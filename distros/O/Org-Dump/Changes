@@ -1,3 +1,8 @@
+0.552   2020-02-07  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Check that argument is defined.
+
+
 0.551   2020-02-06  Released-By: PERLANCAR; Released: no
 
         - First release, split from Org-Parser.

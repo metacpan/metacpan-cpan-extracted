@@ -1,5 +1,8 @@
 Revision history for App-spaceless
 
+0.08      2020-04-20 19:14:22 -0600
+  - Migrate to EUMM.
+
 0.07      2015-12-29 15:50:09 -0500
   - skip directories that do not exist on cygwin.
     as they cannot be made spaceless.

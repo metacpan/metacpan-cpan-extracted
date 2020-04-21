@@ -10,7 +10,7 @@ use Getopt::Long qw( GetOptions );
 use Pod::Usage qw( pod2usage );
 
 # ABSTRACT: Convert PATH type environment variables to spaceless versions
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 
 sub _running_shell
@@ -128,7 +128,7 @@ App::spaceless - Convert PATH type environment variables to spaceless versions
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 DESCRIPTION
 

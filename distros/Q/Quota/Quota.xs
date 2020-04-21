@@ -29,7 +29,7 @@ extern "C" {
 #ifndef NO_MNTENT
 FILE *mtab = NULL;
 #else /* NO_MNTENT */
-#ifdef HAVE_STATVFS
+#ifdef USE_STATVFS_MNTINFO
 struct statvfs *mntp, *mtab = NULL;
 #else
 struct statfs *mntp, *mtab = NULL;
@@ -170,24 +170,33 @@ getnfsquota( char *hostp, char *fsnamep, int uid, int kind,
    * First try USE_EXT_RQUOTAPROG (Extended quota RPC)
    */
   ext_gq_args.gqa_pathp = fsnamep;
-  ext_gq_args.gqa_id = uid;
   ext_gq_args.gqa_type = ((kind != 0) ? GQA_TYPE_GRP : GQA_TYPE_USR);
+  ext_gq_args.gqa_id = uid;
 
   if (callaurpc(hostp, RQUOTAPROG, EXT_RQUOTAVERS, RQUOTAPROC_GETQUOTA,
-                xdr_ext_getquota_args, &ext_gq_args,
-                xdr_getquota_rslt, &gq_rslt) != 0)
+                (xdrproc_t)xdr_ext_getquota_args, (char*)&ext_gq_args,
+                (xdrproc_t)xdr_getquota_rslt, (char*)&gq_rslt) != 0)
 #endif
   {
-     /*
-      * Fall back to RQUOTAPROG if the server (or client via compile switch)
-      * don't support extended quota RPC
-      */
-     gq_args.gqa_pathp = fsnamep;
-     gq_args.gqa_uid = uid;
+     if (kind == 0) {
+       /*
+        * Fall back to RQUOTAPROG if the server (or client via compile switch)
+        * doesn't support extended quota RPC (i.e. only supports user quota)
+        */
+       gq_args.gqa_pathp = fsnamep;
+       gq_args.gqa_uid = uid;
 
-     if (callaurpc(hostp, RQUOTAPROG, RQUOTAVERS, RQUOTAPROC_GETQUOTA,
-                   (xdrproc_t)xdr_getquota_args, (char*)&gq_args,
-                   (xdrproc_t)xdr_getquota_rslt, (char*)&gq_rslt) != 0) {
+       if (callaurpc(hostp, RQUOTAPROG, RQUOTAVERS, RQUOTAPROC_GETQUOTA,
+                     (xdrproc_t)xdr_getquota_args, (char*)&gq_args,
+                     (xdrproc_t)xdr_getquota_rslt, (char*)&gq_rslt) != 0) {
+         return -1;
+       }
+     }
+     else {
+#ifndef USE_EXT_RQUOTA
+       quota_rpc_strerror = "RPC: group quota not supported by RPC";
+       errno = ENOTSUP;
+#endif
        return -1;
      }
   }
@@ -242,14 +251,14 @@ getnfsquota( char *hostp, char *fsnamep, int uid, int kind,
       /* Note: all systems except Linux return relative times */
       if (gq_rslt.GQR_RQUOTA.rq_btimeleft == 0)
         rslt->btime = 0;
-      else if (gq_rslt.GQR_RQUOTA.rq_btimeleft + 10*365*24*60*60 < tv.tv_sec)
+      else if (gq_rslt.GQR_RQUOTA.rq_btimeleft + 10*365*24*60*60 < (u_int)tv.tv_sec)
         rslt->btime = tv.tv_sec + gq_rslt.GQR_RQUOTA.rq_btimeleft;
       else
         rslt->btime = gq_rslt.GQR_RQUOTA.rq_btimeleft;
 
       if (gq_rslt.GQR_RQUOTA.rq_ftimeleft == 0)
         rslt->ftime = 0;
-      else if (gq_rslt.GQR_RQUOTA.rq_ftimeleft + 10*365*24*60*60 < tv.tv_sec)
+      else if (gq_rslt.GQR_RQUOTA.rq_ftimeleft + 10*365*24*60*60 < (u_int)tv.tv_sec)
         rslt->ftime = tv.tv_sec + gq_rslt.GQR_RQUOTA.rq_ftimeleft;
       else
         rslt->ftime = gq_rslt.GQR_RQUOTA.rq_ftimeleft;
@@ -461,6 +470,18 @@ query(dev,uid=getuid(),kind=0)
 
                 if ( (quota_get(qh, &qk_blocks, &qv_blocks) >= 0) &&
                      (quota_get(qh, &qk_files, &qv_files) >= 0) ) {
+
+                  // adapt to common "unlimited" semantics
+                  if ((qv_blocks.qv_softlimit == QUOTA_NOLIMIT) &&
+                      (qv_blocks.qv_hardlimit == QUOTA_NOLIMIT))
+                  {
+                    qv_blocks.qv_hardlimit = qv_blocks.qv_softlimit = 0;
+                  }
+                  if ((qv_files.qv_softlimit == QUOTA_NOLIMIT) &&
+                      (qv_files.qv_hardlimit == QUOTA_NOLIMIT))
+                  {
+                    qv_files.qv_hardlimit = qv_files.qv_softlimit = 0;
+                  }
                   EXTEND(SP, 8);
                   PUSHs(sv_2mortal(newSVnv(Q_DIV(qv_blocks.qv_usage))));
                   PUSHs(sv_2mortal(newSVnv(Q_DIV(qv_blocks.qv_softlimit))));
@@ -558,17 +579,6 @@ setqlim(dev,uid,bs,bh,fs,fh,timelimflag=0,kind=0)
 	int     kind
 	CODE:
 	{
-#ifndef NETBSD_LIBQUOTA
-	  struct dqblk dqblk;
-#endif
-#ifdef USE_IOCTL
-	  struct quotactl qp;
-	  int fd;
-
-	  qp.op = Q_SETQLIM;
-	  qp.uid = uid;
-	  qp.addr = (char *)&dqblk;
-#endif
 	  if(timelimflag != 0)
 	    timelimflag = 1;
 #ifndef NO_RPC
@@ -695,6 +705,7 @@ setqlim(dev,uid,bs,bh,fs,fh,timelimflag=0,kind=0)
               quota_close(qh);
             }
 #else /* not NETBSD_LIBQUOTA */
+	    struct dqblk dqblk;
             memset(&dqblk, 0, sizeof(dqblk));
 	    dqblk.QS_BSOFT = Q_MUL(bs);
 	    dqblk.QS_BHARD = Q_MUL(bh);
@@ -702,24 +713,41 @@ setqlim(dev,uid,bs,bh,fs,fh,timelimflag=0,kind=0)
 	    dqblk.QS_FSOFT = fs;
 	    dqblk.QS_FHARD = fh;
 	    dqblk.QS_FTIME = timelimflag;
+
+            // check for truncation during assignment
+            if ((sizeof(dqblk.QS_BSOFT) <= sizeof(uint64_t)) &&
+                (((uint64_t)bs|(uint64_t)bh|(uint64_t)fs|(uint64_t)fh) & 0xFFFFFFFF00000000ULL))
+            {
+              errno = EINVAL;
+              RETVAL = -1;
+            }
+            else
+            {
 #ifdef USE_IOCTL
-	    if((fd = open(dev, O_RDONLY)) != -1) {
-	      RETVAL = (ioctl(fd, Q_QUOTACTL, &qp) != 0);
-	      close(fd);
-	    }
-	    else
-	      RETVAL = -1;
-#else
+              int fd;
+              if((fd = open(dev, O_RDONLY)) != -1) {
+                struct quotactl qp;
+                qp.op = Q_SETQLIM;
+                qp.uid = uid;
+                qp.addr = (char *)&dqblk;
+
+                RETVAL = (ioctl(fd, Q_QUOTACTL, &qp) != 0);
+                close(fd);
+              }
+              else
+                RETVAL = -1;
+#else  /* not USE_IOCTL */
 #ifdef Q_CTL_V3  /* Linux */
-	    RETVAL = linuxquota_setqlim (dev, uid, (kind != 0), &dqblk);
-#else
+              RETVAL = linuxquota_setqlim (dev, uid, (kind != 0), &dqblk);
+#else  /* not Q_CTL_V3 */
 #ifdef Q_CTL_V2
-	    RETVAL = quotactl (dev, QCMD(Q_SETQUOTA,((kind != 0) ? GRPQUOTA : USRQUOTA)), uid, CADR &dqblk);
+              RETVAL = quotactl (dev, QCMD(Q_SETQUOTA,((kind != 0) ? GRPQUOTA : USRQUOTA)), uid, CADR &dqblk);
 #else
-	    RETVAL = quotactl (Q_SETQLIM, dev, uid, CADR &dqblk);
-#endif
-#endif
-#endif
+              RETVAL = quotactl (Q_SETQLIM, dev, uid, CADR &dqblk);
+#endif  /* not Q_CTL_V2 */
+#endif  /* not Q_CTL_V3 */
+#endif  /* not USE_IOCTL */
+            }
 #endif /* not NETBSD_LIBQUOTA */
 	  }
 	}
@@ -779,10 +807,7 @@ sync(dev=NULL)
 #ifdef Q_CTL_V3  /* Linux */
 #ifdef SGI_XFS
           if ((dev != NULL) && (!strncmp(dev, "(XFS)", 5))) {
-            if (quotactl(QCMD(Q_XQUOTASYNC, XQM_USRQUOTA), dev+5, 0, NULL) != 0)
-              RETVAL = 0;
-            else
-              RETVAL = -1;
+            RETVAL = quotactl(QCMD(Q_XQUOTASYNC, XQM_USRQUOTA), dev+5, 0, NULL);
           }
           else
 #endif
@@ -1011,33 +1036,25 @@ getmntent()
 	    errno = EBADF;
 #endif
 #else /* NO_MNTENT */
-#ifdef OSF_QUOTA
-          char *fstype = getvfsbynumber((int)mntp->f_type);
-#endif
 	  if((mtab != NULL) && mtab_size) {
 	    EXTEND(SP,4);
 	    PUSHs(sv_2mortal(newSVpv(mntp->f_mntfromname, strlen(mntp->f_mntfromname))));
 	    PUSHs(sv_2mortal(newSVpv(mntp->f_mntonname, strlen(mntp->f_mntonname))));
 #ifdef OSF_QUOTA
+            char *fstype = getvfsbynumber((int)mntp->f_type);
             if (fstype != (char *) -1)
               PUSHs(sv_2mortal(newSVpv(fstype, strlen(fstype))));
             else
 #endif
-#ifdef __OpenBSD__
-              /* OpenBSD struct statfs lacks the f_type member (starting with release 2.7) */
-              PUSHs(sv_2mortal(newSVpv("", 0)));
-#else /* !__OpenBSD__ */
-#ifdef HAVE_STATVFS
               PUSHs(sv_2mortal(newSVpv(mntp->f_fstypename, strlen(mntp->f_fstypename))));
-#else
-              PUSHs(sv_2mortal(newSViv((IV)mntp->f_type)));
-#endif /* HAVE_STATVFS */
-#endif /* !__OpenBSD__ */
-#ifdef HAVE_STATVFS
-	    PUSHs(sv_2mortal(newSViv((IV)mntp->f_flag)));
-#else
-	    PUSHs(sv_2mortal(newSViv((IV)mntp->f_flags)));
-#endif
+            PUSHs(sv_2mortal(newSVpvf("%s%s%s%s%s%s%s",
+                                       ((mntp->MNTINFO_FLAG_EL & MNT_LOCAL) ? "local" : "non-local"),
+                                       ((mntp->MNTINFO_FLAG_EL & MNT_RDONLY) ? ",read-only" : ""),
+                                       ((mntp->MNTINFO_FLAG_EL & MNT_SYNCHRONOUS) ? ",sync" : ""),
+                                       ((mntp->MNTINFO_FLAG_EL & MNT_NOEXEC) ? ",noexec" : ""),
+                                       ((mntp->MNTINFO_FLAG_EL & MNT_NOSUID) ? ",nosuid" : ""),
+                                       ((mntp->MNTINFO_FLAG_EL & MNT_ASYNC) ? ",async" : ""),
+                                       ((mntp->MNTINFO_FLAG_EL & MNT_QUOTA) ? ",quotas" : ""))));
 	    mtab_size--;
 	    mntp++;
 	  }

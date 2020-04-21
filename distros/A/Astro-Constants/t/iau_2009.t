@@ -7,6 +7,7 @@ diag("Testing values from IAU 2009/2012 System of Astronomical Constants");
 
 is(SPEED_LIGHT, 299_792_458, 'SPEED_LIGHT');
 delta_within(ASTRONOMICAL_UNIT, 149_597_870_700, 100, 'ASTRONOMICAL_UNIT in metres');
+delta_within(ASTRONOMICAL_UNIT/SPEED_LIGHT, 500, 1, 'travel time for light (Sun to Earth)');
 
 subtest body => sub {
 	delta_within(GRAVITATIONAL * MASS_SOLAR, 1.327_124_4e20, 2.7e16, 'Solar mass parameter [varies on TCB/TDB]');

@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="Collection">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+        This schema definition was developed for Astro::Constants v0.13
+        to validate the PhysicalConstants.xml file after adding data
+        Boyd Duffee, May 2018.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="title" type="xs:string"/>
+        <xs:element name="description" type="xs:string"/>
+        <xs:element name="timestamp" type="xs:string"/>
+        <xs:element name="version" type="xs:string"/>
+        <xs:element name="reference_standard" type="xs:string"/>
+        <xs:element ref="link"/>
+        <xs:element ref="items"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="link">
+    <xs:complexType>
+      <xs:attribute name="href" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="items">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="PhysicalConstant" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PhysicalConstant">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="name" maxOccurs="unbounded" minOccurs="1"/>
+        <xs:element ref="alternateName" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="symbol" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="description" type="xs:string"/>
+        <xs:element ref="value" minOccurs="1" maxOccurs="unbounded"/>
+        <xs:element ref="uncertainty" maxOccurs="unbounded"/>
+        <xs:element name="dimensions" maxOccurs="1"/>
+        <xs:element name="maxValue" type="xs:string"/>
+        <xs:element name="minValue" type="xs:string"/>
+        <xs:element ref="source" maxOccurs="unbounded"/>
+        <xs:element ref="categoryList"/>
+        <xs:element ref="deprecated" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="name">
+    <xs:complexType mixed="true">
+      <xs:attribute name="type" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="alternateName">
+    <xs:complexType mixed="true">
+      <xs:attribute name="type" type="xs:string"/>
+      <xs:attribute name="version" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="symbol">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+      The symbol element can contain a string of ascii characters
+      or uses the symbolRepresentation definition in order to hold more information
+    </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice>
+        <xs:element ref="symbolRepresentation" minOccurs="0"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="value">
+    <xs:complexType mixed="true">
+      <xs:attribute name="system" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="uncertainty">
+    <xs:complexType mixed="true">
+      <xs:attribute name="type" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="dimensions">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+	      The seven SI base units and their dimensions
+	      as set out under BIPM in 2019
+	      s    second    time
+	      m    metre     length
+	      kg   kilogram  mass
+	      A    ampere    electric current
+	      K	   kelvin    thermodynamic temperature
+	      mol  mole      amount of substance (enplethy)
+	      cd   candela   luminous intensity
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="time" type="xs:integer" default="0"/>
+      <xs:attribute name="length" type="xs:integer" default="0"/>
+      <xs:attribute name="mass" type="xs:integer" default="0"/>
+      <xs:attribute name="current" type="xs:integer" default="0"/>
+      <xs:attribute name="temperature" type="xs:integer" default="0"/>
+      <xs:attribute name="mole" type="xs:integer" default="0"/>
+      <xs:attribute name="candela" type="xs:integer" default="0"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="source">
+    <xs:complexType>
+      <xs:attribute name="url" type="xs:anyURI" use="required"/>
+      <xs:attribute name="authority" type="xs:string"/>
+      <xs:attribute name="year" type="xs:integer"/>
+      <xs:attribute name="reference" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="categoryList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="category" type="xs:string" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="symbolRepresentation">
+    <xs:complexType>
+      <xs:choice maxOccurs="6">
+        <xs:element name="unicode" type="xs:string"/>
+        <xs:element name="codepoint" type="xs:string"/>
+        <xs:element name="description" type="xs:string"/>
+        <xs:element name="latex" type="xs:string"/>
+        <xs:element name="html" type="xs:string"/>
+        <xs:element name="ascii" type="xs:string"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="deprecated">
+    <xs:complexType>
+      <xs:attribute name="date" type="xs:string" use="required"/>
+      <xs:attribute name="version" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

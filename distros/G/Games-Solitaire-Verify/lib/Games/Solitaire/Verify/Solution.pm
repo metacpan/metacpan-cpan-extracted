@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Solution;
-$Games::Solitaire::Verify::Solution::VERSION = '0.2301';
+$Games::Solitaire::Verify::Solution::VERSION = '0.2302';
 use warnings;
 use strict;
 
@@ -185,7 +185,7 @@ of Freecell Solver (or a similar solver)
 
 =head1 VERSION
 
-version 0.2301
+version 0.2302
 
 =head1 SYNOPSIS
 

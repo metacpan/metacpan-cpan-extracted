@@ -1,3 +1,7 @@
+0.201110  2020-04-20 23:07:02+02:00 Europe/Brussels
+    - Changes
+      - Blast::Table: refactored next_hit/next_query methods for speed
+
 0.180470  2018-02-16 14:31:00+01:00 Europe/Brussels
     - Additions
       - CdHit/Uclust: new clust_mapper method

@@ -2,7 +2,7 @@ package Bio::FastParsers;
 # ABSTRACT: Classes for parsing bioinformatic programs output
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::FastParsers::VERSION = '0.180470';
+$Bio::FastParsers::VERSION = '0.201110';
 use strict;
 use warnings;
 
@@ -23,7 +23,7 @@ Bio::FastParsers - Classes for parsing bioinformatic programs output
 
 =head1 VERSION
 
-version 0.180470
+version 0.201110
 
 =head1 DESCRIPTION
 

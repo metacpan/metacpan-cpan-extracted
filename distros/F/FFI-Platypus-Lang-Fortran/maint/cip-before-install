@@ -3,5 +3,5 @@
 set -ex
 
 cip sudo apt-get update
-cip sudo apt-get -y install gfortran-6 libffi-dev
+cip sudo apt-get -y install gfortran libffi-dev
 

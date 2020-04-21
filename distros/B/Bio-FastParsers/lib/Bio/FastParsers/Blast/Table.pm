@@ -1,6 +1,6 @@
 package Bio::FastParsers::Blast::Table;
 # ABSTRACT: Front-end class for tabular BLAST parser
-$Bio::FastParsers::Blast::Table::VERSION = '0.180470';
+$Bio::FastParsers::Blast::Table::VERSION = '0.201110';
 use Moose;
 use namespace::autoclean;
 
@@ -70,6 +70,10 @@ my @attrs = qw(
 sub next_hsp {
     my $self = shift;
 
+    # optional args for next_hit/next_query mode
+    my $curr_query = shift;
+    my $curr_hit   = shift;
+
     LINE:
     while (my $line = $self->_next_line) {
 
@@ -100,6 +104,17 @@ sub next_hsp {
         # [15.] query_end
         # [16.] hit_start
         # [17.] hit_end
+
+        # optionally skip current line in next_hit/next_query mode
+        if (defined $curr_query) {
+            if (defined $curr_hit) {
+                next LINE if $fields[0] eq $curr_query
+                          && $fields[1] eq $curr_hit;
+            }
+            else {
+                next LINE if $fields[0] eq $curr_query;
+            }
+        }
 
         # coerce numeric fields to numbers...
         # ... and handle missing bitscores and evalues from USEARCH reports
@@ -140,35 +155,14 @@ sub next_hsp {
 
 sub next_hit {
     my $self = shift;
-
-    # start from wherever we were
-    my $curr_query = $self->_last_query;
-    my $curr_hit   = $self->_last_hit;
-
-    # consume HSPs as long as no new hit (or query)
-    while (my $hsp = $self->next_hsp) {
-        return $hsp
-            if $hsp->query_id ne $curr_query || $hsp->hit_id ne $curr_hit;
-    }
-
-    return;
+    return $self->next_hsp( $self->_last_query, $self->_last_hit );
 }
 
 
 
 sub next_query {
     my $self = shift;
-
-    # start from wherever we were
-    my $curr_query = $self->_last_query;
-
-    # consume HSPs as long as no new query
-    while (my $hsp = $self->next_hsp) {
-        return $hsp
-            if $hsp->query_id ne $curr_query;
-    }
-
-    return;
+    return $self->next_hsp( $self->_last_query );
 }
 
 
@@ -185,7 +179,7 @@ Bio::FastParsers::Blast::Table - Front-end class for tabular BLAST parser
 
 =head1 VERSION
 
-version 0.180470
+version 0.201110
 
 =head1 SYNOPSIS
 

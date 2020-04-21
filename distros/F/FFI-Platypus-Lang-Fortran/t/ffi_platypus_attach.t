@@ -16,8 +16,9 @@ $ffi->lib($libtest);
 
 subtest 'Fortran 77' => sub {
 
-  $ffi->attach( add => ['integer*', 'integer*'] => 'integer');
-  is add(\1,\2), 3, 'add(\1,\2) = 3';
+  $ffi->attach( iadd => ['integer*', 'integer*'] => 'integer');
+  my $r = iadd(\1,\2);
+  is $r, 3, 'iadd(\1,\2) = 3' or diag sprintf("r = %x\n", $r);
 
 };
 

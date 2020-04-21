@@ -57,7 +57,7 @@
          "web" : "https://github.com/perlancar/perl-Org-Dump"
       }
    },
-   "version" : "0.551",
+   "version" : "0.552",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

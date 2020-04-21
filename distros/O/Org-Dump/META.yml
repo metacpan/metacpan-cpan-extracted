@@ -26,7 +26,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Org-Dump
   homepage: https://metacpan.org/release/Org-Dump
   repository: git://github.com/perlancar/perl-Org-Dump.git
-version: '0.551'
+version: '0.552'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

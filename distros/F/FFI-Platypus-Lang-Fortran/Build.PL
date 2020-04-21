@@ -31,6 +31,7 @@ my $builder = My::ModuleBuild->new(
     'File::Which'   => 0,
     'Module::Build::FFI' => '0.22',
     'FFI::Build'    => '0.04',
+    'Test::More'    => '0.98',
   },
   requires => {
     'perl'          => '5.008001',

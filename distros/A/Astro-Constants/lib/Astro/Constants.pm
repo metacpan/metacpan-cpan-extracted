@@ -1,13 +1,11 @@
 package Astro::Constants;
-# ABSTRACT: this library provides physical constants for use in Astronomy
-$Astro::Constants::VERSION = '0.1100';
+# ABSTRACT: This library provides physical constants for use in Physics and Astronomy based on values from 2018 CODATA.
+$Astro::Constants::VERSION = '0.1401';
+use 5.006;
 use strict;
 use warnings;
 
   'They are not constant but are changing still. - Cymbeline, Act II, Scene 5';
-
-
-1;
 
 __END__
 
@@ -17,11 +15,11 @@ __END__
 
 =head1 NAME
 
-Astro::Constants - this library provides physical constants for use in Astronomy
+Astro::Constants - This library provides physical constants for use in Physics and Astronomy based on values from 2018 CODATA.
 
 =head1 VERSION
 
-version 0.1100
+version 0.1401
 
 =head1 SYNOPSIS
 
@@ -34,20 +32,26 @@ version 0.1100
 =head1 DESCRIPTION
 
 This module provides physical and mathematical constants for use
-in Astronomy and Astrophysics.  The two metric systems of units,
-MKS and CGS, are kept in two separate modules and are called by
-name explicitly.
-It allows you to choose between constants in units of
-centimetres /grams /seconds
-with B<Astro::Constants::CGS> and metres /kilograms /seconds with
-B<Astro::Constants::MKS>.
+in Astronomy and Astrophysics.
 
+The values are stored in F<Physical_Constants.xml> in the B<data> directory
+and are mostly based on the 2018 CODATA values from NIST.
+
+B<NOTE:> Other popular languages are still using I<2014> CODATA values
+for their constants and may produce different results in comparison.
+On the roadmap is a set of modules to allow you to specify the year or
+data set for the values of constants, defaulting to the most recent.
+
+The C<:long> tag imports all the constants in their long name forms
+(i.e. GRAVITATIONAL).  Useful subsets can be imported with these tags:
+C<:fundamental> C<:conversion> C<:mathematics> C<:cosmology> 
+C<:planetary> C<:electromagnetic> or C<:nuclear>.
+Alternate names such as LIGHT_SPEED instead of SPEED_LIGHT or HBAR
+instead of H_BAR are imported with C<:alternates>.  I'd like
+to move away from their use, but they have been in the module for years.
 Short forms of the constant names are included to provide backwards
 compatibility with older versions based on Jeremy Bailin's Astroconst
 library and are available through the import tag C<:short>.
-
-The values are stored in F<Physical_Constants.xml> in the B<data> directory
-and are mostly based on the 2014 CODATA values from NIST.
 
 Long name constants are constructed with the L<constant> pragma and
 are not interpolated in double quotish situations because they are 
@@ -55,7 +59,6 @@ really inlined functions.
 Short name constants are constructed with the age-old idiom of fiddling
 with the symbol table using typeglobs, e.g. C<*PI = \3.14159>,
 and may be slower than the long name constants.
-I<This could do with some benchmarking.>
 
 =head2 Why use this module
 
@@ -74,14 +77,21 @@ and which meeting of which standards body is responsible for its value?
 
 Trusting someone else's code does carry some risk, which you I<should> consider, 
 but have you also considered the risk of doing it yourself with no one else 
-to check your work?
+to check your work?  And, are you going to check for the latest values from NIST
+every 4 years?
+
+=head3 And plus, it's B<FASTER>
+
+Benchmarking has shown that the imported constants can be more than 3 times
+faster than using variables or other constant modules because of the way
+the compiler optimizes your code.  So, if you've got a lot of calculating to do,
+this is the module to do it with.
 
 =head1 METHODS
 
 =head2 SPEED_LIGHT
 
-    2.99792458e8	MKS
-    2.99792458e10	CGS
+    299792458	MKS
 
 speed of light in a vacuum
 
@@ -90,8 +100,7 @@ as well as the alternate name C<LIGHT_SPEED> (imported using the :alternate tag 
 
 =head2 BOLTZMANN
 
-    1.38064852e-23	MKS
-    1.38064852e-16	CGS
+    1.380649e-23	MKS
 
 Boltzmann's constant
 
@@ -99,8 +108,7 @@ This constant is also available using the short name C<$A_k>
 
 =head2 GRAVITATIONAL
 
-    6.67408e-11	MKS
-    6.67408e-8	CGS
+    6.67430e-11	MKS
 
 universal gravitational constant
 
@@ -108,8 +116,7 @@ This constant is also available using the short name C<$A_G>
 
 =head2 ELECTRON_VOLT
 
-    1.6021766208e-19	MKS
-    1.6021766208e-12	CGS
+    1.602176634e-19	MKS
 
 electron volt
 
@@ -117,8 +124,7 @@ This constant is also available using the short name C<$A_eV>
 
 =head2 PLANCK
 
-    6.626070040e-34	MKS
-    6.626070040e-27	CGS
+    6.62607015e-34	MKS
 
 Planck constant
 
@@ -126,28 +132,25 @@ This constant is also available using the short name C<$A_h>
 
 =head2 H_BAR
 
-    1.054571800e-34	MKS
-    1.054571800e-27	CGS
+    1.0545718176763e-34	MKS
 
-Planck's constant /2pi
+the reduced Planck constant, Planck's constant (exact) /2pi
 
 This constant is also available using the short name C<$A_hbar>
 as well as the alternate name C<HBAR> (imported using the :alternate tag for backwards compatibility)
 
-=head2 ELECTRON_CHARGE
+=head2 CHARGE_ELEMENTARY
 
-    1.6021766208e-19	MKS
-    4.8032046729e-10	CGS
+    1.602176634e-19	MKS
 
 electron charge (defined positive)
 
 This constant is also available using the short name C<$A_e>
-as well as the alternate name C<CHARGE_ELEMENTARY> (imported using the :alternate tag for backwards compatibility)
+as well as the alternate name C<ELECTRON_CHARGE> (imported using the :alternate tag for backwards compatibility)
 
 =head2 STEFAN_BOLTZMANN
 
-    5.670367e-8	MKS
-    5.670367e-5	CGS
+    5.670374419e-8	MKS
 
 Stefan-Boltzmann constant
 
@@ -156,7 +159,6 @@ This constant is also available using the short name C<$A_sigma>
 =head2 DENSITY_RADIATION
 
     7.565723e-16	MKS
-    7.565723e-15	CGS
 
 radiation density constant, 4 * sigma / c
 
@@ -165,8 +167,7 @@ as well as the alternate name C<A_RAD> (imported using the :alternate tag for ba
 
 =head2 WIEN
 
-    2.8977729e-3	MKS
-    2.8977729e-1	CGS
+    2.897771955e-3	MKS
 
 Wien wavelength displacement law constant
 
@@ -174,8 +175,7 @@ This constant is also available using the short name C<$A_Wien>
 
 =head2 ALPHA
 
-    7.2973525664e-3	MKS
-    7.2973525664e-3	CGS
+    7.2973525693e-3	MKS
 
 fine structure constant
 
@@ -192,8 +192,7 @@ as well as the alternate name C<VACUUM_IMPEDANCE> (imported using the :alternate
 
 =head2 PERMITIV_FREE_SPACE
 
-    8.854187817e-12	MKS
-    1	CGS
+    8.8541878128e-12	MKS
 
 permittivity of free space, epsilon_0, the electric constant
 
@@ -202,8 +201,7 @@ as well as the alternate name C<PERMITIVITY_0> (imported using the :alternate ta
 
 =head2 PERMEABL_FREE_SPACE
 
-    1.2566370614e-6	MKS
-    1	CGS
+    1.25663706212e-6	MKS
 
 permeability of free space, mu_0, the magnetic constant
 
@@ -229,9 +227,9 @@ as well as the alternate name C<FOURPI> (imported using the :alternate tag for b
 
 =head2 STERADIAN
 
-    57.2957795130823
+    3282.80635001174
 
-a measure of solid angle in square degrees
+a measure of solid angle in square degrees and a SI derived unit
 
 This constant is also available using the short name C<$A_ster>
 
@@ -245,17 +243,15 @@ This constant is also available using the short name C<$A_exp>
 
 =head2 ATOMIC_MASS_UNIT
 
-    1.660539040e-27	MKS
-    1.660539040e-24	CGS
+    1.66053906660e-27	MKS
 
-atomic mass unit, 1 u
+unified atomic mass unit, 1 u
 
 This constant is also available using the short name C<$A_amu>
 
 =head2 PARSEC
 
     3.08567758149e16	MKS
-    3.08567758149e18	CGS
 
 parsec
 
@@ -264,7 +260,6 @@ This constant is also available using the short name C<$A_pc>
 =head2 ASTRONOMICAL_UNIT
 
     149_597_870_700	MKS
-    1.496e13	CGS
 
 astronomical unit
 
@@ -273,7 +268,6 @@ This constant is also available using the short name C<$A_AU>
 =head2 LIGHT_YEAR
 
     9_460_730_472_580_800	MKS
-    9.4607304725808e17	CGS
 
 the distance that light travels in vacuum in one Julian year
 
@@ -282,7 +276,6 @@ This constant is also available using the short name C<$A_ly>
 =head2 ANGSTROM
 
     1e-10	MKS
-    1e-8	CGS
 
 Angstrom
 
@@ -291,15 +284,14 @@ This constant is also available using the short name C<$A_AA>
 =head2 JANSKY
 
     1e-26	MKS
-    1e-23	CGS
 
-Jansky
+Jansky, a unit of flux density
 
 This constant is also available using the short name C<$A_Jy>
 
 =head2 AVOGADRO
 
-    6.022140857e23
+    6.02214076e23
 
 Avogadro's number
 
@@ -341,7 +333,6 @@ the period between successive passages of the Sun (as seen from the geocenter) t
 =head2 MASS_SOLAR
 
     1.9884e30	MKS
-    1.9884e33	CGS
 
 solar mass
 
@@ -350,8 +341,7 @@ as well as the alternate name C<SOLAR_MASS> (imported using the :alternate tag f
 
 =head2 LUMINOSITY_SOLAR
 
-    3.846e26	MKS
-    3.846e33	CGS
+    3.828e26	MKS
 
 solar luminosity
 
@@ -360,10 +350,13 @@ as well as the alternate name C<SOLAR_LUMINOSITY> (imported using the :alternate
 
 =head2 DENSITY_CRITICAL_RHOc
 
-    1.8791e-26	MKS
-    1.8791e-29	CGS
+    1.87834e-26	MKS
 
-critical density /h^2
+Critical Density parameter expressed in terms of
+
+	      ρ_c / h² = 3 × (100 km s⁻¹ Mpc⁻¹)² / 8πG
+
+Multiply by the square of the dimensionless Hubble parameter, h, in your calculations to get the actual value
 
 This constant is also available using the short name C<$A_rhoc>
 as well as the alternate name C<RHO_C> (imported using the :alternate tag for backwards compatibility)
@@ -378,7 +371,7 @@ This constant is also available using the short name C<$A_tH>
 
 =head2 TEMPERATURE_CMB
 
-    2.725
+    2.72548
 
 cosmic microwave background temperature in Kelvin
 
@@ -389,7 +382,7 @@ as well as the alternate name C<CMB_TEMPERATURE> (imported using the :alternate 
 
     -26.74
 
-solar V magnitude
+visual brightness of the Sun
 
 This constant is also available using the short name C<$A_Vsun>
 as well as the alternate name C<SOLAR_V_MAG> (imported using the :alternate tag for backwards compatibility)
@@ -406,7 +399,6 @@ as well as the alternate name C<SOLAR_V_ABS_MAG> (imported using the :alternate 
 =head2 RADIUS_SOLAR
 
     6.96e8	MKS
-    6.96e10	CGS
 
 solar radius
 
@@ -416,7 +408,6 @@ as well as the alternate name C<SOLAR_RADIUS> (imported using the :alternate tag
 =head2 MASS_EARTH
 
     5.9722e24	MKS
-    5.9722e27	CGS
 
 mass of Earth
 
@@ -426,7 +417,6 @@ as well as the alternate name C<EARTH_MASS> (imported using the :alternate tag f
 =head2 RADIUS_EARTH
 
     6.378_136_6e6	MKS
-    6.378_136_6e8	CGS
 
 radius of Earth
 
@@ -435,9 +425,9 @@ as well as the alternate name C<EARTH_RADIUS> (imported using the :alternate tag
 
 =head2 TEMPERATURE_SOLAR_SURFACE
 
-    5778
+    5772
 
-surface temperature of sun
+surface temperature of sun (photosphere)
 
 This constant is also available using the short name C<$A_Tsun>
 as well as the alternate name C<SOLAR_TEMPERATURE> (imported using the :alternate tag for backwards compatibility)
@@ -445,7 +435,6 @@ as well as the alternate name C<SOLAR_TEMPERATURE> (imported using the :alternat
 =head2 DENSITY_SOLAR
 
     1408	MKS
-    1.408	CGS
 
 mean solar density
 
@@ -454,8 +443,7 @@ as well as the alternate name C<SOLAR_DENSITY> (imported using the :alternate ta
 
 =head2 DENSITY_EARTH
 
-    5514	MKS
-    5.514	CGS
+    5515	MKS
 
 mean Earth density
 
@@ -464,8 +452,7 @@ as well as the alternate name C<EARTH_DENSITY> (imported using the :alternate ta
 
 =head2 GRAVITY_SOLAR
 
-    274.0	MKS
-    27400	CGS
+    274.78	MKS
 
 solar surface gravity
 
@@ -474,8 +461,7 @@ as well as the alternate name C<SOLAR_GRAVITY> (imported using the :alternate ta
 
 =head2 GRAVITY_EARTH
 
-    9.78	MKS
-    978	CGS
+    9.80665	MKS
 
 Earth surface gravity
 
@@ -485,7 +471,6 @@ as well as the alternate name C<EARTH_GRAVITY> (imported using the :alternate ta
 =head2 RADIUS_LUNAR
 
     1.7381e6	MKS
-    1.7381e8	CGS
 
 lunar radius
 
@@ -494,8 +479,7 @@ as well as the alternate name C<LUNAR_RADIUS> (imported using the :alternate tag
 
 =head2 MASS_LUNAR
 
-    7.342e22	MKS
-    7.342e25	CGS
+    7.346e22	MKS
 
 lunar mass
 
@@ -504,8 +488,7 @@ as well as the alternate name C<LUNAR_MASS> (imported using the :alternate tag f
 
 =head2 AXIS_SM_LUNAR
 
-    3.844e8	MKS
-    3.844e10	CGS
+    3.84402e8	MKS
 
 lunar orbital semi-major axis
 
@@ -523,8 +506,7 @@ as well as the alternate name C<LUNAR_ECCENTRICITY> (imported using the :alterna
 
 =head2 THOMSON_CROSS_SECTION
 
-    6.6524587158e-29	MKS
-    6.6524587158e-25	CGS
+    6.6524587321e-29	MKS
 
 Thomson cross-section
 
@@ -533,8 +515,7 @@ as well as the alternate name C<THOMSON_XSECTION> (imported using the :alternate
 
 =head2 MASS_ELECTRON
 
-    9.10938356e-31	MKS
-    9.10938356e-28	CGS
+    9.1093837015e-31	MKS
 
 mass of electron
 
@@ -543,8 +524,7 @@ as well as the alternate name C<ELECTRON_MASS> (imported using the :alternate ta
 
 =head2 MASS_PROTON
 
-    1.672621898e-27	MKS
-    1.672621898e-24	CGS
+    1.67262192369e-27	MKS
 
 mass of proton
 
@@ -553,8 +533,7 @@ as well as the alternate name C<PROTON_MASS> (imported using the :alternate tag 
 
 =head2 MASS_NEUTRON
 
-    1.674927471e-27	MKS
-    1.674927471e-24	CGS
+    1.67492749804e-27	MKS
 
 neutron mass
 
@@ -563,16 +542,17 @@ as well as the alternate name C<NEUTRON_MASS> (imported using the :alternate tag
 
 =head2 MASS_HYDROGEN
 
-    1.67372e-24
+    1.6738e-27
 
-mass of Hydrogen atom
+mass of Hydrogen atom --   
+This value is from the IUPAC and is a little smaller than MASS_PROTON + MASS_ELECTRON, but within the uncertainty given here.  The current value is 1.008u +/- 0.0002 derived from a range of terrestrial materials.  If this is for precision work, you had best understand what you're using.  See https://iupac.org/what-we-do/periodic-table-of-elements/
 
 This constant is also available using the short name C<$A_mH>
 as well as the alternate name C<HYDROGEN_MASS> (imported using the :alternate tag for backwards compatibility)
 
 =head2 MASS_ALPHA
 
-    6.644_657_230e-27
+    6.6446573357e-27
 
 mass of alpha particle
 
@@ -580,8 +560,7 @@ This constant is also available using the short name C<$A_ma>
 
 =head2 RADIUS_ELECTRON
 
-    2.8179403227e-15	MKS
-    2.8179403227e-13	CGS
+    2.8179403262e-15	MKS
 
 classical electron radius
 
@@ -590,13 +569,28 @@ as well as the alternate name C<ELECTRON_RADIUS> (imported using the :alternate 
 
 =head2 RADIUS_BOHR
 
-    5.2917721067e-11	MKS
-    5.2917721067e-9	CGS
+    5.29177210903e-11	MKS
 
 Bohr radius
 
 This constant is also available using the short name C<$A_a0>
 as well as the alternate name C<BOHR_RADIUS> (imported using the :alternate tag for backwards compatibility)
+
+=head2 RADIUS_JUPITER
+
+    69_911_000	MKS
+
+Volumetric mean radius of Jupiter
+
+This constant is also available using the short name C<$A_rjup>
+
+=head2 MASS_JUPITER
+
+    1.89819e27	MKS
+
+mass of Jupiter
+
+This constant is also available using the short name C<$A_mjup>
 
 =head2 pretty
 
@@ -618,17 +612,49 @@ Looking to fix this in future versions.
 Nothing is exported by default, so the module doesn't clobber any of your variables.  
 Select from the following tags:
 
--=for :list
--* :long                (use this one to get the most constants)
--* :short
--* :fundamental
--* :conversion
--* :mathematics
--* :cosmology
--* :planetary
--* :electromagnetic
--* :nuclear
--* :alternates
+=over 4
+
+=item *
+
+C<:long>                (use this one to get the most constants)
+
+=item *
+
+C<:short>
+
+=item *
+
+C<:fundamental>
+
+=item *
+
+C<:conversion>
+
+=item *
+
+C<:mathematics>
+
+=item *
+
+C<:cosmology>
+
+=item *
+
+C<:planetary>
+
+=item *
+
+C<:electromagnetic>
+
+=item *
+
+C<:nuclear>
+
+=item *
+
+C<:alternates>
+
+=back
 
 =head2 Deprecated functions
 
@@ -654,6 +680,10 @@ L<NIST|http://physics.nist.gov>
 =item *
 
 L<Astronomical Almanac|http://asa.usno.navy.mil>
+
+=item *
+
+L<IAU 2015 Resolution B3|http://iopscience.iop.org/article/10.3847/0004-6256/152/2/41/meta>
 
 =item *
 
@@ -781,7 +811,7 @@ Boyd Duffee <duffee@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Boyd Duffee.
+This software is copyright (c) 2020 by Boyd Duffee.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

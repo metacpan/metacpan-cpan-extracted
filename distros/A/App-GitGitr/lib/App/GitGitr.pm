@@ -1,6 +1,6 @@
 package App::GitGitr;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGitr::VERSION = '0.906';
+$App::GitGitr::VERSION = '0.907';
 # ABSTRACT: GitGitr command support. See L<gitgitr> for full documentation.
 
 use parent 'App::Cmd::Simple';
@@ -183,15 +183,15 @@ App::GitGitr - GitGitr command support. See L<gitgitr> for full documentation.
 
 =head1 VERSION
 
-version 0.906
+version 0.907
 
 =head1 AUTHOR
 
-John SJ Anderson <genehack@genehack.org>
+John SJ Anderson <john@genehack.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by John SJ Anderson.
+This software is copyright (c) 2020 by John SJ Anderson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -48,8 +48,8 @@
             "Data::Random::Structure" : "0",
             "Data::Random::Structure::UTF8" : "0.06",
             "Test::More" : "0",
-            "Test::Pod" : "0",
-            "Test::Script" : "0"
+            "Test::Pod" : "1.51",
+            "Test::Script" : "1.09"
          }
       }
    },
@@ -65,6 +65,6 @@
          "web" : "https://github.com/hadjiprocopis/data-roundtrip"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

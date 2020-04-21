@@ -29,8 +29,8 @@ my %WriteMakefileArgs = (
         'ExtUtils::MakeMaker' => '0',
     },
     TEST_REQUIRES => {
-        'Test::Script' => '0',
-        'Test::Pod' => '0',
+        'Test::Script' => '1.09',
+        'Test::Pod' => '1.51',
         'Test::More' => '0',
         'Benchmark' => '0',
 	'Data::Random::Structure' => '0',

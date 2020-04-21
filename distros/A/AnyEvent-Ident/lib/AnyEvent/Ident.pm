@@ -8,7 +8,7 @@ our @ISA = qw( Exporter );
 our @EXPORT_OK = qw( ident_server ident_client );
 
 # ABSTRACT: Simple asynchronous ident client and server
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 
 # keep the server object in scope so that
@@ -56,7 +56,7 @@ AnyEvent::Ident - Simple asynchronous ident client and server
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

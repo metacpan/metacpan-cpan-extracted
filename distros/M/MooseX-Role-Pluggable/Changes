@@ -1,5 +1,13 @@
 Revision history for MooseX-Role-Pluggable
 
+0.07      2020-04-20 15:39:27-07:00 America/Los_Angeles
+
+  * Released because I forgot to update the changefile...
+
+0.06      2020-04-20 15:37:43-07:00 America/Los_Angeles
+
+  * Whoops -- updated METADATA
+
 0.05      2014-07-24 12:21:28-07:00 America/Los_Angeles
 
         Added support for build args (Sean Maguire)

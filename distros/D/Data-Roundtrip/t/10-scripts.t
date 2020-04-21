@@ -12,7 +12,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION='0.09';
+our $VERSION='0.10';
 
 binmode STDERR, ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';

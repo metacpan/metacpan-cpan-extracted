@@ -1,6 +1,6 @@
 package Bio::FastParsers::Blast::Xml::Iteration;
 # ABSTRACT: NCBI BLAST DTD-derived internal class
-$Bio::FastParsers::Blast::Xml::Iteration::VERSION = '0.180470';
+$Bio::FastParsers::Blast::Xml::Iteration::VERSION = '0.201110';
 use Moose;
 use namespace::autoclean;
 
@@ -129,7 +129,7 @@ Bio::FastParsers::Blast::Xml::Iteration - NCBI BLAST DTD-derived internal class
 
 =head1 VERSION
 
-version 0.180470
+version 0.201110
 
 =head1 SYNOPSIS
 

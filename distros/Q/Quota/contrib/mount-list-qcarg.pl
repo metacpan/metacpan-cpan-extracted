@@ -10,25 +10,34 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 use blib;
+use warnings;
+use strict;
 use Quota;
 
-my($fsname,$path,$fstyp);
+# Note the reason for having a separate loop for getmntent() and the
+# following loop using getgcarg() is that the latter internally also
+# iterates using getmntent(), but mount table iterations cannot be
+# nested due to using global state internally.
 
+my @Mtab;
 if(!Quota::setmntent()) {
-   while(($fsname,$path,$fstyp,$opt) = Quota::getmntent())
-   {
-      push(@Mtab, "#$fsname#$path#$fstyp#$opt#");
-   }
+  while(my @ent = Quota::getmntent())
+  {
+    push @Mtab, \@ent;
+  }
 }
 Quota::endmntent();
 
-print "Quota arg type=". Quota::getqcargtype() ."\n\n";
+print "OS: ". `uname -rs` ."\n";
+print "Quota arg type: ". Quota::getqcargtype() ."\n\n";
 
-foreach (@Mtab)
+foreach my $ent (@Mtab)
 {
-   $path = (split(/#/))[2];
-   $qcarg = Quota::getqcarg($path);
-   $qcarg = "*UNDEF*" unless defined $qcarg;
-   $dev = (stat($path))[0];
-   print "${_}$qcarg#$dev\n";
+  my ($fsname,$path,$fstyp,$fsopt) = @$ent;
+
+  my $qcarg = Quota::getqcarg($path);
+  $qcarg = "*UNDEF*" unless defined $qcarg;
+  my $dev = (stat($path))[0];
+
+  print "#$fsname#$path#$fstyp#$fsopt#$qcarg#$dev\n";
 }

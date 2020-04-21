@@ -1,5 +1,5 @@
 package MooseX::Role::Pluggable;
-$MooseX::Role::Pluggable::VERSION = '0.05';
+$MooseX::Role::Pluggable::VERSION = '0.07';
 # ABSTRACT: add plugins to your Moose classes
 use Class::Load 'load_class';
 use Moose::Role;
@@ -135,7 +135,7 @@ MooseX::Role::Pluggable - add plugins to your Moose classes
 
 =head1 VERSION
 
-version 0.05
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -237,11 +237,11 @@ under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-John SJ Anderson <genehack@genehack.org>
+John SJ Anderson <john@genehack.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by John SJ Anderson.
+This software is copyright (c) 2020 by John SJ Anderson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

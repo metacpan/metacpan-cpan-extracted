@@ -6,7 +6,11 @@ use warnings;
 use Test::More;
 
 use Struct::Dumb;
-use Data::Dump 'pp';
+BEGIN {
+   plan skip_all => "No Data::Dump" unless eval { require Data::Dump; };
+
+   Data::Dump->import( 'pp' );
+}
 
 struct Point => [qw( x y )];
 

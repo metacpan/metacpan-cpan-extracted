@@ -12,14 +12,12 @@ struct getquota_args {
 };
 typedef struct getquota_args getquota_args;
 
-#ifdef USE_EXT_RQUOTA
 struct ext_getquota_args {
         char *gqa_pathp;
-        int gqa_id;
         int gqa_type;
+        int gqa_id;
 };
 typedef struct ext_getquota_args ext_getquota_args;
-#endif
 
 struct rquota {
 	int rq_bsize;
@@ -68,9 +66,7 @@ extern  bool_t xdr_rquota(XDR *, rquota*);
 extern  bool_t xdr_gqr_status(XDR *, gqr_status*);
 extern  bool_t xdr_getquota_rslt(XDR *, getquota_rslt*);
 
-#ifdef USE_EXT_RQUOTA
 #define	EXT_RQUOTAVERS ((unsigned long)(2))
 extern  bool_t xdr_ext_getquota_args(XDR *, ext_getquota_args*);
-#endif
 
 #endif /* !_RQUOTA_H_RPCGEN */

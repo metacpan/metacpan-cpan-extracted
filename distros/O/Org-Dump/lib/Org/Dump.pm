@@ -1,9 +1,9 @@
 package Org::Dump;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-06'; # DATE
+our $DATE = '2020-02-07'; # DATE
 our $DIST = 'Org-Dump'; # DIST
-our $VERSION = '0.551'; # VERSION
+our $VERSION = '0.552'; # VERSION
 
 use 5.010001;
 use strict;
@@ -35,6 +35,7 @@ sub new {
 
 sub _dump {
     my ($self, $el, $indent_level) = @_;
+    die "Please specify element" unless defined $el;
     $indent_level //= 0;
     my @res;
 
@@ -139,7 +140,7 @@ Org::Dump - Show Org document/element object in a human-friendly format
 
 =head1 VERSION
 
-This document describes version 0.551 of Org::Dump (from Perl distribution Org-Dump), released on 2020-02-06.
+This document describes version 0.552 of Org::Dump (from Perl distribution Org-Dump), released on 2020-02-07.
 
 =head1 FUNCTIONS
 

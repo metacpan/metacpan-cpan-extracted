@@ -1,6 +1,7 @@
 Notes
 =====
-
+CHANGES - Remember to copy new files to constants_YEAR_VERSION.xml 
+	and move the older constant file to old_versions/
 
 Not in NIST
 ===========
@@ -18,7 +19,6 @@ A_yr    YEAR    year    3.156e7 0.001
 
 Need to check
 =============
-HYDROGEN_MASS
 HUBBLE_TIME
 RHO_C
 CMB_TEMPERATURE

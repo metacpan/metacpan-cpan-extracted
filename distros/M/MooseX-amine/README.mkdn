@@ -4,7 +4,7 @@ MooseX::amine - Examine Yr Moose
 
 # VERSION
 
-version 0.6
+version 0.7
 
 # SYNOPSIS
 
@@ -78,16 +78,16 @@ not be present.
 
 # CREDITS
 
-- Semi-inspired by [MooseX::Documenter](https://metacpan.org/pod/MooseX::Documenter).
+- Semi-inspired by [MooseX::Documenter](https://metacpan.org/pod/MooseX%3A%3ADocumenter).
 - Syntax highlighting Javascript/CSS stuff based on SHJS and largely stolen from search.cpan.org.
 
 # AUTHOR
 
-John SJ Anderson <genehack@genehack.org>
+John SJ Anderson <john@genehack.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by John SJ Anderson.
+This software is copyright (c) 2020 by John SJ Anderson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

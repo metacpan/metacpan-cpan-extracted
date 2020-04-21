@@ -1,0 +1,15 @@
+#!perl -T
+
+use v6.c;
+use Test;
+use lib 'lib';
+use Astro::Constants qw/SPEED_LIGHT/;
+
+plan 2;
+
+is( SPEED_LIGHT, 2.99792458e8, 'SPEED_LIGHT in MKS' );
+
+eval 'SPEED_LIGHT = 2';
+like($@, qr/Can't modify constant item in scalar assignment/, "Can't change a constant");
+
+done-testing;

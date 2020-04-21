@@ -1,5 +1,8 @@
 Revision history for AnyEvent-Ident
 
+0.08      2020-04-20 19:38:57 -0600
+  - Switch to MakeMaker
+
 0.07      2015-04-01 14:51:27 -0400
   - Functions found in AnyEvent::Ident now have prototypes.  Any code that is
     using the API as documented shouldn't need to be changed.  This does not

@@ -8,8 +8,8 @@ build_requires:
   Data::Random::Structure::UTF8: '0.06'
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
-  Test::Pod: '0'
-  Test::Script: '0'
+  Test::Pod: '1.51'
+  Test::Script: '1.09'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -36,5 +36,5 @@ resources:
   bugtracker: https://github.com/hadjiprocopis/data-roundtrip/issues
   homepage: https://metacpan.org/module/Data::Roundtrip
   repository: https://github.com/hadjiprocopis/data-roundtrip
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

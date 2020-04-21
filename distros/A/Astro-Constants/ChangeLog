@@ -1,3 +1,35 @@
+v0.14	2020 Apr
+====
+* updated values to the **2018 CODATA** standard
+* build script now produces a Raku module for Astro::Constants
+* removed references to CGS in documentation
+* added script that fetches constant values and uncertainties from NIST
+* added warnings to module when using deprecated constants
+* added a script to archive the current PhysicalConstants.xml file
+* added dimensions to constants in terms of the SI base units
+* values that are established by definition are assigned an relative uncertainty of 0
+* clarified definition of critical density parameter, rho_c
+* updated PhysicalConstants.xml schema definition
+  * changed name of **url** element to **source**
+  * added _authority_, _year_ and _reference_ attributes to **source**
+
+v0.13	2018 May
+====
+* adding symbols to PhysicalConstants.xml definition file
+* adding deprecation warning to Astro::Constants::CGS - to be removed from package v0.15
+* alternateName element in PhysicalConstants.xml can now take a "type" attribute
+* alternateName with type=deprecated are now listed with the deprecated tag, not the long tag
+* adding RADIUS_JUPITER and MASS_JUPITER to the definition file
+* adding notice of deprecation to Astro::Constants::CGS
+* updating schema definition to accommodate symbol elements and allow attributes in alternateName
+* switched ELECTRON_CHARGE to CHARGE_ELEMENTARY in long name and alternateName
+
+v0.12	2017 Oct
+=====
+* Fixed MASS_HYDROGEN
+* added warning for undefined constants in precision
+* removed alternateNames from :long export tag
+
 v0.11	2017 May
 =====
 * Fixed precision() 
@@ -16,7 +48,7 @@ Deprecated
 HUBBLE_TIME	- should move to Astro::Cosmology as it's not really constant
 
 
-v0.10
+v0.10	2016 Feb
 =====
 A couple of interface-breaking changes:
 * 'list_constants' and 'describe_constant' have been removed and

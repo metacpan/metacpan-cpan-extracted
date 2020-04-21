@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
+use Test::More 0.98;
 use lib 't/lib';
 use Test::Cleanup;
 use FFI::Build;

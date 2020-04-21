@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Solution::ExpandMultiCardMoves;
-$Games::Solitaire::Verify::Solution::ExpandMultiCardMoves::VERSION = '0.2301';
+$Games::Solitaire::Verify::Solution::ExpandMultiCardMoves::VERSION = '0.2302';
 use warnings;
 use strict;
 use 5.014;
@@ -432,7 +432,7 @@ moves.
 
 =head1 VERSION
 
-version 0.2301
+version 0.2302
 
 =head1 SYNOPSIS
 

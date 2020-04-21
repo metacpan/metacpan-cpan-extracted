@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Simple asynchronous ident response
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 sub new
 {
@@ -95,7 +95,7 @@ AnyEvent::Ident::Response - Simple asynchronous ident response
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 ATTRIBUTES
 

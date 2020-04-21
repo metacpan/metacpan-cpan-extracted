@@ -3,7 +3,6 @@ abstract: 'make simple lightweight record-like structures'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
-  Data::Dump: '0'
   Test::Fatal: '0'
   Test::More: '0.88'
 configure_requires:
@@ -18,8 +17,8 @@ name: Struct-Dumb
 provides:
   Struct::Dumb:
     file: lib/Struct/Dumb.pm
-    version: '0.11'
+    version: '0.12'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Golf;
-$Games::Solitaire::Verify::Golf::VERSION = '0.2301';
+$Games::Solitaire::Verify::Golf::VERSION = '0.2302';
 use strict;
 use warnings;
 use autodie;
@@ -301,7 +301,7 @@ of black-hole-solve (or a similar solver)
 
 =head1 VERSION
 
-version 0.2301
+version 0.2302
 
 =head1 SYNOPSIS
 

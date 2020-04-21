@@ -15,7 +15,7 @@ elsif($os =~ /^IRIX\d* 6/) { $config='irix_6.h'; }
 elsif($os =~ /^OSF1/)      { $config='dec_osf.h'; }
 elsif($os =~ /^Linux/)     { $config='linux.h'; $picobj='linuxapi.o'; }
 elsif($os =~ /^AIX/)       { $config='aix_4_1.h'; }
-elsif($os =~ /^BSD\/OS 2/ ||
+elsif($os =~ /^dragonfly/i ||
       $os =~ /^Darwin/    ||
       $os =~ /^FreeBSD/   ||
       $os =~ /^NetBSD/    ||
@@ -62,8 +62,8 @@ if ( $os =~ /^SunOS/ ) {
 }
 
 # check whether we are using the NetBSD quota library
-if (   (($os =~ /^NetBSD 5\.99\.(\d+)/i) && ($1 >= 59))
-    || (($os =~ /^NetBSD (\d+)/i) && ($1 >= 6)) ) {
+if (   (($os =~ /^NetBSD 5\.99\.(\d+)/) && ($1 >= 59))
+    || (($os =~ /^NetBSD (\d+)/) && ($1 >= 6)) ) {
   $extralibs .= " -lquota";
 }
 

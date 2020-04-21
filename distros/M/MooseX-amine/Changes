@@ -1,5 +1,11 @@
 Revision history for MooseX-amine
 
+0.7       2020-04-20 15:47:07-07:00 America/Los_Angeles
+
+0.7       2020-04-20 15:44:59-07:00 America/Los_Angeles
+
+        * Update repo metadata
+
 0.6       2015-03-13 09:42:31-07:00 America/Los_Angeles
 
         * Fix failing test (Pete Houston)

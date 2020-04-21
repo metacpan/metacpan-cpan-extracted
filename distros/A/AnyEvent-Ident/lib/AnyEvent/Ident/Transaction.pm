@@ -5,7 +5,7 @@ use warnings;
 use AnyEvent::Ident::Response;
 
 # ABSTRACT: Simple asynchronous ident transaction
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 
 sub req { shift->{req} }
@@ -59,7 +59,7 @@ AnyEvent::Ident::Transaction - Simple asynchronous ident transaction
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 METHODS
 

@@ -30,3 +30,10 @@ Revision history for Data-Roundtrip
 0.08	2020-04-20
 	Removed dependency to Sub::Override, overriding subs is done by us now.
 	Fixed POD mistakes.
+
+0.09	2020-04-20
+	Added dependency Test::Script and Test::Pod (thank you Slaven Rezić)
+
+0.10	2020-04-20
+	Added minimum version for Test::Script to be 1.09
+	to support script_stderr_is. Thank you Slaven Rezić!)

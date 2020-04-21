@@ -1,6 +1,6 @@
 package Bio::FastParsers::Blast::Xml;
 # ABSTRACT: Front-end class for XML BLAST parser
-$Bio::FastParsers::Blast::Xml::VERSION = '0.180470';
+$Bio::FastParsers::Blast::Xml::VERSION = '0.201110';
 use Moose;
 use namespace::autoclean;
 
@@ -59,7 +59,7 @@ Bio::FastParsers::Blast::Xml - Front-end class for XML BLAST parser
 
 =head1 VERSION
 
-version 0.180470
+version 0.201110
 
 =head1 SYNOPSIS
 

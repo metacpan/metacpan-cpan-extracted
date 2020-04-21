@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION='0.09';
+our $VERSION='0.10';
 
 # NO UTF8 here, we are checking with random
 # data structure which provides no unicode

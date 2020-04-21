@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4229",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -48,26 +48,27 @@
             "FFI::Build" : "0.04",
             "FFI::CheckLib" : "0",
             "File::Which" : "0",
-            "Module::Build::FFI" : "0.22"
+            "Module::Build::FFI" : "0.22",
+            "Test::More" : "0.98"
          }
       }
    },
    "provides" : {
       "FFI::Build::File::Fortran" : {
          "file" : "lib/FFI/Build/File/Fortran.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "FFI::Platypus::Lang::Fortran" : {
          "file" : "lib/FFI/Platypus/Lang/Fortran.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Module::Build::FFI::Fortran" : {
          "file" : "lib/Module/Build/FFI/Fortran.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Module::Build::FFI::Fortran::ExtUtilsF77" : {
          "file" : "lib/Module/Build/FFI/Fortran/ExtUtilsF77.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -83,6 +84,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

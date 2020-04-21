@@ -1,3 +1,25 @@
+Changes in 1.8.1 (April 2020)
+- correction to Q_XQUOTASYNC update done in 1.8.0: return value inverted
+- compile-fixes and enhancements for latest versions of the BSDs:
+  - compile fix: FreeBSD lacks define RQUOTA_USRQUOTA in rpcsvc/rquota.h
+  - NetBSD: map QUOTA_NOLIMIT to 0 for consistency with other platforms
+  - DragonFly support prepared (untested); obsolete BSD/OS removed
+  - getmntent(): decode numerical values of fs type and options to strings
+  - renamed compile-switch HAVE_STATVFS: too generic (conflict Python.h)
+- fixes for group quota support via RPC (i.e. v2 aka extended RPC):
+  - removed use of USE_EXT_RQUOTA in include/rquota.h: switch is
+    defined only later, thus extended quota was inadvertedly disabled
+  - Linux & OpenBSD: switched from rpcsvc/rquota.h to internal rquota.h,
+    as sys header lacks definition for extended RPC
+  - getnfsquota(): don't use v1 RPC for group quota if v2 fails;
+    return error instead
+  - adjusted order of elements in ext_getquota_args to match XDR encoding
+    (just to avoid confusion; no harm)
+- setqlim: raise error in case of truncation of given limits to 32-bit
+- test.pl:
+  - added smoke test: run automatically upon $ENV{AUTOMATED_TESTING}
+  - enhanced "forced RPC" test: ask for host:path, allow skipping
+
 Changes in 1.8.0 (April 2020)
 - revised "tirpc" change in 1.7.3: use "-ltirpc" only when SUN-RPC is
   NOT included in libc; else we may compile against tirpc but linker

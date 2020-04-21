@@ -1,6 +1,10 @@
 Revision history for Perl module Clone
 
-0.43 2019-07-29 13:47:42  atomic
+0.44 2020-04-20 11:30:00 atoomic
+  - support Perls with COW disabled (plicease)
+  - bump B::COW requirement for testing
+
+0.43 2019-07-29 13:47:42  atoomic
   - fix an issue when cloning a NULL mg_ptr pointer
 
 0.42 2019-07-19 23:06:04  garu

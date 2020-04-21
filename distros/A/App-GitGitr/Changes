@@ -1,5 +1,9 @@
 Changes file for App-GitGitr
 
+0.907     2020-04-20 15:55:18-07:00 America/Los_Angeles
+
+ Update repo metadata
+
 0.906     2017-03-20 15:14:59-07:00 America/Los_Angeles
 
   Switch the _other_ LWP::Simple function call to HTTP::Tiny too...

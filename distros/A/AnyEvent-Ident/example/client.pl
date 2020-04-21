@@ -3,8 +3,10 @@ use warnings;
 use AnyEvent;
 use AnyEvent::Ident::Client;
 
-my $server_port = shift // '1';
-my $client_port = shift // '1';
+my $server_port = shift;
+$server_port = '1' unless defined $server_port;
+my $client_port = shift;
+my $client_port = '1' unless defind $client_port;
 
 my $client = AnyEvent::Ident::Client->new( hostname => '127.0.0.1' );
 

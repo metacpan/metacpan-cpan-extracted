@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="Collection">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="title" type="xs:string"/>
+        <xs:element name="description" type="xs:string"/>
+        <xs:element name="timestamp" type="xs:string"/>
+        <xs:element name="version" type="xs:string"/>
+        <xs:element name="source" type="xs:string"/>
+        <xs:element ref="link"/>
+        <xs:element ref="items"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="link">
+    <xs:complexType>
+      <xs:attribute name="href" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="items">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="PhysicalConstant" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PhysicalConstant">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="name" maxOccurs="unbounded"/>
+        <xs:element name="alternateName" type="xs:string"/>
+        <xs:element name="description" type="xs:string"/>
+        <xs:element ref="value" maxOccurs="unbounded"/>
+        <xs:element ref="uncertainty" maxOccurs="unbounded"/>
+        <xs:element name="dimensions" type="xs:string"/>
+        <xs:element name="maxValue" type="xs:string"/>
+        <xs:element name="minValue" type="xs:string"/>
+        <xs:element ref="url" maxOccurs="unbounded"/>
+        <xs:element ref="categoryList"/>
+        <xs:element ref="deprecated" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="name">
+    <xs:complexType mixed="true">
+      <xs:attribute name="type" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="value">
+    <xs:complexType mixed="true">
+      <xs:attribute name="system" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="uncertainty">
+    <xs:complexType mixed="true">
+      <xs:attribute name="type" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="url">
+    <xs:complexType>
+      <xs:attribute name="href" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="categoryList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="category" type="xs:string"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="deprecated">
+    <xs:complexType>
+      <xs:attribute name="date" type="xs:string" use="required"/>
+      <xs:attribute name="version" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

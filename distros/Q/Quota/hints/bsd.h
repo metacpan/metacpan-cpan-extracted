@@ -30,25 +30,33 @@
 #else  /* !__NetBSD__ */
 #if defined(__APPLE__)
 #include <sys/quota.h>
-#else
+#else  /* !__APPLE__ */
+#if defined(__DragonFly__)
+#include <vfs/ufs/quota.h>
+#else  /* !__DragonFly__ */
 #include <ufs/ufs/quota.h>
-#endif
+#endif  /* !__DragonFly__ */
+#endif  /* !__APPLE__ */
 #endif  /* !__NetBSD__ */
 
 #if defined(__NetBSD__) && (__NetBSD_Version__ >= 299000900) /* NetBSD 2.99.9 */
 /* NetBSD 3.0 has no statfs anymore */
 #include <sys/types.h>
 #include <sys/statvfs.h>
-#define HAVE_STATVFS
+#define USE_STATVFS_MNTINFO
+#define MNTINFO_FLAG_EL  f_flag
+#else
+#define MNTINFO_FLAG_EL  f_flags
 #endif
 
 #include <rpc/rpc.h>
 #include <rpc/pmap_prot.h>
 #include <rpc/svc.h>
 
-#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+/* Use platform header only if it supports extended quota */
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__)
 #include <rpcsvc/rquota.h>
-#else /* BSDi */
+#else /* BSDi, __OpenBSD__ */
 #include "include/rquota.h"
 #endif
 
@@ -75,8 +83,14 @@
 
 #define NO_MNTENT
 
+#if defined (RQUOTA_USRQUOTA)
 #define GQA_TYPE_USR RQUOTA_USRQUOTA
 #define GQA_TYPE_GRP RQUOTA_GRPQUOTA
+#else
+/* FreeBSD does not have RQUOTA_USRQUOTA */
+#define GQA_TYPE_USR 0
+#define GQA_TYPE_GRP 1
+#endif
 #define GQR_STATUS status
 #define GQR_RQUOTA getquota_rslt_u.gqr_rquota
 

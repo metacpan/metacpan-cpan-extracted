@@ -8,13 +8,14 @@
 # (It may become useful if the test is moved to ./t subdirectory.)
 
 use B q{svref_2object};
+use B::COW;
 
 my $has_data_dumper;
 
 BEGIN {
   $| = 1;
   my $tests = 12;
-  $tests += 2 if $] > 5.0219;
+  $tests += 2 if B::COW::can_cow();
   eval q[use Data::Dumper];
   if (!$@) {
     $has_data_dumper = 1;
@@ -100,7 +101,7 @@ ok( $a != $b, '$a != $b' );
   ok( $c != $d, 'SV are differents SVs' );
 
 
-  if ( $] > 5.0219 ) {
+  if ( B::COW::can_cow() ) {
     my $sv_c = svref_2object( $c );
     my $sv_d = svref_2object( $d );
 

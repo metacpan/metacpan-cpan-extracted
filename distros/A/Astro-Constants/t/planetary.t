@@ -1,9 +1,9 @@
 use Test::More;
 use Astro::Constants::MKS qw/:planetary/;
 
-is(EARTH_MASS, 5.9722e24, 'EARTH_MASS');
-is(LUNAR_SM_AXIS, 3.844e8, 'LUNAR_SM_AXIS');
-like(EARTH_GRAVITY, qr/\d/, 'EARTH_GRAVITY');
-like(SOLAR_TEMPERATURE, qr/\d/, 'SOLAR_TEMPERATURE');
+is(MASS_EARTH, 5.9722e24, 'MASS_EARTH');
+is(AXIS_SM_LUNAR, 3.84402e8, 'AXIS_SM_LUNAR');
+like(GRAVITY_EARTH, qr/\d/, 'GRAVITY_EARTH');
+like(TEMPERATURE_SOLAR_SURFACE, qr/\d/, 'TEMPERATURE_SOLAR_SURFACE');
 
 done_testing();

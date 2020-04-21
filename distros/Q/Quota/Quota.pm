@@ -22,7 +22,7 @@ require DynaLoader;
 @ISA = qw(Exporter DynaLoader);
 @EXPORT = ();
 
-$VERSION = '1.8.0';
+$VERSION = '1.8.1';
 
 bootstrap Quota;
 
@@ -44,7 +44,7 @@ sub getdev {
   my($ret) = undef;
   my($fsname,$path);
  
-  if($dev && ($target ne "") && !Quota::setmntent()) {
+  if(defined($dev) && ($target ne "") && !Quota::setmntent()) {
     while(($fsname,$path) = Quota::getmntent()) {
       ($ret=$fsname, last) if ($dev == (stat($path))[0]);
     }

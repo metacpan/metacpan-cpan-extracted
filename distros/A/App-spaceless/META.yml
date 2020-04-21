@@ -4,15 +4,15 @@ author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
   Capture::Tiny: '0'
-  Module::Build: '0.28'
   Path::Class: '0.26'
-  Test::More: '0.94'
+  Test2::V0: '0.000060'
+  Test::Script: '0'
   perl: '5.010001'
 configure_requires:
-  Module::Build: '0.28'
+  ExtUtils::MakeMaker: '0'
   perl: '5.010001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,6 +24,10 @@ requires:
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/plicease/App-spaceless/issues
-  homepage: http://perl.wdlabs.com/App-spaceless
+  homepage: https://metacpan.org/pod/App::spaceless
   repository: git://github.com/plicease/App-spaceless.git
-version: '0.07'
+version: '0.08'
+x_generated_by_perl: v5.31.10
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

@@ -63910,3 +63910,17 @@ Z/ZO/ZOFFIX/Test-Mojo-Role-SubmitForm-1.003001.tar.gz
 A/AL/ALTREUS/Test-Ratchet-0.005.tar.gz
 R/RB/RBWOHLFAR/WWW-Trello-Lite-1.01.tgz
 J/JA/JACQUESG/ZMQ-Raw-0.38.tar.gz
+P/PL/PLICEASE/AnyEvent-Ident-0.08.tar.gz
+G/GE/GENEHACK/App-GitGitr-0.907.tar.gz
+P/PL/PLICEASE/App-spaceless-0.08.tar.gz
+D/DU/DUFFEE/Astro-Constants-0.1401.tar.gz
+D/DB/DBAURAIN/Bio-FastParsers-0.201110.tar.gz
+A/AT/ATOOMIC/Clone-0.44.tar.gz
+B/BL/BLIAKO/Data-Roundtrip-0.10.tar.gz
+P/PL/PLICEASE/FFI-Platypus-Lang-Fortran-0.11.tar.gz
+S/SH/SHLOMIF/Games-Solitaire-Verify-0.2302.tar.gz
+G/GE/GENEHACK/MooseX-amine-0.7.tar.gz
+G/GE/GENEHACK/MooseX-Role-Pluggable-0.07.tar.gz
+P/PE/PERLANCAR/Org-Dump-0.552.tar.gz
+T/TO/TOMZO/Quota-1.8.1.tar.gz
+P/PE/PEVANS/Struct-Dumb-0.12.tar.gz

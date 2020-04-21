@@ -1,3 +1,3 @@
-      FUNCTION ADD(IA, IB)
-          ADD = IA + IB
+      FUNCTION IADD(IA, IB)
+          IADD = IA + IB
       END

@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Move;
-$Games::Solitaire::Verify::Move::VERSION = '0.2301';
+$Games::Solitaire::Verify::Move::VERSION = '0.2302';
 use warnings;
 use strict;
 
@@ -120,7 +120,7 @@ Solitaire move.
 
 =head1 VERSION
 
-version 0.2301
+version 0.2302
 
 =head1 SYNOPSIS
 

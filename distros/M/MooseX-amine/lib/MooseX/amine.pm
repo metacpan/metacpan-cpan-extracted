@@ -1,6 +1,6 @@
 package MooseX::amine;
 # ABSTRACT: Examine Yr Moose
-$MooseX::amine::VERSION = '0.6';
+$MooseX::amine::VERSION = '0.7';
 use Moose;
 use Moose::Meta::Class;
 use Moose::Meta::Role;
@@ -388,7 +388,7 @@ MooseX::amine - Examine Yr Moose
 
 =head1 VERSION
 
-version 0.6
+version 0.7
 
 =head1 SYNOPSIS
 
@@ -472,11 +472,11 @@ not be present.
 
 =head1 AUTHOR
 
-John SJ Anderson <genehack@genehack.org>
+John SJ Anderson <john@genehack.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by John SJ Anderson.
+This software is copyright (c) 2020 by John SJ Anderson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

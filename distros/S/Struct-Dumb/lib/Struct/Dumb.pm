@@ -8,7 +8,7 @@ package Struct::Dumb;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Carp;
 
@@ -359,8 +359,10 @@ Paul Evans <leonerd@leonerd.org.uk>
 
 =cut
 
-sub apply_datadump_filter
+sub maybe_apply_datadump_filter
 {
+   return unless $INC{"Data/Dump.pm"};
+
    require Data::Dump::Filtered;
 
    Data::Dump::Filtered::add_dump_filter( sub {
@@ -383,10 +385,14 @@ sub apply_datadump_filter
 }
 
 if( defined &Data::Dump::dump ) {
-   apply_datadump_filter;
+   maybe_apply_datadump_filter;
 }
 else {
-   $Data::Dump::VERSION = bless \( my $x = \&apply_datadump_filter ), "Struct::Dumb::_DestroyWatch";
+   # A package var we observe that Data/Dump.pm seems to set when loaded
+   # We can't attach to VERSION because too many other things get upset by
+   # that.
+   $Data::Dump::DEBUG = bless \( my $x = \&maybe_apply_datadump_filter ),
+      "Struct::Dumb::_DestroyWatch";
 }
 
 {

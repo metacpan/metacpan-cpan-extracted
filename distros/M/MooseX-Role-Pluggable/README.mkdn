@@ -4,7 +4,7 @@ MooseX::Role::Pluggable - add plugins to your Moose classes
 
 # VERSION
 
-version 0.05
+version 0.07
 
 # SYNOPSIS
 
@@ -94,8 +94,8 @@ Sean Maguire `smaguire@talktalkplc.com`
 
 # SEE ALSO
 
-[MooseX::Role::Pluggable::Plugin](https://metacpan.org/pod/MooseX::Role::Pluggable::Plugin), [MooseX::Object::Pluggable](https://metacpan.org/pod/MooseX::Object::Pluggable),
-[Object::Pluggable](https://metacpan.org/pod/Object::Pluggable)
+[MooseX::Role::Pluggable::Plugin](https://metacpan.org/pod/MooseX%3A%3ARole%3A%3APluggable%3A%3APlugin), [MooseX::Object::Pluggable](https://metacpan.org/pod/MooseX%3A%3AObject%3A%3APluggable),
+[Object::Pluggable](https://metacpan.org/pod/Object%3A%3APluggable)
 
 # COPYRIGHT AND LICENSE
 
@@ -106,11 +106,11 @@ under the same terms as Perl itself.
 
 # AUTHOR
 
-John SJ Anderson <genehack@genehack.org>
+John SJ Anderson <john@genehack.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by John SJ Anderson.
+This software is copyright (c) 2020 by John SJ Anderson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

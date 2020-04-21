@@ -10,7 +10,7 @@ use Astro::Constants::MKS qw/STEFAN_BOLTZMANN SPEED_LIGHT
 
 
 
-is( ALPHA, sprintf("%.13f", 1/137.035999139), 'fine structure constant to within 2.3e-10');
+is( sprintf("%.10f", ALPHA), sprintf("%.10f", 1/137.035999139), 'fine structure constant to within 2.3e-10');
 
 # now rho_c is 3*H^2/8*PI*G
 my $hubble_constant = 67.80;	# +/-0.77, 2013-03-21 Planck Mission
@@ -21,7 +21,7 @@ cmp_ok( abs(PARSEC - (648_000 * ASTRONOMICAL_UNIT/PI)), '<', 13675, 'definition 
 
 is_within(H_BAR, PLANCK/(2 * PI), 1.2e-8, "H_BAR is Planck's constant over 2 Pi");
 
-is_within(PERMEABILITY_0, 4e-7 * PI, 1e-10, 'Permeability of free space, mu_0, is 4 Pi x 10-7');
+is_within(PERMEABILITY_0, 4e-7 * PI, 5.5e-10, 'Permeability of free space, mu_0, is 4 Pi x 10-7');
 
 done_testing();
 

@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Collection>
+    <title>Astro::Constants</title>
+    <description>Physical constants for astronomy for use in Astro::Constants v0.12</description>
+    <timestamp>Wed Jul 5 10:30:55 2017</timestamp>
+    <version>v0.12</version>
+    <source>2014 CODATA</source>
+    <link href="http://metacpan.org/pod/Astro::Constants" />
+    <items>
+        <PhysicalConstant>
+            <name type="long">SPEED_LIGHT</name>
+            <name type="short">A_c</name>
+            <alternateName>LIGHT_SPEED</alternateName>
+            <description>speed of light in a vacuum</description>
+            <value system="MKS">2.99792458e8</value>
+            <value system="CGS">2.99792458e10</value>
+            <uncertainty type="relative">0</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?c" />
+            <categoryList>
+                <category>fundamental</category>
+                <category>cosmology</category>
+                <category>electromagnetic</category>
+            </categoryList>
+        </PhysicalConstant>
+    </items>
+</Collection>

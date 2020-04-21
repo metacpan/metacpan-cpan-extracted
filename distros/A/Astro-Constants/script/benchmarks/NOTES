@@ -1,0 +1,49 @@
+running on perl 5.24.3
+
+Variables
+=========
+Comparing the use of long name constants with short name constants
+showed that long names are 3 times faster
+
+Variables: 11 wallclock secs (10.51 usr +  0.00 sys = 10.51 CPU) @ 3813998.67/s (n=40085126)
+Shortnames: 11 wallclock secs (10.37 usr +  0.00 sys = 10.37 CPU) @ 3865488.52/s (n=40085116)
+Longnames: 11 wallclock secs (10.35 usr +  0.00 sys = 10.35 CPU) @ 15342875.27/s (n=158798759)
+                  Rate   Variables  Shortnames   Longnames
+Variables   3813999/s          --         -1%        -75%
+Shortnames  3865489/s          1%          --        -75%
+Longnames  15342875/s        302%        297%          --
+
+Other modules
+=============
+Comparing Astro::Constants with Scalar::Constant and Const::Fast
+showed at least twice as fast as other constant modules
+
+ConstFast: 11 wallclock secs (10.53 usr +  0.00 sys = 10.53 CPU) @ 7328891.07/s (n=77173223)
+Longnames:  9 wallclock secs (10.28 usr +  0.00 sys = 10.28 CPU) @ 23009046.40/s (n=236532997)
+ScalarConstant: 10 wallclock secs (10.38 usr +  0.00 sys = 10.38 CPU) @ 7932571.77/s (n=82340095)
+Shortnames: 10 wallclock secs (10.42 usr +  0.00 sys = 10.42 CPU) @ 7975972.07/s (n=83109629)
+                     Rate     ConstFast ScalarConstant   Shortnames    Longnames
+ConstFast       7328891/s            --            -8%          -8%         -68%
+ScalarConstant  7932572/s            8%             --          -1%         -66%
+Shortnames      7975972/s            9%             1%           --         -65%
+Longnames      23009046/s          214%           190%         188%           --
+
+
+On combining constants
+======================
+
+using k in calculations (where k = 1/4 PI epsilon_0) is about as fast as 
+just including 1/4 PI epsilon_0 in the calculation.  There is no
+real speedup (differences are about 5% either way) and the only gain
+is in readability.
+
+Profiling
+=========
+
+using ```
+perl -d:NYTProf profile_long.pl
+nytprofhtml --open
+```
+to examine the time that a program spends starting up, it looks like there's no
+speed up to be found in importing a smaller tag.  It spends about 4ms whether
+it's looking up ```:long``` or ```:planetary```.

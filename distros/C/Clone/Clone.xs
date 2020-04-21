@@ -174,7 +174,7 @@ sv_clone (SV * ref, HV* hseen, int depth)
 * Note: when using a Debug Perl with READONLY_COW
 * we cannot do 'sv_buf_to_rw + sv_buf_to_ro' as these APIs calls are not exported
 */
-#if PERL_VERSION >= 20 && !defined(PERL_DEBUG_READONLY_COW)
+#if defined(SV_COW_REFCNT_MAX) && !defined(PERL_DEBUG_READONLY_COW)
         /* only for simple PVs unblessed */
         if ( SvIsCOW(ref) && !SvOOK(ref) && SvLEN(ref) > 0 ) {
 
