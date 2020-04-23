@@ -4,9 +4,11 @@ Version 8.122 - 11 April 2020
   o check & report where genhdlist2 is
   o check that web server has actually started
   o describe more tests to help pinpoint regressions
+  o do not fail test when libnss.so is not found in Debian 9 or FreeBSD
   o fix test with rpm < 4.13 on CentOS7
   o perform some file conflict tests only on Mageia
   o try harder to find genhdlist2 in uninstalled CPAN modules
+  o work without glibc-static-devel
 
 Version 8.121 - 8 April 2020
 

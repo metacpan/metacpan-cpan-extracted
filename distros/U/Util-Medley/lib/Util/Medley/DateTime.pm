@@ -1,5 +1,5 @@
 package Util::Medley::DateTime;
-$Util::Medley::DateTime::VERSION = '0.028';
+$Util::Medley::DateTime::VERSION = '0.029';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -22,7 +22,7 @@ Util::Medley::DateTime - Class with various datetime methods.
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =cut
 
@@ -68,15 +68,15 @@ Returns a iso8601-date-time string.
 
 =item usage:
 
- $dt->iso8601DateTime([time]);
+ $dt->iso8601DateTime([$epoch]);
 
- $dt->iso8601DateTime([epoch => time]);
+ $dt->iso8601DateTime([epoch => $epoch]);
  
 =item args:
 
 =over
 
-=item time [Int]
+=item epoch [Int]
 
 Epoch time used to generate iso8601-date-time string.  Default is now.
 

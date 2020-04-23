@@ -6,14 +6,18 @@ use warnings;
 
 use Test::More;
 
-plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
+    'Bencher/Scenario/PathNaive/abs_path.pm',
     'Bencher/Scenario/PathNaive/concat_path.pm',
     'Bencher/Scenario/PathNaive/normalize_path.pm',
+    'Bencher/Scenario/PathNaive/rel_path.pm',
     'Bencher/Scenario/PathNaive/split_path.pm',
+    'Bencher/ScenarioR/PathNaive/abs_path.pm',
     'Bencher/ScenarioR/PathNaive/concat_path.pm',
     'Bencher/ScenarioR/PathNaive/normalize_path.pm',
+    'Bencher/ScenarioR/PathNaive/rel_path.pm',
     'Bencher/ScenarioR/PathNaive/split_path.pm',
     'Bencher/Scenarios/PathNaive.pm'
 );

@@ -1,93 +1,95 @@
 package Data::Object::Regexp;
 
-use Try::Tiny;
+use 5.014;
+
+use strict;
+use warnings;
+use routines;
+
+use Carp ();
+use Scalar::Util ();
+
 use Role::Tiny::With;
 
-use Data::Object::Export qw(
-  cast
-  croak
-  load
-);
+use parent 'Data::Object::Kind';
 
-map with($_), my @roles = qw(
-  Data::Object::Role::Detract
-  Data::Object::Role::Dumper
-  Data::Object::Role::Output
-  Data::Object::Role::Throwable
-);
-
-map with($_), my @rules = qw(
-  Data::Object::Rule::Defined
-);
+with 'Data::Object::Role::Dumpable';
+with 'Data::Object::Role::Proxyable';
+with 'Data::Object::Role::Throwable';
 
 use overload (
-  '""'     => 'data',
-  '~~'     => 'data',
+  '""'     => 'detract',
+  '~~'     => 'detract',
   fallback => 1
 );
 
-use parent 'Data::Object::Base::Regexp';
-
-our $VERSION = '0.99'; # VERSION
+our $VERSION = '2.03'; # VERSION
 
 # BUILD
-# METHODS
 
-sub roles {
-  return cast([@roles]);
-}
-
-sub rules {
-  return cast([@rules]);
-}
-
-# DISPATCHERS
-
-sub defined {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::Regexp::Defined';
-
-    return cast(load($func)->new($self, @args)->execute);
+method new($data = qr/.*/) {
+  if (Scalar::Util::blessed($data)) {
+    $data = $data->detract if $data->can('detract');
   }
-  catch {
-    my $error = $_;
 
-    $self->throw(ref($error) ? $error->message : "$error");
+  if (!defined($data) || !re::is_regexp($data)) {
+    Carp::confess('Instantiation Error: Not a RegexpRef');
+  }
+
+  return bless \$data, $self;
+}
+
+# PROXY
+
+method build_proxy($package, $method, @args) {
+  my $plugin = $self->plugin($method) or return undef;
+
+  return sub {
+    use Try::Tiny;
+
+    my $is_func = $plugin->package->can('mapping');
+
+    try {
+      my $instance = $plugin->build($is_func ? ($self, @args) : [$self, @args]);
+
+      return $instance->execute;
+    }
+    catch {
+      my $error = $_;
+      my $class = $self->class;
+      my $arity = $is_func ? 'mapping' : 'argslist';
+      my $message = ref($error) ? $error->{message} : "$error";
+      my $signature = "${class}::${method}(@{[join(', ', $plugin->package->$arity)]})";
+
+      Carp::confess("$signature: $error");
+    };
   };
 }
 
-# METHODS
+# PLUGIN
 
-sub search {
-  my ($self, @args) = @_;
+method plugin($name, @args) {
+  my $plugin;
 
-  try {
-    my $func = 'Data::Object::Func::Regexp::Search';
+  my $space = $self->space;
 
-    return cast(load($func)->new($self, @args)->execute);
+  return undef if !$name;
+
+  if ($plugin = eval { $space->child('plugin')->child($name)->load }) {
+
+    return undef unless $plugin->can('argslist');
+
+    return $space->child('plugin')->child($name);
   }
-  catch {
-    my $error = $_;
 
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
+  if ($plugin = $space->child('func')->child($name)->load) {
 
-sub replace {
-  my ($self, @args) = @_;
+    return undef unless $plugin->can('mapping');
 
-  try {
-    my $func = 'Data::Object::Func::Regexp::Replace';
-
-    return cast(load($func)->new($self, @args)->execute);
+    return $space->child('func')->child($name);
   }
-  catch {
-    my $error = $_;
 
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
+  return undef;
 }
 
 1;
@@ -102,11 +104,13 @@ Data::Object::Regexp
 
 =head1 ABSTRACT
 
-Data-Object Regexp Class
+Regexp Class for Perl 5
 
 =cut
 
 =head1 SYNOPSIS
+
+  package main;
 
   use Data::Object::Regexp;
 
@@ -116,33 +120,166 @@ Data-Object Regexp Class
 
 =head1 DESCRIPTION
 
-Data::Object::Regexp provides routines for operating on Perl 5 regular
-expressions. Data::Object::Regexp methods work on data that meets the criteria
-for being a regular expression.
+This package provides methods for manipulating regexp data.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::Kind>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Data::Object::Role::Dumpable>
+
+L<Data::Object::Role::Proxyable>
+
+L<Data::Object::Role::Throwable>
+
+=cut
+
+=head1 LIBRARIES
+
+This package uses type constraints from:
+
+L<Data::Object::Types>
 
 =cut
 
 =head1 METHODS
 
-This package implements the following methods.
+This package implements the following methods:
 
 =cut
 
 =head2 defined
 
-  defined() : NumObject
+  defined() : Num
 
 The defined method returns true if the object represents a value that meets the
-criteria for being defined, otherwise it returns false. This method returns a
-L<Data::Object::Number> object.
+criteria for being defined, otherwise it returns false.
 
 =over 4
 
-=item defined example
+=item defined example #1
 
-  # given $regexp
+  my $re = Data::Object::Regexp->new;
 
-  $regexp->defined; # 1
+  $re->defined; # 1
+
+=back
+
+=cut
+
+=head2 eq
+
+  eq(Any $arg1) : Any
+
+The eq method will throw an exception if called.
+
+=over 4
+
+=item eq example #1
+
+  my $re = Data::Object::Regexp->new(qr//);
+
+  $re->eq(qr//);
+
+=back
+
+=cut
+
+=head2 ge
+
+  ge(Any $arg1) : Any
+
+The ge method will throw an exception if called.
+
+=over 4
+
+=item ge example #1
+
+  my $re = Data::Object::Regexp->new(qr//);
+
+  $re->ge(qr//);
+
+=back
+
+=cut
+
+=head2 gt
+
+  gt(Any $arg1) : Any
+
+The gt method will throw an exception if called.
+
+=over 4
+
+=item gt example #1
+
+  my $re = Data::Object::Regexp->new(qr//);
+
+  $re->gt(qr//);
+
+=back
+
+=cut
+
+=head2 le
+
+  le(Any $arg1) : Any
+
+The le method will throw an exception if called.
+
+=over 4
+
+=item le example #1
+
+  my $re = Data::Object::Regexp->new(qr//);
+
+  $re->le(qr//);
+
+=back
+
+=cut
+
+=head2 lt
+
+  lt(Any $arg1) : Any
+
+The lt method will throw an exception if called.
+
+=over 4
+
+=item lt example #1
+
+  my $re = Data::Object::Regexp->new(qr//);
+
+  $re->lt(qr//);
+
+=back
+
+=cut
+
+=head2 ne
+
+  ne(Any $arg1) : Any
+
+The ne method will throw an exception if called.
+
+=over 4
+
+=item ne example #1
+
+  my $re = Data::Object::Regexp->new(qr//);
+
+  $re->ne(qr//);
 
 =back
 
@@ -150,58 +287,32 @@ L<Data::Object::Number> object.
 
 =head2 replace
 
-  replace(Str $arg1, Str $arg2) : StrObject
+  replace(Str $arg1, Str $arg2) : ReplaceObject
 
 The replace method performs a regular expression substitution on the given
 string. The first argument is the string to match against. The second argument
 is the replacement string. The optional third argument might be a string
 representing flags to append to the s///x operator, such as 'g' or 'e'.  This
-method will always return a L<Data::Object::Replace> object which can be
-used to introspect the result of the operation.
+method will always return a L<Data::Object::Replace> object which can be used
+to introspect the result of the operation.
 
 =over 4
 
-=item replace example
+=item replace example #1
 
-  # given qr(test)
+  my $re = Data::Object::Regexp->new(qr/test/);
 
   $re->replace('this is a test', 'drill');
+
+=back
+
+=over 4
+
+=item replace example #2
+
+  my $re = Data::Object::Regexp->new(qr/test/);
+
   $re->replace('test 1 test 2 test 3', 'drill', 'gi');
-
-=back
-
-=cut
-
-=head2 roles
-
-  roles() : ArrayRef
-
-The roles method returns the list of roles attached to object. This method
-returns a L<Data::Object::Array> object.
-
-=over 4
-
-=item roles example
-
-  # given $regexp
-
-  $regexp->roles;
-
-=back
-
-=cut
-
-=head2 rules
-
-  rules() : ArrayRef
-
-The rules method returns consumed rules.
-
-=over 4
-
-=item rules example
-
-  my $rules = $regexp->rules();
 
 =back
 
@@ -211,59 +322,56 @@ The rules method returns consumed rules.
 
   search(Str $arg1) : SearchObject
 
-The search method performs a regular expression match against the given string
-This method will always return a L<Data::Object::Search> object which
-can be used to introspect the result of the operation.
+The search method performs a regular expression match against the given string,
+this method will always return a L<Data::Object::Search> object which can be
+used to introspect the result of the operation.
 
 =over 4
 
-=item search example
+=item search example #1
 
-  # given qr((test))
+  my $re = Data::Object::Regexp->new(qr/test/);
 
   $re->search('this is a test');
+
+=back
+
+=over 4
+
+=item search example #2
+
+  my $re = Data::Object::Regexp->new(qr/test/);
+
   $re->search('this does not match', 'gi');
 
 =back
 
 =cut
 
-=head1 ROLES
+=head1 AUTHOR
 
-This package inherits all behavior from the folowing role(s):
+Al Newkirk, C<awncorp@cpan.org>
 
-=cut
+=head1 LICENSE
 
-=over 4
+Copyright (C) 2011-2019, Al Newkirk, et al.
 
-=item *
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the L<"license
+file"|https://github.com/iamalnewkirk/foobar/blob/master/LICENSE>.
 
-L<Data::Object::Role::Detract>
+=head1 PROJECT
 
-=item *
+L<Wiki|https://github.com/iamalnewkirk/foobar/wiki>
 
-L<Data::Object::Role::Dumper>
+L<Project|https://github.com/iamalnewkirk/foobar>
 
-=item *
+L<Initiatives|https://github.com/iamalnewkirk/foobar/projects>
 
-L<Data::Object::Role::Output>
+L<Milestones|https://github.com/iamalnewkirk/foobar/milestones>
 
-=item *
+L<Contributing|https://github.com/iamalnewkirk/foobar/blob/master/CONTRIBUTE.md>
 
-L<Data::Object::Role::Throwable>
-
-=back
-
-=head1 RULES
-
-This package adheres to the requirements in the folowing rule(s):
+L<Issues|https://github.com/iamalnewkirk/foobar/issues>
 
 =cut
-
-=over 4
-
-=item *
-
-L<Data::Object::Rule::Defined>
-
-=back

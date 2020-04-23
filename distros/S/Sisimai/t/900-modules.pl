@@ -15,6 +15,7 @@ sub list {
             Lhost/AmazonWorkMail.pm
             Lhost/Aol.pm
             Lhost/ApacheJames.pm
+            Lhost/Barracuda.pm
             Lhost/Bigfoot.pm
             Lhost/Biglobe.pm
             Lhost/Courier.pm
@@ -27,7 +28,8 @@ sub list {
             Lhost/Facebook.pm
             Lhost/FML.pm
             Lhost/GMX.pm
-            Lhost/Google.pm
+            Lhost/Gmail.pm
+            Lhost/GoogleGroups.pm
             Lhost/GSuite.pm
             Lhost/IMailServer.pm
             Lhost/InterScanMSS.pm
@@ -45,12 +47,12 @@ sub list {
             Lhost/OpenSMTPD.pm
             Lhost/Outlook.pm
             Lhost/Postfix.pm
+            Lhost/PowerMTA.pm
             Lhost/qmail.pm
             Lhost/ReceivingSES.pm
             Lhost/SendGrid.pm
             Lhost/Sendmail.pm
             Lhost/SurfControl.pm
-            Lhost/UserDefined.pm
             Lhost/V5sendmail.pm
             Lhost/Verizon.pm
             Lhost/X1.pm
@@ -58,6 +60,7 @@ sub list {
             Lhost/X3.pm
             Lhost/X4.pm
             Lhost/X5.pm
+            Lhost/X6.pm
             Lhost/Yahoo.pm
             Lhost/Yandex.pm
             Lhost/Zoho.pm

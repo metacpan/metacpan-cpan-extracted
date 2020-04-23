@@ -208,3 +208,12 @@ Revision history for PPR
     * Relaxed parsing of __DATA__ and __END__ in line with actual Perl parser
 
     * Numerous doc bugs fixed (thanks F.Li!)
+
+
+0.000025  Wed Apr 22 22:19:14 2020
+
+    * Added full code block parsing of
+      (?{...}) and (??{...}) within regexes
+
+    * Fixed an obscure problem when heredocs are greater than 32766 characters
+      (thanks Albert!)

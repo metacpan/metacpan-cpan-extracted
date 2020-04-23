@@ -3,13 +3,11 @@ use feature ':5.10';
 use strict;
 use warnings;
 use Sisimai::RFC5322;
-use Sisimai::RFC3834;
 use Sisimai::Address;
 use Sisimai::String;
 use Sisimai::Order;
+use Sisimai::Lhost;
 use Sisimai::MIME;
-use Sisimai::ARF;
-use Sisimai::SMTP::Error;
 use Class::Accessor::Lite (
     'new' => 0,
     'rw'  => [
@@ -21,17 +19,10 @@ use Class::Accessor::Lite (
     ]
 );
 
+state $DefaultSet = Sisimai::Order->another;
+state $LhostTable = Sisimai::Lhost->path;
 my $ToBeLoaded = [];
 my $TryOnFirst = [];
-my $DefaultSet = Sisimai::Order->another;
-my $ExtHeaders = Sisimai::Order->headers;
-my $SubjectTab = Sisimai::Order->by('subject');
-my $RFC822Head = Sisimai::RFC5322->HEADERFIELDS;
-my @RFC3834Set = @{ Sisimai::RFC3834->headerlist };
-my @HeaderList = (qw|from to date subject content-type reply-to message-id
-                     received content-transfer-encoding return-path x-mailer|);
-my $IsMultiple = { 'received' => 1 };
-my $EndOfEmail = Sisimai::String->EOM;
 
 sub new {
     # Constructor of Sisimai::Message
@@ -39,27 +30,14 @@ sub new {
     # @options argvs [String] data      Entire email message
     # @options argvs [Array]  load      User defined MTA module list
     # @options argvs [Array]  order     The order of MTA modules
-    # @options argvs [Array]  field     Email header names to be captured
     # @options argvs [Code]   hook      Reference to callback method
     # @return        [Sisimai::Message] Structured email data or Undef if each
     #                                   value of the arguments are missing
     my $class = shift;
     my $argvs = { @_ };
     my $email = $argvs->{'data'}  || return undef;
-    my $field = $argvs->{'field'} || [];
 
-    if( ref $field ne 'ARRAY' ) {
-        # Unsupported value in "field"
-        warn ' ***warning: "field" accepts an array reference only';
-        return undef;
-    }
-
-    my $methodargv = {
-        'data'  => $email,
-        'hook'  => $argvs->{'hook'} // undef,
-        'field' => $field,
-    };
-
+    my $methodargv = { 'data' => $email, 'hook' => $argvs->{'hook'} // undef };
     for my $e ('load', 'order') {
         # Order of MTA modules
         next unless exists $argvs->{ $e };
@@ -87,17 +65,13 @@ sub make {
     # @options argvs [String] data  Entire email message
     # @options argvs [Array]  load  User defined MTA module list
     # @options argvs [Array]  order The order of MTA modules
-    # @options argvs [Array]  field Email header names to be captured
     # @options argvs [Code]   hook  Reference to callback method
     # @return        [Hash]         Resolved data structure
     my $class = shift;
     my $argvs = { @_ };
     my $email = $argvs->{'data'};
 
-    my $bouncedata = undef;
-    my $hookmethod = $argvs->{'hook'}  || undef;
-    my $headerlist = $argvs->{'field'} || [];
-    my $aftersplit = {};
+    my $hookmethod = $argvs->{'hook'} || undef;
     my $processing = {
         'from'   => '',     # From_ line
         'header' => {},     # Email header
@@ -112,27 +86,38 @@ sub make {
     $ToBeLoaded = __PACKAGE__->load(%$methodargv);
 
     # 1. Split email data to headers and a body part.
-    return undef unless $aftersplit = __PACKAGE__->divideup(\$email);
+    return undef unless my $aftersplit = __PACKAGE__->divideup(\$email);
 
     # 2. Convert email headers from text to hash reference
-    $TryOnFirst = [];
     $processing->{'from'}   = $aftersplit->{'from'};
-    $processing->{'header'} = __PACKAGE__->headers(\$aftersplit->{'header'}, $headerlist);
+    $processing->{'header'} = __PACKAGE__->makemap(\$aftersplit->{'header'});
 
-    # 3. Check headers for detecting MTA module
-    unless( scalar @$TryOnFirst ) {
-        push @$TryOnFirst, @{ Sisimai::Order->make($processing->{'header'}, 'email') };
+    # 3. Decode and rewrite the "Subject:" header
+    if( $processing->{'header'}->{'subject'} ) {
+        # Decode MIME-Encoded "Subject:" header
+        my $s = $processing->{'header'}->{'subject'};
+        my $q = Sisimai::MIME->is_mimeencoded(\$s) ? Sisimai::MIME->mimedecode([split(/[ ]/, $s)]) : $s;
+
+        # Remove "Fwd:" string from the "Subject:" header
+        if( lc($q) =~ /\A[ \t]*fwd?:[ ]*(.*)\z/ ) {
+            # Delete quoted strings, quote symbols(>)
+            $q = $1;
+            $aftersplit->{'body'} =~ s/^[>]+[ ]//gm;
+            $aftersplit->{'body'} =~ s/^[>]$//gm;
+        }
+        $processing->{'header'}->{'subject'} = $q;
     }
 
     # 4. Rewrite message body for detecting the bounce reason
+    $TryOnFirst = Sisimai::Order->make($processing->{'header'}->{'subject'});
     $methodargv = { 'hook' => $hookmethod, 'mail' => $processing, 'body' => \$aftersplit->{'body'} };
-    return undef unless $bouncedata = __PACKAGE__->parse(%$methodargv);
+    return undef unless my $bouncedata = __PACKAGE__->parse(%$methodargv);
     return undef unless keys %$bouncedata;
 
     # 5. Rewrite headers of the original message in the body part
-    map { $processing->{ $_ } = $bouncedata->{ $_ } } ('ds', 'catch', 'rfc822');
+    $processing->{ $_ } = $bouncedata->{ $_ } for ('ds', 'catch', 'rfc822');
     my $p = $bouncedata->{'rfc822'} || $aftersplit->{'body'};
-    $processing->{'rfc822'} = ref $p ? $p : __PACKAGE__->takeapart(\$p);
+    $processing->{'rfc822'} = ref $p ? $p : __PACKAGE__->makemap(\$p, 1);
     return $processing;
 }
 
@@ -166,11 +151,6 @@ sub load {
                 require $modulepath.'.pm';
             };
             next if $@;
-
-            for my $w ( @{ $v->headerlist } ) {
-                # Get header name which required user defined MTA module
-                $ExtHeaders->{ $w }->{ $v } = 1;
-            }
             push @$tobeloaded, $v;
         }
     }
@@ -181,87 +161,6 @@ sub load {
         push @$tobeloaded, $e;
     }
     return $tobeloaded;
-}
-
-sub makeorder {
-    # Check headers for detecting MTA module and returns the order of modules
-    # @param         [Hash] heads   Email header data
-    # @return        [Array]        Order of MTA modules
-    my $class = shift;
-    my $heads = shift || return [];
-    my $order = [];
-
-    return [] unless exists $heads->{'subject'};
-    return [] unless $heads->{'subject'};
-
-    # Try to match the value of "Subject" with patterns generated by
-    # Sisimai::Order->by('subject') method
-    my $title = lc $heads->{'subject'};
-    for my $e ( keys %$SubjectTab ) {
-        # Get MTA list from the subject header
-        next if index($title, $e) == -1;
-        push @$order, @{ $SubjectTab->{ $e } }; # Matched and push MTA list
-        last;
-    }
-    return $order;
-}
-
-sub headers {
-    # Convert email headers from text to hash reference
-    # @param         [String] heads  Email header data
-    # @return        [Hash]          Structured email header data
-    my $class = shift;
-    my $heads = shift || return undef;
-    my $field = shift || [];
-
-    my $currheader = '';
-    my $allheaders = {};
-    my $structured = {};
-    my @headslices = split("\n", $$heads);
-
-    map { $allheaders->{ $_ } = 1 } (@HeaderList, @RFC3834Set, keys %$ExtHeaders);
-    map { $allheaders->{ lc $_ } = 1 } @$field if scalar @$field;
-    map { $structured->{ $_ } = undef } @HeaderList;
-    map { $structured->{ $_ } = [] } keys %$IsMultiple;
-
-    SPLIT_HEADERS: while( my $e = shift @headslices ) {
-        # Convert email headers to hash
-        if( $e =~ /\A[ \t]+(.+)\z/ ) {
-            # Continued (foled) header value from the previous line
-            next unless exists $allheaders->{ $currheader };
-
-            # Header line continued from the previous line
-            if( ref $structured->{ $currheader } eq 'ARRAY' ) {
-                # Concatenate a header which have multi-lines such as 'Received'
-                $structured->{ $currheader }->[-1] .= ' '.$1;
-            } else {
-                $structured->{ $currheader } .= ' '.$1;
-            }
-        } else {
-            # split the line into a header name and a header content
-            my($lhs, $rhs) = split(/:[ ]*/, $e, 2);
-            $currheader = lc $lhs;
-            next unless exists $allheaders->{ $currheader };
-
-            if( exists $IsMultiple->{ $currheader } ) {
-                # Such as 'Received' header, there are multiple headers in a single
-                # email message.
-                $rhs =~ y/\t/ /;
-                push @{ $structured->{ $currheader } }, $rhs;
-            } else {
-                # Other headers except "Received" and so on
-                if( $ExtHeaders->{ $currheader } ) {
-                    # MTA specific header
-                    for my $p ( @{ $ExtHeaders->{ $currheader } } ) {
-                        next if grep { $p eq $_ } @$TryOnFirst;
-                        push @$TryOnFirst, $p;
-                    }
-                }
-                $structured->{ $currheader } = $rhs;
-            }
-        }
-    }
-    return $structured;
 }
 
 sub divideup {
@@ -289,89 +188,70 @@ sub divideup {
         $block->{'from'} =  'MAILER-DAEMON Tue Feb 11 00:00:00 2014';
     }
 
-    $block->{'body'} .= "\n";
+    $block->{'header'} .= "\n" unless $block->{'header'} =~ /\n\z/;
+    $block->{'body'}   .= "\n";
     return $block;
 }
 
-sub takeapart {
-    # Take each email header in the original message apart
-    # @param         [String] heads The original message header
-    # @return        [Hash]         Structured message headers
+sub makemap {
+    # Convert a text including email headers to a hash reference
+    # @param    [String] argv0  Email header data
+    # @param    [Bool]   argv1  Decode "Subject:" header
+    # @return   [Hash]          Structured email header data
+    # @since    v4.25.6
     my $class = shift;
-    my $heads = shift || return {};
+    my $argv0 = shift || return {};
+    my $argv1 = shift || 0;
 
-    state $borderline = '__MIME_ENCODED_BOUNDARY__';
-    $$heads =~ s/^[>]+[ ]//mg;    # Remove '>' indent symbol of forwarded message
-    $$heads =~ s/=[ ]+=/=\n =/mg; # Replace ' ' with "\n" at unfolded values
+    $$argv0 =~ s/^[>]+[ ]//mg;  # Remove '>' indent symbol of forwarded message
 
-    my $previousfn = '';
-    my $asciiarmor = {};    # Header names which has MIME encoded value
-    my $headerpart = {};    # Required headers in the original message part
+    # Select and convert all the headers in $argv0. The following regular expression
+    # is based on https://gist.github.com/xtetsuji/b080e1f5551d17242f6415aba8a00239
+    my $firstpairs = { $$argv0 =~ /^([\w-]+):[ ]*(.*?)\n(?![\s\t])/gms };
+    my $headermaps = {};
+    my $recvheader = [];
 
-    for my $e ( split("\n", $$heads) ) {
-        # Header name as a key, The value of header as a value
-        if( $e =~ /\A[ \t]+/ ) {
-            # Continued (foled) header value from the previous line
-            next unless $previousfn;
 
-            # Concatenate the line if it is the value of required header
-            if( Sisimai::MIME->is_mimeencoded(\$e) ) {
-                # The line is MIME-Encoded test
-                if( $previousfn eq 'subject' ) {
-                    # Subject: header
-                    $headerpart->{ $previousfn } .= $borderline.$e;
-                } else {
-                    # Is not Subject header
-                    $headerpart->{ $previousfn } .= $e;
-                }
-                $asciiarmor->{ $previousfn } = 1;
+    $headermaps->{ lc $_ } = $firstpairs->{ $_ } for keys %$firstpairs;
+    for my $e ( values %$headermaps ) { $e =~ s/\n\s+/ /; $e =~ y/\t / /s }
 
-            } else {
-                # ASCII Characters only: Not MIME-Encoded
-                $e =~ s/\A[ \t]+//; # unfolding
-                $headerpart->{ $previousfn }  .= $e;
-                $asciiarmor->{ $previousfn } //= 0;
-            }
-        } else {
-            # Header name as a key, The value of header as a value
-            my($lhs, $rhs) = split(/:[ ]*/, $e, 2);
-            next unless $lhs = lc($lhs || '');
-            $previousfn = '';
-
-            next unless exists $RFC822Head->{ $lhs };
-            $previousfn = $lhs;
-            $headerpart->{ $previousfn } //= $rhs;
-        }
+    if( $$argv0 =~ /^Received:/m ) {
+        # Capture values of each Received: header
+        $recvheader = [$$argv0 =~ /^Received:[ ]*(.*?)\n(?![\s\t])/gms];
+        for my $e ( @$recvheader ) { $e =~ s/\n\s+/ /; $e =~ y/\n\t / /s }
     }
-    return $headerpart unless $headerpart->{'subject'};
+    $headermaps->{'received'} = $recvheader;
+
+    return $headermaps unless $argv1;
+    return $headermaps unless length $headermaps->{'subject'};
 
     # Convert MIME-Encoded subject
-    if( Sisimai::String->is_8bit(\$headerpart->{'subject'}) ) {
+    if( Sisimai::String->is_8bit(\$headermaps->{'subject'}) ) {
         # The value of ``Subject'' header is including multibyte character,
         # is not MIME-Encoded text.
         eval {
             # Remove invalid byte sequence
-            Encode::decode_utf8($headerpart->{'subject'});
-            Encode::encode_utf8($headerpart->{'subject'});
+            Encode::decode_utf8($headermaps->{'subject'});
+            Encode::encode_utf8($headermaps->{'subject'});
         };
-        $headerpart->{'subject'} = 'MULTIBYTE CHARACTERS HAVE BEEN REMOVED' if $@;
+        $headermaps->{'subject'} = 'MULTIBYTE CHARACTERS HAVE BEEN REMOVED' if $@;
 
     } else {
         # MIME-Encoded subject field or ASCII characters only
         my $r = [];
-        if( $asciiarmor->{'subject'} ) {
+        if( Sisimai::MIME->is_mimeencoded(\$headermaps->{'subject'}) ) {
             # split the value of Subject by $borderline
-            for my $v ( split($borderline, $headerpart->{'subject'}) ) {
+            for my $v ( split(/ /, $headermaps->{'subject'}) ) {
                 # Insert value to the array if the string is MIME encoded text
                 push @$r, $v if Sisimai::MIME->is_mimeencoded(\$v);
             }
         } else {
             # Subject line is not MIME encoded
-            $r = [$headerpart->{'subject'}];
+            $r = [$headermaps->{'subject'}];
         }
-        $headerpart->{'subject'} = Sisimai::MIME->mimedecode($r);
+        $headermaps->{'subject'} = Sisimai::MIME->mimedecode($r);
     }
-    return $headerpart;
+    return $headermaps;
 }
 
 sub parse {
@@ -393,8 +273,6 @@ sub parse {
     my $hookmethod = $argvs->{'hook'} || undef;
     my $havecaught = undef;
 
-    # PRECHECK_EACH_HEADER:
-    # Set empty string if the value is undefined
     $mailheader->{'from'}         //= '';
     $mailheader->{'subject'}      //= '';
     $mailheader->{'content-type'} //= '';
@@ -402,7 +280,6 @@ sub parse {
     # Decode BASE64 Encoded message body
     my $mesgformat = lc($mailheader->{'content-type'} || '');
     my $ctencoding = lc($mailheader->{'content-transfer-encoding'} || '');
-
     if( index($mesgformat, 'text/plain') == 0 || index($mesgformat, 'text/html') == 0 ) {
         # Content-Type: text/plain; charset=UTF-8
         if( $ctencoding eq 'base64' ) {
@@ -424,20 +301,6 @@ sub parse {
             $bodystring = $p if length $$p;
         }
     }
-
-    # EXPAND_FORWARDED_MESSAGE:
-    # Check whether or not the message is a bounce mail.
-    # Pre-Process email body if it is a forwarded bounce message.
-    # Get the original text when the subject begins from 'fwd:' or 'fw:'
-    if( lc($mailheader->{'subject'}) =~ /\A[ \t]*fwd?:/ ) {
-        # Delete quoted strings, quote symbols(>)
-        $$bodystring =~ s/^[>]+[ ]//gm;
-        $$bodystring =~ s/^[>]$//gm;
-
-    } elsif( Sisimai::MIME->is_mimeencoded(\$mailheader->{'subject'}) ) {
-        # Decode MIME-Encoded "Subject:" header
-        $mailheader->{'subject'} = Sisimai::MIME->mimedecode([split(/[ ]/, $mailheader->{'subject'})]);
-    }
     $$bodystring =~ tr/\r//d;
 
     if( ref $hookmethod eq 'CODE' ) {
@@ -451,58 +314,67 @@ sub parse {
         eval { $havecaught = $hookmethod->($p) };
         warn sprintf(" ***warning: Something is wrong in hook method:%s", $@) if $@;
     }
-    $$bodystring .= $EndOfEmail;
 
     my $haveloaded = {};
     my $parseddata = undef;
-    my $modulepath = '';
-
+    my $modulename = '';
     PARSER: while(1) {
-        # 1. Sisimai::ARF
-        # 2. User-Defined Module
-        # 3. MTA Module Candidates to be tried on first
-        # 4. Sisimai::Lhost::*
-        # 5. Sisimai::RFC3464
+        # 1. User-Defined Module
+        # 2. MTA Module Candidates to be tried on first
+        # 3. Sisimai::Lhost::*
+        # 4. Sisimai::RFC3464
+        # 5. Sisimai::ARF
         # 6. Sisimai::RFC3834
-        if( Sisimai::ARF->is_arf($mailheader) ) {
-            # Feedback Loop message
-            $parseddata = Sisimai::ARF->make($mailheader, $bodystring);
-            last(PARSER) if $parseddata;
-        }
-
         USER_DEFINED: for my $r ( @$ToBeLoaded ) {
             # Call user defined MTA modules
             next if exists $haveloaded->{ $r };
             $parseddata = $r->make($mailheader, $bodystring);
             $haveloaded->{ $r } = 1;
+            $modulename = $r;
             last(PARSER) if $parseddata;
         }
 
         TRY_ON_FIRST_AND_DEFAULTS: for my $r ( @$TryOnFirst, @$DefaultSet ) {
             # Try MTA module candidates
             next if exists $haveloaded->{ $r };
-            ($modulepath = $r) =~ s|::|/|g;
-            require $modulepath.'.pm';
+            require $LhostTable->{ $r };
             $parseddata = $r->make($mailheader, $bodystring);
             $haveloaded->{ $r } = 1;
+            $modulename = $r;
             last(PARSER) if $parseddata;
         }
 
-        # When the all of Sisimai::Lhost::* modules did not return bounce data,
-        # call Sisimai::RFC3464;
-        require Sisimai::RFC3464;
-        $parseddata = Sisimai::RFC3464->make($mailheader, $bodystring);
-        last(PARSER) if $parseddata;
+        unless( $haveloaded->{'Sisimai::RFC3464'} ) {
+            # When the all of Sisimai::Lhost::* modules did not return bounce
+            # data, call Sisimai::RFC3464;
+            require Sisimai::RFC3464;
+            $parseddata = Sisimai::RFC3464->make($mailheader, $bodystring);
+            $modulename = 'RFC3464';
+            last(PARSER) if $parseddata;
+        }
 
-        # Try to parse the message as auto reply message defined in RFC3834
-        $parseddata = Sisimai::RFC3834->make($mailheader, $bodystring);
-        last(PARSER) if $parseddata;
+        unless( $haveloaded->{'Sisimai::ARF'} ) {
+            # Feedback Loop message
+            require Sisimai::ARF;
+            $parseddata = Sisimai::ARF->make($mailheader, $bodystring) if Sisimai::ARF->is_arf($mailheader);
+            last(PARSER) if $parseddata;
+        }
 
-        # as of now, we have no sample email for coding this block
-        last;
+        unless( $haveloaded->{'Sisimai::RFC3834'} ) {
+            # Try to parse the message as auto reply message defined in RFC3834
+            require Sisimai::RFC3834;
+            $parseddata = Sisimai::RFC3834->make($mailheader, $bodystring);
+            $modulename = 'RFC3834';
+            last(PARSER) if $parseddata;
+        }
+
+        last; # as of now, we have no sample email for coding this block
     } # End of while(PARSER)
+    return undef unless $parseddata;
 
-    $parseddata->{'catch'} = $havecaught if $parseddata;
+    $parseddata->{'catch'} = $havecaught;
+    $modulename =~ s/\A.+:://;
+    $_->{'agent'} ||= $modulename for @{ $parseddata->{'ds'} };
     return $parseddata;
 }
 
@@ -583,7 +455,6 @@ method like the following codes:
     my $message = Sisimai::Message->new(
         'data' => $mailtxt,
         'hook' => $cmethod,
-        'field' => ['X-Mailer', 'Precedence']
     );
     print $message->catch->{'x-mailer'};    # Apple Mail (2.1283)
     print $message->catch->{'queue-id'};    # 2DAEB222022E

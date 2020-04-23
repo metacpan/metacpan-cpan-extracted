@@ -1,151 +1,95 @@
 package Data::Object::Scalar;
 
-use Try::Tiny;
+use 5.014;
+
+use strict;
+use warnings;
+use routines;
+
+use Carp ();
+use Scalar::Util ();
+
 use Role::Tiny::With;
 
-use Data::Object::Export qw(
-  cast
-  load
-);
+use parent 'Data::Object::Kind';
 
-map with($_), my @roles = qw(
-  Data::Object::Role::Detract
-  Data::Object::Role::Dumper
-  Data::Object::Role::Output
-  Data::Object::Role::Throwable
-);
-
-map with($_), my @rules = qw(
-  Data::Object::Rule::Comparison
-  Data::Object::Rule::Defined
-);
+with 'Data::Object::Role::Dumpable';
+with 'Data::Object::Role::Proxyable';
+with 'Data::Object::Role::Throwable';
 
 use overload (
-  '""'     => 'data',
-  '~~'     => 'data',
+  '""'     => 'detract',
+  '~~'     => 'detract',
   fallback => 1
 );
 
-use parent 'Data::Object::Base::Scalar';
-
-our $VERSION = '0.99'; # VERSION
+our $VERSION = '2.03'; # VERSION
 
 # BUILD
-# METHODS
 
-sub roles {
-  return cast([@roles]);
-}
-
-sub rules {
-  return cast([@rules]);
-}
-
-# DISPATCHERS
-
-sub defined {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::Scalar::Defined';
-
-    return cast(load($func)->new($self, @args)->execute);
+method new($data = '') {
+  if (Scalar::Util::blessed($data)) {
+    $data = $data->detract if $data->can('detract');
   }
-  catch {
-    my $error = $_;
 
-    $self->throw(ref($error) ? $error->message : "$error");
+  if (Scalar::Util::blessed($data) && $data->isa('Regexp') && $^V <= v5.12.0) {
+    $data = do { \(my $q = qr/$data/) };
+  }
+
+  return bless ref($data) ? $data : \$data, $self;
+}
+
+# PROXY
+
+method build_proxy($package, $method, @args) {
+  my $plugin = $self->plugin($method) or return undef;
+
+  return sub {
+    use Try::Tiny;
+
+    my $is_func = $plugin->package->can('mapping');
+
+    try {
+      my $instance = $plugin->build($is_func ? ($self, @args) : [$self, @args]);
+
+      return $instance->execute;
+    }
+    catch {
+      my $error = $_;
+      my $class = $self->class;
+      my $arity = $is_func ? 'mapping' : 'argslist';
+      my $message = ref($error) ? $error->{message} : "$error";
+      my $signature = "${class}::${method}(@{[join(', ', $plugin->package->$arity)]})";
+
+      Carp::confess("$signature: $error");
+    };
   };
 }
 
-sub eq {
-  my ($self, @args) = @_;
+# PLUGIN
 
-  try {
-    my $func = 'Data::Object::Func::Scalar::Eq';
+method plugin($name, @args) {
+  my $plugin;
 
-    return cast(load($func)->new($self, @args)->execute);
+  my $space = $self->space;
+
+  return undef if !$name;
+
+  if ($plugin = eval { $space->child('plugin')->child($name)->load }) {
+
+    return undef unless $plugin->can('argslist');
+
+    return $space->child('plugin')->child($name);
   }
-  catch {
-    my $error = $_;
 
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
+  if ($plugin = $space->child('func')->child($name)->load) {
 
-sub ge {
-  my ($self, @args) = @_;
+    return undef unless $plugin->can('mapping');
 
-  try {
-    my $func = 'Data::Object::Func::Scalar::Ge';
-
-    return cast(load($func)->new($self, @args)->execute);
+    return $space->child('func')->child($name);
   }
-  catch {
-    my $error = $_;
 
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub gt {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::Scalar::Gt';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub le {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::Scalar::Le';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub lt {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::Scalar::Lt';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub ne {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::Scalar::Ne';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
+  return undef;
 }
 
 1;
@@ -160,11 +104,13 @@ Data::Object::Scalar
 
 =head1 ABSTRACT
 
-Data-Object Scalar Class
+Scalar Class for Perl 5
 
 =cut
 
 =head1 SYNOPSIS
+
+  package main;
 
   use Data::Object::Scalar;
 
@@ -174,30 +120,44 @@ Data-Object Scalar Class
 
 =head1 DESCRIPTION
 
-Data::Object::Scalar provides routines for operating on Perl 5 scalar
-objects. Scalar methods work on data that meets the criteria for being a scalar.
+This package provides methods for manipulating scalar data.
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Data::Object::Kind>
+
+=cut
+
+=head1 LIBRARIES
+
+This package uses type constraints from:
+
+L<Data::Object::Types>
 
 =cut
 
 =head1 METHODS
 
-This package implements the following methods.
+This package implements the following methods:
 
 =cut
 
 =head2 defined
 
-  defined() : NumObject
+  defined() : Num
 
 The defined method returns true if the object represents a value that meets the
-criteria for being defined, otherwise it returns false. This method returns a
-L<Data::Object::Number> object.
+criteria for being defined, otherwise it returns false.
 
 =over 4
 
-=item defined example
+=item defined example #1
 
-  # given $scalar
+  my $scalar = Data::Object::Scalar->new;
 
   $scalar->defined; # 1
 
@@ -207,18 +167,17 @@ L<Data::Object::Number> object.
 
 =head2 eq
 
-  eq(Any $arg1) : NumObject
+  eq(Any $arg1) : Any
 
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+The eq method will throw an exception if called.
 
 =over 4
 
-=item eq example
+=item eq example #1
 
-  # given $scalar
+  my $scalar = Data::Object::Scalar->new(\*main);
 
-  $scalar->eq; # exception thrown
+  $scalar->eq(\*test);
 
 =back
 
@@ -226,18 +185,17 @@ This method will throw an exception if called.
 
 =head2 ge
 
-  ge(Any $arg1) : NumObject
+  ge(Any $arg1) : Any
 
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+The ge method will throw an exception if called.
 
 =over 4
 
-=item ge example
+=item ge example #1
 
-  # given $scalar
+  my $scalar = Data::Object::Scalar->new(\*main);
 
-  $scalar->ge; # exception thrown
+  $scalar->ge(\*test);
 
 =back
 
@@ -245,18 +203,17 @@ This method will throw an exception if called.
 
 =head2 gt
 
-  gt(Any $arg1) : NumObject
+  gt(Any $arg1) : Any
 
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+The gt method will throw an exception if called.
 
 =over 4
 
-=item gt example
+=item gt example #1
 
-  # given $scalar
+  my $scalar = Data::Object::Scalar->new(\*main);
 
-  $scalar->gt; # exception thrown
+  $scalar->gt(\*test);
 
 =back
 
@@ -264,18 +221,17 @@ This method will throw an exception if called.
 
 =head2 le
 
-  le(Any $arg1) : NumObject
+  le(Any $arg1) : Any
 
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+The le method will throw an exception if called.
 
 =over 4
 
-=item le example
+=item le example #1
 
-  # given $scalar
+  my $scalar = Data::Object::Scalar->new(\*main);
 
-  $scalar->le; # exception thrown
+  $scalar->le(\*test);
 
 =back
 
@@ -283,18 +239,17 @@ This method will throw an exception if called.
 
 =head2 lt
 
-  lt(Any $arg1) : NumObject
+  lt(Any $arg1) : Any
 
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+The lt method will throw an exception if called.
 
 =over 4
 
-=item lt example
+=item lt example #1
 
-  # given $scalar
+  my $scalar = Data::Object::Scalar->new(\*main);
 
-  $scalar->lt; # exception thrown
+  $scalar->lt(\*test);
 
 =back
 
@@ -302,98 +257,46 @@ This method will throw an exception if called.
 
 =head2 ne
 
-  ne(Any $arg1) : NumObject
+  ne(Any $arg1) : Any
 
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+The ne method will throw an exception if called.
 
 =over 4
 
-=item ne example
+=item ne example #1
 
-  # given $scalar
+  my $scalar = Data::Object::Scalar->new(\*main);
 
-  $scalar->ne; # exception thrown
+  $scalar->ne(\*test);
 
 =back
 
 =cut
 
-=head2 roles
+=head1 AUTHOR
 
-  roles() : ArrayRef
+Al Newkirk, C<awncorp@cpan.org>
 
-The roles method returns the list of roles attached to object. This method
-returns a L<Data::Object::Array> object.
+=head1 LICENSE
 
-=over 4
+Copyright (C) 2011-2019, Al Newkirk, et al.
 
-=item roles example
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the L<"license
+file"|https://github.com/iamalnewkirk/foobar/blob/master/LICENSE>.
 
-  # given $scalar
+=head1 PROJECT
 
-  $scalar->roles;
+L<Wiki|https://github.com/iamalnewkirk/foobar/wiki>
 
-=back
+L<Project|https://github.com/iamalnewkirk/foobar>
 
-=cut
+L<Initiatives|https://github.com/iamalnewkirk/foobar/projects>
 
-=head2 rules
+L<Milestones|https://github.com/iamalnewkirk/foobar/milestones>
 
-  rules() : ArrayRef
+L<Contributing|https://github.com/iamalnewkirk/foobar/blob/master/CONTRIBUTE.md>
 
-The rules method returns consumed rules.
-
-=over 4
-
-=item rules example
-
-  my $rules = $scalar->rules;
-
-=back
+L<Issues|https://github.com/iamalnewkirk/foobar/issues>
 
 =cut
-
-=head1 ROLES
-
-This package inherits all behavior from the folowing role(s):
-
-=cut
-
-=over 4
-
-=item *
-
-L<Data::Object::Role::Detract>
-
-=item *
-
-L<Data::Object::Role::Dumper>
-
-=item *
-
-L<Data::Object::Role::Output>
-
-=item *
-
-L<Data::Object::Role::Throwable>
-
-=back
-
-=head1 RULES
-
-This package adheres to the requirements in the folowing rule(s):
-
-=cut
-
-=over 4
-
-=item *
-
-L<Data::Object::Rule::Comparison>
-
-=item *
-
-L<Data::Object::Rule::Defined>
-
-=back

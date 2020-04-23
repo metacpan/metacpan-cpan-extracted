@@ -177,6 +177,7 @@ sys {
   meta->after_hook(
     gather_system => sub {
       my($build) = @_;
+      return if defined $build->runtime_prop->{libs};
       if($build->install_prop->{my_libs})
       {
         $build->runtime_prop->{$_} = $build->install_prop->{"my_$_"} for qw( version cflags libs );

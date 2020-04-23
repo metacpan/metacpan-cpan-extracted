@@ -1,24 +1,27 @@
 package Data::Object::Search;
 
-use parent 'Data::Object::Array';
+use 5.014;
+
+use strict;
+use warnings;
+use routines;
 
 use overload (
-  '""'     => 'data',
-  '~~'     => 'data',
-  'bool'   => 'data',
+  '""'     => 'detract',
+  '~~'     => 'detract',
+  'bool'   => 'detract',
   'qr'     => 'regexp',
   '@{}'    => 'self',
   fallback => 1
 );
 
-our $VERSION = '0.99'; # VERSION
+use parent 'Data::Object::Array';
 
-# BUILD
+our $VERSION = '2.03'; # VERSION
+
 # METHODS
 
-sub captures {
-  my ($self) = @_;
-
+method captures() {
   my $string = $self->initial;
 
   my $last_match_start = $self->last_match_start;
@@ -33,42 +36,35 @@ sub captures {
     push @captures, substr "$string", $start, $end - $start;
   }
 
-  return Data::Object::Export::deduce_deep([@captures]);
+  return [@captures];
 }
 
-sub count {
-  my ($self) = @_;
+method count() {
 
-  return Data::Object::Export::deduce_deep($self->[2]);
+  return $self->[2];
 }
 
-sub initial {
-  my ($self) = @_;
+method initial() {
 
-  return Data::Object::Export::deduce_deep($self->[6]);
+  return $self->[6];
 }
 
-sub last_match_end {
-  my ($self) = @_;
+method last_match_end() {
 
-  return Data::Object::Export::deduce_deep($self->[4]);
+  return $self->[4];
 }
 
-sub last_match_start {
-  my ($self) = @_;
+method last_match_start() {
 
-  return Data::Object::Export::deduce_deep($self->[3]);
+  return $self->[3];
 }
 
-sub named_captures {
-  my ($self) = @_;
+method named_captures() {
 
-  return Data::Object::Export::deduce_deep($self->[5]);
+  return $self->[5];
 }
 
-sub matched {
-  my ($self) = @_;
-
+method matched() {
   my $string = $self->initial;
 
   my $last_match_start = $self->last_match_start;
@@ -77,12 +73,10 @@ sub matched {
   my $start = $last_match_start->[0] || 0;
   my $end   = $last_match_end->[0]   || 0;
 
-  return Data::Object::Export::deduce_deep(substr "$string", $start, $end - $start);
+  return substr "$string", $start, $end - $start;
 }
 
-sub prematched {
-  my ($self) = @_;
-
+method prematched() {
   my $string = $self->initial;
 
   my $last_match_start = $self->last_match_start;
@@ -91,12 +85,10 @@ sub prematched {
   my $start = $last_match_start->[0] || 0;
   my $end   = $last_match_end->[0]   || 0;
 
-  return Data::Object::Export::deduce_deep(substr "$string", 0, $start);
+  return substr "$string", 0, $start;
 }
 
-sub postmatched {
-  my ($self) = @_;
-
+method postmatched() {
   my $string = $self->initial;
 
   my $last_match_start = $self->last_match_start;
@@ -105,19 +97,17 @@ sub postmatched {
   my $start = $last_match_start->[0] || 0;
   my $end   = $last_match_end->[0]   || 0;
 
-  return Data::Object::Export::deduce_deep(substr "$string", $end);
+  return substr "$string", $end;
 }
 
-sub regexp {
-  my ($self) = @_;
+method regexp() {
 
-  return Data::Object::Export::deduce_deep($self->[0]);
+  return qr($self->[0]);
 }
 
-sub string {
-  my ($self) = @_;
+method string() {
 
-  return Data::Object::Export::deduce_deep($self->[1]);
+  return $self->[1];
 }
 
 1;
@@ -132,52 +122,88 @@ Data::Object::Search
 
 =head1 ABSTRACT
 
-Data-Object Regex Class
+Search Class for Perl 5
 
 =cut
 
 =head1 SYNOPSIS
 
+  package main;
+
   use Data::Object::Search;
 
-  my $result = Data::Object::Search->new([
-    $regexp,
-    $altered_string,
-    $count,
-    $last_match_end,
-    $last_match_start,
-    $named_captures,
-    $initial_string
+  my $search = Data::Object::Search->new([
+    '(?^:(test))',
+    'this is a test',
+    1,
+    [
+      10,
+      10
+    ],
+    [
+      14,
+      14
+    ],
+    {},
+    'this is a test'
   ]);
 
 =cut
 
 =head1 DESCRIPTION
 
-Data::Object::Search provides routines for introspecting the results of an
-operation involving a regular expressions. These methods work on data whose
-shape conforms to the tuple defined in the synopsis.
+This package provides methods for manipulating search data.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::Array>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Data::Object::Role::Dumpable>
+
+L<Data::Object::Role::Proxyable>
+
+L<Data::Object::Role::Throwable>
+
+=cut
+
+=head1 LIBRARIES
+
+This package uses type constraints from:
+
+L<Data::Object::Types>
 
 =cut
 
 =head1 METHODS
 
-This package implements the following methods.
+This package implements the following methods:
 
 =cut
 
 =head2 captures
 
-  captures() : ArrayObject
+  captures() : ArrayRef
 
 The captures method returns the capture groups from the result object which
-contains information about the results of the regular expression operation.
+contains information about the results of the regular expression operation..
 
 =over 4
 
-=item captures example
+=item captures example #1
 
-  my $captures = $result->captures();
+  # given: synopsis
+
+  $search->captures; # ['test']
 
 =back
 
@@ -185,17 +211,19 @@ contains information about the results of the regular expression operation.
 
 =head2 count
 
-  count() : NumObject
+  count() : Num
 
-The regexp method returns the regular expression used to perform the match from
+The count method returns the regular expression used to perform the match from
 the result object which contains information about the results of the regular
-expression operation.
+expression operation..
 
 =over 4
 
-=item count example
+=item count example #1
 
-  my $count = $result->count();
+  # given: synopsis
+
+  $search->count; # 1
 
 =back
 
@@ -203,16 +231,18 @@ expression operation.
 
 =head2 initial
 
-  initial() : StrObject
+  initial() : Str
 
 The initial method returns the unaltered string from the result object which
-contains information about the results of the regular expression operation.
+contains information about the results of the regular expression operation..
 
 =over 4
 
-=item initial example
+=item initial example #1
 
-  my $initial = $result->initial();
+  # given: synopsis
+
+  $search->initial; # this is a test
 
 =back
 
@@ -220,17 +250,19 @@ contains information about the results of the regular expression operation.
 
 =head2 last_match_end
 
-  last() : Any
+  last_match_end() : Maybe[ArrayRef[Int]]
 
 The last_match_end method returns an array of offset positions into the string
 where the capture(s) stopped matching from the result object which contains
-information about the results of the regular expression operation.
+information about the results of the regular expression operation..
 
 =over 4
 
-=item last_match_end example
+=item last_match_end example #1
 
-  my $last_match_end = $result->last_match_end();
+  # given: synopsis
+
+  $search->last_match_end; # [14, 14]
 
 =back
 
@@ -238,17 +270,19 @@ information about the results of the regular expression operation.
 
 =head2 last_match_start
 
-  last() : Any
+  last_match_start() : Maybe[ArrayRef[Int]]
 
 The last_match_start method returns an array of offset positions into the
 string where the capture(s) matched from the result object which contains
-information about the results of the regular expression operation.
+information about the results of the regular expression operation..
 
 =over 4
 
-=item last_match_start example
+=item last_match_start example #1
 
-  my $last_match_start = $result->last_match_start();
+  # given: synopsis
+
+  $search->last_match_start; # [10, 10]
 
 =back
 
@@ -256,17 +290,19 @@ information about the results of the regular expression operation.
 
 =head2 matched
 
-  matched() : StrObject | UndefObject
+  matched() : Maybe[Str]
 
 The matched method returns the portion of the string that matched from the
 result object which contains information about the results of the regular
-expression operation.
+expression operation..
 
 =over 4
 
-=item matched example
+=item matched example #1
 
-  my $matched = $result->matched();
+  # given: synopsis
+
+  $search->matched; # test
 
 =back
 
@@ -274,18 +310,19 @@ expression operation.
 
 =head2 named_captures
 
-  name() : StrObject
-
+  named_captures() : HashRef
 
 The named_captures method returns a hash containing the requested named regular
 expressions and captured string pairs from the result object which contains
-information about the results of the regular expression operation.
+information about the results of the regular expression operation..
 
 =over 4
 
-=item named_captures example
+=item named_captures example #1
 
-  my $named_captures = $result->named_captures();
+  # given: synopsis
+
+  $search->named_captures; # {}
 
 =back
 
@@ -293,17 +330,19 @@ information about the results of the regular expression operation.
 
 =head2 postmatched
 
-  postmatched() : StrObject | UndefObject
+  postmatched() : Maybe[Str]
 
 The postmatched method returns the portion of the string after the regular
 expression matched from the result object which contains information about the
-results of the regular expression operation.
+results of the regular expression operation..
 
 =over 4
 
-=item postmatched example
+=item postmatched example #1
 
-  my $postmatched = $result->postmatched();
+  # given: synopsis
+
+  $search->postmatched; # ''
 
 =back
 
@@ -311,17 +350,19 @@ results of the regular expression operation.
 
 =head2 prematched
 
-  prematched() : StrObject | UndefObject
+  prematched() : Maybe[Str]
 
 The prematched method returns the portion of the string before the regular
 expression matched from the result object which contains information about the
-results of the regular expression operation.
+results of the regular expression operation..
 
 =over 4
 
-=item prematched example
+=item prematched example #1
 
-  my $prematched = $result->prematched();
+  # given: synopsis
+
+  $search->prematched; # 'this is a '
 
 =back
 
@@ -329,17 +370,19 @@ results of the regular expression operation.
 
 =head2 regexp
 
-  regexp() : RegexpObject
+  regexp() : RegexpRef
 
 The regexp method returns the regular expression used to perform the match from
 the result object which contains information about the results of the regular
-expression operation.
+expression operation..
 
 =over 4
 
-=item regexp example
+=item regexp example #1
 
-  my $regexp = $result->regexp();
+  # given: synopsis
+
+  $search->regexp; # qr/(test)/
 
 =back
 
@@ -347,70 +390,48 @@ expression operation.
 
 =head2 string
 
-  string() : StrObject
+  string() : Str
 
 The string method returns the string matched against the regular expression
 from the result object which contains information about the results of the
-regular expression operation.
+regular expression operation..
 
 =over 4
 
-=item string example
+=item string example #1
 
-  my $string = $result->string();
+  # given: synopsis
+
+  $search->string; # this is a test
 
 =back
 
 =cut
 
-=head1 ROLES
+=head1 AUTHOR
 
-This package inherits all behavior from the folowing role(s):
+Al Newkirk, C<awncorp@cpan.org>
 
-=cut
+=head1 LICENSE
 
-=over 4
+Copyright (C) 2011-2019, Al Newkirk, et al.
 
-=item *
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the L<"license
+file"|https://github.com/iamalnewkirk/foobar/blob/master/LICENSE>.
 
-L<Data::Object::Role::Detract>
+=head1 PROJECT
 
-=item *
+L<Wiki|https://github.com/iamalnewkirk/foobar/wiki>
 
-L<Data::Object::Role::Dumper>
+L<Project|https://github.com/iamalnewkirk/foobar>
 
-=item *
+L<Initiatives|https://github.com/iamalnewkirk/foobar/projects>
 
-L<Data::Object::Role::Output>
+L<Milestones|https://github.com/iamalnewkirk/foobar/milestones>
 
-=item *
+L<Contributing|https://github.com/iamalnewkirk/foobar/blob/master/CONTRIBUTE.md>
 
-L<Data::Object::Role::Throwable>
-
-=back
-
-=head1 RULES
-
-This package adheres to the requirements in the folowing rule(s):
+L<Issues|https://github.com/iamalnewkirk/foobar/issues>
 
 =cut
-
-=over 4
-
-=item *
-
-L<Data::Object::Rule::Collection>
-
-=item *
-
-L<Data::Object::Rule::Comparison>
-
-=item *
-
-L<Data::Object::Rule::Defined>
-
-=item *
-
-L<Data::Object::Rule::List>
-
-=back

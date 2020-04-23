@@ -1,5 +1,9 @@
 Revision history for Perl extension JSON-RPC2-AnyEvent
 
+0.03 2020-04-22T04:11:54Z
+
+    - Fixed "undefined subroutine" bug. Thank you, @oklas!
+
 0.02 2013-10-20T13:37:16Z
 
     - Fixed t/03_tcp_server.t for Cygwin

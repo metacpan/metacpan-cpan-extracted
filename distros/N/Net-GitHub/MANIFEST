@@ -5,7 +5,6 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
-README
 cpanfile
 cpanfile.ci
 dist.ini
@@ -16,6 +15,7 @@ examples/search.pl
 examples/upload_asset.pl
 lib/Net/GitHub.pm
 lib/Net/GitHub/V3.pm
+lib/Net/GitHub/V3/Actions.pm
 lib/Net/GitHub/V3/Events.pm
 lib/Net/GitHub/V3/Gists.pm
 lib/Net/GitHub/V3/GitData.pm

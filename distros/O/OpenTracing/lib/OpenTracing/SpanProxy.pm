@@ -3,7 +3,7 @@ package OpenTracing::SpanProxy;
 use strict;
 use warnings;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 =encoding utf8
 
@@ -38,7 +38,12 @@ Writes a log entry to the L<OpenTracing::Span>.
 
 =cut
 
+sub id { shift->span->id }
+sub trace_id { shift->span->trace_id }
+sub parent_id { shift->span->parent_id }
 sub log { shift->span->log(@_) }
+sub duration { shift->span->duration(@_) }
+sub finish { shift->span->finish(@_) }
 
 =head2 new_span
 
@@ -53,7 +58,7 @@ sub new_span {
         $parent->trace_id,
         $parent->id,
     );
-    $parent->batch->new_span($name => %args);
+    $parent->tracer->span($name => %args);
 }
 
 =head2 DESTROY

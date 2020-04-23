@@ -1,5 +1,20 @@
 Revision history for Future
 
+0.45    2020-04-22
+        [CHANGES]
+         * API changes to make duck-typing closer to Promises/A+ et.al:
+            + Allow sequencing methods to yield non-Future results; upgrade
+              them to being Future-wrapped
+            + Add ->resolve and ->reject as aliases of ->done and ->fail
+         * Recognise PERL_FUTURE_STRICT environment variable to restore
+           previous sequencing method behaviour
+
+        [BUGFIXES]
+         * ->without_cancel still needs to cancel result if caller is
+           cancelled
+         * Ensure all Future::AsyncAwait interop methods properly respect
+           subclassing
+
 0.44    2020-03-25
         [CHANGES]
          * Added ->result; use that in unit tests and docs where appropriate

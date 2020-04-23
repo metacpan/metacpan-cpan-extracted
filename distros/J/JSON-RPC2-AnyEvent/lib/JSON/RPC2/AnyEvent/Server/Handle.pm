@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 use AnyEvent::Handle;
 use Carp qw(croak);
@@ -49,7 +49,7 @@ sub new {
     $hdl->on_error(sub{
         my ($h, $fatal, $msg) = @_;
         if ( $! == Errno::EBADMSG ) {  # JSON Parse error
-            my $res = JSON::RPC2::AnyEvent::_make_error_response(undef, ERR_PARSE_ERROR, 'Parse error');
+            my $res = JSON::RPC2::AnyEvent::Server::_make_error_response(undef, ERR_PARSE_ERROR, 'Parse error');
             $h->push_write(json => $res);
         } elsif ( $self->{on_error} ){
             $self->{on_error}->($self, $fatal, $msg);

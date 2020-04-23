@@ -4,9 +4,9 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Indicators = __PACKAGE__->INDICATORS;
-my $ReBackbone = qr<^(?:[-]{50}|Content-Type:[ ]*message/rfc822)>m;
-my $MarkingsOf = {
+state $Indicators = __PACKAGE__->INDICATORS;
+state $ReBackbone = qr<^(?:[-]{50}|Content-Type:[ ]*message/rfc822)>m;
+my    $MarkingsOf = {
     'message' => qr{\A(?:
          The[ ]user[(]s[)][ ]
         |Your[ ]message[ ]
@@ -16,7 +16,7 @@ my $MarkingsOf = {
     }x,
     'boundary' => qr/\A__SISIMAI_PSEUDO_BOUNDARY__\z/,
 };
-my $ReFailures = {
+state $ReFailures = {
     #'notaccept'  => [qr/The following recipients did not receive this message:/],
     'mailboxfull' => [qr/The user[(]s[)] account is temporarily over quota/],
     'suspend'     => [
@@ -33,20 +33,13 @@ my $ReFailures = {
     'onhold' => [qr/Each of the following recipients was rejected by a remote mail server/],
 };
 
-sub headerlist  { return ['x-spasign'] }
 sub description { 'au EZweb: http://www.au.kddi.com/mobile/' }
 sub make {
     # Detect an error from EZweb
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.0.0
     my $class = shift;
     my $mhead = shift // return undef;
@@ -85,7 +78,7 @@ sub make {
         my $b0 = Sisimai::MIME->boundary($mhead->{'content-type'}, 1);
         $MarkingsOf->{'boundary'} = qr/\A\Q$b0\E\z/ if $b0; # Convert to regular expression
     }
-    my @rxmessages; map { push @rxmessages, @{ $ReFailures->{ $_ } } } (keys %$ReFailures);
+    my @rxmessages; push @rxmessages, @{ $ReFailures->{ $_ } } for keys %$ReFailures;
 
     for my $e ( split("\n", $emailsteak->[0]) ) {
         # Read error messages and delivery status lines from the head of the email
@@ -152,8 +145,6 @@ sub make {
     return undef unless $recipients;
 
     for my $e ( @$dscontents ) {
-        $e->{'agent'} = __PACKAGE__->smtpagent;
-
         if( exists $e->{'alterrors'} && $e->{'alterrors'} ) {
             # Copy alternative error message
             $e->{'diagnosis'} ||= $e->{'alterrors'};
@@ -220,12 +211,6 @@ Methods in the module are called from only Sisimai::Message.
 C<description()> returns description string of this module.
 
     print Sisimai::Lhost::EZweb->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::EZweb->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

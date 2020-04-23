@@ -1,0 +1,37 @@
+package Data::Object::Number::Func::Defined;
+
+use 5.014;
+
+use strict;
+use warnings;
+
+use registry 'Data::Object::Types';
+
+use Data::Object::Class;
+use Data::Object::ClassHas;
+
+extends 'Data::Object::Number::Func';
+
+our $VERSION = '2.03'; # VERSION
+
+# BUILD
+
+has arg1 => (
+  is => 'ro',
+  isa => 'NumberLike',
+  req => 1
+);
+
+# METHODS
+
+sub execute {
+  my ($self) = @_;
+
+  return 1;
+}
+
+sub mapping {
+  return ('arg1');
+}
+
+1;

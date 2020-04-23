@@ -10,7 +10,7 @@ use vars qw($VERSION);
 
 my $format = '%#:%m%d';
 
-$VERSION = '1.20';
+$VERSION = '1.21';
 
 # Lifted from Date::Holidays::AT source code
 # Ref: https://metacpan.org/source/MDIETRICH/Date-Holidays-AT-v0.1.4/lib/Date/Holidays/AT.pm
@@ -103,7 +103,7 @@ Date::Holidays::Adapter::AT - an adapter class for Date::Holidays::AT
 
 =head1 VERSION
 
-This POD describes version 1.20 of Date::Holidays::Adapter::AT
+This POD describes version 1.21 of Date::Holidays::Adapter::AT
 
 =head1 DESCRIPTION
 
@@ -134,7 +134,7 @@ B<countrycode> in the call to the constructor B<new>.
 The calendar will spand for a year and the keys consist of B<month> and B<day>
 concatenated.
 
-In addition from version 1.20 the adapter support the B<state> parameter, defaulting to
+In addition from version 1.21 the adapter support the B<state> parameter, defaulting to
 B<'all'>.
 
 =head1 DIAGNOSTICS

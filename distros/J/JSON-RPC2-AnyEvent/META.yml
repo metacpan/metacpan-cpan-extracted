@@ -3,18 +3,16 @@ abstract: 'Yet-another, transport-independent and asynchronous JSON-RPC 2.0 impl
 author:
   - 'Daisuke (yet another) Maki <maki.daisuke@gmail.com>'
 build_requires:
-  AnyEvent::Socket: 0
-  Test::More: 0.98
+  AnyEvent::Socket: '0'
+  Test::More: '0.98'
 configure_requires:
-  CPAN::Meta: 0
-  CPAN::Meta::Prereqs: 0
-  Module::Build: 0.38
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v0.8.0, CPAN::Meta::Converter version 2.132830'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: JSON-RPC2-AnyEvent
 no_index:
   directory:
@@ -29,27 +27,29 @@ no_index:
 provides:
   JSON::RPC2::AnyEvent:
     file: lib/JSON/RPC2/AnyEvent.pm
-    version: 0.02
+    version: '0.03'
   JSON::RPC2::AnyEvent::Constants:
     file: lib/JSON/RPC2/AnyEvent/Constants.pm
   JSON::RPC2::AnyEvent::Server:
     file: lib/JSON/RPC2/AnyEvent/Server.pm
-    version: 0.02
+    version: '0.03'
   JSON::RPC2::AnyEvent::Server::Handle:
     file: lib/JSON/RPC2/AnyEvent/Server/Handle.pm
-    version: 0.02
+    version: '0.03'
 recommends:
-  JSON::XS: 0
+  JSON::XS: '0'
 requires:
-  AnyEvent: 7.0
-  AnyEvent::Handle: 0
-  Errno: 0
-  JSON: 0
-  Scalar::Util: 0
-  Try::Tiny: 0
-  perl: 5.010000
+  AnyEvent: '7.0'
+  AnyEvent::Handle: '0'
+  Errno: '0'
+  JSON: '0'
+  Scalar::Util: '0'
+  Try::Tiny: '0'
+  perl: '5.010000'
 resources:
   bugtracker: https://github.com/Maki-Daisuke/p5-JSON-RPC2-AnyEvent/issues
   homepage: https://github.com/Maki-Daisuke/p5-JSON-RPC2-AnyEvent
-  repository: https://github.com/Maki-Daisuke/p5-JSON-RPC2-AnyEvent.git
-version: 0.02
+  repository: git://github.com/Maki-Daisuke/p5-JSON-RPC2-AnyEvent.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -5,14 +5,14 @@ use strict;
 use warnings;
 
 # Based on Sisimai::Lhost::Exim
-my $Indicators = __PACKAGE__->INDICATORS;
-my $ReBackbone = qr|^Included is a copy of the message header:|m;
-my $StartingOf = { 'message' => ['This message was created automatically by mail delivery software.'] };
-my $ReCommands = [
+state $Indicators = __PACKAGE__->INDICATORS;
+state $ReBackbone = qr|^Included is a copy of the message header:|m;
+state $StartingOf = { 'message' => ['This message was created automatically by mail delivery software.'] };
+state $ReCommands = [
     qr/SMTP error from remote (?:mail server|mailer) after ([A-Za-z]{4})/,
     qr/SMTP error from remote (?:mail server|mailer) after end of ([A-Za-z]{4})/,
 ];
-my $MessagesOf = {
+state $MessagesOf = {
     'userunknown' => ['user not found'],
     'hostunknown' => [
         'all host address lookups failed permanently',
@@ -41,7 +41,7 @@ my $MessagesOf = {
     ],
     'contenterror' => ['Too many "Received" headers'],
 };
-my $DelayedFor = [
+state $DelayedFor = [
     'retry timeout exceeded',
     'No action is required on your part',
     'retry time not reached for any host after a long failure period',
@@ -51,30 +51,22 @@ my $DelayedFor = [
     'was frozen on arrival by ',
 ];
 
-# X-MX-Bounce: mta/src/queue/bounce
-# X-MXL-NoteHash: ffffffffffffffff-0000000000000000000000000000000000000000
-# X-MXL-Hash: 4c9d4d411993da17-bbd4212b6c887f6c23bab7db4bd87ef5edc00758
-sub headerlist  { return ['x-mxl-notehash', 'x-mxl-hash', 'x-mx-bounce'] }
 sub description { 'McAfee SaaS' }
 sub make {
     # Detect an error from MXLogic
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.1.1
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
     my $match = 0;
 
-    # 'message-id' => qr/\A[<]mxl[~][0-9a-f]+/,
+    # X-MX-Bounce: mta/src/queue/bounce
+    # X-MXL-NoteHash: ffffffffffffffff-0000000000000000000000000000000000000000
+    # X-MXL-Hash: 4c9d4d411993da17-bbd4212b6c887f6c23bab7db4bd87ef5edc00758
     $match ||= 1 if defined $mhead->{'x-mx-bounce'};
     $match ||= 1 if defined $mhead->{'x-mxl-hash'};
     $match ||= 1 if defined $mhead->{'x-mxl-notehash'};
@@ -196,7 +188,6 @@ sub make {
             }
         }
         $e->{'command'} ||= '';
-        $e->{'agent'}     = __PACKAGE__->smtpagent;
     }
     return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
 }
@@ -227,12 +218,6 @@ Sisimai::Message.
 C<description()> returns description string of this module.
 
     print Sisimai::Lhost::MXLogic->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::MXLogic->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

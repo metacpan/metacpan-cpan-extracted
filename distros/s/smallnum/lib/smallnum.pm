@@ -4,18 +4,19 @@ use strict;
 use warnings;
 use POSIX ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 use overload fallback => 1, 
 	'""' => \&num,
-	'/' => \&division;
+	'*' => \&multiply,
+	'/' => \&divide;
 
-our $offset = 0.5555555;
 our $precision = .01;
+our $offset = 0.5555555;
 
 sub import {
-	$offset = $_[1] if $_[1];
-	$precision = $_[2] if $_[2];
+	$precision = $_[1] if $_[1];
+	$offset = $_[2] if $_[2];
 	overload::constant integer => \&smallnum;
 	overload::constant float => \&smallnum;
 	overload::constant binary => \&smallnum;
@@ -33,15 +34,21 @@ sub num {
 		: $precision * POSIX::ceil(($num - $offset * $precision) / $precision);
 }
 
-sub division {
+sub divide {
 	my (@ot) = (_sref($_[0]), _sref($_[1])); 
 	return $ot[0] && $ot[1]
 		? smallnum($_[2] ? ($ot[1] / $ot[0]) : ($ot[0] / $ot[1])) 
 		: smallnum(0);
 }
 
+sub multiply {
+	my (@ot) = (_sref($_[0]), _sref($_[1])); 
+	return smallnum($ot[1] * $ot[0]);
+}
+
 sub _sref { ref $_[0] ? ${$_[0]} : $_[0] }
 
+# bug on negatives?
 # todo
 
 =head1 NAME
@@ -50,7 +57,7 @@ smallnum - Transparent "SmallNumber" support for Perl
 
 =head1 VERSION
 
-Version 0.02
+Version 0.05
 
 =cut
 
@@ -62,6 +69,24 @@ Version 0.02
 	20.3743543 - 10.1 # 10.27
 	15 / 5.34, # 2.81
 	9 * 0.01, # 0.09
+
+	...
+	
+	use smallnum '0.1';
+
+	10 + 20.452433483  # 30.5
+	20.3743543 - 10.1 # 10.3
+	15 / 5.34, # 2.8
+	9 * 0.01, # 0.1
+
+	...
+
+	use smallnum '1';
+
+	10 + 20.452433483  # 31
+	20.3743543 - 10.1 # 10
+	15 / 5.34, # 3
+	9 * 0.01, # 0
 
 =head1 AUTHOR
 

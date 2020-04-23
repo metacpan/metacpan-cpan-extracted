@@ -9,7 +9,6 @@ use Log::Any qw($log);
 use Log::Any::Adapter;
 use Test::Fatal qw(exception);
 use Test::MockObject;
-use Test::Needs;
 
 BEGIN { use_ok('Log::Any::Adapter::Sentry::Raven') };
 
@@ -101,7 +100,6 @@ subtest test_logging => sub {
             or diag(Dumper \%context);
     }
 
-    my $stack_trace;
     {
         local $log->context->{foo} = 'bar';
         $log->error($Message);
@@ -110,7 +108,7 @@ subtest test_logging => sub {
 
         my ($_invocant, $message, %context) = @$args;
         is $message, $Message, "sentry message did not include foo/bar";
-        $stack_trace = delete $context{'sentry.interfaces.Stacktrace'};
+        my $stack_trace = delete $context{'sentry.interfaces.Stacktrace'};
         {
             local $Data::Dumper::Maxdepth = 3;
             is_deeply(
@@ -123,10 +121,81 @@ subtest test_logging => sub {
             )
                 or diag(Dumper \%context);
         }
+        ok $stack_trace->{frames}, "stack trace included with Devel::StackTrace";
     }
 
-    test_needs 'Devel::StackTrace';
-    ok $stack_trace->{frames}, "stack trace included with Devel::StackTrace";
+    {
+        $log->error(My::Test::Exception->new($Message));
+        my ($name, $args) = $mock_sentry->next_call();
+        is $name, $CAPTURE, "$CAPTURE called with exception";
+
+        my ($_invocant, $message, %context) = @$args;
+        is $message, "$Message", "exception stringified";
+        my $stack_trace = delete $context{'sentry.interfaces.Stacktrace'};
+        is @{$stack_trace->{frames}}, 1, "trace extracted from exception";
+    }
+
+    {
+        local $My::Test::Exception::WEIRD_TRACE = 1;
+        $log->error(My::Test::Exception->new($Message));
+        my ($name, $args) = $mock_sentry->next_call();
+
+        my ($_invocant, $message, %context) = @$args;
+        my $stack_trace = delete $context{'sentry.interfaces.Stacktrace'};
+        ok $stack_trace->{frames}, "got a trace despite bad extraction";
+        isnt @{$stack_trace->{frames}}, 1, "fell back to new trace";
+    }
+
+    {
+        $log->error("We found an exception:", My::Test::Exception->new($Message));
+        my ($name, $args) = $mock_sentry->next_call();
+
+        my ($_invocant, $message, %context) = @$args;
+        is $message, "We found an exception:\n$Message", "exception joined";
+        my $stack_trace = delete $context{'sentry.interfaces.Stacktrace'};
+        isnt @{$stack_trace->{frames}}, 1, "didn't extract handled exception trace";
+    }
 };
+
+{
+    package My::Test::Exception;
+    use overload '""' => sub { ${ shift() } };
+
+    our $WEIRD_TRACE = 1;
+
+    sub new {
+        my ($class, $message) = @_;
+        bless \$message, $class;
+    }
+
+    sub trace {
+        return "without a trace" if $WEIRD_TRACE;
+
+        my $self = shift;
+        my $trace = Devel::StackTrace->new(
+            message => "$self",
+            skip_frames => -1,
+        );
+        $trace->frames(
+            Devel::StackTrace::Frame->new(
+                [
+                    'Imaginary',    # package
+                    'Imaginary.pm', # filename
+                    -1,             # line
+                    'dream',        # subroutine
+                    # more caller vals would follow in the wild
+                ],
+                [], # params
+
+                # these are all the default from Devel::StackTrace
+                undef,       # respect_overload,
+                undef,       # max_arg_length
+                "$self",     # message
+                undef,       # indent
+            )
+        );
+        return $trace;
+    }
+}
 
 done_testing;

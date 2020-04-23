@@ -1,0 +1,92 @@
+Revision history for Math-FractionManip
+
+0.5403 2020-04-22 03:19:23
+    - Improve documentation.
+    - Add legacy changes from Math::Fraction to this file.
+    - Add tests.
+
+0.5402 2020-04-22 02:55:41
+    - Improve documentation.
+
+0.5401 2020-04-22 01:40:35
+    - Fix ambiguous abs() calls.
+
+0.5400 2020-04-22 01:05:29
+    - Resurrect from the original Math::Fraction.
+    - Clean-up code formatting and documentation grammar.
+    - Add tests.
+
+~
+
+Revision history for Perl extension Math::Fraction.
+
+.1a (1 March 1997) Original Release
+
+.2a (2 March 1997) Many Internal Changes:
+       Fixed reduce method so it no longer needs a list of primes after
+         discovering a method in the BigInt module
+       Modified + and * routines to work with as small numbers of possible
+         after reading the fraction section of Knuth's "The Art of Computer
+         Programming" v2 book that I checked out thanks to the reference
+         in the BigInt module
+       Modified - and / routines to with take the negative or receptacle 
+         of the second fraction and then use the + and - method respectively
+       (And when I was browsing the list I also discovered bigrat.pl, but
+         not a BigRat.pm.  Oh well I guess I reinvent the real a bit but
+         I think I created a better one.  I plan to eventually have it is
+         the BigInt package to work with arbitrary size fractions.)
+       Changed the behavior of the MIXED method slightly so that it will
+         display "8/9" instead of "0 8/9"
+       Fixed it so that all the internal functions calls will return list
+         instead of fraction objects, simplifies things internally
+       Created a separate internal reduce function that the reduce method
+         calls and created a separate internal function to simplify signs.
+         Also fixed it so all new fractions will automatically have their signs
+         simplified (ie 1/-2 will become -1/2 and -1/-2 will become 1/2);
+       And probably a few more that I forgot to mention.
+
+.21a (3 March 97) Fixed the strange decimal conversion behavior.
+
+.211a (3 Match 97) Fixed % by zero bug
+
+.22a (3 March 97) Added demo a demo subroutine to the test script.
+
+.3a (8 March 97) First Version to be Uploaded to CPAN.
+   Renamed to Math::Fraction
+   Added Default tags
+   Added Using arbitrary sized numbers.
+   
+.4a (24 March 97)
+  Changed the structure of a Fraction object to now have a 'frac' part and a
+    'tags' part.
+  Fixed the _from_decimal sub to work properly recognize large repeating
+     floats properly.
+  Added support for default sets so that functions can have the own private
+     set of default values.
+  Added a new AUTO which when set will convert the fraction from SMALL
+     to BIG as needed.
+  Fixed the modify_tag so that it will convert the fraction to reflect the
+     new tags.
+  And a lot of other minor bugs fixed.
+
+.5b (17 Dec 97)
+  Changed from an Alpha release to a Beta release because I have not herd of
+      any problems yet.
+  Converted the Manual into POD format
+  Fixed the module so it has a proper install procedure.
+  Modified the copyright a bit to be less intimidating.
+  Changed the Demo Script a bit so it would display better in the manual page.
+
+.51b (18 Dec 97)
+  Fixed bug in which the whole number part of repeating decimals was ignored
+
+.52b 
+  Fixed error in the EXAMPLES section of the manual due to the fixing of the
+      repeating decimal error
+  Added the RAW tag which will always include the sign
+  Minor corrections to the manual
+
+.53b (2 Feb 98)
+  Fixed a bug where negative mixed fractions will come out as -1 -1/4
+      instead of -1 1/4.
+  Fixed a bug so that frac(0,MIXED) will return 0 and not a 0 length string.

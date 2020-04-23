@@ -4,23 +4,17 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Indicators = __PACKAGE__->INDICATORS;
-my $ReBackbone = qr|^Content-Type:[ ]message/rfc822|m;
-my $StartingOf = { 'message' => ['Content-Type: message/delivery-status'] };
+state $Indicators = __PACKAGE__->INDICATORS;
+state $ReBackbone = qr|^Content-Type:[ ]message/rfc822|m;
+state $StartingOf = { 'message' => ['Content-Type: message/delivery-status'] };
 
 sub description { 'Unknown MTA #5' }
 sub make {
     # Detect an error from Unknown MTA #5
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.13.0
     my $class = shift;
     my $mhead = shift // return undef;
@@ -117,10 +111,7 @@ sub make {
     }
     return undef unless $recipients;
 
-    for my $e ( @$dscontents ) {
-        $e->{'diagnosis'} ||= Sisimai::String->sweep($e->{'diagnosis'});
-        $e->{'agent'}       = __PACKAGE__->smtpagent;
-    }
+    $_->{'diagnosis'} ||= Sisimai::String->sweep($_->{'diagnosis'}) for @$dscontents;
     return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
 }
 
@@ -149,12 +140,6 @@ Methods in the module are called from only Sisimai::Message.
 C<description()> returns description string of this module.
 
     print Sisimai::Lhost::X5->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::X5->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

@@ -7,7 +7,7 @@ require './t/999-values.pl';
 
 my $PackageName = 'Sisimai::Reason';
 my $MethodNames = {
-    'class' => ['get', 'retry', 'index', 'match'],
+    'class' => ['get', 'path', 'retry', 'index', 'match'],
     'object' => [],
 };
 
@@ -19,13 +19,14 @@ MAKE_TEST: {
     is $PackageName->anotherone, undef;
     isa_ok $PackageName->index, 'ARRAY';
     isa_ok $PackageName->retry, 'HASH';
+    isa_ok $PackageName->path,  'HASH';
 
     use Sisimai::Mail;
     use Sisimai::Message;
     use Sisimai::Data;
-    my $mailbox = Sisimai::Mail->new('set-of-emails/maildir/bsd/email-sendmail-01.eml');
+    my $mailbox = Sisimai::Mail->new('set-of-emails/maildir/bsd/lhost-sendmail-01.eml');
 
-    while( my $r = $mailbox->read ) {
+    while( my $r = $mailbox->data->read ) {
         my $o = Sisimai::Message->new('data' => $r);
         my $v = Sisimai::Data->make('data' => $o);
         isa_ok $v, 'ARRAY';

@@ -4,11 +4,17 @@ NAME
 
 VERSION
 
-    version v0.0.2
+    version v0.0.3
 
 DESCRIPTION
 
     This is a backend to Log::Any for Sentry::Raven.
+
+    When logging, it does its best to provide a Devel::StackTrace to
+    identify your message. To accomplish this, it uses
+    Devel::StackTrace::Extract to pull a trace from your message (if you
+    pass multiple message arguments, it won't attempt this). Failing that,
+    it will append a new Devel::StackTrace.
 
     It takes two arguments:
 
@@ -19,9 +25,6 @@ DESCRIPTION
       be picked up here eg.
 
           $sentry->add_context( Sentry::Raven->request_context($url, %p) )
-
-      If Devel::StackTrace is installed, this will add a stack trace for
-      you (As of writing, Sentry::Raven requires it, so it will be).
 
     log_level (OPTIONAL)
 

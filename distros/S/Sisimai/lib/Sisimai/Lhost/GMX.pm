@@ -4,36 +4,27 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Indicators = __PACKAGE__->INDICATORS;
-my $ReBackbone = qr|^---[ ]The[ ]header[ ]of[ ]the[ ]original[ ]message[ ]is[ ]following[.][ ]---|m;
-my $StartingOf = { 'message' => ['This message was created automatically by mail delivery software'] };
-my $MessagesOf = { 'expired' => ['delivery retry timeout exceeded'] };
+state $Indicators = __PACKAGE__->INDICATORS;
+state $ReBackbone = qr|^---[ ]The[ ]header[ ]of[ ]the[ ]original[ ]message[ ]is[ ]following[.][ ]---|m;
+state $StartingOf = { 'message' => ['This message was created automatically by mail delivery software'] };
+state $MessagesOf = { 'expired' => ['delivery retry timeout exceeded'] };
 
-# Envelope-To: <kijitora@mail.example.com>
-# X-GMX-Antispam: 0 (Mail was not recognized as spam); Detail=V3;
-# X-GMX-Antivirus: 0 (no virus found)
-# X-UI-Out-Filterresults: unknown:0;
-sub headerlist  { return ['x-gmx-antispam'] }
 sub description { 'GMX: https://www.gmx.net' }
 sub make {
     # Detect an error from GMX and mail.com
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.1.4
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
 
-    # 'from'    => qr/\AMAILER-DAEMON[@]/,
-    # 'subject' => qr/\AMail delivery failed: returning message to sender\z/,
+    # Envelope-To: <kijitora@mail.example.com>
+    # X-GMX-Antispam: 0 (Mail was not recognized as spam); Detail=V3;
+    # X-GMX-Antivirus: 0 (no virus found)
+    # X-UI-Out-Filterresults: unknown:0;
     return undef unless defined $mhead->{'x-gmx-antispam'};
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
@@ -109,7 +100,6 @@ sub make {
     return undef unless $recipients;
 
     for my $e ( @$dscontents ) {
-        $e->{'agent'}     =  __PACKAGE__->smtpagent;
         $e->{'diagnosis'} =~ y/\n/ /;
         $e->{'diagnosis'} =  Sisimai::String->sweep($e->{'diagnosis'});
 
@@ -148,12 +138,6 @@ Methods in the module are called from only Sisimai::Message.
 C<description()> returns description string of this module.
 
     print Sisimai::Lhost::GMX->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::GMX->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

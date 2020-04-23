@@ -23,7 +23,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenarios-PathNaive
   homepage: https://metacpan.org/release/Bencher-Scenarios-PathNaive
   repository: git://github.com/perlancar/perl-Bencher-Scenarios-PathNaive.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

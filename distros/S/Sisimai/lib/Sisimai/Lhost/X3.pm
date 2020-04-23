@@ -4,23 +4,17 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Indicators = __PACKAGE__->INDICATORS;
-my $ReBackbone = qr|^Content-Type:[ ]message/rfc822|m;
-my $StartingOf = { 'message' => ['      This is an automatically generated Delivery Status Notification.'] };
+state $Indicators = __PACKAGE__->INDICATORS;
+state $ReBackbone = qr|^Content-Type:[ ]message/rfc822|m;
+state $StartingOf = { 'message' => ['      This is an automatically generated Delivery Status Notification.'] };
 
 sub description { 'Unknown MTA #3' }
 sub make {
     # Detect an error from Unknown MTA #3
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.1.9
     my $class = shift;
     my $mhead = shift // return undef;
@@ -91,7 +85,6 @@ sub make {
     for my $e ( @$dscontents ) {
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
         $e->{'status'}    = Sisimai::SMTP::Status->find($e->{'diagnosis'}) || '';
-        $e->{'agent'}     = __PACKAGE__->smtpagent;
     }
     return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
 }
@@ -121,12 +114,6 @@ Methods in the module are called from only Sisimai::Message.
 C<description()> returns description string of this module.
 
     print Sisimai::Lhost::X3->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::X3->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

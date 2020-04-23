@@ -4,24 +4,77 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Indicators = __PACKAGE__->INDICATORS;
-my $ReBackbone = qr|^Content-Type:[ ]text/rfc822-headers|m;
-my $StartingOf = { 'message' => ['The message '] };
+state $Indicators = __PACKAGE__->INDICATORS;
+state $ReBackbone = qr|^Content-Type:[ ]text/rfc822-headers|m;
+state $StartingOf = { 'message' => ['The message '] };
+state $MessagesOf = {
+    # amavisd-new-2.11.1/amavisd:1840|%smtp_reason_by_ccat = (
+    # amavisd-new-2.11.1/amavisd:1840|  # currently only used for blocked messages only, status 5xx
+    # amavisd-new-2.11.1/amavisd:1840|  # a multiline message will produce a valid multiline SMTP response
+    # amavisd-new-2.11.1/amavisd:1840|  CC_VIRUS,       'id=%n - INFECTED: %V',
+    # amavisd-new-2.11.1/amavisd:1840|  CC_BANNED,      'id=%n - BANNED: %F',
+    # amavisd-new-2.11.1/amavisd:1840|  CC_UNCHECKED.',1', 'id=%n - UNCHECKED: encrypted',
+    # amavisd-new-2.11.1/amavisd:1840|  CC_UNCHECKED.',2', 'id=%n - UNCHECKED: over limits',
+    # amavisd-new-2.11.1/amavisd:1840|  CC_UNCHECKED,      'id=%n - UNCHECKED',
+    # amavisd-new-2.11.1/amavisd:1840|  CC_SPAM,        'id=%n - spam',
+    # amavisd-new-2.11.1/amavisd:1840|  CC_SPAMMY.',1', 'id=%n - spammy (tag3)',
+    # amavisd-new-2.11.1/amavisd:1840|  CC_SPAMMY,      'id=%n - spammy',
+    # amavisd-new-2.11.1/amavisd:1840|  CC_BADH.',1',   'id=%n - BAD HEADER: MIME error',
+    # amavisd-new-2.11.1/amavisd:1840|  CC_BADH.',2',   'id=%n - BAD HEADER: nonencoded 8-bit character',
+    # amavisd-new-2.11.1/amavisd:1840|  CC_BADH.',3',   'id=%n - BAD HEADER: contains invalid control character',
+    # amavisd-new-2.11.1/amavisd:1840|  CC_BADH.',4',   'id=%n - BAD HEADER: line made up entirely of whitespace',
+    # amavisd-new-2.11.1/amavisd:1840|  CC_BADH.',5',   'id=%n - BAD HEADER: line longer than RFC 5322 limit',
+    # amavisd-new-2.11.1/amavisd:1840|  CC_BADH.',6',   'id=%n - BAD HEADER: syntax error',
+    # amavisd-new-2.11.1/amavisd:1840|  CC_BADH.',7',   'id=%n - BAD HEADER: missing required header field',
+    # amavisd-new-2.11.1/amavisd:1840|  CC_BADH.',8',   'id=%n - BAD HEADER: duplicate header field',
+    # amavisd-new-2.11.1/amavisd:1840|  CC_BADH,        'id=%n - BAD HEADER',
+    # amavisd-new-2.11.1/amavisd:1840|  CC_OVERSIZED,   'id=%n - Message size exceeds recipient\'s size limit',
+    # amavisd-new-2.11.1/amavisd:1840|  CC_MTA.',1',    'id=%n - Temporary MTA failure on relaying',
+    # amavisd-new-2.11.1/amavisd:1840|  CC_MTA.',2',    'id=%n - Rejected by next-hop MTA on relaying',
+    # amavisd-new-2.11.1/amavisd:1840|  CC_MTA,         'id=%n - Unable to relay message back to MTA',
+    # amavisd-new-2.11.1/amavisd:1840|  CC_CLEAN,       'id=%n - CLEAN',
+    # amavisd-new-2.11.1/amavisd:1840|  CC_CATCHALL,    'id=%n - OTHER',  # should not happen
+    # ...
+    # amavisd-new-2.11.1/amavisd:15289|my $status = setting_by_given_contents_category(
+    # amavisd-new-2.11.1/amavisd:15289|  $blocking_ccat,
+    # amavisd-new-2.11.1/amavisd:15289|  { CC_VIRUS,       "554 5.7.0",
+    # amavisd-new-2.11.1/amavisd:15289|    CC_BANNED,      "554 5.7.0",
+    # amavisd-new-2.11.1/amavisd:15289|    CC_UNCHECKED,   "554 5.7.0",
+    # amavisd-new-2.11.1/amavisd:15289|    CC_SPAM,        "554 5.7.0",
+    # amavisd-new-2.11.1/amavisd:15289|    CC_SPAMMY,      "554 5.7.0",
+    # amavisd-new-2.11.1/amavisd:15289|    CC_BADH.",2",   "554 5.6.3",  # nonencoded 8-bit character
+    # amavisd-new-2.11.1/amavisd:15289|    CC_BADH,        "554 5.6.0",
+    # amavisd-new-2.11.1/amavisd:15289|    CC_OVERSIZED,   "552 5.3.4",
+    # amavisd-new-2.11.1/amavisd:15289|    CC_MTA,         "550 5.3.5",
+    # amavisd-new-2.11.1/amavisd:15289|    CC_CATCHALL,    "554 5.7.0",
+    # amavisd-new-2.11.1/amavisd:15289|  });
+    # ...
+    # amavisd-new-2.11.1/amavisd:15332|my $response = sprintf("%s %s%s%s", $status,
+    # amavisd-new-2.11.1/amavisd:15333|  ($final_destiny == D_PASS     ? "Ok" :
+    # amavisd-new-2.11.1/amavisd:15334|   $final_destiny == D_DISCARD  ? "Ok, discarded" :
+    # amavisd-new-2.11.1/amavisd:15335|   $final_destiny == D_REJECT   ? "Reject" :
+    # amavisd-new-2.11.1/amavisd:15336|   $final_destiny == D_BOUNCE   ? "Bounce" :
+    # amavisd-new-2.11.1/amavisd:15337|   $final_destiny == D_TEMPFAIL ? "Temporary failure" :
+    # amavisd-new-2.11.1/amavisd:15338|                                  "Not ok ($final_destiny)" ),
+    'spamdetected'  => [' - spam'],
+    'virusdetected' => [' - infected'],
+    'contenterror'  => [' - bad header:'],
+    'exceedlimit'   => [' - message size exceeds recipient'],
+    'systemerror'   => [
+        ' - temporary mta failure on relaying',
+        ' - rejected by next-hop mta on relaying',
+        ' - unable to relay message back to mta',
+    ],
+};
 
 # https://www.amavis.org
 sub description { 'amavisd-new: https://www.amavis.org/' }
 sub make {
     # Detect an error from amavisd-new
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.25.0
     my $class = shift;
     my $mhead = shift // return undef;
@@ -92,10 +145,19 @@ sub make {
 
     for my $e ( @$dscontents ) {
         # Set default values if each value is empty.
-        map { $e->{ $_ } ||= $permessage->{ $_ } || '' } keys %$permessage;
-
+        $e->{ $_ } ||= $permessage->{ $_ } || '' for keys %$permessage;
         $e->{'diagnosis'} ||= Sisimai::String->sweep($e->{'diagnosis'});
-        $e->{'agent'}       = __PACKAGE__->smtpagent;
+        my $q = lc $e->{'diagnosis'};
+        DETECT_REASON: for my $p ( keys %$MessagesOf ) {
+            # Try to detect an error reason
+            for my $r ( @{ $MessagesOf->{ $p } } ) {
+                # Try to find an error message including lower-cased string
+                # defined in $MessagesOf
+                next unless index($q, $r) > -1;
+                $e->{'reason'} = $p;
+                last(DETECT_REASON)
+            }
+        }
     }
     return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
 }
@@ -126,12 +188,6 @@ C<description()> returns description string of this module.
 
     print Sisimai::Lhost::Amavis->description;
 
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::Amavis->smtpagent;
-
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 
 C<make()> method parses a bounced email and return results as a array reference.
@@ -150,5 +206,4 @@ Copyright (C) 2019,2020 azumakuniyuki, All rights reserved.
 This software is distributed under The BSD 2-Clause License.
 
 =cut
-
 

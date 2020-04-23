@@ -1,9 +1,9 @@
 package Bencher::Scenario::PathNaive::split_path;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-10'; # DATE
+our $DATE = '2020-02-12'; # DATE
 our $DIST = 'Bencher-Scenarios-PathNaive'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our $scenario = {
     summary => 'Benchmark split_path()',
@@ -40,7 +40,7 @@ Bencher::Scenario::PathNaive::split_path - Benchmark split_path()
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenario::PathNaive::split_path (from Perl distribution Bencher-Scenarios-PathNaive), released on 2020-02-10.
+This document describes version 0.002 of Bencher::Scenario::PathNaive::split_path (from Perl distribution Bencher-Scenarios-PathNaive), released on 2020-02-12.
 
 =head1 SYNOPSIS
 
@@ -62,7 +62,7 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Path::Naive> 0.042
+L<Path::Naive> 0.043
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -108,24 +108,24 @@ Benchmark with default options (C<< bencher -m PathNaive::split_path >>):
  +-------------------------+----------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
  | participant             | dataset        | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
  +-------------------------+----------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | Path::Naive::split_path | /a/b/////c/d/e |    510000 |    2      |                 0.00% |              1639.52% | 3.3e-09 |      21 |
- | Path::Naive::split_path | /a/b/c/d/e     |    524090 |    1.9081 |                 2.44% |              1598.08% | 5.7e-12 |      20 |
- | Path::Naive::split_path | /              |   1300000 |    0.76   |               156.74% |               577.54% | 1.4e-09 |      29 |
- | split with /            | /a/b/////c/d/e |   1330000 |    0.754  |               159.27% |               570.92% | 3.8e-10 |      24 |
- | split with /            | /a/b/c/d/e     |   2123000 |    0.471  |               315.01% |               319.15% | 1.7e-11 |      20 |
- | split with /            | /              |   8900000 |    0.112  |              1639.52% |                 0.00% | 4.9e-11 |      23 |
+ | Path::Naive::split_path | /a/b/////c/d/e |    510000 |    1.96   |                 0.00% |              1697.07% | 6.9e-10 |      29 |
+ | Path::Naive::split_path | /a/b/c/d/e     |    514000 |    1.95   |                 0.70% |              1684.65% | 7.8e-10 |      23 |
+ | Path::Naive::split_path | /              |   1318000 |    0.759  |               158.33% |               595.64% | 2.3e-11 |      23 |
+ | split with /            | /a/b/////c/d/e |   1321000 |    0.7572 |               158.95% |               593.97% | 2.3e-11 |      20 |
+ | split with /            | /a/b/c/d/e     |   2100000 |    0.47   |               319.68% |               328.20% | 6.2e-10 |      20 |
+ | split with /            | /              |   9165000 |    0.1091 |              1697.07% |                 0.00% | 5.8e-12 |      30 |
  +-------------------------+----------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
 
 Benchmark module startup overhead (C<< bencher -m PathNaive::split_path --module-startup >>):
 
  #table2#
- +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
- | participant         | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
- +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
- | Path::Naive         |       9.6 |               2.3 |                 0.00% |                31.03% | 1.2e-05 |      20 |
- | perl -e1 (baseline) |       7.3 |               0   |                31.03% |                 0.00% | 1.3e-05 |      20 |
- +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
+ +---------------------+-----------+-------------------+-----------------------+-----------------------+----------+---------+
+ | participant         | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors  | samples |
+ +---------------------+-----------+-------------------+-----------------------+-----------------------+----------+---------+
+ | Path::Naive         |        10 |                 3 |                 0.00% |                45.26% |   0.0001 |      20 |
+ | perl -e1 (baseline) |         7 |                 0 |                45.26% |                 0.00% | 3.1e-05  |      20 |
+ +---------------------+-----------+-------------------+-----------------------+-----------------------+----------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.

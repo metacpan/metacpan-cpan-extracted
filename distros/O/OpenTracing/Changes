@@ -1,5 +1,12 @@
 Revision history for OpenTracing
 
+0.004     2020-04-23 02:35:27+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - includes OpenTracing::Any base implementation, inspired by Log::Any
+    - simple DSL in OpenTracing::DSL
+    - since this requires postderef, minimum perl version is now explicitly set to 5.20+
+
 0.003     2019-06-16 21:56:03+08:00 Asia/Kuala_Lumpur
     No new features.
 

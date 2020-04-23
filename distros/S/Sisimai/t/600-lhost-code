@@ -22,7 +22,7 @@ my $moduletest = sub {
 
     my $outofemail = ['ARF', 'RFC3464', 'RFC3834'];
     my $samplepath = 'set-of-emails/maildir/bsd';
-    my $methodlist = ['description', 'headerlist', 'make', 'DELIVERYSTATUS'];
+    my $methodlist = ['description', 'make', 'DELIVERYSTATUS'];
     my $emailindex = 0;
     my $mesgmethod = {
         'length' => [qw|recipient agent|],
@@ -43,7 +43,7 @@ my $moduletest = sub {
     } else {
         # Other MTA modules
         $M = sprintf("Sisimai::Lhost::%s", $E);
-        $samplepath = sprintf("set-of-emails/private/email-%s", lc $E) if $privateset;
+        $samplepath = sprintf("set-of-emails/private/lhost-%s", lc $E) if $privateset;
     }
 
     Module::Load::load($M);
@@ -51,7 +51,6 @@ my $moduletest = sub {
     can_ok $M, @$methodlist unless grep { $E eq $_ } @$outofemail;
 
     $v = $M->description; ok $v, $E.'->description = '.$v;
-    $v = $M->smtpagent;   ok $v, $E.'->smtpagent = '.$v;
     $v = $M->make;        is $v, undef, $E.'->make = undef';
 
     PARSE_EACH_EMAIL: for my $e ( @$isexpected ) {
@@ -80,7 +79,7 @@ my $moduletest = sub {
 
             } else {
                 # Other MTA modules
-                $samplefile = sprintf("./%s/email-%s-%02d.eml", $samplepath, lc $E, $e->{'n'});
+                $samplefile = sprintf("./%s/lhost-%s-%02d.eml", $samplepath, lc $E, $e->{'n'});
             }
         }
 
@@ -91,7 +90,7 @@ my $moduletest = sub {
         next unless defined $mailobject;
         isa_ok $mailobject, 'Sisimai::Mail';
 
-        READ_EACH_EMAIL: while( my $r = $mailobject->read ) {
+        READ_EACH_EMAIL: while( my $r = $mailobject->data->read ) {
             # Read messages in each email
             my $mesgobject = undef;
             my $dataobject = undef;
@@ -155,7 +154,7 @@ my $moduletest = sub {
 
                 } else {
                     # Other MTA modules
-                    $re = 'Email::'.$E;
+                    $re = $E;
                     is $ds->{ $pp }, $re, sprintf(" [%s] %s->%s = %s", $lb, $E, $pp, $ds->{ $pp });
                 }
 
@@ -199,7 +198,7 @@ my $moduletest = sub {
             } # End of the loop for checking Sisimai::Message
 
 
-            $dataobject = Sisimai::Data->make('data' => $mesgobject, 'delivered' => 1);
+            $dataobject = Sisimai::Data->make('data' => $mesgobject, 'delivered' => 1, 'origin' => $mailobject->data->path);
             isa_ok $dataobject, 'ARRAY',              sprintf("[%s] Data object", $e->{'n'});
             isa_ok $dataobject->[0], 'Sisimai::Data', sprintf("[%s] Sisimai::Data", $e->{'n'});
             ok scalar @$dataobject, sprintf("%s|Sisimai::Data = %s", $E, scalar @$dataobject);
@@ -275,7 +274,7 @@ my $moduletest = sub {
                 $pp = 'alias';        unlike $pr->$pp, qr/[\r]/,               sprintf(" [%s] %s->%s = %s", $lb, $E, $pp, $pr->$pp) if $pr->$pp;
 
                 $re = qr/[ \r]/;
-                for my $rr ( qw|deliverystatus smtpcommand lhost rhost alias listid action messageid| ) {
+                for my $rr ( qw|deliverystatus smtpcommand lhost rhost alias listid action messageid origin| ) {
                     # Each value does not include ' '
                     $pp = $rr; 
                     if( $rr ne 'alias' ) {
@@ -296,7 +295,7 @@ my $moduletest = sub {
                 }
 
                 for my $rr ( qw|addresser recipient| ) {
-                    $re = qr/[@]/;
+                    $re = qr/\A.+[@][0-9A-Za-z.-]+[.][A-Za-z]+?\z/;
                     if( length $pr->$rr->alias ) {
                         $pp = 'alias'; like $pr->$rr->$pp, $re, sprintf(" [%s] %s->%s->%s = %s", $lb, $E, $rr, $pp, $pr->$rr->$pp);
                     }

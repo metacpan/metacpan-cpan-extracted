@@ -1,9 +1,9 @@
 package Bencher::Scenario::PathNaive::concat_path;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-10'; # DATE
+our $DATE = '2020-02-12'; # DATE
 our $DIST = 'Bencher-Scenarios-PathNaive'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our $scenario = {
     summary => 'Benchmark concat_path()',
@@ -37,7 +37,7 @@ Bencher::Scenario::PathNaive::concat_path - Benchmark concat_path()
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenario::PathNaive::concat_path (from Perl distribution Bencher-Scenarios-PathNaive), released on 2020-02-10.
+This document describes version 0.002 of Bencher::Scenario::PathNaive::concat_path (from Perl distribution Bencher-Scenarios-PathNaive), released on 2020-02-12.
 
 =head1 SYNOPSIS
 
@@ -59,7 +59,7 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Path::Naive> 0.042
+L<Path::Naive> 0.043
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -105,12 +105,12 @@ Benchmark with default options (C<< bencher -m PathNaive::concat_path >>):
  +----------------------------------------+--------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
  | participant                            | dataset      | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
  +----------------------------------------+--------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | Path::Naive::concat_and_normalize_path | /a/b/c/./d/e |    119000 |    8.37   |                 0.00% |              1756.74% | 3.2e-09 |      22 |
- | Path::Naive::concat_and_normalize_path | /a/b/c/d/e   |    127000 |    7.86   |                 6.53% |              1642.84% | 2.7e-09 |      30 |
- | Path::Naive::concat_and_normalize_path | a            |    350000 |    2.9    |               193.36% |               532.92% | 3.3e-09 |      20 |
- | Path::Naive::concat_path               | a            |   2207000 |    0.4531 |              1748.27% |                 0.46% | 5.7e-12 |      20 |
- | Path::Naive::concat_path               | /a/b/c/d/e   |   2220000 |    0.451  |              1756.38% |                 0.02% | 1.7e-10 |      30 |
- | Path::Naive::concat_path               | /a/b/c/./d/e |   2220000 |    0.451  |              1756.74% |                 0.00% | 1.8e-10 |      27 |
+ | Path::Naive::concat_and_normalize_path | /a/b/c/./d/e |    117000 |    8.56   |                 0.00% |              1824.80% | 3.2e-09 |      22 |
+ | Path::Naive::concat_and_normalize_path | /a/b/c/d/e   |    120000 |    8.1    |                 6.17% |              1712.89% | 1.3e-08 |      20 |
+ | Path::Naive::concat_and_normalize_path | a            |    327000 |    3.06   |               179.74% |               588.07% | 2.5e-09 |      20 |
+ | Path::Naive::concat_path               | /a/b/c/d/e   |   2228000 |    0.4488 |              1807.08% |                 0.93% | 2.3e-11 |      20 |
+ | Path::Naive::concat_path               | /a/b/c/./d/e |   2229000 |    0.4487 |              1807.32% |                 0.92% | 5.8e-12 |      20 |
+ | Path::Naive::concat_path               | a            |   2250000 |    0.445  |              1824.80% |                 0.00% | 7.5e-11 |      21 |
  +----------------------------------------+--------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
 
@@ -120,8 +120,8 @@ Benchmark module startup overhead (C<< bencher -m PathNaive::concat_path --modul
  +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
  | participant         | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
  +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
- | Path::Naive         |       9.6 |               2.5 |                 0.00% |                34.30% | 1.5e-05 |      20 |
- | perl -e1 (baseline) |       7.1 |               0   |                34.30% |                 0.00% | 1.5e-05 |      20 |
+ | Path::Naive         |       9.6 |               2.3 |                 0.00% |                32.67% |   1e-05 |      20 |
+ | perl -e1 (baseline) |       7.3 |               0   |                32.67% |                 0.00% | 5.2e-05 |      20 |
  +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
 
 

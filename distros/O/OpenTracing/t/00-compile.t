@@ -6,17 +6,21 @@ use warnings;
 
 use Test::More;
 
-plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 12 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'OpenTracing.pm',
+    'OpenTracing/Any.pm',
     'OpenTracing/Batch.pm',
     'OpenTracing/Common.pm',
+    'OpenTracing/DSL.pm',
     'OpenTracing/Log.pm',
     'OpenTracing/Process.pm',
     'OpenTracing/Span.pm',
+    'OpenTracing/SpanContext.pm',
     'OpenTracing/SpanProxy.pm',
-    'OpenTracing/Tag.pm'
+    'OpenTracing/Tag.pm',
+    'OpenTracing/Tracer.pm'
 );
 
 

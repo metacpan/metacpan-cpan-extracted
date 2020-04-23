@@ -1,5 +1,10 @@
 Changes file for Date-Holidays
 
+1.21 2020-04-22 Bug fix release, update not required
+
+- Addressed a minor bug in the test suite addressed with release 1.19, Date::Holidays::UA supports a holidays method
+
+
 1.20 2020-04-21 Bug fix release, update recommended
 
 - A bug was introduced with the release of 1.19, the bug had been lurking since just after the release of 1.18. The bug did not show itself unless adaptees where installed and I tested release 1.19 on a branch new Perlbrew installation, so the bug was not demonstrated.

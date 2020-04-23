@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify;
-$Games::Solitaire::Verify::VERSION = '0.2302';
+$Games::Solitaire::Verify::VERSION = '0.2303';
 use warnings;
 use strict;
 
@@ -21,7 +21,7 @@ Games::Solitaire::Verify - verify solutions for solitaire games.
 
 =head1 VERSION
 
-version 0.2302
+version 0.2303
 
 =head1 SYNOPSIS
 
@@ -40,16 +40,16 @@ perl-5.10.0). If you're interested in the latter, look at:
 
 =over 4
 
-=item * http://fc-solve.shlomifish.org/
+=item * L<https://fc-solve.shlomifish.org/>
 
-=item * http://fc-solve.shlomifish.org/links.html#other_solvers
+=item * L<https://fc-solve.shlomifish.org/links.html#other_solvers>
 
 =back
 
 Instead, what Games-Solitaire-Verify does is verify the solutions
 and makes sure they are correct.
 
-See L<http://pysolfc.sourceforge.net/> for more about card solitaire.
+See L<https://pysolfc.sourceforge.io/> for more about card solitaire.
 
 =head1 SEE ALSO
 

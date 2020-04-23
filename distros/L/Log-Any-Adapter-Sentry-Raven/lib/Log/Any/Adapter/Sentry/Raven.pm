@@ -2,7 +2,7 @@ package Log::Any::Adapter::Sentry::Raven;
 
 # ABSTRACT: Log::Any::Adapter for Sentry::Raven
 use version;
-our $VERSION = 'v0.0.2'; # VERSION
+our $VERSION = 'v0.0.3'; # VERSION
 
 #pod =head1 SYNPOSIS
 #pod
@@ -19,6 +19,12 @@ our $VERSION = 'v0.0.2'; # VERSION
 #pod
 #pod This is a backend to L<Log::Any> for L<Sentry::Raven>.
 #pod
+#pod When logging, it does its best to provide a L<Devel::StackTrace> to
+#pod identify your message. To accomplish this, it uses L<Devel::StackTrace::Extract>
+#pod to pull a trace from your message (if you pass multiple message arguments, it
+#pod won't attempt this).
+#pod Failing that, it will append a new C<Devel::StackTrace>.
+#pod
 #pod It takes two arguments:
 #pod
 #pod =over
@@ -30,9 +36,6 @@ our $VERSION = 'v0.0.2'; # VERSION
 #pod object, it will be picked up here eg.
 #pod
 #pod     $sentry->add_context( Sentry::Raven->request_context($url, %p) )
-#pod
-#pod If L<Devel::StackTrace> is installed, this will add a stack trace for you
-#pod (As of writing, L<Sentry::Raven> requires it, so it will be).
 #pod
 #pod =item log_level (OPTIONAL)
 #pod
@@ -52,6 +55,8 @@ use strict;
 use warnings;
 
 use Carp qw(carp croak);
+use Devel::StackTrace;
+use Devel::StackTrace::Extract qw(extract_stack_trace);
 use Log::Any::Adapter::Util qw(make_method numeric_level);
 use Scalar::Util qw(blessed);
 use Sentry::Raven;
@@ -78,7 +83,6 @@ sub init {
     }
 }
 
-my $Include_Stack_Trace = do { eval { require Devel::StackTrace; 1 } };
 sub structured {
     my ($self, $level, $category, @log_args) = @_;
 
@@ -90,6 +94,7 @@ sub structured {
         $log_any_context = pop @log_args;
     }
 
+    my $stack_trace = _get_stack_trace(@log_args);
     my $log_message = join "\n" => @log_args;
 
     my $sentry_severity = $level;
@@ -104,9 +109,9 @@ sub structured {
         level => $sentry_severity,
         tags  => $log_any_context,
     );
-    if ($Include_Stack_Trace) {
-        push @message_args,
-             Sentry::Raven->stacktrace_context(Devel::StackTrace->new)
+
+    if ($stack_trace) {
+        push @message_args, Sentry::Raven->stacktrace_context($stack_trace);
     }
 
     # https://docs.sentry.io/data-management/event-grouping/
@@ -120,6 +125,20 @@ for my $method ( Log::Any->detection_methods() ) {
         $method,
         sub { return $method_level <= $_[0]->{log_level} },
     );
+}
+
+sub _get_stack_trace {
+    my @message_parts = @_;
+
+    my $trace;
+    if (@message_parts == 1) {
+        $trace = extract_stack_trace($message_parts[0]);
+    }
+    unless (blessed($trace) && $trace->isa('Devel::StackTrace')) {
+        $trace = Devel::StackTrace->new;
+    }
+
+    return $trace;
 }
 
 1;
@@ -136,11 +155,17 @@ Log::Any::Adapter::Sentry::Raven - Log::Any::Adapter for Sentry::Raven
 
 =head1 VERSION
 
-version v0.0.2
+version v0.0.3
 
 =head1 DESCRIPTION
 
 This is a backend to L<Log::Any> for L<Sentry::Raven>.
+
+When logging, it does its best to provide a L<Devel::StackTrace> to
+identify your message. To accomplish this, it uses L<Devel::StackTrace::Extract>
+to pull a trace from your message (if you pass multiple message arguments, it
+won't attempt this).
+Failing that, it will append a new C<Devel::StackTrace>.
 
 It takes two arguments:
 
@@ -153,9 +178,6 @@ Note that if you set any sentry-specific context directly through the sentry
 object, it will be picked up here eg.
 
     $sentry->add_context( Sentry::Raven->request_context($url, %p) )
-
-If L<Devel::StackTrace> is installed, this will add a stack trace for you
-(As of writing, L<Sentry::Raven> requires it, so it will be).
 
 =item log_level (OPTIONAL)
 

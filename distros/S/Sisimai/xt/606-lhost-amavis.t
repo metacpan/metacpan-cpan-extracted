@@ -5,11 +5,12 @@ use lib qw(./lib ./blib/lib);
 require './t/600-lhost-code';
 
 my $enginename = 'Amavis';
-my $samplepath = sprintf("./set-of-emails/private/email-%s", lc $enginename);
+my $samplepath = sprintf("./set-of-emails/private/lhost-%s", lc $enginename);
 my $enginetest = Sisimai::Lhost::Code->maketest;
 my $isexpected = [
     { 'n' => '01001', 'r' => qr/userunknown/ },
     { 'n' => '01002', 'r' => qr/userunknown/ },
+    { 'n' => '01003', 'r' => qr/spamdetected/ },
 ];
 
 plan 'skip_all', sprintf("%s not found", $samplepath) unless -d $samplepath;

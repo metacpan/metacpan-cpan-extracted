@@ -47,7 +47,7 @@ private-sample:
 	@echo
 	@while true; do \
 		d=`$(PARSERSCRIPT) -Fjson $(E) | jq -M '.[].smtpagent' | head -1 \
-			| tr '[A-Z]' '[a-z]' | tr -d '-' | sed -e 's/"//g' -e 's/::/-/g'`; \
+			| tr '[A-Z]' '[a-z]' | tr -d '-' | sed -e 's/"//g' -e 's/^/lhost-/g'`; \
 		if [ -d "$(PRIVATEMAILS)/$$d" ]; then \
 			latestfile=`ls -1 $(PRIVATEMAILS)/$$d/*.$(SAMPLEPREFIX) | tail -1`; \
 			curr_index=`basename $$latestfile | cut -d'-' -f1`; \
@@ -69,7 +69,7 @@ private-sample:
 mta-module-table:
 	@ printf "%s\n"  '| Module (Sisimai::Lhost)  | Description                                         |'
 	@ printf "%s\n"  '|--------------------------|-----------------------------------------------------|'
-	@ for v in `$(LS) ./$(MAILCLASSDIR)/*.pm | grep -v UserDefined`; do \
+	@ for v in `$(LS) ./$(MAILCLASSDIR)/*.pm`; do \
 		m="`echo $$v | cut -d/ -f5 | sed 's/.pm//g'`" ;\
 		d="`echo $$v | cut -d/ -f5 | tr '[A-Z]' '[a-z]' | sed 's/.pm//g'`" ;\
 		l="`echo $$m | wc -c`" ;\
@@ -129,7 +129,7 @@ parser-log:
 	done
 
 reason-coverage:
-	@ for v in `ls -1 $(MAILCLASSDIR) | grep -v UserDefined | sort | tr '[A-Z]' '[a-z]' | sed -e 's|.pm||g' -e 's|^|bite-email-|g'`; do \
+	@ for v in `ls -1 $(MAILCLASSDIR) | sort | tr '[A-Z]' '[a-z]' | sed -e 's|.pm||g' -e 's|^|bite-email-|g'`; do \
 		for e in `echo $(REASON_TABLE) | tr '[A-Z]' '[a-z]'`; do \
 			printf "%d," `grep $$e xt/*-$$v.t t/*-$$v.t | wc -l`; \
 		done; \

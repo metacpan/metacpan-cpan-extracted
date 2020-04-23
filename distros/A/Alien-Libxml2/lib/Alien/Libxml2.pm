@@ -5,7 +5,7 @@ use warnings;
 use base qw( Alien::Base );
 
 # ABSTRACT: Install the C libxml2 library on your system
-our $VERSION = '0.15'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 
 
@@ -24,7 +24,7 @@ Alien::Libxml2 - Install the C libxml2 library on your system
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 

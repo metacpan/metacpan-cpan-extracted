@@ -14,4 +14,3 @@ t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/Log-Any-Adapter-Sentry-Raven.t
-t/without-devel-stracktrace.t

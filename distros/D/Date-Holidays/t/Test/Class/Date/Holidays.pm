@@ -725,15 +725,18 @@ sub test_us : Test(6) {
     }
 }
 
-sub test_ua : Test(4) {
+sub test_ua : Test(5) {
     SKIP: {
         eval { require Date::Holidays::UA };
         skip "Date::Holidays::UA not installed", 4 if $@;
 
         ok(my $dh = Date::Holidays->new( countrycode => 'ua' ),'Testing Date::Holidays::UA');
 
-        dies_ok { $dh->holidays( year => 2020 ) }
-            'Testing holidays for Date::Holidays::UA';
+        dies_ok { $dh->holidays() }
+            'Testing holidays without argument for Date::Holidays::UA';
+
+        ok( $dh->holidays( year => 2018 ),
+            'Testing holidays with argument for Date::Holidays::UA' );
 
         ok($dh->is_holiday(year => 2020, month => 8, day => 24), 'Checking for Ukrainian independence day');
 

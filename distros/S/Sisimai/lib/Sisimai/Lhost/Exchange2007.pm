@@ -4,27 +4,30 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Indicators = __PACKAGE__->INDICATORS;
-my $ReBackbone = qr{^(?:
-     Original[ ]message[ ]headers:              # en-US
-    |En-t.tes[ ]de[ ]message[ ]d'origine[ ]:    # fr-FR/En-têtes de message d'origine
+state $Indicators = __PACKAGE__->INDICATORS;
+state $ReBackbone = qr{^(?:
+     Original[ ]message[ ]headers:                  # en-US
+    |En-t.tes[ ]de[ ]message[ ]d'origine[ ]:        # fr-FR/En-têtes de message d'origine
+    |Intestazioni[ ]originali[ ]del[ ]messaggio:    # it-CH
     )
 }mx;
-my $MarkingsOf = {
+state $MarkingsOf = {
     'message' => qr{\A(?:
          Diagnostic[ ]information[ ]for[ ]administrators:               # en-US
         |Informations[ ]de[ ]diagnostic[ ]pour[ ]les[ ]administrateurs  # fr-FR
+        |Informazioni[ ]di[ ]diagnostica[ ]per[ ]gli[ ]amministratori   # it-CH
         )
     }x,
     'error'   => qr/[ ]((?:RESOLVER|QUEUE)[.][A-Za-z]+(?:[.]\w+)?);/,
     'rhost'   => qr{\A(?:
          Generating[ ]server            # en-US
         |Serveur[ ]de[ ]g.+ration[ ]    # fr-FR/Serveur de génération
-         ):[ ]?(.*)
+        |Server[ ]di[ ]generazione      # it-CH
+        ):[ ]?(.*)
     }x,
-    'subject' => qr/\A(?:Undeliverable|Non_remis_):/,
+    'subject' => qr/\A(?:Undeliverable|Non_remis_|Non[ ]recapitabile):/,
 };
-my $NDRSubject = {
+state $NDRSubject = {
     'SMTPSEND.DNS.NonExistentDomain'=> 'hostunknown',   # 554 5.4.4 SMTPSEND.DNS.NonExistentDomain
     'SMTPSEND.DNS.MxLoopback'       => 'networkerror',  # 554 5.4.4 SMTPSEND.DNS.MxLoopback
     'RESOLVER.ADR.BadPrimary'       => 'systemerror',   # 550 5.2.0 RESOLVER.ADR.BadPrimary
@@ -39,29 +42,26 @@ my $NDRSubject = {
     'QUEUE.Expired'                 => 'expired',       # 550 4.4.7 QUEUE.Expired
 };
 
-# Content-Language: en-US, fr-FR
-sub headerlist  { return ['content-language'] };
 sub description { 'Microsoft Exchange Server 2007' }
 sub make {
     # Detect an error from Microsoft Exchange Server 2007
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.1.1
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
 
+    # Content-Language: en-US, fr-FR
     return undef unless $mhead->{'subject'} =~ $MarkingsOf->{'subject'};
     return undef unless defined $mhead->{'content-language'};
     return undef unless $mhead->{'content-language'} =~ /\A[a-z]{2}(?:[-][A-Z]{2})?\z/;
+
+    # These headers exist only a bounce mail from Office365
+    return undef if $mhead->{'x-ms-exchange-crosstenant-originalarrivaltime'};
+    return undef if $mhead->{'x-ms-exchange-crosstenant-fromentityheader'};
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
     my $emailsteak = Sisimai::RFC5322->fillet($mbody, $ReBackbone);
@@ -143,7 +143,6 @@ sub make {
             }
         }
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
-        $e->{'agent'} = __PACKAGE__->smtpagent;
     }
     return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
 }
@@ -175,12 +174,6 @@ Methods in the module are called from only Sisimai::Message.
 C<description()> returns description string of this module.
 
     print Sisimai::Lhost::Exchange2007->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::Exchange2007->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

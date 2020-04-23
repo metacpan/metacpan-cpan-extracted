@@ -20,4 +20,4 @@ no_index:
 requires:
   Test::More: '0'
   perl: '5.01'
-version: '0.000024'
+version: '0.000025'

@@ -1,3 +1,17 @@
+0.002   2020-04-22  Released-By: PERLANCAR; Urgency: medium
+
+        - Add --order-by option.
+
+        - Add --include-table (-t), --exclude-table (-T), --include-column (-c),
+          and --exclude-column (-C) options.
+
+	- By default, sort by first unique key (which will be the primary key if
+          it exists). This can still be overridden by --order-by option.
+
+        - Add --sql option to diff two results of a SQL query instead of
+          predefined "select all rows from table" queries.
+
+
 0.001   2020-04-20  Released-By: PERLANCAR
 
         - First release.

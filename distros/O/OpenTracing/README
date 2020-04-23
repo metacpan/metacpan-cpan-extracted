@@ -4,25 +4,143 @@ NAME
 
 DESCRIPTION
 
-    This is an early implementation, so the API may be subject to change.
+    The OpenTracing standard provides a way to profile and monitor
+    applications across different components and services.
 
-    In general, you'll want to create an OpenTracing::Batch, then add one
-    or more OpenTracing::Span instances to it. Those instances can have
-    zero or more OpenTracing::Log entries.
+    It's defined by the following specification:
+
+    https://github.com/opentracing/specification/blob/master/specification.md
+
+    and has several "semantic conventions" which provide a common way to
+    include details for common components such as databases, caches and web
+    applications.
+
+    This module currently implements version 1.1 of the official
+    specification.
+
+ How to use this
+
+    There are 3 parts to this:
+
+      * add tracing to your code
+
+      * set up an opentracing service
+
+      * have the top-level application(s) send traces to that service
+
+ Tracing
+
+    Collecting trace data is similar to a logging module such as Log::Any.
+    Add this line to any module where you want to include tracing
+    information:
+
+     use OpenTracing::Any qw($tracer);
+
+    This will give you an OpenTracing::Tracer instance in the $tracer
+    package variable. You can then use this to create spans:
+
+     my $span = $tracer->span(
+      name => 'example'
+     );
+
+    You could also use OpenTracing::DSL for an alternative way to trace
+    blocks of code:
+
+     use OpenTracing::DSL qw(:v1);
+    
+     trace {
+      print 'operation starts here';
+      sleep 2;
+      print 'end of operation';
+     } name => 'example';
+
+ Integration
+
+    For some common modules and services there are integrations which
+    automatically create spans for operations. If you load
+    OpenTracing::Integration::DBI, for example, all database queries will
+    be traced as if you'd wrapped every prepare/execute method with tracing
+    code.
+
+    Most of those third-party integrations are in separate distributions,
+    search for OpenTracing::Integration:: on CPAN for available options.
+
+ Tracers
+
+    Once you have tracing in your code, you'll need a service to collect
+    and present the traces.
+
+    At the time of writing, there is an incomplete list here:
+
+    https://opentracing.io/docs/supported-tracers/
+
+ Application
+
+    The top-level code (applications, dæmons, cron jobs, microservices,
+    etc.) will need to register a tracer implementation and configure it
+    with the service details, so that the collected data has somewhere to
+    go.
+
+    One such tracer implementation is Net::Async::OpenTracing, designed to
+    work with code that uses the IO::Async event loop.
+
+     use IO::Async::Loop;
+     use Net::Async::OpenTracing;
+     my $loop = IO::Async::Loop->new;
+     $loop->add(
+      my $target = Net::Async::OpenTracing->new(
+       host     => 'localhost',
+       port     => 6828,
+       protocol => 'zipkin',
+      )
+     );
+     OpenTracing->global_tracer->register($target);
+
+    See the module documentation for more details on the options.
+
+    If you're feeling lucky, you might also want to add this to your
+    top-level application code:
+
+     use OpenTracing::Integration qw(:all);
+
+    This will go through the list of all modules currently loaded and
+    attempt to enable any matching integrations - see "Integration" and
+    OpenTracing::Integration for more details.
+
+ More information
 
     See the following classes for more information:
-
-      * OpenTracing::Tag
-
-      * OpenTracing::Log
 
       * OpenTracing::Span
 
       * OpenTracing::SpanProxy
 
+      * OpenTracing::Log
+
       * OpenTracing::Process
 
-      * OpenTracing::Batch
+METHODS
+
+ global_tracer
+
+    Returns the default tracer instance.
+
+     my $span = OpenTracing->global_tracer->span(name => 'test');
+
+    This is the same instance used by OpenTracing::Any and
+    OpenTracing::DSL.
+
+ set_global_tracer
+
+    Replaces the current global tracer with the given one.
+
+     OpenTracing->set_global_tracer($tracer);
+
+    Note that a typical application would only need a single instance, and
+    the default should normally be good enough.
+
+    If you want to set up where the traces should go, see "register" in
+    OpenTracing::Tracer instead.
 
 SEE ALSO
 
@@ -38,6 +156,10 @@ SEE ALSO
 
     Some perl modules of relevance:
 
+      * OpenTracing::Manual - this is an independent Moo-based
+      implementation, probably worth a look if you're working mostly with
+      synchronous code.
+
       * Net::Async::OpenTracing - an async implementation for sending
       OpenTracing data to servers via the binary Thrift protocol
 
@@ -49,6 +171,6 @@ AUTHOR
 
 LICENSE
 
-    Copyright Tom Molesworth 2018-2019. Licensed under the same terms as
+    Copyright Tom Molesworth 2018-2020. Licensed under the same terms as
     Perl itself.
 

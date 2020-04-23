@@ -37,7 +37,7 @@ MAKE_TEST: {
         my $mtahost = qr/(?:smtp-in[.]orange[.]fr|smtpz4[.]laposte[.]net|smtp[.]wanadoo[.]fr)/;
         next unless defined $mailbox;
 
-        while( my $r = $mailbox->read ) {
+        while( my $r = $mailbox->data->read ) {
 
             my $p = Sisimai::Message->new('data' => $r);
             isa_ok $p, 'Sisimai::Message';
@@ -57,7 +57,7 @@ MAKE_TEST: {
                 like $e->{'rhost'}, $mtahost, '->rhost = '.$e->{'rhost'};
                 ok defined $e->{'lhost'}, '->lhost = '.$e->{'lhost'};
                 ok exists $e->{'alias'}, '->alias = '.$e->{'alias'};
-                like $e->{'agent'}, qr/\AEmail::/, '->agent = '.$e->{'agent'};
+                like $e->{'agent'}, qr/\A(?:EinsUndEins|Exim|Postfix|Sendmail)/, '->agent = '.$e->{'agent'};
             }
 
             my $v = Sisimai::Data->make('data' => $p);

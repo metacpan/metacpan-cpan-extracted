@@ -4,13 +4,13 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Indicators = __PACKAGE__->INDICATORS;
-my $ReBackbone = qr|^Content-Type:[ ]message/rfc822|m;
-my $StartingOf = {
+state $Indicators = __PACKAGE__->INDICATORS;
+state $ReBackbone = qr|^Content-Type:[ ]message/rfc822|m;
+state $StartingOf = {
     'message' => ['   ----- The following addresses had delivery problems -----'],
     'error'   => ['   ----- Non-delivered information -----'],
 };
-my $MessagesOf = {
+state $MessagesOf = {
     'filtered'    => ['Mail Delivery Failed... User unknown'],
     'mailboxfull' => ["The number of messages in recipient's mailbox exceeded the local limit."],
 };
@@ -18,16 +18,10 @@ my $MessagesOf = {
 sub description { 'BIGLOBE: https://www.biglobe.ne.jp' }
 sub make {
     # Detect an error from Biglobe
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.0.0
     my $class = shift;
     my $mhead = shift // return undef;
@@ -91,7 +85,6 @@ sub make {
     return undef unless $recipients;
 
     for my $e ( @$dscontents ) {
-        $e->{'agent'}     = __PACKAGE__->smtpagent;
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
 
         SESSION: for my $r ( keys %$MessagesOf ) {
@@ -129,12 +122,6 @@ Methods in the module are called from only Sisimai::Message.
 C<description()> returns description string of this module.
 
     print Sisimai::Lhost::Biglobe->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::Biglobe->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

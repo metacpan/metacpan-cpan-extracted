@@ -4,21 +4,18 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Indicators = __PACKAGE__->INDICATORS;
-my $ReBackbone = qr{^(?:
+state $Indicators = __PACKAGE__->INDICATORS;
+state $ReBackbone = qr{^(?:
     # deliver.c:6423|          if (bounce_return_body) fprintf(f,
     # deliver.c:6424|"------ This is a copy of the message, including all the headers. ------\n");
     # deliver.c:6425|          else fprintf(f,
     # deliver.c:6426|"------ This is a copy of the message's headers. ------\n");
-     [-]+[ ]This[ ]is[ ]a[ ]copy[ ]of[ ](?:the|your)[ ]message.+headers[.][ ][-]+
-    |Content-Type:[ ]*message/rfc822
+     [-]+[ ]This[ ]is[ ]a[ ]copy[ ]of[ ](?:the|your)[ ]message.+?headers[.][ ][-]+
+    |Content-Type:[ ]*message/rfc822\n(?:[\s\t]+.*?\n\n)?
     )
-}mx;
-my $StartingOf = {
-    'deliverystatus' => ['Content-type: message/delivery-status'],
-    'endof'          => ['__END_OF_EMAIL_MESSAGE__'],
-};
-my $MarkingsOf = {
+}msx;
+state $StartingOf = { 'deliverystatus' => ['Content-type: message/delivery-status'] };
+state $MarkingsOf = {
     # Error text regular expressions which defined in exim/src/deliver.c
     #
     # deliver.c:6292| fprintf(f,
@@ -48,7 +45,7 @@ my $MarkingsOf = {
     'frozen'  => qr/\AMessage .+ (?:has been frozen|was frozen on arrival)/,
 };
 
-my $ReCommands = [
+state $ReCommands = [
     # transports/smtp.c:564|  *message = US string_sprintf("SMTP error from remote mail server after %s%s: "
     # transports/smtp.c:837|  string_sprintf("SMTP error from remote mail server after RCPT TO:<%s>: "
     qr/SMTP error from remote (?:mail server|mailer) after ([A-Za-z]{4})/,
@@ -56,7 +53,7 @@ my $ReCommands = [
     qr/LMTP error after ([A-Za-z]{4})/,
     qr/LMTP error after end of ([A-Za-z]{4})/,
 ];
-my $MessagesOf = {
+state $MessagesOf = {
     # find exim/ -type f -exec grep 'message = US' {} /dev/null \;
     # route.c:1158|  DEBUG(D_uid) debug_printf("getpwnam() returned NULL (user not found)\n");
     'userunknown' => ['user not found'],
@@ -103,7 +100,7 @@ my $MessagesOf = {
     # deliver.c:5425|  new->message = US"Too many \"Received\" headers - suspected mail loop";
     'contenterror' => ['Too many "Received" headers'],
 };
-my $DelayedFor = [
+state $DelayedFor = [
     # retry.c:902|  addr->message = (addr->message == NULL)? US"retry timeout exceeded" :
     # deliver.c:7475|  "No action is required on your part. Delivery attempts will continue for\n"
     # smtp.c:3508|  US"retry time not reached for any host after a long failure period" :
@@ -122,21 +119,13 @@ my $DelayedFor = [
     'was frozen on arrival by ',
 ];
 
-# X-Failed-Recipients: kijitora@example.ed.jp
-sub headerlist  { return ['x-failed-recipients'] }
 sub description { 'Exim' }
 sub make {
     # Detect an error from Exim
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.0.0
     my $class = shift;
     my $mhead = shift // return undef;
@@ -146,6 +135,7 @@ sub make {
     return undef if $mhead->{'from'} =~/[@].+[.]mail[.]ru[>]?/;
 
     # Message-Id: <E1P1YNN-0003AD-Ga@example.org>
+    # X-Failed-Recipients: kijitora@example.ed.jp
     $match++ if index($mhead->{'from'}, 'Mail Delivery System') == 0;
     $match++ if defined $mhead->{'message-id'} &&
                 $mhead->{'message-id'} =~ /\A[<]\w{7}[-]\w{6}[-]\w{2}[@]/;
@@ -180,8 +170,6 @@ sub make {
     for my $e ( split("\n", $emailsteak->[0]) ) {
         # Read error messages and delivery status lines from the head of the email
         # to the previous line of the beginning of the original message.
-        last if $e eq $StartingOf->{'endof'}->[0];
-
         unless( $readcursor ) {
             # Beginning of the bounce message or message/delivery-status part
             if( $e =~ $MarkingsOf->{'message'} ) {
@@ -320,7 +308,7 @@ sub make {
         if( defined $mhead->{'x-failed-recipients'} ) {
             # X-Failed-Recipients: kijitora@example.jp
             my @rcptinhead = split(',', $mhead->{'x-failed-recipients'});
-            map { $_ =~ s/\A[ ]+//; $_ =~ s/[ ]+\z// } @rcptinhead;
+            for my $e ( @rcptinhead ) { $e =~ s/\A[ ]+//; $e =~ s/[ ]+\z// }
             $recipients = scalar @rcptinhead;
 
             for my $e ( @rcptinhead ) {
@@ -341,7 +329,6 @@ sub make {
 
     for my $e ( @$dscontents ) {
         # Set default values if each value is empty.
-        $e->{'agent'}   = __PACKAGE__->smtpagent;
         $e->{'lhost'} ||= $localhost0;
 
         if( ! $e->{'diagnosis'} && length($boundary00) > 0 ) {
@@ -526,12 +513,6 @@ Methods in the module are called from only Sisimai::Message.
 C<description()> returns description string of this module.
 
     print Sisimai::Lhost::Exim->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::Exim->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

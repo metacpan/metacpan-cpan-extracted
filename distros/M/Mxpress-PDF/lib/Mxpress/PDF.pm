@@ -4,7 +4,7 @@ use warnings;
 
 package Mxpress::PDF {
 	BEGIN {
-		our $VERSION = '0.22';
+		our $VERSION = '0.23';
 		our $AUTHORITY = 'cpan:LNATION';
 	};
 	use Zydeco;
@@ -12,7 +12,7 @@ package Mxpress::PDF {
 	use constant mm => 25.4 / 72;
 	use constant pt => 1;
 	class File (HashRef $args) {
-		my @plugins = (qw/font line box circle pie ellipse text title subtitle subsubtitle h1 h2 h3 h4 h5 h6 toc image form input textarea select annotation cover/, ($args->{plugins} ? @{$args->{plugins}} : ()));
+		my @plugins = (qw/font border line box circle pie ellipse text title subtitle subsubtitle h1 h2 h3 h4 h5 h6 toc image form input textarea select annotation cover/, ($args->{plugins} ? @{$args->{plugins}} : ()));
 		for my $p (@plugins) {
 			my $meth = sprintf('_store_%s', $p);
 			has {$meth} (is => 'rw', type => Object);
@@ -36,13 +36,23 @@ package Mxpress::PDF {
 			$args{is_rotated} = 0;
 			if ($self->page) {
 				unless ($args{force_new_page}) {
-					$self->page->next_column() && return;
-					$self->page->next_row() && return;
+					my $border = $self->border->active;
+					$self->border->end if $border;	
+					my $next = $self->page->next_column();
+					$next = $self->page->next_row() if !$next;
+					if ($border) {
+						$self->border->start if $next;
+						$self->border->active(1);
+					}
+					return if $next;
 				}
 				$args{h_offset} = $self->page->h_offset;
 				$args{is_rotated} = $self->page->is_rotated;
 				$args{columns} = $self->page->columns;
 			}
+			my $border = $self->{_store_border} && $self->border->active;
+			$self->border->end if $border;
+
 			my @attrs = qw/active padding show_page_num page_num_text onsave_cbs x y w h background columns column rows row row_y/;
 			my $page = $self->FACTORY->page(
 				$self->pdf,
@@ -59,6 +69,7 @@ package Mxpress::PDF {
 			$self->page($page);
 			$self->box->add( fill_colour => $page->background, full => \1 ) if $page->background;
 			$self->page->set_position($page->parse_position([]));
+			$self->border->start if $border;
 			$self;
 		}
 		method save {
@@ -183,6 +194,7 @@ package Mxpress::PDF {
 		method next_column {
 			if ($self->column < $self->columns) {
 				my $fh = !!$self->footer->active ? $self->footer->h : 0;
+				
 				$self->y($self->row_y ? $self->row_y : ($self->h + (($self->padding*2)/mm) + $fh));
 				$self->column($self->column + 1);
 				return 1;
@@ -286,15 +298,15 @@ package Mxpress::PDF {
 					$args{$_} //= $args{parent}->$_ for qw/num page_size/;
 					$args{x} //= 0;
 					$args{w} //= $args{parent}->ow;
-					$args{y} //= $args{parent}->h;
+					$args{y} //= $args{parent}->oh + ($args{parent}->padding/mm);
 					$args{h} //= 10/mm;
-					$args{padding} //= 0;
+					$args{padding} //= 10;
 					my $head = $class->new(onsave_cbs => [], %args);
 					$head->activate if !!$head->active;
 					return $head;
 				}
 				before activate {
-					$self->parent->y($self->parent->y - $self->h);
+					$self->parent->y($self->parent->oh - $self->h);
 				}
 			}
 			class +Footer {
@@ -304,7 +316,7 @@ package Mxpress::PDF {
 					$args{w} //= $args{parent}->ow;
 					$args{y} //= (5/mm);
 					$args{h} //= (10/mm);
-					$args{padding} //= 0;
+					$args{padding} //= 10;
 					return $class->new(onsave_cbs => [], %args);
 				}
 			}
@@ -436,7 +448,7 @@ package Mxpress::PDF {
 				return $self->file;
 			}
 			class +Line {
-				has end_position;
+				has end_position (is => 'rw');
 				factory line (Object $file, Map %args) {
 					$class->generic_new($file, %args);
 				}
@@ -444,10 +456,68 @@ package Mxpress::PDF {
 					$shape->strokecolor($self->fill_colour);
 					my ($x, $y, $w, $h) = $self->parse_position($self->position || []);
 					$shape->move($x, $y);
-					($x, $y) = $self->end_position ? $self->parse_position($self->end_position, \1) : ($w, $y);
+					($x, $y) = $self->end_position ? $self->parse_position($self->end_position) : ($x + $w, $y);
 					$shape->line($x, $y);
 					$shape->stroke;
 				}
+				class Border {
+					has border_top (is => 'rw', type => ArrayRef);	
+					has active (is => 'rw');
+					factory border (Object $file, Map %args) {
+						return $class->new(
+							file => $file,
+							padding => 0,
+							fill_colour => $file->page->valid_colour($args{fill_colour} || '#fff'),
+							%args
+						);
+					}
+					method start (Map %args) {
+						if (!$args{border_top}) {
+							my $y = $self->file->page->y*mm;
+							if ($self->file->page->row > 1) {
+								$y -= $self->file->page->padding * ($self->file->page->row - 1);
+							} 
+							$args{border_top} = [
+								$self->file->page->x*mm, 
+								$y, 
+								$self->file->page->w*mm
+							];
+						}
+						$args{active} = 1;
+						$self->set_attrs(%args);
+						return $self->file;
+					}	
+					method end (Map %args) {
+						$args{active} = 0;
+						$self->set_attrs(%args);
+						my $tx = $self->border_top->[0];
+						my $ty = $self->border_top->[1];
+						my ($bx, $by, $w) = map { $_*mm }  $self->parse_position([]);
+						$self->add(
+							position => [$tx, $ty],
+							end_position => [$tx + $w, $ty]
+						);
+			
+						$self->add(
+							position => [$tx, $by],
+							end_position => [$tx + $w, $by]
+						);
+
+						$self->add(
+							position => [$tx, $ty],
+							end_position => [$tx, $by],
+						);
+				
+						my $r = $tx + $w;
+						$self->add(
+							position => [$r, $ty],
+							end_position => [$r, $by],
+						);		
+	
+						return $self->file;	
+					}
+				}
+
 			}
 			class +Box {
 				factory box (Object $file, Map %args) {
@@ -676,7 +746,10 @@ package Mxpress::PDF {
 						$fl = 0;
 					}
 				}
-				unshift( @paragraphs, join( ' ', @paragraph ) ) if scalar(@paragraph);
+				unshift( @paragraphs, join( ' ', @paragraph ) ) if scalar(@paragraph);	
+				if ($self->padding) {
+					$ypos -= $self->padding/mm;
+				}
 				$self->file->page->y($ypos);
 				$self->file->page->columns($columns);
 				if (scalar @paragraphs && $self->next_page) {
@@ -1216,7 +1289,7 @@ Mxpress::PDF - PDF
 
 =head1 VERSION
 
-Version 0.22
+Version 0.23
 
 =cut
 
@@ -1256,22 +1329,26 @@ This is experimental and may yet still change.
 				colour => '#f00',
 			},
 			margin_bottom => 3,
+			padding => 5,
 		},
 		subtitle => {
 			font => {
 				colour => '#0ff',
 			},
-			margin_bottom => 3
+			margin_bottom => 3,	
+			padding => 5,
 		},
 		subsubtitle => {
 			font => {
 				colour => '#f0f',
 			},
+			padding => 5,
 			margin_bottom => 3
 		},
 		text => {
 			font => { colour => '#fff' },
 			margin_bottom => 3,
+			padding => 5,
 			align => 'justify'
 		},
 	);
@@ -1303,11 +1380,13 @@ This is experimental and may yet still change.
 		padding => 5
 	);
 
+	$pdf->border->start;
 	for (0 .. 100) {
 		$pdf->toc->add(
 			[qw/title subtitle subsubtitle/]->[int(rand(3))] => $gen_text->(4)
 		)->text->add( $gen_text->(1000) );
 	}
+	$pdf->border->end;
 
 	$pdf->save();
 
@@ -1356,6 +1435,13 @@ Returns a new Mxpress::PDF::Page::Component::Footer Object. This object is for m
 Returns a new Mxpress::PDF::Plugin::Font Object. This object is for loading a PDFs text font.
 
 	my $font = Mxpress::PDF->font($file, %font_args);
+
+
+=head2 border
+
+Returns a new Mxpress::PDF::Plugin::Border Object. This object is for drawing borders.
+
+	my $border = Mxpress::PDF->border($file, %line_args);
 
 =head2 line
 
@@ -1558,6 +1644,14 @@ An array of arrays that define cbs, triggered when $file->save() is called.
 A Mxpress:PDF::Plugin::Font Object.
 
 	$file->font->load;
+
+=head3 border (is => 'rw', type => Object)
+
+A Mxpress:PDF::Plugin::Border Object.
+
+	$file->border->start;
+	...
+	$file->border->end;
 
 =head3 line (is => 'rw', type => Object)
 
@@ -2148,6 +2242,56 @@ Load the PDF::API2 font object.
 Find a PDF::API2 font object.
 
 	$font->find($famild, $enc?)
+
+=head1 Border
+
+Mxpress::PDF::Plugin::Border extends Mxpress::PDF::Plugin::Shape::Line and is for aiding with drawing borders on a Mxpress::PDF::Page.
+
+You can pass default attributes when instantiating the file object.
+
+	Mxpress::PDF->add_file($filename,
+		border => { %border_attrs },
+	);
+
+or when calling the objects start method.
+
+	$file->border->start(
+		%border_attrs
+	);
+
+=head2 Attributes
+
+The following attributes can be configured for a Mxpress::PDF::Plugin::Border object, they are all optional.
+
+	$line->$attr();
+
+=head3 fill_colour (is => 'rw', type => Str);
+
+The colour of the line.
+
+	$line->fill_colour('#000');
+
+=head3 border_top (is => 'rw', type => ArrayRef);
+
+The position of the top border line
+
+	$line->border_top([$x, $y]);
+
+=head2 Methods
+
+The following methods can be called from a Mxpress::PDF::Plugin::Border Object.
+
+=head3 start
+
+Start the border this will track the current position of the pdf.
+	
+	$border->start;
+
+=head3 end
+
+Stop the border, this will render the border to the page.
+
+	$border->end;
 
 =head1 Shape
 

@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Bencher/Scenario/PathNaive/concat_path.pm','lib/Bencher/Scenario/PathNaive/normalize_path.pm','lib/Bencher/Scenario/PathNaive/split_path.pm','lib/Bencher/Scenarios/PathNaive.pm'];
+my $filenames = ['lib/Bencher/Scenario/PathNaive/abs_path.pm','lib/Bencher/Scenario/PathNaive/concat_path.pm','lib/Bencher/Scenario/PathNaive/normalize_path.pm','lib/Bencher/Scenario/PathNaive/rel_path.pm','lib/Bencher/Scenario/PathNaive/split_path.pm','lib/Bencher/Scenarios/PathNaive.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

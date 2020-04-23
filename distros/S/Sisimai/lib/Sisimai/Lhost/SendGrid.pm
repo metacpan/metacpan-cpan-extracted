@@ -4,32 +4,24 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Indicators = __PACKAGE__->INDICATORS;
-my $ReBackbone = qr|^Content-Type:[ ]message/rfc822|m;
-my $StartingOf = { 'message' => ['This is an automatically generated message from SendGrid.'] };
+state $Indicators = __PACKAGE__->INDICATORS;
+state $ReBackbone = qr|^Content-Type:[ ]message/rfc822|m;
+state $StartingOf = { 'message' => ['This is an automatically generated message from SendGrid.'] };
 
-# Return-Path: <apps@sendgrid.net>
-# X-Mailer: MIME-tools 5.502 (Entity 5.502)
-sub headerlist  { return ['return-path', 'x-mailer'] }
 sub description { 'SendGrid: https://sendgrid.com/' }
 sub make {
     # Detect an error from SendGrid
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.0.2
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
 
-    # 'from'        => qr/\AMAILER-DAEMON\z/,
+    # Return-Path: <apps@sendgrid.net>
+    # X-Mailer: MIME-tools 5.502 (Entity 5.502)
     return undef unless $mhead->{'return-path'};
     return undef unless $mhead->{'return-path'} eq '<apps@sendgrid.net>';
     return undef unless $mhead->{'subject'} eq 'Undelivered Mail Returned to Sender';
@@ -163,7 +155,6 @@ sub make {
                 $e->{'status'} = Sisimai::SMTP::Status->code('expired') || $e->{'status'};
             }
         }
-        $e->{'agent'}     = __PACKAGE__->smtpagent;
         $e->{'lhost'}   ||= $permessage->{'rhost'};
         $e->{'command'} ||= $commandtxt;
     }
@@ -195,12 +186,6 @@ Methods in the module are called from only Sisimai::Message.
 C<description()> returns description string of this module.
 
     print Sisimai::Lhost::SendGrid->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::SendGrid->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

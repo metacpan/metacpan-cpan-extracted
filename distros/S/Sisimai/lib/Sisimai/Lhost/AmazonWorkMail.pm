@@ -5,27 +5,17 @@ use strict;
 use warnings;
 
 # https://aws.amazon.com/workmail/
-my $Indicators = __PACKAGE__->INDICATORS;
-my $ReBackbone = qr|^content-type:[ ]message/rfc822|m;
-my $StartingOf = { 'message' => ['Technical report:'] };
+state $Indicators = __PACKAGE__->INDICATORS;
+state $ReBackbone = qr|^content-type:[ ]message/rfc822|m;
+state $StartingOf = { 'message' => ['Technical report:'] };
 
-# X-Mailer: Amazon WorkMail
-# X-Original-Mailer: Amazon WorkMail
-# X-Ses-Outgoing: 2016.01.14-54.240.27.159
-sub headerlist  { return ['x-ses-outgoing', 'x-original-mailer'] }
 sub description { 'Amazon WorkMail: https://aws.amazon.com/workmail/' }
 sub make {
     # Detect an error from Amazon WorkMail
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.1.29
     my $class = shift;
     my $mhead = shift // return undef;
@@ -33,8 +23,9 @@ sub make {
     my $match = 0;
     my $xmail = $mhead->{'x-original-mailer'} || $mhead->{'x-mailer'} || '';
 
-    # 'subject' => qr/Delivery[_ ]Status[_ ]Notification[_ ].+Failure/,
-    # 'received'=> qr/.+[.]smtp-out[.].+[.]amazonses[.]com\b/,
+    # X-Mailer: Amazon WorkMail
+    # X-Original-Mailer: Amazon WorkMail
+    # X-Ses-Outgoing: 2016.01.14-54.240.27.159
     $match++ if $mhead->{'x-ses-outgoing'};
     if( $xmail ) {
         # X-Mailer: Amazon WorkMail
@@ -111,9 +102,9 @@ sub make {
 
     for my $e ( @$dscontents ) {
         # Set default values if each value is empty.
-        $e->{'lhost'}    ||= $permessage->{'rhost'};
-        map { $e->{ $_ } ||= $permessage->{ $_ } || '' } keys %$permessage;
-        $e->{'diagnosis'}  = Sisimai::String->sweep($e->{'diagnosis'});
+        $e->{'lhost'} ||= $permessage->{'rhost'};
+        $e->{ $_ } ||= $permessage->{ $_ } || '' for keys %$permessage;
+        $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
 
         if( $e->{'status'} =~ /\A[45][.][01][.]0\z/ ) {
             # Get other D.S.N. value from the error message
@@ -127,7 +118,6 @@ sub make {
         # <421 4.4.2 Connection timed out>
         $e->{'replycode'} = $1 if $e->{'diagnosis'} =~ /[<]([245]\d\d)[ ].+[>]/;
         $e->{'reason'}  ||= Sisimai::SMTP::Status->name($e->{'status'}) || '';
-        $e->{'agent'}     = __PACKAGE__->smtpagent;
     }
     return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
 }
@@ -157,12 +147,6 @@ Methods in the module are called from only Sisimai::Message.
 C<description()> returns description string of this module.
 
     print Sisimai::Lhost::AmazonWorkMail->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::AmazonWorkMail->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

@@ -30,7 +30,7 @@ MAKE_TEST: {
         my $mtahost = qr/mx[0-9]+[.]qq[.]com/;
         next unless defined $mailbox;
 
-        while( my $r = $mailbox->read ) {
+        while( my $r = $mailbox->data->read ) {
 
             my $p = Sisimai::Message->new('data' => $r);
             isa_ok $p, 'Sisimai::Message';
@@ -50,7 +50,7 @@ MAKE_TEST: {
                 like $e->{'rhost'}, $mtahost, '->rhost = '.$e->{'rhost'};
                 ok length $e->{'lhost'}, '->lhost = '.$e->{'lhost'};
                 ok exists $e->{'alias'}, '->alias = '.$e->{'alias'};
-                like $e->{'agent'}, qr/\AEmail::Postfix/, '->agent = '.$e->{'agent'};
+                is $e->{'agent'}, 'Postfix', '->agent = '.$e->{'agent'};
             }
 
             my $v = Sisimai::Data->make('data' => $p);

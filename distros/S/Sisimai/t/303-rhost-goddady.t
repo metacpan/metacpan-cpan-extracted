@@ -29,7 +29,7 @@ MAKE_TEST: {
         my $mtahost = 'smtp.secureserver.net';
         next unless defined $mailbox;
 
-        while( my $r = $mailbox->read ) {
+        while( my $r = $mailbox->data->read ) {
 
             my $p = Sisimai::Message->new('data' => $r);
             isa_ok $p, 'Sisimai::Message';
@@ -49,7 +49,7 @@ MAKE_TEST: {
                 is $e->{'rhost'}, $mtahost, '->rhost = '.$mtahost;
                 ok length $e->{'lhost'}, '->lhost = '.$e->{'lhost'};
                 ok exists $e->{'alias'}, '->alias = '.$e->{'alias'};
-                like $e->{'agent'}, qr/\AEmail::/, '->agent = '.$e->{'agent'};
+                like $e->{'agent'}, qr/(?:Postfix|Sendmail)/, '->agent = '.$e->{'agent'};
             }
 
             my $v = Sisimai::Data->make('data' => $p);

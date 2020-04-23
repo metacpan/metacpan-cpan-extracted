@@ -2,14 +2,18 @@ NAME
     Bencher::Scenarios::PathNaive - Benchmark Path::Naive
 
 VERSION
-    This document describes version 0.001 of Bencher::Scenarios::PathNaive
+    This document describes version 0.002 of Bencher::Scenarios::PathNaive
     (from Perl distribution Bencher-Scenarios-PathNaive), released on
-    2020-02-10.
+    2020-02-12.
 
 DESCRIPTION
     This distribution contains the following Bencher scenario modules:
 
+    *   Bencher::Scenario::PathNaive::abs_path
+
     *   Bencher::Scenario::PathNaive::split_path
+
+    *   Bencher::Scenario::PathNaive::rel_path
 
     *   Bencher::Scenario::PathNaive::concat_path
 

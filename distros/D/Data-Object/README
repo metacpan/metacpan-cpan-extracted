@@ -4,338 +4,447 @@ NAME
 
 ABSTRACT
 
-    Modern Perl Development Framework and Standard Library
+    Object-Orientation for Perl 5
 
 SYNOPSIS
 
-      package User;
+      package main;
     
-      use Data::Object 'Class';
+      use Data::Object;
     
-      extends 'Identity';
+      my $array = Array [1..4];
     
-      has 'fname';
-      has 'lname';
+      # my $iterator = $array->iterator;
     
-      1;
+      # $iterator->next; # 1
 
 DESCRIPTION
 
-    Data-Object is a robust development framework for modern Perl
-    development, embracing Perl's multi-paradigm programming nature,
-    flexibility and vast ecosystem that many of engineers already know and
-    love.
+    This package automatically exports and provides constructor functions
+    for creating chainable data type objects from raw Perl data types.
 
-    This framework aims to provide a standardized and cohesive set of
-    classes, types, objects, functions, patterns, and tools for
-    jump-starting application development with modern conventions and best
-    practices.
+LIBRARIES
 
-    The power of this framework comes from the extendable (yet fully
-    optional) type library which is integrated into the object system and
-    type-constrainable subroutine signatures (supporting functions, methods
-    and method modifiers). We also provide classes which wrap Perl 5 native
-    data types and provides methods for operating on the data.
+    This package uses type constraints from:
 
-    Contrary to popular opinion, modern Perl programming can be extremely
-    well-structured and beautiful, leveraging many advanced concepts found
-    on other languages, and some which aren't. Abilities like method
-    modification also referred to as augmenting, reflection, advanced
-    object-orientation, type-constrainable object attributes,
-    type-constrainable subroutine signatures (with named and positional
-    arguments), as well roles (similar to mixins or interfaces in other
-    languages).
-
-      use Data::Object;
-
-    This is what's enabled whenever you import the Data::Object application
-    development framework.
-
-      # basics
-      use strict;
-      use warnings;
-    
-      # loads say, state, switch, unicode_strings, array_base
-      use feature ':5.14';
-    
-      # loads types and signatures
-      use Data::Object::Library;
-      use Data::Object::Signatures;
-    
-      # load super "do" function, etc
-      use Data::Object::Export;
-
-    To explain by way of example: The following creates a class
-    representing a user which has the ability to greet user person.
-
-      package User;
-    
-      use Data::Object 'Class', 'App';
-    
-      has name => (
-        is  => 'ro',
-        isa => 'Str',
-        req => 1
-      );
-    
-      method hello(User $user) {
-        return 'Hello '. $user->name .'. How are you?';
-      }
-    
-      1;
-
-    The following is a script that creates a function that returns how one
-    user greets another user.
-
-      #!/usr/bin/perl
-    
-      use User;
-    
-      use Data::Object 'Core', 'App';
-    
-      fun greetings(User $u1, User $u2) {
-        return $u1->hello($u2);
-      }
-    
-      my $u1 = User->new(name => 'Jane');
-      my $u2 = User->new(name => 'June');
-    
-      say(greetings($u1, $u2)); # Hey June
-
-    This demonstrates much of the power of this framework in one simple
-    example. If you're new to Perl, the code above creates a class with a
-    single (read-only string) attribute called name and a single method
-    called hello, then registers the class in a user-defined type-library
-    called App where all user-defined type constraints will be stored and
-    retrieved (and reified).
-
-    The main program (namespace) initializes the framework and specifies
-    the user-defined type library to use in the creation of a single
-    function greetings which takes two arguments which must both be
-    instances of the class we just created. It's important to note that in
-    order for the code above to execute, the App type library must exist.
-    This could be as simple as:
-
-      package App;
-    
-      use Data::Object 'Library';
-    
-      1;
-
-    That having been explained, it's also important to note that while this
-    example showcases much of what's possible with this framework, all of
-    the sophistication is totally optional. For example, method and
-    function signatures are optionally typed, so the declarations would
-    work just as well without the types specified. In fact, you could then
-    remove the App type library declarations from both packages and even
-    resort rewriting the method and function as plain-old Perl subroutines.
-    This flexibility to be able to enable more advanced capabilities is
-    common in the Perl ecosystem and is one of the things we love most. The
-    wiring-up of things! If you're familiar with Perl, this framework is
-    in-part the wiring up of Moo (with Moose support), Type::Tiny,
-    Function::Parameters, Try::Tiny and data objects in a cooperative and
-    cohesive way that feels like it's native to the language.
-
-INSTALLATION
-
-    If you have cpanm, you only need one line:
-
-      $ cpanm -qn Data::Object
-
-    If you don't have cpanm, get it! It takes less than a minute,
-    otherwise:
-
-      $ curl -L https://cpanmin.us | perl - -qn Data::Object
-
-    Add Data::Object to the list of dependencies in cpanfile:
-
-      requires "Data::Object" => "0.97"; # 0.97 or newer
-
-    If cpanm doesn't have permission to install modules in the current Perl
-    installation, it will automatically set up and install to a local::lib
-    in your home directory. See the local::lib documentation for details on
-    enabling it in your environment. We recommend using a Perlbrew
-    <https://github.com/gugod/app-perlbrew> or Plenv
-    <https://github.com/tokuhirom/plenv> environment. These tools will help
-    you manage multiple Perl installations in your $HOME directory. They
-    are completely isolated Perl installations.
+    Data::Object::Types
 
 FUNCTIONS
 
-    This package implements the following functions.
+    This package implements the following functions:
 
- any
+ args
 
-      any(Any $arg) : Object
+      Args(HashRef $data) : InstanceOf["Data::Object::Args"]
 
-    The any constructor function returns a Data::Object::Any object for
-    given argument.
+    The Args function returns a Data::Object::Args object.
 
-    any example
+    Args example #1
 
-        # given \*main
+        package main;
       
-        my $object = Data::Object->any(\*main);
+        use Data::Object 'Args';
+      
+        my $args = Args; # [...]
+
+    Args example #2
+
+        package main;
+      
+        my $args = Args {
+          subcommand => 0
+        };
+      
+        # $args->subcommand;
 
  array
 
-      array(ArrayRef $arg) : Object
+      Array(ArrayRef $data) : InstanceOf["Data::Object::Box"]
 
-    The array constructor function returns a Data::Object::Array object for
-    given argument.
+    The Array function returns a Data::Object::Box which wraps a
+    Data::Object::Array object.
 
-    array example
+    Array example #1
 
-        # given [1..4]
+        package main;
       
-        my $object = Data::Object->array([1..4]);
+        my $array = Array; # []
+
+    Array example #2
+
+        package main;
+      
+        my $array = Array [1..4];
+
+ boolean
+
+      Boolean(Bool $data) : BooleanObject
+
+    The Boolean function returns a Data::Object::Boolean object
+    representing a true or false value.
+
+    Boolean example #1
+
+        package main;
+      
+        my $boolean = Boolean;
+
+    Boolean example #2
+
+        package main;
+      
+        my $boolean = Boolean 0;
+
+ box
+
+      Box(Any $data) : InstanceOf["Data::Object::Box"]
+
+    The Box function returns a Data::Object::Box object representing a data
+    type object which is automatically deduced.
+
+    Box example #1
+
+        package main;
+      
+        my $box = Box;
+
+    Box example #2
+
+        package main;
+      
+        my $box = Box 123;
+
+    Box example #3
+
+        package main;
+      
+        my $box = Box [1..4];
+
+    Box example #4
+
+        package main;
+      
+        my $box = Box {1..4};
 
  code
 
-      code(CodeRef $arg) : Object
+      Code(CodeRef $data) : InstanceOf["Data::Object::Box"]
 
-    The code constructor function returns a Data::Object::Code object for
-    given argument.
+    The Code function returns a Data::Object::Box which wraps a
+    Data::Object::Code object.
 
-    code example
+    Code example #1
 
-        # given sub { shift + 1 }
+        package main;
       
-        my $object = Data::Object->code(sub { $_[0] + 1 });
+        my $code = Code;
 
- exception
+    Code example #2
 
-      exception(HashRef $arg) : Object
-
-    The exception constructor function returns a Data::Object::Exception
-    object for given argument.
-
-    exception example
-
-        # given { message => 'Oops' }
+        package main;
       
-        my $object = Data::Object->exception({ message => 'Oops' });
+        my $code = Code sub { shift };
+
+ data
+
+      Data(Str $file) : InstanceOf["Data::Object::Data"]
+
+    The Data function returns a Data::Object::Data object.
+
+    Data example #1
+
+        package main;
+      
+        use Data::Object 'Data';
+      
+        my $data = Data;
+
+    Data example #2
+
+        package main;
+      
+        my $data = Data '/path/to/file.pod';
+      
+        # $data->contents(...);
+
+ false
+
+      False() : BooleanObject
+
+    The False function returns a Data::Object::Boolean object representing
+    a false value.
+
+    False example #1
+
+        package main;
+      
+        my $false = False;
 
  float
 
-      float(Num $arg) : Object
+      Float(Num $data) : InstanceOf["Data::Object::Box"]
 
-    The float constructor function returns a Data::Object::Float object for
-    given argument.
+    The Float function returns a Data::Object::Box which wraps a
+    Data::Object::Float object.
 
-    float example
+    Float example #1
 
-        # given 1.23
+        package main;
       
-        my $object = Data::Object->float(1.23);
+        my $float = Float;
+
+    Float example #2
+
+        package main;
+      
+        my $float = Float '0.0';
 
  hash
 
-      hash(HashRef $arg) : Object
+      Hash(HashRef $data) : InstanceOf["Data::Object::Box"]
 
-    The hash constructor function returns a Data::Object::Hash object for
-    given argument.
+    The Hash function returns a Data::Object::Box which wraps a
+    Data::Object::Hash object.
 
-    hash example
+    Hash example #1
 
-        # given {1..4}
+        package main;
       
-        my $object = Data::Object->hash({1..4});
+        my $hash = Hash;
 
- integer
+    Hash example #2
 
-      integer(Int $arg) : Object
-
-    The integer constructor function returns a Data::Object::Integer object
-    for given argument.
-
-    integer example
-
-        # given -123
+        package main;
       
-        my $object = Data::Object->integer(-123);
+        my $hash = Hash {1..4};
+
+ name
+
+      Name(Str $data) : InstanceOf["Data::Object::Name"]
+
+    The Name function returns a Name::Object::Name object.
+
+    Name example #1
+
+        package main;
+      
+        use Data::Object 'Name';
+      
+        my $name = Name 'Example Title';
+      
+        # $name->package;
 
  number
 
-      number(Num $arg) : Object
+      Number(Num $data) : InstanceOf["Data::Object::Box"]
 
-    The number constructor function returns a Data::Object::Number object
-    for given argument.
+    The Number function returns a Data::Object::Box which wraps a
+    Data::Object::Number object.
 
-    number example
+    Number example #1
 
-        # given 123
+        package main;
       
-        my $object = Data::Object->number(123);
+        my $number = Number;
+
+    Number example #2
+
+        package main;
+      
+        my $number = Number 123;
+
+ opts
+
+      Opts(HashRef $data) : InstanceOf["Data::Object::Opts"]
+
+    The Opts function returns a Data::Object::Opts object.
+
+    Opts example #1
+
+        package main;
+      
+        my $opts = Opts;
+
+    Opts example #2
+
+        package main;
+      
+        my $opts = Opts {
+          spec => ['files|f=s']
+        };
+      
+        # $opts->files; [...]
 
  regexp
 
-      regexp(Regexp $arg) : Object
+      Regexp(RegexpRef $data) : InstanceOf["Data::Object::Box"]
 
-    The regexp constructor function returns a Data::Object::Regexp object
-    for given argument.
+    The Regexp function returns a Data::Object::Box which wraps a
+    Data::Object::Regexp object.
 
-    regexp example
+    Regexp example #1
 
-        # given qr(\w+)
+        package main;
       
-        my $object = Data::Object->regexp(qr(\w+));
+        my $regexp = Regexp;
+
+    Regexp example #2
+
+        package main;
+      
+        my $regexp = Regexp qr/.*/;
 
  scalar
 
-      scalar(Any $arg) : Object
+      Scalar(Ref $data) : InstanceOf["Data::Object::Box"]
 
-    The scalar constructor function returns a Data::Object::Scalar object
-    for given argument.
+    The Scalar function returns a Data::Object::Box which wraps a
+    Data::Object::Scalar object.
 
-    scalar example
+    Scalar example #1
 
-        # given \*main
+        package main;
       
-        my $object = Data::Object->scalar(\*main);
+        my $scalar = Scalar;
+
+    Scalar example #2
+
+        package main;
+      
+        my $scalar = Scalar \*main;
+
+ space
+
+      Space(Str $data) : InstanceOf["Data::Object::Space"]
+
+    The Space function returns a Data::Object::Space object.
+
+    Space example #1
+
+        package main;
+      
+        use Data::Object 'Space';
+      
+        my $space = Space 'Example Namespace';
 
  string
 
-      string(Str $arg) : Object
+      String(Str $data) : InstanceOf["Data::Object::Box"]
 
-    The string constructor function returns a Data::Object::String object
-    for given argument.
+    The String function returns a Data::Object::Box which wraps a
+    Data::Object::String object.
 
-    string example
+    String example #1
 
-        # given 'hello'
+        package main;
       
-        my $object = Data::Object->string('hello');
+        my $string = String;
+
+    String example #2
+
+        package main;
+      
+        my $string = String 'abc';
+
+ struct
+
+      Struct(HashRef $data) : InstanceOf["Data::Object::Struct"]
+
+    The Struct function returns a Data::Object::Struct object.
+
+    Struct example #1
+
+        package main;
+      
+        use Data::Object 'Struct';
+      
+        my $struct = Struct;
+
+    Struct example #2
+
+        package main;
+      
+        my $struct = Struct {
+          name => 'example',
+          time => time
+        };
+
+ true
+
+      True() : BooleanObject
+
+    The True function returns a Data::Object::Boolean object representing a
+    true value.
+
+    True example #1
+
+        package main;
+      
+        my $true = True;
 
  undef
 
-      undef(Undef $arg?) : Object
+      Undef() : InstanceOf["Data::Object::Box"]
 
-    The undef constructor function returns a Data::Object::Undef object for
-    given argument.
+    The Undef function returns a Data::Object::Undef object representing
+    the undefined value.
 
-    undef example
+    Undef example #1
 
-        # given undef
+        package main;
       
-        my $object = Data::Object->undef(undef);
+        my $undef = Undef;
 
-METHODS
+ vars
 
-    This package implements the following methods.
+      Vars() : InstanceOf["Data::Object::Vars"]
 
- new
+    The Vars function returns a Data::Object::Vars object representing the
+    available environment variables.
 
-      new(Str $arg) : Object
+    Vars example #1
 
-    The new method expects a string representing a class name under the
-    Data::Object namespace and returns a Data::Object::Space object.
-
-    new example
-
-        # given 'String'
+        package main;
       
-        my $space = Data::Object->new('String');
+        use Data::Object 'Vars';
       
-        my $string = $space->build('hello world');
+        my $vars = Vars;
+
+    Vars example #2
+
+        package main;
+      
+        my $vars = Vars {
+          user => 'USER'
+        };
+      
+        # $vars->user; # $USER
+
+AUTHOR
+
+    Al Newkirk, awncorp@cpan.org
+
+LICENSE
+
+    Copyright (C) 2011-2019, Al Newkirk, et al.
+
+    This is free software; you can redistribute it and/or modify it under
+    the terms of the The Apache License, Version 2.0, as elucidated in the
+    "license file"
+    <https://github.com/iamalnewkirk/foobar/blob/master/LICENSE>.
+
+PROJECT
+
+    Wiki <https://github.com/iamalnewkirk/foobar/wiki>
+
+    Project <https://github.com/iamalnewkirk/foobar>
+
+    Initiatives <https://github.com/iamalnewkirk/foobar/projects>
+
+    Milestones <https://github.com/iamalnewkirk/foobar/milestones>
+
+    Contributing
+    <https://github.com/iamalnewkirk/foobar/blob/master/CONTRIBUTE.md>
+
+    Issues <https://github.com/iamalnewkirk/foobar/issues>
 

@@ -5,31 +5,20 @@ use strict;
 use warnings;
 
 # https://aws.amazon.com/ses/
-my $Indicators = __PACKAGE__->INDICATORS;
-my $ReBackbone = qr|^content-type:[ ]message/rfc822|m;
-my $StartingOf = {
+state $Indicators = __PACKAGE__->INDICATORS;
+state $ReBackbone = qr|^content-type:[ ]message/rfc822|m;
+state $StartingOf = {
     'message' => ['The following message to <', 'An error occurred while trying to deliver the mail '],
 };
-my $MessagesOf = { 'expired' => ['Delivery expired'] };
+state $MessagesOf = { 'expired' => ['Delivery expired'] };
 
-# X-SenderID: Sendmail Sender-ID Filter v1.0.0 nijo.example.jp p7V3i843003008
-# X-Original-To: 000001321defbd2a-788e31c8-2be1-422f-a8d4-cf7765cc9ed7-000000@email-bounces.amazonses.com
-# X-AWS-Outgoing: 199.255.192.156
-# X-SES-Outgoing: 2016.10.12-54.240.27.6
-sub headerlist  { ['x-aws-outgoing', 'x-ses-outgoing', 'x-amz-sns-message-id'] }
 sub description { 'Amazon SES(Sending): https://aws.amazon.com/ses/' };
 sub make {
     # Detect an error from Amazon SES
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.0.2
     my $class = shift;
     my $mhead = shift // return undef;
@@ -62,7 +51,6 @@ sub make {
             # Find JSON string from the message body
             next unless length $e;
             last if $e eq '--';
-            last if $e eq '__END_OF_EMAIL_MESSAGE__';
 
             substr($e, 0, 1, '') if $foldedline; # The line starts with " ", continued from !\n.
             $foldedline = 0;
@@ -201,7 +189,6 @@ sub make {
         }
         return undef unless $recipients;
 
-        map { $_->{'agent'} = __PACKAGE__->smtpagent } @$dscontents;
         if( exists $p->{'mail'}->{'headers'} ) {
             # "headersTruncated":false,
             # "headers":[ { ...
@@ -226,6 +213,10 @@ sub make {
         my $xmail = $mhead->{'x-mailer'} || '';
         return undef if index($xmail, 'Amazon WorkMail') > -1;
 
+        # X-SenderID: Sendmail Sender-ID Filter v1.0.0 nijo.example.jp p7V3i843003008
+        # X-Original-To: 000001321defbd2a-788e31c8-2be1-422f-a8d4-cf7765cc9ed7-000000@email-bounces.amazonses.com
+        # X-AWS-Outgoing: 199.255.192.156
+        # X-SES-Outgoing: 2016.10.12-54.240.27.6
         my $match = 0;
         $match ||= 1 if $mhead->{'x-aws-outgoing'};
         $match ||= 1 if $mhead->{'x-ses-outgoing'};
@@ -302,12 +293,10 @@ sub make {
         for my $e ( @$dscontents ) {
             # Set default values if each value is empty.
             $e->{'lhost'} ||= $permessage->{'rhost'};
-            map { $e->{ $_ } ||= $permessage->{ $_ } || '' } keys %$permessage;
+            $e->{ $_ } ||= $permessage->{ $_ } || '' for keys %$permessage;
 
-            $e->{'agent'}     = __PACKAGE__->smtpagent;
             $e->{'diagnosis'} =~ y/\n/ /;
             $e->{'diagnosis'} =  Sisimai::String->sweep($e->{'diagnosis'});
-
             if( $e->{'status'} =~ /\A[45][.][01][.]0\z/ ) {
                 # Get other D.S.N. value from the error message
                 # 5.1.0 - Unknown address error 550-'5.7.1 ...
@@ -353,12 +342,6 @@ Sisimai::Message.
 C<description()> returns description string of this module.
 
     print Sisimai::Lhost::AmazonSES->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::AmazonSES->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

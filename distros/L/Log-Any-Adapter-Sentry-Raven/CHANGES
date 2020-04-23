@@ -1,9 +1,45 @@
 ==================================================
-Changes from 2019-03-12 00:00:00 +0000 to present.
+Changes from 2019-04-23 00:00:00 +0000 to present.
 ==================================================
 
 -------------------------------------------
-version v0.0.2 at 2020-03-11 14:01:50 +0000
+version v0.0.3 at 2020-04-22 14:12:25 +0000
+-------------------------------------------
+
+  Change: 06f6b44099a44c17bad3051d25e4f57efa4fed71
+  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
+  Date : 2020-04-09 07:23:03 +0000
+
+    Run `make update` 
+
+  Change: b19c37e6c624f6302c201ca58ed3b3242f8988fa
+  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
+  Date : 2020-04-09 07:20:26 +0000
+
+    Extract traces from singular exceptions
+
+    This is helpful when we have exception-handling code that simply
+    tries to log our exception. In that case, we want the trace for the
+    exception, not the trace for the exception-handling code. 
+
+  Change: 488bde3f090abfc8cc467d36ca9c45a185412d19
+  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
+  Date : 2020-04-09 07:11:48 +0000
+
+    Require Devel::StackTrace
+
+    There might be someone who doesn't want this behavior, and it's fine
+    to be open to that patch.
+
+    But adding the complication before there's proof that that someone
+    exists is overkill.
+
+    Additionally, it's rather unlikely that anyone will be including
+    Devel::StackTrace::Extract on their own, and it performs a highly
+    useful addition here (see next commit). 
+
+-------------------------------------------
+version v0.0.2 at 2020-03-10 18:01:36 +0000
 -------------------------------------------
 
   Change: 3928d4bde3991be3ef5ed82d2ab131a897dd3233

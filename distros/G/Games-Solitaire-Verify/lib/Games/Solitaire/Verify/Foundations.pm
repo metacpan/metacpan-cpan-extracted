@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Foundations;
-$Games::Solitaire::Verify::Foundations::VERSION = '0.2302';
+$Games::Solitaire::Verify::Foundations::VERSION = '0.2303';
 use warnings;
 use strict;
 
@@ -178,7 +178,7 @@ foundations (or home-cells) in a Solitaire game.
 
 =head1 VERSION
 
-version 0.2302
+version 0.2303
 
 =head1 SYNOPSIS
 

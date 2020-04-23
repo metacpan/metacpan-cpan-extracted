@@ -3,19 +3,20 @@
 use strict;
 use lib '.', 't';
 use helper;
-use File::Basename 'dirname';
-use Test::More 'no_plan';
+use Config;
 use Cwd;
+use File::Basename 'dirname';
+use List::Util 'uniq';
+use Test::More 'no_plan';
 
 # help CPAN testers who installed genhdlist2 using cpan but do not have /usr/local/bin in their PATH:
-$ENV{PATH} .= ":/usr/local/bin";
+$ENV{PATH} .= ":/usr/local/bin:$Config{bin}";
 
 # help when CPAN testers have not genhdlist2 installed but do have built rpmtools:
-foreach (split(':', $ENV{PERL5LIB})) {
+$ENV{PATH} .= join(':', uniq(map {
 	my $blib_script = dirname($_) . "/script";
-	-d $blib_script and warn ">> Adding $blib_script to PATH\n";
-	$ENV{PATH} .= ":$blib_script" if -d $blib_script;
-}
+	-d $blib_script ? $blib_script : ();
+	} split(':', $ENV{PERL5LIB})));
 
 chdir 't' if -d 't';
 system('rm -rf tmp media');

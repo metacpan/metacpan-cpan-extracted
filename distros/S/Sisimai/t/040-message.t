@@ -5,10 +5,7 @@ use Sisimai::Message;
 
 my $PackageName = 'Sisimai::Message';
 my $MethodNames = {
-    'class' => [
-        'new', 'make', 'load', 'parse', 'divideup', 'headers',
-        'takeapart', 'makeorder'
-    ],
+    'class'  => ['new', 'make', 'load', 'parse', 'divideup', 'makemap'],
     'object' => ['from', 'header', 'ds', 'rfc822'],
 };
 my $SampleEmail = './set-of-emails/mailbox/mbox-0';
@@ -50,16 +47,13 @@ MAKE_TEST: {
     isa_ok $p->rfc822, 'HASH', '->rfc822';
     ok length $p->from, $p->from;
 
-    $p = Sisimai::Message->new('data' => $mailastext, 'field' => {});
-    is $p, undef;
-
     $p = Sisimai::Message->new(
             'data' => $mailastext, 
             'hook' => $callbackto,
             'order' => [
                 'Sisimai::Lhost::Sendmail', 'Sisimai::Lhost::Postfix', 
                 'Sisimai::Lhost::qmail', 'Sisimai::Lhost::Exchange2003', 
-                'Sisimai::Lhost::Google', 'Sisimai::Lhost::Verizon',
+                'Sisimai::Lhost::Gmail', 'Sisimai::Lhost::Verizon',
             ]
          );
 
@@ -78,7 +72,7 @@ MAKE_TEST: {
             next unless $e->{ $q };
             like $e->{ $q }, qr/\A.+[.].+\z/, '->'.$q.' = '.$e->{ $q };
         }
-        is $e->{'agent'}, 'Email::Sendmail', '->agent = '.$e->{'agent'};
+        is $e->{'agent'}, 'Sendmail', '->agent = '.$e->{'agent'};
     }
 
     for my $e ( 'content-type', 'to', 'subject', 'date', 'from', 'message-id' ) {

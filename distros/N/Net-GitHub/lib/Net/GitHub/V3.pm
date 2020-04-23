@@ -3,7 +3,7 @@ package Net::GitHub::V3;
 use Moo;
 use Types::Standard qw(InstanceOf);
 
-our $VERSION = '0.99';
+our $VERSION = '1.00';
 our $AUTHORITY = 'cpan:FAYLAND';
 
 with 'Net::GitHub::V3::Query';
@@ -19,6 +19,7 @@ use Net::GitHub::V3::OAuth;
 use Net::GitHub::V3::Events;
 use Net::GitHub::V3::Gitignore;
 use Net::GitHub::V3::Search;
+use Net::GitHub::V3::Actions;
 
 has '+is_main_module' => (default => 1);
 
@@ -133,6 +134,16 @@ has 'gitignore' => (
     default => sub {
         my $self = shift;
         return Net::GitHub::V3::Gitignore->new( $self->args_to_pass );
+    },
+);
+
+has 'actions' => (
+    is => 'rw',
+    isa => InstanceOf['Net::GitHub::V3::Actions'],
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        return Net::GitHub::V3::Actions->new( $self->args_to_pass );
     },
 );
 

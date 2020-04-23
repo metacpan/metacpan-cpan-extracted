@@ -4,8 +4,8 @@ use strict;
 use warnings;
 
 # http://tools.ietf.org/html/rfc3834
-my $MarkingsOf = { 'boundary' => qr/\A__SISIMAI_PSEUDO_BOUNDARY__\z/ };
-my $AutoReply1 = {
+my    $MarkingsOf = { 'boundary' => qr/\A__SISIMAI_PSEUDO_BOUNDARY__\z/ };
+state $AutoReply1 = {
     # http://www.iana.org/assignments/auto-submitted-keywords/auto-submitted-keywords.xhtml
     'auto-submitted' => qr/\Aauto-(?:generated|replied|notified)/,
     # https://msdn.microsoft.com/en-us/library/ee219609(v=exchg.80).aspx
@@ -20,7 +20,7 @@ my $AutoReply1 = {
         )
     /x,
 };
-my $Excludings = {
+state $Excludings = {
     'subject' => qr{(?:
           security[ ]information[ ]for  # sudo
          |mail[ ]failure[ ][-]          # Exim
@@ -29,7 +29,7 @@ my $Excludings = {
     'from'    => qr/(?:root|postmaster|mailer-daemon)[@]/,
     'to'      => qr/root[@]/,
 };
-my $SubjectSet = qr{\A(?>
+state $SubjectSet = qr{\A(?>
      (?:.+?)?re:
     |auto(?:[ ]response):
     |automatic[ ]reply:
@@ -39,20 +39,12 @@ my $SubjectSet = qr{\A(?>
 }x;
 
 sub description { 'Detector for auto replied message' }
-sub smtpagent   { 'RFC3834' }
-sub headerlist  { [qw|auto-submitted precedence x-auto-response-suppress x-apple-action|] }
 sub make {
     # Detect auto reply message as RFC3834
-    # @param         [Hash] mhead       Message header of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.1.28
     my $class = shift;
     my $mhead = shift // return undef;
@@ -85,7 +77,6 @@ sub make {
 
     require Sisimai::Lhost;
     my $dscontents = [Sisimai::Lhost->DELIVERYSTATUS];
-    my $rfc822part = '';    # (String) message/rfc822-headers part
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
     my $maxmsgline = 5;     # (Integer) Max message length(lines)
     my $haveloaded = 0;     # (Integer) The number of lines loaded from message body
@@ -143,13 +134,11 @@ sub make {
 
     $v->{'diagnosis'} = Sisimai::String->sweep($v->{'diagnosis'});
     $v->{'reason'}    = 'vacation';
-    $v->{'agent'}     = __PACKAGE__->smtpagent;
     $v->{'date'}      = $mhead->{'date'};
     $v->{'status'}    = '';
 
     # Get the Subject header from the original message
-    $rfc822part = 'Subject: '.$1."\n" if lc($mhead->{'subject'}) =~ $SubjectSet;
-
+    my $rfc822part = lc($mhead->{'subject'}) =~ $SubjectSet ? 'Subject: '.$1."\n" : '';
     return { 'ds' => $dscontents, 'rfc822' => $rfc822part };
 }
 
@@ -178,12 +167,6 @@ C<description()> returns description string of this module.
 
     print Sisimai::RFC3834->description;
 
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MDA name or string 'RFC3834'.
-
-    print Sisimai::RFC3834->smtpagent;
-
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 
 C<make()> method parses an auto replied message and return results as an array
@@ -195,7 +178,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2015-2019 azumakuniyuki, All rights reserved.
+Copyright (C) 2015-2020 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

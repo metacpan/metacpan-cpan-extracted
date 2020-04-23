@@ -4,10 +4,10 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Indicators = __PACKAGE__->INDICATORS;
-my $ReBackbone = qr/^[ ]+-----[ ](?:Unsent[ ]message[ ]follows|No[ ]message[ ]was[ ]collected)[ ]-----/m;
-my $StartingOf = { 'message' => ['----- Transcript of session follows -----'] };
-my $MarkingsOf = {
+state $Indicators = __PACKAGE__->INDICATORS;
+state $ReBackbone = qr/^[ ]+-----[ ](?:Unsent[ ]message[ ]follows|No[ ]message[ ]was[ ]collected)[ ]-----/m;
+state $StartingOf = { 'message' => ['----- Transcript of session follows -----'] };
+state $MarkingsOf = {
     # Error text regular expressions which defined in src/savemail.c
     #   savemail.c:485| (void) fflush(stdout);
     #   savemail.c:486| p = queuename(e->e_parent, 'x');
@@ -30,16 +30,10 @@ my $MarkingsOf = {
 sub description { 'Sendmail version 5' }
 sub make {
     # Detect an error from V5sendmail
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.1.2
     my $class = shift;
     my $mhead = shift // return undef;
@@ -130,7 +124,6 @@ sub make {
     for my $e ( @$dscontents ) {
         $errorindex++;
         delete $e->{'sessionerr'};
-        $e->{'agent'}   = __PACKAGE__->smtpagent;
         $e->{'command'} = $commandset[$errorindex] || '';
 
         if( exists $anotherset->{'diagnosis'} && $anotherset->{'diagnosis'} ) {
@@ -177,12 +170,6 @@ Methods in the module are called from only Sisimai::Message.
 C<description()> returns description string of this module.
 
     print Sisimai::Lhost::V5sendmail->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::V5sendmail->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

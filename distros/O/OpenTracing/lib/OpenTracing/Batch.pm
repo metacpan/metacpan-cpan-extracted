@@ -3,7 +3,7 @@ package OpenTracing::Batch;
 use strict;
 use warnings;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use parent qw(OpenTracing::Common);
 
@@ -84,8 +84,13 @@ sub new_span {
     my ($self, $name, %args) = @_;
     $args{operation_name} = $name;
     $args{start_time} //= Time::HiRes::time() * 1_000_000;
-    $self->add_span(my $span = OpenTracing::Span->new(batch => $self, %args));
-    OpenTracing::SpanProxy->new(span => $span)
+    $self->add_span(
+        my $span = OpenTracing::Span->new(
+            batch => $self,
+            %args
+        )
+    );
+    return OpenTracing::SpanProxy->new(span => $span)
 }
 
 =head2 DESTROY

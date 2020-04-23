@@ -5,8 +5,8 @@ use warnings;
 use Sisimai::Lhost;
 
 # http://tools.ietf.org/html/rfc3464
-my $Indicators = Sisimai::Lhost->INDICATORS;
-my $MarkingsOf = {
+state $Indicators = Sisimai::Lhost->INDICATORS;
+state $MarkingsOf = {
     'command' => qr/[ ](RCPT|MAIL|DATA)[ ]+command\b/,
     'message' => qr{\A(?>
          content-type:[ ]*(?:
@@ -31,19 +31,12 @@ my $MarkingsOf = {
 };
 
 sub description { 'Fallback Module for MTAs' };
-sub smtpagent   { 'RFC3464' };
 sub make {
     # Detect an error for RFC3464
-    # @param         [Hash] mhead       Message header of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
@@ -383,7 +376,6 @@ sub make {
         my $b = $dscontents->[-1];
         for my $e ( split("\n", $$mbody) ) {
             # Get the recipient's email address and error messages.
-            last if $e eq '__END_OF_EMAIL_MESSAGE__';
             my $d = lc $e;
             last if $d =~ $MarkingsOf->{'rfc822'};
             last if $d =~ $re_stop;
@@ -404,7 +396,6 @@ sub make {
                     $b = $dscontents->[-1];
                 }
                 $b->{'recipient'} = $y;
-                $b->{'agent'} = __PACKAGE__->smtpagent.'::Fallback';
                 $recipients++;
                 $itisbounce ||= 1;
 
@@ -424,7 +415,6 @@ sub make {
             push @$dscontents, Sisimai::Lhost->DELIVERYSTATUS if scalar(@$dscontents) == $recipients;
             my $b = $dscontents->[-1];
             $b->{'recipient'} = $r->[0]->{'address'};
-            $b->{'agent'} = __PACKAGE__->smtpagent.'::Fallback';
             $recipients++;
         }
     }
@@ -432,7 +422,7 @@ sub make {
 
     for my $e ( @$dscontents ) {
         # Set default values if each value is empty.
-        map { $e->{ $_ } ||= $connheader->{ $_ } || '' } keys %$connheader;
+        $e->{ $_ } ||= $connheader->{ $_ } || '' for keys %$connheader;
 
         if( exists $e->{'alterrors'} && $e->{'alterrors'} ) {
             # Copy alternative error message
@@ -447,13 +437,10 @@ sub make {
 
         if( $mdabounced ) {
             # Make bounce data by the values returned from Sisimai::MDA->make()
-            $e->{'agent'}     = $mdabounced->{'mda'} || __PACKAGE__->smtpagent;
+            $e->{'agent'}     = $mdabounced->{'mda'} || 'RFC3464';
             $e->{'reason'}    = $mdabounced->{'reason'} || 'undefined';
             $e->{'diagnosis'} = $mdabounced->{'message'} if $mdabounced->{'message'};
             $e->{'command'}   = '';
-        } else {
-            # Set the value of smtpagent
-            $e->{'agent'} = __PACKAGE__->smtpagent;
         }
         $e->{'date'}   ||= $mhead->{'date'};
         $e->{'status'} ||= Sisimai::SMTP::Status->find($e->{'diagnosis'}) || '';
@@ -486,12 +473,6 @@ when other Sisimai::Lhost::* modules did not detected a bounce reason.
 C<description()> returns description string of this module.
 
     print Sisimai::RFC3464->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MDA name or string 'RFC3464'.
-
-    print Sisimai::RFC3464->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

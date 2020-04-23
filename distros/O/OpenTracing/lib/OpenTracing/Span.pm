@@ -3,7 +3,7 @@ package OpenTracing::Span;
 use strict;
 use warnings;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use parent qw(OpenTracing::Common);
 
@@ -46,7 +46,7 @@ Parent span ID. 0 if there isn't one.
 
 =cut
 
-sub parent_id { shift->{parent_id} // 0 }
+sub parent_id { shift->{parent_id} //= 0 }
 
 =head2 flags
 
@@ -88,14 +88,6 @@ The tags relating to this span.
 
 sub tags { shift->{tags} }
 
-=head2 batch
-
-The L<OpenTracing::Batch> instance that this span belongs to.
-
-=cut
-
-sub batch { shift->{batch} }
-
 =head2 tag_list
 
 A list of tags as L<OpenTracing::Tag> instances.
@@ -103,7 +95,7 @@ A list of tags as L<OpenTracing::Tag> instances.
 =cut
 
 sub tag_list {
-    my $tags = shift->{tags} //= [];
+    my $tags = shift->{tags} //= {};
     map { OpenTracing::Tag->new(key => $_, value => $tags->{$_}) } sort keys %$tags;
 }
 
@@ -143,6 +135,8 @@ sub log : method {
     );
     $log;
 }
+
+sub tracer { shift->{tracer} }
 
 =head2 finish
 

@@ -1,10 +1,10 @@
 {
-   "abstract" : "Modern Perl Development Framework",
+   "abstract" : "Object-Orientation for Perl 5",
    "author" : [
       "Al Newkirk <awncorp@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -21,24 +21,37 @@
       },
       "runtime" : {
          "requires" : {
-            "Function::Parameters" : "2.001003",
-            "Import::Into" : "1.002005",
-            "Moo" : "2.000001",
-            "Role::Tiny" : "2.000006",
-            "Try::Tiny" : "0.30",
-            "Type::Tiny" : "1.000005",
-            "perl" : "v5.14.0"
+            "Data::Object::Cast" : "0.01",
+            "Data::Object::Class" : "2.02",
+            "Data::Object::ClassHas" : "2.01",
+            "Data::Object::Kind" : "0.01",
+            "Data::Object::Role::Buildable" : "0.03",
+            "Data::Object::Role::Dumpable" : "2.01",
+            "Data::Object::Role::Proxyable" : "2.03",
+            "Data::Object::Role::Throwable" : "2.01",
+            "Data::Object::Types" : "0.04",
+            "perl" : "5.014",
+            "routines" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Function::Parameters" : "2.001003",
-            "Import::Into" : "1.002005",
-            "Moo" : "2.000001",
-            "Role::Tiny" : "2.000006",
-            "Try::Tiny" : "0.30",
-            "Type::Tiny" : "1.000005",
-            "perl" : "v5.14.0"
+            "Data::Object::Cast" : "0.01",
+            "Data::Object::Class" : "2.02",
+            "Data::Object::ClassHas" : "2.01",
+            "Data::Object::Kind" : "0.01",
+            "Data::Object::Role::Buildable" : "0.03",
+            "Data::Object::Role::Dumpable" : "2.01",
+            "Data::Object::Role::Proxyable" : "2.03",
+            "Data::Object::Role::Throwable" : "2.01",
+            "Data::Object::Types" : "0.04",
+            "Test::Auto" : "0.10",
+            "perl" : "5.014",
+            "routines" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
@@ -47,20 +60,17 @@
       "bugtracker" : {
          "web" : "https://github.com/iamalnewkirk/data-object/issues"
       },
-      "homepage" : "http://metacpan.org/release/Data-Object/",
+      "homepage" : "https://metacpan.org/release/Data-Object",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/iamalnewkirk/data-object.git",
          "web" : "https://github.com/iamalnewkirk/data-object"
       }
    },
-   "version" : "0.99",
+   "version" : "2.03",
    "x_authority" : "cpan:AWNCORP",
-   "x_contributors" : [
-      "Al Newkirk <al@iamalnewkirk.com>",
-      "Anthony Brummett <abrummet@genome.wustl.edu>"
-   ],
-   "x_generated_by_perl" : "v5.14.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

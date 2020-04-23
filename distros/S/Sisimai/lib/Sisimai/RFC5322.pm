@@ -3,9 +3,18 @@ use feature ':5.10';
 use strict;
 use warnings;
 
+state $LONGHEADERS = __PACKAGE__->LONGFIELDS;
+state $HEADERTABLE = {
+    'messageid' => ['message-id'],
+    'subject'   => ['subject'],
+    'listid'    => ['list-id'],
+    'date'      => [qw|date posted-date posted resent-date|],
+    'addresser' => [qw|from return-path reply-to errors-to reverse-path x-postfix-sender envelope-from x-envelope-from|],
+    'recipient' => [qw|to delivered-to forward-path envelope-to x-envelope-to resent-to apparently-to|],
+};
+
 # Regular expression of valid RFC-5322 email address(<addr-spec>)
 my $Re = { 'rfc5322' => undef, 'ignored' => undef, 'domain' => undef, };
-
 BUILD_REGULAR_EXPRESSIONS: {
     # See http://www.ietf.org/rfc/rfc5322.txt
     #  or http://www.ex-parrot.com/pdw/Mail-RFC822-Address.html ...
@@ -30,17 +39,7 @@ BUILD_REGULAR_EXPRESSIONS: {
     $Re->{'domain'}  = qr/\A$domain\z/o;
 }
 
-my $LONGHEADERS = __PACKAGE__->LONGFIELDS;
 my $HEADERINDEX = {};
-my $HEADERTABLE = {
-    'messageid' => ['message-id'],
-    'subject'   => ['subject'],
-    'listid'    => ['list-id'],
-    'date'      => [qw|date posted-date posted resent-date|],
-    'addresser' => [qw|from return-path reply-to errors-to reverse-path x-postfix-sender envelope-from x-envelope-from|],
-    'recipient' => [qw|to delivered-to forward-path envelope-to x-envelope-to resent-to apparently-to|],
-};
-
 BUILD_FLATTEN_RFC822HEADER_LIST: {
     # Convert $HEADER: hash reference to flatten hash reference for being
     # called from Sisimai::Lhost::*
@@ -272,7 +271,7 @@ header.
 =head2 C<B<fillet(I<String>, I<RegExp>)>>
 
 C<fillet()> returns array reference which include error message lines of given
-message body and the original message part splitted by the 2nd argument.
+message body and the original message part split by the 2nd argument.
 
     my $v = 'Error message here
     Content-Type: message/rfc822

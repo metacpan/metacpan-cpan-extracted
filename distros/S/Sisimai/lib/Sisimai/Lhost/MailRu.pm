@@ -5,14 +5,14 @@ use strict;
 use warnings;
 
 # Based on Sisimai::Lhost::Exim
-my $Indicators = __PACKAGE__->INDICATORS;
-my $ReBackbone = qr|^------ This is a copy of the message, including all the headers[.] ------|m;
-my $StartingOf = { 'message' => ['This message was created automatically by mail delivery software.'] };
-my $ReCommands = [
+state $Indicators = __PACKAGE__->INDICATORS;
+state $ReBackbone = qr|^------ This is a copy of the message, including all the headers[.] ------|m;
+state $StartingOf = { 'message' => ['This message was created automatically by mail delivery software.'] };
+state $ReCommands = [
     qr/SMTP error from remote (?:mail server|mailer) after ([A-Za-z]{4})/,
     qr/SMTP error from remote (?:mail server|mailer) after end of ([A-Za-z]{4})/,
 ];
-my $MessagesOf = {
+state $MessagesOf = {
     'expired'     => [
         'retry timeout exceeded',
         'No action is required on your part',
@@ -39,20 +39,13 @@ my $MessagesOf = {
     'contenterror'=> ['Too many "Received" headers '],
 };
 
-sub headerlist  { return ['x-failed-recipients'] }
 sub description { '@mail.ru: https://mail.ru' }
 sub make {
     # Detect an error from @mail.ru
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.1.4
     my $class = shift;
     my $mhead = shift // return undef;
@@ -136,7 +129,7 @@ sub make {
         if( defined $mhead->{'x-failed-recipients'} ) {
             # X-Failed-Recipients: kijitora@example.jp
             my @rcptinhead = split(',', $mhead->{'x-failed-recipients'});
-            map { $_ =~ y/ //d } @rcptinhead;
+            $_ =~ y/ //d for @rcptinhead;
             $recipients = scalar @rcptinhead;
 
             for my $e ( @rcptinhead ) {
@@ -214,7 +207,6 @@ sub make {
             }
         }
         $e->{'command'} ||= '';
-        $e->{'agent'}     = __PACKAGE__->smtpagent;
     }
     return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
 }
@@ -244,12 +236,6 @@ Methods in the module are called from only Sisimai::Message.
 C<description()> returns description string of this module.
 
     print Sisimai::Lhost::MailRu->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::MailRu->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

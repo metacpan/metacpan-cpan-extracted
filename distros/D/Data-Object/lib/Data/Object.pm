@@ -4,93 +4,218 @@ use 5.014;
 
 use strict;
 use warnings;
+use routines;
 
-use parent 'Data::Object::Config';
+fun import($class, @args) {
 
-our $VERSION = '0.99'; # VERSION
+  "Data::Object::Keyword"->import($class, @args);
+}
 
-# METHODS
+package
+  Data::Object::Keyword;
 
-sub new {
-  my ($class, $name) = @_;
+use 5.014;
 
-  die "Invalid argument" unless ($name || '') =~ /^[a-zA-Z]\w*/;
+use strict;
+use warnings;
+
+use registry;
+use routines;
+
+use parent 'Exporter';
+
+our $VERSION = '2.03'; # VERSION
+
+our @EXPORT = qw(
+  Array
+  Boolean
+  Box
+  Code
+  False
+  Float
+  Hash
+  Number
+  Regexp
+  Scalar
+  String
+  True
+  Undef
+);
+
+our @EXPORT_OK = (@EXPORT, qw(
+  Args
+  Data
+  Opts
+  Name
+  Space
+  Struct
+  Vars
+));
+
+# IMPORT
+
+fun import($class, @args) {
+  if (caller eq "Data::Object") {
+    "Data::Object::Keyword"->export_to_level(2, @args);
+  }
+}
+
+# FUNCTIONS
+
+fun Args(Maybe[HashRef] $data) {
+  $data //= {};
+
+  require Data::Object::Args;
+
+  return Data::Object::Args->new(named => $data);
+}
+
+fun Array(Maybe[ArrayRef] $data) {
+  $data //= [];
+
+  require Data::Object::Array;
+
+  return Box(Data::Object::Array->new($data));
+}
+
+fun Boolean(Maybe[Bool] $data) {
+  $data //= 0;
+
+  require Data::Object::Boolean;
+
+  return Data::Object::Boolean->new($data)
+}
+
+fun Box(Any $data = undef) {
+
+  require Data::Object::Box;
+
+  return Data::Object::Box->new($data)
+}
+
+fun Code(Maybe[CodeRef] $data) {
+  $data //= sub {};
+
+  require Data::Object::Code;
+
+  return Box(Data::Object::Code->new($data));
+}
+
+fun Data(Maybe[Str] $data) {
+  $data //= $0;
+
+  require Data::Object::Data;
+
+  return Data::Object::Data->new(file => $data);
+}
+
+fun False() {
+
+  require Data::Object::Boolean;
+
+  return Data::Object::Boolean::False();
+}
+
+fun Float(Maybe[Num] $data) {
+  $data //= '0.0';
+
+  require Data::Object::Float;
+
+  return Box(Data::Object::Float->new($data));
+}
+
+fun Hash(Maybe[HashRef] $data) {
+  $data //= {};
+
+  require Data::Object::Hash;
+
+  return Box(Data::Object::Hash->new($data));
+}
+
+fun Name(Maybe[Str] $data) {
+  $data //= '';
+
+  require Data::Object::Name;
+
+  return Data::Object::Name->new($data);
+}
+
+fun Number(Maybe[Num] $data) {
+  $data //= 1;
+
+  require Data::Object::Number;
+
+  return Box(Data::Object::Number->new($data));
+}
+
+fun Opts(Maybe[HashRef] $data) {
+  $data //= {};
+
+  require Data::Object::Opts;
+
+  return Data::Object::Opts->new($data);
+}
+
+fun Regexp(Maybe[RegexpRef] $data) {
+  $data //= qr/.*/;
+
+  require Data::Object::Regexp;
+
+  return Box(Data::Object::Regexp->new($data));
+}
+
+fun Scalar(Maybe[Ref] $data) {
+  $data //= do { my $ref = ''; \$ref };
+
+  require Data::Object::Scalar;
+
+  return Box(Data::Object::Scalar->new($data));
+}
+
+fun Space(Maybe[Str] $data) {
+  $data //= 'main';
 
   require Data::Object::Space;
 
-  return Data::Object::Space->new(join '::', __PACKAGE__, $name);
+  return Data::Object::Space->new($data);
 }
 
-sub any {
-  my ($class, $data) = @_;
+fun String(Maybe[Str] $data) {
+  $data //= '';
 
-  return $class->new('Any')->build($data);
+  require Data::Object::String;
+
+  return Box(Data::Object::String->new($data));
 }
 
-sub array {
-  my ($class, $data) = @_;
+fun Struct(Maybe[HashRef] $data) {
+  $data //= {};
 
-  return $class->new('Array')->build($data);
+  require Data::Object::Struct;
+
+  return Box(Data::Object::Struct->new($data));
 }
 
-sub code {
-  my ($class, $data) = @_;
+fun True() {
 
-  return $class->new('Code')->build($data);
+  require Data::Object::Boolean;
+
+  return Data::Object::Boolean::True();
 }
 
-sub exception {
-  my ($class, $data) = @_;
+fun Undef() {
 
-  return $class->new('Exception')->build($data);
+  require Data::Object::Undef;
+
+  return Box(Data::Object::Undef->new);
 }
 
-sub float {
-  my ($class, $data) = @_;
+fun Vars(Maybe[HashRef] $data) {
+  $data //= {};
 
-  return $class->new('Float')->build($data);
-}
+  require Data::Object::Vars;
 
-sub hash {
-  my ($class, $data) = @_;
-
-  return $class->new('Hash')->build($data);
-}
-
-sub integer {
-  my ($class, $data) = @_;
-
-  return $class->new('Integer')->build($data);
-}
-
-sub number {
-  my ($class, $data) = @_;
-
-  return $class->new('Number')->build($data);
-}
-
-sub regexp {
-  my ($class, $data) = @_;
-
-  return $class->new('Regexp')->build($data);
-}
-
-sub scalar {
-  my ($class, $data) = @_;
-
-  return $class->new('Scalar')->build($data);
-}
-
-sub string {
-  my ($class, $data) = @_;
-
-  return $class->new('String')->build($data);
-}
-
-sub undef {
-  my ($class, $data) = @_;
-
-  return $class->new('Undef')->build($data);
+  return Data::Object::Vars->new(named => $data);
 }
 
 1;
@@ -105,182 +230,74 @@ Data::Object
 
 =head1 ABSTRACT
 
-Modern Perl Development Framework and Standard Library
+Object-Orientation for Perl 5
 
 =cut
 
 =head1 SYNOPSIS
 
-  package User;
+  package main;
 
-  use Data::Object 'Class';
+  use Data::Object;
 
-  extends 'Identity';
+  my $array = Array [1..4];
 
-  has 'fname';
-  has 'lname';
+  # my $iterator = $array->iterator;
 
-  1;
+  # $iterator->next; # 1
 
 =cut
 
 =head1 DESCRIPTION
 
-Data-Object is a robust development framework for modern Perl development,
-embracing Perl's multi-paradigm programming nature, flexibility and vast
-ecosystem that many of engineers already know and love.
-
-This framework aims to provide a standardized and cohesive set of classes,
-types, objects, functions, patterns, and tools for jump-starting application
-development with modern conventions and best practices.
-
-The power of this framework comes from the extendable (yet fully optional) type
-library which is integrated into the object system and type-constrainable
-subroutine signatures (supporting functions, methods and method modifiers). We
-also provide classes which wrap Perl 5 native data types and provides methods
-for operating on the data.
-
-Contrary to popular opinion, modern Perl programming can be extremely
-well-structured and beautiful, leveraging many advanced concepts found on other
-languages, and some which aren't. Abilities like method modification also
-referred to as augmenting, reflection, advanced object-orientation,
-type-constrainable object attributes, type-constrainable subroutine signatures
-(with named and positional arguments), as well roles (similar to mixins or
-interfaces in other languages).
-
-  use Data::Object;
-
-This is what's enabled whenever you import the L<Data::Object> application development framework.
-
-  # basics
-  use strict;
-  use warnings;
-
-  # loads say, state, switch, unicode_strings, array_base
-  use feature ':5.14';
-
-  # loads types and signatures
-  use Data::Object::Library;
-  use Data::Object::Signatures;
-
-  # load super "do" function, etc
-  use Data::Object::Export;
-
-To explain by way of example: The following creates a class representing a user
-which has the ability to greet user person.
-
-  package User;
-
-  use Data::Object 'Class', 'App';
-
-  has name => (
-    is  => 'ro',
-    isa => 'Str',
-    req => 1
-  );
-
-  method hello(User $user) {
-    return 'Hello '. $user->name .'. How are you?';
-  }
-
-  1;
-
-The following is a script that creates a function that returns how one user
-greets another user.
-
-  #!/usr/bin/perl
-
-  use User;
-
-  use Data::Object 'Core', 'App';
-
-  fun greetings(User $u1, User $u2) {
-    return $u1->hello($u2);
-  }
-
-  my $u1 = User->new(name => 'Jane');
-  my $u2 = User->new(name => 'June');
-
-  say(greetings($u1, $u2)); # Hey June
-
-This demonstrates much of the power of this framework in one simple example. If
-you're new to Perl, the code above creates a class with a single (read-only
-string) attribute called C<name> and a single method called C<hello>, then
-registers the class in a user-defined type-library called C<App> where all
-user-defined type constraints will be stored and retrieved (and reified).
-
-The C<main> program (namespace) initializes the framework and specifies the
-user-defined type library to use in the creation of a single function
-C<greetings> which takes two arguments which must both be instances of the
-class we just created. It's important to note that in order for the code above
-to execute, the C<App> type library must exist. This could be as simple as:
-
-  package App;
-
-  use Data::Object 'Library';
-
-  1;
-
-That having been explained, it's also important to note that while this example
-showcases much of what's possible with this framework, all of the
-sophistication is totally optional. For example, method and function signatures
-are optionally typed, so the declarations would work just as well without the
-types specified. In fact, you could then remove the C<App> type library
-declarations from both packages and even resort rewriting the method and
-function as plain-old Perl subroutines. This flexibility to be able to enable
-more advanced capabilities is common in the Perl ecosystem and is one of the
-things we love most. The wiring-up of things! If you're familiar with Perl,
-this framework is in-part the wiring up of L<Moo> (with L<Moose> support),
-L<Type::Tiny>, L<Function::Parameters>, L<Try::Tiny> and data objects in a
-cooperative and cohesive way that feels like it's native to the language.
+This package automatically exports and provides constructor functions for
+creating chainable data type objects from raw Perl data types.
 
 =cut
 
-=head1 INSTALLATION
+=head1 LIBRARIES
 
-If you have cpanm, you only need one line:
+This package uses type constraints from:
 
-  $ cpanm -qn Data::Object
-
-If you don't have cpanm, get it! It takes less than a minute, otherwise:
-
-  $ curl -L https://cpanmin.us | perl - -qn Data::Object
-
-Add C<Data::Object> to the list of dependencies in C<cpanfile>:
-
-  requires "Data::Object" => "0.97"; # 0.97 or newer
-
-If cpanm doesn't have permission to install modules in the current Perl
-installation, it will automatically set up and install to a local::lib in your
-home directory.  See the L<local::lib|local::lib> documentation for details on
-enabling it in your environment. We recommend using a
-L<Perlbrew|https://github.com/gugod/app-perlbrew> or
-L<Plenv|https://github.com/tokuhirom/plenv> environment. These tools will help
-you manage multiple Perl installations in your C<$HOME> directory. They are
-completely isolated Perl installations.
+L<Data::Object::Types>
 
 =cut
 
 =head1 FUNCTIONS
 
-This package implements the following functions.
+This package implements the following functions:
 
 =cut
 
-=head2 any
+=head2 args
 
-  any(Any $arg) : Object
+  Args(HashRef $data) : InstanceOf["Data::Object::Args"]
 
-The C<any> constructor function returns a L<Data::Object::Any> object for given
-argument.
+The Args function returns a L<Data::Object::Args> object.
 
 =over 4
 
-=item any example
+=item Args example #1
 
-  # given \*main
+  package main;
 
-  my $object = Data::Object->any(\*main);
+  use Data::Object 'Args';
+
+  my $args = Args; # [...]
+
+=back
+
+=over 4
+
+=item Args example #2
+
+  package main;
+
+  my $args = Args {
+    subcommand => 0
+  };
+
+  # $args->subcommand;
 
 =back
 
@@ -288,18 +305,106 @@ argument.
 
 =head2 array
 
-  array(ArrayRef $arg) : Object
+  Array(ArrayRef $data) : InstanceOf["Data::Object::Box"]
 
-The C<array> constructor function returns a L<Data::Object::Array> object for
-given argument.
+The Array function returns a L<Data::Object::Box> which wraps a
+L<Data::Object::Array> object.
 
 =over 4
 
-=item array example
+=item Array example #1
 
-  # given [1..4]
+  package main;
 
-  my $object = Data::Object->array([1..4]);
+  my $array = Array; # []
+
+=back
+
+=over 4
+
+=item Array example #2
+
+  package main;
+
+  my $array = Array [1..4];
+
+=back
+
+=cut
+
+=head2 boolean
+
+  Boolean(Bool $data) : BooleanObject
+
+The Boolean function returns a L<Data::Object::Boolean> object representing a
+true or false value.
+
+=over 4
+
+=item Boolean example #1
+
+  package main;
+
+  my $boolean = Boolean;
+
+=back
+
+=over 4
+
+=item Boolean example #2
+
+  package main;
+
+  my $boolean = Boolean 0;
+
+=back
+
+=cut
+
+=head2 box
+
+  Box(Any $data) : InstanceOf["Data::Object::Box"]
+
+The Box function returns a L<Data::Object::Box> object representing a data type
+object which is automatically deduced.
+
+=over 4
+
+=item Box example #1
+
+  package main;
+
+  my $box = Box;
+
+=back
+
+=over 4
+
+=item Box example #2
+
+  package main;
+
+  my $box = Box 123;
+
+=back
+
+=over 4
+
+=item Box example #3
+
+  package main;
+
+  my $box = Box [1..4];
+
+=back
+
+=over 4
+
+=item Box example #4
+
+  package main;
+
+  my $box = Box {1..4};
 
 =back
 
@@ -307,37 +412,79 @@ given argument.
 
 =head2 code
 
-  code(CodeRef $arg) : Object
+  Code(CodeRef $data) : InstanceOf["Data::Object::Box"]
 
-The C<code> constructor function returns a L<Data::Object::Code> object for
-given argument.
+The Code function returns a L<Data::Object::Box> which wraps a
+L<Data::Object::Code> object.
 
 =over 4
 
-=item code example
+=item Code example #1
 
-  # given sub { shift + 1 }
+  package main;
 
-  my $object = Data::Object->code(sub { $_[0] + 1 });
+  my $code = Code;
+
+=back
+
+=over 4
+
+=item Code example #2
+
+  package main;
+
+  my $code = Code sub { shift };
 
 =back
 
 =cut
 
-=head2 exception
+=head2 data
 
-  exception(HashRef $arg) : Object
+  Data(Str $file) : InstanceOf["Data::Object::Data"]
 
-The C<exception> constructor function returns a L<Data::Object::Exception>
-object for given argument.
+The Data function returns a L<Data::Object::Data> object.
 
 =over 4
 
-=item exception example
+=item Data example #1
 
-  # given { message => 'Oops' }
+  package main;
 
-  my $object = Data::Object->exception({ message => 'Oops' });
+  use Data::Object 'Data';
+
+  my $data = Data;
+
+=back
+
+=over 4
+
+=item Data example #2
+
+  package main;
+
+  my $data = Data '/path/to/file.pod';
+
+  # $data->contents(...);
+
+=back
+
+=cut
+
+=head2 false
+
+  False() : BooleanObject
+
+The False function returns a L<Data::Object::Boolean> object representing a
+false value.
+
+=over 4
+
+=item False example #1
+
+  package main;
+
+  my $false = False;
 
 =back
 
@@ -345,18 +492,28 @@ object for given argument.
 
 =head2 float
 
-  float(Num $arg) : Object
+  Float(Num $data) : InstanceOf["Data::Object::Box"]
 
-The C<float> constructor function returns a L<Data::Object::Float> object for given
-argument.
+The Float function returns a L<Data::Object::Box> which wraps a
+L<Data::Object::Float> object.
 
 =over 4
 
-=item float example
+=item Float example #1
 
-  # given 1.23
+  package main;
 
-  my $object = Data::Object->float(1.23);
+  my $float = Float;
+
+=back
+
+=over 4
+
+=item Float example #2
+
+  package main;
+
+  my $float = Float '0.0';
 
 =back
 
@@ -364,37 +521,50 @@ argument.
 
 =head2 hash
 
-  hash(HashRef $arg) : Object
+  Hash(HashRef $data) : InstanceOf["Data::Object::Box"]
 
-The C<hash> constructor function returns a L<Data::Object::Hash> object for given
-argument.
+The Hash function returns a L<Data::Object::Box> which wraps a
+L<Data::Object::Hash> object.
 
 =over 4
 
-=item hash example
+=item Hash example #1
 
-  # given {1..4}
+  package main;
 
-  my $object = Data::Object->hash({1..4});
+  my $hash = Hash;
+
+=back
+
+=over 4
+
+=item Hash example #2
+
+  package main;
+
+  my $hash = Hash {1..4};
 
 =back
 
 =cut
 
-=head2 integer
+=head2 name
 
-  integer(Int $arg) : Object
+  Name(Str $data) : InstanceOf["Data::Object::Name"]
 
-The C<integer> constructor function returns a L<Data::Object::Integer> object for given
-argument.
+The Name function returns a L<Name::Object::Name> object.
 
 =over 4
 
-=item integer example
+=item Name example #1
 
-  # given -123
+  package main;
 
-  my $object = Data::Object->integer(-123);
+  use Data::Object 'Name';
+
+  my $name = Name 'Example Title';
+
+  # $name->package;
 
 =back
 
@@ -402,18 +572,60 @@ argument.
 
 =head2 number
 
-  number(Num $arg) : Object
+  Number(Num $data) : InstanceOf["Data::Object::Box"]
 
-The C<number> constructor function returns a L<Data::Object::Number> object for given
-argument.
+The Number function returns a L<Data::Object::Box> which wraps a
+L<Data::Object::Number> object.
 
 =over 4
 
-=item number example
+=item Number example #1
 
-  # given 123
+  package main;
 
-  my $object = Data::Object->number(123);
+  my $number = Number;
+
+=back
+
+=over 4
+
+=item Number example #2
+
+  package main;
+
+  my $number = Number 123;
+
+=back
+
+=cut
+
+=head2 opts
+
+  Opts(HashRef $data) : InstanceOf["Data::Object::Opts"]
+
+The Opts function returns a L<Data::Object::Opts> object.
+
+=over 4
+
+=item Opts example #1
+
+  package main;
+
+  my $opts = Opts;
+
+=back
+
+=over 4
+
+=item Opts example #2
+
+  package main;
+
+  my $opts = Opts {
+    spec => ['files|f=s']
+  };
+
+  # $opts->files; [...]
 
 =back
 
@@ -421,18 +633,28 @@ argument.
 
 =head2 regexp
 
-  regexp(Regexp $arg) : Object
+  Regexp(RegexpRef $data) : InstanceOf["Data::Object::Box"]
 
-The C<regexp> constructor function returns a L<Data::Object::Regexp> object for given
-argument.
+The Regexp function returns a L<Data::Object::Box> which wraps a
+L<Data::Object::Regexp> object.
 
 =over 4
 
-=item regexp example
+=item Regexp example #1
 
-  # given qr(\w+)
+  package main;
 
-  my $object = Data::Object->regexp(qr(\w+));
+  my $regexp = Regexp;
+
+=back
+
+=over 4
+
+=item Regexp example #2
+
+  package main;
+
+  my $regexp = Regexp qr/.*/;
 
 =back
 
@@ -440,18 +662,48 @@ argument.
 
 =head2 scalar
 
-  scalar(Any $arg) : Object
+  Scalar(Ref $data) : InstanceOf["Data::Object::Box"]
 
-The C<scalar> constructor function returns a L<Data::Object::Scalar> object for given
-argument.
+The Scalar function returns a L<Data::Object::Box> which wraps a
+L<Data::Object::Scalar> object.
 
 =over 4
 
-=item scalar example
+=item Scalar example #1
 
-  # given \*main
+  package main;
 
-  my $object = Data::Object->scalar(\*main);
+  my $scalar = Scalar;
+
+=back
+
+=over 4
+
+=item Scalar example #2
+
+  package main;
+
+  my $scalar = Scalar \*main;
+
+=back
+
+=cut
+
+=head2 space
+
+  Space(Str $data) : InstanceOf["Data::Object::Space"]
+
+The Space function returns a L<Data::Object::Space> object.
+
+=over 4
+
+=item Space example #1
+
+  package main;
+
+  use Data::Object 'Space';
+
+  my $space = Space 'Example Namespace';
 
 =back
 
@@ -459,18 +711,80 @@ argument.
 
 =head2 string
 
-  string(Str $arg) : Object
+  String(Str $data) : InstanceOf["Data::Object::Box"]
 
-The C<string> constructor function returns a L<Data::Object::String> object for given
-argument.
+The String function returns a L<Data::Object::Box> which wraps a
+L<Data::Object::String> object.
 
 =over 4
 
-=item string example
+=item String example #1
 
-  # given 'hello'
+  package main;
 
-  my $object = Data::Object->string('hello');
+  my $string = String;
+
+=back
+
+=over 4
+
+=item String example #2
+
+  package main;
+
+  my $string = String 'abc';
+
+=back
+
+=cut
+
+=head2 struct
+
+  Struct(HashRef $data) : InstanceOf["Data::Object::Struct"]
+
+The Struct function returns a L<Data::Object::Struct> object.
+
+=over 4
+
+=item Struct example #1
+
+  package main;
+
+  use Data::Object 'Struct';
+
+  my $struct = Struct;
+
+=back
+
+=over 4
+
+=item Struct example #2
+
+  package main;
+
+  my $struct = Struct {
+    name => 'example',
+    time => time
+  };
+
+=back
+
+=cut
+
+=head2 true
+
+  True() : BooleanObject
+
+The True function returns a L<Data::Object::Boolean> object representing a true
+value.
+
+=over 4
+
+=item True example #1
+
+  package main;
+
+  my $true = True;
 
 =back
 
@@ -478,46 +792,82 @@ argument.
 
 =head2 undef
 
-  undef(Undef $arg?) : Object
+  Undef() : InstanceOf["Data::Object::Box"]
 
-The C<undef> constructor function returns a L<Data::Object::Undef> object for given
-argument.
+The Undef function returns a L<Data::Object::Undef> object representing the
+I<undefined> value.
 
 =over 4
 
-=item undef example
+=item Undef example #1
 
-  # given undef
+  package main;
 
-  my $object = Data::Object->undef(undef);
+  my $undef = Undef;
 
 =back
 
 =cut
 
-=head1 METHODS
+=head2 vars
 
-This package implements the following methods.
+  Vars() : InstanceOf["Data::Object::Vars"]
 
-=cut
-
-=head2 new
-
-  new(Str $arg) : Object
-
-The new method expects a string representing a class name under the
-Data::Object namespace and returns a L<Data::Object::Space> object.
+The Vars function returns a L<Data::Object::Vars> object representing the
+available environment variables.
 
 =over 4
 
-=item new example
+=item Vars example #1
 
-  # given 'String'
+  package main;
 
-  my $space = Data::Object->new('String');
+  use Data::Object 'Vars';
 
-  my $string = $space->build('hello world');
+  my $vars = Vars;
 
 =back
+
+=over 4
+
+=item Vars example #2
+
+  package main;
+
+  my $vars = Vars {
+    user => 'USER'
+  };
+
+  # $vars->user; # $USER
+
+=back
+
+=cut
+
+=head1 AUTHOR
+
+Al Newkirk, C<awncorp@cpan.org>
+
+=head1 LICENSE
+
+Copyright (C) 2011-2019, Al Newkirk, et al.
+
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the L<"license
+file"|https://github.com/iamalnewkirk/foobar/blob/master/LICENSE>.
+
+=head1 PROJECT
+
+L<Wiki|https://github.com/iamalnewkirk/foobar/wiki>
+
+L<Project|https://github.com/iamalnewkirk/foobar>
+
+L<Initiatives|https://github.com/iamalnewkirk/foobar/projects>
+
+L<Milestones|https://github.com/iamalnewkirk/foobar/milestones>
+
+L<Contributing|https://github.com/iamalnewkirk/foobar/blob/master/CONTRIBUTE.md>
+
+L<Issues|https://github.com/iamalnewkirk/foobar/issues>
 
 =cut

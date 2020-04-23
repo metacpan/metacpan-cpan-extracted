@@ -4,36 +4,29 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Indicators = __PACKAGE__->INDICATORS;
-my $ReBackbone = qr|^Content-Type:[ ]message/rfc822|m;
-my $StartingOf = { 'message' => ['This is the mail system at host yandex.ru.'] };
+state $Indicators = __PACKAGE__->INDICATORS;
+state $ReBackbone = qr|^Content-Type:[ ]message/rfc822|m;
+state $StartingOf = { 'message' => ['This is the mail system at host yandex.ru.'] };
 
-# X-Yandex-Front: mxback1h.mail.yandex.net
-# X-Yandex-TimeMark: 1417885948
-# X-Yandex-Uniq: 92309766-f1c8-4bd4-92bc-657c75766587
-# X-Yandex-Spam: 1
-# X-Yandex-Forward: 10104c00ad0726da5f37374723b1e0c8
-# X-Yandex-Queue-ID: 367D79E130D
-# X-Yandex-Sender: rfc822; shironeko@yandex.example.com
-sub headerlist  { return ['x-yandex-uniq'] }
 sub description { 'Yandex.Mail: https://www.yandex.ru' }
 sub make {
     # Detect an error from Yandex.Mail
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.1.6
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
 
+    # X-Yandex-Front: mxback1h.mail.yandex.net
+    # X-Yandex-TimeMark: 1417885948
+    # X-Yandex-Uniq: 92309766-f1c8-4bd4-92bc-657c75766587
+    # X-Yandex-Spam: 1
+    # X-Yandex-Forward: 10104c00ad0726da5f37374723b1e0c8
+    # X-Yandex-Queue-ID: 367D79E130D
+    # X-Yandex-Sender: rfc822; shironeko@yandex.example.com
     return undef unless $mhead->{'x-yandex-uniq'};
     return undef unless $mhead->{'from'} eq 'mailer-daemon@yandex.ru';
 
@@ -123,12 +116,11 @@ sub make {
 
     for my $e ( @$dscontents ) {
         # Set default values if each value is empty.
-        $e->{'lhost'}    ||= $permessage->{'rhost'};
-        map { $e->{ $_ } ||= $permessage->{ $_ } || '' } keys %$permessage;
+        $e->{'lhost'} ||= $permessage->{'rhost'};
+        $e->{ $_ } ||= $permessage->{ $_ } || '' for keys %$permessage;
         $e->{'command'}   =  shift @commandset || '';
         $e->{'diagnosis'} =~ y/\n/ /;
         $e->{'diagnosis'} =  Sisimai::String->sweep($e->{'diagnosis'});
-        $e->{'agent'}     =  __PACKAGE__->smtpagent;
     }
     return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
 }
@@ -158,12 +150,6 @@ Methods in the module are called from only Sisimai::Message.
 C<description()> returns description string of this module.
 
     print Sisimai::Lhost::Yandex->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::Yandex->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

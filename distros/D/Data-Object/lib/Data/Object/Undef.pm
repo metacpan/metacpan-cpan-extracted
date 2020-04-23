@@ -1,154 +1,97 @@
 package Data::Object::Undef;
 
-use Try::Tiny;
+use 5.014;
+
+use strict;
+use warnings;
+use routines;
+
+use Carp ();
+use Scalar::Util ();
+
 use Role::Tiny::With;
 
-use Data::Object::Export qw(
-  cast
-  croak
-  load
-);
+use parent 'Data::Object::Kind';
 
-map with($_), my @roles = qw(
-  Data::Object::Role::Detract
-  Data::Object::Role::Dumper
-  Data::Object::Role::Output
-  Data::Object::Role::Throwable
-);
-
-map with($_), my @rules = qw(
-  Data::Object::Rule::Comparison
-  Data::Object::Rule::Defined
-);
+with 'Data::Object::Role::Dumpable';
+with 'Data::Object::Role::Proxyable';
+with 'Data::Object::Role::Throwable';
 
 use overload (
-  '""'     => 'data',
-  '0+'     => 'data',
-  'bool'   => 'data',
-  '~~'     => 'data',
+  '""'     => 'detract',
+  '0+'     => 'detract',
+  'bool'   => 'detract',
+  '~~'     => 'detract',
   fallback => 1
 );
 
-use parent 'Data::Object::Base::Undef';
-
-our $VERSION = '0.99'; # VERSION
+our $VERSION = '2.03'; # VERSION
 
 # BUILD
-# METHODS
 
-sub roles {
-  return cast([@roles]);
-}
-
-sub rules {
-  return cast([@rules]);
-}
-
-# DISPATCHERS
-
-sub defined {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::Undef::Defined';
-
-    return cast(load($func)->new($self, @args)->execute);
+method new($data = undef) {
+  if (Scalar::Util::blessed($data)) {
+    $data = $data->detract if $data->can('detract');
   }
-  catch {
-    my $error = $_;
 
-    $self->throw(ref($error) ? $error->message : "$error");
+  if (defined $data) {
+    Carp::confess('Instantiation Error: Not an Undef');
+  }
+
+  return bless \$data, $self;
+}
+
+# PROXY
+
+method build_proxy($package, $method, @args) {
+  my $plugin = $self->plugin($method) or return undef;
+
+  return sub {
+    use Try::Tiny;
+
+    my $is_func = $plugin->package->can('mapping');
+
+    try {
+      my $instance = $plugin->build($is_func ? ($self, @args) : [$self, @args]);
+
+      return $instance->execute;
+    }
+    catch {
+      my $error = $_;
+      my $class = $self->class;
+      my $arity = $is_func ? 'mapping' : 'argslist';
+      my $message = ref($error) ? $error->{message} : "$error";
+      my $signature = "${class}::${method}(@{[join(', ', $plugin->package->$arity)]})";
+
+      Carp::confess("$signature: $error");
+    };
   };
 }
 
-sub eq {
-  my ($self, @args) = @_;
+# PLUGIN
 
-  try {
-    my $func = 'Data::Object::Func::Undef::Eq';
+method plugin($name, @args) {
+  my $plugin;
 
-    return cast(load($func)->new($self, @args)->execute);
+  my $space = $self->space;
+
+  return undef if !$name;
+
+  if ($plugin = eval { $space->child('plugin')->child($name)->load }) {
+
+    return undef unless $plugin->can('argslist');
+
+    return $space->child('plugin')->child($name);
   }
-  catch {
-    my $error = $_;
 
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
+  if ($plugin = $space->child('func')->child($name)->load) {
 
-sub gt {
-  my ($self, @args) = @_;
+    return undef unless $plugin->can('mapping');
 
-  try {
-    my $func = 'Data::Object::Func::Undef::Gt';
-
-    return cast(load($func)->new($self, @args)->execute);
+    return $space->child('func')->child($name);
   }
-  catch {
-    my $error = $_;
 
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub ge {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::Undef::Ge';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub lt {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::Undef::Lt';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub le {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::Undef::Le';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub ne {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::Undef::Ne';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
+  return undef;
 }
 
 1;
@@ -163,45 +106,73 @@ Data::Object::Undef
 
 =head1 ABSTRACT
 
-Data-Object Undef Class
+Undef Class for Perl 5
 
 =cut
 
 =head1 SYNOPSIS
 
+  package main;
+
   use Data::Object::Undef;
 
-  my $undef = Data::Object::Undef->new(undef);
+  my $undef = Data::Object::Undef->new;
 
 =cut
 
 =head1 DESCRIPTION
 
-Data::Object::Undef provides routines for operating on Perl 5 undefined
-data. Undef methods work on undefined values.
+This package provides methods for manipulating undef data.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::Kind>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Data::Object::Role::Dumpable>
+
+L<Data::Object::Role::Proxyable>
+
+L<Data::Object::Role::Throwable>
+
+=cut
+
+=head1 LIBRARIES
+
+This package uses type constraints from:
+
+L<Data::Object::Types>
 
 =cut
 
 =head1 METHODS
 
-This package implements the following methods.
+This package implements the following methods:
 
 =cut
 
 =head2 defined
 
-  defined() : NumObject
+  defined() : Num
 
-The defined method always returns false. This method returns a
-L<Data::Object::Number> object.
+The defined method always returns false.
 
 =over 4
 
-=item defined example
+=item defined example #1
 
-  # given undef
+  my $undef = Data::Object::Undef->new;
 
-  $undef->defined ? 'Yes' : 'No'; # No
+  $undef->defined; # 0
 
 =back
 
@@ -209,18 +180,17 @@ L<Data::Object::Number> object.
 
 =head2 eq
 
-  eq(Any $arg1) : NumObject
+  eq(Any $arg1) : Any
 
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+The eq method will throw an exception if called.
 
 =over 4
 
-=item eq example
+=item eq example #1
 
-  # given $undef
+  my $undef = Data::Object::Undef->new;
 
-  $undef->eq; # exception thrown
+  $undef->eq(undef);
 
 =back
 
@@ -228,18 +198,17 @@ This method will throw an exception if called.
 
 =head2 ge
 
-  ge(Any $arg1) : NumObject
+  ge(Any $arg1) : Any
 
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+The ge method will throw an exception if called.
 
 =over 4
 
-=item ge example
+=item ge example #1
 
-  # given $undef
+  my $undef = Data::Object::Undef->new;
 
-  $undef->ge; # exception thrown
+  $undef->ge(undef);
 
 =back
 
@@ -247,18 +216,17 @@ This method will throw an exception if called.
 
 =head2 gt
 
-  gt(Any $arg1) : NumObject
+  gt(Any $arg1) : Any
 
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+The gt method will throw an exception if called.
 
 =over 4
 
-=item gt example
+=item gt example #1
 
-  # given $undef
+  my $undef = Data::Object::Undef->new;
 
-  $undef->gt; # exception thrown
+  $undef->gt(undef);
 
 =back
 
@@ -266,18 +234,17 @@ This method will throw an exception if called.
 
 =head2 le
 
-  le(Any $arg1) : NumObject
+  le(Any $arg1) : Any
 
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+The le method will throw an exception if called.
 
 =over 4
 
-=item le example
+=item le example #1
 
-  # given $undef
+  my $undef = Data::Object::Undef->new;
 
-  $undef->le; # exception thrown
+  $undef->le(undef);
 
 =back
 
@@ -285,18 +252,17 @@ This method will throw an exception if called.
 
 =head2 lt
 
-  lt(Any $arg1) : NumObject
+  lt(Any $arg1) : Any
 
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+The lt method will throw an exception if called.
 
 =over 4
 
-=item lt example
+=item lt example #1
 
-  # given $undef
+  my $undef = Data::Object::Undef->new;
 
-  $undef->lt; # exception thrown
+  $undef->lt(undef);
 
 =back
 
@@ -304,98 +270,46 @@ This method will throw an exception if called.
 
 =head2 ne
 
-  ne(Any $arg1) : NumObject
+  ne(Any $arg1) : Any
 
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+The ne method will throw an exception if called.
 
 =over 4
 
-=item ne example
+=item ne example #1
 
-  # given $undef
+  my $undef = Data::Object::Undef->new;
 
-  $undef->ne; # exception thrown
+  $undef->ne(undef);
 
 =back
 
 =cut
 
-=head2 roles
+=head1 AUTHOR
 
-  roles() : ArrayRef
+Al Newkirk, C<awncorp@cpan.org>
 
-The roles method returns the list of roles attached to object. This method
-returns a L<Data::Object::Array> object.
+=head1 LICENSE
 
-=over 4
+Copyright (C) 2011-2019, Al Newkirk, et al.
 
-=item roles example
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the L<"license
+file"|https://github.com/iamalnewkirk/foobar/blob/master/LICENSE>.
 
-  # given $undef
+=head1 PROJECT
 
-  $undef->roles;
+L<Wiki|https://github.com/iamalnewkirk/foobar/wiki>
 
-=back
+L<Project|https://github.com/iamalnewkirk/foobar>
 
-=cut
+L<Initiatives|https://github.com/iamalnewkirk/foobar/projects>
 
-=head2 rules
+L<Milestones|https://github.com/iamalnewkirk/foobar/milestones>
 
-  rules() : ArrayRef
+L<Contributing|https://github.com/iamalnewkirk/foobar/blob/master/CONTRIBUTE.md>
 
-The rules method returns consumed rules.
-
-=over 4
-
-=item rules example
-
-  my $rules = $undef->rules();
-
-=back
+L<Issues|https://github.com/iamalnewkirk/foobar/issues>
 
 =cut
-
-=head1 ROLES
-
-This package inherits all behavior from the folowing role(s):
-
-=cut
-
-=over 4
-
-=item *
-
-L<Data::Object::Role::Detract>
-
-=item *
-
-L<Data::Object::Role::Dumper>
-
-=item *
-
-L<Data::Object::Role::Output>
-
-=item *
-
-L<Data::Object::Role::Throwable>
-
-=back
-
-=head1 RULES
-
-This package adheres to the requirements in the folowing rule(s):
-
-=cut
-
-=over 4
-
-=item *
-
-L<Data::Object::Rule::Comparison>
-
-=item *
-
-L<Data::Object::Rule::Defined>
-
-=back

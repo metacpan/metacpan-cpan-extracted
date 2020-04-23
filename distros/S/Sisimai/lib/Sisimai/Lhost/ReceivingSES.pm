@@ -5,10 +5,10 @@ use strict;
 use warnings;
 
 # https://aws.amazon.com/ses/
-my $Indicators = __PACKAGE__->INDICATORS;
-my $ReBackbone = qr|^content-type:[ ]text/rfc822-headers|m;
-my $StartingOf = { 'message' => ['This message could not be delivered.'] };
-my $MessagesOf = {
+state $Indicators = __PACKAGE__->INDICATORS;
+state $ReBackbone = qr|^content-type:[ ]text/rfc822-headers|m;
+state $StartingOf = { 'message' => ['This message could not be delivered.'] };
+state $MessagesOf = {
     # The followings are error messages in Rule sets/*/Actions/Template
     'filtered'     => ['Mailbox does not exist'],
     'mesgtoobig'   => ['Message too large'],
@@ -16,29 +16,20 @@ my $MessagesOf = {
     'contenterror' => ['Message content rejected'],
 };
 
-# X-SES-Outgoing: 2015.10.01-54.240.27.7
-# Feedback-ID: 1.us-west-2.HX6/J9OVlHTadQhEu1+wdF9DBj6n6Pa9sW5Y/0pSOi8=:AmazonSES
-sub headerlist  { return ['x-ses-outgoing'] }
 sub description { 'Amazon SES(Receiving): https://aws.amazon.com/ses/' };
 sub make {
     # Detect an error from Amazon SES/Receiving
-    # @param         [Hash] mhead       Message header of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.1.29
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
 
-    # 'subject' => qr/\ADelivery Status Notification [(]Failure[)]\z/,
-    # 'received'=> qr/.+[.]smtp-out[.].+[.]amazonses[.]com\b/,
+    # X-SES-Outgoing: 2015.10.01-54.240.27.7
+    # Feedback-ID: 1.us-west-2.HX6/J9OVlHTadQhEu1+wdF9DBj6n6Pa9sW5Y/0pSOi8=:AmazonSES
     return undef unless $mhead->{'x-ses-outgoing'};
 
     require Sisimai::RFC1894;
@@ -112,8 +103,8 @@ sub make {
 
     for my $e ( @$dscontents ) {
         # Set default values if each value is empty.
-        $e->{'lhost'}    ||= $permessage->{'rhost'};
-        map { $e->{ $_ } ||= $permessage->{ $_ } || '' } keys %$permessage;
+        $e->{'lhost'} ||= $permessage->{'rhost'};
+        $e->{ $_ } ||= $permessage->{ $_ } || '' for keys %$permessage;
         $e->{'diagnosis'} =~ y/\n/ /;
         $e->{'diagnosis'} =  Sisimai::String->sweep($e->{'diagnosis'});
 
@@ -132,7 +123,6 @@ sub make {
             last;
         }
         $e->{'reason'} ||= Sisimai::SMTP::Status->name($e->{'status'}) || '';
-        $e->{'agent'}    = __PACKAGE__->smtpagent;
     }
     return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
 }
@@ -162,12 +152,6 @@ Methods in the module are called from only Sisimai::Message.
 C<description()> returns description string of this module.
 
     print Sisimai::Lhost::ReceivingSES->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::ReceivingSES->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 no warnings 'recursion'; # Disable the "deep recursion" warning
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 use Carp qw(); # don't import croak
 use Scalar::Util qw( weaken blessed reftype );
@@ -24,6 +24,8 @@ require Future::Exception;
 our @CARP_NOT = qw( Future::Utils );
 
 use constant DEBUG => !!$ENV{PERL_FUTURE_DEBUG};
+
+use constant STRICT => !!$ENV{PERL_FUTURE_STRICT};
 
 our $TIMES = DEBUG || $ENV{PERL_FUTURE_TIMES};
 
@@ -224,6 +226,8 @@ use constant {
 
    CB_SEQ_IMDONE => 1<<7, # $code is in fact immediate ->done result
    CB_SEQ_IMFAIL => 1<<8, # $code is in fact immediate ->fail result
+
+   CB_SEQ_STRICT => 1<<9, # Complain if $code didn't return a Future
 };
 
 use constant CB_ALWAYS => CB_DONE|CB_FAIL|CB_CANCEL;
@@ -270,7 +274,7 @@ sub new
    }, ( ref $proto || $proto );
 }
 
-*AWAIT_CLONE = sub { shift->new };  # We need to respect subclassing
+*AWAIT_CLONE = sub { shift->new };
 
 my $GLOBAL_END;
 END { $GLOBAL_END = 1; }
@@ -449,8 +453,12 @@ sub _mark_ready
             }
 
             unless( blessed $f2 and $f2->isa( "Future" ) ) {
-               $fseq->fail( "Expected " . CvNAME_FILE_LINE($code) . " to return a Future" );
-               next;
+               # Upgrade a non-Future result, or complain in strict mode
+               if( $flags & CB_SEQ_STRICT ) {
+                  $fseq->fail( "Expected " . CvNAME_FILE_LINE($code) . " to return a Future" );
+                  next;
+               }
+               $f2 = Future->done( $f2 );
             }
 
             $fseq->on_cancel( $f2 );
@@ -509,7 +517,7 @@ sub is_ready
    return $self->{ready};
 }
 
-*AWAIT_IS_READY = \&is_ready;
+*AWAIT_IS_READY = sub { shift->is_ready };
 
 =head2 is_done
 
@@ -557,7 +565,7 @@ sub is_cancelled
    return $self->{cancelled};
 }
 
-*AWAIT_IS_CANCELLED = \&is_cancelled;
+*AWAIT_IS_CANCELLED = sub { shift->is_cancelled };
 
 =head2 state
 
@@ -599,6 +607,9 @@ Cannot be called on a convergent future.
 If the future is already cancelled, this request is ignored. If the future is
 already complete with a result or a failure, an exception is thrown.
 
+I<Since version 0.45:> this method is also available under the name
+C<resolve>.
+
 =cut
 
 sub done
@@ -622,9 +633,11 @@ sub done
    return $self;
 }
 
+*resolve = sub { shift->done( @_ ) };
+
 # TODO: For efficiency we can implement better versions of these as individual
 #  methods know which case is being invoked
-*AWAIT_NEW_DONE = *AWAIT_DONE = \&done;
+*AWAIT_NEW_DONE = *AWAIT_DONE = sub { shift->done( @_ ) };
 
 =head2 fail
 
@@ -648,6 +661,8 @@ additional details to be transparently preserved by such code as
    catch {
       return Future->fail($@);
    }
+
+I<Since version 0.45:> this method is also available under the name C<reject>.
 
 =cut
 
@@ -680,9 +695,11 @@ sub fail
    return $self;
 }
 
+*reject = sub { shift->fail( @_ ) };
+
 # TODO: For efficiency we can implement better versions of these as individual
 #  methods know which case is being invoked
-*AWAIT_NEW_FAIL = *AWAIT_FAIL = \&fail;
+*AWAIT_NEW_FAIL = *AWAIT_FAIL = sub { shift->fail( @_ ) };
 
 =head2 die
 
@@ -886,8 +903,7 @@ sub result
    return @{ $self->{result} };
 }
 
-# TODO do we want to rename this AWAIT_RESULT ?
-*AWAIT_GET = \&result;
+*AWAIT_RESULT = *AWAIT_GET = sub { shift->result };
 
 =head2 get
 
@@ -898,8 +914,8 @@ sub result
 If the future is ready, returns the result or throws the failure exception as
 per L</result>.
 
-If it is not yet ready then L</block_until_ready> is invoked to wait for a
-ready state, and the result returned as above.
+If it is not yet ready then L</await> is invoked to wait for a ready state, and
+the result returned as above.
 
 =cut
 
@@ -1160,13 +1176,28 @@ code depending on the success or failure of the first, or may run it
 regardless. The returned sequence future represents the entire combination of
 activity.
 
-In some cases the code should return a future; in some it should return an
-immediate result. If a future is returned, the combined future will then wait
-for the result of this second one. If the combinined future is cancelled, it
-will cancel either the first future or the second, depending whether the first
-had completed. If the code block throws an exception instead of returning a
-value, the sequence future will fail with that exception as its message and no
-further values.
+The invoked code could return a future, or a result directly.
+
+I<Since version 0.45:> if a non-future result is returned it will be wrapped
+in a new immediate Future instance. This behaviour can be disabled by setting
+the C<PERL_FUTURE_STRICT> environment variable to a true value at compiletime:
+
+   $ PERL_FUTURE_STRICT=1 perl ...
+
+The combined future will then wait for the result of this second one. If the
+combinined future is cancelled, it will cancel either the first future or the
+second, depending whether the first had completed. If the code block throws an
+exception instead of returning a value, the sequence future will fail with
+that exception as its message and no further values.
+
+Note that since the code is invoked in scalar context, you cannot directly
+return a list of values this way. Any list-valued results must be done by
+returning a C<Future> instance.
+
+   sub {
+      ...
+      return Future->done( @results );
+   }
 
 As it is always a mistake to call these sequencing methods in void context and lose the
 reference to the returned future (because exception/error handling would be
@@ -1178,6 +1209,8 @@ sub _sequence
 {
    my $f1 = shift;
    my ( $code, $flags ) = @_;
+
+   $flags |= CB_SEQ_STRICT if STRICT;
 
    # For later, we might want to know where we were called from
    my $func = (caller 1)[3];
@@ -1215,7 +1248,11 @@ sub _sequence
       }
 
       unless( blessed $fseq and $fseq->isa( "Future" ) ) {
-         return Future->fail( "Expected " . CvNAME_FILE_LINE($code) . " to return a Future" );
+         # Upgrade a non-Future result, or complain in strict mode
+         $flags & CB_SEQ_STRICT and
+            return Future->fail( "Expected " . CvNAME_FILE_LINE($code) . " to return a Future" );
+
+         $fseq = $f1->new->done( $fseq );
       }
 
       return $fseq;
@@ -1271,8 +1308,8 @@ with the same result and the code will not be invoked.
 The C<then> method can also be passed the C<$fail_code> block as well, giving
 a combination of C<then> and C<else> behaviour.
 
-This operation is designed to be compatible with the semantics of other future
-systems, such as Javascript's Q or Promises/A libraries.
+This operation is similar to those provided by other future systems, such as
+Javascript's Q or Promises/A libraries.
 
 =cut
 
@@ -1626,6 +1663,10 @@ original. This may be useful if the original future represents an operation
 that is being shared among multiple sequences; cancelling one should not
 prevent the others from running too.
 
+Note that this only prevents cancel propagating from C<$future> to C<$f1>; if
+the original C<$f1> instance is cancelled then the returned C<$future> will
+have to be cancelled too.
+
 =cut
 
 sub without_cancel
@@ -1635,7 +1676,10 @@ sub without_cancel
 
    $self->on_ready( sub {
       my $self = shift;
-      if( $self->{failure} ) {
+      if( $self->{cancelled} ) {
+         $new->cancel;
+      }
+      elsif( $self->{failure} ) {
          $new->fail( @{ $self->{failure} } );
       }
       else {

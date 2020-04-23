@@ -2,6 +2,6 @@ package urpmi;
 
 # Dummy package for CPAN testers
 
-our $VERSION = '8.121.4';
+our $VERSION = '8.121.8';
 
 1;

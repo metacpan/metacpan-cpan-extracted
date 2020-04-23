@@ -292,6 +292,9 @@ IMPLEMENTATION METHODS
     future is already complete with a result or a failure, an exception is
     thrown.
 
+    Since version 0.45: this method is also available under the name
+    resolve.
+
  fail
 
        $future->fail( $exception, $category, @details )
@@ -316,6 +319,9 @@ IMPLEMENTATION METHODS
        catch {
           return Future->fail($@);
        }
+
+    Since version 0.45: this method is also available under the name
+    reject.
 
  die
 
@@ -404,8 +410,8 @@ USER METHODS
     If the future is ready, returns the result or throws the failure
     exception as per "result".
 
-    If it is not yet ready then "block_until_ready" is invoked to wait for
-    a ready state, and the result returned as above.
+    If it is not yet ready then "await" is invoked to wait for a ready
+    state, and the result returned as above.
 
  await
 
@@ -544,13 +550,30 @@ SEQUENCING METHODS
     the first, or may run it regardless. The returned sequence future
     represents the entire combination of activity.
 
-    In some cases the code should return a future; in some it should return
-    an immediate result. If a future is returned, the combined future will
-    then wait for the result of this second one. If the combinined future
-    is cancelled, it will cancel either the first future or the second,
-    depending whether the first had completed. If the code block throws an
-    exception instead of returning a value, the sequence future will fail
-    with that exception as its message and no further values.
+    The invoked code could return a future, or a result directly.
+
+    Since version 0.45: if a non-future result is returned it will be
+    wrapped in a new immediate Future instance. This behaviour can be
+    disabled by setting the PERL_FUTURE_STRICT environment variable to a
+    true value at compiletime:
+
+       $ PERL_FUTURE_STRICT=1 perl ...
+
+    The combined future will then wait for the result of this second one.
+    If the combinined future is cancelled, it will cancel either the first
+    future or the second, depending whether the first had completed. If the
+    code block throws an exception instead of returning a value, the
+    sequence future will fail with that exception as its message and no
+    further values.
+
+    Note that since the code is invoked in scalar context, you cannot
+    directly return a list of values this way. Any list-valued results must
+    be done by returning a Future instance.
+
+       sub {
+          ...
+          return Future->done( @results );
+       }
 
     As it is always a mistake to call these sequencing methods in void
     context and lose the reference to the returned future (because
@@ -596,8 +619,8 @@ SEQUENCING METHODS
     The then method can also be passed the $fail_code block as well, giving
     a combination of then and else behaviour.
 
-    This operation is designed to be compatible with the semantics of other
-    future systems, such as Javascript's Q or Promises/A libraries.
+    This operation is similar to those provided by other future systems,
+    such as Javascript's Q or Promises/A libraries.
 
  catch
 
@@ -764,6 +787,10 @@ SEQUENCING METHODS
     original. This may be useful if the original future represents an
     operation that is being shared among multiple sequences; cancelling one
     should not prevent the others from running too.
+
+    Note that this only prevents cancel propagating from $future to $f1; if
+    the original $f1 instance is cancelled then the returned $future will
+    have to be cancelled too.
 
  retain
 

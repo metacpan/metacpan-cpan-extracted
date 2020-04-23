@@ -69,5 +69,7 @@ t/postfix_deref.t
 t/decomment.t
 t/misc_docs.t
 t/perl_pod.t
+t/decomment_heredoc_large.t
+t/heredoc_large.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

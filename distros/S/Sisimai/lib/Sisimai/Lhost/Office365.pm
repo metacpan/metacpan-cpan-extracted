@@ -4,20 +4,19 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Indicators = __PACKAGE__->INDICATORS;
-my $ReBackbone = qr|^Content-Type:[ ]message/rfc822|m;
-my $StartingOf = {
-    'error' => ['Diagnostic information for administrators:'],
-    'eoerr' => ['Original message headers:'],
-};
-my $MarkingsOf = {
+state $Indicators = __PACKAGE__->INDICATORS;
+state $ReBackbone = qr|^Content-Type:[ ]message/rfc822|m;
+state $MarkingsOf = {
+    'eoe'     => qr/\A(?:Original[ ][Mm]essage[ ][Hh]eaders:?|Message[ ]Hops)/,
+    'error'   => qr/\A(?:Diagnostic[ ]information[ ]for[ ]administrators:|Error[ ]Details)/,
     'message' => qr{\A(?:
          Delivery[ ]has[ ]failed[ ]to[ ]these[ ]recipients[ ]or[ ]groups:
+        |Original[ ]Message[ ]Details
         |.+[ ]rejected[ ]your[ ]message[ ]to[ ]the[ ]following[ ]e[-]?mail[ ]addresses:
         )
     }x,
 };
-my $StatusList = {
+state $StatusList = {
     # https://support.office.com/en-us/article/Email-non-delivery-reports-in-Office-365-51daa6b9-2e35-49c4-a0c9-df85bf8533c3
     qr/\A4[.]4[.]7\z/        => 'expired',
     qr/\A4[.]4[.]312\z/      => 'networkerror',
@@ -25,6 +24,8 @@ my $StatusList = {
     qr/\A4[.]7[.]26\z/       => 'securityerror',
     qr/\A4[.]7[.][56]\d\d\z/ => 'blocked',
     qr/\A4[.]7[.]8[5-9]\d\z/ => 'blocked',
+    qr/\A5[.]0[.]350\z/      => 'contenterror',
+    qr/\A5[.]1[.]10\z/       => 'userunknown',
     qr/\A5[.]4[.]1\z/        => 'norelaying',
     qr/\A5[.]4[.]6\z/        => 'networkerror',
     qr/\A5[.]4[.]312\z/      => 'networkerror',
@@ -34,6 +35,7 @@ my $StatusList = {
     qr/\A5[.]7[.]1[23]\z/    => 'rejected',
     qr/\A5[.]7[.]124\z/      => 'rejected',
     qr/\A5[.]7[.]13[3-6]\z/  => 'rejected',
+    qr/\A5[.]7[.]23\z/       => 'blocked',
     qr/\A5[.]7[.]25\z/       => 'networkerror',
     qr/\A5[.]7[.]50[1-3]\z/  => 'spamdetected',
     qr/\A5[.]7[.]50[4-5]\z/  => 'filtered',
@@ -43,46 +45,22 @@ my $StatusList = {
     qr/\A5[.]7[.]510\z/      => 'notaccept',
     qr/\A5[.]7[.]511\z/      => 'rejected',
     qr/\A5[.]7[.]512\z/      => 'securityerror',
+    qr/\A5[.]7[.]57\z/       => 'securityerror',
     qr/\A5[.]7[.]60[6-9]\z/  => 'blocked',
     qr/\A5[.]7[.]6[1-4]\d\z/ => 'blocked',
     qr/\A5[.]7[.]7[0-4]\d\z/ => 'toomanyconn',
 };
-my $ReCommands = {
+state $ReCommands = {
     'RCPT' => qr/unknown recipient or mailbox unavailable ->.+[<]?.+[@].+[.][a-zA-Z]+[>]?/,
 };
 
-sub headerlist  {
-    # X-MS-Exchange-Message-Is-Ndr:
-    # X-Microsoft-Antispam-PRVS: <....@...outlook.com>
-    # X-Exchange-Antispam-Report-Test: UriScan:;
-    # X-Exchange-Antispam-Report-CFA-Test:
-    # X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2015 23:34:45.6789 (JST)
-    # X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-    # X-MS-Exchange-Transport-CrossTenantHeadersStamped: ...
-    return [
-        'content-language',
-        'x-ms-exchange-message-is-ndr',
-        'x-microsoft-antispam-prvs',
-        'x-exchange-antispam-report-test',
-        'x-exchange-antispam-report-cfa-test',
-        'x-ms-exchange-crosstenant-originalarrivaltime',
-        'x-ms-exchange-crosstenant-fromentityheader',
-        'x-ms-exchange-transport-crosstenantheadersstamped',
-    ]
-}
 sub description { 'Microsoft Office 365: https://office.microsoft.com/' }
 sub make {
     # Detect an error from Microsoft Office 365
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.1.3
     my $class = shift;
     my $mhead = shift // return undef;
@@ -90,6 +68,13 @@ sub make {
     my $match = 0;
     my $tryto = qr/.+[.](?:outbound[.]protection|prod)[.]outlook[.]com\b/;
 
+    # X-MS-Exchange-Message-Is-Ndr:
+    # X-Microsoft-Antispam-PRVS: <....@...outlook.com>
+    # X-Exchange-Antispam-Report-Test: UriScan:;
+    # X-Exchange-Antispam-Report-CFA-Test:
+    # X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2015 23:34:45.6789 (JST)
+    # X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+    # X-MS-Exchange-Transport-CrossTenantHeadersStamped: ...
     $match++ if index($mhead->{'subject'}, 'Undeliverable:') > -1;
     $match++ if $mhead->{'x-ms-exchange-message-is-ndr'};
     $match++ if $mhead->{'x-microsoft-antispam-prvs'};
@@ -108,7 +93,6 @@ sub make {
     require Sisimai::RFC1894;
     my $fieldtable = Sisimai::RFC1894->FIELDTABLE;
     my $permessage = {};    # (Hash) Store values of each Per-Message field
-
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
     my $emailsteak = Sisimai::RFC5322->fillet($mbody, $ReBackbone);
     my $readcursor = 0;     # (Integer) Points the current cursor position
@@ -131,9 +115,15 @@ sub make {
         # The email address wasn't found at the destination domain. It might
         # be misspelled or it might not exist any longer. Try retyping the
         # address and resending the message.
+        #
+        # Original Message Details
+        # Created Date:   4/29/2017 6:40:30 AM
+        # Sender Address: neko@example.jp
+        # Recipient Address:      kijitora@example.org
+        # Subject:        Nyaan
         $v = $dscontents->[-1];
-
-        if( $e =~ /\A.+[@].+[<]mailto:(.+[@].+)[>]\z/ ) {
+        if( $e =~ /\A.+[@].+[<]mailto:(.+[@].+)[>]\z/ ||
+            $e =~ /\ARecipient[ ]Address:[ ]+(.+)\z/ ) {
             # kijitora@example.com<mailto:kijitora@example.com>
             if( $v->{'recipient'} ) {
                 # There are multiple recipient addresses in the message body.
@@ -160,16 +150,15 @@ sub make {
                 $permessage->{ $fieldtable->{ $o->[0] } } = $o->[2];
 
             } else {
-                if( $e eq $StartingOf->{'error'}->[0] ) {
+                if( $e =~ $MarkingsOf->{'error'} ) {
                     # Diagnostic information for administrators:
                     $v->{'diagnosis'} = $e;
-
                 } else {
                     # kijitora@example.com
                     # Remote Server returned '550 5.1.10 RESOLVER.ADR.RecipientNotFound; Recipien=
                     # t not found by SMTP address lookup'
                     next unless $v->{'diagnosis'};
-                    if( $e eq $StartingOf->{'eoerr'}->[0] ) {
+                    if( $e =~ $MarkingsOf->{'eoe'} ) {
                         # Original message headers:
                         $endoferror = 1;
                         next;
@@ -183,8 +172,7 @@ sub make {
 
     for my $e ( @$dscontents ) {
         # Set default values if each value is empty.
-        map { $e->{ $_ } ||= $permessage->{ $_ } || '' } keys %$permessage;
-        $e->{'agent'}     = __PACKAGE__->smtpagent;
+        $e->{ $_ } ||= $permessage->{ $_ } || '' for keys %$permessage;
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
 
         if( ! $e->{'status'} || substr($e->{'status'}, -4, 4) eq '.0.0' ) {
@@ -236,12 +224,6 @@ Office 365. Methods in the module are called from only Sisimai::Message.
 C<description()> returns description string of this module.
 
     print Sisimai::Lhost::Office365->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::Office365->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

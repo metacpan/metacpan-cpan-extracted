@@ -60,7 +60,7 @@
    "provides" : {
       "Sisimai" : {
          "file" : "lib/Sisimai.pm",
-         "version" : "v4.25.5"
+         "version" : "v4.25.6"
       },
       "Sisimai::ARF" : {
          "file" : "lib/Sisimai/ARF.pm"
@@ -101,6 +101,9 @@
       "Sisimai::Lhost::ApacheJames" : {
          "file" : "lib/Sisimai/Lhost/ApacheJames.pm"
       },
+      "Sisimai::Lhost::Barracuda" : {
+         "file" : "lib/Sisimai/Lhost/Barracuda.pm"
+      },
       "Sisimai::Lhost::Bigfoot" : {
          "file" : "lib/Sisimai/Lhost/Bigfoot.pm"
       },
@@ -140,8 +143,11 @@
       "Sisimai::Lhost::GSuite" : {
          "file" : "lib/Sisimai/Lhost/GSuite.pm"
       },
-      "Sisimai::Lhost::Google" : {
-         "file" : "lib/Sisimai/Lhost/Google.pm"
+      "Sisimai::Lhost::Gmail" : {
+         "file" : "lib/Sisimai/Lhost/Gmail.pm"
+      },
+      "Sisimai::Lhost::GoogleGroups" : {
+         "file" : "lib/Sisimai/Lhost/GoogleGroups.pm"
       },
       "Sisimai::Lhost::IMailServer" : {
          "file" : "lib/Sisimai/Lhost/IMailServer.pm"
@@ -188,6 +194,9 @@
       "Sisimai::Lhost::Postfix" : {
          "file" : "lib/Sisimai/Lhost/Postfix.pm"
       },
+      "Sisimai::Lhost::PowerMTA" : {
+         "file" : "lib/Sisimai/Lhost/PowerMTA.pm"
+      },
       "Sisimai::Lhost::ReceivingSES" : {
          "file" : "lib/Sisimai/Lhost/ReceivingSES.pm"
       },
@@ -199,9 +208,6 @@
       },
       "Sisimai::Lhost::SurfControl" : {
          "file" : "lib/Sisimai/Lhost/SurfControl.pm"
-      },
-      "Sisimai::Lhost::UserDefined" : {
-         "file" : "lib/Sisimai/Lhost/UserDefined.pm"
       },
       "Sisimai::Lhost::V5sendmail" : {
          "file" : "lib/Sisimai/Lhost/V5sendmail.pm"
@@ -223,6 +229,9 @@
       },
       "Sisimai::Lhost::X5" : {
          "file" : "lib/Sisimai/Lhost/X5.pm"
+      },
+      "Sisimai::Lhost::X6" : {
+         "file" : "lib/Sisimai/Lhost/X6.pm"
       },
       "Sisimai::Lhost::Yahoo" : {
          "file" : "lib/Sisimai/Lhost/Yahoo.pm"
@@ -422,7 +431,7 @@
          "web" : "https://github.com/sisimai/p5-Sisimai"
       }
    },
-   "version" : "v4.25.5",
+   "version" : "v4.25.6",
    "x_contributors" : [
       "0xcdcdcdcd <0xcdcdcdcd@gmail.com>",
       "Adrian Yee <adrian@gt.net>",

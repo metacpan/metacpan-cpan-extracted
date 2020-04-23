@@ -4,45 +4,36 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Indicators = __PACKAGE__->INDICATORS;
-my $ReBackbone = qr|^Content-Type:[ ]message/rfc822|m;
-my $StartingOf = { 'message' => ['Content-Type: message/delivery-status'] };
-my $MessagesOf = {
+state $Indicators = __PACKAGE__->INDICATORS;
+state $ReBackbone = qr|^Content-Type:[ ]message/rfc822|m;
+state $StartingOf = { 'message' => ['Content-Type: message/delivery-status'] };
+state $MessagesOf = {
     'hostunknown' => ['Host or domain name not found'],
     'notaccept'   => ['type=MX: Malformed or unexpected name server reply'],
 };
 
-# X-AOL-IP: 192.0.2.135
-# X-AOL-VSS-INFO: 5600.1067/98281
-# X-AOL-VSS-CODE: clean
-# x-aol-sid: 3039ac1afc14546fb98a0945
-# X-AOL-SCOLL-EIL: 1
-# x-aol-global-disposition: G
-# x-aol-sid: 3039ac1afd4d546fb97d75c6
-# X-BounceIO-Id: 9D38DE46-21BC-4309-83E1-5F0D788EFF1F.1_0
-# X-Outbound-Mail-Relay-Queue-ID: 07391702BF4DC
-# X-Outbound-Mail-Relay-Sender: rfc822; shironeko@aol.example.jp
-sub headerlist  { return ['x-aol-ip'] }
 sub description { 'Aol Mail: https://www.aol.com' }
 sub make {
     # Detect an error from Aol Mail
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.1.3
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
 
-    # 'from'    => qr/\APostmaster [<]Postmaster[@]AOL[.]com[>]\z/,
-    # 'subject' => qr/\AUndeliverable: /,
+    # X-AOL-IP: 192.0.2.135
+    # X-AOL-VSS-INFO: 5600.1067/98281
+    # X-AOL-VSS-CODE: clean
+    # x-aol-sid: 3039ac1afc14546fb98a0945
+    # X-AOL-SCOLL-EIL: 1
+    # x-aol-global-disposition: G
+    # x-aol-sid: 3039ac1afd4d546fb97d75c6
+    # X-BounceIO-Id: 9D38DE46-21BC-4309-83E1-5F0D788EFF1F.1_0
+    # X-Outbound-Mail-Relay-Queue-ID: 07391702BF4DC
+    # X-Outbound-Mail-Relay-Sender: rfc822; shironeko@aol.example.jp
     return undef unless $mhead->{'x-aol-ip'};
 
     require Sisimai::RFC1894;
@@ -117,12 +108,10 @@ sub make {
     for my $e ( @$dscontents ) {
         # Set default values if each value is empty.
         $e->{'lhost'} ||= $permessage->{'rhost'};
-        map { $e->{ $_ } ||= $permessage->{ $_ } || '' } keys %$permessage;
+        $e->{ $_ } ||= $permessage->{ $_ } || '' for keys %$permessage;
 
-        $e->{'agent'}     =  __PACKAGE__->smtpagent;
         $e->{'diagnosis'} =~ y/\n/ /;
         $e->{'diagnosis'} =  Sisimai::String->sweep($e->{'diagnosis'});
-
         SESSION: for my $r ( keys %$MessagesOf ) {
             # Verify each regular expression of session errors
             next unless grep { index($e->{'diagnosis'}, $_) > -1 } @{ $MessagesOf->{ $r } };
@@ -158,12 +147,6 @@ Methods in the module are called from only Sisimai::Message.
 C<description()> returns description string of this module.
 
     print Sisimai::Lhost::Aol->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::Aol->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

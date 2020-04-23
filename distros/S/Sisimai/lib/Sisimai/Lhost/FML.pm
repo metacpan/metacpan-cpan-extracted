@@ -4,8 +4,8 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $ReBackbone = qr|^Original[ ]mail[ ]as[ ]follows:|m;
-my $ErrorTitle = {
+state $ReBackbone = qr|^Original[ ]mail[ ]as[ ]follows:|m;
+state $ErrorTitle = {
     'rejected' => qr{(?>
          (?:Ignored[ ])*NOT[ ]MEMBER[ ]article[ ]from[ ]
         |reject[ ]mail[ ](?:.+:|from)[ ],
@@ -22,7 +22,7 @@ my $ErrorTitle = {
     }x,
     'securityerror' => qr/Security Alert/,
 };
-my $ErrorTable = {
+state $ErrorTable = {
     'rejected' => qr{(?>
         (?:Ignored[ ])*NOT[ ]MEMBER[ ]article[ ]from[ ]
         |reject[ ](?:
@@ -42,20 +42,13 @@ my $ErrorTable = {
     'securityerror' => qr/Security alert:/,
 };
 
-sub headerlist  { return ['x-mlserver'] }
 sub description { 'fml mailing list server/manager' };
 sub make {
     # Detect an error from fml mailing list server/manager
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.22.3
     my $class = shift;
     my $mhead = shift // return undef;
@@ -101,7 +94,6 @@ sub make {
 
     for my $e ( @$dscontents ) {
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
-        $e->{'agent'}     = __PACKAGE__->smtpagent;
 
         for my $f ( keys %$ErrorTable ) {
             # Try to match with error messages defined in $ErrorTable
@@ -147,12 +139,6 @@ list server/manager>. Methods in the module are called from only Sisimai::Messag
 C<description()> returns description string of this module.
 
     print Sisimai::Lhost::FML->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::FML->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

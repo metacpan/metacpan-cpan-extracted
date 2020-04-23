@@ -7,11 +7,15 @@ META.yml
 Makefile.PL
 README
 dist.ini
+lib/Bencher/Scenario/PathNaive/abs_path.pm
 lib/Bencher/Scenario/PathNaive/concat_path.pm
 lib/Bencher/Scenario/PathNaive/normalize_path.pm
+lib/Bencher/Scenario/PathNaive/rel_path.pm
 lib/Bencher/Scenario/PathNaive/split_path.pm
+lib/Bencher/ScenarioR/PathNaive/abs_path.pm
 lib/Bencher/ScenarioR/PathNaive/concat_path.pm
 lib/Bencher/ScenarioR/PathNaive/normalize_path.pm
+lib/Bencher/ScenarioR/PathNaive/rel_path.pm
 lib/Bencher/ScenarioR/PathNaive/split_path.pm
 lib/Bencher/Scenarios/PathNaive.pm
 t/00-compile.t

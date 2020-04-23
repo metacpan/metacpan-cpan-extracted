@@ -2,8 +2,8 @@ NAME
     App::diffdb - Compare two databases, line by line
 
 VERSION
-    This document describes version 0.001 of App::diffdb (from Perl
-    distribution App-diffdb), released on 2020-04-20.
+    This document describes version 0.002 of App::diffdb (from Perl
+    distribution App-diffdb), released on 2020-04-22.
 
 SYNOPSIS
     See included scripts diffdb, diffdb-sqlite, ...
@@ -40,6 +40,16 @@ FUNCTIONS
 
         DBI data source, e.g. "dbi:SQLite:dbname=/path/to/db1.db".
 
+    *   exclude_columns => *array[str]*
+
+    *   exclude_tables => *array[str]*
+
+    *   include_columns => *array[str]*
+
+    *   include_tables => *array[str]*
+
+    *   order_by => *str*
+
     *   password1 => *str*
 
         You might want to specify this parameter in a configuration file
@@ -52,7 +62,11 @@ FUNCTIONS
         You might want to specify this parameter in a configuration file
         instead of directly as command-line option.
 
-    *   row_as => *str* (default: "json-card")
+    *   row_as => *str* (default: "json-one-line")
+
+    *   sql => *str*
+
+        Compare the result of SQL select query, instead of tables.
 
     *   user1 => *str*
 
@@ -94,7 +108,21 @@ FUNCTIONS
 
     *   diff_command => *str* (default: "diff")
 
-    *   row_as => *str* (default: "json-card")
+    *   exclude_columns => *array[str]*
+
+    *   exclude_tables => *array[str]*
+
+    *   include_columns => *array[str]*
+
+    *   include_tables => *array[str]*
+
+    *   order_by => *str*
+
+    *   row_as => *str* (default: "json-one-line")
+
+    *   sql => *str*
+
+        Compare the result of SQL select query, instead of tables.
 
     Returns an enveloped result (an array).
 

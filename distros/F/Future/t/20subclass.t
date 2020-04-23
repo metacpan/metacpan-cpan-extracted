@@ -38,6 +38,32 @@ use Test::Identity;
    $_->cancel for @seq;
 }
 
+# immediate subclass->...
+{
+   my $fdone = t::Future::Subclass->new->done;
+   my $ffail = t::Future::Subclass->new->fail( "Oop\n" );
+
+   isa_ok( $fdone->then( sub { 1 } ),
+           "t::Future::Subclass",
+           'immediate $f->then' );
+
+   isa_ok( $ffail->else( sub { 1 } ),
+           "t::Future::Subclass",
+           'immediate $f->else' );
+
+   isa_ok( $fdone->then_with_f( sub {} ),
+           "t::Future::Subclass",
+           'immediate $f->then_with_f' );
+
+   isa_ok( $ffail->else_with_f( sub {} ),
+           "t::Future::Subclass",
+           'immediate $f->else_with_f' );
+
+   isa_ok( $fdone->followed_by( sub {} ),
+           "t::Future::Subclass",
+           '$f->followed_by' );
+}
+
 # immediate->followed_by( sub { subclass } )
 {
    my $f = t::Future::Subclass->new;
@@ -109,7 +135,7 @@ use Test::Identity;
    $f->failure;
 }
 
-# ->get calls the correct block_until_ready
+# ->get calls the correct await
 {
    my $f = t::Future::Subclass->new;
 

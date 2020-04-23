@@ -3,7 +3,7 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $AgentNames = {
+state $AgentNames = {
     # dovecot/src/deliver/deliver.c
     # 11: #define DEFAULT_MAIL_REJECTION_HUMAN_REASON \
     # 12: "Your message to <%t> was automatically rejected:%n%r"
@@ -14,7 +14,7 @@ my $AgentNames = {
     'vpopmail'   => qr/\Avdelivermail: /,
     'vmailmgr'   => qr/\Avdeliver: /,
 };
-my $MarkingsOf = {
+state $MarkingsOf = {
     'message' => qr{\A(?>
                      Your[ ]message[ ]to[ ].+[ ]was[ ]automatically[ ]rejected:\z
                     |(?:mail[.]local|procmail|maildrop|vdelivermail|vdeliver):[ ]
@@ -23,7 +23,7 @@ my $MarkingsOf = {
 };
 
 # dovecot/src/deliver/mail-send.c:94
-my $MessagesOf = {
+state $MessagesOf = {
     'dovecot' => {
         'userunknown' => ["mailbox doesn't exist: "],
         'mailboxfull' => [
@@ -79,16 +79,10 @@ my $MessagesOf = {
 
 sub make {
     # Parse message body and return reason and text
-    # @param         [Hash] mhead       Message header of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
@@ -188,7 +182,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016,2018,2019 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2016,2018-2020 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

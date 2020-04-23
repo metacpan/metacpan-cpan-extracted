@@ -1,527 +1,99 @@
 package Data::Object::String;
 
-use Try::Tiny;
+use 5.014;
+
+use strict;
+use warnings;
+use routines;
+
+use Carp ();
+use Scalar::Util ();
+
 use Role::Tiny::With;
 
-use Data::Object::Export qw(
-  cast
-  croak
-  load
-);
+use parent 'Data::Object::Kind';
 
-map with($_), my @roles = qw(
-  Data::Object::Role::Detract
-  Data::Object::Role::Dumper
-  Data::Object::Role::Output
-  Data::Object::Role::Throwable
-);
-
-map with($_), my @rules = qw(
-  Data::Object::Rule::Comparison
-  Data::Object::Rule::Defined
-);
+with 'Data::Object::Role::Dumpable';
+with 'Data::Object::Role::Proxyable';
+with 'Data::Object::Role::Throwable';
 
 use overload (
-  '""'     => 'data',
-  '~~'     => 'data',
+  '""'     => 'detract',
+  '~~'     => 'detract',
   fallback => 1
 );
 
-use parent 'Data::Object::Base::String';
-
-our $VERSION = '0.99'; # VERSION
+our $VERSION = '2.03'; # VERSION
 
 # BUILD
-# METHODS
 
-sub roles {
-  return cast([@roles]);
-}
+method new($data = '') {
+  $self = ref $self || $self;
 
-sub rules {
-  return cast([@rules]);
-}
-
-# DISPATCHERS
-
-sub append {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Append';
-
-    return cast(load($func)->new($self, @args)->execute);
+  if (Scalar::Util::blessed($data)) {
+    $data = $data->detract if $data->can('detract');
   }
-  catch {
-    my $error = $_;
 
-    $self->throw(ref($error) ? $error->message : "$error");
+  $data = $data ? "$data" : "";
+
+  if (!defined($data) || ref($data)) {
+    Carp::confess('Instantiation Error: Not a String');
+  }
+
+  return bless \$data, $self;
+}
+
+# PROXY
+
+method build_proxy($package, $method, @args) {
+  my $plugin = $self->plugin($method) or return undef;
+
+  return sub {
+    use Try::Tiny;
+
+    my $is_func = $plugin->package->can('mapping');
+
+    try {
+      my $instance = $plugin->build($is_func ? ($self, @args) : [$self, @args]);
+
+      return $instance->execute;
+    }
+    catch {
+      my $error = $_;
+      my $class = $self->class;
+      my $arity = $is_func ? 'mapping' : 'argslist';
+      my $message = ref($error) ? $error->{message} : "$error";
+      my $signature = "${class}::${method}(@{[join(', ', $plugin->package->$arity)]})";
+
+      Carp::confess("$signature: $error");
+    };
   };
 }
 
-sub camelcase {
-  my ($self, @args) = @_;
+# PLUGIN
 
-  try {
-    my $func = 'Data::Object::Func::String::Camelcase';
+method plugin($name, @args) {
+  my $plugin;
 
-    return cast(load($func)->new($self, @args)->execute);
+  my $space = $self->space;
+
+  return undef if !$name;
+
+  if ($plugin = eval { $space->child('plugin')->child($name)->load }) {
+
+    return undef unless $plugin->can('argslist');
+
+    return $space->child('plugin')->child($name);
   }
-  catch {
-    my $error = $_;
 
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
+  if ($plugin = $space->child('func')->child($name)->load) {
 
-sub chomp {
-  my ($self, @args) = @_;
+    return undef unless $plugin->can('mapping');
 
-  try {
-    my $func = 'Data::Object::Func::String::Chomp';
-
-    return cast(load($func)->new($self, @args)->execute);
+    return $space->child('func')->child($name);
   }
-  catch {
-    my $error = $_;
 
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub chop {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Chop';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub concat {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Concat';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub contains {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Contains';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub defined {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Defined';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub eq {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Eq';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub ge {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Ge';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub gt {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Gt';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub hex {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Hex';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub index {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Index';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub lc {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Lc';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub lcfirst {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Lcfirst';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub length {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Length';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub lines {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Lines';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub lowercase {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Lowercase';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub le {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Le';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub lt {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Lt';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub ne {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Ne';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub replace {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Replace';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub reverse {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Reverse';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub rindex {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Rindex';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub snakecase {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Snakecase';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub split {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Split';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub strip {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Strip';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub titlecase {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Titlecase';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub trim {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Trim';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub uc {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Uc';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub ucfirst {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Ucfirst';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub uppercase {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Uppercase';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub words {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::String::Words';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
+  return undef;
 }
 
 1;
@@ -536,11 +108,13 @@ Data::Object::String
 
 =head1 ABSTRACT
 
-Data-Object String Class
+String Class for Perl 5
 
 =cut
 
 =head1 SYNOPSIS
+
+  package main;
 
   use Data::Object::String;
 
@@ -550,35 +124,55 @@ Data-Object String Class
 
 =head1 DESCRIPTION
 
-Data::Object::String provides routines for operating on Perl 5 string
-data. String methods work on data that meets the criteria for being a string. A
-string holds and manipulates an arbitrary sequence of bytes, typically
-representing characters. Users of strings should be aware of the methods that
-modify the string itself as opposed to returning a new string. Unless stated, it
-may be safe to assume that the following methods copy, modify and return new
-strings based on their function.
+This package provides methods for manipulating string data.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::Kind>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Data::Object::Role::Dumpable>
+
+L<Data::Object::Role::Proxyable>
+
+L<Data::Object::Role::Throwable>
+
+=cut
+
+=head1 LIBRARIES
+
+This package uses type constraints from:
+
+L<Data::Object::Types>
 
 =cut
 
 =head1 METHODS
 
-This package implements the following methods.
+This package implements the following methods:
 
 =cut
 
 =head2 append
 
-  append() : StrObject
+  append() : Str
 
-The append method modifies and returns the string with the argument list
-appended to it separated using spaces. This method returns a
-string object.
+The append method appends arugments to the string using spaces.
 
 =over 4
 
-=item append example
+=item append example #1
 
-  # given 'firstname'
+  my $string = Data::Object::String->new('firstname');
 
   $string->append('lastname'); # firstname lastname
 
@@ -588,19 +182,15 @@ string object.
 
 =head2 camelcase
 
-  camelcase() : StrObject
+  camelcase() : Str
 
-The camelcase method modifies the string such that it will no longer have any
-non-alphanumeric characters and each word (group of alphanumeric characters
-separated by 1 or more non-alphanumeric characters) is capitalized. Note, this
-method modifies the string. This method returns a L<Data::Object::String>
-object.
+The camelcase method converts the string to camelcase.
 
 =over 4
 
-=item camelcase example
+=item camelcase example #1
 
-  # given 'hello world'
+  my $string = Data::Object::String->new('hello world');
 
   $string->camelcase; # HelloWorld
 
@@ -610,18 +200,16 @@ object.
 
 =head2 chomp
 
-  chomp() : StrObject
+  chomp() : Str
 
-The chomp method is a safer version of the chop method, it's used to remove the
-newline (or the current value of $/) from the end of the string. Note, this
-method modifies and returns the string. This method returns a
-string object.
+The chomp method removes the newline (or the current value of $/) from the end
+of the string.
 
 =over 4
 
-=item chomp example
+=item chomp example #1
 
-  # given "name, age, dob, email\n"
+  my $string = Data::Object::String->new("name, age, dob, email\n");
 
   $string->chomp; # name, age, dob, email
 
@@ -631,18 +219,15 @@ string object.
 
 =head2 chop
 
-  chop() : StrObject
+  chop() : Str
 
-The chop method removes the last character of a string and returns the character
-chopped. It is much more efficient than "s/.$//s" because it neither scans nor
-copies the string. Note, this method modifies and returns the string. This
-method returns a string value.
+The chop method removes and returns the last character of the string.
 
 =over 4
 
-=item chop example
+=item chop example #1
 
-  # given "this is just a test."
+  my $string = Data::Object::String->new("this is just a test.");
 
   $string->chop; # this is just a test
 
@@ -652,16 +237,15 @@ method returns a string value.
 
 =head2 concat
 
-  concat(Any $arg1) : StrObject
+  concat(Any $arg1) : Str
 
-The concat method modifies and returns the string with the argument list
-appended to it. This method returns a string value.
+The concat method returns the string with the argument list appended to it.
 
 =over 4
 
-=item concat example
+=item concat example #1
 
-  # given 'ABC'
+  my $string = Data::Object::String->new('ABC');
 
   $string->concat('DEF', 'GHI'); # ABCDEFGHI
 
@@ -671,26 +255,48 @@ appended to it. This method returns a string value.
 
 =head2 contains
 
-  contains(Str | RegexpRef $arg1) : NumObject
+  contains(Str | RegexpRef $arg1) : Num
 
-The contains method searches the string for the string specified in the
-argument and returns true if found, otherwise returns false. If the argument is
-a string, the search will be performed using the core index function. If the
-argument is a regular expression reference, the search will be performed using
-the regular expression engine. This method returns a L<Data::Object::Number>
-object.
+The contains method searches the string for a substring or expression returns
+true or false if found.
 
 =over 4
 
-=item contains example
+=item contains example #1
 
-  # given 'Nullam ultrices placerat nibh vel malesuada.'
+  my $string = Data::Object::String->new('Nullam ultrices placerat.');
 
-  $string->contains('trices'); # 1; true
-  $string->contains('itrices'); # 0; false
+  $string->contains('trices'); # 1
 
-  $string->contains(qr/trices/); # 1; true
-  $string->contains(qr/itrices/); # 0; false
+=back
+
+=over 4
+
+=item contains example #2
+
+  my $string = Data::Object::String->new('Nullam ultrices placerat.');
+
+  $string->contains('itrices'); # 0
+
+=back
+
+=over 4
+
+=item contains example #3
+
+  my $string = Data::Object::String->new('Nullam ultrices placerat.');
+
+  $string->contains(qr/trices/); # 1
+
+=back
+
+=over 4
+
+=item contains example #4
+
+  my $string = Data::Object::String->new('Nullam ultrices placerat.');
+
+  $string->contains(qr/itrices/); # 0
 
 =back
 
@@ -698,17 +304,15 @@ object.
 
 =head2 defined
 
-  defined() : NumObject
+  defined() : Num
 
-The defined method returns true if the object represents a value that meets the
-criteria for being defined, otherwise it returns false. This method returns a
-number object.
+The defined method returns true, always.
 
 =over 4
 
-=item defined example
+=item defined example #1
 
-  # given $string
+  my $string = Data::Object::String->new();
 
   $string->defined; # 1
 
@@ -718,16 +322,15 @@ number object.
 
 =head2 eq
 
-  eq(Any $arg1) : NumObject
+  eq(Any $arg1) : Num
 
-The eq method returns true if the argument provided is equal to the value
-represented by the object. This method returns a number value.
+The eq method returns true if the argument provided is equal to the string.
 
 =over 4
 
-=item eq example
+=item eq example #1
 
-  # given 'exciting'
+  my $string = Data::Object::String->new('exciting');
 
   $string->eq('Exciting'); # 0
 
@@ -737,17 +340,16 @@ represented by the object. This method returns a number value.
 
 =head2 ge
 
-  ge(Any $arg1) : NumObject
+  ge(Any $arg1) : Num
 
 The ge method returns true if the argument provided is greater-than or equal-to
-the value represented by the object. This method returns a Data::Object::Number
-object.
+the string.
 
 =over 4
 
-=item ge example
+=item ge example #1
 
-  # given 'exciting'
+  my $string = Data::Object::String->new('exciting');
 
   $string->ge('Exciting'); # 1
 
@@ -757,16 +359,15 @@ object.
 
 =head2 gt
 
-  gt(Any $arg1) : NumObject
+  gt(Any $arg1) : Num
 
-The gt method returns true if the argument provided is greater-than the value
-represented by the object. This method returns a number value.
+The gt method returns true if the argument provided is greater-than the string.
 
 =over 4
 
-=item gt example
+=item gt example #1
 
-  # given 'exciting'
+  my $string = Data::Object::String->new('exciting');
 
   $string->gt('Exciting'); # 1
 
@@ -778,17 +379,15 @@ represented by the object. This method returns a number value.
 
   hex() : Str
 
-The hex method returns the value resulting from interpreting the string as a
-hex string. This method returns a data type object to be determined after
-execution.
+The hex method returns the value resulting from interpreting the string as a hex string.
 
 =over 4
 
-=item hex example
+=item hex example #1
 
-  # given '0xaf'
+  my $string = Data::Object::String->new('0xaf');
 
-  string->hex; # 175
+  $string->hex; # 175
 
 =back
 
@@ -796,26 +395,57 @@ execution.
 
 =head2 index
 
-  index(Str $arg1, Num $arg2) : NumObject
+  index(Str $arg1, Num $arg2) : Num
 
 The index method searches for the argument within the string and returns the
-position of the first occurrence of the argument. This method optionally takes a
-second argument which would be the position within the string to start
-searching from (also known as the base). By default, starts searching from the
-beginning of the string. This method returns a data type object to be determined
-after execution.
+position of the first occurrence of the argument.
 
 =over 4
 
-=item index example
+=item index example #1
 
-  # given 'unexplainable'
+  my $string = Data::Object::String->new('unexplainable');
 
   $string->index('explain'); # 2
+
+=back
+
+=over 4
+
+=item index example #2
+
+  my $string = Data::Object::String->new('unexplainable');
+
   $string->index('explain', 0); # 2
+
+=back
+
+=over 4
+
+=item index example #3
+
+  my $string = Data::Object::String->new('unexplainable');
+
   $string->index('explain', 1); # 2
+
+=back
+
+=over 4
+
+=item index example #4
+
+  my $string = Data::Object::String->new('unexplainable');
+
   $string->index('explain', 2); # 2
-  $string->index('explain', 3); # -1
+
+=back
+
+=over 4
+
+=item index example #5
+
+  my $string = Data::Object::String->new('unexplainable');
+
   $string->index('explained'); # -1
 
 =back
@@ -824,16 +454,15 @@ after execution.
 
 =head2 lc
 
-  lc() : StrObject
+  lc() : Str
 
-The lc method returns a lowercased version of the string. This method returns a
-string object. This method is an alias to the lowercase method.
+The lc method returns a lowercased version of the string.
 
 =over 4
 
-=item lc example
+=item lc example #1
 
-  # given 'EXCITING'
+  my $string = Data::Object::String->new('EXCITING');
 
   $string->lc; # exciting
 
@@ -843,16 +472,15 @@ string object. This method is an alias to the lowercase method.
 
 =head2 lcfirst
 
-  lc() : StrObject
+  lcfirst() : Str
 
 The lcfirst method returns a the string with the first character lowercased.
-This method returns a string value.
 
 =over 4
 
-=item lcfirst example
+=item lcfirst example #1
 
-  # given 'EXCITING'
+  my $string = Data::Object::String->new('EXCITING');
 
   $string->lcfirst; # eXCITING
 
@@ -862,17 +490,16 @@ This method returns a string value.
 
 =head2 le
 
-  le(Any $arg1) : NumObject
+  le(Any $arg1) : Num
 
 The le method returns true if the argument provided is less-than or equal-to
-the value represented by the object. This method returns a Data::Object::Number
-object.
+the string.
 
 =over 4
 
-=item le example
+=item le example #1
 
-  # given 'exciting'
+  my $string = Data::Object::String->new('exciting');
 
   $string->le('Exciting'); # 0
 
@@ -882,16 +509,15 @@ object.
 
 =head2 length
 
-  length() : NumObject
+  length() : Num
 
-The length method returns the number of characters within the string. This
-method returns a number value.
+The length method returns the number of characters within the string.
 
 =over 4
 
-=item length example
+=item length example #1
 
-  # given 'longggggg'
+  my $string = Data::Object::String->new('longggggg');
 
   $string->length; # 9
 
@@ -901,19 +527,20 @@ method returns a number value.
 
 =head2 lines
 
-  lines() : ArrayObject
+  lines() : ArrayRef
 
-The lines method breaks the string into pieces, split on 1 or more newline
-characters, and returns an array reference consisting of the pieces. This method
-returns an array value.
+The lines method returns an arrayref of parts by splitting on 1 or more newline
+characters.
 
 =over 4
 
-=item lines example
+=item lines example #1
 
-  # given "who am i?\nwhere am i?\nhow did I get here"
+  my $string = Data::Object::String->new(
+    "who am i?\nwhere am i?\nhow did I get here"
+  );
 
-  $string->lines; # ['who am i?','where am i?','how did i get here']
+  $string->lines; # ['who am i?','where am i?','how did I get here']
 
 =back
 
@@ -921,16 +548,15 @@ returns an array value.
 
 =head2 lowercase
 
-  lowercase() : StrObject
+  lowercase() : Str
 
-The lowercase method is an alias to the lc method. This method returns a
-string object.
+The lowercase method is an alias to the lc method.
 
 =over 4
 
-=item lowercase example
+=item lowercase example #1
 
-  # given 'EXCITING'
+  my $string = Data::Object::String->new('EXCITING');
 
   $string->lowercase; # exciting
 
@@ -940,16 +566,15 @@ string object.
 
 =head2 lt
 
-  lt(Any $arg1) : NumObject
+  lt(Any $arg1) : Num
 
-The lt method returns true if the argument provided is less-than the value
-represented by the object. This method returns a number value.
+The lt method returns true if the argument provided is less-than the string.
 
 =over 4
 
-=item lt example
+=item lt example #1
 
-  # given 'exciting'
+  my $string = Data::Object::String->new('exciting');
 
   $string->lt('Exciting'); # 0
 
@@ -959,16 +584,15 @@ represented by the object. This method returns a number value.
 
 =head2 ne
 
-  ne(Any $arg1) : NumObject
+  ne(Any $arg1) : Num
 
-The ne method returns true if the argument provided is not equal to the value
-represented by the object. This method returns a number value.
+The ne method returns true if the argument provided is not equal to the string.
 
 =over 4
 
-=item ne example
+=item ne example #1
 
-  # given 'exciting'
+  my $string = Data::Object::String->new('exciting');
 
   $string->ne('Exciting'); # 1
 
@@ -976,25 +600,67 @@ represented by the object. This method returns a number value.
 
 =cut
 
-=head2 replace
+=head2 render
 
-  replace(Str $arg1, Str $arg2) : StrObject
+  render(HashRef $arg1) : Str
 
-The replace method performs a smart search and replace operation and returns the
-modified string (if any modification occurred). This method optionally takes a
-replacement modifier as it's final argument. Note, this operation expects the
-2nd argument to be a replacement String. This method returns a
-string object.
+The render method treats the string as a template and performs a simple token
+replacement using the argument provided.
 
 =over 4
 
-=item replace example
+=item render example #1
 
-  # given 'Hello World'
+  my $string = Data::Object::String->new('Hi, {name}!');
+
+  $string->render({name => 'Friend'}); # Hi, Friend!
+
+=back
+
+=cut
+
+=head2 replace
+
+  replace(Str $arg1, Str $arg2) : Str
+
+The replace method performs a search and replace operation and returns the modified string.
+
+=over 4
+
+=item replace example #1
+
+  my $string = Data::Object::String->new('Hello World');
 
   $string->replace('World', 'Universe'); # Hello Universe
+
+=back
+
+=over 4
+
+=item replace example #2
+
+  my $string = Data::Object::String->new('Hello World');
+
   $string->replace('world', 'Universe', 'i'); # Hello Universe
+
+=back
+
+=over 4
+
+=item replace example #3
+
+  my $string = Data::Object::String->new('Hello World');
+
   $string->replace(qr/world/i, 'Universe'); # Hello Universe
+
+=back
+
+=over 4
+
+=item replace example #4
+
+  my $string = Data::Object::String->new('Hello World');
+
   $string->replace(qr/.*/, 'Nada'); # Nada
 
 =back
@@ -1003,16 +669,16 @@ string object.
 
 =head2 reverse
 
-  reverse() : ArrayObject
+  reverse() : Str
 
 The reverse method returns a string where the characters in the string are in
-the opposite order. This method returns a string value.
+the opposite order.
 
 =over 4
 
-=item reverse example
+=item reverse example #1
 
-  # given 'dlrow ,olleH'
+  my $string = Data::Object::String->new('dlrow ,olleH');
 
   $string->reverse; # Hello, world
 
@@ -1022,66 +688,108 @@ the opposite order. This method returns a string value.
 
 =head2 rindex
 
-  rindex(Str $arg1, Num $arg2) : NumObject
+  rindex(Str $arg1, Num $arg2) : Num
 
 The rindex method searches for the argument within the string and returns the
-position of the last occurrence of the argument. This method optionally takes a
-second argument which would be the position within the string to start
-searching from (beginning at or before the position). By default, starts
-searching from the end of the string. This method returns a data type object to
-be determined after execution.
+position of the last occurrence of the argument.
 
 =over 4
 
-=item rindex example
+=item rindex example #1
 
-  # given 'explain the unexplainable'
+  my $string = Data::Object::String->new('explain the unexplainable');
 
   $string->rindex('explain'); # 14
-  $string->rindex('explain', 0); # 0
-  $string->rindex('explain', 21); # 14
-  $string->rindex('explain', 22); # 14
-  $string->rindex('explain', 23); # 14
-  $string->rindex('explain', 20); # 14
-  $string->rindex('explain', 14); # 0
-  $string->rindex('explain', 13); # 0
-  $string->rindex('explain', 0); # 0
+
+=back
+
+=over 4
+
+=item rindex example #10
+
+  my $string = Data::Object::String->new('explain the unexplainable');
+
   $string->rindex('explained'); # -1
 
 =back
 
-=cut
-
-=head2 roles
-
-  roles() : ArrayRef
-
-The roles method returns the list of roles attached to object. This method
-returns an array value.
-
 =over 4
 
-=item roles example
+=item rindex example #2
 
-  # given $string
+  my $string = Data::Object::String->new('explain the unexplainable');
 
-  $string->roles;
+  $string->rindex('explain', 0); # 0
 
 =back
 
-=cut
+=over 4
 
-=head2 rules
+=item rindex example #3
 
-  rules() : ArrayRef
+  my $string = Data::Object::String->new('explain the unexplainable');
 
-The rules method returns consumed rules.
+  $string->rindex('explain', 21); # 14
+
+=back
 
 =over 4
 
-=item rules example
+=item rindex example #4
 
-  my $rules = $any->rules();
+  my $string = Data::Object::String->new('explain the unexplainable');
+
+  $string->rindex('explain', 22); # 14
+
+=back
+
+=over 4
+
+=item rindex example #5
+
+  my $string = Data::Object::String->new('explain the unexplainable');
+
+  $string->rindex('explain', 23); # 14
+
+=back
+
+=over 4
+
+=item rindex example #6
+
+  my $string = Data::Object::String->new('explain the unexplainable');
+
+  $string->rindex('explain', 20); # 14
+
+=back
+
+=over 4
+
+=item rindex example #7
+
+  my $string = Data::Object::String->new('explain the unexplainable');
+
+  $string->rindex('explain', 14); # 0
+
+=back
+
+=over 4
+
+=item rindex example #8
+
+  my $string = Data::Object::String->new('explain the unexplainable');
+
+  $string->rindex('explain', 13); # 0
+
+=back
+
+=over 4
+
+=item rindex example #9
+
+  my $string = Data::Object::String->new('explain the unexplainable');
+
+  $string->rindex('explain', 0); # 0
 
 =back
 
@@ -1089,22 +797,17 @@ The rules method returns consumed rules.
 
 =head2 snakecase
 
-  snakecase() : StrObject
+  snakecase() : Str
 
-The snakecase method modifies the string such that it will no longer have any
-non-alphanumeric characters and each word (group of alphanumeric characters
-separated by 1 or more non-alphanumeric characters) is capitalized. The only
-difference between this method and the camelcase method is that this method
-ensures that the first character will always be lowercased. Note, this method
-modifies the string. This method returns a string value.
+The snakecase method converts the string to snakecase.
 
 =over 4
 
-=item snakecase example
+=item snakecase example #1
 
-  # given 'hello world'
+  my $string = Data::Object::String->new('hello world');
 
-  $string->snakecase; # helloWorld
+  $string->snakecase; # hello_world
 
 =back
 
@@ -1112,24 +815,46 @@ modifies the string. This method returns a string value.
 
 =head2 split
 
-  split(RegexpRef $arg1, Num $arg2) : ArrayObject
+  split(RegexpRef $arg1, Num $arg2) : ArrayRef
 
-The split method splits the string into a list of strings, separating each
-chunk by the argument (string or regexp object), and returns that list as an
-array reference. This method optionally takes a second argument which would be
-the limit (number of matches to capture). Note, this operation expects the 1st
-argument to be a Regexp object or a String. This method returns a
-array object.
+The split method returns an arrayref by splitting on the argument.
 
 =over 4
 
-=item split example
+=item split example #1
 
-  # given 'name, age, dob, email'
+  my $string = Data::Object::String->new('name, age, dob, email');
 
   $string->split(', '); # ['name', 'age', 'dob', 'email']
+
+=back
+
+=over 4
+
+=item split example #2
+
+  my $string = Data::Object::String->new('name, age, dob, email');
+
   $string->split(', ', 2); # ['name', 'age, dob, email']
+
+=back
+
+=over 4
+
+=item split example #3
+
+  my $string = Data::Object::String->new('name, age, dob, email');
+
   $string->split(qr/\,\s*/); # ['name', 'age', 'dob', 'email']
+
+=back
+
+=over 4
+
+=item split example #4
+
+  my $string = Data::Object::String->new('name, age, dob, email');
+
   $string->split(qr/\,\s*/, 2); # ['name', 'age, dob, email']
 
 =back
@@ -1138,17 +863,16 @@ array object.
 
 =head2 strip
 
-  strip() : StrObject
+  strip() : Str
 
 The strip method returns the string replacing occurences of 2 or more
-whitespaces with a single whitespace. This method returns a
-string object.
+whitespaces with a single whitespace.
 
 =over 4
 
-=item strip example
+=item strip example #1
 
-  # given 'one,  two,  three'
+  my $string = Data::Object::String->new('one,  two,  three');
 
   $string->strip; # one, two, three
 
@@ -1158,18 +882,16 @@ string object.
 
 =head2 titlecase
 
-  titlecase() : StrObject
+  titlecase() : Str
 
 The titlecase method returns the string capitalizing the first character of
-each word (group of alphanumeric characters separated by 1 or more whitespaces).
-Note, this method modifies the string. This method returns a
-string object.
+each word.
 
 =over 4
 
-=item titlecase example
+=item titlecase example #1
 
-  # given 'mr. john doe'
+  my $string = Data::Object::String->new('mr. john doe');
 
   $string->titlecase; # Mr. John Doe
 
@@ -1179,16 +901,16 @@ string object.
 
 =head2 trim
 
-  trim() : StrObject
+  trim() : Str
 
-The trim method removes 1 or more consecutive leading and/or trailing spaces
-from the string. This method returns a string value.
+The trim method removes one or more consecutive leading and/or trailing spaces
+from the string.
 
 =over 4
 
-=item trim example
+=item trim example #1
 
-  # given ' system is   ready   '
+  my $string = Data::Object::String->new('   system is   ready   ');
 
   $string->trim; # system is   ready
 
@@ -1198,16 +920,15 @@ from the string. This method returns a string value.
 
 =head2 uc
 
-  uc() : StrObject
+  uc() : Str
 
-The uc method returns an uppercased version of the string. This method returns a
-string object. This method is an alias to the uppercase method.
+The uc method returns an uppercased version of the string.
 
 =over 4
 
-=item uc example
+=item uc example #1
 
-  # given 'exciting'
+  my $string = Data::Object::String->new('exciting');
 
   $string->uc; # EXCITING
 
@@ -1217,16 +938,15 @@ string object. This method is an alias to the uppercase method.
 
 =head2 ucfirst
 
-  uc() : StrObject
+  ucfirst() : Str
 
 The ucfirst method returns a the string with the first character uppercased.
-This method returns a string value.
 
 =over 4
 
-=item ucfirst example
+=item ucfirst example #1
 
-  # given 'exciting'
+  my $string = Data::Object::String->new('exciting');
 
   $string->ucfirst; # Exciting
 
@@ -1236,16 +956,15 @@ This method returns a string value.
 
 =head2 uppercase
 
-  uppercase() : StrObject
+  uppercase() : Str
 
-The uppercase method is an alias to the uc method. This method returns a
-string object.
+The uppercase method is an alias to the uc method.
 
 =over 4
 
-=item uppercase example
+=item uppercase example #1
 
-  # given 'exciting'
+  my $string = Data::Object::String->new('exciting');
 
   $string->uppercase; # EXCITING
 
@@ -1255,17 +974,18 @@ string object.
 
 =head2 words
 
-  words() : ArrayObject
+  words() : ArrayRef
 
-The words method splits the string into a list of strings, separating each
-group of characters by 1 or more consecutive spaces, and returns that list as an
-array reference. This method returns an array value.
+The words method returns an arrayref by splitting on 1 or more consecutive
+spaces.
 
 =over 4
 
-=item words example
+=item words example #1
 
-  # given "is this a bug we're experiencing"
+  my $string = Data::Object::String->new(
+    'is this a bug we\'re experiencing'
+  );
 
   $string->words; # ["is","this","a","bug","we're","experiencing"]
 
@@ -1273,46 +993,30 @@ array reference. This method returns an array value.
 
 =cut
 
-=head1 ROLES
+=head1 AUTHOR
 
-This package inherits all behavior from the folowing role(s):
+Al Newkirk, C<awncorp@cpan.org>
 
-=cut
+=head1 LICENSE
 
-=over 4
+Copyright (C) 2011-2019, Al Newkirk, et al.
 
-=item *
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the L<"license
+file"|https://github.com/iamalnewkirk/foobar/blob/master/LICENSE>.
 
-L<Data::Object::Role::Detract>
+=head1 PROJECT
 
-=item *
+L<Wiki|https://github.com/iamalnewkirk/foobar/wiki>
 
-L<Data::Object::Role::Dumper>
+L<Project|https://github.com/iamalnewkirk/foobar>
 
-=item *
+L<Initiatives|https://github.com/iamalnewkirk/foobar/projects>
 
-L<Data::Object::Role::Output>
+L<Milestones|https://github.com/iamalnewkirk/foobar/milestones>
 
-=item *
+L<Contributing|https://github.com/iamalnewkirk/foobar/blob/master/CONTRIBUTE.md>
 
-L<Data::Object::Role::Throwable>
-
-=back
-
-=head1 RULES
-
-This package adheres to the requirements in the folowing rule(s):
+L<Issues|https://github.com/iamalnewkirk/foobar/issues>
 
 =cut
-
-=over 4
-
-=item *
-
-L<Data::Object::Rule::Comparison>
-
-=item *
-
-L<Data::Object::Rule::Defined>
-
-=back

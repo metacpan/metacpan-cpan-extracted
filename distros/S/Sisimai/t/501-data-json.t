@@ -12,7 +12,6 @@ use_ok $PackageName;
 can_ok $PackageName, @{ $MethodNames->{'class'} };
 
 MAKE_TEST: {
-
     use Sisimai::Data;
     use Sisimai::Mail;
     use Sisimai::Message;
@@ -20,7 +19,7 @@ MAKE_TEST: {
 
     is $PackageName->dump('json'), undef;
 
-    my $file = './set-of-emails/maildir/bsd/email-sendmail-02.eml';
+    my $file = './set-of-emails/maildir/bsd/lhost-sendmail-02.eml';
     my $mail = Sisimai::Mail->new($file);
     my $mesg = undef;
     my $data = undef;
@@ -28,9 +27,9 @@ MAKE_TEST: {
     my $json = undef;
     my $perl = undef;
 
-    while( my $r = $mail->read ){ 
+    while( my $r = $mail->data->read ){ 
         $mesg = Sisimai::Message->new('data' => $r); 
-        $data = Sisimai::Data->make('data' => $mesg); 
+        $data = Sisimai::Data->make('data' => $mesg, 'origin' => $mail->data->path); 
         isa_ok $data, 'ARRAY';
 
         for my $e ( @$data ) {
@@ -71,6 +70,7 @@ MAKE_TEST: {
 
             is $e->feedbacktype, $perl->{'feedbacktype'}, 'feedbacktype = '.$e->feedbacktype;
             is $e->action, $perl->{'action'}, 'action = '.$e->action;
+            is $e->origin, $perl->{'origin'}, 'origin = '.$e->origin;
         }
     }
 }

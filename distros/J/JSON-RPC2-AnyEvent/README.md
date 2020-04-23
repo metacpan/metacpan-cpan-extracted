@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Maki-Daisuke/p5-JSON-RPC2-AnyEvent.png?branch=master)](https://travis-ci.org/Maki-Daisuke/p5-JSON-RPC2-AnyEvent)
+[![Build Status](https://travis-ci.org/Maki-Daisuke/p5-JSON-RPC2-AnyEvent.svg?branch=master)](https://travis-ci.org/Maki-Daisuke/p5-JSON-RPC2-AnyEvent)
 # NAME
 
 JSON::RPC2::AnyEvent - Yet-another, transport-independent and asynchronous JSON-RPC 2.0 implementation
@@ -18,7 +18,6 @@ JSON::RPC2::AnyEvent - Yet-another, transport-independent and asynchronous JSON-
         }
     );
     
-
     my $cv = $srv->dispatch({
         jsonrpc => "2.0",
         id      => 1,
@@ -27,7 +26,6 @@ JSON::RPC2::AnyEvent - Yet-another, transport-independent and asynchronous JSON-
     });
     my $res = $cv->recv;  # { jsonrpc => "2.0", id => 1, result => "Hello, Kyo Sogoru!" }
     
-
     my $cv = $srv->dispatch({
         jsonrpc => "2.0",
         id      => 2,
@@ -44,21 +42,17 @@ JSON::RPC2::AnyEvent - Yet-another, transport-independent and asynchronous JSON-
     });  # notification request when "id" is omitted.
     not defined $cv;  # true
 
-
-
 # DESCRIPTION
 
-JSON::RPC2::AnyEvent is yet-another JSON-RPC 2.0 implementation. This module is very similar to [JSON::RPC2](http://search.cpan.org/perldoc?JSON::RPC2) and
+JSON::RPC2::AnyEvent is yet-another JSON-RPC 2.0 implementation. This module is very similar to [JSON::RPC2](https://metacpan.org/pod/JSON%3A%3ARPC2) and
 actually shares the main goals. That is, transport independent, asynchronous, and light-weight.
-However, this module is designed so that it works with [AnyEvent](http://search.cpan.org/perldoc?AnyEvent), especially with [AnyEvent::Handle](http://search.cpan.org/perldoc?AnyEvent::Handle).
-
-
+However, this module is designed so that it works with [AnyEvent](https://metacpan.org/pod/AnyEvent), especially with [AnyEvent::Handle](https://metacpan.org/pod/AnyEvent%3A%3AHandle).
 
 # THINK SIMPLE
 
-JSON::RPC2::AnyEvent considers JSON-RPC as simple as possible. For example, [JSON::RPC2::Server](http://search.cpan.org/perldoc?JSON::RPC2::Server) abstracts JSON-RPC
-server as a kind of hash filter. Unlike [JSON::RPC2::Server](http://search.cpan.org/perldoc?JSON::RPC2::Server) accepts and outputs serialized JSON text,
-[JSON::RPC2::AnyEvent::Server](http://search.cpan.org/perldoc?JSON::RPC2::AnyEvent::Server) accepts and outputs Perl hash:
+JSON::RPC2::AnyEvent considers JSON-RPC as simple as possible. For example, [JSON::RPC2::Server](https://metacpan.org/pod/JSON%3A%3ARPC2%3A%3AServer) abstracts JSON-RPC
+server as a kind of hash filter. Unlike [JSON::RPC2::Server](https://metacpan.org/pod/JSON%3A%3ARPC2%3A%3AServer) accepts and outputs serialized JSON text,
+[JSON::RPC2::AnyEvent::Server](https://metacpan.org/pod/JSON%3A%3ARPC2%3A%3AAnyEvent%3A%3AServer) accepts and outputs Perl hash:
 
                          +----------+
                          |          |
@@ -75,20 +69,16 @@ then, get the result as a hash.
 
 Actually, JSON::RPC2::AnyEvent just treats Perl data structures instead of JSON, and has nothing to with serializing
 Perl data or deserializing JSON text. This concept allows you to use JSON-RPC on any kind of transport layer.
-In particular, this way is excellent with [AnyEvent::Handle](http://search.cpan.org/perldoc?AnyEvent::Handle), such as `$h->push_read(json => sub{...})` and
+In particular, this way is excellent with [AnyEvent::Handle](https://metacpan.org/pod/AnyEvent%3A%3AHandle), such as `$h->push_read(json => sub{...})` and
 `$h->push_write(json => ...)`.
 
-If you are interested in a "real" solution, you should look at [JSON::RPC2::AnyEvent::Server::Handle](http://search.cpan.org/perldoc?JSON::RPC2::AnyEvent::Server::Handle), which is an
+If you are interested in a "real" solution, you should look at [JSON::RPC2::AnyEvent::Server::Handle](https://metacpan.org/pod/JSON%3A%3ARPC2%3A%3AAnyEvent%3A%3AServer%3A%3AHandle), which is an
 example to use this module on stream protocol like TCP.
-
-
 
 # SEE ALSO
 
-- [JSON::RPC2::AnyEvent::Server](http://search.cpan.org/perldoc?JSON::RPC2::AnyEvent::Server)
-- [JSON::RPC2::AnyEvent::Server::Handle](http://search.cpan.org/perldoc?JSON::RPC2::AnyEvent::Server::Handle)
-
-
+- [JSON::RPC2::AnyEvent::Server](https://metacpan.org/pod/JSON%3A%3ARPC2%3A%3AAnyEvent%3A%3AServer)
+- [JSON::RPC2::AnyEvent::Server::Handle](https://metacpan.org/pod/JSON%3A%3ARPC2%3A%3AAnyEvent%3A%3AServer%3A%3AHandle)
 
 # LICENSE
 

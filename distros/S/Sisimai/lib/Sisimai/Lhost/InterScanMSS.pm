@@ -4,20 +4,14 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $ReBackbone = qr|^Content-type:[ ]message/rfc822|m;
+state $ReBackbone = qr|^Content-type:[ ]message/rfc822|m;
 sub description { 'Trend Micro InterScan Messaging Security Suite' }
 sub make {
     # Detect an error from InterScanMSS
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.1.2
     my $class = shift;
     my $mhead = shift // return undef;
@@ -31,6 +25,7 @@ sub make {
 
     # 'received' => qr/[ ][(]InterScanMSS[)][ ]with[ ]/,
     $match ||= 1 if index($mhead->{'from'}, '"InterScan MSS"') == 0;
+    $match ||= 1 if index($mhead->{'from'}, '"InterScan Notification"') == 0;
     $match ||= 1 if grep { $mhead->{'subject'} eq $_ } @$tryto;
     return undef unless $match;
 
@@ -44,14 +39,13 @@ sub make {
         # to the previous line of the beginning of the original message.
         next unless length $e;
 
-        # Sent <<< RCPT TO:<kijitora@example.co.jp>
-        # Received >>> 550 5.1.1 <kijitora@example.co.jp>... user unknown
         $v = $dscontents->[-1];
-
         if( $e =~ /\A.+[<>]{3}[ \t]+.+[<]([^ ]+[@][^ ]+)[>]\z/ ||
-            $e =~ /\A.+[<>]{3}[ \t]+.+[<]([^ ]+[@][^ ]+)[>]/ ) {
+            $e =~ /\A.+[<>]{3}[ \t]+.+[<]([^ ]+[@][^ ]+)[>]/   ||
+            $e =~ /\A(?:Reason:[ ]+)?Unable[ ]to[ ]deliver[ ]message[ ]to[ ][<](.+)[>]/ ) {
             # Sent <<< RCPT TO:<kijitora@example.co.jp>
             # Received >>> 550 5.1.1 <kijitora@example.co.jp>... user unknown
+            # Unable to deliver message to <kijitora@neko.example.jp>
             my $cr = $1;
             if( $v->{'recipient'} && $cr ne $v->{'recipient'} ) {
                 # There are multiple recipient addresses in the message body.
@@ -59,6 +53,7 @@ sub make {
                 $v = $dscontents->[-1];
             }
             $v->{'recipient'} = $cr;
+            $v->{'diagnosis'} = $e if $e =~ /Unable[ ]to[ ]deliver[ ]/;
             $recipients = scalar @$dscontents;
         }
 
@@ -82,7 +77,7 @@ sub make {
     for my $e ( @$dscontents ) {
         # Set default values if each value is empty.
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
-        $e->{'agent'}  = __PACKAGE__->smtpagent;
+        $e->{'reason'} = 'userunknown' if $e->{'diagnosis'} =~ /Unable[ ]to[ ]deliver/;
     }
     return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
 }
@@ -114,12 +109,6 @@ Sisimai::Message.
 C<description()> returns description string of this module.
 
     print Sisimai::Lhost::InterScanMSS->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::InterScanMSS->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

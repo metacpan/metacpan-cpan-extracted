@@ -5,10 +5,10 @@ use strict;
 use warnings;
 use Encode;
 
-my $Indicators = __PACKAGE__->INDICATORS;
-my $ReBackbone = qr|^-------[ ]Returned[ ]Message[ ]--------|m;
-my $StartingOf = { 'message' => ['------- Failure Reasons '] };
-my $MessagesOf = {
+state $Indicators = __PACKAGE__->INDICATORS;
+state $ReBackbone = qr|^-------[ ]Returned[ ]Message[ ]--------|m;
+state $StartingOf = { 'message' => ['------- Failure Reasons '] };
+state $MessagesOf = {
     'userunknown' => [
         'User not listed in public Name & Address Book',
         'ディレクトリのリストにありません',
@@ -19,16 +19,10 @@ my $MessagesOf = {
 sub description { 'Lotus Notes' }
 sub make {
     # Detect an error from Lotus Notes
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.1.1
     my $class = shift;
     my $mhead = shift // return undef;
@@ -39,13 +33,12 @@ sub make {
     my $emailsteak = Sisimai::RFC5322->fillet($mbody, $ReBackbone);
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
-    my $characters = '';    # (String) Character set name of the bounce mail
     my $removedmsg = 'MULTIBYTE CHARACTERS HAVE BEEN REMOVED';
     my $encodedmsg = '';
     my $v = undef;
 
     # Get character set name, Content-Type: text/plain; charset=ISO-2022-JP
-    $characters = lc $1 if $mhead->{'content-type'} =~ /\A.+;[ ]*charset=(.+)\z/;
+    my $characters = $mhead->{'content-type'} =~ /\A.+;[ ]*charset=(.+)\z/ ? lc $1 : '';
 
     for my $e ( split("\n", $emailsteak->[0]) ) {
         # Read error messages and delivery status lines from the head of the email
@@ -109,7 +102,6 @@ sub make {
     return undef unless $recipients;
 
     for my $e ( @$dscontents ) {
-        $e->{'agent'}     = __PACKAGE__->smtpagent;
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
         $e->{'recipient'} = Sisimai::Address->s3s4($e->{'recipient'});
 
@@ -150,12 +142,6 @@ Methods in the module are called from only Sisimai::Message.
 C<description()> returns description string of this module.
 
     print Sisimai::Lhost::Notes->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::Notes->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

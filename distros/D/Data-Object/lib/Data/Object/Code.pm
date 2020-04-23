@@ -1,170 +1,103 @@
 package Data::Object::Code;
 
-use Try::Tiny;
+use 5.014;
+
+use strict;
+use warnings;
+use routines;
+
+use Carp ();
+use Scalar::Util ();
+
 use Role::Tiny::With;
 
-use Data::Object::Export qw(
-  cast
-  croak
-  load
-);
+use parent 'Data::Object::Kind';
 
-map with($_), my @roles = qw(
-  Data::Object::Role::Detract
-  Data::Object::Role::Dumper
-  Data::Object::Role::Throwable
-);
-
-map with($_), my @rules = qw(
-  Data::Object::Rule::Defined
-);
+with 'Data::Object::Role::Dumpable';
+with 'Data::Object::Role::Proxyable';
+with 'Data::Object::Role::Throwable';
 
 use overload (
-  '""'     => 'data',
-  '~~'     => 'data',
+  '""'     => 'detract',
+  '~~'     => 'detract',
   '&{}'    => 'self',
   fallback => 1
 );
 
-use parent 'Data::Object::Base::Code';
-
-our $VERSION = '0.99'; # VERSION
+our $VERSION = '2.03'; # VERSION
 
 # BUILD
+
+method new($data = sub{}) {
+  if (Scalar::Util::blessed($data)) {
+    $data = $data->detract if $data->can('detract');
+  }
+
+  unless (ref($data) eq 'CODE') {
+    Carp::confess('Instantiation Error: Not a CodeRef');
+  }
+
+  return bless $data, $self;
+}
+
+# PROXY
+
+method build_proxy($package, $method, @args) {
+  my $plugin = $self->plugin($method) or return undef;
+
+  return sub {
+    use Try::Tiny;
+
+    my $is_func = $plugin->package->can('mapping');
+
+    try {
+      my $instance = $plugin->build($is_func ? ($self, @args) : [$self, @args]);
+
+      return $instance->execute;
+    }
+    catch {
+      my $error = $_;
+      my $class = $self->class;
+      my $arity = $is_func ? 'mapping' : 'argslist';
+      my $message = ref($error) ? $error->{message} : "$error";
+      my $signature = "${class}::${method}(@{[join(', ', $plugin->package->$arity)]})";
+
+      Carp::confess("$signature: $error");
+    };
+  };
+}
+
+# PLUGIN
+
+method plugin($name, @args) {
+  my $plugin;
+
+  my $space = $self->space;
+
+  return undef if !$name;
+
+  if ($plugin = eval { $space->child('plugin')->child($name)->load }) {
+
+    return undef unless $plugin->can('argslist');
+
+    return $space->child('plugin')->child($name);
+  }
+
+  if ($plugin = $space->child('func')->child($name)->load) {
+
+    return undef unless $plugin->can('mapping');
+
+    return $space->child('func')->child($name);
+  }
+
+  return undef;
+}
+
 # METHODS
 
-sub self {
-  return shift;
-}
+method self() {
 
-sub roles {
-  return cast([@roles]);
-}
-
-sub rules {
-  return cast([@rules]);
-}
-
-# DISPATCHERS
-
-sub call {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::Code::Call';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub compose {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::Code::Compose';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub conjoin {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::Code::Conjoin';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub curry {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::Code::Curry';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub defined {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::Code::Defined';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub disjoin {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::Code::Disjoin';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub next {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::Code::Next';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
-}
-
-sub rcurry {
-  my ($self, @args) = @_;
-
-  try {
-    my $func = 'Data::Object::Func::Code::Rcurry';
-
-    return cast(load($func)->new($self, @args)->execute);
-  }
-  catch {
-    my $error = $_;
-
-    $self->throw(ref($error) ? $error->message : "$error");
-  };
+  return $self;
 }
 
 1;
@@ -179,28 +112,57 @@ Data::Object::Code
 
 =head1 ABSTRACT
 
-Data-Object Code Class
+Code Class for Perl 5
 
 =cut
 
 =head1 SYNOPSIS
 
+  package main;
+
   use Data::Object::Code;
 
-  my $code = Data::Object::Code->new(sub { shift + 1 });
+  my $code = Data::Object::Code->new(sub { $_[0] + 1 });
 
 =cut
 
 =head1 DESCRIPTION
 
-Data::Object::Code provides routines for operating on Perl 5 code
-references. Code methods work on code references.
+This package provides methods for manipulating code data.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::Kind>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Data::Object::Role::Dumpable>
+
+L<Data::Object::Role::Proxyable>
+
+L<Data::Object::Role::Throwable>
+
+=cut
+
+=head1 LIBRARIES
+
+This package uses type constraints from:
+
+L<Data::Object::Types>
 
 =cut
 
 =head1 METHODS
 
-This package implements the following methods.
+This package implements the following methods:
 
 =cut
 
@@ -208,18 +170,44 @@ This package implements the following methods.
 
   call(Any $arg1) : Any
 
-The call method executes and returns the result of the code. This method returns
-a data type object to be determined after execution.
+The call method executes and returns the result of the code.
 
 =over 4
 
-=item call example
+=item call example #1
 
-  # given sub { (shift // 0) + 1 }
+  my $code = Data::Object::Code->new(sub { ($_[0] // 0) + 1 });
 
   $code->call; # 1
+
+=back
+
+=over 4
+
+=item call example #2
+
+  my $code = Data::Object::Code->new(sub { ($_[0] // 0) + 1 });
+
   $code->call(0); # 1
+
+=back
+
+=over 4
+
+=item call example #3
+
+  my $code = Data::Object::Code->new(sub { ($_[0] // 0) + 1 });
+
   $code->call(1); # 2
+
+=back
+
+=over 4
+
+=item call example #4
+
+  my $code = Data::Object::Code->new(sub { ($_[0] // 0) + 1 });
+
   $code->call(2); # 3
 
 =back
@@ -228,27 +216,22 @@ a data type object to be determined after execution.
 
 =head2 compose
 
-  compose(CodeRef $arg1, Any $arg2) : CodeObject
+  compose(CodeRef $arg1, Any $arg2) : CodeLike
 
 The compose method creates a code reference which executes the first argument
 (another code reference) using the result from executing the code as it's
-argument, and returns a code reference which executes the created code reference
-passing it the remaining arguments when executed. This method returns a
-L<Data::Object::Code> object.
+argument, and returns a code reference which executes the created code
+reference passing it the remaining arguments when executed.
 
 =over 4
 
-=item compose example
+=item compose example #1
 
-  # given sub { [@_] }
+  my $code = Data::Object::Code->new(sub { [@_] });
 
-  $code = $code->compose($code, 1,2,3);
-  $code->(4,5,6); # [[1,2,3,4,5,6]]
+  $code->compose($code, 1,2,3);
 
-  # this can be confusing, here's what's really happening:
-  my $listing = sub {[@_]}; # produces an arrayref of args
-  $listing->($listing->(@args)); # produces a listing within a listing
-  [[@args]] # the result
+  # $code->(4,5,6); # [[1,2,3,4,5,6]]
 
 =back
 
@@ -256,24 +239,25 @@ L<Data::Object::Code> object.
 
 =head2 conjoin
 
-  conjoin(CodeRef $arg1) : CodeObject
+  conjoin(CodeRef $arg1) : CodeLike
 
 The conjoin method creates a code reference which execute the code and the
 argument in a logical AND operation having the code as the lvalue and the
-argument as the rvalue. This method returns a L<Data::Object::Code> object.
+argument as the rvalue.
 
 =over 4
 
-=item conjoin example
+=item conjoin example #1
 
-  # given sub { $_[0] % 2 }
+  my $code = Data::Object::Code->new(sub { $_[0] % 2 });
 
   $code = $code->conjoin(sub { 1 });
-  $code->(0); # 0
-  $code->(1); # 1
-  $code->(2); # 0
-  $code->(3); # 1
-  $code->(4); # 0
+
+  # $code->(0); # 0
+  # $code->(1); # 1
+  # $code->(2); # 0
+  # $code->(3); # 1
+  # $code->(4); # 0
 
 =back
 
@@ -281,20 +265,20 @@ argument as the rvalue. This method returns a L<Data::Object::Code> object.
 
 =head2 curry
 
-  curry(CodeRef $arg1) : CodeObject
+  curry(CodeRef $arg1) : CodeLike
 
 The curry method returns a code reference which executes the code passing it
-the arguments and any additional parameters when executed. This method returns a
-L<Data::Object::Code> object.
+the arguments and any additional parameters when executed.
 
 =over 4
 
-=item curry example
+=item curry example #1
 
-  # given sub { [@_] }
+  my $code = Data::Object::Code->new(sub { [@_] });
 
   $code = $code->curry(1,2,3);
-  $code->(4,5,6); # [1,2,3,4,5,6]
+
+  # $code->(4,5,6); # [1,2,3,4,5,6]
 
 =back
 
@@ -302,17 +286,16 @@ L<Data::Object::Code> object.
 
 =head2 defined
 
-  defined() : NumObject
+  defined() : Num
 
 The defined method returns true if the object represents a value that meets the
-criteria for being defined, otherwise it returns false. This method returns a
-L<Data::Object::Number> object.
+criteria for being defined, otherwise it returns false.
 
 =over 4
 
-=item defined example
+=item defined example #1
 
-  # given $code
+  my $code = Data::Object::Code->new;
 
   $code->defined; # 1
 
@@ -326,20 +309,21 @@ L<Data::Object::Number> object.
 
 The disjoin method creates a code reference which execute the code and the
 argument in a logical OR operation having the code as the lvalue and the
-argument as the rvalue. This method returns a L<Data::Object::Code> object.
+argument as the rvalue.
 
 =over 4
 
-=item disjoin example
+=item disjoin example #1
 
-  # given sub { $_[0] % 2 }
+  my $code = Data::Object::Code->new(sub { $_[0] % 2 });
 
   $code = $code->disjoin(sub { -1 });
-  $code->(0); # -1
-  $code->(1); #  1
-  $code->(2); # -1
-  $code->(3); #  1
-  $code->(4); # -1
+
+  # $code->(0); # -1
+  # $code->(1); #  1
+  # $code->(2); # -1
+  # $code->(3); #  1
+  # $code->(4); # -1
 
 =back
 
@@ -350,15 +334,15 @@ argument as the rvalue. This method returns a L<Data::Object::Code> object.
   next(Any $arg1) : Any
 
 The next method is an alias to the call method. The naming is especially useful
-(i.e. helps with readability) when used with closure-based iterators. This
-method returns a L<Data::Object::Code> object. This method is an alias to the
-call method.
+(i.e. helps with readability) when used with closure-based iterators.
 
 =over 4
 
-=item next example
+=item next example #1
 
-  $code->next;
+  my $code = Data::Object::Code->new(sub { $_[0] * 2 });
+
+  $code->next(72); # 144
 
 =back
 
@@ -366,108 +350,49 @@ call method.
 
 =head2 rcurry
 
-  rcurry(Any $arg1) : CodeObject
+  rcurry(Any $arg1) : CodeLike
 
 The rcurry method returns a code reference which executes the code passing it
-the any additional parameters and any arguments when executed. This method
-returns a L<Data::Object::Code> object.
+the any additional parameters and any arguments when executed.
 
 =over 4
 
-=item rcurry example
+=item rcurry example #1
 
-  # given sub { [@_] }
+  my $code = Data::Object::Code->new(sub { [@_] });
 
   $code = $code->rcurry(1,2,3);
-  $code->(4,5,6); # [4,5,6,1,2,3]
+
+  # $code->(4,5,6); # [4,5,6,1,2,3]
 
 =back
 
 =cut
 
-=head2 roles
+=head1 AUTHOR
 
-  roles() : ArrayRef
+Al Newkirk, C<awncorp@cpan.org>
 
-The roles method returns the list of roles attached to object. This method
-returns a L<Data::Object::Array> object.
+=head1 LICENSE
 
-=over 4
+Copyright (C) 2011-2019, Al Newkirk, et al.
 
-=item roles example
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the L<"license
+file"|https://github.com/iamalnewkirk/foobar/blob/master/LICENSE>.
 
-  # given $code
+=head1 PROJECT
 
-  $code->roles;
+L<Wiki|https://github.com/iamalnewkirk/foobar/wiki>
 
-=back
+L<Project|https://github.com/iamalnewkirk/foobar>
 
-=cut
+L<Initiatives|https://github.com/iamalnewkirk/foobar/projects>
 
-=head2 rules
+L<Milestones|https://github.com/iamalnewkirk/foobar/milestones>
 
-  rules() : ArrayRef
+L<Contributing|https://github.com/iamalnewkirk/foobar/blob/master/CONTRIBUTE.md>
 
-The rules method returns consumed rules.
-
-=over 4
-
-=item rules example
-
-  my $rules = $code->rules();
-
-=back
+L<Issues|https://github.com/iamalnewkirk/foobar/issues>
 
 =cut
-
-=head2 self
-
-  self() : Object
-
-The self method returns the calling object (noop).
-
-=over 4
-
-=item self example
-
-  my $self = $code->self();
-
-=back
-
-=cut
-
-=head1 ROLES
-
-This package inherits all behavior from the folowing role(s):
-
-=cut
-
-=over 4
-
-=item *
-
-L<Data::Object::Role::Detract>
-
-=item *
-
-L<Data::Object::Role::Dumper>
-
-=item *
-
-L<Data::Object::Role::Throwable>
-
-=back
-
-=head1 RULES
-
-This package adheres to the requirements in the folowing rule(s):
-
-=cut
-
-=over 4
-
-=item *
-
-L<Data::Object::Rule::Defined>
-
-=back

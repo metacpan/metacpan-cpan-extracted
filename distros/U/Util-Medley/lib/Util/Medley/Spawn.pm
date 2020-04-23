@@ -1,5 +1,5 @@
 package Util::Medley::Spawn;
-$Util::Medley::Spawn::VERSION = '0.028';
+$Util::Medley::Spawn::VERSION = '0.029';
 ###############################################################################
 
 use Modern::Perl;
@@ -18,7 +18,7 @@ Util::Medley::Spawn - utility methods for system commands
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 SYNOPSIS
 
@@ -84,58 +84,61 @@ is 0.
 
 =cut
 
-multi method capture (ArrayRef|Str :$cmd!,
-					  ArrayRef|Str :$stdin,
-					  Bool         :$wantArrayRef) {
+multi method capture(
+	ArrayRef|Str :$cmd !,
+	ArrayRef|Str :$stdin,
+	        Bool :$wantArrayRef
+  )
+{
 
-	my $msg;
-	if (ref($cmd) eq 'ARRAY') {
-		$msg = join(' ', @$cmd);
+	my $cmdStr;
+	if ( ref($cmd) eq 'ARRAY' ) {
+		$cmdStr = join( ' ', @$cmd );
 	}
 	else {
-		$msg = $cmd;	
+		$cmdStr = $cmd;
 	}
-	
-	$self->Logger->verbose($msg);
+
+	$self->Logger->verbose($cmdStr);
 
 	my ( $stdout, $stderr, $exit );
-					 		
 	my $rc = run3 $cmd, \$stdin, \$stdout, \$stderr;
-	
+
 	$exit = $? >> 8;
 	if ( !$rc or $exit ) {
 		if ( $self->confessOnError ) {
 			my $msg =
 			  sprintf
 			  "run3 failed for cmd: exit=%s cmd='%s' stdout='%s' stderr='%s'",
-			  $exit,
-			  join( ' ', @$cmd ), $stdout, $stderr;
-			  
+			  $exit, $cmdStr, $stdout, $stderr;
+
 			confess $msg;
 		}
 	}
 
 	chomp $stdout;
 	chomp $stderr;
-	
+
 	if ($wantArrayRef) {
-		return ([ split(/\n/, $stdout) ], [ split(/\n/, $stderr) ], $exit);		
+		return ( [ split( /\n/, $stdout ) ], [ split( /\n/, $stderr ) ],
+			$exit );
 	}
-	
+
 	return ( $stdout, $stderr, $exit );
 }
 
-multi method capture (ArrayRef|Str $cmd,
-					  ArrayRef|Str $stdin?) {
-	
+multi method capture(ArrayRef|Str $cmd, 
+                     ArrayRef|Str $stdin
+	? )
+{
+
 	my %a;
-	$a{cmd} = $cmd;
+	$a{cmd}   = $cmd;
 	$a{stdin} = $stdin if $stdin;
-	
+
 	return $self->capture(%a);
 }
 
-					  					  	
 =head2 spawn
 
 Executes system command and returns the exit value.  Will write to log 
@@ -163,7 +166,7 @@ System command to invoke.  Can be an arrayref or a string.
 
 =cut
 
-multi method spawn (ArrayRef|Str :$cmd!) {
+multi method spawn(ArrayRef|Str :$cmd! ) {
 
 	if ( ref($cmd) eq 'ARRAY' ) {
 		$self->Logger->verbose( join( ' ', @$cmd ) );
@@ -184,9 +187,9 @@ multi method spawn (ArrayRef|Str :$cmd!) {
 	return $exit;
 }
 
-multi method spawn (ArrayRef|Str $cmd) {
+multi method spawn(ArrayRef|Str $cmd) {
 
-	return $self->spawn(cmd => $cmd);	
+	return $self->spawn( cmd => $cmd );
 }
 
 ##############################################

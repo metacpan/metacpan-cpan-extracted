@@ -22,7 +22,8 @@ my %WriteMakefileArgs = (
   "NAME" => "App::diffdb",
   "PREREQ_PM" => {
     "DBI" => 0,
-    "DBIx::Diff::Schema" => "0.093",
+    "DBIx::Diff::Schema" => "0.094",
+    "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::obj" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
@@ -44,7 +45,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,7 +54,8 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "DBI" => 0,
-  "DBIx::Diff::Schema" => "0.093",
+  "DBIx::Diff::Schema" => "0.094",
+  "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::obj" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
   "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,

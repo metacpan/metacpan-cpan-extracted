@@ -7,7 +7,7 @@ use MIME::Base64 ();
 use MIME::QuotedPrint ();
 use Sisimai::String;
 
-my $ReE = {
+state $ReE = {
     '7bit-encoded' => qr/^content-transfer-encoding:[ ]*7bit/m,
     'quoted-print' => qr/^content-transfer-encoding:[ ]*quoted-printable/m,
     'some-iso2022' => qr/^content-type:[ ]*.+;[ ]*charset=["']?(iso-2022-[-a-z0-9]+)['"]?\b/m,
@@ -15,12 +15,6 @@ my $ReE = {
     'only-charset' => qr/^[\s\t]+charset=['"]?([-0-9a-z]+)['"]?\b/,
     'html-message' => qr|^content-type:[ ]*text/html;|m,
 };
-
-sub patterns {
-  # Make MIME-Encoding and Content-Type related headers regurlar expression
-  # @return   [Array] Regular expressions related to MIME encoding
-  return $ReE;
-}
 
 sub is_mimeencoded {
     # Check that the argument is MIME-Encoded string or not
@@ -198,11 +192,10 @@ sub base64d {
     # @return   [String]         MIME-Decoded text
     my $class = shift;
     my $argv1 = shift // return undef;
-    my $plain = undef;
     return \'' unless ref $argv1 eq 'SCALAR';
 
     # Decode BASE64
-    $plain = MIME::Base64::decode($1) if $$argv1 =~ m|([+/=0-9A-Za-z\r\n]+)|;
+    my $plain = $$argv1 =~ m|([+/=0-9A-Za-z\r\n]+)| ? MIME::Base64::decode($1) : '';
     return \$plain;
 }
 
@@ -269,18 +262,17 @@ sub breaksup {
         # Content-Type: multipart/*
         my $mpboundary = __PACKAGE__->boundary($upperchunk, 0);
         my @innerparts = split(/\Q$mpboundary\E\n/, $lowerchunk);
-
         shift @innerparts unless length $innerparts[0];
+        shift @innerparts if $innerparts[0] eq "\n";
+
         for my $e ( @innerparts ) {
             # Find internal multipart/* blocks and decode
             if( $e =~ $thisformat ) {
                 # Found Content-Type field at the first or second line of this
-                # splitted part
+                # split part
                 my $nextformat = lc $1;
-
                 next unless $nextformat =~ $leavesonly;
                 next if $nextformat eq 'text/html';
-
                 $hasflatten .= ${ __PACKAGE__->breaksup(\$e, $mimeformat) };
 
             } else {
@@ -369,8 +361,8 @@ sub makeflat {
     # Some bounce messages include lower-cased "content-type:" field such as
     #   content-type: message/delivery-status
     #   content-transfer-encoding: quoted-printable
-    $$argv1 =~ s/[Cc]ontent-[Tt]ype:/Content-Type:/gm;
-    $$argv1 =~ s/[Cc]ontent-[Tt]ransfer-[Ee]ncodeing:/Content-Transfer-Encoding:/gm;
+    $$argv1 =~ s/[Cc]ontent-[Tt]ype:/Content-Type:/g;
+    $$argv1 =~ s/[Cc]ontent-[Tt]ransfer-[Ee]ncodeing:/Content-Transfer-Encoding:/g;
 
     # 1. Some bounce messages include upper-cased "Content-Transfer-Encoding",
     #    and "Content-Type" value such as
@@ -380,9 +372,8 @@ sub makeflat {
     $$argv1 =~ s/(Content-[A-Za-z-]+?):[ ]*([^\s]+)/$1.': '.lc($2)/eg;
     $$argv1 =~ s/^Content-(?:Description|Disposition):.+?\n//gm;
 
-    my @multiparts = split(/\Q$ehboundary\E\n/, $$argv1);
+    my @multiparts = split(/\Q$ehboundary\E\n?/, $$argv1);
     shift @multiparts unless length $multiparts[0];
-
     for my $e ( @multiparts ) {
         # Find internal multipart blocks and decode
         XCCT: {
@@ -393,10 +384,15 @@ sub makeflat {
             #   Message-ID: ...
             #   Content-Transfer-Encoding: quoted-printable
             #   Content-Type: text/plain; charset=us-ascii
-            last(XCCT) if $e =~ /\AContent-T[ry]/;
+            #
+            # Fields before "Content-Type:" in each part should have been removed
+            # and "Content-Type:" should be exist at the first line of each part.
+            # The field works as a delimiter to decode contents of each part.
+            #
+            last(XCCT) if $e =~ /\AContent-T[ry]/;  # The first field is "Content-Type:"
             my $p = $1 if $e =~ /\A(.+?)Content-Type:/s || last(XCCT);
-            last(XCCT) if $p =~ /\n\n/;
-            $e =~ s/\A.+?(Content-T[ry].+)\z/$1/s;
+            last(XCCT) if $p =~ /\n\n/m;            # There is no field before "Content-Type:"
+            $e =~ s/\A.+?(Content-T[ry].+)\z/$1/s;  # Remove fields before "Content-Type:"
         }
 
         if( $e =~ /\A(?:Content-[A-Za-z-]+:.+?\r?\n)?Content-Type:[ ]*[^\s]+/ ) {
@@ -513,7 +509,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016,2018-2019 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2016,2018-2020 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

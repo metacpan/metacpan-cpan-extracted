@@ -7,7 +7,7 @@ use 5.006;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Partition a musical duration",
+  "ABSTRACT" => "Partition a musical duration into rhythmic phrases",
   "AUTHOR" => "Gene Boggs <gene\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0502",
+  "VERSION" => "0.0504",
   "test" => {
     "TESTS" => "t/*.t"
   }

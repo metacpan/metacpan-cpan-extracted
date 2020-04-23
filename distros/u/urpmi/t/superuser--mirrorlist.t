@@ -26,4 +26,9 @@ urpmi_removemedia('core');
 
 urpmi_addmedia('--distrib --mirrorlist \$MIRRORLIST');
 is(run_urpm_cmd('urpmq sed'), "sed\n", "is sed available");
+if ($ENV{AUTHOR_TESTING}) {
+    my $name = 'perl-XML-LibXML';
+    urpmi("--auto $name");
+    is(`rpm -q --qf '%{name}' --root $::pwd/root $name`, $name, "$name is installed");
+}
 urpmi_removemedia('-a');

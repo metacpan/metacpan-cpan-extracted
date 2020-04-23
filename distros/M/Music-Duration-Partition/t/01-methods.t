@@ -80,4 +80,14 @@ isa_ok $mdp, 'Music::Duration::Partition';
 $got = $mdp->motif;
 is_deeply $got, [qw/ qn qn qn qn /], 'motif';
 
+$mdp = Music::Duration::Partition->new(
+    pool    => [qw/ hn qn /],
+    weights => [ 1, 1, 1 ],
+);
+isa_ok $mdp, 'Music::Duration::Partition';
+
+throws_ok { $mdp->motif }
+    qr/Number of values must equal number of weights/,
+    'wrong pool weight';
+
 done_testing();

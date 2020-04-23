@@ -5,7 +5,7 @@ use lib qw(./lib ./blib/lib);
 require './t/600-lhost-code';
 
 my $enginename = 'Sendmail';
-my $samplepath = sprintf("./set-of-emails/private/email-%s", lc $enginename);
+my $samplepath = sprintf("./set-of-emails/private/lhost-%s", lc $enginename);
 my $enginetest = Sisimai::Lhost::Code->maketest;
 my $isexpected = [
     { 'n' => '01001', 'r' => qr/suspend/        },
@@ -223,7 +223,6 @@ my $isexpected = [
     { 'n' => '01216', 'r' => qr/userunknown/    },
     { 'n' => '01217', 'r' => qr/blocked/        },
     { 'n' => '01218', 'r' => qr/blocked/        },
-    { 'n' => '01219', 'r' => qr/userunknown/    },
 ];
 
 plan 'skip_all', sprintf("%s not found", $samplepath) unless -d $samplepath;

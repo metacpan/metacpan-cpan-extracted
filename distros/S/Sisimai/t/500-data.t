@@ -18,7 +18,7 @@ MAKE_TEST: {
     is $PackageName->make, undef;
     is $PackageName->new, undef;
 
-    my $file = './set-of-emails/maildir/bsd/email-sendmail-03.eml';
+    my $file = './set-of-emails/maildir/bsd/lhost-sendmail-03.eml';
     my $mail = Sisimai::Mail->new($file);
     my $mesg = undef;
     my $data = undef;
@@ -37,9 +37,9 @@ MAKE_TEST: {
         return $catch;
     };
 
-    while( my $r = $mail->read ){ 
+    while( my $r = $mail->data->read ){ 
         $mesg = Sisimai::Message->new('data' => $r, 'hook' => $call); 
-        $data = Sisimai::Data->make('data' => $mesg); 
+        $data = Sisimai::Data->make('data' => $mesg, 'origin' => $mail->data->path); 
         isa_ok $data, 'ARRAY';
 
         for my $e ( @$data ) {
@@ -73,7 +73,7 @@ MAKE_TEST: {
             ok length $e->messageid, 'messageid = '.$e->messageid;
             like $e->messageid, qr/\A.+[@].+/, 'messageid = '.$e->messageid;
 
-            is $e->smtpagent, 'Email::Sendmail', 'smtpagent = '.$e->smtpagent;
+            is $e->smtpagent, 'Sendmail', 'smtpagent = '.$e->smtpagent;
             is $e->smtpcommand, 'DATA', 'smtpcommand = '.$e->smtpcommand;
 
             ok length $e->diagnosticcode, 'diagnosticcode = '.$e->diagnosticcode;
@@ -89,6 +89,7 @@ MAKE_TEST: {
 
             ok defined $e->feedbacktype, 'feedbacktype = '.$e->feedbacktype;
             ok defined $e->action, 'action = '.$e->action;
+            is $e->origin, $file, 'origin = '.$e->origin;
 
             isa_ok $e->catch, 'HASH';
             is $e->catch->{'type'}, 'email';
@@ -101,14 +102,14 @@ MAKE_TEST: {
         }
     }
 
-    $file = './set-of-emails/maildir/bsd/email-sendmail-04.eml';
+    $file = './set-of-emails/maildir/bsd/lhost-sendmail-04.eml';
     $mail = Sisimai::Mail->new($file);
     $list = { 
         'recipient' => ['X-Failed-Recipient', 'To'],
         'addresser' => ['Return-Path', 'From', 'X-Envelope-From'],
     };
 
-    WITH_ORDER: while( my $r = $mail->read ){ 
+    WITH_ORDER: while( my $r = $mail->data->read ){ 
         $mesg = Sisimai::Message->new('data' => $r); 
         $data = Sisimai::Data->make('data' => $mesg, 'order' => $list); 
         isa_ok $data, 'ARRAY';
@@ -149,7 +150,7 @@ MAKE_TEST: {
             ok length $e->messageid, 'messageid = '.$e->messageid;
             unlike $e->messageid, qr/[ ]/, '->messageid = '.$e->messageid;
 
-            is $e->smtpagent, 'Email::Sendmail', 'smtpagent = '.$e->smtpagent;
+            is $e->smtpagent, 'Sendmail', 'smtpagent = '.$e->smtpagent;
             is $e->smtpcommand, 'MAIL', 'smtpcommand = '.$e->smtpcommand;
 
             ok length $e->diagnosticcode, 'diagnosticcode = '.$e->diagnosticcode;
@@ -169,7 +170,7 @@ MAKE_TEST: {
     IS_NOT_A_BOUNCE: for my $e ( @$file ) {
         $mail = Sisimai::Mail->new($e);
 
-        NOT_BOUNCE: while( my $r = $mail->read ){ 
+        NOT_BOUNCE: while( my $r = $mail->data->read ){ 
             $mesg = Sisimai::Message->new('data' => $r); 
             is $mesg, undef;
         }

@@ -1,9 +1,9 @@
 package Music::Duration::Partition;
 our $AUTHORITY = 'cpan:GENE';
 
-# ABSTRACT: Partition a musical duration
+# ABSTRACT: Partition a musical duration into rhythmic phrases
 
-our $VERSION = '0.0502';
+our $VERSION = '0.0504';
 
 use Moo;
 use strictures 2;
@@ -147,11 +147,11 @@ __END__
 
 =head1 NAME
 
-Music::Duration::Partition - Partition a musical duration
+Music::Duration::Partition - Partition a musical duration into rhythmic phrases
 
 =head1 VERSION
 
-version 0.0502
+version 0.0504
 
 =head1 SYNOPSIS
 
@@ -187,9 +187,9 @@ version 0.0502
 
 =head1 DESCRIPTION
 
-C<Music::Duration::Partition> partitions a musical duration, given by
-the B<size>, into smaller durations drawn from the B<pool> of possible
-durations.
+C<Music::Duration::Partition> partitions a musical duration into
+rhythmic phrases, given by the B<size>, into smaller durations drawn
+from the B<pool> of possible durations.
 
 =head1 ATTRIBUTES
 
@@ -205,15 +205,16 @@ Default: C<%MIDI::Simple::Length>
 
   $size = $mdp->size;
 
-The value of the duration to partition.
+The value, in quarter notes, of the duration to partition.
 
-Default: C<4> (4 quarter notes = 1 whole note)
+Default: C<4>
 
 =head2 pool
 
   $pool = $mdp->pool;
 
-The list of possible note durations to use in constructing a motif.
+The list of possible note durations to use in constructing a rhythmic
+motif.
 
 Default: C<[ keys %MIDI::Simple::Length ]> (wn, hn, qn, ...)
 
@@ -235,7 +236,9 @@ Default: Random item from B<pool>
 
   $weights = $mdp->weights;
 
-Specification of the frequency of pool selection.
+Specification of the frequency of pool item selection.
+
+The number of weights must equal number of pool entries.
 
 Default: Equal probability for each pool entry
 

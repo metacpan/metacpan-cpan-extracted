@@ -5,10 +5,10 @@ use lib qw(./lib ./blib/lib);
 require './t/600-lhost-code';
 
 my $enginename = 'Office365';
-my $samplepath = sprintf("./set-of-emails/private/email-%s", lc $enginename);
+my $samplepath = sprintf("./set-of-emails/private/lhost-%s", lc $enginename);
 my $enginetest = Sisimai::Lhost::Code->maketest;
 my $isexpected = [
-    { 'n' => '01001', 'r' => qr/filtered/      },
+    { 'n' => '01001', 'r' => qr/userunknown/   },
     { 'n' => '01002', 'r' => qr/userunknown/   },
     { 'n' => '01003', 'r' => qr/userunknown/   },
     { 'n' => '01004', 'r' => qr/userunknown/   },
@@ -25,6 +25,9 @@ my $isexpected = [
     { 'n' => '01015', 'r' => qr/userunknown/   },
     { 'n' => '01016', 'r' => qr/userunknown/   },
     { 'n' => '01017', 'r' => qr/mailboxfull/   },
+    { 'n' => '01018', 'r' => qr/userunknown/   },
+    { 'n' => '01019', 'r' => qr/userunknown/   },
+    { 'n' => '01020', 'r' => qr/userunknown/   },
 ];
 
 plan 'skip_all', sprintf("%s not found", $samplepath) unless -d $samplepath;

@@ -4,46 +4,39 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $ReBackbone = qr|^Original[ ]message[ ]follows[.]|m;
-my $StartingOf = { 'error' => ['Body of message generated response:'] };
+state $ReBackbone = qr|^Original[ ]message[ ]follows[.]|m;
+state $StartingOf = { 'error' => ['Body of message generated response:'] };
 
-my $ReSMTP = {
+state $ReSMTP = {
     'conn' => qr/(?:SMTP connection failed,|Unexpected connection response from server:)/,
     'ehlo' => qr|Unexpected response to EHLO/HELO:|,
     'mail' => qr|Server response to MAIL FROM:|,
     'rcpt' => qr|Additional RCPT TO generated following response:|,
     'data' => qr|DATA command generated response:|,
 };
-my $ReFailures = {
-    'hostunknown' => qr/Unknown host/,
-    'userunknown' => qr/\A(?:Unknown user|Invalid final delivery userid)/,
-    'mailboxfull' => qr/\AUser mailbox exceeds allowed size/,
-    'securityerr' => qr/\ARequested action not taken: virus detected/,
-    'undefined'   => qr/\Aundeliverable to/,
-    'expired'     => qr/\ADelivery failed \d+ attempts/,
+state $ReFailures = {
+    'hostunknown'   => qr/Unknown host/,
+    'userunknown'   => qr/\A(?:Unknown user|Invalid final delivery userid)/,
+    'mailboxfull'   => qr/\AUser mailbox exceeds allowed size/,
+    'securityerror' => qr/\ARequested action not taken: virus detected/,
+    'undefined'     => qr/\Aundeliverable to/,
+    'expired'       => qr/\ADelivery failed \d+ attempts/,
 };
 
-# X-Mailer: <SMTP32 v8.22>
-sub headerlist  { return ['x-mailer'] }
 sub description { 'IPSWITCH IMail Server' }
 sub make {
     # Detect an error from IMailServer
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.1.1
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
     my $match = 0;
 
+    # X-Mailer: <SMTP32 v8.22>
     $match ||= 1 if $mhead->{'subject'} =~ /\AUndeliverable Mail[ ]*\z/;
     $match ||= 1 if defined $mhead->{'x-mailer'} && index($mhead->{'x-mailer'}, '<SMTP32 v') == 0;
     return undef unless $match;
@@ -93,8 +86,6 @@ sub make {
     return undef unless $recipients;
 
     for my $e ( @$dscontents ) {
-        $e->{'agent'} = __PACKAGE__->smtpagent;
-
         if( exists $e->{'alterrors'} && $e->{'alterrors'} ) {
             # Copy alternative error message
             $e->{'diagnosis'} = $e->{'alterrors'}.' '.$e->{'diagnosis'};
@@ -146,12 +137,6 @@ Sisimai::Message.
 C<description()> returns description string of this module.
 
     print Sisimai::Lhost::IMailServer->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::IMailServer->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

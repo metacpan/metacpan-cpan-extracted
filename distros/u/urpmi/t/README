@@ -1,4 +1,20 @@
+The tests are running the follwing way:
+
+01compile.t	ensures everything is valid perl
+02create_pkgs.t	builds the various RPMs needed by the others tests
+cfg.t		tests reading/writing the config files
+pod.t		check for POD errors in files (optional)
+
 you need to be root to run superuser--*.t,
 with a normal user those tests are simply skipped.
+
+They actually test both urpmi _and_ *rpm* extensively.
+It had often find regressions in rpm itself that rpm's own testsuite didn't found.
+
+superuser--file-conflicts.t runs only some patches on Mageia due to having a
+downstream patch there
+
+superuser--mirrorlist.t will only be run on Mageia as it needs a specific patch
+that introduces Time::ZoneInfo->current_zone()
 
 use "make testall"

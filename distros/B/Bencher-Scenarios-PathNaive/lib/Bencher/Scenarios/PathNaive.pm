@@ -1,9 +1,9 @@
 package Bencher::Scenarios::PathNaive;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-10'; # DATE
+our $DATE = '2020-02-12'; # DATE
 our $DIST = 'Bencher-Scenarios-PathNaive'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Benchmark Path::Naive
@@ -20,7 +20,7 @@ Bencher::Scenarios::PathNaive - Benchmark Path::Naive
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenarios::PathNaive (from Perl distribution Bencher-Scenarios-PathNaive), released on 2020-02-10.
+This document describes version 0.002 of Bencher::Scenarios::PathNaive (from Perl distribution Bencher-Scenarios-PathNaive), released on 2020-02-12.
 
 =head1 DESCRIPTION
 
@@ -28,7 +28,11 @@ This distribution contains the following L<Bencher> scenario modules:
 
 =over
 
+=item * L<Bencher::Scenario::PathNaive::abs_path>
+
 =item * L<Bencher::Scenario::PathNaive::split_path>
+
+=item * L<Bencher::Scenario::PathNaive::rel_path>
 
 =item * L<Bencher::Scenario::PathNaive::concat_path>
 

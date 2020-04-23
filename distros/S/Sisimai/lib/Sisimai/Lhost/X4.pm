@@ -4,10 +4,10 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Indicators = __PACKAGE__->INDICATORS;
-my $ReBackbone = qr/^---[ ](?:Below this line is a copy of the message|Original message follows)[.]/m;
-my $StartingOf = { 'error'  => ['Remote host said:'] };
-my $MarkingsOf = {
+state $Indicators = __PACKAGE__->INDICATORS;
+state $ReBackbone = qr/^---[ ](?:Below this line is a copy of the message|Original message follows)[.]/m;
+state $StartingOf = { 'error'  => ['Remote host said:'] };
+state $MarkingsOf = {
     #  qmail-remote.c:248|    if (code >= 500) {
     #  qmail-remote.c:249|      out("h"); outhost(); out(" does not like recipient.\n");
     #  qmail-remote.c:265|  if (code >= 500) quit("D"," failed on DATA command");
@@ -36,7 +36,7 @@ my $MarkingsOf = {
     }x,
 };
 
-my $ReSMTP = {
+state $ReSMTP = {
     # Error text regular expressions which defined in qmail-remote.c
     # qmail-remote.c:225|  if (smtpcode() != 220) quit("ZConnected to "," but greeting failed");
     'conn' => qr/(?:Error:)?Connected to .+ but greeting failed[.]/,
@@ -59,7 +59,7 @@ my $ReSMTP = {
         )
     }x,
 };
-my $ReHost = qr{(?:
+state $ReHost = qr{(?:
     # qmail-remote.c:261|  if (!flagbother) quit("DGiving up on ","");
      Giving[ ]up[ ]on[ ](.+[0-9a-zA-Z])[.]?\z
     |Connected[ ]to[ ]([-0-9a-zA-Z.]+[0-9a-zA-Z])[ ]
@@ -68,11 +68,11 @@ my $ReHost = qr{(?:
 }x;
 
 # qmail-send.c:922| ... (&dline[c],"I'm not going to try again; this message has been in the queue too long.\n")) nomem();
-my $HasExpired = 'this message has been in the queue too long.';
+state $HasExpired = 'this message has been in the queue too long.';
 # qmail-remote-fallback.patch
-my $ReCommands = qr/Sorry,[ ]no[ ]SMTP[ ]connection[ ]got[ ]far[ ]enough;[ ]most[ ]progress[ ]was[ ]([A-Z]{4})[ ]/x;
-my $ReIsOnHold = qr/\A[^ ]+ does not like recipient[.][ \t]+.+this message has been in the queue too long[.]\z/;
-my $FailOnLDAP = {
+state $ReCommands = qr/Sorry,[ ]no[ ]SMTP[ ]connection[ ]got[ ]far[ ]enough;[ ]most[ ]progress[ ]was[ ]([A-Z]{4})[ ]/x;
+state $ReIsOnHold = qr/\A[^ ]+ does not like recipient[.][ \t]+.+this message has been in the queue too long[.]\z/;
+state $FailOnLDAP = {
     # qmail-ldap-1.03-20040101.patch:19817 - 19866
     'suspend'     => ['Mailaddress is administrative?le?y disabled'],   # 5.2.1
     'userunknown' => ['Sorry, no mailbox here by that name'],           # 5.1.1
@@ -91,7 +91,7 @@ my $FailOnLDAP = {
         'Unable to login into LDAP server, bad credentials',# 4.4.3
     ],
 };
-my $MessagesOf = {
+state $MessagesOf = {
     # qmail-local.c:589|  strerr_die1x(100,"Sorry, no mailbox here by that name. (#5.1.1)");
     # qmail-remote.c:253|  out("s"); outhost(); out(" does not like recipient.\n");
     'userunknown' => [
@@ -122,16 +122,10 @@ my $MessagesOf = {
 sub description { 'Unknown MTA #4 qmail clones' }
 sub make {
     # Detect an error from Unknown MTA #4, qmail clones
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.1.23
     my $class = shift;
     my $mhead = shift // return undef;
@@ -257,7 +251,6 @@ sub make {
             }
         }
         $e->{'command'} ||= '';
-        $e->{'agent'}  = __PACKAGE__->smtpagent;
     }
     return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
 }
@@ -288,12 +281,6 @@ clone. Methods in the module are called from only Sisimai::Message.
 C<description()> returns description string of this module.
 
     print Sisimai::Lhost::X4->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::X4->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

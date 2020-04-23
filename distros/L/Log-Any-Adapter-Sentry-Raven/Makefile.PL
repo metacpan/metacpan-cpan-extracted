@@ -16,6 +16,8 @@ my %WriteMakefileArgs = (
   "LICENSE" => "artistic_2",
   "NAME" => "Log::Any::Adapter::Sentry::Raven",
   "PREREQ_PM" => {
+    "Devel::StackTrace" => 0,
+    "Devel::StackTrace::Extract" => 0,
     "Log::Any::Adapter::Base" => "1.708",
     "Log::Any::Adapter::Util" => 0,
     "Sentry::Raven" => 0
@@ -30,11 +32,9 @@ my %WriteMakefileArgs = (
     "Log::Any::Adapter" => 0,
     "Test::Fatal" => 0,
     "Test::MockObject" => 0,
-    "Test::More" => 0,
-    "Test::Needs" => 0,
-    "Test::Without::Module" => 0
+    "Test::More" => 0
   },
-  "VERSION" => "v0.0.2",
+  "VERSION" => "v0.0.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,6 +43,8 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Capture::Tiny" => 0,
+  "Devel::StackTrace" => 0,
+  "Devel::StackTrace::Extract" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
@@ -54,9 +56,7 @@ my %FallbackPrereqs = (
   "Sentry::Raven" => 0,
   "Test::Fatal" => 0,
   "Test::MockObject" => 0,
-  "Test::More" => 0,
-  "Test::Needs" => 0,
-  "Test::Without::Module" => 0
+  "Test::More" => 0
 );
 
 

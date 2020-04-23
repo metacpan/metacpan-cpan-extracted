@@ -1,6 +1,7 @@
 =encoding utf8
 
 =for comment POD_DERIVED_INDEX_GENERATED
+
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with OpenTracing::Span
 at lib/OpenTracing/Span.pm
@@ -51,10 +52,6 @@ The operation that this span represents.
 =head2 tags
 
 The tags relating to this span.
-
-=head2 batch
-
-The L<OpenTracing::Batch> instance that this span belongs to.
 
 =head2 tag_list
 

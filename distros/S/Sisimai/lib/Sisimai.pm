@@ -2,7 +2,7 @@ package Sisimai;
 use feature ':5.10';
 use strict;
 use warnings;
-use version; our $VERSION = version->declare('v4.25.5'); our $PATCHLV = 0;
+use version; our $VERSION = version->declare('v4.25.6'); our $PATCHLV = 0;
 
 sub version { return substr($VERSION->stringify, 1).($PATCHLV > 0 ? 'p'.$PATCHLV : '') }
 sub sysname { 'bouncehammer' }
@@ -16,16 +16,11 @@ sub make {
     # @param         [Hash]    argv1      Parser options
     # @options argv1 [Integer] delivered  1 = Including "delivered" reason
     # @options argv1 [Code]    hook       Code reference to a callback method
-    # @options argv1 [Array]   field      Email header names to be captured
     # @return        [Array]              Parsed objects
     # @return        [Undef]              Undef if the argument was wrong or an empty array
     my $class = shift;
-    my $argv0 = shift // return undef;
-    die ' ***error: wrong number of arguments' if scalar @_ % 2;
-
+    my $argv0 = shift // return undef; die ' ***error: wrong number of arguments' if scalar @_ % 2;
     my $argv1 = { @_ };
-    my $field = $argv1->{'field'} || [];
-    die ' ***error: "field" accepts an array reference only' if ref $field ne 'ARRAY';
 
     require Sisimai::Data;
     require Sisimai::Message;
@@ -33,13 +28,13 @@ sub make {
 
     my $list = [];
     my $mail = Sisimai::Mail->new($argv0) || return undef;
-
-    while( my $r = $mail->read ) {
-        # Read and parse each mail file
-        my $p = { 'data'  => $r, 'hook' => $argv1->{'hook'}, 'field' => $field };
+    while( my $r = $mail->data->read ) {
+        # Read and parse each email file
+        my $p = { 'data' => $r, 'hook' => $argv1->{'hook'} };
         next unless my $mesg = Sisimai::Message->new(%$p);
 
-        my $data = Sisimai::Data->make('data' => $mesg, 'delivered' => $argv1->{'delivered'});
+        $p = { 'data' => $mesg, 'delivered' => $argv1->{'delivered'}, 'origin' => $mail->data->path };
+        my $data = Sisimai::Data->make(%$p);
         push @$list, @$data if scalar @$data;
     }
     return undef unless scalar @$list;
@@ -56,9 +51,7 @@ sub dump {
     # @options argv1 [Code]    hook       Code reference to a callback method
     # @return        [String]             Parsed data as JSON text
     my $class = shift;
-    my $argv0 = shift // return undef;
-
-    die ' ***error: wrong number of arguments' if scalar @_ % 2;
+    my $argv0 = shift // return undef; die ' ***error: wrong number of arguments' if scalar @_ % 2;
     my $argv1 = { @_ };
     my $nyaan = __PACKAGE__->make($argv0, %$argv1) // [];
 
@@ -244,7 +237,6 @@ method like the following codes:
     my $message = Sisimai::Message->new(
         'data' => $mailtxt,
         'hook' => $cmethod,
-        'field' => ['X-Mailer', 'Precedence']
     );
     print $message->catch->{'x-mailer'};    # Apple Mail (2.1283)
     print $message->catch->{'queue-id'};    # 2DAEB222022E

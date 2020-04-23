@@ -293,4 +293,13 @@ use Future;
       '->result while pending raises exception' );
 }
 
+# resolve and reject aliases
+{
+   my $fdone = Future->resolve( "abc" );
+   ok( $fdone->is_done, 'Future->resolve' );
+
+   my $ffail = Future->reject( "def\n" );
+   ok( $ffail->is_failed, 'Future->reject' );
+}
+
 done_testing;

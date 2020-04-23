@@ -6,6 +6,7 @@ build_requires:
   Expect: '0'
   ExtUtils::MakeMaker: '0'
   File::Slurp: '0'
+  List::Util: '1.46'
   Net::Server: '0'
   Test::More: '1.302'
   Test::Pod: '0'
@@ -44,5 +45,5 @@ requires:
   perl: '5.010000'
 resources:
   repository: git://git.mageia.org/software/rpm/urpmi/
-version: v8.121.4
+version: v8.121.8
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

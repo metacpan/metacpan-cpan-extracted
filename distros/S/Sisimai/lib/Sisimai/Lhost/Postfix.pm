@@ -4,9 +4,9 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Indicators = __PACKAGE__->INDICATORS;
-my $ReBackbone = qr<^Content-Type:[ ](?:message/rfc822|text/rfc822-headers)>m;
-my $MarkingsOf = {
+state $Indicators = __PACKAGE__->INDICATORS;
+state $ReBackbone = qr<^Content-Type:[ ](?:message/rfc822|text/rfc822-headers)>m;
+state $MarkingsOf = {
     # Postfix manual - bounce(5) - http://www.postfix.org/bounce.5.html
     'message' => qr{\A(?>
          [ ]+The[ ](?:
@@ -32,21 +32,16 @@ my $MarkingsOf = {
 sub description { 'Postfix' }
 sub make {
     # Parse bounce messages from Postfix
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.0.0
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
     return undef unless $mhead->{'subject'} eq 'Undelivered Mail Returned to Sender';
+    return undef if $mhead->{'x-aol-ip'};
 
     require Sisimai::RFC1894;
     require Sisimai::Address;
@@ -198,7 +193,7 @@ sub make {
     for my $e ( @$dscontents ) {
         # Set default values if each value is empty.
         $e->{'lhost'} ||= $permessage->{'rhost'};
-        map { $e->{ $_ } ||= $permessage->{ $_ } || '' } keys %$permessage;
+        $e->{ $_ } ||= $permessage->{ $_ } || '' for keys %$permessage;
 
         if( exists $anotherset->{'diagnosis'} && $anotherset->{'diagnosis'} ) {
             # Copy alternative error message
@@ -240,7 +235,6 @@ sub make {
         $e->{'command'}   = shift @commandset || '';
         $e->{'command'} ||= 'HELO' if $e->{'diagnosis'} =~ /refused to talk to me:/;
         $e->{'spec'}    ||= 'SMTP' if $e->{'diagnosis'} =~ /host .+ said:/;
-        $e->{'agent'}     = __PACKAGE__->smtpagent;
     }
     return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
 }
@@ -270,12 +264,6 @@ Methods in the module are called from only Sisimai::Message.
 C<description()> returns description string of this module.
 
     print Sisimai::Lhost::Postfix->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::Postfix->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

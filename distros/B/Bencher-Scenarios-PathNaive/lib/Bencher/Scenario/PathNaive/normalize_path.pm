@@ -1,9 +1,9 @@
 package Bencher::Scenario::PathNaive::normalize_path;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-10'; # DATE
+our $DATE = '2020-02-12'; # DATE
 our $DIST = 'Bencher-Scenarios-PathNaive'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our $scenario = {
     summary => 'Benchmark normalize_path()',
@@ -35,7 +35,7 @@ Bencher::Scenario::PathNaive::normalize_path - Benchmark normalize_path()
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenario::PathNaive::normalize_path (from Perl distribution Bencher-Scenarios-PathNaive), released on 2020-02-10.
+This document describes version 0.002 of Bencher::Scenario::PathNaive::normalize_path (from Perl distribution Bencher-Scenarios-PathNaive), released on 2020-02-12.
 
 =head1 SYNOPSIS
 
@@ -57,7 +57,7 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Path::Naive> 0.042
+L<Path::Naive> 0.043
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -97,10 +97,10 @@ Benchmark with default options (C<< bencher -m PathNaive::normalize_path >>):
  +-------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
  | dataset                 | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
  +-------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | /a/./b/../b/c///d/././e |    150000 |   6.6     |                 0.00% |               418.04% | 1.3e-08 |      20 |
- | /a/b/c/d/e              |    240000 |   4.1     |                61.40% |               220.95% | 6.7e-09 |      20 |
- | /a                      |    541417 |   1.84701 |               259.69% |                44.02% |   0     |      20 |
- | /                       |    779800 |   1.282   |               418.04% |                 0.00% | 1.7e-11 |      22 |
+ | /a/./b/../b/c///d/././e |    147584 |   6.77581 |                 0.00% |               363.35% | 5.8e-12 |      20 |
+ | /a/b/c/d/e              |    232000 |   4.31    |                57.14% |               194.86% | 1.6e-09 |      23 |
+ | /a                      |    481000 |   2.08    |               226.17% |                42.06% | 7.9e-10 |      22 |
+ | /                       |    684000 |   1.46    |               363.35% |                 0.00% | 4.2e-10 |      20 |
  +-------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
 
@@ -110,8 +110,8 @@ Benchmark module startup overhead (C<< bencher -m PathNaive::normalize_path --mo
  +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
  | participant         | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
  +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
- | Path::Naive         |      9.57 |              2.27 |                 0.00% |                31.59% |   9e-06 |      20 |
- | perl -e1 (baseline) |      7.3  |              0    |                31.59% |                 0.00% | 1.4e-05 |      20 |
+ | Path::Naive         |       9.7 |               2.5 |                 0.00% |                35.25% | 2.2e-05 |      20 |
+ | perl -e1 (baseline) |       7.2 |               0   |                35.25% |                 0.00% | 5.1e-05 |      20 |
  +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
 
 

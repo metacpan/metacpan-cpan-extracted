@@ -1,9 +1,9 @@
 package App::diffdb;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-20'; # DATE
+our $DATE = '2020-04-22'; # DATE
 our $DIST = 'App-diffdb'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -41,11 +41,9 @@ our %args_common = (
     },
     row_as => {
         schema => ['str*', in=>['json-one-line', 'json-card']], # XXX yaml, csv, tsv, ...
-        default => 'json-card',
+        default => 'json-one-line',
     },
 
-    # XXX add arg: include table(s) pos=>2 greedy=>1
-    # XXX add arg: exclude table(s)
     # XXX add arg: include table pattern
     # XXX add arg: exclude table pattern
     # XXX add arg: include column(s)
@@ -136,6 +134,48 @@ our %args_connect_sqlite = (
     },
 );
 
+our %args_diff = (
+    include_tables => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'include_table',
+        schema => ['array*', of=>'str*'], # XXX completion
+        cmdline_aliases => {t=>{}},
+        tags => ['category:table-selection'],
+    },
+    exclude_tables => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'exclude_table',
+        schema => ['array*', of=>'str*'], # XXX completion
+        cmdline_aliases => {T=>{}},
+        tags => ['category:table-selection'],
+    },
+    sql => {
+        summary => 'Compare the result of SQL select query, instead of tables',
+        schema => 'str*',
+        tags => ['category:table-selection'],
+    },
+
+    include_columns => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'include_column',
+        schema => ['array*', of=>'str*'], # XXX completion
+        cmdline_aliases => {c=>{}},
+        tags => ['category:column-selection'],
+    },
+    exclude_columns => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'exclude_column',
+        schema => ['array*', of=>'str*'], # XXX completion
+        cmdline_aliases => {C=>{}},
+        tags => ['category:column-selection'],
+    },
+
+    order_by => {
+        schema => ['str*'],
+        tags => ['category:row-ordering'],
+    },
+);
+
 sub __json_encode {
     state $json = do {
         require JSON::MaybeXS;
@@ -164,26 +204,88 @@ sub _get_row {
     }
 }
 
-sub _diff_table {
+sub _diff_file {
     require IPC::System::Options;
+
+    my ($self, $fname1, $fname2) = @_;
+    IPC::System::Options::system(
+        {log=>1},
+        $self->{diff_command}, "-u",
+        $fname1, $fname2,
+    );
+}
+
+sub _write_result {
+    my ($self, $sth, $fh) = @_;
+    my $rownum = 0;
+    while (1) {
+        $rownum++;
+        my $row = $self->_get_row($rownum, $sth);
+        last unless defined $row;
+        print $fh $row;
+    }
+}
+
+sub _diff_query {
+    my ($self, $query) = @_;
+
+    my $fname1 = "$self->{tempdir}/db1.query";
+  CREATE_FILE1: {
+        open my $fh, ">", $fname1;
+        my $sth = $self->{dbh1}->prepare($query);
+        $sth->execute;
+        $self->_write_result($sth, $fh);
+    };
+
+    my $fname2 = "$self->{tempdir}/db2.query";
+  CREATE_FILE2: {
+        open my $fh, ">", $fname2;
+        my $sth = $self->{dbh2}->prepare($query);
+        $sth->execute;
+        $self->_write_result($sth, $fh);
+    };
+
+    $self->_diff_file($fname1, $fname2);
+}
+
+sub _diff_table {
+    require DBIx::Diff::Schema;
 
     my ($self, $table, $table1_exists, $table2_exists) = @_;
 
     my $fname1 = "$self->{tempdir}/db1.$table".($table1_exists ? '' : '.doesnt_exist');
+    my $order_by = $self->{order_by} // '';
+
   CREATE_FILE1: {
         open my $fh, ">", $fname1;
         last unless $table1_exists;
 
-        # XXX sort by PK
-        my $sth = $self->{dbh1}->prepare("SELECT * FROM \"$table\"");
-        $sth->execute;
-        my $rownum = 0;
-        while (1) {
-            $rownum++;
-            my $row = $self->_get_row($rownum, $sth);
-            last unless defined $row;
-            print $fh $row;
+        my @columns;
+      COLUMN:
+        for my $column (DBIx::Diff::Schema::list_columns($self->{dbh1}, $table)) {
+            if ($self->{include_columns} && @{ $self->{include_columns} }) {
+                next COLUMN unless grep { $column->{COLUMN_NAME} eq $_ } @{ $self->{include_columns} };
+            }
+            if ($self->{exclude_columns} && @{ $self->{exclude_columns} }) {
+                next COLUMN if grep { $column->{COLUMN_NAME} eq $_ } @{ $self->{exclude_columns} };
+            }
+            push @columns, $column;
         }
+        die "No columns to select" unless @columns;
+
+        unless (length $order_by) {
+            my @indexes = grep { $_->{is_unique} }
+                DBIx::Diff::Schema::list_table_indexes(
+            $self->{dbh1}, $table);
+            if (@indexes) {
+                $order_by = join(",", map {qq("$_")} @{ $indexes[0]{columns} });
+            }
+        }
+        my $sth = $self->{dbh1}->prepare(
+            "SELECT ".join(",", map {qq("$_->{COLUMN_NAME}")} @columns).
+                " FROM \"$table\"".($order_by ? " ORDER BY $order_by" : ""));
+        $sth->execute;
+        $self->_write_result($sth, $fh);
     }
 
     my $fname2 = "$self->{tempdir}/db2.$table".($table2_exists ? '' : '.doesnt_exist');
@@ -191,23 +293,27 @@ sub _diff_table {
         open my $fh, ">", $fname2;
         last unless $table2_exists;
 
-        # XXX sort by PK
-        my $sth = $self->{dbh2}->prepare("SELECT * FROM \"$table\"");
-        $sth->execute;
-        my $rownum = 0;
-        while (1) {
-            $rownum++;
-            my $row = $self->_get_row($rownum, $sth);
-            last unless defined $row;
-            print $fh $row;
+        my @columns;
+      COLUMN:
+        for my $column (DBIx::Diff::Schema::list_columns($self->{dbh2}, $table)) {
+            if ($self->{include_columns} && @{ $self->{include_columns} }) {
+                next COLUMN unless grep { $column->{COLUMN_NAME} eq $_ } @{ $self->{include_columns} };
+            }
+            if ($self->{exclude_columns} && @{ $self->{exclude_columns} }) {
+                next COLUMN if grep { $column->{COLUMN_NAME} eq $_ } @{ $self->{exclude_columns} };
+            }
+            push @columns, $column;
         }
+        die "No columns to select" unless @columns;
+
+        my $sth = $self->{dbh2}->prepare(
+            "SELECT ".join(",", map {qq("$_->{COLUMN_NAME}")} @columns).
+                " FROM \"$table\"".($order_by ? " ORDER BY $order_by" : ""));
+        $sth->execute;
+        $self->_write_result($sth, $fh);
     }
 
-    IPC::System::Options::system(
-        {log=>1},
-        $self->{diff_command}, "-u",
-        $fname1, $fname2,
-    );
+    $self->_diff_file($fname1, $fname2);
 }
 
 sub _diff_db {
@@ -230,15 +336,37 @@ sub _diff_db {
         sort @all_tables;
     };
 
-    for my $table (@all_tables) {
-        my $in_db1 = grep { $_ eq $table } @tables1;
-        my $in_db2 = grep { $_ eq $table } @tables2;
-        if ($in_db1 && $in_db2) {
-            $self->_diff_table($table, 1, 1);
-        } elsif (!$in_db2) {
-            $self->_diff_table($table, 1, 0);
-        } else {
-            $self->_diff_table($table, 0, 1);
+  SQL:
+    {
+        last unless $self->{sql};
+        $self->_diff_query($self->{sql});
+    }
+
+  TABLE:
+    {
+        last if $self->{sql};
+        for my $table (@all_tables) {
+            if ($self->{include_tables} && @{ $self->{include_tables} }) {
+                unless (grep { $_ eq $table } @{ $self->{include_tables} }) {
+                    log_trace "Skipping table $table (not in include_tables)";
+                    next TABLE;
+                }
+            }
+            if ($self->{exclude_tables} && @{ $self->{exclude_tables} }) {
+                if (grep { $_ eq $table } @{ $self->{exclude_tables} }) {
+                    log_trace "Skipping table $table (in exclude_tables)";
+                    next TABLE;
+                }
+            }
+            my $in_db1 = grep { $_ eq $table } @tables1;
+            my $in_db2 = grep { $_ eq $table } @tables2;
+            if ($in_db1 && $in_db2) {
+                $self->_diff_table($table, 1, 1);
+            } elsif (!$in_db2) {
+                $self->_diff_table($table, 1, 0);
+            } else {
+                $self->_diff_table($table, 0, 1);
+            }
         }
     }
 
@@ -257,6 +385,7 @@ _
     args => {
         %args_common,
         %args_connect_dbi,
+        %args_diff,
     },
 
     "cmdline.skip_format" => 1,
@@ -273,7 +402,7 @@ sub diffdb {
     require File::Temp;
 
     my %args = @_;
-    my $action = $args{action};
+    my $action = delete $args{action};
     my $self = bless {%args}, __PACKAGE__;
 
     unless ($self->{dbh1}) {
@@ -310,9 +439,8 @@ sub diffdb {
         unless $self->{dbh1} && $self->{dbh2};
 
     $self->{tempdir} = File::Temp::tempdir(CLEANUP => $ENV{DEBUG});
-    $self->{diff_command} = $args{diff_command} // 'diff';
-    $self->{row_as} = $args{row_as} // 'one-line-json';
-
+    $self->{diff_command} //= 'diff';
+    $self->{row_as} //= 'one-line-json';
     $self->_diff_db;
 }
 
@@ -328,6 +456,7 @@ _
     args => {
         %args_common,
         %args_connect_sqlite,
+        %args_diff,
     },
 
     "cmdline.skip_format" => 1,
@@ -366,7 +495,7 @@ App::diffdb - Compare two databases, line by line
 
 =head1 VERSION
 
-This document describes version 0.001 of App::diffdb (from Perl distribution App-diffdb), released on 2020-04-20.
+This document describes version 0.002 of App::diffdb (from Perl distribution App-diffdb), released on 2020-04-22.
 
 =head1 SYNOPSIS
 
@@ -409,6 +538,16 @@ DBI data source, e.g. "dbi:SQLite:dbname=E<sol>pathE<sol>toE<sol>db1.db".
 
 DBI data source, e.g. "dbi:SQLite:dbname=E<sol>pathE<sol>toE<sol>db1.db".
 
+=item * B<exclude_columns> => I<array[str]>
+
+=item * B<exclude_tables> => I<array[str]>
+
+=item * B<include_columns> => I<array[str]>
+
+=item * B<include_tables> => I<array[str]>
+
+=item * B<order_by> => I<str>
+
 =item * B<password1> => I<str>
 
 You might want to specify this parameter in a configuration file instead of
@@ -421,7 +560,11 @@ Will default to C<password1> if C<password1> is specified.
 You might want to specify this parameter in a configuration file instead of
 directly as command-line option.
 
-=item * B<row_as> => I<str> (default: "json-card")
+=item * B<row_as> => I<str> (default: "json-one-line")
+
+=item * B<sql> => I<str>
+
+Compare the result of SQL select query, instead of tables.
 
 =item * B<user1> => I<str>
 
@@ -471,7 +614,21 @@ Second SQLite database file.
 
 =item * B<diff_command> => I<str> (default: "diff")
 
-=item * B<row_as> => I<str> (default: "json-card")
+=item * B<exclude_columns> => I<array[str]>
+
+=item * B<exclude_tables> => I<array[str]>
+
+=item * B<include_columns> => I<array[str]>
+
+=item * B<include_tables> => I<array[str]>
+
+=item * B<order_by> => I<str>
+
+=item * B<row_as> => I<str> (default: "json-one-line")
+
+=item * B<sql> => I<str>
+
+Compare the result of SQL select query, instead of tables.
 
 
 =back

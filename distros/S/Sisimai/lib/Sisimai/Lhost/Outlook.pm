@@ -4,37 +4,29 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Indicators = __PACKAGE__->INDICATORS;
-my $ReBackbone = qr|^Content-Type:[ ]message/rfc822|m;
-my $StartingOf = { 'message' => ['This is an automatically generated Delivery Status Notification'] };
-my $MessagesOf = {
+state $Indicators = __PACKAGE__->INDICATORS;
+state $ReBackbone = qr|^Content-Type:[ ]message/rfc822|m;
+state $StartingOf = { 'message' => ['This is an automatically generated Delivery Status Notification'] };
+state $MessagesOf = {
     'hostunknown' => ['The mail could not be delivered to the recipient because the domain is not reachable'],
     'userunknown' => ['Requested action not taken: mailbox unavailable'],
 };
 
-# X-Message-Delivery: Vj0xLjE7RD0wO0dEPTA7U0NMPTk7bD0xO3VzPTE=
-# X-Message-Info: AuEzbeVr9u5fkDpn2vR5iCu5wb6HBeY4iruBjnutBzpStnUabbM...
-sub headerlist  { return ['x-message-delivery', 'x-message-info'] }
 sub description { 'Microsoft Outlook.com: https://www.outlook.com/' }
 sub make {
     # Detect an error from Microsoft Outlook.com
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.1.3
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
     my $match = 0;
 
-    # 'from'     => qr/postmaster[@]/,
+    # X-Message-Delivery: Vj0xLjE7RD0wO0dEPTA7U0NMPTk7bD0xO3VzPTE=
+    # X-Message-Info: AuEzbeVr9u5fkDpn2vR5iCu5wb6HBeY4iruBjnutBzpStnUabbM...
     $match++ if index($mhead->{'subject'}, 'Delivery Status Notification') > -1;
     $match++ if $mhead->{'x-message-delivery'};
     $match++ if $mhead->{'x-message-info'};
@@ -112,10 +104,9 @@ sub make {
 
     for my $e ( @$dscontents ) {
         # Set default values if each value is empty.
-        $e->{'lhost'}    ||= $permessage->{'rhost'};
-        map { $e->{ $_ } ||= $permessage->{ $_ } || '' } keys %$permessage;
-        $e->{'agent'}      = __PACKAGE__->smtpagent;
-        $e->{'diagnosis'}  = Sisimai::String->sweep($e->{'diagnosis'});
+        $e->{'lhost'} ||= $permessage->{'rhost'};
+        $e->{ $_ } ||= $permessage->{ $_ } || '' for keys %$permessage;
+        $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
 
         unless( $e->{'diagnosis'} ) {
             # No message in 'diagnosis'
@@ -165,12 +156,6 @@ Methods in the module are called from only Sisimai::Message.
 C<description()> returns description string of this module.
 
     print Sisimai::Lhost::Outlook->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::Outlook->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

@@ -4,13 +4,13 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Indicators = __PACKAGE__->INDICATORS;
-my $ReBackbone = qr|^Content-Type:[ ]message/rfc822|m;
-my $StartingOf = {
+state $Indicators = __PACKAGE__->INDICATORS;
+state $ReBackbone = qr|^Content-Type:[ ]message/rfc822|m;
+state $StartingOf = {
     'message' => ['Your message'],
     'error'   => ['did not reach the following recipient(s):'],
 };
-my $ErrorCodes = {
+state $ErrorCodes = {
     'onhold' => [
         '000B099C', # Host Unknown, Message exceeds size limit, ...
         '000B09AA', # Unable to relay for, Message exceeds size limit,...
@@ -26,11 +26,11 @@ my $ErrorCodes = {
     'networkerror' => [
         '00120270', # Too Many Hops
     ],
-    'contenterr' => [
+    'contenterror' => [
         '00050311', # Conversion to Internet format failed
         '000502CC', # Conversion to Internet format failed
     ],
-    'securityerr' => [
+    'securityerror' => [
         '000B0981', # 502 Server does not support AUTH
     ],
     'filtered' => [
@@ -38,29 +38,22 @@ my $ErrorCodes = {
     ],
 };
 
-# X-MS-TNEF-Correlator: <00000000000000000000000000000000000000@example.com>
-# X-Mailer: Internet Mail Service (5.5.1960.3)
-# X-MS-Embedded-Report:
-sub headerlist  { return ['x-ms-embedded-report', 'x-mimeole'] };
 sub description { 'Microsoft Exchange Server 2003' }
 sub make {
     # Detect an error from Microsoft Exchange Server 2003
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     # @since v4.1.1
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
     my $match = 0;
 
+    # X-MS-TNEF-Correlator: <00000000000000000000000000000000000000@example.com>
+    # X-Mailer: Internet Mail Service (5.5.1960.3)
+    # X-MS-Embedded-Report:
     $match ||= 1 if defined $mhead->{'x-ms-embedded-report'};
     EXCHANGE_OR_NOT: while(1) {
         # Check the value of X-Mailer header
@@ -193,7 +186,6 @@ sub make {
     return undef unless $recipients;
 
     for my $e ( @$dscontents ) {
-        $e->{'agent'}     = __PACKAGE__->smtpagent;
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
         delete $e->{'msexch'};
 
@@ -257,12 +249,6 @@ Methods in the module are called from only Sisimai::Message.
 C<description()> returns description string of this module.
 
     print Sisimai::Lhost::Exchange2003->description;
-
-=head2 C<B<smtpagent()>>
-
-C<smtpagent()> returns MTA name.
-
-    print Sisimai::Lhost::Exchange2003->smtpagent;
 
 =head2 C<B<make(I<header data>, I<reference to body string>)>>
 

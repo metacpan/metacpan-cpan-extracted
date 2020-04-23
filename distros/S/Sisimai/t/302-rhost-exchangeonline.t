@@ -30,7 +30,7 @@ MAKE_TEST: {
         my $mtahost = qr/[.].+[.](?:prod|protection)[.]outlook[.]com/;
         next unless defined $mailbox;
 
-        while( my $r = $mailbox->read ) {
+        while( my $r = $mailbox->data->read ) {
 
             my $p = Sisimai::Message->new('data' => $r);
             isa_ok $p, 'Sisimai::Message';
@@ -49,7 +49,7 @@ MAKE_TEST: {
                 ok defined $e->{'alias'}, '->alias = '.$e->{'alias'};
                 ok defined $e->{'command'}, '->command = '.$e->{'command'};
                 like $e->{'rhost'}, $mtahost, '->rhost = '.$mtahost;
-                like $e->{'agent'}, qr/\A(?:Email::.+|RFC3464)/, '->agent = '.$e->{'agent'};
+                like $e->{'agent'}, qr/\A(?:Postfix|Sendmail|RFC3464)/, '->agent = '.$e->{'agent'};
                 like $e->{'status'}, $rs->{ $n }->{'status'}, '->status = '.$e->{'status'};
             }
 

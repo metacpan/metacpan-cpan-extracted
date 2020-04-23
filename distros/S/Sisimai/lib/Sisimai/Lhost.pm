@@ -36,47 +36,42 @@ sub INDICATORS {
         'message-rfc822' => (1 << 2),
     };
 }
-sub removedat   { return 'v4.25.5' }    # This method will be removed at the future release of Sisimai
-sub smtpagent   { my $v = shift; $v =~ s/\ASisimai::Lhost::/Email::/; return $v }
 sub description { return '' }
-sub headerlist  { return [] }
 sub index {
-    # MTA list
+    # Alphabetical sorted MTA module list
     # @return   [Array] MTA list with order
     return [qw|
-        Sendmail Postfix qmail Exim Courier OpenSMTPD Office365 Outlook
-        Exchange2007 Exchange2003 Yahoo GSuite Aol SendGrid AmazonSES MailRu
-        Yandex MessagingServer Domino Notes ReceivingSES AmazonWorkMail Verizon
-        GMX Bigfoot Facebook Zoho EinsUndEins MessageLabs EZweb KDDI Biglobe
-        Amavis ApacheJames McAfee MXLogic MailFoundry IMailServer
-        mFILTER Activehunter InterScanMSS SurfControl MailMarshalSMTP
-        X1 X2 X3 X4 X5 V5sendmail FML Google
+        Activehunter Amavis AmazonSES AmazonWorkMail Aol ApacheJames Barracuda Bigfoot
+        Biglobe Courier Domino EZweb EinsUndEins Exchange2003 Exchange2007 Exim FML
+        Facebook GMX GSuite GoogleGroups Gmail IMailServer InterScanMSS KDDI MXLogic
+        MailFoundry MailMarshalSMTP MailRu McAfee MessageLabs MessagingServer Notes
+        Office365 OpenSMTPD Outlook Postfix PowerMTA ReceivingSES SendGrid Sendmail
+        SurfControl V5sendmail Verizon X1 X2 X3 X4 X5 X6 Yahoo Yandex Zoho mFILTER
+        qmail
     |];
 }
 
-sub heads {
-    # MTA list which have one or more extra headers
-    # @return   [Array] MTA list (have extra headers)
-    return [qw|
-        Exim Office365 Outlook Exchange2007 Exchange2003 GSuite SendGrid
-        AmazonSES ReceivingSES AmazonWorkMail Aol GMX MailRu MessageLabs Yahoo
-        Yandex Zoho EinsUndEins MXLogic McAfee mFILTER EZweb Activehunter IMailServer
-        SurfControl FML Google
-    |];
+sub path {
+    # Returns Sisimai::Lhost::* module path table
+    # @return   [Hash] Module path table
+    # @since    v4.25.6
+    my $class = shift;
+    my $index = __PACKAGE__->index;
+    my $table = {
+        'Sisimai::ARF'     => 'Sisimai/ARF.pm',
+        'Sisimai::RFC3464' => 'Sisimai/RFC3464.pm',
+        'Sisimai::RFC3834' => 'Sisimai/RFC3834.pm',
+    };
+    $table->{ __PACKAGE__.'::'.$_ } = 'Sisimai/Lhost/'.$_.'.pm' for @$index;
+    return $table;
 }
 
 sub make {
     # Method of a parent class to parse a bounce message of each MTA
-    # @param         [Hash] mhead       Message headers of a bounce email
-    # @options mhead [String] from      From header
-    # @options mhead [String] date      Date header
-    # @options mhead [String] subject   Subject header
-    # @options mhead [Array]  received  Received headers
-    # @options mhead [String] others    Other required headers
-    # @param         [String] mbody     Message body of a bounce email
-    # @return        [Hash, Undef]      Bounce data list and message/rfc822 part
-    #                                   or Undef if it failed to parse or the
-    #                                   arguments are missing
+    # @param    [Hash] mhead    Message headers of a bounce email
+    # @param    [String] mbody  Message body of a bounce email
+    # @return   [Hash]          Bounce data list and message/rfc822 part
+    # @return   [Undef]         failed to parse or the arguments are missing
     return undef;
 }
 
@@ -104,7 +99,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017-2019 azumakuniyuki, All rights reserved.
+Copyright (C) 2017-2020 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

@@ -6,3 +6,6 @@ Revision history for Mxpress-PDF
 0.21    2020-04-13
 	- Fix a warning when justifying text.
 
+0.23    2020-04-13
+	- Add new plugin Mxpres::PDF::Plugin::Border
+

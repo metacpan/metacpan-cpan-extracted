@@ -160,6 +160,12 @@ use Future;
    ok( $f3->is_ready, '$f3 ready when $f1 is' );
    is_deeply( [ $f3->result ], [ "result" ], 'result of $f3' );
    is_oneref( $f1, '$f1 has one reference after done' );
+
+   $f1 = Future->new;
+   $f2 = $f1->without_cancel;
+
+   $f1->cancel;
+   ok( $f2->is_cancelled, '$f1 cancelled still cancels $f2' );
 }
 
 done_testing;

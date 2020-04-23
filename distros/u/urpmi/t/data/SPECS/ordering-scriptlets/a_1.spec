@@ -8,10 +8,13 @@ Release: 1
 License: x
 Provides: /bin/a
 BuildRequires: gcc
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^libc.so
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^libc.so|^ld
+%global __provides_exclude %{?__provides_exclude:%__provides_exclude|}^libc.so|^ld
 
 %prep
 %setup -c -T
+# This is a simple static "shell" for scriptlets.
+# Thus it must be w/o deps (static) or with self contained deps (included):
 cat <<EOF > a.c 
 #include <stdio.h>
 int main(int argc, char **argv) { 
@@ -24,12 +27,24 @@ int main(int argc, char **argv) {
 EOF
 
 %build
-gcc -Wall -o a a.c
+# Try a static build with fallback to dynamic if no static libs/headers
+# (in which case we will pull the the wanted libs in %%install):
+gcc -Wall -static -o a a.c || gcc -Wall -o a a.c
 
 %install
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/bin/
 cp a $RPM_BUILD_ROOT/bin/a
+
+%ifos linux
+%global cpio_opts --dereference
+%else
+%global cpio_opts %nil
+%endif
+# Install the wanted libs if not static:
+ldd a | sed -e 's/^[ \t]*//' -e 's/.* => //' -e 's/ .*//' > list
+grep '/' list | (cd / ; cpio -pumd %cpio_opts %buildroot)
+find %buildroot
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -39,4 +54,4 @@ x
 
 %files
 %defattr(-,root,root)
-/bin/*
+/*
