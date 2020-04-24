@@ -1,0 +1,96 @@
+=head1 NAME
+
+aie - Automatic Information Extraction
+
+=head1 DESCRIPTION
+
+Attempts to extract regular information from non-binary files.  AIE
+accepts any non-binary file as input.  It tries to find a repeating
+sequence in the file and then generalizes a regular expression to
+extract the information that varies within the repeating structure.
+
+=head1 SYNOPSIS
+
+  $ aie "./Downloadable NLG systems - ACL Wiki.html"
+Extracting major patterns
+Length: 40136
+.
+........................................
+Extracting most useful terms
+Chose token: $VAR1 = ' class="';
+
+Selected instance 133 of 185
+$VAR1 = [
+          '(.*) class\\=\\"(.*)ree\\" (.*)re(.*)\\=\\"(.*)\\"\\>(.*)\\<\\/(.*)re(.*)
+\\<\\/p\\>\\<p\\>\\<(.*)re(.*)\\=\\"(.*)fo(.*)\\"',
+          '(.*) class\\=\\"(.*)e\\" (.*)\\=\\"(.*)\\"\\>(.*)\\<\\/(.*)\\>\\<\\/(.*)
+\\<p\\>\\<(.*)re(.*)\\=\\"(.*)fo(.*)\\"',
+          '(.*) class\\=\\"(.*)ree\\" (.*)re(.*)\\=\\"(.*)\\"\\>(.*)\\<\\/(.*)
+\\<\\/p\\>\\<p\\>\\<(.*)re(.*)\\=\\"(.*)fo(.*)\\"',
+          '(.*) class\\=\\"(.*)ree\\" (.*)re(.*)\\=\\"(.*)\\"\\>(.*)\\<\\/(.*)
+\\<\\/p\\>\\<p\\>(.*)fo(.*)cl(.*)as(.*)la(.*)as(.*)re(.*)as(.*)re(.*)re(.*) c(.*)re(.*)
+\\<\\/p\\>
+\\<(.*)\\>',
+          '(.*) class\\=\\"(.*)ree\\" (.*)re(.*)\\=\\"(.*)\\"\\>(.*)\\<\\/(.*)
+\\<\\/p\\>\\<p\\>(.*)as(.*)re(.*) c(.*)re(.*)rela(.*)as(.*)fo(.*)as(.*) c(.*)la(.*)re(.*)re(.*)\\" (.*)la(.*)as(.*)fo(.*)la(.*)re(.*)cl(.*)re(.*)\\=\\"(.*)fo(.*)\\"',
+          '(.*) class\\=\\"(.*)e\\" (.*)\\=\\"(.*)\\"\\>(.*)\\<\\/(.*)\\>\\<\\/(.*)
+\\<p\\>\\<(.*)re(.*)\\=\\"(.*)fo(.*)\\"',
+          ' class\\=\\"(.*)ree\\" (.*)re(.*)\\=\\"(.*)\\"\\>(.*)\\<\\/(.*)
+\\<\\/p\\>\\<p\\>(.*)fo(.*)
+\\<\\/p\\>
+\\<(.*)\\>',
+          '(.*) class\\=\\"(.*)e\\" (.*)\\=\\"(.*)\\"\\>(.*)\\<\\/(.*)\\>\\<\\/(.*)
+\\<p\\>\\<(.*)re(.*)\\=\\"(.*)fo(.*)\\"'
+        ];
+$VAR1 = ' class="(.*)e" (.*)="(.*)">(.*)</(.*)
+<p><';
+
+Extracted 23 records
+$VAR1 = [
+          [
+            'mw-headlin',
+            'id',
+            'ASTROGEN',
+            'ASTROGEN</span>',
+            'h2>'
+          ],
+          [
+            'mw-headlin',
+            'id',
+            'Chimera',
+            'Chimera</span>',
+            'h2>'
+          ],
+          [
+            'mw-headlin',
+            'id',
+            'CRISP',
+            'CRISP</span>',
+            'h2>'
+          ],
+
+...
+
+=head1 AUTHOR
+
+Andrew John Dougherty
+
+=head1 LICENSE
+
+GPLv3
+
+=head1 INSTALLATION
+
+Using C<cpan>:
+
+    $ cpanm Org::FRDCSA::AIE
+
+Manual install:
+
+    $ perl Makefile.PL
+    $ make
+    $ make install
+
+
+=cut
+

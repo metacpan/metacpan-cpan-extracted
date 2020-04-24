@@ -78,4 +78,16 @@ class WithBuildargs {
    is( $o->slot, "value", 'native HASH objects still support slots' );
 }
 
+# Subclasses without BUILD shouldn't double-invoke superclass
+{
+   my $BUILD_invoked;
+   class One {
+      method BUILD { $BUILD_invoked++ }
+   }
+   class Two extends One {}
+
+   Two->new;
+   is( $BUILD_invoked, 1, 'One::BUILD invoked only once for Two->new' );
+}
+
 done_testing;

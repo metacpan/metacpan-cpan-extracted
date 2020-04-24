@@ -23,12 +23,12 @@
          "schema:category" : "issue-1810",
          "schema:domainIncludes" : [
             "schema:TouristAttraction",
-            "schema:TouristTrip",
-            "schema:TouristDestination"
+            "schema:TouristDestination",
+            "schema:TouristTrip"
          ],
          "schema:rangeIncludes" : [
-            "schema:Audience",
-            "schema:Text"
+            "schema:Text",
+            "schema:Audience"
          ]
       }
    }

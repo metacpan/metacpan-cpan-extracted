@@ -14,8 +14,8 @@
          "rdfs:label" : "acquiredFrom",
          "schema:domainIncludes" : "schema:OwnershipInfo",
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:ownedFrom" : {
@@ -44,8 +44,8 @@
             "schema:OwnershipInfo"
          ],
          "schema:rangeIncludes" : [
-            "schema:Service",
-            "schema:Product"
+            "schema:Product",
+            "schema:Service"
          ]
       }
    }

@@ -11,7 +11,10 @@ use Object::Pad;
    package AClass {
       BEGIN {
          Object::Pad->import_into( "AClass" );
-         Object::Pad->begin_class( "AClass" );
+
+         my $classmeta = Object::Pad->begin_class( "AClass" );
+
+         ::is( $classmeta->name, "AClass", '$classmeta->name' );
       }
 
       method message { return "Hello" }
@@ -27,7 +30,10 @@ class Parent { has $thing = "parent"; }
    package Child {
       BEGIN {
          Object::Pad->import_into( "Child" );
-         Object::Pad->begin_class( "Child", extends => "Parent" );
+
+         my $classmeta = Object::Pad->begin_class( "Child", extends => "Parent" );
+
+         ::is( $classmeta->name, "Child", '$classmeta->name for Child' );
       }
       has $other = "child";
       method other { return $other }

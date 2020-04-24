@@ -163,9 +163,44 @@ The Data function returns a [Data::Object::Data](https://metacpan.org/pod/Data::
 
         package main;
 
-        my $data = Data '/path/to/file.pod';
+        my $data = Data 't/Data_Object.t';
 
         # $data->contents(...);
+
+## error
+
+    Error(Str | HashRef) : InstanceOf["Data::Object::Exception"]
+
+The Error function returns a [Data::Object::Exception](https://metacpan.org/pod/Data::Object::Exception) object.
+
+- Error example #1
+
+        package main;
+
+        use Data::Object 'Error';
+
+        my $error = Error;
+
+        # die $error;
+
+- Error example #2
+
+        package main;
+
+        my $error = Error 'Oops!';
+
+        # die $error;
+
+- Error example #3
+
+        package main;
+
+        my $error = Error {
+          message => 'Oops!',
+          context => { time => time }
+        };
+
+        # die $error;
 
 ## false
 
@@ -262,6 +297,8 @@ The Opts function returns a [Data::Object::Opts](https://metacpan.org/pod/Data::
 - Opts example #1
 
         package main;
+
+        use Data::Object 'Opts';
 
         my $opts = Opts;
 
@@ -430,18 +467,18 @@ Copyright (C) 2011-2019, Al Newkirk, et al.
 
 This is free software; you can redistribute it and/or modify it under the terms
 of the The Apache License, Version 2.0, as elucidated in the ["license
-file"](https://github.com/iamalnewkirk/foobar/blob/master/LICENSE).
+file"](https://github.com/iamalnewkirk/data-object/blob/master/LICENSE).
 
 # PROJECT
 
-[Wiki](https://github.com/iamalnewkirk/foobar/wiki)
+[Wiki](https://github.com/iamalnewkirk/data-object/wiki)
 
-[Project](https://github.com/iamalnewkirk/foobar)
+[Project](https://github.com/iamalnewkirk/data-object)
 
-[Initiatives](https://github.com/iamalnewkirk/foobar/projects)
+[Initiatives](https://github.com/iamalnewkirk/data-object/projects)
 
-[Milestones](https://github.com/iamalnewkirk/foobar/milestones)
+[Milestones](https://github.com/iamalnewkirk/data-object/milestones)
 
-[Contributing](https://github.com/iamalnewkirk/foobar/blob/master/CONTRIBUTE.md)
+[Contributing](https://github.com/iamalnewkirk/data-object/blob/master/CONTRIBUTE.md)
 
-[Issues](https://github.com/iamalnewkirk/foobar/issues)
+[Issues](https://github.com/iamalnewkirk/data-object/issues)

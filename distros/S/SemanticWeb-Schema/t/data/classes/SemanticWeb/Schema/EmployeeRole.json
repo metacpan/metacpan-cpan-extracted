@@ -15,9 +15,9 @@
             "schema:JobPosting"
          ],
          "schema:rangeIncludes" : [
-            "schema:Number",
+            "schema:PriceSpecification",
             "schema:MonetaryAmount",
-            "schema:PriceSpecification"
+            "schema:Number"
          ]
       },
       "schema:salaryCurrency" : {
@@ -25,8 +25,8 @@
          "rdfs:comment" : "The currency (coded using <a href=\"http://en.wikipedia.org/wiki/ISO_4217\">ISO 4217</a> ) used for the main salary information in this job posting or for this employee.",
          "rdfs:label" : "salaryCurrency",
          "schema:domainIncludes" : [
-            "schema:JobPosting",
-            "schema:EmployeeRole"
+            "schema:EmployeeRole",
+            "schema:JobPosting"
          ],
          "schema:rangeIncludes" : "schema:Text"
       }

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.3';
+our $VERSION = 'v7.0.4';
 
 
 has landlord => (
@@ -50,7 +50,7 @@ SemanticWeb::Schema::RentAction - The act of giving money in return for temporar
 
 =head1 VERSION
 
-version v7.0.3
+version v7.0.4
 
 =head1 DESCRIPTION
 

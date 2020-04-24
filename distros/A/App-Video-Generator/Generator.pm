@@ -1,10 +1,8 @@
 package App::Video::Generator;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use English;
 use Error::Pure qw(err);
 use Getopt::Std;
@@ -15,8 +13,7 @@ use Video::Generator;
 # Constants.
 Readonly::Scalar our $EMPTY_STR => q{};
 
-# Version.
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -114,6 +111,7 @@ App::Video::Generator - Perl class for video-generator application.
 =head1 SYNOPSIS
 
  use App::Video::Generator;
+
  my $obj = App::Video::Generator->new;
  $obj->run;
 
@@ -144,11 +142,9 @@ App::Video::Generator - Perl class for video-generator application.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use App::Video::Generator;
 
  # Run.
@@ -176,23 +172,34 @@ L<Image::Select>,
 L<Readonly>,
 L<Video::Generator>.
 
+=head1 SEE ALSO
+
+=over
+
+=item L<App::Image::Generator>
+
+Perl class for image-generator application.
+
+=back
+
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/App-Video-Generator>.
+L<https://github.com/michal-josef-spacek/App-Video-Generator>.
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2015 Michal Špaček
- BSD 2-Clause License
+© 2015-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

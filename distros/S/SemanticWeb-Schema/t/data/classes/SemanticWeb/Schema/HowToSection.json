@@ -20,8 +20,8 @@
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
-            "schema:ItemList",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:ItemList"
          ],
          "schema:supersededBy" : "schema:step"
       }

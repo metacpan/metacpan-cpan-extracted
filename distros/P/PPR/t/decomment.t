@@ -23,11 +23,11 @@ my $text = <<'END_TEXT';
 
     say ${'# Not a comment'};
 
-    =begin comment
-
-    A comment-like component here
-
-    =cut
+!   =begin comment
+!
+!   A comment-like component here
+!
+!   =cut
 
     $x = $
     # A comment
@@ -47,20 +47,23 @@ my $text = <<'END_TEXT';
 
     say '#Here';
 
-    =begin comment
-
-    Anothe comment-like component here
-
+!   =begin comment
+!
+!   Another comment-like component here
+!
 END_TEXT
 
-$text =~ s{^    }{}gms;
+my $expected = $text;
+
+$text     =~ s{^[! ]   }{}gm;
 
 my $decommented = PPR::decomment($text);
 
-$text =~ s{# A comment\h*}{}g;
-$text =~ s{ ^ = [^\W\d]\w*+ .*? (?: ^ = cut \b [^\n]*+ $ | \z ) }{}gxms;
+$expected =~ s{^!.*}{}gm;
+$expected =~ s{^    }{}gm;
+$expected =~ s{# A comment\h*}{}g;
 
-is $decommented, $text => 'Decommented correctly';
+is $decommented, $expected => 'Decommented correctly';
 
 done_testing();
 

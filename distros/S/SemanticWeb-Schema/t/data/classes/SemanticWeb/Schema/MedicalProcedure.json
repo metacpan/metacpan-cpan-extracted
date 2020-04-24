@@ -13,8 +13,8 @@
          "rdfs:comment" : "Location in the body of the anatomical structure.",
          "rdfs:label" : "bodyLocation",
          "schema:domainIncludes" : [
-            "schema:MedicalProcedure",
-            "schema:AnatomicalStructure"
+            "schema:AnatomicalStructure",
+            "schema:MedicalProcedure"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"
@@ -59,15 +59,15 @@
          "rdfs:comment" : "The status of the study (enumerated).",
          "rdfs:label" : "status",
          "schema:domainIncludes" : [
+            "schema:MedicalCondition",
             "schema:MedicalStudy",
-            "schema:MedicalProcedure",
-            "schema:MedicalCondition"
+            "schema:MedicalProcedure"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
             "schema:EventStatusType",
-            "schema:Text",
-            "schema:MedicalStudyStatus"
+            "schema:MedicalStudyStatus",
+            "schema:Text"
          ]
       }
    }

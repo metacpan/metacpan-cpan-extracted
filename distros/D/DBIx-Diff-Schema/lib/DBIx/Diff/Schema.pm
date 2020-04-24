@@ -1,12 +1,12 @@
 package DBIx::Diff::Schema;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-20'; # DATE
+our $DATE = '2020-04-23'; # DATE
 our $DIST = 'DBIx-Diff-Schema'; # DIST
-our $VERSION = '0.094'; # VERSION
+our $VERSION = '0.096'; # VERSION
 
 use 5.010001;
-use strict;
+use strict 'subs', 'vars';
 use warnings;
 use Log::ger;
 
@@ -18,6 +18,7 @@ our @EXPORT_OK = qw(
                        list_columns
                        list_tables
                        list_table_indexes
+                       list_indexes
                        check_table_exists
                        diff_db_schema
                        diff_table_schema
@@ -149,7 +150,7 @@ sub list_tables {
     sort @res;
 }
 
-$SPEC{list_table_indexes} = {
+$SPEC{list_indexes} = {
     v => 1.1,
     summary => 'List indexes for a table in a database',
     description => <<'_',
@@ -168,7 +169,7 @@ _
     args_as => "array",
     result_naked => 1,
 };
-sub list_table_indexes {
+sub list_indexes {
     my ($dbh, $wanted_table) = @_;
 
     my $driver = $dbh->{Driver}{Name};
@@ -176,6 +177,7 @@ sub list_table_indexes {
     my @res;
 
     if ($driver eq 'SQLite') {
+
         my @wanted_tables;
         if (defined $wanted_table) {
             @wanted_tables = ($wanted_table);
@@ -183,6 +185,7 @@ sub list_table_indexes {
             @wanted_tables = list_tables($dbh);
         }
         for (@wanted_tables) { $_ = $1 if /.+\.(.+)/ }
+
         my $sth = $dbh->prepare("SELECT * FROM sqlite_master");
         $sth->execute;
         while (my $row = $sth->fetchrow_hashref) {
@@ -192,61 +195,106 @@ sub list_table_indexes {
             my $col_num = $1;
             my @cols = list_columns($dbh, $row->{tbl_name});
             push @res, {
-                name      => "(autoindex, primary key)",
+                name      => "PRIMARY",
                 table     => $row->{tbl_name},
                 columns   => [$cols[$col_num-1]{COLUMN_NAME}],
                 is_unique => 1,
                 is_pk     => 1,
             };
         }
-    }
 
-    my $sth = $dbh->table_info(undef, undef, undef, undef);
-    while (my $row = $sth->fetchrow_hashref) {
-        next unless $row->{TABLE_TYPE} eq 'INDEX';
+        $sth = $dbh->table_info(undef, undef, undef, undef);
+      ROW:
+        while (my $row = $sth->fetchrow_hashref) {
+            next unless $row->{TABLE_TYPE} eq 'INDEX';
 
-        my $table = $row->{TABLE_NAME};
-        my $schem = $row->{TABLE_SCHEM};
+            my $table = $row->{TABLE_NAME};
+            my $schem = $row->{TABLE_SCHEM};
 
-        # match table name
-        if (defined $wanted_table) {
-            if ($driver eq 'mysql') {
-                # mysql driver returns database name as schema, so that's useless
-                $schem = '';
-                next unless $table eq $wanted_table;
-            } else {
+            # match table name
+            if (defined $wanted_table) {
                 if ($wanted_table =~ /(.+)\.(.+)/) {
                     next unless $schem eq $1 && $table eq $2;
                 } else {
                     next unless $table eq $wanted_table;
                 }
             }
-        }
 
-        # parse index information
-        my $index_info = {};
-        if ($driver eq 'SQLite') {
-            next unless $row->{sqlite_sql};
+            next unless my $sql = $row->{sqlite_sql};
             #use DD; dd $row;
-            $index_info->{sqlite_sql} = $row->{sqlite_sql};
-            $row->{sqlite_sql} =~ s/\A\s*CREATE\s+(UNIQUE\s+)?INDEX\s+//is
-                or die "Can't extract CREATE INDEX statement in sqlite_sql: $row->{sqlite_sql}";
-            $index_info->{is_unique} = $1 ? 1:0;
-            $row->{sqlite_sql} =~ s/\A(\S+)\s+//s
-                or die "Can't extract index name from sqlite_sql: $row->{sqlite_sql}";
-            $index_info->{name} = $1;
-            $row->{sqlite_sql} =~ s/\AON\s*(\S+)\s*\(\s*(.+)\s*\)//s
-                or die "Can't extract indexed table+columns from sqlite_sql: $row->{sqlite_sql}";
-            $index_info->{table} = $table // $1;
-            $index_info->{columns} = [split /\s*,\s*/, $2];
-        } else {
-            die "Driver $driver is not yet supported";
+            $sql =~ s/\A\s*CREATE\s+(UNIQUE\s+)?INDEX\s+//is or do {
+                log_trace "Not a CREATE INDEX statement, skipped: $row->{sqlite_sql}";
+                next ROW;
+            };
+
+            $row->{is_unique} = $1 ? 1:0; # not-standard, backward compat
+            $row->{NON_UNIQUE} = $1 ? 0:1;
+
+            $sql =~ s/\A(\S+)\s+//s
+                or die "Can't extract index name from sqlite_sql: $sql";
+            $row->{name} = $1; # non-standard, backward compat
+            $row->{INDEX_NAME} = $1;
+
+            $sql =~ s/\AON\s*(\S+)\s*\(\s*(.+)\s*\)//s
+                or die "Can't extract indexed table+columns from sqlite_sql: $sql";
+            $row->{table} = $table // $1; # non-standard, backward-compat
+            $row->{columns} = [split /\s*,\s*/, $2]; # non-standard
+
+            push @res, $row;
+        } # while row
+
+    } elsif ($driver eq 'mysql') {
+
+        my $sth = $dbh->statistics_info(undef, undef, undef, undef, undef);
+        $sth->execute;
+        my @res0;
+        while (my $row = $sth->fetchrow_hashref) {
+            if (defined $wanted_table) {
+                if ($wanted_table =~ /(.+)\.(.+)/) {
+                    next unless $row->{TABLE_SCHEM} eq $1 && $row->{TABLE_NAME} eq $2;
+                } else {
+                    next unless $row->{TABLE_NAME} eq $wanted_table;
+                }
+            }
+            $row->{table} = $row->{TABLE_NAME}; # non-standard, backward-compat
+            $row->{name} = $row->{INDEX_NAME}; # non-standard, backward-compat
+            $row->{is_unique} = $row->{NON_UNIQUE} ? 0:1; # non-standard, backward-compat
+            $row->{is_pk} = $row->{INDEX_NAME} eq 'PRIMARY' ? 1:0; # non-standard, backward-compat
+
+            push @res0, $row;
         }
 
-        push @res, $index_info;
+        # merge separated per-indexed-column result into a single all-columns
+        # result
+        my @index_names;
+        for my $row (@res0) { push @index_names, $row->{INDEX_NAME} unless grep { $row->{INDEX_NAME} eq $_ } @index_names }
+        for my $index_name (@index_names) {
+            my @hashes = grep { $_->{INDEX_NAME} eq $index_name } @res0;
+            if (@hashes == 1) {
+                push @res, $hashes[0];
+            } else {
+                my %merged_hash;
+                $merged_hash{columns} = [];
+                for my $hash (@hashes) {
+                    $merged_hash{columns}[ $hash->{ORDINAL_POSITION}-1 ] = $hash->{COLUMN_NAME};
+                    for (keys %$hash) { $merged_hash{$_} = $hash->{$_} }
+                }
+                delete $merged_hash{ORDINAL_POSITION};
+                push @res, \%merged_hash;
+            }
+        }
+
+    } else {
+
+        die "Driver $driver is not yet supported for list_indexes";
     }
-    sort @res;
+
+    @res;
 }
+
+# old name, deprecated
+$SPEC{list_table_indexes} = $SPEC{list_indexes};
+*list_table_indexes = \&list_indexes;
 
 $SPEC{list_columns} = {
     v => 1.1,
@@ -523,7 +571,7 @@ DBIx::Diff::Schema - Compare schema of two DBI databases
 
 =head1 VERSION
 
-This document describes version 0.094 of DBIx::Diff::Schema (from Perl distribution DBIx-Diff-Schema), released on 2020-04-20.
+This document describes version 0.096 of DBIx::Diff::Schema (from Perl distribution DBIx-Diff-Schema), released on 2020-04-23.
 
 =head1 SYNOPSIS
 
@@ -724,6 +772,41 @@ Usage:
  list_columns($dbh, $table) -> any
 
 List columns of a table.
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<$dbh>* => I<obj>
+
+DBI database handle.
+
+=item * B<$table>* => I<str>
+
+Table name.
+
+
+=back
+
+Return value:  (any)
+
+
+
+=head2 list_indexes
+
+Usage:
+
+ list_indexes($dbh, $table) -> any
+
+List indexes for a table in a database.
+
+General notes: information is retrieved from DBI's table_info().
+
+SQLite notes: autoindex for primary key is also listed as the first index, if it
+exists. This information is retrieved using "SELECT * FROM sqlite_master".
+Autoindex is not listed using table_info().
 
 This function is not exported by default, but exportable.
 

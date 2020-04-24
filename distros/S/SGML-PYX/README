@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use SGML::PYX;
+
      my $obj = SGML::PYX->new(%params);
      $obj->parsefile($sgml_file);
 
@@ -34,11 +35,9 @@ ERRORS
                      data: %s
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use File::Temp qw(tempfile);
      use IO::Barf qw(barf);
      use SGML::PYX;
@@ -78,17 +77,18 @@ SEE ALSO
         Install the PYX modules.
 
 REPOSITORY
-    <https://github.com/tupinek/SGML-PYX>
+    <https://github.com/michal-josef-spacek/SGML-PYX>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © Michal Špaček 2015-2016
-     BSD 2-Clause License
+    © Michal Josef Špaček 2015-2020
+
+    BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

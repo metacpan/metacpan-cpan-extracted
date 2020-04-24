@@ -75,6 +75,6 @@
          "web" : "http://gitweb.mageia.org/software/rpm/urpmi/"
       }
    },
-   "version" : "v8.121.8",
+   "version" : "v8.121.13",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

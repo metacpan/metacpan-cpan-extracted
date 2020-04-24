@@ -14,12 +14,12 @@
          "schema:category" : "issue-2382",
          "schema:domainIncludes" : [
             "schema:PronounceableText",
-            "schema:Event",
+            "schema:BroadcastService",
+            "schema:LinkRole",
             "schema:WriteAction",
             "schema:CommunicateAction",
-            "schema:CreativeWork",
-            "schema:BroadcastService",
-            "schema:LinkRole"
+            "schema:Event",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : [
             "schema:Language",
@@ -32,8 +32,8 @@
          "rdfs:label" : "language",
          "rdfs:subPropertyOf" : "schema:instrument",
          "schema:domainIncludes" : [
-            "schema:WriteAction",
-            "schema:CommunicateAction"
+            "schema:CommunicateAction",
+            "schema:WriteAction"
          ],
          "schema:rangeIncludes" : "schema:Language",
          "schema:supersededBy" : "schema:inLanguage"

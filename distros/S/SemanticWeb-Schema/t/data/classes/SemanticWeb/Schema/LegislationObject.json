@@ -19,8 +19,8 @@
       "schema:legislationLegalValue" : {
          "core:exactMatch" : "ontology:legal_value",
          "dc:source" : [
-            "eli:index.html",
-            "https://github.com/schemaorg/schemaorg/issues/1156"
+            "https://github.com/schemaorg/schemaorg/issues/1156",
+            "eli:index.html"
          ],
          "owl:equivalentProperty" : "ontology:legal_value",
          "rdf:type" : "rdf:Property",

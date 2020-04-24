@@ -2,6 +2,7 @@ MANIFEST
 README
 Changes
 Float128.pm
+Float128.pod
 Float128.xs
 Makefile.PL
 math_float128_include.h

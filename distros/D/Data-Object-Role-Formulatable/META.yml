@@ -1,0 +1,47 @@
+---
+abstract: 'Formulatable Role for Perl 5'
+author:
+  - 'Al Newkirk <awncorp@cpan.org>'
+build_requires:
+  Data::Object::Class: '2.02'
+  Data::Object::ClassHas: '2.01'
+  Data::Object::Role::Buildable: '0.03'
+  Data::Object::Role::Errable: '0.01'
+  Data::Object::Role::Stashable: '2.01'
+  Data::Object::Role::Tryable: '2.00'
+  Data::Object::Space: '2.01'
+  Test::Auto: '0.10'
+  perl: '5.014'
+  routines: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Object-Role-Formulatable
+requires:
+  Data::Object::Class: '2.02'
+  Data::Object::ClassHas: '2.01'
+  Data::Object::Role::Buildable: '0.03'
+  Data::Object::Role::Errable: '0.01'
+  Data::Object::Role::Stashable: '2.01'
+  Data::Object::Role::Tryable: '2.00'
+  Data::Object::Space: '2.01'
+  perl: '5.014'
+  routines: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/iamalnewkirk/data-object-role-formulatable/issues
+  homepage: https://metacpan.org/release/Data-Object-Role-Formulatable
+  repository: git://github.com/iamalnewkirk/data-object-role-formulatable.git
+version: '0.02'
+x_authority: cpan:AWNCORP
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

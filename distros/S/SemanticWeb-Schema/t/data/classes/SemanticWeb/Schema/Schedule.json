@@ -18,8 +18,8 @@
          "schema:domainIncludes" : "schema:Schedule",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:DayOfWeek"
+            "schema:DayOfWeek",
+            "schema:Text"
          ]
       },
       "schema:byMonth" : {
@@ -55,14 +55,14 @@
             "issue-1457"
          ],
          "schema:domainIncludes" : [
-            "schema:Audiobook",
-            "schema:MediaObject",
             "schema:QuantitativeValueDistribution",
-            "schema:Event",
-            "schema:Schedule",
+            "schema:MusicRelease",
             "schema:MusicRecording",
+            "schema:Event",
             "schema:Movie",
-            "schema:MusicRelease"
+            "schema:MediaObject",
+            "schema:Schedule",
+            "schema:Audiobook"
          ],
          "schema:rangeIncludes" : "schema:Duration"
       },
@@ -73,16 +73,33 @@
          "rdfs:label" : "endDate",
          "schema:category" : "issue-2486",
          "schema:domainIncludes" : [
-            "schema:CreativeWorkSeason",
-            "schema:CreativeWorkSeries",
-            "schema:Schedule",
+            "schema:Event",
             "schema:DatedMoneySpecification",
+            "schema:Schedule",
+            "schema:CreativeWorkSeries",
             "schema:Role",
-            "schema:EducationalOccupationalProgram",
-            "schema:Event"
+            "schema:CreativeWorkSeason",
+            "schema:EducationalOccupationalProgram"
          ],
          "schema:rangeIncludes" : [
             "schema:Date",
+            "schema:DateTime"
+         ]
+      },
+      "schema:endTime" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2493",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The endTime of something. For a reserved event or service (e.g. FoodEstablishmentReservation), the time that it is expected to end. For actions that span a period of time, when the action was performed. e.g. John wrote a book from January to <em>December</em>. For media, including audio and video, it's the time offset of the end of a clip within a larger file.<br/><br/>\n\nNote that Event uses startDate/endDate instead of startTime/endTime, even when describing dates with times. This situation may be clarified in future revisions.",
+         "rdfs:label" : "endTime",
+         "schema:category" : "issue-2493",
+         "schema:domainIncludes" : [
+            "schema:FoodEstablishmentReservation",
+            "schema:MediaObject",
+            "schema:Action",
+            "schema:Schedule"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Time",
             "schema:DateTime"
          ]
       },
@@ -140,17 +157,34 @@
          "rdfs:label" : "startDate",
          "schema:category" : "issue-2486",
          "schema:domainIncludes" : [
-            "schema:Role",
             "schema:CreativeWorkSeries",
-            "schema:CreativeWorkSeason",
+            "schema:Role",
             "schema:DatedMoneySpecification",
-            "schema:EducationalOccupationalProgram",
+            "schema:CreativeWorkSeason",
             "schema:Schedule",
-            "schema:Event"
+            "schema:Event",
+            "schema:EducationalOccupationalProgram"
          ],
          "schema:rangeIncludes" : [
             "schema:DateTime",
             "schema:Date"
+         ]
+      },
+      "schema:startTime" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2493",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The startTime of something. For a reserved event or service (e.g. FoodEstablishmentReservation), the time that it is expected to start. For actions that span a period of time, when the action was performed. e.g. John wrote a book from <em>January</em> to December. For media, including audio and video, it's the time offset of the start of a clip within a larger file.<br/><br/>\n\nNote that Event uses startDate/endDate instead of startTime/endTime, even when describing dates with times. This situation may be clarified in future revisions.",
+         "rdfs:label" : "startTime",
+         "schema:category" : "issue-2493",
+         "schema:domainIncludes" : [
+            "schema:Schedule",
+            "schema:FoodEstablishmentReservation",
+            "schema:MediaObject",
+            "schema:Action"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Time",
+            "schema:DateTime"
          ]
       }
    }

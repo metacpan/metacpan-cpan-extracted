@@ -10,27 +10,6 @@
 
 #include "XSParseSublike.h"
 
-#ifndef av_top_index
-#define av_top_index(av)       AvFILL(av)
-#endif
-
-/* Not real API but this avoids so many off-by-one errors */
-#ifndef av_count
-#define av_count(av)           (av_top_index(av) + 1)
-#endif
-
-#ifndef block_end
-#define block_end(a,b)         Perl_block_end(aTHX_ a,b)
-#endif
-
-#ifndef block_start
-#define block_start(a)         Perl_block_start(aTHX_ a)
-#endif
-
-#ifndef intro_my
-#define intro_my()             Perl_intro_my(aTHX)
-#endif
-
 #ifndef wrap_keyword_plugin
 #  include "wrap_keyword_plugin.c.inc"
 #endif
@@ -42,25 +21,18 @@
 #  define HAVE_PARSE_SUBSIGNATURE
 #endif
 
+#include "perl-additions.c.inc"
+
+#include "perl-backcompat.c.inc"
+
 #include "lexer-additions.c.inc"
 
-#ifndef OpSIBLING
-#  define OpSIBLING(op)  (op->op_sibling)
-#endif
+/********************************
+ * Some handy utility functions *
+ ********************************/
 
 #if HAVE_PERL_VERSION(5, 22, 0)
 #  define HAVE_UNOP_AUX
-#endif
-
-#if !HAVE_PERL_VERSION(5, 18, 0)
-typedef AV PADNAMELIST;
-#  define PadlistARRAY(pl)        ((PAD **)AvARRAY(pl))
-#  define PadlistNAMES(pl)        (*PadlistARRAY(pl))
-
-typedef SV PADNAME;
-#  define PadnamePV(pn)           (SvPOKp(pn) ? SvPVX(pn) : NULL)
-#  define PadnameLEN(pn)          SvCUR(pn)
-#  define PadnamelistARRAY(pnl)   AvARRAY(pnl)
 #endif
 
 #ifndef HAVE_UNOP_AUX
@@ -69,8 +41,8 @@ typedef struct {
   IV   iv;
 } UNOP_with_IV;
 
-#define newUNOP_with_IV(type, flags, first, iv)  MY_newUNOP_with_IV(aTHX_ type, flags, first, iv)
-static OP *MY_newUNOP_with_IV(pTHX_ I32 type, I32 flags, OP *first, IV iv)
+#define newUNOP_with_IV(type, flags, first, iv)  S_newUNOP_with_IV(aTHX_ type, flags, first, iv)
+static OP *S_newUNOP_with_IV(pTHX_ I32 type, I32 flags, OP *first, IV iv)
 {
   /* Cargoculted from perl's op.c:Perl_newUNOP()
    */
@@ -92,8 +64,8 @@ static OP *MY_newUNOP_with_IV(pTHX_ I32 type, I32 flags, OP *first, IV iv)
 }
 #endif
 
-#define newMETHOD_REDIR_OP(rclass, methname, flags)  MY_newMETHOD_REDIR_OP(aTHX_ rclass, methname, flags)
-static OP *MY_newMETHOD_REDIR_OP(pTHX_ SV *rclass, SV *methname, I32 flags)
+#define newMETHOD_REDIR_OP(rclass, methname, flags)  S_newMETHOD_REDIR_OP(aTHX_ rclass, methname, flags)
+static OP *S_newMETHOD_REDIR_OP(pTHX_ SV *rclass, SV *methname, I32 flags)
 {
 #if HAVE_PERL_VERSION(5, 22, 0)
   OP *op = newMETHOP_named(OP_METHOD_REDIR, flags, methname);
@@ -115,53 +87,99 @@ static OP *MY_newMETHOD_REDIR_OP(pTHX_ SV *rclass, SV *methname, I32 flags)
   return op;
 }
 
-#ifndef op_convert_list
-#define op_convert_list(type, flags, o)  MY_op_convert_list(aTHX_ type, flags, o)
-static OP *MY_op_convert_list(pTHX_ I32 type, I32 flags, OP *o)
+#define import_pragma(pragma, arg)  S_import_pragma(aTHX_ pragma, arg)
+static void S_import_pragma(pTHX_ const char *pragma, const char *arg)
 {
-  /* A minimal recreation just for our purposes */
-  o->op_type = type;
-  o->op_flags |= flags;
-  o->op_ppaddr = PL_ppaddr[type];
+  dSP;
+  bool unimport = FALSE;
 
-  o = PL_check[type](aTHX_ o);
+  if(pragma[0] == '-') {
+    unimport = TRUE;
+    pragma++;
+  }
 
-  return o;
+  SAVETMPS;
+
+  EXTEND(SP, 2);
+  PUSHMARK(SP);
+  mPUSHp(pragma, strlen(pragma));
+  if(arg)
+    mPUSHp(arg, strlen(arg));
+  PUTBACK;
+
+  call_method(unimport ? "unimport" : "import", G_VOID);
+
+  FREETMPS;
 }
+
+#define ensure_module_version(module, version)  S_ensure_module_version(aTHX_ module, version)
+static void S_ensure_module_version(pTHX_ SV *module, SV *version)
+{
+  dSP;
+
+  ENTER;
+
+  PUSHMARK(SP);
+  PUSHs(module);
+  PUSHs(version);
+  PUTBACK;
+
+  call_method("VERSION", G_VOID);
+
+  LEAVE;
+}
+
+#define fetch_superclass_method_pv(stash, pv, len, level)  S_fetch_superclass_method_pv(aTHX_ stash, pv, len, level)
+static CV *S_fetch_superclass_method_pv(pTHX_ HV *stash, const char *pv, STRLEN len, U32 level)
+{
+#if HAVE_PERL_VERSION(5, 18, 0)
+  GV *gv = gv_fetchmeth_pvn(stash, pv, len, level, GV_SUPER);
+#else
+  SV *superclassname = newSVpvf("%*s::SUPER", HvNAMELEN_get(stash), HvNAME_get(stash));
+  if(HvNAMEUTF8(stash))
+    SvUTF8_on(superclassname);
+  SAVEFREESV(superclassname);
+
+  HV *superstash = gv_stashsv(superclassname, GV_ADD);
+  GV *gv = gv_fetchmeth_pvn(superstash, pv, len, level, 0);
 #endif
 
-/* A handy helper */
-#define save_strndup(s, l)  S_save_strndup(aTHX_ s, l)
-static char *S_save_strndup(pTHX_ char *s, STRLEN l)
-{
-  /* savepvn doesn't put anything on the save stack, despite its name */
-  char *ret = savepvn(s, l);
-  SAVEFREEPV(ret);
-  return ret;
+  if(!gv)
+    return NULL;
+  return GvCV(gv);
 }
 
-#define sv_setrv(s, r)  S_sv_setrv(aTHX_ s, r)
-static void S_sv_setrv(pTHX_ SV *sv, SV *rv)
+#define get_class_isa(stash)  S_get_class_isa(aTHX_ stash)
+static AV *S_get_class_isa(pTHX_ HV *stash)
 {
-  sv_setiv(sv, (IV)rv);
-#if !HAVE_PERL_VERSION(5, 24, 0)
-  SvIOK_off(sv);
-#endif
-  SvROK_on(sv);
+  GV **gvp = (GV **)hv_fetchs(stash, "ISA", 0);
+  if(!gvp || !GvAV(*gvp))
+    croak("Expected %s to have a @ISA list", HvNAME(stash));
+
+  return GvAV(*gvp);
 }
+
+/*********************************
+ * Class and Slot Implementation *
+ *********************************/
 
 /* A SLOTOFFSET is an offset within the AV of an object instance */
 typedef IV SLOTOFFSET;
 
+typedef struct ClassMeta ClassMeta;
+
 typedef struct {
   SV *name;
+  ClassMeta *class;
   OP *defaultop;
+  SLOTOFFSET slotix;
 } SlotMeta;
 
 /* Metadata about a class */
-typedef struct {
+struct ClassMeta {
   SV *name;
   HV *stash;
+  bool sealed;
   SLOTOFFSET offset;   /* first slot index of this partial within its instance */
   AV *slots;           /* each AV item is a raw pointer directly to a SlotMeta */
   enum {
@@ -175,7 +193,7 @@ typedef struct {
 
   COP *tmpcop;         /* a COP to use during generated constructor */
   CV *methodscope;     /* a temporary CV used just during compilation of a `method` */
-} ClassMeta;
+};
 
 /* Special pad indexes within `method` CVs */
 enum {
@@ -186,40 +204,17 @@ enum {
 /* Empty MGVTBL simply for locating instance slots AV */
 static MGVTBL vtbl_slotsav = {};
 
-static OP *newPADxVOP(I32 type, PADOFFSET padix, I32 flags, U32 private)
+#define get_obj_slotsav(self, repr, create)  S_obj_get_slotsav(aTHX_ self, repr, create)
+static SV *S_obj_get_slotsav(pTHX_ SV *self, U8 repr, bool create)
 {
-  OP *op = newOP(type, flags);
-  op->op_targ = padix;
-  op->op_private = private;
-  return op;
-}
+  SV *rv = SvRV(self);
 
-static XOP xop_methstart;
-static OP *pp_methstart(pTHX)
-{
-  SV *self = av_shift(GvAV(PL_defgv));
-  SV *rv;
-  HV *classstash = CvSTASH(find_runcv(0));
-  bool create = PL_op->op_flags & OPf_MOD;
-
-  if(!SvROK(self) || !SvOBJECT(rv = SvRV(self)))
-    croak("Cannot invoke method on a non-instance");
-
-  if(!sv_derived_from(self, HvNAME(classstash)))
-    croak("Cannot invoke foreign method on non-derived instance");
-
-  save_clearsv(&PAD_SVl(PADIX_SELF));
-  sv_setsv(PAD_SVl(PADIX_SELF), self);
-
-  SV *slotsav;
-
-  /* op_private contains the repr type so we can extract slots */
-  switch(PL_op->op_private) {
+  switch(repr) {
     case REPR_NATIVE:
       if(SvTYPE(rv) != SVt_PVAV)
         croak("Not an ARRAY reference");
-      slotsav = rv;
-      break;
+
+      return rv;
 
     case REPR_HASH:
     case_REPR_HASH:
@@ -253,8 +248,7 @@ static OP *pp_methstart(pTHX)
       }
       if(!SvROK(*slotssvp) || SvTYPE(SvRV(*slotssvp)) != SVt_PVAV)
         croak("Expected $self->{\"Object::Pad/slots\"} to be an ARRAY reference");
-      slotsav = SvRV(*slotssvp);
-      break;
+      return SvRV(*slotssvp);
     }
 
     case REPR_MAGIC:
@@ -265,8 +259,7 @@ static OP *pp_methstart(pTHX)
         mg = sv_magicext(rv, (SV *)newAV(), PERL_MAGIC_ext, &vtbl_slotsav, NULL, 0);
       if(!mg)
         croak("Expected to find slots AV magic extension");
-      slotsav = mg->mg_obj;
-      break;
+      return mg->mg_obj;
     }
 
     case REPR_AUTOSELECT:
@@ -274,6 +267,28 @@ static OP *pp_methstart(pTHX)
         goto case_REPR_HASH;
       goto case_REPR_MAGIC;
   }
+
+  croak("ARGH unhandled repr type");
+}
+
+static XOP xop_methstart;
+static OP *pp_methstart(pTHX)
+{
+  SV *self = av_shift(GvAV(PL_defgv));
+  HV *classstash = CvSTASH(find_runcv(0));
+  bool create = PL_op->op_flags & OPf_MOD;
+
+  if(!SvROK(self) || !SvOBJECT(SvRV(self)))
+    croak("Cannot invoke method on a non-instance");
+
+  if(!sv_derived_from(self, HvNAME(classstash)))
+    croak("Cannot invoke foreign method on non-derived instance");
+
+  save_clearsv(&PAD_SVl(PADIX_SELF));
+  sv_setsv(PAD_SVl(PADIX_SELF), self);
+
+  /* op_private contains the repr type so we can extract slots */
+  SV *slotsav = get_obj_slotsav(self, PL_op->op_private, create);
 
   SAVESPTR(PAD_SVl(PADIX_SLOTS));
   PAD_SVl(PADIX_SLOTS) = SvREFCNT_inc(slotsav);
@@ -358,81 +373,7 @@ static OP *newSLOTPADOP(I32 flags, U8 private, PADOFFSET padix, SLOTOFFSET sloti
   return op;
 }
 
-#define import_pragma(pragma, arg)  MY_import_pragma(aTHX_ pragma, arg)
-static void MY_import_pragma(pTHX_ const char *pragma, const char *arg)
-{
-  dSP;
-  bool unimport = FALSE;
-
-  if(pragma[0] == '-') {
-    unimport = TRUE;
-    pragma++;
-  }
-
-  SAVETMPS;
-
-  EXTEND(SP, 2);
-  PUSHMARK(SP);
-  mPUSHp(pragma, strlen(pragma));
-  if(arg)
-    mPUSHp(arg, strlen(arg));
-  PUTBACK;
-
-  call_method(unimport ? "unimport" : "import", G_VOID);
-
-  FREETMPS;
-}
-
-#define ensure_module_version(module, version)  MY_ensure_module_version(aTHX_ module, version)
-static void MY_ensure_module_version(pTHX_ SV *module, SV *version)
-{
-  dSP;
-
-  ENTER;
-
-  PUSHMARK(SP);
-  PUSHs(module);
-  PUSHs(version);
-  PUTBACK;
-
-  call_method("VERSION", G_VOID);
-
-  LEAVE;
-}
-
-#define fetch_superclass_method_pv(stash, pv, len, level)  MY_fetch_superclass_method_pv(aTHX_ stash, pv, len, level)
-static CV *MY_fetch_superclass_method_pv(pTHX_ HV *stash, const char *pv, STRLEN len, U32 level)
-{
-#if HAVE_PERL_VERSION(5, 18, 0)
-  GV *gv = gv_fetchmeth_pvn(stash, pv, len, level, GV_SUPER);
-#else
-  SV *superclassname = newSVpvf("%*s::SUPER", HvNAMELEN_get(stash), HvNAME_get(stash));
-  if(HvNAMEUTF8(stash))
-    SvUTF8_on(superclassname);
-  SAVEFREESV(superclassname);
-
-  HV *superstash = gv_stashsv(superclassname, GV_ADD);
-  GV *gv = gv_fetchmeth_pvn(superstash, pv, len, level, 0);
-#endif
-
-  if(!gv)
-    return NULL;
-  return GvCV(gv);
-}
-
-
-#define get_class_isa(stash)  MY_get_class_isa(aTHX_ stash)
-static AV *MY_get_class_isa(pTHX_ HV *stash)
-{
-  GV **gvp = (GV **)hv_fetchs(stash, "ISA", 0);
-  if(!gvp || !GvAV(*gvp))
-    croak("Expected %s to have a @ISA list", HvNAME(stash));
-
-  return GvAV(*gvp);
-}
-
-#define generate_initslots_method(meta)  MY_generate_initslots_method(aTHX_ meta)
-static void MY_generate_initslots_method(pTHX_ ClassMeta *meta)
+static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
 {
   OP *ops = NULL;
   int i;
@@ -570,6 +511,14 @@ static void MY_generate_initslots_method(pTHX_ ClassMeta *meta)
   LEAVE;
 }
 
+#define mop_class_seal(meta)  S_mop_class_seal(aTHX_ meta)
+static void S_mop_class_seal(pTHX_ ClassMeta *meta)
+{
+  S_generate_initslots_method(aTHX_ meta);
+
+  meta->sealed = true;
+}
+
 /* The metadata on the currently-compiling class */
 #define compclassmeta       S_compclassmeta(aTHX)
 static ClassMeta *S_compclassmeta(pTHX)
@@ -597,7 +546,7 @@ static int on_free_compclassmeta(pTHX_ SV *sv, MAGIC *mg)
 {
   ClassMeta *meta = (ClassMeta *)mg->mg_ptr;
 
-  generate_initslots_method(meta);
+  mop_class_seal(meta);
 }
 
 static MGVTBL vtbl_compclassmeta = {
@@ -608,14 +557,14 @@ static MGVTBL vtbl_compclassmeta = {
   on_free_compclassmeta,
 };
 
-#define COMPCLASSMETA_GEN_ON_FREE (1<<0)
+#define COMPCLASSMETA_SEAL_ON_FREE (1<<0)
 #define compclassmeta_set(meta, flags)  S_compclassmeta_set(aTHX_ meta, flags)
 static void S_compclassmeta_set(pTHX_ ClassMeta *meta, U8 flags)
 {
   SV *sv = *hv_fetchs(GvHV(PL_hintgv), "Object::Pad/compclassmeta", GV_ADD);
   sv_setiv(sv, (IV)meta);
 
-  if(flags & COMPCLASSMETA_GEN_ON_FREE)
+  if(flags & COMPCLASSMETA_SEAL_ON_FREE)
     sv_magicext(sv, NULL, PERL_MAGIC_ext, &vtbl_compclassmeta, (char *)meta, 0);
 }
 
@@ -812,14 +761,15 @@ static XS(injected_constructor)
   XSRETURN(1);
 }
 
-#define mop_create_class(name, super)  MY_mop_create_class(aTHX_ name, super)
-static ClassMeta *MY_mop_create_class(pTHX_ SV *name, SV *superclassname)
+#define mop_create_class(name, super)  S_mop_create_class(aTHX_ name, super)
+static ClassMeta *S_mop_create_class(pTHX_ SV *name, SV *superclassname)
 {
   ClassMeta *meta;
   Newx(meta, 1, ClassMeta);
 
   meta->name = SvREFCNT_inc(name);
 
+  meta->sealed = false;
   meta->offset = 0;
   meta->slots  = newAV();
   meta->repr   = REPR_AUTOSELECT;
@@ -848,7 +798,7 @@ static ClassMeta *MY_mop_create_class(pTHX_ SV *name, SV *superclassname)
     HV *superstash = gv_stashsv(superclassname, 0);
     GV **metagvp = (GV **)hv_fetchs(superstash, "META", 0);
     if(metagvp)
-      supermeta = NUM2PTR(ClassMeta *, SvUV(GvSV(*metagvp)));
+      supermeta = NUM2PTR(ClassMeta *, SvUV(SvRV(GvSV(*metagvp))));
 
     if(supermeta) {
       /* A subclass of an Object::Pad class */
@@ -885,7 +835,10 @@ static ClassMeta *MY_mop_create_class(pTHX_ SV *name, SV *superclassname)
     gv_init_pvn(gv, stash, "META", 4, 0);
     GvMULTI_on(gv);
 
-    sv_setuv(GvSVn(gv), PTR2UV(meta));
+    SV *sv;
+    sv_setref_uv(sv = GvSVn(gv), "Object::Pad::MOP::Class", PTR2UV(meta));
+
+    newCONSTSUB(meta->stash, "META", sv);
   }
 
   return meta;
@@ -928,6 +881,31 @@ static void S_apply_class_attribute(pTHX_ ClassMeta *meta, SV *attr)
     croak("Unrecognised class attribute %" SVf, name);
 }
 
+#define mop_class_add_slot(class, slotname)  S_mop_class_add_slot(aTHX_ class, slotname)
+static SlotMeta *S_mop_class_add_slot(pTHX_ ClassMeta *meta, SV *slotname)
+{
+  AV *slots = meta->slots;
+
+  if(meta->sealed)
+    croak("Cannot add a new slot to an already-sealed class");
+
+  /* TODO: Check for name collisions */
+  SlotMeta *slotmeta;
+  Newx(slotmeta, 1, SlotMeta);
+
+  slotmeta->name = SvREFCNT_inc(slotname);
+  slotmeta->class = meta;
+  slotmeta->slotix = meta->offset + av_count(slots);
+  slotmeta->defaultop = NULL;
+
+  av_push(slots, (SV *)slotmeta);
+
+  return slotmeta;
+}
+
+/*******************
+ * Custom Keywords *
+ *******************/
 
 static int keyword_class(pTHX_ OP **op_ptr)
 {
@@ -1042,7 +1020,7 @@ static int keyword_class(pTHX_ OP **op_ptr)
 
   if(is_block) {
     I32 save_ix = block_start(TRUE);
-    compclassmeta_set(meta, COMPCLASSMETA_GEN_ON_FREE);
+    compclassmeta_set(meta, COMPCLASSMETA_SEAL_ON_FREE);
 
     OP *body = parse_stmtseq(0);
     body = block_end(save_ix, body);
@@ -1059,7 +1037,7 @@ static int keyword_class(pTHX_ OP **op_ptr)
   }
   else {
     SAVEHINTS();
-    compclassmeta_set(meta, COMPCLASSMETA_GEN_ON_FREE);
+    compclassmeta_set(meta, COMPCLASSMETA_SEAL_ON_FREE);
 
     *op_ptr = newOP(OP_NULL, 0);
     return KEYWORD_PLUGIN_STMT;
@@ -1078,16 +1056,8 @@ static int keyword_has(pTHX_ OP **op_ptr)
 
   ENTER;
 
-  AV *slots = compclassmeta->slots;
-
-  /* TODO: Check for name collisions */
-  SlotMeta *slotmeta;
-  Newx(slotmeta, 1, SlotMeta);
-
-  slotmeta->name = name;
-  slotmeta->defaultop = NULL;
-
-  av_push(slots, (SV *)slotmeta);
+  SlotMeta *slotmeta = mop_class_add_slot(compclassmeta, name);
+  SvREFCNT_dec(name);
 
   lex_read_space(0);
 
@@ -1186,6 +1156,9 @@ static void parse_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx)
   /* Splice in the slot scope CV in */
   CV *methodscope = compclassmeta->methodscope;
 
+  if(CvANON(PL_compcv))
+    CvANON_on(methodscope);
+
   CvOUTSIDE    (methodscope) = CvOUTSIDE    (PL_compcv);
   CvOUTSIDE_SEQ(methodscope) = CvOUTSIDE_SEQ(PL_compcv);
 
@@ -1221,8 +1194,9 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx)
     repr = REPR_NATIVE;
 
   slotops = op_append_list(OP_LINESEQ, slotops,
-    newMETHSTARTOP(0, repr)
-  );
+    newSTATEOP(0, NULL, NULL));
+  slotops = op_append_list(OP_LINESEQ, slotops,
+    newMETHSTARTOP(0, repr));
 
   int i;
   for(i = 0; i < nslots; i++) {
@@ -1262,6 +1236,37 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx)
   ctx->body = op_append_list(OP_LINESEQ, slotops, ctx->body);
 
   compclassmeta->methodscope = NULL;
+
+  /* Restore CvOUTSIDE(PL_compcv) back to where it should be */
+  {
+    CV *outside = CvOUTSIDE(PL_compcv);
+    PADNAMELIST *pnl = PadlistNAMES(CvPADLIST(PL_compcv));
+    PADNAMELIST *outside_pnl = PadlistNAMES(CvPADLIST(outside));
+
+    /* Lexical captures will need their parent pad index fixing
+     * Technically these only matter for CvANON because they're only used when
+     * reconstructing the parent pad captures by OP_ANONCODE. But we might as
+     * well be polite and fix them for all CVs
+     */
+    PADOFFSET padix;
+    for(padix = 1; padix <= PadnamelistMAX(pnl); padix++) {
+      PADNAME *pn = PadnamelistARRAY(pnl)[padix];
+      if(!pn || 
+#if !HAVE_PERL_VERSION(5, 22, 0)
+         pn == &PL_sv_undef ||
+#endif
+         !PadnameOUTER(pn) ||
+         !PARENT_PAD_INDEX(pn))
+        continue;
+
+      PADNAME *outside_pn = PadnamelistARRAY(outside_pnl)[PARENT_PAD_INDEX(pn)];
+
+      PARENT_PAD_INDEX_set(pn, PARENT_PAD_INDEX(outside_pn));
+    }
+
+    CvOUTSIDE(PL_compcv)     = CvOUTSIDE(outside);
+    CvOUTSIDE_SEQ(PL_compcv) = CvOUTSIDE_SEQ(outside);
+  }
 }
 
 static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx)
@@ -1301,7 +1306,7 @@ static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op_ptr)
 
 MODULE = Object::Pad    PACKAGE = Object::Pad
 
-void
+SV *
 _begin_class(name, superclassname)
     SV *name
     SV *superclassname
@@ -1309,7 +1314,142 @@ _begin_class(name, superclassname)
   {
     ClassMeta *meta = mop_create_class(name, superclassname);
 
-    compclassmeta_set(meta, COMPCLASSMETA_GEN_ON_FREE);
+    compclassmeta_set(meta, COMPCLASSMETA_SEAL_ON_FREE);
+
+    RETVAL = newSV(0);
+    sv_setref_uv(RETVAL, "Object::Pad::MOP::Class", PTR2UV(meta));
+  }
+  OUTPUT:
+    RETVAL
+
+MODULE = Object::Pad    PACKAGE = Object::Pad::MOP::Class
+
+SV *
+new(class, name)
+    SV *class
+    SV *name
+  CODE:
+  {
+    ClassMeta *meta = mop_create_class(name, NULL);
+
+    RETVAL = newSV(0);
+    sv_setref_uv(RETVAL, "Object::Pad::MOP::Class", PTR2UV(meta));
+  }
+  OUTPUT:
+    RETVAL
+
+SV *
+name(self)
+    SV *self
+  CODE:
+  {
+    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
+    RETVAL = SvREFCNT_inc(meta->name);
+  }
+  OUTPUT:
+    RETVAL
+
+SV *
+add_slot(self, slotname)
+    SV *self
+    SV *slotname
+  CODE:
+  {
+    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
+
+    SlotMeta *slotmeta = mop_class_add_slot(meta, slotname);
+
+    RETVAL = newSV(0);
+    sv_setref_uv(RETVAL, "Object::Pad::MOP::Slot", PTR2UV(slotmeta));
+  }
+  OUTPUT:
+    RETVAL
+
+void
+get_slot(self, slotname)
+    SV *self
+    SV *slotname
+  PPCODE:
+  {
+    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
+
+    AV *slots = meta->slots;
+    U32 nslots = av_count(slots);
+
+    SLOTOFFSET i;
+    for(i = 0; i < nslots; i++) {
+      SlotMeta *slotmeta = (SlotMeta *)AvARRAY(slots)[i];
+
+      if(!sv_eq(slotmeta->name, slotname))
+        continue;
+
+      ST(0) = sv_newmortal();
+      sv_setref_iv(ST(0), "Object::Pad::MOP::Slot", PTR2UV(slotmeta));
+      XSRETURN(1);
+    }
+
+    croak("Class %" SVf " does not have a slot called '%" SVf "'",
+      meta->name, slotname);
+  }
+
+MODULE = Object::Pad    PACKAGE = Object::Pad::MOP::Slot
+
+SV *
+name(self)
+    SV *self
+  ALIAS:
+    name  = 0
+    class = 1
+  CODE:
+  {
+    SlotMeta *meta = NUM2PTR(SlotMeta *, SvUV(SvRV(self)));
+    switch(ix) {
+      case 0: RETVAL = SvREFCNT_inc(meta->name); break;
+      case 1:
+        RETVAL = newSV(0);
+        sv_setref_uv(RETVAL, "Object::Pad::MOP::Class", PTR2UV(meta->class));
+        break;
+    }
+  }
+  OUTPUT:
+    RETVAL
+
+void
+value(self, obj)
+    SV *self
+    SV *obj
+  PPCODE:
+  {
+    SlotMeta *meta = NUM2PTR(SlotMeta *, SvUV(SvRV(self)));
+    SV *objrv;
+
+    if(!SvROK(obj) || !SvOBJECT(objrv = SvRV(obj)))
+      croak("Cannot fetch slot value of a non-instance");
+
+    if(!sv_derived_from(obj, HvNAME(meta->class->stash)))
+      croak("Cannot fetch slot value from a non-derived instance");
+
+    U8 repr = meta->class->repr;
+    if(repr == REPR_AUTOSELECT && !meta->class->foreign_new)
+      repr = REPR_NATIVE;
+    AV *slotsav = (AV *)get_obj_slotsav(obj, repr, true);
+
+    if(meta->slotix > av_top_index(slotsav))
+      croak("ARGH: instance does not have a slot at index %d", meta->slotix);
+
+    SV *value = AvARRAY(slotsav)[meta->slotix];
+
+    /* We must prevent caller from assigning to non-scalar slots, in case
+     * they break the SvTYPE of the value. We can't cancel the CvLVALUE but we
+     * can yield a READONLY value in this case */
+    if(SvPV_nolen(meta->name)[0] != '$') {
+      value = sv_mortalcopy(value);
+      SvREADONLY_on(value);
+    }
+
+    /* stack does not contribute SvREFCNT */
+    ST(0) = value;
+    XSRETURN(1);
   }
 
 BOOT:
@@ -1326,6 +1466,8 @@ BOOT:
   XopENTRY_set(&xop_slotpad, xop_class, OA_UNOP); /* technically a lie */
 #endif
   Perl_custom_op_register(aTHX_ &pp_slotpad, &xop_slotpad);
+
+  CvLVALUE_on(get_cv("Object::Pad::MOP::Slot::value", 0));
 
   wrap_keyword_plugin(&my_keyword_plugin, &next_keyword_plugin);
 

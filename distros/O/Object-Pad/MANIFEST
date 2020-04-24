@@ -1,6 +1,8 @@
 Build.PL
 Changes
 hax/lexer-additions.c.inc
+hax/perl-additions.c.inc
+hax/perl-backcompat.c.inc
 hax/wrap_keyword_plugin.c.inc
 lib/Object/Pad.pm
 lib/Object/Pad.xs
@@ -27,6 +29,9 @@ t/50croak-method.t
 t/51pragmata.t
 t/52croak-scope.t
 t/70mop-create-class.t
+t/71mop-class.t
+t/72mop-slot.t
+t/79mop-generated.t
 t/80async-method.t
 t/80dynamically+Object-Pad.t
 t/81async-method+dynamically.t

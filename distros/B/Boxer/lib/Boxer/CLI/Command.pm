@@ -6,20 +6,22 @@ package Boxer::CLI::Command;
 
 use v5.14;
 use utf8;
-use strictures 2;
 use Role::Commons -all;
 use namespace::autoclean 0.16;
 
 use Log::Any::Adapter qw<Screen>;
 use App::Cmd::Setup-command;
 
+use strictures 2;
+no warnings "experimental::signatures";
+
 =head1 VERSION
 
-Version v1.4.0
+Version v1.4.2
 
 =cut
 
-our $VERSION = "v1.4.0";
+our $VERSION = "v1.4.2";
 
 =head1 AUTHOR
 

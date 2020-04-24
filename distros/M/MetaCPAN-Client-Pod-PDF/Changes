@@ -10,3 +10,6 @@ Revision history for MetaCPAN-Client-Pod-PDF
 0.03    2020-04-13
 	- Add a 'raw' method that accepts a string of valid POD markup to convert into a PDF.
 	- Add a boolean hook to allow for the stringified version of the PDF to be returned.
+
+0.04    2020-04-13
+	- Require latest Mxpress::PDF

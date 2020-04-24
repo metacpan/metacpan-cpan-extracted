@@ -14,9 +14,9 @@
          "rdfs:label" : "serialNumber",
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:domainIncludes" : [
-            "schema:IndividualProduct",
+            "schema:Offer",
             "schema:Demand",
-            "schema:Offer"
+            "schema:IndividualProduct"
          ],
          "schema:rangeIncludes" : "schema:Text"
       }

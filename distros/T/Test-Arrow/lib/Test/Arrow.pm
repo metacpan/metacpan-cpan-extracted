@@ -5,9 +5,19 @@ use Test::Builder::Module;
 use Test::Name::FromLine;
 use Text::MatchedPosition;
 
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 
 our @ISA = qw/Test::Builder::Module/;
+
+sub _carp {
+    my ($pkg, $file, $line) = caller;
+    return warn @_, " at $pkg, $file line $line\n";
+}
+
+sub _croak {
+    my ($pkg, $file, $line) = caller;
+    return die @_, " at $pkg, $file line $line\n";
+}
 
 sub PASS { 1 }
 sub FAIL { 0 }
@@ -20,6 +30,7 @@ sub import {
         my $caller = caller;
         no strict 'refs'; ## no critic
         *{"${caller}::done"} = \&done;
+        *{"${caller}::t"} = \&t;
     }
 
     $pkg->_import_option_no_strict(\%args);
@@ -27,14 +38,16 @@ sub import {
     $pkg->_import_option_binary(\%args);
 
     if (scalar(keys %args) > 0) {
-        die "Wrong option: " . join(", ", keys %args);
+        _croak "Wrong option: " . join(", ", keys %args);
     }
 
-    if ($] < 5.014000) {
+    if ( _need_io_handle() ) {
         require IO::Handle;
         IO::Handle->import;
     }
 }
+
+sub _need_io_handle { $] < 5.014000 }
 
 sub _import_option_no_strict {
     my ($pkg, $args) = @_;
@@ -81,6 +94,10 @@ sub new {
     $self;
 }
 
+sub t {
+    return __PACKAGE__->new(@_);
+}
+
 sub _tb { __PACKAGE__->builder }
 
 sub _reset {
@@ -100,11 +117,6 @@ sub plan {
     my $self = shift;
 
     return _tb->plan(@_);
-}
-
-sub _carp {
-    my ($file, $line) = ( caller(1) )[ 1, 2 ];
-    return warn @_, " at $file line $line\n";
 }
 
 sub skip {
@@ -153,7 +165,7 @@ sub expected {
     my $arg_count = scalar(@_) - 1;
 
     if ($arg_count > 1) {
-        die "'expected' method expects just only one arg. You passed $arg_count args.";
+        _croak "'expected' method expects just only one arg. You passed $arg_count args.";
     }
 
     $self->{_expected} = $value;
@@ -167,7 +179,7 @@ sub got {
     my $arg_count = scalar(@_) - 1;
 
     if ($arg_count > 1) {
-        die "'got' method expects just only one arg. You passed $arg_count args.";
+        _croak "'got' method expects just only one arg. You passed $arg_count args.";
     }
 
     $self->{_got} = $value;
@@ -377,7 +389,7 @@ sub isa_ok {
     my ($result, $error) = _tb->_try(sub { $got->isa($expected) });
 
     if ($error) {
-        die <<WHOA unless $error =~ /^Can't (locate|call) method "isa"/;
+        _croak <<WHOA unless $error =~ /^Can't (locate|call) method "isa"/;
 WHOA! I tried to call ->isa on your $whatami and got some weird error.
 Here's the error.
 $error
@@ -437,7 +449,7 @@ sub _get_isa_diag_name {
         $diag = "$test_name isn't a '$expected'";
     }
     else {
-        die;
+        _croak;
     }
 
     return($diag, $name);
@@ -459,7 +471,7 @@ sub throw {
     my $self = shift;
     my $code = shift;
 
-    die 'The `throw` method expects code ref.' unless ref $code eq 'CODE';
+    _croak 'The `throw` method expects code ref.' unless ref $code eq 'CODE';
 
     eval { $code->() };
 
@@ -518,7 +530,7 @@ sub warnings_ok {
 sub warnings {
     my ($self, $code, $regex, $name) = @_;
 
-    die 'The `warn` method expects code ref.' unless ref $code eq 'CODE';
+    _croak 'The `warn` method expects code ref.' unless ref $code eq 'CODE';
 
     my @warns;
     eval {
@@ -673,7 +685,7 @@ sub __deep_check_type {
         $ok = FAIL;
     }
     else {
-        die <<_WHOA_;
+        _croak <<_WHOA_;
 WHOA!  No type in _deep_check
 This should never happen!  Please contact the author immediately!
 _WHOA_
@@ -818,8 +830,7 @@ sub _format_stack {
           :                     "'$val'";
     }
 
-    $out .= "$vars[0] = $vals[0]\n";
-    $out .= "$vars[1] = $vals[1]\n";
+    $out .= "$vars[0] = $vals[0]\n" . "$vars[1] = $vals[1]\n";
 
     $out =~ s/^/    /msg;
 
@@ -873,6 +884,17 @@ Test::Arrow - Object-Oriented testing library
     $arr->warnings(sub { warn 'Bar' })->catch(qr/^Ba/);
     $arr->throw(sub { die 'Baz' })->catch(qr/^Ba/);
 
+    done;
+
+The function C<t> is exported as a shortcut for constructor. It initializes an instance for each.
+
+    use Test::Arrow;
+
+    t->got(1)->ok;
+
+    t->expect(uc 'foo')->to_be('FOO');
+
+    done;
 
 =head1 DESCRIPTION
 
@@ -946,6 +968,19 @@ It should be in constructor option or should be called as straightforward method
     $arr->plan(skip_all => 'Reason');
 
 =back
+
+=head3 t
+
+The function C<t> will be exported. It's initializer to get instance as shortcut.
+
+    my $arr = Test::Arrow;
+    $arr->got(1)->ok;
+
+Above test is same as below.
+
+    t->got(1)->ok;
+
+The function C<t> can get arguments as same as C<new>.
 
 =head2 SETTERS
 
@@ -1068,7 +1103,7 @@ It works on references, too:
 
 Compare references, it does a deep comparison walking each data structure to see if they are equivalent.
 
-This C<is_deeply> is mostly same as Test::More's one. You can use L<Test::Deep> more in-depth functionality along these lines.
+This C<is_deeply> is mostly same as Test::More's one. You can use L<Test::Deep> more in-depth functionality along these lines. Also L<Test::Deep::Matcher> is more better to use with.
 
 
 =head2 EXCEPTION TEST
@@ -1212,7 +1247,7 @@ B<Note> that you must never put C<done_testing> inside an C<END { ... }> block.
 
 =begin html
 
-<a href="https://github.com/bayashi/Test-Arrow/blob/master/README.pod"><img src="https://img.shields.io/badge/Version-0.18-green?style=flat"></a> <a href="https://github.com/bayashi/Test-Arrow/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Test-Arrow/actions"><img src="https://github.com/bayashi/Test-Arrow/workflows/master/badge.svg?_t=1587262139"/></a> <a href="https://coveralls.io/r/bayashi/Test-Arrow"><img src="https://coveralls.io/repos/bayashi/Test-Arrow/badge.png?_t=1587262139&branch=master"/></a>
+<a href="https://github.com/bayashi/Test-Arrow/blob/master/README.pod"><img src="https://img.shields.io/badge/Version-0.20-green?style=flat"></a> <a href="https://github.com/bayashi/Test-Arrow/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Test-Arrow/actions"><img src="https://github.com/bayashi/Test-Arrow/workflows/master/badge.svg?_t=1587735883"/></a> <a href="https://coveralls.io/r/bayashi/Test-Arrow"><img src="https://coveralls.io/repos/bayashi/Test-Arrow/badge.png?_t=1587735883&branch=master"/></a>
 
 =end html
 

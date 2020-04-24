@@ -1,0 +1,328 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/diffdb/diffdbtable_sqlite
+# and generated automatically using Perinci::CmdLine::Gen version 0.496
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-23'; # DATE
+our $DIST = 'App-diffdb'; # DIST
+our $VERSION = '0.003'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/diffdb/diffdbtable_sqlite",
+    program_name => "diffdbtable-sqlite",
+    log => 1,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Compare two SQLite database tables, line by line
+# PODNAME: diffdbtable-sqlite
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+diffdbtable-sqlite - Compare two SQLite database tables, line by line
+
+=head1 VERSION
+
+This document describes version 0.003 of diffdbtable-sqlite (from Perl distribution App-diffdb), released on 2020-04-23.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % diffdbtable-sqlite [options] [dbpath1] [dbpath2] [table1] [table2]
+
+=head1 DESCRIPTION
+
+This utility compares two SQLite database tables and displays the result as the
+familiar colored unified-style diff.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--diff-command>=I<s>
+
+Default value:
+
+ "diff"
+
+=item B<--row-as>=I<s>
+
+Default value:
+
+ "json-one-line"
+
+Valid values:
+
+ ["json-one-line","json-card"]
+
+=item B<--table1>=I<s>
+
+=item B<--table2>=I<s>
+
+=back
+
+=head2 Column selection options
+
+=over
+
+=item B<--exclude-column>=I<s@>, B<-C>
+
+Can be specified multiple times.
+
+=item B<--exclude-columns-json>=I<s>
+
+See C<--exclude-column>.
+
+=item B<--include-column>=I<s@>, B<-c>
+
+Can be specified multiple times.
+
+=item B<--include-columns-json>=I<s>
+
+See C<--include-column>.
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<s>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Connection options
+
+=over
+
+=item B<--dbpath1>=I<s>
+
+First SQLite database file.
+
+=item B<--dbpath2>=I<s>
+
+Second SQLite database file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=back
+
+=head2 Row ordering options
+
+=over
+
+=item B<--order-by>=I<s>
+
+=back
+
+=head2 Table selection options
+
+=over
+
+=item B<--sql1>=I<s>
+
+Compare the result of SQL select query, instead of tables.
+
+=item B<--sql2>=I<s>
+
+Compare the result of SQL select query, instead of tables.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C diffdbtable-sqlite diffdbtable-sqlite
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete diffdbtable-sqlite 'p/*/`diffdbtable-sqlite`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/diffdbtable-sqlite.conf>, F<~/diffdbtable-sqlite.conf>, or F</etc/diffdbtable-sqlite.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ dbpath1 (see --dbpath1)
+ dbpath2 (see --dbpath2)
+ diff_command (see --diff-command)
+ exclude_columns (see --exclude-column)
+ include_columns (see --include-column)
+ log_level (see --log-level)
+ order_by (see --order-by)
+ row_as (see --row-as)
+ sql1 (see --sql1)
+ sql2 (see --sql2)
+ table1 (see --table1)
+ table2 (see --table2)
+
+=head1 ENVIRONMENT
+
+=head2 DIFFDBTABLE_SQLITE_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/diffdbtable-sqlite.conf>
+
+F<~/diffdbtable-sqlite.conf>
+
+F</etc/diffdbtable-sqlite.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-diffdb>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-diffdb>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-diffdb>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

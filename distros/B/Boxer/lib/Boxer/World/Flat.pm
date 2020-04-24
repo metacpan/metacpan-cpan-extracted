@@ -8,10 +8,10 @@ Boxer::World::Flat - software for single use case
 
 =cut
 
-use v5.14;
+use v5.20;
 use utf8;
-use strictures 2;
 use Role::Commons -all;
+use feature 'signatures';
 use namespace::autoclean 0.16;
 use autodie;
 
@@ -22,13 +22,16 @@ extends qw(Boxer::World);
 use Types::Standard qw( Maybe Bool Tuple );
 use Types::TypeTiny qw( StringLike ArrayLike );
 
+use strictures 2;
+no warnings "experimental::signatures";
+
 =head1 VERSION
 
-Version v1.4.0
+Version v1.4.2
 
 =cut
 
-our $VERSION = "v1.4.0";
+our $VERSION = "v1.4.2";
 
 =head1 DESCRIPTION
 
@@ -102,10 +105,8 @@ has nonfree => (
 	required => 1,
 );
 
-sub as_file
+sub as_file ( $self, $file, $oldstyle = 0 )
 {
-	my ( $self, $file, $oldstyle ) = @_;
-
 	my $pkgs       = join( ',',      sort @{ $self->pkgs } );
 	my $pkgs_avoid = join( ',',      sort @{ $self->pkgs_avoid } );
 	my $pkgs_auto  = join( ',',      sort @{ $self->pkgs_auto } );

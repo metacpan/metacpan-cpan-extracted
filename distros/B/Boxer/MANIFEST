@@ -200,6 +200,7 @@ examples/classes/x11/lightdm/gtk.yml
 examples/classes/x11/lightdm/init.yml
 examples/nodes/lxp5.yml
 examples/nodes/parl-greens.yml
+examples/nodes/zsh.yml
 lib/Boxer.pm
 lib/Boxer/CLI.pm
 lib/Boxer/CLI/Command.pm
@@ -225,6 +226,8 @@ share/skel/script.sh.in
 t/00_compile.t
 t/00_compile_scripts.t
 t/01_app_help.t
+t/04_boxer.t
+t/05_world-reclass.t
 t/bootstrap.t
 t/classify.t
 t/compose.t

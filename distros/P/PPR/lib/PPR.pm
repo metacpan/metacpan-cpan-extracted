@@ -15,7 +15,7 @@ BEGIN {
     }
 }
 use warnings;
-our $VERSION = '0.000025';
+our $VERSION = '0.000026';
 use utf8;
 
 # Class for $PPR::ERROR objects...
@@ -63,6 +63,20 @@ use utf8;
 # Define the grammar...
 our $GRAMMAR = qr{
 (?(DEFINE)
+
+    (?<PerlEntireDocument>
+        \A
+        (?&PerlDocument)
+        (?:
+            \Z
+        |
+            (?(?{ !defined $PPR::ERROR })
+                (?>(?&PerlOWS))  (?{pos()})  ([^\n]++)
+                (?{ $PPR::ERROR = PPR::ERROR->new(source => "$^N", prefix => substr($_, 0, $^R) ) })
+                (?!)
+            )
+        )
+    ) # End of rule
 
     (?<PerlDocument>
         \x{FEFF}?+                      # Optional BOM marker
@@ -1997,7 +2011,7 @@ sub decomment {
     local %PPR::comment_len;
 
     # Locate comments...
-    $str =~ m{ \A (?&PerlDocument) \Z
+    $str =~ m{  (?&PerlEntireDocument)
 
                 (?(DEFINE)
                     (?<decomment>
@@ -2057,7 +2071,7 @@ sub decomment {
 
     # Delete the comments found...
     for my $from_pos (_uniq(sort { $b <=> $a } keys %PPR::comment_len)) {
-        substr($str, $from_pos, $PPR::comment_len{$from_pos}) = q{};
+        substr($str, $from_pos, $PPR::comment_len{$from_pos}) =~ s/.+//g;
     }
 
     return $str;
@@ -2084,7 +2098,7 @@ PPR - Pattern-based Perl Recognizer
 
 =head1 VERSION
 
-This document describes PPR version 0.000025
+This document describes PPR version 0.000026
 
 
 =head1 SYNOPSIS
@@ -2095,7 +2109,7 @@ This document describes PPR version 0.000025
     my $perl_document = qr{
 
         # What to match            # Install the (?&PerlDocument) rule
-        \A (?&PerlDocument) \Z     $PPR::GRAMMAR
+        (?&PerlEntireDocument)     $PPR::GRAMMAR
 
     }x;
 
@@ -2176,17 +2190,16 @@ package variable, C<$PPR::GRAMMAR>, which can be
 interpolated into regexes to add rules that permit
 Perl constructs to be parsed:
 
-    $source_code =~ m{ \A (?&PerlDocument) \Z  $PPR::GRAMMAR }x;
+    $source_code =~ m{ (?&PerlEntireDocument)  $PPR::GRAMMAR }x;
 
 Note that all the examples shown so far have interpolated this "grammar
 variable" at the end of the regular expression. This placement is
-desirable, but not necessary. Each of the following works identically:
+desirable, but not necessary. Both of the following work identically:
 
-    $source_code =~ m{ \A (?&PerlDocument) \Z  $PPR::GRAMMAR }x;
+    $source_code =~ m{ (?&PerlEntireDocument)   $PPR::GRAMMAR }x;
 
-    $source_code =~ m{ $PPR::GRAMMAR  \A (?&PerlDocument) \Z }x;
+    $source_code =~ m{ $PPR::GRAMMAR   (?&PerlEntireDocument) }x;
 
-    $source_code =~ m{ \A $PPR::GRAMMAR (?&PerlDocument) \Z  }x;
 
 However, if the grammar is to be L<extended|"Extending the Perl syntax with keywords">,
 then the extensions must be specified B<I<before>> the base grammar
@@ -2219,6 +2232,29 @@ from matching. That variable is: C<$PPR::ERROR>
 C<$PPR::ERROR> is only set if it is undefined at the point where an
 error is detected, and will only be set to the first such error that
 is encountered during parsing.
+
+Note that errors are only detected when matching context-sensitive components
+(for example in the middle of a C<(?&PerlStatement), as part of a
+C<(?&PerlContextualRegex)>, or at the end of a C<(?&PerlEntireDocument>)>.
+Errors, especially errors at the end of otherwise valid code, will often
+not be detected in context-free components (for example, at the end of a
+C<(?&PerlStatementSequence), as part of a C<(?&PerlRegex)>, or at the
+end of a C<(?&PerlDocument>)>.
+
+A common mistake in this area is to attempt to match an entire Perl document
+using:
+
+    m{ \A (?&PerlDocument) \Z   $PPR::GRAMMAR }x
+
+instead of:
+
+    m{ (?&PerlEntireDocument)   $PPR::GRAMMAR }x
+
+Only the second approach will be able to successfully detect an unclosed
+curly bracket at the end of the document.
+
+
+=head3 C<PPR::ERROR> interface
 
 If it is set, C<$PPR::ERROR> will contain an object of type PPR::ERROR,
 with the following methods:
@@ -2325,7 +2361,7 @@ or, for the less twisty-minded:
   # "Valid" if source code matches a Perl document under the Perl grammar
   printf(
       "$filename %s a valid Perl file\n",
-      slurp($filename) =~ m{ \A (?&PerlDocument) \Z  $PPR::GRAMMAR }x
+      slurp($filename) =~ m{ (?&PerlEntireDocument)  $PPR::GRAMMAR }x
           ? "is"
           : "is not"
   );
@@ -2339,8 +2375,8 @@ or, for the less twisty-minded:
           grep {defined}                         # defined matches
               slurp($filename)                   # from the source code,
                   =~ m{
-                        \G (?&PerlOWS)           # to skip whitespace
-                           ((?&PerlStatement))   # and keep statements,
+                        \G (?&PerlOWS)           # skipping whitespace
+                           ((?&PerlStatement))   # and keeping statements,
                         $PPR::GRAMMAR            # using the Perl grammar
                       }gcx;                      # incrementally
   );
@@ -2383,8 +2419,50 @@ guaranteed to continue to exist in future releases. All such
 
 =head3 C<< (?&PerlDocument) >>
 
+Matches a valid Perl document, including leading or trailing
+whitespace, comments, and any final C<__DATA__> or C<__END__> section.
+
+This rule is context-free, so it can be embedded in a larger regex.
+For example, to match an embedded chunk of Perl code, delimited by
+C<<<< <<< >>>>...C<<<< >>> >>>>:
+
+    $src = m{ <<< (?&PerlDocument) >>>   $PPR::GRAMMAR }x;
+
+
+=head3 C<< (?&PerlEntireDocument) >>
+
 Matches an entire valid Perl document, including leading or trailing
 whitespace, comments, and any final C<__DATA__> or C<__END__> section.
+
+This rule is I<not> context-free. It has an internal C<\A> at the beginning
+and C<\Z> at the end, so a regex containing C<(?&PerlEntireDocument)>
+will only match if:
+
+=over
+
+=item (a)
+
+the C<(?&PerlEntireDocument)> is the sole top-level element of the regex
+(or, at least the sole element of a single top-level C<|>-branch of the regex),
+
+=item B<I<and>>
+
+
+=item (b)
+
+the entire string being matched contains only a single valid Perl document.
+
+=back
+
+In general, if you want to check that a string consists entirely of
+a single valid sequence of Perl code, use:
+
+    $str =~ m{ (?&PerlEntireDocument)  $PPR::GRAMMAR }
+
+If you want to check that a string I<contains> at least one valid sequence
+of Perl code at some point, possibly embedded in other text, use:
+
+    $str =~ m{ (?&PerlDocument)  $PPR::GRAMMAR }
 
 
 =head3 C<< (?&PerlStatementSequence) >>
@@ -2428,8 +2506,8 @@ Matches a conditional expression that uses the C<?>...C<:> ternary operator.
 That is, a single valid Perl expression involving operators above the
 precedence of assignment.
 
-The alterative name comes from the fact that anything matching is what
-most people think of as a single element of a comma-separated list.
+The alterative name comes from the fact that anything matching this rule
+is what most people think of as a single element of a comma-separated list.
 
 
 =head3 C<< (?&PerlBinaryExpression) >>

@@ -69,8 +69,8 @@ my $response = {
 	    'ExpandedNodeId_serverIndex' => 0
 	  },
 	  'ReferenceDescription_browseName' => {
-	    'name' => 'FolderType',
-	    'namespaceIndex' => 0
+	    'QualifiedName_name' => 'FolderType',
+	    'QualifiedName_namespaceIndex' => 0
 	  }
 	},
 	{
@@ -89,8 +89,8 @@ my $response = {
 	    }
 	  },
 	  'ReferenceDescription_browseName' => {
-	    'name' => 'Objects',
-	    'namespaceIndex' => 0
+	    'QualifiedName_name' => 'Objects',
+	    'QualifiedName_namespaceIndex' => 0
 	  },
 	  'ReferenceDescription_nodeId' => {
 	    'ExpandedNodeId_serverIndex' => 0,
@@ -110,8 +110,8 @@ my $response = {
 	},
 	{
 	  'ReferenceDescription_browseName' => {
-	    'namespaceIndex' => 0,
-	    'name' => 'Types'
+	    'QualifiedName_namespaceIndex' => 0,
+	    'QualifiedName_name' => 'Types'
 	  },
 	  'ReferenceDescription_referenceTypeId' => {
 	    'NodeId_identifierType' => 0,
@@ -174,8 +174,8 @@ my $response = {
 	    'NodeId_identifier' => 35
 	  },
 	  'ReferenceDescription_browseName' => {
-	    'name' => 'Views',
-	    'namespaceIndex' => 0
+	    'QualifiedName_name' => 'Views',
+	    'QualifiedName_namespaceIndex' => 0
 	  }
 	}
       ],

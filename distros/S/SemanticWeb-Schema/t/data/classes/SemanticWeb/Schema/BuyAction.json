@@ -12,11 +12,11 @@
          "rdfs:label" : "seller",
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
-            "schema:Flight",
+            "schema:Demand",
+            "schema:Offer",
             "schema:Order",
             "schema:BuyAction",
-            "schema:Demand",
-            "schema:Offer"
+            "schema:Flight"
          ],
          "schema:rangeIncludes" : [
             "schema:Person",

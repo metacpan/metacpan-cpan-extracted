@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use Syntax::Keyword::Try;
 
 use Devel::MAT;
 use Devel::MAT::Cmd::Terminal;
@@ -34,16 +35,14 @@ $progress->() if $progress;
 my $df = $pmat->dumpfile;
 
 if( !$QUIET ) {
-   $pmat->load_tool_for_command( "summary" )
-      ->run_cmd( Commandable::Invocation->new( "" ) );
+   $pmat->run_command( Commandable::Invocation->new( "summary" ) );
 }
 
 if( @ARGV ) {
-   my $cmd = shift @ARGV;
-
-   $pmat->load_tool_for_command( $cmd,
+   $pmat->run_command(
+      Commandable::Invocation->new_from_tokens( @ARGV ),
       progress => $progress,
-   )->run_cmd( Commandable::Invocation->new_from_tokens( @ARGV ) );
+   );
 
    # Finish the pagination output
    Devel::MAT::Tool::more->run while Devel::MAT::Tool::more->can_more;
@@ -58,27 +57,56 @@ while( defined( my $line = $rl->readline(
          sprintf 'pmat%s> ', Devel::MAT::Tool::more->can_more ? " [more]" : ""
       ) ) ) {
    my $inv = Commandable::Invocation->new( $line );
-   my $cmd = $inv->pull_token;
-   $cmd //= "more" if Devel::MAT::Tool::more->can_more;
+   defined $inv->peek_token or
+      $inv = Commandable::Invocation->new( "more" ) if Devel::MAT::Tool::more->can_more;
 
-   next unless defined $cmd; # blank line
+   next unless defined $inv->peek_token; # blank line
 
-   last if $cmd eq "exit";
+   last if $inv->peek_token eq "exit";
 
-   eval {
+   try {
       # We just have to hope nobody catches this one.
       # It would be nice to  next COMMAND  but awkward perl internals reasons
       # mean we can't do that from a signal handler
       local $SIG{INT} = sub { die "\nAborted\n"; };
 
-      $pmat->load_tool_for_command( $cmd,
+      $pmat->run_command( $inv,
          progress => $progress,
-      )->run_cmd( $inv );
-      1;
-   } or
+      );
+   }
+   catch {
       print STDERR "$@";
+   }
 
    print "\n";
 }
 
 print "\n";
+
+=head1 NAME
+
+pmat - Perl Memory Analysis Tool
+
+=head1 SYNOPSIS
+
+   $ pmat my-file.pmat
+
+=head1 OPTIONS
+
+=over 4
+
+=item --quiet, -q
+
+Don't print progress reports or welcome banner.
+
+=back
+
+=head1 DESCRIPTION
+
+See L<Devel::MAT::UserGuide>.
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut

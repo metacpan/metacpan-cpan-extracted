@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/diffdb.pm','script/diffdb','script/diffdb-sqlite'];
+my $filenames = ['lib/App/diffdb.pm','script/diffdb','script/diffdb-sqlite','script/diffdbtable','script/diffdbtable-sqlite'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

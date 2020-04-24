@@ -8,7 +8,7 @@ package Devel::MAT::SV;
 use strict;
 use warnings;
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 use Carp;
 use Scalar::Util qw( weaken );
@@ -464,7 +464,7 @@ boolean true and false. They are
 
 package Devel::MAT::SV::Immortal;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 use constant immortal => 1;
 use constant basetype => "SV";
 sub new {
@@ -478,13 +478,13 @@ sub _outrefs { () }
 
 package Devel::MAT::SV::UNDEF;
 use base qw( Devel::MAT::SV::Immortal );
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 sub desc { "UNDEF" }
 sub type { "UNDEF" }
 
 package Devel::MAT::SV::YES;
 use base qw( Devel::MAT::SV::Immortal );
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 sub desc { "YES" }
 sub type { "SCALAR" }
 
@@ -498,7 +498,7 @@ sub is_weak { '' }
 
 package Devel::MAT::SV::NO;
 use base qw( Devel::MAT::SV::Immortal );
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 sub desc { "NO" }
 sub type { "SCALAR" }
 
@@ -512,7 +512,7 @@ sub is_weak { '' }
 
 package Devel::MAT::SV::Unknown;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 __PACKAGE__->register_type( 0xff );
 
 sub desc { "UNKNOWN" }
@@ -521,7 +521,7 @@ sub _outrefs {}
 
 package Devel::MAT::SV::GLOB;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 __PACKAGE__->register_type( 1 );
 use constant $CONSTANTS;
 use constant basetype => "GV";
@@ -708,7 +708,7 @@ sub _more_saved
 
 package Devel::MAT::SV::SCALAR;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 __PACKAGE__->register_type( 2 );
 use constant $CONSTANTS;
 use constant basetype => "SV";
@@ -870,7 +870,7 @@ sub _outrefs
 
 package Devel::MAT::SV::REF;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 __PACKAGE__->register_type( 3 );
 use constant $CONSTANTS;
 use constant basetype => "SV";
@@ -962,7 +962,7 @@ sub _outrefs
 
 package Devel::MAT::SV::ARRAY;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 __PACKAGE__->register_type( 4 );
 use constant $CONSTANTS;
 use constant basetype => "AV";
@@ -1120,7 +1120,7 @@ sub _outrefs
 package Devel::MAT::SV::PADLIST;
 # Synthetic type
 use base qw( Devel::MAT::SV::ARRAY );
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 use constant type => "PADLIST";
 use constant $CONSTANTS;
 
@@ -1169,7 +1169,7 @@ sub _outrefs
 package Devel::MAT::SV::PADNAMES;
 # Synthetic type
 use base qw( Devel::MAT::SV::ARRAY );
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 use constant type => "PADNAMES";
 use constant $CONSTANTS;
 
@@ -1253,7 +1253,7 @@ sub _outrefs
 package Devel::MAT::SV::PAD;
 # Synthetic type
 use base qw( Devel::MAT::SV::ARRAY );
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 use constant type => "PAD";
 use constant $CONSTANTS;
 
@@ -1363,7 +1363,7 @@ sub _outrefs
 
 package Devel::MAT::SV::HASH;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 __PACKAGE__->register_type( 5 );
 use constant $CONSTANTS;
 use constant basetype => "HV";
@@ -1545,7 +1545,7 @@ sub _outrefs
 
 package Devel::MAT::SV::STASH;
 use base qw( Devel::MAT::SV::HASH );
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 __PACKAGE__->register_type( 6 );
 use constant $CONSTANTS;
 
@@ -1685,7 +1685,7 @@ sub _outrefs
 
 package Devel::MAT::SV::CODE;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 __PACKAGE__->register_type( 7 );
 use constant $CONSTANTS;
 use constant basetype => "CV";
@@ -1694,8 +1694,16 @@ use Carp;
 
 use List::Util 1.44 qw( uniq );
 
-use Struct::Dumb 0.07 qw( readonly_struct );
-readonly_struct Padname => [qw( name ourstash )];
+use Struct::Dumb 0.07 qw( struct );
+struct Padname => [qw( name ourstash flags )];
+{
+   no strict 'refs';
+   *{__PACKAGE__."::Padname::is_outer"}  = sub { shift->flags & 0x01 };
+   *{__PACKAGE__."::Padname::is_state"}  = sub { shift->flags & 0x02 };
+   *{__PACKAGE__."::Padname::is_lvalue"} = sub { shift->flags & 0x04 };
+   *{__PACKAGE__."::Padname::is_typed"}  = sub { shift->flags & 0x08 };
+   *{__PACKAGE__."::Padname::is_our"}    = sub { shift->flags & 0x10 };
+}
 
 =head1 Devel::MAT::SV::CODE
 
@@ -1735,6 +1743,8 @@ sub load
       elsif( $type == 7 ) { $self->_set_padnames_at( $df->_read_ptr ); }
       elsif( $type == 8 ) { my $depth = $df->_read_uint;
                             $self->{pads_at}[$depth] = $df->_read_ptr; }
+      elsif( $type == 9 ) { my $padix = $df->_read_uint;
+                            $self->{padnames}[$padix]->flags = $df->_read_u8; }
       else {
          die "TODO: unhandled CODEx type $type";
       }
@@ -1745,7 +1755,7 @@ sub _load_padname
 {
    my ( $df ) = @_;
 
-   return Padname( $df->_read_str, $df->_read_ptr );
+   return Padname( $df->_read_str, $df->_read_ptr, 0 );
 }
 
 sub _fixup
@@ -1787,7 +1797,7 @@ sub _fixup
          my $padnamesv = $padnames->elem( $padix ) or next;
          $padnamesv->immortal and next; # UNDEF
 
-         $padnames[$padix] = Padname( $padnamesv->pv, $padnamesv->ourstash );
+         $padnames[$padix] = Padname( $padnamesv->pv, $padnamesv->ourstash, 0 );
       }
    }
 
@@ -1997,6 +2007,12 @@ The returned padname is a structure of the following fields:
 
  $name = $padname->name
 
+ $bool = $padname->is_outer
+ $bool = $padname->is_state
+ $bool = $padname->is_lvalue
+ $bool = $padname->is_typed
+ $bool = $padname->is_our
+
 =cut
 
 sub padname
@@ -2135,8 +2151,8 @@ sub desc
    push @flags, "CONST" if $self->constval;
    push @flags, "XS"    if $self->is_xsub;
 
-   push @flags, "C" if $self->is_cloned; # C for Closure
-   push @flags, "P" if $self->is_clone;  # P for Protosub
+   push @flags, "closure" if $self->is_cloned;
+   push @flags, "proto"   if $self->is_clone;
 
    local $" = ",";
    return "CODE(@flags)";
@@ -2225,7 +2241,7 @@ sub _outrefs
 
 package Devel::MAT::SV::IO;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 __PACKAGE__->register_type( 8 );
 use constant $CONSTANTS;
 use constant basetype => "IO";
@@ -2300,7 +2316,7 @@ sub _outrefs
 
 package Devel::MAT::SV::LVALUE;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 __PACKAGE__->register_type( 9 );
 use constant $CONSTANTS;
 use constant basetype => "LV";
@@ -2342,7 +2358,7 @@ sub _outrefs
 
 package Devel::MAT::SV::REGEXP;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 use constant basetype => "REGEXP";
 __PACKAGE__->register_type( 10 );
 
@@ -2354,7 +2370,7 @@ sub _outrefs { () }
 
 package Devel::MAT::SV::FORMAT;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 use constant basetype => "PVFM";
 __PACKAGE__->register_type( 11 );
 
@@ -2366,7 +2382,7 @@ sub _outrefs { () }
 
 package Devel::MAT::SV::INVLIST;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 use constant basetype => "INVLIST";
 __PACKAGE__->register_type( 12 );
 
@@ -2379,7 +2395,7 @@ sub _outrefs { () }
 # A hack to compress files
 package Devel::MAT::SV::_UNDEFSV;
 use base qw( Devel::MAT::SV::SCALAR );
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 __PACKAGE__->register_type( 13 );
 
 sub load

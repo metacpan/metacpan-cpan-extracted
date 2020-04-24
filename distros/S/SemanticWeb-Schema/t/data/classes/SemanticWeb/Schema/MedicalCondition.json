@@ -12,8 +12,8 @@
          "rdfs:comment" : "The anatomy of the underlying organ system or structures associated with this entity.",
          "rdfs:label" : "associatedAnatomy",
          "schema:domainIncludes" : [
-            "schema:MedicalCondition",
-            "schema:PhysicalActivity"
+            "schema:PhysicalActivity",
+            "schema:MedicalCondition"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
@@ -35,10 +35,10 @@
          "rdfs:comment" : "Specifying a drug or medicine used in a medication procedure",
          "rdfs:label" : "drug",
          "schema:domainIncludes" : [
-            "schema:TherapeuticProcedure",
+            "schema:Patient",
             "schema:DrugClass",
-            "schema:MedicalCondition",
-            "schema:Patient"
+            "schema:TherapeuticProcedure",
+            "schema:MedicalCondition"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Drug"
@@ -94,8 +94,8 @@
          "rdfs:comment" : "A possible treatment to address this condition, sign or symptom.",
          "rdfs:label" : "possibleTreatment",
          "schema:domainIncludes" : [
-            "schema:MedicalSignOrSymptom",
-            "schema:MedicalCondition"
+            "schema:MedicalCondition",
+            "schema:MedicalSignOrSymptom"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalTherapy"
@@ -145,15 +145,15 @@
          "rdfs:comment" : "The status of the study (enumerated).",
          "rdfs:label" : "status",
          "schema:domainIncludes" : [
+            "schema:MedicalCondition",
             "schema:MedicalStudy",
-            "schema:MedicalProcedure",
-            "schema:MedicalCondition"
+            "schema:MedicalProcedure"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
             "schema:EventStatusType",
-            "schema:Text",
-            "schema:MedicalStudyStatus"
+            "schema:MedicalStudyStatus",
+            "schema:Text"
          ]
       },
       "schema:typicalTest" : {

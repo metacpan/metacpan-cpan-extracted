@@ -83,17 +83,18 @@ EXAMPLE4
      # Created foo.mpg file in local directory, generated from images in /data/images.
 
 REPOSITORY
-    <https://github.com/tupinek/App-Video-Generator>
+    <https://github.com/michal-josef-spacek/App-Video-Generator>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2015 Michal Špaček
-     BSD 2-Clause License
+    © 2015-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.07
+    0.08
 

@@ -1,5 +1,9 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.14.0 2020-04-23T10:28:31Z
+
+    - Move sdif::autocolor to Getopt::EX::termcolor.
+
 4.13.7 2020-04-06T15:06:22Z
 
     - Unify --visible-* to --visible and implement general.

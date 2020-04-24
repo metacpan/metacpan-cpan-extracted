@@ -1,10 +1,8 @@
 package SGML::PYX;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Encode qw(encode_utf8);
 use Error::Pure qw(err);
@@ -12,8 +10,7 @@ use Tag::Reader::Perl;
 use PYX qw(comment end_element char instruction start_element);
 use PYX::Utils qw(decode entity_decode);
 
-# Version.
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -159,6 +156,7 @@ SGML::PYX - Convertor between SGML and PYX.
 =head1 SYNOPSIS
 
  use SGML::PYX;
+
  my $obj = SGML::PYX->new(%params);
  $obj->parsefile($sgml_file);
 
@@ -203,11 +201,9 @@ SGML::PYX - Convertor between SGML and PYX.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use File::Temp qw(tempfile);
  use IO::Barf qw(barf);
  use SGML::PYX;
@@ -260,21 +256,22 @@ Install the PYX modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/SGML-PYX>
+L<https://github.com/michal-josef-spacek/SGML-PYX>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Špaček 2015-2016
- BSD 2-Clause License
+© Michal Josef Špaček 2015-2020
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

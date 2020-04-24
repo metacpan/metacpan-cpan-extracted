@@ -37,8 +37,8 @@
             "schema:OwnershipInfo"
          ],
          "schema:rangeIncludes" : [
-            "schema:Service",
-            "schema:Product"
+            "schema:Product",
+            "schema:Service"
          ]
       },
       "schema:unitCode" : {
@@ -53,8 +53,8 @@
             "schema:QuantitativeValue"
          ],
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ]
       },
       "schema:unitText" : {
@@ -62,10 +62,10 @@
          "rdfs:comment" : "A string or text indicating the unit of measurement. Useful if you cannot provide a standard unit code for\n<a href='unitCode'>unitCode</a>.",
          "rdfs:label" : "unitText",
          "schema:domainIncludes" : [
-            "schema:PropertyValue",
             "schema:QuantitativeValue",
-            "schema:UnitPriceSpecification",
-            "schema:TypeAndQuantityNode"
+            "schema:TypeAndQuantityNode",
+            "schema:PropertyValue",
+            "schema:UnitPriceSpecification"
          ],
          "schema:rangeIncludes" : "schema:Text"
       }

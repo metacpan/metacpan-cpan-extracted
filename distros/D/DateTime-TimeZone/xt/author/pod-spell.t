@@ -206,7 +206,6 @@ Gambier
 Gaza
 Gibraltar
 Glace_Bay
-Godthab
 Gondwana
 Goose_Bay
 Grand_Turk
@@ -372,6 +371,7 @@ North_Dakota
 Noumea
 Novokuznetsk
 Novosibirsk
+Nuuk
 Observance
 OffsetOnly
 Ojinaga
@@ -580,6 +580,7 @@ dmaki
 drolsky
 env
 ether
+gb
 jhoblitt
 jkeenan
 jwilk
@@ -593,5 +594,6 @@ pre
 ribasushi
 subclasses
 timezones
+uk
 versa
 wyant

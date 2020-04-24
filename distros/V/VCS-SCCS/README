@@ -15,14 +15,34 @@ DESCRIPTION
 PREREQUISITES
     perl-5.6.x
 
-    Tested on our own repositories with perl version 5.6.2, 5.8.x-dor
-    and 5.10.0. 
+    Converted our own repositories with perl version 5.6.2, 5.8.x-dor
+    and 5.10.0. Should work fine with all newer perl releases.
 
 BUILDING AND INSTALLATION
     As all CPAN modules:
 	# perl Makefile.PL
 	# make test
 	# make install
+
+USING IT
+    Start with the documentation, so you get a grasp of what can and
+    cannot be done
+
+    $ perldoc VCS::SCCS
+
+    If you want to dive into the deep, and simply convert your current
+    SCCS folder tree to git, use examples/sccs2git-r which recursively
+    scans down from the current directory for SCCS repositories and
+    merges them down into a single git repository
+
+    $ cd /my/src/project/
+    $ perl /path/to/VSC-SCCS/examples/sccs2git-r
+    $ git status
+
+    If you plan to do more conversions, change the first line of the
+    file examples/sccs2git-r to reflect the location of your perl binary
+    and install it into somewhere in your $PATH and make it executable.
+    The call `perl Makefile.PL` will ask you to install this script.
 
 CHANGES
     See ChangeLog

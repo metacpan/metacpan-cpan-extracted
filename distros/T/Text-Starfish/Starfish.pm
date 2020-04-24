@@ -1,7 +1,7 @@
 # Starfish - Perl-based System for Text-Embedded
 #     Programming and Preprocessing
 #
-# (c) 2001-2019 Vlado Keselj http://web.cs.dal.ca/~vlado vlado@dnlp.ca
+# (c) 2001-2020 Vlado Keselj http://web.cs.dal.ca/~vlado vlado@dnlp.ca
 #               and contributing authors
 #
 # See the documentation following the code.  You can also use the
@@ -22,7 +22,9 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS); # Exporter vars
   file_modification_time getfile getmakefilelist get_verbatim_file
   getinclude include
   last_update putfile read_records read_starfish_conf
-  sfish_add_tag sfish_ignore_outer starfish_cmd ) ] );
+  sfish_add_tag sfish_ignore_outer starfish_cmd make_gen_dirs_to_generate
+  make_add_dirs_to_generate_if_needed
+  ) ] );
 @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 @EXPORT = @{ $EXPORT_TAGS{'all'} };
 
@@ -30,10 +32,12 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS); # Exporter vars
 use vars qw($NAME $ABSTRACT $VERSION);
 $NAME     = 'Starfish';
 $ABSTRACT = 'Perl-based System for Text-Embedded Programming and Preprocessing';
-$VERSION  = '1.29';
+$VERSION  = '1.30';
 
 use vars qw($Revision);
 ($Revision = substr(q$Revision: $, 10)) =~ s/\s+$//;
+
+use vars qw(@DirGenerateIfNeeded);
 
 # non-exported package globals
 use vars qw($GlobalREPLACE);
@@ -277,6 +281,7 @@ sub digest {
   # Final routines, if defined
   if (defined($self->{Final})) {
     my @a = @{ $self->{Final} };
+    local $::Star = $self;
     for my $f (@a) {
       $self->{Out} = &{$f}($self->{Out}); }
   }
@@ -1116,36 +1121,40 @@ sub htmlquote($) {
 
 sub read_records($ ) {
   my $arg = shift;
-  if ($arg =~ /^file=/) { $arg = getfile($') }
+  if ($arg =~ /^file=/) {
+    my $f = $'; local *F; open(F, $f) or croak "cannot open $f:$!";
+    $arg = join('', <F>);
+    close(F);
+  }
+
   my $db = [];
   while ($arg) {
-      $arg =~ s/^\s*(#.*\s*)*//;  # allow comments betwen records
-      my $record;
-      if ($arg =~ /\n\n+/) { $record = "$`\n"; $arg = $'; }
-      else { $record = $arg; $arg = ''; }
-      my $r = {};
-      while ($record) {
-	  if ($record =~ /^#.*\n/) { $record=$'; next; } # allow
-                                                 #   comments in records		
-        $record =~ /^([^\n:]*):/ or
-	    croak "field not properly defined in record: ($record)";
-	my $k = $1; $record = $'; my $v;
-	while (1) {		# .................... line continuation
-	    if ($record =~ /^(.*)\\(\n)/) { $v .= $1.$2; $record = $'; }
-	    elsif ($record =~ /^(.*)\n[ \t]/)
-	    { $v .= $1; $record = $'; }
-	    elsif ($record =~ /^(.*)\n/)
-	    { $v .= $1; $record = $'; last; }
-	    else { $v .= $record; $record = ''; last }
-	}
-        if (exists($r->{$k})) {
-          my $c = 0;
-          while (exists($r->{"$k-$c"})) { ++$c }
-          $k = "$k-$c";
-        }
-        $r->{$k} = $v;
+    if ($arg =~ /^([ \t\r]*(#.*)?\n)+/) { $arg = $'; }
+    last if $arg eq ''; my $record;
+    if ($arg =~ /([ \t\r]*\n){2,}/) { $record = "$`\n"; $arg = $'; }
+    else { $record = $arg; $arg = ''; }
+    my $r = {}; my $recordsave = $record;
+    while ($record) {
+      if ($record =~ /^[ \t]*#.*\n/) { $record=$'; next; } # allow
+                                                   # comments in records
+      $record =~ /^[ \t]*([^\n:]*?)[ \t]*:/ or
+	croak "db8: no attribute in record: ($recordsave)";
+      my $k = $1; $record = $'; my $v;
+      croak "empty key in ($recordsave)" if $k eq '';
+      while (1) {		# .................... line continuation
+	if ($record =~ /^(.*?)\\(\r?\n)/) { $v .= $1.$2; $record = $'; }
+	elsif ($record =~ /^.*?\r?\n[ \t]/) { $v .= $&; $record = $'; }
+	elsif ($record =~ /^(.*?)\r?\n/) { $v .= $1; $record = $'; last; }
+	else { $v .= $record; $record = ''; last }
       }
-      push @{ $db }, $r;
+      if (exists($r->{$k})) {
+	my $c = 0;
+	while (exists($r->{"$k-$c"})) { ++$c }
+	$k = "$k-$c";
+      }
+      $r->{$k} = $v;
+      }
+    push @{ $db }, $r;
   }
   return wantarray ? @{$db} : $db;
 }
@@ -1194,6 +1203,17 @@ sub _croak {
     require Carp;
     Carp::croak($m);
 }
+
+# used in makefile mode
+#kw:makefile
+sub make_add_dirs_to_generate_if_needed {
+  for my $d (@_) {
+    next if grep { $_ eq $d } @DirGenerateIfNeeded;
+    push @DirGenerateIfNeeded, $d;
+  } }
+sub make_gen_dirs_to_generate {
+  foreach my $d (@DirGenerateIfNeeded) {
+    echo "$d:; mkdir -p \$\@\n" } }
 
 1;
 
@@ -1363,7 +1383,7 @@ Starfish object currently processing the text.
 
 =head2 TeX and LaTeX Examples
 
-=head3 Simle TeX or LaTeX Example
+=head3 Simple TeX or LaTeX Example
 
 Generating text with a variable replacement:
 
@@ -1908,6 +1928,34 @@ appends list elements to the file.
 
 appends string to the special variable $0.
 
+=head2 DATA FUNCTIONS
+
+=head3 read_records($string)
+
+The function reads strings and translates it into an array of records
+according to DB822 (db8 for short) data format.  If the string starts
+with 'file=' then the rest of the string is treated as a file name,
+which contents replaces the string in further processing.  The string
+is translated into a list of records (hashes) and a reference to the list
+is returned.  The records are separated by empty line, and in each line
+an attribute and its value are separated by the first colon (:).
+A line can be continued using backslash (\) at the end of line, or by
+starting the next line with a space or tab.  Ending a line with \
+will replace "\\\n" with "\n" in the string, otherwise "\n[ \t]"
+are kept as they are.
+Lines starting with the hash sign (#) are considered comments and they
+are ignored, unless they are part of a multi-line string. An example is:
+
+  id:1
+  name: J. Public
+  phone: 000-111
+
+  id:2
+  etc.
+
+If an attribute is repeated, it will be renamed to an attribute of the
+form att-1, att-2, etc.
+
 =head2 DATE AND TIME FUNCTIONS
 
 =head3 current_year
@@ -1924,16 +1972,14 @@ Returns modification date of this file (in format: Month DD, YYYY).
 
 =head2 FILE FUNCTIONS
 
-=over 4
+=head3 getfile($filename)
 
-=item B<getfile> I<file>
+reads the contents of the file into a string or a list.
 
-grabs the content of the file into a string or a list.
+=head3 getmakefilelist($makefilename, $var)
 
-=item B<getmakefilelist> I<makefile>, I<var>
-
-returns a list, which is a list of words assigned to the variable
-I<var>; e.g.,
+returns a list, which is a list of words assigned to the variable C<$var>
+in the makefile named C<$makefilename>; for example:
 
   FILE_LIST=file1 file2 file3\
     file4
@@ -1942,41 +1988,10 @@ I<var>; e.g.,
 
 Embedded variables are not handled.
 
-=item B<putfile> I<filename>, I<list>
+=head3 putfile($filename,@list)
 
-opens file, writes the list elements to the file, and closes it.
-`C<putfile> I<filename>' "touches" the file.
-
-=item B<read_records> I<string>
-
-The function takes one string argument.  If it starts with 'file='
-then the rest of the string is treated as a file name, which contents
-replaces the string in further processing.  The string is translated
-into a list of records (hashes) and a reference to the list is
-returned.  The records are separated by empty line, and in each line
-an attribute and its value are separated by the first colon (:).
-A line can be continued using backslash (\) at the end of line, or by
-starting the next line with a space or tab.  Ending a line with \
-effectively removes the "\\\n" string at the end of line, but 
-"\n[ \t]" combination is replaced with "\n".
-Comments, starting with the hash sign (#) are allowed between records.
-An example is:
-
-  id:1
-  name: J. Public
-  phone: 000-111
-
-  id:2
-  etc.
-
-If an attribute is repeated, it will be renamed to an attribute of the
-form att-1, att-2, etc.
-
-=item B<read_starfish_conf>
-
-Reads recursively (up the dir tree) configuration files C<starfish.conf>.
-
-=back
+Opens the file C<$filename>, wries the list elements to the file, and closes
+it. `C<putfile> I<filename>' will only touch the file.
 
 =head1 STYLES
 
@@ -2054,7 +2069,7 @@ other comments.
 
 =head1 AUTHORS
 
- 2001-2019 Vlado Keselj http://web.cs.dal.ca/~vlado
+ 2001-2020 Vlado Keselj http://web.cs.dal.ca/~vlado
            and contributing authors:
       2007 Charles Ikeson (overhaul of test.pl)
 

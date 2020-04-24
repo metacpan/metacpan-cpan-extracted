@@ -1,7 +1,7 @@
 package Pg::Explain;
 
 # UTF8 boilerplace, per http://stackoverflow.com/questions/6162484/why-does-modern-perl-avoid-utf-8-by-default/
-use v5.14;
+use v5.18;
 use strict;
 use warnings;
 use warnings qw( FATAL utf8 );
@@ -33,11 +33,11 @@ Pg::Explain - Object approach at reading explain analyze output
 
 =head1 VERSION
 
-Version 0.98
+Version 0.99
 
 =cut
 
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 =head1 SYNOPSIS
 

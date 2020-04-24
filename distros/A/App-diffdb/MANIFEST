@@ -10,6 +10,8 @@ dist.ini
 lib/App/diffdb.pm
 script/diffdb
 script/diffdb-sqlite
+script/diffdbtable
+script/diffdbtable-sqlite
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

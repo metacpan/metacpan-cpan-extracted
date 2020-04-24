@@ -6,7 +6,7 @@ package SemanticWeb::Schema::EducationalOrganization;
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::Organization /;
+extends qw/ SemanticWeb::Schema::CivicStructure SemanticWeb::Schema::Organization /;
 
 
 use MooX::JSON_LD 'EducationalOrganization';
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.3';
+our $VERSION = 'v7.0.4';
 
 
 has alumni => (
@@ -42,7 +42,7 @@ SemanticWeb::Schema::EducationalOrganization - An educational organization.
 
 =head1 VERSION
 
-version v7.0.3
+version v7.0.4
 
 =head1 DESCRIPTION
 

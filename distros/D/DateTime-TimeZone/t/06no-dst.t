@@ -50,8 +50,8 @@ use DateTime;
     ) {
         my $dt = try {
             DateTime->new(
-                year      => 2007,     month  => 12, day => 9,
-                hour      => $hm->[0], minute => $hm->[1],
+                year => 2007,     month  => 12, day => 9,
+                hour => $hm->[0], minute => $hm->[1],
                 time_zone => 'America/Caracas',
             );
         };

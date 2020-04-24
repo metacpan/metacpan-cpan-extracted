@@ -37,7 +37,7 @@ package Time::OlsonTZ::Data;
 use warnings;
 use strict;
 
-our $VERSION = "0.201903";
+our $VERSION = "0.202001";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -77,7 +77,7 @@ retain this format in the future.
 
 =cut
 
-use constant olson_version => "2019c";
+use constant olson_version => "2020a";
 
 =item olson_code_version
 
@@ -89,7 +89,7 @@ piece of information.
 
 =cut
 
-use constant olson_code_version => "2019c";
+use constant olson_code_version => "2020a";
 
 =item olson_data_version
 
@@ -101,7 +101,7 @@ piece of information.
 
 =cut
 
-use constant olson_data_version => "2019c";
+use constant olson_data_version => "2020a";
 
 =back
 
@@ -139,7 +139,7 @@ my $cn = q(+{ map { ($_ => undef) } qw(
 	America/Costa_Rica America/Creston America/Cuiaba America/Curacao
 	America/Danmarkshavn America/Dawson America/Dawson_Creek America/Denver
 	America/Detroit America/Edmonton America/Eirunepe America/El_Salvador
-	America/Fort_Nelson America/Fortaleza America/Glace_Bay America/Godthab
+	America/Fort_Nelson America/Fortaleza America/Glace_Bay
 	America/Goose_Bay America/Grand_Turk America/Guatemala America/Guayaquil
 	America/Guyana America/Halifax America/Havana America/Hermosillo
 	America/Indiana/Indianapolis America/Indiana/Knox
@@ -154,8 +154,8 @@ my $cn = q(+{ map { ($_ => undef) } qw(
 	America/Miquelon America/Moncton America/Monterrey America/Montevideo
 	America/Nassau America/New_York America/Nipigon America/Nome
 	America/Noronha America/North_Dakota/Beulah America/North_Dakota/Center
-	America/North_Dakota/New_Salem America/Ojinaga America/Panama
-	America/Pangnirtung America/Paramaribo America/Phoenix
+	America/North_Dakota/New_Salem America/Nuuk America/Ojinaga
+	America/Panama America/Pangnirtung America/Paramaribo America/Phoenix
 	America/Port-au-Prince America/Port_of_Spain America/Porto_Velho
 	America/Puerto_Rico America/Punta_Arenas America/Rainy_River
 	America/Rankin_Inlet America/Recife America/Regina America/Resolute
@@ -313,6 +313,7 @@ my $li = q(+{
 	"America/Dominica" => "America/Port_of_Spain",
 	"America/Ensenada" => "America/Tijuana",
 	"America/Fort_Wayne" => "America/Indiana/Indianapolis",
+	"America/Godthab" => "America/Nuuk",
 	"America/Grenada" => "America/Port_of_Spain",
 	"America/Guadeloupe" => "America/Port_of_Spain",
 	"America/Indianapolis" => "America/Indiana/Indianapolis",
@@ -643,7 +644,7 @@ developed by Andrew Main (Zefram) <zefram@fysh.org>.
 The Olson timezone database is is the public domain.
 
 The C<Time::OlsonTZ::Data> Perl module wrapper for the database is
-Copyright (C) 2010, 2011, 2012, 2013, 2014, 2017, 2018, 2019
+Copyright (C) 2010, 2011, 2012, 2013, 2014, 2017, 2018, 2019, 2020
 Andrew Main (Zefram) <zefram@fysh.org>.
 
 =head1 LICENSE

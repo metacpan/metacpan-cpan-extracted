@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.3';
+our $VERSION = 'v7.0.4';
 
 
 has arrival_time => (
@@ -90,7 +90,7 @@ SemanticWeb::Schema::Trip - A trip or journey
 
 =head1 VERSION
 
-version v7.0.3
+version v7.0.4
 
 =head1 DESCRIPTION
 

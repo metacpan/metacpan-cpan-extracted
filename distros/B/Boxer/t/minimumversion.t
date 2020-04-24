@@ -2,9 +2,11 @@
 
 use v5.14;
 use utf8;
-use strictures 2;
 
 use Test::More;
 use Test::MinimumVersion;
 
-all_minimum_version_ok('5.014');
+use strictures 2;
+no warnings "experimental::signatures";
+
+all_minimum_version_ok('5.020');

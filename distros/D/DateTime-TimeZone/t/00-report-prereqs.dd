@@ -12,6 +12,7 @@ do { my $x = {
                                       'DateTime' => '0',
                                       'Dist::Zilla::Plugin::OSPrereqs' => '0',
                                       'File::Find::Rule' => '0',
+                                      'File::Slurp::Tiny' => '0',
                                       'File::Spec' => '0',
                                       'File::pushd' => '0',
                                       'Getopt::Long' => '0',

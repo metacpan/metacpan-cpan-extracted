@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.3';
+our $VERSION = 'v7.0.4';
 
 
 has originates_from => (
@@ -58,7 +58,7 @@ SemanticWeb::Schema::LymphaticVessel - A type of blood vessel that specifically 
 
 =head1 VERSION
 
-version v7.0.3
+version v7.0.4
 
 =head1 DESCRIPTION
 

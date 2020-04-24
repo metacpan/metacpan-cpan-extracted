@@ -8,7 +8,7 @@ package Devel::MAT::Dumpfile;
 use strict;
 use warnings;
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 use Carp;
 use IO::Handle;   # ->read
@@ -315,35 +315,35 @@ sub _read
 sub _read_u8
 {
    my $self = shift;
-   $self->{fh}->read( my $buf, 1 ) or croak "Cannot read - $!";
+   defined( $self->{fh}->read( my $buf, 1 ) ) or croak "Cannot read - $!";
    return unpack "C", $buf;
 }
 
 sub _read_u32
 {
    my $self = shift;
-   $self->{fh}->read( my $buf, 4 ) or croak "Cannot read - $!";
+   defined( $self->{fh}->read( my $buf, 4 ) ) or croak "Cannot read - $!";
    return unpack $self->{u32_fmt}, $buf;
 }
 
 sub _read_u64
 {
    my $self = shift;
-   $self->{fh}->read( my $buf, 8 ) or croak "Cannot read - $!";
+   defined( $self->{fh}->read( my $buf, 8 ) ) or croak "Cannot read - $!";
    return unpack $self->{u64_fmt}, $buf;
 }
 
 sub _read_uint
 {
    my $self = shift;
-   $self->{fh}->read( my $buf, $self->{uint_len} ) or croak "Cannot read - $!";
+   defined( $self->{fh}->read( my $buf, $self->{uint_len} ) ) or croak "Cannot read - $!";
    return unpack $self->{uint_fmt}, $buf;
 }
 
 sub _read_ptr
 {
    my $self = shift;
-   $self->{fh}->read( my $buf, $self->{ptr_len} ) or croak "Cannot read - $!";
+   defined( $self->{fh}->read( my $buf, $self->{ptr_len} ) ) or croak "Cannot read - $!";
    return unpack $self->{ptr_fmt}, $buf;
 }
 
@@ -351,14 +351,14 @@ sub _read_ptrs
 {
    my $self = shift;
    my ( $n ) = @_;
-   $self->{fh}->read( my $buf, $self->{ptr_len} * $n ) or croak "Cannot read - $!";
+   defined( $self->{fh}->read( my $buf, $self->{ptr_len} * $n ) ) or croak "Cannot read - $!";
    return unpack "$self->{ptr_fmt}$n", $buf;
 }
 
 sub _read_nv
 {
    my $self = shift;
-   $self->{fh}->read( my $buf, $self->{nv_len} ) or croak "Cannot read - $!";
+   defined( $self->{fh}->read( my $buf, $self->{nv_len} ) ) or croak "Cannot read - $!";
    return unpack $self->{nv_fmt}, $buf;
 }
 

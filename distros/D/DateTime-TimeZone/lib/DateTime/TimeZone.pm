@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.38';
+our $VERSION = '2.39';
 
 # Note that while we make use of DateTime::Duration in this module if we
 # actually try to load it here all hell breaks loose with circular
@@ -441,7 +441,7 @@ sub is_utc {0}
 
 sub has_dst_changes {0}
 
-sub name { $_[0]->{name} }
+sub name     { $_[0]->{name} }
 sub category { ( split /\//, $_[0]->{name}, 2 )[0] }
 
 sub is_valid_name {
@@ -614,7 +614,7 @@ DateTime::TimeZone - Time zone object base class and factory
 
 =head1 VERSION
 
-version 2.38
+version 2.39
 
 =head1 SYNOPSIS
 
@@ -819,8 +819,10 @@ Returns a sorted list of all the valid country codes (in lower-case)
 which can be passed to C<names_in_country()>. In scalar context, it
 returns an array reference, while in list context it returns an array.
 
-If you need to convert country codes to names or vice versa you can
-use C<Locale::Country> to do so.
+If you need to convert country codes to names or vice versa you can use
+C<Locale::Country> to do so. Note that one of the codes returned is "uk",
+which is an alias for the country code "gb", and is not a valid ISO country
+code.
 
 =head2 DateTime::TimeZone->names_in_country( $country_code )
 
@@ -919,7 +921,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at L<http://www.urth.org/~autarch/fs-donation.html>.
+button at L<https://www.urth.org/fs-donation.html>.
 
 =head1 AUTHOR
 
@@ -1003,7 +1005,7 @@ Tom Wyant <wyant@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Dave Rolsky.
+This software is copyright (c) 2020 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

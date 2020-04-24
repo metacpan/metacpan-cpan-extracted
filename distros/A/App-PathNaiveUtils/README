@@ -2,7 +2,7 @@ NAME
     App::PathNaiveUtils - Utilities related to Path::Naive
 
 VERSION
-    This document describes version 0.001 of App::PathNaiveUtils (from Perl
+    This document describes version 0.002 of App::PathNaiveUtils (from Perl
     distribution App-PathNaiveUtils), released on 2020-02-12.
 
 DESCRIPTION
@@ -17,6 +17,8 @@ DESCRIPTION
     *   pn-is-abs-path
 
     *   pn-normalize-path
+
+    *   pn-rel-path
 
     *   pn-split-path
 
@@ -94,6 +96,21 @@ FUNCTIONS
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
+
+    *   $path* => *pathname::unix*
+
+    Return value: (any)
+
+  rel_path
+    Usage:
+
+     rel_path($path, $basepath) -> any
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $basepath* => *pathname::unix*
 
     *   $path* => *pathname::unix*
 

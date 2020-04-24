@@ -8,11 +8,18 @@ our @EXPORT = (
     'u',
     'normalize_whitespace',
     'html2text',
+    'is_empty',
 );
 
 sub u($) {
+    defined($_[0]) or return undef;
+
     my $v = "".$_[0];
     return is_utf8($v) ? $v : decode_utf8($v);
+}
+
+sub is_empty {
+    (! defined($_[0])) || $_[0] eq '';
 }
 
 sub normalize_whitespace {

@@ -23,8 +23,8 @@
       },
       "schema:backstory" : {
          "dc:source" : [
-            "schemadotorgsources2:TP",
-            "https://github.com/schemaorg/schemaorg/issues/1688"
+            "https://github.com/schemaorg/schemaorg/issues/1688",
+            "schemadotorgsources2:TP"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "For an <a class=\"localLink\" href=\"http://schema.org/Article\">Article</a>, typically a <a class=\"localLink\" href=\"http://schema.org/NewsArticle\">NewsArticle</a>, the backstory property provides a textual summary giving a brief explanation of why and how an article was created. In a journalistic setting this could include information about reporting process, methods, interviews, data sources, etc.",
@@ -33,8 +33,8 @@
          "schema:domainIncludes" : "schema:Article",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:CreativeWork",
-            "schema:Text"
+            "schema:Text",
+            "schema:CreativeWork"
          ]
       },
       "schema:pageEnd" : {
@@ -44,14 +44,14 @@
          "rdfs:comment" : "The page on which the work ends; for example \"138\" or \"xvi\".",
          "rdfs:label" : "pageEnd",
          "schema:domainIncludes" : [
-            "schema:Chapter",
             "schema:PublicationVolume",
             "schema:Article",
+            "schema:Chapter",
             "schema:PublicationIssue"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Integer"
+            "schema:Integer",
+            "schema:Text"
          ]
       },
       "schema:pageStart" : {
@@ -61,10 +61,10 @@
          "rdfs:comment" : "The page on which the work starts; for example \"135\" or \"xiii\".",
          "rdfs:label" : "pageStart",
          "schema:domainIncludes" : [
-            "schema:PublicationIssue",
             "schema:PublicationVolume",
             "schema:Chapter",
-            "schema:Article"
+            "schema:Article",
+            "schema:PublicationIssue"
          ],
          "schema:rangeIncludes" : [
             "schema:Integer",
@@ -78,10 +78,10 @@
          "rdfs:comment" : "Any description of pages that is not separated into pageStart and pageEnd; for example, \"1-6, 9, 55\" or \"10-12, 46-49\".",
          "rdfs:label" : "pagination",
          "schema:domainIncludes" : [
-            "schema:Chapter",
             "schema:PublicationIssue",
             "schema:PublicationVolume",
-            "schema:Article"
+            "schema:Article",
+            "schema:Chapter"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -96,8 +96,8 @@
             "schema:WebPage"
          ],
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:SpeakableSpecification"
+            "schema:SpeakableSpecification",
+            "schema:URL"
          ]
       },
       "schema:wordCount" : {

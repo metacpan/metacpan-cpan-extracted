@@ -1,5 +1,8 @@
 # Changes for App::url
 
+1.004 2020-04-23T01:51:42Z
+	* Tests files need to realize they are UTF-8
+
 1.003 2020-04-21T21:37:46Z
 	* Add port defaults for %p for HTTP and HTTPS
 

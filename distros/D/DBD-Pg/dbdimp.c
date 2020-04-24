@@ -494,7 +494,7 @@ int dbd_db_ping (SV * dbh)
     }
 
     /* No matter what state we are in, send an empty query to the backend */
-    result = PQexec(imp_dbh->conn, "/* DBD::Pg ping test v3.10.5 */");
+    result = PQexec(imp_dbh->conn, "/* DBD::Pg ping test v3.11.0 */");
     status = PQresultStatus(result);
     PQclear(result);
     if (PGRES_FATAL_ERROR == status) {
@@ -4016,6 +4016,8 @@ void dbd_st_destroy (SV * sth, imp_sth_t * imp_sth)
     seg_t * nextseg;
     ph_t *  currph;
     ph_t *  nextph;
+
+    imp_dbh->do_tmp_sth = NULL;
 
     if (TSTART_slow) TRC(DBILOGFP, "%sBegin dbd_st_destroy\n", THEADER_slow);
 

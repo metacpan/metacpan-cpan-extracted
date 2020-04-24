@@ -1,3 +1,10 @@
+0.007   2020-04-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add subcommand: list-indexes.
+
+	- Tweak dbinfo-sqlite's Abstract.
+
+
 0.006   2020-04-20  Released-By: PERLANCAR; Urgency: medium
 
 	- Update to newer DBIx::Diff::Schema.

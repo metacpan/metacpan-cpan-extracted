@@ -26,8 +26,8 @@
          "schema:domainIncludes" : "schema:AnatomicalSystem",
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:AnatomicalStructure",
-            "schema:AnatomicalSystem"
+            "schema:AnatomicalSystem",
+            "schema:AnatomicalStructure"
          ]
       },
       "schema:relatedCondition" : {
@@ -36,8 +36,8 @@
          "rdfs:label" : "relatedCondition",
          "schema:domainIncludes" : [
             "schema:SuperficialAnatomy",
-            "schema:AnatomicalSystem",
-            "schema:AnatomicalStructure"
+            "schema:AnatomicalStructure",
+            "schema:AnatomicalSystem"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalCondition"
@@ -55,9 +55,9 @@
          "rdfs:comment" : "A medical therapy related to this anatomy.",
          "rdfs:label" : "relatedTherapy",
          "schema:domainIncludes" : [
-            "schema:SuperficialAnatomy",
             "schema:AnatomicalSystem",
-            "schema:AnatomicalStructure"
+            "schema:AnatomicalStructure",
+            "schema:SuperficialAnatomy"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalTherapy"

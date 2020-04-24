@@ -52,11 +52,10 @@ if ( can_cow() ) {
     }
 
     {
-        my %h = ( 'a'..'d' );
-        foreach my $k ( sort keys %h ) {
-            ok is_cow( $k ), "key $k is cowed";
-            is cowrefcnt( $k ), 0, "hash key $k cowrefcnt is 0" or Dump($k);
-        }
+        my %h = ( 'my_hash_key' => 'value' );
+        my @keys = keys %h;
+        ok is_cow( $keys[0] ), "hash key is cowed";
+        is cowrefcnt( $keys[0] ), 0, "hash key cowrefcnt is 0" or die Dump($keys[0]);
     }
 
 } else {

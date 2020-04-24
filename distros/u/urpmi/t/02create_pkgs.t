@@ -17,6 +17,7 @@ $ENV{PATH} .= join(':', uniq(map {
 	my $blib_script = dirname($_) . "/script";
 	-d $blib_script ? $blib_script : ();
 	} split(':', $ENV{PERL5LIB})));
+warn ">> Final PATH is $ENV{PATH}\n";
 
 chdir 't' if -d 't';
 system('rm -rf tmp media');
@@ -27,6 +28,17 @@ my $genhdlist2 = 'genhdlist2 --xml-info';
 
 my $whereis_genhdlist2 = qx(whereis genhdlist2);
 ok("whereis genhdlist2", "genhdlist2 emplacement= $whereis_genhdlist2");
+warn ">> genhdlist2: $whereis_genhdlist2\n";
+warn ">> FAILED TO FIND genhdlist2\n" if !$whereis_genhdlist2;
+
+# check that genhdlist2 actually works:
+my $dir = "genhdlist2-test";
+mkdir($dir);
+my $out = `genhdlist2 $dir 2>&1`;
+chomp($out);
+my $expected = "no *.rpm found in $dir (use --allow-empty-media?)";
+is($out, $expected, "genhdlist2 works");
+warn ">> genhdlist test output=<<$out>>\n" if $out ne $expected;
 
 # locally build test rpms
 

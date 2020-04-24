@@ -35,8 +35,8 @@
          "rdfs:comment" : "The day of the week for which these opening hours are valid.",
          "rdfs:label" : "dayOfWeek",
          "schema:domainIncludes" : [
-            "schema:EducationalOccupationalProgram",
-            "schema:OpeningHoursSpecification"
+            "schema:OpeningHoursSpecification",
+            "schema:EducationalOccupationalProgram"
          ],
          "schema:rangeIncludes" : "schema:DayOfWeek"
       },
@@ -47,8 +47,8 @@
          "rdfs:label" : "educationalCredentialAwarded",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
-            "schema:Course",
-            "schema:EducationalOccupationalProgram"
+            "schema:EducationalOccupationalProgram",
+            "schema:Course"
          ],
          "schema:rangeIncludes" : [
             "schema:EducationalOccupationalCredential",
@@ -65,8 +65,8 @@
          "schema:domainIncludes" : "schema:EducationalOccupationalProgram",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:URL"
+            "schema:URL",
+            "schema:Text"
          ]
       },
       "schema:endDate" : {
@@ -76,13 +76,13 @@
          "rdfs:label" : "endDate",
          "schema:category" : "issue-2486",
          "schema:domainIncludes" : [
-            "schema:CreativeWorkSeason",
-            "schema:CreativeWorkSeries",
-            "schema:Schedule",
+            "schema:Event",
             "schema:DatedMoneySpecification",
+            "schema:Schedule",
+            "schema:CreativeWorkSeries",
             "schema:Role",
-            "schema:EducationalOccupationalProgram",
-            "schema:Event"
+            "schema:CreativeWorkSeason",
+            "schema:EducationalOccupationalProgram"
          ],
          "schema:rangeIncludes" : [
             "schema:Date",
@@ -98,8 +98,8 @@
          "schema:domainIncludes" : "schema:EducationalOccupationalProgram",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:DefinedTerm",
-            "schema:Text"
+            "schema:Text",
+            "schema:DefinedTerm"
          ]
       },
       "schema:maximumEnrollment" : {
@@ -124,16 +124,16 @@
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Integer",
-            "schema:StructuredValue"
+            "schema:StructuredValue",
+            "schema:Integer"
          ]
       },
       "schema:occupationalCategory" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/2289",
-            "https://github.com/schemaorg/schemaorg/issues/2460",
             "https://github.com/schemaorg/schemaorg/issues/1698",
-            "https://github.com/schemaorg/schemaorg/issues/2192"
+            "https://github.com/schemaorg/schemaorg/issues/2289",
+            "https://github.com/schemaorg/schemaorg/issues/2192",
+            "https://github.com/schemaorg/schemaorg/issues/2460"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A category describing the job, preferably using a term from a taxonomy such as <a href=\"http://www.onetcenter.org/taxonomy.html\">BLS O*NET-SOC</a>, <a href=\"https://www.ilo.org/public/english/bureau/stat/isco/isco08/\">ISCO-08</a> or similar, with the property repeated for each applicable value. Ideally the taxonomy should be identified, and both the textual label and formal code for the category should be provided.<br/><br/>\n\nNote: for historical reasons, any textual label and formal code provided as a literal may be assumed to be from O*NET-SOC.",
@@ -141,14 +141,14 @@
          "schema:category" : [
             "issue-2289",
             "issue-1698",
-            "issue-2460",
-            "issue-2192"
+            "issue-2192",
+            "issue-2460"
          ],
          "schema:domainIncludes" : [
-            "schema:WorkBasedProgram",
             "schema:Occupation",
-            "schema:JobPosting",
-            "schema:EducationalOccupationalProgram"
+            "schema:WorkBasedProgram",
+            "schema:EducationalOccupationalProgram",
+            "schema:JobPosting"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
@@ -168,8 +168,8 @@
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
             "schema:Text",
+            "schema:URL",
             "schema:EducationalOccupationalCredential"
          ]
       },
@@ -180,19 +180,19 @@
          "rdfs:label" : "offers",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
+            "schema:Product",
             "schema:CreativeWork",
-            "schema:MenuItem",
             "schema:AggregateOffer",
-            "schema:Event",
-            "schema:Trip",
             "schema:EducationalOccupationalProgram",
-            "schema:Service",
-            "schema:Product"
+            "schema:Trip",
+            "schema:Event",
+            "schema:MenuItem",
+            "schema:Service"
          ],
          "schema:inverseOf" : "schema:itemOffered",
          "schema:rangeIncludes" : [
-            "schema:Offer",
-            "schema:Demand"
+            "schema:Demand",
+            "schema:Offer"
          ]
       },
       "schema:programPrerequisites" : {
@@ -204,10 +204,10 @@
          "schema:domainIncludes" : "schema:EducationalOccupationalProgram",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:AlignmentObject",
-            "schema:Course",
             "schema:EducationalOccupationalCredential",
-            "schema:Text"
+            "schema:Course",
+            "schema:Text",
+            "schema:AlignmentObject"
          ]
       },
       "schema:programType" : {
@@ -219,8 +219,8 @@
          "schema:domainIncludes" : "schema:EducationalOccupationalProgram",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:DefinedTerm"
+            "schema:DefinedTerm",
+            "schema:Text"
          ]
       },
       "schema:provider" : {
@@ -230,13 +230,13 @@
          "rdfs:label" : "provider",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
+            "schema:Invoice",
             "schema:ParcelDelivery",
-            "schema:Service",
-            "schema:Reservation",
-            "schema:EducationalOccupationalProgram",
-            "schema:Trip",
             "schema:CreativeWork",
-            "schema:Invoice"
+            "schema:Service",
+            "schema:Trip",
+            "schema:Reservation",
+            "schema:EducationalOccupationalProgram"
          ],
          "schema:rangeIncludes" : [
             "schema:Person",
@@ -260,13 +260,13 @@
          "rdfs:label" : "startDate",
          "schema:category" : "issue-2486",
          "schema:domainIncludes" : [
-            "schema:Role",
             "schema:CreativeWorkSeries",
-            "schema:CreativeWorkSeason",
+            "schema:Role",
             "schema:DatedMoneySpecification",
-            "schema:EducationalOccupationalProgram",
+            "schema:CreativeWorkSeason",
             "schema:Schedule",
-            "schema:Event"
+            "schema:Event",
+            "schema:EducationalOccupationalProgram"
          ],
          "schema:rangeIncludes" : [
             "schema:DateTime",
@@ -315,8 +315,8 @@
       },
       "schema:trainingSalary" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/2460",
-            "https://github.com/schemaorg/schemaorg/issues/2289"
+            "https://github.com/schemaorg/schemaorg/issues/2289",
+            "https://github.com/schemaorg/schemaorg/issues/2460"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The estimated salary earned while in the program.",
@@ -326,8 +326,8 @@
             "issue-2460"
          ],
          "schema:domainIncludes" : [
-            "schema:EducationalOccupationalProgram",
-            "schema:WorkBasedProgram"
+            "schema:WorkBasedProgram",
+            "schema:EducationalOccupationalProgram"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:MonetaryAmountDistribution"

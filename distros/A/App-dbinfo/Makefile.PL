@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
   "NAME" => "App::dbinfo",
   "PREREQ_PM" => {
     "DBI" => 0,
-    "DBIx::Diff::Schema" => "0.093",
+    "DBIx::Diff::Schema" => "0.094",
     "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::int" => 0,
@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,7 +53,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "DBI" => 0,
-  "DBIx::Diff::Schema" => "0.093",
+  "DBIx::Diff::Schema" => "0.094",
   "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::bool" => 0,
   "Data::Sah::Compiler::perl::TH::int" => 0,

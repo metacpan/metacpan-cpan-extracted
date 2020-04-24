@@ -7,6 +7,7 @@ use Test::More 0.88;
 use Test::NoTabs;
 
 my @files = (
+    'bin/find-case-collisions',
     'lib/File/Find/CaseCollide.pm',
     'lib/Test/File/Find/CaseCollide.pm',
     't/00-compile.t',

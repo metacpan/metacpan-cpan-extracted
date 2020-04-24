@@ -12,8 +12,8 @@
          "rdfs:comment" : "The location in which the status applies.",
          "rdfs:label" : "applicableLocation",
          "schema:domainIncludes" : [
-            "schema:DrugCost",
-            "schema:DrugLegalStatus"
+            "schema:DrugLegalStatus",
+            "schema:DrugCost"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:AdministrativeArea"
@@ -49,8 +49,8 @@
          "schema:domainIncludes" : "schema:DrugCost",
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Number",
             "schema:QualitativeValue",
+            "schema:Number",
             "schema:Text"
          ]
       },
@@ -59,8 +59,8 @@
          "rdfs:comment" : "The unit in which the drug is measured, e.g. '5 mg tablet'.",
          "rdfs:label" : "drugUnit",
          "schema:domainIncludes" : [
-            "schema:Drug",
-            "schema:DrugCost"
+            "schema:DrugCost",
+            "schema:Drug"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"

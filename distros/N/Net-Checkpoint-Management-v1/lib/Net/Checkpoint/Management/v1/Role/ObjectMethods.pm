@@ -1,5 +1,5 @@
 package Net::Checkpoint::Management::v1::Role::ObjectMethods;
-$Net::Checkpoint::Management::v1::Role::ObjectMethods::VERSION = '0.001004';
+$Net::Checkpoint::Management::v1::Role::ObjectMethods::VERSION = '0.001005';
 # ABSTRACT: Role for Checkpoint Management API version 1.x method generation
 
 use 5.024;
@@ -23,85 +23,93 @@ role {
     my $params = shift;
     my $mop    = shift;
 
-    $mop->method('create_' . $params->{singular} => sub ($self, $object_data) {
-        return $self->_create(join('/',
-            '/web_api',
-            'v' . $self->api_version,
-            $params->{create}
-        ), $object_data);
-    });
+    if (exists $params->{singular} && defined $params->{singular}) {
+        $mop->method('create_' . $params->{singular} => sub ($self, $object_data) {
+            return $self->_create(join('/',
+                '/web_api',
+                'v' . $self->api_version,
+                $params->{create}
+            ), $object_data);
+        })
+            if exists $params->{create} && defined $params->{create};
 
-    $mop->method('list_' . $params->{object} => sub ($self, $query_params = {}) {
-        return $self->_list(join('/',
-            '/web_api',
-            'v' . $self->api_version,
-            $params->{list}
-        ), $params->{list_key}, $query_params);
-    });
+        $mop->method('get_' . $params->{singular} => sub ($self, $query_params = {}) {
+            return $self->_get(join('/',
+                '/web_api',
+                'v' . $self->api_version,
+                $params->{get}
+            ), $query_params);
+        })
+            if exists $params->{get} && defined $params->{get};
 
-    $mop->method('get_' . $params->{singular} => sub ($self, $query_params = {}) {
-        return $self->_get(join('/',
-            '/web_api',
-            'v' . $self->api_version,
-            $params->{get}
-        ), $query_params);
-    });
-
-    $mop->method('update_' . $params->{singular} => sub ($self, $object, $object_data) {
-        my $updated_data = { %$object, %$object_data };
-        if (exists $params->{id_keys} && ref $params->{id_keys} eq 'ARRAY') {
-            # ensure that only a single key is passed to the update call
-            # the order of keys is the priority
-            my @id_keys = $params->{id_keys}->@*;
-            while (my $key = shift @id_keys) {
-                last
-                    if exists $updated_data->{$key}
-                    && defined $updated_data->{$key};
+        $mop->method('update_' . $params->{singular} => sub ($self, $object, $object_data) {
+            my $updated_data = { %$object, %$object_data };
+            if (exists $params->{id_keys} && ref $params->{id_keys} eq 'ARRAY') {
+                # ensure that only a single key is passed to the update call
+                # the order of keys is the priority
+                my @id_keys = $params->{id_keys}->@*;
+                while (my $key = shift @id_keys) {
+                    last
+                        if exists $updated_data->{$key}
+                        && defined $updated_data->{$key};
+                }
+                delete $updated_data->{$_}
+                    for @id_keys;
             }
-            delete $updated_data->{$_}
-                for @id_keys;
-        }
 
-        return $self->_update(join('/',
-            '/web_api',
-            'v' . $self->api_version,
-            $params->{update}
-        ), $updated_data);
-    });
+            return $self->_update(join('/',
+                '/web_api',
+                'v' . $self->api_version,
+                $params->{update}
+            ), $updated_data);
+        })
+            if exists $params->{update} && defined $params->{update};
 
-    $mop->method('delete_' . $params->{singular} => sub ($self, $object) {
-        return $self->_delete(join('/',
-            '/web_api',
-            'v' . $self->api_version,
-            $params->{delete}
-        ), $object);
-    });
+        $mop->method('delete_' . $params->{singular} => sub ($self, $object) {
+            return $self->_delete(join('/',
+                '/web_api',
+                'v' . $self->api_version,
+                $params->{delete}
+            ), $object);
+        })
+            if exists $params->{delete} && defined $params->{delete};
 
-    $mop->method('find_' . $params->{singular} => sub ($self, $search_params = {}, $query_params = {}) {
-        my $listname = 'list_' . $params->{object};
-        my $list_key = $params->{list_key};
-        for my $object ($self->$listname({ 'details-level' => 'full', %$query_params })->{$list_key}->@*) {
-            my $identical = 0;
-            for my $key (keys $search_params->%*) {
-                if ( ref $search_params->{$key} eq 'Regexp') {
-                    if ( exists $object->{$key}
-                        && $object->{$key} =~ $search_params->{$key}) {
-                        $identical++;
+        $mop->method('find_' . $params->{singular} => sub ($self, $search_params = {}, $query_params = {}) {
+            my $listname = 'list_' . $params->{object};
+            my $list_key = $params->{list_key};
+            for my $object ($self->$listname({ 'details-level' => 'full', %$query_params })->{$list_key}->@*) {
+                my $identical = 0;
+                for my $key (keys $search_params->%*) {
+                    if ( ref $search_params->{$key} eq 'Regexp') {
+                        if ( exists $object->{$key}
+                            && $object->{$key} =~ $search_params->{$key}) {
+                            $identical++;
+                        }
+                    }
+                    else {
+                        if ( exists $object->{$key}
+                            && $object->{$key} eq $search_params->{$key}) {
+                            $identical++;
+                        }
                     }
                 }
-                else {
-                    if ( exists $object->{$key}
-                        && $object->{$key} eq $search_params->{$key}) {
-                        $identical++;
-                    }
+                if ($identical == scalar keys $search_params->%*) {
+                    return $object;
                 }
             }
-            if ($identical == scalar keys $search_params->%*) {
-                return $object;
-            }
-        }
-        croak "object not found";
-    });
+            croak "object not found";
+        });
+    }
+
+    if (exists $params->{object} && defined $params->{object}) {
+        $mop->method('list_' . $params->{object} => sub ($self, $query_params = {}) {
+            return $self->_list(join('/',
+                '/web_api',
+                'v' . $self->api_version,
+                $params->{list}
+            ), $params->{list_key}, $query_params);
+        });
+    }
 };
 
 1;
@@ -118,7 +126,7 @@ Net::Checkpoint::Management::v1::Role::ObjectMethods - Role for Checkpoint Manag
 
 =head1 VERSION
 
-version 0.001004
+version 0.001005
 
 =head1 SYNOPSIS
 

@@ -52,5 +52,32 @@ is $read, "b.one 1 $time\nb.two 2 $time\n", 'got expected writes to mock graphit
 is $open, 1, 'opened once';
 is $close, 0, 'connection not closed';
 
+# test fork safety (test method borrowed from mojo-pg)
+subtest 'fork safety' => sub {
+  my ($old, $new);
+  $graphite->connect->then(sub{ $old = shift })->wait;
+  is $open, 1, 'opened once';
+
+  local $$ = -23;
+  $graphite->connect->then(sub{ $new = shift })->wait;
+  isnt $old, $new, 'new connection';
+  is $open, 2, 'reopened';
+};
+
+$read = '';
+subtest 'preprocess' => sub {
+  no warnings 'once';
+  local *CORE::GLOBAL::time = sub { $time };
+  $e->on(read => sub { Mojo::IOLoop->stop });
+  $graphite->write(
+    ['c.one', 1], # default time
+    ['c.two', 2, $time, {foo => 'bar', baz => 'bat'}], # tags
+    ['c.three', 3, undef, {foo => 'bar', baz => 'bat'}], # both
+    ['c.four', 4, $time, {'what()' => 'this that', 'null' => undef}], # cleanup
+  );
+  Mojo::IOLoop->start;
+  is $read, "c.one 1 $time\nc.two;baz=bat;foo=bar 2 $time\nc.three;baz=bat;foo=bar 3 $time\nc.four;null=;what=this_that 4 $time\n", 'expected write';
+};
+
 done_testing;
 

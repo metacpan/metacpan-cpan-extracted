@@ -11,8 +11,8 @@
          "rdfs:comment" : "'carrier' is an out-dated term indicating the 'provider' for parcel delivery and flights.",
          "rdfs:label" : "carrier",
          "schema:domainIncludes" : [
-            "schema:ParcelDelivery",
-            "schema:Flight"
+            "schema:Flight",
+            "schema:ParcelDelivery"
          ],
          "schema:rangeIncludes" : "schema:Organization",
          "schema:supersededBy" : "schema:provider"
@@ -56,8 +56,8 @@
          "rdfs:comment" : "Method used for delivery or shipping.",
          "rdfs:label" : "hasDeliveryMethod",
          "schema:domainIncludes" : [
-            "schema:DeliveryEvent",
-            "schema:ParcelDelivery"
+            "schema:ParcelDelivery",
+            "schema:DeliveryEvent"
          ],
          "schema:rangeIncludes" : "schema:DeliveryMethod"
       },
@@ -89,13 +89,13 @@
          "rdfs:label" : "provider",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
+            "schema:Invoice",
             "schema:ParcelDelivery",
-            "schema:Service",
-            "schema:Reservation",
-            "schema:EducationalOccupationalProgram",
-            "schema:Trip",
             "schema:CreativeWork",
-            "schema:Invoice"
+            "schema:Service",
+            "schema:Trip",
+            "schema:Reservation",
+            "schema:EducationalOccupationalProgram"
          ],
          "schema:rangeIncludes" : [
             "schema:Person",

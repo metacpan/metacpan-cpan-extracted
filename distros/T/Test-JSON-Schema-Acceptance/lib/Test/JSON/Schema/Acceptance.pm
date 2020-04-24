@@ -1,110 +1,109 @@
-package Test::JSON::Schema::Acceptance;
+package Test::JSON::Schema::Acceptance; # git description: 0.0.1-12-g1f33ab6
+# ABSTRACT: Acceptance testing for JSON-Schema based validators like JSON::Schema
+
+our $VERSION = '0.990';
 
 use 5.010;
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
-use Cwd 'abs_path';
-use JSON;
+use Test::More ();
+use Test::Fatal ();
+use Cwd ();
+use JSON ();
 
-=head1 NAME
-
-Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based validators like JSON::Schema
-
-=head1 VERSION
-
-Version 0.0.2
-
-=cut
-
-our $VERSION = '0.0.2';
-
-=head1 SYNOPSIS
-
-This module allows the L<JSON Schema Test Suite|https://github.com/json-schema/JSON-Schema-Test-Suite> tests to be used in perl to test a module that implements json-schema.
-These are the same tests that many modules (libraries, plugins, packages, etc.) use to confirm support of json-scheam.
-Using this module to confirm support gives assurance of interoperability with other modules that run the same tests in differnet languages.
-
-In the JSON::Schema module, a test could look like the following:
-
-  use Test::More;
-  use JSON::Schema;
-  use Test::JSON::Schema::Acceptance;
-
-  my $accepter = Test::JSON::Schema::Acceptance->new(3);
-
-  # Skip tests which are known not to be supported or which cause problems.
-  my $skip_tests = ['multiple extends', 'dependencies', 'ref'];
-
-  $accepter->acceptance( sub{
-    my ( $schema, $input ) = @_;
-    return JSON::Schema->new($schema)->validate($input);
-  }, {
-    skip_tests => $skip_tests
-  } );
-
-  done_testing();
-
-This would determine if JSON::Schema's C<validate> method returns the right result for all of the cases in the JSON Schema Test Suite, except for those listed in C<$skip_tests>.
-
-=head1 DESCRIPTION
-
-L<JSON Schema|http://json-schema.org> is an IETF draft (at time of writing) which allows you to define the structure of JSON.
-
-The abstract from L<draft 4|https://tools.ietf.org/html/draft-zyp-json-schema-04> of the specification:
-
-=over 4
-JSON Schema defines the media type "application/schema+json",
-a JSON based format for defining the structure of JSON data.
-JSON Schema provides a contract for what JSON data is required
-for a given application and how to interact with it.
-JSON Schema is intended to define validation, documentation,
-hyperlink navigation, and interaction control of JSON data.
-=back
-
-L<JSON::Schema|https://metacpan.org/pod/JSON::Schema> is a perl module created independantly of the specification, which aims to implement the json-schema specification.
-
-This module allows other perl modules (for example JSON::Schema) to test that they are json-schema compliant, by running the tests from the official test suite, without having to manually convert them to perl tests.
-
-You are unliekly to want this module, unless you are attempting to write a module which implements json-schema the specification, and want to test your compliance.
-
-
-=head1 CONSTRUCTOR
-
-=over 1
-
-=item C<< Test::JSON::Schema::Acceptance->new($schema_version) >>
-
-Create a new instance of Test::JSON::Schema::Acceptance.
-
-Accepts optional argument of $schema_version.
-This determins the draft version of the schema to confirm compliance to.
-Default is draft 4 (current), but in the synopsis example, JSON::Schema is testing draft 3 compliance.
-
-=cut
+#pod =for :header =for stopwords validators
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod This module allows the L<JSON Schema Test Suite|https://github.com/json-schema/JSON-Schema-Test-Suite> tests to be used in perl to test a module that implements json-schema.
+#pod These are the same tests that many modules (libraries, plugins, packages, etc.) use to confirm support of json-schema.
+#pod Using this module to confirm support gives assurance of interoperability with other modules that run the same tests in different languages.
+#pod
+#pod In the JSON::Schema module, a test could look like the following:
+#pod
+#pod   use Test::More;
+#pod   use JSON::Schema;
+#pod   use Test::JSON::Schema::Acceptance;
+#pod
+#pod   my $accepter = Test::JSON::Schema::Acceptance->new(3);
+#pod
+#pod   # Skip tests which are known not to be supported or which cause problems.
+#pod   my $skip_tests = ['multiple extends', 'dependencies', 'ref'];
+#pod
+#pod   $accepter->acceptance( sub{
+#pod     my ( $schema, $input ) = @_;
+#pod     return JSON::Schema->new($schema)->validate($input);
+#pod   }, {
+#pod     skip_tests => $skip_tests
+#pod   } );
+#pod
+#pod   done_testing();
+#pod
+#pod This would determine if JSON::Schema's C<validate> method returns the right result for all of the cases in the JSON Schema Test Suite, except for those listed in C<$skip_tests>.
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod L<JSON Schema|http://json-schema.org> is an IETF draft (at time of writing) which allows you to define the structure of JSON.
+#pod
+#pod The abstract from L<draft 4|https://tools.ietf.org/html/draft-zyp-json-schema-04> of the specification:
+#pod
+#pod =over 4
+#pod
+#pod JSON Schema defines the media type "application/schema+json",
+#pod a JSON based format for defining the structure of JSON data.
+#pod JSON Schema provides a contract for what JSON data is required
+#pod for a given application and how to interact with it.
+#pod JSON Schema is intended to define validation, documentation,
+#pod hyperlink navigation, and interaction control of JSON data.
+#pod
+#pod =back
+#pod
+#pod L<JSON::Schema|https://metacpan.org/pod/JSON::Schema> is a perl module created independently of the specification, which aims to implement the json-schema specification.
+#pod
+#pod This module allows other perl modules (for example JSON::Schema) to test that they are json-schema compliant, by running the tests from the official test suite, without having to manually convert them to perl tests.
+#pod
+#pod You are unlikely to want this module, unless you are attempting to write a module which implements json-schema the specification, and want to test your compliance.
+#pod
+#pod
+#pod =head1 CONSTRUCTOR
+#pod
+#pod =over 1
+#pod
+#pod =item C<< Test::JSON::Schema::Acceptance->new($schema_version) >>
+#pod
+#pod Create a new instance of Test::JSON::Schema::Acceptance.
+#pod
+#pod Accepts optional argument of $schema_version.
+#pod This determines the draft version of the schema to confirm compliance to.
+#pod Default is draft 4 (current), but in the synopsis example, JSON::Schema is testing draft 3 compliance.
+#pod
+#pod =back
+#pod
+#pod =cut
 
 sub new {
   my $class = shift;
   return bless { draft => shift || 4 }, $class;
 }
 
-=head1 SUBROUTINES/METHODS
-
-=head2 acceptance
-
-Accepts a sub and optional options in the form of a hash.
-The sub should return truthy or falsey depending on if the schema was valid for the input or not.
-
-=head3 options
-
-The only option which is currently accepted is skip_tests, which should be an array ref of tests you want to skip.
-You can skip a whole section of tests or individual tests.
-Any test name that contains any of the array refs items will be skipped, using grep.
-You can also skip a test by its number.
-
-=cut
+#pod =head1 SUBROUTINES/METHODS
+#pod
+#pod =head2 acceptance
+#pod
+#pod =for stopwords truthy falsey
+#pod
+#pod Accepts a sub and optional options in the form of a hash.
+#pod The sub should return truthy or falsey depending on if the schema was valid for the input or not.
+#pod
+#pod =head3 options
+#pod
+#pod The only option which is currently accepted is skip_tests, which should be an array ref of tests you want to skip.
+#pod You can skip a whole section of tests or individual tests.
+#pod Any test name that contains any of the array refs items will be skipped, using grep.
+#pod You can also skip a test by its number.
+#pod
+#pod =cut
 
 sub acceptance {
   my ($self, $code, $options) = @_;
@@ -138,13 +137,13 @@ sub _run_tests {
 
         TODO: {
           if (ref $skip_tests eq 'ARRAY'){
-            todo_skip 'Test explicitly skipped. - '  . $subtest_name, 1
+              Test::More::todo_skip 'Test explicitly skipped. - '  . $subtest_name, 1
               if (grep { $subtest_name =~ /$_/} @$skip_tests) ||
                 grep $_ eq "$test_no", @$skip_tests;
           }
 
           my $result;
-          my $exception = exception{
+          my $exception = Test::Fatal::exception{
             if(ref($test->{data}) eq 'ARRAY' || ref($test->{data}) eq 'HASH'){
               $result = $code->($schema, $json->encode($test->{data}));
             } else {
@@ -154,8 +153,8 @@ sub _run_tests {
           };
 
           my $test_desc = $test_group_test->{description} . ' - ' . $test->{description} . ($exception ? ' - and died!!' : '');
-          ok(!$exception && _eq_bool($test->{valid}, $result), $test_desc) or
-            diag(
+          Test::More::ok(!$exception && _eq_bool($test->{valid}, $result), $test_desc) or
+            Test::More::diag(
               "#$test_no \n" .
               'Test file "' . $test_group->{file} . "\"\n" .
               'Test schema - ' . $test_group_test->{description} . "\n" .
@@ -171,7 +170,7 @@ sub _run_tests {
 sub _load_tests {
   my $self = shift;
 
-  my $mod_dir = abs_path(__FILE__) =~ s~Acceptance\.pm~/test_suite~r; # Find the modules directory... ~
+  my $mod_dir = Cwd::abs_path(__FILE__) =~ s~Acceptance\.pm~/test_suite~r; # Find the modules directory... ~
 
   my $draft_dir = $mod_dir . "/tests/draft" . $self->{draft} . "/";
 
@@ -203,82 +202,165 @@ sub _eq_bool {
   return !(shift xor shift);
 }
 
-=head1 AUTHOR
+#pod =head1 ACKNOWLEDGEMENTS
+#pod
+#pod =for stopwords Signes
+#pod
+#pod Daniel Perrett <perrettdl@cpan.org> for the concept and help in design.
+#pod
+#pod Ricardo Signes <rjbs@cpan.org> for direction to and creation of Test::Fatal.
+#pod
+#pod Various others in #perl-help.
+#pod
+#pod =cut
 
-Ben Hutton (@relequestual), C<< <relequest at cpan.org> >>
+1; # End of Test::JSON::Schema::Acceptance
 
-=head1 BUGS
+__END__
 
-Please report any bugs or feature requests to via github at L<https://github.com/Relequestual/Test-JSON-Schema-Acceptance/issues>.
+=pod
 
-=head1 SUPPORT
+=encoding UTF-8
 
-Users' IRC: #json-schema on irc.perl.org
+=for stopwords validators
 
-=for :html
-L<(click for instant chatroom login)|http://chat.mibbit.com/#json-schema@irc.perl.org>
+=head1 NAME
 
-For questions about json-schema in general IRC: #json-schema on chat.freenode.net
+Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based validators like JSON::Schema
 
-=for :html
-L<(click for instant chatroom login)|http://chat.mibbit.com/#json-schema@chat.freenode.net>
+=head1 VERSION
 
-You can also look for information at:
+version 0.990
 
-=over 3
+=head1 SYNOPSIS
 
-=item * Github issues (report bugs here)
+This module allows the L<JSON Schema Test Suite|https://github.com/json-schema/JSON-Schema-Test-Suite> tests to be used in perl to test a module that implements json-schema.
+These are the same tests that many modules (libraries, plugins, packages, etc.) use to confirm support of json-schema.
+Using this module to confirm support gives assurance of interoperability with other modules that run the same tests in different languages.
 
-L<https://github.com/Relequestual/Test-JSON-Schema-Acceptance/issues>
+In the JSON::Schema module, a test could look like the following:
 
-=item * CPAN Ratings
+  use Test::More;
+  use JSON::Schema;
+  use Test::JSON::Schema::Acceptance;
 
-L<http://cpanratings.perl.org/d/Test-JSON-Schema-Acceptance>
+  my $accepter = Test::JSON::Schema::Acceptance->new(3);
 
-=item * Search Meta CPAN
+  # Skip tests which are known not to be supported or which cause problems.
+  my $skip_tests = ['multiple extends', 'dependencies', 'ref'];
 
-L<http://search.cpan.org/pod/Test::JSON::Schema::Acceptance/>
+  $accepter->acceptance( sub{
+    my ( $schema, $input ) = @_;
+    return JSON::Schema->new($schema)->validate($input);
+  }, {
+    skip_tests => $skip_tests
+  } );
+
+  done_testing();
+
+This would determine if JSON::Schema's C<validate> method returns the right result for all of the cases in the JSON Schema Test Suite, except for those listed in C<$skip_tests>.
+
+=head1 DESCRIPTION
+
+L<JSON Schema|http://json-schema.org> is an IETF draft (at time of writing) which allows you to define the structure of JSON.
+
+The abstract from L<draft 4|https://tools.ietf.org/html/draft-zyp-json-schema-04> of the specification:
+
+=over 4
+
+JSON Schema defines the media type "application/schema+json",
+a JSON based format for defining the structure of JSON data.
+JSON Schema provides a contract for what JSON data is required
+for a given application and how to interact with it.
+JSON Schema is intended to define validation, documentation,
+hyperlink navigation, and interaction control of JSON data.
 
 =back
 
+L<JSON::Schema|https://metacpan.org/pod/JSON::Schema> is a perl module created independently of the specification, which aims to implement the json-schema specification.
+
+This module allows other perl modules (for example JSON::Schema) to test that they are json-schema compliant, by running the tests from the official test suite, without having to manually convert them to perl tests.
+
+You are unlikely to want this module, unless you are attempting to write a module which implements json-schema the specification, and want to test your compliance.
+
+=head1 CONSTRUCTOR
+
+=over 1
+
+=item C<< Test::JSON::Schema::Acceptance->new($schema_version) >>
+
+Create a new instance of Test::JSON::Schema::Acceptance.
+
+Accepts optional argument of $schema_version.
+This determines the draft version of the schema to confirm compliance to.
+Default is draft 4 (current), but in the synopsis example, JSON::Schema is testing draft 3 compliance.
+
+=back
+
+=head1 SUBROUTINES/METHODS
+
+=head2 acceptance
+
+=for stopwords truthy falsey
+
+Accepts a sub and optional options in the form of a hash.
+The sub should return truthy or falsey depending on if the schema was valid for the input or not.
+
+=head3 options
+
+The only option which is currently accepted is skip_tests, which should be an array ref of tests you want to skip.
+You can skip a whole section of tests or individual tests.
+Any test name that contains any of the array refs items will be skipped, using grep.
+You can also skip a test by its number.
 
 =head1 ACKNOWLEDGEMENTS
 
+=for stopwords Signes
+
 Daniel Perrett <perrettdl@cpan.org> for the concept and help in design.
 
-Ricardo SIGNES <rjbs@cpan.org> for direction to and creation of Test::Fatal.
+Ricardo Signes <rjbs@cpan.org> for direction to and creation of Test::Fatal.
 
 Various others in #perl-help.
 
-=head1 LICENSE AND COPYRIGHT
+=head1 SUPPORT
 
-Copyright 2015 Ben Hutton (@relequestual).
+bugs may be submitted through L<https://github.com/karenetheridge/Test-JSON-Schema-Acceptance/issues>.
 
-This program is distributed under the MIT (X11) License:
-L<http://www.opensource.org/licenses/mit-license.php>
+=head1 AUTHOR
 
-Permission is hereby granted, free of charge, to any person
-obtaining a copy of this software and associated documentation
-files (the "Software"), to deal in the Software without
-restriction, including without limitation the rights to use,
-copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following
-conditions:
+Ben Hutton (@relequestual) <relequest@cpan.org>
 
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
+=head1 CONTRIBUTORS
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
+=for stopwords Ben Hutton Karen Etheridge Daniel Perrett
 
+=over 4
+
+=item *
+
+Ben Hutton <bh7@sanger.ac.uk>
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Ben Hutton <relequestual@gmail.com>
+
+=item *
+
+Daniel Perrett <dp13@sanger.ac.uk>
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is Copyright (c) 2015 by Ben Hutton.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut
-
-1; # End of Test::JSON::Schema::Acceptance

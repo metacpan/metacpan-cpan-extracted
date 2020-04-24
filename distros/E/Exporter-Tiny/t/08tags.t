@@ -79,6 +79,8 @@ is(  Local::Bar::foo(), 'foo'  );
 
 {
 	package Local::Baz;
+	# Workaround for people who have PERL5OPT set to load features
+	BEGIN { $INC{'feature.pm'} and 'feature'->unimport('switch') };
 	use Local::Foo -default;
 }
 

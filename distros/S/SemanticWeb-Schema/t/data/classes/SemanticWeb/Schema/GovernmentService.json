@@ -6,6 +6,22 @@
       "rdfs:subClassOf" : "schema:Service"
    },
    "properties" : {
+      "schema:jurisdiction" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2534",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates a legal jurisdiction, e.g. of some legislation, or where some government service is based.",
+         "rdfs:label" : "jurisdiction",
+         "schema:category" : "issue-2534",
+         "schema:domainIncludes" : [
+            "schema:GovernmentService",
+            "schema:Legislation"
+         ],
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:AdministrativeArea"
+         ]
+      },
       "schema:serviceOperator" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The operating organization, if different from the provider.  This enables the representation of services that are provided by an organization, but operated by another organization like a subcontractor.",

@@ -8,7 +8,7 @@ use Moo;
 use Mxpress::PDF;
 use Pod::Simpler::Aoh;
 use JSON;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 extends 'MetaCPAN::Client';
 
@@ -146,7 +146,6 @@ sub dist_pdf {
 			$pod
 		);
 		next if $module eq 'DBIx::Class::AccessorGroup';
-
 		$pdf->toc->add(
 			title => $module
 		);
@@ -170,6 +169,11 @@ sub _start_pdf {
 	$pdf->h1->add(
 		'Table of Contents'
 	)->toc->placeholder;
+
+	$pdf->toc->add(
+		title => $module
+	);
+
 
 	return $pdf;
 }
@@ -205,7 +209,7 @@ MetaCPAN::Client::Pod::PDF - The great new MetaCPAN::Client::Pod::PDF!
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

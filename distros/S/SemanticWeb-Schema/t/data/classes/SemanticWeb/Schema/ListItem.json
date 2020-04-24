@@ -11,8 +11,8 @@
          "rdfs:comment" : "An entity represented by an entry in a list or data feed (e.g. an 'artist' in a list of 'artists')â.",
          "rdfs:label" : "item",
          "schema:domainIncludes" : [
-            "schema:ListItem",
-            "schema:DataFeedItem"
+            "schema:DataFeedItem",
+            "schema:ListItem"
          ],
          "schema:rangeIncludes" : "schema:Thing"
       },
@@ -28,8 +28,8 @@
          "rdfs:comment" : "The position of an item in a series or sequence of items.",
          "rdfs:label" : "position",
          "schema:domainIncludes" : [
-            "schema:ListItem",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:ListItem"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",

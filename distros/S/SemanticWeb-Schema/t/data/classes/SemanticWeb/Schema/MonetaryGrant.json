@@ -18,19 +18,19 @@
          "rdfs:comment" : "The amount of money.",
          "rdfs:label" : "amount",
          "schema:category" : [
-            "issue-1253",
-            "issue-1698"
+            "issue-1698",
+            "issue-1253"
          ],
          "schema:domainIncludes" : [
+            "schema:MoneyTransfer",
+            "schema:MonetaryGrant",
             "schema:InvestmentOrDeposit",
             "schema:DatedMoneySpecification",
-            "schema:MonetaryGrant",
-            "schema:LoanOrCredit",
-            "schema:MoneyTransfer"
+            "schema:LoanOrCredit"
          ],
          "schema:rangeIncludes" : [
-            "schema:MonetaryAmount",
-            "schema:Number"
+            "schema:Number",
+            "schema:MonetaryAmount"
          ]
       },
       "schema:funder" : {
@@ -39,11 +39,11 @@
          "rdfs:label" : "funder",
          "rdfs:subPropertyOf" : "schema:sponsor",
          "schema:domainIncludes" : [
-            "schema:CreativeWork",
+            "schema:MonetaryGrant",
             "schema:Event",
             "schema:Organization",
-            "schema:MonetaryGrant",
-            "schema:Person"
+            "schema:Person",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : [
             "schema:Organization",

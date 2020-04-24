@@ -4,21 +4,24 @@ package Boxer::CLI::Command::Commands;
 
 =cut
 
-use v5.14;
+use v5.20;
 use utf8;
-use strictures 2;
 use Role::Commons -all;
+use feature 'signatures';
 use namespace::autoclean 0.16;
 
 use Boxer::CLI -command;
 
+use strictures 2;
+no warnings "experimental::signatures";
+
 =head1 VERSION
 
-Version v1.4.0
+Version v1.4.2
 
 =cut
 
-our $VERSION = "v1.4.0";
+our $VERSION = "v1.4.2";
 
 require App::Cmd::Command::commands;
 our @ISA;
@@ -28,9 +31,8 @@ use constant {
 	abstract => q[list installed boxer commands],
 };
 
-sub sort_commands
+sub sort_commands ( $self, @commands )
 {
-	my ( $self, @commands ) = @_;
 	my $float = qr/^(?:help|commands|aliases|about)$/;
 	my @head  = sort grep { $_ =~ $float } @commands;
 	my @tail  = sort grep { $_ !~ $float } @commands;

@@ -1,5 +1,23 @@
 Revision history for Object-Pad
 
+0.25    2020-04-24
+        [CHANGES]
+         * Further expanded the (undocumented) MOP API
+            + Added beginnings of O:P:MOP::Class, O:P:MOP::Slot sufficient to
+              create classes and add slots and methods to them
+
+        [BUGFIXES]
+         * Ensure that anonymous methods can perform lexical captures from
+           outside scopes (RT132178)
+         * Ensure that subclasses without BUILD methods don't double invoke
+           that of their superclass
+         * Ensure a method's optree begins with OP_NEXTSTATE as debug tools
+           may rely on this (RT132413)
+         * Don't rely on Test::MemoryGrowth at test time, so tests can still
+           pass on non-Linux
+
+0.24    (bad MANIFEST)
+
 0.23    2020-04-21
         [CHANGES]
          * Add another new :repr type of autoselect, which chooses the most

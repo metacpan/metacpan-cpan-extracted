@@ -18,8 +18,8 @@
          "schema:domainIncludes" : "schema:CDCPMDRecord",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Text"
          ]
       },
       "schema:cvdFacilityCounty" : {
@@ -185,14 +185,14 @@
             "issue-2521"
          ],
          "schema:domainIncludes" : [
-            "schema:SpecialAnnouncement",
             "schema:RealEstateListing",
-            "schema:CDCPMDRecord",
-            "schema:JobPosting"
+            "schema:JobPosting",
+            "schema:SpecialAnnouncement",
+            "schema:CDCPMDRecord"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       }
    }

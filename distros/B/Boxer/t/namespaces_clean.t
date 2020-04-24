@@ -2,10 +2,12 @@
 
 use v5.14;
 use utf8;
-use strictures 2;
 
 use Test::More;
 use Test::CleanNamespaces;
+
+use strictures 2;
+no warnings "experimental::signatures";
 
 my @modules = Test::CleanNamespaces->find_modules;
 

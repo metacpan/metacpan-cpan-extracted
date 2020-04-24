@@ -10,12 +10,14 @@ STDOUT->autoflush;
 
 GetOptions(
    'no-system-perl' => \( my $NO_SYSTEM_PERL ),
+   'no-test'        => \( my $NO_TEST ),
    'since=s'        => \( my $SINCE_VERSION ),
    'until=s'        => \( my $UNTIL_VERSION ),
 ) or exit 1;
 
 exit App::eachperl->new(
    no_system_perl => $NO_SYSTEM_PERL || $ENV{NO_SYSTEM_PERL},
+   no_test        => $NO_TEST,
    since_version  => $SINCE_VERSION,
    until_version  => $UNTIL_VERSION,
 )->run( @ARGV );
@@ -44,7 +46,7 @@ F<eachperl> - a wrapper script for iterating multiple F<perl> binaries
 
 This script iterates over a collection of multiple F<perl> installations,
 allowing the same command to be invoked across each of them. The list of
-available perl binaries is given by a config file (see L<CONFIG>). The main
+available perl binaries is given by a config file (see L</CONFIG>). The main
 mode of operation is that each perl binary in turn is executed with supplied
 commandline arguments; though several other convenience commands are provided
 for common actions.
@@ -95,9 +97,13 @@ A convenient wrapper for installing a module using L<CPAN>.
 
    $ eachperl install A::CPAN::Module
 
-When the module name is exactly C<.> the current working directory is
-installed instead. Rather than using C<CPAN> this is instead installed by
-directly invoking the build script.
+When the module name is exactly C<.> this command is an alias for
+C<install-local>.
+
+=head2 install-local
+
+Install the distribution in the current working directory by directly invoking
+the build script.
 
 This command implies the C<--no-system-perl> option.
 
@@ -107,33 +113,37 @@ A convenient wrapper for testing a module using L<CPAN>.
 
    $ eachperl test A::CPAN::Module
 
-When the module name is exactly C<.> the current working directory is
-tested instead. Rather than using C<CPAN> this is instead tested by directly
-invoking the build script.
+When the module name is exactly C<.> this command is an alias for
+C<test-local>.
+
+=head2 test-local
+
+Install the distribution in the current working directory by directly invoking
+the build script.
+
+=head2 build-then-perl
+
+Builds and tests the distribution in the current working directory, then
+invokes perl on the remaining commandline. Remember to include C<-Mblib> to
+instruct the perl to use the newly-built code
+
+   $ eachperl build-then-perl -Mblib -MMy::Module -E'say My::Module::func()'
 
 =head2 modversion
 
 Prints the version of the named module.
 
    $ eachperl modversion CPAN
-
-     --- perl5.30.0 --- 
-   2.22
-
-     --- bleadperl --- 
-   2.27
+   perl5.30.0: 2.22
+   bleadperl: 2.27
 
 =head2 modpath
 
 Prints the path to the named module.
 
    $ eachperl modpath CPAN
-
-     --- perl5.30.0 --- 
-   /usr/share/perl/5.30/CPAN.pm
-
-     --- bleadperl --- 
-   /home/user/perl5/perlbrew/perls/bleadperl/lib/5.32.0/CPAN.pm
+   perl5.30.0: /usr/share/perl/5.30/CPAN.pm
+   bleadperl: /home/user/perl5/perlbrew/perls/bleadperl/lib/5.32.0/CPAN.pm
 
 =head1 OPTIONS
 
@@ -151,6 +161,11 @@ Any perl binaries newer than this will be skipped.
 
 Deselects the system perl version. The perl version matching the system
 version (or rather, the version running this script) is skipped.
+
+=head2 --no-test
+
+Skip the C<Build test> or C<make test> step when building a local
+distribution.
 
 =head1 CONFIG
 

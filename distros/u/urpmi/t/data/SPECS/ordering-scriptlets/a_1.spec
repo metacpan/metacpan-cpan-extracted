@@ -36,14 +36,9 @@ rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/bin/
 cp a $RPM_BUILD_ROOT/bin/a
 
-%ifos linux
-%global cpio_opts --dereference
-%else
-%global cpio_opts %nil
-%endif
 # Install the wanted libs if not static:
 ldd a | sed -e 's/^[ \t]*//' -e 's/.* => //' -e 's/ .*//' > list
-grep '/' list | (cd / ; cpio -pumd %cpio_opts %buildroot)
+grep '/' list | (cd / ; cpio -pumdL %buildroot)
 find %buildroot
 
 %clean

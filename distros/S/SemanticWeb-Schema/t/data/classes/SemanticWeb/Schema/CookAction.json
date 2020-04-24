@@ -13,8 +13,8 @@
          "rdfs:subPropertyOf" : "schema:location",
          "schema:domainIncludes" : "schema:CookAction",
          "schema:rangeIncludes" : [
-            "schema:Place",
-            "schema:FoodEstablishment"
+            "schema:FoodEstablishment",
+            "schema:Place"
          ]
       },
       "schema:foodEvent" : {

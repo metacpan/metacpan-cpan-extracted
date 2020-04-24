@@ -1,4 +1,4 @@
-JSON Schema Test Suite [![Build Status](https://travis-ci.org/json-schema/JSON-Schema-Test-Suite.png?branch=develop)](https://travis-ci.org/json-schema/JSON-Schema-Test-Suite)
+JSON Schema Test Suite [![Build Status](https://github.com/json-schema-org/JSON-Schema-Test-Suite/workflows/Test%20Suite%20Sanity%20Checking/badge.svg)](https://github.com/json-schema-org/JSON-Schema-Test-Suite/actions?query=workflow%3A%22Test+Suite+Sanity+Checking%22)
 ======================
 
 This repository contains a set of JSON objects that implementors of JSON Schema
@@ -16,7 +16,7 @@ If you're going to use this suite, you need to know how tests are laid out. The
 tests are contained in the `tests` directory at the root of this repository.
 
 Inside that directory is a subdirectory for each draft or version of the
-schema. We'll use `draft3` as an example.
+schema.
 
 If you look inside the draft directory, there are a number of `.json` files,
 which logically group a set of test cases together. Often the grouping is by
@@ -52,29 +52,52 @@ they should be valid or invalid.
 Coverage
 --------
 
-Draft 3 and 4 should have full coverage. If you see anything missing or think
-there is a useful test missing, please send a pull request or open an issue.
+Drafts 07, 06, 04 and 03 should have full coverage, with drafts 06 and
+07 being considered current and actively supported.
+
+Draft 2019-09 support is under development. Contributions are very
+welcome, especially from implementers as they add support to their own
+implementations.
+
+Bug fixes will be made as needed for draft-04 as it is still the most
+widely used, while draft-03 is long since deprecated.
+
+If you see anything missing from the current supported drafts, or incorrect
+on any draft still accepting bug fixes, please file an issue or submit a PR.
 
 Who Uses the Test Suite
 -----------------------
 
 This suite is being used by:
 
+### Clojure ###
+
+* [jinx](https://github.com/juxt/jinx)
+* [json-schema](https://github.com/tatut/json-schema)
+
 ### Coffeescript ###
 
 * [jsck](https://github.com/pandastrike/jsck)
 
+### C++ ###
+
+* [Modern C++ JSON schema validator](https://github.com/pboettch/json-schema-validator)
+
 ### Dart ###
 
-* [json_schema](https://github.com/patefacio/json_schema) 
+* [json_schema](https://github.com/patefacio/json_schema)
+
+### Elixir ###
+
+* [ex_json_schema](https://github.com/jonasschmidt/ex_json_schema)
 
 ### Erlang ###
 
-* [jesse](https://github.com/klarna/jesse)
+* [jesse](https://github.com/for-GET/jesse)
 
 ### Go ###
 
-* [gojsonschema](https://github.com/sigu-399/gojsonschema) 
+* [gojsonschema](https://github.com/sigu-399/gojsonschema)
 * [validate-json](https://github.com/cesanta/validate-json)
 
 ### Haskell ###
@@ -84,7 +107,10 @@ This suite is being used by:
 
 ### Java ###
 
-* [json-schema-validator](https://github.com/fge/json-schema-validator)
+* [json-schema-validator](https://github.com/daveclayton/json-schema-validator)
+* [everit-org/json-schema](https://github.com/everit-org/json-schema)
+* [networknt/json-schema-validator](https://github.com/networknt/json-schema-validator)
+* [Justify](https://github.com/leadpony/justify)
 
 ### JavaScript ###
 
@@ -102,30 +128,42 @@ This suite is being used by:
 * [z-schema](https://github.com/zaggino/z-schema)
 * [jsen](https://github.com/bugventure/jsen)
 * [ajv](https://github.com/epoberezkin/ajv)
+* [djv](https://github.com/korzio/djv)
 
 ### Node.js ###
 
-The JSON Schema Test Suite is also available as an
-[npm](https://www.npmjs.com/package/json-schema-test-suite) package.
-Node-specific support is maintained on the [node branch](https://github.com/json-schema/JSON-Schema-Test-Suite/tree/node).
-See [NODE-README.md](https://github.com/json-schema/JSON-Schema-Test-Suite/blob/node/NODE-README.md)
-for more information.
+For node.js developers, the suite is also available as an
+[npm](https://www.npmjs.com/package/@json-schema-org/tests) package.
+
+Node-specific support is maintained in a [separate
+repository](https://github.com/json-schema-org/json-schema-test-suite-npm)
+which also welcomes your contributions!
 
 ### .NET ###
 
 * [Newtonsoft.Json.Schema](https://github.com/JamesNK/Newtonsoft.Json.Schema)
+* [Manatee.Json](https://github.com/gregsdennis/Manatee.Json)
 
 ### PHP ###
 
 * [json-schema](https://github.com/justinrainbow/json-schema)
+* [json-guard](https://github.com/thephpleague/json-guard)
+
+### PostgreSQL ###
+
+* [postgres-json-schema](https://github.com/gavinwahl/postgres-json-schema)
+* [is_jsonb_valid](https://github.com/furstenheim/is_jsonb_valid)
 
 ### Python ###
 
 * [jsonschema](https://github.com/Julian/jsonschema)
+* [fastjsonschema](https://github.com/seznam/python-fastjsonschema)
+* [hypothesis-jsonschema](https://github.com/Zac-HD/hypothesis-jsonschema)
 
 ### Ruby ###
 
 * [json-schema](https://github.com/hoxworth/json-schema)
+* [json_schemer](https://github.com/davishmcclurg/json_schemer)
 
 ### Rust ###
 
@@ -143,6 +181,7 @@ Contributing
 
 If you see something missing or incorrect, a pull request is most welcome!
 
-There are some sanity checks in place for testing the test suite. You can run
-them with `bin/jsonschema_suite check` or `tox`. They will be run automatically by
-[Travis CI](https://travis-ci.org/) as well.
+There are some sanity checks in place for testing the test suite. You
+can run them with `bin/jsonschema_suite check` or `tox`. They will be
+run automatically by [GitHub Actions](https://github.com/json-schema-org/JSON-Schema-Test-Suite/actions?query=workflow%3A%22Test+Suite+Sanity+Checking%22)
+as well.

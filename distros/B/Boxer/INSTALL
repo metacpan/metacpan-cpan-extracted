@@ -12,7 +12,6 @@ boxer is available as a regular package:
 Alternatively install from CPAN, and only helper tools from Debian:
 
     cpanm Boxer
-    apt install reclass
     apt install mmdebstrap || apt install debootstrap
 
 
@@ -42,5 +41,5 @@ You may want to explore the larger dataset in active use:
 
     git clone https://salsa.debian.org/boxer-team/boxer-data.git
 
-System compositions are expressed using reclass.  See the README in the
-sample data dir for more info on its structure.
+System compositions are expressed using a set of YAML files.
+See the README in the sample data dir for more info on its structure.

@@ -24,8 +24,8 @@
          "schema:isPartOf" : "http:auto.schema.org",
          "schema:rangeIncludes" : [
             "schema:URL",
-            "schema:Text",
-            "schema:QualitativeValue"
+            "schema:QualitativeValue",
+            "schema:Text"
          ]
       },
       "schema:callSign" : {
@@ -114,9 +114,9 @@
             "schema:EngineSpecification"
          ],
          "schema:rangeIncludes" : [
+            "schema:URL",
             "schema:Text",
-            "schema:QualitativeValue",
-            "schema:URL"
+            "schema:QualitativeValue"
          ]
       },
       "schema:knownVehicleDamages" : {
@@ -135,8 +135,8 @@
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:isPartOf" : "http:auto.schema.org",
          "schema:rangeIncludes" : [
-            "schema:QualitativeValue",
             "schema:URL",
+            "schema:QualitativeValue",
             "schema:Text"
          ]
       },
@@ -175,8 +175,8 @@
          "rdfs:label" : "numberOfAxles",
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Number"
+            "schema:Number",
+            "schema:QuantitativeValue"
          ]
       },
       "schema:numberOfDoors" : {
@@ -197,8 +197,8 @@
          "rdfs:label" : "numberOfForwardGears",
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Number"
+            "schema:Number",
+            "schema:QuantitativeValue"
          ]
       },
       "schema:numberOfPreviousOwners" : {
@@ -238,8 +238,8 @@
          "rdfs:comment" : "The date the item e.g. vehicle was purchased by the current owner.",
          "rdfs:label" : "purchaseDate",
          "schema:domainIncludes" : [
-            "schema:Product",
-            "schema:Vehicle"
+            "schema:Vehicle",
+            "schema:Product"
          ],
          "schema:rangeIncludes" : "schema:Date"
       },
@@ -369,9 +369,9 @@
          "rdfs:label" : "vehicleTransmission",
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:rangeIncludes" : [
-            "schema:QualitativeValue",
             "schema:Text",
-            "schema:URL"
+            "schema:URL",
+            "schema:QualitativeValue"
          ]
       },
       "schema:weightTotal" : {

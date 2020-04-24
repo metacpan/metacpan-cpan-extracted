@@ -8,11 +8,11 @@ package Devel::MAT::Tool;
 use strict;
 use warnings;
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 use List::Util qw( any );
 use Commandable::Invocation;
-Commandable::Invocation->VERSION( '0.02' ); # ->putback_tokens
+Commandable::Invocation->VERSION( '0.04' ); # ->peek_remaining
 
 sub new
 {
@@ -194,7 +194,7 @@ sub get_args_from_inv
       defined $val or last;
       push @args, $val;
       if( $argspec->{slurpy} ) {
-         push @args, $inv->pull_token while length $inv->remaining;
+         push @args, $inv->pull_token while length $inv->peek_remaining;
       }
       redo if $argspec->{repeated};
    }

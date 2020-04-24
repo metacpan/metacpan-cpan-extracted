@@ -8,13 +8,12 @@ use routines;
 
 use Moo::Role;
 
-our $VERSION = '2.01'; # VERSION
+our $VERSION = '2.02'; # VERSION
 
 # METHODS
 
 method dump() {
   require Data::Dumper;
-  require Data::Object::Utility;
 
   no warnings 'once';
 
@@ -36,7 +35,6 @@ method dump() {
 
 method pretty_dump() {
   require Data::Dumper;
-  require Data::Object::Utility;
 
   no warnings 'once';
 

@@ -11,9 +11,9 @@
    "properties" : {
       "schema:fundedItem" : {
          "dc:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/1950",
             "schemadotorgsources2:TP",
-            "https://github.com/schemaorg/schemaorg/issues/383",
-            "https://github.com/schemaorg/schemaorg/issues/1950"
+            "https://github.com/schemaorg/schemaorg/issues/383"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Indicates an item funded or sponsored through a <a class=\"localLink\" href=\"http://schema.org/Grant\">Grant</a>.",
@@ -34,13 +34,13 @@
             "schema:Organization",
             "schema:Person",
             "schema:Event",
-            "schema:Grant",
+            "schema:CreativeWork",
             "schema:MedicalStudy",
-            "schema:CreativeWork"
+            "schema:Grant"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       }
    }

@@ -13,9 +13,9 @@
          "rdfs:label" : "activeIngredient",
          "schema:domainIncludes" : [
             "schema:Drug",
+            "schema:DietarySupplement",
             "schema:DrugStrength",
-            "schema:Substance",
-            "schema:DietarySupplement"
+            "schema:Substance"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"
@@ -33,10 +33,10 @@
          "rdfs:comment" : "Recommended intake of this supplement for a given population as defined by a specific recommending authority.",
          "rdfs:label" : "maximumIntake",
          "schema:domainIncludes" : [
-            "schema:Substance",
+            "schema:DietarySupplement",
             "schema:DrugStrength",
-            "schema:Drug",
-            "schema:DietarySupplement"
+            "schema:Substance",
+            "schema:Drug"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MaximumDoseSchedule"

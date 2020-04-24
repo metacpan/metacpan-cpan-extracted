@@ -11,14 +11,13 @@ use POSIX  qw(mktime);
 use Carp;
 
 use vars qw( $VERSION );
-$VERSION = "0.25";
+$VERSION = "0.26";
 
 ### ###########################################################################
 
 # We can safely use \d instead of [0-9] for this ancient format
 
-sub new
-{
+sub new {
     my $proto = shift;
     my $class = ref ($proto) || $proto	or return;
 
@@ -161,45 +160,38 @@ sub new
     return bless \%sccs, $class;
     } # new
 
-sub file
-{
+sub file {
     my $self = shift;
     return $self->{file};
     } # file
 
-sub checksum
-{
+sub checksum {
     my $self = shift;
     return $self->{checksum};
     } # checksum
 
-sub users
-{
+sub users {
     my $self = shift;
     return @{$self->{users}};
     } # users
 
-sub flags
-{
+sub flags {
     my $self = shift;
     return { %{$self->{flags}} };
     } # flags
 
-sub comment
-{
+sub comment {
     my $self = shift;
     return $self->{comment};
     } # comment
 
-sub current
-{
+sub current {
     my $self = shift;
     $self->{current} or return;
     wantarray ? @{$self->{current}} : $self->{current}[0];
     } # current
 
-sub delta
-{
+sub delta {
     my ($self, $rev) = @_;
     $self->{current} or return;
     if (!defined $rev) {
@@ -217,8 +209,7 @@ sub delta
     return { %{ $self->{delta}{$rev} } };
     } # delta
 
-sub version
-{
+sub version {
     my ($self, $rev) = @_;
     ref $self eq __PACKAGE__ or return $VERSION;
     $self->{current}         or return;
@@ -233,8 +224,7 @@ sub version
     return;
     } # version
 
-sub revision
-{
+sub revision {
     my ($self, $vsn) = @_;
     $self->{current} or return;
 
@@ -248,8 +238,7 @@ sub revision
     return;
     } # revision
 
-sub revision_map
-{
+sub revision_map {
     my $self = shift;
     $self->{current} or return;
 
@@ -277,8 +266,7 @@ my %tran = (
 	},
     );
 
-sub set_translate
-{
+sub set_translate {
     my ($self, $type) = @_;
 
     if (ref $type eq "HASH") {
@@ -293,8 +281,7 @@ sub set_translate
 	}
     } # set_translate
 
-sub _tran
-{
+sub _tran {
     my ($self, $line) = @_;
     my $tt = $self->{tran} or return $line;
     my $tr = $tran{$tt}    or return $line;
@@ -303,8 +290,7 @@ sub _tran
     return $line;
     } # _tran
 
-sub translate
-{
+sub translate {
     my ($self, $rev, $line) = @_;
 
     my $type = $self->{tran}    or return $line;
@@ -341,8 +327,7 @@ sub translate
     return $self->_tran ($line);
     } # translate
 
-sub body
-{
+sub body {
     my $self = shift;
 
     $self->{body} && $self->{current} or return;
@@ -468,7 +453,7 @@ VCS::SCCS - OO Interface to SCCS files
  # Content related
  my $body_70 = $sccs->body ();       # file.pl @70 incl NL's
  my @body_70 = $sccs->body ();       # file.pl @70 list of chomped lines
- my @body_69 = $sccs->body (69);     # same for file.pl @96
+ my @body_69 = $sccs->body (69);     # same for file.pl at revision 69
  my @body_69 = $sccs->body ("5.38"); # same
 
  $sccs->set_translate ("SCCS");

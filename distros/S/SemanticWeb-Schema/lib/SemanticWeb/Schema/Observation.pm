@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.3';
+our $VERSION = 'v7.0.4';
 
 
 has margin_of_error => (
@@ -74,7 +74,7 @@ SemanticWeb::Schema::Observation - Instances of the class Observation are used t
 
 =head1 VERSION
 
-version v7.0.3
+version v7.0.4
 
 =head1 DESCRIPTION
 

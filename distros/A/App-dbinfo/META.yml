@@ -18,7 +18,7 @@ meta-spec:
 name: App-dbinfo
 requires:
   DBI: '0'
-  DBIx::Diff::Schema: '0.093'
+  DBIx::Diff::Schema: '0.094'
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::int: '0'
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-dbinfo
   homepage: https://metacpan.org/release/App-dbinfo
   repository: git://github.com/perlancar/perl-App-dbinfo.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

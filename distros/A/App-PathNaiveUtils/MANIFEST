@@ -13,6 +13,7 @@ script/pn-concat-and-normalize-path
 script/pn-concat-path
 script/pn-is-abs-path
 script/pn-normalize-path
+script/pn-rel-path
 script/pn-split-path
 t/00-compile.t
 t/author-critic.t

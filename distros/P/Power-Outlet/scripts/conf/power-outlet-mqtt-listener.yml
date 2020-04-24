@@ -24,3 +24,25 @@ directives:
     options:
       outlets: '1,2,6,7'
       host: bar
+
+- name: Outlet One Toggle Outside Lights
+  topic: stat/outlet-one/POWER
+  value: ON
+  actions:
+  - name: Outside Lights
+    driver: iBootBarGroup
+    command: 'SWITCH'
+    options:
+      outlets: '1,2,6,7'
+      host: bar
+
+- name: Outlet One Toggle Outside Lights
+  topic: stat/outlet-one/POWER
+  value: OFF
+  actions:
+  - name: Outside Lights
+    driver: iBootBarGroup
+    command: 'SWITCH'
+    options:
+      outlets: '1,2,6,7'
+      host: bar

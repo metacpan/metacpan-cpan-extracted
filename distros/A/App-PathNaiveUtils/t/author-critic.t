@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/PathNaiveUtils.pm','script/pn-abs-path','script/pn-concat-and-normalize-path','script/pn-concat-path','script/pn-is-abs-path','script/pn-normalize-path','script/pn-split-path'];
+my $filenames = ['lib/App/PathNaiveUtils.pm','script/pn-abs-path','script/pn-concat-and-normalize-path','script/pn-concat-path','script/pn-is-abs-path','script/pn-normalize-path','script/pn-rel-path','script/pn-split-path'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

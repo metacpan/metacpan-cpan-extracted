@@ -236,7 +236,7 @@ sub content_text {
 
     my $text = html2text( $html );
 
-    my @paragraphs = split /\n\n/, $text;
+    my @paragraphs = split(/\n\n/, $text) or return undef;
 
     if (my $site_name = $self->site_name) {
         $paragraphs[-1] =~ s/\A \s* \p{Punct}? \s* ${site_name} \s* \p{Punct}? \s* \z//x;

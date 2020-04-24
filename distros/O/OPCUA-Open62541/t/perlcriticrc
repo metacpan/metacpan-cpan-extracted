@@ -22,6 +22,8 @@ severity = 2
 [ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions]
 [ControlStructures::ProhibitUnreachableCode]
 [ErrorHandling::RequireCheckingReturnValueOfEval]
+[ErrorHandling::RequireCarping]
+severity = 2
 [InputOutput::ProhibitBacktickOperators]
 [InputOutput::ProhibitBarewordFileHandles]
 [InputOutput::ProhibitTwoArgOpen]

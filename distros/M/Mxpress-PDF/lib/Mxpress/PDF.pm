@@ -4,7 +4,7 @@ use warnings;
 
 package Mxpress::PDF {
 	BEGIN {
-		our $VERSION = '0.23';
+		our $VERSION = '0.24';
 		our $AUTHORITY = 'cpan:LNATION';
 	};
 	use Zydeco;
@@ -391,7 +391,7 @@ package Mxpress::PDF {
 				if (defined $_->$check && $_->$check =~ $val) {
 					return $_;
 				} elsif ($_->$recurse && scalar @{$_->$recurse}) {
-					my $val = $self->_recurse_find($check, $recurse, $val, @{$_->$recurse});
+					my $val = $self->_recurse_find($check, $recurse, $val, reverse @{$_->$recurse});
 					return $val if $val;
 				}
 			}
@@ -1289,7 +1289,7 @@ Mxpress::PDF - PDF
 
 =head1 VERSION
 
-Version 0.23
+Version 0.24
 
 =cut
 

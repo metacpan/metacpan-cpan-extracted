@@ -1,0 +1,20 @@
+<![CDATA[
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<body>
+
+<script>
+function add() {
+  google.calendar.addCalendar("en.usa#holiday@group.v.calendar.google.com",
+      "US Holidays");
+}
+</script>
+
+<center>
+<button onclick="add()">Add US Holidays</button>
+</center>
+
+</body>
+</html>
+]]>

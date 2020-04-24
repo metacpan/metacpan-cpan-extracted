@@ -16,13 +16,13 @@
          "rdfs:label" : "webFeed",
          "schema:category" : "issue-373",
          "schema:domainIncludes" : [
-            "schema:PodcastSeries",
-            "schema:SpecialAnnouncement"
+            "schema:SpecialAnnouncement",
+            "schema:PodcastSeries"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:DataFeed"
+            "schema:DataFeed",
+            "schema:URL"
          ]
       }
    }

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-02-26'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2020-04-23'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use strict;
 use warnings;
@@ -95,7 +95,9 @@ sub run {
 
     close $diff;
 
-    # XXX return original diff's exit code
+    my $exitcode = $? < 0 ? $? : $? >> 8;
+
+    exit $exitcode;
 }
 
 # MAIN
@@ -120,7 +122,7 @@ diffwc - diff + /w/ord highlighting + /c/olor
 
 =head1 VERSION
 
-This document describes version 0.004 of diffwc (from Perl distribution App-diffwc), released on 2018-02-26.
+This document describes version 0.005 of diffwc (from Perl distribution App-diffwc), released on 2020-04-23.
 
 =head1 SYNOPSIS
 
@@ -142,7 +144,7 @@ This is a wrapper for the GNU command-line utility B<diff>. It adds word
 highlighting and colors (note that GNU diff 3.4 or later supports C<--color>
 already).
 
-=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-diffwc-0.004/share/images/screenshot.jpg" />
+=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-diffwc-0.005/share/images/screenshot.jpg" />
 
 =head1 COMPLETION
 
@@ -224,7 +226,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

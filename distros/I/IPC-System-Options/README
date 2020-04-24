@@ -3,8 +3,8 @@ NAME
     options
 
 VERSION
-    This document describes version 0.334 of IPC::System::Options (from Perl
-    distribution IPC-System-Options), released on 2020-03-10.
+    This document describes version 0.336 of IPC::System::Options (from Perl
+    distribution IPC-System-Options), released on 2020-04-23.
 
 SYNOPSIS
      use IPC::System::Options qw(system readpipe run start);
@@ -184,6 +184,24 @@ FUNCTIONS
         This will allow you to run script in dry-run mode by setting
         environment variable.
 
+    *   exit_code_success_criteria => int|array[int]|Regexp|code
+
+        Specify which command exit codes are to be marked as success. For
+        example, exit code 1 for the diff command does not signify an error;
+        it just means that the two input files are different. So in this
+        case you can either specify one of:
+
+         exit_code_success_criteria => [0,1]
+         exit_code_success_criteria => qr/\A(0|1)\z/
+         exit_code_success_criteria => sub { $_[0] == 0 || $_[0] == 1 }
+
+        By default, if this option is not specified, non-zero exit codes
+        count as failure.
+
+        Currently this only affects logging: when exit code is considered
+        non-success, a warning log is produced and "readpipe()" does not log
+        the result.
+
   readpipe([ \%opts ], @args)
     Just like perl's "readpipe()" (a.k.a. "qx()" a.k.a. `` a.k.a. the
     backtick operator) except that it accepts an optional hash first
@@ -247,6 +265,10 @@ FUNCTIONS
 
         See option documentation in "system()".
 
+    *   exit_code_success_criteria => int|array[int]|Regexp|code
+
+        See option documentation in "system()".
+
   run([ \%opts ], @args)
     Like "system()", but uses IPC::Run's "run()". Known options:
 
@@ -299,6 +321,10 @@ FUNCTIONS
         See option documentation in "system()".
 
     *   dry_run => bool
+
+        See option documentation in "system()".
+
+    *   exit_code_success_criteria => int|array[int]|Regexp|code
 
         See option documentation in "system()".
 

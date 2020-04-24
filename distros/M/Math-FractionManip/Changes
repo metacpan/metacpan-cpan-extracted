@@ -1,5 +1,15 @@
 Revision history for Math-FractionManip
 
+0.5502 2020-04-24 09:38:15
+    - Re-add the removed tests and sprintf() them.
+
+0.5501 2020-04-24 09:30:01
+    - Remove two tests that will usually fail and are not strictly necessary.
+
+0.5500 2020-04-23 17:51:18
+    - Remove possibly crusty, broken code upon which *-ld cpantesters were choking.
+    - Rework tests for ** and sqrt.
+
 0.5403 2020-04-22 03:19:23
     - Improve documentation.
     - Add legacy changes from Math::Fraction to this file.

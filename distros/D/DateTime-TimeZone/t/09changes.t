@@ -25,8 +25,8 @@ use Test::Fatal;
 
     # one minute before change to standard time
     my $dt = DateTime->new(
-        year      => 1997, month  => 3, day => 29,
-        hour      => 15,   minute => 59,
+        year => 1997, month  => 3, day => 29,
+        hour => 15,   minute => 59,
         time_zone => 'UTC'
     );
 
@@ -45,8 +45,8 @@ use Test::Fatal;
 
     # Can't start at 1:59 or we get the _2nd_ 1:59 of that day (post-DST change)
     my $dt = DateTime->new(
-        year      => 1997, month  => 3, day => 30,
-        hour      => 1,    minute => 59,
+        year => 1997, month  => 3, day => 30,
+        hour => 1,    minute => 59,
         time_zone => 'Australia/Sydney'
     );
 
@@ -63,8 +63,8 @@ use Test::Fatal;
 
     # one minute before change to standard time
     my $dt = DateTime->new(
-        year      => 2002, month  => 10, day => 26,
-        hour      => 15,   minute => 59,
+        year => 2002, month  => 10, day => 26,
+        hour => 15,   minute => 59,
         time_zone => 'UTC'
     );
 
@@ -82,8 +82,8 @@ use Test::Fatal;
 # same tests without using UTC as intermediate
 {
     my $dt = DateTime->new(
-        year      => 2002, month  => 10, day => 27,
-        hour      => 1,    minute => 59,
+        year => 2002, month  => 10, day => 27,
+        hour => 1,    minute => 59,
         time_zone => 'Australia/Sydney'
     );
 
@@ -99,8 +99,8 @@ use Test::Fatal;
 
     # Can't start at 1:59 or we get the _2nd_ 1:59 of that day (post-DST change)
     my $dt = DateTime->new(
-        year      => 2040, month  => 4, day => 1,
-        hour      => 1,    minute => 59,
+        year => 2040, month  => 4, day => 1,
+        hour => 1,    minute => 59,
         time_zone => 'Australia/Sydney'
     );
 
@@ -115,8 +115,8 @@ use Test::Fatal;
 
 {
     my $dt = DateTime->new(
-        year      => 2040, month  => 10, day => 7,
-        hour      => 1,    minute => 59,
+        year => 2040, month  => 10, day => 7,
+        hour => 1,    minute => 59,
         time_zone => 'Australia/Sydney'
     );
 
@@ -133,8 +133,8 @@ use Test::Fatal;
 
     # one minute before change to standard time
     my $dt = DateTime->new(
-        year      => 1982, month  => 3, day => 28,
-        hour      => 0,    minute => 59,
+        year => 1982, month  => 3, day => 28,
+        hour => 0,    minute => 59,
         time_zone => 'UTC'
     );
 
@@ -152,8 +152,8 @@ use Test::Fatal;
 {
 
     my $dt = DateTime->new(
-        year      => 1982, month  => 3, day => 28,
-        hour      => 1,    minute => 59,
+        year => 1982, month  => 3, day => 28,
+        hour => 1,    minute => 59,
         time_zone => 'Europe/Vienna'
     );
 
@@ -168,8 +168,8 @@ use Test::Fatal;
 
     # one minute before change to standard time
     my $dt = DateTime->new(
-        year      => 1997, month  => 10, day => 26,
-        hour      => 0,    minute => 59,
+        year => 1997, month  => 10, day => 26,
+        hour => 0,    minute => 59,
         time_zone => 'UTC'
     );
 
@@ -189,8 +189,8 @@ use Test::Fatal;
 
     # can't be created directly because of overlap between changes
     my $dt = DateTime->new(
-        year      => 1997, month  => 10, day => 26,
-        hour      => 1,    minute => 59,
+        year => 1997, month  => 10, day => 26,
+        hour => 1,    minute => 59,
         time_zone => 'Europe/Vienna'
     );
 
@@ -206,8 +206,8 @@ use Test::Fatal;
 # future
 {
     my $dt = DateTime->new(
-        year      => 2040, month  => 3, day => 25,
-        hour      => 1,    minute => 59,
+        year => 2040, month  => 3, day => 25,
+        hour => 1,    minute => 59,
         time_zone => 'Europe/Vienna'
     );
 
@@ -220,8 +220,8 @@ use Test::Fatal;
 
 {
     my $dt = DateTime->new(
-        year      => 2040, month  => 10, day => 28,
-        hour      => 1,    minute => 59,
+        year => 2040, month  => 10, day => 28,
+        hour => 1,    minute => 59,
         time_zone => 'Europe/Vienna'
     );
 
@@ -244,8 +244,8 @@ use Test::Fatal;
 # 			1:00	Algeria	CE%sT	1979 Oct 26
 {
     my $dt = DateTime->new(
-        year      => 1977, month  => 10, day => 20,
-        hour      => 23,   minute => 59,
+        year => 1977, month  => 10, day => 20,
+        hour => 23,   minute => 59,
         time_zone => 'Africa/Algiers'
     );
 
@@ -456,8 +456,8 @@ SKIP:
 
 {
     my $dt = DateTime->new(
-        year      => 2001, month  => 10, day => 28,
-        hour      => 0,    minute => 59,
+        year => 2001, month  => 10, day => 28,
+        hour => 0,    minute => 59,
         time_zone => 'UTC'
     );
 

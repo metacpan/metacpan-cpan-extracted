@@ -22,18 +22,32 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-use Getopt::EX::termcolor qw(rgb_to_brightness);
-use App::cdif::Command::OSAscript;
-
 {
     no warnings 'once';
     use Getopt::EX::Colormap;
     $Getopt::EX::Colormap::RGB24 = 1;
 }
 
-our $debug;
+our $debug = 0;
 
-my $script_iTerm = <<END;
+sub get_colors {
+    map {
+	my @rgb = get_color($_);
+	@rgb ? undef : [ @rgb ];
+    } @_;
+}
+
+sub get_color {
+    my $cat = lc shift;
+    if ($cat eq 'background') {
+	return background_rgb();
+    }
+    ();
+}
+
+my %script = (
+
+'background' => <<END,
 tell application "iTerm"
 	tell current session of current window
 		background color
@@ -41,19 +55,18 @@ tell application "iTerm"
 end tell
 END
 
-sub rgb {
-    my $result =
-	App::cdif::Command::OSAscript->new->exec($script_iTerm);
-    my @rgb = $result =~ /(\d+)/g;
-    warn Dumper $result, \@rgb if $debug;
-    @rgb;
-}
+    );
 
-sub brightness {
-    my(@rgb) = rgb;
-    return undef unless @rgb == 3;
-    return undef if grep { not /^\d+$/ } @rgb;
-    rgb_to_brightness @rgb;
+use Capture::Tiny ':all';
+
+sub background_rgb {
+    my $script = $script{background};
+    my($stdout, $stderr, $exit) = capture {
+	system 'osascript', '-e', $script;
+    };
+    $exit == 0 or return;
+    my @rgb = $stdout =~ /(\d+)/g;
+    @rgb == 3 ? ( { max => 65535 }, @rgb) : ();
 }
 
 1;

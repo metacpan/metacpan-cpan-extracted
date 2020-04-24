@@ -1,17 +1,14 @@
 package PYX::Hist;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use List::Util qw(reduce);
 use PYX::Parser;
 
-# Version.
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -121,6 +118,7 @@ PYX::Hist - Processing PYX data or file and print histogram.
 =head1 SYNOPSIS
 
  use PYX::Hist;
+
  my $obj = PYX::Hist->new(%parameters);
  $obj->parse($pyx, $out);
  $obj->parse_file($input_file, $out);
@@ -186,11 +184,9 @@ PYX::Hist - Processing PYX data or file and print histogram.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use PYX::Hist;
 
  # Example data.
@@ -220,11 +216,9 @@ PYX::Hist - Processing PYX data or file and print histogram.
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure;
  use PYX::Hist;
 
@@ -253,11 +247,9 @@ PYX::Hist - Processing PYX data or file and print histogram.
 
 =head1 EXAMPLE3
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure;
  use PYX::Hist;
 
@@ -302,21 +294,22 @@ Install the PYX modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/PYX-Hist>
+L<https://github.com/michal-josef-spacek/PYX-Hist>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2016 Michal Špaček
- BSD 2-Clause License
+© 2014-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

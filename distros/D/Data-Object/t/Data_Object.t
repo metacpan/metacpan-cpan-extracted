@@ -27,6 +27,7 @@ function: Boolean
 function: Box
 function: Code
 function: Data
+function: Error
 function: False
 function: Float
 function: Hash
@@ -223,9 +224,48 @@ Data(Str $file) : InstanceOf["Data::Object::Data"]
 
   package main;
 
-  my $data = Data '/path/to/file.pod';
+  my $data = Data 't/Data_Object.t';
 
   # $data->contents(...);
+
+=cut
+
+=function Error
+
+The Error function returns a L<Data::Object::Exception> object.
+
+=signature Error
+
+Error(Str | HashRef) : InstanceOf["Data::Object::Exception"]
+
+=example-1 Error
+
+  package main;
+
+  use Data::Object 'Error';
+
+  my $error = Error;
+
+  # die $error;
+
+=example-2 Error
+
+  package main;
+
+  my $error = Error 'Oops!';
+
+  # die $error;
+
+=example-3 Error
+
+  package main;
+
+  my $error = Error {
+    message => 'Oops!',
+    context => { time => time }
+  };
+
+  # die $error;
 
 =cut
 
@@ -346,6 +386,8 @@ Opts(HashRef $data) : InstanceOf["Data::Object::Opts"]
 =example-1 Opts
 
   package main;
+
+  use Data::Object 'Opts';
 
   my $opts = Opts;
 
@@ -776,6 +818,112 @@ $subs->example(-1, 'Undef', 'function', fun($tryable) {
 
   $result
 });
+
+$subs->example(-1, 'Args', 'function', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->isa('Data::Object::Args');
+
+  $result
+})
+&&
+$subs->example(-2, 'Args', 'function', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->isa('Data::Object::Args');
+
+  $result
+})
+if eval {
+  require Data::Object::Args
+};
+
+$subs->example(-1, 'Data', 'function', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->isa('Data::Object::Data');
+
+  $result
+})
+&&
+$subs->example(-2, 'Data', 'function', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->isa('Data::Object::Data');
+
+  $result
+})
+if eval {
+  require Data::Object::Data
+};
+
+$subs->example(-1, 'Error', 'function', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->isa('Data::Object::Error');
+
+  $result
+})
+&&
+$subs->example(-2, 'Error', 'function', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->isa('Data::Object::Error');
+
+  $result
+})
+if eval {
+  require Data::Object::Error
+};
+
+$subs->example(-1, 'Opts', 'function', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->isa('Data::Object::Opts');
+
+  $result
+})
+&&
+$subs->example(-2, 'Opts', 'function', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->isa('Data::Object::Opts');
+
+  $result
+})
+if eval {
+  require Data::Object::Opts
+};
+
+$subs->example(-1, 'Name', 'function', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->isa('Data::Object::Name');
+
+  $result
+})
+if eval {
+  require Data::Object::Name
+};
+
+$subs->example(-1, 'Space', 'function', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->isa('Data::Object::Space');
+
+  $result
+})
+if eval {
+  require Data::Object::Space
+};
+
+$subs->example(-1, 'Struct', 'function', fun($tryable) {
+  ok my $result = $tryable->result;
+  $DB::single=1;
+  ok $result->isa('Data::Object::Struct');
+
+  $result
+})
+&&
+$subs->example(-2, 'Struct', 'function', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->isa('Data::Object::Struct');
+
+  $result
+})
+if eval {
+  require Data::Object::Struct
+};
 
 $subs->example(-1, 'Vars', 'function', fun($tryable) {
   ok my $result = $tryable->result;

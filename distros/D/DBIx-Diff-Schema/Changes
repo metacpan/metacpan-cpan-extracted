@@ -1,3 +1,16 @@
+0.096   2020-04-23  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] handle statistics_info() returning the same index twice.
+
+
+0.095   2020-04-23  Released-By: PERLANCAR; Urgency: medium
+
+	- [incompatible change] Rename list_table_indexes() to list_indexes() to
+          be more consistent. The old name is deprecated but still supported.
+
+        - list_indexes(): Support mysql.
+
+
 0.094   2020-04-20  Released-By: PERLANCAR; Urgency: medium
 
 	- Add function: list_table_indexes (currently only supports

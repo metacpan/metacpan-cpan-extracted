@@ -14,8 +14,8 @@
          "rdfs:label" : "annualPercentageRate",
          "schema:domainIncludes" : "schema:FinancialProduct",
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Number"
          ]
       },
       "schema:feesAndCommissionsSpecification" : {
@@ -24,12 +24,12 @@
          "rdfs:comment" : "Description of fees, commissions, and other terms applied either to a class of financial product, or by a financial service organization.",
          "rdfs:label" : "feesAndCommissionsSpecification",
          "schema:domainIncludes" : [
-            "schema:FinancialService",
-            "schema:FinancialProduct"
+            "schema:FinancialProduct",
+            "schema:FinancialService"
          ],
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ]
       },
       "schema:interestRate" : {
@@ -39,8 +39,8 @@
          "rdfs:label" : "interestRate",
          "schema:domainIncludes" : "schema:FinancialProduct",
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Number"
          ]
       }
    }

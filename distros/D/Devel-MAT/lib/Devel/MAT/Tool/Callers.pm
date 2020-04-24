@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 use constant CMD => "callers";
 use constant CMD_DESC => "Display the caller stack";
@@ -67,7 +67,10 @@ sub run
 
       for( $ctx->type ) {
          if( $_ eq "SUB" ) {
-            $what = Devel::MAT::Cmd->format_symbol( $ctx->cv->symname );
+            $what = String::Tagged->from_sprintf( "%s=%s",
+               Devel::MAT::Cmd->format_sv( $ctx->cv ),
+               Devel::MAT::Cmd->format_symbol( $ctx->cv->symname ),
+            );
          }
          elsif( $_ eq "TRY" ) {
             $what = "eval {...}";

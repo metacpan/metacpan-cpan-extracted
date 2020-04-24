@@ -223,6 +223,14 @@ An SV:
        STR  PADNAME
        PTR  OURSTASH
 
+     type: PADNAME_FLAGS
+       UINT PADIX
+       U8   FLAGS  0x01 : OUTER
+                   0x02 : STATE
+                   0x04 : LVALUE
+                   0x08 : TYPED
+                   0x10 : OUR
+
   type: IO
     Header(2I):
       UINT    IFILENO

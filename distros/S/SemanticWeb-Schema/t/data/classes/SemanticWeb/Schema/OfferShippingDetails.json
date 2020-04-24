@@ -2,9 +2,9 @@
    "class" : {
       "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "OfferShippingDetails - indicates the kinds of shipping options might be available for an online shopping offer.",
+      "rdfs:comment" : "OfferShippingDetails represents information about shipping destinations.<br/><br/>\n\nMultiple of these entities can be used to represent different shipping rates for different destinations:<br/><br/>\n\nOne entity for Alaska/Hawaii. A different one for continental US.A different one for all France.<br/><br/>\n\nMultiple of these entities can be used to represent different shipping costs and delivery times.<br/><br/>\n\nTwo entities that are identical but differ in rate and time:<br/><br/>\n\ne.g. Cheaper and slower: $5 in 5-7days\nor Fast and expensive: $15 in 1-2 days",
       "rdfs:label" : "OfferShippingDetails",
-      "rdfs:subClassOf" : "schema:Intangible",
+      "rdfs:subClassOf" : "schema:StructuredValue",
       "schema:category" : "issue-2506",
       "schema:isPartOf" : "http:pending.schema.org"
    },
@@ -12,12 +12,12 @@
       "schema:shippingDestination" : {
          "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "shippingDestination indicates the target region for an online shipping destination.",
+         "rdfs:comment" : "indicates (posssibly multiple) shipping destinations. These can be defined in several ways e.g. postalCode ranges.",
          "rdfs:label" : "shippingDestination",
          "schema:category" : "issue-2506",
          "schema:domainIncludes" : "schema:OfferShippingDetails",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:AdministrativeArea"
+         "schema:rangeIncludes" : "schema:DefinedRegion"
       }
    }
 }

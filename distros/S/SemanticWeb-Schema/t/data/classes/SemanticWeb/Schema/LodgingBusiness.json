@@ -12,10 +12,10 @@
          "rdfs:comment" : "An amenity feature (e.g. a characteristic or service) of the Accommodation. This generic property does not make a statement about whether the feature is included in an offer for the main accommodation or available at extra costs.",
          "rdfs:label" : "amenityFeature",
          "schema:domainIncludes" : [
-            "schema:LodgingBusiness",
+            "schema:Place",
             "schema:Accommodation",
             "schema:FloorPlan",
-            "schema:Place"
+            "schema:LodgingBusiness"
          ],
          "schema:rangeIncludes" : "schema:LocationFeatureSpecification"
       },
@@ -24,11 +24,11 @@
          "rdfs:comment" : "An intended audience, i.e. a group for whom something was created.",
          "rdfs:label" : "audience",
          "schema:domainIncludes" : [
-            "schema:Service",
-            "schema:CreativeWork",
-            "schema:Event",
-            "schema:Product",
             "schema:LodgingBusiness",
+            "schema:Service",
+            "schema:Event",
+            "schema:CreativeWork",
+            "schema:Product",
             "schema:PlayAction"
          ],
          "schema:rangeIncludes" : "schema:Audience"
@@ -38,10 +38,10 @@
          "rdfs:comment" : "A language someone may use with or at the item, service or place. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"http://schema.org/inLanguage\">inLanguage</a>",
          "rdfs:label" : "availableLanguage",
          "schema:domainIncludes" : [
-            "schema:LodgingBusiness",
-            "schema:ContactPoint",
             "schema:ServiceChannel",
-            "schema:TouristAttraction"
+            "schema:LodgingBusiness",
+            "schema:TouristAttraction",
+            "schema:ContactPoint"
          ],
          "schema:rangeIncludes" : [
             "schema:Language",
@@ -57,8 +57,8 @@
             "schema:LodgingReservation"
          ],
          "schema:rangeIncludes" : [
-            "schema:Time",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Time"
          ]
       },
       "schema:checkoutTime" : {
@@ -66,8 +66,8 @@
          "rdfs:comment" : "The latest someone may check out of a lodging establishment.",
          "rdfs:label" : "checkoutTime",
          "schema:domainIncludes" : [
-            "schema:LodgingBusiness",
-            "schema:LodgingReservation"
+            "schema:LodgingReservation",
+            "schema:LodgingBusiness"
          ],
          "schema:rangeIncludes" : [
             "schema:Time",
@@ -80,17 +80,17 @@
          "rdfs:comment" : "The number of rooms (excluding bathrooms and closets) of the accommodation or lodging business.\nTypical unit code(s): ROM for room or C62 for no unit. The type of room can be put in the unitText property of the QuantitativeValue.",
          "rdfs:label" : "numberOfRooms",
          "schema:domainIncludes" : [
-            "schema:Suite",
             "schema:LodgingBusiness",
-            "schema:FloorPlan",
-            "schema:Accommodation",
             "schema:SingleFamilyResidence",
             "schema:Apartment",
-            "schema:House"
+            "schema:Suite",
+            "schema:House",
+            "schema:Accommodation",
+            "schema:FloorPlan"
          ],
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Number"
          ]
       },
       "schema:petsAllowed" : {
@@ -100,13 +100,13 @@
          "rdfs:label" : "petsAllowed",
          "schema:domainIncludes" : [
             "schema:LodgingBusiness",
-            "schema:FloorPlan",
             "schema:ApartmentComplex",
-            "schema:Accommodation"
+            "schema:Accommodation",
+            "schema:FloorPlan"
          ],
          "schema:rangeIncludes" : [
-            "schema:Boolean",
-            "schema:Text"
+            "schema:Text",
+            "schema:Boolean"
          ]
       },
       "schema:starRating" : {
@@ -115,8 +115,8 @@
          "rdfs:comment" : "An official rating for a lodging business or food establishment, e.g. from national associations or standards bodies. Use the author property to indicate the rating organization, e.g. as an Organization with name such as (e.g. HOTREC, DEHOGA, WHR, or Hotelstars).",
          "rdfs:label" : "starRating",
          "schema:domainIncludes" : [
-            "schema:LodgingBusiness",
-            "schema:FoodEstablishment"
+            "schema:FoodEstablishment",
+            "schema:LodgingBusiness"
          ],
          "schema:rangeIncludes" : "schema:Rating"
       }

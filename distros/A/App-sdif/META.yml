@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -40,19 +40,13 @@ provides:
     file: lib/App/cdif/default.pm
   App::sdif:
     file: lib/App/sdif.pm
-    version: v4.13.7
+    version: v4.14.0
   App::sdif::Divert:
     file: lib/App/sdif/Divert.pm
   App::sdif::LabelStack:
     file: lib/App/sdif/LabelStack.pm
   App::sdif::Util:
     file: lib/App/sdif/Util.pm
-  App::sdif::autocolor:
-    file: lib/App/sdif/autocolor.pm
-  App::sdif::autocolor::Apple_Terminal:
-    file: lib/App/sdif/autocolor/Apple_Terminal.pm
-  App::sdif::autocolor::iTerm:
-    file: lib/App/sdif/autocolor/iTerm.pm
   App::sdif::colors:
     file: lib/App/sdif/colors.pm
   App::sdif::debug:
@@ -60,7 +54,8 @@ provides:
   App::sdif::default:
     file: lib/App/sdif/default.pm
 requires:
-  Getopt::EX: v1.15.6
+  Getopt::EX: v1.16.0
+  Getopt::EX::termcolor: '1.03'
   List::Util: '1.45'
   Text::ANSI::Fold: '1.02'
   Text::VisualWidth::PP: '0.05'
@@ -70,9 +65,10 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/sdif-tools/issues
   homepage: https://github.com/kaz-utashiro/sdif-tools
   repository: git://github.com/kaz-utashiro/sdif-tools.git
-version: 4.13.7
+version: 4.14.0
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
 x_static_install: 0

@@ -2,6 +2,10 @@
 
 Getopt::EX::termcolor - Getopt::EX termcolor module
 
+# VERSION
+
+Version 1.04
+
 # SYNOPSIS
 
     use Getopt::EX::Loader;
@@ -17,10 +21,6 @@ Getopt::EX::termcolor - Getopt::EX termcolor module
 
     $ command -Mtermcolor::bg=
 
-# VERSION
-
-Version 1.02
-
 # DESCRIPTION
 
 This is a common module for command using [Getopt::EX](https://metacpan.org/pod/Getopt::EX) to manipulate
@@ -29,15 +29,32 @@ system dependent terminal color.
 Actual action is done by sub-module under [Getopt::EX::termcolor](https://metacpan.org/pod/Getopt::EX::termcolor),
 such as [Getopt::EX::termcolor::Apple\_Terminal](https://metacpan.org/pod/Getopt::EX::termcolor::Apple_Terminal).
 
-At this point, only terminal background color is supported.  Each
-sub-module is expected to have `&brightness` function which returns
-integer value between 0 and 100.  If the sub-module was found and
-`&brightness` function exists, its result is taken as a brightness of
-the terminal.
+Each sub-module is expected to have `&get_color` function which
+return the list of RGB values for requested name, but currently name
+`background` is only supported.  Each RGB values are expected in a
+range of 0 to 255 by default.  If the list first entry is a HASH
+reference, it may include maximum number indication like `{ max =>
+65535 }`.
 
-However, if the environment variable `TERM_BRIGHTNESS` is defined,
-its value is used as a brightness without calling sub-modules.  The
-value of `TERM_BRIGHTNESS` is expected in range of 0 to 100.
+Terminal luminance is calculated from RGB values by this equation and
+produces decimal value from 0 to 100.
+
+    ( 30 * R + 59 * G + 11 * B ) / MAX
+
+If the environment variable `TERM_BGCOLOR` is defined, it is used as
+a background RGB value without calling sub-modules.  RGB value is a
+combination of integer described in 24bit/12bit hex or 24bit decimal
+format.
+
+    24bit hex     #000000 .. #FFFFFF
+    12bit hex     #000 .. #FFF
+    24bit decimal 0,0,0 .. 255,255,255
+
+You can set `TERM_BGCOLOR` in you start up file of shell.  This
+module has utility function `bgcolor` which can be used like this:
+
+    export TERM_BGCOLOR=`perl -MGetopt::EX::termcolor=bgcolor -e bgcolor`
+    : ${TERM_BGCOLOR:=#FFFFFF}
 
 # MODULE FUNCTION
 
@@ -47,18 +64,14 @@ value of `TERM_BRIGHTNESS` is expected in range of 0 to 100.
 
         $ command -Mtermcolor::bg=
 
-    If the terminal brightness is unkown, nothing happens.  Otherwise, the
+    If the terminal luminance is unknown, nothing happens.  Otherwise, the
     module insert **--light-terminal** or **--dark-terminal** option
-    according to the brightness value.  These options are defined as
-    C$<move(0,0)> in this module and do nothing.  They can be overridden
-    by other module or user definition.
+    according to the luminance value.
 
-    You can change the behavior of this module by calling `&set` function
-    with module option.  It takes some parameters and they override
-    default values.
+    You can change the behavior by optional parameters:
 
         threshold : threshold of light/dark  (default 50)
-        default   : default brightness value (default none)
+        default   : default luminance value  (default none)
         light     : light terminal option    (default "--light-terminal")
         dark      : dark terminal option     (default "--dark-terminal")
 
@@ -67,21 +80,6 @@ value of `TERM_BRIGHTNESS` is expected in range of 0 to 100.
         option default \
             -Mtermcolor::bg(default=100,light=--light,dark=--dark)
 
-# UTILITY FUNCTION
-
-- **rgb\_to\_brightness**
-
-    This exportable function caliculates brightness (luminane) from RGB
-    values.  It accepts three parameters of 0 to 65535 integer.
-
-    Maximum value can be specified by optional hash argument.
-
-        rgb_to_brightness( { max => 255 }, 255, 255, 255);
-
-    Brightness is caliculated from RGB values by this equation.
-
-        Y = 0.30 * R + 0.59 * G + 0.11 * B
-
 # SEE ALSO
 
 [Getopt::EX](https://metacpan.org/pod/Getopt::EX)
@@ -89,6 +87,8 @@ value of `TERM_BRIGHTNESS` is expected in range of 0 to 100.
 [Getopt::EX::termcolor::Apple\_Terminal](https://metacpan.org/pod/Getopt::EX::termcolor::Apple_Terminal)
 
 [Getopt::EX::termcolor::iTerm](https://metacpan.org/pod/Getopt::EX::termcolor::iTerm)
+
+[Getopt::EX::termcolor::XTerm](https://metacpan.org/pod/Getopt::EX::termcolor::XTerm)
 
 # AUTHOR
 

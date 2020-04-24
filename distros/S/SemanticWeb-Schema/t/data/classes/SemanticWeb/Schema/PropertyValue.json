@@ -13,10 +13,10 @@
          "rdfs:comment" : "The upper value of some characteristic or property.",
          "rdfs:label" : "maxValue",
          "schema:domainIncludes" : [
-            "schema:MonetaryAmount",
-            "schema:PropertyValueSpecification",
+            "schema:QuantitativeValue",
             "schema:PropertyValue",
-            "schema:QuantitativeValue"
+            "schema:MonetaryAmount",
+            "schema:PropertyValueSpecification"
          ],
          "schema:rangeIncludes" : "schema:Number"
       },
@@ -27,15 +27,15 @@
          "rdfs:label" : "measurementTechnique",
          "schema:category" : "issue-1425",
          "schema:domainIncludes" : [
-            "schema:DataCatalog",
             "schema:DataDownload",
-            "schema:Dataset",
-            "schema:PropertyValue"
+            "schema:DataCatalog",
+            "schema:PropertyValue",
+            "schema:Dataset"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:URL"
+            "schema:URL",
+            "schema:Text"
          ]
       },
       "schema:minValue" : {
@@ -44,10 +44,10 @@
          "rdfs:comment" : "The lower value of some characteristic or property.",
          "rdfs:label" : "minValue",
          "schema:domainIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:PropertyValue",
             "schema:PropertyValueSpecification",
-            "schema:MonetaryAmount"
+            "schema:MonetaryAmount",
+            "schema:PropertyValue",
+            "schema:QuantitativeValue"
          ],
          "schema:rangeIncludes" : "schema:Number"
       },
@@ -57,8 +57,8 @@
          "rdfs:label" : "propertyID",
          "schema:domainIncludes" : "schema:PropertyValue",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:URL"
+            "schema:URL",
+            "schema:Text"
          ]
       },
       "schema:unitCode" : {
@@ -73,8 +73,8 @@
             "schema:QuantitativeValue"
          ],
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ]
       },
       "schema:unitText" : {
@@ -82,10 +82,10 @@
          "rdfs:comment" : "A string or text indicating the unit of measurement. Useful if you cannot provide a standard unit code for\n<a href='unitCode'>unitCode</a>.",
          "rdfs:label" : "unitText",
          "schema:domainIncludes" : [
-            "schema:PropertyValue",
             "schema:QuantitativeValue",
-            "schema:UnitPriceSpecification",
-            "schema:TypeAndQuantityNode"
+            "schema:TypeAndQuantityNode",
+            "schema:PropertyValue",
+            "schema:UnitPriceSpecification"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -96,13 +96,13 @@
          "rdfs:label" : "value",
          "schema:domainIncludes" : [
             "schema:MonetaryAmount",
-            "schema:QuantitativeValue",
-            "schema:PropertyValue"
+            "schema:PropertyValue",
+            "schema:QuantitativeValue"
          ],
          "schema:rangeIncludes" : [
-            "schema:Number",
             "schema:Boolean",
             "schema:StructuredValue",
+            "schema:Number",
             "schema:Text"
          ]
       },
@@ -117,10 +117,10 @@
             "schema:PropertyValue"
          ],
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Enumeration",
-            "schema:QualitativeValue",
             "schema:StructuredValue",
+            "schema:Enumeration",
+            "schema:QuantitativeValue",
+            "schema:QualitativeValue",
             "schema:PropertyValue"
          ]
       }

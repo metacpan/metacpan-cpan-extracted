@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 use List::UtilsBy qw( sort_by );
 

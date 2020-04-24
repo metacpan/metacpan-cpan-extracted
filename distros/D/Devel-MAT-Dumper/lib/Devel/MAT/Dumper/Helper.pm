@@ -8,7 +8,7 @@ package Devel::MAT::Dumper::Helper;
 use strict;
 use warnings;
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 =head1 NAME
 
@@ -94,7 +94,7 @@ Note that this entire mechanism is currently experimental.
 
 my $DMD_helper_h = do {
    local $/;
-   <DATA>;
+   readline DATA;
 };
 
 =head1 FUNCTIONS

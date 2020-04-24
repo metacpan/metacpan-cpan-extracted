@@ -4,22 +4,25 @@ package Boxer::CLI::Command::Aliases;
 
 =cut
 
-use v5.14;
+use v5.20;
 use utf8;
-use strictures 2;
 use Role::Commons -all;
+use feature 'signatures';
 use namespace::autoclean 0.16;
 
 use match::simple qw(match);
 use Boxer::CLI -command;
 
+use strictures 2;
+no warnings "experimental::signatures";
+
 =head1 VERSION
 
-Version v1.4.0
+Version v1.4.2
 
 =cut
 
-our $VERSION = "v1.4.0";
+our $VERSION = "v1.4.2";
 
 use constant {
 	abstract   => q[show aliases for boxer commands],
@@ -51,10 +54,8 @@ sub opt_spec
 	return;
 }
 
-sub execute
+sub execute ( $self, $opt, $args )
 {
-	my ( $self, $opt, $args ) = @_;
-
 	my $filter
 		= scalar(@$args)
 		? $args

@@ -34,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-Diff-Schema
   homepage: https://metacpan.org/release/DBIx-Diff-Schema
   repository: git://github.com/perlancar/perl-DBIx-Diff-Schema.git
-version: '0.094'
+version: '0.096'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

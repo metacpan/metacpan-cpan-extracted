@@ -76,6 +76,7 @@ subtest system => sub {
         # XXX test chdir back fails
     };
 
+    # XXX test opt:exit_code_success_criteria (basically only warn logging is affected)
 };
 
 subtest readpipe => sub {

@@ -217,3 +217,19 @@ Revision history for PPR
 
     * Fixed an obscure problem when heredocs are greater than 32766 characters
       (thanks Albert!)
+
+
+0.000026  Fri Apr 24 04:39:59 2020
+
+    * Improved detection of trailing unbalanced curlies in decomment()
+      (thanks Albert)
+
+    * Added (?&PerlEntireDocument) rule
+
+    * BACKWARDS INCOMPATIBLE CHANGE:
+      PPR::decomment() now retains all newlines from any comments, POD, etc.
+      that it removes. This does not change the meaning or behaviour
+      of the decommented source code in any way, but ensures that consistent
+      line numbers are preserved through the operation.
+      (thanks Albert)
+

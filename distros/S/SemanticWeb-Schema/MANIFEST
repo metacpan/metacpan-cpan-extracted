@@ -208,6 +208,7 @@ lib/SemanticWeb/Schema/DayOfWeek.pm
 lib/SemanticWeb/Schema/DaySpa.pm
 lib/SemanticWeb/Schema/DeactivateAction.pm
 lib/SemanticWeb/Schema/DefenceEstablishment.pm
+lib/SemanticWeb/Schema/DefinedRegion.pm
 lib/SemanticWeb/Schema/DefinedTerm.pm
 lib/SemanticWeb/Schema/DefinedTermSet.pm
 lib/SemanticWeb/Schema/DeleteAction.pm
@@ -320,6 +321,7 @@ lib/SemanticWeb/Schema/GeoShape.pm
 lib/SemanticWeb/Schema/GeospatialGeometry.pm
 lib/SemanticWeb/Schema/GiveAction.pm
 lib/SemanticWeb/Schema/GolfCourse.pm
+lib/SemanticWeb/Schema/GovernmentBenefitsType.pm
 lib/SemanticWeb/Schema/GovernmentBuilding.pm
 lib/SemanticWeb/Schema/GovernmentOffice.pm
 lib/SemanticWeb/Schema/GovernmentOrganization.pm
@@ -329,6 +331,7 @@ lib/SemanticWeb/Schema/Grant.pm
 lib/SemanticWeb/Schema/GroceryStore.pm
 lib/SemanticWeb/Schema/Guide.pm
 lib/SemanticWeb/Schema/HVACBusiness.pm
+lib/SemanticWeb/Schema/Hackathon.pm
 lib/SemanticWeb/Schema/HairSalon.pm
 lib/SemanticWeb/Schema/HardwareStore.pm
 lib/SemanticWeb/Schema/HealthAndBeautyBusiness.pm
@@ -1038,6 +1041,7 @@ t/data/classes/SemanticWeb/Schema/DayOfWeek.json
 t/data/classes/SemanticWeb/Schema/DaySpa.json
 t/data/classes/SemanticWeb/Schema/DeactivateAction.json
 t/data/classes/SemanticWeb/Schema/DefenceEstablishment.json
+t/data/classes/SemanticWeb/Schema/DefinedRegion.json
 t/data/classes/SemanticWeb/Schema/DefinedTerm.json
 t/data/classes/SemanticWeb/Schema/DefinedTermSet.json
 t/data/classes/SemanticWeb/Schema/DeleteAction.json
@@ -1151,6 +1155,7 @@ t/data/classes/SemanticWeb/Schema/GeoShape.json
 t/data/classes/SemanticWeb/Schema/GeospatialGeometry.json
 t/data/classes/SemanticWeb/Schema/GiveAction.json
 t/data/classes/SemanticWeb/Schema/GolfCourse.json
+t/data/classes/SemanticWeb/Schema/GovernmentBenefitsType.json
 t/data/classes/SemanticWeb/Schema/GovernmentBuilding.json
 t/data/classes/SemanticWeb/Schema/GovernmentOffice.json
 t/data/classes/SemanticWeb/Schema/GovernmentOrganization.json
@@ -1160,6 +1165,7 @@ t/data/classes/SemanticWeb/Schema/Grant.json
 t/data/classes/SemanticWeb/Schema/GroceryStore.json
 t/data/classes/SemanticWeb/Schema/Guide.json
 t/data/classes/SemanticWeb/Schema/HVACBusiness.json
+t/data/classes/SemanticWeb/Schema/Hackathon.json
 t/data/classes/SemanticWeb/Schema/HairSalon.json
 t/data/classes/SemanticWeb/Schema/HardwareStore.json
 t/data/classes/SemanticWeb/Schema/HealthAndBeautyBusiness.json

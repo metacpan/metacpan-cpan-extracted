@@ -308,7 +308,7 @@ sub comparefiles {
     { print STDERR "Error: file $f2 does not exist\n"; ok(0); return; }
     my $fc2 = getfile($f2);
     if ($fc1 eq $fc2) { next; }
-    print STDERR "CWD: ".getcwd()."Difference between $f1 and $f2:\n";
+    print STDERR "CWD: ".getcwd()."\nDifference between $f1 and $f2:\n";
     while ($fc1 ne '' or $fc2 ne '') {
       $fc1=~/^.*\n/; my $l1=$&; my $fc1r=$';
       $fc2=~/^.*\n/; my $l2=$&; my $fc2r=$';

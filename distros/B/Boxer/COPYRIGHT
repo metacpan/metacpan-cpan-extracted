@@ -1,7 +1,7 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: Boxer
 Upstream-Contact: Jonas Smedegaard (JONASS) <jonass@cpan.org>
-Source: https://metacpan.org/release/Boxer
+Source: https://wiki.debian.org/Boxer
 
 Files: INSTALL
  LICENSE
@@ -193,6 +193,7 @@ Files: INSTALL
  examples/classes/x11/lightdm/init.yml
  examples/nodes/lxp5.yml
  examples/nodes/parl-greens.yml
+ examples/nodes/zsh.yml
  share/skel/preseed.cfg.in
  share/skel/script.sh.in
 Copyright: Unknown
@@ -223,23 +224,21 @@ Files: Changes
  META.json
  META.yml
  bin/boxer
- dist.ini
  doap.ttl
+ t/00_compile.t
+ t/00_compile_scripts.t
+ t/01_app_help.t
+ t/04_boxer.t
+ t/05_world-reclass.t
  t/bootstrap.t
  t/classify.t
  t/compose.t
- t/namespaces_clean.t
- t/serialize.t
-Copyright: Copyright 2019 Jonas Smedegaard.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/00_compile.t
- t/00_compile_scripts.t
- t/01_app_help.t
  t/fixme.t
  t/minimumversion.t
+ t/namespaces_clean.t
  t/pod.t
-Copyright: Copyright 2018 Jonas Smedegaard.
+ t/serialize.t
+Copyright: Copyright 2020 Jonas Smedegaard.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -257,19 +256,23 @@ Files: lib/Boxer/Part/Reclass.pm
 Copyright: Copyright Â© 2016 Jonas Smedegaard.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: dist.ini
+Copyright: Copyright 2019 Jonas Smedegaard.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: Makefile.PL
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2019 by the copyright holder(s).
+ This software is Copyright (c) 2020 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2019 by the copyright holder(s).
+ This software is Copyright (c) 2020 by the copyright holder(s).
  
  This is free software, licensed under:
  

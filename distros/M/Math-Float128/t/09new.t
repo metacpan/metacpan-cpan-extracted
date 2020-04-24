@@ -2,7 +2,7 @@ use warnings;
 use strict;
 use Math::Float128 qw(:all);
 
-print "1..15\n";
+print "1..20\n";
 
 my($uv, $iv, $nv, $pv, $pv_copy1, $pv_copy2);
 
@@ -128,4 +128,41 @@ else {
   warn "\$pv: $pv\n\$pv_copy2: $pv_copy2\n";
   print "not ok 15\n";
 }
+
+fromUV($pv, ~0);
+if($pv == ~0) {print "ok 16\n"}
+else {
+  warn "\n $pv != ", ~0, "\n";
+  print "not ok 16\n";
+}
+
+fromIV($pv, -123);
+if($pv == -123) {print "ok 17\n"}
+else {
+  warn "\n $pv != -123\n";
+  print "not ok 17\n";
+}
+
+fromNV($pv, -123.5);
+if($pv == -123.5) {print "ok 18\n"}
+else {
+  warn "\n $pv != -123.5\n";
+  print "not ok 18\n";
+}
+
+fromSTR($pv, "-1123.5");
+if($pv == "-1123.5") {print "ok 19\n"}
+else {
+  warn "\n $pv != -1123.5\n";
+  print "not ok 19\n";
+}
+
+fromF128($pv_copy2, $pv);
+if($pv_copy2 == "-1123.5") {print "ok 20\n"}
+else {
+  warn "\n $pv != -1123.5\n";
+  print "not ok 20\n";
+}
+
+
 

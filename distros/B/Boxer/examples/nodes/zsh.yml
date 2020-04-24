@@ -1,0 +1,8 @@
+# test node with custom parameters and no classes
+parameters:
+  doc:
+    console:
+      pkg:
+        - include terminal shell zsh
+  pkg:
+    - zsh

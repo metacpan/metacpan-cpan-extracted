@@ -12,16 +12,21 @@ SYNOPSIS
         "my.metric.two 2 $time",
         ...
       );
+    
+      # preprocessing
+      $graphite->write(
+        ['my.metric.three', 3],
+        ['my.metric.four',  4, $time],
+        ['my.metric.five',  5, undef, {foo => 'bar'}],
+        ...
+      );
 
 DESCRIPTION
 
     Mojo::Graphite::Writer is a non-blocking client for feeding data to the
     Graphite metrics collector. This simple module is meant to aid in
-    batching and queuing writes to the server.
-
-    This is still a work-in-progress, however the author uses it in work
-    applications so every effort will be made to keep the api reasonably
-    stable while improving where possible.
+    formattting, batching, and queuing writes to the server in a fork-safe
+    way.
 
 ATTRIBUTES
 
@@ -35,6 +40,26 @@ ATTRIBUTES
  batch_size
 
     The number of metrics to send in each write batch. Default is 100.
+
+ preprocess
+
+    A callback that is used to process a metric specified as an arrayref,
+    the callback is not called on raw strings. The callback is passed the
+    array reference as its only argument, it should return a string to be
+    written, it need not end with a newline.
+
+    The default callback expects a metric arrayref to contain a metric name
+    and a value in the first two slots. If the time is not specified in the
+    third slot (or is undef) then the current time will be used. If the
+    fourth slot contains a non-empty hashref then those will be treated as
+    key-value tags. The tags will be cleaned up, removing parenthesis
+    characters and converting spaces to underscores. They will then be
+    formatted by joining keys and values with an equal sign and joined to
+    the metric name with semicolons.
+
+    Preprocessing can be fully disabled by setting the attribute to a false
+    value. Passing an array reference without a preprocessing callback will
+    probably not do anything useful.
 
  port
 
@@ -72,10 +97,15 @@ METHODS
     plaintext protocol"
     <https://graphite.readthedocs.io/en/latest/feeding-carbon.html#the-plaintext-protocol>.
     Each string is one metric. It will be line-ending normalized, no
-    newline is required. Writes are batched in groups of size "batch_size".
+    newline is required.
 
-    If the writer is not already connected, calling write will implicitly
-    call "connect".
+    Metrics may also be specified as an array reference. If so they will be
+    preprocessed using the callback in "preprocess" which will transform it
+    to a string to be written as documented above. Preprocessing occurs
+    immediately during the call to write.
+
+    Writes are batched in groups of size "batch_size". If the writer is not
+    already connected, calling write will implicitly call "connect".
 
     Returns a Mojo::Promise that will be resolved when the metrics passed
     in this write call are written. The promise is rejected if any write in
@@ -83,9 +113,7 @@ METHODS
 
 FUTURE WORK
 
-    This module is still in early development. Future work will include
-
-      * Passing structures to "write" and handling the formatting
+    Future work may include
 
       * Possibly a blocking api, though this is questionable
 

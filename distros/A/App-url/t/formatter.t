@@ -1,4 +1,5 @@
 use v5.26;
+use utf8;
 use Mojo::Base -strict, -signatures;
 use open qw(:std :utf8);
 use Test::More 1;

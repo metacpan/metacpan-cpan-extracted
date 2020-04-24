@@ -12,9 +12,9 @@
          "rdfs:comment" : "Specifying the health condition(s) of a patient, medical study, or other target audience.",
          "rdfs:label" : "healthCondition",
          "schema:domainIncludes" : [
-            "schema:Patient",
             "schema:MedicalStudy",
-            "schema:PeopleAudience"
+            "schema:PeopleAudience",
+            "schema:Patient"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalCondition"
@@ -27,13 +27,13 @@
             "schema:Organization",
             "schema:Person",
             "schema:Event",
-            "schema:Grant",
+            "schema:CreativeWork",
             "schema:MedicalStudy",
-            "schema:CreativeWork"
+            "schema:Grant"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:status" : {
@@ -41,15 +41,15 @@
          "rdfs:comment" : "The status of the study (enumerated).",
          "rdfs:label" : "status",
          "schema:domainIncludes" : [
+            "schema:MedicalCondition",
             "schema:MedicalStudy",
-            "schema:MedicalProcedure",
-            "schema:MedicalCondition"
+            "schema:MedicalProcedure"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
             "schema:EventStatusType",
-            "schema:Text",
-            "schema:MedicalStudyStatus"
+            "schema:MedicalStudyStatus",
+            "schema:Text"
          ]
       },
       "schema:studyLocation" : {

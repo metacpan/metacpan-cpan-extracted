@@ -3,7 +3,7 @@ package App::PathNaiveUtils;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-02-12'; # DATE
 our $DIST = 'App-PathNaiveUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -78,6 +78,19 @@ sub normalize_path {
     Path::Naive::normalize_path(@_);
 }
 
+$SPEC{rel_path} = {
+    v => 1.1,
+    args_as => 'array',
+    args => {
+        path     => { schema=>['pathname::unix*'], req=>1, pos=>0 },
+        basepath => { schema=>['pathname::unix*'], req=>1, pos=>1 },
+    },
+    result_naked => 1,
+};
+sub rel_path {
+    Path::Naive::rel_path(@_);
+}
+
 $SPEC{split_path} = {
     v => 1.1,
     args_as => 'array',
@@ -105,7 +118,7 @@ App::PathNaiveUtils - Utilities related to Path::Naive
 
 =head1 VERSION
 
-This document describes version 0.001 of App::PathNaiveUtils (from Perl distribution App-PathNaiveUtils), released on 2020-02-12.
+This document describes version 0.002 of App::PathNaiveUtils (from Perl distribution App-PathNaiveUtils), released on 2020-02-12.
 
 =head1 DESCRIPTION
 
@@ -122,6 +135,8 @@ This distributions provides the following command-line utilities:
 =item * L<pn-is-abs-path>
 
 =item * L<pn-normalize-path>
+
+=item * L<pn-rel-path>
 
 =item * L<pn-split-path>
 
@@ -238,6 +253,29 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<$path>* => I<pathname::unix>
+
+
+=back
+
+Return value:  (any)
+
+
+
+=head2 rel_path
+
+Usage:
+
+ rel_path($path, $basepath) -> any
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<$basepath>* => I<pathname::unix>
 
 =item * B<$path>* => I<pathname::unix>
 

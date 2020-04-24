@@ -13,6 +13,16 @@ TODO
 dist.ini
 doap.ttl
 examples/Example/Exporter.pm
+inc/Test/Fatal.pm
+inc/Test/Requires.pm
+inc/Try/Tiny.pm
+inc/archaic/Test/Builder.pm
+inc/archaic/Test/Builder/IO/Scalar.pm
+inc/archaic/Test/Builder/Module.pm
+inc/archaic/Test/Builder/Tester.pm
+inc/archaic/Test/Builder/Tester/Color.pm
+inc/archaic/Test/More.pm
+inc/archaic/Test/Simple.pm
 lib/Exporter/Shiny.pm
 lib/Exporter/Tiny.pm
 lib/Exporter/Tiny/Manual/Etc.pod

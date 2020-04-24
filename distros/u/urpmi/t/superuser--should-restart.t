@@ -10,8 +10,14 @@ $ENV{URPMI_TEST_RESTART} = 1;
 use strict;
 use lib '.', 't';
 use helper;
-use Test::More 'no_plan';
-plan skip_all => "A mounted /proc is required for those tests due to urpm::sys::_launched_time() relying on /proc/uptime" if ! -d "/proc/$$";
+use Test::More;
+BEGIN {
+    if (-d "/proc/$$") {
+	plan 'no_plan';
+    } else {
+	plan skip_all => "A mounted /proc is required for those tests due to urpm::sys::_launched_time() relying on /proc/uptime";
+    }
+}
 
 need_root_and_prepare();
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.38';
+our $VERSION = '2.39';
 
 use DateTime::Duration;
 use DateTime::TimeZone::OlsonDB;
@@ -381,7 +381,7 @@ sub _first_rule {
 
         if ( $dt <= $date ) {
             if ($next_dt) {
-                return $rule if $date < $next_dt;
+                return $rule      if $date < $next_dt;
                 return $next_rule if $date == $next_dt;
             }
             else {

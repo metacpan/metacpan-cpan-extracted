@@ -19,10 +19,10 @@
          "rdfs:comment" : "A flag to signal that the item, event, or place is accessible for free.",
          "rdfs:label" : "isAccessibleForFree",
          "schema:domainIncludes" : [
-            "schema:CreativeWork",
-            "schema:PublicationEvent",
             "schema:Place",
-            "schema:Event"
+            "schema:Event",
+            "schema:CreativeWork",
+            "schema:PublicationEvent"
          ],
          "schema:rangeIncludes" : "schema:Boolean"
       },

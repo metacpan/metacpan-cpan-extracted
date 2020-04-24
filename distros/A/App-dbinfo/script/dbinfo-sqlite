@@ -8,16 +8,18 @@ use Perinci::CmdLine::Any;
 
 Perinci::CmdLine::Any->new(
     url => '/App/dbinfo/',
+    summary => 'Get/extract information from SQLite database',
     subcommands => {
         'list-tables'  => {url => '/App/dbinfo/list_sqlite_tables'},
         'list-columns' => {url => '/App/dbinfo/list_sqlite_columns'},
+        'list-indexes' => {url => '/App/dbinfo/list_sqlite_indexes'},
         'dump-table'   => {url => '/App/dbinfo/dump_sqlite_table'},
     },
     log => 1,
     log_level => 'info',
 )->run;
 
-# ABSTRACT: Get/extract information from database
+# ABSTRACT: Get/extract information from SQLite database
 # PODNAME: dbinfo-sqlite
 
 __END__
@@ -28,11 +30,11 @@ __END__
 
 =head1 NAME
 
-dbinfo-sqlite - Get/extract information from database
+dbinfo-sqlite - Get/extract information from SQLite database
 
 =head1 VERSION
 
-This document describes version 0.006 of dbinfo-sqlite (from Perl distribution App-dbinfo), released on 2020-04-20.
+This document describes version 0.007 of dbinfo-sqlite (from Perl distribution App-dbinfo), released on 2020-04-20.
 
 =head1 SYNOPSIS
 
@@ -60,6 +62,10 @@ Dump SQLite table into various formats.
 =head2 B<list-columns>
 
 List columns of a SQLite database table.
+
+=head2 B<list-indexes>
+
+List SQLite table indexes.
 
 =head2 B<list-tables>
 
@@ -240,6 +246,16 @@ Table name.
 
 =back
 
+=head2 Options for subcommand list-indexes
+
+=over
+
+=item B<--table>=I<s>
+
+Table name.
+
+=back
+
 =head1 COMPLETION
 
 This script has shell tab completion capability with support for several
@@ -314,6 +330,10 @@ List of available configuration parameters:
 =head2 Configuration for subcommand list-columns
 
  detail (see --detail)
+ table (see --table)
+
+=head2 Configuration for subcommand list-indexes
+
  table (see --table)
 
 =head2 Configuration for subcommand list-tables

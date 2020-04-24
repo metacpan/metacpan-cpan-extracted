@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/PathNaiveUtils.pm'
@@ -18,6 +18,7 @@ my @scripts = (
     'script/pn-concat-path',
     'script/pn-is-abs-path',
     'script/pn-normalize-path',
+    'script/pn-rel-path',
     'script/pn-split-path'
 );
 

@@ -12,8 +12,8 @@
          "rdfs:label" : "addressCountry",
          "schema:domainIncludes" : [
             "schema:GeoCoordinates",
-            "schema:PostalAddress",
-            "schema:GeoShape"
+            "schema:GeoShape",
+            "schema:PostalAddress"
          ],
          "schema:rangeIncludes" : [
             "schema:Country",
@@ -46,9 +46,9 @@
          "rdfs:comment" : "The postal code. For example, 94043.",
          "rdfs:label" : "postalCode",
          "schema:domainIncludes" : [
-            "schema:GeoShape",
             "schema:PostalAddress",
-            "schema:GeoCoordinates"
+            "schema:GeoCoordinates",
+            "schema:GeoShape"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },

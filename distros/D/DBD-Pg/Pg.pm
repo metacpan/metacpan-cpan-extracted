@@ -16,7 +16,7 @@ use 5.008001;
 {
     package DBD::Pg;
 
-    use version; our $VERSION = qv('3.10.5');
+    use version; our $VERSION = qv('3.11.0');
 
     use DBI ();
     use DynaLoader ();
@@ -29,14 +29,14 @@ use 5.008001;
         PG_MAX_SMALLINT => 32767,
         PG_MIN_INTEGER  => -2147483648,
         PG_MAX_INTEGER  => 2147483647,
-        PG_MIN_BIGINT => "-9223372036854775808",
-        PG_MAX_BIGINT => "9223372036854775807",
+        PG_MIN_BIGINT => '-9223372036854775808',
+        PG_MAX_BIGINT => '9223372036854775807',
         PG_MIN_SMALLSERIAL => 1,
         PG_MAX_SMALLSERIAL => 32767,
         PG_MIN_SERIAL => 1,
         PG_MAX_SERIAL => 2147483647,
         PG_MIN_BIGSERIAL => 1,
-        PG_MAX_BIGSERIAL => "9223372036854775807",
+        PG_MAX_BIGSERIAL => '9223372036854775807',
     };
 
     %EXPORT_TAGS =
@@ -46,39 +46,41 @@ use 5.008001;
                        PG_MIN_SMALLINT PG_MAX_SMALLINT PG_MIN_INTEGER PG_MAX_INTEGER PG_MAX_BIGINT PG_MIN_BIGINT
                        PG_MIN_SMALLSERIAL PG_MAX_SMALLSERIAL PG_MIN_SERIAL PG_MAX_SERIAL PG_MIN_BIGSERIAL PG_MAX_BIGSERIAL)],
          pg_types => [qw($DBDPG_DEFAULT PG_ASYNC PG_OLDQUERY_CANCEL PG_OLDQUERY_WAIT
-            PG_ACLITEM PG_ACLITEMARRAY PG_ANY PG_ANYARRAY PG_ANYELEMENT
-            PG_ANYENUM PG_ANYNONARRAY PG_ANYRANGE PG_BIT PG_BITARRAY
-            PG_BOOL PG_BOOLARRAY PG_BOX PG_BOXARRAY PG_BPCHAR
-            PG_BPCHARARRAY PG_BYTEA PG_BYTEAARRAY PG_CHAR PG_CHARARRAY
-            PG_CID PG_CIDARRAY PG_CIDR PG_CIDRARRAY PG_CIRCLE
-            PG_CIRCLEARRAY PG_CSTRING PG_CSTRINGARRAY PG_DATE PG_DATEARRAY
-            PG_DATERANGE PG_DATERANGEARRAY PG_EVENT_TRIGGER PG_FDW_HANDLER PG_FLOAT4
-            PG_FLOAT4ARRAY PG_FLOAT8 PG_FLOAT8ARRAY PG_GTSVECTOR PG_GTSVECTORARRAY
-            PG_INDEX_AM_HANDLER PG_INET PG_INETARRAY PG_INT2 PG_INT2ARRAY
-            PG_INT2VECTOR PG_INT2VECTORARRAY PG_INT4 PG_INT4ARRAY PG_INT4RANGE
-            PG_INT4RANGEARRAY PG_INT8 PG_INT8ARRAY PG_INT8RANGE PG_INT8RANGEARRAY
-            PG_INTERNAL PG_INTERVAL PG_INTERVALARRAY PG_JSON PG_JSONARRAY
-            PG_JSONB PG_JSONBARRAY PG_JSONPATH PG_JSONPATHARRAY PG_LANGUAGE_HANDLER
-            PG_LINE PG_LINEARRAY PG_LSEG PG_LSEGARRAY PG_MACADDR
-            PG_MACADDR8 PG_MACADDR8ARRAY PG_MACADDRARRAY PG_MONEY PG_MONEYARRAY
-            PG_NAME PG_NAMEARRAY PG_NUMERIC PG_NUMERICARRAY PG_NUMRANGE
-            PG_NUMRANGEARRAY PG_OID PG_OIDARRAY PG_OIDVECTOR PG_OIDVECTORARRAY
-            PG_OPAQUE PG_PATH PG_PATHARRAY PG_PG_ATTRIBUTE PG_PG_CLASS
-            PG_PG_DDL_COMMAND PG_PG_DEPENDENCIES PG_PG_LSN PG_PG_LSNARRAY PG_PG_MCV_LIST
-            PG_PG_NDISTINCT PG_PG_NODE_TREE PG_PG_PROC PG_PG_TYPE PG_POINT
+            PG_ACLITEM PG_ACLITEMARRAY PG_ANY PG_ANYARRAY PG_ANYCOMPATIBLE
+            PG_ANYCOMPATIBLEARRAY PG_ANYCOMPATIBLENONARRAY PG_ANYCOMPATIBLERANGE PG_ANYELEMENT PG_ANYENUM
+            PG_ANYNONARRAY PG_ANYRANGE PG_BIT PG_BITARRAY PG_BOOL
+            PG_BOOLARRAY PG_BOX PG_BOXARRAY PG_BPCHAR PG_BPCHARARRAY
+            PG_BYTEA PG_BYTEAARRAY PG_CHAR PG_CHARARRAY PG_CID
+            PG_CIDARRAY PG_CIDR PG_CIDRARRAY PG_CIRCLE PG_CIRCLEARRAY
+            PG_CSTRING PG_CSTRINGARRAY PG_DATE PG_DATEARRAY PG_DATERANGE
+            PG_DATERANGEARRAY PG_EVENT_TRIGGER PG_FDW_HANDLER PG_FLOAT4 PG_FLOAT4ARRAY
+            PG_FLOAT8 PG_FLOAT8ARRAY PG_GTSVECTOR PG_GTSVECTORARRAY PG_INDEX_AM_HANDLER
+            PG_INET PG_INETARRAY PG_INT2 PG_INT2ARRAY PG_INT2VECTOR
+            PG_INT2VECTORARRAY PG_INT4 PG_INT4ARRAY PG_INT4RANGE PG_INT4RANGEARRAY
+            PG_INT8 PG_INT8ARRAY PG_INT8RANGE PG_INT8RANGEARRAY PG_INTERNAL
+            PG_INTERVAL PG_INTERVALARRAY PG_JSON PG_JSONARRAY PG_JSONB
+            PG_JSONBARRAY PG_JSONPATH PG_JSONPATHARRAY PG_LANGUAGE_HANDLER PG_LINE
+            PG_LINEARRAY PG_LSEG PG_LSEGARRAY PG_MACADDR PG_MACADDR8
+            PG_MACADDR8ARRAY PG_MACADDRARRAY PG_MONEY PG_MONEYARRAY PG_NAME
+            PG_NAMEARRAY PG_NUMERIC PG_NUMERICARRAY PG_NUMRANGE PG_NUMRANGEARRAY
+            PG_OID PG_OIDARRAY PG_OIDVECTOR PG_OIDVECTORARRAY PG_PATH
+            PG_PATHARRAY PG_PG_ATTRIBUTE PG_PG_CLASS PG_PG_DDL_COMMAND PG_PG_DEPENDENCIES
+            PG_PG_LSN PG_PG_LSNARRAY PG_PG_MCV_LIST PG_PG_NDISTINCT PG_PG_NODE_TREE
+            PG_PG_PROC PG_PG_SNAPSHOT PG_PG_SNAPSHOTARRAY PG_PG_TYPE PG_POINT
             PG_POINTARRAY PG_POLYGON PG_POLYGONARRAY PG_RECORD PG_RECORDARRAY
-            PG_REFCURSOR PG_REFCURSORARRAY PG_REGCLASS PG_REGCLASSARRAY PG_REGCONFIG
-            PG_REGCONFIGARRAY PG_REGDICTIONARY PG_REGDICTIONARYARRAY PG_REGNAMESPACE PG_REGNAMESPACEARRAY
-            PG_REGOPER PG_REGOPERARRAY PG_REGOPERATOR PG_REGOPERATORARRAY PG_REGPROC
-            PG_REGPROCARRAY PG_REGPROCEDURE PG_REGPROCEDUREARRAY PG_REGROLE PG_REGROLEARRAY
-            PG_REGTYPE PG_REGTYPEARRAY PG_TABLE_AM_HANDLER PG_TEXT PG_TEXTARRAY
-            PG_TID PG_TIDARRAY PG_TIME PG_TIMEARRAY PG_TIMESTAMP
-            PG_TIMESTAMPARRAY PG_TIMESTAMPTZ PG_TIMESTAMPTZARRAY PG_TIMETZ PG_TIMETZARRAY
-            PG_TRIGGER PG_TSM_HANDLER PG_TSQUERY PG_TSQUERYARRAY PG_TSRANGE
-            PG_TSRANGEARRAY PG_TSTZRANGE PG_TSTZRANGEARRAY PG_TSVECTOR PG_TSVECTORARRAY
-            PG_TXID_SNAPSHOT PG_TXID_SNAPSHOTARRAY PG_UNKNOWN PG_UUID PG_UUIDARRAY
-            PG_VARBIT PG_VARBITARRAY PG_VARCHAR PG_VARCHARARRAY PG_VOID
-            PG_XID PG_XIDARRAY PG_XML PG_XMLARRAY
+            PG_REFCURSOR PG_REFCURSORARRAY PG_REGCLASS PG_REGCLASSARRAY PG_REGCOLLATION
+            PG_REGCOLLATIONARRAY PG_REGCONFIG PG_REGCONFIGARRAY PG_REGDICTIONARY PG_REGDICTIONARYARRAY
+            PG_REGNAMESPACE PG_REGNAMESPACEARRAY PG_REGOPER PG_REGOPERARRAY PG_REGOPERATOR
+            PG_REGOPERATORARRAY PG_REGPROC PG_REGPROCARRAY PG_REGPROCEDURE PG_REGPROCEDUREARRAY
+            PG_REGROLE PG_REGROLEARRAY PG_REGTYPE PG_REGTYPEARRAY PG_TABLE_AM_HANDLER
+            PG_TEXT PG_TEXTARRAY PG_TID PG_TIDARRAY PG_TIME
+            PG_TIMEARRAY PG_TIMESTAMP PG_TIMESTAMPARRAY PG_TIMESTAMPTZ PG_TIMESTAMPTZARRAY
+            PG_TIMETZ PG_TIMETZARRAY PG_TRIGGER PG_TSM_HANDLER PG_TSQUERY
+            PG_TSQUERYARRAY PG_TSRANGE PG_TSRANGEARRAY PG_TSTZRANGE PG_TSTZRANGEARRAY
+            PG_TSVECTOR PG_TSVECTORARRAY PG_TXID_SNAPSHOT PG_TXID_SNAPSHOTARRAY PG_UNKNOWN
+            PG_UUID PG_UUIDARRAY PG_VARBIT PG_VARBITARRAY PG_VARCHAR
+            PG_VARCHARARRAY PG_VOID PG_XID PG_XID8 PG_XID8ARRAY
+            PG_XIDARRAY PG_XML PG_XMLARRAY
         )],
     );
 
@@ -128,8 +130,10 @@ use 5.008001;
 
     my $methods_are_installed = 0;
     sub driver {
+
         return $drh if defined $drh;
-        my($class, $attr) = @_;
+
+        my $class = shift;
 
         $class .= '::dr';
 
@@ -204,13 +208,13 @@ use 5.008001;
     sub data_sources {
 
         my $drh = shift;
-        my $attr = shift || '';
+        my $conninfo = shift || '';
         my $connstring = 'dbname=postgres';
         if ($ENV{DBI_DSN}) {
             ($connstring = $ENV{DBI_DSN}) =~ s/dbi:Pg://i;
         }
-        if (length $attr) {
-            $connstring .= ";$attr";
+        if (length $conninfo) {
+            $connstring .= ";$conninfo";
         }
 
         my $dbh = DBD::Pg::dr::connect($drh, $connstring) or return;
@@ -218,14 +222,15 @@ use 5.008001;
         my $SQL = 'SELECT pg_catalog.quote_ident(datname) FROM pg_catalog.pg_database ORDER BY 1';
         my $sth = $dbh->prepare($SQL);
         $sth->execute() or die $DBI::errstr;
-        $attr and $attr = ";$attr";
-        my @sources = map { "dbi:Pg:dbname=$_->[0]$attr" } @{$sth->fetchall_arrayref()};
+        $conninfo and $conninfo = ";$conninfo";
+        my @sources = map { "dbi:Pg:dbname=$_->[0]$conninfo" } @{$sth->fetchall_arrayref()};
         $dbh->disconnect;
         return @sources;
     }
 
 
     sub connect { ## no critic (ProhibitBuiltinHomonyms)
+
         my ($drh, $dbname, $user, $pass, $attr) = @_;
 
         ## Allow "db" and "database" as synonyms for "dbname"
@@ -280,8 +285,7 @@ use 5.008001;
     use strict;
 
     sub parse_trace_flag {
-        my ($h, $flag) = @_;
-        return DBD::Pg->parse_trace_flag($flag);
+        return DBD::Pg->parse_trace_flag($_[1]);
     }
 
     sub prepare {
@@ -301,7 +305,7 @@ use 5.008001;
 
     sub last_insert_id {
 
-        my ($dbh, $catalog, $schema, $table, $col, $attr) = @_;
+        my ($dbh, undef, $schema, $table, undef, $attr) = @_;
 
         ## Our ultimate goal is to get a sequence
         my ($sth, $count, $SQL, $sequence);
@@ -309,7 +313,7 @@ use 5.008001;
         ## Cache all of our table lookups? Default is yes
         my $cache = 1;
 
-        ## Catalog and col are not used
+        ## Catalog and col (arguments 2 and 5) are not used
         $schema = '' if ! defined $schema;
         $table = '' if ! defined $table;
         my $cachename = join("\0", 'lii', $schema, $table);
@@ -470,7 +474,7 @@ use 5.008001;
 
     sub column_info {
         my $dbh = shift;
-        my ($catalog, $schema, $table, $column) = @_;
+        my (undef, $schema, $table, $column) = @_;
 
         my @search;
         ## If the schema or table has an underscore or a %, use a LIKE comparison
@@ -612,16 +616,16 @@ use 5.008001;
     }
 
     sub _prepare_from_data {
-        my ($statement, $data, $names, %attr) = @_;
+        my ($statement, $data, $names, %attrinfo) = @_;
         my $sponge = DBI->connect('dbi:Sponge:', '', '', { RaiseError => 1 });
-        my $sth = $sponge->prepare($statement, { rows=>$data, NAME=>$names, %attr });
+        my $sth = $sponge->prepare($statement, { rows=>$data, NAME=>$names, %attrinfo });
         return $sth;
     }
 
     sub statistics_info {
 
         my $dbh = shift;
-        my ($catalog, $schema, $table, $unique_only, $quick, $attr) = @_;
+        my (undef, $schema, $table, $unique_only) = @_;
 
         ## Catalog is ignored, but table is mandatory
         return undef unless defined $table and length $table;
@@ -632,153 +636,93 @@ use 5.008001;
         my $input_schema = (defined $schema and length $schema) ? 1 : 0;
 
         if ($input_schema) {
-            $schema_where = 'AND n.nspname = ? AND n.oid = d.relnamespace';
+            $schema_where = 'AND n.nspname = ?';
             push(@exe_args, $schema);
         }
-        else {
-            $schema_where = 'AND n.oid = d.relnamespace';
-        }
 
-        my $table_stats_sql = qq{
-            SELECT d.relpages, d.reltuples, n.nspname,
-                   pg_catalog.current_database() as catname
-            FROM   pg_catalog.pg_class d, pg_catalog.pg_namespace n
-            WHERE  d.relname = ? $schema_where
-        };
+        my $is_key_column = $dbh->{private_dbdpg}{version} >= 110000
+            ? 'col.i <= i.indnkeyatts' : 'true';
 
-        my $colnames_sql = qq{
-            SELECT
-                a.attnum, a.attname
-            FROM
-                pg_catalog.pg_attribute a, pg_catalog.pg_class d, pg_catalog.pg_namespace n
-            WHERE
-                a.attrelid = d.oid AND d.relname = ? $schema_where
-        };
-
-        my $stats_sql = qq{
-            SELECT
-                pg_catalog.current_database() as catname,
-                c.relname, i.indkey, i.indisunique, i.indisclustered, a.amname,
-                n.nspname, c.relpages, c.reltuples, i.indexprs, i.indnatts, i.indexrelid,
-                pg_catalog.pg_get_expr(i.indpred,i.indrelid) as predicate,
-                pg_catalog.pg_get_expr(i.indexprs,i.indrelid, true) AS indexdef
-            FROM
-                pg_catalog.pg_index i, pg_catalog.pg_class c,
-                pg_catalog.pg_class d, pg_catalog.pg_am a,
-                pg_catalog.pg_namespace n
-            WHERE
-                d.relname = ? $schema_where AND d.oid = i.indrelid
-                AND i.indexrelid = c.oid AND c.relam = a.oid
-            ORDER BY
-                i.indisunique desc, a.amname, c.relname
-        };
-
-        my $indexdef_sql = q{
-            SELECT
-                pg_catalog.pg_get_indexdef(indexrelid,x,true)
-            FROM
-              pg_index
-            JOIN pg_catalog.generate_series(1,?) s(x) ON indexrelid = ?
-        };
-
-        my @output_rows;
+        my $stats_sql;
 
         # Table-level stats
         if (!$unique_only) {
-            my $table_stats_sth = $dbh->prepare($table_stats_sql);
-            $table_stats_sth->execute(@exe_args) or return undef;
-            my $tst = $table_stats_sth->fetchrow_hashref or return undef;
-            push(@output_rows, [
-                $tst->{catname},  # TABLE_CAT
-                $tst->{nspname},  # TABLE_SCHEM
-                $table,           # TABLE_NAME
-                undef,            # NON_UNIQUE
-                undef,            # INDEX_QUALIFIER
-                undef,            # INDEX_NAME
-                'table',          # TYPE
-                undef,            # ORDINAL_POSITION
-                undef,            # COLUMN_NAME
-                undef,            # ASC_OR_DESC
-                $tst->{reltuples},# CARDINALITY
-                $tst->{relpages}, # PAGES
-                undef,            # FILTER_CONDITION
-                undef,            # pg_expression
-            ]);
+            $stats_sql .= qq{
+                SELECT
+                    pg_catalog.current_database() AS "TABLE_CAT",
+                    n.nspname                     AS "TABLE_SCHEM",
+                    d.relname                     AS "TABLE_NAME",
+                    NULL                          AS "NON_UNIQUE",
+                    NULL                          AS "INDEX_QUALIFIER",
+                    NULL                          AS "INDEX_NAME",
+                    'table'                       AS "TYPE",
+                    NULL                          AS "ORDINAL_POSITION",
+                    NULL                          AS "COLUMN_NAME",
+                    NULL                          AS "ASC_OR_DESC",
+                    d.reltuples                   AS "CARDINALITY",
+                    d.relpages                    AS "PAGES",
+                    NULL                          AS "FILTER_CONDITION",
+                    NULL                          AS "pg_expression",
+                    NULL                          AS "pg_is_key_column"
+                FROM   pg_catalog.pg_class d
+                JOIN   pg_catalog.pg_namespace n ON n.oid = d.relnamespace
+                WHERE  d.relname = ? $schema_where
+                UNION ALL
+            };
+            push @exe_args, @exe_args;
         }
-
-        # Fetch the column names for later use
-        my $colnames_sth = $dbh->prepare($colnames_sql);
-        $colnames_sth->execute(@exe_args) or return undef;
-        my $colnames = $colnames_sth->fetchall_hashref('attnum');
-
-        # Fetch the individual parts of the index
-        my $sth_indexdef = $dbh->prepare($indexdef_sql);
 
         # Fetch the index definitions
+        $stats_sql .= qq{
+            SELECT
+                pg_catalog.current_database() AS "TABLE_CAT",
+                n.nspname                     AS "TABLE_SCHEM",
+                d.relname                     AS "TABLE_NAME",
+                NOT(i.indisunique)            AS "NON_UNIQUE",
+                NULL                          AS "INDEX_QUALIFIER",
+                c.relname                     AS "INDEX_NAME",
+                CASE WHEN i.indisclustered THEN 'clustered'
+                     WHEN a.amname = 'btree' THEN 'btree'
+                     WHEN a.amname = 'hash' THEN 'hashed'
+                     ELSE 'other'
+                END                           AS "TYPE",
+                col.i                         AS "ORDINAL_POSITION",
+                att.attname                   AS "COLUMN_NAME",
+                'A'                           AS "ASC_OR_DESC",
+                c.reltuples                   AS "CARDINALITY",
+                c.relpages                    AS "PAGES",
+                pg_catalog.pg_get_expr(i.indpred,i.indrelid)
+                                              AS "FILTER_CONDITION",
+                pg_catalog.pg_get_indexdef(i.indexrelid, col.i, true)
+                                              AS "pg_expression",
+                $is_key_column                AS "pg_is_key_column"
+            FROM
+                pg_catalog.pg_index i
+                JOIN pg_catalog.pg_class c ON c.oid = i.indexrelid
+                JOIN pg_catalog.pg_class d ON d.oid = i.indrelid
+                JOIN pg_catalog.pg_am a ON a.oid = c.relam
+                JOIN pg_catalog.pg_namespace n ON n.oid = d.relnamespace
+                JOIN pg_catalog.generate_series(1, pg_catalog.current_setting('max_index_keys')::integer) col(i)
+                     ON col.i <= i.indnatts
+                LEFT JOIN pg_catalog.pg_attribute att
+                     ON att.attrelid = d.oid AND att.attnum = i.indkey[col.i - 1]
+            WHERE
+                d.relname = ? $schema_where
+                AND (i.indisunique OR NOT(?)) -- unique_only
+            ORDER BY
+                -- NULLS FIRST to get the table level stats first
+                "NON_UNIQUE" NULLS FIRST, "TYPE", "INDEX_QUALIFIER", "INDEX_NAME", "ORDINAL_POSITION"
+        };
+
         my $sth = $dbh->prepare($stats_sql);
-        $sth->execute(@exe_args) or return undef;
-
-        STAT_ROW:
-        while (my $row = $sth->fetchrow_hashref) {
-
-            next if $unique_only and !$row->{indisunique};
-
-            my $indtype = $row->{indisclustered}
-                ? 'clustered'
-                : ( $row->{amname} eq 'btree' )
-                    ? 'btree'
-                    : ($row->{amname} eq 'hash' )
-                        ? 'hashed' : 'other';
-
-            my $nonunique = $row->{indisunique} ? 0 : 1;
-
-            my @index_row = (
-                $row->{catname},   # TABLE_CAT         0
-                $row->{nspname},   # TABLE_SCHEM       1
-                $table,            # TABLE_NAME        2
-                $nonunique,        # NON_UNIQUE        3
-                undef,             # INDEX_QUALIFIER   4
-                $row->{relname},   # INDEX_NAME        5
-                $indtype,          # TYPE              6
-                undef,             # ORDINAL_POSITION  7
-                undef,             # COLUMN_NAME       8
-                'A',               # ASC_OR_DESC       9
-                $row->{reltuples}, # CARDINALITY      10
-                $row->{relpages},  # PAGES            11
-                $row->{predicate}, # FILTER_CONDITION 12
-                undef,             # pg_expression    13
-            );
-
-            ## Grab expression information
-            $sth_indexdef->execute($row->{indnatts}, $row->{indexrelid});
-            my $expression = $sth_indexdef->fetchall_arrayref();
-
-            my $col_nums = $row->{indkey};
-            $col_nums =~ s/^\s+//;
-            my @col_nums = split(/\s+/, $col_nums);
-
-            my $ord_pos = 1;
-            for my $col_num (@col_nums) {
-                my @copy = @index_row;
-                $copy[7] = $ord_pos; # ORDINAL_POSITION
-                $copy[8] = $colnames->{$col_num}->{attname}; # COLUMN_NAME
-                $copy[13] = $expression->[$ord_pos-1][0];
-                push(@output_rows, \@copy);
-                $ord_pos++;
-            }
-        }
-
-        my @output_colnames = qw/ TABLE_CAT TABLE_SCHEM TABLE_NAME NON_UNIQUE INDEX_QUALIFIER
-                    INDEX_NAME TYPE ORDINAL_POSITION COLUMN_NAME ASC_OR_DESC
-                    CARDINALITY PAGES FILTER_CONDITION pg_expression /;
-
-        return _prepare_from_data('statistics_info', \@output_rows, \@output_colnames);
+        $sth->execute(@exe_args, 0+!!$unique_only) or return undef;
+        return $sth;
     }
 
     sub primary_key_info {
 
         my $dbh = shift;
-        my ($catalog, $schema, $table, $attr) = @_;
+        my (undef, $schema, $table, $attr) = @_;
 
         ## Catalog is ignored, but table is mandatory
         return undef unless defined $table and length $table;
@@ -832,7 +776,7 @@ use 5.008001;
         };
         $sth = $dbh->prepare($sql) or return undef;
         $sth->execute();
-        my $attribs = $sth->fetchall_hashref('attnum');
+        my $attribinfo = $sth->fetchall_hashref('attnum');
 
         my $pkinfo = [];
 
@@ -848,13 +792,13 @@ use 5.008001;
                 # TABLE_NAME
                 $pkinfo->[$x][2] = $info->[2];
                 # COLUMN_NAME
-                $pkinfo->[$x][3] = $attribs->{$_}{colname};
+                $pkinfo->[$x][3] = $attribinfo->{$_}{colname};
                 # KEY_SEQ
                 $pkinfo->[$x][4] = $_;
                 # PK_NAME
                 $pkinfo->[$x][5] = $info->[3];
                 # DATA_TYPE
-                $pkinfo->[$x][6] = $attribs->{$_}{typename};
+                $pkinfo->[$x][6] = $attribinfo->{$_}{typename};
                 $pkinfo->[$x][7] = $info->[5];
                 $pkinfo->[$x][8] = $info->[6];
                 $pkinfo->[$x][9] = $info->[7];
@@ -878,12 +822,12 @@ use 5.008001;
             $info->[5] = $info->[3];
             # COLUMN_NAME
             $info->[3] = 2==$attr->{'pg_onerow'} ?
-                [ map { $attribs->{$_}{colname} } split /\s+/, $info->[4] ] :
-                    join ', ', map { $attribs->{$_}{colname} } split /\s+/, $info->[4];
+                [ map { $attribinfo->{$_}{colname} } split /\s+/, $info->[4] ] :
+                    join ', ', map { $attribinfo->{$_}{colname} } split /\s+/, $info->[4];
             # DATA_TYPE
             $info->[6] = 2==$attr->{'pg_onerow'} ?
-                [ map { $attribs->{$_}{typename} } split /\s+/, $info->[4] ] :
-                    join ', ', map { $attribs->{$_}{typename} } split /\s+/, $info->[4];
+                [ map { $attribinfo->{$_}{typename} } split /\s+/, $info->[4] ] :
+                    join ', ', map { $attribinfo->{$_}{typename} } split /\s+/, $info->[4];
             # KEY_SEQ
             $info->[4] = 2==$attr->{'pg_onerow'} ?
                 [ split /\s+/, $info->[4] ] :
@@ -917,7 +861,6 @@ use 5.008001;
         my $ptable = $_[2] || '';
         my $fschema = $_[4] || '';
         my $ftable = $_[5] || '';
-        my $args = $_[6];
 
         ## Must have at least one named table
         return undef if !length($ptable) and !length($ftable);
@@ -1211,13 +1154,14 @@ use 5.008001;
             my ($dbh, @args) = @_;
             my $attr = $args[4];
             my $sth = $dbh->table_info(@args) or return;
-            my $tables = $sth->fetchall_arrayref() or return;
+            my $tablelist = $sth->fetchall_arrayref() or return;
             my @tables = map { (! (ref $attr eq 'HASH' and $attr->{pg_noprefix})) ?
-                        "$_->[1].$_->[2]" : $_->[2] } @$tables;
+                        "$_->[1].$_->[2]" : $_->[2] } @$tablelist;
             return @tables;
     }
 
     sub table_attributes {
+
         my ($dbh, $table) = @_;
 
         my $sth = $dbh->column_info(undef,undef,$table,undef);
@@ -1281,7 +1225,6 @@ use 5.008001;
 
 
     sub type_info_all {
-        my ($dbh) = @_;
 
         my $names =
             {
@@ -1367,18 +1310,6 @@ use 5.008001;
     ];
     return $ti;
     }
-
-
-    # Characters that need to be escaped by quote().
-    my %esc = (
-        q{'}  => '\\047', # '\\' . sprintf("%03o", ord("'")), # ISO SQL 2
-        '\\' => '\\134', # '\\' . sprintf("%03o", ord("\\")),
-    );
-
-    # Set up lookup for SQL types we don't want to escape.
-    my %no_escape = map { $_ => 1 }
-        DBI::SQL_INTEGER, DBI::SQL_SMALLINT, DBI::SQL_BIGINT, DBI::SQL_DECIMAL,
-        DBI::SQL_FLOAT, DBI::SQL_REAL, DBI::SQL_DOUBLE, DBI::SQL_NUMERIC;
 
     my %get_info_type = (
 
@@ -1587,7 +1518,7 @@ use 5.008001;
         }
         elsif ($ans eq 'ODBCVERSION') {
             my $version = $dbh->{private_dbdpg}{version};
-            return '00.00.0000' unless $version =~ /^(\d\d?)(\d\d)(\d\d)$/;
+            return '00.00.0000' unless $version =~ /^([0-9][0-9]?)([0-9][0-9])([0-9][0-9])$/;
             return sprintf '%02d.%02d.%.2d00', $1,$2,$3;
         }
         elsif ($ans eq 'DBDVERSION') {
@@ -1653,8 +1584,7 @@ use 5.008001;
     package DBD::Pg::st;
 
     sub parse_trace_flag {
-        my ($h, $flag) = @_;
-        return DBD::Pg->parse_trace_flag($flag);
+        return DBD::Pg->parse_trace_flag($_[1]);
     }
 
     sub bind_param_array {
@@ -1667,7 +1597,7 @@ use 5.008001;
 
         ## Bail if the second arg is not undef or an arrayref
         return $sth->set_err(1, "Value for parameter $p_id must be a scalar or an arrayref, not a ".ref($value_array))
-            if defined $value_array and ref $value_array and ref $value_array ne 'ARRAY';
+            if ref $value_array and ref $value_array ne 'ARRAY';
 
         ## Bail if the first arg is not a number
         return $sth->set_err(1, q{Can't use named placeholders for non-driver supported bind_param_array})
@@ -1680,6 +1610,7 @@ use 5.008001;
         return $sth->bind_param($p_id, '', $attr) if $attr; ## This is the big change so -w does not complain
 
         return 1;
+
     } ## end bind_param_array
 
      sub private_attribute_info {
@@ -1730,7 +1661,7 @@ DBD::Pg - PostgreSQL database driver for the DBI module
 
 =head1 VERSION
 
-This documents version 3.10.5 of the DBD::Pg module
+This documents version 3.11.0 of the DBD::Pg module
 
 =head1 DESCRIPTION
 
@@ -2802,7 +2733,7 @@ server version 9.0 or higher.
 
 The C<ping> method determines if there is a working connection to an active 
 database server. It does this by sending a small query to the server, currently 
-B<'DBD::Pg ping test v3.10.5'>. It returns 0 (false) if the connection is not valid, 
+B<'DBD::Pg ping test v3.11.0'>. It returns 0 (false) if the connection is not valid, 
 otherwise it returns a positive number (true). The value returned indicates the 
 current state:
 
@@ -3088,6 +3019,11 @@ Postgres allows indexes on functions and scalar expressions based on one or more
 will always be populated if an index, but the lack of an entry in the COLUMN_NAME should indicate 
 that this is an index expression.
 
+=item pg_is_key_column
+
+Postgres (since version 11) allows including non-key columns in indexes so they can be retrieved by
+index-only scans.  This field will be false for such columns, and true for normal index columns.
+
 =back
 
 
@@ -3280,17 +3216,17 @@ being treated as a placeholder.
 =head3 B<pg_enable_utf8> (integer)
 
 DBD::Pg specific attribute. The behavior of DBD::Pg with regards to this flag has 
-changed as of version 3.0.0. The default value for this attribute, -1, indicates 
-that the internal Perl C<utf8> flag will be turned on for all strings coming back 
-from the database if the client_encoding is set to 'UTF8'. Use of this default 
+changed as of version 3.0.0. The default value for this attribute, -1, tells
+DBD::Pg to UTF8-decode all strings coming back
+from the database if the client_encoding is set to C<UTF8>. Use of this default 
 is highly encouraged. If your code was previously using pg_enable_utf8, you can 
 probably remove mention of it entirely.
 
-If this attribute is set to 0, then the internal C<utf8> flag will *never* be 
-turned on for returned data, regardless of the current client_encoding. 
+If this attribute is set to 0, then DBD::Pg will B<never> UTF8-decode
+returned data, regardless of the current client_encoding.
 
-If this attribute is set to 1, then the internal C<utf8> flag will *always* 
-be turned on for returned data, regardless of the current client_encoding 
+If this attribute is set to 1, then DBD::Pg will B<always> UTF8-decode
+returned data, regardless of the current client_encoding
 (with the exception of bytea data).
 
 Note that the value of client_encoding is only checked on connection time. If 
@@ -3471,34 +3407,35 @@ You can then set the data types by setting the value of the C<pg_type>
 key in the hash passed to L</bind_param>.
 The current list of Postgres data types exported is:
 
- PG_ACLITEM PG_ACLITEMARRAY PG_ANY PG_ANYARRAY PG_ANYELEMENT PG_ANYENUM
- PG_ANYNONARRAY PG_ANYRANGE PG_BIT PG_BITARRAY PG_BOOL PG_BOOLARRAY
- PG_BOX PG_BOXARRAY PG_BPCHAR PG_BPCHARARRAY PG_BYTEA PG_BYTEAARRAY
- PG_CHAR PG_CHARARRAY PG_CID PG_CIDARRAY PG_CIDR PG_CIDRARRAY
- PG_CIRCLE PG_CIRCLEARRAY PG_CSTRING PG_CSTRINGARRAY PG_DATE PG_DATEARRAY
- PG_DATERANGE PG_DATERANGEARRAY PG_EVENT_TRIGGER PG_FDW_HANDLER PG_FLOAT4 PG_FLOAT4ARRAY
- PG_FLOAT8 PG_FLOAT8ARRAY PG_GTSVECTOR PG_GTSVECTORARRAY PG_INDEX_AM_HANDLER PG_INET
- PG_INETARRAY PG_INT2 PG_INT2ARRAY PG_INT2VECTOR PG_INT2VECTORARRAY PG_INT4
- PG_INT4ARRAY PG_INT4RANGE PG_INT4RANGEARRAY PG_INT8 PG_INT8ARRAY PG_INT8RANGE
- PG_INT8RANGEARRAY PG_INTERNAL PG_INTERVAL PG_INTERVALARRAY PG_JSON PG_JSONARRAY
- PG_JSONB PG_JSONBARRAY PG_JSONPATH PG_JSONPATHARRAY PG_LANGUAGE_HANDLER PG_LINE
- PG_LINEARRAY PG_LSEG PG_LSEGARRAY PG_MACADDR PG_MACADDR8 PG_MACADDR8ARRAY
- PG_MACADDRARRAY PG_MONEY PG_MONEYARRAY PG_NAME PG_NAMEARRAY PG_NUMERIC
- PG_NUMERICARRAY PG_NUMRANGE PG_NUMRANGEARRAY PG_OID PG_OIDARRAY PG_OIDVECTOR
- PG_OIDVECTORARRAY PG_OPAQUE PG_PATH PG_PATHARRAY PG_PG_ATTRIBUTE PG_PG_CLASS
- PG_PG_DDL_COMMAND PG_PG_DEPENDENCIES PG_PG_LSN PG_PG_LSNARRAY PG_PG_MCV_LIST PG_PG_NDISTINCT
- PG_PG_NODE_TREE PG_PG_PROC PG_PG_TYPE PG_POINT PG_POINTARRAY PG_POLYGON
- PG_POLYGONARRAY PG_RECORD PG_RECORDARRAY PG_REFCURSOR PG_REFCURSORARRAY PG_REGCLASS
- PG_REGCLASSARRAY PG_REGCONFIG PG_REGCONFIGARRAY PG_REGDICTIONARY PG_REGDICTIONARYARRAY PG_REGNAMESPACE
- PG_REGNAMESPACEARRAY PG_REGOPER PG_REGOPERARRAY PG_REGOPERATOR PG_REGOPERATORARRAY PG_REGPROC
- PG_REGPROCARRAY PG_REGPROCEDURE PG_REGPROCEDUREARRAY PG_REGROLE PG_REGROLEARRAY PG_REGTYPE
- PG_REGTYPEARRAY PG_TABLE_AM_HANDLER PG_TEXT PG_TEXTARRAY PG_TID PG_TIDARRAY
- PG_TIME PG_TIMEARRAY PG_TIMESTAMP PG_TIMESTAMPARRAY PG_TIMESTAMPTZ PG_TIMESTAMPTZARRAY
- PG_TIMETZ PG_TIMETZARRAY PG_TRIGGER PG_TSM_HANDLER PG_TSQUERY PG_TSQUERYARRAY
- PG_TSRANGE PG_TSRANGEARRAY PG_TSTZRANGE PG_TSTZRANGEARRAY PG_TSVECTOR PG_TSVECTORARRAY
- PG_TXID_SNAPSHOT PG_TXID_SNAPSHOTARRAY PG_UNKNOWN PG_UUID PG_UUIDARRAY PG_VARBIT
- PG_VARBITARRAY PG_VARCHAR PG_VARCHARARRAY PG_VOID PG_XID PG_XIDARRAY
- PG_XML PG_XMLARRAY
+ PG_ACLITEM PG_ACLITEMARRAY PG_ANY PG_ANYARRAY PG_ANYCOMPATIBLE PG_ANYCOMPATIBLEARRAY
+ PG_ANYCOMPATIBLENONARRAY PG_ANYCOMPATIBLERANGE PG_ANYELEMENT PG_ANYENUM PG_ANYNONARRAY PG_ANYRANGE
+ PG_BIT PG_BITARRAY PG_BOOL PG_BOOLARRAY PG_BOX PG_BOXARRAY
+ PG_BPCHAR PG_BPCHARARRAY PG_BYTEA PG_BYTEAARRAY PG_CHAR PG_CHARARRAY
+ PG_CID PG_CIDARRAY PG_CIDR PG_CIDRARRAY PG_CIRCLE PG_CIRCLEARRAY
+ PG_CSTRING PG_CSTRINGARRAY PG_DATE PG_DATEARRAY PG_DATERANGE PG_DATERANGEARRAY
+ PG_EVENT_TRIGGER PG_FDW_HANDLER PG_FLOAT4 PG_FLOAT4ARRAY PG_FLOAT8 PG_FLOAT8ARRAY
+ PG_GTSVECTOR PG_GTSVECTORARRAY PG_INDEX_AM_HANDLER PG_INET PG_INETARRAY PG_INT2
+ PG_INT2ARRAY PG_INT2VECTOR PG_INT2VECTORARRAY PG_INT4 PG_INT4ARRAY PG_INT4RANGE
+ PG_INT4RANGEARRAY PG_INT8 PG_INT8ARRAY PG_INT8RANGE PG_INT8RANGEARRAY PG_INTERNAL
+ PG_INTERVAL PG_INTERVALARRAY PG_JSON PG_JSONARRAY PG_JSONB PG_JSONBARRAY
+ PG_JSONPATH PG_JSONPATHARRAY PG_LANGUAGE_HANDLER PG_LINE PG_LINEARRAY PG_LSEG
+ PG_LSEGARRAY PG_MACADDR PG_MACADDR8 PG_MACADDR8ARRAY PG_MACADDRARRAY PG_MONEY
+ PG_MONEYARRAY PG_NAME PG_NAMEARRAY PG_NUMERIC PG_NUMERICARRAY PG_NUMRANGE
+ PG_NUMRANGEARRAY PG_OID PG_OIDARRAY PG_OIDVECTOR PG_OIDVECTORARRAY PG_PATH
+ PG_PATHARRAY PG_PG_ATTRIBUTE PG_PG_CLASS PG_PG_DDL_COMMAND PG_PG_DEPENDENCIES PG_PG_LSN
+ PG_PG_LSNARRAY PG_PG_MCV_LIST PG_PG_NDISTINCT PG_PG_NODE_TREE PG_PG_PROC PG_PG_SNAPSHOT
+ PG_PG_SNAPSHOTARRAY PG_PG_TYPE PG_POINT PG_POINTARRAY PG_POLYGON PG_POLYGONARRAY
+ PG_RECORD PG_RECORDARRAY PG_REFCURSOR PG_REFCURSORARRAY PG_REGCLASS PG_REGCLASSARRAY
+ PG_REGCOLLATION PG_REGCOLLATIONARRAY PG_REGCONFIG PG_REGCONFIGARRAY PG_REGDICTIONARY PG_REGDICTIONARYARRAY
+ PG_REGNAMESPACE PG_REGNAMESPACEARRAY PG_REGOPER PG_REGOPERARRAY PG_REGOPERATOR PG_REGOPERATORARRAY
+ PG_REGPROC PG_REGPROCARRAY PG_REGPROCEDURE PG_REGPROCEDUREARRAY PG_REGROLE PG_REGROLEARRAY
+ PG_REGTYPE PG_REGTYPEARRAY PG_TABLE_AM_HANDLER PG_TEXT PG_TEXTARRAY PG_TID
+ PG_TIDARRAY PG_TIME PG_TIMEARRAY PG_TIMESTAMP PG_TIMESTAMPARRAY PG_TIMESTAMPTZ
+ PG_TIMESTAMPTZARRAY PG_TIMETZ PG_TIMETZARRAY PG_TRIGGER PG_TSM_HANDLER PG_TSQUERY
+ PG_TSQUERYARRAY PG_TSRANGE PG_TSRANGEARRAY PG_TSTZRANGE PG_TSTZRANGEARRAY PG_TSVECTOR
+ PG_TSVECTORARRAY PG_TXID_SNAPSHOT PG_TXID_SNAPSHOTARRAY PG_UNKNOWN PG_UUID PG_UUIDARRAY
+ PG_VARBIT PG_VARBITARRAY PG_VARCHAR PG_VARCHARARRAY PG_VOID PG_XID
+ PG_XID8 PG_XID8ARRAY PG_XIDARRAY PG_XML PG_XMLARRAY
 
 Data types are "sticky," in that once a data type is set to a certain placeholder,
 it will remain for that placeholder, unless it is explicitly set to something

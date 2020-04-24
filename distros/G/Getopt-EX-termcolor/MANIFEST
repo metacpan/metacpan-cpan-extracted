@@ -6,6 +6,7 @@ README.md
 cpanfile
 lib/Getopt/EX/termcolor.pm
 lib/Getopt/EX/termcolor/Apple_Terminal.pm
+lib/Getopt/EX/termcolor/XTerm.pm
 lib/Getopt/EX/termcolor/iTerm.pm
 minil.toml
 t/00_compile.t

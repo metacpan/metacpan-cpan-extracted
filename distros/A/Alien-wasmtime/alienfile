@@ -6,12 +6,24 @@ configure {
   requires 'Path::Tiny';
 };
 
+my $version = $ENV{ALIEN_WASMTIME_VERSION} || 'v0.15.0';
+my $arch = 'x86_64';	
+
 if($^O eq 'linux')
 {
   # archname=x86_64-linux-gnu-thread-multi
-  if($Config{archname} !~ /^x86_64-linux/)
+  if($Config{archname} =~ /^(x86_64|aarch64)-linux/ && $Config{ptrsize} == 8)
   {
-    print "Only x86_64 is supported.\n";
+    if($1 eq 'aarch64')
+    {
+      $version = 'dev';
+      $arch    = 'aarch64';
+      log "Using dev wasmtime, since the current prod version does not support your arch";
+    }
+  }
+  else
+  {
+    print "Only x86_64 and arm64 are supported on Linux.\n";
     print "If we are missing a binary tarball that could work for your platform, please comment here:\n";
     print "https://github.com/perlwasm/Alien-wasmtime/issues/2\n";
     exit;
@@ -19,9 +31,9 @@ if($^O eq 'linux')
 }
 elsif($^O eq 'MSWin32')
 {
-  if($Config{archname} !~ /^MSWin32-x64/)
+  if($Config{archname} !~ /^MSWin32-x64/ || $Config{ptrsize} != 8)
   {
-    print "Only x86_64 is supported.\n";
+    print "Only x86_64 is supported on Windows.\n";
     print "If we are missing a binary tarball that could work for your platform, please comment here:\n";
     print "https://github.com/perlwasm/Alien-wasmtime/issues/2\n";
     exit;
@@ -31,7 +43,7 @@ elsif($^O eq 'darwin')
 {
   if($Config{myarchname} !~ /^i386-darwin/ || $Config{ptrsize} != 8)
   {
-    print "Only x86_64 is supported.\n";
+    print "Only x86_64 is supported on macOS / darwin\n";
     print "If we are missing a binary tarball that could work for your platform, please comment here:\n";
     print "https://github.com/perlwasm/Alien-wasmtime/issues/2\n";
     exit;
@@ -49,23 +61,21 @@ probe sub { 'share' };
 
 share {
 
-  my $version = $ENV{ALIEN_WASMTIME_VERSION} || 'v0.15.0';
-
   if($^O eq 'linux')
   {
-    start_url "https://github.com/bytecodealliance/wasmtime/releases/download/$version/wasmtime-$version-x86_64-linux-c-api.tar.xz";
+    start_url "https://github.com/bytecodealliance/wasmtime/releases/download/$version/wasmtime-$version-$arch-linux-c-api.tar.xz";
     plugin 'Download';
     plugin Extract => 'tar.xz';
   }
   elsif($^O eq 'MSWin32')
   {
-    start_url "https://github.com/bytecodealliance/wasmtime/releases/download/$version/wasmtime-$version-x86_64-windows-c-api.zip";
+    start_url "https://github.com/bytecodealliance/wasmtime/releases/download/$version/wasmtime-$version-$arch-windows-c-api.zip";
     plugin 'Download';
     plugin Extract => 'zip';
   }
   elsif($^O eq 'darwin')
   {
-    start_url "https://github.com/bytecodealliance/wasmtime/releases/download/$version/wasmtime-$version-x86_64-macos-c-api.tar.xz";
+    start_url "https://github.com/bytecodealliance/wasmtime/releases/download/$version/wasmtime-$version-$arch-macos-c-api.tar.xz";
     plugin 'Download';
     plugin Extract => 'tar.xz';
   }

@@ -48,9 +48,9 @@
             "schema:EngineSpecification"
          ],
          "schema:rangeIncludes" : [
+            "schema:URL",
             "schema:Text",
-            "schema:QualitativeValue",
-            "schema:URL"
+            "schema:QualitativeValue"
          ]
       },
       "schema:torque" : {

@@ -16,8 +16,8 @@
          "rdfs:label" : "reviewAspect",
          "schema:category" : "issue-1689",
          "schema:domainIncludes" : [
-            "schema:Review",
             "schema:Guide",
+            "schema:Review",
             "schema:Rating"
          ],
          "schema:rangeIncludes" : "schema:Text"

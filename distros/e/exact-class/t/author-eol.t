@@ -27,6 +27,7 @@ my @files = (
     't/author-portability.t',
     't/author-synopsis.t',
     't/basic.t',
+    't/code_ref_refs.t',
     't/false_injection.t',
     't/prop_inherit.t',
     't/release-kwalitee.t',

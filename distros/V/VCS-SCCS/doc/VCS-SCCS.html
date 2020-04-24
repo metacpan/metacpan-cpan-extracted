@@ -1,0 +1,666 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>VCS::SCCS - OO Interface to SCCS files</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:hmbrand@cpan.org" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#FUNCTIONS">FUNCTIONS</a>
+    <ul>
+      <li><a href="#Meta-function">Meta function</a></li>
+      <li><a href="#Delta-functions">Delta functions</a></li>
+      <li><a href="#Content-function">Content function</a></li>
+    </ul>
+  </li>
+  <li><a href="#SPECIFICATION">SPECIFICATION</a></li>
+  <li><a href="#EXAMPLES">EXAMPLES</a></li>
+  <li><a href="#BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</a></li>
+  <li><a href="#TODO">TODO</a></li>
+  <li><a href="#DIAGNOSTICS">DIAGNOSTICS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>VCS::SCCS - OO Interface to SCCS files</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> use VCS::SCCS;
+
+ my $sccs = VCS::SCCS-&gt;new (&quot;SCCS/s.file.pl&quot;);   # Read and parse
+
+ # Meta info
+ my $fn = $sccs-&gt;file ();            # file.pl
+ my $cs = $sccs-&gt;checksum ();        # 52534
+ my @us = $sccs-&gt;users ();           # qw( merijn user )
+ my $fl = $sccs-&gt;flags ();           # { q =&gt; &quot;Test applic&quot;, v =&gt; undef }
+ my $cm = $sccs-&gt;comment ();         # &quot;&quot;
+ my $cr = $sccs-&gt;current ();         # 70
+ my @cr = $sccs-&gt;current ();         # ( 70, &quot;5.39&quot;, 5, 39 )
+
+ # Delta related
+ my $vs = $sccs-&gt;version ();         # &quot;5.39&quot;
+ my $vs = $sccs-&gt;version (69);       # &quot;5.38&quot;
+ my $rv = $sccs-&gt;revision ();        # 70
+ my $rv = $sccs-&gt;revision (&quot;5.37&quot;);  # 68
+ my $rm = $sccs-&gt;revision_map ();    # [ [ 1, &quot;4.1&quot; ], ... [ 70, &quot;5.39&quot; ]]
+ my $dd = $sccs-&gt;delta (17);         # none, revision or version as arg
+
+ # Content related
+ my $body_70 = $sccs-&gt;body ();       # file.pl @70 incl NL&#39;s
+ my @body_70 = $sccs-&gt;body ();       # file.pl @70 list of chomped lines
+ my @body_69 = $sccs-&gt;body (69);     # same for file.pl at revision 69
+ my @body_69 = $sccs-&gt;body (&quot;5.38&quot;); # same
+
+ $sccs-&gt;set_translate (&quot;SCCS&quot;);
+ print $sccs-&gt;translate ($rev, $line);
+
+ -- NYI --
+ my $diff = $sccs-&gt;diff (67);        # unified diff between rev 67 and 70
+ my $diff = $sccs-&gt;diff (63, &quot;5.37&quot;);# unified diff between rev 63 and 68</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>SCCS was the dominant version control system until the release of the Revision Control System. Today, SCCS is generally considered obsolete. However, its file format is still used internally by a few other revision control programs, including BitKeeper and TeamWare. Sablime[1] also allows the use of SCCS files. The SCCS file format uses a storage technique called interleaved deltas (or the weave). This storage technique is now considered by many revision control system developers as key to some advanced merging techniques, such as the &quot;Precise Codeville&quot; (&quot;pcdv&quot;) merge.</p>
+
+<p>This interface aims at the possibility to read those files, without the need of the sccs utility set, and open up to the possibility of scripts that use it to convert to more modern VCSs like git, Mercurial, CVS, or subversion.</p>
+
+<h1 id="FUNCTIONS">FUNCTIONS</h1>
+
+<h2 id="Meta-function">Meta function</h2>
+
+<dl>
+
+<dt id="new-file">new (&lt;file&gt;)</dt>
+<dd>
+
+<p>The constructor only accepts a single argument: the SCCS file. this will typically be something like <code>SCCS/s.file.c</code>.</p>
+
+<p>If anything in that file makes <code>new ()</code> believe that it is not a SCCS file, it will return undef. In this stage, there is no way yet to tell why <code>new ()</code> failed.</p>
+
+</dd>
+<dt id="file">file</dt>
+<dd>
+
+<p>Returns the name of the parsed file. Useful if you have more than a single $sccs object.</p>
+
+</dd>
+<dt id="checksum">checksum</dt>
+<dd>
+
+<p>Returns the checksum that was stored in the file. This module does not check if it is valid, nor does it have functionality to calculate a new checksum.</p>
+
+</dd>
+<dt id="users">users</dt>
+<dd>
+
+<p>Returns the list of users that was recorded in this file as authorized to make deltas/changes.</p>
+
+</dd>
+<dt id="flags">flags</dt>
+<dd>
+
+<p>Returns a hash of the flags set for this file (if set at all). VCS::SCCS does not do anything with these flags. They are here for the end-user only.</p>
+
+<p>Note that not all flags are supported by all versions of <code>admin</code>, like <code>x</code> is supported on HP-UX, but not in CSSC.</p>
+
+<dl>
+
+<dt id="t-type-of-program">t &lt;type of program&gt;</dt>
+<dd>
+
+<p>File has a user defined value for the %Y% keyword.</p>
+
+</dd>
+<dt id="v-program-name">v [&lt;program name&gt;]</dt>
+<dd>
+
+<p>File was flagged to prompt for MR (using &lt;program name&gt; for validation).</p>
+
+</dd>
+<dt id="i-keyword-string">i &lt;keyword string&gt;</dt>
+<dd>
+
+<p>File was flagged to require id keywords.</p>
+
+</dd>
+<dt id="b">b</dt>
+<dd>
+
+<p>File was allowed to pass -b to get to create branch deltas.</p>
+
+</dd>
+<dt id="m-module-name">m &lt;module name&gt;</dt>
+<dd>
+
+<p>File has a user defined value for the %M% keyword.</p>
+
+</dd>
+<dt id="f-floor">f &lt;floor&gt;</dt>
+<dd>
+
+<p>File was given a floor: the lowest release, a number from 1 to 9998, which may be get for editing.</p>
+
+</dd>
+<dt id="c-ceiling">c &lt;ceiling&gt;</dt>
+<dd>
+
+<p>File was given a ceiling: a number less than or equal to 9999, which can be retrieved by a get command.</p>
+
+</dd>
+<dt id="d-default-sid">d &lt;default sid&gt;</dt>
+<dd>
+
+<p>File was given a default delta number SID.</p>
+
+</dd>
+<dt id="n">n</dt>
+<dd>
+
+<p>File created null deltas for skipped major versions.</p>
+
+</dd>
+<dt id="j">j</dt>
+<dd>
+
+<p>File was flagged to allow concurrent edits on the same SID.</p>
+
+</dd>
+<dt id="l-lock-releases">l &lt;lock releases&gt;</dt>
+<dd>
+
+<p>File was given a list of releases to which deltas can no longer be made.</p>
+
+</dd>
+<dt id="q-user-defined-text">q &lt;user defined text&gt;</dt>
+<dd>
+
+<p>File has a user defined value for the %Q% keyword.</p>
+
+</dd>
+<dt id="s-line-count">s &lt;line count&gt;</dt>
+<dd>
+
+<p>Defines the number of lines scanned for keyword expansion. Past that line, no keyword expansion takes place. Not implemented in all version.</p>
+
+<p>This flag is a SUN extension that does not exist in historic SCCS implementations and is completely ignored by <code>VCS::SCCS</code>.</p>
+
+</dd>
+<dt id="x-HP-UX-SCO">x (HP-UX, SCO)</dt>
+<dd>
+
+<p>File was flagged to set execution bit on get. This is the implementation that VCS::SCCS knows about.</p>
+
+</dd>
+<dt id="x-SCHILY-0-other">x SCHILY|0 (other)</dt>
+<dd>
+
+<p>Enable SCCS extensions that are not implemented in classical SCCS variants. If the <code>x</code> flag is enabled, the keywords %D%, %E%, %G% and %H% are expanded even though not explicitly enabled by the <code>y</code> flag.</p>
+
+<p>This flag is a SCHILY extension that does not exist in historic SCCS implementations.</p>
+
+</dd>
+<dt id="y-val">y &lt;val&gt; ...</dt>
+<dd>
+
+<p>The list of SCCS keywords to be expanded. If the <code>y</code> flag is missing, all keywords are expanded. If the flag is present but the list is empty, no keyword is expanded and no &quot;No id keywords&quot; message is generated. The value <code>*</code> controls the expansion of the %sccs.include.filename% keyword.</p>
+
+<p>This flag is a SUN/SCHILY extension that does not exist in historic SCCS implementations.</p>
+
+<p>This flag is currently ignored in <code>VCS::SCCS</code>.</p>
+
+</dd>
+<dt id="z-reserved-for-use-in-interfaces">z &lt;reserved for use in interfaces&gt;</dt>
+<dd>
+
+<p>Used in Sun&#39;s NSE system.</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="comment">comment</dt>
+<dd>
+
+<p>The comment that was added when the file was created.</p>
+
+</dd>
+<dt id="current">current</dt>
+<dd>
+
+<p>In scalar context returns the current revision number. That is the number of the file that would be restored by get with no arguments.</p>
+
+<p>In list context, it returns the current revision, version and parts of the version, something like <code>(70, &quot;5.39&quot;, 5, 39, undef, undef)</code>. The last 4 numbers are the equivalent of the keywords %R%, %L%, %B%, and %S% for that release.</p>
+
+</dd>
+<dt id="set_translate-type">set_translate (&lt;type&gt;)</dt>
+<dd>
+
+<p>By default VCS::SCCS will not translate the SCCS keywords (like <code>%W%</code>, see <code>translate ()</code> for the full list). With <code>set_translate ()</code>, you can select a translation type: <code>SCCS</code> is currently the only supported type, <code>CVS</code> and <code>RCS</code> are planned. Passing a false argument will reset translation to none.</p>
+
+<p>You can also pass a hashref that will do custom translation:</p>
+
+<pre><code>  my %trans = (
+    &quot;%W%&quot; =&gt; &quot;This is my what id&quot;,
+    &quot;%E%&quot; =&gt; &quot;Yesterday&quot;,
+    &quot;%U%&quot; =&gt; &quot;Noon&quot;,
+    #...
+    };
+  $sccs-&gt;set_translate (\%tran);</code></pre>
+
+<p>any missing keywords will not be translated.</p>
+
+</dd>
+</dl>
+
+<h2 id="Delta-functions">Delta functions</h2>
+
+<dl>
+
+<dt id="delta">delta</dt>
+<dd>
+
+</dd>
+<dt id="delta-revision">delta (&lt;revision&gt;)</dt>
+<dd>
+
+</dd>
+<dt id="delta-version">delta (&lt;version&gt;)</dt>
+<dd>
+
+<p>If called without argument, it returns the delta of the last revision as a hashref.</p>
+
+<p>If called with a revision argument, it returns you the delta of that revision. If there is no such revision, returns undef.</p>
+
+<p>If called with a version argument, it returns you the delta of that version. If there is no such version, returns undef.</p>
+
+<p>The elements of the hash returned are:</p>
+
+<dl>
+
+<dt id="lines_ins">lines_ins</dt>
+<dd>
+
+<p>The number of lines inserted in this delta</p>
+
+</dd>
+<dt id="lines_del">lines_del</dt>
+<dd>
+
+<p>The number of lines deleted in this delta</p>
+
+</dd>
+<dt id="lines_unc">lines_unc</dt>
+<dd>
+
+<p>The number of lines unchanged in this delta</p>
+
+</dd>
+<dt id="type">type</dt>
+<dd>
+
+<p>The type of this delta. Usually this will be a <code>D</code>, but it could also be a <code>R</code>, which has not (yet) been tested.</p>
+
+</dd>
+<dt id="version">version</dt>
+<dd>
+
+<p>The version (SID) of this delta</p>
+
+</dd>
+<dt id="release">release</dt>
+<dd>
+
+<p>The release number of this delta</p>
+
+</dd>
+<dt id="level">level</dt>
+<dd>
+
+<p>The level number of this delta</p>
+
+</dd>
+<dt id="branch">branch</dt>
+<dd>
+
+<p>The branch number of this delta. Can be undef</p>
+
+</dd>
+<dt id="sequence">sequence</dt>
+<dd>
+
+<p>The sequence number of this delta. Can be undef</p>
+
+</dd>
+<dt id="date">date</dt>
+<dd>
+
+<p>The date this delta was submitted in YY/MM/DD format</p>
+
+</dd>
+<dt id="time">time</dt>
+<dd>
+
+<p>The time this delta was submitted in HH:MM:SS format</p>
+
+</dd>
+<dt id="stamp">stamp</dt>
+<dd>
+
+<p>The <code>date</code> and <code>time</code> elements converted to a unix time stamp</p>
+
+</dd>
+<dt id="committer">committer</dt>
+<dd>
+
+<p>The logname of the user that committed this delta</p>
+
+</dd>
+<dt id="mr">mr</dt>
+<dd>
+
+<p>The MR numbers of this delta, separated by &quot;, &quot;</p>
+
+</dd>
+<dt id="comment1">comment</dt>
+<dd>
+
+<p>The comment as entered with this delta</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="version1">version</dt>
+<dd>
+
+</dd>
+<dt id="version-revision">version (&lt;revision&gt;)</dt>
+<dd>
+
+<p>If called without argument, it returns the last version, just as the second return value of <code>current ()</code> in list context.</p>
+
+<p>If called with a revision argument, it returns you the version that matches that revision. It returns undef if no matching version is found.</p>
+
+</dd>
+<dt id="revision">revision</dt>
+<dd>
+
+</dd>
+<dt id="revision-version">revision (&lt;version&gt;)</dt>
+<dd>
+
+<p>If called without argument, it returns the last revision, just as <code>current ()</code> returns in scalar context.</p>
+
+<p>If called with a version argument, it returns you the revision that matches that version. It returns undef if no matching revision is found.</p>
+
+</dd>
+<dt id="revision_map">revision_map</dt>
+<dd>
+
+<p>Returns an anonymous list of <code>revision</code> - <code>version</code> pairs (in anonymous lists).</p>
+
+</dd>
+</dl>
+
+<h2 id="Content-function">Content function</h2>
+
+<dl>
+
+<dt id="body">body</dt>
+<dd>
+
+</dd>
+<dt id="body-revision">body (&lt;revision&gt;)</dt>
+<dd>
+
+</dd>
+<dt id="body-version">body (&lt;version&gt;)</dt>
+<dd>
+
+<p>In scalar context returns the full body for the given revision. If no revision is passed, the current (most recent) revision is used. If a version is passed, the matching revision will be used. If the is no matching version or revision, <code>body ()</code> returns <code>undef</code>.</p>
+
+<p>In list context, <code>body ()</code> returns the list of chomped lines for the given revision.</p>
+
+<p><code>body ()</code> will use the translation set by <code>set_translate ()</code>.</p>
+
+</dd>
+<dt id="diff">diff</dt>
+<dd>
+
+<p>NYI</p>
+
+</dd>
+<dt id="translate-revision-text">translate (&lt;revision&gt;, &lt;text&gt;)</dt>
+<dd>
+
+<p>Translate the SCCS keywords in the text passed using the plan set with <code>set_translate ()</code>.</p>
+
+<p>The SCCS keywords are</p>
+
+<dl>
+
+<dt id="M">%M%</dt>
+<dd>
+
+<p>Module name: either the value of the m flag in the file (see <code>flags</code>), or if absent, the name of the SCCS file with the leading s. removed.</p>
+
+</dd>
+<dt id="I">%I%</dt>
+<dd>
+
+<p>SCCS identification (SID) (%R%.%L%.%B%.%S%) of the retrieved text.</p>
+
+</dd>
+<dt id="R">%R%</dt>
+<dd>
+
+<p>Release.</p>
+
+</dd>
+<dt id="L">%L%</dt>
+<dd>
+
+<p>Level.</p>
+
+</dd>
+<dt id="B">%B%</dt>
+<dd>
+
+<p>Branch.</p>
+
+</dd>
+<dt id="S">%S%</dt>
+<dd>
+
+<p>Sequence.</p>
+
+</dd>
+<dt id="D">%D%</dt>
+<dd>
+
+<p>Current date (YY/MM/DD).</p>
+
+</dd>
+<dt id="H">%H%</dt>
+<dd>
+
+<p>Current date (MM/DD/YY).</p>
+
+</dd>
+<dt id="T">%T%</dt>
+<dd>
+
+<p>Current time (HH:MM:SS).</p>
+
+</dd>
+<dt id="E">%E%</dt>
+<dd>
+
+<p>Date newest applied delta was created (YY/MM/DD).</p>
+
+</dd>
+<dt id="G">%G%</dt>
+<dd>
+
+<p>Date newest applied delta was created (MM/DD/YY).</p>
+
+</dd>
+<dt id="U">%U%</dt>
+<dd>
+
+<p>Time newest applied delta was created (HH:MM:SS).</p>
+
+</dd>
+<dt id="Y">%Y%</dt>
+<dd>
+
+<p>Module type: value of the t flag in the SCCS file (see <code>flags</code>).</p>
+
+</dd>
+<dt id="F">%F%</dt>
+<dd>
+
+<p>SCCS file name.</p>
+
+</dd>
+<dt id="P">%P%</dt>
+<dd>
+
+<p>Fully qualified SCCS file name.</p>
+
+</dd>
+<dt id="Q">%Q%</dt>
+<dd>
+
+<p>The value of the q flag in the file (see <code>flags</code>).</p>
+
+</dd>
+<dt id="C">%C%</dt>
+<dd>
+
+<p>Current line number. This keyword is intended for identifying messages output by the program such as --this should not have happened-- type errors. It is not intended to be used on every line to provide sequence numbers.</p>
+
+</dd>
+<dt id="Z">%Z%</dt>
+<dd>
+
+<p>The 4-character string @(#) @(#) recognizable by what (see what(1)).</p>
+
+</dd>
+<dt id="W">%W%</dt>
+<dd>
+
+<p>A shorthand notation for constructing what(1) strings for HP-UX system program files. %W%=%Z%%M%horizontal-tab%I%</p>
+
+</dd>
+<dt id="A">%A%</dt>
+<dd>
+
+<p>Another shorthand notation for constructing what(1) strings for non-HP-UX system program files. %A% = %Z%%Y% %M% %I%%Z%</p>
+
+</dd>
+</dl>
+
+<p>For now, %D%, %H%, %T%, %G%, %F%, %P%, and %C% are not translated. I see no use for %D%, %H%, or %T%. People that use %G% have enough problems already, so they should be able to cope, %F% and %P% lose their meaning after conversion and %C% might be done later.</p>
+
+<p>If you convert from SCCS to git, it might be advisable to not do any translation at all, and leave the keywords in, just the way they are, and create a checkout hook.</p>
+
+</dd>
+</dl>
+
+<h1 id="SPECIFICATION">SPECIFICATION</h1>
+
+<p>SCCS file format is reasonable well documented. I have included a manual page for sccsfile for HP-UX in doc/</p>
+
+<h1 id="EXAMPLES">EXAMPLES</h1>
+
+<p>See the files in examples/ for my attempts to start converters to other VCSs</p>
+
+<h1 id="BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</h1>
+
+<p>As this module is created as a base for conversion to more useful and robust VCSs, it is a read-only interface to the SCCS files.</p>
+
+<p>Translation is incomplete and might be questionable, but at least there is a workaround.</p>
+
+<h1 id="TODO">TODO</h1>
+
+<pre><code> * improve documentation
+ * implement diff ()
+ * more tests
+ * autodetect the available VCS candidates for sccs2***
+ * sccs2git documentation and installation
+ * sccs2rcs
+ * sccs2cvs
+ * sccs2hg
+ * sccs2svn
+ * errors and warnings
+ * provide hooks to VCS::</code></pre>
+
+<h1 id="DIAGNOSTICS">DIAGNOSTICS</h1>
+
+<p>First errors, than diagnostics ...</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<dl>
+
+<dt id="SCCS">SCCS</dt>
+<dd>
+
+<p>source code at http://sccs.sourceforge.net/</p>
+
+<p>manual pages at http://sccs.sourceforge.net/man/index.html</p>
+
+<p>http://en.wikipedia.org/wiki/Source_Code_Control_System</p>
+
+</dd>
+<dt id="CSSC">CSSC</dt>
+<dd>
+
+<p>https://sourceforge.net/projects/cssc A GNU project that aims to be a drop-in replacement for SCCS. It is written in c++ and therefor disqualifies to be used at any older OS that does support SCCS but has no C++ compiler. And even if you have one, there is a good chance it won&#39;t build or does not bass the basic tests. I did not get it to work.</p>
+
+</dd>
+<dt id="VCS">VCS</dt>
+<dd>
+
+<p>http://search.cpan.org/dist/VCS</p>
+
+</dd>
+<dt id="GIT">GIT</dt>
+<dd>
+
+<p>http://www.kernel.org/pub/software/scm/git/docs/</p>
+
+</dd>
+</dl>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>H.Merijn Brand &lt;h.m.brand@xs4all.nl&gt;</p>
+
+<h1 id="LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</h1>
+
+<p>Copyright (C) 2007-2020 H.Merijn Brand</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

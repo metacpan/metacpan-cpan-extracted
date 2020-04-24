@@ -2,6 +2,8 @@ use Test::Arrow;
 
 my $arr = Test::Arrow->new;
 
+$arr->got(undef)->expected(undef)->is_deeply;
+
 $arr->got(123)->expected(123)->is_deeply;
 
 $arr->got([])->expected([])->is_deeply;
@@ -15,6 +17,10 @@ $arr->got({})->expected({})->is_deeply;
 $arr->got({foo => 2})->expected({foo => 2})->is_deeply;
 
 $arr->got([1, {foo => 3}])->expected([1, {foo => 3}])->is_deeply;
+
+my $r = {bar => 'baz'};
+
+$arr->got($r)->expected($r)->is_deeply;
 
 $arr->is_deeply([1,2,3], [1,2,3], 'is_deeply');
 

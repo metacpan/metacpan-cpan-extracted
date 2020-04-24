@@ -1,5 +1,11 @@
-Revision history for App-ListIntlPhoneCodes
+0.02    2020-04-23  Released-By: PERLANCAR; Urgency: medium
 
-0.01    2016-02-13 (PERLANCAR)
+	- Replace the use of the deprecated Number::Phone::CountryCode with
+	  Number::Phone::Country.
+
+	- Avoid perl undef warning.
+
+
+0.01    2016-02-13  Released-By: PERLANCAR
 
         - First release.

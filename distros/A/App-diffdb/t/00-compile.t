@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/diffdb.pm'
@@ -14,7 +14,9 @@ my @module_files = (
 
 my @scripts = (
     'script/diffdb',
-    'script/diffdb-sqlite'
+    'script/diffdb-sqlite',
+    'script/diffdbtable',
+    'script/diffdbtable-sqlite'
 );
 
 # no fake home requested

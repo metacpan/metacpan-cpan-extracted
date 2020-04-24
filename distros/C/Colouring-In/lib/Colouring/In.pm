@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use smallnum;
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 our %TOOL;
 
@@ -325,7 +325,7 @@ Colouring::In - color or colour.
 
 =head1 VERSION
 
-Version 0.18
+Version 0.19
 
 =cut
 

@@ -13,7 +13,7 @@ use Data::Object::ClassHas;
 
 extends 'Data::Object::String::Func';
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 
 # BUILD
 

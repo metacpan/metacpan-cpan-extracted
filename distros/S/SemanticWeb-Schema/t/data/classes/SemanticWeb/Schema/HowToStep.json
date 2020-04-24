@@ -4,8 +4,8 @@
       "rdfs:comment" : "A step in the instructions for how to achieve a result. It is an ordered list with HowToDirection and/or HowToTip items.",
       "rdfs:label" : "HowToStep",
       "rdfs:subClassOf" : [
-         "schema:CreativeWork",
          "schema:ItemList",
+         "schema:CreativeWork",
          "schema:ListItem"
       ]
    },

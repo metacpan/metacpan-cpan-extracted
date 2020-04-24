@@ -29,8 +29,8 @@
          "rdfs:label" : "legalStatus",
          "schema:domainIncludes" : [
             "schema:Drug",
-            "schema:DietarySupplement",
-            "schema:MedicalEntity"
+            "schema:MedicalEntity",
+            "schema:DietarySupplement"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [

@@ -4,46 +4,55 @@ package Boxer::Task::Classify;
 
 =cut
 
-use v5.14;
+use v5.20;
 use utf8;
-use strictures 2;
 use Role::Commons -all;
+use feature 'signatures';
+no warnings "experimental::signatures";
 use namespace::autoclean 0.16;
 use autodie qw(:all);
 use IPC::System::Simple;
 
 use File::BaseDir qw(data_dirs);
-use Boxer::World::Reclass;
+use Boxer;
 
 use Moo;
 use MooX::StrictConstructor;
 extends qw(Boxer::Task);
 
 use Types::Standard qw(Maybe);
-use Boxer::Types qw( DataDir ClassDir NodeDir Suite );
+use Boxer::Types qw( WorldName DataDir ClassDir NodeDir Suite );
+
+use strictures 2;
+no warnings "experimental::signatures";
 
 =head1 VERSION
 
-Version v1.4.0
+Version v1.4.2
 
 =cut
 
-our $VERSION = "v1.4.0";
+our $VERSION = "v1.4.2";
 
 # permit callers to sloppily pass undefined values
-sub BUILDARGS
+sub BUILDARGS ( $class, %args )
 {
-	my ( $class, %args ) = @_;
 	delete @args{ grep !defined( $args{$_} ), keys %args };
 	return {%args};
 }
 
-has datadir => (
-	is       => 'lazy',
-	isa      => Maybe [DataDir],
-	coerce   => 1,
+has world => (
+	is       => 'ro',
+	isa      => WorldName,
 	required => 1,
-	default  => sub {undef},
+	default  => sub {'reclass'},
+);
+
+has datadir => (
+	is      => 'lazy',
+	isa     => Maybe [DataDir],
+	coerce  => 1,
+	default => sub {undef},
 );
 
 has suite => (
@@ -61,16 +70,15 @@ has classdir => (
 	required => 1,
 );
 
-sub _build_classdir
+sub _build_classdir ($self)
 {
-	my ($self) = @_;
 	my $dir;
 	if ( $self->datadir ) {
-		$self->_logger->trace('Resolving nodedir from datadir');
+		$self->_logger->trace('Resolving classdir from datadir');
 		$dir = $self->datadir->child('classes');
 	}
 	else {
-		$self->_logger->trace('Resolving nodedir from XDG_DATA_DIRS');
+		$self->_logger->trace('Resolving classdir from XDG_DATA_DIRS');
 		$dir = scalar data_dirs( 'boxer', $_[0]->suite, 'classes' );
 	}
 	return $dir;
@@ -83,9 +91,8 @@ has nodedir => (
 	required => 1,
 );
 
-sub _build_nodedir
+sub _build_nodedir ($self)
 {
-	my ($self) = @_;
 	my $dir;
 	if ( $self->datadir ) {
 		$self->_logger->trace('Resolving nodedir from datadir');
@@ -98,9 +105,8 @@ sub _build_nodedir
 	return $dir;
 }
 
-sub run
+sub run ($self)
 {
-	my $self = shift;
 	my @args = (
 		suite    => scalar $self->suite,
 		classdir => scalar $self->classdir,
@@ -110,7 +116,7 @@ sub run
 		'Classifying with reclass',
 		$self->_logger->is_debug() ? {@args} : (),
 	);
-	return Boxer::World::Reclass->new(@args);
+	return Boxer->get_world( $self->world )->new(@args);
 }
 
 =head1 AUTHOR

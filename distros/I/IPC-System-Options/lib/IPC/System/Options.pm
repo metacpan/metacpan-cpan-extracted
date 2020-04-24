@@ -1,9 +1,9 @@
 package IPC::System::Options;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-10'; # DATE
+our $DATE = '2020-04-23'; # DATE
 our $DIST = 'IPC-System-Options'; # DIST
-our $VERSION = '0.334'; # VERSION
+our $VERSION = '0.336'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
@@ -66,15 +66,30 @@ sub _system_or_readpipe_or_run_or_start {
                         capture_stdout|capture_stderr|capture_merged|
                         tee_stdout|tee_stderr|tee_merged|
                         chdir|dies?|dry_run|env|lang|log|max_log_output|shell|
+                        exit_code_success_criteria|
                         stdin # XXX: only for run()
                     )\z/x;
     }
 
     my $opt_die = $opts->{die} || $opts->{dies};
 
-    my $exit_code;
+    my $child_error;
     my $os_error = "";
+    my $exit_code_is_success;
     my $extra_error;
+
+    my $code_exit_code_is_success = sub {
+        my $exit_code = shift;
+        if (defined $opts->{exit_code_success_criteria}) {
+            if    (ref $opts->{exit_code_success_criteria} eq ''      ) { return $exit_code == $opts->{exit_code_success_criteria} }
+            elsif (ref $opts->{exit_code_success_criteria} eq 'ARRAY' ) { return (grep { $exit_code==$_ } @{ $opts->{exit_code_success_criteria} }) ? 1:0 }
+            elsif (ref $opts->{exit_code_success_criteria} eq 'Regexp') { return $exit_code =~ $opts->{exit_code_success_criteria} }
+            elsif (ref $opts->{exit_code_success_criteria} eq 'CODE'  ) { return $opts->{exit_code_success_criteria}->($exit_code) }
+            else { die "exit_code_success_criteria must be a number, array of numbers, Regexp, or coderef" }
+        } else {
+            return $exit_code == 0;
+        }
+    };
 
     if ($opts->{log}) {
         require Log::ger;
@@ -87,14 +102,16 @@ sub _system_or_readpipe_or_run_or_start {
         $cwd = Cwd::getcwd();
         if (!defined $cwd) { # checking $! is always true here, why?
             $log->error("Can't getcwd: $!") if $log;
-            $exit_code = -1;
+            $child_error = -1;
+            $exit_code_is_success = 0;
             $os_error = $!;
             $extra_error = "Can't getcwd";
             goto CHECK_RESULT;
         }
         unless (chdir $opts->{chdir}) {
             $log->error("Can't chdir to '$opts->{chdir}': $!") if $log;
-            $exit_code = -1;
+            $child_error = -1;
+            $exit_code_is_success = 0;
             $os_error = $!;
             $extra_error = "Can't chdir";
             goto CHECK_RESULT;
@@ -185,7 +202,8 @@ sub _system_or_readpipe_or_run_or_start {
                 warn "[DRY RUN] system("._args2cmd(@args).")\n";
             }
             if ($opts->{dry_run}) {
-                $exit_code = 0;
+                $child_error = 0;
+                $exit_code_is_success = 1;
                 $res = "";
                 goto CHECK_RESULT;
             }
@@ -202,7 +220,8 @@ sub _system_or_readpipe_or_run_or_start {
                 # might or might not use shell (if @args == 1)
                 $res = system @args;
             }
-            $exit_code = $?;
+            $child_error = $?;
+            $exit_code_is_success = $code_exit_code_is_success->($? < 0 ? $? : $? >> 8);
             $os_error = $!;
         };
         $code_capture->($doit);
@@ -227,8 +246,9 @@ sub _system_or_readpipe_or_run_or_start {
                 warn "[DRY RUN] readpipe("._args2cmd(@args).")\n";
             }
             if ($opts->{dry_run}) {
-                $exit_code = 0;
-                $res = "";
+                $child_error = 0;
+                $exit_code_is_success = 1;
+               $res = "";
                 goto CHECK_RESULT;
             }
         }
@@ -260,7 +280,8 @@ sub _system_or_readpipe_or_run_or_start {
                     $res = `$cmd`;
                 }
             }
-            $exit_code = $?;
+            $child_error = $? < 0 ? $? : $? >> 8;
+            $exit_code_is_success = $code_exit_code_is_success->($? < 0 ? $? : $? >> 8);
             $os_error = $!;
         };
         $code_capture->($doit);
@@ -298,7 +319,7 @@ sub _system_or_readpipe_or_run_or_start {
                       defined($res_show) ? $res_show : $res,
                       defined($res_show) ?
                           $opts->{max_log_output} : length($res))
-                unless $exit_code;
+                if $exit_code_is_success;
         }
 
     } elsif ($which eq 'run' || $which eq 'start') {
@@ -320,7 +341,8 @@ sub _system_or_readpipe_or_run_or_start {
                 warn "[DRY RUN] $which(".join(", ", @args).")\n";
             }
             if ($opts->{dry_run}) {
-                $exit_code = 0;
+                $child_error = 0;
+                $exit_code_is_success = 1;
                 $res = "";
                 goto CHECK_RESULT;
             }
@@ -347,10 +369,12 @@ sub _system_or_readpipe_or_run_or_start {
             }, # err
         );
         if ($which eq 'run') {
-            $exit_code = $?;
+            $child_error = $?;
+            $exit_code_is_success = $code_exit_code_is_success->($? < 0 ? $? : $? >> 8);
             $os_error = $!;
         } else {
-            $exit_code = 0;
+            $child_error = 0;
+            $exit_code_is_success = 1;
             $os_error = "";
         }
 
@@ -371,7 +395,7 @@ sub _system_or_readpipe_or_run_or_start {
     if ($cwd) {
         unless (chdir $cwd) {
             $log->error("Can't chdir back to '$cwd': $!") if $log;
-            $exit_code ||= -1;
+            $child_error ||= -1;
             $os_error = $!;
             $extra_error = "Can't chdir back";
             goto CHECK_RESULT;
@@ -379,14 +403,14 @@ sub _system_or_readpipe_or_run_or_start {
     }
 
   CHECK_RESULT:
-    if ($exit_code) {
+    unless ($exit_code_is_success) {
         if ($opts->{log} || $opt_die) {
             my $msg = sprintf(
                 "%s(%s) failed: %s (%s)%s%s%s",
                 $which,
                 join(" ", @args),
-                defined $extra_error ? "" : $exit_code,
-                defined $extra_error ? "$extra_error: $os_error" : explain_child_error($exit_code, $os_error),
+                defined $extra_error ? "" : $child_error,
+                defined $extra_error ? "$extra_error: $os_error" : explain_child_error($child_error, $os_error),
                 (ref($opts->{capture_stdout}) ?
                      ", captured stdout: <<" .
                      (defined ${$opts->{capture_stdout}} ? ${$opts->{capture_stdout}} : ''). ">>" : ""),
@@ -403,7 +427,7 @@ sub _system_or_readpipe_or_run_or_start {
     }
 
     if ($which ne 'start') {
-        $? = $exit_code;
+        $? = $child_error;
     }
 
     return $wa && $which ne 'run' && $which ne 'start' ? @$res : $res;
@@ -445,7 +469,7 @@ IPC::System::Options - Perl's system() and readpipe/qx replacement, with options
 
 =head1 VERSION
 
-This document describes version 0.334 of IPC::System::Options (from Perl distribution IPC-System-Options), released on 2020-03-10.
+This document describes version 0.336 of IPC::System::Options (from Perl distribution IPC-System-Options), released on 2020-04-23.
 
 =head1 SYNOPSIS
 
@@ -629,6 +653,22 @@ An example of how this option can be used:
 This will allow you to run script in dry-run mode by setting environment
 variable.
 
+=item * exit_code_success_criteria => int|array[int]|Regexp|code
+
+Specify which command exit codes are to be marked as success. For example, exit
+code 1 for the B<diff> command does not signify an error; it just means that the
+two input files are different. So in this case you can either specify one of:
+
+ exit_code_success_criteria => [0,1]
+ exit_code_success_criteria => qr/\A(0|1)\z/
+ exit_code_success_criteria => sub { $_[0] == 0 || $_[0] == 1 }
+
+By default, if this option is not specified, non-zero exit codes count as
+failure.
+
+Currently this only affects logging: when exit code is considered non-success, a
+warning log is produced and C<readpipe()> does not log the result.
+
 =back
 
 =head2 readpipe([ \%opts ], @args)
@@ -695,6 +735,10 @@ See option documentation in C<system()>.
 
 See option documentation in C<system()>.
 
+=item * exit_code_success_criteria => int|array[int]|Regexp|code
+
+See option documentation in C<system()>.
+
 =back
 
 =head2 run([ \%opts ], @args)
@@ -752,6 +796,10 @@ Supply standard input.
 See option documentation in C<system()>.
 
 =item * dry_run => bool
+
+See option documentation in C<system()>.
+
+=item * exit_code_success_criteria => int|array[int]|Regexp|code
 
 See option documentation in C<system()>.
 

@@ -2,7 +2,28 @@ NAME
     Boxer - system deployment ninja tricks
 
 VERSION
-    Version v1.4.0
+    Version v1.4.2
+
+SYNOPSIS
+        use Boxer;
+
+        my $domain = Boxer->get_world('Reclass')->new( suite => 'stretch', data => 'examples' );
+        say $domain->list_parts();
+
+        my $goal = $domain->get_part('lxp5');
+        my $plan = $domain->map( $goal, 1 );
+        $plan->as_file( Boxer::File::WithSkeleton->new( basename => 'preseed.cfg' ) );
+
+        my $serializer = Boxer::File::WithSkeleton->new( skeleton => 'script.sh.in' );
+        $plan->as_file( $serializer->file( 'script.sh', 1 ) );
+
+        my $anothergoal = $domain->get_part('parl-greens');
+        my $anotherplan = $domain->map($anothergoal);
+        $anotherplan->as_file( $serializer->file( 'parl-greens.sh', 1 ) );
+
+        my $newdomain = Boxer->get_world()->new( suite => 'buster', data => 'examples' );
+        my $plan_a    = $newdomain->map($goal);
+        $plan_a->as_file( Boxer::File::WithSkeleton->new( basename => 'preseed_pure.cfg' ) );
 
 DESCRIPTION
     Framework for system deployment ninja tricks.

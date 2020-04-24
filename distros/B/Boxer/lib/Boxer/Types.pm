@@ -6,26 +6,32 @@ package Boxer::Types;
 
 use v5.14;
 use utf8;
-use strictures 2;
 use Role::Commons -all;
 use namespace::autoclean;
 
 use Path::Tiny;
 
 use Type::Library -base, -declare => qw(
-	DataDir ClassDir NodeDir SkelDir Basename Suite SerializationList );
+	WorldName DataDir ClassDir NodeDir SkelDir Basename Suite SerializationList );
 use Type::Utils;
 use Types::Standard qw( ArrayRef Split Str Tuple StrMatch slurpy );
 use Types::Common::String qw( NonEmptySimpleStr LowerCaseSimpleStr );
 use Types::Path::Tiny qw(Dir);
 
+use strictures 2;
+no warnings "experimental::signatures";
+
 =head1 VERSION
 
-Version v1.4.0
+Version v1.4.2
 
 =cut
 
-our $VERSION = "v1.4.0";
+our $VERSION = "v1.4.2";
+
+declare WorldName, as LowerCaseSimpleStr,
+	coercion => 1,
+	message {'Must be a single lowercase word'};
 
 declare DataDir, as Dir, coercion => 1, message {
 	'Must be an existing directory containing directories for boxer classes and/or boxer nodes';

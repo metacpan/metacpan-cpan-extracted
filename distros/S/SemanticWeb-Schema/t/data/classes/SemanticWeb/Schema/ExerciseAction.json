@@ -65,8 +65,8 @@
          "rdfs:comment" : "Type(s) of exercise or activity, such as strength training, flexibility training, aerobics, cardiac rehabilitation, etc.",
          "rdfs:label" : "exerciseType",
          "schema:domainIncludes" : [
-            "schema:ExercisePlan",
-            "schema:ExerciseAction"
+            "schema:ExerciseAction",
+            "schema:ExercisePlan"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"
@@ -78,8 +78,8 @@
          "rdfs:subPropertyOf" : "schema:location",
          "schema:domainIncludes" : [
             "schema:MoveAction",
-            "schema:ExerciseAction",
-            "schema:TransferAction"
+            "schema:TransferAction",
+            "schema:ExerciseAction"
          ],
          "schema:rangeIncludes" : "schema:Place"
       },
@@ -121,9 +121,9 @@
          "rdfs:label" : "toLocation",
          "rdfs:subPropertyOf" : "schema:location",
          "schema:domainIncludes" : [
-            "schema:TransferAction",
-            "schema:MoveAction",
             "schema:ExerciseAction",
+            "schema:MoveAction",
+            "schema:TransferAction",
             "schema:InsertAction"
          ],
          "schema:rangeIncludes" : "schema:Place"

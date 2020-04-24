@@ -1,4 +1,3 @@
-
 DBD::Pg is Copyright (C) 1994-2020, Greg Sabino Mullane
 
 DBD::Pg  --  the DBI PostgreSQL interface for Perl
@@ -6,7 +5,7 @@ DBD::Pg  --  the DBI PostgreSQL interface for Perl
 DESCRIPTION:
 ------------
 
-This is version 3.10.5 of DBD::Pg, the Perl interface to Postgres using DBI. 
+This is version 3.11.0 of DBD::Pg, the Perl interface to Postgres using DBI. 
 The web site for this interface, and the latest version, can be found at:
 
 	http://search.cpan.org/dist/DBD-Pg/
@@ -232,8 +231,21 @@ running the Makefile.PL, by running pexports and dlltool
 as shown below, within the C:\Program Files\PostgreSQL\8.3\bin
 directory:
 
-  pexports libpq.dll > libpq.def
-  dlltool -dllname libpq.dll --def libpq.def --output-lib ..\lib\libpq.a
+  C:\Windows\> C:\MinGW\bin\pexports libpq.dll > libpq.def
+  C:\Windows\> C:\MinGW\bin\dlltool -dllname libpq.dll --def libpq.def
+--output-lib "C:\Program
+Files\PostgreSQL\12\lib\libpq.a"
+
+pexports and dlltool are included with MinGW - Minimalist Gnu for Windows,
+found here:
+
+  https://osdn.net/projects/mingw/releases/
+
+Once you have installed MinGW you can install pexports and dlltool as
+follows:
+
+  C:\Windows\> C:\MinGW\bin\mingw-get.exe install pexports
+  C:\Windows\> C:\MinGW\bin\mingw-get.exe install dlltool
 
 Then you'll need to set the required environment:
 
@@ -248,7 +260,7 @@ Then you'll need to set the required environment:
 Note that the username and password are the ones for PostgreSQL, NOT the 
 ones for the Windows account that the PostgreSQL installer creates to run 
 the service safely.
-  
+
 (You may wish to set these variables on the system level, by going to
 Control Panel > System > Advanced tab > Environment Variables button and
 adding the environment variables there.)
@@ -371,4 +383,3 @@ LICENSE INFORMATION:
 This module (DBD::Pg) is free software; you can redistribute it and/or modify it 
 under the same terms as Perl 5.10.0. For more details, see the full text of the 
 licenses in the directory LICENSES.
-

@@ -85,9 +85,6 @@ sub basic_tests {
         is($color->toOnTerm, $args{toOnTerm}, "$args{toTerm}");
 }
 
-my $co = Colouring::In->new('hsla(0, 0%, 100%, 0.3)')->toRGBA;
-diag explain $co;
-
 done_testing();
 
 1;

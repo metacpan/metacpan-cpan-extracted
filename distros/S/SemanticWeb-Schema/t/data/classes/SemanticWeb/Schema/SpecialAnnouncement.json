@@ -33,19 +33,19 @@
          "rdfs:label" : "category",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:Product",
-            "schema:PhysicalActivity",
             "schema:Invoice",
             "schema:Recommendation",
-            "schema:SpecialAnnouncement",
-            "schema:ActionAccessSpecification",
-            "schema:Service",
+            "schema:Product",
             "schema:Offer",
-            "schema:URL"
+            "schema:Service",
+            "schema:PhysicalActivity",
+            "schema:SpecialAnnouncement",
+            "schema:ActionAccessSpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:Thing",
+            "schema:URL",
             "schema:Text",
+            "schema:Thing",
             "schema:PhysicalActivityCategory"
          ]
       },
@@ -62,14 +62,14 @@
             "issue-2521"
          ],
          "schema:domainIncludes" : [
-            "schema:SpecialAnnouncement",
             "schema:RealEstateListing",
-            "schema:CDCPMDRecord",
-            "schema:JobPosting"
+            "schema:JobPosting",
+            "schema:SpecialAnnouncement",
+            "schema:CDCPMDRecord"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       },
       "schema:diseasePreventionInfo" : {
@@ -81,8 +81,8 @@
          "schema:domainIncludes" : "schema:SpecialAnnouncement",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:WebContent",
-            "schema:URL"
+            "schema:URL",
+            "schema:WebContent"
          ]
       },
       "schema:diseaseSpreadStatistics" : {
@@ -94,9 +94,9 @@
          "schema:domainIncludes" : "schema:SpecialAnnouncement",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
+            "schema:Dataset",
             "schema:URL",
             "schema:WebContent",
-            "schema:Dataset",
             "schema:Observation"
          ]
       },
@@ -109,9 +109,19 @@
          "schema:domainIncludes" : "schema:SpecialAnnouncement",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:WebContent",
-            "schema:URL"
+            "schema:URL",
+            "schema:WebContent"
          ]
+      },
+      "schema:governmentBenefitsInfo" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2534",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "governmentBenefitsInfo provides information about government benefits associated with a SpecialAnnouncement.",
+         "rdfs:label" : "governmentBenefitsInfo",
+         "schema:category" : "issue-2534",
+         "schema:domainIncludes" : "schema:SpecialAnnouncement",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:GovernmentService"
       },
       "schema:newsUpdatesAndGuidelines" : {
          "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2490",
@@ -122,8 +132,8 @@
          "schema:domainIncludes" : "schema:SpecialAnnouncement",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:WebContent"
+            "schema:WebContent",
+            "schema:URL"
          ]
       },
       "schema:publicTransportClosuresInfo" : {
@@ -148,8 +158,8 @@
          "schema:domainIncludes" : "schema:SpecialAnnouncement",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:WebContent"
+            "schema:WebContent",
+            "schema:URL"
          ]
       },
       "schema:schoolClosuresInfo" : {
@@ -161,8 +171,8 @@
          "schema:domainIncludes" : "schema:SpecialAnnouncement",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:WebContent"
+            "schema:WebContent",
+            "schema:URL"
          ]
       },
       "schema:travelBans" : {
@@ -185,13 +195,13 @@
          "rdfs:label" : "webFeed",
          "schema:category" : "issue-373",
          "schema:domainIncludes" : [
-            "schema:PodcastSeries",
-            "schema:SpecialAnnouncement"
+            "schema:SpecialAnnouncement",
+            "schema:PodcastSeries"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:DataFeed"
+            "schema:DataFeed",
+            "schema:URL"
          ]
       }
    }

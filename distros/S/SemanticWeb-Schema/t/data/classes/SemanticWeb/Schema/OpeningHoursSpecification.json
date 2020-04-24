@@ -21,8 +21,8 @@
          "rdfs:comment" : "The day of the week for which these opening hours are valid.",
          "rdfs:label" : "dayOfWeek",
          "schema:domainIncludes" : [
-            "schema:EducationalOccupationalProgram",
-            "schema:OpeningHoursSpecification"
+            "schema:OpeningHoursSpecification",
+            "schema:EducationalOccupationalProgram"
          ],
          "schema:rangeIncludes" : "schema:DayOfWeek"
       },
@@ -40,13 +40,13 @@
          "rdfs:comment" : "The date when the item becomes valid.",
          "rdfs:label" : "validFrom",
          "schema:domainIncludes" : [
-            "schema:Offer",
-            "schema:OpeningHoursSpecification",
             "schema:MonetaryAmount",
-            "schema:Permit",
+            "schema:OpeningHoursSpecification",
             "schema:LocationFeatureSpecification",
             "schema:PriceSpecification",
-            "schema:Demand"
+            "schema:Offer",
+            "schema:Demand",
+            "schema:Permit"
          ],
          "schema:rangeIncludes" : [
             "schema:DateTime",
@@ -59,13 +59,13 @@
          "rdfs:comment" : "The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours.",
          "rdfs:label" : "validThrough",
          "schema:domainIncludes" : [
-            "schema:Demand",
             "schema:MonetaryAmount",
             "schema:OpeningHoursSpecification",
-            "schema:JobPosting",
-            "schema:Offer",
+            "schema:Demand",
             "schema:LocationFeatureSpecification",
-            "schema:PriceSpecification"
+            "schema:PriceSpecification",
+            "schema:JobPosting",
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : [
             "schema:Date",

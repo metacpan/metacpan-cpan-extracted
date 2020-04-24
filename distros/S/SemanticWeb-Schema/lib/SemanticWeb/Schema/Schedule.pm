@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.3';
+our $VERSION = 'v7.0.4';
 
 
 has by_day => (
@@ -54,6 +54,14 @@ has end_date => (
     is        => 'rw',
     predicate => '_has_end_date',
     json_ld   => 'endDate',
+);
+
+
+
+has end_time => (
+    is        => 'rw',
+    predicate => '_has_end_time',
+    json_ld   => 'endTime',
 );
 
 
@@ -98,6 +106,14 @@ has start_date => (
 
 
 
+has start_time => (
+    is        => 'rw',
+    predicate => '_has_start_time',
+    json_ld   => 'startTime',
+);
+
+
+
 
 
 1;
@@ -114,7 +130,7 @@ SemanticWeb::Schema::Schedule - A schedule defines a repeating time period used 
 
 =head1 VERSION
 
-version v7.0.3
+version v7.0.4
 
 =head1 DESCRIPTION
 
@@ -234,6 +250,31 @@ A end_date should be one of the following types:
 
 A predicate for the L</end_date> attribute.
 
+=head2 C<end_time>
+
+C<endTime>
+
+=for html <p>The endTime of something. For a reserved event or service (e.g.
+FoodEstablishmentReservation), the time that it is expected to end. For
+actions that span a period of time, when the action was performed. e.g.
+John wrote a book from January to <em>December</em>. For media, including
+audio and video, it's the time offset of the end of a clip within a larger
+file.<br/><br/> Note that Event uses startDate/endDate instead of
+startTime/endTime, even when describing dates with times. This situation
+may be clarified in future revisions.<p>
+
+A end_time should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_end_time>
+
+A predicate for the L</end_time> attribute.
+
 =head2 C<except_date>
 
 C<exceptDate>
@@ -348,6 +389,31 @@ A start_date should be one of the following types:
 =head2 C<_has_start_date>
 
 A predicate for the L</start_date> attribute.
+
+=head2 C<start_time>
+
+C<startTime>
+
+=for html <p>The startTime of something. For a reserved event or service (e.g.
+FoodEstablishmentReservation), the time that it is expected to start. For
+actions that span a period of time, when the action was performed. e.g.
+John wrote a book from <em>January</em> to December. For media, including
+audio and video, it's the time offset of the start of a clip within a
+larger file.<br/><br/> Note that Event uses startDate/endDate instead of
+startTime/endTime, even when describing dates with times. This situation
+may be clarified in future revisions.<p>
+
+A start_time should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_start_time>
+
+A predicate for the L</start_time> attribute.
 
 =head1 SEE ALSO
 

@@ -1,5 +1,16 @@
 Revision history for Getopt-EX extension Getopt-EX-termcolor
 
+1.04 2020-04-23T15:45:42Z
+
+    - Fix bug about $ENV{TERM}.
+    - Stop to depend on App::cdif::Command.
+
+1.03 2020-04-23T08:13:28Z
+
+    - Implement XTerm.pm using operating system command sequence.
+    - Introduce environment TERM_BGCOLOR and recommend to use.
+    - RGB default maximum value is now 255x255x255.
+
 1.02 2020-04-18T02:49:50Z
 
     - Change the interface to call &bg with module option.

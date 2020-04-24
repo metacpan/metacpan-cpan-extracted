@@ -88,6 +88,7 @@ ok(my $tcp_services = $cpmgmt->list_services_tcp(),
 ok(my $tcp_service_53 = $cpmgmt->create_service_tcp({
     name    => 'tcp_53',
     port    => 53,
+    'ignore-warnings' => 1,
 }), "create TCP service 'tcp_53' successful");
 
 ok(my $udp_services = $cpmgmt->list_services_udp(),
@@ -101,6 +102,7 @@ is($udp_services, $udp_services_10atatime, 'both list responses are identical');
 ok(my $udp_service_53 = $cpmgmt->create_service_udp({
     name    => 'udp_53',
     port    => 53,
+    'ignore-warnings' => 1,
 }), "create UDP service 'udp_53' successful");
 
 ok(my $icmp_services = $cpmgmt->list_services_icmp(),
@@ -190,6 +192,7 @@ ok($cpmgmt->delete_accessrule({
 
 END {
     if (defined $cpmgmt) {
+        diag "discarding changes and logging out";
         $cpmgmt->discard;
         $cpmgmt->logout;
     }

@@ -15,7 +15,15 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.3';
+our $VERSION = 'v7.0.4';
+
+
+has jurisdiction => (
+    is        => 'rw',
+    predicate => '_has_jurisdiction',
+    json_ld   => 'jurisdiction',
+);
+
 
 
 has service_operator => (
@@ -42,7 +50,7 @@ SemanticWeb::Schema::GovernmentService - A service provided by a government orga
 
 =head1 VERSION
 
-version v7.0.3
+version v7.0.4
 
 =head1 DESCRIPTION
 
@@ -50,6 +58,25 @@ A service provided by a government organization, e.g. food stamps, veterans
 benefits, etc.
 
 =head1 ATTRIBUTES
+
+=head2 C<jurisdiction>
+
+Indicates a legal jurisdiction, e.g. of some legislation, or where some
+government service is based.
+
+A jurisdiction should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::AdministrativeArea']>
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_jurisdiction>
+
+A predicate for the L</jurisdiction> attribute.
 
 =head2 C<service_operator>
 

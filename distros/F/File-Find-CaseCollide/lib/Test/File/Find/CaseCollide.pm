@@ -1,5 +1,5 @@
 package Test::File::Find::CaseCollide;
-$Test::File::Find::CaseCollide::VERSION = '0.0.2';
+$Test::File::Find::CaseCollide::VERSION = '0.2.0';
 use strict;
 use warnings;
 use Test::Differences (qw( eq_or_diff ));
@@ -25,11 +25,11 @@ __END__
 
 =head1 NAME
 
-Test::File::Find::CaseCollide
+Test::File::Find::CaseCollide - test for collisions in filenames, differing only in case
 
 =head1 VERSION
 
-version 0.0.2
+version 0.2.0
 
 =head1 SYNOPSIS
 
@@ -38,14 +38,6 @@ version 0.0.2
 
     # TEST
     Test::File::Find::CaseCollide->verify( { dir => '.' } );
-
-=head1 NAME
-
-Test::File::Find::CaseCollide - test for collisions in filenames, differing only in case
-
-=head1 VERSION
-
-version 0.0.2
 
 =head1 METHODS
 
@@ -72,7 +64,7 @@ The shell command is:
 
     find . -print0 | perl -n0e 'die $_ if $h{lc$_}++'
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -93,35 +85,11 @@ L<https://metacpan.org/release/File-Find-CaseCollide>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/File-Find-CaseCollide>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=File-Find-CaseCollide>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/File-Find-CaseCollide>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/File-Find-CaseCollide>
 
 =item *
 

@@ -4,7 +4,7 @@ use OPCUA::Open62541 qw(:STATUSCODE :CLIENTSTATE);
 
 use OPCUA::Open62541::Test::Server;
 use OPCUA::Open62541::Test::Client;
-use Test::More tests => OPCUA::Open62541::Test::Server::planning() + 19;
+use Test::More tests => OPCUA::Open62541::Test::Server::planning() + 20;
 use Test::LeakTrace;
 use Test::NoWarnings;
 use Time::HiRes qw(sleep);

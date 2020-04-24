@@ -76,11 +76,23 @@ is $got, '54/5', 'fraction';
 $f2->modify_tag('MIXED');
 is $f2 + 10, '10 4/5', 'modify_tag';
 
-is $f1 ** 1.2, '229739670999407/373719281884655', 'exp';
-is $f1->num ** 1.2, '0.614738607654485', 'exp';
+$got = $f1 ** 1.2;
+my ($n, $d) = split /\//, $got;
+like $n, qr/^\d+$/, 'exp numerator';
+like $d, qr/^\d+$/, 'exp denominator';
+is sprintf('%.15f', $f1->num ** 1.2), '0.614738607654485', 'exp';
 
-is $f1 ** 0.5, '70710678118655/86602540378444', 'exp';
-is sqrt($f1), '70710678118655/86602540378444', 'sqrt';
+$got = $f1 ** 0.5;
+($n, $d) = split /\//, $got;
+like $n, qr/^\d+$/, 'exp numerator';
+like $d, qr/^\d+$/, 'exp denominator';
+
+$got = sqrt($f1);
+my ($x, $y) = split /\//, $got;
+like $x, qr/^\d+$/, 'exp numerator';
+like $y, qr/^\d+$/, 'exp denominator';
+is sprintf('%.15f', $x), sprintf('%.15f', $n), 'exp numerator';
+is sprintf('%.15f', $y), sprintf('%.15f', $d), 'exp denominator';
 
 is $f1 cmp $f1, 0, 'cmp';
 is $f2 cmp $f1, 1, 'cmp';

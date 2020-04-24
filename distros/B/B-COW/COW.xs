@@ -21,6 +21,9 @@
 #   define B_CAN_COW 0
 #endif
 
+/* CowREFCNT is incorrect on Perl < 5.32 */
+#define myCowREFCNT(sv)   ((SvLEN(sv)>0) ? CowREFCNT(sv) : 0)
+
 MODULE = B__COW       PACKAGE = B::COW
 
 SV*
@@ -60,7 +63,7 @@ CODE:
 #if !B_CAN_COW
     XSRETURN_UNDEF;
 #else
-    if ( SvIsCOW(sv) ) XSRETURN_IV( CowREFCNT(sv) );
+    if ( SvIsCOW(sv) ) XSRETURN_IV( myCowREFCNT(sv) );
 #endif
     XSRETURN_UNDEF;
 }

@@ -26,6 +26,7 @@ use NewsExtractor::SiteSpecificExtractor::estate_ltn_com_tw;
 use NewsExtractor::SiteSpecificExtractor::www_upmedia_mg;
 use NewsExtractor::SiteSpecificExtractor::UDN;
 use NewsExtractor::SiteSpecificExtractor::ETtoday;
+use NewsExtractor::SiteSpecificExtractor::ChinaTimes;
 
 has extractor => (
     required => 0,
@@ -42,7 +43,7 @@ use constant {
     SiteSpecificExtractorByHost => {
         'www.allnews.tw' => 'NewsExtractor::SiteSpecificExtractor::www_allnews_tw',
         'www.rvn.com.tw' => 'NewsExtractor::SiteSpecificExtractor::www_rvn_com_tw',
-        'www.chinatimes.com' => 'NewsExtractor::JSONLDExtractor',
+        'www.chinatimes.com' => 'NewsExtractor::SiteSpecificExtractor::ChinaTimes',
         'video.udn.com' => 'NewsExtractor::JSONLDExtractor',
         'www.ctwant.com' => 'NewsExtractor::JSONLDExtractor',
         'www.peopo.org' => 'NewsExtractor::SiteSpecificExtractor::www_peopo_org',

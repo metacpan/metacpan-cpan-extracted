@@ -12,8 +12,6 @@ use_ok $_ for qw(
     App::sdif::debug
     App::sdif::default
     App::sdif::colors
-    App::sdif::autocolor
-    App::sdif::autocolor::Apple_Terminal
 
     App::cdif::debug
     App::cdif::default

@@ -43,9 +43,9 @@
          "rdfs:label" : "identifier",
          "schema:domainIncludes" : "schema:Thing",
          "schema:rangeIncludes" : [
+            "schema:Text",
             "schema:URL",
-            "schema:PropertyValue",
-            "schema:Text"
+            "schema:PropertyValue"
          ]
       },
       "schema:image" : {
@@ -54,8 +54,8 @@
          "rdfs:label" : "image",
          "schema:domainIncludes" : "schema:Thing",
          "schema:rangeIncludes" : [
-            "schema:ImageObject",
-            "schema:URL"
+            "schema:URL",
+            "schema:ImageObject"
          ]
       },
       "schema:mainEntityOfPage" : {
@@ -65,8 +65,8 @@
          "schema:domainIncludes" : "schema:Thing",
          "schema:inverseOf" : "schema:mainEntity",
          "schema:rangeIncludes" : [
-            "schema:CreativeWork",
-            "schema:URL"
+            "schema:URL",
+            "schema:CreativeWork"
          ]
       },
       "schema:name" : {
@@ -101,8 +101,8 @@
          "schema:domainIncludes" : "schema:Thing",
          "schema:inverseOf" : "schema:about",
          "schema:rangeIncludes" : [
-            "schema:Event",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:Event"
          ]
       },
       "schema:url" : {

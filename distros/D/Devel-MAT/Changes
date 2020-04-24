@@ -1,5 +1,22 @@
 Revision history for Devel-MAT
 
+0.43    2020-04-24
+        [CHANGES]
+         * Have `callers` print the actual CV identity of subs
+         * Many improvements to `show` command:
+            + Added `show --full-pv` for SCALAR
+            + Added `show --pad` for CODE
+            + Have `show CODE` print the protosub if applicable
+            + Have `show PAD|CODE` indicate `our`/`state` and outer-capture
+              lexicals
+         * Added `find lexical` filter
+         * Support Devel::MAT::Dumper 0.44's CODEx_PADNAME_FLAGS annotations
+         * Display CODE() using more friendly "proto" or "closure" flags
+           instead of "P" and "C"
+
+        [BUGFIXES]
+         * Fix `find blessed` command (RT131079)
+
 0.42    2019-03-21 22:36:09
         [CHANGES]
          * Rename `callstack` to `callers`

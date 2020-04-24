@@ -18,17 +18,16 @@ App::sdif::colors
 
 Read `perldoc -m App::sdif::colors` to see the actual definition.
 
-Option B<--light> or B<--dark> is set by B<-Mautocolor> module
-according to the brightness of the terminal screen.  You can override
-them in your F<~/.sdifrc> like:
+Option B<--light> or B<--dark> is set by B<--autocolor> option which
+calls B<-Mtermcolor> module to determine the brightness of the
+terminal screen.  You can override them in your F<~/.sdifrc> like:
 
     option --light --cmy
     option --dark  --dark-cmy
 
 =head1 SEE ALSO
 
-L<App::sdif::autocolor>,
-L<App::sdif::autocolor::Apple_Terminal>
+L<Getopt::EX::termcolor>
 
 =cut
 
@@ -38,9 +37,7 @@ package App::sdif::colors;
 
 __DATA__
 
-define {NOP} $<move(0,0)>
-
-option --light {NOP}
+option --light $<move(0,0)>
 option --dark  --dark-green
 
 option	--green \

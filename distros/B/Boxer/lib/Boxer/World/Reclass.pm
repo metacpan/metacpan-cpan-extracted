@@ -8,35 +8,38 @@ Boxer::World::Reclass - software as serialized by reclass
 
 =cut
 
-use v5.14;
+use v5.20;
 use utf8;
-use strictures 2;
 use Role::Commons -all;
+use feature 'signatures';
 use namespace::autoclean 0.16;
 use autodie;
-use Carp qw<croak>;
 
-use Capture::Tiny qw(capture_stdout);
 use YAML::XS;
+use List::MoreUtils qw(uniq);
+use Hash::Merge qw(merge);
 use Try::Tiny;
 
 use Moo;
 use MooX::StrictConstructor;
 extends qw(Boxer::World);
 
-use Types::Standard qw( ArrayRef InstanceOf );
+use Types::Standard qw( ArrayRef InstanceOf Maybe );
 use Boxer::Types qw( ClassDir NodeDir Suite );
 
 use Boxer::Part::Reclass;
 use Boxer::World::Flat;
 
+use strictures 2;
+no warnings "experimental::signatures";
+
 =head1 VERSION
 
-Version v1.4.0
+Version v1.4.2
 
 =cut
 
-our $VERSION = "v1.4.0";
+our $VERSION = "v1.4.2";
 
 =head1 DESCRIPTION
 
@@ -60,14 +63,32 @@ has suite => (
 has classdir => (
 	is       => 'lazy',
 	isa      => ClassDir,
+	coerce   => 1,
 	required => 1,
 );
+
+sub _build_classdir ($self)
+{
+	if ( $self->data ) {
+		return $self->data->child('classes');
+	}
+	return;
+}
 
 has nodedir => (
 	is       => 'lazy',
 	isa      => NodeDir,
+	coerce   => 1,
 	required => 1,
 );
+
+sub _build_nodedir ($self)
+{
+	if ( $self->data ) {
+		return $self->data->child('nodes');
+	}
+	return;
+}
 
 has parts => (
 	is       => 'lazy',
@@ -75,47 +96,100 @@ has parts => (
 	init_arg => undef,
 );
 
-sub _build_parts
+# process only matching types, and skip duplicates is arrays
+my $merge_spec = {
+	'SCALAR' => {
+		'SCALAR' => sub { $_[0] },
+		'ARRAY'  => sub { die 'bad input data' },
+		'HASH'   => sub { die 'bad input data' },
+	},
+	'ARRAY' => {
+		'SCALAR' => sub { die 'bad input data' },
+		'ARRAY'  => sub { [ uniq @{ $_[0] }, @{ $_[1] } ] },
+		'HASH'   => sub { die 'bad input data' },
+	},
+	'HASH' => {
+		'SCALAR' => sub { die 'bad input data' },
+		'ARRAY'  => sub { die 'bad input data' },
+		'HASH'   => sub { Hash::Merge::_merge_hashes( $_[0], $_[1] ) },
+	},
+};
+Hash::Merge::add_behavior_spec($merge_spec);
+
+sub _build_parts ($self)
 {
-	my ($self) = @_;
-	my $data = Load(
-		scalar(
-			capture_stdout {
-				system(
-					'reclass',
-					'-b',
-					'',
-					'-c',
-					$self->classdir,
-					'-u',
-					$self->nodedir,
-					'--inventory',
-				);
-			}
-		)
+	my $classdata = $self->classdir->visit(
+		sub ( $path, $state ) {
+			return if $path->is_dir;
+			return unless ( $path->basename =~ /\.yml$/ );
+			my $yaml  = Load( $path->slurp_utf8 );
+			my $class = $path->relative( $self->classdir ) =~ tr/\//./r
+				=~ s/\.yml$//r =~ s/\.init$//r;
+			$state->{$class} = $yaml;
+		},
+		{ recurse => 1 },
+	);
+	my $nodedata = $self->nodedir->visit(
+		sub ( $path, $state ) {
+			return if $path->is_dir;
+			return unless ( $path->basename =~ /\.yml$/ );
+			my $yaml = Load( $path->slurp_utf8 );
+			my $node = $path->basename(qr/\.yml$/);
+			$state->{$node} = $yaml;
+		},
 	);
 	my @parts;
-	for ( keys %{ $data->{nodes} } ) {
+	for ( sort keys %{$nodedata} ) {
+		my %params = ();
+		my @classes
+			= $nodedata->{$_}{classes}
+			? @{ $nodedata->{$_}{classes} }
+			: ();
+		while ( my $next = shift @classes ) {
+			unless ( $classdata->{$next} ) {
+				$self->_logger->debug(
+					"Ignoring missing class $next for node $_.");
+				next;
+			}
+			if ( $classdata->{$next}{classes} and !$params{_seen}{$next} ) {
+				$params{_seen}{$next} = 1;
+				unshift @classes, @{ $classdata->{$next}{classes} }, $next;
+				next;
+			}
+			%params = %{ merge( \%params, $classdata->{$next}{parameters} ) }
+				if $classdata->{$next}{parameters};
+		}
+		delete $params{_seen};
+		%params = %{ merge( \%params, $nodedata->{$_}{parameters} ) }
+			if $nodedata->{$_}{parameters};
 		push @parts,
 			Boxer::Part::Reclass->new(
 			id    => $_,
 			epoch => $self->suite,
-			%{ $data->{nodes}{$_}{parameters} }
+			%params,
 			);
 	}
 	return [@parts];
 }
 
-sub get_node_by_id
+sub list_parts ($self)
 {
-	my ( $self, $id ) = @_;
+	return map { $_->id } @{ $self->parts };
+}
 
+sub get_part ( $self, $id )
+{
+	unless ( @{ $self->parts } ) {
+		$self->_logger->error("No parts exist.");
+		return;
+	}
 	foreach ( @{ $self->parts } ) {
 		if ( $_->id eq $id ) {
 			return $_;
 		}
 	}
-	croak "This world contains no node identified as \"" . $id . "\".";
+	$self->_logger->error("Part \"$id\" does not exist.");
+	return;
 }
 
 my $pos           = 1;
@@ -131,15 +205,9 @@ my @section_order = qw(
 );
 my %section_order = map { $_ => $pos++ } @section_order;
 
-sub flatten
+sub map ( $self, $node_id, $nonfree )
 {
-	my ( $self, $node_id, $nonfree ) = @_;
-
-	my $node = $self->get_node_by_id($node_id);
-
-	( $node->epoch )
-		or croak "Undefined epoch for node \"" . $self->node . "\".";
-
+	my $node = $self->get_part($node_id);
 	my %desc;
 
 	my @section_keys = sort {

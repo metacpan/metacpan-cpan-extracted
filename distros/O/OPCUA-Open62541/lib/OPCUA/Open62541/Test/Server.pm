@@ -7,7 +7,7 @@ use OPCUA::Open62541 'STATUSCODE_GOOD';
 use Carp 'croak';
 use Errno 'EINTR';
 use Net::EmptyPort qw(empty_port);
-use POSIX qw(SIGTERM SIGALRM SIGKILL SIGUSR1 SIG_BLOCK);
+use POSIX qw(SIGTERM SIGALRM SIGKILL SIGUSR1 SIGUSR2 SIG_BLOCK);
 
 use Test::More;
 
@@ -20,6 +20,7 @@ sub new {
     my $class = shift;
     my $self = { @_ };
     $self->{timeout} //= 10;
+    $self->{logfile} //= "server.log";
 
     ok($self->{server} = OPCUA::Open62541::Server->new(), "server: new");
     ok($self->{config} = $self->{server}->getConfig(), "server: get config");
@@ -56,7 +57,7 @@ sub start {
 	logger => $self->{logger},
 	ident => "OPC UA server",
     ), "server: test logger");
-    ok($self->{log}->file("server.log"), "server: log file");
+    ok($self->{log}->file($self->{logfile}), "server: log file");
 
     return $self;
 }
@@ -64,8 +65,9 @@ sub start {
 sub run {
     my OPCUA::Open62541::Test::Server $self = shift;
 
-    my $sigset = POSIX::SigSet->new(SIGUSR1);
-    ok(POSIX::sigprocmask(SIG_BLOCK, $sigset, undef), "server: sigprocmask");
+    my $sigset = POSIX::SigSet->new(SIGUSR1, SIGUSR2);
+    ok(POSIX::sigprocmask(SIG_BLOCK, $sigset, undef), "server: sigprocmask")
+	or diag "sigprocmask failed: $!";
 
     $self->{pid} = fork();
     if (defined($self->{pid})) {
@@ -75,7 +77,7 @@ sub run {
 	}
 	pass("fork server");
     } else {
-	fail("fork server") or diag "Fork failed: $!";
+	fail("fork server") or diag "fork failed: $!";
     }
 
     ok($self->{log}->pid($self->{pid}), "server: log set pid");
@@ -91,11 +93,16 @@ sub child {
 
     local %SIG;
     my $running = 1;
-    $SIG{ALRM} = $SIG{TERM} = sub { $running = 0; };
+    $SIG{ALRM} = sub { note("SIGALRM received"); $running = 0; };
+    $SIG{TERM} = sub { note("SIGTERM received"); $running = 0; };
     $SIG{USR1} = sub { note("SIGUSR1 received"); };
+    $SIG{USR2} = sub { note("SIGUSR2 received"); };
+
+    my $parent_pid = getppid()
+	or die "getppid failed: $!";
 
     defined(alarm($self->{timeout}))
-	or croak "alarm failed: $!";
+	or die "alarm failed: $!";
 
     # run server and stop after ten seconds or due to kill
     note("going to startup server");
@@ -105,12 +112,34 @@ sub child {
     while ($running) {
 	# for signal handling we have to return to Perl regulary
 	if ($self->{singlestep}) {
-	    my $sigset= POSIX::SigSet->new();
+	    my $sigset= POSIX::SigSet->new(SIGUSR2);  # do not step on SIGUSR2
 	    !POSIX::sigsuspend($sigset) && $!{EINTR}
-		or croak("sigsuspend failed: $!");
+		or die "sigsuspend failed: $!";
 	    $self->{log}->{fh}->print("server: singlestep\n");
 	    $self->{log}->{fh}->flush();
+
+	    kill(SIGUSR1, $parent_pid)
+		or die "kill parent failed: $!";
 	}
+
+	if ($self->{actions}) {
+	    my $sigset = POSIX::SigSet->new();
+	    POSIX::sigpending($sigset)
+		or die "sigpending failed: $!";
+	    if ($sigset->ismember(SIGUSR2)) {
+		$sigset = POSIX::SigSet->new(SIGUSR1);  # do not clear SIGUSR1
+		!POSIX::sigsuspend($sigset) && $!{EINTR}
+		    or die "sigsuspend failed: $!";
+
+		my $action = shift @{$self->{actions}}
+		    or croak "no more actions to execute";
+		$action->($self);
+
+		kill(SIGUSR2, $parent_pid)
+		    or die "kill parent failed: $!";
+	    }
+	}
+
 	$self->{server}->run_iterate(1);
     }
     $self->{server}->run_shutdown()
@@ -131,11 +160,45 @@ sub stop {
 sub step {
     my OPCUA::Open62541::Test::Server $self = shift;
 
+    defined(alarm($self->{timeout}))
+	or die "alarm failed: $!";
+
     my $signalled = kill(SIGUSR1, $self->{pid});
     unless ($self->{stepped}) {
-	is($signalled, 1, "server: first step");
+	is($signalled, 1, "server: signaled first step")
+	    or diag "kill failed: $!";
+    }
+
+    local $SIG{USR1} = sub {};
+    my $sigset = POSIX::SigSet->new(SIGUSR2);  # not not wait for USR2
+    my $received = !POSIX::sigsuspend($sigset) && $!{EINTR};
+    unless ($self->{stepped}) {
+	ok($received, "server: did first step")
+	    or diag "sigsuspend failed: $!";
 	$self->{stepped} = 1;
     }
+
+    defined(alarm(0))
+	or die "alarm failed: $!";
+}
+
+sub next_action {
+    my OPCUA::Open62541::Test::Server $self = shift;
+
+    defined(alarm($self->{timeout}))
+	or die "alarm failed: $!";
+
+    my $signalled = kill(SIGUSR2, $self->{pid});
+    is($signalled, 1, "server: signaled next action");
+
+    local $SIG{USR2} = sub {};
+    my $sigset = POSIX::SigSet->new(SIGUSR1);  # not not wait for USR1
+    my $received = !POSIX::sigsuspend($sigset) && $!{EINTR};
+    ok($received, "server: did next action")
+	or diag "sigsuspend failed: $!";
+
+    defined(alarm(0))
+	or die "alarm failed: $!";
 }
 
 1;
@@ -182,6 +245,17 @@ Create a new test server instance.
 
 =over 8
 
+=item $args{actions}
+
+Array of CODE refs with predefined actions that can be executed during runtime.
+The CODE refs will get called with the Server object of the child process as an
+argument.
+
+=item $args{logfile}
+
+Logs to the specified file instead of "server.log" in the current
+directory.
+
 =item $args{timeout}
 
 Maximum time the server will run before shutting down itself.
@@ -221,6 +295,12 @@ with singlestep.
 
 Startup the open62541 server as a background process.
 The function will return immediately.
+
+=item $server->next_action()
+
+Will execute the next predefined action in the server.
+The child process with the server will die if no more actions are
+defined.
 
 =item $server->stop()
 

@@ -18,14 +18,14 @@
          "rdfs:label" : "availabilityEnds",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:Demand",
             "schema:Offer",
+            "schema:Demand",
             "schema:ActionAccessSpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
+            "schema:Time",
             "schema:Date",
-            "schema:Time"
+            "schema:DateTime"
          ]
       },
       "schema:availabilityStarts" : {
@@ -38,14 +38,14 @@
          "rdfs:label" : "availabilityStarts",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:Offer",
             "schema:ActionAccessSpecification",
+            "schema:Offer",
             "schema:Demand"
          ],
          "schema:rangeIncludes" : [
             "schema:Time",
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       },
       "schema:category" : {
@@ -58,19 +58,19 @@
          "rdfs:label" : "category",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:Product",
-            "schema:PhysicalActivity",
             "schema:Invoice",
             "schema:Recommendation",
-            "schema:SpecialAnnouncement",
-            "schema:ActionAccessSpecification",
-            "schema:Service",
+            "schema:Product",
             "schema:Offer",
-            "schema:URL"
+            "schema:Service",
+            "schema:PhysicalActivity",
+            "schema:SpecialAnnouncement",
+            "schema:ActionAccessSpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:Thing",
+            "schema:URL",
             "schema:Text",
+            "schema:Thing",
             "schema:PhysicalActivityCategory"
          ]
       },
@@ -85,15 +85,15 @@
          "rdfs:subPropertyOf" : "schema:areaServed",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:Offer",
             "schema:Demand",
+            "schema:Offer",
             "schema:ActionAccessSpecification",
             "schema:DeliveryChargeSpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:Place",
+            "schema:Text",
             "schema:GeoShape",
-            "schema:Text"
+            "schema:Place"
          ]
       },
       "schema:expectsAcceptanceOf" : {
@@ -103,9 +103,9 @@
          "rdfs:label" : "expectsAcceptanceOf",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:MediaSubscription",
+            "schema:ConsumeAction",
             "schema:ActionAccessSpecification",
-            "schema:ConsumeAction"
+            "schema:MediaSubscription"
          ],
          "schema:rangeIncludes" : "schema:Offer"
       },
@@ -116,16 +116,16 @@
          "rdfs:label" : "ineligibleRegion",
          "schema:category" : "issue-2242",
          "schema:domainIncludes" : [
-            "schema:Offer",
-            "schema:Demand",
+            "schema:ActionAccessSpecification",
             "schema:DeliveryChargeSpecification",
-            "schema:ActionAccessSpecification"
+            "schema:Demand",
+            "schema:Offer"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
             "schema:GeoShape",
-            "schema:Place"
+            "schema:Place",
+            "schema:Text"
          ]
       },
       "schema:requiresSubscription" : {
@@ -139,8 +139,8 @@
             "schema:MediaObject"
          ],
          "schema:rangeIncludes" : [
-            "schema:MediaSubscription",
-            "schema:Boolean"
+            "schema:Boolean",
+            "schema:MediaSubscription"
          ]
       }
    }

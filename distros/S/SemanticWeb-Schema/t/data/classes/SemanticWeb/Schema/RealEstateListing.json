@@ -22,14 +22,14 @@
             "issue-2521"
          ],
          "schema:domainIncludes" : [
-            "schema:SpecialAnnouncement",
             "schema:RealEstateListing",
-            "schema:CDCPMDRecord",
-            "schema:JobPosting"
+            "schema:JobPosting",
+            "schema:SpecialAnnouncement",
+            "schema:CDCPMDRecord"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       },
       "schema:leaseLength" : {
@@ -39,14 +39,14 @@
          "rdfs:label" : "leaseLength",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
-            "schema:Accommodation",
             "schema:RealEstateListing",
+            "schema:Accommodation",
             "schema:Offer"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Duration",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Duration"
          ]
       }
    }

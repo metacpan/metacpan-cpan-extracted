@@ -87,7 +87,7 @@ SKIP: {
     }
 
     $t=q{Connect with forced uppercase 'DBI:' works};
-    my ($testdsn,$testuser,$helpconnect,$su,$uid,$testdir,$pg_ctl,$initdb,$error,$version)
+    my ($testdsn,$testuser,$helpconnect,$su,$uid,$testdir,$pg_ctl,$initdb,$error,$version) ## no critic (Variables::ProhibitUnusedVarsStricter)
         = get_test_settings();
     $testdsn =~ s/^dbi/DBI/i;
     my $ldbh = DBI->connect($testdsn, $testuser, $ENV{DBI_PASS},
@@ -135,10 +135,15 @@ END {
         }
     }
     for my $name (qw/DBI_DRIVER DBI_AUTOPROXY LANG/) {
-        if (exists $ENV{$name} and defined $ENV{$name}) {
+        if (exists $ENV{$name} and defined $ENV{$name} and $ENV{$name}) {
             $extra .= sprintf "\n%-*s $ENV{$name}", $offset, $name;
         }
     }
+
+    for my $name (grep { /^DBDPG/ } sort keys %ENV) {
+        $extra .= sprintf "\n%-*s $ENV{$name}", $offset, $name;
+    }
+
 
     ## More helpful stuff
     for (sort keys %set) {

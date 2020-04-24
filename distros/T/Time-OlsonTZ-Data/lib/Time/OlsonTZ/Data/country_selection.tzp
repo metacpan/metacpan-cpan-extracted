@@ -768,15 +768,15 @@ use strict;
 				olson_description => "Pacific - BC (most areas)",
 				timezone_name => "America/Vancouver",
 			},
-			"Pacific - Yukon (north)" => {
-				location_coords => "+6404-13925",
-				olson_description => "Pacific - Yukon (north)",
-				timezone_name => "America/Dawson",
-			},
-			"Pacific - Yukon (south)" => {
+			"Pacific - Yukon (east)" => {
 				location_coords => "+6043-13503",
-				olson_description => "Pacific - Yukon (south)",
+				olson_description => "Pacific - Yukon (east)",
 				timezone_name => "America/Whitehorse",
+			},
+			"Pacific - Yukon (west)" => {
+				location_coords => "+6404-13925",
+				olson_description => "Pacific - Yukon (west)",
+				timezone_name => "America/Dawson",
 			},
 		},
 	},
@@ -1337,7 +1337,7 @@ use strict;
 			"Greenland (most areas)" => {
 				location_coords => "+6411-05144",
 				olson_description => "Greenland (most areas)",
-				timezone_name => "America/Godthab",
+				timezone_name => "America/Nuuk",
 			},
 			"National Park (east coast)" => {
 				location_coords => "+7646-01840",
@@ -3229,14 +3229,14 @@ use strict;
 		alpha2_code => "UA",
 		olson_name => "Ukraine",
 		regions => {
-			"MSK+00 - Crimea" => {
+			Crimea => {
 				location_coords => "+4457+03406",
-				olson_description => "MSK+00 - Crimea",
+				olson_description => "Crimea",
 				timezone_name => "Europe/Simferopol",
 			},
-			Ruthenia => {
+			Transcarpathia => {
 				location_coords => "+4837+02218",
-				olson_description => "Ruthenia",
+				olson_description => "Transcarpathia",
 				timezone_name => "Europe/Uzhgorod",
 			},
 			"Ukraine (most areas)" => {
@@ -3244,9 +3244,9 @@ use strict;
 				olson_description => "Ukraine (most areas)",
 				timezone_name => "Europe/Kiev",
 			},
-			"Zaporozh'ye/Zaporizhia; Lugansk/Luhansk (east)" => {
+			"Zaporozhye and east Lugansk" => {
 				location_coords => "+4750+03510",
-				olson_description => "Zaporozh'ye/Zaporizhia; Lugansk/Luhansk (east)",
+				olson_description => "Zaporozhye and east Lugansk",
 				timezone_name => "Europe/Zaporozhye",
 			},
 		},

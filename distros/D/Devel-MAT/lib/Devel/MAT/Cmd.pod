@@ -105,7 +105,8 @@ brackets C<[...]> and expects the value to be an integer.
 
 If true, the value represents a string from the user code. Wraps the result
 in quote marks C<"..."> and limits the length to a maximum of 64 characters
-(or as specified by the C<maxlen> argument).
+(or as specified by the C<maxlen> argument). No truncation if C<maxlen> is
+zero.
 
 =back
 

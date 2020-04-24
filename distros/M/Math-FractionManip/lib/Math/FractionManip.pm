@@ -6,7 +6,7 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 #use warnings;
 
-our $VERSION = '0.5403';
+our $VERSION = '0.5502';
 
 use Carp;
 use Math::BigInt;
@@ -727,23 +727,11 @@ sub _de_decimal {
   my @return;
   my $big = _tag($SIZE, $_[2]);
   my (@int_part, @decimal_part);
-  if ($big eq "BIG") {
-    my @digits = (1, 1);
-    ($int_part[0], $digits[0]) = $frac[0]->fnorm =~ /(\d+)E\-(\d+)/;
-    ($int_part[1], $digits[1]) = $frac[1]->fnorm =~ /(\d+)E\-(\d+)/;
-    @digits = sort { $a <=> $b } @digits;
-    my $factor = 10 ** $digits[1];
-    @frac = (($_[0] * $factor), ($_[1] * $factor));
-    chop $frac[0]; chop $frac[1];
-    @frac = (Math::BigInt->new($frac[0]), Math::BigInt->new($frac[1]));
-  }
-  else {
-    ($int_part[0], $decimal_part[0]) = $frac[0] =~ /(\d+)\.(\d+)/;
-    ($int_part[1], $decimal_part[1]) = $frac[1] =~ /(\d+)\.(\d+)/;
-    @decimal_part = sort { $a <=> $b } (length($decimal_part[0]), length($decimal_part[1]));
-    my $factor = 10 ** $decimal_part[1];
-    @frac = ($_[0] * $factor, $_[1] * $factor);
-  }
+  ($int_part[0], $decimal_part[0]) = $frac[0] =~ /(\d+)\.(\d+)/;
+  ($int_part[1], $decimal_part[1]) = $frac[1] =~ /(\d+)\.(\d+)/;
+  @decimal_part = sort { $a <=> $b } (length($decimal_part[0]), length($decimal_part[1]));
+  my $factor = 10 ** $decimal_part[1];
+  @frac = ($_[0] * $factor, $_[1] * $factor);
   return @frac;
 }
 
@@ -863,7 +851,7 @@ Math::FractionManip - Manipulate fractions
 
 =head1 VERSION
 
-version 0.5403
+version 0.5502
 
 =head1 SYNOPSIS
 

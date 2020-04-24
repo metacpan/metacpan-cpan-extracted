@@ -24,7 +24,7 @@ use routines;
 
 use parent 'Exporter';
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 
 our @EXPORT = qw(
   Array
@@ -45,12 +45,19 @@ our @EXPORT = qw(
 our @EXPORT_OK = (@EXPORT, qw(
   Args
   Data
+  Error
   Opts
   Name
   Space
   Struct
   Vars
 ));
+
+our %EXPORT_TAGS = (
+  all => \@EXPORT_OK
+);
+
+no warnings 'redefine';
 
 # IMPORT
 
@@ -107,6 +114,14 @@ fun Data(Maybe[Str] $data) {
   require Data::Object::Data;
 
   return Data::Object::Data->new(file => $data);
+}
+
+fun Error(Maybe[Str | HashRef] $data) {
+  $data = { message => $data } if !$data || !ref $data;
+
+  require Data::Object::Exception;
+
+  return Data::Object::Exception->new($data);
 }
 
 fun False() {
@@ -193,7 +208,7 @@ fun Struct(Maybe[HashRef] $data) {
 
   require Data::Object::Struct;
 
-  return Box(Data::Object::Struct->new($data));
+  return Data::Object::Struct->new($data);
 }
 
 fun True() {
@@ -463,9 +478,58 @@ The Data function returns a L<Data::Object::Data> object.
 
   package main;
 
-  my $data = Data '/path/to/file.pod';
+  my $data = Data 't/Data_Object.t';
 
   # $data->contents(...);
+
+=back
+
+=cut
+
+=head2 error
+
+  Error(Str | HashRef) : InstanceOf["Data::Object::Exception"]
+
+The Error function returns a L<Data::Object::Exception> object.
+
+=over 4
+
+=item Error example #1
+
+  package main;
+
+  use Data::Object 'Error';
+
+  my $error = Error;
+
+  # die $error;
+
+=back
+
+=over 4
+
+=item Error example #2
+
+  package main;
+
+  my $error = Error 'Oops!';
+
+  # die $error;
+
+=back
+
+=over 4
+
+=item Error example #3
+
+  package main;
+
+  my $error = Error {
+    message => 'Oops!',
+    context => { time => time }
+  };
+
+  # die $error;
 
 =back
 
@@ -610,6 +674,8 @@ The Opts function returns a L<Data::Object::Opts> object.
 =item Opts example #1
 
   package main;
+
+  use Data::Object 'Opts';
 
   my $opts = Opts;
 
@@ -854,20 +920,20 @@ Copyright (C) 2011-2019, Al Newkirk, et al.
 
 This is free software; you can redistribute it and/or modify it under the terms
 of the The Apache License, Version 2.0, as elucidated in the L<"license
-file"|https://github.com/iamalnewkirk/foobar/blob/master/LICENSE>.
+file"|https://github.com/iamalnewkirk/data-object/blob/master/LICENSE>.
 
 =head1 PROJECT
 
-L<Wiki|https://github.com/iamalnewkirk/foobar/wiki>
+L<Wiki|https://github.com/iamalnewkirk/data-object/wiki>
 
-L<Project|https://github.com/iamalnewkirk/foobar>
+L<Project|https://github.com/iamalnewkirk/data-object>
 
-L<Initiatives|https://github.com/iamalnewkirk/foobar/projects>
+L<Initiatives|https://github.com/iamalnewkirk/data-object/projects>
 
-L<Milestones|https://github.com/iamalnewkirk/foobar/milestones>
+L<Milestones|https://github.com/iamalnewkirk/data-object/milestones>
 
-L<Contributing|https://github.com/iamalnewkirk/foobar/blob/master/CONTRIBUTE.md>
+L<Contributing|https://github.com/iamalnewkirk/data-object/blob/master/CONTRIBUTE.md>
 
-L<Issues|https://github.com/iamalnewkirk/foobar/issues>
+L<Issues|https://github.com/iamalnewkirk/data-object/issues>
 
 =cut

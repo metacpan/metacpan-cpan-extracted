@@ -1,13 +1,12 @@
-# Pragmas.
+use lib '.';
 use strict;
 use warnings;
 
-# Modules.
 use inc::Module::Install;
 
 # Definition.
 abstract 'SGML to PYX parser.';
-author 'Michal Spacek <skim@cpan.org>';
+author 'Michal Josef Spacek <skim@cpan.org>';
 author_requires 'English' => 0;
 author_requires 'File::Object' => 0.07;
 author_requires 'Test::More' => 0;
@@ -26,14 +25,14 @@ requires 'PYX' => 0.05;
 requires 'PYX::Utils' => 0.04;
 resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
 	'?Name=SGML-PYX';
-resources 'homepage' => 'https://github.com/tupinek/SGML-PYX';
-resources 'repository' => 'git://github.com/tupinek/SGML-PYX';
+resources 'homepage' => 'https://github.com/michal-josef-spacek/SGML-PYX';
+resources 'repository' => 'git://github.com/michal-josef-spacek/SGML-PYX';
 test_requires 'File::Object' => 0.07;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 1.02;
 tests_recursive;
-version '0.02';
+version '0.03';
 
 # Run.
 WriteAll();

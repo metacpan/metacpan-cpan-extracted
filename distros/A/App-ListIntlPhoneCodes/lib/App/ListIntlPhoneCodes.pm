@@ -1,7 +1,9 @@
 package App::ListIntlPhoneCodes;
 
-our $DATE = '2016-02-13'; # DATE
-our $VERSION = '0.01'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-23'; # DATE
+our $DIST = 'App-ListIntlPhoneCodes'; # DIST
+our $VERSION = '0.02'; # VERSION
 
 use 5.010001;
 use strict;
@@ -16,22 +18,22 @@ our @EXPORT_OK = qw(list_countries);
 our $data;
 {
     require Locale::Codes::Country_Codes;
-    require Number::Phone::CountryCode;
+    require Number::Phone::Country;
     $data = [];
     my $id2names  = $Locale::Codes::Data{'country'}{'id2names'};
     my $id2alpha2 = $Locale::Codes::Data{'country'}{'id2code'}{'alpha-2'};
 
     for my $id (keys %$id2names) {
         my $alpha2 = $id2alpha2->{$id};
-        my $npc = Number::Phone::CountryCode->new($alpha2);
+        my $dial_code = Number::Phone::Country::country_code($alpha2);
         push @$data, [
             $alpha2,
             $id2names->{$id}[0],
-            $npc ? $npc->country_code : undef,
+            $dial_code,
         ];
     }
 
-    $data = [sort {$a->[0] cmp $b->[0]} @$data];
+    $data = [sort {($a->[0]//'') cmp ($b->[0]//'')} @$data];
 }
 
 my $res = gen_read_table_func(
@@ -53,9 +55,9 @@ my $res = gen_read_table_func(
                 pos => 1,
                 sortable => 1,
             },
-            code => {
-                summary => 'English country name',
-                schema => 'int',
+            codes => {
+                summary => 'Country code',
+                schema => 'str*',
                 pos => 2,
                 sortable => 1,
             },
@@ -80,7 +82,7 @@ App::ListIntlPhoneCodes - List international phone calling codes
 
 =head1 VERSION
 
-This document describes version 0.01 of App::ListIntlPhoneCodes (from Perl distribution App-ListIntlPhoneCodes), released on 2016-02-13.
+This document describes version 0.02 of App::ListIntlPhoneCodes (from Perl distribution App-ListIntlPhoneCodes), released on 2020-04-23.
 
 =head1 SYNOPSIS
 
@@ -89,13 +91,17 @@ This document describes version 0.01 of App::ListIntlPhoneCodes (from Perl distr
 =head1 FUNCTIONS
 
 
-=head2 list_intl_phone_codes(%args) -> [status, msg, result, meta]
+=head2 list_intl_phone_codes
+
+Usage:
+
+ list_intl_phone_codes(%args) -> [status, msg, payload, meta]
 
 List international phone calling codes.
 
 REPLACE ME
 
-This function is not exportable.
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -145,41 +151,49 @@ Only return records where the 'alpha2' field is less than specified value.
 
 Only return records where the 'alpha2' field is greater than specified value.
 
-=item * B<code> => I<int>
+=item * B<codes> => I<str>
 
-Only return records where the 'code' field equals specified value.
+Only return records where the 'codes' field equals specified value.
 
-=item * B<code.in> => I<array[int]>
+=item * B<codes.contains> => I<str>
 
-Only return records where the 'code' field is in the specified values.
+Only return records where the 'codes' field contains specified text.
 
-=item * B<code.is> => I<int>
+=item * B<codes.in> => I<array[str]>
 
-Only return records where the 'code' field equals specified value.
+Only return records where the 'codes' field is in the specified values.
 
-=item * B<code.isnt> => I<int>
+=item * B<codes.is> => I<str>
 
-Only return records where the 'code' field does not equal specified value.
+Only return records where the 'codes' field equals specified value.
 
-=item * B<code.max> => I<int>
+=item * B<codes.isnt> => I<str>
 
-Only return records where the 'code' field is less than or equal to specified value.
+Only return records where the 'codes' field does not equal specified value.
 
-=item * B<code.min> => I<int>
+=item * B<codes.max> => I<str>
 
-Only return records where the 'code' field is greater than or equal to specified value.
+Only return records where the 'codes' field is less than or equal to specified value.
 
-=item * B<code.not_in> => I<array[int]>
+=item * B<codes.min> => I<str>
 
-Only return records where the 'code' field is not in the specified values.
+Only return records where the 'codes' field is greater than or equal to specified value.
 
-=item * B<code.xmax> => I<int>
+=item * B<codes.not_contains> => I<str>
 
-Only return records where the 'code' field is less than specified value.
+Only return records where the 'codes' field does not contain specified text.
 
-=item * B<code.xmin> => I<int>
+=item * B<codes.not_in> => I<array[str]>
 
-Only return records where the 'code' field is greater than specified value.
+Only return records where the 'codes' field is not in the specified values.
+
+=item * B<codes.xmax> => I<str>
+
+Only return records where the 'codes' field is less than specified value.
+
+=item * B<codes.xmin> => I<str>
+
+Only return records where the 'codes' field is greater than specified value.
 
 =item * B<detail> => I<bool> (default: 0)
 
@@ -231,6 +245,10 @@ Only return records where the 'en_country_name' field is less than specified val
 
 Only return records where the 'en_country_name' field is greater than specified value.
 
+=item * B<exclude_fields> => I<array[str]>
+
+Select fields to return.
+
 =item * B<fields> => I<array[str]>
 
 Select fields to return.
@@ -260,11 +278,12 @@ specify descending order instead of the default ascending.
 
 =item * B<with_field_names> => I<bool>
 
-Return field names in each record (as hash/associative array).
+Return field names in each record (as hashE<sol>associative array).
 
 When enabled, function will return each record as hash/associative array
 (field name => value pairs). Otherwise, function will return each record
 as list/array (field value, field value, ...).
+
 
 =back
 
@@ -273,7 +292,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -305,7 +324,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,21 +4,24 @@ package Boxer::CLI::Command::About;
 
 =cut
 
-use v5.14;
+use v5.20;
 use utf8;
-use strictures 2;
 use Role::Commons -all;
+use feature 'signatures';
 use namespace::autoclean 0.16;
 
 use Boxer::CLI -command;
 
+use strictures 2;
+no warnings "experimental::signatures";
+
 =head1 VERSION
 
-Version v1.4.0
+Version v1.4.2
 
 =cut
 
-our $VERSION = "v1.4.0";
+our $VERSION = "v1.4.2";
 
 use constant {
 	abstract   => q[list which boxer plugins are installed],
@@ -40,10 +43,8 @@ sub opt_spec
 	return;
 }
 
-sub execute
+sub execute ( $self, $opt, $args )
 {
-	my ( $self, $opt, $args ) = @_;
-
 	my $auth = $self->app->can('AUTHORITY');
 	printf(
 		FORMAT_STR,

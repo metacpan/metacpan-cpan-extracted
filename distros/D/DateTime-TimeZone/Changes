@@ -1,3 +1,9 @@
+2.39    2020-04-24
+
+- This release is based on version 2020a of the Olson database. This release
+  includes contemporary changes for Morocco an the Yukon.
+
+
 2.38    2019-11-15
 
 - Added support for Etc/GMT and Etc/UTC style zones like "Etc/GMT-2" or

@@ -1,48 +1,42 @@
 {
-   "version" : "0.25",
    "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : 2,
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
       },
-   "generated_by" : "Author",
+   "provides" : {
+      "VCS::SCCS" : {
+         "file" : "SCCS.pm",
+         "version" : "0.26"
+         }
+      },
+   "version" : "0.26",
    "license" : [
       "perl_5"
       ],
-   "author" : [
-      "H.Merijn Brand <h.m.brand@xs4all.nl>"
-      ],
    "abstract" : "OO Interface to SCCS files",
+   "dynamic_config" : 1,
    "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "perl" : "5.006",
+            "Carp" : "0",
+            "POSIX" : "0"
+            }
+         },
+      "test" : {
+         "recommends" : {
+            "Test::More" : "1.302175"
+            },
+         "requires" : {
+            "Test::NoWarnings" : "0",
+            "Test::More" : "0"
+            }
+         },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
             }
-         },
-      "test" : {
-         "requires" : {
-            "Test::NoWarnings" : "0",
-            "Test::More" : "0"
-            },
-         "recommends" : {
-            "Test::More" : "1.302174"
-            }
-         },
-      "runtime" : {
-         "requires" : {
-            "POSIX" : "0",
-            "Carp" : "0",
-            "File::Spec" : "0",
-            "perl" : "5.006"
-            }
-         }
-      },
-   "dynamic_config" : 1,
-   "release_status" : "stable",
-   "name" : "VCS-SCCS",
-   "provides" : {
-      "VCS::SCCS" : {
-         "file" : "SCCS.pm",
-         "version" : "0.25"
          }
       },
    "resources" : {
@@ -50,9 +44,15 @@
          "http://dev.perl.org/licenses/"
          ],
       "repository" : {
-         "type" : "git",
          "web" : "https://github.com/Tux/VCS-SCCS",
+         "type" : "git",
          "url" : "https://github.com/Tux/VCS-SCCS"
          }
-      }
+      },
+   "author" : [
+      "H.Merijn Brand <h.m.brand@xs4all.nl>"
+      ],
+   "name" : "VCS-SCCS",
+   "generated_by" : "Author",
+   "release_status" : "stable"
    }

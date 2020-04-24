@@ -2,43 +2,67 @@
 
 use v5.14;
 use utf8;
-use strictures 2;
 
 use Test::More;
 use Test::Fatal;
-use File::Which;
+use Test::Deep qw(:v1);
 use Path::Tiny;
 use Log::Any::Test;
 use Log::Any qw($log);
 
-plan skip_all => 'reclass executable required' unless which('reclass');
+use strictures 2;
+no warnings "experimental::signatures";
 
 use_ok('Boxer::Task::Classify');
 
-my $from_reclass = new_ok(
-	'Boxer::Task::Classify' => [
-		datadir => path('examples'),
-	]
-);
-$log->empty_ok("no more logs");
+subtest 'from examples' => sub {
+	my $classifier = new_ok(
+		'Boxer::Task::Classify' => [ datadir => path('examples'), ] );
+	$log->empty_ok("no more logs");
 
-my $from_root = new_ok( 'Boxer::Task::Classify' => [ datadir => path('.') ] );
-$log->empty_ok("no more logs");
+	my $world = $classifier->run;
+	isa_ok $world, 'Boxer::World',
+		'classified world is a Boxer::World';
+	$log->category_contains_ok(
+		'Boxer::Task::Classify',
+		qr/^Resolving nodedir /, 'datadir logged'
+	);
+	$log->category_contains_ok(
+		'Boxer::Task::Classify',
+		qr/^Resolving classdir /, 'classdir logged'
+	);
+	$log->category_contains_ok(
+		'Boxer::Task::Classify',
+		qr/^Classifying /, 'classification logged'
+	);
+	$log->empty_ok("no more logs");
+};
 
-like exception {
-	$from_root->run;
-}, qr/Must be an existing directory containing boxer classes/,
-	'Died as expected on existing but wrong datadir';
-$log->category_contains_ok(
-	'Boxer::Task::Classify',
-	qr/^Resolving nodedir from datadir/, 'datadir resolving logged'
-);
-$log->empty_ok("no more logs");
+subtest 'from empty dirs' => sub {
+	my $dir = Path::Tiny->tempdir;
+	note("Temporary directory is $dir");
 
-like exception {
-	Boxer::Task::Classify->new( datadir => path('nowhere') );
-}, qr/Directory 'nowhere' does not exist/,
-	'Died as expected on non-exising datadir';
-$log->empty_ok("no more logs");
+	my $classifier = new_ok( 'Boxer::Task::Classify' => [ datadir => $dir ] );
+	$log->empty_ok("no more logs");
+
+	like exception {
+		$classifier->run;
+	}, qr/Must be an existing directory /, 'Died as expected';
+	$log->category_contains_ok(
+		'Boxer::Task::Classify',
+		qr/^Resolving classdir from /, 'classdir logged'
+	);
+	$log->empty_ok("no more logs");
+};
+
+subtest 'from non-existing dirs' => sub {
+	my $dir = Path::Tiny->tempdir;
+	note("Temporary directory is $dir");
+
+	like exception {
+		Boxer::Task::Classify->new( datadir => $dir->child('foo') );
+	}, qr/Directory '\S+' does not exist/, 'Died as expected';
+	$log->empty_ok("no more logs");
+};
 
 done_testing();

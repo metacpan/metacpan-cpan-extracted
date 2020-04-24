@@ -34,8 +34,8 @@
          "rdfs:label" : "artform",
          "schema:domainIncludes" : "schema:VisualArtwork",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:URL"
+            "schema:URL",
+            "schema:Text"
          ]
       },
       "schema:artist" : {
@@ -44,9 +44,9 @@
          "rdfs:label" : "artist",
          "schema:category" : "Comics",
          "schema:domainIncludes" : [
-            "schema:ComicStory",
             "schema:VisualArtwork",
-            "schema:ComicIssue"
+            "schema:ComicIssue",
+            "schema:ComicStory"
          ],
          "schema:isPartOf" : "http:bib.schema.org",
          "schema:rangeIncludes" : "schema:Person"
@@ -67,8 +67,8 @@
          "rdfs:label" : "colorist",
          "schema:category" : "Comics",
          "schema:domainIncludes" : [
-            "schema:VisualArtwork",
             "schema:ComicIssue",
+            "schema:VisualArtwork",
             "schema:ComicStory"
          ],
          "schema:isPartOf" : "http:bib.schema.org",
@@ -84,8 +84,8 @@
             "schema:VisualArtwork"
          ],
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Distance"
+            "schema:Distance",
+            "schema:QuantitativeValue"
          ]
       },
       "schema:height" : {
@@ -93,10 +93,10 @@
          "rdfs:comment" : "The height of the item.",
          "rdfs:label" : "height",
          "schema:domainIncludes" : [
-            "schema:Product",
-            "schema:MediaObject",
+            "schema:VisualArtwork",
             "schema:Person",
-            "schema:VisualArtwork"
+            "schema:Product",
+            "schema:MediaObject"
          ],
          "schema:rangeIncludes" : [
             "schema:QuantitativeValue",
@@ -109,9 +109,9 @@
          "rdfs:label" : "inker",
          "schema:category" : "Comics",
          "schema:domainIncludes" : [
+            "schema:VisualArtwork",
             "schema:ComicIssue",
-            "schema:ComicStory",
-            "schema:VisualArtwork"
+            "schema:ComicStory"
          ],
          "schema:isPartOf" : "http:bib.schema.org",
          "schema:rangeIncludes" : "schema:Person"
@@ -135,9 +135,9 @@
          "rdfs:label" : "penciler",
          "schema:category" : "Comics",
          "schema:domainIncludes" : [
+            "schema:ComicIssue",
             "schema:VisualArtwork",
-            "schema:ComicStory",
-            "schema:ComicIssue"
+            "schema:ComicStory"
          ],
          "schema:isPartOf" : "http:bib.schema.org",
          "schema:rangeIncludes" : "schema:Person"
@@ -164,8 +164,8 @@
             "schema:MediaObject"
          ],
          "schema:rangeIncludes" : [
-            "schema:Distance",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Distance"
          ]
       }
    }

@@ -13,8 +13,8 @@
          "rdfs:comment" : "The delivery method(s) to which the delivery charge or payment charge specification applies.",
          "rdfs:label" : "appliesToDeliveryMethod",
          "schema:domainIncludes" : [
-            "schema:PaymentChargeSpecification",
-            "schema:DeliveryChargeSpecification"
+            "schema:DeliveryChargeSpecification",
+            "schema:PaymentChargeSpecification"
          ],
          "schema:rangeIncludes" : "schema:DeliveryMethod"
       },
@@ -23,18 +23,18 @@
          "rdfs:comment" : "The geographic area where a service or offered item is provided.",
          "rdfs:label" : "areaServed",
          "schema:domainIncludes" : [
-            "schema:Offer",
             "schema:DeliveryChargeSpecification",
-            "schema:ContactPoint",
-            "schema:Organization",
             "schema:Demand",
-            "schema:Service"
+            "schema:Offer",
+            "schema:Organization",
+            "schema:Service",
+            "schema:ContactPoint"
          ],
          "schema:rangeIncludes" : [
-            "schema:Place",
-            "schema:GeoShape",
+            "schema:Text",
             "schema:AdministrativeArea",
-            "schema:Text"
+            "schema:Place",
+            "schema:GeoShape"
          ]
       },
       "schema:eligibleRegion" : {
@@ -48,15 +48,15 @@
          "rdfs:subPropertyOf" : "schema:areaServed",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:Offer",
             "schema:Demand",
+            "schema:Offer",
             "schema:ActionAccessSpecification",
             "schema:DeliveryChargeSpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:Place",
+            "schema:Text",
             "schema:GeoShape",
-            "schema:Text"
+            "schema:Place"
          ]
       },
       "schema:ineligibleRegion" : {
@@ -66,16 +66,16 @@
          "rdfs:label" : "ineligibleRegion",
          "schema:category" : "issue-2242",
          "schema:domainIncludes" : [
-            "schema:Offer",
-            "schema:Demand",
+            "schema:ActionAccessSpecification",
             "schema:DeliveryChargeSpecification",
-            "schema:ActionAccessSpecification"
+            "schema:Demand",
+            "schema:Offer"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
             "schema:GeoShape",
-            "schema:Place"
+            "schema:Place",
+            "schema:Text"
          ]
       }
    }

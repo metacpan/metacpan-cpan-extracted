@@ -30,7 +30,7 @@ DateTime::TimeZone::Local->_load_subclass() =~ /Unix$/
 
 my $IsMaintainer = hostname() =~ /houseabsolute|quasar/ && -d '.hg';
 my $CanWriteEtcLocaltime = -w '/etc/localtime' && -l '/etc/localtime';
-my $CanSymlink           = try {
+my $CanSymlink = try {
 ## no critic (InputOutput::RequireCheckedSyscalls)
     symlink q{}, q{};
     1;
@@ -268,7 +268,7 @@ SKIP:
         my $tz_file = catfile( $zoneinfo_dir, 'America', 'Chicago' );
         open my $fh, '>', $tz_file or die $!;
         print {$fh} 'foo' or die $!;
-        close $fh or die $!;
+        close $fh         or die $!;
 
         symlink $tz_file => catfile( $etc_dir, 'localtime' ) or die $!;
 
@@ -288,7 +288,7 @@ SKIP:
         my $tz_file = catdir( $etc_dir, 'timezone' );
         open my $fh, '>', $tz_file or die $!;
         print {$fh} "America/Chicago\n" or die $!;
-        close $fh or die $!;
+        close $fh                       or die $!;
 
         local *DateTime::TimeZone::Local::Unix::FromEtcLocaltime
             = sub {undef};
@@ -321,7 +321,7 @@ SKIP:
 
     open my $fh, '>', $tz_file or die $!;
     print {$fh} "TZ=Australia/Melbourne\n" or die $!;
-    close $fh or die $!;
+    close $fh                              or die $!;
 
     {
         # requires that /etc/default/init contain
@@ -355,7 +355,7 @@ SKIP:
     open my $fh, '>', $tz_file
         or die "Cannot write to $tz_file: $!";
     print {$fh} 'Foo/Bar' or die $!;
-    close $fh or die $!;
+    close $fh             or die $!;
 
     DateTime::TimeZone::Local::Unix->FromEtcTimezone();
     is(
@@ -375,7 +375,7 @@ SKIP:
     open my $fh, '>', $tz_file
         or die "Cannot write to $tz_file: $!";
     print {$fh} "TZ = Foo/Bar\n" or die $!;
-    close $fh or die $!;
+    close $fh                    or die $!;
 
     DateTime::TimeZone::Local::Unix->FromEtcTIMEZONE();
     is(

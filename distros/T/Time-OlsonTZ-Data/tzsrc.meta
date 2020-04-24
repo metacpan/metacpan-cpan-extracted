@@ -52,5 +52,5 @@
 		"zone1970.tab",
 		"zoneinfo2tdf.pl",
 	],
-	version => "2019c",
+	version => "2020a",
 }

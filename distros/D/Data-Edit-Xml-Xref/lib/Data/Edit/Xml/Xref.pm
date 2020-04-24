@@ -19,7 +19,7 @@
 # Conrefs report should use targets/ to update the conref file so conrefs fixed by fixDitaRefs are considered
 
 package Data::Edit::Xml::Xref;
-our $VERSION = 20200202;
+our $VERSION = 20200424;
 use v5.26;
 use warnings FATAL => qw(all);
 use strict;
@@ -3408,8 +3408,8 @@ sub createClassificationMap($$$)                                                
     push my @o, <<END;                                                          # Other meta fields for classification map
 <map>
   <topicmeta>
-    <othermeta name="ryffine.classificationMap" content="yes"/>
-    <othermeta name="ryffine.classificationMap.source" content="$bookMap"/>
+    <othermeta name="appaapps.classificationMap" content="yes"/>
+    <othermeta name="appaapps.classificationMap.source" content="$bookMap"/>
   </topicmeta>
 END
 
@@ -3932,8 +3932,8 @@ END
     file=>(fpe(qw(good urls txt))),
     summarize=>1);
 
-  {urlsBad  => \%b,
-   urlsGood => \%g,
+  {urlsBad  => {%b},
+   urlsGood => {%g},
   }                                                                             # From multiverse to universe
  } # reportUrls
 
@@ -4723,19 +4723,19 @@ B<Example:>
   lll "Test 011";
     clearFolder(tests, 111);
     createSampleInputFilesForFixDitaRefsImproved3(tests);
-  
+
     my $y = 𝘅𝗿𝗲𝗳(inputFolder => out, reports => reportFolder);                    # Check results without fixes
     ok $y->statusLine eq q(Xref: 1 ref);
-  
+
     my $x = 𝘅𝗿𝗲𝗳
      (inputFolder => out,
       reports     => reportFolder,
       fixBadRefs  => 1,
       fixDitaRefs => targets,
       fixedFolder => outFixed);
-  
+
     ok !$x->errors;
-  
+
 
 =head1 Create test data
 
@@ -6625,8 +6625,8 @@ sub createUrlTests($)                                                           
 <concept id="c">
   <title>Urls</title>
   <conbody>
-    <p><xref format="html" href="https://www.ryffine.com" scope="external">aaa</xref></p>
-    <p><xref format="html" href="https://ww2.ryffine.com" scope="external">bbb</xref></p>
+    <p><xref format="html" href="https://www.appaapps.com" scope="external">aaa</xref></p>
+    <p><xref format="html" href="https://ww2.appaapps.com" scope="external">bbb</xref></p>
   </conbody>
 </concept>
 END
@@ -9082,11 +9082,12 @@ lll "Test 033 Urls";
 
   my $x = xref(inputFolder => in, reports => reportFolder, validateUrls=>1);
 
-  ok $x->statusLine eq q(Xref: 1 url);
+  ok $x->statusLine eq q(Xref: 2 urls);
 
-  #dumpFile(q(/home/phil/z/xref.data), deleteVariableFields($x)); exit;
+#  dumpFile(q(/home/phil/z/xref.data), deleteVariableFields($x));
   is_deeply deleteVariableFields($x),
- {addNavTitles                         => undef,
+bless({
+  addNavTitles                         => undef,
   allowUniquePartialMatches            => undef,
   attributeCount                       => {
                                             "concept.dita" => { format => 2, href => 2, id => 1, scope => 2 },
@@ -9094,7 +9095,7 @@ lll "Test 033 Urls";
   attributeNamesAndValuesCount         => {
                                             "concept.dita" => {
                                               format => { html => 2 },
-                                              href => { "ww2.ryffine.com" => 1, "www.ryffine.com" => 1 },
+                                              href => { "ww2.appaapps.com" => 1, "www.appaapps.com" => 1 },
                                               id => { c => 1 },
                                               scope => { external => 2 },
                                             },
@@ -9201,7 +9202,7 @@ lll "Test 033 Urls";
   matchTopics                          => undef,
   maxZoomIn                            => undef,
   maxZoomOut                           => { "concept.dita" => {} },
-  md5Sum                               => { "concept.dita" => "e35a2dd1ebfc703810418cde44b5aef7" },
+  md5Sum                               => { "concept.dita" => "f38f3212622c0fd073b213176a045e47" },
   md5SumDuplicates                     => {},
   missingImageFiles                    => {},
   missingTopicIds                      => {},
@@ -9223,13 +9224,13 @@ lll "Test 033 Urls";
   references                           => {},
   relocatedReferencesFailed            => [],
   relocatedReferencesFixed             => [],
-  reports                              => '',
+  reports                              => "",
   requestAttributeNameAndValueCounts   => undef,
   requiredCleanUp                      => {},
-  results                              => [[1, "url"]],
+  results                              => [[2, "urls"]],
   sourceTopicToTargetBookMap           => {},
-  statusLine                           => "Xref: 1 url",
-  statusTable                          => "   Count  Condition\n1      1  url\n",
+  statusLine                           => "Xref: 2 urls",
+  statusTable                          => "   Count  Condition\n1      2  urls\n",
   subjectSchemeMap                     => undef,
   suppressReferenceChecks              => undef,
   tableDimensions                      => {},
@@ -9250,10 +9251,13 @@ lll "Test 033 Urls";
   topicsReferencedFromBookMaps         => {},
   topicsToReferringBookMaps            => {},
   urls                                 => {
-                                            "concept.dita" => { "ww2.ryffine.com" => 1, "www.ryffine.com" => 1 },
+                                            "concept.dita" => { "ww2.appaapps.com" => 1, "www.appaapps.com" => 1 },
                                           },
-  urlsBad                              => { "ww2.ryffine.com" => { "concept.dita" => 1 } },
-  urlsGood                             => { "www.ryffine.com" => { "concept.dita" => 1 } },
+  urlsBad                              => {
+                                            "ww2.appaapps.com" => { "concept.dita" => 1 },
+                                            "www.appaapps.com" => { "concept.dita" => 1 },
+                                          },
+  urlsGood                             => {},
   validateUrls                         => 1,
   validationErrors                     => {},
   vocabulary                           => {},
@@ -9261,7 +9265,7 @@ lll "Test 033 Urls";
   xrefBadScope                         => {},
   xRefs                                => {},
   xrefsFixedByTitle                    => [],
-};
+}, "Data::Edit::Xml::Xref")
  }
 
 clearFolder($_, 1e3) for in, out, outFixed, reportFolder, tests, targets, q(zzzParseErrors);

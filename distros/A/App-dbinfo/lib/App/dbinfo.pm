@@ -3,7 +3,7 @@ package App::dbinfo;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-04-20'; # DATE
 our $DIST = 'App-dbinfo'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -67,6 +67,14 @@ our %arg_table = (
         summary => 'Table name',
         schema => 'str*',
         req => 1,
+        pos => 1,
+    },
+);
+
+our %arg1opt_table = (
+    table => {
+        summary => 'Table name',
+        schema => 'str*',
         pos => 1,
     },
 );
@@ -369,6 +377,46 @@ sub dump_sqlite_table {
     );
 }
 
+$SPEC{list_indexes} = {
+    v => 1.1,
+    summary => 'List database indexes',
+    args => {
+        %args_common_dbi,
+        %arg1opt_table,
+    },
+    args_rels => {
+        %args_rels_common,
+    },
+};
+sub list_indexes {
+    require DBIx::Diff::Schema;
+
+    my %args = @_;
+
+    my $dbh = _connect(\%args);
+
+    [200, "OK", DBIx::Diff::Schema::list_table_indexes($dbh, $args{table})];
+}
+
+$SPEC{list_sqlite_indexes} = {
+    v => 1.1,
+    summary => 'List SQLite table indexes',
+    args => {
+        %args_common_sqlite,
+        %arg1opt_table,
+    },
+    args_rels => {
+    },
+};
+sub list_sqlite_indexes {
+    my %args = @_;
+    my $dsn; $dsn = "dbi:SQLite:dbname=".delete($args{dbpath}) if defined $args{dbpath};
+    list_indexes(
+        dsn => $dsn,
+        %args,
+    );
+}
+
 1;
 # ABSTRACT: Get/extract information from database
 
@@ -384,7 +432,7 @@ App::dbinfo - Get/extract information from database
 
 =head1 VERSION
 
-This document describes version 0.006 of App::dbinfo (from Perl distribution App-dbinfo), released on 2020-04-20.
+This document describes version 0.007 of App::dbinfo (from Perl distribution App-dbinfo), released on 2020-04-20.
 
 =head1 SYNOPSIS
 
@@ -591,6 +639,55 @@ Return value:  (any)
 
 
 
+=head2 list_indexes
+
+Usage:
+
+ list_indexes(%args) -> [status, msg, payload, meta]
+
+List database indexes.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<dbh> => I<obj>
+
+Alternative to specifying dsnE<sol>userE<sol>password (from Perl).
+
+=item * B<dsn> => I<str>
+
+DBI data source, e.g. "dbi:SQLite:dbname=E<sol>pathE<sol>toE<sol>db.db".
+
+=item * B<password> => I<str>
+
+You might want to specify this parameter in a configuration file instead of
+directly as command-line option.
+
+=item * B<table> => I<str>
+
+Table name.
+
+=item * B<user> => I<str>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
 =head2 list_sqlite_columns
 
 Usage:
@@ -622,6 +719,42 @@ Arguments ('*' denotes required arguments):
 Show detailed information per record.
 
 =item * B<table>* => I<str>
+
+Table name.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 list_sqlite_indexes
+
+Usage:
+
+ list_sqlite_indexes(%args) -> [status, msg, payload, meta]
+
+List SQLite table indexes.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<dbpath> => I<filename>
+
+=item * B<table> => I<str>
 
 Table name.
 

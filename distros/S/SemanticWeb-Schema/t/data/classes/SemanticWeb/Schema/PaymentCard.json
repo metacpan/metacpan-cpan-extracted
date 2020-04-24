@@ -22,8 +22,8 @@
          "schema:domainIncludes" : "schema:PaymentCard",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:Boolean"
+            "schema:Boolean",
+            "schema:Number"
          ]
       },
       "schema:contactlessPayment" : {

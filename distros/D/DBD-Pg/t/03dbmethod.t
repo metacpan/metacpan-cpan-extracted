@@ -25,7 +25,7 @@ my $dbh = connect_database();
 if (! $dbh) {
     plan skip_all => 'Connection to database failed, cannot continue testing';
 }
-plan tests => 580;
+plan tests => 589;
 
 isnt ($dbh, undef, 'Connect to database for database handle method testing');
 
@@ -37,7 +37,7 @@ my ($schema,$schema2,$schema3) = ('dbd_pg_testschema', 'dbd_pg_testschema2', 'db
 my ($table1,$table2,$table3) = ('dbd_pg_test1','dbd_pg_test2','dbd_pg_test3');
 my ($sequence2,$sequence3,$sequence4) = ('dbd_pg_testsequence2','dbd_pg_testsequence3','dbd_pg_testsequence4');
 
-my ($SQL, $sth, $result, @result, $expected, $warning, $rows, $t, $info);
+my ($SQL, $sth, $result, @results, $expected, $warning, $rows, $t, $info);
 
 # Quick simple "tests"
 
@@ -176,7 +176,7 @@ eval {
 is ($@, q{}, $t);
 
 $t='DB handle method "last_insert_id" returns a numeric value';
-like ($result, qr{^\d+$}, $t);
+like ($result, qr{^[0-9]+$}, $t);
 
 $t='DB handle method "last_insert_id" works when given a valid sequence and an invalid table';
 eval {
@@ -185,7 +185,7 @@ eval {
 is ($@, q{}, $t);
 
 $t='DB handle method "last_insert_id" returns a numeric value';
-like ($result, qr{^\d+$}, $t);
+like ($result, qr{^[0-9]+$}, $t);
 
 $t='DB handle method "last_insert_id" works when given a valid table';
 eval {
@@ -325,9 +325,9 @@ $dbh->do("DROP SEQUENCE $sequence4");
 
 $t='DB handle method "selectrow_array" works';
 $SQL = 'SELECT id FROM dbd_pg_test ORDER BY id';
-@result = $dbh->selectrow_array($SQL);
+@results = $dbh->selectrow_array($SQL);
 $expected = [10];
-is_deeply (\@result, $expected, $t);
+is_deeply (\@results, $expected, $t);
 
 #
 # Test of the "selectrow_arrayref" database handle method
@@ -542,7 +542,7 @@ cmp_ok ($namedatalen, '>=', 63, $t);
 # Make sure odbcversion looks normal
 $t='DB handle method "get_info" returns a valid looking ODBCVERSION string}';
 my $odbcversion = $dbh->get_info(18);
-like ($odbcversion, qr{^([1-9]\d|\d[1-9])\.\d\d\.\d\d00$}, $t);
+like ($odbcversion, qr{^([1-9][0-9]|[0-9][1-9])\.[0-9][0-9]\.[0-9][0-9]00$}, $t);
 
 # Make sure odbcversion looks abnormal
 $t='DB handle method "get_info" returns zeroes if the version cannot be parsed}';
@@ -555,7 +555,7 @@ is ($odbcversion, '00.00.0000', $t);
 # Testing max connections is good as this info is dynamic
 $t='DB handle method "get_info" returns a number for SQL_MAX_DRIVER_CONNECTIONS';
 my $maxcon = $dbh->get_info('SQL_MAX_DRIVER_CONNECTIONS');
-like ($maxcon, qr{^\d+$}, $t);
+like ($maxcon, qr{^[0-9]+$}, $t);
 
 # Test the DBDVERSION
 $t='DB handle method "get_info" returns a number for SQL_DRIVER_VER';
@@ -620,72 +620,113 @@ is ($result->{TABLE_CAT}, $dbh->{pg_db}, 'DB handle method "table_info" returns 
 is ($result->{TABLE_NAME}, 'dbd_pg_test', 'DB handle method "table_info" returns proper TABLE_NAME');
 is ($result->{TABLE_TYPE}, 'TABLE', 'DB handle method "table_info" returns proper TABLE_TYPE');
 
-$t=q{DB handle method "table_info" returns correct number of rows when given a 'TABLE,VIEW' type argument};
-$sth = $dbh->table_info(undef,undef,undef,'TABLE,VIEW');
-$number = $sth->rows();
-cmp_ok ($number, '>', 1, $t);
-
-$t=q{DB handle method "table_info" returns correct number of rows when given a 'TABLE,VIEW,SYSTEM TABLE,SYSTEM VIEW' type argument};
-$sth = $dbh->table_info(undef,undef,undef,'TABLE,VIEW,SYSTEM TABLE,SYSTEM VIEW');
-$number = $sth->rows();
-cmp_ok ($number, '>', 1, $t);
-
 $t='DB handle method "table_info" returns zero rows when given an invalid type argument';
 $sth = $dbh->table_info(undef,undef,undef,'DUMMY');
 $rows = $sth->rows();
 is ($rows, 0, $t);
 
-$t=q{DB handle method "table_info" returns correct number of rows when given a 'VIEW' type argument};
+$t=q{DB handle method "table_info" returns rows when given a 'VIEW' type argument};
 $sth = $dbh->table_info(undef,undef,undef,'VIEW');
-$rows = $sth->rows();
-cmp_ok ($rows, '<', $number, $t);
+my $count_views = $sth->rows();
+cmp_ok ($count_views, '>', 1, $t);
 
-$t=q{DB handle method "table_info" returns correct number of rows when given a 'TABLE' type argument};
-$sth = $dbh->table_info(undef,undef,undef,'TABLE');
-$rows = $sth->rows();
-cmp_ok ($rows, '<', $number, $t);
+$t=q{DB handle method "table_info" returns no rows when given a 'VIEW' type argument for the test schema};
+$sth = $dbh->table_info(undef,$schema,undef,'VIEW');
+is ($sth->rows, 0, $t);
+
+$t=q{DB handle method "table_info" returns one row when given a 'TABLE,VIEW' type argument for the test schema};
+$sth = $dbh->table_info(undef,$schema,undef,'TABLE,VIEW');
+is ($sth->rows, 1, $t);
+
+$dbh->do('CREATE VIEW testview AS SELECT sum(reltuples) AS tonsoftups FROM pg_class');
+
+$t=q{DB handle method "table_info" returns no rows when given a 'VIEW' type argument for the test schema};
+$sth = $dbh->table_info(undef,$schema,undef,'VIEW');
+is ($sth->rows, 1, $t);
+
+$t=q{DB handle method "table_info" returns one row when given a 'TABLE,VIEW' type argument for the test schema};
+$sth = $dbh->table_info(undef,$schema,undef,'TABLE,VIEW');
+is ($sth->rows, 2, $t);
+
+$t=q{DB handle method "table_info" returns same rows when given a 'TABLE,VIEW,SYSTEM TABLE,SYSTEM VIEW' type argument};
+$sth = $dbh->table_info(undef,$schema,undef,'TABLE,VIEW,SYSTEM TABLE,SYSTEM VIEW');
+is ($sth->rows, 2, $t);
+
+$t=q{DB handle method "table_info" returns more rows when given a 'TABLE,VIEW,SYSTEM TABLE,SYSTEM VIEW' type argument};
+$sth = $dbh->table_info(undef,undef,undef,'TABLE,VIEW,SYSTEM TABLE,SYSTEM VIEW');
+## Should be at least 100 system tables and views
+cmp_ok ($sth->rows(), '>', 100, $t);
 
 $dbh->do('CREATE TEMP TABLE dbd_pg_local_temp (i INT)');
 
-$t=q{DB handle method "table_info" returns correct number of rows when given a 'LOCAL TEMPORARY' type argument};
+$t=q{DB handle method "table_info" returns no 'LOCAL TEMPORARY' rows for specific schema};
+$sth = $dbh->table_info(undef,$schema,undef,'LOCAL TEMPORARY');
+is ($sth->rows(), 0, $t);
+
+$t=q{DB handle method "table_info" returns one 'LOCAL TEMPORARY' row for specific table};
+$sth = $dbh->table_info(undef,undef,'dbd_pg_local_temp','LOCAL TEMPORARY');
+is ($sth->rows(), 1, $t);
+
+$t=q{DB handle method "table_info" returns correct 'LOCAL TEMPORARY' rows across whole system};
 $sth = $dbh->table_info(undef,undef,undef,'LOCAL TEMPORARY');
-$rows = $sth->rows();
-cmp_ok ($rows, '<', $number, $t);
-cmp_ok ($rows, '>', 0, $t);
-
-$t=q{DB handle method "table_info" returns correct number of rows when given a 'MATERIALIZED VIEW' type argument};
-$sth = $dbh->table_info(undef,undef,undef,'MATERIALIZED VIEW');
-$rows = $sth->rows();
-is ($rows, 0, $t);
-
-$t=q{DB handle method "table_info" returns correct number of rows when given a 'FOREIGN TABLE' type argument};
-$sth = $dbh->table_info(undef,undef,undef,'FOREIGN TABLE');
-$rows = $sth->rows();
-is ($rows, 0, $t);
+my $total_temp = $sth->rows();
+$dbh->do('DROP TABLE dbd_pg_local_temp');
+$sth = $dbh->table_info(undef,undef,undef,'LOCAL TEMPORARY');
+is ($sth->rows(), $total_temp-1, $t);
 
 SKIP: {
+
     if ($pgversion < 90300) {
-        skip 'Postgres version 9.3 or better required to create materialized views', 1;
+        skip ('Cannot test table_info for materialized views unless database if 9.3 or higher', 3);
     }
-    $dbh->do('CREATE MATERIALIZED VIEW dbd_pg_matview (a) AS SELECT count(*) FROM pg_class');
-    $t=q{DB handle method "table_info" returns correct number of rows when given a 'MATERIALIZED VIEW' type argument};
+
     $sth = $dbh->table_info(undef,undef,undef,'MATERIALIZED VIEW');
-    $rows = $sth->rows();
-    is ($rows, 1, $t);
+    my $total_matviews = $sth->rows();
+
+    $t=q{DB handle method "table_info" returns zero 'MATERIALIZED VIEW' rows for test schema};
+    $sth = $dbh->table_info(undef,$schema,undef,'MATERIALIZED VIEW');
+    is ($sth->rows(), 0, $t);
+
+    $dbh->do("CREATE MATERIALIZED VIEW $schema.testmatview AS SELECT 123 WITH NO DATA");
+
+    $t=q{DB handle method "table_info" returns one 'MATERIALIZED VIEW' rows for test schema};
+    $sth = $dbh->table_info(undef,$schema,undef,'MATERIALIZED VIEW');
+    is ($sth->rows(), 1, $t);
+
+    $t=q{DB handle method "table_info" returns expected 'MATERIALIZED VIEW' rows};
+    $sth = $dbh->table_info(undef,undef,undef,'MATERIALIZED VIEW');
+    is ($sth->rows(), $total_matviews+1, $t);
+
 }
 
 SKIP: {
+
     if ($pgversion < 90100) {
-        skip 'Postgres version 9.1 or better required to create foreign tables', 1;
+        skip ('Cannot test table_info for foreign tables unless database is 9.1 or higher', 3);
     }
+
+    $sth = $dbh->table_info(undef,undef,undef,'FOREIGN TABLE');
+    my $total_ftables = $sth->rows();
+
+    $t=q{DB handle method "table_info" returns zero 'FOREIGN TABLE' rows for test schema};
+    $sth = $dbh->table_info(undef,$schema,undef,'FOREIGN TABLE');
+    is ($sth->rows(), 0, $t);
+
+    $dbh->do('DROP FOREIGN DATA WRAPPER IF EXISTS dbd_pg_testfdw CASCADE');
     $dbh->do('CREATE FOREIGN DATA WRAPPER dbd_pg_testfdw');
     $dbh->do('CREATE SERVER dbd_pg_testserver FOREIGN DATA WRAPPER dbd_pg_testfdw');
-    $dbh->do('CREATE FOREIGN TABLE dbd_pg_testforeign (c1 int) SERVER dbd_pg_testserver');
-    $t=q{DB handle method "table_info" returns correct number of rows when given a 'FOREIGN TABLE' type argument};
+    $dbh->do("CREATE FOREIGN TABLE $schema.dbd_pg_testforeign (c1 int) SERVER dbd_pg_testserver");
+
+    $t=q{DB handle method "table_info" returns one 'FOREIGN TABLE' rows for test schema};
+    $sth = $dbh->table_info(undef,$schema,undef,'FOREIGN TABLE');
+    is ($sth->rows(), 1, $t);
+
+    $t=q{DB handle method "table_info" returns expected 'FOREIGN TABLE' rows};
     $sth = $dbh->table_info(undef,undef,undef,'FOREIGN TABLE');
-    $rows = $sth->rows();
-    is ($rows, 1, $t);
+    is ($sth->rows(), $total_ftables+1, $t);
+
     $dbh->rollback();
+
 }
 
 # Test listing catalog names
@@ -700,7 +741,7 @@ ok ($sth, $t);
 
 { # Test listing table types
 
-my @expected = ('LOCAL TEMPORARY',
+$expected = ['LOCAL TEMPORARY',
                 'SYSTEM TABLE',
                 'SYSTEM VIEW',
                 'MATERIALIZED VIEW',
@@ -708,7 +749,7 @@ my @expected = ('LOCAL TEMPORARY',
                 'FOREIGN TABLE',
                 'SYSTEM FOREIGN TABLE',
                 'TABLE',
-                'VIEW',);
+                'VIEW',];
 
 $t='DB handle method "table_info" works when called with a type of %';
 $sth = $dbh->table_info('', '', '', '%');
@@ -716,7 +757,7 @@ ok ($sth, $t);
 
 $t='DB handle method "table_info" type list returns all expected types';
 my %advertised = map { $_->[0] => 1 } @{ $sth->fetchall_arrayref([3]) };
-is_deeply ([sort keys %advertised], [sort @expected], $t);
+is_deeply ([sort keys %advertised], [sort @$expected], $t);
 
 $t='DB handle method "table_info" object list returns no unadvertised types';
 $sth = $dbh->table_info('', '', '%');
@@ -845,14 +886,14 @@ is ($r->{KEY_SEQ},     1,                  'DB handle method "primary_key_info" 
 #
 
 $t='DB handle method "primary_key" works';
-@result = $dbh->primary_key('', '', 'dbd_pg_test');
+@results = $dbh->primary_key('', '', 'dbd_pg_test');
 $expected = ['id'];
-is_deeply (\@result, $expected, $t);
+is_deeply (\@results, $expected, $t);
 
 $t='DB handle method "primary_key" returns empty list for invalid table';
-@result = $dbh->primary_key('', '', 'dbd_pg_test_do_not_create_this_table');
+@results = $dbh->primary_key('', '', 'dbd_pg_test_do_not_create_this_table');
 $expected = [];
-is_deeply (\@result, $expected, $t);
+is_deeply (\@results, $expected, $t);
 
 #
 # Test of the "statistics_info" database handle method
@@ -862,14 +903,23 @@ $t='DB handle method "statistics_info" returns undef: no table';
 $sth = $dbh->statistics_info(undef,undef,undef,undef,undef);
 is ($sth, undef, $t);
 
-## Invalid table
-$t='DB handle method "statistics_info" returns undef: bad table';
-$sth = $dbh->statistics_info(undef,undef,'dbd_pg_test9',undef,undef);
+$t='DB handle method "statistics_info" returns undef: empty table';
+$sth = $dbh->statistics_info(undef,undef,'',undef,undef);
 is ($sth, undef, $t);
+
+## Invalid table
+$t='DB handle method "statistics_info" returns no rows: bad table';
+$sth = $dbh->statistics_info(undef,undef,'dbd_pg_test9',undef,undef);
+$result = $sth->fetchall_arrayref;
+$expected = [];
+is_deeply ($result, $expected, $t);
 
 
 my $with_oids = $pgversion < 120000 ? 'WITH OIDS' : '';
-my $hash_index_idx = $with_oids ? 5 : 4;
+my $with_include = $pgversion >= 110000;
+my $hash_index_idx = 4;
+$hash_index_idx += 1 if $with_oids;
+$hash_index_idx += 2 if $with_include;
 ## Create some tables with various indexes
 {
     local $SIG{__WARN__} = sub {};
@@ -897,39 +947,55 @@ my $hash_index_idx = $with_oids ? 5 : 4;
     $dbh->do("CREATE INDEX dbd_pg_test3_index_c ON $table3 USING hash(c)");
     $dbh->do("CREATE INDEX dbd_pg_test3_oid ON $table3(oid)") if $with_oids;
     $dbh->do("CREATE UNIQUE INDEX dbd_pg_test3_pred ON $table3(c) WHERE c > 0 AND c < 45");
+    $dbh->do("CREATE UNIQUE INDEX dbd_pg_test3_incl ON $table3(b) INCLUDE (c)")
+        if $with_include;
     $dbh->commit();
 }
 
 my $correct_stats = {
 one => [
-    [ $dbh->{pg_db}, $schema, $table1, undef, undef, undef, 'table', undef, undef, undef, '0', '0', undef, undef ],
-    [ $dbh->{pg_db}, $schema, $table1, '0', undef, 'dbd_pg_test1_index_c', 'btree',  1, 'c', 'A', '0', '1', undef, 'c' ],
-    [ $dbh->{pg_db}, $schema, $table1, '0', undef, 'dbd_pg_test1_pk',      'btree',  1, 'a', 'A', '0', '1', undef, 'a' ],
-    [ $dbh->{pg_db}, $schema, $table1, '0', undef, 'dbd_pg_test1_uc1',     'btree',  1, 'b', 'A', '0', '1', undef, 'b' ],
+    [ $dbh->{pg_db}, $schema, $table1, undef, undef, undef, 'table', undef, undef, undef, '0', '0', undef, undef, undef ],
+    [ $dbh->{pg_db}, $schema, $table1, '0', undef, 'dbd_pg_test1_index_c', 'btree',  1, 'c', 'A', '0', '1', undef, 'c', '1' ],
+    [ $dbh->{pg_db}, $schema, $table1, '0', undef, 'dbd_pg_test1_pk',      'btree',  1, 'a', 'A', '0', '1', undef, 'a', '1' ],
+    [ $dbh->{pg_db}, $schema, $table1, '0', undef, 'dbd_pg_test1_uc1',     'btree',  1, 'b', 'A', '0', '1', undef, 'b', '1' ],
     ],
     two => [
-    [ $dbh->{pg_db}, $schema, $table2, undef, undef, undef, 'table', undef, undef, undef, '0', '0', undef, undef ],
-    [ $dbh->{pg_db}, $schema, $table2, '0', undef, 'dbd_pg_test2_b_key',   'btree',  1, 'b', 'A', '0', '1', undef, 'b' ],
-    [ $dbh->{pg_db}, $schema, $table2, '0', undef, 'dbd_pg_test2_b_key',   'btree',  2, 'c', 'A', '0', '1', undef, 'c' ],
-    [ $dbh->{pg_db}, $schema, $table2, '0', undef, 'dbd_pg_test2_pkey',    'btree',  1, 'a', 'A', '0', '1', undef, 'a' ],
-    [ $dbh->{pg_db}, $schema, $table2, '0', undef, 'dbd_pg_test2_pkey',    'btree',  2, 'b', 'A', '0', '1', undef, 'b' ],
-    [ $dbh->{pg_db}, $schema, $table2, '1', undef, 'dbd_pg_test2_expr',    'btree',  1, undef, 'A', '0', '1', undef, '(a + b)' ],
-    [ $dbh->{pg_db}, $schema, $table2, '1', undef, 'dbd_pg_test2_expr',    'btree',  2, 'c', 'A', '0', '1', undef, 'c' ],
+    [ $dbh->{pg_db}, $schema, $table2, undef, undef, undef, 'table', undef, undef, undef, '0', '0', undef, undef, undef ],
+    [ $dbh->{pg_db}, $schema, $table2, '0', undef, 'dbd_pg_test2_b_key',   'btree',  1, 'b', 'A', '0', '1', undef, 'b', '1' ],
+    [ $dbh->{pg_db}, $schema, $table2, '0', undef, 'dbd_pg_test2_b_key',   'btree',  2, 'c', 'A', '0', '1', undef, 'c', '1' ],
+    [ $dbh->{pg_db}, $schema, $table2, '0', undef, 'dbd_pg_test2_pkey',    'btree',  1, 'a', 'A', '0', '1', undef, 'a', '1' ],
+    [ $dbh->{pg_db}, $schema, $table2, '0', undef, 'dbd_pg_test2_pkey',    'btree',  2, 'b', 'A', '0', '1', undef, 'b', '1' ],
+    [ $dbh->{pg_db}, $schema, $table2, '1', undef, 'dbd_pg_test2_expr',    'btree',  1, undef, 'A', '0', '1', undef, '(a + b)', '1' ],
+    [ $dbh->{pg_db}, $schema, $table2, '1', undef, 'dbd_pg_test2_expr',    'btree',  2, 'c', 'A', '0', '1', undef, 'c', '1' ],
     ],
     three => [
-    [ $dbh->{pg_db}, $schema, $table3, undef, undef, undef, 'table', undef, undef, undef, '0', '0', undef, undef ],
-    [ $dbh->{pg_db}, $schema, $table3, '0', undef, 'dbd_pg_test3_index_b', 'btree',  1, 'b', 'A', '0', '1', undef, 'b' ],
-    [ $dbh->{pg_db}, $schema, $table3, '0', undef, 'dbd_pg_test3_pkey',    'btree',  1, 'a', 'A', '0', '1', undef, 'a' ],
-    [ $dbh->{pg_db}, $schema, $table3, '0', undef, 'dbd_pg_test3_pred',    'btree',  1, 'c', 'A', '0', '1', '((c > 0) AND (c < 45))', 'c' ],
-    ($with_oids ? [ $dbh->{pg_db}, $schema, $table3, '1', undef, 'dbd_pg_test3_oid',     'btree',  1, 'oid', 'A', '0', '1', undef, 'oid' ] : ()),
-    [ $dbh->{pg_db}, $schema, $table3, '1', undef, 'dbd_pg_test3_index_c', 'hashed', 1, 'c', 'A', '0', '4', undef, 'c' ],
+    [ $dbh->{pg_db}, $schema, $table3, undef, undef, undef, 'table', undef, undef, undef, '0', '0', undef, undef, undef ],
+    ($with_include ? (
+        [ $dbh->{pg_db}, $schema, $table3, '0', undef, 'dbd_pg_test3_incl',    'btree',  1, 'b', 'A', '0', '1', undef, 'b', '1' ],
+        [ $dbh->{pg_db}, $schema, $table3, '0', undef, 'dbd_pg_test3_incl',    'btree',  2, 'c', 'A', '0', '1', undef, 'c', '0' ],
+    ) :()),
+    [ $dbh->{pg_db}, $schema, $table3, '0', undef, 'dbd_pg_test3_index_b', 'btree',  1, 'b', 'A', '0', '1', undef, 'b', '1' ],
+    [ $dbh->{pg_db}, $schema, $table3, '0', undef, 'dbd_pg_test3_pkey',    'btree',  1, 'a', 'A', '0', '1', undef, 'a', '1' ],
+    [ $dbh->{pg_db}, $schema, $table3, '0', undef, 'dbd_pg_test3_pred',    'btree',  1, 'c', 'A', '0', '1', '((c > 0) AND (c < 45))', 'c', '1' ],
+    ($with_oids ? [ $dbh->{pg_db}, $schema, $table3, '1', undef, 'dbd_pg_test3_oid',     'btree',  1, 'oid', 'A', '0', '1', undef, 'oid', '1' ] : ()),
+    [ $dbh->{pg_db}, $schema, $table3, '1', undef, 'dbd_pg_test3_index_c', 'hashed', 1, 'c', 'A', '0', '4', undef, 'c', '1' ],
 ],
     three_uo => [
-    [ $dbh->{pg_db}, $schema, $table3, '0', undef, 'dbd_pg_test3_index_b', 'btree',  1, 'b', 'A', '0', '1', undef, 'b' ],
-    [ $dbh->{pg_db}, $schema, $table3, '0', undef, 'dbd_pg_test3_pkey',    'btree',  1, 'a', 'A', '0', '1', undef, 'a' ],
-    [ $dbh->{pg_db}, $schema, $table3, '0', undef, 'dbd_pg_test3_pred',    'btree',  1, 'c', 'A', '0', '1', '((c > 0) AND (c < 45))', 'c' ],
+    ($with_include ? (
+        [ $dbh->{pg_db}, $schema, $table3, '0', undef, 'dbd_pg_test3_incl',    'btree',  1, 'b', 'A', '0', '1', undef, 'b', '1' ],
+        [ $dbh->{pg_db}, $schema, $table3, '0', undef, 'dbd_pg_test3_incl',    'btree',  2, 'c', 'A', '0', '1', undef, 'c', '0' ],
+    ) :()),
+    [ $dbh->{pg_db}, $schema, $table3, '0', undef, 'dbd_pg_test3_index_b', 'btree',  1, 'b', 'A', '0', '1', undef, 'b', '1' ],
+    [ $dbh->{pg_db}, $schema, $table3, '0', undef, 'dbd_pg_test3_pkey',    'btree',  1, 'a', 'A', '0', '1', undef, 'a', '1' ],
+    [ $dbh->{pg_db}, $schema, $table3, '0', undef, 'dbd_pg_test3_pred',    'btree',  1, 'c', 'A', '0', '1', '((c > 0) AND (c < 45))', 'c', '1' ],
     ],
 };
+
+my @stats_columns = qw(
+    TABLE_CAT TABLE_SCHEM TABLE_NAME NON_UNIQUE INDEX_QUALIFIER INDEX_NAME TYPE
+    ORDINAL_POSITION COLUMN_NAME ASC_OR_DESC CARDINALITY PAGES FILTER_CONDITION
+    pg_expression pg_is_key_column
+);
 
 ## Make some per-version tweaks
 
@@ -957,10 +1023,16 @@ $stats = $sth->fetchall_arrayref;
 $correct_stats->{three}[$hash_index_idx][11] = $stats->[$hash_index_idx][11] = 0;
 is_deeply ($stats, $correct_stats->{three}, $t);
 
+$t = 'Correct stats column names';
+is_deeply ($sth->{NAME}, \@stats_columns, $t);
+
 $t="Correct stats output for $table3 (unique only)";
 $sth = $dbh->statistics_info(undef,$schema,$table3,1,undef);
 $stats = $sth->fetchall_arrayref;
 is_deeply ($stats, $correct_stats->{three_uo}, $t);
+
+$t = 'Correct stats column names (unique only)';
+is_deeply ($sth->{NAME}, \@stats_columns, $t);
 
 {
     $t="Correct stats output for $table1";
@@ -1271,9 +1343,9 @@ my $fk5 = [
 # primary column name [3]
 # foreign column name [7]
 # ordinal position [8]
-my @fk6 = @$fk5; my $fk6 = \@fk6; $fk6->[3] = 'a'; $fk6->[7] = 'f3'; $fk6->[8] = 2;
-my @fk7 = @$fk5; my $fk7 = \@fk7; $fk7->[3] = 'b'; $fk7->[7] = 'f2'; $fk7->[8] = 3;
-$expected = [$fk3,$fk1,$fk2,$fk5,$fk6,$fk7];
+my @fk6 = @$fk5; my $fk6r = \@fk6; $fk6r->[3] = 'a'; $fk6r->[7] = 'f3'; $fk6r->[8] = 2;
+my @fk7 = @$fk5; my $fk7r = \@fk7; $fk7r->[3] = 'b'; $fk7r->[7] = 'f2'; $fk7r->[8] = 3;
+$expected = [$fk3,$fk1,$fk2,$fk5,$fk6r,$fk7r];
 is_deeply ($result, $expected, $t);
 
 $t='DB handle method "foreign_key_info" works with FetchHashKeyName NAME_lc';
@@ -1313,16 +1385,16 @@ $dbh->do("SET search_path = $schema");
 #
 
 $t='DB handle method "tables" works';
-@result = $dbh->tables('', '', 'dbd_pg_test', '');
-like ($result[0], qr/dbd_pg_test/, $t);
+@results = $dbh->tables('', '', 'dbd_pg_test', '');
+like ($results[0], qr/dbd_pg_test/, $t);
 
 $t='DB handle method "tables" works with a "pg_noprefix" attribute';
-@result = $dbh->tables('', '', 'dbd_pg_test', '', {pg_noprefix => 1});
-is ($result[0], 'dbd_pg_test', $t);
+@results = $dbh->tables('', '', 'dbd_pg_test', '', {pg_noprefix => 1});
+is ($results[0], 'dbd_pg_test', $t);
 
 $t='DB handle method "tables" works with type=\'%\'';
-@result = $dbh->tables('', '', 'dbd_pg_test', '%');
-like ($result[0], qr/dbd_pg_test/, $t);
+@results = $dbh->tables('', '', 'dbd_pg_test', '%');
+like ($results[0], qr/dbd_pg_test/, $t);
 
 #
 # Test of the "type_info_all" database handle method
@@ -1601,27 +1673,26 @@ $t='DB handle method "pg_lo_creat" returns a valid descriptor for reading';
 $dbh->{AutoCommit}=1; $dbh->{AutoCommit}=0; ## Catch error where not in begin
 
 my ($R,$W) = ($dbh->{pg_INV_READ}, $dbh->{pg_INV_WRITE});
-my $RW = $R|$W;
 my $object;
 
 $t='DB handle method "pg_lo_creat" works with old-school dbh->func() method';
 $object = $dbh->func($W, 'pg_lo_creat');
-like ($object, qr/^\d+$/o, $t);
+like ($object, qr/^[0-9]+$/o, $t);
 isnt ($object, 0, $t);
 
 $t='DB handle method "pg_lo_creat" works with deprecated dbh->func(...lo_creat) method';
 $object = $dbh->func($W, 'lo_creat');
-like ($object, qr/^\d+$/o, $t);
+like ($object, qr/^[0-9]+$/o, $t);
 isnt ($object, 0, $t);
 
 $t='DB handle method "pg_lo_creat" returns a valid descriptor for writing';
 $object = $dbh->pg_lo_creat($W);
-like ($object, qr/^\d+$/o, $t);
+like ($object, qr/^[0-9]+$/o, $t);
 isnt ($object, 0, $t);
 
 $t='DB handle method "pg_lo_open" returns a valid descriptor for writing';
 my $handle = $dbh->pg_lo_open($object, $W);
-like ($handle, qr/^\d+$/o, $t);
+like ($handle, qr/^[0-9]+$/o, $t);
 isnt ($object, -1, $t);
 
 $t='DB handle method "pg_lo_lseek" works when writing';
@@ -1642,7 +1713,7 @@ ok ($result, $t);
 # Reopen for reading
 $t='DB handle method "pg_lo_open" returns a valid descriptor for reading';
 $handle = $dbh->pg_lo_open($object, $R);
-like ($handle, qr/^\d+$/o, $t);
+like ($handle, qr/^[0-9]+$/o, $t);
 cmp_ok ($handle, 'eq', 0, $t);
 
 $t='DB handle method "pg_lo_lseek" works when reading';
@@ -1764,7 +1835,7 @@ SKIP: {
 
         $t='DB handle method "pg_lo_open" works after "pg_lo_insert"';
         $handle = $dbh->pg_lo_open($handle, $R);
-        like ($handle, qr/^\d+$/o, $t);
+        like ($handle, qr/^[0-9]+$/o, $t);
 
         $t='DB handle method "pg_lo_read" returns correct data after "pg_lo_import"';
         $data = '';
@@ -1977,7 +2048,7 @@ is_deeply ($info, [$notify_name, $pid, ''], $t);
 
 $t='DB handle method "getfd" returns a number';
 $result = $dbh->func('getfd');
-like ($result, qr/^\d+$/, $t);
+like ($result, qr/^[0-9]+$/, $t);
 
 #
 # Test of the "state" database handle method

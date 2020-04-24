@@ -45,5 +45,5 @@ requires:
   perl: '5.010000'
 resources:
   repository: git://git.mageia.org/software/rpm/urpmi/
-version: v8.121.8
+version: v8.121.13
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

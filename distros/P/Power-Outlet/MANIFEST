@@ -15,6 +15,7 @@ lib/Power/Outlet/Hue.pm
 lib/Power/Outlet/iBoot.pm
 lib/Power/Outlet/iBootBar.pm
 lib/Power/Outlet/iBootBarGroup.pm
+lib/Power/Outlet/SonoffDiy.pm
 lib/Power/Outlet/Tasmota.pm
 lib/Power/Outlet/WeMo.pm
 lib/Power/Outlet/Virtual.pm
@@ -24,6 +25,7 @@ t/002_ip.t
 t/002_iBoot_live.t
 t/003_iBootBar_live.t
 t/003_Hue_live.t
+t/003_SonoffDiy_live.t
 t/003_Tasmota_live.t
 t/003_WeMo_live.t
 t/003_Virtual_live.t

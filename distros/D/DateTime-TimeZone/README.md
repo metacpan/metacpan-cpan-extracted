@@ -4,7 +4,7 @@ DateTime::TimeZone - Time zone object base class and factory
 
 # VERSION
 
-version 2.38
+version 2.39
 
 # SYNOPSIS
 
@@ -30,10 +30,10 @@ methods.
 ## Special Case Platforms
 
 If you are on the Win32 platform, you will want to also install
-[DateTime::TimeZone::Local::Win32](https://metacpan.org/pod/DateTime::TimeZone::Local::Win32). This will enable you to specify a time
+[DateTime::TimeZone::Local::Win32](https://metacpan.org/pod/DateTime%3A%3ATimeZone%3A%3ALocal%3A%3AWin32). This will enable you to specify a time
 zone of `'local'` when creating a [DateTime](https://metacpan.org/pod/DateTime) object.
 
-If you are on HPUX, install [DateTime::TimeZone::HPUX](https://metacpan.org/pod/DateTime::TimeZone::HPUX). This provides support
+If you are on HPUX, install [DateTime::TimeZone::HPUX](https://metacpan.org/pod/DateTime%3A%3ATimeZone%3A%3AHPUX). This provides support
 for HPUX style time zones like `'MET-1METDST'`.
 
 # USAGE
@@ -82,11 +82,11 @@ The method for finding the local zone varies by operating system. See
 the appropriate module for details of how we check for the local time
 zone.
 
-- [DateTime::TimeZone::Local::Unix](https://metacpan.org/pod/DateTime::TimeZone::Local::Unix)
-- [DateTime::TimeZone::Local::Android](https://metacpan.org/pod/DateTime::TimeZone::Local::Android)
-- [DateTime::TimeZone::Local::hpux](https://metacpan.org/pod/DateTime::TimeZone::Local::hpux)
-- [DateTime::TimeZone::Local::Win32](https://metacpan.org/pod/DateTime::TimeZone::Local::Win32)
-- [DateTime::TimeZone::Local::VMS](https://metacpan.org/pod/DateTime::TimeZone::Local::VMS)
+- [DateTime::TimeZone::Local::Unix](https://metacpan.org/pod/DateTime%3A%3ATimeZone%3A%3ALocal%3A%3AUnix)
+- [DateTime::TimeZone::Local::Android](https://metacpan.org/pod/DateTime%3A%3ATimeZone%3A%3ALocal%3A%3AAndroid)
+- [DateTime::TimeZone::Local::hpux](https://metacpan.org/pod/DateTime%3A%3ATimeZone%3A%3ALocal%3A%3Ahpux)
+- [DateTime::TimeZone::Local::Win32](https://metacpan.org/pod/DateTime%3A%3ATimeZone%3A%3ALocal%3A%3AWin32)
+- [DateTime::TimeZone::Local::VMS](https://metacpan.org/pod/DateTime%3A%3ATimeZone%3A%3ALocal%3A%3AVMS)
 
 If a local time zone is not found, then an exception will be thrown. This
 exception will always stringify to something containing the text `"Cannot
@@ -201,8 +201,10 @@ Returns a sorted list of all the valid country codes (in lower-case)
 which can be passed to `names_in_country()`. In scalar context, it
 returns an array reference, while in list context it returns an array.
 
-If you need to convert country codes to names or vice versa you can
-use `Locale::Country` to do so.
+If you need to convert country codes to names or vice versa you can use
+`Locale::Country` to do so. Note that one of the codes returned is "uk",
+which is an alias for the country code "gb", and is not a valid ISO country
+code.
 
 ## DateTime::TimeZone->names\_in\_country( $country\_code )
 
@@ -301,7 +303,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~autarch/fs-donation.html).
+button at [https://www.urth.org/fs-donation.html](https://www.urth.org/fs-donation.html).
 
 # AUTHOR
 
@@ -329,7 +331,7 @@ Dave Rolsky <autarch@urth.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Dave Rolsky.
+This software is copyright (c) 2020 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

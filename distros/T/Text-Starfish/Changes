@@ -184,3 +184,14 @@ Revision history for Perl extension Text::Starfish.
 1.29  Sat Sep 14 18:26:36 ADT 2019
 	- documentation improvements
 	- fixed test 35 (missing test file)
+
+1.30  Fri Apr 24 13:53:51 ADT 2020
+	- documentation improvements
+	- README first line generation made better using a final
+	  routine
+	- make $Star available in the final routines
+	- adapted test 35 to test for $Star
+	- added to be used for make:
+	  make_add_dirs_to_generate_if_needed,
+	  make_gen_dirs_to_generate, and @DirGenerateIfNeeded
+	- revised read_records function

@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
     "script/pn-concat-path",
     "script/pn-is-abs-path",
     "script/pn-normalize-path",
+    "script/pn-rel-path",
     "script/pn-split-path"
   ],
   "LICENSE" => "perl",
@@ -30,7 +31,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "Data::Sah::Filter::perl::Path::expand_tilde" => 0,
     "Data::Sah::Filter::perl::Path::strip_slashes" => 0,
-    "Path::Naive" => "0.042",
+    "Path::Naive" => "0.043",
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Lite" => "1.820",
     "Sah::Schema::pathname::unix" => 0,
@@ -44,7 +45,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -60,7 +61,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Path::Naive" => "0.042",
+  "Path::Naive" => "0.043",
   "Perinci::CmdLine::Any" => 0,
   "Perinci::CmdLine::Lite" => "1.820",
   "Sah::Schema::pathname::unix" => 0,

@@ -41,7 +41,7 @@
    "provides" : {
       "Test::Arrow" : {
          "file" : "lib/Test/Arrow.pm",
-         "version" : "0.18"
+         "version" : "0.20"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "url" : "http://github.com/bayashi/Test-Arrow"
       }
    },
-   "version" : "0.18",
+   "version" : "0.20",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -1,3 +1,6 @@
+v0.15.0 2020-04-23T09:17:50+0800
+  - Reduce the amonut of warnings.
+
 v0.14.0 2020-04-08T00:00:54+0800
   - Improve the extraction of journalist names on ETToday and CNA
 

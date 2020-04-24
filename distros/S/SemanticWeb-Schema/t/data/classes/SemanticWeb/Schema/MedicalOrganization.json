@@ -13,8 +13,8 @@
          "rdfs:label" : "healthPlanNetworkId",
          "schema:category" : "issue-1062",
          "schema:domainIncludes" : [
-            "schema:MedicalOrganization",
-            "schema:HealthPlanNetwork"
+            "schema:HealthPlanNetwork",
+            "schema:MedicalOrganization"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:Text"

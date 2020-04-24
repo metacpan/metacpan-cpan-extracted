@@ -62,6 +62,12 @@ METHODS
 
     Loads the named Devel::MAT::Tool class.
 
+ run_command
+
+       $pmat->run_command( $inv )
+
+    Runs a tool command given by the Commandable::Invocation instance.
+
  inref_graph
 
        $node = $pmat->inref_graph( $sv, %opts )

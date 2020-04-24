@@ -10,23 +10,26 @@ Boxer::World - set of software available to install
 
 use v5.14;
 use utf8;
-use strictures 2;
 use Role::Commons -all;
 use namespace::autoclean 0.16;
 use autodie;
 
 use Moo;
 use MooX::StrictConstructor;
-use Types::Standard qw( ArrayRef InstanceOf );
+use Types::Standard qw( ArrayRef InstanceOf Maybe );
+use Boxer::Types qw( DataDir );
 with qw(MooX::Role::Logger);
+
+use strictures 2;
+no warnings "experimental::signatures";
 
 =head1 VERSION
 
-Version v1.4.0
+Version v1.4.2
 
 =cut
 
-our $VERSION = "v1.4.0";
+our $VERSION = "v1.4.2";
 
 =head1 DESCRIPTION
 
@@ -40,6 +43,12 @@ available for installation into (or as) an operating system.
 L<Boxer>.
 
 =cut
+
+has data => (
+	is     => 'lazy',
+	isa    => Maybe [DataDir],
+	coerce => 1,
+);
 
 has parts => (
 	is       => 'ro',

@@ -11,8 +11,8 @@
          "rdfs:comment" : "The author of this content or rating. Please note that author is special in that HTML 5 provides a special mechanism for indicating authorship via the rel tag. That is equivalent to this and may be used interchangeably.",
          "rdfs:label" : "author",
          "schema:domainIncludes" : [
-            "schema:Rating",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:Rating"
          ],
          "schema:rangeIncludes" : [
             "schema:Person",
@@ -25,8 +25,8 @@
          "rdfs:label" : "bestRating",
          "schema:domainIncludes" : "schema:Rating",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Number"
+            "schema:Number",
+            "schema:Text"
          ]
       },
       "schema:ratingExplanation" : {
@@ -45,8 +45,8 @@
          "rdfs:label" : "ratingValue",
          "schema:domainIncludes" : "schema:Rating",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Number"
+            "schema:Number",
+            "schema:Text"
          ]
       },
       "schema:reviewAspect" : {
@@ -56,8 +56,8 @@
          "rdfs:label" : "reviewAspect",
          "schema:category" : "issue-1689",
          "schema:domainIncludes" : [
-            "schema:Review",
             "schema:Guide",
+            "schema:Review",
             "schema:Rating"
          ],
          "schema:rangeIncludes" : "schema:Text"
@@ -68,8 +68,8 @@
          "rdfs:label" : "worstRating",
          "schema:domainIncludes" : "schema:Rating",
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:Text"
+            "schema:Text",
+            "schema:Number"
          ]
       }
    }

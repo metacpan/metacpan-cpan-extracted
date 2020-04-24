@@ -4,8 +4,8 @@
       "rdfs:comment" : "A type of physical examination of a patient performed by a physician.",
       "rdfs:label" : "PhysicalExam",
       "rdfs:subClassOf" : [
-         "schema:MedicalProcedure",
-         "schema:MedicalEnumeration"
+         "schema:MedicalEnumeration",
+         "schema:MedicalProcedure"
       ],
       "schema:isPartOf" : "http:health-lifesci.schema.org"
    },

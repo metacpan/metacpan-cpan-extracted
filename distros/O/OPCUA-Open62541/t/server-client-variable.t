@@ -13,7 +13,7 @@ use OPCUA::Open62541::Test::Server;
 use OPCUA::Open62541::Test::Client;
 use Test::More tests =>
     OPCUA::Open62541::Test::Server::planning() +
-    OPCUA::Open62541::Test::Client::planning() + 16;
+    OPCUA::Open62541::Test::Client::planning() + 19;
 use Test::LeakTrace;
 use Test::NoWarnings;
 
@@ -60,16 +60,24 @@ my %attr = (
 	ACCESSLEVELMASK_READ | ACCESSLEVELMASK_WRITE,
 );
 is($server->{server}->addVariableNode(\%requestedNewNodeId, \%parentNodeId,
-    \%referenceTypeId, \%browseName, \%typeDefinition, \%attr, 0,
-    undef), STATUSCODE_GOOD, "server add variable node");
+    \%referenceTypeId, \%browseName, \%typeDefinition, \%attr, 0, undef),
+    STATUSCODE_GOOD, "server add variable node");
+
+$attr{VariableAttributes_value}{Variant_scalar} = 23;
+is($server->{server}->writeValue(\%requestedNewNodeId,
+    $attr{VariableAttributes_value}),
+    STATUSCODE_GOOD, "server write value");
+
+my $out;
+is($server->{server}->readValue(\%requestedNewNodeId, \$out),
+    STATUSCODE_GOOD, "server read value");
+is_deeply($out, $attr{VariableAttributes_value}, "value");
 
 $server->start();
 my $client = OPCUA::Open62541::Test::Client->new(port => $server->port());
 $client->start();
 $server->run();
 $client->run();
-
-my $out;
 
 $client->{client}->readDisplayNameAttribute(\%requestedNewNodeId, \$out);
 is_deeply($out, $attr{VariableAttributes_displayName}, "display name");

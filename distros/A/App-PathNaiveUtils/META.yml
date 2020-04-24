@@ -22,7 +22,7 @@ requires:
   Data::Sah::Compiler::perl::TH::str: '0'
   Data::Sah::Filter::perl::Path::expand_tilde: '0'
   Data::Sah::Filter::perl::Path::strip_slashes: '0'
-  Path::Naive: '0.042'
+  Path::Naive: '0.043'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Lite: '1.820'
   Sah::Schema::pathname::unix: '0'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-PathNaiveUtils
   homepage: https://metacpan.org/release/App-PathNaiveUtils
   repository: git://github.com/perlancar/perl-App-PathNaiveUtils.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -58,6 +58,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript pn-normalize-path'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript pn-rel-path'
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript

@@ -30,7 +30,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Math-FractionManip
   repository: https://github.com/ology/Math-FractionManip.git
-version: '0.5403'
+version: '0.5502'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

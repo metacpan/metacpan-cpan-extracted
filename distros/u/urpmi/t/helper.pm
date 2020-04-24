@@ -55,7 +55,7 @@ sub start_httpd() {
 	exec './simple-httpd', $::pwd, "$::pwd/tmp", httpd_port();
 	exit 1;
     }
-    'http://localhost:' . httpd_port();
+    ('http://localhost:' . httpd_port(), $server_pid);
 }
 
 chdir 't' if -d 't';

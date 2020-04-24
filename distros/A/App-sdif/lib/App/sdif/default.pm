@@ -6,7 +6,7 @@ __DATA__
 
 option --nop $<move(0,0)>
 
-option --autocolor -Mautocolor
+option --autocolor -Mtermcolor::bg(light=--light,dark=--dark)
 option default --autocolor
 
 autoload -Mcolors \

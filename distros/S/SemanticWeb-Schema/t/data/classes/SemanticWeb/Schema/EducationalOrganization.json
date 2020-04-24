@@ -3,7 +3,10 @@
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "An educational organization.",
       "rdfs:label" : "EducationalOrganization",
-      "rdfs:subClassOf" : "schema:Organization"
+      "rdfs:subClassOf" : [
+         "schema:CivicStructure",
+         "schema:Organization"
+      ]
    },
    "properties" : {
       "schema:alumni" : {

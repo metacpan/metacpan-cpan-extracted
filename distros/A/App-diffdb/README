@@ -2,8 +2,8 @@ NAME
     App::diffdb - Compare two databases, line by line
 
 VERSION
-    This document describes version 0.002 of App::diffdb (from Perl
-    distribution App-diffdb), released on 2020-04-22.
+    This document describes version 0.003 of App::diffdb (from Perl
+    distribution App-diffdb), released on 2020-04-23.
 
 SYNOPSIS
     See included scripts diffdb, diffdb-sqlite, ...
@@ -19,8 +19,6 @@ FUNCTIONS
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
-
-    *   action => *str* (default: "diff_db")
 
     *   dbh1 => *obj*
 
@@ -96,8 +94,6 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   action => *str* (default: "diff_db")
-
     *   dbpath1 => *filename*
 
         First SQLite database file.
@@ -135,6 +131,136 @@ FUNCTIONS
 
     Return value: (any)
 
+  diffdbtable
+    Usage:
+
+     diffdbtable(%args) -> [status, msg, payload, meta]
+
+    Compare two database tables, line by line.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dbh1 => *obj*
+
+        Alternative to specifying dsn1/user1/password1.
+
+    *   dbh2 => *obj*
+
+        Alternative to specifying dsn2/user2/password2.
+
+    *   diff_command => *str* (default: "diff")
+
+    *   dsn1 => *str*
+
+        DBI data source, e.g. "dbi:SQLite:dbname=/path/to/db1.db".
+
+    *   dsn2 => *str*
+
+        DBI data source, e.g. "dbi:SQLite:dbname=/path/to/db1.db".
+
+    *   exclude_columns => *array[str]*
+
+    *   include_columns => *array[str]*
+
+    *   order_by => *str*
+
+    *   password1 => *str*
+
+        You might want to specify this parameter in a configuration file
+        instead of directly as command-line option.
+
+    *   password2 => *str*
+
+        Will default to "password1" if "password1" is specified.
+
+        You might want to specify this parameter in a configuration file
+        instead of directly as command-line option.
+
+    *   row_as => *str* (default: "json-one-line")
+
+    *   sql1 => *str*
+
+        Compare the result of SQL select query, instead of tables.
+
+    *   sql2 => *str*
+
+        Compare the result of SQL select query, instead of tables.
+
+    *   table1 => *str*
+
+    *   table2 => *str*
+
+    *   user1 => *str*
+
+    *   user2 => *str*
+
+        Will default to "user1" if "user1" is specified.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  diffdbtable_sqlite
+    Usage:
+
+     diffdbtable_sqlite(%args) -> [status, msg, payload, meta]
+
+    Compare two SQLite database tables, line by line.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dbpath1 => *filename*
+
+        First SQLite database file.
+
+    *   dbpath2 => *filename*
+
+        Second SQLite database file.
+
+    *   diff_command => *str* (default: "diff")
+
+    *   exclude_columns => *array[str]*
+
+    *   include_columns => *array[str]*
+
+    *   order_by => *str*
+
+    *   row_as => *str* (default: "json-one-line")
+
+    *   sql1 => *str*
+
+        Compare the result of SQL select query, instead of tables.
+
+    *   sql2 => *str*
+
+        Compare the result of SQL select query, instead of tables.
+
+    *   table1 => *str*
+
+    *   table2 => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
 ENVIRONMENT
   DEBUG
     Bool. If set to true, temporary directory is not cleaned up at the end
@@ -157,8 +283,6 @@ BUGS
 SEE ALSO
     diff-db-schema from App::DiffDBSchemaUtils which presents the result
     structure from DBIx::Diff::Schema directly.
-
-    diff.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

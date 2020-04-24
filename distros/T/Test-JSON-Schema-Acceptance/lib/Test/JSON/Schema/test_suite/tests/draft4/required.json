@@ -18,6 +18,21 @@
                 "description": "non-present required property is invalid",
                 "data": {"bar": 1},
                 "valid": false
+            },
+            {
+                "description": "ignores arrays",
+                "data": [],
+                "valid": true
+            },
+            {
+                "description": "ignores strings",
+                "data": "",
+                "valid": true
+            },
+            {
+                "description": "ignores other non-objects",
+                "data": 12,
+                "valid": true
             }
         ]
     },
@@ -33,6 +48,41 @@
                 "description": "not required by default",
                 "data": {},
                 "valid": true
+            }
+        ]
+    },
+    {
+        "description": "required with escaped characters",
+        "schema": {
+            "required": [
+                "foo\nbar",
+                "foo\"bar",
+                "foo\\bar",
+                "foo\rbar",
+                "foo\tbar",
+                "foo\fbar"
+            ]
+        },
+        "tests": [
+            {
+                "description": "object with all properties present is valid",
+                "data": {
+                    "foo\nbar": 1,
+                    "foo\"bar": 1,
+                    "foo\\bar": 1,
+                    "foo\rbar": 1,
+                    "foo\tbar": 1,
+                    "foo\fbar": 1
+                },
+                "valid": true
+            },
+            {
+                "description": "object with some properties missing is invalid",
+                "data": {
+                    "foo\nbar": "1",
+                    "foo\"bar": "1"
+                },
+                "valid": false
             }
         ]
     }

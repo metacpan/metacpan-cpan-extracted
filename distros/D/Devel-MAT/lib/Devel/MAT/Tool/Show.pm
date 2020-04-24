@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
 
 package Devel::MAT::Tool::Show;
 
@@ -9,12 +9,19 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 use List::Util qw( max );
 
 use constant CMD => "show";
 use constant CMD_DESC => "Show information about a given SV";
+
+use constant CMD_OPTS => (
+   full_pv => { help => "show the full captured PV",
+                alias => "F" },
+   pad => { help => "show the first PAD of a CODE",
+            alias => "P" },
+);
 
 =head1 NAME
 
@@ -49,6 +56,7 @@ use constant CMD_ARGS_SV => 1;
 sub run
 {
    my $self = shift;
+   my %opts = %{ +shift };
    my ( $sv ) = @_;
 
    Devel::MAT::Cmd->printf( "%s with refcount %d\n",
@@ -108,7 +116,7 @@ sub run
 
    my $type = ref $sv; $type =~ s/^Devel::MAT::SV:://;
    my $method = "show_$type";
-   $self->$method( $sv );
+   $self->$method( $sv, \%opts );
 }
 
 sub say_with_sv
@@ -143,7 +151,7 @@ sub show_GLOB
 sub show_SCALAR
 {
    my $self = shift;
-   my ( $sv ) = @_;
+   my ( $sv, $opts ) = @_;
 
    Devel::MAT::Cmd->printf( "  UV=%s\n",
       Devel::MAT::Cmd->format_value( $sv->uv, nv => 1 ),
@@ -157,7 +165,9 @@ sub show_SCALAR
 
    if( defined( my $pv = $sv->pv ) ) {
       Devel::MAT::Cmd->printf( "  PV=%s\n",
-         Devel::MAT::Cmd->format_value( $pv, pv => 1 ),
+         Devel::MAT::Cmd->format_value( $pv, pv => 1,
+             ( $opts->{full_pv} ? ( maxlen => 0 ) : () ),
+         ),
       );
       Devel::MAT::Cmd->printf( "  PVLEN %d\n", $sv->pvlen );
    }
@@ -203,7 +213,7 @@ sub show_HASH
 sub show_CODE
 {
    my $self = shift;
-   my ( $cv ) = @_;
+   my ( $cv, $opts ) = @_;
 
    $cv->hekname  ? Devel::MAT::Cmd->printf( "  hekname=%s\n", $cv->hekname )
                  : Devel::MAT::Cmd->printf( "  no hekname\n" );
@@ -221,15 +231,23 @@ sub show_CODE
                  : Devel::MAT::Cmd->printf( "  no scope\n" );
 
    $cv->padlist  ? say_with_sv( "  padlist=", $cv->padlist )
-                 : Devel::MAT::Cmd->printf( "  no padlist\n" );
+                 : ();
 
    $cv->padnames_av ? say_with_sv( "  padnames_av=", $cv->padnames_av )
-                    : Devel::MAT::Cmd->printf( "  no padnames_av\n" );
+                    : ();
+
+   $cv->protosub ? say_with_sv( "  protosub=", $cv->protosub )
+                 : ();
 
    my @pads = $cv->pads;
    foreach my $depth ( 0 .. $#pads ) {
       next unless $pads[$depth];
       say_with_sv( "  pad[$depth]=", $pads[$depth] );
+   }
+
+   if( $opts->{pad} and my $pad0 = ( $cv->pads )[0] ) {
+      Devel::MAT::Cmd->printf( "PAD[0]:\n" );
+      $self->show_PAD_contents( $pad0 );
    }
 
    if( my @globs = $cv->globrefs ) {
@@ -251,6 +269,15 @@ sub show_PAD
    $self->show_PAD_contents( $pad );
 }
 
+sub _join
+{
+   # Like CORE::join but respects string concat operator
+   my ( $sep, @elems ) = @_;
+   my $ret = shift @elems;
+   $ret = $ret . $sep . $_ for @elems;
+   return $ret;
+}
+
 sub show_PAD_contents
 {
    my $self = shift;
@@ -261,7 +288,16 @@ sub show_PAD_contents
    my @elems = $pad->elems;
    my @padnames = map {
       my $padname = $padcv->padname( $_ );
-      $padname ? $padname->name : undef
+      # is_outer is always set for is_our; it's only interesting without is_our
+      my $is_just_outer = $padname && $padname->is_outer && !$padname->is_our;
+
+      $padname ? _join( " ",
+         ( $padname->is_state ? Devel::MAT::Cmd->format_note( "state" ) : () ),
+         ( $padname->is_our   ? Devel::MAT::Cmd->format_note( "our" )   : () ),
+         Devel::MAT::Cmd->format_note( $padname->name, 1 ),
+         ( $is_just_outer     ? Devel::MAT::Cmd->format_note( "*OUTER", 2 ) : () ),
+         # is_typed and is_lvalue not indicated
+      ) : undef
    } 0 .. $#elems;
    my $idxlen  = length $#elems;
    my $namelen = max map { defined $_ ? length $_ : 0 } @padnames;
@@ -277,7 +313,7 @@ sub show_PAD_contents
    Devel::MAT::Cmd->printf( "  [%*d/%-*s]=%s\n",
       $idxlen, 0,
       $namelen, Devel::MAT::Cmd->format_note( '@_', 1 ),
-      Devel::MAT::Cmd->format_sv_with_value( $elems[0] ),
+      ( $elems[0] ? Devel::MAT::Cmd->format_sv_with_value( $elems[0] ) : "NULL" ),
    );
 
    foreach my $padix ( 1 .. $#elems ) {
@@ -285,7 +321,7 @@ sub show_PAD_contents
       if( $padnames[$padix] ) {
          Devel::MAT::Cmd->printf( "  [%*d/%-*s]=%s\n",
             $idxlen, $padix,
-            $namelen, Devel::MAT::Cmd->format_note( $padnames[$padix], 1 ),
+            $namelen, $padnames[$padix],
             ( $sv ? Devel::MAT::Cmd->format_sv_with_value( $sv ) : "NULL" ),
          );
       }

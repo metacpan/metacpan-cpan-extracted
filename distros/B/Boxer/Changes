@@ -2,10 +2,69 @@ Boxer
 =====
 
 Created:      2013-02-12
-Home page:    <https://metacpan.org/release/Boxer>
 Home page:    <https://wiki.debian.org/Boxer>
+Home page:    <https://metacpan.org/release/Boxer>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Boxer>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
+
+v1.4.2	2020-04-24
+
+ [ Bug Fixes ]
+ - fix process empty class list or non-empty parameters in node data
+ - have Boxer::Task::Classify: explicitly set datadir default as unset
+   (this partly reverts git commit a4bea17)
+
+ [ Test Suite ]
+ - fix tighten World::Reclass test to not tolerate duplicates (this also
+   reverts git commit f3e3009)
+ - tighten World::Reclass test to cover node with custom parameters and no
+   class
+
+ [ Packaging ]
+ - update perltidy config: consistently use long-options; use --converse
+ - use List::MoreUtils
+
+ [ Other ]
+ - rephrase World::Reclass slightly to make peace between perltidy and
+   Test::Tabs)
+ - tighten World::Reclass to process only matching types, and skip
+   duplicates is arrays
+
+v1.4.1	2020-04-23
+
+ [ Bug Fixes ]
+ - Boxer::Task::Classify: reword trace messages
+ - Boxer::World::Reclass: avoid constructor for attributes classdir nodedir
+
+ [ Documentation ]
+ - add Boxer synopsis
+
+ [ Test Suite ]
+ - add coverage of Boxer::World::Reclass; use Test::Deep
+ - improve coverage of Boxer::Task::Classify
+ - stop enumerate tests in 01_app_help.t
+ - use subtest to isolate repetitions
+ - use tempdir to ensure empty or non-existing dir
+
+ [ Packaging ]
+ - require perl 5.020
+
+ [ Other ]
+ - Boxer::Part::Reclass: tighten type for attribute suite
+ - Boxer::Task::Classify: simplify attribute datadir to not be required nor
+   have default explicitly unset
+ - Boxer::World: add attribute data
+ - Boxer::World::Reclass: add method list_parts
+ - Boxer::World::Reclass: log (not croak) on error resolving parts from
+   node
+ - Boxer::World::Reclass: rename attribute flatten -> map
+ - Boxer::World::Reclass: rename method get_node_by_id -> get_part, and
+   distinguish empty world from missing part
+ - handle Boxer::World::* as plugins, using Module::Find and
+   Module::Load::Conditional
+ - process YAML data internally, using Hash::Merge (not with reclass)
+ - relax constraints and tests to be less specific to Reclass world
+ - use feature signatures
 
 v1.4.0	2019-04-01
 

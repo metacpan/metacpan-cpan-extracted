@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.3';
+our $VERSION = 'v7.0.4';
 
 
 has announcement_location => (
@@ -62,6 +62,14 @@ has getting_tested_info => (
     is        => 'rw',
     predicate => '_has_getting_tested_info',
     json_ld   => 'gettingTestedInfo',
+);
+
+
+
+has government_benefits_info => (
+    is        => 'rw',
+    predicate => '_has_government_benefits_info',
+    json_ld   => 'governmentBenefitsInfo',
 );
 
 
@@ -130,7 +138,7 @@ SemanticWeb::Schema::SpecialAnnouncement - A SpecialAnnouncement combines a simp
 
 =head1 VERSION
 
-version v7.0.3
+version v7.0.4
 
 =head1 DESCRIPTION
 
@@ -370,6 +378,25 @@ A getting_tested_info should be one of the following types:
 =head2 C<_has_getting_tested_info>
 
 A predicate for the L</getting_tested_info> attribute.
+
+=head2 C<government_benefits_info>
+
+C<governmentBenefitsInfo>
+
+governmentBenefitsInfo provides information about government benefits
+associated with a SpecialAnnouncement.
+
+A government_benefits_info should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::GovernmentService']>
+
+=back
+
+=head2 C<_has_government_benefits_info>
+
+A predicate for the L</government_benefits_info> attribute.
 
 =head2 C<news_updates_and_guidelines>
 

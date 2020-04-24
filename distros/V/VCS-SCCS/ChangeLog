@@ -1,3 +1,11 @@
+0.26	- 23 Apr 2020, H.Merijn Brand
+    * Small doc fix (typo)
+    * Name sccs2git-r in README
+    * Add --help to sccs2git-r
+    * Add --no-recurse to sccs2git-r
+    * Allow sccs2git install from build
+    * Add static docs in doc/
+
 0.25	- 09 Apr 2020, H.Merijn Brand
     * It's 2017
     * It's 2018

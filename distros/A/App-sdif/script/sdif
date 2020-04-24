@@ -176,9 +176,10 @@ my @optargs = (
 );
 
 my @SAVEDARGV = @ARGV;
-use Getopt::EX::Long;
-Getopt::Long::Configure("bundling");
-GetOptions(@optargs) || usage({status => 1});
+use Getopt::EX::Long qw(:DEFAULT Configure ExConfigure);
+ExConfigure BASECLASS => [ "App::sdif", "Getopt::EX" ];
+Configure "bundling";
+GetOptions @optargs or usage({status => 1});
 
 warn "\@ARGV = (@SAVEDARGV)\n" if $opt_d;
 
@@ -919,10 +920,10 @@ dark screen, place next line in your F<~/.sdifrc>.
 
     option default --dark-cmy
 
-Option B<--autocolor> is defined to load B<-Mautocolor> module.  It
-sets B<--light> or B<--dark> option according to the brightness of the
-terminal screen.  You can set preferred color in your F<~/.sdifrc>
-like:
+Option B<--autocolor> is defined in B<default> module to call
+L<Getopt::EX::termcolor> module.  It sets B<--light> or B<--dark>
+option according to the brightness of the terminal screen.  You can
+set preferred color in your F<~/.sdifrc> like:
 
     option --light --cmy
     option --dark  --dark-cmy
@@ -930,9 +931,9 @@ like:
 If the B<BRIGHTNESS> environment variable is set in a range of 0 to
 100 digit, it is used as a screen brightness.
 
-Currently automatic setting by B<-Mautocolor> module works only on
-macOS Terminal.app and iTerm.app.  If you are using other terminal
-application, set the B<BRIGHTNESS> or write a module.
+Currently automatic setting by L<Getopt::EX::termcolor> module works
+only on macOS Terminal.app and iTerm.app.  If you are using other
+terminal application, set the B<BRIGHTNESS> or write a module.
 
 Option B<--autocolor> is set by default, so override it to do nothing
 to disable.
@@ -1253,7 +1254,6 @@ This is equivalent to :
 =head2 default
 
   default      --autocolor
-  --autocolor  -Mautocolor
   --nop        do nothing
 
 =head2 -Mcolors
@@ -1302,16 +1302,16 @@ L<cdif(1)>, L<watchdiff(1)>
 
 L<Getopt::EX::Colormap>
 
-L<App::sdif::colors>,
-L<App::sdif::autocolor>,
-L<App::sdif::autocolor::Apple_Terminal>
+L<Getopt::EX::termcolor>
+
+L<App::sdif::colors>
 
 L<https://taku910.github.io/mecab/>
 
 =cut
 
-#  LocalWords:  perldoc colormap autocolor onword cdifopts mecab CJK
-#  LocalWords:  diffopts colortable Unicode OCOMMAND NCOMMAND OFILE
-#  LocalWords:  MCOMMAND NFILE MFILE OMARK NMARK MMARK UMARK OLINE
-#  LocalWords:  NLINE MLINE ULINE OTEXT NTEXT MTEXT UTEXT Cyan RGB
-#  LocalWords:  SDIFOPTS Kazumasa Utashiro watchdiff
+#  LocalWords:  perldoc colormap autocolor termcolor onword cdifopts
+#  LocalWords:  mecab CJK diffopts colortable Unicode OCOMMAND
+#  LocalWords:  NCOMMAND OFILE MCOMMAND NFILE MFILE OMARK NMARK MMARK
+#  LocalWords:  UMARK OLINE NLINE MLINE ULINE OTEXT NTEXT MTEXT UTEXT
+#  LocalWords:  Cyan RGB SDIFOPTS Kazumasa Utashiro watchdiff

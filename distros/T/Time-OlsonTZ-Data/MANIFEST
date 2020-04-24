@@ -76,7 +76,6 @@ lib/Time/OlsonTZ/Data/America/El_Salvador.tz
 lib/Time/OlsonTZ/Data/America/Fort_Nelson.tz
 lib/Time/OlsonTZ/Data/America/Fortaleza.tz
 lib/Time/OlsonTZ/Data/America/Glace_Bay.tz
-lib/Time/OlsonTZ/Data/America/Godthab.tz
 lib/Time/OlsonTZ/Data/America/Goose_Bay.tz
 lib/Time/OlsonTZ/Data/America/Grand_Turk.tz
 lib/Time/OlsonTZ/Data/America/Guatemala.tz
@@ -124,6 +123,7 @@ lib/Time/OlsonTZ/Data/America/Noronha.tz
 lib/Time/OlsonTZ/Data/America/North_Dakota/Beulah.tz
 lib/Time/OlsonTZ/Data/America/North_Dakota/Center.tz
 lib/Time/OlsonTZ/Data/America/North_Dakota/New_Salem.tz
+lib/Time/OlsonTZ/Data/America/Nuuk.tz
 lib/Time/OlsonTZ/Data/America/Ojinaga.tz
 lib/Time/OlsonTZ/Data/America/Panama.tz
 lib/Time/OlsonTZ/Data/America/Pangnirtung.tz

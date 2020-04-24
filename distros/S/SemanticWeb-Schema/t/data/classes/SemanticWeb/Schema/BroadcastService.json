@@ -35,12 +35,12 @@
          "rdfs:label" : "broadcastFrequency",
          "schema:category" : "issue-1004",
          "schema:domainIncludes" : [
-            "schema:BroadcastService",
-            "schema:BroadcastChannel"
+            "schema:BroadcastChannel",
+            "schema:BroadcastService"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:BroadcastFrequencySpecification"
+            "schema:BroadcastFrequencySpecification",
+            "schema:Text"
          ]
       },
       "schema:broadcastTimezone" : {
@@ -90,12 +90,12 @@
          "schema:category" : "issue-2382",
          "schema:domainIncludes" : [
             "schema:PronounceableText",
-            "schema:Event",
+            "schema:BroadcastService",
+            "schema:LinkRole",
             "schema:WriteAction",
             "schema:CommunicateAction",
-            "schema:CreativeWork",
-            "schema:BroadcastService",
-            "schema:LinkRole"
+            "schema:Event",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : [
             "schema:Language",
@@ -114,9 +114,9 @@
          "rdfs:comment" : "The type of screening or video broadcast used (e.g. IMAX, 3D, SD, HD, etc.).",
          "rdfs:label" : "videoFormat",
          "schema:domainIncludes" : [
+            "schema:BroadcastEvent",
             "schema:ScreeningEvent",
-            "schema:BroadcastService",
-            "schema:BroadcastEvent"
+            "schema:BroadcastService"
          ],
          "schema:rangeIncludes" : "schema:Text"
       }

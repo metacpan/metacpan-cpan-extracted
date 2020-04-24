@@ -15,7 +15,9 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "App-diffdb",
   "EXE_FILES" => [
     "script/diffdb",
-    "script/diffdb-sqlite"
+    "script/diffdb-sqlite",
+    "script/diffdbtable",
+    "script/diffdbtable-sqlite"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
@@ -29,7 +31,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
     "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
     "File::Temp" => 0,
-    "IPC::System::Options" => "0.332",
+    "IPC::System::Options" => "0.335",
     "JSON::MaybeXS" => 0,
     "Log::ger" => "0.037",
     "Perinci::CmdLine::Any" => 0,
@@ -45,7 +47,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -64,7 +66,7 @@ my %FallbackPrereqs = (
   "File::Temp" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "IPC::System::Options" => "0.332",
+  "IPC::System::Options" => "0.335",
   "JSON::MaybeXS" => 0,
   "Log::ger" => "0.037",
   "Perinci::CmdLine::Any" => 0,

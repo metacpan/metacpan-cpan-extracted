@@ -7,3 +7,5 @@ Revision history for Colouring-In
 	- toTerm method that output colours in the format rNNNgNNNbNNN
 	- toOnTerm method that output colours in the format on_rNNNgNNNbNNN
 
+0.19    2020-04-23
+	- Update smallnum dependency

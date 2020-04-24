@@ -11,7 +11,7 @@ use warnings;
 
 use Config::Tiny;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my $RESET = "\e[m";
 my $BOLD  = "\e[1m";
@@ -53,7 +53,7 @@ sub new
    my %args = @_;
 
    my $self = bless {
-      map { $_ => $args{$_} } qw( no_system_perl since_version until_version ),
+      map { $_ => $args{$_} } qw( no_system_perl no_test since_version until_version ),
    }, $class;
 
    $self->maybe_apply_config( "./.eachperlrc" );
@@ -86,6 +86,8 @@ sub postprocess_config
    foreach (qw( since_version until_version )) {
       my $ver = $self->{$_} or next;
       $ver =~ m/^v/ or $ver = "v$ver";
+      # E.g. --until 5.14 means until the /end/ of the 5.14 series; so 5.14.999
+      $ver .= ".999" if $_ eq "until_version" and $ver !~ m/\.\d+\./;
       $self->{$_} = version->parse( $ver );
    }
 
@@ -137,7 +139,7 @@ sub run
       unshift @argv, "exec";
    }
 
-   my $cmd = shift @argv;
+   ( my $cmd = shift @argv ) =~ s/-/_/g;
    my $code = $self->can( "run_$cmd" ) or
       die "Unrecognised eachperl command $cmd\n";
 
@@ -160,6 +162,7 @@ sub run_exec
 {
    my $self = shift;
    my ( @argv ) = @_;
+   my %opts = %{ shift @argv } if @argv and ref $argv[0] eq "HASH";
 
    my @results;
 
@@ -171,7 +174,9 @@ sub run_exec
       my $perl = $_->name;
       my $path = $_->fullpath;
 
-      print "\n$BOLD  --- $perl --- $RESET\n";
+      print $opts{oneline} ?
+         "$BOLD$perl:$RESET " :
+         "\n$BOLD  --- $perl --- $RESET\n";
 
       system( $path, @argv );
       if( $? & 127 ) {
@@ -185,8 +190,10 @@ sub run_exec
       }
    }
 
-   print "\n----------\n";
-   printf "%-20s: %s\n", @$_ for @results;
+   unless( $opts{no_summary} ) {
+      print "\n----------\n";
+      printf "%-20s: %s\n", @$_ for @results;
+   }
 
    kill $signal, $$ if $signal;
    return 0;
@@ -200,6 +207,44 @@ sub run_cpan
    return $self->run_exec( "-MCPAN", "-e", join( " ", @argv ) );
 }
 
+sub _invoke_local
+{
+   my $self = shift;
+   my %opts = @_;
+
+   my $perl = "";
+   my @args;
+
+   if( -r "Build.PL" ) {
+      $perl .= <<'EOPERL';
+         system( $^X, "Build.PL" ) == 0 and
+         system( $^X, "Build", "clean" ) == 0 and
+         system ($^X, "Build" ) == 0
+EOPERL
+      $perl .= ' and system( $^X, "Build", "test" ) == 0'    if $opts{test};
+      $perl .= ' and system( $^X, "Build", "install" ) == 0' if $opts{install};
+   }
+   elsif( -r "Makefile.PL" ) {
+      $perl .= <<'EOPERL';
+         system( $^X, "Makefile.PL" ) == 0 and
+         system( $^X, "make" ) == 0
+EOPERL
+      $perl .= ' and system( "make", "test" ) == 0'    if $opts{test};
+      $perl .= ' and system( "make", "install" ) == 0' if $opts{install};
+   }
+   else {
+      die "TODO: Work out how to locally control dist when lacking Build.PL or Makefile.PL";
+   }
+
+   $perl .= ' and system( $^X, @ARGV ) == 0', push @args, "--", @{$opts{perl}} if $opts{perl};
+
+   return $self->run_exec( "-e", $perl . <<'EOPERL', @args);
+         and print "-- PASS -\n" or print "-- FAIL --\n";
+      kill $?, $$ if $? & 127;
+      exit +($? >> 8);
+EOPERL
+}
+
 sub run_install
 {
    my $self = shift;
@@ -207,37 +252,14 @@ sub run_install
 
    local $self->{no_system_perl} = 1;
 
-   return $self->run_cpan( install => "\"$module\"" ) unless $module eq ".";
+   return $self->run_install_local if $module eq ".";
+   return $self->run_cpan( install => "\"$module\"" );
+}
 
-   # Install the code in the local dir directly, not via CPAN
-
-   if( -r "Build.PL" ) {
-      # TODO: Some sort of --notest option
-      return $self->run_exec( "-e", <<'EOPERL' );
-         system( $^X, "Build.PL" ) == 0 and
-         system( $^X, "Build", "clean" ) == 0 and
-         system( $^X, "Build", "test" ) == 0 and
-         system( $^X, "Build", "install" ) == 0 and
-            print "-- PASS --\n" or
-            print "-- FAIL --\n";
-         kill $?, $$ if $? & 127;
-         exit +($? >> 8);
-EOPERL
-   }
-   elsif( -r "Makefile.PL" ) {
-      return $self->run_exec( "-e", <<'EOPERL' );
-         system( $^X, "Makefile.PL" ) == 0 and
-         system( "make", "test" ) == 0 and
-         system( "make", "install" ) == 0 and
-            print "-- PASS --\n" or
-            print "-- FAIL --\n";
-         kill $?, $$ if $? & 127;
-         exit +($? >> 8);
-EOPERL
-   }
-   else {
-      warn "TODO: Work out how to locally install when lacking Build.PL or Makefile.PL";
-   }
+sub run_install_local
+{
+   my $self = shift;
+   $self->_invoke_local( test => !$self->{no_test}, install => 1 );
 }
 
 sub run_test
@@ -245,34 +267,21 @@ sub run_test
    my $self = shift;
    my ( $module ) = @_;
 
-   return $self->run_cpan( test => "\"$module\"" ) unless $module eq ".";
+   return $self->run_test_local if $module eq ".";
+   return $self->run_cpan( test => "\"$module\"" );
+}
 
-   # Test the code in the local dir directly, not via CPAN
+sub run_test_local
+{
+   my $self = shift;
+   $self->_invoke_local( test => 1 );
+}
 
-   if( -r "Build.PL" ) {
-      return $self->run_exec( "-e", <<'EOPERL' );
-         system( $^X, "Build.PL" ) == 0 and
-         system( $^X, "Build", "clean" ) == 0 and
-         system( $^X, "Build", "test" ) == 0 and
-            print "-- PASS --\n" or
-            print "-- FAIL --\n";
-         kill $?, $$ if $? & 127;
-         exit +($? >> 8);
-EOPERL
-   }
-   elsif( -r "Makefile.PL" ) {
-      return $self->run_exec( "-e", <<'EOPERL' );
-         system( $^X, "Makefile.PL" ) == 0 and
-         system( "make", "test" ) == 0 and
-            print "-- PASS --\n" or
-            print "-- FAIL --\n";
-         kill $?, $$ if $? & 127;
-         exit +($? >> 8);
-EOPERL
-   }
-   else {
-      warn "TODO: Work out how to locally test when lacking Build.PL or Makefile.PL";
-   }
+sub run_build_then_perl
+{
+   my $self = shift;
+   my ( @argv ) = @_;
+   $self->_invoke_local( test => !$self->{no_test}, perl => \@argv );
 }
 
 sub run_modversion
@@ -280,7 +289,10 @@ sub run_modversion
    my $self = shift;
    my ( $module ) = @_;
 
-   return $self->run_exec( "-M$module", "-e", "print ${module}\->VERSION, qq(\\n);" );
+   return $self->run_exec(
+      { oneline => 1, no_summary => 1 },
+      "-M$module", "-e", "print ${module}\->VERSION, qq(\\n);"
+   );
 }
 
 sub run_modpath
@@ -290,7 +302,10 @@ sub run_modpath
 
    ( my $filename = "$module.pm" ) =~ s{::}{/}g;
 
-   return $self->run_exec( "-M$module", "-e", "print \$INC{qq($filename)}, qq(\\n);" );
+   return $self->run_exec(
+      { oneline => 1, no_summary => 1 },
+      "-M$module", "-e", "print \$INC{qq($filename)}, qq(\\n);"
+   );
 }
 
 =head1 AUTHOR

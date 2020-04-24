@@ -15,7 +15,7 @@ use Data::Object::Cast;
 with 'Data::Object::Role::Buildable';
 with 'Data::Object::Role::Proxyable';
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 
 # ATTRIBUTES
 
@@ -187,20 +187,20 @@ Copyright (C) 2011-2019, Al Newkirk, et al.
 
 This is free software; you can redistribute it and/or modify it under the terms
 of the The Apache License, Version 2.0, as elucidated in the L<"license
-file"|https://github.com/iamalnewkirk/foobar/blob/master/LICENSE>.
+file"|https://github.com/iamalnewkirk/data-object/blob/master/LICENSE>.
 
 =head1 PROJECT
 
-L<Wiki|https://github.com/iamalnewkirk/foobar/wiki>
+L<Wiki|https://github.com/iamalnewkirk/data-object/wiki>
 
-L<Project|https://github.com/iamalnewkirk/foobar>
+L<Project|https://github.com/iamalnewkirk/data-object>
 
-L<Initiatives|https://github.com/iamalnewkirk/foobar/projects>
+L<Initiatives|https://github.com/iamalnewkirk/data-object/projects>
 
-L<Milestones|https://github.com/iamalnewkirk/foobar/milestones>
+L<Milestones|https://github.com/iamalnewkirk/data-object/milestones>
 
-L<Contributing|https://github.com/iamalnewkirk/foobar/blob/master/CONTRIBUTE.md>
+L<Contributing|https://github.com/iamalnewkirk/data-object/blob/master/CONTRIBUTE.md>
 
-L<Issues|https://github.com/iamalnewkirk/foobar/issues>
+L<Issues|https://github.com/iamalnewkirk/data-object/issues>
 
 =cut

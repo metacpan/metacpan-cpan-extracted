@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2017-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2017-2020 -- leonerd@leonerd.org.uk
 
 package Devel::MAT::Tool::Find;
 
@@ -9,7 +9,9 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
+
+use Scalar::Util qw( blessed );
 
 use constant CMD => "find";
 use constant CMD_DESC => "List SVs matching given criteria";
@@ -71,7 +73,7 @@ sub run_cmd
    ) };
 
    my @filters;
-   while( length $inv->remaining ) {
+   while( length $inv->peek_remaining ) {
       push @filters, $self->build_filter( $inv );
    }
 
@@ -79,7 +81,10 @@ sub run_cmd
       my $count = 0;
       SV: foreach my $sv ( $self->df->heap ) {
          foreach my $filter ( @filters ) {
-            $filter->( $sv ) or next SV;
+            my $ret = $filter->( $sv ) or next SV;
+            if( !blessed $ret and ref $ret eq "HASH" ) {
+               $sv = $ret->{sv} if $ret->{sv};
+            }
          }
 
          $count++;
@@ -97,8 +102,15 @@ sub run_cmd
          @output = ();
 
          foreach my $filter ( @filters ) {
-            my $o = $filter->( $sv ) or next SV;
-            push @output, $o;
+            my $ret = $filter->( $sv ) or next SV;
+            # Allow filters to alter the search as we go
+            if( !blessed $ret and ref $ret eq "HASH" ) {
+               $sv = $ret->{sv} if $ret->{sv};
+               push @output, $ret->{output} if $ret->{output};
+            }
+            else {
+               push @output, $ret;
+            }
          }
 
          my $fmt = "%s";
@@ -430,7 +442,70 @@ sub build
       my ( $sv ) = @_;
       return unless my $stash = $sv->blessed;
       return unless $stash->stashname eq $package;
-      return Devel::MAT::Cmd->format_value( $stash->stashame );
+      return Devel::MAT::Cmd->format_value( $stash->stashname );
+   };
+}
+
+package # hide
+   Devel::MAT::Tool::Find::filter::lexical;
+use base qw( Devel::MAT::Tool::Find::filter );
+
+=head2 lexical
+
+   pmat> find lexical $x
+   UNDEF() at 0x56426e97c8b0: $x at depth 1 of CODE(PP) at 0x56426e97c5e0
+   ...
+
+Searches for SVs that are lexical variables of the given name.
+
+=cut
+
+use constant FILTER_DESC => "lexical variables";
+
+use constant FILTER_ARGS => (
+   { name => "name", help => "the variable name", required => 1 },
+);
+
+use constant FILTER_OPTS => (
+   all => { help => "Include variables in non-live pads",
+            alias => "a" },
+);
+
+sub build
+{
+   my $self = shift;
+   my $inv = shift;
+   my %opts = %{ +shift };
+   my ( $name ) = @_;
+
+   defined $name or
+      die "Expected variable name for 'lexical' filter";
+
+   # We'll actually match pad which contains such a lexical. then redirect the
+   # search onto the SV itself
+   return sub {
+      my ( $pad ) = @_;
+      return unless $pad->type eq "PAD";
+      return unless my $sv = $pad->lexvar( $name );
+
+      my $cv = $pad->padcv;
+
+      my $depth;
+      my @pads = $cv->pads;
+      $pad == $pads[$_] and $depth = $_+1 and last
+         for 0 .. $#pads;
+
+      # This isn't a real hit unless the pad is live
+      return unless $opts{all} || $depth <= $cv->depth;
+
+      return {
+         sv     => $sv,
+         output => String::Tagged->from_sprintf( "%s at depth %d of %s",
+            Devel::MAT::Cmd->format_note( $name, 1 ),
+            $depth,
+            Devel::MAT::Cmd->format_sv( $cv )
+         ),
+      };
    };
 }
 

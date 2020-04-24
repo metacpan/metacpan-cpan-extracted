@@ -1,5 +1,17 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+0.011 2020-04-24
+    - Test client and server can use a custom log file.
+    - Improve signal handling in test server.
+    - Implement test server runtime actions.
+    - Implement server functions to read and write values:
+      readValue(), writeValue()
+    - Implement more server functions to add nodes:
+      addVariableTypeNode(), addObjectNode(), addObjectTypeNode(),
+      addViewNode(), addReferenceTypeNode(), addDataTypeNode()
+    - Implement client function Service_browse().
+    - Add prefix to QualifiedName hash keys.
+
 0.010 2020-04-20
     - Make single stepping the test server actually work.
 

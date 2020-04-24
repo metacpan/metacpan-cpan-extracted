@@ -19,5 +19,5 @@ no_index:
     - inc
 requires:
   perl: '5.006'
-version: '0.000002'
+version: '0.000003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -8,7 +8,7 @@ package Devel::MAT;
 use strict;
 use warnings;
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 use Carp;
 use List::Util qw( first pairs );
@@ -170,6 +170,26 @@ sub load_tool_for_command
 
       $self->load_tool( $name, %args );
    };
+}
+
+=head2 run_command
+
+   $pmat->run_command( $inv )
+
+Runs a tool command given by the L<Commandable::Invocation> instance.
+
+=cut
+
+sub run_command
+{
+   my $self = shift;
+   my ( $inv, %args ) = @_;
+
+   my $cmd = $inv->pull_token;
+
+   $self->load_tool_for_command( $cmd,
+      progress => $args{process},
+   )->run_cmd( $inv );
 }
 
 =head2 inref_graph
@@ -557,9 +577,11 @@ sub format_value
       return "[" . Devel::MAT::Cmd->_format_value( $val+0 ) . "]";
    }
    elsif( $opts{pv} ) {
-      my $maxlen = $opts{maxlen} // 64;
-      ( my $truncated = length $val > $maxlen ) and
-         substr( $val, $maxlen ) = "";
+      my $truncated;
+      if( my $maxlen = $opts{maxlen} // 64 ) {
+         ( $truncated = length $val > $maxlen ) and
+            substr( $val, $maxlen ) = "";
+      }
 
       return Devel::MAT::Cmd->_format_value(
          perlstring( $val ) . ( $truncated ? "..." : "" )

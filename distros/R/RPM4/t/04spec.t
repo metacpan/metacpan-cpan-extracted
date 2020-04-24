@@ -7,8 +7,13 @@ use FindBin qw($Bin);
 use File::Temp qw(tempdir);
 use RPM4;
 
-my $skip = -e '/etc/debian_version' || `uname -a` =~ /BSD/i;
-plan tests => ($skip ? 25 : 27);
+my $plan = 27;
+my $uname = `uname -a`;
+my $skip_no_sysdb = -e '/etc/debian_version' || $uname =~ /BSD/i;
+$plan -= 2 if $skip_no_sysdb;
+my $skip_freebsd9_3 = $uname =~ /freebsd-(9|10)/i;
+$plan -= 3 if $skip_freebsd9_3;
+plan tests => $plan;
 
 my %info = RPM4::moduleinfo();
 
@@ -22,9 +27,11 @@ RPM4::add_macro("_signature gpg");
 RPM4::add_macro("_gpg_name RPM4 test key");
 RPM4::add_macro("_gpg_path $Bin/gnupg");
 
+if (!$skip_freebsd9_3) {
 ok((RPM4::installsrpm("$Bin/test-rpm-1.0-1mdk.src.rpm"))[0] =~ m/test-rpm\.spec$/, "installsrpms works");
 like(RPM4::installsrpm("$Bin/test-rpm-1.0-1mdk.src.rpm"), '/test-rpm\.spec$/', "installsrpms works");
 ok(!RPM4::installsrpm("$Bin/test-rpm-1.0-1mdk.noarch.rpm"), "installsrpms works");
+}
 
 my $spec;
 if ($info{Hack} eq "Yes") {
@@ -49,10 +56,10 @@ ok($h->queryformat("%{NAME}") eq "test-rpm", "can querying header give by spec")
 
 ok($spec->build([ qw(PREP) ]) == 0, "simulate rpm -bp (check prep)");
 ok($spec->build([ qw(BUILD) ]) == 0, "simulate rpm -bc");
-ok($spec->build([ qw(INSTALL CHECK) ]) == 0, "simulate rpm -bi") if !$skip;;
+ok($spec->build([ qw(INSTALL CHECK) ]) == 0, "simulate rpm -bi") if !$skip_no_sysdb;;
 # else next test fails with rpm-4.14:
 ok($spec = RPM4::Spec->new("$Bin/test-rpm.spec"), "ReLoading the spec file");
-ok($spec->build([ qw(FILECHECK) ]) == 0, "simulate rpm -bl") if !$skip;
+ok($spec->build([ qw(FILECHECK) ]) == 0, "simulate rpm -bl") if !$skip_no_sysdb;
 #ok($spec->build([ qw(PACKAGEBINARY CLEAN) ]) == 0, "simulate rpm -bb (binary, clean)");
 ok($spec->build([ qw(PACKAGESOURCE) ]) == 0, "simulate rpm -bs");
 #ok($spec->rpmbuild("bb") == 0, "testing spec->rpmbuild(-bb)");

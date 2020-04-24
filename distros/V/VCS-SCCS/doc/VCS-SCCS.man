@@ -1,0 +1,422 @@
+STDIN(1)              User Contributed Perl Documentation             STDIN(1)
+
+
+
+[1mNAME[0m
+       VCS::SCCS - OO Interface to SCCS files
+
+[1mSYNOPSIS[0m
+        use VCS::SCCS;
+
+        my $sccs = VCS::SCCS->new ("SCCS/s.file.pl");   # Read and parse
+
+        # Meta info
+        my $fn = $sccs->file ();            # file.pl
+        my $cs = $sccs->checksum ();        # 52534
+        my @us = $sccs->users ();           # qw( merijn user )
+        my $fl = $sccs->flags ();           # { q => "Test applic", v => undef }
+        my $cm = $sccs->comment ();         # ""
+        my $cr = $sccs->current ();         # 70
+        my @cr = $sccs->current ();         # ( 70, "5.39", 5, 39 )
+
+        # Delta related
+        my $vs = $sccs->version ();         # "5.39"
+        my $vs = $sccs->version (69);       # "5.38"
+        my $rv = $sccs->revision ();        # 70
+        my $rv = $sccs->revision ("5.37");  # 68
+        my $rm = $sccs->revision_map ();    # [ [ 1, "4.1" ], ... [ 70, "5.39" ]]
+        my $dd = $sccs->delta (17);         # none, revision or version as arg
+
+        # Content related
+        my $body_70 = $sccs->body ();       # file.pl @70 incl NL's
+        my @body_70 = $sccs->body ();       # file.pl @70 list of chomped lines
+        my @body_69 = $sccs->body (69);     # same for file.pl at revision 69
+        my @body_69 = $sccs->body ("5.38"); # same
+
+        $sccs->set_translate ("SCCS");
+        print $sccs->translate ($rev, $line);
+
+        -- NYI --
+        my $diff = $sccs->diff (67);        # unified diff between rev 67 and 70
+        my $diff = $sccs->diff (63, "5.37");# unified diff between rev 63 and 68
+
+[1mDESCRIPTION[0m
+       SCCS was the dominant version control system until the release of the
+       Revision Control System. Today, SCCS is generally considered obsolete.
+       However, its file format is still used internally by a few other
+       revision control programs, including BitKeeper and TeamWare. Sablime[1]
+       also allows the use of SCCS files. The SCCS file format uses a storage
+       technique called interleaved deltas (or the weave). This storage
+       technique is now considered by many revision control system developers
+       as key to some advanced merging techniques, such as the "Precise
+       Codeville" ("pcdv") merge.
+
+       This interface aims at the possibility to read those files, without the
+       need of the sccs utility set, and open up to the possibility of scripts
+       that use it to convert to more modern VCSs like git, Mercurial, CVS, or
+       subversion.
+
+[1mFUNCTIONS[0m
+   [1mMeta function[0m
+       new (<file>)
+           The constructor only accepts a single argument: the SCCS file. this
+           will typically be something like "SCCS/s.file.c".
+
+           If anything in that file makes "new ()" believe that it is not a
+           SCCS file, it will return undef. In this stage, there is no way yet
+           to tell why "new ()" failed.
+
+       file
+           Returns the name of the parsed file. Useful if you have more than a
+           single $sccs object.
+
+       checksum
+           Returns the checksum that was stored in the file. This module does
+           not check if it is valid, nor does it have functionality to
+           calculate a new checksum.
+
+       users
+           Returns the list of users that was recorded in this file as
+           authorized to make deltas/changes.
+
+       flags
+           Returns a hash of the flags set for this file (if set at all).
+           VCS::SCCS does not do anything with these flags. They are here for
+           the end-user only.
+
+           Note that not all flags are supported by all versions of "admin",
+           like "x" is supported on HP-UX, but not in CSSC.
+
+           t <type of program>
+               File has a user defined value for the %Y% keyword.
+
+           v [<program name>]
+               File was flagged to prompt for MR (using <program name> for
+               validation).
+
+           i <keyword string>
+               File was flagged to require id keywords.
+
+           b   File was allowed to pass -b to get to create branch deltas.
+
+           m <module name>
+               File has a user defined value for the %M% keyword.
+
+           f <floor>
+               File was given a floor: the lowest release, a number from 1 to
+               9998, which may be get for editing.
+
+           c <ceiling>
+               File was given a ceiling: a number less than or equal to 9999,
+               which can be retrieved by a get command.
+
+           d <default sid>
+               File was given a default delta number SID.
+
+           n   File created null deltas for skipped major versions.
+
+           j   File was flagged to allow concurrent edits on the same SID.
+
+           l <lock releases>
+               File was given a list of releases to which deltas can no longer
+               be made.
+
+           q <user defined text>
+               File has a user defined value for the %Q% keyword.
+
+           s <line count>
+               Defines the number of lines scanned for keyword expansion. Past
+               that line, no keyword expansion takes place. Not implemented in
+               all version.
+
+               This flag is a SUN extension that does not exist in historic
+               SCCS implementations and is completely ignored by "VCS::SCCS".
+
+           x (HP-UX, SCO)
+               File was flagged to set execution bit on get. This is the
+               implementation that VCS::SCCS knows about.
+
+           x SCHILY|0 (other)
+               Enable SCCS extensions that are not implemented in classical
+               SCCS variants. If the "x" flag is enabled, the keywords %D%,
+               %E%, %G% and %H% are expanded even though not explicitly
+               enabled by the "y" flag.
+
+               This flag is a SCHILY extension that does not exist in historic
+               SCCS implementations.
+
+           y <val> ...
+               The list of SCCS keywords to be expanded. If the "y" flag is
+               missing, all keywords are expanded. If the flag is present but
+               the list is empty, no keyword is expanded and no "No id
+               keywords" message is generated. The value "*" controls the
+               expansion of the %sccs.include.filename% keyword.
+
+               This flag is a SUN/SCHILY extension that does not exist in
+               historic SCCS implementations.
+
+               This flag is currently ignored in "VCS::SCCS".
+
+           z <reserved for use in interfaces>
+               Used in Sun's NSE system.
+
+       comment
+           The comment that was added when the file was created.
+
+       current
+           In scalar context returns the current revision number. That is the
+           number of the file that would be restored by get with no arguments.
+
+           In list context, it returns the current revision, version and parts
+           of the version, something like "(70, "5.39", 5, 39, undef, undef)".
+           The last 4 numbers are the equivalent of the keywords %R%, %L%,
+           %B%, and %S% for that release.
+
+       set_translate (<type>)
+           By default VCS::SCCS will not translate the SCCS keywords (like
+           "%W%", see "translate ()" for the full list). With "set_translate
+           ()", you can select a translation type: "SCCS" is currently the
+           only supported type, "CVS" and "RCS" are planned. Passing a false
+           argument will reset translation to none.
+
+           You can also pass a hashref that will do custom translation:
+
+             my %trans = (
+               "%W%" => "This is my what id",
+               "%E%" => "Yesterday",
+               "%U%" => "Noon",
+               #...
+               };
+             $sccs->set_translate (\%tran);
+
+           any missing keywords will not be translated.
+
+   [1mDelta functions[0m
+       delta
+       delta (<revision>)
+       delta (<version>)
+           If called without argument, it returns the delta of the last
+           revision as a hashref.
+
+           If called with a revision argument, it returns you the delta of
+           that revision. If there is no such revision, returns undef.
+
+           If called with a version argument, it returns you the delta of that
+           version. If there is no such version, returns undef.
+
+           The elements of the hash returned are:
+
+           lines_ins
+               The number of lines inserted in this delta
+
+           lines_del
+               The number of lines deleted in this delta
+
+           lines_unc
+               The number of lines unchanged in this delta
+
+           type
+               The type of this delta. Usually this will be a "D", but it
+               could also be a "R", which has not (yet) been tested.
+
+           version
+               The version (SID) of this delta
+
+           release
+               The release number of this delta
+
+           level
+               The level number of this delta
+
+           branch
+               The branch number of this delta. Can be undef
+
+           sequence
+               The sequence number of this delta. Can be undef
+
+           date
+               The date this delta was submitted in YY/MM/DD format
+
+           time
+               The time this delta was submitted in HH:MM:SS format
+
+           stamp
+               The "date" and "time" elements converted to a unix time stamp
+
+           committer
+               The logname of the user that committed this delta
+
+           mr  The MR numbers of this delta, separated by ", "
+
+           comment
+               The comment as entered with this delta
+
+       version
+       version (<revision>)
+           If called without argument, it returns the last version, just as
+           the second return value of "current ()" in list context.
+
+           If called with a revision argument, it returns you the version that
+           matches that revision. It returns undef if no matching version is
+           found.
+
+       revision
+       revision (<version>)
+           If called without argument, it returns the last revision, just as
+           "current ()" returns in scalar context.
+
+           If called with a version argument, it returns you the revision that
+           matches that version. It returns undef if no matching revision is
+           found.
+
+       revision_map
+           Returns an anonymous list of "revision" - "version" pairs (in
+           anonymous lists).
+
+   [1mContent function[0m
+       body
+       body (<revision>)
+       body (<version>)
+           In scalar context returns the full body for the given revision.  If
+           no revision is passed, the current (most recent) revision is used.
+           If a version is passed, the matching revision will be used.  If the
+           is no matching version or revision, "body ()" returns "undef".
+
+           In list context, "body ()" returns the list of chomped lines for
+           the given revision.
+
+           "body ()" will use the translation set by "set_translate ()".
+
+       diff
+           NYI
+
+       translate (<revision>, <text>)
+           Translate the SCCS keywords in the text passed using the plan set
+           with "set_translate ()".
+
+           The SCCS keywords are
+
+           %M% Module name: either the value of the m flag in the file (see
+               "flags"), or if absent, the name of the SCCS file with the
+               leading s. removed.
+
+           %I% SCCS identification (SID) (%R%.%L%.%B%.%S%) of the retrieved
+               text.
+
+           %R% Release.
+
+           %L% Level.
+
+           %B% Branch.
+
+           %S% Sequence.
+
+           %D% Current date (YY/MM/DD).
+
+           %H% Current date (MM/DD/YY).
+
+           %T% Current time (HH:MM:SS).
+
+           %E% Date newest applied delta was created (YY/MM/DD).
+
+           %G% Date newest applied delta was created (MM/DD/YY).
+
+           %U% Time newest applied delta was created (HH:MM:SS).
+
+           %Y% Module type: value of the t flag in the SCCS file (see
+               "flags").
+
+           %F% SCCS file name.
+
+           %P% Fully qualified SCCS file name.
+
+           %Q% The value of the q flag in the file (see "flags").
+
+           %C% Current line number.  This keyword is intended for identifying
+               messages output by the program such as --this should not have
+               happened-- type errors.  It is not intended to be used on every
+               line to provide sequence numbers.
+
+           %Z% The 4-character string @(#) @(#) recognizable by what (see
+               [1mwhat[22m(1)).
+
+           %W% A shorthand notation for constructing [1mwhat[22m(1) strings for HP-UX
+               system program files.  %W%=%Z%%M%horizontal-tab%I%
+
+           %A% Another shorthand notation for constructing [1mwhat[22m(1) strings for
+               non-HP-UX system program files.  %A% = %Z%%Y% %M% %I%%Z%
+
+           For now, %D%, %H%, %T%, %G%, %F%, %P%, and %C% are not translated.
+           I see no use for %D%, %H%, or %T%. People that use %G% have enough
+           problems already, so they should be able to cope, %F% and %P% lose
+           their meaning after conversion and %C% might be done later.
+
+           If you convert from SCCS to git, it might be advisable to not do
+           any translation at all, and leave the keywords in, just the way
+           they are, and create a checkout hook.
+
+[1mSPECIFICATION[0m
+       SCCS file format is reasonable well documented. I have included a
+       manual page for sccsfile for HP-UX in doc/
+
+[1mEXAMPLES[0m
+       See the files in examples/ for my attempts to start converters to other
+       VCSs
+
+[1mBUGS AND LIMITATIONS[0m
+       As this module is created as a base for conversion to more useful and
+       robust VCSs, it is a read-only interface to the SCCS files.
+
+       Translation is incomplete and might be questionable, but at least there
+       is a workaround.
+
+[1mTODO[0m
+        * improve documentation
+        * implement diff ()
+        * more tests
+        * autodetect the available VCS candidates for sccs2***
+        * sccs2git documentation and installation
+        * sccs2rcs
+        * sccs2cvs
+        * sccs2hg
+        * sccs2svn
+        * errors and warnings
+        * provide hooks to VCS::
+
+[1mDIAGNOSTICS[0m
+       First errors, than diagnostics ...
+
+[1mSEE ALSO[0m
+       SCCS
+         source code at http://sccs.sourceforge.net/
+
+         manual pages at http://sccs.sourceforge.net/man/index.html
+
+         http://en.wikipedia.org/wiki/Source_Code_Control_System
+
+       CSSC
+         https://sourceforge.net/projects/cssc A GNU project that aims to be a
+         drop-in replacement for SCCS. It is written in c++ and therefor
+         disqualifies to be used at any older OS that does support SCCS but
+         has no C++ compiler. And even if you have one, there is a good chance
+         it won't build or does not bass the basic tests. I did not get it to
+         work.
+
+       VCS
+         http://search.cpan.org/dist/VCS
+
+       GIT
+         http://www.kernel.org/pub/software/scm/git/docs/
+
+[1mAUTHOR[0m
+       H.Merijn Brand <h.m.brand@xs4all.nl>
+
+[1mLICENSE AND COPYRIGHT[0m
+       Copyright (C) 2007-2020 H.Merijn Brand
+
+       This library is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself.
+
+
+
+perl v5.30.0                      2020-04-23                          STDIN(1)

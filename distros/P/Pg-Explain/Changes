@@ -1,5 +1,8 @@
 Revision history for Pg-Explain
 
+0.99    2020/04/23
+        - Fix requirements for tests
+
 0.98    2020/04/17
         - Add links to git repo for cpan tools (by Tom Hukins)
         - Fix parsing plans with tabs instead of spaces (by Pierre GIRAUD)

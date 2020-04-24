@@ -7,7 +7,7 @@ require Exporter;
 use parent 'Exporter';
 use OPCUA::Open62541::Constant;
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 our @EXPORT_OK = @OPCUA::Open62541::Constant::EXPORT_OK;
 our %EXPORT_TAGS = %OPCUA::Open62541::Constant::EXPORT_TAGS;
@@ -92,7 +92,23 @@ magically.
 
 =item $status_code = $server->run_shutdown($server)
 
+=item $status_code = $server->readValue(\%nodeId, \$outValue)
+
+=item $status_code = $server->writeValue(\%nodeId, $value)
+
 =item $status_code = $server->addVariableNode(\%requestedNewNodeId, \%parentNodeId, \%referenceTypeId, \%browseName, \%typeDefinition, \%attr, $nodeContext, \$outNewNodeId)
+
+=item $status_code = $server->addVariableTypeNode(\%requestedNewNodeId, \%parentNodeId, \%referenceTypeId, \%browseName, \%typeDefinition, \%attr, \%nodeContext, \%outNewNodeId)
+
+=item $status_code = $server->addObjectNode(\%requestedNewNodeId, \%parentNodeId, \%referenceTypeId, \%browseName, \%typeDefinition, \%attr, \%nodeContext, \%outNewNodeId)
+
+=item $status_code = $server->addObjectTypeNode(\%requestedNewNodeId, \%parentNodeId, \%referenceTypeId, \%browseName, \%attr, \%nodeContext, \%outNewNodeId)
+
+=item $status_code = $server->addViewNode(\%requestedNewNodeId, \%parentNodeId, \%referenceTypeId, \%browseName, \%attr, \%nodeContext, \%outNewNodeId)
+
+=item $status_code = $server->addReferenceTypeNode(\%requestedNewNodeId, \%parentNodeId, \%referenceTypeId, \%browseName, \%attr, \%nodeContext, \%outNewNodeId)
+
+=item $status_code = $server->addDataTypeNode(\%requestedNewNodeId, \%parentNodeId, \%referenceTypeId, \%browseName, \%attr, \%nodeContext, \%outNewNodeId)
 
 =back
 
@@ -146,6 +162,8 @@ run_iterate() or open62541 may try to operate on a non existent socket.
 =item $callback = sub { my ($client, $userdata, $requestId, \%response) = @_ }
 
 =back
+
+=item $response = $client->Service_browse(\%request)
 
 =item $status_code = $client->readDisplayNameAttribute(\%nodeId, \$outDisplayName)
 

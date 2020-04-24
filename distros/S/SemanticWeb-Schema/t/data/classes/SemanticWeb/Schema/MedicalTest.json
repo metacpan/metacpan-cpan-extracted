@@ -22,8 +22,8 @@
          "schema:domainIncludes" : "schema:MedicalTest",
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:MedicalEnumeration"
+            "schema:MedicalEnumeration",
+            "schema:Text"
          ]
       },
       "schema:signDetected" : {

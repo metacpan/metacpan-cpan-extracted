@@ -8,7 +8,7 @@ package Object::Pad;
 use strict;
 use warnings;
 
-our $VERSION = '0.23';
+our $VERSION = '0.25';
 
 use Carp;
 
@@ -416,6 +416,26 @@ sub begin_class
    Object::Pad::_begin_class( $name, $args{extends} );
 }
 
+sub Object::Pad::MOP::Class::add_BUILD
+{
+   my $self = shift;
+   my ( $code ) = @_;
+   # For now a builder is just a method named BUILD. But keep this API in case
+   # one day it isn't
+   $self->add_method( BUILD => $code );
+}
+
+sub Object::Pad::MOP::Class::add_method
+{
+   my $self = shift;
+   my ( $name, $code ) = @_;
+
+   my $pkg = $self->name;
+
+   no strict 'refs';
+   *{"${pkg}::${name}"} = $code;
+}
+
 # The universal base-class methods
 
 sub Object::Pad::UNIVERSAL::BUILDARGS
@@ -430,7 +450,10 @@ sub Object::Pad::UNIVERSAL::BUILDALL
    my $self = shift;
 
    foreach my $pkg ( reverse @{ mro::get_linear_isa( ref $self ) } ) {
-      my $meth = $pkg->can( "BUILD" ) or next;
+      no strict 'refs';
+      defined &{"${pkg}::BUILD"} or next;
+
+      my $meth = \&{"${pkg}::BUILD"};
       $self->$meth( @_ );
    }
 }

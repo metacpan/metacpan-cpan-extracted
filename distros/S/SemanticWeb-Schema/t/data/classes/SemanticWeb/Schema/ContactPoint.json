@@ -11,18 +11,18 @@
          "rdfs:comment" : "The geographic area where a service or offered item is provided.",
          "rdfs:label" : "areaServed",
          "schema:domainIncludes" : [
-            "schema:Offer",
             "schema:DeliveryChargeSpecification",
-            "schema:ContactPoint",
-            "schema:Organization",
             "schema:Demand",
-            "schema:Service"
+            "schema:Offer",
+            "schema:Organization",
+            "schema:Service",
+            "schema:ContactPoint"
          ],
          "schema:rangeIncludes" : [
-            "schema:Place",
-            "schema:GeoShape",
+            "schema:Text",
             "schema:AdministrativeArea",
-            "schema:Text"
+            "schema:Place",
+            "schema:GeoShape"
          ]
       },
       "schema:availableLanguage" : {
@@ -30,10 +30,10 @@
          "rdfs:comment" : "A language someone may use with or at the item, service or place. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"http://schema.org/inLanguage\">inLanguage</a>",
          "rdfs:label" : "availableLanguage",
          "schema:domainIncludes" : [
-            "schema:LodgingBusiness",
-            "schema:ContactPoint",
             "schema:ServiceChannel",
-            "schema:TouristAttraction"
+            "schema:LodgingBusiness",
+            "schema:TouristAttraction",
+            "schema:ContactPoint"
          ],
          "schema:rangeIncludes" : [
             "schema:Language",
@@ -60,8 +60,8 @@
          "rdfs:label" : "email",
          "schema:domainIncludes" : [
             "schema:Person",
-            "schema:Organization",
-            "schema:ContactPoint"
+            "schema:ContactPoint",
+            "schema:Organization"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -103,9 +103,9 @@
          "rdfs:comment" : "The geographic area where the service is provided.",
          "rdfs:label" : "serviceArea",
          "schema:domainIncludes" : [
-            "schema:ContactPoint",
             "schema:Service",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:ContactPoint"
          ],
          "schema:rangeIncludes" : [
             "schema:AdministrativeArea",
@@ -119,9 +119,9 @@
          "rdfs:comment" : "The telephone number.",
          "rdfs:label" : "telephone",
          "schema:domainIncludes" : [
-            "schema:Place",
             "schema:Organization",
             "schema:Person",
+            "schema:Place",
             "schema:ContactPoint"
          ],
          "schema:rangeIncludes" : "schema:Text"

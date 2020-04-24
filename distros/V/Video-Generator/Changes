@@ -1,3 +1,13 @@
+0.09 2020-04-23T13:22:32+02:00
+ - Add missing LICENSE file.
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.08 2015-11-20T15:04:49+01:00
  - Add 'ffmpeg_pixel_format' parameter.
 

@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {
 	'Moo' => '2.004000',
 	'MetaCPAN::Client' => '2.026000',
-	'Mxpress::PDF' => '0.19',
+	'Mxpress::PDF' => '0.24',
 	'Pod::Simpler::Aoh' => '0.07',
 	'JSON' => '4.02'
     },

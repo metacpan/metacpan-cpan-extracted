@@ -20,7 +20,7 @@ has schema_ld => (
 
 sub _build_schema_ld {
     my ($self) = @_;
-    my $el = $self->dom->at('script[type="application/ld+json"]');
+    my $el = $self->dom->at('script[type="application/ld+json"]') or return {};
     return from_json( $el->text );
 }
 

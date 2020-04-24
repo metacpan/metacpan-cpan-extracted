@@ -7,6 +7,10 @@ CONTRIBUTING.md
 SCCS.pm
 doc/sccsfile.4
 doc/sccsfile.man
+doc/VCS-SCCS.3
+doc/VCS-SCCS.html
+doc/VCS-SCCS.man
+doc/VCS-SCCS.md
 examples/sccs2git-add
 examples/sccs2git-gfi
 examples/sccs2git-r

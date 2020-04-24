@@ -40,6 +40,17 @@ IMPORT OPTIONS
 
        $ perl -MDevel::MAT::Dumper=-dump_at_DIE ...
 
+ -dump_at_WARN
+
+    Installs a handler for the special __WARN__ signal to write a dump file
+    when perl prints a warning.
+
+       $ perl -MDevel::MAT::Dumper=-dump_at_WARN ...
+
+    It is likely useful to combine this with the NNN numbering feature of
+    the -file argument, to ensure that later warnings don't overwrite a
+    particular file.
+
  -dump_at_END
 
     Installs an END block which writes a dump file at END time, just before
@@ -90,7 +101,8 @@ IMPORT OPTIONS
 
     If the pattern contains NNN, this will be replaced by a unique serial
     number per written file, starting from 0. This may be helpful in the
-    case of DIE or SIGQUIT handlers, which could be invoked multiple times.
+    case of DIE, WARN or SIGQUIT handlers, which could be invoked multiple
+    times.
 
     The file name is converted to an absolute path immediately, so if the
     running program later calls chdir(), it will still be generated in the

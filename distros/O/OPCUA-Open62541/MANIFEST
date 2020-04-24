@@ -17,6 +17,7 @@ README
 script/constant.pl
 script/packed-type.pl
 t/client-browse-async.t
+t/client-browse.t
 t/client-config-default.t
 t/client-config.t
 t/client-connect-async.t
@@ -51,6 +52,7 @@ t/server-variable.t
 t/server.t
 t/statuscodes.t
 t/test-client.t
+t/test-server-runtimeaction.t
 t/test-server-singlestep.t
 t/test-server.t
 t/types.t

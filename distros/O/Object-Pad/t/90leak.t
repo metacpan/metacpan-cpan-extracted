@@ -4,7 +4,13 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::MemoryGrowth;
+
+BEGIN {
+   plan skip_all => "Test::MemoryGrowth is not available" unless
+      defined eval { require Test::MemoryGrowth };
+
+   Test::MemoryGrowth->import;
+}
 
 use Object::Pad;
 

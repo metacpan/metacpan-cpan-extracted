@@ -8,7 +8,7 @@ package Devel::MAT::Dumper;
 use strict;
 use warnings;
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 use File::Basename qw( basename );
 use File::Spec;
@@ -59,6 +59,17 @@ the callstack and memory state than using an C<END> block.
 
    $ perl -MDevel::MAT::Dumper=-dump_at_DIE ...
 
+=head2 -dump_at_WARN
+
+Installs a handler for the special C<__WARN__> signal to write a dump file
+when perl prints a warning.
+
+   $ perl -MDevel::MAT::Dumper=-dump_at_WARN ...
+
+It is likely useful to combine this with the C<NNN> numbering feature of the
+C<-file> argument, to ensure that later warnings don't overwrite a particular
+file.
+
 =head2 -dump_at_END
 
 Installs an C<END> block which writes a dump file at C<END> time, just before
@@ -108,7 +119,7 @@ begin with a leading hyphen, as this confuses some commandline parsers.
 
 If the pattern contains C<NNN>, this will be replaced by a unique serial
 number per written file, starting from 0. This may be helpful in the case of
-C<DIE> or C<SIGQUIT> handlers, which could be invoked multiple times.
+C<DIE>, C<WARN> or C<SIGQUIT> handlers, which could be invoked multiple times.
 
 The file name is converted to an absolute path immediately, so if the running
 program later calls C<chdir()>, it will still be generated in the directory
@@ -170,6 +181,17 @@ sub import
             print STDERR "Dumping to $file because of DIE\n";
             Devel::MAT::Dumper::dump( $file );
             die @_;
+         };
+      }
+      elsif( $sym eq "-dump_at_WARN" ) {
+         my $old_WARN = $SIG{__WARN__};
+         $SIG{__WARN__} = sub {
+            local $SIG{__WARN__} = $old_WARN if defined $old_WARN;
+
+            ( my $file = $dumpfile_name ) =~ s/NNN/$next_serial++/e;
+            print STDERR "Dumping to $file because of WARN\n";
+            Devel::MAT::Dumper::dump( $file );
+            warn @_;
          };
       }
       elsif( $sym eq "-dump_at_END" ) {

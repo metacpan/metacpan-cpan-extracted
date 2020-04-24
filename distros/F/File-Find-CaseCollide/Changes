@@ -1,5 +1,10 @@
 Revision history for File-Find-CaseCollide
 
+0.2.0       2020-04-24
+    - Hopefully fix the documentation
+    - Add bin/find-case-collisions
+    - Cleanups.
+
 0.0.2       2019-04-27
     - Add a performance note.
 

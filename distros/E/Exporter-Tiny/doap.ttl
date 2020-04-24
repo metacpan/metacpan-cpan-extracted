@@ -27,7 +27,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Exporter-Tiny";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-026>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-029_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-030>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-031_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-032>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-033_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-034>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-035_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-035_02>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-036>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-037_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-037_02>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-037_03>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-038>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-039_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-040>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-041_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-041_02>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-042>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-043_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-043_02>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-044>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_1-000000>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_1-001_000>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_1-001_001>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_1-002000>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_1-002001>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-026>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-029_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-030>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-031_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-032>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-033_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-034>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-035_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-035_02>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-036>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-037_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-037_02>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-037_03>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-038>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-039_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-040>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-041_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-041_02>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-042>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-043_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-043_02>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-044>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_1-000000>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_1-001_000>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_1-001_001>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_1-002000>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_1-002001>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_1-002002>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-exporter-tiny>;
@@ -445,6 +445,28 @@
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Exporter-Tiny-1.002001.tar.gz>;
 	doap:revision        "1.002001"^^xsd:string.
 
+<http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_1-002002>
+	a                    doap:Version;
+	dc:identifier        "Exporter-Tiny-1.002002"^^xsd:string;
+	dc:issued            "2020-04-24"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Bug in handling regexps in import lists; Exporter::Tiny allowed regexps like /foo/i but not /foo/. Having trailing flags is now optional!";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/bokutin>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-exporter-tiny/issues/6>;
+		], [
+			a doap-changeset:Bugfix, doap-changeset:Tests;
+			rdfs:label "Tests would fail if `PERL5OPT=-Mfeature=:5.18` environment variable was set. This is because bareword `-default` was being interpreted as the Perl `default` keyword.";
+			doap-changeset:thanks <urn:uuid:b3e41a0e-7432-48e3-900d-a5cc78c4337e>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-exporter-tiny/issues/5>;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_1-002001>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Exporter-Tiny-1.002002.tar.gz>;
+	doap:revision        "1.002002"^^xsd:string.
+
 <http://purl.org/NET/cpan-uri/dist/Type-Tiny/project>
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
@@ -461,6 +483,12 @@
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tiny-0.026.tar.gz>;
 	doap:revision        "0.026"^^xsd:string.
 
+<http://purl.org/NET/cpan-uri/person/bokutin>
+	a                    foaf:Person;
+	foaf:name            "Tomohiro Hosaka";
+	foaf:nick            "BOKUTIN";
+	foaf:page            <https://github.com/bokutin>, <https://metacpan.org/author/BOKUTIN>.
+
 <http://purl.org/NET/cpan-uri/person/chocolateboy>
 	a                    foaf:Person;
 	foaf:nick            "CHOCOLATEBOY";
@@ -472,6 +500,11 @@
 	foaf:name            "Toby Inkster";
 	foaf:nick            "TOBYINK";
 	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<urn:uuid:b3e41a0e-7432-48e3-900d-a5cc78c4337e>
+	a                    foaf:Person;
+	foaf:nick            "zhumengu";
+	foaf:page            <https://github.com/zhumengu>.
 
 []
 	a                    nfo:FileDataObject;

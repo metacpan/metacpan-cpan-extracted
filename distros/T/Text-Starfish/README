@@ -1,8 +1,7 @@
-<? read_starfish_conf(); echo &readme_line(); !>
-#+
-Text::Starfish version 1.29
+Text::Starfish version 1.30
 ===========================
-#-
+Note: The above lines are generated based on the following code:
+<? read_starfish_conf(); &set_readme_line1; !>
 
 The Text::Starfish module supports processing of embedded Perl code in
 an arbitrary text.  Documentation is part of the file Starfish.pm
@@ -31,7 +30,7 @@ something important to add.
 
 COPYRIGHT AND LICENCE
 
-Copyright 2001-2019 Vlado Keselj http://web.cs.dal.ca/~vlado vlado@dnlp.ca
+Copyright 2001-2020 Vlado Keselj http://web.cs.dal.ca/~vlado vlado@dnlp.ca
 
 This script is provided "as is" without express or implied warranty.
 This is free software; you can redistribute it and/or modify it under

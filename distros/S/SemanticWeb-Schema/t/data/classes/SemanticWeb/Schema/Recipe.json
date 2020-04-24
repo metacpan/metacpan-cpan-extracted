@@ -35,8 +35,8 @@
          "rdfs:comment" : "Nutrition information about the recipe or menu item.",
          "rdfs:label" : "nutrition",
          "schema:domainIncludes" : [
-            "schema:MenuItem",
-            "schema:Recipe"
+            "schema:Recipe",
+            "schema:MenuItem"
          ],
          "schema:rangeIncludes" : "schema:NutritionInformation"
       },
@@ -69,8 +69,8 @@
          "rdfs:subPropertyOf" : "schema:step",
          "schema:domainIncludes" : "schema:Recipe",
          "schema:rangeIncludes" : [
-            "schema:CreativeWork",
             "schema:ItemList",
+            "schema:CreativeWork",
             "schema:Text"
          ]
       },
@@ -81,8 +81,8 @@
          "rdfs:subPropertyOf" : "schema:yield",
          "schema:domainIncludes" : "schema:Recipe",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Text"
          ]
       },
       "schema:suitableForDiet" : {
@@ -90,8 +90,8 @@
          "rdfs:comment" : "Indicates a dietary restriction or guideline for which this recipe or menu item is suitable, e.g. diabetic, halal etc.",
          "rdfs:label" : "suitableForDiet",
          "schema:domainIncludes" : [
-            "schema:MenuItem",
-            "schema:Recipe"
+            "schema:Recipe",
+            "schema:MenuItem"
          ],
          "schema:rangeIncludes" : "schema:RestrictedDiet"
       }

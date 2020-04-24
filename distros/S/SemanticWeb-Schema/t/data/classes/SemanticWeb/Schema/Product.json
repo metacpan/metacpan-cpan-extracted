@@ -12,10 +12,10 @@
          "rdfs:comment" : "A property-value pair representing an additional characteristics of the entitity, e.g. a product feature or another characteristic for which there is no matching property in schema.org.<br/><br/>\n\nNote: Publishers should be aware that applications designed to use specific schema.org properties (e.g. http://schema.org/width, http://schema.org/color, http://schema.org/gtin13, ...) will typically expect such data to be provided using those properties, rather than using the generic property/value mechanism.",
          "rdfs:label" : "additionalProperty",
          "schema:domainIncludes" : [
-            "schema:Product",
+            "schema:QualitativeValue",
             "schema:QuantitativeValue",
             "schema:Place",
-            "schema:QualitativeValue"
+            "schema:Product"
          ],
          "schema:rangeIncludes" : "schema:PropertyValue"
       },
@@ -24,14 +24,14 @@
          "rdfs:comment" : "The overall rating, based on a collection of reviews or ratings, of the item.",
          "rdfs:label" : "aggregateRating",
          "schema:domainIncludes" : [
-            "schema:CreativeWork",
+            "schema:Place",
             "schema:Service",
-            "schema:Product",
-            "schema:Brand",
+            "schema:Offer",
             "schema:Organization",
             "schema:Event",
-            "schema:Place",
-            "schema:Offer"
+            "schema:Product",
+            "schema:CreativeWork",
+            "schema:Brand"
          ],
          "schema:rangeIncludes" : "schema:AggregateRating"
       },
@@ -40,11 +40,11 @@
          "rdfs:comment" : "An intended audience, i.e. a group for whom something was created.",
          "rdfs:label" : "audience",
          "schema:domainIncludes" : [
-            "schema:Service",
-            "schema:CreativeWork",
-            "schema:Event",
-            "schema:Product",
             "schema:LodgingBusiness",
+            "schema:Service",
+            "schema:Event",
+            "schema:CreativeWork",
+            "schema:Product",
             "schema:PlayAction"
          ],
          "schema:rangeIncludes" : "schema:Audience"
@@ -54,10 +54,10 @@
          "rdfs:comment" : "An award won by or for this item.",
          "rdfs:label" : "award",
          "schema:domainIncludes" : [
-            "schema:CreativeWork",
+            "schema:Service",
             "schema:Person",
             "schema:Product",
-            "schema:Service",
+            "schema:CreativeWork",
             "schema:Organization"
          ],
          "schema:rangeIncludes" : "schema:Text"
@@ -67,10 +67,10 @@
          "rdfs:comment" : "Awards won by or for this item.",
          "rdfs:label" : "awards",
          "schema:domainIncludes" : [
-            "schema:CreativeWork",
-            "schema:Person",
+            "schema:Organization",
             "schema:Product",
-            "schema:Organization"
+            "schema:CreativeWork",
+            "schema:Person"
          ],
          "schema:rangeIncludes" : "schema:Text",
          "schema:supersededBy" : "schema:award"
@@ -81,13 +81,13 @@
          "rdfs:label" : "brand",
          "schema:domainIncludes" : [
             "schema:Service",
-            "schema:Organization",
+            "schema:Person",
             "schema:Product",
-            "schema:Person"
+            "schema:Organization"
          ],
          "schema:rangeIncludes" : [
-            "schema:Brand",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Brand"
          ]
       },
       "schema:category" : {
@@ -100,19 +100,19 @@
          "rdfs:label" : "category",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:Product",
-            "schema:PhysicalActivity",
             "schema:Invoice",
             "schema:Recommendation",
-            "schema:SpecialAnnouncement",
-            "schema:ActionAccessSpecification",
-            "schema:Service",
+            "schema:Product",
             "schema:Offer",
-            "schema:URL"
+            "schema:Service",
+            "schema:PhysicalActivity",
+            "schema:SpecialAnnouncement",
+            "schema:ActionAccessSpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:Thing",
+            "schema:URL",
             "schema:Text",
+            "schema:Thing",
             "schema:PhysicalActivityCategory"
          ]
       },
@@ -134,8 +134,8 @@
             "schema:VisualArtwork"
          ],
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Distance"
+            "schema:Distance",
+            "schema:QuantitativeValue"
          ]
       },
       "schema:gtin" : {
@@ -146,9 +146,9 @@
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:category" : "issue-1244",
          "schema:domainIncludes" : [
+            "schema:Offer",
             "schema:Product",
-            "schema:Demand",
-            "schema:Offer"
+            "schema:Demand"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:Text"
@@ -158,13 +158,13 @@
          "rdfs:comment" : "The GTIN-12 code of the product, or the product to which the offer refers. The GTIN-12 is the 12-digit GS1 Identification Key composed of a U.P.C. Company Prefix, Item Reference, and Check Digit used to identify trade items. See <a href=\"http://www.gs1.org/barcodes/technical/idkeys/gtin\">GS1 GTIN Summary</a> for more details.",
          "rdfs:label" : "gtin12",
          "rdfs:subPropertyOf" : [
-            "schema:identifier",
-            "schema:gtin"
+            "schema:gtin",
+            "schema:identifier"
          ],
          "schema:domainIncludes" : [
-            "schema:Product",
+            "schema:Offer",
             "schema:Demand",
-            "schema:Offer"
+            "schema:Product"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -190,13 +190,13 @@
          "rdfs:comment" : "The GTIN-14 code of the product, or the product to which the offer refers. See <a href=\"http://www.gs1.org/barcodes/technical/idkeys/gtin\">GS1 GTIN Summary</a> for more details.",
          "rdfs:label" : "gtin14",
          "rdfs:subPropertyOf" : [
-            "schema:identifier",
-            "schema:gtin"
+            "schema:gtin",
+            "schema:identifier"
          ],
          "schema:domainIncludes" : [
             "schema:Product",
-            "schema:Offer",
-            "schema:Demand"
+            "schema:Demand",
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -206,12 +206,12 @@
          "rdfs:comment" : "The <a href=\"http://apps.gs1.org/GDD/glossary/Pages/GTIN-8.aspx\">GTIN-8</a> code of the product, or the product to which the offer refers. This code is also known as EAN/UCC-8 or 8-digit EAN. See <a href=\"http://www.gs1.org/barcodes/technical/idkeys/gtin\">GS1 GTIN Summary</a> for more details.",
          "rdfs:label" : "gtin8",
          "rdfs:subPropertyOf" : [
-            "schema:identifier",
-            "schema:gtin"
+            "schema:gtin",
+            "schema:identifier"
          ],
          "schema:domainIncludes" : [
-            "schema:Product",
             "schema:Offer",
+            "schema:Product",
             "schema:Demand"
          ],
          "schema:rangeIncludes" : "schema:Text"
@@ -223,8 +223,8 @@
          "rdfs:label" : "hasMerchantReturnPolicy",
          "schema:category" : "issue-2288",
          "schema:domainIncludes" : [
-            "schema:Organization",
-            "schema:Product"
+            "schema:Product",
+            "schema:Organization"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:MerchantReturnPolicy"
@@ -234,10 +234,10 @@
          "rdfs:comment" : "The height of the item.",
          "rdfs:label" : "height",
          "schema:domainIncludes" : [
-            "schema:Product",
-            "schema:MediaObject",
+            "schema:VisualArtwork",
             "schema:Person",
-            "schema:VisualArtwork"
+            "schema:Product",
+            "schema:MediaObject"
          ],
          "schema:rangeIncludes" : [
             "schema:QuantitativeValue",
@@ -280,12 +280,12 @@
          "rdfs:comment" : "A pointer to another, functionally similar product (or multiple products).",
          "rdfs:label" : "isSimilarTo",
          "schema:domainIncludes" : [
-            "schema:Product",
-            "schema:Service"
+            "schema:Service",
+            "schema:Product"
          ],
          "schema:rangeIncludes" : [
-            "schema:Product",
-            "schema:Service"
+            "schema:Service",
+            "schema:Product"
          ]
       },
       "schema:itemCondition" : {
@@ -306,15 +306,15 @@
          "rdfs:label" : "logo",
          "rdfs:subPropertyOf" : "schema:image",
          "schema:domainIncludes" : [
-            "schema:Organization",
-            "schema:Brand",
-            "schema:Service",
             "schema:Product",
-            "schema:Place"
+            "schema:Organization",
+            "schema:Service",
+            "schema:Place",
+            "schema:Brand"
          ],
          "schema:rangeIncludes" : [
-            "schema:ImageObject",
-            "schema:URL"
+            "schema:URL",
+            "schema:ImageObject"
          ]
       },
       "schema:manufacturer" : {
@@ -322,9 +322,9 @@
          "rdfs:comment" : "The manufacturer of the product.",
          "rdfs:label" : "manufacturer",
          "schema:domainIncludes" : [
+            "schema:Product",
             "schema:DietarySupplement",
-            "schema:Drug",
-            "schema:Product"
+            "schema:Drug"
          ],
          "schema:rangeIncludes" : "schema:Organization"
       },
@@ -337,9 +337,9 @@
             "schema:Product"
          ],
          "schema:rangeIncludes" : [
-            "schema:URL",
             "schema:Text",
-            "schema:Product"
+            "schema:Product",
+            "schema:URL"
          ]
       },
       "schema:model" : {
@@ -348,8 +348,8 @@
          "rdfs:label" : "model",
          "schema:domainIncludes" : "schema:Product",
          "schema:rangeIncludes" : [
-            "schema:ProductModel",
-            "schema:Text"
+            "schema:Text",
+            "schema:ProductModel"
          ]
       },
       "schema:mpn" : {
@@ -358,9 +358,9 @@
          "rdfs:comment" : "The Manufacturer Part Number (MPN) of the product, or the product to which the offer refers.",
          "rdfs:label" : "mpn",
          "schema:domainIncludes" : [
-            "schema:Offer",
+            "schema:Product",
             "schema:Demand",
-            "schema:Product"
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -382,19 +382,19 @@
          "rdfs:label" : "offers",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
+            "schema:Product",
             "schema:CreativeWork",
-            "schema:MenuItem",
             "schema:AggregateOffer",
-            "schema:Event",
-            "schema:Trip",
             "schema:EducationalOccupationalProgram",
-            "schema:Service",
-            "schema:Product"
+            "schema:Trip",
+            "schema:Event",
+            "schema:MenuItem",
+            "schema:Service"
          ],
          "schema:inverseOf" : "schema:itemOffered",
          "schema:rangeIncludes" : [
-            "schema:Offer",
-            "schema:Demand"
+            "schema:Demand",
+            "schema:Offer"
          ]
       },
       "schema:productID" : {
@@ -422,8 +422,8 @@
          "rdfs:comment" : "The date the item e.g. vehicle was purchased by the current owner.",
          "rdfs:label" : "purchaseDate",
          "schema:domainIncludes" : [
-            "schema:Product",
-            "schema:Vehicle"
+            "schema:Vehicle",
+            "schema:Product"
          ],
          "schema:rangeIncludes" : "schema:Date"
       },
@@ -442,12 +442,12 @@
          "schema:domainIncludes" : [
             "schema:Organization",
             "schema:Product",
+            "schema:CreativeWork",
             "schema:Brand",
             "schema:Service",
+            "schema:Place",
             "schema:Offer",
-            "schema:CreativeWork",
-            "schema:Event",
-            "schema:Place"
+            "schema:Event"
          ],
          "schema:rangeIncludes" : "schema:Review"
       },
@@ -456,11 +456,11 @@
          "rdfs:comment" : "Review of the item.",
          "rdfs:label" : "reviews",
          "schema:domainIncludes" : [
-            "schema:Place",
-            "schema:Offer",
+            "schema:Organization",
             "schema:CreativeWork",
             "schema:Product",
-            "schema:Organization"
+            "schema:Place",
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : "schema:Review",
          "schema:supersededBy" : "schema:review"
@@ -473,8 +473,8 @@
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:domainIncludes" : [
             "schema:Offer",
-            "schema:Product",
-            "schema:Demand"
+            "schema:Demand",
+            "schema:Product"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -483,11 +483,11 @@
          "rdfs:comment" : "A slogan or motto associated with the item.",
          "rdfs:label" : "slogan",
          "schema:domainIncludes" : [
-            "schema:Service",
-            "schema:Brand",
-            "schema:Place",
             "schema:Product",
-            "schema:Organization"
+            "schema:Brand",
+            "schema:Organization",
+            "schema:Place",
+            "schema:Service"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -497,8 +497,8 @@
          "rdfs:comment" : "The weight of the product or person.",
          "rdfs:label" : "weight",
          "schema:domainIncludes" : [
-            "schema:Person",
-            "schema:Product"
+            "schema:Product",
+            "schema:Person"
          ],
          "schema:rangeIncludes" : "schema:QuantitativeValue"
       },
@@ -512,8 +512,8 @@
             "schema:MediaObject"
          ],
          "schema:rangeIncludes" : [
-            "schema:Distance",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Distance"
          ]
       }
    }

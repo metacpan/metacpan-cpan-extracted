@@ -1,6 +1,12 @@
+  * Add option --dirty-licensing (and deprecate option --nonfree)
+  * Add option --dirty-config (and skip tweaks if unset)
+  * Add option --dirty
+  * Include report with/in generated material, including dirt warnings
+
   * Only optionally (not by default) include tweaks.
   * Include README on whether it is a Debian Blend or Debian Pure Blend.
   * Isolate package auto-install flagging only relevant for upgrades.
+  * Modernize package auto-install flagging to call "apt-mark minimize-manual".
   * Fail (or optionally warn) if both installing and avoiding a package.
   * Handle bugs as parameters, and extend data documentation.
   * Resolve default suite from system, favored over hardcoded string.
@@ -19,8 +25,6 @@
   * Introduce compose option --nodepath (and maybe deprecate --nodedir)
     + nodepath is colon-separated lookup list for node
     + dirs without *.yml files are silently skipped
-    + dirs with subdirs are skipped with warning that it is unsupported
-      - Avoids confusing error if reclass is fed non-node YAML data.
     + default nodepath is environment variable BOXER_NODE_PATH
     + BOXER_NODE_PATH internal default is .:${XDG datadir + suite/nodes}
   * Resolve skeleton template variables in Boxer::File::WithSkeleton
@@ -76,6 +80,9 @@ Later releases...
     + <https://wiki.fogproject.org/wiki/index.php?title=FOG_on_a_MAC>
   * Improve testsuite
     + Test implicit --skeldir (by setting ENV variable instead)
+  * Check for items in both @pkgs and @pkgs_avoid
+    + Fail by default
+    + Warn and remove from @pkgs when --force
 
 
 misc.
@@ -91,3 +98,42 @@ misc.
     <https://stackoverflow.com/questions/533553/perl-build-unit-testing-code-coverage-a-complete-working-example>
   * Ask for node(s) interactively if not provided
     * But fail if not on an interactive terminal
+
+  * Refactor modularity
+    + Minimize dependencies of core binary package boxer
+      - Introduce (and have core package recommend) binary package boxer-reclass
+    + Add core option --features
+      - Space-delimited feature sets, each colon, declared and comma-delimited
+      - Each feature set shadows defaults of same feature set
+      - Defaults: --features "gui-desktop:xfce gui-widgets:gtk3,gtk2,xfce"
+    + Optionally store defaults compatible with apt-config
+      - Introduce (and have core package recommend) binary package boxer-apt
+      - boxer::Feature::ui "tui,gui,cli"; # wui
+      - boxer::Feature::gui-widgets "xfce,gtk,sdl,wxgtk,xlib"; # mate,gnome,wx-gtk2,qt5,qt4,lxqt,kde,fltk,gnustep,glut,tk,athena,motif
+      - boxer::Feature::gui-widgets::gtk "gtk3,gtk2"
+      - boxer::Feature::gui-widgets::sdl "sdl2" # sdl1.2
+      - boxer::Feature::gui-widgets::xlib "xcb,xlib"
+      - boxer::Feature::gui-protocol "x11" # wayland
+      - boxer::Feature::tui-widgets "whiptail,dialog,newt,slang,cdk,ncurses,wxbase";
+      - boxer::Feature::script-lang "perl,python3"; # python2,tcl,ruby
+      - boxer::Feature::network::attitude "extraverted"; # introverted
+      - boxer::Feature::network::framework "systemd" # nm,ifupdown
+      - Add commands to show/change features (similar to apt-mark?)
+    + Have Boxer::World::Flat support dump, and others support load, of sets
+      - Track features
+    + Have Boxer cache Boxer::World::Flat set for system default features
+      - Ship build-time generated default set with package boxer-apt
+      - If non-flat world exist (e.g. boxer-reclass is installed),
+        (re)generate and cache sets (and use only cache sets: ignore default set)
+      - If only flat world exist and system features match features of default set,
+        warn about missing package boxer-reclass and use default set
+      - If only flat world exist and system features are different from features of default set,
+        fail with error that features are customized and package boxer-reclass is needed to resolve them
+    + Introduce pkg-exempt for conditional avoidance
+      listing packages tolerating its avoidance
+      to exclude if only tolerant packages recommend or depend on it
+    + Introduce pkg-ban for unconditional avoidance
+      to avoid e.g gpm on hardware without video console
+      or libgl1 on GPU-less hardware too slow for software rendering
+    + Deprecate pkg-avoid: ambiguous
+    + Support tweaks prefix "in-target" and deprecrate "chroot /target"

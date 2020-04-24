@@ -145,6 +145,7 @@ enum PMAT_CODEx {
   /* PMAT_CODEx_PADSV was 6 */
   PMAT_CODEx_PADNAMES = 7,
   PMAT_CODEx_PAD,
+  PMAT_CODEx_PADNAME_FLAGS,
 };
 
 enum PMAT_CTXt {
@@ -531,7 +532,7 @@ static void write_private_stash(FILE *fh, const HV *stash)
 static void write_private_cv(FILE *fh, const CV *cv)
 {
   bool is_xsub = CvISXSUB(cv);
-  PADLIST *padlist = (is_xsub ? NULL : CvPADLIST(cv));
+  PADLIST *pl = (is_xsub ? NULL : CvPADLIST(cv));
 
   /* If the optree contains custom ops, the OP_CLASS() macro will allocate
    * a mortal SV. We'll need to FREETMPS it to ensure we don't dump it
@@ -584,7 +585,7 @@ static void write_private_cv(FILE *fh, const CV *cv)
   /* Padlists are no longer heap-allocated on 5.20+ */
   write_svptr(fh, NULL);
 #else
-  write_svptr(fh, (SV*)(padlist));
+  write_svptr(fh, (SV*)(pl));
 #endif
   if(CvCONST(cv))
     write_svptr(fh, (SV*)CvXSUBANY(cv).any_ptr);
@@ -614,35 +615,45 @@ static void write_private_cv(FILE *fh, const CV *cv)
     dump_optree(fh, cv, CvROOT(cv));
 
 #if (PERL_REVISION == 5) && (PERL_VERSION >= 18)
-  if(padlist) {
-    PADNAME **names = PadlistNAMESARRAY(padlist);
-    PAD **pads = PadlistARRAY(padlist);
+  if(pl) {
+    PADNAME **names = PadlistNAMESARRAY(pl);
+    PAD **pads = PadlistARRAY(pl);
     int depth, i;
 
     write_u8(fh, PMAT_CODEx_PADNAMES);
 #  if (PERL_VERSION > 20)
     write_svptr(fh, NULL);
     {
-      PADNAME **padnames = PadnamelistARRAY(PadlistNAMES(padlist));
-      int padix_max = PadnamelistMAX(PadlistNAMES(padlist));
+      PADNAME **padnames = PadnamelistARRAY(PadlistNAMES(pl));
+      int padix_max = PadnamelistMAX(PadlistNAMES(pl));
 
       int padix;
       for(padix = 1; padix <= padix_max; padix++) {
-        PADNAME *padname = padnames[padix];
-        if(!padname)
+        PADNAME *pn = padnames[padix];
+        if(!pn)
           continue;
 
         write_u8(fh, PMAT_CODEx_PADNAME);
         write_uint(fh, padix);
-        write_str(fh, PadnamePV(padname));
-        write_svptr(fh, (SV*)PadnameOURSTASH(padname));
+        write_str(fh, PadnamePV(pn));
+        write_svptr(fh, (SV*)PadnameOURSTASH(pn));
+
+        if(PadnameFLAGS(pn)) {
+          write_u8(fh, PMAT_CODEx_PADNAME_FLAGS);
+          write_uint(fh, padix);
+          write_u8(fh, (PadnameOUTER(pn)   ? 0x01 : 0) |
+                       (PadnameIsSTATE(pn) ? 0x02 : 0) |
+                       (PadnameLVALUE(pn)  ? 0x04 : 0) |
+                       (PadnameFLAGS(pn) & PADNAMEt_TYPED ? 0x08 : 0) |
+                       (PadnameFLAGS(pn) & PADNAMEt_OUR   ? 0x10 : 0));
+        }
       }
     }
 #  else
-    write_svptr(fh, (SV*)PadlistNAMES(padlist));
+    write_svptr(fh, (SV*)PadlistNAMES(pl));
 #  endif
 
-    for(depth = 1; depth <= PadlistMAX(padlist); depth++) {
+    for(depth = 1; depth <= PadlistMAX(pl); depth++) {
       PAD *pad = pads[depth];
 
       write_u8(fh, PMAT_CODEx_PAD);
@@ -1243,6 +1254,7 @@ static void dumpfh(FILE *fh)
         break;
     }
   }
+#endif
 
   write_u8(fh, 0);
 
@@ -1299,7 +1311,6 @@ static void dumpfh(FILE *fh)
       }
     }
   }
-#endif
 
   write_u8(fh, 0);
 }

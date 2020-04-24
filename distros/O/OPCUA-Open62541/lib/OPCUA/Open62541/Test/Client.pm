@@ -21,6 +21,7 @@ sub new {
     $self->{port}
 	or croak "no port given";
     $self->{timeout} ||= 10;
+    $self->{logfile} //= "client.log";
 
     ok($self->{client} = OPCUA::Open62541::Client->new(), "client: new");
     ok($self->{config} = $self->{client}->getConfig(), "client: get config");
@@ -46,7 +47,7 @@ sub start {
 	logger => $self->{logger},
 	ident => "OPC UA client",
     ), "client: test logger");
-    ok($self->{log}->file("client.log"), "client: log file");
+    ok($self->{log}->file($self->{logfile}), "client: log file");
 
     return $self;
 }
@@ -157,6 +158,11 @@ Create a new test client instance.
 =item $args{port}
 
 Required port number of the server.
+
+=item $args{logfile}
+
+Logs to the specified file instead of "client.log" in the current
+directory.
 
 =item $args{timeout}
 

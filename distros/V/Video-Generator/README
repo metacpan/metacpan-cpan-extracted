@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use Video::Generator;
+
      my $obj = Video::Generator->new(%parameters);
      my $type = $obj->create($out_path);
 
@@ -110,11 +111,9 @@ ERRORS
                      ..
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use File::Path qw(rmtree);
      use File::Spec::Functions qw(catfile);
      use File::Temp qw(tempdir);
@@ -142,11 +141,9 @@ EXAMPLE1
      #     Stream #0:0[0x1e0]: Video: mpeg1video, yuv420p(tv), 1920x1080 [SAR 1:1 DAR 16:9], 104857 kb/s, 60 fps, 60 tbr, 90k tbn, 60 tbc
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use File::Path qw(rmtree);
      use File::Spec::Functions qw(catfile);
      use File::Temp qw(tempdir);
@@ -197,17 +194,18 @@ SEE ALSO
         Video class for frame generation.
 
 REPOSITORY
-    <https://github.com/tupinek/Video-Generator>.
+    <https://github.com/michal-josef-spacek/Video-Generator>.
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2015 Michal Špaček
-     BSD 2-Clause License
+    © 2014-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.08
+    0.09
 

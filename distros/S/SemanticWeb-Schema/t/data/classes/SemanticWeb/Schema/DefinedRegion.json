@@ -1,0 +1,12 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "DefinedRegion is a DefinedRegion",
+      "rdfs:label" : "DefinedRegion",
+      "rdfs:subClassOf" : "schema:StructuredValue",
+      "schema:category" : "issue-2506",
+      "schema:isPartOf" : "http:pending.schema.org"
+   },
+   "properties" : {}
+}

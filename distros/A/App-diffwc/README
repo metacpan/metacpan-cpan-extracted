@@ -2,11 +2,11 @@ NAME
     App::diffwc - diff + /w/ord highlighting + /c/olor
 
 VERSION
-    This document describes version 0.004 of App::diffwc (from Perl
-    distribution App-diffwc), released on 2018-02-26.
+    This document describes version 0.005 of App::diffwc (from Perl
+    distribution App-diffwc), released on 2020-04-23.
 
 SYNOPSIS
-    See the command-line script diffwc and diff-filter.
+    See the command-line script diffwc and diffwc-filter-u.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -26,7 +26,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

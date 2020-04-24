@@ -1,4 +1,10 @@
-Revision history for Net-Checkpoint-Management-v1: 0.001004
+Revision history for Net-Checkpoint-Management-v1: 0.001005
+
+0.001005  2020-04-23 19:39:32+02:00 Europe/Vienna
+    - improve exceptions for responses which contain the error message in a
+      key named 'errors' or 'warnings' in addition to 'blocking-errors'
+    - add task methods
+    - fix api.t failures because of existing DNS objects
 
 0.001004  2020-01-22 14:30:27+01:00 Europe/Vienna
     - fix error handling of responses which contain the error message in a key

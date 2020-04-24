@@ -14,8 +14,8 @@
          "rdfs:label" : "about",
          "schema:category" : "issue-1670",
          "schema:domainIncludes" : [
-            "schema:Event",
             "schema:CreativeWork",
+            "schema:Event",
             "schema:CommunicateAction"
          ],
          "schema:inverseOf" : "schema:subjectOf",
@@ -26,17 +26,17 @@
          "rdfs:comment" : "An actor, e.g. in tv, radio, movie, video games etc., or in an event. Actors can be associated with individual items or with a series, episode, clip.",
          "rdfs:label" : "actor",
          "schema:domainIncludes" : [
-            "schema:Clip",
             "schema:MovieSeries",
-            "schema:RadioSeries",
-            "schema:VideoGameSeries",
-            "schema:VideoObject",
-            "schema:VideoGame",
-            "schema:Episode",
-            "schema:CreativeWorkSeason",
+            "schema:Clip",
             "schema:Movie",
             "schema:Event",
-            "schema:TVSeries"
+            "schema:VideoGame",
+            "schema:TVSeries",
+            "schema:CreativeWorkSeason",
+            "schema:VideoObject",
+            "schema:Episode",
+            "schema:VideoGameSeries",
+            "schema:RadioSeries"
          ],
          "schema:rangeIncludes" : "schema:Person"
       },
@@ -45,14 +45,14 @@
          "rdfs:comment" : "The overall rating, based on a collection of reviews or ratings, of the item.",
          "rdfs:label" : "aggregateRating",
          "schema:domainIncludes" : [
-            "schema:CreativeWork",
+            "schema:Place",
             "schema:Service",
-            "schema:Product",
-            "schema:Brand",
+            "schema:Offer",
             "schema:Organization",
             "schema:Event",
-            "schema:Place",
-            "schema:Offer"
+            "schema:Product",
+            "schema:CreativeWork",
+            "schema:Brand"
          ],
          "schema:rangeIncludes" : "schema:AggregateRating"
       },
@@ -82,11 +82,11 @@
          "rdfs:comment" : "An intended audience, i.e. a group for whom something was created.",
          "rdfs:label" : "audience",
          "schema:domainIncludes" : [
-            "schema:Service",
-            "schema:CreativeWork",
-            "schema:Event",
-            "schema:Product",
             "schema:LodgingBusiness",
+            "schema:Service",
+            "schema:Event",
+            "schema:CreativeWork",
+            "schema:Product",
             "schema:PlayAction"
          ],
          "schema:rangeIncludes" : "schema:Audience"
@@ -101,8 +101,8 @@
             "schema:Event"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:contributor" : {
@@ -114,8 +114,8 @@
             "schema:Event"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:director" : {
@@ -123,17 +123,17 @@
          "rdfs:comment" : "A director of e.g. tv, radio, movie, video gaming etc. content, or of an event. Directors can be associated with individual items or with a series, episode, clip.",
          "rdfs:label" : "director",
          "schema:domainIncludes" : [
-            "schema:Movie",
-            "schema:RadioSeries",
             "schema:VideoGameSeries",
-            "schema:TVSeries",
-            "schema:Episode",
-            "schema:CreativeWorkSeason",
-            "schema:Event",
-            "schema:VideoGame",
-            "schema:VideoObject",
             "schema:Clip",
-            "schema:MovieSeries"
+            "schema:Movie",
+            "schema:MovieSeries",
+            "schema:RadioSeries",
+            "schema:Episode",
+            "schema:TVSeries",
+            "schema:VideoObject",
+            "schema:CreativeWorkSeason",
+            "schema:VideoGame",
+            "schema:Event"
          ],
          "schema:rangeIncludes" : "schema:Person"
       },
@@ -160,14 +160,14 @@
             "issue-1457"
          ],
          "schema:domainIncludes" : [
-            "schema:Audiobook",
-            "schema:MediaObject",
             "schema:QuantitativeValueDistribution",
-            "schema:Event",
-            "schema:Schedule",
+            "schema:MusicRelease",
             "schema:MusicRecording",
+            "schema:Event",
             "schema:Movie",
-            "schema:MusicRelease"
+            "schema:MediaObject",
+            "schema:Schedule",
+            "schema:Audiobook"
          ],
          "schema:rangeIncludes" : "schema:Duration"
       },
@@ -178,13 +178,13 @@
          "rdfs:label" : "endDate",
          "schema:category" : "issue-2486",
          "schema:domainIncludes" : [
-            "schema:CreativeWorkSeason",
-            "schema:CreativeWorkSeries",
-            "schema:Schedule",
+            "schema:Event",
             "schema:DatedMoneySpecification",
+            "schema:Schedule",
+            "schema:CreativeWorkSeries",
             "schema:Role",
-            "schema:EducationalOccupationalProgram",
-            "schema:Event"
+            "schema:CreativeWorkSeason",
+            "schema:EducationalOccupationalProgram"
          ],
          "schema:rangeIncludes" : [
             "schema:Date",
@@ -224,11 +224,11 @@
          "rdfs:label" : "funder",
          "rdfs:subPropertyOf" : "schema:sponsor",
          "schema:domainIncludes" : [
-            "schema:CreativeWork",
+            "schema:MonetaryGrant",
             "schema:Event",
             "schema:Organization",
-            "schema:MonetaryGrant",
-            "schema:Person"
+            "schema:Person",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : [
             "schema:Organization",
@@ -243,12 +243,12 @@
          "schema:category" : "issue-2382",
          "schema:domainIncludes" : [
             "schema:PronounceableText",
-            "schema:Event",
+            "schema:BroadcastService",
+            "schema:LinkRole",
             "schema:WriteAction",
             "schema:CommunicateAction",
-            "schema:CreativeWork",
-            "schema:BroadcastService",
-            "schema:LinkRole"
+            "schema:Event",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : [
             "schema:Language",
@@ -260,10 +260,10 @@
          "rdfs:comment" : "A flag to signal that the item, event, or place is accessible for free.",
          "rdfs:label" : "isAccessibleForFree",
          "schema:domainIncludes" : [
-            "schema:CreativeWork",
-            "schema:PublicationEvent",
             "schema:Place",
-            "schema:Event"
+            "schema:Event",
+            "schema:CreativeWork",
+            "schema:PublicationEvent"
          ],
          "schema:rangeIncludes" : "schema:Boolean"
       },
@@ -277,10 +277,10 @@
             "schema:Action"
          ],
          "schema:rangeIncludes" : [
-            "schema:PostalAddress",
             "schema:Place",
-            "schema:Text",
-            "schema:VirtualLocation"
+            "schema:PostalAddress",
+            "schema:VirtualLocation",
+            "schema:Text"
          ]
       },
       "schema:maximumAttendeeCapacity" : {
@@ -320,19 +320,19 @@
          "rdfs:label" : "offers",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
+            "schema:Product",
             "schema:CreativeWork",
-            "schema:MenuItem",
             "schema:AggregateOffer",
-            "schema:Event",
-            "schema:Trip",
             "schema:EducationalOccupationalProgram",
-            "schema:Service",
-            "schema:Product"
+            "schema:Trip",
+            "schema:Event",
+            "schema:MenuItem",
+            "schema:Service"
          ],
          "schema:inverseOf" : "schema:itemOffered",
          "schema:rangeIncludes" : [
-            "schema:Offer",
-            "schema:Demand"
+            "schema:Demand",
+            "schema:Offer"
          ]
       },
       "schema:organizer" : {
@@ -351,8 +351,8 @@
          "rdfs:label" : "performer",
          "schema:domainIncludes" : "schema:Event",
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:performers" : {
@@ -395,12 +395,12 @@
          "schema:domainIncludes" : [
             "schema:Organization",
             "schema:Product",
+            "schema:CreativeWork",
             "schema:Brand",
             "schema:Service",
+            "schema:Place",
             "schema:Offer",
-            "schema:CreativeWork",
-            "schema:Event",
-            "schema:Place"
+            "schema:Event"
          ],
          "schema:rangeIncludes" : "schema:Review"
       },
@@ -412,13 +412,13 @@
             "schema:Organization",
             "schema:Person",
             "schema:Event",
-            "schema:Grant",
+            "schema:CreativeWork",
             "schema:MedicalStudy",
-            "schema:CreativeWork"
+            "schema:Grant"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:startDate" : {
@@ -428,13 +428,13 @@
          "rdfs:label" : "startDate",
          "schema:category" : "issue-2486",
          "schema:domainIncludes" : [
-            "schema:Role",
             "schema:CreativeWorkSeries",
-            "schema:CreativeWorkSeason",
+            "schema:Role",
             "schema:DatedMoneySpecification",
-            "schema:EducationalOccupationalProgram",
+            "schema:CreativeWorkSeason",
             "schema:Schedule",
-            "schema:Event"
+            "schema:Event",
+            "schema:EducationalOccupationalProgram"
          ],
          "schema:rangeIncludes" : [
             "schema:DateTime",
@@ -470,12 +470,12 @@
          "rdfs:comment" : "Organization or person who adapts a creative work to different languages, regional differences and technical requirements of a target market, or that translates during some event.",
          "rdfs:label" : "translator",
          "schema:domainIncludes" : [
-            "schema:CreativeWork",
-            "schema:Event"
+            "schema:Event",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:typicalAgeRange" : {

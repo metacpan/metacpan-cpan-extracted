@@ -4,10 +4,10 @@ package Boxer::Task::Bootstrap;
 
 =cut
 
-use v5.14;
+use v5.20;
 use utf8;
-use strictures 2;
 use Role::Commons -all;
+use feature 'signatures';
 use namespace::autoclean 0.16;
 use autodie qw(:all);
 use IPC::System::Simple qw(runx);
@@ -18,17 +18,20 @@ extends qw(Boxer::Task);
 
 use Types::Standard qw( Bool Str InstanceOf ArrayRef Maybe );
 
+use strictures 2;
+no warnings "experimental::signatures";
+
 =head1 VERSION
 
-Version v1.4.0
+Version v1.4.2
 
 =cut
 
-our $VERSION = "v1.4.0";
+our $VERSION = "v1.4.2";
 
 has world => (
 	is       => 'ro',
-	isa      => InstanceOf ['Boxer::World::Reclass'],
+	isa      => InstanceOf ['Boxer::World'],
 	required => 1,
 );
 
@@ -66,9 +69,8 @@ has apt => (
 	isa => Bool,
 );
 
-sub _build_apt
+sub _build_apt ($self)
 {
-	my ($self) = @_;
 	my $flag;
 	foreach my $helper (qw(mmdebstrap)) {
 		if ( $self->{helper} eq $helper ) {
@@ -89,11 +91,10 @@ has dryrun => (
 	default  => sub {0},
 );
 
-sub run
-{
-	my $self = shift;
+sub run ($self)
 
-	my $world = $self->world->flatten( $self->node, $self->nonfree, );
+{
+	my $world = $self->world->map( $self->node, $self->nonfree, );
 	my @opts;
 
 	my @pkgs       = sort @{ $world->pkgs };

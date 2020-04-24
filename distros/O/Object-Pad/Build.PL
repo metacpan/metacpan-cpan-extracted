@@ -17,7 +17,6 @@ my $build = Module::Build->new(
    test_requires => {
       'Data::Dump' => 0,
       'Test::Fatal' => 0,
-      'Test::MemoryGrowth' => 0,
       'Test::More' => '0.88', # done_testing
       'Test::Refcount' => 0,
    },

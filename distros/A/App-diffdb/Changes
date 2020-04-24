@@ -1,3 +1,10 @@
+0.003   2020-04-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Remove option --action.
+
+        - Add CLIs: diffdbtable, diffdbtable-sqlite.
+
+
 0.002   2020-04-22  Released-By: PERLANCAR; Urgency: medium
 
         - Add --order-by option.

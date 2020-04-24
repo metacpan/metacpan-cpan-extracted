@@ -1,5 +1,9 @@
 Revision history for B-COW
 
+0.004     2020-04-23 14:41:21-06:00 America/Denver
+
+fix CowREFCNT issues on big endian
+
 0.003     2020-04-20 09:59:34-06:00 America/Denver
 
 support for Perl compiled without COW

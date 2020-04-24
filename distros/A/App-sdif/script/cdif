@@ -157,8 +157,9 @@ my @optargs = (
     "q" => sub { push @rcsopt, "-q" },
 );
 
-use Getopt::EX::Long;
-Getopt::Long::Configure("bundling");
+use Getopt::EX::Long qw(:DEFAULT Configure ExConfigure);
+ExConfigure BASECLASS => [ "App::cdif", "Getopt::EX" ];
+Configure("bundling");
 GetOptions(@optargs) || usage({status => 1});
 
 my %opt_d;

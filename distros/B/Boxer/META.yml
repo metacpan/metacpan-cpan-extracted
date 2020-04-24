@@ -8,6 +8,7 @@ build_requires:
   File::Which: '0'
   Test::CleanNamespaces: '0'
   Test::Compile: '0'
+  Test::Deep: '0.111'
   Test::Fatal: '0'
   Test::File::Contents: '0'
   Test::Fixme: '0'
@@ -39,72 +40,75 @@ optional_features: {}
 provides:
   Boxer:
     file: lib/Boxer.pm
-    version: v1.4.0
+    version: v1.4.2
   Boxer::CLI:
     file: lib/Boxer/CLI.pm
-    version: v1.4.0
+    version: v1.4.2
   Boxer::CLI::Command:
     file: lib/Boxer/CLI/Command.pm
-    version: v1.4.0
+    version: v1.4.2
   Boxer::CLI::Command::About:
     file: lib/Boxer/CLI/Command/About.pm
-    version: v1.4.0
+    version: v1.4.2
   Boxer::CLI::Command::Aliases:
     file: lib/Boxer/CLI/Command/Aliases.pm
-    version: v1.4.0
+    version: v1.4.2
   Boxer::CLI::Command::Bootstrap:
     file: lib/Boxer/CLI/Command/Bootstrap.pm
-    version: v1.4.0
+    version: v1.4.2
   Boxer::CLI::Command::Commands:
     file: lib/Boxer/CLI/Command/Commands.pm
-    version: v1.4.0
+    version: v1.4.2
   Boxer::CLI::Command::Compose:
     file: lib/Boxer/CLI/Command/Compose.pm
-    version: v1.4.0
+    version: v1.4.2
   Boxer::File::WithSkeleton:
     file: lib/Boxer/File/WithSkeleton.pm
-    version: v1.4.0
+    version: v1.4.2
   Boxer::Part:
     file: lib/Boxer/Part.pm
-    version: v1.4.0
+    version: v1.4.2
   Boxer::Part::Reclass:
     file: lib/Boxer/Part/Reclass.pm
-    version: v1.4.0
+    version: v1.4.2
   Boxer::Role::Interact:
     file: lib/Boxer/Role/Interact.pm
-    version: v1.4.0
+    version: v1.4.2
   Boxer::Task:
     file: lib/Boxer/Task.pm
-    version: v1.4.0
+    version: v1.4.2
   Boxer::Task::Bootstrap:
     file: lib/Boxer/Task/Bootstrap.pm
-    version: v1.4.0
+    version: v1.4.2
   Boxer::Task::Classify:
     file: lib/Boxer/Task/Classify.pm
-    version: v1.4.0
+    version: v1.4.2
   Boxer::Task::Serialize:
     file: lib/Boxer/Task/Serialize.pm
-    version: v1.4.0
+    version: v1.4.2
   Boxer::Types:
     file: lib/Boxer/Types.pm
-    version: v1.4.0
+    version: v1.4.2
   Boxer::World:
     file: lib/Boxer/World.pm
-    version: v1.4.0
+    version: v1.4.2
   Boxer::World::Flat:
     file: lib/Boxer/World/Flat.pm
-    version: v1.4.0
+    version: v1.4.2
   Boxer::World::Reclass:
     file: lib/Boxer/World/Reclass.pm
-    version: v1.4.0
+    version: v1.4.2
 requires:
   App::Cmd: '0'
-  Capture::Tiny: '0'
   Class::XSAccessor: '0'
   File::BaseDir: '0'
   File::ShareDir: '0'
+  Hash::Merge: '0'
   IPC::System::Simple: '0'
+  List::MoreUtils: '0'
   Log::Any::Adapter::Screen: '0'
+  Module::Find: '0'
+  Module::Load::Conditional: '0'
   Module::Runtime: '0'
   Moo: '1.001000'
   MooX::Role::Logger: '0'
@@ -119,18 +123,18 @@ requires:
   autodie: '0'
   match::simple: '0'
   namespace::autoclean: '0.16'
-  perl: '5.014000'
+  perl: '5.020000'
   strictures: '2'
 resources:
   Identifier: http://purl.org/NET/cpan-uri/dist/Boxer/project
   bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Boxer
-  homepage: https://metacpan.org/release/Boxer
+  homepage: https://wiki.debian.org/Boxer
   license: http://dev.perl.org/licenses/
   repository: https://salsa.debian.org/boxer-team/boxer
-version: v1.4.0
+version: v1.4.2
 x_help_wanted:
-  - tester
   - documenter
+  - tester
 x_provides_scripts:
   boxer:
     file: bin/boxer

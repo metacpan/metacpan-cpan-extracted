@@ -6,7 +6,6 @@ package Boxer::Task;
 
 use v5.14;
 use utf8;
-use strictures 2;
 use Role::Commons -all;
 use namespace::autoclean 0.16;
 use autodie;
@@ -15,13 +14,16 @@ use Moo;
 use MooX::StrictConstructor;
 with qw( MooX::Role::Logger Boxer::Role::Interact );
 
+use strictures 2;
+no warnings "experimental::signatures";
+
 =head1 VERSION
 
-Version v1.4.0
+Version v1.4.2
 
 =cut
 
-our $VERSION = "v1.4.0";
+our $VERSION = "v1.4.2";
 
 =head1 DESCRIPTION
 

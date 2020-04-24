@@ -1,10 +1,8 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catfile);
 use File::Temp qw(tempdir);

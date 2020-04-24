@@ -4,26 +4,29 @@ package Boxer::CLI::Command::Compose;
 
 =cut
 
-use v5.14;
+use v5.20;
 use utf8;
-use strictures 2;
 use Role::Commons -all;
+use feature 'signatures';
 use namespace::autoclean 0.16;
 
 use Path::Tiny;
 use Module::Runtime qw/use_module/;
 use Boxer::CLI -command;
 
+use strictures 2;
+no warnings "experimental::signatures";
+
 =head1 VERSION
 
-Version v1.4.0
+Version v1.4.2
 
 =cut
 
-our $VERSION = "v1.4.0";
+our $VERSION = "v1.4.2";
 
 use constant {
-	abstract   => q[compose system recipe from reclass node],
+	abstract   => q[compose system recipe from abstract node],
 	usage_desc => q[%c compose %o NODE [NODE...]],
 };
 
@@ -32,8 +35,8 @@ sub description
 	<<'DESCRIPTION';
 Compose a system recipe.
 
-Resolve a recipe to build a system.  Input is one or more reclass nodes
-to resolve using a set of reclass classes, and output is one or more
+Resolve a recipe to build a system.  Input is one or more abstract nodes
+to resolve using a set of abstract classes, and output is one or more
 recipies serialized in one or more formats.
 
 DESCRIPTION
@@ -60,11 +63,8 @@ sub opt_spec
 	);
 }
 
-sub execute
+sub execute ( $self, $opt, $args )
 {
-	my $self = shift;
-	my ( $opt, $args ) = @_;
-
 	Log::Any::Adapter->set( 'Screen', default_level => 'info' )
 		if ( $opt->{verbose} );
 

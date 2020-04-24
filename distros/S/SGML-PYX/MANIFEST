@@ -20,6 +20,8 @@ README
 SIGNATURE
 t/data/cdata1.sgml
 t/data/cdata2.sgml
+t/data/cdata3.sgml
+t/data/cdata4.sgml
 t/data/char1.sgml
 t/data/char2.sgml
 t/data/comment1.sgml

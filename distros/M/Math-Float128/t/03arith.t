@@ -85,9 +85,9 @@ else {
   print "not ok 9\n";
 }
 
-if(signbit_F128(UnityF128(-1)) == 1) {print "ok 10\n"}
+if(signbit_F128(UnityF128(-1))) {print "ok 10\n"}
 else {
-  warn "\nExpected 1\n Got ", signbit_F128(UnityF128(-1)), "\n";
+  warn "\nExpected a true value\n Got ", signbit_F128(UnityF128(-1)), "\n";
   print "not ok 10\n";
 }
 

@@ -1,22 +1,27 @@
-0.004   2018-02-26 (PERLANCAR)
+0.005   2020-04-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Return diff's exit code.
+
+
+0.004   2018-02-26  Released-By: PERLANCAR
 
 	- Add color theme support.
 
 
-0.003   2017-08-16 (PERLANCAR)
+0.003   2017-08-16  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Add screenshot.
 
 
-0.002   2017-08-12 (PERLANCAR)
+0.002   2017-08-12  Released-By: PERLANCAR
 
         - No functional changes.
 
         - Some doc tweaks/fixes.
 
 
-0.001   2017-08-12 (PERLANCAR)
+0.001   2017-08-12  Released-By: PERLANCAR
 
         - First release.

@@ -4,8 +4,8 @@
       "rdfs:comment" : "A video game is an electronic game that involves human interaction with a user interface to generate visual feedback on a video device.",
       "rdfs:label" : "VideoGame",
       "rdfs:subClassOf" : [
-         "schema:SoftwareApplication",
-         "schema:Game"
+         "schema:Game",
+         "schema:SoftwareApplication"
       ]
    },
    "properties" : {
@@ -14,17 +14,17 @@
          "rdfs:comment" : "An actor, e.g. in tv, radio, movie, video games etc., or in an event. Actors can be associated with individual items or with a series, episode, clip.",
          "rdfs:label" : "actor",
          "schema:domainIncludes" : [
-            "schema:Clip",
             "schema:MovieSeries",
-            "schema:RadioSeries",
-            "schema:VideoGameSeries",
-            "schema:VideoObject",
-            "schema:VideoGame",
-            "schema:Episode",
-            "schema:CreativeWorkSeason",
+            "schema:Clip",
             "schema:Movie",
             "schema:Event",
-            "schema:TVSeries"
+            "schema:VideoGame",
+            "schema:TVSeries",
+            "schema:CreativeWorkSeason",
+            "schema:VideoObject",
+            "schema:Episode",
+            "schema:VideoGameSeries",
+            "schema:RadioSeries"
          ],
          "schema:rangeIncludes" : "schema:Person"
       },
@@ -33,15 +33,15 @@
          "rdfs:comment" : "An actor, e.g. in tv, radio, movie, video games etc. Actors can be associated with individual items or with a series, episode, clip.",
          "rdfs:label" : "actors",
          "schema:domainIncludes" : [
+            "schema:Clip",
+            "schema:VideoGame",
+            "schema:Episode",
+            "schema:VideoObject",
             "schema:Movie",
             "schema:VideoGameSeries",
             "schema:MovieSeries",
-            "schema:Episode",
             "schema:RadioSeries",
-            "schema:TVSeries",
-            "schema:VideoGame",
-            "schema:VideoObject",
-            "schema:Clip"
+            "schema:TVSeries"
          ],
          "schema:rangeIncludes" : "schema:Person",
          "schema:supersededBy" : "schema:actor"
@@ -51,8 +51,8 @@
          "rdfs:comment" : "Cheat codes to the game.",
          "rdfs:label" : "cheatCode",
          "schema:domainIncludes" : [
-            "schema:VideoGameSeries",
-            "schema:VideoGame"
+            "schema:VideoGame",
+            "schema:VideoGameSeries"
          ],
          "schema:rangeIncludes" : "schema:CreativeWork"
       },
@@ -61,17 +61,17 @@
          "rdfs:comment" : "A director of e.g. tv, radio, movie, video gaming etc. content, or of an event. Directors can be associated with individual items or with a series, episode, clip.",
          "rdfs:label" : "director",
          "schema:domainIncludes" : [
-            "schema:Movie",
-            "schema:RadioSeries",
             "schema:VideoGameSeries",
-            "schema:TVSeries",
-            "schema:Episode",
-            "schema:CreativeWorkSeason",
-            "schema:Event",
-            "schema:VideoGame",
-            "schema:VideoObject",
             "schema:Clip",
-            "schema:MovieSeries"
+            "schema:Movie",
+            "schema:MovieSeries",
+            "schema:RadioSeries",
+            "schema:Episode",
+            "schema:TVSeries",
+            "schema:VideoObject",
+            "schema:CreativeWorkSeason",
+            "schema:VideoGame",
+            "schema:Event"
          ],
          "schema:rangeIncludes" : "schema:Person"
       },
@@ -80,15 +80,15 @@
          "rdfs:comment" : "A director of e.g. tv, radio, movie, video games etc. content. Directors can be associated with individual items or with a series, episode, clip.",
          "rdfs:label" : "directors",
          "schema:domainIncludes" : [
-            "schema:Movie",
-            "schema:TVSeries",
-            "schema:VideoObject",
-            "schema:VideoGame",
             "schema:Episode",
-            "schema:RadioSeries",
+            "schema:TVSeries",
+            "schema:Movie",
+            "schema:Clip",
             "schema:MovieSeries",
+            "schema:RadioSeries",
             "schema:VideoGameSeries",
-            "schema:Clip"
+            "schema:VideoObject",
+            "schema:VideoGame"
          ],
          "schema:rangeIncludes" : "schema:Person",
          "schema:supersededBy" : "schema:director"
@@ -98,13 +98,13 @@
          "rdfs:comment" : "The electronic systems used to play <a href=\"http://en.wikipedia.org/wiki/Category:Video_game_platforms\">video games</a>.",
          "rdfs:label" : "gamePlatform",
          "schema:domainIncludes" : [
-            "schema:VideoGameSeries",
-            "schema:VideoGame"
+            "schema:VideoGame",
+            "schema:VideoGameSeries"
          ],
          "schema:rangeIncludes" : [
-            "schema:URL",
             "schema:Text",
-            "schema:Thing"
+            "schema:Thing",
+            "schema:URL"
          ]
       },
       "schema:gameServer" : {
@@ -128,18 +128,18 @@
          "rdfs:label" : "musicBy",
          "schema:domainIncludes" : [
             "schema:RadioSeries",
-            "schema:VideoGameSeries",
-            "schema:Clip",
+            "schema:Episode",
             "schema:Movie",
-            "schema:MovieSeries",
-            "schema:TVSeries",
-            "schema:VideoObject",
+            "schema:Clip",
             "schema:VideoGame",
-            "schema:Episode"
+            "schema:VideoObject",
+            "schema:TVSeries",
+            "schema:VideoGameSeries",
+            "schema:MovieSeries"
          ],
          "schema:rangeIncludes" : [
-            "schema:MusicGroup",
-            "schema:Person"
+            "schema:Person",
+            "schema:MusicGroup"
          ]
       },
       "schema:playMode" : {
@@ -158,13 +158,13 @@
          "rdfs:label" : "trailer",
          "schema:domainIncludes" : [
             "schema:MovieSeries",
-            "schema:VideoGame",
-            "schema:CreativeWorkSeason",
             "schema:RadioSeries",
+            "schema:Movie",
             "schema:TVSeries",
+            "schema:VideoGame",
             "schema:Episode",
-            "schema:VideoGameSeries",
-            "schema:Movie"
+            "schema:CreativeWorkSeason",
+            "schema:VideoGameSeries"
          ],
          "schema:rangeIncludes" : "schema:VideoObject"
       }

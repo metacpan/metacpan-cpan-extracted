@@ -1,5 +1,5 @@
 package File::Find::CaseCollide;
-$File::Find::CaseCollide::VERSION = '0.0.2';
+$File::Find::CaseCollide::VERSION = '0.2.0';
 use strict;
 use warnings;
 use 5.014;
@@ -59,11 +59,11 @@ __END__
 
 =head1 NAME
 
-File::Find::CaseCollide
+File::Find::CaseCollide - find collisions in filenames, differing only in case
 
 =head1 VERSION
 
-version 0.0.2
+version 0.2.0
 
 =head1 SYNOPSIS
 
@@ -77,14 +77,6 @@ version 0.0.2
 This tests for filenames in the same directory which differ only in lowercase
 vs uppercase letters which some filesystems do not support (e.g: "hello.txt" vs.
 "Hello.txt").
-
-=head1 NAME
-
-File::Find::CaseCollide - find collisions in filenames, differing only in case
-
-=head1 VERSION
-
-version 0.0.2
 
 =head1 METHODS
 
@@ -102,7 +94,7 @@ empty.
 L<https://www.jamendo.com/album/59248/sense> - Sense by LadyLau, a CC-licensed
 album.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -123,35 +115,11 @@ L<https://metacpan.org/release/File-Find-CaseCollide>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/File-Find-CaseCollide>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=File-Find-CaseCollide>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/File-Find-CaseCollide>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/File-Find-CaseCollide>
 
 =item *
 

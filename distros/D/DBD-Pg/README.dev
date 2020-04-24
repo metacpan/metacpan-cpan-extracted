@@ -76,6 +76,7 @@ LICENSES/artistic.txt - Artistic (Perl) license
 
 testme.tmp.pl - Quick helper file for testing individual bugs
 
+.dir-locals.el - Emacs helper file
 
 * Build files:
 
@@ -547,9 +548,7 @@ lib/Bundle/DBD/Pg.pm
 If you are adding a new file to the distribution (and this should be a rare event), 
 please check that you have done the following items:
 
-* Created a standard header for the file, with a (dollar sign)Id(dollar sign)
-
-* Added it to git via 'git add filename' and git commit filename'
+* Added it to git via 'git add filename' and 'git commit filename'
 
 * Added it to the MANIFEST file
 

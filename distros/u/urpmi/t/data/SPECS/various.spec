@@ -19,7 +19,11 @@ for i in /etc/test-%{name} \
 	 echo foo > $RPM_BUILD_ROOT$i
 done
 
+%ifos linux
 %find_lang test-%{name}
+%else
+echo > test-%{name}.lang
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT

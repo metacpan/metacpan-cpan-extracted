@@ -8,7 +8,7 @@ has tx => ( required => 1, is => 'ro', isa => InstanceOf['Mojo::Transaction::HTT
 use NewsExtractor::Article;
 use NewsExtractor::Extractor;
 use NewsExtractor::Error;
-use Importer 'NewsExtractor::TextUtil' => qw(u);
+use Importer 'NewsExtractor::TextUtil' => qw(u is_empty);
 
 use Try::Tiny;
 
@@ -29,10 +29,11 @@ sub parse {
     }
 
     for my $it (qw(headline article_body)) {
-        unless(defined($article{$it})) {
+        if (is_empty($article{$it})) {
             $err = NewsExtractor::Error->new(
                 message => u("Failed to extract: $it")
-            )
+            );
+            last;
         }
     }
     return ($err, undef) if $err;

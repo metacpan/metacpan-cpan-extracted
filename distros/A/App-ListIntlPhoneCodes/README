@@ -1,8 +1,269 @@
-SYNOPSIS
+NAME
+    App::ListIntlPhoneCodes - List international phone calling codes
 
+VERSION
+    This document describes version 0.02 of App::ListIntlPhoneCodes (from
+    Perl distribution App-ListIntlPhoneCodes), released on 2020-04-23.
+
+SYNOPSIS
      # Use via list-intl-phone-codes CLI script
 
-SEE ALSO
+FUNCTIONS
+  list_intl_phone_codes
+    Usage:
 
+     list_intl_phone_codes(%args) -> [status, msg, payload, meta]
+
+    List international phone calling codes.
+
+    REPLACE ME
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   alpha2 => *str*
+
+        Only return records where the 'alpha2' field equals specified value.
+
+    *   alpha2.contains => *str*
+
+        Only return records where the 'alpha2' field contains specified
+        text.
+
+    *   alpha2.in => *array[str]*
+
+        Only return records where the 'alpha2' field is in the specified
+        values.
+
+    *   alpha2.is => *str*
+
+        Only return records where the 'alpha2' field equals specified value.
+
+    *   alpha2.isnt => *str*
+
+        Only return records where the 'alpha2' field does not equal
+        specified value.
+
+    *   alpha2.max => *str*
+
+        Only return records where the 'alpha2' field is less than or equal
+        to specified value.
+
+    *   alpha2.min => *str*
+
+        Only return records where the 'alpha2' field is greater than or
+        equal to specified value.
+
+    *   alpha2.not_contains => *str*
+
+        Only return records where the 'alpha2' field does not contain
+        specified text.
+
+    *   alpha2.not_in => *array[str]*
+
+        Only return records where the 'alpha2' field is not in the specified
+        values.
+
+    *   alpha2.xmax => *str*
+
+        Only return records where the 'alpha2' field is less than specified
+        value.
+
+    *   alpha2.xmin => *str*
+
+        Only return records where the 'alpha2' field is greater than
+        specified value.
+
+    *   codes => *str*
+
+        Only return records where the 'codes' field equals specified value.
+
+    *   codes.contains => *str*
+
+        Only return records where the 'codes' field contains specified text.
+
+    *   codes.in => *array[str]*
+
+        Only return records where the 'codes' field is in the specified
+        values.
+
+    *   codes.is => *str*
+
+        Only return records where the 'codes' field equals specified value.
+
+    *   codes.isnt => *str*
+
+        Only return records where the 'codes' field does not equal specified
+        value.
+
+    *   codes.max => *str*
+
+        Only return records where the 'codes' field is less than or equal to
+        specified value.
+
+    *   codes.min => *str*
+
+        Only return records where the 'codes' field is greater than or equal
+        to specified value.
+
+    *   codes.not_contains => *str*
+
+        Only return records where the 'codes' field does not contain
+        specified text.
+
+    *   codes.not_in => *array[str]*
+
+        Only return records where the 'codes' field is not in the specified
+        values.
+
+    *   codes.xmax => *str*
+
+        Only return records where the 'codes' field is less than specified
+        value.
+
+    *   codes.xmin => *str*
+
+        Only return records where the 'codes' field is greater than
+        specified value.
+
+    *   detail => *bool* (default: 0)
+
+        Return array of full records instead of just ID fields.
+
+        By default, only the key (ID) field is returned per result entry.
+
+    *   en_country_name => *str*
+
+        Only return records where the 'en_country_name' field equals
+        specified value.
+
+    *   en_country_name.contains => *str*
+
+        Only return records where the 'en_country_name' field contains
+        specified text.
+
+    *   en_country_name.in => *array[str]*
+
+        Only return records where the 'en_country_name' field is in the
+        specified values.
+
+    *   en_country_name.is => *str*
+
+        Only return records where the 'en_country_name' field equals
+        specified value.
+
+    *   en_country_name.isnt => *str*
+
+        Only return records where the 'en_country_name' field does not equal
+        specified value.
+
+    *   en_country_name.max => *str*
+
+        Only return records where the 'en_country_name' field is less than
+        or equal to specified value.
+
+    *   en_country_name.min => *str*
+
+        Only return records where the 'en_country_name' field is greater
+        than or equal to specified value.
+
+    *   en_country_name.not_contains => *str*
+
+        Only return records where the 'en_country_name' field does not
+        contain specified text.
+
+    *   en_country_name.not_in => *array[str]*
+
+        Only return records where the 'en_country_name' field is not in the
+        specified values.
+
+    *   en_country_name.xmax => *str*
+
+        Only return records where the 'en_country_name' field is less than
+        specified value.
+
+    *   en_country_name.xmin => *str*
+
+        Only return records where the 'en_country_name' field is greater
+        than specified value.
+
+    *   exclude_fields => *array[str]*
+
+        Select fields to return.
+
+    *   fields => *array[str]*
+
+        Select fields to return.
+
+    *   query => *str*
+
+        Search.
+
+    *   random => *bool* (default: 0)
+
+        Return records in random order.
+
+    *   result_limit => *int*
+
+        Only return a certain number of records.
+
+    *   result_start => *int* (default: 1)
+
+        Only return starting from the n'th record.
+
+    *   sort => *array[str]*
+
+        Order records according to certain field(s).
+
+        A list of field names separated by comma. Each field can be prefixed
+        with '-' to specify descending order instead of the default
+        ascending.
+
+    *   with_field_names => *bool*
+
+        Return field names in each record (as hash/associative array).
+
+        When enabled, function will return each record as hash/associative
+        array (field name => value pairs). Otherwise, function will return
+        each record as list/array (field value, field value, ...).
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-ListIntlPhoneCodes>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-ListIntlPhoneCodes>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ListIntlPhoneCode
+    s>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Locale::Codes
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

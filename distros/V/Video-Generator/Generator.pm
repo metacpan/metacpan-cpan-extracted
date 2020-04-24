@@ -1,10 +1,8 @@
 package Video::Generator;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use FFmpeg::Command;
@@ -20,8 +18,7 @@ use Video::Pattern;
 # Constants.
 Readonly::Scalar our $SPACE => q{ };
 
-# Version.
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Constructor.
 sub new {
@@ -163,6 +160,7 @@ Video::Generator - Perl class for video generation.
 =head1 SYNOPSIS
 
  use Video::Generator;
+
  my $obj = Video::Generator->new(%parameters);
  my $type = $obj->create($out_path);
 
@@ -283,11 +281,9 @@ Video::Generator - Perl class for video generation.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use File::Path qw(rmtree);
  use File::Spec::Functions qw(catfile);
  use File::Temp qw(tempdir);
@@ -316,11 +312,9 @@ Video::Generator - Perl class for video generation.
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use File::Path qw(rmtree);
  use File::Spec::Functions qw(catfile);
  use File::Temp qw(tempdir);
@@ -392,21 +386,22 @@ Video class for frame generation.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Video-Generator>.
+L<https://github.com/michal-josef-spacek/Video-Generator>.
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
- BSD 2-Clause License
+© 2014-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

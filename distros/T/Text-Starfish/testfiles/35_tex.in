@@ -8,6 +8,7 @@
 %    my $r = shift;
 %    $r =~ s/^% -\*- compile-command.*\n//;
 %    $r.= "\\end{document}\n";
+%    $r.= "% $Star->{INFILE}\n";
 %    return $r;
 %  } );
 % !>

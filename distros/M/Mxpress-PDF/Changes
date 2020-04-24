@@ -9,3 +9,5 @@ Revision history for Mxpress-PDF
 0.23    2020-04-13
 	- Add new plugin Mxpres::PDF::Plugin::Border
 
+0.24    2020-04-13
+	- Fix for nested TOC outlines.

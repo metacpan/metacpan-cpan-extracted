@@ -1,0 +1,14 @@
+frdcsa/FRDCSA.xml
+lib/Org/FRDCSA/AIE.pm
+lib/Org/FRDCSA/AIE/Method/SimpleLCS.pm
+lib/Org/FRDCSA/AIE/Method/Walking.pm
+lib/Org/FRDCSA/AIE/test/test-simplelcs.pl
+lib/Org/FRDCSA/AIE/test/test-walking.pl
+lib/Org/FRDCSA/AIE2.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+script/aie
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

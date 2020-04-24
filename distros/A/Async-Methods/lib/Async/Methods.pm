@@ -1,6 +1,6 @@
 package Async::Methods;
 
-our $VERSION = '0.000002'; # v0.0.2
+our $VERSION = '0.000003'; # v0.0.3
 
 $VERSION = eval $VERSION;
 
@@ -90,11 +90,22 @@ package await;
 
 sub this {
   my ($self) = @_;
-  if ($self->isa('Mojo::Promise') and !$self->can('get')) {
-    require Mojo::Promise::Role::Get;
-    $self = $self->with_roles('+Get');
+  return $self->get if $self->can('get');
+  if ($self->isa('Mojo::Promise')) {
+    # This logic stolen from Mojo::Promis::Role::Get v0.1.2
+    Carp::croak "'get' cannot be called when the event loop is running"
+      if $self->ioloop->is_running;
+    my (@result, $rejected);
+    $self->then(sub { @result = @_ }, sub { $rejected = 1; @result = @_ })
+         ->wait;
+    if ($rejected) {
+      my $reason = $result[0] // 'Promise was rejected';
+      die $reason if ref $reason or $reason =~ m/\n\z/;
+      Carp::croak $reason;
+    }
+    return wantarray ? @result : $result[0];
   }
-  return $self->get;
+  die "Don't know how to await for $self";
 }
 
 sub await::_ {
@@ -304,7 +315,7 @@ to be a deal-breaker in practice.
 
 =head1 CONTRIBUTORS
 
-None yet - maybe this software is perfect! (ahahahahahahahahaha)
+ Grinnz - Dan Book (cpan:DBOOK) <dbook@cpan.org>
 
 =head1 COPYRIGHT
 

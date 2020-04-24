@@ -268,6 +268,25 @@ SV * STRtoF128(pTHX_ SV * str) {
      return obj_ref;
 }
 
+void fromSTR(pTHX_ float128 * f, SV * str) {
+     char * p;
+     int inf_or_nan = 0;
+
+#ifdef _WIN32_BIZARRE_INFNAN
+     inf_or_nan = _win32_infnanstring(SvPV_nolen(str));
+     if(inf_or_nan) {
+       if(inf_or_nan == 2) *f = _get_nan();
+       else *f = _get_inf(inf_or_nan);
+     }
+     else *f = strtoflt128(SvPV_nolen(str), &p);
+#else
+     *f = strtoflt128(SvPV_nolen(str), &p);
+#endif
+
+     if(!inf_or_nan) _nnum_inc(p);
+
+}
+
 SV * NVtoF128(pTHX_ SV * nv) {
      float128 * f;
      SV * obj_ref, * obj;
@@ -283,6 +302,10 @@ SV * NVtoF128(pTHX_ SV * nv) {
      sv_setiv(obj, INT2PTR(IV,f));
      SvREADONLY_on(obj);
      return obj_ref;
+}
+
+void fromNV(pTHX_ float128 * f, SV * nv) {
+     *f = (float128)SvNV(nv);
 }
 
 SV * IVtoF128(pTHX_ SV * iv) {
@@ -302,6 +325,10 @@ SV * IVtoF128(pTHX_ SV * iv) {
      return obj_ref;
 }
 
+void fromIV(pTHX_ float128 * f, SV * iv) {
+     *f = (float128)SvIV(iv);
+}
+
 SV * UVtoF128(pTHX_ SV * uv) {
      float128 * f;
      SV * obj_ref, * obj;
@@ -317,6 +344,10 @@ SV * UVtoF128(pTHX_ SV * uv) {
      sv_setiv(obj, INT2PTR(IV,f));
      SvREADONLY_on(obj);
      return obj_ref;
+}
+
+void fromUV(pTHX_ float128 * f,SV * uv) {
+     *f = (float128)SvUV(uv);
 }
 
 void F128toSTR(pTHX_ SV * f) {
@@ -1686,6 +1717,19 @@ SV * F128toF128(pTHX_ SV * a) {
        croak("Invalid object supplied to Math::Float128::F128toF128 function");
      }
      croak("Invalid argument supplied to Math::Float128::F128toF128 function");
+}
+
+void fromF128(pTHX_ float128 * f, SV * a) {
+
+     if(sv_isobject(a)) {
+       const char *h = HvNAME(SvSTASH(SvRV(a)));
+       if(strEQ(h, "Math::Float128")) {
+
+         *f = *(INT2PTR(float128 *, SvIVX(SvRV(a))));
+       }
+       else croak("Invalid object supplied to Math::Float128::fromF128 function");
+     }
+     else croak("Invalid argument supplied to Math::Float128::fromF128 function");
 }
 
 SV * _itsa(pTHX_ SV * a) {
@@ -3135,12 +3179,46 @@ CODE:
   RETVAL = STRtoF128 (aTHX_ str);
 OUTPUT:  RETVAL
 
+void
+fromSTR (f, str)
+	float128 *	f
+	SV *	str
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        fromSTR(aTHX_ f, str);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
+
 SV *
 NVtoF128 (nv)
 	SV *	nv
 CODE:
   RETVAL = NVtoF128 (aTHX_ nv);
 OUTPUT:  RETVAL
+
+void
+fromNV (f, nv)
+	float128 *	f
+	SV *	nv
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        fromNV(aTHX_ f, nv);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
 
 SV *
 IVtoF128 (iv)
@@ -3149,12 +3227,46 @@ CODE:
   RETVAL = IVtoF128 (aTHX_ iv);
 OUTPUT:  RETVAL
 
+void
+fromIV (f, iv)
+	float128 *	f
+	SV *	iv
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        fromIV(aTHX_ f, iv);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
+
 SV *
 UVtoF128 (uv)
 	SV *	uv
 CODE:
   RETVAL = UVtoF128 (aTHX_ uv);
 OUTPUT:  RETVAL
+
+void
+fromUV (f, uv)
+	float128 *	f
+	SV *	uv
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        fromUV(aTHX_ f, uv);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
 
 void
 F128toSTR (f)
@@ -3394,6 +3506,23 @@ F128toF128 (a)
 CODE:
   RETVAL = F128toF128 (aTHX_ a);
 OUTPUT:  RETVAL
+
+void
+fromF128 (f, a)
+	float128 *	f
+	SV *	a
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        fromF128(aTHX_ f, a);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
 
 SV *
 _itsa (a)

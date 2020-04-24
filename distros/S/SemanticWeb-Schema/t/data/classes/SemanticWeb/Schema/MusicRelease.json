@@ -22,8 +22,8 @@
          "rdfs:label" : "creditedTo",
          "schema:domainIncludes" : "schema:MusicRelease",
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:duration" : {
@@ -39,14 +39,14 @@
             "issue-1457"
          ],
          "schema:domainIncludes" : [
-            "schema:Audiobook",
-            "schema:MediaObject",
             "schema:QuantitativeValueDistribution",
-            "schema:Event",
-            "schema:Schedule",
+            "schema:MusicRelease",
             "schema:MusicRecording",
+            "schema:Event",
             "schema:Movie",
-            "schema:MusicRelease"
+            "schema:MediaObject",
+            "schema:Schedule",
+            "schema:Audiobook"
          ],
          "schema:rangeIncludes" : "schema:Duration"
       },

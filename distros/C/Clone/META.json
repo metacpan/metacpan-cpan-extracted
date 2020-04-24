@@ -32,7 +32,7 @@
       },
       "test" : {
          "requires" : {
-            "B::COW" : "0.003",
+            "B::COW" : "0.004",
             "Test::More" : "0"
          }
       }
@@ -49,6 +49,6 @@
          "url" : "http://github.com/garu/Clone"
       }
    },
-   "version" : "0.44",
+   "version" : "0.45",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

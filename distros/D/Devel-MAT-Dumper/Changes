@@ -1,5 +1,13 @@
 Revision history for Devel-MAT-Dumper
 
+0.42    2020-04-24
+        [CHANGES]
+         * Support a -dump_at_WARN flag
+         * Add a new CODEx type to handle nonzero PadnameFLAGS() (RT132414)
+
+        [BUGFIXES]
+         * Ensure perls before 5.18 still write context information
+
 0.41    2019-08-14 23:25:22
         [CHANGES]
          * Define another thirdparty XS extension for setting dumper helpers

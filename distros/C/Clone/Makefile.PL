@@ -9,7 +9,7 @@ WriteMakefile(
     'PL_FILES'      => {},
     'TEST_REQUIRES' => {
       'Test::More' => 0,
-      'B::COW'     => '0.003',
+      'B::COW'     => '0.004',
     },
     'LIBS'          => [''],     # e.g., '-lm'
     'DEFINE'        => '',       # e.g., '-DHAVE_SOMETHING'

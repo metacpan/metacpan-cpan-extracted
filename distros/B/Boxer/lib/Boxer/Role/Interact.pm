@@ -6,7 +6,6 @@ package Boxer::Role::Interact;
 
 use v5.14;
 use utf8;
-use strictures 2;
 use Role::Commons -all;
 use namespace::autoclean 0.16;
 
@@ -14,13 +13,16 @@ use Moo::Role;
 
 use Types::Standard qw< Bool >;
 
+use strictures 2;
+no warnings "experimental::signatures";
+
 =head1 VERSION
 
-Version v1.4.0
+Version v1.4.2
 
 =cut
 
-our $VERSION = "v1.4.0";
+our $VERSION = "v1.4.2";
 
 has verbose => (
 	is       => 'rw',

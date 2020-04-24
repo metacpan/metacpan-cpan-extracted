@@ -45,19 +45,19 @@ is($undefs->toRGBA, 'rgba(255,255,255,1)' );
 my $okay = Colouring::In->new([105, 200, 10], 1);
 is($okay->toHEX, '#69c80a');
 #TODO: rounding
-is($okay->toHSL(), 'hsl(90,90%,41%)');
+is($okay->toHSL(), 'hsl(90,90.24%,41%)');
 
 my $okay2 = Colouring::In->new([255, 220, 230]);
-is($okay2->toHSL(), 'hsl(342,100%,93%)');
-is($okay2->toHSV(), 'hsv(342,14%,100%)');
+is($okay2->toHSL(), 'hsl(342.6,100%,93%)');
+is($okay2->toHSV(), 'hsv(342.86,14%,100%)');
 
 my $okay3 = Colouring::In->new([225, 255, 230]);
-is($okay3->toHSL(), 'hsl(129.6,100%,94%)');
-is($okay3->toHSV(), 'hsv(129.6,12%,100%)');
+is($okay3->toHSL(), 'hsl(130.2,100%,94%)');
+is($okay3->toHSV(), 'hsv(130,12%,100%)');
 
 my $okay4 = Colouring::In->new([225, 230, 255, 1]);
-is($okay4->toHSL(), 'hsl(230.4,100%,94%)');
-is($okay4->toHSV(), 'hsv(230.4,12%,100%)');
+is($okay4->toHSL(), 'hsl(229.8,100%,94%)');
+is($okay4->toHSV(), 'hsv(230,12%,100%)');
 
 done_testing();
 

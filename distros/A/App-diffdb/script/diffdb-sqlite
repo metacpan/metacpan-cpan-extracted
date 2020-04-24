@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.496
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-22'; # DATE
+our $DATE = '2020-04-23'; # DATE
 our $DIST = 'App-diffdb'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +38,7 @@ diffdb-sqlite - Compare two SQLite databases, line by line
 
 =head1 VERSION
 
-This document describes version 0.002 of diffdb-sqlite (from Perl distribution App-diffdb), released on 2020-04-22.
+This document describes version 0.003 of diffdb-sqlite (from Perl distribution App-diffdb), released on 2020-04-23.
 
 =head1 SYNOPSIS
 
@@ -59,16 +59,6 @@ C<*> marks required options.
 
 =over
 
-=item B<--action>=I<s>
-
-Default value:
-
- "diff_db"
-
-Valid values:
-
- ["list_tables1","list_tables2","diff_db"]
-
 =item B<--diff-command>=I<s>
 
 Default value:
@@ -84,18 +74,6 @@ Default value:
 Valid values:
 
  ["json-one-line","json-card"]
-
-=item B<--tables1>
-
-Shortcut for --action=list_tables1.
-
-See C<--action>.
-
-=item B<--tables2>
-
-Shortcut for --action=list_tables2.
-
-See C<--action>.
 
 =back
 
@@ -301,7 +279,6 @@ Finally, you can filter a section by environment variable using the filter C<env
 
 List of available configuration parameters:
 
- action (see --action)
  dbpath1 (see --dbpath1)
  dbpath2 (see --dbpath2)
  diff_command (see --diff-command)
@@ -343,10 +320,6 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 SEE ALSO
-
-L<diff>.
 
 =head1 AUTHOR
 

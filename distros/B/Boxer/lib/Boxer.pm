@@ -8,25 +8,81 @@ Boxer - system deployment ninja tricks
 
 =cut
 
-use v5.14;
+use v5.20;
 use utf8;
-use strictures 2;
 use Role::Commons -all;
+use feature 'signatures';
 use namespace::autoclean 0.16;
+
+use Module::Find;
+use Module::Load::Conditional qw(can_load);
+use Log::Any qw($log);
+
+use strictures 2;
+no warnings "experimental::signatures";
 
 =head1 VERSION
 
-Version v1.4.0
+Version v1.4.2
 
 =cut
 
-our $VERSION = "v1.4.0";
+our $VERSION = "v1.4.2";
+
+=head1 SYNOPSIS
+
+    use Boxer;
+
+    my $domain = Boxer->get_world('Reclass')->new( suite => 'stretch', data => 'examples' );
+    say $domain->list_parts();
+
+    my $goal = $domain->get_part('lxp5');
+    my $plan = $domain->map( $goal, 1 );
+    $plan->as_file( Boxer::File::WithSkeleton->new( basename => 'preseed.cfg' ) );
+
+    my $serializer = Boxer::File::WithSkeleton->new( skeleton => 'script.sh.in' );
+    $plan->as_file( $serializer->file( 'script.sh', 1 ) );
+
+    my $anothergoal = $domain->get_part('parl-greens');
+    my $anotherplan = $domain->map($anothergoal);
+    $anotherplan->as_file( $serializer->file( 'parl-greens.sh', 1 ) );
+
+    my $newdomain = Boxer->get_world()->new( suite => 'buster', data => 'examples' );
+    my $plan_a    = $newdomain->map($goal);
+    $plan_a->as_file( Boxer::File::WithSkeleton->new( basename => 'preseed_pure.cfg' ) );
 
 =head1 DESCRIPTION
 
 Framework for system deployment ninja tricks.
 
 See L<boxer> for further information.
+
+=cut
+
+sub list_worlds ($self)
+{
+	return findsubmod Boxer::World;
+}
+
+sub get_world
+{
+	my ( $self, $name ) = @_;
+
+	$name ||= 'flat';
+
+	foreach my $world ( $self->list_worlds() ) {
+		if ( lc( substr( $world, -( length($name) + 2 ) ) ) eq lc("::$name") )
+		{
+			unless ( can_load( modules => { $world => 0 } ) ) {
+				$log->error($Module::Load::Conditional::ERROR);
+				return;
+			}
+			return $world;
+		}
+	}
+	$log->error("No world \"$name\" found");
+	return;
+}
 
 =head1 BUGS
 

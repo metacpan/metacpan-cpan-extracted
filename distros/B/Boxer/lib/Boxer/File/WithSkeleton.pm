@@ -4,10 +4,10 @@ package Boxer::File::WithSkeleton;
 
 =cut
 
-use v5.14;
+use v5.20;
 use utf8;
-use strictures 2;
 use Role::Commons -all;
+use feature 'signatures';
 use namespace::autoclean 0.16;
 
 use Path::Tiny;
@@ -22,18 +22,20 @@ use Types::TypeTiny qw(HashLike);
 use Types::Path::Tiny qw(Dir File Path);
 use Boxer::Types qw(SkelDir Basename);
 
+use strictures 2;
+no warnings "experimental::signatures";
+
 =head1 VERSION
 
-Version v1.4.0
+Version v1.4.2
 
 =cut
 
-our $VERSION = "v1.4.0";
+our $VERSION = "v1.4.2";
 
 # permit callers to sloppily pass undefined values
-sub BUILDARGS
+sub BUILDARGS ( $class, %args )
 {
-	my ( $class, %args ) = @_;
 	delete @args{ grep !defined( $args{$_} ), keys %args };
 	return {%args};
 }
@@ -47,12 +49,12 @@ has file => (
 	is  => 'lazy',
 	isa => Basename,
 
-	default => sub {
-		if ( $_[0]->basename ) {
-			return $_[0]->basename;
+	default => sub ($self) {
+		if ( $self->basename ) {
+			return $self->basename;
 		}
-		elsif ( $_[0]->skeleton_suffix ) {
-			return $_[0]->skeleton_path->basename( $_[0]->skeleton_suffix );
+		elsif ( $self->skeleton_suffix ) {
+			return $self->skeleton_path->basename( $self->skeleton_suffix );
 		}
 	},
 );
@@ -61,9 +63,9 @@ has file_path => (
 	is       => 'lazy',
 	isa      => Path,
 	required => 1,
-	default  => sub {
-		if ( $_[0]->file_dir and $_[0]->file ) {
-			return $_[0]->file_dir->child( $_[0]->file );
+	default  => sub ($self) {
+		if ( $self->file_dir and $self->file ) {
+			return $self->file_dir->child( $self->file );
 		}
 	},
 );
@@ -77,13 +79,13 @@ has file_dir => (
 has skeleton => (
 	is      => 'lazy',
 	isa     => Basename,
-	default => sub {
-		if (    $_[0]->basename
-			and $_[0]->skeleton_dir
-			and $_[0]->skeleton_suffix )
+	default => sub ($self) {
+		if (    $self->basename
+			and $self->skeleton_dir
+			and $self->skeleton_suffix )
 		{
-			return $_[0]->skeleton_dir->child(
-				$_[0]->basename . $_[0]->skeleton_suffix )->basename;
+			return $self->skeleton_dir->child(
+				$self->basename . $self->skeleton_suffix )->basename;
 		}
 	},
 );
@@ -92,9 +94,9 @@ has skeleton_path => (
 	is       => 'lazy',
 	isa      => File,
 	required => 1,
-	default  => sub {
-		if ( $_[0]->skeleton_dir and $_[0]->skeleton ) {
-			return $_[0]->skeleton_dir->child( $_[0]->skeleton );
+	default  => sub ($self) {
+		if ( $self->skeleton_dir and $self->skeleton ) {
+			return $self->skeleton_dir->child( $self->skeleton );
 		}
 	},
 );
@@ -111,10 +113,8 @@ has skeleton_suffix => (
 	default => '.in',
 );
 
-sub create
+sub create ( $self, $vars )
 {
-	my ( $self, $vars ) = @_;
-
 	my $template = Template::Tiny->new(
 		TRIM => 1,
 	);
