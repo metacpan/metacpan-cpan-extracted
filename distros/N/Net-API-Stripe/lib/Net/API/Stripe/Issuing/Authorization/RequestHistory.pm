@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Issuing/Authorization/RequestHistory.pm
-## Version 0.1.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Version 0.2
+## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/04/11
@@ -15,7 +15,7 @@ BEGIN
 {
     use strict;
     use parent qw( Net::API::Stripe::Generic );
-    our( $VERSION ) = '0.1.1';
+    our( $VERSION ) = '0.2';
 };
 
 sub approved { shift->_set_get_boolean( 'approved', @_ ); }
@@ -56,7 +56,7 @@ Net::API::Stripe::Issuing::Authorization::RequestHistory - A Stripe Authorizatio
 
 =head1 VERSION
 
-    0.1.1
+    0.2
 
 =head1 DESCRIPTION
 
@@ -210,7 +210,7 @@ One of authentication_failed, authorization_controls, card_active, card_inactive
 
 Initial version
 
-=head2 v0.1.1
+=head2 v0.2
 
 Change helper method for B<approved> from B<_set_get_scalar> to B<_set_get_boolean>
 

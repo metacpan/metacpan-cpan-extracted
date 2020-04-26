@@ -16,7 +16,7 @@ StreamFinder - Fetch actual raw streamable URLs from various radio-station and v
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2019 by
+This module is Copyright (C) 2017-2020 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -30,11 +30,13 @@ file.
 
 =head1 SYNOPSIS
 
+	#!/usr/bin/perl
+
 	use strict;
 
 	use StreamFinder;
 
-	my $station = new StreamFinder(<url>);
+	my $station = new StreamFinder($ARGV[0]);
 
 	die "Invalid URL or no streams found!\n"  unless ($station);
 
@@ -70,6 +72,8 @@ file.
 
 	if ($icon_url) {   #SAVE THE ICON TO A TEMP. FILE:
 
+		print "Icon URL=$icon_url=\n";
+
 		my ($image_ext, $icon_image) = $station->getIconData();
 
 		if ($icon_image && open IMGOUT, ">/tmp/${stationID}.$image_ext") {
@@ -79,6 +83,8 @@ file.
 			print IMGOUT $icon_image;
 
 			close IMGOUT;
+
+			print "...Icon image downloaded to (/tmp/${stationID}.$image_ext)\n";
 
 		}
 
@@ -100,14 +106,23 @@ file.
 
 StreamFinder accepts a valid radio station or video URL on supported websites 
 and returns the actual stream URL(s), title, and cover art icon for that 
-station.  The purpose is that one needs one of these URLs 
+station / podcast / video.  The purpose is that one needs one of these URLs 
 in order to have the option to stream the station / video in one's own choice 
 of media player software rather than using their web browser and accepting 
-any / all flash, ads, javascript, cookies, trackers, web-bugs, and other 
+flash, ads, javascript, cookies, trackers, web-bugs, and other 
 crapware associated with that method of playing.  The author uses his own 
-custom all-purpose media player called "fauxdacious" (his custom hacked 
-version of the open-source "audacious" audio player).  "fauxdacious" 
-incorporates this module to decode and play streams.  
+custom all-purpose media player called "Fauxdacious" (his custom hacked 
+version of the open-source "Audacious" audio player).  "Fauxdacious" 
+(L<https://wildstar84.wordpress.com/fauxdacious/> incorporates this module to 
+decode and play streams, along with their titles / station names, and station 
+/ podcast / video icons! 
+
+Please NOTE:  StreamFinder is a module, NOT a standalone application.  It is 
+designed to be used by other Perl applications.  To create your own very simple 
+application just to fetch streams manually, simply grab the code in the 
+B<SYNOPSIS> section above, save it to an executable text file, ie. 
+I<StreamFinder.pl> and run it from the command line with a supported streaming 
+site URL as the argument.  You can then edit it to tailor it to your needs.
 
 The currently-supported websites are:  banned.video 
 (L<StreamFinder::BannedVideo>), brighteon.com (L<StreamFinder::Brighteon>), 
@@ -131,6 +146,7 @@ functions the same way.
 Each site is supported by a separate subpackage (StreamFinder::I<Package>), 
 which is determined and selected based on the URL when the StreamFinder object 
 is created.  The methods are overloaded by the selected subpackage's methods.  
+An example would be B<StreamFinder::Youtube>.  
 
 Please see the POD. documentation for each subpackage for important additional 
 information on options and features specific to each site / subpackage!
@@ -139,20 +155,23 @@ One or more playable streams can be returned for each station / video /
 podcast, along with at least a "title" (station name / video or podcast 
 title) and an icon image URL ("iconurl" - if found).  Additional information 
 that MAY be fetched is a (larger?) banner image ("imageurl"), a (longer?) 
-"description", an "artist" / author, a "genre", and a "year" (podcasts, 
+"description", an "artist" / author, a "genre", and / or a "year" (podcasts, 
 videos, etc.).  Some sites also provide station's FCC call letters 
 ("fccid").  For icon and image URLs, functions exist (getIconData() 
 and getImageData() to fetch the actual binary data and mime type for 
-downloading to local storage for use by your preferred media player.  
+downloading to local storage for use by your application or preferred media 
+player.  
 
-If you have another streaming site that is not supported, please file a 
-feature request via email or the CPAN bug system, or (for faster service), 
-provide a Perl patch module / program source that can extract some or all 
-of the necessary information for streams on that site and I'll consider it!  
-The easiest way to do this is to take one of the existing submodules, copy 
-it to "StreamFinder::I<YOURSITE>.pm and modify it (and the POD docs) to 
-your specific site's needs, test it on several of their pages (see the 
-"SYNOPSIS" code above), and send it to me (That's what I do)!
+If you have another streaming site that is not supported, first, make sure 
+you have B<youtube-dl> installed and see if B<StreamFinder::Youtube> can 
+successfully fetch it.  If not, then please file a feature request via email 
+or the CPAN bug system, or (for faster service), provide a Perl patch module 
+/ program source that can extract some or all of the necessary information 
+for streams on that site and I'll consider it!  The easiest way to do this 
+is to take one of the existing submodules, copy it to 
+"StreamFinder::I<YOURSITE>.pm and modify it (and the POD docs) to your 
+specific site's needs, test it on several of their pages (see the "SYNOPSIS" 
+code above), and send it to me (That's what I do)!
 
 =head1 SUBROUTINES/METHODS
 
@@ -163,13 +182,17 @@ your specific site's needs, test it on several of their pages (see the
 Accepts a URL and creates and returns a new station object, or 
 I<undef> if the URL is not a valid station or no streams are found.
 
+NOTE:  Depending on the type of site being queried, the "station 
+object" can be either a streaming station, a video, or a podcast, 
+but works the same way (method calls, arguments, etc.).
+
 NOTE:  A full URL must be specified here, but if using any of the 
 subpackage modules directly instead, then either a full URL OR just 
 the station / video's site ID may be used!  Reason being that this 
 function parses the full URL to determine which subpackage (site) 
 module to use.
 
-I<options> can vary depending on the type of stream (site) that is 
+I<options> can vary depending on the type of site that is 
 being queried.  One option common to all sites is I<-debug>, which 
 turns on debugging output.  A numeric option can follow specifying 
 the level (0, 1, or 2).  0 is none, 1 is basic, 2 is detailed.  
@@ -379,7 +402,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.26';
+our $VERSION = '1.28';
 our $DEBUG = 0;
 
 require Exporter;
@@ -387,7 +410,7 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = qw();
 my @supported_mods = (qw(Apple BannedVideo Brighteon IHeartRadio RadioNet Radionomy Reciva 
-		Tunein Vimeo Youtube));
+		Tunein Vimeo Spreaker Youtube));
 
 my %haveit;
 
@@ -426,6 +449,8 @@ sub new
 		return new StreamFinder::Vimeo($url, @args);
 	} elsif ($haveit{'Apple'} && $url =~ m#\b(?:podcasts?|music)\.apple\.com\/#) {  #NOTE:ALSO USES youtube-dl!
 		return new StreamFinder::Apple($url, @args);
+	} elsif ($haveit{'Spreaker'} && $url =~ m#\.spreaker\.com\/#) {
+		return new StreamFinder::Spreaker($url, @args);
 #	} elsif ($haveit{'Facebook'} && ($url =~ m#^http[s]?\:\/\/\w*\.facebook\.#)) {  #REMOVED SUPPORT AS FB NOW LOCKS YOUR ACCOUNT & FORCES PASSWORD CHANGE!
 #		return new StreamFinder::Facebook($url, @args);
 #	} elsif ($haveit{'Youtube'} && $url =~ m#\b(?:youtube|youtu|yt)\.\/#) {

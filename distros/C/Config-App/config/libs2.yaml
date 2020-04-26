@@ -1,0 +1,7 @@
+---
+default:
+    libs:
+        - lib3
+        - lib4
+        - lib5
+include: config/libs3.yaml

@@ -6,6 +6,19 @@ Home page:    <https://metacpan.org/release/MooX-Press>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.060	2020-04-25
+
+ [ Bug Fixes ]
+ - Eliminate closure warnings.
+ - Eliminate printf warnings.
+ - Stop wrapping method bodies in do blocks because it conflicts with
+   lvalue methods in versions of Perl too old to optimize the do block
+   away.
+
+0.059	2020-04-25
+
+ - Use MooX::TypeTiny again, but only versions 0.002001 and higher.
+
 0.058	2020-04-08
 
  - Stop using MooX::TypeTiny for now; it introduces some weird coercion

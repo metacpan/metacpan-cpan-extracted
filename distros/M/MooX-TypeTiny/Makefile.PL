@@ -11,14 +11,14 @@ my %META = (
     } },
     test => {
       requires => {
-        'Test::More'  => 0.94,
-        'Test::Fatal' => 0.003,
+        'Test::More'  => '0.94',
+        'Test::Fatal' => '0.003',
       },
     },
     runtime => {
       requires => {
-        'Moo'         => 1.004003,
-        'Type::Tiny'  => 1.000002,
+        'Moo'         => 2.004000,
+        'Type::Tiny'  => 1.008000,
       },
     },
     develop => {

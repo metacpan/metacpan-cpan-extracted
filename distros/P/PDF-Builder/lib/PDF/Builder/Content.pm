@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 no warnings qw( deprecated recursion uninitialized );
 
-our $VERSION = '3.017'; # VERSION
-my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
+our $VERSION = '3.018'; # VERSION
+my $LAST_UPDATE = '3.018'; # manually update whenever code is changed
 
 use Carp;
 use Compress::Zlib qw();
@@ -85,6 +85,7 @@ sub new {
     $self->{' linedash'}       = [[],0]; # see also gs D
     $self->{' flatness'}       = 1;      # see also gs FL
     $self->{' apiistext'}      = 0;
+    $self->{' openglyphlist'}  = 0;
 
     return $self;
 }
@@ -158,6 +159,16 @@ sub translate {
 Rotates the coordinate system counter-clockwise (anti-clockwise) around the
 current origin. Use a negative argument to rotate clockwise. Note that 360 
 degrees will be treated as 0 degrees.
+
+B<Note:> Unless you have already moved (translated) the origin, it is, and will
+remain, at the lower left corner of the visible sheet. It will I<not>
+automatically shift to another corner. For example, a rotation of +90 degrees
+(counter-clockwise) will leave the entire visible sheet in negative Y territory (0 at the left edge, -original_width at the right edge), while X remains in
+positive territory (0 at bottom, +original_height at the top edge).
+
+This C<rotate()> call permits any angle. Do not confuse it with the I<page>
+rotation C<rotate> call, which only permits increments of 90 degrees (with
+opposite sign!), but I<does> shift the origin to another corner of the sheet.
 
 =cut
 
@@ -2709,6 +2720,11 @@ If C<$spacing> is given, the current setting is replaced by that value and
 C<$self> is B<returned> (to permit chaining).
 If C<$spacing> is not given, the current setting is B<returned>.
 
+B<CAUTION:> be careful about using C<charspace> if you are using a connected
+font. This might include Arabic, Devanagari, Latin cursive handwriting, and so 
+on. You don't want to leave gaps between characters, or cause overlaps. For 
+such fonts and typefaces, set the C<charspace> spacing to 0.
+
 =cut
 
 sub _charspace {
@@ -3255,6 +3271,8 @@ Options:
 Indents the text by the number of points (A value less than 0 gives an
 I<outdent>).
 
+=item -underline => 'none'
+
 =item -underline => 'auto'
 
 =item -underline => $distance
@@ -3264,7 +3282,8 @@ I<outdent>).
 Underlines the text. C<$distance> is the number of units beneath the
 baseline, and C<$thickness> is the width of the line.
 Multiple underlines can be made by passing several distances and
-thicknesses.
+thicknesses. 
+A value of 'none' means no underlining (is the default).
 
 Example:
  
@@ -3273,6 +3292,8 @@ Example:
     #   distance 7, thickness 1.5, color yellow
     #   distance 11, thickness 2, color (strokecolor default)
     -underline=>[4,[1,'red'],7,[1.5,'yellow'],11,2],
+
+=item -strikethru => 'none'
 
 =item -strikethru => 'auto'
 
@@ -3285,6 +3306,7 @@ line about 30% of the font size above the baseline, or a specified C<$distance>
 (above the baseline) and C<$thickness> (in points).
 Multiple strikethroughs can be made by passing several distances and
 thicknesses.
+A value of 'none' means no strikethrough. It is the default.
 
 Example:
  
@@ -3305,6 +3327,7 @@ sub _text_underline {
     if (ref($underline) eq 'ARRAY') {
         @underline = @{$underline};
     } else {
+		if ($underline eq 'none') { return; }
         @underline = ($underline, 1);
     }
     push @underline,1 if @underline%2;
@@ -3330,8 +3353,18 @@ sub _text_underline {
             $thickness = $underlinethickness;
         }
 
-        my ($x1,$y1) = $self->_textpos(@{$xy1}, 0, -($distance+($thickness/2)));
-        my ($x2,$y2) = $self->_textpos(@{$xy2}, 0, -($distance+($thickness/2)));
+        my ($x1,$y1, $x2,$y2);
+        my $h = $distance+($thickness/2);
+        if (scalar(@{$xy1}) > 2) {
+            # actual baseline start and end points, not old reduced method
+            my @xyz = @{$xy1};
+            $x1 = $xyz[1]; $y1 = $xyz[2] - $h;
+            @xyz = @{$xy2};
+            $x2 = $xyz[1]; $y2 = $xyz[2] - $h;
+        } else {
+            ($x1,$y1) = $self->_textpos(@{$xy1}, 0, -$h);
+            ($x2,$y2) = $self->_textpos(@{$xy2}, 0, -$h);
+		}
 
         $self->add_post($self->_strokecolor($scolor));
         $self->add_post(_linewidth($thickness));
@@ -3353,6 +3386,7 @@ sub _text_strikethru {
     if (ref($strikethru) eq 'ARRAY') {
         @strikethru = @{$strikethru};
     } else {
+		if ($strikethru eq 'none') { return; }
         @strikethru = ($strikethru, 1);
     }
     push @strikethru,1 if @strikethru%2;
@@ -3360,7 +3394,7 @@ sub _text_strikethru {
    # fonts define an underline position and thickness, but not strikethrough
    # ideally would be just under 1ex
    #my $strikethruposition = (-$self->{' font'}->strikethruposition()*$self->{' fontsize'}/1000||1);
-    my $strikethruposition = 3*($self->{'fontsize'}/1000||1);  # >0 is up
+    my $strikethruposition = 4*($self->{'fontsize'}/1000||1);  # >0 is up
    # let's borrow the underline thickness for strikethrough purposes
     my $strikethruthickness = ($self->{' font'}->underlinethickness()*$self->{' fontsize'}/1000||1);
     my $pos = 1;
@@ -3382,8 +3416,18 @@ sub _text_strikethru {
             $thickness = $strikethruthickness;
         }
 
-        my ($x1,$y1) = $self->_textpos(@{$xy1}, 0, $distance+($thickness/2));
-        my ($x2,$y2) = $self->_textpos(@{$xy2}, 0, $distance+($thickness/2));
+        my ($x1,$y1, $x2,$y2);
+        my $h = $distance+($thickness/2);
+        if (scalar(@{$xy1}) > 2) {
+            # actual baseline start and end points, not old reduced method
+            my @xyz = @{$xy1};
+            $x1 = $xyz[1]; $y1 = $xyz[2] + $h;
+            @xyz = @{$xy2};
+            $x2 = $xyz[1]; $y2 = $xyz[2] + $h;
+        } else {
+            ($x1,$y1) = $self->_textpos(@{$xy1}, 0, $h);
+            ($x2,$y2) = $self->_textpos(@{$xy2}, 0, $h);
+        }
 
         $self->add_post($self->_strokecolor($scolor));
         $self->add_post(_linewidth($thickness));
@@ -3461,6 +3505,530 @@ sub _metaEnd {
     return $self;
 }
 
+=item $width = $content->textHS($HSarray, $settings, %opts)
+
+=item $width = $content->textHS($HSarray, $settings)
+
+Takes an array of hashes produced by HarfBuzz::Shaper and outputs them to the
+PDF output file. HarfBuzz outputs glyph CIDs and positioning information. 
+It may rearrange and swap characters (glyphs), and the result may bear no
+resemblence to the original Unicode point list. examples/HarfBuzz.pl shows a
+number of examples with Latin and non-Latin text. 
+examples/resources/HarfBuzz_example.pdf is available in case you want to see 
+some examples and don't yet have HarfBuzz::Shaper installed.
+
+=over
+
+=item $HSarray
+
+This is the reference to array of hashes produced by HarfBuzz::Shaper, normally 
+unchanged after being created (but I<can> be modified). See 
+L<PDF::Builder::Docs/Using Shaper> for some things that can be done.
+
+=item $settings
+
+This a reference to a hash of various pieces of information that C<textHS()> 
+needs in order to function. They include:
+
+=over
+
+=item script => 'script_name'
+
+This is the standard 4 letter code (e.g., 'Latn') for the script (alphabet and
+writing system) you're using. Currently, only Latn (Western writing systems)
+do kerning, and 'Latn' is the default. HarfBuzz::Shaper will usually be able to 
+figure out from the Unicode points used what the script is, which is fortunate 
+because there is currently no call to override its guess! However, PDF::Builder 
+and HarfBuzz::Shaper do not talk to each other about the script being used.
+
+=item features => array_of_features
+
+This item is B<required>, but may be empty, e.g., 
+C<$settings-E<gt>{'features'} = ();>.
+It can include switches using the standard HarfBuzz naming, and a + or -
+switch, such as '-liga' to turn B<off> ligatures. '-liga' and '-kern', to turn
+off ligatures and kerning, are the only features supported currently. B<Note>
+that this is separate from any switches for features that you send to 
+HarfBuzz::Shaper (with C<$hb-E<gt>add_features()>, etc.) when you run it 
+(before C<textHS()>).
+
+=item language => 'language_code'
+
+This item is optional and currently unused. It is the standard code for the
+language to be used, such as 'en' or 'en_US'. You might need to define this for
+HarfBuzz::Shaper, in case that system can't surmise the language rules to be 
+used.
+
+=item dir => 'flag'
+
+Tell C<textHS()> whether this text is to be written in a LTR manner (B<L>, the 
+B<default>) or RTL manner (B<R>). Top-to-bottom (TTB/B<T>) and Bottom-to-top 
+(BTT/B<B>) directions are not yet implemented. From the script used (Unicode 
+points), HarfBuzz::Shaper can usually figure out what direction to write text 
+in, which is fortunate, as there is currently no way to override this 
+determination! Also, HarfBuzz::Shaper does not share its information with 
+PDF::Builder.
+
+=item align => 'flag'
+
+Given the current output location, align the
+text at the B<B>eginning of the line (left for LTR, right for RTL), B<C>entered
+at the location, or at the B<E>nd of the line (right for LTR, left for RTL).
+The default is B<B>. B<C>entered is analogous to using C<text_center()>, and
+B<E>nd is analogous to using C<text_right()>.
+
+=item dump => flag
+
+Set to 1, it prints out positioning and glyph CID information (to STDOUT) for
+each glyph in the chunk. The default is 0 (no information dump).
+
+=item -minKern => amount (default 1)
+
+If the amount of kerning (font character width I<differs from> glyph ax value) 
+is I<larger> than this many character grid units, use the unaltered ax for the
+width (C<textHS()> will output a kern amount in the TJ operation). Otherwise,
+ignore kerning and use ax of the actual character width. The intent is to avoid
+bloating the PDF code with unnecessary tiny kerning adjustments in the TJ 
+operation.
+
+=back
+
+=item %opts
+
+This a hash of options.
+
+=over
+
+=item -underline => underlining_instructions
+
+See C<text()> for available instructions.
+
+=item -strikethru => strikethrough_instructions
+
+See C<text()> for available instructions.
+
+=item -strokecolor => line_color
+
+Color specification (e.g., 'green', '#FF3377') for underline or strikethrough,
+if not given in an array with their instructions.
+
+=back
+
+=back
+
+Text is sent I<separately> to HarfBuzz::Shaper in 'chunks' ('segments') of a 
+single script (alphabet), a
+single direction (LTR or RTL), a single font file, and a single font size. A 
+chunk may consist of a large amount of text, but at present, C<textHS()> can 
+only output a single line. For long lines that need to be split into 
+column-width lines, the best way may be to take the array of hashes returned by
+HarfBuzz::Shaper and split it into smaller chunks at spaces and other 
+whitespace. You may have to query the font to see what the glyph CIDs are for 
+space and anything else used.
+
+It is expected that when C<textHS()> is called, that the font and font size
+have already been set in PDF::Builder code, as this information is needed to
+interpret what HarfBuzz::Shaper is returning, and to write it to the PDF file.
+Needless to say, the font should be opened from the same file as was given
+to HarfBuzz::Shaper (C<ttfont()> only, with .ttf or .otf files), and the font
+size must be the same. The appropriate location on the page must also already
+have been specified.
+
+B<NOTE:> as HarfBuzz::Shaper is still in its early days, it is possible that
+there will be major changes in its API. We hope that all changes will be 
+upwardly compatible, but do not control this package and cannot guarantee that
+there will not be any incompatible changes that in turn require changes to
+PDF::Builder (C<textHS()>).
+
+=cut
+
+sub textHS {
+    my ($self, $HSarray, $settings, %opts) = @_;
+    # TBD justify would be multiple lines split up from a long string,
+    #       not really applicable here
+    #     full justification to stretch/squeeze a line to fit a given width
+    #       might better be done on the $info array out of Shaper
+    #     indent probably not useful at this level
+
+    my $font = $self->{' font'};
+    my $fontsize = $self->{' fontsize'};
+    my $dir = $settings->{'dir'} || 'L';
+    my $align = $settings->{'align'} || 'B';
+    my $dump = $settings->{'dump'} || 0;
+    my $script = $settings->{'script'} || 'Latn';  # Latn (Latin), etc.
+    my $language;  # not used
+    if (defined $settings->{'language'}) { 
+	$language = $settings->{'language'}; 
+    }
+    my $minKern = $settings->{'minKern'} || 1; # greater than 1 don't omit kern
+
+    my $dokern = 1; # why did they take away smartmatch???
+    foreach my $feature (@{ $settings->{'features'} }) { 
+	if ($feature ne '-kern') { next; }
+        $dokern = 0;
+	last;
+    }
+
+    # check if font and font size set
+    if ($self->{' fontset'} == 0) {
+        unless (defined($self->{' font'}) and $self->{' fontsize'}) {
+            croak q{Can't add text without first setting a font and font size};
+        }
+        $self->font($self->{' font'}, $self->{' fontsize'});
+        $self->{' fontset'} = 1;
+    }
+    # TBD consider -indent option   (at Beginning of line)
+
+    my $chunkLength = $self->advancewidthHS($HSarray, $settings, 
+	              %opts, -doKern=>$dokern, -minKern=>$minKern);
+    my $kernPts = 0; # amount of kerning (left adjust) this glyph
+    my $prevKernPts = 0; # amount previous glyph (THIS TJ operator)
+    my @currentOffset = (0, 0);
+    my @currentPos = $self->textpos();
+    my @startPos = @currentPos;
+
+    # TBD deal with TTB and BTT directions (vertical text)
+    #     assuming LTR/RTL all ay = 0
+    my $mult;
+    # need to first back up (to left) to write chunk
+    # LTR B and RTL E write (LTR) at current position anyway
+    if ($dir eq 'L') {
+	if      ($align eq 'B') {
+	    $mult = 0;
+	} elsif ($align eq 'C') {
+	    $mult = -.5;
+	} else { # align E
+	    $mult = -1;
+	}
+    } else { # dir R
+	if      ($align eq 'B') {
+	    $mult = -1;
+	} elsif ($align eq 'C') {
+	    $mult = -.5;
+	} else { # align E
+	    $mult = 0;
+	}
+    }
+    $self->translate($currentPos[0]+$chunkLength*$mult, $currentPos[1]);
+    # now can just write chunk LTR
+
+    # start of any underline or strikethru
+    my @ulxy1 = (0, $self->textpos());
+
+    foreach my $glyph (@$HSarray) { # loop through all glyphs in chunk
+	my $ax = $glyph->{'ax'}; # output as LTR, +ax = advance to right
+	my $ay = $glyph->{'ay'};
+	my $dx = $glyph->{'dx'};
+	my $dy = $glyph->{'dy'};
+	my  $g = $glyph->{'g'};
+	my $gCID = sprintf("%04x", $g);
+	my $cw = $ax;
+	    
+	# kerning for any LTR or RTL script? not just Latin script?
+        if ($dokern) { 
+	    # kerning, etc. cw != ax, but ignore tiny differences
+	    # cw = width font (and Reader) thinks character is
+            $cw = $font->wxByCId($g)/1000*$fontsize;
+	    # if kerning ( ax < cw ), set kern amount as difference.
+	    # very small amounts ignore by setting ax = cw 
+	    # (> minKern? use the kerning, else ax = cw)
+	    # Shaper may expand spacing, too!
+	    $kernPts = $cw - $ax;  # sometimes < 0 !
+	    if ($kernPts != 0) {
+	        if (int(abs($kernPts*1000/$fontsize)+0.5) <= $minKern) {
+	            # small amount, cancel kerning
+		        $kernPts = 0;
+		        $ax = $cw;
+		    }
+	    }
+	    if ($dump && $cw != $ax) {
+            print "cw exceeds ax by ".sprintf("%.2f", $cw-$ax)."\n";
+	    }
+	    # kerning to NEXT glyph (used on next loop)
+	    # this is why we use axs and axr instead of changing ax, so it
+	    # won't think a huge amount of kerning is requested!
+	}
+
+	if ($dump) {
+            print "glyph CID $g ";
+            if ($glyph->{'name'} ne '') { print "name '$glyph->{'name'}' "; }
+            print "offset x/y $dx/$dy ";
+	    print "orig. ax $ax ";
+	} # continued after $ax modification...
+
+        # keep coordinated with advancewidthHS(), see for documentation
+	if      (defined $glyph->{'axs'}) {
+	    $ax = $glyph->{'axs'};
+	} elsif (defined $glyph->{'axsp'}) {
+	    $ax *= $glyph->{'axsp'}/100;
+	} elsif (defined $glyph->{'axr'}) {
+	    $ax -= $glyph->{'axr'};
+	} elsif (defined $glyph->{'axrp'}) {
+	    $ax *= (1 - $glyph->{'axrp'}/100);
+	}
+
+	if ($dump) { # ...continued
+        print "advance x/y $ax/$ay ";  # modified ax
+        print "char width $cw ";
+	    if ($ay != 0 || $dx != 0 || $dy != 0) {
+	        print "! "; # flag that adjustments needed
+	    }
+	    if ($kernPts != 0) {
+	        print "!! "; # flag that kerning is apparently done
+	    }
+        print "\n";
+	}
+
+	# dy not 0? end everything and output Td and do a Tj
+	# internal location (textpos) should be at dx=dy=0, as should
+	# be currentOffset array. however, Reader current position is
+	# likely to be at last Tm or Td.
+	# note that RTL is output LTR
+	if ($dy != 0) {
+	    $self->_endCID();
+
+	    # consider ignoring any kern request, if vertically adjusting dy
+	    my $xadj = $dx - $prevKernPts;
+	    my $yadj = $dy;
+        # currentOffset should be at beginning of glyph before dx/dy
+	    # text matrix should be there, too
+	    # Reader is still back at Tm/Td plus any glyphs so far
+        @currentPos = ($currentPos[0]+$currentOffset[0]+$xadj, 
+ 	                   $currentPos[1]+$currentOffset[1]+$yadj); 
+#       $self->translate(@currentPos);
+ 	    $self->distance($currentOffset[0]+$xadj,
+	                    $currentOffset[1]+$yadj);
+
+	    $self->add("<$gCID> Tj");
+	    # add glyph to subset list
+	    $font->fontfile()->subsetByCId($g);
+
+	    @currentOffset = (0, 0);
+	    # restore positions to base line for next character
+		@currentPos = ($currentPos[0]+$prevKernPts-$dx+$ax, 
+ 		               $currentPos[1]-$dy+$ay); 
+#	    $self->translate(@currentPos);
+ 	    $self->distance($prevKernPts-$dx+$ax, -$dy+$ay);
+
+	} else {
+	    # otherwise simply add glyph to TJ array, with possible x adj
+	    $self->_outputCID($gCID, $dx, $prevKernPts, $font);
+	    $currentOffset[0] += $ax + $dx;
+	    $currentOffset[1] += $ay;  # for LTR/RTL probably always 0
+ 	    $self->matrix_update($ax + $dx, $ay);
+	}
+
+	$prevKernPts = $kernPts; # for next glyph's adjustment
+	$kernPts = 0;
+    } # end of chunk by individual glyphs
+    $self->_endCID();
+
+    # if LTR, need to move to right end, if RTL, need to return to left end.
+    if ($dir eq 'L') {
+	    if      ($align eq 'B') {
+	        $mult = 1;
+	    } elsif ($align eq 'C') {
+	        $mult = .5;
+	    } else { # align E
+	        $mult = 0;
+	    }
+    } else { # dir R
+	    if      ($align eq 'B') {
+	        $mult = -1;
+	    } elsif ($align eq 'C') {
+	        $mult = -.5;
+	    } else { # align E
+	        $mult = 0;
+	    }
+    }
+    $self->translate($startPos[0]+$chunkLength*$mult, $startPos[1]);
+
+    my @ulxy2 = (0, $ulxy1[1]+$chunkLength, $ulxy1[2]);
+
+    # need to swap ulxy1 and ulxy2? draw UL or ST L to R. direction of 'up'
+    # depends on LTR, so doesn't work if draw RTL.
+    if ($ulxy1[1] > $ulxy2[1]) {
+        my $t; 
+        $t = $ulxy1[1]; $ulxy1[1]=$ulxy2[1]; $ulxy2[1]=$t;
+        $t = $ulxy1[2]; $ulxy1[2]=$ulxy2[2]; $ulxy2[2]=$t;
+    }
+
+    # handle outputting underline and strikethru here
+    if (defined $opts{'-underline'}) {
+        $self->_text_underline(\@ulxy1,\@ulxy2, $opts{'-underline'}, $opts{'-strokecolor'});
+    }
+    if (defined $opts{'-strikethru'}) {
+        $self->_text_strikethru(\@ulxy1,\@ulxy2, $opts{'-strikethru'}, $opts{'-strokecolor'});
+    }
+
+    return $chunkLength;
+} # end of textHS
+
+sub _startCID {
+    my ($self) = @_;
+    if ($self->{' openglyphlist'}) { return; }
+    $self->addNS(" [<");
+    return;
+}
+ 
+sub _endCID {
+    my ($self) = @_;
+    if (!$self->{' openglyphlist'}) { return; }
+    $self->addNS(">] TJ ");
+    # TBD look into detecting empty list already, avoid <> in TJ
+    $self->{' openglyphlist'} = 0;
+    return;
+}
+
+sub _outputCID {
+    my ($self, $glyph, $dx, $kern, $font) = @_;
+    # outputs a single glyph to TJ array, either adding to existing glyph 
+    # string or starting new one after kern amount. kern > 0 moves left, 
+    # dx > 0 moves right, both in points (change to milliems).
+    # add glyph to subset list
+    $font->fontfile()->subsetByCId(hex($glyph));
+
+    if (!$self->{' openglyphlist'}) {
+	# need to output [< first
+	$self->_startCID();
+	$self->{' openglyphlist'} = 1;
+    }
+
+    if ($dx == $kern) { 
+	    # no adjustment, just add to existing output
+	    $self->addNS($glyph); # <> still open
+    } else {
+	    $kern -= $dx;
+	    # adjust right by dx after closing glyph string
+	    # dx>0 is move char RIGHT, kern>0 is move char LEFT, both in points
+	    # kern/fontsize*1000 is units to move left, round to 1 decimal place
+	    # >0 means move left (in TJ operation) that many char grid units
+	    $kern *= (1000/$self->{' fontsize'});
+	    # output correction (char grid units) and this glyph in new <> string
+	    $self->addNS(sprintf("> %.1f <%s", $kern, $glyph));
+	    # TBD look into detecting empty list already, avoid <> in TJ
+    }
+    return;
+}
+
+=item $width = $content->advancewidthHS($HSarray, $settings, %opts)
+
+=item $width = $content->advancewidthHS($HSarray, $settings)
+
+Returns text chunk width (in points) for Shaper-defined glyph array.
+B<Note:> You must define the font and font size I<before> calling 
+C<advancewidthHS()>.
+
+=over
+
+=item $HSarray
+
+The array reference of glyphs created by the HarfBuzz::Shaper call. 
+See C<textHS()> for details.
+
+=item $settings
+
+the hash reference of settings. See C<textHS()> for details.
+Currently none are used, and direction is assumed to be LTR or RTL.
+
+=item %opts
+
+Options. Unlike C<advancewidth()>, you
+cannot override the font, font size, etc. used by HarfBuzz::Shaper to calculate
+the glyph list.
+
+=over
+
+=item -doKern => flag (default 1)
+
+If 1, cancel minor kerns per C<-minKern> setting. This flag should be 0 (false)
+if B<-kern> was passed to HarfBuzz::Shaper (do not kern text).
+This is treated as 0 if an ax override setting is given.
+
+=item -minKern => amount (default 1)
+
+If the amount of kerning (font character width I<differs from> glyph ax value) 
+is I<larger> than this many character grid units, use the unaltered ax for the
+width (C<textHS()> will output a kern amount in the TJ operation). Otherwise,
+ignore kerning and use ax of the actual character width. The intent is to avoid
+bloating the PDF code with unnecessary tiny kerning adjustments in the TJ 
+operation.
+
+=back
+
+=back
+
+Returns total width in points.
+
+=cut
+
+sub advancewidthHS {
+    my ($self, $HSarray, $settings, %opts) = @_;
+
+    # check if font and font size set
+    if ($self->{' fontset'} == 0) {
+        unless (defined($self->{' font'}) and $self->{' fontsize'}) {
+            croak q{Can't add text without first setting a font and font size};
+        }
+        $self->font($self->{' font'}, $self->{' fontsize'});
+        $self->{' fontset'} = 1;
+    }
+
+    my $doKern  = $opts{'-doKern'}  || 1; # flag
+    my $minKern = $opts{'-minKern'} || 1; # character grid units (about 1/1000 em)
+
+    my $width = 0;
+    my $ax = 0;
+    my $cw = 0;
+    # simply go through the array and add up all the 'ax' values.
+    # if 'axs' defined, use that instead of 'ax'
+    # if 'axsp' defined, use that percentage of 'ax'
+    # if 'axr' defined, reduce 'ax' by that amount (increase if <0)
+    # if 'axrp' defined, reduce 'ax' by that percentage (increase if <0)
+    #  otherwise use 'ax' value unchanged
+    #
+    # as in textHS(), ignore kerning (small difference between cw and ax)
+    # however, if user defined an override of ax, assume they want any
+    # resulting kerning! only look at -minKern (default 1 char grid unit)
+    # if original ax is used.
+    #
+    # TBD vertical text 'ay' values?
+    foreach my $glyph (@$HSarray) {
+        $ax = $glyph->{'ax'};
+
+	    if      (defined $glyph->{'axs'}) {
+	        $width += $glyph->{'axs'};
+	    } elsif (defined $glyph->{'axsp'}) {
+	        $width += $glyph->{'axsp'}/100 * $ax;
+	    } elsif (defined $glyph->{'axr'}) {
+	        $width += ($ax - $glyph->{'axr'});
+	    } elsif (defined $glyph->{'axrp'}) {
+	        $width += $ax * (1 - $glyph->{'axrp'}/100);
+	    } else {
+	        if ($doKern) {
+	            # kerning, etc. cw != ax, but ignore tiny differences
+	            my $fontsize = $self->{' fontsize'};
+	            # cw = width font (and Reader) thinks character is (points)
+	            $cw = $self->{' font'}->wxByCId($glyph->{'g'})/1000*$fontsize;
+	            # if kerning ( ax < cw ), set kern amount as difference.
+	            # very small amounts ignore by setting ax = cw 
+	            # (> minKern? use the kerning, else ax = cw)
+	            # textHS() should be making the same adjustment as here
+	            my $kernPts = $cw - $ax;  # sometimes < 0 !
+	            if ($kernPts > 0) {
+		            if (int(abs($kernPts*1000/$fontsize)+0.5) <= $minKern) {
+		                # small amount, cancel kerning
+		                $ax = $cw;
+		            }
+	            }
+	        }
+	        $width += $ax;
+	    }
+    }
+
+    return $width;
+}
+
 =back
 
 =head2 Advanced Methods
@@ -3476,8 +4044,6 @@ current transformation matrix, current clipping port, flatness, and dictname.
 This method applies to both I<text> and I<gfx> objects.
 
 =cut
-#Currently, this method is a no-op for PDF::Builder I<text> objects.
-#
 
 # 8.4.1 Table 52 Graphics State Parameters (device independent) -----------
 # current transformation matrix*, current clipping path*, current color space,
@@ -3516,8 +4082,6 @@ the stack) unless you have done at least one I<save> (pushed it on the stack).
 This method applies to both I<text> and I<gfx> objects.
 
 =cut
-#Currently, this method is a no-op for PDF::Builder I<text> objects.
-#
 
 sub _restore {
     return 'Q';
@@ -3555,6 +4119,41 @@ then, there are many side effects either way. It is generally not useful
 to suspend text mode with ET/textend and BT/textstart, but it is possible, 
 if you I<really> need to do it.
 
+Another, useful, case is when your input PDF is from the B<Chrome browser> 
+printing a page to PDF with
+headers and/or footers. In some versions, this leaves the PDF page with a
+strange scaling (such as the page height in points divided by 3300) and the 
+Y-axis flipped so 0 is at the top. This causes problems when trying to add
+additional text or graphics in a new text or graphics record, where text is 
+flipped (mirrored) upsidedown and at the wrong end of the page. If this 
+happens, you might be able to cure it by adding
+
+    $scale = .23999999; # example, 792/3300, examine PDF or experiment!
+     ...
+    if ($scale != 1) {
+        my @pageDim = $page->mediabox();     # e.g., 0 0 612 792
+        my $size_page = $pageDim[3]/$scale;  # 3300 = 792/.23999999
+        my $invScale = 1.0/$scale;           # 4.16666684
+        $text->add("$invScale 0 0 -$invScale 0 $size_page cm");
+    }
+
+as the first output to the C<$text> stream. Unfortunately, it is difficult to
+predict exactly what C<$scale> should be, as it may be 3300 units per page, or
+a fixed amount. You may need to examine an uncompressed PDF file stream to 
+see what is being used. It I<might> be possible to get the input (original) 
+PDF into a string and look for a certain pattern of "cm" output
+
+    .2399999 0 0 -.23999999 0 792 cm
+
+or similar, which is not within a save/restore (q/Q). If the stream is 
+already compressed, this might not be possible.
+
+=item $content->addNS(@content)
+
+Like C<add()>, but does B<not> make sure there is a space between each element
+and before and after the new content. It is up to I<you> to ensure that any
+necessary spaces in the PDF stream are placed there explicitly!
+
 =cut
 
 # add to 'poststream' string (dumped by ET)
@@ -3573,6 +4172,16 @@ sub add {
 
     if (scalar @_) {
        $self->{' stream'} .= encode('iso-8859-1', ($self->{' stream'} =~ m|\s$|o ? '' : ' ') . join(' ', @_) . ' ');
+    }
+
+    return $self;
+}
+
+sub addNS {
+    my $self = shift;
+
+    if (scalar @_) {
+       $self->{' stream'} .= encode('iso-8859-1', join('', @_));
     }
 
     return $self;
@@ -3641,6 +4250,7 @@ sub textstart {
         @{$self->{' scale'}}          = (1,1);
         @{$self->{' skew'}}           = (0,0);
         $self->{' rotate'}            = 0;
+	$self->{' openglyphlist'}     = 0;
     }
 
     return $self;

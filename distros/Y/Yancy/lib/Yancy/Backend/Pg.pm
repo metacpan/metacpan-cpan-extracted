@@ -1,5 +1,5 @@
 package Yancy::Backend::Pg;
-our $VERSION = '1.054';
+our $VERSION = '1.055';
 # ABSTRACT: A backend for Postgres using Mojo::Pg
 
 #pod =head1 SYNOPSIS
@@ -158,6 +158,7 @@ sub fixup_default {
     my ( $self, $value ) = @_;
     return undef if !defined $value or $value =~ /^nextval/i or $value eq 'NULL';
     return "now" if $value =~ /^(?:NOW|(?:CURRENT_|LOCAL|STATEMENT_|TRANSACTION_|CLOCK_)(?:DATE|TIME(?:STAMP)?))(?:\(\))?/i;
+    return 0 if $value eq '0.0';
     $self->mojodb->db->query( 'SELECT ' . $value )->array->[0];
 }
 
@@ -203,7 +204,7 @@ Yancy::Backend::Pg - A backend for Postgres using Mojo::Pg
 
 =head1 VERSION
 
-version 1.054
+version 1.055
 
 =head1 SYNOPSIS
 
@@ -325,7 +326,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Doug Bell.
+This software is copyright (c) 2020 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

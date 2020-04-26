@@ -1,8 +1,11 @@
 Change log for PDF::API2 version 2.xxx (predecessor to PDF::Builder)
 
-2.037     2019-11-14
+2.037     2020-02-05
 
     - Allow PDF 2.0 files to be opened. [already in PDF::Builder]
+
+    - [RT #131147] Ignore dictionary entries with null values (reported by Klaus
+      Ethgen, fix by Vadim Repin). [already in PDF::Builder]
 
 2.036     2019-09-17
 

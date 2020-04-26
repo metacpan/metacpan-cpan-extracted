@@ -45,7 +45,8 @@ my %Cmd = (		# CLI commands to test with (output should be long enough to be mor
 			ISW			=> 'show version',
 			Series200		=> 'show interfaces switchport general',
 			Wing			=> 'show wireless radio detail',
-			SLX			=> 'show system',
+#			SLX			=> 'show system',
+			SLX			=> 'show interface stats brief', # Better test, on serial port, SLX really fills the output of this command with garbage..
 );
 my %CmdRefreshed = (	# CLI commands whose output is refreshed; to test that we can exit the refresh
 			PassportERS_cli		=> 'monitor ports stats interface utilization',

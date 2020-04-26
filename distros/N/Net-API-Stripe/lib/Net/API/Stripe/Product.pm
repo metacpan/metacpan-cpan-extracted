@@ -182,7 +182,7 @@ The product’s name, meant to be displayable to the customer. Applicable to bot
 
 The dimensions of this product for shipping purposes. A SKU associated with this product can override this value by having its own package_dimensions. Only applicable to products of type=good.
 
-This is a C<Net::API::Stripe::Product::PackageDimension> object.
+This is a L<Net::API::Stripe::Product::PackageDimension> object.
 
 =item B<shippable> boolean
 
@@ -190,7 +190,7 @@ Whether this product is a shipped good. Only applicable to products of type=good
 
 =item B<skus> list
 
-This is a list (C<Net::API::Stripe::List>) of C<Net::API::Stripe::Order::SKU> objects.
+This is a list (L<Net::API::Stripe::List>) of L<Net::API::Stripe::Order::SKU> objects.
 
 This is an undocumented property.
 

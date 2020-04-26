@@ -35,6 +35,10 @@ sub TO_DUMP ( $self, $dumper, %args ) {
     return $res, $tags;
 }
 
+sub is_root ($self) {
+    return $self->{api}->user_is_root( $self->{user_id} // $EMPTY );
+}
+
 sub api_can_call ( $self, $method_id ) {
     $method_id =~ tr /-/_/;
 

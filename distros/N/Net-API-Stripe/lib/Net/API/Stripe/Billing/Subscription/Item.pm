@@ -95,7 +95,7 @@ String representing the object’s type. Objects of the same type share the same
 
 Define thresholds at which an invoice will be sent, and the related subscription advanced to a new billing period
 
-This is a C<Net::API::Stripe::Billing::Thresholds> object.
+This is a L<Net::API::Stripe::Billing::Thresholds> object.
 
 =over 8
 
@@ -129,7 +129,7 @@ Set of key-value pairs that you can attach to an object. This can be useful for 
 
 Hash describing the plan the customer is subscribed to.
 
-This is a C<Net::API::Stripe::Billing::Plan> object.
+This is a L<Net::API::Stripe::Billing::Plan> object.
 
 =item B<quantity> positive integer or zero
 
@@ -143,7 +143,7 @@ The subscription this subscription_item belongs to.
 
 The tax rates which apply to this subscription_item. When set, the default_tax_rates on the subscription do not apply to this subscription_item.
 
-This is an array of C<Net::API::Stripe::Tax::Rate> objects.
+This is an array of L<Net::API::Stripe::Tax::Rate> objects.
 
 =back
 

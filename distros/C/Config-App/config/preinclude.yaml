@@ -1,0 +1,4 @@
+---
+default:
+    answer: 42
+preinclude: config/alt.yaml

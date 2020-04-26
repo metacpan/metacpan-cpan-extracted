@@ -6,7 +6,7 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 #use warnings;
 
-our $VERSION = '0.5502';
+our $VERSION = '0.5503';
 
 use Carp;
 use Math::BigInt;
@@ -851,7 +851,7 @@ Math::FractionManip - Manipulate fractions
 
 =head1 VERSION
 
-version 0.5502
+version 0.5503
 
 =head1 SYNOPSIS
 

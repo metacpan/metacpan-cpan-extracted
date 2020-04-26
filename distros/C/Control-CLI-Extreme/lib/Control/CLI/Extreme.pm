@@ -7,7 +7,7 @@ use Carp;
 use Control::CLI qw( :all );
 
 my $Package = __PACKAGE__;
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 our @ISA = qw(Control::CLI);
 our %EXPORT_TAGS = (
 		use	=> [qw(useTelnet useSsh useSerial useIPv6)],
@@ -345,7 +345,7 @@ our %ErrorPatterns = ( # Patterns which indicated the last command sent generate
 				. ')',
 );
 our $CmdConfirmPrompt = '[\(\[] *(?:[yY](?:es)? *(?:[\\\/]|or) *[nN]o?|[nN]o? *(?:[\\\/]|or) *[yY](?:es)?|y - .+?, n - .+?, <cr> - .+?) *[\)\]](?: *[?:] *| )$'; # Y/N prompt
-our $CmdInitiatedPrompt = '[?:=](?:[ \t]*|\(.+?\) )$'; # Prompt for additional user info
+our $CmdInitiatedPrompt = '[?:=]\h*(?:\(.+?\)\h*)?$'; # Prompt for additional user info
 our $WakeConsole = "\n"; # Sequence to send when connecting to console to wake device
 
 my $LoginReadAttempts = 10;		# Number of read attempts for readwait() method used in login()
@@ -1907,7 +1907,11 @@ sub poll_cmd { # Method to handle cmd for poll methods (used for both blocking &
 			$output =~ s/^\x0d *\x0d//	 if $familyType eq $Prm{s200};	# Remove Secure Router CR+spaces+0+CR sequence following more prompt
 			$output =~ s/^\x0d *\x00\x0d//	 if $familyType eq $Prm{sr};	# Remove Secure Router CR+spaces+0+CR sequence following more prompt
 			$output =~ s/^(?:\e\[D \e\[D)+// if $familyType eq $Prm{isw};	# Remove ISW escape sequences following more prompt
-			$output =~ s/^(?:\e\[[58]D\e\[K|(?:(?:\e\[\dD)|\x08)*\x0d\s{8}(?:(?:\e\[\dD)|\x08)*)// if $familyType eq $Prm{slx}; # Remove SLX escape sequence following more prompt or final END prompt (Telnet/ssh | Console)
+			if ($familyType eq $Prm{slx}) {
+				$output =~ s/(?:(?:\e\[[58]D|\x0d)?\e\[K|(?:\e\[\dD|\x08)*\x0d {8}(?:\e\[\dD|\x08)*\x0d?|\x08{8} {8}\x08{8})//; # Remove SLX escape sequence following more prompt or final END prompt (Telnet/ssh | Console)
+				$output =~ s/ ?\e\[\d+;\d+H//g; # Remove SLX escape sequences on Console output of some command
+				$output =~ s/\e\[m\x0f(?:\e\[7m)?//g; # SLX9850 on serial port, spits these all the time..
+			}
 			$output =~ s/^(?:\e\[60;D|(?:\e\[m)?\x0d)\e\[K// if $familyType eq $Prm{xos};	# Remove ExtremeXOS escape sequence following more prompt
 			$output =~ s/\e\[2J\e\[H//       if $cmd->{noRefreshCmdDone} && $familyType eq $Prm{pers}; # Recover from ExtremeXOS refreshed command
 			$output =~ s/\x0d\e\[23A\e\[J/\n/ if $cmd->{noRefreshCmdDone} && $familyType eq $Prm{xos}; # Recover from ExtremeXOS refreshed command
@@ -1966,9 +1970,8 @@ sub poll_cmd { # Method to handle cmd for poll methods (used for both blocking &
 		}
 		if ($cmd->{more_prompt} && $cmd->{lastLine} =~ s/(?:$cmd->{more_prompt})$//) { # We have a more prompt
 			$cmd->{morePromptDelayed} = 0;	# Reset this flag
-			if (length $cmd->{lastLine}) { # We did not gobble the \n
-				$self->{POLL}{local_buffer} .= $cmd->{lastLine}; # Re-add it now
-				$cmd->{lastLine} = '';	# And clear lastLine, otherwise it will compromise pattern to delete more prompt del char sequence
+			if ($cmd->{lastLine} =~ s/^\n//) { # If we did not gobble the \n remove it and re-add it (residual lastLine can still be rolled over)
+				$self->{POLL}{local_buffer} .= "\n";
 				$self->{POLL}{output_buffer} .= $cmd->{outputNewline} if $newLineLastLine;
 			}
 			$cmd->{outputNewline} = '' if $newLineLastLine; # Either way (\n gobbled or not) we clear it
@@ -2665,7 +2668,7 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 		 $attrib->{attribute} eq 'unit_number' || $attrib->{attribute} eq 'master_unit') && do {
 			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show stacking']);
 			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
-			if ($$outref =~ /(?:This node is not in an Active Topology|stacking-support:\s+\w+\s+Disabled)/) {
+			if ($$outref =~ /(?:This node is not in an Active Topology|stacking-support:\s+\w+\s+Disabled|\*[\d:a-f]+  -     Disabled)/) {
 				$self->_setAttrib('switch_mode', 'Switch');
 				$self->_setAttrib('unit_number', undef);
 				$self->_setAttrib('stack_size', undef);
@@ -6031,7 +6034,7 @@ This method sets the Y/N confirm prompt used by the object instance to match con
 The cmd() method will use this patterm match to detect these Y/N confirmation prompts and automatically feed a 'Y' to them so that the command is executed as you would expect when scripting the device - see cmd(). In the event you want to feed a 'N' instead, refer to cmd_prompted().
 The default prompt match pattern used is:
 
-  '[\(\[] *(?:[yY](?:es)? *(?:[\\\/]|or) *[nN]o?|[nN]o? *(?:[\\\/]|or) *[yY](?:es)?|y - yes, n - no, <cr> - cancel) *[\)\]](?: *[?:] *| )$'
+  '[\(\[] *(?:[yY](?:es)? *(?:[\\\/]|or) *[nN]o?|[nN]o? *(?:[\\\/]|or) *[yY](?:es)?|y - .+?, n - .+?, <cr> - .+?) *[\)\]](?: *[?:] *| )$'
 
 The first form of this method allows reading the current setting; the latter will set the new Y/N prompt and return the previous setting.
 
@@ -6046,7 +6049,7 @@ This method sets the prompt used by the object instance to match the prompt that
 This is used exclusively by the cmd_prompted() method which is capable to detect these prompts and feed the required information to them. See cmd_prompted().
 The default prompt match pattern used is:
 
-  '[?:=](?:[ \t]*|\(.+?\) )$'
+  '[?:=]\h*(?:\(.+?\)\h*)?$'
 
 This method can also be used if you wish to feed a 'N' to Y/N prompts, unlike what is automaticaly done by the cmd() method.
 The first form of this method allows reading the current setting; the latter will set the new prompt and return the previous setting.

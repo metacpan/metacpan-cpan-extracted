@@ -1,25 +1,30 @@
 package MooX::TypeTiny;
 use strict;
 use warnings;
-our $VERSION = '0.001004';
+our $VERSION = '0.002002';
 $VERSION =~ tr/_//d;
+
+use Moo::_Utils qw(_install_modifier);
 
 sub import {
   my $target = caller;
   require Moo;
   require Moo::Role;
 
-  unless ($Moo::MAKERS{$target} && $Moo::MAKERS{$target}{is_class}) {
-      die "MooX::TypeTiny can only be used on Moo classes.";
+  unless (Moo->is_class($target)) {
+    die "MooX::TypeTiny can only be used on Moo classes.";
   }
 
-  Moo::Role->apply_roles_to_object(
-    Moo->_accessor_maker_for($target),
-    'Method::Generate::Accessor::Role::TypeTiny',
-  );
+  _install_modifier($target, 'before', ['has', 'extends', 'with'], sub {
+    my $am = Moo->_accessor_maker_for($target);
+    if (!$am->DOES('MooX::TypeTiny::Role::GenerateAccessor')) {
+      Moo::Role->apply_roles_to_object(
+        $am, 'MooX::TypeTiny::Role::GenerateAccessor' );
+    }
 
-  # make sure we have our own constructor
-  Moo->_constructor_maker_for($target);
+    # make sure we have our own constructor
+    Moo->_constructor_maker_for($target);
+  });
 }
 
 1;

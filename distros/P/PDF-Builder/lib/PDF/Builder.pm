@@ -5,7 +5,7 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 # $VERSION defined here so developers can run PDF::Builder from git.
 # it should be automatically updated as part of the CPAN build.
-our $VERSION = '3.017'; # VERSION
+our $VERSION = '3.018'; # VERSION
 my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
 
 use Carp;
@@ -164,7 +164,7 @@ Release distribution is on CPAN: https://metacpan.org/pod/PDF::Builder
 
 =head1 LICENSE
 
-This software is Copyright (c) 2017-2019 by Phil M. Perry.
+This software is Copyright (c) 2017-2020 by Phil M. Perry.
 
 This is free software, licensed under:
 

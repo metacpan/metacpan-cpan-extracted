@@ -9,9 +9,9 @@ use Perl::Tidy;
 use Data::Dumper;
 use Module::Starter;
 $Data::Dumper::Deparse = 1;
-
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 our %CLASS;
+our $SUB_INDEX = 1;
 
 sub dist {
 	$CLASS{DIST} = $_[1];
@@ -114,7 +114,6 @@ sub end {
 	return $_[0];
 }
 
-our $SUB_INDEX = 1;
 sub sub {
 	my ($self, $sub) = @_;
 	$CLASS{CURRENT}{SUBS}{CURRENT} = $CLASS{CURRENT}{SUBS}{$sub} = {
@@ -207,6 +206,8 @@ sub _build_use {
 
 sub _build_global {
 	my @codes = map { "our $_;" } @{$_[0]};
+	$CLASS{VERSION} ||= 0.01;
+	unshift @codes, "our \$VERSION = $CLASS{VERSION};";
 	return join "\n", @codes;
 }
 
@@ -263,6 +264,11 @@ sub _build_pod {
 				$sub, ($definition->{SUBS}{$sub}{POD} || ""), ($definition->{SUBS}{$sub}{EXAMPLE} || ""))
 			: sprintf("=head2 %s\n\n%s", $sub, $definition->{SUBS}{$sub}{POD} || "");
 	}
+
+	if (scalar @subs) {
+		unshift @subs, "=head1 SUBROUTINES/METHODS";
+	}
+
 	my $lcname = lc($class);
 	(my $safename = $class) =~ s/\:\:/-/g;
 	$CLASS{EMAIL} =~ s/\@/ at /; 
@@ -329,8 +335,6 @@ Version {{version}}
 Quick summary of what the module does.
 {{synopsis}}
 
-=head1 SUBROUTINES/METHODS
-
 {{subs}}
 
 =head1 AUTHOR
@@ -391,7 +395,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 

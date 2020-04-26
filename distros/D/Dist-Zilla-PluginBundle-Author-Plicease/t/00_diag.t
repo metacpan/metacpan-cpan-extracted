@@ -49,6 +49,7 @@ $modules{$_} = $_ for qw(
   Test::Pod::Coverage
   Test::Script
   Test::Version
+  URI::Escape
   YAML
   namespace::autoclean
 );

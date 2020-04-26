@@ -4,7 +4,7 @@
       "haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -33,8 +33,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Moo" : "1.004003",
-            "Type::Tiny" : "1.000002"
+            "Moo" : "2.004",
+            "Type::Tiny" : "1.008"
          }
       },
       "test" : {
@@ -60,6 +60,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#web-simple"
    },
-   "version" : "0.001004",
+   "version" : "0.002002",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

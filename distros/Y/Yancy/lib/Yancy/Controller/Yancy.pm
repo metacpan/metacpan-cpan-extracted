@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy;
-our $VERSION = '1.054';
+our $VERSION = '1.055';
 # ABSTRACT: Basic controller for displaying content
 
 #pod =head1 SYNOPSIS
@@ -43,6 +43,51 @@ our $VERSION = '1.054';
 #pod website. Any user agent that requests JSON will get JSON instead of
 #pod HTML. For full details on how JSON clients are detected, see
 #pod L<Mojolicious::Guides::Rendering/Content negotiation>.
+#pod
+#pod =head1 ACTION HOOKS
+#pod
+#pod Every action can call one or more of your application's
+#pod L<helpers|https://mojolicious.org/perldoc/Mojolicious/Guides/Tutorial#Helpers>.
+#pod These helpers can change the item before it is displayed or
+#pod before it is saved to the database.
+#pod
+#pod These helpers get one argument: An item being displayed, created, saved,
+#pod or deleted. The helper then returns the item to be displayed, created,
+#pod or saved.
+#pod
+#pod     use Mojolicious::Lite -signatures;
+#pod     plugin Yancy => { ... };
+#pod
+#pod     # Set a last_updated timestamp when creating or updating events
+#pod     helper update_timestamp => sub( $c, $item ) {
+#pod         $item->{last_updated} = time;
+#pod         return $item;
+#pod     };
+#pod     post '/event/:event_id' => 'yancy#set',
+#pod         {
+#pod             event_id => undef,
+#pod             schema => 'events',
+#pod             helpers => [ 'update_timestamp' ],
+#pod             forward_to => 'events.get',
+#pod         },
+#pod         'events.set';
+#pod
+#pod Helpers can also be anonymous subrefs for those times when you want a
+#pod unique behavior for a single route.
+#pod
+#pod     # Format the last_updated timestamp when showing event details
+#pod     use Time::Piece;
+#pod     get '/event/:event_id' => 'yancy#get',
+#pod         {
+#pod             schema => 'events',
+#pod             helpers => [
+#pod                 sub( $c, $item ) {
+#pod                     $item->{last_updated} = Time::Piece->new( $item->{last_updated} );
+#pod                     return $item;
+#pod                 },
+#pod             ],
+#pod         },
+#pod         'events.get';
 #pod
 #pod =head1 EXTENDING
 #pod
@@ -213,6 +258,11 @@ use POSIX qw( ceil );
 #pod Set the default order for the items. Supports any L<Yancy::Backend/list>
 #pod C<order_by> structure.
 #pod
+#pod =item before_render
+#pod
+#pod An array reference of hooks to call once for each item in the C<items> list.
+#pod See L</ACTION HOOKS> for usage.
+#pod
 #pod =back
 #pod
 #pod =head4 Output Stash
@@ -363,13 +413,16 @@ sub list {
     #; $c->app->log->info( Dumper $filter );
     #; $c->app->log->info( Dumper $opt );
 
-    my $items = $c->yancy->backend->list( $schema_name, $filter, $opt );
+    my $result = $c->yancy->backend->list( $schema_name, $filter, $opt );
+    for my $helper ( @{ $c->stash( 'before_render' ) // [] } ) {
+        $c->$helper( $_ ) for @{ $result->{items} };
+    }
     # By the time `any` is reached, the format will be blank. To support
     # any format of template, we need to restore the format stash
     my $format = $c->stash( 'format' );
     return $c->respond_to(
         json => sub {
-            $c->stash( json => { %$items, offset => $offset } );
+            $c->stash( json => { %$result, offset => $offset } );
         },
         any => sub {
             if ( !$c->stash( 'template' ) ) {
@@ -377,8 +430,8 @@ sub list {
             }
             $c->stash(
                 ( format => $format )x!!$format,
-                %$items,
-                total_pages => ceil( $items->{total} / $limit ),
+                %$result,
+                total_pages => ceil( $result->{total} / $limit ),
             );
         },
     );
@@ -413,6 +466,11 @@ sub list {
 #pod
 #pod The name of the template to use. See L<Mojolicious::Guides::Rendering/Renderer>
 #pod for how template names are resolved.
+#pod
+#pod =item before_render
+#pod
+#pod An array reference of helpers to call before the item is displayed.  See
+#pod L</ACTION HOOKS> for usage.
 #pod
 #pod =back
 #pod
@@ -451,6 +509,9 @@ sub get {
     if ( !$item ) {
         $c->reply->not_found;
         return;
+    }
+    for my $helper ( @{ $c->stash( 'before_render' ) // [] } ) {
+        $c->$helper( $item );
     }
     # By the time `any` is reached, the format will be blank. To support
     # any format of template, we need to restore the format stash
@@ -518,6 +579,12 @@ sub get {
 #pod
 #pod The name of the template to use. See L<Mojolicious::Guides::Rendering/Renderer>
 #pod for how template names are resolved.
+#pod
+#pod =item before_write
+#pod
+#pod An array reference of helpers to call after the new values are applied
+#pod to the item, but before the item is written to the database. See
+#pod L</ACTION HOOKS> for usage.
 #pod
 #pod =item forward_to
 #pod
@@ -685,11 +752,14 @@ sub set {
         }
     }
 
+    for my $helper ( @{ $c->stash( 'before_write' ) // [] } ) {
+        $c->$helper( $data );
+    }
+
     my %opt;
     if ( my $props = $c->stash( 'properties' ) ) {
         $opt{ properties } = $props;
     }
-
     my $update = $id ? 1 : 0;
     if ( $update ) {
         eval { $c->yancy->set( $schema_name, $id, $data, %opt ) };
@@ -779,6 +849,11 @@ sub set {
 #pod The name of a route to forward the user to on success. Optional.
 #pod Forwarding will not happen for JSON requests.
 #pod
+#pod =item before_delete
+#pod
+#pod An array reference of helpers to call just before the item is deleted.
+#pod See L</ACTION HOOKS> for usage.
+#pod
 #pod =back
 #pod
 #pod =head4 Output Stash
@@ -854,7 +929,11 @@ sub delete {
         return;
     }
 
-    $c->yancy->delete( $schema_name, $id );
+    my $item = $c->yancy->get( $schema_name => $id );
+    for my $helper ( @{ $c->stash( 'before_delete' ) // [] } ) {
+        $c->$helper( $item );
+    }
+    $c->yancy->delete( $schema_name, $item->{ $id_field } );
 
     return $c->respond_to(
         json => sub {
@@ -900,7 +979,7 @@ Yancy::Controller::Yancy - Basic controller for displaying content
 
 =head1 VERSION
 
-version 1.054
+version 1.055
 
 =head1 SYNOPSIS
 
@@ -993,6 +1072,11 @@ authorization / security.
 
 Set the default order for the items. Supports any L<Yancy::Backend/list>
 C<order_by> structure.
+
+=item before_render
+
+An array reference of hooks to call once for each item in the C<items> list.
+See L</ACTION HOOKS> for usage.
 
 =back
 
@@ -1101,6 +1185,11 @@ the route path as a placeholder.
 The name of the template to use. See L<Mojolicious::Guides::Rendering/Renderer>
 for how template names are resolved.
 
+=item before_render
+
+An array reference of helpers to call before the item is displayed.  See
+L</ACTION HOOKS> for usage.
+
 =back
 
 =head4 Output Stash
@@ -1177,6 +1266,12 @@ item will be created. Usually part of the route path as a placeholder.
 
 The name of the template to use. See L<Mojolicious::Guides::Rendering/Renderer>
 for how template names are resolved.
+
+=item before_write
+
+An array reference of helpers to call after the new values are applied
+to the item, but before the item is written to the database. See
+L</ACTION HOOKS> for usage.
 
 =item forward_to
 
@@ -1299,6 +1394,11 @@ for how template names are resolved.
 The name of a route to forward the user to on success. Optional.
 Forwarding will not happen for JSON requests.
 
+=item before_delete
+
+An array reference of helpers to call just before the item is deleted.
+See L</ACTION HOOKS> for usage.
+
 =back
 
 =head4 Output Stash
@@ -1323,6 +1423,51 @@ into doing something on your site that they didn't intend, such as
 editing or deleting content.  You must add a C<< <%= csrf_field %> >> to
 your form in order to delete an item successfully. See
 L<Mojolicious::Guides::Rendering/Cross-site request forgery>.
+
+=head1 ACTION HOOKS
+
+Every action can call one or more of your application's
+L<helpers|https://mojolicious.org/perldoc/Mojolicious/Guides/Tutorial#Helpers>.
+These helpers can change the item before it is displayed or
+before it is saved to the database.
+
+These helpers get one argument: An item being displayed, created, saved,
+or deleted. The helper then returns the item to be displayed, created,
+or saved.
+
+    use Mojolicious::Lite -signatures;
+    plugin Yancy => { ... };
+
+    # Set a last_updated timestamp when creating or updating events
+    helper update_timestamp => sub( $c, $item ) {
+        $item->{last_updated} = time;
+        return $item;
+    };
+    post '/event/:event_id' => 'yancy#set',
+        {
+            event_id => undef,
+            schema => 'events',
+            helpers => [ 'update_timestamp' ],
+            forward_to => 'events.get',
+        },
+        'events.set';
+
+Helpers can also be anonymous subrefs for those times when you want a
+unique behavior for a single route.
+
+    # Format the last_updated timestamp when showing event details
+    use Time::Piece;
+    get '/event/:event_id' => 'yancy#get',
+        {
+            schema => 'events',
+            helpers => [
+                sub( $c, $item ) {
+                    $item->{last_updated} = Time::Piece->new( $item->{last_updated} );
+                    return $item;
+                },
+            ],
+        },
+        'events.get';
 
 =head1 EXTENDING
 
@@ -1444,7 +1589,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Doug Bell.
+This software is copyright (c) 2020 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

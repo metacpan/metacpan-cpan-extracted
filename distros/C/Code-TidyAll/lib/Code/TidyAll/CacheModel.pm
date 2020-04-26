@@ -12,7 +12,7 @@ use Specio::Library::String;
 
 use Moo;
 
-our $VERSION = '0.75';
+our $VERSION = '0.78';
 
 has base_sig => (
     is      => 'ro',
@@ -71,7 +71,7 @@ has path => (
 
 sub _build_file_contents {
     my ($self) = @_;
-    return Path::Tiny::path( $self->full_path )->slurp;
+    return Path::Tiny::path( $self->full_path )->slurp_raw;
 }
 
 sub _trigger_file_contents {
@@ -141,7 +141,7 @@ Code::TidyAll::CacheModel - Caching model for Code::TidyAll
 
 =head1 VERSION
 
-version 0.75
+version 0.78
 
 =head1 SYNOPSIS
 
@@ -280,7 +280,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 - 2019 by Jonathan Swartz.
+This software is copyright (c) 2011 - 2020 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under the same
 terms as the Perl 5 programming language system itself.

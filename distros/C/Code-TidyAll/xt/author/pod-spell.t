@@ -49,6 +49,7 @@ Jack
 JavaScript
 Joe
 Jonathan
+Kenneth
 Knop
 Mark
 Martin
@@ -132,6 +133,7 @@ js
 jsbeautify
 jshint
 jslint
+kenneth
 lib
 listref
 mark
@@ -180,3 +182,4 @@ txn
 validator
 validators
 zglob
+Ölwing

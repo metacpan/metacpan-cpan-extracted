@@ -11,3 +11,7 @@ Revision history for Mxpress-PDF
 
 0.24    2020-04-13
 	- Fix for nested TOC outlines.
+
+0.25    2020-04-25
+	- New attribute concat in Mxpress::PDF::Plugin::Text that aids in concatenating text segments.
+	- Add an example to synopsis of switching between default, bold, italic fonts.

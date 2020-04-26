@@ -38,6 +38,7 @@ is $refspec -> src_matches('refs/heads/master'), 1;
 is $refspec -> rtransform ('refs/remotes/github/master'), "refs/heads/master";
 is $refspec -> dst_matches('refs/remotes/github/master'), 1;
 is $refspec -> dst_matches('refs/remotes/blah/master'), 0;
+is $refspec, $refspec -> string;
 
 my $rename = Git::Raw::Remote -> create($repo, 'pre_rename', $url);
 is $rename -> name, 'pre_rename';
@@ -178,6 +179,20 @@ is $github -> is_connected, 1;
 my $ls = $github -> ls;
 
 is_deeply $ls -> {'HEAD'}, $ls -> {'refs/heads/master'};
+
+$path = rel2abs(catfile('t', 'refspecs_repo'));
+make_path($path);
+
+$repo = Git::Raw::Repository -> init ($path, 0);
+$github = Git::Raw::Remote -> create_anonymous($repo, $url);
+
+$github->download({}, ['refs/heads/no-parent:']);
+
+isa_ok $repo->lookup($ls -> {'refs/heads/no-parent'} -> {'id'}), 'Git::Raw::Commit';
+is $repo->lookup($ls -> {'refs/heads/master'} -> {'id'}), undef;
+
+rmtree $path;
+ok ! -e $path;
 
 $path = rel2abs(catfile('t', 'callbacks_repo'));
 make_path($path);

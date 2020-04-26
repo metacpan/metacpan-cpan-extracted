@@ -145,13 +145,13 @@ Set of key-value pairs that you can attach to an object. This can be useful for 
 
 The timespan covered by this invoice item.
 
-This is a C<Net::API::Stripe::Billing::Invoice::Period> object.
+This is a L<Net::API::Stripe::Billing::Invoice::Period> object.
 
 =item B<plan> hash, plan object
 
 The plan of the subscription, if the line item is a subscription or a proration.
 
-This is a C<Net::API::Stripe::Billing::Plan> object.
+This is a L<Net::API::Stripe::Billing::Plan> object.
 
 =item B<proration> boolean
 
@@ -173,13 +173,13 @@ The subscription item that generated this invoice item. Left empty if the line i
 
 The amount of tax calculated per tax rate for this line item
 
-This is an array of C<Net::API::Stripe::Billing::Invoice::TaxAmount> objects.
+This is an array of L<Net::API::Stripe::Billing::Invoice::TaxAmount> objects.
 
 =item B<tax_rates> array of hashes
 
 The tax rates which apply to the line item.
 
-This is an array of C<Net::API::Stripe::Tax::Rate> objects.
+This is an array of L<Net::API::Stripe::Tax::Rate> objects.
 
 =item B<type> string
 

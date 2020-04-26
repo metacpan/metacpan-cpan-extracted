@@ -23,8 +23,10 @@ my @files = (
     't/author-pod-syntax.t',
     't/author-portability.t',
     't/author-synopsis.t',
+    't/libs.t',
     't/merge.t',
     't/module.t',
+    't/preinclude.t',
     't/regress.t',
     't/release-kwalitee.t'
 );

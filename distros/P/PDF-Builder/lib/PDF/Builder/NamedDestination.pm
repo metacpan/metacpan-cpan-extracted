@@ -5,7 +5,7 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 no warnings qw[ recursion uninitialized ];
 
-our $VERSION = '3.017'; # VERSION
+our $VERSION = '3.018'; # VERSION
 my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
 
 # TBD: do -rect and -border apply to Named Destinations (link, url, file)? 

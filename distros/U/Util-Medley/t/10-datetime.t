@@ -1,5 +1,4 @@
-use Test2::V0;
-use Test2::Plugin::DieOnFail;
+use Test::More;
 use Modern::Perl;
 use Util::Medley::DateTime;
 use Util::Medley::String;

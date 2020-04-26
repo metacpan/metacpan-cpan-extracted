@@ -1,5 +1,5 @@
 package Git::Raw;
-$Git::Raw::VERSION = '0.85';
+$Git::Raw::VERSION = '0.86';
 use strict;
 use warnings;
 
@@ -19,6 +19,7 @@ use Git::Raw::Odb;
 use Git::Raw::Odb::Object;
 use Git::Raw::Mempack;
 use Git::Raw::Rebase;
+use Git::Raw::RefSpec;
 use Git::Raw::Reference;
 use Git::Raw::Repository;
 use Git::Raw::Stash;
@@ -50,7 +51,7 @@ Git::Raw - Perl bindings to the Git linkable library (libgit2)
 
 =head1 VERSION
 
-version 0.85
+version 0.86
 
 =head1 DESCRIPTION
 

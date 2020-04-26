@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Number.pm
-## Version 0.1
-## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
+## Version 0.2
+## Copyright(c) 2019 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -15,8 +15,9 @@ BEGIN
 {
     use strict;
     use parent qw( Module::Generic );
-    use Number::Format;
-    our( $VERSION ) = '0.1';
+    use Net::API::Stripe::Number::Format;
+    use TryCatch;
+    our( $VERSION ) = '0.2';
 };
 
 use overload (
@@ -107,18 +108,27 @@ sub init
 {
 	my $self = shift( @_ );
 	my $num  = shift( @_ );
+	return( $self->error( "No number was provided." ) ) if( !CORE::length( $num ) );
 	use utf8;
 	$self->{thousand}	= ',';
 	$self->{decimal}	= '.';
 	$self->{symbol}		= '¥';
 	$self->{precision}	= 0;
 	$self->SUPER::init( @_ );
-	$self->{_fmt} = Number::Format->new(
-		-thousands_sep => $self->{thousand},
-		-decimal_point => $self->{decimal},
-		-int_curr_symbol => $self->{currency},
-		-decimal_digits => $self->{precision},
-	);
+	$Number::Format::DEFAULT_LOCALE->{int_curr_symbol} = 'JPY';
+	try
+	{
+		$self->{_fmt} = Net::API::Stripe::Number::Format->new(
+			thousands_sep => $self->{thousand},
+			decimal_point => $self->{decimal},
+			int_curr_symbol => $self->{currency},
+			decimal_digits => $self->{precision},
+		);
+	}
+	catch( $e )
+	{
+		return( $self->error( "Unable to crete a Net::API::Stripe::Number::Format object: $e" ) );
+	}
 	$self->{_number} = $num;
 	return( $self );
 }
@@ -188,7 +198,7 @@ Or
 
 =head1 VERSION
 
-    0.1
+    0.2
 
 =head1 DESCRIPTION
 

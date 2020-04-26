@@ -106,7 +106,7 @@ Three-letter ISO currency code, in lowercase. Must be a supported currency.
 
 The items included in this order return.
 
-This is an array of C<Net::API::Stripe::Order::Item> objects.
+This is an array of L<Net::API::Stripe::Order::Item> objects.
 
 =item B<livemode> boolean
 
@@ -116,13 +116,13 @@ Has the value true if the object exists in live mode or the value false if the o
 
 The order that this return includes items from.
 
-When expanded, this is a C<Net::API::Stripe::Order> object.
+When expanded, this is a L<Net::API::Stripe::Order> object.
 
 =item B<refund> string (expandable)
 
 The ID of the refund issued for this return.
 
-When expanded, this is a C<Net::API::Stripe::Refund> object.
+When expanded, this is a L<Net::API::Stripe::Refund> object.
 
 =back
 

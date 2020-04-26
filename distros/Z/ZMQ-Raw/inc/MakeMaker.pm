@@ -145,6 +145,7 @@ if (!$is_windows)
 	push @opts,
 		'HAVE_FORK',
 		'HAVE_MKDTEMP',
+		'ZMQ_HAVE_IPC',
 		'ZMQ_HAVE_UIO',
 		'ZMQ_HAVE_IFADDRS';
 }

@@ -56,8 +56,6 @@ is_deeply(
     'conf() works as expected',
 );
 
-ok( $obj = MODULE->new( 'config/libs.yaml', 1 ), MODULE . '->new( "libs.yaml", 1 )' );
-
 $obj = MODULE->new( 'config/app.yaml', 1 );
 my $nested = $obj->get('nested');
 $nested->{something}{else} = 'different';

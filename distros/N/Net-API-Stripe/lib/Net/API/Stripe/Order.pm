@@ -133,7 +133,7 @@ A positive integer in the smallest currency unit (that is, 100 cents for $1.00, 
 
 ID of the Connect Application that created the order.
 
-If this was somehow expanded, this would be a C<Net::API::Stripe::Connect::Account> object.
+If this was somehow expanded, this would be a L<Net::API::Stripe::Connect::Account> object.
 
 =item B<application_fee> integer
 
@@ -141,7 +141,7 @@ If this was somehow expanded, this would be a C<Net::API::Stripe::Connect::Accou
 
 The ID of the payment used to pay for the order. Present if the order status is paid, fulfilled, or refunded.
 
-When expanded, this is a C<Net::API::Stripe::Charge> object.
+When expanded, this is a L<Net::API::Stripe::Charge> object.
 
 =item B<created> timestamp
 
@@ -155,7 +155,7 @@ Three-letter ISO currency code, in lowercase. Must be a supported currency.
 
 The customer used for the order.
 
-When expanded, this is a C<Net::API::Stripe::Customer> object.
+When expanded, this is a L<Net::API::Stripe::Customer> object.
 
 =item B<email> string
 
@@ -167,7 +167,7 @@ The email address of the customer placing the order.
 
 List of items constituting the order. An order can have up to 25 items.
 
-This is an array of C<Net::API::Stripe::Order::Item> objects.
+This is an array of L<Net::API::Stripe::Order::Item> objects.
 
 =item B<livemode> boolean
 
@@ -179,7 +179,7 @@ Set of key-value pairs that you can attach to an object. This can be useful for 
 
 =item B<returns> list
 
-This is an array of C<Net::API::Stripe::Order::Returns> objects.
+This is an array of L<Net::API::Stripe::Order::Returns> objects.
 
 =item B<selected_shipping_method> string
 
@@ -189,13 +189,13 @@ The shipping method that is currently selected for this order, if any. If presen
 
 The shipping address for the order. Present if the order is for goods to be shipped.
 
-This is a C<Net::API::Stripe::Shipping> object.
+This is a L<Net::API::Stripe::Shipping> object.
 
 =item B<shipping_methods> array of hashes
 
 A list of supported shipping methods for this order. The desired shipping method can be specified either by updating the order, or when paying it.
 
-This is an array of C<Net::API::Stripe::Order::ShippingMethod> objects.
+This is an array of L<Net::API::Stripe::Order::ShippingMethod> objects.
 
 =item B<status> string
 
@@ -205,7 +205,7 @@ Current order status. One of created, paid, canceled, fulfilled, or returned. Mo
 
 The timestamps at which the order status was updated.
 
-This is a C<Net::API::Stripe::Order::StatusTransitions> object.
+This is a L<Net::API::Stripe::Order::StatusTransitions> object.
 
 =item B<updated> timestamp
 

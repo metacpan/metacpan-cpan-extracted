@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.179';
+our $VERSION = '1.180';
 
 use Quiq::Database::Row::Array;
 use Quiq::AnsiColor;
@@ -118,6 +118,10 @@ definiert, wird die CASCM-Datenbank direkt zugegriffen, nicht
 
 Lösche Temporäre Dateien nicht.
 
+=item color => $bool (Default: 1)
+
+Schreibe Ausgabe mit ANSI Colorcodes.
+
 =item dryRun => $bool (Default: 0)
 
 Führe keine ändernden Kommandos aus.
@@ -163,14 +167,16 @@ sub new {
         ],
         udl => undef,                 # für direkten Zugriff auf DB
         keepTempFiles => 0,
+        color => 1,
         dryRun => 0,
         verbose => 1,
         # Private Attribute
         db => undef,                  # wenn DB-Zugriff über UDL
         sh => undef,
-        a => Quiq::AnsiColor->new(-t STDOUT),
+        a => undef,
         @_,
     );
+    $self->set(a=>Quiq::AnsiColor->new(-t STDOUT && $self->color? 1: 0));
 
     my $sh = Quiq::Shell->new(
         dryRun => $self->dryRun,
@@ -184,7 +190,7 @@ sub new {
             return $cmd;
         },
         cmdPrefix => '> ',
-        cmdAnsiColor => 'bold',
+        !$self->color? (): (cmdAnsiColor => 'bold'),
     );
     $self->set(sh=>$sh);
 
@@ -284,9 +290,9 @@ sub abstract {
 
     my %item;
     for my $row ($self->showPackage(keys %package)) {
-        my $package = $row->[5];
-        my $item = $row->[1];
-        my $version = $row->[3];
+        my $package = $row->[2];
+        my $item = $row->[0];
+        my $version = $row->[1];
 
         my $maxVersion = $package{$package}[1]{$item} //= -1;
         if ($version > $maxVersion) {
@@ -1572,6 +1578,7 @@ sub findItem {
                 , sta.statename AS state
                 , ver.creationtime
                 , usr.username
+                , ver.versionstatus
             FROM
                 haritems itm
                 JOIN harversions ver
@@ -2032,60 +2039,9 @@ und liefere diese Ergebnismenge zurück.
 
   $scm->showPackage('S6800_0_Seitz_IMS_Obsolete_Files');
   =>
-  1 id
-  2 item_path
-  3 item_type
-  4 version
-  5 versiondataobjid
-  
-  1         2                                         3   4    5
-  | 4002520 | CPM_META/q07i101.cols.xml               | 1 |  1 | 5965056 |
-  | 3992044 | CPM_META/q07i102.cols.xml               | 1 |  9 | 6017511 |
-  | 4114775 | CPM_META/q07i105.cols.xml               | 1 |  2 | 6146470 |
-  | 3992045 | CPM_META/q07i109.cols.xml               | 1 |  6 | 5968199 |
-  | 3992046 | CPM_META/q07i113.cols.xml               | 1 |  6 | 5968200 |
-  | 4233433 | CPM_META/q24i200shw.cpmload.xml         | 1 | 13 | 6327078 |
-  | 4233434 | CPM_META/q24i200shw.flm.cpmload.xml     | 1 |  4 | 6318106 |
-  | 4233435 | CPM_META/q24i210kumul.cpmload.xml       | 1 | 11 | 6327079 |
-  | 4233436 | CPM_META/q24i210kumul.flm.cpmload.xml   | 1 |  4 | 6318108 |
-  | 4233437 | CPM_META/q24i210risiko.cpmload.xml      | 1 | 13 | 6336633 |
-  | 4233438 | CPM_META/q24i210risiko.flm.cpmload.xml  | 1 |  4 | 6318110 |
-  | 4233439 | CPM_META/q24i210schaden.cpmload.xml     | 1 | 13 | 6327081 |
-  | 4233440 | CPM_META/q24i210schaden.flm.cpmload.xml | 1 |  4 | 6318112 |
-  | 4003062 | CPM_META/q33i001.cols.xml               | 1 |  3 | 5981911 |
-  | 4003063 | CPM_META/q33i003.cols.xml               | 1 |  4 | 5981912 |
-  | 4003064 | CPM_META/q33i005.cols.xml               | 1 |  3 | 5981913 |
-  | 4003065 | CPM_META/q33i206.cols.xml               | 1 |  3 | 5981914 |
-  | 4115111 | CPM_META/q44i912.cols.xml               | 1 |  2 | 6157279 |
-  | 4144529 | CPM_META/q44i912.cpmload.xml            | 1 |  2 | 6318380 |
-  | 4144530 | CPM_META/q44i912.flm.cpmload.xml        | 1 |  2 | 6318381 |
-  | 4115112 | CPM_META/q44i913.cols.xml               | 1 |  3 | 6237929 |
-  | 4115113 | CPM_META/q44i914.cols.xml               | 1 |  4 | 6249865 |
-  | 4144531 | CPM_META/q44i914.cpmload.xml            | 1 |  7 | 6318382 |
-  | 4144532 | CPM_META/q44i914.flm.cpmload.xml        | 1 |  2 | 6318383 |
-  | 4095239 | CPM_META/q46i080.cpmload.xml            | 1 |  3 | 6327923 |
-  | 4095240 | CPM_META/q46i080.flm.cpmload.xml        | 1 |  2 | 6318576 |
-  | 4095550 | CPM_META/q46i081.cpmload.xml            | 1 |  3 | 6327924 |
-  | 4095551 | CPM_META/q46i081.flm.cpmload.xml        | 1 |  2 | 6318578 |
-  | 4095548 | CPM_META/q46i084.cpmload.xml            | 1 |  3 | 6327925 |
-  | 4095549 | CPM_META/q46i084.flm.cpmload.xml        | 1 |  2 | 6318580 |
-  | 4003101 | CPM_META/q80i102.cols.xml               | 1 |  4 | 5974529 |
-  | 3936189 | ddl/table/q31i001.sql                   | 1 |  1 | 5885525 |
-  | 3936190 | ddl/table/q31i002.sql                   | 1 |  1 | 5885526 |
-  | 3936191 | ddl/table/q31i003.sql                   | 1 |  1 | 5885527 |
-  | 3936192 | ddl/table/q31i004.sql                   | 1 |  1 | 5885528 |
-  | 3936193 | ddl/table/q31i007.sql                   | 1 |  1 | 5885529 |
-  | 3936194 | ddl/table/q31i014.sql                   | 1 |  1 | 5885530 |
-  | 3936195 | ddl/table/q31i017.sql                   | 1 |  1 | 5885531 |
-  | 4144537 | ddl/table/q44i912_cpm.sql               | 1 |  1 | 6163139 |
-  | 4144538 | ddl/table/q44i914_cpm.sql               | 1 |  1 | 6163140 |
-  | 3936311 | ddl/table/q65i001.sql                   | 1 |  1 | 5885647 |
-  | 3936312 | ddl/table/q65i002.sql                   | 1 |  1 | 5885648 |
-  | 3936313 | ddl/table/q65i003.sql                   | 1 |  1 | 5885649 |
-  | 3936314 | ddl/table/q65i030.sql                   | 1 |  1 | 5885650 |
-  | 4060343 | ddl/udf/rv_cpm_load_ims.sql             | 1 |  1 | 6038412 |
-  | 4060442 | ddl/udf/rv_cpm_load_imsh.sql            | 1 |  2 | 6039389 |
-  | 4060883 | ddl/udf/rv_cpm_load_imshr.sql           | 1 |  1 | 6039379 |
+  1 item_path
+  2 version
+  3 package_name
 
 =cut
 
@@ -2174,7 +2130,7 @@ Name des Quellpakets (from package).
 
 Name des Zielpakets (to package).
 
-=item @files
+=item @files (Default: I<alle Dateien>)
 
 Dateien (versions), die übertragen werden sollen.
 
@@ -2187,6 +2143,7 @@ Ausgabe des Kommandos (String)
 =head4 Description
 
 Übertrage die Dateien @files von Paket $fromPackage in Paket $toPackage.
+Sind keine Dateien angegeben, übertrage alle Dateien aus $fromPackage.
 
 =cut
 
@@ -2196,6 +2153,16 @@ sub switchPackage {
     my ($self,$fromPackage,$toPackage,@files) = @_;
 
     my $output;
+
+    # Sind keine Dateien angegeben, beziehen wir
+    # die Liste der Dateien aus dem Quellpaket. Wir transferieren
+    # dann also alle Dateien.
+
+    if (!@files) {
+        for my $row ($self->showPackage($fromPackage)) {
+            push @files,$row->[0];
+        }
+    }
 
     # Ermittele die Stufen der Packages
 
@@ -2962,7 +2929,7 @@ sub runSql {
 
 =head1 VERSION
 
-1.179
+1.180
 
 =head1 AUTHOR
 

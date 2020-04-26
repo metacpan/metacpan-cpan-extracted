@@ -1,6 +1,6 @@
 package App::GitGot::Repositories;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Repositories::VERSION = '1.336';
+$App::GitGot::Repositories::VERSION = '1.337';
 # ABSTRACT: Object holding a collection of repositories
 use 5.014;
 
@@ -62,7 +62,7 @@ App::GitGot::Repositories - Object holding a collection of repositories
 
 =head1 VERSION
 
-version 1.336
+version 1.337
 
 =head1 ATTRIBUTES
 
@@ -85,11 +85,11 @@ of those tags.
 
 =head1 AUTHOR
 
-John SJ Anderson <genehack@genehack.org>
+John SJ Anderson <john@genehack.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by John SJ Anderson.
+This software is copyright (c) 2020 by John SJ Anderson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

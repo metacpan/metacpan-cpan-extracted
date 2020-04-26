@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
 	NAME             => 'Authen::Passphrase::Argon2',
-	AUTHOR           => q{lnation <thisusedtobeanemail@gmail.com>},
+	AUTHOR           => q{lnation <email@lnation.org>},
 	VERSION_FROM     => 'lib/Authen/Passphrase/Argon2.pm',
 	ABSTRACT_FROM    => 'lib/Authen/Passphrase/Argon2.pm',
 	LICENSE          => 'artistic_2',

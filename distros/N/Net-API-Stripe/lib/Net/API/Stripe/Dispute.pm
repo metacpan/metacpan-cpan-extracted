@@ -120,17 +120,17 @@ Disputed amount. Usually the amount of the charge, but can differ (usually becau
 
 It seems this property is removed from the API documentation or maybe an omission?
 
-This is an id or a C<Net::API::Stripe::Balance::Transaction> object.
+This is an id or a L<Net::API::Stripe::Balance::Transaction> object.
 
 =item B<balance_transactions> array, contains: balance_transaction object
 
 List of zero, one, or two balance transactions that show funds withdrawn and reinstated to your Stripe account as a result of this dispute.
 
-This is an array of C<Net::API::Stripe::Balance::Transaction> objects.
+This is an array of L<Net::API::Stripe::Balance::Transaction> objects.
 
 =item B<charge> string (expandable)
 
-ID of the charge that was disputed or an C<Net::API::Stripe::Charge> object.
+ID of the charge that was disputed or an L<Net::API::Stripe::Charge> object.
 
 =item B<created> timestamp
 
@@ -142,7 +142,7 @@ Three-letter ISO currency code, in lowercase. Must be a supported currency.
 
 =item B<disputed_transaction> string (expandable)
 
-When expanded, this is a C<Net::API::Stripe::Balance::Transaction> object.
+When expanded, this is a L<Net::API::Stripe::Balance::Transaction> object.
 
 =item B<evidence> hash
 
@@ -208,7 +208,7 @@ Evidence provided to respond to a dispute. Updating any field in the hash will s
 
 =item B<evidence_details> hash
 
-Information about the evidence submission. This is a C<Net::API::Stripe::Dispute::EvidenceDetails> object.
+Information about the evidence submission. This is a L<Net::API::Stripe::Dispute::EvidenceDetails> object.
 
 =item B<is_charge_refundable> boolean
 

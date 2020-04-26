@@ -7,8 +7,13 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.017'; # VERSION
-my $LAST_UPDATE = '3.014'; # manually update whenever code is changed
+our $VERSION = '3.018'; # VERSION
+my $LAST_UPDATE = '3.018'; # manually update whenever code is changed
+
+# dependent on optional packages:
+my $HS_installed = 1; # HarfBuzz::Shaper IS installed and you want to use it.
+                      # will quit if Shaper not installed!
+                      # note that you will likely need to update font file list
 
 # command line:
 #   -step  = stop after each test to let the tester look at the PDF file
@@ -101,6 +106,11 @@ my (@example_list, @example_results);
   push @example_list, "ContentText.pl";
   push @example_results, "create examples/ContentText.pdf, showing multiple pages demonstrating the\n capabilities of the Content/Text.pm library advanced text methods.\n";
 
+ if ($HS_installed) {
+  push @example_list, "HarfBuzz.pl";
+  push @example_results, "create examples/HarfBuzz.pdf, showing raw text output through text(), and\n the equivalent text output by textHS() after processing by HarfBuzz::Shaper.\n";
+ }
+
   push @example_list, "RMtutorial.pl";
   push @example_results, "create examples/RMtutorial.pdf, demonstrating very basic usage of\n PDF::Builder text and graphics.\n";
 
@@ -151,10 +161,12 @@ if      (scalar @ARGV == 0) {
 
 $pause = '';
 # some warnings:
-if ('023_cjkfonts' ~~ @example_list) {
-    print "023_cjkfonts: to display the resulting PDFs, you may need to install\n";
-    print "  East Asian fonts for your PDF reader.\n";
-    $pause = ' ';
+foreach my $test (@example_list) {
+    if ($test eq '023_cjkfonts') {
+        print "$test: to display the resulting PDFs, you may need to install\n";
+        print "  East Asian fonts for your PDF reader.\n";
+        $pause = ' ';
+    }
 }
 if ($pause eq ' ') {
     print "Press Enter to continue: ";
@@ -178,10 +190,10 @@ for ($i=0; $i<scalar(@example_list); $i++) {
         $arg = '';
     }
     print "\n=== Running test examples/$file $arg\n";
+    print $desc;
 
     system("perl examples/$file $arg");
 
-    print $desc;
     if ($type eq '-cont') { next; }
     print "Press Enter to continue: ";
     $pause = <>;

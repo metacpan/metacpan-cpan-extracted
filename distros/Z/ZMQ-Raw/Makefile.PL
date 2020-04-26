@@ -133,6 +133,7 @@ if (!$is_windows)
 	push @opts,
 		'HAVE_FORK',
 		'HAVE_MKDTEMP',
+		'ZMQ_HAVE_IPC',
 		'ZMQ_HAVE_UIO',
 		'ZMQ_HAVE_IFADDRS';
 }
@@ -298,6 +299,7 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
+    "File::Temp" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Socket" => 0,
@@ -306,7 +308,7 @@ my %WriteMakefileArgs = (
     "Test::Pod::Coverage" => "0.0",
     "threads" => 0
   },
-  "VERSION" => "0.38",
+  "VERSION" => "0.39",
   "test" => {
     "TESTS" => "t/*.t"
   }

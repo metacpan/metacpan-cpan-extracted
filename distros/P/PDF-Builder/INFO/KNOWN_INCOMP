@@ -7,7 +7,7 @@ Bug fixes to PDF::API2 (in PDF::Builder) are not mentioned if they correct
 an error (that produces an error message and/or incorrect output) and do not 
 affect the operation or results of otherwise correct code.
 
-3.017     2019-12-15
+3.017     2019-12-31
 
    See INFO/DEPRECATED for a list of deprecated methods and other items that
      have been removed from PDF::Builder (or will be, at some future date). 

@@ -15,7 +15,7 @@ use Text::Diff 1.44 qw(diff);
 
 use Moo;
 
-our $VERSION = '0.75';
+our $VERSION = '0.78';
 
 has argv => (
     is      => 'ro',
@@ -184,7 +184,7 @@ sub process_source_or_file {
         foreach my $iter ( 1 .. $self->tidyall->iterations ) {
             $self->transform_file($tempfile);
         }
-        $new_source = $tempfile->slurp;
+        $new_source = $tempfile->slurp_raw;
     }
     if ( $self->can('validate_source') ) {
         $self->validate_source($new_source);
@@ -222,7 +222,7 @@ sub _write_temp_file {
 
     my $tempfile = $self->tidyall->_tempdir->child($rel_path);
     $tempfile->parent->mkpath( { mode => 0755 } );
-    $tempfile->spew($source);
+    $tempfile->spew_raw($source);
     return $tempfile;
 }
 
@@ -251,7 +251,7 @@ Code::TidyAll::Plugin - Create plugins for tidying or validating code
 
 =head1 VERSION
 
-version 0.75
+version 0.78
 
 =head1 SYNOPSIS
 
@@ -422,7 +422,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 - 2019 by Jonathan Swartz.
+This software is copyright (c) 2011 - 2020 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under the same
 terms as the Perl 5 programming language system itself.

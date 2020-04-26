@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Role::RequireUser;
-our $VERSION = '1.054';
+our $VERSION = '1.055';
 # ABSTRACT: Add authorization based on user attributes
 
 #pod =head1 SYNOPSIS
@@ -58,7 +58,8 @@ sub require_user {
         my ( $c ) = @_;
         #; say "Are you authorized? " . $c->yancy->auth->current_user;
         my $user = $c->yancy->auth->current_user;
-        if ( !$where && $user ) {
+        # If where isn't specified, or it's a plain scalar truth value
+        if ( ( !$where || ( !ref $where && $where ) ) && $user ) {
             return 1;
         }
         if ( $where && match( $where, $user ) ) {
@@ -97,7 +98,7 @@ Yancy::Plugin::Auth::Role::RequireUser - Add authorization based on user attribu
 
 =head1 VERSION
 
-version 1.054
+version 1.055
 
 =head1 SYNOPSIS
 
@@ -150,7 +151,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Doug Bell.
+This software is copyright (c) 2020 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

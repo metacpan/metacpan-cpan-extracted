@@ -17,4 +17,6 @@ Revision history for Perl module Net::API::Stripe
 	Removed Net::API::Stripe::Balance::Transaction::List used to handle the list of balance_transactions and replaced it directly by Net::API::Stripe::List from which it inherited
 	Removed Net::API::Stripe::Hash since it was not used anymore and used instead Module::Generic _set_get_hash, _set_get_class, etc
 	Removed Net::API::Stripe::Session because its namespace was to high and generic for its particular purpose.
-	
+1.0 2020-04-25
+    Updated the formatting of the documentation	
+	Added the Net::API::Stripe::Number::Format in replacement of the dependence on Number::Format due to obscure bug under modperl and that Number::Format croaks

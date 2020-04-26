@@ -135,7 +135,7 @@ fee integer
 
 Fees (in JPY) paid for this transaction.
 
-=item B<fee_details> array of C<Net::API::Stripe::Balance::Transaction::FeeDetails> objects
+=item B<fee_details> array of L<Net::API::Stripe::Balance::Transaction::FeeDetails> objects
 
 Detailed breakdown of fees (in JPY) paid for this transaction.
 

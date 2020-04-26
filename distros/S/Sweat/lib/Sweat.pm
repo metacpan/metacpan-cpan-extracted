@@ -1,6 +1,6 @@
 package Sweat;
 
-our $VERSION = 202002270;
+our $VERSION = 202004250;
 
 use v5.10;
 
@@ -464,8 +464,14 @@ sub entertainment_for_drill {
     }
     else {
         $article = $self->next_article;
-        $text = $article->text;
-        $url = $article->url;
+        if ( $article ) {
+            $text = $article->text;
+            $url = $article->url;
+        }
+        else {
+            $text = "Couldn't fetch article, so have this instead: "
+                    . $self->fortune;
+        }
     }
 
     return ( $text, $url, $article );

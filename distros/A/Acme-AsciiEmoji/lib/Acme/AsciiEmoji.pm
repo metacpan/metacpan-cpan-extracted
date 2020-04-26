@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Exporter::Shiny;
 
-our $VERSION = '0.11';
+our $VERSION = '1.00';
 
 our %EMOJI;
 
@@ -287,7 +287,7 @@ Acme::AsciiEmoji - Emoji
 
 =head1 VERSION
 
-Version 0.11
+Version 1.00
 
 =cut
 
@@ -1181,7 +1181,7 @@ sub wall {
 
 =head1 AUTHOR
 
-Robert Acock, C<< <thisusedtobeanemail at gmail.com> >>
+Robert Acock, C<< <email at lnation.org> >>
 
 =head1 BUGS
 
@@ -1222,7 +1222,7 @@ L<http://search.cpan.org/dist/Acme-AsciiEmoji/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 LNATION.
+Copyright 2017->2020 LNATION.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

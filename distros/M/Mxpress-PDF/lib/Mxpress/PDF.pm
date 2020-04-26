@@ -4,7 +4,7 @@ use warnings;
 
 package Mxpress::PDF {
 	BEGIN {
-		our $VERSION = '0.24';
+		our $VERSION = '0.25';
 		our $AUTHORITY = 'cpan:LNATION';
 	};
 	use Zydeco;
@@ -603,6 +603,8 @@ package Mxpress::PDF {
 			has no_space (is => 'rw', type => Bool);
 			has min_width (is => 'rw', type => Num);
 			has end_w (is => 'rw', type => Str);
+			has end_lw (is => 'rw', type => Str);
+			has concat (is => 'rw', type => Bool);
 			has next_page;
 			factory text (Object $file, Map %args) {
 				$class->generic_new($file, %args);
@@ -671,7 +673,17 @@ package Mxpress::PDF {
 							($fl, $fp) = (1, 0);
 						}
 						my ($xpos, $lw, $line_width, @line) = ($x, $w, 0);
-						($xpos, $lw) = $self->_set_indent($xpos, $lw, $fl, $fp);
+						if (!!$self->concat) { 
+							$self->concat(!!0);
+							$xpos = $self->end_w + $text->advancewidth(' ');
+							$ypos = $y;
+							$lw = $self->end_lw - $text->advancewidth(' '); 
+						use Data::Dumper;
+						warn Dumper $lw;
+						} else { 	
+							($xpos, $lw) = $self->_set_indent($xpos, $lw, $fl, $fp);
+						}
+
 						while (@paragraph and ($line_width + (scalar(@line) * $space_width) + ($width{$paragraph[0]}||0)) < $lw) {
 							$line_width += $width{$paragraph[0]} || 0;
 							push @line, shift(@paragraph);
@@ -680,7 +692,7 @@ package Mxpress::PDF {
 						if (!@line && @paragraph) {
 							my $temp = shift(@paragraph);
 							my @letters = split //, $temp;
-							my ($wid, $lin) = 0;
+							my ($wid, $lin) = (0, '');
 							while ($wid < $lw) {
 								my $letter = shift @letters;
 								$wid += $text->advancewidth($letter);
@@ -732,7 +744,6 @@ package Mxpress::PDF {
 							} else {
 								$self->end_w($xpos + $line_width);
 							}
-							$self->end_w($xpos + $line_width);
                                                         my $pad_end = $self->pad_end || '';
                                                         my $pad = sprintf ("%s%s",
                                                                 $self->pad x int((
@@ -743,6 +754,8 @@ package Mxpress::PDF {
                                                         $text->translate($xpos + ( $lw - $text->advancewidth($pad) ), $ypos) if (!$self->no_space);
                                                         $text->text($pad);
 						}
+						$self->end_w($xpos + $line_width);
+						$self->end_lw($lw - $line_width);
 						$fl = 0;
 					}
 				}
@@ -1289,7 +1302,7 @@ Mxpress::PDF - PDF
 
 =head1 VERSION
 
-Version 0.24
+Version 0.25
 
 =cut
 
@@ -1379,6 +1392,16 @@ This is experimental and may yet still change.
 		h => $pdf->mmp(10),
 		padding => 5
 	);
+
+
+	my $default = $pdf->text->font;
+	my $bold = Mxpress::PDF->font($pdf, colour => '#fff', family => 'Times-Bold');
+	my $italic = Mxpress::PDF->font($pdf, colour => '#fff', family => 'Times-Italic');
+
+	$pdf->text->add('default text,');
+	$pdf->text->add('bold text,', font => $bold, concat => \1);
+	$pdf->text->add('italic text,', font => $italic, concat => \1);
+	$pdf->text->add('default text.', font => $default, concat => \1);
 
 	$pdf->border->start;
 	for (0 .. 100) {
@@ -2656,6 +2679,12 @@ Pad the passed text to fit the available space, default is undefined.
 Append a string to the padded text.
 
 	$text->pad_end('!');
+
+=head3 concat (is => 'rw', type => Bool);
+
+Concatenate the text to the end of the last line/text segmant.
+
+	$text->concat(!!1);
 
 =head2 Methods
 

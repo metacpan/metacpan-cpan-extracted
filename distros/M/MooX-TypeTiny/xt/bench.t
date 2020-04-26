@@ -46,7 +46,7 @@ for my $attr (qw(attr_isa attr_coerce attr_isa_coerce)) {
 
     my $bench = Dumbbench->new(
       target_rel_precision => 0.005,
-      initial_runs         => 20,
+      initial_runs         => 200,
     );
     $bench->add_instances(
       map {

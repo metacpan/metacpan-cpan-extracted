@@ -1,5 +1,5 @@
 package ZMQ::Raw::Loop;
-$ZMQ::Raw::Loop::VERSION = '0.38';
+$ZMQ::Raw::Loop::VERSION = '0.39';
 use strict;
 use warnings;
 use Carp;
@@ -44,7 +44,7 @@ ZMQ::Raw::Loop - Loop class
 
 =head1 VERSION
 
-version 0.38
+version 0.39
 
 =head1 DESCRIPTION
 

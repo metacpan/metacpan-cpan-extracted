@@ -127,7 +127,7 @@ Three-letter ISO currency code, in lowercase. Must be a supported currency (L<ht
 
 =item B<customer> string (expandable)
 
-The ID of the customer who will be billed when this invoice item is billed. When expanded, this is a C<Net::API::Stripe::Customer> object.
+The ID of the customer who will be billed when this invoice item is billed. When expanded, this is a L<Net::API::Stripe::Customer> object.
 
 =item B<date> timestamp
 
@@ -143,7 +143,7 @@ If true, discounts will apply to this invoice item. Always false for prorations.
 
 =item B<invoice> string (expandable)
 
-The ID of the invoice this invoice item belongs to. When expanded, this is a C<Net::API::Stripe::Billing::Invoice> object.
+The ID of the invoice this invoice item belongs to. When expanded, this is a L<Net::API::Stripe::Billing::Invoice> object.
 
 =item B<livemode> boolean
 
@@ -157,13 +157,13 @@ Set of key-value pairs that you can attach to an object. This can be useful for 
 
 The period associated with with this invoice item.
 
-This is a C<Net::API::Stripe::Billing::Invoice::Period> object.
+This is a L<Net::API::Stripe::Billing::Invoice::Period> object.
 
 =item B<plan> hash, plan object
 
 If the invoice item is a proration, the plan of the subscription that the proration was computed for.
 
-This is a C<Net::API::Stripe::Billing::Plan> object.
+This is a L<Net::API::Stripe::Billing::Plan> object.
 
 =item B<proration> boolean
 
@@ -175,7 +175,7 @@ Quantity of units for the invoice item. If the invoice item is a proration, the 
 
 =item B<subscription> string (expandable)
 
-The subscription that this invoice item has been created for, if any. When expanded, this is a C<Net::API::Stripe::Billing::Subscription> object.
+The subscription that this invoice item has been created for, if any. When expanded, this is a L<Net::API::Stripe::Billing::Subscription> object.
 
 =item B<subscription_item> string
 
@@ -185,7 +185,7 @@ The subscription item that this invoice item has been created for, if any.
 
 The tax rates which apply to the invoice item. When set, the default_tax_rates on the invoice do not apply to this invoice item.
 
-This is an array of C<Net::API::Stripe::Tax::Rate> objects.
+This is an array of L<Net::API::Stripe::Tax::Rate> objects.
 
 =item B<unified_proration> boolean
 

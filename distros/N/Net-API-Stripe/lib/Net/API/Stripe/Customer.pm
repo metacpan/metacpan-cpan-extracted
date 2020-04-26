@@ -221,7 +221,7 @@ The customer’s email address.
 
 =item B<invoice_prefix> string
 
-The prefix for the customer used to generate unique invoice numbers.
+The prefix for the customer used to generate unique invoice numbers. This prefix must be unique otherwise it will generated an error such as C<This invoice number prefix is taken by customer: cus_fake1234567890. Please enter a different prefix>
 
 =item B<invoice_settings> hash
 

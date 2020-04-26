@@ -126,3 +126,10 @@ Revision history for StreamFinder
         - StreamFinder::IHeartRadio - Handle non-US site URLs.  Change default 
         "keep" priority to "secure_shoutcast, shoutcast, secure, any" for 
         easier use by Fauxdacious.
+1.27    2020/04/23
+        - Added StreamFinder::Spreaker for https://widget.spreaker.com 
+        podcasts.
+        - Minor doc. improvements.
+1.28    2020/04/25
+        - Fix failure to include StreamFinder::Spreaker in MANIFEST and 
+        to update change log.

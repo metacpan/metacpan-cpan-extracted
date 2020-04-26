@@ -76,11 +76,11 @@ Creates a new L<Net::API::Stripe::Balance> object.
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<available> array of C<Net::API::Stripe::Connect::Transfer>
+=item B<available> array of L<Net::API::Stripe::Connect::Transfer>
 
 Funds that are available to be transferred or paid out, whether automatically by Stripe or explicitly via the Transfers API or Payouts API. The available balance for each currency and payment type can be found in the source_types property.
 
-Currently this is an array of C<Net::API::Stripe::Connect::Transfer>, but I am considering revising that in light of the documentation of the Stripe API.
+Currently this is an array of L<Net::API::Stripe::Connect::Transfer>, but I am considering revising that in light of the documentation of the Stripe API.
 
 =over 8
 
@@ -110,7 +110,7 @@ Amount for card.
 
 =back
 
-=item B<connect_reserved> array of C<Net::API::Stripe::Balance::ConnectReserved> objects.
+=item B<connect_reserved> array of L<Net::API::Stripe::Balance::ConnectReserved> objects.
 
 Funds held due to negative balances on connected Custom accounts. The connect reserve balance for each currency and payment type can be found in the source_types property.
 
@@ -134,7 +134,7 @@ Breakdown of balance by source types.
 
 Has the value true if the object exists in live mode or the value false if the object exists in test mode.
 
-=item B<pending> array of C<Net::API::Stripe::Balance::Pending> objects.
+=item B<pending> array of L<Net::API::Stripe::Balance::Pending> objects.
 
 Funds that are not yet available in the balance, due to the 7-day rolling pay cycle. The pending balance for each currency, and for each payment type, can be found in the source_types property.
 

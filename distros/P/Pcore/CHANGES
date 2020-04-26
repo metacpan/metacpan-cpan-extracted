@@ -1,3 +1,7 @@
+v0.133.0 2020-04-25T08:09:50Z
+ - resources updated
+ - auth is_root method added
+
 v0.132.1 2020-04-19T19:03:24Z
  - api nginx controller fixed
 

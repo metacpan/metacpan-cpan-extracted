@@ -1,5 +1,8 @@
 Revision history for Math-FractionManip
 
+0.5503 2020-04-25 13:11:47
+    - Remove questionable tests that attempted to compare floats for the ** and sqrt operations.
+
 0.5502 2020-04-24 09:38:15
     - Re-add the removed tests and sprintf() them.
 

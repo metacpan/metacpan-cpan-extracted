@@ -111,7 +111,7 @@ The type of items in the value list. One of card_fingerprint, card_bin, email, i
 
 List of items contained within this value list.
 
-This is a C<Net::API::Stripe::List> object with array of C<Net::API::Stripe::Fraud::List::Item> objects.
+This is a L<Net::API::Stripe::List> object with array of L<Net::API::Stripe::Fraud::List::Item> objects.
 
 =item B<livemode> boolean
 

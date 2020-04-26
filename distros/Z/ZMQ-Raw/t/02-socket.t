@@ -248,5 +248,17 @@ my $dish = ZMQ::Raw::Socket->new ($ctx, ZMQ::Raw->ZMQ_DISH);
 $dish->join ('abc');
 $dish->leave ('abc');
 
+SKIP: {
+    require File::Temp;
+
+    skip 'Does not work on Windows.', 1 if $^O eq 'MSWin32';
+
+    my $dir = File::Temp::tempdir( CLEANUP => 1 );
+
+    my $ipc = ZMQ::Raw::Socket->new ($ctx, ZMQ::Raw->ZMQ_PUB);
+    $ipc->bind("ipc://$dir/somesocket");
+    ok( -e "$dir/somesocket", 'bind() creates a UNIX socket' );
+}
+
 done_testing;
 

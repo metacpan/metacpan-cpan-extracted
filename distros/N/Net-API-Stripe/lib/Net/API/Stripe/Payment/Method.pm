@@ -73,7 +73,9 @@ Net::API::Stripe::Payment::Method - A Stripe Payment Method Object
 
     my $pm = $stripe->payment_method({
         billing_details => $billing_details_object,
-        card => $
+        card => $card_object,
+        metadata => { transaction_id => 123, customer_id => 456 },
+        type => 'card',
     });
 
 See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.

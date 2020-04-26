@@ -1,9 +1,38 @@
 ==================================================
-Changes from 2019-04-23 00:00:00 +0000 to present.
+Changes from 2019-04-25 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.029 at 2020-04-22 18:55:05 +0000
+version 0.030 at 2020-04-24 23:14:20 +0000
+------------------------------------------
+
+  Change: 776c338aa3b1be99a0f3ca62305a27cb393eed6f
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-04-24 18:14:11 +0000
+
+    ignore fixed some unittests after conversion to Test::More 
+
+  Change: 53270551e71c3a8c7f32e00a129454cde4e668de
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-04-24 18:10:29 +0000
+
+    ignore fixed unittests 
+
+  Change: 2d6dffb64230e21a680f9a7dffcc791ab5ebf8df
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-04-24 17:19:22 +0000
+
+    additional testing and bug fixes for Util::Medley::Module::Overview 
+
+  Change: d6c84975470b542858ac42b7b64fea66034d4105
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-04-24 15:54:47 +0000
+
+    - switched from Test2::Suite to Test::More for simplicity. - added
+    Util::Medley::Module::Overview - added cli action module-overview 
+
+------------------------------------------
+version 0.029 at 2020-04-22 18:54:58 +0000
 ------------------------------------------
 
   Change: b21f2090e77abbf4c1a437968f0997f1f38d33cf

@@ -34,6 +34,7 @@ my @files = (
     'lib/App/GitGot/Command/move.pm',
     'lib/App/GitGot/Command/mux.pm',
     'lib/App/GitGot/Command/push.pm',
+    'lib/App/GitGot/Command/readd.pm',
     'lib/App/GitGot/Command/remove.pm',
     'lib/App/GitGot/Command/status.pm',
     'lib/App/GitGot/Command/tag.pm',

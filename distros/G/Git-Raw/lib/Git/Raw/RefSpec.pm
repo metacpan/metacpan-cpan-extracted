@@ -1,7 +1,10 @@
 package Git::Raw::RefSpec;
-$Git::Raw::RefSpec::VERSION = '0.85';
+$Git::Raw::RefSpec::VERSION = '0.86';
 use strict;
 use warnings;
+use overload
+	'""'       => sub { return $_[0] -> string },
+	fallback   => 1;
 
 =head1 NAME
 
@@ -9,7 +12,7 @@ Git::Raw::RefSpec - Git refspec class
 
 =head1 VERSION
 
-version 0.85
+version 0.86
 
 =head1 DESCRIPTION
 
@@ -19,6 +22,10 @@ B<WARNING>: The API of this module is unstable and may change without warning
 (any change will be appropriately documented in the changelog).
 
 =head1 METHODS
+
+=head2 parse( $input, $is_fetch )
+
+Parse the refspec string C<$input>.
 
 =head2 dst( )
 

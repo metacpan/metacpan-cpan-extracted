@@ -29,7 +29,7 @@ use Try::Tiny;
 
 use Moo 2.000000;
 
-our $VERSION = '0.75';
+our $VERSION = '0.78';
 
 sub default_conf_names { ( 'tidyall.ini', '.tidyallrc' ) }
 
@@ -564,7 +564,7 @@ sub process_file {
         return Code::TidyAll::Result->new( path => $path, state => 'cached' );
     }
 
-    my $contents = $cache_model->file_contents || $full_path->slurp;
+    my $contents = $cache_model->file_contents || $full_path->slurp_raw;
     my $result   = $self->process_source( $contents, $path );
 
     if ( $result->state eq 'tidied' ) {
@@ -577,7 +577,7 @@ sub process_file {
 
         # We don't use ->spew because that creates a new file and renames it,
         # losing the existing mode setting in the process.
-        path( $full_path . $self->output_suffix )->append( { truncate => 1 }, $contents );
+        path( $full_path . $self->output_suffix )->append_raw( { truncate => 1 }, $contents );
 
         # change the in memory contents of the cache (but don't update yet)
         $cache_model->file_contents($contents) unless $self->output_suffix;
@@ -617,7 +617,7 @@ sub _backup_file {
     unless ( $self->no_backups ) {
         my $backup_file = $self->_backup_dir->child( $self->_backup_filename($path) );
         $backup_file->parent->mkpath( { mode => 0775 } );
-        $backup_file->spew($contents);
+        $backup_file->spew_raw($contents);
     }
 }
 
@@ -850,7 +850,7 @@ Code::TidyAll - Engine for tidyall, your all-in-one code tidier and validator
 
 =head1 VERSION
 
-version 0.75
+version 0.78
 
 =head1 SYNOPSIS
 
@@ -1070,7 +1070,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Adam Herzog Andy Jack Finn Smith George Hartzell Graham Knop Gregory Oschwald Joe Crotty Mark Fowler Grimes Martin Gruner Mohammad S Anwar Nick Tonkin Olaf Alders Pedro Melo Ricardo Signes Sergey Romanov Shlomi Fish timgimyee
+=for stopwords Adam Herzog Andy Jack Finn Smith George Hartzell Graham Knop Gregory Oschwald Joe Crotty Kenneth Ölwing Mark Fowler Grimes Martin Gruner Mohammad S Anwar Nick Tonkin Olaf Alders Pedro Melo Ricardo Signes Sergey Romanov Shlomi Fish timgimyee
 
 =over 4
 
@@ -1101,6 +1101,10 @@ Gregory Oschwald <goschwald@maxmind.com>
 =item *
 
 Joe Crotty <joe.crotty@returnpath.net>
+
+=item *
+
+Kenneth Ölwing <kenneth.olwing@skatteverket.se>
 
 =item *
 
@@ -1150,7 +1154,7 @@ timgimyee <tim.gim.yee@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 - 2019 by Jonathan Swartz.
+This software is copyright (c) 2011 - 2020 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under the same
 terms as the Perl 5 programming language system itself.

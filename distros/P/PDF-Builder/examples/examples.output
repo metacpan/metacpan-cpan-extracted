@@ -47,6 +47,12 @@ to see when the resulting PDFs are displayed.
    1 page 16x16 char grid
  bankgothic -- latin1  
    2 pages 16x16 char grid
+ bankgothicbold -- latin1  
+   2 pages 16x16 char grid
+ bankgothicbolditalic -- latin1  
+   2 pages 16x16 char grid
+ bankgothicitalic -- latin1  
+   2 pages 16x16 char grid
  georgia -- latin1  
    3 pages 16x16 char grid
  georgiaitalic -- latin1 
@@ -109,6 +115,9 @@ to see when the resulting PDFs are displayed.
  Symbol 1x4
  ZapfDingbats 1x4
  bankgothic 2x4
+ bankgothicbold 2x4
+ bankgothicbolditalic 2x4
+ bankgothicitalic 2x4
  georgia 3x4
  georgiaitalic 3x4
  georgiabold 3x4
@@ -296,6 +305,13 @@ ContentText.pl
           crazy long URL-style text, default left justify, splits at
             camelCase, punctuation, letter runs, slashes
             same, but outdented to force splits at different points
+
+HarfBuzz.pl  one page showing various scripts (Latin, Middle Eastern, and
+               South Asian) LTR and RTL, with ligatures and kerning (Latin)
+               in two lines: a raw output of the UTF-8 script using text(),
+               and a line processed through HarfBuzz::Shaper and textHS(). A
+               copy of the output file is provided for your convenience in
+               examples/resources/HarfBuzz_example.pdf.
 
 RMtutorial.pl  one page Lorem Ipsum, photo, simple graphics as a demo
 

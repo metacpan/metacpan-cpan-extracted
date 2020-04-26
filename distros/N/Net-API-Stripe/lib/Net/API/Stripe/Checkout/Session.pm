@@ -131,7 +131,7 @@ The value (auto or required) for whether Checkout collected the customer’s bil
 
 The URL the customer will be directed to if they decide to cancel payment and return to your website.
 
-This is a C<URI> object.
+This is a L<URI> object.
 
 =item B<client_reference_id> string
 
@@ -141,7 +141,7 @@ A unique string to reference the Checkout Session. This can be a customer ID, a 
 
 The ID of the customer for this session. For Checkout Sessions in payment or subscription mode, Checkout will create a new customer object based on information provided during the session unless an existing customer was provided when the session was created.
 
-When expanded, this is a C<Net::API::Stripe::Customer> object.
+When expanded, this is a L<Net::API::Stripe::Customer> object.
 
 =item B<customer_email> string
 
@@ -151,7 +151,7 @@ If provided, this value will be used when the Customer object is created. If not
 
 The line items, plans, or SKUs purchased by the customer.
 
-This is an array of C<Net::API::Stripe::Checkout::Item> objects.
+This is an array of L<Net::API::Stripe::Checkout::Item> objects.
 
 =item B<livemode> boolean
 
@@ -167,13 +167,13 @@ The mode of the Checkout Session, one of payment, setup, or subscription.
 
 =item B<payment_intent> string (expandable)
 
-The ID of the PaymentIntent for Checkout Sessions in payment mode. If it is expanded, it contains a C<Net::API::Stripe::Payment::Intent> object.
+The ID of the PaymentIntent for Checkout Sessions in payment mode. If it is expanded, it contains a L<Net::API::Stripe::Payment::Intent> object.
 
 =item B<payment_intent_data> object
 
 A subset of parameters to be passed to PaymentIntent creation for Checkout Sessions in payment mode.
 
-This is a C<Net::API::Stripe::Payment::Intent> object and used to create a checkout session.
+This is a L<Net::API::Stripe::Payment::Intent> object and used to create a checkout session.
 
 =item B<payment_method_types> array containing strings
 
@@ -183,13 +183,13 @@ A list of the types of payment methods (e.g. card) this Checkout Session is allo
 
 The ID of the SetupIntent for Checkout Sessions in setup mode.
 
-When expanded, this is a C<Net::API::Stripe::Payment::Intent> object.
+When expanded, this is a L<Net::API::Stripe::Payment::Intent> object.
 
 =item B<setup_intent_data> object
 
 A subset of parameters to be passed to SetupIntent creation for Checkout Sessions in setup mode.
 
-This is a C<Net::API::Stripe::Payment::Intent> object and used to create a checkout session.
+This is a L<Net::API::Stripe::Payment::Intent> object and used to create a checkout session.
 
 =item B<submit_type> string
 
@@ -197,13 +197,13 @@ Describes the type of transaction being performed by Checkout in order to custom
 
 =item B<subscription> string (expandable)
 
-The ID of the subscription for Checkout Sessions in subscription mode. If it is expanded, this is the C<Net::API::Stripe::Billing::Subscription> object.
+The ID of the subscription for Checkout Sessions in subscription mode. If it is expanded, this is the L<Net::API::Stripe::Billing::Subscription> object.
 
 =item B<subscription_data> object
 
 A subset of parameters to be passed to subscription creation for Checkout Sessions in subscription mode.
 
-This is a C<Net::API::Stripe::Billing::Subscription> object and used to create a checkout session.
+This is a L<Net::API::Stripe::Billing::Subscription> object and used to create a checkout session.
 
 =item B<success_url> string
 

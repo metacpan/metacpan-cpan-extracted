@@ -199,7 +199,7 @@ A brief description of the plan, hidden from customers.
 
 =item B<product> string (expandable)
 
-The product whose pricing this plan determines. When expanded, this is a C<Net::API::Stripe::Product> object.
+The product whose pricing this plan determines. When expanded, this is a L<Net::API::Stripe::Product> object.
 
 =item B<statement_description> string
 
@@ -213,7 +213,7 @@ This is an undocumented property, which appears in data returned by Stripe. This
 
 Each element represents a pricing tier. This parameter requires I<billing_scheme> to be set to I<tiered>. See also the documentation for I<billing_scheme>.
 
-This is an array of C<Net::API::Stripe::Billing::Plan::Tiers> objects.
+This is an array of L<Net::API::Stripe::Billing::Plan::Tiers> objects.
 
 =item B<tiers_mode> string
 
@@ -223,7 +223,7 @@ Defines if the tiering price should be graduated or volume based. In volume-base
 
 Apply a transformation to the reported usage or set quantity before computing the billed price. Cannot be combined with tiers.
 
-This is a C<Net::API::Stripe::Billing::Plan::TransformUsage> object.
+This is a L<Net::API::Stripe::Billing::Plan::TransformUsage> object.
 
 =item B<trial_period_days> positive integer
 

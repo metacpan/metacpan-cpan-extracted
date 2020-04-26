@@ -278,7 +278,7 @@ Indicates the reason why the invoice was created. subscription_cycle indicates a
 
 =item B<charge> string (expandable)
 
-ID of the latest charge generated for this invoice, if any. When expanded, this is a C<Net::API::Stripe::Charge> object.
+ID of the latest charge generated for this invoice, if any. When expanded, this is a L<Net::API::Stripe::Charge> object.
 
 =item B<collection_method> string
 
@@ -294,17 +294,17 @@ Three-letter ISO currency code, in lowercase. Must be a supported currency.
 
 =item B<custom_fields> array of hashes
 
-Custom fields displayed on the invoice. This is an array of C<Net::API::Stripe::CustomField> objects.
+Custom fields displayed on the invoice. This is an array of L<Net::API::Stripe::CustomField> objects.
 
 =item B<customer> string (expandable)
 
-This is a Stripe Customer id, or when expanded, this is a C<Net::API::Stripe::Customer> object.
+This is a Stripe Customer id, or when expanded, this is a L<Net::API::Stripe::Customer> object.
 
 =item B<customer_address> hash
 
 The customer’s address. Until the invoice is finalized, this field will equal customer.address. Once the invoice is finalised, this field will no longer be updated.
 
-This is a C<Net::API::Stripe::Address> object.
+This is a L<Net::API::Stripe::Address> object.
 
 =item B<customer_email> string
 
@@ -322,7 +322,7 @@ The customer’s phone number. Until the invoice is finalized, this field will e
 
 The customer’s shipping information. Until the invoice is finalized, this field will equal customer.shipping. Once the invoice is finalized, this field will no longer be updated.
 
-This is a C<Net::API::Stripe::Shipping> object.
+This is a L<Net::API::Stripe::Shipping> object.
 
 =item B<customer_tax_exempt> string
 
@@ -332,25 +332,25 @@ The customer’s tax exempt status. Until the invoice is finalized, this field w
 
 The customer’s tax IDs. Until the invoice is finalized, this field will contain the same tax IDs as customer.tax_ids. Once the invoice is finalized, this field will no longer be updated.
 
-This is a C<Net::API::Stripe::Customer::TaxIds> object.
+This is a L<Net::API::Stripe::Customer::TaxIds> object.
 
 =item B<default_payment_method> string (expandable)
 
 ID of the default payment method for the invoice. It must belong to the customer associated with the invoice. If not set, defaults to the subscription’s default payment method, if any, or to the default payment method in the customer’s invoice settings.
 
-When expanded, this is a C<Net::API::Stripe::Payment::Method> object.
+When expanded, this is a L<Net::API::Stripe::Payment::Method> object.
 
 =item B<default_source> string (expandable)
 
 ID of the default payment source for the invoice. It must belong to the customer associated with the invoice and be in a chargeable state. If not set, defaults to the subscription’s default source, if any, or to the customer’s default source.
 
-When expanded, this is a C<Net::API::Stripe::Payment::Source> object.
+When expanded, this is a L<Net::API::Stripe::Payment::Source> object.
 
 =item B<default_tax_rates> array of hashes
 
 The tax rates applied to this invoice, if any.
 
-This is an array of C<Net::API::Stripe::Tax::Rate> object.
+This is an array of L<Net::API::Stripe::Tax::Rate> object.
 
 =item B<description> string
 
@@ -358,7 +358,7 @@ An arbitrary string attached to the object. Often useful for displaying to users
 
 =item B<discount> hash, discount object
 
-This is a C<Net::API::Stripe::Billing::Discount> object
+This is a L<Net::API::Stripe::Billing::Discount> object
 
 =item B<due_date> timestamp
 
@@ -386,7 +386,7 @@ The link to download the PDF for the invoice. If the invoice has not been finali
 
 The individual line items that make up the invoice. lines is sorted as follows: invoice items in reverse chronological order, followed by the subscription, if any.
 
-This is a C<Net::API::Stripe::Billing::Invoice::Lines> object.
+This is a L<Net::API::Stripe::Billing::Invoice::Lines> object.
 
 =item B<livemode> boolean
 
@@ -412,7 +412,7 @@ Whether payment was successfully collected for this invoice. An invoice can be p
 
 The PaymentIntent associated with this invoice. The PaymentIntent is generated when the invoice is finalized, and can then be used to pay the invoice. Note that voiding an invoice will cancel the PaymentIntent.
 
-When expanded, this is a C<Net::API::Stripe::Payment::Intent> object.
+When expanded, this is a L<Net::API::Stripe::Payment::Intent> object.
 
 =item B<period_end> timestamp
 
@@ -448,11 +448,11 @@ The status of the invoice, one of draft, open, paid, uncollectible, or void. Lea
 
 =item B<status_transitions> hash
 
-This is a C<Net::API::Stripe::Billing::Invoice::StatusTransition> object.
+This is a L<Net::API::Stripe::Billing::Invoice::StatusTransition> object.
 
 =item B<subscription> string (expandable)
 
-The subscription that this invoice was prepared for, if any. When expanded, this is a C<Net::API::Stripe::Billing::Subscription> object.
+The subscription that this invoice was prepared for, if any. When expanded, this is a L<Net::API::Stripe::Billing::Subscription> object.
 
 =item B<subscription_proration_date> integer
 
@@ -478,7 +478,7 @@ Total after discounts and taxes.
 
 The aggregate amounts calculated per tax rate for all line items.
 
-This is an array of C<Net::API::Stripe::Billing::Invoice::TaxAmount> objects.
+This is an array of L<Net::API::Stripe::Billing::Invoice::TaxAmount> objects.
 
 =item B<webhooks_delivered_at> timestamp
 

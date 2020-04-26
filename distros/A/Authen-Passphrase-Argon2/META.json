@@ -1,7 +1,7 @@
 {
    "abstract" : "Store and check password using Argon2",
    "author" : [
-      "lnation <thisusedtobeanemail@gmail.com>"
+      "lnation <email@lnation.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
@@ -50,7 +50,7 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Authen-Passphrase-Argon2"
       }
    },
-   "version" : "0.08",
+   "version" : "1.00",
    "x_contributors" : [
       "Alexander Hartmaier <abraxxa@cpan.org>",
       "Lars DÉªá´á´á´á´á´¡ è¿ªææ¯ <daxim@cpan.org>",

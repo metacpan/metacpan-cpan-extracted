@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010001;
+
 
 use ExtUtils::MakeMaker;
 
@@ -14,23 +14,18 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Sah-Schemas-App-cryp",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Sah::Schemas::App::cryp",
   "PREREQ_PM" => {
     "Data::Sah::Coerce::perl::To_str::From_str::normalize_cryptoexchange_account" => 0,
     "Perinci::Sub::XCompletion::cryptoexchange_account" => 0
   },
   "TEST_REQUIRES" => {
-    "Data::Sah" => "0.903",
-    "Data::Sah::Coerce" => "0.038",
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::More" => "0.98",
-    "strict" => 0,
-    "warnings" => 0
+    "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,16 +33,12 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Sah" => "0.903",
-  "Data::Sah::Coerce" => "0.038",
   "Data::Sah::Coerce::perl::To_str::From_str::normalize_cryptoexchange_account" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Perinci::Sub::XCompletion::cryptoexchange_account" => 0,
-  "Test::More" => "0.98",
-  "strict" => 0,
-  "warnings" => 0
+  "Test::More" => 0
 );
 
 

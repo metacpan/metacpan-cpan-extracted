@@ -144,11 +144,11 @@ Whether this tax amount is inclusive or exclusive.
 
 The tax rate that was applied to get this tax amount.
 
-When expanded, this is a C<Net::API::Stripe::Tax::Rate> object.
+When expanded, this is a L<Net::API::Stripe::Tax::Rate> object.
 
 =back
 
-=item B<tax_rates>() array of C<Net::API::Stripe::Tax::Rate> objects
+=item B<tax_rates>() array of L<Net::API::Stripe::Tax::Rate> objects
 
 The tax rates which apply to the line item.
 

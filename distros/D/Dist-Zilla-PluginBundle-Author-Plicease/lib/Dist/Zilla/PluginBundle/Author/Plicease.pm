@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::Plicease 2.45 {
+package Dist::Zilla::PluginBundle::Author::Plicease 2.46 {
 
   use 5.014;
   use Moose;
@@ -209,7 +209,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.45 {
     unless($self->payload->{no_readme})
     {
       $self->_my_add_plugin([
-        'ReadmeAnyFromPod' => {
+        'Author::Plicease::ReadmeAnyFromPod' => {
                 type            => 'text',
                 filename        => 'README',
                 location        => 'build',
@@ -218,26 +218,23 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.45 {
       ]);
 
       $self->_my_add_plugin([
-        'ReadmeAnyFromPod' => ReadMePodInRoot => {
-          type                  => 'gfm',
-          filename              => 'README.md',
-          location              => 'root',
+        'Author::Plicease::ReadmeAnyFromPod' => ReadMePodInRoot => {
+                type            => 'gfm',
+                filename        => 'README.md',
+                location        => 'root',
           maybe source_filename => $self->payload->{readme_from},
+
+          # these are for my ReadmeAnyFromPod wrapper.
+                travis_status   => int(defined $self->payload->{travis_status} ? $self->payload->{travis_status} : 0),
+          maybe appveyor        => $self->payload->{appveyor},
+          maybe travis_user     => $self->payload->{travis_user} // $self->payload->{github_user},
+          maybe appveyor_user   => $self->payload->{appveyor_user},
+          maybe cirrus_user     => $self->payload->{cirrus_user},
+          maybe github_user     => $self->payload->{github_user},
+          maybe workflow        => $self->payload->{workflow},
        },
      ]);
     }
-
-    $self->_my_add_plugin([
-      'Author::Plicease::MarkDownCleanup' => {
-              travis_status => int(defined $self->payload->{travis_status} ? $self->payload->{travis_status} : 0),
-        maybe appveyor      => $self->payload->{appveyor},
-        maybe travis_user   => $self->payload->{travis_user} // $self->payload->{github_user},
-        maybe appveyor_user => $self->payload->{appveyor_user},
-        maybe cirrus_user   => $self->payload->{cirrus_user},
-        maybe github_user   => $self->payload->{github_user},
-        maybe workflow      => $self->payload->{workflow},
-      },
-    ]);
 
     $self->_my_add_plugin([
       'Author::Plicease::SpecialPrereqs' => {
@@ -307,7 +304,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.45
+version 2.46
 
 =head1 SYNOPSIS
 
@@ -416,18 +413,16 @@ This plugin bundle is mostly equivalent to
  [ConfirmRelease]
  [MinimumPerl]
  
- [ReadmeAnyFromPod]
+ [Author::Plicease::ReadmeAnyFromPod]
  filename = README
  location = build
  type = text
  
- [ReadmeAnyFromPod / ReadMePodInRoot]
+ [Author::Plicease::ReadmeAnyFromPod / ReadMePodInRoot]
  filename = README.md
  location = root
- type = gfm
- 
- [Author::Plicease::MarkDownCleanup]
  travis_status = 0
+ type = gfm
  
  [Author::Plicease::SpecialPrereqs]
  [Author::Plicease::NoUnsafeInc]
@@ -545,8 +540,6 @@ Specify a minimum Perl version.  If not specified it will be detected.
 =over 4
 
 =item L<Dist::Zilla>
-
-=item L<Dist::Zilla::Plugin::Author::Plicease::MarkDownCleanup>
 
 =item L<Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs>
 

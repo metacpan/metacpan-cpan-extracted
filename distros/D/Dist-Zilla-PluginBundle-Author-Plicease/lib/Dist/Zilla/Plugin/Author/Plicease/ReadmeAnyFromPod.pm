@@ -1,13 +1,11 @@
-package Dist::Zilla::Plugin::Author::Plicease::MarkDownCleanup 2.45 {
+package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.46 {
 
   use 5.014;
-  use Path::Tiny qw( path );
   use Moose;
+  use URI::Escape ();
 
-  # ABSTRACT: add a travis status button to the README.md file
 
-
-  with 'Dist::Zilla::Role::AfterBuild';
+  extends 'Dist::Zilla::Plugin::ReadmeAnyFromPod';
 
   has travis_status => (
     is => 'ro',
@@ -50,12 +48,22 @@ package Dist::Zilla::Plugin::Author::Plicease::MarkDownCleanup 2.45 {
 
   sub mvp_multivalue_args { qw( workflow ) }
 
-  sub after_build
-  {
-    my($self) = @_;
-    my $readme = $self->zilla->root->child("README.md");
-    if(-r $readme)
-    {
+  around get_readme_content => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    my $content = do {
+      local *URI::Escape::uri_escape = sub {
+        my($uri) = @_;
+        $uri;
+      };
+
+      $self->$orig(@_);
+    };
+
+    return $content unless $self->type eq 'gfm';
+
+    my $status = do {
       my $name = $self->zilla->name;
 
       my $cirrus_status = -f $self->zilla->root->child('.cirrus.yml');
@@ -69,17 +77,13 @@ package Dist::Zilla::Plugin::Author::Plicease::MarkDownCleanup 2.45 {
       {
         $status .= " ![$workflow](https://github.com/@{[ $self->github_user ]}/$name/workflows/$workflow/badge.svg)";
       }
+      $status;
+    };
 
-      my $content = $readme->slurp;
-      $content =~ s{# NAME\s+(.*?) - (.*?#)}{# $1$status\n\n$2}s;
-      $content =~ s{# VERSION\s+version (\d+\.|)\d+\.\d+(\\_\d+|)\s+#}{#};
-      $readme->spew_raw($content);
-    }
-    else
-    {
-      $self->log("no README.md found");
-    }
-  }
+    $content =~ s{# NAME\s+(.*?) - (.*?#)}{# $1$status\n\n$2}s;
+    $content =~ s{# VERSION\s+version (\d+\.|)\d+\.\d+(\\_\d+|)\s+#}{#};
+    return $content;
+  };
 
   __PACKAGE__->meta->make_immutable;
 }
@@ -94,15 +98,15 @@ __END__
 
 =head1 NAME
 
-Dist::Zilla::Plugin::Author::Plicease::MarkDownCleanup - add a travis status button to the README.md file
+Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod
 
 =head1 VERSION
 
-version 2.45
+version 2.46
 
 =head1 SYNOPSIS
 
- [Author::Plicease::MarkDownCleanup]
+ [Author::Plicease::ReadmeAnyFromPod]
 
 =head1 SEE ALSO
 

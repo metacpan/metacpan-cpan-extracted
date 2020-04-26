@@ -1,5 +1,10 @@
 Revision history for Config::App
 
+1.12      2020-04-24 12:57:30-07:00 America/Los_Angeles
+        - "libs" from included files are all appended not overwritten
+        - Support for preinclude and optional_preinclude
+        - Update Travis YAML
+
 1.11      2019-04-02 11:03:41-07:00 America/Los_Angeles
         - Fix name of regression test
 

@@ -1,6 +1,11 @@
 Revision history for ZMQ-Raw
 
-0.38      2020-04-19 12:34:33+01:00 Europe/London
+0.39      2020-04-25 12:11:21+01:00 Europe/London
+
+ - Added support for IPC sockets (thanks, @FGasper)
+ - Update to libzmq b56195e99
+
+0.38      2019-04-19 12:00:10+01:00 Europe/London
 
  - Update to libzmq d882e807d
 

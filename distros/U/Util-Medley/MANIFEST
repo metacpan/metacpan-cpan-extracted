@@ -19,6 +19,7 @@ lib/Util/Medley/File.pm
 lib/Util/Medley/File/Zip.pm
 lib/Util/Medley/List.pm
 lib/Util/Medley/Logger.pm
+lib/Util/Medley/Module/Overview.pm
 lib/Util/Medley/Number.pm
 lib/Util/Medley/Package.pm
 lib/Util/Medley/Roles/Attributes/Cache.pm
@@ -41,6 +42,7 @@ t/10-cache.t
 t/10-crypt.t
 t/10-datetime.t
 t/10-list.t
+t/10-module-overview.t
 t/10-package.t
 t/10-string.t
 t/20-logger.t

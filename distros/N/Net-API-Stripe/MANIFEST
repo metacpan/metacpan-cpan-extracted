@@ -115,6 +115,7 @@ lib/Net/API/Stripe/Issuing/Transaction.pm
 lib/Net/API/Stripe/List.pm
 lib/Net/API/Stripe/Mandate.pm
 lib/Net/API/Stripe/Number.pm
+lib/Net/API/Stripe/Number/Format.pm
 lib/Net/API/Stripe/Order.pm
 lib/Net/API/Stripe/Order/DeliveryEstimate.pm
 lib/Net/API/Stripe/Order/Item.pm
@@ -166,5 +167,14 @@ MANIFEST
 README
 t/001_load.t
 t/002_pod.t
+t/003_format_bytes.t
+t/004_format_negative.t
+t/005_format_picture.t
+t/006_format_price.t
+t/007_format_number.t
+t/008_locale.t
+t/009_object.t
+t/010_round.t
+t/011_unformat_number.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

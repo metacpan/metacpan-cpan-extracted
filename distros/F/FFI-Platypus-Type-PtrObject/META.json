@@ -1,0 +1,79 @@
+{
+   "abstract" : "Platypus custom type for an object wrapped around an opaque pointer",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "FFI-Platypus-Type-PtrObject",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "FFI::Build::MM" : "0.83",
+            "perl" : "5.008001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Perl::Critic" : "0",
+            "Test2::Require::Module" : "0.000060",
+            "Test2::Tools::PerlCritic" : "0",
+            "Test2::V0" : "0.000060",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.98",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "FFI::Platypus" : "1.11",
+            "Ref::Util" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FFI::Platypus::Memory" : "0",
+            "Test2::Tools::FFI" : "0",
+            "Test2::V0" : "0.000060",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Perl5-FFI/FFI-Platypus-Type-PtrObject/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/FFI::Platypus::Type::PtrObject",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Perl5-FFI/FFI-Platypus-Type-PtrObject.git",
+         "web" : "https://github.com/Perl5-FFI/FFI-Platypus-Type-PtrObject"
+      }
+   },
+   "version" : "0.02",
+   "x_generated_by_perl" : "v5.31.10",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_use_unsafe_inc" : 0
+}
+

@@ -19,6 +19,7 @@ As of 2.025 (last version tested against)...
 (see bug 108987)
 tested against 3.003 April 2017
 tested against 3.004 July 2017
+tested with each release thereafter
 
 =========== broken:
 
@@ -59,7 +60,7 @@ BarCode.pl       Demonstrate the bar code library, 1 page (11 one-dimensional
                  details is produced for each font file.
 
  021_synfonts    .75 slant, 12 oblique, 4 bold, and small caps variants (where
-                 available) of the given core fonts, as available, for 29 core 
+                 available) of the given core fonts, as available, for 32 core 
                  fonts. Also, a sample page with combined variants.
 
  022_truefonts   Given one or more TrueType (.ttf) font FILES on the command
@@ -146,6 +147,9 @@ ContentText.pl   demonstrate Content-related text call, 10 pages.
 
 RMtutorial.pl    Rich Measham's basic tutorial on using PDF::API2, updated
                  for PDF::Builder.
+
+HarfBuzz.pl      show use with HarfBuzz::Shaper to shape complex scripts as
+                 well as ligatures and kerning in Latin fonts.
 
 Rotated.pl       demonstrates how to rotate selected pages
 

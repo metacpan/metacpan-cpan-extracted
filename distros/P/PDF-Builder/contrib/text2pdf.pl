@@ -72,7 +72,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.017'; # VERSION
+our $VERSION = '3.018'; # VERSION
 my $LAST_UPDATE = '3.002'; # manually update whenever code is changed
 
 use PDF::Builder;

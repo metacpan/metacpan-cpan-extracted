@@ -4,8 +4,7 @@ author:
   - 'John Gravatt <gravattj@cpan.org>'
 build_requires:
   File::RandomGenerator: '0'
-  Test2::Plugin::DieOnFail: '0'
-  Test2::V0: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
@@ -42,6 +41,8 @@ requires:
   List::Compare: '0'
   List::Util: '0'
   Modern::Perl: '0'
+  Module::Load: '0'
+  Module::Overview: '0'
   Moose: '0'
   Moose::Role: '0'
   Number::Format: '0'
@@ -50,6 +51,7 @@ requires:
   Scalar::Util::Numeric: '0'
   Sort::Naturally: '0'
   String::Util: '0'
+  Text::ASCIITable: '0'
   Time::HiRes: '0'
   Time::Local: '0'
   Time::ParseDate: '0'
@@ -58,8 +60,9 @@ requires:
   constant: '0'
   namespace::autoclean: '0'
   perl: v5.16.0
+  strict: '0'
   vars: '0'
   warnings: '0'
-version: '0.029'
+version: '0.030'
 x_generated_by_perl: v5.16.3
 x_serialization_backend: 'YAML::Tiny version 1.73'

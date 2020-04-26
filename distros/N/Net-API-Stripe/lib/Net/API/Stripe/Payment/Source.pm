@@ -260,7 +260,7 @@ String representing the object’s type. Objects of the same type share the same
 
 The account this card belongs to. This attribute will not be in the card object if the card belongs to a customer or recipient instead.
 
-When expanded, this is a C<Net::API::Stripe::Connect::Account>
+When expanded, this is a L<Net::API::Stripe::Connect::Account>
 
 =item B<account_holder_name> string
 
@@ -272,13 +272,13 @@ The type of entity that holds the account. This can be either individual or comp
 
 =item B<ach_credit_transfer>
 
-If B<type> is set to C<ach_credit_transfer>, this is a C<Net::API::Stripe::Payment::Source::ACHCreditTransfer> object.
+If B<type> is set to C<ach_credit_transfer>, this is a L<Net::API::Stripe::Payment::Source::ACHCreditTransfer> object.
 
 It is not very clear in the Stripe API, but in the B<type> property, they mention "An additional hash is included on the source with a name matching this value. It contains additional information specific to the payment method (L<https://stripe.com/docs/sources>) used." :/
 
 =item B<ach_debit>
 
-If B<type> is set to C<ach_debit>, this is a C<Net::API::Stripe::Payment::Source::ACHDebit> object.
+If B<type> is set to C<ach_debit>, this is a L<Net::API::Stripe::Payment::Source::ACHDebit> object.
 
 It is not very clear in the Stripe API, but in the B<type> property, they mention "An additional hash is included on the source with a name matching this value. It contains additional information specific to the payment method (L<https://stripe.com/docs/sources>) used." :/
 
@@ -328,7 +328,7 @@ If address_zip was provided, results of the check: pass, fail, unavailable, or u
 
 =item B<alipay>
 
-If B<type> is set to C<alipay>, this is a C<Net::API::Stripe::Payment::Method::Details::Alipay> object.
+If B<type> is set to C<alipay>, this is a L<Net::API::Stripe::Payment::Method::Details::Alipay> object.
 
 =item B<amount> integer
 
@@ -344,7 +344,7 @@ A set of available payout methods for this card. Will be either ["standard"] or 
 
 =item B<bancontact>
 
-If B<type> is set to C<bancontact>, this is a C<Net::API::Stripe::Payment::Method::Details::BanContact> object.
+If B<type> is set to C<bancontact>, this is a L<Net::API::Stripe::Payment::Method::Details::BanContact> object.
 
 =item B<bank_name> string
 
@@ -368,11 +368,11 @@ Card brand. Can be American Express, Diners Club, Discover, JCB, MasterCard, Uni
 
 =item B<card> object
 
-If B<type> is set to C<card>, this is a C<Net::API::Stripe::Payment::Card> object. See also L<https://stripe.com/docs/sources/cards>.
+If B<type> is set to C<card>, this is a L<Net::API::Stripe::Payment::Card> object. See also L<https://stripe.com/docs/sources/cards>.
 
 =item B<card_present>
 
-If B<type> is set to C<card_present>, this is a C<Net::API::Stripe::Payment::Method::Details::CardPresent> object.
+If B<type> is set to C<card_present>, this is a L<Net::API::Stripe::Payment::Method::Details::CardPresent> object.
 
 =item B<client_secret> string
 
@@ -382,7 +382,7 @@ The client secret of the source. Used for client-side retrieval using a publisha
 
 Information related to the code verification flow. Present if the source is authenticated by a verification code (flow is code_verification).
 
-This is a C<Net::API::Stripe::Payment::Source::CodeVerification> object.
+This is a L<Net::API::Stripe::Payment::Source::CodeVerification> object.
 
 =item B<country> string
 
@@ -398,7 +398,7 @@ Three-letter ISO code for the currency associated with the source. This is the c
 
 =item B<customer> string
 
-The ID of the customer to which this source is attached. This will not be present when the source has not been attached to a customer. If it is expanded, this would be a C<Net::API::Stripe::Customer> object.
+The ID of the customer to which this source is attached. This will not be present when the source has not been attached to a customer. If it is expanded, this would be a L<Net::API::Stripe::Customer> object.
 
 =item B<cvc_check> string
 
@@ -418,7 +418,7 @@ The customer’s email address, set by the API call that creates the receiver.
 
 =item B<eps>
 
-If B<type> is set to C<eps>, this is a C<Net::API::Stripe::Payment::Method::Details::EPS> object.
+If B<type> is set to C<eps>, this is a L<Net::API::Stripe::Payment::Method::Details::EPS> object.
 
 =item B<exp_month> integer
 
@@ -450,11 +450,11 @@ Card funding type. Can be credit, debit, prepaid, or unknown.
 
 =item B<giropay>
 
-If B<type> is set to C<giropay>, this is a C<Net::API::Stripe::Payment::Method::Details::Giropay> object.
+If B<type> is set to C<giropay>, this is a L<Net::API::Stripe::Payment::Method::Details::Giropay> object.
 
 =item B<ideal>
 
-If B<type> is set to C<ideal>, this is a C<Net::API::Stripe::Payment::Method::Details::Ideal> object.
+If B<type> is set to C<ideal>, this is a L<Net::API::Stripe::Payment::Method::Details::Ideal> object.
 
 =item B<inbound_address> string
 
@@ -462,7 +462,7 @@ A bitcoin address that is specific to this receiver. The customer can send bitco
 
 =item B<klarna>
 
-If B<type> is set to C<klarna>, this is a C<Net::API::Stripe::Payment::Method::Details::Klarna> object.
+If B<type> is set to C<klarna>, this is a L<Net::API::Stripe::Payment::Method::Details::Klarna> object.
 
 =item B<last4> string
 
@@ -478,7 +478,7 @@ Set of key-value pairs that you can attach to an object. This can be useful for 
 
 =item B<multibanco>
 
-If B<type> is set to C<multibanco>, this is a C<Net::API::Stripe::Payment::Method::Details::MultiBanco> object.
+If B<type> is set to C<multibanco>, this is a L<Net::API::Stripe::Payment::Method::Details::MultiBanco> object.
 
 =item B<name> string
 
@@ -486,7 +486,7 @@ Cardholder name.
 
 =item B<p24>
 
-If B<type> is set to C<p24>, this is a C<Net::API::Stripe::Payment::Method::Details::P24> object.
+If B<type> is set to C<p24>, this is a L<Net::API::Stripe::Payment::Method::Details::P24> object.
 
 =item B<payment> string
 
@@ -496,7 +496,7 @@ The ID of the payment created from the receiver, if any. Hidden when viewing the
 
 Information about the owner of the payment instrument that may be used or required by particular source types.
 
-This is a C<Net::API::Stripe::Payment::Source::Owner> object.
+This is a L<Net::API::Stripe::Payment::Source::Owner> object.
 
 =item B<payment_amount> positive integer
 
@@ -510,19 +510,19 @@ If the Alipay account object is not reusable, the exact currency that you can cr
 
 Information related to the receiver flow. Present if the source is a receiver (flow is receiver).
 
-This is a C<Net::API::Stripe::Payment::Source::Receiver> object.
+This is a L<Net::API::Stripe::Payment::Source::Receiver> object.
 
 =item B<recipient> string (expandable)
 
 The recipient that this card belongs to. This attribute will not be in the card object if the card belongs to a customer or account instead.
 
-When expanded, this is a C<Net::API::Stripe::Customer>.
+When expanded, this is a L<Net::API::Stripe::Customer>.
 
 =item B<redirect> hash
 
 Information related to the redirect flow. Present if the source is authenticated by a redirect (flow is redirect).
 
-This is a C<Net::API::Stripe::Payment::Source::Redirect> object.
+This is a L<Net::API::Stripe::Payment::Source::Redirect> object.
 
 =item B<reusable> boolean
 
@@ -536,11 +536,11 @@ The routing transit number for the bank account.
 
 =item B<sofort> hash
 
-If B<type> is set to C<sofort>, this is a C<Net::API::Stripe::Payment::Details::Sofort> virtual object, ie it is created dynamically by C<Nodule::Generic::_set_get_hash_as_object>
+If B<type> is set to C<sofort>, this is a L<Net::API::Stripe::Payment::Details::Sofort> virtual object, ie it is created dynamically by L<Nodule::Generic/"set_get_hash_as_object">
 
 =item B<source_order> hash
 
-Information about the items and shipping associated with the source. Required for transactional credit (for example Klarna) sources before you can charge it. This is a C<Net::API::Stripe::Order> object.
+Information about the items and shipping associated with the source. Required for transactional credit (for example Klarna) sources before you can charge it. This is a L<Net::API::Stripe::Order> object.
 
 =over 8
 
@@ -558,11 +558,11 @@ The email address of the customer placing the order.
 
 =item B<items> array of hashes
 
-List of items constituting the order. This is an array of C<Net::API::Stripe::Order::Item> objects.
+List of items constituting the order. This is an array of L<Net::API::Stripe::Order::Item> objects.
 
 =item B<shipping> hash
 
-The shipping address for the order. Present if the order is for goods to be shipped. This is a C<Net::API::Stripe::Shipping> object
+The shipping address for the order. Present if the order is for goods to be shipped. This is a L<Net::API::Stripe::Shipping> object
 
 =back
 
@@ -576,7 +576,7 @@ The status of the source, one of canceled, chargeable, consumed, failed, or pend
 
 =item B<stripe_account>
 
-If B<type> is set to C<stripe_account>, this is a C<Net::API::Stripe::Payment::Method::Details::StripeAccount> object.
+If B<type> is set to C<stripe_account>, this is a L<Net::API::Stripe::Payment::Method::Details::StripeAccount> object.
 
 =item B<tokenization_method> string
 
@@ -584,7 +584,7 @@ If the card number is tokenized, this is the method that was used. Can be apple_
 
 =item B<transactions>
 
-A list (C<Net::API::Stripe::List>) of C<Net::API::Stripe::Bitcoin::Transaction> object
+A list (L<Net::API::Stripe::List>) of L<Net::API::Stripe::Bitcoin::Transaction> object
 
 =item B<type> string
 
@@ -610,7 +610,7 @@ The username for the Alipay account.
 
 =item B<wechat>
 
-If B<type> is set to C<wechat>, this is a C<Net::API::Stripe::Payment::Method::Details::WeChat> object.
+If B<type> is set to C<wechat>, this is a L<Net::API::Stripe::Payment::Method::Details::WeChat> object.
 
 =back
 

@@ -10,8 +10,10 @@ tools/1_pc.pl
 tools/2_t-tests.pl
 tools/3_examples.pl
 tools/4_contrib.pl
+tools/TTFdump.pl
 INFO/Changes_2017
 INFO/Changes_2018
+INFO/Changes_2019
 INFO/Changes-ver_2
 INFO/DEPRECATED
 INFO/KNOWN_INCOMP
@@ -35,6 +37,7 @@ examples/resources/aptfrontview.jpg
 examples/resources/sample_55.pdf
 examples/resources/sample.txt
 examples/resources/pod2htmd.temp
+examples/resources/HarfBuzz_example.pdf
 examples/011_open_update
 examples/012_pages
 examples/020_corefonts
@@ -61,6 +64,7 @@ examples/Boxes.pl
 examples/Bspline.pl
 examples/Content.pl
 examples/ContentText.pl
+examples/HarfBuzz.pl
 examples/RMtutorial.pl
 examples/Rotated.pl
 examples/examples.output

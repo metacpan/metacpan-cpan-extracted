@@ -136,7 +136,15 @@ foreach my $fn (@ARGV) {
     my $yw = int(($fbbx[3] - $fbbx[1])/20)*20;
     my $fw = $xw>$yw? $yw: $xw;
     my $mw = 800/$fw;
-    my $y0 = int((20 - $fbbx[1])/20)*20*$mw;
+   #my $y0 = int((20 - $fbbx[1])/20)*20*$mw;
+    my $y0 = ($fbbx[1] < 0)? -$fbbx[1]: $fbbx[1];
+       $y0 = int($y0/$yw*1000);
+       if ($y0 < 0 || $y0 > 325) {
+	   print STDERR "\nFont bounding box baseline at $y0/1000,";
+	   if ($y0 <   0) { $y0 = 0;   }
+	   if ($y0 > 325) { $y0 = 325; }
+	   print STDERR " display baseline moved to $y0\n";
+       }
     my $sX = 0.045;
     my $sY = 0.045;
 

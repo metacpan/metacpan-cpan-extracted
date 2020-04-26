@@ -16,7 +16,7 @@ use Try::Tiny;
 
 use Moo;
 
-our $VERSION = '0.75';
+our $VERSION = '0.78';
 
 has conf_name => (
     is  => 'ro',
@@ -67,7 +67,7 @@ sub check {
             or die sprintf( 'could not find conf file %s', join( ' or ', @conf_names ) );
 
         my $guard;
-        unless ( $self->no_stash ) {
+        unless ( $self->no_stash || $root_dir->child( '.git', 'MERGE_HEAD' )->exists ) {
 
             # We stash things to make sure that we only attempt to run tidyall
             # on changes in the index while ensuring that after the hook runs
@@ -144,7 +144,7 @@ tidyall'd
 
 =head1 VERSION
 
-version 0.75
+version 0.78
 
 =head1 SYNOPSIS
 
@@ -313,7 +313,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 - 2019 by Jonathan Swartz.
+This software is copyright (c) 2011 - 2020 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under the same
 terms as the Perl 5 programming language system itself.

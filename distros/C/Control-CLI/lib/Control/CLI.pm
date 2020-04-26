@@ -11,7 +11,7 @@ use IO::Socket::INET;
 use Errno qw( EINPROGRESS EWOULDBLOCK );
 
 my $Package = __PACKAGE__;
-our $VERSION = '2.08';
+our $VERSION = '2.09';
 our %EXPORT_TAGS = (
 		use	=> [qw(useTelnet useSsh useSerial useIPv6)],
 		prompt	=> [qw(promptClear promptHide promptCredential)],
@@ -29,8 +29,8 @@ my $ComPortReadBuffer = 4096;	# Size of serial port read buffers
 my $ComReadInterval = 100;	# Timeout between single character reads
 my $ComBreakDuration = 300;	# Number of milliseconds the break signal is held for
 my $ChangeBaudDelay = 100;	# Number of milliseconds to sleep between tearing down and restarting serial port connection
-my $VT100_QueryDeviceStatus	= "\e\\[5n";	# Used in regex, so '[' needs to be backslashed
-my $VT100_ReportDeviceOk	= "\e[0n";	# Sent to host
+my $VT100_QueryDeviceStatus	= "\e[5n";	# With report_query_status, if received from host
+my $VT100_ReportDeviceOk	= "\e[0n";	# .. sent to host, with report_query_status
 
 my %Default = ( # Hash of default object settings which can be modified on a per object basis
 	timeout			=> 10,			# Default Timeout value in secs
@@ -2658,11 +2658,15 @@ sub _check_query { # Internal method to process Query Device Status escape seque
 		$$bufRef = join('', $self->{QUERYBUFFER}, $$bufRef); # prepend it to new output
 		$self->{QUERYBUFFER} = '';
 	}
-	if ($$bufRef =~ s/(\e(?:\[.?)?)$//){ # If output stream ends with \e, or \e[ or \e[.
-		# We could be looking at an escape sequence fragment; so we strip it and cache it
-		$self->{QUERYBUFFER} .= $1;
+	if ($$bufRef =~ /(\e(?:\[.?)?)$/){ # If output stream ends with \e, or \e[ or \e[.
+		# We could be looking at an escape sequence fragment; we check if it partially matches $VT100_QueryDeviceStatus
+		my $escFrag = $1;
+		if ($VT100_QueryDeviceStatus =~ /^\Q$escFrag\E/){	# If it does,
+			$$bufRef =~ s/\Q$escFrag\E$//;			# we strip it
+			$self->{QUERYBUFFER} .= $escFrag;		# and cache it
+		}
 	}
-	return unless $$bufRef =~ s/$VT100_QueryDeviceStatus//go;
+	return unless $$bufRef =~ s/\Q$VT100_QueryDeviceStatus\E//go;
 	# A Query Device Status escape sequence was found and removed from output buffer
 	$self->_put($pkgsub, \$VT100_ReportDeviceOk); # Send a Report Device OK escape sequence
 	return;

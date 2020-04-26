@@ -1,5 +1,4 @@
-use Test2::V0;
-use Test2::Plugin::DieOnFail;
+use Test::More;
 use Modern::Perl;
 use Util::Medley::Cache;
 use Data::Printer alias => 'pdump';
@@ -230,7 +229,7 @@ sub test_get {
 
 		# should succeed
 		ok( my $data = $c->get( ns => $Ns, key => $Keys[2] ) );
-		is( $data, $Data[2] );
+		is_deeply( $data, $Data[2] );
 
 		# should fail
 		eval { $c->get( key => $Keys[3] ) };
@@ -240,7 +239,7 @@ sub test_get {
 
 		# should succeed
 		ok( my $data = $c->get( key => $Keys[2] ) );
-		is( $data, $Data[2] );
+		is_deeply( $data, $Data[2] );
 
 		# should succeed
 		eval { $c->get( key => $Keys[3] ) };

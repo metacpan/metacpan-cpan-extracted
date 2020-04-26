@@ -274,7 +274,7 @@ Your Apache VirtualHost configuration would look something like this, assuming y
         SSLCertificateChainFile /etc/letsencrypt/live/example.com/chain.pem
     </Virtualhost>
 
-The key part is the line with C<PerlResponseHandler> and value Net::API::Stripe::WebHook::Apache. This will tell Apache/mod_perl that our module will handle all http request for this particular location.
+The key part is the line with C<PerlResponseHandler> and value L<Net::API::Stripe::WebHook::Apache>. This will tell Apache/mod_perl that our module will handle all http request for this particular location.
 
 So, if we get an incoming event from Stripe at https://example.com/hook/d18bbab7-e537-4dba-9a1f-dd6cc70ea6c1, we receive C<d18bbab7-e537-4dba-9a1f-dd6cc70ea6c1> as part of the path info, and we call B<validate_webhook>() to validate it before processing the event incoming packet.
 
@@ -284,7 +284,7 @@ What you want to do is inherit L<Net::API::Stripe::WebHook::Apache> and set your
 
     PerlResponseHandler My::WebHookHandler
 
-The inherited handler will be called by Apache with the class My::WebHookHandler and the apache Apache2::RequestRec object. As we wrote above, once validated, B<handler> will initiate an object from your module by calling C<My::WebHookHandler->new( object => Net::API::Stripe::Event, request => Net::API::REST::Request, response => Net::API::REST::Response )> where each package name are an object. C<object> represents the event packet received from Stripe. C<request> is an object to access great number of method to access the Apache API, and C<response> is an object to access Apache API to provide a reply. See the manual page for each of those package.
+The inherited handler will be called by Apache with the class My::WebHookHandler and the apache Apache2::RequestRec object. As we wrote above, once validated, B<handler> will initiate an object from your module by calling C<My::WebHookHandler->new( object => L<Net::API::Stripe::Event>, request => L<Net::API::REST::Request>, response => L<Net::API::REST::Response> )> where each package name are an object. C<object> represents the event packet received from Stripe. C<request> is an object to access great number of method to access the Apache API, and C<response> is an object to access Apache API to provide a reply. See the manual page for each of those package.
 
 =head1 CONSTRUCTOR
 
@@ -316,7 +316,7 @@ This is called by Apache/mod_perl upon incoming http request
 
 =item handler( $r )
 
-This is called by Apache with an L<Apache2::Request> object and returns an Apache2::Constant code such as 200
+This is called by Apache with an L<Apache2::Request> object and returns an L<Apache2::Constant> code such as 200
 
 =item B<event_handler>( Stripe event type )
 
@@ -346,9 +346,11 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-Stripe API documentation:
+Stripe API documentation: L<https://stripe.com/docs/api/events/types>
 
-L<https://stripe.com/docs/api/events/types>
+L<Net::API::REST>, L<Apache2>
+
+L<ModPerl::Registry>, L<ModPerl::PerlRun>, L<http://perl.apache.org/>
 
 =head1 COPYRIGHT & LICENSE
 

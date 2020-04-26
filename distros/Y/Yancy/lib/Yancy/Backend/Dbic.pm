@@ -1,5 +1,5 @@
 package Yancy::Backend::Dbic;
-our $VERSION = '1.054';
+our $VERSION = '1.055';
 # ABSTRACT: A backend for DBIx::Class schemas
 
 #pod =head1 SYNOPSIS
@@ -139,12 +139,15 @@ sub new {
         if ( my $e = load_class( $dbic_class ) ) {
             die ref $e ? "Could not load class $dbic_class: $e" : "Could not find class $dbic_class";
         }
-        $backend = $dbic_class->connect( $dsn );
+        $backend = $dbic_class->connect( $dsn, undef, undef, {}, { quote_names => 1 } );
     }
     elsif ( !blessed $backend ) {
         my $dbic_class = shift @$backend;
         if ( my $e = load_class( $dbic_class ) ) {
             die ref $e ? "Could not load class $dbic_class: $e" : "Could not find class $dbic_class";
+        }
+        if ( my $extra_attrs = $backend->[4] ||= {} ) {
+            $extra_attrs->{ quote_names } = 1;
         }
         $backend = $dbic_class->connect( @$backend );
     }
@@ -410,7 +413,7 @@ Yancy::Backend::Dbic - A backend for DBIx::Class schemas
 
 =head1 VERSION
 
-version 1.054
+version 1.055
 
 =head1 SYNOPSIS
 
@@ -527,7 +530,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Doug Bell.
+This software is copyright (c) 2020 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

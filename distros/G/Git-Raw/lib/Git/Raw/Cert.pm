@@ -1,5 +1,5 @@
 package Git::Raw::Cert;
-$Git::Raw::Cert::VERSION = '0.85';
+$Git::Raw::Cert::VERSION = '0.86';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ Git::Raw::Cert - Git certificate class
 
 =head1 VERSION
 
-version 0.85
+version 0.86
 
 =head1 DESCRIPTION
 

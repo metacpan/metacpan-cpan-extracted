@@ -5,7 +5,7 @@
 use 5.014;     ## strict, unicode_strings
 use warnings;
 
-use File::HomeDir;
+use File::HomeDir::Tiny ();
 use Path::Tiny;
 use YAML           qw/ LoadFile /;
 
@@ -17,7 +17,7 @@ sub get_command_line {
 sub get_project_suggestion {
   my $word = shift;
 
-  my $configfile = path( File::HomeDir->my_home() , '.gitgot' );
+  my $configfile = path( File::HomeDir::Tiny::home() , '.gitgot' );
 
   my $config = LoadFile( $configfile )
     or die "$configfile not found\n";
@@ -56,15 +56,15 @@ got-complete - shell completion helper for got
 
 =head1 VERSION
 
-version 1.336
+version 1.337
 
 =head1 AUTHOR
 
-John SJ Anderson <genehack@genehack.org>
+John SJ Anderson <john@genehack.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by John SJ Anderson.
+This software is copyright (c) 2020 by John SJ Anderson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -40,6 +40,9 @@ perl examples\Boxes.pl
 perl examples\Bspline.pl
 perl examples\Content.pl
 perl examples\ContentText.pl
+REM disable next line if HarfBuzz::Shaper is not installed, 
+REM and you will need to update font file paths
+perl examples\HarfBuzz.pl
 perl examples\RMtutorial.pl
 perl examples\Rotated.pl
 perl examples\ShowFont.pl Helvetica

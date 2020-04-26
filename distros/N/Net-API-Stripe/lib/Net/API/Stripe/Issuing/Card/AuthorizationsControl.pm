@@ -97,7 +97,7 @@ Array of strings containing categories of authorizations to always decline on th
 
 Limit the spending with rules based on time intervals and categories.
 
-This is an array of C<Net::API::Stripe::Issuing::Card::AuthorizationsControl::SpendingLimit> objects.
+This is an array of L<Net::API::Stripe::Issuing::Card::AuthorizationsControl::SpendingLimit> objects.
 
 =item B<spending_limits_currency> currency
 

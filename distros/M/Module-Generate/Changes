@@ -11,3 +11,6 @@ Revision history for Module-Generate
 
 0.05    2020-04-18
 	- resolve: Can't locate Foo.pm in @INC
+
+0.06    2020-04-25
+	- set our $VERSION on generate

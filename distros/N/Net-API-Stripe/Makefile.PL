@@ -12,8 +12,6 @@ my %WriteMakefileArgs = (
     ABSTRACT            => 'An interface to the Stripe API',
     INSTALLDIRS         => ($] < 5.011 ? 'perl' : 'site'),
     PREREQ_PM           => {
-        'Test::Simple' => 0,
-        'Test::Pod'	=> 0,
         'common::sense'			=> 0,
         'parent'				=> 0,
         'constant'				=> 0,
@@ -51,6 +49,11 @@ my %WriteMakefileArgs = (
         'Number::Format'		=> '1.75',
         'Net::API::REST'		=> '0.5.3',
     },
+    TEST_REQUIRES =>
+    {
+		'Test::Simple' => 0,
+		'Test::Pod'	=> 0,
+    },
     LICENSE				=> 'perl_5',
     MIN_PERL_VERSION	=> 5.6.0,
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
@@ -65,9 +68,11 @@ my %WriteMakefileArgs = (
                 web         => 'https://git.deguest.jp/jack/Net-API-Stripe',
                 type        => 'git',
             },
-        #    bugtracker => {
-        #        web         => undef,
-        #    },
+            bugtracker => {
+                # web         => 'https://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-API-Stripe',
+                web			=> 'https://git.deguest.jp/jack/Net-API-Stripe/issues',
+                mailto		=> 'cpan-bug@deguest.jp',
+            },
         },
     })),
 );

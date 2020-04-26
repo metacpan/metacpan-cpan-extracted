@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Issuing/Card.pm
-## Version 0.1
-## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
+## Version 0.2
+## Copyright(c) 2019 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -16,7 +16,7 @@ BEGIN
 {
     use strict;
     use parent qw( Net::API::Stripe::Generic );
-    our( $VERSION ) = '0.1';
+    our( $VERSION ) = '0.2';
 };
 
 sub id { shift->_set_get_scalar( 'id', @_ ); }
@@ -52,6 +52,25 @@ sub replacement_for { return( shift->_set_get_scalar_or_object( 'replacement_for
 sub replacement_reason { return( shift->_set_get_scalar( 'replacement_reason', @_ ) ); }
 
 sub shipping { shift->_set_get_object( 'shipping', 'Net::API::Stripe::Shipping', @_ ); }
+
+sub spending_controls
+{
+	return( shift->_set_get_class( 'spending_controls',
+	{
+	allowed_categories => { type => 'array' },
+	blocked_categories => { type => 'array' },
+	spending_limits => 
+        {
+        type => 'class', definition =>
+            {
+            amount => { type => 'number' },
+            categories => { type => 'array' },
+            interval => { type => 'scalar' },
+            }
+	    },
+	spending_limits_currency => { type => 'scalar' },
+	}, @_ ) );
+}
 
 sub status { shift->_set_get_scalar( 'status', @_ ); }
 
@@ -90,7 +109,7 @@ See documentation in L<Net::API::Stripe> for example to make api calls to Stripe
 
 =head1 VERSION
 
-    0.1
+    0.2
 
 =head1 DESCRIPTION
 
@@ -199,6 +218,58 @@ Where and how the card will be shipped.
 
 This is a L<Net::API::Stripe::Shipping> object.
 
+=item B<spending_controls> hash
+
+This is a hash whose properties are accessible as a dynamic class methods
+
+=over 8
+
+=item I<amount> positive integer
+
+Maximum amount allowed to spend per time interval.
+
+=item I<categories> array
+
+Array of strings containing categories on which to apply the spending limit. Leave this blank to limit all charges.
+
+=item I<interval> enum
+
+The time interval or event with which to apply this spending limit towards.
+
+=over 12
+
+=item I<per_authorization>
+
+A maximum amount for each authorization.
+
+=item I<daily>
+
+A maximum within a day. A day start at midnight UTC.
+
+=item I<weekly>
+
+A maximum within a week. The first day of a week is Monday.
+
+=item I<monthly>
+
+A maximum within a month. Starts on the first of that month.
+
+=item I<yearly>
+
+A maximum amount within a year. Starts January 1st.
+
+=item I<all_time>
+
+A maximum amount for all transactions.
+
+=back
+
+=item I<spending_limits_currency> currency
+
+Currency for the amounts within spending_limits. Locked to the currency of the card.
+
+=back
+
 =item B<status> string
 
 One of active, inactive, canceled, lost, or stolen.
@@ -281,6 +352,10 @@ One of virtual or physical.
 =head2 v0.1
 
 Initial version
+
+=head2 v0.2
+
+Added method L</"spending_controls"> that was added on Stripe api.
 
 =head1 AUTHOR
 

@@ -1,3 +1,4 @@
 ---
 default:
     libs: lib2
+include: config/libs2.yaml

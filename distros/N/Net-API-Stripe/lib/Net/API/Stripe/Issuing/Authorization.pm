@@ -164,17 +164,17 @@ The currency that was presented to the cardholder for the authorization. Three-l
 
 =item B<balance_transactions> array, contains: balance_transaction object
 
-This is an array of C<Net::API::Stripe::Balance::Transaction> objects.
+This is an array of L<Net::API::Stripe::Balance::Transaction> objects.
 
 =item B<card> hash
 
-This is a C<Net::API::Stripe::Issuing::Card> object.
+This is a L<Net::API::Stripe::Issuing::Card> object.
 
 =item B<cardholder> string (expandable)
 
 The cardholder to whom this authorization belongs.
 
-When expanded, this is a C<Net::API::Stripe::Issuing::Card::Holder> object.
+When expanded, this is a L<Net::API::Stripe::Issuing::Card::Holder> object.
 
 =item B<created> timestamp
 
@@ -196,7 +196,7 @@ Has the value true if the object exists in live mode or the value false if the o
 
 =item B<merchant_data> hash
 
-This is a C<Net::API::Stripe::Issuing::MerchantData> object.
+This is a L<Net::API::Stripe::Issuing::MerchantData> object.
 
 =item B<metadata> hash
 
@@ -212,7 +212,7 @@ The additional amount Stripe will hold if the authorization is approved. This fi
 
 =item B<request_history> array of hashes
 
-This is an array of C<Net::API::Stripe::Issuing::Authorization::RequestHistory> objects.
+This is an array of L<Net::API::Stripe::Issuing::Authorization::RequestHistory> objects.
 
 =item B<status> string
 
@@ -220,11 +220,11 @@ One of pending, reversed, or closed.
 
 =item B<transactions> array of hashes
 
-This is an array of C<Net::API::Stripe::Issuing::Authorization::Transaction> objects.
+This is an array of L<Net::API::Stripe::Issuing::Authorization::Transaction> objects.
 
 =item B<verification_data> hash
 
-This is a C<Net::API::Stripe::Issuing::Authorization::VerificationData> object.
+This is a L<Net::API::Stripe::Issuing::Authorization::VerificationData> object.
 
 =item B<wallet_provider> string
 

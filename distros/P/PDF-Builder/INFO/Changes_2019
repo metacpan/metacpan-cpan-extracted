@@ -1,0 +1,378 @@
+See also INFO/Changes-ver_2 for changes released for PDF::API2, and 
+incorporated into PDF::Builder.
+See also INFO/Changes_2018 for earlier version 3 release logs.
+
+3.017     2019-12-31 
+
+    examples/RMtutorial.pl, examples/Boxes.pl, examples/README,
+      examples/examples.output, MANIFEST, tools/3_examples.pl,
+      INFO/old/examples.bat
+     Rich Measham's tutorial on using PDF::API2, adapted for PDF::Builder. 
+      Also a demonstration of the interaction of PDF boxes (media, crop,
+      bleed, trim, art).
+
+    lib/PDF/Builder/Basic/PDF/File-Pages.pm [RT 131147] fix problem with
+      Null object bubbling up and forcing an improper method invocation. Fix
+      used (by Vadim Repin) is in File.pm, while a narrower scope (and 
+      presumably a bit safer) fix (by Klaus Ethgen) is on standby in Pages.pm.
+
+    examples/Rotated.pl, examples/ShowFont.pl minor cleanup
+
+    examples/Rotated.pl, examples/README, examples/examples.output,
+      examples/ContentText.pl, MANIFEST, tools/3_examples.pl, 
+      INFO/old/examples.bat
+     Demonstrate how to embed rotated pages within a document.
+
+    CONTRIBUTING, README minor updates
+
+    INFO/KNOWN_INCOMP general statement about large batch of removals
+    INFO/DEPRECATED, t/content.t, lib/PDF/Builder/Content.pm, 
+      lib/PDF/Builder/Resource/ExtGState.pm
+     Remove deprecated method meterlimit() (use correct spelling miterlimit).
+    INFO/DEPRECATED, t/content.t, lib/PDF/Builder/Content.pm 
+     Remove deprecated method hspace() (use corrected name hscale).
+    INFO/DEPRECATED, lib/PDF/Builder/Content.pm 
+     Remove deprecated dash pattern options -full and -clear (replaced by
+      -pattern option).
+    INFO/DEPRECATED, t/deprecations.t, lib/PDF/Builder/NamedDestination.pm,
+      lib/PDF/Builder/Resource.pm
+     Remove deprecated method new_api() (use new instead).
+    INFO/DEPRECATED, t/papersizes.t, lib/PDF/Builder/Resource/PaperSizes.pm
+     Remove deprecated non-standard paper sizes 4a, 2a, 4b, 2b 
+      (use 4a0, 2a0, 4b0, 2b0 standard sizes instead).
+    INFO/DEPRECATED, lib/PDF/Builder/Resource/XObject/Form/BarCode/code3of9.pm
+     Remove deprecated method encode_3of9_string_w_chk() (use 
+      encode_3of9_string(*, 1) instead).
+    INFO/DEPRECATED, lib/PDF/Builder/Resource/XObject/Form/BarCode/code3of9.pm
+     Remove deprecated method encode_3of9_w_chk() (use 
+      encode_3of9(*, 1, 0) instead).
+    INFO/DEPRECATED, lib/PDF/Builder/Resource/XObject/Form/BarCode/code3of9.pm
+     Remove deprecated method encode_3of9_ext() (use 
+      encode_3of9(*, 0, 1) instead).
+    INFO/DEPRECATED, lib/PDF/Builder/Resource/XObject/Form/BarCode/code3of9.pm
+     Remove deprecated method encode_3of9_ext_w_chk() (use 
+      encode_3of9(*, 1, 1) instead).
+    INFO/DEPRECATED, lib/PDF/Builder/Resource/XObject/Image.pm
+     Rename deprecated methods imask() to mask() and 
+      bpc() to bits_per_component().
+    INFO/DEPRECATED, lib/PDF/Builder.pm
+     Rename deprecated methods openScalar() to open_scalar() and 
+      importpage() to import_page().
+    INFO/DEPRECATED, lib/PDF/Builder/Annotation.pm
+     Rename deprecated method pdfile() to pdf_file().
+
+    lib/PDF/Builder/Resource/XObject/Image/JPEG.pm 
+      check for uninitialized var per API2 2.037
+
+    Makefile.PL, lib/PDF/Builder/Docs.pm, README
+      Remove "optional" libraries from attempt to install. It was not clear
+      whether they would actually be installed or how users would react to
+      failures to install them. Most of all, there was no information passed
+      to owners of these optional libraries that their efforts were bearing
+      fruit! Just leave them to be manually installed, if desired.
+
+    lib/PDF/Builder/Resource/Font/Corefont-Postscript-SynFont-BdFont.pm
+      Check -encode for (invalid) multibyte encodings such as UTF*. There are
+      probably more encoding names to be added later (East Asian alphabets,
+      in particular). Bitmapped distribution fonts (BdFont) doesn't appear to
+      support -encode, so remove it from the POD. TrueType fonts (alone)
+      /do/ support multibyte encodings (as do CJK). Ref PDF::API2 PR 20
+      https://github.com/ssimms/pdfapi2/pull/20.
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Page.pm restrict rotate() method
+      to multiple of 90 degrees. Also swap 'Rotate' property test order so
+      that find_prop() not called unnecessariy (ref RT 130722). Clarify in
+      the POD that a positive rotation is clockwise.
+
+    lib/PDF/Builder/Resource/BaseFont.pm per PDF::API2, default value for
+      returned UniByCId value (when undef), preventing undefined errors.
+
+3.016     2019-08-16
+
+    INFO/RoadMap, CONTRIBUTING, MANIFEST, README
+     Add a road map describing where we'd like to take PDF::Builder.
+
+    examples/024_bdffonts-README-examples.output, lib/PDF/Builder.pm, 
+      lib/PDF/Builder/Resource/BaseFont.pm, 
+      lib/PDF/Builder/Resource/Font/BdFont.pm, tools/3_examples.pl, 
+      INFO/old/examples.bat
+     BDF (bitmapped fonts) now working properly, provided you have a good
+      .bdf file as your starting point. They're ugly enough not to be all
+      that useful, but might be used to decorative effect in chapter titles
+      and major headings (not suitable for body text!).
+
+    lib/PDF/Builder/Docs.pm, lib/PDF/Builder/Resource/CIDFont/TrueType.pm
+     Improve documentation of ttfont's -nosubset and -noembed flags.
+     
+    lib/PDF/Builder.pm, lib/PDF/Builder/Docs.pm, 
+      lib/PDF/Builder/Resource/Font/Postscript.pm
+     [RT 130038] Improve documentation for putting an image on the page, 
+      pointing to other sources of information. There are undoubtedly many
+      other "how to do" tasks that need upgraded documentation, and we will
+      attend to them over time. In the meantime, be sure to check out the
+      examples/ Perl programs for numerous examples of how to use calls, and
+      even the t-tests in t/ might prove useful as examples.
+
+    examples/021_psfonts, lib/PDF/Builder/Docs.com, lib/PDF/Builder.com,
+      lib/PDF/Builder/Resource/Font/SynFont.pm
+     [RT 130040] Confirm that the "synfont" method to modify a font does not
+      seem to work with "CJK" fonts (created by the "cjkfont" method), due to
+      internal font file format differences. Also add "Ipsum Lorem" sample 
+      text to 021_psfonts output.
+
+    docs/buildDoc.pl, lib/PDF/Builder.pm, lib/PDF/Builder/Content.pm-
+      Docs.pm-Page.pm
+     Improvement to documentation generation utility to handle pod2html
+      upgrade to specify URLs with targets (#name), and update some POD that
+      refers to specific targets on a page. It's possible that if you have an
+      earlier Perl level, this might not work properly.
+
+    lib/PDF/Builder/Resource/CIDFont/TrueType/FontFile.pm, 
+      lib/PDF/Builder/Docs.pm, examples/022_truefonts
+     [RT 130041] OTF and TTF "CFF" files were getting the font file embedded
+      in them (by ttfont method), even though there was no link to use that
+      large stream, when -noembed=>1. This has been fixed. Also, the 
+      documentation (Docs.pm) has been upgraded to clarify when and how font
+      file embedding is done (especially that it's NOT done for cjkfont). The 
+      TrueType example has had a flag added to specify embedding control.
+
+    lib/PDF/Builder/Resource/BaseFont.pm-CIDFont.pm-UniFont.pm [RT 130074] 
+      clarify remaining uses of is_utf8() call that it's utf8::is_utf8().
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Page.pm, lib/PDF/Builder/Docs.pm, 
+      INFO/DEPRECATED, INFO/KNOWN_INCOMP, MANIFEST, t/bbox.t, 
+      tools/2_t-tests.pl, INFO/old/t-tests.bat
+     [RT 130039] add "get" capability to both global and page bounding box 
+      calls, obsoleting the get_* calls for the page. $pdf->mediabox() will
+      return the global media box, $page->mediabox() will return the current
+      page's media box, and so on for bleed, crop, trim, and art boxes.
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Basic/PDF/File.pm 
+     [GH 101] permit out-of-spec PDF structures that were formerly fatal 
+      errors. -diags flag to enable reporting of suspicious structures, 
+      otherwise silent. There are many PDFs "in the wild" that do not conform 
+      to Adobe PDF standards, yet many Readers are happy to accept them.
+
+    docs/buildDoc.pl output module (.pm or .pod) being processed, so user won't 
+      be worried about how long it's taking.
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Resource/UniFont.pm-BaseFont.pm, 
+      lib/PDF/Builder/Basic/PDF/Array.pm-Dict.pm-File.pm-Filter.pm-Literal.pm-
+      Objind.pm-Page.pm-Pages.pm-String.pm-Utils.pm,
+      lib/PDF/Builder/Basic/PDF/Filter/FlateDecode.pm,
+      lib/PDF/Builder/Resource/CIDFont/CJKFont.pm-TrueType.pm, 
+      lib/PDF/Builder/Resource/CIDFont/TrueType/FontFile.pm,
+      lib/PDF/Builder/Lite.pm-Page.pm-Resource.pm, 
+      t/author-critic.t--author-pod-syntax.t--rt126274.t (new), MANIFEST
+     per PDF::API2 changes, code style cleanup (including some minor changes
+      to outobjdeep(), such as removing %options), and some bug fixes not 
+      already in PDF::Builder. Also some Perl Critic cleanup and removal of
+      unused routines.
+
+    contrib/pdf-deoptimize.pl--pdf-optimize.pl, lib/PDF/Builder.pm,
+      lib/PDF/Builder/Basic/PDF/Array.pm-Dict.pm-Objind.pm-Page.pm-Pages.pm, 
+      lib/PDF/Builder/Util.pm, INFO/DEPRECATED
+     per PDF::API2 changes, elementsof() changed to elements().
+
+    lib/PDF/Builder/Annotation.pm-Content.pm-Outline.pm-Page.pm-Resource.pm,
+      lib/PDF/Builder/Resource/CIDFont.pm-ColorSpace.pm-ExtGState.pm, 
+      lib/PDF/Builder/Resource/XObject/Form/Hybrid.pm
+     per PDF::API2 changes, outobjdeep() is no longer destructive (content is
+      no longer removed). Some outobjdeep() calls removed, others simplified.
+
+    lib/PDF/Builder/Resource/CIDFonts/CMap/*.cmap finish work on [RT 128674]
+      by updating .cmap files to latest. This is difficult because Adobe 
+      provides poor documentation, moved to GitHub a couple years back and
+      did not provide good snapshots of previous releases (to see exactly what
+      changed over time), and provides differing levels of up-to-dateness
+      depending on when someone last updated on GitHub (including older
+      supplements!). It's not clear exactly what Adobe version the existing 
+      (older) PDF::Builder .cmap files correspond to. In some cases, it appears
+      that they were incomplete at the claimed supplement level. It's not 
+      possible to map the cid2code.txt files to PDF::Builder .cmap files in an 
+      automated manner because it's not clear which Unicode is to be used in 
+      the g2u array when multiple Unicode codepoints map to a given CID. There 
+      are some inconsistencies of what CIDs are defined, between the Adobe 
+      documentation, what's in the cid2code.txt files, and what's available in 
+      Unicode. Suggestions on how to automate cid2code.txt usage would be 
+      appreciated. Anyway, this is my best attempt, and corrections accepted!
+
+    tools/1_pc.pl, 2_t-tests.pl clean up minor bugs, improve diagnostics.
+
+3.015     2019-05-19 
+
+    The keepers of CPAN declined to re-index PDF::Builder 3.014, which had many
+      reported problems with its load, so I'll kick out 3.015 earlier than I
+      normally would. Hopefully, with a good load, "Testers" will show passed/
+      failed/other on the Meta page, and PDF::Builder will show up in the
+      reverse dependencies of other products.
+
+    Perl 5.18 now required minimum level.
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Page.pm-Docs.pm [ref CTS 2] allow 
+      User Unit specification for PDF (globally) and page. This permits (with 
+      suitable Readers) document sizes in excess of 200 inches.
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Page.pm-Docs.pm [ref CTS 2] clean up 
+      and extend documentation on "box" methods. Allow -orient option on "box" 
+      methods to name a page's media, but present in Landscape orientation. 
+      Default Media Box of US Letter (8.5in x 11in).
+
+    lib/PDF/Builder.pm [ref RT 117184] in open(), if read-in PDF is missing an 
+      EOL after the final %%EOF, add one so that material added after isn't 
+      run-on in comment (most readers can handle this, but better to be clear).
+    lib/PDF/Builder/Basic/PDF/File.pm [ref RT 117184] an empty xref (0 0) is
+      now allowed to go through without tripping the fatal Malformed message. I
+      don't think it's legal PDF, but Acrobat Reader passes it without comment,
+      so I'll let it go (still may produce warning messages). Late add of 
+      'hybrid.pdf' to RT 117184 has a number of problems reported as warnings 
+      in PDF::Builder (Acrobat Reader is silent on them), but seems to produce 
+      an acceptable PDF. 
+
+      Also don't add an EOL after overwriting the PDF version -- there should 
+      already be one there. Finally, there doesn't seem to be any point in 
+      explicitly handling a "run-on" header comment as described in RT 117210, 
+      as we merely copy the old file to the output (with version updated if 
+      necessary). If any Readers have trouble with such and need the comment 
+      stripped out, it might be done (1. don't change object offsets, and 2. 
+      put the new comment AFTER any binary comment).
+
+    lib/PDF/Builder/Basic/PDF/Pages.pm [ref CTS 3] remove rebuild_tree() for 
+      now, as it has never been properly implemented.
+
+    Add some comments to CONTRIBUTING pointing to the Software Development Kit.
+
+3.014     2019-04-26 
+    
+    MANIFEST, tools/*.pl move four developmental test .pl files from root into
+      new tools directory. They were not intended to be installed into the
+      Perl lib/PDF/ production directory, but for some reason that's where they
+      were ending up. This change should keep them out of lib/PDF/ when 
+      installed via CPAN and the like.
+
+    lib/PDF/Builder/Basic/PDF/File.pm [ref RT 117184] fix contributed by 
+      Vadim Repin to allow PDF::Builder to write out a cross reference stream,
+      if one was read in with an existing PDF (forcing a PDF 1.5 output level).
+      This does not (yet) create an XRef stream from scratch.
+    lib/PDF/Builder.pm, lib/PDF/Builder/Docs.pm update documentation for save(),
+      saveas(), and stringify() to reinforce that the $pdf object is unusable 
+      after calling these methods.
+
+    lib/PDF/Builder/Resource/CIDFont/TrueType/FontFile.pm [ref RT 128674]
+      rewrite CMap handling, with contributions by Alfred Reibenschuh 
+      (original PDF::API2 author) and Bob Hallissy (TTF::Font author).
+      Only attempt to use the original four .cmap files, and now only if 
+      -usecmf flag set to 1. Otherwise -cmaps flag can set a list of 
+      Platform/Encoding pairs in priority order to look for a match in the
+      font's internal cmap tables, or use the default set, or force a
+      lookup with the find_ms() method. In all cases, either one list can
+      be given, and will be used for both Windows and non-Windows platforms,
+      or two lists can be given, separated by a semicolon, with the first
+      one being for a Windows platform and the second for non-Windows.
+      A debug flag -debug may be set to 1 to show various diagnostic 
+      information while processing the CMap/.cmap section. Now the default
+      processing is to use the default list of internal cmaps, and if no
+      match is found, call find_ms(), and as a last resort, if there is
+      a .cmap file found, use that. To emulate the old CID mapping, set
+      -usecmf=>1 and -cmaps=>'find_ms'.
+     Various random documentation updates made, particularly regarding the
+      use of "core" fonts, and recommending using TTF/OTF instead.
+     Have not yet found a good data source to generate updated .cmap files
+      for FontFile's use -- still TBD. Could not generate a generic
+      "Adobe:Identity" .cmap file. The ticket is being held open for now as
+      a reminder to deal with .cmap updates.
+    lib/PDF/Builder/Resource/CIDFont/CJKFont.pm notes added as to why 
+      FontFile changes not made here (.data and .cmap files are required,
+      no searching of internal cmaps).
+
+    lib/PDF/Builder/Basic/PDF/File.pm-Objind.pm-Pages.pm [ref RT 121911]
+      fixes contributed by Vadim Repin to deal with the failure of adding new 
+      pages to an existing document. This apparently had something to do with 
+      circular references, improper 'realise' of objects, and other things.
+
+      There were three other issues raised in this ticket: rebuild_tree
+      didn't work (already dealt with in PDF::Builder), a useless line of
+      code (already removed from PDF::API2 and PDF::Builder), and LZWDecode/
+      FlateDecode optimizations (maybe look at again later).
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Docs.pm add documentation (POD) 
+      explaining how the interaction between text objects and graphics objects
+      may result in (apparently wrong) unexpected order of output (rendering
+      order).
+
+    lib/PDF/Builder/Content.pm-Docs.pm, examples/Content.pl further 
+      explanation (mostly POD) on text and graphics object interactions, and 
+      especially the effect on clipping, particularly of text glyphs.
+
+    examples/022_truefonts add a flag --full (or -f) to force 65536 characters
+      to be output, rather than whatever the count of CIDs is reported in the
+      font. This may be useful for seeing all the defined glyphs if there are
+      gaps in the CID sequence.
+
+    Makefile.PL, README, lib/PDF/Builder/Docs.pm
+      Move "optional" libraries (modules), currently Graphics::TIFF and
+      Image::PNG::Libpng, to new "recommends" section in Makefile.PL. Your 
+      installer MAY attempt to automatically install these as prerequisites. 
+      If it does, and fails, no need to panic: they aren't vital to the 
+      operation of PDF::Builder, and should NOT cause an overall installation
+      failure! You are free to remove these optional libraries from your Perl
+      installation if you do not plan to use them. More information is in 
+      PDF::Builder::Docs. PDF::Builder is now expected to show up in CPAN's 
+      listing of "Reverse dependencies" for these libraries.
+
+    lib/PDF/Builder/Resource/Font/SynFont.pm, lib/PDF/Builder/Docs.pm,
+      lib/PDF/Builder.pm, DEPRECATED, examples/021_synfonts, examples/README,
+      examples/example.output
+     Deprecate -slant option, replacing by -condense, for the option to
+      condense or expand character widths in a synthetic font. Expand and 
+      clarify documentation. 021_synfonts add a page of text showing all the 
+      options in use together, and command-line type. There is still much to be 
+      done to make synthetic fonts completely usable, and I am exploring some 
+      alternatives. 
+
+      Fonts are limited to single byte encoding (you may wish to select an 
+      alternate plane as a font and run that through synfont()). A major 
+      problem I have not been able to solve is the expansion of Latin alphabet 
+      ligatures to multiletter capital strings (e.g., ffi to F+F+I) for 
+      small-caps usage, as well as small-caps for things like "long s" which 
+      are not in the base plane, because the ASCII letters do not appear to be 
+      available in other planes.
+
+    lib/PDF/Builder/Basic/PDF/File.pm
+      [ref RT 106020 and RT 117210] add some tolerance for out-of-spec PDF 
+      files. Initially this is permitting a comment between the PDF version
+      number in the header and the EOL, and extra whitespace in the cross
+      reference listing and some other wigglies (e.g., starting object 1, not
+      0, 0 entries per subsection, lots of warnings). These files don't 
+      strictly meet the PDF formatting spec, but many readers seem to tolerate 
+      them (fix them up), so PDF::Builder should, too. Note that PDF::Builder 
+      already is happy to read a Mac-style PDF using only CR for an EOL (one 
+      byte, not the required two). 
+
+      There is one more that I haven't added yet: there are reports of 
+      sightings "in the wild" (e.g., RT 106020) of a PDF version header 
+      followed by a comment followed by the first object (n 0 obj) before 
+      encountering the first $cr. If I can come up with or obtain a "working" 
+      PDF like this, I will look into adding tolerance code for it.
+
+      For future consideration: save header comments (in-line and after header)
+      for output at overall header. Should coordinate with being able to 
+      specify a header comment (in .pl code) and possibly comments within 
+      objects. Other out-of-spec conditions that most readers tolerate will be
+      added over time.
+
+    CONTRIBUTING, MANIFEST
+      Add file (at CPAN's request) suggesting how best to contribute to 
+      the project.
+
+    examples/025_unifonts, 3_examples.pl, INFO/old/examples.bat
+      The data used by 025_unifonts (attached PDF-J document) is encoded in 
+      SJIS. This is invalid UTF-8 and caused the script to blow up. The fix is
+      to inform Perl that the DATA being read is SJIS, so it can be encoded on
+      the fly to UTF-8.
+
+    INFO/Changes_2018, Changes, MANIFEST, lib/PDF/Builder.pm, README
+      2019 copyright, archive 2018 changes.
+      
+(see INFO/Changes_2018 for earlier changes)
+(see INFO/Changes-ver_2 for changes to PDF::API2 up through 2.033)

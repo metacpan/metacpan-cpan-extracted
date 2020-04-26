@@ -1,6 +1,6 @@
 package App::GitGot::Command::add;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Command::add::VERSION = '1.336';
+$App::GitGot::Command::add::VERSION = '1.337';
 # ABSTRACT: add a new repo to your config
 use 5.014;
 
@@ -133,7 +133,7 @@ App::GitGot::Command::add - add a new repo to your config
 
 =head1 VERSION
 
-version 1.336
+version 1.337
 
 =head1 SYNOPSIS
 
@@ -151,11 +151,11 @@ version 1.336
 
 =head1 AUTHOR
 
-John SJ Anderson <genehack@genehack.org>
+John SJ Anderson <john@genehack.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by John SJ Anderson.
+This software is copyright (c) 2020 by John SJ Anderson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

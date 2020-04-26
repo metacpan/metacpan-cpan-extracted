@@ -13,7 +13,7 @@ use Try::Tiny;
 
 use Moo;
 
-our $VERSION = '0.75';
+our $VERSION = '0.78';
 
 # Public
 has conf_name                => ( is => 'ro' );
@@ -89,7 +89,7 @@ sub check {
                 my $contents  = $self->cat_file( $root->child($rel_file) );
                 my $full_path = $tempdir->child($rel_file);
                 $full_path->parent->mkpath( { mode => 0755 } );
-                $full_path->spew($contents);
+                $full_path->spew_raw($contents);
             }
             my $tidyall = $self->tidyall_class->new_from_conf_file(
                 $tempdir->child($conf_name),
@@ -183,7 +183,7 @@ to be tidyall'd
 
 =head1 VERSION
 
-version 0.75
+version 0.78
 
 =head1 SYNOPSIS
 
@@ -342,7 +342,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 - 2019 by Jonathan Swartz.
+This software is copyright (c) 2011 - 2020 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under the same
 terms as the Perl 5 programming language system itself.

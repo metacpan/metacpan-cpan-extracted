@@ -39,7 +39,7 @@ for my $attr (qw(attr_isa attr_coerce attr_isa_coerce)) {
     my $want_e = exception { $want = $wanto->$attr($value) };
     my $got;
     my $got_e = exception { $got = $goto->$attr($value) };
-    defined and s/ at .*? line \d+\.?$//m
+    defined and s/ line \d+//
       for $want_e, $got_e;
 
     is $got_e, $want_e,

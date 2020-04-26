@@ -1,6 +1,6 @@
 package App::GitGot::Command::remove;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Command::remove::VERSION = '1.336';
+$App::GitGot::Command::remove::VERSION = '1.337';
 # ABSTRACT: remove a managed repository from your config
 use 5.014;
 
@@ -67,15 +67,15 @@ App::GitGot::Command::remove - remove a managed repository from your config
 
 =head1 VERSION
 
-version 1.336
+version 1.337
 
 =head1 AUTHOR
 
-John SJ Anderson <genehack@genehack.org>
+John SJ Anderson <john@genehack.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by John SJ Anderson.
+This software is copyright (c) 2020 by John SJ Anderson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

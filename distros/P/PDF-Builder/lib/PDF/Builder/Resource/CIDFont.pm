@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::BaseFont';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.017'; # VERSION
-my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
+our $VERSION = '3.018'; # VERSION
+my $LAST_UPDATE = '3.018'; # manually update whenever code is changed
 
 use Encode qw(:all);
 
@@ -65,8 +65,8 @@ sub uniByCId {
     my ($self, $gid) = @_;
     my $uni = $self->data()->{'g2u'}->[$gid];
     # fallback to U+0000 if no match
-    $gid = 0 unless defined $uni;
-    return $gid;
+    $uni = 0 unless defined $uni;
+    return $uni;
 }
 
 sub cidByUni { 

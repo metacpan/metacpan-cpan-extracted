@@ -3,8 +3,8 @@ package PDF::Builder::Docs;
 use strict;
 use warnings;
 
-our $VERSION = '3.017'; # VERSION
-my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
+our $VERSION = '3.018'; # VERSION
+my $LAST_UPDATE = '3.018'; # manually update whenever code is changed
 
 # originally part of Builder.pm, it was split out due to its length
 
@@ -1712,6 +1712,147 @@ No transparency -- ignore tRNS chunk if provided, ignore Alpha channel if
 provided.
 
 =back
+
+=head2 Using Shaper
+
+    # if HarfBuzz::Shaper is not installed, either bail out, or try to
+    # use regular TTF calls instead
+    my $rc;
+    $rc = eval {
+        require HarfBuzz::Shaper;
+	1;
+    };
+    if (!defined $rc) { $rc = 0; }
+    if ($rc == 0) {
+        # bail out in some manner
+    } else {
+        # can use Shaper
+    }
+
+    my $fontfile = '/WINDOWS/Fonts/times.ttf'; # used by both Shaper and textHS
+    my $fontsize = 15;                         # used by both Shaper and textHS
+    my $font = $pdf->ttfont($fontfile);
+    $text->font($font, $fontsize);
+    
+    my $hb = HarfBuzz::Shaper->new(); # only need to set up once
+    my %settings; # for textHS(), not Shaper
+    $settings{'dump'} = 1; # see the diagnostics
+    $settings{'script'} = 'Latn';
+    $settings('dir'} = 'L';  # LTR
+    $settings{'features'} = ();  # required
+
+    # -- set language (override automatic setting)
+    #$settings{'language'} = 'en';
+    #$hb->set_language( 'en_US' );
+    # -- turn OFF ligatures
+    #push @{ $settings{'features'} }, '-liga';
+    #$hb->add_features( '-liga' );
+    # -- turn OFF kerning
+    #push @{ $settings{'features'} }, '-kern'; 
+    #$hb->add_features( '-kern' );
+    $hb->set_font($fontfile);
+    $hb->set_size($fontsize);
+    $hb->set_text("Let's eat waffles in the field for brunch.");
+      # expect ffl and fi ligatures, and perhaps some kerning
+
+    my $info = $hb->shaper();
+    $text->textHS($info, \%settings); # -strikethru, -underline allowed
+
+The package HarfBuzz::Shaper may be optionally installed in order to use the
+text-shaping capabilities of the HarfBuzz library. These include kerning and
+ligatures in Western scripts (such as the Latin alphabet). More complex scripts
+can be handled, such as Arabic family and Indic scripts, where multiple forms
+of a character may be automatically selected, characters may be reordered, and
+other modifications made. The examples/HarfBuzz.pl script gives some examples
+of what may be done.
+
+Keep in mind that HarfBuzz works only with TrueType (.ttf) and OpenType (.otf)
+font files. It will not work with PostScript (Type1), core, bitmapped, or CJK
+fonts. Not all .ttf fonts have the instructions necessary to guide HarfBuzz,
+but most proper .otf fonts do. In other words, there are no guarantees that a
+particular font file will work with Shaper!
+
+The basic idea is to break up text into "chunks" which are of the same script
+(alphabet), language, direction, font face, font size, and variant (italic, 
+bold, etc.). These could range from a single character to paragraph-length 
+strings of text. These are fed to HarfBuzz::Shaper, along with flags, the font
+file to be used, and other supporting
+information, to create an array of output glyphs. Each element is a hash 
+describing the glyph to be output, including its name (if available), its glyph
+ID (number) in the selected font, its x and y displacement (usually 0), and
+its "advance" x and y values, all in points. For horizontal languages (LTR and
+RTL), the y advance is normally 0 and the x advance is the font's character
+width, less any kerning amount.
+
+Shaper will attempt to figure out the script used and the text direction, based on the Unicode range; and a reasonable guess at the language used. The language
+can be overridden, but currently the script and text direction cannot be
+overridden.
+
+B<An important note:> the number of glyphs (array elements) may not be equal to 
+the number of Unicode points (characters) given in the chunk's text string! 
+Sometimes a character will be decomposed into several pieces (multiple glyphs); 
+sometimes multiple characters may be combined into a single ligature glyph; and
+characters may be reordered (especially in Indic and Southeast Asian languages).
+As well, for Right-to-Left (bidirectional) scripts such as Hebrew and Arabic
+families, the text is output in Left-to-Right order (reversed from the input).
+
+With due care, a Shaper array can be manipulated in code. The elements are more
+or less independent of each other, so elements can be modified, rearranged,
+inserted, or deleted. You might adjust the position of a glyph with 'dx' and 
+'dy' hash elements. The 'ax' value should be left alone, so that the wrong 
+kerning isn't calculated, but you might need to adjust the "advance x" value by
+means of one of the following:
+
+=over
+
+=item B<axs> is a value to be I<substituted> for 'ax' (points)
+
+=item B<axsp> is a I<substituted> value (I<percentage>) of the original 'ax'
+
+=item B<axr> I<reduces> 'ax' by the value (points). If negative, increase 'ax'
+
+=item B<axrp> I<reduces> 'ax' by the given I<percentage>. Again, negative increases 'ax'
+
+=back
+
+B<Caution:> a given character's glyph ID is I<not> necessarily going to be the 
+same between any two fonts! For example, an ASCII space (U+0020) might be 
+C<E<lt>0001E<gt>> in one font, and C<E<lt>0003E<gt>> in another font (even one 
+closely related!). A U+00A0 required blank (non-breaking space) may be output
+as a regular ASCII space U+0020. Take care if you need to find a particular
+glyph in the array, especially if the number of elements don't match. Consider
+making a text string of "marker" characters (space, nbsp, hyphen, soft hyphen,
+etc.) and processing it through HarfBuzz::Shaper to get the corresponding
+glyph numbers. You may have to count spaces, say, to see where you could break
+a glyph array to fit a line.
+
+The C<advancewidthHS()> method uses the same inputs as does C<textHS()>.
+Like C<advancewidth()>, it returns the chunk length in points. Unlike
+C<advancewidth()>, you cannot override the glyph array's font, font size, etc.
+
+Once you have your (possibly modified) array of glyphs, you feed it to the
+C<textHS()> method to render it to the page. Remember that this method handles
+only a single line of text; it does not do line splitting or fitting -- that
+I<you> currently need to do manually. For Western scripts (e.g., Latin), that
+might not be too difficult, but for other scripts that involve extensive
+modification of the raw characters, it may be quite difficult to split 
+I<words>, but you still may be able to split at inter-word spaces.
+
+=head3 Not yet supported by Shaper
+
+A useful, but not exhaustive, set of functions are allowed by C<textHS()> use.
+B<Not yet> supported are top-to-bottom and bottom-to-top directions (e.g., for
+Far Eastern languages in traditional orientation), explicit script names and 
+direction for HarfBuzz::Shaper, discretionary ligatures, and manual selection 
+of glyphs (e.g., swashes and alternate forms). If you have a need for any of 
+these, please open a support ticket in PDF::Builder (and/or HarfBuzz::Shaper), 
+with supporting examples of what it's supposed to do. If it seems to be widely
+useful, we'll see what might be done.
+
+Currently, C<textHS()> can only handle a single text string. We are looking at
+how fitting to a line length (splitting up an array) could be done, as well as 
+how words might be split on hard and soft hyphens. At some point, full paragraph
+and page shaping could be possible.
 
 =cut
 

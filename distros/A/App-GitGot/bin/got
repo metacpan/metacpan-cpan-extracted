@@ -21,7 +21,7 @@ got - A tool to make it easier to manage multiple code repositories using differ
 
 =head1 VERSION
 
-version 1.336
+version 1.337
 
 =head1 SYNOPSIS
 
@@ -217,6 +217,24 @@ sent me.
 
 =back
 
+=head2 Similar tools
+
+=over
+
+=item L<Git::Bunch>
+
+Allows to check the status and exec commands on a list of
+repository, as well as to sync the local machine's repositories with
+another via rsync. Can also manage (and rsync) regular directories.
+
+=item L<myrepos|http://myrepos.branchable.com/>
+
+Allows to run the main commands (C<update>,C<status>,etc) in all registered
+repos. Advertised as working with many versioning systems.
+Not on CPAN nor GitHub.
+
+=back
+
 =head1 LIMITATIONS
 
 Currently git is the only supported VCS.
@@ -243,11 +261,11 @@ Currently git is the only supported VCS.
 
 =head1 AUTHOR
 
-John SJ Anderson <genehack@genehack.org>
+John SJ Anderson <john@genehack.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by John SJ Anderson.
+This software is copyright (c) 2020 by John SJ Anderson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

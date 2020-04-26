@@ -7,7 +7,7 @@ require_ok 'Dist::Zilla::Plugin::Author::Plicease';
 require_ok 'Dist::Zilla::Plugin::Author::Plicease::Core';
 require_ok 'Dist::Zilla::Plugin::Author::Plicease::Init2';
 require_ok 'Dist::Zilla::Plugin::Author::Plicease::MakeMaker';
-require_ok 'Dist::Zilla::Plugin::Author::Plicease::MarkDownCleanup';
+require_ok 'Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod';
 require_ok 'Dist::Zilla::Plugin::Author::Plicease::NoUnsafeInc';
 require_ok 'Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs';
 require_ok 'Dist::Zilla::Plugin::Author::Plicease::Tests';

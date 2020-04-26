@@ -86,15 +86,19 @@ It's a command-line Unixish program, so of course it's far too configurable. Hap
 
 # Installation
 
+You can install Sweat as a stand-alone binary program, as a distribution of Perl software via the CPAN, or from source using the code found at this very repository.
+
+## Installing as a binary
+
+The latest binaries for macOS (Darwin) and Linux are available at Sweat's homepage: [https://jmac.org/sweat](https://jmac.org/sweat). Just download and run! (Noting, of course, any platform-specific caveats listed on that page.)
+
+## Installing from CPAN
+
 **First, make sure you have the `cpanm` program on your machine.** It is likely
 available as "cpanminus" in your favorite package manager. (Or install it from
 source, through the instructions at [http://cpanmin.us](http://cpanmin.us).)
 
-Then, choose one of the options below.
-
-## Installing the latest release
-
-Run this command:
+Then, run this command:
 
     cpanm Sweat
 
@@ -123,10 +127,9 @@ Or far more thorough instructions this way:
 
     man sweat
 
-# Notes
+# Issues and contributions
 
-This is this module's first release (or nearly so). It works for the
-author's own use-cases, but it's probably buggy beyond that. Please
+Please
 report issues at [the module's GitHub
 site](https://github.com/jmacdotorg/sweat). Code and documentation
 pull requests are very welcome!
@@ -142,7 +145,7 @@ Jason McIntosh (jmac@jmac.org)
 
 # Copyright and licence
 
-This software is Copyright (c) 2019 by Jason McIntosh.
+This software is Copyright (c) 2019-2020 by Jason McIntosh.
 
 This is free software, licensed under:
 

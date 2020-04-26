@@ -11,7 +11,7 @@ use Syntax::Construct qw( ?<> /a );
 
 use parent 'Authen::Passphrase';
 
-our $VERSION = '0.08';
+our $VERSION = '1.00';
 
 our (%salts, %hashes, @argons);
 BEGIN {
@@ -195,7 +195,7 @@ Authen::Passphrase::Argon2 - Store and check password using Argon2
 
 =head1 VERSION
 
-Version 0.08
+Version 1.00
 
 =cut
 
@@ -333,7 +333,7 @@ Check whether passphrases match.
 
 =head1 AUTHOR
 
-LNATION, C<< <thisusedtobeanemail at gmail.com> >>
+LNATION, C<< <email at lnation.org> >>
 
 =head1 BUGS
 
@@ -374,7 +374,7 @@ L<http://search.cpan.org/dist/Authen-Passphrase-Argon2/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 lnation.
+Copyright 2018->2020 lnation.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

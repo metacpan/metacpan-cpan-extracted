@@ -5,8 +5,8 @@ use base 'PDF::Builder::Content';
 use strict;
 use warnings;
 
-our $VERSION = '3.017'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.018'; # VERSION
+my $LAST_UPDATE = '3.018'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -37,6 +37,8 @@ Alias for C<text>. Implemented for symmetry, for those who use a lot of
 C<text_center> and C<text_right>, and desire a C<text_left>.
 
 Adds text to the page (left justified). 
+Note that there is no maximum width, and nothing to keep you from overflowing
+the physical page on the right!
 The width used (in points) is B<returned>.
 
 =back
@@ -67,7 +69,7 @@ The width used (in points) is B<returned>.
 sub text_center {
     my ($self, $text, @opts) = @_;
 
-    my $width = $self->advancewidth($text);
+    my $width = $self->advancewidth($text, @opts);
     return $self->text($text, -indent => -($width/2), @opts);
 }
 
@@ -80,6 +82,8 @@ sub text_center {
 As C<text>, but right-aligned to the current point.
 
 Adds text to the page (right justified). 
+Note that there is no maximum width, and nothing to keep you from overflowing
+the physical page on the left!
 The width used (in points) is B<returned>.
 
 =back
@@ -89,7 +93,7 @@ The width used (in points) is B<returned>.
 sub text_right {
     my ($self, $text, @opts) = @_;
 
-    my $width = $self->advancewidth($text);
+    my $width = $self->advancewidth($text, @opts);
     return $self->text($text, -indent => -$width, @opts);
 }
 
@@ -112,39 +116,56 @@ B<Options:>
 
 =over
 
+=item -nocs => value
+
+If this option value is 1 (default 0), do B<not> use any intercharacter
+spacing. This is useful for connected characters, such as fonts for Arabic,
+Devanagari, Latin cursive handwriting, etc. You don't want to add additional
+space between characters during justification, which would disconnect them.
+
+I<Word> (interword) spacing values (explicit or default) are doubled if
+-nocs is 1. This is to make up for the lack of added/subtracted intercharacter
+spacing.
+
 =item -wordsp => value
 
 The percentage of one space character (default 100) that is the maximum amount
 to add to (each) interword spacing to expand the line.
+If C<-nocs> is 1, double C<value>.
 
 =item -charsp => value
 
 If adding interword space didn't do enough, the percentage of one em (default 
 100) that is the maximum amount to add to (each) intercharacter spacing to 
 further expand the line.
+If C<-nocs> is 1, force C<value> to 0.
 
 =item -wordspa => value
 
 If adding intercharacter space didn't do enough, the percentage of one space
 character (default 100) that is the maximum I<additional> amount to add to 
 (each) interword spacing to further expand the line.
+If C<-nocs> is 1, double C<value>.
 
 =item -charspa => value
 
 If adding more interword space didn't do enough, the percentage of one em 
 (default 100) that is the maximum I<additional> amount to add to (each) 
 intercharacter spacing to further expand the line.
+If C<-nocs> is 1, force C<value> to 0.
 
 =item -condw => value
 
 The percentage of one space character (default 25) that is the maximum amount
 to subtract from (each) interword spacing to condense the line.
+If C<-nocs> is 1, double C<value>.
 
 =item -condc => value
 
 If removing interword space didn't do enough, the percentage of one em
 (default 10) that is the maximum amount to subtract from (each) intercharacter
 spacing to further condense the line.
+If C<-nocs> is 1, force C<value> to 0.
 
 =back
 
@@ -174,9 +195,18 @@ sub text_justified {
     my $condc = defined($opts{'-condc'})? $opts{'-condc'}: 10;
     # 7. if still short or long, hscale()
 
+    my $nocs = defined($opts{'-nocs'})? $opts{'-nocs'}: 0;
+    if ($nocs) {
+        $charsp = $charspa = $condc = 0;
+	$wordsp *= 2;
+	$wordspa *= 2;
+	$condw *= 2;
+    }
+
     # with original wordspace, charspace, and hscale settings
+    # note that we do NOT change any existing charspace here
     my $length = $self->advancewidth($text, %opts);
-    my $overage = $length - $width;
+    my $overage = $length - $width; # > 0, raw text is too wide, < 0, narrow
 
     my ($i, @chars, $val, $limit);
     my $hs = $self->hscale();   # save old settings and reset to 0
@@ -193,7 +223,7 @@ sub text_justified {
     my $num_chars = -1;
     @chars = split //, $text;
     for ($i=0; $i<scalar @chars; $i++) {
-	if ($chars[$i] eq ' ') { $num_spaces++; }
+	if ($chars[$i] eq ' ') { $num_spaces++; } # TBD other whitespace?
 	$num_chars++;  # count spaces as characters, too
     }
     my $em = $self->advancewidth('M');
@@ -202,7 +232,7 @@ sub text_justified {
     if ($overage > 0) {
 	# too wide: need to condense it
 	# 1. subtract from interword space, up to -$condw/100 $sp
-	if ($overage > 0 && $num_spaces > 0) {
+	if ($overage > 0 && $num_spaces > 0 && $condw > 0) {
 	    $val = $overage/$num_spaces;
 	    $limit = $condw/100*$sp;
 	    if ($val > $limit) { $val = $limit; }
@@ -210,7 +240,7 @@ sub text_justified {
 	    $overage -= $val*$num_spaces;
 	}
 	# 2. subtract from intercharacter space, up to -$condc/100 $em
-	if ($overage > 0 && $num_chars > 0) {
+	if ($overage > 0 && $num_chars > 0 && $condc > 0) {
 	    $val = $overage/$num_chars;
 	    $limit = $condc/100*$em;
 	    if ($val > $limit) { $val = $limit; }
@@ -222,7 +252,7 @@ sub text_justified {
 	# too narrow: need to expand it (usual case)
 	$overage = -$overage; # working with positive value is easier
 	# 1. add to interword space, up to $wordsp/100 $sp
-	if ($overage > 0 && $num_spaces > 0) {
+	if ($overage > 0 && $num_spaces > 0 && $wordsp > 0) {
 	    $val = $overage/$num_spaces;
 	    $limit = $wordsp/100*$sp;
 	    if ($val > $limit) { $val = $limit; }
@@ -230,7 +260,7 @@ sub text_justified {
 	    $overage -= $val*$num_spaces;
 	}
 	# 2. add to intercharacter space, up to $charsp/100 $em
-	if ($overage > 0 && $num_chars > 0) {
+	if ($overage > 0 && $num_chars > 0 && $charsp > 0) {
 	    $val = $overage/$num_chars;
 	    $limit = $charsp/100*$em;
 	    if ($val > $limit) { $val = $limit; }
@@ -238,7 +268,7 @@ sub text_justified {
 	    $overage -= $val*$num_chars;
 	}
 	# 3. add to interword space, up to $wordspa/100 $sp additional
-	if ($overage > 0 && $num_spaces > 0) {
+	if ($overage > 0 && $num_spaces > 0 && $wordspa > 0) {
 	    $val = $overage/$num_spaces;
 	    $limit = $wordspa/100*$sp;
 	    if ($val > $limit) { $val = $limit; }
@@ -246,7 +276,7 @@ sub text_justified {
 	    $overage -= $val*$num_spaces;
 	}
 	# 4. add to intercharacter space, up to $charspa/100 $em additional
-	if ($overage > 0 && $num_chars > 0) {
+	if ($overage > 0 && $num_chars > 0 && $charspa > 0) {
 	    $val = $overage/$num_chars;
 	    $limit = $charspa/100*$em;
 	    if ($val > $limit) { $val = $limit; }
@@ -259,8 +289,8 @@ sub text_justified {
     # last ditch effort to fill the line: use hscale()
     # temporarily resets hscale to expand width of line to match $width
     # wordspace and charspace are already (temporarily) at max/min
-    if ($overage > 0) {
-        $self->hscale(100*($width/$self->advancewidth($text)));
+    if ($overage > 0.1) {
+        $self->hscale(100*($width/$self->advancewidth($text, %opts)));
     }
 
     } # original $overage was not near 0
@@ -367,7 +397,7 @@ sub _text_fill_line {
 	 $lastWord = shift @txt;  # preserve any SHYs in the word
          push @line, (_removeSHY($lastWord));
 	 # one space between each element of line, like join(' ', @line)
-         $overflowed = $self->advancewidth("@line") > $width;
+         $overflowed = $self->advancewidth("@line", %opts) > $width;
 	 last if $overflowed;
     }
     # if overflowed, and overflow not allowed, remove the last word added, 
@@ -402,7 +432,7 @@ sub _text_fill_line {
 	if (@line) {
 	    # line not empty. $space is width for word fragment, not
 	    # including blank after previous last word of @line.
-	    $space = $width - $self->advancewidth("@line ");
+	    $space = $width - $self->advancewidth("@line ", %opts);
 	} else {
 	    # line empty (first word too long, and we can try hyphenating).
 	    # $space is entire $width available for left fragment.
@@ -599,8 +629,9 @@ are B<returned>.
 
 Note that the entire line is fit to the available 
 width via a call to C<text_justified>. 
-The last line is unjustified (normal size) and left aligned by default, although
-the option
+See C<text_justified> for options to control stretch and condense.
+The last line is unjustified (normal size) and left aligned by default, 
+although the option
 
 B<Options:>
 
@@ -625,14 +656,14 @@ sub text_fill_justified {
 	if    ($opts{'-last_align'} =~ m/^l/i) { $align = 'l'; }
 	elsif ($opts{'-last_align'} =~ m/^c/i) { $align = 'c'; }
 	elsif ($opts{'-last_align'} =~ m/^r/i) { $align = 'r'; }
-	else { die "Unknown -last_align for justified fill\n"; }
+	else { warn "Unknown -last_align for justified fill, 'left' used\n"; }
     }
 
     my $over = (not(defined($opts{'-spillover'}) and $opts{'-spillover'} == 0));
     my ($line, $ret) = $self->_text_fill_line($text, $width, $over, %opts);
     # if last line, use $align (don't justify)
     if ($ret eq '') {
-	my $lw = $self->advancewidth($line);
+	my $lw = $self->advancewidth($line, %opts);
 	if      ($align eq 'l') {
 	    $width = $self->text($line, %opts);
 	} elsif ($align eq 'c') {
@@ -682,6 +713,8 @@ for paragraph first lines). This setting is ignored for centered text.
 =item -align => $choice
 
 C<$choice> is 'justified', 'right', 'center', 'left'; the default is 'left'.
+See C<text_justified> call for options to control how a line is expanded or
+condensed if C<$choice> is 'justified'.
 
 =item -underline => $distance
 
@@ -719,7 +752,7 @@ fit to a given width, and nothing is done for "widows and orphans".
 =cut
 
 # TBD for LTR languages, does indenting on left make sense for right justified?
-# TBD for bidi languages, should indenting be on right?
+# TBD for bidi/RTL languages, should indenting be on right?
 
 sub paragraph {
     my ($self, $text, $width,$height, $continue, %opts) = @_;
@@ -733,7 +766,7 @@ sub paragraph {
 	elsif ($opts{'-align'} =~ /^c/i) { $align = 'c'; }
 	elsif ($opts{'-align'} =~ /^r/i) { $align = 'r'; }
 	elsif ($opts{'-align'} =~ /^j/i) { $align = 'j'; }
-	else { die "Unknown -align value for paragraph()\n"; }
+	else { warn "Unknown -align value for paragraph(), 'left' used\n"; }
     } # default stays at 'l'
     my $indent = defined($opts{'-pndnt'})? $opts{'-pndnt'}: 0;
     if ($align eq 'c') { $indent = 0; } # indent/outdent makes no sense centered

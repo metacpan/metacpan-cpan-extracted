@@ -151,3 +151,9 @@ Revision history for Control-CLI
 	  a password on connection
 	* Optimized stripLastLine() to use correct and more efficient regex \z assertion
 	* SSH errors originating from known_hosts verification were not not prepended with the Control::CLI method
+
+2.09	2020-04-25
+	* The report_query_status functionality was caching partial escape sequences even if they did not exactly
+	  match a Query Device Status escape sequence, and this could result in some escape sequences being withheld
+	  from read() attepts if they appeared at the end of host output. Now the caching is only performed if an
+	  escape sequence is found to be an exact partial match of the Query Device Status escape sequence (\e[5n) 

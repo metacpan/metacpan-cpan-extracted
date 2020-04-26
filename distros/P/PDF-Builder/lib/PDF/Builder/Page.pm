@@ -5,7 +5,7 @@ use base 'PDF::Builder::Basic::PDF::Pages';
 use strict;
 use warnings;
 
-our $VERSION = '3.017'; # VERSION
+our $VERSION = '3.018'; # VERSION
 my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
 
 use POSIX qw(floor);
@@ -372,6 +372,10 @@ E.g., a rotation of +90 (or -270) will have the bottom edge of the paper at
 the left of the screen.
 
 (This allows you to auto-rotate to landscape without changing the mediabox!)
+
+Do not confuse this C<rotate()> call with the I<graphics context> rotation 
+(Content.pm) C<rotate()>, which permits any angle, is of opposite direction, 
+and does not shift the origin!
 
 =cut
 

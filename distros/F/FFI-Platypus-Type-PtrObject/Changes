@@ -1,0 +1,9 @@
+Revision history for FFI-Platypus-Type-PtrObject},
+
+0.02      2020-04-24 13:43:19 -0600
+  - Convert NULL => undef for return from C land (gh#2)
+
+0.01      2020-04-24 12:39:40 -0600
+  - initial version
+
+

@@ -13,12 +13,19 @@ use JSON::XS ();
 use YAML::XS ();
 use POSIX ();
 
-our $VERSION = '1.11'; # VERSION
+our $VERSION = '1.12'; # VERSION
 
 $Carp::Internal{ (__PACKAGE__) }++;
 
 sub _location {
     return $ENV{CONFIGAPPINIT} || 'config/app.yaml';
+}
+
+sub _add_to_inc {
+    my ( $root_dir, @libs ) = @_;
+    for my $lib ( map { $root_dir . '/' . $_ } @libs ) {
+        unshift( @INC, $lib ) unless ( grep { $_ eq $lib } @INC );
+    }
 }
 
 sub import {
@@ -37,7 +44,7 @@ sub import {
         }
     }
 
-    unshift( @INC, $root_dir . "/$_" ) for ( @libs || 'lib' );
+    _add_to_inc( $root_dir, ( @libs || 'lib' ) );
 
     my $error = do {
         local $@;
@@ -71,10 +78,10 @@ sub import {
         $singleton = $self unless ($no_singleton);
 
         if ( my $libs = $self->get('libs') ) {
-            $libs        = [$libs] if ( ref $libs ne 'ARRAY' );
-            my $root_dir = $self->get( qw( config_app root_dir ) );
-
-            unshift( @INC, $root_dir . "/$_" ) for (@$libs);
+            _add_to_inc(
+                $self->get( qw( config_app root_dir ) ),
+                ( ref $libs eq 'ARRAY' ) ? @$libs : $libs,
+            );
         }
 
         return $self;
@@ -139,6 +146,19 @@ sub _location_fetch {
 
     my $set = _parse_config( $raw_config, $location, @source_path );
 
+    my $location_fetch = sub { _location_fetch( $box, $user, $env, $conf, $_[0], $location, @source_path ) };
+    my $fetch_block    = sub {
+        my $include  = ( ( $_[0] ) ? 'pre' : '' ) . 'include';
+        my $optional = 'optional_' . $include;
+
+        $location_fetch->( $set->{$include}               ) if ( $set->{$include}   );
+        $location_fetch->( delete( $conf->{$include} )    ) if ( $conf->{$include}  );
+        $location_fetch->( \$set->{$optional}             ) if ( $set->{$optional}  );
+        $location_fetch->( \ delete( $conf->{$optional} ) ) if ( $conf->{$optional} );
+    };
+
+    $fetch_block->(1);
+
     _merge_settings( $conf, $_ ) for (
         grep { defined } (
             map {
@@ -157,19 +177,7 @@ sub _location_fetch {
         )
     );
 
-    _location_fetch( $box, $user, $env, $conf, $set->{include}, $location, @source_path )
-        if ( $set->{include} );
-
-    _location_fetch( $box, $user, $env, $conf, delete( $conf->{include} ), $location, @source_path )
-        if ( $conf->{include} );
-
-    _location_fetch( $box, $user, $env, $conf, \$set->{optional_include}, $location, @source_path )
-        if ( $set->{optional_include} );
-
-    if ( $conf->{optional_include} ) {
-        my $optional_include = delete( $conf->{optional_include} );
-        _location_fetch( $box, $user, $env, $conf, \$optional_include, $location, @source_path );
-    }
+    $fetch_block->();
 
     return;
 }
@@ -295,13 +303,29 @@ sub _find_root_dir {
 }
 
 sub _merge_settings {
-    my ( $merge, $source ) = @_;
+    my ( $merge, $source, $is_deep_call ) = @_;
     return unless $source;
+
+    if ( not $is_deep_call and ref $merge eq 'HASH' and ref $source eq 'HASH' ) {
+        if ( my $libs = delete $source->{libs} ) {
+            if ( not exists $merge->{libs} ) {
+                $merge->{libs} = $libs;
+            }
+            elsif ( ref $merge->{libs} eq 'ARRAY' ) {
+                my %libs = map { $_ => 1 } @{ $merge->{libs} }, ( ref $libs eq 'ARRAY' ) ? @$libs : $libs;
+                $merge->{libs} = [ sort keys %libs ];
+            }
+            else {
+                my %libs = map { $_ => 1 } $merge->{libs}, ( ref $libs eq 'ARRAY' ) ? @$libs : $libs;
+                $merge->{libs} = [ sort keys %libs ];
+            }
+        }
+    }
 
     if ( ref $merge eq 'HASH' ) {
         for my $key ( keys %{$source} ) {
             if ( exists $merge->{$key} and ref $merge->{$key} eq 'HASH' and ref $source->{$key} eq 'HASH' ) {
-                _merge_settings( $merge->{$key}, $source->{$key} );
+                _merge_settings( $merge->{$key}, $source->{$key}, 1 );
             }
             else {
                 $merge->{$key} = _clone( $source->{$key} );
@@ -329,7 +353,7 @@ Config::App - Cascading merged application configuration
 
 =head1 VERSION
 
-version 1.11
+version 1.12
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Config-App.svg)](https://travis-ci.org/gryphonshafer/Config-App)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Config-App/badge.png)](https://coveralls.io/r/gryphonshafer/Config-App)
@@ -448,6 +472,15 @@ Normally, if you "include" a location that doesn't exist, you'll get an error.
 However, if you replace the "include" key word with "optional_include", then
 the location will be included if it exists and silently bypassed if it doesn't
 exist.
+
+=head3 Pre-Including Configuration Files
+
+When you "include" or "optional_include" configuration files, the included file
+or files are included after reading of the current or source configuration file.
+Thus, any data in included files will overwrite data in the current or source
+configuration file. If you want this reversed, with data in the current or
+source configuration file  overwriting data in any included files, use
+"preinclude" and "optional_preinclude" respectively.
 
 =head2 Configuration File Finding
 
@@ -635,15 +668,7 @@ L<GitHub|https://github.com/gryphonshafer/Config-App>
 
 =item *
 
-L<CPAN|http://search.cpan.org/dist/Config-App>
-
-=item *
-
 L<MetaCPAN|https://metacpan.org/pod/Config::App>
-
-=item *
-
-L<AnnoCPAN|http://annocpan.org/dist/Config-App>
 
 =item *
 
@@ -669,7 +694,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Gryphon Shafer.
+This software is copyright (c) 2020 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

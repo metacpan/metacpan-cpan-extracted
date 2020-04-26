@@ -1,5 +1,12 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.46      2020-04-25 17:55:13 -0600
+  - Removed .appveyor.yml from init2 template
+  - Added [Author::Plicease::ReadmeAnyFromPod] to work around
+    rt-129865 regression.
+  - Removed [Author::Plicease::MarkDownCleanup] (functionality was moved
+    into [Author::Plicease::ReadmeAnyFromPod]
+
 2.45      2020-04-02 11:11:08 -0600
   - Fixed default macos and windows workflows.
 

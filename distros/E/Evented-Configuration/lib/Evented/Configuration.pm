@@ -1,4 +1,4 @@
-# Copyright (c) 2017, Mitchell Cooper
+# Copyright (c) 2020, Mitchell Cooper
 #
 # Evented::Configuration:
 #
@@ -41,7 +41,7 @@ use parent 'Evented::Object';
 use Scalar::Util qw(blessed);
 use File::Basename qw(dirname);
 
-our $VERSION = '4.02';
+our $VERSION = '4.03';
 
 my ($true, $false) = (1, 0);
 sub on  () { state $on  = bless \$true,  'Evented::Configuration::Boolean' }
@@ -102,8 +102,8 @@ sub parse_config {
                 my $sconf = __PACKAGE__->new(conffile => $sfile);
                 
                 # error?
-                my ($ok, $err) = $sconf->parse_config;
-                return $err->($., "include error: $err") if !$ok;
+                my ($ok, $err_msg) = $sconf->parse_config;
+                return $err->($., "include error: $err_msg") if !$ok;
                 
                 # inject
                 for my $sblock (keys %{ $sconf->{conf} }) {

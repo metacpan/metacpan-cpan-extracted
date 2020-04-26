@@ -1,5 +1,4 @@
-use Test2::V0;
-use Test2::Plugin::DieOnFail;
+use Test::More;
 use Modern::Perl;
 use Util::Medley::List;
 use Data::Printer alias => 'pdump';
@@ -46,7 +45,7 @@ my @have   = ( 'a', 'b', 'c', undef );
 my @expect = ( 'a', 'b', 'c', '' );
 
 my $aref = $list->undefsToStrings( \@have );
-is( \@expect, $aref );
+is_deeply( \@expect, $aref );
 
 #####################################
 # uniq

@@ -326,16 +326,21 @@ refspecs(self)
 		count = git_remote_refspec_count(remote_ptr -> remote);
 
 		for (i = 0; i < count; ++i) {
-			const git_refspec *refspec;
+			RefSpec spec;
+			const git_refspec *s;
 			SV *tmp;
 
-			refspec = git_remote_get_refspec(
+			s = git_remote_get_refspec(
 				remote_ptr -> remote,
 				i
 			);
 
+			Newxz(spec, 1, git_raw_refspec);
+			spec -> refspec = (git_refspec *)s;
+			spec -> owned = 0;
+
 			GIT_NEW_OBJ_WITH_MAGIC(
-				tmp, "Git::Raw::RefSpec", (git_refspec *) refspec, SvRV(self)
+				tmp, "Git::Raw::RefSpec", spec, SvRV(self)
 			);
 
 			mXPUSHs(tmp);
@@ -360,6 +365,8 @@ fetch(self, ...)
 		int rc;
 
 		git_fetch_options fetch_opts = GIT_FETCH_OPTIONS_INIT;
+		git_strarray specs = {NULL, 0};
+		git_strarray *refspecs = NULL;
 
 	CODE:
 		if (items >= 2) {
@@ -367,9 +374,20 @@ fetch(self, ...)
 			git_hv_to_fetch_opts(opts, &fetch_opts);
 		}
 
-		rc = git_remote_fetch(self -> remote, NULL,
+		if (items >= 3) {
+			git_list_to_paths(
+				git_ensure_av(ST(2), "refspecs"),
+				&specs
+			);
+			refspecs = &specs;
+		}
+
+		rc = git_remote_fetch(self -> remote, refspecs,
 			&fetch_opts, NULL
 		);
+		if (refspecs) {
+			Safefree(specs.strings);
+		}
 		git_check_error(rc);
 
 void
@@ -449,6 +467,8 @@ download(self, ...)
 		int rc;
 
 		git_fetch_options fetch_opts = GIT_FETCH_OPTIONS_INIT;
+		git_strarray specs = {NULL, 0};
+		git_strarray *refspecs = NULL;
 
 	CODE:
 		if (items >= 2) {
@@ -456,9 +476,20 @@ download(self, ...)
 			git_hv_to_fetch_opts(opts, &fetch_opts);
 		}
 
-		rc = git_remote_download(self -> remote, NULL,
+		if (items >= 3) {
+			git_list_to_paths(
+				git_ensure_av(ST(2), "refspecs"),
+				&specs
+			);
+			refspecs = &specs;
+		}
+
+		rc = git_remote_download(self -> remote, refspecs,
 			&fetch_opts
 		);
+		if (refspecs) {
+			Safefree(specs.strings);
+		}
 		git_check_error(rc);
 
 void

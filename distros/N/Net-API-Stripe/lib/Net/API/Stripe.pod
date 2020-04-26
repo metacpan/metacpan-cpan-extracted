@@ -7,60 +7,60 @@ Net::API::Stripe - An interface to Stripe API
 =head1 SYNOPSIS
 
     my $stripe = Net::API::Stripe->new({
-		debug => 3,
-		conf_file => './stripe-settings.json',
-		livemode => 0,
-		ignore_unknown_parameters => 1,
-		expand => 'all',
+        debug => 3,
+        conf_file => './stripe-settings.json',
+        livemode => 0,
+        ignore_unknown_parameters => 1,
+        expand => 'all',
     }) || die( Net::API::Stripe->error );
 
 A Stripe json settings file looks like this:
 
-	{
-		"livemode": false,
-		"test_secret_key": "sk_test_1234567890abcdefg",
-		"test_public_key": "pk_test_1234567890abcdefg",
-		"live_secret_key": "sk_live_0987654321zyxwvut",
-		"live_public_key": "pk_live_0987654321zyxwvut",
-		"version": "2020-03-02",
-	}
+    {
+        "livemode": false,
+        "test_secret_key": "sk_test_1234567890abcdefg",
+        "test_public_key": "pk_test_1234567890abcdefg",
+        "live_secret_key": "sk_live_0987654321zyxwvut",
+        "live_public_key": "pk_live_0987654321zyxwvut",
+        "version": "2020-03-02",
+    }
 
 Create a customer:
 
-	# Create an address object
-	my $addr;
-	if( $v->{street} || $v->{city} || $v->{postal_code} || $v->{country} )
-	{
-		$addr = $stripe->address({
-			line1 => $v->{street},
-			line2 => $v->{building},
-			city => $v->{city},
-			postal_code => $v->{postal_code},
-			state => $v->{state},
-			country => $v->{country},
-		}) || bailout( "Unable to create a postal address object: ", $stripe->error );
-	}
-	my $cust_object = $stripe->customer({
-	    balance => 20000,
-	    address => $addr,
-	    # Must be set up previously before using it
-	    coupon => '2020DISCOUNT50',
-	    # Japanese Yen
-	    currency => 'jpy',
-	    description => 'VIP customer',
-	    email => 'john@example.com',
-	    invoice_prefix => 'VIP',
-	    # Default payment must be set up beforehand for it to be declared here
-	    invoice_settings => { default_payment_method => 'pm_fake1234567' },
-	    metadata => { db_id => 123, process_id => 456 },
-	    name => 'John Doe',
-	    phone => '+81-90-1234-5678',
-	    preferred_locales => [qw( en ja )],
-	    shipping => $addr,
-	});
+    # Create an address object
+    my $addr;
+    if( $v->{street} || $v->{city} || $v->{postal_code} || $v->{country} )
+    {
+        $addr = $stripe->address({
+            line1 => $v->{street},
+            line2 => $v->{building},
+            city => $v->{city},
+            postal_code => $v->{postal_code},
+            state => $v->{state},
+            country => $v->{country},
+        }) || bailout( "Unable to create a postal address object: ", $stripe->error );
+    }
+    my $cust_object = $stripe->customer({
+        balance => 20000,
+        address => $addr,
+        # Must be set up previously before using it
+        coupon => '2020DISCOUNT50',
+        # Japanese Yen
+        currency => 'jpy',
+        description => 'VIP customer',
+        email => 'john@example.com',
+        invoice_prefix => 'VIP',
+        # Default payment must be set up beforehand for it to be declared here
+        invoice_settings => { default_payment_method => 'pm_fake1234567' },
+        metadata => { db_id => 123, process_id => 456 },
+        name => 'John Doe',
+        phone => '+81-90-1234-5678',
+        preferred_locales => [qw( en ja )],
+        shipping => $addr,
+    });
 
-	# Submit this customer to Stripe for creation
-	my $cust = $stripe->customers( create => $cust_object ) || die( sprintf( "Failed with error message %s and code %d\n", $stripe->error->message, $stripe->error->code );
+    # Submit this customer to Stripe for creation
+    my $cust = $stripe->customers( create => $cust_object ) || die( sprintf( "Failed with error message %s and code %d\n", $stripe->error->message, $stripe->error->code ) );
 
 Retrieve customer:
 
@@ -68,25 +68,25 @@ Retrieve customer:
     # or we can also pass a customer object
     my $cust = $stripe->customers( retrieve => $cust_object ) || do
     {
-    	if( $stripe->http_response->code == 404 )
-    	{
-    		die( "Customer ", $cust_object->id, " does not exist!\n" );
-    	}
-    	else
-    	{
-    		die( "Some unexpected error occurred: ", $stripe->error, "\n" );
-    	}
+        if( $stripe->http_response->code == 404 )
+        {
+            die( "Customer ", $cust_object->id, " does not exist!\n" );
+        }
+        else
+        {
+            die( "Some unexpected error occurred: ", $stripe->error, "\n" );
+        }
     };
 
 Other methods are describe below and the parameters they take are documented in their respective module.    
 
 =head1 VERSION
 
-    v0.9
+    v1.0
 
 =head1 DESCRIPTION
 
-This is a comprehensive Stripe API. It provides an object oriented friendly interface for which I put a lot of hard word so you could spend your time on other aspects of your development.
+This is a comprehensive Stripe API. It provides an object oriented friendly interface for which I put a lot of hard work so you could spend your time on other aspects of your development.
 
 It inherits from L<Module::Generic> and L<Net::API::Stripe> sub modules inherits from L<Net::API::Stripe::Generic>
 
@@ -99,25 +99,43 @@ It may also take an hash like arguments, that also are method of the same name.
 
 =over 4
 
-=item I<api_uri> The base uri of the Stripe API. This should not be changed.
+=item I<api_uri>
 
-=item I<browser> The user agent id to use when making http api calls
+The base uri of the Stripe API. This should not be changed.
 
-=item I<conf_file> The file path to the configuration file. Each property in this configuration file is same as the parameters to instantiate a new L<Net::API::Stripe> object.
+=item I<browser>
 
-=item I<debug> Toggles debug mode on/off
+The user agent id to use when making http api calls
 
-=item I<expand> Integer. Sets the depth level of expansion of Stripe objects. If objects are not expanded, Stripe API will return the object id, but when they are expanded, Stripe returns the entire object and its properties. Youc an then chain your code and do something like:
+=item I<conf_file>
+
+The file path to the configuration file. Each property in this configuration file is same as the parameters to instantiate a new L<Net::API::Stripe> object.
+
+=item I<debug>
+
+Toggles debug mode on/off
+
+=item I<expand>
+
+Integer. Sets the depth level of expansion of Stripe objects. If objects are not expanded, Stripe API will return the object id, but when they are expanded, Stripe returns the entire object and its properties. Youc an then chain your code and do something like:
 
     print $cust->invoice_settings->default_payment_method->type
 
-=item I<ignore_unknown_parameters> Boolean. When this is on, this will ignore any properties sent back from Stripe API that are unknown to us. This happens frequently as Stripe updates its API. When this value is set to false, then unknown properties will cause this to stop processing and return an error.
+=item I<ignore_unknown_parameters>
 
-=item I<livemode> Boolean value to toggle test or live mode
+Boolean. When this is on, this will ignore any properties sent back from Stripe API that are unknown to us. This happens frequently as Stripe updates its API. When this value is set to false, then unknown properties will cause this to stop processing and return an error.
 
-=item I<verbose> Toggles verbose mode on/off
+=item I<livemode>
 
-=item I<version> The version of the Stripe API to use. Example C<2020-03-02>
+Boolean value to toggle test or live mode
+
+=item I<verbose>
+
+Toggles verbose mode on/off
+
+=item I<version>
+
+The version of the Stripe API to use. Example C<2020-03-02>
 
 =back
 
@@ -374,15 +392,15 @@ Provided with optional hash parameters, this returns a L<Net::API::Stripe::Billi
 
 =head2 post( END POINT, HASH PAYLOAD )
 
-Given a Stripe end point absolute uri and a hash reference, this will issue a C<POST> http request to the Stripe api and return a hash reference representing the object provided by Stripe or undef with an error set, which can be retrieved using the B<error> method.
+Given a Stripe end point absolute uri and a hash reference, this will issue a C<POST> http request to the Stripe api and return a hash reference representing the object provided by Stripe or undef with an error set, which can be retrieved using the L</"error"> method.
 
 If no I<idempotency> parameter was provided, B<post> will automatically create one.
 
 =head2 post_multipart( END POINT, HASH PAYLOAD )
 
-Given a Stripe end point absolute uri and a hash reference, this will issue a C<POST> multipart http request to the Stripe api and return a hash reference representing the object returned by Stripe. If an error had occurred, it will return undef and set an error that can be retrieved using the B<error> method.
+Given a Stripe end point absolute uri and a hash reference, this will issue a C<POST> multipart http request to the Stripe api and return a hash reference representing the object returned by Stripe. If an error had occurred, it will return undef and set an error that can be retrieved using the L</"error"> method.
 
-This method is used primarily when upload file. See the section below on C</"FILES">
+This method is used primarily when upload file. See the section below on L</"FILES">
 
 =head2 product
 
@@ -506,7 +524,7 @@ Provided a C<balance> object or an id, this returns a L<Net::API::Stripe::Balanc
 
 =head2 ERROR HANDLING
 
-L<Net::API::Stripe> never dies, or at least not voluntarily. Instead, when an error occurs and is reported, it returns undef and the error can be retrieved with the B<error> method, such as:
+L<Net::API::Stripe> never dies, or at least not voluntarily. Instead, when an error occurs and is reported, it returns undef and the error can be retrieved with the L</"error"> method, such as:
 
     my $prod = $stripe->products( retrieve => $prod_id ) || die( $stripe->error, "\n" );
 
@@ -563,7 +581,7 @@ Everywhere Stripe returns a date or datetime, L<Net::API::Stripe> will return a 
 When a number is returned by Stripe, L<Net::API::Stripe> will return a L<Net::API::Stripe::Number>, so one could call the method representing a number like this:
 
     printf( "Charge was %s\n", $charge->amount->format_money( 2, '€' ) );
-	# Assuming the charge amount is 100, this would produce: €100.00
+    # Assuming the charge amount is 100, this would produce: €100.00
 
 =head2 API ACCESS METHODS
 
@@ -592,9 +610,9 @@ You can B<retrieve> or B<list> the balance transactions.
 This can take various parameter to influence the list of data returned by Stripe. It returns a L<Net::API::Stripe::List> object of L<Net::API::Stripe::Balance::Transaction> objects. Valid parameters are as follows. See Stripe API for more information: L<https://stripe.com/docs/api/balance_transactions/list>
 
     my $list = $stripe->balance_transactions( 'list' ) || die( $stripe->error );
-	while( my $bt = $list->next )
-	{
-		printf( <<EOT, $bt->id, $bt->amount, $bt->created->iso8601, $bt->currency, $bt->customer->name, $bt->description );
+    while( my $bt = $list->next )
+    {
+        printf( <<EOT, $bt->id, $bt->amount, $bt->created->iso8601, $bt->currency, $bt->customer->name, $bt->description );
 Id: %s
 Amount: %s
 Created on: $s
@@ -602,7 +620,7 @@ Currency: %s
 Cusomer name: %s
 Description: %s
 EOT
-	}
+    }
 
 Possible parameters are:
 
@@ -612,11 +630,17 @@ Possible parameters are:
 
 =item I<created>
 
-=item I<currency> 3-letter iso 4217 currency
+=item I<currency>
 
-=item I<ending_before> Stripe balance transaction id
+3-letter iso 4217 currency
 
-=item I<limit> Integer
+=item I<ending_before>
+
+Stripe balance transaction id
+
+=item I<limit>
+
+Integer
 
 =item I<payout>
 
@@ -624,7 +648,9 @@ Possible parameters are:
 
 =item I<starting_after>
 
-=item I<type> Only returns transactions of the given type
+=item I<type>
+
+Only returns transactions of the given type
 
 =back
 
@@ -644,7 +670,9 @@ Possible parameters are:
 
 =over 4
 
-=item I<account> A Stripe account id. This is required.
+=item I<account>
+
+A Stripe account id. This is required.
 
 =item I<external_account> This is required. Either a token, like the ones returned by Stripe.js, or a hash reference containing a user’s bank account details with the following properties:
 
@@ -668,7 +696,9 @@ Possible parameters are:
 
 =item I<default_for_currency> Boolean
 
-=item I<metadata> An arbitrary hash reference
+=item I<metadata>
+
+An arbitrary hash reference
 
 =back
 
@@ -682,9 +712,13 @@ Possible parameters are:
 
 =over 4
 
-=item I<id> A Stripe bank account id. This is required.
+=item I<id>
 
-=item I<account> A Stripe account id. This is required.
+A Stripe bank account id. This is required.
+
+=item I<account>
+
+A Stripe account id. This is required.
 
 =back
 
@@ -698,9 +732,13 @@ Possible parameters are:
 
 =over 4
 
-=item I<id> A Stripe bank account id. This is required.
+=item I<id>
 
-=item I<account> A Stripe account id. This is required.
+A Stripe bank account id. This is required.
+
+=item I<account>
+
+A Stripe account id. This is required.
 
 =item I<account_holder_name> String
 
@@ -708,7 +746,9 @@ Possible parameters are:
 
 =item I<default_for_currency> Boolean
 
-=item I<metadata> An arbitrary hash reference
+=item I<metadata>
+
+An arbitrary hash reference
 
 =back
 
@@ -722,9 +762,13 @@ Possible parameters are:
 
 =over 4
 
-=item I<id> A Stripe bank account id. This is required.
+=item I<id>
 
-=item I<account> A Stripe account id. This is required.
+A Stripe bank account id. This is required.
+
+=item I<account>
+
+A Stripe account id. This is required.
 
 =back
 
@@ -738,7 +782,9 @@ Possible parameters are:
 
 =over 4
 
-=item I<account> A Stripe account id. This is required.
+=item I<account>
+
+A Stripe account id. This is required.
 
 =back
 
@@ -756,9 +802,13 @@ Possible parameters are:
 
 =over 4
 
-=item I<id> A customer id
+=item I<id>
 
-=item I<source> A hash reference with the following properties: object number exp_month exp_year cvc currency name metadata default_for_currency address_line1 address_line2 address_city address_state address_zip address_country
+A customer id
+
+=item I<source>
+
+A hash reference with the following properties: object number exp_month exp_year cvc currency name metadata default_for_currency address_line1 address_line2 address_city address_state address_zip address_country
 
 =item I<metadata> An arbitrary hash reference
 
@@ -772,9 +822,13 @@ Possible parameters are:
 
 =over 4
 
-=item I<id> Stripe card id
+=item I<id>
 
-=item I<customer> Stripe customer id
+Stripe card id
+
+=item I<customer>
+
+Stripe customer id
 
 =back
 
@@ -786,29 +840,51 @@ Possible parameters are:
 
 =over 4
 
-=item I<id> Stripe card id
+=item I<id>
 
-=item I<customer> Stripe customer id
+Stripe card id
+
+=item I<customer>
+
+Stripe customer id
 
 =item I<address_city> City
 
-=item I<address_country> Country as 2-letters ISO 3166 country code
+=item I<address_country>
 
-=item I<address_line1> Address first line
+Country as 2-letters ISO 3166 country code
 
-=item I<address_line2> Address second line
+=item I<address_line1>
 
-=item I<address_state> State / region
+Address first line
 
-=item I<address_zip> Postal code
+=item I<address_line2>
 
-=item I<exp_month> Expiration month
+Address second line
 
-=item I<exp_year> Expiration year
+=item I<address_state>
 
-=item I<metadata> Arbitrary hash reference
+State / region
 
-=item I<name> Name for this credit card
+=item I<address_zip>
+
+Postal code
+
+=item I<exp_month>
+
+Expiration month
+
+=item I<exp_year>
+
+Expiration year
+
+=item I<metadata>
+
+Arbitrary hash reference
+
+=item I<name>
+
+Name for this credit card
 
 =back
 
@@ -820,9 +896,13 @@ Possible parameters are:
 
 =over 4
 
-=item I<id> Stripe customer id
+=item I<id>
 
-=item I<card_id> Stripe card id
+Stripe customer id
+
+=item I<card_id>
+
+Stripe card id
 
 =back
 
@@ -834,9 +914,13 @@ Possible parameters are:
 
 =over 4
 
-=item I<id> Stripe customer id
+=item I<id>
 
-=item I<ending_before> A card id
+Stripe customer id
+
+=item I<ending_before>
+
+A card id
 
 =item I<limit> Integer
 
@@ -3042,34 +3126,34 @@ For more information, see Stripe documentation here: L<https://stripe.com/docs/a
 
 =head1 API SAMPLE
 
-	{
-	  "object": "balance",
-	  "available": [
-		{
-		  "amount": 0,
-		  "currency": "jpy",
-		  "source_types": {
-			"card": 0
-		  }
-		}
-	  ],
-	  "connect_reserved": [
-		{
-		  "amount": 0,
-		  "currency": "jpy"
-		}
-	  ],
-	  "livemode": false,
-	  "pending": [
-		{
-		  "amount": 7712,
-		  "currency": "jpy",
-		  "source_types": {
-			"card": 7712
-		  }
-		}
-	  ]
-	}
+    {
+      "object": "balance",
+      "available": [
+        {
+          "amount": 0,
+          "currency": "jpy",
+          "source_types": {
+            "card": 0
+          }
+        }
+      ],
+      "connect_reserved": [
+        {
+          "amount": 0,
+          "currency": "jpy"
+        }
+      ],
+      "livemode": false,
+      "pending": [
+        {
+          "amount": 7712,
+          "currency": "jpy",
+          "source_types": {
+            "card": 7712
+          }
+        }
+      ]
+    }
 
 =head1 HISTORY
 

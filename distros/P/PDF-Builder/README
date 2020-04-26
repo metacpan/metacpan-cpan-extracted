@@ -37,6 +37,8 @@ Libraries used, available from CPAN --
  OPTIONAL, install manually if wanted...
   Graphics::TIFF (recommended if using TIFF image functions)
   Image::PNG::Libpng (recommended for enhanced PNG image function processing)
+  HarfBuzz::Shaper (recommended for Latin script ligatures and kerning, as
+                    well as for any complex script such as Arabic or Khmer)
 
 Other than an installer for standard CPAN packages (such as 'cpan' on
 Strawberry Perl for Windows), no other tools or manually-installed prereqs
@@ -46,7 +48,7 @@ install process, only copying of .pm Perl module files.
 
 ===================================================================
 
-This software is Copyright (c) 2017-2019 by Phil M. Perry.
+This software is Copyright (c) 2017-2020 by Phil M. Perry.
 Previous copyrights are held by others (Steve Simms, Alfred Reibenschuh, 
 et al.).
 

@@ -1,13 +1,13 @@
 package App::GitGot::Command::fork;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Command::fork::VERSION = '1.336';
+$App::GitGot::Command::fork::VERSION = '1.337';
 # ABSTRACT: fork a github repo
 use 5.014;
 
 use autodie;
 use Class::Load       'try_load_class';
 use Cwd;
-use File::HomeDir;
+use File::HomeDir::Tiny ();
 use Path::Tiny;
 use Types::Standard -types;
 
@@ -69,7 +69,7 @@ sub _execute {
 }
 
 sub _parse_github_identity {
-  my $file = path( File::HomeDir->my_home() , '.github-identity' );
+  my $file = path( File::HomeDir::Tiny::home() , '.github-identity' );
 
   $file->exists or
     say STDERR "ERROR: Can't find $file" and exit(1);
@@ -120,7 +120,7 @@ App::GitGot::Command::fork - fork a github repo
 
 =head1 VERSION
 
-version 1.336
+version 1.337
 
 =head1 SYNOPSIS
 
@@ -133,11 +133,11 @@ version 1.336
 
 =head1 AUTHOR
 
-John SJ Anderson <genehack@genehack.org>
+John SJ Anderson <john@genehack.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by John SJ Anderson.
+This software is copyright (c) 2020 by John SJ Anderson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -54,3 +54,13 @@ Revision history for Control-CLI-Extreme
 	  Control::CLI's default of Carriage Return + Line Feed ("\n"); the change was necessary since SLX, over
 	  the serial port, otherwise does not work properly. The change has no effect on all other Extreme
 	  Networks devices
+
+1.04	2020-04-25
+	* SLX platforms on the serial port can place a -more- prompt even in the middle of a line. The cmd()
+	  method was omitting output from that line immediately before the more prompt.
+	* SLX platforms are quite dirty in the output they produce for certain CLI commands when executed
+	  on the serial port. The cmd() method now deletes all those spurious escape character sequences.
+	* Attribute 'switch_mode' was incorrectly getting set to "Stack" on XOS switch with dedicated stacking
+	  cables connected but with stacking-mode disabled on the switch.
+	* cmd_initiated_prompt() default prompt match pattern was not matching Y/N confirm prompts from
+	  ExtremeXOS family switches and is now changed to: '[?:=]\h*(?:\(.+?\)\h*)?$'

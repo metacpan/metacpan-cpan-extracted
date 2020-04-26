@@ -52,6 +52,8 @@
             "List::Compare" : "0",
             "List::Util" : "0",
             "Modern::Perl" : "0",
+            "Module::Load" : "0",
+            "Module::Overview" : "0",
             "Moose" : "0",
             "Moose::Role" : "0",
             "Number::Format" : "0",
@@ -60,6 +62,7 @@
             "Scalar::Util::Numeric" : "0",
             "Sort::Naturally" : "0",
             "String::Util" : "0",
+            "Text::ASCIITable" : "0",
             "Time::HiRes" : "0",
             "Time::Local" : "0",
             "Time::ParseDate" : "0",
@@ -68,6 +71,7 @@
             "constant" : "0",
             "namespace::autoclean" : "0",
             "perl" : "v5.16.0",
+            "strict" : "0",
             "vars" : "0",
             "warnings" : "0"
          }
@@ -75,13 +79,12 @@
       "test" : {
          "requires" : {
             "File::RandomGenerator" : "0",
-            "Test2::Plugin::DieOnFail" : "0",
-            "Test2::V0" : "0"
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.029",
+   "version" : "0.030",
    "x_generated_by_perl" : "v5.16.3",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

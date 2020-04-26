@@ -73,7 +73,7 @@ Monetary threshold that triggers the subscription to create an invoice
 
 Indicates which line items triggered a threshold invoice.
 
-This is an array of C<Net::API::Stripe::Billing::Thresholds::ItemReasons> objects.
+This is an array of L<Net::API::Stripe::Billing::Thresholds::ItemReasons> objects.
 
 =item B<reset_billing_cycle_anchor> boolean
 

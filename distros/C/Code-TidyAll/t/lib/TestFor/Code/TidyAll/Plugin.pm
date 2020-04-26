@@ -77,7 +77,7 @@ sub tidyall {
         is( $result->state, 'checked', "state=checked [$desc]" );
         is( $result->error, undef,     "no error [$desc]" );
         if ( $result->new_contents ) {
-            $source ||= path( $p{source_file} )->slurp;
+            $source ||= path( $p{source_file} )->slurp_raw;
             is( $result->new_contents, $source, "same contents [$desc]" );
         }
     }
@@ -106,6 +106,12 @@ sub _extra_path {
         # We need to use forward slashes to get this working with all the
         # layers of quoting in RunsCommand and IPC::Run3.
         $Perl =~ s{\\}{/}g;
+
+        # Text::ParseWords will break on spaces later so we need to wrap the
+        # path in quotes. Technically, this should be done for the *nix case
+        # too, but spaces in paths are quite uncommon on Unix and we don't
+        # want to risk the breakage changing this for *nix might lead to.
+        $Perl = qq{"$Perl"};
     }
 
     sub _this_perl {

@@ -91,8 +91,6 @@ $got = sqrt($f1);
 my ($x, $y) = split /\//, $got;
 like $x, qr/^\d+$/, 'exp numerator';
 like $y, qr/^\d+$/, 'exp denominator';
-is sprintf('%.15f', $x), sprintf('%.15f', $n), 'exp numerator';
-is sprintf('%.15f', $y), sprintf('%.15f', $d), 'exp denominator';
 
 is $f1 cmp $f1, 0, 'cmp';
 is $f2 cmp $f1, 1, 'cmp';

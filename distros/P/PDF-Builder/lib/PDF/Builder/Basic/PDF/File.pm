@@ -17,8 +17,8 @@ package PDF::Builder::Basic::PDF::File;
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.017'; # VERSION
-my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
+our $VERSION = '3.018'; # VERSION
+my $LAST_UPDATE = '3.018'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -1217,15 +1217,17 @@ sub readxrtr {
 		if ($options{'-diags'} == 1) {
                     # See PDF 1.7 section 7.5.4: Cross-Reference Table
                     warn "Malformed xref: subsection header needs a single\n" .
-                         "ASCII space between the numbers and no extra spaces.\n"; #orig
+                         "ASCII space between the numbers and no extra spaces.\n";
 	        }
             }
             $xdiff = length($buf); # how much remaining in buffer
 
             # in case xnum == 0 is permitted (or used and tolerated by readers),
             #   skip over entry reads and go to next subsection
-            if ($xnum < 1 && $options{'-diags'} == 1) { 
-                warn "Xref subsection has 0 entries. Skipped.\n";
+            if ($xnum < 1) { 
+                if ($options{'-diags'} == 1) { 
+                    warn "Xref subsection has 0 entries. Skipped.\n";
+		}
                 $xrefListEmpty = 1;
                 next; 
             }
@@ -1256,8 +1258,8 @@ sub readxrtr {
                 } else {
 		    if ($options{'-diags'} == 1) {
                         warn "Xref entry readable, but doesn't meet PDF spec.\n";
-                        $entry_format_error++;
                     }
+                    $entry_format_error++;
                 }
 
                 $buf =~ s/^$ws_char*(\d+)$ws_char+(\d+)$ws_char+([nf])$ws_char*$cr//;
@@ -1267,8 +1269,10 @@ sub readxrtr {
                 #      next generation number (f)
                 # $3 = flag (n = object in use, f = free)
                 # buf reduced by entry just processed
-                if (exists $xlist->{$xmin} && $options{'-diags'} == 1) {
-                    warn "Duplicate object number $xmin in xref table ignored.\n";
+                if (exists $xlist->{$xmin}) {
+                    if ($options{'-diags'} == 1) {
+                        warn "Duplicate object number $xmin in xref table ignored.\n";
+		    }
                 } else {
                     $xlist->{$xmin} = [$1, $2, $3];
                     if ($xmin == 0 && $subsection_count > 1 && $options{'-diags'} == 1) {
@@ -1297,31 +1301,31 @@ sub readxrtr {
                 if ($xlist->{'1'}[0] == 0 &&  # only member of free list
                     $xlist->{'1'}[1] == 65535 &&
                     $xlist->{'1'}[2] eq 'f') {
+                    # object 1 appears to be the free list head, so shift
+                    #   down all objects
 		    if ($options{'-diags'} == 1) {
-                        # object 1 appears to be the free list head, so shift
-                        #   down all objects
                         warn "xref appears to be mislabeled starting with 1. Shift down all elements.\n";
-                        my $next = 1;
-                        while (exists $xlist->{$next}) {
-                            $xlist->{$next - 1} = $xlist->{$next};
-                            $next++;
-                        }
-                        delete $xlist->{--$next};
 		    }
+                    my $next = 1;
+                    while (exists $xlist->{$next}) {
+                        $xlist->{$next - 1} = $xlist->{$next};
+                        $next++;
+                    }
+                    delete $xlist->{--$next};
 
                 } else {
                     # if object 1 does not appear to be a free list head, 
                     #   insert a new object 0
 		    if ($options{'-diags'} == 1) {
                         warn "Xref appears to be missing object 0. Insert a new one.\n";
-                        $xlist->{'0'} = [0, 65535, 'f'];
 		    }
+                    $xlist->{'0'} = [0, 65535, 'f'];
                 }
             } else {
 		if ($options{'-diags'} == 1) {
                     warn "Malformed cross reference list in PDF file $self->{' fname'} -- no object 0 (free list head)\n";
-                    $xlist->{'0'} = [0, 65535, 'f'];
 		}
+                $xlist->{'0'} = [0, 65535, 'f'];
             }
         } # no object 0 entry
 
@@ -1354,8 +1358,10 @@ sub readxrtr {
             warn "Object 0 next generation is not 65535.\n";
         }
         do {
-            if ($xlist->{$next_free}[2] ne 'f' && $options{'-diags'} == 1) {
-                warn "Corrupted free object list: next=$next_free is not a free object.\n";
+            if ($xlist->{$next_free}[2] ne 'f') {
+                if ($options{'-diags'} == 1) {
+                    warn "Corrupted free object list: next=$next_free is not a free object.\n";
+		}
                 $next_free = 0; # force end of free list
             } else { 
                 $next_free = $xlist->{$next_free}[0];
@@ -1382,7 +1388,7 @@ sub readxrtr {
         # XRef streams
         ($tdict, $buf) = $self->readval($buf);
 
-        unless ($tdict->{' stream'}) {  #orig 'die'
+        unless ($tdict->{' stream'}) {
 	    if ($options{'-diags'} == 1) {
                 warn "Malformed XRefStm at $xref_obj $xref_gen obj in PDF file $self->{' fname'}";
 	    }
@@ -1421,7 +1427,7 @@ sub readxrtr {
                 }
 
                 $cols[0] = 1 unless defined $cols[0];
-                if ($cols[0] > 2 && $options{'-diags'} == 1) {  #orig 'die'
+                if ($cols[0] > 2 && $options{'-diags'} == 1) {
                     warn "Invalid XRefStm entry type ($cols[0]) at $xref_obj $xref_gen obj";
                 }
 

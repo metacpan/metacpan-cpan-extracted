@@ -29,6 +29,24 @@
 #      optional:                   
 #      flags:
 
+module-overview:
+  class:
+    name: Util::Medley::Exec
+    attr:
+      required:
+      optional:
+  method:
+    name: moduleOverview
+    args:
+      required:
+        hard:
+          m: moduleName        
+      optional:
+        h: hideModules          
+      flags:
+        show-inherited-private-attributes: showInheritedPrivateAttributes
+        show-inherited-private-methods: showInheritedPrivateMethods
+             
 commify:
   class:
     name: Util::Medley::Exec

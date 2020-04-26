@@ -6,7 +6,7 @@ use Module::Metadata;
 
 WriteMakefile(
     NAME             => 'Acme::AsciiEmoji',
-    AUTHOR           => q{Robert Acock <thisusedtobeanemail@gmail.com>},
+    AUTHOR           => q{Robert Acock <email@lnation.org>},
     VERSION_FROM     => 'lib/Acme/AsciiEmoji.pm',
     ABSTRACT_FROM    => 'lib/Acme/AsciiEmoji.pm',
     LICENSE          => 'artistic_2',

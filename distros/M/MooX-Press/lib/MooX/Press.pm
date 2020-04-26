@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.058';
+our $VERSION   = '0.060';
 
 use Types::Standard 1.010000 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -616,7 +616,7 @@ sub _make_package {
 	}
 	else {
 		use_module($toolkit)->import::into($qname);
-#		use_module("MooX::TypeTiny")->import::into($qname) if $toolkit eq 'Moo' && eval { require MooX::TypeTiny };
+		use_module("MooX::TypeTiny")->import::into($qname) if $toolkit eq 'Moo' && eval { require MooX::TypeTiny; 'MooX::TypeTiny'->VERSION('0.002001') };
 		use_module("MooseX::XSAccessor")->import::into($qname) if $toolkit eq 'Moose' && eval { require MooseX::XSAccessor };
 		use_module("namespace::autoclean")->import::into($qname);
 		
@@ -822,6 +822,7 @@ sub _make_package {
 						while (@methods and not ref $methods[0]);
 					my $coderef = shift(@methods) || \"new";
 					for my $name (@method_names) {
+						no warnings 'closure';
 						if (is_CodeRef $coderef) {
 							eval "package $fpackage; sub $name :method { splice(\@_, 1, 0, '$qname'); goto \$coderef }; 1"
 								or $builder->croak("Could not create factory $name in $fpackage: $@");
@@ -1451,13 +1452,14 @@ sub install_methods {
 			$callcode = 'goto $code';
 		}
 		else {
-			($callcode = $code) =~ s/sub/do/;
+			($callcode = $code) =~ s/\A \s* sub \s* \{ (.+) \} \s*/$1/x;
 			$callcode = "package $caller; $callcode" if defined $caller;
 		}
 		
 		my $attrs_string = $is_coderef ? "" : ":method";
 		$attrs_string .= " :lvalue" if match("lvalue", $attrs);
 		
+		no warnings 'printf';
 		my $subcode = sprintf(
 			q{
 				package %-49s  # package name
@@ -1488,6 +1490,8 @@ sub install_methods {
 			$callcode,
 			($is_coderef ? '' : '1;'),
 		);
+		
+		no warnings 'closure';
 		($return{$name} = eval($subcode))
 			or $builder->croak("Could not create method $name in package $class: $@");
 	}
@@ -1666,7 +1670,8 @@ sub _prepare_method_modifier {
 	$invocant_count  = $method->{invocant_count} if exists $method->{invocant_count};
 	
 	my $name = join('|', @$names)."($kind)";
-
+	
+	no warnings 'closure';
 	my $wrapped = eval qq{
 		my \$check;
 		sub {

@@ -41,6 +41,18 @@ static bool is_thread_safe (const zmq::socket_base_t &socket_)
     return socket_.is_thread_safe ();
 }
 
+// compare elements to value
+template <class It, class T, class Pred>
+static It find_if2 (It b_, It e_, const T &value, Pred pred)
+{
+    for (; b_ != e_; ++b_) {
+        if (pred (*b_, value)) {
+            break;
+        }
+    }
+    return b_;
+}
+
 zmq::socket_poller_t::socket_poller_t () :
     _tag (0xCAFEBABE),
     _signaler (NULL)
@@ -101,12 +113,10 @@ int zmq::socket_poller_t::add (socket_base_t *socket_,
                                void *user_data_,
                                short events_)
 {
-    for (items_t::iterator it = _items.begin (), end = _items.end (); it != end;
-         ++it) {
-        if (it->socket == socket_) {
-            errno = EINVAL;
-            return -1;
-        }
+    if (find_if2 (_items.begin (), _items.end (), socket_, &is_socket)
+        != _items.end ()) {
+        errno = EINVAL;
+        return -1;
     }
 
     if (is_thread_safe (*socket_)) {
@@ -151,12 +161,10 @@ int zmq::socket_poller_t::add (socket_base_t *socket_,
 
 int zmq::socket_poller_t::add_fd (fd_t fd_, void *user_data_, short events_)
 {
-    for (items_t::iterator it = _items.begin (), end = _items.end (); it != end;
-         ++it) {
-        if (!it->socket && it->fd == fd_) {
-            errno = EINVAL;
-            return -1;
-        }
+    if (find_if2 (_items.begin (), _items.end (), fd_, &is_fd)
+        != _items.end ()) {
+        errno = EINVAL;
+        return -1;
     }
 
     const item_t item = {
@@ -183,15 +191,10 @@ int zmq::socket_poller_t::add_fd (fd_t fd_, void *user_data_, short events_)
 
 int zmq::socket_poller_t::modify (const socket_base_t *socket_, short events_)
 {
-    const items_t::iterator end = _items.end ();
-    items_t::iterator it;
+    const items_t::iterator it =
+      find_if2 (_items.begin (), _items.end (), socket_, &is_socket);
 
-    for (it = _items.begin (); it != end; ++it) {
-        if (it->socket == socket_)
-            break;
-    }
-
-    if (it == end) {
+    if (it == _items.end ()) {
         errno = EINVAL;
         return -1;
     }
@@ -205,15 +208,10 @@ int zmq::socket_poller_t::modify (const socket_base_t *socket_, short events_)
 
 int zmq::socket_poller_t::modify_fd (fd_t fd_, short events_)
 {
-    const items_t::iterator end = _items.end ();
-    items_t::iterator it;
+    const items_t::iterator it =
+      find_if2 (_items.begin (), _items.end (), fd_, &is_fd);
 
-    for (it = _items.begin (); it != end; ++it) {
-        if (!it->socket && it->fd == fd_)
-            break;
-    }
-
-    if (it == end) {
+    if (it == _items.end ()) {
         errno = EINVAL;
         return -1;
     }
@@ -227,15 +225,10 @@ int zmq::socket_poller_t::modify_fd (fd_t fd_, short events_)
 
 int zmq::socket_poller_t::remove (socket_base_t *socket_)
 {
-    const items_t::iterator end = _items.end ();
-    items_t::iterator it;
+    const items_t::iterator it =
+      find_if2 (_items.begin (), _items.end (), socket_, &is_socket);
 
-    for (it = _items.begin (); it != end; ++it) {
-        if (it->socket == socket_)
-            break;
-    }
-
-    if (it == end) {
+    if (it == _items.end ()) {
         errno = EINVAL;
         return -1;
     }
@@ -252,15 +245,10 @@ int zmq::socket_poller_t::remove (socket_base_t *socket_)
 
 int zmq::socket_poller_t::remove_fd (fd_t fd_)
 {
-    const items_t::iterator end = _items.end ();
-    items_t::iterator it;
+    const items_t::iterator it =
+      find_if2 (_items.begin (), _items.end (), fd_, &is_fd);
 
-    for (it = _items.begin (); it != end; ++it) {
-        if (!it->socket && it->fd == fd_)
-            break;
-    }
-
-    if (it == end) {
+    if (it == _items.end ()) {
         errno = EINVAL;
         return -1;
     }
@@ -455,9 +443,9 @@ int zmq::socket_poller_t::check_events (zmq::socket_poller_t::event_t *events_,
         }
         //  Else, the poll item is a raw file descriptor, simply convert
         //  the events to zmq_pollitem_t-style format.
-        else {
+        else if (it->events) {
 #if defined ZMQ_POLL_BASED_ON_POLL
-
+            zmq_assert (it->pollfd_index >= 0);
             const short revents = _pollfds[it->pollfd_index].revents;
             short events = 0;
 

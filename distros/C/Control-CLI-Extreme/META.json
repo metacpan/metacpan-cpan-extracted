@@ -17,8 +17,7 @@
       "build" : {
          "requires" : {
             "IO::Interactive" : "0",
-            "Net::Telnet" : "0",
-            "perl" : "v5.6.0"
+            "Net::Telnet" : "0"
          }
       },
       "configure" : {
@@ -28,14 +27,15 @@
       },
       "runtime" : {
          "requires" : {
-            "Control::CLI" : "2.02"
+            "Control::CLI" : "2.02",
+            "perl" : "v5.6.0"
          }
       }
    },
    "provides" : {
       "Control::CLI::Extreme" : {
          "file" : "lib/Control/CLI/Extreme.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       }
    },
    "release_status" : "stable",
@@ -44,6 +44,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

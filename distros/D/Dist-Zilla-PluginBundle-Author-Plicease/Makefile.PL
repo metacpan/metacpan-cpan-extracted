@@ -55,18 +55,18 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014",
   "NAME"             => "Dist::Zilla::PluginBundle::Author::Plicease",
   "PM"               => {
-    "lib/Dist/Zilla/MintingProfile/Author/Plicease.pm"         => "\$(INST_LIB)/Dist/Zilla/MintingProfile/Author/Plicease.pm",
-    "lib/Dist/Zilla/Plugin/Author/Plicease.pm"                 => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease.pm",
-    "lib/Dist/Zilla/Plugin/Author/Plicease/Core.pm"            => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Core.pm",
-    "lib/Dist/Zilla/Plugin/Author/Plicease/Init2.pm"           => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Init2.pm",
-    "lib/Dist/Zilla/Plugin/Author/Plicease/MakeMaker.pm"       => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/MakeMaker.pm",
-    "lib/Dist/Zilla/Plugin/Author/Plicease/MarkDownCleanup.pm" => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/MarkDownCleanup.pm",
-    "lib/Dist/Zilla/Plugin/Author/Plicease/NoUnsafeInc.pm"     => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/NoUnsafeInc.pm",
-    "lib/Dist/Zilla/Plugin/Author/Plicease/SpecialPrereqs.pm"  => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/SpecialPrereqs.pm",
-    "lib/Dist/Zilla/Plugin/Author/Plicease/Tests.pm"           => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Tests.pm",
-    "lib/Dist/Zilla/Plugin/Author/Plicease/Thanks.pm"          => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Thanks.pm",
-    "lib/Dist/Zilla/Plugin/Author/Plicease/Upload.pm"          => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Upload.pm",
-    "lib/Dist/Zilla/PluginBundle/Author/Plicease.pm"           => "\$(INST_LIB)/Dist/Zilla/PluginBundle/Author/Plicease.pm"
+    "lib/Dist/Zilla/MintingProfile/Author/Plicease.pm"          => "\$(INST_LIB)/Dist/Zilla/MintingProfile/Author/Plicease.pm",
+    "lib/Dist/Zilla/Plugin/Author/Plicease.pm"                  => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease.pm",
+    "lib/Dist/Zilla/Plugin/Author/Plicease/Core.pm"             => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Core.pm",
+    "lib/Dist/Zilla/Plugin/Author/Plicease/Init2.pm"            => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Init2.pm",
+    "lib/Dist/Zilla/Plugin/Author/Plicease/MakeMaker.pm"        => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/MakeMaker.pm",
+    "lib/Dist/Zilla/Plugin/Author/Plicease/NoUnsafeInc.pm"      => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/NoUnsafeInc.pm",
+    "lib/Dist/Zilla/Plugin/Author/Plicease/ReadmeAnyFromPod.pm" => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/ReadmeAnyFromPod.pm",
+    "lib/Dist/Zilla/Plugin/Author/Plicease/SpecialPrereqs.pm"   => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/SpecialPrereqs.pm",
+    "lib/Dist/Zilla/Plugin/Author/Plicease/Tests.pm"            => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Tests.pm",
+    "lib/Dist/Zilla/Plugin/Author/Plicease/Thanks.pm"           => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Thanks.pm",
+    "lib/Dist/Zilla/Plugin/Author/Plicease/Upload.pm"           => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Upload.pm",
+    "lib/Dist/Zilla/PluginBundle/Author/Plicease.pm"            => "\$(INST_LIB)/Dist/Zilla/PluginBundle/Author/Plicease.pm"
   },
   "PREREQ_PM" => {
     "Data::Section"                           => 0,
@@ -99,6 +99,7 @@ my %WriteMakefileArgs = (
     "Test::Pod::Coverage"                     => "1.10",
     "Test::Script"                            => "1.10",
     "Test::Version"                           => "2.00",
+    "URI::Escape"                             => 0,
     "YAML"                                    => "1.15",
     "namespace::autoclean"                    => 0
   },
@@ -107,7 +108,7 @@ my %WriteMakefileArgs = (
     "Test::More"   => "0.98",
     "Test::Script" => "1.10"
   },
-  "VERSION" => "2.45",
+  "VERSION" => "2.46",
   "test"    => {
     "TESTS" => "t/*.t"
   }

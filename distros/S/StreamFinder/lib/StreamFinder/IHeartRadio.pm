@@ -124,8 +124,8 @@ pls, secure_hls, hls, secure_shortcast, shortcast, secure_rtmp, rtmp, (I<ext>,
 ie. mp4) etc.
 
 DEFAULT keep list is 'secure_shoutcast, shoutcast, secure, any', meaning that all 
-secure_shoutcast streams followed by all other shoutcast streams, followed by 
-all other secure (https) streams, followed by all remaining streams.  
+secure_shoutcast (https:) streams followed by any other shoutcast streams, then all 
+other secure (https:) streams, followed by any remaining (http:) streams (.m3u8, etc.).  
 More than one value can be specified to control order of search.
 
 NOTE:  This is now the preferred method over the DEPRECIATED one below.  If using 

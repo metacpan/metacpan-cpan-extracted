@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.179';
+our $VERSION = '1.180';
 
 use Quiq::Duration;
 use Quiq::Path;
@@ -590,7 +590,7 @@ sub reverse {
 
 =head1 VERSION
 
-1.179
+1.180
 
 =head1 AUTHOR
 

@@ -1,6 +1,6 @@
 package App::GitGot::Command::gc;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Command::gc::VERSION = '1.336';
+$App::GitGot::Command::gc::VERSION = '1.337';
 # ABSTRACT: Run the 'gc' command to garbage collect in git repos
 use 5.014;
 
@@ -51,15 +51,15 @@ App::GitGot::Command::gc - Run the 'gc' command to garbage collect in git repos
 
 =head1 VERSION
 
-version 1.336
+version 1.337
 
 =head1 AUTHOR
 
-John SJ Anderson <genehack@genehack.org>
+John SJ Anderson <john@genehack.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by John SJ Anderson.
+This software is copyright (c) 2020 by John SJ Anderson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -45,6 +45,10 @@ A. Proper TTF/OTF support (RT 113700), especially ligature replacement and
    like Arabic family and southern/southeastern Asian families, proper support 
    (Pango?) is vital.
 
+   UPDATE: See Text::Layout and HarfBuzz::Shaper packages. Layout is usable
+     with Builder (but no explicit support yet). Shaper is supported by Builder
+     for ligatures and complex scripts.
+
 B. Unification of font support: including character set and encoding support
    improvements [see CTS 16 and CTS 23] to make more commonality between using 
    UTF-8 and single byte encodings, across all the font types (core, TrueType, 
@@ -99,9 +103,16 @@ G. Fix Small Caps (and capitalization in general) for ligatures (CTS 13):
    non-Latin single characters (e.g., Greek terminal/nonterminal sigma, German
    eszett, long s) also may need proper handling for capitalization.
 
+   UPDATE: It may be better to use individual letters (rather than ligature
+     Unicode points), allowing easy capitalization and small caps. Then use
+     HarfBuzz::Shaper to replace lowercase letter sequences with true ligatures
+     on the fly.
+
 H. Fallback glyphs (CTS 5) when a desired glyph is not found in one font,
    but can be found in another. This is similar to HTML when you give a font
    family list in CSS. Pango might help with this.
+
+   UPDATE: This is being considered for Text::Layout, but nothing scheduled yet.
 
 I. Support for tagged structure (CTS 17 and RT 120375). At least, don't corrupt
    an existing tagged PDF file when extracting pages.
@@ -123,9 +134,20 @@ K. Text method to move to arbitrary points: relative or absolute movement
    text. Consider using a TABLE within the column or page to get text organized 
    into the desired format (see "tbl" addition in section II).
 
+   UPDATE: The $text->distance() call permits arbitrary delta-x and delta-y
+     (in points) of text movement. It's not hard to convert non-points to 
+     points, such as distance(2.4/in, -1.23/cm). For tables, take a look at
+     the PDF::Table package for now.
+
 L. Determine what it is about "CJK" fonts (.ttf and .otf) that makes them
    incompatible with synfont [RT 130040] and embedding [RT 130041], and fix if 
    possible. Are separate CJK fonts even necessary these days?
+
+M. Add decorative rectangular box effects around sections of text. With or
+   without border (allow rounded corners) and background color, drop shadows
+   (3D effect), etc. The box is drawn at given dimensions and location, and
+   the text written over it in the usual manner. Content clipping might also
+   be supported.
 
 =============================================================================
 II. Items to add to a separate area (new module or sub-module)
@@ -164,6 +186,13 @@ C. General text flowing capability, to fill irregularly shaped columns (such
    Note that it might be good to notify the user during processing that such a 
    move has been done, so that it can be inspected.
 
+   UPDATE: Columns could be any shape, drawn with lines, polylines, arcs,
+     circles, splines, etc. Text baselines don't necessarily have to be 
+     horizontal. Clip baselines to the "column" shape to get the line length
+     and starting point for each line of text. There may have to be some 
+     iterations to reshape a line if its height results in a shift of the
+     baseline into a wider or narrower area.
+
 D. Font Families: per CTS 22, make it easier to deal with switching fonts
    and variations within a font (bold, italic, size, color, underline, small
    caps, etc.), possibly with HTML tags inlined. The idea would be to only have 
@@ -172,6 +201,10 @@ D. Font Families: per CTS 22, make it easier to deal with switching fonts
    yourself. Perhaps several formats of markup could be supported (HTML, 
    Markdown, troff), driven by a definition file? Pango may help with this, at
    least with font-specification markup.
+
+   UPDATE: Text::Layout package may prove very useful here, although it needs
+     some enhancements (a new "back end" to return text for shaping, rather 
+     than directly outputting it).
 
 E. Continuing (D), eventually much of HTML and other common markups (headings, 
    quotes, HTML entities, tables, lists, etc.) supported. One goal would be to

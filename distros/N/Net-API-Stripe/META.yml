@@ -4,6 +4,8 @@ author:
   - 'Jacques Deguest (jack@deguest.jp)'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::Pod: '0'
+  Test::Simple: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -46,8 +48,6 @@ requires:
   Net::OAuth: '0.28'
   Number::Format: '1.75'
   Scalar::Util: '1.54'
-  Test::Pod: '0'
-  Test::Simple: '0'
   TryCatch: '1.003002'
   URI::Escape: '3.31'
   URI::Query: '0.16'
@@ -57,5 +57,5 @@ requires:
   overload: '1.30'
   parent: '0'
   perl: '5.006000'
-version: '0.9'
+version: '1.0'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

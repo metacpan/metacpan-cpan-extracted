@@ -1,5 +1,5 @@
 package Yancy::Backend::Role::Relational;
-our $VERSION = '1.054';
+our $VERSION = '1.055';
 # ABSTRACT: A role to give a relational backend relational capabilities
 
 #pod =head1 SYNOPSIS
@@ -341,7 +341,7 @@ sub read_schema {
         # ; use Data::Dumper;
         # ; say Dumper $columns;
         for my $c ( @$columns ) {
-            my $column = $c->{COLUMN_NAME};
+            my $column = $c->{COLUMN_NAME} =~ s/['"`]//gr;
             my %info = %{ $col2info->{ $column } || {} };
             # the || is because SQLite doesn't give the DATA_TYPE
             my $sqltype = $c->{DATA_TYPE} || $TYPENAME2SQL{ lc $c->{TYPE_NAME} };
@@ -429,7 +429,7 @@ Yancy::Backend::Role::Relational - A role to give a relational backend relationa
 
 =head1 VERSION
 
-version 1.054
+version 1.055
 
 =head1 SYNOPSIS
 
@@ -543,7 +543,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Doug Bell.
+This software is copyright (c) 2020 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -55,6 +55,7 @@ my @files = (
     't/helper-bin/exit.pl',
     't/helper-bin/generic-transformer.pl',
     't/helper-bin/generic-validator.pl',
+    't/helper-bin/raw-transformer.pl',
     't/inc1/Foo.pm',
     't/inc2/Bar.pm',
     't/lib/TestFor/Code/TidyAll/Basic.pm',

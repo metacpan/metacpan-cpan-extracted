@@ -1,3 +1,14 @@
+1.180 2020-04-25
+================
+
+[Quiq::Cascm]
+* new() - Option color=>$bool hinzugefügt
+* findItem() - Ergebnismenge um Kolumne versionsstatus erweitert
+* switchPackage() - Default nun Übertragung aller Dateien
+
+[Quiq::DirHandle]
+* Unittest für CentOS verbessert
+
 1.179 2020-04-19
 ================
 
