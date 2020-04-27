@@ -6,7 +6,7 @@ use Object::Simple -base;
 use Carp;
 use Path::Tiny;
 
-our $VERSION = "0.07";
+our $VERSION = "0.08";
 our $types;
 sub AUTOLOAD {
     my $self = shift;
@@ -112,24 +112,32 @@ sub required {
 }
 
 sub set_value {
-    my $type = $_[0]->type;
-
-    $_[0]->_set_types($type);
-
-    if ($_[0]->is_cumulative) {
+    my $self = shift;
+    my $type = $self->type;
+    $self->_set_types($type);
+    if ($self->is_cumulative) {
         my @values;
-        if ($_[0]->_defined) {
-            @values = @{$_[0]->value};
+        if ($self->_defined) {
+            @values = @{$self->value};
         }
-        push @values, $types->{$type}->{set_value}->($_[0], $_[1]);
-        $_[0]->_defined(1);
-        $_[0]->value([@values]);
-    } elsif ($_[0]->_defined) {
-        printf STDERR "error: flag '%s' cannot be repeated, try --help", $_[0]->name;
-        exit 1;
+        my @ret = $types->{$type}->{set_value}->($self, @_);
+        if (scalar @ret > 1) {
+            return undef, $ret[1];
+        }
+        push @values, $ret[0];
+        $self->_defined(1);
+        $self->value([@values]);
+    } elsif ($self->_defined) {
+        printf STDERR "error: flag '%s' cannot be repeated, try --help\n", $self->name;
+        return undef, 1;
     } else {
-        $_[0]->_defined(1);
-        $_[0]->value($types->{$type}->{set_value}->(@_));
+        $self->_defined(1);
+        my @ret = $types->{$type}->{set_value}->($self, @_);
+        if (scalar @ret > 1) {
+            # has error
+            return undef, $ret[1];
+        }
+        return $self->value($ret[0]);
     }
 }
 

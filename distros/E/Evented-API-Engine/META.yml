@@ -2,7 +2,9 @@
 abstract: 'Evented API Engine for Perl applications'
 author:
   - 'Mitchell Cooper <cooper@cpan.org>'
-build_requires:
+build_requires: {}
+configure_requires:
+  Pod::Readme: '0'
   Pod::Select: '0'
 dynamic_config: 0
 generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
@@ -14,13 +16,13 @@ name: Evented-API-Engine
 provides:
   Evented::API::Engine:
     file: lib/Evented/API/Engine.pm
-    version: '4.07'
+    version: '4.13'
   Evented::API::Events:
     file: lib/Evented/API/Events.pm
-    version: '4.07'
+    version: '4.13'
   Evented::API::Module:
     file: lib/Evented/API/Module.pm
-    version: '4.07'
+    version: '4.13'
 requires:
   Evented::Object: '5.63'
   JSON::XS: '3.00'
@@ -29,5 +31,5 @@ requires:
 resources:
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/cooper/evented-api-engine
-version: '4.07'
+version: '4.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

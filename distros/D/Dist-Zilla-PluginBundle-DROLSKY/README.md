@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 # VERSION
 
-version 1.06
+version 1.07
 
 # SYNOPSIS
 
@@ -159,6 +159,7 @@ This is more or less equivalent to the following `dist.ini`:
     skip = Dist::Zilla::Plugin::DROLSKY::License
     skip = Dist::Zilla::Plugin::DROLSKY::TidyAll
     skip = Pod::Weaver::PluginBundle::DROLSKY
+    ; also skips any package starting with inc:: that lives in the inc/ dir.
 
     [Test::Pod::Coverage::Configurable]
     ; Configured by setting pod_coverage_class for the bundle

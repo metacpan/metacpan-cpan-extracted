@@ -4,7 +4,7 @@ use warnings;
 
 package Mxpress::PDF {
 	BEGIN {
-		our $VERSION = '0.25';
+		our $VERSION = '0.27';
 		our $AUTHORITY = 'cpan:LNATION';
 	};
 	use Zydeco;
@@ -12,7 +12,7 @@ package Mxpress::PDF {
 	use constant mm => 25.4 / 72;
 	use constant pt => 1;
 	class File (HashRef $args) {
-		my @plugins = (qw/font border line box circle pie ellipse text title subtitle subsubtitle h1 h2 h3 h4 h5 h6 toc image form input textarea select annotation cover/, ($args->{plugins} ? @{$args->{plugins}} : ()));
+		my @plugins = (qw/font list border line box circle pie ellipse text title subtitle subsubtitle h1 h2 h3 h4 h5 h6 toc image form input textarea select annotation cover/, ($args->{plugins} ? @{$args->{plugins}} : ()));
 		for my $p (@plugins) {
 			my $meth = sprintf('_store_%s', $p);
 			has {$meth} (is => 'rw', type => Object);
@@ -435,7 +435,7 @@ package Mxpress::PDF {
 			has end (is => 'rw', type => Num);
 			method generic_new (Object $file, Map %args) {
 				return $class->new(
-					padding => $args{padding} || 0,
+					padding => $args{padding} || 0,	
 					%args,
 					file => $file,
 					fill_colour => $file->page->valid_colour($args{fill_colour} || '#fff'),
@@ -449,7 +449,12 @@ package Mxpress::PDF {
 			}
 			class +Line {
 				has end_position (is => 'rw');
+				has type (is => 'rw', type => Str);
+				has dash (is => 'rw', type => ArrayRef);
+				has join (is => 'rw', type => Num);
 				factory line (Object $file, Map %args) {
+					$args{line_join} ||= 2;
+					$args{line_type} ||= 'solid';
 					$class->generic_new($file, %args);
 				}
 				method shape (Object $shape) {
@@ -457,6 +462,14 @@ package Mxpress::PDF {
 					my ($x, $y, $w, $h) = $self->parse_position($self->position || []);
 					$shape->move($x, $y);
 					($x, $y) = $self->end_position ? $self->parse_position($self->end_position) : ($x + $w, $y);
+					if ($self->dash) {
+						$shape->linedash(@{$self->dash});
+					} elsif ($self->type eq 'dots') {
+						$shape->linedash(1, 1);
+					} elsif ($self->type eq 'dashed') {
+						$shape->linedash(5, 5);
+					}				
+					$shape->linejoin($self->join);
 					$shape->line($x, $y);
 					$shape->stroke;
 				}
@@ -535,7 +548,7 @@ package Mxpress::PDF {
 			}
 			class +Circle {
 				factory circle (Object $file, Map %args) {
-					$args{radius} ||= 50;
+					$args{radius} ||= 50;	
 					return $class->generic_new($file, %args);
 				}
 				method shape (Object $shape) {
@@ -543,11 +556,10 @@ package Mxpress::PDF {
 						$self->position || [
 							($self->file->page->x*mm) + $self->radius,
 							($self->file->page->y*mm) - $self->radius,
-							$self->radius
 						]
 					);
 					my $circle = $shape->circle(
-						$x, $y, $r
+						$x, $y, $self->radius/mm
 					);
 					$circle->fillcolor($self->fill_colour);
 					$circle->fill;
@@ -798,7 +810,7 @@ package Mxpress::PDF {
 					$total_width += $width{$_} + $space_width;
 				}
 				return ($total_width, $space_width, %width);
-			}
+			}	
 			class +Title {
 				factory title (Object $file, Map %args) {
 					$args{font}->{size} ||= 50/pt;
@@ -1110,6 +1122,35 @@ package Mxpress::PDF {
 				return $self->file;
 			}
 		}
+		class +List extends Plugin::Text {
+			has type ( is => 'rw', type => Str );
+			factory list (Object $file, Map %args) {
+				my $self = $class->generic_new($file, %args);
+				$self->type($args{type} || 'bullet');
+				return $self;
+			}
+			around add (ArrayRef $list, Map %args) {
+				$self->set_attrs(%args);
+				my $i = 0;
+				for my $item (@{$list}) {
+					$i++;
+					my ($x, $y) = $self->parse_position([]);
+					my $offset;
+					if ($self->type eq 'number') {
+						$offset = 5;
+						$self->$next("$i\.", position => [$x*mm, $y*mm]);
+					} else {
+						$offset = (($self->font->line_height*mm)/2) + 0.6;
+						$self->file->circle->add(
+							fill_colour => '#000', 
+							radius => 0.5,
+							position => [($x*mm), ($y*mm) - $offset]
+						);
+					}
+					$self->$next($item, position => [($x*mm) + $offset, $y*mm]);
+				}
+			}
+		}
 		class +Form {
 			use PDF::API2::Basic::PDF::Utils;
 			has acro (is => 'rw', type => Object);
@@ -1302,7 +1343,7 @@ Mxpress::PDF - PDF
 
 =head1 VERSION
 
-Version 0.25
+Version 0.27
 
 =cut
 
@@ -1403,7 +1444,13 @@ This is experimental and may yet still change.
 	$pdf->text->add('italic text,', font => $italic, concat => \1);
 	$pdf->text->add('default text.', font => $default, concat => \1);
 
-	$pdf->border->start;
+	$pdf->list->add([
+		'First',
+		'Second',
+		'Third'
+	], type => 'number');
+
+	$pdf->border->start(type => 'dots');
 	for (0 .. 100) {
 		$pdf->toc->add(
 			[qw/title subtitle subsubtitle/]->[int(rand(3))] => $gen_text->(4)
@@ -1482,7 +1529,7 @@ Returns a new Mxpress::PDF::Plugin::Shape::Box Object. This object is for drawin
 
 Returns a new Mxpress::PDF::Plugin::Shape::Circle Object. This object is for drawing circle shapes.
 
-	my $box = Mxpress::PDF->box($file, %circle_args);
+	my $box = Mxpress::PDF->circle($file, %circle_args);
 
 =head2 pie
 
@@ -1510,7 +1557,7 @@ Returns a new Mxpress::PDF::Plugin::Text::Title Object. This object aids with wr
 
 =head2 subtitle
 
-Returns a new Mxpress::PDF::Plugin::Text::Title Object. This object aids with writing 'subtitle' text to a pdf page.
+Returns a new Mxpress::PDF::Plugin::Text::Subtitle Object. This object aids with writing 'subtitle' text to a pdf page.
 
 	my $subtitle = Mxpress::PDF->subtitle($file, %subtitle_args);
 
@@ -1555,6 +1602,12 @@ Returns a new Mxpress::PDF::Plugin::Text::H5 Object. This object aids with writi
 Returns a new Mxpress::PDF::Plugin::Text::H6 Object. This object aids with writing 'heading' text to a pdf page.
 
 	my $h1 = Mxpress::PDF->h2($file, %h6_args);
+
+=head2 list
+
+Returns a new Mxpress::PDF::Plugin::List Object. This object aids with writing lists to a pdf page.
+
+	my $text = Mxpress::PDF->list($file, %list_args);
 
 =head2 toc
 
@@ -1773,6 +1826,12 @@ A Mxpress::PDF::Plugin::H6 Object.
 A Mxpress::PDF::Plugin::Text Object
 
 	$file->text->add;
+
+=head3 list
+
+A Mxpress::PDF::Plugin::List Object.
+
+	$file->list->add;
 
 =head2 Methods
 
@@ -2358,6 +2417,59 @@ The position of the line
 
 	$line->end_position([$x, $y]);
 
+=head3 type (is => 'rw', type => Str);
+
+Sets the type of line style.
+
+=over 
+
+=item solid
+
+The default which is a solid line.
+
+=item dots
+
+A line built out of dots, equivelant to setting dash as:
+
+	[1, 1]
+
+=item dashed
+
+A line built out of dashes, equivelant to setting dash as:
+
+	[5, 5]
+
+=back
+
+=head3 dash (is => 'rw', type => ArrayRef);
+
+The arguments represent alternating dash and gap lengths. 
+
+	[10, 10]
+
+=head3 join (is => 'rw', type => Num);
+
+Sets the style of join to be used at corners of a path.
+ 
+=over
+ 
+=item 0 = Miter Join
+ 
+The outer edges of the stroke extend until they meet, up to the limit
+specified below.  If the limit would be surpassed, a bevel join is
+used instead.
+ 
+=item 1 = Round Join
+ 
+A circle with a diameter equal to the linewidth is drawn around the
+corner point, producing a rounded corner.
+ 
+=item 2 = Bevel Join
+ 
+A triangle is drawn to fill in the notch between the two strokes.
+ 
+=back
+
 =head2 Methods
 
 The following methods can be called from a Mxpress::PDF::Plugin::Shape::Line Object.
@@ -2839,6 +2951,35 @@ or when calling the objects add method.
 	$file->h6->add(
 		%heading_attrs
 	);
+
+=head1 List
+
+Mxpress::PDF::Plugin::List extends Mxpress::PDF::Plugin::Text and is for aiding with adding lists to a Mxpress::PDF::Page.
+
+You can pass default attributes when instantiating the file object.
+
+	Mxpress::PDF->add_file($filename,
+		list => { %list_attrs },
+	);
+
+or when calling the objects add method.
+
+	$file->list->add(
+		%list_attrs
+	);
+
+=head2 Attributes
+
+The following attributes can be configured for a Mxpress::PDF::Plugin::List object, they are all optional.
+
+	$list->$attr();
+
+=head3 type (is => 'rw', type => Str);
+
+The type of list that will be rendered. The current options are either bullet, for a bullet point list, or number,
+for a number ordered list.
+
+	$file->list->type('number');
 
 =head1 TOC
 

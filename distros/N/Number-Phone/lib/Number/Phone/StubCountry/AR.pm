@@ -22,25 +22,29 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200309202343;
+our $VERSION = 1.20200427120026;
 
 my $formatters = [
                 {
                   'format' => '$1',
                   'intl_format' => 'NA',
                   'leading_digits' => '
-            [09]|
+            0|
             1(?:
-              [02]|
-              1[02-5]
-            )
+              0[0-35-7]|
+              1[02-5]|
+              2[015]|
+              34|
+              4[78]
+            )|
+            911
           ',
                   'pattern' => '(\\d{3})'
                 },
                 {
                   'format' => '$1-$2',
                   'intl_format' => 'NA',
-                  'leading_digits' => '[2-8]',
+                  'leading_digits' => '[1-9]',
                   'pattern' => '(\\d{2})(\\d{4})'
                 },
                 {
@@ -52,10 +56,7 @@ my $formatters = [
                 {
                   'format' => '$1-$2',
                   'intl_format' => 'NA',
-                  'leading_digits' => '
-            2[0-8]|
-            [3-8]
-          ',
+                  'leading_digits' => '[1-8]',
                   'pattern' => '(\\d{4})(\\d{4})'
                 },
                 {
@@ -282,8 +283,12 @@ my $formatters = [
 
 my $validators = {
                 'fixed_line' => '
+          3888[013-9]\\d{5}|
           (?:
-            2954|
+            29(?:
+              54|
+              66
+            )|
             3(?:
               777|
               865
@@ -302,82 +307,6 @@ my $validators = {
             )
           )[46]\\d{5}|
           (?:
-            (?:
-              11[1-8]|
-              670
-            )\\d|
-            2(?:
-              2(?:
-                1[2-6]|
-                3[3-6]
-              )|
-              (?:
-                3[06]|
-                49
-              )4|
-              6(?:
-                04|
-                1[2-7]|
-                4[4-6]
-              )|
-              9(?:
-                [17][4-6]|
-                9[3-6]
-              )
-            )|
-            3(?:
-              (?:
-                36|
-                64
-              )4|
-              4(?:
-                1[2-7]|
-                [235][4-6]|
-                84
-              )|
-              5(?:
-                1[2-8]|
-                [38][4-6]
-              )|
-              8(?:
-                1[2-6]|
-                [58][3-6]|
-                7[24-6]
-              )
-            )
-          )\\d{6}|
-          (?:
-            2(?:
-              284|
-              657|
-              9(?:
-                20|
-                66
-              )
-            )|
-            3(?:
-              4(?:
-                8[27]|
-                92
-              )|
-              755|
-              878
-            )
-          )[2-7]\\d{5}|
-          (?:
-            2(?:
-              [28]0|
-              37|
-              6[36]|
-              9[48]
-            )|
-            3(?:
-              62|
-              7[069]|
-              8[03]
-            )
-          )[45]\\d{6}|
-          (?:
             2(?:
               2(?:
                 2[59]|
@@ -386,7 +315,7 @@ my $validators = {
               )|
               3(?:
                 26|
-                4[24]
+                44
               )|
               473|
               9(?:
@@ -400,14 +329,28 @@ my $validators = {
           )[45]\\d{5}|
           (?:
             2(?:
+              284|
+              302|
+              657|
+              920
+            )|
+            3(?:
+              4(?:
+                8[27]|
+                92
+              )|
+              541|
+              755|
+              878
+            )
+          )[2-7]\\d{5}|
+          (?:
+            2(?:
               (?:
                 26|
                 62
               )2|
-              3(?:
-                02|
-                2[03]
-              )|
+              32[03]|
               477|
               9(?:
                 42|
@@ -415,18 +358,67 @@ my $validators = {
               )
             )|
             3(?:
+              329|
               4(?:
                 [47]6|
                 62|
                 89
               )|
-              5(?:
-                41|
-                64
-              )|
-              873
+              564
             )
           )[2-6]\\d{5}|
+          (?:
+            (?:
+              11[1-8]|
+              670
+            )\\d|
+            2(?:
+              2(?:
+                0[45]|
+                1[2-6]|
+                3[3-6]
+              )|
+              3(?:
+                [06]4|
+                7[45]
+              )|
+              494|
+              6(?:
+                04|
+                1[2-7]|
+                [36][45]|
+                4[3-6]
+              )|
+              80[45]|
+              9(?:
+                [17][4-6]|
+                [48][45]|
+                9[3-6]
+              )
+            )|
+            3(?:
+              364|
+              4(?:
+                1[2-7]|
+                [235][4-6]|
+                84
+              )|
+              5(?:
+                1[2-8]|
+                [38][4-6]
+              )|
+              6(?:
+                2[45]|
+                44
+              )|
+              7[069][45]|
+              8(?:
+                [03][45]|
+                [17][2-6]|
+                [58][3-6]
+              )
+            )
+          )\\d{6}|
           2(?:
             2(?:
               21|
@@ -476,7 +468,6 @@ my $validators = {
               )
             )|
             3(?:
-              329|
               4(?:
                 42|
                 71
@@ -490,8 +481,7 @@ my $validators = {
               7(?:
                 18|
                 5[17]
-              )|
-              888
+              )
             )
           )[3-6]\\d{5}|
           (?:
@@ -506,8 +496,8 @@ my $validators = {
               )|
               3(?:
                 1[47]|
-                [24]5|
-                5[25]|
+                25|
+                [45][25]|
                 96
               )|
               47[48]|
@@ -554,8 +544,12 @@ my $validators = {
           )[4-6]\\d{5}
         ',
                 'geographic' => '
+          3888[013-9]\\d{5}|
           (?:
-            2954|
+            29(?:
+              54|
+              66
+            )|
             3(?:
               777|
               865
@@ -574,82 +568,6 @@ my $validators = {
             )
           )[46]\\d{5}|
           (?:
-            (?:
-              11[1-8]|
-              670
-            )\\d|
-            2(?:
-              2(?:
-                1[2-6]|
-                3[3-6]
-              )|
-              (?:
-                3[06]|
-                49
-              )4|
-              6(?:
-                04|
-                1[2-7]|
-                4[4-6]
-              )|
-              9(?:
-                [17][4-6]|
-                9[3-6]
-              )
-            )|
-            3(?:
-              (?:
-                36|
-                64
-              )4|
-              4(?:
-                1[2-7]|
-                [235][4-6]|
-                84
-              )|
-              5(?:
-                1[2-8]|
-                [38][4-6]
-              )|
-              8(?:
-                1[2-6]|
-                [58][3-6]|
-                7[24-6]
-              )
-            )
-          )\\d{6}|
-          (?:
-            2(?:
-              284|
-              657|
-              9(?:
-                20|
-                66
-              )
-            )|
-            3(?:
-              4(?:
-                8[27]|
-                92
-              )|
-              755|
-              878
-            )
-          )[2-7]\\d{5}|
-          (?:
-            2(?:
-              [28]0|
-              37|
-              6[36]|
-              9[48]
-            )|
-            3(?:
-              62|
-              7[069]|
-              8[03]
-            )
-          )[45]\\d{6}|
-          (?:
             2(?:
               2(?:
                 2[59]|
@@ -658,7 +576,7 @@ my $validators = {
               )|
               3(?:
                 26|
-                4[24]
+                44
               )|
               473|
               9(?:
@@ -672,14 +590,28 @@ my $validators = {
           )[45]\\d{5}|
           (?:
             2(?:
+              284|
+              302|
+              657|
+              920
+            )|
+            3(?:
+              4(?:
+                8[27]|
+                92
+              )|
+              541|
+              755|
+              878
+            )
+          )[2-7]\\d{5}|
+          (?:
+            2(?:
               (?:
                 26|
                 62
               )2|
-              3(?:
-                02|
-                2[03]
-              )|
+              32[03]|
               477|
               9(?:
                 42|
@@ -687,18 +619,67 @@ my $validators = {
               )
             )|
             3(?:
+              329|
               4(?:
                 [47]6|
                 62|
                 89
               )|
-              5(?:
-                41|
-                64
-              )|
-              873
+              564
             )
           )[2-6]\\d{5}|
+          (?:
+            (?:
+              11[1-8]|
+              670
+            )\\d|
+            2(?:
+              2(?:
+                0[45]|
+                1[2-6]|
+                3[3-6]
+              )|
+              3(?:
+                [06]4|
+                7[45]
+              )|
+              494|
+              6(?:
+                04|
+                1[2-7]|
+                [36][45]|
+                4[3-6]
+              )|
+              80[45]|
+              9(?:
+                [17][4-6]|
+                [48][45]|
+                9[3-6]
+              )
+            )|
+            3(?:
+              364|
+              4(?:
+                1[2-7]|
+                [235][4-6]|
+                84
+              )|
+              5(?:
+                1[2-8]|
+                [38][4-6]
+              )|
+              6(?:
+                2[45]|
+                44
+              )|
+              7[069][45]|
+              8(?:
+                [03][45]|
+                [17][2-6]|
+                [58][3-6]
+              )
+            )
+          )\\d{6}|
           2(?:
             2(?:
               21|
@@ -748,7 +729,6 @@ my $validators = {
               )
             )|
             3(?:
-              329|
               4(?:
                 42|
                 71
@@ -762,8 +742,7 @@ my $validators = {
               7(?:
                 18|
                 5[17]
-              )|
-              888
+              )
             )
           )[3-6]\\d{5}|
           (?:
@@ -778,8 +757,8 @@ my $validators = {
               )|
               3(?:
                 1[47]|
-                [24]5|
-                5[25]|
+                25|
+                [45][25]|
                 96
               )|
               47[48]|
@@ -826,8 +805,12 @@ my $validators = {
           )[4-6]\\d{5}
         ',
                 'mobile' => '
+          93888[013-9]\\d{5}|
           9(?:
-            2954|
+            29(?:
+              54|
+              66
+            )|
             3(?:
               777|
               865
@@ -845,82 +828,6 @@ my $validators = {
               9[12]
             )
           )[46]\\d{5}|
-          (?:
-            675\\d|
-            9(?:
-              11[1-8]\\d|
-              2(?:
-                2(?:
-                  1[2-6]|
-                  3[3-6]
-                )|
-                (?:
-                  3[06]|
-                  49
-                )4|
-                6(?:
-                  04|
-                  1[2-7]|
-                  4[4-6]
-                )|
-                9(?:
-                  [17][4-6]|
-                  9[3-6]
-                )
-              )|
-              3(?:
-                (?:
-                  36|
-                  64
-                )4|
-                4(?:
-                  1[2-7]|
-                  [235][4-6]|
-                  84
-                )|
-                5(?:
-                  1[2-8]|
-                  [38][4-6]
-                )|
-                8(?:
-                  1[2-6]|
-                  [58][3-6]|
-                  7[24-6]
-                )
-              )
-            )
-          )\\d{6}|
-          9(?:
-            2(?:
-              284|
-              657|
-              9(?:
-                20|
-                66
-              )
-            )|
-            3(?:
-              4(?:
-                8[27]|
-                92
-              )|
-              755|
-              878
-            )
-          )[2-7]\\d{5}|
-          9(?:
-            2(?:
-              [28]0|
-              37|
-              6[36]|
-              9[48]
-            )|
-            3(?:
-              62|
-              7[069]|
-              8[03]
-            )
-          )[45]\\d{6}|
           9(?:
             2(?:
               2(?:
@@ -930,7 +837,7 @@ my $validators = {
               )|
               3(?:
                 26|
-                4[24]
+                44
               )|
               473|
               9(?:
@@ -944,14 +851,28 @@ my $validators = {
           )[45]\\d{5}|
           9(?:
             2(?:
+              284|
+              302|
+              657|
+              920
+            )|
+            3(?:
+              4(?:
+                8[27]|
+                92
+              )|
+              541|
+              755|
+              878
+            )
+          )[2-7]\\d{5}|
+          9(?:
+            2(?:
               (?:
                 26|
                 62
               )2|
-              3(?:
-                02|
-                2[03]
-              )|
+              32[03]|
               477|
               9(?:
                 42|
@@ -959,18 +880,67 @@ my $validators = {
               )
             )|
             3(?:
+              329|
               4(?:
                 [47]6|
                 62|
                 89
               )|
-              5(?:
-                41|
-                64
-              )|
-              873
+              564
             )
           )[2-6]\\d{5}|
+          (?:
+            675\\d|
+            9(?:
+              11[1-8]\\d|
+              2(?:
+                2(?:
+                  0[45]|
+                  1[2-6]|
+                  3[3-6]
+                )|
+                3(?:
+                  [06]4|
+                  7[45]
+                )|
+                494|
+                6(?:
+                  04|
+                  1[2-7]|
+                  [36][45]|
+                  4[3-6]
+                )|
+                80[45]|
+                9(?:
+                  [17][4-6]|
+                  [48][45]|
+                  9[3-6]
+                )
+              )|
+              3(?:
+                364|
+                4(?:
+                  1[2-7]|
+                  [235][4-6]|
+                  84
+                )|
+                5(?:
+                  1[2-8]|
+                  [38][4-6]
+                )|
+                6(?:
+                  2[45]|
+                  44
+                )|
+                7[069][45]|
+                8(?:
+                  [03][45]|
+                  [17][2-6]|
+                  [58][3-6]
+                )
+              )
+            )
+          )\\d{6}|
           92(?:
             2(?:
               21|
@@ -1020,7 +990,6 @@ my $validators = {
               )
             )|
             3(?:
-              329|
               4(?:
                 42|
                 71
@@ -1034,8 +1003,7 @@ my $validators = {
               7(?:
                 18|
                 5[17]
-              )|
-              888
+              )
             )
           )[3-6]\\d{5}|
           9(?:
@@ -1050,8 +1018,8 @@ my $validators = {
               )|
               3(?:
                 1[47]|
-                [24]5|
-                5[25]|
+                25|
+                [45][25]|
                 96
               )|
               47[48]|
@@ -1196,6 +1164,7 @@ $areanames{es}->{542624} = "Uspallata\,\ Mendoza";
 $areanames{es}->{542625} = "General\ Alvear\,\ Mendoza";
 $areanames{es}->{542626} = "La\ Paz\,\ Mendoza";
 $areanames{es}->{54263} = "San\ Martín\,\ Mendoza";
+$areanames{es}->{542643} = "San\ Juan\,\ San\ Juan";
 $areanames{es}->{542644} = "San\ Juan\,\ San\ Juan";
 $areanames{es}->{542645} = "San\ Juan\,\ San\ Juan";
 $areanames{es}->{542646} = "Villa\ San\ Agustín\,\ San\ Juan";
@@ -1319,7 +1288,12 @@ $areanames{es}->{543534} = "Villa\ María\,\ Córdoba";
 $areanames{es}->{543535} = "Villa\ María\,\ Córdoba";
 $areanames{es}->{543536} = "Villa\ María\,\ Córdoba";
 $areanames{es}->{543537} = "Bell\ Ville\,\ Córdoba";
-$areanames{es}->{543541} = "Villa\ Carlos\ Paz\,\ Córdoba";
+$areanames{es}->{5435412} = "Villa\ Carlos\ Paz\,\ Córdoba";
+$areanames{es}->{5435413} = "Villa\ Carlos\ Paz\,\ Córdoba";
+$areanames{es}->{5435414} = "Villa\ Carlos\ Paz\,\ Córdoba";
+$areanames{es}->{5435415} = "Villa\ Carlos\ Paz\,\ Córdoba";
+$areanames{es}->{5435416} = "Villa\ Carlos\ Paz\,\ Córdoba";
+$areanames{es}->{5435417} = "Cosquin\/Córdoba";
 $areanames{es}->{543542} = "Salsacate\,\ Córdoba";
 $areanames{es}->{543543} = "Córdoba\ \(Argüello\)\,\ Córdoba";
 $areanames{es}->{543544} = "Villa\ Dolores\,\ Córdoba";
@@ -1401,7 +1375,13 @@ $areanames{es}->{543867} = "Tafí\ del\ Valle\,\ Tucumán";
 $areanames{es}->{543868} = "Cafayate\,\ Salta";
 $areanames{es}->{543869} = "Ranchillos\ y\ San\ Miguel\,\ Tucumán";
 $areanames{es}->{543872} = "Salta\,\ Salta";
-$areanames{es}->{543873} = "Tartagal\,\ Salta";
+$areanames{es}->{5438730} = "Tartagal\,\ Salta";
+$areanames{es}->{5438731} = "Tartagal\,\ Salta";
+$areanames{es}->{5438732} = "Tartagal\,\ Salta";
+$areanames{es}->{5438733} = "Tartagal\,\ Salta";
+$areanames{es}->{5438734} = "Tartagal\,\ Salta";
+$areanames{es}->{5438735} = "Tartagal\,\ Salta";
+$areanames{es}->{5438736} = "Tartagal\,\ Salta";
 $areanames{es}->{543874} = "Salta\,\ Salta";
 $areanames{es}->{543875} = "Salta\,\ Salta";
 $areanames{es}->{543876} = "San\ José\ de\ Metán\,\ Salta";
@@ -1412,7 +1392,10 @@ $areanames{es}->{543884} = "San\ Salvador\ de\ Jujuy\,\ Jujuy";
 $areanames{es}->{543885} = "La\ Quiaca\,\ Jujuy";
 $areanames{es}->{543886} = "Libertador\ General\ San\ Martín\,\ Jujuy";
 $areanames{es}->{543887} = "Humahuaca\,\ Jujuy";
-$areanames{es}->{543888} = "San\ Pedro\ de\ Jujuy\,\ Jujuy";
+$areanames{es}->{5438883} = "San\ Pedro\ de\ Jujuy\,\ Jujuy";
+$areanames{es}->{5438884} = "San\ Pedro\ de\ Jujuy\,\ Jujuy";
+$areanames{es}->{5438885} = "San\ Pedro\ de\ Jujuy\,\ Jujuy";
+$areanames{es}->{5438886} = "San\ Pedro\ de\ Jujuy\,\ Jujuy";
 $areanames{es}->{543891} = "Graneros\,\ Tucumán";
 $areanames{es}->{543892} = "Amaicha\ del\ Valle\,\ Tucumán";
 $areanames{es}->{543894} = "Burruyacú\,\ Tucumán";
@@ -1508,6 +1491,7 @@ $areanames{en}->{542624} = "Uspallata\,\ Mendoza";
 $areanames{en}->{542625} = "General\ Alvear\,\ Mendoza";
 $areanames{en}->{542626} = "La\ Paz\,\ Mendoza";
 $areanames{en}->{54263} = "San\ Martín\,\ Mendoza";
+$areanames{en}->{542643} = "San\ Juan\,\ San\ Juan";
 $areanames{en}->{542644} = "San\ Juan\,\ San\ Juan";
 $areanames{en}->{542645} = "San\ Juan\,\ San\ Juan";
 $areanames{en}->{542646} = "Villa\ San\ Agustín\,\ San\ Juan";
@@ -1631,7 +1615,12 @@ $areanames{en}->{543534} = "Villa\ María\,\ Córdoba";
 $areanames{en}->{543535} = "Villa\ María\,\ Córdoba";
 $areanames{en}->{543536} = "Villa\ María\,\ Córdoba";
 $areanames{en}->{543537} = "Bell\ Ville\,\ Córdoba";
-$areanames{en}->{543541} = "Villa\ Carlos\ Paz\,\ Córdoba";
+$areanames{en}->{5435412} = "Villa\ Carlos\ Paz\,\ Córdoba";
+$areanames{en}->{5435413} = "Villa\ Carlos\ Paz\,\ Córdoba";
+$areanames{en}->{5435414} = "Villa\ Carlos\ Paz\,\ Córdoba";
+$areanames{en}->{5435415} = "Villa\ Carlos\ Paz\,\ Córdoba";
+$areanames{en}->{5435416} = "Villa\ Carlos\ Paz\,\ Córdoba";
+$areanames{en}->{5435417} = "Cosquin\/Córdoba";
 $areanames{en}->{543542} = "Salsacate\,\ Córdoba";
 $areanames{en}->{543543} = "Córdoba\ \(Argüello\)\,\ Córdoba";
 $areanames{en}->{543544} = "Villa\ Dolores\,\ Córdoba";
@@ -1713,7 +1702,13 @@ $areanames{en}->{543867} = "Tafí\ del\ Valle\,\ Tucumán";
 $areanames{en}->{543868} = "Cafayate\,\ Salta";
 $areanames{en}->{543869} = "Ranchillos\ y\ San\ Miguel\,\ Tucumán";
 $areanames{en}->{543872} = "Salta\,\ Salta";
-$areanames{en}->{543873} = "Tartagal\,\ Salta";
+$areanames{en}->{5438730} = "Tartagal\,\ Salta";
+$areanames{en}->{5438731} = "Tartagal\,\ Salta";
+$areanames{en}->{5438732} = "Tartagal\,\ Salta";
+$areanames{en}->{5438733} = "Tartagal\,\ Salta";
+$areanames{en}->{5438734} = "Tartagal\,\ Salta";
+$areanames{en}->{5438735} = "Tartagal\,\ Salta";
+$areanames{en}->{5438736} = "Tartagal\,\ Salta";
 $areanames{en}->{543874} = "Salta\,\ Salta";
 $areanames{en}->{543875} = "Salta\,\ Salta";
 $areanames{en}->{543876} = "San\ José\ de\ Metán\,\ Salta";
@@ -1724,7 +1719,10 @@ $areanames{en}->{543884} = "San\ Salvador\ de\ Jujuy\,\ Jujuy";
 $areanames{en}->{543885} = "La\ Quiaca\,\ Jujuy";
 $areanames{en}->{543886} = "Libertador\ General\ San\ Martín\,\ Jujuy";
 $areanames{en}->{543887} = "Humahuaca\,\ Jujuy";
-$areanames{en}->{543888} = "San\ Pedro\ de\ Jujuy\,\ Jujuy";
+$areanames{en}->{5438883} = "San\ Pedro\ de\ Jujuy\,\ Jujuy";
+$areanames{en}->{5438884} = "San\ Pedro\ de\ Jujuy\,\ Jujuy";
+$areanames{en}->{5438885} = "San\ Pedro\ de\ Jujuy\,\ Jujuy";
+$areanames{en}->{5438886} = "San\ Pedro\ de\ Jujuy\,\ Jujuy";
 $areanames{en}->{543891} = "Graneros\,\ Tucumán";
 $areanames{en}->{543892} = "Amaicha\ del\ Valle\,\ Tucumán";
 $areanames{en}->{543894} = "Burruyacú\,\ Tucumán";

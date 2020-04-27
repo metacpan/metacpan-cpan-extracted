@@ -1,7 +1,7 @@
 package App::CPANModulesUtils;
 
-our $DATE = '2019-02-13'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2020-02-13'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -141,6 +141,9 @@ are <pm:Acme::CPANModules> distributions that mention specified modules. This is
 done by checking the presence of a dependency with the relationship
 `x_mentions`.
 
+See also <pm:App::lcpan> which has a "x-mentions-for-mod" subcommand that does
+the same thing.
+
 _
     args => {
         modules => {
@@ -150,7 +153,10 @@ _
             greedy => 1,
         },
     },
-
+    links => [
+        # clashes with SEE ALSO in this POD
+        #{url=>'pm:App::lcpan', summary=>'lcpan also has a "x-mentions-for-mod" subcommand that does the same thing'},
+    ],
 };
 sub acme_cpanmodules_for {
     require App::lcpan::Call;
@@ -182,7 +188,7 @@ App::CPANModulesUtils - Command-line utilities related to Acme::CPANModules
 
 =head1 VERSION
 
-This document describes version 0.003 of App::CPANModulesUtils (from Perl distribution App-CPANModulesUtils), released on 2019-02-13.
+This document describes version 0.004 of App::CPANModulesUtils (from Perl distribution App-CPANModulesUtils), released on 2020-02-13.
 
 =head1 SYNOPSIS
 
@@ -217,6 +223,9 @@ are L<Acme::CPANModules> distributions that mention specified modules. This is
 done by checking the presence of a dependency with the relationship
 C<x_mentions>.
 
+See also L<App::lcpan> which has a "x-mentions-for-mod" subcommand that does
+the same thing.
+
 This function is not exported.
 
 Arguments ('*' denotes required arguments):
@@ -224,6 +233,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<modules>* => I<array[perl::modname]>
+
 
 =back
 
@@ -237,6 +247,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 gen_acme_cpanmodules_module_from_acme_cpanlists_list
@@ -273,6 +284,7 @@ Will default to the Acme::CPANLists module name, with CPANLists replaced by
 CPANModules.
 
 =item * B<overwrite> => I<true>
+
 
 =back
 
@@ -313,7 +325,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

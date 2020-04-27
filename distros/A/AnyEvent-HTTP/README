@@ -153,6 +153,12 @@ DESCRIPTION
             specify an appropriate "Proxy-Authorization" header in every
             request.
 
+            Note that this module will prefer an existing persistent
+            connection, even if that connection was made using another
+            proxy. If you need to ensure that a new connection is made in
+            this case, you can either force "persistent" to false or e.g.
+            use the proxy address in your "sessionid".
+
         body => $string
             The request body, usually empty. Will be sent as-is (future
             versions of this module might offer more options).
@@ -191,13 +197,15 @@ DESCRIPTION
 
             See also the "sessionid" parameter.
 
-        session => $string
-            The module might reuse connections to the same host internally.
-            Sometimes (e.g. when using TLS), you do not want to reuse
-            connections from other sessions. This can be achieved by setting
-            this parameter to some unique ID (such as the address of an
-            object storing your state data, or the TLS context) - only
-            connections using the same unique ID will be reused.
+        sessionid => $string
+            The module might reuse connections to the same host internally
+            (regardless of other settings, such as "tcp_connect" or
+            "proxy"). Sometimes (e.g. when using TLS or a specfic proxy),
+            you do not want to reuse connections from other sessions. This
+            can be achieved by setting this parameter to some unique ID
+            (such as the address of an object storing your state data or the
+            TLS context, or the proxy IP) - only connections using the same
+            unique ID will be reused.
 
         on_prepare => $callback->($fh)
             In rare cases you need to "tune" the socket before it is used to
@@ -216,6 +224,13 @@ DESCRIPTION
             your own "tcp_connect" function - obviously, it has to follow
             the same calling conventions, except that it may always return a
             connection guard object.
+
+            The connections made by this hook will be treated as equivalent
+            to connections made the built-in way, specifically, they will be
+            put into and taken from the persistent connection cache. If your
+            $tcp_connect function is incompatible with this kind of re-use,
+            consider switching off "persistent" connections and/or providing
+            a "sessionid" identifier.
 
             There are probably lots of weird uses for this function,
             starting from tracing the hosts "http_request" actually tries to
@@ -299,8 +314,9 @@ DESCRIPTION
             Try to create/reuse a persistent connection. When this flag is
             set (default: true for idempotent requests, false for all
             others), then "http_request" tries to re-use an existing
-            (previously-created) persistent connection to the host and,
-            failing that, tries to create a new one.
+            (previously-created) persistent connection to same host (i.e.
+            identical URL scheme, hostname, port and sessionid) and, failing
+            that, tries to create a new one.
 
             Requests failing in certain ways will be automatically retried
             once, which is dangerous for non-idempotent requests, which is
@@ -311,8 +327,8 @@ DESCRIPTION
             request or not.
 
             When reusing an existent connection, many parameters (such as
-            TLS context) will be ignored. See the "session" parameter for a
-            workaround.
+            TLS context) will be ignored. See the "sessionid" parameter for
+            a workaround.
 
         keepalive => $boolean
             Only used when "persistent" is also true. This parameter decides
@@ -402,7 +418,7 @@ DESCRIPTION
         this module. Its format is subject to change, but currently it is as
         follows:
 
-        The key "version" has to contain 1, otherwise the hash gets emptied.
+        The key "version" has to contain 2, otherwise the hash gets cleared.
         All other keys are hostnames or IP addresses pointing to
         hash-references. The key for these inner hash references is the
         server path for which this cookie is meant, and the values are again
@@ -417,7 +433,7 @@ DESCRIPTION
         a chance of understanding the above paragraph:
 
            {
-              version    => 1,
+              version    => 2,
               "10.0.0.1" => {
                  "/" => {
                     "mythweb_id" => {

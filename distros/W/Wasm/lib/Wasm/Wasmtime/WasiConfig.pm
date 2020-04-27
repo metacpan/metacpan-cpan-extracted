@@ -5,15 +5,11 @@ use warnings;
 use Wasm::Wasmtime::FFI;
 
 # ABSTRACT: WASI Configuration
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 $ffi_prefix = 'wasi_config_';
-$ffi->custom_type('wasi_config_t' => {
-  native_type => 'opaque',
-  perl_to_native => sub { shift->{ptr} },
-  native_to_perl => sub { bless { ptr => shift }, __PACKAGE__ },
-});
+$ffi->load_custom_type('::PtrObject' => 'wasi_config_t' => __PACKAGE__);
 
 
 sub _wrapper
@@ -54,10 +50,7 @@ $ffi->attach( set_env => ['wasi_config_t','int','string[]','string[]'] => sub {
   $self;
 });
 
-$ffi->attach( [ 'delete' => 'DESTROY' ] => ['wasi_config_t'] => sub {
-  my($xsub, $self) = @_;
-  $xsub->($self) if $self->{ptr};
-});
+_generate_destroy();
 
 1;
 
@@ -73,7 +66,7 @@ Wasm::Wasmtime::WasiConfig - WASI Configuration
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

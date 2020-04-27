@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-04-18'; # DATE
-our $VERSION = '0.542'; # VERSION
+our $DATE = '2020-04-27'; # DATE
+our $VERSION = '0.543'; # VERSION
 
 use Perinci::CmdLine::Any;
 
@@ -28,13 +28,20 @@ lint-prereqs - Check extraneous/missing/incorrect prerequisites in dist.ini
 
 =head1 VERSION
 
-This document describes version 0.542 of lint-prereqs (from Perl distribution App-LintPrereqs), released on 2020-04-18.
+This document describes version 0.543 of lint-prereqs (from Perl distribution App-LintPrereqs), released on 2020-04-27.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % lint-prereqs [options]
+ % lint-prereqs [-F] [--config-path=s | -c] [--config-profile=s | -P]
+     [--core-prereqs] [--debug] [--extra-runtime-dir=s+]
+     [--extra-runtime-dirs-json=s] [--extra-test-dir=s+]
+     [--extra-test-dirs-json=s] [--fix] [--format=s] [--json]
+     [--log-level=s] [--(no)naked-res] [--no-config | -C]
+     [--no-core-prereqs] [--no-env] [--no-fix] [--nocore-prereqs] [--nofix]
+     [--page-result[=s]] [--perl-version=s] [--quiet] [--scanner=s]
+     [--trace] [--verbose]
 
 =head1 DESCRIPTION
 
@@ -310,7 +317,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/s1/.config/lint-prereqs.conf>, F</home/s1/lint-prereqs.conf>, F</etc/lint-prereqs.conf>, or F<./lint-prereqs.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/lint-prereqs.conf>, F</home/u1/lint-prereqs.conf>, F</etc/lint-prereqs.conf>, or F<./lint-prereqs.conf>.
 
 All found files will be read and merged.
 
@@ -342,9 +349,9 @@ Specify additional command-line options.
 
 =head1 FILES
 
-F</home/s1/.config/lint-prereqs.conf>
+F</home/u1/.config/lint-prereqs.conf>
 
-F</home/s1/lint-prereqs.conf>
+F</home/u1/lint-prereqs.conf>
 
 F</etc/lint-prereqs.conf>
 

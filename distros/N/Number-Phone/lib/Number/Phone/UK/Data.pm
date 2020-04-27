@@ -21,7 +21,6 @@ sub db {
     if(!$db || $pid != $$) {
         # we want to re-open the DB if we've forked, because of
         # https://github.com/DrHyde/perl-modules-Number-Phone/issues/72
-        # Unfortunately that's annoyingly hard to test
         $pid = $$;
         $db = DBM::Deep->new($file);
     }
@@ -38,9 +37,7 @@ sub _slurp {
     my $db = shift;
     if(!ref($db)) {
         return $db
-    } elsif($db->isa('ARRAY')) {
-        return [ map { _slurp($_) } @{$db} ]
-    } elsif($db->isa('HASH')) {
+    } else {
         return { map {
             $_ => _slurp($db->{$_})
         } keys(%{$db}) };

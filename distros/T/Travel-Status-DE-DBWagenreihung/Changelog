@@ -1,3 +1,8 @@
+Travel::Status::DE::DBWagenreihung 0.03 - Sun Apr 26 2020
+
+    * Wagenreihung: Add train_powertype function
+    * Wagon: Add train_no and uic_id accessors
+
 Travel::Status::DE::DBWagenreihung 0.02 - Sun Jun 23 2019
 
     * Add from_json option to constructor

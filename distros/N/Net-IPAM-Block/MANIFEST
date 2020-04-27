@@ -1,6 +1,7 @@
 Build.PL
 Changes
 lib/Net/IPAM/Block.pm
+lib/Net/IPAM/Block/Private.pm
 LICENSE
 MANIFEST			This list of files
 META.json

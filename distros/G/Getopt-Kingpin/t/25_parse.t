@@ -1,7 +1,6 @@
 use strict;
 use Test::More 0.98;
 use Test::Exception;
-use Test::Trap;
 use Getopt::Kingpin;
 use Getopt::Kingpin::Command;
 

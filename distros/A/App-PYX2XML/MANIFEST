@@ -22,5 +22,11 @@ README
 SIGNATURE
 t/App-PYX2XML/01-use.t
 t/App-PYX2XML/02-version.t
+t/App-PYX2XML/03-new.t
+t/App-PYX2XML/04-run.t
+t/data/element.pyx
+t/data/element_latin2.pyx
+t/data/element_utf8.pyx
+t/data/element_with_content.pyx
 xt/App-PYX2XML/01-pod_coverage.t
 xt/App-PYX2XML/02-pod.t

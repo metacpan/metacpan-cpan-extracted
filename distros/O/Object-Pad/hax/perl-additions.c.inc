@@ -4,6 +4,12 @@
 #  define av_count(av)           (av_top_index(av) + 1)
 #endif
 
+#if HAVE_PERL_VERSION(5, 22, 0)
+#  define PadnameIsNULL(pn)  (!(pn))
+#else
+#  define PadnameIsNULL(pn)  (!(pn) || (pn) == &PL_sv_undef)
+#endif
+
 #define save_strndup(s, l)  S_save_strndup(aTHX_ s, l)
 static char *S_save_strndup(pTHX_ char *s, STRLEN l)
 {

@@ -1,7 +1,7 @@
 use strict;
 use Test::More 0.98;
 use Test::Exception;
-use Test::Trap;
+use Capture::Tiny ':all';
 use Getopt::Kingpin;
 
 
@@ -26,16 +26,17 @@ subtest 'arg required' => sub {
     push @ARGV, qw(--name=kingpin arg1);
 
     my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
     my $name = $kingpin->flag('name', 'set name')->string();
     my $arg1 = $kingpin->arg('arg1', 'set arg1')->string();
     my $arg2 = $kingpin->arg('arg2', 'set arg2')->required->string();
 
-    trap {
+    my ($stdout, $stderr, $ret, $exit) = capture {
         $kingpin->parse;
     };
-    
-    like $trap->stderr, qr/required arg 'arg2' not provided/, 'required error';
-    is $trap->exit, 1;
+
+    like $stderr, qr/required arg 'arg2' not provided/, 'required error';
+    is $exit, 1;
 };
 
 subtest 'arg required 2' => sub {
@@ -43,16 +44,17 @@ subtest 'arg required 2' => sub {
     push @ARGV, qw(--name=kingpin);
 
     my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
     my $name = $kingpin->flag('name', 'set name')->string();
     my $arg1 = $kingpin->arg('arg1', 'set arg1')->string();
     my $arg2 = $kingpin->arg('arg2', 'set arg2')->required->string();
 
     # requiredがついている手前は、全てrequiredの扱い
-    trap {
+    my ($stdout, $stderr, $ret, $exit) = capture {
         $kingpin->parse;
     };
-    like $trap->stderr, qr/required arg 'arg2' not provided/, 'required error';
-    is $trap->exit, 1;
+    like $stderr, qr/required arg 'arg2' not provided/, 'required error';
+    is $exit, 1;
 };
 
 subtest 'arg required 3' => sub {

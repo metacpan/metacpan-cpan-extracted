@@ -1,3 +1,18 @@
+0.872   2020-04-27  Released-By: PERLANCAR; Urgency: medium
+
+	- When function metadata property 'args_as' is array(ref)?,
+	  arguments that are not positional (do not define 'pos' argument
+	  metadata property) can be specified as the first hashref; the
+	  hashref is optional if all those non-positional arguments are
+	  optional.
+
+
+0.871   2020-04-16  Released-By: PERLANCAR; Urgency: medium
+
+	- Do not add function's prog: links to module's See Also because
+	  they are normally irrelevant.
+
+
 0.870   2020-01-31  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Fix misplaced parenthesis which caused perl undef

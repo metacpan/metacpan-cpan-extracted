@@ -1,7 +1,7 @@
 use strict;
 use Test::More 0.98;
 use Test::Exception;
-use Test::Trap;
+use Capture::Tiny ':all';
 use Getopt::Kingpin;
 
 
@@ -36,14 +36,15 @@ subtest 'validate value parse error' => sub {
     push @ARGV, qw(--num ten);
 
     my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
     my $num = $kingpin->flag('num', 'set number')->int();
 
-    trap {
+    my ($stdout, $stderr, $ret, $exit) = capture {
         $kingpin->parse;
     };
 
-    like $trap->stderr, qr/int parse error/, "int parse error";
-    is $trap->exit, 1;
+    like $stderr, qr/int parse error/, "int parse error";
+    is $exit, 1;
 };
 
 done_testing;

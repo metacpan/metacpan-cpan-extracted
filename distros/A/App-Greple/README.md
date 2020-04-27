@@ -4,7 +4,7 @@ greple - extensible grep with lexical expression and region handling
 
 # VERSION
 
-Version 8.3801
+Version 8.3902
 
 # SYNOPSIS
 
@@ -92,6 +92,14 @@ Version 8.3801
       --conceal=type       conceal run time errors
       --persist            continue even after encoding error
       -d flags             display info (f:file d:dir c:color m:misc s:stat)
+
+# INSTALL
+
+## CPANMINUS
+
+    $ cpanm App::Greple
+    or
+    $ curl -sL http://cpanmin.us | perl - App::Greple
 
 # DESCRIPTION
 

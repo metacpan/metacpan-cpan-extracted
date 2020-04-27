@@ -129,7 +129,7 @@
             "Moose::Role" : "0",
             "PadWalker" : "0",
             "Path::Class" : "0",
-            "Path::Iterator::Rule" : "0",
+            "Path::Tiny::Rule" : "0",
             "Perl::Critic::Moose" : "1.05",
             "Pod::Elemental::Transformer::List" : "0",
             "Pod::Elemental::Transformer::Verbatim" : "0",
@@ -170,27 +170,27 @@
    "provides" : {
       "Dist::Zilla::Plugin::DROLSKY::MakeMaker" : {
          "file" : "lib/Dist/Zilla/Plugin/DROLSKY/MakeMaker.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Dist::Zilla::Plugin::DROLSKY::Role::CoreCounter" : {
          "file" : "lib/Dist/Zilla/Plugin/DROLSKY/Role/CoreCounter.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Dist::Zilla::Plugin::DROLSKY::RunExtraTests" : {
          "file" : "lib/Dist/Zilla/Plugin/DROLSKY/RunExtraTests.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Dist::Zilla::Plugin::DROLSKY::WeaverConfig" : {
          "file" : "lib/Dist/Zilla/Plugin/DROLSKY/WeaverConfig.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Dist::Zilla::PluginBundle::DROLSKY" : {
          "file" : "lib/Dist/Zilla/PluginBundle/DROLSKY.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Pod::Weaver::PluginBundle::DROLSKY" : {
          "file" : "lib/Pod/Weaver/PluginBundle/DROLSKY.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       }
    },
    "release_status" : "stable",
@@ -205,7 +205,7 @@
          "web" : "https://github.com/autarch/Dist-Zilla-PluginBundle-DROLSKY"
       }
    },
-   "version" : "1.06",
+   "version" : "1.07",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030001"
@@ -985,7 +985,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.06",
+                  "tag" : "v1.07",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },

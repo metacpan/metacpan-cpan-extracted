@@ -1,7 +1,7 @@
 package Perinci::To::Doc::Role::Section;
 
-our $DATE = '2020-01-31'; # DATE
-our $VERSION = '0.870'; # VERSION
+our $DATE = '2020-04-27'; # DATE
+our $VERSION = '0.872'; # VERSION
 
 use 5.010;
 use Log::ger;
@@ -111,7 +111,7 @@ Perinci::To::Doc::Role::Section - Role for class that generates documentation wi
 
 =head1 VERSION
 
-This document describes version 0.870 of Perinci::To::Doc::Role::Section (from Perl distribution Perinci-To-Doc), released on 2020-01-31.
+This document describes version 0.872 of Perinci::To::Doc::Role::Section (from Perl distribution Perinci-To-Doc), released on 2020-04-27.
 
 =head1 DESCRIPTION
 

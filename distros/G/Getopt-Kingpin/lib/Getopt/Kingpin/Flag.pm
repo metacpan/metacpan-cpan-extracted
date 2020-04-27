@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Getopt::Kingpin::Base -base;
 
-our $VERSION = "0.07";
+our $VERSION = "0.08";
 
 has _placeholder => undef;
 has _hidden      => 0;

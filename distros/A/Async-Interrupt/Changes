@@ -1,5 +1,9 @@
 Revision history for Perl extension Async::Interrupt.
 
+1.26 Mon Apr 27 13:34:10 CEST 2020
+	- make it compatible with perl 5.31's sighandler changes
+          (patch by Todd Rinaldo).
+
 1.25 Sat Apr 20 12:42:25 CEST 2019
 	- fix dependency on Canary::Stability (reported by Ross Opperman).
 

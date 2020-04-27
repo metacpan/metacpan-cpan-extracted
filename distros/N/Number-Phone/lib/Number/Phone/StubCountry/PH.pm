@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200309202348;
+our $VERSION = 1.20200427120031;
 
 my $formatters = [
                 {
@@ -176,7 +176,7 @@ my $validators = {
               4[235-9]|
               6[0-25-8]|
               7[1-9]|
-              8[19]|
+              8[189]|
               9[4-9]
             )
           )\\d{7}
@@ -187,15 +187,63 @@ my $validators = {
                 'toll_free' => '1800\\d{7,9}',
                 'voip' => ''
               };
+my %areanames = ();
+$areanames{en}->{6332} = "Cebu";
+$areanames{en}->{6333} = "Iloilo";
+$areanames{en}->{633461} = "Negros\ Occidental";
+$areanames{en}->{6335} = "Negros\ Oriental";
+$areanames{en}->{6336} = "Antique\/Aklan\/Capiz";
+$areanames{en}->{6338} = "Bohol";
+$areanames{en}->{634235} = "Quezon";
+$areanames{en}->{634244} = "Quezon";
+$areanames{en}->{634251} = "Quezon";
+$areanames{en}->{634264} = "Quezon";
+$areanames{en}->{634279} = "Quezon";
+$areanames{en}->{634396} = "Batangas";
+$areanames{en}->{634422} = "Bulacan";
+$areanames{en}->{634463} = "Bulacan";
+$areanames{en}->{634593} = "Pampanga";
+$areanames{en}->{634594} = "Pampanga";
+$areanames{en}->{634597} = "Pampanga";
+$areanames{en}->{6346} = "Cavite";
+$areanames{en}->{634761} = "Zambales";
+$areanames{en}->{634765} = "Zambales";
+$areanames{en}->{6348} = "Palawan";
+$areanames{en}->{635221} = "Albay";
+$areanames{en}->{6353} = "Leyte";
+$areanames{en}->{635446} = "Camarines\ Sur";
+$areanames{en}->{6355} = "Western\ Samar";
+$areanames{en}->{6356} = "Sorsogon\/Masbate";
+$areanames{en}->{6362} = "Zamboanga\ del\ Sur";
+$areanames{en}->{6363} = "Lanao\ del\ Norte\/Lanao\ del\ Sur";
+$areanames{en}->{636422} = "North\ Cotabato";
+$areanames{en}->{636423} = "North\ Cotabato";
+$areanames{en}->{6365} = "Zamboanga\ del\ Norte\/Zamboanga\ del\ Sur";
+$areanames{en}->{6372} = "La\ Union";
+$areanames{en}->{6374} = "Abra\/Benguet\/Kalinga\-Apayao\/Ifugao\/Mountain\ Province";
+$areanames{en}->{6375} = "Pangasinan";
+$areanames{en}->{6377} = "Ilocos\ Sur\/Ilocos\ Norte";
+$areanames{en}->{6378} = "Isabela\/Quirino\/Batanes\/Nueva\ Vizcaya\/Cagayan\ Valley";
+$areanames{en}->{6382} = "Davao\ del\ Sur\/Davao";
+$areanames{en}->{6383} = "South\ Cotabato";
+$areanames{en}->{6384} = "Davao\ del\ Norte";
+$areanames{en}->{6385} = "Agusan\ del\ Sur\/Agusan\ del\ Norte";
+$areanames{en}->{638622} = "Surigao\ del\ Sur";
+$areanames{en}->{6387} = "Davao\ Oriental";
+$areanames{en}->{638822} = "Misamis\ Oriental";
+$areanames{en}->{638834} = "Misamis\ Occidental";
+$areanames{en}->{638842} = "Misamis\ Oriental";
+$areanames{en}->{638851} = "Bukidnon";
+$areanames{en}->{638853} = "Bukidnon";
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+63|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

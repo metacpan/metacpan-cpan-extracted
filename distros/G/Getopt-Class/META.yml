@@ -1,0 +1,34 @@
+---
+abstract: 'A class based approach for options of Getopt::Long'
+author:
+  - 'Jacques Deguest (jack@deguest.jp)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.302162'
+  Test::Pod: '1.52'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Getopt-Class
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DateTime: '1.51'
+  DateTime::Format::Strptime: '1.76'
+  Getopt::Long: '0.44'
+  Module::Generic: v0.11.8
+  Scalar::Util: '1.54'
+  TryCatch: '1.003002'
+  parent: '0.237'
+  perl: '5.006000'
+  strict: '1.11'
+  warnings: '1.44'
+version: v0.101.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

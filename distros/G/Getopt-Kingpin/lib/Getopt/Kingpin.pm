@@ -9,7 +9,7 @@ use Getopt::Kingpin::Commands;
 use File::Basename;
 use Carp;
 
-our $VERSION = "0.07";
+our $VERSION = "0.08";
 
 use overload (
     '""' => sub {$_[0]->name},
@@ -49,6 +49,13 @@ has name => sub {
 
 has description => sub {
     return "";
+};
+
+has terminate => sub {
+    return sub {
+        my $ret = defined $_[1] ? $_[1] : 0;
+        exit $ret;
+    };
 };
 
 sub new {
@@ -113,7 +120,11 @@ sub parse {
         @argv = @ARGV;
     }
 
-    return $self->_parse(@argv);
+    my ($ret, $exit_code) = $self->_parse(@argv);
+    if (defined $exit_code) {
+        return $self->terminate->($ret, $exit_code);
+    }
+    return $ret;
 }
 
 sub _parse {
@@ -129,7 +140,6 @@ sub _parse {
     };
     my $arg_index = 0;
     my $arg_only = 0;
-    my $current_cmd;
     while (scalar @argv > 0) {
         my $arg = shift @argv;
         if ($arg eq "--") {
@@ -144,8 +154,8 @@ sub _parse {
             my $v = $self->flags->get($name);
 
             if (not defined $v) {
-                printf STDERR "%s: error: unknown long flag '--%s', try --help", $self->name, $name;
-                exit 1;
+                printf STDERR "%s: error: unknown long flag '--%s', try --help\n", $self->name, $name;
+                return undef, 1;
             }
 
             my $value;
@@ -157,7 +167,10 @@ sub _parse {
                 $value = shift @argv;
             }
 
-            $v->set_value($value);
+            my ($dummy, $exit) = $v->set_value($value);
+            if (defined $exit) {
+                return undef, $exit;
+            }
         } elsif ($arg_only == 0 and $arg =~ /^-(\S+)$/) {
             my $short_name = $1;
             while (length $short_name > 0) {
@@ -169,8 +182,8 @@ sub _parse {
                     }
                 }
                 if (not defined $name) {
-                    printf STDERR "%s: error: unknown short flag '-%s', try --help", $self->name, $s;
-                    exit 1;
+                    printf STDERR "%s: error: unknown short flag '-%s', try --help\n", $self->name, $s;
+                    return undef, 1;
                 }
                 delete $required_but_not_found->{$name} if exists $required_but_not_found->{$name};
                 my $v = $self->flags->get($name);
@@ -187,7 +200,10 @@ sub _parse {
                     }
                 }
 
-                $v->set_value($value);
+                my ($dummy, $exit) = $v->set_value($value);
+                if (defined $exit) {
+                    return undef, $exit;
+                }
                 $short_name = $remain;
             }
         } else {
@@ -203,53 +219,59 @@ sub _parse {
                         if ($self->flags->get("help")) {
                             push @argv_for_command, "--help";
                         }
-                        $cmd->_parse(@argv_for_command);
-                        $current_cmd = $cmd;
-                        next;
+                        return $cmd->_parse(@argv_for_command);
                     }
                 }
             }
 
             if (not ($arg_index == 0 and $arg eq "help")) {
                 if ($arg_index < $self->args->count) {
-                    $self->args->get_by_index($arg_index)->set_value($arg);
+                    my ($dummy, $exit) = $self->args->get_by_index($arg_index)->set_value($arg);
+                    if (defined $exit) {
+                        return undef, $exit;
+                    }
                     if (not $self->args->get_by_index($arg_index)->is_cumulative) {
                         $arg_index++;
                     }
                 } else {
-                    printf STDERR "%s: error: unexpected %s, try --help", $self->name, $arg;
-                    exit 1;
+                    printf STDERR "%s: error: unexpected %s, try --help\n", $self->name, $arg;
+                    return undef, 1;
                 }
             }
         }
     }
 
     if ($self->flags->get("help")) {
-        if (defined $current_cmd) {
-            $current_cmd->help;
-        } else {
-            $self->help;
-        }
-        exit 0;
+        $self->help;
+        return undef, 0;
     }
 
     if ($self->flags->get("version")) {
         printf STDERR "%s\n", $self->_version;
-        exit 0;
+        return undef, 0;
     }
 
     foreach my $f ($self->flags->values) {
         if (defined $f->value) {
             next;
         } elsif (defined $f->_envar) {
-            $f->set_value($f->_envar);
+            my ($dummy, $exit) = $f->set_value($f->_envar);
+            if (defined $exit) {
+                return undef, $exit;
+            }
         } elsif (defined $f->_default) {
             if ($f->type =~ /List$/) {
                 foreach my $default (@{$f->_default}) {
-                    $f->set_value($default);
+                    my ($dummy, $exit) = $f->set_value($default);
+                    if (defined $exit) {
+                        return undef, $exit;
+                    }
                 }
             } else {
-                $f->set_value($f->_default);
+                my ($dummy, $exit) = $f->set_value($f->_default);
+                if (defined $exit) {
+                    return undef, $exit;
+                }
             }
         } elsif ($f->type =~ /List$/) {
             $f->value([]);
@@ -260,14 +282,23 @@ sub _parse {
         if (defined $arg->value) {
             next;
         } elsif (defined $arg->_envar) {
-            $arg->set_value($arg->_envar);
+            my ($dummy, $exit) = $arg->set_value($arg->_envar);
+            if (defined $exit) {
+                return undef, $exit;
+            }
         } elsif (defined $arg->_default) {
             if ($arg->type =~ /List$/) {
                 foreach my $default (@{$arg->_default}) {
-                    $arg->set_value($default);
+                    my ($dummy, $exit) = $arg->set_value($default);
+                    if (defined $exit) {
+                        return undef, $exit;
+                    }
                 }
             } else {
-            $arg->set_value($arg->_default);
+                my ($dummy, $exit) = $arg->set_value($arg->_default);
+                if (defined $exit) {
+                    return undef, $exit;
+                }
             }
         } elsif ($arg->type =~ /List$/) {
             $arg->value([]);
@@ -275,22 +306,18 @@ sub _parse {
     }
 
     foreach my $r (values %$required_but_not_found) {
-        printf STDERR "%s: error: required flag --%s not provided, try --help", $self->name, $r->name;
-        exit 1;
+        printf STDERR "%s: error: required flag --%s not provided, try --help\n", $self->name, $r->name;
+        return undef, 1;
     }
     for (my $i = 0; $i < $self->args->count; $i++) {
         my $arg = $self->args->get_by_index($i);
         if ($arg->_required and not $arg->_defined) {
-            printf STDERR "%s: error: required arg '%s' not provided, try --help", $self->name, $arg->name;
-            exit 1;
+            printf STDERR "%s: error: required arg '%s' not provided, try --help\n", $self->name, $arg->name;
+            return undef, 1;
         }
     }
 
-    if (defined $current_cmd) {
-        return $current_cmd;
-    } else {
-        return $self;
-    }
+    return $self;
 }
 
 sub version {

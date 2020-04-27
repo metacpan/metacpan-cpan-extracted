@@ -1,18 +1,15 @@
 package PYX::SGML::Tags;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use PYX::Parser;
 use PYX::Utils qw(encode);
 use Tags::Output::Raw;
 
-# Version.
-our $VERSION = 0.02;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -150,6 +147,7 @@ PYX::SGML::Tags - Processing PYX data or file and write as SGML via Tags.
 =head1 SYNOPSIS
 
  use PYX::SGML::Tags;
+
  my $obj = PYX::SGML::Tags->new(%parameters);
  $obj->parse($pyx, $out);
  $obj->parse_file($input_file, $out);
@@ -235,13 +233,11 @@ Constructor.
          From Tags::Output::Raw::flush():
                  Cannot write to output handler.
 
-=head1 EXAMPLE
+=head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use PYX::SGML::Tags;
 
  # Input.
@@ -253,6 +249,35 @@ Constructor.
 
  # Object.
  my $obj = PYX::SGML::Tags->new;
+
+ # Process.
+ $obj->parse($pyx);
+ print "\n";
+
+ # Output:
+ # <element>data</element>
+
+=head1 EXAMPLE2
+
+ use strict;
+ use warnings;
+
+ use PYX::SGML::Tags;
+ use Tags::Output::Indent;
+
+ # Input.
+ my $pyx = <<'END';
+ (element
+ -data
+ )element
+ END
+
+ # Object.
+ my $obj = PYX::SGML::Tags->new(
+         'tags' => Tags::Output::Indent->new(
+                 'output_handler' => \*STDOUT,
+         ),
+ );
 
  # Process.
  $obj->parse($pyx);
@@ -281,21 +306,22 @@ Install the PYX modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/PYX-SGML-Tags>
+L<https://github.com/michal-josef-spacek/PYX-SGML-Tags>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2011-2016 Michal Špaček
- BSD 2-Clause License
+© 2011-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.04
 
 =cut

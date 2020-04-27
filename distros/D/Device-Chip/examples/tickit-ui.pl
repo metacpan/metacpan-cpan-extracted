@@ -13,6 +13,8 @@ GetOptions(
    'mode|M=s'    => \( my $STARTMODE = "GPIO" ),
 ) or exit 1;
 
+defined $ADAPTER or die "Need --adapter\n";
+
 Device::Chip::Ex::TickitUI->run(
    Device::Chip::Adapter->new_from_description( $ADAPTER ),
    startmode => $STARTMODE,

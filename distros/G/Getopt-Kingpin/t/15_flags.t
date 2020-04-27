@@ -1,7 +1,7 @@
 use strict;
 use Test::More 0.98;
 use Test::Exception;
-use Test::Trap;
+use Capture::Tiny ':all';
 use Getopt::Kingpin;
 use File::Basename;
 
@@ -23,15 +23,16 @@ subtest 'flags ordered help' => sub {
     push @ARGV, qw(--help);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     my $verbose3 = $kingpin->flag('verbose3', 'Verbose mode.')->bool();
     my $verbose1 = $kingpin->flag('verbose1', 'Verbose mode.')->bool();
     my $verbose2 = $kingpin->flag('verbose2', 'Verbose mode.')->bool();
 
-    trap {
+    my ($stdout, $stderr, $ret, $exit) = capture {
         $kingpin->parse;
     };
 
-    is $trap->stdout, sprintf <<'...', basename($0);
+    is $stdout, sprintf <<'...', basename($0);
 usage: %s [<flags>]
 
 Flags:

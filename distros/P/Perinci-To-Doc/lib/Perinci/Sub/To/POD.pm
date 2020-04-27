@@ -1,7 +1,7 @@
 package Perinci::Sub::To::POD;
 
-our $DATE = '2020-01-31'; # DATE
-our $VERSION = '0.870'; # VERSION
+our $DATE = '2020-04-27'; # DATE
+our $VERSION = '0.872'; # VERSION
 
 use 5.010001;
 use Log::ger;
@@ -342,7 +342,7 @@ sub after_gen_doc {
             next if 'hidden-mod' ~~ @{ $ra->{arg}{tags} // [] };
             $self->add_doc_lines(join(
                 "",
-                "=item * B<".(($orig_args_as =~ /array/ ? '$' : '').$name).">",
+                "=item * B<".(($orig_args_as =~ /array/ && defined($ra->{arg}{pos}) ? '$' : '').$name).">",
                 ($ra->{arg}{req} ? '*' : ''), ' => ',
                 "I<", $ra->{human_arg}, ">",
                 (defined($ra->{human_arg_default}) ?
@@ -440,7 +440,7 @@ Perinci::Sub::To::POD - Generate POD documentation from Rinci function metadata
 
 =head1 VERSION
 
-This document describes version 0.870 of Perinci::Sub::To::POD (from Perl distribution Perinci-To-Doc), released on 2020-01-31.
+This document describes version 0.872 of Perinci::Sub::To::POD (from Perl distribution Perinci-To-Doc), released on 2020-04-27.
 
 =head1 SYNOPSIS
 

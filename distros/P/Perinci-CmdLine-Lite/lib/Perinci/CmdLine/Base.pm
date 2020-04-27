@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Base;
 
-our $DATE = '2020-04-01'; # DATE
-our $VERSION = '1.827'; # VERSION
+our $DATE = '2020-04-27'; # DATE
+our $VERSION = '1.828'; # VERSION
 
 use 5.010001;
 use strict;
@@ -170,6 +170,7 @@ our %copts = (
     format => {
         getopt  => 'format=s',
         summary => 'Choose output format, e.g. json, text',
+        value_label => 'name',
         handler => sub {
             my ($go, $val, $r) = @_;
             $r->{format} = $val;
@@ -191,7 +192,7 @@ our %copts = (
     page_result => {
         getopt  => "page-result:s",
         summary => "Filter output through a pager",
-        usage   => "--page-result (or --page-result=PROGNAME)",
+        value_label => 'program',
         handler => sub {
             my ($go, $val, $r) = @_;
             $r->{page_result} = 1;
@@ -248,6 +249,7 @@ _
     cmd => {
         getopt  => "cmd=s",
         summary => 'Select subcommand',
+        value_label => 'subcommand_name',
         handler => sub {
             my ($go, $val, $r) = @_;
             $r->{subcommand_name} = $val;
@@ -269,6 +271,7 @@ _
         getopt  => 'config-path=s@',
         schema  => ['array*', of => 'filename*'],
         summary => 'Set path to configuration file',
+        value_label=>'path',
         handler => sub {
             my ($go, $val, $r) = @_;
             $r->{config_paths} //= [];
@@ -297,6 +300,7 @@ _
     config_profile => {
         getopt  => 'config-profile=s',
         summary => 'Set configuration profile to use',
+        value_label=>'profile',
         handler => sub {
             my ($go, $val, $r) = @_;
             $r->{config_profile} = $val;
@@ -367,6 +371,7 @@ _
         summary => 'Set log level',
         schema  => ['str*' => in => [
             qw/trace debug info warn warning error fatal/]],
+        value_label=>'level',
         handler => sub {
             my ($go, $val, $r) = @_;
             $r->{log_level} = $val;
@@ -1764,7 +1769,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.827 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2020-04-01.
+This document describes version 1.828 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2020-04-27.
 
 =head1 DESCRIPTION
 

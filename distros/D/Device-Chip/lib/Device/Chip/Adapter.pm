@@ -10,9 +10,11 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Carp;
+
+use Struct::Dumb qw( readonly_struct );
 
 require Device::Chip;
 
@@ -87,12 +89,18 @@ It is intended that this method is used for creating an adapter that a
 standalone program can use from a description string specified by the user;
 likely in a commandline option or environment variable.
 
+If I<$DESC> is undefined, a default value is taken from the environment
+variable C<DEVICE_CHIP_ADAPTER>, if defined. If not, an exception is thrown.
+
 =cut
 
 sub new_from_description
 {
    shift;
    my ( $description ) = @_;
+
+   defined( $description //= $ENV{DEVICE_CHIP_ADAPTER} ) or
+      croak "Undefined Device::Chip adapter description";
 
    my ( $basename, $opts ) = $description =~ m/^([^:]+)(?::(.*))?$/ or
       croak "Malformed adapter description - $description";
@@ -106,7 +114,7 @@ sub new_from_description
    require $file;
 
    my $code = $class->can( "new_from_description" );
-   if( $code != \&new_from_description ) {
+   if( $code and $code != \&new_from_description ) {
       return $class->$code( @opts );
    }
    elsif( !@opts ) {
@@ -212,6 +220,51 @@ itself, minus any pins that are in use by the protocol itself.
 
 Adapters should name GPIO pins in a way that makes sense from the hardware;
 for example C<MOSI>, C<SDA>, C<DTR>, C<Q0>, etc...
+
+=head2 meta_gpios
+
+   @pin_definitions = $protocol->meta_gpios
+
+Returns a list of definition objects that define the behavior of the GPIO
+pins. This should be returned in the same order as the L</list_gpios> method.
+
+Each returned value will be an instance with the following methods:
+
+=over 4
+
+=item name
+
+   $def->name = STR
+
+Gives the device's name for that GPIO pin - the name that would be returned
+by L</list_gpios> and recognised by the other methods.
+
+=item dir
+
+   $def->dir = "r" | "w" | "rw"
+
+Gives the data directions that the GPIO pin supports. C<r> for pins that are
+read-only, C<w> for pins that are write-only, and C<rw> for pins that are
+bidirectional.
+
+=item invert
+
+   $def->invert = BOOL
+
+If true, the hardware itself will invert the sense of reads or writes to this
+pin - that is, a low voltage on the pin will be represented by a true value in
+the L</write_gpios> and L</read_gpios> methods, and a high voltage represented
+by a false value.
+
+=back
+
+Adapter implementations may wish to use a L<Struct::Dumb> definition provided
+by this package, called L<Device::Chip::Adapter::GPIODefinition> to implement
+these.
+
+=cut
+
+readonly_struct GPIODefinition => [qw( name dir invert )];
 
 =head2 write_gpios
 

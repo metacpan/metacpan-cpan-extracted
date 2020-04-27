@@ -1,43 +1,16 @@
 package Net::IPAM::IP;
 
-our $VERSION = '1.16';
+our $VERSION = '1.20';
 
 use 5.10.0;
 use strict;
 use warnings;
 use utf8;
 
-use Carp qw/carp croak/;
-use Socket qw/:addrinfo AF_INET AF_INET6 AF_UNSPEC SOCK_RAW/;
-####
-use namespace::clean;
-
-use overload
-  '""'     => sub { shift->to_string },
-  bool     => sub { 1 },
-  fallback => 1;
-
-# On some platforms, inet_pton accepts various forms of invalid input or discards valid input.
-# In this case use a (slower) pure-perl implementation for Socket::inet_pton.
-# and also for Socket::inet_ntop, I don't trust that too.
-BEGIN {
-  if (    # wrong valid
-       defined Socket::inet_pton( AF_INET,  '010.0.0.1' )
-    || defined Socket::inet_pton( AF_INET,  '10.000.0.1' )
-    || defined Socket::inet_pton( AF_INET6, 'cafe:::' )
-    || defined Socket::inet_pton( AF_INET6, 'cafe::1::' )
-    || defined Socket::inet_pton( AF_INET6, 'cafe::1:' )
-    || defined Socket::inet_pton( AF_INET6, ':cafe::' )
-
-    # wrong invalid
-    || !defined Socket::inet_pton( AF_INET6, 'caFe::' )
-    )
-  {
-    no warnings 'redefine';
-    *Socket::inet_pton = \&_inet_pton_pp;
-    *Socket::inet_ntop = \&_inet_ntop_pp;
-  }
-}
+use Carp            ();
+use Scalar::Util    ();
+use Socket          ();
+use Net::IPAM::Util ();
 
 =head1 NAME
 
@@ -87,14 +60,16 @@ Returns undef on illegal input.
 =cut
 
 sub new {
-  croak 'wrong method call' unless defined $_[1];
-  my $self = bless( {}, ref $_[0] || $_[0] );
+  Carp::croak('missing argument') unless defined $_[1];
+  my $self = bless( {}, $_[0] );
 
   # IPv4
   if ( index( $_[1], ':' ) < 0 ) {
-    my $n = Socket::inet_pton( AF_INET, $_[1] ) // return;
+    my $n = Socket::inet_pton( Socket::AF_INET, $_[1] );
+    return unless defined $n;
+
     $self->{version} = 4;
-    $self->{binary}  = chr(AF_INET) . $n;
+    $self->{binary}  = chr(Socket::AF_INET) . $n;
     return $self;
   }
 
@@ -105,17 +80,20 @@ sub new {
     # remove leading ::ffff: or return undef
     return unless $ip4m6 =~ s/^::ffff://i;
 
-    my $n = Socket::inet_pton( AF_INET, $ip4m6 ) // return;
+    my $n = Socket::inet_pton( Socket::AF_INET, $ip4m6 );
+    return unless defined $n;
 
     $self->{version} = 4;
-    $self->{binary}  = chr(AF_INET) . $n;
+    $self->{binary}  = chr(Socket::AF_INET) . $n;
     return $self;
   }
 
   # IPv6 address
-  my $n = Socket::inet_pton( AF_INET6, $_[1] ) // return;
+  my $n = Socket::inet_pton( Socket::AF_INET6, $_[1] );
+  return unless defined $n;
+
   $self->{version} = 6;
-  $self->{binary}  = chr(AF_INET6) . $n;
+  $self->{binary}  = chr(Socket::AF_INET6) . $n;
   return $self;
 }
 
@@ -134,13 +112,13 @@ Can be used for cloning the object:
 =cut
 
 sub new_from_bytes {
-  croak 'wrong method call' unless defined $_[1];
   my $self = bless( {}, ref $_[0] || $_[0] );
   my $n    = $_[1];
+  Carp::croak('missing argument') unless defined $n;
 
   if ( length($n) == 4 ) {
     $self->{version} = 4;
-    $self->{binary}  = chr(AF_INET) . $n;
+    $self->{binary}  = chr(Socket::AF_INET) . $n;
     return $self;
   }
   elsif ( length($n) == 16 ) {
@@ -149,16 +127,16 @@ sub new_from_bytes {
     if ( index( $n, "\x00" x 10 . "\xff\xff" ) == 0 ) {
       my $ipv4 = substr( $n, 12 );
       $self->{version} = 4;
-      $self->{binary}  = chr(AF_INET) . $ipv4;
+      $self->{binary}  = chr(Socket::AF_INET) . $ipv4;
       return $self;
     }
 
     $self->{version} = 6;
-    $self->{binary}  = chr(AF_INET6) . $n;
+    $self->{binary}  = chr(Socket::AF_INET6) . $n;
     return $self;
   }
 
-  croak 'illegal input,';
+  Carp::croak 'illegal input';
 }
 
 =head2 getaddrs($name, [$error_cb])
@@ -168,15 +146,15 @@ Returns a list of ip objects for a given $name or undef if there is no RR record
   my @ips = Net::IPAM::IP->getaddrs('dns.google.');
   say "@ips";  #  8.8.8.8 8.8.4.4 2001:4860:4860::8844 2001:4860:4860::8888
 
-L</"getaddrs"> calls the L<Socket> functions C<< getaddrinfo() >> and C<< getnameinfo() >> under the hood.
+L</"getaddrs"> calls the L<Socket> function C<< getaddrinfo() >> under the hood.
 
 With no error callback L</getaddrs> just calls C<< carp() >> with underlying Socket errors.
 
 For granular error handling use your own error callback:
 
   my $my_error_cb = sub {
-    my ( $error, $msg) = @_;
-    # check the $error and do what you want with error and message
+    my $error = shift;
+    # check the $error and do what you want
     ...
   }
 
@@ -192,37 +170,47 @@ reporting underlying Socket errors.
 
 =cut
 
+# heuristic detection of ip addrs as input
+my $v4_rx       = qr/^[0-9.]+$/;
+my $v6_rx       = qr/^[a-fA-F0-9:]+$/;
+my $v4mapv6_rx  = qr/^::[a-fA-F]+:[0-9.]+$/;
+my $v4compv6_rx = qr/^::[0-9.]+$/;
+
+my $ip_rx = qr/$v4_rx|$v6_rx|$v4mapv6_rx|$v4compv6_rx/;
+
 sub getaddrs {
   my ( $class, $name, $error_cb ) = @_;
-  $error_cb //= sub { carp "@_" };
+  Carp::croak('missing argument') unless defined $name;
 
-  unless ( defined $name ) {
-    $error_cb->( 0, "missing argument" );
-    return;
-  }
+  $error_cb = \&Carp::carp unless defined $error_cb;
 
-  my ( $err, @res ) = getaddrinfo( $name, "", { socktype => SOCK_RAW, family => AF_UNSPEC } );
+  # just ip address as input param, don't rely on (buggy) Socket getaddrinfo
+  return $class->new($name) if $name =~ $ip_rx;
+
+  # resolve name
+  my ( $err, @res ) =
+    Socket::getaddrinfo( $name, "", { socktype => Socket::SOCK_RAW, family => Socket::AF_UNSPEC } );
 
   if ($err) {
 
     # no error, just no resolveable name
-    return if $err == EAI_NONAME;
+    return if $err == Socket::EAI_NONAME;
 
-    $error_cb->( $err, "getaddrinfo($name)" );
+    $error_cb->("getaddrinfo($name): $err");
     return;
   }
 
+  # unpack sockaddr struct
   my @ips;
-
   while ( my $ai = shift @res ) {
-    my ( $err, $ip ) = getnameinfo( $ai->{addr}, NI_NUMERICHOST, NIx_NOSERV );
-
-    if ($err) {
-      $error_cb->( $err, "getnameinfo($name)" );
-      return;
+    my $n;
+    if ( $ai->{family} == Socket::AF_INET ) {
+      $n = substr( $ai->{addr}, 4, 4 );
     }
-
-    push @ips, $class->new($ip);
+    else {
+      $n = substr( $ai->{addr}, 8, 16 );
+    }
+    push @ips, $class->new_from_bytes($n);
   }
 
   return @ips;
@@ -242,16 +230,17 @@ Compare IP objects, returns -1, 0, +1
 
 Fast bytewise lexical comparison of the binary representation in network byte order.
 
-IPv4 addresses are always treated as smaller than IPv6 addresses.
+IPv4 addresses are B<always> treated as smaller than IPv6 addresses (::ffff:0.0.0.0 < ::)
 
 =cut
 
 sub cmp {
-  croak "wrong or missing arg" unless ref $_[1] && $_[1]->isa(__PACKAGE__);
+  Carp::croak "wrong or missing arg"
+    unless Scalar::Util::blessed( $_[1] ) && $_[1]->isa(__PACKAGE__);
 
   # the first byte is the version: IPv4 is sorted before IPv6
   # there is no utf8-flag in packed values,
-  # we can use just string compare for the bytes
+  # we can just use string compare for the bytes
 
   return $_[0]->{binary} cmp $_[1]->{binary};
 }
@@ -265,17 +254,7 @@ Returns 4 or 6.
 =cut
 
 sub version {
-  return $_[0]->{version} if defined $_[0]->{version};
-
-  # unpack first byte, AF_INETx, 20% faster with substr()
-  # my $v = unpack( 'C', $_[0]->{binary} );
-
-  my $v = ord( substr( $_[0]->{binary}, 0, 1 ) );
-
-  # get, cache and return
-  return $_[0]->{version} = 4 if $v == AF_INET;
-  return $_[0]->{version} = 6 if $v == AF_INET6;
-  die 'logic error,';
+  return $_[0]->{version};
 }
 
 =head2 to_string
@@ -297,13 +276,14 @@ Stringification is overloaded with L</"to_string">
 
 # without inet_ntop bug it would be easy, sic
 #sub to_string {
-#  return $_[0]->{string} if defined $_[0]->{string};
+#  return $_[0]->{as_string} if exists $_[0]->{as_string};
 #  my ( $v, $n ) = unpack( 'C a*', $_[0]->{binary} );
-#  return $_[0]->{string} = Socket::inet_ntop( $v, $n );
+#  return $_[0]->{as_string} = Socket::inet_ntop( $v, $n );
 #}
 
 # circumvent IPv4-compatible-IPv6 bug in Socket::inet_ntop
 sub to_string {
+  return $_[0]->{as_string} if exists $_[0]->{as_string};
 
   # unpack to version and network byte order (from Socket::inet_pton), 20% faster with substr()
   # my ( $v, $n ) = unpack( 'C a*', $_[0]->{binary} );
@@ -313,7 +293,7 @@ sub to_string {
   my $str = Socket::inet_ntop( $v, $n );
 
   # no bug in Socket::inet_ntop for IPv4, just return
-  return $str if $v == AF_INET;
+  return $_[0]->{as_string} = $str if $v == Socket::AF_INET;
 
   # handle bug in Socket::inet_ntop for deprecated IPv4-compatible-IPv6 addresses
   # ::aaaa:bbbb are returned as ::hex(aa).hex(aa).hex(bb).hex(bb) = ::170.170.187.187
@@ -321,11 +301,11 @@ sub to_string {
 
   # first handle normal case, no dot '.'
   if ( index( $str, '.' ) < 0 ) {
-    return $str;
+    return $_[0]->{as_string} = $str;
   }
 
   # handle the bug, use our pure perl inet_ntop
-  return _inet_ntop_pp( $v, $n );
+  return $_[0]->{as_string} = Net::IPAM::Util::inet_ntop_pp( $v, $n );
 }
 
 =head2 incr
@@ -338,8 +318,13 @@ Returns the next IP address, returns undef on overflow.
 =cut
 
 sub incr {
-  my $n = incr_n( $_[0]->bytes ) // return;
-  return ( ref $_[0] )->new_from_bytes($n);
+  my $n_plus1 = Net::IPAM::Util::incr_n( $_[0]->bytes );
+
+  # overflow?
+  return unless defined $n_plus1;
+
+  # sort of cloning
+  return $_[0]->new_from_bytes($n_plus1);
 }
 
 =head2 expand
@@ -352,20 +337,20 @@ Expand IP address into canonical form, useful for C<< grep >>, aligned output an
 =cut
 
 sub expand {
-  return $_[0]->{expand} if defined $_[0]->{expand};
+  return $_[0]->{expand} if exists $_[0]->{expand};
 
-  # unpack to version and network byte order (from Socket::inet_pton), substr() ist faster than unpack
-  # my ( $v, $n ) = unpack( 'C a*', $_[0]->{binary} );
+# unpack to version and network byte order (from Socket::inet_pton), substr() ist faster than unpack
+# my ( $v, $n ) = unpack( 'C a*', $_[0]->{binary} );
 
   my ( $v, $n ) = ( ord( substr( $_[0]->{binary}, 0, 1 ) ), substr( $_[0]->{binary}, 1, ) );
 
-  if ( $v == AF_INET6 ) {
+  if ( $v == Socket::AF_INET6 ) {
     my @hextets = unpack( 'H4' x 8, $n );
 
     # cache it and return
     return $_[0]->{expand} = join( ':', @hextets );
   }
-  elsif ( $v == AF_INET ) {
+  elsif ( $v == Socket::AF_INET ) {
     my @octets = unpack( 'C4', $n );
 
     # cache it and return
@@ -384,21 +369,21 @@ Reverse IP address, needed for PTR entries in DNS zone files.
 =cut
 
 sub reverse {
-  return $_[0]->{reverse} if defined $_[0]->{reverse};
+  return $_[0]->{reverse} if exists $_[0]->{reverse};
 
   # unpack to version and network byte order (from Socket::inet_pton)
   # my ( $v, $n ) = unpack( 'C a*', $_[0]->{binary} );
   # substr() ist faster
   my ( $v, $n ) = ( ord( substr( $_[0]->{binary}, 0, 1 ) ), substr( $_[0]->{binary}, 1, ) );
 
-  if ( $v == AF_INET6 ) {
+  if ( $v == Socket::AF_INET6 ) {
     my $hex_str = unpack( 'H*',     $n );
     my @nibbles = unpack( 'A' x 32, $hex_str );
 
     # cache it and return
     return $_[0]->{reverse} = join( '.', reverse @nibbles );
   }
-  elsif ( $v == AF_INET ) {
+  elsif ( $v == Socket::AF_INET ) {
     my @octets = unpack( 'C4', $n );
 
     # cache it and return
@@ -413,7 +398,7 @@ Returns the DNS name for the ip object or undef if there is no PTR RR.
 
   say Net::IPAM::IP->new('2001:4860:4860::8888')->getname;   # dns.google.
 
-L</"getname"> calls the L<Socket> functions C<< getaddrinfo() >> and C<< getnameinfo() >> under the hood.
+L</"getname"> calls the L<Socket> function C<< getnameinfo() >> under the hood.
 
 With no error callback L</getname> just calls C<< carp() >> with underlying Socket errors.
 
@@ -426,24 +411,25 @@ use L<Net::DNS> or similar modules.
 =cut
 
 sub getname {
-  my $error_cb = $_[1] // sub { carp "@_" };
+  my ( $self, $error_cb ) = @_;
+  $error_cb = \&Carp::carp unless defined $error_cb;
 
-  my ( $err, @res ) =
-    getaddrinfo( $_[0], '', { socktype => SOCK_RAW, flags => AI_NUMERICHOST, family => AF_UNSPEC } );
-
-  if ($err) {
-    $error_cb->( $err, "getaddrinfo($_[0])" );
-    return;
+  my $sock_addr;
+  if ( $self->{version} == 4 ) {
+    $sock_addr = Socket::pack_sockaddr_in( 0, $self->bytes );
+  }
+  else {
+    $sock_addr = Socket::pack_sockaddr_in6( 0, $self->bytes );
   }
 
-  my $name;
-  ( $err, $name ) = getnameinfo( $res[0]->{addr}, NI_NAMEREQD, NIx_NOSERV );
+  my ( $err, $name ) = Socket::getnameinfo( $sock_addr, Socket::NI_NAMEREQD, Socket::NIx_NOSERV );
+
   if ($err) {
 
     # no error, just no resolveable name
-    return if $err == EAI_NONAME;
+    return if $err == Socket::EAI_NONAME;
 
-    $error_cb->( $err, "getnameinfo($_[0])" );
+    $error_cb->("getnameinfo($self): $err");
     return;
   }
 
@@ -484,149 +470,12 @@ Always true.
 
 Alias for L</"to_string">.
 
-=head1 FUNCTIONS
-
-L<Net::IPAM::IP> implements the following functions;
-
-=head2 incr_n($n)
-
-Increment a packed IPv4 or IPv6 address, no need for L<Math::BigInt>. Needed by methods in L<Net::IPAM::Block>.
-
 =cut
 
-sub incr_n {
-  my $n = shift;
-
-  # length in bytes / 4 => length in long (32 bits)
-  my $pos = length($n) / 4 - 1;
-
-  # start at least significant long
-  my $long = vec( $n, $pos, 32 );
-
-  # carry?
-  while ( $long == 0xffff_ffff ) {
-
-    # OVERFLOW, this long is already the most significant long!
-    return if $pos == 0;
-
-    # set this long to zero
-    vec( $n, $pos, 32 ) = 0;
-
-    # carry on to next more significant long
-    $long = vec( $n, --$pos, 32 );
-  }
-
-  # incr this long
-  vec( $n, $pos, 32 ) = ++$long;
-  return $n;
-}
-
-# make fast 'tail' calls, goto &NAME
-# modify @_ = (AF_INETx, $ip) => @_ = ($ip)
-sub _inet_ntop_pp {
-  my $v = shift;
-  goto &_inet_ntop_v4_pp if $v == AF_INET;
-  goto &_inet_ntop_v6_pp if $v == AF_INET6;
-  return;
-}
-
-sub _inet_ntop_v4_pp {
-  my $n = shift // return;
-  return if length($n) != 4;
-  return join( '.', unpack( 'C4', $n ) );
-}
-
-# (1) Hexadecimal digits are expressed as lower-case letters.
-#     For example, 2001:db8::1 is preferred over 2001:DB8::1.
-#
-# (2) Leading zeros in each 16-bit field are suppressed.
-#     For example, 2001:0db8::0001 is rendered as 2001:db8::1,
-#     though any all-zero field that is explicitly presented is rendered as 0.
-#
-# (3) Representations are shortened as much as possible.
-#     The longest sequence of consecutive all-zero fields is replaced with double-colon.
-#     If there are multiple longest runs of all-zero fields, then it is the leftmost that is compressed.
-#     E.g., 2001:db8:0:0:1:0:0:1 is rendered as 2001:db8::1:0:0:1 rather than as 2001:db8:0:0:1::1.
-#
-# (4) "::" is not used to shorten just a single 0 field.
-#     For example, 2001:db8:0:0:0:0:2:1 is shortened to 2001:db8::2:1,
-#     but 2001:db8:0000:1:1:1:1:1 is rendered as 2001:db8:0:1:1:1:1:1.
-#
-sub _inet_ntop_v6_pp {
-  my $n = shift // return;
-  return if length($n) != 16;
-
-  # expand binary to hex, lower case, rule (1), leading zeroes squashed
-  # add : at left and right for symmetric squashing algo, see below
-  # :2001:db8:85a3:0:0:8a2e:370:7334:
-  my $ip = sprintf( ':%x:%x:%x:%x:%x:%x:%x:%x:', unpack( 'n8', $n ) );
-
-  # rule (3,4) # squash the longest sequence of consecutive all-zero fields
-  # e.g. :0:0: (?!not followed) :0\1
-  $ip =~ s/(:0[:0]+:) (?! .+ :0\1)/::/x;
-
-  $ip =~ s/^:// unless $ip =~ /^::/;    # trim additional left
-  $ip =~ s/:$// unless $ip =~ /::$/;    # trim additional right
-  return $ip;
-}
-
-# make fast 'tail' calls, goto &NAME
-# modify @_ = (AF_INETx, $ip) => @_ = ($ip)
-sub _inet_pton_pp {
-  my $v = shift;
-  goto &_inet_pton_v4_pp if $v == AF_INET;
-  goto &_inet_pton_v6_pp if $v == AF_INET6;
-  return;
-}
-
-# @_ = ($ip)
-sub _inet_pton_v4_pp {
-
-  # 'C' may overflow for values > 255, check below
-  no warnings qw(pack numeric);
-  my $n = pack( 'C4', split( /\./, $_[0] ) );
-
-  # unpack(pack...) must be idempotent
-  # check for overflow errors or leading zeroes
-  return unless $_[0] eq join( '.', unpack( 'C4', $n ) );
-
-  return $n;
-}
-
-# @_ = ($ip)
-sub _inet_pton_v6_pp {
-  my $ip = shift // return;
-
-  return if $ip =~ m/[^a-fA-F0-9:]/;
-  return if $ip =~ m/:::/;
-
-  # starts with just one colon: :cafe...
-  return if $ip =~ m/^:[^:]/;
-
-  # ends with just one colon: ..:cafe:affe:
-  return if $ip =~ m/[^:]:$/;
-
-  my $col_count     = $ip =~ tr/://;
-  my $dbl_col_count = $ip =~ s/::/::/g;
-
-  return if $col_count > 7;
-  return if $dbl_col_count > 1;
-  return if $dbl_col_count == 0 && $col_count != 7;
-
-  # normalize for splitting, prepend or append 0
-  $ip =~ s/^:: /0::/x;
-  $ip =~ s/ ::$/::0/x;
-
-  # expand ::
-  my $expand_dbl_col = ':0' x ( 8 - $col_count ) . ':';
-  $ip =~ s/::/$expand_dbl_col/;
-
-  my @hextets = split( /:/, $ip );
-  return if grep { length > 4 } @hextets;
-
-  my $n = pack( 'n8', map { hex } @hextets );
-  return $n;
-}
+use overload
+  '""'     => sub { shift->to_string },
+  bool     => sub { 1 },
+  fallback => 1;
 
 =head1 WARNING
 
@@ -634,6 +483,30 @@ Some Socket::inet_XtoY implementations are hopelessly buggy.
 
 Tests are made during loading and in case of errors, these functions are redefined
 with a (slower) pure-perl implementation.
+
+=cut
+
+# On some platforms, inet_pton accepts various forms of invalid input or discards valid input.
+# In this case use a (slower) pure-perl implementation for Socket::inet_pton.
+# and also for Socket::inet_ntop, I don't trust that too.
+BEGIN {
+  if (    # wrong valid
+       defined Socket::inet_pton( Socket::AF_INET,  '010.0.0.1' )
+    || defined Socket::inet_pton( Socket::AF_INET,  '10.000.0.1' )
+    || defined Socket::inet_pton( Socket::AF_INET6, 'cafe:::' )
+    || defined Socket::inet_pton( Socket::AF_INET6, 'cafe::1::' )
+    || defined Socket::inet_pton( Socket::AF_INET6, 'cafe::1:' )
+    || defined Socket::inet_pton( Socket::AF_INET6, ':cafe::' )
+
+    # wrong invalid
+    || !defined Socket::inet_pton( Socket::AF_INET6, 'caFe::' )
+    )
+  {
+    no warnings 'redefine';
+    *Socket::inet_pton = \&Net::IPAM::Util::inet_pton_pp;
+    *Socket::inet_ntop = \&Net::IPAM::Util::inet_ntop_pp;
+  }
+}
 
 =head1 AUTHOR
 
@@ -664,6 +537,7 @@ TODO
 
 =head1 SEE ALSO
 
+L<Net::IPAM::Util>
 L<Net::IPAM::Block>
 L<Net::IPAM::Tree>
 

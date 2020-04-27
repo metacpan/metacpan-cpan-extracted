@@ -2,7 +2,7 @@ package Wasm::Wasmtime::Func;
 
 use strict;
 use warnings;
-use Ref::Util qw( is_ref is_plain_arrayref );
+use Ref::Util qw( is_blessed_ref is_plain_arrayref );
 use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::FuncType;
 use Wasm::Wasmtime::Trap;
@@ -16,20 +16,19 @@ use overload
   ;
 
 # ABSTRACT: Wasmtime function class
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 $ffi_prefix = 'wasm_func_';
-$ffi->type('opaque' => 'wasm_func_t');
+$ffi->load_custom_type('::PtrObject' => 'wasm_func_t' => __PACKAGE__);
 
 
 $ffi->attach( new => ['wasm_store_t', 'wasm_functype_t', 'opaque'] => 'wasm_func_t' => sub {
   my $xsub = shift;
   my $class = shift;
-  my($ptr, $owner, $wrapper, $store);
-  if(is_ref $_[0])
+  if(is_blessed_ref $_[0] && $_[0]->isa('Wasm::Wasmtime::Store'))
   {
-    $store = shift;
+    my $store = shift;
     my($functype, $cb) = is_plain_arrayref($_[0])
        ? (Wasm::Wasmtime::FuncType->new($_[0], $_[1]), $_[2])
        : @_;
@@ -37,7 +36,7 @@ $ffi->attach( new => ['wasm_store_t', 'wasm_functype_t', 'opaque'] => 'wasm_func
     my $param_arity  = scalar $functype->params;
     my $result_arity = scalar$functype->results;
 
-    $wrapper = $ffi->closure(sub {
+    my $wrapper = $ffi->closure(sub {
       my($params, $results) = @_;
 
       my @args = $param_arity ? wasm_to_perl($params) : ();
@@ -59,18 +58,19 @@ $ffi->attach( new => ['wasm_store_t', 'wasm_functype_t', 'opaque'] => 'wasm_func
     });
     my $wasm_type = wasm_type($param_arity);
     my $fptr = $ffi->cast("($wasm_type,opaque)->opaque", => 'opaque', $wrapper);
-    $ptr = $xsub->($store->{ptr}, $functype->{ptr}, $fptr);
+    my $self = $xsub->($store, $functype, $fptr);
+    $self->{store} = $store;
+    $self->{wrapper} = $wrapper;
+    return $self;
   }
   else
   {
-    ($ptr, $owner) = @_;
+    my ($ptr, $owner) = @_;
+    bless {
+      ptr     => $ptr,
+      owner   => $owner,
+    }, $class;
   }
-  bless {
-    ptr     => $ptr,
-    owner   => $owner,
-    wrapper => $wrapper,
-    store   => $store,
-  }, $class;
 });
 
 
@@ -80,11 +80,10 @@ $ffi->attach( call => ['wasm_func_t', 'string', 'string'] => 'wasm_trap_t' => su
   my $args = perl_to_wasm(\@_, [$self->type->params]);
   my $results = wasm_allocate( $self->result_arity );
 
-  my $trap = $xsub->($self->{ptr}, $args, $results);
+  my $trap = $xsub->($self, $args, $results);
 
   if($trap)
   {
-    $trap = Wasm::Wasmtime::Trap->new($trap);
     my $message = $trap->message;
     Carp::croak("trap in wasm function call: $message");
   }
@@ -113,19 +112,21 @@ sub attach
 
 $ffi->attach( type => ['wasm_func_t'] => 'wasm_functype_t' => sub {
   my($xsub, $self) = @_;
-  Wasm::Wasmtime::FuncType->new($xsub->($self->{ptr}), $self->{owner} || $self);
+  my $type = $xsub->($self);
+  $type->{owner} = $self->{owner} || $self;
+  $type;
 });
 
 
 $ffi->attach( param_arity => ['wasm_func_t'] => 'size_t' => sub {
   my($xsub, $self) = @_;
-  $xsub->($self->{ptr});
+  $xsub->($self);
 });
 
 
 $ffi->attach( result_arity => ['wasm_func_t'] => 'size_t' => sub {
   my($xsub, $self) = @_;
-  $xsub->($self->{ptr});
+  $xsub->($self);
 });
 
 
@@ -133,7 +134,7 @@ $ffi->attach( result_arity => ['wasm_func_t'] => 'size_t' => sub {
 $ffi->attach( as_extern => ['wasm_func_t'] => 'opaque' => sub {
   my($xsub, $self) = @_;
   require Wasm::Wasmtime::Extern;
-  my $ptr = $xsub->($self->{ptr});
+  my $ptr = $xsub->($self);
   Wasm::Wasmtime::Extern->new($ptr, $self->{owner} || $self);
 });
 
@@ -153,7 +154,7 @@ Wasm::Wasmtime::Func - Wasmtime function class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

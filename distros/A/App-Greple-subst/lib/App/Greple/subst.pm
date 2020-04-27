@@ -6,11 +6,14 @@ subst - Greple module for text search and substitution
 
 =head1 VERSION
 
-Version 2.12
+Version 2.13
 
 =head1 SYNOPSIS
 
 greple -Msubst --dict I<dictionary> [ options ]
+
+  --dict      dictionary file
+  --dictdata  dictionary data
 
   --check=[ng,ok,any,outstand,all]
   --select=N
@@ -53,6 +56,11 @@ You can use same file by B<greple>'s B<-f> option and string after
 "//" is ignored as a comment in that case.
 
     greple -f DICT ...
+
+Option B<--dictdata> can be used to provide dictionary data in command
+line.
+
+    greple --dictdata $'colou?r color\ncent(er|re) center\n'
 
 =head2 Overlapped pattern
 
@@ -248,7 +256,7 @@ it under the same terms as Perl itself.
 
 package App::Greple::subst;
 
-our $VERSION = '2.12';
+our $VERSION = '2.13';
 
 use v5.14;
 use strict;
@@ -271,6 +279,7 @@ our @EXPORT_OK   = qw();
 use Carp;
 use Data::Dumper;
 use Text::ParseWords qw(shellwords);
+use Encode;
 use App::Greple::Common;
 use App::Greple::Pattern;
 use App::Greple::subst::Dict;
@@ -296,6 +305,7 @@ our $opt_subst = 0;
 our @opt_subst_from;
 our @opt_subst_to;
 our @opt_dictfile;
+our @opt_dictdata;
 our $opt_printdict;
 our $opt_dictname;
 our $opt_subst_diffcmd = "diff -u";
@@ -340,12 +350,25 @@ sub subst_initialize {
 	@subst_diffcmd = ("diff", "-U$opt_U");
     }
 
-    for my $dictfile (@opt_dictfile) {
-	if (-d $dict) {
-	    warn "$dict is directory\n";
+    for my $data (@opt_dictdata) {
+	if (utf8::is_utf8 $data) {
+	    $data = encode 'utf8', $data;
+	}
+	open my $fh, "<", \$data;
+	read_dict_fh($fh);
+    }
+    for my $file (@opt_dictfile) {
+	if (-d $file) {
+	    warn "$file is directory\n";
 	    next;
 	}
-	read_dict($dictfile);
+	read_dict($file);
+    }
+
+    if ($dict->words == 0) {
+	warn "Module -Msubst requires dictionary data.\n";
+	main::usage();
+	die;
     }
 }
 
@@ -390,7 +413,7 @@ my @match_list;
 
 sub subst_show_stat {
     my %arg = @_;
-    my @fromto = $dict->dictionary;
+    my @fromto = $dict->words;
     my($from_max, $to_max) = (0, 0);
     my @show;
     for my $i (0 .. $#fromto) {
@@ -450,17 +473,20 @@ sub subst_show_stat {
 }
 
 sub read_dict {
-    my $dictfile = shift;
-    say $dictfile if $opt_dictname;
+    my $file = shift;
+    say $file if $opt_dictname;
+    open my $fh, $file or die "$file: $!\n";
+    read_dict_fh($fh);
+}
 
-    open DICT, $dictfile or die "$dictfile: $!\n";
-
+sub read_dict_fh {
+    my $fh = shift;
     local $_;
     my $flag = FLAG_REGEX;
     $flag |= FLAG_COOK if $opt_linefold;
-    while (<DICT>) {
-	print if $opt_printdict;
+    while (<$fh>) {
 	chomp;
+	say if $opt_printdict;
 	if (not /^\s*[^#]/) {
 	    $dict->add_comment($_);
 	    next;
@@ -470,7 +496,6 @@ sub read_dict {
 	my($pattern, $correct) = @param;
 	$dict->add($pattern, $correct, flag => $flag);
     }
-    close DICT;
 }
 
 sub mix_regions {
@@ -519,7 +544,7 @@ sub subst_search {
     my $ng = is $ss_check qw(ng any all none);
     my $ok = is $ss_check qw(ok any all none);
     my $outstand = is $ss_check qw(outstand);
-    for my $p ($dict->dictionary) {
+    for my $p ($dict->words) {
 	$index++;
 	$p // next;
 	next if $p->is_comment;
@@ -585,17 +610,20 @@ sub subst_search {
     ## --select
     ##
     if (my $select = $opt_subst_select) {
-	my $max = $dict->dictionary;
+	my $max = $dict->words;
 	use Getopt::EX::Numbers;
-	my $numbers = Getopt::EX::Numbers->new(max => $max);
-	my %select = do {
-	    map  { ($_ * 2 => 1) , ($_ * 2 + 1 => 1) }
+	my $numbers = Getopt::EX::Numbers->new(min => 1, max => $max);
+	my @select;
+	for (my @select_index = do {
+	    map  { $_ * 2, $_ * 2 + 1 }
 	    map  { $_ - 1 }
 	    grep { $_ <= $max }
 	    map  { $numbers->parse($_)->sequence }
 	    split /,/, $select;
-	};
-	@matched = grep $select{$_->[2]}, @matched;
+	}) {
+	    $select[$_] = 1;
+	}
+	@matched = grep $select[$_->[2]], @matched;
     }
     grep $effective[$_->[2]], @matched;
 }
@@ -664,6 +692,7 @@ sub subst_create {
 __DATA__
 
 builtin dict=s         @opt_dictfile
+builtin dictdata=s     @opt_dictdata
 builtin stat-style=s   $opt_stat_style
 builtin printdict!     $opt_printdict
 builtin dictname!      $opt_dictname
@@ -681,7 +710,7 @@ builtin ignore-space!  $opt_ignore_space
 builtin show-comment!  $opt_show_comment
 
 option default \
-	-Mtermcolor::set(default=100,light=--subst-color-light,dark=--subst-color-dark) \
+	-Mtermcolor::bg(default=100,light=--subst-color-light,dark=--subst-color-dark) \
 	--prologue subst_initialize \
 	--begin subst_begin \
 	--le &subst_search --no-regioncolor
@@ -696,6 +725,7 @@ option --divert-stdout --prologue __PACKAGE__::divert_stdout \
 option --with-stat     --epilogue subst_show_stat
 option --stat          --divert-stdout --with-stat
 
+help	--subst-color-light light terminal color
 option	--subst-color-light \
 	--cm 555D/100,000/433 \
 	--cm 555D/010,000/343 \
@@ -725,6 +755,7 @@ option	--subst-color-light \
 	--cm 555D/222,000/L23 \
 	$<move(0,0)>
 
+help	--subst-color-dark dark terminal color
 option	--subst-color-dark \
 	--cm DS;433,544/L01 \
 	--cm DS;343,454/L01 \

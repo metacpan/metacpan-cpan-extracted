@@ -1,7 +1,7 @@
 use strict;
 use Test::More 0.98;
 use Test::Exception;
-use Test::Trap;
+use Capture::Tiny ':all';
 use Getopt::Kingpin;
 
 
@@ -48,14 +48,15 @@ subtest 'existing_file_or_dir not found' => sub {
     push @ARGV, qw(NOT_FOUND);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     my $path = $kingpin->arg("path", "")->existing_file_or_dir();
 
-    trap {
+    my ($stdout, $stderr, $ret, $exit) = capture {
         $kingpin->parse;
     };
 
-    like $trap->stderr, qr/error: path 'NOT_FOUND' does not exist, try --help/;
-    is $trap->exit, 1;
+    like $stderr, qr/error: path 'NOT_FOUND' does not exist, try --help/;
+    is $exit, 1;
 };
 
 done_testing;

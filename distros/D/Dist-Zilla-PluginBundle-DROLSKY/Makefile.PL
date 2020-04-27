@@ -94,7 +94,7 @@ my %WriteMakefileArgs = (
     "Moose::Role" => 0,
     "PadWalker" => 0,
     "Path::Class" => 0,
-    "Path::Iterator::Rule" => 0,
+    "Path::Tiny::Rule" => 0,
     "Perl::Critic::Moose" => "1.05",
     "Pod::Elemental::Transformer::List" => 0,
     "Pod::Elemental::Transformer::Verbatim" => 0,
@@ -124,7 +124,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => "0.96"
   },
-  "VERSION" => "1.06",
+  "VERSION" => "1.07",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -201,7 +201,7 @@ my %FallbackPrereqs = (
   "Moose::Role" => 0,
   "PadWalker" => 0,
   "Path::Class" => 0,
-  "Path::Iterator::Rule" => 0,
+  "Path::Tiny::Rule" => 0,
   "Perl::Critic::Moose" => "1.05",
   "Pod::Elemental::Transformer::List" => 0,
   "Pod::Elemental::Transformer::Verbatim" => 0,

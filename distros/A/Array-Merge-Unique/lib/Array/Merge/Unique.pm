@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Import::Export;
-our $VERSION = '0.03';
+our $VERSION = '1.00';
 
 use base qw/Import::Export/;
 
@@ -34,7 +34,7 @@ Array::Merge::Unique - Merge those arrays uniquely
 
 =head1 VERSION
 
-Version 0.03
+Version 1.00
 
 =cut
 
@@ -51,9 +51,15 @@ Quick summary of what the module does.
 
 =head2 unique_array
 
+This module exports a single method unique_array that accepts multiple Arrays and 
+merges them uniquely by value or reference.
+
+	my $ref = { a => "b" };
+	my $arrayref = unique_array([qw/one two three/, $ref], qw/one two/, $ref); # qw/one two three/, $ref
+
 =head1 AUTHOR
 
-Robert Acock, C<< <thisusedtobeanemail at gmail.com> >>
+Robert Acock, C<< <email at lnation.org> >>
 
 =head1 BUGS
 
@@ -66,7 +72,6 @@ automatically be notified of progress on your bug as I make changes.
 You can find documentation for this module with the perldoc command.
 
     perldoc Array::Merge::Unique
-
 
 You can also look for information at:
 
@@ -92,10 +97,9 @@ L<http://search.cpan.org/dist/Array-Merge-Unique/>
 
 =head1 ACKNOWLEDGEMENTS
 
-
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Robert Acock.
+Copyright 2017->2020 Robert Acock.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -132,7 +136,6 @@ YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
 CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
 CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 
 =cut
 

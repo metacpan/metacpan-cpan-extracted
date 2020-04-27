@@ -2,14 +2,15 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.057
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
 use Test::More;
 
-plan tests => 2;
+plan tests => 3;
 
 my @module_files = (
-    'File/LibMagic.pm'
+    'File/LibMagic.pm',
+    'File/LibMagic/Constants.pm'
 );
 
 

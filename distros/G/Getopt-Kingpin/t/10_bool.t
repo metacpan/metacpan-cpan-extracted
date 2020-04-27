@@ -1,6 +1,6 @@
 use strict;
 use Test::More 0.98;
-use Test::Trap;
+use Capture::Tiny ':all';
 use Getopt::Kingpin;
 
 
@@ -81,13 +81,14 @@ subtest 'bool required 3' => sub {
     push @ARGV, qw();
 
     my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
     my $x = $kingpin->flag('verbose', 'set verbose mode')->required()->bool();
 
-    trap {
+    my ($stdout, $stderr, $ret, $exit) = capture {
         $kingpin->parse;
     };
 
-    like $trap->stderr, qr/error: required flag --verbose not provided, try --help/, 'required error';
+    like $stderr, qr/error: required flag --verbose not provided, try --help/, 'required error';
 
 };
 

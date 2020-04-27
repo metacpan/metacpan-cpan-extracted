@@ -1,3 +1,8 @@
+
+0.14   2020-04-26
+       - Add steps 'When I fill in:' and 'When I fill "<>" with "<>"'
+         to manage form content.
+
 0.13   2019-08-24
        - Eliminate undefined value warning on template evaluation
 

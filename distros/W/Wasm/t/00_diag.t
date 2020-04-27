@@ -18,19 +18,24 @@ $modules{$_} = $_ for qw(
   FFI::Platypus
   FFI::Platypus::Buffer
   FFI::Platypus::Record
+  FFI::Platypus::Type::PtrObject
   Path::Tiny
   Ref::Util
   Sub::Install
   Test2::API
   Test2::V0
+  Test::Alien::Diag
 );
 
 $post_diag = sub {
-  eval {
-    require Wasm::Wasmtime::FFI;
-    diag "Wasm::Wasmtime::FFI->_lib = $_" for Wasm::Wasmtime::FFI->_lib;
+  eval { require Test::Alien::Diag; require Alien::wasmtime; Test::Alien::Diag::alien_diag('Alien::wasmtime'); };
+  if($@) {
+    eval {
+      require Wasm::Wasmtime::FFI;
+      diag "Wasm::Wasmtime::FFI->_lib = $_" for Wasm::Wasmtime::FFI->_lib;
+    };
+    diag "error requiring Wasm::Wasmtime::FFI: $@" if $@;
   };
-  diag "error requiring Wasm::Wasmtime::FFI: $@" if $@;
 };
 
 my @modules = sort keys %modules;

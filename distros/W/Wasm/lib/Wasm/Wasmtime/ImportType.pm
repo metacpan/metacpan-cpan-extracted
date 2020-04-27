@@ -6,30 +6,30 @@ use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::ExternType;
 
 # ABSTRACT: Wasmtime import type class
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 $ffi_prefix = 'wasm_importtype_';
-$ffi->type('opaque' => 'wasm_importtype_t');
+$ffi->load_custom_type('::PtrObject' => 'wasm_importtype_t' => __PACKAGE__);
 
 
 $ffi->attach( new => ['wasm_byte_vec_t*', 'wasm_externtype_t'] => 'wasm_importtype_t' => sub {
   my $xsub = shift;
   my $class = shift;
-  my($ptr, $owner);
   if(defined $_[2] && ref($_[2]) eq 'Wasm::Wasmtime::ExternType')
   {
     my $module = Wasm::Wasmtime::ByteVec->new(shift);
     my $name = Wasm::Wasmtime::ByteVec->new(shift);
     my $externtype = shift;
-    my $ptr = $xsub->($module, $name, $externtype->{ptr});
+    my $self = $xsub->($module, $name, $externtype);
     $module->delete;
     $name->delete;
+    $self;
   }
   else
   {
-    ($ptr,$owner) = @_;
-    bless {
+    my($ptr,$owner) = @_;
+    return bless {
       ptr   => $ptr,
       owner => $owner,
     }, $class;
@@ -39,34 +39,26 @@ $ffi->attach( new => ['wasm_byte_vec_t*', 'wasm_externtype_t'] => 'wasm_importty
 
 $ffi->attach( name => ['wasm_importtype_t'] => 'wasm_byte_vec_t*' => sub {
   my($xsub, $self) = @_;
-  my $name = $xsub->($self->{ptr});
+  my $name = $xsub->($self);
   $name->get;
 });
 
 
 $ffi->attach( type => ['wasm_importtype_t'] => 'wasm_externtype_t' => sub {
   my($xsub, $self) = @_;
-  Wasm::Wasmtime::ExternType->new(
-    $xsub->($self->{ptr}),
-    $self->{owner} || $self,
-  );
+  my $type = $xsub->($self);
+  $type->{owner} = $self->{owner} || $self;
+  $type;
 });
 
 
 $ffi->attach( module => ['wasm_importtype_t'] => 'wasm_byte_vec_t*' => sub {
   my($xsub, $self) = @_;
-  my $name = $xsub->($self->{ptr});
+  my $name = $xsub->($self);
   $name->get;
 });
 
-$ffi->attach( [ delete => "DESTROY" ] => ['wasm_importtype_t'] => sub {
-  my($xsub, $self) = @_;
-  if(defined $self->{ptr} && !defined $self->{owner})
-  {
-    $xsub->($self->{ptr});
-  }
-});
-
+_generate_destroy();
 _generate_vec_class();
 
 1;
@@ -83,7 +75,7 @@ Wasm::Wasmtime::ImportType - Wasmtime import type class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

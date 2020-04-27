@@ -1,5 +1,11 @@
 Revision history for Perl module Module::Extract::Use
 
+1.047 2020-04-26T13:06:59Z
+	* extract_modules now has a -e switch to exclude core modules
+
+1.046 2020-04-26T12:46:56Z
+	* Small pod fix
+
 1.045 2019-12-19T12:19:24Z
 	* Fix test for extracting modules from parent and base
 

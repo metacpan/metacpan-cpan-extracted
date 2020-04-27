@@ -30,8 +30,6 @@ use Object::Pad;
 
 # anon methods can capture lexicals (RT132178)
 {
-   use Devel::MAT::Dumper;
-
    class Generated {
       foreach my $letter (qw( x y z )) {
          my $code = method {

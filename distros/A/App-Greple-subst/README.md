@@ -4,11 +4,14 @@ subst - Greple module for text search and substitution
 
 # VERSION
 
-Version 2.12
+Version 2.13
 
 # SYNOPSIS
 
 greple -Msubst --dict _dictionary_ \[ options \]
+
+    --dict      dictionary file
+    --dictdata  dictionary data
 
     --check=[ng,ok,any,outstand,all]
     --select=N
@@ -51,6 +54,11 @@ You can use same file by **greple**'s **-f** option and string after
 "//" is ignored as a comment in that case.
 
     greple -f DICT ...
+
+Option **--dictdata** can be used to provide dictionary data in command
+line.
+
+    greple --dictdata $'colou?r color\ncent(er|re) center\n'
 
 ## Overlapped pattern
 

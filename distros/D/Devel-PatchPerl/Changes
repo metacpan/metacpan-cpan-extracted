@@ -1,6 +1,23 @@
 ==================================================
-Changes from 2015-03-13 00:00:00 +0000 to present.
+Changes from 2015-04-29 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 1.92 at 2020-04-27 10:25:28 +0000
+-----------------------------------------
+
+  Change: fc4fd9ed11ccce6c653010df796d7ccc5c0a8bb9
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-04-27 11:25:28 +0000
+
+    Release engineering for 1.92
+
+    - Added
+    https://github.com/perl/perl5/commit/e9c9cf57594854df9f5802f7f149be47
+    38212e96
+
+    to resolve issues building threaded/quadmath perls below v5.28.0 on
+    recent Ubunutu 20.04 
 
 -----------------------------------------
 version 1.90 at 2020-03-11 15:12:17 +0000
@@ -520,62 +537,6 @@ version 1.36 at 2015-07-03 11:48:26 +0000
 
     Added Errno GCC5 patches as far back as v5.6.0 
 
------------------------------------------
-version 1.34 at 2015-04-25 15:23:56 +0000
------------------------------------------
-
-  Change: 89bb0b402fb68d598d7f0499e18540fb4a1dae0f
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2015-04-25 16:23:56 +0000
-
-    Release engineering for 1.34 
-
-  Change: 5677b4c71e15af57d8fb359fda214f12abff88ba
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2015-04-17 17:19:35 +0000
-
-    Merge pull request #19 from wolfsage/topic/various-fixes
-
-    Topic/various fixes 
-
-  Change: 7e270ee6d6e9fe5b65a8794fc8884bcfa405e0b0
-  Author: Matthew Horsfall (alh) <wolfsage@gmail.com>
-  Date : 2015-04-17 07:10:05 +0000
-
-    Specific patch for 5.005 
-
-  Change: 97f4c4059de179e581a695ec7aa41a078cb4dddd
-  Author: Matthew Horsfall (alh) <wolfsage@gmail.com>
-  Date : 2015-04-17 06:58:28 +0000
-
-    Specific patches for 5.005_02 and 5.005_01 
-
-  Change: 91defd96b9246858f1f386e42f35aa5eea1b5c53
-  Author: Matthew Horsfall (alh) <wolfsage@gmail.com>
-  Date : 2015-04-17 06:14:25 +0000
-
-    Allow building of 5.005_0[34] on linux. 
-
-  Change: d81295c3de45538390e9a6573e371382a2d65026
-  Author: Matthew Horsfall (alh) <wolfsage@gmail.com>
-  Date : 2015-04-17 06:10:44 +0000
-
-    Updated hints files, necessary to build older Perls 
-
------------------------------------------
-version 1.32 at 2015-03-30 15:52:27 +0000
------------------------------------------
-
-  Change: 20838d9989acda6d0ed987ab6daa9b740aaaecf4
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2015-03-30 16:52:27 +0000
-
-    Favour gpatch over patch
-
-    This should work better on older versions of Solaris
-
-    Updated the included hints to latest from blead 
-
 =================================================
-Plus 65 releases after 2015-03-13 00:00:00 +0000.
+Plus 67 releases after 2015-04-29 00:00:00 +0000.
 =================================================

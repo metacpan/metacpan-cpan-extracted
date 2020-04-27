@@ -1,7 +1,7 @@
 package Perinci::To::POD;
 
-our $DATE = '2020-01-31'; # DATE
-our $VERSION = '0.870'; # VERSION
+our $DATE = '2020-04-27'; # DATE
+our $VERSION = '0.872'; # VERSION
 
 use 5.010001;
 use Log::ger;
@@ -167,7 +167,13 @@ sub gen_doc_section_links {
     my @links;
     push @links, @{ $meta->{links} } if $meta->{links};
     for my $m (values %$child_metas) {
-        push @links, @{ $m->{links} } if $m->{links};
+        for my $link (@{ $m->{links} || [] }) {
+            # skip function that links to a prog: URL; this is probably not
+            # relevant for module doc
+            next if $link->{url} =~ /\Aprog:/;
+
+            push @links, $link;
+        }
     }
 
     if (@links) {
@@ -201,7 +207,7 @@ Perinci::To::POD - Generate POD documentation for a package from Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.870 of Perinci::To::POD (from Perl distribution Perinci-To-Doc), released on 2020-01-31.
+This document describes version 0.872 of Perinci::To::POD (from Perl distribution Perinci-To-Doc), released on 2020-04-27.
 
 =head1 SYNOPSIS
 

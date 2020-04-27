@@ -3,14 +3,14 @@ abstract: 'command line options parser (like golang kingpin)'
 author:
   - 'sago35 <sago35@gmail.com>'
 build_requires:
+  Capture::Tiny: '0'
   Digest::MD5: '0'
   Test::Exception: '0'
   Test::More: '0.98'
-  Test::Trap: '0'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.0.18, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,50 +28,50 @@ no_index:
     - builder
 provides:
   Getopt::Kingpin:
-    file: lib/Getopt/Kingpin.pm
-    version: '0.07'
+    file: lib/Getopt\Kingpin.pm
+    version: '0.08'
   Getopt::Kingpin::Arg:
-    file: lib/Getopt/Kingpin/Arg.pm
-    version: '0.07'
+    file: lib/Getopt\Kingpin\Arg.pm
+    version: '0.08'
   Getopt::Kingpin::Args:
-    file: lib/Getopt/Kingpin/Args.pm
-    version: '0.07'
+    file: lib/Getopt\Kingpin\Args.pm
+    version: '0.08'
   Getopt::Kingpin::Base:
-    file: lib/Getopt/Kingpin/Base.pm
-    version: '0.07'
+    file: lib/Getopt\Kingpin\Base.pm
+    version: '0.08'
   Getopt::Kingpin::Command:
-    file: lib/Getopt/Kingpin/Command.pm
-    version: '0.07'
+    file: lib/Getopt\Kingpin\Command.pm
+    version: '0.08'
   Getopt::Kingpin::Commands:
-    file: lib/Getopt/Kingpin/Commands.pm
-    version: '0.07'
+    file: lib/Getopt\Kingpin\Commands.pm
+    version: '0.08'
   Getopt::Kingpin::Flag:
-    file: lib/Getopt/Kingpin/Flag.pm
-    version: '0.07'
+    file: lib/Getopt\Kingpin\Flag.pm
+    version: '0.08'
   Getopt::Kingpin::Flags:
-    file: lib/Getopt/Kingpin/Flags.pm
-    version: '0.07'
+    file: lib/Getopt\Kingpin\Flags.pm
+    version: '0.08'
   Getopt::Kingpin::Type::Bool:
-    file: lib/Getopt/Kingpin/Type/Bool.pm
-    version: '0.07'
+    file: lib/Getopt\Kingpin\Type\Bool.pm
+    version: '0.08'
   Getopt::Kingpin::Type::ExistingDir:
-    file: lib/Getopt/Kingpin/Type/ExistingDir.pm
-    version: '0.07'
+    file: lib/Getopt\Kingpin\Type\ExistingDir.pm
+    version: '0.08'
   Getopt::Kingpin::Type::ExistingFile:
-    file: lib/Getopt/Kingpin/Type/ExistingFile.pm
-    version: '0.07'
+    file: lib/Getopt\Kingpin\Type\ExistingFile.pm
+    version: '0.08'
   Getopt::Kingpin::Type::ExistingFileOrDir:
-    file: lib/Getopt/Kingpin/Type/ExistingFileOrDir.pm
-    version: '0.07'
+    file: lib/Getopt\Kingpin\Type\ExistingFileOrDir.pm
+    version: '0.08'
   Getopt::Kingpin::Type::File:
-    file: lib/Getopt/Kingpin/Type/File.pm
-    version: '0.07'
+    file: lib/Getopt\Kingpin\Type\File.pm
+    version: '0.08'
   Getopt::Kingpin::Type::Int:
-    file: lib/Getopt/Kingpin/Type/Int.pm
-    version: '0.07'
+    file: lib/Getopt\Kingpin\Type\Int.pm
+    version: '0.08'
   Getopt::Kingpin::Type::String:
-    file: lib/Getopt/Kingpin/Type/String.pm
-    version: '0.07'
+    file: lib/Getopt\Kingpin\Type\String.pm
+    version: '0.08'
 requires:
   Object::Simple: '0'
   Path::Tiny: '0'
@@ -80,7 +80,8 @@ resources:
   bugtracker: https://github.com/sago35/Getopt-Kingpin/issues
   homepage: https://github.com/sago35/Getopt-Kingpin
   repository: git://github.com/sago35/Getopt-Kingpin.git
-version: '0.07'
+version: '0.08'
 x_contributors:
+  - 'Pavel Goran <me@pvgoran.name>'
   - 'Syohei YOSHIDA <syohex@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

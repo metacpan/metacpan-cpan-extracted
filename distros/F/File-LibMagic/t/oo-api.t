@@ -1,14 +1,15 @@
 use strict;
 use warnings;
 
-use lib 't/lib';
+use FindBin qw( $Bin );
+use lib "$Bin/lib";
 
 use Test::AnyOf;
 use Test::More 0.96;
 
 use File::LibMagic;
 
-# If tihs is populated then libmagic will use it to find the magic file.
+# If this is populated then libmagic will use it to find the magic file.
 delete $ENV{MAGIC};
 
 {
@@ -30,7 +31,7 @@ delete $ENV{MAGIC};
         'tiny.pdf' => [
             'PDF document, version 1.4',
             'application/pdf',
-            qr/(?:binary|unknown)/,
+            qr/(?:binary|unknown|us-ascii)/,
         ],
     );
 
@@ -77,7 +78,7 @@ SKIP:
 
     my $flm = File::LibMagic->new(
         [
-            't/samples/magic',
+            "$Bin/samples/magic",
             $standard_file,
         ],
     );
@@ -114,7 +115,7 @@ sub _test_flm {
     my $tests = shift;
 
     for my $file ( sort keys %{$tests} ) {
-        my $path = "t/samples/$file";
+        my $path = "$Bin/samples/$file";
 
         subtest(
             "old API with $path",
@@ -287,7 +288,7 @@ sub _test_info {
             my $subclass = My::Magic::Subclass->new();
             isa_ok( $subclass, 'My::Magic::Subclass' );
             is(
-                $subclass->checktype_filename('t/samples/missing'),
+                $subclass->checktype_filename("$Bin/samples/missing"),
                 'text/x-test-passes',
                 'checktype_filename is overridden'
             );

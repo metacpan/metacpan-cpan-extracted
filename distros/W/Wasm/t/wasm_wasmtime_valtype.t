@@ -3,15 +3,19 @@ use Wasm::Wasmtime::ValType;
 
 foreach my $name (qw( i32 i64 f32 f64 anyref funcref ))
 {
+  my $vt = Wasm::Wasmtime::ValType->new($name);
+  pass 'created $name';
   is(
-    Wasm::Wasmtime::ValType->new($name),
+    $vt,
     object {
       call [ isa => 'Wasm::Wasmtime::ValType' ] => T();
       call kind => $name;
       call kind_num => match qr/^[0-9]+$/;
     },
-    "created $name",
+    "use $name",
   );
+  undef $vt;
+  pass "deleted $name";
 }
 
 done_testing;

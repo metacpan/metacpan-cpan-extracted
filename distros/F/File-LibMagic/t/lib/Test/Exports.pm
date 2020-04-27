@@ -8,11 +8,13 @@ use Test::Fatal;
 use Test::More 0.96;
 
 use Exporter qw( import );
+use File::LibMagic::Constants qw( constants );
 
 our @EXPORT_OK = qw( test_complete test_easy );
 
 sub test_complete {
-    my $package = shift;
+    my $package     = shift;
+    my $samples_dir = shift;
 
     subtest(
         'constants',
@@ -21,36 +23,28 @@ sub test_complete {
 
     subtest(
         'custom magic file',
-        sub { _test_complete_with_handle( $package, 't/samples/magic' ) }
+        sub {
+            _test_complete_with_handle(
+                $package,
+                $samples_dir,
+                "$samples_dir/magic",
+            );
+        }
     );
     subtest(
         'empty string for magic file name',
-        sub { _test_complete_with_handle( $package, q{} ) }
+        sub { _test_complete_with_handle( $package, $samples_dir, q{} ) }
     );
     subtest(
         'undef for magic file name',
-        sub { _test_complete_with_handle( $package, undef ) }
+        sub { _test_complete_with_handle( $package, $samples_dir, undef ) }
     );
 }
 
 sub _test_constants {
     my $package = shift;
 
-    my @constants = qw(
-        MAGIC_CHECK
-        MAGIC_COMPRESS
-        MAGIC_CONTINUE
-        MAGIC_DEBUG
-        MAGIC_DEVICES
-        MAGIC_ERROR
-        MAGIC_MIME
-        MAGIC_NONE
-        MAGIC_PRESERVE_ATIME
-        MAGIC_RAW
-        MAGIC_SYMLINK
-    );
-
-    foreach my $const (@constants) {
+    foreach my $const ( grep { !/_MAX$/ } constants() ) {
         ## no critic (Variables::RequireInitializationForLocalVars)
         local $@;
         ## no critic (BuiltinFunctions::ProhibitStringyEval)
@@ -74,6 +68,7 @@ sub _test_constants {
 
 sub _test_complete_with_handle {
     my $package     = shift;
+    my $samples_dir = shift;
     my $custom_file = shift;
 
     my $handle
@@ -96,31 +91,31 @@ sub _test_complete_with_handle {
             'magic_file on foo text (with custom magic)'
         );
         is(
-            $magic_file->( $handle, 't/samples/foo.foo' ),
+            $magic_file->( $handle, "$samples_dir/foo.foo" ),
             'A foo file',
             'magic_file on foo file (with custom magic)'
         );
     }
     else {
         is(
-            $magic_file->( $handle, 't/samples/foo.txt' ),
+            $magic_file->( $handle, "$samples_dir/foo.txt" ),
             'ASCII text',
             'magic_file on foo file (no custom magic)'
         );
         is(
-            $magic_file->( $handle, 't/samples/foo.foo' ),
+            $magic_file->( $handle, "$samples_dir/foo.foo" ),
             'ASCII text',
             'magic_file on foo file (no custom magic)'
         );
     }
 
     is(
-        $magic_file->( $handle, 't/samples/foo.txt' ),
+        $magic_file->( $handle, "$samples_dir/foo.txt" ),
         'ASCII text',
         'magic_file on ASCII text'
     );
     is_any_of(
-        $magic_file->( $handle, 't/samples/foo.c' ),
+        $magic_file->( $handle, "$samples_dir/foo.c" ),
         [ 'ASCII text', 'ASCII C program text', 'C source, ASCII text' ],
         'magic_file on C code'
     );
@@ -129,7 +124,8 @@ sub _test_complete_with_handle {
 }
 
 sub test_easy {
-    my $package = shift;
+    my $package     = shift;
+    my $samples_dir = shift;
 
     my $MagicBuffer = $package->can('MagicBuffer');
     my $MagicFile   = $package->can('MagicFile');
@@ -140,12 +136,12 @@ sub test_easy {
         'MagicBuffer on text'
     );
     is(
-        $MagicFile->('t/samples/foo.txt'),
+        $MagicFile->("$samples_dir/foo.txt"),
         'ASCII text',
         'MagicFile on ASCII text'
     );
     is_any_of(
-        $MagicFile->('t/samples/foo.c'),
+        $MagicFile->("$samples_dir/foo.c"),
         [ 'ASCII C program text', 'C source, ASCII text' ],
         'MagicFile on C code'
     );
@@ -165,7 +161,7 @@ sub test_easy {
 TODO: {
         local $TODO = 'May not fail sanely with all versions of libmagic';
         like(
-            exception { $MagicFile->('t/samples/missing') },
+            exception { $MagicFile->("$samples_dir/missing") },
             qr{libmagic cannot open .+ at .+},
             'MagicFile: missing file'
         );

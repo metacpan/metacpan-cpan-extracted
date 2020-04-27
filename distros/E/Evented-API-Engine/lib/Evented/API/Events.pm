@@ -12,7 +12,7 @@ use parent 'Evented::Object';
 use Scalar::Util qw(blessed weaken);
 use Evented::Object::Hax qw(set_symbol);
 
-our $VERSION = '4.11';
+our $VERSION = '4.13';
 
 sub add_events {
     my $mod = shift;

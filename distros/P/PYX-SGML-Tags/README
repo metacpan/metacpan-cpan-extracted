@@ -4,6 +4,7 @@ NAME
 
 SYNOPSIS
      use PYX::SGML::Tags;
+
      my $obj = PYX::SGML::Tags->new(%parameters);
      $obj->parse($pyx, $out);
      $obj->parse_file($input_file, $out);
@@ -73,12 +74,10 @@ ERRORS
              From Tags::Output::Raw::flush():
                      Cannot write to output handler.
 
-EXAMPLE
-     # Pragmas.
+EXAMPLE1
      use strict;
      use warnings;
 
-     # Modules.
      use PYX::SGML::Tags;
 
      # Input.
@@ -98,6 +97,34 @@ EXAMPLE
      # Output:
      # <element>data</element>
 
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use PYX::SGML::Tags;
+     use Tags::Output::Indent;
+
+     # Input.
+     my $pyx = <<'END';
+     (element
+     -data
+     )element
+     END
+
+     # Object.
+     my $obj = PYX::SGML::Tags->new(
+             'tags' => Tags::Output::Indent->new(
+                     'output_handler' => \*STDOUT,
+             ),
+     );
+
+     # Process.
+     $obj->parse($pyx);
+     print "\n";
+
+     # Output:
+     # <element>data</element>
+
 DEPENDENCIES
     Class::Utils, Error::Pure, PYX::Parser, PYX::Utils, Tags::Output::Raw.
 
@@ -106,17 +133,18 @@ SEE ALSO
         Install the PYX modules.
 
 REPOSITORY
-    <https://github.com/tupinek/PYX-SGML-Tags>
+    <https://github.com/michal-josef-spacek/PYX-SGML-Tags>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2011-2016 Michal Špaček
-     BSD 2-Clause License
+    © 2011-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.02
+    0.04
 

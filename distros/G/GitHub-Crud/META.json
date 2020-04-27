@@ -36,7 +36,7 @@
    "provides" : {
       "GitHub::Crud" : {
          "file" : "lib/GitHub/Crud.pm",
-         "version" : "20200419"
+         "version" : "20200428"
       }
    },
    "release_status" : "stable",
@@ -45,6 +45,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20200419",
+   "version" : "20200428",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

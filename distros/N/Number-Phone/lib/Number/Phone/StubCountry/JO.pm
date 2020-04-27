@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200309202347;
+our $VERSION = 1.20200427120030;
 
 my $formatters = [
                 {
@@ -56,6 +56,10 @@ my $formatters = [
 
 my $validators = {
                 'fixed_line' => '
+          87(?:
+            000|
+            90[01]
+          )\\d{3}|
           (?:
             2(?:
               6(?:
@@ -81,8 +85,7 @@ my $validators = {
               2[024-7]|
               3\\d|
               4[0-3]|
-              [57][023]|
-              6[03]
+              [5-7][023]
             )|
             53(?:
               0[0-3]|
@@ -106,7 +109,7 @@ my $validators = {
               )|
               4(?:
                 0[0-25]|
-                1[2-7]|
+                1[2-467]|
                 2[0569]|
                 [38][07-9]|
                 4[025689]|
@@ -127,12 +130,17 @@ my $validators = {
               )
             )|
             87(?:
-              [029]0|
-              7[08]
+              20|
+              7[078]|
+              99
             )
           )\\d{4}
         ',
                 'geographic' => '
+          87(?:
+            000|
+            90[01]
+          )\\d{3}|
           (?:
             2(?:
               6(?:
@@ -158,8 +166,7 @@ my $validators = {
               2[024-7]|
               3\\d|
               4[0-3]|
-              [57][023]|
-              6[03]
+              [5-7][023]
             )|
             53(?:
               0[0-3]|
@@ -183,7 +190,7 @@ my $validators = {
               )|
               4(?:
                 0[0-25]|
-                1[2-7]|
+                1[2-467]|
                 2[0569]|
                 [38][07-9]|
                 4[025689]|
@@ -204,20 +211,17 @@ my $validators = {
               )
             )|
             87(?:
-              [029]0|
-              7[08]
+              20|
+              7[078]|
+              99
             )
           )\\d{4}
         ',
                 'mobile' => '
           7(?:
-            55[0-49]|
-            (?:
-              7[025-9]|
-              8[0-25-9]|
-              9\\d
-            )\\d
-          )\\d{5}
+            [78][0-25-9]|
+            9\\d
+          )\\d{6}
         ',
                 'pager' => '
           74(?:
@@ -226,7 +230,7 @@ my $validators = {
           )\\d{5}
         ',
                 'personal_number' => '70\\d{7}',
-                'specialrate' => '(85\\d{6})|(900\\d{5})|(
+                'specialrate' => '(85\\d{6})|(9\\d{7})|(
           8(?:
             10|
             8\\d
@@ -236,19 +240,41 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
+$areanames{en}->{962262} = "Mafraq";
+$areanames{en}->{962263} = "Jarash";
+$areanames{en}->{962264} = "Ajloun";
+$areanames{en}->{962265} = "Irbid";
 $areanames{en}->{962266} = "Mafraq";
 $areanames{en}->{962267} = "Jarash";
 $areanames{en}->{962268} = "Ajloun";
 $areanames{en}->{962269} = "Irbid";
-$areanames{en}->{9623222} = "Tafileh";
+$areanames{en}->{96227} = "Irbid";
+$areanames{en}->{962320} = "Aqaba";
+$areanames{en}->{962321} = "Ma\’an";
+$areanames{en}->{962322} = "Tafileh";
+$areanames{en}->{962323} = "Karak";
 $areanames{en}->{962324} = "Aqaba";
 $areanames{en}->{962325} = "Maan";
 $areanames{en}->{9623260} = "Tafileh";
+$areanames{en}->{9623262} = "Southern\ Region";
 $areanames{en}->{962327} = "Karak";
 $areanames{en}->{962530} = "Zarqa";
 $areanames{en}->{962531} = "Madaba";
+$areanames{en}->{962532} = "Madaba";
 $areanames{en}->{962533} = "Balqa";
-$areanames{en}->{9626} = "Amman";
+$areanames{en}->{962534} = "Balqa";
+$areanames{en}->{962535} = "Balqa";
+$areanames{en}->{962536} = "Zarqa";
+$areanames{en}->{962537} = "Zarqa";
+$areanames{en}->{962538} = "Zarqa";
+$areanames{en}->{962539} = "Zarqa";
+$areanames{en}->{962620} = "Amman";
+$areanames{en}->{962622} = "Greater\ Amman";
+$areanames{en}->{962625} = "Amman";
+$areanames{en}->{96263} = "Amman";
+$areanames{en}->{96264} = "Amman";
+$areanames{en}->{962647} = "Greater\ Amman";
+$areanames{en}->{96265} = "Amman";
 
     sub new {
       my $class = shift;

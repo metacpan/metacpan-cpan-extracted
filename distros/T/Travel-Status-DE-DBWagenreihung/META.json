@@ -4,7 +4,7 @@
       "Copyright (C) 2018-2019 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -42,15 +42,15 @@
    "provides" : {
       "Travel::Status::DE::DBWagenreihung" : {
          "file" : "lib/Travel/Status/DE/DBWagenreihung.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Travel::Status::DE::DBWagenreihung::Section" : {
          "file" : "lib/Travel/Status/DE/DBWagenreihung/Section.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Travel::Status::DE::DBWagenreihung::Wagon" : {
          "file" : "lib/Travel/Status/DE/DBWagenreihung/Wagon.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -62,6 +62,6 @@
          "url" : "https://github.com/derf/Travel-Status-DE-DBWagenreihung"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

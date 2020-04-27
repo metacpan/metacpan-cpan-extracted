@@ -1,6 +1,7 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
+                                        'Config::AutoConf' => '0',
                                         'ExtUtils::CBuilder' => '0',
                                         'ExtUtils::MakeMaker' => '0'
                                       }
@@ -11,7 +12,7 @@ do { my $x = {
                                       'Code::TidyAll::Plugin::SortLines::Naturally' => '0.000003',
                                       'Code::TidyAll::Plugin::Test::Vars' => '0.02',
                                       'Devel::PPPort' => '3.23',
-                                      'ExtUtils::Constants' => '0',
+                                      'ExtUtils::Constant' => '0',
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
@@ -40,9 +41,9 @@ do { my $x = {
                       'requires' => {
                                       'Carp' => '0',
                                       'Exporter' => '0',
+                                      'List::Util' => '0',
                                       'Scalar::Util' => '0',
                                       'XSLoader' => '0',
-                                      'base' => '0',
                                       'perl' => '5.008',
                                       'strict' => '0',
                                       'warnings' => '0'
@@ -57,8 +58,10 @@ do { my $x = {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'File::Temp' => '0',
+                                   'FindBin' => '0',
                                    'Test::Fatal' => '0',
                                    'Test::More' => '0.96',
+                                   'base' => '0',
                                    'lib' => '0'
                                  }
                  }

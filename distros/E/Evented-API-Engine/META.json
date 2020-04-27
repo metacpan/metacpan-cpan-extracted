@@ -14,8 +14,9 @@
    },
    "name" : "Evented-API-Engine",
    "prereqs" : {
-      "build" : {
+      "configure" : {
          "requires" : {
+            "Pod::Readme" : "0",
             "Pod::Select" : "0"
          }
       },
@@ -31,15 +32,15 @@
    "provides" : {
       "Evented::API::Engine" : {
          "file" : "lib/Evented/API/Engine.pm",
-         "version" : "4.07"
+         "version" : "4.13"
       },
       "Evented::API::Events" : {
          "file" : "lib/Evented/API/Events.pm",
-         "version" : "4.07"
+         "version" : "4.13"
       },
       "Evented::API::Module" : {
          "file" : "lib/Evented/API/Module.pm",
-         "version" : "4.07"
+         "version" : "4.13"
       }
    },
    "release_status" : "stable",
@@ -51,6 +52,6 @@
          "url" : "https://github.com/cooper/evented-api-engine"
       }
    },
-   "version" : "4.07",
+   "version" : "4.13",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

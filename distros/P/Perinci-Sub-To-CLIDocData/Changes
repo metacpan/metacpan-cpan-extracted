@@ -1,3 +1,16 @@
+0.293   2020-04-27  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix logic bug that causes list of options to not be
+	  added into usage_line.
+
+
+0.292   2020-04-27  Released-By: PERLANCAR; Urgency: medium
+
+	- List all options instead of just '[options]' in the produced
+	  'usage_line'; the old usage format is now available in
+	  'compact_usage_line'.
+
+
 0.291   2019-07-26  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Fix autosummary for alisa option, it should be 'Alias

@@ -56,17 +56,18 @@ EXAMPLE2
      # <element>foo</element>
 
 REPOSITORY
-    <https://github.com/tupinek/App-PYX2XML>
+    <https://github.com/michal-josef-spacek/App-PYX2XML>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2015-2016 Michal Špaček
-     BSD 2-Clause License
+    © 2015-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.02
+    0.04
 

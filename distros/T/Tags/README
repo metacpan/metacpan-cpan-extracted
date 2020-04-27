@@ -32,7 +32,7 @@ SEE ALSO
         Install the Tags modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Tags>
+    <https://github.com/michal-josef-spacek/Tags>
 
 AUTHOR
     Michal Josef Špaček <mailto:skim@cpan.org>
@@ -40,9 +40,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2005-2018 Michal Josef Špaček
-     BSD 2-Clause License
+    © 2005-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.01
+    0.08
 

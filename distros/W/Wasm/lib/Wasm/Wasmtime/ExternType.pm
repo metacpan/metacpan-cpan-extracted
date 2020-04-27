@@ -9,11 +9,11 @@ use Wasm::Wasmtime::TableType;
 use Wasm::Wasmtime::MemoryType;
 
 # ABSTRACT: Wasmtime extern type class
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 $ffi_prefix = 'wasm_externtype_';
-$ffi->type('opaque' => 'wasm_externtype_t');
+$ffi->load_custom_type('::PtrObject' => 'wasm_externtype_t' => __PACKAGE__);
 
 sub new
 {
@@ -32,52 +32,44 @@ my %kind = (
 );
 
 
-$ffi->attach( kind => ['wasm_externtype_t'] => 'uint8' => sub {
-  my($xsub, $self) = @_;
-  $kind{$xsub->($self->{ptr})};
-});
+sub kind { $kind{shift->kind_num} }
 
 
-$ffi->attach( [ kind => 'kind_num' ] => ['wasm_externtype_t'] => 'uint8' => sub {
-  my($xsub, $self) = @_;
-  $xsub->($self->{ptr});
-});
+$ffi->attach( [ kind => 'kind_num' ] => ['wasm_externtype_t'] => 'uint8');
 
 
 $ffi->attach( as_functype => ['wasm_externtype_t'] => 'wasm_functype_t' => sub {
   my($xsub, $self) = @_;
-  my $ptr = $xsub->($self->{ptr});
-  $ptr ? Wasm::Wasmtime::FuncType->new($ptr, $self->{owner} || $self) : undef;
+  my $functype = $xsub->($self);
+  $functype->{owner} = $self->{owner} || $self if $functype;
+  $functype;
 });
 
 
 $ffi->attach( as_globaltype => ['wasm_externtype_t'] => 'wasm_globaltype_t' => sub {
   my($xsub, $self) = @_;
-  my $ptr = $xsub->($self->{ptr});
-  $ptr ? Wasm::Wasmtime::GlobalType->new($ptr, $self->{owner} || $self) : undef;
+  my $globaltype = $xsub->($self);
+  $globaltype->{owner} = $self->{owner} || $self if $globaltype;
+  $globaltype;
 });
 
 
 $ffi->attach( as_tabletype => ['wasm_externtype_t'] => 'wasm_tabletype_t' => sub {
   my($xsub, $self) = @_;
-  my $ptr = $xsub->($self->{ptr});
-  $ptr ? Wasm::Wasmtime::TableType->new($ptr, $self->{owner} || $self) : undef;
+  my $tabletype = $xsub->($self);
+  $tabletype->{owner} = $self->{owner} || $self if $tabletype;
+  $tabletype;
 });
 
 
 $ffi->attach( as_memorytype => ['wasm_externtype_t'] => 'wasm_memorytype_t' => sub {
   my($xsub, $self) = @_;
-  my $ptr = $xsub->($self->{ptr});
-  $ptr ? Wasm::Wasmtime::MemoryType->new($ptr, $self->{owner} || $self) : undef;
+  my $memorytype = $xsub->($self);
+  $memorytype->{owner} = $self->{owner} || $self if $memorytype;
+  $memorytype;
 });
 
-$ffi->attach( [ delete => "DESTROY" ] => ['wasm_externtype_t'] => sub {
-  my($xsub, $self) = @_;
-  if(defined $self->{ptr} && !defined $self->{owner})
-  {
-    $xsub->($self->{ptr});
-  }
-});
+_generate_destroy();
 
 1;
 
@@ -93,7 +85,7 @@ Wasm::Wasmtime::ExternType - Wasmtime extern type class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

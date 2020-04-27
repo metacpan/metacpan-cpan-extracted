@@ -16,13 +16,15 @@ name: Net-IPAM-Block
 provides:
   Net::IPAM::Block:
     file: lib/Net/IPAM/Block.pm
-    version: '1.10'
+    version: '1.12'
+  Net::IPAM::Block::Private:
+    file: lib/Net/IPAM/Block/Private.pm
 requires:
   Carp: '0'
   List::Util: '1.43'
-  Net::IPAM::IP: '1.15'
+  Net::IPAM::IP: '1.19'
+  Net::IPAM::Util: '0'
   Scalar::Util: '1.39'
-  namespace::clean: '0'
   perl: v5.10.0
-version: '1.10'
+version: '1.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

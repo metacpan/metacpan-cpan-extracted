@@ -159,6 +159,26 @@ static AV *S_get_class_isa(pTHX_ HV *stash)
   return GvAV(*gvp);
 }
 
+#define find_cop_for_lvintro(padix, o, copp)  S_find_cop_for_lvintro(aTHX_ padix, o, copp)
+static COP *S_find_cop_for_lvintro(pTHX_ PADOFFSET padix, OP *o, COP **copp)
+{
+  for( ; o; o = OpSIBLING(o)) {
+    if(OP_CLASS(o) == OA_COP) {
+      *copp = (COP *)o;
+    }
+    else if(o->op_type == OP_PADSV && o->op_targ == padix && o->op_private & OPpLVAL_INTRO) {
+      return *copp;
+    }
+    else if(o->op_flags & OPf_KIDS) {
+      COP *ret = find_cop_for_lvintro(padix, cUNOPx(o)->op_first, copp);
+      if(ret)
+        return ret;
+    }
+  }
+
+  return NULL;
+}
+
 /*********************************
  * Class and Slot Implementation *
  *********************************/
@@ -889,7 +909,29 @@ static SlotMeta *S_mop_class_add_slot(pTHX_ ClassMeta *meta, SV *slotname)
   if(meta->sealed)
     croak("Cannot add a new slot to an already-sealed class");
 
-  /* TODO: Check for name collisions */
+  if(!slotname || !SvOK(slotname) || !SvCUR(slotname))
+    croak("slotname must not be undefined or empty");
+
+  switch(SvPV_nolen(slotname)[0]) {
+    case '$':
+    case '@':
+    case '%':
+      break;
+
+    default:
+      croak("slotname must begin with a sigil");
+  }
+
+  U32 i;
+  for(i = 0; i < av_count(slots); i++) {
+    SlotMeta *slotmeta = (SlotMeta *)AvARRAY(slots)[i];
+    if(SvCUR(slotmeta->name) < 2)
+      continue;
+
+    if(sv_eq(slotmeta->name, slotname))
+      croak("Cannot add another slot named %" SVf, slotname);
+  }
+
   SlotMeta *slotmeta;
   Newx(slotmeta, 1, SlotMeta);
 
@@ -1141,6 +1183,10 @@ static void parse_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx)
   for(i = 0; i < nslots; i++) {
     SlotMeta *slotmeta = (SlotMeta *)AvARRAY(slots)[i];
 
+    /* Skip the anonymous ones */
+    if(SvCUR(slotmeta->name) < 2)
+      continue;
+
     /* Claim these are all STATE variables just to quiet the "will not stay
      * shared" warning */
     pad_add_name_sv(slotmeta->name, padadd_STATE, NULL, NULL);
@@ -1192,6 +1238,30 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx)
   U8 repr = compclassmeta->repr;
   if(repr == REPR_AUTOSELECT && !compclassmeta->foreign_new)
     repr = REPR_NATIVE;
+
+  {
+    ENTER;
+    SAVEVPTR(PL_curcop);
+
+    /* See https://rt.cpan.org/Ticket/Display.html?id=132428
+     *   https://github.com/Perl/perl5/issues/17754
+     */
+    PADOFFSET padix;
+    for(padix = PADIX_SELF + 1; padix <= PadnamelistMAX(PadlistNAMES(CvPADLIST(PL_compcv))); padix++) {
+      PADNAME *pn = padnames[padix];
+      if(PadnameIsNULL(pn) || !PadnameLEN(pn))
+        continue;
+      if(!strEQ(PadnamePV(pn), "$self"))
+        continue;
+
+      COP *padcop = NULL;
+      if(find_cop_for_lvintro(padix, ctx->body, &padcop))
+        PL_curcop = padcop;
+      warn("\"my\" variable $self masks earlier declaration in same scope");
+    }
+
+    LEAVE;
+  }
 
   slotops = op_append_list(OP_LINESEQ, slotops,
     newSTATEOP(0, NULL, NULL));
@@ -1251,10 +1321,7 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx)
     PADOFFSET padix;
     for(padix = 1; padix <= PadnamelistMAX(pnl); padix++) {
       PADNAME *pn = PadnamelistARRAY(pnl)[padix];
-      if(!pn || 
-#if !HAVE_PERL_VERSION(5, 22, 0)
-         pn == &PL_sv_undef ||
-#endif
+      if(PadnameIsNULL(pn) ||
          !PadnameOUTER(pn) ||
          !PARENT_PAD_INDEX(pn))
         continue;
@@ -1330,7 +1397,7 @@ new(class, name)
     SV *name
   CODE:
   {
-    ClassMeta *meta = mop_create_class(name, NULL);
+    ClassMeta *meta = mop_create_class(sv_mortalcopy(name), NULL);
 
     RETVAL = newSV(0);
     sv_setref_uv(RETVAL, "Object::Pad::MOP::Class", PTR2UV(meta));
@@ -1357,7 +1424,7 @@ add_slot(self, slotname)
   {
     ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
 
-    SlotMeta *slotmeta = mop_class_add_slot(meta, slotname);
+    SlotMeta *slotmeta = mop_class_add_slot(meta, sv_mortalcopy(slotname));
 
     RETVAL = newSV(0);
     sv_setref_uv(RETVAL, "Object::Pad::MOP::Slot", PTR2UV(slotmeta));

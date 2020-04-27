@@ -12,4 +12,9 @@
 	- Added the methods true, false under Module::Generic to be used in _set_get_boolean and _is_class_loaded and _load_class which are wrappers for Class::Load::is_class_loaded and Class::Load::load_class
 0.6.6 2019-11-03
     - Adjusted the functionning of _set_get_hash_as_object so that it always returns an object even when there was no data. This is to avoid the perl error of "Can't call method "this_property" on an undefined value" when doing something like my_dynamic_hash->this_property
-    
+0.11.8 2020-04-25
+	- Changed init when an object preset value looks like a package name, this now also requires that the package be loaded to consider it as a package requirement. Example:
+	$self->{url} = 'URI';
+	requires an object URI for the object property 'url'
+	- error() method now respect the 'no warnings' pragma
+	If 'no warnings' is set, an error wil still be set, but no warning will be printed out on STDERR

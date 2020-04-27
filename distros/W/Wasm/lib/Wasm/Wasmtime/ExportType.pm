@@ -6,30 +6,30 @@ use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::ExternType;
 
 # ABSTRACT: Wasmtime export type class
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 $ffi_prefix = 'wasm_exporttype_';
-$ffi->type('opaque' => 'wasm_exporttype_t');
+$ffi->load_custom_type('::PtrObject' => 'wasm_exporttype_t' => __PACKAGE__);
 
 
 $ffi->attach( new => ['wasm_byte_vec_t*', 'wasm_externtype_t'] => 'wasm_exporttype_t' => sub {
   my $xsub = shift;
   my $class = shift;
-  my($ptr, $owner);
   if(defined $_[1] && ref($_[1]) eq 'Wasm::Wasmtime::ExternType')
   {
     # not sure this is actually useful?
     # doesn't seem to bee a way to new an wasm_externtype_t
     my $name = Wasm::Wasmtime::ByteVec->new(shift);
     my $externtype = shift;
-    my $ptr = $xsub->($name, $externtype->{ptr});
+    my $self = $xsub->($name, $externtype->{ptr});
     $name->delete;
+    return $self;
   }
   else
   {
-    ($ptr,$owner) = @_;
-    bless {
+    my ($ptr,$owner) = @_;
+    return bless {
       ptr   => $ptr,
       owner => $owner,
     }, $class;
@@ -39,27 +39,19 @@ $ffi->attach( new => ['wasm_byte_vec_t*', 'wasm_externtype_t'] => 'wasm_exportty
 
 $ffi->attach( name => ['wasm_exporttype_t'] => 'wasm_byte_vec_t*' => sub {
   my($xsub, $self) = @_;
-  my $name = $xsub->($self->{ptr});
+  my $name = $xsub->($self);
   $name->get;
 });
 
 
 $ffi->attach( type => ['wasm_exporttype_t'] => 'wasm_externtype_t' => sub {
   my($xsub, $self) = @_;
-  Wasm::Wasmtime::ExternType->new(
-    $xsub->($self->{ptr}),
-    $self->{owner} || $self,
-  );
+  my $type = $xsub->($self);
+  $type->{owner} = $self->{owner} || $self;
+  $type;
 });
 
-$ffi->attach( [ delete => "DESTROY" ] => ['wasm_exporttype_t'] => sub {
-  my($xsub, $self) = @_;
-  if(defined $self->{ptr} && !defined $self->{owner})
-  {
-    $xsub->($self->{ptr});
-  }
-});
-
+_generate_destroy();
 _generate_vec_class();
 
 1;
@@ -76,7 +68,7 @@ Wasm::Wasmtime::ExportType - Wasmtime export type class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

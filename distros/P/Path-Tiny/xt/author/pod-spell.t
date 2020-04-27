@@ -17,11 +17,13 @@ Aristotle
 BENCHMARKING
 Bell
 BooK
+Book
 Bruhat
 CRLF
 Champoux
 Chris
 Continsouzas
+Dan
 Dave
 David
 Doug
@@ -96,6 +98,7 @@ fatalize
 gabiruh
 geraud
 gfuji
+grinnz
 haarg
 hartzell
 ian

@@ -8,11 +8,11 @@ use Ref::Util qw( is_ref );
 use Carp ();
 
 # ABSTRACT: Wasmtime global type class
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 $ffi_prefix = 'wasm_globaltype_';
-$ffi->type('opaque' => 'wasm_globaltype_t');
+$ffi->load_custom_type('::PtrObject' => 'wasm_globaltype_t' => __PACKAGE__);
 
 
 my %mutability = (
@@ -27,7 +27,11 @@ $ffi->attach( new => ['wasm_valtype_t','uint8'] => 'wasm_globaltype_t' => sub {
   my $owner;
   if(defined $_[0] && !is_ref($_[0]) && $_[0] =~ /^[0-9]+$/)
   {
-    ($ptr, $owner) = @_;
+    my($ptr, $owner) = @_;
+    return bless {
+      ptr => $ptr,
+      owner => $owner,
+    }, $class;
   }
   else
   {
@@ -41,19 +45,18 @@ $ffi->attach( new => ['wasm_valtype_t','uint8'] => 'wasm_globaltype_t' => sub {
       $valtype = Wasm::Wasmtime::ValType->new($valtype);
     }
     Carp::croak("mutability must be one of 'const' or 'var'") unless defined $mutability{$mutability};
-    $ptr = $xsub->(delete $valtype->{ptr}, $mutability{$mutability});
+    my $self = $xsub->($valtype, $mutability{$mutability});
+    delete $valtype->{ptr};
+    return $self;
   }
-  bless {
-    ptr => $ptr,
-    owner => $owner,
-  }, $class;
 });
 
 
 $ffi->attach( content => ['wasm_globaltype_t'] => 'wasm_valtype_t' => sub {
   my($xsub, $self) = @_;
-  my $ptr = $xsub->($self->{ptr});
-  Wasm::Wasmtime::ValType->new($ptr, $self);
+  my $valtype = $xsub->($self);
+  $valtype->{owner} = $self;
+  $valtype;
 });
 
 
@@ -64,7 +67,7 @@ my @mutability = (
 
 $ffi->attach( mutability => ['wasm_globaltype_t'] => 'uint8' => sub {
   my($xsub, $self) = @_;
-  $mutability[$xsub->($self->{ptr})];
+  $mutability[$xsub->($self)];
 });
 
 
@@ -72,17 +75,11 @@ $ffi->attach( mutability => ['wasm_globaltype_t'] => 'uint8' => sub {
 $ffi->attach( as_externtype => ['wasm_globaltype_t'] => 'opaque' => sub {
   my($xsub, $self) = @_;
   require Wasm::Wasmtime::ExternType;
-  my $ptr = $xsub->($self->{ptr});
+  my $ptr = $xsub->($self);
   Wasm::Wasmtime::ExternType->new($ptr, $self->{owner} || $self);
 });
 
-$ffi->attach( [ delete => "DESTROY" ] => ['wasm_globaltype_t'] => sub {
-  my($xsub, $self) = @_;
-  if(defined $self->{ptr} && !defined $self->{owner})
-  {
-    $xsub->($self->{ptr});
-  }
-});
+_generate_destroy();
 
 1;
 
@@ -98,7 +95,7 @@ Wasm::Wasmtime::GlobalType - Wasmtime global type class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

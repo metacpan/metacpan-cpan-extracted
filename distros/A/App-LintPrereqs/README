@@ -3,8 +3,8 @@ NAME
     dist.ini
 
 VERSION
-    This document describes version 0.542 of App::LintPrereqs (from Perl
-    distribution App-LintPrereqs), released on 2020-04-18.
+    This document describes version 0.543 of App::LintPrereqs (from Perl
+    distribution App-LintPrereqs), released on 2020-04-27.
 
 SYNOPSIS
      # Use via lint-prereqs CLI script

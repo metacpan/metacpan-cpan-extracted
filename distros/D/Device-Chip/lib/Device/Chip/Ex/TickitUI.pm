@@ -18,15 +18,6 @@ use Tickit;
 use Tickit::Widgets qw( VBox CheckButton Tabbed );
 
 Tickit::Style->load_style( <<'EOSTYLE' );
-Button {
-  bg: "black"; fg: "white";
-}
-Button:current {
-  bg: "white"; fg: "black";
-}
-Button:read {
-  bg: "red"; fg: "black";
-}
 Entry {
   bg: "green"; fg: "black";
 }
@@ -108,6 +99,7 @@ sub run
    }
 
    my $tickit = Tickit->new( root => $vbox );
+   $tickit->term->await_started( 0.5 );
 
    my $update;
    $update = sub {

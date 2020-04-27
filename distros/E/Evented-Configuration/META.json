@@ -16,7 +16,9 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "Module::Build" : "0.42",
+            "Pod::Readme" : "0",
+            "Pod::Select" : "0"
          }
       },
       "runtime" : {
@@ -29,7 +31,7 @@
    "provides" : {
       "Evented::Configuration" : {
          "file" : "lib/Evented/Configuration.pm",
-         "version" : "4.01"
+         "version" : "4.04"
       }
    },
    "release_status" : "stable",
@@ -41,6 +43,6 @@
          "url" : "https://github.com/cooper/evented-configuration"
       }
    },
-   "version" : "4.01",
+   "version" : "4.04",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

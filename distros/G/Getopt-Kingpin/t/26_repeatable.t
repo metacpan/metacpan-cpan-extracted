@@ -1,7 +1,7 @@
 use strict;
 use Test::More 0.98;
 use Test::Exception;
-use Test::Trap;
+use Capture::Tiny ':all';
 use Getopt::Kingpin;
 
 subtest 'repeatable flag error' => sub {
@@ -9,14 +9,15 @@ subtest 'repeatable flag error' => sub {
     push @ARGV, qw(--xxx a --xxx b --xxx c);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     my $args = $kingpin->flag("xxx", "xxx yyy")->string();
 
-    trap {
-        my $cmd = $kingpin->parse;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
     };
 
-    like $trap->stderr, qr/error: flag 'xxx' cannot be repeated, try --help/;
-    is $trap->exit, 1;
+    like $stderr, qr/error: flag 'xxx' cannot be repeated, try --help/;
+    is $exit, 1;
 };
 
 subtest 'repeatable flag (is_cumulative)' => sub {
@@ -69,14 +70,15 @@ subtest 'repeatable arg error' => sub {
     push @ARGV, qw(a b c);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     my $args = $kingpin->arg("xxx", "xxx yyy")->string();
 
-    trap {
-        my $cmd = $kingpin->parse;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
     };
 
-    like $trap->stderr, qr/error: unexpected b, try --help/;
-    is $trap->exit, 1;
+    like $stderr, qr/error: unexpected b, try --help/;
+    is $exit, 1;
 };
 
 subtest 'repeatable arg (is_cumulative)' => sub {

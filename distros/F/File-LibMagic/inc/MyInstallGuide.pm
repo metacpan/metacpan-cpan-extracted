@@ -1,4 +1,4 @@
-package MyInstallGuide;
+package inc::MyInstallGuide;
 
 use Dist::Zilla::File::FromCode;
 use Moose;
@@ -20,7 +20,7 @@ On Debian/Ubuntu run:
 
     sudo apt-get install libmagic-dev
 
-On Mac you can use homebrew (http://brew.sh/):
+On Mac you can use homebrew (https://brew.sh/):
 
     brew install libmagic
 

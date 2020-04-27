@@ -37,6 +37,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.03",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mschmitt/Date-Holidays-DE.git",
+         "web" : "https://github.com/mschmitt/Date-Holidays-DE"
+      }
+   },
+   "version" : "2.05",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

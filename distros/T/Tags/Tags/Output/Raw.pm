@@ -15,7 +15,7 @@ Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $LAST_INDEX => -1;
 Readonly::Scalar my $SPACE => q{ };
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Finalize Tags output.
 sub finalize {
@@ -387,6 +387,7 @@ __END__
 =head1 SYNOPSIS
 
  use Tags::Output::Raw;
+
  my $tags = Tags::Output::Raw->new(%params);
  $tags->put(['b', 'tag']);
  my @open_tags = $tags->open_tags;
@@ -650,7 +651,7 @@ Install the Tags modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Tags>
+L<https://github.com/michal-josef-spacek/Tags>
 
 =head1 AUTHOR
 
@@ -660,11 +661,12 @@ L<http://skim.cz/>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2005-2018 Michal Josef Špaček
- BSD 2-Clause License
+© 2005-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

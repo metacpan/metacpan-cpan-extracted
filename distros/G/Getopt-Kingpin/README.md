@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/sago35/Getopt-Kingpin.svg?branch=master)](https://travis-ci.org/sago35/Getopt-Kingpin) [![Coverage Status](http://codecov.io/github/sago35/Getopt-Kingpin/coverage.svg?branch=master)](https://codecov.io/github/sago35/Getopt-Kingpin?branch=master) [![Build Status](https://img.shields.io/appveyor/ci/sago35/Getopt-Kingpin/master.svg)](https://ci.appveyor.com/project/sago35/Getopt-Kingpin/branch/master)
+[![Build Status](https://travis-ci.org/sago35/Getopt-Kingpin.svg?branch=master)](https://travis-ci.org/sago35/Getopt-Kingpin) [![Coverage Status](http://codecov.io/github/sago35/Getopt-Kingpin/coverage.svg?branch=master)](https://codecov.io/github/sago35/Getopt-Kingpin?branch=master) [![Build Status](https://img.shields.io/appveyor/ci/sago35/Getopt-Kingpin/master.svg?logo=appveyor)](https://ci.appveyor.com/project/sago35/Getopt-Kingpin/branch/master)
 # NAME
 
 Getopt::Kingpin - command line options parser (like golang kingpin)
@@ -272,10 +272,10 @@ Print help.
 
 # SEE ALSO
 
-- [Getopt::Long](https://metacpan.org/pod/Getopt::Long)
-- [Getopt::Long::Descriptive](https://metacpan.org/pod/Getopt::Long::Descriptive)
-- [Smart::Options](https://metacpan.org/pod/Smart::Options)
-- [MooseX::Getopt::Usage](https://metacpan.org/pod/MooseX::Getopt::Usage)
+- [Getopt::Long](https://metacpan.org/pod/Getopt%3A%3ALong)
+- [Getopt::Long::Descriptive](https://metacpan.org/pod/Getopt%3A%3ALong%3A%3ADescriptive)
+- [Smart::Options](https://metacpan.org/pod/Smart%3A%3AOptions)
+- [MooseX::Getopt::Usage](https://metacpan.org/pod/MooseX%3A%3AGetopt%3A%3AUsage)
 
 # LICENSE
 

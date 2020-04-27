@@ -94,6 +94,44 @@ $chip->mount( $adapter )->get;
    $adapter->check_and_clear( '->cached_write_reg writes a new value' );
 }
 
+# cached read multi
+{
+   $adapter->expect_write_then_read( pack( "C", 6 ), 2 )
+      ->returns( "BC" );
+
+   is( $chip->cached_read_reg( 6, 2 )->get, "BC",
+      '->cached_read_reg multi initially' );
+
+   $adapter->check_and_clear( '->cached_read_reg multi initially' );
+
+   $adapter->expect_write_then_read( pack( "C", 5 ), 1 )
+      ->returns( "A" );
+   $adapter->expect_write_then_read( pack( "C", 8 ), 2 )
+      ->returns( "DE" );
+
+   is( $chip->cached_read_reg( 5, 5 )->get, "ABCDE",
+      '->cached_read_reg multi again' );
+
+   $adapter->check_and_clear( '->cached_read_reg multi again' );
+}
+
+# cached write multi
+{
+   $adapter->expect_write( pack( "C a*", 5, "ab" ) );
+   $adapter->expect_write( pack( "C a*", 9, "e" ) );
+
+   $chip->cached_write_reg( 5, "abCDe" )->get;
+
+   $adapter->check_and_clear( '->cached_write_reg multi' );
+
+   $chip->cached_write_reg( 5, "abCDe" )->get;
+
+   $adapter->check_and_clear( '->cached_write_reg multi does not write a duplicate value' );
+
+   is( $chip->cached_read_reg( 5, 5 )->get, "abCDe",
+      '->cached_read_reg multi after ->cached_write_reg' );
+}
+
 # wide data
 {
    {

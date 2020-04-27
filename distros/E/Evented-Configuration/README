@@ -216,17 +216,8 @@ AUTHOR
 
     Mitchell Cooper <https://github.com/cooper> <cooper@cpan.org>
 
-    Copyright © 2014. Released under BSD license.
+    Copyright © 2011-2020. Released under New BSD license.
 
-      * IRC channel: irc.notroll.net #k <irc://irc.notroll.net/k>
-
-      * Email: cooper@cpan.org
-
-      * CPAN: COOPER <http://search.cpan.org/~cooper/>
-
-      * GitHub: cooper <https://github.com/cooper>
-
-    Comments, complaints, and recommendations are accepted. IRC is my
-    preferred communication medium. Bugs may be reported on RT
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Evented-Configuration>.
+    Comments, complaints, and recommendations are accepted. Bugs may be
+    reported on GitHub <https://github.com/cooper/evented-object/issues>.
 

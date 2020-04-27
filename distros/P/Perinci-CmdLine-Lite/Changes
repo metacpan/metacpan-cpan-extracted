@@ -1,3 +1,16 @@
+1.828   2020-04-27  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Add 'value_label' keys to common options, to be utilized in usage
+	  line by Perinci::Sub::To::CLIDocData.
+
+        - [ux] Wrap usage line which can now be potentially long because it now
+          lists all options instead of just '[options]'.
+
+	- [bugfix] Don't add a usage for --page-result, because that will
+	  result in the --page-result option being shown a dedicated usage
+	  line.
+
+
 1.827   2020-04-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Add attribute: allow_unknown_opts.

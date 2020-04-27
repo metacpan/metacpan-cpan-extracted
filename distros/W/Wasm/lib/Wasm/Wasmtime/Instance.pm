@@ -11,11 +11,11 @@ use Ref::Util qw( is_ref is_blessed_ref is_plain_coderef is_plain_scalarref );
 use Carp ();
 
 # ABSTRACT: Wasmtime instance class
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 $ffi_prefix = 'wasm_instance_';
-$ffi->type('opaque' => 'wasm_instance_t');
+$ffi->load_custom_type('::PtrObject' => 'wasm_instance_t' => __PACKAGE__);
 
 
 sub _cast_import
@@ -58,7 +58,7 @@ sub _cast_import
   Carp::croak("Non-extern object as import");
 }
 
-$ffi->attach( new => ['wasm_store_t','wasm_module_t','wasm_extern_t[]','opaque*'] => 'wasm_instance_t' => sub {
+$ffi->attach( new => ['wasm_store_t','wasm_module_t','opaque[]','opaque*'] => 'wasm_instance_t' => sub {
   my $xsub = shift;
   my $class = shift;
   my $module = shift;
@@ -80,6 +80,7 @@ $ffi->attach( new => ['wasm_store_t','wasm_module_t','wasm_extern_t[]','opaque*'
     my($imports) = @_;
 
     $imports ||= [];
+    Carp::confess("imports is not an array reference") unless ref($imports) eq 'ARRAY';
     my @imports = @$imports;
     my $trap;
     my $store = $module->store;
@@ -94,14 +95,12 @@ $ffi->attach( new => ['wasm_store_t','wasm_module_t','wasm_extern_t[]','opaque*'
       @imports = map { _cast_import($_, shift @mi, $store, \@keep) } @imports;
     }
 
-    my $ptr = $xsub->($store->{ptr}, $module->{ptr}, \@imports, \$trap);
-    if($ptr)
+    my $self = $xsub->($store, $module, \@imports, \$trap);
+    if($self)
     {
-      return bless {
-        ptr    => $ptr,
-        module => $module,
-        keep   => \@keep,
-      }, $class;
+      $self->{module} = $module;
+      $self->{keep}   = \@keep;
+      return $self;
     }
     else
     {
@@ -140,14 +139,11 @@ sub module { shift->{module} }
 $ffi->attach( exports => ['wasm_instance_t','wasm_extern_vec_t*'] => sub {
   my($xsub, $self) = @_;
   my $externs = Wasm::Wasmtime::ExternVec->new;
-  $xsub->($self->{ptr}, $externs);
+  $xsub->($self, $externs);
   $externs->to_list;
 });
 
-$ffi->attach( [ 'delete' => 'DESTROY' ] => ['wasm_engine_t'] => sub {
-  my($xsub, $self) = @_;
-  $xsub->($self->{ptr}) if $self->{ptr};
-});
+_generate_destroy();
 
 1;
 
@@ -163,7 +159,7 @@ Wasm::Wasmtime::Instance - Wasmtime instance class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

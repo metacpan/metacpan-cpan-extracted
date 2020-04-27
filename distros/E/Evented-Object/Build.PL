@@ -7,7 +7,7 @@ use Module::Build;
 my $class = Module::Build->subclass(
     class => 'Evented::Object::Builder',
     code => q{
-        sub ACTION_distmeta {
+        sub ACTION_docs {
             use Pod::Readme;
             use Pod::Select;
             use File::Copy;
@@ -26,7 +26,7 @@ my $class = Module::Build->subclass(
             # Copy Object.pod to README.pod
             copy('doc/Evented/Object.pod', 'README.pod');
 
-            # Extract text to generate README
+            # Extract text to generate plain-text README
             my $parser = Pod::Readme->new();
             $parser->parse_from_file('README.pod', 'README');
 
@@ -52,7 +52,6 @@ my $build = $class->new(
     },
     auto_configure_requires => 0,
     license             => 'bsd',
-    create_makefile_pl  => 'traditional',
     create_readme       => 1,
     dynamic_config      => 0,
     meta_merge          => {

@@ -1,7 +1,7 @@
 use strict;
 use Test::More 0.98;
 use Test::Exception;
-use Test::Trap;
+use Capture::Tiny ':all';
 use Getopt::Kingpin;
 use Getopt::Kingpin::Command;
 use File::Basename;
@@ -76,6 +76,7 @@ subtest 'command help' => sub {
     push @ARGV, qw(--help);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     my $post = $kingpin->command("post", "post image");
     my $server = $post->flag("server", "")->string();
     my $image = $post->arg("image", "")->file();
@@ -96,9 +97,11 @@ Commands:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'command help' => sub {
@@ -106,6 +109,7 @@ subtest 'command help' => sub {
     push @ARGV, qw(--help);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     my $post = $kingpin->command("post", "post image");
     my $server = $post->flag("server", "")->string();
     my $image = $post->arg("image", "")->file();
@@ -130,9 +134,11 @@ Commands:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'command help' => sub {
@@ -140,6 +146,7 @@ subtest 'command help' => sub {
     push @ARGV, qw(--help);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     my $post = $kingpin->command("post", "post image");
     my $server = $post->flag("server", "")->string();
     my $get  = $kingpin->command("get", "get image");
@@ -163,9 +170,11 @@ Commands:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'command help 2' => sub {
@@ -173,6 +182,7 @@ subtest 'command help 2' => sub {
     push @ARGV, qw(help);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     my $post = $kingpin->command("post", "post image");
     my $server = $post->flag("server", "")->string();
     my $get  = $kingpin->command("get", "get image");
@@ -196,9 +206,11 @@ Commands:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'command help 3' => sub {
@@ -206,6 +218,7 @@ subtest 'command help 3' => sub {
     push @ARGV, qw(--help post);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     my $post = $kingpin->command("post", "post image");
     my $server = $post->flag("server", "")->string();
     my $get  = $kingpin->command("get", "get image");
@@ -221,9 +234,11 @@ Flags:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'command help 3' => sub {
@@ -231,6 +246,7 @@ subtest 'command help 3' => sub {
     push @ARGV, qw(post --help);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     my $post = $kingpin->command("post", "post image");
     my $server = $post->flag("server", "")->string();
     my $get  = $kingpin->command("get", "get image");
@@ -246,9 +262,11 @@ Flags:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'command help 3' => sub {
@@ -256,6 +274,7 @@ subtest 'command help 3' => sub {
     push @ARGV, qw(help post);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     my $post = $kingpin->command("post", "post image");
     my $server = $post->flag("server", "")->string();
     my $get  = $kingpin->command("get", "get image");
@@ -271,9 +290,11 @@ Flags:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'command help 3' => sub {
@@ -281,6 +302,7 @@ subtest 'command help 3' => sub {
     push @ARGV, qw(help post --server=SERVER);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     my $post = $kingpin->command("post", "post image");
     my $server = $post->flag("server", "")->string();
     my $get  = $kingpin->command("get", "get image");
@@ -296,9 +318,11 @@ Flags:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'command help 3' => sub {
@@ -306,6 +330,7 @@ subtest 'command help 3' => sub {
     push @ARGV, qw(--help post);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     my $post = $kingpin->command("post", "post image");
     my $server = $post->flag("server", "")->string();
     my $get  = $kingpin->command("get", "get image");
@@ -321,9 +346,11 @@ Flags:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'command help 4' => sub {
@@ -331,6 +358,7 @@ subtest 'command help 4' => sub {
     push @ARGV, qw(help get);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     my $post = $kingpin->command("post", "post image");
     my $server = $post->flag("server", "")->string();
     my $get  = $kingpin->command("get", "get image");
@@ -345,9 +373,11 @@ Flags:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'command help 5' => sub {
@@ -355,6 +385,7 @@ subtest 'command help 5' => sub {
     push @ARGV, qw(--help post);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     my $post = $kingpin->command("post", "");
     my $server = $post->arg("server", "server address")->string();
     my $get  = $kingpin->command("get", "get image");
@@ -370,9 +401,11 @@ Args:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'command help 6' => sub {
@@ -380,6 +413,7 @@ subtest 'command help 6' => sub {
     push @ARGV, qw(--help);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     my $post = $kingpin->command("post", "post image");
     my $server = $post->flag("server", "server address")->string();
     my $get  = $kingpin->command("get", "get image");
@@ -404,9 +438,11 @@ Commands:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'command help 6' => sub {
@@ -414,6 +450,7 @@ subtest 'command help 6' => sub {
     push @ARGV, qw(--help);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     my $post = $kingpin->command("post", "post image");
     my $server = $post->flag("server", "server address")->string();
     my $get  = $kingpin->command("get", "get image");
@@ -442,9 +479,11 @@ Commands:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'command help 6' => sub {
@@ -452,6 +491,7 @@ subtest 'command help 6' => sub {
     push @ARGV, qw(--help get);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     my $post = $kingpin->command("post", "post image");
     my $server = $post->flag("server", "server address")->string();
     my $get  = $kingpin->command("get", "get image");
@@ -471,9 +511,11 @@ Subcommands:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'command help 7' => sub {
@@ -481,6 +523,7 @@ subtest 'command help 7' => sub {
     push @ARGV, qw(--help register);
 
     my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
 
     my $register      = $kingpin->command('register', 'Register a new user.');
     my $register_nick = $register->arg('nick', 'Nickname for user.')->required->string;
@@ -505,9 +548,11 @@ Args:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'command help 7-2' => sub {
@@ -515,6 +560,7 @@ subtest 'command help 7-2' => sub {
     push @ARGV, qw(register --help);
 
     my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
 
     my $register      = $kingpin->command('register', 'Register a new user.');
     my $register_nick = $register->arg('nick', 'Nickname for user.')->required->string;
@@ -539,9 +585,11 @@ Args:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'command help 7-3' => sub {
@@ -549,6 +597,7 @@ subtest 'command help 7-3' => sub {
     push @ARGV, qw(help register);
 
     my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
 
     my $register      = $kingpin->command('register', 'Register a new user.');
     my $register_nick = $register->arg('nick', 'Nickname for user.')->required->string;
@@ -573,9 +622,11 @@ Args:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'command help 8' => sub {
@@ -583,6 +634,7 @@ subtest 'command help 8' => sub {
     push @ARGV, qw(--help post);
 
     my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
 
     my $register      = $kingpin->command('register', 'Register a new user.');
     my $register_nick = $register->arg('nick', 'Nickname for user.')->required->string;
@@ -608,9 +660,11 @@ Args:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'command help 8-2' => sub {
@@ -618,6 +672,7 @@ subtest 'command help 8-2' => sub {
     push @ARGV, qw(post --help);
 
     my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
 
     my $register      = $kingpin->command('register', 'Register a new user.');
     my $register_nick = $register->arg('nick', 'Nickname for user.')->required->string;
@@ -643,9 +698,11 @@ Args:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'command help 8-3' => sub {
@@ -653,6 +710,7 @@ subtest 'command help 8-3' => sub {
     push @ARGV, qw(help post);
 
     my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
 
     my $register      = $kingpin->command('register', 'Register a new user.');
     my $register_nick = $register->arg('nick', 'Nickname for user.')->required->string;
@@ -678,9 +736,11 @@ Args:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'command help 9-1' => sub {
@@ -730,6 +790,7 @@ subtest 'command help 9-3 help' => sub {
     push @ARGV, qw(help register);
 
     my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
     my $verbose = $kingpin->flag("verbose", "set verbose mode")->bool;
 
     my $register      = $kingpin->command('register', 'Register a new user.');
@@ -753,9 +814,11 @@ Args:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'command help 9-4 help' => sub {
@@ -763,6 +826,7 @@ subtest 'command help 9-4 help' => sub {
     push @ARGV, qw(--help register);
 
     my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
     my $verbose = $kingpin->flag("verbose", "set verbose mode")->bool;
 
     my $register      = $kingpin->command('register', 'Register a new user.');
@@ -786,9 +850,11 @@ Args:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'command help 9-4 help' => sub {
@@ -796,6 +862,7 @@ subtest 'command help 9-4 help' => sub {
     push @ARGV, qw(register --help);
 
     my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
     my $verbose = $kingpin->flag("verbose", "set verbose mode")->bool;
 
     my $register      = $kingpin->command('register', 'Register a new user.');
@@ -819,9 +886,11 @@ Args:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 

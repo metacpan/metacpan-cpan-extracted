@@ -14,7 +14,7 @@ require Exporter;
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(holidays);
-our $VERSION   = '2.03';
+our $VERSION   = '2.05';
 
 sub holidays{
 	my %parameters = (
@@ -36,6 +36,7 @@ sub holidays{
 	# fadi  = Faschingsdienstag
 	# asmi  = Aschermittwoch
 	# frau  = Internationaler Frauentag
+	# befr  = Tag der Befreiung
 	# grdo  = Gruendonnerstag
 	# karf  = Karfreitag
 	# kars  = Karsamstag
@@ -117,6 +118,9 @@ sub holidays{
 	if ($year >= 2019) {
 		push @{$holidays{'be'}}, qw(frau);
 	}
+	if ($year == 2020) {
+		push @{$holidays{'be'}}, qw(befr);
+	}
 
 	# Extras for Brandenburg
 	@{$holidays{'bb'}} = qw(osts pfis refo);
@@ -186,6 +190,9 @@ sub holidays{
 
 	# First of May
 	$holiday{'1mai'} = _date2timestamp($year,  5,  1);
+
+	# Liberation Day
+	$holiday{'befr'} = _date2timestamp($year,  5,  8);
 
 	# Christmas eve and Christmas Dec 24-26
 	$holiday{'heil'} = _date2timestamp($year, 12, 24);
@@ -409,6 +416,7 @@ The module knows about the following holidays:
   fadi  Faschingsdienstag           Shrove tuesday
   asmi  Aschermittwoch              Ash wednesday
   frau  Internationaler Frauentag   International Women's day
+  befr  Tag der Befreiung           Liberation day
   grdo  Gruendonnerstag             Maundy Thursday
   karf  Karfreitag                  Good friday
   kars  Karsamstag                  Holy Saturday

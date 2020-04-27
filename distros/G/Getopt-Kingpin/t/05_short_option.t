@@ -1,7 +1,7 @@
 use strict;
 use Test::More 0.98;
-use Test::Trap;
 use Test::Exception;
+use Capture::Tiny ':all';
 use Getopt::Kingpin;
 
 
@@ -36,13 +36,14 @@ subtest 'unknown short flag' => sub {
     push @ARGV, qw(-h);
 
     my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
 
-    trap {
+    my ($stdout, $stderr, $ret, $exit) = capture {
         $kingpin->parse;
     };
 
-    like $trap->stderr, qr/error: unknown short flag '-h', try --help/;
-    is $trap->exit, 1;
+    like $stderr, qr/error: unknown short flag '-h', try --help/;
+    is $exit, 1;
 };
 
 subtest 'POSIX-style short flag combining 1' => sub {
@@ -116,15 +117,16 @@ subtest 'Short-flag+parameter combining 4 error' => sub {
     push @ARGV, qw(-x12y);
 
     my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
     my $x = $kingpin->flag("long_x", "")->short("x")->int();
     my $y = $kingpin->flag("long_y", "")->short("y")->bool();
 
-    trap {
+    my ($stdout, $stderr, $ret, $exit) = capture {
         $kingpin->parse;
     };
 
-    like $trap->stderr, qr/int parse error/;
-    is $trap->exit, 1;
+    like $stderr, qr/int parse error/;
+    is $exit, 1;
 };
 
 done_testing;

@@ -16,11 +16,13 @@ name: Net-IPAM-IP
 provides:
   Net::IPAM::IP:
     file: lib/Net/IPAM/IP.pm
-    version: '1.16'
+    version: '1.20'
+  Net::IPAM::Util:
+    file: lib/Net/IPAM/Util.pm
 requires:
   Carp: '0'
+  Scalar::Util: '1.39'
   Socket: '2.019'
-  namespace::clean: '0'
   perl: v5.10.0
-version: '1.16'
+version: '1.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

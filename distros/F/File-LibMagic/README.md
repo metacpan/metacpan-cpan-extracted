@@ -4,13 +4,13 @@ File::LibMagic - Determine MIME types of data or files using libmagic
 
 # VERSION
 
-version 1.16
+version 1.22
 
 # SYNOPSIS
 
     use File::LibMagic;
 
-    my $magic = File::LibMagic->new();
+    my $magic = File::LibMagic->new;
 
     my $info = $magic->info_from_filename('path/to/file');
     # Prints a description like "ASCII text"
@@ -30,9 +30,9 @@ version 1.16
 
 # DESCRIPTION
 
-The `File::LibMagic` is a simple perl interface to libmagic from the file
-package (version 4.x or 5.x). You will need both the library (`libmagic.so`)
-and the header file (`magic.h`) to build this Perl module.
+The `File::LibMagic` module is a simple perl interface to libmagic from the
+file package (version 4.x or 5.x). You will need both the library
+(`libmagic.so`) and the header file (`magic.h`) to build this Perl module.
 
 ## Installing libmagic
 
@@ -44,7 +44,7 @@ on Red Hat run:
 
     sudo yum install file-devel
 
-On Mac you can use homebrew (http://brew.sh/):
+On Mac you can use homebrew (https://brew.sh/):
 
     brew install libmagic
 
@@ -63,7 +63,7 @@ location.
 
 This module provides an object-oriented API with the following methods:
 
-## File::LibMagic->new()
+## File::LibMagic->new
 
 Creates a new File::LibMagic object.
 
@@ -76,7 +76,7 @@ many modules.
 
 This method takes the following named parameters:
 
-- magic\_file
+- `magic_file`
 
     This should be a string or an arrayref containing one or more magic files.
 
@@ -89,35 +89,92 @@ This method takes the following named parameters:
     Note that even if you're using a custom file, you probably _also_ want to use
     the standard file (`/usr/share/misc/magic` on my system, yours may vary).
 
-- follow\_symlinks
+- `follow_symlinks`
 
     If this is true, then calls to `$magic->info_from_filename` will follow
     symlinks to the real file.
 
-- uncompress
+- `uncompress`
 
     If this is true, then compressed files (such as gzip files) will be
     uncompressed, and the various `info_from_*` methods will return info
     about the uncompressed file.
+
+- Processing limits
+
+    Newer versions of the libmagic library have a number of limits order to
+    prevent malformed or malicious files from causing resource exhaustion or other
+    errors.
+
+    If your libmagic support it, you can set the following limits through
+    constructor parameters. If your version does not support setting these limits,
+    passing these options will cause the constructor to croak. In addition, the
+    specific limits were introduced over a number of libmagic releases, and your
+    version of libmagic may not support every parameter. Using a parameter that is
+    not supported by your libmagic will also cause the constructor to cloak.
+
+    - `max_indir`
+
+        This limits recursion for indirection when processing entries in the
+        magic file.
+
+    - `max_name`
+
+        This limits the maximum number of levels of name/use magic that will be
+        processed in the magic file.
+
+    - `max_elf_notes`
+
+        This limits the maximum number of ELF notes that will be processed when
+        determining a file's mime type.
+
+    - `max_elf_phnum`
+
+        This limits the maximum number of ELF program sections that will be processed
+        when determining a file's mime type.
+
+    - `max_elf_shnum`
+
+        This limits the maximum number of ELF sections that will be processed when
+        determining a file's mime type.
+
+    - `max_regex`
+
+        This limits the maximum size of regexes when processing entries in the magic
+        file.
+
+    - `max_bytes`
+
+        This limits the maximum number of bytes read from a file when determining a
+        file's mime type.
+
+    The values of these parameters should be integer limits.
+
+- `max_future_compat`
+
+    For compatibility with future additions to the libmagic processing limit
+    parameters, you can pass a `max_future_compat` parameter. This is a hash
+    reference where the keys are constant values (integers defined by libmagic,
+    not names) and the values are the limit you want to set.
 
 ## $magic->info\_from\_filename('path/to/file')
 
 This method returns info about the given file. The return value is a hash
 reference with four keys:
 
-- description
+- `description`
 
     A textual description of the file content like "ASCII C program text".
 
-- mime\_type
+- `mime_type`
 
     The MIME type without a character encoding, like "text/x-c".
 
-- encoding
+- `encoding`
 
     Just the character encoding, like "us-ascii".
 
-- mime\_with\_encoding
+- `mime_with_encoding`
 
     The MIME type with a character encoding, like "text/x-c;
     charset=us-ascii". Note that if no encoding was found, this will be the same
@@ -125,16 +182,35 @@ reference with four keys:
 
 ## $magic->info\_from\_string($string)
 
-This method returns info about the given string. The string can be passed as a
-reference to save memory.
+This method returns info about the contents of the given string. The string
+can be passed as a reference to save memory.
 
-The return value is the same as that of `$mime->info_from_filename()`.
+The return value is the same as that of `$mime->info_from_filename`.
 
 ## $magic->info\_from\_handle($fh)
 
-This method returns info about the given filehandle. It will read data
-starting from the handle's current position, and leave the handle at that same
-position after reading.
+This method returns info about the contents read from the given filehandle. It
+will read data starting from the handle's current position, and leave the
+handle at that same position after reading.
+
+## File::LibMagic->max\_param\_constant
+
+This method returns the maximum value that can be passed as a processing limit
+parameter to the constructor. You can use this to determine if passing a
+particular value in the `max_future_compat` constructor parameter will work.
+
+This may include constant values that do not have corresponding `max_X`
+constructor keys if your version of libmagic is newer than the one used to
+build this distribution.
+
+Conversely, if your version is older than it's possible that not all of the
+defined keys will be supported.
+
+## File::LibMagic->limit\_key\_is\_supported($key)
+
+This method takes a processing limit key like `max_indir` or `max_name` and
+returns a boolean indicating whether the linked version of libmagic supports
+that processing limit.
 
 # DISCOURAGED APIS
 
@@ -249,29 +325,29 @@ version of file on your system as well!
 # DEPENDENCIES/PREREQUISITES
 
 This module requires file 4.x or file 5x and the associated libmagic library
-and headers (http://darwinsys.com/file/).
+and headers (https://darwinsys.com/file/).
 
 # RELATED MODULES
 
 Andreas created File::LibMagic because he wanted to use libmagic (from
-file 4.x) [File::MMagic](https://metacpan.org/pod/File::MMagic) only worked with file 3.x.
+file 4.x) [File::MMagic](https://metacpan.org/pod/File%3A%3AMMagic) only worked with file 3.x.
 
-[File::MimeInfo::Magic](https://metacpan.org/pod/File::MimeInfo::Magic) uses the magic file from freedesktop.org which is
+[File::MimeInfo::Magic](https://metacpan.org/pod/File%3A%3AMimeInfo%3A%3AMagic) uses the magic file from freedesktop.org which is
 encoded in XML, and is thus not the fastest approach. See
-[http://mail.gnome.org/archives/nautilus-list/2003-December/msg00260.html](http://mail.gnome.org/archives/nautilus-list/2003-December/msg00260.html)
+[https://mail.gnome.org/archives/nautilus-list/2003-December/msg00260.html](https://mail.gnome.org/archives/nautilus-list/2003-December/msg00260.html)
 for a discussion of this issue.
 
-File::Type uses a relatively small magic file, which is directly hacked into
-the module code. It is quite fast but the database is quite small relative to
-the file package.
+[File::Type](https://metacpan.org/pod/File%3A%3AType) uses a relatively small magic file, which is directly hacked
+into the module code. It is quite fast but the database is quite small
+relative to the file package.
 
 # SUPPORT
 
 Please submit bugs to the CPAN RT system at
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-LibMagic or via email at
+https://rt.cpan.org/Public/Dist/Display.html?Name=File-LibMagic or via email at
 bug-file-libmagic@rt.cpan.org.
 
-Bugs may be submitted at [http://rt.cpan.org/Public/Dist/Display.html?Name=File::LibMagic](http://rt.cpan.org/Public/Dist/Display.html?Name=File::LibMagic) or via email to [bug-file::libmagic@rt.cpan.org](mailto:bug-file::libmagic@rt.cpan.org).
+Bugs may be submitted at [https://github.com/houseabsolute/File-LibMagic/issues](https://github.com/houseabsolute/File-LibMagic/issues).
 
 I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
 
@@ -294,7 +370,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~autarch/fs-donation.html).
+button at [https://www.urth.org/fs-donation.html](https://www.urth.org/fs-donation.html).
 
 # AUTHORS
 
@@ -307,11 +383,12 @@ button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~a
 - E. Choroba <choroba@matfyz.cz>
 - Mithun Ayachit <mayachit@amfam.com>
 - Olaf Alders <olaf@wundersolutions.com>
+- Paul Wise <pabs3@bonedaddy.net>
 - Tom Wyant <wyant@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Andreas Fitzner, Michael Hendricks, and Dave Rolsky.
+This software is copyright (c) 2020 by Andreas Fitzner, Michael Hendricks, Dave Rolsky, and Paul Wise.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

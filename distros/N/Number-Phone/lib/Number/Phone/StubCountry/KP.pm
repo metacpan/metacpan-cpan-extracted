@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200309202347;
+our $VERSION = 1.20200427120030;
 
 my $formatters = [
                 {
@@ -33,7 +33,7 @@ my $formatters = [
                 },
                 {
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '2',
+                  'leading_digits' => '[2-7]',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d)(\\d{3})(\\d{4})'
                 },
@@ -48,13 +48,29 @@ my $formatters = [
 my $validators = {
                 'fixed_line' => '
           (?:
-            2\\d|
+            (?:
+              195|
+              2
+            )\\d|
+            3[19]|
+            4[159]|
+            5[37]|
+            6[17]|
+            7[39]|
             85
           )\\d{6}
         ',
                 'geographic' => '
           (?:
-            2\\d|
+            (?:
+              195|
+              2
+            )\\d|
+            3[19]|
+            4[159]|
+            5[37]|
+            6[17]|
+            7[39]|
             85
           )\\d{6}
         ',
@@ -65,15 +81,33 @@ my $validators = {
                 'toll_free' => '',
                 'voip' => ''
               };
+my %areanames = ();
+$areanames{en}->{850195} = "Pyongyang";
+$areanames{en}->{85021} = "Pyongyang";
+$areanames{en}->{8502381} = "Pyongyang";
+$areanames{en}->{85027} = "Pyongyang";
+$areanames{en}->{85028} = "Pyongyang";
+$areanames{en}->{85031} = "Pyongyang";
+$areanames{en}->{85039} = "Nampo";
+$areanames{en}->{85041} = "Sariwon";
+$areanames{en}->{85045} = "Haeju";
+$areanames{en}->{85049} = "Kaesong";
+$areanames{en}->{85053} = "Hamhung";
+$areanames{en}->{85057} = "Wonsan";
+$areanames{en}->{85061} = "Sinuiju";
+$areanames{en}->{85067} = "Kanggye";
+$areanames{en}->{85073} = "Chongjin";
+$areanames{en}->{85079} = "Hyesan";
+$areanames{en}->{8508} = "Rason";
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+850|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

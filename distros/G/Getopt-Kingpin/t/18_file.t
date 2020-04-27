@@ -1,7 +1,7 @@
 use strict;
 use Test::More 0.98;
 use Test::Exception;
-use Test::Trap;
+use Capture::Tiny ':all';
 use Getopt::Kingpin;
 
 
@@ -64,14 +64,15 @@ subtest 'existing_file is dir' => sub {
     push @ARGV, qw(lib);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     my $path = $kingpin->arg("path", "")->existing_file();
 
-    trap {
+    my ($stdout, $stderr, $ret, $exit) = capture {
         $kingpin->parse;
     };
 
-    like $trap->stderr, qr/error: 'lib' is a directory, try --help/;
-    is $trap->exit, 1;
+    like $stderr, qr/error: 'lib' is a directory, try --help/;
+    is $exit, 1;
 };
 
 subtest 'existing_file error' => sub {
@@ -79,16 +80,17 @@ subtest 'existing_file error' => sub {
     push @ARGV, qw(kingpin Build.PL NOT_FOUND_FILE);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     my $name = $kingpin->arg("name", "")->string();
     my $path = $kingpin->arg("path", "")->file();
     my $not_found = $kingpin->arg("not_found", "")->existing_file();
 
-    trap {
+    my ($stdout, $stderr, $ret, $exit) = capture {
         $kingpin->parse;
     };
 
-    like $trap->stderr, qr/error: path 'NOT_FOUND_FILE' does not exist, try --help/;
-    is $trap->exit, 1;
+    like $stderr, qr/error: path 'NOT_FOUND_FILE' does not exist, try --help/;
+    is $exit, 1;
 };
 
 subtest 'file with default' => sub {

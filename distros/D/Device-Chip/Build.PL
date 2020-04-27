@@ -8,6 +8,7 @@ my $build = Module::Build->new(
    requires => {
       'Future' => '0.26',
       'List::Util' => '1.33',
+      'Struct::Dumb' => 0,
       'Test::Builder' => 0,
 
       'perl' => '5.010', #  //

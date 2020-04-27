@@ -9,44 +9,46 @@ use Wasm::Wasmtime::GlobalType;
 use Wasm::Wasmtime::CBC qw( perl_to_wasm wasm_allocate wasm_to_perl );
 
 # ABSTRACT: Wasmtime global class
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 $ffi_prefix = 'wasm_global_';
-$ffi->type('opaque' => 'wasm_global_t');
+$ffi->load_custom_type('::PtrObject' => 'wasm_global_t' => __PACKAGE__);
 
 
 $ffi->attach( new => ['wasm_store_t', 'wasm_globaltype_t', 'string'] => 'wasm_global_t' => sub {
   my $xsub = shift;
   my $class = shift;
-  my $ptr;
-  my $owner;
   if(is_ref $_[0])
   {
     my($store, $globaltype, $value) = @_;
-    $ptr = $xsub->($store->{ptr}, $globaltype->{ptr}, perl_to_wasm([$value], [$globaltype->content]));
+    my $self = $xsub->($store, $globaltype, perl_to_wasm([$value], [$globaltype->content]));
+    $self->{store} = $store;
+    return $self;
   }
   else
   {
-    ($ptr, $owner) = @_;
+    my($ptr, $owner) = @_;
+    bless {
+      ptr   => $ptr,
+      owner => $owner,
+    }, $class;
   }
-  bless {
-    ptr   => $ptr,
-    owner => $owner,
-  }, $class;
 });
 
 
 $ffi->attach( type => ['wasm_global_t'] => 'wasm_globaltype_t' => sub {
   my($xsub, $self) = @_;
-  Wasm::Wasmtime::GlobalType->new($xsub->($self->{ptr}), $self->{owner} || $self);
+  my $type = $xsub->($self);
+  $type->{owner} = $self->{owner} || $self;
+  $type;
 });
 
 
 $ffi->attach( get => ['wasm_global_t', 'string'] => sub {
   my($xsub, $self) = @_;
   my $value = wasm_allocate(1);
-  $xsub->($self->{ptr}, $value);
+  $xsub->($self, $value);
   ($value) = wasm_to_perl($value);
   $value;
 });
@@ -54,7 +56,7 @@ $ffi->attach( get => ['wasm_global_t', 'string'] => sub {
 
 $ffi->attach( set => ['wasm_global_t','string'] => sub {
   my($xsub, $self, $value) = @_;
-  $xsub->($self->{ptr}, perl_to_wasm([$value],[$self->type->content]));
+  $xsub->($self, perl_to_wasm([$value],[$self->type->content]));
 });
 
 
@@ -62,17 +64,11 @@ $ffi->attach( set => ['wasm_global_t','string'] => sub {
 $ffi->attach( as_extern => ['wasm_global_t'] => 'opaque' => sub {
   my($xsub, $self) = @_;
   require Wasm::Wasmtime::Extern;
-  my $ptr = $xsub->($self->{ptr});
+  my $ptr = $xsub->($self);
   Wasm::Wasmtime::Extern->new($ptr, $self->{owner} || $self);
 });
 
-$ffi->attach( [ delete => "DESTROY" ] => ['wasm_global_t'] => sub {
-  my($xsub, $self) = @_;
-  if(defined $self->{ptr} && !defined $self->{owner})
-  {
-    $xsub->($self->{ptr});
-  }
-});
+_generate_destroy();
 
 1;
 
@@ -88,7 +84,7 @@ Wasm::Wasmtime::Global - Wasmtime global class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

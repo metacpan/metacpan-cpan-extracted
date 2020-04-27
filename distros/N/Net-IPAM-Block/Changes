@@ -1,5 +1,12 @@
 Revision history for Net-IPAM-Block
 
+1.12    Mon, 27 Apr 2020 16:50:46 +0200
+        * outsourcing private functions in own package
+
+1.11    Sun, 26 Apr 2020 19:39:24 +0200
+        * rework namespacing
+        * use Net::IPAM::Util
+
 1.10    Sun, 19 Apr 2020 19:23:11 +0200
         * use namespace::clean
 

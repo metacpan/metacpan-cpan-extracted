@@ -6,8 +6,7 @@ use warnings;
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 
-# Version.
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -306,6 +305,7 @@ __END__
 =head1 SYNOPSIS
 
  use Tags::Output;
+
  my $obj = Tags::Output->new(%parameters);
  $obj->finalize;
  my $ret = $obj->flush($reset_flag);
@@ -522,7 +522,7 @@ Install the Tags modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Tags>
+L<https://github.com/michal-josef-spacek/Tags>
 
 =head1 AUTHOR
 
@@ -532,11 +532,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2005-2018 Michal Josef Špaček
- BSD 2-Clause License
+© 2005-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

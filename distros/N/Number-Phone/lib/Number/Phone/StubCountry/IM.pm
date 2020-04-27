@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200309202346;
+our $VERSION = 1.20200427120030;
 
 my $formatters = [
                 {
@@ -160,7 +160,15 @@ $areanames{en}->{441206} = "Colchester";
 $areanames{en}->{441207} = "Consett";
 $areanames{en}->{441208} = "Bodmin";
 $areanames{en}->{441209} = "Redruth";
-$areanames{en}->{44121} = "Birmingham";
+$areanames{en}->{441210} = "Birmingham";
+$areanames{en}->{441211} = "Birmingham";
+$areanames{en}->{441212} = "Birmingham";
+$areanames{en}->{441213} = "Birmingham";
+$areanames{en}->{441214} = "Birmingham";
+$areanames{en}->{441215} = "Birmingham";
+$areanames{en}->{441216} = "Birmingham";
+$areanames{en}->{441217} = "Birmingham";
+$areanames{en}->{4412180} = "Birmingham";
 $areanames{en}->{441223} = "Cambridge";
 $areanames{en}->{441224} = "Aberdeen";
 $areanames{en}->{441225} = "Bath";

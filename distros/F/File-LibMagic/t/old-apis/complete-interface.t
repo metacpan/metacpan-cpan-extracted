@@ -1,7 +1,8 @@
 use strict;
 use warnings;
 
-use lib 't/lib';
+use FindBin qw( $Bin );
+use lib "$Bin/../lib";
 
 use Test::Exports qw( test_complete );
 use Test::More 0.96;
@@ -13,6 +14,6 @@ use Test::More 0.96;
     use File::LibMagic qw( :complete );
 }
 
-test_complete('Test::Complete');
+test_complete( 'Test::Complete', "$Bin/../samples" );
 
 done_testing();

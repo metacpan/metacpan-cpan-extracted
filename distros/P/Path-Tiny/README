@@ -2,7 +2,7 @@ NAME
     Path::Tiny - File path utility
 
 VERSION
-    version 0.112
+    version 0.114
 
 SYNOPSIS
       use Path::Tiny;
@@ -312,7 +312,7 @@ METHODS
 
   children
         @paths = path("/tmp")->children;
-        @paths = path("/tmp")->children( qr/\.txt$/ );
+        @paths = path("/tmp")->children( qr/\.txt\z/ );
 
     Returns a list of "Path::Tiny" objects for all files and directories
     within a directory. Excludes "." and ".." automatically.
@@ -1059,6 +1059,8 @@ CONTRIBUTORS
     *   Aristotle Pagaltzis <pagaltzis@gmx.de>
 
     *   Chris Williams <bingos@cpan.org>
+
+    *   Dan Book <grinnz@grinnz.com>
 
     *   Dave Rolsky <autarch@urth.org>
 

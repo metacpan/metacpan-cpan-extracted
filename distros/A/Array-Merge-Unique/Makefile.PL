@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME             => 'Array::Merge::Unique',
-    AUTHOR           => q{Robert Acock <thisusedtobeanemail@gmail.com>},
+    AUTHOR           => q{Robert Acock <email@lnation.org>},
     VERSION_FROM     => 'lib/Array/Merge/Unique.pm',
     ABSTRACT_FROM    => 'lib/Array/Merge/Unique.pm',
     LICENSE          => 'artistic_2',

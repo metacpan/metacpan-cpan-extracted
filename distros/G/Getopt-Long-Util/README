@@ -2,14 +2,14 @@ NAME
     Getopt::Long::Util - Utilities for Getopt::Long
 
 VERSION
-    This document describes version 0.890 of Getopt::Long::Util (from Perl
-    distribution Getopt-Long-Util), released on 2017-08-10.
+    This document describes version 0.891 of Getopt::Long::Util (from Perl
+    distribution Getopt-Long-Util), released on 2020-04-27.
 
 FUNCTIONS
   detect_getopt_long_script
     Usage:
 
-     detect_getopt_long_script(%args) -> [status, msg, result, meta]
+     detect_getopt_long_script(%args) -> [status, msg, payload, meta]
 
     Detect whether a file is a Getopt::Long-based CLI script.
 
@@ -46,7 +46,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -81,18 +81,34 @@ FUNCTIONS
   humanize_getopt_long_opt_spec
     Usage:
 
-     humanize_getopt_long_opt_spec($optspec) -> str
+     humanize_getopt_long_opt_spec( [ \%optional_named_args ] , $optspec) -> str
 
-    Convert Getopt::Long option specification like "help|h|?" or "--foo=s"
-    or "debug!" into, respectively, "--help, -h, -?" or "--foo=s" or
-    "--(no)debug". Will die if can't parse the string. The output is
-    suitable for including in help/usage text.
+    Convert Getopt::Long option specification into a more human-friendly
+    notation that is suitable for including in help/usage text, for example:
+
+     help|h|?       ->  --help, -h, -?
+     help|h|?       ->  --help | -h | -?  (if you provide 'separator')
+     --foo=s        ->  --foo=s
+     --foo=s        ->  --foo=somelabel  (if you provide 'value_label')
+     --foo:s        ->  --foo[=s]
+     --foo=s@       ->  --foo=s+
+     --foo=s%       ->  --foo key=value
+     --foo=s        ->  --foo=somelabel  (if you provide 'value_label')
+     --debug!       ->  --(no)debug
+
+    Will die if can't parse the optspec string.
 
     This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
 
+    *   key_label => *str* (default: "key")
+
     *   $optspec* => *str*
+
+    *   separator => *str* (default: ", ")
+
+    *   value_label => *str*
 
     Return value: (str)
 
@@ -150,7 +166,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/sharyanto/perl-Getopt-Long-Util>.
+    <https://github.com/perlancar/perl-Getopt-Long-Util>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
@@ -175,7 +191,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    This software is copyright (c) 2020, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

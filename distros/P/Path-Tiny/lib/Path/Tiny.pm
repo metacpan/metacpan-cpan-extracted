@@ -5,7 +5,7 @@ use warnings;
 package Path::Tiny;
 # ABSTRACT: File path utility
 
-our $VERSION = '0.112';
+our $VERSION = '0.114';
 
 # Dependencies
 use Config;
@@ -79,7 +79,7 @@ sub _win32_vol {
     # so just use the original drive Z: -> Z:
     $dcwd = "$drv" unless defined $dcwd && length $dcwd;
     # normalize dwcd to end with a slash: might be C:\some\cwd or D:\ or Z:
-    $dcwd =~ s{$SLASH?$}{/};
+    $dcwd =~ s{$SLASH?\z}{/};
     # make the path absolute with dcwd
     $path =~ s{^$DRV_VOL}{$dcwd};
     return $path;
@@ -88,7 +88,7 @@ sub _win32_vol {
 # This is a string test for before we have the object; see is_rootdir for well-formed
 # object test
 sub _is_root {
-    return IS_WIN32() ? ( $_[0] =~ /^$WIN32_ROOT$/ ) : ( $_[0] eq '/' );
+    return IS_WIN32() ? ( $_[0] =~ /^$WIN32_ROOT\z/ ) : ( $_[0] eq '/' );
 }
 
 BEGIN {
@@ -235,8 +235,8 @@ sub path {
 
     # expand relative volume paths on windows; put trailing slash on UNC root
     if ( IS_WIN32() ) {
-        $path = _win32_vol( $path, $1 ) if $path =~ m{^($DRV_VOL)(?:$NOTSLASH|$)};
-        $path .= "/" if $path =~ m{^$UNC_VOL$};
+        $path = _win32_vol( $path, $1 ) if $path =~ m{^($DRV_VOL)(?:$NOTSLASH|\z)};
+        $path .= "/" if $path =~ m{^$UNC_VOL\z};
     }
 
     # concatenations stringifies objects, too
@@ -248,14 +248,14 @@ sub path {
     my $cpath = $path = File::Spec->canonpath($path);
     $path =~ tr[\\][/] if IS_WIN32();
     $path = "/" if $path eq '/..'; # for old File::Spec
-    $path .= "/" if IS_WIN32() && $path =~ m{^$UNC_VOL$};
+    $path .= "/" if IS_WIN32() && $path =~ m{^$UNC_VOL\z};
 
     # root paths must always have a trailing slash, but other paths must not
     if ( _is_root($path) ) {
-        $path =~ s{/?$}{/};
+        $path =~ s{/?\z}{/};
     }
     else {
-        $path =~ s{/$}{};
+        $path =~ s{/\z}{};
     }
 
     # do any tilde expansions
@@ -628,7 +628,7 @@ sub basename {
     $self->_splitpath unless defined $self->[FILE];
     my $file = $self->[FILE];
     for my $s (@suffixes) {
-        my $re = ref($s) eq 'Regexp' ? qr/$s$/ : qr/\Q$s\E$/;
+        my $re = ref($s) eq 'Regexp' ? qr/$s\z/ : qr/\Q$s\E\z/;
         last if $file =~ s/$re//;
     }
     return $file;
@@ -695,7 +695,7 @@ sub child {
 #pod =method children
 #pod
 #pod     @paths = path("/tmp")->children;
-#pod     @paths = path("/tmp")->children( qr/\.txt$/ );
+#pod     @paths = path("/tmp")->children( qr/\.txt\z/ );
 #pod
 #pod Returns a list of C<Path::Tiny> objects for all files and directories
 #pod within a directory.  Excludes "." and ".." automatically.
@@ -1266,7 +1266,7 @@ sub lines {
     if ( $args->{count} ) {
         my ( $counter, $mod, @result ) = ( 0, abs( $args->{count} ) );
         while ( my $line = <$fh> ) {
-            $line =~ s/(?:\x{0d}?\x{0a}|\x{0d})$// if $chomp;
+            $line =~ s/(?:\x{0d}?\x{0a}|\x{0d})\z// if $chomp;
             $result[ $counter++ ] = $line;
             # for positive count, terminate after right number of lines
             last if $counter == $args->{count};
@@ -1279,7 +1279,7 @@ sub lines {
         return @result;
     }
     elsif ($chomp) {
-        return map { s/(?:\x{0d}?\x{0a}|\x{0d})$//; $_ } <$fh>; ## no critic
+        return map { s/(?:\x{0d}?\x{0a}|\x{0d})\z//; $_ } <$fh>; ## no critic
     }
     else {
         return wantarray ? <$fh> : ( my $count =()= <$fh> );
@@ -1308,7 +1308,7 @@ sub lines_utf8 {
         && !$args->{count} )
     {
         my $slurp = slurp_utf8($self);
-        $slurp =~ s/$CRLF$//; # like chomp, but full CR?LF|CR
+        $slurp =~ s/$CRLF\z//; # like chomp, but full CR?LF|CR
         return split $CRLF, $slurp, -1; ## no critic
     }
     elsif ( defined($HAS_PU) ? $HAS_PU : ( $HAS_PU = _check_PU() ) ) {
@@ -1471,11 +1471,11 @@ sub parent {
     elsif ( length $self->[DIR] ) {
         # because of symlinks, any internal updir requires us to
         # just add more updirs at the end
-        if ( $self->[DIR] =~ m{(?:^\.\./|/\.\./|/\.\.$)} ) {
+        if ( $self->[DIR] =~ m{(?:^\.\./|/\.\./|/\.\.\z)} ) {
             $parent = path( $self->[VOL] . $self->[DIR] . "/.." );
         }
         else {
-            ( my $dir = $self->[DIR] ) =~ s{/[^\/]+/$}{/};
+            ( my $dir = $self->[DIR] ) =~ s{/[^\/]+/\z}{/};
             $parent = path( $self->[VOL] . $dir );
         }
     }
@@ -1665,7 +1665,7 @@ sub _resolve_between {
                 $path = path($path)->realpath->[PATH];
             }
             else {
-                $path =~ s{/[^/]+/..$}{/};
+                $path =~ s{/[^/]+/..\z}{/};
             }
         }
         if ( -l $path ) {
@@ -1983,7 +1983,7 @@ sub subsumes {
     }
     else {
         # exact match or prefix breaking at a separator
-        return $other->[PATH] =~ m{^\Q$self->[PATH]\E(?:/|$)};
+        return $other->[PATH] =~ m{^\Q$self->[PATH]\E(?:/|\z)};
     }
 }
 
@@ -2156,7 +2156,7 @@ Path::Tiny - File path utility
 
 =head1 VERSION
 
-version 0.112
+version 0.114
 
 =head1 SYNOPSIS
 
@@ -2488,7 +2488,7 @@ Current API available since 0.001.
 =head2 children
 
     @paths = path("/tmp")->children;
-    @paths = path("/tmp")->children( qr/\.txt$/ );
+    @paths = path("/tmp")->children( qr/\.txt\z/ );
 
 Returns a list of C<Path::Tiny> objects for all files and directories
 within a directory.  Excludes "." and ".." automatically.
@@ -3285,7 +3285,7 @@ add a module to the list.
 
 This module was featured in the L<2013 Perl Advent Calendar|http://www.perladvent.org/2013/2013-12-18.html>.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -3310,7 +3310,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex Efros Aristotle Pagaltzis Chris Williams Dave Rolsky David Steinbrunner Doug Bell Gabor Szabo Gabriel Andrade George Hartzell Geraud Continsouzas Goro Fuji Graham Knop Ollis Ian Sillitoe James Hunt John Karr Karen Etheridge Mark Ellis Martin H. Sluka Kjeldsen Michael G. Schwern Nigel Gregoire Philippe Bruhat (BooK) Regina Verbae Roy Ivy III Shlomi Fish Smylers Tatsuhiko Miyagawa Toby Inkster Yanick Champoux 김도형 - Keedi Kim
+=for stopwords Alex Efros Aristotle Pagaltzis Chris Williams Dan Book Dave Rolsky David Steinbrunner Doug Bell Gabor Szabo Gabriel Andrade George Hartzell Geraud Continsouzas Goro Fuji Graham Knop Ollis Ian Sillitoe James Hunt John Karr Karen Etheridge Mark Ellis Martin H. Sluka Kjeldsen Michael G. Schwern Nigel Gregoire Philippe Bruhat (BooK) Regina Verbae Roy Ivy III Shlomi Fish Smylers Tatsuhiko Miyagawa Toby Inkster Yanick Champoux 김도형 - Keedi Kim
 
 =over 4
 
@@ -3325,6 +3325,10 @@ Aristotle Pagaltzis <pagaltzis@gmx.de>
 =item *
 
 Chris Williams <bingos@cpan.org>
+
+=item *
+
+Dan Book <grinnz@grinnz.com>
 
 =item *
 

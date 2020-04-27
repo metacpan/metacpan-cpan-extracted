@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200309202347;
+our $VERSION = 1.20200427120031;
 
 my $formatters = [
                 {
@@ -94,16 +94,21 @@ my $validators = {
         ',
                 'mobile' => '
           7(?:
-            (?:
-              [0-25-8]\\d|
-              3[2-4]|
-              9[23]
-            )\\d|
             4(?:
-              21|
-              60
+              60\\d|
+              747
+            )|
+            94(?:
+              [01]\\d|
+              2[0-4]
             )
-          )\\d{4}
+          )\\d{3}|
+          7(?:
+            [0-25-8]\\d|
+            3[2-4]|
+            42|
+            9[23]
+          )\\d{5}
         ',
                 'pager' => '',
                 'personal_number' => '',
@@ -127,8 +132,34 @@ $areanames{en}->{38943} = "Veles\/Kavadarci\/Negotino";
 $areanames{en}->{38944} = "Tetovo";
 $areanames{en}->{38945} = "Kicevo\/Makedonski\ Brod";
 $areanames{en}->{38946} = "Ohrid\/Struga\/Debar";
-$areanames{en}->{38947} = "Bitola\/Demir\ Hisar\/Resen";
-$areanames{en}->{38948} = "Prilep\/Krusevo";
+$areanames{en}->{389472} = "Bitola\/Demir\ Hisar\/Resen";
+$areanames{en}->{389474} = "Bitola\/Demir\ Hisar\/Resen";
+$areanames{en}->{389475} = "Bitola\/Demir\ Hisar\/Resen";
+$areanames{en}->{38947600} = "Bitola\/Demir\ Hisar\/Resen";
+$areanames{en}->{38947608} = "Bitola\/Demir\ Hisar\/Resen";
+$areanames{en}->{38947609} = "Bitola\/Demir\ Hisar\/Resen";
+$areanames{en}->{3894761} = "Bitola\/Demir\ Hisar\/Resen";
+$areanames{en}->{3894762} = "Bitola\/Demir\ Hisar\/Resen";
+$areanames{en}->{3894763} = "Bitola\/Demir\ Hisar\/Resen";
+$areanames{en}->{3894764} = "Bitola\/Demir\ Hisar\/Resen";
+$areanames{en}->{3894765} = "Bitola\/Demir\ Hisar\/Resen";
+$areanames{en}->{3894766} = "Bitola\/Demir\ Hisar\/Resen";
+$areanames{en}->{3894767} = "Bitola\/Demir\ Hisar\/Resen";
+$areanames{en}->{3894768} = "Bitola\/Demir\ Hisar\/Resen";
+$areanames{en}->{3894769} = "Bitola\/Demir\ Hisar\/Resen";
+$areanames{en}->{389478} = "Bitola\/Demir\ Hisar\/Resen";
+$areanames{en}->{389484} = "Prilep\/Krusevo";
+$areanames{en}->{389485} = "Prilep\/Krusevo";
+$areanames{en}->{3894861} = "Prilep\/Krusevo";
+$areanames{en}->{3894862} = "Prilep\/Krusevo";
+$areanames{en}->{3894863} = "Prilep\/Krusevo";
+$areanames{en}->{3894864} = "Prilep\/Krusevo";
+$areanames{en}->{3894865} = "Prilep\/Krusevo";
+$areanames{en}->{3894866} = "Prilep\/Krusevo";
+$areanames{en}->{3894867} = "Prilep\/Krusevo";
+$areanames{en}->{3894868} = "Prilep\/Krusevo";
+$areanames{en}->{3894869} = "Prilep\/Krusevo";
+$areanames{en}->{389488} = "Prilep\/Krusevo";
 
     sub new {
       my $class = shift;

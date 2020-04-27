@@ -1,5 +1,17 @@
 Revision history for Object-Pad
 
+0.26    2020-04-27
+        [CHANGES]
+         * Sanity-checking of ->add_slot names
+         * Permit "anonymous" slots with sigils but no names; accessed only
+           via $slotmeta->value
+         * Warn when $self lexical is shadowed (partly fixes RT132428)
+
+        [BUGFIXES]
+         * Ensure to run GETMAGIC on ->add_slot names
+         * Removed extranous and undeclared `use Devel::MAT::Dumper` from unit
+           tests
+
 0.25    2020-04-24
         [CHANGES]
          * Further expanded the (undocumented) MOP API

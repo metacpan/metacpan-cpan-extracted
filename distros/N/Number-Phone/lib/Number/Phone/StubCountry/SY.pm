@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200309202348;
+our $VERSION = 1.20200427120032;
 
 my $formatters = [
                 {
@@ -41,34 +41,34 @@ my $formatters = [
 
 my $validators = {
                 'fixed_line' => '
-          [12]1\\d{6,7}|
+          21\\d{6,7}|
           (?:
             1(?:
-              [2356]|
-              4\\d
+              [14]\\d|
+              [2356]
             )|
             2[235]|
             3(?:
               [13]\\d|
               4
             )|
-            4[13]|
+            4[134]|
             5[1-3]
           )\\d{6}
         ',
                 'geographic' => '
-          [12]1\\d{6,7}|
+          21\\d{6,7}|
           (?:
             1(?:
-              [2356]|
-              4\\d
+              [14]\\d|
+              [2356]
             )|
             2[235]|
             3(?:
               [13]\\d|
               4
             )|
-            4[13]|
+            4[134]|
             5[1-3]
           )\\d{6}
         ',
@@ -76,7 +76,7 @@ my $validators = {
           9(?:
             22|
             [3-589]\\d|
-            6[024-9]
+            6[02-9]
           )\\d{6}
         ',
                 'pager' => '',
@@ -85,15 +85,35 @@ my $validators = {
                 'toll_free' => '',
                 'voip' => ''
               };
+my %areanames = ();
+$areanames{en}->{96311} = "Damascus\ and\ rural\ areas";
+$areanames{en}->{96312} = "Al\-Nebek";
+$areanames{en}->{96313} = "Al\-Zabadani";
+$areanames{en}->{96314} = "Al\-Quneitra";
+$areanames{en}->{96315} = "Dara";
+$areanames{en}->{96316} = "Al\-Swedaa";
+$areanames{en}->{96321} = "Aleppo";
+$areanames{en}->{96322} = "Al\-Rakkah";
+$areanames{en}->{96323} = "Edleb";
+$areanames{en}->{96325} = "Menbej";
+$areanames{en}->{96331} = "Homs";
+$areanames{en}->{96333} = "Hamah";
+$areanames{en}->{96334} = "Palmyra";
+$areanames{en}->{96341} = "Lattakia";
+$areanames{en}->{96343} = "Tartous";
+$areanames{en}->{96344} = "Hamah";
+$areanames{en}->{96351} = "Deir\ Ezzour";
+$areanames{en}->{96352} = "Alhasakah";
+$areanames{en}->{96353} = "Al\-Kameshli";
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+963|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

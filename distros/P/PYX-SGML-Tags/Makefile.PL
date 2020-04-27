@@ -1,13 +1,12 @@
-# Pragmas.
+use lib '.';
 use strict;
 use warnings;
 
-# Modules.
 use inc::Module::Install;
 
 # Definition.
 abstract 'Processing PYX data or file and write as SGML via Tags.';
-author 'Michal Spacek <skim@cpan.org>';
+author 'Michal Josef Spacek <skim@cpan.org>';
 author_requires 'English' => 0;
 author_requires 'File::Object' => 0.07;
 author_requires 'Test::More' => 0;
@@ -26,8 +25,9 @@ requires 'Tags::Output::Raw' => 0.04;
 requires 'perl' => '5.6.2';
 resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
 	'?Name=PYX-SGML-Tags';
-resources 'homepage' => 'https://github.com/tupinek/PYX-SGML-Tags';
-resources 'repository' => 'git://github.com/tupinek/PYX-SGML-Tags';
+resources 'homepage' => 'https://github.com/michal-josef-spacek/PYX-SGML-Tags';
+resources 'repository' => 'git://github.com/michal-josef-spacek/PYX-SGML-Tags';
+test_requires 'Encode' => 0;
 test_requires 'English' => 0;
 test_requires 'Error::Pure::Utils' => 0.15;
 test_requires 'File::Object' => 0.07;
@@ -36,7 +36,7 @@ test_requires 'Tags::Output::Indent' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.02';
+version '0.04';
 
 # Run.
 WriteAll();

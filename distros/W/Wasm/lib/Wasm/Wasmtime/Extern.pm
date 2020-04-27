@@ -10,11 +10,11 @@ use Wasm::Wasmtime::Memory;
 use Wasm::Wasmtime::ExternType;
 
 # ABSTRACT: Wasmtime extern class
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 $ffi_prefix = 'wasm_extern_';
-$ffi->type('opaque' => 'wasm_extern_t');
+$ffi->load_custom_type('::PtrObject' => 'wasm_extern_t' => __PACKAGE__);
 
 sub new
 {
@@ -28,7 +28,7 @@ sub new
 
 $ffi->attach( type => ['wasm_extern_t'] => 'wasm_externtype_t' => sub {
   my($xsub, $self) = @_;
-  Wasm::Wasmtime::ExternType->new($xsub->($self->{ptr}), undef);
+  $xsub->($self);
 });
 
 my %kind = (
@@ -39,57 +39,45 @@ my %kind = (
 );
 
 
-$ffi->attach( kind => ['wasm_extern_t'] => 'uint8' => sub {
-  my($xsub, $self) = @_;
-  $kind{$xsub->($self->{ptr})};
-});
+sub kind { $kind{shift->kind_num} }
 
 
-$ffi->attach( [ kind => 'kind_num' ] => ['wasm_extern_t'] => 'uint8' => sub {
-  my($xsub, $self) = @_;
-  $xsub->($self->{ptr});
-});
+$ffi->attach( [ kind => 'kind_num' ] => ['wasm_extern_t'] => 'uint8');
 
 
 $ffi->attach( as_func => ['wasm_extern_t'] => 'wasm_func_t' => sub {
   my($xsub, $self) = @_;
-  my $ptr = $xsub->($self->{ptr});
-  return undef unless $ptr;
-  Wasm::Wasmtime::Func->new($ptr, $self->{owner} || $self);
+  my $func = $xsub->($self);
+  return unless $func;
+  $func->{owner} = $self->{owner} || $self;
+  $func;
 });
 
 
 $ffi->attach( as_global => ['wasm_extern_t'] => 'wasm_global_t' => sub {
   my($xsub, $self) = @_;
-  my $ptr = $xsub->($self->{ptr});
-  return undef unless $ptr;
-  Wasm::Wasmtime::Global->new($ptr, $self->{owner} || $self);
+  my $global = $xsub->($self);
+  $global->{owner} = $self->{owner} || $self if $global;
+  $global;
 });
 
 
 $ffi->attach( as_table => ['wasm_extern_t'] => 'wasm_table_t' => sub {
   my($xsub, $self) = @_;
-  my $ptr = $xsub->($self->{ptr});
-  return undef unless $ptr;
-  Wasm::Wasmtime::Table->new($ptr, $self->{owner} || $self);
+  my $table = $xsub->($self);
+  $table->{owner} = $self->{owner} || $self if $table;
+  $table;
 });
 
 
 $ffi->attach( as_memory => ['wasm_extern_t'] => 'wasm_memory_t' => sub {
   my($xsub, $self) = @_;
-  my $ptr = $xsub->($self->{ptr});
-  return undef unless $ptr;
-  Wasm::Wasmtime::Memory->new($ptr, $self->{owner} || $self);
+  my $memory = $xsub->($self);
+  $memory->{owner} = $self->{owner} || $self if $memory;
+  $memory;
 });
 
-$ffi->attach( [ delete => "DESTROY" ] => ['wasm_extern_t'] => sub {
-  my($xsub, $self) = @_;
-  if(defined $self->{ptr} && !defined $self->{owner})
-  {
-    $xsub->($self->{ptr});
-  }
-});
-
+_generate_destroy();
 _generate_vec_class();
 
 1;
@@ -106,7 +94,7 @@ Wasm::Wasmtime::Extern - Wasmtime extern class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

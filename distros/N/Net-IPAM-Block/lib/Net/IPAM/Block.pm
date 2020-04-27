@@ -1,23 +1,17 @@
 package Net::IPAM::Block;
 
-our $VERSION = '1.10';
+our $VERSION = '1.12';
 
 use 5.10.0;
 use strict;
 use warnings;
 use utf8;
 
-use Carp qw(croak);
-use List::Util qw(any all);
-use Scalar::Util qw(blessed);
-###
-use namespace::clean;
-
-use Net::IPAM::IP;
-use overload
-  '""'     => sub { shift->to_string },
-  bool     => sub { 1 },
-  fallback => 1;
+use Carp                      ();
+use List::Util                ();
+use Net::IPAM::IP             ();
+use Net::IPAM::Util           ();
+use Net::IPAM::Block::Private ();
 
 use Exporter 'import';
 our @EXPORT_OK = qw(aggregate);
@@ -96,113 +90,23 @@ Returns undef on illegal input.
 =cut
 
 sub new {
-  croak 'wrong method call' unless defined $_[1];
+  Carp::croak 'missing argument' unless defined $_[1];
 
   my $self  = bless( {}, $_[0] );
   my $input = $_[1];
 
-  return $self->_fromIP($input) if ref $input;
+  return Net::IPAM::Block::Private::_fromIP( $self, $input ) if ref $input;
 
   # handle CIDR: 2001:db8::/32
   my $idx = index( $input, '/' );
-  return $self->_fromCIDR( $input, $idx ) if $idx >= 0;
+  return Net::IPAM::Block::Private::_fromCIDR( $self, $input, $idx ) if $idx >= 0;
 
   # handle range: 192.168.1.17-192.168.1.35
   $idx = index( $input, '-' );
-  return $self->_fromRange( $input, $idx ) if $idx >= 0;
+  return Net::IPAM::Block::Private::_fromRange( $self, $input, $idx ) if $idx >= 0;
 
   # handle address: fe80::1
-  return $self->_fromAddr($input);
-}
-
-# 1.2.3.4/24  => {base: 1.2.3.0, last: 1.2.3.255, mask: 255.255.255.0}
-# fe80::1/124 => {base: fe80::,  last: fe80::f,   mask: ffff:ffff:ffff:ffff:ffff:ffff:ffff:fff0}
-sub _fromCIDR {
-  my ( $self, $addr, $idx ) = @_;
-
-  # split CIDR in prefix and ones: 10.0.0.0/8 => 10.0.0.0, 8
-  my $prefix_str = substr( $addr, 0, $idx );
-  my $ones       = substr( $addr, $idx + 1 );
-
-  my $prefix = Net::IPAM::IP->new($prefix_str) // return;
-  my $bits   = 32;
-  $bits = 128 if $prefix->version == 6;
-
-  return unless $ones =~ m/^\d+$/;    # pos integer
-  return if $ones > $bits;
-
-  my $mask_n = _make_mask_n( $ones, $bits );
-  my $base_n = _make_base_n( $prefix->bytes, $mask_n );
-  my $last_n = _make_last_n( $prefix->bytes, $mask_n );
-
-  $self->{base} = Net::IPAM::IP->new_from_bytes($base_n);
-  $self->{last} = Net::IPAM::IP->new_from_bytes($last_n);
-  $self->{mask} = Net::IPAM::IP->new_from_bytes($mask_n);
-
-  return $self;
-}
-
-# 1.2.3.4-1.2.3.17  => {base: 1.2.3.4, last: 1.2.3.17, mask: undef}
-# fe80::-fe80::ffff => {base: fe80::, last: fe80::ffff, mask: ffff:ffff:ffff:ffff:ffff:ffff:ffff::}
-sub _fromRange {
-  my ( $self, $addr, $idx ) = @_;
-
-  # split range in base and last 10.0.0.1-10.0.0.3 => 10.0.0.1, 10.0.0.3
-  my $base_str = substr( $addr, 0, $idx );
-  my $last_str = substr( $addr, $idx + 1 );
-
-  my $base_ip = Net::IPAM::IP->new($base_str) // return;
-  my $last_ip = Net::IPAM::IP->new($last_str) // return;
-
-  # version base != version last
-  my $version = $base_ip->version;
-  return if $version != $last_ip->version;
-
-  # base > last?
-  return if $base_ip->cmp($last_ip) > 0;
-
-  $self->{base} = $base_ip;
-  $self->{last} = $last_ip;
-  $self->{mask} = _get_mask_ip( $base_ip, $last_ip );
-
-  return $self;
-}
-
-# 1.2.3.4 => {base: 1.2.3.4, last: 1.2.3.4, mask: 255.255.255.255}
-# fe80::1 => {base: fe80::1, last: fe80::1, mask: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff}
-sub _fromAddr {
-  my ( $self, $addr ) = @_;
-
-  my $base = Net::IPAM::IP->new($addr) // return;
-  my $bits = 32;
-  $bits = 128 if $base->version == 6;
-
-  my $mask_n = _make_mask_n( $bits, $bits );
-
-  $self->{base} = $base;
-  $self->{last} = Net::IPAM::IP->new_from_bytes( $base->bytes );
-  $self->{mask} = Net::IPAM::IP->new_from_bytes($mask_n);
-
-  return $self;
-}
-
-# 1.2.3.4 => {base: 1.2.3.4, last: 1.2.3.4, mask: 255.255.255.255}
-# fe80::1 => {base: fe80::1, last: fe80::1, mask: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff}
-sub _fromIP {
-  my ( $self, $base ) = @_;
-
-  return unless blessed($base) && $base->isa('Net::IPAM::IP');
-
-  my $bits = 32;
-  $bits = 128 if $base->version == 6;
-
-  my $mask_n = _make_mask_n( $bits, $bits );
-
-  $self->{base} = $base;
-  $self->{last} = Net::IPAM::IP->new_from_bytes( $base->bytes );
-  $self->{mask} = Net::IPAM::IP->new_from_bytes($mask_n);
-
-  return $self;
+  return Net::IPAM::Block::Private::_fromAddr( $self, $input );
 }
 
 =head2 version
@@ -236,7 +140,7 @@ Stringification is overloaded with L</"to_string">
 sub to_string {
   my $self = shift;
   if ( defined $self->{mask} ) {
-    return $self->{base}->to_string . '/' . _leading_ones( $self->{mask}->bytes );
+    return $self->{base}->to_string . '/' . Net::IPAM::Block::Private::_leading_ones( $self->{mask}->bytes );
   }
   else {
     return $self->{base}->to_string . '-' . $self->{last}->to_string;
@@ -282,7 +186,7 @@ sub cidrsplit {
   $bits = 128 if $self->version == 6;
 
   # get the ones in mask: 11111111_11111111_1110000_0000 => 19
-  my $ones = _leading_ones( $self->{mask}->bytes );
+  my $ones = Net::IPAM::Block::Private::_leading_ones( $self->{mask}->bytes );
 
   # can't split, ones == maxbits (32 or 128)
   return if $ones == $bits;
@@ -290,18 +194,18 @@ sub cidrsplit {
   # make next mask, e.g. /19 -> /20
   # 11111111_11111111_1110000_0000
   # 11111111_11111111_1111000_0000
-  my $next_mask_n = _make_mask_n( $ones + 1, $bits );
+  my $next_mask_n = Net::IPAM::Block::Private::_make_mask_n( $ones + 1, $bits );
 
   # get original base_n from block
   my $base_n = $self->{base}->bytes;
 
   # make new base and last with new mask
-  my $base1_n = _make_base_n( $base_n, $next_mask_n );
-  my $last1_n = _make_last_n( $base_n, $next_mask_n );
+  my $base1_n = Net::IPAM::Block::Private::_make_base_n( $base_n, $next_mask_n );
+  my $last1_n = Net::IPAM::Block::Private::_make_last_n( $base_n, $next_mask_n );
 
   # make next base by incrementing last
-  my $base2_n = Net::IPAM::IP::incr_n($last1_n);
-  my $last2_n = _make_last_n( $base2_n, $next_mask_n );
+  my $base2_n = Net::IPAM::Util::incr_n($last1_n);
+  my $last2_n = Net::IPAM::Block::Private::_make_last_n( $base2_n, $next_mask_n );
 
   # make new cidr blocks
   my $cidr1 = bless( {}, ref $self );
@@ -358,11 +262,11 @@ sub to_cidrs {
 
     # try
     # make outer-mask and with this mask make new start and last
-    my $bitlen = _bitlen( $cursor_n, $end_n, $bits );
+    my $bitlen = Net::IPAM::Block::Private::_bitlen( $cursor_n, $end_n, $bits );
 
-    my $mask_n  = _make_mask_n( $bits - $bitlen, $bits );
-    my $start_n = _make_base_n( $cursor_n, $mask_n );
-    my $last_n  = _make_last_n( $cursor_n, $mask_n );
+    my $mask_n  = Net::IPAM::Block::Private::_make_mask_n( $bits - $bitlen, $bits );
+    my $start_n = Net::IPAM::Block::Private::_make_base_n( $cursor_n, $mask_n );
+    my $last_n  = Net::IPAM::Block::Private::_make_last_n( $cursor_n, $mask_n );
 
     #  find matching bitlen/mask at $cursor position
     while ( $bitlen > 0 ) {
@@ -375,9 +279,9 @@ sub to_cidrs {
       # nope, no success, reduce bitlen and try again
       $bitlen--;
 
-      $mask_n  = _make_mask_n( $bits - $bitlen, $bits );
-      $start_n = _make_base_n( $cursor_n, $mask_n );
-      $last_n  = _make_last_n( $cursor_n, $mask_n );
+      $mask_n  = Net::IPAM::Block::Private::_make_mask_n( $bits - $bitlen, $bits );
+      $start_n = Net::IPAM::Block::Private::_make_base_n( $cursor_n, $mask_n );
+      $last_n  = Net::IPAM::Block::Private::_make_last_n( $cursor_n, $mask_n );
     }
 
     # make new cidr block
@@ -394,7 +298,7 @@ sub to_cidrs {
     }
 
     #  move the $cursor one behind last
-    $cursor_n = Net::IPAM::IP::incr_n($last_n) // die 'OVERFLOW: logic error,';
+    $cursor_n = Net::IPAM::Util::incr_n($last_n) // die 'OVERFLOW: logic error,';
   }
 
   return wantarray ? @result : [@result];
@@ -514,7 +418,7 @@ sub bitlen {
   my $bits = 32;
   $bits = 128 if $self->version == 6;
 
-  return _bitlen( $self->{base}->bytes, $self->{last}->bytes, $bits );
+  return Net::IPAM::Block::Private::_bitlen( $self->{base}->bytes, $self->{last}->bytes, $bits );
 }
 
 =head2 iter
@@ -584,7 +488,7 @@ cmp() returns -1, 0, +1:
 =cut
 
 sub cmp {
-  croak "wrong or missing arg" unless ref $_[1] && $_[1]->isa(__PACKAGE__);
+  Carp::croak "wrong or missing arg" unless ref $_[1] && $_[1]->isa(__PACKAGE__);
 
   return -1 if $_[0]->{base}->cmp( $_[1]->{base} ) < 0;
   return 1  if $_[0]->{base}->cmp( $_[1]->{base} ) > 0;
@@ -614,7 +518,7 @@ Returns true if the blocks are disjunct
 =cut
 
 sub is_disjunct_with {
-  croak "wrong or missing arg" unless ref $_[1] && $_[1]->isa(__PACKAGE__);
+  Carp::croak "wrong or missing arg" unless ref $_[1] && $_[1]->isa(__PACKAGE__);
 
   #  a       |----------|
   #  b |---|
@@ -648,7 +552,7 @@ Returns true if the blocks overlap.
 =cut
 
 sub overlaps_with {
-  croak "wrong or missing arg" unless ref $_[1] && $_[1]->isa(__PACKAGE__);
+  Carp::croak "wrong or missing arg" unless ref $_[1] && $_[1]->isa(__PACKAGE__);
 
   # false if a == b
   return if $_[0]->cmp( $_[1] ) == 0;
@@ -686,24 +590,10 @@ The argument may also be a Net::IPAM::IP address object.
 # polymorphic: arg may be block or ip
 sub contains {
   if ( ref $_[1] ) {
-    return _contains_ip(@_)    if $_[1]->isa('Net::IPAM::IP');
-    return _contains_block(@_) if $_[1]->isa('Net::IPAM::Block');
+    return Net::IPAM::Block::Private::_contains_ip(@_)    if $_[1]->isa('Net::IPAM::IP');
+    return Net::IPAM::Block::Private::_contains_block(@_) if $_[1]->isa('Net::IPAM::Block');
   }
-  croak 'wrong argument,';
-}
-
-# a.base <= b && a.last >= b
-sub _contains_ip {
-  return $_[0]->{base}->cmp( $_[1] ) <= 0 && $_[0]->{last}->cmp( $_[1] ) >= 0;
-}
-
-sub _contains_block {
-
-  # a == b, return false
-  return 0 if $_[0]->cmp( $_[1] ) == 0;
-
-  # a.base <= b.base && a.last >= b.last
-  return $_[0]->{base}->cmp( $_[1]->{base} ) <= 0 && $_[0]->{last}->cmp( $_[1]->{last} ) >= 0;
+  Carp::croak 'wrong argument,';
 }
 
 =head2 find_free_cidrs
@@ -741,13 +631,13 @@ sub find_free_cidrs {
     my $this = shift @candidates;
 
     # mark it as free, if this block is disjunct with ALL inner blocks
-    if ( all { $this->is_disjunct_with($_) } @inner ) {
+    if ( List::Util::all { $this->is_disjunct_with($_) } @inner ) {
       push @free, $this;
       next;
     }
 
     # skip if this block is already contained in ANY inner block or equal with
-    if ( any { $_->contains($this) || $_->cmp($this) == 0 } @inner ) {
+    if ( List::Util::any { $_->contains($this) || $_->cmp($this) == 0 } @inner ) {
       next;
     }
 
@@ -755,122 +645,12 @@ sub find_free_cidrs {
     push @candidates, $this->cidrsplit;
 
     # limit cpu and memory
-    croak("too many CIDRs generated,") if @candidates > $MaxCIDRSplit;
+    Carp::croak("too many CIDRs generated,") if @candidates > $MaxCIDRSplit;
   }
 
   @free = sort { $a->cmp($b) } @free;
 
   return wantarray ? @free : [@free];
-}
-
-# count leading ones:
-# 0xffff_ff80 => 25
-# 0xffff_ffff_ffff_ff00_0000_0000_0000_0000 => 56
-#
-sub _leading_ones {
-  my $n    = shift or die 'missing arg,';
-  my $ones = 0;
-
-  # step bytewise through $n from left to right
-  for my $i ( 0 .. length($n) - 1 ) {
-    my $byte = vec( $n, $i, 8 );
-
-    # count bytes
-    if ( $byte == 0xff ) {
-      $ones += 8;
-      next;
-    }
-
-    # count bits
-    while ( ( $byte & 0b1000_0000 ) != 0 ) {
-      $ones++;
-      $byte = $byte << 1;
-    }
-    last;
-  }
-
-  return $ones;
-}
-
-# makes base address from address and netmask:
-sub _make_base_n {
-  my ( $addr_n, $mask_n ) = @_;
-  return $addr_n & $mask_n;
-}
-
-# makes last address from address and netmask:
-#
-# last = base | hostMask
-#
-# Example:
-#   ~netMask(255.0.0.0) = hostMask(0.255.255.255)
-#
-#   ~0xff_00_00_00  = 0x00_ff_ff_ff
-#  -----------------------------------------------
-#
-#    0x7f_00_00_00 base
-#  | 0x00_ff_ff_ff hostMask
-#  ----------------------
-#    0x7f_ff_ff_ff last
-#
-sub _make_last_n {
-  my ( $addr_n, $mask_n ) = @_;
-  return $addr_n | ~$mask_n;
-}
-
-# make CIDR mask from bits:
-# (24, 32)  => 0xffff_ff00
-# (56, 128) => 0xffff_ffff_ffff_ff00_0000_0000_0000_0000
-#
-sub _make_mask_n {
-  my ( $ones, $bits ) = @_;
-  my $zeros = $bits - $ones;
-
-  return pack( "B$bits", '1' x $ones . '0' x $zeros );
-}
-
-# _bitlen returns the minimum number of bits to represent a range from base_n to last_n
-#
-# 10.0.0.0  = base_n  = 00001010_00000000_00000000_00000000
-# 10.0.0.17 = last_n  = 00001010_00000000_00000000_00010001
-# ---------------------------------------------------------
-#                   ^ = 00000000_00000000_00000000_00010001 XOR FOR LEADING ZEROS
-#                   ~ = 11111111_11111111_11111111_11101110 COMPLEMENT FOR LEADING ONES
-#                                                     ^^^^^ BITLEN = BITS - LEADING ONES
-sub _bitlen {
-  my ( $base_n, $last_n, $bits ) = @_;
-  return $bits - _leading_ones( ~( $base_n ^ $last_n ) );
-}
-
-# try to _get_mask from base_ip and last_ip, returns undef if base-last is no CIDR
-sub _get_mask_ip {
-  my ( $base_ip, $last_ip ) = @_;
-
-  # version base != version last
-  my $version = $base_ip->version;
-  croak 'version mismatch,' if $version != $last_ip->version;
-
-  # base > last?
-  croak 'base > last,' if $base_ip->cmp($last_ip) > 0;
-
-  my $bits = 32;
-  $bits = 128 if $version == 6;
-
-  my $base_n = $base_ip->bytes;
-  my $last_n = $last_ip->bytes;
-
-  # get outer mask for range
-  my $bitlen = _bitlen( $base_n, $last_n, $bits );
-  my $mask_n = _make_mask_n( $bits - $bitlen, $bits );
-
-  # is range a real CIDR?
-  if ( ( $base_n eq _make_base_n( $base_n, $mask_n ) )
-    && ( $last_n eq _make_last_n( $last_n, $mask_n ) ) )
-  {
-    return Net::IPAM::IP->new_from_bytes($mask_n);
-  }
-
-  return;
 }
 
 =head1 FUNCTIONS
@@ -933,7 +713,7 @@ sub aggregate {
     $i = $j;
 
     # last has changed, calculate new mask, returns undef if no CIDR
-    $this->{mask} = _get_mask_ip( $this->{base}, $this->{last} );
+    $this->{mask} = Net::IPAM::Block::Private::_get_mask_ip( $this->{base}, $this->{last} );
 
     push @packed, $this;
   }
@@ -962,6 +742,13 @@ Always true.
   my $str = "$block";
 
 Alias for L</"to_string">.
+
+=cut
+
+use overload
+  '""'     => sub { shift->to_string },
+  bool     => sub { 1 },
+  fallback => 1;
 
 =head1 AUTHOR
 
@@ -1001,7 +788,6 @@ This software is copyright (c) 2020 by Karl Gaissmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-
 
 =cut
 

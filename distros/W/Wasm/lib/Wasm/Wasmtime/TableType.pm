@@ -7,21 +7,23 @@ use Wasm::Wasmtime::ValType;
 use Ref::Util qw( is_ref is_plain_arrayref );
 
 # ABSTRACT: Wasmtime table type class
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 $ffi_prefix = 'wasm_tabletype_';
-$ffi->type('opaque' => 'wasm_tabletype_t');
+$ffi->load_custom_type('::PtrObject' => 'wasm_tabletype_t' => __PACKAGE__);
 
 
 $ffi->attach( new => ['wasm_valtype_t','uint32[2]'] => 'wasm_tabletype_t' => sub {
   my $xsub = shift;
   my $class = shift;
-  my $ptr;
-  my $owner;
   if(defined $_[0] && !is_ref($_[0]) && $_[0] =~ /^[0-9]+$/)
   {
-    ($ptr, $owner) = @_;
+    my($ptr, $owner) = @_;
+    return bless {
+      ptr => $ptr,
+      owner => $owner,
+    }, $class;
   }
   else
   {
@@ -37,25 +39,24 @@ $ffi->attach( new => ['wasm_valtype_t','uint32[2]'] => 'wasm_tabletype_t' => sub
     Carp::croak("bad limits") unless is_plain_arrayref($limit);
     Carp::croak("no minumum in limit") unless defined $limit->[0];
     $limit->[1] = 0xffffffff unless defined $limit->[1];
-    $ptr = $xsub->(delete $valtype->{ptr}, $limit);
+    my $self = $xsub->($valtype, $limit);
+    delete $valtype->{ptr};
+    return $self;
   }
-  bless {
-    ptr => $ptr,
-    owner => $owner,
-  }, $class;
 });
 
 
 $ffi->attach( element => ['wasm_tabletype_t'] => 'wasm_valtype_t' => sub {
   my($xsub, $self) = @_;
-  my $ptr = $xsub->($self->{ptr});
-  Wasm::Wasmtime::ValType->new($ptr, $self);
+  my $valtype = $xsub->($self);
+  $valtype->{owner} = $self;
+  $valtype;
 });
 
 
 $ffi->attach( limits => ['wasm_tabletype_t'] => 'uint32[2]' => sub {
   my($xsub, $self) = @_;
-  $xsub->($self->{ptr});
+  $xsub->($self);
 });
 
 
@@ -63,17 +64,11 @@ $ffi->attach( limits => ['wasm_tabletype_t'] => 'uint32[2]' => sub {
 $ffi->attach( as_externtype => ['wasm_tabletype_t'] => 'opaque' => sub {
   my($xsub, $self) = @_;
   require Wasm::Wasmtime::ExternType;
-  my $ptr = $xsub->($self->{ptr});
+  my $ptr = $xsub->($self);
   Wasm::Wasmtime::ExternType->new($ptr, $self->{owner} || $self);
 });
 
-$ffi->attach( [ delete => "DESTROY" ] => ['wasm_tabletype_t'] => sub {
-  my($xsub, $self) = @_;
-  if(defined $self->{ptr} && !defined $self->{owner})
-  {
-    $xsub->($self->{ptr});
-  }
-});
+_generate_destroy();
 
 1;
 
@@ -89,7 +84,7 @@ Wasm::Wasmtime::TableType - Wasmtime table type class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

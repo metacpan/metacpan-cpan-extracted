@@ -1,9 +1,9 @@
 package App::LintPrereqs;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-18'; # DATE
+our $DATE = '2020-04-27'; # DATE
 our $DIST = 'App-LintPrereqs'; # DIST
-our $VERSION = '0.542'; # VERSION
+our $VERSION = '0.543'; # VERSION
 
 use 5.010001;
 use strict;
@@ -694,7 +694,7 @@ App::LintPrereqs - Check extraneous/missing/incorrect prerequisites in dist.ini
 
 =head1 VERSION
 
-This document describes version 0.542 of App::LintPrereqs (from Perl distribution App-LintPrereqs), released on 2020-04-18.
+This document describes version 0.543 of App::LintPrereqs (from Perl distribution App-LintPrereqs), released on 2020-04-27.
 
 =head1 SYNOPSIS
 

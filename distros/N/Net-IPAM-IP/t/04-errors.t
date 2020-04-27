@@ -10,10 +10,10 @@ can_ok( 'Net::IPAM::IP', 'new' );
 can_ok( 'Net::IPAM::IP', 'new_from_bytes' );
 
 eval { Net::IPAM::IP->new };
-like( $@, qr/wrong/i, 'new: missing arg' );
+like( $@, qr/missing/i, 'new: missing arg' );
 
 eval { Net::IPAM::IP->new_from_bytes };
-like( $@, qr/wrong/i, 'new_from_bytes: missing arg' );
+like( $@, qr/missing/i, 'new_from_bytes: missing arg' );
 
 my $ip    = Net::IPAM::IP->new('1.2.3.4');
 my $bytes = substr( $ip->bytes, 1 );
@@ -44,5 +44,11 @@ $ip = Net::IPAM::IP->new('0.0.0.0');
 $ip->{binary} = substr( $ip->{binary}, 1 );
 eval { $ip->reverse };
 like( $@, qr/logic error/i, 'expand: logic error' );
+
+{
+  local $SIG{__WARN__} = sub { die @_ };
+  eval { Net::IPAM::IP->getaddrs() };
+  like( $@, qr/missing/i, 'getaddrs: missing arg' );
+}
 
 done_testing();

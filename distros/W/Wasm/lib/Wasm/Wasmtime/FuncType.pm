@@ -2,49 +2,49 @@ package Wasm::Wasmtime::FuncType;
 
 use strict;
 use warnings;
-use Ref::Util qw( is_ref );
+use Ref::Util qw( is_arrayref );
 use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::ValType;
 
 # ABSTRACT: Wasmtime function type class
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 $ffi_prefix = 'wasm_functype_';
-$ffi->type('opaque' => 'wasm_functype_t');
+$ffi->load_custom_type('::PtrObject' => 'wasm_functype_t' => __PACKAGE__);
 
 
 $ffi->attach( new => ['wasm_valtype_vec_t*', 'wasm_valtype_vec_t*'] => 'wasm_functype_t' => sub {
   my $xsub = shift;
   my $class = shift;
-  my($ptr, $owner);
-  if(is_ref $_[0])
+  if(is_arrayref $_[0] && is_arrayref $_[1])
   {
     # try not to think too much about all of the maps here
     my($params, $results) = map { my $rec = Wasm::Wasmtime::ValTypeVec->new; $rec->set($_) }
                             map { [map { delete $_->{ptr} } map { Wasm::Wasmtime::ValType->new($_) } @$_] } @_;
-    $ptr = $xsub->($params, $results);
+    my $self = $xsub->($params, $results);
+    return $self;
   }
   else
   {
-    ($ptr, $owner) = @_;
+    my($ptr, $owner) = @_;
+    bless {
+      ptr   => $ptr,
+      owner => $owner,
+    }, $class;
   }
-  bless {
-    ptr   => $ptr,
-    owner => $owner,
-  }, $class;
 });
 
 
 $ffi->attach( params => ['wasm_functype_t'] => 'wasm_valtype_vec_t*' => sub {
   my($xsub, $self) = @_;
-  $xsub->($self->{ptr})->to_list;
+  $xsub->($self)->to_list;
 });
 
 
 $ffi->attach( results => ['wasm_functype_t'] => 'wasm_valtype_vec_t*' => sub {
   my($xsub, $self) = @_;
-  $xsub->($self->{ptr})->to_list;
+  $xsub->($self)->to_list;
 });
 
 
@@ -52,17 +52,11 @@ $ffi->attach( results => ['wasm_functype_t'] => 'wasm_valtype_vec_t*' => sub {
 $ffi->attach( as_externtype => ['wasm_functype_t'] => 'opaque' => sub {
   my($xsub, $self) = @_;
   require Wasm::Wasmtime::ExternType;
-  my $ptr = $xsub->($self->{ptr});
+  my $ptr = $xsub->($self);
   Wasm::Wasmtime::ExternType->new($ptr, $self->{owner} || $self);
 });
 
-$ffi->attach( [ delete => "DESTROY" ] => ['wasm_functype_t'] => sub {
-  my($xsub, $self) = @_;
-  if(defined $self->{ptr} && !defined $self->{owner})
-  {
-    $xsub->($self->{ptr});
-  }
-});
+_generate_destroy();
 
 1;
 
@@ -78,7 +72,7 @@ Wasm::Wasmtime::FuncType - Wasmtime function type class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

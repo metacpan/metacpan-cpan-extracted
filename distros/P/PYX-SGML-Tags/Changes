@@ -1,3 +1,22 @@
+0.04 2020-04-26T18:32:33+02:00
+ - Add test comments.
+ - Add test for utf-8 characters (in Czech).
+ - Add Tags reseting to each test.
+ - Test for element renamed to -xml version. Added sgml version.
+
+0.03 2020-04-26T15:28:41+02:00
+ - Add EXAMPLE2 to PYX::SGML::Tags.
+ - Add tests for parse() method.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Rename tests to better names (tag → element).
+ - Rename PYX data files to better names (tag → element).
+ - Rename PYX data to better names (tag → element).
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update copyright years.
+ - Update my name to reality.
+
 0.02 2016-02-20T23:38:52+01:00
  - Add 'input_encoding' parameter.
  - Add REPOSITORY section to doc.

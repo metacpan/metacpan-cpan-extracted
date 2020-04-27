@@ -8,5 +8,5 @@ manifest_include(
   't/smells-of-vcs' => qr{.*},
   't' => '.pm',
   't' => '.pl',
-  '' => qr{stolen_chunk_of_toke\.c|Declare\.xs},
+  '' => qr{stolen_chunk_of_toke\.c|Declare\.xs|ppport.h},
 );

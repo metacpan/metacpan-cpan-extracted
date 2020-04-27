@@ -40,6 +40,8 @@ t/data/end_element1.pyx
 t/data/instruction1.pyx
 t/data/instruction2.pyx
 t/data/parse.pyx
+t/data/parse_encoding_latin2.pyx
+t/data/parse_encoding_utf8.pyx
 t/data/start_element1.pyx
 t/data/start_element2.pyx
 t/data/start_element3.pyx
@@ -51,7 +53,9 @@ t/PYX-Parser/01-use.t
 t/PYX-Parser/02-version.t
 t/PYX-Parser/03-new.t
 t/PYX-Parser/04-parse_file.t
-t/PYX-Parser/05-parse_file-rewrite.t
+t/PYX-Parser/06-parse_file-encoding_latin2.t
+t/PYX-Parser/06-parse_file-encoding_utf8.t
+t/PYX-Parser/07-parse_file-rewrite.t
 t/PYX/01-use.t
 t/PYX/02-version.t
 t/PYX/03-char.t

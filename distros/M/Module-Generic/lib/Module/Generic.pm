@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version 0.11.6
+## Version 0.11.9
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2020/03/27
+## Modified 2020/04/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -44,7 +44,7 @@ BEGIN
     @EXPORT      = qw( );
     @EXPORT_OK   = qw( subclasses );
     %EXPORT_TAGS = ();
-    $VERSION     = '0.11.6';
+    $VERSION     = '0.11.9';
     $VERBOSE     = 0;
     $DEBUG       = 0;
     $SILENT_AUTOLOAD      = 1;
@@ -420,12 +420,34 @@ sub error
 		$args->{message} = substr( $args->{message}, 0, $this->{error_max_length} ) if( $this->{error_max_length} > 0 && length( $args->{message} ) > $this->{error_max_length} );
         $this->{_msg_no_exec_sub} = 0;
 		my $n = 1;
-		$n++ while( ( caller( $n ) )[0] eq 'Module::Generic' );
+		# $n++ while( ( caller( $n ) )[0] eq 'Module::Generic' );
 		$args->{skip_frames} = $n + 1;
 		## my( $p, $f, $l ) = caller( $n );
 		## my( $sub ) = ( caller( $n + 1 ) )[3];
 		my $o = $this->{error} = ${ $class . '::ERROR' } = Module::Generic::Exception->new( $args );
 		## printf( STDERR "%s::error() called from package %s ($p) in file %s ($f) at line %d ($l) from sub %s ($sub)\n", __PACKAGE__, $o->package, $o->file, $o->line, $o->subroutine );
+		
+		## Get the warnings status of the caller. We use caller(1) to skip one frame further, ie our caller's caller
+		## This can be changed by using 'no warnings'
+		my $call_offset = 0;
+		## my $bitmask = '';
+		while( my @call_data = caller( $call_offset ) )
+		{
+		    ## printf( STDERR "[$call_offset] In file $call_data[1] at line $call_data[2] from subroutine %s has bitmask $call_data[9]\n", (caller($call_offset+1))[3] );
+		    unless( $call_offset > 0 && $call_data[0] ne $class && (caller($call_offset-1))[0] eq $class )
+		    {
+		        ## print( STDERR "Skipping package $call_data[0]\n" );
+		        $call_offset++;
+                next;
+		    }
+		    last if( $call_data[9] || ( $call_offset > 0 && (caller($call_offset-1))[0] ne $class ) );
+		    $call_offset++;
+		}
+		## print( STDERR "Using offset $call_offset with bitmask ", ( caller( $call_offset ) )[9], "\n" );
+		my $bitmask = ( caller( $call_offset ) )[9];
+        my $offset = $warnings::Offsets{uninitialized};
+        ## $self->message( 3, "Caller (2)'s bitmask is '$bitmask', warnings offset is '$offset' and vector is '", vec( $bitmask, $offset, 1 ), "'." );
+        my $should_display_warning = vec( $bitmask, $offset, 1 );
 		
 		my $r;
 		$r = Apache2::RequestUtil->request if( $MOD_PERL );
@@ -448,7 +470,7 @@ sub error
         	{
 				# $r->log_error( "Module::Generic::error(): No Apache mod_perl error handler set, reverting to log_error" ) if( $r );
 				# $r->log_error( "$o" );
-				$r->warn( $o->as_string );
+				$r->warn( $o->as_string ) if( $should_display_warning );
         	}
         }
         elsif( $this->{fatal} )
@@ -462,11 +484,11 @@ sub error
 			# $r->log_error( "Module::Generic::error(): calling warn" ) if( $r );
 			if( $r )
 			{
-				$r->warn( $o->as_string );
+				$r->warn( $o->as_string ) if( $should_display_warning );
 			}
 			else
 			{
-				warn( $o );
+				warn( $o ) if( $should_display_warning );
 			}
         }
         ## https://metacpan.org/pod/Perl::Critic::Policy::Subroutines::ProhibitExplicitReturnUndef
@@ -588,7 +610,9 @@ sub init
 			}
     		elsif( exists( $data->{ $name } ) )
     		{
-    			if( index( $data->{ $name }, '::' ) != -1 || $data->{ $name } =~ /^[a-zA-Z][a-zA-Z\_]*[a-zA-Z]$/ )
+    			## Pre-existing field value looks like a module package and that package is already loaded
+    			if( ( index( $data->{ $name }, '::' ) != -1 || $data->{ $name } =~ /^[a-zA-Z][a-zA-Z\_]*[a-zA-Z]$/ ) &&
+    				$self->_is_class_loaded( $data->{ $name } ) )
     			{
     				my $thisPack = $data->{ $name };
     				if( !Scalar::Util::blessed( $val ) )
@@ -1511,6 +1535,8 @@ sub __create_class
 		scalar_or_object => '_set_get_scalar_or_object',
 		uri			=> '_set_get_uri',
 		};
+		## Alias
+		$type2func->{string} = $type2func->{scalar};
 		
 		my $perl = <<EOT;
 package $class;
@@ -1654,7 +1680,7 @@ sub _set_get_class_array
     if( @_ )
     {
     	my $ref = shift( @_ );
-    	return( $self->error( "I was expecting an array ref, but instead got '$ref'" ) ) if( ref( $ref ) ne 'ARRAY' );
+    	return( $self->error( "I was expecting an array ref, but instead got '$ref'. _is_array returned: '", $self->_is_array( $ref ), "'" ) ) if( !$self->_set_get_array( $ref ) );
     	my $arr = [];
     	for( my $i = 0; $i < scalar( @$ref ); $i++ )
     	{
@@ -1960,7 +1986,7 @@ sub _set_get_object_array2
     if( @_ )
     {
     	my $data_to_process = shift( @_ );
-    	return( $self->error( "I was expecting an array ref, but instead got '$this'" ) ) if( ref( $data_to_process ) ne 'ARRAY' );
+    	return( $self->error( "I was expecting an array ref, but instead got '$this'. _is_array returned: '", $self->_is_array( $ref ), "'" ) ) if( !$self->_is_array( $data_to_process ) );
     	my $arr1 = [];
     	foreach my $ref ( @$data_to_process )
     	{
@@ -2014,7 +2040,7 @@ sub _set_get_object_array
     if( @_ )
     {
     	my $ref = shift( @_ );
-    	return( $self->error( "I was expecting an array ref, but instead got '$ref'" ) ) if( ref( $ref ) ne 'ARRAY' );
+    	return( $self->error( "I was expecting an array ref, but instead got '$ref'. _is_array returned: '", $self->_is_array( $ref ), "'" ) ) if( !$self->_is_array( $ref ) );
     	my $arr = [];
     	for( my $i = 0; $i < scalar( @$ref ); $i++ )
     	{
@@ -2969,14 +2995,14 @@ sub each
 sub exists
 {
 	my $self = CORE::shift( @_ );
-	my $this = shift( @_ );
+	my $this = CORE::shift( @_ );
 	return( scalar( CORE::grep( /^$this$/, @$self ) ) );
 }
 
 sub for
 {
 	my $self = CORE::shift( @_ );
-	my $code = shift( @_ );
+	my $code = CORE::shift( @_ );
 	return if( ref( $code ) ne 'CODE' );
 	CORE::for( my $i; $i < scalar( @$self ); $i++ )
 	{
@@ -2988,7 +3014,7 @@ sub for
 sub foreach
 {
 	my $self = CORE::shift( @_ );
-	my $code = shift( @_ );
+	my $code = CORE::shift( @_ );
 	return if( ref( $code ) ne 'CODE' );
 	CORE::foreach my $v ( @$self )
 	{
@@ -3028,7 +3054,7 @@ sub length { return( scalar( @{$_[0]} ) ); }
 sub map
 {
 	my $self = CORE::shift( @_ );
-	my $code = shift( @_ );
+	my $code = CORE::shift( @_ );
 	return if( ref( $code ) ne 'CODE' );
 	return( CORE::map( $code->( $_ ), @$self ) );
 }
@@ -3088,7 +3114,7 @@ sub shift
 	return( CORE::shift( @$self ) );
 }
 
-sub size { return( shift->length ); }
+sub size { return( CORE::shift->length ); }
 
 sub sort
 {
@@ -3440,19 +3466,19 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.11.6
+    v0.11.9
 
 =head1 DESCRIPTION
 
-C<Module::Generic> as its name says it all, is a generic module to inherit from.
+L<Module::Generic> as its name says it all, is a generic module to inherit from.
 It contains standard methods that may howerver be bypassed by the module using 
-C<Module::Generic>.
+L<Module::Generic>.
 
 As an added benefit, it also contains a powerfull AUTOLOAD transforming any hash 
 object key into dynamic methods and also recognize the dynamic routine a la AutoLoader
 from which I have shamelessly copied in the AUTOLOAD code. The reason is that while
 C<AutoLoader> provides the user with a convenient AUTOLOAD, I wanted a way to also
-keep the functionnality of C<Module::Generic> AUTOLOAD that were not included in
+keep the functionnality of L<Module::Generic> AUTOLOAD that were not included in
 C<AutoLoader>. So the only solution was a merger.
 
 =head1 METHODS
@@ -3723,7 +3749,7 @@ For example, consider the following:
 		billing => { type => 'class', definition =>
 			{
 			interval => { type => 'scalar' },
-			frquency => { type => 'number' },
+			frequency => { type => 'number' },
 			nickname => { type => 'scalar' },
 			}}
 		}) );

@@ -9,15 +9,17 @@ use warnings;
 use Pod::Usage;
 use Getopt::Std qw(getopts);
 
+=encoding utf8
+
 =head1 NAME
 
 extract_modules - determine which Perl modules a given file uses
 
 =cut
 
-our $VERSION = '1.101';
+our $VERSION = '1.103';
 
-getopts('cjl0', \my %opts);
+getopts('ecjl0', \my %opts);
 
 =head1 SYNOPSIS
 
@@ -77,6 +79,20 @@ which statically analyze the source without compiling or running it.
 These modules cannot discover modules loaded dynamically through a
 string eval.
 
+=head2 Command-line options
+
+=over 4
+
+=item * -c  cpanfile output
+
+=item * -e  exclude core modules
+
+=item * -j  JSON output
+
+=item * -l  succint list, one module per line
+
+=item * -0  succint list, modules null separated (for xargs -0)
+
 =cut
 
 # if no parameters are passed, give usage information
@@ -121,6 +137,12 @@ foreach my $file ( @ARGV ) {
 	my @modules = $object->$method( $file );
 	my $ref = ref $modules[0] ? $modules[0] : \@modules;
 	push @Grand_modules, map { $sub->( $_ ) } @$ref;
+
+	# remove core modules
+	@Grand_modules =
+		grep { ! defined Module::CoreList->first_release( $_->[0] ) }
+		@Grand_modules
+		if $opts{e};
 
 	next if $opts{j} || $opts{l} || $opts{0} || $opts{c}; # do these after
 
@@ -206,7 +228,7 @@ brian d foy C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright © 2009-2017, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2009-2020, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You can use this script under the same terms as Perl itself.
 

@@ -8,7 +8,7 @@
 # add download repo zip file as is done in Dita::Conversion then reply to Ivan and request inclusion of this module on their list
 package GitHub::Crud;
 use v5.16;
-our $VERSION = 20200419;
+our $VERSION = 20200428;
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess);
@@ -384,29 +384,37 @@ sub write($$;$)                                                                 
   my $bran = qm $gitHub->refOrBranch(0) || '?';
   my $mess = qm $gitHub->message;
 
-  my $url  = url;
-  my $s    = $gitHub->getExistingSha;                                           # Get the L<sha> of the file if the file exists
-  my $sha = $s ? ', "sha": "'. $s .'"' : '';                                    # L<sha> of existing file or blank string if no existing file
-
-  if ($s and my $S = getSha($data))                                             # L<sha> of new data
-   {if ($s eq $S)                                                               # Duplicate if the L<sha>s match
-     {$gitHub->failed = undef;
-      return 1;
-     }
-   }
   if (!specialFileData($data))                                                  # Send the data as utf8 unless it is a special file
    {use Encode 'encode';
     $data  = encode('UTF-8', $data);
    }
+
+  my $url  = url;
+  my $s    = $gitHub->getExistingSha || getSha($data);                          # Get the L<sha> of the file if the file exists
+  my $sha = $s ? ', "sha": "'. $s .'"' : '';                                    # L<sha> of existing file or blank string if no existing file
+
+# if ($s and my $S = getSha($data))                                             # L<sha> of new data
+#  {if ($s eq $S)                                                               # Duplicate if the L<sha>s match
+#    {$gitHub->failed = undef;
+#     return 1;
+#    }
+#  }
+
   my $denc = encodeBase64($data) =~ s/\n//gsr;
 
-  my $tmpFile = writeFile(undef,                                                # Write encoded content to temporary file
-          qq({"message": "$mess", "content": "$denc" $sha}));
-  my $d = qq(-d @).$tmpFile;
+  my $branch = sub                                                              # It seems we must put the branch in the json file though the documentation seems to imply it can go in the url or the json
+   {my $b = $gitHub->branch;
+    return qq(, "branch" : "$b") if $b;
+    q()
+   }->();
+
+  my $j = qq({"message": "$mess", "content": "$denc" $sha $branch});
+  my $t = writeFile(undef, $j);                                                 # Write encoded content to temporary file
+  my $d = qq(-d @).$t;
   my $u = filePath($url, $user, $repo, qw(contents), $file.$bran);
   my $c = qq(curl -si -X PUT $pat $u $d);                                       # Curl command
   my $r = GitHub::Crud::Response::new($gitHub, $c);                             # Execute command to create response
-  unlink $tmpFile;                                                              # Cleanup
+  unlink $t;                                                                    # Cleanup
 
   my $status = $r->status;                                                      # Check response code
   my $success = $status == 200 ? 'updated' : $status == 201 ? 'created' : undef;# Updated, created
@@ -557,6 +565,13 @@ sub listCommits($)                                                              
   $r
  }
 
+sub listCommitShas($)                                                           # Create {commit name => sha} from the results of L<listCommits>.
+ {my ($commits) = @_;                                                           # Commits from listCommits
+
+  return undef unless my $data = $commits->data;                                # Commits array
+  {map {$$_{name} => $$_{commit}{sha}} @$data}                                  # Commits hash
+ }
+
 sub writeCommit($$@)                                                            # Write all the files in a B<$folder> (or just the the named files) into a L<GitHub> repository in parallel as a commit on the specified branch.\mRequired attributes: L<userid|/userid>, L<repository|/repository>, L<refOrBranch|/refOrBranch>.
  {my ($gitHub, $folder, @files) = @_;                                           # GitHub object, file prefix to remove, files to write
 
@@ -601,16 +616,25 @@ END
     $r
    }->();
 
+  my $parents = sub                                                             # Prior commits
+   {my %c = listCommitShas $gitHub->listCommits;
+    my $b = $gitHub->branch;
+    return '' unless my $s = $c{$b};
+    qq(, "parents" : ["$s"])
+   }->();
+
   my $commit = sub                                                              # Create a commit to hold the tree
    {my $s = $tree->data->sha;
-    my $f = writeFile(undef, <<END);
-{
- "message": "Committed by GitHub::Crud",
- "tree"   : "$s"
+    my $d = dateTimeStamp;
+    my $j = <<END;
+{  "message" : "Committed by GitHub::Crud on: $d"
+ , "tree"    : "$s"
+    $parents
 }
 END
+    my $f = writeFile(undef, $j);                                               # Write json
 
-    my $c = qq(curl -si -X POST $pat -d \@$f $url/$user/$repo/git/commits);
+    my $c = qq(curl -si -X POST $pat -d \@$f $url/$user/$repo/git/commits);     # Execute json
 
     my $r = GitHub::Crud::Response::new($gitHub, $c);
     my $success = $r->status == 201;                                            # Check response code
@@ -938,7 +962,7 @@ Commit a folder to GitHub then read and check some of the uploaded content:
 
 
 
-Version 20200220.
+Version 20200428.
 
 
 The following sections describe the methods in each functional area of this
@@ -963,27 +987,27 @@ B<Example:>
     my $f  = temporaryFolder;                                                     # Folder in which we will create some files to upload in the commit
     my $c  = dateTimeStamp;                                                       # Create some content
     my $if = q(/home/phil/.face);                                                 # Image file
-
+  
     writeFile(fpe($f, q(data), $_, qw(txt)), $c) for 1..3;                        # Place content in files in a sub folder
     copyBinaryFile $if, my $If = fpe $f, qw(face jpg);                            # Add an image
-
+  
     my $g = GitHub::Crud::𝗻𝗲𝘄                                                     # Create GitHub
       (userid           => q(philiprbrenan),
        repository       => q(aaa),
        branch           => q(test),
        confessOnFailure => 1);
-
+  
     $g->loadPersonalAccessToken;                                                  # Load a personal access token
     $g->writeCommit($f);                                                          # Upload commit - confess to any errors
-
+  
     my $C = $g->read(q(data/1.txt));                                              # Read data written in commit
     my $I = $g->read(q(face.jpg));
     my $i = readBinaryFile $if;
-
+  
     confess "Date stamp failed" unless $C eq $c;                                  # Check text
     confess "Image failed"      unless $i eq $I;                                  # Check image
     success "Write commit succeeded";
-
+  
 
 =head1 Files
 
@@ -1015,7 +1039,7 @@ B<Example:>
 
     success "𝗹𝗶𝘀𝘁:", gitHub->𝗹𝗶𝘀𝘁;
   # 𝗹𝗶𝘀𝘁: alpha.data .github/workflows/test.yaml images/aaa.txt images/aaa/bbb.txt
-
+  
 
 =head2 specialFileData($d)
 
@@ -1051,7 +1075,7 @@ B<Example:>
     $g->write($d);
     confess "𝗿𝗲𝗮𝗱 FAILED" unless $g->𝗿𝗲𝗮𝗱 eq $d;
     success "Read passed";
-
+  
 
 =head2 write($gitHub, $data, $File)
 
@@ -1069,15 +1093,15 @@ B<Example:>
 
     my $g = gitHub;
     $g->gitFile = "zzz.data";
-
+  
     my $d = dateTimeStamp.q( 𝝰𝝱𝝲);
-
+  
     if (1)
      {my $t = time();
       $g->𝘄𝗿𝗶𝘁𝗲($d);
       lll "First 𝘄𝗿𝗶𝘁𝗲 time: ", time() -  $t;
      }
-
+  
     my $r = $g->read;
     lll "Write bbb: $r";
     if (1)
@@ -1087,7 +1111,7 @@ B<Example:>
      }
     confess "𝘄𝗿𝗶𝘁𝗲 FAILED" unless $g->exists;
     success "Write passed";
-
+  
 
 =head2 readBlob($gitHub, $sha)
 
@@ -1108,11 +1132,11 @@ B<Example:>
     my $s = $g->writeBlob($d);
     my $S = q(4a2df549febb701ba651aae46e041923e9550cb8);
     confess q(Write blob FAILED) unless $s eq $S;
-
+  
     my $D = $g->𝗿𝗲𝗮𝗱𝗕𝗹𝗼𝗯($s);
     confess q(Write/Read blob FAILED) unless $d eq $D;
     success q(Write/Read blob passed);
-
+  
 
 =head2 writeBlob($gitHub, $data)
 
@@ -1133,11 +1157,11 @@ B<Example:>
     my $s = $g->𝘄𝗿𝗶𝘁𝗲𝗕𝗹𝗼𝗯($d);
     my $S = q(4a2df549febb701ba651aae46e041923e9550cb8);
     confess q(Write blob FAILED) unless $s eq $S;
-
+  
     my $D = $g->readBlob($s);
     confess q(Write/Read blob FAILED) unless $d eq $D;
     success q(Write/Read blob passed);
-
+  
 
 =head2 copy($gitHub, $target)
 
@@ -1171,7 +1195,7 @@ B<Example:>
     lll "Read     ccc: $D";
     confess "𝗰𝗼𝗽𝘆 FAILED" unless $d eq $D;
     success "Copy passed"
-
+  
 
 =head2 exists($gitHub)
 
@@ -1195,7 +1219,7 @@ B<Example:>
     $g->delete;
     confess "𝗲𝘅𝗶𝘀𝘁𝘀 FAILED" if $g->read eq $d;
     success "Exists passed";
-
+  
 
 =head2 rename($gitHub, $target)
 
@@ -1217,19 +1241,19 @@ B<Example:>
     my ($f1, $f2) = qw(zzz.data zzz2.data);
     my $g = gitHub;
        $g->gitFile = $f2; $g->delete;
-
+  
     my $d = dateTimeStamp;
     $g->gitFile  = $f1;
     $g->write($d);
     confess "𝗿𝗲𝗻𝗮𝗺𝗲 FAILED" unless $g->read eq $d;
-
+  
     $g->𝗿𝗲𝗻𝗮𝗺𝗲($f2);
     confess "𝗿𝗲𝗻𝗮𝗺𝗲 FAILED" if $g->exists;
-
+  
     $g->gitFile  = $f2;
     confess "𝗿𝗲𝗻𝗮𝗺𝗲 FAILED" if $g->read eq $d;
     success "Rename passed";
-
+  
 
 =head2 delete($gitHub)
 
@@ -1253,9 +1277,9 @@ B<Example:>
     my $d = dateTimeStamp;
     $g->gitFile = "zzz.data";
     $g->write($d);
-
+  
     confess "𝗱𝗲𝗹𝗲𝘁𝗲 FAILED" unless $g->read eq $d;
-
+  
     if (1)
      {my $t = time();
       my $d = $g->𝗱𝗲𝗹𝗲𝘁𝗲;
@@ -1263,7 +1287,7 @@ B<Example:>
       lll "First 𝗱𝗲𝗹𝗲𝘁𝗲: ", time() -  $t;
       confess "𝗱𝗲𝗹𝗲𝘁𝗲 FAILED" if $g->exists;
      }
-
+  
     if (1)
      {my $t = time();
       my $d = $g->𝗱𝗲𝗹𝗲𝘁𝗲;
@@ -1272,7 +1296,7 @@ B<Example:>
       confess "𝗱𝗲𝗹𝗲𝘁𝗲 FAILED" if $g->exists;
      }
     success "Delete passed";
-
+  
 
 =head1 Repositories
 
@@ -1290,8 +1314,33 @@ Required attributes: L<userid|/userid>, L<repository|/repository>.
 B<Example:>
 
 
-    success "ListCommits passed:", dump(gitHub->𝗹𝗶𝘀𝘁𝗖𝗼𝗺𝗺𝗶𝘁𝘀);
+    my $c = gitHub->𝗹𝗶𝘀𝘁𝗖𝗼𝗺𝗺𝗶𝘁𝘀;
+    my %s = listCommitShas $c;
+    lll "Commits
+",     dump $c;
+    lll "Commit shas
+", dump \%s;
+    success "ListCommits passed";
+  
 
+=head2 listCommitShas($commits)
+
+Create {commit name => sha} from the results of L<listCommits>.
+
+     Parameter  Description
+  1  $commits   Commits from listCommits
+
+B<Example:>
+
+
+    my $c = gitHub->listCommits;
+    my %s = 𝗹𝗶𝘀𝘁𝗖𝗼𝗺𝗺𝗶𝘁𝗦𝗵𝗮𝘀 $c;
+    lll "Commits
+",     dump $c;
+    lll "Commit shas
+", dump \%s;
+    success "ListCommits passed";
+  
 
 =head2 writeCommit($gitHub, $folder, @files)
 
@@ -1310,33 +1359,33 @@ B<Example:>
     my $f  = temporaryFolder;                                                     # Folder in which we will create some files to upload in the commit
     my $c  = dateTimeStamp;                                                       # Create some content
     my $if = q(/home/phil/.face);                                                 # Image file
-
+  
     writeFile(fpe($f, q(data), $_, qw(txt)), $c) for 1..3;                        # Place content in files in a sub folder
     copyBinaryFile $if, my $If = fpe $f, qw(face jpg);                            # Add an image
-
+  
     my $g = GitHub::Crud::new                                                     # Create GitHub
       (userid           => q(philiprbrenan),
        repository       => q(aaa),
        branch           => q(test),
        confessOnFailure => 1);
-
+  
     $g->loadPersonalAccessToken;                                                  # Load a personal access token
     $g->𝘄𝗿𝗶𝘁𝗲𝗖𝗼𝗺𝗺𝗶𝘁($f);                                                          # Upload commit - confess to any errors
-
+  
     my $C = $g->read(q(data/1.txt));                                              # Read data written in commit
     my $I = $g->read(q(face.jpg));
     my $i = readBinaryFile $if;
-
+  
     confess "Date stamp failed" unless $C eq $c;                                  # Check text
     confess "Image failed"      unless $i eq $I;                                  # Check image
     success "Write commit succeeded";
-
+  
 
 =head2 listWebHooks($gitHub)
 
 List web hooks associated with your L<GitHub|https://github.com> repository.
 
-Required: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>.
+Required: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>. 
 
 If the list operation is successful, L<failed|/failed> is set to false otherwise it is set to true.
 
@@ -1349,7 +1398,7 @@ B<Example:>
 
 
     success join ' ', q(Webhooks:), dump(gitHub->𝗹𝗶𝘀𝘁𝗪𝗲𝗯𝗛𝗼𝗼𝗸𝘀);
-
+  
 
 =head2 createPushWebHook($gitHub)
 
@@ -1372,7 +1421,7 @@ B<Example:>
     my $g = gitHub;
     my $d = $g->𝗰𝗿𝗲𝗮𝘁𝗲𝗣𝘂𝘀𝗵𝗪𝗲𝗯𝗛𝗼𝗼𝗸;
     success join ' ', "Create web hook:", dump($d);
-
+  
 
 =head2 listRepositories($gitHub)
 
@@ -1389,7 +1438,7 @@ B<Example:>
 
 
     success "List repositories: ", dump(gitHub()->𝗹𝗶𝘀𝘁𝗥𝗲𝗽𝗼𝘀𝗶𝘁𝗼𝗿𝗶𝗲𝘀);
-
+  
 
 =head2 createRepository($gitHub)
 
@@ -1407,7 +1456,7 @@ B<Example:>
 
     gitHub(repository => q(ccc))->𝗰𝗿𝗲𝗮𝘁𝗲𝗥𝗲𝗽𝗼𝘀𝗶𝘁𝗼𝗿𝘆;
     success "Create repository succeeded";
-
+  
 
 =head2 createRepositoryFromSavedToken($userid, $repository, $private, $accessFolderOrToken)
 
@@ -1426,7 +1475,7 @@ B<Example:>
 
     𝗰𝗿𝗲𝗮𝘁𝗲𝗥𝗲𝗽𝗼𝘀𝗶𝘁𝗼𝗿𝘆𝗙𝗿𝗼𝗺𝗦𝗮𝘃𝗲𝗱𝗧𝗼𝗸𝗲𝗻(q(philiprbrenan), q(ddd));
     success "Create repository succeeded";
-
+  
 
 =head2 createIssue($gitHub)
 
@@ -1446,7 +1495,7 @@ B<Example:>
 
     gitHub(title=>q(Hello), body=>q(World))->𝗰𝗿𝗲𝗮𝘁𝗲𝗜𝘀𝘀𝘂𝗲;
     success "Create issue succeeded";
-
+  
 
 =head2 createIssueFromSavedToken($userid, $repository, $title, $body, $accessFolderOrToken)
 
@@ -1466,7 +1515,7 @@ B<Example:>
 
     &𝗰𝗿𝗲𝗮𝘁𝗲𝗜𝘀𝘀𝘂𝗲𝗙𝗿𝗼𝗺𝗦𝗮𝘃𝗲𝗱𝗧𝗼𝗸𝗲𝗻(qw(philiprbrenan ddd hello World));
     success "Create issue succeeded";
-
+  
 
 =head2 writeFileUsingSavedToken($userid, $repository, $file, $content, $accessFolderOrToken)
 
@@ -1485,10 +1534,10 @@ B<Example:>
     my $s = q(HelloWorld);
     &𝘄𝗿𝗶𝘁𝗲𝗙𝗶𝗹𝗲𝗨𝘀𝗶𝗻𝗴𝗦𝗮𝘃𝗲𝗱𝗧𝗼𝗸𝗲𝗻(qw(philiprbrenan ddd hello.txt), $s);
     my $S = gitHub(repository=>q(ddd), gitFile=>q(hello.txt))->read;
-
+  
     confess "Write file using saved token FAILED" unless $s eq $S;
     success "Write file using saved token succeeded";
-
+  
 
 =head2 writeFileFromFileUsingSavedToken($userid, $repository, $file, $localFile, $accessFolderOrToken)
 
@@ -1510,7 +1559,7 @@ B<Example:>
     my $S = gitHub(repository=>q(ddd), gitFile=>q(hello.txt))->read;
     confess "Write file from file using saved token FAILED" unless $s eq $S;
     success "Write file from file using saved token succeeded"
-
+  
 
 =head2 readFileUsingSavedToken($userid, $repository, $file, $accessFolderOrToken)
 
@@ -1528,10 +1577,10 @@ B<Example:>
     my $s = q(Hello to the World);
             &writeFileUsingSavedToken(qw(philiprbrenan ddd hello.txt), $s);
     my $S = &𝗿𝗲𝗮𝗱𝗙𝗶𝗹𝗲𝗨𝘀𝗶𝗻𝗴𝗦𝗮𝘃𝗲𝗱𝗧𝗼𝗸𝗲𝗻 (qw(philiprbrenan ddd hello.txt));
-
+  
     confess "Read file using saved token FAILED" unless $s eq $S;
     success "Read file using saved token succeeded"
-
+  
 
 =head2 writeFolderUsingSavedToken($userid, $repository, $targetFolder, $localFolder, $accessFolderOrToken)
 
@@ -1560,19 +1609,19 @@ B<Example:>
 
     my $d = temporaryFolder;
     my $t = join '', 1..20;
-
+  
     my $g = gitHub
      (userid                    => q(philiprbrenan),
       personalAccessToken       => $t,
       personalAccessTokenFolder => $d,
      );
-
+  
             $g->𝘀𝗮𝘃𝗲𝗣𝗲𝗿𝘀𝗼𝗻𝗮𝗹𝗔𝗰𝗰𝗲𝘀𝘀𝗧𝗼𝗸𝗲𝗻;
     my $T = $g->loadPersonalAccessToken;
-
+  
     confess "Load/Save token FAILED" unless $t eq $T;
     success "Load/Save token succeeded"
-
+  
 
 =head2 loadPersonalAccessToken($gitHub)
 
@@ -1586,19 +1635,19 @@ B<Example:>
 
     my $d = temporaryFolder;
     my $t = join '', 1..20;
-
+  
     my $g = gitHub
      (userid                    => q(philiprbrenan),
       personalAccessToken       => $t,
       personalAccessTokenFolder => $d,
      );
-
+  
             $g->savePersonalAccessToken;
     my $T = $g->𝗹𝗼𝗮𝗱𝗣𝗲𝗿𝘀𝗼𝗻𝗮𝗹𝗔𝗰𝗰𝗲𝘀𝘀𝗧𝗼𝗸𝗲𝗻;
-
+  
     confess "Load/Save token FAILED" unless $t eq $T;
     success "Load/Save token succeeded"
-
+  
 
 
 =head2 GitHub::Crud Definition
@@ -1699,37 +1748,39 @@ B<status> - Our version of Status.
 
 10 L<listCommits|/listCommits> - List all the commits in a L<GitHub|https://github.com> repository.
 
-11 L<listRepositories|/listRepositories> - List the repositories accessible to a user on L<GitHub|https://github.com>.
+11 L<listCommitShas|/listCommitShas> - Create {commit name => sha} from the results of L<listCommits>.
 
-12 L<listWebHooks|/listWebHooks> - List web hooks associated with your L<GitHub|https://github.com> repository.
+12 L<listRepositories|/listRepositories> - List the repositories accessible to a user on L<GitHub|https://github.com>.
 
-13 L<loadPersonalAccessToken|/loadPersonalAccessToken> - Load a personal access token by userid from folder L<personalAccessTokenFolder|/personalAccessTokenFolder>.
+13 L<listWebHooks|/listWebHooks> - List web hooks associated with your L<GitHub|https://github.com> repository.
 
-14 L<new|/new> - Create a new L<GitHub|https://github.com> object with attributes as describe at: L<GitHub::Crud Definition>.
+14 L<loadPersonalAccessToken|/loadPersonalAccessToken> - Load a personal access token by userid from folder L<personalAccessTokenFolder|/personalAccessTokenFolder>.
 
-15 L<read|/read> - Read data from a file on L<GitHub|https://github.com>.
+15 L<new|/new> - Create a new L<GitHub|https://github.com> object with attributes as describe at: L<GitHub::Crud Definition>.
 
-16 L<readBlob|/readBlob> - Read a L<blob|https://en.wikipedia.org/wiki/Binary_large_object> from L<GitHub|https://github.com>.
+16 L<read|/read> - Read data from a file on L<GitHub|https://github.com>.
 
-17 L<readFileUsingSavedToken|/readFileUsingSavedToken> - Read from a file on L<GitHub|https://github.com> using a personal access token as supplied or saved in a file.
+17 L<readBlob|/readBlob> - Read a L<blob|https://en.wikipedia.org/wiki/Binary_large_object> from L<GitHub|https://github.com>.
 
-18 L<rename|/rename> - Rename a source file on L<GitHub|https://github.com> if the target file name is not already in use.
+18 L<readFileUsingSavedToken|/readFileUsingSavedToken> - Read from a file on L<GitHub|https://github.com> using a personal access token as supplied or saved in a file.
 
-19 L<savePersonalAccessToken|/savePersonalAccessToken> - Save a L<GitHub|https://github.com> personal access token by userid in folder L<personalAccessTokenFolder|/personalAccessTokenFolder>.
+19 L<rename|/rename> - Rename a source file on L<GitHub|https://github.com> if the target file name is not already in use.
 
-20 L<specialFileData|/specialFileData> - Do not encode or decode data with a known file signature
+20 L<savePersonalAccessToken|/savePersonalAccessToken> - Save a L<GitHub|https://github.com> personal access token by userid in folder L<personalAccessTokenFolder|/personalAccessTokenFolder>.
 
-21 L<write|/write> - Write utf8 data into a L<GitHub|https://github.com> file.
+21 L<specialFileData|/specialFileData> - Do not encode or decode data with a known file signature
 
-22 L<writeBlob|/writeBlob> - Write data into a L<GitHub|https://github.com> as a L<blob|https://en.wikipedia.org/wiki/Binary_large_object> that can be referenced by future commits.
+22 L<write|/write> - Write utf8 data into a L<GitHub|https://github.com> file.
 
-23 L<writeCommit|/writeCommit> - Write all the files in a B<$folder> (or just the the named files) into a L<GitHub|https://github.com> repository in parallel as a commit on the specified branch.
+23 L<writeBlob|/writeBlob> - Write data into a L<GitHub|https://github.com> as a L<blob|https://en.wikipedia.org/wiki/Binary_large_object> that can be referenced by future commits.
 
-24 L<writeFileFromFileUsingSavedToken|/writeFileFromFileUsingSavedToken> - Copy a file to L<GitHub|https://github.com>  using a personal access token as supplied or saved in a file.
+24 L<writeCommit|/writeCommit> - Write all the files in a B<$folder> (or just the the named files) into a L<GitHub|https://github.com> repository in parallel as a commit on the specified branch.
 
-25 L<writeFileUsingSavedToken|/writeFileUsingSavedToken> - Write to a file on L<GitHub|https://github.com> using a personal access token as supplied or saved in a file.
+25 L<writeFileFromFileUsingSavedToken|/writeFileFromFileUsingSavedToken> - Copy a file to L<GitHub|https://github.com>  using a personal access token as supplied or saved in a file.
 
-26 L<writeFolderUsingSavedToken|/writeFolderUsingSavedToken> - Write all the files in a local folder to a target folder on a named L<GitHub|https://github.com> repository using a personal access token as supplied or saved in a file.
+26 L<writeFileUsingSavedToken|/writeFileUsingSavedToken> - Write to a file on L<GitHub|https://github.com> using a personal access token as supplied or saved in a file.
+
+27 L<writeFolderUsingSavedToken|/writeFolderUsingSavedToken> - Write all the files in a local folder to a target folder on a named L<GitHub|https://github.com> repository using a personal access token as supplied or saved in a file.
 
 =head1 Installation
 
@@ -1812,6 +1863,20 @@ if (0) {                                                                        
    }
   confess "write FAILED" unless $g->exists;
   success "Write passed";
+ }
+
+if (0) {                                                                        # Write to and then read from a branch other than master - the branch must already exist in the repo
+  my $g = gitHub;
+  $g->gitFile = "zzz.data";
+  $g->branch  = "aaa";
+
+  $g->delete;
+  confess "delete branch FAILED" if $g->exists;
+
+  my $d = dateTimeStamp;
+  $g->write($d);
+  confess "write branch FAILED" unless $g->read eq $d;
+  success "Write branch passed";
  }
 
 if (0) {                                                                        # Write and read a zip file
@@ -1928,8 +1993,12 @@ if (0)
     "\nRead 2: ", dump($g->read);
  }
 
-if (0) {                                                                        #TlistCommits # List all commits
-  success "ListCommits passed:", dump(gitHub->listCommits);
+if (0) {                                                                        #TlistCommits #TlistCommitShas # List all commits
+  my $c = gitHub->listCommits;
+  my %s = listCommitShas $c;
+  lll "Commits\n",     dump $c;
+  lll "Commit shas\n", dump \%s;
+  success "ListCommits passed";
  }
 
 if (0) {                                                                        #Tlist

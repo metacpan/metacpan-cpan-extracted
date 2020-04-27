@@ -3,7 +3,7 @@ package Tags;
 use strict;
 use warnings;
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 1;
 
@@ -56,7 +56,7 @@ Install the Tags modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Tags>
+L<https://github.com/michal-josef-spacek/Tags>
 
 =head1 AUTHOR
 
@@ -66,11 +66,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2005-2018 Michal Josef Špaček
- BSD 2-Clause License
+© 2005-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION 
 
-0.01
+0.08
 
 =cut

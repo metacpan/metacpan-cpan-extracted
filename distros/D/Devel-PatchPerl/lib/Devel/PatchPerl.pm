@@ -1,5 +1,5 @@
 package Devel::PatchPerl;
-$Devel::PatchPerl::VERSION = '1.90';
+$Devel::PatchPerl::VERSION = '1.92';
 # ABSTRACT: Patch perl source a la Devel::PPPort's buildperl.pl
 
 use strict;
@@ -194,6 +194,7 @@ my @patch = (
               [ \&_patch_sdbm_file_c ],
               [ \&_patch_mmaix_pm ],
               [ \&_patch_time_local_t ],
+              [ \&_patch_pp_c_libc ],
             ],
   },
   {
@@ -10025,6 +10026,26 @@ TIMELOCALT5
   }
 }
 
+sub _patch_pp_c_libc {
+  my $perlver = shift;
+  my $num = _norm_ver( $perlver );
+  return unless $num > 5.008000;
+  return unless $num < 5.028000;
+  _patch_b64(<<'PPCLIBC');
+LS0tIHBwLmMKKysrIHBwLmMKQEAgLTM2NTMsOCArMzY1MywxMiBAQCBQUChwcF9jcnlwdCkKICNp
+ZiBkZWZpbmVkKF9fR0xJQkNfXykgfHwgZGVmaW5lZChfX0VNWF9fKQogCWlmIChQTF9yZWVudHJh
+bnRfYnVmZmVyLT5fY3J5cHRfc3RydWN0X2J1ZmZlcikgewogCSAgICBQTF9yZWVudHJhbnRfYnVm
+ZmVyLT5fY3J5cHRfc3RydWN0X2J1ZmZlci0+aW5pdGlhbGl6ZWQgPSAwOwotCSAgICAvKiB3b3Jr
+IGFyb3VuZCBnbGliYy0yLjIuNSBidWcgKi8KKyNpZiAoZGVmaW5lZChfX0dMSUJDX18pICYmIF9f
+R0xJQkNfXyA9PSAyKSAmJiBcCisgICAgKGRlZmluZWQoX19HTElCQ19NSU5PUl9fKSAmJiBfX0dM
+SUJDX01JTk9SX18gPj0gMiAmJiBfX0dMSUJDX01JTk9SX18gPCA0KQorCSAgICAvKiB3b3JrIGFy
+b3VuZCBnbGliYy0yLjIuNSBidWcsIGhhcyBiZWVuIGZpeGVkIGF0IHNvbWUKKwkgICAgICogdGlt
+ZSBpbiBnbGliYy0yLjMuWCAqLwogCSAgICBQTF9yZWVudHJhbnRfYnVmZmVyLT5fY3J5cHRfc3Ry
+dWN0X2J1ZmZlci0+Y3VycmVudF9zYWx0Yml0cyA9IDA7CisjZW5kaWYKIAl9CiAjZW5kaWYKICAg
+ICB9Cg==
+PPCLIBC
+}
+
 qq[patchin'];
 
 __END__
@@ -10039,7 +10060,7 @@ Devel::PatchPerl - Patch perl source a la Devel::PPPort's buildperl.pl
 
 =head1 VERSION
 
-version 1.90
+version 1.92
 
 =head1 SYNOPSIS
 

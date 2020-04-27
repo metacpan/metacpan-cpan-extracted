@@ -4,7 +4,10 @@ use strict;
 use warnings;
 use IO::Handle;
 use MPV::Simple;
-
+use Storable qw(freeze thaw);
+use Time::HiRes qw(usleep);
+use threads;
+use threads::shared;
 
 require Exporter;
 
@@ -29,8 +32,8 @@ our @EXPORT = qw(
 
 
 # Wake event loop up, when a command is passed to the mpv process
-our $wakeup;
-$SIG{USR1} = sub {$wakeup = 1};
+#our $wakeup;
+our $wakeup :shared;
 
 # Avoid zombies
 $SIG{CHLD} = 'IGNORE';
@@ -69,9 +72,10 @@ sub new {
         $obj->{evreader} = $evreader;
         $obj->{event_handling} = $opts{event_handling} || 0;
         bless $obj, $class;
+        usleep(100);
         return $obj;
     }
-    # Command Handler
+    # Event Handler
     else {
         close $reader2;
         close $writer;
@@ -83,99 +87,32 @@ sub new {
     
 }
 
-sub set_property_string {
-    my ($obj,@args) = @_;
-    my $args = join('###',@args);
-    my $line = "set_property_string###$args\n";
-    
-    my $writer = $obj->{writer};
-    print $writer $line;
-    kill(USR1 => $obj->{pid});
-    
-    my $reader = $obj->{reader};
-    my $ret = <$reader>;
-    chomp $ret;
-    return $ret;
-}
-
-sub get_property_string {
-    my ($obj,@args) = @_;
-    my $args = join('###',@args);
-    my $line = "get_property_string###$args\n";
-    my $writer = $obj->{writer};
-    print $writer $line;
-    kill(USR1 => $obj->{pid});
-    
-    my $reader = $obj->{reader};
-    my $ret = <$reader>;
-    chomp $ret;
-    return $ret;
-}
-
-sub observe_property_string {
-    my ($obj,@args) = @_;
-    my $args = join('###',@args);
-    my $line = "observe_property_string###$args\n";
-    my $writer = $obj->{writer};
-    print $writer $line;
-    kill(USR1 => $obj->{pid});
-    
-    my $reader = $obj->{reader};
-    my $ret = <$reader>;
-    chomp $ret;
-    return $ret;
-}
-
-sub unobserve_property {
-    my ($obj,@args) = @_;
-    my $args = join('###',@args);
-    my $line = "unobserve_property###$args\n";
-    my $writer = $obj->{writer};
-    print $writer $line;
-    kill(USR1 => $obj->{pid});
-    
-    my $reader = $obj->{reader};
-    my $ret = <$reader>;
-    chomp $ret;
-    return $ret;
-    
-}
-
-sub command {
-    my ($obj,@args) = @_;
-    my $args = join('###',@args);
-    my $line = "command###$args\n";
-    my $writer = $obj->{writer};
-    print $writer $line;
-    kill(USR1 => $obj->{pid});
-    
-    my $reader = $obj->{reader};
-    my $ret = <$reader>;
-    chomp $ret;
-    return $ret;
-}
-
-sub initialize {
-    my ($obj,@args) = @_;
-    my $args = join('###',@args);
-    my $line = "initialize###$args\n";
-    my $writer = $obj->{writer};
-    print $writer $line;
-    kill(USR1 => $obj->{pid});
-    
-    my $reader = $obj->{reader};
-    my $ret = <$reader>;
-    chomp $ret;
-    return $ret;
-}
-
 sub terminate_destroy {
     my ($obj,@args) = @_;
     my $args = join('###',@args);
     my $line = "terminate_destroy###$args\n";
     my $writer = $obj->{writer};
     print $writer $line;
-    kill(USR1 => $obj->{pid});
+}
+
+sub AUTOLOAD {
+    my ($obj,@args) = @_;
+    our $AUTOLOAD;
+    
+    # trim package name
+    my $func = $AUTOLOAD; 
+    $func =~ s/.*:://;
+    
+    my $args = join('###',@args);
+    my $line = "$func###$args\n";
+    
+    my $writer = $obj->{writer};
+    print $writer $line;
+    
+    my $reader = $obj->{reader};
+    my $ret = <$reader>;
+    chomp $ret;
+    return $ret;
 }
 
 sub mpv {
@@ -183,43 +120,47 @@ sub mpv {
     
     my $ctx = MPV::Simple->new() or die "Could not create MPV instance: $!\n";
     
-    # Process already existing commands
-    # otherwise there was arbitraries deadlock.Very curious...
-    #while ( my $line = <$reader> ) {
-    #        last unless ($line);
-    #        _process_command($ctx,$line,$writer2);
-    #   }
+    #New implementation: use mpv_set_wakeup_callback
+    $ctx->set_wakeup_callback('MPV::Simple::Pipe::wakeup');
     
-    $ctx->setup_event_notification();
+    #old implementation:
+    #$ctx->setup_event_notification();
     
     while (1) {
-        #print "Processing events/commands\n";
-        while ( my $line = <$reader> ) {
+        
+        while ( defined(my $line = <$reader>) ) {
             last unless ($line);
             _process_command($ctx,$line,$writer2);
-       }
-       
-       my $n = $ctx->has_events;;
-       # The following line blocks until new events occur
-       # or SIG{USR2}is fired
-       if ($wakeup || $n) {
-        while (my $event = $ctx->wait_event(0)) {
-                    my $id = $event->{id};
-                    last if ($id ==0);
-                    my $name = $event->{name} || '';
-                    my $data = $event->{data} || '';
-                    print $evwriter "$id###$name###$data\n" if ($opts{event_handling} && $id != 0);
-                    #use Storable qw(store_fd);
-                    #store_fd($event,$evwriter) if ($opts{event_handling} && $id != 0);
-                    
-                }
         }
+        
+        #old implementation
+        #my $wakeup = $ctx->has_events;
+        
+        while ($wakeup) {
+            $wakeup = 0;
+            
+            while (my $event = $ctx->wait_event(0)) {
+                        my $id = $event->{id};
+                        last if ($id == 0);
+                        my $name = $event->{name} || '';
+                        my $data = $event->{data} || '';
+                        my $event_name = $MPV::Simple::event_names[$id];
+                        print $evwriter "$id###$name###$data###$event_name\n" if ($opts{event_handling} && $id != 0);
+                    }
+            }
+            
+        # We have to add a little sleep to save CPU!    
+        usleep(100);
             
     }
     close $writer2;
     close $evwriter;
     close $reader;
     exit 0;
+}
+
+sub wakeup {
+    $wakeup = 1;
 }
 
 sub _process_command {
@@ -245,24 +186,26 @@ sub _process_command {
                 print "FEHLER:$@\n";
         }
         
-        #use Data::Dumper;
-        #print "RET ". $return ."\n";
         print $writer2  "$return\n";
     }
-    $wakeup = 0;
+    
 }
 
 sub get_events {
     my ($self) = @_;
     my $evreader = $self->{evreader};
-    #my $line = $evreader->getline || undef;
+    
     my $line = <$evreader>;
     return undef unless ($line);
     chomp $line;
-    my ($event_id,$name,$data) = split('###',$line);
+    
+    #my $event = thaw($line);
+    #return $event;
+    
+    my ($event_id,$name,$data,$event_name) = split('###',$line);
     return {
         event_id => $event_id,
-        event => $MPV::Simple::event_names[$event_id],
+        event => $event_name,
         name => $name,
         data => $data,
     };
@@ -293,9 +236,10 @@ MPV::Simple::Pipe
     use utf8;
     use MPV::Simple::Pipe;
     use Tcl::Tk;
+    use Time::HiRes qw(usleep);
     
     # 1) It is recommended to to create the MPV::Simple::Pipe object before TCL
-    # interpreter even if it seems not as necessary as in MPV::Simple::JSON
+    # interpreter because this forks and copies the perl environment
     # 2) If you want to handle events you have to pass a true value to the 
     # option event_handling 
     my $mpv = MPV::Simple::Pipe->new(event_handling => 1);
@@ -307,20 +251,22 @@ MPV::Simple::Pipe
     # Create the video frame
     my $f = $mw->Frame(-width => 640, -height => 480)->pack(-expand =>1,-fill => "both");
     
-    $mpv->initialize();
-    
-    # With the MPV property "wid" you can embed MPV in a foreign window
-    $mpv->set_property_string("wid",$f->id());
-    
-    # The video shall start paused here
-    $mpv->set_property_string('pause','yes');
-    
-    # Load a video file
-    $mpv->command("loadfile", "path_to_video.ogg");
-    
-    # For handling events you must repeatly call a event handler.
-    # I think, it is enough to call the event handler every 500/1000ms
-    $int->call('after',1000,\&handle_events);
+    # Until the video frame is mapped, we set up the MPV Player in this video frame
+    $f->bind('<Map>' => sub {
+        $f->bind('<Map>' => sub {});
+        
+        $mpv->initialize();
+        
+        # The video shall start paused here
+        $mpv->set_property_string("pause","yes");
+        
+        # With the MPV property "wid" you can embed MPV in a foreign window
+        # (therefore it was important, that $f is already mapped!)
+        $mpv->set_property_string("wid",$f->id());
+        
+        # Load a video file
+        $mpv->command("loadfile", "path_to_video.ogg");
+    });
     
     my $b1 = $mw->Button(
         -text   =>  "Play",
@@ -340,28 +286,44 @@ MPV::Simple::Pipe
     )->pack(-side => 'left');
     my $b5 = $mw->Button(
         -text   =>  "Close",
-        -command => sub {$mpv->terminate_destroy();$mw->destroy();}
+        # I recommend to destroy first the Tcl::Tk main window, and
+        # then the mpv instance
+        -command => sub {$mw->destroy();$mpv->terminate_destroy();}
     )->pack(-side => 'left');
-    $int->MainLoop;
+    
+    # In this example the Tcl loop coexists with the MPV loop
+    # see L<https://docstore.mik.ua/orelly/perl3/tk/ch15_09.htm>
+    # Another approach (especially if coexisting loops are not possible) 
+    # would be using a timer, see MPV::Simple:JSON for an example
+    loop($int);
+    
+    sub loop {
+        my $int = shift;
+        while ($int->Eval("info commands .")) { 
+            while (my $stat = $int->DoOneEvent(Tcl::DONT_WAIT) ) {}
+            while (my $event = $mpv->get_events() ){handle_event($event);}
+            
+            # Important: We add a little sleep to save CPU!
+            usleep(100);
+        }
+        print "Shuting down..\n";
+        $mpv->terminate_destroy();
+    }
     
     # Event handler
     # If you set $opt{event_handling} to a true value in the constructor
     # the events are sent through a non-blocking pipe ($mpv->{evreader}) you can access 
-    # by the method $mpv->get_events(); which returns a hashref of the event
+    # events by the method $mpv->get_events(); which returns a hashref of the event
     # The event_ids can be translated to the event names with the global array 
     # $MPV::Simple::event_names[$id]
-    sub handle_events {
-        while ( my $event = $mpv->get_events() ) {
-            if ($event->{event} eq "property-change") {
-                    print "prop ".$event->{name}." changed to ".$event->{data}." %\n";
-            }
-            else {
-                    print $event->{event}."\n";
-            }
+    sub handle_event {
+        my $event = shift;
+        if ($event->{event} eq "property-change") {
+            print "prop ".$event->{name}." changed to ".$event->{data}." %\n";
         }
-    
-    # Don't forget to call the event handler repeatly
-    $int->call('after',1000,\&handle_events);
+        else {
+            print $event->{event}."\n";
+        }
     }
     
 =head1 DESCRIPTION

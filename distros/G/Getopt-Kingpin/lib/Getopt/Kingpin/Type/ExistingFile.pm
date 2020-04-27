@@ -5,7 +5,7 @@ use warnings;
 use Carp;
 use Path::Tiny;
 
-our $VERSION = "0.07";
+our $VERSION = "0.08";
 
 sub set_value {
     my $self = shift;
@@ -13,13 +13,13 @@ sub set_value {
 
     my $p = path($value);
     if ($p->is_dir) {
-        printf STDERR "error: '%s' is a directory, try --help", $value;
-        exit 1;
+        printf STDERR "error: '%s' is a directory, try --help\n", $value;
+        return undef, 1;
     } elsif ($p->is_file) {
         # ok
     } else {
-        printf STDERR "error: path '%s' does not exist, try --help", $value;
-        exit 1;
+        printf STDERR "error: path '%s' does not exist, try --help\n", $value;
+        return undef, 1;
     }
     return $p;
 }

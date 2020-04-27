@@ -5,33 +5,25 @@ use warnings;
 use Wasm::Wasmtime::FFI;
 
 # ABSTRACT: Global configuration for Wasm::Wasmtime::Engine
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 $ffi_prefix = 'wasm_config_';
-$ffi->type('opaque' => 'wasm_config_t');
+$ffi->load_custom_type('::PtrObject' => 'wasm_config_t' => __PACKAGE__);
 
 
-$ffi->attach( new => [] => 'wasm_config_t' => sub {
-  my($xsub, $class) = @_;
-  bless {
-    ptr => $xsub->(),
-  }, $class;
-});
+$ffi->attach( new => [] => 'wasm_config_t' );
 
-$ffi->attach( [ 'delete' => 'DESTROY' ] => ['wasm_config_t'] => sub {
-  my($xsub, $self) = @_;
-  $xsub->($self->{ptr}) if $self->{ptr};
-});
+_generate_destroy();
 
 
 foreach my $prop (qw( debug_info wasm_threads wasm_reference_types
                       wasm_simd wasm_bulk_memory wasm_multi_value
                       cranelift_debug_verifier ))
 {
-  $ffi->attach( [ "wasmtime_config_${prop}_set" => $prop ] => [ 'opaque', 'bool' ] => sub {
+  $ffi->attach( [ "wasmtime_config_${prop}_set" => $prop ] => [ 'wasm_config_t', 'bool' ] => sub {
     my($xsub, $self, $value) = @_;
-    $xsub->($self->{ptr}, $value);
+    $xsub->($self, $value);
     $self;
   });
 }
@@ -49,7 +41,7 @@ if(Wasm::Wasmtime::Error->can('new'))
     my($xsub, $self, $value) = @_;
     if(defined $strategy{$value})
     {
-      if(my $error = $xsub->($self->{ptr}, $strategy{$value}))
+      if(my $error = $xsub->($self, $strategy{$value}))
       {
         Carp::croak($error->message);
       }
@@ -67,7 +59,7 @@ else
     my($xsub, $self, $value) = @_;
     if(defined $strategy{$value})
     {
-      unless(my $ret = $xsub->($self->{ptr}, $strategy{$value}))
+      unless(my $ret = $xsub->($self, $strategy{$value}))
       {
         Carp::croak("error setting strategy $value");
       }
@@ -91,7 +83,7 @@ $ffi->attach( ['wasmtime_config_cranelift_opt_level_set' => 'cranelift_opt_level
   my($xsub, $self, $value) = @_;
   if(defined $cranelift_opt_level{$value})
   {
-    $xsub->($self->{ptr}, $cranelift_opt_level{$value});
+    $xsub->($self, $cranelift_opt_level{$value});
   }
   else
   {
@@ -99,7 +91,6 @@ $ffi->attach( ['wasmtime_config_cranelift_opt_level_set' => 'cranelift_opt_level
   }
   $self;
 });
-
 
 
 my %profiler = (
@@ -113,7 +104,7 @@ if(Wasm::Wasmtime::Error->can('new'))
     my($xsub, $self, $value) = @_;
     if(defined $profiler{$value})
     {
-      if(my $error = $xsub->($self->{ptr}, $profiler{$value}))
+      if(my $error = $xsub->($self, $profiler{$value}))
       {
         Carp::croak($error->message);
       }
@@ -131,7 +122,7 @@ else
     my($xsub, $self, $value) = @_;
     if(defined $profiler{$value})
     {
-      unless(my $ret = $xsub->($self->{ptr}, $profiler{$value}))
+      unless(my $ret = $xsub->($self, $profiler{$value}))
       {
         Carp::croak("error setting profiler $value");
       }
@@ -158,7 +149,7 @@ Wasm::Wasmtime::Config - Global configuration for Wasm::Wasmtime::Engine
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

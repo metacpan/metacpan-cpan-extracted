@@ -45,10 +45,14 @@ WriteMakefile(
         'meta-spec' => { version => 2 },
         dynamic_config => 0,
         resources => {
+            # GitHub mirrors from Shadowcat. We list it so we can get pull requests.
+            # The canonical repo is:
+            # r/o: git://git.shadowcat.co.uk/p5sagit/Devel-Declare.git
             # r/w: p5sagit@git.shadowcat.co.uk:Devel-Declare.git
+            # web: http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=p5sagit/Devel-Declare.git
             repository => {
-                url => 'git://git.shadowcat.co.uk/p5sagit/Devel-Declare.git',
-                web => 'http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=p5sagit/Devel-Declare.git',
+                url => 'https://github.com/p5sagit/Devel-Declare.git',
+                web => 'https://github.com/p5sagit/Devel-Declare',
                 type => 'git',
             },
             bugtracker => {

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.020;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Carp qw(cluck confess);
 use JSON;
@@ -265,6 +265,39 @@ sub train_no {
 	return $self->{data}{istformation}{zugnummer};
 }
 
+sub train_powertype {
+	my ($self) = @_;
+
+	if ( exists $self->{train_powertype} ) {
+		return $self->{train_powertype};
+	}
+
+	my @wagons = $self->wagons;
+	my %ml     = map { $_ => 0 } ( 90 .. 99 );
+
+	for my $wagon (@wagons) {
+
+		if ( not $wagon->uic_id or length( $wagon->uic_id ) != 12 ) {
+			next;
+		}
+
+		my $wagon_type = substr( $wagon->uic_id, 0, 2 );
+		if ( $wagon_type < 90 ) {
+			next;
+		}
+
+		$ml{$wagon_type}++;
+	}
+
+	my @likelihood = reverse sort { $ml{$a} <=> $ml{$b} } keys %ml;
+
+	if ( $ml{ $likelihood[0] } == 0 ) {
+		return $self->{train_powertype} = undef;
+	}
+
+	return $self->{train_powertype} = $likelihood[0];
+}
+
 sub train_subtype {
 	my ($self) = @_;
 
@@ -272,7 +305,8 @@ sub train_subtype {
 		return $self->{train_subtype};
 	}
 
-	my @wagons = $self->wagons;
+	my @wagons          = $self->wagons;
+	my $with_restaurant = 0;
 
 	my %ml = (
 		'ICE 1'     => 0,
@@ -289,6 +323,9 @@ sub train_subtype {
 		if ( not $wagon->model ) {
 			next;
 		}
+		if ( $wagon->type eq 'WRmz' ) {
+			$with_restaurant = 1;
+		}
 		if ( $wagon->model == 401
 			or ( $wagon->model >= 801 and $wagon->model <= 804 ) )
 		{
@@ -303,18 +340,18 @@ sub train_subtype {
 			$ml{'ICE 3'}++;
 		}
 		elsif ( $wagon->model == 407 ) {
-			$ml{'ICE 3 V'}++;
+			$ml{'ICE 3 Velaro'}++;
 		}
 		elsif ( $wagon->model == 412 or $wagon->model == 812 ) {
 			$ml{'ICE 4'}++;
 		}
-		elsif ( $wagon->model == 411 ) {
-			$ml{'ICE T 411'}++;
+		elsif ( $wagon->model == 411 or $wagon->model == 415 ) {
+			$ml{'ICE T'}++;
 		}
-		elsif ( $wagon->model == 415 ) {
-			$ml{'ICE T 415'}++;
+		elsif ( $wagon->model == 475 ) {
+			$ml{'TGV'}++;
 		}
-		elsif ( $wagon->is_dosto ) {
+		elsif ( $self->train_type eq 'IC' and $wagon->is_dosto ) {
 			$ml{'IC2'}++;
 		}
 	}
@@ -328,6 +365,10 @@ sub train_subtype {
 	}
 
 	$self->{train_subtype} = $likelihood[0];
+
+	if ( $self->{train_subtype} eq 'ICE 3' and $with_restaurant ) {
+		$self->{train_subtype} = 'ICE 3 Redesign';
+	}
 	return $self->{train_subtype};
 }
 
@@ -341,7 +382,8 @@ sub wagons {
 	for my $group ( @{ $self->{data}{istformation}{allFahrzeuggruppe} } ) {
 		for my $wagon ( @{ $group->{allFahrzeug} } ) {
 			my $wagon_object
-			  = Travel::Status::DE::DBWagenreihung::Wagon->new( %{$wagon} );
+			  = Travel::Status::DE::DBWagenreihung::Wagon->new( %{$wagon},
+				train_no => $group->{verkehrlichezugnummer} );
 			push( @{ $self->{wagons} }, $wagon_object );
 			if ( not $wagon_object->{position}{valid} ) {
 				$self->{has_bad_wagons} = 1;
@@ -436,7 +478,9 @@ Travel::Status::DE::DBWagenreihung - Interface to Deutsche Bahn Wagon Order API.
 
 =head1 VERSION
 
-version 0.02
+version 0.03
+
+This is beta software. The API may change without notice.
 
 =head1 DESCRIPTION
 

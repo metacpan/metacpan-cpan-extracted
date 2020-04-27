@@ -9,11 +9,11 @@ use Wasm::Wasmtime::ExportType;
 use Carp ();
 
 # ABSTRACT: Wasmtime module class
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 $ffi_prefix = 'wasm_module_';
-$ffi->type('opaque' => 'wasm_module_t');
+$ffi->load_custom_type('::PtrObject' => 'wasm_module_t' => __PACKAGE__);
 
 sub _args
 {
@@ -63,12 +63,12 @@ sub _args
 if(Wasm::Wasmtime::Error->can('new'))
 {
 
-  $ffi->attach( [ wasmtime_module_new => 'new' ] => ['wasm_store_t', 'wasm_byte_vec_t*', 'wasm_module_t*'] => 'wasmtime_error_t' => sub {
+  $ffi->attach( [ wasmtime_module_new => 'new' ] => ['wasm_store_t', 'wasm_byte_vec_t*', 'opaque*'] => 'wasmtime_error_t' => sub {
     my $xsub = shift;
     my $class = shift;
     my($store, $wasm, $data) = _args(@_);
     my $ptr;
-    if(my $error = $xsub->($store->{ptr}, $$wasm, \$ptr))
+    if(my $error = $xsub->($store, $$wasm, \$ptr))
     {
       Carp::croak("error creating module: " . $error->message);
     }
@@ -79,7 +79,7 @@ if(Wasm::Wasmtime::Error->can('new'))
     my $xsub = shift;
     my $class = shift;
     my($store, $wasm, $data) = _args(@_);
-    my $error = $xsub->($store->{ptr}, $$wasm);
+    my $error = $xsub->($store, $$wasm);
     wantarray  ## no critic (Freenode::Wantarray)
       ? $error ? (0, $error->message) : (1, '')
       : $error ? 0 : 1;
@@ -93,19 +93,17 @@ else
     my $xsub = shift;
     my $class = shift;
     my($store, $wasm, $data) = _args(@_);
-    my $ptr = $xsub->($store->{ptr}, $$wasm);
-    Carp::croak("error creating module") unless $ptr;
-    bless {
-      ptr   => $ptr,
-      store => $store,
-    }, $class;
+    my $self = $xsub->($store, $$wasm);
+    Carp::croak("error creating module") unless $self;
+    $self->{store} = $store;
+    $self;
   });
 
   $ffi->attach( validate => ['wasm_store_t','wasm_byte_vec_t*'] => 'bool' => sub {
     my $xsub = shift;
     my $class = shift;
     my($store, $wasm, $data) = _args(@_);
-    my $ok = $xsub->($store->{ptr}, $$wasm);
+    my $ok = $xsub->($store, $$wasm);
     wantarray  ## no critic (Freenode::Wantarray)
       ? $ok ? (1, '') : (0, 'unknown error')
       : $ok ? 1 : 0;
@@ -117,7 +115,7 @@ else
 $ffi->attach( exports => [ 'wasm_module_t', 'wasm_exporttype_vec_t*' ] => sub {
   my($xsub, $self) = @_;
   my $exports = Wasm::Wasmtime::ExportTypeVec->new;
-  $xsub->($self->{ptr}, $exports);
+  $xsub->($self, $exports);
   $exports->to_list;
 });
 
@@ -125,7 +123,7 @@ $ffi->attach( exports => [ 'wasm_module_t', 'wasm_exporttype_vec_t*' ] => sub {
 $ffi->attach( imports => [ 'wasm_module_t', 'wasm_importtype_vec_t*' ] => sub {
   my($xsub, $self) = @_;
   my $imports = Wasm::Wasmtime::ImportTypeVec->new;
-  $xsub->($self->{ptr}, $imports);
+  $xsub->($self, $imports);
   $imports->to_list;
 });
 
@@ -148,10 +146,7 @@ sub get_export
   $self->{exports}->{$name};
 }
 
-$ffi->attach( [ 'delete' => 'DESTROY' ] => ['wasm_module_t'] => sub {
-  my($xsub, $self) = @_;
-  $xsub->($self->{ptr}) if $self->{ptr};
-});
+_generate_destroy();
 
 1;
 
@@ -167,7 +162,7 @@ Wasm::Wasmtime::Module - Wasmtime module class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

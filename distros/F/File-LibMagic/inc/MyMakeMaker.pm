@@ -1,19 +1,28 @@
-package MyMakeMaker;
+package inc::MyMakeMaker;
 
 # ABSTRACT: build a Makefile.PL that uses ExtUtils::MakeMaker
 use Moose;
 
 use namespace::autoclean;
 
-extends 'Dist::Zilla::Plugin::MakeMaker::Awesome';
+extends 'Dist::Zilla::Plugin::DROLSKY::MakeMaker';
+
+# We need to override this because we remove the DROLSKY::MakeMaker plugin
+# from our config, and that's where this value is passed from our bundle.
+has '+has_xs' => (
+    default => 1,
+);
 
 override _build_WriteMakefile_args => sub {
     my $self = shift;
 
     my $args = super();
 
-    $args->{PM}
-        = { 'lib/File/LibMagic.pm' => '$(INST_LIB)/File/LibMagic.pm' };
+    $args->{PM} = {
+        'lib/File/LibMagic.pm' => '$(INST_LIB)/File/LibMagic.pm',
+        'lib/File/LibMagic/Constants.pm' =>
+            '$(INST_LIB)/File/LibMagic/Constants.pm',
+    };
     $args->{LIBS}   = '-lmagic';
     $args->{INC}    = '-I. -Ic';
     $args->{XS}     = { 'lib/File/LibMagic.xs' => 'lib/File/LibMagic.c' };
@@ -32,7 +41,7 @@ override _build_WriteMakefile_dump => sub {
 
     my $dump = super();
     $dump .= <<'EOF';
-$WriteMakefileArgs{DEFINE} = _defines();
+$WriteMakefileArgs{DEFINE} = ( $WriteMakefileArgs{DEFINE} || q{} ) . _defines();
 $WriteMakefileArgs{INC}    = join q{ }, _includes(), $WriteMakefileArgs{INC};
 $WriteMakefileArgs{LIBS}   = join q{ }, _libs(), $WriteMakefileArgs{LIBS};
 
@@ -51,7 +60,6 @@ __PACKAGE__->meta->make_immutable;
 
 __DATA__
 
-use lib qw( inc );
 use Config::AutoConf;
 use Getopt::Long;
 
@@ -74,9 +82,16 @@ sub _defines {
 
     _check_libmagic($ac);
 
-    return $ac->check_lib( 'magic', 'magic_version' )
-        ? '-DHAVE_MAGIC_VERSION'
-        : q{};
+    my @defs;
+    push @defs, '-DHAVE_MAGIC_VERSION'
+            if $ac->check_lib( 'magic', 'magic_version' );
+    push @defs, '-DHAVE_MAGIC_SETPARAM'
+            if $ac->check_lib( 'magic', 'magic_setparam' );
+    push @defs, '-DHAVE_MAGIC_GETPARAM'
+            if $ac->check_lib( 'magic', 'magic_getparam' );
+
+    return q{} unless @defs;
+    return q{ } . join q{ }, @defs;
 }
 
 sub _check_libmagic {

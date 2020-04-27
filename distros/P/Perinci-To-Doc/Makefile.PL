@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     "File::Temp" => 0,
     "File::Which" => 0,
     "Locale::TextDomain::UTF8" => 0,
-    "Log::ger" => "0.027",
+    "Log::ger" => "0.037",
     "Markdown::To::POD" => "0.02",
     "Moo" => 0,
     "Moo::Role" => 0,
@@ -58,7 +58,7 @@ my %WriteMakefileArgs = (
     "Perinci::Access::Perl" => "0.87",
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.870",
+  "VERSION" => "0.872",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -75,7 +75,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Locale::TextDomain::UTF8" => 0,
-  "Log::ger" => "0.027",
+  "Log::ger" => "0.037",
   "Markdown::To::POD" => "0.02",
   "Moo" => 0,
   "Moo::Role" => 0,

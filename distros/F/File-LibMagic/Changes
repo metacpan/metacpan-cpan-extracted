@@ -1,3 +1,54 @@
+1.22     2020-04-26
+
+- This is a stable release with the same changes as 1.21. See the change logs
+  for 1.17 and 1.21 for details of what's new.
+
+
+1.21     2020-04-04 (TRIAL RELEASE)
+
+- Add two class methods that provide introspection on the available limit
+  processing parameters, max_param_constant() and
+  limit_key_is_supported(). Based on a PR from Paul Wise. GH #24.
+
+
+1.20     2020-03-28 (TRIAL RELEASE)
+
+- Fix one last test that assumed a limit parameter was available. Reported by
+  Slaven Rezić. GH #22.
+
+
+1.19     2020-03-28 (TRIAL RELEASE)
+
+- Fix tests that still mistakenly assumed that all limit parameter constants
+  should be exported by File::LibMagic. Reported by Slaven Rezić. GH #22.
+
+
+1.18     2020-03-28 (TRIAL RELEASE)
+
+- Not all versions of libmagic support setting processing limits, and those
+  that do may not support all the limit parameters that the most recent
+  version supports. This release fixes compilation and runtime issues that
+  would occur with older libmagic versions that don't support the same options
+  as the version I have installed locally. Reported by Slaven Rezić. GH #22.
+
+
+1.17     2020-03-28 (TRIAL RELEASE)
+
+- Switched to using GitHub issues.
+
+- Removed embedded copy of Config::AutoConf from distro. Instead this is now a
+  configure phase prereq. Implemented by Paul Wise. GH #19.
+
+- Moved list of constants in libmagic that we care about to one
+  module. Implemented by Paul Wise. GH #20.
+
+- Add support for setting libmagic processing limits. Implemented by Paul
+  Wise. GH #15.
+
+- Check all libmagic function return values properly and croak on
+  failure. Implemented by Paul Wise. GH #21.
+
+
 1.16     2017-10-22
 
 - Added a doc note on installing the required dependencies on Red Hat. RT
@@ -188,7 +239,7 @@
 
 0.93     2009-05-12
       using Devel::CheckLib as suggested in 
-      http://wiki.cpantesters.org/wiki/CPANAuthorNotes
+      http://cpanwiki.grango.org/wiki/CPANAuthorNotes
 
 0.92     2009-05-12
       "normalisation"-problem -> changed t/6-oo.t
@@ -197,7 +248,7 @@
       Changed t/6-oo.t in order to pass 'make test' for file-5.x
 
 0.90     2008-11-26
-      removed some debugging code I accidently left in
+      removed some debugging code I accidentally left in
 
 0.89     2008-08-06
       added -lz to Makefile.PL in order to compile under 
@@ -235,7 +286,7 @@
       Port to AMD-64, thanks to Nathan Hawkins <utsl@quic.net>
 
 0.80     2004-07-21
-      some improvements in colaboration with James Olin Oden <joden@lee.k12.nc.us> 
+      some improvements in collaboration with James Olin Oden <joden@lee.k12.nc.us> 
 
 0.10     2004-04-19
       some cleanup

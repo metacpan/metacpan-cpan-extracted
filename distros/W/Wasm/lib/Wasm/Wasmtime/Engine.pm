@@ -6,25 +6,22 @@ use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::Config;
 
 # ABSTRACT: Wasmtime engine class
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 $ffi_prefix = 'wasm_engine_';
-$ffi->type('opaque' => 'wasm_engine_t');
+$ffi->load_custom_type('::PtrObject' => 'wasm_engine_t' => __PACKAGE__ );
 
 
 $ffi->attach( [ 'new_with_config' => 'new' ] => ['wasm_config_t'] => 'wasm_engine_t' => sub {
   my($xsub, $class, $config) = @_;
   $config ||= Wasm::Wasmtime::Config->new;
-  bless {
-    ptr => $xsub->(delete $config->{ptr}),
-  }, $class;
+  my $self = $xsub->($config),
+  delete $config->{ptr};
+  $self;
 });
 
-$ffi->attach( [ 'delete' => 'DESTROY' ] => ['wasm_engine_t'] => sub {
-  my($xsub, $self) = @_;
-  $xsub->($self->{ptr}) if $self->{ptr};
-});
+_generate_destroy();
 
 1;
 
@@ -40,7 +37,7 @@ Wasm::Wasmtime::Engine - Wasmtime engine class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

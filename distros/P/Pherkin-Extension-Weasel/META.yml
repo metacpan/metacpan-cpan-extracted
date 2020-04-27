@@ -30,7 +30,7 @@ requires:
 resources:
   bugtracker: https://github.com/ehuelsmann/pherkin-extension-weasel/issues
   repository: https://github.com/ehuelsmann/pherkin-extension-weasel.git
-version: '0.13'
+version: '0.14'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Yves Lavoie <ylavoie@yveslavoie.com>'

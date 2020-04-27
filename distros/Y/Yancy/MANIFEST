@@ -140,6 +140,7 @@ t/fixtures/foreign-key-field/pg.sql
 t/fixtures/foreign-key-field/schema.json
 t/fixtures/foreign-key-field/sqlite.sql
 t/helpers.t
+t/i18n.t
 t/lib/Digest/Broken.pm
 t/lib/Local/Controller/Extend/Yancy.pm
 t/lib/Local/Schema.pm

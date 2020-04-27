@@ -1,7 +1,9 @@
 package Perinci::CmdLine::POD;
 
-our $DATE = '2019-01-25'; # DATE
-our $VERSION = '0.017'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-27'; # DATE
+our $DIST = 'Perinci-CmdLine-POD'; # DIST
+our $VERSION = '0.018'; # VERSION
 
 use 5.010001;
 use strict;
@@ -50,8 +52,12 @@ sub _fmt_opt {
 
     push @res, "Default value:\n\n ", dmp($ospec->{default}), "\n\n" if $show_default;
 
-    if ($arg_spec->{schema} && $arg_spec->{schema}[1]{in} && !$ospec->{is_alias}) {
-        push @res, "Valid values:\n\n ", dmp($arg_spec->{schema}[1]{in}), "\n\n";
+    if ($arg_spec->{schema} && !$ospec->{is_alias}) {
+        if ($arg_spec->{schema}[1]{in}) {
+            push @res, "Valid values:\n\n ", dmp($arg_spec->{schema}[1]{in}), "\n\n";
+        } elsif ($arg_spec->{schema}[1]{examples}) {
+            push @res, "Example valid values:\n\n ", dmp($arg_spec->{schema}[1]{examples}), "\n\n";
+        }
     }
 
     if ($ospec->{main_opt}) {
@@ -243,6 +249,7 @@ _
 };
 sub gen_pod_for_pericmd_script {
     no warnings 'once';
+    require Text::Wrap;
 
     my %args = @_;
 
@@ -401,7 +408,7 @@ sub gen_pod_for_pericmd_script {
                     if (defined $gen_sc) { next unless $sc_name eq $gen_sc }
                     my $usage = $clidocdata{$sc_name}->{usage_line};
                     $usage =~ s/\[\[prog\]\]/$program_name $sc_name/;
-                    push @sectpod, " % $usage\n";
+                    push @sectpod, Text::Wrap::wrap(' % ', '     ', "$usage\n");
                 }
             } else {
                 push @sectpod, " % $program_name [options] [subcommand] [arg]...\n";
@@ -410,7 +417,7 @@ sub gen_pod_for_pericmd_script {
         } else {
             my $usage = $clidocdata{''}->{usage_line};
             $usage =~ s/\[\[prog\]\]/$program_name/;
-            push @sectpod, " % $usage\n\n";
+            push @sectpod, Text::Wrap::wrap(" % ", "     ", "$usage\n")."\n";
         }
 
         my @examples;
@@ -982,7 +989,7 @@ Perinci::CmdLine::POD - Generate POD for Perinci::CmdLine-based CLI script
 
 =head1 VERSION
 
-This document describes version 0.017 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2019-01-25.
+This document describes version 0.018 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2020-04-27.
 
 =head1 SYNOPSIS
 
@@ -1096,6 +1103,7 @@ Set `summary` attribute, see Perinci::CmdLine::Base.
 
 Set `url` attribute, see Perinci::CmdLine::Base for more details.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1135,7 +1143,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,10 +1,10 @@
 {
-   "abstract" : "Adding keywords to perl, in perl",
+   "abstract" : "(DEPRECATED) Adding keywords to perl, in perl",
    "author" : [
       "Matt S Trout - <mst@shadowcat.co.uk> - original author"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.2501, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -51,11 +51,11 @@
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://git.shadowcat.co.uk/p5sagit/Devel-Declare.git",
-         "web" : "http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=p5sagit/Devel-Declare.git"
+         "url" : "https://github.com/p5sagit/Devel-Declare.git",
+         "web" : "https://github.com/p5sagit/Devel-Declare"
       }
    },
-   "version" : "0.006019",
+   "version" : "0.006022",
    "x_contributors" : [
       "Florian Ragwitz <rafl@debian.org>",
       "Matt S Trout <mst@shadowcat.co.uk>",
@@ -76,5 +76,5 @@
       "Yanick Champoux <yanick@babyl.dyndns.org>"
    ],
    "x_deprecated" : 1,
-   "x_serialization_backend" : "JSON::MaybeXS version 1.003009"
+   "x_serialization_backend" : "JSON::MaybeXS version 1.004"
 }

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,54 +12,61 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 624ccb402df443843b77fda690dc4fca9898ffb1 Changes
-SHA1 2c511157dfdf92a515f663ead7842444270de63a LICENSE
-SHA1 02a5703ff3939d65b72436f6e9bf917761f03ad4 MANIFEST
-SHA1 874ded6e3d7fb3f651523d83922be70c2f4fb8ee META.yml
-SHA1 bd1f77ecaf7ae2bca545320f11be46947f6c1f12 Makefile.PL
-SHA1 f37906bed9f42501575abc5287bfe54f408fc6f8 README
-SHA1 13c0c00f9a7560053374f0b62a0c3f81cea92505 Tags.pm
-SHA1 f4bc050ceec57082833a9bbe619284f8300b0d1e examples/ex1.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 65818ac16a85564f4453364ef82c701cef1531e2 t/PYX-SGML-Tags/01-use.t
-SHA1 f96ed52a25fd04f245450fde6986f7abf6fb1864 t/PYX-SGML-Tags/02-version.t
-SHA1 f6f886e56e5254b231b545ee2f87274053157c4b t/PYX-SGML-Tags/03-new.t
-SHA1 c6b922924aada4695fcd1f2109a2412863f09869 t/PYX-SGML-Tags/04-parse_file-char.t
-SHA1 13fad71296c73fb11bfa559327fe02bacae0c8dd t/PYX-SGML-Tags/05-parse_file-instruction.t
-SHA1 16d8056d62dcbd9215aca1b96d10db2a92bfc5d7 t/PYX-SGML-Tags/06-parse_file-comment.t
-SHA1 1bd7382cd0415956f224243711ca6831760d3f6c t/PYX-SGML-Tags/07-parse_file-tag.t
-SHA1 acdb3822e3f9407eb7112244141b16fae4ba148f t/data/char1.pyx
-SHA1 ab84cb603a94e57dc53774fa1bc99a2280a3b236 t/data/char2.pyx
-SHA1 e078943c5e96dfdbfd35f9c30d6d005d5e2e72be t/data/comment1.pyx
-SHA1 0c0f811e2d2a074edb98116d36975db4674180bb t/data/comment2.pyx
-SHA1 b8ea03c263d314f0eb829e9f14d9303b78cedae7 t/data/instruction1.pyx
-SHA1 28c1f6c54a1f700482c30a3c765177cabad1c378 t/data/instruction2.pyx
-SHA1 62e4b213fc3e67db97e647e865929188ff6883c6 t/data/tag1.pyx
-SHA1 1285e641b51d707aa2c051dce42a472674c61bb0 t/data/tag2.pyx
-SHA1 b4530008ba8974a5808bfdaf6a20ef66fa20caf1 t/data/tag3.pyx
-SHA1 8e285f9babee89d05a50c6b3c0a5964528b1e06f t/data/tag4.pyx
-SHA1 f98cdcf6c16a2fbef2f234b962e58e55034903cb xt/PYX-SGML-Tags/01-pod_coverage.t
-SHA1 d6af287d935876d2e19dec4c81aef1854423ecd3 xt/PYX-SGML-Tags/02-pod.t
+SHA256 f5cec69cccc933e05b46b338154677d4c941701bb855edb3d35adff1601f400e Changes
+SHA256 0ed14285b9b297d9a1db9f6515c0ad85608e60cc12362323475c8c10d8606d15 LICENSE
+SHA256 a6280a6002370ca5e4406889dc10badf17290021ae0804b6ffd3396cc33433d0 MANIFEST
+SHA256 04a6b346d50c762b445269fbf292b0b864121cf666bfd5448db9cbbd80bf7d25 META.yml
+SHA256 aa086cef618ca3673ac3b314e89ffe5f3f83986cb0635600be87ac96ccfcec73 Makefile.PL
+SHA256 0fa922f22a1c9711f0e9f5e505a691fb261fdf3375f374be25a92980f5c5c411 README
+SHA256 d687b55de7e9cd203b200942a0e9cc468c3cf400419ef38a841698df6cffaf04 Tags.pm
+SHA256 25ad5550024913986639433a45d27d4c5071e52f5a6e4755671e4019ce487a53 examples/ex1.pl
+SHA256 e00f98b7f3ebaf7376974df23f595bdba71636a3bdad9f3d0bd33d50660b13d1 examples/ex2.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 433eb744289fa115818ed7f6432636d7af317d62fb1c846c2df7d6e867672835 t/PYX-SGML-Tags/01-use.t
+SHA256 73ddd9757dca92ddceeec54e5c452c9f20783b1a61e88a8aa2899c334248cdbd t/PYX-SGML-Tags/02-version.t
+SHA256 80b8039efb38e8a249f82443e938b45c4907952ad7c69e154ace76e280a1f22f t/PYX-SGML-Tags/03-new.t
+SHA256 1fc4422e9e483623105a8ee89ab1378fe732dd79cf92e8600de00a9f390f3b5d t/PYX-SGML-Tags/04-parse-char.t
+SHA256 cb2f784a7abd345d3b88bee82990d30208c7c7a2269fbf994d4a0e2a826f65ce t/PYX-SGML-Tags/05-parse-instruction.t
+SHA256 76b085d570e3212e47068fcd5bf929a5877e8e3b82a56ef927c9d82a2ad495d9 t/PYX-SGML-Tags/06-parse-comment.t
+SHA256 a3ec13b8e302c3d9123482e4f8c0b1f44c14caf1d9b9faff83658231f16d3bd8 t/PYX-SGML-Tags/07-parse-element-sgml.t
+SHA256 91b00a387d82536e4cad5f23b727c7f357a0f8d8956dd345c1365e457af73413 t/PYX-SGML-Tags/08-parse-element-xml.t
+SHA256 3fa89c22bf9d313887e7ae3d7f56f05859c49f213f55effc4ef4fc9039379c28 t/PYX-SGML-Tags/09-parse_file-char.t
+SHA256 355503d86fdbdfad43ac6daf68c7d6e5a4a091fe178eb0e6c0911a2f6868daa6 t/PYX-SGML-Tags/10-parse_file-instruction.t
+SHA256 f6b4cd8e1840980f18c51ebb30a2188566555b1cf935f7a85b83e531a8ff5d9b t/PYX-SGML-Tags/11-parse_file-comment.t
+SHA256 f1c110e8914a3b1ddcdb6798468817621fb88f55e0345acd6455b3ca7a45d99a t/PYX-SGML-Tags/12-parse_file-element-sgml.t
+SHA256 8352a12c039959a380b1e28f1543b01ec190abed7f4bddc442dcbbc7860c7c26 t/PYX-SGML-Tags/13-parse_file-element-xml.t
+SHA256 0b087570b9299656484f25f7aa5eb3fd6dbb19bb4737a76865bdf2007afe0249 t/data/char1.pyx
+SHA256 352fa13386cb8eca5ad28dca6b28d2a8c45a2997ca0c00052d80f06b76776484 t/data/char2.pyx
+SHA256 6834092382481146eeed047dd1d107ea169458c87a08703aa3fc74c55d251755 t/data/comment1.pyx
+SHA256 a9b259d3f6c293342daa59e403a13d20b64da6f46f067e4592c78c1c47bfc1d4 t/data/comment2.pyx
+SHA256 ca09610b69bbffe2a98d1786594d64ab40d1f1b7b932023121a8b794025fee58 t/data/element1.pyx
+SHA256 e1e21fe5a9ca52fdddb04cc4f1974632b7b23abd115b93488f8d6525da79da0e t/data/element2.pyx
+SHA256 998b0845279581cbd82a3d6b35993f52b3ee039bb9f038989b4091c4665e3262 t/data/element3.pyx
+SHA256 8057770a89eabb6fa1fe3555c0e4a350a64564d734566328ca007085faacc6cd t/data/element4.pyx
+SHA256 4cec64797099f3e37c371fd06e1ef91495ffc2825ab851a2043670e16a112a94 t/data/instruction1.pyx
+SHA256 555b83b016f7c3e0a721d848ac2bc183008bdd999e7a8c29ec292b90de981c12 t/data/instruction2.pyx
+SHA256 7b5ebcafbd4ead95e06bdd7b380996efa1d12aa093ce92f133d8646151702fdf xt/PYX-SGML-Tags/01-pod_coverage.t
+SHA256 4e65a4aa38205947bb3aa4e5e46653c1d09d7edf23c1237c29438aa9c788e736 xt/PYX-SGML-Tags/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWyOsAAAoJEJe+XXKaIuTlCrwH/iRWyK9Wm7sjB7frN4GshAmc
-eb9wVh3vioA/7fCGqP2PYRI4ufM+n2SQ64PC7T4E/TojWtyFmG4ATIjO1DFFzICj
-31UzpZPqTgAfNE9bahZYk+CF4NVl9wxMi3NIa8WGH8B90o0C7XdF8fs/8vqditJq
-BBu3CVMrjawAEWV88ovOVIdbXvO6FWUwndh8ut5glZ35zBmDpcnp6bVo7QcMso+2
-dawxoNMSWaCWKvpRxM2kKALiIn+u157bF/QvP+p9qSHhkXq3OG3b7qbnhv3CiOrH
-eJrUhAZkAUwZMayeBehGaTJK7yfXD8SPeeRXUzvNaZLcMG3CX7G+ctny6vQDgAM=
-=Z5Gw
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl6lt6MACgkQKyiOZjWe
+rHZekwgAhBuo7C+Zvc7BjGIj4V6jitwkYFt+Ykl+2m16rL6XF/0L7n7O0f/xuZ7j
+er0ExKv+I6Z5YwoeFXaMD8bBnpNPQpLEwg8SiNpHN+ULqvhCX9gSCwWUCR1cL0HC
+YRzZxPncqMV7Y7sMkvE8oqeg73JNokI9gimxr5Ev2JEJI3SVfsoPwNMoXeUcgoTJ
+50lSogNLGW28rbNt0rPTiYyY1jyo+qv9QxvZepiEjvPxFOZNJcW+Z9KWMaa6y/Ha
+Bu5CqI98z/qtfoFc6rlQguYNVM51AYcE3bH8FoqFNVv0sgq+LyP16YPtyg47hmDL
+bBk6CJVCCiOy7hEQztY04DpcnkYUAw==
+=aTdN
 -----END PGP SIGNATURE-----

@@ -20,19 +20,28 @@ package App::Greple::subst::Dict {
 	bless [], $class;
     }
 
-    sub dictionary {
-	@{+shift};
+    sub words_ref {
+	my $obj = shift;
+	$obj;
+    }
+
+    sub words {
+	my $obj = shift;
+	my $ref = $obj->words_ref;
+	@{$ref};
     }
 
     sub add {
 	my $obj = shift;
-	push @$obj, App::Greple::subst::Dict::Ent->new(@_);
+	my $ref = $obj->words_ref;
+	push @$ref, App::Greple::subst::Dict::Ent->new(@_);
 	$obj;
     }
 
     sub add_comment {
 	my $obj = shift;
-	push @$obj, App::Greple::subst::Dict::Ent->new_comment(@_);
+	my $ref = $obj->words_ref;
+	push @$ref, App::Greple::subst::Dict::Ent->new_comment(@_);
 	$obj;
     }
 
@@ -49,8 +58,9 @@ package App::Greple::subst::Dict {
     sub print {
 	use List::Util qw(max);
 	my $obj = shift;
-	my $max = max map { vwidth $_->string  } grep { defined } @$obj;
-	for my $p (@$obj) {
+	my @words = $obj->words;
+	my $max = max map { vwidth $_->string  } grep { defined } @words;
+	for my $p (@words) {
 	    if ($p->is_comment) {
 		say $p->comment;
 	    } else {

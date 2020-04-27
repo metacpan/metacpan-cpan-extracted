@@ -11,7 +11,7 @@ use Readonly;
 # Constants.
 Readonly::Scalar my $EMPTY_STR => q{};
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -220,11 +220,11 @@ PYX::Parser - PYX parser with callbacks.
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%parameters)>
+ my $obj = PYX::Parser->new(%parameters);
 
- Constructor.
+Constructor.
 
 =over 8
 
@@ -309,30 +309,40 @@ PYX::Parser - PYX parser with callbacks.
 
 =back
 
-=item C<line()>
+=head2 C<line>
 
- Get actual parsing line.
- Returns string.
+ my $line = $obj->line;
 
-=item C<parse($pyx[, $out])>
+Get actual parsing line.
 
- Parse PYX text or array of PYX text.
- If $out not present, use 'output_handler'.
- Returns undef.
+Returns string.
 
-=item C<parse_file($input_file[, $out])>
+=head2 C<parse>
 
- Parse file with PYX data.
- If $out not present, use 'output_handler'.
- Returns undef.
+ $obj->parse($pyx, $out);
 
-=item C<parse_handler($input_file_handler[, $out])>
+Parse PYX text or array of PYX text.
+If $out not present, use 'output_handler'.
 
- Parse PYX handler.
- If $out not present, use 'output_handler'.
- Returns undef.
+Returns undef.
 
-=back
+=head2 C<parse_file>
+
+ $obj->parse_file($input_file, $out);
+
+Parse file with PYX data.
+If $out not present, use 'output_handler'.
+
+Returns undef.
+
+=head2 C<parse_handler>
+
+ $obj->parse_handle($input_file_handler, $out);
+
+Parse PYX handler.
+If $out not present, use 'output_handler'.
+
+Returns undef.
 
 =head1 ERRORS
 
@@ -432,6 +442,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

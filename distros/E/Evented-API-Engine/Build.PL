@@ -7,16 +7,25 @@ use Module::Build;
 my $class = Module::Build->subclass(
     class => 'Evented::API::Builder',
     code => q{
-        sub ACTION_distmeta {
+        sub ACTION_docs {
             use Pod::Select;
+            use Pod::Readme;
+            use File::Copy;
 
             my $self = shift;
 
-            podselect({ -output => 'doc/engine.pod' },
+            # Generate .pod files
+            podselect({ -output => 'doc/Evented/API/Engine.pod' },
                 'lib/Evented/API/Engine.pm');
-                
-            podselect({ -output => 'doc/module.pod' },
+            podselect({ -output => 'doc/Evented/API/Module.pod' },
                 'lib/Evented/API/Module.pm');
+
+            # Copy Engine.pod to README.pod
+            copy('doc/Evented/API/Engine.pod', 'README.pod');
+
+            # Extract text to generate plain-text README
+            my $parser = Pod::Readme->new();
+            $parser->parse_from_file('README.pod', 'README');
 
             return $self->SUPER::ACTION_docs;
         }
@@ -35,11 +44,11 @@ my $build = $class->new(
         # Scalar::Util (nothing used unavailable in 5.10 core dist)
     },
     configure_requires  => {
-        'Pod::Select'   => 0
+        'Pod::Select'   => 0,
+        'Pod::Readme'   => 0
     },
     auto_configure_requires => 0,
     license             => 'bsd',
-    create_makefile_pl  => 'traditional',
     create_readme       => 1,
     dynamic_config      => 0,
     meta_merge          => {

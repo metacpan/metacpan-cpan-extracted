@@ -15,7 +15,7 @@ Readonly::Scalar my $ATTR_CHARS => q{<&"};
 Readonly::Scalar my $CHAR_CHARS => q{<&\240};
 Readonly::Scalar my $EMPTY_STR => q{};
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Encode newline in data to '\n' in output.
 sub encode_newline {
@@ -75,6 +75,7 @@ __END__
 =head1 SYNOPSIS
 
  use Tags::Utils qw(encode_newline encode_attr_entities encode_char_entities);
+
  my $string_with_encoded_newline = encode_newline("foo\nbar");
  my $string_with_encoded_attr_entities = encode_attr_entities('<data & "data"');
  my $string_with_encoded_char_entities = encode_char_entities('<data & data');
@@ -181,7 +182,7 @@ Install the Tags modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Tags>
+L<https://github.com/michal-josef-spacek/Tags>
 
 =head1 AUTHOR
 
@@ -191,11 +192,12 @@ L<http://skim.cz/>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2005-2018 Michal Josef Špaček
- BSD 2-Clause License
+© 2005-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

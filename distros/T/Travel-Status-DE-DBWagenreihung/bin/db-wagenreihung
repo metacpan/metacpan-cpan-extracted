@@ -4,7 +4,7 @@ use warnings;
 use 5.020;
 use utf8;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Getopt::Long;
 use List::Util qw(min);
@@ -160,17 +160,38 @@ B<db-wagenreihung> I<station> I<train-number>
 
 =head1 VERSION
 
-version 0.02
+version 0.03
+
+This is beta software: API and output format may change without notice.
 
 =head1 DESCRIPTION
 
-db-wagenreihung shows wagon orders as reported by the Deutsche Bahn Wagon Order
-API. At the moment, only long-distance ICE trains operated by Deutsche
-Bahn are supported. Most IC/EC lines also work, but results may not be
-entirely correct.
+db-wagenreihung shows the wagon order of train I<train-number> at station
+I<station> (must be a name or DS100 code) as reported by the Deutsche Bahn
+Wagon Order API. As of April 2020, long-distance IC/EC/ICFE trains are widely
+supported, and some regions (e.g. Stuttgart/Karlsruhe) also provide wagon
+orders for select regional trains. Data accuracy varies, but seems to be
+improving over time.
+
+It is not possible to request the wagon order at a train's terminus station.
+This is a known limitation.
 
 The departure of I<train-number> must be in the time range between now and
 two hours in the future.
+
+=head1 EXAMPLES
+
+=over
+
+=item db-wagenreihung 'Essen Hbf' 723
+
+Show wagon order of ICE 723 at Essen Hbf
+
+=item db-wagenreihung TS 3259
+
+Show wagon order of IRE 3259 at Stuttgart Hbf
+
+=back
 
 =head1 DEPENDENCIES
 
@@ -186,7 +207,7 @@ two hours in the future.
 
 =head1 AUTHOR
 
-Copyright (C) 2018-2019 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2018-2020 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

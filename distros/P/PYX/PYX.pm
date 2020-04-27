@@ -11,7 +11,7 @@ use Readonly;
 Readonly::Array our @EXPORT_OK => qw(attribute char comment end_element instruction
 	start_element);
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Encode attribute as PYX.
 sub attribute {
@@ -88,39 +88,53 @@ PYX - A perl module for PYX handling.
 
 =head1 SUBROUTINES
 
-=over 8
+=head2 C<attribute>
 
-=item C<attribute(@attr)>
+ my @data = attribute(@attr);
 
- Encode attribute as PYX.
- Returns array of encoded lines.
+Encode attribute as PYX.
 
-=item C<char($char)>
+Returns array of encoded lines.
 
- Encode characters between elements as PYX.
- Returns array of encoded lines.
+=head2 C<char>
 
-=item C<comment($comment)>
+ my @data = char($char);
 
- Encode comment as PYX.
- Returns array of encoded lines.
+Encode characters between elements as PYX.
 
-=item C<end_element($elem)>
+Returns array of encoded lines.
 
- Encode end of element as PYX.
- Returns array of encoded lines.
+=head2 C<comment>
 
-=item C<instruction($target, $code)>
+ my @data = comment($comment);
 
- Encode instruction as PYX.
- Returns array of encoded lines.
+Encode comment as PYX.
 
-=item C<start_element($elem, @attr)>
+Returns array of encoded lines.
 
- Encode begin of element as PYX.
- Returns array of encoded lines.
+=head2 C<end_element>
 
-=back
+ my @data = end_element($elem);
+
+Encode end of element as PYX.
+
+Returns array of encoded lines.
+
+=head2 C<instruction>
+
+ my @data = instruction($target, $code);
+
+Encode instruction as PYX.
+
+Returns array of encoded lines.
+
+=head2 C<start_element>
+
+ my @data = start_element($elem, @attr);
+
+Encode begin of element as PYX.
+
+Returns array of encoded lines.
 
 =head1 EXAMPLE
 
@@ -184,6 +198,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

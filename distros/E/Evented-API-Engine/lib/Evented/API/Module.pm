@@ -12,7 +12,7 @@ use parent 'Evented::Object';
 use Scalar::Util qw(blessed weaken);
 use List::Util qw(first);
 
-our $VERSION = '4.11';
+our $VERSION = '4.13';
 
 =head1 NAME
 
@@ -300,9 +300,8 @@ sub _do_void {
     my $api = $mod->api;
 
     # fire module void.
-    # consider: should this have return_check like init?
     $mod->Log('Voiding');
-    my $void_fire = $mod->fire('void');
+    my $void_fire = $mod->prepare('void')->fire('return_check');
 
     # init was stopped. cancel the unload.
     my $stopper = $void_fire->stopper;

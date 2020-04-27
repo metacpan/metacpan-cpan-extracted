@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Lite;
 
-our $DATE = '2020-04-01'; # DATE
-our $VERSION = '1.827'; # VERSION
+our $DATE = '2020-04-27'; # DATE
+our $VERSION = '1.828'; # VERSION
 
 use 5.010001;
 # use strict; # already enabled by Mo
@@ -629,7 +629,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.827 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2020-04-01.
+This document describes version 1.828 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2020-04-27.
 
 =head1 SYNOPSIS
 

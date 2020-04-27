@@ -32,6 +32,11 @@ L<Device::Class> documentation. The documentation in this file mostly concerns
 itself with the abilities and utilities provided by the base class 
 implementation.
 
+In the current version this base class happens to be a blessed hash reference,
+but eventually it will be built using L<Object::Pad> or some similar and
+compatible future replacement of it. Subclasses may wish to use L<Object::Pad>
+as their own implementation to prepare for this.
+
 =head1 METADATA METHODS
 
 The following class-level methods provide information about the chip and how

@@ -41,7 +41,7 @@ use parent 'Evented::Object';
 use Scalar::Util qw(blessed);
 use File::Basename qw(dirname);
 
-our $VERSION = '4.03';
+our $VERSION = '4.04';
 
 my ($true, $false) = (1, 0);
 sub on  () { state $on  = bless \$true,  'Evented::Configuration::Boolean' }
@@ -586,28 +586,7 @@ L<Evented::Object> - the event class that powers Evented::Configuration.
 
 L<Mitchell Cooper|https://github.com/cooper> <cooper@cpan.org>
 
-Copyright E<copy> 2014. Released under BSD license.
+Copyright E<copy> 2011-2020. Released under New BSD license.
 
-=over 4
-
-=item *
-
-B<IRC channel>: L<irc.notroll.net #k|irc://irc.notroll.net/k>
-
-=item *
-
-B<Email>: cooper@cpan.org
-
-=item *
-
-B<CPAN>: L<COOPER|http://search.cpan.org/~cooper/>
-
-=item *
-
-B<GitHub>: L<cooper|https://github.com/cooper>
-
-=back
-
-Comments, complaints, and recommendations are accepted. IRC is my preferred communication
-medium. Bugs may be reported on
-L<RT|https://rt.cpan.org/Public/Dist/Display.html?Name=Evented-Configuration>.
+Comments, complaints, and recommendations are accepted. Bugs may be reported on
+L<GitHub|https://github.com/cooper/evented-object/issues>.

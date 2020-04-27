@@ -17,6 +17,8 @@
  *   up but if it does blame me (Matt S Trout), not the poor original authors
  */
 
+#include "ppport.h"
+
 /* the following #defines are stolen from assorted headers, not toke.c (mst) */
 
 #define skipspace(a)            S_skipspace(aTHX_ a, 0)
@@ -186,19 +188,23 @@ static SUBLEXINFO *my_Isublex_info_ptr(pTHX) { return &(aTHX->Isublex_info); }
 #define SvPV_nolen_const SvPV_nolen
 #endif
 
-/* Name changed in 5.17; use new name in our code.  Apparently we're meant
-   to use something else instead, but no non-underscored way to achieve
-   this is apparent.  */
-
-#ifndef _is_utf8_mark
-#define _is_utf8_mark is_utf8_mark
-#endif
-
 /* utf8_to_uvchr_buf() not defined in earlier perls, but less-capable
  * substitute is available */
 
 #ifndef utf8_to_uvchr_buf
 #define utf8_to_uvchr_buf(s, e, lp) ((e), utf8_to_uvchr(s, lp))
+#endif
+
+#ifndef isIDFIRST_lazy_if_safe
+# define isIDFIRST_lazy_if_safe(p,e,UTF)                                    \
+                    ((! UTF || p > e) ? isIDFIRST_lazy_if(p,UTF) : 0)
+#endif
+#ifndef isALNUM_lazy_if_safe
+# define isALNUM_lazy_if_safe(p,e,UTF)                                      \
+                        ((! UTF || p > e) ? isALNUM_lazy_if(p,UTF) : 0)
+#endif
+#ifndef isALNUM_utf8_safe
+# define isALNUM_utf8_safe(p,e)     ((p > e) ? isALNUM_utf8(p) : 0)
 #endif
 
 /* and now we're back to the toke.c stuff again (mst) */
@@ -435,9 +441,30 @@ S_scan_word(pTHX_ register char *s, char *dest, STRLEN destlen, int allow_packag
     for (;;) {
 	if (d >= e)
 	    Perl_croak(aTHX_ ident_too_long);
-	if (isALNUM(*s))	/* UTF handled below */
-	    *d++ = *s++;
-	else if (*s == '\'' && allow_package && isIDFIRST_lazy_if(s+1,UTF)) {
+        if (UTF && isIDFIRST_utf8_safe((const U8*) s, (const U8*) PL_bufend)) {
+             /* The UTF-8 case must come first, otherwise things
+             * like c\N{COMBINING TILDE} would start failing, as the
+             * isALNUM case below would gobble the 'c' up.
+             */
+
+            char *t = s + UTF8SKIP(s);
+            while (isIDCONT_utf8_safe((const U8*) t, (const U8*) PL_bufend)) {
+                t += UTF8SKIP(t);
+            }
+            if (d + (t - s) > e)
+                Perl_croak(aTHX_ "%s", ident_too_long);
+            Copy(s, d, t - s, char);
+            *d += t - s;
+            s = t;
+        }
+        else if (isALNUM(*s))
+            do {
+                *d++ = *s++;
+            } while (isWORDCHAR_A(*s) && d < e);
+	else if (   *s == '\''
+                 && allow_package
+                 && isIDFIRST_lazy_if_safe(s+1, PL_bufend, UTF))
+        {
 	    *d++ = ':';
 	    *d++ = ':';
 	    s++;
@@ -445,16 +472,6 @@ S_scan_word(pTHX_ register char *s, char *dest, STRLEN destlen, int allow_packag
 	else if (*s == ':' && s[1] == ':' && allow_package && s[2] != '$') {
 	    *d++ = *s++;
 	    *d++ = *s++;
-	}
-	else if (UTF && UTF8_IS_START(*s) && isALNUM_utf8((U8*)s)) {
-	    char *t = s + UTF8SKIP(s);
-	    while (UTF8_IS_CONTINUED(*t) && _is_utf8_mark((U8*)t))
-		t += UTF8SKIP(t);
-	    if (d + (t - s) > e)
-		Perl_croak(aTHX_ ident_too_long);
-	    Copy(s, d, t - s, char);
-	    d += t - s;
-	    s = t;
 	}
 	else {
 	    *d = '\0';
@@ -921,9 +938,27 @@ S_scan_ident(pTHX_ register char *s, register const char *send, char *dest, STRL
 	for (;;) {
 	    if (d >= e)
 		Perl_croak(aTHX_ ident_too_long);
-	    if (isALNUM(*s))	/* UTF handled below */
-		*d++ = *s++;
-	    else if (*s == '\'' && isIDFIRST_lazy_if(s+1,UTF)) {
+            if (UTF && isIDFIRST_utf8_safe((const U8*) s, (const U8*) PL_bufend)) {
+                 /* The UTF-8 case must come first, otherwise things
+                 * like c\N{COMBINING TILDE} would start failing, as the
+                 * isALNUM case below would gobble the 'c' up.
+                 */
+
+                char *t = s + UTF8SKIP(s);
+                while (isIDCONT_utf8_safe((const U8*) t, (const U8*) PL_bufend)) {
+                    t += UTF8SKIP(t);
+                }
+                if (d + (t - s) > e)
+                    Perl_croak(aTHX_ "%s", ident_too_long);
+                Copy(s, d, t - s, char);
+                *d += t - s;
+                s = t;
+            }
+            else if (isALNUM(*s))
+                do {
+                    *d++ = *s++;
+                } while (isWORDCHAR_A(*s) && d < e);
+	    else if (*s == '\'' && isIDFIRST_lazy_if_safe(s+1,send,UTF)) {
 		*d++ = ':';
 		*d++ = ':';
 		s++;
@@ -931,16 +966,6 @@ S_scan_ident(pTHX_ register char *s, register const char *send, char *dest, STRL
 	    else if (*s == ':' && s[1] == ':') {
 		*d++ = *s++;
 		*d++ = *s++;
-	    }
-	    else if (UTF && UTF8_IS_START(*s) && isALNUM_utf8((U8*)s)) {
-		char *t = s + UTF8SKIP(s);
-		while (UTF8_IS_CONTINUED(*t) && _is_utf8_mark((U8*)t))
-		    t += UTF8SKIP(t);
-		if (d + (t - s) > e)
-		    Perl_croak(aTHX_ ident_too_long);
-		Copy(s, d, t - s, char);
-		d += t - s;
-		s = t;
 	    }
 	    else
 		break;
@@ -954,7 +979,8 @@ S_scan_ident(pTHX_ register char *s, register const char *send, char *dest, STRL
 	return s;
     }
     if (*s == '$' && s[1] &&
-	(isALNUM_lazy_if(s+1,UTF) || s[1] == '$' || s[1] == '{' || strnEQ(s+1,"::",2)) )
+	(   isALNUM_lazy_if_safe(s+1,send,UTF)
+         || s[1] == '$' || s[1] == '{' || strnEQ(s+1,"::",2)) )
     {
 	return s;
     }
@@ -982,13 +1008,16 @@ S_scan_ident(pTHX_ register char *s, register const char *send, char *dest, STRL
 		}
 	    }
 	}
-	if (isIDFIRST_lazy_if(d,UTF)) {
+	if (isIDFIRST_lazy_if_safe(d,d+destlen,UTF)) {
 	    d++;
 	    if (UTF) {
 		e = s;
-		while ((e < send && isALNUM_lazy_if(e,UTF)) || *e == ':') {
+		while ( ((   e < send
+                          && isIDFIRST_utf8_safe(e, send))
+                       || *e == ':'))
+                {
 		    e += UTF8SKIP(e);
-		    while (e < send && UTF8_IS_CONTINUED(*e) && _is_utf8_mark((U8*)e))
+		    while (e < send && isIDFIRST_utf8_safe(e, send))
 			e += UTF8SKIP(e);
 		}
 		Copy(s, d, e - s, char);

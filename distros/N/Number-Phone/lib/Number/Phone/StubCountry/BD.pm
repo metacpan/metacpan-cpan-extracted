@@ -22,13 +22,13 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200309202343;
+our $VERSION = 1.20200427120027;
 
 my $formatters = [
                 {
                   'format' => '$1-$2',
                   'leading_digits' => '
-            31[5-7]|
+            31[5-8]|
             [459]1
           ',
                   'national_rule' => '0$1',
@@ -95,6 +95,16 @@ my $formatters = [
 my $validators = {
                 'fixed_line' => '
           (?:
+            4(?:
+              31\\d\\d|
+              423
+            )|
+            5222
+          )\\d{3}(?:
+            \\d{2}
+          )?|
+          8332[6-9]\\d\\d|
+          (?:
             3(?:
               03[56]|
               224
@@ -105,18 +115,6 @@ my $validators = {
             )
           )\\d{3,4}|
           (?:
-            4(?:
-              31\\d\\d|
-              [46]23
-            )|
-            5(?:
-              222|
-              32[37]
-            )
-          )\\d{3}(?:
-            \\d{2}
-          )?|
-          (?:
             3(?:
               42[47]|
               529|
@@ -125,14 +123,53 @@ my $validators = {
             4(?:
               027|
               525|
-              658
+              65(?:
+                28|
+                8
+              )
             )|
-            (?:
-              56|
-              73
-            )2|
+            562|
             6257|
-            9[35]1
+            7(?:
+              1(?:
+                5[3-5]|
+                6[12]|
+                7[156]|
+                89
+              )|
+              22[589]56|
+              32|
+              42675|
+              52(?:
+                [25689](?:
+                  56|
+                  8
+                )|
+                [347]8
+              )|
+              71(?:
+                6[1267]|
+                75|
+                89
+              )|
+              92374
+            )|
+            82(?:
+              2[59]|
+              32
+            )56|
+            9(?:
+              03[23]56|
+              23(?:
+                256|
+                373
+              )|
+              31|
+              5(?:
+                1|
+                2[4589]56
+              )
+            )
           )\\d{3}|
           (?:
             3(?:
@@ -186,8 +223,8 @@ my $validators = {
                 2[568]|
                 3[3-6]|
                 5[5-7]|
-                6[01367]|
-                7[15]|
+                6[0136-9]|
+                7[0-7]|
                 8[014-9]
               )
             )|
@@ -196,6 +233,7 @@ my $validators = {
                 2[025-79]|
                 3[2-4]
               )|
+              181|
               22[12]|
               32[2356]|
               824
@@ -214,12 +252,26 @@ my $validators = {
               22|
               53
             )|
+            7(?:
+              22[57-9]|
+              42[56]|
+              82[35]
+            )8|
             8(?:
+              0[124-9]|
+              2(?:
+                181|
+                2[02-4679]8
+              )|
               4[12]|
               [5-7]2
             )|
             9(?:
-              [024]2|
+              [04]2|
+              2(?:
+                2|
+                328
+              )|
               81
             )
           )\\d{4}|
@@ -243,7 +295,7 @@ my $validators = {
                 5[25]
               )|
               6(?:
-                25|
+                2[35]|
                 56|
                 62
               )|
@@ -256,7 +308,7 @@ my $validators = {
             5(?:
               02[03489]|
               22[457]|
-              32[569]|
+              32[35-79]|
               42[46]|
               6(?:
                 [18]|
@@ -293,7 +345,6 @@ my $validators = {
               72[24]
             )|
             8(?:
-              0|
               217|
               3[12]|
               [5-7]1
@@ -312,6 +363,16 @@ my $validators = {
         ',
                 'geographic' => '
           (?:
+            4(?:
+              31\\d\\d|
+              423
+            )|
+            5222
+          )\\d{3}(?:
+            \\d{2}
+          )?|
+          8332[6-9]\\d\\d|
+          (?:
             3(?:
               03[56]|
               224
@@ -322,18 +383,6 @@ my $validators = {
             )
           )\\d{3,4}|
           (?:
-            4(?:
-              31\\d\\d|
-              [46]23
-            )|
-            5(?:
-              222|
-              32[37]
-            )
-          )\\d{3}(?:
-            \\d{2}
-          )?|
-          (?:
             3(?:
               42[47]|
               529|
@@ -342,14 +391,53 @@ my $validators = {
             4(?:
               027|
               525|
-              658
+              65(?:
+                28|
+                8
+              )
             )|
-            (?:
-              56|
-              73
-            )2|
+            562|
             6257|
-            9[35]1
+            7(?:
+              1(?:
+                5[3-5]|
+                6[12]|
+                7[156]|
+                89
+              )|
+              22[589]56|
+              32|
+              42675|
+              52(?:
+                [25689](?:
+                  56|
+                  8
+                )|
+                [347]8
+              )|
+              71(?:
+                6[1267]|
+                75|
+                89
+              )|
+              92374
+            )|
+            82(?:
+              2[59]|
+              32
+            )56|
+            9(?:
+              03[23]56|
+              23(?:
+                256|
+                373
+              )|
+              31|
+              5(?:
+                1|
+                2[4589]56
+              )
+            )
           )\\d{3}|
           (?:
             3(?:
@@ -403,8 +491,8 @@ my $validators = {
                 2[568]|
                 3[3-6]|
                 5[5-7]|
-                6[01367]|
-                7[15]|
+                6[0136-9]|
+                7[0-7]|
                 8[014-9]
               )
             )|
@@ -413,6 +501,7 @@ my $validators = {
                 2[025-79]|
                 3[2-4]
               )|
+              181|
               22[12]|
               32[2356]|
               824
@@ -431,12 +520,26 @@ my $validators = {
               22|
               53
             )|
+            7(?:
+              22[57-9]|
+              42[56]|
+              82[35]
+            )8|
             8(?:
+              0[124-9]|
+              2(?:
+                181|
+                2[02-4679]8
+              )|
               4[12]|
               [5-7]2
             )|
             9(?:
-              [024]2|
+              [04]2|
+              2(?:
+                2|
+                328
+              )|
               81
             )
           )\\d{4}|
@@ -460,7 +563,7 @@ my $validators = {
                 5[25]
               )|
               6(?:
-                25|
+                2[35]|
                 56|
                 62
               )|
@@ -473,7 +576,7 @@ my $validators = {
             5(?:
               02[03489]|
               22[457]|
-              32[569]|
+              32[35-79]|
               42[46]|
               6(?:
                 [18]|
@@ -510,7 +613,6 @@ my $validators = {
               72[24]
             )|
             8(?:
-              0|
               217|
               3[12]|
               [5-7]1
@@ -554,621 +656,255 @@ my $validators = {
               };
 my %areanames = ();
 $areanames{en}->{8802} = "Dhaka";
-$areanames{en}->{88030208} = "Banskhali\,\ Chittagong";
-$areanames{en}->{88030228} = "Fatikchari\,\ Chittagong";
-$areanames{en}->{880302356} = "Hathazari\,\ Chittagong";
-$areanames{en}->{88030238} = "Hathazari\,\ Chittagong";
-$areanames{en}->{880302456} = "Mirsharai\,\ Chittagong";
-$areanames{en}->{88030248} = "Mirsari\,\ Chittagong";
-$areanames{en}->{88030258} = "Rangunia\,\ Chittagong";
-$areanames{en}->{88030268} = "Rauzan\,\ Chittagong";
-$areanames{en}->{88030278} = "Snadwip\,\ Chittagong";
-$areanames{en}->{880302856} = "Barabkunda\,\ Chittagong";
-$areanames{en}->{88030288} = "Sitakunda\,\ Chittagong";
-$areanames{en}->{88030298} = "Anwara\,\ Chittagong";
-$areanames{en}->{88030328} = "Boalkhali\,\ Chittagong";
-$areanames{en}->{88030338} = "Chandanaish\,\ Chittagong";
-$areanames{en}->{88030348} = "Lohagara\,\ Chittagong";
-$areanames{en}->{88030352} = "Potia\,\ Chittagong";
-$areanames{en}->{88030353} = "Potia\,\ Chittagong";
-$areanames{en}->{88030354} = "Potia\,\ Chittagong";
-$areanames{en}->{88030355} = "Potia\,\ Chittagong";
-$areanames{en}->{88030358} = "Potiya\,\ Chittagong";
-$areanames{en}->{88030362} = "Satkania\,\ Chittagong";
-$areanames{en}->{88030363} = "Satkania\,\ Chittagong";
-$areanames{en}->{88030368} = "Satkhania\,\ Chittagong";
-$areanames{en}->{8803161} = "Chittagong";
-$areanames{en}->{8803162} = "Chittagong";
-$areanames{en}->{8803163} = "Chittagong";
-$areanames{en}->{8803165} = "Chittagong";
-$areanames{en}->{8803167} = "Chittagong";
-$areanames{en}->{8803168} = "Chittagong";
-$areanames{en}->{8803171} = "Chittagong";
-$areanames{en}->{8803172} = "Chittagong";
-$areanames{en}->{8803174} = "Chittagong";
-$areanames{en}->{8803175} = "Chittagong";
-$areanames{en}->{88032151} = "Noakhali";
-$areanames{en}->{88032152} = "Noakhali";
-$areanames{en}->{88032153} = "Noakhali";
-$areanames{en}->{88032161} = "Noakhali";
-$areanames{en}->{88032162} = "Noakhali";
-$areanames{en}->{88032163} = "Noakhali";
-$areanames{en}->{88032175} = "Chatkhil\,\ Noakhali";
-$areanames{en}->{88032218} = "Begamgonj\,\ Noakhali";
-$areanames{en}->{88032228} = "Chatkhil\,\ Noakhali";
-$areanames{en}->{880322356} = "Companiganj\ \(B\.Hat\)\,\ Noakhali";
-$areanames{en}->{88032238} = "Companigonj\,\ Noakhali";
-$areanames{en}->{88032242} = "Hatiya\ \(Oshkhali\)\,\ Noakhali";
-$areanames{en}->{88032243} = "Hatiya\ \(Oshkhali\)\,\ Noakhali";
-$areanames{en}->{880322556} = "Shenbag\,\ Noakhali";
-$areanames{en}->{88032258} = "Senbag\,\ Noakhali";
-$areanames{en}->{88033160} = "Feni";
-$areanames{en}->{88033161} = "Feni";
-$areanames{en}->{88033162} = "Feni";
-$areanames{en}->{88033163} = "Feni";
-$areanames{en}->{88033173} = "Feni";
-$areanames{en}->{88033174} = "Feni";
-$areanames{en}->{88033176} = "Sonagazi\,\ Feni";
-$areanames{en}->{88033178} = "Chagalnaiya\,\ Feni";
-$areanames{en}->{88033179} = "Daganbhuyan\,\ Feni";
-$areanames{en}->{88033228} = "Chhagalnaiya\,\ Feni";
-$areanames{en}->{88033238} = "Dagonbhuya\,\ Feni";
-$areanames{en}->{880332456} = "Parshuram\,\ Feni";
-$areanames{en}->{88033248} = "Parsuram\,\ Feni";
-$areanames{en}->{88033258} = "Sonagazi\,\ Feni";
-$areanames{en}->{88033268} = "Fulgazi\,\ Feni";
-$areanames{en}->{88034158} = "Eidgaon\,\ Cox\'s\ bazar";
-$areanames{en}->{88034162} = "Cox\'s\ bazar";
-$areanames{en}->{88034163} = "Cox\'s\ bazar";
-$areanames{en}->{88034164} = "Cox\'s\ bazar";
-$areanames{en}->{880342256} = "Chokoria\,\ Cox\'s\ bazar";
-$areanames{en}->{88034228} = "Chakaria\,\ Cox\'s\ bazar";
-$areanames{en}->{88034242} = "Moheshkhali\,\ Cox\'s\ bazar";
-$areanames{en}->{88034243} = "Moheshkhali\,\ Cox\'s\ bazar";
-$areanames{en}->{880342556} = "Ramu\,\ Cox\'s\ bazar";
-$areanames{en}->{88034272} = "Ukhiya\,\ Cox\'s\ bazar";
-$areanames{en}->{88034273} = "Ukhiya\,\ Cox\'s\ bazar";
-$areanames{en}->{88035161} = "Rangamati";
-$areanames{en}->{88035162} = "Rangamati";
-$areanames{en}->{88035163} = "Rangamati";
-$areanames{en}->{88035292} = "Kaptai\,\ Rangamati";
-$areanames{en}->{88035293} = "Kaptai\,\ Rangamati";
-$areanames{en}->{88035294} = "Kaptai\,\ Rangamati";
-$areanames{en}->{88036162} = "Bandarban";
-$areanames{en}->{88036163} = "Bandarban";
-$areanames{en}->{88036189} = "Bandarban";
-$areanames{en}->{88037161} = "Khagrachari";
-$areanames{en}->{88037162} = "Khagrachari";
-$areanames{en}->{88038155} = "Laximpur";
-$areanames{en}->{88038158} = "Laximpur";
-$areanames{en}->{88038161} = "Laximpur";
-$areanames{en}->{88038162} = "Laximpur";
-$areanames{en}->{88038175} = "Ramganj\,\ Laximpur";
-$areanames{en}->{880382256} = "Raipura\,\ Laximpur";
-$areanames{en}->{88038232} = "Ramgati\ \(Alexender\)\,\ Laximpur";
-$areanames{en}->{88038233} = "Ramgati\ \(Alexender\)\,\ Laximpur";
-$areanames{en}->{88038248} = "Ramgonj\,\ Laximpur";
-$areanames{en}->{88040208} = "Rupsha\,\ Khulna";
-$areanames{en}->{88040272} = "Paikgacha\,\ Khulna";
-$areanames{en}->{88040273} = "Paikgacha\,\ Khulna";
-$areanames{en}->{88040274} = "Paikgacha\,\ Khulna";
-$areanames{en}->{88040298} = "Terokhada\,\ Khulna";
-$areanames{en}->{880403356} = "Dighalia\,\ Khulna";
-$areanames{en}->{8804172} = "Khulna";
-$areanames{en}->{8804173} = "Khulna";
-$areanames{en}->{8804176} = "Khulna";
-$areanames{en}->{8804177} = "Khulna";
-$areanames{en}->{8804178} = "Khulna";
-$areanames{en}->{8804180} = "Khulna";
-$areanames{en}->{8804181} = "Khulna";
-$areanames{en}->{8804186} = "Khulna";
-$areanames{en}->{88042175} = "Sharsa\ \(Benapol\)\,\ Jessore";
-$areanames{en}->{88042222} = "Abhaynagar\ \(Noapara\)\,\ Jessore";
-$areanames{en}->{88042223} = "Abhaynagar\ \(Noapara\)\,\ Jessore";
-$areanames{en}->{88042228} = "Abhynagar\,\ Jessore";
-$areanames{en}->{88042238} = "Bagerphara\,\ Jessore";
-$areanames{en}->{88042248} = "Chaugacha\,\ Jessore";
-$areanames{en}->{88042252} = "Jhikargacha\,\ Jessore";
-$areanames{en}->{88042253} = "Jhikargacha\,\ Jessore";
-$areanames{en}->{88042254} = "Jhikargacha\,\ Jessore";
-$areanames{en}->{88042255} = "Jhikargacha\,\ Jessore";
-$areanames{en}->{88042258} = "Jhikargacha\,\ Jessore";
-$areanames{en}->{880422656} = "Keshobpur\,\ Jessore";
-$areanames{en}->{88042268} = "Keshobpur\,\ Jessore";
-$areanames{en}->{880422778} = "Manirampur\,\ Jessore";
-$areanames{en}->{88042278} = "Monirampur\,\ Jessore";
-$areanames{en}->{88042288} = "Sharsa\,\ Jessore";
-$areanames{en}->{88043121} = "Barisal";
-$areanames{en}->{88043208} = "Banaripara\,\ Barisal";
-$areanames{en}->{880432256} = "Goarnadi\,\ Barisal";
-$areanames{en}->{88043228} = "Gournadi\,\ Barisal";
-$areanames{en}->{880432356} = "Agailjhara\,\ Barisal";
-$areanames{en}->{88043238} = "Agailjhara\,\ Barisal";
-$areanames{en}->{88043248} = "Hizla\,\ Barisal";
-$areanames{en}->{88043258} = "Mehendigonj\,\ Barisal";
-$areanames{en}->{880432675} = "Muladi\,\ Barisal";
-$areanames{en}->{88043268} = "Muladi\,\ Barisal";
-$areanames{en}->{880432773} = "Babugonj\,\ Barisal";
-$areanames{en}->{88043278} = "Babugonj\,\ Barisal";
-$areanames{en}->{880432874} = "Bakergonj\,\ Barisal";
-$areanames{en}->{88043288} = "Bakergonj\,\ Barisal";
-$areanames{en}->{88043298} = "Uzirpur\,\ Barisal";
-$areanames{en}->{880433256} = "Banaripara\,\ Barisal";
-$areanames{en}->{88044162} = "Patuakhali";
-$areanames{en}->{88044163} = "Patuakhali";
-$areanames{en}->{88044164} = "Patuakhali";
-$areanames{en}->{880442256} = "Baufal\,\ Patuakhali";
-$areanames{en}->{880442356} = "Dashmina\,\ Patuakhali";
-$areanames{en}->{880442456} = "Golachipa\,\ Patuakhali";
-$areanames{en}->{88044252} = "Khepupara\,\ Patuakhali";
-$areanames{en}->{88044253} = "Khepupara\,\ Patuakhali";
-$areanames{en}->{880442675} = "Mirjagonj\ \(RSU\)\,\ Patuakhali";
-$areanames{en}->{880445575} = "Pathorghata\,\ Barguna";
+$areanames{en}->{8803020} = "Banskhali";
+$areanames{en}->{8803022} = "Fatikchari";
+$areanames{en}->{8803023} = "Hathazari";
+$areanames{en}->{8803024} = "Mirsharai\/Mirsari";
+$areanames{en}->{8803025} = "Rangunia";
+$areanames{en}->{8803026} = "Rauzan";
+$areanames{en}->{8803027} = "Snadwip";
+$areanames{en}->{8803028} = "Barabkunda\/Sitakunda";
+$areanames{en}->{8803029} = "Anwara";
+$areanames{en}->{8803032} = "Boalkhali";
+$areanames{en}->{8803033} = "Chandanaish";
+$areanames{en}->{8803034} = "Lohagara";
+$areanames{en}->{8803035} = "Potia\/Potiya";
+$areanames{en}->{8803036} = "Satkania\/Satkhania";
+$areanames{en}->{880316} = "Chittagong";
+$areanames{en}->{880317} = "Chittagong";
+$areanames{en}->{880318} = "Chittagong";
+$areanames{en}->{880321} = "Noakhali\/Chatkhil";
+$areanames{en}->{8803221} = "Begamgonj";
+$areanames{en}->{8803222} = "Chatkhil";
+$areanames{en}->{8803223} = "Companiganj\ \(B\.Hat\)";
+$areanames{en}->{8803224} = "Hatiya\ \(Oshkhali\)";
+$areanames{en}->{8803225} = "Shenbag\/Senbag";
+$areanames{en}->{880331} = "Feni\/Sonagazi\/Chagalnaiya\/Daganbhuyan";
+$areanames{en}->{8803322} = "Chhagalnaiya";
+$areanames{en}->{8803323} = "Dagonbhuya";
+$areanames{en}->{8803324} = "Parshuram\/Parsuram";
+$areanames{en}->{8803325} = "Sonagazi";
+$areanames{en}->{8803326} = "Fulgazi";
+$areanames{en}->{880341} = "Eidgaon\/Cox\'s\ bazar";
+$areanames{en}->{8803422} = "Chokoria\/Chakaria";
+$areanames{en}->{8803424} = "Moheshkhali";
+$areanames{en}->{8803425} = "Ramu";
+$areanames{en}->{8803427} = "Ukhiya";
+$areanames{en}->{880351} = "Rangamati";
+$areanames{en}->{880352} = "Kaptai";
+$areanames{en}->{88036} = "Bandarban";
+$areanames{en}->{880371} = "Khagrachari";
+$areanames{en}->{880381} = "Laximpur\/Ramganj";
+$areanames{en}->{8803822} = "Raipura";
+$areanames{en}->{8803823} = "Ramgati\ \(Alexender\)";
+$areanames{en}->{8803824} = "Ramgonj";
+$areanames{en}->{8804020} = "Rupsha";
+$areanames{en}->{8804027} = "Paikgacha";
+$areanames{en}->{8804029} = "Terokhada";
+$areanames{en}->{880403} = "Dighalia";
+$areanames{en}->{88041} = "Khulna";
+$areanames{en}->{880421} = "Sharsa\ \(Benapol\)";
+$areanames{en}->{8804222} = "Abhaynagar\ \(Noapara\)";
+$areanames{en}->{8804223} = "Bagerphara";
+$areanames{en}->{8804224} = "Chaugacha";
+$areanames{en}->{8804225} = "Jhikargacha";
+$areanames{en}->{8804226} = "Keshobpur";
+$areanames{en}->{8804227} = "Manirampur";
+$areanames{en}->{8804228} = "Sharsa";
+$areanames{en}->{880431} = "Barisal";
+$areanames{en}->{8804320} = "Banaripara";
+$areanames{en}->{8804322} = "Goarnadi";
+$areanames{en}->{8804323} = "Agailjhara";
+$areanames{en}->{8804324} = "Hizla";
+$areanames{en}->{8804325} = "Mehendigonj";
+$areanames{en}->{8804326} = "Muladi";
+$areanames{en}->{8804327} = "Babugonj";
+$areanames{en}->{8804328} = "Bakergonj";
+$areanames{en}->{8804329} = "Uzirpur";
+$areanames{en}->{880433} = "Banaripara";
+$areanames{en}->{880441} = "Patuakhali";
+$areanames{en}->{8804422} = "Baufal\/Mirjagonj";
+$areanames{en}->{8804423} = "Baufal\/Mirjagonj";
+$areanames{en}->{88044235} = "Dashmina\,\ Patuakhali";
+$areanames{en}->{8804424} = "Baufal\/Mirjagonj";
+$areanames{en}->{8804426} = "Baufal\/Mirjagonj";
+$areanames{en}->{8804455} = "Pathorghata";
 $areanames{en}->{88044862} = "Barguna";
 $areanames{en}->{88044863} = "Barguna";
-$areanames{en}->{88045161} = "Jhinaidah";
-$areanames{en}->{88045162} = "Jhinaidah";
-$areanames{en}->{88045163} = "Jhinaidah";
-$areanames{en}->{88045164} = "Jhinaidah";
-$areanames{en}->{88045174} = "Horinakunda\,\ Jhinaidah";
-$areanames{en}->{88045189} = "Jhinaidah";
-$areanames{en}->{88045238} = "Kaligonj\,\ Jhinaidah";
-$areanames{en}->{88045252} = "Moheshpur";
-$areanames{en}->{88045253} = "Moheshpur";
-$areanames{en}->{88046162} = "Pirojpur";
-$areanames{en}->{88046163} = "Pirojpur";
-$areanames{en}->{88046232} = "Bhandaria\,\ Pirojpur";
-$areanames{en}->{88046233} = "Bhandaria\,\ Pirojpur";
-$areanames{en}->{880462456} = "Kaokhali\,\ Pirojpur";
-$areanames{en}->{88046248} = "Kawkhali\,\ Bagerhat";
-$areanames{en}->{880462575} = "Mothbaria\,\ Pirojpur";
-$areanames{en}->{880462674} = "Nazirpur\,\ Pirojpur";
-$areanames{en}->{88046268} = "Nazirpur\,\ Bagerhat";
-$areanames{en}->{88046278} = "Swarupkhati\,\ Bagerhat";
-$areanames{en}->{88046532} = "Fakirhat\,\ Bagerhat";
-$areanames{en}->{88046533} = "Fakirhat\,\ Bagerhat";
-$areanames{en}->{88046534} = "Fakirhat\,\ Bagerhat";
-$areanames{en}->{88046535} = "Fakirhat\,\ Bagerhat";
-$areanames{en}->{88046538} = "Fakirhat\,\ Bagerhat";
-$areanames{en}->{88046548} = "Kachua\,\ Bagerhat";
-$areanames{en}->{880465556} = "Mollarhat\,\ Bagerhat";
-$areanames{en}->{88046558} = "Mollarhat\,\ Bagerhat";
-$areanames{en}->{880465656} = "Morelganj\,\ Bagerhat";
-$areanames{en}->{880465756} = "Rampal\,\ Bagerhat";
-$areanames{en}->{88046578} = "Rampal\,\ Bagerhat";
-$areanames{en}->{88046582} = "Mongla\,\ Bagerhat";
-$areanames{en}->{88046583} = "Mongla\,\ Bagerhat";
-$areanames{en}->{88046584} = "Mongla\,\ Bagerhat";
-$areanames{en}->{88046585} = "Mongla\,\ Bagerhat";
-$areanames{en}->{88046627} = "Mongla\,\ Bagerhat";
-$areanames{en}->{88046861} = "Bagerhat";
-$areanames{en}->{88046862} = "Bagerhat";
-$areanames{en}->{88046863} = "Bagerhat";
-$areanames{en}->{88046875} = "Mongla\ Port\,\ Bagerhat";
-$areanames{en}->{88047162} = "Satkhira";
-$areanames{en}->{88047163} = "Satkhira";
-$areanames{en}->{88047164} = "Satkhira";
-$areanames{en}->{88047165} = "Satkhira";
-$areanames{en}->{88047166} = "Satkhira";
-$areanames{en}->{88048162} = "Narail";
-$areanames{en}->{88048163} = "Narail";
-$areanames{en}->{88048189} = "Narail";
-$areanames{en}->{880482356} = "Lohagara\,\ Narail";
-$areanames{en}->{880485456} = "Sreepur\,\ Magura";
-$areanames{en}->{88048862} = "Magura";
-$areanames{en}->{88048863} = "Magura";
-$areanames{en}->{88048875} = "Mohammadpur\,\ Magura";
-$areanames{en}->{88048889} = "Magura";
-$areanames{en}->{88049155} = "Bhola";
-$areanames{en}->{88049158} = "Bhola";
-$areanames{en}->{88049161} = "Bhola";
-$areanames{en}->{88049162} = "Bhola";
-$areanames{en}->{880492256} = "Borhanuddin\,\ Bhola";
-$areanames{en}->{880492456} = "Daulatkhan\,\ Bhola";
-$areanames{en}->{880492575} = "Lalmohan\,\ Bhola";
-$areanames{en}->{880495374} = "Nalcity\,\ Jhalakati";
-$areanames{en}->{88049538} = "Nalcity\,\ Jhalokhati";
-$areanames{en}->{88049862} = "Jhalakati";
-$areanames{en}->{88049863} = "Jhalakati";
-$areanames{en}->{88049889} = "Jhalakati";
-$areanames{en}->{88050208} = "Sibgonj\ \(Mokamtala\)";
-$areanames{en}->{880502356} = "Dhunat\,\ Bogra";
-$areanames{en}->{88050248} = "Dhupchachia";
-$areanames{en}->{880502856} = "Shariakandi\,\ Bogra";
-$areanames{en}->{88050298} = "Sherpur";
-$areanames{en}->{8805161} = "Bogra";
-$areanames{en}->{8805162} = "Bogra";
-$areanames{en}->{8805163} = "Bogra";
-$areanames{en}->{8805164} = "Bogra";
-$areanames{en}->{8805165} = "Bogra";
-$areanames{en}->{8805166} = "Bogra";
-$areanames{en}->{8805167} = "Bogra";
-$areanames{en}->{8805168} = "Bogra";
-$areanames{en}->{8805171} = "Bogra";
-$areanames{en}->{8805172} = "Bogra";
-$areanames{en}->{8805173} = "Bogra";
-$areanames{en}->{8805175} = "Gabtali\,\ Bogra";
-$areanames{en}->{8805176} = "Nandigram\,\ Bogra";
-$areanames{en}->{8805177} = "Sherpur\,\ Bogra";
-$areanames{en}->{8805189} = "Bogra";
-$areanames{en}->{88052161} = "Rangpur";
-$areanames{en}->{88052167} = "Rangpur";
-$areanames{en}->{88052168} = "Rangpur";
-$areanames{en}->{88052169} = "Rangpur";
-$areanames{en}->{88052222} = "Badarganj\,\ Rangpur";
-$areanames{en}->{88052223} = "Badarganj\,\ Rangpur";
-$areanames{en}->{88052248} = "Haragacha";
-$areanames{en}->{880522556} = "Mithapukur\,\ Rangpur";
-$areanames{en}->{88052258} = "Mithapukur";
-$areanames{en}->{88052278} = "Pirgonj";
-$areanames{en}->{88053161} = "Dianjpur";
-$areanames{en}->{88053162} = "Dianjpur";
-$areanames{en}->{88053163} = "Dianjpur";
-$areanames{en}->{88053164} = "Dianjpur";
-$areanames{en}->{88053165} = "Dianjpur";
-$areanames{en}->{88053166} = "Dianjpur";
-$areanames{en}->{88053174} = "Parbitipur\,\ Dianjpur";
-$areanames{en}->{88053175} = "Hakimpur\ \(Hili\)\,\ Dianjpur";
-$areanames{en}->{88053189} = "Dianjpur";
-$areanames{en}->{88053232} = "Birganj\,\ Dianjpur";
-$areanames{en}->{88053233} = "Birganj\,\ Dianjpur";
-$areanames{en}->{88053234} = "Birganj\,\ Dianjpur";
-$areanames{en}->{88053235} = "Birganj\,\ Dianjpur";
-$areanames{en}->{88053236} = "Birganj\,\ Dianjpur";
-$areanames{en}->{88053238} = "Birgonj\/Gobindagonj";
-$areanames{en}->{88053258} = "Shetabgonj";
-$areanames{en}->{880532656} = "Chrirbandar\,\ Dianjpur";
-$areanames{en}->{88053272} = "Fulbari\,\ Dianjpur";
-$areanames{en}->{88053273} = "Fulbari\,\ Dianjpur";
-$areanames{en}->{88053298} = "Bangla\ hili";
-$areanames{en}->{88054161} = "Gaibandha";
-$areanames{en}->{88054162} = "Gaibandha";
-$areanames{en}->{88054175} = "Gabindaganj\,\ Gaibandha";
-$areanames{en}->{88054189} = "Gaibandha";
-$areanames{en}->{88054248} = "Palashbari";
-$areanames{en}->{880542656} = "Saghata\ \(Bonarpara\)\,\ Gaibandha";
-$areanames{en}->{88055161} = "Nilphamari";
-$areanames{en}->{88055162} = "Nilphamari";
-$areanames{en}->{88055175} = "Domar\,\ Nilphamari";
-$areanames{en}->{88055189} = "Nilphamari";
-$areanames{en}->{88055262} = "Saidpur\,\ Nilphamari";
-$areanames{en}->{88055268} = "Syedpur";
-$areanames{en}->{88056152} = "Thakurgoan";
-$areanames{en}->{88056161} = "Thakurgoan";
-$areanames{en}->{88056189} = "Thakurgoan";
-$areanames{en}->{880565356} = "Boda\,\ Panchagar";
-$areanames{en}->{88056861} = "Panchagar";
-$areanames{en}->{88056862} = "Panchagar";
-$areanames{en}->{88056875} = "Tetulia\,\ Panchagar";
-$areanames{en}->{88056889} = "Panchagar";
-$areanames{en}->{88057162} = "Jhinaidah\,\ Joypurhat";
-$areanames{en}->{88057163} = "Jhinaidah\,\ Joypurhat";
-$areanames{en}->{88057175} = "Panchbibi\,\ Joypurhat";
-$areanames{en}->{88057189} = "Jhinaidah\,\ Joypurhat";
-$areanames{en}->{88057248} = "Panchbibi";
-$areanames{en}->{88058161} = "Kurigram";
-$areanames{en}->{88058162} = "Kurigram";
-$areanames{en}->{88058189} = "Kurigram";
-$areanames{en}->{88058268} = "Nageswari";
-$areanames{en}->{88059161} = "Lalmonirhat";
-$areanames{en}->{88059162} = "Lalmonirhat";
-$areanames{en}->{88059189} = "Lalmonirhat";
-$areanames{en}->{88060155} = "Shariatpur";
-$areanames{en}->{88060159} = "Naria\,\ Shariatpur";
-$areanames{en}->{88060161} = "Shariatpur";
-$areanames{en}->{880602356} = "Damudda\,\ Shariatpur";
-$areanames{en}->{880602475} = "GoshairHat\,\ Shariatpur";
-$areanames{en}->{88060248} = "Goshairhat\,\ Sariatpur";
-$areanames{en}->{88062228} = "Dhamrai";
-$areanames{en}->{88062238} = "Dohar";
-$areanames{en}->{88062248} = "Keranigonj";
-$areanames{en}->{88062258} = "Nowabgonj";
-$areanames{en}->{880625356} = "Monahardi\,\ Narsingdi";
-$areanames{en}->{88062538} = "Monohordi";
-$areanames{en}->{88062548} = "Palash";
-$areanames{en}->{880625556} = "Raipura\,\ Narsingdi";
-$areanames{en}->{88062572} = "Madhabdi\,\ Narsingdi";
-$areanames{en}->{88062573} = "Madhabdi\,\ Narsingdi";
-$areanames{en}->{88062574} = "Madhabdi\,\ Narsingdi";
-$areanames{en}->{88062575} = "Madhabdi\,\ Narsingdi";
-$areanames{en}->{88062576} = "Madhabdi\,\ Narsingdi";
-$areanames{en}->{88062577} = "Madhabdi\,\ Narsingdi";
-$areanames{en}->{88062579} = "Madhabdi\,\ Narsingdi";
-$areanames{en}->{88062862} = "Narsingdi";
-$areanames{en}->{88062863} = "Narsingdi";
-$areanames{en}->{88062864} = "Narsingdi";
-$areanames{en}->{88062874} = "Palash\ \(Ghorasal\)\,\ Narsingdi";
-$areanames{en}->{88062875} = "Shibpur\,\ Narsingdi";
-$areanames{en}->{88063161} = "Faridpur";
-$areanames{en}->{88063162} = "Faridpur";
-$areanames{en}->{88063163} = "Faridpur";
-$areanames{en}->{88063164} = "Faridpur";
-$areanames{en}->{88063165} = "Faridpur";
-$areanames{en}->{88063166} = "Faridpur";
-$areanames{en}->{88063167} = "Faridpur";
-$areanames{en}->{88063189} = "Faridpur";
-$areanames{en}->{880632356} = "Bhanga\,\ Faridpur";
-$areanames{en}->{880632456} = "Boalmari\,\ Faridpur";
-$areanames{en}->{880632756} = "Nagarkanda\,\ Faridpur";
-$areanames{en}->{880632875} = "Sadarpur\ \(J\.Monjil\)\,\ Faridpur";
-$areanames{en}->{88064165} = "Rajbari";
-$areanames{en}->{88064189} = "Rajbari";
-$areanames{en}->{880642356} = "Goalanda\,\ Rajbari";
-$areanames{en}->{880642475} = "Pangsha\,\ Rajbari";
-$areanames{en}->{88065161} = "Maninganj";
-$areanames{en}->{88065163} = "Maninganj";
-$areanames{en}->{88065171} = "Singair\,\ Maninganj";
-$areanames{en}->{88065174} = "Daulatpur\,\ Maninganj";
-$areanames{en}->{88065175} = "Shibalaya\,\ Maninganj";
-$areanames{en}->{88065189} = "Maninganj";
-$areanames{en}->{88065248} = "Zitka";
-$areanames{en}->{88065278} = "Singair";
-$areanames{en}->{88066155} = "Madaripur";
-$areanames{en}->{88066156} = "Madaripur";
-$areanames{en}->{88066161} = "Madaripur";
-$areanames{en}->{88066162} = "Madaripur";
-$areanames{en}->{88066228} = "Kalkini\,\ Madaripur";
-$areanames{en}->{880662356} = "Rajoir\,\ Madaripur";
-$areanames{en}->{880662456} = "Shibchar\,\ Madaripur";
-$areanames{en}->{880665256} = "Kashiani\,\ Gopalgonj";
-$areanames{en}->{880665356} = "Kotalipara\,\ Gopalgonj";
-$areanames{en}->{88066538} = "Kotalipara\,\ Gopalgonj";
-$areanames{en}->{880665456} = "Moksudpur\,\ Gopalgonj";
-$areanames{en}->{880665556} = "Tungipara\,\ Gopalgonj";
-$areanames{en}->{880665559} = "Tungipara\,\ Gopalgonj";
-$areanames{en}->{88066558} = "Tongipara\,\ Gopalgonj";
-$areanames{en}->{88066855} = "Gopalgonj";
-$areanames{en}->{88066857} = "Gopalgonj";
-$areanames{en}->{88066858} = "Gopalgonj";
-$areanames{en}->{88066861} = "Gopalgonj";
-$areanames{en}->{880672256} = "Araihazar\,\ Narayanganj";
-$areanames{en}->{88067228} = "Arihazar";
-$areanames{en}->{88067238} = "Sonargaon";
-$areanames{en}->{88067248} = "Bandar";
-$areanames{en}->{880672556} = "Rupganj\,\ Narayanganj";
-$areanames{en}->{88067258} = "Rupgonj";
-$areanames{en}->{880682251} = "Kaliakoir\,\ Gazipur";
-$areanames{en}->{880682351} = "Kaliganj\,\ Gazipur";
-$areanames{en}->{880682451} = "Kapashia\,\ Gazipur";
-$areanames{en}->{880682551} = "Sreepur\,\ Gazipur";
-$areanames{en}->{880682552} = "Sreepur\,\ Gazipur";
-$areanames{en}->{88069161} = "Munsigonj";
-$areanames{en}->{88069162} = "Munsigonj";
-$areanames{en}->{88069163} = "Munsigonj";
-$areanames{en}->{88069174} = "Tongibari\,\ Munsigonj";
-$areanames{en}->{88069189} = "Munsigonj";
-$areanames{en}->{88069228} = "Gazaria";
-$areanames{en}->{880692356} = "Lohajang\,\ Munsigonj";
-$areanames{en}->{88069248} = "Sirajdikhan";
-$areanames{en}->{88069258} = "Sreenagar";
-$areanames{en}->{88069268} = "Tongibari";
-$areanames{en}->{88070222} = "Bheramara\,\ Kushtia";
-$areanames{en}->{88070223} = "Bheramara\,\ Kushtia";
-$areanames{en}->{88072175} = "Rajshahi";
-$areanames{en}->{88072176} = "Rajshahi";
-$areanames{en}->{88072177} = "Rajshahi";
-$areanames{en}->{88072180} = "Rajshahi";
-$areanames{en}->{88072181} = "Rajshahi";
-$areanames{en}->{88072186} = "Rajshahi";
-$areanames{en}->{88073162} = "Pabna";
-$areanames{en}->{88073163} = "Pabna";
-$areanames{en}->{88073164} = "Pabna";
-$areanames{en}->{88073165} = "Pabna";
-$areanames{en}->{88073166} = "Pabna";
-$areanames{en}->{88073175} = "Bera\,\ Pabna";
-$areanames{en}->{88073189} = "Pabna";
-$areanames{en}->{88073238} = "Bera\,\ Pabna";
-$areanames{en}->{880732456} = "Chatmohar\,\ Pabna";
-$areanames{en}->{88073248} = "Chatmohar\,\ Pabna";
-$areanames{en}->{88073258} = "Faridpur\,\ Pabna";
-$areanames{en}->{880732663} = "Ishwardi\,\ Pabna";
-$areanames{en}->{880732756} = "Shathiya\,\ Pabna";
-$areanames{en}->{88073278} = "Sathia\,\ Pabna";
-$areanames{en}->{88073288} = "Bhangura\,\ Pabna";
-$areanames{en}->{880732956} = "Sujanagar\,\ Pabna";
-$areanames{en}->{88074152} = "Nagoan";
-$areanames{en}->{88074153} = "Nagoan";
-$areanames{en}->{88074155} = "Santahar\,\ Nagoan";
-$areanames{en}->{88074161} = "Nagoan";
-$areanames{en}->{88074162} = "Nagoan";
-$areanames{en}->{88074163} = "Nagoan";
-$areanames{en}->{88074169} = "Santahar\,\ Nagoan";
-$areanames{en}->{88074189} = "Nagoan";
-$areanames{en}->{88075162} = "Sirajganj";
-$areanames{en}->{88075163} = "Sirajganj";
-$areanames{en}->{88075172} = "Sirajganj";
-$areanames{en}->{88075173} = "Sirajganj";
-$areanames{en}->{88075189} = "Sirajganj";
-$areanames{en}->{88076162} = "Chuadanga";
-$areanames{en}->{88076163} = "Chuadanga";
-$areanames{en}->{88076164} = "Chuadanga";
-$areanames{en}->{88076189} = "Chuadanga";
-$areanames{en}->{88076222} = "Alamdanga\,\ Chuadanga";
-$areanames{en}->{88076223} = "Alamdanga\,\ Chuadanga";
-$areanames{en}->{880772474} = "Gurudashpur\,\ Natore";
-$areanames{en}->{88078155} = "Chapai\ Nobabganj";
-$areanames{en}->{88078156} = "Chapai\ Nobabganj";
-$areanames{en}->{88078160} = "Chapai\ Nobabganj";
-$areanames{en}->{88078161} = "Chapai\ Nobabganj";
-$areanames{en}->{88078162} = "Chapai\ Nobabganj";
-$areanames{en}->{88078174} = "Rahanpur\,\ Chapai\ Nobabganj";
-$areanames{en}->{88078175} = "Shibganj\,\ Chapai\ Nobabganj";
-$areanames{en}->{88078189} = "Chapai\ Nobabganj";
-$areanames{en}->{88079162} = "Meherpur";
-$areanames{en}->{88079163} = "Meherpur";
-$areanames{en}->{880802056} = "Chauddagram\,\ Comilla";
-$areanames{en}->{88080208} = "Chauddagram\,\ Comilla";
-$areanames{en}->{880802256} = "Chandina\,\ Comilla";
-$areanames{en}->{88080228} = "Chandiana\,\ Comilla";
-$areanames{en}->{88080233} = "Daudkandi\,\ Comilla";
-$areanames{en}->{88080234} = "Daudkandi\,\ Comilla";
-$areanames{en}->{88080238} = "Daudkandi\,\ Comilla";
-$areanames{en}->{88080248} = "Debidwar\,\ Comilla";
-$areanames{en}->{88080258} = "Homna\,\ Comilla";
-$areanames{en}->{880802656} = "Muradnagar\,\ Comilla";
-$areanames{en}->{88080268} = "Muradnagar\,\ Comilla";
-$areanames{en}->{88080278} = "Barura\,\ Comilla";
-$areanames{en}->{88080288} = "Brahmanpara\,\ Comilla";
-$areanames{en}->{880802956} = "Burichang\,\ Comilla";
-$areanames{en}->{88080298} = "Burichang\,\ Comilla";
-$areanames{en}->{88080322} = "Laksham\,\ Comilla";
-$areanames{en}->{88080323} = "Laksham\,\ Comilla";
-$areanames{en}->{88080324} = "Laksham\,\ Comilla";
-$areanames{en}->{88080325} = "Laksham\,\ Comilla";
-$areanames{en}->{88080328} = "Laksham\,\ Comilla";
-$areanames{en}->{88080338} = "Nangalcoat\,\ Comilla";
-$areanames{en}->{8808154} = "Homna\,\ Comilla";
-$areanames{en}->{880816} = "Comilla";
-$areanames{en}->{8808171} = "Comilla";
-$areanames{en}->{8808172} = "Comilla";
-$areanames{en}->{8808173} = "Comilla";
-$areanames{en}->{8808174} = "Comilla";
-$areanames{en}->{8808175} = "Comilla";
-$areanames{en}->{8808176} = "Comilla";
-$areanames{en}->{8808177} = "Comilla";
-$areanames{en}->{88082171} = "Sylhet\ MEA";
-$areanames{en}->{88082172} = "Sylhet\ MEA";
-$areanames{en}->{88082176} = "Sylhet\ MEA";
-$areanames{en}->{88083152} = "Habiganj";
-$areanames{en}->{88083153} = "Habiganj";
-$areanames{en}->{88083161} = "Habiganj";
-$areanames{en}->{88083162} = "Habiganj";
-$areanames{en}->{88083163} = "Habiganj";
-$areanames{en}->{88083258} = "Chunarughat";
-$areanames{en}->{88083278} = "Madabpur";
-$areanames{en}->{880832856} = "Nabiganj\,\ Habiganj";
-$areanames{en}->{88083288} = "Nabigonj";
-$areanames{en}->{88084163} = "Chandpur";
-$areanames{en}->{88084164} = "Chandpur";
-$areanames{en}->{88084165} = "Chandpur";
-$areanames{en}->{88084242} = "Hajiganj\,\ Chandpur";
-$areanames{en}->{88084243} = "Hajiganj\,\ Chandpur";
-$areanames{en}->{88084244} = "Hajiganj\,\ Chandpur";
-$areanames{en}->{88084245} = "Hajiganj\,\ Chandpur";
-$areanames{en}->{88084248} = "Hajigonj\,\ Chandpur";
-$areanames{en}->{880842556} = "Kochua\,\ Chandpur";
-$areanames{en}->{88084258} = "Kachua\,\ Chandpur";
-$areanames{en}->{880842656} = "Matlab\,\ Chandpur";
-$areanames{en}->{88084268} = "Matlab\,\ Chandpur";
-$areanames{en}->{880842756} = "Shaharasti\,\ Chandpur";
-$areanames{en}->{88084278} = "Shahrasti\,\ Chandpur";
-$areanames{en}->{88085152} = "Brahmanbaria";
-$areanames{en}->{88085153} = "Brahmanbaria";
-$areanames{en}->{88085154} = "Brahmanbaria";
-$areanames{en}->{88085161} = "Brahmanbaria";
-$areanames{en}->{88085162} = "Brahmanbaria";
-$areanames{en}->{88085163} = "Brahmanbaria";
-$areanames{en}->{88085175} = "Nabinagar\,\ Brahmanbaria";
-$areanames{en}->{880852256} = "Akhaura\,\ Brahmanbaria";
-$areanames{en}->{88085228} = "Akhaura\,\ Brahmanbaria";
-$areanames{en}->{880852356} = "Bancharampur\,\ Brahmanbaria";
-$areanames{en}->{88085238} = "Bancharampur\,\ Brahmanbaria";
-$areanames{en}->{880852473} = "Kashba\,\ Brahmanbaria";
-$areanames{en}->{88085248} = "Quashba\,\ Brahmanbaria";
-$areanames{en}->{88085258} = "Nabinagar\,\ Brahmanbaria";
-$areanames{en}->{88085268} = "Nasirnagar\,\ Brahmanbaria";
-$areanames{en}->{88085278} = "Sarail\,\ Brahmanbaria";
-$areanames{en}->{88085282} = "Ashuganj\,\ Brahmanbaria";
-$areanames{en}->{88085283} = "Ashuganj\,\ Brahmanbaria";
-$areanames{en}->{88085284} = "Ashuganj\,\ Brahmanbaria";
-$areanames{en}->{88085285} = "Ashuganj\,\ Brahmanbaria";
-$areanames{en}->{88086152} = "Maulavibazar";
-$areanames{en}->{88086153} = "Maulavibazar";
-$areanames{en}->{88086154} = "Maulavibazar";
-$areanames{en}->{88086161} = "Maulavibazar";
-$areanames{en}->{88086175} = "Rajnagar\,\ Maulavibazar";
-$areanames{en}->{88086189} = "Maulavibazar";
-$areanames{en}->{880862256} = "Baralekha\,\ Maulavibazar";
-$areanames{en}->{88086228} = "Baralekha";
-$areanames{en}->{88086238} = "Komalgonj";
-$areanames{en}->{880862456} = "Kulaura\,\ Maulavibazar";
-$areanames{en}->{88086248} = "Kulaura";
-$areanames{en}->{88086258} = "Rajnagar";
-$areanames{en}->{88086262} = "Sreemongal\,\ Maulavibazar";
-$areanames{en}->{88086263} = "Sreemongal\,\ Maulavibazar";
-$areanames{en}->{88086264} = "Sreemongal\,\ Maulavibazar";
-$areanames{en}->{88086265} = "Sreemongal\,\ Maulavibazar";
-$areanames{en}->{88086266} = "Sreemongal\,\ Maulavibazar";
-$areanames{en}->{88086267} = "Sreemongal\,\ Maulavibazar";
-$areanames{en}->{88086268} = "Sreemongal";
-$areanames{en}->{88086269} = "Sreemongal\,\ Maulavibazar";
-$areanames{en}->{88087155} = "Sunamganj";
-$areanames{en}->{88087156} = "Sunamganj";
-$areanames{en}->{88087161} = "Sunamganj";
-$areanames{en}->{88087162} = "Sunamganj";
-$areanames{en}->{88087163} = "Sunamganj";
-$areanames{en}->{880872356} = "Chattak\,\ Sunamganj";
-$areanames{en}->{88087238} = "Chatak";
-$areanames{en}->{880872575} = "Dharmapasha\,\ Sunamganj";
-$areanames{en}->{880872756} = "Jaganathpur\,\ Sunamganj";
-$areanames{en}->{88087278} = "Jagonnathpur";
-$areanames{en}->{88090208} = "Phulpur";
-$areanames{en}->{880902256} = "Bhaluka\,\ Mymensingh";
-$areanames{en}->{88090248} = "Gouripur";
-$areanames{en}->{880902556} = "Gafargaon\,\ Mymensingh";
-$areanames{en}->{88090258} = "Goforgaon";
-$areanames{en}->{880902756} = "Iswarganj\,\ Mymensingh";
-$areanames{en}->{88090278} = "Ishwargonj";
-$areanames{en}->{88090288} = "Muktagacha";
-$areanames{en}->{8809151} = "Mymensingh";
-$areanames{en}->{8809152} = "Mymensingh";
-$areanames{en}->{8809153} = "Mymensingh";
-$areanames{en}->{8809154} = "Mymensingh";
-$areanames{en}->{8809155} = "Mymensingh";
-$areanames{en}->{8809156} = "Mymensingh";
-$areanames{en}->{8809161} = "Mymensingh";
-$areanames{en}->{8809162} = "Mymensingh";
-$areanames{en}->{8809163} = "Mymensingh";
-$areanames{en}->{8809164} = "Mymensingh";
-$areanames{en}->{8809175} = "Muktagacha\,\ Mymensingh";
-$areanames{en}->{8809189} = "Mymensingh";
-$areanames{en}->{88092153} = "Tangail";
-$areanames{en}->{88092154} = "Tangail";
-$areanames{en}->{88092155} = "Tangail";
-$areanames{en}->{88092158} = "Tangail";
-$areanames{en}->{88092161} = "Tangail";
-$areanames{en}->{88092162} = "Tangail";
-$areanames{en}->{880922256} = "Bashail\,\ Tangail";
-$areanames{en}->{88092238} = "Bhuapur";
-$areanames{en}->{880922556} = "Ghatail\,\ Tangail";
-$areanames{en}->{88092258} = "Ghatail";
-$areanames{en}->{88092268} = "Gopalpur";
-$areanames{en}->{880922774} = "Kalihati\,\ Tangail";
-$areanames{en}->{88092278} = "Elenga\/Kalihati";
-$areanames{en}->{880922856} = "Modhupur\,\ Tangail";
-$areanames{en}->{88092288} = "Modhupur";
-$areanames{en}->{88092298} = "Mirzapur";
-$areanames{en}->{88093161} = "Sherpur";
-$areanames{en}->{88093173} = "Nalitabari\,\ Sherpur";
-$areanames{en}->{88093175} = "Nakla\,\ Sherpur";
-$areanames{en}->{88093189} = "Sherpur";
-$areanames{en}->{88094155} = "Kishoreganj";
-$areanames{en}->{88094156} = "Kishoreganj";
-$areanames{en}->{88094161} = "Kishoreganj";
-$areanames{en}->{88094162} = "Kishoreganj";
-$areanames{en}->{88094175} = "Tarail\,\ Kishoreganj";
-$areanames{en}->{88094232} = "Bajitpur\,\ Kishoreganj";
-$areanames{en}->{88094233} = "Bajitpur\,\ Kishoreganj";
-$areanames{en}->{88094242} = "Bhairabbazar\,\ Kishoreganj";
-$areanames{en}->{88094243} = "Bhairabbazar\,\ Kishoreganj";
-$areanames{en}->{88094244} = "Bhairabbazar\,\ Kishoreganj";
-$areanames{en}->{88094245} = "Bhairabbazar\,\ Kishoreganj";
-$areanames{en}->{88094246} = "Bhairabbazar\,\ Kishoreganj";
-$areanames{en}->{88094247} = "Bhairabbazar\,\ Kishoreganj";
-$areanames{en}->{88094248} = "Bhairabbazar\,\ Kishoreganj";
-$areanames{en}->{88094249} = "Bhairabbazar\,\ Kishoreganj";
-$areanames{en}->{880942656} = "Itna\,\ Kishoreganj";
-$areanames{en}->{88094288} = "Kotiadhi";
-$areanames{en}->{88095161} = "Netrokona";
-$areanames{en}->{88095162} = "Netrokona";
-$areanames{en}->{88095189} = "Netrokona";
-$areanames{en}->{88098162} = "Jamalpur";
-$areanames{en}->{88098163} = "Jamalpur";
-$areanames{en}->{88098164} = "Jamalpur";
-$areanames{en}->{88098165} = "Jamalpur";
-$areanames{en}->{88098174} = "Islampur\,\ Jamalpur";
-$areanames{en}->{88098175} = "Dewanganj\,\ Jamalpur";
-$areanames{en}->{88098189} = "Jamalpur";
+$areanames{en}->{880451} = "Jhinaidah\/Horinakunda";
+$areanames{en}->{8804523} = "Kaligonj";
+$areanames{en}->{8804525} = "Moheshpur";
+$areanames{en}->{880461} = "Pirojpur";
+$areanames{en}->{8804623} = "Bhandaria";
+$areanames{en}->{8804624} = "Kaokhali\/Kawkhali";
+$areanames{en}->{8804625} = "Mothbaria";
+$areanames{en}->{8804626} = "Nazirpur";
+$areanames{en}->{8804627} = "Swarupkhati";
+$areanames{en}->{8804652} = "Bagerhat";
+$areanames{en}->{8804653} = "Fakirhat";
+$areanames{en}->{8804654} = "Kachua";
+$areanames{en}->{8804655} = "Mollarhat";
+$areanames{en}->{8804656} = "Morelganj";
+$areanames{en}->{8804657} = "Rampal";
+$areanames{en}->{8804658} = "Mongla\,\ Bagerhat";
+$areanames{en}->{880466} = "Mongla";
+$areanames{en}->{880468} = "Bagerhat\/Mongla\ Port";
+$areanames{en}->{88047} = "Satkhira";
+$areanames{en}->{880481} = "Narail";
+$areanames{en}->{880482} = "Lohagara";
+$areanames{en}->{880485} = "Sreepur";
+$areanames{en}->{880488} = "Magura\/Mohammadpur";
+$areanames{en}->{880491} = "Bhola";
+$areanames{en}->{8804922} = "Borhanuddin";
+$areanames{en}->{8804924} = "Daulatkhan";
+$areanames{en}->{8804925} = "Lalmohan";
+$areanames{en}->{880495} = "Nalcity";
+$areanames{en}->{880498} = "Jhalakati";
+$areanames{en}->{8805020} = "Sibgonj\ \(Mokamtala\)";
+$areanames{en}->{8805023} = "Dhunat";
+$areanames{en}->{8805024} = "Dhupchachia";
+$areanames{en}->{8805028} = "Shariakandi";
+$areanames{en}->{8805029} = "Sherpur";
+$areanames{en}->{88051} = "Bogra\/Gabtali\/Nandigram\/Sherpur";
+$areanames{en}->{880521} = "Rangpur";
+$areanames{en}->{8805222} = "Badarganj";
+$areanames{en}->{8805224} = "Haragacha";
+$areanames{en}->{8805225} = "Mithapukur";
+$areanames{en}->{8805227} = "Pirgonj";
+$areanames{en}->{880531} = "Dianjpur\/Parbitipur\/Hakimpur\ \(Hili\)";
+$areanames{en}->{8805323} = "Birgonj\/Gobindagonj\/Birganj";
+$areanames{en}->{8805325} = "Shetabgonj";
+$areanames{en}->{8805326} = "Chrirbandar";
+$areanames{en}->{8805327} = "Fulbari";
+$areanames{en}->{8805329} = "Bangla\ hili";
+$areanames{en}->{880541} = "Gaibandha\/Gabindaganj";
+$areanames{en}->{8805424} = "Palashbari";
+$areanames{en}->{8805426} = "Saghata\ \(Bonarpara\)";
+$areanames{en}->{880551} = "Nilphamari\/Domar";
+$areanames{en}->{880552} = "Saidpur\/Syedpur";
+$areanames{en}->{880561} = "Thakurgoan";
+$areanames{en}->{880565} = "Boda";
+$areanames{en}->{880568} = "Panchagar\/Tetulia";
+$areanames{en}->{880571} = "Jhinaidah\/Panchbibi";
+$areanames{en}->{880572} = "Panchbibi";
+$areanames{en}->{880581} = "Kurigram";
+$areanames{en}->{880582} = "Nageswari";
+$areanames{en}->{88059} = "Lalmonirhat";
+$areanames{en}->{880601} = "Shariatpur\ Naria";
+$areanames{en}->{8806023} = "Damudda";
+$areanames{en}->{8806024} = "GoshairHat";
+$areanames{en}->{8806222} = "Dhamrai";
+$areanames{en}->{8806223} = "Dohar";
+$areanames{en}->{8806224} = "Keranigonj";
+$areanames{en}->{8806225} = "Nowabgonj";
+$areanames{en}->{8806253} = "Monahardi\/Monohordi";
+$areanames{en}->{8806254} = "Palash";
+$areanames{en}->{8806255} = "Raipura";
+$areanames{en}->{8806257} = "Madhabdi";
+$areanames{en}->{880628} = "Narsingdi\/Palash\ \(Ghorasal\)\/Shibpur";
+$areanames{en}->{880631} = "Faridpur";
+$areanames{en}->{8806323} = "Bhanga";
+$areanames{en}->{8806324} = "Boalmari";
+$areanames{en}->{8806327} = "Nagarkanda";
+$areanames{en}->{8806328} = "Sadarpur\ \(J\.Monjil\)";
+$areanames{en}->{880641} = "Rajbari";
+$areanames{en}->{8806423} = "Goalanda";
+$areanames{en}->{8806424} = "Pangsha";
+$areanames{en}->{880651} = "Maninganj\/Singair\/Daulatpur\/Shibalaya";
+$areanames{en}->{8806524} = "Zitka";
+$areanames{en}->{8806527} = "Singair";
+$areanames{en}->{880661} = "Madaripur";
+$areanames{en}->{880668} = "Gopalgonj";
+$areanames{en}->{8806722} = "Araihazar\/Arihazar";
+$areanames{en}->{8806723} = "Sonargaon";
+$areanames{en}->{8806724} = "Bandar";
+$areanames{en}->{8806725} = "Rupganj\/Rupgonj";
+$areanames{en}->{8806822} = "Kaliakoir";
+$areanames{en}->{8806823} = "Kaliganj";
+$areanames{en}->{8806824} = "Kapashia";
+$areanames{en}->{8806825} = "Sreepur";
+$areanames{en}->{880691} = "Munsigonj\/Tongibari";
+$areanames{en}->{8806922} = "Gazaria";
+$areanames{en}->{8806923} = "Lohajang";
+$areanames{en}->{8806924} = "Sirajdikhan";
+$areanames{en}->{8806925} = "Sreenagar";
+$areanames{en}->{8806926} = "Tongibari";
+$areanames{en}->{88070} = "Bheramara";
+$areanames{en}->{88071} = "Kushtia";
+$areanames{en}->{880721} = "Rajshahi";
+$areanames{en}->{88072255} = "Rajshahi";
+$areanames{en}->{88072258} = "Godagari";
+$areanames{en}->{8807227} = "Paba";
+$areanames{en}->{88072285} = "Rajshahi";
+$areanames{en}->{88072288} = "Baneswar";
+$areanames{en}->{88072295} = "Rajshahi";
+$areanames{en}->{88072298} = "Tanore";
+$areanames{en}->{880731} = "Pabna\ \ Bera";
+$areanames{en}->{880732} = "Bera\/Chatmohar\/Faridpur\/Ishwardi\/Shathiya\/Sathia\/Bhangura\/Sujanagar";
+$areanames{en}->{880741} = "Nagoan\/Santahar";
+$areanames{en}->{8807425} = "Manda";
+$areanames{en}->{88074267} = "Nagoan";
+$areanames{en}->{88074268} = "Mahadevpur";
+$areanames{en}->{880751} = "Sirajganj";
+$areanames{en}->{88075225} = "Sirajganj";
+$areanames{en}->{88075228} = "Sirajgonj";
+$areanames{en}->{8807523} = "Sirajgonj";
+$areanames{en}->{8807524} = "Sirajgonj";
+$areanames{en}->{88075255} = "Sirajganj";
+$areanames{en}->{88075258} = "Sirajgonj";
+$areanames{en}->{88075265} = "Sirajganj";
+$areanames{en}->{88075268} = "Sirajgonj";
+$areanames{en}->{8807527} = "Sirajgonj";
+$areanames{en}->{88075285} = "Sirajganj";
+$areanames{en}->{88075288} = "Sirajgonj";
+$areanames{en}->{88075295} = "Sirajganj";
+$areanames{en}->{88075298} = "Sirajgonj";
+$areanames{en}->{880761} = "Chuadanga";
+$areanames{en}->{880762} = "Alamdanga";
+$areanames{en}->{880771} = "Natore";
+$areanames{en}->{8807724} = "Gurudashpur";
+$areanames{en}->{880781} = "Rahanpur\/Shibganj\/Chapai\ Nobabganj";
+$areanames{en}->{8807823} = "Rohanpur";
+$areanames{en}->{8807825} = "Shibgonj";
+$areanames{en}->{88079} = "Meherpur";
+$areanames{en}->{880802} = "Chauddagram\/Chandina\/Chandiana\/Daudkandi\/Debidwar\/Homna\/Muradnagar\/Brahmanpara\/Barura\/Burichang";
+$areanames{en}->{88081} = "Homna\/Comilla";
+$areanames{en}->{8808217} = "Sylhet\ MEA";
+$areanames{en}->{8808218} = "Sylhet";
+$areanames{en}->{8808220} = "Kanaighat";
+$areanames{en}->{8808222} = "Balagonj";
+$areanames{en}->{8808223} = "Bianibazar";
+$areanames{en}->{8808224} = "Biswanath";
+$areanames{en}->{8808225} = "Sylhet";
+$areanames{en}->{8808226} = "Fenchugonj";
+$areanames{en}->{8808227} = "Golapgonj";
+$areanames{en}->{88082295} = "Sylhet";
+$areanames{en}->{88082298} = "Jaintapur";
+$areanames{en}->{880823} = "Sylhet";
+$areanames{en}->{880831} = "Habiganj";
+$areanames{en}->{880832} = "Chunarughat\/Madabpur\/Nabiganj";
+$areanames{en}->{880833} = "Habiganj";
+$areanames{en}->{880841} = "Chandpur";
+$areanames{en}->{880842} = "Hajiganj\/Kochua\/Shahrasti\/Matlab";
+$areanames{en}->{880851} = "Brahmanbaria\/Nabinagar";
+$areanames{en}->{880852} = "Akhaura\/Bancharampur\/Kashba\/Sarail\/Quashba\/Nabinagar\/Ashuganj";
+$areanames{en}->{880861} = "Maulavibazar\/Rajnagar";
+$areanames{en}->{880862} = "Baralekha\/Komalgonj\/Kulaura\/Rajnagar\/Sreemongal";
+$areanames{en}->{880871} = "Sunamganj";
+$areanames{en}->{880872} = "Chatak\/Dharmapasha\/Jaganathpur\/Jagonnathpur";
+$areanames{en}->{880902} = "Phulpur\/Bhaluka\/Gouripur\/Gafargaon\/Goforgaon\/Iswarganj\/Ishwargonj\/Muktagacha";
+$areanames{en}->{880903} = "Mymensingh";
+$areanames{en}->{88091} = "Mymensingh";
+$areanames{en}->{880921} = "Tangail";
+$areanames{en}->{880922} = "Bashail\/Bhuapur\/Ghatail\/Gopalpur\/Kalihati\/Elenga\/Kalihati\/Modhupur\/Mirzapur";
+$areanames{en}->{88092325} = "Tangail";
+$areanames{en}->{88092328} = "Shakhipur";
+$areanames{en}->{8809233} = "Tangail";
+$areanames{en}->{88093} = "Nalitabari\/Nakla\/Sherpur";
+$areanames{en}->{880941} = "Kishoreganj\/Tarail";
+$areanames{en}->{880942} = "Bajitpur\/Bhairabbazar\/Itna\/Kotiadhi";
+$areanames{en}->{88095} = "Netrokona";
+$areanames{en}->{88098} = "Jamalpur\/Islampur\/Dewanganj";
 
     sub new {
       my $class = shift;

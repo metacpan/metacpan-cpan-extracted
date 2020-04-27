@@ -5,7 +5,7 @@ use warnings;
 use Getopt::Kingpin -base;
 use Carp;
 
-our $VERSION = "0.07";
+our $VERSION = "0.08";
 
 sub help_short {
     my $self = shift;

@@ -8,25 +8,21 @@ use Wasm::Wasmtime::Trap;
 use Wasm::Wasmtime::WasiConfig;
 
 # ABSTRACT: WASI instance class
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 $ffi_prefix = 'wasi_instance_';
-$ffi->custom_type('wasi_instance_t' => {
-  native_type => 'opaque',
-  perl_to_native => sub { shift->{ptr} },
-  native_to_perl => sub { bless { ptr => shift }, __PACKAGE__ },
-});
+$ffi->load_custom_type('::PtrObject' => 'wasi_instance_t' => __PACKAGE__);
 
 
-$ffi->attach( new => ['wasm_store_t', 'string', 'wasi_config_t', 'wasm_trap_t*'] => 'wasi_instance_t' => sub {
+$ffi->attach( new => ['wasm_store_t', 'string', 'wasi_config_t', 'opaque*'] => 'wasi_instance_t' => sub {
   my $xsub = shift;
   my $class = shift;
   my $store = shift;
   my $name = shift;
   my $config = defined $_[0] && ref($_[0]) eq 'Wasm::Wasmtime::WasiConfig' ? shift : Wasm::Wasmtime::WasiConfig->new;
   my $trap;
-  my $instance = $xsub->($store->{ptr}, $name, $config, \$trap);
+  my $instance = $xsub->($store, $name, $config, \$trap);
   delete $config->{ptr};
   unless($instance)
   {
@@ -42,10 +38,7 @@ $ffi->attach( new => ['wasm_store_t', 'string', 'wasi_config_t', 'wasm_trap_t*']
 
 # TODO: bind_import
 
-$ffi->attach( [ 'delete' => 'DESTROY' ] => ['wasi_instance_t'] => sub {
-  my($xsub, $self) = @_;
-  $xsub->($self) if $self->{ptr};
-});
+_generate_destroy();
 
 1;
 
@@ -61,7 +54,7 @@ Wasm::Wasmtime::WasiInstance - WASI instance class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

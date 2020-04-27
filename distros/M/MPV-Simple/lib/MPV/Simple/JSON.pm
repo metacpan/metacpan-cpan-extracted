@@ -251,17 +251,25 @@ MPV::Simple::JSON
     # Create the video frame
     my $f = $mw->Frame(-width => 640, -height => 480)->pack(-expand =>1,-fill => "both");
     
-    # With the MPV property "wid" you can embed MPV in a foreign window
-    $mpv->set_property_string("wid",$f->id());
-    
-    # The video shall start paused here
-    $mpv->set_property_string('pause','yes');
-    
-    # Load a video file
-    $mpv->command("loadfile", "./einladung2.mp4");
+    # Until the video frame is mapped, we set up the MPV Player in this video frame
+    $f->bind('<Map>' => sub {
+        $f->bind('<Map>' => sub {});
+        
+        # The video shall start paused here
+        $mpv->set_property_string("pause","yes");
+        
+        # With the MPV property "wid" you can embed MPV in a foreign window
+        # (therefore it was important, that $f is already mapped!)
+        $mpv->set_property_string("wid",$f->id());
+        
+        # Load a video file
+        $mpv->command("loadfile", "path_to_video.ogg");
+    });
     
     # For handling events you must repeatly call a event handler.
-    # I think, it is enough to call the event handler every 500/1000ms
+    # A good value for the timeout is 200-1000ms (I think 500ms is enough)
+    # Another aproach would be, that the Tcl::Tk loop coexists with the 
+    # MPV loop (see MPV::Simple::Pipe for an example)
     $int->call('after',1000,\&handle_events);
     
     my $b1 = $mw->Button(
@@ -282,7 +290,9 @@ MPV::Simple::JSON
     )->pack(-side => 'left');
     my $b5 = $mw->Button(
         -text   =>  "Close",
-        -command => sub {$mpv->terminate_destroy();$mw->destroy();}
+        # I recommend to destroy first the Tcl::Tk main window, and
+        # then the mpv instance
+        -command => sub {$mw->destroy();$mpv->terminate_destroy();}
     )->pack(-side => 'left');
     $int->MainLoop;
     

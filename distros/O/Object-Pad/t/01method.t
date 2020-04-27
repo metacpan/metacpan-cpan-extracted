@@ -56,4 +56,26 @@ SKIP: {
    is( $obj->value, 123, '$obj->value from BUILD-generated anon method' );
 }
 
+# method warns about redeclared $self (RT132428)
+{
+   class RT132428 {
+      BEGIN {
+         my $warnings = "";
+         local $SIG{__WARN__} = sub { $warnings .= join "", @_; };
+
+         ::ok( defined eval <<'EOPERL',
+            method test {
+               my $self = shift;
+            }
+            1;
+EOPERL
+            'method compiles OK' );
+
+         ::like( $warnings,
+            qr/^"my" variable \$self masks earlier declaration in same scope at \(eval \d+\) line 2\./,
+            'warning from redeclared $self comes from correct line' );
+      }
+   }
+}
+
 done_testing;

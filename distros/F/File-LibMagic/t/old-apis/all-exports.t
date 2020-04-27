@@ -1,7 +1,8 @@
 use strict;
 use warnings;
 
-use lib 't/lib';
+use FindBin qw( $Bin );
+use lib "$Bin/../lib";
 
 use Test::Exports qw( test_complete test_easy );
 use Test::More 0.88;
@@ -15,12 +16,12 @@ use Test::More 0.88;
 
 subtest(
     'complete API exported by :all',
-    sub { test_complete('Test::AllExports') }
+    sub { test_complete( 'Test::AllExports', "$Bin/../samples" ) }
 );
 
 subtest(
     'easy API exported by :all',
-    sub { test_easy('Test::AllExports') }
+    sub { test_easy( 'Test::AllExports', "$Bin/../samples" ) }
 );
 
 done_testing();

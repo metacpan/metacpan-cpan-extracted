@@ -1,7 +1,8 @@
 use strict;
 use warnings;
 
-use lib 't/lib';
+use FindBin qw( $Bin );
+use lib "$Bin/lib";
 
 use Cwd qw( abs_path );
 use File::Temp qw( tempdir );
@@ -16,10 +17,11 @@ use File::LibMagic;
         unless eval { symlink( q{}, q{} ); 1 };
     ## use critic
 
-    my $dir = tempdir( CLEANUP => 1 );
+    my $dir       = tempdir( CLEANUP => 1 );
     my $link_file = "$dir/link-to-tiny.pdf";
-    symlink abs_path() . '/t/samples/tiny.pdf' => $link_file
-        or die "Cannot create symlink to t/samples/tiny.pdf: $!";
+    my $to        = abs_path($Bin) . '/samples/tiny.pdf';
+    symlink $to => $link_file
+        or die "Cannot create symlink to $to: $!";
 
     my $info = File::LibMagic->new( follow_symlinks => 1 )
         ->info_from_filename($link_file);
@@ -35,10 +37,14 @@ use File::LibMagic;
             'description'
         );
         is( $info->{mime_type}, 'application/pdf', 'mime type' );
-        like( $info->{encoding}, qr/^(?:binary|unknown)$/, 'encoding' );
+        like(
+            $info->{encoding},
+            qr/^(?:binary|unknown|us-ascii)$/,
+            'encoding',
+        );
         like(
             $info->{mime_with_encoding},
-            qr{^application/pdf; charset=(?:binary|unknown)$},
+            qr{^application/pdf; charset=(?:binary|unknown|us-ascii)$},
             'mime with charset'
         );
     }
@@ -46,7 +52,8 @@ use File::LibMagic;
 
 {
     my $info
-        = File::LibMagic->new()->info_from_filename('t/samples/tiny-pdf.gz');
+        = File::LibMagic->new()
+        ->info_from_filename("$Bin/samples/tiny-pdf.gz");
 
     is_any_of(
         $info->{mime_type},
@@ -56,12 +63,28 @@ use File::LibMagic;
 
     $info
         = File::LibMagic->new( uncompress => 1 )
-        ->info_from_filename('t/samples/tiny-pdf.gz');
+        ->info_from_filename("$Bin/samples/tiny-pdf.gz");
 
     is(
         $info->{mime_type},
         'application/pdf',
         'gzip file is application/pdf when uncompressed'
+    );
+}
+
+SKIP:
+{
+    skip 'The install libmagic does not support the max_bytes parameter', 1
+        unless File::LibMagic->can('MAGIC_PARAM_BYTES_MAX');
+
+    my $info
+        = File::LibMagic->new( max_bytes => 1 )
+        ->info_from_filename("$Bin/samples/tiny-pdf.gz");
+
+    is(
+        $info->{mime_type},
+        'application/octet-stream',
+        'gzip file is application/octet-stream when max bytes is set to 1'
     );
 }
 

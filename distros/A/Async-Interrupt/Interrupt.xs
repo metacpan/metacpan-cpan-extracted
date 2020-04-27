@@ -200,7 +200,7 @@ handle_asyncs (void)
     }
 }
 
-#if HAS_SA_SIGINFO
+#if HAS_SA_SIGINFO && !PERL_VERSION_ATLEAST(5, 31, 6)
 static Signal_t async_sighandler (int signum, siginfo_t *si, void *sarg)
 {
   if (signum == 9)

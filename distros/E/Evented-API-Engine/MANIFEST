@@ -1,10 +1,12 @@
+.gitattributes
 Build.PL
 lib/Evented/API/Engine.pm
 lib/Evented/API/Events.pm
 lib/Evented/API/Module.pm
-MANIFEST			This list of files
 LICENSE
-mod/API/Methods.module/Methods.pm
-README.md
+MANIFEST			This list of files
 META.json
 META.yml
+mod/API/Methods.module/Methods.pm
+README.md
+README

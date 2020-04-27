@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = "0.07";
+our $VERSION = "0.08";
 
 sub set_value {
     my $self = shift;
@@ -13,8 +13,8 @@ sub set_value {
     if ($value =~ /^-?[0-9]+$/) {
         # ok
     } else {
-        printf STDERR "int parse error";
-        exit 1;
+        printf STDERR "int parse error\n";
+        return undef, 1;
     }
     return $value;
 }

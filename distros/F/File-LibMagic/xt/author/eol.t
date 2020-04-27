@@ -8,6 +8,7 @@ use Test::EOL;
 
 my @files = (
     'lib/File/LibMagic.pm',
+    'lib/File/LibMagic/Constants.pm',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/constructor-params.t',

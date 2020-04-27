@@ -40,7 +40,7 @@ You can use this module to bind a signal to a callback while at the same
 time activating an event pipe that you can C<select> on, fixing the race
 completely.
 
-This can be used to implement the signal hadling in event loops,
+This can be used to implement the signal handling in event loops,
 e.g. L<AnyEvent>, L<POE>, L<IO::Async::Loop> and so on.
 
 =item Background threads want speedy reporting
@@ -160,7 +160,7 @@ told to the thread object:
 So to repeat: first the XS object is created, then it is queried for the
 callback that should be called when the Interrupt object gets signalled.
 
-Then the interrupt object is queried for the callback fucntion that the
+Then the interrupt object is queried for the callback function that the
 thread should call to signal the Interrupt object, and this callback is
 then attached to the thread.
 
@@ -238,7 +238,7 @@ BEGIN {
    # etc. might be null pointers.
    $SIG{KILL} = sub { };
 
-   our $VERSION = 1.25;
+   our $VERSION = 1.26;
 
    require XSLoader;
    XSLoader::load ("Async::Interrupt", $VERSION);
@@ -640,7 +640,7 @@ occasionally useful.
 This module works by "hijacking" SIGKILL, which is guaranteed to always
 exist, but also cannot be caught, so is always available.
 
-Basically, this module fakes the occurance of a SIGKILL signal and
+Basically, this module fakes the occurence of a SIGKILL signal and
 then intercepts the interpreter handling it. This makes normal signal
 handling slower (probably unmeasurably, though), but has the advantage
 of not requiring a special runops function, nor slowing down normal perl

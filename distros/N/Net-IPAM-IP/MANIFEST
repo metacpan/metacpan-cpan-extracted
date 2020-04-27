@@ -1,6 +1,7 @@
 Build.PL
 Changes
 lib/Net/IPAM/IP.pm
+lib/Net/IPAM/Util.pm
 LICENSE
 MANIFEST			This list of files
 META.json
@@ -11,9 +12,11 @@ t/01-new.t
 t/02-sort.t
 t/03-incr.t
 t/04-errors.t
-t/05-inet-x2y-pp.t
+t/05-inet-x2y-false-pp.t
+t/05-inet-x2y-true-pp.t
 t/06-subclassing.t
 t/07-addrs_and_names.t
+t/08-caching.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

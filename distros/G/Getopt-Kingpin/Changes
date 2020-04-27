@@ -1,5 +1,11 @@
 Revision history for Perl extension Getopt-Kingpin
 
+0.08 2020-04-27T04:02:15Z
+
+    - Add newline at the end of error messages
+    - Override termination function
+    - Drop perl 5.8 support
+
 0.07 2017-08-21T08:21:28Z
 
     - Fix help message when place_holder and default exist

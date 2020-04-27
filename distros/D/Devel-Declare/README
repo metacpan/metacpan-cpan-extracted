@@ -1,5 +1,5 @@
 NAME
-    Devel::Declare - Adding keywords to perl, in perl
+    Devel::Declare - (DEPRECATED) Adding keywords to perl, in perl
 
 SYNOPSIS
       use Method::Signatures;

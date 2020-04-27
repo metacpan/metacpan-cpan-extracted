@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200309202348;
+our $VERSION = 1.20200427120031;
 
 my $formatters = [
                 {
@@ -49,16 +49,16 @@ my $validators = {
           (?:
             22[2-47-9]|
             42[45]|
-            82[01458]|
-            92[369]
+            82[014-68]|
+            92[3569]
           )\\d{5}
         ',
                 'geographic' => '
           (?:
             22[2-47-9]|
             42[45]|
-            82[01458]|
-            92[369]
+            82[014-68]|
+            92[3569]
           )\\d{5}
         ',
                 'mobile' => '5[69]\\d{7}',
@@ -68,15 +68,31 @@ my $validators = {
                 'toll_free' => '1800\\d{6}',
                 'voip' => ''
               };
+my %areanames = ();
+$areanames{en}->{970222} = "Jericho\/Hebron";
+$areanames{en}->{970223} = "Jerusalem";
+$areanames{en}->{970227} = "Bethlehem";
+$areanames{en}->{970229} = "Ramallah\/Al\-Bireh";
+$areanames{en}->{970424} = "Jenin";
+$areanames{en}->{970820} = "Khan\ Yunis";
+$areanames{en}->{970821} = "Rafah";
+$areanames{en}->{970824} = "North\ Gaza";
+$areanames{en}->{970825} = "Deir\ al\-Balah";
+$areanames{en}->{970826} = "Gaza";
+$areanames{en}->{970828} = "Gaza";
+$areanames{en}->{970923} = "Nablus";
+$areanames{en}->{970925} = "Tubas";
+$areanames{en}->{970926} = "Tulkarm";
+$areanames{en}->{970929} = "Qalqilya\/Salfit";
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+970|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

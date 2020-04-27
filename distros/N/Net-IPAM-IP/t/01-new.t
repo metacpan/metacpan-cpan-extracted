@@ -15,7 +15,7 @@ foreach my $txt (qw/:: fE80::0:1 1.2.3.4 ::ffff:127.0.0.1 ::ff:0 caFe::/) {
 
 # invalid
 foreach my $txt (
-  qw/010.0.0.1 10.000.0.1 : ::cafe::affe cafe::: cafe::1:: cafe::1: :cafe:: ::cafe::
+  qw/010.0.0.1 10.000.0.1 : ::ffff:1.2.3.4.5 ::cafe::affe cafe::: cafe::1:: cafe::1: :cafe:: ::cafe::
   cafe::1:2:3:4:5:6:7:8 1:2:3:4:5:6:7:8:9 ::1.2.3.4 cafe:affe:1.2.3.4 ::ff:1.2.3.4 ::dddd:1.2.3.4/
   )
 {

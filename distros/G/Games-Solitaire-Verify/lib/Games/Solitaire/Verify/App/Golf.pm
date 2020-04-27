@@ -1,11 +1,11 @@
 package Games::Solitaire::Verify::App::Golf;
-$Games::Solitaire::Verify::App::Golf::VERSION = '0.2303';
+$Games::Solitaire::Verify::App::Golf::VERSION = '0.2401';
 use strict;
 use warnings;
 use autodie;
 
 use Games::Solitaire::Verify::Golf ();
-use Path::Tiny qw/ path tempdir tempfile cwd /;
+use Path::Tiny qw/ path /;
 
 
 sub run
@@ -40,7 +40,7 @@ of black-hole-solve (or a similar solver)
 
 =head1 VERSION
 
-version 0.2303
+version 0.2401
 
 =head1 METHODS
 

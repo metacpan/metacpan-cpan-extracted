@@ -8,11 +8,11 @@ use Wasm::Wasmtime::Store;
 use Wasm::Wasmtime::TableType;
 
 # ABSTRACT: Wasmtime table class
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 $ffi_prefix = 'wasm_table_';
-$ffi->type('opaque' => 'wasm_table_t');
+$ffi->load_custom_type('::PtrObject' => 'wasm_table_t' => __PACKAGE__);
 
 sub new
 {
@@ -30,31 +30,24 @@ sub new
 
 $ffi->attach( type => ['wasm_table_t'] => 'wasm_tabletype_t' => sub {
   my($xsub, $self) = @_;
-  Wasm::Wasmtime::TableType->new($xsub->($self->{ptr}), $self->{owner} || $self);
+  my $type = $xsub->($self);
+  $type->{owner} = $self->{owner} || $self;
+  $type;
 });
 
 
-$ffi->attach( size => ['wasm_table_t'] => 'uint32' => sub {
-  my($xsub, $self) = @_;
-  $xsub->($self->{ptr});
-});
+$ffi->attach( size => ['wasm_table_t'] => 'uint32' );
 
 
 # actually returns a wasm_extern_t, but recursion
 $ffi->attach( as_extern => ['wasm_table_t'] => 'opaque' => sub {
   my($xsub, $self) = @_;
   require Wasm::Wasmtime::Extern;
-  my $ptr = $xsub->($self->{ptr});
+  my $ptr = $xsub->($self);
   Wasm::Wasmtime::Extern->new($ptr, $self->{owner} || $self);
 });
 
-$ffi->attach( [ delete => "DESTROY" ] => ['wasm_table_t'] => sub {
-  my($xsub, $self) = @_;
-  if(defined $self->{ptr} && !defined $self->{owner})
-  {
-    $xsub->($self->{ptr});
-  }
-});
+_generate_destroy();
 
 1;
 
@@ -70,7 +63,7 @@ Wasm::Wasmtime::Table - Wasmtime table class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

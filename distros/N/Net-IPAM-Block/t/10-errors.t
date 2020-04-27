@@ -9,7 +9,7 @@ BEGIN { use_ok('Net::IPAM::Block') || print "Bail out!\n"; }
 can_ok( 'Net::IPAM::Block', 'new' );
 
 eval { Net::IPAM::Block->new };
-like( $@, qr/wrong/i, 'new: missing arg' );
+like( $@, qr/missing/i, 'new: missing arg' );
 
 ok( defined( Net::IPAM::Block->new('/') ) eq '',          'new: wrong cidr' );
 ok( defined( Net::IPAM::Block->new('/20') ) eq '',        'new: wrong prefix' );

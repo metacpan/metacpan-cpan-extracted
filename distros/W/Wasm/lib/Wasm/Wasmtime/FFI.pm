@@ -10,7 +10,7 @@ use Devel::GlobalDestruction ();
 use base qw( Exporter );
 
 # ABSTRACT: Private class for Wasm::Wasmtime
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 our @EXPORT = qw( $ffi $ffi_prefix _generate_vec_class _generate_destroy );
@@ -86,7 +86,6 @@ sub _generate_vec_class
   my $type = $class;
   $type =~ s/^.*:://;
   my $v_type = "wasm_@{[ lc $type ]}_vec_t";
-  my $c_type = "wasm_@{[ lc $type ]}_t";
   my $vclass  = "Wasm::Wasmtime::${type}Vec";
   my $prefix = "wasm_@{[ lc $type ]}_vec";
 
@@ -95,7 +94,7 @@ sub _generate_vec_class
       my($self) = @_;
       my $size = $self->size;
       return () if $size == 0;
-      my $ptrs = $ffi->cast('opaque', "${c_type}[$size]", $self->data);
+      my $ptrs = $ffi->cast('opaque', "opaque[$size]", $self->data);
       map { $class->new($_, $self) } @$ptrs;
     },
     into => $vclass,
@@ -119,7 +118,8 @@ sub _wrapper_destroy
   return if Devel::GlobalDestruction::in_global_destruction();
   if(defined $self->{ptr} && !defined $self->{owner})
   {
-    $xsub->($self->{ptr});
+    $xsub->($self);
+    delete $self->{ptr};
   }
 }
 
@@ -127,8 +127,19 @@ sub _generate_destroy
 {
   my $caller = caller;
   my $type = lc $caller;
-  $type =~ s/^.*:://;
-  $type = "wasm_${type}_t";
+  if($type =~ /::linker$/)
+  {
+    $type = 'wasmtime_linker_t';
+  }
+  elsif($type =~ /::wasi/)
+  {
+    $type =~ s/^.*::wasi(.*)$/wasi_${1}_t/g;
+  }
+  else
+  {
+    $type =~ s/^.*:://;
+    $type = "wasm_${type}_t";
+  }
   $ffi->attach( [ delete => join('::', $caller, 'DESTROY') ] => [ $type ] => \&_wrapper_destroy);
 }
 
@@ -282,7 +293,7 @@ Wasm::Wasmtime::FFI - Private class for Wasm::Wasmtime
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

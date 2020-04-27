@@ -1,7 +1,9 @@
 package Getopt::Long::Util;
 
-our $DATE = '2017-08-10'; # DATE
-our $VERSION = '0.890'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-27'; # DATE
+our $DIST = 'Getopt-Long-Util'; # DIST
+our $VERSION = '0.891'; # VERSION
 
 use 5.010001;
 use strict;
@@ -131,10 +133,20 @@ $SPEC{humanize_getopt_long_opt_spec} = {
     v => 1.1,
     description => <<'_',
 
-Convert <pm:Getopt::Long> option specification like `help|h|?` or `--foo=s` or
-`debug!` into, respectively, `--help, -h, -?` or `--foo=s` or `--(no)debug`.
-Will die if can't parse the string. The output is suitable for including in
-help/usage text.
+Convert <pm:Getopt::Long> option specification into a more human-friendly
+notation that is suitable for including in help/usage text, for example:
+
+    help|h|?       ->  --help, -h, -?
+    help|h|?       ->  --help | -h | -?  (if you provide 'separator')
+    --foo=s        ->  --foo=s
+    --foo=s        ->  --foo=somelabel  (if you provide 'value_label')
+    --foo:s        ->  --foo[=s]
+    --foo=s@       ->  --foo=s+
+    --foo=s%       ->  --foo key=value
+    --foo=s        ->  --foo=somelabel  (if you provide 'value_label')
+    --debug!       ->  --(no)debug
+
+Will die if can't parse the optspec string.
 
 _
     args => {
@@ -143,6 +155,18 @@ _
             req => 1,
             pos => 0,
         },
+        separator => {
+            schema => 'str*',
+            default => ', ',
+        },
+        key_label => {
+            schema => 'str*',
+            default => 'key',
+        },
+        value_label => {
+            schema => 'str*',
+        },
+
     },
     args_as => 'array',
     result_naked => 1,
@@ -151,6 +175,7 @@ _
     },
 };
 sub humanize_getopt_long_opt_spec {
+    my $opts = {}; $opts = shift if ref $_[0] eq 'HASH';
     my $optspec = shift;
 
     my $parse = parse_getopt_long_opt_spec($optspec)
@@ -162,7 +187,7 @@ sub humanize_getopt_long_opt_spec {
     my $i = 0;
     for (@{ $parse->{opts} }) {
         $i++;
-        $res .= ", " if length($res);
+        $res .= ($opts->{separator} // ", ") if length($res);
         if ($parse->{is_neg} && length($_) > 1) {
             $res .= "--(no)$_";
         } else {
@@ -171,7 +196,18 @@ sub humanize_getopt_long_opt_spec {
             } else {
                 $res .= "-$_";
             }
-            $res .= "=$parse->{type}" if $i==1 && $parse->{type};
+            if ($i==1 && ($parse->{type} || $parse->{opttype})) {
+                # show value label
+                my $key_label = $opts->{key_label} // 'key';
+                my $value_label = $opts->{value_label} //
+                    $parse->{type} // $parse->{opttype};
+                $res .= "[" if $parse->{opttype};
+                $res .= ($parse->{type} && $parse->{desttype} eq '%' ? " " : "=");
+                $res .= "key=" if $parse->{desttype} eq '%';
+                $res .= $value_label;
+                $res .= "]" if $parse->{opttype};
+            }
+            $res .= "+" if ($parse->{desttype} // '') eq '@';
         }
     }
     $res;
@@ -352,7 +388,7 @@ Getopt::Long::Util - Utilities for Getopt::Long
 
 =head1 VERSION
 
-This document describes version 0.890 of Getopt::Long::Util (from Perl distribution Getopt-Long-Util), released on 2017-08-10.
+This document describes version 0.891 of Getopt::Long::Util (from Perl distribution Getopt-Long-Util), released on 2020-04-27.
 
 =head1 FUNCTIONS
 
@@ -361,7 +397,7 @@ This document describes version 0.890 of Getopt::Long::Util (from Perl distribut
 
 Usage:
 
- detect_getopt_long_script(%args) -> [status, msg, result, meta]
+ detect_getopt_long_script(%args) -> [status, msg, payload, meta]
 
 Detect whether a file is a Getopt::Long-based CLI script.
 
@@ -399,6 +435,7 @@ Include scripts that do not have +x mode bit set.
 
 String to be checked.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -406,11 +443,12 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 gen_getopt_long_spec_from_getopt_std_spec
@@ -440,21 +478,33 @@ arguments while C<c> doesn't.
 
 Getopt::Std spec string.
 
+
 =back
 
 Return value:  (hash)
+
 
 
 =head2 humanize_getopt_long_opt_spec
 
 Usage:
 
- humanize_getopt_long_opt_spec($optspec) -> str
+ humanize_getopt_long_opt_spec( [ \%optional_named_args ] , $optspec) -> str
 
-Convert L<Getopt::Long> option specification like C<help|h|?> or C<--foo=s> or
-C<debug!> into, respectively, C<--help, -h, -?> or C<--foo=s> or C<--(no)debug>.
-Will die if can't parse the string. The output is suitable for including in
-help/usage text.
+Convert L<Getopt::Long> option specification into a more human-friendly
+notation that is suitable for including in help/usage text, for example:
+
+ help|h|?       ->  --help, -h, -?
+ help|h|?       ->  --help | -h | -?  (if you provide 'separator')
+ --foo=s        ->  --foo=s
+ --foo=s        ->  --foo=somelabel  (if you provide 'value_label')
+ --foo:s        ->  --foo[=s]
+ --foo=s@       ->  --foo=s+
+ --foo=s%       ->  --foo key=value
+ --foo=s        ->  --foo=somelabel  (if you provide 'value_label')
+ --debug!       ->  --(no)debug
+
+Will die if can't parse the optspec string.
 
 This function is not exported by default, but exportable.
 
@@ -462,11 +512,19 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<key_label> => I<str> (default: "key")
+
 =item * B<$optspec>* => I<str>
+
+=item * B<separator> => I<str> (default: ", ")
+
+=item * B<value_label> => I<str>
+
 
 =back
 
 Return value:  (str)
+
 
 
 =head2 parse_getopt_long_opt_spec
@@ -525,6 +583,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<$optspec>* => I<str>
 
+
 =back
 
 Return value:  (hash)
@@ -535,7 +594,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Getopt-Lon
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Getopt-Long-Util>.
+Source repository is at L<https://github.com/perlancar/perl-Getopt-Long-Util>.
 
 =head1 BUGS
 
@@ -563,7 +622,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

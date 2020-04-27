@@ -6,40 +6,38 @@ use Ref::Util qw( is_ref is_plain_arrayref );
 use Wasm::Wasmtime::FFI;
 
 # ABSTRACT: Wasmtime memory type class
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 $ffi_prefix = 'wasm_memorytype_';
-$ffi->type('opaque' => 'wasm_memorytype_t');
+$ffi->load_custom_type('::PtrObject' => 'wasm_memorytype_t' => __PACKAGE__);
 
 
 $ffi->attach( new => ['uint32[2]'] => 'wasm_memorytype_t' => sub {
   my $xsub = shift;
   my $class = shift;
-  my $ptr;
-  my $owner;
   if(is_ref $_[0])
   {
     my $limit = shift;
     Carp::croak("bad limits") unless is_plain_arrayref($limit);
     Carp::croak("no minumum in limit") unless defined $limit->[0];
     $limit->[1] = 0xffffffff unless defined $limit->[1];
-    $ptr = $xsub->($limit);
+    return $xsub->($limit);
   }
   else
   {
-    ($ptr, $owner) = @_;
+    my ($ptr, $owner) = @_;
+    return bless {
+      ptr => $ptr,
+      owner => $owner,
+    }, $class;
   }
-  bless {
-    ptr => $ptr,
-    owner => $owner,
-  }, $class;
 });
 
 
 $ffi->attach( limits => ['wasm_memorytype_t'] => 'uint32[2]' => sub {
   my($xsub, $self) = @_;
-  my $limits = $xsub->($self->{ptr});
+  my $limits = $xsub->($self);
   $limits;
 });
 
@@ -48,17 +46,11 @@ $ffi->attach( limits => ['wasm_memorytype_t'] => 'uint32[2]' => sub {
 $ffi->attach( as_externtype => ['wasm_memorytype_t'] => 'opaque' => sub {
   my($xsub, $self) = @_;
   require Wasm::Wasmtime::ExternType;
-  my $ptr = $xsub->($self->{ptr});
+  my $ptr = $xsub->($self);
   Wasm::Wasmtime::ExternType->new($ptr, $self->{owner} || $self);
 });
 
-$ffi->attach( [ delete => "DESTROY" ] => ['wasm_memorytype_t'] => sub {
-  my($xsub, $self) = @_;
-  if(defined $self->{ptr} && !defined $self->{owner})
-  {
-    $xsub->($self->{ptr});
-  }
-});
+_generate_destroy();
 
 1;
 
@@ -74,7 +66,7 @@ Wasm::Wasmtime::MemoryType - Wasmtime memory type class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

@@ -5,25 +5,13 @@ use warnings;
 
 use ExtUtils::Constant;
 
-my @names = (
-    qw(
-        MAGIC_CHECK
-        MAGIC_COMPRESS
-        MAGIC_CONTINUE
-        MAGIC_DEBUG
-        MAGIC_DEVICES
-        MAGIC_ERROR
-        MAGIC_MIME
-        MAGIC_NONE
-        MAGIC_PRESERVE_ATIME
-        MAGIC_RAW
-        MAGIC_SYMLINK
-        )
-);
+use FindBin qw( $Bin );
+use lib "$Bin/../lib";
+use File::LibMagic::Constants qw ( constants );
 
 ExtUtils::Constant::WriteConstants(
     NAME         => 'File::LibMagic',
-    NAMES        => \@names,
+    NAMES        => [ constants() ],
     DEFAULT_TYPE => 'IV',
     C_FILE       => 'const/inc.c',
     XS_FILE      => 'const/inc.xs',

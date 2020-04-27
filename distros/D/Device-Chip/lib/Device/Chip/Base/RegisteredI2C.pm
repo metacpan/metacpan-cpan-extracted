@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015,2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2019 -- leonerd@leonerd.org.uk
 
 package Device::Chip::Base::RegisteredI2C;
 
@@ -11,7 +11,7 @@ use base qw( Device::Chip );
 
 use utf8;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Carp;
 
@@ -83,16 +83,20 @@ a single byte value, then attempts to read the given number of register slots.
 sub read_reg
 {
    my $self = shift;
-   my ( $reg, $len ) = @_;
+   my ( $reg, $len, $_forcecache ) = @_;
 
    $self->REG_ADDR_SIZE == 8 or
       croak "TODO: Currently unable to cope with REG_ADDR_SIZE != 8";
 
    my $f = $self->protocol->write_then_read( pack( "C", $reg ), $len * $self->REG_DATA_BYTES );
 
-   if( $self->{devicechip_regcache}[$reg] ) {
-      $self->{devicechip_regcache}[$reg] = $f
-         ->transform( done => sub { substr $_[0], 0, $self->REG_DATA_BYTES } );
+   foreach my $offs ( 0 .. $len-1 ) {
+      $_forcecache || $self->{devicechip_regcache}[$reg + $offs] and
+         $self->{devicechip_regcache}[$reg + $offs] = $f->then( sub {
+            Future->done(
+               my $bytes = substr $_[0], $offs * $self->REG_DATA_BYTES, $self->REG_DATA_BYTES
+            );
+         });
    }
 
    return $f;
@@ -110,13 +114,19 @@ byte value followed by the data to write into it.
 sub write_reg
 {
    my $self = shift;
-   my ( $reg, $val ) = @_;
+   my ( $reg, $val, $_forcecache ) = @_;
 
    $self->REG_ADDR_SIZE == 8 or
       croak "TODO: Currently unable to cope with REG_ADDR_SIZE != 8";
 
-   defined $self->{devicechip_regcache}[$reg] and
-      $self->{devicechip_regcache}[$reg] = Future->done( substr $val, 0, $self->REG_DATA_BYTES );
+   my $len = length( $val ) / $self->REG_DATA_BYTES;
+
+   foreach my $offs ( 0 .. $len-1 ) {
+      $_forcecache || defined $self->{devicechip_regcache}[$reg + $offs] and
+         $self->{devicechip_regcache}[$reg + $offs] = Future->done(
+            my $bytes = substr $val, $offs * $self->REG_DATA_BYTES, $self->REG_DATA_BYTES
+         );
+   }
 
    $self->protocol->write( pack( "C", $reg ) . $val );
 }
@@ -143,11 +153,29 @@ sub cached_read_reg
    my $self = shift;
    my ( $reg, $len ) = @_;
 
-   $len == 1 or
-      croak "TODO: Currently unable to cope with \$len != 1";
+   my @f;
 
-   return $self->{devicechip_regcache}[$reg] ||=
-      $self->read_reg( $reg, $len );
+   my $endreg = $reg + $len;
+
+   while( $reg < $endreg ) {
+      if( defined $self->{devicechip_regcache}[$reg] ) {
+         push @f, $self->{devicechip_regcache}[$reg++];
+      }
+      else {
+         $len = 1;
+         $len++ while $reg + $len < $endreg and
+            !defined $self->{devicechip_regcache}[ $reg + $len ];
+
+         my $thisreg = $reg;
+         push @f, $self->read_reg( $reg, $len, "forcecache" );
+
+         $reg += $len;
+      }
+   }
+
+   return Future->needs_all( @f )->then(sub {
+      return Future->done( join "", @_ );
+   });
 }
 
 =head2 cached_write_reg
@@ -170,16 +198,31 @@ sub cached_write_reg
    my $self = shift;
    my ( $reg, $val ) = @_;
 
-   my $len = length( $val ) / $self->REG_DATA_BYTES;
-   $len == 1 or
-      croak "TODO: Currently unable to cope with \$len != 1";
+   my $len = length( $val ) / ( my $datasize = $self->REG_DATA_BYTES );
 
-   ( $self->{devicechip_regcache}[$reg] ||= Future->done( "" ) )
-   ->then( sub {
-      my ( $cached_val ) = @_;
-      return Future->done() if $cached_val eq $val;
+   Future->needs_all(
+      map {
+         $self->{devicechip_regcache}[$reg + $_] // Future->done( "" )
+      } 0 .. $len-1
+   )->then( sub {
+      my @current = @_;
+      my @want    = $val =~ m/(.{$datasize})/g;
 
-      return $self->write_reg( $reg, $val );
+      # Determine chunks that need rewriting
+      my @f;
+      my $offs = 0;
+      while( $offs < $len ) {
+         $offs++, next if $current[$offs] eq $want[$offs];
+
+         my $startoffs = $offs++;
+         $offs++ while $offs < $len and
+            $current[$offs] ne $want[$offs];
+
+         push @f, $self->write_reg( $reg + $startoffs,
+            join( "", @want[$startoffs..$offs-1] ), "forcecache" );
+      }
+
+      return Future->needs_all( @f );
    });
 }
 

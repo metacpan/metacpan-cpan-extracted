@@ -6,7 +6,7 @@ use Object::Simple -base;
 use Getopt::Kingpin::Flag;
 use Carp;
 
-our $VERSION = "0.07";
+our $VERSION = "0.08";
 
 has _flags => sub {
     return {};
@@ -48,10 +48,6 @@ sub unshift {
         if ($name eq "help") {
 
         } else {
-            if (exists $self->_flags->{$name}) {
-                croak sprintf "flag %s is already exists", $name;
-            }
-
             $f->index($index);
             $self->_flags->{$name} = $f;
             $index++;

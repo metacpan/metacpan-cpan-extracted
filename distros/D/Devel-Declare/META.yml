@@ -1,5 +1,5 @@
 ---
-abstract: 'Adding keywords to perl, in perl'
+abstract: '(DEPRECATED) Adding keywords to perl, in perl'
 author:
   - 'Matt S Trout - <mst@shadowcat.co.uk> - original author'
 build_requires:
@@ -10,7 +10,7 @@ configure_requires:
   B::Hooks::OP::Check: '0.19'
   ExtUtils::Depends: '0.302'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.2501, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,8 +28,8 @@ requires:
   perl: '5.008001'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-Declare
-  repository: git://git.shadowcat.co.uk/p5sagit/Devel-Declare.git
-version: '0.006019'
+  repository: https://github.com/p5sagit/Devel-Declare.git
+version: '0.006022'
 x_contributors:
   - 'Florian Ragwitz <rafl@debian.org>'
   - 'Matt S Trout <mst@shadowcat.co.uk>'

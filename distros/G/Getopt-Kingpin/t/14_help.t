@@ -1,7 +1,7 @@
 use strict;
 use Test::More 0.98;
 use Test::Exception;
-use Test::Trap;
+use Capture::Tiny ':all';
 use Getopt::Kingpin;
 use File::Basename;
 
@@ -11,6 +11,7 @@ subtest 'help' => sub {
     push @ARGV, qw(--help);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     my $verbose = $kingpin->flag('verbose', 'Verbose mode.')->short('v')->bool();
     my $name    = $kingpin->arg('name', 'Name of user.')->required()->string();
 
@@ -26,9 +27,11 @@ Args:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 
@@ -37,6 +40,7 @@ subtest 'help short' => sub {
     push @ARGV, qw(-h);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     $kingpin->flags->get("help")->short('h');
     my $verbose = $kingpin->flag('verbose', 'Verbose mode.')->short('v')->bool();
     my $name    = $kingpin->arg('name', 'Name of user.')->required()->string();
@@ -53,9 +57,11 @@ Args:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'help max_length_of_flag' => sub {
@@ -63,6 +69,7 @@ subtest 'help max_length_of_flag' => sub {
     push @ARGV, qw(-h);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     $kingpin->flags->get("help")->short('h');
     my $verbose = $kingpin->flag('verbose', 'Verbose mode.')->short('v')->bool();
     my $ip      = $kingpin->flag('ip', 'IP address.')->string();
@@ -77,9 +84,11 @@ Flags:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'help max_length_of_flag 2' => sub {
@@ -87,6 +96,7 @@ subtest 'help max_length_of_flag 2' => sub {
     push @ARGV, qw(-h);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     $kingpin->flags->get("help")->short('h');
     my $verbose = $kingpin->flag('verbose', 'Verbose mode.')->short('v')->bool();
     my $ip      = $kingpin->flag('ipaddress', 'IP address.')->string();
@@ -101,9 +111,11 @@ Flags:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'help max_length_of_arg' => sub {
@@ -111,6 +123,7 @@ subtest 'help max_length_of_arg' => sub {
     push @ARGV, qw(-h);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     $kingpin->flags->get("help")->short('h');
     my $verbose = $kingpin->flag('verbose', 'Verbose mode.')->short('v')->bool();
     my $ip      = $kingpin->flag('ip', 'IP address.')->bool();
@@ -131,9 +144,11 @@ Args:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'help max_length_of_arg 2' => sub {
@@ -141,6 +156,7 @@ subtest 'help max_length_of_arg 2' => sub {
     push @ARGV, qw(-h);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     $kingpin->flags->get("help")->short('h');
     my $verbose = $kingpin->flag('verbose', 'Verbose mode.')->short('v')->bool();
     my $ip      = $kingpin->flag('ip', 'IP address.')->string();
@@ -161,9 +177,11 @@ Args:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'help required' => sub {
@@ -171,6 +189,7 @@ subtest 'help required' => sub {
     push @ARGV, qw(-h);
 
     my $kingpin = Getopt::Kingpin->new();
+    $kingpin->terminate(sub {return @_});
     $kingpin->flags->get("help")->short('h');
     my $verbose = $kingpin->flag('verbose', 'Verbose mode.')->short('v')->bool();
     my $ip      = $kingpin->flag('ip', 'IP address.')->string();
@@ -191,9 +210,11 @@ Args:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'app info' => sub {
@@ -201,6 +222,7 @@ subtest 'app info' => sub {
     push @ARGV, qw(--help);
 
     my $kingpin = Getopt::Kingpin->new("app_name", "app_description");
+    $kingpin->terminate(sub {return @_});
 
     my $expected = sprintf <<'...';
 usage: app_name [<flags>]
@@ -212,9 +234,11 @@ Flags:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->exit, 0;
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
 };
 
 subtest 'place holder' => sub {
@@ -222,6 +246,7 @@ subtest 'place holder' => sub {
     push @ARGV, qw(--help);
 
     my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
     $kingpin->flag("name", "Set name.")->string();
 
     my $expected = sprintf <<'...', basename($0);
@@ -233,8 +258,10 @@ Flags:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $stdout, $expected;
 };
 
 subtest 'default' => sub {
@@ -242,6 +269,7 @@ subtest 'default' => sub {
     push @ARGV, qw(--help);
 
     my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
     my $name = $kingpin->flag('name', 'Set name.')->default("default name")->string();
 
     my $expected = sprintf <<'...', basename($0);
@@ -253,8 +281,10 @@ Flags:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $stdout, $expected;
 };
 
 subtest 'default2' => sub {
@@ -262,6 +292,7 @@ subtest 'default2' => sub {
     push @ARGV, qw(--help);
 
     my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
     my $name = $kingpin->flag('name', 'Set name.')->default("")->string();
     my $id1 = $kingpin->flag('id1', 'Set id1.')->default(1)->int();
     my $id2 = $kingpin->flag('id2', 'Set id2.')->default(0)->int();
@@ -277,8 +308,10 @@ Flags:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $stdout, $expected;
 };
 
 subtest 'place holder' => sub {
@@ -286,6 +319,7 @@ subtest 'place holder' => sub {
     push @ARGV, qw(--help);
 
     my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
     my $name = $kingpin->flag('name', 'Set name.')->placeholder("place_holder_name")->string();
 
     my $expected = sprintf <<'...', basename($0);
@@ -297,8 +331,10 @@ Flags:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $stdout, $expected;
 };
 
 subtest 'place holder' => sub {
@@ -306,6 +342,7 @@ subtest 'place holder' => sub {
     push @ARGV, qw(--help);
 
     my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
     my $name = $kingpin->flag('name', 'Set name.')->placeholder("place_holder_name")->string();
     my $id1 = $kingpin->flag('id1', 'Set id1.')->placeholder("1")->int();
     my $id2 = $kingpin->flag('id2', 'Set id2.')->placeholder("0")->int();
@@ -321,8 +358,10 @@ Flags:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $stdout, $expected;
 };
 
 subtest 'place holder with default' => sub {
@@ -330,6 +369,7 @@ subtest 'place holder with default' => sub {
     push @ARGV, qw(--help);
 
     my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
     my $name = $kingpin->flag('name', 'Set name.')->placeholder("place_holder_name")->default("default name")->string();
 
     my $expected = sprintf <<'...', basename($0);
@@ -341,8 +381,10 @@ Flags:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $stdout, $expected;
 };
 
 subtest 'flag with hidden flag' => sub {
@@ -350,6 +392,7 @@ subtest 'flag with hidden flag' => sub {
     push @ARGV, qw(--help);
 
     my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
 
     my $name = $kingpin->flag('name', 'Set name.')->hidden->string();
 
@@ -361,8 +404,10 @@ Flags:
 
 ...
 
-    trap {$kingpin->parse};
-    is $trap->stdout, $expected;
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $stdout, $expected;
 };
 
 done_testing;

@@ -1,5 +1,10 @@
 Revision history for Perl extension App-Greple-subst
 
+2.13 2020-04-27T05:18:26Z
+
+    - Use Getopt::EX::termcolor new interface.
+    - Implement --dictdata option.
+
 2.12 2020-04-16T07:01:31Z
 
     - Change to use Getopt::EX::termcolor.

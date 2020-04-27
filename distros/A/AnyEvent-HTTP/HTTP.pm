@@ -48,7 +48,7 @@ use AnyEvent::Handle ();
 
 use base Exporter::;
 
-our $VERSION = 2.24;
+our $VERSION = 2.25;
 
 our @EXPORT = qw(http_get http_post http_head http_request);
 
@@ -200,6 +200,11 @@ C<AnyEvent::HTTP::set_proxy>).
 Currently, if your proxy requires authorization, you have to specify an
 appropriate "Proxy-Authorization" header in every request.
 
+Note that this module will prefer an existing persistent connection,
+even if that connection was made using another proxy. If you need to
+ensure that a new connection is made in this case, you can either force
+C<persistent> to false or e.g. use the proxy address in your C<sessionid>.
+
 =item body => $string
 
 The request body, usually empty. Will be sent as-is (future versions of
@@ -241,13 +246,15 @@ me the page, no matter what".
 
 See also the C<sessionid> parameter.
 
-=item session => $string
+=item sessionid => $string
 
-The module might reuse connections to the same host internally. Sometimes
-(e.g. when using TLS), you do not want to reuse connections from other
-sessions. This can be achieved by setting this parameter to some unique
-ID (such as the address of an object storing your state data, or the TLS
-context) - only connections using the same unique ID will be reused.
+The module might reuse connections to the same host internally (regardless
+of other settings, such as C<tcp_connect> or C<proxy>). Sometimes (e.g.
+when using TLS or a specfic proxy), you do not want to reuse connections
+from other sessions. This can be achieved by setting this parameter to
+some unique ID (such as the address of an object storing your state data
+or the TLS context, or the proxy IP) - only connections using the same
+unique ID will be reused.
 
 =item on_prepare => $callback->($fh)
 
@@ -265,6 +272,12 @@ establishes connections. Normally it uses L<AnyEvent::Socket::tcp_connect>
 to do this, but you can provide your own C<tcp_connect> function -
 obviously, it has to follow the same calling conventions, except that it
 may always return a connection guard object.
+
+The connections made by this hook will be treated as equivalent to
+connections made the built-in way, specifically, they will be put into
+and taken from the persistent connection cache. If your C<$tcp_connect>
+function is incompatible with this kind of re-use, consider switching off
+C<persistent> connections and/or providing a C<sessionid> identifier.
 
 There are probably lots of weird uses for this function, starting from
 tracing the hosts C<http_request> actually tries to connect, to (inexact
@@ -344,8 +357,8 @@ that doesn't solve your problem in a better way.
 Try to create/reuse a persistent connection. When this flag is set
 (default: true for idempotent requests, false for all others), then
 C<http_request> tries to re-use an existing (previously-created)
-persistent connection to the host and, failing that, tries to create a new
-one.
+persistent connection to same host (i.e. identical URL scheme, hostname,
+port and sessionid) and, failing that, tries to create a new one.
 
 Requests failing in certain ways will be automatically retried once, which
 is dangerous for non-idempotent requests, which is why it defaults to off
@@ -355,7 +368,7 @@ connection timeout, so you never know whether there was a problem with
 your request or not.
 
 When reusing an existent connection, many parameters (such as TLS context)
-will be ignored. See the C<session> parameter for a workaround.
+will be ignored. See the C<sessionid> parameter for a workaround.
 
 =item keepalive => $boolean
 
@@ -1227,6 +1240,7 @@ sub http_request($$@) {
          $prepare_handle->();
 #         $state{handle}->destroyed
 #            and die "AnyEvent::HTTP: unexpectedly got a destructed handle (2), please report.";#d#
+         $rpath = $upath;
          $handle_actual_request->();
 
       } else {
@@ -1296,8 +1310,8 @@ function from time to time.
 A cookie jar is initially an empty hash-reference that is managed by this
 module. Its format is subject to change, but currently it is as follows:
 
-The key C<version> has to contain C<1>, otherwise the hash gets
-emptied. All other keys are hostnames or IP addresses pointing to
+The key C<version> has to contain C<2>, otherwise the hash gets
+cleared. All other keys are hostnames or IP addresses pointing to
 hash-references. The key for these inner hash references is the
 server path for which this cookie is meant, and the values are again
 hash-references. Each key of those hash-references is a cookie name, and
@@ -1311,7 +1325,7 @@ Here is an example of a cookie jar with a single cookie, so you have a
 chance of understanding the above paragraph:
 
    {
-      version    => 1,
+      version    => 2,
       "10.0.0.1" => {
          "/" => {
             "mythweb_id" => {

@@ -5,11 +5,11 @@ use warnings;
 use Wasm::Wasmtime::FFI;
 
 # ABSTRACT: Wasmtime value type class
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 $ffi_prefix = 'wasm_valtype_';
-$ffi->type('opaque' => 'wasm_valtype_t');
+$ffi->load_custom_type('::PtrObject' => 'wasm_valtype_t' => __PACKAGE__);
 
 my %kind = (
   0   => 'i32',
@@ -31,44 +31,30 @@ foreach my $key (keys %kind)
 $ffi->attach( new => ['uint8'] => 'wasm_valtype_t' => sub {
   my $xsub = shift;
   my $class = shift;
-  my($ptr, $owner);
   if($_[0] =~ /^[0-9]+$/)
   {
-    ($ptr, $owner) = @_;
+    my($ptr, $owner) = @_;
+    return bless {
+      ptr   => $ptr,
+      owner => $owner,
+    }, $class;
   }
   else
   {
     my($kind) = @_;
     my $kind_num = $rkind{$kind};
     Carp::croak("no such value type: $kind") unless defined $kind_num;
-    $ptr = $xsub->($kind_num);
-  }
-  bless {
-    ptr   => $ptr,
-    owner => $owner,
-  }, $class;
-});
-
-
-$ffi->attach( kind => ['wasm_valtype_t'] => 'uint8' => sub {
-  my($xsub, $self) = @_;
-  $kind{$xsub->($self->{ptr})};
-});
-
-
-$ffi->attach( [kind => 'kind_num'] => ['wasm_valtype_t'] => 'uint8' => sub {
-  my($xsub, $self) = @_;
-  $xsub->($self->{ptr});
-});
-
-$ffi->attach( [ delete => "DESTROY" ] => ['wasm_valtype_t'] => sub {
-  my($xsub, $self) = @_;
-  if(defined $self->{ptr} && !defined $self->{owner})
-  {
-    $xsub->($self->{ptr});
+    return $xsub->($kind_num);
   }
 });
 
+
+sub kind { $kind{shift->kind_num} }
+
+
+$ffi->attach( [kind => 'kind_num'] => ['wasm_valtype_t'] => 'uint8' );
+
+_generate_destroy();
 _generate_vec_class( delete => 0 );
 
 $ffi->attach( [ wasm_valtype_vec_new => 'Wasm::Wasmtime::ValTypeVec::set' ] => ['wasm_valtype_vec_t*','size_t','opaque[]'] => sub {
@@ -91,7 +77,7 @@ Wasm::Wasmtime::ValType - Wasmtime value type class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

@@ -34,19 +34,19 @@
    "provides" : {
       "Evented::Object" : {
          "file" : "lib/Evented/Object.pm",
-         "version" : "5.63"
+         "version" : "5.67"
       },
       "Evented::Object::Collection" : {
          "file" : "lib/Evented/Object/Collection.pm",
-         "version" : "5.63"
+         "version" : "5.67"
       },
       "Evented::Object::EventFire" : {
          "file" : "lib/Evented/Object/EventFire.pm",
-         "version" : "5.63"
+         "version" : "5.67"
       },
       "Evented::Object::Hax" : {
          "file" : "lib/Evented/Object/Hax.pm",
-         "version" : "5.63"
+         "version" : "5.67"
       }
    },
    "release_status" : "stable",
@@ -58,6 +58,6 @@
          "url" : "https://github.com/cooper/evented-object"
       }
    },
-   "version" : "5.63",
+   "version" : "5.67",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

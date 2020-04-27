@@ -1,5 +1,19 @@
 Revision history for Net-IPAM-IP
 
+1.20    Mon, 27 Apr 2020 01:29:42 +0200
+        * outsource inet_ntop_pp() and inet_pton_pp to Net::IPAM::Util
+
+1.19    Sun, 26 Apr 2020 12:41:42 +0200
+        * better coverage, coherent algo for getaddrs and getname
+        * outsource _incr_n() to Net::IPAM::Util
+
+1.18    Sat, 25 Apr 2020 15:37:00 +0200
+        * pollute namespace again with private methods, doesn't work well with Devel::Cover
+        * unreleased
+
+1.17    Fri, 24 Apr 2020 20:44:33 +0200
+        * unreleased, very clean namespace
+
 1.16    Mon, 20 Apr 2020 09:01:32 +0200
         * use carp as default error_cb
 

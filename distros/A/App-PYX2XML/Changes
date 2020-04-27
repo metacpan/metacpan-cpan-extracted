@@ -1,3 +1,22 @@
+0.04 2020-04-26T22:52:34+02:00
+ - Fix test dependencies.
+ - Remove obsolete ERRORS section in doc.
+ - Rewrite doc METHODS section to =head2.
+
+0.03 2020-04-26T19:51:53+02:00
+ - Add test for constructor.
+ - Add test for run() method.
+ - Fix usage of -e option.
+ - Fix to 80 characters on line.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Move argument parsing from constructor to run section.
+ - Sort attributes.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.02 2016-02-20T23:43:25+01:00
  - Add -e option for input encoding.
 

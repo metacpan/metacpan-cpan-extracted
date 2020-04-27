@@ -1,42 +1,48 @@
-0.890   2017-08-10 (PERLANCAR)
+0.891   2020-04-27  Released-By: PERLANCAR; Urgency: medium
+
+	- More sophisticated humanize_getopt_long_opt_spec(): add options
+	  key_label, value_label, separator.
+
+
+0.890   2017-08-10  Released-By: PERLANCAR
 
 	- Detect GL:{Less,EvenLess}-based scripts.
 
 
-0.88    2016-10-30 (PERLANCAR)
+0.88    2016-10-30  Released-By: PERLANCAR
 
 	- Add gen_getopt_long_spec_from_getopt_std_spec().
 
 
-0.87    2016-10-27 (PERLANCAR)
+0.87    2016-10-27  Released-By: PERLANCAR
 
 	- Tweak Rinci metadata.
 
 
-0.86    2016-10-26 (PERLANCAR)
+0.86    2016-10-26  Released-By: PERLANCAR
 
 	- [optimize] Avoid regex slowdown of detecting /^\s*use
 	  Getopt::Long/ due to \s* after ^, when source lines reach many
 	  thousands, by splitting the source per line.
 
 
-0.85    2016-10-21 (PERLANCAR)
+0.85    2016-10-21  Released-By: PERLANCAR
 
 	- Also detect scripts that use Getopt::Long::Complete as using
 	  Getopt::Long (add func.module in result metadata).
 
 
-0.84    2016-01-08 (PERLANCAR)
+0.84    2016-01-08  Released-By: PERLANCAR
 
         - Parse '<>' [RT#110991].
 
 
-0.83    2015-06-11 (PERLANCAR)
+0.83    2015-06-11  Released-By: PERLANCAR
 
 	- Remove usage of List::Util, to reduce startup overhead.
 
 
-0.82    2015-06-11 (PERLANCAR)
+0.82    2015-06-11  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -44,32 +50,32 @@
 	  with dzil plugin DZP:InserBlock::FromModule.
 
 
-0.81    2015-03-24 (PERLANCAR)
+0.81    2015-03-24  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [opt] Shave off +- 2-3ms by avoiding experimental+Carp.
 
 
-0.80    2015-02-15 (PERLANCAR)
+0.80    2015-02-15  Released-By: PERLANCAR
 
 	- Add 'dash_prefix' key in parse result; [compliance] accept -foo
 	  in addition to --foo.
 
 
-0.79    2014-12-21 (PERLANCAR)
+0.79    2014-12-21  Released-By: PERLANCAR
 
 	- Add function: detect_getopt_long_script().
 
 
-0.78    2014-12-09 (PERLANCAR)
+0.78    2014-12-09  Released-By: PERLANCAR
 
         - No functional changes.
 
         - Mention Getopt::Long::Spec.
 
 
-0.77    2014-07-23 (SHARYANTO)
+0.77    2014-07-23  Released-By: SHARYANTO
 
         [REMOVED FEATURES]
 
@@ -78,21 +84,21 @@
           cycles.
 
 
-0.76    2014-07-23 (SHARYANTO)
+0.76    2014-07-23  Released-By: SHARYANTO
 
         - Move sorting of option names to parse_getopt_long_opt_spec(), so other
           routines (including humanize_getopt_long_opt_spec() need not re-sort
           the options).
 
 
-0.75    2014-07-23 (SHARYANTO)
+0.75    2014-07-23  Released-By: SHARYANTO
 
         - humanize_getopt_long_opt_spec(): Sort option names, put long option
           before short (--help before -h), letter option before symbol (-h
           before -?).
 
 
-0.74    2014-07-09 (SHARYANTO)
+0.74    2014-07-09  Released-By: SHARYANTO
 
         [BUG FIXES]
 
@@ -102,20 +108,21 @@
           to make opt spec stay legal.
 
 
-0.73    2014-07-09 (SHARYANTO)
+0.73    2014-07-09  Released-By: SHARYANTO
 
         [BUG FIXES]
 
         - Fix normalization of 'bool!' and 'inc+'.
 
 
-0.72    2014-07-09 (SHARYANTO) - Pesta demokrasi!
+0.72    2014-07-09  Released-By: SHARYANTO; Note: Pesta demokrasi!
 
         - Add function: parse_getopt_long_opt_spec() (and make
           humanize_getopt_long_opt_spec() use that).
 
 
-0.71    2014-04-17 (SHARYANTO)
+0.71    2014-04-17  Released-By: SHARYANTO
 
         - First release. Extracted from SHARYANTO-Utils (renamed module from
           SHARYANTO::Getopt::Long::Util to Getopt::Long::Util).
+

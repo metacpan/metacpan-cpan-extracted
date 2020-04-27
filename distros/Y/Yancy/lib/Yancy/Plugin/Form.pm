@@ -1,5 +1,5 @@
 package Yancy::Plugin::Form;
-our $VERSION = '1.055';
+our $VERSION = '1.056';
 # ABSTRACT: Generate form HTML using various UI libraries
 
 #pod =head1 SYNOPSIS
@@ -263,6 +263,9 @@ use Yancy::Util qw( currym );
 sub register {
     my ( $self, $app, $conf ) = @_;
     my $prefix = $conf->{prefix} || 'form';
+    
+    $app->plugin( 'Mojolicious::Plugin::I18N' );
+    
     for my $method ( qw( form_for field_for input_for filter_for input ) ) {
         $app->helper( "yancy.$prefix.$method" => currym( $self, $method ) );
     }
@@ -280,7 +283,7 @@ Yancy::Plugin::Form - Generate form HTML using various UI libraries
 
 =head1 VERSION
 
-version 1.055
+version 1.056
 
 =head1 SYNOPSIS
 

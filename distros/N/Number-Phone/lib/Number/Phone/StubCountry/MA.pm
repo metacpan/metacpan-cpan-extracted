@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200309202347;
+our $VERSION = 1.20200427120031;
 
 my $formatters = [
                 {
@@ -31,7 +31,7 @@ my $formatters = [
             5(?:
               29|
               38
-            )[89]
+            )[89]0
           ',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{5})(\\d{4})'
@@ -76,10 +76,11 @@ my $validators = {
                 'fixed_line' => '
           5(?:
             29(?:
-              [189]0|
-              29
+              [189][05]|
+              2[29]|
+              3[01]
             )|
-            38[89]0
+            38[89][05]
           )\\d{4}|
           5(?:
             2(?:
@@ -106,10 +107,11 @@ my $validators = {
                 'geographic' => '
           5(?:
             29(?:
-              [189]0|
-              29
+              [189][05]|
+              2[29]|
+              3[01]
             )|
-            38[89]0
+            38[89][05]
           )\\d{4}|
           5(?:
             2(?:
@@ -181,8 +183,8 @@ $areanames{fr}->{2125287} = "Guelmim\/Tan\ Tan";
 $areanames{fr}->{2125288} = "Es\-Semara\/Agadir\/Tarfaya";
 $areanames{fr}->{2125289} = "Laayoune\/Dakhla";
 $areanames{fr}->{2125290} = "Casablanca";
-$areanames{fr}->{2125298} = "Marrakech\ et\ alentours";
-$areanames{fr}->{2125299} = "Agadir\ et\ alentours";
+$areanames{fr}->{21252980} = "Marrakech\ et\ alentours";
+$areanames{fr}->{21252990} = "Agadir\ et\ alentours";
 $areanames{fr}->{212530} = "Rabat\/Kénitra";
 $areanames{fr}->{212531} = "Tanger\/Tétouan\/Larache\/Al\ Hoceima\/Cherfchaouen";
 $areanames{fr}->{212532} = "Fès\/Oujda\/Meknès\/Taza\/Nador\/Errachidia";
@@ -209,8 +211,8 @@ $areanames{fr}->{2125377} = "Rabat";
 $areanames{fr}->{2125378} = "Salé";
 $areanames{fr}->{2125379} = "Souk\ Larbaa";
 $areanames{fr}->{2125380} = "Rabat\ et\ alentours";
-$areanames{fr}->{2125388} = "Tanger\ et\ alentours";
-$areanames{fr}->{2125389} = "Fès\/Maknès\ et\ alentours";
+$areanames{fr}->{21253880} = "Tanger\ et\ alentours";
+$areanames{fr}->{21253890} = "Fès\/Maknès\ et\ alentours";
 $areanames{fr}->{2125393} = "Tanger";
 $areanames{fr}->{2125394} = "Asilah";
 $areanames{fr}->{2125395} = "Larache";
@@ -241,8 +243,8 @@ $areanames{en}->{2125287} = "Guelmim\/Tan\ Tan";
 $areanames{en}->{2125288} = "Agadir\/Es\-Semara\/Tarfaya";
 $areanames{en}->{2125289} = "Dakhla\/Laayoune";
 $areanames{en}->{2125290} = "Casablanca";
-$areanames{en}->{2125298} = "Marrakech\ area";
-$areanames{en}->{2125299} = "Agadir\ area";
+$areanames{en}->{21252980} = "Marrakech\ area";
+$areanames{en}->{21252990} = "Agadir\ area";
 $areanames{en}->{212530} = "Rabat\/Kènitra";
 $areanames{en}->{212531} = "Tangier\/Al\ Hoceima\/Larache\/Tètouan\/Chefchaouen";
 $areanames{en}->{212532} = "Fès\/Errachidia\/Meknès\/Nador\/Oujda\/Taza";
@@ -269,8 +271,8 @@ $areanames{en}->{2125377} = "Rabat";
 $areanames{en}->{2125378} = "Salé";
 $areanames{en}->{2125379} = "Souk\ Larbaa";
 $areanames{en}->{2125380} = "Rabat\ area";
-$areanames{en}->{2125388} = "Tangier\ area";
-$areanames{en}->{2125389} = "Fès\/Meknès\ areas";
+$areanames{en}->{21253880} = "Tangier\ area";
+$areanames{en}->{21253890} = "Fès\/Meknès\ areas";
 $areanames{en}->{2125393} = "Tangier";
 $areanames{en}->{2125394} = "Asilah";
 $areanames{en}->{2125395} = "Larache";

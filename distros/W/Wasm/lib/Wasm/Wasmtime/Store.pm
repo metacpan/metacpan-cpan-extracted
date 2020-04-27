@@ -6,29 +6,25 @@ use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::Engine;
 
 # ABSTRACT: Wasmtime store class
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 $ffi_prefix = 'wasm_store_';
-$ffi->type('opaque' => 'wasm_store_t');
+$ffi->load_custom_type('::PtrObject' => 'wasm_store_t' => __PACKAGE__);
 
 
 $ffi->attach( new => ['wasm_engine_t'] => 'wasm_store_t' => sub {
   my($xsub, $class, $engine) = @_;
   $engine ||= Wasm::Wasmtime::Engine->new;
-  bless {
-    ptr    => $xsub->($engine->{ptr}),
-    engine => $engine,
-  }, $class;
+  my $self = $xsub->($engine);
+  $self->{engine} = $engine;
+  $self;
 });
 
 
 sub engine { shift->{engine} }
 
-$ffi->attach( [ 'delete' => 'DESTROY' ] => ['wasm_store_t'] => sub {
-  my($xsub, $self) = @_;
-  $xsub->($self->{ptr}) if $self->{ptr};
-});
+_generate_destroy();
 
 1;
 
@@ -44,7 +40,7 @@ Wasm::Wasmtime::Store - Wasmtime store class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,41 +12,47 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 59b1696043358992857fd46a5044440465e939ee Changes
-SHA1 ecec73beff956fc76e8b8199687ac9bb85103e96 LICENSE
-SHA1 2e3a14a25cf8a2a97ccc7faa3505d597c216ceae MANIFEST
-SHA1 7d4c6e89fed4e32ee9ba5154499662c1aeb3205a META.yml
-SHA1 6214c63be2a3523285eb053113f1f21c04eaf89b Makefile.PL
-SHA1 d11ac8fb0b17826d689ae8a09d8d5864fd6c81e0 PYX2XML.pm
-SHA1 05637b696fb1b4c35c6b915eb6ba3a1d1ce8ad15 README
-SHA1 048579e3a9806dcb9be3b7e3220324ed9bc2f398 bin/pyx2xml
-SHA1 b11a8d513ad87fb6082b83352ecc86dc523e5116 examples/ex1.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 01978a56e76a58399af3bd4d022aa990b9669bee inc/Module/Install/Scripts.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 250a9c922d939b13965d080e4739c9884b16e4d6 t/App-PYX2XML/01-use.t
-SHA1 3c22d6dce78da8463c8dd1669752b747bb6be8f9 t/App-PYX2XML/02-version.t
-SHA1 08eea5d378b14e2474edb2f3ce237b68ea00a22b xt/App-PYX2XML/01-pod_coverage.t
-SHA1 cedbb59a70703a409d2e696ec95b16f0278dc4bb xt/App-PYX2XML/02-pod.t
+SHA256 ec1bfe4513b0cddc19d4bd554b8bcf4bcf98867f84c6b7961d87be109468e82e Changes
+SHA256 b47dd6a3ac3bf4d241874909d8e985bccf84a062fcbda326ef686955f83f7f88 LICENSE
+SHA256 d7f95c4746c1a7b2d06bf49c562dcf34c0c2ec4f6e510b461c4c8efed04613dd MANIFEST
+SHA256 df5320ca549fecdf87e0abc436e58772a72b178b1dc8d6103cdac770d3f894e8 META.yml
+SHA256 06ba1d3db2df237a1c9aded6b669e8575c0a627c73174d8842feba1942ef97bf Makefile.PL
+SHA256 ab25fcaae562e6ab87e6299a1c9d31d0f348520ca9caba01d1070cd80dbe5b9f PYX2XML.pm
+SHA256 a4f19a55c0187e08c11da60ec44dd75d691393fc11d5a52ab0a5cba84dfc813d README
+SHA256 d3e9b45a40b51b8cc3fed27cd1992e3562493b49ff28aecca1de5d6e13bddda2 bin/pyx2xml
+SHA256 d43754f690ca14ad77e5eddc104dac273dddbcb93e2c6bda2923a8d8cbcf9b97 examples/ex1.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 751bc4e2f98074c05c9e23d484f2406cef042099664b6c87a73d6530bbeda427 inc/Module/Install/Scripts.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 b43faf9959a3d823609c21f8920839fd47379c102cd39b726de091e9bf60ae7b t/App-PYX2XML/01-use.t
+SHA256 f25d8c76f05b1175aa0722154e4a48ff94053a446248289f4a1a468c9b93906a t/App-PYX2XML/02-version.t
+SHA256 b0120307e6706e52cb68f13f8dee0d9e65e49622df88be18198f95010b5c3533 t/App-PYX2XML/03-new.t
+SHA256 c915044dc5a43d893d9a305ba9caebd1dd8ac2321291425df0a3e0d8690a93ed t/App-PYX2XML/04-run.t
+SHA256 ca09610b69bbffe2a98d1786594d64ab40d1f1b7b932023121a8b794025fee58 t/data/element.pyx
+SHA256 e8038e6c7dacdce9fe4ba9b5700de6d1d6d99c36d2272f10c5416be6bf558f80 t/data/element_latin2.pyx
+SHA256 8057770a89eabb6fa1fe3555c0e4a350a64564d734566328ca007085faacc6cd t/data/element_utf8.pyx
+SHA256 09b51c5cc86d6468bed74266f14a6dabc084891b3de9e23e439bb5687737dd5e t/data/element_with_content.pyx
+SHA256 bd929e3f2f77f615d9374f9371c2ac77357f03127bd552c1ef95cad8d695e54b xt/App-PYX2XML/01-pod_coverage.t
+SHA256 b2f6aa4d6a79eab6b30aebf26508402cd5c76bdaed99e9ac90942bbecaadeaa0 xt/App-PYX2XML/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWyOwPAAoJEJe+XXKaIuTluwUH/AqWKcezMWBJbcU6tyGNdPWF
-OUqNoCreqoolfzsIiCK4YJLtl1CV8pGzzrEZitdinrF5AJJgatMJyLYFhU4qWOBS
-0zpgFw+nyS7zNK34tKwCMUoX+D5A6q8mWmekV0gUzVLX/04+3APn4a/N0wSiDpDi
-VEKMLq8GqAVC3GCKIgjCHus1KPjXURz7S2a7PacJBDin2mYu+tKaiYPkdJu0p41G
-hPEXsf1pezCXCgeVOWGzGWn8j98RjSAVkCGrWr2OdcS9zNgVrB+C8+A/Rdti1p0a
-l3q5bpehq/Xb9s8NnGC/iSUdB/O+5Ksjx+gneiiF0CgH4vCMuC6nlm4hgGjqqCI=
-=1JwY
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl6l9JMACgkQKyiOZjWe
+rHZXRAgAimULQvUwHgqVHsJXZeac1I61CK4IVMNOISKf6YUij890Vxz0r0J4MTbj
+/NcnXVVKMfrSADIJ9sfHDZuU3amlzEXAdNputa0YfQGcOoP7Jd3G3J8IEMKcMkPB
+X6R3TKN7neY36Ss7tb5zpa+B9YKTjZRGk5/4GflV2fI7EtJ2U8ZDGrtk/j6RBwTl
+WksIxd9alH3upJKgrAyxgqwPrE0cdkC9MzzXtSyAkJEwM5ikqPcn5ehmqXHTyzjX
+TNtlu1vBXXvcHmt5qPcgDnI80ywg15aVj5+qfPlZ4m0AM1hio8NRY1wk62alfB2b
+Iy9Yl8Omog747Cc0F9IFFSLBXxB0CA==
+=MRgR
 -----END PGP SIGNATURE-----

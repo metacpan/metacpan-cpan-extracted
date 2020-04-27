@@ -7,7 +7,7 @@ use Module::Build;
 my $class = Module::Build->subclass(
     class => 'Evented::Configuration::Builder',
     code => q{
-        sub ACTION_distmeta {
+        sub ACTION_docs {
             use Pod::Readme;
             use Pod::Select;
 
@@ -43,7 +43,6 @@ my $build = $class->new(
     recommends          => {},
     build_requires      => {},
     license             => 'bsd',
-    create_makefile_pl  => 'traditional',
     dynamic_config      => 0,
     meta_merge          => {
         resources => {

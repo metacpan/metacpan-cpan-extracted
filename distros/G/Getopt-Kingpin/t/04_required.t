@@ -1,6 +1,6 @@
 use strict;
 use Test::More 0.98;
-use Test::Trap;
+use Capture::Tiny ':all';
 use Getopt::Kingpin;
 
 
@@ -9,14 +9,15 @@ subtest 'required' => sub {
     push @ARGV, qw();
 
     my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
     $kingpin->flag('name', 'set name')->required->string();
 
-    trap {
+    my ($stdout, $stderr, $ret, $exit) = capture {
         $kingpin->parse;
     };
 
-    like $trap->stderr, qr/error: required flag --name not provided, try --help/, 'required error';
-    is $trap->exit, 1;
+    like $stderr, qr/error: required flag --name not provided, try --help/, 'required error';
+    is $exit, 1;
 };
 
 subtest 'required and not required' => sub {
@@ -24,14 +25,15 @@ subtest 'required and not required' => sub {
     push @ARGV, qw(--name abc --x 3);
 
     my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
     my $name = $kingpin->flag('name', 'set name')->required->string();
     my $x = $kingpin->flag('x', 'set x')->int();
 
-    trap {
+    my ($stdout, $stderr, $ret, $exit) = capture {
         $kingpin->parse;
     };
 
-    is $trap->exit, undef;
+    is $exit, undef;
     is $name, 'abc';
     is $x, 3;
 };

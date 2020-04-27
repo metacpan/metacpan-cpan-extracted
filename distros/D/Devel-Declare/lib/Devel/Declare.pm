@@ -1,23 +1,23 @@
 package Devel::Declare;
-# ABSTRACT: (DEPRECATED) Adding keywords to perl, in perl
 
 use strict;
 use warnings;
 use 5.008001;
 
-our $VERSION = '0.006019';
+our $VERSION = '0.006022';
+
+bootstrap Devel::Declare;
+$VERSION =~ tr/_//d;
 
 use constant DECLARE_NAME => 1;
 use constant DECLARE_PROTO => 2;
 use constant DECLARE_NONE => 4;
 use constant DECLARE_PACKAGE => 8+1; # name implicit
 
-use vars qw(%declarators %declarator_handlers @ISA);
+our (%declarators, %declarator_handlers, @ISA);
 use base qw(DynaLoader);
 use Scalar::Util 'set_prototype';
 use B::Hooks::OP::Check 0.19;
-
-bootstrap Devel::Declare;
 
 @ISA = ();
 
@@ -288,7 +288,7 @@ sub linestr_callback {
 
 =head1 NAME
 
-Devel::Declare - Adding keywords to perl, in perl
+Devel::Declare - (DEPRECATED) Adding keywords to perl, in perl
 
 =head1 SYNOPSIS
 

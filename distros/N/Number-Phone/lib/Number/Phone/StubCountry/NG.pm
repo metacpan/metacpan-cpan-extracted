@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200309202348;
+our $VERSION = 1.20200427120031;
 
 my $formatters = [
                 {
@@ -78,7 +78,6 @@ my $validators = {
             (?:
               [1-356]\\d|
               4[02-8]|
-              7[0-79]|
               8[2-9]
             )\\d|
             9(?:
@@ -86,12 +85,19 @@ my $validators = {
               [1-9]\\d
             )
           )\\d{5}|
+          7(?:
+            0(?:
+              [013-689]\\d|
+              2[0-24-9]
+            )\\d{3,4}|
+            [1-79]\\d{6}
+          )|
           (?:
             [12]\\d|
             4[147]|
             5[14579]|
             6[1578]|
-            7[0-3578]
+            7[1-3578]
           )\\d{5}
         ',
                 'geographic' => '
@@ -99,7 +105,6 @@ my $validators = {
             (?:
               [1-356]\\d|
               4[02-8]|
-              7[0-79]|
               8[2-9]
             )\\d|
             9(?:
@@ -107,24 +112,31 @@ my $validators = {
               [1-9]\\d
             )
           )\\d{5}|
+          7(?:
+            0(?:
+              [013-689]\\d|
+              2[0-24-9]
+            )\\d{3,4}|
+            [1-79]\\d{6}
+          )|
           (?:
             [12]\\d|
             4[147]|
             5[14579]|
             6[1578]|
-            7[0-3578]
+            7[1-3578]
           )\\d{5}
         ',
                 'mobile' => '
           (?:
-            707[0-3]|
+            702[0-24-9]|
             8(?:
               01|
               19
             )[01]
           )\\d{6}|
           (?:
-            70[1-689]|
+            70[13-689]|
             8(?:
               0[2-9]|
               1[0-8]
@@ -196,7 +208,22 @@ $areanames{en}->{23486} = "Ahoada";
 $areanames{en}->{23487} = "Calabar";
 $areanames{en}->{23488} = "Umuahia";
 $areanames{en}->{23489} = "Yenegoa";
-$areanames{en}->{2349} = "Abuja";
+$areanames{en}->{234903} = "Abuja";
+$areanames{en}->{234904} = "Abuja";
+$areanames{en}->{234905} = "Abuja";
+$areanames{en}->{234906} = "Abuja";
+$areanames{en}->{234907} = "Abuja";
+$areanames{en}->{234908} = "Abuja";
+$areanames{en}->{234909} = "Abuja";
+$areanames{en}->{23491} = "Abuja";
+$areanames{en}->{23492} = "Abuja";
+$areanames{en}->{23493} = "Abuja";
+$areanames{en}->{23494} = "Abuja";
+$areanames{en}->{23495} = "Abuja";
+$areanames{en}->{23496} = "Abuja";
+$areanames{en}->{23497} = "Abuja";
+$areanames{en}->{23498} = "Abuja";
+$areanames{en}->{23499} = "Abuja";
 
     sub new {
       my $class = shift;

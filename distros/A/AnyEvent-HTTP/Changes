@@ -16,6 +16,17 @@ TODO: servers send empty reason, which then gets mangled with linear whitespace 
 
 TODO: look into http 0.9 support (Kostirya <kostirya@gmail.com>)
 TODO: http://appft.uspto.gov/netacgi/nph-Parser?Sect1=PTO1&Sect2=HITOFF&%23038;d=PG01&%23038;p=1&%23038;u=/netahtml/PTO/srchnum.html&%23038;r=1&%23038;f=G&%23038;l=50&%23038;s1="20110298798".PGNR.&%23038;OS=DN/20110298798&%23038;RS=DN/20110298798
+TODO: cookie_jar_extract should refuse when host is an ip literal
+TODO: cookie_jar_et_cookie should reject cookies not matching their down server domain
+TODO: cookie prefixes? https://tools.ietf.org/html/draft-ietf-httpbis-cookie-prefixes-00
+TODO: default rbuf_max limit for header-reading, chunk header reading etc.
+
+2.25 Mon Apr 27 14:11:40 CEST 2020
+	- fix incorrectly sending proxy requests to origin servers
+          when reusing proxy connections (analyzed and testcase by Ivan Robert).
+	- the sessionid parameter was documented as session in random
+          places - fix docs and keep using sessionid in the code as before.
+	- fix cookie format documentation.
 
 2.24 Thu Aug 30 03:23:03 CEST 2018
 	- bring cookie management more in line with RFC 6265; implement idn

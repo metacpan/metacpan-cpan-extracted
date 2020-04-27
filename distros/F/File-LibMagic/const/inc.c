@@ -65,6 +65,95 @@ constant_11 (pTHX_ const char *name, IV *iv_return) {
 }
 
 static int
+constant_21 (pTHX_ const char *name, IV *iv_return) {
+  /* When generated this function returned values for the list of names given
+     here.  However, subsequent manual editing may have added or removed some.
+     MAGIC_PARAM_BYTES_MAX MAGIC_PARAM_INDIR_MAX MAGIC_PARAM_REGEX_MAX */
+  /* Offset 16 gives the best switch position.  */
+  switch (name[16]) {
+  case 'R':
+    if (memEQ(name, "MAGIC_PARAM_INDIR_MAX", 21)) {
+    /*                               ^           */
+#ifdef MAGIC_PARAM_INDIR_MAX
+      *iv_return = MAGIC_PARAM_INDIR_MAX;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'S':
+    if (memEQ(name, "MAGIC_PARAM_BYTES_MAX", 21)) {
+    /*                               ^           */
+#ifdef MAGIC_PARAM_BYTES_MAX
+      *iv_return = MAGIC_PARAM_BYTES_MAX;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'X':
+    if (memEQ(name, "MAGIC_PARAM_REGEX_MAX", 21)) {
+    /*                               ^           */
+#ifdef MAGIC_PARAM_REGEX_MAX
+      *iv_return = MAGIC_PARAM_REGEX_MAX;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  }
+  return PERL_constant_NOTFOUND;
+}
+
+static int
+constant_25 (pTHX_ const char *name, IV *iv_return) {
+  /* When generated this function returned values for the list of names given
+     here.  However, subsequent manual editing may have added or removed some.
+     MAGIC_PARAM_ELF_NOTES_MAX MAGIC_PARAM_ELF_PHNUM_MAX
+     MAGIC_PARAM_ELF_SHNUM_MAX */
+  /* Offset 16 gives the best switch position.  */
+  switch (name[16]) {
+  case 'N':
+    if (memEQ(name, "MAGIC_PARAM_ELF_NOTES_MAX", 25)) {
+    /*                               ^               */
+#ifdef MAGIC_PARAM_ELF_NOTES_MAX
+      *iv_return = MAGIC_PARAM_ELF_NOTES_MAX;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'P':
+    if (memEQ(name, "MAGIC_PARAM_ELF_PHNUM_MAX", 25)) {
+    /*                               ^               */
+#ifdef MAGIC_PARAM_ELF_PHNUM_MAX
+      *iv_return = MAGIC_PARAM_ELF_PHNUM_MAX;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'S':
+    if (memEQ(name, "MAGIC_PARAM_ELF_SHNUM_MAX", 25)) {
+    /*                               ^               */
+#ifdef MAGIC_PARAM_ELF_SHNUM_MAX
+      *iv_return = MAGIC_PARAM_ELF_SHNUM_MAX;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  }
+  return PERL_constant_NOTFOUND;
+}
+
+static int
 constant (pTHX_ const char *name, STRLEN len, IV *iv_return) {
   /* Initially switch on the length of the name.  */
   /* When generated this function returned values for the list of names given
@@ -77,12 +166,15 @@ constant (pTHX_ const char *name, STRLEN len, IV *iv_return) {
      Regenerate these constant functions by feeding this entire source file to
      perl -x
 
-#!/home/autarch/perl5/perlbrew/perls/perl-5.26.1/bin/perl -w
+#!/home/autarch/perl5/perlbrew/perls/perl-5.30.1/bin/perl -w
 use ExtUtils::Constant qw (constant_types C_constant XS_constant);
 
 my $types = {map {($_, 1)} qw(IV)};
 my @names = (qw(MAGIC_CHECK MAGIC_COMPRESS MAGIC_CONTINUE MAGIC_DEBUG
 	       MAGIC_DEVICES MAGIC_ERROR MAGIC_MIME MAGIC_NONE
+	       MAGIC_PARAM_BYTES_MAX MAGIC_PARAM_ELF_NOTES_MAX
+	       MAGIC_PARAM_ELF_PHNUM_MAX MAGIC_PARAM_ELF_SHNUM_MAX
+	       MAGIC_PARAM_INDIR_MAX MAGIC_PARAM_NAME_MAX MAGIC_PARAM_REGEX_MAX
 	       MAGIC_PRESERVE_ATIME MAGIC_RAW MAGIC_SYMLINK));
 
 print constant_types(), "\n"; # macro defs
@@ -196,14 +288,39 @@ __END__
     }
     break;
   case 20:
-    if (memEQ(name, "MAGIC_PRESERVE_ATIME", 20)) {
-#ifdef MAGIC_PRESERVE_ATIME
-      *iv_return = MAGIC_PRESERVE_ATIME;
-      return PERL_constant_ISIV;
+    /* Names all of length 20.  */
+    /* MAGIC_PARAM_NAME_MAX MAGIC_PRESERVE_ATIME */
+    /* Offset 13 gives the best switch position.  */
+    switch (name[13]) {
+    case 'A':
+      if (memEQ(name, "MAGIC_PARAM_NAME_MAX", 20)) {
+      /*                            ^             */
+#ifdef MAGIC_PARAM_NAME_MAX
+        *iv_return = MAGIC_PARAM_NAME_MAX;
+        return PERL_constant_ISIV;
 #else
-      return PERL_constant_NOTDEF;
+        return PERL_constant_NOTDEF;
 #endif
+      }
+      break;
+    case 'E':
+      if (memEQ(name, "MAGIC_PRESERVE_ATIME", 20)) {
+      /*                            ^             */
+#ifdef MAGIC_PRESERVE_ATIME
+        *iv_return = MAGIC_PRESERVE_ATIME;
+        return PERL_constant_ISIV;
+#else
+        return PERL_constant_NOTDEF;
+#endif
+      }
+      break;
     }
+    break;
+  case 21:
+    return constant_21 (aTHX_ name, iv_return);
+    break;
+  case 25:
+    return constant_25 (aTHX_ name, iv_return);
     break;
   }
   return PERL_constant_NOTFOUND;

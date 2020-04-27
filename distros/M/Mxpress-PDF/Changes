@@ -15,3 +15,9 @@ Revision history for Mxpress-PDF
 0.25    2020-04-25
 	- New attribute concat in Mxpress::PDF::Plugin::Text that aids in concatenating text segments.
 	- Add an example to synopsis of switching between default, bold, italic fonts.
+
+0.26    2020-04-25
+	- Extend Mxpress::PDF::Plugin::Line to allow for line styles (dots, dashed and custom)
+
+0.27    2020-04-27
+	- Add new plugin Mxpress::PDF::Plugin::List that aids in rendering bullet point lists.

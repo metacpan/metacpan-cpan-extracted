@@ -7,11 +7,11 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use Devel::PPPort 3.42;
 use Dist::Zilla 6.0;
-use Path::Iterator::Rule;
+use Path::Tiny::Rule;
 
 # For the benefit of AutoPrereqs
 use Dist::Zilla::Plugin::Authority;
@@ -553,9 +553,9 @@ sub _explicit_prereq_plugins {
 }
 
 sub _dist_uses_test2 {
-    my $rule = Path::Iterator::Rule->new;
+    my $rule = Path::Tiny::Rule->new;
     my $iter
-        = $rule->file->name(qr/\.(t|pm)/)->contents_match(qr/^use Test2/m)
+        = $rule->file->name(qr/\.(t|pm)$/)->contents_match(qr/^use Test2/m)
         ->iter('t');
 
     while ( my $file = $iter->() ) {
@@ -566,6 +566,8 @@ sub _dist_uses_test2 {
 }
 
 sub _prompt_if_stale_plugin {
+    my $self = shift;
+
     my $name = __PACKAGE__;
     return (
         [
@@ -588,11 +590,27 @@ sub _prompt_if_stale_plugin {
                         Dist::Zilla::Plugin::DROLSKY::TidyAll
                         Dist::Zilla::Plugin::DROLSKY::WeaverConfig
                         Pod::Weaver::PluginBundle::DROLSKY
-                        )
+                        ),
+                    $self->_inc_packages,
                 ],
             }
         ],
     );
+}
+
+sub _inc_packages {
+    return unless -d 'inc';
+
+    my @packages;
+    my $rule = Path::Tiny::Rule->new;
+    my $iter = $rule->file->name(qr/\.pm$/)->iter('inc');
+    while ( my $pm = $iter->() ) {
+        my ($first) = $pm->lines( { count => 1 } );
+        push @packages, $1
+            if $first =~ /package (inc::.+);/;
+    }
+
+    return @packages;
 }
 
 sub _pod_test_plugins {
@@ -835,7 +853,7 @@ sub _build_allow_dirty {
 sub _build_has_xs {
     my $self = shift;
 
-    my $rule = Path::Iterator::Rule->new;
+    my $rule = Path::Tiny::Rule->new;
     return $rule->skip_dirs(
         '.build',
         $self->dist . '-*',
@@ -860,7 +878,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =head1 SYNOPSIS
 
@@ -1015,6 +1033,7 @@ This is more or less equivalent to the following F<dist.ini>:
     skip = Dist::Zilla::Plugin::DROLSKY::License
     skip = Dist::Zilla::Plugin::DROLSKY::TidyAll
     skip = Pod::Weaver::PluginBundle::DROLSKY
+    ; also skips any package starting with inc:: that lives in the inc/ dir.
 
     [Test::Pod::Coverage::Configurable]
     ; Configured by setting pod_coverage_class for the bundle

@@ -7,6 +7,7 @@ maint/Makefile.include
 maint/Makefile.PL.include
 Makefile.PL
 MANIFEST			This list of files
+ppport.h
 stolen_chunk_of_toke.c
 t/00load.t
 t/block_size.t
@@ -47,3 +48,4 @@ t/sugar.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 README                                   README file (added by Distar)
+LICENSE                                  LICENSE file (added by Distar)

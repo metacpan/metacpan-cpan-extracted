@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::App::CmdLine::Expand;
-$Games::Solitaire::Verify::App::CmdLine::Expand::VERSION = '0.2303';
+$Games::Solitaire::Verify::App::CmdLine::Expand::VERSION = '0.2401';
 use strict;
 use warnings;
 
@@ -175,7 +175,7 @@ multi-card moves.
 
 =head1 VERSION
 
-version 0.2303
+version 0.2401
 
 =head1 SYNOPSIS
 

@@ -12,29 +12,47 @@ SYNOPSIS
      my @data = start_element($elem, @attr);
 
 SUBROUTINES
-    "attribute(@attr)"
-             Encode attribute as PYX.
-             Returns array of encoded lines.
+  "attribute"
+     my @data = attribute(@attr);
 
-    "char($char)"
-             Encode characters between elements as PYX.
-             Returns array of encoded lines.
+    Encode attribute as PYX.
 
-    "comment($comment)"
-             Encode comment as PYX.
-             Returns array of encoded lines.
+    Returns array of encoded lines.
 
-    "end_element($elem)"
-             Encode end of element as PYX.
-             Returns array of encoded lines.
+  "char"
+     my @data = char($char);
 
-    "instruction($target, $code)"
-             Encode instruction as PYX.
-             Returns array of encoded lines.
+    Encode characters between elements as PYX.
 
-    "start_element($elem, @attr)"
-             Encode begin of element as PYX.
-             Returns array of encoded lines.
+    Returns array of encoded lines.
+
+  "comment"
+     my @data = comment($comment);
+
+    Encode comment as PYX.
+
+    Returns array of encoded lines.
+
+  "end_element"
+     my @data = end_element($elem);
+
+    Encode end of element as PYX.
+
+    Returns array of encoded lines.
+
+  "instruction"
+     my @data = instruction($target, $code);
+
+    Encode instruction as PYX.
+
+    Returns array of encoded lines.
+
+  "start_element"
+     my @data = start_element($elem, @attr);
+
+    Encode begin of element as PYX.
+
+    Returns array of encoded lines.
 
 EXAMPLE
      use strict;
@@ -84,5 +102,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

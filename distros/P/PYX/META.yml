@@ -39,4 +39,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/PYX
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/PYX
-version: '0.06'
+version: '0.07'

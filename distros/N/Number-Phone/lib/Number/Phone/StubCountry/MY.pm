@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200309202347;
+our $VERSION = 1.20200427120031;
 
 my $formatters = [
                 {
@@ -36,8 +36,7 @@ my $formatters = [
                   'leading_digits' => '
             1(?:
               [02469]|
-              [37][2-9]|
-              8[1-9]
+              [378][1-9]
             )|
             8
           ',
@@ -204,17 +203,17 @@ my $validators = {
                 [1-9]\\d
               )|
               7(?:
-                0[3-9]|
+                0\\d|
                 1[01]
               )
             )|
             (?:
-              [2379][2-9]|
-              4[235-9]|
               (?:
-                59|
-                6
-              )\\d
+                [269]|
+                59
+              )\\d|
+              [37][1-9]|
+              4[235-9]
             )\\d|
             8(?:
               1[23]|
@@ -232,15 +231,22 @@ my $validators = {
                 'specialrate' => '(1600\\d{6})',
                 'toll_free' => '1[378]00\\d{6}',
                 'voip' => '
-          154(?:
-            6(?:
-              0\\d|
-              1[0-3]
+          15(?:
+            4(?:
+              6[0-4]\\d|
+              8(?:
+                0[125]|
+                [17]\\d|
+                21|
+                3[01]|
+                4[01589]|
+                5[014]|
+                6[02]
+              )
             )|
-            8(?:
-              [25]1|
-              4[0189]|
-              7[0-4679]
+            6(?:
+              32[0-6]|
+              78\\d
             )
           )\\d{4}
         '
@@ -2153,6 +2159,11 @@ $areanames{en}->{606980} = "Bukit\ Gambir";
 $areanames{en}->{606981} = "Bakri";
 $areanames{en}->{606983} = "Bakri";
 $areanames{en}->{606984} = "Bukit\ Gambir";
+$areanames{en}->{606985} = "Muar";
+$areanames{en}->{606986} = "Bakri";
+$areanames{en}->{606987} = "Bakri";
+$areanames{en}->{606988} = "Bakri";
+$areanames{en}->{606989} = "Bakri";
 $areanames{en}->{607207} = "Johor\ Bahru";
 $areanames{en}->{607208} = "Johor\ Bahru";
 $areanames{en}->{607209} = "Johor\ Bahru";
@@ -2882,6 +2893,7 @@ $areanames{en}->{6084555} = "Sibu";
 $areanames{en}->{6084610} = "Rejang";
 $areanames{en}->{6084612} = "Rejang";
 $areanames{en}->{6084613} = "Selalang";
+$areanames{en}->{6084614} = "Rejang";
 $areanames{en}->{6084620} = "Sarikei";
 $areanames{en}->{6084631} = "Selalang";
 $areanames{en}->{6084632} = "Selalang";
@@ -3393,6 +3405,7 @@ $areanames{en}->{6087884} = "Kuala\ Penyu";
 $areanames{en}->{6087885} = "Kuala\ Penyu";
 $areanames{en}->{6087887} = "Membakut";
 $areanames{en}->{6087888} = "Membakut";
+$areanames{en}->{6087889} = "Membakut";
 $areanames{en}->{6088201} = "Kota\ Kinabalu";
 $areanames{en}->{6088203} = "Kota\ Kinabalu";
 $areanames{en}->{6088204} = "Kota\ Kinabalu";
@@ -3935,15 +3948,8 @@ $areanames{en}->{609415} = "Kuala\ Rompin";
 $areanames{en}->{609417} = "Nenasi";
 $areanames{en}->{609418} = "Nenasi";
 $areanames{en}->{609419} = "Kuala\ Rompin";
-$areanames{en}->{609421} = "Pekan";
-$areanames{en}->{609422} = "Pekan";
+$areanames{en}->{60942} = "Pekan";
 $areanames{en}->{609423} = "Chini";
-$areanames{en}->{609424} = "Pekan";
-$areanames{en}->{609425} = "Pekan";
-$areanames{en}->{609426} = "Pekan";
-$areanames{en}->{609427} = "Pekan";
-$areanames{en}->{609428} = "Pekan";
-$areanames{en}->{609429} = "Pekan";
 $areanames{en}->{609430} = "Pekan";
 $areanames{en}->{6094310} = "Pekan";
 $areanames{en}->{6094311} = "Pekan";
@@ -4149,6 +4155,7 @@ $areanames{en}->{609820} = "Paka";
 $areanames{en}->{609821} = "Sri\ Gading";
 $areanames{en}->{609822} = "Al\ Muktafi\ Billa\ H\ Shah";
 $areanames{en}->{609823} = "Al\ Muktafi\ Billa\ H\ Shah";
+$areanames{en}->{609824} = "Kerteh";
 $areanames{en}->{609825} = "Kerteh";
 $areanames{en}->{609826} = "Kerteh";
 $areanames{en}->{609827} = "Paka";
