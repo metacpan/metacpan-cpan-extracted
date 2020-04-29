@@ -1,3 +1,10 @@
+v0.134.1 2020-04-29T02:35:45Z
+ - typo
+
+v0.134.0 2020-04-28T14:13:57Z
+ - seorank
+ - 2captcha
+
 v0.133.0 2020-04-25T08:09:50Z
  - resources updated
  - auth is_root method added

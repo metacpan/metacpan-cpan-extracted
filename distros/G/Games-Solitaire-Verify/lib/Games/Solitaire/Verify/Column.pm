@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Column;
-$Games::Solitaire::Verify::Column::VERSION = '0.2401';
+$Games::Solitaire::Verify::Column::VERSION = '0.2402';
 use warnings;
 use strict;
 
@@ -190,7 +190,7 @@ columns that are composed of a sequence of cards.
 
 =head1 VERSION
 
-version 0.2401
+version 0.2402
 
 =head1 SYNOPSIS
 
@@ -349,7 +349,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 by Shlomi Fish.
+This software is Copyright (c) 2008 by Shlomi Fish.
 
 This is free software, licensed under:
 

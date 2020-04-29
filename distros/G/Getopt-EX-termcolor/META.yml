@@ -26,7 +26,7 @@ no_index:
 provides:
   Getopt::EX::termcolor:
     file: lib/Getopt/EX/termcolor.pm
-    version: '1.04'
+    version: '1.05'
   Getopt::EX::termcolor::Apple_Terminal:
     file: lib/Getopt/EX/termcolor/Apple_Terminal.pm
   Getopt::EX::termcolor::XTerm:
@@ -43,7 +43,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/Getopt-EX-termcolor/issues
   homepage: https://github.com/kaz-utashiro/Getopt-EX-termcolor
   repository: git://github.com/kaz-utashiro/Getopt-EX-termcolor.git
-version: '1.04'
+version: '1.05'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

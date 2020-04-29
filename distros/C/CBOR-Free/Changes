@@ -1,5 +1,16 @@
 Revision history for Perl module CBOR::Free
 
+0.30
+- BUG FIX: The decoder no longer leaks an extra reference on indirect values.
+- BUG FIX: The decoder no longer leaks a scalar on indefinite-length strings.
+- BUG FIX: The decoder no longer leaks arrays or hashes on errant input.
+- Add new sequence decoder module.
+- Add new character encoding/decoding options.
+- Remove experimental “text_keys” mode. (The new encoding options should
+  satisfy all needs that this served.)
+- Decoder: make hash key storage a bit more efficient if the key
+  is encoded as an indefinite-length string.
+
 0.23 8 April 2020
 - Fix encoding of “magical” scalars and hashes.
   (Thanks to ATOOMIC for identifying the issue!)

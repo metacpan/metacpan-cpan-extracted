@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use Tags::Output::LibXML;
+
      my $tags = Tags::Output::LibXML->new(%parameters);
      $tags->put(['b', 'element']);
      my @open_tags = $tags->open_tags;
@@ -103,11 +104,9 @@ ERRORS
      TODO
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Tags::Output::LibXML;
 
      # Object.
@@ -128,11 +127,9 @@ EXAMPLE1
      # <text>data</text>
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode;
      use Tags::Output::LibXML;
 
@@ -177,13 +174,19 @@ SEE ALSO
     Task::Tags
         Install the Tags modules.
 
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Tags-Output-LibXML>
+
 AUTHOR
-    Michal Špaček skim@cpan.org
+    Michal Josef Špaček skim@cpan.org
+
+    <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2011-2015 Michal Špaček
-     BSD 2-Clause License
+    © 2011-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

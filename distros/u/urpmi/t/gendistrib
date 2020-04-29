@@ -1,0 +1,407 @@
+#!/usr/bin/perl
+
+(our $VERSION) = q(Id: gendistrib 20724 2006-11-30 13:13:27Z rafael ) =~ /(\d+)/;
+
+use strict;
+use Cwd;
+use MDV::Distribconf::Build;
+use Getopt::Long;
+
+sub usage () {
+    require Pod::Usage;
+    Pod::Usage::pod2usage({ '-verbose' => 1 });
+    exit 0;
+}
+
+my %urpmfiles;
+my %old;
+
+GetOptions(
+    'blind' => \my $blind,
+    'clean' => \my $clean,
+    'hdlists=s' => \$urpmfiles{hdlists},
+    'help|h' => \&usage,
+    'mediacfg=s' => \$urpmfiles{mediacfg},
+    'nobadrpm' => \my $nobadrpm,
+    'noemptymedia' => \my $noemptymedia,
+    'nomd5sum' => \my $nomd5sum,
+    'skipmissingdir' => \my $skipmissingdir,
+    's' => \my $nooutput,
+    'v|version' => sub { warn "$0 version $VERSION\n"; exit 0 },
+
+# old stuff
+    'chkdep' => \$old{chkdep},
+    'compss=s' => \$old{compss},
+    'depslist=s' => \$old{depslist},
+    'noclean' => \$old{noclean},
+    'provides=s' => \$old{provides},
+    'headersdir=s' => \$old{headersdir},
+    'nomediainfo' => \$old{nomediainfo},
+);
+
+foreach (qw(chkdep compss depslist noclean headersdir provides nomediainfo)) {
+    $old{$_} and warn "--$_ is obsolete (not used anymore)\n";
+}
+
+@ARGV == 1 or usage();
+my ($root) = @ARGV;
+
+my $distrib = MDV::Distribconf::Build->new($root);
+
+$distrib->loadtree or die "$root does not seem to be a distribution tree\n";
+
+if (defined($urpmfiles{mediacfg})) {
+    $distrib->parse_mediacfg($urpmfiles{mediacfg}) or die "Can't read $urpmfiles{mediacfg}\n";
+} elsif (defined($urpmfiles{hdlists})) {
+    $distrib->parse_hdlists($urpmfiles{hdlists}) or die "Can't read $urpmfiles{hdlists}\n";
+} else {
+    $distrib->parse_mediacfg || $distrib->parse_hdlists or die "Can't read the distrib config\n";
+}
+
+my $destinfodir = $distrib->getfullpath(undef, "infodir");
+$urpmfiles{version} = $distrib->getfullpath(undef, "VERSION"),
+
+# Error which are fatale
+my @fatal = qw(SAME_INDEX);
+push @fatal, 'MISSING_MEDIADIR' if !$skipmissingdir;
+my @IGNORE = qw(MISSING_INDEX);
+my @fatalerrors; # fatales error show at the end
+$distrib->check(sub {
+        my %info = @_;
+        grep { $_ eq $info{errcode} } @IGNORE and next;
+        if (grep { $_ eq $info{errcode} } @fatal) {
+            push(@fatalerrors, "$info{level}: $info{message}");
+        } else {
+            printf STDERR "$info{level}: $info{message}\n" unless $nooutput;
+        }
+    }
+);
+
+if (@fatalerrors) {
+    printf STDERR <<EOF;
+
+A fatal error has been detected, continueing is likely to produce an invalid
+tree. (Missing directories can be ignored with --skipmissingdir.)
+Fix the error in media.cfg and retry:
+
+EOF
+    print STDERR "$_\n" foreach @fatalerrors;
+    print STDERR "\n";
+    exit(1);
+}
+
+my @hdlists;
+foreach my $m ($distrib->listmedia) {
+    my $path = $distrib->getfullpath($m, 'path');
+    -d $path or next; # this has been checked earlier
+
+    push @hdlists, {
+        media         => $m,
+        dir           => $distrib->getpath($m, 'path'),
+        path          => $path,
+        descr         => $distrib->getvalue($m, 'name'),
+        hdlist2       => $distrib->getfullpath($m, 'hdlist'),
+        synthesis2    => $distrib->getfullpath($m, 'synthesis'),
+        pubkey2       => $distrib->getfullpath($m, 'pubkey'),
+        hdlist        => "$path/media_info/hdlist.cz",
+        synthesis     => "$path/media_info/synthesis.hdlist" . $distrib->getvalue($m, 'synthesis-suffix'),
+        pubkey        => "$path/media_info/pubkey",
+        noneedrebuild => $blind || $clean ? 0 : $distrib->check_index_sync($m, 'formedia'),
+    };
+}
+
+if (!-d $destinfodir) {
+    mkdir $destinfodir, 0755
+        or die qq(Can't create directory "$destinfodir": $!\n);
+}
+
+my $infodir = $distrib->getfullpath(undef, 'infodir');
+
+foreach my $d ($infodir, map { "$_->{path}/media_info" } @hdlists) {
+    if (! -d $d) {
+	mkdir $d, 0755 or die qq(Can't create directory "$d": $!\n);
+    }
+}
+
+foreach my $e (@hdlists) {
+    if ($e->{dir} =~ /%\{ARCH\}/) {
+	die "sorry, %{ARCH} not supported anymore\n";
+    }
+    @{$e->{files}} = glob("$root/$e->{dir}/*.rpm") or do {
+        print STDERR "unable to find rpm files in $e->{dir}\n" unless $nooutput;
+        next;
+    };
+}
+
+if ($noemptymedia) {
+    if (grep { @{$_->{files}} == 0 } @hdlists) {
+	die "Empty media were found, stopping\n";
+    }
+}
+
+my $synthesis_filter = $distrib->getvalue(undef, 'synthesis-filter');
+my $xml_info_filter = $distrib->getvalue(undef, 'xml-info-filter');
+foreach my $e (grep { !$_->{noneedrebuild} } @hdlists) {
+    print STDERR qq(building hdlist & synthesis for medium "$e->{descr}"\n) unless $nooutput;
+    my $file_deps = "$destinfodir/file-deps";
+    my $options = join(' ', 
+		       '--allow-empty-media', 
+		       $nooutput ? '--quiet' : (),
+		       $clean ? '--clean' : (),
+		       $nobadrpm ? '--no-bad-rpm' : (),
+		       $nomd5sum ? "--no-md5sum" : (),
+		       $distrib->getvalue($e->{media}, 'xml-info') ? '--xml-info' : (),
+		       $synthesis_filter ? "--synthesis-filter '$synthesis_filter'" : (),
+		       $xml_info_filter ? "--xml-info-filter '$xml_info_filter'" : (),
+		       -e $file_deps ? "--file-deps $file_deps" : (),
+		   );
+    my $cmd = "genhdlist2 $options $e->{path}";
+    print "running $cmd\n" unless $nooutput;
+    system($cmd) == 0 or die "$cmd failed\n";
+}
+
+foreach my $e (@hdlists) {
+    hdlist_alternate_location($e->{hdlist2}, $e->{hdlist});
+    hdlist_alternate_location($e->{synthesis2}, $e->{synthesis});
+    $e->{pubkey2} =~ s/ /_/g; # workaround MDV::Distribconf issue
+    hdlist_alternate_location($e->{pubkey2}, $e->{pubkey});
+}
+
+if (grep { ! $_->{noneedrebuild} } @hdlists) {
+
+    if (-f $destinfodir . '/media.cfg') {
+	if (! -f "$destinfodir/hdlists" ||
+	    (stat($distrib->getfullpath(undef, 'infodir') . '/media.cfg'))[9] >
+		(stat($destinfodir . '/hdlists'))[9]) {
+	    print STDERR "Write hdlists file\n" unless $nooutput;
+	    $distrib->write_hdlists($destinfodir . '/hdlists')
+		or print STDERR "Can't write $destinfodir/hdlists file\n";
+	}
+    }
+}
+if (grep { !$_->{noneedrebuild} } @hdlists) {
+    unlink "$destinfodir/MD5SUM"; #- safety cleaning
+    unless ($nomd5sum) {
+	# this MD5SUM is mostly obsolete, but is still needed up to 2007.1
+	# (and even on cooker for existing urpmi.cfg)
+	require File::Glob;
+	require Digest::MD5;
+	my $md5sum;
+	my $cwd = getcwd();
+	chdir($destinfodir);
+	foreach my $fn (glob("hdlist_*"), glob("synthesis*")) {
+            open(my $fh, '<', $fn) or die "Can't open '$fn': $!";
+            binmode($fh);
+            $md5sum .= Digest::MD5->new->addfile($fh)->hexdigest . "  $fn\n";
+	}
+	chdir($cwd);
+	open my $md5sumfh, '>', "$destinfodir/MD5SUM" or die "Can't create $destinfodir/MD5SUM: $!\n";
+	print $md5sumfh $md5sum if $md5sum;
+    }
+
+    print STDERR "Calculating size of medias\n" unless $nooutput;
+    foreach my $e (@hdlists) {
+        my $size = 0;
+        foreach (@{$e->{files} || []}) {
+            $size += (stat($_))[7];
+        }
+        my $blk = 1;
+        my $showsize = $size;
+        my @unit = (' ', qw(k m g));
+        while (@unit) {
+            my $u = shift(@unit);
+            if ($size / $blk < 1) {
+                last;
+            }
+            $showsize = sprintf('%d%s', $size / $blk, $u);
+            $blk *= 1024;
+        }
+        $distrib->setvalue($e->{media}, 'size', $showsize);
+    }
+
+    print STDERR "Rewriting media.cfg file\n" unless $nooutput;
+    $distrib->write_mediacfg($urpmfiles{mediacfg});
+
+    print STDERR "Building version file\n" unless $nooutput;
+    $distrib->write_version($urpmfiles{version});
+}
+
+sub hdlist_alternate_location {
+    my ($alternate, $main) = @_;
+
+    if (! -e $main) {
+	print STDERR "missing $main, not creating alternate location $alternate\n";
+    } elsif (inode($alternate) == inode($main)) {
+	# ok
+    } else {
+	if (-l $alternate) {
+	    print STDERR "bad alternate location " . readlink($alternate) . ", replacing it\n";
+	    unlink $alternate;
+	} elsif (-e $alternate) {
+	    print STDERR "replacing existing plain file $alternate with a symlink\n";
+	    unlink $alternate;
+	}
+	print STDERR qq(link alternate location $alternate\n) unless $nooutput;
+	relative_symlink($main, $alternate);
+    }
+}
+
+sub inode {
+    my ($f) = @_;
+    (stat($f))[1];
+}
+
+sub relative_symlink {
+    my ($src, $dest) = @_;
+
+    # cleanup
+    foreach ($src, $dest) {
+	s!//!/!g;
+	s!/\./!/!g;
+    }
+
+    my @src = split('/', $src);
+    my @dest = split('/', $dest);
+    pop @dest;
+
+    while (@src && @dest && $src[0] eq $dest[0]) {
+	shift @src;
+	shift @dest;
+    }
+    symlink join('/', ('..') x @dest, @src), $dest;
+}
+
+__END__
+
+=head1 NAME
+
+gendistrib - generates a mirror tree for a distribution
+
+=head1 SYNOPSIS
+
+    gendistrib [options] directory
+
+=head1 OPTIONS
+
+=over 4
+
+=item --blind
+
+Always rebuild indexes, without checking whether it's needed.
+
+=item --clean
+
+Force rebuild of indexes from scratch.
+
+=item --hdlists file
+
+Path of the F<hdlists> file (defaults to F<media/media_info/hdlists>). This is
+deprecated; if gendistrib finds a F<media.cfg> file, it will use it and ignore
+the F<hdlists> file unless this option is given.
+
+=item --mediacfg file
+
+Use the specified F<media.cfg> file (defaults to F<media/media_info/media.cfg>).
+
+=item --nobadrpm
+
+Don't abort when encountering bad rpms.
+
+=item --noemptymedia
+
+Stop and abort if an empty media is found.
+
+=item --nomd5sum
+
+Don't generate MD5SUM files.
+
+=item --skipmissingdir
+
+If a media dir is missing, ignore it instead of aborting.
+
+=item -s
+
+Silent mode.
+
+=back
+
+=head1 DESCRIPTION
+
+F<gendistrib> is a tool that helps to generate the structure of a Mandriva
+RPM repository, compatible with Mandriva tools (F<urpmi>, F<rpmdrake>,
+etc.)
+
+=head2 General Structure of a Repository
+
+A typical repository, under a root directory F</ROOT/>, has the following
+structure:
+
+    ROOT/ - media/
+	    |- contrib/
+	    |   `- media_info/
+	    |- main/
+	    |   `- media_info/
+	    `- media_info/
+
+In this example, we have two media, called I<main> and I<contrib>. The
+RPMs packages are placed in the F<main> and F<contrib> subdirectories.
+Repository metadata is contained in the top-level F<media_info> directory.
+Per-media metadata are contained in the F<main/media_info> and
+F<contrib/media_info> subdirectories.
+
+=head2 Configuration of the distribution tree
+
+Before using F<gendistrib>, you must create a file F<media_info/media.cfg>
+to describe your repository. (An empty file will work, but this isn't
+recommended.) The syntax of this file is reminiscent of F<.ini> files.
+
+A first section C<[media_info]> contains global information about the
+repository:
+
+    [media_info]
+    version=2006.0
+    branch=Cooker
+    arch=i586
+
+Then, supply one section per media.
+
+    [main]
+    hdlist=hdlist_main.cz
+    name=Main
+
+Here, the C<hdlist> parameter specifies what will be the name of the
+hdlist file in the top-level F<media_info> directory. C<name> is a human
+readable label for the media.
+
+=head2 Operation
+
+F<gendistrib> should be passed the F<ROOT> directory as parameter. It will
+then generate the hdlist and synthesis files and all other files needed
+for proper repository operation.
+
+=head1 SEE ALSO
+
+genhdlist2(1), and MDV::Distribconf(3) for description of the format of the
+F<media.cfg> file.
+
+=head1 COPYRIGHT
+
+Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 MandrakeSoft SA
+
+Copyright (C) 2005, 2006 Mandriva SA
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+=cut

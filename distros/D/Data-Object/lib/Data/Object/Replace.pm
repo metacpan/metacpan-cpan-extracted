@@ -17,7 +17,7 @@ use overload (
 
 use parent 'Data::Object::Array';
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 
 # METHODS
 

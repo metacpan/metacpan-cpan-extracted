@@ -51,7 +51,7 @@ function: Vars
 
   use Data::Object;
 
-  my $array = Array [1..4];
+  my $array = Box Array [1..4];
 
   # my $iterator = $array->iterator;
 
@@ -107,7 +107,7 @@ L<Data::Object::Array> object.
 
 =signature Array
 
-Array(ArrayRef $data) : InstanceOf["Data::Object::Box"]
+Array(ArrayRef $data) : InstanceOf["Data::Object::Array"]
 
 =example-1 Array
 
@@ -188,7 +188,7 @@ L<Data::Object::Code> object.
 
 =signature Code
 
-Code(CodeRef $data) : InstanceOf["Data::Object::Box"]
+Code(CodeRef $data) : InstanceOf["Data::Object::Code"]
 
 =example-1 Code
 
@@ -293,7 +293,7 @@ L<Data::Object::Float> object.
 
 =signature Float
 
-Float(Num $data) : InstanceOf["Data::Object::Box"]
+Float(Num $data) : InstanceOf["Data::Object::Float"]
 
 =example-1 Float
 
@@ -316,7 +316,7 @@ L<Data::Object::Hash> object.
 
 =signature Hash
 
-Hash(HashRef $data) : InstanceOf["Data::Object::Box"]
+Hash(HashRef $data) : InstanceOf["Data::Object::Hash"]
 
 =example-1 Hash
 
@@ -359,7 +359,7 @@ L<Data::Object::Number> object.
 
 =signature Number
 
-Number(Num $data) : InstanceOf["Data::Object::Box"]
+Number(Num $data) : InstanceOf["Data::Object::Number"]
 
 =example-1 Number
 
@@ -410,7 +410,7 @@ L<Data::Object::Regexp> object.
 
 =signature Regexp
 
-Regexp(RegexpRef $data) : InstanceOf["Data::Object::Box"]
+Regexp(RegexpRef $data) : InstanceOf["Data::Object::Regexp"]
 
 =example-1 Regexp
 
@@ -451,7 +451,7 @@ L<Data::Object::Scalar> object.
 
 =signature Scalar
 
-Scalar(Ref $data) : InstanceOf["Data::Object::Box"]
+Scalar(Ref $data) : InstanceOf["Data::Object::Scalar"]
 
 =example-1 Scalar
 
@@ -501,7 +501,7 @@ L<Data::Object::String> object.
 
 =signature String
 
-String(Str $data) : InstanceOf["Data::Object::Box"]
+String(Str $data) : InstanceOf["Data::Object::String"]
 
 =example-1 String
 
@@ -541,7 +541,7 @@ I<undefined> value.
 
 =signature Undef
 
-Undef() : InstanceOf["Data::Object::Box"]
+Undef() : InstanceOf["Data::Object::Undef"]
 
 =example-1 Undef
 
@@ -602,18 +602,16 @@ $subs->synopsis(fun($tryable) {
 
 $subs->example(-1, 'Array', 'function', fun($tryable) {
   ok my $result = $tryable->result;
-  ok $result->isa('Data::Object::Box');
-  ok $result->source->isa('Data::Object::Array');
-  is_deeply $result->source, [];
+  ok $result->isa('Data::Object::Array');
+  is_deeply $result, [];
 
   $result
 });
 
 $subs->example(-2, 'Array', 'function', fun($tryable) {
   ok my $result = $tryable->result;
-  ok $result->isa('Data::Object::Box');
-  ok $result->source->isa('Data::Object::Array');
-  is_deeply $result->source, [1..4];
+  ok $result->isa('Data::Object::Array');
+  is_deeply $result, [1..4];
 
   $result
 });
@@ -672,16 +670,14 @@ $subs->example(-4, 'Box', 'function', fun($tryable) {
 
 $subs->example(-1, 'Code', 'function', fun($tryable) {
   ok my $result = $tryable->result;
-  ok $result->isa('Data::Object::Box');
-  ok $result->source->isa('Data::Object::Code');
+  ok $result->isa('Data::Object::Code');
 
   $result
 });
 
 $subs->example(-2, 'Code', 'function', fun($tryable) {
   ok my $result = $tryable->result;
-  ok $result->isa('Data::Object::Box');
-  ok $result->source->isa('Data::Object::Code');
+  ok $result->isa('Data::Object::Code');
 
   $result
 });
@@ -696,108 +692,96 @@ $subs->example(-1, 'False', 'function', fun($tryable) {
 
 $subs->example(-1, 'Float', 'function', fun($tryable) {
   ok my $result = $tryable->result;
-  ok $result->isa('Data::Object::Box');
-  ok $result->source->isa('Data::Object::Float');
-  is ${$result->source}, '0.0';
+  ok $result->isa('Data::Object::Float');
+  is ${$result}, '0.0';
 
   $result
 });
 
 $subs->example(-2, 'Float', 'function', fun($tryable) {
   ok my $result = $tryable->result;
-  ok $result->isa('Data::Object::Box');
-  ok $result->source->isa('Data::Object::Float');
-  is ${$result->source}, '0.0';
+  ok $result->isa('Data::Object::Float');
+  is ${$result}, '0.0';
 
   $result
 });
 
 $subs->example(-1, 'Hash', 'function', fun($tryable) {
   ok my $result = $tryable->result;
-  ok $result->isa('Data::Object::Box');
-  ok $result->source->isa('Data::Object::Hash');
-  is_deeply $result->source, {};
+  ok $result->isa('Data::Object::Hash');
+  is_deeply $result, {};
 
   $result
 });
 
 $subs->example(-2, 'Hash', 'function', fun($tryable) {
   ok my $result = $tryable->result;
-  ok $result->isa('Data::Object::Box');
-  ok $result->source->isa('Data::Object::Hash');
-  is_deeply $result->source, {1..4};
+  ok $result->isa('Data::Object::Hash');
+  is_deeply $result, {1..4};
 
   $result
 });
 
 $subs->example(-1, 'Number', 'function', fun($tryable) {
   ok my $result = $tryable->result;
-  ok $result->isa('Data::Object::Box');
-  ok $result->source->isa('Data::Object::Number');
-  is ${$result->source}, 1;
+  ok $result->isa('Data::Object::Number');
+  is ${$result}, 1;
 
   $result
 });
 
 $subs->example(-2, 'Number', 'function', fun($tryable) {
   ok my $result = $tryable->result;
-  ok $result->isa('Data::Object::Box');
-  ok $result->source->isa('Data::Object::Number');
-  is ${$result->source}, 123;
+  ok $result->isa('Data::Object::Number');
+  is ${$result}, 123;
 
   $result
 });
 
 $subs->example(-1, 'Regexp', 'function', fun($tryable) {
   ok my $result = $tryable->result;
-  ok $result->isa('Data::Object::Box');
-  ok $result->source->isa('Data::Object::Regexp');
-  like ${$result->source}, qr/\.\*/;
+  ok $result->isa('Data::Object::Regexp');
+  like ${$result}, qr/\.\*/;
 
   $result
 });
 
 $subs->example(-2, 'Regexp', 'function', fun($tryable) {
   ok my $result = $tryable->result;
-  ok $result->isa('Data::Object::Box');
-  ok $result->source->isa('Data::Object::Regexp');
-  like ${$result->source}, qr/\.\*/;
+  ok $result->isa('Data::Object::Regexp');
+  like ${$result}, qr/\.\*/;
 
   $result
 });
 
 $subs->example(-1, 'Scalar', 'function', fun($tryable) {
   ok my $result = $tryable->result;
-  ok $result->isa('Data::Object::Box');
-  ok $result->source->isa('Data::Object::Scalar');
-  is "${$result->source}", '';
+  ok $result->isa('Data::Object::Scalar');
+  is "${$result}", '';
 
   $result
 });
 
 $subs->example(-2, 'Scalar', 'function', fun($tryable) {
-  ok my $result = $tryable->result;
-  ok $result->isa('Data::Object::Box');
-  ok $result->source->isa('Data::Object::Scalar');
-  is "${$result->source}", '*main::main';
+  ok !(my $result = $tryable->result);
+  ok $result->isa('Data::Object::Scalar');
+  is "${$result}", '*main::main';
 
   $result
 });
 
 $subs->example(-1, 'String', 'function', fun($tryable) {
-  ok my $result = $tryable->result;
-  ok $result->isa('Data::Object::Box');
-  ok $result->source->isa('Data::Object::String');
-  is "${$result->source}", '';
+  ok !(my $result = $tryable->result);
+  ok $result->isa('Data::Object::String');
+  is "${$result}", '';
 
   $result
 });
 
 $subs->example(-2, 'String', 'function', fun($tryable) {
   ok my $result = $tryable->result;
-  ok $result->isa('Data::Object::Box');
-  ok $result->source->isa('Data::Object::String');
-  is "${$result->source}", 'abc';
+  ok $result->isa('Data::Object::String');
+  is "${$result}", 'abc';
 
   $result
 });
@@ -811,10 +795,9 @@ $subs->example(-1, 'True', 'function', fun($tryable) {
 });
 
 $subs->example(-1, 'Undef', 'function', fun($tryable) {
-  ok my $result = $tryable->result;
-  ok $result->isa('Data::Object::Box');
-  ok $result->source->isa('Data::Object::Undef');
-  is ${$result->source}, undef;
+  ok !(my $result = $tryable->result);
+  ok $result->isa('Data::Object::Undef');
+  is ${$result}, undef;
 
   $result
 });
@@ -909,7 +892,6 @@ if eval {
 
 $subs->example(-1, 'Struct', 'function', fun($tryable) {
   ok my $result = $tryable->result;
-  $DB::single=1;
   ok $result->isa('Data::Object::Struct');
 
   $result

@@ -41,13 +41,17 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/iamalnewkirk/data-object-cast/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Data::Object::Cast",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/iamalnewkirk/Data-Object-Cast.git",
-         "web" : "https://github.com/iamalnewkirk/Data-Object-Cast"
+         "url" : "git://github.com/iamalnewkirk/data-object-cast.git",
+         "web" : "https://github.com/iamalnewkirk/data-object-cast"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_authority" : "cpan:AWNCORP",
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",

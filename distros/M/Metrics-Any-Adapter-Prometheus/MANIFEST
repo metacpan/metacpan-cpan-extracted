@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/Metrics/Any/Adapter/Prometheus.pm
+MANIFEST			This list of files
+t/00use.t
+t/01metrics.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

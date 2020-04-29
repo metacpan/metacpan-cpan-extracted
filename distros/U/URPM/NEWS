@@ -1,3 +1,8 @@
+Version 5.27 - 29 April 2020
+
+- fix testing on pre UsrMove Linuxes (eg: mga2)
+- restore support for rpm-4.9
+
 Version 5.26 - 21 April 2020
 
 - restore support for building on mga4 (broken in 5.24)

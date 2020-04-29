@@ -1,5 +1,6 @@
 package QuadPres::Exception;
-$QuadPres::Exception::VERSION = '0.28.1';
+$QuadPres::Exception::VERSION = '0.28.2';
+use 5.016;
 use strict;
 use warnings;
 
@@ -29,7 +30,7 @@ sub text
 }
 
 package QuadPres::Exception::RenderFile;
-$QuadPres::Exception::RenderFile::VERSION = '0.28.1';
+$QuadPres::Exception::RenderFile::VERSION = '0.28.2';
 use vars qw(@ISA);
 
 @ISA = qw(QuadPres::Exception);
@@ -42,15 +43,11 @@ __END__
 
 =encoding UTF-8
 
-=head1 NAME
-
-QuadPres::Exception
-
 =head1 VERSION
 
-version 0.28.1
+version 0.28.2
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -71,35 +68,11 @@ L<https://metacpan.org/release/QuadPres>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/QuadPres>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=QuadPres>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/QuadPres>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/QuadPres>
 
 =item *
 

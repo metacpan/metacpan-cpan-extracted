@@ -15,7 +15,7 @@ use Scalar::Util qw(
 
 our $To = 'Data::Object';
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 # FUNCTIONS
 
@@ -96,11 +96,13 @@ INSPECT:
 
   return [@$data] if $type eq 'ARRAY';
   return {%$data} if $type eq 'HASH';
+
   return $$data if $type eq 'BOOLEAN';
   return $$data if $type eq 'REGEXP';
   return $$data if $type eq 'FLOAT';
   return $$data if $type eq 'NUMBER';
   return $$data if $type eq 'STRING';
+
   return undef  if $type eq 'UNDEF';
 
   if ($type eq 'ANY' or $type eq 'SCALAR') {
@@ -108,13 +110,18 @@ INSPECT:
 
     return [@$data] if $type eq 'ARRAY';
     return {%$data} if $type eq 'HASH';
+
     return $$data if $type eq 'BOOLEAN';
     return $$data if $type eq 'FLOAT';
     return $$data if $type eq 'NUMBER';
     return $$data if $type eq 'REGEXP';
-    return $data if $type eq 'SCALAR';
     return $$data if $type eq 'STRING';
+
     return undef  if $type eq 'UNDEF';
+
+    if ($type eq 'SCALAR') {
+      return do { my $v = $$data; \$v };
+    }
 
     if ($type eq 'REF') {
       $type = TypeName($data = $$data) and goto INSPECT;

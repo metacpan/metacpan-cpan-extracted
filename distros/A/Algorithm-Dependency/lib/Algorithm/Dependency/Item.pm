@@ -18,7 +18,7 @@ use 5.005;
 use strict;
 use Algorithm::Dependency ();
 
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 
 
 #####################################################################
@@ -78,7 +78,7 @@ Algorithm::Dependency::Item - Implements an item in a dependency hierarchy.
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head1 DESCRIPTION
 

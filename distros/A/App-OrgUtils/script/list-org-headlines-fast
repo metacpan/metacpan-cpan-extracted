@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.496
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-18'; # DATE
+our $DATE = '2020-04-27'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.476'; # VERSION
+our $VERSION = '0.477'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,13 +38,18 @@ list-org-headlines-fast - List Org headlines
 
 =head1 VERSION
 
-This document describes version 0.476 of list-org-headlines-fast (from Perl distribution App-OrgUtils), released on 2020-04-18.
+This document describes version 0.477 of list-org-headlines-fast (from Perl distribution App-OrgUtils), released on 2020-04-27.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % list-org-headlines-fast [options] <input>
+ % list-org-headlines-fast [--ascendant-match=s] [--format=name]
+     [--has-tag=s+] [--has-tags-json=s] [--is-done] [--is-todo]
+     [--isnt-done] [--isnt-todo] [--json] [--lacks-tag=s+]
+     [--lacks-tags-json=s] [--level=s] [--match=s] [--max-level=s]
+     [--min-level=s] [--(no)naked-res] [--page-result[=program]]
+     [--parent-match=s] <input>
 
 =head1 DESCRIPTION
 

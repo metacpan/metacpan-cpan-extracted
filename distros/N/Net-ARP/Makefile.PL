@@ -2,7 +2,7 @@
 # Perl ARP Extension makefile
 #
 # Programmed by Bastian Ballmann
-# Last update: 24.06.2013
+# Last update: 27.04.2020
 #
 # This program is free software; you can redistribute 
 # it and/or modify it under the terms of the 
@@ -32,7 +32,7 @@ if($Config{'osname'} =~ /linux/i)
     $flags = "-DLINUX";
     $objects = "ARP.o send_packet_linux.o get_mac_linux.o arp_lookup_linux.o";
 }
-elsif($Config{'osname'} =~ /bsd/i)
+elsif($Config{'osname'} =~ /bsd|darwin/i)
 {
     $flags = "-DBSD";
     $objects = "ARP.o send_packet_bsd.o get_mac_bsd.o arp_lookup_bsd.o";
@@ -45,7 +45,7 @@ else
 
 WriteMakefile(
     NAME              => 'Net::ARP',
-    VERSION           => '1.0.8',
+    VERSION           => '1.0.10',
     AUTHOR            => 'Bastian Ballmann',
     DEFINE            => $flags, 
     OBJECT            => $objects	      

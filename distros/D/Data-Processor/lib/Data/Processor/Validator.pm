@@ -101,6 +101,9 @@ sub validate {
             $self->explain(
             ">>'$key' is an array reference so we check all elements\n");
             for my $member (@{$self->{data}->{$key}}){
+                next if !defined $member
+                    && $self->{schema}->{$schema_key}->{allow_empty};
+
                 my $e = Data::Processor::Validator->new(
                     $self->{schema}->{$schema_key}->{members},
                     parent_keys => [@{$self->{parent_keys}}, $key],

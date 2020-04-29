@@ -1,0 +1,701 @@
+#!/usr/bin/perl
+
+our ($VERSION) = q(Id: genhdlist2 20460 2006-11-23 13:19:11Z pixel ) =~ /(\d+\.\d+)/;
+
+use Cwd;
+use URPM;
+use List::Util 'any';
+use MDV::Packdrakeng;
+use Getopt::Long;
+use strict;
+
+main();
+
+sub usage () {
+    require Pod::Usage;
+    Pod::Usage::pod2usage({ '-verbose' => 1 });
+}
+
+sub main() {
+    my %options = (
+	synthesis_filter => '.cz:xz -7',
+	xml_info => 'auto',
+	xml_info_filter => '.lzma:xz -7',
+	versioned => 'auto'
+    );
+
+    GetOptions(
+	'clean' => \$options{no_incremental},
+	'no-bad-rpm' => \$options{no_bad_rpm},
+	'no-md5sum' => \$options{no_md5sum},
+	'no-clean-old-rpms' => \$options{no_clean_old_rpms},
+	'only-clean-old-rpms' => \$options{only_clean_old_rpms},
+	'nolock' => \$options{nolock},
+	'no-hdlist' => \$options{no_hdlist},
+	'allow-empty-media' => \$options{allow_empty_media},
+	'file-deps=s' => \$options{file_deps},
+	'synthesis-filter=s' => \$options{synthesis_filter},
+	'xml-info!' => \$options{xml_info},
+	'xml-info-filter=s' => \$options{xml_info_filter},
+	'versioned!' => \$options{versioned},
+	'media_info-dir=s' => \$options{media_info_dir},
+	'h|help' => sub { usage(); exit 0 },
+	'q|quiet' => sub { $options{verbose} = -1 },
+	'v|verbose' => sub { $options{verbose}++ },
+	'version' => sub { warn "$0 version $VERSION\n"; exit 0 },
+    );
+
+    @ARGV == 1 or usage();
+    my $rpms_dir = $ARGV[0];
+
+    $options{no_incremental} ||= $options{no_hdlist};
+
+    # Force locale to be C
+    # We don't translate anything but we would get translated package info and
+    # wrongly put it in hdlists
+    # https://bugs.mageia.org/show_bug.cgi?id=95
+    $ENV{LC_ALL} = 'C';
+
+    do_it($rpms_dir, %options);
+}
+
+# global vars
+my ($no_bad_rpm, $verbose);
+my $tmp_header;
+
+sub do_we_use_recommends {
+    my ($rpms_dir) = @_;
+    my @files = glob("$rpms_dir/../../core/release/mageia-release-common*");
+    if (@files) {
+	# fast path:
+	return !any { /mga[1-4]/ } @files;
+    } else {
+	# slow path:
+	return glob("$rpms_dir/*mga[5-9].*.rpm") ? 1 : 0;
+    }
+}
+
+sub do_it {
+    my ($rpms_dir, %options) = @_;
+
+    $verbose  = $options{verbose};
+    $no_bad_rpm = $options{no_bad_rpm};
+
+    my @rpms = grep { /\.rpm$/ } all($rpms_dir);
+    @rpms || $options{allow_empty_media} or die "no *.rpm found in $rpms_dir (use --allow-empty-media?)\n";
+
+    my $media_info_dir = $options{media_info_dir} || "$rpms_dir/media_info";
+    -e $media_info_dir || mkdir $media_info_dir or die "Can't mkdir $media_info_dir: $!\n";
+    -d $media_info_dir && -w _ && -x _ or die "$media_info_dir isn't a writable directory, bailing out\n";
+
+    my ($synthesis_suffix, $synthesis_filter) = split(":", $options{synthesis_filter});
+    my ($xml_info_suffix, $xml_info_filter) = split(":", $options{xml_info_filter});
+
+    my $synthesis = "$media_info_dir/synthesis.hdlist$synthesis_suffix";
+    my $lock_file = "$media_info_dir/UPDATING";
+    $tmp_header = "$media_info_dir/.tmp-header";
+
+    my $lock = !$options{nolock} && global_lock($lock_file);
+
+    $SIG{INT} = sub { 
+	unlink "$media_info_dir/hdlist.cz.tmp", "$synthesis.tmp", $tmp_header;
+	unlink $lock_file if $lock;
+	exit 1;
+    };
+    END { unlink $lock_file if $lock }
+
+
+    #- handle old-rpms.lst
+    my $old_rpms_file = "$media_info_dir/old-rpms.lst";
+    my $old_rpms = read_old_rpms_lst($old_rpms_file, $options{nolock});
+    if ($old_rpms) {
+	filter_out_old_rpms($rpms_dir, $old_rpms, \@rpms);
+	if (!$options{no_clean_old_rpms}) {
+	    clean_old_rpms($rpms_dir, $old_rpms);
+	    write_old_rpms_lst($old_rpms, $old_rpms_file);
+	}
+    }
+    $options{only_clean_old_rpms} and return;
+
+
+    my %rpms_todo = map { /(.*)\.rpm/ => 1 } @rpms;
+
+    my $urpm = new URPM;
+
+    read_file_deps($urpm, $options{file_deps}) if $options{file_deps};
+
+    if ($options{xml_info} eq 'auto') {
+	$options{xml_info} = -e "$media_info_dir/info.xml$xml_info_suffix";
+    }
+    my @xml_media_info = $options{xml_info} ? ('info', 'files', 'changelog') : @{[]};
+    # default to "@suggests@" lines on older distros, "@recommends@" lines on newer:
+    my $output_recommends = do_we_use_recommends($rpms_dir);
+
+    build($urpm, \%rpms_todo, $media_info_dir, $rpms_dir, \@xml_media_info, $options{no_incremental}, $options{no_hdlist}, $xml_info_suffix, $xml_info_filter, $synthesis);
+    build_synthesis($urpm, "$synthesis.tmp", $synthesis_filter, $output_recommends);
+
+    if (1) {
+	my @media_info_files = ($options{no_hdlist} ? @{[]} : 'hdlist.cz',
+				"synthesis.hdlist$synthesis_suffix", map { "$_.xml$xml_info_suffix" } @xml_media_info);
+	foreach my $name (@media_info_files) {
+	    print "replacing $media_info_dir/$name with $name.tmp\n" if $verbose >= 0;
+	    rename "$media_info_dir/$name.tmp", "$media_info_dir/$name" or die "rename $media_info_dir/$name failed: $!\n";
+	}
+	my $existed = remove_versioned_media_info($media_info_dir);
+	if ($options{versioned} && ($options{versioned} ne 'auto' || $existed)) {
+	    push @media_info_files, generate_versioned_media_info($media_info_dir, \@media_info_files);
+	}
+	generate_md5sum($media_info_dir, \@media_info_files) if !$options{no_md5sum};
+    }
+}
+
+sub lock_file {
+    my ($file) = @_;
+    #- avoid putting a require on Fcntl ':flock' (which is perl and not perl-base).
+    my ($LOCK_EX, $LOCK_NB) = (2, 4);
+
+    print "locking $file\n" if $verbose > 0;
+    open(my $lock, '>', $file) or die "lock_file $file failed\n";
+    flock $lock, $LOCK_EX|$LOCK_NB or return;
+    $lock;
+}
+sub global_lock {
+    my ($file) = @_;
+    my $lock = lock_file($file) or die "another genhdlist2 already running\n";
+    $lock;
+}
+
+sub read_file_deps {
+    my ($urpm, $file_deps) = @_;
+
+    -r $file_deps or die "can't read $file_deps: $?\n";
+
+    foreach (cat_($file_deps)) {
+	chomp;
+	# mark that this "file provide" is required:
+	$urpm->{provides}{$_} = undef;
+    }
+}
+
+sub build {
+    my ($urpm, $rpms_todo, $media_info_dir, $rpms_dir, $xml_media_info, $b_no_incremental, $b_no_hdlist, $xml_info_suffix, $xml_info_filter, $synthesis) = @_;
+
+    my $hdlist = "$media_info_dir/hdlist.cz";
+
+    my $out_hdlist;
+    if (!$b_no_hdlist) {
+	$out_hdlist = MDV::Packdrakeng->new(
+	    archive => "$hdlist.tmp",
+	    compress => "zstd",
+	    uncompress => "zstd -d",
+	    extern => 1,
+	    comp_level => 11,
+	) or die "Can't create archive";
+    }
+
+    my $out = {
+	hdlist => $out_hdlist,
+	map { $_ => open_xml_filter("$media_info_dir/$_.xml${xml_info_suffix}.tmp", $xml_info_filter) } @$xml_media_info
+    };
+
+    if (-e $hdlist && !$b_no_incremental) {
+	print "filtering $hdlist into hdlist.cz.tmp\n" if $verbose >= 0;
+
+        # keep real filesizes from synthesis since hdlist no more have filesizes since 2008
+        # else URPM will put a bogus estimation:
+        my $sizes = get_filesize_from_synthesis($urpm, $rpms_todo, $synthesis);
+
+	filter_existing_hdlist($urpm, $rpms_todo, $hdlist, $out, $sizes);
+    }
+
+    add_new_rpms_to_hdlist($urpm, $rpms_todo, $out, $rpms_dir);
+
+    close_xml($out->{$_}) foreach @$xml_media_info;
+}
+
+sub get_filesize_from_synthesis {
+    my ($urpm, $rpms_todo, $synthesis) = @_;
+
+    return {} if !-r $synthesis;
+
+    my %sizes;
+    $urpm->parse_synthesis($synthesis, packing => 1, callback => sub {
+	my (undef, $pkg) = @_;
+	my $fullname = $pkg->fullname;
+	$sizes{$fullname} = $pkg->filesize if $rpms_todo->{$fullname};
+	0; # don't keep in memory
+    });
+    \%sizes;
+}
+
+sub filter_existing_hdlist {
+    my ($urpm, $rpms_todo, $in_hdlist, $out, $sizes) = @_;
+
+    if ($urpm->parse_hdlist($in_hdlist, packing => 1, callback => sub {
+	my (undef, $pkg) = @_;
+	my $fullname = $pkg->fullname;
+	if (delete $rpms_todo->{$fullname}) {
+	    print "keeping $fullname\n" if $verbose > 1;
+	    add_pkg($out, $pkg);
+	    # readd back real filesize from synthesis since hdlist no more have filesizes since 2008
+	    # else URPM will put a bogus estimation:
+	    $pkg->set_filesize($sizes->{$fullname}) if $sizes->{$fullname};
+	    1; # do keep in memory
+	} else {
+	    print "removing $fullname\n" if $verbose > 0;
+	    0; # don't keep in memory
+	}
+    })) {
+	# ok
+    } else {
+	my $nb = @{$urpm->{depslist}};
+	print STDERR "parse_hdlist has failed, keeping $nb headers successfully parsed\n" if $verbose >= 0;
+    }
+}
+
+sub add_new_rpms_to_hdlist {
+    my ($urpm, $rpms_todo, $out, $rpms_dir) = @_;
+
+    my @rpms = keys %$rpms_todo or return;
+    if ($verbose >= 0) {
+	if (@rpms > 100 || $verbose == 0) {
+	    print "adding ", int(@rpms), " new rpms not available in existing hdlist\n";
+	} else {
+	    print "adding ", join(' ', @rpms), "\n";
+	}
+    }
+
+    foreach (@rpms) {
+	print "adding $_\n" if $verbose > 1;
+
+	my $rpm = "$rpms_dir/$_.rpm";
+	my ($id, undef) = $urpm->parse_rpm($rpm);
+	if (!defined $id) {
+	    if ($no_bad_rpm) {
+		print STDERR "bad rpm $rpm\n";
+		next;
+	    } else {
+		die "bad rpm $rpm\n";
+	    }
+	}
+	my $pkg = $urpm->{depslist}[$id];
+	add_pkg($out, $pkg);
+
+	$pkg->pack_header; # for synthesis
+    }
+}
+
+sub open_xml_filter {
+    my ($file, $xml_info_filter) = @_;
+
+    open(my $F, "| $xml_info_filter > $file") or die "can't open $file\n";
+    binmode $F, ':utf8';
+    print $F qq(<?xml version="1.0" encoding="utf-8"?>\n);
+    print $F "<media_info>";
+    $F;
+}
+
+sub close_xml {
+    my ($F) = @_;
+    print $F "</media_info>\n";
+}
+
+sub ensure_utf8 {
+    if (utf8::is_utf8($_[0])) {
+	utf8::valid($_[0]) and return;
+
+	utf8::encode($_[0]); #- disable utf8 flag
+	utf8::upgrade($_[0]);
+    } else {
+	utf8::decode($_[0]); #- try to set utf8 flag
+	utf8::valid($_[0]) and return;
+	warn "do not know what to with $_[0]\n";
+    }
+}
+
+sub encode_xml {
+    my ($s) = @_;
+    $s =~ s/&/&amp;/g;
+    $s =~ s/</&lt;/g;
+    $s =~ s/>/&gt;/g;
+    ensure_utf8($s);
+    $s;
+}
+sub encode_xml_attribute {
+    my ($s) = @_;
+
+    $s = encode_xml($s);
+
+    $s =~ /'/ or return qq('$s');
+    $s =~ /"/ or return qq("$s");
+
+    # argh!! hum replacing " with '' :-D
+    $s =~ s/"/''/g;
+    print STDERR qq(encoding xml attribute: replacing " with '' for $s\n);
+
+    qq("$s");
+}
+
+sub add_pkg {
+    my ($out, $pkg) = @_;
+    my $fullname = $pkg->fullname;
+
+    if ($out->{hdlist}) {
+	add_pkg_header($out->{hdlist}, $pkg, $fullname);
+    }
+
+    if ($out->{files}) {
+	my $F = $out->{files};
+	print $F qq(<files fn="$fullname">\n);
+	print $F encode_xml($_), "\n" foreach $pkg->files;
+	print $F qq(</files>);
+    }
+
+    if ($out->{info}) {
+	my $F = $out->{info};
+	print $F qq(<info fn="$fullname");
+	printf $F qq(\n $_=%s), encode_xml_attribute($pkg->$_) foreach qw(sourcerpm url license);
+	print $F qq(>\n);
+	print $F encode_xml($pkg->description), "\n";
+	print $F qq(</info>);
+    }
+
+    if ($out->{changelog} && $pkg->changelog_name) {
+	my $F = $out->{changelog};
+	my @ti = $pkg->changelog_time;
+	my @na = $pkg->changelog_name;
+	my @te = $pkg->changelog_text;
+
+	print $F qq(<changelogs fn="$fullname">\n);
+	foreach (0 .. $#ti) {
+	    print $F qq(<log time="$ti[$_]">\n);
+	    print $F qq(<log_name>), encode_xml($na[$_]), qq(</log_name>\n);
+	    print $F qq(<log_text>), encode_xml($te[$_]), qq(</log_text>\n);
+	    print $F qq(</log>);
+	}
+	print $F qq(</changelogs>);
+    }
+}
+
+sub add_pkg_header {
+    my ($out, $pkg, $fullname) = @_;
+    {
+	open(my $fh, ">", $tmp_header);
+	$pkg->build_header(fileno $fh);
+    }
+    {
+	open(my $fh, "<", $tmp_header);
+	$out->add_virtual('f', $fullname, $fh);
+    }
+    unlink $tmp_header;
+}
+
+sub build_synthesis {
+    my ($urpm, $synthesis, $synthesis_filter, $output_recommends) = @_;
+	$urpm->build_synthesis(
+	    start     => 0,
+	    end       => $#{$urpm->{depslist}},
+	    synthesis => $synthesis,
+	    filter    => $synthesis_filter,
+	    recommends => $output_recommends,
+	) or die "build_synthesis failed (disk full?)\n";
+}
+
+sub remove_versioned_media_info {
+    my ($media_info_dir) = @_;
+
+    my @l = grep { /^\d{8}-\d{6}-/ && -l "$media_info_dir/$_" } all($media_info_dir) or return;
+
+    foreach (@l) {
+	print "removing previous versioned $_\n" if $verbose > 0;
+	unlink "$media_info_dir/$_";
+    }
+    1;
+}
+
+sub generate_versioned_media_info {
+    my ($media_info_dir, $media_info_files) = @_;
+
+    require POSIX;
+    my $version = POSIX::strftime("%Y%m%d-%H%M%S", gmtime());
+
+    map {
+	print "creating versioned media_info $_: $version-$_\n" if $verbose > 0;
+	symlink $_, "$media_info_dir/$version-$_";
+	"$version-$_";
+    } @$media_info_files;
+}
+
+sub generate_md5sum {
+    my ($media_info_dir, $media_info_files) = @_;
+    require Digest::MD5;
+    print "updating $media_info_dir/MD5SUM\n" if $verbose >= 0;
+    my $cwd = getcwd();
+    chdir($media_info_dir);
+    my $m;
+    foreach my $fn (@$media_info_files) {
+	open(my $fh, '<', $fn) or die "Can't open '$fn': $!";
+	binmode($fh);
+	$m .= Digest::MD5->new->addfile($fh)->hexdigest . "  $fn\n";
+    }
+    chdir($cwd);
+    unlink "$media_info_dir/MD5SUM"; # ensure no hard link is used
+    open(my $f, '>', "$media_info_dir/MD5SUM") or die "Can't write MD5SUM: $!\n";
+    print $f $m;
+}
+
+
+################################################################################
+sub read_old_rpms_lst {
+    my ($file, $nolock) = @_;
+
+    -e $file or return;
+
+    my $lock = !$nolock && lock_file("$file.lock") 
+      or $verbose >= 0 && print "lock failed, we simply won't write the modified file\n";
+
+    require Config::IniFiles;
+    my $lst = Config::IniFiles->new('-file' => $file) or die "invalid $file\n";
+    { lst => $lst, lock => $lock };
+}
+
+sub write_old_rpms_lst {
+    my ($old_rpms, $file) = @_;
+
+    if ($old_rpms->{lock}) {
+	sleep 10;
+	$old_rpms->{lst}->WriteConfig($file); # no need to use a temp file + rename since WriteConfig is doing so
+
+	print "unlocking $file.lock\n" if $verbose > 0;
+	close(delete $old_rpms->{lock});
+	unlink "$file.lock";
+    } else {
+	# we don't have the lock, so don't write
+    }
+}
+
+sub clean_old_rpms {
+    my ($rpms_dir, $old_rpms) = @_;
+
+    my $lst = $old_rpms->{lst};
+    foreach my $pkg ($lst->Parameters('Remove')) {
+	my $keep;
+	if (-e "$rpms_dir/$pkg") {
+	    my $date = $lst->val('Remove', $pkg);
+	    if ($date >= time()) {
+		$keep = 1;
+		print "[OLD-RPMS] keeping $pkg (it is scheduled for " . $lst->GetParameterComment('Remove', $pkg) . "# )\n" if $verbose > 0;
+	    } else {
+		print "[OLD-RPMS] removing rpm file $pkg (was scheduled for " . $lst->GetParameterComment('Remove', $pkg) . "# )\n" if $verbose >= 0;
+		unlink "$rpms_dir/$pkg";
+	    }
+	} else {
+	    print "[OLD-RPMS] $pkg already removed\n" if $verbose >= 0;
+	}
+	$keep or $old_rpms->{lst}->delval('Remove', $pkg);
+    }
+}
+
+# 'Remove'
+
+sub clean_old_rpms {
+    my ($rpms_dir, $old_rpms) = @_;
+
+    _apply_date_old_rpms($rpms_dir, $old_rpms, 'Remove', 'OLD-RPMS', sub {
+	my ($pkg, $date) = @_;
+	print "[OLD-RPMS] removing rpm file $pkg (was scheduled for $date)\n" if $verbose >= 0;
+	unlink "$rpms_dir/$pkg";
+    });
+}
+
+sub _apply_date_old_rpms {
+    my ($rpms_dir, $old_rpms, $section, $section_tag, $do_it) = @_;
+
+    my $lst = $old_rpms->{lst};
+    foreach my $pkg ($lst->Parameters($section)) {
+	my $keep;
+	if (-e "$rpms_dir/$pkg") {
+	    my $date = $lst->val($section, $pkg);
+	    if ($date >= time()) {
+		$keep = 1;
+		print "[$section_tag] keeping $pkg (it is scheduled for " . $lst->GetParameterComment($section, $pkg) . "# )\n" if $verbose > 0;
+	    } else {
+		$do_it->($pkg, $verbose >= 0 && $lst->GetParameterComment($section, $pkg));
+	    }
+	} else {
+	    print "[$section_tag] $pkg already removed\n" if $verbose >= 0;
+	}
+	$keep or $old_rpms->{lst}->delval($section, $pkg);
+    }
+}
+
+sub filter_out_old_rpms {
+    my ($rpms_dir, $old_rpms, $rpms_list) = @_;
+
+    _apply_date_old_rpms($rpms_dir, $old_rpms, 'Keep-in-hdlist', 'KEEP-IN-HDLIST', sub {
+	my ($pkg, $date) = @_;
+	print "[KEEP-IN-HDLIST] removing $pkg from hdlist (was scheduled for $date)\n" if $verbose >= 0;
+    });
+
+    my %old = map { $_ => 1 } $old_rpms->{lst}->Parameters('Remove');
+    delete $old{$_} foreach $old_rpms->{lst}->Parameters('Keep-in-hdlist');
+
+    @$rpms_list = grep { !$old{$_} } @$rpms_list;
+}
+################################################################################
+
+
+sub cat_ { my @l = map { my $F; open($F, '<', $_) ? <$F> : () } @_; wantarray() ? @l : join '', @l }
+
+sub all {
+    my $d = shift;
+
+    local *F;
+    opendir F, $d or return;
+    my @l = grep { $_ ne '.' && $_ ne '..' } readdir F;
+    closedir F;
+
+    @l;
+}
+
+__END__
+
+=head1 NAME
+
+genhdlist2 - generates an hdlist and a synthesis file
+
+=head1 SYNOPSIS
+
+    genhdlist2 [options] dir
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--clean>
+
+Do not use existing hdlist.cz, build hdlist from scratch.
+
+=item B<--file-deps>
+
+Use the given file to know which file dependencies are used by other media.
+Here is an example of use:
+
+    package foo in medium contrib requires /bin/bar
+    package bar in medium main has file /bin/bar
+
+    % echo /bin/bar > media/media_info/file-deps
+    % genhdlist2 --file-deps media/media_info/file-deps media/main/release
+
+    without file-deps, media/main/release/media_info/synthesis.hdlist.cz would not provide /bin/bar.
+
+This option is not needed for file-deps inside a same medium.
+
+=item B<--no-md5sum>
+
+Do not generate MD5SUM file.
+
+=item B<--no-bad-rpm>
+
+Do not abort on bad rpms.
+
+=item B<--no-clean-old-rpms>
+
+Take into account old-rpms.lst, but don't remove rpms from repository
+
+=item B<--only-clean-old-rpms>
+
+F<genhdlist2> will only clean old rpms from repository, it will not update
+hdlist/synthesis.
+
+=item B<--nolock>
+
+Don't lock the media (can be useful when locks fail, eg NFS). Since the lock
+is used to verify no other genhdlist2 process is running on the same media, it
+is a dangerous option.
+
+=item B<--allow-empty-media>
+
+By default if no *.rpm files are found, F<genhdlist2> will exit on error.
+To allow building empty media, use this option.
+
+=item B<--media_info-dir> I<directory>
+
+Write hdlist/synthesis in this directory instead of <dir>/media_info
+(mostly useful for debugging)
+
+=item B<--synthesis-filter SUFFIX:FILTER>
+
+Use SUFFIX for filename suffix and filter through FILTER for compression.
+By default genhdlist2 will use '.cz:xz -7'.
+
+=item B<--xml-info>
+
+Force to generate xml info. By default genhdlist2 will only regenerate xml info files already there in media_info/
+
+=item B<--xml-info-filter SUFFIX:FILTER>
+
+Use SUFFIX for filename suffix and filter through FILTER for compression.
+By default genhdlist2 will use '.lzma:xz -7'.
+
+=item B<--versioned>
+
+Force to generate versioned media info.
+
+=item B<--no-hdlist>
+
+Disable generation of hdlist.cz.
+
+=item B<-v>
+
+Be verbose. Use one more B<-v> to get even more verbose.
+
+=item B<--quiet>
+
+Quiet mode.
+
+=back
+
+=head1 DESCRIPTION
+
+F<genhdlist2> is used to generate an hdlist and an associated synthesis file
+from a set of RPM packages found in the directory passed on the command-line.
+It will put the hdlist and synthesis files in media_info/ sub-directory.
+
+Without B<--clean>, F<genhdlist2> is incremental, ie it will use existing
+media_info/hdlist.cz: it will first remove package headers for packages that
+are no more in the directory. It will then add new packages. This makes an
+important assumption: name-version-release-arch is enough to uniquely
+indentify a package. So if foo-1-1 is in hdlist, genhdlist2 will keep it and
+not bother verifying if it really is the same package.
+
+Contrary to F<gendistrib>, F<genhdlist2> doesn't have to be work on all media
+at once. For this, it assumes no inter media file dependencies are used. If
+you still have inter media file dependencies, you can use option
+B<--file-deps>.
+
+=head1 SEE ALSO
+
+gendistrib(1), parsehdlist(1)
+
+=head1 COPYRIGHT
+
+Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 MandrakeSoft SA
+
+Copyright (C) 2005, 2006, 2007 Mandriva SA
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+=cut

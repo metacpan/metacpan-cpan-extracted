@@ -1,3 +1,21 @@
+0.04 2020-04-29T16:09:46+02:00
+ - Fix METHODS section in doc.
+ - Rename all files, which has name 'tag' in name to use of 'element'.
+ - Rewrite METHODS to =head2 in doc.
+ - Update copyright years.
+
+0.03 2020-04-28T00:59:15+02:00
+ - Add REPOSITORY section to doc.
+ - Add author website to AUTHOR section in doc.
+ - Add finalize() method.
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update copyright years.
+ - Update my name to reality.
+
 0.02 2015-10-21T17:00:08+02:00
  - Improve SEE ALSO section in doc.
  - Move author tests to xt/ directory.

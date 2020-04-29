@@ -66,7 +66,7 @@ use List::Util            ();
 use Algorithm::Dependency ();
 use Params::Util qw{_INSTANCE _STRING};
 
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 
 
 #####################################################################
@@ -252,7 +252,7 @@ Algorithm::Dependency::Weight - Calculate dependency 'weights'
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head1 SYNOPSIS
 

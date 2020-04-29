@@ -25,7 +25,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Type-Tiny-XS";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-015>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-016>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-015>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-016>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-017>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-type-tiny-xs>;
@@ -306,6 +306,23 @@
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tiny-XS-0.016.tar.gz>;
 	doap:revision        "0.016"^^xsd:string.
 
+<http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-017>
+	a                    doap:Version;
+	dc:identifier        "Type-Tiny-XS-0.017"^^xsd:string;
+	dc:issued            "2020-04-28"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix segfault in BOOT.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/xenu>;
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/130458>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-type-tiny-xs/pull/11>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tiny-XS-0.017.tar.gz>;
+	doap:revision        "0.017"^^xsd:string.
+
 <http://purl.org/NET/cpan-uri/person/haarg>
 	a                    foaf:Person;
 	foaf:name            "Graham Knop";
@@ -342,6 +359,17 @@
 	foaf:name            "Toby Inkster";
 	foaf:nick            "TOBYINK";
 	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<http://purl.org/NET/cpan-uri/person/xenu>
+	a                    foaf:Person;
+	foaf:name            "Tomasz Konojacki";
+	foaf:nick            "XENU";
+	foaf:page            <https://metacpan.org/author/XENU>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/130458>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "130458"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=130458>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/98631>
 	a                    doap-bugs:Issue;

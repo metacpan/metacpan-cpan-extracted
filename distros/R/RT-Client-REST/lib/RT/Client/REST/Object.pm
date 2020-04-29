@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Object;
-$RT::Client::REST::Object::VERSION = '0.56';
+$RT::Client::REST::Object::VERSION = '0.57';
 
 use Error qw(:try);
 use Params::Validate;
@@ -600,7 +600,7 @@ RT::Client::REST::Object - base class for RT objects
 
 =head1 VERSION
 
-version 0.56
+version 0.57
 
 =head1 SYNOPSIS
 
@@ -974,7 +974,7 @@ SRVSH
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Dmitri Tikhonov.
+This software is copyright (c) 2020 by Dmitri Tikhonov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,11 +4,9 @@ use strict;
 use warnings;
 
 use Test::More tests => 54;
-use Test::Differences;
 use Test::XML::Ordered qw(is_xml_ordered);
 
-use File::Spec;
-use Encode;
+use Encode qw/ decode /;
 
 use XML::Grammar::Fortune ();
 
@@ -38,22 +36,6 @@ my @tests = (
 );
 
 my @common = ( validation => 0, load_ext_dtd => 0, no_network => 1 );
-
-sub read_file
-{
-    my $path = shift;
-
-    open my $in, "<", $path
-        or die "Cannot open '$path' for reading";
-    binmode $in, ":utf8";
-    my $contents;
-    {
-        local $/;
-        $contents = <$in>
-    }
-    close($in);
-    return $contents;
-}
 
 sub normalize_xml
 {
@@ -132,9 +114,6 @@ foreach my $fn_base (@tests)
             {},
             "Testing for Good XSLTing of '$fn_base'",
         );
-
     }
-
 }
 1;
-

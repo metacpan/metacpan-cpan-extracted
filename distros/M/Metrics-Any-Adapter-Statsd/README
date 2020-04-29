@@ -1,0 +1,58 @@
+NAME
+
+    Metrics::Any::Adapter::Statsd - a metrics reporting adapter for statsd
+
+SYNOPSIS
+
+       use Metrics::Any::Adapter 'Statsd';
+
+DESCRIPTION
+
+    This Metrics::Any adapter type reports metrics to statsd via the local
+    UDP socket. Each metric value reported will result in a new UDP packet
+    being sent.
+
+    The location of the statsd server is set by two package variables,
+    defaulting to
+
+       $Net::Statsd::HOST = "127.0.0.1";
+       $Net::Statsd::PORT = 8125
+
+    The configuration can be changed by setting new values.
+
+METRIC HANDLING
+
+    Unlabelled counter, gauge and timing metrics are handled natively as
+    you would expect for statsd; with multipart names being joined by
+    periods (.).
+
+    Distribution metrics are emitted as two sub-named metrics by appending
+    count and sum. The count metric in incremented by one for each
+    observation and the sum by the observed amount.
+
+    Labels are not handled by this adapter and are thrown away. This will
+    result in a single value being reported that accumulates the sum total
+    across all of the label values. In the case of labelled gauges using
+    the set_gauge_to method this will not be a useful value.
+
+    For better handling of labelled metrics for certain services which have
+    extended the basic statsd format to handle them, see:
+
+      * Metrics::Any::Adapter::DogStatsd - a metrics reporting adapter for
+      DogStatsd
+
+      * Metrics::Any::Adapter::SignalFx - a metrics reporting adapter for
+      SignalFx
+
+TODO
+
+      * Support non-one samplerates; emit only one-in-N packets with the
+      @rate notation in the packet.
+
+      * Optionally support one dimension of labelling by appending the
+      conventional some.metric.by_$label.$value notation to it.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

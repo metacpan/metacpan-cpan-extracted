@@ -1,5 +1,8 @@
 Revision history for QuadPres
 
+0.28.2       2020-04-28
+    - Set minimal version of perl due to s///r .
+
 0.28.1       2019-04-17
 
     - Add missing req on MooX::late

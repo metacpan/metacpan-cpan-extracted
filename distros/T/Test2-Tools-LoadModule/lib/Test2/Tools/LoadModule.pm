@@ -7,17 +7,21 @@ use warnings;
 
 use Carp;
 use Exporter 5.567;	# Comes with Perl 5.8.1.
+use File::Find ();
+use File::Spec ();
 use Getopt::Long 2.34;	# Comes with Perl 5.8.1.
 use Test2::API ();
 use Test2::Util ();
 
 use base qw{ Exporter };
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 $VERSION =~ s/ _ //smxg;
 
 {
     my @test2 = qw{
+	all_modules_tried_ok
+	clear_modules_tried
 	load_module_ok
 	load_module_or_skip
 	load_module_or_skip_all
@@ -92,16 +96,63 @@ use constant TEST_MORE_OPT		=> {
     require	=> 1,
 };
 
-sub load_module_ok (@) {	## no critic (RequireArgUnpacking)
-    my @arg = _validate_args( 0, @_ );
+{
+    my %module_tried;
 
-    my $ctx = Test2::API::context();
+    sub load_module_ok (@) {	## no critic (RequireArgUnpacking)
+	my @arg = _validate_args( 0, @_ );
 
-    my $rslt = _load_module_ok( @arg );
+	# We do this now in case _load_module_ok() throws an uncaught
+	# exception, just so we have SOME record we tried.
+	$module_tried{ $arg[1] } = undef;
 
-    $ctx->release();
+	my $ctx = Test2::API::context();
 
-    return $rslt;
+	my $rslt = _load_module_ok( @arg );
+
+	$module_tried{ $arg[1] } = $rslt;
+
+	$ctx->release();
+
+	return $rslt;
+    }
+
+    sub all_modules_tried_ok (@) {
+	my @where = @_;
+	@where
+	    or @where = ( 'blib/lib', 'blib/arch' );
+	my @not_tried;
+	foreach my $d ( @where ) {
+	    File::Find::find( sub {
+		    m/ [.] pm \z /smx
+			or return;
+		    my ( undef, $dir, $name ) = File::Spec->splitpath(
+			File::Spec->abs2rel( $File::Find::name, $d ) );
+		    my @dir = File::Spec->splitdir( $dir );
+		    $dir[-1]
+			or pop @dir;
+		    ( my $module = join '::', @dir, $name ) =~ s/ [.] pm //smx;
+		    exists $module_tried{$module}
+			or push @not_tried, $module;
+		}, $d );
+	}
+
+	if ( @not_tried ) {
+
+	    my $ctx = Test2::API::context();
+
+	    $ctx->fail( "Module $_ not tried" ) for sort @not_tried;
+
+	    $ctx->release();
+
+	    return 0;
+	}
+    }
+
+    sub clear_modules_tried () {
+	%module_tried = ();
+	return;
+    }
 }
 
 sub _load_module_ok {
@@ -503,6 +554,10 @@ By default, C<$@> is appended to the diagnostics issued in the event of
 a load failure. If you want to omit this, or embed the value in your own
 text, see L<CONFIGURATION|/CONFIGURATION>, below.
 
+As a side effect, the names of all modules tried with this test are
+recorded, along with test results (pass/fail) for the use of
+L<all_modules_tried_ok()|/all_modules_tried_ok>.
+
 =head2 load_module_or_skip
 
  load_module_or_skip $module, $ver, $import, $name, $num;
@@ -541,6 +596,39 @@ module.
 This subroutine can be called either at the top level or in a subtest,
 but either way it B<must> be called before any actual tests in the file
 or subtest.
+
+=head2 all_modules_tried_ok
+
+ all_modules_tried_ok
+
+Added in version C<0.002>.
+
+Prototype: C<(@)>.
+
+This test traverses any directories specified as arguments looking for
+Perl modules (defined as files whose names end in F<.pm>). A failing
+test is generated for any such file not previously tested using
+L<load_module_ok()|/load_module_ok>.
+
+If no directory is specified, the default is
+C< ( '/blib/lib', '/blib/arch' ) >.
+
+B<NOTE> that no attempt is made to parse the file and determine its
+module name. The module is assumed from the part of the file path below
+the specified directory. So an explicit specification of F<lib/> will
+work (if that is where the modules are stored) but an explicit F<blib/>
+will not.
+
+=head2 clear_modules_tried
+
+ clear_modules_tried
+
+Added in version C<0.002>.
+
+Prototype: C<()>.
+
+This is not a test. It clears the record of modules tried by
+L<load_module_ok()|/load_module_ok>.
 
 =head2 require_ok
 

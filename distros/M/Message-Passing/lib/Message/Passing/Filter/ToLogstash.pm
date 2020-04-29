@@ -1,7 +1,7 @@
 package Message::Passing::Filter::ToLogstash;
 use Moo;
 use MooX::Types::MooseLike::Base qw/ ArrayRef /;
-use List::MoreUtils qw/ uniq /;
+use List::Util qw( uniq );
 use DateTime;
 use Sys::Hostname::Long;
 use namespace::clean -except => 'meta';
@@ -89,4 +89,3 @@ cases.
 =head2 filter
 
 Filter the message.
-

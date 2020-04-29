@@ -1,5 +1,5 @@
 package App::SmokeBrew;
-$App::SmokeBrew::VERSION = '0.54';
+$App::SmokeBrew::VERSION = '0.56';
 #ABSTRACT: The guts of smokebrew
 
 use strict;
@@ -279,6 +279,7 @@ sub run {
     }
     msg( "Finished build and configuration for perl ($perl)", $self->verbose );
   }
+  $self->builddir->rmtree() unless $self->noclean();
 }
 
 sub _perl_exe {
@@ -306,7 +307,7 @@ App::SmokeBrew - The guts of smokebrew
 
 =head1 VERSION
 
-version 0.54
+version 0.56
 
 =head1 SYNOPSIS
 
@@ -338,7 +339,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Chris Williams.
+This software is copyright (c) 2020 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

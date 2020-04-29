@@ -1,0 +1,32 @@
+NAME
+
+    Metrics::Any::Adapter::Prometheus - a metrics reporting adapter for
+    Prometheus
+
+SYNOPSIS
+
+       use Metrics::Any::Adapter 'Prometheus';
+
+DESCRIPTION
+
+    This Metrics::Any adapter type reports metrics to Prometheus by using
+    Net::Prometheus. Each metric added to the adapter will be registered
+    with the global Net::Prometheus::Registry instance.
+
+    It becomes the calling program's responsibility to arrange for these to
+    be HTTP accessible by using the Net::Prometheus API.
+
+    Distribution metrics are exported as Histograms by default. They may
+    alternatively be exported as Summaries in order to generate smaller
+    amounts of export data, by setting the use_histograms import argument
+    to false:
+
+       use Metrics::Any::Adapter 'Prometheus', use_histograms => 0;
+
+    Timer metrics are implemented as distribution metrics with the units
+    set to seconds.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

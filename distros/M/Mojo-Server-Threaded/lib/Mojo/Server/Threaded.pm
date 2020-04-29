@@ -1,9 +1,9 @@
 package Mojo::Server::Threaded;
 use Mojo::Base 'Mojo::Server::Daemon';
 
-our $VERSION = 0.16;
+our $VERSION = 0.17;
 
-use threads('stack_size' => 64*4096);
+use threads('stack_size' => 64 * 4096);
 use Thread::Queue;
 
 use File::Spec::Functions 'tmpdir';
@@ -30,13 +30,13 @@ my $trace = $ENV{MOJO_SERVER_THREADED_TRACE};
 
 my %default_commands = (
   WORKER => sub {
-    my($self, $cmd, $tid) = @_;
+    my ($self, $cmd, $tid) = @_;
     return unless $cmd =~ /^(?:QUIT|KILL)$/i;
     return unless $self->{pool}{$tid};
     $self->{pool}{$tid}{queue_out}->enqueue($cmd);
   },
   WORKERS => sub {
-    my($self, $diff) = @_;
+    my ($self, $diff) = @_;
     return unless $diff;
     my $new = $self->workers + $diff;
     $self->workers($new >= 0 ? $new : 0);
@@ -46,8 +46,8 @@ my %default_commands = (
       $w->{graceful} = steady_time;
     }
   },
-  QUIT    => sub { $_[0]->_term(1) },
-  KILL    => sub { $_[0]->_term },
+  QUIT => sub { $_[0]->_term(1) },
+  KILL => sub { $_[0]->_term },
 );
 
 sub DESTROY {
@@ -56,7 +56,7 @@ sub DESTROY {
 }
 
 sub register_command {
-  my($self, $command, $sub) = @_;
+  my ($self, $command, $sub) = @_;
   $self->{commands}{uc($command)} = $sub;
   return $self;
 }
@@ -65,12 +65,12 @@ sub daemonize { }
 
 sub _check_pid_file {
   my $file = shift->pid_file;
-  return undef unless open my $handle, '<', $file;
+  return unless open my $handle, '<', $file;
   local $/ = undef;
-  my($pid, $mport) = split(/\s+/, <$handle>);
+  my ($pid, $mport) = split(/\s+/, <$handle>);
   close($handle);
 
-  return($pid, $mport) if $pid && kill 0, $pid;
+  return ($pid, $mport) if $pid && kill 0, $pid;
 
   unlink $file or warn "unlink failed, $!";
   return;
@@ -82,7 +82,7 @@ sub check_pid {
 }
 
 sub check_mport {
-  my($pid, $mport) = shift->_check_pid_file;
+  my ($pid, $mport) = shift->_check_pid_file;
   return $mport;
 }
 
@@ -109,12 +109,11 @@ sub run {
   my $self = shift;
 
   # Clean manager environment
-  local $SIG{INT} = local $SIG{TERM} = sub { $self->_term };
-  local $SIG{QUIT} = sub { $self->_term(1) };
+  local $SIG{INT}  = local $SIG{TERM} = sub { $self->_term };
+  local $SIG{QUIT} = sub                    { $self->_term(1) };
 
   # Setup Manager TCP listener
-  $self->register_command($_, $default_commands{$_})
-    for keys %default_commands;
+  $self->register_command($_, $default_commands{$_}) for keys %default_commands;
   $self->_setup_manage_listener();
 
   # Preload application before starting workers
@@ -122,7 +121,7 @@ sub run {
   $self->ioloop->max_accepts($self->accepts);
 
   $self->{running} = 1;
-  while ( $self->{running} ) {
+  while ($self->{running}) {
     $self->_manage;
     sleep 0.01;
   }
@@ -130,7 +129,7 @@ sub run {
 }
 
 sub send_command {
-  my($self, $cmd) = @_;
+  my ($self, $cmd) = @_;
 
   return unless $cmd;
 
@@ -138,10 +137,8 @@ sub send_command {
 
   $self->app->log->info("sending '$cmd' to port $port");
 
-  my $con = IO::Socket::IP->new(
-    PeerAddr => '127.0.0.1',
-    PeerPort => $port,
-  ) or $self->app->log->error("could not connect to manager port $port");
+  my $con = IO::Socket::IP->new(PeerAddr => '127.0.0.1', PeerPort => $port,)
+    or $self->app->log->error("could not connect to manager port $port");
   return unless $con;
   $con->send($cmd);
   $con->close();
@@ -167,12 +164,12 @@ sub _manage {
   # Spawn more workers if necessary and check PID file
   if (!$self->{finished}) {
     my $graceful = grep { $_->{graceful} } values %{$self->{pool}};
-    my $spare = $self->spare;
+    my $spare    = $self->spare;
     $spare = $graceful ? $graceful > $spare ? $spare : $graceful : 0;
     my $need = ($self->workers - keys %{$self->{pool}}) + $spare;
     while ($need-- > 0) {
-        $trace && $self->app->log->debug("spawning new worker");
-        $self->_spawn
+      $trace && $self->app->log->debug("spawning new worker");
+      $self->_spawn;
     }
     $self->ensure_pid_file($$);
   }
@@ -193,9 +190,9 @@ sub _manage {
   for my $tid (keys %{$self->{pool}}) {
     next unless my $w = $self->{pool}{$tid};
 
-    unless ( $w->{thread}->is_running() ) {
-        $self->emit(reap => $tid)->_stopped($tid);
-        next;
+    unless ($w->{thread}->is_running()) {
+      $self->emit(reap => $tid)->_stopped($tid);
+      next;
     }
 
     # No heartbeat (graceful stop)
@@ -211,10 +208,10 @@ sub _manage {
     $w->{force} = 1 if $graceful && $graceful + $gt <= $time;
 
     # send KILL and abandon threads
-    if ( $w->{force} || ($self->{finished} && !$graceful) ) {
-        $log->warn("Abandon worker $tid immediately");
-        $w->{queue_out}->enqueue('KILL');
-        $self->emit(reap => $tid)->_stopped($tid);
+    if ($w->{force} || ($self->{finished} && !$graceful)) {
+      $log->warn("Abandon worker $tid immediately");
+      $w->{queue_out}->enqueue('KILL');
+      $self->emit(reap => $tid)->_stopped($tid);
     }
   }
 }
@@ -246,14 +243,14 @@ sub _spawn {
 }
 
 sub _worker {
-  my($self, $queue_out, $queue_in) = @_;
+  my ($self, $queue_out, $queue_in) = @_;
 
   my $tid = threads->tid();
 
   # reopen log in new thread
   my $log = $self->app->log;
 
-  if ( $log->handle->fileno > 2 ) {
+  if ($log->handle->fileno > 2) {
     my $new = IO::File->new();
     $new->open($log->path, '>>');
     $log->handle($new);
@@ -270,14 +267,15 @@ sub _worker {
 
   $SIG{$_} = 'DEFAULT' for qw(INT TERM);
 
-  $trace && $self->on(
-    'request' => sub { $log->debug("Worker $tid: handling request"); },
-  );
+  $trace
+    && $self->on(
+    'request' => sub { $log->debug("Worker $tid: handling request"); },);
 
   #weaken $self;
 
   my $cb = sub {
-    $trace && $log->debug("Worker $tid: sending finished to manager") if $finished;
+    $trace && $log->debug("Worker $tid: sending finished to manager")
+      if $finished;
     $self->_heartbeat($finished);
   };
 
@@ -286,26 +284,29 @@ sub _worker {
   $trace && $log->debug("Worker $tid: setting up heartbeat timer");
   $loop->recurring($self->heartbeat_interval => $cb);
 
-  $loop->recurring(0.01 => sub {
-    while ( my $msg = $self->{queue_in}->dequeue_nb() ) {
-      $trace && $log->debug("Worker: got message '$msg' from manager");
-      $self->{$msg} = 1;
+  $loop->recurring(
+    0.01 => sub {
+      while (my $msg = $self->{queue_in}->dequeue_nb()) {
+        $trace && $log->debug("Worker: got message '$msg' from manager");
+        $self->{$msg} = 1;
+      }
+      if ($self->{QUIT}) {
+        delete $self->{QUIT};
+        $trace && $log->debug("Worker $tid: got QUIT");
+        $self->max_requests(1);
+        $self->close_connections if $self->can('close_connections');
+        $loop->stop_gracefully;
+        $finished = 1;
+        $trace && $log->debug("Worker $tid: loop should end");
+      }
+      elsif ($self->{KILL}) {
+        delete $self->{KILL};
+        $loop->stop if $loop;
+        threads->exit();
+      }
+      threads->yield();
     }
-    if ( $self->{QUIT} ) {
-      delete $self->{QUIT};
-      $trace && $log->debug("Worker $tid: got QUIT");
-      $self->max_requests(1);
-      $self->close_connections if $self->can('close_connections');
-      $loop->stop_gracefully;
-      $finished = 1;
-      $trace && $log->debug("Worker $tid: loop should end");
-    } elsif ( $self->{KILL} ) {
-      delete $self->{KILL};
-      $loop->stop if $loop;
-      threads->exit();
-    }
-    threads->yield();
-  });
+  );
 
   srand;
 
@@ -349,22 +350,22 @@ sub _check_manage_listener {
   $trace && $log->debug("checking management socket");
 
   my %cmd;
-  foreach my $con ( $self->{mselect}->can_read(0.1) ) {
-    if ( $con == $self->{msocket} ) {
+  foreach my $con ($self->{mselect}->can_read(0.1)) {
+    if ($con == $self->{msocket}) {
       my $client = $con->accept;
-      my $peer = $client->peerhost();
+      my $peer   = $client->peerhost();
       $log->debug("management connection from $peer");
+
       # TODO make this configurable
-      $peer eq '127.0.0.1'
-        ? $self->{mselect}->add($client)
-        : $client->close();
-    } else {
+      $peer eq '127.0.0.1' ? $self->{mselect}->add($client) : $client->close();
+    }
+    else {
       $trace && $log->debug("reading from management socket");
       $con->recv(my $buf, 4096);
       if ($buf =~ /\w+/) {
         chomp($buf);
         $trace && $log->debug("got $buf on management socket");
-        my($k, @v) = split(/\s+/, $buf);
+        my ($k, @v) = split(/\s+/, $buf);
         $k = uc($k);
         next unless my $func = $self->{commands}{$k};
         $trace && $log->debug("running command function for '$k'");
@@ -387,9 +388,9 @@ sub _wait {
   for my $tid (keys %{$self->{pool}}) {
     next unless my $w = $self->{pool}{$tid};
     my $time = steady_time;
-    while ( my $msg = $w->{queue_in}->dequeue_nb() ) {
+    while (my $msg = $w->{queue_in}->dequeue_nb()) {
       $trace && $log->debug("Manager: got heartbeat '$msg'");
-      my($id, $finished) = split(/:/, $msg);
+      my ($id, $finished) = split(/:/, $msg);
       next unless $id == $tid;
       @$w{qw(healthy time)} = (1, $time) and $self->emit(heartbeat => $id);
       $w->{graceful} ||= $time if $finished;
@@ -398,7 +399,7 @@ sub _wait {
 
   my $lt  = $self->{last_check_manage_listener} || 0;
   my $now = steady_time;
-  if ( $now - $lt > $self->manage_interval ) {
+  if ($now - $lt > $self->manage_interval) {
     $self->_check_manage_listener();
     $self->{last_check_manage_listener} = $now;
   }

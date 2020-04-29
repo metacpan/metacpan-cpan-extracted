@@ -89,7 +89,7 @@ SKIP: {
         is_deeply(
             $decoded,
             $item,
-            "we decode what CBOR::XS encoded ($item_q)",
+            sprintf("we decode what CBOR::XS encoded ($item_q, %d bytes)", length $cbor),
         ) or diag explain sprintf("CBOR: %v.02x", $cbor);
 
         $cbor = CBOR::Free::encode($item) or die "failed to encode($item)?";

@@ -18,12 +18,12 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "App-Notifier-Service",
-  "dist_version" => "0.0800",
+  "dist_version" => "0.0801",
   "license" => "mit",
   "module_name" => "App::Notifier::Service",
   "recursive_test_files" => 1,
   "requires" => {
-    "Dancer2" => 0,
+    "Dancer2" => "0.300003",
     "File::Spec" => 0,
     "FindBin" => 0,
     "List::MoreUtils" => 0,

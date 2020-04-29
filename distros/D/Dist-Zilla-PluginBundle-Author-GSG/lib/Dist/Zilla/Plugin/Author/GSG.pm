@@ -9,9 +9,12 @@ use namespace::autoclean;
 
 # ABSTRACT: Grant Street Group defaults CPAN dists
 use version;
-our $VERSION = 'v0.1.0'; # VERSION
+our $VERSION = 'v0.1.1'; # VERSION
 
-before 'BUILDARGS' => sub {
+before 'BUILDARGS' => \&_BUILDARGS;
+
+# Use a named sub for Devel::Cover
+sub _BUILDARGS {
     my ($class, $args) = @_;
 
     $args->{zilla}->{authors}
@@ -47,7 +50,7 @@ before 'BUILDARGS' => sub {
 
         $args->{zilla}->{_copyright_year} = $year;
     }
-};
+}
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -64,7 +67,7 @@ Dist::Zilla::Plugin::Author::GSG - Grant Street Group defaults CPAN dists
 
 =head1 VERSION
 
-version v0.1.0
+version v0.1.1
 
 =head1 SYNOPSIS
 

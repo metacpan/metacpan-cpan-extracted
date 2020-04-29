@@ -1,0 +1,36 @@
+---
+abstract: 'extract dates from german texts'
+author:
+  - 'Andreas Mager <andreas.mager@apa.at>'
+  - 'Christian Eder <christian.eder@apa.at>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Date-Extract-DE
+provides:
+  Date::Extract::DE:
+    file: lib/Date/Extract/DE.pm
+    version: v0.0.2
+requires:
+  Date::Range: '0'
+  Date::Simple: '0'
+  DateTime: '0'
+  DateTime::Incomplete: '0'
+  Moose: '0.64'
+  MooseX::ClassAttribute: '0'
+  namespace::autoclean: '0.05'
+  perl: v5.12.0
+  version: '0.77'
+resources:
+  bugtracker: https://github.com/apa-it/date-extract-de/issues
+  license: http://opensource.org/licenses/gpl-2.0.php
+  repository: https://github.com/apa-it/date-extract-de
+version: v0.0.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

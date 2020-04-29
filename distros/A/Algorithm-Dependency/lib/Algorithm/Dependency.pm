@@ -1,9 +1,41 @@
-package Algorithm::Dependency; # git description: c08ce7f
+package Algorithm::Dependency; # git description: v1.111-8-g2fb772e
 # ABSTRACT: Base class for implementing various dependency trees
 
 #pod =pod
 #pod
 #pod =head1 SYNOPSIS
+#pod
+#pod Typical Usage: Ordering based on dependency requirements
+#pod   
+#pod   use Algorithm::Dependency::Ordered;
+#pod   use Algorithm::Dependency::Source::HoA;
+#pod   
+#pod   my $deps = {
+#pod     core  => [ ],
+#pod     a     => [ 'core' ],
+#pod     b     => [ 'a' ]
+#pod     this  => [ ],
+#pod     that  => [ ],
+#pod   };
+#pod   my $deps_source = Algorithm::Dependency::Source::HoA->new( $deps );
+#pod
+#pod   my $dep = Algorithm::Dependency::Ordered->new(
+#pod     source   => $deps_source,
+#pod     selected => [ 'this', 'that' ], # Items we have processed elsewhere or have already satisfied
+#pod   )
+#pod   or die 'Failed to set up dependency algorithm';
+#pod
+#pod   my $also = $dep->schedule_all();
+#pod   # Returns: ['core', 'a', 'b'] -- ie: installation-order. Whereas using base
+#pod   # Algorithm::Dependency would return sorted ['a', 'b', 'core']
+#pod
+#pod   my $also = $dep->schedule( 'b' );
+#pod   # Returns: ['core', 'a', 'b'] -- installation order, including ourselves
+#pod
+#pod   my $also = $dep->depends( 'b' );
+#pod   # Returns: ['a', 'core'] -- sorted order, not including ourselves
+#pod
+#pod Base Classes
 #pod
 #pod   use Algorithm::Dependency;
 #pod   use Algorithm::Dependency::Source::File;
@@ -16,7 +48,7 @@ package Algorithm::Dependency; # git description: c08ce7f
 #pod   my $dep = Algorithm::Dependency->new(
 #pod       source   => $data_source,
 #pod       selected => [ 'This', 'That' ]
-#pod       ) or die 'Failed to set up dependency algorithm';
+#pod   ) or die 'Failed to set up dependency algorithm';
 #pod   
 #pod   # For the item 'Foo', find out the other things we also have to select.
 #pod   # This WON'T include the item we selected, 'Foo'.
@@ -59,6 +91,8 @@ package Algorithm::Dependency; # git description: c08ce7f
 #pod
 #pod =head2 General Description
 #pod
+#pod =for stopwords versioned
+#pod
 #pod Algorithm::Dependency implements algorithms relating to dependency
 #pod hierarchies. To use this framework, all you need is a source for the master
 #pod list of all the items, and a list of those already selected. If your
@@ -96,7 +130,7 @@ use Params::Util qw{_INSTANCE _ARRAY};
 use Algorithm::Dependency::Item   ();
 use Algorithm::Dependency::Source ();
 
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 
 
 #####################################################################
@@ -258,6 +292,11 @@ sub item { $_[0]->{source}->item($_[1]) }
 #pod reference to an empty array if no other items are needed, or C<undef>
 #pod on error.
 #pod
+#pod NOTE: The result of C<depends> is ordered by an internal C<sort>
+#pod irrespective of the ordering provided by the dependency handler.  Use
+#pod L<Algorithm::Dependency::Ordered> and C<schedule> to use the most
+#pod common ordering (process sequence)
+#pod
 #pod =cut
 
 sub depends {
@@ -295,8 +334,11 @@ sub depends {
 #pod
 #pod =head2 schedule $name1, ..., $nameN
 #pod
-#pod Given a list of one or more item names, the C<depends> method will return,
-#pod as a reference to an array, the ordered list of items you should act upon.
+#pod Given a list of one or more item names, the C<depends> method will
+#pod return, as a reference to an array, the ordered list of items you
+#pod should act upon in whichever order this particular dependency handler
+#pod uses - see L<Algorithm::Dependency::Ordered> for one that implements
+#pod the most common ordering (process sequence).
 #pod
 #pod This would be the original names provided, plus those added to satisfy
 #pod dependencies, in the preferred order of action. For the normal algorithm,
@@ -354,9 +396,41 @@ Algorithm::Dependency - Base class for implementing various dependency trees
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head1 SYNOPSIS
+
+Typical Usage: Ordering based on dependency requirements
+
+  use Algorithm::Dependency::Ordered;
+  use Algorithm::Dependency::Source::HoA;
+  
+  my $deps = {
+    core  => [ ],
+    a     => [ 'core' ],
+    b     => [ 'a' ]
+    this  => [ ],
+    that  => [ ],
+  };
+  my $deps_source = Algorithm::Dependency::Source::HoA->new( $deps );
+
+  my $dep = Algorithm::Dependency::Ordered->new(
+    source   => $deps_source,
+    selected => [ 'this', 'that' ], # Items we have processed elsewhere or have already satisfied
+  )
+  or die 'Failed to set up dependency algorithm';
+
+  my $also = $dep->schedule_all();
+  # Returns: ['core', 'a', 'b'] -- ie: installation-order. Whereas using base
+  # Algorithm::Dependency would return sorted ['a', 'b', 'core']
+
+  my $also = $dep->schedule( 'b' );
+  # Returns: ['core', 'a', 'b'] -- installation order, including ourselves
+
+  my $also = $dep->depends( 'b' );
+  # Returns: ['a', 'core'] -- sorted order, not including ourselves
+
+Base Classes
 
   use Algorithm::Dependency;
   use Algorithm::Dependency::Source::File;
@@ -369,7 +443,7 @@ version 1.111
   my $dep = Algorithm::Dependency->new(
       source   => $data_source,
       selected => [ 'This', 'That' ]
-      ) or die 'Failed to set up dependency algorithm';
+  ) or die 'Failed to set up dependency algorithm';
   
   # For the item 'Foo', find out the other things we also have to select.
   # This WON'T include the item we selected, 'Foo'.
@@ -411,6 +485,8 @@ some form of database, the list of files in a folder, or generated
 dynamically.
 
 =head2 General Description
+
+=for stopwords versioned
 
 Algorithm::Dependency implements algorithms relating to dependency
 hierarchies. To use this framework, all you need is a source for the master
@@ -516,10 +592,18 @@ The method returns a reference to an array of item names on success, a
 reference to an empty array if no other items are needed, or C<undef>
 on error.
 
+NOTE: The result of C<depends> is ordered by an internal C<sort>
+irrespective of the ordering provided by the dependency handler.  Use
+L<Algorithm::Dependency::Ordered> and C<schedule> to use the most
+common ordering (process sequence)
+
 =head2 schedule $name1, ..., $nameN
 
-Given a list of one or more item names, the C<depends> method will return,
-as a reference to an array, the ordered list of items you should act upon.
+Given a list of one or more item names, the C<depends> method will
+return, as a reference to an array, the ordered list of items you
+should act upon in whichever order this particular dependency handler
+uses - see L<Algorithm::Dependency::Ordered> for one that implements
+the most common ordering (process sequence).
 
 This would be the original names provided, plus those added to satisfy
 dependencies, in the preferred order of action. For the normal algorithm,
@@ -566,7 +650,7 @@ Adam Kennedy <adamk@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Adam Kennedy Karen Etheridge
+=for stopwords Adam Kennedy Karen Etheridge Mark Murawski
 
 =over 4
 
@@ -577,6 +661,10 @@ Adam Kennedy <adam@ali.as>
 =item *
 
 Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Mark Murawski <markm@intellasoft.net>
 
 =back
 

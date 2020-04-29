@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::VariantsMap;
-$Games::Solitaire::Verify::VariantsMap::VERSION = '0.2401';
+$Games::Solitaire::Verify::VariantsMap::VERSION = '0.2402';
 use strict;
 use warnings;
 
@@ -219,7 +219,7 @@ their parameters.
 
 =head1 VERSION
 
-version 0.2401
+version 0.2402
 
 =head1 FUNCTIONS
 
@@ -383,7 +383,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 by Shlomi Fish.
+This software is Copyright (c) 2008 by Shlomi Fish.
 
 This is free software, licensed under:
 

@@ -1,0 +1,19 @@
+Build.PL
+Changes
+lib/Metrics/Any.pm
+lib/Metrics/Any/Adapter.pm
+lib/Metrics/Any/Adapter/Null.pm
+lib/Metrics/Any/Adapter/Test.pm
+lib/Metrics/Any/Collector.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01collector.t
+t/02adapter-early.t
+t/03adapter-late.t
+t/10adapter-null.t
+t/11adapter-test.t
+t/99pod.t

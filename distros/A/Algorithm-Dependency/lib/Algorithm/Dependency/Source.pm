@@ -20,7 +20,7 @@ use strict;
 use Algorithm::Dependency ();
 use Params::Util qw{_SET};
 
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 
 
 #####################################################################
@@ -207,7 +207,7 @@ Algorithm::Dependency::Source - Implements a source of hierarchy items
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head1 DESCRIPTION
 

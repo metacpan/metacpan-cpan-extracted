@@ -14,9 +14,7 @@ License: x
 %install
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/usr/lib/test-%{name}
-%ifos linux
 cp /sbin/ldconfig $RPM_BUILD_ROOT/usr/lib/test-%{name}
-%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT

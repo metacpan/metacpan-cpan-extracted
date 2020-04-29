@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
 
 package Net::Async::HTTP::Server;
 
@@ -10,12 +10,25 @@ use warnings;
 use base qw( IO::Async::Listener );
 IO::Async::Listener->VERSION( '0.61' );
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Carp;
 
 use Net::Async::HTTP::Server::Protocol;
 use Net::Async::HTTP::Server::Request;
+
+use Metrics::Any '$metrics';
+
+$metrics->make_counter( requests  =>
+   name        => "net_async_http_server_requests",
+   description => "Number of HTTP requests received",
+   labels      => [qw( method )],
+);
+$metrics->make_counter( responses =>
+   name        => "net_async_http_server_responses",
+   description => "Number of HTTP responses served",
+   labels      => [qw( method code )],
+);
 
 =head1 NAME
 
@@ -105,13 +118,6 @@ bind the server to a listening socket to make it accept requests.
 
 =cut
 
-my $METRICS;
-
-push @Net::Prometheus::MAKE_COLLECTOR, sub {
-   require Net::Async::HTTP::Server::PrometheusCollector;
-   return $METRICS //= Net::Async::HTTP::Server::PrometheusCollector->new;
-};
-
 sub _init
 {
    my $self = shift;
@@ -186,7 +192,7 @@ sub _received_request
    my $self = shift;
    my ( $request ) = @_;
 
-   $METRICS->observe_request( $request ) if $METRICS;
+   $metrics->inc_counter( requests => $request->method );
 
    $self->invoke_event( on_request => $request );
 }
@@ -196,7 +202,7 @@ sub _done_request
    my $self = shift;
    my ( $request ) = @_;
 
-   $METRICS->observe_response( $request ) if $METRICS;
+   $metrics->inc_counter( responses => $request->method, $request->response_status_code );
 }
 
 =head1 TODO

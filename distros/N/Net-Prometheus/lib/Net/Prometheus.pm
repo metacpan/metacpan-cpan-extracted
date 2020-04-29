@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
 
 package Net::Prometheus;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Carp;
 
@@ -18,6 +18,8 @@ use Net::Prometheus::Gauge;
 use Net::Prometheus::Counter;
 use Net::Prometheus::Summary;
 use Net::Prometheus::Histogram;
+
+use Net::Prometheus::Registry;
 
 use Net::Prometheus::ProcessCollector;
 
@@ -106,7 +108,7 @@ sub new
    my %args = @_;
 
    my $self = bless {
-      collectors => [],
+      registry => Net::Prometheus::Registry->new,
    }, $class;
 
    if( not $args{disable_process_collector} and
@@ -139,11 +141,7 @@ sub register
    my $self = shift;
    my ( $collector ) = @_;
 
-   # TODO: ban duplicate registration
-
-   push @{ $self->{collectors} }, $collector;
-
-   return $collector;
+   return $self->{registry}->register( $collector );
 }
 
 =head2 unregister
@@ -159,13 +157,7 @@ sub unregister
    my $self = shift;
    my ( $collector ) = @_;
 
-   my $found;
-   @{ $self->{collectors} } = grep {
-      not( $_ == $collector and ++$found )
-   } @{ $self->{collectors} };
-
-   $found or
-      croak "No such collector";
+   return $self->{registry}->unregister( $collector );
 }
 
 =head2 new_gauge
@@ -288,10 +280,8 @@ sub collect
 {
    my $self = shift;
 
-   my $collectors = $self->{collectors};
-
    my %samples_by_name;
-   foreach my $collector ( @{ $collectors } ) {
+   foreach my $collector ( $self->{registry}->collectors, Net::Prometheus::Registry->collectors ) {
       push @{ $samples_by_name{ $_->fullname } }, $_ for $collector->collect;
    }
 
@@ -448,11 +438,7 @@ information to be exported.
 
 =item *
 
-Split Registry out from toplevel instance.
-
-=item *
-
-Write some actual example programs.
+Histogram/Summary 'start_timer' support
 
 =back
 

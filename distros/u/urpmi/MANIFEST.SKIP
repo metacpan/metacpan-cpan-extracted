@@ -5,7 +5,7 @@
 \bCVS\b
 \bSCCS\b
 ,v$
-\B\.svn\b
+\B\.git\b
 \b_darcs\b
 
 # Avoid Makemaker generated and utility files.
@@ -36,7 +36,7 @@
 ^debugsources.list$
 #!end included /usr/lib/perl5/5.10.0/ExtUtils/MANIFEST.SKIP
 
-\B\.svn\b
+\B\.git\b
 ^\.pms
 ~$
 \.orig$

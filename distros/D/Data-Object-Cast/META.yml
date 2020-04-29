@@ -25,8 +25,10 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  repository: git://github.com/iamalnewkirk/Data-Object-Cast.git
-version: '0.01'
+  bugtracker: https://github.com/iamalnewkirk/data-object-cast/issues
+  homepage: https://metacpan.org/pod/Data::Object::Cast
+  repository: git://github.com/iamalnewkirk/data-object-cast.git
+version: '0.02'
 x_authority: cpan:AWNCORP
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

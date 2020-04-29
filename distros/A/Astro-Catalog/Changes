@@ -6,6 +6,13 @@ For more detail please see the commit log at
 
   https://github.com/timj/perl-Astro-Catalog
 
+v4.35
+
+  + Changed the Astro::Catalog::IO::TST pattern match used to identify
+    magnitude error columns to allow multiple characters in the filter name
+    (with thanks to Paul Leyland - CPAN bug #132433).
+  + Suppressed some debugging output (unless $DEBUG is set).
+
 v4.34
 
   + Updated reference coordinates for 4_sesame.t test.

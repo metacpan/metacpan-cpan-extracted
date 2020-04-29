@@ -1,0 +1,66 @@
+NAME
+
+    Date::Extract::DE - Extract dates from german text
+
+VERSION
+
+    0.0.2
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+SYNOPSIS
+
+        use Date::Extract::DE;
+        my $parser = Date::Extract::DE->new( reference_date => $reference_date );
+        my $dates = $parser->extract($text);
+
+DESCRIPTION
+
+    This is a module to extract dates from german text (similar to
+    Date::Extract).
+
+METHODS
+
+    new(reference_date => $reference_date, lookback_days => $lookback_days)
+
+      Creates a new instance. Optionally, you can specify a reference
+      Date::Simple which is used to determine the year when a date is given
+      incompletely in the text (default is today). You can also specify a
+      maximum numer of days to look back when an incomplete date is guessed
+      (otherwise the closest date is used)
+
+    extract($text)
+
+      Tries to extract dates from the text and returns an arrayref of
+      Date::Simple instances
+
+AUTHORS
+
+    Andreas Mager <andreas@rainofbits.com>
+
+    Christian Eder <christian.eder@apa.at>
+
+LICENCE AND COPYRIGHT
+
+    Copyright (c) 2020, APA-IT. All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    This module is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this module. If not, see http://www.gnu.org/licenses/.
+

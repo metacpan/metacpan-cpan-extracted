@@ -1,2 +1,11 @@
+0.002		2020-04-28	T. R. Wyant
+    Added all_modules_tried_ok(). This traverses the specified
+    directories (default: blib/lib and blib/arch) looking for modules
+    that were not tried by load_module_ok(), and generating a failure
+    for each.
+
+    Added clear_modules_tried(). This clears the record of modules tried
+    by load_module_ok().
+
 0.001		2020-02-11	T. R. Wyant
     Initial production release.

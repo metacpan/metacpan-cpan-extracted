@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.14'
+generated_by: 'Module::Install version 1.19'
 license: lgpl_2_1
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,20 +27,21 @@ requires:
   Config::Any: 0
   DateTime: 0
   IO::Handle: 0
-  JSON::MaybeXS: '1.002002'
-  Module::Runtime: '0.013'
-  Moo: '0.091011'
-  MooX::Options: '3.71'
-  MooX::Types::MooseLike: '0.08'
-  Package::Variant: '1.001001'
+  JSON::MaybeXS: 1.002002
+  List::Util: 1.45
+  Module::Runtime: 0.013
+  Moo: 0.091011
+  MooX::Options: 3.71
+  MooX::Types::MooseLike: 0.08
+  Package::Variant: 1.001001
   String::RewritePrefix: 0
   Sys::Hostname::Long: 0
   Task::Weaken: 0
   Try::Tiny: 0
-  namespace::clean: '0.23'
+  namespace::clean: 0.23
   perl: 5.8.4
 resources:
   license: http://opensource.org/licenses/lgpl-license.php
-  repository: git://github.com/suretec/Message-Passing.git
-version: '0.116'
+  repository: https://github.com/suretec/Message-Passing/
+version: 0.117
 x_authority: cpan:GHENRY

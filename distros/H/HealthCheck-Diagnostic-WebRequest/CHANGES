@@ -1,0 +1,196 @@
+==================================================
+Changes from 2019-04-29 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version v1.3.5 at 2020-04-28 16:05:32 +0000
+-------------------------------------------
+
+  Change: 5dac822a9a3718c534c4dd47950036138c695b8f
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-04-16 14:16:51 +0000
+
+    Convert to Dist::Zilla::PluginBundle::Author::GSG 
+
+-------------------------------------------
+version v1.3.4 at 2020-01-21 15:16:27 +0000
+-------------------------------------------
+
+  Change: acc2ca321394ce10c878789cfeba3815e9f96fa2
+  Author: Marcus Dubreuil <marcus.dubreuil@grantstreet.com>
+  Date : 2020-01-21 09:49:00 +0000
+
+    SM-2136 Add .proverc with -l 
+
+-------------------------------------------
+version v1.3.3 at 2019-12-12 23:23:53 +0000
+-------------------------------------------
+
+  Change: 88420887e1998014c9a5865ad1f3e1abbc786fd4
+  Author: Randy Sofia <rsofia@grantstreet.com>
+  Date : 2019-12-12 17:26:23 +0000
+
+    PEX-14297a Prevent fatal exception for parent class parameters 
+
+-------------------------------------------
+version v1.3.2 at 2019-12-10 20:17:09 +0000
+-------------------------------------------
+
+  Change: b54551372b053f31ae98a7e8dee43b0c6f660b54
+  Author: Randy Sofia <rsofia@grantstreet.com>
+  Date : 2019-12-10 11:18:27 +0000
+
+    PEX-14297 Strict param checking 
+
+  Change: e04a600aff73636c54fd635fb6ca48295147e3f5
+  Author: Randy Sofia <rsofia@grantstreet.com>
+  Date : 2019-11-22 11:14:20 +0000
+
+    PEX-14297 Add option to prevent following redirects 
+
+-------------------------------------------
+version v1.3.1 at 2019-10-24 21:14:21 +0000
+-------------------------------------------
+
+  Change: 005908bf5ee2286fe2902decc35ebcf10b83679b
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-24 17:14:21 +0000
+
+    Create distribution files 
+
+  Change: 050ec56087baaf51e7174fd3a923ed296a919f61
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-24 17:05:19 +0000
+
+    Convert to Bitbucket workflow 
+
+  Change: 92d84e7884e919332c332befd597fd857a5901cb
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-24 17:05:19 +0000
+
+    Remove gitc metadata 
+
+----------------------------------------------------------------------
+dist/version v0.0.1.1_01/master/quickfix1 at 2019-10-23 20:55:27 +0000
+----------------------------------------------------------------------
+
+  Change: fec895a0766e4280c07f6a3078e71b8a63f7ace7
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-23 16:26:09 +0000
+
+    Use http not https in tests
+
+    Because otherwise we need to depend on LWP::Protocol::https for no
+    good reason. Leave that dependency for folks who actually need it. 
+
+  Change: 1ec22ca4cef5c30e940a80470fe46e056066447b
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-23 16:26:09 +0000
+
+    use $class->VERSION not global $VERSION
+
+    It's more correct and then `make test` works before Dist::Zilla adds
+    the $VERSION variable. 
+
+--------------------------------------------------------------------------
+dist/version v0.0.0.13827_01/master/PEX-13827 at 2019-10-23 15:01:35 +0000
+--------------------------------------------------------------------------
+
+  Change: 4a7844ab6f34b1fd5868d50dfc94950575a5779d
+  Author: Brendan Byrd <brendan.byrd@grantstreet.com>
+  Date : 2019-10-22 20:31:55 +0000
+
+    PEX-13827: Combine status_code/operator and expand into multiple
+    codes
+
+    This adds a more flexible status_code parser that allows for many
+    different code combinations. Also cleaned up the info string a bit
+    and made the timeout tests more true to how the real LWP acts
+    (catching a die from $protocol->request). 
+
+  Change: 44d54a4cdca004e37041a54ee5cc8dfd30574688
+  Author: Randy Sofia <rsofia@grantstreet.com>
+  Date : 2019-10-14 13:29:13 +0000
+
+    PEX-13827 Better proxy error and failed status for squid errors 
+
+  Change: 2648ac39b9dc4716b6cbf6c1684e4d857b01d8be
+  Author: Randy Sofia <rsofia@grantstreet.com>
+  Date : 2019-10-11 17:27:36 +0000
+
+    PEX-13827 Additional operators and more descriptive errors 
+
+--------------------------------------------------------------------------
+dist/version v0.0.0.11292_01/master/PEX-11292 at 2019-07-02 17:47:51 +0000
+--------------------------------------------------------------------------
+
+  Change: d02ccac6936322224ea22c4efc88262ee1d14891
+  Author: Brendan Byrd <brendan.byrd@grantstreet.com>
+  Date : 2019-07-01 18:34:14 +0000
+
+    PEX-11292: Tweaks to LWP agent string/option 
+
+  Change: 72eb8dc020547b1bf628c1af4429be3d686a5953
+  Author: Brendan Byrd <brendan.byrd@grantstreet.com>
+  Date : 2019-07-01 18:25:36 +0000
+
+    PEX-11292: Small tweaks to 'request' option processing and docs 
+
+  Change: 171853fd9729f34b99828f35cfe78205770038d6
+  Author: Randy Sofia <rsofia@grantstreet.com>
+  Date : 2019-06-12 14:33:28 +0000
+
+    Fix options reference and agent string 
+
+  Change: 548668ce544c4f83728f7803a3bb3b5f9648ae16
+  Author: Randy Sofia <rsofia@grantstreet.com>
+  Date : 2019-06-12 10:57:24 +0000
+
+    Add HTTP::Request to cpanfile 
+
+  Change: 4cb4530e99bc262f32dc49599d5f528b2d92764e
+  Author: Randy Sofia <rsofia@grantstreet.com>
+  Date : 2019-06-12 10:44:11 +0000
+
+    Updated documentation to reflect HTTP::Request option 
+
+  Change: 69d4d186fd91bbd6280e72c15870f4c4dd1ce860
+  Author: Randy Sofia <rsofia@grantstreet.com>
+  Date : 2019-06-12 10:24:53 +0000
+
+    Update test to override request object 
+
+  Change: a6f966d7ed044b9473a26ef0df32e82d5a20b9be
+  Author: Randy Sofia <rsofia@grantstreet.com>
+  Date : 2019-06-12 10:13:54 +0000
+
+    Provide support for raw HTTP::Request 
+
+  Change: 2d1e4de604ac06a2814ecd25bf89e037925da1fa
+  Author: Randy Sofia <rsofia@grantstreet.com>
+  Date : 2019-06-11 16:10:25 +0000
+
+    Add HEAD/POST request methods and ability to send form data 
+
+-----------------------------------------------------------------------
+dist/version v0.0.0.1803_01/master/SM-1803 at 2019-05-23 13:31:15 +0000
+-----------------------------------------------------------------------
+
+  Change: 9186b13efa07f4c11e3508b620349c23a513d4fa
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-05-22 18:22:25 +0000
+
+    Slightly shorten info message
+
+    I think this is a bit easier to understand, although still not
+    exactly what I'd expect from a wordsmith. Wish I had one :-) 
+
+  Change: 27fb308b46156c055140e13f4d9f1f95038bea89
+  Author: Brandon Messineo <brandon.messineo@grantstreet.com>
+  Date : 2019-05-22 16:19:24 +0000
+
+    Fix info message to be more readable 
+
+================================================
+Plus 7 releases after 2019-04-29 00:00:00 +0000.
+================================================

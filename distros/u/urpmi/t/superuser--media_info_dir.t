@@ -6,6 +6,7 @@ use helper;
 use Test::More 'no_plan';
 
 
+set_path();
 need_root_and_prepare();
 various();
 urpmq_various();

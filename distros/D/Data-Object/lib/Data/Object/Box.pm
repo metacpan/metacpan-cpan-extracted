@@ -15,7 +15,7 @@ use Data::Object::Cast;
 with 'Data::Object::Role::Buildable';
 with 'Data::Object::Role::Proxyable';
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 
 # ATTRIBUTES
 

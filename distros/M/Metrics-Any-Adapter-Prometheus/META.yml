@@ -1,0 +1,27 @@
+---
+abstract: 'a metrics reporting adapter for Prometheus'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Metrics::Any: '0.02'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Metrics-Any-Adapter-Prometheus
+provides:
+  Metrics::Any::Adapter::Prometheus:
+    file: lib/Metrics/Any/Adapter/Prometheus.pm
+    version: '0.03'
+requires:
+  Net::Prometheus::Counter: '0'
+  Net::Prometheus::Registry: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

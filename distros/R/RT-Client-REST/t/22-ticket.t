@@ -4,7 +4,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 113;
+use Test::More tests => 114;
 use Test::Exception;
 
 use constant METHODS => (
@@ -15,7 +15,7 @@ use constant METHODS => (
     'id', 'queue', 'owner', 'creator', 'subject', 'status', 'priority',
     'initial_priority', 'final_priority', 'requestors', 'cc', 'admin_cc',
     'created', 'starts', 'started', 'due', 'resolved', 'told',
-    'time_estimated', 'time_worked', 'time_left', 'last_updated',
+    'time_estimated', 'time_worked', 'time_left', 'last_updated', 'sla',
 );
 
 BEGIN {

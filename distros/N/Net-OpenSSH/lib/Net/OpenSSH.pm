@@ -1,6 +1,6 @@
 package Net::OpenSSH;
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 use strict;
 use warnings;
@@ -118,9 +118,10 @@ sub _catch_tainted_args {
 sub _set_error {
     my $self = shift;
     my $code = shift || 0;
+    my @extra = grep defined, @_;
     my $err = $self->{_error} = ( $code
                                   ? Scalar::Util::dualvar($code, join(': ', @{$self->{_error_prefix}},
-                                                                      (@_ ? @_ : "Unknown error $code")))
+                                                                      (@extra ? @extra : "Unknown error $code")))
                                   : 0 );
     $debug and $debug & 1 and _debug "set_error($code - $err)";
     return $err
@@ -417,7 +418,7 @@ sub new {
     $self->{_default_stdin_fh} = $self->_open_file('<', $default_stdin_file)
 	if defined $default_stdin_file;
 
-    if ($self->error == OSSH_SLAVE_PIPE_FAILED) {
+    if ($self->{_error} == OSSH_SLAVE_PIPE_FAILED) {
         $self->_master_fail($async, "Unable to create default slave stream", $self->{_error});
         return $self;
     }
@@ -808,7 +809,7 @@ sub _waitpid {
 
         my $time_limit;
         if (defined $timeout and $self->{_kill_ssh_on_timeout}) {
-            $timeout = 0 if $self->error == OSSH_SLAVE_TIMEOUT;
+            $timeout = 0 if $self->{_error} == OSSH_SLAVE_TIMEOUT;
             $time_limit = time + $timeout;
         }
         local $SIG{CHLD} = sub {} unless __has_sigchld_handle;
@@ -994,7 +995,7 @@ sub _master_check {
     }
     else {
         my $out = $self->_master_ctl('check');
-        my $error = $self->{_error};
+        $error = $self->{_error};
         unless ($error) {
             my $pid = $self->{_pid};
             if ($out =~ /pid=(\d+)/) {
@@ -1229,6 +1230,7 @@ sub _master_ctl {
     my %opts = (ref $_[0] eq 'HASH' ? %{shift()} : ());
     my $cmd = shift;
 
+    local $?;
     local $self->{_error_prefix} = [@{$self->{_error_prefix}},
                                     "control command failed"];
     $self->capture({ %opts,
@@ -1740,7 +1742,7 @@ sub _encode_args {
             local $self->{_error_prefix} = [@{$self->{_error_prefix}}, "argument encoding failed"];
             $self->_encode($enc, @_);
         }
-        return !$self->error;
+        return !$self->{_error};
     }
     1;
 }
@@ -1781,7 +1783,7 @@ sub _io3 {
     if ($enc and @data) {
         local $self->{_error_prefix} = [@{$self->{_error_prefix}}, "stdin data encoding failed"];
         $self->_encode($enc, @data) if $has_input;
-        return if $self->error;
+        return if $self->{_error};
     }
 
     my $bout = '';
@@ -2061,7 +2063,7 @@ sub test {
     _croak_bad_options %opts;
 
     $self->system(\%opts, @_);
-    my $error = $self->error;
+    my $error = $self->{_error};
     unless ($error) {
         return 1;
     }
@@ -2370,7 +2372,7 @@ sub _rsync {
     return $pid if $async;
     $self->_waitpid($pid, $timeout) and return 1;
 
-    if ($self->error == OSSH_SLAVE_CMD_FAILED and $?) {
+    if ($self->{_error} == OSSH_SLAVE_CMD_FAILED and $?) {
 	my $err = ($? >> 8);
 	my $errstr = $rsync_error{$err};
 	$errstr = 'Unknown rsync error' unless defined $errstr;
@@ -4669,7 +4671,7 @@ notice between releases.
 If you are using password authentication, enabling debugging for
 L<IO::Tty> may also show interesting information:
 
-    IO::Tty::DEBUG = 1;
+    $IO::Tty::DEBUG = 1;
 
 Finally, by default debugging output is sent to C<STDERR>. You can
 override it pointing C<$Net::OpenSSH::debug_fh> to a different file
@@ -5225,7 +5227,7 @@ I always welcome documentation corrections and improvements.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2018 by Salvador FandiE<ntilde>o
+Copyright (C) 2008-2020 by Salvador FandiE<ntilde>o
 (sfandino@yahoo.com)
 
 This library is free software; you can redistribute it and/or modify

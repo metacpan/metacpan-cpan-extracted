@@ -22,7 +22,8 @@ for my $i ( @nums ) {
 
     _cmpbin( $encoded, pack('C d>', 0xfb, $i), "encode $i" );
 
-    # NB: Long-double perls introduce rounding errors when decoding CBOR floats.
+    # NB: Long-double and quad-math perls introduce rounding errors
+    # when decoding CBOR floats.
     cmp_deeply(
         CBOR::Free::decode($encoded),
         $Config{'uselongdouble'} || $Config{'usequadmath'} ? num($i, 0.0001) : $i,

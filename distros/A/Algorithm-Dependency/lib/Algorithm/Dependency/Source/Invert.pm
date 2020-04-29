@@ -19,7 +19,7 @@ use strict;
 use Params::Util '_INSTANCE';
 use Algorithm::Dependency::Source::HoA ();
 
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 our @ISA     = 'Algorithm::Dependency::Source::HoA';
 
 
@@ -59,7 +59,7 @@ Algorithm::Dependency::Source::Invert - Logically invert a source
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head1 SYNOPSIS
 

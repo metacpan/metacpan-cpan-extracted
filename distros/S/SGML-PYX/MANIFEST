@@ -32,6 +32,8 @@ t/data/element2.sgml
 t/data/element3.sgml
 t/data/element4.sgml
 t/data/element5.sgml
+t/data/element6.sgml
+t/data/element7.sgml
 t/data/end_element1.sgml
 t/data/end_element2.sgml
 t/data/instruction1.sgml

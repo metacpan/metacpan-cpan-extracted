@@ -48,7 +48,6 @@
          "requires" : {
             "Expect" : "0",
             "File::Slurp" : "0",
-            "List::Util" : "1.46",
             "Net::Server" : "0",
             "Test::More" : "1.302",
             "Test::Pod" : "0",
@@ -64,7 +63,7 @@
       },
       "urpmi" : {
          "file" : "urpmi.pm",
-         "version" : "v8.120.0"
+         "version" : "v8.122.0"
       }
    },
    "release_status" : "stable",
@@ -75,6 +74,6 @@
          "web" : "http://gitweb.mageia.org/software/rpm/urpmi/"
       }
    },
-   "version" : "v8.121.13",
+   "version" : "v8.122",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

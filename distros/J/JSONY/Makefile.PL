@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "JSON::PP" => 0,
     "YAML::PP" => "0.018"
   },
-  "VERSION" => "0.1.20",
+  "VERSION" => "0.1.21",
   "test" => {
     "TESTS" => "t/*.t"
   }

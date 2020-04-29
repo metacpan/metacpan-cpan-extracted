@@ -1,5 +1,9 @@
 Revision history for Getopt-EX extension Getopt-EX-termcolor
 
+1.05 2020-04-28T00:45:35Z
+
+    - Accept anything start with xterm as XTerm.
+
 1.04 2020-04-23T15:45:42Z
 
     - Fix bug about $ENV{TERM}.

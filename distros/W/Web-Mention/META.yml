@@ -31,7 +31,7 @@ no_index:
 provides:
   Web::Mention:
     file: lib/Web/Mention.pm
-    version: '0.704'
+    version: '0.710'
   Web::Mention::Author:
     file: lib/Web/Mention/Author.pm
 requires:
@@ -44,10 +44,10 @@ requires:
   LWP::Protocol::https: '0'
   List::Util: '0'
   Mojo::DOM58: '0'
-  Moose: '0'
-  MooseX::ClassAttribute: '0'
-  MooseX::Enumeration: '0'
-  MooseX::Types::URI: '0'
+  Moo: '0'
+  MooX::ClassAttribute: '0'
+  MooX::Enumeration: '0'
+  MooX::HandlesVia: '0'
   Path::Class::Dir: '0'
   Readonly: '0'
   Scalar::Util: '0'
@@ -61,7 +61,7 @@ resources:
   bugtracker: https://github.com/jmacdotorg/webmention-perl/issues
   homepage: https://github.com/jmacdotorg/webmention-perl
   repository: git://github.com/jmacdotorg/webmention-perl.git
-version: '0.704'
+version: '0.710'
 x_contributors:
   - 'Jason McIntosh <jmac@jmac.org>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'

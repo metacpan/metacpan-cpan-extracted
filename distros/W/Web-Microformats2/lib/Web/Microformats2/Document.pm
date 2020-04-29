@@ -1,17 +1,18 @@
 package Web::Microformats2::Document;
-use Moose;
+use Moo;
+use MooX::HandlesVia;
 use Encode qw(encode_utf8);
 use JSON qw(decode_json);
 use List::Util qw(any);
+use Types::Standard qw(HashRef ArrayRef InstanceOf);
 
 use Web::Microformats2::Item;
 
 has 'top_level_items' => (
-    is => 'ro',
-    traits => ['Array'],
-    isa => 'ArrayRef[Web::Microformats2::Item]',
+    is => 'lazy',
+    handles_via => 'Array',
+    isa => ArrayRef[InstanceOf['Web::Microformats2::Item']],
     default => sub { [] },
-    lazy => 1,
     handles => {
         all_top_level_items => 'elements',
         add_top_level_item => 'push',
@@ -21,11 +22,10 @@ has 'top_level_items' => (
 );
 
 has 'items' => (
-    is => 'ro',
-    traits => ['Array'],
-    isa => 'ArrayRef[Web::Microformats2::Item]',
+    is => 'lazy',
+    handles_via => 'Array',
+    isa => ArrayRef[InstanceOf['Web::Microformats2::Item']],
     default => sub { [] },
-    lazy => 1,
     handles => {
         add_item => 'push',
         all_items => 'elements',
@@ -33,17 +33,15 @@ has 'items' => (
 );
 
 has 'rels' => (
-    is => 'ro',
-    isa => 'HashRef',
-    lazy => 1,
+    is => 'lazy',
+    isa => HashRef,
     clearer => '_clear_rels',
     default => sub { {} },
 );
 
 has 'rel_urls' => (
-    is => 'ro',
-    isa => 'HashRef',
-    lazy => 1,
+    is => 'lazy',
+    isa => HashRef,
     clearer => '_clear_rel_urls',
     default => sub { {} },
 );

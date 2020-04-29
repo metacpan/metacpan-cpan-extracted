@@ -38,7 +38,7 @@ The callback to be called when a message is received.
 
 =head2 consume ($msg)
 
-Calls the callback with the message as it's first parameter
+Calls the callback with the message as its first parameter.
 
 =head1 SEE ALSO
 

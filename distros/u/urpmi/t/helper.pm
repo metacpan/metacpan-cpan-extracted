@@ -1,19 +1,35 @@
 package helper;
 
 use Test::More;
+use Cwd 'getcwd';
+use Config;
 use urpm::select;
 use urpm::util;
 use base 'Exporter';
 our @EXPORT = qw(need_root_and_prepare need_downloader
 		 are_weak_deps_supported is_mageia
 		 start_httpd httpd_port
-		 urpmi_addmedia urpmi_removemedia urpmi_update
+		 urpmi_addmedia urpmi_addmedia_should_retry urpmi_removemedia urpmi_update
 		 urpm_cmd run_urpm_cmd urpmi_cmd urpmi urpmi_partial test_urpmi_fail urpme
 		 urpmi_cfg set_urpmi_cfg_global_options
-		 system_ system_should_fail
+		 set_path system_ system_should_fail
 		 check_installed_fullnames check_installed_names check_nothing_installed
 		 check_installed_and_remove check_installed_fullnames_and_remove check_installed_and_urpme
 	    );
+
+sub set_path() {
+    # help CPAN testers who installed genhdlist2 using cpan but do not have /usr/local/bin in their PATH:
+    $ENV{PATH} .= ":/usr/local/bin:$Config{bin}";
+
+    # help when CPAN testers have not genhdlist2 installed but do have built rpmtools:
+    $ENV{PATH} .= join(':', uniq(map {
+	my $blib_script = dirname($_) . "/script";
+	-d $blib_script ? $blib_script : ();
+    } split(':', $ENV{PERL5LIB})));
+
+    # Fallback to bundled genhdlist2/gendistrib if not installed:
+    $ENV{PATH} .= ':' . getcwd();
+}
 
 my $using_root;
 sub need_root_and_prepare() {
@@ -27,6 +43,7 @@ sub need_root_and_prepare() {
     system('rm -rf root');
     isnt(-d 'root', "test root dir can not be removed $!", "creating chroot");
     system('mkdir -p root/etc/rpm');
+    system('echo "%__dbi_other fsync nofsync" >root/etc/rpm/macros');
     system('echo "%_pkgverify_level none" >root/etc/rpm/macros');
     $using_root = 1;
     $ENV{LC_ALL} = 'C';
@@ -55,7 +72,7 @@ sub start_httpd() {
 	exec './simple-httpd', $::pwd, "$::pwd/tmp", httpd_port();
 	exit 1;
     }
-    ('http://localhost:' . httpd_port(), $server_pid);
+    'http://localhost:' . httpd_port();
 }
 
 chdir 't' if -d 't';
@@ -85,7 +102,13 @@ sub urpmi_cmd() { urpm_cmd('urpmi') }
 
 sub urpmi_addmedia {
     my ($para) = @_;
+    $ENV{URPMI_TESTSUITE} = 1;
     system_(urpm_cmd('urpmi.addmedia --no-verify-rpm') . " $para");
+}
+sub urpmi_addmedia_should_retry {
+    my ($para) = @_;
+    $ENV{URPMI_TESTSUITE} = 1;
+    system_should_retry(urpm_cmd('urpmi.addmedia --no-verify-rpm') . " $para");
 }
 sub urpmi_removemedia {
     my ($para) = @_;
@@ -140,6 +163,17 @@ sub system_should_fail {
     $? & 127 ? is($? & 127, 0, "should fail nicely but not get killed: $cmd")
              : ok($? != 0, "should fail: $cmd");
 }
+sub system_should_retry {
+    my ($cmd) = @_;
+    system($cmd);
+    if ($? == 28) {
+	my $nb = 60;
+	warn "curl timeouted (code=28), will retry after $nb seconds\n";
+	sleep($nb);
+	system($cmd);
+    }
+    ok($? == 0, $cmd);
+}
 
 sub check_installed_fullnames {
     my (@names) = @_;
@@ -181,7 +215,7 @@ sub is_mageia() {
 }
 
 sub are_weak_deps_supported() {
-    return urpm::select::_rpm_version() gt 4.12.0
+    return urpm::select::_rpm_version() gt 4.12.0;
 }
 
 END { 

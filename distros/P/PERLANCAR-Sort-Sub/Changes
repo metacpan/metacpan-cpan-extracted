@@ -1,3 +1,9 @@
+0.080   2020-02-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Add sort sub: pod_sections_ala_perlancar (sort spec moved from
+	  Pod::Weaver::Plugin::PERLANCAR::SortSections).
+
+
 0.07    2019-12-15  Released-By: PERLANCAR; Urgency: medium
 
 	- Add meta(), build updates.

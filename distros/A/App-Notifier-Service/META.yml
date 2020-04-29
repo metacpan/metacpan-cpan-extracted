@@ -28,9 +28,9 @@ name: App-Notifier-Service
 provides:
   App::Notifier::Service:
     file: lib/App/Notifier/Service.pm
-    version: '0.0800'
+    version: '0.0801'
 requires:
-  Dancer2: '0'
+  Dancer2: '0.300003'
   File::Spec: '0'
   FindBin: '0'
   List::MoreUtils: '0'
@@ -44,7 +44,7 @@ resources:
   bugtracker: https://github.com/shlomif/app-notifier/issues
   homepage: http://www.shlomifish.org/open-source/projects/App-Notifier/
   repository: git://github.com/shlomif/app-notifier.git
-version: '0.0800'
+version: '0.0801'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -145,7 +145,7 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000036'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@Filter/MetaProvides::Package'
       version: '2.004003'

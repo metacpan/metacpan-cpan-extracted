@@ -3,37 +3,56 @@ NAME
 
 SYNOPSIS
      use PYX::SGML::Raw;
+
      my $obj = PYX::SGML::Raw->new(%parameters);
      $obj->parse($pyx, $out);
      $obj->parse_file($input_file, $out);
      $obj->parse_handle($input_file_handler, $out);
+     $obj->finalize;
 
-SUBROUTINES
-    "new()"
-             Constructor.
+METHODS
+  "new"
+     my $obj = PYX::SGML::Raw->new(%parameters);
 
-            *       "output_handler"
+    Constructor.
 
-                     Output handler.
-                     Default value is \*STDOUT.
+    Returns instance of object.
 
-    "parse($pyx[, $out])"
-             Parse PYX text or array of PYX text.
-             Output is serialization to SGML.
-             If $out not present, use 'output_handler'.
-             Returns undef.
+    *       "output_handler"
 
-    "parse_file($input_file[, $out])"
-             Parse file with PYX data.
-             Output is serialization to SGML.
-             If $out not present, use 'output_handler'.
-             Returns undef.
+             Output handler.
+             Default value is \*STDOUT.
 
-    "parse_handler($input_file_handler[, $out])"
-             Parse PYX handler.
-             Output is serialization to SGML.
-             If $out not present, use 'output_handler'.
-             Returns undef.
+  "parse"
+     $obj->parse($pyx, $out);
+
+    Parse PYX text or array of PYX text. Output is serialization to SGML. If
+    $out not present, use 'output_handler'.
+
+    Returns undef.
+
+  "parse_file"
+     $obj->parse_file($input_file, $out);
+
+    Parse file with PYX data. Output is serialization to SGML. If $out not
+    present, use 'output_handler'.
+
+    Returns undef.
+
+  "parse_handler"
+     $obj->parse_handle($input_file_handler, $out);
+
+    Parse PYX handler. Output is serialization to SGML. If $out not present,
+    use 'output_handler'.
+
+    Returns undef.
+
+  "finalize"
+     $obj->finalize;
+
+    Finalize opened tags, if exists.
+
+    Returns undef.
 
 ERRORS
      new():
@@ -41,11 +60,9 @@ ERRORS
                      Unknown parameter '%s'.
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use PYX::SGML::Raw;
 
      # Input.
@@ -72,13 +89,19 @@ SEE ALSO
     Task::PYX
         Install the PYX modules.
 
+REPOSITORY
+    <https://github.com/michal-josef-spacek/PYX-SGML-Raw>
+
 AUTHOR
-    Michal Špaček skim@cpan.org.
+    Michal Josef Špaček skim@cpan.org.
+
+    <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2011-2015 Michal Špaček
-     BSD 2-Clause License
+    © 2011-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.02
+    0.04
 

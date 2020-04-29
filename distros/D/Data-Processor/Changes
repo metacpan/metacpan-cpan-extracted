@@ -1,3 +1,6 @@
+1.0.5  2020-04-28 18:40:56 CEST
+    - add allow_empty option for arrays (thanks, hadfl)
+
 1.0.4  2019-12-09 12:58:18 CET
     - Support `x-` style meta properties
 

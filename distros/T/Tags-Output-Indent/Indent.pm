@@ -1,11 +1,9 @@
 package Tags::Output::Indent;
 
-# Pragmas.
 use base qw(Tags::Output);
 use strict;
 use warnings;
 
-# Modules.
 use Error::Pure qw(err);
 use Indent;
 use Indent::Word;
@@ -21,8 +19,7 @@ Readonly::Scalar my $LAST_INDEX => -1;
 Readonly::Scalar my $LINE_SIZE => 79;
 Readonly::Scalar my $SPACE => q{ };
 
-# Version.
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Finalize Tags output.
 sub finalize {
@@ -327,10 +324,10 @@ sub _put_begin_of_tag {
 		$self->_print_tag('>');
 	}
 
-	# XML check for uppercase names.
-	if ($self->{'xml'} && $tag ne lc($tag)) {
-		err 'In XML must be lowercase tag name.';
-	}
+	# TODO Add checking of XML element name.
+#	if ($self->{'xml'} && _check(element_name)) {
+#		err 'This is not XML format.';
+#	}
 
 	# Push begin of tag to tmp code.
 	push @{$self->{'tmp_code'}}, "<$tag";
@@ -546,6 +543,7 @@ __END__
 =head1 SYNOPSIS
 
  use Tags::Output::Indent(%params);
+
  my $tags = Tags::Output::Indent->new;
  $tags->put(['b', 'tag']);
  my @open_tags = $tags->open_tags;
@@ -733,11 +731,9 @@ __END__
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Tags::Output::Indent;
 
  # Object.
@@ -786,17 +782,24 @@ Install the Tags modules.
 
 =back
 
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/Tags-Output-Indent>
+
 =head1 AUTHOR
 
-Michal Špaček L<skim@cpan.org>
+Michal Josef Špaček L<skim@cpan.org>
+
+L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2011-2016 Michal Špaček
- BSD 2-Clause License
+© 2011-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

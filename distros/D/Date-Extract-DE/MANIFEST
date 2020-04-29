@@ -1,0 +1,20 @@
+Build.PL
+Changes
+lib/Date/Extract/DE.pm
+LICENCSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/01-extractions.t
+t/pod-coverage.t
+t/pod.t
+t/release-check-changes.t
+t/release-distmeta.t
+t/release-minimum-version.t
+t/release-no-tabs.t
+t/release-pod-syntax.t
+t/release-portability.t
+t/release-synopsis.t
+t/release-unused-vars.t
+TODO

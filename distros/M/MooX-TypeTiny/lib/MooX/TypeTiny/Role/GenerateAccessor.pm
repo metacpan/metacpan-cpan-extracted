@@ -65,14 +65,18 @@ around _generate_coerce => sub {
 # this doesn't need to be perfect.  false negatives are fine.
 sub _is_simple_value {
   my ($self, $value) = @_;
-  return $value =~ /\A(
+  return $value =~ /\A(?:
       \$\w+(?:(?:->)?(?:\[[0-9]+\]|\{\w+\}))?
     |
-      [0-9_.]+
+      [-0-9_.ex]+
     |
       "[^\$\@"]*"
     |
       '[^']*'
+    |
+      undef\(\)
+    |
+      \(!1\)
   )\z/x;
 }
 

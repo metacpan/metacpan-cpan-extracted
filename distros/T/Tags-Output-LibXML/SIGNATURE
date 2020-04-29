@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,50 +12,50 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 e6018a6be506119b9cca421df09b5ef81499290c Changes
-SHA1 1179f98d0de353aafbd6ac4d01401f030d8a1003 LICENSE
-SHA1 49bcc807a47b5cc0ede06b2f8ac2a974bd1e74ab LibXML.pm
-SHA1 fbfd419cf18090cde642b0ad8fd7ab31cfc1fa8e MANIFEST
-SHA1 058f0b5f2ca6825a08cbb8614475ab90fb20202d META.yml
-SHA1 5bc1ae389fa3316028ad1406d3c4a4bfe458b8f8 Makefile.PL
-SHA1 8227c26047acb7506e3e4f45a5b6e9453267efbb README
-SHA1 010bcc79de896e5fe5c45dd6389a0af0059da5ef examples/ex1.pl
-SHA1 f695a469bd6a18b53f7be25339e1a0e044af0276 examples/ex2.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 12cd70fb4dd8340a1792a999c770ea4ace4c923d t/Tags-Output-LibXML/01-use.t
-SHA1 65b81eee860559f896ad09fadde4ed77b8bcbf24 t/Tags-Output-LibXML/02-version.t
-SHA1 d69e09ad55535d8e96c865675c7b20a806850931 t/Tags-Output-LibXML/03-new.t
-SHA1 2235d5b54ad0d406b41ddda707dd9285e1692ecd t/Tags-Output-LibXML/04-comment.t
-SHA1 48e7678dfd34e61d4014fc53b45fe99c1ab934dc t/Tags-Output-LibXML/05-simple_tag.t
-SHA1 16f3d781484f5fd435f9dbbc15a745c944c6399a t/Tags-Output-LibXML/06-tag.t
-SHA1 84957c7b0f02663410cb7945f53bf493ed58bb3d t/Tags-Output-LibXML/07-preserve_from_attribute.t
-SHA1 9a9df12e9add96bd9b25c66d8f5e37c68710eff9 t/Tags-Output-LibXML/08-cdata.t
-SHA1 7c05e0550db14cabd6924fc9779110533730f4e8 t/Tags-Output-LibXML/09-attributes.t
-SHA1 bea79320f4ef71ff1aab2ba271d4d1e792319f78 t/Tags-Output-LibXML/10-instruction.t
-SHA1 6dce25344d5e38902a4aa800f2e05159a22790a3 t/Tags-Output-LibXML/11-raw.t
-SHA1 0b0dd0079940a2738c44ad9c6e27d5323277e02d t/Tags-Output-LibXML/12-data_callback.t
-SHA1 0f544f94a16aaa544ed72ad85137c14bf35ad3de xt/Tags-Output-LibXML/01-pod_coverage.t
-SHA1 91bf07fbf15fee64dc48c062f2459ac712f4c01c xt/Tags-Output-LibXML/02-pod.t
+SHA256 8ff8851f7cb18635972b9f034eb6ce96276c6f62fee549f818ea944e4640cf8c Changes
+SHA256 0ed14285b9b297d9a1db9f6515c0ad85608e60cc12362323475c8c10d8606d15 LICENSE
+SHA256 bcba7bab3df34ed80eef175686442574a19da742f51f2988a462e213176388d8 LibXML.pm
+SHA256 2c8e24af354a5479d7e2013091be4cb845dcb92d3dc79de23497a22215ccdd7e MANIFEST
+SHA256 a61eb352703c40a3d84a1b97d7f8edaa36be18e7e2c4191c5d56faea706a054c META.yml
+SHA256 597eb2e22e8046171ab8fbbb8cb4d97ea5f8d46d6508154e359be39f5436d8fe Makefile.PL
+SHA256 474a9b203348625789c003214751590d382cb4763b8377120df06c345f613401 README
+SHA256 e6c239f24a2d750cc174734579c99be8be406dc8ed05af2cbf6d062bb6648066 examples/ex1.pl
+SHA256 d41efebd8050da3294f86157062c45eea12bc22cc45d202b0bdffe19b2910c95 examples/ex2.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 c080e5f2154062d7f881d4536860a2ec08974861aeef9ae417d225385dd5a740 t/Tags-Output-LibXML/01-use.t
+SHA256 eb79f82e92a6697aff615f99f347285ceed7c6aa3ea17f39e37df0bedb6317c3 t/Tags-Output-LibXML/02-version.t
+SHA256 768e6af3aa2150b26f4152a72855e88497af4c0640a0172dac9e3a5c8537f1ac t/Tags-Output-LibXML/03-new.t
+SHA256 795421dcfecf91a91427809dd360a284ef4f34c4267d91c9faf07a0b7d67f9bd t/Tags-Output-LibXML/04-comment.t
+SHA256 49c54b2a07af7700b2d5374e693edfbd762b9e88fcbd5496de022050ca4d4503 t/Tags-Output-LibXML/05-simple_tag.t
+SHA256 282b53b1bb7f6e3d87c3bb63168d8dd966fd3c3c53d5063d4ad7884c4fac0ba0 t/Tags-Output-LibXML/06-tag.t
+SHA256 69e3e0091f47563ec639d4abbcf4d644384d920afa063f05fbbe3ba34c1ebd37 t/Tags-Output-LibXML/07-preserve_from_attribute.t
+SHA256 673967c86d2f230004cb35e31c8ee5e90a3bc3f60e7cef0b107861661153d552 t/Tags-Output-LibXML/08-cdata.t
+SHA256 4b9be3fed1ba7bedf663c47de8b07a6875b7f03a2e6b90fdf21063b7af2d741f t/Tags-Output-LibXML/09-attributes.t
+SHA256 c10db4f41f226930b9108562a7a4c924edbf23d36a44fb09e361561dd650f6dc t/Tags-Output-LibXML/10-instruction.t
+SHA256 5edc681170ca081fd5d386368a8dd9db9fe009af240c816e8d00406bcd0879c1 t/Tags-Output-LibXML/11-raw.t
+SHA256 dbdf2c0e92178a9c59a75abb73ed2e096291f84b8c91aa4bdded4cf2c9746664 t/Tags-Output-LibXML/12-data_callback.t
+SHA256 a4a43db29f03e59ff9dedd894f73610028336d5d8b89188a15fc9d5f091a0251 xt/Tags-Output-LibXML/01-pod_coverage.t
+SHA256 680880f3e4857f21da08112e9fecf62006ec72291b54c32451d6c247c07e19f7 xt/Tags-Output-LibXML/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWMpX/AAoJEJe+XXKaIuTlXscH/1PEmRurJUH6KzULq4AlpC4S
-Zq/pyw+kV5ziedAJ+KJr4lC0dWj8NjHzbUSHKb2o8ki+qzgdQX9RyHL3v/r+vYyT
-2we5L1UNkZzKyfozqY2qTpJ0QYNRJh8/kcsy8lHcl0Rx60vkdmQcxg+pEU/O5MW/
-Wh9cqc96K5DPFVpu98HrsXMDY7MH6xBtMaMNJUl9Eyi3yV3cFQrGM6lkVVu3ePgH
-G7dGq5vP6teTEEA862i2k/KTh1qhpSNBwmraesw4ZnMW2Xm2W/KxpVBecqZeL8Ug
-vuMxyX0SX7fNsVUZHGoxURcg1ICADRIecUhOhbAgHiP0sI9VgtSeZdO1Yw/scgg=
-=2HI5
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl6nYb4ACgkQKyiOZjWe
+rHYwsQgAs9WYWdbvgbGLP0aJ4hyV6qHW+8qL2OVFhJ04Yv/viVPGMnObg4zeeEfT
+BPpo549efzffapE3LLpnqRDBFp9ERsLHe1nYj8YvyXLkgzpV5MEvNf7fzCj3Nbxi
+6s0l+7F7X4GRKhrnN2UWpfVxI28naKiff6vNHNE4HxQTj00+t7z53UtZKJiYoLrG
+mdjlSuxBgbJxwVdR1U0NpxTjX3ys/xDc41cbm275zqOaMEHUoMoO6JzkqNLneV9Q
+QUNp4rsK668TL0ui+0Bf3vXzL4dqJvHGj/cjhDKNtcpIMltouRIA120KkVjPGBVB
+uao5Yv3f5PuqMrOg0Iq8H3FXVbK5cQ==
+=JlVv
 -----END PGP SIGNATURE-----

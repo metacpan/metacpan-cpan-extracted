@@ -1,5 +1,6 @@
 Build.PL
 Changes
+examples/net-async-http-server.pl
 examples/parent-process.psgi
 examples/static.psgi
 lib/Net/Prometheus.pm
@@ -9,6 +10,7 @@ lib/Net/Prometheus/Histogram.pm
 lib/Net/Prometheus/Metric.pm
 lib/Net/Prometheus/ProcessCollector.pm
 lib/Net/Prometheus/ProcessCollector/linux.pm
+lib/Net/Prometheus/Registry.pm
 lib/Net/Prometheus/Summary.pm
 lib/Net/Prometheus/Types.pm
 LICENSE

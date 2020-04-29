@@ -6,6 +6,7 @@ Makefile.PL
 README.md
 cbor_free_boolean.c
 cbor_free_boolean.h
+cbor_free_common.c
 cbor_free_common.h
 cbor_free_decode.c
 cbor_free_decode.h
@@ -14,6 +15,8 @@ cbor_free_encode.h
 lib/CBOR/Free.pm
 lib/CBOR/Free/AddOne.pm
 lib/CBOR/Free/Decoder.pm
+lib/CBOR/Free/Decoder/Base.pm
+lib/CBOR/Free/SequenceDecoder.pm
 lib/CBOR/Free/Tagged.pm
 lib/CBOR/Free/X.pm
 lib/CBOR/Free/X/Base.pm
@@ -25,6 +28,7 @@ lib/CBOR/Free/X/InvalidUTF8.pm
 lib/CBOR/Free/X/NegativeIntTooLow.pm
 lib/CBOR/Free/X/Recursion.pm
 lib/CBOR/Free/X/Unrecognized.pm
+lib/CBOR/Free/X/WideCharacter.pm
 ppport.h
 t/32bit.t
 t/add_one.t
@@ -36,17 +40,21 @@ t/config.t
 t/dec_strings.t
 t/decode.t
 t/decode_map_keys.t
+t/encode_modes.t
 t/errors.t
 t/examples.t
 t/float.t
 t/fuzzed.t
 t/fuzzed/a
 t/hash.t
+t/incomplete.t
 t/negint.t
 t/pod.t
 t/scalar_ref.t
+t/sequence_decoder.t
 t/shared.t
 t/string.t
+t/string_decode_modes.t
 t/tag.t
 t/tag_decode.t
 t/uint.t

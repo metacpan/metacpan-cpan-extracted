@@ -1,0 +1,7 @@
+Revision history for Data-Dataset-Classic-Titanic
+
+0.0100 2020-04-27 10:54:00
+    - Mint with Dist::Zilla.
+    - Track down the Titanic data.
+    - Make functions to return the data in different ways.
+    - Make tests!

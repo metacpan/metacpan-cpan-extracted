@@ -1,5 +1,9 @@
 Revision history for App-rshasum
 
+0.6.1       2020-04-28
+    - Require perl-5.016-or-above.
+        - http://cpantesters.org/cpan/report/2e68abc4-8249-11ea-b61b-de5d1f24ea8f .
+
 0.6.0       2020-04-19
     - Add more documentation.
 

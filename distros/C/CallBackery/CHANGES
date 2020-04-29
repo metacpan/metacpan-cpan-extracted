@@ -1,3 +1,7 @@
+0.32.6 2020-04-28 11:33:40 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - make js source compatible with qx 5 compiler
+
 0.32.5 2020-04-20 14:19:59 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - remove content-type headers ... it gets set automatically

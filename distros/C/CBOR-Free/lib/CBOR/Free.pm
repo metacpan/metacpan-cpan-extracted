@@ -11,7 +11,7 @@ our ($VERSION);
 use XSLoader ();
 
 BEGIN {
-    $VERSION = '0.23';
+    $VERSION = '0.30';
     XSLoader::load();
 }
 
@@ -64,16 +64,70 @@ The encoder currently does not handle any other blessed references.
 =item * C<canonical> - A boolean that makes the encoder output
 CBOR in L<canonical form|https://tools.ietf.org/html/rfc7049#section-3.9>.
 
-=item * C<text_keys> - EXPERIMENTAL. Encodes all Perl hash keys as CBOR text.
-If you use this mode then your strings B<must> be properly decoded, or else
-the output CBOR may mangle your string.
+=item * C<string_encode_mode> - Decides the logic to use for
+CBOR encoding of strings and hash keys. (The word “string”
+in the below descriptions applies equally to hash keys.)
 
-For example, this:
+Takes one of:
 
-    CBOR::Free::encode( { "\xc3\xa9" => 1 }, text_keys => 1 )
+=over
 
-… will create a CBOR map with key C<"\xc3\x83\xc2\xa9"> because the key
-in the hash that was sent to C<encode()> was not properly decoded.
+=item * C<sv>: The default mode of operation. If the string’s internal
+UTF8 flag is set, it will become a CBOR text string; otherwise, it will be
+CBOR binary. This is good for IPC with other Perl code but isn’t a very
+friendly default for working with other languages that probably expect more
+reliably-typed strings.
+
+This is (currently) the only way to output text and binary strings in a
+single CBOR document. Unfortunately, because Perl itself doesn’t reliably
+distinguish between text and binary strings, neither can CBOR::Free. If you
+want to try, though:
+
+=over
+
+=item * Be sure to use character-decoding logic that always
+sets the string’s UTF8 flag, even if the input is plain ASCII.
+(As of this writing, L<Encode> and L<Unicode::UTF8> work this way.)
+
+=item * Whatever consumes your Perl-sourced CBOR should probably accept
+“mis-typed” strings.
+
+=back
+
+=item * C<encode_text>: Treats all strings as unencoded characters.
+All CBOR strings will be text.
+
+This is probably what you want if you
+follow the receive-decode-process-encode-output workflow that
+L<perlunitut> recommends (which you might be doing via C<use utf8>)
+B<AND> if you intend for your CBOR to contain exclusively text.
+
+Think of this option as: “All my strings are decoded.”
+
+(Perl internals note: if !SvUTF8, the CBOR will be the UTF8-upgraded
+version.)
+
+=item * C<as_text>: Treats all strings as octets of UTF-8.
+Wide characters (i.e., code points above 255) are thus invalid input.
+All CBOR strings will be text.
+
+This is probably what you want if you forgo character decoding (and encoding),
+treating all input as octets, B<BUT> you still intend for your CBOR to
+contain exclusively text.
+
+Think of this option as: “I’ve encoded all my strings as UTF-8.”
+
+(Perl internals note: if SvUTF8, the CBOR will be the downgraded version.)
+
+=item * C<as_binary>: Like C<as_text>, but outputs CBOR binary
+instead of text.
+
+This is probably what you want if your application is “all binary,
+all the time”.
+
+Think of this option as: “Just the bytes, ma’am.”
+
+=back
 
 =item * C<preserve_references> - A boolean that makes the encoder encode
 multi-referenced values via L<CBOR’s “shared references” tags|https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml>. This allows encoding of shared
@@ -97,37 +151,19 @@ Notes on mapping Perl to CBOR:
 
 =over
 
-=item * The internal state of a defined Perl scalar (e.g., whether it’s an
+=item * The internal state of a Perl scalar (e.g., whether it’s an
 integer, float, string, etc.) determines its CBOR encoding.
 
 =item * Perl doesn’t currently provide reliable binary/character string types.
-CBOR::Free tries to distinguish anyway by looking at a string’s UTF8 flag: if
-set, then the string becomes CBOR text; otherwise, it’ll be CBOR binary.
-That’s not always going to work, though. A trivial example:
-
-    perl -MCBOR::Free -e'my $str = "abc"; utf8::decode($str); print CBOR::Free::encode($str)'
-
-Since C<utf8::decode()> doesn’t set the UTF8 flag unless it “has to”
-(see L<utf8>), that function is a no-op in the above.
-
-The above I<will> produce a CBOR text string, though, if you use
-L<Unicode::UTF8> instead of L<utf8>:
-
-    perl -MUnicode::UTF8 -MCBOR::Free -e'print CBOR::Free::encode(Unicode::UTF8::decode_utf8("abc"))'
-
-The crucial point, though, is that, because Perl itself doesn’t guarantee
-the reliable string types that CBOR recognizes, any heuristics we apply
-to distinguish one from the other are a “best-guess” merely.
-
-B<IMPORTANT:> Whatever consumes your Perl-sourced CBOR B<MUST> account
-for the prospect of an incorrectly-typed string.
+The various C<string_encode_mode> options (described above) provide ways to
+deal with this problem.
 
 =item * The above applies also to strings vs. numbers: whatever consumes
 your Perl-sourced CBOR B<MUST> account for the prospect of numbers that
 are in CBOR as strings, or vice-versa.
 
 =item * Perl hash keys are serialized as strings, either binary or text
-(following the algorithm described above).
+(according to the C<string_encode_mode>).
 
 =item * L<Types::Serialiser> booleans are encoded as CBOR booleans.
 Perl undef is encoded as CBOR null. (NB: No Perl value encodes as CBOR
@@ -157,13 +193,28 @@ Notes on mapping CBOR to Perl:
 
 =over
 
-=item * CBOR text strings become Perl strings with the internal UTF8 flag set.
-CBOR binary strings become Perl strings I<without> that flag set. This is
-a mostly-internal distinction in Perl that doesn’t actually constitute
-separate byte/character string types, but it’s at least something similar.
+=item * C<decode()> decodes CBOR text strings as UTF-8-decoded Perl strings.
+CBOR binary strings become undecoded Perl strings.
 
-Note that invalid UTF-8 in a CBOR text string is considered
-invalid input and will thus prompt a thrown exception.
+(See L<CBOR::Free::Decoder> and L<CBOR::Free::SequenceDecoder> for more
+character-decoding options.)
+
+Notes:
+
+=over
+
+=item * Invalid UTF-8 in a CBOR text string is usually considered
+invalid input and will thus prompt a thrown exception. (See
+L<CBOR::Free::Decoder> and L<CBOR::Free::SequenceDecoder> if you want
+to tolerate invalid UTF-8.)
+
+=item * You can reliably use C<utf8::is_utf8()> to determine if a given Perl
+string came from CBOR text or binary, but B<ONLY> if you test the scalar as
+it appears in the newly-decoded data structure itself. Generally Perl code
+should avoid C<is_utf8()>, but with CBOR::Free-created strings this limited
+use case is legitimate and potentially gainful.
+
+=back
 
 =item * The only map keys that C<decode()> accepts are integers and strings.
 An exception is thrown if the decoder finds anything else as a map key.

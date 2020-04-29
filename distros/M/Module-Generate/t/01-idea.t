@@ -13,8 +13,9 @@ BEGIN {
 			->begin(sub {
 				$one = 'abc';
 			})
-			->sub('new')
-				->code(sub { return bless {}, $_[0] })
+			->new
+			->accessor('test')
+			->accessor('testing')
 			->sub('one')
 				->code(sub { $one } )
 			->sub('name')
@@ -49,6 +50,9 @@ my $foo = Foo->new;
 
 is($foo->one, 'abc');
 is($foo->name(10, 10), 20);
+is($foo->test, undef);
+ok($foo->test('abc'));
+is($foo->test, 'abc');
 
 use Foo::Bar;
 

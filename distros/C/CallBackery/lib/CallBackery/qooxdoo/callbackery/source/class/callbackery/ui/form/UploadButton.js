@@ -8,19 +8,19 @@ qx.Class.define("callbackery.ui.form.UploadButton", {
     properties: {
       accept: {
         nullable: true,
-        apply : "_applyAttribute",
+        apply : "_applyAttribute"
       },
       capture: {
         nullable: true,
-        apply : "_applyAttribute",
+        apply : "_applyAttribute"
       },
       multiple: {
         nullable: true,
-        apply : "_applyAttribute",
+        apply : "_applyAttribute"
       },
       webkitdirectory: {
         nullable: true,
-        apply : "_applyAttribute",
+        apply : "_applyAttribute"
       }
     },
     members: {
@@ -32,18 +32,19 @@ qx.Class.define("callbackery.ui.form.UploadButton", {
         var id = 'uploadId_'+(idCntr++);
         var input = this.__inputObject 
           = new qx.html.Input("file",{display: 'none'},{id: id});
-        var label = new qx.html.Element("label",{},{for: id});
+        var label = new qx.html.Element("label",{},{'for': id});
         label.addListenerOnce('appear',function(e){
           label.add(input);
           qx.html.Element.flush();
           var inputEl = input.getDomElement();
-          inputEl.addEventListener('change',e => {
-            this.fireDataEvent('changeFileSelection',inputEl.files);
+          var that = this;
+          inputEl.addEventListener('change',function(e){
+            that.fireDataEvent('changeFileSelection',inputEl.files);
             inputEl.value = "";
           });
         },this);
         return label;
-      },
+      }
     }
   });
 

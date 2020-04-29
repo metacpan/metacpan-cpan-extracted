@@ -3,15 +3,23 @@ package Pcore::API::majestic;
 use Pcore -class, -res;
 use Pcore::Util::Scalar qw[is_plain_arrayref];
 use Pcore::Util::Data qw[to_uri from_json];
+use Pcore::HTTP qw[$UA_CHROME_WINDOWS];
 
 has api_key              => ();    # direct access to the API, access is restricted by IP address
 has openapp_access_token => ();    # OpenApp access, user key, identify user
 has openapp_private_key  => ();    # OpenApp access, application vendor key, identify application
 
+# required for bulk_backlink_check
+has username   => ();
+has password   => ();
+has twocaptchs => ();
+
 has max_threads => 3;
 has proxy       => ();
 
 has _semaphore => sub ($self) { Coro::Semaphore->new( $self->{max_threads} ) }, is => 'lazy';
+has _cookies   => sub         { {} };
+has _login => 0;                   # login status, 0 - not logged in, -1 - in progress, 1 - done
 
 sub test ($self) {
     return res $self->get_subscription_info;
@@ -93,6 +101,120 @@ sub get_subscription_info ( $self, %args ) {
     return $res;
 }
 
+# BULK BACKLINK CHECK
+# max. 1M urls
+sub bulk_backlink_check ( $self, $domains, $index = 'fresh' ) {
+    ...;
+
+    $self->_login;
+
+    $domains = [$domains] if !is_plain_arrayref $domains;
+
+    my $boundary = '----WebKitFormBoundaryZuJozWdPKUmeXhrB';
+
+    my $id = P->uuid->v4_str;
+
+    my $data = qq[$boundary\r
+Content-Disposition: form-data; name="file"; filename="$id"\r
+Content-Type: text/plain\r
+\r
+@{[ join( "\n", $domains->@*) . "\n" ]}\r
+$boundary\r
+Content-Disposition: form-data; name="ajaxLoadUrl"\r
+\r
+/reports/downloads/confirm-file-upload/backlinksAjax\r
+$boundary\r
+Content-Disposition: form-data; name="fileType"\r
+\r
+SingleColumn\r
+$boundary\r
+Content-Disposition: form-data; name="IndexDataSource"\r
+\r
+F\r
+$boundary--\r
+];
+
+    my $res = P->http->post(
+        'https://majestic.com/reports/bulk-backlinks-upload',
+        user_agent    => $UA_CHROME_WINDOWS,
+        max_redirects => 0,
+        cookies       => $self->{_cookies},
+        headers       => [
+            Referer        => 'https://majestic.com/reports/bulk-backlink-checker',
+            Origin         => 'https://majestic.com',
+            'Content-Type' => "multipart/form-data; boundary=$boundary",
+        ],
+        data => $data
+
+    );
+
+    return;
+}
+
+sub _login ($self) {
+
+    # already logged in
+    return if $self->{_login} == 1;
+
+    $self->{_login} = -1;
+
+    # get login page
+    my $res = P->http->get(
+        'https://majestic.com/account/login',
+        user_agent => $UA_CHROME_WINDOWS,
+        cookies    => $self->{_cookies},
+    );
+
+    # get captchs image
+    my $captcha = P->http->get(
+        'https://majestic.com/account/login/captcha',
+        user_agent => $UA_CHROME_WINDOWS,
+        cookies    => $self->{_cookies},
+    );
+
+    # resolve captcha
+    $captcha = $self->{twocaptcha}->normal_captcha( $captcha->{data} );
+
+    # login
+    $res = P->http->post(
+        'https://majestic.com/account/login',
+        user_agent => $UA_CHROME_WINDOWS,
+        cookies    => $self->{_cookies},
+        headers    => [                     #
+            'Content-Type' => 'application/x-www-form-urlencoded',
+            Origin         => 'https://majestic.com',
+        ],
+        data => P->data->to_uri( {
+            redirect             => '/reports/bulk-backlink-checker',
+            ruri                 => '/reports/bulk-backlink-checker',
+            forceConcurrentLogin => undef,
+            subscriptionCode     => undef,
+            country              => undef,
+            currency             => undef,
+            term                 => undef,
+            EmailAddress         => $self->{username},
+            Password             => $self->{password},
+            Captcha              => $captcha->{data},
+            CaptchaShown         => 1,
+            RememberMe           => 'on',
+        } )
+    );
+
+    $self->{_login} = 1;
+
+    return;
+}
+
+sub _logout ($self) {
+    if ( $self->{_login} == 1 ) {
+        $self->{_login} = 0;
+
+        $self->{_cookies} = {};
+    }
+
+    return;
+}
+
 # BULK CHECK
 # NOTE max. 100k domains
 # sub bulk_check ( $self, $domains, $cb ) {
@@ -109,7 +231,7 @@ sub get_subscription_info ( $self, %args ) {
 
 #         my $job_id = P->uuid->str;
 
-#         my $body = qq[-----------------------------3733385012218\r\nContent-Disposition: form-data; name=\"file\"; filename="$job_id"\r\nContent-Type: text/plain\r\n\r\n@{[ join( "\n", $domains->@*) . "\n" ]}\r\n-----------------------------3733385012218\r\nContent-Disposition: form-data; name="ajaxLoadUrl"\r\n\r\n/reports/downloads/confirm-file-upload/backlinksAjax\r\n-----------------------------3733385012218\r\nContent-Disposition: form-data; name="fileType"\r\n\r\nSingleColumn\r\n-----------------------------3733385012218\r\nContent-Disposition: form-data; name="IndexDataSource"\r\n\r\nF\r\n-----------------------------3733385012218--\r\n];
+#         my $body = qq[$boundary\r\nContent-Disposition: form-data; name=\"file\"; filename="$job_id"\r\nContent-Type: text/plain\r\n\r\n@{[ join( "\n", $domains->@*) . "\n" ]}\r\n$boundary\r\nContent-Disposition: form-data; name="ajaxLoadUrl"\r\n\r\n/reports/downloads/confirm-file-upload/backlinksAjax\r\n$boundary\r\nContent-Disposition: form-data; name="fileType"\r\n\r\nSingleColumn\r\n$boundary\r\nContent-Disposition: form-data; name="IndexDataSource"\r\n\r\nF\r\n$boundary--\r\n];
 
 #         # send domains
 #         P->http->post(
@@ -249,60 +371,6 @@ sub get_subscription_info ( $self, %args ) {
 #     return;
 # }
 
-# sub _login ( $self, $cb ) {
-
-#     # login is valid for 1 day
-#     if ( $self->{_cookies} && $self->{_cookies_time} + 60 * 60 * 24 > time ) {
-#         $cb->( result 200, $self->{_cookies} );
-#     }
-#     else {
-#         push $self->{_login_requests}->@*, $cb;
-
-#         return if $self->{_login_requests}->@* > 1;
-
-#         state $on_finish = sub ( $self, $res ) {
-#             while ( my $cb = shift $self->{_login_requests}->@* ) {
-#                 AE::postpone { $cb->($res) };
-#             }
-
-#             return;
-#         };
-
-#         my $cookies = {};
-
-#         P->http->post(
-#             'https://majestic.com/account/login',
-#             useragent => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0',
-#             cookies   => $cookies,
-#             headers   => { CONTENT_TYPE => 'application/x-www-form-urlencoded' },
-#             body      => P->data->to_uri( { EmailAddress => $self->{username}, Password => $self->{password}, RememberMe => 1 } ),
-#             on_finish => sub ($res) {
-#                 if ( !$res ) {
-#                     undef $self->{_cookies};
-
-#                     $on_finish->( $self, result [ 500, 'Login error' ] );
-#                 }
-#                 elsif ( $res->decoded_body->$* =~ /in a lot today/sm ) {
-#                     undef $self->{_cookies};
-
-#                     $on_finish->( $self, result [ 500, 'Login error - captcha' ] );
-#                 }
-#                 else {
-#                     $self->{_cookies} = $cookies;
-
-#                     $self->{_cookies_time} = time;
-
-#                     $on_finish->( $self, result 200, $cookies );
-#                 }
-
-#                 return;
-#             }
-#         );
-#     }
-
-#     return;
-# }
-
 sub _req ( $self, $params ) {
     my $guard = $self->{max_threads} && $self->_semaphore->guard;
 
@@ -337,6 +405,20 @@ sub _req ( $self, $params ) {
 }
 
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    3 | 107                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    3 | 117                  | ValuesAndExpressions::ProhibitImplicitNewlines - Literal line breaks in a string                               |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    3 | 208                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_logout' declared but not used      |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

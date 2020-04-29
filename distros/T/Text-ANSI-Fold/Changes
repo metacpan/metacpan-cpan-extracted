@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Fold
 
+1.05 2020-04-28T08:34:30Z
+
+    - Conform to ECMA-48 OPERATING SYSTEM COMMAND string terminator.
+
 1.04 2020-04-03T01:26:58Z
 
     - Conform to ECMA-48 OPERATING SYSTEM COMMAND definition.

@@ -19,6 +19,7 @@ use Data::Dumper;
 use List::Util qw(sum);
 
 our $MINILLA_CHANGES = 1;
+our $NO_WARNINGS = 0;
 
 sub read_unified_2 {
     map {
@@ -60,6 +61,7 @@ sub read_unified_sub {
 }
 
 sub read_unified {
+    # Option: prefix, ORDER, NOWARN
     my $opt = ref $_[0] eq 'HASH' ? shift : {};
     my $FH = shift;
     my $column = @_;
@@ -85,7 +87,9 @@ sub read_unified {
     my @stack = new App::sdif::LabelStack @lsopt;
     while (<$FH>) {
 	if ($prefix) {
-	    s/^\Q$prefix// or warn "Unexpected: $_";
+	    s/^\Q$prefix// or do {
+		warn "Unexpected: $_" unless $NO_WARNINGS;
+	    };
 	    if ($MINILLA_CHANGES) {
 		# Minilla removes single space mark in git commit message.
 		# This is not perfect but mostly works.
@@ -95,7 +99,9 @@ sub read_unified {
 	# `git diff' produces message like this:
 	# "\ No newline at end of file"
 	/^([-+ ]{$mark_length}|\t)/p or do {
-	    warn "Unexpected line: $_" unless /^\\ /;
+	    unless (/^\\ /) {
+		warn "Unexpected line: $_" unless $NO_WARNINGS;
+	    }
 	    next;
 	};
 	my $mark = $1;

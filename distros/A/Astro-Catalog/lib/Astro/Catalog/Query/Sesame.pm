@@ -21,9 +21,10 @@ http://cdsweb.u-strasbg.fr/cdsws.gml for details of the service.
 use strict;
 use warnings;
 use base qw/ Astro::Catalog::Transport::WebService /;
-use vars qw/ $VERSION /;
+use vars qw/ $VERSION $DEBUG /;
 
 use Carp;
+use Data::Dumper;
 use POSIX qw(ceil);
 
 # generic catalog objects
@@ -31,7 +32,8 @@ use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-$VERSION = "4.34";
+$VERSION = "4.35";
+$DEBUG = 0;
 
 =head1 METHODS
 
@@ -195,7 +197,7 @@ sub _parse_query {
   my @result = $self->_dump_raw();
   chomp @result;
 
-  use Data::Dumper; print Dumper( @result );
+  print Dumper( @result ) if $DEBUG;
 
   # Grab Coordinates
   # ----------------

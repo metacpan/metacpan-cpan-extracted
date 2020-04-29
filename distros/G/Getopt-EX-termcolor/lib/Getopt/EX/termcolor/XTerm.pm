@@ -66,7 +66,7 @@ sub osc_command {
 
 use List::Util qw(pairmap);
 
-my %oscPs = pairmap { $b => $a, lc $b => $a } qw(
+my @oscPs_map = qw(
     10 text_foreground
     11 text_background
     12 text_cursor
@@ -78,9 +78,11 @@ my %oscPs = pairmap { $b => $a, lc $b => $a } qw(
     18 Tektronix_cursor
     19 highlight_foreground
     );
+my %oscPs = pairmap { $b => $a, lc $b => $a } @oscPs_map;
+my @oscPs_names = pairmap { $b } @oscPs_map;
 
 sub uncntrl {
-    $_[0] =~ s/([^\040-\176])/sprintf "\\%03o", ord $1/gaer;
+    $_[0] =~ s/([^\040-\176])/sprintf "\\%03o", ord $1/gear;
 }
 
 # OSC Set Text Parameter
@@ -92,7 +94,7 @@ sub osc_stp {
 }
 
 my $osc_st_re = qr/[\a\x9c]|\e\\/;
-my $osc_answer_re = qr/\e\]\d+;(?<answer>[\x08-\x13\x20-\x7d]*)(?:$osc_st_re)/;
+my $osc_answer_re = qr/\e\]\d+;(?<answer>[\x08-\x13\x20-\x7d]*)$osc_st_re/;
 
 sub osc_answer {
     @_ or return;
@@ -121,12 +123,12 @@ sub ask {
 	$answer .= $key;
 	last if $answer =~ /$osc_st_re\z/;
     }
+    ReadMode "restore", $tty;
     if ($debug) {
 	printf STDERR "[%s] Answer:  %s\n",
 	    __PACKAGE__,
 	    uncntrl $answer;
     }
-    ReadMode "restore", $tty;
     return $answer;
 }
 
@@ -144,22 +146,10 @@ sub color_rgb {
 do { test() } if __FILE__ eq $0;
 
 sub test {
-    my @name = qw(
-	  text_foreground
-	  text_background
-	  text_cursor
-	  mouse_foreground
-	  mouse_background
-	  Tektronix_foreground
-	  Tektronix_background
-	  highlight_background
-	  Tektronix_cursor
-	  highlight_foreground
-	);
     local $Data::Dumper::Indent = 1;
     local $Data::Dumper::Terse = 1;
-    my $max = max map { length } @name;
-    for my $name (@name) {
+    my $max = max map { length } @oscPs_names;
+    for my $name (@oscPs_names) {
 	my @rgb = color_rgb($name);
 	printf "%*s: %s",
 	    $max, $name,

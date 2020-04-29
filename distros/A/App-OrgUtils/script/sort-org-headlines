@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.496
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-18'; # DATE
+our $DATE = '2020-04-27'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.476'; # VERSION
+our $VERSION = '0.477'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,13 +38,15 @@ sort-org-headlines -
 
 =head1 VERSION
 
-This document describes version 0.476 of sort-org-headlines (from Perl distribution App-OrgUtils), released on 2020-04-18.
+This document describes version 0.477 of sort-org-headlines (from Perl distribution App-OrgUtils), released on 2020-04-27.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % sort-org-headlines [options] [file]
+ % sort-org-headlines [-A key=s] [-S=s] [--format=name] [--json]
+     [--level=s] [--(no)naked-res] [--page-result[=program]]
+     [--sort-args-json=s] [--sort-args key=s] [--sort-sub=s] [file]
 
 =head1 OPTIONS
 

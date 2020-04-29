@@ -770,6 +770,8 @@ setup_my_cxt(pTHX_ pMY_CXT){
     MY_CXT.tc_extra_args = NULL;
 }
 
+XSPROTO(boot_Type__Tiny__XS__Util);
+
 #define DEFINE_TC(name) typetiny_tc_generate(aTHX_ "Type::Tiny::XS::" STRINGIFY(name), CAT2(typetiny_tc_, name), NULL)
 
 #define MTC_CLASS "Type::Tiny::XS::TC"
@@ -782,6 +784,7 @@ VERSIONCHECK: DISABLE
 BOOT:
 {
     MY_CXT_INIT;
+    PUSHMARK(MARK);
     boot_Type__Tiny__XS__Util(aTHX_ cv);
     setup_my_cxt(aTHX_ aMY_CXT);
     

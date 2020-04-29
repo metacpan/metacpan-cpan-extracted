@@ -5,7 +5,7 @@ use warnings;
 use 5.008001;
 
 ## No version.pm for this one, as the prereqs are not loaded yet.
-my $VERSION = '3.11.0';
+my $VERSION = '3.11.1';
 
 ## App::Info is stored inside t/lib
 ## Create a proper path so we can use it below
@@ -339,7 +339,7 @@ MAKE_SPLINT
 
 fulltest: RELEASE_TESTING=1
 fulltest: AUTHOR_TESTING=1
-fulltest :: $(TEST_TYPE)
+fulltest: $(TEST_TYPE)
 	$(NOECHO) $(NOOP)
 
 MAKE_FULLTEST

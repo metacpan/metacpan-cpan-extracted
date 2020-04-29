@@ -24,7 +24,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST;
-$RT::Client::REST::VERSION = '0.56';
+$RT::Client::REST::VERSION = '0.57';
 use Error qw(:try);
 use HTTP::Cookies;
 use HTTP::Request::Common;
@@ -872,7 +872,7 @@ sub _version { $RT::Client::REST::VERSION }
     # The problem with the second approach is that it creates unrelated
     # methods in RT::Client::REST namespace.
     package RT::Client::REST::NoopLogger;
-$RT::Client::REST::NoopLogger::VERSION = '0.56';
+$RT::Client::REST::NoopLogger::VERSION = '0.57';
 sub new { bless \(my $logger), __PACKAGE__ }
     for my $method (RT::Client::REST::LOGGER_METHODS) {
         no strict 'refs'; ## no critic (ProhibitNoStrict)
@@ -894,7 +894,7 @@ RT::Client::REST - Client for RT using REST API
 
 =head1 VERSION
 
-version 0.56
+version 0.57
 
 =head1 SYNOPSIS
 
@@ -1355,7 +1355,7 @@ SRVSH
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Dmitri Tikhonov.
+This software is copyright (c) 2020 by Dmitri Tikhonov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

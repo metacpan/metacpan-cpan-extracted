@@ -8,6 +8,11 @@
 *json.jsony-load.yaml == *json.json-decode.yaml
 
 
+=== Single word
+--- jsony: foo
+--- json: [ "foo" ]
+
+
 === String splitting 1
 --- jsony: foo bar baz
 --- json: [ "foo", "bar", "baz" ]
@@ -214,3 +219,8 @@ baz: 42
 --- jsony
 [] {} 42
 --- json: [[], {}, 42]
+
+
+=== List of nodes
+--- jsony: [foo bar] baz
+--- json: [["foo", "bar"], "baz"]

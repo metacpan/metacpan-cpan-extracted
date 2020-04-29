@@ -43,9 +43,9 @@ dedicated to L<Message::Passing::Output::WebHooks>.
 If you want a more complex example, rather than just overriding some of the functionality from
 the default script, then you're better off writing your own script.
 
-See L<Message::Passing:Role::Script>, for a basic role you are likely to want to use to do this.
+See L<Message::Passing::Role::Script>, for a basic role you are likely to want to use to do this.
 You'll also want to use L<Message::Passing::DSL>, as shown in the example documentation for
-the script role..
+the script role.
 
 If you are writing your own script, want some components to be completely configurable
 (as per the default script), then see L<Message::Passing::Role::CLIComponent>, which
@@ -75,11 +75,11 @@ appends C<Encoder::> or C<Decoder::> to the standard filter prefix.
 =head1 Writing Inputs and Outputs
 
 The interface for both inputs and outputs is conceptually very simple, however there are
-some gotchas to watch out for which are described below.
+some gotchas to watch out for... which are described below.
 
 =head2 Use common attributes.
 
-Please try to keep the names of your component's attributes in keeping with the other
+Please try to keep the names of your component's attributes coping with the other
 inputs and outputs in the framework.
 
 To help with this, a number of simple roles with attributes you may want are included in
@@ -95,7 +95,7 @@ the distribution:
 
 =head2 MUST by asynchronous.
 
-Your input or output B<MUST NOT> block in the course of it's normal operation. You should use L<AnyEvent>
+Your input or output B<MUST NOT> block in the course of its normal operation. You should use L<AnyEvent>
 to make your input or output asynchronous.
 
 If you are trying to convert a synchronous module into being an input, then you can often make it
@@ -116,7 +116,7 @@ Roles are provided to help component authors with this, please see the documenta
 
 =item L<Message::Passing::Role::HasAConnection> - for your component
 
-=item L<Message::Passing::Role::ConnectionManager> - to implement your connection manager.
+=item L<Message::Passing::Role::ConnectionManager> - to implement your connection manager
 
 =back
 

@@ -1,16 +1,13 @@
 package PYX::SGML::Raw;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use PYX::Parser;
 use PYX::Utils qw(encode entity_encode);
 
-# Version.
-our $VERSION = 0.02;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -61,6 +58,12 @@ sub parse_file {
 sub parse_handler {
 	my ($self, $input_file_handler, $out) = @_;
 	$self->{'pyx_parser'}->parse_handler($input_file_handler, $out);
+	return;
+}
+
+sub finalize {
+	my $self = shift;
+	_end_of_start_tag($self->{'pyx_parser'});
 	return;
 }
 
@@ -144,18 +147,22 @@ PYX::SGML::Raw - Processing PYX data or file and write as SGML.
 =head1 SYNOPSIS
 
  use PYX::SGML::Raw;
+
  my $obj = PYX::SGML::Raw->new(%parameters);
  $obj->parse($pyx, $out);
  $obj->parse_file($input_file, $out);
  $obj->parse_handle($input_file_handler, $out);
+ $obj->finalize;
 
-=head1 SUBROUTINES
+=head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new()>
+ my $obj = PYX::SGML::Raw->new(%parameters);
 
- Constructor.
+Constructor.
+
+Returns instance of object.
 
 =over 8
 
@@ -166,28 +173,43 @@ PYX::SGML::Raw - Processing PYX data or file and write as SGML.
 
 =back
 
-=item C<parse($pyx[, $out])>
+=head2 C<parse>
 
- Parse PYX text or array of PYX text.
- Output is serialization to SGML.
- If $out not present, use 'output_handler'.
- Returns undef.
+ $obj->parse($pyx, $out);
 
-=item C<parse_file($input_file[, $out])>
+Parse PYX text or array of PYX text.
+Output is serialization to SGML.
+If $out not present, use 'output_handler'.
 
- Parse file with PYX data.
- Output is serialization to SGML.
- If $out not present, use 'output_handler'.
- Returns undef.
+Returns undef.
 
-=item C<parse_handler($input_file_handler[, $out])>
+=head2 C<parse_file>
 
- Parse PYX handler.
- Output is serialization to SGML.
- If $out not present, use 'output_handler'.
- Returns undef.
+ $obj->parse_file($input_file, $out);
 
-=back
+Parse file with PYX data.
+Output is serialization to SGML.
+If $out not present, use 'output_handler'.
+
+Returns undef.
+
+=head2 C<parse_handler>
+
+ $obj->parse_handle($input_file_handler, $out);
+
+Parse PYX handler.
+Output is serialization to SGML.
+If $out not present, use 'output_handler'.
+
+Returns undef.
+
+=head2 C<finalize>
+
+ $obj->finalize;
+
+Finalize opened tags, if exists.
+
+Returns undef.
 
 =head1 ERRORS
 
@@ -197,11 +219,9 @@ PYX::SGML::Raw - Processing PYX data or file and write as SGML.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use PYX::SGML::Raw;
 
  # Input.
@@ -237,17 +257,24 @@ Install the PYX modules.
 
 =back
 
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/PYX-SGML-Raw>
+
 =head1 AUTHOR
 
-Michal Špaček L<skim@cpan.org>.
+Michal Josef Špaček L<skim@cpan.org>.
+
+L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2011-2015 Michal Špaček
- BSD 2-Clause License
+© 2011-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.04
 
 =cut

@@ -14,7 +14,7 @@ use urpm::md5sum;
 # perl_checker: require urpm::media
 # perl_checker: require urpm::parallel
 
-our $VERSION = 'v8.121.13';
+our $VERSION = 'v8.122';
 our @ISA = qw(URPM Exporter);
 our @EXPORT_OK = ('file_from_local_url', 'file_from_local_medium', 'is_local_medium');
 
@@ -34,6 +34,8 @@ urpm - Mageia perl tools to handle the urpmi database
 
 C<urpm> is used by urpmi executables to manipulate packages and media
 on a Mageia Linux distribution.
+
+It rely on L<URPM> for the lower level librpm bindings.
 
 =head2 The urpm class
 
@@ -599,6 +601,10 @@ sub DESTROY {}
 
 The L<URPM> package is used to manipulate at a lower level synthesis and rpm
 files.
+
+The L<rpmtools> package provides commands to generate synthesis and hdlist
+files (as well as other metadata): L<genhdlist2> and L<gendistrib> (a
+gendhlist2 wrapper handling a whole media set) from L<rpmtools> package.
 
 See also submodules: L<gurpmi>, L<urpm::args>, L<urpm::bug_report>,
 L<urpm::cdrom>, L<urpm::cfg>, L<urpm::download>, L<urpm::get_pkgs>,

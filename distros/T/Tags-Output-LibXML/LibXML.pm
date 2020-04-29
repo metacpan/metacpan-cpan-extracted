@@ -1,11 +1,9 @@
 package Tags::Output::LibXML;
 
-# Pragmas.
 use base qw(Tags::Output);
 use strict;
 use warnings;
 
-# Modules.
 use Error::Pure qw(err);
 use Readonly;
 use XML::LibXML;
@@ -13,8 +11,7 @@ use XML::LibXML;
 # Constants.
 Readonly::Scalar my $EMPTY_STR => q{};
 
-# Version.
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Flush tags in object.
 sub flush {
@@ -214,6 +211,7 @@ __END__
 =head1 SYNOPSIS
 
  use Tags::Output::LibXML;
+
  my $tags = Tags::Output::LibXML->new(%parameters);
  $tags->put(['b', 'element']);
  my @open_tags = $tags->open_tags;
@@ -332,11 +330,9 @@ __END__
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Tags::Output::LibXML;
 
  # Object.
@@ -358,11 +354,9 @@ __END__
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Encode;
  use Tags::Output::LibXML;
 
@@ -419,17 +413,24 @@ Install the Tags modules.
 
 =back
 
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/Tags-Output-LibXML>
+
 =head1 AUTHOR
 
-Michal Špaček L<skim@cpan.org>
+Michal Josef Špaček L<skim@cpan.org>
+
+L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2011-2015 Michal Špaček
- BSD 2-Clause License
+© 2011-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

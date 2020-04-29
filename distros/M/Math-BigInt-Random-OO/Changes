@@ -1,45 +1,56 @@
--*- mode: change-log -*-
+0.04 2020-04-28
 
-Revision history for Perl extension Math::BigInt::Random::OO.
+ - Fix CPAN RT #81931 (thanks to DANAJ).
 
-0.03  Sat Feb 20 11:38:41 2010
+ - New MANIFEST.SKIP file based on the template in the ExtUtils-Manifest
+   distribution.
 
-        - OO.pm: Catch the case when a parameter is undef.
+ - Add more test files and update existing test files.
 
-        - Makefile.PL: Changed required version of Perl to 5.008.
+ - Add MANIFEST.SKIP file.
 
-        - README: Clean up the file.
+ - Format CHANGES according to CPAN::Changes::Spec.
 
-        - OO.pm: POD is now ASCII. The podlators aren't ready for UTF-8.
+ - Miscellaneous "cosmetic" changes.
 
-        - OO.pm: Corrected URL for 'CPAN Testers PASS Matrix' and removed
-        links to AnnoCPAN (http://annocpan.org).
+0.03  2010-02-20
 
-        - OO.pm: Cleaned up and extended comments in the NOTES section.
+ - OO.pm: Catch the case when a parameter is undef.
 
-        - OO.pm: Added missing POD escapes, E<...>.
+ - Makefile.PL: Changed required version of Perl to 5.008.
 
-        - OO.pm: Explicitly set POD encoding with '=encoding utf8'.
+ - README: Clean up the file.
 
-        - OO.pm, README: Incremented version number.
+ - OO.pm: POD is now ASCII. The podlators aren't ready for UTF-8.
 
-0.02  Fri Feb 19 15:44:42 2010
+ - OO.pm: Corrected URL for 'CPAN Testers PASS Matrix' and removed
+   links to AnnoCPAN (http://annocpan.org).
 
-        - 12-length-base.t: Rewritten so it doesn't use the 'subtest'
-        function, which was introduced in Test::More 0.94.
+ - OO.pm: Cleaned up and extended comments in the NOTES section.
 
-        - *.t: Better comments in the code.
+ - OO.pm: Added missing POD escapes, E<...>.
 
-        - *.t: Using UTF-8 in all files.
+ - OO.pm: Explicitly set POD encoding with '=encoding utf8'.
 
-        - OO.pm: Removed unused package global variable $base.
+ - OO.pm, README: Incremented version number.
 
-        - OO.pm: Corrected e-mail address, updated web links, and included
-        a few more web links in the BUGS and SUPPORT sections of the POD.
+0.02 2010-02-19
 
-        - OO.pm, README: Incremented version number.
+ - 12-length-base.t: Rewritten so it doesn't use the 'subtest'
+   function, which was introduced in Test::More 0.94.
 
-0.01  Thu Jan 21 19:43:17 2010
+ - *.t: Better comments in the code.
 
-        - Original version; created by h2xs 1.23 with options
-                -AX --skip-exporter --use-new-tests -n Math::BigInt::Random::OO
+ - *.t: Using UTF-8 in all files.
+
+ - OO.pm: Removed unused package global variable $base.
+
+ - OO.pm: Corrected e-mail address, updated web links, and included
+   a few more web links in the BUGS and SUPPORT sections of the POD.
+
+ - OO.pm, README: Incremented version number.
+
+0.01 2010-01-21
+
+ - Original version; created by h2xs 1.23 with options
+       -AX --skip-exporter --use-new-tests -n Math::BigInt::Random::OO

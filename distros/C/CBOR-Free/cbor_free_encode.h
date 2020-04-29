@@ -19,6 +19,16 @@
 // there as well as in HeUTF8().
 #define CBF_HeUTF8(h_entry) (HeUTF8(h_entry) || (!HeSVKEY(h_entry) && HeKWASUTF8(h_entry)))
 
+enum cbf_string_encode_mode {
+    CBF_STRING_ENCODE_SV,     // i.e., is text == SvUTF8
+    CBF_STRING_ENCODE_UNICODE,
+    CBF_STRING_ENCODE_UTF8,
+    CBF_STRING_ENCODE_OCTETS,
+
+    // ----------------------------------------------------------------------
+    CBF_STRING_ENCODE__LIMIT,
+};
+
 typedef struct {
     STRLEN buflen;
     STRLEN len;
@@ -29,6 +39,7 @@ typedef struct {
     bool is_canonical;
     bool text_keys;
     bool encode_scalar_refs;
+    enum cbf_string_encode_mode string_encode_mode;
 } encode_ctx;
 
 struct sortable_hash_entry {
@@ -40,7 +51,7 @@ struct sortable_hash_entry {
 
 SV * cbf_encode( pTHX_ SV *value, encode_ctx *encode_state, SV *RETVAL );
 
-encode_ctx cbf_encode_ctx_create( uint8_t flags );
+encode_ctx cbf_encode_ctx_create( uint8_t flags, enum cbf_string_encode_mode );
 
 void cbf_encode_ctx_free_reftracker( encode_ctx* encode_state );
 void cbf_encode_ctx_free_all( encode_ctx* encode_state );

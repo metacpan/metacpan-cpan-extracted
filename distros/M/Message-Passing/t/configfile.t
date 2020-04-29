@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More 0.88;
 use File::Temp qw/ tempdir /;
-use JSON qw/ encode_json decode_json /;
+use JSON::MaybeXS qw/ encode_json decode_json /;
 use File::Spec;
 
 my $dir = tempdir( CLEANUP => 1 );
@@ -35,4 +35,3 @@ is_deeply $i->input_options, {
     };
 
 done_testing;
-

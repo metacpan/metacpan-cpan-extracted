@@ -18,7 +18,7 @@ There are only three types of components:
 =head2 OUTPUTS
 
 An output is simply a class with a C<consume> method. This will be called with a message
-as it's only parameter, like this:
+as its only parameter, like this:
 
     $output->consume($message);
 
@@ -27,7 +27,7 @@ Outputs are expected to compose L<Message::Passing::Role::Output>.
 =head2 INPUTS
 
 An input is simply a class with an C<output_to> attribute. Your code just calls the consume
-method on it's output, like this:
+method on its output, like this:
 
     $self->output_to->consume($message);
 
@@ -63,7 +63,7 @@ However, you can write a filter manually as:
         $self->output_to->consume($message);
     }
 
-As you've hopefully guessed now, a C<chain> is just an input, outputting to zero or more filters, which output to
+As you've hopefully guessed by now, a C<chain> is just an input, outputting to zero or more filters, which output to
 an output.
 
 =head1 DSL

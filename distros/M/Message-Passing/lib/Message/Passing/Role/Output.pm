@@ -1,6 +1,5 @@
 package Message::Passing::Role::Output;
 use Moo::Role;
-use JSON qw/ to_json /;
 use Scalar::Util qw/ blessed /;
 #use namespace::clean -except => 'meta';
 

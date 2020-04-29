@@ -1,13 +1,14 @@
 package Web::Microformats2::Parser;
 
-use Moose;
-use MooseX::Types::URI qw(Uri);
+use Moo;
+use Types::Standard qw(InstanceOf);
 use HTML::TreeBuilder::XPath;
 use HTML::Entities;
 use v5.10;
-use Scalar::Util;
+use Scalar::Util qw(blessed);
 use JSON;
 use DateTime::Format::ISO8601;
+use URI;
 use Carp;
 
 use Web::Microformats2::Item;
@@ -17,8 +18,8 @@ use Readonly;
 
 has 'url_context' => (
     is => 'rw',
-    isa => Uri,
-    coerce => 1,
+    isa => InstanceOf['URI'],
+    coerce => sub { URI->new( $_[0] ) },
     lazy => 1,
     clearer => '_clear_url_context',
     default => sub { URI->new( 'http://example.com/' ) },

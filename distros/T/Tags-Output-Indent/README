@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use Tags::Output::Indent(%params);
+
      my $tags = Tags::Output::Indent->new;
      $tags->put(['b', 'tag']);
      my @open_tags = $tags->open_tags;
@@ -173,11 +174,9 @@ ERRORS
      In XML mode must be a attribute value.
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Tags::Output::Indent;
 
      # Object.
@@ -212,13 +211,19 @@ SEE ALSO
     Task::Tags
         Install the Tags modules.
 
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Tags-Output-Indent>
+
 AUTHOR
-    Michal Špaček skim@cpan.org
+    Michal Josef Špaček skim@cpan.org
+
+    <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2011-2016 Michal Špaček
-     BSD 2-Clause License
+    © 2011-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.05
+    0.06
 

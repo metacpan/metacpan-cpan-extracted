@@ -13,9 +13,9 @@ my $open  = 0;
 my $close = 0;
 my $id = Mojo::IOLoop->server(address => '127.0.0.1', sub {
   my (undef, $stream, $id) = @_;
-  $open++;
   $stream->on(read  => sub { $read .= $_[1]; $e->emit(read => $read); });
   $stream->on(close => sub { $close++ });
+  $e->emit(open => ++$open);
 });
 my $port = Mojo::IOLoop->acceptor($id)->port;
 
@@ -59,15 +59,22 @@ subtest 'fork safety' => sub {
   is $open, 1, 'opened once';
 
   local $$ = -23;
-  $graphite->connect->then(sub{ $new = shift })->wait;
+  my $p = Mojo::Promise->new->timeout(5);
+  $p->catch(sub{ fail 'Timeout!' });
+  $p->finally(sub{ Mojo::IOLoop->stop });
+  $e->once(open => sub { $p->resolve });
+
+  $graphite->connect->then(sub{ $new = shift });
+  Mojo::IOLoop->start;
+
   isnt $old, $new, 'new connection';
   is $open, 2, 'reopened';
 };
 
 $read = '';
 subtest 'preprocess' => sub {
-  no warnings 'once';
-  local *CORE::GLOBAL::time = sub { $time };
+  no warnings 'redefine';
+  local *Mojo::Graphite::Writer::_time = sub () { $time };
   $e->on(read => sub { Mojo::IOLoop->stop });
   $graphite->write(
     ['c.one', 1], # default time
@@ -78,6 +85,7 @@ subtest 'preprocess' => sub {
   Mojo::IOLoop->start;
   is $read, "c.one 1 $time\nc.two;baz=bat;foo=bar 2 $time\nc.three;baz=bat;foo=bar 3 $time\nc.four;null=;what=this_that 4 $time\n", 'expected write';
 };
+
 
 done_testing;
 

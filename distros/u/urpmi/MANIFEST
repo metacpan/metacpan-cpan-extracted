@@ -411,6 +411,8 @@ t/data/SPECS/various-debug.spec
 t/data/SPECS/various.spec
 t/data/SPECS/various2.spec
 t/data/SPECS/various3.spec
+t/gendistrib
+t/genhdlist2
 t/helper.pm
 t/pod.t
 t/README

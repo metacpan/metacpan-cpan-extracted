@@ -2,22 +2,14 @@
 
 use strict;
 use lib '.', 't';
-use helper;
 use Config;
-use Cwd;
-use File::Basename 'dirname';
-use List::Util 'uniq';
+use helper;
 use Test::More 'no_plan';
+use Cwd;
 
-# help CPAN testers who installed genhdlist2 using cpan but do not have /usr/local/bin in their PATH:
-$ENV{PATH} .= ":/usr/local/bin:$Config{bin}";
+set_path();
 
-# help when CPAN testers have not genhdlist2 installed but do have built rpmtools:
-$ENV{PATH} .= join(':', uniq(map {
-	my $blib_script = dirname($_) . "/script";
-	-d $blib_script ? $blib_script : ();
-	} split(':', $ENV{PERL5LIB})));
-warn ">> Final PATH is $ENV{PATH}\n";
+warn ">> RPM version is: ", `LC_ALL=C rpm --version`, "\n";
 
 chdir 't' if -d 't';
 system('rm -rf tmp media');
@@ -26,19 +18,20 @@ foreach (qw(media tmp tmp/BUILD tmp/RPMS tmp/RPMS/noarch tmp/SRPMS)) {
 }
 my $genhdlist2 = 'genhdlist2 --xml-info';
 
-my $whereis_genhdlist2 = qx(whereis genhdlist2);
-ok("whereis genhdlist2", "genhdlist2 emplacement= $whereis_genhdlist2");
-warn ">> genhdlist2: $whereis_genhdlist2\n";
-warn ">> FAILED TO FIND genhdlist2\n" if !$whereis_genhdlist2;
+my $whereis_genhdlist2 = qx(whereis -b genhdlist2);
+$whereis_genhdlist2 =~ s/^genhdlist2:\s+//;
+ok("whereis genhdlist2", "genhdlist2 emplacement=$whereis_genhdlist2");
 
 # check that genhdlist2 actually works:
 my $dir = "genhdlist2-test";
 mkdir($dir);
 my $out = `genhdlist2 $dir 2>&1`;
 chomp($out);
-my $expected = "no *.rpm found in $dir (use --allow-empty-media?)";
-is($out, $expected, "genhdlist2 works");
-warn ">> genhdlist test output=<<$out>>\n" if $out ne $expected;
+is($out, "no *.rpm found in $dir (use --allow-empty-media?)", "genhdlist2 works");
+$out = `genhdlist2 --help 2>&1`;
+chomp($out);
+my ($first) = split(/\n/, $out);
+is($first, "Usage:", "genhdlist2 --help works");
 
 # locally build test rpms
 
@@ -50,6 +43,8 @@ foreach my $dir (grep { -d $_ } glob("data/SPECS/*")) {
 }
 
 foreach my $spec (glob("data/SPECS/*.spec")) {
+    warn "SKIPPING /rpm-query-in-scriptlet/" if $spec =~ /rpm-query-in-scriptlet/ && $Config{archname} =~ /bsd/;
+    next if $spec =~ /rpm-query-in-scriptlet/ && $Config{archname} =~ /bsd/;
     my $name = rpmbuild($spec);
 
     if ($name eq 'various') {
@@ -91,7 +86,11 @@ sub rpmbuild {
 
     my $dir = getcwd();
     my ($target) = $spec =~ m!-(i586|x86_64)\.spec$!;
-    system_("rpmbuild --quiet --define 'rpm_version %(rpm -q --queryformat \"%{VERSION}\" rpm|sed -e \"s/\\\\.//g\")' --define '_topdir $dir/tmp' --define '_tmppath $dir/tmp' -bb --clean --nodeps ".($target ? "--target $target" : "")." $spec");
+    $target = $target ? "--target $target" : '';
+    # unsetting %__os_install_post fixes failure to build on FreeBSD:
+    my $nopost = " --define '__os_install_post %nil'";
+    my $rpmv = "--define 'rpm_version %(rpm -q --queryformat \"%{VERSION}\" rpm|sed -e \"s/\\\\.//g\")' ";
+    system_("rpmbuild --quiet $rpmv --define '_topdir $dir/tmp' --define '_tmppath $dir/tmp' -bb --clean --nodeps $nopost $target $spec");
 
     my ($name) = $spec =~ m!([^/]*)\.spec$!;
 

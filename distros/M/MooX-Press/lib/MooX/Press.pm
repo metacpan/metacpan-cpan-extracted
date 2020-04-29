@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.060';
+our $VERSION   = '0.061';
 
 use Types::Standard 1.010000 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -1452,7 +1452,7 @@ sub install_methods {
 			$callcode = 'goto $code';
 		}
 		else {
-			($callcode = $code) =~ s/\A \s* sub \s* \{ (.+) \} \s*/$1/x;
+			($callcode = $code) =~ s/\A \s* sub \s* \{ (.+) \} \s* \z/$1/xs;
 			$callcode = "package $caller; $callcode" if defined $caller;
 		}
 		

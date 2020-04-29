@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Linux::LXC;
-$Linux::LXC::VERSION = '1.0004';
+$Linux::LXC::VERSION = '1.0005';
 
 use v5.0;
 
@@ -174,7 +174,7 @@ sub put {
 		my $abs_folder = '';
 		while (my $cur_folder = shift @folders) {
 			$abs_folder .= '/' . $cur_folder;
-			if (!-d $abs_folder) {
+			if (!-x $abs_folder) {
 				`mkdir $abs_folder`;
 				`chown $uid:$uid $abs_folder`;
 			}

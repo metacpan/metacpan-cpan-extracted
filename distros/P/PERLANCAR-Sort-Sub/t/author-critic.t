@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/PERLANCAR/Sort/Sub.pm','lib/Sort/Sub/changes_group_ala_perlancar.pm','lib/Sort/Sub/prereq_ala_perlancar.pm'];
+my $filenames = ['lib/PERLANCAR/Sort/Sub.pm','lib/Sort/Sub/changes_group_ala_perlancar.pm','lib/Sort/Sub/pod_sections_ala_perlancar.pm','lib/Sort/Sub/prereq_ala_perlancar.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

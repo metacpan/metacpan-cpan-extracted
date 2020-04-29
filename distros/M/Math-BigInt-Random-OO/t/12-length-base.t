@@ -1,25 +1,9 @@
-#!/usr/bin/perl
-#
-# Author:      Peter J. Acklam
-# Time-stamp:  2010-02-20 00:01:05 +01:00
-# E-mail:      pjacklam@cpan.org
-# URL:         http://home.online.no/~pjacklam
+#!perl
 
-########################
-
-use 5.008;              # required version of Perl
-use strict;             # restrict unsafe constructs
-use warnings;           # control optional warnings
-use utf8;               # enable UTF-8 in source code
-
-########################
+use strict;
+use warnings;
 
 local $| = 1;                   # disable buffering
-
-#BEGIN {
-#    chdir 't' if -d 't';
-#    unshift @INC, '../lib';     # for running manually
-#}
 
 use Math::BigInt::Random::OO;
 
@@ -145,8 +129,3 @@ for my $base (2, 4, 8, 10, 16, 25, 36) {
         }
     }
 }
-
-# Emacs Local Variables:
-# Emacs coding: utf-8-unix
-# Emacs mode: perl
-# Emacs End:

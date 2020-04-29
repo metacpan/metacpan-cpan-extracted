@@ -10,7 +10,7 @@ use Scalar::Util ();
 
 use parent 'Data::Object::Kind';
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 
 state $TrueVal = 1;
 state $TrueRef = \$TrueVal;

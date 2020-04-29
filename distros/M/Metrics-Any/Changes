@@ -1,0 +1,18 @@
+Revision history for Metrics-Any
+
+0.03    2020-04-29
+        [CHANGES]
+         * Support and encourage hierarchial metric names to be specified by
+           arrayrefs of string parts
+         * Suggest `units` parameter to ->make_counter
+         * Give Collector a boolean overload making it appear false if it has
+           the Null adapter
+
+0.02    2020-04-28
+        [CHANGES]
+         * Add new metric types: distribution, gauge, timer
+         * Pass additional arguments from `use Metrics::Any::Adapter`
+           statement into adapter constructor
+
+0.01    2020-04-27
+        First version, released on an unsuspecting world.

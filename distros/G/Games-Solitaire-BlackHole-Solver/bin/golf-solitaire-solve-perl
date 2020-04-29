@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Games::Solitaire::BlackHole::Solver::Golf::App;
+use Games::Solitaire::BlackHole::Solver::Golf::App ();
 
 Games::Solitaire::BlackHole::Solver::Golf::App->new->run;
 
@@ -19,7 +19,7 @@ golf-solitaire-solve-perl - a solver for Golf Solitaire deals.
 
 =head1 VERSION
 
-version 0.4.0
+version 0.4.1
 
 =head1 SYNOPSIS
 

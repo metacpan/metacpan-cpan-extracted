@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = "1.04";
+our $VERSION = "1.05";
 
 use Carp;
 use Text::VisualWidth::PP 'vwidth';
@@ -34,7 +34,7 @@ my $control_re  = qr{
     # see ECMA-48 8.3.89 OSC - OPERATING SYSTEM COMMAND
     \e \]			# osc
     [\x08-\x13\x20-\x7d]*+	# command
-    \e \\			# st
+    (?: \e\\ | \x9c | \a )	# st: string terminator
 }x;
 
 use constant SGR_RESET => "\e[m";
@@ -658,7 +658,7 @@ ANSI escape code definition.
 Requirements for Japanese Text Layout,
 W3C Working Group Note 3 April 2012
 
-=item <http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-048.pdf>
+=item L<http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-048.pdf>
 
 Control Functions for Coded Character Sets
 

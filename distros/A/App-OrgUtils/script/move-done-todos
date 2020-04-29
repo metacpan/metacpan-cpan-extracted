@@ -168,13 +168,15 @@ move-done-todos - Move done todos from one Org file to another
 
 =head1 VERSION
 
-This document describes version 0.476 of move-done-todos (from Perl distribution App-OrgUtils), released on 2020-04-18.
+This document describes version 0.477 of move-done-todos (from Perl distribution App-OrgUtils), released on 2020-04-27.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % move-done-todos [options] <undone_file> [done_file]
+ % move-done-todos [--config-path=path | -c] [--config-profile=profile |
+     -P] [--format=name] [--json] [--(no)naked-res] [--no-config | -C]
+     [--no-env] [--page-result[=program]] <undone_file> [done_file]
 
 =head1 DESCRIPTION
 

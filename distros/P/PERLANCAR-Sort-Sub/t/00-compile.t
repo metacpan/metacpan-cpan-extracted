@@ -6,11 +6,12 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'PERLANCAR/Sort/Sub.pm',
     'Sort/Sub/changes_group_ala_perlancar.pm',
+    'Sort/Sub/pod_sections_ala_perlancar.pm',
     'Sort/Sub/prereq_ala_perlancar.pm'
 );
 

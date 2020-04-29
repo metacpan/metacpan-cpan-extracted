@@ -300,7 +300,7 @@ for my $t (@incompletes) {
         "incomplete: $label (lack: $lack)",
     );
 
-    like( $@->get_message(), qr<$lack>, "… and the error says “$lack”" );
+    like( $@->get_message(), qr<[^0-9] $lack [^0-9]>x, "… and the error says “$lack”" );
 }
 
 done_testing;

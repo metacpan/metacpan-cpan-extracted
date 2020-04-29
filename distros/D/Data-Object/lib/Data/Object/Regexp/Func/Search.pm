@@ -14,7 +14,7 @@ use Data::Object::Search;
 
 extends 'Data::Object::Regexp::Func';
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 
 # BUILD
 

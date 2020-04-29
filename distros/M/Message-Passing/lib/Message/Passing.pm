@@ -8,7 +8,7 @@ use MooX::Options flavour => [qw( pass_through )], protect_argv => 0;
 use namespace::clean -except => [qw/ meta new_with_options parse_options _options_data _options_config/];
 use 5.008004;
 
-our $VERSION = '0.116';
+our $VERSION = '0.117';
 $VERSION = eval $VERSION;
 
 around 'parse_options' => sub {
@@ -132,14 +132,14 @@ application log file, or push the logs into Elasticsearch.
 There are a growing set of components you can plug together
 to make your solution.
 
-Getting started is really easy - you can just use the C<message-passing>
+Getting started is really easy - you can just use the C<message-pass>
 command installed by the distribution. If you have a common config
 that you want to repeat, or you want to write your own server
 which does something more flexible than the normal script allows,
 then see L<Message::Passing::DSL>.
 
 To dive straight in, see the documentation for the command line utility
-L<message-passing>, and see the examples in L<Message::Passing::Manual::Cookbook>.
+L<message-pass>, and see the examples in L<Message::Passing::Manual::Cookbook>.
 
 For more about how the system works, see L<Message::Passing::Manual::Concepts>.
 
@@ -227,7 +227,7 @@ Outputs send data to somewhere, i.e. they consume messages.
 
 =over
 
-=item L<Message::Passing::Manual> - The manual (contributions cherished)
+=item L<Message::Passing::Manual> - The manual (contributions cherished).
 
 =item L<http://www.slideshare.net/bobtfish/messaging-interoperability-and-log-aggregation-a-new-framework> - Slide deck!
 
@@ -244,7 +244,7 @@ and one output. To build your own similar scripts, see:
 
 =over
 
-=item L<Message::Passing::DSL> - To declare your message chains
+=item L<Message::Passing::DSL> - To declare your message chains.
 
 =item L<Message::Passing::Role::CLIComponent> - To provide C<foo> and C<foo_options> attribute pairs.
 
@@ -256,7 +256,7 @@ and one output. To build your own similar scripts, see:
 
 =head3 build_chain
 
-Builds and returns the configured chain of input => filter => output
+Builds and returns the configured chain of input => filter => output.
 
 =head3 start
 
@@ -275,7 +275,7 @@ Tomas (t0m) Doran <bobtfish@bobtfish.net>
 =head2 Bugs
 
 Please log bugs at L<rt.cpan.org>. Each distribution has a bug tracker
-link in it's L<metacpan.org> page.
+link in its L<metacpan.org> page.
 
 =head2 Discussion
 
@@ -284,7 +284,7 @@ L<#message-passing> on L<irc.perl.org>.
 =head2 Source code
 
 Source code for all modules is available at L<http://github.com/suretec>
-and forks / patches are very welcome.
+and forks/patches are very welcome.
 
 =head1 SPONSORSHIP
 
@@ -298,8 +298,8 @@ the SureVoIP API -
 
 Copyright Suretec Systems Ltd. 2012.
 
-Logstash (upon which many ideas for this project is based, but
-which we do not reuse any code from) is copyright 2010 Jorden Sissel.
+Logstash (upon which many ideas for this project are based, but
+from which we do not reuse any code) is copyright 2010 Jorden Sissel.
 
 =head1 LICENSE
 

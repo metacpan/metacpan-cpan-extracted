@@ -10,7 +10,7 @@ use Exporter qw{ import };
 use Test2::V0;
 use Test2::Util qw{ pkg_to_file };
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 our @EXPORT_OK = qw{
     build_skip_reason

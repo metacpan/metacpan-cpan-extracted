@@ -175,7 +175,7 @@ for my $t (@decode) {
         sprintf('Decode %s', $t->[1])
     ) or diag explain $decoded;
 
-    my $encoded = CBOR::Free::encode( $t->[0] );
+    my $encoded = CBOR::Free::encode( $decoded );
 
     is_deeply(
         scalar( CBOR::Free::decode( $encoded ) ),

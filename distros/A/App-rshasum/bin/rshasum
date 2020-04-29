@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 # PODNAME: rshasum
 
+use 5.016;
 use strict;
 use warnings;
 
@@ -20,7 +21,7 @@ rshasum - recursive shasum.
 
 =head1 VERSION
 
-version 0.6.0
+version 0.6.1
 
 =head1 SYNOPSIS
 

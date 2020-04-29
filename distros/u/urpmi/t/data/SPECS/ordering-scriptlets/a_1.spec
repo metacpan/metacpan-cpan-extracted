@@ -7,7 +7,7 @@ Version: 1
 Release: 1
 License: x
 Provides: /bin/a
-BuildRequires: gcc
+#BuildRequires: gcc
 %global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^libc.so|^ld
 %global __provides_exclude %{?__provides_exclude:%__provides_exclude|}^libc.so|^ld
 
@@ -29,7 +29,7 @@ EOF
 %build
 # Try a static build with fallback to dynamic if no static libs/headers
 # (in which case we will pull the the wanted libs in %%install):
-gcc -Wall -static -o a a.c || gcc -Wall -o a a.c
+cc -Wall -static -o a a.c || cc -Wall -o a a.c
 
 %install
 rm -rf $RPM_BUILD_ROOT

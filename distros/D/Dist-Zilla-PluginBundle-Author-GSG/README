@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v0.1.0
+    version v0.1.1
 
 SYNOPSIS
 
@@ -31,6 +31,14 @@ SYNOPSIS
         ; The MakeMaker Plugin gets an additional setting
         ; in order to support "version ranges".
         eumm_version = 7.1101
+    
+        ; We try to guess which remote to use to talk to GitHub
+        ; but you can hardcode a value if necessary
+        github_remote = # detected from git if find_github_remote is set
+    
+        ; Enabled by default if the PluginBundle name is Author::GSG
+        ; This means Filters do not automatically get it set
+        find_github_remote = 1
     
         ; The defaults for author and license come from
         [Author::GSG]
@@ -76,6 +84,19 @@ SYNOPSIS
         [GitHub::UploadRelease] # plus magic to work without releasing elsewhere
     
         [Test::Compile]
+        ; test_compile_filename
+        ; test_compile_phase
+        ; test_compile_skip
+        ; test_compile_file
+        ; test_compile_fake_home
+        ; test_compile_needs_display
+        ; test_compile_fail_on_warning
+        ; test_compile_bail_out_on_fail
+        ; test_compile_module_finder
+        ; test_compile_script_finder
+        ; test_compile_xt_mode
+        ; test_compile_switch
+    
         [Test::ReportPrereqs]
 
 DESCRIPTION
@@ -102,6 +123,24 @@ DESCRIPTION
     incrementing a more strict semver.
 
 ATTRIBUTES / PARAMETERS
+
+    github_remote / find_github_remote
+
+      Looks in the git remote list for a push remote that matches
+      github.com (case insensitively) and if we find one, we pass it to the
+      Git and GitHub Plugins we use.
+
+      If no remotes or multiple remotes are found, throws an exception
+      indicating that you need to add the GitHub remote as described in
+      "Cutting a release".
+
+      Trying to find a remote, and failing if it isn't found, is only
+      enabled if you set find_github_remote to a truthy value. However,
+      find_github_remote defaults to truthy if the section name for the
+      PluginBundle is the default, @Author::GSG.
+
+      You can disable this, and fall back to each Plugin's default, by
+      setting github_remote to an empty string.
 
     meta_provides
 
@@ -136,6 +175,15 @@ ATTRIBUTES / PARAMETERS
     exclude_match
 
       Passed to "exclude_match" in Dist::Zilla::Plugin::Git::GatherDir.
+
+    test_compile_*
+
+          [@Author::GSG]
+          test_compile_skip    = ^My::NonCompiling::Module$
+          test_compile_xt_mode = 1
+
+      All options for Dist::Zilla::Plugin::Test::Compile should be
+      supported with the test_compile_ prefix.
 
 Setting up a new dist
 

@@ -32,7 +32,7 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-$VERSION = "4.34";
+$VERSION = "4.35";
 
 =head1 METHODS
 
@@ -245,6 +245,8 @@ Whether the webservice uses a URN and $endpoint, or is
 a service specified by a WSDL file
 
   $bool = $q->_is_service();
+
+=back
 
 =cut
 

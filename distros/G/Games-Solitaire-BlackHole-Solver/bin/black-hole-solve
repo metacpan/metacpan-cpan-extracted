@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Games::Solitaire::BlackHole::Solver::App;
+use Games::Solitaire::BlackHole::Solver::App ();
 
 Games::Solitaire::BlackHole::Solver::App->new->run;
 
@@ -19,7 +19,7 @@ black-hole-solve - a solver for Black Hole Solitaire deals.
 
 =head1 VERSION
 
-version 0.4.0
+version 0.4.1
 
 =head1 SYNOPSIS
 

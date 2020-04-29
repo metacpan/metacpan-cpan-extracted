@@ -1,18 +1,7 @@
-#!/usr/bin/perl
-#
-# Author:      Peter J. Acklam
-# Time-stamp:  2010-02-19 16:19:16 +01:00
-# E-mail:      pjacklam@cpan.org
-# URL:         http://home.online.no/~pjacklam
+#!perl
 
-########################
-
-use 5.008;              # required version of Perl
-use strict;             # restrict unsafe constructs
-use warnings;           # control optional warnings
-use utf8;               # enable UTF-8 in source code
-
-########################
+use strict;
+use warnings;
 
 local $| = 1;                   # disable buffering
 
@@ -41,8 +30,3 @@ else {
       or print "not ";
     print "ok 1 # Valid signature\n";
 }
-
-# Emacs Local Variables:
-# Emacs coding: utf-8-unix
-# Emacs mode: perl
-# Emacs End:

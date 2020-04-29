@@ -33,7 +33,7 @@ use strict;
 use Algorithm::Dependency::Source ();
 use Params::Util qw{_HASH _ARRAY0};
 
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 our @ISA     = 'Algorithm::Dependency::Source';
 
 
@@ -102,7 +102,7 @@ Algorithm::Dependency::Source::HoA - Source for a HASH of ARRAYs
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head1 SYNOPSIS
 

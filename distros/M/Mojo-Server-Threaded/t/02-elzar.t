@@ -16,7 +16,7 @@ use Win32::Process qw(:DEFAULT STILL_ACTIVE);
 # Configure
 {
   my $elzar = Mojo::Server::Elzar->new;
-  $elzar->threaded->app->config->{test} = {};
+  $elzar->threaded->app->config->{test}     = {};
   $elzar->threaded->app->config->{myserver} = {
     accepts            => 13,
     backlog            => 43,
@@ -54,11 +54,11 @@ use Win32::Process qw(:DEFAULT STILL_ACTIVE);
 }
 
 # Prepare script
-my $dir     = tempdir('elzXXXXX', CLEANUP => 1);
-my $script  = $dir->child('myapp.pl');
-my $log     = $dir->child('mojo.log');
-my $port1   = Mojo::IOLoop::Server->generate_port;
-my $port2   = Mojo::IOLoop::Server->generate_port;
+my $dir    = tempdir('elzXXXXX', CLEANUP => 1);
+my $script = $dir->child('myapp.pl');
+my $log    = $dir->child('mojo.log');
+my $port1  = Mojo::IOLoop::Server->generate_port;
+my $port2  = Mojo::IOLoop::Server->generate_port;
 my @spawned;
 
 my $head = <<EOF;
@@ -116,14 +116,14 @@ push @spawned, _spawn($script) || BAIL_OUT("couldn't spawn script");
 sleep 1;
 
 my $i = 0;
-while ( !_port($port2) ) {
+while (!_port($port2)) {
   diag "wait for server startup, " . ++$i;
   sleep 1;
 }
 
-my($old_pid, $old_port);
+my ($old_pid, $old_port);
 $i = 0;
-while ( ! $old_port ) {
+while (!$old_port) {
   diag "wait for server startup, " . ++$i;
   ($old_pid, $old_port) = _pid();
   sleep 1;
@@ -136,7 +136,7 @@ my $tx = $ua->get("http://127.0.0.1:$port1/hello");
 ok $tx->is_finished, 'transaction is finished';
 ok $tx->keep_alive,  'connection will be kept alive';
 ok !$tx->kept_alive, 'connection was not kept alive';
-is $tx->res->code, 200, 'right status';
+is $tx->res->code, 200,            'right status';
 is $tx->res->body, 'Hello Elzar!', 'right content';
 
 # Application is alive (second port)
@@ -144,7 +144,7 @@ $tx = $ua->get("http://127.0.0.1:$port2/hello");
 ok $tx->is_finished, 'transaction is finished';
 ok $tx->keep_alive,  'connection will be kept alive';
 ok !$tx->kept_alive, 'connection was not kept alive';
-is $tx->res->code, 200, 'right status';
+is $tx->res->code, 200,            'right status';
 is $tx->res->body, 'Hello Elzar!', 'right content';
 
 # Same result
@@ -152,7 +152,7 @@ $tx = $ua->get("http://127.0.0.1:$port1/hello");
 ok $tx->is_finished, 'transaction is finished';
 ok $tx->keep_alive,  'connection will be kept alive';
 ok $tx->kept_alive,  'connection was kept alive';
-is $tx->res->code, 200, 'right status';
+is $tx->res->code, 200,            'right status';
 is $tx->res->body, 'Hello Elzar!', 'right content';
 
 # Same result (second port)
@@ -160,7 +160,7 @@ $tx = $ua->get("http://127.0.0.1:$port2/hello");
 ok $tx->is_finished, 'transaction is finished';
 ok $tx->keep_alive,  'connection will be kept alive';
 ok $tx->kept_alive,  'connection was kept alive';
-is $tx->res->code, 200, 'right status';
+is $tx->res->code, 200,            'right status';
 is $tx->res->body, 'Hello Elzar!', 'right content';
 
 # Update script (broken)
@@ -189,7 +189,7 @@ $tx = $ua->get("http://127.0.0.1:$port1/hello");
 ok $tx->is_finished, 'transaction is finished';
 ok $tx->keep_alive,  'connection will be kept alive';
 ok $tx->kept_alive,  'connection was kept alive';
-is $tx->res->code, 200, 'right status';
+is $tx->res->code, 200,            'right status';
 is $tx->res->body, 'Hello Elzar!', 'right content';
 
 # Connection did not get lost (second port)
@@ -197,7 +197,7 @@ $tx = $ua->get("http://127.0.0.1:$port2/hello");
 ok $tx->is_finished, 'transaction is finished';
 ok $tx->keep_alive,  'connection will be kept alive';
 ok $tx->kept_alive,  'connection was kept alive';
-is $tx->res->code, 200, 'right status';
+is $tx->res->code, 200,            'right status';
 is $tx->res->body, 'Hello Elzar!', 'right content';
 
 # Request that will be served after graceful shutdown has been initiated
@@ -234,7 +234,7 @@ $i = 0;
 while (1) {
   diag "wait for hot deploy to finish, " . ++$i;
   sleep 1;
-  my($new_pid, $new_port) = _pid();
+  my ($new_pid, $new_port) = _pid();
   last if $new_pid and $new_pid ne $old_pid;
 }
 
@@ -244,7 +244,7 @@ sleep 2;
 Mojo::IOLoop->one_tick until $tx->is_finished;
 ok !$tx->keep_alive, 'connection will not be kept alive';
 ok !$tx->kept_alive, 'connection was not kept alive';
-is $tx->res->code, 200, 'right status';
+is $tx->res->code, 200,                  'right status';
 is $tx->res->body, 'Graceful shutdown!', 'right content';
 
 sleep 1;
@@ -298,7 +298,7 @@ is $tx->res->body, $second, 'same content';
 push @spawned, _spawn($script, '-s') || BAIL_OUT("couldn't spawn script");
 
 $i = 0;
-while ( _port($port2) ) {
+while (_port($port2)) {
   diag "wait for server shutdown, " . ++$i;
   sleep 1;
 }
@@ -310,14 +310,15 @@ $log = $log->slurp;
 like $log, qr/Worker \d+ started/, 'right message';
 like $log, qr/Starting zero downtime software upgrade \(10 seconds\)/,
   'right message';
-like $log, qr/Upgrade successful, stopping server with port $old_port/, 'right message';
+like $log, qr/Upgrade successful, stopping server with port $old_port/,
+  'right message';
 
 # cleanup
 _kill(@spawned);
 
 sub _pid {
   local $/ = undef;
-  return undef unless open my $file, '<', $dir->child('elzar.pid');
+  return unless open my $file, '<', $dir->child('elzar.pid');
   return split(/\s+/, <$file>);
 }
 
@@ -334,7 +335,7 @@ sub _spawn {
 }
 
 sub _kill {
-  for my $obj ( @_ ) {
+  for my $obj (@_) {
     $obj->GetExitCode(my $ec);
     $obj->Kill(0) if $ec == STILL_ACTIVE;
   }

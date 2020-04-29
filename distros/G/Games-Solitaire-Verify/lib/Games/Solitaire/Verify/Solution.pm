@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Solution;
-$Games::Solitaire::Verify::Solution::VERSION = '0.2401';
+$Games::Solitaire::Verify::Solution::VERSION = '0.2402';
 use warnings;
 use strict;
 
@@ -185,7 +185,7 @@ of Freecell Solver (or a similar solver)
 
 =head1 VERSION
 
-version 0.2401
+version 0.2402
 
 =head1 SYNOPSIS
 
@@ -328,7 +328,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 by Shlomi Fish.
+This software is Copyright (c) 2008 by Shlomi Fish.
 
 This is free software, licensed under:
 

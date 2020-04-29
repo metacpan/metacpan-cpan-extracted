@@ -42,7 +42,7 @@ use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-$VERSION = '4.34';
+$VERSION = '4.35';
 
 
 =begin __PRIVATE_METHODS__

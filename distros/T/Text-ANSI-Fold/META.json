@@ -4,7 +4,7 @@
       "- Kazumasa Utashiro."
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.9",
+   "generated_by" : "Minilla/v3.1.10",
    "license" : [
       "perl_5"
    ],
@@ -55,7 +55,7 @@
    "provides" : {
       "Text::ANSI::Fold" : {
          "file" : "lib/Text/ANSI/Fold.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       },
       "Text::ANSI::Fold::Japanese::W3C" : {
          "file" : "lib/Text/ANSI/Fold/Japanese/W3C.pm"
@@ -75,10 +75,11 @@
          "web" : "https://github.com/kaz-utashiro/Text-ANSI-Fold"
       }
    },
-   "version" : "1.04",
+   "version" : "1.05",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
+   "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1
 }

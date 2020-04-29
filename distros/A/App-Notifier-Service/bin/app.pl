@@ -4,7 +4,7 @@
 use strict;
 use warnings;
 
-use Dancer2;
+use Dancer2 0.300003;
 use App::Notifier::Service;
 
 {
@@ -24,7 +24,7 @@ __END__
 
 =head1 VERSION
 
-version 0.0800
+version 0.0801
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

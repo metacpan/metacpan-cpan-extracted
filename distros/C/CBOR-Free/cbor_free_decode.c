@@ -8,14 +8,29 @@
 #include "cbor_free_decode.h"
 
 #include <stdlib.h>
+#include <stdbool.h>
 
 // For ntohs and ntohl
 #include <arpa/inet.h>
 
-#define _DECODE_CHECK_FOR_OVERAGE( decstate, len) \
-    if ((len + decstate->curbyte) > decstate->end) { \
-        _croak_incomplete( aTHX_ decstate, (len + decstate->curbyte) - decstate->end ); \
+#define _IS_INCOMPLETE(decstate, len) \
+    ((len + decstate->curbyte) > decstate->end)
+
+#define _SET_INCOMPLETE(decstate, len) \
+    decstate->incomplete_by = (len + decstate->curbyte) - decstate->end;
+
+#define _RETURN_IF_INCOMPLETE( decstate, len, toreturn ) \
+    if (_IS_INCOMPLETE(decstate, len)) { \
+        _SET_INCOMPLETE(decstate, len); \
+        return toreturn; \
     }
+
+#define _RETURN_IF_SET_INCOMPLETE(decstate, toreturn) \
+    if (decstate->incomplete_by) return toreturn;
+
+#define SHOULD_VALIDATE_UTF8(decstate, major_type) \
+    major_type == CBOR_TYPE_UTF8 \
+    || decstate->string_decode_mode == CBF_STRING_DECODE_ALWAYS
 
 //----------------------------------------------------------------------
 
@@ -65,37 +80,6 @@ const char *MAJOR_TYPE_DESCRIPTION[] = {
 };
 
 //----------------------------------------------------------------------
-
-void _free_decode_state(decode_ctx* decode_state);
-
-//----------------------------------------------------------------------
-
-SV *_call_with_arguments( pTHX_ SV* cb, const U8 count, SV** args ) {
-    // --- Almost all copy-paste from “perlcall” … blegh!
-    dSP;
-
-    ENTER;
-    SAVETMPS;
-
-    PUSHMARK(SP);
-    EXTEND(SP, count);
-
-    U8 i;
-    for (i=0; i<count; i++) PUSHs( sv_2mortal(args[i]) );
-
-    PUTBACK;
-
-    call_sv(cb, G_SCALAR);
-
-    SV *ret = newSVsv(POPs);
-
-    FREETMPS;
-    LEAVE;
-
-    return ret;
-}
-
-//----------------------------------------------------------------------
 // Croakers
 
 static const char* UV_TO_STR_TMPL = (sizeof(UV) == 8 ? "%llu" : "%lu");
@@ -109,29 +93,29 @@ UV _iv_to_str(IV num, char *numstr, const char strlen) {
     return my_snprintf( numstr, strlen, IV_TO_STR_TMPL, num );
 }
 
-void _croak_incomplete( pTHX_ decode_ctx* decstate, STRLEN lack ) {
-    _free_decode_state(decstate);
+void _free_decode_state_if_not_persistent( pTHX_ decode_ctx* decstate ) {
+    if (!(decstate->flags & CBF_FLAG_PERSIST_STATE)) {
+        free_decode_state(aTHX_ decstate);
+    }
+}
+
+static inline void _croak_incomplete( pTHX_ decode_ctx* decstate ) {
 
     SV* args[2] = {
         newSVpvs("Incomplete"),
-        newSVuv(lack),
+        newSVuv(decstate->incomplete_by),
     };
 
-    _call_with_arguments(
-        aTHX_
-        newSVpvs("CBOR::Free::_die"),
-        2,
-        args
-    );
+    _free_decode_state_if_not_persistent(aTHX_ decstate);
 
-    assert(0);
+    cbf_die_with_arguments( aTHX_ 2, args );
 }
 
-void _croak_invalid_control( pTHX_ decode_ctx* decstate ) {
+static inline void _croak_invalid_control( pTHX_ decode_ctx* decstate ) {
     const uint8_t ord = (uint8_t) *(decstate->curbyte);
-    STRLEN offset = decstate->curbyte - decstate->start;
+    UV offset = decstate->curbyte - decstate->start;
 
-    _free_decode_state(decstate);
+    _free_decode_state_if_not_persistent(aTHX_ decstate);
 
     SV* args[3] = {
         newSVpvs("InvalidControl"),
@@ -139,36 +123,29 @@ void _croak_invalid_control( pTHX_ decode_ctx* decstate ) {
         newSVuv(offset),
     };
 
-    _call_with_arguments(
-        aTHX_
-        newSVpvs("CBOR::Free::_die"),
-        3,
-        args
-    );
+    cbf_die_with_arguments( aTHX_ 3, args );
 
     assert(0);
 }
 
 void _croak_invalid_utf8( pTHX_ decode_ctx* decstate, char *string, STRLEN len ) {
-    _free_decode_state(decstate);
+    _free_decode_state_if_not_persistent(aTHX_ decstate);
 
     SV* args[2] = {
         newSVpvs("InvalidUTF8"),
         newSVpvn(string, len),
     };
 
-    _call_with_arguments(
-        aTHX_
-        newSVpvs("CBOR::Free::_die"),
-        2,
-        args
-    );
+    cbf_die_with_arguments( aTHX_ 2, args );
 
     assert(0);
 }
 
-void _croak_invalid_map_key( pTHX_ decode_ctx* decstate, const uint8_t byte, STRLEN offset ) {
-    _free_decode_state(decstate);
+void _croak_invalid_map_key( pTHX_ decode_ctx* decstate ) {
+    const uint8_t byte = decstate->curbyte[0];
+    UV offset = decstate->curbyte - decstate->start;
+
+    _free_decode_state_if_not_persistent(aTHX_ decstate);
 
     char bytebuf[5];
 
@@ -186,6 +163,13 @@ void _croak_invalid_map_key( pTHX_ decode_ctx* decstate, const uint8_t byte, STR
             break;
         case CBOR_UNDEFINED:
             bytestr = "undefined";
+            break;
+        case CBOR_HALF_FLOAT:
+            bytestr = "half-float";
+        case CBOR_FLOAT:
+            bytestr = "float";
+        case CBOR_DOUBLE:
+            bytestr = "double float";
             break;
         default:
             switch ((byte & 0xe0) >> 5) {
@@ -207,37 +191,29 @@ void _croak_invalid_map_key( pTHX_ decode_ctx* decstate, const uint8_t byte, STR
         newSVuv(offset),
     };
 
-    _call_with_arguments(
-        aTHX_
-        newSVpvs("CBOR::Free::_die"),
-        3,
-        args
-    );
+    cbf_die_with_arguments( aTHX_ 3, args );
 
     assert(0);
 }
 
-void _croak_cannot_decode_64bit( pTHX_ decode_ctx* decstate, const uint8_t *u64bytes, STRLEN offset ) {
-    _free_decode_state(decstate);
+void _croak_cannot_decode_64bit( pTHX_ decode_ctx* decstate ) {
+    UV offset = decstate->curbyte - decstate->start;
+
+    _free_decode_state_if_not_persistent(aTHX_ decstate);
 
     SV* args[3] = {
         newSVpvs("CannotDecode64Bit"),
-        newSVpvn( (const char *)u64bytes, 8),
+        newSVpvn( decstate->curbyte, 8),
         newSVuv(offset),
     };
 
-    _call_with_arguments(
-        aTHX_
-        newSVpvs("CBOR::Free::_die"),
-        3,
-        args
-    );
+    cbf_die_with_arguments( aTHX_ 3, args );
 
     assert(0);
 }
 
 void _croak_cannot_decode_negative( pTHX_ decode_ctx* decstate, UV abs, STRLEN offset ) {
-    _free_decode_state(decstate);
+    _free_decode_state_if_not_persistent(aTHX_ decstate);
 
     SV* args[3] = {
         newSVpvs("NegativeIntTooLow"),
@@ -245,12 +221,7 @@ void _croak_cannot_decode_negative( pTHX_ decode_ctx* decstate, UV abs, STRLEN o
         newSVuv(offset),
     };
 
-    _call_with_arguments(
-        aTHX_
-        newSVpvs("CBOR::Free::_die"),
-        3,
-        args
-    );
+    cbf_die_with_arguments( aTHX_ 3, args );
 
     assert(0);
 }
@@ -266,7 +237,7 @@ void _warn_unhandled_tag( pTHX_ UV tagnum, U8 value_major_type ) {
 
 static inline void _validate_utf8_string_if_needed( pTHX_ decode_ctx* decstate, char *buffer, STRLEN len ) {
 
-    if (!decstate->naive_utf8 && !is_utf8_string( (U8 *)buffer, len)) {
+    if (!(decstate->flags & CBF_FLAG_NAIVE_UTF8) && !is_utf8_string( (U8 *)buffer, len)) {
         _croak_invalid_utf8( aTHX_ decstate, buffer, len );
     }
 }
@@ -275,9 +246,7 @@ static inline void _validate_utf8_string_if_needed( pTHX_ decode_ctx* decstate, 
 // DECODER:
 //----------------------------------------------------------------------
 
-// Needed because of mutual recursion of functions.
-SV *_decode( pTHX_ decode_ctx* decstate );
-
+// Sets incomplete_by.
 static inline UV _parse_for_uint_len2( pTHX_ decode_ctx* decstate ) {
     union control_byte *control = (union control_byte *) decstate->curbyte;
 
@@ -286,7 +255,7 @@ static inline UV _parse_for_uint_len2( pTHX_ decode_ctx* decstate ) {
     switch (control->pieces.length_type) {
         case CBOR_LENGTH_SMALL:
 
-            _DECODE_CHECK_FOR_OVERAGE( decstate, 2);
+            _RETURN_IF_INCOMPLETE( decstate, 2, 0 );
 
             ++decstate->curbyte;
 
@@ -297,7 +266,7 @@ static inline UV _parse_for_uint_len2( pTHX_ decode_ctx* decstate ) {
             break;
 
         case CBOR_LENGTH_MEDIUM:
-            _DECODE_CHECK_FOR_OVERAGE( decstate, 3);
+            _RETURN_IF_INCOMPLETE( decstate, 3, 0);
 
             ++decstate->curbyte;
 
@@ -308,7 +277,7 @@ static inline UV _parse_for_uint_len2( pTHX_ decode_ctx* decstate ) {
             break;
 
         case CBOR_LENGTH_LARGE:
-            _DECODE_CHECK_FOR_OVERAGE( decstate, 5);
+            _RETURN_IF_INCOMPLETE( decstate, 5, 0);
 
             ++decstate->curbyte;
 
@@ -319,14 +288,14 @@ static inline UV _parse_for_uint_len2( pTHX_ decode_ctx* decstate ) {
             break;
 
         case CBOR_LENGTH_HUGE:
-            _DECODE_CHECK_FOR_OVERAGE( decstate, 9);
+            _RETURN_IF_INCOMPLETE( decstate, 9, 0);
 
             ++decstate->curbyte;
 
 #if !IS_64_BIT
 
             if (decstate->curbyte[0] || decstate->curbyte[1] || decstate->curbyte[2] || decstate->curbyte[3]) {
-                _croak_cannot_decode_64bit( aTHX_ decstate, (const uint8_t *) decstate->curbyte, decstate->curbyte - decstate->start );
+                _croak_cannot_decode_64bit( aTHX_ decstate );
             }
 #endif
             ret = _buffer_u64_to_uv( (uint8_t *) decstate->curbyte );
@@ -353,35 +322,44 @@ static inline UV _parse_for_uint_len2( pTHX_ decode_ctx* decstate ) {
 
 //----------------------------------------------------------------------
 
+// Sets incomplete_by.
 SV *_decode_array( pTHX_ decode_ctx* decstate ) {
     union control_byte *control = (union control_byte *) decstate->curbyte;
 
     AV *array = newAV();
+    sv_2mortal( (SV *) array );
+
     SV *cur = NULL;
 
     if (control->pieces.length_type == CBOR_LENGTH_INDEFINITE) {
         ++decstate->curbyte;
 
-        while (*(decstate->curbyte) != '\xff') {
+        while (1) {
+            _RETURN_IF_INCOMPLETE( decstate, 1, NULL );
 
-            cur = _decode( aTHX_ decstate );
+            if ( decstate->curbyte[0] == '\xff') {
+                ++decstate->curbyte;
+                break;
+            }
+
+            cur = cbf_decode_one( aTHX_ decstate );
+
+            _RETURN_IF_SET_INCOMPLETE(decstate, NULL);
+
             av_push(array, cur);
-            //sv_2mortal(cur);
         }
-
-        _DECODE_CHECK_FOR_OVERAGE( decstate, 1 );
-
-        ++decstate->curbyte;
     }
     else {
         SSize_t array_length = _parse_for_uint_len2( aTHX_ decstate );
+        _RETURN_IF_SET_INCOMPLETE(decstate, NULL);
 
         if (array_length) {
             av_fill(array, array_length - 1);
 
             SSize_t i;
             for (i=0; i<array_length; i++) {
-                cur = _decode( aTHX_ decstate );
+                cur = cbf_decode_one( aTHX_ decstate );
+                _RETURN_IF_SET_INCOMPLETE(decstate, NULL);
 
                 if (!av_store(array, i, cur)) {
                     _croak("Failed to store item in array!");
@@ -390,9 +368,10 @@ SV *_decode_array( pTHX_ decode_ctx* decstate ) {
         }
     }
 
-    return newRV_noinc( (SV *) array);
+    return newRV_inc( (SV *) array );
 }
 
+// Sets incomplete_by.
 UV _decode_uint( pTHX_ decode_ctx* decstate ) {
     union control_byte *control = (union control_byte *) decstate->curbyte;
 
@@ -403,6 +382,7 @@ UV _decode_uint( pTHX_ decode_ctx* decstate ) {
     return _parse_for_uint_len2( aTHX_ decstate );
 }
 
+// Sets incomplete_by.
 IV _decode_negint( pTHX_ decode_ctx* decstate ) {
     union control_byte *control = (union control_byte *) decstate->curbyte;
 
@@ -411,6 +391,7 @@ IV _decode_negint( pTHX_ decode_ctx* decstate ) {
     }
 
     UV positive = _parse_for_uint_len2( aTHX_ decstate );
+    _RETURN_IF_SET_INCOMPLETE(decstate, 0);
 
 #if IS_64_BIT
     if (positive >= 0x8000000000000000U) {
@@ -434,135 +415,180 @@ IV _decode_negint( pTHX_ decode_ctx* decstate ) {
     return( -1 - (int64_t) positive );
 }
 
-struct numbuf _decode_str( pTHX_ decode_ctx* decstate ) {
+// Sets incomplete_by.
+// Return indicates whether string_h has SV.
+bool _decode_str( pTHX_ decode_ctx* decstate, union numbuf_or_sv* string_u ) {
     union control_byte *control = (union control_byte *) decstate->curbyte;
-
-    struct numbuf ret;
 
     if (control->pieces.length_type == CBOR_LENGTH_INDEFINITE) {
         ++decstate->curbyte;
 
-        //TODO: Parse it as a string, not an SV.
-        SV *tempsv = newSVpvs("");
+        SV *string = newSVpvs_flags("", SVs_TEMP);
+        string_u->sv = string;
 
-        while (*(decstate->curbyte) != '\xff') {
+        while (1) {
+            _RETURN_IF_INCOMPLETE( decstate, 1, false );
+
+            if (decstate->curbyte[0] == '\xff') {
+                ++decstate->curbyte;
+                break;
+            }
+
             //TODO: Require the same major type.
 
-            SV *cur = _decode( aTHX_ decstate );
+            SV *cur = cbf_decode_one( aTHX_ decstate );
 
-            sv_catsv(tempsv, cur);
+            _RETURN_IF_SET_INCOMPLETE( decstate, false );
+
+            sv_2mortal(cur);
+
+            sv_catsv(string, cur);
         }
 
-        _DECODE_CHECK_FOR_OVERAGE( decstate, 1 );
+        SvREFCNT_inc(string);
 
-        ++decstate->curbyte;
-
-        ret.buffer = SvPV_nolen(tempsv);
-        ret.num.uv = SvCUR(tempsv);
-
-        return ret;
+        return true;
     }
 
-    ret.num.uv = _parse_for_uint_len2( aTHX_ decstate );
+    string_u->numbuf.num.uv = _parse_for_uint_len2( aTHX_ decstate );
+    _RETURN_IF_SET_INCOMPLETE(decstate, false);
 
-    _DECODE_CHECK_FOR_OVERAGE( decstate, ret.num.uv );
+    _RETURN_IF_INCOMPLETE( decstate, string_u->numbuf.num.uv, false );
 
-    ret.buffer = decstate->curbyte;
+    string_u->numbuf.buffer = decstate->curbyte;
 
-    decstate->curbyte += ret.num.uv;
+    decstate->curbyte += string_u->numbuf.num.uv;
 
-    return ret;
+    return false;
 }
 
+// Sets incomplete_by.
 void _decode_hash_entry( pTHX_ decode_ctx* decstate, HV *hash ) {
-    _DECODE_CHECK_FOR_OVERAGE( decstate, 1 );
+    _RETURN_IF_INCOMPLETE( decstate, 1,  );
 
     union control_byte *control = (union control_byte *) decstate->curbyte;
 
-    struct numbuf my_key;
-    my_key.buffer = NULL;
+    union numbuf_or_sv my_key;
+    my_key.numbuf.buffer = NULL;
 
     // This is going to be a hash key, so it can’t usefully be
     // anything but a string/PV.
     I32 keylen;
     char *keystr;
 
+    bool my_key_has_sv = false;
+
     switch (control->pieces.major_type) {
         case CBOR_TYPE_UINT:
-            my_key.num.uv = _decode_uint( aTHX_ decstate );
+            my_key.numbuf.num.uv = _decode_uint( aTHX_ decstate );
+            _RETURN_IF_SET_INCOMPLETE(decstate, );
 
             keystr = (char *) decstate->scratch.bytes;
-            keylen = _uv_to_str( my_key.num.uv, keystr, sizeof(decstate->scratch.bytes));
+            keylen = _uv_to_str( my_key.numbuf.num.uv, keystr, sizeof(decstate->scratch.bytes));
+            // fprintf(stderr, "key (%p) is uint: %.*s\n", keystr, keylen, keystr);
 
             break;
 
         case CBOR_TYPE_NEGINT:
-            my_key.num.iv = _decode_negint( aTHX_ decstate );
+            my_key.numbuf.num.iv = _decode_negint( aTHX_ decstate );
+            _RETURN_IF_SET_INCOMPLETE(decstate, );
 
             keystr = (char *) decstate->scratch.bytes;
-            keylen = _iv_to_str( my_key.num.iv, keystr, sizeof(decstate->scratch.bytes));
+            keylen = _iv_to_str( my_key.numbuf.num.iv, keystr, sizeof(decstate->scratch.bytes));
 
             break;
 
         case CBOR_TYPE_BINARY:
         case CBOR_TYPE_UTF8:
-            my_key = _decode_str( aTHX_ decstate );
+            my_key_has_sv = _decode_str( aTHX_ decstate, &my_key );
+            _RETURN_IF_SET_INCOMPLETE(decstate, );
 
-            if (my_key.num.uv > 0x7fffffffU) {
-                _croak("key too long!");
-            }
+            if (!my_key_has_sv) {
+                if (my_key.numbuf.num.uv > 0x7fffffffU) {
+                    _croak("key too long!");
+                }
 
-            keystr = my_key.buffer;
+                keystr = my_key.numbuf.buffer;
 
-            if (control->pieces.major_type == CBOR_TYPE_UTF8) {
-                _validate_utf8_string_if_needed( aTHX_ decstate, keystr, my_key.num.uv );
+                if (SHOULD_VALIDATE_UTF8(decstate, control->pieces.major_type)) {
+                    _validate_utf8_string_if_needed( aTHX_ decstate, keystr, my_key.numbuf.num.uv );
 
-                keylen = -my_key.num.uv;
-            }
-            else {
-                keylen = my_key.num.uv;
+                    keylen = decstate->string_decode_mode == CBF_STRING_DECODE_NEVER ? my_key.numbuf.num.uv : -my_key.numbuf.num.uv;
+                }
+                else {
+                    keylen = my_key.numbuf.num.uv;
+                }
             }
 
             break;
 
         default:
-            _croak_invalid_map_key( aTHX_ decstate, decstate->curbyte[0], decstate->curbyte - decstate->start );
+            _croak_invalid_map_key( aTHX_ decstate);
             return; // Silence compiler warning.
     }
 
-    SV *curval = _decode( aTHX_ decstate );
+    SV *curval = cbf_decode_one( aTHX_ decstate );
 
-    hv_store(hash, keystr, keylen, curval, 0);
+    if (decstate->incomplete_by) {
+        if (my_key_has_sv) {
+            SvREFCNT_dec( my_key.sv );
+        }
+    }
+    else if (my_key_has_sv) {
+        hv_store_ent(hash, my_key.sv, curval, 0);
+    }
+    else {
+        hv_store(hash, keystr, keylen, curval, 0);
+    }
 }
 
+// Sets incomplete_by.
 SV *_decode_map( pTHX_ decode_ctx* decstate ) {
     union control_byte *control = (union control_byte *) decstate->curbyte;
 
     HV *hash = newHV();
+    sv_2mortal( (SV *) hash );
 
     if (control->pieces.length_type == CBOR_LENGTH_INDEFINITE) {
         ++decstate->curbyte;
 
-        while (decstate->curbyte[0] != '\xff') {
+        while (1) {
+            _RETURN_IF_INCOMPLETE( decstate, 1, NULL );
+
+            if (decstate->curbyte[0] == '\xff') {
+                ++decstate->curbyte;
+                break;
+            }
+
             _decode_hash_entry( aTHX_ decstate, hash );
+
+            // TODO: Recursively decref all hash members.
+            if ( decstate->incomplete_by ) {
+                return NULL;
+            }
         }
-
-        _DECODE_CHECK_FOR_OVERAGE( decstate, 1 );
-
-        ++decstate->curbyte;
     }
     else {
         SSize_t keycount = _parse_for_uint_len2( aTHX_ decstate );
+        if ( decstate->incomplete_by ) {
+            return NULL;
+        }
 
         if (keycount) {
             while (keycount > 0) {
                 _decode_hash_entry( aTHX_ decstate, hash );
+
+                // TODO: Recursively decref all hash members.
+                if ( decstate->incomplete_by ) {
+                    return NULL;
+                }
+
                 --keycount;
             }
         }
     }
 
-    return newRV_noinc( (SV *) hash);
+    return newRV_inc( (SV *) hash);
 }
 
 //----------------------------------------------------------------------
@@ -600,48 +626,69 @@ static inline double _decode_double_to_le( decode_ctx* decstate, uint8_t *ptr ) 
 
 //----------------------------------------------------------------------
 
+// Sets incomplete_by.
 static inline SV *_decode_str_to_sv( pTHX_ decode_ctx* decstate ) {
-    struct numbuf decoded_str = _decode_str( aTHX_ decstate );
+    union numbuf_or_sv string;
 
-    return newSVpvn( decoded_str.buffer, decoded_str.num.uv );
+    if (_decode_str( aTHX_ decstate, &string )) {
+        return string.sv;
+    }
+
+    _RETURN_IF_SET_INCOMPLETE(decstate, NULL);
+
+    return newSVpvn( string.numbuf.buffer, string.numbuf.num.uv );
 }
 
-SV *_decode( pTHX_ decode_ctx* decstate ) {
+// Sets incomplete_by.
+SV *cbf_decode_one( pTHX_ decode_ctx* decstate ) {
     SV *ret = NULL;
 
-    _DECODE_CHECK_FOR_OVERAGE( decstate, 1);
+    _RETURN_IF_INCOMPLETE( decstate, 1, NULL );
 
     union control_byte *control = (union control_byte *) decstate->curbyte;
+
+    // fprintf(stderr, "major type: %d\n", control->pieces.major_type);
 
     switch (control->pieces.major_type) {
         case CBOR_TYPE_UINT:
             ret = newSVuv( _decode_uint( aTHX_ decstate ) );
+            if ( decstate->incomplete_by ) {
+                SvREFCNT_dec(ret);
+                return NULL;
+            }
 
             break;
         case CBOR_TYPE_NEGINT:
             ret = newSViv( _decode_negint( aTHX_ decstate ) );
+            if ( decstate->incomplete_by ) {
+                SvREFCNT_dec(ret);
+                return NULL;
+            }
 
             break;
         case CBOR_TYPE_BINARY:
         case CBOR_TYPE_UTF8:
             ret = _decode_str_to_sv( aTHX_ decstate );
+            _RETURN_IF_SET_INCOMPLETE(decstate, NULL);
 
-            if (CBOR_TYPE_UTF8 == control->pieces.major_type) {
+            if (SHOULD_VALIDATE_UTF8(decstate, control->pieces.major_type)) {
                 _validate_utf8_string_if_needed( aTHX_ decstate, SvPV_nolen(ret), SvCUR(ret));
 
                 // Always set the UTF8 flag, even if it’s not needed.
                 // This helps ensure that text strings will round-trip
                 // through Perl.
-                SvUTF8_on(ret);
+                if (decstate->string_decode_mode != CBF_STRING_DECODE_NEVER) SvUTF8_on(ret);
             }
 
             break;
         case CBOR_TYPE_ARRAY:
             ret = _decode_array( aTHX_ decstate );
+            _RETURN_IF_SET_INCOMPLETE(decstate, NULL);
 
             break;
         case CBOR_TYPE_MAP:
             ret = _decode_map( aTHX_ decstate );
+            _RETURN_IF_SET_INCOMPLETE(decstate, NULL);
 
             break;
         case CBOR_TYPE_TAG:
@@ -651,6 +698,7 @@ SV *_decode( pTHX_ decode_ctx* decstate ) {
             }
 
             UV tagnum = _parse_for_uint_len2( aTHX_ decstate );
+            _RETURN_IF_SET_INCOMPLETE(decstate, NULL);
 
             U8 value_major_type = ((union control_byte *) decstate->curbyte)->pieces.major_type;
 
@@ -662,6 +710,7 @@ SV *_decode( pTHX_ decode_ctx* decstate ) {
                 }
 
                 UV refnum = _parse_for_uint_len2( aTHX_ decstate );
+                _RETURN_IF_SET_INCOMPLETE(decstate, NULL);
 
                 if (refnum >= decstate->reflistlen) {
                     _croak("Missing shareable!");
@@ -671,10 +720,11 @@ SV *_decode( pTHX_ decode_ctx* decstate ) {
                 SvREFCNT_inc(ret);
             }
             else {
-                ret = _decode( aTHX_ decstate );
+                ret = cbf_decode_one( aTHX_ decstate );
+                _RETURN_IF_SET_INCOMPLETE(decstate, NULL);
 
                 if (tagnum == CBOR_TAG_INDIRECTION) {
-                    ret = newRV_inc(ret);
+                    ret = newRV_noinc(ret);
                 }
                 else if (tagnum == CBOR_TAG_SHAREABLE && decstate->reflist) {
                     ++decstate->reflistlen;
@@ -689,7 +739,7 @@ SV *_decode( pTHX_ decode_ctx* decstate ) {
                     SV **handler_cr = hv_fetch( my_tag_handler, (char *) &tagnum, sizeof(UV), 0 );
 
                     if (handler_cr && *handler_cr && SvOK(*handler_cr)) {
-                        ret = _call_with_arguments( aTHX_ *handler_cr, 1, &ret );
+                        ret = cbf_call_scalar_with_arguments( aTHX_ *handler_cr, 1, &ret );
                     }
                     else {
                         _warn_unhandled_tag( aTHX_ tagnum, value_major_type );
@@ -715,12 +765,12 @@ SV *_decode( pTHX_ decode_ctx* decstate ) {
 
                 case CBOR_NULL:
                 case CBOR_UNDEFINED:
-                    ret = newSVsv( &PL_sv_undef );
+                    ret = &PL_sv_undef;
                     ++decstate->curbyte;
                     break;
 
                 case CBOR_HALF_FLOAT:
-                    _DECODE_CHECK_FOR_OVERAGE( decstate, 3 );
+                    _RETURN_IF_INCOMPLETE( decstate, 3, NULL );
 
                     ret = newSVnv( decode_half_float( (uint8_t *) (1 + decstate->curbyte) ) );
 
@@ -728,7 +778,7 @@ SV *_decode( pTHX_ decode_ctx* decstate ) {
                     break;
 
                 case CBOR_FLOAT:
-                    _DECODE_CHECK_FOR_OVERAGE( decstate, 5 );
+                    _RETURN_IF_INCOMPLETE( decstate, 5, NULL );
 
                     float decoded_flt;
 
@@ -744,7 +794,7 @@ SV *_decode( pTHX_ decode_ctx* decstate ) {
                     break;
 
                 case CBOR_DOUBLE:
-                    _DECODE_CHECK_FOR_OVERAGE( decstate, 9 );
+                    _RETURN_IF_INCOMPLETE( decstate, 9, NULL );
 
                     double decoded_dbl;
 
@@ -772,45 +822,110 @@ SV *_decode( pTHX_ decode_ctx* decstate ) {
     return ret;
 }
 
-decode_ctx _create_decode_state( pTHX_ SV *cbor, HV *tag_handler, UV flags ) {
-    STRLEN cborlen;
+/*
+ * Possible states:
+ *
+ * 1) We’re initializing.
+ * 2) We just concat’ed two SVPVs (same as initializing).
+ * 3) We just shortened from the beginning.
+ */
 
-    char *cborstr = SvPV(cbor, cborlen);
+void renew_decode_state_buffer( pTHX_ decode_ctx *decode_state, SV *cbor ) {
+    STRLEN cborlen = SvCUR(cbor);
 
-    decode_ctx decode_state = {
-        cborstr,                            // start
-        cborlen,                            // size
-        cborstr,                            // curbyte
-        cborstr + cborlen,                  // end
-        tag_handler,
-        NULL,                               // reflist
-        0,                                  // reflistlen
-        !!(flags & CBF_FLAG_NAIVE_UTF8),
-    };
+    char *cborstr = SvPVX(cbor);
+
+    STRLEN offset;
+    if (decode_state->curbyte == NULL) {
+        offset = 0;
+    }
+    else {
+        offset = decode_state->curbyte - decode_state->start;
+    }
+
+    decode_state->start = cborstr;
+    decode_state->size = cborlen;
+    decode_state->curbyte = cborstr + offset;
+    decode_state->end = cborstr + cborlen;
+}
+
+void advance_decode_state_buffer( pTHX_ decode_ctx *decode_state ) {
+    STRLEN diff = decode_state->curbyte - decode_state->start;
+
+    decode_state->start = decode_state->curbyte;
+    decode_state->size -= diff;
+}
+
+decode_ctx* create_decode_state( pTHX_ SV *cbor, HV *tag_handler, UV flags ) {
+    decode_ctx *decode_state;
+    Newx( decode_state, 1, decode_ctx );
+
+    decode_state->curbyte = NULL;
+
+    if (cbor) {
+        renew_decode_state_buffer( aTHX_ decode_state, cbor );
+    }
+
+    decode_state->tag_handler = tag_handler;
+    if (NULL != tag_handler) {
+        SvREFCNT_inc((SV *) tag_handler);
+    }
+
+    decode_state->reflist = NULL;
+    decode_state->reflistlen = 0;
+    decode_state->flags = flags;
+    decode_state->incomplete_by = 0;
+
+    decode_state->string_decode_mode = CBF_STRING_DECODE_CBOR;
 
     if (flags & CBF_FLAG_PRESERVE_REFERENCES) {
-        Newx( decode_state.reflist, 0, void * );
+        ensure_reflist_exists( aTHX_ decode_state );
     }
 
     return decode_state;
 }
 
-void _free_decode_state(decode_ctx* decode_state) {
-    if (decode_state->reflist) {
-        Safefree(decode_state->reflist);
+void ensure_reflist_exists( pTHX_ decode_ctx* decode_state) {
+    if (NULL == decode_state->reflist) {
+        Newx( decode_state->reflist, 0, void * );
     }
 }
 
-SV *cbf_decode( pTHX_ SV *cbor, HV *tag_handler, UV flags ) {
+void delete_reflist( pTHX_ decode_ctx* decode_state) {
+    if (NULL != decode_state->reflist) {
+        Safefree(decode_state->reflist);
+        decode_state->reflist = NULL;
+        decode_state->reflistlen = 0;
+    }
+}
 
-    decode_ctx decode_state = _create_decode_state( aTHX_ cbor, tag_handler, flags);
+void reset_reflist_if_needed( pTHX_ decode_ctx* decode_state) {
+    if (decode_state->reflistlen) {
+        delete_reflist( aTHX_ decode_state );
+        ensure_reflist_exists( aTHX_ decode_state );
+    }
+}
 
-    SV *RETVAL = _decode( aTHX_ &decode_state );
+void free_decode_state( pTHX_ decode_ctx* decode_state) {
+    delete_reflist( aTHX_ decode_state );
 
-    _free_decode_state(&decode_state);
+    if (NULL != decode_state->tag_handler) {
+        SvREFCNT_dec((SV *) decode_state->tag_handler);
+        decode_state->tag_handler = NULL;
+    }
 
-    if (decode_state.curbyte != decode_state.end) {
-        STRLEN bytes_count = decode_state.end - decode_state.curbyte;
+    Safefree(decode_state);
+}
+
+SV *cbf_decode_document( pTHX_ decode_ctx *decode_state ) {
+    SV *RETVAL = cbf_decode_one( aTHX_ decode_state );
+
+    if (decode_state->incomplete_by) {
+        _croak_incomplete( aTHX_ decode_state );
+    }
+
+    if (decode_state->curbyte != decode_state->end) {
+        STRLEN bytes_count = decode_state->end - decode_state->curbyte;
 
         char numstr[24];
         _uv_to_str(bytes_count, numstr, 24);
@@ -819,6 +934,17 @@ SV *cbf_decode( pTHX_ SV *cbor, HV *tag_handler, UV flags ) {
 
         call_argv("CBOR::Free::_warn_decode_leftover", G_DISCARD, words);
     }
+
+    return RETVAL;
+}
+
+SV *cbf_decode( pTHX_ SV *cbor, HV *tag_handler, UV flags ) {
+
+    decode_ctx *decode_state = create_decode_state( aTHX_ cbor, tag_handler, flags);
+
+    SV *RETVAL = cbf_decode_document( aTHX_ decode_state );
+
+    free_decode_state( aTHX_ decode_state);
 
     return RETVAL;
 }

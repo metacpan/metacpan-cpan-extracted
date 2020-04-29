@@ -13,7 +13,7 @@ use Mojo::UserAgent;
 
 # Manage and clean up PID file
 my $threaded = Mojo::Server::Threaded->new;
-my $dir     = tempdir;
+my $dir      = tempdir;
 ok $threaded->pid_file, 'has default path';
 my $file = $dir->child('threaded.pid');
 $threaded->pid_file($file);
@@ -36,7 +36,7 @@ my $bad = path(__FILE__)->sibling('does_not_exist', 'test.pid');
 $threaded = Mojo::Server::Threaded->new(pid_file => $bad);
 $threaded->app->log->level('debug')->unsubscribe('message');
 my $log = '';
-my $cb = $threaded->app->log->on(message => sub { $log .= pop });
+my $cb  = $threaded->app->log->on(message => sub { $log .= pop });
 eval { $threaded->ensure_pid_file($$) };
 like $@,     qr/Can't create process id file/, 'right error';
 unlike $log, qr/Creating process id file/,     'right message';
@@ -70,7 +70,7 @@ $threaded->on(
     $thr->send_command('QUIT');
   }
 );
-$threaded->on(reap => sub { push @reap, pop });
+$threaded->on(reap   => sub { push @reap, pop });
 $threaded->on(finish => sub { $graceful = pop });
 $threaded->app->log->level('debug')->unsubscribe('message');
 $log = '';
@@ -86,8 +86,8 @@ $threaded->app->hook(
 ) if $can_server;
 $threaded->run;
 SKIP: {
-    skip "before_server_start hook not available" if !$can_server;
-    is_deeply \@server, [4, 'development'], 'hook has been emitted once';
+  skip "before_server_start hook not available" if !$can_server;
+  is_deeply \@server, [4, 'development'], 'hook has been emitted once';
 }
 is scalar @spawn, 4, 'four workers spawned';
 is scalar @reap,  4, 'four workers reaped';
@@ -113,7 +113,7 @@ undef $threaded;
 ok !-e $pid, 'process id file has been removed';
 
 # One worker and immediate shutdown
-$port    = Mojo::IOLoop::Server->generate_port;
+$port     = Mojo::IOLoop::Server->generate_port;
 $threaded = Mojo::Server::Threaded->new(
   accepts            => 500,
   heartbeat_interval => 2,
@@ -137,7 +137,7 @@ $threaded->once(
     $threaded->send_command('KILL');
   }
 );
-$threaded->on(reap => sub { push @reap, pop });
+$threaded->on(reap   => sub { push @reap, pop });
 $threaded->on(finish => sub { $graceful = pop });
 $threaded->run;
 is $threaded->ioloop->max_accepts, 500, 'right value';

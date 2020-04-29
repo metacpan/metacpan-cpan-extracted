@@ -14,6 +14,7 @@ use Data::Dumper;
 
 use CBOR::Free;
 use CBOR::Free::Decoder;
+use CBOR::Free::SequenceDecoder;
 
 __PACKAGE__->runtests() if !caller;
 
@@ -50,13 +51,27 @@ sub T1_ascii_text_string_roundtrip {
     is( $cbor2, $cbor_text, 'text string round-trips, even if all code points are ASCII' );
 }
 
-sub T2_decode_naive_utf8 {
+sub T3_decode_naive_utf8 {
     my $bad_utf8 = "c\xff\xff\xff";
 
     my $decoder = CBOR::Free::Decoder->new();
-    $decoder->naive_utf8();
+    my $ret = $decoder->naive_utf8();
+    is($ret, 1, 'naive_utf8() returns truthy' );
 
     my $got = $decoder->decode($bad_utf8);
+
+    ok( utf8::is_utf8($got), 'UTF8 flag is set' );
+    ok( !utf8::valid($got), '… but the actual value is invalid UTF-8' );
+}
+
+sub T3_decode_naive_utf8__sequence_decoder {
+    my $bad_utf8 = "c\xff\xff\xff";
+
+    my $decoder = CBOR::Free::SequenceDecoder->new();
+    my $ret = $decoder->naive_utf8();
+    is($ret, 1, 'naive_utf8() returns truthy' );
+
+    my $got = ${ $decoder->give($bad_utf8) };
 
     ok( utf8::is_utf8($got), 'UTF8 flag is set' );
     ok( !utf8::valid($got), '… but the actual value is invalid UTF-8' );

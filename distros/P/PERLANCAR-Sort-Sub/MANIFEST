@@ -9,6 +9,7 @@ README
 dist.ini
 lib/PERLANCAR/Sort/Sub.pm
 lib/Sort/Sub/changes_group_ala_perlancar.pm
+lib/Sort/Sub/pod_sections_ala_perlancar.pm
 lib/Sort/Sub/prereq_ala_perlancar.pm
 t/00-compile.t
 t/author-critic.t

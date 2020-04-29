@@ -10,7 +10,7 @@ use Tag::Reader::Perl;
 use PYX qw(comment end_element char instruction start_element);
 use PYX::Utils qw(decode entity_decode);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -162,11 +162,13 @@ SGML::PYX - Convertor between SGML and PYX.
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%params)>
+ my $obj = SGML::PYX->new(%params);
 
- Constructor.
+Constructor.
+
+Returns instance of object.
 
 =over 8
 
@@ -181,12 +183,13 @@ SGML::PYX - Convertor between SGML and PYX.
 
 =back
 
-=item C<parsefile($sgml_file)>
+=head2 C<parsefile>
 
- Parse input SGML file and convert to PYX output.
- Returns undef.
+ $obj->parsefile($sgml_file);
 
-=back
+Parse input SGML file and convert to PYX output.
+
+Returns undef.
 
 =head1 ERRORS
 
@@ -272,6 +275,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Queue;
-$RT::Client::REST::Queue::VERSION = '0.56';
+$RT::Client::REST::Queue::VERSION = '0.57';
 use Params::Validate qw(:types);
 use RT::Client::REST 0.20;
 use RT::Client::REST::Object 0.01;
@@ -97,6 +97,13 @@ sub _attributes {{
         rest_name => 'CcAddresses',
     },
 
+    sla_disabled => {
+        validation => {
+            type => SCALAR,
+        },
+        rest_name => 'SLADisabled',
+    },
+
 }}
 
 
@@ -132,7 +139,7 @@ RT::Client::REST::Queue - queue object representation.
 
 =head1 VERSION
 
-version 0.56
+version 0.57
 
 =head1 SYNOPSIS
 
@@ -302,7 +309,7 @@ SRVSH
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Dmitri Tikhonov.
+This software is copyright (c) 2020 by Dmitri Tikhonov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -176,9 +176,7 @@ COLLECTORS
 
 TODO
 
-      * Split Registry out from toplevel instance.
-
-      * Write some actual example programs.
+      * Histogram/Summary 'start_timer' support
 
 AUTHOR
 

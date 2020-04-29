@@ -1,3 +1,14 @@
+0.03 2020-04-28T00:50:37+02:00
+ - Add REPOSITORY section to doc.
+ - Add author website to AUTHOR section in doc.
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.02 2015-10-29T22:56:13+01:00
  - Add LICENSE file.
  - Add Test::NoWarnings to tests.

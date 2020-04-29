@@ -85,8 +85,8 @@ Web::Mention - Implementation of the IndieWeb Webmention protocol
 
 This class implements the Webmention protocol, as defined by the W3C and
 the IndieWeb community. (See [this article by Chris
-Aldrich](https://alistapart.com/article/webmentions-enabling-better-communication-on-the-internet/)
-for an excellent high-level summary of Webmention and its applications.)
+Aldrich](https://metacpan.org/pod/https:#alistapart.com-article-webmentions-enabling-better--communication-on-the-internet) for an excellent high-level summary of
+Webmention and its applications.)
 
 An object of this class represents a single webmention, with target and
 source URLs. It can verify itself, determining whether or not the
@@ -183,7 +183,7 @@ Defaults to `...`.
 Gets or sets the maximum length, in characters, of the content displayed
 by that object method prior to truncation. (See ["content"](#content).)
 
-Defaults to 200.
+Defaults to 280.
 
 ## Object Methods
 
@@ -228,7 +228,7 @@ target's part.)
 
     $bool = $wm->is_tested;
 
-Returns 1 if this object's `verify()` method has been called at least
+Returns 1 if this object's ["verify"](#verify) method has been called at least
 once, regardless of the results of that call. Returns 0 otherwise.
 
 ### is\_verified
@@ -239,8 +239,8 @@ Returns 1 if the webmention's source document actually does seem to
 mention the target URL. Otherwise returns 0.
 
 The first time this is called on a given webmention object, it will try
-to fetch the source document at its designated URL. If it cannot fetch
-the document on this first attempt, this method returns 0.
+to fetch the source document at its designated URL by way of the
+["verify"](#verify) method.
 
 ### original\_source
 
@@ -267,8 +267,8 @@ Returns undef if this webmention instance hasn't tried to send itself.
 
     my $rsvp = $wm->rsvp_type;
 
-If this webmention is of type `rsvp` (see ["type"](#type), below), then this method returns the
-type of RSVP represented. It will be one of:
+If this webmention is of type `rsvp` (see ["type"](#type), below), then this
+method returns the type of RSVP represented. It will be one of:
 
 - yes
 - no
@@ -291,6 +291,12 @@ If that whole process goes through successfully and the endpoint returns
 a success response (meaning that it has acknowledged the webmention, and
 most likely queued it for later processing), then this method returns
 true. Otherwise, it returns false.
+
+**To determine why a webmention did not send itself successfully**, consult
+the value of `response`. If it is defined, then you can call
+[HTTP::Response](https://metacpan.org/pod/HTTP::Response) methods (such as `code` or `message`) to learn more
+about the problem. Otherwise, if `response` is not defined, then the
+target URL did not advertise a Webmention endpoint.
 
 ### source
 
@@ -376,6 +382,19 @@ properties.)
     $type = $wm->type;
 
 The type of webmention this is. One of:
+
+### verify
+
+    my $is_verified = $wm->verify
+
+This **verifies** the webmention, confirming that the content located at
+the source URL contains the target URL. Returns 1 if so, and 0
+otherwise. Will also return 0 if it cannot fetch the content at all,
+after one try.
+
+Sets `is_tested` to 1 as a side-effect.
+
+See also ["is\_verified"](#is_verified).
 
 - mention _(default)_
 - reply

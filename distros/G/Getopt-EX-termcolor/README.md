@@ -4,7 +4,7 @@ Getopt::EX::termcolor - Getopt::EX termcolor module
 
 # VERSION
 
-Version 1.04
+Version 1.05
 
 # SYNOPSIS
 
@@ -43,12 +43,14 @@ produces decimal value from 0 to 100.
 
 If the environment variable `TERM_BGCOLOR` is defined, it is used as
 a background RGB value without calling sub-modules.  RGB value is a
-combination of integer described in 24bit/12bit hex or 24bit decimal
-format.
+combination of integer described in 24bit/12bit hex, 24bit decimal or
+6x6x6 216 color format.  RGB color notation is compatible with
+[Getopt::EX::Colormap](https://metacpan.org/pod/Getopt::EX::Colormap).
 
     24bit hex     #000000 .. #FFFFFF
-    12bit hex     #000 .. #FFF
-    24bit decimal 0,0,0 .. 255,255,255
+    12bit hex     #000    .. #FFF
+    24bit decimal 0,0,0   .. 255,255,255
+    6x6x6 216     000     .. 555
 
 You can set `TERM_BGCOLOR` in you start up file of shell.  This
 module has utility function `bgcolor` which can be used like this:

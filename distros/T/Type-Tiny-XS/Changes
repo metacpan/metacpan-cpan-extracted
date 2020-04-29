@@ -6,6 +6,15 @@ Home page:    <https://metacpan.org/release/Type-Tiny-XS>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny-XS>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.017	2020-04-28
+
+ [ Bug Fixes ]
+ - Fix segfault in BOOT.
+   Fixes RT#130458.
+   Tomasz Konojacki++
+   <https://rt.cpan.org/Ticket/Display.html?id=130458>
+   <https://github.com/tobyink/p5-type-tiny-xs/pull/11>
+
 0.016	2019-09-05
 
  [ Bug Fixes ]

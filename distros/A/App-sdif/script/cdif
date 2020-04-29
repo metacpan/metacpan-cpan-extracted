@@ -67,6 +67,7 @@ my $opt_command = 1;
 my $opt_mark = 1;
 my $opt_prefix = 1;
 my $opt_prefix_pattern = q/(?:\\| )*(?:  )*/;
+my $opt_lenience = 1;
 
 my %visible = (
     nul => [ 1,  "\000"  => "\N{SYMBOL FOR NULL}" ],
@@ -142,6 +143,7 @@ my @optargs = (
     "visible=s" => \@opt_visible,
     "visible-cr|vcr!" => sub { $opt_visible{cr} = $_[1] },
     "visible-esc|vesc!" => sub { $opt_visible{esc} = $_[1] },
+    "lenience!" => \$opt_lenience,
 
     "i|ignore-case" => \$opt_i,
     "b|ignore-space-change" => \$opt_b,
@@ -167,6 +169,7 @@ for my $opt_d (@opt_d) {
     map { $opt_d{$_}++ } split //, $opt_d;
 }
 
+$App::sdif::Util::NO_WARNINGS = $opt_lenience;
 $App::cdif::Command::Mecab::debug = 1 if $opt_d{m};
 
 $rcs++ if @rcsopt;
@@ -915,6 +918,7 @@ Options:
 	--prefix-pattern    prefix pattern
 	--visible char=?    set visible attributes
 	--[no]mecab	    use mecab tokenizer     (default false)
+	--[no]lenience      supress unexpected input warning (default true)
 
 
 =head1 DESCRIPTION
@@ -1184,6 +1188,11 @@ of total appended/deleted/changed words in the context of cdif.  It's
 common to have many insertions and deletions of newlines because of
 text filling process.  So normal information is followed by modified
 number which ignores insert/delete newlines.
+
+=item B<-->[B<no>]B<lenience>
+
+Supress warning message for unexpected input from diff command.  True
+by default.
 
 =back
 

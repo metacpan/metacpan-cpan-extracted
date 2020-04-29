@@ -14,3 +14,6 @@ Revision history for Module-Generate
 
 0.06    2020-04-25
 	- set our $VERSION on generate
+
+0.07    2020-04-27
+	- adds a 'new' method

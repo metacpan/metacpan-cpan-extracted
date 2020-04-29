@@ -1,5 +1,10 @@
 Revision history for Perl extension Algorithm-Dependency
 
+1.112     2020-04-28 03:15:25Z
+        - restore prerequisite version declarations from version 1.110
+        - update documentation to add clarity for how ordered processing works
+          (PR#1) (thanks, Mark Murawski!)
+
 1.111     2018-12-22 01:42:08Z
         - distribution tooling updates
 

@@ -1,5 +1,7 @@
 # This Changes log is JSONY!
 
+- 0.1.21 'Mon Apr 27 08:50:37 PDT 2020',
+    'Single scalar should become an array'
 - 0.1.20 'Tue Apr  7 13:24:19 PDT 2020',
     'Allow lists starting with array or hash',
     'Allow for leading comments'

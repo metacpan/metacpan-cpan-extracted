@@ -46,7 +46,7 @@ SKIP: {
         $err,
         all(
             re( qr<0x0000_0001_0000_0000> ),
-            re( qr<13> ),
+            re( qr<[^0-9]13[^0-9]> ),
         ),
         '… and the message looks as it should',
     );

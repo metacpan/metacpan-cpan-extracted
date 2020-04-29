@@ -1,3 +1,9 @@
+0.0801  2020-04-28
+    - Convert weaver.ini to @SHLOMIF .
+    - Remove the failing libxml version tests.
+        - http://cpantesters.org/cpan/report/2b753f08-c5cb-11e9-be0e-c9311f24ea8f
+    - Code cleanups.
+
 0.0800  2019-10-29
     - Add the <fact /> alias to <f/> and the <lang/> alias to <l/>.
         - For vim jump sanity.

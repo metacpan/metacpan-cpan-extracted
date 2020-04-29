@@ -105,7 +105,7 @@ sub start {
 
 =head1 NAME
 
-Message::Passing:Role::Script - Handy role for building messaging scripts.
+Message::Passing::Role::Script - Handy role for building messaging scripts.
 
 =head1 SYNOPSIS
 

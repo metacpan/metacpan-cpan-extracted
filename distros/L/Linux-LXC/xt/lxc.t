@@ -63,11 +63,17 @@ ok grep{'lxc-test'} $container->get_stopped_containers == 0, 'Container is not p
 ok $container->is_running, 'Container is considered as running.';
 ok grep{'lxc-test'} $container->get_running_containers, 'Container is present in get_running_containers.';
 
+# Testing "put" subroutine
 `echo testing > /tmp/lxc-test.txt`;
 $container->set_config($config_names_to_use{'idmap'}, 'u 0 4300000 100000', ADDITION_MODE);
 $container->set_config($config_names_to_use{'idmap'}, 'g 0 4300000 100000', ADDITION_MODE);
 $container->put('/tmp/lxc-test.txt', '/etc/random/lxc-test.txt');
 ok -f '/var/lib/lxc/lxc-test/rootfs/etc/random/lxc-test.txt', 'A file was correctly put into the container.';
+$container->exec('mkdir /tmp/folder1');
+$container->exec('ln -s /tmp/folder1 /tmp/folder2');
+$container->put('/tmp/lxc-test.txt', '/tmp/folder2/lxc-test.txt');
+ok -f '/var/lib/lxc/lxc-test/rootfs/tmp/folder2/lxc-test.txt', 'Put a file in a symlink is working.';
+
 my %paths = (
 	'' => 0,
 	'/etc' => 0,

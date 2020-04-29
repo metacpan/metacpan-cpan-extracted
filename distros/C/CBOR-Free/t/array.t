@@ -28,6 +28,25 @@ for my $t (@tests) {
     _cmpbin( CBOR::Free::encode($in), $enc, "Encode: " . Dumper($in) );
 }
 
+my @dectests = (
+    [ "\x9f\x80\xff" => [ [] ] ],
+    [ "\x9f\x80\x40\xff" => [ [], q<> ] ],
+);
+
+for my $t (@dectests) {
+    my ($in, $dec) = @$t;
+
+    local $Data::Dumper::Terse = 1;
+    local $Data::Dumper::Useqq = 1;
+    local $Data::Dumper::Indent = 0;
+
+    is_deeply(
+        CBOR::Free::decode($in),
+        $dec,
+        "Decode: " . Dumper($in),
+    );
+}
+
 sub _cmpbin {
     my ($got, $expect, $label) = @_;
 

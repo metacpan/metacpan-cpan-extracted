@@ -1,3 +1,7 @@
+0.04 2020-04-28T15:01:29+02:00
+ - Add test for element with space in attribute.
+ - Rewrite METHODS to =head2 in doc.
+
 0.03 2020-04-23T16:09:11+02:00
  - Add bigger test for cdata.
  - Fix Makefile.PL fails with no '.' in @INC.

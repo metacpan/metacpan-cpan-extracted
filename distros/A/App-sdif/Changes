@@ -1,5 +1,9 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.15.0 2020-04-29T15:15:12Z
+
+    - Introduce --lenience option to suppress unexpected input warnings.
+
 4.14.0 2020-04-23T10:28:31Z
 
     - Move sdif::autocolor to Getopt::EX::termcolor.

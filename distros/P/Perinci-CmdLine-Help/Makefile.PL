@@ -17,10 +17,10 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Perinci::CmdLine::Help",
   "PREREQ_PM" => {
-    "Data::Dmp" => "0.21",
+    "Data::Dmp" => "0.240",
     "Exporter" => "5.57",
     "Perinci::Sub::Normalize" => "0.19",
-    "Perinci::Sub::To::CLIDocData" => "0.28",
+    "Perinci::Sub::To::CLIDocData" => "0.294",
     "Text::Wrap" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.172",
+  "VERSION" => "0.173",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,13 +39,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Dmp" => "0.21",
+  "Data::Dmp" => "0.240",
   "Exporter" => "5.57",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Perinci::Sub::Normalize" => "0.19",
-  "Perinci::Sub::To::CLIDocData" => "0.28",
+  "Perinci::Sub::To::CLIDocData" => "0.294",
   "Test::More" => 0,
   "Text::Wrap" => 0,
   "strict" => 0,

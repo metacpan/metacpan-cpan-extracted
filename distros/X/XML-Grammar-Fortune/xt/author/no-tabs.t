@@ -10,8 +10,6 @@ my @files = (
     'lib/XML/Grammar/Fortune.pm',
     'lib/XML/Grammar/Fortune/ToText.pm',
     't/00-compile.t',
-    't/00-load.t',
-    't/00basic.t',
     't/data/text-results/irc-conversation-1.txt',
     't/data/text-results/irc-conversation-3-with-join-unjoin.txt',
     't/data/text-results/quote-fort-sample-10-with-hyperlink.txt',

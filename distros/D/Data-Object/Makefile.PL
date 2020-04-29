@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Data::Object",
   "PREREQ_PM" => {
-    "Data::Object::Cast" => "0.01",
+    "Data::Object::Cast" => "0.02",
     "Data::Object::Class" => "2.02",
     "Data::Object::ClassHas" => "2.01",
     "Data::Object::Kind" => "0.01",
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Data::Object::Cast" => "0.01",
+    "Data::Object::Cast" => "0.02",
     "Data::Object::Class" => "2.02",
     "Data::Object::ClassHas" => "2.01",
     "Data::Object::Kind" => "0.01",
@@ -45,7 +45,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "2.04",
+  "VERSION" => "2.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,7 +53,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Object::Cast" => "0.01",
+  "Data::Object::Cast" => "0.02",
   "Data::Object::Class" => "2.02",
   "Data::Object::ClassHas" => "2.01",
   "Data::Object::Kind" => "0.01",

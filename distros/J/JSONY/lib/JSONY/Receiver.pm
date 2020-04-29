@@ -5,6 +5,7 @@ package JSONY::Receiver;
 use base 'Pegex::Tree';
 use boolean;
 
+sub final { ref $_[1] ? $_[1] : [$_[1]] }
 sub got_top_seq_entry { $_[1][0][0] }
 sub got_top_map { $_[0]->got_map([$_[1]]) }
 sub got_seq { $_[1]->[0] }

@@ -1,0 +1,16 @@
+Revision history for Metrics-Any-Adapter-Prometheus
+
+0.03    2020-04-29
+        [CHANGES]
+         * Join multipart metric names on underscores
+         * Only append "_total" to names of Counter metrics that lack other
+           units
+
+0.02    2020-04-28
+        [CHANGES]
+         * Implement the new distribution, gauge and timer metric types
+         * Append "_total" to counter metric names as suggested by Prometheus
+           style
+
+0.01    2020-04-27
+        First version, released on an unsuspecting world.

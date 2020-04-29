@@ -1,9 +1,9 @@
 package Sort::Sub::prereq_ala_perlancar;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-15'; # DATE
+our $DATE = '2020-02-13'; # DATE
 our $DIST = 'PERLANCAR-Sort-Sub'; # DIST
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.080'; # VERSION
 
 use 5.010001;
 use strict;
@@ -59,7 +59,7 @@ Sort::Sub::prereq_ala_perlancar - Sort prereqs PERLANCAR-style
 
 =head1 VERSION
 
-This document describes version 0.07 of Sort::Sub::prereq_ala_perlancar (from Perl distribution PERLANCAR-Sort-Sub), released on 2019-12-15.
+This document describes version 0.080 of Sort::Sub::prereq_ala_perlancar (from Perl distribution PERLANCAR-Sort-Sub), released on 2020-02-13.
 
 =head1 SYNOPSIS
 
@@ -124,7 +124,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

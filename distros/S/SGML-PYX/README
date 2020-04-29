@@ -8,21 +8,28 @@ SYNOPSIS
      $obj->parsefile($sgml_file);
 
 METHODS
-    "new(%params)"
-             Constructor.
+  "new"
+     my $obj = SGML::PYX->new(%params);
 
-            *       "output"
+    Constructor.
 
-                     Output callback, which prints output PYX code.
-                     Default value is subroutine:
-                       my (@data) = @_;
-                       print join "\n", map { encode_utf8($_) } @data;
-                       print "\n";
-                       return;
+    Returns instance of object.
 
-    "parsefile($sgml_file)"
-             Parse input SGML file and convert to PYX output.
-             Returns undef.
+    *       "output"
+
+             Output callback, which prints output PYX code.
+             Default value is subroutine:
+               my (@data) = @_;
+               print join "\n", map { encode_utf8($_) } @data;
+               print "\n";
+               return;
+
+  "parsefile"
+     $obj->parsefile($sgml_file);
+
+    Parse input SGML file and convert to PYX output.
+
+    Returns undef.
 
 ERRORS
      new():
@@ -90,5 +97,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

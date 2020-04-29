@@ -1,5 +1,10 @@
 Revision history for Net-Async-HTTP-Server
 
+0.11    2020-04-28
+        [CHANGES]
+         * Use Metrics::Any instead of the hacky devel-only Net::Prometheus
+           registration API
+
 0.10    2019-11-28 00:54:47
         [CHANGES]
          * Experimental Net::Prometheus integration by automatic metrics

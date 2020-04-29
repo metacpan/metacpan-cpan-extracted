@@ -45,7 +45,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Dancer2" : "0",
+            "Dancer2" : "0.300003",
             "File::Spec" : "0",
             "FindBin" : "0",
             "List::MoreUtils" : "0",
@@ -71,7 +71,7 @@
    "provides" : {
       "App::Notifier::Service" : {
          "file" : "lib/App/Notifier/Service.pm",
-         "version" : "0.0800"
+         "version" : "0.0801"
       }
    },
    "release_status" : "stable",
@@ -86,7 +86,7 @@
          "web" : "https://github.com/shlomif/app-notifier"
       }
    },
-   "version" : "0.0800",
+   "version" : "0.0801",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"
@@ -214,7 +214,7 @@
                   "meta_noindex" : 1
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000036",
+                  "Module::Metadata" : "1.000037",
                   "version" : "0.006"
                }
             },

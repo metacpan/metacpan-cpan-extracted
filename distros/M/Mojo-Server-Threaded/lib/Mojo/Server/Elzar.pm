@@ -10,7 +10,8 @@ use Win32::Process;
 
 our $VERSION = $Mojo::Server::Threaded::VERSION;
 
-has threaded => sub { Mojo::Server::Threaded->new(listen => ['http://*:8080']) };
+has threaded =>
+  sub { Mojo::Server::Threaded->new(listen => ['http://*:8080']) };
 has upgrade_timeout => 180;
 
 my $trace = $ENV{MOJO_SERVER_ELZAR_TRACE};
@@ -20,8 +21,8 @@ sub configure {
 
   # Elzar settings
   my $threaded = $self->threaded;
-  my $c    = $threaded->app->config($name) || {};
-  my $fb_c = $threaded->app->config($fallback_name || '');
+  my $c        = $threaded->app->config($name) || {};
+  my $fb_c     = $threaded->app->config($fallback_name || '');
   $c->{$_} //= $fb_c->{$_} for keys %$fb_c;
 
   $self->upgrade_timeout($c->{upgrade_timeout}) if $c->{upgrade_timeout};
@@ -106,6 +107,7 @@ sub _finish {
 
   my $threaded = $self->threaded->cleanup(0);
   unlink $threaded->pid_file;
+
   #$threaded->ensure_pid_file($new);
 }
 
@@ -124,14 +126,15 @@ sub _manage {
   my $self = shift;
 
   my $threaded = $self->threaded;
-  my $log = $threaded->app->log;
+  my $log      = $threaded->app->log;
 
   # Upgraded (wait for all workers to send a heartbeat)
   my $mport = $self->threaded->management_port;
   if ($ENV{ELZAR_PORT} && $ENV{ELZAR_PORT} ne $mport) {
     $log->debug("Upgrade in progress");
     return unless $threaded->healthy == $threaded->workers;
-    $log->info("Upgrade successful, stopping server with port $ENV{ELZAR_PORT}");
+    $log->info(
+      "Upgrade successful, stopping server with port $ENV{ELZAR_PORT}");
     $self->threaded->send_command('QUIT', '', $ENV{ELZAR_PORT});
   }
 
@@ -150,8 +153,11 @@ sub _manage {
       $log->info($$ . " new: $self->{new}");
     }
 
-    # Timeout
-    if ( $self->{upgrade} + $ut <= steady_time ) {
+    # new instance died or timeout
+    if (!Win32::Process::Open(my $proc, $self->{new}, 0)) {
+      $self->_cleanup($self->{new});
+    }
+    elsif ($self->{upgrade} + $ut <= steady_time) {
       $log->info("Killing $self->{new}");
       Win32::Process::KillProcess($self->{new}, my $ec = -1);
       $self->_cleanup($self->{new});
@@ -178,7 +184,7 @@ sub _svc_install {
   require Win32::Daemon;
   Win32::Daemon->import();
 
-  my $mx = $ENV{ELZAR_EXE} =~ /(?:\.bat|\.cmd)$/i ? '-x' : '';
+  my $mx      = $ENV{ELZAR_EXE} =~ /(?:\.bat|\.cmd)$/i ? '-x' : '';
   my $display = my $name = $ENV{ELZAR_SVC_INST};
   $name =~ s/\s+/_/g;
   my $desc = "Elzar Webserver for $ENV{ELZAR_APP} listening on "
@@ -191,7 +197,9 @@ sub _svc_install {
     parameters  => qq($mx "$ENV{ELZAR_EXE}" -r "$ENV{ELZAR_APP}"),
     start_type  => SERVICE_DEMAND_START(),
     description => $desc,
-  }) or return "Installation failed, ", Win32::FormatMessage(Win32::GetLastError());
+  })
+    or return "Installation failed, ",
+    Win32::FormatMessage(Win32::GetLastError());
   return "Installation successful";
 }
 
@@ -211,82 +219,85 @@ sub _svc_run {
     timeout  => $self->threaded->graceful_timeout,
   );
 
-  Win32::Daemon::RegisterCallbacks( {
-      start =>  sub {
-        my($ev, $ctx) = @_;
-        $ctx->{log}->info("service: starting manager process");
-        my $proc = _new_proc(_elzar_cmd()) or do {
-          my $msg = Win32::FormatMessage(Win32::GetLastError());
-          $ctx->{log}->error("Error starting manager process, $msg");
-          Win32::Daemon::State(SERVICE_STOPPED());
-          Win32::Daemon::StopService();
-          return;
-        };
-        my $pid = $proc->GetProcessID();
-        $ctx->{log}->info("service: manager process $pid started");
-        Win32::Daemon::State(SERVICE_RUNNING());
-      },
-
-      stop =>  sub {
-        my($ev, $ctx) = @_;
-        Win32::Daemon::State( SERVICE_STOP_PENDING(), $ctx->{timeout} * 1000 );
-        $ctx->{log}->info("service: stopping manager process");
-        if ( my $pid = $ctx->{threaded}->check_pid ) {
-          if ( Win32::Process::Open(my $proc, $pid, 0) ) {
-            if ( $ctx->{threaded}->send_command('QUIT') ) {
-              my $start = steady_time;
-              my $ec;
-              while ( $start + $ctx->{timeout} > steady_time ) {
-                $proc->GetExitCode($ec);
-                last if $ec != Win32::Process::STILL_ACTIVE();
-                sleep(1);
-              }
-              if ( $ec == Win32::Process::STILL_ACTIVE() ) {
-                $ctx->{log}->info("service: graceful timeout reached, killing manager $pid");
-                $proc->Kill(99);
-              }
-            } else {
-              $ctx->{log}->error("service: error sending QUIT to manager $pid");
-              $ctx->{log}->info("service: killing manager $pid");
-              $proc->Kill(98);
-            }
-          }
-        }
-        $ctx->{log}->info("service: stopping service process");
+  Win32::Daemon::RegisterCallbacks({
+    start => sub {
+      my ($ev, $ctx) = @_;
+      $ctx->{log}->info("service: starting manager process");
+      my $proc = _new_proc(_elzar_cmd()) or do {
+        my $msg = Win32::FormatMessage(Win32::GetLastError());
+        $ctx->{log}->error("Error starting manager process, $msg");
         Win32::Daemon::State(SERVICE_STOPPED());
         Win32::Daemon::StopService();
-      },
+        return;
+      };
+      my $pid = $proc->GetProcessID();
+      $ctx->{log}->info("service: manager process $pid started");
+      Win32::Daemon::State(SERVICE_RUNNING());
+    },
 
-      pause => sub {
-        my($ev, $ctx) = @_;
-        $ctx->{log}->info("service: sending DEPLOY to manager");
-        unless ( $ctx->{threaded}->send_command('DEPLOY') ) {
-          $ctx->{log}->error("service: error sending DEPLOY to manager");
-        }
-        Win32::Daemon::State(SERVICE_RUNNING());
-      },
-
-      timer => sub {
-        my($ev, $ctx) = @_;
-        $trace && $ctx->{log}->debug("service: in timer callback, checking manager");
-        if ( SERVICE_RUNNING() == Win32::Daemon::State() ) {
-          my $keep_running = 0;
-          my $pid = $ctx->{threaded}->check_pid;
-          if ( $pid ) {
-            Win32::Process::Open(my $proc, $pid, 0);
-            if ( $proc ) {
-              $proc->GetExitCode(my $ec);
-              if (!$ec or $ec == Win32::Process::STILL_ACTIVE() ) {
-                return;
-              }
+    stop => sub {
+      my ($ev, $ctx) = @_;
+      Win32::Daemon::State(SERVICE_STOP_PENDING(), $ctx->{timeout} * 1000);
+      $ctx->{log}->info("service: stopping manager process");
+      if (my $pid = $ctx->{threaded}->check_pid) {
+        if (Win32::Process::Open(my $proc, $pid, 0)) {
+          if ($ctx->{threaded}->send_command('QUIT')) {
+            my $start = steady_time;
+            my $ec;
+            while ($start + $ctx->{timeout} > steady_time) {
+              $proc->GetExitCode($ec);
+              last if $ec != Win32::Process::STILL_ACTIVE();
+              sleep(1);
+            }
+            if ($ec == Win32::Process::STILL_ACTIVE()) {
+              $ctx->{log}->info(
+                "service: graceful timeout reached, killing manager $pid");
+              $proc->Kill(99);
             }
           }
-          $ctx->{log}->info("service: manager process not found, stopping");
-          Win32::Daemon::State(SERVICE_STOPPED());
-          Win32::Daemon::StopService();
+          else {
+            $ctx->{log}->error("service: error sending QUIT to manager $pid");
+            $ctx->{log}->info("service: killing manager $pid");
+            $proc->Kill(98);
+          }
         }
-      },
-  } );
+      }
+      $ctx->{log}->info("service: stopping service process");
+      Win32::Daemon::State(SERVICE_STOPPED());
+      Win32::Daemon::StopService();
+    },
+
+    pause => sub {
+      my ($ev, $ctx) = @_;
+      $ctx->{log}->info("service: sending DEPLOY to manager");
+      unless ($ctx->{threaded}->send_command('DEPLOY')) {
+        $ctx->{log}->error("service: error sending DEPLOY to manager");
+      }
+      Win32::Daemon::State(SERVICE_RUNNING());
+    },
+
+    timer => sub {
+      my ($ev, $ctx) = @_;
+      $trace
+        && $ctx->{log}->debug("service: in timer callback, checking manager");
+      if (SERVICE_RUNNING() == Win32::Daemon::State()) {
+        my $keep_running = 0;
+        my $pid          = $ctx->{threaded}->check_pid;
+        if ($pid) {
+          Win32::Process::Open(my $proc, $pid, 0);
+          if ($proc) {
+            $proc->GetExitCode(my $ec);
+            if (!$ec or $ec == Win32::Process::STILL_ACTIVE()) {
+              return;
+            }
+          }
+        }
+        $ctx->{log}->info("service: manager process not found, stopping");
+        Win32::Daemon::State(SERVICE_STOPPED());
+        Win32::Daemon::StopService();
+      }
+    },
+  });
 
   $log->info("starting service event loop");
   Win32::Daemon::StartService(\%ctx, 5000);

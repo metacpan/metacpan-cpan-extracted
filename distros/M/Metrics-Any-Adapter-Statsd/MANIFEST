@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/Metrics/Any/Adapter/DogStatsd.pm
+lib/Metrics/Any/Adapter/SignalFx.pm
+lib/Metrics/Any/Adapter/Statsd.pm
+MANIFEST			This list of files
+t/00use.t
+t/01metrics.t
+t/02metrics-dogstatsd.t
+t/02metrics-signalfx.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

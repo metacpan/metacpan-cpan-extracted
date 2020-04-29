@@ -31,6 +31,7 @@ WriteMakefile1(
 
     OBJECT => [
         '$(BASEEXT)$(OBJ_EXT)',
+        'cbor_free_common.o',
         'cbor_free_boolean.o',
         'cbor_free_encode.o',
         'cbor_free_decode.o',

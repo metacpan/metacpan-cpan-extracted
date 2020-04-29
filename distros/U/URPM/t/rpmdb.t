@@ -19,7 +19,7 @@ my ($pkg_perl, $count_perl, $pkg_perl_extern);
     @all_pkgs_extern = sort { $a cmp $b } split /\n/ => qx(rpm -qa --nosignature --qf '%{name}-%{version}-%{release}\n');
     ok(@all_pkgs_extern > 0, 'There are RPMs');
 
-    my $perl = -e '/etc/redhat-release' || -e '/etc/mageia-release' ? qx(rpm -qf /bin/perl --qf '%{name}') : 'perl';
+    my $perl = -e '/etc/redhat-release' || -e '/etc/mageia-release' ? qx(rpm -qf /usr/bin/perl --qf '%{name}') : 'perl';
     $count = $db->traverse(sub {
 	    my ($pkg) = @_;
 	    my ($name, $version, $release, $arch) = $pkg->fullname;

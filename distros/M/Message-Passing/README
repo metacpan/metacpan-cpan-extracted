@@ -35,14 +35,14 @@ DESCRIPTION
     There are a growing set of components you can plug together to make your
     solution.
 
-    Getting started is really easy - you can just use the "message-passing"
+    Getting started is really easy - you can just use the "message-pass"
     command installed by the distribution. If you have a common config that
     you want to repeat, or you want to write your own server which does
     something more flexible than the normal script allows, then see
     Message::Passing::DSL.
 
     To dive straight in, see the documentation for the command line utility
-    message-passing, and see the examples in
+    message-pass, and see the examples in
     Message::Passing::Manual::Cookbook.
 
     For more about how the system works, see
@@ -100,7 +100,7 @@ COMPONENTS
     Message::Passing::Output::Test
 
 SEE ALSO
-    Message::Passing::Manual - The manual (contributions cherished)
+    Message::Passing::Manual - The manual (contributions cherished).
     <http://www.slideshare.net/bobtfish/messaging-interoperability-and-log-a
     ggregation-a-new-framework> - Slide deck!
     Log::Message::Structured - For creating your log messages.
@@ -111,14 +111,14 @@ THIS MODULE
     This is a simple MooX::Options script, with one input, one filter and
     one output. To build your own similar scripts, see:
 
-    Message::Passing::DSL - To declare your message chains
+    Message::Passing::DSL - To declare your message chains.
     Message::Passing::Role::CLIComponent - To provide "foo" and
     "foo_options" attribute pairs.
     Message::Passing::Role::Script - To provide daemonization features.
 
   METHODS
    build_chain
-    Builds and returns the configured chain of input => filter => output
+    Builds and returns the configured chain of input => filter => output.
 
    start
     Class method to call the run_message_server function with the results of
@@ -133,14 +133,14 @@ AUTHOR
 SUPPORT
   Bugs
     Please log bugs at rt.cpan.org. Each distribution has a bug tracker link
-    in it's metacpan.org page.
+    in its metacpan.org page.
 
   Discussion
     #message-passing on irc.perl.org.
 
   Source code
     Source code for all modules is available at <http://github.com/suretec>
-    and forks / patches are very welcome.
+    and forks/patches are very welcome.
 
 SPONSORSHIP
     This module exists due to the wonderful people at Suretec Systems Ltd.
@@ -152,8 +152,8 @@ SPONSORSHIP
 COPYRIGHT
     Copyright Suretec Systems Ltd. 2012.
 
-    Logstash (upon which many ideas for this project is based, but which we
-    do not reuse any code from) is copyright 2010 Jorden Sissel.
+    Logstash (upon which many ideas for this project are based, but from
+    which we do not reuse any code) is copyright 2010 Jorden Sissel.
 
 LICENSE
     GNU Library General Public License, Version 2.1

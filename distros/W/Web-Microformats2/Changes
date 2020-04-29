@@ -1,5 +1,10 @@
 Revision history for Web::Microformats2
 
+0.510 2020-04-28T23:07:03Z
+
+    - For the sake of faster load time, swapped out all use of Moose
+    (and MooseX) for Moo (and MooX).
+
 0.501 2019-06-06T16:26:33Z
 
     - Improved parsing of an edge case where the input document wants to

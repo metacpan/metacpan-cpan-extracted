@@ -13,7 +13,9 @@ echo foo > foo
 rm -rf $RPM_BUILD_ROOT
 for i in /etc/test-%{name} \
          /var/lib/test-%{name}/foo1 /var/lib/test-%{name}/foo2 /var/lib/test-%{name}/foo3 \
+%ifos linux
 	 /usr/share/locale/fr/LC_MESSAGES/test-%{name}.mo \
+%endif
          /usr/test-%{name}/foo; do
 	 mkdir -p `dirname $RPM_BUILD_ROOT$i`
 	 echo foo > $RPM_BUILD_ROOT$i

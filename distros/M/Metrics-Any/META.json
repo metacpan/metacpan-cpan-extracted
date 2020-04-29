@@ -1,0 +1,63 @@
+{
+   "abstract" : "abstract collection of monitoring metrics",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Metrics-Any",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Metrics::Any" : {
+         "file" : "lib/Metrics/Any.pm",
+         "version" : "0.03"
+      },
+      "Metrics::Any::Adapter" : {
+         "file" : "lib/Metrics/Any/Adapter.pm",
+         "version" : "0.03"
+      },
+      "Metrics::Any::Adapter::Null" : {
+         "file" : "lib/Metrics/Any/Adapter/Null.pm",
+         "version" : "0.03"
+      },
+      "Metrics::Any::Adapter::Test" : {
+         "file" : "lib/Metrics/Any/Adapter/Test.pm",
+         "version" : "0.03"
+      },
+      "Metrics::Any::Collector" : {
+         "file" : "lib/Metrics/Any/Collector.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

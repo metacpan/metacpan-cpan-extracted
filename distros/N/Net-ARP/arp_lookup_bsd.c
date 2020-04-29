@@ -22,16 +22,13 @@ See the GNU General Public License for more details.
 #include <sys/socket.h>
 #include <net/if_dl.h>
 #include <net/route.h>
-#include <stdint.h>
 #include <net/if_arp.h>
 #include <net/if.h>
 #include <netinet/in.h>
 #include <netinet/if_ether.h>
 #include <arpa/inet.h>
 #include <sys/sysctl.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include <sys/types.h>
 #include "arp.h"
 
 #define ROUNDUP(a) \

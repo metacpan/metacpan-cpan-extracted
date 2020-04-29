@@ -119,6 +119,14 @@ typedef struct s_Package* URPM__Package;
 #define FILTER_MODE_DOC_FILES     1
 #define FILTER_MODE_CONF_FILES    2
 
+#ifndef RPM4_11_0
+#ifdef PATCHED_MGA
+#define RPMTAG_RECOMMENDNAME RPMTAG_SUGGESTSNAME
+#define RPMTAG_RECOMMENDFLAGS RPMTAG_SUGGESTSFLAGS
+#define RPMTAG_RECOMMENDVERSION RPMTAG_SUGGESTSVERSION
+#endif
+#endif
+
 #ifdef RPM4_11_0
 #ifndef RPM4_12_0
 #ifndef PATCHED_RH
@@ -1275,15 +1283,19 @@ static void *rpmRunTransactions_callback(__attribute__((unused)) const void *h,
 #endif
     case RPMCALLBACK_INST_START:
     case RPMCALLBACK_INST_PROGRESS:
+#ifdef RPM4_10_0
     case RPMCALLBACK_INST_STOP:
+#endif
       callback = td->callback_inst;
       callback_type = "inst";
       break;
+#ifdef RPM4_10_0
     case RPMCALLBACK_SCRIPT_START:
     case RPMCALLBACK_SCRIPT_STOP:
       callback = td->callback_inst;
       callback_type = "script";
       break;
+#endif
     case RPMCALLBACK_CPIO_ERROR:
     case RPMCALLBACK_SCRIPT_ERROR:
     case RPMCALLBACK_UNPACK_ERROR:
@@ -1325,7 +1337,9 @@ static void *rpmRunTransactions_callback(__attribute__((unused)) const void *h,
 	else
 	  tprev = tcurr;
 	break;
+#ifdef RPM4_10_0
       case RPMCALLBACK_INST_STOP:
+#endif
       case RPMCALLBACK_TRANS_STOP:
       case RPMCALLBACK_UNINST_STOP:
 #ifdef RPM4_14_2

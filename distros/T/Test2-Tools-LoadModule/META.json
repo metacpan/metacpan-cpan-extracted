@@ -32,6 +32,8 @@
          "requires" : {
             "Carp" : "0",
             "Exporter" : "5.567",
+            "File::Find" : "0",
+            "File::Spec" : "0",
             "Getopt::Long" : "2.34",
             "Test2::API" : "0",
             "Test2::Util" : "0",
@@ -44,7 +46,7 @@
    "provides" : {
       "Test2::Tools::LoadModule" : {
          "file" : "lib/Test2/Tools/LoadModule.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -62,6 +64,6 @@
          "web" : "https://github.com/trwyant/perl-Test2-Tools-LoadModule"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

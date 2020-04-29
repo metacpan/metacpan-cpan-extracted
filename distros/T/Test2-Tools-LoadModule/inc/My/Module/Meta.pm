@@ -71,6 +71,8 @@ sub requires {
     return +{
 	Carp		=> 0,		# Comes with Perl 5.8.1
 	Exporter	=> 5.567,	# Comes with Perl 5.8.1
+	'File::Find'	=> 0,		# Comes with Perl 5.8.1
+	'File::Spec'	=> 0,		# Comes with Perl 5.8.1
 	'Getopt::Long'	=> 2.34,	# Comes with Perl 5.8.1
 	'Test2::API'	=> 0,
 	'Test2::Util'	=> 0,

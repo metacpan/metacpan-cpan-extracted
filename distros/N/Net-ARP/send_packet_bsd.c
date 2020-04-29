@@ -24,8 +24,6 @@ See the GNU General Public License for more details.
 #include <fcntl.h>
 #include <net/bpf.h>
 #include <net/if.h>
-#include <string.h>
-#include <stdio.h>
 #include "arp.h"
 
 int send_packet_bsd(const char *dev, u_char *packet, u_int packetsize)

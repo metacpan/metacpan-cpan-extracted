@@ -142,13 +142,16 @@ org2html - Convert Org document to HTML
 
 =head1 VERSION
 
-This document describes version 0.476 of org2html (from Perl distribution App-OrgUtils), released on 2020-04-18.
+This document describes version 0.477 of org2html (from Perl distribution App-OrgUtils), released on 2020-04-27.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % org2html [options] <input_filename>
+ % org2html [-B=s] [-b] [--backend=s] [--browser] [--config-path=path | -c]
+     [--config-profile=profile | -P] [--format=name] [--json]
+     [--(no)naked-res] [--no-config | -C] [--no-env]
+     [--page-result[=program]] <input_filename>
 
 =head1 DESCRIPTION
 

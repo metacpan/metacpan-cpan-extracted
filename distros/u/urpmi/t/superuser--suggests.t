@@ -17,8 +17,12 @@ use lib '.', 't';
 use helper;
 use urpm::util;
 use Test::More;
-if (are_weak_deps_supported()) {
-    plan skip_all => "Weak dependencies support is needed for those tests" ;
+BEGIN {
+    if (are_weak_deps_supported()) {
+	plan 'no_plan';
+    } else {
+	plan skip_all => "Weak dependencies support is needed for those tests" ;
+    }
 }
 
 

@@ -22,5 +22,7 @@ README
 SIGNATURE
 t/App-Unicode-Block/01-use.t
 t/App-Unicode-Block/02-version.t
+t/App-Unicode-Block/03-new.t
+t/App-Unicode-Block/04-run.t
 xt/App-Unicode-Block/01-pod_coverage.t
 xt/App-Unicode-Block/02-pod.t

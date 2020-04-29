@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Freecells;
-$Games::Solitaire::Verify::Freecells::VERSION = '0.2401';
+$Games::Solitaire::Verify::Freecells::VERSION = '0.2402';
 use warnings;
 use strict;
 
@@ -8,8 +8,6 @@ use parent 'Games::Solitaire::Verify::Base';
 
 use Games::Solitaire::Verify::Exception ();
 use Games::Solitaire::Verify::Card      ();
-
-use List::Util qw(first);
 
 # _s is the string.
 __PACKAGE__->mk_acc_ref(
@@ -200,7 +198,7 @@ Freecells in games such as Freecell, Baker's Game, or Seahaven Towers
 
 =head1 VERSION
 
-version 0.2401
+version 0.2402
 
 =head1 SYNOPSIS
 
@@ -335,7 +333,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 by Shlomi Fish.
+This software is Copyright (c) 2008 by Shlomi Fish.
 
 This is free software, licensed under:
 

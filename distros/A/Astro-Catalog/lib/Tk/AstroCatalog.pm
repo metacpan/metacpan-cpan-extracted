@@ -35,7 +35,7 @@ my $COLOR_INDEX = 0;
 
 use vars qw/$VERSION $FORMAT/;
 
-$VERSION = '4.34';
+$VERSION = '4.35';
 
 # Kluge - this is the format of the catalog to be read
 # Needs to be given as an option on the FileSelect widget.

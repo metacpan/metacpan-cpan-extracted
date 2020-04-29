@@ -1,4 +1,4 @@
-package Data::Object;
+  package Data::Object;
 
 use 5.014;
 
@@ -24,7 +24,7 @@ use routines;
 
 use parent 'Exporter';
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 
 our @EXPORT = qw(
   Array
@@ -82,7 +82,7 @@ fun Array(Maybe[ArrayRef] $data) {
 
   require Data::Object::Array;
 
-  return Box(Data::Object::Array->new($data));
+  return Data::Object::Array->new($data);
 }
 
 fun Boolean(Maybe[Bool] $data) {
@@ -105,7 +105,7 @@ fun Code(Maybe[CodeRef] $data) {
 
   require Data::Object::Code;
 
-  return Box(Data::Object::Code->new($data));
+  return Data::Object::Code->new($data);
 }
 
 fun Data(Maybe[Str] $data) {
@@ -136,7 +136,7 @@ fun Float(Maybe[Num] $data) {
 
   require Data::Object::Float;
 
-  return Box(Data::Object::Float->new($data));
+  return Data::Object::Float->new($data);
 }
 
 fun Hash(Maybe[HashRef] $data) {
@@ -144,7 +144,7 @@ fun Hash(Maybe[HashRef] $data) {
 
   require Data::Object::Hash;
 
-  return Box(Data::Object::Hash->new($data));
+  return Data::Object::Hash->new($data);
 }
 
 fun Name(Maybe[Str] $data) {
@@ -160,7 +160,7 @@ fun Number(Maybe[Num] $data) {
 
   require Data::Object::Number;
 
-  return Box(Data::Object::Number->new($data));
+  return Data::Object::Number->new($data);
 }
 
 fun Opts(Maybe[HashRef] $data) {
@@ -176,7 +176,7 @@ fun Regexp(Maybe[RegexpRef] $data) {
 
   require Data::Object::Regexp;
 
-  return Box(Data::Object::Regexp->new($data));
+  return Data::Object::Regexp->new($data);
 }
 
 fun Scalar(Maybe[Ref] $data) {
@@ -184,7 +184,7 @@ fun Scalar(Maybe[Ref] $data) {
 
   require Data::Object::Scalar;
 
-  return Box(Data::Object::Scalar->new($data));
+  return Data::Object::Scalar->new($data);
 }
 
 fun Space(Maybe[Str] $data) {
@@ -200,7 +200,7 @@ fun String(Maybe[Str] $data) {
 
   require Data::Object::String;
 
-  return Box(Data::Object::String->new($data));
+  return Data::Object::String->new($data);
 }
 
 fun Struct(Maybe[HashRef] $data) {
@@ -222,7 +222,7 @@ fun Undef() {
 
   require Data::Object::Undef;
 
-  return Box(Data::Object::Undef->new);
+  return Data::Object::Undef->new;
 }
 
 fun Vars(Maybe[HashRef] $data) {
@@ -255,7 +255,7 @@ Object-Orientation for Perl 5
 
   use Data::Object;
 
-  my $array = Array [1..4];
+  my $array = Box Array [1..4];
 
   # my $iterator = $array->iterator;
 
@@ -320,7 +320,7 @@ The Args function returns a L<Data::Object::Args> object.
 
 =head2 array
 
-  Array(ArrayRef $data) : InstanceOf["Data::Object::Box"]
+  Array(ArrayRef $data) : InstanceOf["Data::Object::Array"]
 
 The Array function returns a L<Data::Object::Box> which wraps a
 L<Data::Object::Array> object.
@@ -427,7 +427,7 @@ object which is automatically deduced.
 
 =head2 code
 
-  Code(CodeRef $data) : InstanceOf["Data::Object::Box"]
+  Code(CodeRef $data) : InstanceOf["Data::Object::Code"]
 
 The Code function returns a L<Data::Object::Box> which wraps a
 L<Data::Object::Code> object.
@@ -556,7 +556,7 @@ false value.
 
 =head2 float
 
-  Float(Num $data) : InstanceOf["Data::Object::Box"]
+  Float(Num $data) : InstanceOf["Data::Object::Float"]
 
 The Float function returns a L<Data::Object::Box> which wraps a
 L<Data::Object::Float> object.
@@ -585,7 +585,7 @@ L<Data::Object::Float> object.
 
 =head2 hash
 
-  Hash(HashRef $data) : InstanceOf["Data::Object::Box"]
+  Hash(HashRef $data) : InstanceOf["Data::Object::Hash"]
 
 The Hash function returns a L<Data::Object::Box> which wraps a
 L<Data::Object::Hash> object.
@@ -636,7 +636,7 @@ The Name function returns a L<Name::Object::Name> object.
 
 =head2 number
 
-  Number(Num $data) : InstanceOf["Data::Object::Box"]
+  Number(Num $data) : InstanceOf["Data::Object::Number"]
 
 The Number function returns a L<Data::Object::Box> which wraps a
 L<Data::Object::Number> object.
@@ -699,7 +699,7 @@ The Opts function returns a L<Data::Object::Opts> object.
 
 =head2 regexp
 
-  Regexp(RegexpRef $data) : InstanceOf["Data::Object::Box"]
+  Regexp(RegexpRef $data) : InstanceOf["Data::Object::Regexp"]
 
 The Regexp function returns a L<Data::Object::Box> which wraps a
 L<Data::Object::Regexp> object.
@@ -728,7 +728,7 @@ L<Data::Object::Regexp> object.
 
 =head2 scalar
 
-  Scalar(Ref $data) : InstanceOf["Data::Object::Box"]
+  Scalar(Ref $data) : InstanceOf["Data::Object::Scalar"]
 
 The Scalar function returns a L<Data::Object::Box> which wraps a
 L<Data::Object::Scalar> object.
@@ -777,7 +777,7 @@ The Space function returns a L<Data::Object::Space> object.
 
 =head2 string
 
-  String(Str $data) : InstanceOf["Data::Object::Box"]
+  String(Str $data) : InstanceOf["Data::Object::String"]
 
 The String function returns a L<Data::Object::Box> which wraps a
 L<Data::Object::String> object.
@@ -858,7 +858,7 @@ value.
 
 =head2 undef
 
-  Undef() : InstanceOf["Data::Object::Box"]
+  Undef() : InstanceOf["Data::Object::Undef"]
 
 The Undef function returns a L<Data::Object::Undef> object representing the
 I<undefined> value.

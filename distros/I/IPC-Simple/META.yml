@@ -1,0 +1,37 @@
+---
+abstract: 'simple, non-blocking IPC'
+author:
+  - 'Jeff Ober <sysread@fastmail.fm>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IPC-Simple
+requires:
+  AnyEvent: '0'
+  AnyEvent::Handle: '0'
+  Carp: '0'
+  Exporter: '0'
+  Fcntl: '0'
+  IPC::Open3: '0'
+  Moo: '0'
+  POSIX: '0'
+  Symbol: '0'
+  Types::Standard: '0'
+resources:
+  bugtracker: https://github.com/sysread/IPC-Simple/issues
+  homepage: https://github.com/sysread/IPC-Simple
+  repository: https://github.com/sysread/IPC-Simple.git
+version: '0.02'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

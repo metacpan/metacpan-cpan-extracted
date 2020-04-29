@@ -5,6 +5,7 @@ use_ok $_ for qw(
     Getopt::EX::termcolor
     Getopt::EX::termcolor::Apple_Terminal
     Getopt::EX::termcolor::iTerm
+    Getopt::EX::termcolor::XTerm
 );
 
 done_testing;

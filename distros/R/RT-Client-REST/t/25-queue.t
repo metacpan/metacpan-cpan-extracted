@@ -4,7 +4,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 16;
+use Test::More tests => 17;
 use Test::Exception;
 
 use constant METHODS => (
@@ -12,7 +12,7 @@ use constant METHODS => (
 
     # attrubutes:
     'id', 'name', 'description', 'correspond_address', 'comment_address',
-    'initial_priority', 'final_priority', 'default_due_in',
+    'initial_priority', 'final_priority', 'default_due_in', 'sla_disabled',
 );
 
 BEGIN {

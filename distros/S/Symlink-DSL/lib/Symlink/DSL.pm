@@ -1,5 +1,6 @@
 package Symlink::DSL;
-$Symlink::DSL::VERSION = '0.2.3';
+$Symlink::DSL::VERSION = '0.2.5';
+use 5.014;
 use strict;
 use warnings;
 use autodie;
@@ -180,7 +181,7 @@ Symlink::DSL - a domain-specific language for setting up symbolic links.
 
 =head1 VERSION
 
-version 0.2.3
+version 0.2.5
 
 =head1 SYNOPSIS
 
@@ -205,6 +206,15 @@ And in C<< setup.symlinks.manifest.txt >>:
     symlink from ~/bin/sus to ./bin/sus
     symlink from ~/bin/tail-extract to ./bin/tail-extract
 
+=head1 DESCRIPTION
+
+Symlink::DSL implements a domain-specific language for setting up symbolic
+links (e.g: to dot files and other resources). For example, one
+can write:
+
+    symlink from ~/bin/80_chars_ruler to ./bin/80_chars_ruler
+    symlink from ~/bin/backup-slash.bash to ./bin/backup-slash.bash
+
 =head1 METHODS
 
 =head2 Symlink::DSL->new({dir => $path2dir, skip_re=> $regexp})
@@ -217,7 +227,11 @@ Accepts:
 
 =item * dir
 
+The directory path which contains the manifest file.
+
 =item * skip_re
+
+A regular expression that will skip checking existing links.
 
 =item * manifest_base
 
@@ -229,7 +243,7 @@ The basename of the manifest file. Defaults to C<< setup.symlinks.manifest.txt >
 
 Returns the directory path.
 
-=head2 $obj->handle_line({%args})
+=head2 $obj->handle_line({line => $line_string})
 
 Handles a single line.
 
@@ -237,7 +251,7 @@ Handles a single line.
 
 Returns the basename of the manifest files. Can be set in new() .
 
-Added in 0.2.0).
+(Added in 0.2.0 .)
 
 =head2 $obj->manifest()
 
@@ -285,27 +299,11 @@ L<https://metacpan.org/release/Symlink-DSL>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Symlink-DSL>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Symlink-DSL>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Symlink-DSL>
 
 =item *
 

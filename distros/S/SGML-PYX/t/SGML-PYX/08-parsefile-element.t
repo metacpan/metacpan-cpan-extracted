@@ -3,7 +3,7 @@ use warnings;
 
 use File::Object;
 use SGML::PYX;
-use Test::More 'tests' => 6;
+use Test::More 'tests' => 8;
 use Test::NoWarnings;
 use Test::Output;
 
@@ -88,4 +88,35 @@ stdout_is(
 	},
 	$right_ret,
 	'Test element with one character data.',
+);
+
+# Test.
+$obj = SGML::PYX->new;
+$right_ret = <<'END';
+(element
+Aattr val val
+)element
+END
+stdout_is(
+	sub {
+		$obj->parsefile($data_dir->file('element6.sgml')->s);
+		return;
+	},
+	$right_ret,
+	'Test simple element with attribute which has value with space.',
+);
+
+# Test.
+$obj = SGML::PYX->new;
+$right_ret = <<'END';
+(element
+Aattr val val
+END
+stdout_is(
+	sub {
+		$obj->parsefile($data_dir->file('element7.sgml')->s);
+		return;
+	},
+	$right_ret,
+	'Test element with attribute which has value with space.',
 );

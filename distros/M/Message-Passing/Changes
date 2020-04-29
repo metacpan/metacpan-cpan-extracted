@@ -1,3 +1,9 @@
+  - Fix missing List::MoreUtils dependency
+    by using uniq from List::Util 1.45
+  - Fix missing JSON dependency
+    by using JSON::MaybeXS also for tests
+  - Document Output::Test clear_messages method
+
 0.116 2015-02-23T18:00:00+01:00
   - Fix link in 'Writing Filters' section of
     Message::Passing::Manual::Components
@@ -160,7 +166,7 @@
 
   - Make JSON decoder pass refs straight through, to
     act as a no-op if the input has already decoded
-    it's data into a hash.
+    its data into a hash.
 
   - Remove spurious warnings from reconnect code.
 
@@ -222,4 +228,3 @@
 
 0.001 2012-03-21T22:26:21+0000
     - Initial version.
-

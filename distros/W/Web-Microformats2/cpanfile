@@ -3,10 +3,11 @@ requires "HTML::Entities";
 requires "HTML::TreeBuilder::XPath";
 requires "JSON";
 requires "List::Util";
-requires "Moose";
-requires "MooseX::Types::URI";
+requires "Moo";
+requires "MooX::HandlesVia";
 requires "Readonly";
 requires "Scalar::Util";
+requires "Type::Tiny";
 
 on 'test' => sub {
     requires "Test::Deep";

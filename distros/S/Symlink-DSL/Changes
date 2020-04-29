@@ -1,5 +1,13 @@
 Revision history for Symlink-DSL
 
+0.2.5       2020-04-29
+    - Documentation improvements.
+        - Thanks to the Mageia Linux packaging process.
+
+0.2.4       2020-04-28
+    - Require minimal version of perl - 5.014:
+        - http://cpantesters.org/cpan/report/288f7b04-4209-11ea-8085-8f411f24ea8f .
+
 0.2.3       2020-01-28
     - Rebuild for order of 'NAME' and 'VERSION' sections in the generated
     POD documentation (see 0.001004 in

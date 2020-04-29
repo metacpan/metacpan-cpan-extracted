@@ -12,7 +12,7 @@ use Data::Object::ClassHas;
 
 extends 'Data::Object::Hash::Func';
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 
 # BUILD
 

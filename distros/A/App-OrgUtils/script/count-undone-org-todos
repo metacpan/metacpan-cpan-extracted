@@ -6,7 +6,7 @@ use warnings;
 
 use Org::Parser;
 
-our $VERSION = '0.476'; # VERSION
+our $VERSION = '0.477'; # VERSION
 
 my $org = Org::Parser->new;
 my $doc;
@@ -40,7 +40,7 @@ count-undone-org-todos - Count todos which are undone in Org document
 
 =head1 VERSION
 
-This document describes version 0.476 of count-undone-org-todos (from Perl distribution App-OrgUtils), released on 2020-04-18.
+This document describes version 0.477 of count-undone-org-todos (from Perl distribution App-OrgUtils), released on 2020-04-27.
 
 =head1 SYNOPSIS
 

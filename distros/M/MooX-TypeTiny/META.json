@@ -60,6 +60,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#web-simple"
    },
-   "version" : "0.002002",
+   "version" : "0.002003",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

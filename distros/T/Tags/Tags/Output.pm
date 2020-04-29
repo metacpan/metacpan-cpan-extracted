@@ -6,7 +6,7 @@ use warnings;
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Constructor.
 sub new {
@@ -69,10 +69,17 @@ sub flush {
 	return $ret;
 }
 
-# Return array of opened tags.
-sub open_tags {
+# Return array of opened elements.
+sub open_elements {
 	my $self = shift;
 	return @{$self->{'printed_tags'}};
+}
+
+# Deprecated.
+sub open_tags {
+	my $self = shift;
+	warn "Method open_tags() is deprecated";
+	return $self->open_elements;
 }
 
 # Put tags code.
@@ -309,9 +316,12 @@ __END__
  my $obj = Tags::Output->new(%parameters);
  $obj->finalize;
  my $ret = $obj->flush($reset_flag);
- my @tags = $obj->open_tags;
+ my @elements = $obj->open_elements;
  $obj->put(@data);
  $obj->reset;
+
+ # Deprecated methods.
+ my @tags = $obj->open_tags;
 
 =head1 METHODS
 
@@ -366,9 +376,9 @@ __END__
  Or return code.
  If enabled $reset_flag, then resets internal variables via reset method.
 
-=item C<open_tags()>
+=item C<open_elements()>
 
- Return array of opened tags.
+ Return array of opened elements.
 
 =item C<put(@data)>
 
@@ -379,6 +389,16 @@ __END__
 
  Resets internal variables.
  Returns undef.
+
+=back
+
+=head1 DEPRECATED METHODS
+
+=over 8
+
+=item C<open_tags()>
+
+ Return array of opened tags.
 
 =back
 
@@ -538,6 +558,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

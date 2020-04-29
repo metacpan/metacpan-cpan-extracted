@@ -1,16 +1,16 @@
 package Web::Mention;
 
-use Moose;
-use MooseX::ClassAttribute;
-use MooseX::Types::URI qw(Uri);
+use Moo;
+use MooX::ClassAttribute;
+use MooX::Enumeration;
+use Types::Standard qw(InstanceOf Maybe Str Bool Num Enum);
 use LWP;
 use HTTP::Link;
 use DateTime;
 use String::Truncate qw(elide);
 use Try::Tiny;
 use Types::Standard qw(Enum);
-use MooseX::Enumeration;
-use Scalar::Util;
+use Scalar::Util qw(blessed);
 use Carp qw(carp croak);
 use Mojo::DOM58;
 use URI::Escape;
@@ -21,88 +21,85 @@ use DateTime::Format::ISO8601;
 use Web::Microformats2::Parser;
 use Web::Mention::Author;
 
-our $VERSION = '0.704';
+our $VERSION = '0.710';
 
 Readonly my @VALID_RSVP_TYPES => qw(yes no maybe interested);
 
 has 'source' => (
-    isa => Uri,
+    isa => InstanceOf['URI'],
     is => 'ro',
     required => 1,
-    coerce => 1,
+    coerce => sub { URI->new($_[0]) },
 );
 
 has 'original_source' => (
-    isa => Uri,
-    is => 'ro',
-    lazy_build => 1,
-    coerce => 1,
+    isa => InstanceOf['URI'],
+    is => 'lazy',
+    coerce => sub { URI->new($_[0]) },
 );
 
 has 'source_html' => (
-    isa => 'Maybe[Str]',
+    isa => Maybe[Str],
     is => 'rw',
 );
 
 has 'source_mf2_document' => (
-    isa => 'Maybe[Web::Microformats2::Document]',
+    isa => Maybe[InstanceOf['Web::Microformats2::Document']],
     is => 'rw',
-    lazy_build => 1,
+    lazy => 1,
+    builder => '_build_source_mf2_document',
     clearer => '_clear_mf2',
 );
 
 has 'target' => (
-    isa => Uri,
+    isa => InstanceOf['URI'],
     is => 'ro',
     required => 1,
-    coerce => 1,
+    coerce => sub { URI->new($_[0]) },
 );
 
 has 'endpoint' => (
-    isa => 'Maybe[URI]',
-    is => 'ro',
-    lazy_build => 1,
+    isa => Maybe[InstanceOf['URI']],
+    is => 'lazy',
 );
 
 has 'is_tested' => (
-    isa => 'Bool',
+    isa => Bool,
     is => 'rw',
     default => 0,
 );
 
 has 'is_verified' => (
-    isa => 'Bool',
-    is => 'ro',
-    lazy_build => 1,
+    isa => Bool,
+    is => 'lazy',
 );
 
 has 'time_verified' => (
-    isa => 'DateTime',
+    isa => InstanceOf['DateTime'],
     is => 'rw',
 );
 
 has 'time_received' => (
-    isa => 'DateTime',
+    isa => InstanceOf['DateTime'],
     is => 'ro',
     default => sub{ DateTime->now },
 );
 
 has 'time_published' => (
-    isa => 'DateTime',
+    isa => InstanceOf['DateTime'],
     is => 'rw',
-    lazy_build => 1,
+    lazy => 1,
+    builder => '_build_time_published',
 );
 
 has 'rsvp_type' => (
-    isa => 'Maybe[Str]',
-    is => 'ro',
-    lazy_build => 1,
+    isa => Maybe[Str],
+    is => 'lazy',
 );
 
 has 'author' => (
-    isa => 'Maybe[Web::Mention::Author]',
-    is => 'ro',
-    lazy_build => 1,
+    isa => Maybe[InstanceOf['Web::Mention::Author']],
+    is => 'lazy',
     clearer => '_clear_author',
 );
 
@@ -110,44 +107,42 @@ has 'type' => (
     isa => Enum[qw(rsvp reply like repost quotation mention)],
     traits => ['Enumeration'],
     handles => [qw(is_rsvp is_reply is_like is_repost is_quotation is_mention)],
-    is => 'ro',
-    lazy_build => 1,
+    is => 'lazy',
     clearer => '_clear_type',
 );
 
 has 'content' => (
-    isa => 'Maybe[Str]',
-    is => 'ro',
-    lazy_build => 1,
+    isa => Maybe[Str],
+    is => 'lazy',
     clearer => '_clear_content',
 );
 
 has 'title' => (
-    isa => 'Maybe[Str]',
-    is => 'ro',
-    lazy_build => 1,
+    isa => Maybe[Str],
+    is => 'lazy',
     clearer => '_clear_title',
 );
 
 has 'response' => (
-    isa => 'HTTP::Response',
+    isa => Maybe[InstanceOf['HTTP::Response']],
     is => 'rw',
+    clearer => '_clear_response',
 );
 
 class_has 'ua' => (
-    isa => 'LWP::UserAgent',
+    isa => InstanceOf['LWP::UserAgent'],
     is => 'rw',
     default => sub { LWP::UserAgent->new },
 );
 
 class_has 'max_content_length' => (
-    isa => 'Num',
+    isa => Num,
     is => 'rw',
-    default => 200,
+    default => 280,
 );
 
 class_has 'content_truncation_marker' => (
-    isa => 'Str',
+    isa => Str,
     is => 'rw',
     default => '...',
 );
@@ -263,6 +258,7 @@ sub send {
     my $target = $self->target;
 
     unless ( $endpoint ) {
+        $self->_clear_response;
         return 0;
     }
 
@@ -705,8 +701,9 @@ Web::Mention - Implementation of the IndieWeb Webmention protocol
 
 This class implements the Webmention protocol, as defined by the W3C and
 the IndieWeb community. (See L<this article by Chris
-Aldrich|https://alistapart.com/article/webmentions-enabling-better-communication-on-the-internet/>
-for an excellent high-level summary of Webmention and its applications.)
+Aldrich|https://alistapart.com/article/webmentions-enabling-better-
+communication-on-the-internet/> for an excellent high-level summary of
+Webmention and its applications.)
 
 An object of this class represents a single webmention, with target and
 source URLs. It can verify itself, determining whether or not the
@@ -803,7 +800,7 @@ Defaults to C<...>.
 Gets or sets the maximum length, in characters, of the content displayed
 by that object method prior to truncation. (See L<"content">.)
 
-Defaults to 200.
+Defaults to 280.
 
 =head2 Object Methods
 
@@ -848,7 +845,7 @@ target's part.)
 
  $bool = $wm->is_tested;
 
-Returns 1 if this object's C<verify()> method has been called at least
+Returns 1 if this object's L<"verify"> method has been called at least
 once, regardless of the results of that call. Returns 0 otherwise.
 
 =head3 is_verified
@@ -859,8 +856,8 @@ Returns 1 if the webmention's source document actually does seem to
 mention the target URL. Otherwise returns 0.
 
 The first time this is called on a given webmention object, it will try
-to fetch the source document at its designated URL. If it cannot fetch
-the document on this first attempt, this method returns 0.
+to fetch the source document at its designated URL by way of the
+L<"verify"> method.
 
 =head3 original_source
 
@@ -887,8 +884,8 @@ Returns undef if this webmention instance hasn't tried to send itself.
 
  my $rsvp = $wm->rsvp_type;
 
-If this webmention is of type C<rsvp> (see L<"type">, below), then this method returns the
-type of RSVP represented. It will be one of:
+If this webmention is of type C<rsvp> (see L<"type">, below), then this
+method returns the type of RSVP represented. It will be one of:
 
 =over
 
@@ -926,6 +923,12 @@ If that whole process goes through successfully and the endpoint returns
 a success response (meaning that it has acknowledged the webmention, and
 most likely queued it for later processing), then this method returns
 true. Otherwise, it returns false.
+
+B<To determine why a webmention did not send itself successfully>, consult
+the value of C<response>. If it is defined, then you can call
+L<HTTP::Response> methods (such as C<code> or C<message>) to learn more
+about the problem. Otherwise, if C<response> is not defined, then the
+target URL did not advertise a Webmention endpoint.
 
 =head3 source
 
@@ -1011,6 +1014,19 @@ properties.)
  $type = $wm->type;
 
 The type of webmention this is. One of:
+
+=head3 verify
+
+ my $is_verified = $wm->verify
+
+This B<verifies> the webmention, confirming that the content located at
+the source URL contains the target URL. Returns 1 if so, and 0
+otherwise. Will also return 0 if it cannot fetch the content at all,
+after one try.
+
+Sets C<is_tested> to 1 as a side-effect.
+
+See also L<"is_verified">.
 
 =over
 

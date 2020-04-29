@@ -43,6 +43,7 @@
             "File::Find::Object" : "0",
             "Getopt::Long" : "0",
             "List::Util" : "1.33",
+            "perl" : "5.016",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -53,15 +54,14 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Path::Tiny" : "0",
-            "Test::More" : "0.88",
-            "perl" : "5.006"
+            "Test::More" : "0.88"
          }
       }
    },
    "provides" : {
       "App::rshasum" : {
          "file" : "lib/App/rshasum.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       }
    },
    "release_status" : "stable",
@@ -76,7 +76,7 @@
          "web" : "https://github.com/shlomif/rshasum"
       }
    },
-   "version" : "0.6.0",
+   "version" : "0.6.1",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

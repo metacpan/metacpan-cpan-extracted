@@ -5,16 +5,27 @@ use Test::More;
 
 use Test::DZil;
 use Test::Deep qw();
+use Test::Fatal qw();
 
 use Git::Wrapper;
+use File::Spec qw();
 use File::Temp qw();
 use File::pushd qw();
+
+use Time::Piece;
 
 use lib qw(lib);
 use Dist::Zilla::PluginBundle::Author::GSG;
 
 $ENV{EMAIL} = 'fake@example.com'; # force a default for git
 delete $ENV{V}; # because it could mess up Git::NextVersion
+
+# Avoid letting tests pick up our "root" git directory
+{
+    my @path = File::Spec->splitdir( File::Spec->rel2abs(__FILE__) );
+    splice @path, -2;    # Remote t/$file.t
+    $ENV{GIT_CEILING_DIRECTORIES} = File::Spec->catdir(@path);
+}
 
 {
     my $git = Git::Wrapper->new('.');
@@ -39,7 +50,7 @@ subtest 'Build a basic dist' => sub {
 
     $git->init;
     $git->remote( qw/ add origin /,
-        "https://fake-github.com/$upstream.git" );
+        "https://fake.github.com/$upstream.git" );
     $git->commit( { m => 'init', date => '2001-02-03 04:05:06' },
         '--allow-empty' );
 
@@ -172,10 +183,15 @@ subtest 'NextVersion' => sub {
     my $git = Git::Wrapper->new($dir);
     my $upstream = 'GrantStreetGroup/p5-Versioned-Package';
 
+    my $now = Time::Piece->new - 86400 * 30;
+
+    local $ENV{GIT_AUTHOR_DATE}    = $now->datetime;
+    local $ENV{GIT_COMMITTER_DATE} = $ENV{GIT_AUTHOR_DATE};
+
     $git->init;
     $git->remote( qw/ add origin /,
-        "https://fake-github.com/$upstream.git" );
-    $git->commit( { m => 'init', date => '2001-02-03 04:05:06' },
+        "https://fake.github.com/$upstream.git" );
+    $git->commit( { m => 'init', date => $now->datetime },
         '--allow-empty' );
 
     my $tzil = Builder->from_config(
@@ -197,16 +213,7 @@ subtest 'NextVersion' => sub {
     my ($version_plugin)
         = $tzil->plugin_named('@Author::GSG/Git::NextVersion');
     my ($changelog_plugin)
-        = $tzil->plugin_named('@Author::GSG/ChangelogFromGit');
-
-    $version_plugin->git->commit( { m => $_ }, '--allow-empty' ) for (
-        q{Merge branch 'ABC-123'},
-        q{Merge remote-tracking branch 'origin/master' into test},
-        q{Merge remote-tracking branch 'origin/test' into stage},
-        q{Merge remote-tracking branch 'origin/stage' into prod},
-        q{Merge pull request #123 in GHT/gsg-test from internal to master},
-        q{Merge pull request #321 from GrantStreetGroup/external},
-    );
+        = $tzil->plugin_named('@Author::GSG/ChangelogFromGit::CPAN::Changes');
 
     my @versions = (
         [ 'v0.0.1'              => 'v0.0.2' ],
@@ -214,40 +221,86 @@ subtest 'NextVersion' => sub {
         [ 'dist/v2.31.1.2/prod' => 'v2.31.2' ],
     );
 
-    my @expected_changes = { changes => ["init\n"] };
     for (@versions) {
         my ($have, $expect) = @{ $_ };
-        sleep 1; # ugh, ChangelogFromGit uses the commit date
         delete $version_plugin->{_all_versions};
-        delete $changelog_plugin->{releases};
 
-        $version_plugin->git->tag($have);
-        $version_plugin->git->commit( { m => "Version $expect" },
+        $now += 86400;
+        $ENV{GIT_AUTHOR_DATE} = $ENV{GIT_COMMITTER_DATE} = $now->datetime;
+        $version_plugin->git->commit( { m => "Changes for $have" },
             '--allow-empty' );
-
-        $expected_changes[-1]{version} = $have;
-        push @expected_changes, { changes => ["Version $expect\n"] };
+        $version_plugin->git->tag($have);
 
         is $version_plugin->provide_version, $expect,
             "Version after $have is $expect";
     }
 
+    for (
+        q{Merge branch 'ABC-123'},
+        q{Merge remote-tracking branch 'origin/master' into test},
+        q{Merge remote-tracking branch 'origin/test' into stage},
+        q{Merge remote-tracking branch 'origin/stage' into prod},
+        q{Merge pull request #123 in GHT/gsg-test from internal to master},
+        q{Merge pull request #321 from GrantStreetGroup/external},
+        q{A New Release},
+        )
+    {
+        $now += 86400;
+        $ENV{GIT_AUTHOR_DATE} = $ENV{GIT_COMMITTER_DATE} = $now->datetime;
+        $version_plugin->git->commit( { m => $_ },
+            '--allow-empty' );
+    }
     $version_plugin->git->tag('v3.0.0');
-    $expected_changes[-1]{version} = 'v3.0.0';
+
+    # For debugging, you can see the log here.
+    #diag $_ for $version_plugin->git->RUN('log', '--decorate' );
 
     {
         my $dir = File::pushd::pushd( $version_plugin->git->dir )
             or die "Unable to chdir source: $!";
+        local $ENV{DZIL_RELEASING} = 1;
         $changelog_plugin->gather_files;
     }
 
-    my @got = map { {
-        version => $_->version,
-        changes => [ map { $_->description } @{ $_->changes } ]
-    } } $changelog_plugin->all_releases;
+    my @changelog = map { [ split /\s+-\s+/ms ] } split /\n\s*\n/ms,
+        $tzil->files->[-1]->content;
 
-    is_deeply \@got, \@expected_changes,
-        "Expected Changes generated";
+    my %got;
+    for (@changelog) {
+        my ($version, @changes) = @{$_};
+
+        $version =~ s/\s+\d{4}-\d{2}-\d{2}T.*$//; # Remove date
+
+        chomp @changes;
+        s/\s+/ /gms       for @changes;
+        s/\s+\([^)]+\)$// for @changes;
+
+        $got{$version} = \@changes;
+    }
+
+    # This is not what I expected in the Changelog.
+    # I don't know why "init" and "v0.0.1" changes are in the wrong release.
+    my %expect = (
+        'Changelog for Versioned' => [],
+        'v0.0.1'                  => ['No changes found'],
+        'v1.2.3.4'                => ['Changes for v1.2.3.4'],
+        'v2.31.1.2'               => [
+            'Changes for dist/v2.31.1.2/prod',
+            'Changes for v1.2.3.4',
+            'Changes for v0.0.1',
+            'init'
+        ],
+        'v3.0.0' => [
+            'A New Release',
+            'Merge remote-tracking branch \'origin/stage\' into prod',
+            'Merge remote-tracking branch \'origin/test\' into stage',
+            'Merge remote-tracking branch \'origin/master\' into test',
+            'Changes for dist/v2.31.1.2/prod'
+        ]
+    );
+
+    is_deeply( \%got, \%expect, "Expected Changes generated" )
+        || diag explain [ \%got, \%expect ];
 };
 
 subtest "Override MetaProvides subclass" => sub {
@@ -261,8 +314,12 @@ subtest "Override MetaProvides subclass" => sub {
         { dist_root => 'corpus/dist/metaprovides_subclass' },
         {   add_files => {
                 'source/dist.ini' => dist_ini(
-                    { name           => 'External-Fake' },
-                    [ '@Author::GSG' => { meta_provides => 'Fake' } ],
+                    { name => 'External-Fake' },
+                    [   '@Author::GSG' => {
+                            meta_provides => 'Fake',
+                            github_remote => 'fake'
+                        }
+                    ],
                 ),
                 'source/lib/External/Fake.pm' =>
                     "package External::Fake;\n# ABSTRACT: ABSTRACT\n1;",
@@ -280,6 +337,166 @@ subtest "Override MetaProvides subclass" => sub {
     );
 };
 
+# A package similar to our Internal PluginBundle
+package  # Hide from the CPAN
+    Dist::Zilla::PluginBundle::Fake::WithoutGitHub {
+    use Moose;
+    with qw( Dist::Zilla::Role::PluginBundle::Easy );
+
+    sub configure {
+        my ($self) = @_;
+
+        $self->add_bundle(
+            'Filter' => {
+                %{ $self->payload },
+                -bundle => '@Author::GSG',
+                -remove => [ qw(
+                    GitHub::Meta
+                    Author::GSG::GitHub::UploadRelease
+                ) ]
+            }
+        );
+    }
+
+    __PACKAGE__->meta->make_immutable;
+}
+
+subtest "Set correct GitHub Remote" => sub {
+    my $dir = File::Temp->newdir("dzpbag-XXXXXXXXX");
+
+    #local $Git::Wrapper::DEBUG = 1;
+    my $git = Git::Wrapper->new($dir);
+    $git->init;
+    $git->commit( { m => 'init' }, '--allow-empty' );
+
+    my @config = (
+        { dist_root => 'corpus/dist/github' },
+        {   also_copy => { $dir => 'source' },
+            add_files => {
+                'source/dist.ini' =>
+                    dist_ini( { name => 'Fake' }, ['@Fake::WithoutGitHub'] ),
+                'source/lib/Fake.pm' =>
+                    "package Fake;\n# ABSTRACT: ABSTRACT\n1;",
+            }
+        }
+    );
+
+    ok Builder->from_config(@config),
+        "A subclass without any GitHub Plugins doesn't try to find a remote";
+
+    $config[1]{add_files}{'source/dist.ini'} = dist_ini(
+        { name => 'Fake' },
+        [   '@Filter' => {
+                -bundle => '@Author::GSG',
+                -remove => [qw( Author::GSG::GitHub::UploadRelease )],
+            }
+        ],
+    );
+
+    ok Builder->from_config(@config),
+        "A filter doesn't automatically generate the github_remote";
+
+    $config[1]{add_files}{'source/dist.ini'} = dist_ini(
+        { name => 'Fake' },
+        [   '@Filter' => {
+                -bundle => '@Author::GSG',
+                -remove => [qw( Author::GSG::GitHub::UploadRelease )],
+                find_github_remote => 1,
+            },
+        ],
+    );
+
+    like(
+        Test::Fatal::exception { Builder->from_config(@config) },
+        qr/^Unable to find git remote for GitHub /,
+        "A filter that requests it, tries to find the github_remote"
+    );
+
+    $config[1]{add_files}{'source/dist.ini'}
+        = dist_ini( { name => 'Fake' }, ['@Author::GSG',
+            find_github_remote => 0 ], );
+
+    ok Builder->from_config(@config),
+        "You can disable finding the github_remote";
+
+    $config[1]{add_files}{'source/dist.ini'}
+        = dist_ini( { name => 'Fake' }, ['@Author::GSG'], );
+
+    like(
+        Test::Fatal::exception { Builder->from_config(@config) },
+        qr/^Unable to find git remote for GitHub /,
+        "Without a git remote we fail"
+    );
+
+    $git->remote(
+        add => origin => "https://github.internal.test/Fake.git" );
+
+    like(
+        Test::Fatal::exception { Builder->from_config(@config) },
+        qr/^Unable to find git remote for GitHub /,
+        "Without a git remote we fail"
+    );
+
+    $git->remote(
+        add => 0 => "https://fake.GitHub.com/GrantStreetGroup/Fake.git" );
+
+    {
+        ok my $tzil = Builder->from_config(@config),
+            "With a single (falsy) remote we don't get an exception";
+
+        my %set;
+        foreach my $plugin ( @{ $tzil->plugins } ) {
+            if ( $plugin->isa('Dist::Zilla::Plugin::Git::Push') ) {
+                $set{git}++;
+                Test::Deep::cmp_bag( $plugin->push_to, [0],
+                    "Set push_to on " . $plugin->plugin_name );
+            }
+            elsif ( $plugin->isa('Dist::Zilla::Plugin::GitHub') ) {
+                $set{github}++;
+                is $plugin->remote, 0,
+                    "Set remote on " . $plugin->plugin_name;
+            }
+        }
+
+        is $set{git},    1, "Set one Git Plugin";
+        is $set{github}, 2, "Set two GitHub Plugins";
+    }
+
+    $git->remote(
+        add => 1 => "https://fake.GitHub.com/GrantStreetGroup/Fake.git" );
+
+    like(
+        Test::Fatal::exception { Builder->from_config(@config) },
+        qr/^Multiple git remotes found for GitHub /,
+        "Without a git remote we fail"
+    );
+
+    $config[1]{add_files}{'source/dist.ini'} = dist_ini( { name => 'Fake' },
+        [ '@Author::GSG' => { github_remote => 'fake' } ] );
+
+    {
+        ok my $tzil = Builder->from_config(@config),
+            "With an overridden github_remote we don't get an exception";
+
+        my %set;
+        foreach my $plugin ( @{ $tzil->plugins } ) {
+            if ( $plugin->isa('Dist::Zilla::Plugin::Git::Push') ) {
+                $set{git}++;
+                Test::Deep::cmp_bag( $plugin->push_to, ['fake'],
+                    "Set 'fake' push_to on " . $plugin->plugin_name );
+            }
+            elsif ( $plugin->isa('Dist::Zilla::Plugin::GitHub') ) {
+                $set{github}++;
+                is $plugin->remote, 'fake',
+                    "Set 'fake' remote on " . $plugin->plugin_name;
+            }
+        }
+
+        is $set{git},    1, "Set one Git::Push Plugin";
+        is $set{github}, 2, "Set two Git::Push Plugin";
+    }
+};
+
 subtest "Pass through Git::GatherDir params" => sub {
     my $tzil = Builder->from_config(
         { dist_root => 'corpus/dist/git-gather_dir' },
@@ -287,6 +504,7 @@ subtest "Pass through Git::GatherDir params" => sub {
                 'source/dist.ini' => dist_ini(
                     { name           => 'External-Fake' },
                     [ '@Author::GSG' => {
+                        github_remote    => 'fake',
                         include_dotfiles => 1,
                         exclude_filename => [ qw< foo bar > ],
                         exclude_match => [ q{baz}, q{qu+x} ],
@@ -320,7 +538,8 @@ subtest "Add 'script' ExecDir for StaticInstall" => sub {
         { dist_root => 'corpus/dist/exec_dir' },
         {   add_files => {
                 'source/dist.ini' => dist_ini(
-                    { name => 'External-Fake' }, ['@Author::GSG'],
+                    { name => 'External-Fake' },
+                    [ '@Author::GSG' => { github_remote => 'fake' } ],
                 ),
             }
         }
@@ -331,6 +550,54 @@ subtest "Add 'script' ExecDir for StaticInstall" => sub {
 
     is_deeply \@dirs, [qw< bin script >],
         "Have both bin/ and script/ ExecDirs";
+};
+
+
+subtest "Add 'test_compile_*' config slice" => sub {
+    my $tzil = Builder->from_config(
+        { dist_root => 'corpus/dist/test_compile' },
+        {   add_files => {
+                'source/dist.ini' => dist_ini(
+                    { name => 'Test-Compile' },
+                    [   '@Author::GSG' => {
+                            github_remote    => 'fake',
+                            test_compile_filename  => 'compile.t',
+                            test_compile_phase     => 'author',
+                            test_compile_skip      => [ 'Foo$', '^Ba[rz]' ],
+                            test_compile_file      => ['Foo/Bar.PL'],
+                            test_compile_fake_home => 1,
+                            test_compile_needs_display    => 0,
+                            test_compile_fail_on_warning  => 'author',
+                            test_compile_bail_out_on_fail => 1,
+                            test_compile_module_finder    => [':FakeModules'],
+                            test_compile_script_finder    => [':FakeFiles'],
+                            test_compile_xt_mode          => 1,
+                            test_compile_switch           => [ '-X', '-Y' ],
+                        }
+                    ],
+                ),
+            }
+        }
+    );
+
+    my ($plugin)
+        = grep { $_->plugin_name =~ /\bTest::Compile\b/ } @{ $tzil->plugins };
+
+    is_deeply $plugin->{filename} => 'compile.t', "filename is set";
+    is_deeply $plugin->{phase}    => 'author',    "phase is set";
+    is_deeply $plugin->{skips}      => [ 'Foo$', '^Ba[rz]' ], "skip is set";
+    is_deeply $plugin->{files}      => ['Foo/Bar.PL'], "file is set";
+    is_deeply $plugin->{fake_home} => 1, "fake_home is set";
+    is_deeply $plugin->{needs_display}   => 0, "needs_display is set";
+    is_deeply $plugin->{fail_on_warning} => 'author',
+        "fail_on_warning is set";
+    is_deeply $plugin->{bail_out_on_fail} => 1, "bail_out_on_fail is set";
+    is_deeply $plugin->{module_finder}    => [':FakeModules'],
+        "module_finder is set";
+    is_deeply $plugin->{script_finder} => [':FakeFiles'],
+        "script_finder is set";
+    is_deeply $plugin->{xt_mode} => 1, "xt_mode is set";
+    is_deeply $plugin->{switches}  => [ '-X', '-Y' ], "switch is set";
 };
 
 done_testing;

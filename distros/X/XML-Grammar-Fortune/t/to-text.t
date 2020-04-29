@@ -1,18 +1,15 @@
 #!/usr/bin/perl
 
+use 5.014;
 use strict;
 use warnings;
 
 use Test::More tests => 18;
-use Test::Differences;
+use Test::Differences qw/ eq_or_diff /;
 
-use File::Spec;
-use IO::String;
+use XML::Grammar::Fortune::ToText ();
 
-use XML::LibXML;
-use XML::LibXSLT;
-
-use XML::Grammar::Fortune::ToText;
+use Path::Tiny qw/ path /;
 
 # TEST:$num_texts=18
 
@@ -39,26 +36,10 @@ my @tests = (
         )
 );
 
-sub read_file
-{
-    my $path = shift;
-
-    open my $in, "<", $path
-        or die "Could not open '$path'! - $!";
-    binmode $in, ":utf8";
-    my $contents;
-    {
-        local $/;
-        $contents = <$in>
-    }
-    close($in);
-    return $contents;
-}
-
 foreach my $fn_base (@tests)
 {
-    my $buffer    = "";
-    my $io        = IO::String->new($buffer);
+    my $buffer = "";
+    open my $io, '>', \$buffer;
     my $converter = XML::Grammar::Fortune::ToText->new(
         {
             'input'  => "./t/data/xml/$fn_base.xml",
@@ -67,14 +48,14 @@ foreach my $fn_base (@tests)
     );
 
     $converter->run();
+    close $io;
 
     # TEST*$num_texts
     eq_or_diff(
         $buffer,
-        read_file("./t/data/text-results/$fn_base.txt"),
+        scalar( path("./t/data/text-results/$fn_base.txt")->slurp_utf8 ),
         "Testing for Good Conversion to Text of '$fn_base'",
     );
 }
 
 1;
-

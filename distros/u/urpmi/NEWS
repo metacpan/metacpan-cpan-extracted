@@ -1,14 +1,34 @@
-Version 8.122 - 11 April 2020
+Version 8.122 - 28 April 2020
 
 - cpan_testers:
+  o adapt to a world where gcc is no more the apex predator
+    (aka works out of the box when there's clang but not gcc)
+  o bundled genhdlist2 and fallback to it if CPAN failed to install rpmtools
+    scripts
   o check & report where genhdlist2 is
   o check that web server has actually started
   o describe more tests to help pinpoint regressions
+  o display RPM version in cpan-testers logs
   o do not fail test when libnss.so is not found in Debian 9 or FreeBSD
+  o fix failing to build some rpms on FreeBSD
+  o fix failing tests when serving over HTTP from within /root
   o fix test with rpm < 4.13 on CentOS7
+  o make sure genhdlist2 works
   o perform some file conflict tests only on Mageia
   o try harder to find genhdlist2 in uninstalled CPAN modules
   o work without glibc-static-devel
+  o workaround %find_lang sometimes failing on FreeBSD
+- library:
+  o enhance the doc
+  o fix rpm version check causing strange warning messages:
+    "shell-init: error retrieving current directory: getcwd: cannot access parent directories: No such file or directory"
+- testsuite:
+  o add more extensive tests
+  o describe it more
+  o disable fsync/fdatasync while running tests
+  o make it more robust
+  o make sure simple-httpd is really killed once tests are completed
+  o retry if curl failed with timeout
 
 Version 8.121 - 8 April 2020
 

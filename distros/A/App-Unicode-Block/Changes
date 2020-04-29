@@ -1,2 +1,15 @@
+0.04 2020-04-28T15:19:27+02:00
+ - Remove test for -l option because list of Unicode modules isn't stable
+   over Perl releases.
+
+0.03 2020-04-28T15:07:24+02:00
+ - Fix test dependencies.
+ - Remove obsolete module usage in test.
+
+0.02 2020-04-28T14:07:01+02:00
+ - Add tests for constructor.
+ - Add tests for run() method.
+ - Move argument parsing from constructor to run() method.
+
 0.01 2020-01-19T17:49:52+01:00
  - First version.

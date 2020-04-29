@@ -6,6 +6,7 @@ use Data::Processor;
 my $schema = {
     array => {
         array => 1,
+        allow_empty => 1,
         members => {
             one => {
                 value => qr{what.*}
@@ -45,6 +46,7 @@ my $data = {
             one => 'whatever',
             two => 'something else'
         },
+        undef,
         {
             'error: members missing',
         },

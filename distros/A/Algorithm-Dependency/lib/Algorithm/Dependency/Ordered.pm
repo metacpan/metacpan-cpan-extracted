@@ -23,7 +23,7 @@ use 5.005;
 use strict;
 use Algorithm::Dependency ();
 
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 our @ISA     = 'Algorithm::Dependency';
 
 
@@ -96,7 +96,7 @@ Algorithm::Dependency::Ordered - Implements an ordered dependency hierarchy
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head1 DESCRIPTION
 

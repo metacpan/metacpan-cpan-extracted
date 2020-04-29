@@ -1,3 +1,11 @@
+0.09 2020-04-27T23:28:40+02:00
+ [Tags::Output]
+ - Add open_elements() method, deprecate open_tags() method with warning.
+
+ [Tags::Output::Raw]
+ - Add open_elements() method, deprecate open_tags() method with warning.
+ - Fix issue with XML element in lowercase only.
+
 0.08 2020-04-26T16:04:35+02:00
  [Common]
  - Improve LICENSE AND COPYRIGHT section in doc.

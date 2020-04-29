@@ -53,6 +53,7 @@ diff ... | sdif
     --[no]cdif		use ``cdif'' as word context diff backend
     --cdifopts=s	set cdif command options
     --mecab		pass --mecab option to cdif
+    --[no]lenience      supress unexpected input warning (default on)
 
 =cut
 
@@ -106,6 +107,7 @@ my $opt_column;
 my $opt_view;
 my $opt_ambiguous = 'narrow';
 my $opt_margin = 0;
+my $opt_lenience = 1;
 our $screen_width;
 
 my $opt_color = 'always';
@@ -171,6 +173,7 @@ my @optargs = (
     "nocdif|no-cdif" => sub { $opt_cdif = undef },
     "cdifopts=s" => sub { push @opt_cdifopts, shellwords $_[1] },
     "colortable" => \$opt_colortable,
+    "lenience!" => \$opt_lenience,
 
     "--mecab" => sub { push @opt_cdifopts, "--mecab" },
 );
@@ -187,6 +190,8 @@ if ($opt_ambiguous =~ /^(?:detect|auto)$/) {
     use Unicode::EastAsianWidth::Detect qw(is_cjk_lang);
     $opt_ambiguous = is_cjk_lang() ? 'wide' : 'narrow';
 }
+
+$App::sdif::Util::NO_WARNINGS = $opt_lenience;
 
 use Text::VisualWidth::PP qw(vwidth);
 if ($opt_ambiguous =~ /^(?:wide|full)/) {
@@ -252,8 +257,9 @@ if (defined $opt_cdif and $opt_cdif eq '') {
     $opt_cdif = $default_opt_cdif;
 }
 unshift @opt_cdifopts,
-    $opt_256    ? qw(--256)    : qw(--no-256)   ,
-    $opt_prefix ? qw(--prefix) : qw(--no-prefix),
+    $opt_256      ? qw(--256)      : qw(--no-256)   ,
+    $opt_prefix   ? qw(--prefix)   : qw(--no-prefix),
+#   $opt_lenience ? qw(--lenience) : qw(--no-lenience),
     qw(--prefix-pattern) => $opt_prefix_pattern,
     @default_opt_cdifopts;
 
@@ -803,6 +809,7 @@ sub print_field_n {
     for my $i (0 .. $#_) {
 	my $f = $_[$i];
 	my $markpos = $i < @markpos ? $markpos[$i] : $markpos[-1];
+	local $_;
 	$_ = $f->{"MARK"} and print if $markpos eq LEFT;
 	$_ = $f->{"LINE"} and print;
 	$_ = $f->{"TEXT"} and print;
@@ -848,14 +855,20 @@ sub pwidth {
 	1 while s/[^\010]\010//;
 	s/^\010+//;
     }
-    vwidth($_);
+    vwidth $_;
 }
 
 sub terminal_width {
+    use Term::ReadKey;
     my $default = 80;
-    my $cols = `tput cols 2> /dev/tty`;
-    chomp $cols;
-    $cols > 0 ? int($cols) : $default;
+    my @size;
+    if (open my $tty, ">", "/dev/tty") {
+	# Term::ReadKey 2.31 on macOS 10.15 has a bug in argument handling
+	# and the latest version 2.38 fails to install.
+	# This code should work on both versions.
+	@size = GetTerminalSize $tty, $tty;
+    }
+    $size[0] or $default;
 }
 
 sub unesc {
@@ -1108,6 +1121,11 @@ Specify prefix pattern in regex.  Default pattern is:
 
 This pattern matches B<git> graph style and whitespace indented diff
 output.
+
+=item B<-->[B<no>]B<lenience>
+
+Supress warning message for unexpected input from diff command.  True
+by default.
 
 =item B<--colormap>=I<colormap>, B<--cm>=I<colormap>
 

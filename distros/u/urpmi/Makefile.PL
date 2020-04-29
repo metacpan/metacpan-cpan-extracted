@@ -159,7 +159,6 @@ WriteMakefile(
     'TEST_REQUIRES' => {
 	'Expect'		=> '0',
 	'File::Slurp'		=> '0',
-	'List::Util'		=> '1.46', # for 'uniq'
 	'Net::Server'		=> '0',
 	'rpmtools'		=> '7.12',
 	'Test::More'		=> '1.302',
@@ -195,7 +194,7 @@ WriteMakefile(
 		},
 		'urpmi' => {
 		    file => 'urpmi.pm',
-		    version => 'v8.120',
+		    version => 'v8.122',
 		},
             },
             resources => {

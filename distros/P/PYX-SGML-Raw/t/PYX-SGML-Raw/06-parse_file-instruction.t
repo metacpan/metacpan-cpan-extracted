@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use File::Object;
 use PYX::SGML::Raw;
 use Test::More 'tests' => 3;

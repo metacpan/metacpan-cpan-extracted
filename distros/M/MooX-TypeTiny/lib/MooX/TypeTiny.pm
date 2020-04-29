@@ -1,7 +1,7 @@
 package MooX::TypeTiny;
 use strict;
 use warnings;
-our $VERSION = '0.002002';
+our $VERSION = '0.002003';
 $VERSION =~ tr/_//d;
 
 use Moo::_Utils qw(_install_modifier);
@@ -17,10 +17,8 @@ sub import {
 
   _install_modifier($target, 'before', ['has', 'extends', 'with'], sub {
     my $am = Moo->_accessor_maker_for($target);
-    if (!$am->DOES('MooX::TypeTiny::Role::GenerateAccessor')) {
-      Moo::Role->apply_roles_to_object(
-        $am, 'MooX::TypeTiny::Role::GenerateAccessor' );
-    }
+    $am->does($_) or Moo::Role->apply_roles_to_object($am, $_)
+      for qw(MooX::TypeTiny::Role::GenerateAccessor);
 
     # make sure we have our own constructor
     Moo->_constructor_maker_for($target);

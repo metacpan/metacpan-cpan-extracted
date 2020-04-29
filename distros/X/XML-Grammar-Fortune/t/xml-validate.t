@@ -2,8 +2,7 @@ use strict;
 use warnings;
 
 use Test::More tests => 20;    # last test to print
-
-use XML::LibXML;
+use XML::LibXML ();
 
 # TEST:$num_tests=20
 my @inputs = (
@@ -38,14 +37,11 @@ foreach my $fn_base (@inputs)
 {
     my $filename = "./t/data/xml/$fn_base.xml";
     my $doc      = XML::LibXML->new->parse_file($filename);
-
-    my $code;
-    $code = $rngschema->validate($doc);
+    my $code     = $rngschema->validate($doc);
 
     # TEST*$num_tests
     ok(
         ( defined($code) && ( $code == 0 ) ),
         "The validation of '$filename' succeeded."
-    ) || diag("\$@ == $@");
-
+    ) || diag("\$\@ == $@");
 }

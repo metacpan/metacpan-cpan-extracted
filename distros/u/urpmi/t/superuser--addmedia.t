@@ -6,6 +6,7 @@ use helper;
 use Test::More 'no_plan';
 BEGIN { use_ok 'urpm::cfg' }
 
+set_path();
 need_root_and_prepare();
 
 my $name = 'various';

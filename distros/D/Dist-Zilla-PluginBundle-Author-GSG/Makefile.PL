@@ -24,8 +24,9 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "Dist::Zilla::PluginBundle::Author::GSG",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Dist::Zilla" => 0,
-    "Dist::Zilla::Plugin::ChangelogFromGit" => 0,
+    "Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes" => 0,
     "Dist::Zilla::Plugin::Git::Commit" => 0,
     "Dist::Zilla::Plugin::Git::Contributors" => 0,
     "Dist::Zilla::Plugin::Git::NextVersion" => "2.044",
@@ -58,11 +59,13 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::DZil" => 0,
     "Test::Deep" => 0,
+    "Test::Fatal" => 0,
     "Test::More" => 0,
     "Test::Pod" => "1.14",
-    "Test::Strict" => 0
+    "Test::Strict" => 0,
+    "Time::Piece" => 0
   },
-  "VERSION" => "v0.1.0",
+  "VERSION" => "v0.1.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -70,8 +73,9 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "Dist::Zilla" => 0,
-  "Dist::Zilla::Plugin::ChangelogFromGit" => 0,
+  "Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes" => 0,
   "Dist::Zilla::Plugin::Git::Commit" => 0,
   "Dist::Zilla::Plugin::Git::Contributors" => 0,
   "Dist::Zilla::Plugin::Git::NextVersion" => "2.044",
@@ -100,9 +104,11 @@ my %FallbackPrereqs = (
   "Pod::Weaver::Section::Contributors" => 0,
   "Test::DZil" => 0,
   "Test::Deep" => 0,
+  "Test::Fatal" => 0,
   "Test::More" => 0,
   "Test::Pod" => "1.14",
   "Test::Strict" => 0,
+  "Time::Piece" => 0,
   "namespace::autoclean" => 0,
   "version" => 0
 );

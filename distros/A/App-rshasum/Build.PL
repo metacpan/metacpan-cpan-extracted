@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "App-rshasum",
-  "dist_version" => "0.6.0",
+  "dist_version" => "0.6.1",
   "license" => "mit",
   "module_name" => "App::rshasum",
   "recursive_test_files" => 1,
@@ -27,6 +27,7 @@ my %module_build_args = (
     "File::Find::Object" => 0,
     "Getopt::Long" => 0,
     "List::Util" => "1.33",
+    "perl" => "5.016",
     "strict" => 0,
     "warnings" => 0
   },
@@ -38,8 +39,7 @@ my %module_build_args = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Path::Tiny" => 0,
-    "Test::More" => "0.88",
-    "perl" => "5.006"
+    "Test::More" => "0.88"
   }
 );
 
@@ -50,8 +50,7 @@ my %fallback_build_requires = (
   "IPC::Open3" => 0,
   "Module::Build" => "0.28",
   "Path::Tiny" => 0,
-  "Test::More" => "0.88",
-  "perl" => "5.006"
+  "Test::More" => "0.88"
 );
 
 

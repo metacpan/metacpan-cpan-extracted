@@ -12,7 +12,7 @@ Object-Orientation for Perl 5
 
     use Data::Object;
 
-    my $array = Array [1..4];
+    my $array = Box Array [1..4];
 
     # my $iterator = $array->iterator;
 
@@ -59,7 +59,7 @@ The Args function returns a [Data::Object::Args](https://metacpan.org/pod/Data::
 
 ## array
 
-    Array(ArrayRef $data) : InstanceOf["Data::Object::Box"]
+    Array(ArrayRef $data) : InstanceOf["Data::Object::Array"]
 
 The Array function returns a [Data::Object::Box](https://metacpan.org/pod/Data::Object::Box) which wraps a
 [Data::Object::Array](https://metacpan.org/pod/Data::Object::Array) object.
@@ -128,7 +128,7 @@ object which is automatically deduced.
 
 ## code
 
-    Code(CodeRef $data) : InstanceOf["Data::Object::Box"]
+    Code(CodeRef $data) : InstanceOf["Data::Object::Code"]
 
 The Code function returns a [Data::Object::Box](https://metacpan.org/pod/Data::Object::Box) which wraps a
 [Data::Object::Code](https://metacpan.org/pod/Data::Object::Code) object.
@@ -217,7 +217,7 @@ false value.
 
 ## float
 
-    Float(Num $data) : InstanceOf["Data::Object::Box"]
+    Float(Num $data) : InstanceOf["Data::Object::Float"]
 
 The Float function returns a [Data::Object::Box](https://metacpan.org/pod/Data::Object::Box) which wraps a
 [Data::Object::Float](https://metacpan.org/pod/Data::Object::Float) object.
@@ -236,7 +236,7 @@ The Float function returns a [Data::Object::Box](https://metacpan.org/pod/Data::
 
 ## hash
 
-    Hash(HashRef $data) : InstanceOf["Data::Object::Box"]
+    Hash(HashRef $data) : InstanceOf["Data::Object::Hash"]
 
 The Hash function returns a [Data::Object::Box](https://metacpan.org/pod/Data::Object::Box) which wraps a
 [Data::Object::Hash](https://metacpan.org/pod/Data::Object::Hash) object.
@@ -271,7 +271,7 @@ The Name function returns a [Name::Object::Name](https://metacpan.org/pod/Name::
 
 ## number
 
-    Number(Num $data) : InstanceOf["Data::Object::Box"]
+    Number(Num $data) : InstanceOf["Data::Object::Number"]
 
 The Number function returns a [Data::Object::Box](https://metacpan.org/pod/Data::Object::Box) which wraps a
 [Data::Object::Number](https://metacpan.org/pod/Data::Object::Number) object.
@@ -314,7 +314,7 @@ The Opts function returns a [Data::Object::Opts](https://metacpan.org/pod/Data::
 
 ## regexp
 
-    Regexp(RegexpRef $data) : InstanceOf["Data::Object::Box"]
+    Regexp(RegexpRef $data) : InstanceOf["Data::Object::Regexp"]
 
 The Regexp function returns a [Data::Object::Box](https://metacpan.org/pod/Data::Object::Box) which wraps a
 [Data::Object::Regexp](https://metacpan.org/pod/Data::Object::Regexp) object.
@@ -333,7 +333,7 @@ The Regexp function returns a [Data::Object::Box](https://metacpan.org/pod/Data:
 
 ## scalar
 
-    Scalar(Ref $data) : InstanceOf["Data::Object::Box"]
+    Scalar(Ref $data) : InstanceOf["Data::Object::Scalar"]
 
 The Scalar function returns a [Data::Object::Box](https://metacpan.org/pod/Data::Object::Box) which wraps a
 [Data::Object::Scalar](https://metacpan.org/pod/Data::Object::Scalar) object.
@@ -366,7 +366,7 @@ The Space function returns a [Data::Object::Space](https://metacpan.org/pod/Data
 
 ## string
 
-    String(Str $data) : InstanceOf["Data::Object::Box"]
+    String(Str $data) : InstanceOf["Data::Object::String"]
 
 The String function returns a [Data::Object::Box](https://metacpan.org/pod/Data::Object::Box) which wraps a
 [Data::Object::String](https://metacpan.org/pod/Data::Object::String) object.
@@ -421,7 +421,7 @@ value.
 
 ## undef
 
-    Undef() : InstanceOf["Data::Object::Box"]
+    Undef() : InstanceOf["Data::Object::Undef"]
 
 The Undef function returns a [Data::Object::Undef](https://metacpan.org/pod/Data::Object::Undef) object representing the
 _undefined_ value.

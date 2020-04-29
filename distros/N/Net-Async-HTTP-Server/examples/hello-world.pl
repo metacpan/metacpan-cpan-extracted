@@ -12,9 +12,19 @@ use Getopt::Long;
 
 GetOptions(
    'ssl|S' => \my $SSL,
+   'metrics' => \my $METRICS,
 ) or exit 1;
 
 require IO::Async::SSL if $SSL;
+
+my $prometheus;
+if( $METRICS ) {
+   require Metrics::Any::Adapter;
+   Metrics::Any::Adapter->import( 'Prometheus' );
+
+   require Net::Prometheus;
+   $prometheus = Net::Prometheus->new;
+}
 
 my $loop = IO::Async::Loop->new();
 
@@ -24,7 +34,13 @@ my $httpserver = Net::Async::HTTP::Server->new(
       my ( $req ) = @_;
 
       my $response = HTTP::Response->new( 200 );
-      $response->add_content( "Hello, world!\n" );
+      if( $prometheus and $req->path eq "/metrics" ) {
+         $response->add_content( $prometheus->render );
+      }
+      else {
+         $response->add_content( "Hello, world!\n" );
+      }
+
       $response->content_type( "text/plain" );
 
       $response->content_length( length $response->content );
@@ -48,5 +64,12 @@ $httpserver->listen(
       SSL_cert_file => "t/server.pem", )
       : () ),
 );
+
+my $sockhost = $httpserver->read_handle->sockhost;
+$sockhost = "[$sockhost]" if $sockhost =~ m/:/; # IPv6 numerical
+
+printf "Listening on %s://%s:%d\n",
+   ( $SSL ? "https" : "http" ),
+   $sockhost, $httpserver->read_handle->sockport;
 
 $loop->run;

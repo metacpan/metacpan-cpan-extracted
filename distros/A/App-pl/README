@@ -1,0 +1,25 @@
+pl - Swiss Army Knife of Perl One-Liners
+
+Just one small script extends "perl -E" with many bells & whistles: Various
+one-letter commands & magic variables (with meaningful aliases too) and more
+nifty loop options take Perl programming to the command line.  List::Util is
+fully imported.  Unless you pass a program on the command line, starts a
+simple Perl Shell.
+
+E(cho) 3 values, including 2 from "@A(RGV)".  And same for difficult values:
+
+    pl 'e "Perl", @A' one liner
+    pl 'e \"Perl", \@A, undef' one liner
+
+Print up to 3 matching lines, resetting count (and "$.") for each file:
+
+    pl -rP3 '/Perl.*one.*liner/' file1 file2 file3
+
+Loop over args, printing each with line ending.  And same, shouting:
+
+    pl -opl '' Perl one liner
+    pl -opl '$_ = uc' Perl one liner
+
+Count hits in magic statistics hash "%n(umber)":
+
+    pl -n '++$n{$1} while /(Perl|one|liner)/g' file1 file2 file3

@@ -4,7 +4,7 @@
       "Shlomi Fish <shlomif@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -51,6 +51,7 @@
             "Text::VimColor" : "0",
             "autodie" : "0",
             "parent" : "0",
+            "perl" : "5.016",
             "strict" : "0",
             "utf8" : "0",
             "vars" : "0",
@@ -62,47 +63,46 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0.88",
-            "perl" : "5.006"
+            "Test::More" : "0.88"
          }
       }
    },
    "provides" : {
       "QuadPres" : {
          "file" : "lib/QuadPres.pm",
-         "version" : "v0.28.1"
+         "version" : "v0.28.2"
       },
       "QuadPres::Base" : {
          "file" : "lib/QuadPres/Base.pm",
-         "version" : "v0.28.1"
+         "version" : "v0.28.2"
       },
       "QuadPres::Config" : {
          "file" : "lib/QuadPres/Config.pm",
-         "version" : "v0.28.1"
+         "version" : "v0.28.2"
       },
       "QuadPres::Exception" : {
          "file" : "lib/QuadPres/Exception.pm",
-         "version" : "v0.28.1"
+         "version" : "v0.28.2"
       },
       "QuadPres::Exception::RenderFile" : {
          "file" : "lib/QuadPres/Exception.pm",
-         "version" : "v0.28.1"
+         "version" : "v0.28.2"
       },
       "QuadPres::FS" : {
          "file" : "lib/QuadPres/FS.pm",
-         "version" : "v0.28.1"
+         "version" : "v0.28.2"
       },
       "QuadPres::Url" : {
          "file" : "lib/QuadPres/Url.pm",
-         "version" : "v0.28.1"
+         "version" : "v0.28.2"
       },
       "QuadPres::VimIface" : {
          "file" : "lib/QuadPres/VimIface.pm",
-         "version" : "v0.28.1"
+         "version" : "v0.28.2"
       },
       "QuadPres::WriteContents" : {
          "file" : "lib/QuadPres/WriteContents.pm",
-         "version" : "v0.28.1"
+         "version" : "v0.28.2"
       }
    },
    "release_status" : "stable",
@@ -117,10 +117,10 @@
          "web" : "https://github.com/shlomif/quad-pres"
       }
    },
-   "version" : "0.28.1",
+   "version" : "0.28.2",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.028001"
+         "version" : "5.030002"
       },
       "plugins" : [
          {
@@ -132,17 +132,17 @@
                }
             },
             "name" : "@Filter/TestMoreDoneTesting",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "@Filter/AutoPrereqs",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Filter/ExecDir",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
@@ -158,38 +158,38 @@
                }
             },
             "name" : "@Filter/GatherDir",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "@Filter/License",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@Filter/ManifestSkip",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@Filter/MetaYAML",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::PruneCruft",
             "name" : "@Filter/PruneCruft",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::Readme",
             "name" : "@Filter/Readme",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::RunExtraTests",
             "config" : {
                "Dist::Zilla::Role::TestRunner" : {
-                  "default_jobs" : 1
+                  "default_jobs" : "4"
                }
             },
             "name" : "@Filter/RunExtraTests",
@@ -198,7 +198,7 @@
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@Filter/ShareDir",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangesHasContent",
@@ -208,22 +208,22 @@
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@Filter/ConfirmRelease",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@Filter/Manifest",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@Filter/MetaConfig",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@Filter/MetaJSON",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
@@ -233,7 +233,7 @@
                      {
                         "class" : "Dist::Zilla::Plugin::FinderCode",
                         "name" : "@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.012"
+                        "version" : "6.014"
                      }
                   ],
                   "include_underscores" : 0
@@ -245,7 +245,7 @@
                   "meta_noindex" : 1
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000033",
+                  "Module::Metadata" : "1.000037",
                   "version" : "0.006"
                }
             },
@@ -255,32 +255,27 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
             "name" : "@Filter/MetaResources",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::ModuleBuild",
             "config" : {
                "Dist::Zilla::Role::TestRunner" : {
-                  "default_jobs" : 1
+                  "default_jobs" : "4"
                }
             },
             "name" : "@Filter/ModuleBuild",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::PkgVersion",
             "name" : "@Filter/PkgVersion",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Filter/PodSyntaxTests",
-            "version" : "6.012"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::PodVersion",
-            "name" : "@Filter/PodVersion",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Compile",
@@ -354,7 +349,7 @@
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
             "name" : "@Filter/TestRelease",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodWeaver",
@@ -386,7 +381,7 @@
                         "version" : "4.015"
                      },
                      {
-                        "class" : "Pod::Weaver::Section::Name",
+                        "class" : "Pod::Weaver::Section::Generic",
                         "name" : "@SHLOMIF/Name",
                         "version" : "4.015"
                      },
@@ -463,7 +458,7 @@
                      {
                         "class" : "Pod::Weaver::Section::Support",
                         "name" : "@SHLOMIF/Support",
-                        "version" : "1.010"
+                        "version" : "1.013"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Authors",
@@ -499,7 +494,7 @@
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@Filter/UploadToCPAN",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -510,7 +505,7 @@
                }
             },
             "name" : "Runtime",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::TidyAll",
@@ -520,57 +515,57 @@
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.012"
+            "version" : "6.014"
          }
       ],
       "zilla" : {
@@ -578,10 +573,11 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.012"
+         "version" : "6.014"
       }
    },
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+   "x_generated_by_perl" : "v5.30.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "MIT"
 }
 

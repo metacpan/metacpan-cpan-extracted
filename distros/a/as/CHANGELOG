@@ -1,3 +1,6 @@
+0.10	28 April 2020
+	fix Can't locate Bar.pm in @INC from missing '.'
+
 0.09	9 November 2019
 	Adoption.
 

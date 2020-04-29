@@ -1,5 +1,8 @@
 Revision history for MooX::TypeTiny
 
+0.002003 - 2020-04-29
+  - fix compatibility issues with perl 5.8
+
 0.002002 - 2020-04-25
   - fix applying method generator role multiple times, leading to C3 errors
 

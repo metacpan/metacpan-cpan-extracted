@@ -2,12 +2,12 @@
 # Test send_packet function
 #
 # Programmed by Bastian Ballmann
-# Last update: 22.06.2013
+# Last update: 27.04.2020
 
 use Net::ARP;
 use Test::More qw( no_plan );
 
-$dev="lo";
+$dev="enp3s0f1";
 print "Using device $dev to test send_packet()\n";
 
 $ret = Net::ARP::send_packet("strange_dev",   # network interface

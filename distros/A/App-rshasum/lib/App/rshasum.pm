@@ -1,5 +1,6 @@
 package App::rshasum;
-$App::rshasum::VERSION = '0.6.0';
+$App::rshasum::VERSION = '0.6.1';
+use 5.016;
 use strict;
 use warnings;
 
@@ -89,7 +90,7 @@ App::rshasum - recursive shasum.
 
 =head1 VERSION
 
-version 0.6.0
+version 0.6.1
 
 =head1 SYNOPSIS
 

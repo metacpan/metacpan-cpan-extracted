@@ -18,7 +18,6 @@ license 'bsd';
 name 'App-Unicode-Block';
 readme_from 'bin/unicode-block';
 recursive_author_tests('xt');
-requires 'Class::Utils' => 0.03;
 requires 'Curses::UI' => 0;
 requires 'Encode' => 0;
 requires 'Error::Pure' => 0.15;
@@ -31,10 +30,13 @@ resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
 	'?Name=App-Unicode-Block';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/App-Unicode-Block';
 resources 'repository' => 'git://github.com/michal-josef-spacek/App-Unicode-Block';
+test_requires 'English' => 0;
+test_requires 'Error::Pure::Utils' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
+test_requires 'Test::Output' => 0;
 tests_recursive;
-version '0.01';
+version '0.04';
 
 # Run.
 WriteAll();

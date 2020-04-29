@@ -6,7 +6,7 @@ use Package::Variant
     subs => [ qw(has around before after with) ];
 use MooX::Options;
 use MooX::Types::MooseLike::Base qw/ Str /;
-use JSON ();
+use JSON::MaybeXS ();
 use Try::Tiny qw/ try /;
 
 sub make_variant {
@@ -33,7 +33,7 @@ sub make_variant {
             my $str = shift;
             if (! ref $str) {
                 try {
-                    $str = JSON->new->relaxed->decode($str)
+                    $str = JSON::MaybeXS->new(relaxed => 1)->decode($str)
                 };
             }
             $str;

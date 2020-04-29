@@ -1,5 +1,19 @@
 Revision history for Web::Mention
 
+0.710 2020-04-28T23:06:05Z
+
+    - For the sake of faster load time, swapped out all use of Moose
+    (and MooseX) for Moo (and MooX).
+
+    - Improvements to the author-determination algorithm implementation.
+
+    - The `send` method will clear the value of `response` if the object
+    cannot determine a Webmention endpoint for the target.
+    
+    - Increasing the default value of `max_content_length` to 280.
+
+    - Documentation improvements.
+
 0.704 2020-01-08T21:13:41Z
 
     - Improved handling of targets that specify a `Link` HTTP header with a URL but no `rel` value. (Thanks to Tomaž Šolc for the patch.)

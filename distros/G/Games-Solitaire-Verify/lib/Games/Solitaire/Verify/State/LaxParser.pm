@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::State::LaxParser;
-$Games::Solitaire::Verify::State::LaxParser::VERSION = '0.2401';
+$Games::Solitaire::Verify::State::LaxParser::VERSION = '0.2402';
 use warnings;
 use strict;
 
@@ -80,7 +80,7 @@ states (or positions) of the entire board.
 
 =head1 VERSION
 
-version 0.2401
+version 0.2402
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
@@ -174,7 +174,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 by Shlomi Fish.
+This software is Copyright (c) 2008 by Shlomi Fish.
 
 This is free software, licensed under:
 

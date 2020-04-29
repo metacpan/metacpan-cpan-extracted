@@ -1,15 +1,18 @@
-The tests are running the follwing way:
+The tests are running the following way:
 
 01compile.t	ensures everything is valid perl
 02create_pkgs.t	builds the various RPMs needed by the others tests
 cfg.t		tests reading/writing the config files
 pod.t		check for POD errors in files (optional)
+superuser--*.t
+
+The first tests just ensure that basic things in urpmi works.
 
 you need to be root to run superuser--*.t,
 with a normal user those tests are simply skipped.
 
-They actually test both urpmi _and_ *rpm* extensively.
-It had often find regressions in rpm itself that rpm's own testsuite didn't found.
+They actually test both urpmi, URPM _and_ *rpm* extensively.
+It had often found regressions in rpm itself that rpm's own testsuite didn't found.
 
 superuser--file-conflicts.t runs only some patches on Mageia due to having a
 downstream patch there
@@ -17,4 +20,14 @@ downstream patch there
 superuser--mirrorlist.t will only be run on Mageia as it needs a specific patch
 that introduces Time::ZoneInfo->current_zone()
 
+Usage:
+------
+
 use "make testall"
+
+You can speed up things by using eatmydata which will prevent all the fsync()
+& fdatasync() calls in librpm:
+eatmydata make testall
+
+If you didn't alter the tests data, you can further speedup a re-run by using:
+[[ -d t/media ]] && mv -f t/02create_pkgs.t{,.i}

@@ -1,5 +1,12 @@
 Revision history for Net-Prometheus
 
+0.08    2020-04-28
+        [CHANGES]
+         * Added Net::Prometheus::Registry
+         * Allow Registry to act globally to allow 3rd-party modules to add
+           themselves (primarily for Metrics::Any::Adapter::Prometheus to use)
+         * Add a small example program showing Net::Async::HTTP::Server::PSGI
+
 0.07    2018-10-18 16:52:17
         [CHANGES]
          * Escape embedded characters in HELP text

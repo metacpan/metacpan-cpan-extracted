@@ -1,7 +1,7 @@
 package App::ListOrgAnniversaries;
 
-our $DATE = '2020-04-18'; # DATE
-our $VERSION = '0.476'; # VERSION
+our $DATE = '2020-04-27'; # DATE
+our $VERSION = '0.477'; # VERSION
 
 use 5.010;
 use strict;
@@ -330,7 +330,7 @@ App::ListOrgAnniversaries - List all anniversaries in Org files
 
 =head1 VERSION
 
-This document describes version 0.476 of App::ListOrgAnniversaries (from Perl distribution App-OrgUtils), released on 2020-04-18.
+This document describes version 0.477 of App::ListOrgAnniversaries (from Perl distribution App-OrgUtils), released on 2020-04-27.
 
 =head1 SYNOPSIS
 

@@ -24,6 +24,25 @@ my $line;
 {
     like
 	intercept {
+	    all_modules_tried_ok(); $line = __LINE__;
+	},
+	array {
+
+	    event Fail => sub {
+		call name	=> 'Module Test2::Tools::LoadModule not tried';
+		call info	=> CHECK_MISSING_INFO;
+		prop file	=> __FILE__;
+		prop package	=> __PACKAGE__;
+		prop line	=> $line;
+		prop subname	=> "${CLASS}::all_modules_tried_ok";
+	    };
+
+	    end;
+	},
+	"$CLASS not tried (yet)";
+
+    like
+	intercept {
 	    load_module_ok( CLASS ); $line = __LINE__;
 	},
 	array {
@@ -40,6 +59,36 @@ my $line;
 	    end;
 	},
 	"Load previously-loaded module $CLASS, default import";
+
+    like
+	intercept {
+	    all_modules_tried_ok(); $line = __LINE__;
+	},
+	array {
+	    end;
+	},
+	'All modules tried';
+
+    clear_modules_tried;
+
+    like
+	intercept {
+	    all_modules_tried_ok(); $line = __LINE__;
+	},
+	array {
+
+	    event Fail => sub {
+		call name	=> 'Module Test2::Tools::LoadModule not tried';
+		call info	=> CHECK_MISSING_INFO;
+		prop file	=> __FILE__;
+		prop package	=> __PACKAGE__;
+		prop line	=> $line;
+		prop subname	=> "${CLASS}::all_modules_tried_ok";
+	    };
+
+	    end;
+	},
+	"clear_modules_tried() made us forget we tried $CLASS";
 }
 
 

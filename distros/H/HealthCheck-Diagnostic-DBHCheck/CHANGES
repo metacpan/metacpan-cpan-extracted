@@ -1,0 +1,253 @@
+==================================================
+Changes from 2019-04-29 00:00:00 +0000 to present.
+==================================================
+
+---------------------------------------------
+version v0.500.1 at 2020-04-28 15:53:38 +0000
+---------------------------------------------
+
+  Change: b0c6cf382d8b9735b69dede5bf5637941bae5e1f
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-04-28 11:53:29 +0000
+
+    Correct README 
+
+  Change: 468ad1ded4aa96a69f8fe071f60805a098e46ae1
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-04-28 11:45:37 +0000
+
+    Update README 
+
+  Change: c03f98d974db9f66eb2b8594e63435342cee6228
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-04-16 14:16:44 +0000
+
+    Convert to Dist::Zilla::PluginBundle::Author::GSG 
+
+  Change: 7b9af7f510d73208aa97b5d86e3a2ba19cde7247
+  Author: Marcus Dubreuil <marcus.dubreuil@grantstreet.com>
+  Date : 2020-01-29 08:51:52 +0000
+
+    SM-1914 Pass through DB error to return 
+
+  Change: 4a24eb3990714ce4613b55f034ccc387311b1599
+  Author: Marcus Dubreuil <marcus.dubreuil@grantstreet.com>
+  Date : 2020-01-27 16:29:26 +0000
+
+    SM-1914 Make eval pass through original error 
+
+  Change: b776ae2f6ddfefd9cdb8c8869adbd947c8d24386
+  Author: Marcus Dubreuil <marcus.dubreuil@grantstreet.com>
+  Date : 2020-01-22 14:21:48 +0000
+
+    SM-1914 Use return hashref with status and info
+
+    Only for some of the original croaks, where it's usually a fatal
+    exception. 
+
+  Change: fb3e032c2873ac80dde1a45e5f1ecd1a241c2bbb
+  Author: Marcus Dubreuil <marcus.dubreuil@grantstreet.com>
+  Date : 2020-01-22 10:30:34 +0000
+
+    SM-1914 Add eval check around dbh init with test 
+
+---------------------------------------------
+version v0.500.0 at 2019-04-30 21:31:58 +0000
+---------------------------------------------
+
+  Change: fafa9e4129caca579dc05e3dfaafbcb9ea89293f
+  Author: Brendan Byrd <brendan.byrd@grantstreet.com>
+  Date : 2019-04-30 16:47:17 +0000
+
+    PEX-11289a: Use TEMPORARY keyword for DROP commands
+
+    DROP TABLE and DROP TEMPORARY TABLE have two different permission
+    models. Also, you can't use the former on a read-only secondary. 
+
+  Change: e66ae7b3605bd24ca82454dedd6ab4d3b2daa234
+  Author: Brendan Byrd <brendan.byrd@grantstreet.com>
+  Date : 2019-04-09 14:02:42 +0000
+
+    PEX-11289: Add $result dumps for test debugging 
+
+  Change: 1a059e9f74aaaa0150fc9b03bf407bc5446c62e3
+  Author: Brendan Byrd <brendan.byrd@grantstreet.com>
+  Date : 2019-04-09 14:02:30 +0000
+
+    PEX-11289: Fix a few minor typos 
+
+  Change: 75ccc1225e49b9194d3a7466e684ae02fbfebb48
+  Author: Paul Durden <paul.durden@grantstreet.com>
+  Date : 2019-04-05 13:23:49 +0000
+
+    PEX-11289 Bumped version again 
+
+  Change: fc85d1c9e58585be56e1469d6a1775f7dc9525fe
+  Author: Paul Durden <paul.durden@grantstreet.com>
+  Date : 2019-04-05 13:23:14 +0000
+
+    PEX-11289 Bumped version again 
+
+  Change: 795b63ccf54464b9ac98d21ce1bf358d86f6705b
+  Author: Paul Durden <paul.durden@grantstreet.com>
+  Date : 2019-04-05 13:13:42 +0000
+
+    PEX-11289 Bumped version again 
+
+  Change: 5f0ae7c144788c1a35b6d971e721bfd3891e0407
+  Author: Paul Durden <paul.durden@grantstreet.com>
+  Date : 2019-04-05 12:03:43 +0000
+
+    PEX-11289 Improved Makefile, bumped version 
+
+  Change: 843e12a773ca6564a10c27d89a2d12c49455369d
+  Author: Paul Durden <paul.durden@grantstreet.com>
+  Date : 2019-04-05 11:33:57 +0000
+
+    PEX-11289 Added a README generated from the Makefile 
+
+  Change: 82976e519449bfe21fa615d8234785596265af65
+  Author: Paul Durden <paul.durden@grantstreet.com>
+  Date : 2019-04-05 11:32:26 +0000
+
+    PEX-11289 Allow specifying the expected DBH class 
+
+  Change: cc9c6ebfb4ebb8d8d2cf6243130f962fb44312b6
+  Author: Paul Durden <paul.durden@grantstreet.com>
+  Date : 2019-04-04 15:42:56 +0000
+
+    PEX-11289 Now using 'db_access' attribute instead of multiple flags
+
+    Now using 'db_access' instead of two separate boolean flags. This is
+    a cleaner interface. 
+
+  Change: a28d74e4dd89623ea96643a1bbfdd744af28d56f
+  Author: Paul Durden <paul.durden@grantstreet.com>
+  Date : 2019-04-04 13:20:22 +0000
+
+    PEX-11289 POD cleanup 
+
+  Change: 3ccb040247b4b5c9d71922e908f5d07ce519d33e
+  Author: Paul Durden <paul.durden@grantstreet.com>
+  Date : 2019-04-04 13:15:09 +0000
+
+    PEX-11289 Try a dbh->ping before the initial select test 
+
+  Change: 62765a6cebfc746ffc8145afb0f801c1b40fa5b6
+  Author: Paul Durden <paul.durden@grantstreet.com>
+  Date : 2019-04-04 13:08:23 +0000
+
+    PEX-11289 Using quote_identifier to avoid table name issues
+
+    Now using the quote_identifier() for the provided table name to avoid
+    any special characters. 
+
+  Change: 9594a12f478f133fe4742eac053965717be216ab
+  Author: Paul Durden <paul.durden@grantstreet.com>
+  Date : 2019-04-04 13:00:48 +0000
+
+    PEX-11289 Update tests to use coderefs for DBH and env variables
+
+    * Created helper function for db_connect() that defautls to using
+    SQLite, but allows environment overrides consistent with what
+    DBIx::Connector::Retry and other CPAN modules use for testing 
+
+  Change: 0f27acd2ae07738ea8044e860c6bcb96246bf529
+  Author: Paul Durden <paul.durden@grantstreet.com>
+  Date : 2019-04-04 13:00:48 +0000
+
+    PEX-11289 dbh parameter should always be a coderef 
+
+  Change: f45d921bb107d10cb6fb2f67ae42eb78df9c391e
+  Author: Paul Durden <paul.durden@grantstreet.com>
+  Date : 2019-03-26 11:06:28 +0000
+
+    PEX-11289 Added help and realclean targets
+
+    * Getting the main module name from the dist.ini file * Using CARTON
+    macro instead of explicitly calling carton * Added a help target, and
+    made it the first / default target * Added a readme target to
+    generate a README.md file for the project * Added a realclean target
+    to clean carton's local directory too 
+
+  Change: c035e25bd213af5a7bfca21a8387151cb20442f4
+  Author: Paul Durden <paul.durden@grantstreet.com>
+  Date : 2019-03-26 11:03:31 +0000
+
+    PEX-11289 Updated dzil.ini
+
+    * Now starting with GSGBundle and removing modules as needed * Added
+    ReadMeAnyFromPod 
+
+  Change: 76f5c2dc5daa9c69fa6365d128e4f24c53b56764
+  Author: Paul Durden <paul.durden@grantstreet.com>
+  Date : 2019-03-13 17:14:37 +0000
+
+    Initial master repo 
+
+  Change: 4e041e1fbe14e8e24c0c36d901fbf9c8f571abe2
+  Author: Paul Durden <paul.durden@grantstreet.com>
+  Date : 2019-03-13 16:43:39 +0000
+
+    PEX-11289 Added the type of test to the info string 
+
+  Change: e523471e79f42b03bfc04dcba454e68edda40894
+  Author: Paul Durden <paul.durden@grantstreet.com>
+  Date : 2019-03-13 15:43:28 +0000
+
+    PEX-11289 Clean up after a release 
+
+  Change: a6b6e4d823ea65cd673e4ffb564f0c59be6d9588
+  Author: Paul Durden <paul.durden@grantstreet.com>
+  Date : 2019-03-13 15:42:34 +0000
+
+    PEX-11289 Wran when building if important files are dirty 
+
+  Change: 0e85b898e8d203bc897f0e5d2b005dc652998b1c
+  Author: Paul Durden <paul.durden@grantstreet.com>
+  Date : 2019-03-13 15:29:25 +0000
+
+    PEX-11289 POD cleanup 
+
+  Change: 838159e3e085f375d8b7e06a2f970403095276ae
+  Author: Paul Durden <paul.durden@grantstreet.com>
+  Date : 2019-03-13 15:03:04 +0000
+
+    PEX-11289 Can't use GSGBundle as is, must call out plugins
+
+    We cannot use the @GSGBundle in its entirety because some modules are
+    gitc specific, and this is a BitBucket module 
+
+  Change: 5ae858917d0194952132a8b7bef9920b589026dc
+  Author: Paul Durden <paul.durden@grantstreet.com>
+  Date : 2019-03-13 14:43:28 +0000
+
+    PEX-11289 Added dzil clean to clean target 
+
+  Change: 6979a6813b1aad4d8ae4ef8db59ca89af6c946ae
+  Author: Paul Durden <paul.durden@grantstreet.com>
+  Date : 2019-03-13 14:42:38 +0000
+
+    PEX-11289 Git should ignore Dist::Zilla artifacts 
+
+  Change: bfdfd852294ef1e65c57913205281ea9e1ca04c0
+  Author: Paul Durden <paul.durden@grantstreet.com>
+  Date : 2019-03-12 19:10:20 +0000
+
+    PEX-11289 Initial commit of code and tests 
+
+  Change: 1d3562384d7974c21322ab0964c0d6f062249d37
+  Author: Paul Durden <paul.durden@grantstreet.com>
+  Date : 2019-03-12 19:09:10 +0000
+
+    PEX-11289 Adding .gitignore .proverc and Makefile 
+
+  Change: f7c8196df7b36dff178453f260464757a89c64a0
+  Author: Paul Durden <paul.durden@grantstreet.com>
+  Date : 2019-03-12 19:03:01 +0000
+
+    PEX-11289 Adding cpanfile and dist.ini 
+
+================
+End of releases.
+================

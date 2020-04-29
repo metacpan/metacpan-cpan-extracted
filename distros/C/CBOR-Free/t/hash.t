@@ -6,6 +6,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Deep;
 use Test::FailWarnings;
 use Test::Exception;
 
@@ -82,7 +83,7 @@ sub T6_canonical {
 
         _cmpbin( CBOR::Free::encode($in, canonical => 1), $enc, "Encode canonical (first arg): " . Dumper($in) );
 
-        _cmpbin( CBOR::Free::encode($in, hahaha => 0, canonical => 1), $enc, "Encode canonical (later arg): " . Dumper($in) );
+        _cmpbin( CBOR::Free::encode($in, scalar_references => 0, canonical => 1), $enc, "Encode canonical (later arg): " . Dumper($in) );
     }
 }
 
@@ -128,6 +129,28 @@ sub T4_invalid_text_key {
     ok( !utf8::valid( (keys %$dec_hr)[0] ), '… but the actual value is invalid UTF-8' );
 }
 
+sub T2_invalid_map_key__float {
+    my $cbor_float = CBOR::Free::encode( 1.1 );
+    my $cbor = "\xa2\x41a\x41z$cbor_float\x43abc";
+
+    throws_ok(
+        sub { CBOR::Free::decode($cbor) },
+        'CBOR::Free::X::InvalidMapKey',
+        'reject float as map key',
+    );
+
+    my $err = $@;
+
+    cmp_deeply(
+        $err,
+        all(
+            re( qr<double float> ),
+            re( qr<5> ),
+        ),
+        '… with the expected error message',
+    );
+}
+
 #----------------------------------------------------------------------
 
 sub T1_decoded_high_bit_key {
@@ -142,129 +165,6 @@ sub T1_decoded_high_bit_key {
         $cbor,
         "\xa1" . "\x62$eacute_utf8" . "\1",
         'decoded UTF-8 e-acute encodes correctly',
-    );
-}
-
-sub T2_encode_text_keys__utf8_decode {
-    my $eacute_utf8 = "é";
-
-    my $cbor = CBOR::Free::encode( { $eacute_utf8 => 2 }, text_keys => 1 );
-
-    _cmpbin(
-        $cbor,
-        "\xa1" . "\x64\xc3\x83\xc2\xa9" . "\2",
-        'undecoded UTF-8',
-    );
-
-    my $eacute = $eacute_utf8;
-    utf8::decode($eacute) or die "bad UTF-8??";
-
-    $cbor = CBOR::Free::encode( { $eacute => 2 }, text_keys => 1 );
-
-    _cmpbin(
-        $cbor,
-        "\xa1" . "\x62$eacute_utf8" . "\2",
-        'decoded UTF-8',
-    );
-}
-
-sub T2_encode_text_keys_canonical__utf8_decode {
-    my $eacute_utf8 = "\xc3\xa9";
-
-    my $cbor = CBOR::Free::encode( { $eacute_utf8 => 2 },
-        canonical => 1,
-        text_keys => 1,
-    );
-
-    _cmpbin(
-        $cbor,
-        "\xa1" . "\x64\xc3\x83\xc2\xa9" . "\2",
-        'undecoded UTF-8',
-    );
-
-    my $eacute = $eacute_utf8;
-    utf8::decode($eacute) or die "bad UTF-8??";
-
-    $cbor = CBOR::Free::encode( { $eacute => 2 },
-        canonical => 1,
-        text_keys => 1,
-    );
-
-    _cmpbin(
-        $cbor,
-        "\xa1" . "\x62$eacute_utf8" . "\2",
-        'decoded UTF-8',
-    );
-}
-
-sub T4_encode_text_keys {
-    my $cbor;
-
-    my %simple = ( foo => 1 );
-    $cbor = CBOR::Free::encode(
-        \%simple,
-        text_keys => 1,
-    );
-
-    _cmpbin(
-        $cbor,
-        "\xa1cfoo\1",
-        'simple key',
-    );
-
-    #----------------------------------------------------------------------
-
-    my %high_bit_char_code = ( "\xff" => 1 );
-    $cbor = CBOR::Free::encode(
-        \%high_bit_char_code,
-        text_keys => 1,
-    );
-
-    my $utf8_255 = "\xff";
-    utf8::encode($utf8_255);
-
-    _cmpbin(
-        $cbor,
-        "\xa1" . "\x62$utf8_255" . "\1",
-        'high-bit char code is converted to UTF-8',
-    );
-
-    #----------------------------------------------------------------------
-
-    my %already_utf8 = ( "\x{100}" => 1 );
-
-    $cbor = CBOR::Free::encode(
-        \%already_utf8,
-        text_keys => 1,
-    );
-
-    _cmpbin(
-        $cbor,
-        "\xa1\x62\xc4\x80\1",
-        'high-charcode key',
-    );
-
-    my $bar_upgraded = "bar";
-    utf8::upgrade($bar_upgraded);
-
-    my %input = (
-        foo => 1,
-        $bar_upgraded => 2,
-        q<> => 3,
-        "\x{100}" => 4,
-        "\xff" => 5,
-    );
-
-    $cbor = CBOR::Free::encode(
-        \%input,
-        canonical => 1,
-        text_keys => 1,
-    );
-
-    _cmpbin(
-        $cbor,
-        "\xa5" . "\x60\3" . "\x62$utf8_255\5" . "\x62\xc4\x80\4" . "\x63bar\2" . "\x63foo\1",
-        'w/ canonical flag',
     );
 }
 

@@ -6,7 +6,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 0.06
+Version 0.08
 
 =cut
 
@@ -22,11 +22,12 @@ Version 0.06
 			->abstract('Over my head.')
 			->our('$type')
 			->begin(sub {
-				$one = 'boeing';
+				$type = 'boeing';
 			})
-			->sub('new')
-				->code(sub { return bless {}, $_[0] })
+			->new
+				->pod('Instantiate a new plane.')
 				->example('my $plane = Planes->new')
+			->accessor('airline')
 			->sub('type')
 				->code(sub { $type })
 				->pod('Returns the type of plane.')
@@ -216,6 +217,39 @@ Define a code block is executed as late as possible.
 	});
 
 =cut
+
+=head2 new
+
+Define an object constructor.
+
+	$class->new;
+
+equivalent to:
+
+	sub new {
+		my ($cls, %args) = (shift, scalar @_ == 1 ? %{$_[0]} : @_);
+		bless \%args, $cls;	
+	}
+
+optionally you can pass your own sub routine.
+
+	$class->new(sub { ... });
+
+=head2 accessor
+
+Define a accessor.
+
+	$class->accessor('test');
+
+equivalent to:
+
+	sub test {	
+		my ($self, $value) = @_;
+		if ($value) {
+			$self->{$sub} = $value;
+		}
+		return $self->{$sub}
+	}";
 
 =head2 sub
 

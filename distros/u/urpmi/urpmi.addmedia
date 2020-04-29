@@ -86,7 +86,7 @@ and [options] are from
     exit 1;
 }
 
-$ENV{PATH} = "/sbin:/usr/sbin:/bin:/usr/bin";
+$ENV{PATH} = "/sbin:/usr/sbin:/bin:/usr/bin" if !$ENV{URPMI_TESTSUITE};
 delete @ENV{qw(ENV BASH_ENV IFS CDPATH)};
 
 $options{force} = 0;

@@ -3,13 +3,22 @@
 use strict;
 use lib '.', 't';
 use helper;
-use Test::More 'no_plan';
+use Config;
+use Test::More;
+
+if ($Config{archname} =~ /bsd/) {
+    plan skip_all => "we cannot build rpm-query-in-scriptlet on FreeBSD due to cpio failure";
+} else {
+    plan 'no_plan';
+}
+
 
 my $name = 'rpm-query-in-scriptlet';
 
 need_root_and_prepare();
 system_('mkdir -p root/var/lib/rpm');
 test_rpm_query_in_scriptlet();
+done_testing();
 
 sub test_rpm_query_in_scriptlet {
     system_("rpm --root $::pwd/root -i media/$name/$name*.rpm --nodeps");

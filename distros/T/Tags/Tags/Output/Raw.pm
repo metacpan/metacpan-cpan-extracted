@@ -15,7 +15,7 @@ Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $LAST_INDEX => -1;
 Readonly::Scalar my $SPACE => q{ };
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Finalize Tags output.
 sub finalize {
@@ -196,11 +196,10 @@ sub _put_begin_of_tag {
 		$self->_flush_tmp('>');
 	}
 
-	# XXX Is really?
-	# Check to lowercased chars for XML.
-	if ($self->{'xml'} && $tag ne lc $tag) {
-		err 'In XML must be lowercase tag name.';
-	}
+	# TODO Add checking of XML element name.
+#	if ($self->{'xml'} && _check(element_name)) {
+#		err 'This is not XML format.';
+#	}
 
 	# Push begin of tag to tmp code.
 	push @{$self->{'tmp_code'}}, "<$tag";
@@ -390,10 +389,13 @@ __END__
 
  my $tags = Tags::Output::Raw->new(%params);
  $tags->put(['b', 'tag']);
- my @open_tags = $tags->open_tags;
+ my @elements = $tags->open_elements;
  $tags->finalize;
  $tags->flush($reset_flag);
  $tags->reset;
+
+ # Deprecated methods.
+ my @tags = $obj->open_tags;
 
 =head1 METHODS
 
@@ -531,7 +533,7 @@ __END__
  Or return code.
  If enabled $reset_flag, then resets internal variables via reset method.
 
-=item C<open_tags()>
+=item C<open_elements()>
 
  Return array of opened tags.
 
@@ -544,6 +546,16 @@ __END__
 
  Resets internal variables.
  Returns undef.
+
+=back
+
+=head1 DEPRECATED METHODS
+
+=over 8
+
+=item C<open_tags()>
+
+ Return array of opened tags.
 
 =back
 
@@ -567,7 +579,6 @@ __END__
          Ending bad tag: '%s' doesn't begin.
          Ending bad tag: '%s' in block of tag '%s'.
          In XML mode must be a attribute '%s' value.
-         In XML must be lowercase tag name.
          From Tags::Output::put():
                 Bad data.
                 Bad type of data.
@@ -667,6 +678,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

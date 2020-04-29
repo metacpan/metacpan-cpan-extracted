@@ -1,0 +1,12 @@
+Revision history for Module-Generate-Hash
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.03    2020-04-28
+	Adds Accessors
+
+0.04    2020-04-29
+	Update Module::Generate dependency version
+
+

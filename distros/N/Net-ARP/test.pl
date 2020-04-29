@@ -3,7 +3,7 @@
 # Perl ARP Extension test file
 #
 # Programmed by Bastian Ballmann
-# Last update: 31.01.2007
+# Last update: 28.04.2020
 #
 # This program is free software; you can redistribute 
 # it and/or modify it under the terms of the 
@@ -25,7 +25,7 @@ BEGIN
               
     if($@ =~ /^Can\'t\slocate/)
     {
-        $dev = "eth0";
+        $dev = "enp3s0f1";
     }
     else
     {

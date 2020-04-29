@@ -94,7 +94,7 @@ See L<URPM> for parameters
 =cut
 
 # install logger callback
-my ($erase_logger, $index, $total_pkg, $uninst_count, $current_pkg);
+my ($erase_logger, $index, $total_pkg, $uninst_count, $current_pkg, $rpm_version);
 sub install_logger {
     my ($urpm, $type, undef, $subtype, $amount, $total) = @_;
     local $| = 1;
@@ -121,7 +121,7 @@ sub install_logger {
 		$cnt = $pname ? $urpm->{logger_count} : '-';
 	    }
 	    require urpm::select;
-	    $index++ if urpm::select::_rpm_version() lt 4.13.0;
+	    $index++ if $rpm_version lt 4.13.0;
 	    my $s = sprintf("%9s: %-22s", $cnt . "/" . $total_pkg, $pname);
 	    print $s;
 	    $s =~ / $/ or printf "\n%9s  %-22s", '', '';
@@ -377,6 +377,7 @@ sub install {
     } elsif (!$options{noorder} && (@errors = $trans->order(%options))) {
     } else {
 	$urpm->{readmes} = {};
+	$rpm_version ||= urpm::select::_rpm_version();
 
 	_get_callbacks($urpm, $db, $trans, \%options, $install, $upgrade, scalar @trans_pkgs);
 

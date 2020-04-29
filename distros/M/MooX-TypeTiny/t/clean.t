@@ -28,7 +28,7 @@ BEGIN {
 
 BEGIN {
     package MyChild;
-    use parent 'MyParent';
+    our @ISA = qw(MyParent);
 }
 
 ok defined &MyParent::new, 'cleaning does not remove constructor';

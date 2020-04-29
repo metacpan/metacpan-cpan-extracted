@@ -1,10 +1,10 @@
 package App::Notifier::Service;
-$App::Notifier::Service::VERSION = '0.0800';
+$App::Notifier::Service::VERSION = '0.0801';
 use 5.014;
 
-use Dancer2;
+use Dancer2 0.300003;
 
-use File::Spec;
+use File::Spec ();
 use YAML::XS qw( LoadFile );
 use List::MoreUtils qw();
 
@@ -145,7 +145,7 @@ notifying that an event (such as the finish of a task) occured.
 
 =head1 VERSION
 
-version 0.0800
+version 0.0801
 
 =head1 SYNOPSIS
 
@@ -170,7 +170,7 @@ version 0.0800
     plackup ./bin/app.psgi
 
     # Alternatively run the following Perl code:
-    use Dancer2;
+    use Dancer2 0.300003;
     use App::Notifier::Service;
     start;
 

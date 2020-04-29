@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/SQL/Bind.pm
+minil.toml
+t/00_compile.t
+t/sql.t
+META.yml
+MANIFEST

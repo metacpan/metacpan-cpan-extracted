@@ -12,8 +12,9 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'Carp' => '0',
                                       'Dist::Zilla' => '0',
-                                      'Dist::Zilla::Plugin::ChangelogFromGit' => '0',
+                                      'Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes' => '0',
                                       'Dist::Zilla::Plugin::Git::Commit' => '0',
                                       'Dist::Zilla::Plugin::Git::Contributors' => '0',
                                       'Dist::Zilla::Plugin::Git::NextVersion' => '2.044',
@@ -52,9 +53,11 @@ do { my $x = {
                                    'IPC::Open3' => '0',
                                    'Test::DZil' => '0',
                                    'Test::Deep' => '0',
+                                   'Test::Fatal' => '0',
                                    'Test::More' => '0',
                                    'Test::Pod' => '1.14',
-                                   'Test::Strict' => '0'
+                                   'Test::Strict' => '0',
+                                   'Time::Piece' => '0'
                                  }
                  }
      };

@@ -6,7 +6,7 @@ Getopt::EX::termcolor - Getopt::EX termcolor module
 
 =head1 VERSION
 
-Version 1.04
+Version 1.05
 
 =head1 SYNOPSIS
 
@@ -53,12 +53,14 @@ C<TERM_LUMINANCE> is expected in range of 0 to 100.
 
 If the environment variable C<TERM_BGCOLOR> is defined, it is used as
 a background RGB value without calling sub-modules.  RGB value is a
-combination of integer described in 24bit/12bit hex or 24bit decimal
-format.
+combination of integer described in 24bit/12bit hex, 24bit decimal or
+6x6x6 216 color format.  RGB color notation is compatible with
+L<Getopt::EX::Colormap>.
 
     24bit hex     #000000 .. #FFFFFF
-    12bit hex     #000 .. #FFF
-    24bit decimal 0,0,0 .. 255,255,255
+    12bit hex     #000    .. #FFF
+    24bit decimal 0,0,0   .. 255,255,255
+    6x6x6 216     000     .. 555
 
 You can set C<TERM_BGCOLOR> in you start up file of shell.  This
 module has utility function C<bgcolor> which can be used like this:
@@ -125,7 +127,7 @@ use warnings;
 use Carp;
 use Data::Dumper;
 
-our $VERSION = "1.04";
+our $VERSION = "1.05";
 
 use Exporter 'import';
 our @EXPORT      = qw();
@@ -188,7 +190,7 @@ sub get_rgb {
   RGB:
     {
 	# TERM=xterm
-	if (($ENV{TERM} // '') =~ /\bxterm-256color\b/) {
+	if (($ENV{TERM} // '') =~ /^xterm/) {
 	    my $mod = __PACKAGE__ . "::XTerm";
 	    @rgb = call_mod_sub $mod, 'get_color', $cat;
 	    last if @rgb >= 3;

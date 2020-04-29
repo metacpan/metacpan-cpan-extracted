@@ -1,3 +1,7 @@
+0.0801   2020-04-28
+    - Require minimal version of Dancer2.
+        - Due to CPAN Testers failure.
+
 0.0800   2020-04-14
     - Trim distribution of unneeded Dancer v1 remnant files.
 

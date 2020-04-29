@@ -1,34 +1,35 @@
 package Web::Mention::Author;
 
-use Moose;
-use MooseX::Types::URI qw(Uri);
-use MooseX::ClassAttribute;
+use Moo;
+use MooX::ClassAttribute;
+use Types::Standard qw(InstanceOf Str);
 use Try::Tiny;
 use LWP::UserAgent;
 use List::Util qw(first);
+use Scalar::Util qw(blessed);
 
 use Web::Microformats2::Parser;
 
 has 'name' => (
     is => 'ro',
-    isa => 'Str',
+    isa => Str,
 );
 
 has 'url' => (
     is => 'ro',
-    isa => Uri,
-    coerce => 1,
+    isa => InstanceOf['URI'],
+    coerce => sub { URI->new($_[0]) },
 );
 
 has 'photo' => (
     is => 'ro',
-    isa => Uri,
-    coerce => 1,
+    isa => InstanceOf['URI'],
+    coerce => sub { URI->new($_[0]) },
 );
 
 class_has 'parser' => (
     is => 'ro',
-    isa => 'Web::Microformats2::Parser',
+    isa => InstanceOf['Web::Microformats2::Parser'],
     default => sub { Web::Microformats2::Parser->new },
 );
 
@@ -95,37 +96,40 @@ sub new_from_mf2_document {
     }
 
     # "If there is an author-page URL:"
+    if ( $author_page ) {
 
-    #   "Get the author-page from that URL and parse it for Microformats-2."
-    my $ua = LWP::UserAgent->new;
-    my $response = $ua->get( $author_page );
-    my $author_doc = $class->parser->parse( $response );
+        #   "Get the author-page from that URL and parse it for Microformats-2."
+        my $ua = LWP::UserAgent->new;
+        my $response = $ua->get( $author_page );
+        my $author_doc = $class->parser->parse( $response );
 
-    #   "If author-page has 1+ h-card with url == uid == author-page's URL,
-    #   then use first such h-card, exit."
-    my @h_cards = grep{ $_->has_type( 'h-card' ) } $doc->all_items;
-    for my $h_card ( @h_cards ) {
-        my $urls_ref = $h_card->get_properties( 'url' );
-        my $uids_ref = $h_card->get_properties( 'uid' );
-        if (
-            first { $_ eq $author_page->as_string } @$urls_ref
-            && first { $_ eq $author_page->as_string } @$uids_ref
-        ) {
-            return $class->_new_with_h_card( $h_card );
+        #   "If author-page has 1+ h-card with url == uid == author-page's URL,
+        #   then use first such h-card, exit."
+        my @h_cards = grep{ $_->has_type( 'h-card' ) } $doc->all_items;
+        for my $h_card ( @h_cards ) {
+            my $urls_ref = $h_card->get_properties( 'url' );
+            my $uids_ref = $h_card->get_properties( 'uid' );
+            if (
+                first { $_ eq $author_page->as_string } @$urls_ref
+                && first { $_ eq $author_page->as_string } @$uids_ref
+            ) {
+                return $class->_new_with_h_card( $h_card );
+            }
         }
-    }
 
-    # XXX Skipping the "rel-me"-based test.
+        # XXX Skipping the "rel-me"-based test.
 
-    #   "if the h-entry's page has 1+ h-card with url == author-page URL,
-    #   use first such h-card, exit."
-    for my $h_card ( @h_cards ) {
-        my $urls_ref = $h_card->get_properties( 'url' );
-        if (
-            first { $_ eq $author_page->as_string } @$urls_ref
-        ) {
-            return $class->_new_with_h_card( $h_card );
+        #   "if the h-entry's page has 1+ h-card with url == author-page URL,
+        #   use first such h-card, exit."
+        for my $h_card ( @h_cards ) {
+            my $urls_ref = $h_card->get_properties( 'url' );
+            if (
+                first { $_ eq $author_page->as_string } @$urls_ref
+            ) {
+                return $class->_new_with_h_card( $h_card );
+            }
         }
+
     }
 
     return;

@@ -3,7 +3,7 @@ abstract: 'Object-Orientation for Perl 5'
 author:
   - 'Al Newkirk <awncorp@cpan.org>'
 build_requires:
-  Data::Object::Cast: '0.01'
+  Data::Object::Cast: '0.02'
   Data::Object::Class: '2.02'
   Data::Object::ClassHas: '2.01'
   Data::Object::Kind: '0.01'
@@ -27,7 +27,7 @@ meta-spec:
   version: '1.4'
 name: Data-Object
 requires:
-  Data::Object::Cast: '0.01'
+  Data::Object::Cast: '0.02'
   Data::Object::Class: '2.02'
   Data::Object::ClassHas: '2.01'
   Data::Object::Kind: '0.01'
@@ -44,7 +44,7 @@ resources:
   bugtracker: https://github.com/iamalnewkirk/data-object/issues
   homepage: https://metacpan.org/release/Data-Object
   repository: git://github.com/iamalnewkirk/data-object.git
-version: '2.04'
+version: '2.05'
 x_authority: cpan:AWNCORP
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

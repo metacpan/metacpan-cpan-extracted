@@ -1,6 +1,6 @@
 # Text::Aligner - Align text in columns
 package Text::Aligner;
-
+$Text::Aligner::VERSION = '0.16';
 use strict;
 use warnings;
 
@@ -8,8 +8,7 @@ use 5.008;
 
 BEGIN    {
     use Exporter ();
-    use vars qw ($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION     = '0.13';
+    use vars qw (@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
     @ISA         = qw (Exporter);
     @EXPORT      = qw ();
     @EXPORT_OK   = qw ( align);
@@ -206,7 +205,7 @@ package Text::Aligner::Auto;
 # Combined numeric and left alignment.  Numbers are aligned numerically,
 # other strings are left-aligned.  The resulting columns are interleaved
 # flush left and filled on the right if necessary.
-
+$Text::Aligner::Auto::VERSION = '0.16';
 sub _new { # only called by Text::Aligner->new()
     my $class = shift;
     my $numspec = shift; # currently ignored
@@ -253,7 +252,7 @@ BEGIN { # import _is_number()
 package Text::Aligner::MaxKeeper;
 # Keep the maximum of a dynamic set of numbers.  Optimized for the case of
 # a relatively small range of numbers that may occur repeatedly.
-
+$Text::Aligner::MaxKeeper::VERSION = '0.16';
 sub new {
     bless {
         max => undef,
@@ -292,9 +291,6 @@ sub _to_max {
     $$var;
 }
 
-########################################### main pod documentation begin ##
-
-
 1; #this line is important and will help the module return a true value
 
 __END__
@@ -309,7 +305,7 @@ Text::Aligner
 
 =head1 VERSION
 
-version 0.13
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -481,6 +477,6 @@ This software is Copyright (c) 2002 by Anno Siegel.
 
 This is free software, licensed under:
 
-  The MIT (X11) License
+  The ISC License
 
 =cut

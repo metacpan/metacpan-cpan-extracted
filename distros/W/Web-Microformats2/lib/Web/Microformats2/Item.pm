@@ -1,11 +1,13 @@
 package Web::Microformats2::Item;
-use Moose;
+use Moo;
+use MooX::HandlesVia;
+use Types::Standard qw(HashRef ArrayRef Str Maybe InstanceOf);
 use Carp;
 
 has 'properties' => (
     is => 'ro',
-    isa => 'HashRef',
-    traits => ['Hash'],
+    isa => HashRef,
+    handles_via => 'Hash',
     default => sub { {} },
     handles => {
         has_properties => 'count',
@@ -15,8 +17,8 @@ has 'properties' => (
 
 has 'p_properties' => (
     is => 'ro',
-    isa => 'HashRef',
-    traits => ['Hash'],
+    isa => HashRef,
+    handles_via => 'Hash',
     default => sub { {} },
     handles => {
         has_p_properties => 'count',
@@ -26,8 +28,8 @@ has 'p_properties' => (
 
 has 'u_properties' => (
     is => 'ro',
-    isa => 'HashRef',
-    traits => ['Hash'],
+    isa => HashRef,
+    handles_via => 'Hash',
     default => sub { {} },
     handles => {
         has_u_properties => 'count',
@@ -37,8 +39,8 @@ has 'u_properties' => (
 
 has 'e_properties' => (
     is => 'ro',
-    isa => 'HashRef',
-    traits => ['Hash'],
+    isa => HashRef,
+    handles_via => 'Hash',
     default => sub { {} },
     handles => {
         has_e_properties => 'count',
@@ -48,8 +50,8 @@ has 'e_properties' => (
 
 has 'dt_properties' => (
     is => 'ro',
-    isa => 'HashRef',
-    traits => ['Hash'],
+    isa => HashRef,
+    handles_via => 'Hash',
     default => sub { {} },
     handles => {
         has_dt_properties => 'count',
@@ -58,15 +60,15 @@ has 'dt_properties' => (
 );
 has 'parent' => (
     is => 'ro',
-    isa => 'Maybe[Web::Microformats2::Item]',
+    isa => Maybe[InstanceOf['Web::Microformats2::Item']],
     weak_ref => 1,
 );
 
 has 'children' => (
     is => 'ro',
-    isa => 'ArrayRef[Web::Microformats2::Item]',
+    isa => ArrayRef[InstanceOf['Web::Microformats2::Item']],
     default => sub { [] },
-    traits => ['Array'],
+    handles_via => 'Array',
     handles => {
         add_child => 'push',
         has_children => 'count',
@@ -75,9 +77,9 @@ has 'children' => (
 
 has 'types' => (
     is => 'ro',
-    isa => 'ArrayRef[Str]',
+    isa => ArrayRef[Str],
     required => 1,
-    traits => ['Array'],
+    handles_via => 'Array',
     handles => {
         find_type => 'first',
     },
@@ -86,12 +88,12 @@ has 'types' => (
 
 has 'value' => (
     is => 'rw',
-    isa => 'Maybe[Str]',
+    isa => Maybe[Str],
 );
 
 has 'last_seen_date' => (
     is => 'rw',
-    isa => 'Maybe[DateTime]',
+    isa => Maybe[InstanceOf['DateTime']],
 );
 
 sub add_property {

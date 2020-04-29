@@ -52,7 +52,7 @@ use 5.005;
 use strict;
 use Algorithm::Dependency::Source ();
 
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 our @ISA     = 'Algorithm::Dependency::Source';
 
 
@@ -135,7 +135,7 @@ Algorithm::Dependency::Source::File - File source for dependency hierarchies
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head1 DESCRIPTION
 

@@ -79,4 +79,7 @@ union control_byte {
     _croak(NULL); \
 }
 
+SV *cbf_call_scalar_with_arguments( pTHX_ SV* cb, const U8 count, SV** args );
+void cbf_die_with_arguments( pTHX_ const U8 count, SV** args );
+
 #endif

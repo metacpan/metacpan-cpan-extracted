@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::State;
-$Games::Solitaire::Verify::State::VERSION = '0.2401';
+$Games::Solitaire::Verify::State::VERSION = '0.2402';
 use warnings;
 use strict;
 
@@ -192,6 +192,7 @@ sub _init
     {
         return $self->_from_string( $args->{string} );
     }
+    return;
 }
 
 
@@ -821,7 +822,7 @@ states (or positions) of the entire board.
 
 =head1 VERSION
 
-version 0.2401
+version 0.2402
 
 =head1 SYNOPSIS
 
@@ -1033,7 +1034,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 by Shlomi Fish.
+This software is Copyright (c) 2008 by Shlomi Fish.
 
 This is free software, licensed under:
 

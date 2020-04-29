@@ -27,7 +27,7 @@ resources:
   bugtracker: https://github.com/maettu/Data-Processor/issues
   homepage: https://github.com/maettu/Data-Processor
   repository: https://github.com/maettu/Data-Processor.git
-version: 1.0.4
+version: 1.0.5
 x_contributors:
   - 'Dominik Hassler <hadfl@cpan.org>'
   - 'Dominik Hassler <hadfl@omniosce.org>'

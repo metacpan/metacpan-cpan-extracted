@@ -1,6 +1,10 @@
+Changes between 1.0.9 and 1.0.10
+
+- fixed compilation errors on macOS
+
 Changes between 1.0.8 and 1.0.9
 
-- missing includes for BSD (thanks to Damyan Ivanov)
+- support for mac os x (thanks to Jose Palao)
 
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 

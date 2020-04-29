@@ -1,526 +1,272 @@
-==================================================
-Changes from 2019-03-31 00:00:00 +0000 to present.
-==================================================
-
--------------------------------------------
-version v0.1.0 at 2020-03-30 22:20:53 +0000
--------------------------------------------
-
-  Change: 630904ceb4768f0a2c58712b72890d29acb16be2
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-03-30 18:17:31 +0000
-
-    Update README 
-
-  Change: 062998da1a73c43aca2926b6a501141aadc98a6c
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-03-11 14:15:43 +0000
-
-    Additional ExecDir instead of changing the default
-
-    Because we have dists that use bin and disable static_install_mode. 
-
-  Change: b5cd0b25dd4408f9ff1481439205baa6f6d882ef
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-03-04 16:43:20 +0000
-
-    Set default ExecDir to script
-
-    For compatibility with StaticInstall. We are only ever likely to
-    install perl scripts, so this should be safe.
-
-    https://metacpan.org/pod/Dist::Zilla::Plugin::StaticInstall 
-
---------------------------------------------
-version v0.0.20 at 2020-02-06 16:48:15 +0000
---------------------------------------------
-
-  Change: 67c5d264531300dc43f4d596ae0215f02ef46738
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-02-06 11:48:15 +0000
-
-    Update README and LICENSE 
-
-  Change: 53f7b6467d3d41c886d380b89902e109cddec92f
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-01-24 11:46:48 +0000
-
-    Require Dist::Zilla::Plugin::Git 2.044
-
-    Earlier versions cause test failures for reasons that aren't clear.
-    Easiest fix is to just require a version that works. 
-
---------------------------------------------
-version v0.0.19 at 2020-01-10 16:54:53 +0000
---------------------------------------------
-
-  Change: 886ec6514388aa8099de957c23a4b1ce5ef41e9c
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-01-07 17:07:31 +0000
-
-    Update README 
-
-  Change: 363b67ea1bfb1d33cb1c3897b6ab07151bf75f96
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-01-07 17:06:12 +0000
-
-    Remove the Git::Contributors Plugin
-
-    Concern was expressed at putting these names and email addresses in
-    places that will be indexed easily by web scrapers. This will remove
-    it from the README.md that shows up on GitHub, the POD for the
-    module, and the meta.yml/meta.json that the MetaCPAN uses to show
-    those names in the sidebar. 
-
-  Change: 4ec1d2397f78cc78a2afd0ae25a831b64589f52d
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-01-07 17:06:12 +0000
-
-    Use TMPDIR for tempdir_root in test
-
-    Otherwise it may create the temp directory in the git repo and we're
-    testing that we don't have one and git will look up and find it.
-
-    There may be a better solution, but not sure what that might be. 
-
---------------------------------------------
-version v0.0.18 at 2019-11-20 16:17:30 +0000
---------------------------------------------
-
-  Change: 2d9a317a4dab0beb15abf29b23e4acaeb2e5c59e
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-11-20 11:17:30 +0000
-
-    Update README.md 
-
-  Change: ad77bac8e04e8ee52a4304f60269639e33753cfe
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-11-19 18:35:31 +0000
-
-    Use Git::GatherDir exclude_filename not PruneFiles
-
-    We already have that Plugin loaded with the feature we need. 
-
-  Change: c25f8cf2109d22e801035449fa6a2d91af1e70ca
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-11-19 18:33:51 +0000
-
-    Pass parameters to Git::GatherDir Plugin
-
-    We need some of these for our apps. 
-
-  Change: 566085694d73df801ec390357839da29e6f85469
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-11-19 18:32:17 +0000
-
-    Switch to correct comments in ini file examples 
-
---------------------------------------------
-version v0.0.17 at 2019-11-05 22:33:04 +0000
---------------------------------------------
-
-  Change: d47a860e79ce01dcd09a519da95bac044bfefc3b
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-11-05 17:33:04 +0000
-
-    Update README 
-
-  Change: f4d5bf25c81208ea7ef1a6d32efeb40a47ca23e6
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-11-05 15:18:59 +0000
-
-    Prune README.md and LICENSE.txt from the dist
-
-    Since we are going to properly generate those with correct names. 
-
-  Change: 36958e21b3992da14384ea73effe3ba8cf287de3
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-11-05 14:44:27 +0000
-
-    Remove existing MANIFEST.SKIP
-
-    Because we don't actually need one as we are only getting committed
-    files anyway from Git::GatherDir, we can instead add a PruneFiles
-    Plugin that removes the things we don't want and expect. 
-
---------------------------------------------
-version v0.0.16 at 2019-11-04 20:15:58 +0000
---------------------------------------------
-
-  Change: 248acab8647ced2996db6f46550b54c7d1dc0ebc
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-11-04 15:15:58 +0000
-
-    Update README 
-
-  Change: c9577011e9c7eab977b5592c4b28ee2477f3975f
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-11-01 13:14:06 +0000
-
-    Exclude Merge commits from Changelog
-
-    Specific ones hopefully, that are actual merges. Unfortunately the
-    ChangelogFromGit Plugin doesn't let you skip all actual merge
-    commits, the solution it provides is to exclude based on a regex. 
-
---------------------------------------------
-version v0.0.15 at 2019-10-25 22:35:27 +0000
---------------------------------------------
-
-  Change: ddc01f9d3a417f8b918294e85137dc6a028e875b
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-25 18:35:27 +0000
-
-    Update README 
-
-  Change: 5679bca0a8e7dab0ce8d9e8754787428db8dd3d0
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-25 14:16:29 +0000
-
-    Require OurPkgVersion Plugin version 0.20
-
-    Which fixes a bug we're running into where it won't provide a version
-    number for us. 
-
---------------------------------------------
-version v0.0.14 at 2019-10-24 18:19:50 +0000
---------------------------------------------
-
-  Change: 79bd5482177beacd1e2eb30c85557a969856b6a2
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-24 14:19:50 +0000
-
-    Update README 
-
-  Change: 0f1bae0bbc861703e3d87258645147db20b5e828
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-24 12:43:00 +0000
-
-    Document version specs 
-
-  Change: 53ce62ec28ca39cb8d6b0020f7eb7912b7f6045e
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-24 12:34:13 +0000
-
-    Adjust Changelog detection for our actual versions
-
-    This should mean things going forward are right, but we still end up
-    with decent Changelogs. 
-
-  Change: e5fe8db606afe81efc9174e6dd59135330781e28
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-24 12:33:57 +0000
-
-    Fix NextVersion for v0.0.0.0
-
-    Because we used to tag with four digits for some reason. 
-
-  Change: b979dd308b849bb2748ce7cc2f0c49fb999e0848
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-23 19:50:12 +0000
-
-    Make sure we populate # VERSION
-
-    Because we should be and need to. 
-
---------------------------------------------
-version v0.0.13 at 2019-10-23 20:39:40 +0000
---------------------------------------------
-
-  Change: a0d820f60a28183104f4c3dad6a42fa56ff07706
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-23 16:39:40 +0000
-
-    Update README 
-
-  Change: dd8e1efe582da6a534e6624866e1c3a8ac283cf0
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-23 14:32:12 +0000
-
-    Require new enough MakeMaker for "version range"
-
-    Because otherwise it just complains and doesn't work. 
-
-  Change: 67f9c66bc865f4aca612e5c8afbd759abe2032b1
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-23 13:00:40 +0000
-
-    Fix $source_git directory
-
-    It was "." which was all sorts of problematic as it was committing to
-    our local repo instead of the test temp repo. For some reason that
-    caused it to find the wrong "version" in the package.
-
-    I guess a new version of the Git Plugins changed something? not sure. 
-
-  Change: c1e68133a3d742296059a597846d443edef61b43
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-07-24 11:44:55 +0000
-
-    Correctly use semantic versioning
-
-    As described by DAGOLDEN
-    https://xdg.me/blog/version-numbers-should-be-boring/ 
-
-  Change: 5a28f67fd0295639b75fd806c5e8482cc5b5f6e8
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-07-24 11:43:16 +0000
-
-    Whitespace improvements 
-
---------------------------------------------
-version v0.0.12 at 2019-07-11 21:47:49 +0000
---------------------------------------------
-
-  Change: a671b1db684a83110346137dd20db07b266fd5e0
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-07-11 17:07:23 +0000
-
-    Remove a V from the environment
-
-    It's used by Git::NextVersion and if it exists but is undef it will
-    break the tests. 
-
-  Change: e3be6b1c19121e7d118b5dc980ba6707f1e570aa
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-07-11 17:07:23 +0000
-
-    Set a default $ENV{EMAIL} in tests
-
-    git complains if it can't figure out an email to use before we've
-    configured anything. This lets tests pass in that situation. 
-
-  Change: ab3642c7005ebbb787679d234b7d1755cbc3ff8f
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-07-11 17:07:23 +0000
-
-    Diag the git version to make debugging easier 
-
---------------------------------------------
-version v0.0.11 at 2019-06-28 16:42:30 +0000
---------------------------------------------
-
-  Change: 6355c0ca8876aa6a3961528d0cbd44fdb3efd330
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-06-21 11:05:50 +0000
-
-    Stop if we detect git is too old 
-
-  Change: 1b5001a9ce01c619daa03bd5b3b900a0c4695d30
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-06-14 13:57:59 +0000
-
-    Update README 
-
-  Change: 6614e6ad513fc97a70154e4dcc72f21982a6fcb0
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-06-14 13:56:40 +0000
-
-    Add MetaProvides Plugin support 
-
-  Change: 517da014db60e3ffdae5edce12c3e9fc35b65430
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-06-13 18:42:06 +0000
-
-    Add requires perl version, for kwalitee
-
-    We would work with earlier versions than our upstream tools, but lets
-    just pick what they say so that cpants is happy.
-
-    https://cpants.cpanauthors.org/kwalitee/meta_yml_declares_perl_versio
-    n 
-
-  Change: 3c3b994dc4a714d4feb1ff9fa56ffa251e2ce4cb
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-06-13 18:36:48 +0000
-
-    Include a META.yml
-
-    Because the cpants kwalitee checker thinks it's important to have.
-
-    https://cpants.cpanauthors.org/kwalitee/has_meta_yml 
-
---------------------------------------------
-version v0.0.10 at 2019-06-11 21:36:34 +0000
---------------------------------------------
-
-  Change: d1f6151491a766df210a72f5496fd92f21ba239d
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-06-10 16:21:01 +0000
-
-    Fix Makefile examples in documentation 
-
--------------------------------------------
-version v0.0.9 at 2019-06-10 18:48:05 +0000
--------------------------------------------
-
-  Change: dc315bdb2deba1f804087c8ca200fea982266dca
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-06-10 14:48:05 +0000
-
-    Update version in README.md
-
-    Still need to figure out how to make that automatic. 
-
-  Change: ff4a1f8c8f8e7f43574c9369ec28574fab0d0b90
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-06-07 16:21:04 +0000
-
-    Rename Makefile in sharedir to avoid MANIFEST.SKIP
-
-    Unfortunately this *won't* update automatically so that's super
-    annoying, but not too much stuff is using it yet. 
-
--------------------------------------------
-version v0.0.8 at 2019-06-07 19:07:07 +0000
--------------------------------------------
-
-  Change: af88b64684d83eb92e16b09f2b57adf132f9c599
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-06-07 15:07:07 +0000
-
-    Update README version. 
-
-  Change: 4f1a5c53fb4c201d1cdc904fdcfd515080d7c77e
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-06-05 18:39:25 +0000
-
-    Rename carton target
-
-    I think this one is clearer and makes a better target name 
-
-  Change: 54abac202e1e987e4fdc1f2a2827a49d19c6fc71
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-06-05 18:39:25 +0000
-
-    Auto carton install develop requirements as needed 
-
-  Change: 4a4d0e4b7c3a003b8fed38dc93de719eeac15b08
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-06-05 18:39:25 +0000
-
-    use $(CARTON) everywhere instead of hardcoding 
-
-  Change: 7ba963818b53321c575a53c80ff99e619eb9c89a
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-06-05 18:39:25 +0000
-
-    Require GitHub::Meta >= 0.46
-
-    This fixes a bug with connecting. 
-
--------------------------------------------
-version v0.0.7 at 2019-05-31 16:18:28 +0000
--------------------------------------------
-
-  Change: 8a2c6f6a6ab37d4c86c053cdc817f562f58fc1a9
-  Author: Mark Flickinger <mark.flickinger@grantstreet.com>
-  Date : 2019-05-31 12:18:28 +0000
-
-    Update README.md 
-
-  Change: c289a803b6c8ae05ae8290dc65c8f6384205d74c
-  Author: Mark Flickinger <mark.flickinger@grantstreet.com>
-  Date : 2019-05-21 16:08:30 +0000
-
-    Add OurPkgVersion to pod and readme 
-
-  Change: f7d8f2a4248604c47dcb533eec795bed126966fa
-  Author: Mark Flickinger <mark.flickinger@grantstreet.com>
-  Date : 2019-05-06 16:39:34 +0000
-
-    Add OurPkgVersion plugin 
-
--------------------------------------------
-version v0.0.6 at 2019-05-02 16:58:04 +0000
--------------------------------------------
-
-  Change: e05fd53a2fdb6efd31736a09dcb61f454cb4de23
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-04-30 12:39:04 +0000
-
-    Adjust MANIFEST.SKIP to be less draconian
-
-    While still trying to figure out a good way to let folks add to this
-    list, it's more important that new things get included in the dist. 
-
-  Change: cf1ced3697c395f1fc4cca7fc5cabf08e55a3b3b
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-04-26 14:05:23 +0000
-
-    Switch to Git::GatherDir Plugin for speed 
-
-  Change: 2cf816c2a51a0f49268dc4104b5847e4b9fd4034
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-04-26 11:21:25 +0000
-
-    Pass configuration to StaticInstall Plugin 
-
--------------------------------------------
-version v0.0.5 at 2019-04-24 16:36:33 +0000
--------------------------------------------
-
-  Change: e4bb0bea97b97acdfad68c4d972d1823966ac4b3
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-04-23 16:51:30 +0000
-
-    Avoid test failure in strange circumstance
-
-    I've only seen this failure from the cpantesters, but I don't really
-    understand why it happens, just that it does. 
-
-  Change: e3e8cab010aa134c6d5e043dfa485ff75d478bbc
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-04-23 13:24:11 +0000
-
-    Allow specifying EXTRA_UPDATES in Makefile 
-
-  Change: b13e033a55239a6cdae6eceb056415aa83a06106
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-04-23 13:24:10 +0000
-
-    Simplify default license setup 
-
-  Change: 8a89b21d050f1bf9e1a148058974be0c53533f49
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-04-22 13:04:33 +0000
-
-    Make it obvious that BUILDARGS is a class method 
-
-  Change: 992e44a22a75c08c837585606fa322ee3c533ec2
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-04-19 18:42:28 +0000
-
-    Use the default Pod::Weaver finder
-
-    This is extra complexity we don't currently need. 
-
-  Change: b86380812a6e118a04a90df9200752423121f286
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-04-19 15:45:29 +0000
-
-    Improve CONTRIBUTING docs 
-
-  Change: d079c02c259618a93febd03d973fb150737d13db
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-04-19 15:45:29 +0000
-
-    Fix bug in POD example 
-
-  Change: 66a2e7e4110e5171a3ae4770ef391781cfba56a3
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-04-11 15:04:25 +0000
-
-    Use superhashof() instead of ignore()ing values
-
-    For more reliable test runs. 
-
-  Change: 60d657e6231789d7dc4f6438845debbaf38fcec3
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-03-29 18:06:44 +0000
-
-    Tests for Plugin::Author::GSG 
-
-================================================
-Plus 4 releases after 2019-03-31 00:00:00 +0000.
-================================================
+Changelog for Dist-Zilla-PluginBundle-Author-GSG
+
+v0.1.1 2020-04-28T21:20:42
+ - Fix missing test parameter (Andrew Hewus Fresh)
+ - Update README (Andrew Hewus Fresh)
+ - Use named sub in `around` (Andrew Hewus Fresh)
+ - Find github_remote based on section name (Andrew Hewus Fresh)
+ - Don't let tests use module git repo (Andrew Hewus Fresh)
+ - Update cpanfile (Andrew Hewus Fresh)
+ - Fix tests for new ChangeLog Plugin (Andrew Hewus Fresh)
+ - Change cpanfile for ChangelogFromGit::CPAN::Changes (Brendan Byrd)
+ - Try to find the correct remote for github (Andrew Hewus Fresh)
+ - Switch to using ChangelogFromGit::CPAN::Changes (Brendan Byrd)
+ - Pass through all Test::Compile options (Andrew Hewus Fresh)
+
+v0.1.0 2020-03-30T22:17:31
+ - Update README (Andrew Hewus Fresh)
+ - Additional ExecDir instead of changing the default (Andrew Hewus Fresh)
+ - Set default ExecDir to script (Andrew Hewus Fresh)
+ - Update README and LICENSE (Andrew Hewus Fresh)
+ - Require Dist::Zilla::Plugin::Git 2.044 (Andrew Hewus Fresh)
+ - Remove the Git::Contributors Plugin (Andrew Hewus Fresh)
+ - Use TMPDIR for tempdir_root in test (Andrew Hewus Fresh)
+ - Update README.md (Andrew Hewus Fresh)
+ - Use Git::GatherDir exclude_filename not PruneFiles (Andrew Hewus Fresh)
+ - Pass parameters to Git::GatherDir Plugin (Andrew Hewus Fresh)
+ - Switch to correct comments in ini file examples (Andrew Hewus Fresh)
+ - Prune README.md and LICENSE.txt from the dist (Andrew Hewus Fresh)
+ - Remove existing MANIFEST.SKIP (Andrew Hewus Fresh)
+ - Exclude Merge commits from Changelog (Andrew Hewus Fresh)
+ - Require OurPkgVersion Plugin version 0.20 (Andrew Hewus Fresh)
+ - Document version specs (Andrew Hewus Fresh)
+ - Adjust Changelog detection for our actual versions (Andrew Hewus Fresh)
+ - Fix NextVersion for v0.0.0.0 (Andrew Hewus Fresh)
+ - Make sure we populate # VERSION (Andrew Hewus Fresh)
+ - Require new enough MakeMaker for "version range" (Andrew Hewus Fresh)
+ - Fix $source_git directory (Andrew Hewus Fresh)
+ - Correctly use semantic versioning (Andrew Hewus Fresh)
+ - Whitespace improvements (Andrew Hewus Fresh)
+ - Remove a V from the environment (Andrew Hewus Fresh)
+ - Diag the git version to make debugging easier (Andrew Hewus Fresh)
+ - Set a default $ENV{EMAIL} in tests (Andrew Hewus Fresh)
+ - Stop if we detect git is too old (Andrew Hewus Fresh)
+ - Add MetaProvides Plugin support (Andrew Hewus Fresh)
+ - Add requires perl version, for kwalitee (Andrew Hewus Fresh)
+ - Include a META.yml (Andrew Hewus Fresh)
+ - Fix Makefile examples in documentation (Andrew Fresh)
+
+v0.0.20 2020-02-06T16:48:15
+ - Update README and LICENSE (Andrew Hewus Fresh)
+ - Require Dist::Zilla::Plugin::Git 2.044 (Andrew Hewus Fresh)
+ - Update README (Andrew Hewus Fresh)
+ - Remove the Git::Contributors Plugin (Andrew Hewus Fresh)
+ - Use TMPDIR for tempdir_root in test (Andrew Hewus Fresh)
+ - Update README.md (Andrew Hewus Fresh)
+ - Use Git::GatherDir exclude_filename not PruneFiles (Andrew Hewus Fresh)
+ - Pass parameters to Git::GatherDir Plugin (Andrew Hewus Fresh)
+ - Switch to correct comments in ini file examples (Andrew Hewus Fresh)
+ - Prune README.md and LICENSE.txt from the dist (Andrew Hewus Fresh)
+ - Remove existing MANIFEST.SKIP (Andrew Hewus Fresh)
+ - Exclude Merge commits from Changelog (Andrew Hewus Fresh)
+ - Require OurPkgVersion Plugin version 0.20 (Andrew Hewus Fresh)
+ - Document version specs (Andrew Hewus Fresh)
+ - Adjust Changelog detection for our actual versions (Andrew Hewus Fresh)
+ - Fix NextVersion for v0.0.0.0 (Andrew Hewus Fresh)
+ - Make sure we populate # VERSION (Andrew Hewus Fresh)
+ - Require new enough MakeMaker for "version range" (Andrew Hewus Fresh)
+ - Fix $source_git directory (Andrew Hewus Fresh)
+ - Correctly use semantic versioning (Andrew Hewus Fresh)
+ - Whitespace improvements (Andrew Hewus Fresh)
+ - Remove a V from the environment (Andrew Hewus Fresh)
+ - Diag the git version to make debugging easier (Andrew Hewus Fresh)
+ - Set a default $ENV{EMAIL} in tests (Andrew Hewus Fresh)
+ - Stop if we detect git is too old (Andrew Hewus Fresh)
+ - Add MetaProvides Plugin support (Andrew Hewus Fresh)
+ - Add requires perl version, for kwalitee (Andrew Hewus Fresh)
+ - Include a META.yml (Andrew Hewus Fresh)
+ - Fix Makefile examples in documentation (Andrew Fresh)
+ - Update version in README.md (Andrew Fresh)
+ - Rename Makefile in sharedir to avoid MANIFEST.SKIP (Andrew Fresh)
+ - Update README version. (Andrew Fresh)
+ - Require GitHub::Meta >= 0.46 (Andrew Fresh)
+ - Add OurPkgVersion to pod and readme (Mark Flickinger)
+ - Add OurPkgVersion plugin (Mark Flickinger)
+ - Rename carton target (Andrew Fresh)
+ - Auto carton install develop requirements as needed (Andrew Fresh)
+ - use $(CARTON) everywhere instead of hardcoding (Andrew Fresh)
+ - Switch to Git::GatherDir Plugin for speed (Andrew Fresh)
+ - Adjust MANIFEST.SKIP to be less draconian (Andrew Fresh)
+ - Pass configuration to StaticInstall Plugin (Andrew Fresh)
+ - Avoid test failure in strange circumstance (Andrew Fresh)
+ - Allow specifying EXTRA_UPDATES in Makefile (Andrew Fresh)
+ - Simplify default license setup (Andrew Fresh)
+ - Make it obvious that BUILDARGS is a class method (Andrew Fresh)
+ - Use the default Pod::Weaver finder (Andrew Fresh)
+ - Improve CONTRIBUTING docs (Andrew Fresh)
+ - Fix bug in POD example (Andrew Fresh)
+ - Use superhashof() instead of ignore()ing values (Andrew Fresh)
+ - Tests for Plugin::Author::GSG (Andrew Fresh)
+ - Switch to Test::DZil instead of hand-rolled (Andrew Fresh)
+ - Improve docs for cutting a new release (Andrew Fresh)
+
+v0.0.19 2020-01-10T16:54:53
+ - Update README (Andrew Hewus Fresh)
+ - Remove the Git::Contributors Plugin (Andrew Hewus Fresh)
+ - Use TMPDIR for tempdir_root in test (Andrew Hewus Fresh)
+
+v0.0.18 2019-11-20T16:17:30
+ - Update README.md (Andrew Hewus Fresh)
+ - Use Git::GatherDir exclude_filename not PruneFiles (Andrew Hewus Fresh)
+ - Pass parameters to Git::GatherDir Plugin (Andrew Hewus Fresh)
+ - Switch to correct comments in ini file examples (Andrew Hewus Fresh)
+
+v0.0.17 2019-11-05T22:33:04
+ - Update README (Andrew Hewus Fresh)
+ - Prune README.md and LICENSE.txt from the dist (Andrew Hewus Fresh)
+ - Remove existing MANIFEST.SKIP (Andrew Hewus Fresh)
+
+v0.0.16 2019-11-04T20:15:58
+ - Update README (Andrew Hewus Fresh)
+ - Exclude Merge commits from Changelog (Andrew Hewus Fresh)
+
+v0.0.15 2019-10-25T22:35:27
+ - Update README (Andrew Hewus Fresh)
+ - Require OurPkgVersion Plugin version 0.20 (Andrew Hewus Fresh)
+
+v0.0.14 2019-10-24T18:19:50
+ - Update README (Andrew Hewus Fresh)
+ - Document version specs (Andrew Hewus Fresh)
+ - Adjust Changelog detection for our actual versions (Andrew Hewus Fresh)
+ - Fix NextVersion for v0.0.0.0 (Andrew Hewus Fresh)
+ - Make sure we populate # VERSION (Andrew Hewus Fresh)
+
+v0.0.13 2019-10-23T20:39:40
+ - Update README (Andrew Hewus Fresh)
+ - Require new enough MakeMaker for "version range" (Andrew Hewus Fresh)
+ - Fix $source_git directory (Andrew Hewus Fresh)
+ - Correctly use semantic versioning (Andrew Hewus Fresh)
+ - Whitespace improvements (Andrew Hewus Fresh)
+
+v0.0.12 2019-07-11T21:47:49
+ - Remove a V from the environment (Andrew Hewus Fresh)
+ - Diag the git version to make debugging easier (Andrew Hewus Fresh)
+ - Set a default $ENV{EMAIL} in tests (Andrew Hewus Fresh)
+
+v0.0.11 2019-06-28T16:42:30
+ - Stop if we detect git is too old (Andrew Hewus Fresh)
+ - Update README (Andrew Hewus Fresh)
+ - Add MetaProvides Plugin support (Andrew Hewus Fresh)
+ - Add requires perl version, for kwalitee (Andrew Hewus Fresh)
+ - Include a META.yml (Andrew Hewus Fresh)
+
+v0.0.10 2019-06-11T21:36:34
+ - Fix Makefile examples in documentation (Andrew Fresh)
+ - Update version in README.md (Andrew Fresh)
+ - Rename Makefile in sharedir to avoid MANIFEST.SKIP (Andrew Fresh)
+ - Update README version. (Andrew Fresh)
+ - Require GitHub::Meta >= 0.46 (Andrew Fresh)
+ - Update README.md (Mark Flickinger)
+ - Add OurPkgVersion to pod and readme (Mark Flickinger)
+ - Add OurPkgVersion plugin (Mark Flickinger)
+ - Rename carton target (Andrew Fresh)
+ - Auto carton install develop requirements as needed (Andrew Fresh)
+ - use $(CARTON) everywhere instead of hardcoding (Andrew Fresh)
+ - Switch to Git::GatherDir Plugin for speed (Andrew Fresh)
+ - Adjust MANIFEST.SKIP to be less draconian (Andrew Fresh)
+ - Pass configuration to StaticInstall Plugin (Andrew Fresh)
+ - Avoid test failure in strange circumstance (Andrew Fresh)
+ - Allow specifying EXTRA_UPDATES in Makefile (Andrew Fresh)
+ - Simplify default license setup (Andrew Fresh)
+ - Make it obvious that BUILDARGS is a class method (Andrew Fresh)
+ - Use the default Pod::Weaver finder (Andrew Fresh)
+ - Improve CONTRIBUTING docs (Andrew Fresh)
+ - Fix bug in POD example (Andrew Fresh)
+ - Use superhashof() instead of ignore()ing values (Andrew Fresh)
+ - Tests for Plugin::Author::GSG (Andrew Fresh)
+ - Switch to Test::DZil instead of hand-rolled (Andrew Fresh)
+ - Improve docs for cutting a new release (Andrew Fresh)
+ - Move GitHub::UploadRelease after Git::Tag (Andrew Fresh)
+ - Help GitHub::UploadRelease find Git::Tag Plugin (Andrew Fresh)
+ - Add a _get_credentials backwards compat shim (Andrew Fresh)
+
+v0.0.9 2019-06-10T18:48:05
+ - Update version in README.md (Andrew Fresh)
+ - Rename Makefile in sharedir to avoid MANIFEST.SKIP (Andrew Fresh)
+
+v0.0.8 2019-06-07T19:07:07
+ - Update README version. (Andrew Fresh)
+ - Require GitHub::Meta >= 0.46 (Andrew Fresh)
+ - Rename carton target (Andrew Fresh)
+ - Auto carton install develop requirements as needed (Andrew Fresh)
+ - use $(CARTON) everywhere instead of hardcoding (Andrew Fresh)
+
+v0.0.7 2019-05-31T16:18:28
+ - Update README.md (Mark Flickinger)
+ - Add OurPkgVersion to pod and readme (Mark Flickinger)
+ - Add OurPkgVersion plugin (Mark Flickinger)
+
+v0.0.6 2019-05-02T16:58:04
+ - Switch to Git::GatherDir Plugin for speed (Andrew Fresh)
+ - Adjust MANIFEST.SKIP to be less draconian (Andrew Fresh)
+ - Pass configuration to StaticInstall Plugin (Andrew Fresh)
+
+v0.0.5 2019-04-24T16:36:33
+ - Avoid test failure in strange circumstance (Andrew Fresh)
+ - Allow specifying EXTRA_UPDATES in Makefile (Andrew Fresh)
+ - Simplify default license setup (Andrew Fresh)
+ - Make it obvious that BUILDARGS is a class method (Andrew Fresh)
+ - Use the default Pod::Weaver finder (Andrew Fresh)
+ - Improve CONTRIBUTING docs (Andrew Fresh)
+ - Fix bug in POD example (Andrew Fresh)
+ - Use superhashof() instead of ignore()ing values (Andrew Fresh)
+ - Tests for Plugin::Author::GSG (Andrew Fresh)
+
+v0.0.4 2019-03-29T18:45:33
+ - Switch to Test::DZil instead of hand-rolled (Andrew Fresh)
+ - Improve docs for cutting a new release (Andrew Fresh)
+
+v0.0.3 2019-03-27T02:20:30
+ - No changes found
+
+v0.0.2 2019-03-27T02:20:30
+ - No changes found
+
+v0.0.1 2019-03-27T01:48:40
+ - Move GitHub Plugins after Git Pugins (Andrew Fresh)
+ - Filter out the UploadToCPAN Plugin (Andrew Fresh)
+ - Documentation on how you're expected to use this (Andrew Fresh)
+ - Support main_module from dist.ini in Makefile (Andrew Fresh)
+ - Use perl instead of sed to parse dist.ini (Andrew Fresh)
+ - Simple explanation in CONTRIBUTING about how (Andrew Fresh)
+ - More documentation improvmenets (Andrew Fresh)
+ - Update README.md (Andrew Fresh)
+ - Rearrange Plugins to make documentation clearer (Andrew Fresh)
+ - Initial stab at the beginnings of CONTRIBUTING doc (Andrew Fresh)
+ - Add a clean and realclean targets (Andrew Fresh)
+ - Add a target and a LICENSE.txt (Andrew Fresh)
+ - Improve Carton detection (Andrew Fresh)
+ - Improve documentation (Andrew Fresh)
+ - Make Plugin::Author::GSG public (Andrew Fresh)
+ - Pick up semver numbering for git changelog (Andrew Fresh)
+ - Put hidden Plugins in Plugin::Author::GSG namespace (Andrew Fresh)
+ - Default PERL_CARTON_PERL5LIB=$PERL5LIB in Makefile (Andrew Fresh)
+ - Tidy up Makefile defines (Andrew Fresh)
+ - Override SHARE_DIR and include share/Makefile (Andrew Fresh)
+ - Let SHARE_DIR be falsy (Andrew Fresh)
+ - Switch to ?= not := in Makefile (Andrew Fresh)
+ - use install instead of cp for share files (Andrew Fresh)
+ - Default copyright_year/holder in BUILDARGS (Andrew Fresh)
+ - Let `make test` work the first time (Andrew Fresh)
+ - Use the "on develop" phase not cpanfile.dzil (Andrew Fresh)
+ - Allow including the default Makefile (Andrew Fresh)
+ - Don't force Makefile to be a dependency (Andrew Fresh)
+ - Only update Makefile with `make update` (Andrew Fresh)
+ - Set a github.user for the test (Andrew Fresh)
+ - Fix some bugs in the Makefile (Andrew Fresh)
+ - Add a more "meta" content tests (Andrew Fresh)
+ - Enable the StaticInstall Plugin (Andrew Fresh)
+ - Add github metadata (Andrew Fresh)
+ - Add files from `make update` (Andrew Fresh)
+ - Add some additional tests to the tests file (Andrew Fresh)
+ - Add a Plugin to upload releases to GitHub (Andrew Fresh)
+ - Add a default license Plugin (Andrew Fresh)
+ - Add PodWeaver Plugin with some of our prefs (Andrew Fresh)
+ - Add some Plugins for extra tests (Andrew Fresh)
+ - Switch from MetaYAML to MetaJSON (Andrew Fresh)
+ - Add a dist.ini for this dist (Andrew Fresh)
+ - Add some notes to the CONTRIBUTING file (Andrew Fresh)
+ - Add a few more Git related Plugins (Andrew Fresh)
+ - Add a basic implmentation that doesn't do much (Andrew Fresh)
+ - Add some helper files including a Makefile (Andrew Fresh)
+ - Initial commit (Andrew Fresh)

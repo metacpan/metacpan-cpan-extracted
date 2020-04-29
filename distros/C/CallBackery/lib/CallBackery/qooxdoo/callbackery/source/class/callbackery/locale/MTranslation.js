@@ -23,8 +23,6 @@ qx.Mixin.define("callbackery.locale.MTranslation", {
         /**
          * Translate incoming data. Do NOT mark the string for translation
          * use the tr function for this. xtr is meant for backend strings.
-         * 
-         * @param {String|Array|qx.data.Array} messageId 
          */
         xtr: function(messageId,varargs) {
             var nlsManager = qx.locale.Manager;

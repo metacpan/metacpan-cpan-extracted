@@ -1,3 +1,16 @@
+0.06 2020-04-28T00:10:37+02:00
+ - Add author website to doc.
+ - Add open_elements() method, deprecate open_tags() method with warning.
+ - Add repository name to doc.
+ - Add some comments to tests.
+ - Fix issue with XML element in lowercase only.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.05 2016-03-23T21:22:44+01:00
  - Add LICENSE file.
  - Add tests for finalize() and open_tags() methods.

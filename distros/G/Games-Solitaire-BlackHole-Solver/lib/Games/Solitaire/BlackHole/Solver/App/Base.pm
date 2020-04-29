@@ -1,10 +1,10 @@
 package Games::Solitaire::BlackHole::Solver::App::Base;
-$Games::Solitaire::BlackHole::Solver::App::Base::VERSION = '0.4.0';
+$Games::Solitaire::BlackHole::Solver::App::Base::VERSION = '0.4.1';
 use Moo;
 use Getopt::Long qw/ GetOptions /;
 use Pod::Usage qw/ pod2usage /;
 use Math::Random::MT ();
-use List::Util qw/ any /;
+use List::Util 1.34 qw/ any /;
 
 extends('Exporter');
 
@@ -112,8 +112,6 @@ sub _my_exit
     }
 
     exit( !$verdict );
-
-    return;
 }
 
 sub _parse_board
@@ -499,14 +497,14 @@ sub _set_up_solver
 }
 
 package Games::Solitaire::BlackHole::Solver::App::Base::Task;
-$Games::Solitaire::BlackHole::Solver::App::Base::Task::VERSION = '0.4.0';
+$Games::Solitaire::BlackHole::Solver::App::Base::Task::VERSION = '0.4.1';
 use Moo;
 
 has [ '_queue', '_gen', '_task_idx', '_name', '_remaining_iters', '_seed', ] =>
     ( is => 'rw' );
 
 package Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem;
-$Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem::VERSION = '0.4.0';
+$Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem::VERSION = '0.4.1';
 use Moo;
 
 has [ '_quota', '_task', '_task_idx', '_task_name', ] => ( is => 'rw' );
@@ -525,7 +523,7 @@ Games::Solitaire::BlackHole::Solver::App::Base - base class.
 
 =head1 VERSION
 
-version 0.4.0
+version 0.4.1
 
 =head1 METHODS
 

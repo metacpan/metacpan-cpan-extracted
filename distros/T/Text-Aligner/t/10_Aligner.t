@@ -2,7 +2,7 @@ use Test::More;
 use strict;
 
 my $n_tests;
-use Text::Aligner;
+use Text::Aligner 0.16;
 
 use Term::ANSIColor;
 use constant HAVE_COLORSTRIP => defined &Term::ANSIColor::colorstrip;

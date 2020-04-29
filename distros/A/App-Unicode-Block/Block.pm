@@ -3,7 +3,6 @@ package App::Unicode::Block;
 use strict;
 use warnings;
 
-use Class::Utils qw(set_params);
 use Curses::UI;
 use Encode qw(encode_utf8);
 use Error::Pure qw(err);
@@ -12,7 +11,7 @@ use List::MoreUtils qw(none);
 use Unicode::Block::Ascii;
 use Unicode::Block::List;
 
-our $VERSION = 0.01;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -21,8 +20,13 @@ sub new {
 	# Create object.
 	my $self = bless {}, $class;
 
-	# Process params.
-	set_params($self, @params);
+	# Object.
+	return $self;
+}
+
+# Run.
+sub run {
+	my $self = shift;
 
 	# Process arguments.
 	$self->{'_opts'} = {
@@ -35,7 +39,7 @@ sub new {
 		print STDERR "\t-l\t\tList of blocks.\n";
 		print STDERR "\t--version\tPrint version.\n";
 		print STDERR "\tunicode_block\tUnicode block name for print.\n";
-		exit 1;
+		return 1;
 	}
 	$self->{'_unicode_block'} = $ARGV[0];
 
@@ -51,20 +55,11 @@ sub new {
 			err "Unicode block '$self->{'_unicode_block'}' doesn't exist.";
 		}
 	}
-
-	# Object.
-	return $self;
-}
-
-# Run.
-sub run {
-	my $self = shift;
-
 	# Print unicode blocks.
 	if ($self->{'_opts'}->{'l'}) {
 		print join "\n", @{$self->{'_unicode_block_list'}};
 		print "\n";
-		return;
+		return 0;
 	}
 
 	# Print block.
@@ -99,7 +94,7 @@ sub run {
 		$cui->mainloop;
 	}
 
-	return;
+	return 0;
 }
 
 sub _print_block {
@@ -149,10 +144,8 @@ App::Unicode::Block - Base class for unicode-block script.
 
 =head1 ERRORS
 
- new():
+ run():
          Unicode block '%s' doesn't exist.
-         From Class::Utils::set_params():
-                 Unknown parameter '%s'.
 
 =head1 EXAMPLE
 
@@ -220,6 +213,6 @@ L<http://skim.cz>
 
 =head1 VERSION
 
-0.01
+0.04
 
 =cut

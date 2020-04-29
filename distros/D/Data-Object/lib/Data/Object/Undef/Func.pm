@@ -9,7 +9,7 @@ use Data::Object::Class;
 
 with 'Data::Object::Role::Throwable';
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 
 # BUILD
 

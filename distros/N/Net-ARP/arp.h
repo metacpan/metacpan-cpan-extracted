@@ -59,7 +59,11 @@ struct my_arphdr {
    u_char dest_ip[IP_ALEN];     // dest ip
 };
 
-extern struct ether_addr *ether_aton (__const char *__asc) __THROW;
+#ifdef LINUX 
+  extern struct ether_addr *ether_aton (__const char *__asc) __THROW;
+#else
+  extern struct ether_addr *ether_aton (__const char *__asc);
+#endif
 extern int get_mac_linux(const char *dev, char *mac);
 extern int get_mac_bsd(const char *dev, char *mac);
 extern int arp_lookup_linux(const char *dev, const char *ip, char *mac);

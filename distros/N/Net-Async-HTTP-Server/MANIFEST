@@ -2,7 +2,6 @@ Build.PL
 Changes
 examples/hello-world.pl
 lib/Net/Async/HTTP/Server.pm
-lib/Net/Async/HTTP/Server/PrometheusCollector.pm
 lib/Net/Async/HTTP/Server/Protocol.pm
 lib/Net/Async/HTTP/Server/PSGI.pm
 lib/Net/Async/HTTP/Server/Request.pm
@@ -25,9 +24,10 @@ t/05refcount.t
 t/10request-HTTP.t
 t/20psgi.t
 t/21psgi-streaming.t
+t/70metrics.t
 t/80cross-http.t
-t/80server+net-prometheus.t
 t/81cross-https.t
 t/99pod.t
 t/privkey.pem
+t/regen-certs.sh
 t/server.pem

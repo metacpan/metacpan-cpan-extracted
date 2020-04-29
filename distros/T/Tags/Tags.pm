@@ -3,7 +3,7 @@ package Tags;
 use strict;
 use warnings;
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 1;
 
@@ -70,8 +70,8 @@ L<http://skim.cz>
 
 BSD 2-Clause License
 
-=head1 VERSION 
+=head1 VERSION
 
-0.08
+0.09
 
 =cut

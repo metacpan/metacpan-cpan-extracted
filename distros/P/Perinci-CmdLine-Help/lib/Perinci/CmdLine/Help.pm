@@ -1,9 +1,9 @@
 package Perinci::CmdLine::Help;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-06'; # DATE
+our $DATE = '2020-04-27'; # DATE
 our $DIST = 'Perinci-CmdLine-Help'; # DIST
-our $VERSION = '0.172'; # VERSION
+our $VERSION = '0.173'; # VERSION
 
 use 5.010001;
 use strict;
@@ -113,7 +113,7 @@ sub gen_help {
         $clidocdata = $res->[2];
         my $usage = $clidocdata->{usage_line};
         $usage =~ s/\[\[prog\]\]/$progname/;
-        push @help, "  $usage\n";
+        push @help, Text::Wrap::wrap("  ", "    ", "$usage\n");
     }
 
     # subcommands
@@ -265,7 +265,7 @@ Perinci::CmdLine::Help - Generate help message for Perinci::CmdLine-based app
 
 =head1 VERSION
 
-This document describes version 0.172 of Perinci::CmdLine::Help (from Perl distribution Perinci-CmdLine-Help), released on 2020-02-06.
+This document describes version 0.173 of Perinci::CmdLine::Help (from Perl distribution Perinci-CmdLine-Help), released on 2020-04-27.
 
 =head1 DESCRIPTION
 

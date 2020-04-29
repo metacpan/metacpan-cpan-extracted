@@ -21,6 +21,10 @@
           ["json-decode"],
           ["yaml"]]]]],
   "data": [
+    { "label": "Single word",
+      "point": {
+        "jsony": "foo",
+        "json": "[ \"foo\" ]"}},
     { "label": "String splitting 1",
       "point": {
         "jsony": "foo bar baz",
@@ -96,4 +100,8 @@
     { "label": "List of nodes",
       "point": {
         "jsony": "[] {} 42\n",
-        "json": "[[], {}, 42]"}}]}
+        "json": "[[], {}, 42]"}},
+    { "label": "List of nodes",
+      "point": {
+        "jsony": "[foo bar] baz",
+        "json": "[[\"foo\", \"bar\"], \"baz\"]"}}]}

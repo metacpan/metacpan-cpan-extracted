@@ -10,7 +10,7 @@ all_from 'lib/Message/Passing.pm';
 license 'LGPL_2_1';
 authority('cpan:GHENRY');
 resources(
-    repository => "git://github.com/suretec/Message-Passing.git",
+    repository => "https://github.com/suretec/Message-Passing/",
 );
 
 requires 'Moo' => '0.091011';
@@ -29,6 +29,7 @@ requires 'Task::Weaken';
 requires 'Sys::Hostname::Long';
 requires 'DateTime';
 requires 'IO::Handle';
+requires 'List::Util' => 1.45;
 
 recommends 'Linux::IO_Prio' => 0.03;
 
@@ -46,6 +47,8 @@ author_requires(
     'Compress::Bzip2' => '0',
     'Crypt::CBC' => '0',
     'Crypt::Blowfish' => '0',
+    'Sys::Hostname::Long' => '0',
+    'AnyEvent::Handle::UDP' => '0',
 );
 
 author_tests 't/author';
@@ -56,4 +59,3 @@ if ($Module::Install::AUTHOR) {
 }
 
 WriteAll;
-

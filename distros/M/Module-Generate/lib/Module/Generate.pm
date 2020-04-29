@@ -9,9 +9,13 @@ use Perl::Tidy;
 use Data::Dumper;
 use Module::Starter;
 $Data::Dumper::Deparse = 1;
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 our %CLASS;
 our $SUB_INDEX = 1;
+
+sub start {
+	return ref $_[0] ? $_[0] : bless {}, $_[0];
+}
 
 sub dist {
 	$CLASS{DIST} = $_[1];
@@ -20,7 +24,9 @@ sub dist {
 
 sub class {
 	my ($self, $class) = @_;
-	$CLASS{CURRENT} = $CLASS{$class} = {};
+	$CLASS{CURRENT} = $CLASS{$class} = {
+		NAME => $class
+	};
 	return ref $self ? $self : bless {}, $self;
 }
 
@@ -112,6 +118,38 @@ sub init {
 sub end {
 	$CLASS{CURRENT}{END} = $_[1];
 	return $_[0];
+}
+
+sub new {
+	my ($self, $sub) = @_;
+	$CLASS{CURRENT}{SUBS}{CURRENT} = $CLASS{CURRENT}{SUBS}{new} = {
+		INDEX => $SUB_INDEX++,
+		POD => "Instantiate a new $CLASS{CURRENT}{NAME} object.",
+		EXAMPLE => "$CLASS{CURRENT}{NAME}\-\>new"
+	};
+	$CLASS{CURRENT}{SUBS}{CURRENT}{CODE} = $sub || eval "sub {
+		my (\$cls, \%args) = (shift, scalar \@_ == 1 ? \%{\$_[0]} : \@_);
+		bless \\%args, \$cls;	
+	}";
+	return $self;
+}
+
+sub accessor {
+	my ($self, $sub) = @_;
+	$CLASS{CURRENT}{SUBS}{CURRENT} = $CLASS{CURRENT}{SUBS}{$sub} = {
+		INDEX => $SUB_INDEX++,
+		ACCESSOR => 1,
+		POD => "get or set ${sub}.",
+		EXAMPLE => "\$obj->${sub}\;\n\n\t\$obj->${sub}(\$value)\;"
+	};
+	$CLASS{CURRENT}{SUBS}{CURRENT}{CODE} = eval "sub {
+		my (\$self, \$value) = \@_;
+		if (\$value) {
+			\$self->{$sub} = \$value;
+		}
+		return \$self->{$sub}
+	}";
+	return $self;
 }
 
 sub sub {
@@ -237,6 +275,8 @@ sub _build_subs {
 		if ($class->{SUBS}{$sub}{CODE}) {
 			$code = Dumper $class->{SUBS}{$sub}{CODE};
 			$code =~ s/\$VAR1 = sub //;
+			$code =~ s/\s*\n*\s*package Module\:\:Generate\;|use warnings\;|use strict\;//g;
+			$code =~ s/{\s*\n*/{/;
 			$code =~ s/};$/}/;
 			$code = sprintf "sub %s %s", $sub, $code;
 		} else {
@@ -255,19 +295,32 @@ sub _build_pod {
 	my $content = join '', <$d>;
 	$content =~ s/^.*\n__DATA__\n/\n/s;
 	$content =~ s/\n__END__\n.*$/\n/s;
-	my @subs;
+	my (@subs, @access);
 	for my $sub (sort { 
 		$definition->{SUBS}{$a}{INDEX} <=> $definition->{SUBS}{$b}{INDEX} 
 	} keys %{$definition->{SUBS}}) {
-		push @subs, $definition->{SUBS}{$sub}{EXAMPLE} 
-			? sprintf("=head2 %s\n\n%s\n\n\t%s", 
-				$sub, ($definition->{SUBS}{$sub}{POD} || ""), ($definition->{SUBS}{$sub}{EXAMPLE} || ""))
-			: sprintf("=head2 %s\n\n%s", $sub, $definition->{SUBS}{$sub}{POD} || "");
+		if ($definition->{SUBS}{$sub}{ACCESSOR}) {
+			push @access, $definition->{SUBS}{$sub}{EXAMPLE} 
+				? sprintf("=head2 %s\n\n%s\n\n\t%s", 
+					$sub, ($definition->{SUBS}{$sub}{POD} || ""), ($definition->{SUBS}{$sub}{EXAMPLE} || ""))
+				: sprintf("=head2 %s\n\n%s", $sub, $definition->{SUBS}{$sub}{POD} || "");
+		} else {
+			push @subs, $definition->{SUBS}{$sub}{EXAMPLE} 
+				? sprintf("=head2 %s\n\n%s\n\n\t%s", 
+					$sub, ($definition->{SUBS}{$sub}{POD} || ""), ($definition->{SUBS}{$sub}{EXAMPLE} || ""))
+				: sprintf("=head2 %s\n\n%s", $sub, $definition->{SUBS}{$sub}{POD} || "");
+		}
+	}
+
+	if (scalar @access) {
+		unshift @access, "=head1 ACCESSORS";
 	}
 
 	if (scalar @subs) {
 		unshift @subs, "=head1 SUBROUTINES/METHODS";
 	}
+
+	@subs = (@subs, @access);
 
 	my $lcname = lc($class);
 	(my $safename = $class) =~ s/\:\:/-/g;
@@ -395,7 +448,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 0.06
+Version 0.08
 
 =cut
 
@@ -411,11 +464,12 @@ Version 0.06
 			->abstract('Over my head.')
 			->our('$type')
 			->begin(sub {
-				$one = 'boeing';
+				$type = 'boeing';
 			})
-			->sub('new')
-				->code(sub { return bless {}, $_[0] })
+			->new
+				->pod('Instantiate a new plane.')
 				->example('my $plane = Planes->new')
+			->accessor('airline')
 			->sub('type')
 				->code(sub { $type })
 				->pod('Returns the type of plane.')
@@ -605,6 +659,39 @@ Define a code block is executed as late as possible.
 	});
 
 =cut
+
+=head2 new
+
+Define an object constructor.
+
+	$class->new;
+
+equivalent to:
+
+	sub new {
+		my ($cls, %args) = (shift, scalar @_ == 1 ? %{$_[0]} : @_);
+		bless \%args, $cls;	
+	}
+
+optionally you can pass your own sub routine.
+
+	$class->new(sub { ... });
+
+=head2 accessor
+
+Define a accessor.
+
+	$class->accessor('test');
+
+equivalent to:
+
+	sub test {	
+		my ($self, $value) = @_;
+		if ($value) {
+			$self->{$sub} = $value;
+		}
+		return $self->{$sub}
+	}";
 
 =head2 sub
 

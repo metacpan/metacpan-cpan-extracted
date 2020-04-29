@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Exception;
-$Games::Solitaire::Verify::Exception::VERSION = '0.2401';
+$Games::Solitaire::Verify::Exception::VERSION = '0.2402';
 use strict;
 use warnings;
 
@@ -131,7 +131,9 @@ use overload q#""# => sub {
     my $err  = $self->error();
     $err =~ s/([^\n])\z/$1\n/ms;
     return $err;
-};
+    },
+    'bool'     => sub { return 1; },
+    'fallback' => 1;
 
 
 
@@ -151,7 +153,7 @@ classes for G::S::Verify.
 
 =head1 VERSION
 
-version 0.2401
+version 0.2402
 
 =head1 SYNOPSIS
 
@@ -263,7 +265,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 by Shlomi Fish.
+This software is Copyright (c) 2008 by Shlomi Fish.
 
 This is free software, licensed under:
 
