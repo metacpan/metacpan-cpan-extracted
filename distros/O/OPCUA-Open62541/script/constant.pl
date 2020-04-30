@@ -31,13 +31,17 @@ my @consts = (
   [qw(	enum	RULEHANDLING		constants	)],
   [qw(	enum	ORDER			constants	)],
   [qw(	enum	VARIANT			types		)],
-  # need UA_StatusCode as C type to run special typemap conversion
-  [qw(	define	StatusCode		statuscodes	)],
+  # We need UA_StatusCode as C type to run special typemap conversion.
+  [qw(	define	STATUSCODE		statuscodes	UA_StatusCode	)],
   # needed for functionality tests
   [qw(	enum	BROWSERESULTMASK	types_generated	)],
   [qw(	enum	CLIENTSTATE		client_config	)],
   [qw(	enum	NODEIDTYPE		types		)],
-  [qw(	define	TYPES			types_generated	)],
+  # Type numbers depend on open62541 compile time options.  We cannot
+  # put them into Contant.pm as this file is commited into the source
+  # tree.  Generate them as C functions and use the value from the C
+  # header file.  Then it is the number during XS compile time.
+  [qw(	define	TYPES			types_generated	int		)],
   [qw(	define	NS0ID			nodeids		)],
   # needed for production
   [qw(	enum	NODECLASS		types_generated	)],
@@ -77,11 +81,7 @@ sub parse_consts {
 
 ########################################################################
 sub parse_prefix {
-    my ($pmf, $podf, $type, $prefix, $header) = @_;
-
-    # if prefix is not upper case, it is a typedef, then also create XS file
-    my $typedef;
-    ($typedef, $prefix) = ($prefix, uc($prefix)) if $prefix ne uc($prefix);
+    my ($pmf, $podf, $type, $prefix, $header, $typedef) = @_;
 
     my $cfile = "/usr/local/include/open62541/$header.h";
     open(my $cf, '<', $cfile)
@@ -89,7 +89,7 @@ sub parse_prefix {
 
     my ($xsfile, $xsf);
     if ($typedef) {
-	$xsfile = "Open62541-". lc($typedef). ".xsh";
+	$xsfile = "Open62541-". lc($prefix). ".xsh";
 	open($xsf, '>', $xsfile)
 	    or die "Open '$xsfile' for writing failed: $!";
     }
@@ -269,7 +269,7 @@ EOPODFOOTER
 sub print_xsfunc {
     my ($xsf, $typedef, $prefix, $str) = @_;
     print $xsf <<"EOXSFUNC";
-UA_${typedef}
+${typedef}
 ${prefix}_${str}()
     CODE:
 	RETVAL = UA_${prefix}_${str};

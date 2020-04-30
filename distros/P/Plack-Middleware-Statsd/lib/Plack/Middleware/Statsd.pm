@@ -22,7 +22,7 @@ use Ref::Util qw/ is_coderef /;
 use Time::HiRes;
 use Try::Tiny;
 
-our $VERSION = 'v0.4.3';
+our $VERSION = 'v0.4.4';
 
 # Note: You may be able to omit the client if there is a client
 # defined in the environment hash at C<psgix.monitor.statsd>, and the
@@ -178,7 +178,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 =head1 VERSION
 
-version v0.4.3
+version v0.4.4
 
 =head1 SYNOPSIS
 
@@ -378,6 +378,38 @@ You can access the configured statsd client from L<Catalyst>:
   }
 
 Alternatively, you can use L<Catalyst::Plugin::Statsd>.
+
+=head2 Using with Plack::Middleware::SizeLimit
+
+L<Plack::Middleware::SizeLimit> version 0.11 supports callbacks that
+allow you to monitor process size information.  In your F<app.psgi>:
+
+  use Net::Statsd::Tiny;
+  use Try::Tiny;
+
+  my $statsd = Net::Statsd::Tiny->new( ... );
+
+  builder {
+
+    enable "Statsd",
+      client      => $statsd,
+      sample_rate => 1.0;
+
+    ...
+
+    enable "SizeLimit",
+      ...
+      callback => sub {
+          my ($size, $shared, $unshared) = @_;
+          try {
+              $statsd->timing_ms('psgi.proc.size', $size);
+              $statsd->timing_ms('psgi.proc.shared', $shared);
+              $statsd->timing_ms('psgi.proc.unshared', $unshared);
+          }
+          catch {
+              warn $_;
+          };
+      };
 
 =head1 KNOWN ISSUES
 

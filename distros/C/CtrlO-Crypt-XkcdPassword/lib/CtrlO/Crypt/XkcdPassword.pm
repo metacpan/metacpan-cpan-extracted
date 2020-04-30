@@ -4,7 +4,7 @@ use warnings;
 
 # ABSTRACT: Yet another xkcd style password generator
 
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 
 use Carp qw(croak);
 use Crypt::Rijndael;
@@ -102,7 +102,7 @@ sub xkcd {
         croak "Invalid key [$key] received."
             unless ($key eq 'words' || $key eq 'digits');
 
-        if (defined $args{$key} && ($args{$key} !~ /^[1-9][0-9]?$/)) {
+        if (defined $args{$key} && ($args{$key} !~ /^[0-9]+$/)) {
             croak "Invalid value [$args{$key}] for key [$key].";
         }
     }
@@ -120,7 +120,7 @@ sub xkcd {
         push(
             @$words,
             sprintf(
-                '%0' . $d . 'd',
+                '%0' . $d . 'u',
                 with_entropy_source(
                     $self->entropy, sub { rand_int( 10**$d ) }
                 )
@@ -150,7 +150,7 @@ CtrlO::Crypt::XkcdPassword - Yet another xkcd style password generator
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head1 SYNOPSIS
 

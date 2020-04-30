@@ -1,7 +1,9 @@
 package Pod::From::Acme::CPANModules;
 
-our $DATE = '2019-01-11'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-30'; # DATE
+our $DIST = 'Pod-From-Acme-CPANModules'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -19,7 +21,18 @@ sub _markdown_to_pod {
 
 $SPEC{gen_pod_from_acme_cpanmodules} = {
     v => 1.1,
-    summary => 'Create "INCLUDED MODULES" POD sections from $LIST',
+    summary => 'Generate POD from an Acme::CPANModules::* module',
+    description => <<'_',
+
+Currently what this routine does:
+
+* Fill the Description section from the CPANModules' list description
+
+* Add an Included Modules section, containing the CPANModules' list entries
+
+* Add a Feature Comparison Matrix section, if one or more entries have 'features'
+
+_
     args_rels => {
         req_one => [qw/module author_lists/],
         choose_all => [qw/author_lists module_lists/],
@@ -57,8 +70,6 @@ sub gen_pod_from_acme_cpanmodules {
 
         {
             my $pod = '';
-            $pod .= "$list->{summary}".($list->{summary} =~ /\.$/ ? "" : ".")."\n\n"
-                if $list->{summary};
             $pod .= _markdown_to_pod($list->{description})."\n\n"
                 if $list->{description} && $list->{description} =~ /\S/;
             $res->{pod}{DESCRIPTION} = $pod if $pod;
@@ -95,7 +106,7 @@ sub gen_pod_from_acme_cpanmodules {
 }
 
 1;
-# ABSTRACT: Create "INCLUDED MODULES" POD sections from $LIST
+# ABSTRACT: Generate POD from an Acme::CPANModules::* module
 
 __END__
 
@@ -105,11 +116,11 @@ __END__
 
 =head1 NAME
 
-Pod::From::Acme::CPANModules - Create "INCLUDED MODULES" POD sections from $LIST
+Pod::From::Acme::CPANModules - Generate POD from an Acme::CPANModules::* module
 
 =head1 VERSION
 
-This document describes version 0.002 of Pod::From::Acme::CPANModules (from Perl distribution Pod-From-Acme-CPANModules), released on 2019-01-11.
+This document describes version 0.004 of Pod::From::Acme::CPANModules (from Perl distribution Pod-From-Acme-CPANModules), released on 2020-04-30.
 
 =head1 SYNOPSIS
 
@@ -126,7 +137,19 @@ Usage:
 
  gen_pod_from_acme_cpanmodules(%args) -> any
 
-Create "INCLUDED MODULES" POD sections from $LIST.
+Generate POD from an Acme::CPANModules::* module.
+
+Currently what this routine does:
+
+=over
+
+=item * Fill the Description section from the CPANModules' list description
+
+=item * Add an Included Modules section, containing the CPANModules' list entries
+
+=item * Add a Feature Comparison Matrix section, if one or more entries have 'features'
+
+=back
 
 This function is not exported by default, but exportable.
 
@@ -139,6 +162,7 @@ Arguments ('*' denotes required arguments):
 As an alternative to `module`, you can directly supply $LIST here.
 
 =item * B<module> => I<str>
+
 
 =back
 
@@ -166,7 +190,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.46 {
+package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.47 {
 
   use 5.014;
   use Moose;
@@ -53,6 +53,7 @@ package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.46 {
     my $self = shift;
 
     my $content = do {
+      no warnings 'redefine';
       local *URI::Escape::uri_escape = sub {
         my($uri) = @_;
         $uri;
@@ -70,7 +71,7 @@ package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.46 {
 
       my $status = '';
       $status .= " [![Build Status](https://api.cirrus-ci.com/github/@{[ $self->cirrus_user ]}/$name.svg)](https://cirrus-ci.com/github/@{[ $self->cirrus_user ]}/$name)" if $cirrus_status;
-      $status .= " [![Build Status](https://secure.travis-ci.org/@{[ $self->travis_user ]}/$name.png)](http://travis-ci.org/@{[ $self->travis_user ]}/$name)" if $self->travis_status;
+      $status .= " [![Build Status](https://travis-ci.org/@{[ $self->travis_user ]}/$name.svg)](http://travis-ci.org/@{[ $self->travis_user ]}/$name)" if $self->travis_status;
       $status .= " [![Build status](https://ci.appveyor.com/api/projects/status/@{[ $self->appveyor ]}/branch/master?svg=true)](https://ci.appveyor.com/project/@{[ $self->appveyor_user ]}/$name/branch/master)" if $self->appveyor;
 
       foreach my $workflow (@{ $self->workflow })
@@ -102,7 +103,7 @@ Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod
 
 =head1 VERSION
 
-version 2.46
+version 2.47
 
 =head1 SYNOPSIS
 

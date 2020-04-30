@@ -55,7 +55,19 @@ sub connect_client
 }
 
 like( Metrics::Any::Adapter::Test->metrics,
-   qr/^net_async_http_server_requests method:GET = 1/m,
-   'Metrics::Any test adapter contains HTTP server metrics' );
+   qr/^http_server_requests_in_flight = 0/m,
+   'Metrics::Any test adapter contains requests in flight gauge' );
+
+like( Metrics::Any::Adapter::Test->metrics,
+   qr/^http_server_requests method:GET = 1/m,
+   'Metrics::Any test adapter contains request counter' );
+
+like( Metrics::Any::Adapter::Test->metrics,
+   qr/^http_server_responses method:GET code:200 = 1/m,
+   'Metrics::Any test adapter contains responses counter' );
+
+like( Metrics::Any::Adapter::Test->metrics,
+   qr/^http_server_response_bytes_total = ([1-9]\d+)/m,
+   'Metrics::Any test adapter contains non-zero response bytes' );
 
 done_testing;

@@ -10,24 +10,40 @@ use warnings;
 use base qw( IO::Async::Listener );
 IO::Async::Listener->VERSION( '0.61' );
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Carp;
 
 use Net::Async::HTTP::Server::Protocol;
 use Net::Async::HTTP::Server::Request;
 
-use Metrics::Any '$metrics';
+use Metrics::Any 0.03 '$metrics';
 
+$metrics->make_gauge( in_flight =>
+   name        => [qw( http server requests_in_flight )],
+   description => "Count of the number of requests received that have not yet been completed",
+   # no labels
+);
 $metrics->make_counter( requests  =>
-   name        => "net_async_http_server_requests",
+   name        => [qw( http server requests )],
    description => "Number of HTTP requests received",
    labels      => [qw( method )],
 );
 $metrics->make_counter( responses =>
-   name        => "net_async_http_server_responses",
+   name        => [qw( http server responses )],
    description => "Number of HTTP responses served",
    labels      => [qw( method code )],
+);
+$metrics->make_timer( duration =>
+   name        => [qw( http server request duration )],
+   description => "Duration of time spent processing requests",
+   # no labels
+);
+$metrics->make_distribution( response_size =>
+   name        => [qw( http server response bytes )],
+   description => "The size in bytes of responses sent",
+   units       => "bytes",
+   # no labels
 );
 
 =head1 NAME
@@ -75,14 +91,12 @@ an HTTP request is received, allowing the program to respond to it.
 For accepting HTTP connections via L<PSGI> and L<Plack>, see also
 L<Plack::Handler::Net::Async::HTTP::Server>.
 
-=head2 Prometheus Metrics
+=head2 Metrics
 
-If L<Net::Prometheus> at least version C<0.07_001> is also loaded into the
-running perl instance (i.e. not just installed and available, but actually
-loaded) then some integration code will be run which exports basic metrics on
-received requests and send responses. This is largely experimental and
-undocumented for now. It is implemented in
-C<Net::Async::HTTP::Server::PrometheusCollector>.
+I<Since version 0.11.>
+
+This module reports basic metrics about received requests and sent responses
+via L<Metrics::Any>.
 
 =cut
 
@@ -192,7 +206,12 @@ sub _received_request
    my $self = shift;
    my ( $request ) = @_;
 
-   $metrics->inc_counter( requests => $request->method );
+   if( $metrics ) {
+      $metrics->inc_gauge( in_flight => );
+
+      $metrics->inc_counter( requests => $request->method );
+      $self->{request_received_timestamp}{$request} = $self->loop->time;
+   }
 
    $self->invoke_event( on_request => $request );
 }
@@ -202,7 +221,15 @@ sub _done_request
    my $self = shift;
    my ( $request ) = @_;
 
-   $metrics->inc_counter( responses => $request->method, $request->response_status_code );
+   if( $metrics ) {
+      my $received_timestamp = delete $self->{request_received_timestamp}{$request};
+
+      $metrics->dec_gauge( in_flight => );
+
+      $metrics->inc_counter( responses => $request->method, $request->response_status_code );
+      $metrics->inc_timer_by( duration => $self->loop->time - $received_timestamp );
+      $metrics->inc_distribution_by( response_size => $request->bytes_written );
+   }
 }
 
 =head1 TODO

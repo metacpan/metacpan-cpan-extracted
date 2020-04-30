@@ -1,5 +1,13 @@
 Revision history for Net-Async-HTTP-Server
 
+0.12    2020-04-29
+        [CHANGES]
+         * Improved metrics reporting using Metrics::Any 0.03
+            + Added response time and byte size distributions and
+              requests-in-flight gauge
+         * Reduced overhead when not collecting metrics by disabling the code
+           when not using a Metrics::Any adapter
+
 0.11    2020-04-28
         [CHANGES]
          * Use Metrics::Any instead of the hacky devel-only Net::Prometheus

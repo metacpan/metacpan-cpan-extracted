@@ -9,6 +9,12 @@ use IO::Async::Loop;
 
 plan skip_all => 'set NET_ASYNC_REDIS_HOST env var to test' unless exists $ENV{NET_ASYNC_REDIS_HOST};
 
+# If we have ::TAP, use it - but no need to list it as a dependency
+eval {
+    require Log::Any::Adapter;
+    Log::Any::Adapter->import(qw(TAP));
+};
+
 my $loop = IO::Async::Loop->new;
 testing_loop($loop);
 

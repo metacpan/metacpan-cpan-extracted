@@ -1,11 +1,11 @@
 NAME
-    Pod::From::Acme::CPANModules - Create "INCLUDED MODULES" POD sections
-    from $LIST
+    Pod::From::Acme::CPANModules - Generate POD from an Acme::CPANModules::*
+    module
 
 VERSION
-    This document describes version 0.002 of Pod::From::Acme::CPANModules
+    This document describes version 0.004 of Pod::From::Acme::CPANModules
     (from Perl distribution Pod-From-Acme-CPANModules), released on
-    2019-01-11.
+    2020-04-30.
 
 SYNOPSIS
      use Pod::From::Acme::CPANModules qw(gen_pod_from_acme_cpanmodules);
@@ -18,7 +18,17 @@ FUNCTIONS
 
      gen_pod_from_acme_cpanmodules(%args) -> any
 
-    Create "INCLUDED MODULES" POD sections from $LIST.
+    Generate POD from an Acme::CPANModules::* module.
+
+    Currently what this routine does:
+
+    *   Fill the Description section from the CPANModules' list description
+
+    *   Add an Included Modules section, containing the CPANModules' list
+        entries
+
+    *   Add a Feature Comparison Matrix section, if one or more entries have
+        'features'
 
     This function is not exported by default, but exportable.
 
@@ -52,7 +62,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

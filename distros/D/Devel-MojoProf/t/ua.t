@@ -13,10 +13,7 @@ for my $name (qw(blocking non-blocking promise)) {
 }
 
 my @report;
-Devel::MojoProf->singleton->reporter(sub {
-  push @report, $_[1];
-  shift->Devel::MojoProf::_default_reporter(@_) if $ENV{HARNESS_IS_VERBOSE};
-});
+Devel::MojoProf->singleton->reporter(sub { push @report, $_[1] });
 
 my $ua = Mojo::UserAgent->new;
 $ua->ioloop(Mojo::IOLoop->singleton);

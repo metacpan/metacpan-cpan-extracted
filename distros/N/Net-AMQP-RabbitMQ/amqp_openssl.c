@@ -28,6 +28,10 @@
 #include "config.h"
 #endif
 
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #include "amqp_openssl_bio.h"
 #include "amqp_openssl_hostname_validation.h"
 #include "amqp_private.h"
@@ -164,7 +168,7 @@ static ssize_t amqp_ssl_socket_recv(void *base, void *buf, size_t len,
 }
 
 static int amqp_ssl_socket_open(void *base, const char *host, int port,
-                                struct timeval *timeout) {
+                                const struct timeval *timeout) {
   struct amqp_ssl_socket_t *self = (struct amqp_ssl_socket_t *)base;
   long result;
   int status;
@@ -354,6 +358,11 @@ amqp_socket_t *amqp_ssl_socket_new(amqp_connection_state_t state) {
   }
   /* Disable SSLv2 and SSLv3 */
   SSL_CTX_set_options(self->ctx, SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3);
+
+  SSL_CTX_set_mode(self->ctx, SSL_MODE_ENABLE_PARTIAL_WRITE);
+  /* OpenSSL v1.1.1 turns this on by default, which makes the non-blocking
+   * logic not behave as expected, so turn this back off */
+  SSL_CTX_clear_mode(self->ctx, SSL_MODE_AUTO_RETRY);
 
   amqp_set_socket(state, (amqp_socket_t *)self);
 
@@ -591,9 +600,7 @@ static int setup_openssl(void) {
   CRYPTO_set_locking_callback(ssl_locking_callback);
 
 #ifdef AMQP_OPENSSL_V110
-  if (CONF_modules_load_file(
-          NULL, "rabbitmq-c",
-          CONF_MFLAGS_DEFAULT_SECTION | CONF_MFLAGS_IGNORE_MISSING_FILE) <= 0) {
+  if (OPENSSL_init_ssl(0, NULL) <= 0) {
     status = AMQP_STATUS_SSL_ERROR;
     goto out;
   }

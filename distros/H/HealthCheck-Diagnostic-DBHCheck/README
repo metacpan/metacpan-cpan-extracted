@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version v0.500.1
+    version v0.500.3
 
 SYNOPSIS
 
@@ -37,6 +37,16 @@ DESCRIPTION
 ATTRIBUTES
 
     Those inherited from "ATTRIBUTES" in HealthCheck::Diagnostic plus:
+
+ label
+
+    Inherited from "label1" in HealthCheck::Diagnostic, defaults to
+    dbh_check.
+
+ tags
+
+    Inherited from "tags1" in HealthCheck::Diagnostic, defaults to [
+    'dbh_check' ].
 
  dbh
 

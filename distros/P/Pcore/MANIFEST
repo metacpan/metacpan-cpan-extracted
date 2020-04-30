@@ -43,6 +43,7 @@ lib/Pcore/API/dynadot.pm
 lib/Pcore/API/majestic.pm
 lib/Pcore/API/moz.pm
 lib/Pcore/API/namecheap.pm
+lib/Pcore/API/namesilo.pm
 lib/Pcore/API/seorank.pm
 lib/Pcore/API/twocaptcha.pm
 lib/Pcore/App.pm

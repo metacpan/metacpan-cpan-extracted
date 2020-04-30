@@ -1,22 +1,63 @@
 NAME
-    Acme::CPANModules::HidingModules - Simulate the unavailability of
-    modules
+    Acme::CPANModules::HidingModules - Hiding modules
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Acme::CPANModules::HidingModules (from Perl distribution
-    Acme-CPANModules-HidingModules), released on 2019-01-10.
+    Acme-CPANModules-HidingModules), released on 2020-02-13.
 
 DESCRIPTION
-    Simulate the unavailability of modules.
+    Hiding modules.
 
-    The tools listed here can simulate the absence of modules, usually for
-    testing purposes. For example, you have Foo::Bar installed but want to
-    test how your code would behave when Foo::Bar is not installed.
+    So you want to convince some Perl code that some modules that are
+    installed, aren't (usually for testing purposes)? There are several ways
+    to go about it, with different effects and level of convincing.
 
-    These tools usually work by installing a require() hook in @INC. If the
-    hook sees that you are trying to load one of the target modules, it dies
-    instead.
+    Loading modules
+
+    Most of the time, you just want to make certain modules not loadable (by
+    "require" or "use"). To do this, you usually install a hook at the first
+    element of @INC. The hooks would die when it receives a request to load
+    a modules that you want to hide. Some modules that work this way
+    include:
+
+    lib::filter family, including lib::disallow. These family of modules
+    support hiding (non-)core modules in addition to the specific ones you
+    mentioned. It also supports recursive allowing (i.e. you want to allow
+    Moo and all the modules that Moo loads, and all the modules that they
+    load, and so on).
+
+    Devel::Hide, which also plans to support hiding (non-)core modules.
+
+    Test::Without::Module.
+
+    Finding module's path
+
+    Depending on which module you use to find a module's path, here are some
+    patches you can load to fool the finder.
+
+    Module::Path::Patch::Hide
+
+    Module::Path::More::Patch::Hide
+
+    Listing installed modules
+
+    Depending on which module you use to find a module's path, here are some
+    patches you can load to fool the lister.
+
+    Module::List::Patch::Hide
+
+    PERLANCAR::Module::List::Patch::Hide
+
+    Module::List::Tiny::Patch::Hide
+
+    Module::List::Wildcard::Patch::Hide
+
+    Hard-core hiding
+
+    To fool code that tries to find the module files themselves without
+    using any module, i.e. by iterating @INC, you will need to actually
+    (temporarily) rename the module files. LApp::pmrenamehide does this.
 
 INCLUDED MODULES
     *   lib::filter
@@ -27,17 +68,34 @@ INCLUDED MODULES
 
     *   Test::Without::Module
 
-    *   Module::Path::Patch::Hide - This only hides modules from
-        Module::Path
+    *   Module::Path::Patch::Hide
 
-    *   Module::Path::More::Patch::Hide - This only hides modules from
-        Module::Path::More
+    *   Module::Path::More::Patch::Hide
 
-    *   Module::List::Patch::Hide - This only hides modules from
-        Module::List
+    *   Module::List::Patch::Hide
 
-    *   PERLANCAR::Module::List::Patch::Hide - This only hides modules from
-        PERLANCAR::Module::List
+    *   PERLANCAR::Module::List::Patch::Hide
+
+    *   Module::List::Tiny::Patch::Hide
+
+    *   Module::List::Wildcard::Patch::Hide
+
+    *   App::pmrenamehide
+
+FAQ
+  What are ways to use this module?
+    Aside from reading it, you can install all the listed modules using
+    cpanmodules:
+
+        % cpanmodules ls-entries HidingModules | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=HidingModules -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    This module also helps lcpan produce a more meaningful result for "lcpan
+    related-mods" when it comes to finding related modules for the modules
+    listed in this Acme::CPANModules module.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -64,7 +122,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

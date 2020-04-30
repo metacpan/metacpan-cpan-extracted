@@ -13,7 +13,7 @@ use Try::Tiny;
 use List::MoreUtils qw/part natatime/;
 use overload '~~' => \&_matches, '""' => \&_stringify;
 
-our $VERSION = "1.06";
+our $VERSION = "1.07";
 
 our $MESSAGE;        # global var for last message from ~~ (see '_matches')
 our $MAX_DEEP = 100; # limit for recursive calls to inspect()
@@ -137,7 +137,7 @@ my $builtin_msgs = {
     List => {
       NOT_A_LIST => "is not an arrayref",
       TOO_SHORT  => "less than %d items",
-      TOO_LONG   => "more than %d its",
+      TOO_LONG   => "more than %d items",
       ANY        => "should have at least one '%s'",
     },
     Struct => {
@@ -373,7 +373,12 @@ sub msg {
   $msg = $global_msgs->{$subclass}{$msg_id}  # otherwise
       || $global_msgs->{Generic}{$msg_id}
      or croak "no error string for message $msg_id";
-  return sprintf "$name: $msg", @args; 
+
+  # perl v5.22 and above warns if there are too many @args for sprintf.
+  # The line below prevents that warning
+  no if $] ge '5.022000', warnings => 'redundant';
+
+  return sprintf "$name: $msg", @args;
 }
 
 

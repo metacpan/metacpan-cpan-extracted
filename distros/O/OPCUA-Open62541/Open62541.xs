@@ -127,7 +127,6 @@ typedef UA_NodeId *		OPCUA_Open62541_NodeId;
 typedef UA_LocalizedText *	OPCUA_Open62541_LocalizedText;
 
 /* types_generated.h */
-typedef UA_BrowseResultMask	OPCUA_Open62541_BrowseResultMask;
 typedef UA_Variant *		OPCUA_Open62541_Variant;
 
 /* plugin/log.h */
@@ -237,7 +236,7 @@ XS_unpack_UA_##type(SV *in)						\
 	UV out = SvUV(in);						\
 									\
 	if (out > UA_##limit##_MAX)					\
-		warn("Unsigned value %li greater than UA_"		\
+		warn("Unsigned value %lu greater than UA_"		\
 		    #limit "_MAX", out);				\
 	return out;							\
 }									\
@@ -494,7 +493,7 @@ XS_unpack_UA_NodeId(SV *in)
 		out.identifier.byteString = XS_unpack_UA_ByteString(*svp);
 		break;
 	default:
-		CROAK("NodeId_identifierType %ld unknown", type);
+		CROAK("NodeId_identifierType %li unknown", type);
 	}
 	return out;
 }
@@ -697,17 +696,24 @@ OPCUA_Open62541_Variant_setScalar(OPCUA_Open62541_Variant variant, SV *in,
 	void *scalar;
 	UA_StatusCode status;
 
+	if (unpack_UA_table[type->typeIndex] == NULL) {
+		CROAK("No unpack conversion for type '%s' index %u",
+		    type->typeName, type->typeIndex);
+	}
+
 	scalar = UA_new(type);
 	if (scalar == NULL) {
-		CROAKE("UA_new type %d, name %s",
-		    type->typeIndex, type->typeName);
+		CROAKE("UA_new type '%s' index %u",
+		    type->typeName, type->typeIndex);
 	}
 	(unpack_UA_table[type->typeIndex])(in, scalar);
 
 	status = UA_Variant_setScalarCopy(variant, scalar, type);
+	/* Free, not destroy.  The nested data structures belong to Perl. */
+	UA_free(scalar);
 	if (status != UA_STATUSCODE_GOOD) {
-		CROAKS(status, "UA_Variant_setScalarCopy type %d, name %s",
-		    type->typeIndex, type->typeName);
+		CROAKS(status, "UA_Variant_setScalarCopy type '%s' index %u",
+		    type->typeName, type->typeIndex);
 	}
 }
 
@@ -727,6 +733,10 @@ OPCUA_Open62541_Variant_setArray(OPCUA_Open62541_Variant variant, SV *in,
 		UA_Variant_setArray(variant, NULL, 0, type);
 		return;
 	}
+	if (unpack_UA_table[type->typeIndex] == NULL) {
+		CROAK("No pack conversion for type '%s' index %u",
+		    type->typeName, type->typeIndex);
+	}
 
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVAV)
 		CROAK("Not an ARRAY reference");
@@ -734,8 +744,8 @@ OPCUA_Open62541_Variant_setArray(OPCUA_Open62541_Variant variant, SV *in,
 	top = av_len(av);
 	array = UA_Array_new(top + 1, type);
 	if (array == NULL)
-		CROAKE("UA_Array_new size %zd, type %d, name %s",
-		    top + 1, type->typeIndex, type->typeName);
+		CROAKE("UA_Array_new size %zd, type '%s' index %u",
+		    top + 1, type->typeName, type->typeIndex);
 	p = array;
 	for (i = 0; i <= top; i++) {
 		svp = av_fetch(av, i, 0);
@@ -746,9 +756,13 @@ OPCUA_Open62541_Variant_setArray(OPCUA_Open62541_Variant variant, SV *in,
 	}
 
 	status = UA_Variant_setArrayCopy(variant, array, top + 1, type);
+	/* Free, not destroy.  The nested data structures belong to Perl. */
+	if (array != UA_EMPTY_ARRAY_SENTINEL)
+		UA_free(array);
 	if (status != UA_STATUSCODE_GOOD) {
-		CROAKS(status, "UA_Variant_setArrayCopy type %d, name %s",
-		    type->typeIndex, type->typeName);
+		CROAKS(status,
+		    "UA_Variant_setArrayCopy size %zd, type '%s' index %u",
+		    top + 1, type->typeName, type->typeIndex);
 	}
 }
 
@@ -793,6 +807,11 @@ XS_unpack_UA_Variant(SV *in)
 static void
 OPCUA_Open62541_Variant_getScalar(OPCUA_Open62541_Variant variant, SV *out)
 {
+	if (pack_UA_table[variant->type->typeIndex] == NULL) {
+		/* XXX memory leak in caller */
+		CROAK("No pack conversion for type '%s' index %u",
+		    variant->type->typeName, variant->type->typeIndex);
+	}
 	(pack_UA_table[variant->type->typeIndex])(out, variant->data);
 }
 
@@ -809,6 +828,12 @@ OPCUA_Open62541_Variant_getArray(OPCUA_Open62541_Variant variant, SV *out)
 		sv_set_undef(out);
 		return;
 	}
+	if (pack_UA_table[variant->type->typeIndex] == NULL) {
+		/* XXX memory leak in caller */
+		CROAK("No pack conversion for type '%s' index %u",
+		    variant->type->typeName, variant->type->typeIndex);
+	}
+
 	av = newAV();
 	av_extend(av, variant->arrayLength);
 	p = variant->data;
@@ -906,6 +931,10 @@ XS_unpack_UA_ExtensionObject(SV *in)
 		if (svp == NULL)
 			CROAK("No ExtensionObject_content_type in HASH");
 		type = XS_unpack_OPCUA_Open62541_DataType(*svp);
+		if (unpack_UA_table[type->typeIndex] == NULL) {
+			CROAK("No unpack conversion for type '%s' index %u",
+			    type->typeName, type->typeIndex);
+		}
 		out.content.decoded.type = type;
 
 		svp = hv_fetchs(content, "ExtensionObject_content_data", 0);
@@ -914,14 +943,14 @@ XS_unpack_UA_ExtensionObject(SV *in)
 
 		data = UA_new(type);
 		if (data == NULL) {
-			CROAK("UA_new type %d, name %s",
-			    type->typeIndex, type->typeName);
+			CROAK("UA_new type '%s' index %u",
+			    type->typeName, type->typeIndex);
 		}
 		(unpack_UA_table[type->typeIndex])(*svp, data);
 
 		break;
 	default:
-		CROAK("ExtensionObject_encoding %ld unknown", encoding);
+		CROAK("ExtensionObject_encoding %li unknown", encoding);
 	}
 	return out;
 }
@@ -930,6 +959,7 @@ static void
 XS_pack_UA_ExtensionObject(SV *out, UA_ExtensionObject in)
 {
 	dTHX;
+	OPCUA_Open62541_DataType type;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -952,13 +982,19 @@ XS_pack_UA_ExtensionObject(SV *out, UA_ExtensionObject in)
 		break;
 	case UA_EXTENSIONOBJECT_DECODED:
 	case UA_EXTENSIONOBJECT_DECODED_NODELETE:
+		type = in.content.decoded.type;
+		if (pack_UA_table[type->typeIndex] == NULL) {
+			/* XXX memory leak in caller */
+			CROAK("No pack conversion for type '%s' index %u",
+			    type->typeName, type->typeIndex);
+		}
+
 		sv = newSV(0);
-		XS_pack_OPCUA_Open62541_DataType(sv, in.content.decoded.type);
+		XS_pack_OPCUA_Open62541_DataType(sv, type);
 		hv_stores(hv, "ExtensionObject_content_type", sv);
 
 		sv = newSV(0);
-		(pack_UA_table[in.content.decoded.type->typeIndex])(sv,
-		    in.content.decoded.data);
+		(pack_UA_table[type->typeIndex])(sv, in.content.decoded.data);
 		hv_stores(hv, "ExtensionObject_content_data", sv);
 
 		break;
@@ -978,7 +1014,7 @@ XS_unpack_OPCUA_Open62541_DataType(SV *in)
 	UV index = SvUV(in);
 
 	if (index >= UA_TYPES_COUNT) {
-		CROAK("Unsigned value %li not below UA_TYPES_COUNT", index);
+		CROAK("Unsigned value %lu not below UA_TYPES_COUNT", index);
 	}
 	return &UA_TYPES[index];
 }
@@ -1706,6 +1742,8 @@ UINT64_MAX()
     OUTPUT:
 	RETVAL
 
+INCLUDE: Open62541-types.xsh
+
 # 6.1.12 StatusCode, statuscodes.c, unknown just for testing
 
 UA_StatusCode
@@ -1947,10 +1985,15 @@ UA_Server_run(server, running)
 	OPCUA_Open62541_Server		server
 	UA_Boolean			&running
     PREINIT:
+#ifdef DEBUG
 	MAGIC *mg;
+#endif
     CODE:
 	/* If running is changed, the magic callback will report to server. */
-	mg = sv_magicext(ST(1), NULL, PERL_MAGIC_ext, &server_run_mgvtbl,
+#ifdef DEBUG
+	mg =
+#endif
+	sv_magicext(ST(1), NULL, PERL_MAGIC_ext, &server_run_mgvtbl,
 	    (void *)&running, 0);
 	DPRINTF("server %p, sv_server %p, &running %p, mg %p",
 	    server, server->sv_server, &running, mg);
@@ -1991,7 +2034,7 @@ UA_StatusCode
 UA_Server_readValue(server, nodeId, outValue)
 	OPCUA_Open62541_Server		server
 	UA_NodeId			nodeId
-	OPCUA_Open62541_Variant         outValue
+	OPCUA_Open62541_Variant		outValue
     INIT:
 	if (!SvOK(ST(2)) || !(SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) < SVt_PVAV))
 		CROAK("outValue is not a scalar reference");
@@ -2009,6 +2052,18 @@ UA_Server_writeValue(server, nodeId, value)
 	UA_Variant			value
     CODE:
 	RETVAL = UA_Server_writeValue(server->sv_server, nodeId, value);
+    OUTPUT:
+	RETVAL
+
+# 11.5 Browsing
+
+UA_BrowseResult
+UA_Server_browse(server, maxReferences, bd)
+	OPCUA_Open62541_Server		server
+	UA_UInt32			maxReferences
+	UA_BrowseDescription		bd
+    CODE:
+	RETVAL = UA_Server_browse(server->sv_server, maxReferences, &bd);
     OUTPUT:
 	RETVAL
 
@@ -2136,6 +2191,57 @@ UA_Server_addDataTypeNode(server, requestedNewNodeId, parentNodeId, referenceTyp
     OUTPUT:
 	RETVAL
 
+UA_StatusCode
+UA_Server_deleteNode(server, nodeId, deleteReferences)
+	OPCUA_Open62541_Server		server
+	UA_NodeId			nodeId
+	UA_Boolean			deleteReferences
+    CODE:
+	RETVAL = UA_Server_deleteNode(server->sv_server, nodeId,
+	    deleteReferences);
+    OUTPUT:
+	RETVAL
+
+# 11.10 Reference Management
+
+UA_StatusCode
+UA_Server_addReference(server, sourceId, refTypeId, targetId, isForward)
+	OPCUA_Open62541_Server		server
+	UA_NodeId			sourceId
+	UA_NodeId			refTypeId
+	UA_ExpandedNodeId		targetId
+	UA_Boolean			isForward
+    CODE:
+	RETVAL = UA_Server_addReference(server->sv_server, sourceId, refTypeId,
+	    targetId, isForward);
+    OUTPUT:
+	RETVAL
+
+UA_StatusCode
+UA_Server_deleteReference(server, sourceNodeId, referenceTypeId, isForward, targetNodeId, deleteBidirectional)
+	OPCUA_Open62541_Server		server
+	UA_NodeId			sourceNodeId
+	UA_NodeId			referenceTypeId
+	UA_Boolean			isForward
+	UA_ExpandedNodeId		targetNodeId
+	UA_Boolean			deleteBidirectional
+    CODE:
+	RETVAL = UA_Server_deleteReference(server->sv_server, sourceNodeId,
+	    referenceTypeId, isForward, targetNodeId, deleteBidirectional);
+    OUTPUT:
+	RETVAL
+
+# Namespace Handling
+
+UA_UInt16
+UA_Server_addNamespace(server, name)
+	OPCUA_Open62541_Server		server
+	const char *			name
+    CODE:
+	RETVAL = UA_Server_addNamespace(server->sv_server, name);
+    OUTPUT:
+	RETVAL
+
 #############################################################################
 MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::ServerConfig	PREFIX = UA_ServerConfig_
 
@@ -2188,6 +2294,14 @@ UA_ServerConfig_getLogger(config)
 	    "lg_storage %p",
 	    config, config->svc_serverconfig, RETVAL, RETVAL->lg_logger,
 	    RETVAL->lg_storage);
+    OUTPUT:
+	RETVAL
+
+UA_BuildInfo
+UA_ServerConfig_getBuildInfo(config)
+	OPCUA_Open62541_ServerConfig	config
+    CODE:
+	RETVAL = config->svc_serverconfig->buildInfo;
     OUTPUT:
 	RETVAL
 

@@ -9,7 +9,8 @@ chdir $_;
 
 sub pl($@) {
     my $expect = shift;
-    open my $fh, '-|', $^X, '../pl', @_;
+    open my $fh, '-|', $^X, '../pl',
+      $^O !~ /^MSWin/ ? @_ : map '"'.join('\"', split /"/).'"', @_;
     local $/;
     my $ret = <$fh>;
     ok $ret eq $expect, join ' ', 'pl', map /[\s*?[\]{}\$\\'"]|^$/ ? "'$_'" : $_, @_;

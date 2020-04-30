@@ -6,7 +6,7 @@ use Test::PostgreSQL::Docker;
 use Data::Dumper;
 
 my $REP = $ENV{PERL_TEST_PG_DOCKER_REP} || 'postgres';
-my $TAG = $ENV{PERL_TEST_PG_DOCKER_REP} || '12-alpine';
+my $TAG = $ENV{PERL_TEST_PG_DOCKER_TAG} || '12-alpine';
 
 sub default_args_for_new {
     return (pgname => $REP, tag => $TAG);

@@ -6,11 +6,14 @@ lib/OPCUA/Open62541/Test/Client.pm
 lib/OPCUA/Open62541/Test/Logger.pm
 lib/OPCUA/Open62541/Test/Server.pm
 LICENSE
+Makefile
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 Open62541-packed-type.xsh
 Open62541-packed.xsh
 Open62541-statuscode.xsh
+Open62541-types.xsh
 Open62541.xs
 ppport.h
 README
@@ -41,12 +44,16 @@ t/OPCUA-Open62541.t
 t/perlcriticrc
 t/perltidyrc
 t/pod.t
+t/server-browse.t
 t/server-client-variable.t
 t/server-config-default.t
 t/server-config-minimal.t
 t/server-config.t
+t/server-delete-nodes.t
 t/server-iterate.t
 t/server-leak.t
+t/server-namespace.t
+t/server-references.t
 t/server-running.t
 t/server-variable.t
 t/server.t

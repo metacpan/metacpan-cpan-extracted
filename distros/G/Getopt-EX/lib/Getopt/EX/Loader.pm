@@ -261,6 +261,8 @@ sub expand {
 
 	    shift @follow;
 
+	    debug_argv({color=>'Y'}, $argv, undef, \@s, \@follow) if $debug;
+
 	    ##
 	    ## $<shift>, $<move>, $<remove>, $<copy>
 	    ##
@@ -286,7 +288,7 @@ sub expand {
 	    my(@module, @default);
 	    if (@module = $obj->modopt(\@s)) {
 		@default = grep { @$_ } map { [ $_->default ] } @module;
-		debug_argv($argv, \@default, \@s, \@follow) if $debug;
+		debug_argv({color=>'B'}, $argv, \@default, \@s, \@follow) if $debug;
 	    }
 	    push @$argv, @default, @s, @follow;
 
@@ -296,12 +298,14 @@ sub expand {
 }
 
 sub debug_argv {
+    my $opt = ref $_[0] eq 'HASH' ? shift : {};
     my($before, $default, $working, $follow) = @_;
+    my $color = $opt->{color} // 'R';
     printf STDERR
 	"\@ARGV = %s\n",
 	array_to_str(@{$before//[]},
-		     $default ? colorize('RDI', array_to_str(@$default)) : (),
-		     $working ? colorize('RD',  array_to_str(@$working)) : (),
+		     $default ? colorize("${color}DI", array_to_str(@$default)) : (),
+		     $working ? colorize("${color}D",  array_to_str(@$working)) : (),
 		     @{$follow//[]});
 
 }

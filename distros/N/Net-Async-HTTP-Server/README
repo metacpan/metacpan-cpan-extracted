@@ -44,14 +44,12 @@ DESCRIPTION
     For accepting HTTP connections via PSGI and Plack, see also
     Plack::Handler::Net::Async::HTTP::Server.
 
- Prometheus Metrics
+ Metrics
 
-    If Net::Prometheus at least version 0.07_001 is also loaded into the
-    running perl instance (i.e. not just installed and available, but
-    actually loaded) then some integration code will be run which exports
-    basic metrics on received requests and send responses. This is largely
-    experimental and undocumented for now. It is implemented in
-    Net::Async::HTTP::Server::PrometheusCollector.
+    Since version 0.11.
+
+    This module reports basic metrics about received requests and sent
+    responses via Metrics::Any.
 
 EVENTS
 

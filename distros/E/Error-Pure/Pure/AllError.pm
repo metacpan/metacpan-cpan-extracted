@@ -13,7 +13,7 @@ use Readonly;
 Readonly::Array our @EXPORT_OK => qw(err);
 Readonly::Scalar my $EVAL => 'eval {...}';
 
-our $VERSION = 0.25;
+our $VERSION = 0.26;
 
 # Process error.
 sub err {
@@ -53,25 +53,22 @@ Error::Pure::AllError - Error::Pure module with full backtrace.
 =head1 SYNOPSIS
 
  use Error::Pure::AllError qw(err);
+
  err "This is a fatal error.", "name", "value";
 
 =head1 SUBROUTINES
 
-=over 4
+=head2 C<err>
 
-=item C<err(@messages)>
+ err "This is a fatal error.", "name", "value";
 
- Process error with messages @messages.
-
-=back
+Process error with message(s). There is key => value list after first message.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::AllError qw(err);
 
  print "1\n";
@@ -104,7 +101,7 @@ Install the Error::Pure modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Error-Pure>
+L<https://github.com/michal-josef-spacek/Error-Pure>
 
 =head1 AUTHOR
 
@@ -114,11 +111,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2008-2018 Michal Josef Špaček
- BSD 2-Clause License
+© 2008-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.25
+0.26
 
 =cut

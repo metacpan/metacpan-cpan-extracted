@@ -37,7 +37,7 @@ requires:
   perl: 5.8.0
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Error-Pure
-  homepage: https://github.com/tupinek/Error-Pure
+  homepage: https://github.com/michal-josef-spacek/Error-Pure
   license: http://opensource.org/licenses/bsd-license.php
-  repository: git://github.com/tupinek/Error-Pure
-version: '0.25'
+  repository: git://github.com/michal-josef-spacek/Error-Pure
+version: '0.26'

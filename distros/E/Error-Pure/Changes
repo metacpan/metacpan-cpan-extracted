@@ -1,3 +1,11 @@
+0.26 2020-04-30T01:04:41+02:00
+ [Common]
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Rewrite subroutines to use =head2 in doc.
+ - Update author github username.
+ - Update copyright years.
+
 0.25 2018-01-22T14:10:53+01:00
  [Common]
  - Add missing author requires.

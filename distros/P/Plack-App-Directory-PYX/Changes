@@ -1,0 +1,6 @@
+0.02 2020-04-30T20:44:41+02:00
+ - Add indent constructor parameter and implementation.
+ - Add test for directory index.
+
+0.01 2020-04-30T01:38:47+02:00
+ - First version.

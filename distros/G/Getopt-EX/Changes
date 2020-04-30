@@ -1,5 +1,13 @@
 Revision history for Perl extension Getopt-EX
 
+v1.17.0 2020-04-30T03:33:43Z
+
+    - In Colormap.pm, use 'X' as 'crossed out' effect rather than NOP.
+
+    This is significant change for mudule spec, but expected impact is
+    probably neglectable.  There should be no intensive user and
+    crossed-out effect is not implemented in most terminal software.
+
 v1.16.0 2020-04-15T07:54:29Z
 
     - Module now can have &finalize function.

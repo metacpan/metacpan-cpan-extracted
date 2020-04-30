@@ -1,5 +1,8 @@
 package Spork::Shlomify::Slides::FromSpork;
-$Spork::Shlomify::Slides::FromSpork::VERSION = '0.0402';
+$Spork::Shlomify::Slides::FromSpork::VERSION = '0.0403';
+use strict;
+use warnings;
+
 use Spork -Base;
 use mixin 'Spoon::Installer';
 require CGI;
@@ -169,7 +172,7 @@ Spork::Slides - Slide Presentations (Only Really Kwiki)
 
 =head1 VERSION
 
-version 0.0402
+version 0.0403
 
 =head1 SYNOPSIS
 
@@ -209,27 +212,11 @@ L<https://metacpan.org/release/Spork-Shlomify>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Spork-Shlomify>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Spork-Shlomify>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Spork-Shlomify>
 
 =item *
 

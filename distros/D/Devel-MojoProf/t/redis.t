@@ -6,10 +6,7 @@ $ENV{TEST_REDIS} = 'redis://localhost' if $ENV{TEST_ALL};
 plan skip_all => 'TEST_REDIS=redis://localhost' unless $ENV{TEST_REDIS};
 
 my @report;
-Devel::MojoProf->singleton->reporter(sub {
-  push @report, $_[1];
-  shift->Devel::MojoProf::_default_reporter(@_) if $ENV{HARNESS_IS_VERBOSE};
-});
+Devel::MojoProf->singleton->reporter(sub { push @report, $_[1] });
 
 my $redis = Mojo::Redis->new($ENV{TEST_REDIS});
 my $db    = $redis->db;

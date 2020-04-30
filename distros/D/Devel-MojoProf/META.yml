@@ -24,5 +24,7 @@ resources:
   bugtracker: https://github.com/jhthorsen/devel-mojoprof/issues
   homepage: https://github.com/jhthorsen/devel-mojoprof
   repository: https://github.com/jhthorsen/devel-mojoprof.git
-version: '0.03'
+version: '0.04'
+x_contributors:
+  - 'Jan Henning Thorsen'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

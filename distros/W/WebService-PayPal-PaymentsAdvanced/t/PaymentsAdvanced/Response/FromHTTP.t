@@ -54,7 +54,7 @@ sub _test_error {
         WebService::PayPal::PaymentsAdvanced::Response::FromHTTP->new(
             http_response => $http_response,
             request_uri   => 'http://www.paypal.com/',
-            )
+        )
     };
 
     isa_ok(

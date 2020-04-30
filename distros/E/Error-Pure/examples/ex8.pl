@@ -1,29 +1,24 @@
 #!/usr/bin/env perl
 
-# Pragmas.
+package Example3;
+
 use strict;
 use warnings;
 
-# Modules.
-use English qw(-no_match_vars);
-use Error::Pure qw(err);
-use Error::Pure::Utils qw(err_msg_hr);
+use Error::Pure::Print qw(err);
 
-# Error in eval.
-eval {
-        err 'Error',
-                'key1', 'val1',
-                'key2', 'val2';
+# Test with error.
+sub test {
+        err '1', '2', '3';
 };
-if ($EVAL_ERROR) {
-        print $EVAL_ERROR;
-        my $err_msg_hr = err_msg_hr();
-        foreach my $key (sort keys %{$err_msg_hr}) {
-                print "$key: $err_msg_hr->{$key}\n";
-        }
-}
+
+package main;
+
+use strict;
+use warnings;
+
+# Run.
+Example3::test();
 
 # Output:
-# Error
-# key1: val1
-# key2: val2
+# Example3: 1

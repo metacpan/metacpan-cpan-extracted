@@ -1,5 +1,9 @@
 Revision history for Perl extension App::Wax.
 
+2.3.2 - 2020-04-30
+
+    - documentation tweaks/fixes
+
 2.3.1 - 2019-06-23
 
     - sanity-check corrupt (empty) index files
@@ -22,7 +26,7 @@ Revision history for Perl extension App::Wax.
 2.1.0 - 2018-03-15
 
     - update metadata to reflect updated dependencies in the build file
-    - minor doc tweaks/fixes
+    - minor documentation tweaks/fixes
 
 2.0.0 - 2018-03-15
 
@@ -36,7 +40,7 @@ Revision history for Perl extension App::Wax.
     - improve extension inference: common double-barrel extensions such as
       tar.gz and tar.bz2 are now detected
     - fix -u/--user-agent option
-    - misc doc tweaks/fixes
+    - misc documentation tweaks/fixes
 
 1.1.1 - 2017-06-06
 
@@ -68,7 +72,7 @@ Revision history for Perl extension App::Wax.
 1.0.1 - 2015-02-04
 
     - fix usage/help display
-    - doc/code nitfixen
+    - fix documentation/code nits
 
 1.0.0 - 2015-02-03
 
@@ -84,7 +88,7 @@ Revision history for Perl extension App::Wax.
 
 0.3.1 - 2011-06-17
 
-    - docfixen
+    - fix documentation nits
     - rm README.md from CPAN
 
 0.3.0 - 2011-06-17
@@ -109,7 +113,7 @@ Revision history for Perl extension App::Wax.
 
 0.0.2 - 2011-06-17
 
-    - docfixen
+    - documentation fixes
 
 0.0.1 - 2011-06-16
 

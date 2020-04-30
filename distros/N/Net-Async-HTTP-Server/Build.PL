@@ -9,7 +9,7 @@ my $build = Module::Build->new(
       'HTTP::Request' => 0,
       'IO::Async' => '0.54',
       'IO::Async::Listener' => '0.61',
-      'Metrics::Any' => 0,
+      'Metrics::Any' => '0.03',
    },
    test_requires => {
       'HTTP::Response' => 0,

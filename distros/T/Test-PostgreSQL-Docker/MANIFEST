@@ -12,6 +12,8 @@ t/10_run.t
 t/11_options.t
 t/12_duplicated_run.t
 t/data/fixture.sql
+t/data/fixture_bigm.sql
 t/lib/t/Util.pm
+xt/pg_bigm.t
 META.yml
 MANIFEST

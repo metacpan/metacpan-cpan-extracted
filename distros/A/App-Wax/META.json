@@ -58,6 +58,6 @@
          "url" : "https://github.com/chocolateboy/App-Wax"
       }
    },
-   "version" : "v2.3.1",
+   "version" : "v2.3.2",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

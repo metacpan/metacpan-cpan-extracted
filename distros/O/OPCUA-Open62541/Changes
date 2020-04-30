@@ -1,5 +1,31 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+0.012 2020-04-30
+    - Fix signal race in test server.
+    - Use test server planning_nofork() to compute test numbers
+      of non-forking server tests.
+    - Implement server browse(), deleteNode(), addReference(),
+      deleteReference().
+    - Improve test client usability.
+    - Use the github continuous integration framework to build the
+      module and run tests on a Ubuntu VM.
+    - In client-connect-async test, skip the subtests that trigger
+      an freeaddrinfo bug of open62541.  The bug is fixed in the
+      OpenBSD port, the test is skipped elsewhere.
+    - Implement server getBuildInfo().
+    - Implement server addNamespace().
+    - Plug memleak in variant setScalar() and setArray().
+    - Make error messages in croak consistent.
+    - The type constants depend on the compile options of open62541.
+      Do not check in these numbers in Perl files, but generate C
+      functions that evaluate them during Open62541.xs compile time.
+      Table with type conversion must not assume that the type
+      numbers are continuous.  This makes the module work with
+      precompiled open62541 library on GNU/Linux.
+    - Avoid compiler warnings with GCC.
+    - Fix test races seen on GNU/Linux.
+    - Improve test logger diagnostic output.
+
 0.011 2020-04-24
     - Test client and server can use a custom log file.
     - Improve signal handling in test server.

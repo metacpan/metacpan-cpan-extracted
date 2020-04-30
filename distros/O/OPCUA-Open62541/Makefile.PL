@@ -29,7 +29,8 @@ WriteMakefile(
     DEFINE		=> '',
     INC			=> '-I. -I/usr/local/include '.
 	'-Wall -Wpointer-arith -Wuninitialized -Wstrict-prototypes '.
-	'-Wmissing-prototypes -Wunused -Wsign-compare -Wshadow',
+	'-Wmissing-prototypes -Wunused -Wsign-compare -Wshadow '.
+	'-Wno-pointer-sign',
     SIGN		=> 1,
     TEST_REQUIRES	=> {
 	'Test::Deep'		=> 0,

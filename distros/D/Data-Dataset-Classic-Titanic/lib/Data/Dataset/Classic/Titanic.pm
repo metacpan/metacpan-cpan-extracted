@@ -1,9 +1,9 @@
 package Data::Dataset::Classic::Titanic;
 our $AUTHORITY = 'cpan:GENE';
 
-# ABSTRACT: Provide the classic titanic survivor dataset
+# ABSTRACT: Provide the classic Titanic survivor dataset
 
-our $VERSION = '0.0100';
+our $VERSION = '0.0101';
 
 use strict;
 use warnings;
@@ -15,7 +15,8 @@ use File::ShareDir qw(dist_dir);
 
 sub as_file {
     my $file = eval { dist_dir('Data-Dataset-Classic-Titanic') . '/titanic.csv' };
-    $file ||= 'share/titanic.csv';
+    $file = 'share/titanic.csv'
+        unless $file && -e $file;
     return $file;
 }
 
@@ -61,12 +62,15 @@ sub as_hash {
 
     while (my $row = $csv->getline($fh)) {
         $counter++;
+
+        # If we are on the first row, grab the headers and skip the row
         if ($counter == 1) {
             push @headers, @$row;
             @data{@headers} = undef;
             next;
         }
 
+        # Add each row item to the growing header lists
         for my $i (0 .. @headers - 1) {
             push @{ $data{ $headers[$i] } }, $row->[$i];
         }
@@ -109,11 +113,11 @@ __END__
 
 =head1 NAME
 
-Data::Dataset::Classic::Titanic - Provide the classic titanic survivor dataset
+Data::Dataset::Classic::Titanic - Provide the classic Titanic survivor dataset
 
 =head1 VERSION
 
-version 0.0100
+version 0.0101
 
 =head1 SYNOPSIS
 
@@ -130,7 +134,7 @@ version 0.0100
 =head1 DESCRIPTION
 
 C<Data::Dataset::Classic::Titanic> provides access to the classic
-titanic survivor dataset.
+Titanic survivor dataset.
 
 =head1 FUNCTIONS
 
@@ -146,7 +150,7 @@ Return the Titanic data filename location.
 
 Return the Titanic data as an array.
 
-These headers are not included in the returned data.  See the C<headers> function.
+The headers are not included in the returned data.  See the C<headers> function.
 
 =head2 as_hash
 
@@ -173,6 +177,8 @@ finally, the port of embarkation (C = Cherbourg; Q = Queenstown; S =
 Southampton).
 
 =head1 SEE ALSO
+
+L<https://en.wikipedia.org/wiki/RMS_Titanic>
 
 L<https://github.com/datasciencedojo/datasets/blob/master/titanic.csv>
 

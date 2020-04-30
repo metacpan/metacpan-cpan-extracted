@@ -12,7 +12,7 @@ use Getopt::Long;
 
 GetOptions(
    'ssl|S' => \my $SSL,
-   'metrics' => \my $METRICS,
+   'metrics=s' => \my $METRICS,
 ) or exit 1;
 
 require IO::Async::SSL if $SSL;
@@ -20,10 +20,12 @@ require IO::Async::SSL if $SSL;
 my $prometheus;
 if( $METRICS ) {
    require Metrics::Any::Adapter;
-   Metrics::Any::Adapter->import( 'Prometheus' );
+   Metrics::Any::Adapter->import( $METRICS );
 
-   require Net::Prometheus;
-   $prometheus = Net::Prometheus->new;
+   if( $METRICS eq "Prometheus" ) {
+      require Net::Prometheus;
+      $prometheus = Net::Prometheus->new;
+   }
 }
 
 my $loop = IO::Async::Loop->new();

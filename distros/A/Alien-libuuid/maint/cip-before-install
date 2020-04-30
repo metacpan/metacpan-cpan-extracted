@@ -2,5 +2,7 @@
 
 set -ex
 
-cip sudo apt-get update 
-cip sudo apt-get install -y uuid-dev libffi-dev
+if echo $CIP_ENV | grep -q system; then
+  cip sudo apt-get update
+  cip sudo apt-get install -y uuid-dev libffi-dev
+fi

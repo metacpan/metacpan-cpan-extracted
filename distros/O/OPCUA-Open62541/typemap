@@ -19,8 +19,10 @@ UA_ByteString				T_PACKED
 UA_Variant				T_PACKED
 enum UA_NodeIdType			T_ENUM
 UA_NodeId				T_PACKED
+UA_BrowseDescription			T_PACKED
 UA_BrowseRequest			T_PACKED
 UA_BrowseResponse			T_PACKED
+UA_BrowseResult				T_PACKED
 OPCUA_Open62541_NodeId			T_PTROBJ_OPTIONAL
 OPCUA_Open62541_LocalizedText		T_PTROBJ_REFERENCE
 UA_QualifiedName			T_PACKED
@@ -33,6 +35,7 @@ UA_ReferenceTypeAttributes		T_PACKED
 UA_VariableAttributes			T_PACKED
 UA_VariableTypeAttributes		T_PACKED
 UA_ViewAttributes			T_PACKED
+UA_BuildInfo				T_PACKED
 OPCUA_Open62541_Server			T_PTROBJ_SPECIAL
 OPCUA_Open62541_ServerConfig		T_PTROBJ_SPECIAL
 OPCUA_Open62541_Client			T_PTROBJ_SPECIAL
@@ -41,6 +44,7 @@ UA_ClientState				T_ENUM
 OPCUA_Open62541_Logger			T_PTROBJ_SPECIAL
 UA_LogLevel				T_PACKED
 UA_LogCategory				T_PACKED
+UA_ExpandedNodeId			T_PACKED
 
 #############################################################################
 INPUT

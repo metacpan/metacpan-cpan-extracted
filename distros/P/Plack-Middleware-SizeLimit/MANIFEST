@@ -20,6 +20,5 @@ MANIFEST			This list of files
 META.yml
 README
 README.mkdn
-SIGNATURE
 t/0-signature.t
 t/1-basic.t

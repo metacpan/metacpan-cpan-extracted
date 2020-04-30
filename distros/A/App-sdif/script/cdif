@@ -1037,15 +1037,6 @@ terminal :
     000 .. 555         : 6x6x6 RGB 216 colors
     L00 .. L25         : Black (L00), 24 grey levels, White (L25)
 
-=over 4
-
-Begining # can be omitted in 24bit RGB notation.
-
-When values are all same in 24bit or 12bit RGB, it is converted to 24
-grey level, otherwise 6x6x6 216 color.
-
-=back
-
 or color names enclosed by angle bracket :
 
     <red> <blue> <green> <cyan> <magenta> <yellow>
@@ -1054,36 +1045,13 @@ or color names enclosed by angle bracket :
 
 with other special effects :
 
-    Z  0 Zero (reset)
-    D  1 Double-struck (boldface)
-    P  2 Pale (dark)
-    I  3 Italic
-    U  4 Underline
-    F  5 Flash (blink: slow)
-    Q  6 Quick (blink: rapid)
-    S  7 Stand-out (reverse video)
-    V  8 Vanish (concealed)
-    J  9 Junk (crossed out)
+    D  Double-struck (boldface)
+    I  Italic
+    U  Underline
+    S  Stand-out (reverse video)
 
-    E    Erase Line
-
-    ;    No effect
-    X    No effect
-    /    Toggle foreground/background
-    ^    Reset to foreground
-
-At first the color is considered as foreground, and slash (C</>)
-switches foreground and background.  If multiple colors are given in
-the same spec, all indicators are produced in the order of their
-presence.  Consequently, the last one takes effect.
-
-If the spec start with plus (C<+>) or minus (C<->) character,
-following characters are appneded/deleted from previous value. Reset
-mark (C<^>) is inserted before appended string.
-
-Effect characters are case insensitive, and can be found anywhere and
-in any order in color spec string.  Because C<X> and C<;> takes no
-effect, you can use them to improve readability, like C<SxD;K/544>.
+Above color spec is simplified summary so if you want complete
+information, read L<Getopt::EX::Colormap>.
 
 Defaults are :
 

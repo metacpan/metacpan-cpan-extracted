@@ -9,7 +9,7 @@ use List::Util qw(uniq any first);
 use Moose::Util::TypeConstraints qw(enum subtype where);
 use namespace::autoclean;
 
-our $VERSION = '2.3';
+our $VERSION = '2.4';
 
 with
     'Dist::Zilla::Role::PluginBundle::Easy',
@@ -292,6 +292,7 @@ sub configure {
                 qw(
                     Test::Perl::Critic
                     Test::Portability::Files
+                    Test::Portability
                 )
             ]
         }
@@ -345,7 +346,7 @@ Dist::Zilla::PluginBundle::Author::WATERKIP - An plugin bundle for all distribut
 
 =head1 VERSION
 
-version 2.3
+version 2.4
 
 =head1 SYNOPSIS
 
@@ -375,6 +376,10 @@ Commit files after a release
 Define the release options. Choose between:
 
 C<cpan> or C<stratopan>. When fake release is used, this overrides these two options
+
+=head2 build_network_plugins
+
+Builder for network plugins
 
 =head1 SEE ALSO
 

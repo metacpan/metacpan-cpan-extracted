@@ -6,7 +6,7 @@ use 5.008001;
 use base qw( Alien::Base );
 
 # ABSTRACT: Find or download and install libuuid
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 
@@ -29,48 +29,45 @@ Alien::libuuid - Find or download and install libuuid
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
+
+In your Makefile.PL:
+
+ use ExtUtils::MakeMaker;
+ use Alien::Base::Wrapper ();
+
+ WriteMakefile(
+   Alien::Base::Wrapper->new('Alien::libuuid')->mm_args2(
+     # MakeMaker args
+     NAME => 'Kafka::Librd',
+     ...
+   ),
+ );
 
 In your Build.PL:
 
  use Module::Build;
- use Alien::libuuid;
+ use Alien::Base::Wrapper qw( Alien::libuuid !export );
+
  my $builder = Module::Build->new(
    ...
    configure_requires => {
      'Alien::libuuid' => '0',
      ...
    },
-   extra_compiler_flags => Alien::libuuid->cflags,
-   extra_linker_flags   => Alien::libuuid->libs,
+   Alien::Base::Wrapper->mb_args,
    ...
  );
- 
+
  $build->create_build_script;
-
-In your Makefile.PL:
-
- use ExtUtils::MakeMaker;
- use Config;
- use Alien::libuuid;
- 
- WriteMakefile(
-   ...
-   CONFIGURE_REQUIRES => {
-     'Alien::libuuid' => '0',
-   },
-   CCFLAGS => Alien::libuuid->cflags . " $Config{ccflags}",
-   LIBS    => [ Alien::libuuid->libs ],
-   ...
- );
 
 In your L<FFI::Platypus> script or module:
 
  use FFI::Platypus;
  use Alien::libuuid;
- 
+
  my $ffi = FFI::Platypus->new(
    lib => [ Alien::libuuid->dynamic_libs ],
  );

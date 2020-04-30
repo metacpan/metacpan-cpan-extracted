@@ -1,5 +1,5 @@
 ---
-abstract: 'Provide the classic titanic survivor dataset'
+abstract: 'Provide the classic Titanic survivor dataset'
 author:
   - 'Gene Boggs <gene@cpan.org>'
 build_requires:
@@ -28,7 +28,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Data-Dataset-Classic-Titanic
   repository: https://github.com/ology/Data-Dataset-Classic-Titanic.git
-version: '0.0100'
+version: '0.0101'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

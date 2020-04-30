@@ -1,7 +1,7 @@
 MANIFEST
 README
 Makefile.PL
-lib/App/pl.pm
+App/pl.pm
 pl
 t/a.txt
 t/b.txt

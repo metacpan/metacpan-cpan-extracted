@@ -3,20 +3,20 @@ abstract: 'Data description and validation'
 author:
   - 'Laurent Dami <laurent.dami@justice.ge.ch>'
 build_requires:
-  Test::More: 0
+  Test::More: '0'
 configure_requires:
-  Module::Build: 0.42
+  Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4204, CPAN::Meta::Converter version 2.133380'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Data-Domain
 provides:
   Data::Domain:
     file: lib/Data/Domain.pm
-    version: 1.06
+    version: '1.07'
   Data::Domain::All_of:
     file: lib/Data/Domain.pm
   Data::Domain::Date:
@@ -46,16 +46,17 @@ provides:
   Data::Domain::Whatever:
     file: lib/Data/Domain.pm
 requires:
-  Date::Calc: 0
-  List::MoreUtils: 0
-  Scalar::Does: 0.007
-  Scalar::Util: 0
-  Sub::Exporter: 0
-  Try::Tiny: 0
-  autouse: 0
-  experimental: 0
-  perl: 5.010001
+  Date::Calc: '0'
+  List::MoreUtils: '0'
+  Scalar::Does: '0.007'
+  Scalar::Util: '0'
+  Sub::Exporter: '0'
+  Try::Tiny: '0'
+  autouse: '0'
+  experimental: '0'
+  perl: '5.010001'
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/Data-Domain
-version: 1.06
+version: '1.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

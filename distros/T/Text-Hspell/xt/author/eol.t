@@ -7,7 +7,8 @@ use Test::More 0.88;
 use Test::EOL;
 
 my @files = (
-    'lib/Text/Hspell.pm'
+    'lib/Text/Hspell.pm',
+    't/check_word.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

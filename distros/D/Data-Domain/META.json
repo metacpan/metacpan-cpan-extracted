@@ -4,13 +4,13 @@
       "Laurent Dami <laurent.dami@justice.ge.ch>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4204",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Data-Domain",
    "prereqs" : {
@@ -41,7 +41,7 @@
    "provides" : {
       "Data::Domain" : {
          "file" : "lib/Data/Domain.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Data::Domain::All_of" : {
          "file" : "lib/Data/Domain.pm"
@@ -95,5 +95,6 @@
          "url" : "https://github.com/damil/Data-Domain"
       }
    },
-   "version" : "1.06"
+   "version" : "1.07",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

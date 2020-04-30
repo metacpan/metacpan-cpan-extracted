@@ -1,35 +1,26 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'perl' => 'v5.10.0'
                                       }
                       },
        'develop' => {
                       'requires' => {
-                                      'Code::TidyAll::Plugin::Test::Vars' => '0.02',
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
-                                      'Parallel::ForkManager' => '1.19',
-                                      'Perl::Critic' => '1.126',
-                                      'Perl::Tidy' => '20160302',
+                                      'Perl::Critic' => '1.123',
+                                      'Perl::Tidy' => '20140711',
                                       'Pod::Coverage::TrustPod' => '0',
-                                      'Pod::Wordlist' => '0',
                                       'Test::CPAN::Changes' => '0.19',
-                                      'Test::CPAN::Meta::JSON' => '0.16',
-                                      'Test::CleanNamespaces' => '0.15',
                                       'Test::Code::TidyAll' => '0.50',
-                                      'Test::Mojibake' => '0',
-                                      'Test::More' => '0.96',
+                                      'Test::More' => '0.88',
                                       'Test::NoTabs' => '0',
                                       'Test::Pod' => '1.41',
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Spelling' => '0.12',
-                                      'Test::Vars' => '0.009',
-                                      'Test::Version' => '2.05',
-                                      'perl' => '5.006',
-                                      'strict' => '0',
-                                      'warnings' => '0'
+                                      'Test::Version' => '1'
                                     }
                     },
        'runtime' => {
@@ -85,6 +76,8 @@ do { my $x = {
                                    'Test::RequiresInternet' => '0',
                                    'Try::Tiny' => '0',
                                    'lib' => '0',
+                                   'overload' => '0',
+                                   'perl' => '5.014',
                                    'strict' => '0',
                                    'warnings' => '0'
                                  }

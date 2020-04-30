@@ -6,6 +6,8 @@ use HTTP::Request::Common;
 
 our $terminated = 0;
 
+my @log;
+
 my $app = sub {
     my $env = shift;
     $env->{'psgix.harakiri'} = 1 unless $env->{'psgix.harakiri'};
@@ -21,6 +23,7 @@ $app = builder {
     enable SizeLimit => (
         max_process_size_in_kb => 1,
         log_when_limits_exceeded => 1,
+        callback => sub { push @log, [@_] },
     );
     $app;
 };
@@ -30,5 +33,7 @@ my $res = $test->request(GET "/");
 
 is $res->content, 'abcdef';
 is $terminated, 1;
+
+ok scalar(@log), 'callback';
 
 done_testing;

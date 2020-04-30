@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.47      2020-04-29 09:58:39 -0600
+  - Silence redefine warning.
+  - Fix travis-ci status button in README.md
+
 2.46      2020-04-25 17:55:13 -0600
   - Removed .appveyor.yml from init2 template
   - Added [Author::Plicease::ReadmeAnyFromPod] to work around

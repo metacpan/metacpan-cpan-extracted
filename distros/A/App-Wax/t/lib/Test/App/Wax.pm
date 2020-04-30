@@ -16,7 +16,7 @@ my @FILENAMES = ('1.json', '2.html');
 
 our @KEEP = map { "/cache/file$_" } @FILENAMES;
 our @TEMP = map { "/tmp/file$_" } @FILENAMES;
-our @URL = map { "http://example.com/$_" } @FILENAMES;
+our @URL = map { "https://example.com/$_" } @FILENAMES;
 
 my %FILENAME_TEMP = map { $URL[$_] => $TEMP[$_] } 0 .. $#FILENAMES;
 my %FILENAME_KEEP = map { $URL[$_] => $KEEP[$_] } 0 .. $#FILENAMES;

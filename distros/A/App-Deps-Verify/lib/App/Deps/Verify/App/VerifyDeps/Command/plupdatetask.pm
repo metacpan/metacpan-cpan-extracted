@@ -1,5 +1,5 @@
 package App::Deps::Verify::App::VerifyDeps::Command::plupdatetask;
-$App::Deps::Verify::App::VerifyDeps::Command::plupdatetask::VERSION = '0.10.0';
+$App::Deps::Verify::App::VerifyDeps::Command::plupdatetask::VERSION = '0.10.1';
 use App::Deps::Verify::App::VerifyDeps -command;
 
 use strict;
@@ -72,7 +72,7 @@ __END__
 
 =head1 VERSION
 
-version 0.10.0
+version 0.10.1
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
@@ -95,27 +95,11 @@ L<https://metacpan.org/release/App-Deps-Verify>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/App-Deps-Verify>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-Deps-Verify>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/App-Deps-Verify>
 
 =item *
 

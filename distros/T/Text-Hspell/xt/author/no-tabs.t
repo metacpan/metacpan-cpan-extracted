@@ -7,7 +7,8 @@ use Test::More 0.88;
 use Test::NoTabs;
 
 my @files = (
-    'lib/Text/Hspell.pm'
+    'lib/Text/Hspell.pm',
+    't/check_word.t'
 );
 
 notabs_ok($_) foreach @files;

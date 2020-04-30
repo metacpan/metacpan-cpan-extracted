@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Linux::LXC;
-$Linux::LXC::VERSION = '1.0005';
+$Linux::LXC::VERSION = '1.0006';
 
 use v5.0;
 
@@ -56,7 +56,7 @@ sub get_stopped_containers {
 
 sub get_version {
 	my $version = `lxc-start --version`;
-    chomp($version);
+	chomp($version);
 	return $version;
 }
 
@@ -152,10 +152,10 @@ sub is_stopped {
 }
 
 sub put {
-	my ($this, $input, $dest) = @_;
+	my ($this, $input, $dest_from_container_root) = @_;
 	# id map configuration attribute name changes between LXC version 2 and 3… Purpose of $idmap_label variable is to
 	# take care of it.
-    my $idmap_label = $this->get_version() =~ /^2/
+	my $idmap_label = $this->get_version() =~ /^2/
 		? 'lxc.id_map'
 		: 'lxc.idmap';
 	my ($uid) = $this->get_config($idmap_label, qr/^u 0 (\d+)/, ALLOW_UNDEF);
@@ -163,28 +163,33 @@ sub put {
 	if (!-r $input) {
 		croak "Input $input is not readable";
 	}
-	if ($dest !~ /^\//) {
+	if ($dest_from_container_root !~ /^\//) {
 		croak 'Destination should be an absolute path';
 	}
-	$dest = $this->get_lxc_path().'/rootfs'.$dest;
-	my ($dir_dest) = $dest =~ /^(.*\/)/;
-	if (defined $uid) {
-		my @folders = split(/\//, $dir_dest);
-		shift @folders;
-		my $abs_folder = '';
-		while (my $cur_folder = shift @folders) {
-			$abs_folder .= '/' . $cur_folder;
-			if (!-x $abs_folder) {
-				`mkdir $abs_folder`;
-				`chown $uid:$uid $abs_folder`;
-			}
+	my $container_root = $this->get_lxc_path() . '/rootfs';
+	my ($dir_dest) = $dest_from_container_root =~ /^(.*\/)/;
+	# He have to use a transit folder and to use chroot for being able to correctly resolve symlinks.
+	$Backticks::autodie = 0;
+	`test -e $container_root/tmp/lxc-transit && rm -rf $container_root/tmp/lxc-transit`;
+	$Backticks::autodie = 1;
+	`cp -R $input $container_root/tmp/lxc-transit`;
+	# Here, we are creating all folder path in which we want to copy the $input.
+	my @folders = split(/\//, $dir_dest);
+	shift @folders;
+	my $abs_folder = '';
+	while (my $cur_folder = shift @folders) {
+		$abs_folder .= '/' . $cur_folder;
+		# If the current folder is not existing or if it is not a symlink, we create it.
+		if (!$this->_check_folder_existence($container_root, $abs_folder)) {
+			`chroot $container_root mkdir $abs_folder`;
+			# This instruction is the cause we can not simply use a `mkdir -p` command for creating the path: we need
+			# to set the good rights to folder in order to copy it.
+			# Note: we set right only if we have to create the folder, for avoiding to create too much mess.
+			`chroot $container_root chown $uid:$uid $abs_folder` if (defined $uid);
 		}
-		`cp -R $input $dest`;
-		`chown -R $uid:$uid $dest` if defined $uid;
-	} else {
-		-d $dir_dest or `mkdir -p $dir_dest`;
-		`cp -R $input $dest`;
 	}
+	`chroot $container_root mv /tmp/lxc-transit $dest_from_container_root`;
+	`chroot $container_root chown -R $uid:$uid $dest_from_container_root` if defined $uid;
 }
 
 sub del_config {
@@ -214,7 +219,7 @@ sub set_config {
 	my ($this, $attr, $value, $flags) = @_;
 	$flags = ERASING_MODE unless defined $flags;
 	croak 'set_config can not be in erasing and addition mode'
-	  if ($flags == (ERASING_MODE | ADDITION_MODE));
+		if ($flags == (ERASING_MODE | ADDITION_MODE));
 	$this->_check_container_is_existing();
 	if ($flags & ADDITION_MODE) {
 		open my $CONF, '>>', $this->get_lxc_path() . '/config';
@@ -280,6 +285,17 @@ sub _check_container_is_running {
 	if ($this->is_stopped()) {
 		croak 'Container ' . $this->get_utsname() . ' is not running';
 	}
+}
+
+# Subroutine to use for knowing if a given folder exists on the container.
+# This check is able to solve symlinks too.
+sub _check_folder_existence {
+	my ($this, $container_root, $abs_folder) = @_;
+	$Backticks::autodie = 0;
+	my $res1 = `chroot $container_root test -e $abs_folder`->success;
+	my $res2 = `chroot $container_root test -L $abs_folder`->success;
+	$Backticks::autodie = 1;
+	return ($res1 || $res2);
 }
 
 sub _qx {

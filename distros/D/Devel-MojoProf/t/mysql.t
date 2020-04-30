@@ -6,10 +6,7 @@ $ENV{TEST_MYSQL} = 'mysql://root@/test' if $ENV{TEST_ALL};
 plan skip_all => 'TEST_MYSQL=mysql://root@/test' unless $ENV{TEST_MYSQL};
 
 my @report;
-Devel::MojoProf->singleton->reporter(sub {
-  push @report, $_[1];
-  shift->Devel::MojoProf::_default_reporter(@_) if $ENV{HARNESS_IS_VERBOSE};
-});
+Devel::MojoProf->singleton->reporter(sub { push @report, $_[1] });
 
 my $mysql = Mojo::mysql->new($ENV{TEST_MYSQL});
 my $db    = $mysql->db;

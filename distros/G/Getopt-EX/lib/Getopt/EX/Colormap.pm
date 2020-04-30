@@ -84,8 +84,7 @@ sub ansi256_number {
 
 my %numbers = (
     ';' => undef,	# ; : NOP
-    X => undef,		# X : NOP
-    N => undef,		# N : None (NOP)
+    N   => undef,	# N : None (NOP)
     E => 'EL',		# E : Erase Line
     Z => 0,		# Z : Zero (Reset)
     D => 1,		# D : Double-Struck (Bold)
@@ -96,7 +95,7 @@ my %numbers = (
     Q => 6,		# Q : Quick (Blink: Rapid)
     S => 7,		# S : Standout (Reverse)
     V => 8,		# V : Vanish (Concealed)
-    J => 9,		# J : Junk (Crossed out)
+    X => 9,		# X : Crossed out
     K => 30, k => 90,	# K : Kuro (Black)
     R => 31, r => 91,	# R : Red  
     G => 32, g => 92,	# G : Green
@@ -563,6 +562,7 @@ or color names enclosed by angle bracket :
 
 with other special effects :
 
+    N    None
     Z  0 Zero (reset)
     D  1 Double-struck (boldface)
     P  2 Pale (dark)
@@ -572,12 +572,11 @@ with other special effects :
     Q  6 Quick (blink: rapid)
     S  7 Stand-out (reverse video)
     V  8 Vanish (concealed)
-    J  9 Junk (crossed out)
+    X  9 Crossed out
 
     E    Erase Line
 
     ;    No effect
-    X    No effect
     /    Toggle foreground/background
     ^    Reset to foreground
 
@@ -596,8 +595,8 @@ following characters are appended/deleted to/from previous
 value. Reset mark (C<^>) is inserted before appended string.
 
 Effect characters are case insensitive, and can be found anywhere and
-in any order in color spec string.  Because C<X> and C<;> takes no
-effect, you can use them to improve readability, like C<SxD;K/544>.
+in any order in color spec string.  Character C<;> does nothing and
+can be used just for readability, like C<SD;K/544>.
 
 Samples:
 
@@ -932,6 +931,37 @@ is 144.  Use like this:
     perl -MGetopt::EX::Colormap=colortable -e colortable
 
 =back
+
+=head2 EXAMPLE
+
+If you want to use this module instead of L<Term::ANSIColor>, this
+example code
+
+    use Term::ANSIColor;
+    print color 'bold blue';
+    print "This text is bold blue.\n";
+    print color 'reset';
+    print "This text is normal.\n";
+    print colored("Yellow on magenta.", 'yellow on_magenta'), "\n";
+    print "This text is normal.\n";
+    print colored ['yellow on_magenta'], 'Yellow on magenta.', "\n";
+    print colored ['red on_bright_yellow'], 'Red on bright yellow.', "\n";
+    print colored ['bright_red on_black'], 'Bright red on black.', "\n";
+    print "\n";
+
+can be written with L<Getopt::EX::Colormap> like:
+
+    use Getopt::EX::Colormap qw(colorize ansi_code);
+    print ansi_code 'DB';
+    print "This text is bold blue.\n";
+    print ansi_code 'Z';
+    print "This text is normal.\n";
+    print colorize('Y/M', "Yellow on magenta."), "\n";
+    print "This text is normal.\n";
+    print colorize('Y/M', 'Yellow on magenta.'), "\n";
+    print colorize('R/y', 'Red on bright yellow.'), "\n";
+    print colorize('r/K', 'Bright red on black.'), "\n";
+    print "\n";
 
 
 =head1 RESET SEQUENCE

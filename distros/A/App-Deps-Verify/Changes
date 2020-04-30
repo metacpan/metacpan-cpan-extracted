@@ -1,5 +1,8 @@
 Revision history for App-Deps-Verify
 
+0.10.1       2020-04-29
+    - Fix Kwalitee: "=head1 NAME"
+
 0.10.0       2019-12-30
     - Add the plupdatetask sub command
 

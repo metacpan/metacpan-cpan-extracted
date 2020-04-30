@@ -32,13 +32,15 @@ EOF
 print $out "typedef void (*packed_UA)(SV *, void *);";
 print $out "static packed_UA unpack_UA_table[UA_TYPES_COUNT] = {";
 foreach my $type (@types) {
-	print $out "	unpack_UA_$type,";
+	my $index = "UA_TYPES_". uc($type);
+	print $out "	[$index] = unpack_UA_$type,";
 }
 print $out "};";
 
 print $out "static packed_UA pack_UA_table[UA_TYPES_COUNT] = {";
 foreach my $type (@types) {
-	print $out "	pack_UA_$type,";
+	my $index = "UA_TYPES_". uc($type);
+	print $out "	[$index] = pack_UA_$type,";
 }
 print $out "};";
 

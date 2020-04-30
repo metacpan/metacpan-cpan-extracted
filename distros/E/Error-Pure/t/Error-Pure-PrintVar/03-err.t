@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use FindBin qw($Bin);
 use English qw(-no_match_vars);
 use Error::Pure::PrintVar qw(err);

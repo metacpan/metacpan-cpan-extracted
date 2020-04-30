@@ -1,5 +1,9 @@
 Revision history for Data-Dataset-Classic-Titanic
 
+0.0101 2020-04-29 22:47:19
+    - Fix typos.
+    - Make as_file() return the distribution share file if the dist_dir one does not exist.
+
 0.0100 2020-04-27 10:54:00
     - Mint with Dist::Zilla.
     - Track down the Titanic data.

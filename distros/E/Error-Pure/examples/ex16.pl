@@ -1,14 +1,12 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
-use Error::Pure::Error qw(err);
+use Error::Pure::Die qw(err);
 
 # Error.
 err '1';
 
 # Output:
-# #Error [example1.pl:9] 1
+# 1 at example1.pl line 9.

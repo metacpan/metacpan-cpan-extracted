@@ -39,7 +39,7 @@ pwgen-xkcd.pl - Generate a xkcd-style password
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head1 USAGE
 

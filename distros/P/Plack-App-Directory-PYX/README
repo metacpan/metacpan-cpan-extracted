@@ -1,0 +1,148 @@
+NAME
+    Plack::App::Directory::PYX - Plack PYX directory application.
+
+SYNOPSIS
+     use Plack::App::Directory::PYX;
+
+     my $obj = Plack::App::File->new(%parameters);
+     my $psgi_ar = $obj->serve_path($env, $path_to_file_or_dir);
+     my $app = $obj->to_app;
+
+METHODS
+  "new"
+     my $obj = Plack::App::File->new(%parameters);
+
+    Constructor.
+
+    Returns instance of object.
+
+    *   "indent"
+
+        Set indent of SGML output.
+
+  "serve_path"
+     my $psgi_ar = $obj->serve_path($env, $path_to_file_or_dir);
+
+    Process file or directory on disk and serve it to application.
+
+    Returns reference to array (PSGI structure).
+
+  "to_app"
+     my $app = $obj->to_app;
+
+    Creates Plack application.
+
+    Returns Plack::Component object.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use File::Temp;
+     use IO::Barf;
+     use Plack::App::Directory::PYX;
+     use Plack::Runner;
+
+     # Temporary file with PYX.
+     my $temp_pyx_file = File::Temp->new->filename;
+
+     # PYX file.
+     my $pyx = <<'END';
+     (html
+     (head
+     (title
+     -Title
+     )title
+     )head
+     (body
+     (div
+     -Hello world
+     )div
+     )body
+     )html
+     END
+     barf($temp_pyx_file, $pyx);
+
+     # Run application with one PYX file.
+     my $app = Plack::App::Directory::PYX->new('file' => $temp_pyx_file)->to_app;
+     Plack::Runner->new->run($app);
+
+     # Output:
+     # HTTP::Server::PSGI: Accepting connections at http://0:5000/
+
+     # > curl http://localhost:5000/
+     # <html><head><title>Title</title></head><body><div>Hello world</div></body></html>
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use File::Temp;
+     use IO::Barf;
+     use Plack::App::Directory::PYX;
+     use Plack::Runner;
+
+     # Temporary file with PYX.
+     my $temp_pyx_file = File::Temp->new->filename;
+
+     # PYX file.
+     my $pyx = <<'END';
+     (html
+     (head
+     (title
+     -Title
+     )title
+     )head
+     (body
+     (div
+     -Hello world
+     )div
+     )body
+     )html
+     END
+     barf($temp_pyx_file, $pyx);
+
+     # Run application with one PYX file.
+     my $app = Plack::App::Directory::PYX->new(
+             'file' => $temp_pyx_file,
+             'indent' => 1,
+     )->to_app;
+     Plack::Runner->new->run($app);
+
+     # Output:
+     # HTTP::Server::PSGI: Accepting connections at http://0:5000/
+
+     # > curl http://localhost:5000/
+     # <html>
+     #   <head>
+     #     <title>
+     #       Title
+     #     </title>
+     #   </head>
+     #   <body>
+     #     <div>
+     #       Hello world
+     #     </div>
+     #   </body>
+     # </html>
+
+DEPENDENCIES
+    Plack::App::Directory, PYX::SGML::Tags, Tags::Output::Raw,
+    Unicode::UTF8,
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Plack-App-Directory-PYX>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2016-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

@@ -1,5 +1,50 @@
 Revision history for Net-Async-Redis
 
+2.003     2020-05-01 00:37:12+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - latest commands from Redis 6.0 GA release
+
+    This is intended to be a stable release with next phase of
+    development aimed at supporting the newer RESP3 protocol:
+    https://github.com/antirez/RESP3
+
+2.002_005 2020-04-29 02:50:10+08:00 Asia/Kuala_Lumpur (TRIAL RELEASE)
+    No new features.
+
+    Bugs fixed:
+
+    - the ->multi return value was a nested Future, changing the result
+    compared to previous versions - thanks to Nael for reporting
+    - subscribe/psubscribe interleaved with ping or other requests
+    could get confused about the pending queue
+
+2.002_004 2020-04-23 02:19:48+08:00 Asia/Kuala_Lumpur (TRIAL RELEASE)
+    New features:
+
+    - pipeline parameter now does something, set to 0 to allow "unlimited"
+    pipelined requests (as in keep trying until the Redis server stops listening
+    to process the backlog)
+
+2.002_003 2020-04-23 01:59:30+08:00 Asia/Kuala_Lumpur (TRIAL RELEASE)
+    No new features.
+
+    Bugs fixed:
+
+    - MULTI implementation broke in the previous version
+
+2.002_002 2020-04-14 01:40:41+08:00 Asia/Kuala_Lumpur (TRIAL RELEASE)
+    New features:
+
+    - Latest Redis has new ACL methods, including those in Commands.pm
+    - simple ping latency example for testing
+
+2.002_001 2020-04-03 22:02:06+08:00 Asia/Kuala_Lumpur (TRIAL RELEASE)
+    New features:
+
+    - Redis cluster support, https://redis.io/topics/cluster-spec
+    - updated to latest Redis 5.x commands
+
 2.001     2019-07-22 13:36:07+08:00 Asia/Kuala_Lumpur
     New features:
 

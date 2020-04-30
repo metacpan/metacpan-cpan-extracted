@@ -1,14 +1,45 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
-use Error::Pure::ErrorList qw(err);
+use Dumpvalue;
+use Error::Pure::Die qw(err);
+use Error::Pure::Utils qw(err_get);
 
-# Error.
-err '1';
+# Error in eval.
+eval { err '1', '2', '3'; };
 
-# Output:
-# #Error [example1.pl:9] 1
+# Error structure.
+my @err = err_get();
+
+# Dump.
+my $dump = Dumpvalue->new;
+$dump->dumpValues(\@err);
+
+# In \@err:
+# [
+#         {
+#                 'msg' => [
+#                         '1',
+#                         '2',
+#                         '3',
+#                 ],
+#                 'stack' => [
+#                         {
+#                                 'args' => '(1)',
+#                                 'class' => 'main',
+#                                 'line' => '9',
+#                                 'prog' => 'script.pl',
+#                                 'sub' => 'err',
+#                         },
+#                         {
+#                                 'args' => '',
+#                                 'class' => 'main',
+#                                 'line' => '9',
+#                                 'prog' => 'script.pl',
+#                                 'sub' => 'eval {...}',
+#                         },
+#                 ],
+#         },
+# ],

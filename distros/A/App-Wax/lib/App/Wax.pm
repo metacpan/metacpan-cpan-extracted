@@ -18,7 +18,7 @@ use URI::Split qw(uri_split);
 
 # XXX this declaration must be on a single line
 # https://metacpan.org/pod/version#How-to-declare()-a-dotted-decimal-version
-use version; our $VERSION = version->declare('v3.1.1');
+use version; our $VERSION = version->declare('v3.1.2');
 
 # defaults
 use constant {
@@ -31,7 +31,7 @@ use constant {
     SEPARATOR  => '--',
     TEMPLATE   => 'XXXXXXXX',
     TIMEOUT    => 60,
-    USER_AGENT => 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:60.0) Gecko/20100101 Firefox/60.0',
+    USER_AGENT => 'Mozilla/5.0 (Windows NT 10.0; rv:68.0) Gecko/20100101 Firefox/68.0',
     VERBOSE    => 0,
 };
 
@@ -326,9 +326,11 @@ method debug ($template, @args) {
     }
 }
 
-# perform housekeeping after a download: replace the placeholder
-# with the file path; push the path onto the delete list if
-# it's a temporary file; and log any errors
+# perform housekeeping after a download: replace the placeholder with the file
+# path; push the path onto the delete list if it's a temporary file; and log any
+# errors
+#
+# XXX give this a more descriptive name e.g. _handle_download or _after_download
 method _handle ($resolved, $command, $unlink) {
     my ($command_index, $filename, $error) = @$resolved;
 

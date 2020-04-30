@@ -1,8 +1,20 @@
-0.002   2019-01-11 (PERLANCAR)
+0.004   2020-04-30  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Tweak Abstract and Description.
+
+
+0.003   2020-04-30  Released-By: PERLANCAR; Urgency: medium
+
+	- Don't include summary again in Description.
+
+
+0.002   2019-01-11  Released-By: PERLANCAR
 
 	- Add feature comparison matrix.
 
 
-0.001   2018-01-09 (PERLANCAR)
+0.001   2018-01-09  Released-By: PERLANCAR
 
         - First release.

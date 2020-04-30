@@ -59,7 +59,7 @@
    "provides" : {
       "Test::PostgreSQL::Docker" : {
          "file" : "lib/Test/PostgreSQL/Docker.pm",
-         "version" : "0.03"
+         "version" : "0.03001"
       }
    },
    "release_status" : "stable",
@@ -73,7 +73,7 @@
          "web" : "https://github.com/ytnobody/p5-Test-PostgreSQL-Docker"
       }
    },
-   "version" : "0.03",
+   "version" : "0.03001",
    "x_authority" : "cpan:YTURTLE",
    "x_contributors" : [
       "makamaka <makamaka.donzoko@gmail.com>"

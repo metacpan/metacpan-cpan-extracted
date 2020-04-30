@@ -6,7 +6,7 @@ use OPCUA::Open62541::Test::Server;
 use OPCUA::Open62541::Test::Client;
 use Test::More tests =>
     OPCUA::Open62541::Test::Server::planning() +
-    OPCUA::Open62541::Test::Client::planning() + 2;
+    OPCUA::Open62541::Test::Client::planning() + 7;
 use Test::Deep;
 use Test::NoWarnings;
 
@@ -216,6 +216,37 @@ my %response = (
 my $result = $client->{client}->Service_browse(\%request);
 cmp_deeply($result, \%response, "browse response")
     or diag explain $result;
+
+# Brose a node that does not exist in the middle of some other nodes.
+
+my @nodeids =
+    map { { BrowseDescription_nodeId => $_ } }
+    map { $_->{ReferenceDescription_nodeId}{ExpandedNodeId_nodeId} }
+    map { @{$_->{BrowseResult_references}} }
+    @{$response{BrowseResponse_results}};
+is(@nodeids, 4, "reference nodeids");
+
+# Add another node with an invalid id at position 3
+splice @nodeids, 3, 0, {
+  'NodeId_identifier' => 1312634529,  # does not exist
+  'NodeId_identifierType' => 0,
+  'NodeId_namespaceIndex' => 0
+};
+
+$request{BrowseRequest_nodesToBrowse} = [ @nodeids ];
+
+$result = $client->{client}->Service_browse(\%request);
+is($result->{BrowseResponse_responseHeader}{ResponseHeader_serviceResult},
+    STATUSCODE_GOOD, "header good")
+    or diag explain $result;
+is(@{$result->{BrowseResponse_results}}, 5, "results")
+    or diag explain $result;
+my @status =
+    map { $_->{BrowseResult_statusCode} }
+    @{$result->{BrowseResponse_results}};
+is(@status, 5, "reference nodeids");
+is_deeply(\@status, ['Good', 'Good', 'Good', 'BadNodeIdUnknown', 'Good'],
+    "status") or diag explain \@status;
 
 $client->stop();
 $server->stop();

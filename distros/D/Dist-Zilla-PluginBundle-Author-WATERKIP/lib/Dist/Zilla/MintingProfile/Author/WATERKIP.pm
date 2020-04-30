@@ -1,5 +1,5 @@
 package Dist::Zilla::MintingProfile::Author::WATERKIP;
-our $VERSION = '2.3';
+our $VERSION = '2.4';
 use Moose;
 with 'Dist::Zilla::Role::MintingProfile::ShareDir';
 use namespace::clean;
@@ -20,11 +20,9 @@ Dist::Zilla::MintingProfile::Author::WATERKIP - A minting profile with WATERKIP 
 
 =head1 VERSION
 
-version 2.3
+version 2.4
 
 =head1 SYNOPSIS
-
- dzil new -P Author::WATERKIP Foo::Bar
 
 =head1 DESCRIPTION
 
@@ -83,6 +81,8 @@ C<.editorconfig>
 The created C<dist.ini> will use the current dzil C<config.ini> to populate the
 author, license, and copyright fields. It will additionally add the plugin
 bundle L<Dist::Zilla::PluginBundle::Author::WATERKIP>.
+
+=for shell  dzil new -P Author::WATERKIP Foo::Bar
 
 =head1 BUGS
 

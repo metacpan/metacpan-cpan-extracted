@@ -1,5 +1,9 @@
 Revision history for Spork-Shlomify
 
+0.0403  2020-04-29
+    - [Minor] CPANTS Kwalitee Fixes
+        - Missing "use strict;"/etc.
+
 0.0402  2020-01-29
     - Place the POD of lib/Spork/Shlomify/Slides/FromSpork.pm after '__END__'
     instead of under '__DATA__'.

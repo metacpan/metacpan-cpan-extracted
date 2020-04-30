@@ -4,7 +4,7 @@ use Moo::Role;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000025';
+our $VERSION = '0.000026';
 
 ## no critic (ProhibitUnusedPrivateSubroutines)
 sub _class_for {

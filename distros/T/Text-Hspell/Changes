@@ -1,5 +1,10 @@
 Revision history for Text-Hspell
 
+0.2.3       2020-04-29
+    - Add tests under t/*.t for CPANTS.
+    - CPANTS min perl version.
+    - $VERSION consolidation.
+
 0.2.2       2020-01-28
     - Rebuild for order of 'NAME' and 'VERSION' sections in the generated
     POD documentation (see:

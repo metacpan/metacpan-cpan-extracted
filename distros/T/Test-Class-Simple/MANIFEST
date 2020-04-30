@@ -1,0 +1,15 @@
+Changes
+index.html
+lib/Test/Class/Simple.pm
+LICENCE
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+t/class.t
+t/module.t
+t/tlib/Test/Class/Simple/Class.pm
+t/tlib/Test/Class/Simple/ClassTest.pm
+t/tlib/Test/Class/Simple/Module.pm
+t/tlib/Test/Class/Simple/ModuleTest.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

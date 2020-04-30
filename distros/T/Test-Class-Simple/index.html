@@ -1,0 +1,193 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Methods">Methods</a>
+        <ul>
+          <li><a href="#setup">_setup()</a></li>
+          <li><a href="#get_instance">get_instance()</a></li>
+          <li><a href="#create_instance">create_instance()</a></li>
+          <li><a href="#get_module_name">get_module_name()</a></li>
+          <li><a href="#run_on_module-set_value">run_on_module($set_value)</a></li>
+          <li><a href="#run_test_cases-cases">run_test_cases($cases)</a></li>
+        </ul>
+      </li>
+      <li><a href="#Options">Options</a>
+        <ul>
+          <li><a href="#method">method</a></li>
+          <li><a href="#params">params</a></li>
+          <li><a href="#exp">exp</a></li>
+          <li><a href="#name">name</a></li>
+          <li><a href="#pre_test_hook">pre_test_hook</a></li>
+          <li><a href="#post_test_hook">post_test_hook</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test::Class::Simple - simplify your unit tests writing based on Test::Class</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.01</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  package My::Example;
+
+  sub new {
+    my $class = shift;
+
+    $class = ref($class) || $class;
+    my $self = { _counter =&gt; 0 };
+    bless $self, $class;
+    return $self;
+  }
+
+  sub increase_counter {
+    my $self = shift;
+
+    $self-&gt;{_counter}++;
+    return $self-&gt;{_counter};
+  }
+
+
+  package My::Example::Test;
+  use parent qw(Test::Class::Simple);
+
+  # setup methods are run before every test method.
+  sub _setup {
+    my $self = shift;
+
+    # get mocked object of the class that is Test::MockObject::Extends
+    my $instance = $self-&gt;get_instance();
+    $instance-&gt;{_counter} = 100;
+    return;
+  }
+
+  # Set which class should be mocked
+  sub get_module_name {
+    return &#39;My::Example&#39;;
+  }
+
+  # Indicate that instance should be created
+  sub create_instance {
+    return 1;
+  }
+
+  # a test method that runs 1 test
+  sub test_counter : Test(2) {
+    my $self = shift;
+
+    my $test_cases = [
+      {
+        method =&gt; &#39;increase_counter&#39;,
+        params =&gt; [],
+        exp    =&gt; 101,
+        name   =&gt; &#39;Increase counter once&#39;,
+      },
+      {
+        method =&gt; &#39;increase_counter&#39;,
+        params =&gt; [],
+        exp    =&gt; 102,
+        name   =&gt; &#39;Increase counter twice&#39;,
+      },
+    ];
+    $self-&gt;run_test_cases($test_cases);
+    return;
+  }</code></pre>
+
+<p>later in a nearby .t file</p>
+
+<pre><code>  #! /usr/bin/perl
+  use My::Example::Test;
+
+  # run all the test methods in My::Example::Test
+  My::Example::Test-&gt;new()-&gt;runtests();
+  exit 0;</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This is an extension of <a href="https://metacpan.org/pod/Test::Class">Test::Class</a> module to implement unit tests in more simple and declarative way.</p>
+
+<h2 id="Methods">Methods</h2>
+
+<h3 id="setup">_setup()</h3>
+
+<p>Method that is executed before every test method and is useful for some initializations required for the tests.</p>
+
+<h3 id="get_instance">get_instance()</h3>
+
+<p>Returns mocked object of the class specified in <a href="#get_module_name">get_module_name()</a>. If <a href="#create_instance">create_instance()</a> is set to false, returns <code>undef</code> value.</p>
+
+<h3 id="create_instance">create_instance()</h3>
+
+<p>Can be overridden and must return boolean value. Indicates whether mocked instance should be created.</p>
+
+<h3 id="get_module_name">get_module_name()</h3>
+
+<p>Must be overridden and should return name of the module for which tests should be run.</p>
+
+<h3 id="run_on_module-set_value">run_on_module($set_value)</h3>
+
+<p>Sets boolean value that indicates that tests should run against the module rather then the instance of the class.</p>
+
+<h3 id="run_test_cases-cases">run_test_cases($cases)</h3>
+
+<p>Accepts arrayref of the test cases described with <a href="#Options">options</a> inside hash references and executes them one by one.</p>
+
+<h2 id="Options">Options</h2>
+
+<h3 id="method">method</h3>
+
+<p>Name of the method that should be executed.</p>
+
+<h3 id="params">params</h3>
+
+<p>Array reference of the parameters that should be passed to the <a href="#method">method</a></p>
+
+<h3 id="exp">exp</h3>
+
+<p>Can be either data structure or a code reference. For data structure <a href="https://metacpan.org/pod/Test::Deep#cmp_deeply">cmp_deeply</a> will be executed. If code reference is set then result will be passed as a single parameter and will be expected to return true value if test case was considered as successful.</p>
+
+<h3 id="name">name</h3>
+
+<p>Name of the test case. Usually shown in the output of test run.</p>
+
+<h3 id="pre_test_hook">pre_test_hook</h3>
+
+<p>Code reference that will be executed before current test case. E.g. for mocking data for next test case.</p>
+
+<h3 id="post_test_hook">post_test_hook</h3>
+
+<p>Code reference that will be executed after current test case. E.g. for unmocking data.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Oleksii Kysil</p>
+
+
+</body>
+
+</html>
+
+

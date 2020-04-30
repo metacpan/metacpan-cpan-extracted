@@ -16,38 +16,57 @@ use WebService::PayPal::PaymentsAdvanced;
 use WebService::PayPal::PaymentsAdvanced::Mocker;
 
 use lib 't/lib';
+use Secret ();
 use Util;
 
 ## no critic (ProhibitCallsToUnexportedSubs)
 {
-    my $ua = LWP::UserAgent->new();
-    debug_ua($ua);
-
-    my $payments = WebService::PayPal::PaymentsAdvanced->new(
-        password                 => 'seekrit',
-        ua                       => $ua,
-        user                     => 'someuser',
-        validate_hosted_form_uri => 0,            # requires network access
-        vendor                   => 'PayPal',
+    my @tests = (
+        {
+            description => 'string user/password',
+            secret_cb   => sub {@_},
+        },
+        {
+            description => 'object user/password',
+            secret_cb   => sub { Secret->new(@_) },
+        },
     );
 
-    isa_ok( $payments, 'WebService::PayPal::PaymentsAdvanced' );
+    for my $test (@tests) {
+        subtest $test->{description} => sub {
+            my $ua = LWP::UserAgent->new();
+            debug_ua($ua);
 
-    my $encoded = $payments->_pseudo_encode_args(
-        { foo => 'xxx', bar => 'a space', baz => 'a +' } );
+            my $payments = WebService::PayPal::PaymentsAdvanced->new(
+                password => $test->{secret_cb}->('seekrit'),
+                ua       => $ua,
+                user     => $test->{secret_cb}->('someuser'),
+                validate_hosted_form_uri => 0,       # requires network access
+                vendor                   => 'PayPal',
+            );
 
-    is( $encoded, 'bar[7]=a space&baz[3]=a +&foo[3]=xxx', 'pseudo encoding' );
-    is(
-        $payments->_encode_credentials,
-        'PARTNER=PayPal&PWD=seekrit&USER=someuser&VENDOR=PayPal',
-        'encode credentials'
-    );
+            isa_ok( $payments, 'WebService::PayPal::PaymentsAdvanced' );
 
-    is_deeply(
-        $payments->_force_upper_case( { foo => 1, BaR => 2 } ),
-        { FOO => 1, BAR => 2 },
-        'force upper case hash keys'
-    );
+            my $encoded = $payments->_pseudo_encode_args(
+                { foo => 'xxx', bar => 'a space', baz => 'a +' } );
+
+            is(
+                $encoded, 'bar[7]=a space&baz[3]=a +&foo[3]=xxx',
+                'pseudo encoding'
+            );
+            is(
+                $payments->_encode_credentials,
+                'PARTNER=PayPal&PWD=seekrit&USER=someuser&VENDOR=PayPal',
+                'encode credentials'
+            );
+
+            is_deeply(
+                $payments->_force_upper_case( { foo => 1, BaR => 2 } ),
+                { FOO => 1, BAR => 2 },
+                'force upper case hash keys'
+            );
+        };
+    }
 }
 
 {

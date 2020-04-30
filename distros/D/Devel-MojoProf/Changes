@@ -1,5 +1,8 @@
 Revision history for perl distribution Devel-MojoProf
 
+0.04 2020-04-30T11:56:42+0900
+ - Changed t/sqlite.t to using a real table #1
+
 0.03 2019-02-11T14:02:37+0100
  - Add missing dependency Class::Method::Modifiers
 

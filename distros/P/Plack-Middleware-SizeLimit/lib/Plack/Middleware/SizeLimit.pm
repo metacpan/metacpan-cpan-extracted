@@ -12,9 +12,10 @@ use Plack::Util::Accessor qw(
     max_process_size_in_kb
     check_every_n_requests
     log_when_limits_exceeded
+    callback
 );
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 sub prepare_app {
     my $self = shift;
@@ -22,6 +23,7 @@ sub prepare_app {
     $self->set_max_process_size($self->max_process_size_in_kb);
     $self->set_min_shared_size($self->min_shared_size_in_kb);
     $self->set_max_unshared_size($self->max_unshared_size_in_kb);
+    $self->set_callback($self->callback);
 }
 
 sub call {
@@ -81,7 +83,11 @@ Plack::Middleware::SizeLimit - Terminate processes if they grow too large
             # min_shared_size_in_kb => '8192', # 8MB
             # max_process_size_in_kb => '16384', # 16MB
             check_every_n_requests => 2,
-            log_when_limits_exceeded => 1
+            log_when_limits_exceeded => 1,
+            callback => sub {
+               my ($size, $share, $unshared) = @_;
+               ...
+            },
         );
         $app;
     };
@@ -135,6 +141,12 @@ of every request.
 
 When true, the middleware will log a warning whenever it signals to the server
 that the process is to be terminated.  This is false by default.
+
+=item callback
+
+A reference to a subroutine that takes the process size
+information. This can be used to feed this information into a
+monitoring system, such as statsd.
 
 =back
 

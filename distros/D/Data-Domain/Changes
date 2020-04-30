@@ -1,6 +1,9 @@
 Revision history for Data-Domain
 
-1.05 05.04.2014
+1.07 29.04.2020
+  - fix warning 'redundant' appeared in perl 5.22 
+
+1.06 05.04.2014
   - #94464 fix missing dependency on List::MoreUtils
 
 1.05 04.08.2013

@@ -28,26 +28,33 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Class::Method::Modifiers' => '0',
-                                      'Future' => '0.40',
-                                      'Future::AsyncAwait' => '0.27',
+                                      'Digest::CRC' => '0.22',
+                                      'Future' => '0.42',
+                                      'Future::AsyncAwait' => '0.34',
                                       'IO::Async' => '0',
                                       'IO::Async::Notifier' => '0',
                                       'IO::Async::Stream' => '0',
+                                      'List::BinarySearch::XS' => '0.09',
                                       'List::Util' => '1.29',
+                                      'List::UtilsBy' => '0',
                                       'Log::Any' => '1.050',
                                       'Math::Random::Secure' => '0',
                                       'Mixin::Event::Dispatch::Bus' => '2.000',
-                                      'OpenTracing' => '0.003',
-                                      'Ryu::Async' => '0.006',
+                                      'Ryu::Async' => '0.016',
                                       'Scalar::Util' => '0',
-                                      'Syntax::Keyword::Try' => '0.08',
+                                      'Syntax::Keyword::Dynamically' => '0',
+                                      'Syntax::Keyword::Try' => '0.11',
                                       'URI' => '0',
                                       'URI::redis' => '0',
+                                      'constant' => '0',
                                       'curry' => '0',
                                       'curry::weak' => '0',
+                                      'indirect' => '0',
                                       'mro' => '0',
+                                      'overload' => '0',
                                       'parent' => '0',
                                       'strict' => '0',
+                                      'utf8' => '0',
                                       'warnings' => '0'
                                     }
                     },
@@ -69,8 +76,7 @@ do { my $x = {
                                    'Test::HexString' => '0',
                                    'Test::More' => '0.98',
                                    'Variable::Disposition' => '0.004',
-                                   'perl' => '5.006',
-                                   'utf8' => '0'
+                                   'perl' => '5.006'
                                  }
                  }
      };

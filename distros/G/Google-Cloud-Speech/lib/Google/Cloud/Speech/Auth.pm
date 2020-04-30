@@ -42,7 +42,8 @@ sub request_token {
         },
     );
 
-    if ( my $res = $tx->success and $tx->res->json('/access_token') ) {
+    my $res = $tx->res;
+    if ( $res->is_success and $res->json('/access_token') ) {
         my $token_obj = $res->json;
         my $token = $token_obj->{'token_type'} . ' ' . $token_obj->{'access_token'};
         $self->{'token'} = $token;

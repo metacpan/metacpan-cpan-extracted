@@ -5,7 +5,7 @@ package String::Cushion;
 
 # ABSTRACT: Vertically pad a string
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0200';
+our $VERSION = '1.0000';
 
 1;
 
@@ -55,8 +55,8 @@ String::Cushion - Vertically pad a string
 <p>
 <img src="https://img.shields.io/badge/perl-5.10.1+-blue.svg" alt="Requires Perl 5.10.1+" />
 <a href="https://travis-ci.org/Csson/p5-String-Cushion"><img src="https://api.travis-ci.org/Csson/p5-String-Cushion.svg?branch=master" alt="Travis status" /></a>
-<a href="http://cpants.cpanauthors.org/release/CSSON/String-Cushion-0.0200"><img src="http://badgedepot.code301.com/badge/kwalitee/CSSON/String-Cushion/0.0200" alt="Distribution kwalitee" /></a>
-<a href="http://matrix.cpantesters.org/?dist=String-Cushion%200.0200"><img src="http://badgedepot.code301.com/badge/cpantesters/String-Cushion/0.0200" alt="CPAN Testers result" /></a>
+<a href="http://cpants.cpanauthors.org/release/CSSON/String-Cushion-1.0000"><img src="http://badgedepot.code301.com/badge/kwalitee/CSSON/String-Cushion/1.0000" alt="Distribution kwalitee" /></a>
+<a href="http://matrix.cpantesters.org/?dist=String-Cushion%201.0000"><img src="http://badgedepot.code301.com/badge/cpantesters/String-Cushion/1.0000" alt="CPAN Testers result" /></a>
 <img src="https://img.shields.io/badge/coverage-89.2%-orange.svg" alt="coverage 89.2%" />
 </p>
 
@@ -64,7 +64,7 @@ String::Cushion - Vertically pad a string
 
 =head1 VERSION
 
-Version 0.0200, released 2017-05-18.
+Version 1.0000, released 2020-04-30.
 
 =head1 SYNOPSIS
 

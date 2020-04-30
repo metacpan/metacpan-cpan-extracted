@@ -18,10 +18,14 @@ sub planning {
 sub new {
     my $class = shift;
     my $self = { @_ };
-    $self->{port}
-	or croak "no port given";
     $self->{timeout} ||= 10;
     $self->{logfile} //= "client.log";
+
+    if (not $self->{url}) {
+	$self->{host} ||= "localhost";
+	$self->{url} = "opc.tcp://$self->{host}";
+	$self->{url} .= ":$self->{port}" if $self->{port};
+    }
 
     ok($self->{client} = OPCUA::Open62541::Client->new(), "client: new");
     ok($self->{config} = $self->{client}->getConfig(), "client: get config");
@@ -39,9 +43,6 @@ sub start {
     my OPCUA::Open62541::Test::Client $self = shift;
 
     is($self->{config}->setDefault(), "Good", "client: set default config");
-    $self->{url} = "opc.tcp://localhost";
-    $self->{url} .= ":$self->{port}" if $self->{port};
-
     ok($self->{logger} = $self->{config}->getLogger(), "client: get logger");
     ok($self->{log} = OPCUA::Open62541::Test::Logger->new(
 	logger => $self->{logger},
@@ -155,9 +156,17 @@ Create a new test client instance.
 
 =over 8
 
+=item $args{host}
+
+Hostname or IP of the server. Defaults to localhost.
+
 =item $args{port}
 
-Required port number of the server.
+Optional port number of the server.
+
+=item $args{url}
+
+URL of the server. Overwrites host and port arguments.
 
 =item $args{logfile}
 
@@ -173,9 +182,8 @@ Defaults to 10 seconds.
 
 =item $client->url($url)
 
-Optionally set the url.
-Returns the url created from localhost and port.
-Must be called after start() for that.
+Returns the URL of the server.
+Can also set the URL by passing an argument.
 
 =item $client->start()
 

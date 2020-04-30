@@ -2,7 +2,10 @@
 use strict;
 use warnings;
 
-use Test::More tests => 19;
+use lib "../lib";
+
+use Test::More tests => 20;
+use Test::NoWarnings;
 
 BEGIN { use_ok( 'Data::Domain', qw/:all/ );}
 diag( "Testing Data::Domain $Data::Domain::VERSION, Perl $], $^X" );
@@ -433,6 +436,7 @@ subtest "All_of" => sub {
 
 subtest "Overloads" => sub {
   plan tests => 4;
+  use experimental 'smartmatch';
 
   $dom = Unblessed;
   my $string = "$dom";

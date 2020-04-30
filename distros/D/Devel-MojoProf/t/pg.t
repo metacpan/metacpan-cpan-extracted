@@ -7,10 +7,7 @@ $ENV{TEST_PG} = "postgresql://$ENV{USER}@/test" if $ENV{TEST_ALL};
 plan skip_all => 'TEST_PG=postgresql://postgres@/test' unless $ENV{TEST_PG};
 
 my @report;
-Devel::MojoProf->singleton->reporter(sub {
-  push @report, $_[1];
-  shift->Devel::MojoProf::_default_reporter(@_) if $ENV{HARNESS_IS_VERBOSE};
-});
+Devel::MojoProf->singleton->reporter(sub { push @report, $_[1] });
 
 my $pg = Mojo::Pg->new($ENV{TEST_PG});
 my $db = $pg->db;

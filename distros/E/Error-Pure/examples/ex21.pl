@@ -1,14 +1,25 @@
 #!/usr/bin/env perl
 
-# Pragmas.
+package Example3;
+
 use strict;
 use warnings;
 
-# Modules.
-use Error::Pure::Print qw(err);
+use Error::Pure::PrintVar qw(err);
 
-# Error.
-err '1';
+# Test with error.
+sub test {
+        err '1', '2', '3';
+}
+
+package main;
+
+use strict;
+use warnings;
+
+# Run.
+Example3::test();
 
 # Output:
-# 1
+# Example3: 1
+# 2: 3

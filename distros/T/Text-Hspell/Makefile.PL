@@ -5,6 +5,7 @@
 use strict;
 use warnings;
 
+use 5.014;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
@@ -15,6 +16,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Text-Hspell",
   "LICENSE" => "mit",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Text::Hspell",
   "PREREQ_PM" => {
     "DynaLoader" => 0,
@@ -24,11 +26,12 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Test::More" => "0.88"
+    "Test::More" => "0.88",
+    "utf8" => 0
   },
-  "VERSION" => "0.2.2",
+  "VERSION" => "0.2.3",
   "test" => {
-    "TESTS" => ""
+    "TESTS" => "t/*.t"
   }
 );
 
@@ -43,6 +46,7 @@ my %FallbackPrereqs = (
   "Encode" => 0,
   "Test::More" => "0.88",
   "strict" => 0,
+  "utf8" => 0,
   "vars" => 0,
   "warnings" => 0
 );

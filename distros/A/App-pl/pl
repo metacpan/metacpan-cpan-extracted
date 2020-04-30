@@ -6,7 +6,7 @@ use v5.10;
 
 our( $VERSION, $A, @A );
 BEGIN {
-    $VERSION = '0.49.6';
+    $VERSION = '0.49.7';
     *A = *ARGV;
     my $execed = shift if @A && $A[0] eq '+';
     return unless @A and $A[0] =~ /^-/s;
@@ -716,6 +716,12 @@ Count hits in magic statistics hash C<%n(umber)>:
 
     pl -n '++$n{$1} while /(Perl|one|liner)/g' file1 file2 file3
 
+Even though the point here is to make things even easier, most Perl one-liners
+from the internet work, just by omitting C<-e> or C<-E>.  Known minor
+differences are: don't C<goto LINE>, but C<next LINE> is fine.  In B<-n>
+C<last> goes straight to the next file instead of being like C<exit>.  And
+shenanigans with unbalanced braces won't work.
+
 =head1 DESCRIPTION
 
 Pl follows Perl's philosophy for one-liners: the one variable solely used in
@@ -1013,40 +1019,42 @@ This does the same, but explicitly loops over lists C<@co & @bg>:
 
 =item Split up numbers with commas, dots or underscores
 
-Loop (B<-o>) over remaining args in C<$_>.  After a decimal dot, insert a
-comma before each 4th comma-less digit.  Then do the same backwards from end
-or decimal dot:
+Loop and print with line-end (B<-opl>) over remaining args in C<$_>.  If
+reading from stdin, instead of arguments, use only B<-pl>.  After a decimal
+dot, insert a comma before each 4th comma-less digit.  Then do the same
+backwards from end or decimal dot:
 
-    pl -o '1 while s/[,.]\d{3}\K(?=\d)/,/; 1 while s/\d\K(?=\d{3}(?:$|[.,]))/,/; e' 1234567 12345678 123456789 1234567890 1234.5678 3.141 3.14159265358
+    pl -opl '1 while s/[,.]\d{3}\K(?=\d)/,/; 1 while s/\d\K(?=\d{3}(?:$|[.,]))/,/' \
+        12345678 123456789 1234567890 1234.5678 3.141 3.14159265358
 
-The same for languages with a decimal comma:
+The same for languages with a decimal comma, using either a dot or a space as spacer:
 
-    pl -o '1 while s/[,.]\d{3}\K(?=\d)/./; 1 while s/\d\K(?=\d{3}(?:$|[.,]))/./; e' 1234567 12345678 12345678 1234567890 1234,5678 3,141 3,141592653589
+    pl -opl '1 while s/[,.]\d{3}\K(?=\d)/./; 1 while s/\d\K(?=\d{3}(?:$|[,]))/./' \
+        12345678 12345678 1234567890 1234,5678 3,141 3,141592653589
+    pl -opl '1 while s/[, ]\d{3}\K(?=\d)/ /; 1 while s/\d\K(?=\d{3}(?:$|[ ,]))/ /' \
+        12345678 12345678 1234567890 1234,5678 3,141 3,141592653589
 
 The same for Perl style output:
 
-    pl -o '1 while s/[._]\d{3}\K(?=\d)/_/; 1 while s/\d\K(?=\d{3}(?:$|[._]))/_/; e' 1234567 12345678 123456789 1234567890 1234.5678 3.141 3.14159265358
+    pl -opl '1 while s/[._]\d{3}\K(?=\d)/_/; 1 while s/\d\K(?=\d{3}(?:$|[._]))/_/' \
+        12345678 123456789 1234567890 1234.5678 3.141 3.14159265358
 
 =item DNS lookup
 
-# todo sub h, IPv6 /:/?
-# sort by raw ip 0(127) 2(169.254) 4(10) 4(172.16 - 172.31) 4(192.168) 6other
-# 1(??) 3(fe80::/10) 5(fd) 7other
-# sorted by type (localhost, link local, private, public), version (v4, v6) and IP
+The C<h(osts)> function deals with the nerdy C<gethost...> etc. and outputs as
+a hosts file.  The file is sorted by address type (localhost, link local,
+private, public), version (IPv4, IPv6) and address.  You tack on any number of
+IP-addresses or hostnames, either as Perl arguments or on the command-line via
+C<@A(RGV)>:
 
-This one is beyond words.  It deals with the nerdy C<gethost...> and outputs
-as a hosts file.  You tack on any number of IP-addresses or hostnames:
-
+    pl 'hosts qw(perl.org 127.0.0.1 perldoc.perl.org cpan.org)'
+    pl 'hosts @ARGV' perl.org 127.0.0.1 perldoc.perl.org cpan.org
     pl 'h qw(perl.org 127.0.0.1 perldoc.perl.org cpan.org)'
     pl 'h @A' perl.org 127.0.0.1 perldoc.perl.org cpan.org
 
-If you don't want it to be sorted, call C<h> for individual addresses:
+If you don't want it to be sorted, call C<h(osts)> for individual addresses:
 
     pl 'h for qw(perl.org 127.0.0.1 perldoc.perl.org cpan.org)'
     pl -o h perl.org 127.0.0.1 perldoc.perl.org cpan.org
-
-=back
-
-=over
 
 =back

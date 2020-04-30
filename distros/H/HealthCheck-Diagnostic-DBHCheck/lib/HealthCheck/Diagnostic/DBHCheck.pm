@@ -2,7 +2,7 @@ package HealthCheck::Diagnostic::DBHCheck;
 
 # ABSTRACT: Check a database handle to make sure you have read/write access
 use version;
-our $VERSION = 'v0.500.1'; # VERSION
+our $VERSION = 'v0.500.3'; # VERSION
 
 use 5.010;
 use strict;
@@ -23,7 +23,8 @@ sub new {
       if ($params{dbh} && (ref $params{dbh} ne "CODE"));
 
     return $class->SUPER::new(
-        label => 'dbh_check',
+        tags  => [ 'dbh_check' ],
+        label =>   'dbh_check',
         %params
     );
 }
@@ -36,28 +37,22 @@ sub check {
     # 2nd, if invoked with an object (not the class), then get dbh from object
     $dbh ||= $self->{dbh} if ref $self;
 
-    croak("Valid 'dbh' is required") unless $dbh;
+    croak "Valid 'dbh' is required" unless $dbh;
 
-    croak("The 'dbh' parameter should be a coderef!")
-        unless (ref $dbh eq "CODE");
+    croak "The 'dbh' parameter should be a coderef!"
+        unless ref $dbh eq "CODE";
 
     my $db_access = $params{db_access}          # Provided call to check()
         // ((ref $self) && $self->{db_access})  # Value from new()
         || "rw";                                # default value
 
-    croak("The value '$db_access' is not valid for the 'db_access' parameter")
-        unless ($db_access =~ /^r[ow]$/);
+    croak "The value '$db_access' is not valid for the 'db_access' parameter"
+        unless $db_access =~ /^r[ow]$/;
 
-    eval{ local $SIG{__DIE__}; $dbh = $dbh->(%params); };
+    $dbh = $dbh->(%params);
 
-    if($@) {
-        return { status => 'CRITICAL', info => $@ };
-    }
-
-    return {
-        status => 'UNKNOWN',
-        info => "The 'dbh' coderef should return an object!"
-    } unless (blessed $dbh);
+    croak "The 'dbh' coderef should return an object!"
+        unless blessed $dbh;
 
     my $db_class = $params{db_class}            # Provided in call to check()
         // ((ref $self) && $self->{db_class})   # Value from new
@@ -65,10 +60,8 @@ sub check {
 
     my $isa = ref $dbh;
 
-    return {
-        status => 'UNKNOWN',
-        info => "The 'dbh' coderef should return a '$db_class', not a '$isa'"
-    } unless ($dbh->isa($db_class));
+    croak "The 'dbh' coderef should return a '$db_class', not a '$isa'"
+        unless $dbh->isa($db_class);
 
     my $res = $self->SUPER::check(
         %params,
@@ -90,7 +83,7 @@ sub _read_write_temp_table {
 
     my $qtable   = $dbh->quote_identifier($table);
 
-    # Drop it like its hot
+    # Drop it like it's hot
     $dbh->do("DROP TEMPORARY TABLE IF EXISTS $qtable");
 
     $dbh->do(
@@ -131,19 +124,23 @@ sub run {
 
     my $status = "OK";
 
-    # See if we can ping the DB connection
-    if ($dbh->can("ping")) {
-        $status = $dbh->ping ? "OK" : "CRITICAL";
-    }
+    RUN_TESTS: {
 
-    if ($status eq "OK") {
+        # See if we can ping the DB connection
+        if ($dbh->can("ping") && !$dbh->ping) {
+            $status = "CRITICAL";
+            last RUN_TESTS;
+        }
+
         # See if a simple SELECT works
-        my $value  = eval { $dbh->selectrow_array("SELECT 1"); };
-        $status = (defined($value) && ($value == 1)) ? "OK" : "CRITICAL";
-    }
+        my $value = eval { $dbh->selectrow_array("SELECT 1"); };
+        unless (defined $value && $value == 1) {
+            $status = "CRITICAL";
+            last RUN_TESTS;
+        }
 
-    $status = _read_write_temp_table(%params)
-        if (($status eq "OK") && $read_write);
+        $status = _read_write_temp_table(%params) if $read_write;
+    }
 
     # Generate the human readable info string
     my $info = sprintf(
@@ -172,7 +169,7 @@ HealthCheck::Diagnostic::DBHCheck - Check a database handle to make sure you hav
 
 =head1 VERSION
 
-version v0.500.1
+version v0.500.3
 
 =head1 SYNOPSIS
 
@@ -205,10 +202,20 @@ For write access, a temporary table is created, and used for testing.
 
 Those inherited from L<HealthCheck::Diagnostic/ATTRIBUTES> plus:
 
+=head2 label
+
+Inherited from L<HealthCheck::Diagnostic/label1>,
+defaults to C<dbh_check>.
+
+=head2 tags
+
+Inherited from L<HealthCheck::Diagnostic/tags1>,
+defaults to C<[ 'dbh_check' ]>.
+
 =head2 dbh
 
 A coderef that returns a
-L<DBI DATABASE handle object|DBI/DBI-DATABSE-HANDLE-OBJECTS>
+L<DBI DATABASE handle object|DBI/DBI-DATABASE-HANDLE-OBJECTS>
 or optionally the handle itself.
 
 Can be passed either to C<new> or C<check>.

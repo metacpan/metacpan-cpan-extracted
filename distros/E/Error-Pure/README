@@ -3,11 +3,15 @@ NAME
 
 SYNOPSIS
      use Error::Pure qw(err);
+
      err 'This is a fatal error', 'name', 'value';
 
 SUBROUTINES
-    "err(@messages)"
-             Process error with messages @messages.
+  "err"
+     err 'This is a fatal error', 'name', 'value';
+
+    Process error with message(s). There is key => value list after first
+    message.
 
 VARIABLES
     $LEVEL
@@ -26,11 +30,9 @@ VARIABLES
              3) $Error::Pure::TYPE_DEFAULT = 'Die'
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Error::Pure qw(err);
 
      # Set env error type.
@@ -43,11 +45,9 @@ EXAMPLE1
      # 1 at example1.pl line 9.
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Error::Pure qw(err);
 
      # Set env error type.
@@ -60,11 +60,9 @@ EXAMPLE2
      # #Error [path_to_script:12] 1
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Error::Pure qw(err);
 
      # Set error type.
@@ -78,11 +76,9 @@ EXAMPLE3
      # main  err  path_to_script  12
 
 EXAMPLE4
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Error::Pure qw(err);
 
      $SIG{__DIE__} = sub {
@@ -100,11 +96,9 @@ EXAMPLE4
      # #Error [path_to_script.pl:17] Error
 
 EXAMPLE5
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use English qw(-no_match_vars);
      use Error::Pure qw(err);
      use Error::Pure::Utils qw(err_msg_hr);
@@ -139,7 +133,7 @@ ACKNOWLEDGMENTS
     Jakub Špičak and his Masser (<http://masser.sf.net>).
 
 REPOSITORY
-    <https://github.com/tupinek/Error-Pure>
+    <https://github.com/michal-josef-spacek/Error-Pure>
 
 AUTHOR
     Michal Josef Špaček <mailto:skim@cpan.org>
@@ -147,9 +141,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2008-2018 Michal Josef Špaček
-     BSD 2-Clause License
+    © 2008-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.25
+    0.26
 

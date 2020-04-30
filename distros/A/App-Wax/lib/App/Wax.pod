@@ -11,7 +11,8 @@ App::Wax - webify your CLI
 =head1 DESCRIPTION
 
 C<App::Wax> is the helper library for L<wax>, a command-line program which runs
-other command-line programs and converts their URL arguments to local file paths.
+other command-line programs and converts their URL arguments to local file
+paths.
 
 See the L<wax> documentation for more details.
 
@@ -73,9 +74,9 @@ An instance of L<Mime::Types> used to help determine an extension for the file.
 
 B<Type>: Bool, rw, default: false.
 
-If set to true, the remote resource is saved to a persistent file. On subsequent
-invocations, the resource is re-downloaded if it has been updated, and its path
-is substituted for the resource's URL.
+If set to true, the remote resource is saved to a persistent file. On
+subsequent invocations, the resource is re-downloaded if it has been updated,
+and its path is substituted for the resource's URL.
 
 If L<"cache"> and L<"mirror"> are both set to true, an exception is thrown.
 
@@ -146,17 +147,18 @@ Returns a string representation of the supplied command.
 
 B<Signature>: [ $url: Str, $url_index: Int ] -> $extension: Str
 
-Returns the file extension for the given URL (e.g. C<.html>) if one can be determined from
-the resource's C<Content-Type> header or the path component of the URL if it's
-C<text/plain> or C<application/octet-stream>. Otherwise, returns an empty string.
+Returns the file extension for the given URL (e.g. C<.html>) if one can be
+determined from the resource's C<Content-Type> header or the path component of
+the URL if it's C<text/plain> or C<application/octet-stream>. Otherwise,
+returns an empty string.
 
 =head2 is_url
 
 B<Signature>: $param: Str -> $components: ArrayRef[Str] | Undef
 
 Returns a true value (a reference to an array of URL components returned by
-L<URI::Split/uri_split>) if the supplied string is a valid absolute
-URL, false otherwise.
+L<URI::Split/uri_split>) if the supplied string is a valid absolute URL, false
+otherwise.
 
 =head2 log
 
@@ -184,25 +186,27 @@ or L<"resolve_temp"> otherwise.
 
 B<Signature>: [ $url: Str, $url_index: Int ] -> ($filename: Str, $error: Maybe[Str])
 
-Returns the path the L<cached|"cache"> or L<mirrored|"mirror"> URL should be saved to/retrieved
-from and an optional error message if creation of the index file failed.
+Returns the path the L<cached|"cache"> or L<mirrored|"mirror"> URL should be
+saved to/retrieved from and an optional error message if creation of the index
+file failed.
 
-C<resolve_keep> uses an additional file to store the resource's extension. If this file
-can't be created, the error message is returned as the second element of the list.
-Otherwise, it's undef.
+C<resolve_keep> uses an additional file to store the resource's extension. If
+this file can't be created, the error message is returned as the second element
+of the list. Otherwise, it's undef.
 
 =head2 resolve_temp
 
 B<Signature>: [ $url: Str, $url_index: Int ] -> ($path: Str, $error: Maybe[Str])
 
-Returns the path of the temporary file the URL should be saved to
-and an optional error message if creation of the temporary file failed.
+Returns the path of the temporary file the URL should be saved to and an
+optional error message if creation of the temporary file failed.
 
 =head2 run
 
 B<Signature>: $command: ArrayRef[Str] -> $exit_code: Int
 
-Takes a command and runs it with filenames substituted for URLs. Returns the command's exit code.
+Takes a command and runs it with filenames substituted for URLs. Returns the
+command's exit code.
 
 =head1 EXPORT
 
@@ -218,7 +222,7 @@ None by default.
 
 =item * L<wax>
 
-=item * L<RT #37347|http://rt.cpan.org/Public/Bug/Display.html?id=37347>
+=item * L<RT #37347|https://rt.cpan.org/Public/Bug/Display.html?id=37347>
 
 =back
 
@@ -228,9 +232,9 @@ chocolateboy <chocolate@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2010-2019 by chocolateboy.
+Copyright (c) 2010-2020 by chocolateboy.
 
-This is free software; you can redistribute it and/or modify it under the
-terms of the L<Artistic License 2.0|http://www.opensource.org/licenses/artistic-license-2.0.php>.
+This is free software; you can redistribute it and/or modify it under the terms
+of the L<Artistic License 2.0|https://www.opensource.org/licenses/artistic-license-2.0.php>.
 
 =cut

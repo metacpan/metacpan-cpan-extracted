@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Error::Pure::Die qw(err);
 use Error::Pure::Utils qw(clean err_get);
 use Test::More 'tests' => 7;

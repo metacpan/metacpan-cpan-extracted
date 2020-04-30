@@ -7,8 +7,7 @@ use warnings;
 use Cwd qw(abs_path);
 use Readonly;
 
-# Version.
-our $VERSION = 0.25;
+our $VERSION = 0.26;
 
 Readonly::Array our @EXPORT_OK => qw(clean err_get err_helper err_msg err_msg_hr);
 Readonly::Scalar my $DOTS => '...';
@@ -205,6 +204,7 @@ Error::Pure::Utils - Utilities for structured errors.
 =head1 SYNOPSIS
 
  use Error::Pure::Utils qw(clean err_get err_helper err_msg err_msg_hr);
+
  clean();
  my @errors = err_get($clean);
  my @err_msg = err_msg($index);
@@ -213,53 +213,64 @@ Error::Pure::Utils - Utilities for structured errors.
 
 =head1 SUBROUTINES
 
-=over 8
+=head2 C<clean>
 
-=item C<clean()>
+ clean();
 
- Resets internal variables with errors.
- It is exportable.
- Returns undef.
+Resets internal variables with errors.
+It is exportable.
 
-=item C<err_get([$clean])>
+Returns undef.
 
- Get and clean processed errors.
- err_get() returns error structure.
- err_get(1) returns error structure and delete it internally.
- It is exportable.
- Returns array of errors.
+=head2 C<err_get>
 
-=item C<err_msg([$index])>
+ my @errors = err_get($clean);
 
- Get $index error messages array.
- If $index isn't present, use -1 as last message.
- Is is usable in situation >>err 'Error', 'item1', 'item2', 'item3', 'item4'<<.
- Then returns ('Error', 'item1', 'item2', 'item3', 'item4') array.
- See EXAMPLE2.
- It is exportable.
- Returns array of error messages.
+Get and clean processed errors.
+err_get() returns error structure.
+err_get(1) returns error structure and delete it internally.
+It is exportable.
 
-=item C<err_msg_hr([$index])>
+Returns array of errors.
 
- Get $index error message key, value pairs as hash reference.
- If $index isn't present, use -1 as last message.
- Is is usable in situation >>err 'Error', 'key1', 'val1', 'key2', 'val2'<<.
- Then returns {'key1' => 'val1', 'key2' => 'val2'} structure.
- See EXAMPLE3.
- It is exportable.
- Returns reference to hash with error messages.
+=head2 C<err_msg>
 
-=item C<err_helper(@msg)>
+ my @err_msg = err_msg($index);
 
- Subroutine for additional module above Error::Pure.
- @msg is array of messages.
- If last error is undef, rewrite it to 'undef' string.
- If @msg is blank, add 'undef' string.
- Chomp last error.
- It is exportable.
- Returns array of errors.
+Get $index error messages array.
+If $index isn't present, use -1 as last message.
+Is is usable in situation >>err 'Error', 'item1', 'item2', 'item3', 'item4'<<.
+Then returns ('Error', 'item1', 'item2', 'item3', 'item4') array.
+See EXAMPLE2.
+It is exportable.
 
-=back
+Returns array of error messages.
+
+=head2 C<err_msg_hr>
+
+ my $err_msg_hr = err_msg_hr($index);
+
+Get $index error message key, value pairs as hash reference.
+If $index isn't present, use -1 as last message.
+Is is usable in situation >>err 'Error', 'key1', 'val1', 'key2', 'val2'<<.
+Then returns {'key1' => 'val1', 'key2' => 'val2'} structure.
+See EXAMPLE3.
+It is exportable.
+
+Returns reference to hash with error messages.
+
+=head2 C<err_helper>
+
+ my @errors = err_helper('This is a fatal error', 'name', 'value');
+
+Subroutine for additional module above Error::Pure.
+@msg is array of messages.
+If last error is undef, rewrite it to 'undef' string.
+If @msg is blank, add 'undef' string.
+Chomp last error.
+It is exportable.
+
+Returns array of errors.
 
 =head1 VARIABLES
 
@@ -294,11 +305,9 @@ Default value is 50.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Dumpvalue;
  use Error::Pure::Die qw(err);
  use Error::Pure::Utils qw(err_get);
@@ -342,11 +351,9 @@ Default value is 50.
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use English qw(-no_match_vars);
  use Error::Pure qw(err);
  use Error::Pure::Utils qw(err_msg);
@@ -371,11 +378,9 @@ Default value is 50.
 
 =head1 EXAMPLE3
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use English qw(-no_match_vars);
  use Error::Pure qw(err);
  use Error::Pure::Utils qw(err_msg_hr);
@@ -417,7 +422,7 @@ Install the Error::Pure modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Error-Pure>
+L<https://github.com/michal-josef-spacek/Error-Pure>
 
 =head1 AUTHOR
 
@@ -427,11 +432,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2008-2018 Michal Josef Špaček
- BSD 2-Clause License
+© 2008-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.25
+0.26
 
 =cut

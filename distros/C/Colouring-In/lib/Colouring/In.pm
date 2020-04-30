@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use smallnum;
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 our %TOOL;
 
@@ -307,6 +307,69 @@ sub fadein {
 	return $colour->hsla( $TOOL{hash2array}( $hsl, 'h', 's', 'l', 'a' ) );
 }
 
+sub mix {
+	my ($colour1, $colour2, $weight) = @_;
+	my ($h1, $c1, $h2, $c2) = ($TOOL{hsl}($colour1), $TOOL{hsl}($colour2));
+	$weight = ($weight || 50) / 100;
+	my $a = $h1->{a} - $h2->{a};
+	my $w = ($weight * 2) - 1;
+	my $w1 = ((($w * $a == -1) ? $w : ($w + $a) / (1 + $w * $a)) + 1) / 2;
+	my $w2 = 1 - $w1;
+	return Colouring::In->new([ 
+		($c1->{colour}[0] * $w1) + ($c2->{colour}[0] * $w2),
+		($c1->{colour}[1] * $w1) + ($c2->{colour}[1] * $w2),
+		($c1->{colour}[2] * $w1) + ($c2->{colour}[2] * $w2),
+		($c1->{alpha} * $weight) + ($c2->{alpha} * 1 - $weight)
+	]);
+}
+
+sub tint {
+	my ($colour, $weight) = @_;
+	mix(
+		'rgb(255,255,255)',
+		$colour,
+		$weight
+	);
+}
+
+sub shade {
+	my ($colour, $weight) = @_;
+	mix(
+		'rgb(0, 0, 0)',
+		$colour,
+		$weight
+	);
+}
+
+sub saturate {
+	my ($colour, $amt, $meth) = @_;
+	my ($h1, $c1) = $TOOL{hsl}($colour);
+	$amt = $TOOL{depercent}($amt);
+	$h1->{s} += $TOOL{clamp}(
+		( $meth && $meth eq 'relative' )
+			? $h1->{s} * $amt
+			: $amt, 1,
+	);
+	return $c1->hsla( $TOOL{hash2array}( $h1, 'h', 's', 'l', 'a' ) );
+}
+
+sub desaturate {
+	my ($colour, $amt, $meth) = @_;
+	my ($h1, $c1) = $TOOL{hsl}($colour);
+	$amt = $TOOL{depercent}($amt);
+	$h1->{s} -= $TOOL{clamp}(
+		( $meth && $meth eq 'relative' )
+			? $h1->{s} * $amt
+			: $amt, 1,
+	);
+	return $c1->hsla( $TOOL{hash2array}( $h1, 'h', 's', 'l', 'a' ) );
+}
+
+sub greyscale {
+	my ($colour) = @_;
+	desaturate($colour, 100);
+}
+
 sub colour {
 	my @rgb = @{ $_[0]->{colour} };
 	my $r = defined $rgb[0] ? $rgb[0] : 255;
@@ -325,7 +388,7 @@ Colouring::In - color or colour.
 
 =head1 VERSION
 
-Version 0.19
+Version 0.20
 
 =cut
 
@@ -410,6 +473,14 @@ Instantiate an Colouring::In Object tranparent colour from hue, saturation, ligh
 
 =cut
 
+=head2 mix
+
+Mix two colours.
+
+	my $mix = $colour->mix('rgb(255, 255, 255)', 'rgb(0, 0, 0)', $weight);
+
+=cut
+
 =head2 lighten
 
 Increase the lightness of the colour.
@@ -448,7 +519,43 @@ Increase the opacity of the colour.
 
 	my $fadein = $colour->fadein('5%');
 
+=head2 tint
+
+Apply a tint to the colour. 
+
+	my $tint = $colour->tint('rgb(255, 0, 0)');
+
+	my $tint = $colour->tint('rgb(255, 0, 0)', $weight);
+
 =cut
+
+=head2 shade
+
+Apply a shade to the colour.
+
+	my $shade = $colour->shade('rgb(255, 0, 0)');
+
+	my $shade = $colour->shade('rgb(255, 0, 0)', $weight);
+
+=head2 saturate
+
+Increase the saturation of the colour.
+
+	my $saturate = $colour->saturate('rgb(255, 255, 255)', '50%');
+
+=head2 desaturate
+
+Decrease the saturation of a color.
+
+	my $desaturate = $colour->desaturate('rgb(255, 0, 0)', '50%');
+
+=cut
+
+=head2 greyscale
+
+Remove all saturation from a color.
+
+	my $grey = $colour->greyscale('rgb(255, 0, 0)');
 
 =head2 toCSS
 

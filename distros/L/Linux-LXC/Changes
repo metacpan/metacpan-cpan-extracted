@@ -1,7 +1,10 @@
 Changes file for Linux::LXC
 
+1.0006    2020-04-30 14:33:45+02:00 Europe/Paris
+	* PLL-9: fix again "put" method that still has errors with symlinks.
+
 1.0005    2020-04-29 16:08:52+02:00 Europe/Paris
-	* PPL-9: fix "put" method on symlinks.
+	* PLL-9: fix "put" method on symlinks.
 
 1.0004    2020-02-08 20:57:32+01:00 Europe/Paris
 	* PLL-6: add LXC v3 support.

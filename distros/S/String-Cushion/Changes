@@ -1,6 +1,25 @@
 Revision history for String-Cushion
 
-0.0200 2017-05-18 20:27:12 UTC
+1.0000 2020-04-30 17:07:19 UTC
+ [Other]
+ - Bumped to 1.0000
+
+ [Stats & Dependency Changes]
+ - 1 file changed, 1 insertion(+), 1 deletion(-)
+ - (dev req) ~ Dist::Zilla 6.008 --> 6.012
+ - (dev req) ~ Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   0.007 --> 0.009
+ - (dev req) ~ Dist::Zilla::Plugin::CheckChangesHasContent 0.008 --> 0.011
+ - (dev req) ~ Dist::Zilla::Plugin::Git 2.041 --> 2.046
+ - (dev req) ~ Dist::Zilla::Plugin::Git::Contributors 0.029 --> 0.035
+ - (dev req) ~ Dist::Zilla::Plugin::PromptIfStale 0.053 --> 0.055
+ - (dev req) ~ Dist::Zilla::Plugin::RunExtraTests 0.028 --> 0.029
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Compile 2.056 --> 2.058
+ - (dev req) ~ Dist::Zilla::Plugin::Test::ReportPrereqs 0.021 --> 0.027
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Version 1.05 --> 1.09
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0315 --> 0.0324
+
+0.0200 2017-05-18T20:27:12Z UTC
  [Other]
  - Now uses Makefile.PL instead of Build.PL
  - Explicit $VERSION in .pm file.

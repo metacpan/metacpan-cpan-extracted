@@ -9,3 +9,6 @@ Revision history for Colouring-In
 
 0.19    2020-04-23
 	- Update smallnum dependency
+
+0.20    2020-04-30
+	- Adds mix, tint, shade, saturate, desaturate and greyscale methods.

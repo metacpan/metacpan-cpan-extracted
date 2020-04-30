@@ -1,11 +1,9 @@
 package Error::Pure;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use warnings;
 
-# Modules.
 use English qw(-no_match_vars);
 use Error::Pure::Utils qw();
 use Readonly;
@@ -15,8 +13,7 @@ Readonly::Array our @EXPORT_OK => qw(err);
 Readonly::Scalar my $TYPE_DEFAULT => 'Die';
 Readonly::Scalar my $LEVEL_DEFAULT => 4;
 
-# Version.
-our $VERSION = 0.25;
+our $VERSION = 0.26;
 
 # Type of error.
 our $TYPE = $TYPE_DEFAULT;
@@ -65,17 +62,16 @@ Error::Pure - Perl module for structured errors.
 =head1 SYNOPSIS
 
  use Error::Pure qw(err);
+
  err 'This is a fatal error', 'name', 'value';
 
 =head1 SUBROUTINES
 
-=over 8
+=head2 C<err>
 
-=item C<err(@messages)>
+ err 'This is a fatal error', 'name', 'value';
 
- Process error with messages @messages.
-
-=back
+Process error with message(s). There is key => value list after first message.
 
 =head1 VARIABLES
 
@@ -102,11 +98,9 @@ Error::Pure - Perl module for structured errors.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure qw(err);
 
  # Set env error type.
@@ -120,11 +114,9 @@ Error::Pure - Perl module for structured errors.
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure qw(err);
 
  # Set env error type.
@@ -138,11 +130,9 @@ Error::Pure - Perl module for structured errors.
 
 =head1 EXAMPLE3
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure qw(err);
 
  # Set error type.
@@ -157,11 +147,9 @@ Error::Pure - Perl module for structured errors.
 
 =head1 EXAMPLE4
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure qw(err);
 
  $SIG{__DIE__} = sub {
@@ -180,11 +168,9 @@ Error::Pure - Perl module for structured errors.
 
 =head1 EXAMPLE5
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use English qw(-no_match_vars);
  use Error::Pure qw(err);
  use Error::Pure::Utils qw(err_msg_hr);
@@ -231,7 +217,7 @@ Jakub Špičak and his Masser (L<http://masser.sf.net>).
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Error-Pure>
+L<https://github.com/michal-josef-spacek/Error-Pure>
 
 =head1 AUTHOR
 
@@ -241,11 +227,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2008-2018 Michal Josef Špaček
- BSD 2-Clause License
+© 2008-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.25
+0.26
 
 =cut

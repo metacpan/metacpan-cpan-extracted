@@ -24,6 +24,8 @@ is($client->{client}->connect_async(
     undef,
     $data
 ), STATUSCODE_GOOD, "connect async");
+# wait an initial 100ms for open62541 to start the timer that creates the socket
+sleep .1;
 
 my $i;
 for ($i = 50; $i > 0; $i--) {

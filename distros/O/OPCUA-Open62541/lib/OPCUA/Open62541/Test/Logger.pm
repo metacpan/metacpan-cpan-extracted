@@ -97,7 +97,7 @@ sub loggrep {
 	}
     } while ($timeout and time() < $end);
 
-    fail "logger: loggrep match" or diag "timeout '$timeout' reached";
+    fail "logger: loggrep match" or diag "regex '$regex' not found";
     return;
 }
 

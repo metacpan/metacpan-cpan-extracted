@@ -23,6 +23,7 @@ sub redis {
         Future->needs_any(
             $redis->connect(
                 host => $ENV{NET_ASYNC_REDIS_HOST} // '127.0.0.1',
+                port => $ENV{NET_ASYNC_REDIS_PORT} // '6379',
             ),
             $loop->timeout_future(after => 5)
         )->get

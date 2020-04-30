@@ -7,7 +7,8 @@ use Net::Async::HTTP;
 use Path::Tiny;
 use HTML::TreeBuilder;
 use Template;
-use List::UtilsBy qw(extract_by);
+use List::Util qw(first);
+use List::UtilsBy qw(extract_by sort_by);
 
 use Log::Any qw($log);
 use Log::Any::Adapter qw(Stderr), log_level => 'trace';
@@ -30,6 +31,7 @@ $html->parse($data);
 $html->eof;
 my %commands_by_group;
 my @commands;
+my %key_finder;
 for my $cmd ($html->look_down(_tag => 'span', class => 'command')) {
     my ($txt) = $cmd->parent->attr('href') =~ m{/commands/([\w-]+)$} or die "failed on " . $cmd->as_text;
     $txt =~ tr/-/_/;
@@ -45,13 +47,19 @@ for my $cmd ($html->look_down(_tag => 'span', class => 'command')) {
         args    => [ map { s/\h+$//r } map { s/^\h+//r } grep { /\S/ } split /\n/, join '', map { $_->as_text } $cmd->parent->look_down(_tag => 'span', class => 'args') ],
         summary => join("\n", map { $_->as_text } $cmd->parent->look_down(_tag => 'span', class => 'summary')),
     };
+    my @args = $info->{args}->@*;
+    if(defined(my $idx = first { $args[$_] =~ /\bkey\b/ } 0..$#args)) {
+        warn "have key for $idx";
+        $key_finder{$info->{command}} = (0 + split(' ', $command)) + $idx;
+    }
     $info->{summary} =~ s{\.$}{};
     $log->debugf("Adding command %s", $info);
 }
 
 for my $group (sort keys %commands_by_group) {
     $log->infof('%s', $group);
-    for(@{$commands_by_group{$group}}) {
+    $commands_by_group{$group} = [ sort_by { $_->{method} } $commands_by_group{$group}->@* ];
+    for($commands_by_group{$group}->@*) {
         $log->infof(' * %s - %s', $_->{method}, $_->{summary});
     }
 }
@@ -77,6 +85,20 @@ It is intended to be loaded by L<Net::Async::Redis> to provide methods
 for each available Redis command.
 
 =cut
+
+=head1 PACKAGE VARIABLES
+
+=head2 KEY_FINDER
+
+This maps the argument index for the C<key> information in each command.
+
+=cut
+
+our %KEY_FINDER = (
+[% FOR command IN key_finder.keys.sort -%]
+    '[% command %]' => [% key_finder.item(command) %],
+[% END -%]
+);
 
 [% FOR group IN commands.keys.sort -%]
 =head1 METHODS - [% group.ucfirst %]
@@ -117,7 +139,10 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2015-2017. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2015-2020. Licensed under the same terms as Perl itself.
 
-}, { commands => \%commands_by_group }) or die $tt->error;
+}, {
+    commands => \%commands_by_group,
+    key_finder => \%key_finder,
+}) or die $tt->error;
     

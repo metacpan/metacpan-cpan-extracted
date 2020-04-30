@@ -3,17 +3,22 @@ use warnings;
 
 package OPCUA::Open62541::Test::Server;
 use OPCUA::Open62541::Test::Logger;
-use OPCUA::Open62541 'STATUSCODE_GOOD';
+use OPCUA::Open62541 qw(:NODEIDTYPE :STATUSCODE :TYPES);
 use Carp 'croak';
 use Errno 'EINTR';
 use Net::EmptyPort qw(empty_port);
-use POSIX qw(SIGTERM SIGALRM SIGKILL SIGUSR1 SIGUSR2 SIG_BLOCK);
+use POSIX qw(SIGTERM SIGALRM SIGKILL SIGUSR1 SIGUSR2 SIG_BLOCK SIG_UNBLOCK);
 
 use Test::More;
 
 sub planning {
-    # number of ok() and is() calls in this code
-    return OPCUA::Open62541::Test::Logger::planning() + 14;
+    # number of pass(), ok() and is() calls in this code
+    return OPCUA::Open62541::Test::Logger::planning() + 15;
+}
+
+sub planning_nofork {
+    # some test want to avoid fork and to not call run() and stop()
+    return OPCUA::Open62541::Test::Logger::planning() + 7;
 }
 
 sub new {
@@ -62,11 +67,197 @@ sub start {
     return $self;
 }
 
+sub setup_complex_objects {
+    my OPCUA::Open62541::Test::Server $self = shift;
+    my $server = $self->{server};
+
+    # SOME_OBJECT_0
+    #    |
+    #    | HasTypeDefinition
+    #    |
+    #    +-> SOME_OBJECT_TYPE
+    #        |
+    #        | HasComponent
+    #        |
+    #        +-> SOME_VARIABLE_0
+    #            |
+    #            | HasTypeDefinition
+    #            |
+    #            +-> SOME_VARIABLE_TYPE
+
+    my %nodes;
+    $nodes{some_variable_type} = {
+	nodeId => {
+	    NodeId_namespaceIndex => 1,
+	    NodeId_identifierType => NODEIDTYPE_STRING,
+	    NodeId_identifier     => "SOME_VARIABLE_TYPE",
+	},
+	parentNodeId => {
+	    NodeId_namespaceIndex => 0,
+	    NodeId_identifierType => NODEIDTYPE_NUMERIC,
+	    NodeId_identifier     => OPCUA::Open62541::NS0ID_BASEDATAVARIABLETYPE,
+	},
+	referenceTypeId => {
+	    NodeId_namespaceIndex => 0,
+	    NodeId_identifierType => NODEIDTYPE_NUMERIC,
+	    NodeId_identifier     => OPCUA::Open62541::NS0ID_HASSUBTYPE,
+	},
+	browseName => {
+	    QualifiedName_namespaceIndex => 1,
+	    QualifiedName_name           => "SVT",
+	},
+	typeDefinition => {
+	    NodeId_namespaceIndex => 0,
+	    NodeId_identifierType => NODEIDTYPE_NUMERIC,
+	    NodeId_identifier     => 0,
+	},
+	attributes => {
+	    VariableTypeAttributes_dataType => TYPES_INT32,
+	    VariableTypeAttributes_displayName => {
+		LocalizedText_text => 'Some Variable Type'
+	    },
+	},
+    };
+    $nodes{some_object_type} = {
+	nodeId => {
+	    NodeId_namespaceIndex => 1,
+	    NodeId_identifierType => NODEIDTYPE_STRING,
+	    NodeId_identifier     => "SOME_OBJECT_TYPE",
+	},
+	parentNodeId => {
+	    NodeId_namespaceIndex => 0,
+	    NodeId_identifierType => NODEIDTYPE_NUMERIC,
+	    NodeId_identifier     => OPCUA::Open62541::NS0ID_BASEOBJECTTYPE,
+	},
+	referenceTypeId => {
+	    NodeId_namespaceIndex => 0,
+	    NodeId_identifierType => NODEIDTYPE_NUMERIC,
+	    NodeId_identifier     => OPCUA::Open62541::NS0ID_HASSUBTYPE,
+	},
+	browseName => {
+	    QualifiedName_namespaceIndex => 1,
+	    QualifiedName_name           => "SOT",
+	},
+	attributes => {
+	    ObjectTypeAttributes_displayName => {
+		LocalizedText_text => 'Some Object Type'
+	    },
+	},
+    };
+    $nodes{some_variable_0} = {
+	nodeId => {
+	    NodeId_namespaceIndex => 1,
+	    NodeId_identifierType => NODEIDTYPE_STRING,
+	    NodeId_identifier     => "SOME_VARIABLE_0",
+	},
+	parentNodeId => $nodes{some_object_type}{nodeId},
+	referenceTypeId => {
+	    NodeId_namespaceIndex => 0,
+	    NodeId_identifierType => NODEIDTYPE_NUMERIC,
+	    NodeId_identifier     => OPCUA::Open62541::NS0ID_HASCOMPONENT,
+	},
+	browseName => {
+	    QualifiedName_namespaceIndex => 1,
+	    QualifiedName_name           => "SV0",
+	},
+	typeDefinition => {
+	    NodeId_namespaceIndex => 1,
+	    NodeId_identifierType => NODEIDTYPE_STRING,
+	    NodeId_identifier     => "SOME_VARIABLE_TYPE",
+	},
+	attributes => {
+	    VariableAttributes_displayName => {
+		LocalizedText_text => 'Some Variable 0'
+	    },
+	    Variable_value    => {
+		Variant_type   => TYPES_INT32,
+		Variant_scalar => 42,
+	    },
+	},
+    };
+    $nodes{some_object_0} = {
+	nodeId => {
+	    NodeId_namespaceIndex => 1,
+	    NodeId_identifierType => NODEIDTYPE_STRING,
+	    NodeId_identifier     => "SOME_OBJECT_0",
+	},
+	parentNodeId => {
+	    NodeId_namespaceIndex => 0,
+	    NodeId_identifierType => NODEIDTYPE_NUMERIC,
+	    NodeId_identifier     => OPCUA::Open62541::NS0ID_OBJECTSFOLDER,
+	},
+	referenceTypeId => {
+	    NodeId_namespaceIndex => 0,
+	    NodeId_identifierType => NODEIDTYPE_NUMERIC,
+	    NodeId_identifier     => OPCUA::Open62541::NS0ID_ORGANIZES,
+	},
+	browseName => {
+	    QualifiedName_namespaceIndex => 1,
+	    QualifiedName_name           => "SO0",
+	},
+	typeDefinition => {
+	    NodeId_namespaceIndex => 1,
+	    NodeId_identifierType => NODEIDTYPE_STRING,
+	    NodeId_identifier     => "SOME_OBJECT_TYPE",
+	},
+	attributes => {
+	    ObjectAttributes_displayName => {
+		LocalizedText_text => 'Some Object 0'
+	    },
+	},
+    };
+
+    is($server->addVariableTypeNode(
+	$nodes{some_variable_type}{nodeId},
+	$nodes{some_variable_type}{parentNodeId},
+	$nodes{some_variable_type}{referenceTypeId},
+	$nodes{some_variable_type}{browseName},
+	$nodes{some_variable_type}{typeDefinition},
+	$nodes{some_variable_type}{attributes},
+	0,
+	undef
+    ), STATUSCODE_GOOD, "add some_variable_type node");
+
+    is($server->addObjectTypeNode(
+	$nodes{some_object_type}{nodeId},
+	$nodes{some_object_type}{parentNodeId},
+	$nodes{some_object_type}{referenceTypeId},
+	$nodes{some_object_type}{browseName},
+	$nodes{some_object_type}{attributes},
+	0,
+	undef
+    ), STATUSCODE_GOOD, "add some_object_type node");
+
+    is($server->addVariableNode(
+	$nodes{some_variable_0}{nodeId},
+	$nodes{some_variable_0}{parentNodeId},
+	$nodes{some_variable_0}{referenceTypeId},
+	$nodes{some_variable_0}{browseName},
+	$nodes{some_variable_0}{typeDefinition},
+	$nodes{some_variable_0}{attributes},
+	0,
+	undef
+    ), STATUSCODE_GOOD, "add some_variable_0 node");
+
+    is($server->addObjectNode(
+	$nodes{some_object_0}{nodeId},
+	$nodes{some_object_0}{parentNodeId},
+	$nodes{some_object_0}{referenceTypeId},
+	$nodes{some_object_0}{browseName},
+	$nodes{some_object_0}{typeDefinition},
+	$nodes{some_object_0}{attributes},
+	0,
+	undef
+    ), STATUSCODE_GOOD, "add some_object_0 node");
+
+    return %nodes;
+}
+
 sub run {
     my OPCUA::Open62541::Test::Server $self = shift;
 
-    my $sigset = POSIX::SigSet->new(SIGUSR1, SIGUSR2);
-    ok(POSIX::sigprocmask(SIG_BLOCK, $sigset, undef), "server: sigprocmask")
+    my $sigset = POSIX::SigSet->new(SIGTERM, SIGUSR1, SIGUSR2);
+    ok(POSIX::sigprocmask(SIG_BLOCK, $sigset, undef), "server: sigblock")
 	or diag "sigprocmask failed: $!";
 
     $self->{pid} = fork();
@@ -79,6 +270,10 @@ sub run {
     } else {
 	fail("fork server") or diag "fork failed: $!";
     }
+
+    $sigset = POSIX::SigSet->new(SIGTERM);
+    ok(POSIX::sigprocmask(SIG_UNBLOCK, $sigset, undef), "server: sig unblock")
+	or diag "sigprocmask failed: $!";
 
     ok($self->{log}->pid($self->{pid}), "server: log set pid");
 
@@ -98,6 +293,10 @@ sub child {
     $SIG{USR1} = sub { note("SIGUSR1 received"); };
     $SIG{USR2} = sub { note("SIGUSR2 received"); };
 
+    my $sigset = POSIX::SigSet->new(SIGTERM);
+    POSIX::sigprocmask(SIG_UNBLOCK, $sigset, undef)
+	or die "sigprocmask failed: $!";
+
     my $parent_pid = getppid()
 	or die "getppid failed: $!";
 
@@ -112,7 +311,7 @@ sub child {
     while ($running) {
 	# for signal handling we have to return to Perl regulary
 	if ($self->{singlestep}) {
-	    my $sigset= POSIX::SigSet->new(SIGUSR2);  # do not step on SIGUSR2
+	    $sigset= POSIX::SigSet->new(SIGUSR2);  # do not step on SIGUSR2
 	    !POSIX::sigsuspend($sigset) && $!{EINTR}
 		or die "sigsuspend failed: $!";
 	    $self->{log}->{fh}->print("server: singlestep\n");
@@ -123,7 +322,7 @@ sub child {
 	}
 
 	if ($self->{actions}) {
-	    my $sigset = POSIX::SigSet->new();
+	    $sigset = POSIX::SigSet->new();
 	    POSIX::sigpending($sigset)
 		or die "sigpending failed: $!";
 	    if ($sigset->ismember(SIGUSR2)) {
@@ -233,6 +432,11 @@ Return the number of tests results that running one server will
 create.
 Add this to your number of planned tests.
 
+=item OPCUA::Open62541::Test::Server::planning_nofork
+
+Similar to planning, but to used for non-foring tests that do not
+call run() and stop().
+
 =back
 
 =head2 METHODS
@@ -285,6 +489,24 @@ Must be called after start() for that.
 =item $server->start()
 
 Configure the server.
+
+=item $server->setup_complex_objects()
+
+Adds the following nodes to the server:
+
+ some_object_0
+ | HasTypeDefinition
+ some_object_type
+ | HasComponent
+ some_variable_0
+ | HasTypeDefinition
+ some_variable_type
+
+Returns the definitions for each node as a hash ref with the above names as hash
+keys.
+Each definition has the hashes used to add the node (nodeId, parentNodeId,
+referenceTypeId, browseName, attributes and the typeDefinition depending on the
+node class).
 
 =item $server->step()
 

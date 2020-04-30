@@ -39,6 +39,6 @@ requires:
   warnings: '0'
 resources:
   repository: git://github.com/domm/CtrlO-Crypt-XkcdPassword.git
-version: '1.006'
+version: '1.008'
 x_generated_by_perl: v5.24.0
 x_serialization_backend: 'YAML::Tiny version 1.69'

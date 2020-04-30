@@ -8,7 +8,7 @@ use MIME::Base64;
 use Mojo::File;
 use Carp;
 
-$Google::Cloud::Speech::VERSION = '0.05';
+$Google::Cloud::Speech::VERSION = '0.06';
 
 has secret_file => sub { };
 has ua          => sub { Mojo::UserAgent->new() };
@@ -89,7 +89,7 @@ sub asyncrecognize {
         audio  => $audio,
     };
 
-    my $url = $self->url . "/speech:longrunningrecognize";
+    my $url = $self->baseurl . "/speech:longrunningrecognize";
     my $tx = $self->ua->post( $url => $header => json => $hash_ref );
 
     my $res = $self->handle_errors($tx)->json;
@@ -98,7 +98,6 @@ sub asyncrecognize {
 
         return $self;
     }
-
     croak 'there was an error';
 }
 
@@ -108,7 +107,7 @@ sub is_done {
     my $async_id = $self->async_id;
     return unless $async_id;
 
-    my $url = $self->url . "/operations/" . $async_id;
+    my $url = $self->baseurl . "/operations/" . $async_id;
     my $tx = $self->ua->get( $url => { 'Authorization' => $self->token } );
 
     my $res     = $self->handle_errors($tx)->json;
@@ -126,7 +125,7 @@ sub handle_errors {
     my ( $self, $tx ) = @_;
     my $res = $tx->res;
 
-    unless ( $tx->success ) {
+    unless ( $res->is_success ) {
         my $error_ref = $tx->error;
         croak( "invalid response: " . $error_ref->{'message'} );
     }

@@ -1,5 +1,7 @@
 Revision history for Dist::Zilla::PluginBundle::Author::WATERKIP
 
+2.4       2020-04-29 18:43:07Z
+
 2.3       2019-11-01 23:34:25Z
 
     * Update test dependencies for new modules

@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-#use v5.20;
+use v5.20;
 use strict;
 
 use Log::Any::Adapter('File', 'log.txt');
@@ -69,10 +69,10 @@ $container->set_config($config_names_to_use{'idmap'}, 'u 0 4300000 100000', ADDI
 $container->set_config($config_names_to_use{'idmap'}, 'g 0 4300000 100000', ADDITION_MODE);
 $container->put('/tmp/lxc-test.txt', '/etc/random/lxc-test.txt');
 ok -f '/var/lib/lxc/lxc-test/rootfs/etc/random/lxc-test.txt', 'A file was correctly put into the container.';
-$container->exec('mkdir /tmp/folder1');
-$container->exec('ln -s /tmp/folder1 /tmp/folder2');
-$container->put('/tmp/lxc-test.txt', '/tmp/folder2/lxc-test.txt');
-ok -f '/var/lib/lxc/lxc-test/rootfs/tmp/folder2/lxc-test.txt', 'Put a file in a symlink is working.';
+$container->exec('mkdir /etc/folder1');
+$container->exec('ln -s /etc/folder1 /etc/folder2');
+$container->put('/tmp/lxc-test.txt', '/etc/folder2/lxc-test.txt');
+ok -f '/var/lib/lxc/lxc-test/rootfs/etc/folder1/lxc-test.txt', 'Put a file in a symlink is working.';
 
 my %paths = (
 	'' => 0,

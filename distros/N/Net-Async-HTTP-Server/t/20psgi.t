@@ -127,6 +127,9 @@ my $C = IO::Socket::INET->new(
 
    my $buffer = "";
    wait_for_stream { $buffer =~ m/$CRLF$CRLF/ } $C => $buffer;
+
+   $buffer =~ s/^.*$CRLF$CRLF//s;
+   wait_for_stream { $buffer =~ m/Hello, world/ } $C => $buffer;
 }
 
 {

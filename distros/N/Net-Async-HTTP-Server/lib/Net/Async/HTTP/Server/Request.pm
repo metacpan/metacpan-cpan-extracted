@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
 
 package Net::Async::HTTP::Server::Request;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Carp;
 
@@ -39,6 +39,7 @@ sub new
       req  => $request,
 
       pending => [],
+      bytes_written => 0,
       is_done => 0,
       is_closed => 0,
    }, $class;
@@ -238,11 +239,21 @@ sub _write_to_stream
 
    while( defined( my $next = shift @{ $self->{pending} } ) ) {
       $stream->write( $next,
+         on_write => sub {
+            $self->{bytes_written} += $_[1];
+         },
          $self->protocol eq "HTTP/1.0" ?
             ( on_flush => sub { $stream->close } ) :
             (),
       );
    }
+
+   # An empty ->write to ensure we capture the written byte count correctly
+   $stream->write( "",
+      on_write => sub {
+         $self->{conn}->parent->_done_request( $self );
+      }
+   ) if $self->{is_done};
 
    return $self->{is_done};
 }
@@ -312,8 +323,6 @@ sub done
 
    $self->{is_done} = 1;
    $self->{conn}->_flush_requests;
-
-   $self->{conn}->parent->_done_request( $self );
 }
 
 =head2 write_chunk_eof
@@ -452,6 +461,13 @@ sub response_status_code
    my $self = shift;
    my $line = $self->{response_status_line} or return undef;
    return +( split m/ /, $line )[1];
+}
+
+# For metrics
+sub bytes_written
+{
+   my $self = shift;
+   return $self->{bytes_written};
 }
 
 =head1 AUTHOR
