@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-04-20'; # DATE
-our $VERSION = '1.051'; # VERSION
+our $DATE = '2020-05-06'; # DATE
+our $VERSION = '1.056'; # VERSION
 
 use 5.010;
 use strict;
@@ -65,7 +65,7 @@ lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.051 of lcpan (from Perl distribution App-lcpan), released on 2020-04-20.
+This document describes version 1.056 of lcpan (from Perl distribution App-lcpan), released on 2020-05-06.
 
 =head1 SYNOPSIS
 
@@ -566,6 +566,10 @@ Extract a script's latest release file to current directory.
 
 Inject one or more tarballs to the mirror.
 
+=head2 B<log>
+
+Show database index log.
+
 =head2 B<mentions>
 
 List mentions.
@@ -751,6 +755,14 @@ rar), C<err> means some other error in processing file.
 =head2 B<reset>
 
 Reset (empty) the database index.
+
+All data tables will be emptied. This includes all records in the C<log> table as
+well as C<index_creation_time> record in the C<meta> table, so there is no records
+of previous indexing activity. There is also no record of resetting in the
+C<log>.
+
+Tables are not dropped and re-created. The C<meta> table is not emptied.
+
 
 =head2 B<script>
 
@@ -999,6 +1011,22 @@ Display program's version and exit.
 
 =over
 
+=item B<--added-after>=I<s>
+
+Include only records that are added after a certain date.
+
+=item B<--added-before>=I<s>
+
+Include only records that are added before a certain date.
+
+=item B<--added-in-last-n-updates>=I<s>
+
+Include only records that are added during the last N index updates.
+
+=item B<--added-in-last-update>
+
+Include only records that are added during the last index update.
+
 =item B<--all>
 
 Equivalent to --phase ALL --rel ALL.
@@ -1120,6 +1148,22 @@ Default value:
 
  "requires"
 
+=item B<--updated-after>=I<s>
+
+Include only records that are updated after a certain date.
+
+=item B<--updated-before>=I<s>
+
+Include only records that are updated before a certain date.
+
+=item B<--updated-in-last-n-updates>=I<s>
+
+Include only records that are updated during the last N index updates.
+
+=item B<--updated-in-last-update>
+
+Include only records that are updated during the last index update.
+
 =item B<--with-xs-or-pp>
 
 Check each dependency as XS/PP.
@@ -1232,6 +1276,22 @@ Default value:
 
 =over
 
+=item B<--added-after>=I<s>
+
+Include only records that are added after a certain date.
+
+=item B<--added-before>=I<s>
+
+Include only records that are added before a certain date.
+
+=item B<--added-in-last-n-updates>=I<s>
+
+Include only records that are added during the last N index updates.
+
+=item B<--added-in-last-update>
+
+Include only records that are added during the last index update.
+
 =item B<--all>
 
 Equivalent to --phase ALL --rel ALL.
@@ -1251,6 +1311,22 @@ Default value:
 Default value:
 
  "ALL"
+
+=item B<--updated-after>=I<s>
+
+Include only records that are updated after a certain date.
+
+=item B<--updated-before>=I<s>
+
+Include only records that are updated before a certain date.
+
+=item B<--updated-in-last-n-updates>=I<s>
+
+Include only records that are updated during the last N index updates.
+
+=item B<--updated-in-last-update>
+
+Include only records that are updated during the last index update.
 
 =item B<--user-author-isnt>=I<s@>
 
@@ -1310,6 +1386,22 @@ Can be specified multiple times.
 
 =over
 
+=item B<--added-after>=I<s>
+
+Include only records that are added after a certain date.
+
+=item B<--added-before>=I<s>
+
+Include only records that are added before a certain date.
+
+=item B<--added-in-last-n-updates>=I<s>
+
+Include only records that are added during the last N index updates.
+
+=item B<--added-in-last-update>
+
+Include only records that are added during the last index update.
+
 =item B<--detail>, B<-l>
 
 =item B<--or>
@@ -1337,6 +1429,22 @@ Valid values:
 Search query.
 
 Can be specified multiple times.
+
+=item B<--updated-after>=I<s>
+
+Include only records that are updated after a certain date.
+
+=item B<--updated-before>=I<s>
+
+Include only records that are updated before a certain date.
+
+=item B<--updated-in-last-n-updates>=I<s>
+
+Include only records that are updated during the last N index updates.
+
+=item B<--updated-in-last-update>
+
+Include only records that are updated during the last index update.
 
 =item B<-n>
 
@@ -1502,6 +1610,22 @@ Whether to delete the release file from the filesystem too.
 
 =over
 
+=item B<--added-after>=I<s>
+
+Include only records that are added after a certain date.
+
+=item B<--added-before>=I<s>
+
+Include only records that are added before a certain date.
+
+=item B<--added-in-last-n-updates>=I<s>
+
+Include only records that are added during the last N index updates.
+
+=item B<--added-in-last-update>
+
+Include only records that are added during the last index update.
+
 =item B<--all>
 
 Equivalent to --phase ALL --rel ALL.
@@ -1604,6 +1728,22 @@ Default value:
 Default value:
 
  "requires"
+
+=item B<--updated-after>=I<s>
+
+Include only records that are updated after a certain date.
+
+=item B<--updated-before>=I<s>
+
+Include only records that are updated before a certain date.
+
+=item B<--updated-in-last-n-updates>=I<s>
+
+Include only records that are updated during the last N index updates.
+
+=item B<--updated-in-last-update>
+
+Include only records that are updated during the last index update.
 
 =item B<--with-xs-or-pp>
 
@@ -1811,6 +1951,22 @@ See C<--dist>.
 
 =over
 
+=item B<--added-after>=I<s>
+
+Include only records that are added after a certain date.
+
+=item B<--added-before>=I<s>
+
+Include only records that are added before a certain date.
+
+=item B<--added-in-last-n-updates>=I<s>
+
+Include only records that are added during the last N index updates.
+
+=item B<--added-in-last-update>
+
+Include only records that are added during the last index update.
+
 =item B<--author>=I<s>, B<-a>
 
 Filter by author.
@@ -1874,6 +2030,22 @@ Default value:
  ["dist"]
 
 Can be specified multiple times.
+
+=item B<--updated-after>=I<s>
+
+Include only records that are updated after a certain date.
+
+=item B<--updated-before>=I<s>
+
+Include only records that are updated before a certain date.
+
+=item B<--updated-in-last-n-updates>=I<s>
+
+Include only records that are updated during the last N index updates.
+
+=item B<--updated-in-last-update>
+
+Include only records that are updated during the last index update.
 
 =item B<-n>
 
@@ -2507,6 +2679,22 @@ See C<--module>.
 
 =over
 
+=item B<--added-after>=I<s>
+
+Include only records that are added after a certain date.
+
+=item B<--added-before>=I<s>
+
+Include only records that are added before a certain date.
+
+=item B<--added-in-last-n-updates>=I<s>
+
+Include only records that are added during the last N index updates.
+
+=item B<--added-in-last-update>
+
+Include only records that are added during the last index update.
+
 =item B<--author>=I<s>, B<-a>
 
 Filter by author.
@@ -2588,6 +2776,22 @@ Default value:
  ["module"]
 
 Can be specified multiple times.
+
+=item B<--updated-after>=I<s>
+
+Include only records that are updated after a certain date.
+
+=item B<--updated-before>=I<s>
+
+Include only records that are updated before a certain date.
+
+=item B<--updated-in-last-n-updates>=I<s>
+
+Include only records that are updated during the last N index updates.
+
+=item B<--updated-in-last-update>
+
+Include only records that are updated during the last index update.
 
 =item B<-n>
 
@@ -2677,6 +2881,22 @@ See C<--module>.
 
 =over
 
+=item B<--added-after>=I<s>
+
+Include only records that are added after a certain date.
+
+=item B<--added-before>=I<s>
+
+Include only records that are added before a certain date.
+
+=item B<--added-in-last-n-updates>=I<s>
+
+Include only records that are added during the last N index updates.
+
+=item B<--added-in-last-update>
+
+Include only records that are added during the last index update.
+
 =item B<--author>=I<s>, B<-a>
 
 Filter by author.
@@ -2759,6 +2979,22 @@ Default value:
 
 Can be specified multiple times.
 
+=item B<--updated-after>=I<s>
+
+Include only records that are updated after a certain date.
+
+=item B<--updated-before>=I<s>
+
+Include only records that are updated before a certain date.
+
+=item B<--updated-in-last-n-updates>=I<s>
+
+Include only records that are updated during the last N index updates.
+
+=item B<--updated-in-last-update>
+
+Include only records that are updated during the last index update.
+
 =item B<-n>
 
 Shortcut --query-type name.
@@ -2782,6 +3018,22 @@ See C<--query-type>.
 =head2 Options for subcommand namespaces
 
 =over
+
+=item B<--added-after>=I<s>
+
+Include only records that are added after a certain date.
+
+=item B<--added-before>=I<s>
+
+Include only records that are added before a certain date.
+
+=item B<--added-in-last-n-updates>=I<s>
+
+Include only records that are added during the last N index updates.
+
+=item B<--added-in-last-update>
+
+Include only records that are added during the last index update.
 
 =item B<--detail>, B<-l>
 
@@ -2827,6 +3079,22 @@ Valid values:
 
 =item B<--to-level>=I<s>
 
+=item B<--updated-after>=I<s>
+
+Include only records that are updated after a certain date.
+
+=item B<--updated-before>=I<s>
+
+Include only records that are updated before a certain date.
+
+=item B<--updated-in-last-n-updates>=I<s>
+
+Include only records that are updated during the last N index updates.
+
+=item B<--updated-in-last-update>
+
+Include only records that are updated during the last index update.
+
 =item B<-n>
 
 Shortcut --query-type name.
@@ -2850,6 +3118,22 @@ See C<--query-type>.
 =head2 Options for subcommand rdeps
 
 =over
+
+=item B<--added-after>=I<s>
+
+Include only records that are added after a certain date.
+
+=item B<--added-before>=I<s>
+
+Include only records that are added before a certain date.
+
+=item B<--added-in-last-n-updates>=I<s>
+
+Include only records that are added during the last N index updates.
+
+=item B<--added-in-last-update>
+
+Include only records that are added during the last index update.
 
 =item B<--all>
 
@@ -2927,6 +3211,22 @@ Default value:
 Default value:
 
  "ALL"
+
+=item B<--updated-after>=I<s>
+
+Include only records that are updated after a certain date.
+
+=item B<--updated-before>=I<s>
+
+Include only records that are updated before a certain date.
+
+=item B<--updated-in-last-n-updates>=I<s>
+
+Include only records that are updated during the last N index updates.
+
+=item B<--updated-in-last-update>
+
+Include only records that are updated during the last index update.
 
 =item B<-R>
 
@@ -3044,6 +3344,22 @@ Return score-related fields.
 
 =over
 
+=item B<--added-after>=I<s>
+
+Include only records that are added after a certain date.
+
+=item B<--added-before>=I<s>
+
+Include only records that are added before a certain date.
+
+=item B<--added-in-last-n-updates>=I<s>
+
+Include only records that are added during the last N index updates.
+
+=item B<--added-in-last-update>
+
+Include only records that are added during the last index update.
+
 =item B<--author>=I<s>, B<-a>
 
 Filter by author.
@@ -3101,6 +3417,22 @@ Default value:
  ["name"]
 
 Can be specified multiple times.
+
+=item B<--updated-after>=I<s>
+
+Include only records that are updated after a certain date.
+
+=item B<--updated-before>=I<s>
+
+Include only records that are updated before a certain date.
+
+=item B<--updated-in-last-n-updates>=I<s>
+
+Include only records that are updated during the last N index updates.
+
+=item B<--updated-in-last-update>
+
+Include only records that are updated during the last index update.
 
 =item B<-n>
 
@@ -3126,6 +3458,22 @@ See C<--query-type>.
 
 =over
 
+=item B<--added-after>=I<s>
+
+Include only records that are added after a certain date.
+
+=item B<--added-before>=I<s>
+
+Include only records that are added before a certain date.
+
+=item B<--added-in-last-n-updates>=I<s>
+
+Include only records that are added during the last N index updates.
+
+=item B<--added-in-last-update>
+
+Include only records that are added during the last index update.
+
 =item B<--author>=I<s>, B<-a>
 
 Filter by author.
@@ -3183,6 +3531,22 @@ Default value:
  ["name"]
 
 Can be specified multiple times.
+
+=item B<--updated-after>=I<s>
+
+Include only records that are updated after a certain date.
+
+=item B<--updated-before>=I<s>
+
+Include only records that are updated before a certain date.
+
+=item B<--updated-in-last-n-updates>=I<s>
+
+Include only records that are updated during the last N index updates.
+
+=item B<--updated-in-last-update>
+
+Include only records that are updated during the last index update.
 
 =item B<-n>
 
@@ -3723,6 +4087,10 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand author-deps
 
+ added_after (see --added-after)
+ added_before (see --added-before)
+ added_in_last_n_updates (see --added-in-last-n-updates)
+ added_in_last_update (see --added-in-last-update)
  author (see --author)
  dont_uniquify (see --dont-uniquify)
  flatten (see --flatten)
@@ -3736,6 +4104,10 @@ List of available configuration parameters:
  perl_version (see --perl-version)
  phase (see --phase)
  rel (see --rel)
+ updated_after (see --updated-after)
+ updated_before (see --updated-before)
+ updated_in_last_n_updates (see --updated-in-last-n-updates)
+ updated_in_last_update (see --updated-in-last-update)
  with_xs_or_pp (see --with-xs-or-pp)
 
 =head2 Configuration for subcommand author-deps-by-dependent-count
@@ -3764,9 +4136,17 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand author-rdeps
 
+ added_after (see --added-after)
+ added_before (see --added-before)
+ added_in_last_n_updates (see --added-in-last-n-updates)
+ added_in_last_update (see --added-in-last-update)
  author (see --author)
  phase (see --phase)
  rel (see --rel)
+ updated_after (see --updated-after)
+ updated_before (see --updated-before)
+ updated_in_last_n_updates (see --updated-in-last-n-updates)
+ updated_in_last_update (see --updated-in-last-update)
  user_authors (see --user-author)
  user_authors_arent (see --user-author-isnt)
 
@@ -3785,10 +4165,18 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand authors
 
+ added_after (see --added-after)
+ added_before (see --added-before)
+ added_in_last_n_updates (see --added-in-last-n-updates)
+ added_in_last_update (see --added-in-last-update)
  detail (see --detail)
  or (see --or)
  query (see --query)
  query_type (see --query-type)
+ updated_after (see --updated-after)
+ updated_before (see --updated-before)
+ updated_in_last_n_updates (see --updated-in-last-n-updates)
+ updated_in_last_update (see --updated-in-last-update)
 
 =head2 Configuration for subcommand authors-by-dist-count
 
@@ -3853,6 +4241,10 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand deps
 
+ added_after (see --added-after)
+ added_before (see --added-before)
+ added_in_last_n_updates (see --added-in-last-n-updates)
+ added_in_last_update (see --added-in-last-update)
  dont_uniquify (see --dont-uniquify)
  flatten (see --flatten)
  include_core (see --exclude-core)
@@ -3864,6 +4256,10 @@ List of available configuration parameters:
  perl_version (see --perl-version)
  phase (see --phase)
  rel (see --rel)
+ updated_after (see --updated-after)
+ updated_before (see --updated-before)
+ updated_in_last_n_updates (see --updated-in-last-n-updates)
+ updated_in_last_update (see --updated-in-last-update)
  with_xs_or_pp (see --with-xs-or-pp)
 
 =head2 Configuration for subcommand deps-by-dependent-count
@@ -3921,6 +4317,10 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand dists
 
+ added_after (see --added-after)
+ added_before (see --added-before)
+ added_in_last_n_updates (see --added-in-last-n-updates)
+ added_in_last_update (see --added-in-last-update)
  author (see --author)
  detail (see --detail)
  has_buildpl (see --has-buildpl)
@@ -3934,6 +4334,10 @@ List of available configuration parameters:
  query_type (see --query-type)
  rel_mtime_newer_than (see --rel-mtime-newer-than)
  sort (see --sort)
+ updated_after (see --updated-after)
+ updated_before (see --updated-before)
+ updated_in_last_n_updates (see --updated-in-last-n-updates)
+ updated_in_last_update (see --updated-in-last-update)
 
 =head2 Configuration for subcommand dists-by-dep-count
 
@@ -3968,6 +4372,9 @@ List of available configuration parameters:
 
  author (see --author)
  files (see --file)
+
+=head2 Configuration for subcommand log
+
 
 =head2 Configuration for subcommand mentions
 
@@ -4049,6 +4456,10 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand mods
 
+ added_after (see --added-after)
+ added_before (see --added-before)
+ added_in_last_n_updates (see --added-in-last-n-updates)
+ added_in_last_update (see --added-in-last-update)
  author (see --author)
  detail (see --detail)
  dist (see --dist)
@@ -4061,6 +4472,10 @@ List of available configuration parameters:
  query (see --query)
  query_type (see --query-type)
  sort (see --sort)
+ updated_after (see --updated-after)
+ updated_before (see --updated-before)
+ updated_in_last_n_updates (see --updated-in-last-n-updates)
+ updated_in_last_update (see --updated-in-last-update)
 
 =head2 Configuration for subcommand mods-by-mention-count
 
@@ -4085,6 +4500,10 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand modules
 
+ added_after (see --added-after)
+ added_before (see --added-before)
+ added_in_last_n_updates (see --added-in-last-n-updates)
+ added_in_last_update (see --added-in-last-update)
  author (see --author)
  detail (see --detail)
  dist (see --dist)
@@ -4097,9 +4516,17 @@ List of available configuration parameters:
  query (see --query)
  query_type (see --query-type)
  sort (see --sort)
+ updated_after (see --updated-after)
+ updated_before (see --updated-before)
+ updated_in_last_n_updates (see --updated-in-last-n-updates)
+ updated_in_last_update (see --updated-in-last-update)
 
 =head2 Configuration for subcommand namespaces
 
+ added_after (see --added-after)
+ added_before (see --added-before)
+ added_in_last_n_updates (see --added-in-last-n-updates)
+ added_in_last_update (see --added-in-last-update)
  detail (see --detail)
  from_level (see --from-level)
  level (see --level)
@@ -4108,9 +4535,17 @@ List of available configuration parameters:
  query_type (see --query-type)
  sort (see --sort)
  to_level (see --to-level)
+ updated_after (see --updated-after)
+ updated_before (see --updated-before)
+ updated_in_last_n_updates (see --updated-in-last-n-updates)
+ updated_in_last_update (see --updated-in-last-update)
 
 =head2 Configuration for subcommand rdeps
 
+ added_after (see --added-after)
+ added_before (see --added-before)
+ added_in_last_n_updates (see --added-in-last-n-updates)
+ added_in_last_update (see --added-in-last-update)
  authors (see --author)
  authors_arent (see --author-isnt)
  dont_uniquify (see --dont-uniquify)
@@ -4119,6 +4554,10 @@ List of available configuration parameters:
  modules (see --module)
  phase (see --phase)
  rel (see --rel)
+ updated_after (see --updated-after)
+ updated_before (see --updated-before)
+ updated_in_last_n_updates (see --updated-in-last-n-updates)
+ updated_in_last_update (see --updated-in-last-update)
 
 =head2 Configuration for subcommand rdeps-scripts
 
@@ -4145,6 +4584,10 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand releases
 
+ added_after (see --added-after)
+ added_before (see --added-before)
+ added_in_last_n_updates (see --added-in-last-n-updates)
+ added_in_last_update (see --added-in-last-update)
  author (see --author)
  detail (see --detail)
  full_path (see --full-path)
@@ -4158,9 +4601,17 @@ List of available configuration parameters:
  query (see --query)
  query_type (see --query-type)
  sort (see --sort)
+ updated_after (see --updated-after)
+ updated_before (see --updated-before)
+ updated_in_last_n_updates (see --updated-in-last-n-updates)
+ updated_in_last_update (see --updated-in-last-update)
 
 =head2 Configuration for subcommand rels
 
+ added_after (see --added-after)
+ added_before (see --added-before)
+ added_in_last_n_updates (see --added-in-last-n-updates)
+ added_in_last_update (see --added-in-last-update)
  author (see --author)
  detail (see --detail)
  full_path (see --full-path)
@@ -4174,6 +4625,10 @@ List of available configuration parameters:
  query (see --query)
  query_type (see --query-type)
  sort (see --sort)
+ updated_after (see --updated-after)
+ updated_before (see --updated-before)
+ updated_in_last_n_updates (see --updated-in-last-n-updates)
+ updated_in_last_update (see --updated-in-last-update)
 
 =head2 Configuration for subcommand reset
 

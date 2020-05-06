@@ -1,220 +1,187 @@
-package Test::JSON::Schema::Acceptance; # git description: 0.0.1-12-g1f33ab6
-# ABSTRACT: Acceptance testing for JSON-Schema based validators like JSON::Schema
-
-our $VERSION = '0.990';
-
-use 5.010;
 use strict;
 use warnings;
+package Test::JSON::Schema::Acceptance; # git description: v0.991-12-ge50ddad
+# vim: set ts=8 sts=2 sw=2 tw=100 et :
+# ABSTRACT: Acceptance testing for JSON-Schema based validators like JSON::Schema
 
+our $VERSION = '0.992';
+
+no if "$]" >= 5.031009, feature => 'indirect';
 use Test::More ();
 use Test::Fatal ();
-use Cwd ();
-use JSON ();
+use JSON::MaybeXS 1.004001;
+use File::ShareDir 'dist_dir';
+use Moo;
+use MooX::TypeTiny 0.002002;
+use Types::Standard 1.010002 qw(Str InstanceOf ArrayRef HashRef Dict Any HasMethods);
+use Path::Tiny;
+use List::Util 1.33 'any';
+use namespace::clean;
 
-#pod =for :header =for stopwords validators
-#pod
-#pod =head1 SYNOPSIS
-#pod
-#pod This module allows the L<JSON Schema Test Suite|https://github.com/json-schema/JSON-Schema-Test-Suite> tests to be used in perl to test a module that implements json-schema.
-#pod These are the same tests that many modules (libraries, plugins, packages, etc.) use to confirm support of json-schema.
-#pod Using this module to confirm support gives assurance of interoperability with other modules that run the same tests in different languages.
-#pod
-#pod In the JSON::Schema module, a test could look like the following:
-#pod
-#pod   use Test::More;
-#pod   use JSON::Schema;
-#pod   use Test::JSON::Schema::Acceptance;
-#pod
-#pod   my $accepter = Test::JSON::Schema::Acceptance->new(3);
-#pod
-#pod   # Skip tests which are known not to be supported or which cause problems.
-#pod   my $skip_tests = ['multiple extends', 'dependencies', 'ref'];
-#pod
-#pod   $accepter->acceptance( sub{
-#pod     my ( $schema, $input ) = @_;
-#pod     return JSON::Schema->new($schema)->validate($input);
-#pod   }, {
-#pod     skip_tests => $skip_tests
-#pod   } );
-#pod
-#pod   done_testing();
-#pod
-#pod This would determine if JSON::Schema's C<validate> method returns the right result for all of the cases in the JSON Schema Test Suite, except for those listed in C<$skip_tests>.
-#pod
-#pod =head1 DESCRIPTION
-#pod
-#pod L<JSON Schema|http://json-schema.org> is an IETF draft (at time of writing) which allows you to define the structure of JSON.
-#pod
-#pod The abstract from L<draft 4|https://tools.ietf.org/html/draft-zyp-json-schema-04> of the specification:
-#pod
-#pod =over 4
-#pod
-#pod JSON Schema defines the media type "application/schema+json",
-#pod a JSON based format for defining the structure of JSON data.
-#pod JSON Schema provides a contract for what JSON data is required
-#pod for a given application and how to interact with it.
-#pod JSON Schema is intended to define validation, documentation,
-#pod hyperlink navigation, and interaction control of JSON data.
-#pod
-#pod =back
-#pod
-#pod L<JSON::Schema|https://metacpan.org/pod/JSON::Schema> is a perl module created independently of the specification, which aims to implement the json-schema specification.
-#pod
-#pod This module allows other perl modules (for example JSON::Schema) to test that they are json-schema compliant, by running the tests from the official test suite, without having to manually convert them to perl tests.
-#pod
-#pod You are unlikely to want this module, unless you are attempting to write a module which implements json-schema the specification, and want to test your compliance.
-#pod
-#pod
-#pod =head1 CONSTRUCTOR
-#pod
-#pod =over 1
-#pod
-#pod =item C<< Test::JSON::Schema::Acceptance->new($schema_version) >>
-#pod
-#pod Create a new instance of Test::JSON::Schema::Acceptance.
-#pod
-#pod Accepts optional argument of $schema_version.
-#pod This determines the draft version of the schema to confirm compliance to.
-#pod Default is draft 4 (current), but in the synopsis example, JSON::Schema is testing draft 3 compliance.
-#pod
-#pod =back
-#pod
-#pod =cut
+has specification => (
+  is => 'ro',
+  isa => Str,
+  lazy => 1,
+  default => 'draft2019-09',
+);
 
-sub new {
-  my $class = shift;
-  return bless { draft => shift || 4 }, $class;
+has test_dir => (
+  is => 'ro',
+  isa => InstanceOf['Path::Tiny'],
+  coerce => sub { path($_[0])->absolute('.') },
+  lazy => 1,
+  default => sub { path(dist_dir('Test-JSON-Schema-Acceptance'), 'tests', $_[0]->specification) },
+);
+
+around BUILDARGS => sub {
+  my ($orig, $class, @args) = @_;
+  my %args = @args % 2 ? ( specification => 'draft'.$args[0] ) : @args;
+  $args{specification} = 'draft2019-09' if ($args{specification} // '') eq 'latest';
+  $class->$orig(\%args);
+};
+
+sub BUILD {
+  my $self = shift;
+  -d $self->test_dir or die 'test_dir does not exist: '.$self->test_dir;
 }
 
-#pod =head1 SUBROUTINES/METHODS
-#pod
-#pod =head2 acceptance
-#pod
-#pod =for stopwords truthy falsey
-#pod
-#pod Accepts a sub and optional options in the form of a hash.
-#pod The sub should return truthy or falsey depending on if the schema was valid for the input or not.
-#pod
-#pod =head3 options
-#pod
-#pod The only option which is currently accepted is skip_tests, which should be an array ref of tests you want to skip.
-#pod You can skip a whole section of tests or individual tests.
-#pod Any test name that contains any of the array refs items will be skipped, using grep.
-#pod You can also skip a test by its number.
-#pod
-#pod =cut
-
 sub acceptance {
-  my ($self, $code, $options) = @_;
-  my $tests = $self->_load_tests;
+  my $self = shift;
+  my $options = +{ ref $_[0] eq 'CODE' ? (validate_json_string => @_) : @_ };
 
-  my $skip_tests = $options->{skip_tests} // {};
-  my $only_test = $options->{only_test} // undef;
+  die 'require one or the other of "validate_data", "validate_json_string"'
+    if not $options->{validate_data} and not $options->{validate_json_string};
 
-  $self->_run_tests($code, $tests, $skip_tests, $only_test);
+  die 'cannot provide both "validate_data" and "validate_json_string"'
+    if $options->{validate_data} and $options->{validate_json_string};
+
+  $self->_run_tests($self->_test_data, $options);
 
 }
 
 sub _run_tests {
-  my ($self, $code, $tests, $skip_tests, $only_test) = @_;
-  my $json = JSON->new;
+  my ($self, $tests, $options) = @_;
 
-  local $Test::Builder::Level = $Test::Builder::Level + 2;
+  Test::More::note('running tests in '.$self->test_dir.'...');
 
-  my $test_no = 0;
-  foreach my $test_group (@{$tests}) {
+  warn "'skip_tests' option is deprecated" if $options->{skip_tests};
 
-    foreach my $test_group_test (@{$test_group->{json}}){
+  my %results; # results by file
 
-      my $test_group_cases = $test_group_test->{tests};
-      my $schema = $test_group_test->{schema};
+  foreach my $one_file (@$tests) {
+    next if $options->{tests} and $options->{tests}{file}
+      and not grep $_ eq $one_file->{file},
+        (ref $options->{tests}{file} eq 'ARRAY'
+          ? @{$options->{tests}{file}} : $options->{tests}{file});
 
-      foreach my $test (@{$test_group_cases}) {
-        $test_no++;
-        next if defined $only_test && $test_no != $only_test;
-        my $subtest_name = $test_group_test->{description} . ' - ' . $test->{description};
+    foreach my $test_group (@{$one_file->{json}}) {
+      next if $options->{tests} and $options->{tests}{group_description}
+        and not grep $_ eq $test_group->{description},
+          (ref $options->{tests}{group_description} eq 'ARRAY'
+            ? @{$options->{tests}{group_description}} : $options->{tests}{group_description});
 
-        TODO: {
-          if (ref $skip_tests eq 'ARRAY'){
-              Test::More::todo_skip 'Test explicitly skipped. - '  . $subtest_name, 1
-              if (grep { $subtest_name =~ /$_/} @$skip_tests) ||
-                grep $_ eq "$test_no", @$skip_tests;
-          }
+      foreach my $test (@{$test_group->{tests}}) {
+        next if $options->{tests} and $options->{tests}{test_description}
+          and not grep $_ eq $test->{description},
+            (ref $options->{tests}{test_description} eq 'ARRAY'
+              ? @{$options->{tests}{test_description}} : $options->{tests}{test_description});
 
-          my $result;
-          my $exception = Test::Fatal::exception{
-            if(ref($test->{data}) eq 'ARRAY' || ref($test->{data}) eq 'HASH'){
-              $result = $code->($schema, $json->encode($test->{data}));
-            } else {
-              # $result = $code->($schema, $json->encode([$test->{data}]));
-              $result = $code->($schema, JSON->new->allow_nonref->encode($test->{data}));
+        local $::TODO = 'Test marked TODO via "todo_tests"'
+          if $options->{todo_tests} and
+            any {
+              my $o = $_;
+              (not $o->{file} or grep $_ eq $one_file->{file}, (ref $o->{file} eq 'ARRAY' ? @{$o->{file}} : $o->{file}))
+                and
+              (not $o->{group_description} or grep $_ eq $test_group->{description}, (ref $o->{group_description} eq 'ARRAY' ? @{$o->{group_description}} : $o->{group_description}))
+                and
+              (not $o->{test_description} or grep $_ eq $test->{description}, (ref $o->{test_description} eq 'ARRAY' ? @{$o->{test_description}} : $o->{test_description}))
             }
-          };
+            @{$options->{todo_tests}};
 
-          my $test_desc = $test_group_test->{description} . ' - ' . $test->{description} . ($exception ? ' - and died!!' : '');
-          Test::More::ok(!$exception && _eq_bool($test->{valid}, $result), $test_desc) or
-            Test::More::diag(
-              "#$test_no \n" .
-              'Test file "' . $test_group->{file} . "\"\n" .
-              'Test schema - ' . $test_group_test->{description} . "\n" .
-              'Test data - ' . $test->{description} . "\n" .
-              ($exception ? "$exception " : "") . "\n"
-            );
-        }
+        my $result = $self->_run_test($one_file, $test_group, $test, $options);
+        ++$results{$one_file->{file}}->{ $result ? 'pass' : 'fail' };
       }
     }
   }
+
+  Test::More::note '';
+  Test::More::note sprintf('%-25s pass  fail', 'filename');
+  Test::More::note '-'x36;
+  Test::More::note sprintf('%-25s  %3d   %3d', $_, $results{$_}{pass} // 0, $results{$_}{fail} // 0)
+    foreach sort keys %results;
+  Test::More::note '';
 }
 
-sub _load_tests {
+sub _run_test {
+  my ($self, $one_file, $test_group, $test, $options) = @_;
+
+  TODO: {
+    local $::TODO = 'Test marked TODO via "skip_tests"'
+      if ref $options->{skip_tests} eq 'ARRAY' and
+        grep +(($test_group->{description}.' - '.$test->{description}) =~ /$_/), @{$options->{skip_tests}};
+
+    my $result;
+    my $exception = Test::Fatal::exception {
+      $result = $options->{validate_data}
+        ? $options->{validate_data}->($test_group->{schema}, $test->{data})
+        : $options->{validate_json_string}->($test_group->{schema}, $self->_json_decoder->encode($test->{data}));
+    };
+
+    my $got = $result ? 'true' : 'false';
+    my $expected = $test->{valid} ? 'true' : 'false';
+
+    local $Test::Builder::Level = $Test::Builder::Level + 3;
+
+    my $pass = Test::More::is($got, $expected,
+      $one_file->{file}.': "'.$test_group->{description}.'" - "'.$test->{description}.'"');
+    $pass = Test::More::fail($exception) if $exception;
+
+    return $pass;
+  }
+}
+
+has _json_decoder => (
+  is => 'ro',
+  isa => HasMethods[qw(encode decode)],
+  lazy => 1,
+  default => sub { JSON::MaybeXS->new(allow_nonref => 1, utf8 => 1) },
+);
+
+has _test_data => (
+  is => 'lazy',
+  isa => ArrayRef[Dict[
+           file => Str,
+           json => ArrayRef[Dict[
+             description => Str,
+             schema => InstanceOf['JSON::PP::Boolean']|HashRef,
+             tests => ArrayRef[Dict[
+               data => Any,
+               description => Str,
+               valid => InstanceOf['JSON::PP::Boolean'],
+             ]],
+           ]],
+          ]],
+);
+
+sub _build__test_data {
   my $self = shift;
-
-  my $mod_dir = Cwd::abs_path(__FILE__) =~ s~Acceptance\.pm~/test_suite~r; # Find the modules directory... ~
-
-  my $draft_dir = $mod_dir . "/tests/draft" . $self->{draft} . "/";
-
-  opendir (my $dir, $draft_dir) ;
-  my @test_files = grep { -f "$draft_dir/$_"} readdir $dir;
-  closedir $dir;
-  # warn Dumper(\@test_files);
-
   my @test_groups;
 
-  foreach my $file (@test_files) {
-    my $fn = $draft_dir . $file;
-    open ( my $fh, '<', $fn ) or die ("Could not open schema file $fn for read");
-    my $raw_json = '';
-    $raw_json .= $_ while (<$fh>);
-    close($fh);
-    my $parsed_json = JSON->new->allow_nonref->decode($raw_json);
-    # my $parsed_json = JSON::from_json($raw_json);
+  # note that we do not recurse into subdirs by default.
+  foreach my $file (sort $self->test_dir->children) {
+    next if not $file->is_file;
+    next if $file !~ /\.json$/;
 
-    push @test_groups, { file => $file, json => $parsed_json };
+    push @test_groups, {
+      file => $file->basename,
+      json => $self->_json_decoder->decode($file->slurp_raw),
+    };
   }
 
   return \@test_groups;
 }
 
-
-# Forces the two variables passed, into boolean context.
-sub _eq_bool {
-  return !(shift xor shift);
-}
-
-#pod =head1 ACKNOWLEDGEMENTS
-#pod
-#pod =for stopwords Signes
-#pod
-#pod Daniel Perrett <perrettdl@cpan.org> for the concept and help in design.
-#pod
-#pod Ricardo Signes <rjbs@cpan.org> for direction to and creation of Test::Fatal.
-#pod
-#pod Various others in #perl-help.
-#pod
-#pod =cut
-
-1; # End of Test::JSON::Schema::Acceptance
+1;
 
 __END__
 
@@ -222,7 +189,7 @@ __END__
 
 =encoding UTF-8
 
-=for stopwords validators
+=for stopwords validators Schemas ANDed ORed TODO
 
 =head1 NAME
 
@@ -230,11 +197,11 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 0.990
+version 0.992
 
 =head1 SYNOPSIS
 
-This module allows the L<JSON Schema Test Suite|https://github.com/json-schema/JSON-Schema-Test-Suite> tests to be used in perl to test a module that implements json-schema.
+This module allows the L<JSON Schema Test Suite|https://github.com/json-schema/JSON-Schema-Test-Suite> tests to be used in perl to test a module that implements the JSON Schema specification ("json-schema").
 These are the same tests that many modules (libraries, plugins, packages, etc.) use to confirm support of json-schema.
 Using this module to confirm support gives assurance of interoperability with other modules that run the same tests in different languages.
 
@@ -244,17 +211,15 @@ In the JSON::Schema module, a test could look like the following:
   use JSON::Schema;
   use Test::JSON::Schema::Acceptance;
 
-  my $accepter = Test::JSON::Schema::Acceptance->new(3);
+  my $accepter = Test::JSON::Schema::Acceptance->new(specification => 'draft3');
 
-  # Skip tests which are known not to be supported or which cause problems.
-  my $skip_tests = ['multiple extends', 'dependencies', 'ref'];
-
-  $accepter->acceptance( sub{
-    my ( $schema, $input ) = @_;
-    return JSON::Schema->new($schema)->validate($input);
-  }, {
-    skip_tests => $skip_tests
-  } );
+  $accepter->acceptance(
+    validate_data => sub {
+      my ($schema, $input_data) = @_;
+      return JSON::Schema->new($schema)->validate($input_data);
+    },
+    todo_tests => [ { file => 'dependencies.json' } ],
+  );
 
   done_testing();
 
@@ -264,38 +229,79 @@ This would determine if JSON::Schema's C<validate> method returns the right resu
 
 L<JSON Schema|http://json-schema.org> is an IETF draft (at time of writing) which allows you to define the structure of JSON.
 
-The abstract from L<draft 4|https://tools.ietf.org/html/draft-zyp-json-schema-04> of the specification:
+From the overview of the L<draft 2019-09 version of the
+specification|https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.3>:
 
 =over 4
 
-JSON Schema defines the media type "application/schema+json",
-a JSON based format for defining the structure of JSON data.
-JSON Schema provides a contract for what JSON data is required
-for a given application and how to interact with it.
-JSON Schema is intended to define validation, documentation,
-hyperlink navigation, and interaction control of JSON data.
+This document proposes a new media type "application/schema+json" to identify a JSON Schema for
+describing JSON data. It also proposes a further optional media type,
+"application/schema-instance+json", to provide additional integration features. JSON Schemas are
+themselves JSON documents. This, and related specifications, define keywords allowing authors to
+describe JSON data in several ways.
+
+JSON Schema uses keywords to assert constraints on JSON instances or annotate those instances with
+additional information. Additional keywords are used to apply assertions and annotations to more
+complex JSON data structures, or based on some sort of condition.
 
 =back
 
-L<JSON::Schema|https://metacpan.org/pod/JSON::Schema> is a perl module created independently of the specification, which aims to implement the json-schema specification.
+This module allows other perl modules (for example JSON::Schema) to test that they are JSON Schema-compliant, by running the tests from the official test suite, without having to manually convert them to perl tests.
 
-This module allows other perl modules (for example JSON::Schema) to test that they are json-schema compliant, by running the tests from the official test suite, without having to manually convert them to perl tests.
-
-You are unlikely to want this module, unless you are attempting to write a module which implements json-schema the specification, and want to test your compliance.
+You are unlikely to want this module, unless you are attempting to write a module which implements JSON Schema the specification, and want to test your compliance.
 
 =head1 CONSTRUCTOR
 
-=over 1
-
-=item C<< Test::JSON::Schema::Acceptance->new($schema_version) >>
+  Test::JSON::Schema::Acceptance->new(specification => $specification_version)
 
 Create a new instance of Test::JSON::Schema::Acceptance.
 
-Accepts optional argument of $schema_version.
+Available options are:
+
+=head2 specification
+
 This determines the draft version of the schema to confirm compliance to.
-Default is draft 4 (current), but in the synopsis example, JSON::Schema is testing draft 3 compliance.
+Possible values are:
+
+=over 4
+
+=item *
+
+C<draft3>
+
+=item *
+
+C<draft4>
+
+=item *
+
+C<draft6>
+
+=item *
+
+C<draft7>
+
+=item *
+
+C<draft2019-09>
+
+=item *
+
+C<latest> (alias for C<draft2019-09>)
 
 =back
+
+The default is C<latest>, but in the synopsis example, L<JSON::Schema> is testing draft 3 compliance.
+
+(For backwards compatibility, C<new> can be called with a single numeric argument of 3 to 7, which maps to
+C<draft3> through C<draft7>.)
+
+=head2 test_dir
+
+Instead of specifying a draft specification to test against, which will select the most appropriate tests,
+you can pass in the name of a directory of tests to run directly. Files in this directory should be F<.json>
+files following the format described in
+L<https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/master/README.md>.
 
 =head1 SUBROUTINES/METHODS
 
@@ -303,19 +309,86 @@ Default is draft 4 (current), but in the synopsis example, JSON::Schema is testi
 
 =for stopwords truthy falsey
 
-Accepts a sub and optional options in the form of a hash.
-The sub should return truthy or falsey depending on if the schema was valid for the input or not.
+Accepts a hash of options as its arguments.
 
-=head3 options
+(Backwards-compatibility mode: accepts a subroutine which is used as C<validate_json_string>,
+and a hashref of arguments.)
 
-The only option which is currently accepted is skip_tests, which should be an array ref of tests you want to skip.
-You can skip a whole section of tests or individual tests.
-Any test name that contains any of the array refs items will be skipped, using grep.
-You can also skip a test by its number.
+Available options are:
+
+=head3 validate_data
+
+A subroutine reference, which is passed two arguments: the JSON Schema, and the B<inflated> data
+structure to be validated.
+
+The subroutine should return truthy or falsey depending on if the schema was valid for the input or
+not.
+
+Either C<validate_data> or C<validate_json_string> is required.
+
+=head3 validate_json_string
+
+A subroutine reference, which is passed two arguments: the JSON Schema, and the B<JSON string>
+containing the data to be validated.
+
+The subroutine should return truthy or falsey depending on if the schema was valid for the input or
+not.
+
+Either C<validate_data> or C<validate_json_string> is required.
+
+=head3 tests
+
+Optional. Restricts tests to just those mentioned (the conditions are ANDed together, not ORed).
+The syntax can take one of many forms:
+
+  # run tests in this file
+  tests => { file => 'dependencies.json' }
+
+  # run tests in these files
+  tests => { file => [ 'dependencies.json', 'refRemote.json' ] }
+
+  # run tests in this file with this group description
+  tests => {
+    file => 'refRemote.json',
+    group_description => 'remote ref',
+  }
+
+  # run tests in this file with these group descriptions
+  tests => {
+    file => 'const.json',
+    group_description => [ 'const validation', 'const with object' ],
+  }
+
+  # run tests in this file with this group description and test description
+  tests => {
+    file => 'const.json',
+    group_description => 'const validation',
+    test_description => 'another type is invalid',
+  }
+
+  # run tests in this file with this group description and these test descriptions
+  tests => {
+    file => 'const.json',
+    group_description => 'const validation',
+    test_description => [ 'same value is valid', 'another type is invalid' ],
+  }
+
+=head3 todo_tests
+
+Optional. Mentioned tests will run as L<"TODO"|Test::More/TODO: BLOCK>. Uses arrayrefs of
+the same hashref structure as L</tests> above, which are ORed together.
+
+  todo_tests => [
+    # all tests in this file are TODO
+    { file => 'dependencies.json' },
+    # just some tests in this file are TODO
+    { file => 'boolean_schema.json', test_description => 'array is invalid' },
+    # .. etc
+  ]
 
 =head1 ACKNOWLEDGEMENTS
 
-=for stopwords Signes
+=for stopwords Perrett Signes
 
 Daniel Perrett <perrettdl@cpan.org> for the concept and help in design.
 
@@ -325,7 +398,7 @@ Various others in #perl-help.
 
 =head1 SUPPORT
 
-bugs may be submitted through L<https://github.com/karenetheridge/Test-JSON-Schema-Acceptance/issues>.
+Bugs may be submitted through L<https://github.com/karenetheridge/Test-JSON-Schema-Acceptance/issues>.
 
 =head1 AUTHOR
 
@@ -333,13 +406,9 @@ Ben Hutton (@relequestual) <relequest@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ben Hutton Karen Etheridge Daniel Perrett
+=for stopwords Karen Etheridge Ben Hutton Daniel Perrett
 
 =over 4
-
-=item *
-
-Ben Hutton <bh7@sanger.ac.uk>
 
 =item *
 
@@ -347,7 +416,7 @@ Karen Etheridge <ether@cpan.org>
 
 =item *
 
-Ben Hutton <relequestual@gmail.com>
+Ben Hutton <relequestual@cpan.org>
 
 =item *
 
@@ -362,5 +431,7 @@ This software is Copyright (c) 2015 by Ben Hutton.
 This is free software, licensed under:
 
   The MIT (X11) License
+
+=for Pod::Coverage BUILDARGS BUILD
 
 =cut

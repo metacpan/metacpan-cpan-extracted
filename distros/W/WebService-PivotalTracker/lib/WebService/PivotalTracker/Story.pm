@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Params::ValidationCompiler qw( validation_for );
 use WebService::PivotalTracker::Comment;
@@ -159,7 +159,7 @@ sub _build_comments {
             WebService::PivotalTracker::Comment->new(
                 raw_content => $_,
                 pt_api      => $self->_pt_api,
-                )
+            )
         } @{$raw_comments}
     ];
 }
@@ -215,7 +215,7 @@ sub _build_labels {
                 WebService::PivotalTracker::Label->new(
                     raw_content => $_,
                     pt_api      => $self->_pt_api,
-                    )
+                )
             } @{ $self->raw_content->{labels} }
         ];
     }
@@ -227,7 +227,7 @@ sub _build_labels {
             WebService::PivotalTracker::Label->new(
                 raw_content => $_,
                 pt_api      => $self->_pt_api,
-                )
+            )
         } @{$raw_labels}
     ];
 }
@@ -271,7 +271,7 @@ WebService::PivotalTracker::Story - A single story
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -402,7 +402,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by MaxMind, Inc.
+This software is Copyright (c) 2016 - 2020 by MaxMind, Inc.
 
 This is free software, licensed under:
 

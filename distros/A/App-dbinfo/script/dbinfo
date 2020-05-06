@@ -33,7 +33,7 @@ dbinfo - Get/extract information from database
 
 =head1 VERSION
 
-This document describes version 0.007 of dbinfo (from Perl distribution App-dbinfo), released on 2020-04-20.
+This document describes version 0.008 of dbinfo (from Perl distribution App-dbinfo), released on 2020-05-06.
 
 =head1 SYNOPSIS
 

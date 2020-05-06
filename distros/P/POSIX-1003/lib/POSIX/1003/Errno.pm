@@ -1,15 +1,19 @@
-# Copyrights 2011-2013 by [Mark Overmeer].
+# Copyrights 2011-2020 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.01.
-use warnings;
-use strict;
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution POSIX-1003.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package POSIX::1003::Errno;
 use vars '$VERSION';
-$VERSION = '0.98';
+$VERSION = '1.00';
 
 use base 'POSIX::1003::Module';
+
+use warnings;
+use strict;
 
 use Carp    'croak';
 
@@ -26,7 +30,6 @@ my  $errno;
 our %errno;
 
 BEGIN {
-    # initialize the :constants export tag
     $errno = errno_table;
     push @constants, keys %$errno;
     tie %errno, 'POSIX::1003::ReadOnlyTable', $errno;

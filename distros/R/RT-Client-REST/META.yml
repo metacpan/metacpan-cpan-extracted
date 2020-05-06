@@ -1,13 +1,7 @@
 ---
 abstract: 'Client for RT using REST API'
 author:
-  - 'Abhijit Menon-Sen <ams@wiw.org>'
-  - 'Dmitri Tikhonov <dtikhonov@yahoo.com>'
-  - 'Damien "dams" Krotkine <dams@cpan.org>'
-  - 'Dean Hamstead <dean@bytefoundry.com.au>'
-  - 'Miquel Ruiz <mruiz@cpan.org>'
-  - JLMARTIN
-  - SRVSH
+  - 'Dmitri Tikhonov'
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
@@ -50,6 +44,19 @@ requires:
 resources:
   homepage: https://github.com/RT-Client-REST/RT-Client-REST
   repository: https://github.com/RT-Client-REST/RT-Client-REST.git
-version: '0.57'
+version: '0.59'
+x_contributors:
+  - 'Abhijit Menon-Sen <ams@wiw.org>'
+  - 'belg4mit <belg4mit>'
+  - 'bobtfish <bobtfish@bobtfish.net>'
+  - 'Byron Ellacott <code@bje.id.au>'
+  - 'Dean Hamstead <djzort@cpan.org>'
+  - 'dkrotkine <dkrotkine@gmail.com>'
+  - 'Dmitri Tikhonov <dmitri@cpan.org>'
+  - 'Marco Pessotto <melmothx@gmail.com>'
+  - 'pplusdomain <pplusdomain@gmail.com>'
+  - 'Sarvesh D <sarveshd@openmailbox.org>'
+  - 'Søren Lund <soren@lund.org>'
+  - 'Tom Harrison <tomh@apnic.net>'
 x_generated_by_perl: v5.26.3
 x_serialization_backend: 'YAML::Tiny version 1.73'

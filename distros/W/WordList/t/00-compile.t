@@ -6,12 +6,17 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'WordList.pm',
-    'WordList/Namespace.pm',
-    'WordList/Test/OneTwo.pm'
+    'WordList/Test/Dynamic/OneTwo_Each.pm',
+    'WordList/Test/Dynamic/OneTwo_EachParam.pm',
+    'WordList/Test/Dynamic/OneTwo_FirstNextReset.pm',
+    'WordList/Test/OneTwo.pm',
+    'WordListRole/EachFromFirstNextReset.pm',
+    'WordListRole/FirstNextResetFromEach.pm',
+    'WordListRole/WordList.pm'
 );
 
 

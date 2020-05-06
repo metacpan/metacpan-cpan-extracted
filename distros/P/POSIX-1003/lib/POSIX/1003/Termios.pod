@@ -4,14 +4,6 @@
 
 POSIX::1003::Termios - POSIX general terminal interface
 
-=head1 INHERITANCE
-
- POSIX::1003::Termios
-   is a POSIX::1003::Module
-
- POSIX::1003::Termios
-   is a POSIX::Termios
-
 =head1 SYNOPSIS
 
   use POSIX::1003::Termios qw(:speed);
@@ -31,23 +23,7 @@ POSIX::1003::Termios - POSIX general terminal interface
 This module provides an interface to the "General Terminal Interfaces",
 as specified by POSIX. The actual implementation is part of POSIX.xs
 
-See L<documentation in the base class|POSIX::1003::Module/"DESCRIPTION">.
- 
 =head1 METHODS
-
-See L<documentation in the base class|POSIX::1003::Module/"METHODS">.
- 
-=over 4
-
-=item POSIX::1003::Termios-E<gt>B<exampleValue>(NAME)
-
-See L<POSIX::1003::Module/"METHODS">
-
-=item $obj-E<gt>B<import>()
-
-See L<POSIX::1003::Module/"METHODS">
-
-=back
 
 =head2 Constructors
 
@@ -67,7 +43,7 @@ termios C struct.
 
 =over 4
 
-=item $obj-E<gt>B<getattr>([FD])
+=item $obj-E<gt>B<getattr>( [$fd] )
 
 Get terminal control attributes (POSIX function C<tcgetattr>). Pass a file
 descriptor, which defaults to C<0> (stdin). Returns C<undef> on failure.
@@ -79,7 +55,7 @@ descriptor, which defaults to C<0> (stdin). Returns C<undef> on failure.
   # Obtain the attributes for stdout
   $termios->getattr(1);
 
-=item $obj-E<gt>B<getcc>(INDEX)
+=item $obj-E<gt>B<getcc>($index)
 
 Retrieve a value from the C<c_cc> field of a termios object. The c_cc field is
 an array so an index must be specified.
@@ -115,7 +91,7 @@ Retrieve the C<c_oflag> field of a termios object.
 Retrieve the output baud rate.
   $ospeed = $termios->getospeed;
 
-=item $obj-E<gt>B<setattr>(FD, FLAGS)
+=item $obj-E<gt>B<setattr>($fd, $flags)
 
 Set terminal control attributes (POSIX function C<tcsetattr>).  Returns
 C<undef> on failure.
@@ -123,18 +99,18 @@ C<undef> on failure.
   # Set attributes immediately for stdout.
   $termios->setattr(1, TCSANOW);
 
-=item $obj-E<gt>B<setcc>(VALUE, INDEX)
+=item $obj-E<gt>B<setcc>($value, $index)
 
 Set a value in the C<c_cc> field of a termios object.  The c_cc field is an
 array so an index must be specified.
   $termios->setcc(VEOF, 1 );
 
-=item $obj-E<gt>B<setcflag>(FLAGS)
+=item $obj-E<gt>B<setcflag>($flags)
 
 Set the C<c_cflag> field of a termios object.
   $termios->setcflag( $c_cflag | CLOCAL );
 
-=item $obj-E<gt>B<setiflag>(FLAGS)
+=item $obj-E<gt>B<setiflag>($flags)
 
 Set the C<c_iflag> field of a termios object.
   $termios->setiflag( $c_iflag | BRKINT );
@@ -144,12 +120,12 @@ Set the C<c_iflag> field of a termios object.
 Set the input baud rate.  Returns C<undef> on failure.
   $termios->setispeed( B9600 );
 
-=item $obj-E<gt>B<setlflag>(FLAGS)
+=item $obj-E<gt>B<setlflag>($flags)
 
 Set the C<c_lflag> field of a termios object.
   $termios->setlflag( $c_lflag | ECHO );
 
-=item $obj-E<gt>B<setoflag>(FLAGS)
+=item $obj-E<gt>B<setoflag>($flags)
 
 Set the c_oflag field of a termios object.
   $termios->setoflag( $c_oflag | OPOST );
@@ -165,21 +141,21 @@ Set the output baud rate.
 
 =over 4
 
-=item B<tcdrain>(FD)
+=item B<tcdrain>($fd)
 
-=item B<tcflow>(FD, ACTION)
+=item B<tcflow>($fd, $action)
 
-See the possible ACTION values in L</CONSTANTS>, import tag C<:action>
+See the possible $action values in L</CONSTANTS>, import tag C<:action>
 
-=item B<tcflush>(FD, QUEUE)
+=item B<tcflush>($fd, $queue)
 
-See the possible QUEUE values in L</CONSTANTS>, import tag C<:flush>
+See the possible $queue values in L</CONSTANTS>, import tag C<:flush>
 
-=item B<tcsendbreak>(FD, DURATION)
+=item B<tcsendbreak>($fd, $duration)
 
-DURATION is system dependent.
+$duration is system dependent.
 
-=item B<ttyname>(FD)
+=item B<ttyname>($fd)
 
 Returns the path to the special device which relates to the file-descriptor.
 See also L<POSIX::1003::Proc::ctermid()|POSIX::1003::Proc/"Standard POSIX functions from unistd.h">
@@ -236,48 +212,24 @@ of this module:
 =for comment
 #TABLE_TERMIOS_START
 
-  B0         0          ICANON     2          TCIOFLUSH  2
-  B110       3          ICRNL      256        TCION      3
-  B1200      9          IEXTEN     32768      TCOFLUSH   1
-  B134       4          IGNBRK     1          TCOOFF     0
-  B150       5          IGNCR      128        TCOON      1
-  B1800      10         IGNPAR     4          TCSADRAIN  1
-  B19200     14         INLCR      64         TCSAFLUSH  2
-  B200       6          INPCK      16         TCSANOW    0
-  B2400      11         ISIG       1          TOSTOP     256
-  B300       7          ISTRIP     32         VEOF       4
-  B38400     15         IXOFF      4096       VEOL       11
-  B4800      12         IXON       1024       VERASE     2
-  B50        1          NCCS       32         VINTR      0
-  B600       8          NOFLSH     128        VKILL      3
-  B75        2          OPOST      1          VMIN       6
-  B9600      13         PARENB     256        VQUIT      1
-  BRKINT     2          PARMRK     8          VSTART     8
-  CLOCAL     2048       PARODD     512        VSTOP      9
-  ECHONL     64         TCIFLUSH   0          VSUSP      10
-  HUPCL      1024       TCIOFF     2          VTIME      5
-
+  During installation, a symbol table will get inserted here.
 
 =for comment
 #TABLE_TERMIOS_END
 
-
-
-
-
 =head1 SEE ALSO
 
-This module is part of POSIX-1003 distribution version 0.98,
-built on December 03, 2013. Website: F<http://perl.overmeer.net>.  The code is based on L<POSIX>, which
+This module is part of POSIX-1003 distribution version 1.00,
+built on May 05, 2020. Website: F<http://perl.overmeer.net/CPAN>.  The code is based on L<POSIX>, which
 is released with Perl itself.  See also L<POSIX::Util> for
 additional functionality.
 
 =head1 COPYRIGHTS
 
-Copyrights 2011-2013 on the perl code and the related documentation
+Copyrights 2011-2020 on the perl code and the related documentation
  by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

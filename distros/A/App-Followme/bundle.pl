@@ -46,7 +46,7 @@ chdir($Bin);
 rename("$output.TMP", $output);
 
 #----------------------------------------------------------------------
-# Append a text file to the bundle
+# Append a binary file to the bundle
 
 sub append_binary_file {
     my ($out, $file) = @_;
@@ -85,7 +85,7 @@ sub append_text_file {
 }
 
 #----------------------------------------------------------------------
-# Append a text file to the bundle
+# Append a file to the bundle
 
 sub bundle_file {
     my ($out, $file) = @_;

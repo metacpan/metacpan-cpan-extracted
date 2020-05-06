@@ -8,13 +8,21 @@ use Importer 'NewsExtractor::TextUtil' => 'normalize_whitespace';
 sub journalist {
     my ($self) = @_;
     my $content_text = $self->content_text;
-    my ($name) = $content_text =~ m{\b記者([\p{Letter}、]+?)／(?:\p{Letter}+?)報導\b};
-    unless ($name) {
-	($name) = $content_text =~ m{\b(?:娛樂|財經|政治|鄉民|社會|體育|生活|國際)中心／(\p{Letter}+?)報導\n};
+
+    my @patterns = (
+        qr{\b記者\s*([\p{Letter}、]+?)\s*／\s*(?:\p{Letter}+?)報導\b},
+        qr{\b文／([\p{Letter}、]+)\b},
+        qr{\b (?:三立準氣象 | \p{Letter}{2} 中心) ／ (\p{Letter}+?) 報導\b}x,
+    );
+
+    my $name;
+
+    for my $pat (@patterns) {
+        ($name) = $content_text =~ $pat;
+        last if defined $name;
     }
-    my %exclude = map { $_ => 1 } qw(綜合 台北);
-    return '' if $exclude{$name};
-    return normalize_whitespace($name);
+
+    return $name && normalize_whitespace($name);
 }
 
 1;

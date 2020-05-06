@@ -1,6 +1,6 @@
 <TMPL_INCLUDE NAME="header.tpl">
 
-  <title>LemonLDAP::NG sessions explorer</title>
+  <title>LemonLDAP::NG Sessions explorer</title>
 </head>
 
 <body ng-app="llngSessionsExplorer" ng-controller="SessionsExplorerCtrl" ng-csp>
@@ -16,7 +16,7 @@
         <div class="navbar-collapse">
           <ul class="nav navbar-nav" role="grid">
             <li uib-dropdown>
-              <a id="navsso" name="menu" uib-dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="glyphicon glyphicon-user"></i> {{translate('ssoSessions')}} <span class="caret"></span></a>
+              <a id="navsso" name="menu" uib-dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" ng-style="navssoStyle"><i class="glyphicon glyphicon-user"></i> {{translate('ssoSessions')}} <span class="caret"></span></a>
               <ul uib-dropdown-menu aria-labelled-by="navsso">
                 <li><a id="a-users" href="#" role="row"><i class="glyphicon glyphicon-user"></i> {{translate('users')}}</a></li>
                 <li><a id="a-ip" href="#!/ipAddr" role="row"><i class="glyphicon glyphicon-sort-by-order"></i> {{translate('ipAddresses')}}</a></li>
@@ -25,17 +25,17 @@
                 <li><a id="a-updatetime" href="#!/_updateTime" role="row"><i class="glyphicon glyphicon-hourglass"></i> {{translate('_updateTime')}}</a></li>
               </ul>
             </li>
-            <li><a id="a-persistent" href="#!/persistent" role="row"><i class="glyphicon glyphicon-lock"></i> {{translate('persistentSessions')}}</a></li>
-            <li><a id="a-offline" href="#!/offline" role="row"><i class="glyphicon glyphicon-time"></i> {{translate('offlineSessions')}}</a></li>
+            <li><a id="a-persistent" href="#!/persistent" role="row" ng-style="persistentStyle"><i class="glyphicon glyphicon-lock"></i> {{translate('persistentSessions')}}</a></li>
+            <li><a id="a-offline" href="#!/offline" role="row" ng-style="offlineStyle"><i class="glyphicon glyphicon-time"></i> {{translate('offlineSessions')}}</a></li>
           </ul>
         </div>
       </div>
-      <div class="text-center"><p class="badge">{{total}} <span trspan="session_s"></span></p></div>
+      <div ng-show="data.length!=0" class="text-center"><p class="badge">{{total}} {{translate('session_s')}}</p></div>
       <div class="region region-sidebar-first">
         <section id="block-superfish-1" class="block block-superfish clearfix">
           <div ui-tree data-drag-enabled="false" id="tree-root">
             <div ng-show="data.length==0" class="center">
-              <span class="label label-warning" trspan="noDatas"></span>
+              <span class="label label-warning">{{translate('noData')}}</span>
             </div>
             <ol ui-tree-nodes="" ng-model="data">
               <li ng-repeat="node in data track by node.id" ui-tree-node ng-include="'nodes_renderer.html'" collapsed="true"></li>
@@ -60,6 +60,9 @@
                 <li ng-repeat="link in links"><a href="{{link.target}}" role="row"><i ng-if="link.icon" class="glyphicon glyphicon-{{link.icon}}"></i> {{translate(link.title)}}</a></li>
                 <li ng-repeat="menulink in menulinks"><a href="{{menulink.target}}" role="row"><i ng-if="menulink.icon" class="glyphicon glyphicon-{{menulink.icon}}"></i> {{translate(menulink.title)}}</a></li>
                 <li ng-include="'languages.html'"></li>
+                <TMPL_IF NAME="INSTANCE_NAME">
+                  <li><a href="https://lemonldap-ng.org"><TMPL_VAR NAME="INSTANCE_NAME"></a></li>
+                </TMPL_IF>
               </ul>
             </li>
           </ul>
@@ -95,7 +98,8 @@
       </table>
     </div>
     <div ng-if="!node.nodes">
-       <th ng-if="node.td!='1' && node.td!='2'"><span title="{{node.title}}">{{translate(node.title)}}</span></th>
+       <th ng-if="node.title=='type'"><span title="{{node.title}}">{{translate(node.title)}}</span></th>
+       <th ng-if="node.td!='1' && node.td!='2' && node.title!='type'"><span title="{{node.title}}">{{node.title}}</span></th>
        <td class="data-{{node.epoch}}" ng-if="node.td>='1'">{{node.title}}</td>
        <th ng-if="node.title=='type' || node.title=='rp'">{{translate(node.value)}}</th>
        <td id="v-{{node.title}}" class="col-md-4 data-{{node.epoch}}" ng-if="node.title!='type' && node.title!='rp'">{{node.value}}</td>

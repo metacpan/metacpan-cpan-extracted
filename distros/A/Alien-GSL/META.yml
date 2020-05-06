@@ -2,12 +2,14 @@
 abstract: 'Easy installation of the GNU Scientific Library'
 author:
   - 'Joel A. Berger <joel.a.berger@gmail.com>'
-build_requires: {}
+build_requires:
+  IO::Socket::SSL: '1.56'
+  Net::SSLeay: '1.49'
 configure_requires:
   Alien::Base::ModuleBuild: '0'
   Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,15 +18,14 @@ name: Alien-GSL
 provides:
   Alien::GSL:
     file: lib/Alien/GSL.pm
-    version: '1.01'
+    version: '1.02'
 requires:
   Alien::Base: '0'
-  File::ShareDir: '1.00'
   parent: '0'
   perl: v5.8.1
 resources:
   bugtracker: https://github.com/Perl5-Alien/Alien-GSL/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Perl5-Alien/Alien-GSL
-version: '1.01'
+version: '1.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

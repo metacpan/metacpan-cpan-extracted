@@ -1,0 +1,17 @@
+Revision history for FFI-C},
+
+0.04      2020-05-05 09:24:13 -0600
+  - non-generated struct/union objects properly support can (gh#28)
+  - Added nullable property to FFI::C::Def class (gh#30)
+
+0.03      2020-05-03 15:57:56 -0600
+  - Allow creating variable array with array ref initalization (gh#27)
+    (that this was missing from the initial release was an oversight)
+
+0.02      2020-05-03 07:57:00 -0600
+  - Fixed floating point tests with longdouble and quadmath Perls (gh#24, gh#25)
+
+0.01      2020-05-02 17:15:38 -0600
+  - initial version
+
+

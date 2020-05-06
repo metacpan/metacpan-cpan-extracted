@@ -1,6 +1,9 @@
+.github/workflows/perl.yml
 bin/db-iris
 Build.PL
 Changelog
+cpanfile
+Dockerfile
 examples/traintrack
 lib/Travel/Status/DE/IRIS.pm
 lib/Travel/Status/DE/IRIS/Result.pm
@@ -11,6 +14,8 @@ README.md
 scripts/acronyms.pl
 scripts/acronyms.sh
 scripts/debug
+scripts/makedeb-docker
+scripts/makedeb-docker-helper
 share/csv2json
 share/enhance
 share/json2csv

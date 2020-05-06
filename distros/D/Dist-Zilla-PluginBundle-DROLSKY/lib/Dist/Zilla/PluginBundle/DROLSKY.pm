@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Devel::PPPort 3.42;
 use Dist::Zilla 6.0;
@@ -50,7 +50,7 @@ use Dist::Zilla::Plugin::MojibakeTests;
 use Dist::Zilla::Plugin::NextRelease;
 use Dist::Zilla::Plugin::PPPort;
 use Dist::Zilla::Plugin::PodSyntaxTests;
-use Dist::Zilla::Plugin::PromptIfStale 0.050;
+use Dist::Zilla::Plugin::PromptIfStale 0.056;
 use Dist::Zilla::Plugin::ReadmeAnyFromPod;
 use Dist::Zilla::Plugin::SurgicalPodWeaver;
 use Dist::Zilla::Plugin::Test::CPAN::Changes;
@@ -566,8 +566,6 @@ sub _dist_uses_test2 {
 }
 
 sub _prompt_if_stale_plugin {
-    my $self = shift;
-
     my $name = __PACKAGE__;
     return (
         [
@@ -590,27 +588,11 @@ sub _prompt_if_stale_plugin {
                         Dist::Zilla::Plugin::DROLSKY::TidyAll
                         Dist::Zilla::Plugin::DROLSKY::WeaverConfig
                         Pod::Weaver::PluginBundle::DROLSKY
-                        ),
-                    $self->_inc_packages,
+                        )
                 ],
             }
         ],
     );
-}
-
-sub _inc_packages {
-    return unless -d 'inc';
-
-    my @packages;
-    my $rule = Path::Tiny::Rule->new;
-    my $iter = $rule->file->name(qr/\.pm$/)->iter('inc');
-    while ( my $pm = $iter->() ) {
-        my ($first) = $pm->lines( { count => 1 } );
-        push @packages, $1
-            if $first =~ /package (inc::.+);/;
-    }
-
-    return @packages;
 }
 
 sub _pod_test_plugins {
@@ -878,7 +860,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 
@@ -977,7 +959,7 @@ This is more or less equivalent to the following F<dist.ini>:
 
     [MetaResources]
     homepage = https://metacpan.org/release/My-Module
-    ; RT bits are omitted if use_github_issue is true
+    ; RT bits are omitted if use_github_issues is true
     bugtracker.web  = https://rt.cpan.org/Public/Dist/Display.html?Name=My-Module
     bugtracker.mail = bug-My-Module@rt.cpan.org
 
@@ -993,13 +975,13 @@ This is more or less equivalent to the following F<dist.ini>:
     ; Width is configured by setting next_release_width for the bundle
     format = %-8v %{yyyy-MM-dd}d%{ (TRIAL RELEASE)}T
 
-    ; Scans the test files for use of Test2 and picks either
+    ; Scans the test files for use of Test2 and picks either this:
     [Prereqs / Test::More with Test2]
     -phase = test
     -type  = requires
     Test::More = 1.302015
 
-    ; If the distro doesn't use Test2
+    ; or, if the distro doesn't use Test2:
     [Prereqs / Test::More with subtest]
     -phase = test
     -type  = requires
@@ -1033,7 +1015,6 @@ This is more or less equivalent to the following F<dist.ini>:
     skip = Dist::Zilla::Plugin::DROLSKY::License
     skip = Dist::Zilla::Plugin::DROLSKY::TidyAll
     skip = Pod::Weaver::PluginBundle::DROLSKY
-    ; also skips any package starting with inc:: that lives in the inc/ dir.
 
     [Test::Pod::Coverage::Configurable]
     ; Configured by setting pod_coverage_class for the bundle

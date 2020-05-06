@@ -3,6 +3,7 @@ Changes
 lib/File/BOM.pm
 Makefile.PL
 MANIFEST
+META.json
 META.yml			Module meta-data (added by MakeMaker)
 README
 README-cygwin
@@ -14,5 +15,5 @@ t/04..pod.t
 t/99..shutdown.t
 t/data/broken_bom.txt
 t/lib/Test/Framework.pm
+testrules.yml
 TODO
-META.json

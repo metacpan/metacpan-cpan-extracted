@@ -15,7 +15,7 @@ use App::Followme::Web;
 
 use base qw(App::Followme::ConfiguredObject);
 
-our $VERSION = "1.92";
+our $VERSION = "1.93";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -280,9 +280,7 @@ retrieve the data from the file.
 =item $file = $self->to_file($file);
 
 A convenience method that converts a folder name to an index file name,
-otherwise passthe file name.
-
-unchaned.
+otherwise pass the file name unchanged.
 
 =back
 

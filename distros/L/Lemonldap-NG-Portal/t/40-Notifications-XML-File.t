@@ -99,7 +99,7 @@ SKIP: {
         'Auth query'
     );
     expectOK($res);
-    my $id = expectCookie($res);
+    $id = expectCookie($res);
     expectForm( $res, undef, '/notifback', 'reference1x1', 'url' );
 
     # Verify that cookie is ciphered (session unvalid)

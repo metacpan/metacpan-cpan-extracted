@@ -1,5 +1,17 @@
 Revision history for Text-Hspell
 
+0.2.5       2020-05-05
+    - Change ["-lhspell", "-lz"] to ["-lhspell -lz"] to try fixing CPAN testers
+    failures on Debian/Ubuntu/etc.
+        - Tested in an Ubuntu 16.04 VM.
+        - https://github.com/shlomif/Text-Hspell/issues/1
+        - Thanks to @eserte .
+
+0.2.4       2020-05-04
+    - Link to zlib / "-lz" to try to avoid CPAN testers failures on debian/etc.
+        - https://github.com/shlomif/Text-Hspell/issues/1
+        - Thanks to @eserte .
+
 0.2.3       2020-04-29
     - Add tests under t/*.t for CPANTS.
     - CPANTS min perl version.

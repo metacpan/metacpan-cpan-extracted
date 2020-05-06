@@ -1,6 +1,7 @@
 Build.PL
 Changes
 examples/bbio-tickit-ui.pl
+examples/read-adc.pl
 examples/set-pwm.pl
 lib/Device/BusPirate.pm
 lib/Device/BusPirate/Mode.pm

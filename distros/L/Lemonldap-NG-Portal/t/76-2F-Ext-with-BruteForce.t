@@ -72,11 +72,10 @@ ok(
     ),
     '4th Bad Auth query -> Rejected'
 );
-count(1);
-ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/, 'Protection enabled' );
-count(1);
+ok( $res->[2]->[0] =~ /<span trmsg="86">/, 'Protection enabled' );
+count(2);
 
-# Cool down
+# Count down
 Time::Fake->offset("+2s");
 
 # Try to authenticate
@@ -93,7 +92,8 @@ ok(
 count(1);
 
 my ( $host, $url, $query ) =
-  expectForm( $res, undef, '/ext2fcheck?skin=bootstrap', 'token', 'code', 'checkLogins' );
+  expectForm( $res, undef, '/ext2fcheck?skin=bootstrap', 'token', 'code',
+    'checkLogins' );
 
 ok(
     $res->[2]->[0] =~
@@ -112,10 +112,8 @@ ok(
     ),
     'Post code'
 );
-count(1);
-
-ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/, 'Protection enabled' );
-count(1);
+ok( $res->[2]->[0] =~ /<span trmsg="86">/, 'Protection enabled' );
+count(2);
 
 # Cool down
 Time::Fake->offset("+6s");
@@ -134,14 +132,14 @@ ok(
 count(1);
 
 ( $host, $url, $query ) =
-  expectForm( $res, undef, '/ext2fcheck?skin=bootstrap', 'token', 'code', 'checkLogins' );
+  expectForm( $res, undef, '/ext2fcheck?skin=bootstrap', 'token', 'code',
+    'checkLogins' );
 
 ok(
     $res->[2]->[0] =~
 qr%<input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code" autocomplete="off" />%,
     'Found EXTCODE input'
 ) or print STDERR Dumper( $res->[2]->[0] );
-count(1);
 
 $query =~ s/code=/code=123456/;
 ok(
@@ -153,17 +151,16 @@ ok(
     ),
     'Post code'
 );
-count(1);
+count(2);
 
 my $id = expectCookie($res);
 
 ok( $res->[2]->[0] =~ /trspan="lastLogins"/, 'History found' )
   or print STDERR Dumper( $res->[2]->[0] );
-count(1);
 my @c = ( $res->[2]->[0] =~ /<td>127.0.0.1/gs );
-ok( @c == 5, 'Five entries found' )
+ok( @c == 6, 'Six entries found' )
   or print STDERR Dumper( $res->[2]->[0] );
-count(1);
+count(2);
 
 $client->logout($id);
 clean_sessions();

@@ -4,13 +4,13 @@
       "Matt Lawrence E<lt>mattlaw@cpan.orgE<gt>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4212",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "File-BOM",
    "prereqs" : {
@@ -37,14 +37,23 @@
    "provides" : {
       "File::BOM" : {
          "file" : "lib/File/BOM.pm",
-         "version" : "0.16"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://github.com/mattlaw/File-BOM.git"
+      },
+      "x_type" : "git",
+      "x_web" : "https://github.com/mattlaw/File-BOM"
    },
-   "version" : "0.16"
+   "version" : "0.18",
+   "x_meta_spec" : {
+      "version" : 2
+   },
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

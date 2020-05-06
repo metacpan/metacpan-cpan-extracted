@@ -523,6 +523,28 @@ SKIP: {
    $loop->remove( $function );
 }
 
+# exit by POSIX::_exit
+{
+   # We can't easily turn this into an assertion test, but if the required
+   # behaviour doesn't hold then the test script will be killed early and
+   # prove will notice this.
+
+   my $testpid = $$;
+   END { kill $testpid if defined $testpid and $testpid != $$ }
+
+   my $function = IO::Async::Function->new(
+      code => sub {},
+   );
+
+   $loop->add( $function );
+
+   $function->call( args => [] )->get;
+
+   $function->stop;
+
+   undef $testpid;
+}
+
 # max_worker_calls
 {
    my $counter;

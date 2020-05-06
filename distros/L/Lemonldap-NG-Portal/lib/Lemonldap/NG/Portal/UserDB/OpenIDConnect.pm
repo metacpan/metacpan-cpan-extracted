@@ -4,6 +4,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
+  PE_ERROR
   PE_OK
 );
 
@@ -24,6 +25,13 @@ sub init {
 sub getUser {
     my ( $self, $req ) = @_;
     my $op = $req->data->{_oidcOPCurrent};
+
+    # This is likely to happen when running getUser without extractFormInfo
+    # see #1980
+    unless ($op) {
+        $self->logger->warn("No OP found in current session");
+        return PE_ERROR;
+    }
 
     my $access_token = $req->data->{access_token};
 

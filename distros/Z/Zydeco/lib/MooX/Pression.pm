@@ -10,7 +10,7 @@ use warnings;
 package MooX::Pression;
 use Zydeco ();
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.517';
+our $VERSION   = '0.518';
 our @ISA       = 'Zydeco';
 *PACKAGE_SPEC  = \&Zydeco::PACKAGE_SPEC;
 1;

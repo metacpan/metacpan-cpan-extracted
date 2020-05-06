@@ -5,7 +5,7 @@ use IO::File;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
 
-use Test::Requires 'GD';
+use Test::Requires 'Image::Size';
 use Test::More tests => 6;
 
 #----------------------------------------------------------------------
@@ -29,7 +29,7 @@ mkdir $test_dir;
 chdir $test_dir;
 
 my %configuration = (
-\                   extension => 'jpg',
+                    extension => 'jpg',
                     thumb_suffix => '-thumb',
                     );
 

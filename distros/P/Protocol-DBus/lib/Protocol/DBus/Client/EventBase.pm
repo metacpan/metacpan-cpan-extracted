@@ -100,8 +100,30 @@ sub on_message {
     return $self;
 }
 
+=head2 $obj = I<OBJ>->on_failure( $HANDLER_CR )
+
+Set this to receive a copy of whatever error kills the connection.
+If not set, such an error will be warn()ed.
+
+=cut
+
+sub on_failure {
+    my ($self, $cb) = @_;
+
+    $self->{'_on_failure'} = $cb;
+
+    return $self;
+}
+
 #----------------------------------------------------------------------
 
+sub _on_failure {
+    my ($self, $cb) = @_;
+
+    $self->{'_on_failure'} = $cb;
+
+    return $self;
+}
 
 sub _create_system {
     return $_[0]->_create(
@@ -136,17 +158,43 @@ sub _create_get_message_callback {
     my $on_message_cr_r = $self->{'_on_message_r'} ||= \do { my $v = undef };
     my $on_signal_cr_r = $self->{'_on_signal_r'} ||= \do { my $v = undef };
 
+    my $on_failure_cr_r = \$self->{'_on_failure'};
+    my $stop_reading_cr_r = \$self->{'_stop_reading_cr'};
+
     return sub {
-        while (my $msg = $dbus->get_message()) {
-            if ($$on_message_cr_r) {
-                $$on_message_cr_r->($msg);
+        my $ok = eval {
+            while (my $msg = $dbus->get_message()) {
+                if ($$on_message_cr_r) {
+                    $$on_message_cr_r->($msg);
+                }
+
+                if ($$on_signal_cr_r && $msg->type_is('SIGNAL')) {
+                    $$on_signal_cr_r->($msg);
+                }
             }
 
-            if ($$on_signal_cr_r && $msg->type_is('SIGNAL')) {
-                $$on_signal_cr_r->($msg);
+            1;
+        };
+
+        if (!$ok) {
+            my $err = $@;
+
+            if (my $cr = $$on_failure_cr_r) {
+                $cr->($err);
             }
+            else {
+                warn $err;
+            }
+
+            $$stop_reading_cr_r->();
         }
     };
+}
+
+sub DESTROY {
+    if (defined ${^GLOBAL_PHASE} && 'DESTROY' eq ${^GLOBAL_PHASE}) {
+        warn "$_[0] lasted until ${^GLOBAL_PHASE} phase!";
+    }
 }
 
 1;

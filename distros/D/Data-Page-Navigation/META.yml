@@ -3,24 +3,42 @@ abstract: 'adds methods for page navigation link to Data::Page'
 author:
   - 'Masahiro Nagano <kazeburo {at} gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
-distribution_type: module
-generated_by: 'Module::Install version 1.00'
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Data-Page-Navigation
 no_index:
   directory:
-    - inc
     - t
     - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Data::Page::Navigation:
+    file: lib/Data/Page/Navigation.pm
+    version: '0.07'
 requires:
-  Data::Page: 2
+  Data::Page: '2'
+  Test::More: '0'
 resources:
-  license: http://dev.perl.org/licenses/
+  bugtracker: https://github.com/kazeburo/Data-Page-Navigation/issues
+  homepage: https://github.com/kazeburo/Data-Page-Navigation
   repository: git://github.com/kazeburo/Data-Page-Navigation.git
-version: 0.06
+version: '0.07'
+x_contributors:
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+  - 'Naoki Tomita <tomita@cpan.org>'
+  - 'Takahiro Shimizu <takah@astrea.jp>'
+  - 'Yuki Kimoto <kimoto.yuki@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

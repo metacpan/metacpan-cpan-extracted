@@ -39,6 +39,22 @@ my $prom = Net::Prometheus->new;
       qr/^the_distribution_bytes_count 1\nthe_distribution_bytes_sum 10000/m,
       'Net::Prometheus->render contains Histogram metric'
    );
+
+   # Buckets
+   my @buckets = grep { m/^the_distribution_bytes_bucket/ } split m/\n/, $prom->render;
+   is_deeply( \@buckets,
+      [
+         'the_distribution_bytes_bucket{le="100"} 0',
+         'the_distribution_bytes_bucket{le="1000"} 0',
+         'the_distribution_bytes_bucket{le="10000"} 1',
+         'the_distribution_bytes_bucket{le="100000"} 1',
+         'the_distribution_bytes_bucket{le="1000000"} 1',
+         'the_distribution_bytes_bucket{le="10000000"} 1',
+         'the_distribution_bytes_bucket{le="100000000"} 1',
+         'the_distribution_bytes_bucket{le="+Inf"} 1',
+      ],
+      'Net::Prometheus->render contains correct Histogram buckets'
+   );
 }
 
 # gauges

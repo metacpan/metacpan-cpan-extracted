@@ -13,7 +13,7 @@ displayError = (j, status, err) ->
 	console.log 'Error', err
 	res = JSON.parse j.responseText
 	if res and res.error
-		res = res.error.replace /.* /, ''
+		res = res.error.replace(/.* /, '')
 		console.log 'Returned error', res
 		setMsg res, 'warning'
 
@@ -83,7 +83,5 @@ verify = ->
 					
 $(document).ready ->
 	getKey(0)
-	$('#changekey').on 'click', () ->
-		getKey(1)
-	$('#verify').on 'click', () ->
-		verify()
+	$('#changekey').on 'click', () -> getKey(1)
+	$('#verify').on 'click', () -> verify()

@@ -1,5 +1,7 @@
 require 5.008;
 
+use lib '.';
+
 # do we have threads/forks?
 BEGIN { eval "use Devel::ThreadsForks; 1" || do 'threadsforks' } #BEGIN
 

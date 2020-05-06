@@ -1,5 +1,14 @@
 Revision history for Device-BusPirate
 
+0.19    2020-05-02
+        [CHANGES]
+         * Use ->syswrite_exactly from Future::IO 0.04
+         * Self-cycle the ->write futures in case caller doesn't hold onto
+           them
+         * Added ->read_adc_voltage + example program
+         * More PIRATE_DEBUG debug printing
+         * Updated included Tickit example to latest Tickit::Widgets 0.30
+
 0.18    2019-04-25 23:01:19
         [CHANGES]
          * Use ->sysread_exactly from Future::IO 0.03

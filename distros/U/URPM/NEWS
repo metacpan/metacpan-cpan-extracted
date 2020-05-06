@@ -1,3 +1,8 @@
+Version 5.28 - 30 April 2020
+
+- actually support deps on patched Mageia[23]'s rpm-4.11
+- fix compiling with rpm-4.10 (eg: Debian 7 Wheezy)
+
 Version 5.27 - 29 April 2020
 
 - fix testing on pre UsrMove Linuxes (eg: mga2)

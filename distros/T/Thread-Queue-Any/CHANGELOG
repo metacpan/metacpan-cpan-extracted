@@ -1,3 +1,6 @@
+0.16	5 May 2020
+	Exit early in the Makefile if on an unthreadable perl
+
 0.15	9 November 2019
 	Adopted
 

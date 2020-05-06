@@ -1,5 +1,5 @@
 {
-   "abstract" : "simplify your unit tests writing based on Test::Class",
+   "abstract" : "Simplify your unit tests writing based on Test::Class",
    "author" : [
       "Oleksii Kysil"
    ],
@@ -22,7 +22,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Metadata" : "0"
          }
       },
       "configure" : {
@@ -38,7 +39,7 @@
             "Test::MockModule" : "0.13",
             "Test::MockObject::Extends" : "1.20161202",
             "parent" : "0",
-            "perl" : "5.008004",
+            "perl" : "5.010000",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -47,7 +48,7 @@
    "provides" : {
       "Test::Class::Simple" : {
          "file" : "lib/Test/Class/Simple.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -58,6 +59,6 @@
          "web" : "https://gitlab.com/oleksii.kysil/test-class-simple"
       }
    },
-   "version" : "0.04",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

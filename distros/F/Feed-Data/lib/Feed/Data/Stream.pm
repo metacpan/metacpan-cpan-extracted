@@ -18,8 +18,6 @@ BEGIN {
 	);
 }
 
-our $VERSION = '0.01';
-
 has 'stream' => (
 	is  => 'rw',
 	isa => Str,
@@ -34,7 +32,7 @@ has 'stream_type' => (
 		my $self = shift;
 		return 'url' if $self->stream =~ m{^http}xms;
 		return 'string' if $self->stream =~ m{\<\?xml}xms;
-		return 'file' if $self->stream =~ m{(\.xml|\.html|\.txt|\.json|\.csv)}xms; 
+		return 'file' if $self->stream =~ m{(\.xml|\.html|\.txt|\.json|\.csv|\.yml)}xms; 
 	}
 );
 

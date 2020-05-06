@@ -3,23 +3,26 @@ abstract: 'use C<IO::Async> with C<ppoll(2)>'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
-  IO::Async::LoopTests: 0.24
-  Test::More: 0
+  IO::Async::LoopTests: '0.76'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4001, CPAN::Meta::Converter version 2.120630'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: IO-Async-Loop-Ppoll
 provides:
   IO::Async::Loop::Ppoll:
     file: lib/IO/Async/Loop/Ppoll.pm
-    version: 0.09
+    version: '0.10'
 requires:
-  IO::Async: 0.24
-  IO::Async::Loop::Poll: 0.2
-  IO::Ppoll: 0.05
+  IO::Async: '0.24'
+  IO::Async::Loop::Poll: '0.76'
+  IO::Ppoll: '0.05'
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.09
+version: '0.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

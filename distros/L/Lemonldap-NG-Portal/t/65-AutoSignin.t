@@ -11,7 +11,9 @@ my $client = LLNG::Manager::Test->new( {
             authentication  => 'Demo',
             userDB          => 'Same',
             autoSigninRules => {
-                dwho => '$env->{REMOTE_ADDR} =~ /^127/',
+                rtyler => '$env->{REMOTE_ADDR} =~ /^127',
+                dwho   => '$env->{REMOTE_ADDR =~ /^127/',
+                msmith => '$env->{REMOTE_ADDR} =~ /^127/',
             },
         }
     }

@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Solution;
-$Games::Solitaire::Verify::Solution::VERSION = '0.2402';
+$Games::Solitaire::Verify::Solution::VERSION = '0.2403';
 use warnings;
 use strict;
 
@@ -73,7 +73,7 @@ sub _read_state
         die "No ======== separator";
     }
 
-    return;
+    return ();
 }
 
 sub _read_move
@@ -107,7 +107,7 @@ sub _read_move
         )
     );
 
-    return;
+    return ();
 }
 
 sub _apply_move
@@ -122,7 +122,7 @@ sub _apply_move
         );
     }
 
-    return;
+    return ();
 }
 
 
@@ -167,7 +167,7 @@ sub verify
         ref $err ? $err->rethrow : die $err;
     }
 
-    return;
+    return ();
 }
 
 1;    # End of Games::Solitaire::Verify::Solution
@@ -185,7 +185,7 @@ of Freecell Solver (or a similar solver)
 
 =head1 VERSION
 
-version 0.2402
+version 0.2403
 
 =head1 SYNOPSIS
 

@@ -9,17 +9,18 @@ use Test::MockObject::Extends;
 use Test::MockModule;
 use Test::Deep qw(cmp_deeply);
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 sub setup : Test(setup) {
     my $self = shift;
 
+    $self->pre_setup();
     my $module = $self->get_module_name();
     if ( defined $module && $self->create_instance() ) {
         my $instance = Test::MockObject::Extends->new($module);
         $self->{instance} = $instance;
     }
-    $self->_setup();
+    $self->post_setup();
     return;
 }
 
@@ -77,7 +78,11 @@ sub create_instance {
     return 0;
 }
 
-sub _setup {
+sub pre_setup {
+    return;
+}
+
+sub post_setup {
     return;
 }
 
@@ -95,11 +100,11 @@ sub run_on_module {
 
 =head1 NAME
 
-Test::Class::Simple - simplify your unit tests writing based on Test::Class
+Test::Class::Simple - Simplify your unit tests writing based on Test::Class
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -169,7 +174,7 @@ version 0.04
 
 later in a nearby .t file
 
-  #! /usr/bin/perl
+  #!/usr/bin/perl
   use My::Example::Test;
 
   # run all the test methods in My::Example::Test
@@ -182,9 +187,15 @@ This is an extension of L<Test::Class|https://metacpan.org/pod/Test::Class> modu
 
 =head2 Methods
 
-=head3 _setup()
+=head3 pre_setup()
 
-Method that is executed before every test method and is useful for some initializations required for the tests.
+Can be overridden. Method that is executed before every test method and is useful for some initializations required for the tests.
+Is executed before creating mocked object;
+
+=head3 post_setup()
+
+Can be overridden. Method that is executed before every test method and is useful for some initializations required for the tests.
+Is executed after creating mocked object;
 
 =head3 get_instance()
 

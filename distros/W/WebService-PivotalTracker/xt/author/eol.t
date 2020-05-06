@@ -24,6 +24,7 @@ my @files = (
     't/00-report-prereqs.t',
     't/basic.t',
     't/fixtures/6dacc86cc06f5740ef4d9ae3cd8624cb.json',
+    't/lib/Secret.pm',
     't/lib/Test/UA.pm'
 );
 

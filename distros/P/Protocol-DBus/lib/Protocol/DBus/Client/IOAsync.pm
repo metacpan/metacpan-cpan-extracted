@@ -142,13 +142,22 @@ sub _set_watches_and_create_messenger {
 
     $self->{'watch_sr'} = $watch_sr = \$watch;
 
+    my $loop = $self->{'loop'};
+
+    $self->{'_stop_reading_cr'} = sub {
+        $loop->remove($$watch_sr);
+        $$watch_sr = undef;
+    };
+
     return sub {
         $watch->want_writeready( $dbus->pending_send() );
     };
 }
 
 sub DESTROY {
-    if (my $watch_sr = delete $_[0]{'watch_sr'}) {
+    my $watch_sr = delete $_[0]{'watch_sr'};
+
+    if ($watch_sr && $$watch_sr) {
         $_[0]{'loop'}->remove($$watch_sr);
         $$watch_sr = undef;
     }

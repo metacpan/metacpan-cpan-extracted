@@ -12,7 +12,7 @@ use Time::Piece;
 use XML::Entities;
 use XML::Parser::Lite;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 our @EXPORT_OK = qw(parse_string parse_file);
 
@@ -116,6 +116,11 @@ sub DESTROY {
 
 sub file {
     shift->{file};
+}
+
+
+sub file_version {
+    shift->{homebank}{version};
 }
 
 
@@ -245,7 +250,7 @@ sub find_transaction_transfer_pair {
     my $self = shift;
     my $transaction = shift;
 
-    return if $transaction->{paymode} ne 'internaltransfer';
+    return if !$transaction->{dst_account};
 
     my $transfer_key = $transaction->{transfer_key};
 
@@ -265,7 +270,7 @@ sub find_transaction_transfer_pair {
     my @candidates;
 
     for my $t (@{$self->transactions}) {
-        next if $t->{paymode} ne 'internaltransfer';
+        next if !$t->{dst_account};
         next if $t->{account} != $transaction->{dst_account};
         next if $t->{dst_account} != $transaction->{account};
         next if $t->{amount} != -$transaction->{amount};
@@ -280,9 +285,9 @@ sub find_transaction_transfer_pair {
 
     # sort the candidates so we can pick the nearest one by date
     my @ordered_candidates =
-        map { $_->[1] }
+        map  { $_->[1] }
         sort { $a->[0] <=> $b->[0] }
-        map { [abs($transaction_day - _ymd_to_julian($_->{date})), $_] } @candidates;
+        map  { [abs($transaction_day - _ymd_to_julian($_->{date})), $_] } @candidates;
 
     if (my $winner = $ordered_candidates[0]) {
         my $key1 = $transfer_key || '[no key]';
@@ -356,6 +361,7 @@ sub parse_file {
 sub parse_string {
     my $str = shift or die _usage(q{parse_string($str)});
 
+    my %homebank;
     my %properties;
     my @accounts;
     my @payees;
@@ -375,7 +381,11 @@ sub parse_string {
                     $attr{$key} = _decode_xml_entities($attr{$key});
                 }
 
-                if ($node eq 'properties') {
+                if ($node eq 'homebank') {
+                    $attr{version} = delete $attr{v} if $attr{v};
+                    %homebank = %attr;
+                }
+                elsif ($node eq 'properties') {
                     $attr{currency} = delete $attr{curr} if $attr{curr};
                     %properties = %attr;
                 }
@@ -441,6 +451,7 @@ sub parse_string {
     $xml_parser->parse($str);
 
     return {
+        homebank        => \%homebank,
         properties      => \%properties,
         accounts        => \@accounts,
         payees          => \@payees,
@@ -491,7 +502,7 @@ File::HomeBank - Parse HomeBank files
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -527,6 +538,12 @@ Get the filepath (if parsed from a file).
     $homebank = File::HomeBank->new(file => $filepath);
 
 Construct a L<File::HomeBank>.
+
+=head2 file_version
+
+    $version = $homebank->file_version;
+
+Get the file format version.
 
 =head2 title
 
@@ -568,7 +585,7 @@ Get an arrayref of transactions.
 
     $account = $homebank->find_account_by_key($key);
 
-Find a account with the given key.
+Find an account with the given key.
 
 =head2 find_currency_by_key
 

@@ -1,3 +1,9 @@
+0.9.0 2020-05-05
+
+    - Introducing interface OPTIMADE::Filter::Modifiable which is used to
+      detect objects that could be modified using modify().
+    - Overriding equality operators for OPTIMADE::Filter::Property.
+
 0.8.0 2020-03-25
 
     - Renaming package from OPTiMaDe::Filter to OPTIMADE::Filter.

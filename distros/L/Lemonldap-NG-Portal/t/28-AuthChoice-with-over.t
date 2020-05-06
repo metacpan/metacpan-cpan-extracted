@@ -48,7 +48,7 @@ is( $sessiondata->{authenticationLevel}, 3, "Overriden authentication level" );
 $client->logout($id);
 
 # Authenticate on second choice
-my $postString = 'user=dwho&password=dwho&test=2_null';
+$postString = 'user=dwho&password=dwho&test=2_null';
 
 # Try to authenticate
 # -------------------
@@ -61,9 +61,9 @@ ok(
     'Auth query'
 );
 expectOK($res);
-my $id = expectCookie($res);
+$id = expectCookie($res);
 ok( $res = $client->_get("/sessions/global/$id"), 'Get session' );
-my $sessiondata = from_json( $res->[2]->[0] );
+$sessiondata = from_json( $res->[2]->[0] );
 is( $sessiondata->{authenticationLevel}, 1, "Default authentication level" );
 $client->logout($id);
 clean_sessions();

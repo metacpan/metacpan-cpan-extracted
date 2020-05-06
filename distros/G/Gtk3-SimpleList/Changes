@@ -1,4 +1,21 @@
 Revision history for Gtk3::SimpleList
 
-0.01 Mon Nov 23 21:37:15 CEST 2013
+0.21 Mon Apr 4 16:17:00 CEST 2020
+* Remove useless Data::Dumper from Makefile.PL (CPAN RT#132493)
+
+0.20 Mon Apr 4 11:35:15 CEST 2020
+    Add repository details
+    Fix URL
+
+0.19 Mon Apr 4 10:51:15 CEST 2020
+    Do not use PREREQ_FATAL=>1 (CPAN RT#127879)
+    Remove debug message that causes warnings (CPAN RT#132441)
+
+0.18 Mon Nov 5 04:26:15 CEST 2018
+    Clarify docs (RT#124740)
+
+0.17 Mon Nov 6 08:57:15 CEST 2017
+    Actually include tests
+
+0.16 Mon Nov 5 21:38:15 CEST 2017
     First version, released on an unsuspecting world.

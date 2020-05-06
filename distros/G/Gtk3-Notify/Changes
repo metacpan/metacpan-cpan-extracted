@@ -1,4 +1,17 @@
 Revision history for Gtk3::Notify.pm
 
-0.01 Mon Nov 23 21:37:15 CEST 2013
+
+0.03
+
+* Add more tests
+* Add repository details (links, ...) for CPAN
+* Bailout early if Notify typelib isn't available
+* Skip tests that need a DISPLAY when there's not (CPAN RT#127946)
+
+0.02
+
+* Add tests
+* Do not use PREREQ_FATAL (CPAN RT#116732)
+
+0.01 Sun Oct 29 14:42:05 2017
     First version, released on an unsuspecting world.

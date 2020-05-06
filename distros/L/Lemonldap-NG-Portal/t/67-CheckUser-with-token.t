@@ -21,6 +21,7 @@ my $client = LLNG::Manager::Test->new( {
             formTimeout                    => 120,
             checkUserDisplayPersistentInfo => 1,
             checkUserDisplayEmptyValues    => 1,
+            impersonationMergeSSOgroups    => 1,
         }
     }
 );
@@ -124,6 +125,12 @@ ok( $res->[2]->[0] =~ m%<span trspan="macros">%, 'Found trspan="macros"' )
   or explain( $res->[2]->[0], 'trspan="macros"' );
 ok( $res->[2]->[0] =~ m%Auth-User: %, 'Found Auth-User' )
   or explain( $res->[2]->[0], 'Header Key: Auth-User' );
+ok( $res->[2]->[0] =~ m%testHeader1: %, 'Found testHeader1' )
+  or explain( $res->[2]->[0], 'Header Key: testHeader1' );
+ok( $res->[2]->[0] =~ m%testHeader2: %, 'Found testHeader2' )
+  or explain( $res->[2]->[0], 'Header Key: testHeader2' );
+ok( $res->[2]->[0] !~ m%emptyHeader: %, 'emptyHeader not found' )
+  or explain( $res->[2]->[0], 'Header Key: emptyHeader' );
 ok( $res->[2]->[0] =~ m%: rtyler%, 'Found rtyler' )
   or explain( $res->[2]->[0], 'Header Value: rtyler' );
 ok( $res->[2]->[0] =~ m%<div class="col">su</div>%, 'Found su' )
@@ -133,7 +140,7 @@ ok( $res->[2]->[0] =~ m%<td scope="row">uid</td>%, 'Found uid' )
 ok( $res->[2]->[0] =~ m%<td scope="row">_whatToTrace</td>%,
     'Found _whatToTrace' )
   or explain( $res->[2]->[0], 'Macro Key _whatToTrace' );
-count(11);
+count(14);
 
 $query =~ s/user=dwho/user=msmith/;
 $query =~

@@ -57,7 +57,7 @@ print $FH "\n#endif\n";
 close($FH);
 
 my $workaround;
-if (-e '/etc/mageia-release' && $cfg{modversion} =~ /4\.9\./) {
+if (-e '/etc/mageia-release' && $cfg{modversion} =~ /4\.(11|9)\./) {
    $workaround = '-DPATCHED_MGA';
 }
 if (! -e '/etc/mageia-release' && -e '/etc/redhat-release' && $cfg{modversion} =~ /4.11/) {

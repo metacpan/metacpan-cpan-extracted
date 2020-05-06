@@ -15,9 +15,9 @@ require( './t/dictionary.pl' );
 
 # Wrong patter for language
 {
-    diag( "\@ARGV value is '" . join( "', '", @ARGV ) . "'." );
+    # diag( "\@ARGV value is '" . join( "', '", @ARGV ) . "'." );
     local @ARGV = qw( --langs FR );
-    diag( "\@ARGV value now is '" . join( "', '", @ARGV ) . "'." );
+    # diag( "\@ARGV value now is '" . join( "', '", @ARGV ) . "'." );
     my $opt5 = Getopt::Class->new({
         dictionary => $dict,
         debug => 0,

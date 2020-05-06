@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Freecells;
-$Games::Solitaire::Verify::Freecells::VERSION = '0.2402';
+$Games::Solitaire::Verify::Freecells::VERSION = '0.2403';
 use warnings;
 use strict;
 
@@ -72,7 +72,7 @@ sub _init
         return $self->_input_from_string( $args->{string} );
     }
 
-    return;
+    return ();
 }
 
 sub _parse_freecell_card
@@ -117,7 +117,7 @@ sub assign
         2, ( defined($card) ? $card->fast_s : '  ' )
     );
 
-    return;
+    return ();
 }
 
 
@@ -144,7 +144,7 @@ sub clear
 
     $self->assign( $pos, undef() );
 
-    return;
+    return ();
 }
 
 
@@ -198,7 +198,7 @@ Freecells in games such as Freecell, Baker's Game, or Seahaven Towers
 
 =head1 VERSION
 
-version 0.2402
+version 0.2403
 
 =head1 SYNOPSIS
 

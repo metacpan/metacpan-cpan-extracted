@@ -11,7 +11,6 @@ BEGIN {
 
 my $debug = 'error';
 my ( $issuer, $sp, $res, $spId );
-my %handlerOR = ( issuer => [], sp => [] );
 
 # Redefine LWP methods for tests
 LWP::Protocol::PSGI->register(
@@ -63,20 +62,16 @@ LWP::Protocol::PSGI->register(
     }
 );
 
-ok( $issuer = issuer(), 'Issuer portal' );
-$handlerOR{issuer} = \@Lemonldap::NG::Handler::Main::_onReload;
+$issuer = register( 'issuer', \&issuer );
 
 # Test REST config backend
 ok( $res = $issuer->_get('/config/latest'), 'Get latest conf metadata' );
 count(1);
 expectOK($res);
 
-switch ('sp');
-&Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
+$sp = register( 'sp', \&sp );
 
-ok( $sp = sp(), 'SP portal' );
-$handlerOR{sp} = \@Lemonldap::NG::Handler::Main::_onReload;
-count(2);
+switch ('sp');
 
 # Simple SP access
 ok(
@@ -208,13 +203,6 @@ expectReject($res);
 
 clean_sessions();
 done_testing( count() );
-
-sub switch {
-    my $type = shift;
-    @Lemonldap::NG::Handler::Main::_onReload = @{
-        $handlerOR{$type};
-    };
-}
 
 sub issuer {
     return LLNG::Manager::Test->new( {

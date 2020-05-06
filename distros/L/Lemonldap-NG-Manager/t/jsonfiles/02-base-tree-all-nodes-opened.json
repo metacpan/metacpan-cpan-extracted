@@ -1315,12 +1315,6 @@
         "type": "bool",
         "data": 0
       }, {
-        "default": 0,
-        "id": "singleSessionUserByIP",
-        "title": "singleSessionUserByIP",
-        "type": "bool",
-        "data": 0
-      }, {
         "default": 1,
         "id": "notifyDeleted",
         "title": "notifyDeleted",

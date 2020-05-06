@@ -171,6 +171,10 @@ sub _set_watches_and_create_messenger {
         },
     )->watch( $socket, 1, $dbus->pending_send() );
 
+    $self->{'_stop_reading_cr'} = sub {
+        Mojo::IOLoop->singleton->reactor()->remove($socket);
+    };
+
     return sub {
         if ($dbus->pending_send()) {
             _flush_send_queue( $dbus, $reactor, $socket );

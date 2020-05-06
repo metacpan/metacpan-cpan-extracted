@@ -1,12 +1,16 @@
-Revision history for WordList-MetaSyntactic-dangdut
+0.003   2020-05-01  Released-By: PERLANCAR; Urgency: medium
 
-0.002   2016-06-08 (PERLANCAR)
+	- Adjust to renamed parent class WordList::MetaSyntactic ->
+	  WordListBase::MetaSyntactic.
+
+
+0.002   2016-06-08  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Tweak Abstract (grammar).
 
 
-0.001   2016-06-06 (PERLANCAR)
+0.001   2016-06-06  Released-By: PERLANCAR
 
         - First release.

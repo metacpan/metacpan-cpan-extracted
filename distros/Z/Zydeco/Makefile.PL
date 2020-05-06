@@ -20,14 +20,18 @@ my $meta = {
                         configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
                         develop   => { recommends => { "Dist::Inkt" => 0.001 } },
                         runtime   => {
-                                       recommends => { "Class::XSAccessor" => 0, "MooX::TypeTiny" => 0, "perl" => "5.022000" },
+                                       recommends => {
+                                                       "Class::XSAccessor" => 0,
+                                                       "MooX::TypeTiny" => 0.002002,
+                                                       "perl" => "5.022000",
+                                                     },
                                        requires   => {
                                                        "B::Hooks::EndOfScope" => 0.24,
                                                        "Devel::StrictMode" => 0,
                                                        "Exporter::Tiny" => "1.000000",
                                                        "Import::Into" => 0,
                                                        "Keyword::Simple" => 0.04,
-                                                       "MooX::Press" => 0.058,
+                                                       "MooX::Press" => 0.061,
                                                        "Path::ScanINC" => 0,
                                                        "perl" => "5.014000",
                                                        "PPR" => "0.000023",
@@ -39,8 +43,8 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "MooX::Pression" => { file => "lib/MooX/Pression.pm", version => 0.517 },
-                        "Zydeco" => { file => "lib/Zydeco.pm", version => 0.517 },
+                        "MooX::Pression" => { file => "lib/MooX/Pression.pm", version => 0.518 },
+                        "Zydeco" => { file => "lib/Zydeco.pm", version => 0.518 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -54,7 +58,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Zydeco/project",
                       },
-  "version"        => 0.517,
+  "version"        => 0.518,
 };
 
 my %dynamic_config;

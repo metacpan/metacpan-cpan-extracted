@@ -18,3 +18,8 @@
 	requires an object URI for the object property 'url'
 	- error() method now respect the 'no warnings' pragma
 	If 'no warnings' is set, an error wil still be set, but no warning will be printed out on STDERR
+0.11.9 2020-04-27
+	- Removed some ambiguity in the use of shift
+0.12.0 2020-05-01
+	- Added colour_closest, colour_format, colour_parse and message_colour
+	- Added missing pod documentation

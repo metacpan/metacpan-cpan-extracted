@@ -11,8 +11,37 @@ require 't/test-lib.pm';
 
 # Try to create a notification
 my $notif =
-'{"date":"2099-05-03","uid":"dwho","reference":"Test","xml":"{\"title\":\"Test\"}"}';
+'{"date":"2099-02-30","uid":"dwho","reference":"Test","xml":"{\"title\":\"Test\"}"}';
 my $res =
+  &client->jsonPostResponse( 'notifications/actives', '',
+    IO::String->new($notif),
+    'application/json', length($notif) );
+ok( $res->{error} =~ /^Notification not created: Bad date/,
+    'Notification not inserted' );
+count(1);
+
+$notif =
+'{"date":"2099-13-30","uid":"dwho","reference":"Test","xml":"{\"title\":\"Test\"}"}';
+$res =
+  &client->jsonPostResponse( 'notifications/actives', '',
+    IO::String->new($notif),
+    'application/json', length($notif) );
+ok( $res->{error} =~ /^Notification not created: Bad date/,
+    'Notification not inserted' );
+count(1);
+
+$notif =
+'{"date":"2099-05_12","uid":"dwho","reference":"Test","xml":"{\"title\":\"Test\"}"}';
+$res =
+  &client->jsonPostResponse( 'notifications/actives', '',
+    IO::String->new($notif),
+    'application/json', length($notif) );
+ok( $res->{error} =~ /^Malformed date$/, 'Notification not inserted' );
+count(1);
+
+$notif =
+'{"date":"2099-12-31","uid":"dwho","reference":"Test","xml":"{\"title\":\"Test\"}"}';
+$res =
   &client->jsonPostResponse( 'notifications/actives', '',
     IO::String->new($notif),
     'application/json', length($notif) );
@@ -44,7 +73,7 @@ displayTests('done');
 
 # Delete notification
 $res =
-  &client->_del('notifications/done/dwho_Test_20990503_dwho_VGVzdA==.done');
+  &client->_del('notifications/done/dwho_Test_20991231_dwho_VGVzdA==.done');
 $res = &client->jsonResponse( 'notifications/done', 'groupBy=substr(uid,1)' );
 ok( $res->{result} == 1, 'Result = 1' );
 ok( $res->{count} == 0,  'Count = 0' );

@@ -109,15 +109,6 @@ sub all_plugins_in_prereqs
             note($plugin . ' is explicitly exempted; skipping'), next
                 if exists $exempt{$plugin};
 
-            # cannot be a (non-develop) prereq if the module lives in this distribution
-            note("$plugin is found in local directory or in 'provides' metadata; skipping"), next
-            if (
-                $pluginbundle_meta ? exists $pluginbundle_meta->{provides}{$plugin}
-               : do {
-                   (my $file = $plugin) =~ s{::}{/}g; $file .= '.pm';
-                   path('lib', $file)->exists;
-               });
-
             # plugins with a specific :version requirement are injected into
             # built distribution's prereqs (x_Dist_Zilla-requires by default)
             my $required_version = $bundle_plugin_requirements->{find_meta($plugin)->name} // 0;

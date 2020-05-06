@@ -2,20 +2,24 @@ bin/efa-m
 Build.PL
 Changelog
 COPYING
+Dockerfile
 lib/Travel/Status/DE/EFA.pm
 lib/Travel/Status/DE/EFA/Line.pm
 lib/Travel/Status/DE/EFA/Result.pm
 lib/Travel/Status/DE/EFA/Stop.pm
 lib/Travel/Status/DE/VRR.pm
 MANIFEST			This list of files
-META.json
 README
-t/10-pod-coverage.t
+scripts/check-efa-urls
+scripts/makedeb-docker
+scripts/makedeb-docker-helper
 t/20-vrr.t
 t/21-vrr-ambig.t
 t/in/essen_alfredusbad_ambiguous.xml
 t/in/essen_bp.html
 t/in/essen_hb.xml
 t/in/essen_hb_invalid.xml
+xt/10-pod-coverage.t
 META.yml
+META.json
 SIGNATURE    Added here by Module::Build

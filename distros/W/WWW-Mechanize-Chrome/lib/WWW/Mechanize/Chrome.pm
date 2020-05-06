@@ -24,7 +24,7 @@ use HTML::Selector::XPath 'selector_to_xpath';
 use HTTP::Cookies::ChromeDevTools;
 use POSIX ':sys_wait_h';
 
-our $VERSION = '0.48';
+our $VERSION = '0.51';
 our @CARP_NOT;
 
 =encoding utf-8
@@ -1839,6 +1839,7 @@ or not. Setting this will never wait for an HTTP response.
 
 sub update_response($self, $response) {
     $self->log('trace', 'Updated response object');
+    $self->clear_current_form();
     $self->{response} = $response
 }
 
@@ -2096,6 +2097,7 @@ sub get_future($self, $url, %options ) {
         )
         }, url => "$url", %options, navigates => 1 )
     ->then( sub {
+        $self->clear_current_form();
         Future->done( $self->response )
     })
 };
@@ -2497,6 +2499,9 @@ current request.
 =cut
 
 sub reload( $self, %options ) {
+    if( exists $options{ ignoreCache } ) {
+        $options{ ignoreCache } = $options{ ignoreCache } ? JSON::true : JSON::false;
+    };
     $self->_mightNavigate( sub {
         $self->target->send_message('Page.reload', %options )
     }, navigates => 1, %options)
@@ -2564,6 +2569,10 @@ This method sets up custom headers that will be sent with B<every> HTTP(S)
 request that Chrome makes.
 
 Note that currently, we only support one value per header.
+
+Chrome since version 63+ does not allow setting and sending the C<Referer>
+header anymore. The bug report is
+at L<https://bugs.chromium.org/p/chromium/issues/detail?id=849972>.
 
 =cut
 
@@ -4465,7 +4474,7 @@ sub get_set_value($self,%options) {
         if (defined $pre and ! ref $pre);
     my $post  = delete $options{post};
     $post = [$post]
-        if (defined $pre and ! ref $post);
+        if (defined $post and ! ref $post);
     $pre  ||= []; # just to eliminate some checks downwards
     $post ||= []; # just to eliminate some checks downwards
     my $name  = delete $options{ name };
@@ -4623,6 +4632,187 @@ JS
         return
     }
 }
+
+=head2 C<< $mech->select( $name, $value ) >>
+
+=head2 C<< $mech->select( $name, \@values ) >>
+
+    $mech->select( 'items', 'banana' );
+
+Given the name of a C<select> field, set its value to the value
+specified.  If the field is not C<< <select multiple> >> and the
+C<$value> is an array, only the B<first> value will be set.
+Passing C<$value> as a hash with
+an C<n> key selects an item by number (e.g.
+C<< {n => 3} >> or C<< {n => [2,4]} >>).
+The numbering starts at 1.  This applies to the current form.
+
+If you have a field with C<< <select multiple> >> and you pass a single
+C<$value>, then C<$value> will be added to the list of fields selected,
+without clearing the others.  However, if you pass an array reference,
+then all previously selected values will be cleared.
+
+Returns true on successfully setting the value. On failure, returns
+false and calls C<< $self>warn() >> with an error message.
+
+=cut
+
+sub select($self, $name, $value) {
+    my $field;
+    if( ! eval {
+        ($field) = $self->_field_by_name(
+            node => $self->current_form,
+            name => $name,
+            #%options,
+        );
+        1;
+    }) {
+        # the field was not found
+        return;
+    };
+
+    my @options = $self->xpath( './/option', node => $field);
+    my @by_index;
+    my @by_value;
+    my $single = $field->get_attribute('type') eq "select-one";
+    my $deselect;
+
+    if ('HASH' eq ref $value||'') {
+        for (keys %$value) {
+            $self->warn(qq{Unknown select value parameter "$_"})
+              unless $_ eq 'n';
+        }
+
+        $deselect = ref $value->{n};
+        @by_index = ref $value->{n} ? @{ $value->{n} } : $value->{n};
+    } elsif ('ARRAY' eq ref $value||'') {
+        # clear all preselected values
+        $deselect = 1;
+        @by_value = @{ $value };
+    } else {
+        @by_value = $value;
+    };
+
+    if ($deselect) {
+        for my $o (@options) {
+            $o->{selected} = 0;
+        }
+    };
+
+    if ($single) {
+        # Only use the first element for single-element boxes
+        $#by_index = 0+@by_index ? 0 : -1;
+        $#by_value = 0+@by_value ? 0 : -1;
+    };
+
+    # Select the items, either by index or by value
+    for my $idx (@by_index) {
+        $options[$idx-1]->set_attribute('selected' => 1 );
+    };
+
+    for my $v (@by_value) {
+        my $option = $self->xpath( sprintf( './/option[@value="%s"]', quote_xpath $v) , node => $field, single => 1 );
+        $option->set_attribute( 'selected' => '1' );
+    };
+
+    return @by_index + @by_value > 0;
+}
+
+=head2 C<< $mech->tick( $name, $value [, $set ] ) >>
+
+    $mech->tick("confirmation_box", 'yes');
+
+"Ticks" the first checkbox that has both the name and value associated with it
+on the current form. Dies if there is no named check box for that value.
+Passing in a false value as the third optional argument will cause the
+checkbox to be unticked.
+
+(Un)ticking the checkbox is done by sending a click event to it if needed.
+If C<$value> is C<undef>, the first checkbox matching C<$name> will
+be (un)ticked.
+
+If C<$name> is a reference to a hash, that hash will be used
+as the options to C<< ->find_link_dom >> to find the element.
+
+=cut
+
+sub tick($self, $name, $value=undef, $set=1) {
+    my %options;
+    my @boxes;
+
+    if (! defined $name) {
+        croak("->tick called with undef name");
+    } elsif (ref $name and blessed($name)) {
+        $options{ dom } = $name;
+    } elsif (ref $name eq 'HASH') { # options
+        %options = %$name;
+    } else {
+        $options{ name } = $name;
+    };
+
+    if (exists $options{ name }) {
+        my $attr = 'name';
+        if ($name =~ s/^\^//) { # if it starts with ^, it's supposed to be a name
+            $attr = 'name'
+        } elsif ($name =~ s/^#//) {
+            $attr = 'id'
+        } elsif ($name =~ s/^\.//) {
+            $attr = 'class'
+        };
+        $name = quotemeta($name);
+        $value = quotemeta($value) if $value;
+
+        _default_limiter( one => \%options );
+        my $q = $self->element_query(
+            ['input'],
+            {
+                      $attr => $name,
+                      type  => 'checkbox',
+                maybe value => $value,
+            }
+        );
+        $options{ xpath } = $q;
+        #$options{ xpath } = [
+        #               defined $value
+        #               ? sprintf( q{//input[@type="checkbox" and @%s="%s" and @value="%s"]}, $attr, $name, $value)
+        #               : sprintf( q{//input[@type="checkbox" and @%s="%s"]}, $attr, $name)
+        #];
+        $options{ user_info } =  defined $value
+                              ? "Checkbox with name '$name' and value '$value'"
+                              : "Checkbox with name '$name'";
+    };
+
+    if ($options{ dom }) {
+        @boxes = $options{ dom };
+    } else {
+        @boxes = $self->_option_query(%options);
+    };
+
+    my $target = $boxes[0];
+    my $is_set = ($target->get_attribute( 'checked' ) || '') eq 'checked';
+    if ($set xor $is_set) {
+        if ($set) {
+            $target->set_attribute('checked', 'checked');
+        } else {
+            $target->set_attribute('checked', undef);
+        };
+    };
+};
+
+=head2 C<< $mech->untick( $name, $value ) >>
+
+  $mech->untick('spam_confirm','yes',undef)
+
+Causes the checkbox to be unticked. Shorthand for
+
+  $mech->tick($name,$value,undef)
+
+=cut
+
+sub untick {
+    my ($self, $name, $value) = @_;
+    $self->tick( $name, $value, undef );
+};
 
 =head2 C<< $mech->submit( $form ) >>
 

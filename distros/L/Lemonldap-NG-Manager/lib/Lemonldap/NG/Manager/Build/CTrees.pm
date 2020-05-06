@@ -14,7 +14,7 @@
 
 package Lemonldap::NG::Manager::Build::CTrees;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.8';
 
 sub cTrees {
     return {
@@ -191,27 +191,49 @@ sub cTrees {
             'oidcRPMetaDataOptionsExtraClaims',
             {
                 title => 'oidcRPMetaDataOptions',
+                help  => 'idpopenidconnect.html#options',
                 nodes => [ {
-                        title => 'oidcRPMetaDataOptionsAuthentication',
+                        title => 'oidcRPMetaDataOptionsBasic',
                         form  => 'simpleInputContainer',
                         nodes => [
                             'oidcRPMetaDataOptionsClientID',
                             'oidcRPMetaDataOptionsClientSecret',
                             'oidcRPMetaDataOptionsPublic',
-                            'oidcRPMetaDataOptionsRequirePKCE',
+                            'oidcRPMetaDataOptionsRedirectUris',
                         ]
                     },
-                    'oidcRPMetaDataOptionsUserIDAttr',
-                    'oidcRPMetaDataOptionsIDTokenSignAlg',
-                    'oidcRPMetaDataOptionsIDTokenExpiration',
-                    'oidcRPMetaDataOptionsIDTokenForceClaims',
-                    'oidcRPMetaDataOptionsAccessTokenExpiration',
-                    'oidcRPMetaDataOptionsAuthorizationCodeExpiration',
-                    'oidcRPMetaDataOptionsAllowOffline',
-                    'oidcRPMetaDataOptionsRefreshToken',
-                    'oidcRPMetaDataOptionsOfflineSessionExpiration',
-                    'oidcRPMetaDataOptionsRedirectUris',
-                    'oidcRPMetaDataOptionsBypassConsent',
+                    {
+                        title => 'oidcRPMetaDataOptionsAdvanced',
+                        form  => 'simpleInputContainer',
+                        nodes => [
+                            'oidcRPMetaDataOptionsBypassConsent',
+                            'oidcRPMetaDataOptionsUserIDAttr',
+                            'oidcRPMetaDataOptionsIDTokenForceClaims',
+                            'oidcRPMetaDataOptionsAdditionalAudiences',
+                            'oidcRPMetaDataOptionsRefreshToken',
+                        ]
+                    },
+                    {
+                        title => 'security',
+                        form  => 'simpleInputContainer',
+                        nodes => [
+                            'oidcRPMetaDataOptionsIDTokenSignAlg',
+                            'oidcRPMetaDataOptionsRequirePKCE',
+                            'oidcRPMetaDataOptionsAllowOffline',
+                            'oidcRPMetaDataOptionsAllowPasswordGrant',
+                            'oidcRPMetaDataOptionsRule',
+                        ]
+                    },
+                    {
+                        title => 'oidcRPMetaDataOptionsTimeouts',
+                        form  => 'simpleInputContainer',
+                        nodes => [
+                            'oidcRPMetaDataOptionsAuthorizationCodeExpiration',
+                            'oidcRPMetaDataOptionsIDTokenExpiration',
+                            'oidcRPMetaDataOptionsAccessTokenExpiration',
+                            'oidcRPMetaDataOptionsOfflineSessionExpiration',
+                        ]
+                    },
                     {
                         title => 'logout',
                         form  => 'simpleInputContainer',
@@ -222,7 +244,6 @@ sub cTrees {
                             'oidcRPMetaDataOptionsLogoutSessionRequired',
                         ]
                     },
-                    'oidcRPMetaDataOptionsRule',
                 ]
             },
             'oidcRPMetaDataMacros',

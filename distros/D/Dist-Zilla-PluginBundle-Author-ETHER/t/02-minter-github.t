@@ -63,13 +63,13 @@ my $module = path($mint_dir, 'lib/My/New/Dist.pm')->slurp_utf8;
 
 like(
     $module,
-    qr/^use strict;\nuse warnings;\nno if "\$\]" >= 5.031008, feature => 'indirect';\npackage My::New::Dist;/m,
+    qr/^use strict;\nuse warnings;\npackage My::New::Dist;/m,
     'our new module has a valid package declaration',
 );
 
 like(
      $module,
-    qr/^our \$VERSION = '0.001';$/m,
+    qr/^our \$VERSION = '0.001';\n\nno if "\$\]" >= 5.031009, feature => 'indirect';$/m,
     'initial module $VERSION is calculated correctly',
 );
 
@@ -121,6 +121,12 @@ like(
     'plugin bundle and version is referenced in dist.ini',
 );
 
+like(
+    $dist_ini,
+    qr/\[Prereqs \/ DevelopRequires\]\nTest::Warnings = 0\n/,
+    'develop prereqs are added',
+);
+
 unlike($dist_ini, qr/^\s/, 'no leading whitespace in dist.ini');
 unlike($dist_ini, qr/[^\S\n]\n/, 'no trailing whitespace in dist.ini');
 unlike($dist_ini, qr/\n\n\n/, 'no double blank links in dist.ini');
@@ -160,7 +166,7 @@ is(
 
 =head1 FUNCTIONS/METHODS
 
-=head2 C<foo>
+=head2 foo
 
 ...
 

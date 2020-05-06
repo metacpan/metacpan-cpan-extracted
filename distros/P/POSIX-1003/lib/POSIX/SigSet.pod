@@ -29,9 +29,9 @@ examples of its usage.
 
 =over 4
 
-=item POSIX::SigSet-E<gt>B<new>([SIGNALS])
+=item POSIX::SigSet-E<gt>B<new>( [$signals] )
 
-Create a new SigSet object. One or more SIGNALS can be added immediately.
+Create a new SigSet object. One or more $signals can be added immediately.
 The object will be destroyed automatically when it is no longer needed.
 
 =back
@@ -40,11 +40,11 @@ The object will be destroyed automatically when it is no longer needed.
 
 =over 4
 
-=item $obj-E<gt>B<addset>(SIGNAL)
+=item $obj-E<gt>B<addset>($signal)
 
 Add one signal to a SigSet object. Returns C<undef> on failure.
 
-=item $obj-E<gt>B<delset>(SIGNAL)
+=item $obj-E<gt>B<delset>($signal)
 
 Remove one signal from the SigSet object.
 Returns C<undef> on failure.
@@ -72,17 +72,17 @@ example:
 
 =head1 SEE ALSO
 
-This module is part of POSIX-1003 distribution version 0.98,
-built on December 03, 2013. Website: F<http://perl.overmeer.net>.  The code is based on L<POSIX>, which
+This module is part of POSIX-1003 distribution version 1.00,
+built on May 05, 2020. Website: F<http://perl.overmeer.net/CPAN>.  The code is based on L<POSIX>, which
 is released with Perl itself.  See also L<POSIX::Util> for
 additional functionality.
 
 =head1 COPYRIGHTS
 
-Copyrights 2011-2013 on the perl code and the related documentation
+Copyrights 2011-2020 on the perl code and the related documentation
  by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

@@ -58,7 +58,7 @@ while (<F>) {
 close F;
 
 ok( $hstruct = from_json($hstruct), 'struct.json is JSON' );
-ok( ref $hstruct eq 'ARRAY', 'struct.json is an array' )
+ok( ref $hstruct eq 'ARRAY',        'struct.json is an array' )
   or print STDERR "Expected: ARRAY, got: " . ( ref $hstruct ) . "\n";
 count(2);
 

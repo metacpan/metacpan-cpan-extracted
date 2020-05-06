@@ -320,6 +320,9 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 						for key, value of l
 							if !key.match /^(_utime|ipAddr|error)$/ 
 								cv += ", #{key} : #{value}"
+						tab = cv.split ', '
+						tab.sort()
+						cv = tab.join ', '
 						tmp.push
 							t: l._utime
 							title: $scope.localeDate l._utime
@@ -331,6 +334,9 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 						for key, value of l
 							if !key.match /^(_utime|ipAddr|error)$/
 								cv += ", #{key} : #{value}"
+						tab = cv.split ', '
+						tab.sort()
+						cv = tab.join ', '
 						tmp.push
 							t: l._utime
 							title: $scope.localeDate l._utime
@@ -491,6 +497,15 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 			$scope.waiting = false
 		, (resp) ->
 			$scope.waiting = false
+
+		# Highlight current selection
+		console.log "Selection", sessionType
+		$scope.navssoStyle = {color: '#777'}
+		$scope.offlineStyle = {color: '#777'}
+		$scope.persistentStyle = {color: '#777'}
+		$scope.navssoStyle = {color: '#333'} if sessionType == 'global'
+		$scope.offlineStyle = {color: '#333'} if sessionType == 'offline'
+		$scope.persistentStyle = {color: '#333'} if sessionType == 'persistent'
 
 	# Intialization function
 	# Simply set $scope.waiting to false during $translator and tree root

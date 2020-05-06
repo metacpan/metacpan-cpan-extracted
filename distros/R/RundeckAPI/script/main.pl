@@ -26,8 +26,7 @@
 use strict;
 use diagnostics;
 use Data::Dumper;
-use lib "../lib";
-use RundeckAPI 1.1;
+use RundeckAPI;
 
 #####
 ## PROTOS

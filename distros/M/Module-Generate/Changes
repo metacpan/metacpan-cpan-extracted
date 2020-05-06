@@ -17,3 +17,6 @@ Revision history for Module-Generate
 
 0.07    2020-04-27
 	- adds a 'new' method
+
+0.09    2020-05-01
+	- Allow for sub routine code and phases to be passed as strings or coderefs

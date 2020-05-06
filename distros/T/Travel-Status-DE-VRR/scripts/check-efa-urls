@@ -1,0 +1,30 @@
+#!/usr/bin/env zsh
+
+export PERL5LIB=lib
+
+checks="BSVG Braunschweig Hbf
+DING Ulm Hbf
+KVV Karlsruhe Hbf
+LinzAG Linz Hbf
+MVV München Hackerbrücke
+NVBW Stuttgart Hbf (A.-Klett-Pl.)
+SVV Salzburg Hbf
+TLEM London Waterloo East
+VAG Schallstadt Bf
+VBL Luzern Bf
+Verbundlinie Graz Hbf
+VGN Nürnberg Hbf
+VMV Schwerin Hbf
+VOR Wien Hbf
+VRN Mannheim Hbf
+VRR Essen Hbf
+VRR2 Essen Hbf
+VVO Dresden Hbf
+VVS Stuttgart Schwabstraße"
+
+echo $checks | while read service name place; do
+	echo -n "${service} ... "
+	if bin/efa-m -s $service $name $place > /dev/null; then
+		echo OK
+	fi
+done

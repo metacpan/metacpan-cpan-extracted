@@ -1,5 +1,9 @@
 Revision history for Perl extension Data::TableAutoSum.
 
+0.11  2020-05-06
+        - Add perl license information to Makefile.PL
+        - Check for defined filenames to avoid "Use of uninitialized ... in concatenation" warnings
+
 0.10  2019-04-28
         - Add github repository
 

@@ -1,6 +1,6 @@
 package Lemonldap::NG::Manager::Conf::Zero;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.8';
 
 sub zeroConf {
     my ( $domain, $sessionDir, $persistentSessionDir, $notificationDir ) = @_;
@@ -136,10 +136,12 @@ sub zeroConf {
         'groups'                => {},
         'exportedHeaders'       => {
             "test1.$domain" => {
-                'Auth-User' => '$uid'
+                'Auth-User'   => '$uid',
+                'Auth-Groups' => '$groups'
             },
             "test2.$domain" => {
-                'Auth-User' => '$uid'
+                'Auth-User'   => '$uid',
+                'Auth-Groups' => '$groups'
             }
         },
         'registerDB'          => 'Demo',
@@ -148,7 +150,7 @@ sub zeroConf {
         'notificationStorage' => 'File',
         'locationRules'       => {
             "auth.$domain" => {
-                '(?#checkUser)^/checkuser' => '$uid eq "dwho"',
+                '(?#checkUser)^/checkuser' => 'inGroup("timelords")',
                 '(?#errors)^/lmerror/'     => 'accept',
                 'default'                  => 'accept'
             },
@@ -161,13 +163,13 @@ sub zeroConf {
                 '^/logout' => 'logout_sso'
             },
             "manager.$domain" => {
-                'default' => '$uid eq "dwho" or $uid eq "rtyler"',
+                'default' => 'inGroup("timelords") or $uid eq "rtyler"',
 '(?#Configuration)^/(.*?\.(fcgi|psgi)/)?(manager\.html|confs/|$)'
-                  => '$uid eq "dwho"',
+                  => 'inGroup("timelords")',
                 '(?#Sessions)/(.*?\.(fcgi|psgi)/)?sessions' =>
-                  '$uid eq "dwho" or $uid eq "rtyler"',
+                  'inGroup("timelords") or $uid eq "rtyler"',
                 '(?#Notifications)/(.*?\.(fcgi|psgi)/)?notifications' =>
-                  '$uid eq "dwho" or $uid eq "rtyler"',
+                  'inGroup("timelords") or $uid eq "rtyler"',
             }
         },
         'whatToTrace'   => '_whatToTrace',

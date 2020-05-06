@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Object;
-$RT::Client::REST::Object::VERSION = '0.57';
+$RT::Client::REST::Object::VERSION = '0.59';
 
 use Error qw(:try);
 use Params::Validate;
@@ -229,11 +229,11 @@ sub to_form {
 
         my $value;
         if (exists($attributes->{$attr}{value2form})) {
-            $value = $attributes->{$attr}{value2form}($self->$attr);
+            $value = $attributes->{$attr}{value2form}($self->$attr)
         } elsif ($attributes->{$attr}{list}) {
-            $value = join(',', $self->$attr);
+            $value = join(',', $self->$attr)
         } else {
-            $value = (defined($self->$attr) ? $self->$attr : 'Not set');
+            $value = (defined($self->$attr) ? $self->$attr : '');
         }
 
         $hash{$rest_name} = $value;
@@ -258,7 +258,7 @@ sub from_form {
 
     unless ('HASH' eq ref($hash)) {
         RT::Client::REST::Object::InvalidValueException->throw(
-            "Expecting a hash reference as argument to 'from_form'",
+            q|Expecting a hash reference as argument to 'from_form'|,
         );
     }
 
@@ -268,10 +268,10 @@ sub from_form {
 
     my $attributes = $self->_attributes;
     my %rest2attr;  # Mapping of REST names to our attributes;
-    while (my ($attr, $value) = each(%$attributes)) {
+    while (my ($attr, $settings) = each(%$attributes)) {
         my $rest_name = (exists($attributes->{$attr}{rest_name}) ?
                          lc($attributes->{$attr}{rest_name}) : $attr);
-        $rest2attr{$rest_name} = $attr;
+        $rest2attr{$rest_name} = [ $attr, $settings ];
     }
 
     # Now set attributes:
@@ -294,11 +294,12 @@ sub from_form {
             next;
         }
 
-        if ($value =~ m/not set/i) {
+        my ( $method, $settings)  = @{$rest2attr{$key}};
+
+        if ($settings->{is_datetime} and $value eq 'Not set') {
             $value = undef;
         }
 
-        my $method = $rest2attr{$key};
         if (exists($attributes->{$method}{form2value})) {
             $value = $attributes->{$method}{form2value}($value);
         } elsif ($attributes->{$method}{list}) {
@@ -600,7 +601,7 @@ RT::Client::REST::Object - base class for RT objects
 
 =head1 VERSION
 
-version 0.57
+version 0.59
 
 =head1 SYNOPSIS
 
@@ -938,43 +939,13 @@ Do not forget to pass RT::Client::REST object to this method.
 L<RT::Client::REST::Ticket>,
 L<RT::Client::REST::SearchResult>.
 
-=head1 AUTHORS
+=head1 AUTHOR
 
-=over 4
-
-=item *
-
-Abhijit Menon-Sen <ams@wiw.org>
-
-=item *
-
-Dmitri Tikhonov <dtikhonov@yahoo.com>
-
-=item *
-
-Damien "dams" Krotkine <dams@cpan.org>
-
-=item *
-
-Dean Hamstead <dean@bytefoundry.com.au>
-
-=item *
-
-Miquel Ruiz <mruiz@cpan.org>
-
-=item *
-
-JLMARTIN
-
-=item *
-
-SRVSH
-
-=back
+Dmitri Tikhonov
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Dmitri Tikhonov.
+This software is copyright (c) 2020, 2018 by Dmitri Tikhonov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -27,7 +27,7 @@
             "Test::Pod::Coverage" : "1.08"
          },
          "x_spec" : {
-            "App::lcpan" : "1.049"
+            "App::lcpan" : "1.054"
          }
       },
       "test" : {
@@ -51,7 +51,7 @@
          "web" : "https://github.com/perlancar/perl-App-lcpan-Manual"
       }
    },
-   "version" : "1.049.000",
+   "version" : "1.054.001",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

@@ -9,7 +9,7 @@ use Capture::Tiny 0.17 qw/capture_stdout/;
 use Text::ParseWords qw/shellwords/;
 
 # ABSTRACT: Base classes for Alien:: modules
-our $VERSION = '2.21'; # VERSION
+our $VERSION = '2.22'; # VERSION
 
 
 sub import {
@@ -477,6 +477,21 @@ sub bin_dir {
 }
 
 
+
+sub dynamic_dir {
+  my ($class) = @_;
+  if($class->install_type('system'))
+  {
+    return ();
+  }
+  else
+  {
+    my $dir = Path::Tiny->new($class->dist_dir, 'dynamic');
+    return -d $dir ? ("$dir") : ();
+  }
+}
+
+
 sub alien_helper {
   {};
 }
@@ -609,7 +624,7 @@ Alien::Base - Base classes for Alien:: modules
 
 =head1 VERSION
 
-version 2.21
+version 2.22
 
 =head1 SYNOPSIS
 
@@ -879,7 +894,22 @@ Example usage:
 
  use Env qw( @PATH );
  
- unshft @PATH, Alien::MyLibrary->bin_dir;
+ unshift @PATH, Alien::MyLibrary->bin_dir;
+
+=head2 dynamic_dir
+
+ my(@dir) = Alien::MyLibrary->dynamic_dir
+
+Returns the dynamic dir for a dynamic build (if the main
+build is static).  For a C<share> install this will be a
+directory under C<dist_dir> named C<dynamic> if it exists.
+System builds return an empty list.
+
+Example usage:
+
+ use Env qw( @PATH );
+ 
+ unshift @PATH, Alien::MyLibrary->dynamic_dir;
 
 =head2 alien_helper
 

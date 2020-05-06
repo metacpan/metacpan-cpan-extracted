@@ -1,15 +1,19 @@
-# Copyrights 2011-2013 by [Mark Overmeer].
+# Copyrights 2011-2020 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.01.
-use warnings;
-use strict;
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution POSIX-1003.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package POSIX::1003::Termios;
 use vars '$VERSION';
-$VERSION = '0.98';
+$VERSION = '1.00';
 
 use base 'POSIX::1003::Module', 'POSIX::Termios';
+
+use warnings;
+use strict;
 
 my @speed = qw/
  B0 B110 B1200 B134 B150 B1800 B19200 B200 B2400
@@ -42,5 +46,12 @@ our %EXPORT_TAGS =
  , functions => \@functions
  );
 
+
+# Only needed by manual.PL
+sub _create_constant($)
+{   my ($class, $name) = @_;
+    no strict 'refs';
+    sub { &{"POSIX::$name"} };
+}
 
 1;

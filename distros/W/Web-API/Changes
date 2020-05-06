@@ -1,9 +1,25 @@
 ==================================================
-Changes from 2018-11-26 00:00:00 +0000 to present.
+Changes from 2019-05-03 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 2.6 at 2019-11-26 04:59:31 +0000
+version 2.7 at 2020-05-02 07:57:14 +0000
+----------------------------------------
+
+  Change: 713df94906cf2b05bb1f35d0e85508153c337652
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2020-05-02 19:56:15 +0000
+
+    fixes #30 
+
+  Change: a860c10cb1eb29299af4c6334618c88d423a8e42
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2019-12-13 18:46:54 +0000
+
+    default to plain text decoding 
+
+----------------------------------------
+version 2.6 at 2019-11-26 04:59:19 +0000
 ----------------------------------------
 
   Change: 7da3392c4a45d33734f9e88ecf36ccb6432ed271
@@ -110,146 +126,6 @@ version 2.5 at 2019-11-18 02:35:12 +0000
 
     Grammar correction 
 
-----------------------------------------
-version 2.3 at 2018-12-25 10:23:48 +0000
-----------------------------------------
-
-  Change: 5745eb37374e0faf4b732ea7625914d4e8c9ee9d
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2018-12-25 23:23:48 +0000
-
-    Merge branch 'master' of github.com:nupfel/Web-API 
-
-  Change: 6975533993cbdf4030ae42ccb3eb19e13dc0ab69
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2018-12-25 23:23:14 +0000
-
-    api_version and auth method 'header' via Token, bump to 2.3 
-
-  Change: 6107849c9e68490be2b9b39826eea365692269ea
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2018-07-31 21:52:09 +0000
-
-    ignore .build 
-
-  Change: a63841d5d55eb3d4d1c2e918ef6c74428c4aaff6
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2017-10-21 18:34:38 +0000
-
-    v2.2.3 
-
-  Change: 17fb57d4f3f7484b7b20744db938204fdc435b40
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2017-10-21 18:34:04 +0000
-
-    require at least 6.04 of HTTP::Cookies which provides get_cookies() 
-
-  Change: 6343894258b675ba8e9689436e21ff6144bec169
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2017-06-13 03:34:42 +0000
-
-    v2.2.2 
-
-  Change: 4720a529a86e432a2db6ca63e639c8084e372441
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2017-06-13 03:30:23 +0000
-
-    return cookies hash in response structure as well 
-
-  Change: a899f0de5a9350b31c587983167dd22af0ff8921
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2017-05-10 00:30:38 +0000
-
-    v2.2.1 
-
-  Change: 89d064dc29556fcd5c0cd4ca18d34e89ba0109ce
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2017-05-10 00:29:58 +0000
-
-    catch DESTROY calls. fixes #26 
-
-  Change: 6a5c2e574d90c7611dbdca9df6bc523ccc04280d
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2017-05-10 00:29:03 +0000
-
-    restore documentation fixes 
-
-  Change: ee7294170a5ddda0f22091d6facdedd838974731
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2016-09-10 00:29:57 +0000
-
-    Merge branch 'master' of github.com:nupfel/Web-API 
-
-  Change: 7c2634ab2c98a53f17d6c00a4d5265d7de89c28d
-  Author: Jeremy Mates <jmates@cpan.org>
-  Date : 2016-09-10 00:29:34 +0000
-
-    Spelling fixes, some L<links>, other documentation tweaks. 
-
-  Change: 79e34cdb04115f134dd625c9a129d83ba976f055
-  Author: sam <sam@lion.openimp.net>
-  Date : 2016-09-10 00:29:33 +0000
-
-    remove that stuff 
-
-  Change: ae357fcf2241f77768b9bfea43757ec0546c0c7c
-  Author: sam <sam@lion.openimp.net>
-  Date : 2016-09-10 00:29:33 +0000
-
-    adding Build.PL and META files for installation 
-
-  Change: 7872546af96babbd50e509eecaf9c5fc48d5fdf0
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2016-09-10 00:24:55 +0000
-
-    fixed example usage constructor 
-
-  Change: 31fc25c58ce4d065450ef7c5441195a8c5772e02
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2016-09-10 00:24:05 +0000
-
-    use Data::Printer to avoid mangling integers. fixes #24 
-
-  Change: 2aecd21d1b0bb3b08084d2961f60be9a23a2ff02
-  Author: Tobias Kirschstein <nupfel@users.noreply.github.com>
-  Date : 2016-04-03 15:29:51 +0000
-
-    Merge pull request #20 from thrig/master
-
-    Spelling fixes, some L<links>, other documentation tweaks. 
-
-  Change: daa06fdc559d31e11cb959ac3f38f5bd5ece9e22
-  Author: Jeremy Mates <jmates@cpan.org>
-  Date : 2016-01-09 16:00:18 +0000
-
-    Spelling fixes, some L<links>, other documentation tweaks. 
-
-  Change: b68331c08d658a7aa5985d8fc56ade7e2027be18
-  Author: Tobias Kirschstein <nupfel@users.noreply.github.com>
-  Date : 2015-11-06 09:26:39 +0000
-
-    Merge pull request #19 from sthompsonxyz/master
-
-    adding Build.PL and META files for installation 
-
-  Change: 9009e6f47334c75a847f5bcac1f43c6df0c8b778
-  Author: sam <sam@lion.openimp.net>
-  Date : 2015-11-05 16:43:38 +0000
-
-    remove that stuff 
-
-  Change: 47aeb7c185fdf6f6894a9366bc54708d344a431e
-  Author: sam <sam@lion.openimp.net>
-  Date : 2015-11-05 13:44:55 +0000
-
-    adding Build.PL and META files for installation 
-
-  Change: d4425a8b008fc4846eb345f637aeedc37a8ca487
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2014-12-20 12:21:39 +0000
-
-    use caller with parenthesis to silence warning. fixes #18 
-
 =================================================
-Plus 22 releases after 2018-11-26 00:00:00 +0000.
+Plus 23 releases after 2019-05-03 00:00:00 +0000.
 =================================================

@@ -1,7 +1,7 @@
 # Alias for Lemonldap::NG::Portal::Main
 package Lemonldap::NG::Portal;
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 use Lemonldap::NG::Portal::Main;
 use base 'Lemonldap::NG::Portal::Main';
 

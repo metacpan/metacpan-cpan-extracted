@@ -1,5 +1,11 @@
 Revision history for IO-Async
 
+0.76    2020-05-05
+        [CHANGES]
+         * Initial attempt at providing metrics via Metrics::Any
+         * Renamed ->(un)watch_child API to ->(un)watch_process
+         * Renamed 'child' LoopTests suite to 'process'
+
 0.75    2019-11-26 00:06:59
         [CHANGES]
          * Remember to keep O_NONBLOCK off on IO::Async::Channel sync mode

@@ -1,0 +1,24 @@
+default-lease-time 600;
+max-lease-time 7200;
+
+ddns-update-style none;
+
+authoritative;
+
+option web-proxy code 252 = text;
+
+log-facility local7;
+
+
+# a /16
+subnet 10.0.0.0 netmask 255.255.0.0 {
+    option domain-name-servers 10.0.0.1 , 10.0.10.1;
+    option routers 10.0.0.1;
+}
+
+subnet 192.168.0.0 netmask 255.255.0.0 {
+    range 192.168.0.100 192.168.0.200;
+    option domain-name-servers 10.0.0.1 , 10.0.10.1;
+    option routers 192.168.0.1;
+}
+

@@ -1,8 +1,35 @@
-SYNOPSIS
+NAME
+    App::linespeed - Calculate how fast input lines are coming in
 
+VERSION
+    This document describes version 0.002 of App::linespeed (from Perl
+    distribution App-linespeed), released on 2020-05-04.
+
+SYNOPSIS
     See the command-line script linespeed.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-linespeed>.
 
-    numspeed from App::numspeed
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-linespeed>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-linespeed>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

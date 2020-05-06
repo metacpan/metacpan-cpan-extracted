@@ -9,7 +9,7 @@ use Perl::Tidy;
 use Data::Dumper;
 use Module::Starter;
 $Data::Dumper::Deparse = 1;
-our $VERSION = '0.08';
+our $VERSION = '0.11';
 our %CLASS;
 our $SUB_INDEX = 1;
 
@@ -254,8 +254,9 @@ sub _build_phase {
 	my @codes;
 	for (qw/BEGIN UNITCHECK CHECK INIT END/) {
 		if ($phases->{$_}) {
-			my $code = Dumper $phases->{$_};
-			$code =~ s/\$VAR1 = sub //;
+			my $code = ref $phases->{$_} ? Dumper $phases->{$_} : $phases->{$_};
+			$code =~ s/\$VAR1 = //;
+			$code =~ s/sub\s*//;
 			$code =~ s/};$/}/;
 			$code = sprintf "%s %s;", 'BEGIN', $code;
 			push @codes, $code;
@@ -273,8 +274,9 @@ sub _build_subs {
 	} keys %{$class->{SUBS}}) {
 		my $code;
 		if ($class->{SUBS}{$sub}{CODE}) {
-			$code = Dumper $class->{SUBS}{$sub}{CODE};
-			$code =~ s/\$VAR1 = sub //;
+			$code = ref $class->{SUBS}{$sub}{CODE} ? Dumper $class->{SUBS}{$sub}{CODE} : $class->{SUBS}{$sub}{CODE};
+			$code =~ s/\$VAR1 = //;
+			$code =~ s/sub\s*//;
 			$code =~ s/\s*\n*\s*package Module\:\:Generate\;|use warnings\;|use strict\;//g;
 			$code =~ s/{\s*\n*/{/;
 			$code =~ s/};$/}/;
@@ -448,7 +450,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 0.08
+Version 0.11
 
 =cut
 

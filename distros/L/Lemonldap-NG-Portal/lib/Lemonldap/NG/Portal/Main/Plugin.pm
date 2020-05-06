@@ -78,6 +78,7 @@ sub createNotification {
     my $notifEngine = $self->p->loadedModules->{
         'Lemonldap::NG::Portal::Plugins::Notifications'};
 
+    $self->logger->debug("Loading Notifications plugin...");
     return PE_ERROR unless $notifEngine;
 
     # Prepare notification

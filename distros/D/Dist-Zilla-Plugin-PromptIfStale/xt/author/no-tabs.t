@@ -38,6 +38,7 @@ my @files = (
     't/25-core-modules.t',
     't/26-command-missing-module.t',
     't/27-travis.t',
+    't/28-local-plugin.t',
     't/99-placeholder.t',
     't/corpus/StaleModule.pm',
     't/corpus/Unindexed.pm',

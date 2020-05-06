@@ -1,0 +1,45 @@
+NAME
+    WordListMod::BinarySearch - Provide word_exists() that uses binary
+    search
+
+VERSION
+    This document describes version 0.002 of WordListMod::BinarySearch (from
+    Perl distribution WordListMod-BinarySearch), released on 2020-05-01.
+
+SYNOPSIS
+     use WordListMod qw(get_mod_wordlist);
+     my $wl = get_mod_wordlist("EN::Foo", "BinarySearch");
+     say $wl->word_exists("foo"); # uses binary searching
+
+DESCRIPTION
+    This mod provides an alternative "word_exists()" method that performs
+    binary searching instead of the default linear.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WordListMod-BinarySearch>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WordListMod-BinarySearch>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=WordListMod-BinarySea
+    rch>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    File::SortedSeek
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

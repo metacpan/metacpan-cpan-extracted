@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.88",
     "utf8" => 0
   },
-  "VERSION" => "0.2.3",
+  "VERSION" => "0.2.5",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
 %WriteMakefileArgs = (
     %WriteMakefileArgs,
     'OBJECT' => 'Hspell.o',
-    'LIBS' => [ "-lhspell", ],
+    'LIBS' => [ "-lhspell -lz", ],
 );
 
 my %FallbackPrereqs = (

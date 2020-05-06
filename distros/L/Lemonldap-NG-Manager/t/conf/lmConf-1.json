@@ -154,6 +154,7 @@
   },
   "portal": "http://auth.example.com/",
   "reloadUrls": {},
+  "compactConf": 1,
   "securedCookie": 0,
   "sessionDataToRemember": {},
   "timeout": 72000,

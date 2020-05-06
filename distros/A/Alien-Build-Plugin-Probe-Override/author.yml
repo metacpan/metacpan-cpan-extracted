@@ -9,6 +9,7 @@ pod_spelling_system:
     - travis
     - appveyor
     - preload
+    - KIWIROY
 
 pod_coverage:
   skip: 0

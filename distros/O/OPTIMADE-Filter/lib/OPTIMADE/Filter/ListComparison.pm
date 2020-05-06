@@ -2,6 +2,9 @@ package OPTIMADE::Filter::ListComparison;
 
 use strict;
 use warnings;
+
+use parent 'OPTIMADE::Filter::Modifiable';
+
 use Scalar::Util qw(blessed);
 
 sub new {
@@ -63,9 +66,9 @@ sub modify {
     my $self = shift;
     my $code = shift;
 
-    $self->{property} = $code->( $self->{property}, @_ );
-    $self->{values} = [ map { [ OPTIMADE::Filter::modify( $_->[0], $code, @_ ),
-                                OPTIMADE::Filter::modify( $_->[1], $code, @_ ) ] }
+    $self->property( $self->property->modify( $code, @_ ) );
+    $self->{values} = [ map { [ OPTIMADE::Filter::Modifiable::modify( $_->[0], $code, @_ ),
+                                OPTIMADE::Filter::Modifiable::modify( $_->[1], $code, @_ ) ] }
                             @{$self->{values}} ];
     return $code->( $self, @_ );
 }

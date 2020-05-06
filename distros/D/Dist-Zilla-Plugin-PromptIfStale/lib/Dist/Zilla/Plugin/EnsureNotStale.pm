@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 package Dist::Zilla::Plugin::EnsureNotStale;
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
+# vim: set ts=8 sts=2 sw=2 tw=115 et :
 # ABSTRACT: Abort at build/release time if modules are out of date
 
-our $VERSION = '0.055';
+our $VERSION = '0.057';
 
 use Moose;
 extends 'Dist::Zilla::Plugin::PromptIfStale';
@@ -29,7 +29,7 @@ Dist::Zilla::Plugin::EnsureNotStale - Abort at build/release time if modules are
 
 =head1 VERSION
 
-version 0.055
+version 0.057
 
 =head1 SYNOPSIS
 
@@ -82,7 +82,7 @@ L<http://dzil.org/#mailing-list>.
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.freenode.org>.
 
 =head1 AUTHOR
 

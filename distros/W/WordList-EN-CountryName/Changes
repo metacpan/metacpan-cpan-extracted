@@ -1,0 +1,28 @@
+0.050   2020-05-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename module from WordList::EN::CountryNames ->
+	  WordList::EN::CountryName for consistency.
+
+
+0.04    2016-01-13  Released-By: PERLANCAR
+
+        - No functional changes.
+
+        - [build] Rebuild to add statistics.
+
+
+0.03    2016-01-12  Released-By: PERLANCAR
+
+        - No functional changes.
+
+        - [build] Rebuild: add Synopsis.
+
+
+0.02    2016-01-08  Released-By: PERLANCAR
+
+	- Forgot to add WordList::EN::CountryNames::SingleWord.
+
+
+0.01    2016-01-07  Released-By: PERLANCAR
+
+        - First release.

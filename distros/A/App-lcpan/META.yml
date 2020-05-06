@@ -3,9 +3,12 @@ abstract: 'Manage your local CPAN mirror'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
+  File::Copy::Recursive: '0'
   File::Spec: '0'
+  FindBin: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  JSON::MaybeXS: '0'
   Test::More: '0.98'
   Test::SQL::Schema::Versioned: '0.15'
   Test::WithDB::SQLite: '0.08'
@@ -34,10 +37,12 @@ requires:
   Complete::Util: '0.608'
   DBD::SQLite: '0'
   DBI: '0'
+  DBIx::Util::Schema: '0'
   Data::Sah::Coerce::perl::To_date::From_float::epoch: '0'
   Data::Sah::Coerce::perl::To_date::From_obj::datetime: '0'
   Data::Sah::Coerce::perl::To_date::From_obj::time_moment: '0'
   Data::Sah::Coerce::perl::To_date::From_str::iso8601: '0'
+  Data::Sah::Coerce::perl::To_date::From_str::natural: '0'
   Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_distname: '0'
   Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
@@ -64,7 +69,7 @@ requires:
   Hash::Subset: '0.005'
   IO::Compress::Gzip: '0'
   IO::Prompt::I18N: '0'
-  IPC::System::Options: '0.332'
+  IPC::System::Options: '0.335'
   LWP::Protocol::Patch::CountBytesIn: '0'
   LWP::UserAgent::Patch::FilterMirrorMaxSize: '0'
   List::Util: '1.45'
@@ -105,7 +110,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan
   homepage: https://metacpan.org/release/App-lcpan
   repository: git://github.com/perlancar/perl-App-lcpan.git
-version: '1.051'
+version: '1.056'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

@@ -12,9 +12,10 @@ use JSON;
 use Compiled::Params::OO qw/cpo/;
 use XML::RSS::LibXML;
 use Text::CSV_XS qw/csv/;
+use YAML::XS qw//;
 
 use 5.006;
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 our $validate;
 BEGIN {
@@ -26,6 +27,7 @@ BEGIN {
 		raw => [Any, Optional->of(Str)],
 		text => [Any, Optional->of(Str)],
 		json => [Any, Optional->of(Str)],
+		yaml => [Any, Optional->of(Str)],
 		csv => [Any, Optional->of(Str)],
 		table => [Any, Optional->of(Str)],
 		convert_feed => [Any, Str, Str]
@@ -158,6 +160,12 @@ sub _json {
 	return $json->pretty->encode( \@render );
 }
 
+sub _yaml {
+	my ( $self, $type ) = $validate->yaml->(@_);
+	my @render = $self->_convert_feed('generate', 'json');
+	return YAML::XS::Dump \@render;
+}
+
 sub _table {
 	my ( $self, $type ) = $validate->table->(@_);
 	my @render = $self->_convert_feed('generate', 'json');
@@ -236,7 +244,7 @@ Feed::Data - dynamic data feeds
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =head1 SYNOPSIS 
 
@@ -257,7 +265,7 @@ Version 0.05
 		$object->render('text'); # text, html, xml..
 		$object->hash('text'); # text, html, xml...
 		$object->fields('title', 'description'); # returns title and description object
-		$object->edit(title => 'WoW', description => 'something amazing'); # sets
+		$object->edit(title => 'TTI', description => 'Should have been a PWA.'); # sets
 		
 		$object->title->text;
 		$object->link->raw;
@@ -427,6 +435,7 @@ render the feed using the passed in format, defaults to text.
 	# json 
 	# rss
 	# csv
+	# yaml
 	# table
 	# styled_table
 

@@ -47,7 +47,7 @@ my $tzil = Builder->from_config(
                 [ 'PromptIfStale' => {
                         check_all_prereqs => 1,
                         # some of these are duplicated with prereqs
-                        module => [ 'Bar', map { 'Foo' . $_ } 0 .. 2 ], phase => 'build'
+                        module => [ 'Bar', map 'Foo'.$_, 0 .. 2 ], phase => 'build'
                     },
                 ],
             ),
@@ -61,7 +61,7 @@ if (not $checked_app++)
     my $wd = pushd $tzil->root;
     cmp_deeply(
         [ Dist::Zilla::App::Command::stale->stale_modules($tzil) ],
-        [ 'Bar', map { 'Foo' . $_ } ('0' .. '8') ],
+        [ 'Bar', map 'Foo'.$_, ('0' .. '8') ],
         'app finds stale modules',
     );
     Dist::Zilla::Plugin::PromptIfStale::__clear_already_checked();
@@ -71,14 +71,14 @@ if (not $checked_app++)
 
 my %expected_prompts = (
     before_build => [
-        map { '    ' . $_ . ' is not installed.' } 'Bar', map { 'Foo' . $_ } ('0' .. '2') ],
+        map '    '.$_.' is not installed.', 'Bar', map 'Foo'.$_, ('0' .. '2') ],
     after_build => [
-        map { '    ' . $_ . ' is not installed.' } map { 'Foo' . $_ } ('3' .. '8') ],
+        map '    '.$_.' is not installed.', map 'Foo'.$_, ('3' .. '8') ],
 );
 
-my @expected_prompts = map {
-    "Issues found:\n" . join("\n", @{$expected_prompts{$_}}, 'Continue anyway?')
-} qw(before_build after_build);
+my @expected_prompts = map
+    "Issues found:\n".join("\n", @{$expected_prompts{$_}}, 'Continue anyway?'),
+    qw(before_build after_build);
 
 $tzil->chrome->set_response_for($_, 'y') foreach @expected_prompts;
 

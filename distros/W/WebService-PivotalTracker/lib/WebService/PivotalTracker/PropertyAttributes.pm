@@ -3,7 +3,7 @@ package WebService::PivotalTracker::PropertyAttributes;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Scalar::Util qw( blessed );
 use Sub::Quote qw( quote_sub );
@@ -83,7 +83,7 @@ WebService::PivotalTracker::PropertyAttributes - An internal tool; nothing to se
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 DESCRIPTION
 
@@ -101,7 +101,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by MaxMind, Inc.
+This software is Copyright (c) 2016 - 2020 by MaxMind, Inc.
 
 This is free software, licensed under:
 

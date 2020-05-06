@@ -7,17 +7,15 @@ package Lemonldap::NG::Common::Notifications::File;
 
 use strict;
 use Mouse;
+use Time::Local;
 use MIME::Base64;
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Common::Notifications';
 
-our $ext = 'json';
-
 sub import {
     shift;
-    $ext = 'xml' if ( $_[0] eq 'XML' );
     return Lemonldap::NG::Common::Notifications->import(@_);
 }
 
@@ -38,11 +36,37 @@ has fileNameSeparator => ( is => 'rw', default => '_' );
 sub get {
     my ( $self, $uid, $ref ) = @_;
     return () unless ($uid);
+    my $ext = $self->extension;
     my $fns        = $self->{fileNameSeparator};
     my $identifier = &getIdentifier( $self, $uid, $ref );
 
     opendir D, $self->{dirName};
     my @notif = grep /^\d{8}${fns}${identifier}\S*\.$ext$/, readdir(D);
+    closedir D;
+
+    my $files;
+    foreach my $file (@notif) {
+        unless ( open F, '<', $self->{dirName} . "/$file" ) {
+            $self->logger->error(
+                "Unable to read notification $self->{dirName}/$file");
+            next;
+        }
+        $files->{$file} = join( '', <F> );
+    }
+    return $files;
+}
+
+# Returns accepted notification corresponding to the user $uid.
+# If $ref is set, returns only notification corresponding to this reference.
+sub getAccepted {
+    my ( $self, $uid, $ref ) = @_;
+    return () unless ($uid);
+    my $ext = $self->extension;
+    my $fns        = $self->{fileNameSeparator};
+    my $identifier = &getIdentifier( $self, $uid, $ref );
+
+    opendir D, $self->{dirName};
+    my @notif = grep /^\d{8}${fns}${identifier}\S*\.(?:done|$ext)$/, readdir(D);
     closedir D;
 
     my $files;
@@ -63,6 +87,7 @@ sub get {
 # keys date, uid, ref and condition.
 sub getAll {
     my $self = shift;
+    my $ext  = $self->extension;
     opendir D, $self->{dirName};
     my @notif;
     my $fns = $self->{fileNameSeparator};
@@ -88,6 +113,7 @@ sub getAll {
 # keys date, uid, ref and condition.
 sub getExisting {
     my $self = shift;
+    my $ext  = $self->extension;
     opendir D, $self->{dirName};
     my @notif;
     my $fns = $self->{fileNameSeparator};
@@ -112,6 +138,7 @@ sub getExisting {
 # @param $myref identifier returned by get() or getAll()
 sub delete {
     my ( $self, $myref ) = @_;
+    my $ext = $self->extension;
     my $new = ( $myref =~ /(.*?)(?:\.$ext)$/ )[0] . '.done';
     return rename( $self->{dirName} . "/$myref", $self->{dirName} . "/$new" );
 }
@@ -128,7 +155,15 @@ sub purge {
 # Insert a new notification
 sub newNotif {
     my ( $self, $date, $uid, $ref, $condition, $content ) = @_;
+    my $ext = $self->extension;
     my $fns = $self->{fileNameSeparator};
+    $fns ||= '_';
+    my @t = split( /\D+/, $date );
+    $t[1]--;
+    eval {
+        timelocal( $t[5] || 0, $t[4] || 0, $t[3] || 0, $t[2], $t[1], $t[0] );
+    };
+    return ( 0, "Bad date" ) if ($@);
     $date =~ s/-//g;
     return ( 0, "Bad date" ) unless ( $date =~ /^\d{8}/ );
     my $filename =

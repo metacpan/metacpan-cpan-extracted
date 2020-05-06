@@ -24,6 +24,7 @@
          "requires" : {
             "IO::String" : "0",
             "Net::LDAP" : "0",
+            "String::Random" : "0",
             "Test::Pod" : "1"
          }
       },
@@ -72,6 +73,6 @@
       ],
       "x_MailingList" : "mailto:lemonldap-ng-dev@ow2.org"
    },
-   "version" : "v2.0.7",
+   "version" : "v2.0.8",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More;
 
 use EV;
 use IO::Async::Loop::EV;
@@ -30,3 +30,5 @@ $loop->loop_once until defined $ev_signal and defined $ioasync_signal;
 
 is( $ev_signal,      "INT", 'EV signal' );
 is( $ioasync_signal, "INT", 'IO::Async signal' );
+
+done_testing;

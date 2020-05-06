@@ -19,7 +19,7 @@ SKIP: {
                 portal                   => 'http://auth.example.com/',
                 userDB                   => 'Same',
                 passwordDB               => 'LDAP',
-                portalRequireOldPassword => 1,
+                portalRequireOldPassword => '$uid eq "dwho"',
                 ldapServer               => 'ldap://127.0.0.1:19389/',
                 ldapBase                 => 'ou=users,dc=example,dc=com',
                 managerDn                => 'cn=admin,dc=example,dc=com',

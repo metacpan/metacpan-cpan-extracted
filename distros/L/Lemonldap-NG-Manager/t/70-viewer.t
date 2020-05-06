@@ -9,6 +9,9 @@ require 't/test-lib.pm';
 
 my $struct = 't/jsonfiles/70-diff.json';
 
+# Remove new conf
+unlink 't/conf/lmConf-2.json';
+
 sub body {
     return IO::File->new( $struct, 'r' );
 }
@@ -23,13 +26,14 @@ $res = &client->jsonResponse('/view/1/portalDisplayLogout');
 ok( $res->{value} eq '_Hidden_', 'Key is hidden' )
   or explain( $res, 'value => "_Hidden_"' );
 $res = &client->jsonResponse('/view/1/samlIDPMetaDataNodes');
-ok( $res->{value} eq '_Hidden_', 'Key is hidden' )
+ok( ref($res) eq 'HASH' and $res->{value} eq '_Hidden_', 'Key is hidden' )
   or explain( $res, 'value => "_Hidden_"' );
 count(2);
 
 # Try to display latest conf
 $res = &client->jsonResponse('/view/latest');
-ok( $res->{cfgNum} eq '1', 'Latest conf loaded' );
+ok( $res->{cfgNum} eq '1', 'Latest conf loaded' )
+  or explain( $res, "cfgNum => 1" );
 count(1);
 
 ok(
@@ -55,11 +59,11 @@ count(2);
 # Try to compare confs 1 & 2
 $res = &client->jsonResponse('/view/diff/1/2');
 
-# ok( $res->[1]->{captcha_login_enabled} eq '1', 'Key found' );
-ok( $res->[1]->{captcha_mail_enabled} eq '0', 'Key found' );
-ok( 6 == keys %{ $res->[1] },                 'Right number of keys found' )
+ok( $res->[1]->{captcha_login_enabled} eq '1', 'Key found' );
+ok( $res->[1]->{captcha_mail_enabled} eq '0',  'Key found' );
+ok( 7 == keys %{ $res->[1] },                  'Right number of keys found' )
   or print STDERR Dumper($res);
-count(2);
+count(3);
 
 # Try to display previous conf
 $res = &client->jsonResponse('/view/1');
@@ -68,7 +72,7 @@ ok( $res->{cfgNum} eq '1', 'Browser is allowed' )
 count(1);
 
 # Remove new conf
-`rm -rf t/conf/lmConf-2.json`;
+unlink 't/conf/lmConf-2.json';
 
 done_testing( count() );
 

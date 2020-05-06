@@ -37,6 +37,18 @@ DESCRIPTION
     results, or the application can generate a plain-text result directly
     and serve them by its own means.
 
+ Metrics::Any
+
+    For more flexibility of metrics reporting, other modules may wish to
+    use Metrics::Any as an abstraction interface instead of directly using
+    this API.
+
+    By using Metrics::Any instead, the module does not directly depend on
+    Net::Prometheus, and in addition program ultimately using the module
+    gets the flexibility to use Prometheus (via
+    Metrics::Any::Adapter::Prometheus) or use another reporting system via
+    a different adapter.
+
 CONSTRUCTOR
 
  new
@@ -135,7 +147,7 @@ METHODS
 
  collect
 
-       @metricsamples = $prometheus->collect
+       @metricsamples = $prometheus->collect( $opts )
 
     Returns a list of "MetricSamples" in Net::Prometheus::Types obtained
     from all of the currently-registered collectors.
@@ -147,6 +159,38 @@ METHODS
     Returns a string in the Prometheus text exposition format containing
     the current values of all the registered metrics.
 
+       $str = $prometheus->render( { options => "for collectors" } )
+
+    An optional HASH reference may be provided; if so it will be passed
+    into the collect method of every registered collector.
+
+ handle
+
+       $response = $prometheus->handle( $request )
+
+    Given an HTTP request in an HTTP::Request instance, renders the metrics
+    in response to it and returns an HTTP::Response instance.
+
+    This application will respond to any GET request, and reject requests
+    for any other method. If a query string is present on the URI it will
+    be parsed for collector options to pass into the "render" method.
+
+    This method is useful for integrating metrics into an existing HTTP
+    server application which uses these objects. For example:
+
+       my $prometheus = Net::Prometheus->new;
+    
+       sub serve_request
+       {
+          my ( $request ) = @_;
+    
+          if( $request->uri->path eq "/metrics" ) {
+             return $prometheus->handle( $request );
+          }
+    
+          ...
+       }
+
  psgi_app
 
        $app = $prometheus->psgi_app
@@ -156,7 +200,45 @@ METHODS
     suitable for scraping by the Prometheus collector.
 
     This application will respond to any GET request, and reject requests
-    for any other method.
+    for any other method. If a QUERY_STRING is present in the environment
+    it will be parsed for collector options to pass into the "render"
+    method.
+
+    This method is useful for integrating metrics into an existing HTTP
+    server application which is uses or is based on PSGI. For example:
+
+       use Plack::Builder;
+    
+       my $prometheus = Net::Prometheus::->new;
+    
+       builder {
+          mount "/metrics" => $prometheus->psgi_app;
+          ...
+       }
+
+ export_to_IO_Async
+
+       $prometheus->export_to_IO_Async( $loop, %args )
+
+    Performs the necessary steps to create an HTTP server for exporting
+    metrics over HTTP via IO::Async. This will involve creating a new
+    Net::Async::HTTP::Server instance added to the loop.
+
+    This new server will listen on its own port number for any incoming
+    request, and will serve metrics regardless of path.
+
+    Note this should only be used in applications that don't otherwise have
+    an HTTP server, such as self-contained monitoring exporters or
+    exporting metrics as a side-effect of other activity. For existing HTTP
+    server applications it is better to integrate with the existing
+    request/response processing of the application, such as by using the
+    "handle" or "psgi_app" methods.
+
+    Takes the following named arguments:
+
+    port => INT
+
+      Port number on which to listen for incoming HTTP requests.
 
 COLLECTORS
 
@@ -167,16 +249,26 @@ COLLECTORS
     arguments and expected to return a list of "MetricSamples" in
     Net::Prometheus::Types structures.
 
-       @metricsamples = $collector->collect
+       @metricsamples = $collector->collect( $opts )
 
     The Net::Prometheus::Metric class is already a valid collector (and
     hence, so too are the individual metric type subclasses). This
     interface allows the creation of new custom collector objects, that
     more directly collect information to be exported.
 
+    Collectors might choose to behave differently in the presence of some
+    specifically-named option; typically to provide extra detail not
+    normally provided (maybe at the expense of extra processing time to
+    calculate it). Collectors must not complain about the presence of
+    unrecognised options; the hash is shared among all potential
+    collectors.
+
 TODO
 
       * Histogram/Summary 'start_timer' support
+
+      * Add other export_to_* methods for other event systems and
+      HTTP-serving frameworks, e.g. Mojo.
 
 AUTHOR
 

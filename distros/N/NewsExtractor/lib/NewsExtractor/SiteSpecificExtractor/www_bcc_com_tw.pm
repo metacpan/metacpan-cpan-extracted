@@ -13,7 +13,7 @@ sub headline {
 
 sub dateline {
     my ($self) = @_;
-    my $el = $self->dom->at('div.tt27');
+    my $el = $self->dom->at('div.tt27') or return undef;
     my $txt = $el->all_text;
     $txt =~ s/\s+報導\z//;
     return $txt;
@@ -21,7 +21,7 @@ sub dateline {
 
 sub journalist {
     my ($self) = @_;
-    my $content = $self->content_text;
+    my $content = $self->content_text or return undef;
     my ($o) = $content =~ m{。 [（\(] (\p{Letter}+?) 報導 [）\)] \n\n}x;
     unless ($o) {
         ($o) = $content =~ m{。 [（\(] 中廣記者 (\p{Letter}+?) [）\)] \z}x;
@@ -37,7 +37,7 @@ sub content_text {
         $el->remove();
     }
 
-    $el = $self->dom->at('#some-class-name');
+    $el = $self->dom->at('#some-class-name') or return undef;
     return html2text( $el->to_string );
 }
 

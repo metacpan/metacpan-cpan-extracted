@@ -1,0 +1,91 @@
+{
+   "abstract" : "Alien package for libtiff",
+   "author" : [
+      "Shawn Laffan <shawnlaffan@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-libtiff",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build" : "1.41",
+            "Alien::Build::MM" : "1.41",
+            "Alien::Build::Plugin::Cleanse::BuildDir" : "0",
+            "Alien::MSYS" : "0",
+            "ExtUtils::MakeMaker" : "6.52",
+            "File::Find::Rule" : "0",
+            "PkgConfig" : "0.19026",
+            "Sort::Versions" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "1.41",
+            "Alien::Build::MM" : "1.41",
+            "Alien::Build::Plugin::Cleanse::BuildDir" : "0",
+            "Alien::MSYS" : "0",
+            "ExtUtils::MakeMaker" : "6.52",
+            "File::Find::Rule" : "0",
+            "PkgConfig" : "0",
+            "Sort::Versions" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "1.41",
+            "Alien::Build" : "0.25",
+            "FFI::CheckLib" : "0.23"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FFI::CheckLib" : "0.23",
+            "Test::Alien" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/shawnlaffan/perl-alien-libtiff/issues/"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/shawnlaffan/perl-alien-libtiff"
+      }
+   },
+   "version" : "1.01",
+   "x_alienfile" : {
+      "generated_by" : "Alien::Build::MM version 1.74",
+      "requires" : {
+         "share" : {
+            "Alien::MSYS" : "0.07",
+            "Archive::Tar" : "0",
+            "HTML::LinkExtor" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Net::SSLeay" : "1.49",
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "system" : {}
+      }
+   },
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

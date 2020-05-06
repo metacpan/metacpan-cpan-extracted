@@ -6,7 +6,7 @@ use Test::More tests => 27;
 use Devel::ebug;
 
 my $ebug = Devel::ebug->new;
-$ebug->program("t/calc.pl");
+$ebug->program("corpus/calc.pl");
 $ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 
@@ -28,7 +28,7 @@ $ebug->step;
 
 # set break point at add()
 $ebug = Devel::ebug->new;
-$ebug->program("t/calc.pl");
+$ebug->program("corpus/calc.pl");
 $ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 is( $ebug->break_point_subroutine("main::add"), 12 );
@@ -37,19 +37,19 @@ is($ebug->line, 12);
 
 # set break point at fib2()
 $ebug = Devel::ebug->new;
-$ebug->program("t/calc_oo.pl");
+$ebug->program("corpus/calc_oo.pl");
 $ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
-$ebug->break_point("t/Calc.pm", 29);
+$ebug->break_point("corpus/lib/Calc.pm", 29);
 is_deeply([$ebug->break_points], []);
-is_deeply([$ebug->break_points("t/Calc.pm")], [29]);
+is_deeply([$ebug->break_points("corpus/lib/Calc.pm")], [29]);
 $ebug->run;
 is($ebug->line, 29);
 is($ebug->eval('$i'), 1);
 
 # set break point at add()
 $ebug = Devel::ebug->new;
-$ebug->program("t/calc.pl");
+$ebug->program("corpus/calc.pl");
 $ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 $ebug->break_point(6, '$e == 4');
@@ -60,18 +60,19 @@ is($ebug->eval('$e'), 4);
 
 # set break point at fib2()
 $ebug = Devel::ebug->new;
-$ebug->program("t/calc_oo.pl");
+$ebug->program("corpus/calc_oo.pl");
 $ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
-$ebug->break_point("t/Calc.pm", 29, '$i == 2');
+$ebug->break_point("corpus/lib/Calc.pm", 29, '$i == 2');
 is_deeply([$ebug->break_points_with_condition], []);
 $ebug->break_point(11);
-is_deeply([$ebug->break_points_with_condition("t/Calc.pm")],
-          [{filename => "t/Calc.pm", line => 29, condition => '$i == 2'}]);
+is_deeply([$ebug->break_points_with_condition("corpus/lib/Calc.pm")],
+          [{filename => "corpus/lib/Calc.pm", line => 29, condition => '$i == 2'}]);
 is_deeply([$ebug->all_break_points_with_condition],
-          [{filename => "t/Calc.pm", line => 29, condition => '$i == 2'},
-           {filename => "t/calc_oo.pl", line => 11},
-           ]);
+          [
+           {filename => "corpus/calc_oo.pl", line => 11},
+          {filename => "corpus/lib/Calc.pm", line => 29, condition => '$i == 2'},
+           ]) or diag explain [$ebug->all_break_points_with_condition];;
 $ebug->run;
 is($ebug->line, 29);
 is($ebug->eval('$i'), 2);
@@ -80,14 +81,14 @@ is($ebug->eval('$x2'), 2);
 
 # set break points at line numbers and delete one
 $ebug = Devel::ebug->new;
-$ebug->program("t/calc.pl");
+$ebug->program("corpus/calc.pl");
 $ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 $ebug->break_point(6);
 $ebug->break_point(12);
 $ebug->break_point(9);
 $ebug->break_point_delete(6);
-$ebug->break_point_delete("t/calc.pl", 12);
+$ebug->break_point_delete("corpus/calc.pl", 12);
 is_deeply([$ebug->break_points], [9]);
 $ebug->run;
 is($ebug->line, 9);

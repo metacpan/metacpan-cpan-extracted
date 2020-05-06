@@ -1,5 +1,23 @@
 Revision history for Net-Prometheus
 
+0.10    2020-05-05
+        [CHANGES]
+         * Optional convenience creation of Histogram bucket bounds by
+           repeating values per decade
+
+        [BUGFIXES]
+         * Declare test_requires HTTP::Request (RT132473)
+
+0.09    2020-05-01
+        [CHANGES]
+         * Pass additional options from query params or ->render method into
+           collector ->collect methods
+         * Added more methods for easy export of metrics:
+            + ->handle method to allow integration into existing
+              HTTP::Message-based HTTP servers
+            + ->export_to_IO_Async method to allow easy export of metrics from
+              IO::Async-based applications without an existing HTTP server
+
 0.08    2020-04-28
         [CHANGES]
          * Added Net::Prometheus::Registry

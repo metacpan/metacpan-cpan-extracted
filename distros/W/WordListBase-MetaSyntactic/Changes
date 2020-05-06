@@ -1,0 +1,21 @@
+0.004   2020-05-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Add reset_indicator(), first_word(), and next_word() like
+	  WordList 0.5.2.
+
+
+0.003   2020-05-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename module WordList{,Base}::MetaSyntactic.
+
+
+0.002   2016-06-08  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- Tweak Abstract.
+
+
+0.001   2016-06-06  Released-By: PERLANCAR
+
+        - First release.

@@ -7,7 +7,7 @@ use utf8;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.15';
+our $VERSION = '1.17';
 
 use Carp qw(confess cluck);
 use Encode qw(encode);
@@ -126,7 +126,12 @@ sub new {
 		return $self;
 	}
 
-	$self->{xml} = $response->decoded_content;
+	if ( $opt{efa_encoding} ) {
+		$self->{xml} = encode( $opt{efa_encoding}, $response->content );
+	}
+	else {
+		$self->{xml} = $response->decoded_content;
+	}
 
 	if ( not $self->{xml} ) {
 
@@ -517,108 +522,119 @@ sub results {
 
 # static
 sub get_efa_urls {
+
+	# sorted lexically by shortname
 	return (
 		{
-			url       => 'http://www.ding.eu/ding3/XSLT_DM_REQUEST',
+			url       => 'https://bsvg.efa.de/bsvagstd/XML_DM_REQUEST',
+			name      => 'Braunschweiger Verkehrs-GmbH',
+			shortname => 'BSVG',
+		},
+		{
+			url       => 'https://www.ding.eu/ding3/XSLT_DM_REQUEST',
 			name      => 'Donau-Iller Nahverkehrsverbund',
 			shortname => 'DING',
 		},
 		{
-			url       => 'http://efa.ivb.at/ivb/XSLT_DM_REQUEST',
-			name      => 'Innsbrucker Verkehrsbetriebe',
-			shortname => 'IVB',
+			url  => 'https://projekte.kvv-efa.de/sl3-alone/XSLT_DM_REQUEST',
+			name => 'Karlsruher Verkehrsverbund',
+			shortname => 'KVV',
 		},
+		{
+			url       => 'https://www.linzag.at/static/XSLT_DM_REQUEST',
+			name      => 'Linz AG',
+			shortname => 'LinzAG',
+			encoding  => 'iso-8859-15',
+		},
+		{
+			url       => 'https://efa.mvv-muenchen.de/mobile/XSLT_DM_REQUEST',
+			name      => 'Münchner Verkehrs- und Tarifverbund',
+			shortname => 'MVV',
+		},
+		{
+			url       => 'https://www.efa-bw.de/nvbw/XSLT_DM_REQUEST',
+			name      => 'Nahverkehrsgesellschaft Baden-Württemberg',
+			shortname => 'NVBW',
+		},
+
+		# HTTPS not supported
 		{
 			url       => 'http://efa.svv-info.at/sbs/XSLT_DM_REQUEST',
 			name      => 'Salzburger Verkehrsverbund',
 			shortname => 'SVV',
 		},
-		{
-			url       => 'http://efa.vor.at/wvb/XSLT_DM_REQUEST',
-			name      => 'Verkehrsverbund Ost-Region',
-			shortname => 'VOR',
-		},
-		{
-			url       => 'http://efaneu.vmobil.at/vvv/XSLT_DM_REQUEST',
-			name      => 'Vorarlberger Verkehrsverbund',
-			shortname => 'VVV',
-		},
 
-		# Returns broken Unicode which makes Encode::decode die()
-		#{
-		#	url       => 'http://fahrplan.verbundlinie.at/stv/XSLT_DM_REQUEST',
-		#	name      => 'Verkehrsverbund Steiermark',
-		#	shortname => 'Verbundlinie',
-		#},
-		{
-			url       => 'http://www.linzag.at/static/XSLT_DM_REQUEST',
-			name      => 'Linz AG',
-			shortname => 'LinzAG',
-		},
-		{
-			url       => 'http://212.114.197.7/vgnExt_oeffi/XML_DM_REQUEST',
-			name      => 'Verkehrsverbund Grossraum Nuernberg',
-			shortname => 'VGN',
-		},
-		{
-			url       => 'http://efa.vrr.de/vrr/XSLT_DM_REQUEST',
-			name      => 'Verkehrsverbund Rhein-Ruhr',
-			shortname => 'VRR',
-		},
-		{
-			url       => 'http://app.vrr.de/standard/XML_DM_REQUEST',
-			name      => 'Verkehrsverbund Rhein-Ruhr (alternative)',
-			shortname => 'VRR2',
-		},
-		{
-			url       => 'http://www2.vvs.de/vvs/XSLT_DM_REQUEST',
-			name      => 'Verkehrsverbund Stuttgart',
-			shortname => 'VVS',
-		},
-		{
-			url  => 'http://delfi1.vvo-online.de:8080/delfi3/XSLT_DM_REQUEST',
-			name => 'Verkehrsverbund Oberelbe',
-			shortname => 'VVO',
-		},
-		{
-			url       => 'http://delfi.vrn.de/delfi/XSLT_DM_REQUEST',
-			name      => 'Verkehrsverbund Rhein-Neckar (DELFI)',
-			shortname => 'VRNdelfi',
-		},
-		{
-			url       => 'http://fahrplanauskunft.vrn.de/vrn/XSLT_DM_REQUEST',
-			name      => 'Verkehrsverbund Rhein-Neckar',
-			shortname => 'VRN',
-		},
-		{
-			url       => 'http://www.efa-bw.de/nvbw/XSLT_DM_REQUEST',
-			name      => 'Nahverkehrsgesellschaft Baden-Württemberg',
-			shortname => 'NVBW',
-		},
-		{
-			url       => 'http://80.146.180.107/vmv/XSLT_DM_REQUEST',
-			name      => 'Verkehrsgesellschaft Mecklenburg-Vorpommern',
-			shortname => 'VMV',
-		},
-		{
-			url       => 'http://213.144.24.66/kvv2/XML_DM_REQUEST',
-			name      => 'Karlsruher Verkehrsverbund',
-			shortname => 'KVV',
-		},
+		# HTTPS: invalid certificate
 		{
 			url  => 'http://www.travelineeastmidlands.co.uk/em/XSLT_DM_REQUEST',
 			name => 'Traveline East Midlands',
 			shortname => 'TLEM',
 		},
 		{
+			url       => 'https://efa.vagfr.de/vagfr3/XSLT_DM_REQUEST',
+			name      => 'Freiburger Verkehrs AG',
+			shortname => 'VAG',
+		},
+
+		# HTTPS: unsupported protocol
+		{
 			url       => 'http://mobil.vbl.ch/vblmobil/XML_DM_REQUEST',
 			name      => 'Verkehrsbetriebe Luzern',
 			shortname => 'VBL',
 		},
+
+		# HTTPS not supported
 		{
-			url       => 'http://bsvg.efa.de/bsvagstd/XML_DM_REQUEST',
-			name      => 'Braunschweiger Verkehrs-GmbH',
-			shortname => 'BSVG',
+			url       => 'http://fahrplan.verbundlinie.at/stv/XSLT_DM_REQUEST',
+			name      => 'Verkehrsverbund Steiermark',
+			shortname => 'Verbundlinie',
+		},
+		{
+			url       => 'https://efa.vgn.de/vgnExt_oeffi/XML_DM_REQUEST',
+			name      => 'Verkehrsverbund Grossraum Nuernberg',
+			shortname => 'VGN',
+		},
+
+		# HTTPS: certificate verification fails
+		{
+			url       => 'http://efa.vmv-mbh.de/vmv/XML_DM_REQUEST',
+			name      => 'Verkehrsgesellschaft Mecklenburg-Vorpommern',
+			shortname => 'VMV',
+		},
+		{
+			url       => 'https://efa.vor.at/wvb/XSLT_DM_REQUEST',
+			name      => 'Verkehrsverbund Ost-Region',
+			shortname => 'VOR',
+			encoding  => 'iso-8859-15',
+		},
+
+		# HTTPS not supported
+		{
+			url       => 'http://fahrplanauskunft.vrn.de/vrn/XML_DM_REQUEST',
+			name      => 'Verkehrsverbund Rhein-Neckar',
+			shortname => 'VRN',
+		},
+		{
+			url       => 'https://efa.vrr.de/vrr/XSLT_DM_REQUEST',
+			name      => 'Verkehrsverbund Rhein-Ruhr',
+			shortname => 'VRR',
+		},
+		{
+			url       => 'https://app.vrr.de/standard/XML_DM_REQUEST',
+			name      => 'Verkehrsverbund Rhein-Ruhr (alternative)',
+			shortname => 'VRR2',
+		},
+
+		# HTTPS not supported
+		{
+			url       => 'http://efa.vvo-online.de:8080/dvb/XSLT_DM_REQUEST',
+			name      => 'Verkehrsverbund Oberelbe',
+			shortname => 'VVO',
+		},
+		{
+			url       => 'https://www2.vvs.de/vvs/XSLT_DM_REQUEST',
+			name      => 'Verkehrsverbund Stuttgart',
+			shortname => 'VVS',
 		},
 
 	);
@@ -637,7 +653,7 @@ Travel::Status::DE::EFA - unofficial EFA departure monitor
     use Travel::Status::DE::EFA;
 
     my $status = Travel::Status::DE::EFA->new(
-        efa_url => 'http://efa.vrr.de/vrr/XSLT_DM_REQUEST',
+        efa_url => 'https://efa.vrr.de/vrr/XSLT_DM_REQUEST',
         place => 'Essen', name => 'Helenenstr'
     );
 
@@ -650,7 +666,7 @@ Travel::Status::DE::EFA - unofficial EFA departure monitor
 
 =head1 VERSION
 
-version 1.15
+version 1.17
 
 =head1 DESCRIPTION
 
@@ -666,7 +682,8 @@ It reports all upcoming tram/bus/train departures at a given place.
 =item my $status = Travel::Status::DE::EFA->new(I<%opt>)
 
 Requests the departures as specified by I<opts> and returns a new
-Travel::Status::DE::EFA object.  Dies if the wrong I<opts> were passed.
+Travel::Status::DE::EFA object.  B<efa_url>, B<place> and B<name> are
+mandatory.  Dies if the wrong I<opts> were passed.
 
 Arguments:
 
@@ -674,20 +691,9 @@ Arguments:
 
 =item B<efa_url> => I<url>
 
-URL to the EFA service. Known URLs are:
-
-=over
-
-=item * L<http://212.114.197.7/vgnExt_oeffi/XML_DM_REQUEST> (Verkehrsverbund GroE<szlig>raum NE<uuml>rnberg)
-
-=item * L<http://efa.vrr.de/vrr/XSLT_DM_REQUEST> (Verkehrsverbund Rhein-Ruhr)
-
-=item * L<http://www2.vvs.de/vvs/XSLT_DM_REQUEST> (Verkehrsverbund Stuttgart)
-
-=back
-
-If you found a URL not listed here, please send it to
-E<lt>derf@finalrewind.orgE<gt>.
+URL to the EFA service. See C<< efa-m --list >> for known URLs.
+If you found a URL not listed there, please notify
+E<lt>derf+efa@finalrewind.orgE<gt>.
 
 =item B<place> => I<place>
 
@@ -701,6 +707,12 @@ B<stop> (stop/station name).
 =item B<name> => I<name>
 
 address / poi / stop name to list departures for.
+
+=item B<efa_encoding> => I<encoding>
+
+Some EFA servers do not correctly specify their response encoding. If you
+observe encoding issues, you can manually specify it here. Example:
+iso-8859-15.
 
 =item B<full_routes> => B<0>|B<1>
 
@@ -758,6 +770,8 @@ the following elements.
 =item B<name>: Name of the entity operating this service
 
 =item B<shortname>: Short name of the entity
+
+=item B<encoding>: Server-side encoding override for B<efa_encoding> (optional)
 
 =back
 

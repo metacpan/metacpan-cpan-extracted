@@ -19,7 +19,7 @@ WWW::Mechanize::Chrome::Node - represent a Chrome HTML node in Perl
 
 =cut
 
-our $VERSION = '0.48';
+our $VERSION = '0.51';
 
 =head1 MEMBERS
 
@@ -332,7 +332,7 @@ sub set_attribute_future( $self, $attribute, $value ) {
             $self->driver->send_message(
                 'DOM.setAttributeValue',
                 name => $attribute,
-                value => $value,
+                value => ''.$value,
                 nodeId => 0+$nodeId
             )
         })

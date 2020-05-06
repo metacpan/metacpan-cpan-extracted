@@ -5,8 +5,8 @@
         <!-- XS buttons -->
         <div class="navbar-header">
           <span class="navbar-brand">
-            <img ng-click="home()" class="link hidden-xs" width="88px" height="32px" src="<TMPL_VAR NAME="STATIC_PREFIX">logos/llng-logo-32.png"/>
-            <img ng-click="home()" class="link visible-xs" width="32px" height="32px" src="<TMPL_VAR NAME="STATIC_PREFIX">logos/llng-icon-32.png"/>
+            <img ng-click="home()" class="link hidden-xs" width="88px" height="32px" title="<TMPL_VAR NAME="INSTANCE_NAME">" src="<TMPL_VAR NAME="STATIC_PREFIX">logos/llng-logo-32.png"/>
+            <img ng-click="home()" class="link visible-xs" width="32px" height="32px" title="<TMPL_VAR NAME="INSTANCE_NAME">" src="<TMPL_VAR NAME="STATIC_PREFIX">logos/llng-icon-32.png"/>
           </span>
           <button type="button" class="navbar-toggle" ng-click="showM=!showM">
             <span class="sr-only">Toggle navigation</span>
@@ -22,6 +22,7 @@
         </div>
         <ul class="hidden-xs nav navbar-nav" role="grid">
           <li ng-repeat="l in links" id="l in links"><a href="{{l.target}}" role="row"><strong><i ng-if="activeModule == l.title" ng-style="myStyle" class="glyphicon glyphicon-{{l.icon}}"></i><i ng-if="activeModule != l.title" class="glyphicon glyphicon-{{l.icon}}" ng-style="clickStyle"></i> <span ng-if="activeModule == l.title" ng-style="myStyle" ng-bind="translate(l.title)"></span><span ng-if="activeModule != l.title" ng-bind="translate(l.title)" ng-style="clickStyle"></span></strong></a></li>
+
         </ul>
         <ul class="hidden-xs nav navbar-nav navbar-right">
           <li uib-dropdown>
@@ -34,6 +35,11 @@
               <li role="separator" class="divider"></li>
               <li class="dropdown-header"><span ng-bind="translate('version')"></span></li>
               <li><a href="https://lemonldap-ng.org/team" name="version"><TMPL_VAR NAME="VERSION"></a></li>
+              <TMPL_IF NAME="INSTANCE_NAME">
+                <li role="separator" class="divider"></li>
+                <li class="dropdown-header"><span ng-bind="translate('instance')"></span></li>
+                <li><a href="https://lemonldap-ng.org"><TMPL_VAR NAME="INSTANCE_NAME"></a></li>
+              </TMPL_IF>
             </ul>
           </li>
         </ul>

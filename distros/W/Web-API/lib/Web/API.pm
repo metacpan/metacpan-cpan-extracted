@@ -6,7 +6,7 @@ use experimental 'smartmatch';
 
 # ABSTRACT: A Simple base module to implement almost every RESTful API with just a few lines of configuration
 
-our $VERSION = '2.6'; # VERSION
+our $VERSION = '2.7'; # VERSION
 
 use LWP::UserAgent;
 use HTTP::Cookies 6.04;
@@ -374,10 +374,6 @@ sub decode {
         }
         else {
             given ($content_type) {
-                when (/plain/) {
-                    chomp $content;
-                    $data = { text => $content };
-                }
                 when (/urlencoded/) {
                     foreach (split(/&/, $content)) {
                         my ($key, $value) = split(/=/, $_);
@@ -387,6 +383,9 @@ sub decode {
                 when (/json/) { $data = $self->json->decode($content); }
                 when (/(xml|html)/) {
                     $data = $self->xml->XMLin($content, NoAttr => 0);
+                }
+                default {
+                    $data = { text => $content };
                 }
             }
         }
@@ -806,7 +805,7 @@ sub format_response {
 
     if ($error) {
         chomp($error);
-        $self->log("ERROR: $error");
+        $self->log("ERROR: $error") if $self->debug;
         $answer->{error} = $error;
     }
 
@@ -954,7 +953,7 @@ Web::API - A Simple base module to implement almost every RESTful API with just 
 
 =head1 VERSION
 
-version 2.6
+version 2.7
 
 =head1 SYNOPSIS
 

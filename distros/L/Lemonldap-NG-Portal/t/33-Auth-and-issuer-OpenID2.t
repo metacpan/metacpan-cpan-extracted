@@ -10,10 +10,9 @@ BEGIN {
     require 't/test-lib.pm';
 }
 
-my $maintests = 14;
+my $maintests = 12;
 my $debug     = 'error';
 my ( $issuer, $sp, $res );
-my %handlerOR = ( issuer => [], sp => [] );
 
 LWP::Protocol::PSGI->register(
     sub {
@@ -50,13 +49,10 @@ SKIP: {
     if ($@) {
         skip 'Net::OpenID::* notfound', $maintests;
     }
-    ok( $issuer = issuer(), 'Issuer portal' );
-    $handlerOR{issuer} = \@Lemonldap::NG::Handler::Main::_onReload;
-    switch ('sp');
-    &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
 
-    ok( $sp = sp(), 'SP portal' );
-    $handlerOR{sp} = \@Lemonldap::NG::Handler::Main::_onReload;
+    $issuer = register( 'issuer', \&issuer );
+
+    $sp = register( 'sp', \&sp );
 
     # Simple SP access
     my $res;
@@ -181,13 +177,6 @@ SKIP: {
 count($maintests);
 clean_sessions();
 done_testing( count() );
-
-sub switch {
-    my $type = shift;
-    @Lemonldap::NG::Handler::Main::_onReload = @{
-        $handlerOR{$type};
-    };
-}
 
 sub issuer {
     return LLNG::Manager::Test->new( {

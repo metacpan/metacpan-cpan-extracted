@@ -1,5 +1,5 @@
 package Acme::CPANAuthors::ToBeLike;
-$Acme::CPANAuthors::ToBeLike::VERSION = '0.50';
+$Acme::CPANAuthors::ToBeLike::VERSION = '0.52';
 #ABSTRACT: BeLike other CPAN Authors
 
 use strict;
@@ -25,11 +25,13 @@ use Acme::CPANAuthors::Register (
   FLORA => q[Florian Ragwitz],
   GENEHACK => q[John SJ Anderson],
   GETTY => q[Torsten Raudssus],
+  JAHERO => q[Jan Herout],
   JJNAPIORK => q[John Napiorkowski],
   JONASBN => q[jonasbn],
+  KWAKWA => q[Paul Williams],
   LESPEA => q[Adam Lesperance],
   LOGIE => q[Logan Bell],
-  MARCEL => q[base64.tokyo],
+  MARCEL => q[Marcel Gruenauer],
   MELO => q[Pedro Melo],
   MPERRY => q[Matt Perry],
   MRUIZ => q[Miquel Ruiz Martin],
@@ -41,6 +43,7 @@ use Acme::CPANAuthors::Register (
   SARTAK => q[Shawn M Moore],
   SCHWIGON => q[Steffen Schwigon],
   SHANTANU => q[Shantanu Bhadoria],
+  SHLOMIF => q[Shlomi Fish],
   SONGMU => q[Masayuki Matsuki],
   TOKUHIROM => q[Tokuhiro Matsuno''<xmp>],
   XAERXESS => q[Grzegorz Rozniecki],
@@ -62,7 +65,7 @@ Acme::CPANAuthors::ToBeLike - BeLike other CPAN Authors
 
 =head1 VERSION
 
-version 0.50
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -105,11 +108,13 @@ a module indexed with C<BeLike> in the name.
   FLORA => q[Florian Ragwitz],
   GENEHACK => q[John SJ Anderson],
   GETTY => q[Torsten Raudssus],
+  JAHERO => q[Jan Herout],
   JJNAPIORK => q[John Napiorkowski],
   JONASBN => q[jonasbn],
+  KWAKWA => q[Paul Williams],
   LESPEA => q[Adam Lesperance],
   LOGIE => q[Logan Bell],
-  MARCEL => q[base64.tokyo],
+  MARCEL => q[Marcel Gruenauer],
   MELO => q[Pedro Melo],
   MPERRY => q[Matt Perry],
   MRUIZ => q[Miquel Ruiz Martin],
@@ -121,6 +126,7 @@ a module indexed with C<BeLike> in the name.
   SARTAK => q[Shawn M Moore],
   SCHWIGON => q[Steffen Schwigon],
   SHANTANU => q[Shantanu Bhadoria],
+  SHLOMIF => q[Shlomi Fish],
   SONGMU => q[Masayuki Matsuki],
   TOKUHIROM => q[Tokuhiro Matsuno''<xmp>],
   XAERXESS => q[Grzegorz Rozniecki],
@@ -139,7 +145,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Chris Williams.
+This software is copyright (c) 2020 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

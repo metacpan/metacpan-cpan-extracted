@@ -1,13 +1,13 @@
 use strict;
 use warnings;
-no if "$]" >= 5.031008, feature => 'indirect';
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.153-3-g721a01f
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.155-6-gbf4846a
+# vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.154';
+our $VERSION = '0.156';
 
+no if "$]" >= 5.031009, feature => 'indirect';
 use Moose;
 with
     'Dist::Zilla::Role::PluginBundle::Easy',
@@ -385,7 +385,7 @@ sub configure {
         [ 'Git::Describe'       => { ':version' => '0.004', on_package_line => 1 } ],
         [
             ($self->surgical_podweaver ? 'SurgicalPodWeaver' : 'PodWeaver') => {
-                $self->surgical_podweaver ? () : ( ':version' => '4.005' ),
+                $self->surgical_podweaver ? () : ( ':version' => '4.008' ),
                 -f 'weaver.ini' ? () : ( config_plugin => '@Author::ETHER' ),
                 replacer => 'replace_with_comment',
                 post_code_replacer => 'replace_with_nothing',
@@ -489,6 +489,7 @@ sub configure {
         # Take care! runtime-requires prereqs needs to be updated in dist.ini when this is changed.
         ':version' => '0.007',
 
+        'RewriteVersion::Transitional.:version' => 0.006,
         'RewriteVersion::Transitional.global' => 1,
         'RewriteVersion::Transitional.fallback_version_provider' => 'Git::NextVersion',
         'RewriteVersion::Transitional.version_regexp' => '^v([\d._]+)(-TRIAL)?$',
@@ -598,7 +599,9 @@ around add_plugins => sub {
         }
 
         # record prereq (and version) for later possible injection
-        $self->_add_minimum_plugin_requirement($plugin => $payload->{':version'} // 0);
+        # (Note: this depends on $CWD being equal to $zilla->root)
+        $self->_add_minimum_plugin_requirement($plugin => $payload->{':version'} // 0)
+            if not -f do { (my $filename = $plugin) =~ s{::}{/}g; $filename .= '.pm' };
     }
 
     return $self->$orig(@plugins);
@@ -649,7 +652,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.154
+version 0.156
 
 =head1 SYNOPSIS
 
@@ -797,7 +800,7 @@ following F<dist.ini> (following the preamble), minus some optimizations:
     on_package_line = 1
 
     [PodWeaver] (or [SurgicalPodWeaver])
-    :version = 4.005
+    :version = 4.008
     config_plugin = @Author::ETHER ; unless weaver.ini is present
     replacer = replace_with_comment
     post_code_replacer = replace_with_nothing

@@ -3,11 +3,12 @@
 use strict;
 use warnings;
 use OPTIMADE::Filter::Property;
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 my $property = OPTIMADE::Filter::Property->new( "Some", "Property" );
 is( $property->to_filter, 'some.property' );
 is( $property->to_SQL, "'Some'.'Property'" );
+is( $property, $property );
 
 my $error = '';
 eval {

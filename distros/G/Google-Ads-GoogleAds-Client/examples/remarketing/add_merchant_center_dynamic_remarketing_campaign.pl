@@ -14,9 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# This example creates a shopping campaign associated with an existing
-# merchant center account, along with a related ad group and dynamic
-# display ad, and targets a user list for remarketing purposes.
+# This example creates a shopping campaign associated with an existing Merchant
+# Center account, along with a related ad group and dynamic display ad, and
+# targets a user list for remarketing purposes.
 
 use strict;
 use warnings;
@@ -43,6 +43,8 @@ use Google::Ads::GoogleAds::V3::Common::UserListInfo;
 use Google::Ads::GoogleAds::V3::Enums::AdvertisingChannelTypeEnum qw(DISPLAY);
 use Google::Ads::GoogleAds::V3::Enums::CampaignStatusEnum;
 use Google::Ads::GoogleAds::V3::Enums::AdGroupStatusEnum;
+use Google::Ads::GoogleAds::V3::Enums::DisplayAdFormatSettingEnum
+  qw(NON_NATIVE);
 use Google::Ads::GoogleAds::V3::Enums::AssetTypeEnum qw(IMAGE);
 use Google::Ads::GoogleAds::V3::Services::CampaignService::CampaignOperation;
 use Google::Ads::GoogleAds::V3::Services::AdGroupService::AdGroupOperation;
@@ -65,19 +67,19 @@ use Data::Uniqid qw(uniqid);
 # code.
 #
 # Running the example with -h will print the command line usage.
-my $customer_id        = "INSERT_CUSTOMER_ID_HERE";
-my $merchant_center_id = "INSERT_MERCHANT_CENTER_ID_HERE";
-my $campaign_budget_id = "INSERT_CAMPAIGN_BUDGET_ID_HERE";
-my $user_list_id       = "INSERT_USER_LIST_ID_HERE";
+my $customer_id                = "INSERT_CUSTOMER_ID_HERE";
+my $merchant_center_account_id = "INSERT_MERCHANT_CENTER_ACCOUNT_ID_HERE";
+my $campaign_budget_id         = "INSERT_CAMPAIGN_BUDGET_ID_HERE";
+my $user_list_id               = "INSERT_USER_LIST_ID_HERE";
 
 sub add_merchant_center_dynamic_remarketing_campaign {
-  my ($api_client, $customer_id, $merchant_center_id, $campaign_budget_id,
-    $user_list_id)
+  my ($api_client, $customer_id, $merchant_center_account_id,
+    $campaign_budget_id, $user_list_id)
     = @_;
 
-  # Create a shopping campaign associated with a given merchant center account.
+  # Create a shopping campaign associated with a given Merchant Center account.
   my $campaign_resource_name =
-    create_campaign($api_client, $customer_id, $merchant_center_id,
+    create_campaign($api_client, $customer_id, $merchant_center_account_id,
     $campaign_budget_id);
 
   # Create an ad group for the campaign.
@@ -96,7 +98,9 @@ sub add_merchant_center_dynamic_remarketing_campaign {
 
 # Creates a campaign linked to a Merchant Center product feed.
 sub create_campaign {
-  my ($api_client, $customer_id, $merchant_center_id, $campaign_budget_id) = @_;
+  my ($api_client, $customer_id, $merchant_center_account_id,
+    $campaign_budget_id)
+    = @_;
 
   # Create a campaign.
   my $campaign = Google::Ads::GoogleAds::V3::Resources::Campaign->new({
@@ -110,11 +114,11 @@ sub create_campaign {
         ),
       manualCpc => Google::Ads::GoogleAds::V3::Common::ManualCpc->new(),
       # The settings for the shopping campaign.
-      # This connects the campaign to the merchant center account.
+      # This connects the campaign to the Merchant Center account.
       shoppingSetting =>
         Google::Ads::GoogleAds::V3::Resources::ShoppingSetting->new({
           campaignPriority => 0,
-          merchantId       => $merchant_center_id,
+          merchantId       => $merchant_center_account_id,
           # Display Network campaigns do not support partition by country. The only
           # supported value is "ZZ". This signals that products from all countries are
           # available in the campaign. The actual products which serve are based on
@@ -172,16 +176,13 @@ sub create_ad_group {
 sub create_ad {
   my ($api_client, $customer_id, $ad_group_resource_name) = @_;
 
-  my $marketing_image_url  = "https://goo.gl/3b9Wfh";
-  my $marketing_image_name = "Marketing Image";
   my $marketing_image_resource_name =
-    upload_asset($api_client, $customer_id, $marketing_image_url,
-    $marketing_image_name);
+    upload_asset($api_client, $customer_id, "https://goo.gl/3b9Wfh",
+    "Marketing Image");
 
-  my $logo_image_url  = "https://goo.gl/mtt54n";
-  my $logo_image_name = "Square Marketing Image";
-  my $logo_image_resource_name =
-    upload_asset($api_client, $customer_id, $logo_image_url, $logo_image_name);
+  my $square_marketing_image_resource_name =
+    upload_asset($api_client, $customer_id, "https://goo.gl/mtt54n",
+    "Square Marketing Image");
 
   # Create a responsive display ad info object.
   my $responsive_display_ad_info =
@@ -193,7 +194,7 @@ sub create_ad {
       ],
       squareMarketingImages => [
         Google::Ads::GoogleAds::V3::Common::AdImageAsset->new({
-            asset => $logo_image_resource_name
+            asset => $square_marketing_image_resource_name
           })
       ],
       headlines => [
@@ -212,33 +213,27 @@ sub create_ad {
       ],
       businessName => "Interplanetary Cruises",
       # Optional: Call to action text.
-      # Valid texts: https://support.google.com/adwords/answer/7005917
+      # Valid texts: https://support.google.com/google-ads/answer/7005917
       callToActionText => "Apply Now",
+      # Optional: Set the ad colors.
+      mainColor   => "#0000ff",
+      accentColor => "#ffff00",
+      # Optional: Set to false to strictly render the ad using the colors.
+      allowFlexibleColor => "false",
+      # Optional: Set the format setting that the ad will be served in.
+      formatSetting => NON_NATIVE,
       # Optional: Create a logo image and set it to the ad.
       # logoImages => [
       #   Google::Ads::GoogleAds::V3::Common::AdImageAsset->new({
-      #       asset => $logo_image_resource_name
+      #       asset => "INSERT_LOGO_IMAGE_RESOURCE_NAME_HERE"
       #     })
       # ],
       # Optional: Create a square logo image and set it to the ad.
-      squareLogoImages => [
-        Google::Ads::GoogleAds::V3::Common::AdImageAsset->new({
-            asset => $logo_image_resource_name
-          })
-      ],
-      # Whitelisted accounts only: Set color settings using hexadecimal values.
-      # Set allowFlexibleColor to false if you want your ads to render by always
-      # using your colors strictly.
-      #
-      # mainColor => "#0000ff"
-      # accentColor => "#ffff00"
-      # allowFlexibleColor => "false"
-      #
-      # Whitelisted accounts only: Set the format setting that the ad will be
-      # served in.
-      #
-      # formatSetting => DisplayAdFormatSettingEnum::NON_NATIVE
-      #
+      # squareLogoImages => [
+      #   Google::Ads::GoogleAds::V3::Common::AdImageAsset->new({
+      #       asset => "INSERT_SQUARE_LOGO_IMAGE_RESOURCE_NAME_HERE"
+      #     })
+      # ]
     });
 
   # Create an ad group ad.
@@ -337,22 +332,22 @@ $api_client->set_die_on_faults(1);
 
 # Parameters passed on the command line will override any parameters set in code.
 GetOptions(
-  "customer_id=s"        => \$customer_id,
-  "merchant_center_id=i" => \$merchant_center_id,
-  "campaign_budget_id=i" => \$campaign_budget_id,
-  "user_list_id=i"       => \$user_list_id
+  "customer_id=s"                => \$customer_id,
+  "merchant_center_account_id=i" => \$merchant_center_account_id,
+  "campaign_budget_id=i"         => \$campaign_budget_id,
+  "user_list_id=i"               => \$user_list_id
 );
 
 # Print the help message if the parameters are not initialized in the code nor
 # in the command line.
 pod2usage(2)
-  if not check_params($customer_id, $merchant_center_id, $campaign_budget_id,
-  $user_list_id);
+  if not check_params($customer_id, $merchant_center_account_id,
+  $campaign_budget_id, $user_list_id);
 
 # Call the example.
 add_merchant_center_dynamic_remarketing_campaign($api_client,
   $customer_id =~ s/-//gr,
-  $merchant_center_id, $campaign_budget_id, $user_list_id);
+  $merchant_center_account_id, $campaign_budget_id, $user_list_id);
 
 =pod
 
@@ -362,7 +357,7 @@ add_merchant_center_dynamic_remarketing_campaign
 
 =head1 DESCRIPTION
 
-This example creates a shopping campaign associated with an existing merchant center
+This example creates a shopping campaign associated with an existing Merchant Center
 account, along with a related ad group and dynamic display ad, and targets a user
 list for remarketing purposes.
 
@@ -370,10 +365,10 @@ list for remarketing purposes.
 
 add_merchant_center_dynamic_remarketing_campaign.pl [options]
 
-    -help                       Show the help message.
-    -customer_id                The Google Ads customer ID.
-    -merchant_center_id         The Merchant Center ID.
-    -campaign_budget_id         The campaign budget ID.
-    -user_list_id               The user list ID.
+    -help                           Show the help message.
+    -customer_id                    The Google Ads customer ID.
+    -merchant_center_account_id     The Merchant Center account ID.
+    -campaign_budget_id             The campaign budget ID.
+    -user_list_id                   The user list ID.
 
 =cut

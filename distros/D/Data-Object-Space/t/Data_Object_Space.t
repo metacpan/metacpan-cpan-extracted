@@ -31,18 +31,24 @@ method: call
 method: child
 method: children
 method: cop
+method: destroy
+method: eval
 method: functions
 method: hash
 method: hashes
 method: id
+method: included
 method: inherits
 method: load
+method: loaded
+method: locate
 method: methods
 method: name
 method: parent
 method: parse
 method: parts
 method: prepend
+method: rebase
 method: root
 method: routine
 method: routines
@@ -381,6 +387,51 @@ cop(Any @args) : CodeRef
 
 =cut
 
+=method destroy
+
+The destroy method attempts to wipe out a namespace and also remove it and its
+children from C<%INC>. B<NOTE:> This can cause catastrophic failures if used
+incorrectly.
+
+=signature destroy
+
+destroy() : Object
+
+=example-1 destroy
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('data/dumper');
+
+  $space->load; # Data/Dumper
+
+  $space->destroy;
+
+=cut
+
+=method eval
+
+The eval method takes a list of strings and evaluates them under the namespace
+represented by the instance.
+
+=signature eval
+
+eval(Str @args) : Any
+
+=example-1 eval
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('foo');
+
+  $space->eval('our $VERSION = 0.01');
+
+=cut
+
 =method functions
 
 The functions method searches the package namespace for functions and returns
@@ -487,6 +538,26 @@ id() : Str
 
 =cut
 
+=method included
+
+The included method returns the path of the namespace if it exists in C<%INC>.
+
+=signature included
+
+included() : Str
+
+=example-1 included
+
+  package main;
+
+  my $space = Data::Object::Space->new('Data/Object/Space');
+
+  $space->included;
+
+  # lib/Data/Object/Space.pm
+
+=cut
+
 =method inherits
 
 The inherits method returns the list of superclasses the target package is
@@ -550,6 +621,79 @@ load() : Str
   $space->load
 
   # CPAN
+
+=cut
+
+=method loaded
+
+The loaded method checks whether the package namespace is already loaded
+returns truthy or falsy.
+
+=signature loaded
+
+loaded() : Int
+
+=example-1 loaded
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('data/dumper');
+
+  $space->loaded;
+
+  # 0
+
+=example-2 loaded
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('data/dumper');
+
+  $space->load;
+
+  $space->loaded;
+
+  # 1
+
+=cut
+
+=method locate
+
+The locate method checks whether the package namespace is available in
+C<@INC>, i.e. on disk. This method returns the file if found or an empty
+string.
+
+=signature locate
+
+locate() : Str
+
+=example-1 locate
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('foo');
+
+  $space->locate;
+
+  # ''
+
+=example-2 locate
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('data/dumper');
+
+  $space->locate;
+
+  # /path/to/Data/Dumper.pm
 
 =cut
 
@@ -732,6 +876,25 @@ prepend(Str @args) : Object
   $space->prepend('etc', 'tmp');
 
   # 'Etc/Tmp/Foo/Bar'
+
+=cut
+
+=method rebase
+
+The rebase method returns an object by prepending the package namespace
+specified to the base of the current object's namespace.
+
+=signature rebase
+
+rebase(Str @args) : Object
+
+=example-1 rebase
+
+  # given: synopsis
+
+  $space->rebase('zoo');
+
+  # Zoo/Bar
 
 =cut
 
@@ -1161,6 +1324,24 @@ $subs->example(-1, 'cop', 'method', fun($tryable) {
   $result
 });
 
+$subs->example(-1, 'destroy', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+
+  ok !$result->used;
+  ok !$result->included;
+  ok !$result->loaded;
+
+  $result
+});
+
+$subs->example(-1, 'eval', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is $result, 0.01;
+  is "Foo"->VERSION, 0.01;
+
+  $result
+});
+
 $subs->example(-1, 'functions', 'method', fun($tryable) {
   ok my $result = $tryable->result;
   is_deeply $result, ['start'];
@@ -1189,6 +1370,13 @@ $subs->example(-1, 'id', 'method', fun($tryable) {
   $result
 });
 
+$subs->example(-1, 'included', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  like $result, qr(Data/Object/Space.pm);
+
+  $result
+});
+
 $subs->example(-1, 'inherits', 'method', fun($tryable) {
   ok my $result = $tryable->result;
   is_deeply $result, [];
@@ -1206,6 +1394,32 @@ $subs->example(-2, 'inherits', 'method', fun($tryable) {
 $subs->example(-1, 'load', 'method', fun($tryable) {
   ok my $result = $tryable->result;
   is $result, 'CPAN';
+
+  $result
+});
+
+$subs->example(-1, 'loaded', 'method', fun($tryable) {
+  ok !(my $result = $tryable->result);
+
+  $result
+});
+
+$subs->example(-2, 'loaded', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+
+  $result
+});
+
+$subs->example(-1, 'locate', 'method', fun($tryable) {
+  ok !(my $result = $tryable->result);
+  ok !length($result);
+
+  $result
+});
+
+$subs->example(-2, 'locate', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok length($result);
 
   $result
 });
@@ -1297,6 +1511,13 @@ $subs->example(-1, 'prepend', 'method', fun($tryable) {
 $subs->example(-2, 'prepend', 'method', fun($tryable) {
   ok my $result = $tryable->result;
   is $$result, 'Etc/Tmp/Foo/Bar';
+
+  $result
+});
+
+$subs->example(-1, 'rebase', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is $$result, 'Zoo/Bar';
 
   $result
 });

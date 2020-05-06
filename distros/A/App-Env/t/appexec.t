@@ -9,7 +9,7 @@ use File::Spec::Functions qw[ catfile ];
 
 my $exe    = catfile( qw[ blib script appexec ] );
 my $lib    = catfile( qw[ t lib ] );
-my $script = catfile( qw [ t appexec.pl ] );
+my $script = catfile( qw [ t bin appexec.pl ] );
 
 {
     my $fh = File::Temp->new;

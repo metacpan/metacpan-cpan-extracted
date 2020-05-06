@@ -57,6 +57,7 @@ use strict;
 use Data::Dumper;
 use File::Find;
 use LWP::UserAgent;
+use Time::Fake;
 use URI::Escape;
 use Lemonldap::NG::Common::FormEncode;
 
@@ -65,7 +66,6 @@ use Lemonldap::NG::Common::FormEncode;
 no warnings 'redefine';
 
 BEGIN {
-    require 't/Time-Fake.pm';
     use_ok('Lemonldap::NG::Portal::Main');
 }
 
@@ -76,11 +76,13 @@ $Data::Dumper::Useperl  = 1;
 my $ini;
 
 use File::Temp 'tempfile', 'tempdir';
+use File::Copy 'copy';
 our $tmpDir = $LLNG::TMPDIR
   || tempdir( 'tmpSessionXXXXX', DIR => 't/sessions', CLEANUP => 1 );
 mkdir "$tmpDir/lock";
 mkdir "$tmpDir/saml";
 mkdir "$tmpDir/saml/lock";
+copy( "t/lmConf-1.json", "$tmpDir/lmConf-1.json" );
 
 =head4 count($inc)
 
@@ -92,6 +94,29 @@ sub count {
     my $c = shift;
     $count += $c if ($c);
     return $count;
+}
+
+=head4 buildForm($params)
+
+Convenience method that builds a url-encoded query string from a hash of arguments
+
+=cut
+
+sub buildForm {
+    my $fields = shift;
+    my $query  = join(
+        '&',
+        map {
+            "$_="
+              . (
+                $fields->{$_}
+                ? uri_escape( uri_unescape( $fields->{$_} ) )
+                : ''
+              )
+          }
+          keys(%$fields)
+    );
+    return $query;
 }
 
 =head4 explain( $result, $expected_result )
@@ -141,8 +166,7 @@ sub count_sessions {
 
 sub getCache {
     require Cache::FileCache;
-    return Cache::FileCache->new(
-        {
+    return Cache::FileCache->new( {
             namespace   => 'lemonldap-ng-session',
             cache_root  => $tmpDir,
             cache_depth => 0,
@@ -275,18 +299,7 @@ m@<form.+?action="(?:(?:http://([^/]+))?(/.*?)?|(#))".+method="(post|get)"@is,
               m#<input.+?name="([^"]+)"[^>]+(?:value="([^"]*?)")?#gs,
             %fields
         );
-        my $query = join(
-            '&',
-            map {
-                "$_="
-                  . (
-                    $fields{$_}
-                    ? uri_escape( uri_unescape( $fields{$_} ) )
-                    : ''
-                  )
-              }
-              keys(%fields)
-        );
+        my $query = buildForm( \%fields );
         foreach my $f (@requiredFields) {
             ok( exists $fields{$f}, qq{ Field "$f" is defined} );
             count(1);
@@ -355,6 +368,18 @@ Verify that returned code is 400. Note that it works only for Ajax request
 sub expectBadRequest {
     my ($res) = @_;
     ok( $res->[0] == 400, ' HTTP code is 400' ) or explain( $res->[0], 400 );
+    count(1);
+}
+
+=head4 expectPortalError( $res, $errnum )
+
+Verify that an error is displayed on the portal
+=cut
+
+sub expectPortalError {
+    my ( $res, $errnum, $message ) = @_;
+    $errnum ||= 9;
+    like( $res->[2]->[0], qr/<span trmsg="$errnum">/, $message );
     count(1);
 }
 
@@ -501,6 +526,40 @@ sub tempdb {
     return "$tmpDir/userdb.db";
 }
 
+my %handlerOR;
+
+=head4 register
+
+Registers a new LLNG instance
+
+=cut
+
+sub register {
+    my ( $type, $constructor ) = @_;
+    my $obj;
+    @Lemonldap::NG::Handler::Main::_onReload = ();
+    &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
+    ok( $obj = $constructor->(), 'Register $type' );
+    count(1);
+    $handlerOR{$type} = \@Lemonldap::NG::Handler::Main::_onReload;
+    return $obj;
+}
+
+=head4 register
+
+Switch to a registered instance
+
+=cut
+
+sub switch {
+    my $type = shift;
+    return [] unless $handlerOR{$type};
+    note( '==> Switching to ' . uc($type) . ' <==' );
+    @Lemonldap::NG::Handler::Main::_onReload = @{
+        $handlerOR{$type};
+    };
+}
+
 =head2 LLNG::Manager::Test Class
 
 =cut
@@ -515,7 +574,7 @@ extends 'Lemonldap::NG::Common::PSGI::Cli::Lib';
 our $defaultIni = {
     configStorage => {
         type    => 'File',
-        dirName => 't',
+        dirName => "$tmpDir",
     },
     localSessionStorage        => 'Cache::FileCache',
     localSessionStorageOptions => {
@@ -705,8 +764,7 @@ to test content I<(to launch a C<expectForm()> for example)>.
 
 sub _get {
     my ( $self, $path, %args ) = @_;
-    my $res = $self->app->(
-        {
+    my $res = $self->app->( {
             'HTTP_ACCEPT' => $args{accept}
               || 'application/json, text/plain, */*',
             'HTTP_ACCEPT_LANGUAGE' => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
@@ -758,8 +816,7 @@ sub _post {
     my ( $self, $path, $body, %args ) = @_;
     die "$body must be a IO::Handle"
       unless ( ref($body) and $body->can('read') );
-    my $res = $self->app->(
-        {
+    my $res = $self->app->( {
             'HTTP_ACCEPT' => $args{accept}
               || 'application/json, text/plain, */*',
             'HTTP_ACCEPT_LANGUAGE' => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
@@ -771,10 +828,12 @@ sub _post {
             'PATH_INFO' => $path,
             ( $args{query}   ? ( QUERY_STRING => $args{query} )   : () ),
             ( $args{referer} ? ( REFERER      => $args{referer} ) : () ),
-            'REMOTE_ADDR' => '127.0.0.1',
             (
-                $args{remote_user}
-                ? ( 'REMOTE_USER' => $args{remote_user} )
+                $args{ip} ? ( 'REMOTE_ADDR' => $args{ip} )
+                : ( 'REMOTE_ADDR' => '127.0.0.1' )
+            ),
+            (
+                $args{remote_user} ? ( 'REMOTE_USER' => $args{remote_user} )
                 : ()
             ),
             'REQUEST_METHOD' => $args{method} || 'POST',

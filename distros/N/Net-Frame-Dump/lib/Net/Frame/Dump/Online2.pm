@@ -1,5 +1,5 @@
 #
-# $Id: Online2.pm,v 89981a6995b9 2018/06/17 11:10:11 gomor $
+# $Id: Online2.pm,v a93481b098ec 2020/05/01 08:55:56 gomor $
 #
 package Net::Frame::Dump::Online2;
 use strict;
@@ -110,7 +110,7 @@ sub start {
    }
 
    my $fcode;
-   if (Net::Pcap::compile($pd, \$fcode, $self->filter, 0, $mask) < 0) {
+   if (Net::Pcap::compile($pd, \$fcode, $self->filter, $self->filterCodeOptimizer, $mask) < 0) {
       print("[-] ".__PACKAGE__.": compile: ". Net::Pcap::geterr($pd). "\n");
       return;
    }
@@ -499,7 +499,7 @@ Patrice E<lt>GomoRE<gt> Auffret
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2006-2018, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2006-2020, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the Artistic license.
 See LICENSE.Artistic file in the source distribution archive.

@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-OEIS.
 #
@@ -28,12 +28,18 @@ eval q{use Scalar::Util 'weaken'; 1}
   || eval q{sub weaken { $_[0] = undef }; 1 }
     || die "Oops, error making a weaken() fallback: $@";
 
-our $VERSION = 14;
+our $VERSION = 15;
 
 # singleton here results in a separate instance object in each derived subclass
 use Class::Singleton;
 our @ISA = ('Class::Singleton');
-*_new_instance = __PACKAGE__->can('new');
+#
+# Called by ->instance() from Class::Singleton.  Must dispatch back up the
+# heirarchy to get a derived $class->new() rather than just \&new here.
+sub _new_instance {
+  my $class = shift;
+  return $class->new(@_);
+}
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -177,7 +183,7 @@ L<http://user42.tuxfamily.org/math-oeis/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2020 Kevin Ryde
 
 Math-OEIS is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

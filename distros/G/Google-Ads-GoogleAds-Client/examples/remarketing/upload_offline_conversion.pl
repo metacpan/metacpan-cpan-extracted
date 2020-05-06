@@ -63,8 +63,8 @@ sub upload_offline_conversion {
         $customer_id, $conversion_action_id
         ),
       gclid              => $gclid,
-      conversionValue    => $conversion_value,
       conversionDateTime => $conversion_date_time,
+      conversionValue    => $conversion_value,
       currencyCode       => "USD"
     });
 
@@ -76,14 +76,23 @@ sub upload_offline_conversion {
       partialFailure => "true"
     });
 
-  # Print the result.
+  # Print any partial errors returned.
+  if ($upload_click_conversions_response->{partialFailureError}) {
+    printf "Partial error encountered: '%s'.\n",
+      $upload_click_conversions_response->{partialFailureError}{message};
+  }
+
+  # Print the result if valid.
   my $uploaded_click_conversion =
     $upload_click_conversions_response->{results}[0];
-  printf "Uploaded conversion that occurred at '%s' " .
-    "from Google Click ID '%s' to '%s'.\n",
-    $uploaded_click_conversion->{conversionDateTime},
-    $uploaded_click_conversion->{gclid},
-    $uploaded_click_conversion->{conversionAction};
+  if (%$uploaded_click_conversion) {
+    printf
+      "Uploaded conversion that occurred at '%s' from Google Click ID '%s' " .
+      "to the conversion action with resource name '%s'.\n",
+      $uploaded_click_conversion->{conversionDateTime},
+      $uploaded_click_conversion->{gclid},
+      $uploaded_click_conversion->{conversionAction};
+  }
 
   return 1;
 }
@@ -105,7 +114,7 @@ GetOptions(
   "conversion_action_id=i" => \$conversion_action_id,
   "gclid=s"                => \$gclid,
   "conversion_date_time=s" => \$conversion_date_time,
-  "conversion_value=i"     => \$conversion_value
+  "conversion_value=f"     => \$conversion_value
 );
 
 # Print the help message if the parameters are not initialized in the code nor

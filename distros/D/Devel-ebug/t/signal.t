@@ -9,7 +9,7 @@ plan skip_all => "Devel::ebug does not handle signals under Windows atm" if $^O 
 plan tests => 8;
 
 my $ebug = Devel::ebug->new;
-$ebug->program("t/signal.pl");
+$ebug->program("corpus/signal.pl");
 $ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 

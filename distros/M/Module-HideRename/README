@@ -1,0 +1,99 @@
+NAME
+    Module::HideRename - Hide modules by renaming them
+
+VERSION
+    This document describes version 0.003 of Module::HideRename (from Perl
+    distribution Module-HideRename), released on 2020-02-13.
+
+SYNOPSIS
+     use Module::HideRename qw(
+         hiderename_modules
+         unhiderename_modules
+     );
+
+     hiderename_modules(modules => ['Foo', 'Foo::Bar']);
+     # this will rename Foo.pm to Foo_hidden.pm and Foo/Bar.pm to Foo/Bar_hidden.pm
+
+     unhiderename_modules(modules => ['Foo', 'Foo::Bar']);
+     # this will rename back Foo_hidden.pm to Foo.pm and Foo/Bar_hidden.pm to Foo/Bar.pm
+
+DESCRIPTION
+    Sometimes all you need to do to hide a module from a Perl code is
+    install an @INC hook (e.g. like what Devel::Hide or
+    Test::Without::Module does). But sometimes you actually need to hide
+    (rename) the module files.
+
+FUNCTIONS
+  hiderename_modules
+    Usage:
+
+     hiderename_modules(%args) -> [status, msg, payload, meta]
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   modules* => *array[perl::modname]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  unhiderename_modules
+    Usage:
+
+     unhiderename_modules(%args) -> [status, msg, payload, meta]
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   modules* => *array[perl::modname]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Module-HideRename>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Module-HideRename>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Module-HideRename>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    App::pmhiderename, CLI for hiderenaming
+
+    lib::hiderename, pragma for hiderenaming
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -12,7 +12,7 @@
    <tr partner="<TMPL_VAR NAME="name">">
     <td><TMPL_VAR NAME="displayName"></td>
     <td class="localeDate" val="<TMPL_VAR NAME="epoch">"></td>
-    <td><TMPL_VAR NAME="scope"></td>
+    <td><TMPL_VAR NAME="scope" ESCAPE=HTML></td>
     <td>
       <a partner="<TMPL_VAR NAME="name">" title="delete" class="oidcConsent">
         <span class="btn btn-danger" role="button">

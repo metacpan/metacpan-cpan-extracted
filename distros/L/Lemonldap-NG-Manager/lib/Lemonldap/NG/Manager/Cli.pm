@@ -6,7 +6,7 @@ use Mouse;
 use Data::Dumper;
 use Lemonldap::NG::Common::Conf::ReConstants;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.8';
 $Data::Dumper::Useperl = 1;
 
 extends('Lemonldap::NG::Manager::Cli::Lib');
@@ -21,17 +21,17 @@ has cfgNum => (
     }
 );
 
-has sep => ( is => 'rw', isa => 'Str', default => '/' );
-
-has req => ( is => 'ro' );
-
+has log    => ( is => 'rw' );
+has req    => ( is => 'ro' );
+has sep    => ( is => 'rw', isa => 'Str', default => '/' );
 has format => ( is => 'rw', isa => 'Str', default => "%-25s | %-25s | %-25s" );
-
-has yes => ( is => 'rw', isa => 'Bool', default => 0 );
-
-has force => ( is => 'rw', isa => 'Bool', default => 0 );
-
-has log => ( is => 'rw' );
+has yes    => ( is => 'rw', isa => 'Bool', default => 0 );
+has safe   => ( is => 'rw', isa => 'Bool', default => 0 );
+has force  => ( is => 'rw', isa => 'Bool', default => 0 );
+has logger => ( is => 'ro', lazy => 1, builder => sub { $_[0]->mgr->logger } );
+has userLogger =>
+  ( is => 'ro', lazy => 1, builder => sub { $_[0]->mgr->userLogger } );
+has localConf => ( is => 'ro', lazy => 1, builder => sub { $_[0]->mgr } );
 
 sub get {
     my ( $self, @keys ) = @_;
@@ -60,6 +60,7 @@ sub set {
             die "$key seems to be a hash, modification refused";
         }
         $oldValue //= '';
+        $self->logger->info("CLI: Set key $key with $pairs{$key}");
         push @list, [ $key, $oldValue, $pairs{$key} ];
     }
     unless ( $self->yes ) {
@@ -75,7 +76,7 @@ sub set {
         }
     }
     require Clone;
-    my $new = Clone::clone( $self->mgr->currentConf );
+    my $new = Clone::clone( $self->mgr->hLoadedPlugins->{conf}->currentConf );
     foreach my $key ( keys %pairs ) {
         $self->_setKey( $new, $key, $pairs{$key} );
     }
@@ -96,10 +97,11 @@ sub addKey {
         unless ( $root =~ /$simpleHashKeys$/o or $root =~ /$sep/o ) {
             die "$root is not a simple hash. Aborting";
         }
+        $self->logger->info("CLI: Append key $root/$newKey $value");
         push @list, [ $root, $newKey, $value ];
     }
     require Clone;
-    my $new = Clone::clone( $self->mgr->currentConf );
+    my $new = Clone::clone( $self->mgr->hLoadedPlugins->{conf}->currentConf );
     foreach my $el (@list) {
         my @path = split $sep, $el->[0];
         if ( $#path == 0 ) {
@@ -136,10 +138,11 @@ sub delKey {
         unless ( $root =~ /$simpleHashKeys$/o or $root =~ /$sep/o ) {
             die "$root is not a simple hash. Aborting";
         }
+        $self->logger->info("CLI: Remove key $root/$key");
         push @list, [ $root, $key ];
     }
     require Clone;
-    my $new = Clone::clone( $self->mgr->currentConf );
+    my $new = Clone::clone( $self->mgr->hLoadedPlugins->{conf}->currentConf );
     foreach my $el (@list) {
         my @path = split $sep, $el->[0];
         if ( $#path == 0 ) {
@@ -191,12 +194,13 @@ sub delKey {
 
 sub lastCfg {
     my ($self) = @_;
+    $self->logger->info("CLI: Retrieve last conf.");
     return $self->jsonResponse('/confs/latest')->{cfgNum};
 }
 
 sub save {
     my ($self) = @_;
-    my $conf = $self->jsonResponse( '/confs/latest', 'full=1' );
+    my $conf = $self->jsonResponse( '/confs/' . $self->cfgNum, 'full=1' );
     my $json = JSON->new->indent->canonical;
     print $json->encode($conf);
 }
@@ -218,10 +222,38 @@ sub restore {
         close $f;
         die "Empty or malformed file $file" unless ( $conf =~ /\w/s );
     }
+    $self->logger->info("CLI: Restore conf.");
     my $res = $self->_post( '/confs/raw', '', IO::String->new($conf),
         'application/json', length($conf) );
     use Data::Dumper;
     print STDERR Dumper($res);
+}
+
+sub rollback {
+    my ($self)      = @_;
+    my $lastCfg     = $self->mgr->confAcc->lastCfg;
+    my $previousCfg = $lastCfg - 1;
+    my $conf =
+      $self->mgr->confAcc->getConf( { cfgNum => $previousCfg, raw => 1 } )
+      or die $Lemonldap::NG::Common::Conf::msg;
+
+    $conf->{cfgNum}    = $lastCfg;
+    $conf->{cfgAuthor} = scalar( getpwuid $< ) . '(command-line-interface)';
+    chomp $conf->{cfgAuthor};
+    $conf->{cfgAuthorIP} = '127.0.0.1';
+    $conf->{cfgDate}     = time;
+    $conf->{cfgVersion}  = $Lemonldap::NG::Manager::VERSION;
+    $conf->{cfgLog}      = $self->log // "Rolled back configuration $lastCfg";
+
+    my $s = $self->mgr->confAcc->saveConf($conf);
+    if ( $s > 0 ) {
+        $self->logger->info("CLI: Configuration $lastCfg has been rolled back");
+        print STDERR "Configuration $lastCfg has been rolled back\n";
+    }
+    else {
+        $self->logger->error("CLI: Failed to rollback configuration $lastCfg");
+        print STDERR "Failed to rollback configuration $lastCfg\n";
+    }
 }
 
 sub _getKey {
@@ -232,7 +264,8 @@ sub _getKey {
         warn "Malformed key $base";
         return ();
     }
-    my $value = $self->mgr->getConfKey( $self->req, $base, noCache => 1 );
+    my $value = $self->mgr->hLoadedPlugins->{conf}
+      ->getConfKey( $self->req, $base, noCache => 1 );
     if ( $self->req->error ) {
         die $self->req->error;
     }
@@ -268,35 +301,50 @@ sub _save {
     require Lemonldap::NG::Manager::Conf::Parser;
     my $parser = Lemonldap::NG::Manager::Conf::Parser->new( {
             newConf => $new,
-            refConf => $self->mgr->currentConf,
+            refConf => $self->mgr->hLoadedPlugins->{conf}->currentConf,
             req     => $self->req
         }
     );
-    unless ( $parser->testNewConf() ) {
-        printf STDERR "Modifications rejected: %s:\n", $parser->{message};
+    unless ( $parser->testNewConf( $self->localConf ) ) {
+        my $msg = "Configuration rejected with message: " . $parser->message;
+        $self->logger->error("CLI: $msg");
+        if ( $self->safe ) {
+            die "$msg";
+        }
+        else {
+            print STDERR "$msg\n";
+        }
     }
     my $saveParams = { force => $self->force };
     if ( $self->force and $self->cfgNum ) {
+        $self->logger->debug( "CLI: cfgNum forced with " . $self->cfgNum );
+        print STDERR "cfgNum forced with ", $self->cfgNum;
         $saveParams->{cfgNum}      = $self->cfgNum;
         $saveParams->{cfgNumFixed} = 1;
     }
-    $new->{cfgAuthor} = scalar( getpwuid $< ) . '(command-line)';
+    $new->{cfgAuthor} = scalar( getpwuid $< ) . '(command-line-interface)';
     chomp $new->{cfgAuthor};
     $new->{cfgAuthorIP} = '127.0.0.1';
     $new->{cfgDate}     = time;
     $new->{cfgVersion}  = $Lemonldap::NG::Manager::VERSION;
-    $new->{cfgLog}      = $self->log // 'Modified using LLNG cli';
+    $new->{cfgLog}      = $self->log // 'Modified with LL::NG CLI';
     $new->{key} ||= join( '',
         map { chr( int( ord( Crypt::URandom::urandom(1) ) * 94 / 256 ) + 33 ) }
           ( 1 .. 16 ) );
 
     my $s = $self->mgr->confAcc->saveConf( $new, %$saveParams );
     if ( $s > 0 ) {
+        $self->logger->debug(
+            "CLI: Configuration $s has been saved by $new->{cfgAuthor}");
+        $self->logger->info("CLI: Configuration $s saved");
         print STDERR "Saved under number $s\n";
-        $parser->{status} = [ $self->mgr->applyConf($new) ];
+        $parser->{status} =
+          [ $self->mgr->hLoadedPlugins->{conf}->applyConf($new) ];
     }
     else {
-        printf STDERR "Modifications rejected: %s:\n", $parser->{message};
+        $self->logger->error("CLI: Configuration not saved!");
+        printf STDERR "Modifications rejected: %s:\n", $parser->{message}
+          if $parser->{message};
         print STDERR Dumper($parser);
     }
     foreach (qw(errors warnings status)) {
@@ -334,10 +382,10 @@ sub run {
     }
     $self->cfgNum( $self->lastCfg ) unless ( $self->cfgNum );
     my $action = shift;
-    unless ( $action =~ /^(?:get|set|addKey|delKey|save|restore)$/ ) {
-        die
-"unknown action $action. Only get, set, addKey or delKey are accepted";
+    unless ( $action =~ /^(?:get|set|addKey|delKey|save|restore|rollback)$/ ) {
+        die "Unknown action $action. Only get, set, addKey or delKey allowed";
     }
+
     $self->$action(@_);
 }
 
@@ -346,8 +394,7 @@ package Lemonldap::NG::Manager::Cli::Request;
 use Mouse;
 
 has cfgNum => ( is => 'rw' );
-
-has error => ( is => 'rw' );
+has error  => ( is => 'rw' );
 
 sub params {
     my ( $self, $key ) = @_;

@@ -13,7 +13,7 @@ use WebService::MinFraud::Data::Rx::Type::Hostname;
 use WebService::MinFraud::Data::Rx::Type::IPAddress;
 use WebService::MinFraud::Data::Rx::Type::WebURI;
 
-our $VERSION = '1.009001';
+our $VERSION = '1.010000';
 
 extends 'WebService::MinFraud::Validator::Base';
 
@@ -362,7 +362,7 @@ WebService::MinFraud::Validator::FraudService - Parent Validation for the minFra
 
 =head1 VERSION
 
-version 1.009001
+version 1.010000
 
 =head1 SUPPORT
 
@@ -374,7 +374,7 @@ Mateu Hunter <mhunter@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 - 2019 by MaxMind, Inc.
+This software is copyright (c) 2015 - 2020 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,15 +1,19 @@
-# Copyrights 2011-2013 by [Mark Overmeer].
+# Copyrights 2011-2020 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.01.
-use warnings;
-use strict;
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution POSIX-1003.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package POSIX::1003::Limit;
 use vars '$VERSION';
-$VERSION = '0.98';
+$VERSION = '1.00';
 
 use base 'POSIX::1003::Module';
+
+use warnings;
+use strict;
 
 use Carp    'croak';
 
@@ -60,9 +64,15 @@ sub exampleValue($)
 {   my ($class, $name) = @_;
     if($name =~ m/^RLIMIT_/)
     {   my ($soft, $hard, $success) = getrlimit $name;
-        $soft //= 'undef';
-        $hard //= 'undef';
-        return "$soft, $hard";
+        for($soft,$hard)
+        {   $_ //= 'undef';
+            s/18446744073709551615/2**64-1/g;
+            s/9223372036854775807/2**63-1/g;
+        }
+        return "$rlimit->{$name}, $soft, $hard";
+    }
+    elsif($name =~ m/^RLIM_/)
+    {   return $rlimit->{$name} // 'undef';
     }
     elsif($name =~ m/^UL_GET|^GET_/)
     {   my $val = ulimit $name;

@@ -39,7 +39,7 @@ my $res;
 
 # Unauth tests
 ok( $res = $client->_get('/test'), 'Get response' );
-ok( $res->[0] == 200, 'Response code is 200' )
+ok( $res->[0] == 200,              'Response code is 200' )
   or print "Expect 200, got $res->[0]\n";
 ok( $res->[2]->[0] eq 'Unauth', 'Get unauth result' )
   or print "Expect Unauth, got $res->[2]->[0]\n";
@@ -64,7 +64,7 @@ count(3);
 # Bad path test
 
 ok( $res = $client->_get('/[]/test'), 'Try a bad path' );
-ok( $res->[0] == 400, 'Response is 400' );
+ok( $res->[0] == 400,                 'Response is 400' );
 count(2);
 
 clean();

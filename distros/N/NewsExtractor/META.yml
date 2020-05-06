@@ -15,7 +15,7 @@ name: NewsExtractor
 provides:
   NewsExtractor:
     file: lib/NewsExtractor.pm
-    version: v0.16.0
+    version: v0.20.0
   NewsExtractor::Article:
     file: lib/NewsExtractor/Article.pm
   NewsExtractor::CSSExtractor:
@@ -42,12 +42,18 @@ provides:
     file: lib/NewsExtractor/SiteSpecificExtractor/ETtoday.pm
   NewsExtractor::SiteSpecificExtractor::UDN:
     file: lib/NewsExtractor/SiteSpecificExtractor/UDN.pm
+  NewsExtractor::SiteSpecificExtractor::ctee_com_tw:
+    file: lib/NewsExtractor/SiteSpecificExtractor/ctee_com_tw.pm
   NewsExtractor::SiteSpecificExtractor::estate_ltn_com_tw:
     file: lib/NewsExtractor/SiteSpecificExtractor/estate_ltn_com_tw.pm
   NewsExtractor::SiteSpecificExtractor::money_udn_com:
     file: lib/NewsExtractor/SiteSpecificExtractor/money_udn_com.pm
+  NewsExtractor::SiteSpecificExtractor::newnet_tw:
+    file: lib/NewsExtractor/SiteSpecificExtractor/newnet_tw.pm
   NewsExtractor::SiteSpecificExtractor::news_cts_com_tw:
     file: lib/NewsExtractor/SiteSpecificExtractor/news_cts_com_tw.pm
+  NewsExtractor::SiteSpecificExtractor::news_ebc_net_tw:
+    file: lib/NewsExtractor/SiteSpecificExtractor/news_ebc_net_tw.pm
   NewsExtractor::SiteSpecificExtractor::news_tnn_tw:
     file: lib/NewsExtractor/SiteSpecificExtractor/news_tnn_tw.pm
   NewsExtractor::SiteSpecificExtractor::news_tvbs_com_tw:
@@ -58,6 +64,12 @@ provides:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_allnews_tw.pm
   NewsExtractor::SiteSpecificExtractor::www_bcc_com_tw:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_bcc_com_tw.pm
+  NewsExtractor::SiteSpecificExtractor::www_epochtimes_com:
+    file: lib/NewsExtractor/SiteSpecificExtractor/www_epochtimes_com.pm
+  NewsExtractor::SiteSpecificExtractor::www_hkcnews_com:
+    file: lib/NewsExtractor/SiteSpecificExtractor/www_hkcnews_com.pm
+  NewsExtractor::SiteSpecificExtractor::www_idn_com_tw:
+    file: lib/NewsExtractor/SiteSpecificExtractor/www_idn_com_tw.pm
   NewsExtractor::SiteSpecificExtractor::www_ksnews_com_tw:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_ksnews_com_tw.pm
   NewsExtractor::SiteSpecificExtractor::www_ntdtv_com:
@@ -72,6 +84,10 @@ provides:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_setn_com.pm
   NewsExtractor::SiteSpecificExtractor::www_taipeitimes_com:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_taipeitimes_com.pm
+  NewsExtractor::SiteSpecificExtractor::www_thestandnews_com:
+    file: lib/NewsExtractor/SiteSpecificExtractor/www_thestandnews_com.pm
+  NewsExtractor::SiteSpecificExtractor::www_ttv_com_tw:
+    file: lib/NewsExtractor/SiteSpecificExtractor/www_ttv_com_tw.pm
   NewsExtractor::SiteSpecificExtractor::www_upmedia_mg:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_upmedia_mg.pm
   NewsExtractor::TXExtractor:
@@ -94,7 +110,7 @@ requires:
   Type::Tiny: '0'
   Types::URI: '0'
   YAML: '0'
-version: v0.16.0
+version: v0.20.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: CC0-1.0
 x_static_install: '1'

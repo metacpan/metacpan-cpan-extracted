@@ -166,9 +166,9 @@ sub serviceToXML {
 
     foreach (@param_assertion) {
         my @_tab = split( /;/, $self->getValue( $_, $conf ) );
-        $template->param( $_ . 'Default', $_tab[0] ? 'true' : 'false' );
-        $template->param( $_ . 'Index',   $_tab[1] );
-        $template->param( $_ . 'Binding', $_tab[2] );
+        $template->param( $_ . 'Default',  $_tab[0] ? 'true' : 'false' );
+        $template->param( $_ . 'Index',    $_tab[1] );
+        $template->param( $_ . 'Binding',  $_tab[2] );
         $template->param( $_ . 'Location', $_tab[3] );
     }
 

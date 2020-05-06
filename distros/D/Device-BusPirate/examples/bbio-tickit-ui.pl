@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Tickit;
-use Tickit::Widgets qw( GridBox Button Static VBox CheckButton );
+use Tickit::Widgets 0.30 qw( GridBox Button Static VBox CheckButton );
 use Device::BusPirate;
 use Getopt::Long;
 
@@ -26,11 +26,7 @@ my $tickit = Tickit->new(
          row_spacing => 1,
          col_spacing => 2,
       },
-      children => [
-         [ Tickit::Widget::Static->new( text => "Line", heading => 1 ),
-           ],
-      ]
-   )
+   )->append_row( [ Tickit::Widget::Static->new( text => "Line", heading => 1 ) ] ),
 );
 $tickit->term->await_started( 0.05 );
 
@@ -123,24 +119,26 @@ foreach my $pin (qw( power aux clk mosi cs miso )) {
 
 # Stick a couple of checkbuttons in the spare 'power' slot
 
-$grid->add( 1, 3, Tickit::Widget::VBox->new(
-      children => [
-         Tickit::Widget::CheckButton->new(
-            label => "Pullup",
-            on_toggle => sub {
-               my ( undef, $pullup ) = @_;
-               $bb->pullup( $pullup )->get;
-            },
-         ),
-         Tickit::Widget::CheckButton->new(
-            label => "Open-drain",
-            on_toggle => sub {
-               my ( undef, $opendrain ) = @_;
-               $bb->configure( open_drain => $opendrain )->get;
-            },
-         ),
-      ],
-) );
+$grid->add( 1, 3, Tickit::Widget::VBox->new
+   ->add(
+      Tickit::Widget::CheckButton->new(
+         label => "Pullup",
+         on_toggle => sub {
+            my ( undef, $pullup ) = @_;
+            $bb->pullup( $pullup )->get;
+         },
+      )
+   )
+   ->add(
+      Tickit::Widget::CheckButton->new(
+         label => "Open-drain",
+         on_toggle => sub {
+            my ( undef, $opendrain ) = @_;
+            $bb->configure( open_drain => $opendrain )->get;
+         },
+      )
+   )
+);
 
 sub _tick
 {

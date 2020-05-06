@@ -12,7 +12,7 @@ use vars ();
 use Scalar::Util qw< blessed reftype >;
 use Data::Dumper qw< Dumper  >;
 
-our $VERSION = '1.052';
+our $VERSION = '1.054';
 
 my $anon_scalar_ref = \do{my $var};
 my $MAGIC_VARS = q{my ($CAPTURE, $CONTEXT, $DEBUG, $INDEX, $MATCH, %ARG, %MATCH);};
@@ -495,7 +495,7 @@ sub _debug_require {
                  ;
     my $message2 = ($stack_height ? '|   ' : q{})
                  . " \\_____"
-                 . ($succeeded ? 'Satisified' : 'FAILED')
+                 . ($succeeded ? 'Satisfied' : 'FAILED')
                  ;
 
     # Report if match required backtracking...
@@ -1511,6 +1511,7 @@ sub _translate_subrule_calls {
 
     # Translate all other calls (MAIN GRAMMAR FOR MODULE)...
     $grammar_spec =~ s{
+    (?{ $curr_line_num = substr($_, 0, pos) =~ tr/\n//; })
       (?<list_marker> (?<ws1> \s*+)  (?<op> (?&SEPLIST_OP) ) (?<ws2> \s*+) )?
       (?<construct>
         (?<! \(\? )
@@ -1625,6 +1626,10 @@ sub _translate_subrule_calls {
             $WS_PATTERN
         )
       |
+        (?<complex_repetition>
+            (?&SEPLIST_OP) \s* (?<complex_separator> \S* )
+        )
+      |
         (?<raw_regex>
             \(\?\<\w+\>
         )
@@ -1660,7 +1665,7 @@ sub _translate_subrule_calls {
     )
 
     (?(DEFINE)
-        (?<SEPLIST_OP> \*\* | [*+?] [+?]? \s* %%? | \{ \d+(,\d*)? \} [+?]? \s* %%? )
+        (?<SEPLIST_OP> \*\* | [*+?] [+?]?+ \s* %%?+ | \{ \d+(,\d*)? \} [+?]?+ \s* %%?+ )
         (?<PARENS>    \( (?:[?] (?: <[=!] | [:>] ))?
                          (?: \\. | (?&PARENCODE) | (?&PARENS) | (?&CHARSET) | [^][()\\<>]++ )*+
                       \)
@@ -1772,7 +1777,7 @@ sub _translate_subrule_calls {
 
                 # Determine type of lookahead, and work around capture problem...
                 my ($type, $pre, $post) = ( 'neglookahead', '(?!(?!)|', ')' );
-                if (defined $+{sign} eq '?') {
+                if ($+{sign} eq '?') {
                     $type = 'poslookahead';
                     $pre  x= 2;
                     $post x= 2;
@@ -1887,10 +1892,44 @@ sub _translate_subrule_calls {
                 );
             }
 
+        # Translate too-complex repetition specifications...
+            elsif (defined $+{complex_repetition}) {
+                my ($repetition, $separator) = @+{'complex_repetition', 'complex_separator'};
+                my ($metaop) = $repetition =~ m{(%%?)};
+                my $quotedop = quotemeta($metaop);
+                $separator =~ s/\s+/ /g;
+                my $problem = $separator =~ /\S/
+                    ? ["The $separator... separator you specified after the $metaop is too complex",
+                       "(Try refactoring it into a single subrule call)",
+                      ]
+                    : ["No separator was specified after the $metaop",
+                       "(Or did you need a $quotedop instead, to match a literal '$metaop'?)",
+                      ];
+                _debug_notify( fatal =>
+                    "Invalid separation specifier: $metaop",
+                    "at line $curr_line_num of $pretty_rule_name",
+                    @{$problem},
+                );
+                exit(1);
+            }
+
         # Translate non-reportable raw regexes (leave as is)...
             elsif (defined $+{raw_regex}) {
+                # Handle raw % and %%
+                my $raw_regex = $+{raw_regex};
+                if ($raw_regex =~ / \A %%?+ /x) {
+                    _debug_notify( fatal =>
+                        "Invalid separation specifier: $&",
+                        "at line $curr_line_num of $pretty_rule_name",
+                        "(Did you forget to put a repetition quantifier before the $&",
+                        " or did you need a " . quotemeta($&) . " instead, to match a literal '$&'?)",
+                    );
+                    exit(1);
+                }
+
+                # Handle any other raw regex...
                 _translate_raw_regex(
-                    $+{raw_regex}, $compiletime_debugging_requested
+                    $raw_regex, $compiletime_debugging_requested
                 );
             }
 
@@ -1966,15 +2005,22 @@ sub _translate_subrule_calls {
         # Something that looks like a rule call or directive, but isn't...
             elsif (defined $+{incomplete_request}) {
                 my $request = $+{incomplete_request};
-                my $inferred_type = $request =~ /:/ ? 'directive' : 'subrule call';
-                    _debug_notify( warn =>
-                        qq{Possible failed attempt to specify a $inferred_type:},
-                        qq{    $request},
-                        qq{near $source_file line $source_line},
-                        qq{(If you meant to match literally, use: \\$request)},
-                        q{},
+                $request =~ s/\n//g;
+                if ($request =~ /\A\s*<\s*\Z/) {
+                    _debug_notify( fatal =>
+                        qq{Invalid < metacharacter near line $curr_line_num of $pretty_rule_name},
+                        qq{If you meant to match a literal '<', use: \\<},
                     );
-                $request;
+                }
+                else {
+                    _debug_notify( fatal =>
+                        qq{Possible failed attempt to specify},
+                        qq{a subrule call or directive:  $request},
+                        qq{near line $curr_line_num of $pretty_rule_name},
+                        qq{If you meant to match literally, use: \\$request},
+                    );
+                }
+                exit(1);
             }
 
         # A quantifier that isn't quantifying anything...
@@ -1984,8 +2030,7 @@ sub _translate_subrule_calls {
                 my $literal = quotemeta($quant);
                 _debug_notify( fatal =>
                     qq{Quantifier that doesn't quantify anything: $quant},
-                    qq{in declaration of $pretty_rule_name},
-                    qq{near $source_file line $source_line},
+                    qq{at line $curr_line_num in declaration of $pretty_rule_name},
                     qq{(Did you mean to match literally? If so, try: $literal)},
                     q{},
                 );
@@ -1995,7 +2040,7 @@ sub _translate_subrule_calls {
         # There shouldn't be any other possibility...
             else {
                 die qq{Internal error: this shouldn't happen!\n},
-                    qq{Near '$curr_construct' in $pretty_rule_name\n};
+                    qq{Near '$curr_construct' at $curr_line_num of $pretty_rule_name\n};
             }
         };
 
@@ -2665,7 +2710,7 @@ Regexp::Grammars - Add grammatical parsing features to Perl 5.10 regexes
 
 =head1 VERSION
 
-This document describes Regexp::Grammars version 1.052
+This document describes Regexp::Grammars version 1.054
 
 
 =head1 SYNOPSIS
@@ -3852,7 +3897,7 @@ Regexp::Grammars provides cleaner ways to specify them:
         <[item]>* % <separator>      # zero-or-more
 
 Note that these are just regular repetition qualifiers (i.e. C<+>
-and C<*>) applied to a subriule (C<< <[item]> >>), with a C<%>
+and C<*>) applied to a subrule (C<< <[item]> >>), with a C<%>
 modifier after them to specify the required separator between the
 repeated matches.
 
@@ -3903,29 +3948,31 @@ You can even do this:
 though the separator specification is, of course, meaningless in that case
 as it will never be needed to separate a maximum of one item.
 
-If a C<%> appears anywhere else in a grammar (i.e. I<not> immediately after a
-repetition qualifier), it is treated normally (i.e. as a self-matching literal
-character):
+Within a Regexp::Grammars regex a simple C<%> is always metasyntax, so it cannot
+be used to match a literal C<'%'>. Any attempt to do so is immediately fatal
+when the regex is compiled:
+
+    <token: percentage>
+        \d{1,3} %                # Fatal. Will not match "7%", "100%", etc.
 
     <token: perl_hash>
-        % <ident>                # match "%foo", "%bar", etc.
+        % <ident>                # Fatal. Will not match "%foo", "%bar", etc.
 
     <token: perl_mod>
-        <expr> % <expr>          # match "$n % 2", "($n+3) % ($n-1)", etc.
+        <expr> % <expr>          # Fatal. Will not match "$n % 2", etc.
 
-If you need to match a literal C<%> immediately after a repetition, either
-quote it:
-
-    <token: percentage>
-        \d{1,3} \% solution                  # match "7% solution", etc.
-
-or refactor the C<%> character:
+If you need to match a literal C<%> immediately after a repetition, quote it
+with a backslash:
 
     <token: percentage>
-        \d{1,3} <percent_sign> solution      # match "7% solution", etc.
+        \d{1,3} \%               # Okay. Will match "7%", "100%", etc.
 
-    <token: percent_sign>
-        %
+    <token: perl_hash>
+        \% <ident>               # Okay. Will match "%foo", "%bar", etc.
+
+    <token: perl_mod>
+        <expr> \% <expr>         # Okay. Will match "$n % 2", etc.
+
 
 Note that it's usually necessary to use the C<< <[...]> >> form for the
 repeated items being matched, so that all of them are saved in the
@@ -3936,7 +3983,8 @@ by specifying them as a list-like subrule too:
 
 The repeated item I<must> be specified as a subrule call of some kind
 (i.e. in angles), but the separators may be specified either as a
-subrule or as a raw bracketed pattern. For example:
+subrule or as a raw bracketed pattern (i.e. brackets without any
+nested subrule calls). For example:
 
     <[number]>* % ( , | : )    # Numbers separated by commas or colons
 
@@ -4124,7 +4172,7 @@ grammar:
     }
 
 
-...or else to explicitly interpolate at least one scalar (even 
+...or else to explicitly interpolate at least one scalar (even
 just a scalar containing an empty string):
 
     sub build_keyword_parser {
@@ -5678,7 +5726,7 @@ as in the previous example.
 The module also provides three useful shortcuts, specifically to
 make it easy to declare, but not define, rules and tokens.
 
-The C<< <...> >> and C<< <???> >> directives are equivalent to
+The C<< <...> >> and C<< <!!!> >> directives are equivalent to
 the directive:
 
     <error: Cannot match RULENAME (not implemented)>
@@ -6618,33 +6666,49 @@ it and quoting the leading angle:
     \<[identifier
 
 
-=item C<< Possible failed attempt to specify a directive: %s >>
-
-Your grammar contained something of the form:
-
-    <identifier:...
-
-but which wasn't a known directive like C<< <rule:...> >>
-or C<< <debug:...> >>. If it was supposed to be a Regexp::Grammars
-directive, check the spelling of the directive name. If it wasn't
-supposed to be a directive, you can silence the warning by rewriting it
-and quoting the leading angle:
-
-    \<identifier:
-
-=item C<< Possible failed attempt to specify a subrule call %s >>
+=item C<< Possible failed attempt to specify a subrule call or directive: %s >>
 
 Your grammar contained something of the form:
 
     <identifier...
 
-but which wasn't a call to a known subrule like C<< <ident> >> or C<<
-<name> >>. If it was supposed to be a Regexp::Grammars subrule call,
-check the spelling of the rule name in the angles. If it wasn't supposed
-to be a subrule call, you can silence the warning by rewriting it and
-quoting the leading angle:
+but which wasn't a call to a known subrule or directive. If it was
+supposed to be a subrule call, check the spelling of the rule name in
+the angles. If it was supposed to be a Regexp::Grammars directive,
+check the spelling of the directive name. If it wasn't supposed to be a
+subrule call or directive, you can silence the warning by rewriting it
+and quoting the leading angle:
 
-    \<identifier...
+    \<identifier
+
+
+
+=item C<< Invalid < metacharacter >>
+
+The C<< < >> character is always special in Regexp::Grammars regexes:
+it either introduces a subrule call, or a rule/token declaration,
+or a directive.
+
+If you need to match a literal C<'<'>, use C<< \< >> in your regex.
+
+
+=item C<< Invalid separation specifier: %s >>
+
+You used a C<%> or a C<%%> in the regex, but in a way that won't do what
+you expect. C<%> and C<%%> are metacharacters in Regexp::Grammars
+regexes, and can only be placed between a repeated atom (that matches a
+list of items) and a simple atom (that matches the separator between
+list items). See L<Matching separated lists>.
+
+If you were using C<%> or C<%%> as a metacharacter, then you either
+forgot the repetition quantifier (C<*>, C<+>, C<{0,9}>, etc.) on the
+preceding list-matching atom, or you specified the following separator
+atom as something too complex for the module to parse (for example,
+a set of parens with nested subrule calls).
+
+On the other hand, if you were intending to match a literal C<%> or C<%%>
+within a Regexp::Grammars regex, then you must explicitly specify it
+as being a literal by quotemeta'ing it, like so: C<\%> or C<\%\%>
 
 
 =item C<< Repeated subrule %s will only capture its final match >>

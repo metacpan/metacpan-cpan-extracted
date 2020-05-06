@@ -18,7 +18,7 @@ meta-spec:
 name: App-diffdb
 requires:
   DBI: '0'
-  DBIx::Diff::Schema: '0.094'
+  DBIx::Util::Schema: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::obj: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-diffdb
   homepage: https://metacpan.org/release/App-diffdb
   repository: git://github.com/perlancar/perl-App-diffdb.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

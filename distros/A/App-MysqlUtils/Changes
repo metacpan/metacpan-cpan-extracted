@@ -1,3 +1,9 @@
+0.020   2020-05-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Use DBIx::Util::Schema instead of DBIx::Diff::Schema now for
+	  list_* functions.
+
+
 0.019   2019-12-24  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

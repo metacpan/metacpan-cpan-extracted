@@ -6,6 +6,7 @@ use warnings;
 use IO::Async::Test;
 
 use Test::More;
+use Test::Metrics::Any;
 
 use Socket 1.93 qw( 
    AF_INET SOCK_STREAM SOCK_RAW INADDR_LOOPBACK AI_PASSIVE
@@ -403,6 +404,20 @@ my ( $testerr, $testhost, $testserv ) = getnameinfo( $testaddr );
    );
 
    is_deeply( [ $future->get ], [ "127.0.0.1", 80 ], '$resolver->getnameinfo with numeric is synchronous for future' );
+}
+
+# Metrics
+{
+   is_metrics_from(
+      sub {
+         $resolver->getnameinfo( addr => $testaddr )->get;
+      },
+      { "io_async_resolver_lookups type:getnameinfo" => 1 },
+      'Resolver increments metrics'
+   );
+
+   # Can't easily unit-test the failure counter because we can't guarantee to
+   # create a failure
 }
 
 # $loop->set_resolver

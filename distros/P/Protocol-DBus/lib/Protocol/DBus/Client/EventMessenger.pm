@@ -49,6 +49,9 @@ sub new {
     return bless [$dbus, $post_send_cr], $class;
 }
 
+# for testing
+sub _dbus { $_[0][0] }
+
 sub _wrap_send {
     my ($fn, $self) = @_;
 

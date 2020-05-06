@@ -41,7 +41,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '1.0.10';
+our $VERSION = '1.0.11';
 
 require XSLoader;
 XSLoader::load('Net::ARP', $VERSION);
@@ -65,7 +65,7 @@ ARP - Perl extension for creating ARP packets
 	                'aa:bb:cc:aa:bb:cc',  # Destinaton MAC
 	                'reply');             # ARP operation
 
-$mac = Net::ARP::get_mac("eth0");
+$mac = Net::ARP::get_mac("enp3s0f1");
 
 print "$mac\n";
 
@@ -131,7 +131,7 @@ get the mac address of an ethernet interface or ip address.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2004-2013 by Bastian Ballmann
+Copyright (C) 2004-2020 by Bastian Ballmann
 
 License: GPLv2
 

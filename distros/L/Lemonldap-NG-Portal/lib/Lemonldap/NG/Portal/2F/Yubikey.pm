@@ -15,7 +15,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Portal::Main::SecondFactor';
 
@@ -68,7 +68,7 @@ sub run {
     my $checkLogins = $req->param('checkLogins');
     $self->logger->debug("Yubikey checkLogins set") if ($checkLogins);
 
-    my $yubikey = 0;
+    my $yubikey;
     if ( $req->{sessionInfo}->{_2fDevices} ) {
         $self->logger->debug("Loading 2F Devices ...");
 
@@ -82,14 +82,10 @@ sub run {
             return PE_ERROR;
         }
         $self->logger->debug("2F Device(s) found");
+        $self->logger->debug("Reading Yubikey ...");
 
-        foreach (@$_2fDevices) {
-            $self->logger->debug("Reading Yubikey ...");
-            if ( $_->{type} eq 'UBK' ) {
-                $yubikey = $_->{_yubikey};
-                last;
-            }
-        }
+        $yubikey = $_->{_yubikey}
+          foreach grep { $_->{type} eq 'UBK' } @$_2fDevices;
     }
 
     unless ($yubikey) {
@@ -129,19 +125,18 @@ sub verify {
     }
 
     # Verify OTP
-    my $yubikey    = 0;
+    my $yubikey;
     my $_2fDevices = eval {
         $self->logger->debug("Looking for 2F Devices ...");
         from_json( $session->{_2fDevices}, { allow_nonref => 1 } );
     };
-
-    foreach (@$_2fDevices) {
-        $self->logger->debug("Reading Yubikey ...");
-        if ( $_->{type} eq 'UBK' ) {
-            $yubikey = $_->{_yubikey};
-            last;
-        }
+    if ($@) {
+        $self->logger->error("Bad encoding in _2fDevices: $@");
+        return PE_ERROR;
     }
+
+    $self->logger->debug("Reading Yubikey ...");
+    $yubikey = $_->{_yubikey} foreach grep { $_->{type} eq 'UBK' } @$_2fDevices;
 
     if (
         index( $yubikey,
@@ -155,7 +150,7 @@ sub verify {
         $self->userLogger->warn('Yubikey verification failed');
         return PE_BADOTP;
     }
-    PE_OK;
+    return PE_OK;
 }
 
 1

@@ -1,7 +1,7 @@
 package End::PrintBytesIn;
 
-our $DATE = '2020-04-20'; # DATE
-our $VERSION = '1.051'; # VERSION
+our $DATE = '2020-05-06'; # DATE
+our $VERSION = '1.056'; # VERSION
 
 use 5.010001;
 use strict;
@@ -29,7 +29,7 @@ End::PrintBytesIn - Show LWP::Protocol::Patch::CountBytesIn::bytes_in
 
 =head1 VERSION
 
-This document describes version 1.051 of End::PrintBytesIn (from Perl distribution App-lcpan), released on 2020-04-20.
+This document describes version 1.056 of End::PrintBytesIn (from Perl distribution App-lcpan), released on 2020-05-06.
 
 =head1 SYNOPSIS
 

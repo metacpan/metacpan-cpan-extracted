@@ -91,7 +91,7 @@ my %WriteMakefileArgs = (
     "Test::UseAllModules" => "0.15",
     "utf8" => 0
   },
-  "VERSION" => "1.9.0",
+  "VERSION" => "1.10.0",
   "test" => {
     "TESTS" => "t/*.t t/commands/*.t t/issue/*.t"
   }

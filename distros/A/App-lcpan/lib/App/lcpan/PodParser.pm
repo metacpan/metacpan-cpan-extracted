@@ -1,7 +1,7 @@
 package App::lcpan::PodParser;
 
-our $DATE = '2020-04-20'; # DATE
-our $VERSION = '1.051'; # VERSION
+our $DATE = '2020-05-06'; # DATE
+our $VERSION = '1.056'; # VERSION
 
 use 5.010;
 use strict;
@@ -33,8 +33,11 @@ sub handle_text {
             log_trace("    found a mention in naked text to unknown module: %s", $1);
             $module_name = $1;
         }
+        my $now = time();
         $self->{sth_ins_mention}->execute(
-            $self->{content_id}, $self->{file_id}, $module_id, $module_name, undef);
+            $self->{content_id}, $self->{file_id}, $module_id, $module_name, undef,
+            $now,$now,
+        );
     }
 }
 
@@ -66,8 +69,11 @@ sub start_L {
         # name doesn't look like a module name, skip
         return;
     }
+    my $now = time();
     $self->{sth_ins_mention}->execute(
-        $self->{content_id}, $self->{file_id}, $module_id, $module_name, $script_name);
+        $self->{content_id}, $self->{file_id}, $module_id, $module_name, $script_name,
+        $now,$now,
+    );
 }
 
 1;
@@ -85,7 +91,7 @@ App::lcpan::PodParser - Pod parser for use in App::lcpan
 
 =head1 VERSION
 
-This document describes version 1.051 of App::lcpan::PodParser (from Perl distribution App-lcpan), released on 2020-04-20.
+This document describes version 1.056 of App::lcpan::PodParser (from Perl distribution App-lcpan), released on 2020-05-06.
 
 =for Pod::Coverage .+
 

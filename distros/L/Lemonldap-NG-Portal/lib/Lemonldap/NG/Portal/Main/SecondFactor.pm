@@ -10,7 +10,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
 );
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.8';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -34,6 +34,13 @@ has prefix  => ( is => 'rw' );
 has logo    => ( is => 'rw', default => '2f.png' );
 has label   => ( is => 'rw' );
 has noRoute => ( is => 'ro' );
+has authnLevel => (
+    is      => 'rw',
+    lazy    => 1,
+    default => sub {
+        return $_[0]->conf->{ $_[0]->prefix . '2fAuthnLevel' };
+    }
+);
 
 sub init {
     my ($self) = @_;
@@ -78,7 +85,6 @@ sub _redirect {
 
 sub _verify {
     my ( $self, $req ) = @_;
-
     my $checkLogins = $req->param('checkLogins');
     $self->logger->debug("checkLogins set") if ($checkLogins);
 
@@ -101,31 +107,69 @@ sub _verify {
     # Launch second factor verification
     my $res = $self->verify( $req, $session );
 
+    # Update sessionInfo
+    delete $session->{$_}
+      foreach (qw(tokenSessionStartTimestamp tokenTimeoutTimestamp _type));
+    $req->sessionInfo($session);
+    $req->id( delete $req->sessionInfo->{_2fRealSession} );
+    $req->urldc( delete $req->sessionInfo->{_2fUrldc} );
+    $req->{sessionInfo}->{_utime} = delete $req->{sessionInfo}->{_2fUtime};
+
     # Case error
     if ($res) {
         $req->noLoginDisplay(1);
-        $req->sessionInfo($session);
-        $req->id( delete $req->sessionInfo->{_2fRealSession} );
-        $req->urldc( delete $req->sessionInfo->{_2fUrldc} );
-        $req->{sessionInfo}->{_utime} = delete $req->{sessionInfo}->{_2fUtime};
         $req->authResult(PE_BADCREDENTIALS);
         return $self->p->do( $req,
             [ sub { $self->p->storeHistory(@_) }, sub { $res } ] );
     }
 
     # Else restore session
-    $req->sessionInfo($session);
-    $req->id( delete $req->sessionInfo->{_2fRealSession} );
-    $req->urldc( delete $req->sessionInfo->{_2fUrldc} );
-    $req->{sessionInfo}->{_utime} = delete $req->{sessionInfo}->{_2fUtime};
     $req->mustRedirect(1);
     $self->userLogger->notice( $self->prefix
           . '2F verification for '
           . $req->sessionInfo->{ $self->conf->{whatToTrace} } );
 
-    if ( my $l = $self->conf->{ $self->prefix . '2fAuthnLevel' } ) {
-        $self->p->updateSession( $req, { authenticationLevel => $l } );
+    if ( my $l = $self->authnLevel ) {
+        $self->logger->debug(
+            "Update sessionInfo with new authenticationLevel: $l");
+        $req->sessionInfo->{authenticationLevel} = $l;
+
+        # Compute macros & local groups again with new authenticationLevel
+        $self->logger->debug("Compute macros and local groups...");
+        $req->steps( [ 'setMacros', 'setLocalGroups' ] );
+        if ( my $error = $self->p->process($req) ) {
+            $self->logger->debug("SFA: Process returned error: $error");
+            $req->error($error);
+            return $self->p->do( $req, [ sub { $error } ] );
+        }
+        $self->logger->debug("De-duplicate groups...");
+        $req->sessionInfo->{groups} = join $self->conf->{multiValuesSeparator},
+          keys %{ {
+                map { $_ => 1 } split $self->conf->{multiValuesSeparator},
+                $req->sessionInfo->{groups}
+            }
+          };
+
+        $self->logger->debug("Filter macros...");
+        my %macros = (
+            map { $_ => $req->sessionInfo->{$_} }
+              keys %{ $self->{conf}->{macros} }
+        );
+
+        $self->logger->debug(
+"Update session with new authenticationLevel, groups, hGroups and macros"
+        );
+        $self->p->updateSession(
+            $req,
+            {
+                authenticationLevel => $l,
+                groups              => $req->sessionInfo->{groups},
+                hGroups             => $req->sessionInfo->{hGroups},
+                %macros
+            }
+        );
     }
+
     $req->authResult(PE_SENDRESPONSE);
     return $self->p->do(
         $req,

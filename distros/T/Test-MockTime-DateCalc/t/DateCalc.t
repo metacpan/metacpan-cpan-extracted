@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2009, 2010, 2011 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2019 Kevin Ryde
 
 # This file is part of Test-MockTime-DateCalc.
 #
@@ -42,7 +42,7 @@ use Test::MockTime::DateCalc;
 use Date::Calc;
 
 {
-  my $want_version = 6;
+  my $want_version = 7;
   ok ($Test::MockTime::DateCalc::VERSION,
       $want_version,
       'VERSION variable');

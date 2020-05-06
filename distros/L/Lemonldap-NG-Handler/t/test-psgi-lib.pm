@@ -4,14 +4,11 @@ use strict;
 use 5.10.0;
 use POSIX 'strftime';
 use Data::Dumper;
+use Time::Fake;
 use_ok('Lemonldap::NG::Common::PSGI::Cli::Lib');
 
 our $client;
 our $count = 1;
-
-BEGIN {
-    require 't/Time-Fake.pm';
-}
 
 no warnings 'redefine';
 
@@ -44,23 +41,53 @@ sub init {
     );
     ok( $client->app, 'App object' ) or explain( $client, '->app...' );
     count(3);
-    open F, ">$file"
-      or die $!;
+
     my $now = time;
     my $ts  = strftime "%Y%m%d%H%M%S", localtime;
 
-    print F '{"_updateTime":"'
-      . $ts
-      . '","_timezone":"1","_session_kind":"SSO","_passwordDB":"Demo","_startTime":"'
-      . $ts
-      . '","ipAddr":"127.0.0.1","UA":"Mozilla/5.0 (X11; VAX4000; rv:43.0) Gecko/20100101 Firefox/143.0 Iceweasel/143.0.1","_user":"dwho","_userDB":"Demo","_lastAuthnUTime":'
-      . $now
-      . ',"uid":"dwho","_issuerDB":"Null","_session_id":"f5eec18ebb9bc96352595e2d8ce962e8ecf7af7c9a98cb9a43f9cd181cf4b545","authenticationLevel":1,"_whatToTrace":"dwho","_auth":"Demo","_utime":'
-      . $now
-      . ',"_loginHistory":{"successLogin":[{"ipAddr":"127.0.0.1","_utime":'
-      . $now
-      . '}]},"cn":"Doctor Who","mail":"dwho@badwolf.org"}';
-    close F;
+    my $sessionData = {
+        '_timezone'     => '1',
+        'groups'        => 'users; timelords',
+        'uid'           => 'dwho',
+        '_loginHistory' => {
+            'successLogin' => [ {
+                    '_utime' => $now,
+                    'ipAddr' => '127.0.0.1'
+                }
+            ]
+        },
+        'cn'              => 'Doctor Who',
+        '_lastAuthnUTime' => $now,
+        '_whatToTrace'    => 'dwho',
+        '_issuerDB'       => 'Null',
+        '_startTime'      => "$ts",
+        '_user'           => 'dwho',
+        '_updateTime'     => "$ts",
+        '_userDB'         => 'Demo',
+        'hGroups'         => {
+            'users'     => {},
+            'timelords' => {}
+        },
+        'ipAddr'              => '127.0.0.1',
+        'mail'                => 'dwho@badwolf.org',
+        'authenticationLevel' => 1,
+        '_utime'              => $now,
+        '_passwordDB'         => 'Demo',
+        '_auth'               => 'Demo',
+        'UA' =>
+'Mozilla/5.0 (X11; VAX4000; rv:43.0) Gecko/20100101 Firefox/143.0 Iceweasel/143.0.1'
+    };
+
+    my $as = Lemonldap::NG::Common::Session->new( {
+            storageModule        => 'Apache::Session::File',
+            storageModuleOptions => { Directory => 't/sessions' },
+            id                   => $sessionId,
+            force                => 1,
+            kind                 => 'SSO',
+            info                 => $sessionData,
+        }
+    );
+
 }
 
 sub client {
@@ -87,7 +114,8 @@ sub explain {
 }
 
 sub clean {
-    unlink $file;
+    unlink glob 't/sessions/*';
+    unlink glob 't/sessions/lock/*';
 }
 
 package Lemonldap::NG::Handler::PSGI::Cli::Lib;

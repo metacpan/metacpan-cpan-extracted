@@ -3,7 +3,7 @@ package Thread::Bless;
 # Make sure we have version info for this module
 # Make sure we do everything by the book from now on
 
-$VERSION = '0.07';
+$VERSION = '0.09';
 use strict;
 
 # Make sure we can find out the refaddr of an object and weaken it
@@ -428,7 +428,9 @@ Examples should be added.
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>.
 
-Please report bugs to <perlbugs@dijkmat.nl>.
+maintained by LNATION, <email@lnation.org>.
+
+Please report bugs to <email@lnation.org>.
 
 =head1 ACKNOWLEDGEMENTS
 

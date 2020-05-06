@@ -17,10 +17,10 @@ name: Net-Prometheus-PerlCollector
 provides:
   Net::Prometheus::PerlCollector:
     file: lib/Net/Prometheus/PerlCollector.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Net::Prometheus::Types: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

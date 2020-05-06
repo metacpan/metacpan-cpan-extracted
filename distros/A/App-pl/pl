@@ -6,7 +6,7 @@ use v5.10;
 
 our( $VERSION, $A, @A );
 BEGIN {
-    $VERSION = '0.49.7';
+    $VERSION = '0.50';
     *A = *ARGV;
     my $execed = shift if @A && $A[0] eq '+';
     return unless @A and $A[0] =~ /^-/s;
@@ -66,9 +66,17 @@ BEGIN {
       and grep $seen{$_}, qw(a p P r z);
     push @pl::opts, join '', '-', @pl1 if @pl1;
 #warn join '|', $perl // $^X, @perl, '--', $0, '+', @pl::opts, '--', @A, "\n";
-    if( ! $execed and $perl || @perl ) {
-	exec $perl // $^X, @perl, '--', $0, '+', @pl::opts, '--', @A; # reexec, pass perl-opts to perl
-	warn $perl // $^X, ": $!\n";
+    if( ! $execed and $perl || @perl ) { # let perl do perl-opts
+	unshift @A, $perl // $^X, @perl, '--', $0, '+', @pl::opts, '--';
+	if( $^O !~ /^MSWin/ ) {
+	    exec @A;
+	    warn $perl // $^X, ": $!\n";
+	} else {
+	    require Win32::ShellQuote;
+	    system {$A[0]} Win32::ShellQuote::quote_system_list( @A );
+	    warn $perl // $^X, ": $!\n" if $!;
+	    exit;
+	}
 	exit 1;
     }
 }
@@ -167,7 +175,7 @@ sub d(&) {
 }
 
 # scalar date time
-# todo ISO;  5.10 has Time::HiRes?
+# todo ISO;  5.10 has Time::HiRes
 sub D(;$$) {
     my( $s, $us ) = $_[0];
     if( ! defined $s || $s < 0 ) {
@@ -265,13 +273,17 @@ sub help(;$) {
     if( @_ && ! defined $_[0] ) {
 	print <<\EOF;
 usage: pl [-b PERLCODE] [-e PERLCODE] [-o] [-VVERSION] [-PERLOPT...] [--] [PERLCODE] [ARG ...]
-  -b & -e           wrap begin/end PERLCODE around program in same scope, my-vars work.
+  -bprog & -eprog   wrap begin/end program around program in same scope, my-vars work.
   -o                assume "for(@A) { ... }" loop around program
   -O                assume "for $A (@A) { ... }" loop around program
+  -p[number]        print on each loop (also -o/-O) iteration, at most number times
+  -P[number]        like -p, but print only if PERLCODE evaluates to true, like grep
+  -r                reset "$." and -p/-P counter for each file
   -VVERSION         rerun with given VERSION, which is just appended to "perl".
+  -zeof-prog        add end-of-file program (for -n/-p...) in same scope, my-vars work.
 These options are handled by perl:
 EOF
-	p { E if /^\s+-[0acCdDfFiImMnptTuUvwWX]/ } $^X, '-h';
+	p { E if /^\s+-[0acCdDfFiImMntTuUvwWX]/ } $^X, '-h';
     }
     print <<\EOF;
 Predefined functions:
@@ -343,7 +355,7 @@ INIT {
 	    help undef;
 	    exit;
 	} elsif( /v/ ) {
-	    e "This is pl v$VERSION, with perl v$^V
+	    e "This is pl v$VERSION, with perl $^V
 
 Copyright 1997-2020, Daniel Pfeiffer
 
@@ -698,9 +710,10 @@ nifty loop options take Perl programming to the command line.  List::Util is
 fully imported.  Unless you pass a program on the command line, starts a
 simple Perl Shell.
 
-E(cho) 3 values, including 2 from C<@A(RGV)>.  And same for difficult values:
+How to C<e(cho)> values, including from C<@A(RGV)>, with single C<$q(uote)> &
+double C<$Q(uote)>.  Same for hard-to-print values:
 
-    pl 'e "Perl", @A' one liner
+    pl 'e "${q}Perl$q", "$Q@A$Q"' one liner
     pl 'e \"Perl", \@A, undef' one liner
 
 Print up to 3 matching lines, resetting count (and C<$.>) for each file:
@@ -722,6 +735,13 @@ differences are: don't C<goto LINE>, but C<next LINE> is fine.  In B<-n>
 C<last> goes straight to the next file instead of being like C<exit>.  And
 shenanigans with unbalanced braces won't work.
 
+Windows note: Do yourself a favour and get a real Shell, e.g. from Cygwin or
+MSYS.  Any help for getting this to work in PowerShell is welcome!  If you
+can't avoid command.com, you will have to first convert all inner quotes to
+C<qq>.  Then convert the outer single quotes to double quotes:
+
+    pl "e qq{${q}Perl$q}, qq{$Q@A$Q}" one liner
+
 =head1 DESCRIPTION
 
 Pl follows Perl's philosophy for one-liners: the one variable solely used in
@@ -732,36 +752,11 @@ letter, including Perl's own C<@F> & C<*ARGV>.
 -b doesn't do a C<BEGIN> block.  Rather it is in the same scope as your main
 PERLCODE.  So you can use it to initialise C<my> variables.  Whereas, if you
 define a my variable in a B<-n>, B<-p>, B<-o> or B<-O> loop, it's a new
-variable each time.  This echoes "a c" because -e does do an B<END> block,
-which is a closure of the first C<$inner> variable:
+variable each time.  This echoes "a c" because -e emulates an B<END> block, as
+a closure of the first C<$inner> variable:
 
     pl -Ob 'my $outer'  -e 'echo $inner, $outer'  'my $inner = $outer = $ARGV' a b c
     pl -Ob 'my $outer'  -e 'e $inner, $outer'  'my $inner = $outer = $A' a b c
-
-=head2 diff | d { ... }
-
-Multifile diff on unique key fields.  If you have Algorithm::Diff with color highlighting.
-
-=head3 Sorting
-
-Hashes are sorted numerically at the end, if unambiguously possible.  That is
-if either all numbers are unsigned hex (including undescores) or all numbers
-are valid Perl literals or all numbers are decimal as Perl parses them from
-strings (including leading zeroes).  Otherwise, or if several keys have the
-same numeric value (e.g. 8, +8, 8e0, 0b100, 0B1_00, 010, 0x8), sorting is
-textual.
-
-Detecting hex numbers sorts wrongly if you only have words like "babe", "bad"
-& "be".  If you still do other numbers including 0xabc, you can turn it off
-by:
-
-    $sort_hex = 0;
-    $H = 0;
-
-If you want strictly text sorting only:
-
-    $sort_txt = 1;
-    $H = 1;
 
 =head1 EXAMPLES
 
@@ -775,20 +770,33 @@ ownership, just to show how things are even easier and more concise with pl.
 
 =item VERSION of a File
 
-
+Print the first line where the substitution was successful:
 
     pl -P1 's/.+\bVERSION\s*=\s*[v$Quote$quote]([0-9.]+).+/$1/' pl
     pl -P1 's/.+\bVERSION\s*=\s*[v$Q$q]([0-9.]+).+/$1/' pl
 
+For multple files, add the filename, and reset B<-P> count for each file:
+
     pl -rP1 's/.+\bVERSION\s*=\s*[v$Quote$quote]([0-9.]+).+/$ARGV: $1/' *.pm
     pl -rP1 's/.+\bVERSION\s*=\s*[v$Q$q]([0-9.]+).+/$A: $1/' *.pm
 
+=item Only POD or non-POD
+
+You can extract either parts of a Perl file, with these commands.  Note that
+they don't take the empty line before into account.  If you want that, and
+you're sure the files adheres strictly to this convention, use the option
+B<-00P> instead.  If you want only the 1st POD (e.g. NAME & SYNOPSIS) use the
+option B<-P1> or B<-00P1>:
+
+    pl -P '/^=\w/../^=cut/' file
+    pl -P 'not /^=\w/../^=cut/' file
+
 =item Content of a Package
 
-Pl's C<echo> or C<e> can print any item.  Packages are funny hashes, with two
-colons at the end.  Backslashing the variable passes it as a unit to
-C<Data::Dumper>.  Otherwise all elements would come out just separated by
-spaces:
+Pl's C<e(cho)> can print any item.  Packages are funny hashes, with two colons
+at the end.  Backslashing the variable passes it as a unit to C<Data::Dumper>,
+which gets loaded on demand in this case.  Otherwise all elements would come
+out just separated by spaces:
 
     pl 'echo \%List::Util::'
     pl 'e \%List::Util::'
@@ -982,6 +990,23 @@ Again without the date:
     pl -o 'piped { diff { s/^\S+ \K(.+?) +(\d+) .{16} (.+)/sprintf "%-20s %10d", $1, $2/e; $3 }} "tar", "-tvf", $_' *.tar *.tgz *.txz
     pl -o 'p { d { s/^\S+ \K(.+?) +(\d+) .{16} (.+)/sprintf "%-20s %10d", $1, $2/e; $3 }} "tar", "-tvf", $_' *.tar *.tgz *.txz
 
+=item Diff ELF executables or libraries by loaded dependencies
+
+You get the idea: you can do this for any command that outputs records with a
+unique key.  This one looks at the required libraries and which file they came
+from.  For a change loop with B<-O> and C<@A(RGV)> to avoid the previous
+examples' confusion between outer C<$_> which are the cli args, and the inner
+one, which are the read lines:
+
+    pl -O 'piped { diff { $1 } if s/^\t(.+\.so.*) => (.*) \(\w+\)/$2/ } ldd => $ARGV' exe1 exe2 exe3
+    pl -O 'p { d { $1 } if s/^\t(.+\.so.*) => (.*) \(\w+\)/$2/ } ldd => $A' exe1 exe2 exe3
+
+It's even more useful if you use just the basename as a key, because version
+numbers may change:
+
+    pl -O 'piped { diff { $2 } if s/^\t((.+)\.so.* => .*) \(\w+\)/$1/ } ldd => $ARGV' exe1 exe2 exe3
+    pl -O 'p { d { $2 } if s/^\t((.+)\.so.* => .*) \(\w+\)/$1/ } ldd => $A' exe1 exe2 exe3
+
 =back
 
 =head2 Tables
@@ -996,19 +1021,19 @@ C<"\e[m">.  There are twice twice 8 different colors for dim & bright and for
 foreground & background.  Hence the multiplication of escape codes and of
 values to fill them.
 
-This fills C<@A> (alias to C<@ARGV>) in C<-b>, as though it had been given on
-the command line.  It maps it to the 16fold number format to print the header.
-Then the main PERLCODE loops over it with C<$A> (alias to C<$ARGV>), thanks to
-C<-O>, to print the body.  All numbers are duplicated with C<(N)x2>, once to
-go into the escape sequence, once to be displayed:
+This fills C<@A(RGV)> in C<-b>, as though it had been given on the command
+line.  It maps it to the 16fold number format to print the header.  Then the
+main PERLCODE loops over it with C<$A> (alias to C<$ARGV>), thanks to C<-O>,
+to print the body.  All numbers are duplicated with C<(N)x2>, once to go into
+the escape sequence, once to be displayed:
 
-    pl -Ob '@A = map +($_, $_+8), 1..8; f "co:  fg;bg"."%5d"x16, map $_, @A' \
+    pl -Ob '@A = map +($_, $_+8), 1..8; f "co:  fg;bg"."%5d"x16, @A' \
         'f "%2d:  \e[%dm%d;   ".("\e[%dm%4d "x16)."\e[m", $A, ($A + ($A > 8 ? 81 : 29))x2, map +(($_)x2, ($_+60)x2), 40..47'
 
-This does the same, but explicitly loops over lists C<@co & @bg>:
+This does exactly the same, but explicitly loops over lists C<@co & @bg>:
 
     pl '@co = map +($_, $_+8), 1..8; @bg = map +(($_)x2, ($_+60)x2), 40..47;
-        f "co:  fg;bg"."%5d"x16, map $_, @co;
+        f "co:  fg;bg"."%5d"x16, @co;
         f "%2d:  \e[%dm%d;   ".("\e[%dm%4d "x16)."\e[m", $_, ($_ + ($_ > 8 ? 81 : 29))x2, @bg for @co'
 
 =back
@@ -1020,16 +1045,16 @@ This does the same, but explicitly loops over lists C<@co & @bg>:
 =item Split up numbers with commas, dots or underscores
 
 Loop and print with line-end (B<-opl>) over remaining args in C<$_>.  If
-reading from stdin, instead of arguments, use only B<-pl>.  After a decimal
-dot, insert a comma before each 4th comma-less digit.  Then do the same
-backwards from end or decimal dot:
+reading from stdin or files, instead of arguments, use only B<-pl>.  After a
+decimal dot, insert a comma before each 4th comma-less digit.  Then do the
+same backwards from end or decimal dot:
 
     pl -opl '1 while s/[,.]\d{3}\K(?=\d)/,/; 1 while s/\d\K(?=\d{3}(?:$|[.,]))/,/' \
         12345678 123456789 1234567890 1234.5678 3.141 3.14159265358
 
 The same for languages with a decimal comma, using either a dot or a space as spacer:
 
-    pl -opl '1 while s/[,.]\d{3}\K(?=\d)/./; 1 while s/\d\K(?=\d{3}(?:$|[,]))/./' \
+    pl -opl '1 while s/[,.]\d{3}\K(?=\d)/./; 1 while s/\d\K(?=\d{3}(?:$|[.,]))/./' \
         12345678 12345678 1234567890 1234,5678 3,141 3,141592653589
     pl -opl '1 while s/[, ]\d{3}\K(?=\d)/ /; 1 while s/\d\K(?=\d{3}(?:$|[ ,]))/ /' \
         12345678 12345678 1234567890 1234,5678 3,141 3,141592653589
@@ -1038,6 +1063,18 @@ The same for Perl style output:
 
     pl -opl '1 while s/[._]\d{3}\K(?=\d)/_/; 1 while s/\d\K(?=\d{3}(?:$|[._]))/_/' \
         12345678 123456789 1234567890 1234.5678 3.141 3.14159265358
+
+=item Generate a random UUID
+
+This gives a hex number with the characteristic pattern of dashes:
+
+    pl '$x = "%04x"; f "$x$x-$x-$x-$x-$x$x$x", map rand 0x10000, 0..7'
+
+To be RFC 4122 conformant, the 4 version & 2 variant bits need to have
+standard values.  Note that Shell strings can span more than one line:
+
+    pl '@u = map rand 0x10000, 0..7; ($u[3] /= 16) |= 0x4000; ($u[4] /= 4) |= 0x8000;
+        $x = "%04x"; f "$x$x-$x-$x-$x-$x$x$x", @u'
 
 =item DNS lookup
 

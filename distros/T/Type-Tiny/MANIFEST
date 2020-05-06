@@ -175,6 +175,7 @@ t/20-unit/Type-Tiny-Union/constrainedobject.t
 t/20-unit/Type-Tiny-Union/errors.t
 t/20-unit/Type-Tiny-Union/relationships.t
 t/20-unit/Type-Tiny-_HalfOp/double-union.t
+t/20-unit/Type-Tiny-_HalfOp/extra-params.t
 t/20-unit/Type-Tiny-_HalfOp/overload-precedence.t
 t/20-unit/Type-Tiny/arithmetic.t
 t/20-unit/Type-Tiny/basic.t

@@ -11,7 +11,7 @@ use Alien::Build::Plugin::Download::Negotiate;
 use Alien::Build::Plugin::Extract::Negotiate;
 
 # ABSTRACT: Alien::Build plugin to download from GitHub
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 has github_user => sub { croak("github_user is required") };
@@ -19,6 +19,7 @@ has github_repo => sub { croak("github_repo is required") };
 has include_assets => 0;
 has version => qr/^v?(.*)$/;
 has prefer => 0;
+has tags_only => 0;
 
 sub init
 {
@@ -29,7 +30,8 @@ sub init
     croak("Don't set set a start_url with the Download::GitHub plugin");
   }
 
-  $meta->prop->{start_url} ||= "https://api.github.com/repos/@{[ $self->github_user ]}/@{[ $self->github_repo ]}/releases";
+  my $endpoint = $self->tags_only ? 'tags' : 'releases' ;
+  $meta->prop->{start_url} ||= "https://api.github.com/repos/@{[ $self->github_user ]}/@{[ $self->github_repo ]}/$endpoint";
 
   $meta->apply_plugin('Download',
     prefer  => $self->prefer,
@@ -44,7 +46,7 @@ sub init
       my $orig = shift;
       my($build, $url) = @_;
       my $res = $orig->($build, $url);
-      if($res->{type} eq 'file' && $res->{filename} eq 'releases')
+      if($res->{type} eq 'file' && $res->{filename} =~ qr{^(?:releases|tags)$})
       {
         my $rel;
         if($res->{content})
@@ -59,14 +61,16 @@ sub init
         {
           croak("malformed response object: no content or path");
         }
+        my $version_key = $res->{filename} eq 'releases' ? 'tag_name' : 'name';
+
         return {
           type => 'list',
           list => [
             map {
               my $release = $_;
-              my($version) = $release->{tag_name} =~ $self->version;
+              my($version) = $release->{$version_key} =~ $self->version;
               my @results = ({
-                filename => $release->{tag_name},
+                filename => $release->{$version_key},
                 url      => $release->{tarball_url},
                 defined $version ? (version  => $version) : (),
               });
@@ -120,7 +124,7 @@ Alien::Build::Plugin::Download::GitHub - Alien::Build plugin to download from Gi
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -175,6 +179,15 @@ If a regular expression is provided, this will include assets that match by
 name.
 
 =back
+
+=head2 tags_only
+
+Boolean value for those repositories that do not upgrade their tags to releases.
+There are two different endpoints. One for
+L<releases|https://developer.github.com/v3/repos/releases/#list-releases-for-a-repository>
+and one for simple L<tags|https://developer.github.com/v3/repos/#list-tags>. The
+default is to interrogate the former for downloads. Passing a true value for
+L</"tags_only"> interrogates the latter for downloads.
 
 =head2 version
 

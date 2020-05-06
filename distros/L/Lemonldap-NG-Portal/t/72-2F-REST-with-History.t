@@ -5,20 +5,22 @@ use IO::String;
 use LWP::UserAgent;
 use LWP::Protocol::PSGI;
 use Plack::Request;
+use JSON qw/from_json/;
 
 require 't/test-lib.pm';
-my $maintests = 6;
+my $maintests = 7;
 
 LWP::Protocol::PSGI->register(
     sub {
         my $req = Plack::Request->new(@_);
         if ( $req->path_info eq '/init' ) {
-            ok( $req->content eq '{"name":"dwho"}', ' Init req gives dwho' )
-              or explain( $req->content, '{"name":"dwho"}' );
+            my $json = from_json( $req->content );
+            is( $json->{name}, "dwho", ' Init req gives dwho' );
         }
         elsif ( $req->path_info eq '/vrfy' ) {
-            ok( $req->content eq '{"code":"1234"}', ' Code is 1234' )
-              or explain( $req->content, '{"code":"1234"}' );
+            my $json = from_json( $req->content );
+            is( $json->{name}, "dwho", ' Verify req contains name' );
+            is( $json->{code}, "1234", ' Verify req contains code' );
         }
         else {
             fail( ' Bad REST call ' . $req->path_info );
@@ -38,7 +40,7 @@ my $client = LLNG::Manager::Test->new( {
             rest2fInitUrl       => 'http://auth.example.com/init',
             rest2fInitArgs      => { name => 'uid' },
             rest2fVerifyUrl     => 'http://auth.example.com/vrfy',
-            rest2fVerifyArgs    => { code => 'code' },
+            rest2fVerifyArgs    => { name => 'uid', code => 'code' },
             loginHistoryEnabled => 1,
             authentication      => 'Demo',
             userDB              => 'Same',
@@ -65,7 +67,8 @@ ok( $res->[2]->[0] =~ qr%<img src="/static/common/logos/logo_llng_old.png"%,
 count(1);
 
 my ( $host, $url, $query ) =
-  expectForm( $res, undef, '/rest2fcheck?skin=bootstrap', 'token', 'code', 'checkLogins' );
+  expectForm( $res, undef, '/rest2fcheck?skin=bootstrap', 'token', 'code',
+    'checkLogins' );
 $query =~ s/code=/code=1234/;
 
 ok(

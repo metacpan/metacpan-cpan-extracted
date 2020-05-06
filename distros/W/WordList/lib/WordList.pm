@@ -1,9 +1,16 @@
 package WordList;
 
-our $DATE = '2018-04-03'; # DATE
-our $VERSION = '0.4.1'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-04'; # DATE
+our $DIST = 'WordList'; # DIST
+our $VERSION = '0.6.0'; # VERSION
 
 use strict 'subs', 'vars';
+
+# IFUNBUILT
+# use Role::Tiny::With;
+# with 'WordListRole::WordList';
+# END IFUNBUILT
 
 sub new {
     my $class = shift;
@@ -12,7 +19,19 @@ sub new {
     unless (defined ${"$class\::DATA_POS"}) {
         ${"$class\::DATA_POS"} = tell $fh;
     }
-    bless [], $class;
+
+    # check for known and required parameters
+    my %params = @_;
+    my $param_spec = \%{"$class\::PARAMS"};
+    for my $param_name (keys %params) {
+        die "Unknown parameter '$param_name'" unless $param_spec->{$param_name};
+    }
+    for my $param_name (keys %$param_spec) {
+        die "Missing required parameter '$param_name'"
+            if $param_spec->{$param_name}{req} && !exists($params{$param_name});
+    }
+
+    bless [undef, undef, \%params], $class;
 }
 
 sub each_word {
@@ -28,6 +47,31 @@ sub each_word {
         my $res = $code->($word);
         last if defined $res && $res == -2;
     }
+}
+
+sub next_word {
+    my $self = shift;
+
+    my $class = ref($self);
+    my $fh = \*{"$class\::DATA"};
+    my $word = <$fh>;
+    chomp $word if defined $word;
+    $word;
+}
+
+sub reset_iterator {
+    my $self = shift;
+
+    my $class = ref($self);
+    my $fh = \*{"$class\::DATA"};
+    seek $fh, ${"$class\::DATA_POS"}, 0;
+}
+
+sub first_word {
+    my $self = shift;
+
+    $self->reset_iterator;
+    $self->next_word;
 }
 
 sub pick {
@@ -109,7 +153,7 @@ WordList - Word lists
 
 =head1 VERSION
 
-This document describes version 0.4.1 of WordList (from Perl distribution WordList), released on 2018-04-03.
+This document describes version 0.6.0 of WordList (from Perl distribution WordList), released on 2020-05-04.
 
 =head1 SYNOPSIS
 
@@ -145,10 +189,21 @@ There must not be any duplicate entry in the word list.
 B<Dynamic and non-deterministic wordlist.> A dynamic wordlist must set package
 variable C<$DYNAMIC> to either 1 (deterministic) or 2 (non-deterministic). A
 dynamic wordlist does not put the wordlist in the DATA section; instead, user
-relies on C<each_word()> or C<all_words()> to get the list. A deterministic
-wordlist returns the same list everytime C<each_word()> or C<all_words()> is
-called. A non-deterministic list can return a different list for a different
-C<each_word()> or C<all_words()> call.
+relies on C<first_word()> + C<next_word()>, or C<each_word()>, or C<all_words()>
+to get the list. A deterministic wordlist returns the same list everytime
+C<each_word()> or C<all_words()> is called. A non-deterministic list can return
+a different list for a different C<each_word()> or C<all_words()> call. See
+L<WordListRole::Dynamic::FirstNextResetFromEach> and
+L<WordListRole::Dynamic::EachFromFirstNextReset> if you want to write a dynamic
+wordlist module. It is possible for a dynamic list to return unordered or
+duplicate entries, but it is not encouraged.
+
+B<Parameterized wordlist.> When instantiating a wordlist class instance, user
+can pass a list of key-value pairs as parameters. Normally only a dynamic
+wordlist would accept parameters. Parameters are defined in the C<%PARAMS>
+package variable. It is a hash of parameter names as keys and parameter
+specification as values. Parameter specification follows function argument
+metadata specified in L<Rinci::function>.
 
 =head1 DIFFERENCES WITH GAMES::WORD::WORDLIST
 
@@ -200,6 +255,20 @@ first argument.
 
 If code return -2 will exit early.
 
+=head2 first_word
+
+Another way to iterate the word list is by calling L</first_word> to get the
+first word, then L</next_word> repeatedly until you get C<undef>.
+
+=head2 next_word
+
+Get the next word. See L</first_word> for more details.
+
+=head2 reset_iterator
+
+Reset iterator. Basically L</first_word> is equivalent to C<reset_iterator> +
+L</next_word>.
+
 =head2 pick
 
 Usage:
@@ -222,8 +291,8 @@ Usage:
 Check whether C<$word> is in the list.
 
 Algorithm in this implementation is linear scan (O(n)). Check out
-L<WordList::Role::BinarySearch> for an O(log n) implementation, or
-L<WordList::Role::Bloom> for O(1) implementation.
+L<WordListRole::BinarySearch> for an O(log n) implementation, or
+L<WordListRole::Bloom> for O(1) implementation.
 
 =head2 all_words
 
@@ -253,9 +322,13 @@ feature.
 
 =head1 SEE ALSO
 
-C<WordList::Role::*> modules.
+C<WordListRole::*> modules.
 
-Other C<WordList::*> modules.
+C<WordListMod::*> modules.
+
+C<WordList::*> modules.
+
+L<Rinci>.
 
 =head1 AUTHOR
 
@@ -263,7 +336,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

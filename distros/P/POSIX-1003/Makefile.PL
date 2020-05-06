@@ -1,5 +1,7 @@
 use ExtUtils::MakeMaker;
 
+use 5.10.0;
+
 WriteMakefile
   ( NAME        => 'POSIX::1003'
   , VERSION_FROM => 'lib/POSIX/1003/Module.pm'
@@ -11,10 +13,24 @@ WriteMakefile
      }
   , AUTHOR      => 'Mark Overmeer'
   , ABSTRACT    => 'POSIX::1003, alternative for POSIX in core'
-  , LICENSE     => 'perl'
-  , PL_FILES    => {}
   , INC         => '-I.'
   , realclean   => {FILES => '*.c'}
+  , LICENSE     => 'perl_5'
+
+  , META_MERGE  =>
+      { 'meta-spec' => { version => 2 }
+      , resources  =>
+          { repository =>
+              { type => 'git'
+              , url  => 'https://github.com/markov2/perl5-POSIX-1003.git'
+              , web  => 'https://github.com/markov2/perl5-POSIX-1003'
+              }
+          , homepage => 'http://perl.overmeer.net/CPAN/'
+          , license  => [ 'http://dev.perl.org/licenses/' ]
+          }
+      }
+
+
   );
 
 #### the next lines are added for OODoc, which generates the
@@ -34,13 +50,12 @@ linkext:: $(MAN3PODS)
 	$(FULLPERL) manuals.PL $(MAN3PODS)
 
 # for DIST
-RAWDIR          = ../public_html/posix/raw
-DISTDIR         = ../public_html/posix/source
-LICENSE         = artistic
+RAWDIR          = ../public_html/posix-1003/raw
+DISTDIR         = ../public_html/posix-1003/source
 
 # for POD
 FIRST_YEAR      = 2011
 EMAIL           = perl@overmeer.net
-WEBSITE         = http://perl.overmeer.net
+WEBSITE         = http://perl.overmeer.net/CPAN
 __POSTAMBLE
 

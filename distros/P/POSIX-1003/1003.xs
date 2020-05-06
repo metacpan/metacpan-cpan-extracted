@@ -12,6 +12,7 @@
     I_SYS_POLL
     I_SYS_RESOURCE
     I_ULIMIT
+    I_SOCKET
 
     HAS_FCNTL
     HAS_SETEUID
@@ -69,6 +70,8 @@
    Overrule via files in the "system" sub-directory of this distribution.
  */
 
+#include <sys/types.h>
+
 #ifndef HAS_CONFSTR
 #define HAS_CONFSTR
 #endif
@@ -117,6 +120,49 @@
 #define HAS_FTRUNCATE
 #endif
 
+#ifndef HAS_GLOB
+#define HAS_GLOB
+#endif
+
+#ifndef HAS_WORDEXP
+#define HAS_WORDEXP
+#endif
+
+#ifndef HAS_FNMATCH
+#define HAS_FNMATCH
+#endif
+
+#ifndef I_SYS_WAIT
+#define I_SYS_WAIT
+#endif
+
+#ifdef I_UNISTD
+#  ifndef HAS_GETPID
+#  define HAS_GETPID
+#  endif
+
+#  ifndef HAS_GETPPID
+#  define HAS_GETPPID
+#  endif
+#endif
+
+#ifdef I_TIME
+
+#  ifndef HAS_STRPTIME
+#  define HAS_STRPTIME
+#  endif
+
+#  ifndef HAS_MKTIME
+#  define HAS_MKTIME
+#  endif
+
+#endif
+
+#define I_TIME
+#define I_RESOURCE
+#define I_SYS_RESOURCE
+#define I_GRP
+
 /*
  * work-arounds for various operating systems
  */
@@ -131,8 +177,12 @@
 #include <fcntl.h>
 #endif
 
+#ifdef I_SOCKET
+#include <fcntl.h>
+#endif
+
 #ifdef HAS_ULIMIT
-#  ifdef  I_ULIMIT
+#  ifndef I_ULIMIT
 #  define I_ULIMIT
 #  endif
 #  include <ulimit.h>
@@ -149,6 +199,100 @@
 #include <sys/poll.h>
 #endif
 #endif
+
+#ifdef I_SYS_WAIT
+#include <sys/wait.h>
+#endif
+
+#ifdef I_TIME
+#include <time.h>
+#endif
+
+#ifdef I_GRP
+#include <grp.h>
+#endif
+
+#ifdef HAS_GLOB
+#include <glob.h>
+
+/*!!! NOT thread safe... no closures in C :-( */
+static SV  * _glob_call;
+
+static int _glob_on_error(epath, eerrno)
+    const char * epath;
+    int          eerrno;
+{   // See man perlcall
+    dSP;
+    int stop = 0;
+    int count;
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    XPUSHs(sv_2mortal(newSVpv(epath, 0)));
+    XPUSHs(sv_2mortal(newSViv(eerrno)));
+    PUTBACK;
+
+    count = call_sv(_glob_call, G_SCALAR);
+
+    SPAGAIN;
+
+    if(count) stop = POPi;
+
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+
+    return stop;
+}
+
+#endif
+
+#define I_SIGNAL
+#ifdef I_SIGNAL
+#include <signal.h>
+#endif
+
+#ifdef HAS_FNMATCH
+#include <fnmatch.h>
+#endif
+
+/*
+ * For missing
+ */
+
+#ifndef __COMPAR_FN_T
+# define __COMPAR_FN_T
+typedef int (*__compar_fn_t) (__const void *, __const void *);
+#endif
+
+char * missing[10000];
+unsigned int  nr_missing = 0;
+bool missing_is_sorted = 0;
+
+static int
+strptr_cmp(const void *p1, const void *p2)
+{   /* passed in are char **'s    */
+    return strcmp(* (char * const *) p1, * (char * const *) p2);
+}
+
+static int
+strptr2_cmp(const void *p1, const void *p2)
+{   /* only second passed in are char **'s    */
+    return strcmp(p1, * (char * const *) p2);
+}
+
+/* MO: openbsd has no limits, but I am lazy */
+#ifdef NGROUPS_MAX
+#  define _NGROUPS NGROUPS_MAX
+#else
+#  define _NGROUPS 2048
+#endif
+
+/*
+ * Fill tables
+ */
 
 HV * sc_table = NULL;
 HV *
@@ -250,14 +394,14 @@ fill_rlimit()
     return rl_table;
 }
 
-HV * poll_table = NULL;
+HV * events_table = NULL;
 HV *
-fill_poll()
-{   if(poll_table) return poll_table;
+fill_events()
+{   if(events_table) return events_table;
 
-    poll_table = newHV();
-#include "poll.c"
-    return poll_table;
+    events_table = newHV();
+#include "events.c"
+    return events_table;
 }
 
 HV * errno_table = NULL;
@@ -268,6 +412,82 @@ fill_errno()
     errno_table = newHV();
 #include "errno.c"
     return errno_table;
+}
+
+HV * socket_table = NULL;
+HV *
+fill_socket()
+{   if(socket_table) return socket_table;
+
+    socket_table = newHV();
+#include "socket.c"
+    return socket_table;
+}
+
+
+#include "float.h"
+#include "math.h"
+HV * math_table = NULL;
+HV *
+fill_math()
+{   if(math_table) return math_table;
+
+    /* buffer to be able to convert float constants into float strings */
+    char float_string[1024];
+
+    math_table = newHV();
+#include "math.c"
+    return math_table;
+}
+
+HV * locale_table = NULL;
+HV *
+fill_locale()
+{   if(locale_table) return locale_table;
+
+    locale_table = newHV();
+#include "locale.c"
+    return locale_table;
+}
+
+HV * os_table = NULL;
+HV *
+fill_os()
+{   if(os_table) return os_table;
+
+    os_table = newHV();
+#include "osconsts.c"
+    return os_table;
+}
+
+HV * proc_table = NULL;
+HV *
+fill_proc()
+{   if(proc_table) return proc_table;
+
+    proc_table = newHV();
+#include "proc.c"
+    return proc_table;
+}
+
+HV * time_table = NULL;
+HV *
+fill_time()
+{   if(time_table) return time_table;
+
+    time_table = newHV();
+#include "time.c"
+    return time_table;
+}
+
+HV * user_table = NULL;
+HV *
+fill_user()
+{   if(user_table) return user_table;
+
+    user_table = newHV();
+#include "user.c"
+    return user_table;
 }
 
 MODULE = POSIX::1003	PACKAGE = POSIX::1003::Sysconf
@@ -306,6 +526,26 @@ _strsignal(signr)
 #endif
     OUTPUT:
 	RETVAL
+
+MODULE = POSIX::1003	PACKAGE = POSIX::1003::Module
+
+SV *
+is_missing(name)
+    char *              name;
+    PROTOTYPE: $
+    PREINIT:
+        char *          found;
+    CODE:
+        if(!missing_is_sorted)
+        {   qsort(missing, nr_missing, sizeof(char *), strptr_cmp);
+            missing_is_sorted = 1;
+        }
+
+        found  = bsearch(name, missing, nr_missing, sizeof(char *),strptr2_cmp);
+        RETVAL = (found == NULL ? &PL_sv_no : &PL_sv_yes);
+    OUTPUT:
+        RETVAL
+
 
 MODULE = POSIX::1003	PACKAGE = POSIX::1003::Confstr
 
@@ -383,6 +623,70 @@ fsys_table()
     OUTPUT:
 	RETVAL
 
+SV *
+_glob(filenames, pattern, flags, errfun)
+        AV   * filenames;
+	char * pattern;
+	int    flags;
+        SV   * errfun;
+    PROTOTYPE:  \@$$$
+    PREINIT:
+#ifdef HAS_GLOB
+        glob_t   globbuf;
+        char  ** pathv;
+#endif
+        int      rc;
+    CODE:
+#ifdef HAS_GLOB
+        /* clear flags which are handled in Perl */
+        flags     &= ~(GLOB_DOOFFS|GLOB_APPEND);
+        globbuf.gl_offs = 0;
+
+	/* sorting raw characters is useless */
+        flags     |= GLOB_NOSORT;
+
+        if(SvOK(errfun))
+        {   _glob_call = errfun;
+            rc = glob(pattern, flags, _glob_on_error, &globbuf);
+        }
+        else
+        {   rc = glob(pattern, flags, NULL, &globbuf);
+        }
+
+        if(rc==0)
+        {   for(pathv = &globbuf.gl_pathv[0]; *pathv; pathv++)
+            {   av_push(filenames, newSVpv(*pathv, 0));
+            }
+            globfree(&globbuf);
+        }
+	RETVAL = newSViv(rc);
+#else
+        errno  = ENOSYS;
+        RETVAL = &PL_sv_undef;
+#endif
+
+    OUTPUT:
+	RETVAL
+
+int
+_fnmatch(pattern, name, flags)
+	char * pattern;
+	char * name;
+	int    flags;
+    PROTOTYPE:  $$$
+    PREINIT:
+    CODE:
+#ifdef HAS_FNMATCH
+        RETVAL = fnmatch(pattern, name, flags);
+#else
+        errno  = ENOSYS;
+        RETVAL = &PL_sv_undef;
+#endif
+
+    OUTPUT:
+	RETVAL
+
+
 MODULE = POSIX::1003	PACKAGE = POSIX::1003::Properties
 
 HV *
@@ -442,9 +746,9 @@ _getrlimit(resource)
     PPCODE:
 	/* on linux, rlim64_t is a __UQUAD_TYPE */
 	result = getrlimit64(resource, &rlim);
-	PUSHs(sv_2mortal(newSVuv(rlim.rlim_cur)));
-	PUSHs(sv_2mortal(newSVuv(rlim.rlim_max)));
-	PUSHs(result==-1 ? &PL_sv_no : &PL_sv_yes);
+	XPUSHs(sv_2mortal(newSVuv(rlim.rlim_cur)));
+	XPUSHs(sv_2mortal(newSVuv(rlim.rlim_max)));
+	XPUSHs(result==-1 ? &PL_sv_no : &PL_sv_yes);
 
 SV *
 _setrlimit(resource, cur, max)
@@ -476,9 +780,9 @@ _getrlimit(resource)
     PPCODE:
 	/* on linux, rlim64_t is a __ULONGWORD_TYPE */
 	result = getrlimit(resource, &rlim);
-	PUSHs(sv_2mortal(newSVuv(rlim.rlim_cur)));
-	PUSHs(sv_2mortal(newSVuv(rlim.rlim_max)));
-	PUSHs(result==-1 ? &PL_sv_no : &PL_sv_yes);
+	XPUSHs(sv_2mortal(newSVuv(rlim.rlim_cur)));
+	XPUSHs(sv_2mortal(newSVuv(rlim.rlim_max)));
+	XPUSHs(result==-1 ? &PL_sv_no : &PL_sv_yes);
 
 SV *
 _setrlimit(resource, cur, max)
@@ -505,9 +809,9 @@ _getrlimit(resource)
 	int		resource;
     PROTOTYPE: $
     PPCODE:
-	PUSHs(&PL_sv_undef);
-	PUSHs(&PL_sv_undef);
-	PUSHs(&PL_sv_no);
+	XPUSHs(&PL_sv_undef);
+	XPUSHs(&PL_sv_undef);
+	XPUSHs(&PL_sv_no);
 
 SV *
 _setrlimit(resource, cur, max)
@@ -529,17 +833,48 @@ MODULE = POSIX::1003	PACKAGE = POSIX::1003::FS
 #include <sys/mkdev.h>
 #endif
 
-dev_t
+#ifdef __GNU_LIBRARY__
+#include <sys/sysmacros.h>
+#endif
+
+SV *
 makedev(dev_t major, dev_t minor)
     PROTOTYPE: $$
+    CODE:
+#ifdef HAS_SYSMKDEV
+	RETVAL = newSViv(makedev(major, minor));
+#else
+	errno  = ENOSYS;
+	RETVAL = &PL_sv_undef;
+#endif
+    OUTPUT:
+	RETVAL
 
-dev_t
+SV *
 major(dev_t dev)
     PROTOTYPE: $
+    CODE:
+#ifdef HAS_SYSMKDEV
+	RETVAL = newSVuv(major(dev));
+#else
+	errno  = ENOSYS;
+	RETVAL = &PL_sv_undef;
+#endif
+    OUTPUT:
+	RETVAL
 
-dev_t
+SV *
 minor(dev_t dev)
     PROTOTYPE: $
+    CODE:
+#ifdef HAS_SYSMKDEV
+	RETVAL = newSVuv(minor(dev));
+#else
+	errno  = ENOSYS;
+	RETVAL = &PL_sv_undef;
+#endif
+    OUTPUT:
+	RETVAL
 
 int
 mknod(filename, mode, dev)
@@ -560,10 +895,10 @@ mknod(filename, mode, dev)
 MODULE = POSIX::1003	PACKAGE = POSIX::1003::Events
 
 HV *
-poll_table()
+events_table()
     PROTOTYPE:
     CODE:
-	RETVAL = fill_poll();
+	RETVAL = fill_events();
     OUTPUT:
 	RETVAL
 
@@ -576,39 +911,47 @@ _poll(handles, timeout)
 	struct pollfd * fds;
 	HV            * ret;
 	char          * key;
-        char            key_str[8];
+        char            key_str[16];
 	int             rc;
         HE            * entry;
         I32		len;
 	int		j;
+        int             nfd;
     PPCODE:
 #ifdef HAS_POLL
-	const int nfd = hv_iterinit(handles);
+	nfd = hv_iterinit(handles);
 	Newx(fds, nfd, struct pollfd);
 	for(j=0; j < nfd; j++)
-        {   entry          = hv_iternext(handles);
+        {   /* Get hash key into 'C' space */
+            entry          = hv_iternext(handles);
 	    key            = hv_iterkey(entry, &len);
-	    key[len]       = 0;
-            fds[j].fd      = atoi(key_str);
+            if(len > 15) len = 15;    /* fd-num is always small */
+	    strncpy(key_str, key, len);
+            key_str[len]   = 0;
+            fds[j].fd      = strtoul(key_str, NULL, 10);
+
 	    fds[j].events  = SvUV(hv_iterval(handles, entry));
-	    fds[j].revents = 0;    // returned events
+	    fds[j].revents = 0;       /* returned events */
 	}
 	rc = poll(fds, nfd, timeout);
         if(rc==-1)
         {   XPUSHs(&PL_sv_undef);
         }
-        else
+        else if(rc==0)
 	{   ret = newHV();
-            if(rc > 0)
-            {   for(j=0; j < nfd; j++)
-                {   if(fds[j].revents)
-	            {   sprintf((char *)key_str, "%d", fds[j].fd);
-                        (void)hv_store(ret, key_str, strlen(key_str), newSVuv(fds[j].revents), 0);
-                    }
+            XPUSHs(sv_2mortal((SV*)ret));
+        }
+	else
+	{   ret = newHV();
+            for(j=0; j < nfd; j++)
+            {   if(fds[j].revents)
+	        {   sprintf((char *)key_str, "%15d", fds[j].fd);
+                    (void)hv_store(ret, key_str, strlen(key_str), newSVuv(fds[j].revents), 0);
                 }
-	    }
-	    XPUSHs((SV*)ret);
+            }
+	    XPUSHs(sv_2mortal((SV*)ret));
 	}
+        Safefree(fds);
 	XSRETURN(1);
 #else
 	errno = ENOSYS;
@@ -616,6 +959,14 @@ _poll(handles, timeout)
 #endif
 
 MODULE = POSIX::1003	PACKAGE = POSIX::1003::User
+
+HV *
+user_table()
+    PROTOTYPE:
+    CODE:
+        RETVAL = fill_user();
+    OUTPUT:
+        RETVAL
 
 void
 setuid(uid)
@@ -878,11 +1229,11 @@ void
 getgroups()
     PROTOTYPE:
     INIT:
-	gid_t	grouplist[NGROUPS_MAX+1];
+	gid_t	grouplist[_NGROUPS];
 	int	nr_groups;
     PPCODE:
 #ifdef HAS_GETGROUPS
-	nr_groups = getgroups(NGROUPS_MAX+1, grouplist);
+	nr_groups = getgroups(_NGROUPS, grouplist);
 	if(nr_groups >= 0) {
 	    int nr;
 	    for(nr = 0; nr < nr_groups; nr++)
@@ -897,11 +1248,11 @@ setgroups(...)
     PROTOTYPE: @
     INIT:
 	int   index;
-	gid_t groups[NGROUPS_MAX];
+	gid_t groups[_NGROUPS];
 	int   result;
     CODE:
 #ifdef HAS_SETGROUPS
-        for(index = 0; index < items && index < NGROUPS_MAX; index++)
+        for(index = 0; index < items && index < _NGROUPS; index++)
 	{   groups[index] = (gid_t)SvUV(ST(index));
 	}
 	result = setgroups(index, groups);
@@ -934,6 +1285,199 @@ _strerror(int errnr)
         errno  = ENOSYS;
         RETVAL = &PL_sv_undef;
 #endif
+    OUTPUT:
+	RETVAL
+
+MODULE = POSIX::1003	PACKAGE = POSIX::1003::Math
+
+HV *
+math_table()
+    PROTOTYPE:
+    CODE:
+	RETVAL = fill_math();
+    OUTPUT:
+	RETVAL
+
+MODULE = POSIX::1003	PACKAGE = POSIX::1003::Locale
+
+HV *
+locale_table()
+    PROTOTYPE:
+    CODE:
+	RETVAL = fill_locale();
+    OUTPUT:
+	RETVAL
+
+MODULE = POSIX::1003	PACKAGE = POSIX::1003::OS
+
+HV *
+osconsts_table()
+    PROTOTYPE:
+    CODE:
+	RETVAL = fill_os();
+    OUTPUT:
+	RETVAL
+
+MODULE = POSIX::1003	PACKAGE = POSIX::1003::Proc
+
+HV *
+proc_table()
+    PROTOTYPE:
+    CODE:
+	RETVAL = fill_proc();
+    OUTPUT:
+        RETVAL
+
+int
+getpid()
+    PROTOTYPE:
+    CODE:
+#ifdef HAS_GETPID
+        RETVAL = getpid();
+#else
+        errno  = ENOSYS;
+        RETVAL = &PL_sv_undef;
+#endif
+    OUTPUT:
+        RETVAL
+
+int
+getppid()
+    PROTOTYPE:
+    CODE:
+#ifdef HAS_GETPPID
+        RETVAL = getpid();
+#else
+        errno  = ENOSYS;
+        RETVAL = &PL_sv_undef;
+#endif
+    OUTPUT:
+        RETVAL
+
+MODULE = POSIX::1003	PACKAGE = POSIX::1003::Time
+
+
+MODULE = POSIX::1003	PACKAGE = POSIX::1003::Time
+
+HV *
+time_table()
+    PROTOTYPE:
+    CODE:
+	RETVAL = fill_time();
+    OUTPUT:
+        RETVAL
+
+void
+_strptime(input, format)
+    const char *input
+    const char *format
+    PREINIT:
+#ifdef I_TIME
+        struct tm t  = { -1,-1,-1,-1,-1,-1,-1,-1 };
+#endif
+    PPCODE:
+#ifdef HAS_STRPTIME
+        strptime(input, format, &t);
+        if(t.tm_sec  == -1) XPUSHs(&PL_sv_undef); else mXPUSHi(t.tm_sec);
+        if(t.tm_min  == -1) XPUSHs(&PL_sv_undef); else mXPUSHi(t.tm_min);
+        if(t.tm_hour == -1) XPUSHs(&PL_sv_undef); else mXPUSHi(t.tm_hour);
+        if(t.tm_mday == -1) XPUSHs(&PL_sv_undef); else mXPUSHi(t.tm_mday);
+        if(t.tm_mon  == -1) XPUSHs(&PL_sv_undef); else mXPUSHi(t.tm_mon);
+        if(t.tm_year == -1) XPUSHs(&PL_sv_undef); else mXPUSHi(t.tm_year);
+        if(t.tm_wday == -1) XPUSHs(&PL_sv_undef); else mXPUSHi(t.tm_wday);
+        if(t.tm_yday == -1) XPUSHs(&PL_sv_undef); else mXPUSHi(t.tm_yday);
+        if(t.tm_isdst== -1) XPUSHs(&PL_sv_undef); else mXPUSHi(t.tm_isdst);
+#else
+        errno  = ENOSYS;
+#endif
+
+void
+_mktime(sec, min, hour, mday, mon, year, wday, yday, isdst)
+    int  sec
+    int  min
+    int  hour
+    int  mday
+    int  mon
+    int  year
+    int  wday
+    int  yday
+    int  isdst
+    PREINIT:
+#ifdef I_TIME
+        struct tm t;
+        time_t    ts;
+#endif
+    PPCODE:
+#ifdef HAS_MKTIME
+        t.tm_sec  = sec;
+        t.tm_min  = min;
+        t.tm_hour = hour;
+        t.tm_mday = mday;
+        t.tm_mon  = mon;
+        t.tm_year = year;
+        t.tm_wday = wday;
+        t.tm_yday = yday;
+        t.tm_isdst = isdst;
+        ts = mktime(&t);
+        if(ts != -1)
+        {   mXPUSHi(ts);
+            if(t.tm_sec  == -1) XPUSHs(&PL_sv_undef); else mXPUSHi(t.tm_sec);
+            if(t.tm_min  == -1) XPUSHs(&PL_sv_undef); else mXPUSHi(t.tm_min);
+            if(t.tm_hour == -1) XPUSHs(&PL_sv_undef); else mXPUSHi(t.tm_hour);
+            if(t.tm_mday == -1) XPUSHs(&PL_sv_undef); else mXPUSHi(t.tm_mday);
+            if(t.tm_mon  == -1) XPUSHs(&PL_sv_undef); else mXPUSHi(t.tm_mon);
+            if(t.tm_year == -1) XPUSHs(&PL_sv_undef); else mXPUSHi(t.tm_year);
+            if(t.tm_wday == -1) XPUSHs(&PL_sv_undef); else mXPUSHi(t.tm_wday);
+            if(t.tm_yday == -1) XPUSHs(&PL_sv_undef); else mXPUSHi(t.tm_yday);
+            if(t.tm_isdst== -1) XPUSHs(&PL_sv_undef); else mXPUSHi(t.tm_isdst);
+        }
+#else
+        errno  = ENOSYS;
+#endif
+
+SV *
+_strftime(fmt, sec, min, hour, mday, mon, year, wday= -1, yday= -1, isdst= -1)
+    char *fmt
+    int   sec
+    int   min
+    int   hour
+    int   mday
+    int   mon
+    int   year
+    int   wday
+    int   yday
+    int   isdst
+    INIT:
+        char buf[1024];
+        struct tm t;
+    CODE:
+#ifdef HAS_STRFTIME
+        t.tm_sec  = sec;
+        t.tm_min  = min;
+        t.tm_hour = hour;
+        t.tm_mday = mday;
+        t.tm_mon  = mon;
+        t.tm_year = year;
+        t.tm_wday = wday;
+        t.tm_yday = yday;
+        t.tm_isdst = isdst;
+	buf[1023] = '\0';
+	RETVAL = strftime(buf, 1024, fmt, &t)==0 ? &PL_sv_undef
+            : newSVpv(buf, 0);
+#else
+        errno  = ENOSYS;
+        RETVAL = &PL_sv_undef;
+#endif
+    OUTPUT:
+	RETVAL
+
+MODULE = POSIX::1003	PACKAGE = POSIX::1003::Socket
+
+HV *
+socket_table()
+    PROTOTYPE:
+    CODE:
+	RETVAL = fill_socket();
     OUTPUT:
 	RETVAL
 
@@ -981,9 +1525,11 @@ _lock(fd, function, param)
         SV *  param
     PROTOTYPE: $$$
     INIT:
+#ifdef HAS_FCNTL
         struct flock locker;
         SV **type, **whence, **start, **len;
         HV *fl, *fs;
+#endif
     CODE:
 #ifdef HAS_FCNTL
         fs     = (HV *)SvRV(param);
@@ -1078,3 +1624,5 @@ _lockf(fd, function, len)
 #endif
     OUTPUT:
 	RETVAL
+
+

@@ -427,115 +427,154 @@ function templates(tpl,key) {
                   "type" : "bool"
                },
                {
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRedirectUris",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRedirectUris",
+                  "title" : "oidcRPMetaDataOptionsRedirectUris"
+               }
+            ],
+            "id" : "oidcRPMetaDataOptionsBasic",
+            "title" : "oidcRPMetaDataOptionsBasic",
+            "type" : "simpleInputContainer"
+         },
+         {
+            "_nodes" : [
+               {
+                  "default" : 0,
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsBypassConsent",
+                  "help" : "openidconnectclaims.html",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsBypassConsent",
+                  "title" : "oidcRPMetaDataOptionsBypassConsent",
+                  "type" : "bool"
+               },
+               {
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsUserIDAttr",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsUserIDAttr",
+                  "title" : "oidcRPMetaDataOptionsUserIDAttr"
+               },
+               {
+                  "default" : 0,
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsIDTokenForceClaims",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsIDTokenForceClaims",
+                  "title" : "oidcRPMetaDataOptionsIDTokenForceClaims",
+                  "type" : "bool"
+               },
+               {
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAdditionalAudiences",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAdditionalAudiences",
+                  "title" : "oidcRPMetaDataOptionsAdditionalAudiences"
+               },
+               {
+                  "default" : 0,
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRefreshToken",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRefreshToken",
+                  "title" : "oidcRPMetaDataOptionsRefreshToken",
+                  "type" : "bool"
+               }
+            ],
+            "id" : "oidcRPMetaDataOptionsAdvanced",
+            "title" : "oidcRPMetaDataOptionsAdvanced",
+            "type" : "simpleInputContainer"
+         },
+         {
+            "_nodes" : [
+               {
+                  "default" : "HS512",
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsIDTokenSignAlg",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsIDTokenSignAlg",
+                  "select" : [
+                     {
+                        "k" : "none",
+                        "v" : "None"
+                     },
+                     {
+                        "k" : "HS256",
+                        "v" : "HS256"
+                     },
+                     {
+                        "k" : "HS384",
+                        "v" : "HS384"
+                     },
+                     {
+                        "k" : "HS512",
+                        "v" : "HS512"
+                     },
+                     {
+                        "k" : "RS256",
+                        "v" : "RS256"
+                     },
+                     {
+                        "k" : "RS384",
+                        "v" : "RS384"
+                     },
+                     {
+                        "k" : "RS512",
+                        "v" : "RS512"
+                     }
+                  ],
+                  "title" : "oidcRPMetaDataOptionsIDTokenSignAlg",
+                  "type" : "select"
+               },
+               {
                   "default" : 0,
                   "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRequirePKCE",
                   "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRequirePKCE",
                   "title" : "oidcRPMetaDataOptionsRequirePKCE",
                   "type" : "bool"
+               },
+               {
+                  "default" : 0,
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAllowOffline",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAllowOffline",
+                  "title" : "oidcRPMetaDataOptionsAllowOffline",
+                  "type" : "bool"
+               },
+               {
+                  "default" : 0,
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAllowPasswordGrant",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAllowPasswordGrant",
+                  "title" : "oidcRPMetaDataOptionsAllowPasswordGrant",
+                  "type" : "bool"
+               },
+               {
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRule",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRule",
+                  "title" : "oidcRPMetaDataOptionsRule"
                }
             ],
-            "id" : "oidcRPMetaDataOptionsAuthentication",
-            "title" : "oidcRPMetaDataOptionsAuthentication",
+            "id" : "security",
+            "title" : "security",
             "type" : "simpleInputContainer"
          },
          {
-            "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsUserIDAttr",
-            "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsUserIDAttr",
-            "title" : "oidcRPMetaDataOptionsUserIDAttr"
-         },
-         {
-            "default" : "HS512",
-            "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsIDTokenSignAlg",
-            "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsIDTokenSignAlg",
-            "select" : [
+            "_nodes" : [
                {
-                  "k" : "none",
-                  "v" : "None"
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAuthorizationCodeExpiration",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAuthorizationCodeExpiration",
+                  "title" : "oidcRPMetaDataOptionsAuthorizationCodeExpiration",
+                  "type" : "int"
                },
                {
-                  "k" : "HS256",
-                  "v" : "HS256"
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsIDTokenExpiration",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsIDTokenExpiration",
+                  "title" : "oidcRPMetaDataOptionsIDTokenExpiration",
+                  "type" : "int"
                },
                {
-                  "k" : "HS384",
-                  "v" : "HS384"
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAccessTokenExpiration",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAccessTokenExpiration",
+                  "title" : "oidcRPMetaDataOptionsAccessTokenExpiration",
+                  "type" : "int"
                },
                {
-                  "k" : "HS512",
-                  "v" : "HS512"
-               },
-               {
-                  "k" : "RS256",
-                  "v" : "RS256"
-               },
-               {
-                  "k" : "RS384",
-                  "v" : "RS384"
-               },
-               {
-                  "k" : "RS512",
-                  "v" : "RS512"
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsOfflineSessionExpiration",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsOfflineSessionExpiration",
+                  "title" : "oidcRPMetaDataOptionsOfflineSessionExpiration",
+                  "type" : "int"
                }
             ],
-            "title" : "oidcRPMetaDataOptionsIDTokenSignAlg",
-            "type" : "select"
-         },
-         {
-            "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsIDTokenExpiration",
-            "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsIDTokenExpiration",
-            "title" : "oidcRPMetaDataOptionsIDTokenExpiration",
-            "type" : "int"
-         },
-         {
-            "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsIDTokenForceClaims",
-            "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsIDTokenForceClaims",
-            "title" : "oidcRPMetaDataOptionsIDTokenForceClaims",
-            "type" : "bool"
-         },
-         {
-            "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAccessTokenExpiration",
-            "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAccessTokenExpiration",
-            "title" : "oidcRPMetaDataOptionsAccessTokenExpiration",
-            "type" : "int"
-         },
-         {
-            "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAuthorizationCodeExpiration",
-            "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAuthorizationCodeExpiration",
-            "title" : "oidcRPMetaDataOptionsAuthorizationCodeExpiration",
-            "type" : "int"
-         },
-         {
-            "default" : 0,
-            "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAllowOffline",
-            "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAllowOffline",
-            "title" : "oidcRPMetaDataOptionsAllowOffline",
-            "type" : "bool"
-         },
-         {
-            "default" : 0,
-            "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRefreshToken",
-            "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRefreshToken",
-            "title" : "oidcRPMetaDataOptionsRefreshToken",
-            "type" : "bool"
-         },
-         {
-            "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsOfflineSessionExpiration",
-            "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsOfflineSessionExpiration",
-            "title" : "oidcRPMetaDataOptionsOfflineSessionExpiration",
-            "type" : "int"
-         },
-         {
-            "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRedirectUris",
-            "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRedirectUris",
-            "title" : "oidcRPMetaDataOptionsRedirectUris"
-         },
-         {
-            "default" : 0,
-            "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsBypassConsent",
-            "help" : "openidconnectclaims.html",
-            "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsBypassConsent",
-            "title" : "oidcRPMetaDataOptionsBypassConsent",
-            "type" : "bool"
+            "id" : "oidcRPMetaDataOptionsTimeouts",
+            "title" : "oidcRPMetaDataOptionsTimeouts",
+            "type" : "simpleInputContainer"
          },
          {
             "_nodes" : [
@@ -557,10 +596,6 @@ function templates(tpl,key) {
                      {
                         "k" : "front",
                         "v" : "Front Channel"
-                     },
-                     {
-                        "k" : "back",
-                        "v" : "Back Channel"
                      }
                   ],
                   "title" : "oidcRPMetaDataOptionsLogoutType",
@@ -577,13 +612,9 @@ function templates(tpl,key) {
             "id" : "logout",
             "title" : "logout",
             "type" : "simpleInputContainer"
-         },
-         {
-            "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRule",
-            "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRule",
-            "title" : "oidcRPMetaDataOptionsRule"
          }
       ],
+      "help" : "idpopenidconnect.html#options",
       "id" : "oidcRPMetaDataOptions",
       "title" : "oidcRPMetaDataOptions"
    },

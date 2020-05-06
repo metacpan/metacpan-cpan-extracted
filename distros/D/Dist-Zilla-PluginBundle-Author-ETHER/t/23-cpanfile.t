@@ -88,7 +88,8 @@ cmp_deeply(
 or diag 'got distmeta: ', explain $tzil->distmeta;
 
 SKIP: {
-skip '$cwd needs to be $zilla->root for this test', 1 if not eval { Dist::Zilla->VERSION('6.003') };
+skip '$cwd needs to be $zilla->root for this test (requires Dist::Zilla 6.003)', 1
+  if not eval { Dist::Zilla->VERSION('6.003') };
 
 my $git_commit = first { $_->isa('Dist::Zilla::Plugin::Git::Commit') } @{ $tzil->plugins };
 cmp_deeply(

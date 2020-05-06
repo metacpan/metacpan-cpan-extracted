@@ -160,16 +160,14 @@ typedef struct _ffi_pl_type_extra_object {
 
 typedef struct _ffi_pl_type_extra_record {
   size_t size;
-  void *stash; /* really an HV* pointing to the package stash, or NULL */
-} ffi_pl_type_extra_record;
-
-typedef struct _ffi_pl_type_extra_record_value {
-  size_t size;
   char *class; /* base class */
   ffi_type *ffi_type;
-} ffi_pl_type_extra_record_value;
+} ffi_pl_type_extra_record;
 
 typedef struct _ffi_pl_type_extra_custom_perl {
+  union {
+    ffi_pl_type_extra_record record;
+  } ox;
   void *perl_to_native;
   void *native_to_perl;
   void *perl_to_native_post;
@@ -194,7 +192,6 @@ typedef union _ffi_pl_type_extra {
   ffi_pl_type_extra_array        array;
   ffi_pl_type_extra_closure      closure;
   ffi_pl_type_extra_record       record;
-  ffi_pl_type_extra_record_value record_value;
   ffi_pl_type_extra_object       object;
 } ffi_pl_type_extra;
 
@@ -207,6 +204,7 @@ typedef struct _ffi_pl_type {
 typedef struct _ffi_pl_function {
   void *address;
   void *platypus_sv;  /* really a Perl SV* */
+  int platypus_api;
   ffi_cif ffi_cif;
   ffi_pl_type *return_type;
   ffi_pl_type *argument_types[0];

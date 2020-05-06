@@ -5,7 +5,7 @@ package App::Env::Example;
 use strict;
 use warnings;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 # This example uses Shell::GetEnv to illustrate how to source a shell
 # script which defines the environment for an application.  Other
@@ -46,7 +46,7 @@ App::Env::Example - example application environment module for App::Env.
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 DESCRIPTION
 
@@ -125,20 +125,21 @@ B<App::Env::import> via the B<AppOpts> option.
 
 See the source of this module for a simple example.
 
-=head1 BUGS
+=head1 SUPPORT
 
-Please report any bugs or feature requests on the bugtracker website
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-Env> or by email to
-L<bug-App-Env@rt.cpan.org|mailto:bug-App-Env@rt.cpan.org>.
+=head2 Bugs
 
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+Please report any bugs or feature requests to bug-app-env@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=App-Env
 
-=head1 SOURCE
+=head2 Source
 
-The development version is on github at L<https://github.com/djerius/app-env>
-and may be cloned from L<git://github.com/djerius/app-env.git>
+Source is available at
+
+  https://gitlab.com/djerius/App-Env
+
+and may be cloned from
+
+  https://gitlab.com/djerius/App-Env.git
 
 =head1 SEE ALSO
 

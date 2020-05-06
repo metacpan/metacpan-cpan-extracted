@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More;
 
 use POE qw( Session Kernel );
 use IO::Async::Loop::POE;
@@ -37,3 +37,5 @@ $loop->loop_once until defined $poe_signal and defined $ioasync_signal;
 
 is( $poe_signal,     "INT", 'POE signal' );
 is( $ioasync_signal, "INT", 'IO::Async signal' );
+
+done_testing;

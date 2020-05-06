@@ -282,6 +282,7 @@ t/mojolicious/lib/EmbeddedTestApp.pm
 t/mojolicious/lib/MojoliciousConfigTest.pm
 t/mojolicious/lib/MojoliciousTest.pm
 t/mojolicious/lib/MojoliciousTest/Baz.pm
+t/mojolicious/lib/MojoliciousTest/Command/_test2_command.pm
 t/mojolicious/lib/MojoliciousTest/Command/test_command.pm
 t/mojolicious/lib/MojoliciousTest/Exceptional.pm
 t/mojolicious/lib/MojoliciousTest/Foo.pm

@@ -28,7 +28,8 @@ new(class, platypus, address, abi, var_fixed_args, return_type, ...)
     }
 #endif
 #ifndef FFI_PL_PROBE_RECORDVALUE
-    if(return_type->type_code == FFI_PL_TYPE_RECORD_VALUE)
+    if(return_type->type_code == FFI_PL_TYPE_RECORD_VALUE
+    || return_type->type_code == (FFI_PL_TYPE_RECORD_VALUE|FFI_PL_SHAPE_CUSTOM_PERL))
     {
       croak("returning record values is not supported by some combination of your libffi/compiler/platypus");
     }
@@ -53,6 +54,14 @@ new(class, platypus, address, abi, var_fixed_args, return_type, ...)
     Newx(buffer, (sizeof(ffi_pl_function) + sizeof(ffi_pl_type*)*(items-6+extra_arguments)), char);
     self = (ffi_pl_function*)buffer;
     Newx(ffi_argument_types, items-6+extra_arguments, ffi_type*);
+
+    {
+      HV *hv;
+      SV **sv;
+      hv = (HV*) SvRV(platypus);
+      sv = hv_fetch(hv, "api", 3, 0);
+      self->platypus_api = SvIV(*sv);
+    }
 
     self->address = address;
     self->return_type = return_type;
@@ -198,7 +207,8 @@ _attach(self, perl_name, path_name, proto)
       croak("self is not of type FFI::Platypus::Function");
 
     f = INT2PTR(ffi_pl_function*, SvIV((SV*) SvRV(self)));
-    is_ret_rv = f->return_type->type_code == FFI_PL_TYPE_RECORD_VALUE;
+    is_ret_rv = (f->return_type->type_code == FFI_PL_TYPE_RECORD_VALUE) ||
+                (f->return_type->type_code == (FFI_PL_TYPE_RECORD_VALUE | FFI_PL_SHAPE_CUSTOM_PERL));
 
     if(path_name == NULL)
       path_name = "unknown";
@@ -238,7 +248,10 @@ _sub_ref(self, path_name)
     ffi_pl_function *f;
   CODE:
     f = INT2PTR(ffi_pl_function*, SvIV((SV*) SvRV(self)));
-    is_ret_rv = f->return_type->type_code == FFI_PL_TYPE_RECORD_VALUE;
+
+    is_ret_rv = (f->return_type->type_code == FFI_PL_TYPE_RECORD_VALUE) ||
+                (f->return_type->type_code == (FFI_PL_TYPE_RECORD_VALUE | FFI_PL_SHAPE_CUSTOM_PERL));
+
     cv = newXS(NULL, is_ret_rv ? ffi_pl_sub_call_rv : ffi_pl_sub_call, path_name);
     CvXSUBANY(cv).any_ptr = (void *) INT2PTR(ffi_pl_function*, SvIV((SV*) SvRV(self)));
     /*

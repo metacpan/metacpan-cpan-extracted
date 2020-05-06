@@ -28,6 +28,11 @@ subtest 'basic load' => sub {
             {
               return \%mock_response;
             }
+            elsif($url eq 'https://api.github.com/repos/Perl5-Alien/dontpanic/tags')
+            {
+              $mock_response{filename} = 'tags';
+              return \%mock_response;
+            }
             else
             {
               die "unhandled url: $url";
@@ -332,6 +337,54 @@ subtest 'basic load' => sub {
         { filename => '1.00',  url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/1.00',  version => '1.00' },
         ]
       }, 'correct list of assests included';
+  };
+
+  subtest 'tags_only' => sub {
+    @mock_calls = ();
+    local $mock_response{filename} = 'unknown';
+    local $mock_response{content} = encode_json([
+      {
+        name => 'v1.01',
+        tarball_url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/v1.01',
+      },
+      {
+        name => '1.00',
+        tarball_url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/1.00',
+      },
+    ]);
+
+    my $build = alienfile q{
+
+      use alienfile;
+
+      probe sub { 'share' };
+
+      share {
+        plugin 'Download::GitHub' => (
+          github_user => 'Perl5-Alien',
+          github_repo => 'dontpanic',
+          tags_only   => 1,
+        );
+      };
+
+    };
+
+    alienfile_skip_if_missing_prereqs;
+
+    is $build->fetch, {
+      list => [
+        {
+          filename => 'v1.01',
+          version  => '1.01',
+          url      => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/v1.01'
+        },
+        {
+          version  => '1.00',
+          filename => '1.00',
+          url      => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/1.00'
+        }],
+      type => 'list'
+    }, 'tags';
   };
 };
 

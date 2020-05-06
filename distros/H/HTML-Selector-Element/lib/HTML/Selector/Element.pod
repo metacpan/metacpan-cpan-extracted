@@ -1,0 +1,401 @@
+=encoding utf8
+
+
+=head1 NAME
+
+HTML::Selector::Element - Search for elements in a HTML::Element DOM tree using CSS selectors
+
+
+=head1 SYNOPSIS
+
+Conceptual demo code with complete isolation between this module and HTML::Element:
+
+    use HTML::TreeBuilder;
+    require HTML::Selector::Element;
+    # Parse the CSS rule, store it in a Html::Selector::Element object (cached)
+    $sel ||= HTML::Selector::Element->new('div.nav ul.navbar');
+    
+    # Construct criteria for look_down (may reference the start element):
+    my @criteria = $sel->criteria(\$element);
+    # Now search
+    return $element->look_down(@criteria);
+
+But there's an easier way...
+
+    # require the module, import the specified methods into HTML::Element
+    use HTML::Selector::Element qw(find is closest);
+       
+    # search for all matching elements under $element
+    my @all = $element->find('div.section + div span');
+    # search for first matching element under $element
+    my $first = $element->find('div.section + div span');
+    
+    # test if an element matches a CSS selector;
+    if($element->is('div nav > ul.navbar')) {
+        printf "Yes it is\n";
+    }
+    
+    # Search for an element relative to the element where you start from
+    # Like in jQuery, but unlike querySelector/querySelectorAll in browsers:
+    # This may be on the right side of $element instead of underneath:
+    my $sibling = $element->find('~ label');
+    
+    # Like look_up, but using a CSS selector
+    my $ancestor = $element->closest('div.container');
+
+
+=head1 DESCRIPTION
+
+This module is inspired by jQuery, in Javascript.
+
+It allows you to easily search through a subtree of a DOM of a HTML/XML document
+using HTML::Element, as parsed by HTML::TreeBuilder.
+It relies on HTML::Element's highly optimized C<look_down> method for the actual search.
+
+=head1 IMPLEMENTATION
+
+The module consists of two packages:
+
+=over 4
+
+=item *
+
+HTML::Selector::Element, to compile a CSS selector to search criteria for 
+ C<look_down>
+
+=item *
+
+HTML::Selector::Element::Trait which contains additional object methods for the DOM elements.
+You can add them either by making a making a subclass, or by monkeypatching them into the 
+package HTML::Element via C<import>. (A "trait", or "role", is a class without data, consisting
+only of methods that are to be used on objects from a different class.)
+
+=back
+
+If you C<require> or C<use> either of these two packages, both packages will be loaded.
+
+=head1 SUBCLASSING vs. MONKEYPATCHING
+
+=head2 multiple inheritance
+
+You can do something like this:
+
+    package My::Node;
+    require HTML::Element;
+    require HTML::Selector::Element;
+    @ISA = qw(HTML::Selector::Element::Trait HTML::Element);
+
+All methods that are in HTML::Selector::Element::Trait will be available to your subclass.
+
+Note that "HTML::Selector::Element::Trait" must come before "HTML::Element" in C<@ISA>,
+because it overrides C<find>, and this is the only way that this will work.
+
+=head2 monkeypatching: import
+
+HTML::TreeBuilder makes using a subclass of HTML::Element very impractical, because it
+always uses elements of the hardcoded class HTML::Element to build its DOM tree.
+
+In that case it is advisable to monkeypatch the wanted subs into HTML::Element.
+
+Technically, that is nothing but just importing the desired subs into the HTML::Element package,
+but only after the module L<HTML::Element> is already loaded.
+
+So this will work, although this will cause a warning for the redefenition of the sub C<find>:
+
+    {
+        use HTML::Element;
+        package HTML::Element;
+        use HTML::Selector::Element:Trait;
+    }
+
+But this situation is so common, that I provided a shortcut:
+instead, you can use the following code (optionally using parameters for L<Exporter>):
+
+    use HTML::Selector::Element;
+
+This will load the module and import the default methods, although not into the current package,
+but I<into the package HTML::Element>. Any parameters to this C<use> statement
+(a list of methods to import, and / or the tag C<!DEFAULT>) are passed on to
+C<import> in the package HTML::Selector::Element::Trait.
+
+=head1 METHODS
+
+=head2 HTML::Selector::Element
+
+This module  implements the parsing of a CSS rule, and building a list of criteria, compatible
+with C<look_down> and C<look_up>.
+
+=head3 new
+
+This class method constructs the object, parsing the CSS rule(s) and storing the parsed result.
+
+    $selector = HTML::Element::Selector->new($rule)
+
+You can pass multiple rules as arguments. It will behave as if it got a single big rule consisting
+of all arguments, joined by a comma, except that each argument also has to be a valid CSS rule 
+on its own.
+
+=head3 criteria
+
+This produces a list of search criteria ready to be used as arguments for C<look_down> and C<look_up>.
+
+    @criteria = $sel->criteria(\$root); # containing checks that every tested element is below $root
+    @absolute = $sel->criteria();       # ignores the location of the elements in the DOM
+
+The optional argument is a reference to a scalar, which should be the start element for the search.
+The criteria will contain closures referencing that scalar reference, and it will be used to verify that
+all elements in the chain as matched by the rule,  are indeed in the proper relative position to this 
+element in the DOM.
+
+It is OK to change the value of that scalar to point to a new root element, before ussing the criteria
+with C<look_down>, but only in a single thread. For multiple threads you need separate criteria per rule,
+per thread.
+
+=head2 HTML::Selector::Element::Trait
+
+These methods are wrapper functions around the use of HTML::Selector::Element.
+
+=head3 find
+
+This method I<replaces> HTML::Element's own C<find>. It searches for elements matching the
+CSS rule where any found matched element, as well as the entire matched element chain of which the 
+returned element is the last one, is below the start element (or to elements on its right side or below, 
+for that kind of CSS rule).
+
+It's built around C<look_down>, so it either finds an entire lists of results when used in list context,
+or just the first result, skipping the rest of the search when one match is found, in scalar context.
+
+    $first = $element->find($rule);
+    @all = $element->find($rule);
+
+You may enter more than one CSS rule (string) as its parameters, in which case it'll search for elements matching 
+any of these rules. As such, it is backward compatible with HTML::Element's original C<find>,
+as a CSS rulte containing just a word is just looking for a tag; except you can no longer search for 
+HTML::Element's pseudo-tags (starting with "~"). If you want the latter, use C<find_by_tagname> instead.
+
+    # find elements that either match $rule1 or $rule2
+    return $element->find($rule1, $rule2);
+
+It is intended as jQuery compatible, thus if your rule starts with a combinator C<+> or C<~>, it will 
+search below the siblings of C<$element> on the right.
+
+This is I<not> supported natively in Javascript in browsers using 
+C<el.querySelector('~ span')> or C<el.querySelectorAll('~ span')>.
+These will throw an exception.
+
+=head3 is
+
+    if($element->is($rule)) { ... }
+
+C<is> will test if the element matches the CSS rule, in absolute mode, i.e. the elements in the matched chain
+may be anywhere in the DOM, there's no restriction that they should be below a starting element, as that would
+not even be possible: every element except the last one in the chain will be among the "parents" or "uncles"
+of C<$element>.
+
+Though its main use is as a boolean, it actually returns the element itself if it matches (hence: true) 
+and nothing (empty list in list contect, undef in scalar context) (hence, false) if it doesn't. In that way, it's
+also compatible with the results of C<find>.
+
+=head3 closest
+
+C<look_up> matching a CSS rule. In list context, it returns a filtered list consisting of the element itself and 
+all ancestors, in order from bottom to top, but that match the rule.
+
+In scalar context, it returns the first (closest) element from that same list.
+
+These methods make up of the vast majority of everthing  most people will ever need. 
+The following methods are not exported by default:
+
+=head3 look_self
+
+This method with the slightly awkward name is the low level equivalen if C<is> but with criteria as 
+its parameters. For some reason this was missing in HTML::Element.
+
+=head3 select, query
+
+The same as C<find> except it will not check whether the entire matched chain lies below of the start element.
+Instead, the rule is matched in absolute mode, the same as with C<is>.
+
+Because L<HTML::TreeBuilder::Select> defines its own sub C<select> in the package C<HTML::Element>, I have 
+provided C<query> as an alternative. That way you can load both modules while avoiding a conflict.
+
+=head1 CSS
+
+The following CSS selectors are recognized. Capital letters are placeholders, symbolos and lower 
+case letters are literals. A "word" consists of word characters an hyphens, and many 
+Unicode characters, but the rules are hard to pin down.
+
+=over 4
+
+=item *
+
+C<WORD>
+
+tag name
+
+=item *
+
+C<.WORD>
+
+Matches a class: the attribute "class" contains C<WORD> (as a word: separate from the rest by whitespace).
+
+=item *
+
+C<#WORD>
+
+Identifier. The attribute "id" is exactly this word.
+
+=item *
+
+C<[ATTR]>
+
+The attribute C<ATTR> exists and is not undefined.
+
+In HTML::Element, an attribute with value C<undef> is considered as not existing.
+
+=item *
+
+C<[ATTR=VALUE]>
+
+The attribute C<ATTR> is exactly the value. C<VALUE> is either a word, or any string
+between single or double quotes, except that the value may not contain the delimiter.
+
+Partial matches are supported, where you replace C<=> with one of the other operarands C<*=> (contains),
+C<^=> (starts with), C<$=> (ends with), C<~=> (contains the word; see class matches), and C<|=>
+(something weird: either an exact match or the attribute starts with this, followed by C<->;
+typically only used for language handling).
+
+There's even the non-standard C<!=>, which means the attribute exists but is anything but this exact value.
+
+Modifiers to make the attribute match non-case-sensitive are not supported. 
+(Has anybody actually ever used this feature?)
+
+=item *
+
+C<:not(RULE)>, C<:is(RULE)>
+
+C<RULE> is a nested CSS rule, matched in absolute mode.
+C<:not> and C<:is> are complementtary: one will match when the other does not,
+and vice versa.
+
+=item *
+
+C<:has(SUBRULE)>
+
+Just like in jQuery. This does a C<find> search below the current element
+(or its right siblings) and returns true if something is found.
+
+=item *
+
+C<:first-child>, C<:last-child>, C<:first-of-type>, C<:last-of-type>, C<:only-child>
+
+=item *
+
+C<:nth-child(INDEX)>, C<:nth-of-type(INDEX)>, C<:nth-last-child(INDEX)>, C<:nth-last-of-type(INDEX)>
+
+C<INDEX> is either a word C<even> or C<odd>, or an expression of the type C<An+B>
+where C<A> and C<B> are integers, and variations on this form: C<3>, C<3n+2>, C<5n>, C<-2n+9>, C<3n-2>
+
+=item *
+
+C<:root>
+
+=item *
+
+C<:empty>
+
+No text content, and no child elements.
+THis is determined by L<HTML::Element>'s method C<is_empty>.
+
+=item *
+
+C<:WORD>
+
+This can be handled by you if you override the sub C<parse_pseudo>.
+
+=back
+
+Pseudo-elements, as C<::before> and C<::after>, are not handled because these
+pseudo-elements do not exist actually, therefore they could never match.
+
+=head1 BUGS
+
+=over 4
+
+=item *
+
+The cache of the criteria for the CSS rules is inherently not thread-safe.
+Each thread should get its own cache.
+
+=item *
+
+When you subclass HTML::Selector::Element, primarily to override the sub 
+C<parse_pseudo>, the methods imported from HTML::Selector::Element::Trait 
+are still using "HTML::Selector::Element". 
+
+You can getaround this problem by replacing the sub C<parse_pseudoe> instead
+of subclassing.
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+The first iteration of the CSS tule parser was derived from themodule [HTML::Selector::XPath]
+written by Tatsuhiko Miyagawa and maintained by Max Maischein (Corion).
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<HTML::Element>
+
+The module that this module is an extension for. It implements a HTML DOM tree in pure perl.
+
+=item *
+
+L<HTML::Selector::XPath>
+
+The CSS rule parser is initially derived from this module.
+
+=item *
+
+L<HTML::TreeBuilder::XPath>
+
+An extension module for L<HTML::Element> that adds support for XPath searches
+
+=item *
+
+L<HTML::TreeBuilder::Select>
+
+A module that combines HTML::Selector::XPath and HTML::TreeBuilder::XPath to achieve
+a similar goal as my module.
+
+In a benchmark with a large HTML file (a 100k home page from the internet) 
+parsed wuith L<HTML::TreeBuilder>, I got a 30x speedup compared to L<HTML::TreeBuilder::Select>.
+
+Do note that this module adds a method C<select> to L<HTML::Element>, thus when loading both, 
+you can expect a name clash. You can avoid it by excluding "L<select>" from the import list,
+and add an alias as an alternative name yourself.
+
+=item *
+
+L<HTML::Element::Library>
+
+Yet another extension library for L<HTML::Element>
+
+=back
+
+=head1 AUTHOR
+
+Bart Lateur <bartl@cpan.org>
+
+=head1 COPYRIGHT
+
+This software is copyright (c) 2018-2020 by Bart Lateur.
+
+=head1 LICENSE
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

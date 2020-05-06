@@ -1173,11 +1173,6 @@
         "title": "singleUserByIP",
         "type": "bool"
       }, {
-        "default": 0,
-        "id": "singleSessionUserByIP",
-        "title": "singleSessionUserByIP",
-        "type": "bool"
-      }, {
         "default": 1,
         "id": "notifyDeleted",
         "title": "notifyDeleted",

@@ -8,9 +8,10 @@ use GraphQL::Execution qw(execute);
 use GraphQL::Type::Library -all;
 use Module::Runtime qw(require_module);
 use Mojo::Promise;
+use curry;
 use Exporter 'import';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 our @EXPORT_OK = qw(promise_code);
 
 use constant promise_code => +{
@@ -23,30 +24,36 @@ use constant promise_code => +{
     # Mojo::Promise, so force it to be one. hoping will be fixed soon
     Mojo::Promise->all(@promises);
   },
-  # currently only instance methods. not wasteful at all.
-  resolve => sub { Mojo::Promise->new->resolve(@_) },
-  reject => sub { Mojo::Promise->new->reject(@_) },
+  resolve => Mojo::Promise->curry::resolve,
+  reject => Mojo::Promise->curry::reject,
+  new => Mojo::Promise->curry::new,
+};
+# from https://github.com/apollographql/subscriptions-transport-ws/blob/master/src/message-types.ts
+use constant ws_protocol => +{
+  # no legacy ones like 'init'
+  GQL_CONNECTION_INIT => 'connection_init', # Client -> Server
+  GQL_CONNECTION_ACK => 'connection_ack', # Server -> Client
+  GQL_CONNECTION_ERROR => 'connection_error', # Server -> Client
+  # NOTE: The keep alive message type does not follow the standard due to connection optimizations
+  GQL_CONNECTION_KEEP_ALIVE => 'ka', # Server -> Client
+  GQL_CONNECTION_TERMINATE => 'connection_terminate', # Client -> Server
+  GQL_START => 'start', # Client -> Server
+  GQL_DATA => 'data', # Server -> Client
+  GQL_ERROR => 'error', # Server -> Client
+  GQL_COMPLETE => 'complete', # Server -> Client
+  GQL_STOP => 'stop', # Client -> Server
 };
 
 my @DEFAULT_METHODS = qw(get post);
-use constant EXECUTE => sub {
-  my ($schema, $query, $root_value, $per_request, $variables, $operationName, $field_resolver) = @_;
-  execute(
-    $schema,
-    $query,
-    $root_value,
-    $per_request,
-    $variables,
-    $operationName,
-    $field_resolver,
-    # promise code - not overridable
-    promise_code(),
-  );
+use constant EXECUTE => sub { $_[7] = promise_code(); goto &execute; };
+use constant SUBSCRIBE => sub {
+  splice @_, 7, 1, promise_code();
+  goto &GraphQL::Subscription::subscribe;
 };
 sub make_code_closure {
   my ($schema, $root_value, $field_resolver) = @_;
   sub {
-    my ($c, $body, $execute) = @_;
+    my ($c, $body, $execute, $subscribe_resolver) = @_;
     $execute->(
       $schema,
       $body->{query},
@@ -55,15 +62,161 @@ sub make_code_closure {
       $body->{variables},
       $body->{operationName},
       $field_resolver,
+      $subscribe_resolver ? (undef, $subscribe_resolver) : (),
     );
   };
 }
 
 sub _safe_serialize {
-  my $data = shift or return 'undefined';
+  my $data = shift // return 'undefined';
   my $json = to_json($data);
   $json =~ s#/#\\/#g;
   return $json;
+}
+
+sub _graphiql_wrap {
+  my ($wrappee, $use_subscription) = @_;
+  sub {
+    my ($c) = @_;
+    if (
+      # not as ignores Firefox-sent multi-accept: $c->accepts('', 'html') and
+      ($c->req->headers->header('Accept')//'') =~ /^text\/html\b/ and
+      !defined $c->req->query_params->param('raw')
+    ) {
+      my $p = $c->req->query_params;
+      return $c->render(
+        template => 'graphiql',
+        layout => undef,
+        title            => 'GraphiQL',
+        graphiql_version => 'latest',
+        queryString      => _safe_serialize( $p->param('query') ),
+        operationName    => _safe_serialize( $p->param('operationName') ),
+        resultString     => _safe_serialize( $p->param('result') ),
+        variablesString  => _safe_serialize( $p->param('variables') ),
+        subscriptionEndpoint => to_json(
+          # if serialises to true (which empty-string will), turns on subs code
+          $use_subscription
+            ? $c->url_for->to_abs->scheme('ws')
+            : 0
+        ),
+      );
+    }
+    goto $wrappee;
+  };
+}
+
+sub _decode {
+  my ($bytes) = @_;
+  my $body = eval { decode_json($bytes) };
+  # conceal error info like versions from attackers
+  return (0, { errors => [ { message => "Malformed request" } ] }) if $@;
+  (1, $body);
+}
+
+sub _execute {
+  my ($c, $body, $handler, $execute, $subscribe_fn) = @_;
+  my $data = eval { $handler->($c, $body, $execute, $subscribe_fn) };
+  return { errors => [ { message => $@ } ] } if $@;
+  $data;
+}
+
+sub _make_route_handler {
+  my ($handler) = @_;
+  sub {
+    my ($c) = @_;
+    my ($decode_ok, $body) = _decode($c->req->body);
+    return $c->render(json => $body) if !$decode_ok;
+    my $data = _execute($c, $body, $handler, EXECUTE());
+    return $c->render(json => $data) if !is_Promise($data);
+    $data->then(sub { $c->render(json => shift) });
+  };
+}
+
+sub _make_connection_handler {
+  my ($handler, $subscribe_resolver, $context) = @_;
+  sub {
+    my ($c, $bytes) = @_;
+    my ($decode_ok, $body) = _decode($bytes);
+    return $c->send({json => {
+      payload => $body, type => ws_protocol->{GQL_ERROR}
+    }}) if !$decode_ok;
+    my $msg_type = $body->{type};
+    if ($msg_type eq ws_protocol->{GQL_CONNECTION_INIT}) {
+      $context->{connected} = 1;
+      return $c->send({json => {
+        payload => {}, type => ws_protocol->{GQL_CONNECTION_ACK}
+      }});
+    } elsif ($msg_type eq ws_protocol->{GQL_START}) {
+      $context->{id} = $body->{id};
+      my $data = _execute(
+        $c, $body->{payload}, $handler, SUBSCRIBE(), $subscribe_resolver,
+      );
+      return $c->send({json => {
+        payload => $data, type => ws_protocol->{GQL_ERROR},
+      }}) if !is_Promise($data);
+      $data->then(
+        sub {
+          my ($result) = @_;
+          if (!is_AsyncIterator($result)) {
+            # subscription error
+            $c->send({json => {
+              payload => $result, type => ws_protocol->{GQL_ERROR},
+              id => $context->{id},
+            }});
+            $c->finish;
+            return;
+          }
+          my $promise;
+          $context->{async_iterator} = $result->map_then(sub {
+            $c->send({json => {
+              payload => $_[0],
+              type => ws_protocol->{GQL_DATA},
+              id => $context->{id},
+            }});
+            $promise = $context->{async_iterator}->next_p;
+            $c->send({json => {
+              payload => {},
+              type => ws_protocol->{GQL_COMPLETE},
+              id => $context->{id},
+            }}) if !$promise; # exhausted, tell client
+          });
+          $promise = $context->{async_iterator}->next_p; # start the process
+        },
+        sub {
+          $c->send({json => {
+            payload => $_[0], type => ws_protocol->{GQL_ERROR},
+          }});
+          $c->finish;
+        },
+      );
+    } elsif ($msg_type eq ws_protocol->{GQL_STOP}) {
+      $c->send({json => {
+        payload => {},
+        type => ws_protocol->{GQL_COMPLETE},
+        id => $context->{id},
+      }});
+      $context->{async_iterator}->close_tap if $context->{async_iterator};
+      undef %$context; # relinquish our refcounts
+    }
+  }
+}
+
+sub _make_subs_route_handler {
+  my ($handler, $subscribe_resolver) = @_;
+  require GraphQL::Subscription;
+  sub {
+    my ($c) = @_;
+    # without this, GraphiQL won't accept is valid
+    my $sec_websocket_protocol = $c->tx->req->headers->sec_websocket_protocol;
+    $c->tx->res->headers->sec_websocket_protocol($sec_websocket_protocol)
+      if $sec_websocket_protocol;
+    my %context;
+    $c->on(text => _make_connection_handler($handler, $subscribe_resolver, \%context));
+    $c->on(finish => sub {
+      $context{async_iterator}->close_tap if $context{async_iterator};
+      undef %context; # relinquish our refcounts
+    });
+  };
 }
 
 sub register {
@@ -73,47 +226,27 @@ sub register {
     $class = "GraphQL::Plugin::Convert::$class";
     require_module $class;
     my $converted = $class->to_graphql(@values);
-    @{$conf}{keys %$converted} = values %$converted;
+    $conf = { %$conf, %$converted };
   }
-  die "Need schema or handler\n" if !grep $conf->{$_}, qw(schema handler);
+  die "Need schema\n" if !$conf->{schema};
   my $endpoint = $conf->{endpoint} || '/graphql';
   my $handler = $conf->{handler} || make_code_closure(
-    map $conf->{$_}, qw(schema root_value resolver)
+    @{$conf}{qw(schema root_value resolver)}
   );
-  my $ajax_route = sub {
-    my ($c) = @_;
-    if (
-      $conf->{graphiql} and
-      # not as ignores Firefox-sent multi-accept: $c->accepts('', 'html') and
-      ($c->req->headers->header('Accept')//'') =~ /^text\/html\b/ and
-      !defined $c->req->query_params->param('raw')
-    ) {
-      return $c->render(
-        template => 'graphiql',
-        layout => undef,
-        title            => 'GraphiQL',
-        graphiql_version => 'latest',
-        queryString      => _safe_serialize( $c->req->query_params->param('query') ),
-        operationName    => _safe_serialize( $c->req->query_params->param('operationName') ),
-        resultString     => _safe_serialize( $c->req->query_params->param('result') ),
-        variablesString  => _safe_serialize( $c->req->query_params->param('variables') ),
-      );
-    }
-    my $data;
-    my $body = eval { decode_json($c->req->body) };
-    if ($@) {
-      # conceal error info like versions from attackers
-      $data = { errors => [ { message => "Malformed request" } ] };
-    } else {
-      $data = eval { $handler->($c, $body, EXECUTE()) } if !$@;
-      $data = { errors => [ { message => $@ } ] } if $@;
-    }
-    return $data->then(sub { $c->render(json => shift) }) if is_Promise($data);
-    $c->render(json => $data);
-  };
   push @{$app->renderer->classes}, __PACKAGE__
     unless grep $_ eq __PACKAGE__, @{$app->renderer->classes};
-  $app->routes->any(\@DEFAULT_METHODS => $endpoint => $ajax_route);
+  my $route_handler = _make_route_handler($handler);
+  $route_handler = _graphiql_wrap($route_handler, $conf->{schema}->subscription)
+    if $conf->{graphiql};
+  my $r = $app->routes;
+  if ($conf->{schema}->subscription) {
+    # must add "websocket" route before "any" because checked in define order
+    my $subs_route_handler = _make_subs_route_handler(
+      $handler, $conf->{subscribe_resolver}
+    );
+    $r->websocket($endpoint => $subs_route_handler);
+  }
+  $r->any(\@DEFAULT_METHODS => $endpoint => $route_handler);
 }
 
 1;
@@ -142,8 +275,8 @@ Mojolicious::Plugin::GraphQL - a plugin for adding GraphQL route handlers
   };
 
   # OR, equivalently:
-  plugin GraphQL => {handler => sub {
-    my ($c, $body, $execute) = @_;
+  plugin GraphQL => {schema => $schema, handler => sub {
+    my ($c, $body, $execute, $subscribe_fn) = @_;
     # returns JSON-able Perl data
     $execute->(
       $schema,
@@ -153,12 +286,13 @@ Mojolicious::Plugin::GraphQL - a plugin for adding GraphQL route handlers
       $body->{variables},
       $body->{operationName},
       undef, # $field_resolver
+      $subscribe_fn ? (undef, $subscribe_fn) : (), # only passed for subs
     );
   }};
 
   # OR, with bespoke user-lookup and caching:
-  plugin GraphQL => {handler => sub {
-    my ($c, $body, $execute) = @_;
+  plugin GraphQL => {schema => $schema, handler => sub {
+    my ($c, $body, $execute, $subscribe_fn) = @_;
     my $user = MyStuff::User->lookup($app->request->headers->header('X-Token'));
     die "Invalid user\n" if !$user; # turned into GraphQL { errors => [ ... ] }
     my $cached_result = MyStuff::RequestCache->lookup($user, $body->{query});
@@ -171,6 +305,7 @@ Mojolicious::Plugin::GraphQL - a plugin for adding GraphQL route handlers
       $body->{variables},
       $body->{operationName},
       undef, # $field_resolver
+      $subscribe_fn ? (undef, $subscribe_fn) : (), # only passed for subs
     ));
   };
 
@@ -180,13 +315,14 @@ Mojolicious::Plugin::GraphQL - a plugin for adding GraphQL route handlers
 =head1 DESCRIPTION
 
 This plugin allows you to easily define a route handler implementing a
-GraphQL endpoint.
+GraphQL endpoint, including a websocket for subscriptions following
+Apollo's C<subscriptions-transport-ws> protocol.
 
 As of version 0.09, it will supply the necessary C<promise_code>
 parameter to L<GraphQL::Execution/execute>. This means your resolvers
 can (and indeed should) return Promise objects to function
-asynchronously. Notice not necessarily "Promises/A+" - all that's needed
-is a two-arg C<then> to work fine with GraphQL.
+asynchronously. As of 0.15 these must be "Promises/A+" as subscriptions
+require C<resolve> and C<reject> methods.
 
 The route handler code will be compiled to behave like the following:
 
@@ -227,8 +363,7 @@ String. Defaults to C</graphql>.
 
 =head2 schema
 
-A L<GraphQL::Schema> object. If not supplied, your C<handler> will need
-to be a closure that will pass a schema on to GraphQL.
+A L<GraphQL::Schema> object. As of 0.15, must be supplied.
 
 =head2 root_value
 
@@ -248,6 +383,10 @@ with at least one of a C<data> key and/or an C<errors> key.
 
 If it throws an exception, that will be turned into a GraphQL-formatted
 error.
+
+If being used for a subscription, it will be called with a fourth
+parameter as shown above. It is safe to not handle this if you are
+content with GraphQL's defaults.
 
 =head2 graphiql
 
@@ -299,6 +438,7 @@ __DATA__
 <!--
 Copied from https://github.com/graphql/express-graphql/blob/master/src/renderGraphiQL.js
 Converted to use the simple template to capture the CGI args
+Added the apollo-link-ws stuff, marked with "ADDED"
 -->
 <!--
 The request to this GraphQL server provided the header "Accept: text/html"
@@ -326,9 +466,13 @@ add "&raw" to the end of the URL within a browser.
   <script src="//cdn.jsdelivr.net/react/15.4.2/react.min.js"></script>
   <script src="//cdn.jsdelivr.net/react/15.4.2/react-dom.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/graphiql@<%= $graphiql_version %>/graphiql.min.js"></script>
+  <% if ($subscriptionEndpoint) { %>
+  <!-- ADDED -->
+  <script src="//unpkg.com/subscriptions-transport-ws@0.9.16/browser/client.js"></script>
+  <% } %>
 </head>
 <body>
-  <script>
+  <script type="module">
     // Collect the URL parameters
     var parameters = {};
     window.location.search.substr(1).split('&').forEach(function (entry) {
@@ -397,10 +541,52 @@ add "&raw" to the end of the URL within a browser.
     function updateURL() {
       history.replaceState(null, null, locationQuery(parameters));
     }
+    // this section ADDED
+    <% if ($subscriptionEndpoint) { %>
+
+    // this replaces the apollo GraphiQL-Subscriptions-Fetcher which is now incompatible with 0.6+ of subscriptions-transport-ws
+    // based on matiasanaya PR to fix but with improvement to only look at definition of operation being executed
+    import { parse } from "//unpkg.com/graphql@15.0.0/language/index.mjs";
+    const subsGraphQLFetcher = (subscriptionsClient, fallbackFetcher) => {
+      const hasSubscriptionOperation = (graphQlParams) => {
+        const thisOperation = graphQlParams.operationName;
+        const queryDoc = parse(graphQlParams.query);
+        const opDefinitions = queryDoc.definitions.filter(
+          x => x.kind === 'OperationDefinition'
+        );
+        const thisDefinition = opDefinitions.length == 1
+          ? opDefinitions[0]
+          : opDefinitions.filter(x => x.name.value === thisOperation)[0];
+        return thisDefinition.operation === 'subscription';
+      };
+      let activeSubscription = false;
+      return (graphQLParams) => {
+        if (subscriptionsClient && activeSubscription) {
+          subscriptionsClient.unsubscribeAll();
+        }
+        if (subscriptionsClient && hasSubscriptionOperation(graphQLParams)) {
+          activeSubscription = true;
+          return subscriptionsClient.request(graphQLParams);
+        } else {
+          return fallbackFetcher(graphQLParams);
+        }
+      };
+    };
+
+    var subscriptionEndpoint = <%== $subscriptionEndpoint %>;
+    let subscriptionsClient = new window.SubscriptionsTransportWs.SubscriptionClient(subscriptionEndpoint, {
+      lazy: true, // not in original
+      reconnect: true
+    });
+    let myCustomFetcher = subsGraphQLFetcher(subscriptionsClient, graphQLFetcher);
+    <% } else { %>
+    let myCustomFetcher = graphQLFetcher;
+    <% } %>
+    // end ADDED
     // Render <GraphiQL /> into the body.
     ReactDOM.render(
       React.createElement(GraphiQL, {
-        fetcher: graphQLFetcher,
+        fetcher: myCustomFetcher, // ADDED changed from graphQLFetcher
         onEditQuery: onEditQuery,
         onEditVariables: onEditVariables,
         onEditOperationName: onEditOperationName,

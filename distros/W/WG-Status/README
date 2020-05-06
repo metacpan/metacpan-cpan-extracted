@@ -1,0 +1,66 @@
+WG-Status version 0.04
+======================
+
+
+WG::Status parses the output of a WireGuard VPN "wg show all" command
+and turns it into a Perl data structure.
+
+SYNOPSIS
+
+*NOTE:* all wireguard commands must be run as root or via sudo, so execute
+accordingly.
+
+
+use WG::Status qw(wg_status kernel_module);
+
+# where does your Linux distribution put things?
+my $WG = '/usr/bin/wg';
+
+
+# this won't work on BSD or Windows, obviously
+my $loadedmodule = kernel_module();
+die "WireGuard kernel module not loaded" unless $loadedmodule;
+
+
+# get our data structure
+my $wg = wg_status($WG);
+
+running
+
+  foreach my $instance (@$wg) {
+    foreach (keys %$instance) {
+      print "$_: $$instance{$_}\n";
+    }
+  }
+
+gives us
+
+  public key: bbIdn6VAL1bCzbDSgmzH3XcUFN088STLiAB4KvgO1Bo=
+  listening port: 9820
+  interface: wg0
+  peers: ARRAY(0x116dc30)
+
+...and so on.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+   none
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2020 by Joey Kelly
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License version 2 as published
+by the Free Software Foundation
+
+

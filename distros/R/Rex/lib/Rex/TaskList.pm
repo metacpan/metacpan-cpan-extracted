@@ -9,7 +9,7 @@ package Rex::TaskList;
 use strict;
 use warnings;
 
-our $VERSION = '1.9.0'; # VERSION
+our $VERSION = '1.10.0'; # VERSION
 
 use Data::Dumper;
 use Rex::Config;

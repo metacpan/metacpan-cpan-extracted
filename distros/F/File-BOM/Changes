@@ -1,5 +1,12 @@
 File::BOM changes document
 
+0.18 - Fri May 2020  1 
+    - Update manifest to include testrules.yml
+
+0.17 - Fri May  1 2020
+    - Fix tests to be runnable in parallel. Thanks to Tom Hukins.
+    - Fix documentation typos. Thanks again to Tom Hukins.
+
 0.16 - Wed Feb  6 2019
     - Fix tests failing under Encode 2.99. Thanks to Petr Pisar.
 

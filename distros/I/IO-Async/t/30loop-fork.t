@@ -6,6 +6,7 @@ use warnings;
 use IO::Async::Test;
 
 use Test::More;
+use Test::Metrics::Any;
 
 use POSIX qw( SIGINT );
 
@@ -93,6 +94,15 @@ SKIP: {
    wait_for { defined $exitcode };
 
    ok( $exitcode == 0, 'IO::Async::Loop->new inside forked process code gets new loop instance' );
+}
+
+# Metrics
+{
+   is_metrics_from(
+      sub { $loop->fork( code => sub {}, on_exit => sub {} ) },
+      { io_async_forks => 1 },
+      '$loop->fork increments fork counter'
+   );
 }
 
 done_testing;

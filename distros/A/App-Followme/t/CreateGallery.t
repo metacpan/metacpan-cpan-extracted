@@ -5,8 +5,8 @@ use IO::File;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
 
-use Test::Requires 'GD';
-use Test::More tests => 15;
+use Test::Requires 'Image::Size';
+use Test::More tests => 5;
 
 #----------------------------------------------------------------------
 # Load package
@@ -34,32 +34,7 @@ my %configuration = (
                     template_file => $template_name,
                     thumb_suffix => '-thumb',
                     web_extension => 'html',
-                    photo_height => 600,
-                    thumb_height => 150,
                     );
-
-#----------------------------------------------------------------------
-# Test support routines
-
-do {
-    my $gal = App::Followme::CreateGallery->new(%configuration);
-
-    my %new_configuration = %configuration;
-    $new_configuration{photo_height} = 600;
-    $new_configuration{thumb_height} = 150;
-    $gal = App::Followme::CreateGallery->new(%new_configuration);
-    my ($width, $height) = $gal->new_size('photo', 1800, 1200);
-    is($width, 900, 'photo width'); # test 1
-    is($height, 600, 'photo height'); # test 2
-
-    %new_configuration = %configuration;
-    $new_configuration{photo_width} = 600;
-    $new_configuration{thumb_width} = 150;
-    $gal = App::Followme::CreateGallery->new(%new_configuration);
-    ($width, $height) = $gal->new_size('thumb', 1800, 1200);
-    is($width, 150, 'thumb width'); # test 3
-    is($height, 100, 'thumb height'); # test 4
-};
 
 #----------------------------------------------------------------------
 # Create gallery
@@ -109,9 +84,8 @@ EOQ
         my $input_file = catfile($data_dir, $filename);
         my $output_file = catfile($gallery_dir, $filename);
 
-        my $photo = $gal->{data}->read_photo($input_file);
-        $gal->write_photo($output_file, $photo);
-        ok(-e $output_file, "read and write photo $count"); # test 5-7
+        my $photo = fio_read_page($input_file, ':raw');
+        fio_write_page($output_file, $photo, ':raw');
 
         push(@photo_files, $output_file);
         my $thumb_file = $gal->{data}->get_thumb_file($output_file);
@@ -119,24 +93,20 @@ EOQ
     }
 
     my $title = $gal->{data}->build('$title', $photo_files[0]);
-    is($$title, 'First Photo', 'First page title'); # test 8
+    is($$title, 'First Photo', 'First page title'); # test 1
 
     my $url = $gal->{data}->build('url', $photo_files[1]);
-    is($$url, 'second-photo.jpg', 'Second page url'); # test 9
+    is($$url, 'second-photo.jpg', 'Second page url'); # test 2
 
     $url = $gal->{data}->build('url', $thumb_files[2]);
-    is($$url, 'third-photo-thumb.jpg', 'Third page thumb url'); # test 10
+    is($$url, 'third-photo-thumb.jpg', 'Third page thumb url'); # test 3
 
     $gal->run($gallery_dir);
 
-    foreach my $i (1 .. 3) {
-        ok(-e $thumb_files[$i-1], "Create thumb $i"); # test 11-13
-    }
-
     my $gallery_name = fio_to_file($gallery_dir, 'html');
-    ok(-e $gallery_name, 'Create index file'); # test 14
+    ok(-e $gallery_name, 'Create index file'); # test 4
 
     my $page = fio_read_page($gallery_name);
     my @items = $page =~ m/(<li>)/g;
-    is(@items, 3, 'Index three photos'); # test 15
+    is(@items, 3, 'Index three photos'); # test 5
 };

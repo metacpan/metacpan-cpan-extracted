@@ -35,22 +35,19 @@ use HTTP::Cookies;
 use REST::Client;
 use Scalar::Util qw(reftype);
 use JSON;
-
+use Storable qw(dclone);
 use Exporter qw(import);
 
 our @EXPORT_OK = qw(get post put delete);
-
-# use Devel::NYTProf;
 
 #####
 ## CONSTANTS
 #####
 our $TIMEOUT = 10;
-our $VERSION = "1.1.001";
+our $VERSION = "1.2.1";
 #####
 ## VARIABLES
 #####
-my $rc=0;
 
 #####
 ## CONSTRUCTOR
@@ -58,6 +55,7 @@ my $rc=0;
 
 sub new {
 	my($class, %args) = @_;
+	my $rc=0;
 	my $self = {
 		'url'		=> $args{'url'},
 		'login'		=> $args{'login'},
@@ -66,7 +64,7 @@ sub new {
 		'debug'		=> $args{'debug'},
 		'result'	=> undef,
 	};
-# cretae and store a cookie jar
+# create and store a cookie jar
 	my $cookie_jar = HTTP::Cookies->new(
 		autosave		=> 1,
 		ignore_discard	=> 1,
@@ -124,16 +122,15 @@ sub new {
 	my %hash = ();
 
 ## Dirty job, but Rundeck doent follow the REST norm, returning 200 even if auth fails
-## Anyway, this is safe, since if string not found it will fail at get/put/whatever time
+## However, this is safe, since if string not found it will fail at get/put/whatever time
 	if (index($client->{'_res'}{'_content'}, 'alert alert-danger') != -1) {
 		$rc = 403;
 	}
 	if ($rc != 200) {
-		%hash = ('reqstatus' => 'UNKN');
+		$self->{'result'}->{'reqstatus' } = 'UNKN';
 	} else {
-		%hash = ('reqstatus' => 'OK');
+		$self->{'result'}->{'reqstatus'} = 'OK';
 	}
-	$self->{'result'} = \%hash;
 	$self->{'result'}->{'httpstatus'} = $rc;
 
 # done, bless object and return it
@@ -149,131 +146,140 @@ sub new {
 sub get (){
 	my $self = shift;
 	my $endpoint = shift;
-	my $responseRef = ();
-	my $responsehash;
+
+	my $responsehash = ();
 	my $rc = 0;
 
 	$self->{'client'}->GET($endpoint);
 	$rc = $self->{'client'}->responseCode ();
-	$self->{'result'}->{'httpstatus'} = $rc;
-# if request did'nt succed, get outta there
-	if ($rc-$rc%100 != 200) {
-		$self->{'result'}->{'reqstatus'} = 'CRIT';
-		$self->{'result'}->{'httpstatus'} = $rc;
-		return $self->{'result'};
-	}
-	my $responseContent = $self->{'client'}->responseContent();
-	$self->_logD($responseContent);
-# handle case where test is "ping", response is "pong" in plain text, not a json
-	if ($endpoint =~ /ping/) {
-		$self->{'result'}->{'reqstatus'} = 'CRIT';
-		$self->{'result'}->{'reqstatus'} = 'OK' if ($responseContent =~ /pong/);
-		return $self->{'result'};
-	}
-# Last case : we've got a nice JSON
-	$responseRef = decode_json($responseContent) if $responseContent ne '';
+	$responsehash->{'httpstatus'} = $rc;
 
-	my $reftype = reftype($responseRef);
-	if (not defined $reftype) {
-		$self->_bomb("Can't decode undef type");
-	} elsif ($reftype eq 'ARRAY') {
-		$self->{'result'}->{'arraycount'} = $#$responseRef+1;
-		for (my $i = 0; $i <= $#$responseRef; $i++) {
-			$self->{'result'}->{$i} = $responseRef->[$i];
+	if ($rc-$rc%100 != 200) {
+		$responsehash->{'reqstatus'} = 'CRIT';
+		$responsehash->{'httpstatus'} = $rc;
+	} else {
+		my $responseContent = $self->{'client'}->responseContent();
+		$self->_logD($responseContent);
+	# handle special case where test is "ping", response is "pong" in plain text, not a json
+		if ($endpoint =~ /ping/) {
+			$responsehash->{'reqstatus'} = $responseContent =~ /pong/ ? 'OK' : 'CRIT';
+			return dclone ($responsehash);
 		}
-	} elsif ($reftype eq 'SCALAR') {
-		$self->_bomb("Can't decode scalar type");
-	} elsif ($reftype eq 'HASH') {
-		$self->{'result'} = $responseRef;
+		$responsehash = $self->_handleResponse($responseContent);
 	}
-	$self->{'result'}->{'reqstatus'} = 'OK';
-	$self->{'result'}->{'httpstatus'} = $rc;
-	return $self->{'result'};
+	return dclone ($responsehash);
 }
 
 sub post(){
 	my $self = shift;
 	my $endpoint = shift;
 	my $json = shift;
-	my $responseRef = ();
+
+	my $responsehash = ();
 	my $rc = 0;
 
 	$self->{'client'}->addHeader ("Content-Type", 'application/json');
 	$self->{'client'}->POST($endpoint, $json);
 	$rc = $self->{'client'}->responseCode ();
 	$self->{'result'}->{'httpstatus'} = $rc;
+
 	if ($rc-$rc%100 != 200) {
-		$self->{'result'}->{'reqstatus'} = 'CRIT';
-		$self->{'result'}->{'httpstatus'} = $rc;
-		return $self->{'result'};
+		$responsehash->{'reqstatus'} = 'CRIT';
+		$responsehash->{'httpstatus'} = $rc;
+	} else {
+		my $responseContent = $self->{'client'}->responseContent();
+		$self->_logD($responseContent);
+		$responsehash = $self->_handleResponse($responseContent);
 	}
-	my $responseContent = $self->{'client'}->responseContent();
-	$self->_logD($responseContent);
-	$responseRef = decode_json($responseContent) if $responseContent ne '';
-	$self->{'result'} = $responseRef;
-	$self->{'result'}->{'reqstatus'} = 'OK';
-	$self->{'result'}->{'httpstatus'} = $rc;
-	return $self->{'result'};
+	return dclone ($responsehash);
 }
 
 sub put(){
 	my $self = shift;
 	my $endpoint = shift;
 	my $json = shift;
-	my $responseRef = ();
+
+	my $responsehash = ();
 	my $rc = 0;
 
 	$self->{'client'}->addHeader ("Content-Type", 'application/json');
 	$self->{'client'}->PUT($endpoint, $json);
 	$rc = $self->{'client'}->responseCode ();
 	$self->{'result'}->{'httpstatus'} = $rc;
+
 	if ($rc-$rc%100 != 200) {
-		$self->{'result'}->{'reqstatus'} = 'CRIT';
-		$self->{'result'}->{'httpstatus'} = $rc;
-		return $self->{'result'};
+		$responsehash->{'reqstatus'} = 'CRIT';
+		$responsehash->{'httpstatus'} = $rc;
+	} else {
+		my $responseContent = $self->{'client'}->responseContent();
+		$self->_logD($responseContent);
+		$responsehash = $self->_handleResponse($responseContent);
 	}
-	my $responseContent = $self->{'client'}->responseContent();
-	$self->_logD($responseContent);
-	$responseRef = decode_json($responseContent) if $responseContent ne '';
-	$self->{'result'} = $responseRef;
-	$self->{'result'}->{'reqstatus'} = 'OK';
-	$self->{'result'}->{'httpstatus'} = $rc;
-	return $self->{'result'};
+	return dclone ($responsehash);
 }
 
 sub delete () {
 	my $self = shift;
 	my $endpoint = shift;
-	my $responseRef = ();
+
+	my $responsehash = ();
 	my $rc = 0;
 
 	$self->{'client'}->DELETE($endpoint);
 	$rc = $self->{'client'}->responseCode ();
-	$self->{'result'}->{'httpstatus'} = $rc;
+	$responsehash->{'httpstatus'} = $rc;
+
 	if ($rc-$rc%100 != 200) {
-		$self->{'result'}->{'reqstatus'} = 'CRIT';
-		$self->{'result'}->{'httpstatus'} = $rc;
-		return $self->{'result'};
+		$responsehash->{'reqstatus'} = 'CRIT';
+		$responsehash->{'httpstatus'} = $rc;
+	} else {
+		my $responseContent = $self->{'client'}->responseContent();
+		$self->_logD($responseContent);
+		$responsehash = $self->_handleResponse($responseContent);
 	}
-	my $responseContent = $self->{'client'}->responseContent();
-	$self->_logD($responseContent);
-	$responseRef = decode_json($responseContent) if $responseContent ne '';
-	$self->{'result'} = $responseRef;
-	$self->{'result'}->{'reqstatus'} = 'OK';
-	$self->{'result'}->{'httpstatus'} = $rc;
-	return $self->{'result'};
+	return dclone ($responsehash);
+}
+
+sub _handleResponse () {
+	my $self = shift;
+	my $responseContent = shift;
+
+	my $responseJSON = ();
+	my $responsehash = ();
+	my $rc = 0;
+
+	$responseJSON = decode_json($responseContent) if $responseContent ne '';
+	my $reftype = reftype($responseJSON);
+	if (not defined $reftype) {
+		$self->_bomb("Can't decode undef type");
+	} elsif ($reftype eq 'ARRAY') {
+
+		$responsehash->{'arraycount'} = $#$responseJSON+1;
+		for (my $i = 0; $i <= $#$responseJSON; $i++) {
+			$responsehash->{$i} = $responseJSON->[$i];
+		}
+	} elsif ($reftype eq 'SCALAR') {
+		$self->_bomb("Can't decode scalar type");
+	} elsif ($reftype eq 'HASH') {
+		$responsehash = dclone ($responseJSON);
+	}
+	$responsehash->{'reqstatus'} = 'OK';
+	$responsehash->{'httpstatus'} = $rc;
+	return $responsehash;
 }
 
 sub _logD() {
 	my $self = shift;
 	my $object = shift;
+
 	print Dumper ($object) if $self->{'debug'};
 }
 
 sub _bomb() {
 	my $self = shift;
 	my $msg = shift;
-	$msg .= "\nReport this to xavier\@xavierhumbert.net";
+
+	$msg .= "\nReport this to xavier.humbert\@ac-nancy-metz.fr";
 	die $msg;
 }
 1;

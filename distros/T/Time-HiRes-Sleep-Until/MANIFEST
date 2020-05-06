@@ -9,4 +9,5 @@ t/001_tests.t
 perl-Time-HiRes-Sleep-Until.spec
 scripts/Time-HiRes-Sleep-Until-epoch.pl
 scripts/Time-HiRes-Sleep-Until-mark.pl
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

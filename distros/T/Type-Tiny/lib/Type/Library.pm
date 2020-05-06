@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Library::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Library::VERSION   = '1.010001';
+	$Type::Library::VERSION   = '1.010002';
 }
 
 $Type::Library::VERSION =~ tr/_//d;
@@ -91,7 +91,10 @@ sub _mksub
 		? sprintf(
 			q{
 				sub (%s) {
-					return $_[0]->complete($type) if ref($_[0]) eq 'Type::Tiny::_HalfOp';
+					if (ref($_[0]) eq 'Type::Tiny::_HalfOp') {
+						my $complete_type = shift->complete($type);
+						@_ && wantarray ? return($complete_type, @_) : return $complete_type;
+					}
 					my $params; $params = shift if ref($_[0]) eq q(ARRAY);
 					my $t = $params ? $type->parameterize(@$params) : $type;
 					@_ && wantarray ? return($t%s, @_) : return $t%s;

@@ -20,7 +20,7 @@ my $builder = Alien::Base::ModuleBuild->new(
   alien_name => 'gsl',
   alien_repository => [
     {
-      protocol => 'ftp',
+      protocol => 'https',
       host     => 'ftp.gnu.org',
       location => '/gnu/gsl',
       pattern  => qr/^gsl-([\d\.]+)\.tar\.gz$/,

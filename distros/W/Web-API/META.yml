@@ -32,6 +32,6 @@ resources:
   bugtracker: https://github.com/nupfel/Web-API/issues
   homepage: https://github.com/nupfel/Web-API/wiki
   repository: git://github.com/nupfel/Web-API.git
-version: '2.6'
+version: '2.7'
 x_generated_by_perl: v5.27.0
 x_serialization_backend: 'YAML::Tiny version 1.70'

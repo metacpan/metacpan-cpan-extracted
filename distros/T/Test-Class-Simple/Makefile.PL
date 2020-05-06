@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use 5.008004;
+use 5.10.0;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -12,7 +12,11 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/Test/Class/Simple.pm',
     AUTHOR           => 'Oleksii Kysil',
     LICENSE          => 'perl_5',
-    MIN_PERL_VERSION => '5.008004',
+    MIN_PERL_VERSION => '5.10.0',
+    BUILD_REQUIRES   => {
+        'ExtUtils::MakeMaker' => 0,
+        'Module::Metadata'    => 0,
+    },
     PREREQ_PM        => {
         'strict'                    => 0,
         'warnings'                  => 0,

@@ -21,7 +21,7 @@ before_install:
     - eval $(curl https://travis-perl.github.io/init) --auto
     - cpanm --notest ExtUtils::MakeMaker
 
-matrix:
+jobs:
   include:
     - os: osx
       perl: system

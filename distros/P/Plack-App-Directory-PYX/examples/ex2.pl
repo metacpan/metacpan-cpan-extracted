@@ -31,7 +31,7 @@ barf($temp_pyx_file, $pyx);
 # Run application with one PYX file.
 my $app = Plack::App::Directory::PYX->new(
         'file' => $temp_pyx_file,
-        'indent' => 1,
+        'indent' => 'Tags::Output::Indent',
 )->to_app;
 Plack::Runner->new->run($app);
 

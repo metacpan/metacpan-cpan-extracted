@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use DateTime::Format::RFC3339;
 use Params::ValidationCompiler qw( validation_for );
@@ -66,7 +66,7 @@ sub projects {
             WebService::PivotalTracker::Project->new(
                 raw_content => $_,
                 pt_api      => $self,
-                )
+            )
         } @{ $self->_client->get($uri) }
     ];
 }
@@ -99,7 +99,7 @@ sub projects {
                 WebService::PivotalTracker::Story->new(
                     raw_content => $_,
                     pt_api      => $self,
-                    )
+                )
             } @{ $self->_client->get($uri) }
         ];
     }
@@ -155,7 +155,7 @@ sub projects {
                 WebService::PivotalTracker::ProjectMembership->new(
                     raw_content => $_,
                     pt_api      => $self,
-                    )
+                )
             } @{ $self->_client->get($uri) }
         ];
     }
@@ -198,7 +198,7 @@ sub projects {
                 WebService::PivotalTracker::ProjectIteration->new(
                     raw_content => $_,
                     pt_api      => $self,
-                    )
+                )
             } @{ $self->_client->get($uri) }
         ];
     }
@@ -232,7 +232,7 @@ sub projects {
             optional => 1,
         },
         labels => {
-            type => ArrayRef [NonEmptyStr],
+            type     => ArrayRef [NonEmptyStr],
             optional => 1
         },
     );
@@ -309,7 +309,7 @@ WebService::PivotalTracker - Perl library for the Pivotal Tracker REST API
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -356,7 +356,8 @@ This creates a new object of this class. It accepts the following arguments:
 
 =item * token
 
-An MD5 access token for Pivotal Tracker.
+An MD5 access token for Pivotal Tracker. May be provided as a string or
+something that stringifies to the token.
 
 This is required.
 
@@ -459,7 +460,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Dave Rolsky Florian Ragwitz Greg Oschwald Will Storey
+=for stopwords Dave Rolsky Florian Ragwitz Greg Oschwald William Storey
 
 =over 4
 
@@ -477,13 +478,13 @@ Greg Oschwald <goschwald@maxmind.com>
 
 =item *
 
-Will Storey <will@summercat.com>
+William Storey <wstorey@maxmind.com>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by MaxMind, Inc.
+This software is Copyright (c) 2016 - 2020 by MaxMind, Inc.
 
 This is free software, licensed under:
 

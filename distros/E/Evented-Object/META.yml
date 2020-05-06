@@ -17,20 +17,20 @@ name: Evented-Object
 provides:
   Evented::Object:
     file: lib/Evented/Object.pm
-    version: '5.67'
+    version: '5.68'
   Evented::Object::Collection:
     file: lib/Evented/Object/Collection.pm
-    version: '5.67'
+    version: '5.68'
   Evented::Object::EventFire:
     file: lib/Evented/Object/EventFire.pm
-    version: '5.67'
+    version: '5.68'
   Evented::Object::Hax:
     file: lib/Evented/Object/Hax.pm
-    version: '5.67'
+    version: '5.68'
 requires:
   perl: '5.010'
 resources:
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/cooper/evented-object
-version: '5.67'
+version: '5.68'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

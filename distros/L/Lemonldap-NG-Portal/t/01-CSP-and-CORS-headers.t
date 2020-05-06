@@ -13,7 +13,8 @@ my $client = LLNG::Manager::Test->new( {
             corsAllow_Origin  => '',
             corsAllow_Methods => 'POST',
             cspFormAction     => '*',
-            customToTrace     => 'mail'
+            cspFrameAncestors => 'test.example.com',
+            customToTrace     => 'mail',
         }
     }
 );
@@ -54,10 +55,13 @@ my %headers = @{ $res->[1] };
 #CSP
 ok(
     $headers{'Content-Security-Policy'} =~
-/default-src 'self';img-src 'self' data:;style-src 'self';font-src 'self';connect-src 'self';script-src 'self';form-action \*;frame-ancestors 'none'/,
-    'CSP header value found'
+m%default-src 'self';img-src 'self' data:;style-src 'self';font-src 'self';connect-src 'self';script-src 'self';form-action \*;frame-ancestors test\.example\.com;%,
+    'CSP header values found'
 ) or print STDERR Dumper( $res->[1] );
-count(1);
+ok( $headers{'X-Frame-Options'} eq 'ALLOW-FROM test.example.com;',
+    'X-Frame-Options "ALLOW-FROM" found' )
+  or print STDERR Dumper( $res->[1] );
+count(2);
 
 # Try to authenticate with good password
 # --------------------------------------
@@ -71,7 +75,10 @@ ok(
 );
 count(1);
 expectOK($res);
-my $id = expectCookie($res);
+my $id        = expectCookie($res);
+my $rawCookie = getHeader( $res, 'Set-Cookie' );
+ok( $rawCookie =~ /;\s*SameSite=None/, 'Found SameSite=None' );
+count(1);
 
 # Try to get a redirection for an auth user with a valid url
 # ----------------------------------------------------------
@@ -106,7 +113,10 @@ ok( $headers{'Lm-Remote-User'} eq 'dwho', "Lm-Remote-User found" )
 ok( $headers{'Lm-Remote-Custom'} eq 'dwho@badwolf.org',
     "Lm-Remote-Custom found" )
   or print STDERR Dumper( $res->[1] );
-count(2);
+ok( $headers{'X-Frame-Options'} eq 'ALLOW-FROM test.example.com;',
+    'X-Frame-Options "ALLOW-FROM" found' )
+  or print STDERR Dumper( $res->[1] );
+count(3);
 
 checkCorsPolicy($res);
 

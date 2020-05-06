@@ -4,11 +4,12 @@ use warnings;
 
 use parent qw(Test::Class::Simple);
 
-sub _setup {
+sub post_setup {
     my $self = shift;
 
     my $instance = $self->get_instance();
     $instance->{_counter} = 100;
+    $self->run_on_module(0);
     return;
 }
 
@@ -65,4 +66,36 @@ sub test_increase_counter : Test(5) {
     $self->run_test_cases($test_cases);
     return;
 }
+
+sub test_unknown : Test(1) {
+    my $self = shift;
+
+    my $test_cases = [
+        {
+            method => 'unknown',
+            params => [],
+            exp    => undef,
+            name   => 'No data passed to function',
+        },
+    ];
+    $self->run_test_cases($test_cases);
+    return;
+}
+
+sub test_check_reference : Test(1) {
+    my $self = shift;
+
+    $self->run_on_module(1);
+    my $test_cases = [
+        {
+            method => 'check_reference',
+            params => [],
+            exp    => 0,
+            name   => 'No data passed to function',
+        },
+    ];
+    $self->run_test_cases($test_cases);
+    return;
+}
+
 1;

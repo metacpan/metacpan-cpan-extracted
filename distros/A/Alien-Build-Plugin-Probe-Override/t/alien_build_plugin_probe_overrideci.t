@@ -7,7 +7,7 @@ use File::Temp qw( tempdir );
 
 @INC = map { path($_)->absolute->canonpath } @INC;
 
-delete $ENV{$_} for qw( TRAVIS TRAVIS_BUILD_ROOT APPVEYOR APPVEYOR_BUILD_FOLDER );
+delete $ENV{$_} for qw( TRAVIS TRAVIS_BUILD_ROOT APPVEYOR APPVEYOR_BUILD_FOLDER GITHUB_ACTIONS GITHUB_WORKSPACE );
 
 my $root = path(tempdir ( CLEANUP => 1 ));
 
@@ -25,6 +25,10 @@ my %CI = (
     APPVEYOR              => 'True',
     APPVEYOR_BUILD_FOLDER => $dir1->canonpath,
   },
+  github_actions => {
+    GITHUB_ACTIONS        => 'true',
+    GITHUB_WORKSPACE      => $dir1->canonpath,
+  }
 );
 
 foreach my $ci (sort keys %CI)

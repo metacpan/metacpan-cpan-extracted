@@ -34,15 +34,14 @@
          "requires" : {
             "B" : "0",
             "Class::Load" : "0.25",
-            "Class::Struct" : "0.62",
             "Data::Dumper" : "0",
             "Data::Printer" : "0",
             "Devel::StackTrace" : "0",
             "Exporter" : "5.73",
             "Number::Format" : "1.75",
             "Scalar::Util" : "1.50",
-            "Test::More" : "0",
             "Text::Number" : "0",
+            "Tie::Hash" : "1.05",
             "TryCatch" : "1.003002",
             "Want" : "0.29",
             "common::sense" : "0",
@@ -50,11 +49,18 @@
             "overloading" : "0.02",
             "parent" : "0",
             "perl" : "5.006000",
-            "strict" : "0"
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Pod" : "0",
+            "Test::Simple" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v0.11.9",
+   "version" : "v0.12.1",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

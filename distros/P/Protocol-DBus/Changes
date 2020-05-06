@@ -1,7 +1,27 @@
 Revision history for Perl module Protocol::DBus
 
+0.15
+- BREAKING CHANGE: This module now expects and returns strings as
+character-decoded. Previously it did no encoding nor decoding. (This change
+is made to prevent invalid UTF-8 from being sent.)
+- BREAKING CHANGE: send_call()’s returned promise, in cases where a reply
+is not requested, now resolves when the message is sent.
+- BREAKING CHANGE: send_call() no longer throws exceptions; all failure cases
+are communicated as rejections of the returned promise. This change is made
+to obviate the need to trap exceptions in event loops.
+- BREAKING CHANGE: send_return(), send_error(), and send_signal() now
+all return promises that resolve when the message is sent. Previously they
+returned a boolean that indicated whether the message had been sent or was
+still queued. This change is made to make use within event loops a bit more
+natural. It also effects a more consistent interface: all send_*() methods
+now return promises.
+- Add on_failure callback to event loop modules.
+- Document “flags” parameter to send_call().
+
 0.14 Wed 25 Mar 2020
 - Clarify UTF-8 encoding requirement in documentation. (No code changes.)
+  UPDATE: This requirement was reversed in 0.15; starting then, all strings
+  are to be *decoded* instead of raw UTF-8.
 
 0.13 Thu 12 Dec 2019
 - Mojo connector now uses Mojo::Promise rather than Promise::ES6 and

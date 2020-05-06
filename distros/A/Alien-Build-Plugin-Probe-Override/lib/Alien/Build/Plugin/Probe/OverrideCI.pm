@@ -7,7 +7,7 @@ use Path::Tiny qw( path );
 use File::chdir;
 
 # ABSTRACT: Override logic for continuous integration
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 sub init
@@ -23,6 +23,10 @@ sub init
   elsif(defined $ENV{APPVEYOR} && $ENV{APPVEYOR} eq 'True' && $ENV{APPVEYOR_BUILD_FOLDER})
   {
     $ci_build_root = path($ENV{APPVEYOR_BUILD_FOLDER})->realpath;
+  }
+  elsif(defined $ENV{GITHUB_ACTIONS} && $ENV{GITHUB_ACTIONS} eq 'true' && $ENV{GITHUB_WORKSPACE})
+  {
+    $ci_build_root = path($ENV{GITHUB_WORKSPACE})->realpath;
   }
   else
   {
@@ -58,7 +62,7 @@ Alien::Build::Plugin::Probe::OverrideCI - Override logic for continuous integrat
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -67,7 +71,7 @@ In your .travis.yml:
  language: perl
  
  install:
-   - cpanm -n Alien::Build::Probe::OverrideCI
+   - cpanm -n Alien::Build::Plugin::Probe::OverrideCI
    - cpanm -n --installdeps .
  
  env:
@@ -81,7 +85,7 @@ In your appveyor.yml
 
  install:
    - ... # however you install/select which Perl to use
-   - cpanm -n Alien::Build::Probe::OverrideCI
+   - cpanm -n Alien::Build::Plugin::Probe::OverrideCI
    - cpanm -n --installdeps .
  
  environment:
@@ -89,6 +93,31 @@ In your appveyor.yml
    matrix:
      - ALIEN_INSTALL_TYPE_CI: share
        ALIEN_INSTALL_TYPE_CI: system
+
+In your .github/workflows/main.yml
+
+  jobs:
+    perl:
+      env:
+        ALIEN_BUILD_PRELOAD: Probe::OverrideCI
+      strategy:
+        matrix:
+          install_type:
+            - share
+            - system
+          perl-version:
+            - '5.30'
+            - '5.16'
+      steps:
+        - uses: actions/checkout@v2
+        - name: Install CI Dependencies
+          run: cpanm -n -q Alien::Build::Plugin::Probe::OverrideCI
+        - name: Install Project Dependencies
+          run: cpanm -n -q --installdeps .
+        - name: Configure Project
+          run: perl Makefile.PL
+          env:
+            ALIEN_INSTALL_TYPE_CI: ${{ matrix.install_type }}
 
 =head1 DESCRIPTION
 
@@ -122,7 +151,11 @@ be useful for you.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Roy Storey (KIWIROY)
 
 =head1 COPYRIGHT AND LICENSE
 

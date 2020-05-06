@@ -8,8 +8,8 @@ my $EUMM_VERSION = eval($ExtUtils::MakeMaker::VERSION);
 
 my $META_MERGE = {
     resources => {
-        repository => 'https://github.com/chocolateboy/App-Wax',
-        bugtracker => 'https://github.com/chocolateboy/App-Wax/issues',
+        repository => 'https://github.com/chocolateboy/wax',
+        bugtracker => 'https://github.com/chocolateboy/wax/issues',
     },
 };
 
@@ -31,11 +31,11 @@ WriteMakefile(
         'Digest::SHA'                => '0',
         'File::BaseDir'              => '0.08',
         'File::Slurper'              => '0.012',
-        'IPC::System::Simple'        => '1.25',
-        'LWP'                        => '6.39',
+        'IPC::System::Simple'        => '1.30',
+        'LWP'                        => '6.44',
         'Method::Signatures::Simple' => '1.07',
         'MIME::Types'                => '2.17',
-        'Mouse'                      => 'v2.5.6',
+        'Mouse'                      => 'v2.5.10',
         'Parallel::parallel_map'     => '0.02',
         'Try::Tiny'                  => '0.30',
         'URI'                        => '1.76',

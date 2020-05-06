@@ -27,7 +27,7 @@ use Config::IniFiles;
 #inherits Lemonldap::NG::Common::Conf::Backends::SOAP
 #inherits Lemonldap::NG::Common::Conf::Backends::LDAP
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.8';
 our $msg     = '';
 our $iniObj;
 
@@ -304,7 +304,7 @@ sub getLocalConf {
         $cfg = Config::IniFiles->new( -file => $file, -allowcontinue => 1 );
 
         unless ( defined $cfg ) {
-            $msg .= "Local config error: " . @Config::IniFiles::errors . "\n";
+            $msg .= "Local config Error: " . @Config::IniFiles::errors . "\n";
             return $r;
         }
 
@@ -334,7 +334,7 @@ sub getLocalConf {
             {
                 eval "\$r->{$_} = $r->{$_}";
                 if ($@) {
-                    $msg .= "Warning: error in file $file: $@.\n";
+                    $msg .= "Warn: error in file $file: $@.\n";
                     return $r;
                 }
             }
@@ -356,7 +356,7 @@ sub getLocalConf {
         if ( $r->{$_} =~ /^[{\[].*[}\]]$/ || $r->{$_} =~ /^sub\s*{.*}$/ ) {
             eval "\$r->{$_} = $r->{$_}";
             if ($@) {
-                $msg .= "Warning: error in file $file: $@.\n";
+                $msg .= "Warn: error in file $file: $@.\n";
                 return $r;
             }
         }

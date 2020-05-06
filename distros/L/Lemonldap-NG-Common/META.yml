@@ -5,6 +5,7 @@ author:
 build_requires:
   IO::String: '0'
   Net::LDAP: '0'
+  String::Random: '0'
   Test::Pod: '1'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -50,5 +51,5 @@ resources:
   X_twitter: https://twitter.com/lemonldapng
   homepage: http://lemonldap-ng.org/
   license: http://opensource.org/licenses/GPL-2.0
-version: v2.0.7
+version: v2.0.8
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

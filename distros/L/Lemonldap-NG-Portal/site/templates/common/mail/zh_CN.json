@@ -4,6 +4,7 @@
 "autoMail":"此邮件是自动发送的",
 "click2Register":"请点击此处已确认您的账户注册",
 "click2Reset":"请点击此处充值您的密码",
+"goToPortal":"回到首页",
 "hello":"您好",
 "mail2fSubject":"[LemonLDAP::NG] Your login code",
 "mailConfirmSubject":"[LemonLDAP::NG] 密码重置确认",

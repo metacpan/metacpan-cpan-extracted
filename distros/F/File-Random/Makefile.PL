@@ -4,6 +4,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     'NAME'		    => 'File::Random',
     'VERSION_FROM'	=> 'Random.pm', # finds $VERSION
+    'LICENSE'	        => 'perl',
     'PREREQ_PM'		=> {
         Want                            => 0,
 

@@ -10,7 +10,7 @@ use Mojo::URL;
 use Scalar::Util 'weaken';
 use SQL::Abstract::mysql;
 
-our $VERSION = '1.18';
+our $VERSION = '1.19';
 
 has abstract        => sub { SQL::Abstract::mysql->new(quote_char => chr(96), name_sep => '.') };
 has auto_migrate    => 0;
@@ -133,7 +133,7 @@ sub _dequeue {
   $dbh->{AutoCommit} = 1;
 
   $self->_set_strict_mode($dbh) if $self->{strict_mode};
-  $self->migrations->migrate if $self->auto_migrate and !$self->{migrated}++;
+  $self->migrations->migrate    if $self->auto_migrate and !$self->{migrated}++;
   $self->emit(connection => $dbh);
   [$dbh];
 }
@@ -424,9 +424,10 @@ following new ones.
 
 =head2 close_idle_connections
 
-  $mysql = $mysql->close_idle_connections;
+  $mysql = $mysql->close_idle_connections($keep);
 
-Close all connections that are not currently active.
+Close all connections that are not currently active, or limit the
+number of idle connections to C<$keep>.
 
 =head2 db
 

@@ -6,7 +6,7 @@ use JSON;
 use Lemonldap::NG::Common::PSGI::Constants;
 use Lemonldap::NG::Common::PSGI::Request;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.8';
 
 our $_json = JSON->new->allow_nonref;
 
@@ -17,6 +17,7 @@ has languages    => ( is => 'rw', isa     => 'Str', default => 'en' );
 has logLevel     => ( is => 'rw', isa     => 'Str', default => 'info' );
 has portal       => ( is => 'rw', isa     => 'Str' );
 has staticPrefix => ( is => 'rw', isa     => 'Str' );
+has instanceName => ( is => 'rw', isa     => 'Str', default => '' );
 has templateDir  => ( is => 'rw', isa     => 'Str|ArrayRef' );
 has links        => ( is => 'rw', isa     => 'ArrayRef' );
 has menuLinks    => ( is => 'rw', isa     => 'ArrayRef' );
@@ -34,17 +35,17 @@ sub init {
     foreach my $k ( keys %$args ) {
         $self->{$k} = $args->{$k} unless ( $k eq 'logger' );
     }
-    unless ( $self->logger and $self->userLogger ) {
+    unless ( ref( $self->logger ) and ref( $self->userLogger ) ) {
         my $logger =
              $args->{logger}
           || $ENV{LLNG_DEFAULTLOGGER}
           || 'Lemonldap::NG::Common::Logger::Std';
-        unless ( $self->logger ) {
+        unless ( ref $self->logger ) {
             eval "require $logger";
             die $@ if ($@);
             $self->logger( $logger->new($self) );
         }
-        unless ( $self->userLogger ) {
+        unless ( ref $self->userLogger ) {
             $logger = $ENV{LLNG_USERLOGGER} || $args->{userLogger} || $logger;
             eval "require $logger";
             die $@ if ($@);
@@ -271,6 +272,7 @@ sub sendHtml {
         # TODO: warn if STATICPREFIX does not end with '/'
         $htpl->param(
             STATIC_PREFIX => $sp,
+            INSTANCE_NAME => $self->instanceName,
             SCRIPTNAME    => $sc,
             ( $self->can('tplParams') ? ( $self->tplParams($req) ) : () ),
             (

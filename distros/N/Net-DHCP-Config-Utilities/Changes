@@ -1,5 +1,11 @@
 Revision history for Net-DHCP-Config-Utilities
 
+0.2.0	 2020-05-04:07:00
+		 - Formatting cleanups.
+		 - Add Net::DHCP::Config::Utilities::INI_check.
+		 - Add checking functionality to bin/inidhcp.
+		 - Better document the actions for bin/inidhcp.
+
 0.1.0	 2019-11-13/01:00
 		 - ISC DHCPD generator now includes descriptions.
 		 - ISC DHCPD generator now sorts everything,

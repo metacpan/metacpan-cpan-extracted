@@ -69,7 +69,7 @@ my $module = path($mint_dir, 'lib/Dist/Zilla/Plugin/Foo/Bar.pm')->slurp_utf8;
 
 like(
     $module,
-    qr/^use strict;\nuse warnings;\nno if "\$\]" >= 5.031008, feature => 'indirect';\npackage Dist::Zilla::Plugin::Foo::Bar;/m,
+    qr/^use strict;\nuse warnings;\npackage Dist::Zilla::Plugin::Foo::Bar;/m,
     'our new module has a valid package declaration',
 );
 
@@ -206,7 +206,7 @@ This is a L<Dist::Zilla> plugin that...
 
 =head1 CONFIGURATION OPTIONS
 
-=head2 C<foo>
+=head2 foo
 
 ...
 

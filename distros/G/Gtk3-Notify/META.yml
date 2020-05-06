@@ -7,8 +7,8 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -21,8 +21,11 @@ requires:
   Glib::Object::Introspection: '0'
   Gtk3: '0'
 resources:
-  X_bucktracker: https://github.com/potyl/perl-Gtk3-Notify/issues
-  homepage: https://github.com/potyl/perl-Gtk3-Notify
-  repository: https://github.com/potyl/perl-Gtk3-Notify
-version: '0.02'
+  X_bucktracker: https://github.com/soig/Gtk3-Notify/issues
+  homepage: https://github.com/soig/Gtk3-Notify
+version: '0.03'
+x_repository:
+  type: git
+  url: https://github.com/soig/Gtk3-Notify.git
+  web: https://github.com/soig/Gtk3-Notify
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

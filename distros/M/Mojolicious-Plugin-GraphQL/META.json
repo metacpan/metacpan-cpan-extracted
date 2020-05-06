@@ -41,9 +41,10 @@
             "Cpanel::JSON::XS" : "0"
          },
          "requires" : {
-            "GraphQL" : "0.26",
+            "GraphQL" : "0.39",
             "Module::Runtime" : "0",
-            "Mojolicious" : "7.60",
+            "Mojolicious" : "8.00",
+            "curry" : "0",
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
@@ -51,7 +52,6 @@
       },
       "test" : {
          "requires" : {
-            "Mojolicious" : "7.60",
             "Test::More" : "0.92"
          }
       }
@@ -70,6 +70,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#graphql-perl"
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

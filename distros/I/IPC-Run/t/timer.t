@@ -13,16 +13,15 @@ use strict;
 BEGIN {
     $|  = 1;
     $^W = 1;
-    if ( $ENV{PERL_CORE} ) {
-        chdir '../lib/IPC/Run' if -d '../lib/IPC/Run';
-        unshift @INC, 'lib', '../..';
-        $^X = '../../../t/' . $^X;
-    }
 }
 
-use Test::More tests => 77;
+use Test::More;
 use IPC::Run qw( run );
 use IPC::Run::Timer qw( :all );
+
+plan skip_all => 'Skipping on Win32' if $ENV{GITHUB_WINDOWS_TESTING};
+plan tests => 77;
+
 
 my $t;
 my $started;

@@ -33,6 +33,19 @@ sub modifyPassword {
         $self->logger->error('"dn" is not set, aborting password modification');
         return PE_ERROR;
     }
+    my $rule = $self->p->HANDLER->buildSub(
+        $self->p->HANDLER->substitute(
+            $self->conf->{portalRequireOldPassword}
+        )
+    );
+    unless ($rule) {
+        my $error = $self->p->HANDLER->tsv->{jail}->error || '???';
+    }
+    my $requireOldPassword = (
+          $req->userData
+        ? $rule->( $req, $req->userData )
+        : $rule->( $req, $req->sessionInfo )
+    );
 
     # Ensure connection is valid
     $self->bind;
@@ -41,7 +54,7 @@ sub modifyPassword {
     # Call the modify password method
     my $code =
       $self->ldap->userModifyPassword( $dn, $pwd, $req->data->{oldpassword},
-        1 );
+        1, $requireOldPassword );
 
     unless ( $code == PE_PASSWORD_OK ) {
         return $code;

@@ -97,6 +97,8 @@ EXPORTS
     a function, with no invocant. It supports the representation used in all
     JSON backends.
 
+    Available since version 1.002004.
+
 CONSTRUCTOR
   new
     With JSON::PP, JSON::XS and Cpanel::JSON::XS you are required to call

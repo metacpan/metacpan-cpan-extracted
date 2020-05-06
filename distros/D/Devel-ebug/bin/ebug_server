@@ -1,47 +1,11 @@
-#!/usr/bin/perl
+#!perl
 
-=head1 NAME
+# PODNAME: ebug_client
+# ABSTRACT: Debugger server for remote debugging Perl script
+our $VERSION = '0.60'; # VERSION
 
-ebug-server - Debugger server for remote debugging Perl script
 
-=head1 SYNOPSIS
-
-ebug-server [-keepio][-port port] -- script args...
-
-=head1 DESCRIPTION
-
-ebug-server is an debugger server for remote debugging
-Perl script, using ebug-client.
-
-When invoked, it will show you how to invoke ebug-client.
-
-=head1 EXAMPLE
-
- # Run hello.pl and wait for "ebug-client" to attach
- $ ebug-server -- hello.pl
-
- # Same as above, but keep I/O happen on server side
- $ ebug-server -keepio -- hello.pl
-
-=head1 NOTE
-
-You can't specify secret key - it must be generated automatically.
-Also, you can't specify port below 3141.
-
-Since Devel::ebug::Backend listens to "localhost" socket,
-you will need to relay I/O using tool like socat for true
-remote debugging.
-
-=head1 SEE ALSO
-
-L<Devel::debug>, L<ebug>, L<ebug-client>
-
-=head1 AUTHOR
-
-Taisuke Yamada, <tyamadajp!list!rakugaki!org>
-
-=cut
-
+#use lib::findbin '../lib'; # dev-only
 use String::Koremutake;
 use Getopt::Long;
 use strict;
@@ -80,3 +44,69 @@ EOF
     exit(1);
 }
 
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ebug_client - Debugger server for remote debugging Perl script
+
+=head1 VERSION
+
+version 0.60
+
+=head1 SYNOPSIS
+
+ebug-server [-keepio][-port port] -- script args...
+
+=head1 DESCRIPTION
+
+ebug-server is an debugger server for remote debugging
+Perl script, using ebug-client.
+
+When invoked, it will show you how to invoke ebug-client.
+
+=head1 EXAMPLE
+
+ # Run hello.pl and wait for "ebug-client" to attach
+ $ ebug-server -- hello.pl
+ 
+ # Same as above, but keep I/O happen on server side
+ $ ebug-server -keepio -- hello.pl
+
+=head1 NOTE
+
+You can't specify secret key - it must be generated automatically.
+Also, you can't specify port below 3141.
+
+Since Devel::ebug::Backend listens to "localhost" socket,
+you will need to relay I/O using tool like socat for true
+remote debugging.
+
+=head1 SEE ALSO
+
+L<Devel::debug>, L<ebug>, L<ebug-client>
+
+=head1 AUTHOR
+
+Original author: Leon Brocard E<lt>acme@astray.comE<gt>
+
+Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Brock Wilcox E<lt>awwaiid@thelackthereof.orgE<gt>
+
+Taisuke Yamada
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2005-2020 by Leon Brocard.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

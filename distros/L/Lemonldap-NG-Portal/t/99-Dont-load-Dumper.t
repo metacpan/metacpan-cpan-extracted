@@ -19,32 +19,39 @@ my $ini = {
     domain                     => 'example.com',
     templateDir                => 'site/templates',
     staticPrefix               => '/static',
+    authentication             => 'Demo',
+    userDB                     => 'Demo',
+    passwordDB                 => 'Demo',
+    registerDB                 => 'Demo',
     loginHistoryEnabled        => 1,
     securedCookie              => 0,
     https                      => 0,
     portalDisplayResetPassword => 1,
-    portalStatus               => 1,
-    cda                        => 1,
-    notification               => 1,
-    portalCheckLogins          => 1,
-    stayConnected              => 1,
-    bruteForceProtection       => 1,
-    grantSessionRules          => 1,
-    upgradeSession             => 1,
-    autoSigninRules            => { a => 1 },
-    checkState                 => 1,
-    portalForceAuthn           => 1,
-    checkUser                  => 1,
-    impersonationRule          => 1,
-    contextSwitchingRule       => 1,
-    decryptValueRule           => 1,
-    grantSessionRules          => { a => 1 },
-    checkStateSecret           => 'x',
+
+    # portalDisplayCertificateResetByMail => 1, Missing dependencies
+    portalStatus         => 1,
+    cda                  => 1,
+    notification         => 1,
+    portalCheckLogins    => 1,
+    stayConnected        => 1,
+    bruteForceProtection => 1,
+    grantSessionRules    => 1,
+    upgradeSession       => 1,
+    autoSigninRules      => { a => 1 },
+    checkState           => 1,
+    portalForceAuthn     => 1,
+    checkUser            => 1,
+    impersonationRule    => 1,
+    contextSwitchingRule => 1,
+    decryptValueRule     => 1,
+    globalLogoutRule     => 1,
+    grantSessionRules    => { a => 1 },
+    checkStateSecret     => 'x',
 };
 
 ok( $p = Lemonldap::NG::Portal::Main->new, 'Portal object' );
-ok( $p->init($ini), 'Init' );
-ok( $app = $p->run, 'App' );
+ok( $p->init($ini),                        'Init' );
+ok( $app = $p->run,                        'App' );
 
 eval { Data::Dumper::Dumper( {} ) };
 ok( $@, "Portal doesn't depend on Data::Dumper" );

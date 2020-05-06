@@ -28,6 +28,7 @@ SKIP: {
                 impersonationMergeSSOgroups    => 1,
                 totp2fSelfRegistration         => 1,
                 totp2fActivation               => 1,
+                totp2fAuthnLevel               => 8
             }
         }
     );
@@ -232,6 +233,46 @@ m%<div class="alert alert-success"><div class="text-center"><b><span trspan="all
         'Found _whatToTrace' )
       or explain( $res->[2]->[0], 'Macro Key _whatToTrace' );
     count(12);
+
+    ok(
+        $res = $client->_get(
+            '/checkuser',
+            cookie => "lemonldap=$id",
+            accept => 'text/html'
+        ),
+        'CheckUser form',
+    );
+    ( $host, $url, $query ) =
+      expectForm( $res, undef, '/checkuser', 'user', 'url' );
+    ok( $res->[2]->[0] =~ m%<span trspan="checkUserMerged">%,
+        'Found trspan="checkUserMerged"' )
+      or explain( $res->[2]->[0], 'trspan="checkUserMerged"' );
+    count(2);
+
+    $query =~ s/user=dwho/user=rtyler/;
+
+    ok(
+        $res = $client->_post(
+            '/checkuser',
+            IO::String->new($query),
+            cookie => "lemonldap=$id",
+            length => length($query),
+            accept => 'text/html',
+        ),
+        'POST checkuser'
+    );
+
+    ( $host, $url, $query ) =
+      expectForm( $res, undef, '/checkuser', 'user', 'url' );
+    ok( $res->[2]->[0] =~ m%<span trspan="checkUserComputeSession">%,
+        'Found trspan="checkUserComputeSession"' )
+      or explain( $res->[2]->[0], 'trspan="checkUserComputeSession"' );
+    ok( $res->[2]->[0] =~ m%<td scope="row">authMode</td>%,
+        'Found macro authMode' )
+      or explain( $res->[2]->[0], 'Macro Key authMode' );
+    ok( $res->[2]->[0] =~ m%<td scope="row">TOTP</td>%, 'Found TOTP' )
+      or explain( $res->[2]->[0], 'Macro Value TOTP' );
+    count(4);
 
     $client->logout($id);
 }

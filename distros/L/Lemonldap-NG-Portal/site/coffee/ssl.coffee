@@ -5,12 +5,9 @@ tryssl = () ->
 	console.log 'path -> ', path
 	console.log 'Call URL -> ', window.datas.sslHost
 	$.ajax window.datas.sslHost,
-		dataType: 'jsonp'
-		# PE_BADCREDENTIALS
-		statusCode:
-			401: () ->
-				$('#lform').submit()
-				console.log 'Error code 401'
+		dataType: 'json',
+		xhrFields:
+			withCredentials: true
 		# If request succeed, cookie is set, posting form to get redirection
 		# or menu
 		success: (data) ->
@@ -18,9 +15,23 @@ tryssl = () ->
 			console.log 'Success -> ', data
 		# Case else, will display PE_BADCREDENTIALS or fallback to next auth
 		# backend
-		error: () ->
-			sendUrl path
-			console.log 'Error'
+		error: (result) ->
+			# If the AJAX query didn't fire at all, it's probably
+			# a bad certificate
+			if result.status == 0
+				# We couldn't send the request.
+				# if client verification is optional, this means
+				# the certificate was rejected (or some network error)
+				sendUrl path
+			# For compatibility with earlier configs, handle PE9 by posting form
+			if result.responseJSON && 'error' of result.responseJSON && result.responseJSON.error == "9"
+				sendUrl path
+
+			# If the server sent a html error description, display it
+			if result.responseJSON && 'html' of result.responseJSON
+				$('#errormsg').html(result.responseJSON.html);
+				$(window).trigger('load');
+			console.log 'Error during AJAX SSL authentication', result
 	false
 
 sendUrl = (path) ->

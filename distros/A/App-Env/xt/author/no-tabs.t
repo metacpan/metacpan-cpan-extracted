@@ -15,13 +15,14 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/alias.t',
-    't/appexec.pl',
     't/appexec.t',
     't/appid.t',
     't/badmodule.t',
+    't/bin/appexec.pl',
+    't/bin/appwhich',
+    't/bin/capture.pl',
     't/cache.t',
     't/cache_sig.t',
-    't/capture.pl',
     't/capture.t',
     't/clone.t',
     't/default.t',
@@ -30,6 +31,7 @@ my @files = (
     't/fatal.t',
     't/lib/App/Env/App1.pm',
     't/lib/App/Env/App2.pm',
+    't/lib/App/Env/AppWhich.pm',
     't/lib/App/Env/Site.pm',
     't/lib/App/Env/Site1/App1.pm',
     't/lib/App/Env/Site1/App2.pm',
@@ -47,7 +49,8 @@ my @files = (
     't/temp.t',
     't/use1.t',
     't/use2.t',
-    't/use3.t'
+    't/use3.t',
+    't/which.t'
 );
 
 notabs_ok($_) foreach @files;

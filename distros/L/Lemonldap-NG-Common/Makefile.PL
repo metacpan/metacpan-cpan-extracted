@@ -24,9 +24,10 @@ WriteMakefile(
     VERSION_FROM   => 'lib/Lemonldap/NG/Common.pm',    # finds $VERSION
     LICENSE        => 'gpl',
     BUILD_REQUIRES => {
-        'IO::String' => 0,
-        'Net::LDAP'  => 0,
-        'Test::Pod'  => 1.00,
+        'IO::String'     => 0,
+        'Net::LDAP'      => 0,
+        'String::Random' => 0,
+        'Test::Pod'      => 1.00,
     },
     META_MERGE => {
         'recommends' => {
@@ -90,7 +91,7 @@ WriteMakefile(
     },
     MAN1PODS => {
         'scripts/convertConfig'    => 'blib/man1/convertConfig.1p',
-        'scripts/convertSessions'    => 'blib/man1/convertSessions.1p',
+        'scripts/convertSessions'  => 'blib/man1/convertSessions.1p',
         'scripts/lemonldap-ng-cli' => 'blib/man1/lemonldap-ng-cli.1p',
     },
 );

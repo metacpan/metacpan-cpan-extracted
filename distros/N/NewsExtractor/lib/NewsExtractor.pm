@@ -1,11 +1,12 @@
 package NewsExtractor;
-our $VERSION = v0.16.0;
+our $VERSION = v0.20.0;
 use Moo;
 
 use Mojo::UserAgent;
 use Mojo::UserAgent::Transactor;
 use Try::Tiny;
 
+use Types::Standard qw< Str >;
 use Types::URI qw< Uri >;
 
 use Importer 'NewsExtractor::TextUtil' => qw(u);
@@ -14,11 +15,20 @@ use NewsExtractor::Download;
 
 has url => ( required => 1, is => 'ro', isa => Uri, coerce => 1 );
 
+has user_agent_string => (
+    required => 1,
+    is => 'ro',
+    isa => Str,
+    default => sub {
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:75.0) Gecko/20100101 Firefox/75.0'
+    }
+);
+
 sub download {
     my NewsExtractor $self = shift;
 
     my $ua = Mojo::UserAgent->new()->transactor(
-        Mojo::UserAgent::Transactor->new()->name('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:75.0) Gecko/20100101 Firefox/75.0')
+        Mojo::UserAgent::Transactor->new()->name( $self->user_agent_string )
     )->max_redirects(3);
 
     my ($error, $download);
@@ -65,7 +75,7 @@ NewsExtractor - download and extract news articles from Internet.
     say "Headline: " . $article->headline;
     say "When: " . ($article->dateline // "(unknown)");
     say "By: " . ($article->journalist // "(unknown)");
-    say "\n" . $article->content_text;
+    say "\n" . $article->article_body;
 
 =head1 SEE Also
 

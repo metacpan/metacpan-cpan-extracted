@@ -66,8 +66,6 @@ sub ask {
 sub confirm {
     my ( $self, $req ) = @_;
 
-    # Disabled due to #1821
-    #$req->pdata->{keepPdata} = 1;
     my $upg;
 
     if ( $req->param('kerberos') ) {

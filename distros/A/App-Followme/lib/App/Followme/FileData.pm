@@ -12,7 +12,7 @@ use base qw(App::Followme::FolderData);
 use App::Followme::FIO;
 use App::Followme::Web;
 
-our $VERSION = "1.92";
+our $VERSION = "1.93";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -285,7 +285,7 @@ This class has the following configuration variable:
 
 =item base_directory
 
-The top directory containing the files o be processed
+The top directory containing the files to be processed
 
 =item title_template
 

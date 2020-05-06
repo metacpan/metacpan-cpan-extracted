@@ -8,11 +8,13 @@ package Device::BusPirate::Mode;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Carp;
 
 use Future::AsyncAwait;
+
+use constant PIRATE_DEBUG => $ENV{PIRATE_DEBUG} // 0;
 
 use constant {
    CONF_CS     => 0x01,
@@ -180,6 +182,7 @@ sub set_pwm
    my $duty = $args{duty} // 50;
 
    if( $freq == 0 ) {
+      print STDERR "PIRATE BB CLEAR-PWM\n" if PIRATE_DEBUG;
       return $self->pirate->write_expect_ack( "\x13", "clear PWM" );
    }
 
@@ -194,9 +197,31 @@ sub set_pwm
 
    $duty = $period * $duty / 100;
 
+   print STDERR "PIRATE BB SET-PWM\n" if PIRATE_DEBUG;
    $self->pirate->write_expect_ack(
       pack( "C C S> S>", 0x12, $prescale, $duty, $period ), "set PWM"
    );
+}
+
+=head2 read_adc_voltage
+
+   $voltage = $mode->read_adc_voltage->get
+
+Reads the voltage on the ADC pin and returns it as a numerical value in volts.
+
+=cut
+
+async sub read_adc_voltage
+{
+   my $self = shift;
+
+   $self->MODE eq "BB" or
+      croak "Cannot ->read_adc except in BB mode";
+
+   await $self->pirate->write( "\x14" );
+   my $buf = await $self->pirate->read( 2 );
+
+   return unpack( "S>", $buf ) * 6.6 / 1024;
 }
 
 =head1 AUTHOR

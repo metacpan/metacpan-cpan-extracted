@@ -1,0 +1,52 @@
+=encoding utf8
+
+=head1 NAME
+
+Module::Generic::Null - Null Value Chaining Object Class
+
+=head1 SYNOPSIS
+
+    # In your code:
+    sub customer
+    {
+        my $self = shift( @_ );
+        return( $self->error( "No customer id was provided" ) ) if( !scalar( @_ ) );
+        return( $self->customer_info_to_object( @_ ) );
+    }
+
+    # And this method is called without providing an id, thus triggering an error,
+    # but is chained. Upon error triggered by method "error", a Module::Generic::Null
+    # object is returned
+    my $name = $object->customer->name;
+
+=head1 DESCRIPTION
+
+Normally this call would have triggered a perl error like C<Cannot call method name on an undefined value>, but since L<Module::Generic/"error"> returns a L<Module::Generic::Null> object, the method B<name> here is called without triggering an error, and of course returns an L<Module::Generic::Null> object when being chained, or undef otherwise. Undefined value is the typical response one gets when an error occurred, so you can check like this :
+
+    my $name = $object->customer->name || die( $object->error );
+
+L<Module::Generic::Null> use C<AUTOLOAD> to allow any method to work, but contains the original error within its object.
+
+Apart from that, this does not do anything meaningful.
+
+=head1 METHODS
+
+There is only 1 method. This module makes it possible to call it with any method to fake original data flow.
+
+=head2 new
+
+This takes an error object and an optional hash reference of key-value pairs and return the object.
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2000-2020 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut
+

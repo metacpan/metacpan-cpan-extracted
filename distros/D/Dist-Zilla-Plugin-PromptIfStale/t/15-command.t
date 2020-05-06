@@ -50,15 +50,15 @@ use CaptureDiagnostics;
                 my $mod = '0';
                 map {
                     my $phase = $_;
-                    map {
-                        [ 'Prereqs' => $phase . $_ => { 'Foo' . $mod++ => 0 } ]
-                    } qw(Requires Recommends Suggests)
+                    map
+                        [ 'Prereqs' => $phase . $_ => { 'Foo' . $mod++ => 0 } ],
+                        qw(Requires Recommends Suggests)
                 } qw(Runtime Test Develop);
             },
             [ 'PromptIfStale' => 'config1' => {
                     check_all_prereqs => 1,
                     # some of these are duplicated with prereqs
-                    module => [ 'Bar', map { 'Foo' . $_ } 0 .. 2 ], phase => 'build'
+                    module => [ 'Bar', map 'Foo'.$_, 0 .. 2 ], phase => 'build'
                 },
             ],
         )
@@ -72,7 +72,7 @@ use CaptureDiagnostics;
         $result->stdout,
         join("\n",
             'Bar',
-            (map { 'Foo' . $_ } ('0' .. '8')),
+            (map 'Foo'.$_, ('0' .. '8')),
             'Indexed::But::Not::Installed',
             'Unindexed',
         ) . "\n",

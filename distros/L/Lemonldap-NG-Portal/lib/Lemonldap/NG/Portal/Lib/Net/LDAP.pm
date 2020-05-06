@@ -12,7 +12,7 @@ use Unicode::String qw(utf8);
 use Scalar::Util 'weaken';
 use utf8;
 
-our $VERSION  = '2.0.6';
+our $VERSION  = '2.0.8';
 our $ppLoaded = 0;
 
 BEGIN {
@@ -215,6 +215,9 @@ sub userBind {
 
             # Get expiration warning and graces
             if ( $resp->grace_authentications_remaining ) {
+                $self->{portal}->logger->debug(
+                    "LDAP password policy - grace authentications remaining: "
+                      . $resp->grace_authentications_remaining );
                 $req->info(
                     $self->{portal}->loadTemplate(
                         $req,
@@ -227,14 +230,20 @@ sub userBind {
             }
 
             if ( $resp->time_before_expiration ) {
+                $self->{portal}->logger->debug(
+                    "LDAP password policy - time before expiration: "
+                      . $resp->time_before_expiration );
                 $req->info(
                     $self->{portal}->loadTemplate(
                         $req,
                         'simpleInfo',
                         params => {
-                            trspan => 'authRemaining,'
-                              . $self->convertSec(
-                                $resp->time_before_expiration
+                            trspan => 'pwdWillExpire,'
+                              . join(
+                                ',',
+                                $self->convertSec(
+                                    $resp->time_before_expiration
+                                )
                               )
                         }
                     )
@@ -257,20 +266,21 @@ sub userBind {
     return PE_BADCREDENTIALS;
 }
 
-## @method int userModifyPassword(string dn, string newpassword, string oldpassword, boolean ad)
+## @method int userModifyPassword(string dn, string newpassword, string oldpassword, boolean ad, boolean requireOldPassword)
 # Change user's password.
 # @param $dn DN
 # @param $newpassword New password
 # @param $oldpassword Current password
 # @param $ad Active Directory mode
+# @param $requireOldPassword Old password is needed to update
 # @return Lemonldap::NG::Portal constant
 sub userModifyPassword {
-    my ( $self, $dn, $newpassword, $oldpassword, $ad ) = @_;
-    my $ppolicyControl     = $self->{conf}->{ldapPpolicyControl};
-    my $setPassword        = $self->{conf}->{ldapSetPassword};
-    my $asUser             = $self->{conf}->{ldapChangePasswordAsUser};
-    my $requireOldPassword = $self->{conf}->{portalRequireOldPassword};
-    my $passwordAttribute  = "userPassword";
+    my ( $self, $dn, $newpassword, $oldpassword, $ad, $requireOldPassword ) =
+      @_;
+    my $ppolicyControl    = $self->{conf}->{ldapPpolicyControl};
+    my $setPassword       = $self->{conf}->{ldapSetPassword};
+    my $asUser            = $self->{conf}->{ldapChangePasswordAsUser};
+    my $passwordAttribute = "userPassword";
     my $err;
     my $mesg;
 

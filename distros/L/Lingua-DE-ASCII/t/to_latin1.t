@@ -11,7 +11,7 @@ use constant CHUNK_SIZE => 250;
 local @ARGV = ( 
     "t/english.dat",
     map {"t/words_with_$_.dat"} 
-    ("foreign", "ä", "ö", "ü", "ß", "ae", "oe", "ue", "ss")
+    ("foreign", "auml", "ouml", "uuml", "szlig", "ae", "oe", "ue", "ss")
 );
 
 chomp( my @all_words = <> );

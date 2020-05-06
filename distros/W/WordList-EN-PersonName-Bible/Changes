@@ -1,0 +1,16 @@
+0.003   2020-05-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename module from WordList::PersonName::Bible::EN ->
+	  WordList::EN::PersonName::Bible for consistency.
+
+
+0.002   2020-05-01  Released-By: PERLANCAR
+
+        - No functional changes.
+
+        - [build] Rebuild to update statistics.
+
+
+0.001   2020-05-01  Released-By: PERLANCAR
+
+        - First release.

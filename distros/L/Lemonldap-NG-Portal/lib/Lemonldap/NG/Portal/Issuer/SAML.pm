@@ -5,6 +5,7 @@ use Mouse;
 use Lemonldap::NG::Portal::Lib::SAML;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
+  PE_SESSIONEXPIRED
   PE_SAML_ART_ERROR
   PE_SAML_DESTINATION_ERROR
   PE_SAML_SESSION_ERROR
@@ -17,7 +18,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_UNAUTHORIZEDPARTNER
 );
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer',
   'Lemonldap::NG::Portal::Lib::SAML';
@@ -47,7 +48,8 @@ sub init {
     my $rule =
       $hd->buildSub( $hd->substitute( $self->conf->{issuerDBSAMLRule} ) );
     unless ($rule) {
-        $self->error( "Bad SAML rule -> " . $hd->tsv->{jail}->error );
+        my $error = $hd->tsv->{jail}->error || '???';
+        $self->error("Bad SAML activation rule -> $error");
         return 0;
     }
     $self->{rule} = $rule;
@@ -170,12 +172,15 @@ sub storeEnv {
     my ( $self, $req ) = @_;
     return PE_OK
       if ( $req->uri !~ $self->ssoUrlRe or $req->uri =~ $self->ssoUrlArtifact );
+
+# This doesn't always work, especially when coming from a HTTP-Redirect flow and
+# POST-ing the login form
     my ( $request, $response, $method, $relaystate, $artifact ) =
       $self->checkMessage( $req, $req->uri, $req->method, $req->content_type );
     return PE_OK if ( $artifact or !$request );
     my $login = $self->createLogin( $self->lassoServer );
     $self->disableSignatureVerification($login);
-    $self->processAuthnRequestMsg( $login, $request );
+    $self->processAuthnRequestMsg( $login, $request, 'debug' );
     if ( my $sp = $login->remote_providerID() ) {
         $req->env->{llng_saml_sp} = $sp;
         if ( my $spConfKey = $self->spList->{$sp}->{confKey} ) {
@@ -211,7 +216,7 @@ sub run {
     }
 
     # Session ID
-    my $session_id = $req->{sessionInfo}->{_session_id} || $req->{id};
+    my $session_id = $req->{sessionInfo}->{_session_id} || $req->id;
 
     # Session creation timestamp
     my $time = $req->{sessionInfo}->{_utime} || time();
@@ -384,7 +389,7 @@ sub run {
             $self->logger->debug("$sp match $spConfKey SP in configuration");
             $req->env->{llng_saml_spconfkey} = $spConfKey;
 
-            if ( my $rule = $self->spRules->{$sp} ) {
+            if ( my $rule = $self->spRules->{$spConfKey} ) {
                 unless ( $rule->( $req, $req->sessionInfo ) ) {
                     $self->userLogger->warn( 'User '
                           . $req->sessionInfo->{ $self->conf->{whatToTrace} }
@@ -1268,7 +1273,7 @@ sub logout {
     return PE_OK if ( $req->data->{samlSLOCalled} );
 
     # Session ID
-    my $session_id = $req->{sessionInfo}->{_session_id} || $req->{id};
+    my $session_id = $req->{sessionInfo}->{_session_id} || $req->id;
 
     # Close SAML sessions
     unless ( $self->deleteSAMLSecondarySessions($session_id) ) {
@@ -1606,7 +1611,7 @@ sub sloServer {
 
         if ($session_index) {
             my $sessionIndexSession = $self->getSamlSession($session_index);
-            return $self->p->sendError( $req, 'SAML session not found', 400 )
+            return $self->p->do( $req, [ sub { PE_SESSIONEXPIRED } ] )
               unless $sessionIndexSession;
 
             $local_session_id = $sessionIndexSession->data->{_saml_id};

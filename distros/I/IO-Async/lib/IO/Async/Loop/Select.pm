@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2007-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2007-2020 -- leonerd@leonerd.org.uk
 
 package IO::Async::Loop::Select;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.75';
+our $VERSION = '0.76';
 use constant API_VERSION => '0.49';
 
 use base qw( IO::Async::Loop );
@@ -234,7 +234,9 @@ sub loop_once
 
    $self->pre_select( \$rvec, \$wvec, \$evec, \$timeout );
 
+   $self->pre_wait;
    my $ret = select( $rvec, $wvec, $evec, $timeout );
+   $self->post_wait;
 
    if( $ret < 0 ) {
       # r/w/e vec can't be trusted

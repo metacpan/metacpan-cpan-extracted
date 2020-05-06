@@ -1,14 +1,16 @@
 use Test::More;
 use strict;
 use IO::String;
+use JSON;
+use Lemonldap::NG::Portal::Main::Constants 'PE_CAPTCHAEMPTY';
 
 require 't/test-lib.pm';
 
 my $res;
 
-my $maintests = 24;
+my $maintests = 29;
 SKIP: {
-    eval 'use GD::SecurityImage;use Image::Magick;';
+    eval 'use GD::SecurityImage; use Image::Magick;';
     if ($@) {
         skip 'Image::Magick not found', $maintests;
     }
@@ -24,6 +26,24 @@ SKIP: {
             }
         }
     );
+
+    # Try to authenticate without captcha
+    # -----------------------------------
+    ok(
+        $res = $client->_post(
+            '/',
+            IO::String->new('user=dwho&password=dwho'),
+            length => 23,
+        ),
+        'Auth query'
+    );
+    expectReject($res);
+
+    my $json;
+    ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
+      or print STDERR "$@\n" . Dumper($res);
+    ok( $json->{error} == PE_CAPTCHAEMPTY, 'Response is PE_CAPTCHAEMPTY' )
+      or explain( $json, "error => 77" );
 
     # Test normal first access
     # ------------------------
@@ -112,11 +132,17 @@ m%<input name="password" type="text" class="form-control key" autocomplete="off"
     ok( $newtoken ne $token, ' Token is refreshed' );
     ok( $res->[2]->[0] =~ m#<img id="captcha" src="data:image/png;base64#,
         ' New captcha image inserted' );
+    ok(
+        $res->[2]->[0] =~
+m#<img class="renewcaptchaclick" src="/static/common/icons/arrow_refresh.png" alt="Renew Captcha" title="Renew Captcha" class="img-thumbnail mb-3" />#,
+        ' Renew Captcha button found'
+    ) or explain( $res->[2]->[0], 'Renew captcha button not found' );
+    ok( $res->[2]->[0] =~ /captcha\.(?:min\.)?js/, 'Get captcha javascript' );
 
     # Try to renew captcha
     ok( $res = $client->_get( '/renewcaptcha', accept => 'text/html' ),
         'Unauth request to renew Captcha' );
-    my $json = eval { JSON::from_json( $res->[2]->[0] ) };
+    $json = eval { JSON::from_json( $res->[2]->[0] ) };
     ok( ( defined $json->{newtoken} and $json->{newtoken} =~ /^\d{10}_\d+$/ ),
         'New token has been received' )
       or explain( $json->{newtoken}, 'NO token received' );

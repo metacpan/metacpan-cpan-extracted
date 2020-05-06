@@ -11,7 +11,7 @@ SYNOPSIS
         say "Headline: " . $article->headline;
         say "When: " . ($article->dateline // "(unknown)");
         say "By: " . ($article->journalist // "(unknown)");
-        say "\n" . $article->content_text;
+        say "\n" . $article->article_body;
 
 SEE Also
 

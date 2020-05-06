@@ -15,12 +15,14 @@ my %WriteMakefileArgs = (
         'strict'        => '1.11',
         'warnings'      => '1.44',
         'parent'        => '0.237',
-        'Module::Generic' => '0.11.8',
-        'Getopt::Long'  => '0.44',
-        'TryCatch'      => '1.003002',
         'DateTime'      => '1.51',
         'DateTime::Format::Strptime' => '1.76',
+        'Devel::Confess'=> '0.009004',
+        'Getopt::Long'  => '0.44',
+        'Module::Generic' => 'v0.12.1',
         'Scalar::Util'  => '1.54',
+    	'Tie::Hash'     => '1.05',
+        'TryCatch'      => '1.003002',
     },
     TEST_REQUIRES       =>
     {

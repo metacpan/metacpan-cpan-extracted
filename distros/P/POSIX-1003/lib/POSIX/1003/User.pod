@@ -4,34 +4,11 @@
 
 POSIX::1003::User - POSIX handling user and groups
 
-=head1 INHERITANCE
-
- POSIX::1003::User
-   is a POSIX::1003::Module
-
 =head1 SYNOPSIS
 
   use POSIX::1003::User;
 
 =head1 DESCRIPTION
-
-See L<documentation in the base class|POSIX::1003::Module/"DESCRIPTION">.
- 
-=head1 METHODS
-
-See L<documentation in the base class|POSIX::1003::Module/"METHODS">.
- 
-=over 4
-
-=item POSIX::1003::User-E<gt>B<exampleValue>(NAME)
-
-See L<POSIX::1003::Module/"METHODS">
-
-=item $obj-E<gt>B<import>()
-
-See L<POSIX::1003::Module/"METHODS">
-
-=back
 
 =head1 FUNCTIONS
 
@@ -48,6 +25,20 @@ is more consistent and widely available.  L<setresuid()|POSIX::1003::User/"Get/s
 powerful, but not everywhere.  Functions which are not implemented
 will return error ENOSYS.
 
+B<. Example>
+
+ my $uid = getuid();
+ defined $uid or die $!;
+
+ setuid($uid)
+    or die "cannot set uid to $uid: $!\n";
+
+ my ($ruid, $euid, $suid) = getresuid;
+ defined $ruid or die $!;
+
+ setresuid($ruid, $euid, $suid)
+    or die $!;
+
 =over 4
 
 =item B<geteuid>()
@@ -56,9 +47,9 @@ will return error ENOSYS.
 
 =item B<getuid>()
 
-=item B<seteuid>(EUID)
+=item B<seteuid>($euid)
 
-=item B<setresuid>(RUID, EUID, SUID)
+=item B<setresuid>($ruid, $euid, $suid)
 
 example: 
 
@@ -68,9 +59,9 @@ example:
 
   setgroups(1,2,3) or die $!;
 
-=item B<setreuid>(RUID, EUID)
+=item B<setreuid>($ruid, $euid)
 
-=item B<setuid>(UID)
+=item B<setuid>($uid)
 
 =back
 
@@ -91,13 +82,13 @@ group-id.
 
 =item B<getresgid>()
 
-=item B<setegid>(EGID)
+=item B<setegid>($egid)
 
-=item B<setgid>(GID)
+=item B<setgid>($gid)
 
-=item B<setregid>(RGID, EGID)
+=item B<setregid>($rgid, $egid)
 
-=item B<setresgid>(RGID, EGID, SGID)
+=item B<setresgid>($rgid, $egid, $sgid)
 
 =back
 
@@ -114,11 +105,11 @@ Simply L<perlfunc/getlogin>
 
 Simply L<perlfunc/getpwent>
 
-=item B<getpwnam>(USERNAME)
+=item B<getpwnam>($username)
 
 Simply L<perlfunc/getpwnam>
 
-=item B<getpwuid>(USERID)
+=item B<getpwuid>($userid)
 
 Simply L<perlfunc/getpwuid>
 
@@ -139,11 +130,11 @@ example:
 
 Simply L<perlfunc/getgrent>
 
-=item B<getgrgid>(GROUPID)
+=item B<getgrgid>($groupid)
 
 Simply L<perlfunc/getgrgid>
 
-=item B<getgrnam>(GROUPNAME)
+=item B<getgrnam>($groupname)
 
 Simply L<perlfunc/getgrnam>
 
@@ -151,17 +142,17 @@ Simply L<perlfunc/getgrnam>
 
 =head1 SEE ALSO
 
-This module is part of POSIX-1003 distribution version 0.98,
-built on December 03, 2013. Website: F<http://perl.overmeer.net>.  The code is based on L<POSIX>, which
+This module is part of POSIX-1003 distribution version 1.00,
+built on May 05, 2020. Website: F<http://perl.overmeer.net/CPAN>.  The code is based on L<POSIX>, which
 is released with Perl itself.  See also L<POSIX::Util> for
 additional functionality.
 
 =head1 COPYRIGHTS
 
-Copyrights 2011-2013 on the perl code and the related documentation
+Copyrights 2011-2020 on the perl code and the related documentation
  by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

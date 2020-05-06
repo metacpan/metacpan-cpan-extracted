@@ -27,7 +27,8 @@ sub init {
           $hd->buildSub(
             $hd->substitute( $self->conf->{grantSessionRules}->{$_} ) );
         unless ($rule) {
-            $self->error( "Bad grantSession rule " . $hd->tsv->{jail}->error );
+            my $error = $hd->tsv->{jail}->error || '???';
+            $self->error("Bad grantSession rule -> $error");
             return 0;
         }
         $self->rules->{$_} = $rule;
@@ -66,7 +67,8 @@ sub run {
                 my $hd  = $self->p->HANDLER;
                 my $msg = $hd->substitute($1);
                 unless ( $msg = $hd->buildSub($msg) ) {
-                    $self->error( "Bad message " . $hd->tsv->{jail}->error );
+                    my $error = $hd->tsv->{jail}->error || '???';
+                    $self->error("Bad message -> $error");
                     return PE_OK;
                 }
                 $msg = $msg->( $req, $req->sessionInfo );

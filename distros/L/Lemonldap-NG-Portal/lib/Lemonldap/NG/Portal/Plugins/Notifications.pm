@@ -15,12 +15,12 @@ use strict;
 use Mouse;
 use MIME::Base64;
 use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_ERROR
   PE_NOTIFICATION
+  PE_ERROR
   PE_OK
 );
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -33,17 +33,19 @@ use constant endAuth => 'checkNotifDuringAuth';
 #sub forAuthUser { 'checkNotifForAuthUser' }
 
 # PROPERTIES
-
 has module => ( is => 'rw' );
 
 # INITIALIZATION
-
 sub init {
     my ($self) = @_;
 
-    # Declare new route
-    $self->addUnauthRoute( 'notifback' => 'getNotifBack', [ 'POST', 'GET' ] );
-    $self->addAuthRoute( 'notifback' => 'getNotifBack', ['POST'] );
+    # Declare new routes
+    $self->addUnauthRoute( notifback => 'getNotifBack', [ 'POST', 'GET' ] );
+    $self->addAuthRoute( notifback => 'getNotifBack', ['POST'] );
+    $self->addAuthRouteWithRedirect(
+        mynotifications => { '*' => 'myNotifs' },
+        ['GET']
+    ) if $self->conf->{notificationsExplorer};
 
     if ( $self->conf->{notificationServer} ) {
         $self->logger->debug('Notification server enable');
@@ -101,6 +103,7 @@ sub init {
         $self->error($@);
         return 0;
     }
+
     1;
 }
 
@@ -158,6 +161,89 @@ sub getNotifBack {
 sub notificationServer {
     my ( $self, $req, @args ) = @_;
     return $self->module->notificationServer( $req, @args );
+}
+
+sub myNotifs {
+    my ( $self, $req, $ref ) = @_;
+
+    if ($ref) {
+        return $self->sendJSONresponse( $req, { error => 'Missing epoch parameter' } )
+          unless $req->param('epoch');
+
+        # Retrieve notification reference=$ref with epoch
+        my $notif = $self->_viewNotif( $req, $ref, $req->param('epoch') );
+        $notif =~ s/"checkbox"/"checkbox" checked disabled/g;
+
+        # Return HTML fragment
+        return $self->sendJSONresponse( $req,
+            { notification => $notif, result => ( $notif ? 1 : 0 ) } );
+    }
+
+    my $_notifications = $self->retrieveNotifs($req);
+    my $nbr            = @$_notifications;
+    my $msg            = $nbr ? 'myNotification' : 'noNotification';
+    $msg .= 's' if ( $nbr > 1 );
+
+    $self->logger->debug("$nbr accepted notification(s) found");
+
+    # Build template
+    my $params = {
+        PORTAL        => $self->conf->{portal},
+        MAIN_LOGO     => $self->conf->{portalMainLogo},
+        SKIN          => $self->p->getSkin($req),
+        LANGS         => $self->conf->{showLanguages},
+        NOTIFICATIONS => $_notifications,
+        MSG           => $msg
+    };
+    return $self->sendJSONresponse( $req, { %$params, result => $nbr } )
+      if ( $req->wantJSON );
+
+    # Display template
+    return $self->p->sendHtml( $req, 'notifications', params => $params );
+}
+
+sub retrieveNotifs {
+    my ( $self, $req ) = @_;
+
+    # Retrieve user's accepted notifications
+    $self->logger->debug( 'Searching for "'
+          . $req->userData->{ $self->conf->{whatToTrace} }
+          . '" accepted notification(s)' );
+    my @_notifications = sort {
+             $b->{epoch} <=> $a->{epoch}
+          or $a->{reference} cmp $b->{reference}
+      } (
+        map {
+            /^notification_(.+)$/
+              ? { reference => $1, epoch => $req->{userData}->{$_} }
+              : ()
+          }
+          keys %{ $req->{userData} }
+      );
+    splice @_notifications, $self->conf->{notificationsMaxRetrieve};
+
+    return \@_notifications;
+}
+
+sub _viewNotif {
+    my ( $self, $req, $ref, $epoch ) = @_;
+
+    $self->logger->debug( "Retrieve notification with reference: \"$ref\" and epoch: \"$epoch\"" );
+    my $notif = eval { $self->module->viewNotification( $req, $ref, $epoch ); };
+    if ($@) {
+    	$self->logger->debug( "Notification not found" );
+        $self->logger->error($@);
+        return '';
+    }
+
+    return $notif;
+}
+
+sub displayLink {
+    my ( $self, $req ) = @_;
+    my $_notifications = $self->retrieveNotifs($req);
+
+    return ( $self->conf->{notificationsExplorer} && scalar @$_notifications );
 }
 
 1;

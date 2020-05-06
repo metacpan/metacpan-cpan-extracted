@@ -41,6 +41,16 @@ my $build = Module::Build->new (
         'Test::Exception' => '0.20',
         'Module::Build'   => '0.20',
     },
+    meta_merge => {
+        meta_spec => {
+            version => 2,
+        },
+        resources => {
+            repository => 'https://github.com/mattlaw/File-BOM.git',
+            web => 'https://github.com/mattlaw/File-BOM',
+            type => 'git',
+        },
+    },
 );
 
 $build->create_build_script;

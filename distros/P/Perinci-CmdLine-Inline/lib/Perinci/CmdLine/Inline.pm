@@ -10,9 +10,9 @@
 package Perinci::CmdLine::Inline;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-05'; # DATE
+our $DATE = '2020-05-02'; # DATE
 our $DIST = 'Perinci-CmdLine-Inline'; # DIST
-our $VERSION = '0.548'; # VERSION
+our $VERSION = '0.550'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -775,8 +775,7 @@ my %pericmd_attrs = (
 Currently not implemented in Perinci::CmdLine::Inline.
 
 _
-        schema => ['array*', of=>'str*'],
-        'x.schema.element_entity' => 'riap_url',
+        schema => ['array*', of=>'riap::url*'],
     },
     skip_format => {
         summary => 'Assume that function returns raw text that need '.
@@ -936,8 +935,7 @@ _
         include => {
             summary => 'Include extra modules',
             'summary.alt.plurality.singular' => 'Include an extra module',
-            schema => ['array*', of=>'str*'],
-            'x.schema.element_entity' => 'modulename',
+            schema => ['array*', of=>'perl::modname*'],
             cmdline_aliases => {I=>{}},
         },
 
@@ -1004,8 +1002,7 @@ _
 
         output_file => {
             summary => 'Set output file, defaults to stdout',
-            schema => 'str*',
-            'x.schema.entity' => 'filename',
+            schema => 'filename*',
             cmdline_aliases => {o=>{}},
             tags => ['category:output'],
         },
@@ -1413,7 +1410,7 @@ _
         push @l, 'if ($use_utf8) { binmode STDOUT, ":encoding(utf8)" }', "\n";
 
         push @l, 'if ($is_stream) {', "\n";
-        push @l, '    my $code = $_pci_r->{res}[2]; if (ref($code) ne "CODE") { die "Result is a stream but no coderef provided" } if ($_pci_meta_result_type_is_simple) { while(defined(my $l=$code->())) { print $fh $l; print $fh "\n" unless $_pci_meta_result_type eq "buf"; } } else { while (defined(my $rec=$code->())) { print $fh _pci_json()->encode($rec),"\n" } }', "\n";
+        push @l, '    my $code = $_pci_r->{res}[2]; if (ref($code) ne "CODE") { die "Result is a stream but no coderef provided" } if ($_pci_meta_result_type_is_simple) { while(defined(my $l=$code->())) { print $fh $l; print $fh "\n" unless $_pci_meta_result_type eq "buf"; } } else { while (defined(my $rec=$code->())) { if (!defined($rec) || ref $rec) { print $fh _pci_json()->encode($rec),"\n" } else { print $fh $rec,"\n" } } }', "\n";
         push @l, '} else {', "\n";
         push @l, '    print $fh $fres;', "\n";
         push @l, '}', "\n";
@@ -1633,7 +1630,7 @@ Perinci::CmdLine::Inline - Generate inline Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.548 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2020-04-05.
+This document describes version 0.550 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2020-05-02.
 
 =head1 SYNOPSIS
 
@@ -1792,7 +1789,7 @@ Name of environment variable name that sets default options.
 
 Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base.
 
-=item * B<extra_urls_for_version> => I<array[str]>
+=item * B<extra_urls_for_version> => I<array[riap::url]>
 
 More URLs to show version for --version.
 
@@ -1806,7 +1803,7 @@ Currently does nothing, provided only for compatibility with Perinci::CmdLine::B
 
 Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base.
 
-=item * B<include> => I<array[str]>
+=item * B<include> => I<array[perl::modname]>
 
 Include extra modules.
 
@@ -1820,7 +1817,7 @@ An alternative to specifying `url`.
 
 =item * B<meta_is_normalized> => I<bool>
 
-=item * B<output_file> => I<str>
+=item * B<output_file> => I<filename>
 
 Set output file, defaults to stdout.
 

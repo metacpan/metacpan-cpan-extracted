@@ -21,11 +21,11 @@ Net::DAVTalk - Interface to talk to DAV servers
 
 =head1 VERSION
 
-Version 0.18
+Version 0.19
 
 =cut
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 =head1 SYNOPSIS
 
@@ -279,7 +279,7 @@ sub Request {
     content => $Bytes,
   });
 
-  if ($Response->{status} == '599' and $Response->content =~ m/timed out/i) {
+  if ($Response->{status} == '599' and $Response->{content} =~ m/timed out/i) {
     confess "Error with $Method for $URI (504, Gateway Timeout)";
   }
 
@@ -295,7 +295,7 @@ sub Request {
       content => $Bytes,
     });
 
-    if ($Response->{status} == '599' and $Response->content =~ m/timed out/i) {
+    if ($Response->{status} == '599' and $Response->{content} =~ m/timed out/i) {
       confess "Error with $Method for $location (504, Gateway Timeout)";
     }
   }

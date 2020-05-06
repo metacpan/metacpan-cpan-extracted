@@ -14,10 +14,11 @@ use Lemonldap::NG::Common::IPv6;
 
 use feature 'state';
 
-extends 'Lemonldap::NG::Common::Conf::AccessLib',
+extends 'Lemonldap::NG::Manager::Plugin',
+  'Lemonldap::NG::Common::Conf::AccessLib',
   'Lemonldap::NG::Common::Session::REST';
 
-our $VERSION = '2.0.4';
+our $VERSION = '2.0.8';
 
 #############################
 # I. INITIALIZATION METHODS #
@@ -25,7 +26,7 @@ our $VERSION = '2.0.4';
 
 use constant defaultRoute => 'sessions.html';
 
-sub addRoutes {
+sub init {
     my ( $self, $conf ) = @_;
 
     # HTML template
@@ -55,6 +56,7 @@ sub addRoutes {
     $self->{multiValuesSeparator} ||= '; ';
     $self->{impersonationPrefix} = $conf->{impersonationPrefix} || 'real_';
     $self->{hiddenAttributes} //= "_password";
+    return 1;
 }
 
 #######################
@@ -98,7 +100,7 @@ sub sessions {
       or return $self->sendError( $req, undef, 400 );
     my $params = $req->parameters();
     my $type   = delete $params->{sessionType};
-    $type = $type eq 'global' ? 'SSO' : ucfirst($type);
+    $type = $type eq 'global'  ? 'SSO'   : ucfirst($type);
     $type = $type eq 'Offline' ? 'OIDCI' : ucfirst($type);
 
     my $res;

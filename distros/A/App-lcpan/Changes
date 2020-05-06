@@ -1,7 +1,54 @@
+1.056   2020-05-06  Released-By: PERLANCAR; Urgency: medium
+
+	- [testing] Avoid error when testing database schema version upgrades.
+
+
+1.055   2020-05-06  Released-By: PERLANCAR; Urgency: medium
+
+	- [testing] Add some basic tests, finally.
+
+
+1.054   2020-05-06  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix typo in translating --updated-in-last-update.
+
+        - Add convenience options --{added,updated}-in-last-n-updates=n.
+
+	- [subcommand log] Reorder lcpan_version column.
+
+
+1.053   2020-05-05  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump database schema version to v14 to add 'log' table.
+
+	- [subcommand reset] Reset index_creation_time metadata, add
+          description.
+
+        - [subcommand update][bugfix] Mark files that we skip sub indexing for,
+          so we don't re-process them again and again.
+
+        - Add convenience options --added-in-last-update,
+          --updated-in-last-update.
+
+        - [subcommand author-rdeps] Add --{added,updated}-* options.
+
+
+1.052   2020-05-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump database schema version to v13 to add rec_mtime and rec_mtime to
+	  all tables. Recording ctime and mtime will allow users to check for
+	  newly added/updated authors, distributions, modules, and so on.
+
+        - Add filter options --added-{before,after} & --updated-{before,after}
+          to some subcommands.
+
+	- Record index creation time and show it in 'stats'.
+
+
 1.051   2020-04-20  Released-By: PERLANCAR; Urgency: medium
 
-	- Add unique indexes for PK which apparently are not added for
-	  tables that have other unique indexes.
+	- Add unique indexes for PK which apparently are not added for tables
+	  that have other unique indexes (bump database schema version to v12).
 
 
 1.050   2020-04-19  Released-By: PERLANCAR; Urgency: medium
@@ -563,7 +610,7 @@
           '--no-skip-sub-indexing' option during 'lcpan update'. It increases
           index size to ~360M on current mini CPAN.
 
-        - Bump database schema version to 10 to support subroutine indexing and
+        - Bump database schema version to v10 to support subroutine indexing and
           force reindexing of content/script/mention.
 
         [Enhancements]

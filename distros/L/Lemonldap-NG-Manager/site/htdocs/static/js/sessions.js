@@ -228,7 +228,7 @@
       $scope.displaySession = function(scope) {
         var sessionId, transformSession;
         transformSession = function(session) {
-          var _insert, array, attr, attrs, category, cv, element, epoch, i, id, j, k, key, l, len, len1, len2, len3, len4, len5, m, name, o, oidcConsent, p, real, ref, ref1, res, sfDevice, spoof, subres, time, title, tmp, value;
+          var _insert, array, attr, attrs, category, cv, element, epoch, i, id, j, k, key, l, len, len1, len2, len3, len4, len5, m, name, o, oidcConsent, p, real, ref, ref1, res, sfDevice, spoof, subres, tab, time, title, tmp, value;
           _insert = function(re, title) {
             var key, reg, tmp, value;
             tmp = [];
@@ -374,6 +374,9 @@
                     cv += ", " + key + " : " + value;
                   }
                 }
+                tab = cv.split(', ');
+                tab.sort();
+                cv = tab.join(', ');
                 tmp.push({
                   t: l._utime,
                   title: $scope.localeDate(l._utime),
@@ -392,6 +395,9 @@
                     cv += ", " + key + " : " + value;
                   }
                 }
+                tab = cv.split(', ');
+                tab.sort();
+                cv = tab.join(', ');
                 tmp.push({
                   t: l._utime,
                   title: $scope.localeDate(l._utime),
@@ -537,7 +543,7 @@
         } else {
           over = 0;
         }
-        return $http.get(scriptname + "sessions/" + sessionType + "?" + query).then(function(response) {
+        $http.get(scriptname + "sessions/" + sessionType + "?" + query).then(function(response) {
           var data, i, len, n, ref;
           data = response.data;
           if (data.result) {
@@ -565,6 +571,31 @@
         }, function(resp) {
           return $scope.waiting = false;
         });
+        console.log("Selection", sessionType);
+        $scope.navssoStyle = {
+          color: '#777'
+        };
+        $scope.offlineStyle = {
+          color: '#777'
+        };
+        $scope.persistentStyle = {
+          color: '#777'
+        };
+        if (sessionType === 'global') {
+          $scope.navssoStyle = {
+            color: '#333'
+          };
+        }
+        if (sessionType === 'offline') {
+          $scope.offlineStyle = {
+            color: '#333'
+          };
+        }
+        if (sessionType === 'persistent') {
+          return $scope.persistentStyle = {
+            color: '#333'
+          };
+        }
       };
       $scope.init = function() {
         $scope.waiting = true;

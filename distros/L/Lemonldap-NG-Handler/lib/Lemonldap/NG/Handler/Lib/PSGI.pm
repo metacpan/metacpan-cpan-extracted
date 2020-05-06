@@ -144,6 +144,18 @@ sub _authAndTrace {
         }
     }
     elsif ( $res < 400 ) {
+        if ( $req->wantJSON ) {
+            my %h    = ( $req->spliceHdrs );
+            my $host = $req->env->{HTTP_HOST};
+            if (    $h{Location}
+                and $h{Location} =~ m#^\Q$self->{portal}\E#
+                and $h{Location} !~ m#^https?://$host# )
+            {
+                return [
+                    401, [ 'WWW-Authenticate' => 'SSO ' . $self->{portal} ], []
+                ];
+            }
+        }
         return [ $res, [ $req->spliceHdrs ], [] ];
     }
     else {

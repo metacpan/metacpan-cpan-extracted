@@ -1,33 +1,32 @@
-# Copyrights 2011-2013 by [Mark Overmeer].
+# Copyrights 2011-2020 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.01.
-use warnings;
-use strict;
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution POSIX-1003.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package POSIX::1003::Signals;
 use vars '$VERSION';
-$VERSION = '0.98';
+$VERSION = '1.00';
 
 use base 'POSIX::1003::Module';
 
-my @states  = qw/
-    SIG_BLOCK SIG_DFL SIG_ERR
-    SIG_IGN SIG_SETMASK SIG_UNBLOCK
- /;
+use warnings;
+use strict;
 
 my @functions = qw/
     raise sigaction signal sigpending sigprocmask sigsuspend signal
     signal_names strsignal
  /;
 
-my (@signals, @actions);
-my @constants = @states;
+my (@handlers, @signals, @actions);
+my @constants;
 
 our %EXPORT_TAGS =
   ( signals   => \@signals
   , actions   => \@actions
-  , status    => \@states
+  , handlers  => \@handlers
   , constants => \@constants
   , functions => \@functions
   , tables    => [ '%signals' ]
@@ -39,15 +38,16 @@ my $signals;
 our %signals;
 
 BEGIN {
-    # initialize the :signals export tag
     $signals = signals_table;
 
     push @constants, keys %$signals;
-    push @signals, grep !/^SA_/, keys %$signals;
-    push @actions, grep /^SA_/, keys %$signals;
+    push @handlers, grep /^SIG_/, keys %$signals;
+    push @signals,  grep !/^SA_|^SIG_/, keys %$signals;
+    push @actions,  grep /^SA_/, keys %$signals;
 
     tie %signals, 'POSIX::1003::ReadOnlyTable', $signals;
 }
+
 
 # Perl does not support pthreads, so:
 sub raise($) { CORE::kill $_[0], $$ }

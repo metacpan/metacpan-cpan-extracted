@@ -4,7 +4,7 @@ package PerlIO::Via::Base64;
 # Set the version info
 
 use strict;
-$PerlIO::Via::Base64::VERSION = 0.02;
+$PerlIO::Via::Base64::VERSION = 0.03;
 
 # Make sure the encoding/decoding stuff is available
 
@@ -115,10 +115,10 @@ PerlIO::Via::Base64 - PerlIO layer for base64 (MIME) encoded strings
  PerlIO::Via::Base64->eol( "\n" );  # default, write lines 76 bytes long
  PerlIO::Via::Base64->eol( '' );    # no line endings, write one long string
 
- open( my $in,'<Via(PerlIO::Via::Base64)','file.mime' )
+ open( my $in,'<via(PerlIO::Via::Base64)','file.mime' )
   or die "Can't open file.mime for reading: $!\n";
  
- open( my $out,'>Via(PerlIO::Via::Base64)','file.mime' )
+ open( my $out,'>via(PerlIO::Via::Base64)','file.mime' )
   or die "Can't open file.mime for writing: $!\n";
 
 =head1 DESCRIPTION
@@ -165,6 +165,8 @@ L<PerlIO::Via>, L<MIME::Base64>, L<PerlIO::Via::QuotedPrint>,
 L<PerlIO::Via::MD5>, L<PerlIO::Via::StripHTML>.
 
 =head1 COPYRIGHT
+
+Copyright (c) 2020 LNATION
 
 Copyright (c) 2002 Elizabeth Mattijsen.
 

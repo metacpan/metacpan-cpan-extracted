@@ -4,6 +4,7 @@ use warnings;
 use lib 't/lib';
 
 use HTTP::Response ();
+use Secret         ();
 use Test::Fatal qw( exception );
 use Test::LWP::UserAgent ();
 use Test::More 0.88;
@@ -191,6 +192,49 @@ for my $key (qw(abcdef123456 abcdef123456abcd)) {
             license_key => $key,
         );
         is( $client->license_key, $key, 'correct key set' );
+    };
+}
+
+my @tests = (
+    {
+        description => 'string license key',
+        license_key => 'abcdef123456',
+    },
+    {
+        description => 'object license key',
+        license_key => Secret->new('abcdef123456'),
+    },
+);
+for my $test (@tests) {
+    subtest $test->{description} => sub {
+        my $service_info = _get_service_info('score');
+
+        my $ua = Test::LWP::UserAgent->new;
+        $ua->map_response(
+            sub {
+                my $request = shift;
+                return $request->header('Authorization') eq
+                    'Basic NDI6YWJjZGVmMTIzNDU2';
+            },
+            HTTP::Response->new(
+                '200',
+                'OK',
+                [ 'Content-Type' => $service_info->{content_type} ],
+                $service_info->{response_content},
+            ),
+        );
+
+        is(
+            WebService::MinFraud::Client->new(
+                account_id  => 42,
+                license_key => $test->{license_key},
+                ua          => $ua,
+            )->score(
+                { device => { ip_address => '1.1.1.1' } },
+            )->id,
+            '27d26476-e2bc-11e4-92b8-962e705b4af5',
+            'correct ID',
+        );
     };
 }
 

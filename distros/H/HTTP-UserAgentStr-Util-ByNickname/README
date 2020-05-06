@@ -3,9 +3,9 @@ NAME
     string by nickname
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.003 of
     HTTP::UserAgentStr::Util::ByNickname (from Perl distribution
-    HTTP-UserAgentStr-Util-ByNickname), released on 2019-05-10.
+    HTTP-UserAgentStr-Util-ByNickname), released on 2020-05-01.
 
 SYNOPSIS
      use HTTP::UserAgentStr::Util::ByNickname qw(
@@ -51,7 +51,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

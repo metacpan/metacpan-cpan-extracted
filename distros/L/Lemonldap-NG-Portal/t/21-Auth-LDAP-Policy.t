@@ -109,7 +109,7 @@ SKIP: {
         ),
         'Auth query'
     );
-    $match = 'trmsg="' . $code . '"';
+    $match = 'trspan="' . $code . '"';
     ok( $res->[2]->[0] =~ /$match/, 'Grace remaining' );
 
     # 3 - TEST PE_PP_ACCOUNT_LOCKED

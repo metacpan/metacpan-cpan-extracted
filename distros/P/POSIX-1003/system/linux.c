@@ -10,6 +10,6 @@
 #define UL_GETOPENMAX __UL_GETOPENMAX
 #endif
 
-#ifdef __USE_FILE_OFFSET64
+#if defined __GNUC__ && defined __USE_LARGEFILE64
 #define HAS_RLIMIT_64
 #endif

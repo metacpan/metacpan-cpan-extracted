@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Data::Compare;
 use Data::Dumper;
-use OPTIMADE::Filter;
+use OPTIMADE::Filter::Modifiable;
 use OPTIMADE::Filter::Parser;
 use Scalar::Util qw(blessed);
 use Test::More tests => 1;
@@ -14,7 +14,7 @@ $Data::Dumper::Sortkeys = 1;
 my $parser = new OPTIMADE::Filter::Parser;
 my $tree = $parser->parse_string( 'a >= 5 OR b <= 2 AND c > 10' );
 
-my $tree_now = OPTIMADE::Filter::modify( $tree,
+my $tree_now = OPTIMADE::Filter::Modifiable::modify( $tree,
     sub {
         my( $node ) = @_;
         if( blessed $node && $node->isa( OPTIMADE::Filter::Comparison:: ) ) {

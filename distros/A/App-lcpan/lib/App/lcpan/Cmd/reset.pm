@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::reset;
 
-our $DATE = '2020-04-20'; # DATE
-our $VERSION = '1.051'; # VERSION
+our $DATE = '2020-05-06'; # DATE
+our $VERSION = '1.056'; # VERSION
 
 use 5.010;
 use strict;
@@ -29,7 +29,7 @@ App::lcpan::Cmd::reset - Reset (empty) the database index
 
 =head1 VERSION
 
-This document describes version 1.051 of App::lcpan::Cmd::reset (from Perl distribution App-lcpan), released on 2020-04-20.
+This document describes version 1.056 of App::lcpan::Cmd::reset (from Perl distribution App-lcpan), released on 2020-05-06.
 
 =head1 FUNCTIONS
 
@@ -41,6 +41,13 @@ Usage:
  handle_cmd(%args) -> [status, msg, payload, meta]
 
 Reset (empty) the database index.
+
+All data tables will be emptied. This includes all records in the C<log> table as
+well as C<index_creation_time> record in the C<meta> table, so there is no records
+of previous indexing activity. There is also no record of resetting in the
+C<log>.
+
+Tables are not dropped and re-created. The C<meta> table is not emptied.
 
 This function is not exported.
 

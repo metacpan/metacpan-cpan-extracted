@@ -4,6 +4,7 @@
 "autoMail":"Ceci est un message automatique",
 "click2Register":"Cliquez ici pour confirmer l'enregistrement de votre compte",
 "click2Reset":"Cliquez ici pour réinitialiser votre mot de passe",
+"goToPortal":"Aller au portail",
 "hello":"Bonjour",
 "mail2fSubject":"[LemonLDAP::NG] Votre code de connexion",
 "mailConfirmSubject": "[LemonLDAP::NG] Confirmation de réinitialisation de mot de passe",

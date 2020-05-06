@@ -1,0 +1,2 @@
+requires 'Catalyst', '5.90114';
+requires 'Catalyst::View::MojoTemplate', '0.001';

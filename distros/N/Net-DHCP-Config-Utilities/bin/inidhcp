@@ -13,14 +13,16 @@ use Config::Tiny;
 use Net::DHCP::Config::Utilities;
 use Net::DHCP::Config::Utilities::Subnet;
 use Net::DHCP::Config::Utilities::INI_loader;
+use Net::DHCP::Config::Utilities::INI_check;
 use Net::DHCP::Config::Utilities::Generator::ISC_DHCPD;
 use Net::CIDR;
+use Data::Dumper;
 
-sub version{
+sub version {
 	print "inidhcp v. 0.0.1\n";
 }
 
-sub help{
+sub help {
 	print '
 -a <action>   The action to perform.
 -c <config>   The config file to use.
@@ -40,14 +42,15 @@ sub help{
 -V <vars>     The variable section to pass to generator in the templates.
 
 ACTIONS
-add  Adds a new scope. Requires a minimum of -s and -m.
-rm   Removes a scope. Requires -s.
-gen  Generates the output
+add   Adds a new scope. Requires a minimum of -s and -m.
+rm    Removes a scope. Requires -s.
+gen   Generates the output
+check Goes through the dhcp.ini files for overlaps.
 ';
 }
 
 my $action;
-my $config_file='/usr/local/etc/inidhcp.ini';
+my $config_file = '/usr/local/etc/inidhcp.ini';
 my $routers;
 my $scope;
 my $mask;
@@ -57,7 +60,7 @@ my $bootfile;
 my $broadcast;
 my @range;
 my $ntp;
-my $print=0;
+my $print = 0;
 my $mtu;
 my $web_proxy;
 my $lease_time;
@@ -68,156 +71,161 @@ my $version;
 my $vars_section;
 
 # get the commandline options
-Getopt::Long::Configure ('no_ignore_case');
-Getopt::Long::Configure ('bundling');
+Getopt::Long::Configure('no_ignore_case');
+Getopt::Long::Configure('bundling');
 GetOptions(
-		   'R=s@'=>\@range,
-		   'a=s'=>\$action,
-		   'c=s'=>\$config_file,
-		   'g=s'=>\$routers,
-		   's=s'=>\$scope,
-		   'm=s'=>\$mask,
-		   't=s'=>\$tftp,
-		   'b=s'=>\$bootfile,
-		   'B=s'=>\$broadcast,
-		   'd=s'=>\$dns,
-		   'n=s'=>\$ntp,
-		   'p'=>\$print,
-		   'M=s'=>\$mtu,
-		   'w=s'=>\$web_proxy,
-		   'l=s'=>\$lease_time,
-		   'r=s'=>\$root_path,
-		   'D=s'=>\$desciption,
-		   'h'=>\$help,
-		   'help'=>\$help,
-		   'v'=>\$version,
-		   'version'=>\$version,
-		   'V'=>\$vars_section
-		   );
+	'R=s@'    => \@range,
+	'a=s'     => \$action,
+	'c=s'     => \$config_file,
+	'g=s'     => \$routers,
+	's=s'     => \$scope,
+	'm=s'     => \$mask,
+	't=s'     => \$tftp,
+	'b=s'     => \$bootfile,
+	'B=s'     => \$broadcast,
+	'd=s'     => \$dns,
+	'n=s'     => \$ntp,
+	'p'       => \$print,
+	'M=s'     => \$mtu,
+	'w=s'     => \$web_proxy,
+	'l=s'     => \$lease_time,
+	'r=s'     => \$root_path,
+	'D=s'     => \$desciption,
+	'h'       => \$help,
+	'help'    => \$help,
+	'v'       => \$version,
+	'version' => \$version,
+	'V'       => \$vars_section
+);
 
-if ( $version ){
+if ($version) {
 	&version;
 	exit;
 }
 
-if ( $help ){
+if ($help) {
 	&version;
 	&help;
 	exit;
 }
 
-if ( ! defined( $action ) ){
+if ( !defined($action) ) {
 	die('No action specified via -a');
 }
 
-if ( ! -f $config_file ){
-	die('Config "'.$config_file.'" does not exist');
+if ( !-f $config_file ) {
+	die( 'Config "' . $config_file . '" does not exist' );
 }
 
 # test -s if it is specified
-if ( defined( $scope ) ){
-	eval{
-		my @cidrs=Net::CIDR::addr2cidr( $scope );
-	};
-	if ( $@ ){
-		die( '"'.$scope.'" is not a valid base IP for a scope' );
+if ( defined($scope) ) {
+	eval { my @cidrs = Net::CIDR::addr2cidr($scope); };
+	if ($@) {
+		die( '"' . $scope . '" is not a valid base IP for a scope' );
 	}
 }
 
 my $config;
-eval{
-	$config=Config::Tiny->read( $config_file );
-};
-if ( $@ ){
-	die( 'Config::Tiny->read died unexpectedly... '.$@ );
-}elsif( !defined( $config ) ){
-	die( 'Failed to read the config... '.Config::Tiny->errstr );
+eval { $config = Config::Tiny->read($config_file); };
+if ($@) {
+	die( 'Config::Tiny->read died unexpectedly... ' . $@ );
+}
+elsif ( !defined($config) ) {
+	die( 'Failed to read the config... ' . Config::Tiny->errstr );
 }
 
 # make sure we have all the basics we need to operate
-if (!defined( $config->{_}{dir} ) ){
+if ( !defined( $config->{_}{dir} ) ) {
 	die('"dir" not defined in the config');
-}elsif(!defined( $config->{generator}{footer} ) ){
-	$config->{generator}{footer}=$config->{_}{dir}.'/footer';
+}
+elsif ( !defined( $config->{generator}{footer} ) ) {
+	$config->{generator}{footer} = $config->{_}{dir} . '/footer';
+
 	#die('"footer" not defined in the config in the config section "generator"');
-}elsif(!defined( $config->{generator}{header} ) ){
-	$config->{generator}{header}=$config->{_}{dir}.'/header';
+}
+elsif ( !defined( $config->{generator}{header} ) ) {
+	$config->{generator}{header} = $config->{_}{dir} . '/header';
+
 	#die('"header" not defined in the config in the config section "generator"');
-}elsif(!defined( $config->{generator}{output} ) ){
-	$config->{generator}{output}=$config->{_}{dir}.'/output';
+}
+elsif ( !defined( $config->{generator}{output} ) ) {
+	$config->{generator}{output} = $config->{_}{dir} . '/output';
+
 	#die('"output" not defined in the config in the config section "generator"');
-}elsif( ! -d $config->{_}{dir} ){
-	die('"'.$config->{_}{dir}.'" is not a directory or does not exist');
+}
+elsif ( !-d $config->{_}{dir} ) {
+	die( '"' . $config->{_}{dir} . '" is not a directory or does not exist' );
 }
 
 # do this first as we don't need to load anything
-if ( $action eq 'rm' ){
-	if ( !defined( $scope ) ){
+if ( $action eq 'rm' ) {
+	if ( !defined($scope) ) {
 		die('No scope specified via -s');
 	}
-	my $file=$config->{_}{dir}.'/'.$scope.'.dhcp.ini';
-	unlink( $file ) or die( 'Failed to unlink "'.$file.'"');
+	my $file = $config->{_}{dir} . '/' . $scope . '.dhcp.ini';
+	unlink($file) or die( 'Failed to unlink "' . $file . '"' );
 	exit 0;
 }
 
-my $util=Net::DHCP::Config::Utilities->new;
-my $loader = Net::DHCP::Config::Utilities::INI_loader->new( $util );
+my $util   = Net::DHCP::Config::Utilities->new;
+my $loader = Net::DHCP::Config::Utilities::INI_loader->new($util);
 
-
-eval{
-	$loader->load_dir( $config->{_}{dir} );
-};
-if ( $@ ){
-	die( 'Failed to load the scopes from "'.$config->{_}{dir}.'"'.$@ );
+eval { $loader->load_dir( $config->{_}{dir} ); };
+if ($@) {
+	die( 'Failed to load the scopes from "' . $config->{_}{dir} . '"' . $@ );
 }
 
 #handle generation
-if ( $action eq 'gen' ){
+if ( $action eq 'gen' ) {
 	my $vars;
-	if ( !defined( $vars_section ) ){
-		if (!defined( $config->{vars} ) ){
-			$vars={};
-		}else{
-			$vars=$config->{vars};
+	if ( !defined($vars_section) ) {
+		if ( !defined( $config->{vars} ) ) {
+			$vars = {};
 		}
-	}else{
-		if ( !defined( $config->{$vars_section} ) ){
-			die( '"'.$vars_section.'" does not exist as a section in "'.$config_file.'"' );
+		else {
+			$vars = $config->{vars};
 		}
-		$vars=$config->{$vars_section};
+	}
+	else {
+		if ( !defined( $config->{$vars_section} ) ) {
+			die( '"' . $vars_section . '" does not exist as a section in "' . $config_file . '"' );
+		}
+		$vars = $config->{$vars_section};
 	}
 
 	# make sure this always exists, even if it is blank so we don't error upon init
-	if (!defined( $config->{vars} ) ){
-		$config->{vars}={};
+	if ( !defined( $config->{vars} ) ) {
+		$config->{vars} = {};
 	}
 
 	# init generator
 	my $generator;
-	eval{
-        $generator=Net::DHCP::Config::Utilities::Generator::ISC_DHCPD->new({
-																			'footer'=>$config->{generator}{footer},
-																			'header'=>$config->{generator}{header},
-																			'vars'=>$vars,
-																			'output'=>$config->{generator}{output},
-																			});
+	eval {
+		$generator = Net::DHCP::Config::Utilities::Generator::ISC_DHCPD->new(
+			{
+				'footer' => $config->{generator}{footer},
+				'header' => $config->{generator}{header},
+				'vars'   => $vars,
+				'output' => $config->{generator}{output},
+			}
+		);
 	};
-	if ( $@ ){
-		die( 'Failed to init the ISC DHCPD config generation module... '.$@ );
+	if ($@) {
+		die( 'Failed to init the ISC DHCPD config generation module... ' . $@ );
 	}
 
 	# generate it
 	my $isc_dhcpd_config;
-	eval{
+	eval {
 		# if $print is true, then a string is returned and nothing is written to the FS
-		my $isc_dhcpd_config=$generator->generate( $util, $print );
+		my $isc_dhcpd_config = $generator->generate( $util, $print );
 	};
-	if ( $@ ){
-		die ( 'ISC DHCPD config generation failed... '.$@ );
+	if ($@) {
+		die( 'ISC DHCPD config generation failed... ' . $@ );
 	}
 
 	# print the config if requested
-	if ( $print ){
+	if ($print) {
 		print $isc_dhcpd_config;
 	}
 
@@ -225,93 +233,109 @@ if ( $action eq 'gen' ){
 }
 
 # handle adding
-if ( $action eq 'add' ){
-	if ( !defined( $mask ) ){
-		die( 'No subnet mask specified via -m' );
+if ( $action eq 'add' ) {
+	if ( !defined($mask) ) {
+		die('No subnet mask specified via -m');
 	}
 
 	# the bare options needed to create a subnet
-	my $options={
-				 mask=>$mask,
-				 base=>$scope,
-				 };
+	my $options = {
+		mask => $mask,
+		base => $scope,
+	};
 
 	# suck in the various options if specified
-	if (defined( $dns )){
-		$options->{dns}=$dns;
+	if ( defined($dns) ) {
+		$options->{dns} = $dns;
 	}
-	if (defined( $routers )){
-		$options->{routers}=$routers;
+	if ( defined($routers) ) {
+		$options->{routers} = $routers;
 	}
-	if (defined( $ntp )){
-		$options->{ntp}=$ntp;
+	if ( defined($ntp) ) {
+		$options->{ntp} = $ntp;
 	}
-	if (defined( $bootfile )){
-		$options->{bootfile}=$bootfile;
+	if ( defined($bootfile) ) {
+		$options->{bootfile} = $bootfile;
 	}
-	if(defined( $tftp )){
-		$options->{'tftp-server'}=$tftp;
+	if ( defined($tftp) ) {
+		$options->{'tftp-server'} = $tftp;
 	}
-	if (defined( $range[0] )){
-		$options->{ranges}=\@range;
+	if ( defined( $range[0] ) ) {
+		$options->{ranges} = \@range;
 	}
-	if (defined( $mtu )){
-		$options->{mtu}=$mtu;
+	if ( defined($mtu) ) {
+		$options->{mtu} = $mtu;
 	}
-	if (defined( $web_proxy )){
-		$options->{'web-proxy'}=$web_proxy;
+	if ( defined($web_proxy) ) {
+		$options->{'web-proxy'} = $web_proxy;
 	}
-	if (defined( $lease_time )){
-		$options->{'lease-time'}=$lease_time;
+	if ( defined($lease_time) ) {
+		$options->{'lease-time'} = $lease_time;
 	}
-	if (defined( $broadcast )){
-		$options->{broadcast}=$broadcast;
+	if ( defined($broadcast) ) {
+		$options->{broadcast} = $broadcast;
 	}
-	if (defined( $root_path )){
-		$options->{'root'}=$root_path;
+	if ( defined($root_path) ) {
+		$options->{'root'} = $root_path;
 	}
-	if (defined( $desciption )){
-		$options->{desciption}=$desciption;
+	if ( defined($desciption) ) {
+		$options->{desciption} = $desciption;
 	}
 
 	# make sure everything is sane
 	my $subnet;
-	eval{
-		$subnet = Net::DHCP::Config::Utilities::Subnet->new( $options );
-	};
-	if ( $@ ){
-		die('Failed to create the new subnet... '.$@ );
+	eval { $subnet = Net::DHCP::Config::Utilities::Subnet->new($options); };
+	if ($@) {
+		die( 'Failed to create the new subnet... ' . $@ );
 	}
 
 	# make sure we don't overlap or anything
-	eval{
-		$util->subnet_add( $subnet );
-	};
-	if ( $@ ){
-		die( 'Failed to add subnet... '.$@ );
+	eval { $util->subnet_add($subnet); };
+	if ($@) {
+		die( 'Failed to add subnet... ' . $@ );
 	}
 
 	# begin transforming $options for making the ini
 	delete $options->{base};
-	if( defined( $options->{ranges} ) ){
+	if ( defined( $options->{ranges} ) ) {
 		delete $options->{ranges};
-		my $range_int=0;
-		foreach my $current_range ( @range ){
-			$options->{'range'.$range_int}=$current_range;
+		my $range_int = 0;
+		foreach my $current_range (@range) {
+			$options->{ 'range' . $range_int } = $current_range;
 			$range_int++;
 		}
 	}
 
 	# create a new ini and shove the options into it
-	my $new_ini=Config::Tiny->new;
-	$new_ini->{$scope}=$options;
+	my $new_ini = Config::Tiny->new;
+	$new_ini->{$scope} = $options;
 
-	my $new_ini_path=$config->{_}{dir}.'/'.$scope.'.dhcp.ini';
-	if (! $new_ini->write( $new_ini_path ) ){
-		die( 'Failed to write to "'.$new_ini_path.'"' );
+	my $new_ini_path = $config->{_}{dir} . '/' . $scope . '.dhcp.ini';
+	if ( !$new_ini->write($new_ini_path) ) {
+		die( 'Failed to write to "' . $new_ini_path . '"' );
 	}
 
 	exit;
+}
+
+# the check funtion
+if ( $action eq 'check' ) {
+	my $checker = Net::DHCP::Config::Utilities::INI_check->new( $config->{_}{dir} );
+
+	my $bad = 0;
+
+	my %overlaps = $checker->overlap_check;
+
+	my @overlaps_keys = keys(%overlaps);
+	if ( defined( $overlaps_keys[0] ) ) {
+		$Data::Dumper::Terse = 1;
+		print "Overlapping Sections found...\n"
+			. "File => Section => File With Overlap => Overlapping Section\n"
+			. Dumper( \%overlaps );
+		$bad = 1;
+	}
+
+	exit $bad;
 }
 
 =head1 NAME
@@ -329,13 +353,48 @@ inidhcp B<-c> <config> B<-a> add B<-s> <scope> B<-m> <mask> [B<-g> <gateways>]
 [B<-d> <DNS servers>]  [B<-w> <URL>] [B<-l> <time>] [B<-b> <bootfile>]
 [B<-R> <IP IP>]
 
+inidhcp B<-c> <config> B<-a> check
+
+=head1 ACTIONS
+
+These are specified via the -a flag.
+
+=head2 rm
+
+This removes the scope specified via B<-s> <scope>.
+
+=head2 gen
+
+This generates the ISC DHCPD config.
+
+You can specify the vars sections in the INI file to use via them
+the B<-V> flag.
+
+=head2 add
+
+This adds a new subnet. The minimum required values are
+B<-m> <mask> and B<-s> <scope>.
+
+The following are additional flags that can be used with this.
+
+    B<-g> <gateways>
+    B<-t> <TFTP server>
+    B<-n> <NTP servers>
+    B<-B> <broadcast>
+    B<-M> <MTU>
+    B<-d> <DNS servers>
+    B<-w> <URL>
+    B<-l> <time>
+    B<-b> <bootfile>
+    B<-R> <IP IP>
+
 =head1 FLAGS
 
 =head2 -a <action>
 
 The action to perform.
 
-=head2 -c <config>
+xs=head2 -c <config>
 
 The config file to use.
 

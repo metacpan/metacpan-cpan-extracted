@@ -132,7 +132,7 @@ sub init {
     }
     if ( $self->conf->{wsdlServer} ) {
         $self->addUnauthRoute( 'portal.wsdl' => 'getWsdl', ['GET'] );
-        $self->addAuthRoute( 'portal.wsdl' => 'getWsdl', ['GET'] );
+        $self->addAuthRoute( 'portal.wsdl' => 'getWsdl',   ['GET'] );
     }
     1;
 }

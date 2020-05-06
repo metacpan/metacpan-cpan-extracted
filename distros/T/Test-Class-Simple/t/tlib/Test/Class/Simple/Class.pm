@@ -16,6 +16,12 @@ sub increase_counter {
 
     $self->{_counter}++;
     return $self->{_counter};
-  }
+}
+
+sub check_reference {
+    my $value = shift;
+
+    return ( ref $value ) ? 1 : 0;
+}
 
 1;

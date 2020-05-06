@@ -1,10 +1,8 @@
-0.4.6 2020-03-08 23:11:11 +0100 Tobias Oetiker <tobi@oetiker.ch>
+0.5.1 2020-05-04 09:49:57 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
- - fix MANIFEST
-
-0.4.5 2020-03-08 20:57:32 +0100 Tobias Oetiker <tobi@oetiker.ch>
-
- - add missing cpanfile
+ - in callbackery apps protect public from removal
+ - improve build probability under illumos for perlmodules assuming tools are gnutools
+ - improve dependency tracking in callbackery rebuild
 
 0.4.4 2020-03-06 10:36:04 +0100 Tobias Oetiker <tobi@oetiker.ch>
 

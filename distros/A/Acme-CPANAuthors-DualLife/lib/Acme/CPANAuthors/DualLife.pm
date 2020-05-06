@@ -1,5 +1,5 @@
 package Acme::CPANAuthors::DualLife;
-$Acme::CPANAuthors::DualLife::VERSION = '0.46';
+$Acme::CPANAuthors::DualLife::VERSION = '0.48';
 #ABSTRACT: We are CPAN Authors of Dual Life core modules
 
 use strict;
@@ -51,7 +51,6 @@ use Acme::CPANAuthors::Register (
   OVID => q[Curtis 'Ovid' Poe],
   PEVANS => q[Paul Evans],
   PJACKLAM => q[Peter John Acklam],
-  PJF => q[Paul Jamieson Fenwick],
   PMQS => q[Paul Marquess],
   RGARCIA => q[Rafael Garcia-Suarez],
   RJBS => q[Ricardo SIGNES],
@@ -86,7 +85,7 @@ Acme::CPANAuthors::DualLife - We are CPAN Authors of Dual Life core modules
 
 =head1 VERSION
 
-version 0.46
+version 0.48
 
 =head1 SYNOPSIS
 
@@ -154,7 +153,6 @@ It is currently statically generated information, I hope to make it dynamic in t
   OVID => q[Curtis 'Ovid' Poe],
   PEVANS => q[Paul Evans],
   PJACKLAM => q[Peter John Acklam],
-  PJF => q[Paul Jamieson Fenwick],
   PMQS => q[Paul Marquess],
   RGARCIA => q[Rafael Garcia-Suarez],
   RJBS => q[Ricardo SIGNES],
@@ -186,7 +184,7 @@ Chris Williams
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Chris Williams.
+This software is copyright (c) 2020 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

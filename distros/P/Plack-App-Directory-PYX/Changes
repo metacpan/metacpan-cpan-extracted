@@ -1,3 +1,10 @@
+0.03 2020-05-01T15:28:05+02:00
+ - Fix (hack) difference between XS and PP versions in Cookie::Baker and
+   WWW::Form::UrlEncoded::XS (RT#132460).
+ - Fix test dependencies.
+ - Rewrite API of indent() method to consume name of Tags::Output
+   serialization class.
+
 0.02 2020-04-30T20:44:41+02:00
  - Add indent constructor parameter and implementation.
  - Add test for directory index.

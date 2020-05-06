@@ -159,7 +159,11 @@
       };
       $scope.getLanguage = function(lang) {
         $scope.lang = lang;
-        $scope.form = 'white';
+        if ($scope.form.date) {
+          $scope.form.date = new Date();
+        } else {
+          $scope.form = 'white';
+        }
         $scope.init();
         return $scope.showM = false;
       };
@@ -190,31 +194,53 @@
         } else {
           over = 0;
         }
-        return $http.get(scriptname + "notifications/" + $scope.type + "?" + query).then(function(response) {
-          var data, i, len, n, ref;
-          data = response.data;
-          if (data.result) {
-            ref = data.values;
-            for (i = 0, len = ref.length; i < len; i++) {
-              n = ref[i];
-              autoId++;
-              n.id = "node" + autoId;
-              if (level < scheme.length - 1) {
-                n.nodes = [];
-                n.level = level + 1;
-                n.query = query;
-                n.over = over;
+        if ($scope.type === 'done' || $scope.type === 'actives') {
+          $http.get(scriptname + "notifications/" + $scope.type + "?" + query).then(function(response) {
+            var data, i, len, n, ref;
+            data = response.data;
+            if (data.result) {
+              ref = data.values;
+              for (i = 0, len = ref.length; i < len; i++) {
+                n = ref[i];
+                autoId++;
+                n.id = "node" + autoId;
+                if (level < scheme.length - 1) {
+                  n.nodes = [];
+                  n.level = level + 1;
+                  n.query = query;
+                  n.over = over;
+                }
+                node.push(n);
               }
-              node.push(n);
+              if (value === '') {
+                $scope.total = data.total;
+              }
             }
-            if (value === '') {
-              $scope.total = data.total;
-            }
-          }
-          return $scope.waiting = false;
-        }, function(resp) {
-          return $scope.waiting = false;
-        });
+            return $scope.waiting = false;
+          }, function(resp) {
+            return $scope.waiting = false;
+          });
+        }
+        console.log("Selection", $scope.type);
+        $scope.activesStyle = {
+          color: '#777'
+        };
+        $scope.doneStyle = {
+          color: '#777'
+        };
+        $scope.newStyle = {
+          color: '#777'
+        };
+        if ($scope.type === 'actives') {
+          $scope.activesStyle = {
+            color: '#333'
+          };
+        }
+        if ($scope.type === 'done') {
+          return $scope.doneStyle = {
+            color: '#333'
+          };
+        }
       };
       $scope.displayNotification = function(scope) {
         var node, notificationId;
@@ -226,13 +252,25 @@
           notificationId = node.uid + "_" + node.reference;
         }
         $http.get(scriptname + "notifications/" + $scope.type + "/" + notificationId).then(function(response) {
+          var e, notif;
           $scope.currentNotification = {
             uid: node.uid,
             reference: node.reference,
             condition: node.condition
           };
           if ($scope.type === 'actives') {
-            $scope.currentNotification.notifications = response.data.notifications;
+            try {
+              console.log("Try to parse a JSON formated notification...");
+              notif = JSON.parse(response.data.notifications);
+              $scope.currentNotification.date = $scope.notifDate(notif.date);
+              $scope.currentNotification.text = notif.text;
+              $scope.currentNotification.title = notif.title;
+              $scope.currentNotification.subtitle = notif.subtitle;
+            } catch (error) {
+              e = error;
+              console.log("Unable to parse JSON");
+              $scope.currentNotification.notifications = response.data.notifications;
+            }
           } else {
             $scope.currentNotification.done = response.data.done;
           }
@@ -289,7 +327,7 @@
           $scope.formPost.reference = $scope.form.reference;
           $scope.formPost.condition = $scope.form.condition;
           $scope.formPost.xml = $scope.form.xml;
-          return $http.post('notifications/actives', $scope.formPost).then(function(response) {
+          $http.post('notifications/actives', $scope.formPost).then(function(response) {
             var data;
             data = response.data;
             $scope.form = {};
@@ -304,21 +342,24 @@
               };
             }
             $scope.showModal("alert.html");
-            return $scope.waiting = false;
+            $scope.waiting = false;
+            return $scope.form.date = new Date();
           }, function(response) {
             $scope.message = {
               title: 'notificationNotCreated',
               message: response.statusText
             };
             $scope.showModal("alert.html");
-            return $scope.waiting = false;
+            $scope.waiting = false;
+            return $scope.form.date = new Date();
           });
         } else {
           $scope.message = {
             title: 'incompleteForm'
           };
-          return $scope.showModal("alert.html");
+          $scope.showModal("alert.html");
         }
+        return $scope.form.date = new Date();
       };
       $scope.init = function() {
         $scope.waiting = true;
@@ -338,6 +379,15 @@
         };
       };
       $scope.displayCreateForm = function() {
+        $scope.activesStyle = {
+          color: '#777'
+        };
+        $scope.doneStyle = {
+          color: '#777'
+        };
+        $scope.newStyle = {
+          color: '#333'
+        };
         $scope.waiting = true;
         return $translator.init($scope.lang).then(function() {
           $scope.currentNotification = null;

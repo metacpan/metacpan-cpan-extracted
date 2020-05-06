@@ -13,18 +13,19 @@ my $bp = Device::BusPirate->new(
    fh => [], # unused
 );
 
-# Check that ->write uses ->_syswrite
+# Check that ->write uses Future::IO
 {
    my $buf = "";
 
    no warnings 'redefine';
-   local *Device::BusPirate::_syswrite = sub {
+   local *Future::IO::syswrite_exactly = sub {
       $buf .= $_[2];
+      return Future->done( length $_[2] );
    };
 
    $bp->write( "ABC" );
 
-   is( $buf, "ABC", '->write invokes _syswrite' );
+   is( $buf, "ABC", '->write uses Future::IO->syswrite_exactly' );
 }
 
 # Check that ->read uses Future::IO

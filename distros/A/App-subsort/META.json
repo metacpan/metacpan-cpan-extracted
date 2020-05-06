@@ -31,11 +31,11 @@
          "requires" : {
             "Complete::File" : "0.440",
             "Complete::Module" : "0",
-            "Complete::Sah" : "0",
+            "Complete::Sah" : "0.005",
             "Complete::Sequence" : "0.002",
             "Complete::Util" : "0.608",
-            "Getopt::Long::More" : "0.006",
-            "Log::ger" : "0.027",
+            "Getopt::Long::More" : "0.007",
+            "Log::ger" : "0.037",
             "Module::List::Tiny" : "0",
             "Sort::Sub" : "0.118",
             "perl" : "5.010001",
@@ -64,7 +64,7 @@
          "web" : "https://github.com/perlancar/perl-App-subsort"
       }
    },
-   "version" : "0.045",
+   "version" : "0.046",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -152,11 +152,6 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::FileFinder::ByName",
-            "name" : "@Author::PERLANCAR/FileFinder::ByName PERLANCAR",
-            "version" : "6.012"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::PERLANCAR/ExecDir script",
             "version" : "6.012"
@@ -164,7 +159,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.599"
+            "version" : "0.600"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -389,7 +384,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
-                        "version" : "0.081"
+                        "version" : "0.082"
                      }
                   ]
                }
@@ -455,12 +450,14 @@
             "config" : {
                "Dist::Zilla::Plugin::Test::Perl::Critic::Subset" : {
                   "finder" : [
-                     "@Author::PERLANCAR/FileFinder::ByName PERLANCAR"
+                     ":ExecFiles",
+                     ":InstallModules",
+                     ":TestFiles"
                   ]
                }
             },
             "name" : "@Author::PERLANCAR/Test::Perl::Critic::Subset",
-            "version" : "3.001.003"
+            "version" : "3.001.005"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",

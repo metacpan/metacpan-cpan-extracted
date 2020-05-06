@@ -17,7 +17,7 @@ use Module::Build;
 use strict;
 use warnings;
 
-my $libvirtver = "6.1.0";
+my $libvirtver = "6.3.0";
 my $stat = system "pkg-config --atleast-version=$libvirtver libvirt";
 die "cannot run pkg-config to check libvirt version" if $stat == -1;
 die "libvirt >= $libvirtver is required\n" unless $stat == 0;
@@ -73,7 +73,7 @@ my $b = Module::Build->new(
     dist_author => 'Daniel Berrange <dan@berrange.com>',
     dist_abstract => 'libvirt Perl API',
     requires => {
-        'perl' => '5.8.0',
+        'perl' => '5.16.0',
     },
     extra_compiler_flags => $GCC_CFLAGS . $LIBVIRT_CFLAGS,
     extra_linker_flags => $LIBVIRT_LIBS,
@@ -93,7 +93,7 @@ my $b = Module::Build->new(
         resources => {
             license => "http://www.gnu.org/licenses/gpl.html",
             homepage =>  "http://libvirt.org/",
-            repository => "https://libvirt.org/git/?p=libvirt-perl.git;a=summary",
+            repository => "https://gitlab.com/libvirt/libvirt-perl",
             MailingList => "http://www.redhat.com/mailman/listinfo/libvir-list",
         },
     },

@@ -23,6 +23,11 @@ sub HASHfromSample
 
    ok( defined $histogram, 'defined $histogram' );
 
+   is_deeply( [ $histogram->bucket_bounds ],
+      [ 1, 2, 5 ],
+      '$histogram->bucket_bounds'
+   );
+
    is_deeply( [ map { HASHfromSample( $_ ) } $histogram->samples ],
       [
          # Slightly fragile as we depend on 'count' coming before 'sum'
@@ -84,6 +89,51 @@ sub HASHfromSample
          );
       }, 'Histogram with non-monotonic buckets dies'
    );
+}
+
+# Decade buckets
+{
+   my $hist;
+
+   # Large
+   $hist = Net::Prometheus::Histogram->new(
+      name => "large",
+      help => "A large value",
+      bucket_min => 1, bucket_max => 1E6
+   );
+
+   is_deeply( [ $hist->bucket_bounds ],
+      [ 1E0, 1E1, 1E2, 1E3, 1E4, 1E5, 1E6 ],
+      'buckets for 1 to 1E6' );
+
+   # Small
+   $hist = Net::Prometheus::Histogram->new(
+      name => "small",
+      help => "A small value",
+      bucket_min => 1E-6, bucket_max => 1,
+   );
+
+   is_deeply( [ $hist->bucket_bounds ],
+      [ 1E-6, 1E-5, 1E-4, 1E-3, 1E-2, 1E-1, 1E0 ],
+      'buckets for 1E-6 to 1' );
+}
+
+# Custom buckets
+{
+   # Generate E6 values
+   my $hist = Net::Prometheus::Histogram->new(
+      name => "E6",
+      help => "Engineering E6 series",
+      bucket_min => 1,
+      buckets_per_decade => [ 1, 1.5, 2.2, 3.3, 4.7, 6.8 ],
+   );
+
+   is_deeply( [ $hist->bucket_bounds ],
+      [  1.0, 1.5, 2.2, 3.3, 4.7, 6.8,
+          10,  15,  22,  33,  47,  68,
+         100, 150, 220, 330, 470, 680,
+        1000 ],
+     'buckets for custom values per decade' );
 }
 
 done_testing;

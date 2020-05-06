@@ -312,6 +312,7 @@ llapp.controller 'TreeCtrl', [
 				data:
 					description: "New app description"
 					uri: "https://test.example.com/"
+					tooltip: "New app tooltip"
 					logo: "network.png"
 					display: "auto"
 
@@ -338,6 +339,7 @@ llapp.controller 'TreeCtrl', [
 					type: ''
 					rule: ''
 					logo: ''
+					level: ''
 					label: ''
 					over: []
 

@@ -1,9 +1,10 @@
 use Test::More;
 use strict;
 use IO::String;
+use JSON qw(from_json);
 
 my $res;
-my $maintests = 10;
+my $maintests = 17;
 require 't/test-lib.pm';
 my $file = tempdb();
 
@@ -105,7 +106,8 @@ q{INSERT INTO notifications VALUES ('rtyler','testref2','2050-05-30 00:00:00',?,
                 notificationStorageOptions => {
                     dbiChain => "dbi:SQLite:dbname=$file",
                 },
-                oldNotifFormat => 0,
+                oldNotifFormat        => 0,
+                notificationsExplorer => 1
             }
         }
     );
@@ -129,9 +131,9 @@ q{INSERT INTO notifications VALUES ('rtyler','testref2','2050-05-30 00:00:00',?,
           /<input type="hidden" name="reference[\dx]+" value="(\w+?)">/gs );
     ok( @refs == 2, 'Two notification references found' )
       or print STDERR Dumper( $res->[2]->[0] );
-    ok( @refs[0] eq 'testref2', '1st reference found is "testref2"' )
+    ok( $refs[0] eq 'testref2', '1st reference found is "testref2"' )
       or print STDERR Dumper( $res->[2]->[0] );
-    ok( @refs[1] eq 'testref', '2nd reference found is "testref"' )
+    ok( $refs[1] eq 'testref', '2nd reference found is "testref"' )
       or print STDERR Dumper( $res->[2]->[0] );
     expectForm( $res, undef, '/notifback', 'reference1x1', 'url' );
 
@@ -179,7 +181,7 @@ q{INSERT INTO notifications VALUES ('rtyler','testref2','2050-05-30 00:00:00',?,
         !defined( $cookies->{lemonldappdata} ),
         " Make sure no pdata is returned"
     );
-    $client->logout($id);
+    $id = expectCookie($res);
 
     # Verify that notification was tagged as 'done'
     my $sth =
@@ -188,6 +190,32 @@ q{INSERT INTO notifications VALUES ('rtyler','testref2','2050-05-30 00:00:00',?,
     my $i = 0;
     while ( $sth->fetchrow_hashref ) { $i++ }
     ok( $i == 2, 'Notification was deleted' );
+
+    # GET notifications explorer
+    ok(
+        $res = $client->_get(
+            '/mynotifications', cookie => "lemonldap=$id",
+        ),
+        'Notifications explorer query'
+    );
+
+    my $json;
+    ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
+      or print STDERR "$@\n" . Dumper($res);
+    ok( $json->{result} == 2, ' Result is 2' )
+      or explain( $json, "result => 2" );
+    ok( $json->{MSG} == 'myNotifications', ' MSG is myNotifications' )
+      or explain( $json, "result => 2" );
+    ok( $json->{NOTIFICATIONS}->[0]->{reference} =~ /testref2?/,
+        ' Notification 1 found' )
+      or explain( $json, "Notification 1" );
+    ok( $json->{NOTIFICATIONS}->[0]->{reference} =~ /testref2?/,
+        ' Notification 2 found' )
+      or explain( $json, "Notification 2" );
+    ok( $json->{NOTIFICATIONS}->[0]->{epoch} =~ /\d{10}/, ' epoch found' )
+      or explain( $json, "Epoch found" );
+
+    $client->logout($id);
 
     # Try to authenticate
     # -------------------

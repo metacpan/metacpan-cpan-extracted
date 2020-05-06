@@ -5,7 +5,7 @@ use Mouse;
 use Lemonldap::NG::Portal::Main::Constants
   qw( PE_OK PE_BADCREDENTIALS PE_IMPERSONATION_SERVICE_NOT_ALLOWED PE_MALFORMEDUSER );
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -23,30 +23,23 @@ sub hAttr {
 
 sub init {
     my ($self) = @_;
-    my $hd = $self->p->HANDLER;
 
-    # Parse activation rule
-    $self->logger->debug(
-        "Impersonation rule -> " . $self->conf->{impersonationRule} );
-    my $rule =
-      $hd->buildSub( $hd->substitute( $self->conf->{impersonationRule} ) );
-    unless ($rule) {
-        $self->error( "Bad impersonation rule -> " . $hd->tsv->{jail}->error );
-        return 0;
-    }
-    $self->rule($rule);
+    # Parse Impersonation rules
+    $self->rule(
+        $self->p->buildRule(
+            $self->conf->{impersonationRule}, 'impersonation'
+        )
+    );
+    return 0 unless $self->rule;
 
-    # Parse identity rule
-    $self->logger->debug( "Impersonation identities rule -> "
-          . $self->conf->{impersonationIdRule} );
-    $rule =
-      $hd->buildSub( $hd->substitute( $self->conf->{impersonationIdRule} ) );
-    unless ($rule) {
-        $self->error(
-            "Bad impersonation identities rule -> " . $hd->tsv->{jail}->error );
-        return 0;
-    }
-    $self->idRule($rule);
+    $self->idRule(
+        $self->p->buildRule(
+            $self->conf->{impersonationIdRule},
+            'impersonationId'
+        )
+    );
+    return 0 unless $self->idRule;
+
     return 1;
 }
 
@@ -115,13 +108,6 @@ sub run {
         }
     }
 
-    # Update spoof session
-    $self->logger->debug("Populating spoof session...");
-    foreach (qw (_auth _userDB authenticationLevel)) {
-        $self->logger->debug("Processing $_...");
-        $spoofSession->{$_} = $realSession->{"$self->{conf}->{impersonationPrefix}$_"};
-    }
-
     # Merging SSO Groups and hGroups & dedup
     $spoofSession->{groups}  ||= '';
     $spoofSession->{hGroups} ||= {};
@@ -188,12 +174,10 @@ sub _userData {
     my $raz = 0;
 
     # Compute Macros and Groups with real and spoof sessions
-    $req->{sessionInfo} = {%$realSession};
-
-    # Search user in database
+    $req->sessionInfo($realSession);
     $req->steps( [
-            'getUser',   'setSessionInfo',
-            'setMacros', 'setGroups',
+            'getUser',        'setAuthSessionInfo',
+            'setSessionInfo', $self->p->groupsAndMacros,
             'setLocalGroups'
         ]
     );
@@ -227,9 +211,8 @@ sub _userData {
         $req->{sessionInfo} = {%$realSession};
         $req->{user}        = $realId;
         $req->steps( [
-                'getUser',   'setSessionInfo',
-                'setMacros', 'setGroups',
-                'setLocalGroups'
+                'getUser',                 'setSessionInfo',
+                $self->p->groupsAndMacros, 'setLocalGroups'
             ]
         );
         $self->logger->debug('Spoof session equal real session');
@@ -239,6 +222,19 @@ sub _userData {
             $req->error($error);
         }
     }
+
+    # Compute groups & macros again with real authenticationLevel
+    $req->sessionInfo->{authenticationLevel} =
+      $realSession->{real_authenticationLevel};
+    delete $req->sessionInfo->{groups};
+    $req->steps(
+        [ 'setSessionInfo', $self->p->groupsAndMacros, 'setLocalGroups' ] );
+    if ( my $error = $self->p->process($req) ) {
+        $self->logger->debug("Impersonation: Process returned error: $error");
+        $req->error($error);
+    }
+
+    $self->logger->debug("Return \"$req->{user}\" sessionInfo");
     return $req->{sessionInfo};
 }
 

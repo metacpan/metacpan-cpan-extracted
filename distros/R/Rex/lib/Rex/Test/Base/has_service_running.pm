@@ -9,7 +9,7 @@ package Rex::Test::Base::has_service_running;
 use strict;
 use warnings;
 
-our $VERSION = '1.9.0'; # VERSION
+our $VERSION = '1.10.0'; # VERSION
 
 use Rex -base;
 use base qw(Rex::Test::Base);

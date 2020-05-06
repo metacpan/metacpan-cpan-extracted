@@ -5,19 +5,29 @@ use Pcore::Util::Scalar qw[is_plain_arrayref];
 
 has api_key     => ( required => 1 );
 has proxy       => ();
-has max_threads => 10;
+has max_threads => 2;
 
-has _semaphore => sub ($self) { Coro::Semaphore->new( $self->{max_threads} ) }, is => 'lazy';
+has _semaphore => ();
+
+sub BUILD ( $self, $args ) {
+    $self->{api_key} = [ $self->{api_key} ] if !is_plain_arrayref $self->{api_key};
+
+    return;
+}
 
 # up to 200 domains
 sub check_domains ( $self, $domains ) {
-    my $guard = $self->{max_threads} && $self->_semaphore->guard;
+    my $api_key = shift $self->{api_key}->@*;
 
-    say 'run';
+    push $self->{api_key}->@*, $api_key;
+
+    my $sem = $self->{_semaphore}->{$api_key} //= Coro::Semaphore->new( $self->{max_threads} );
+
+    my $guard = $self->{max_threads} && $sem->guard;
 
     my $idx = { map { $_ => 0 } is_plain_arrayref $domains ? $domains->@* : $domains };
 
-    my $url = "https://www.namesilo.com/api/checkRegisterAvailability?version=1&type=xml&key=$self->{api_key}&domains=" . join ',', keys $idx->%*;
+    my $url = "https://www.namesilo.com/api/checkRegisterAvailability?version=1&type=xml&key=$api_key&domains=" . join ',', keys $idx->%*;
 
     my $res = P->http->get( $url, proxy => $self->{proxy} );
 

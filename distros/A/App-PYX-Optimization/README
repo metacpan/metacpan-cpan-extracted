@@ -1,0 +1,46 @@
+NAME
+    pyx-optimization - PYX optimization tool.
+
+SYNOPSIS
+     pyx-optimization [-h] [--version] [filename] [-]
+
+DESCRIPTION
+    This tool optimize PYX code. It removes trailing whitespace from data
+    and comment sections.
+
+ARGUMENTS
+    *       "-h"
+
+             Print help.
+
+    *       "--version"
+
+             Print version of script.
+
+    *       "filename"
+
+             PYX filename.
+
+    *       "-"
+
+             STDIN with PYX code.
+
+EXAMPLE
+     pyx-optimization __PYX_FILE__
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-PYX-Optimization>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2015-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

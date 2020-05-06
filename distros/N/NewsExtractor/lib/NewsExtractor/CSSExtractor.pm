@@ -18,6 +18,8 @@ sub _take {
 
     $self->dom->find("$sel style, $sel script")->map('remove');
     my $txt = "". $self->dom->find( $sel )->map('all_text')->join("\n\n");
+    return undef if $txt eq '';
+
     $txt =~ s/\s+$//;
     $txt =~ s/^\s+//;
     $txt = normalize_whitespace($txt);
@@ -27,17 +29,23 @@ sub _take {
 
 sub headline {
     my ($self) = @_;
-    return $self->_take($self->css_selector->headline);
+    my $ret = $self->_take($self->css_selector->headline) or return;
+    $ret =~ s/\n/ /g;
+    return normalize_whitespace($ret);
 }
 
 sub dateline {
     my ($self) = @_;
-    return $self->_take( $self->css_selector->dateline );
+    my $ret = $self->_take($self->css_selector->dateline) or return;
+    $ret =~ s/\n/ /g;
+    return normalize_whitespace($ret);
 }
 
 sub journalist {
     my ($self) = @_;
-    return $self->_take( $self->css_selector->journalist );
+    my $ret = $self->_take( $self->css_selector->journalist ) or return;
+    $ret =~ s/\n/ /g;
+    return normalize_whitespace($ret);
 }
 
 sub content_text {

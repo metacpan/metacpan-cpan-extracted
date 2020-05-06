@@ -8,7 +8,7 @@ our @ISA         = qw(Exporter);
 our %EXPORT_TAGS = ( 'all' => [qw()] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
 #our @EXPORT      = qw(error new not_before not_after serial);
-our $VERSION     = '0.52';
+our $VERSION = '0.53';
 my $parser = undef;
 my $asn    = undef;
 my $error  = undef;
@@ -766,6 +766,58 @@ sub SubjectAltName {
     }
     return undef;
 }
+
+=head2 DecodedSubjectAltNames
+
+Returns a pointer to an array of strings containing all the alternative subject name
+extensions.
+
+Each such extension is represented as a decoded ASN.1 value, i.e. a pointer to a list
+of pointers to objects, each object having a single key with the type of the alternative
+name and a value specific to that type.
+
+Example return value:
+
+  [
+    [
+      {
+        'directoryName' => {
+          'rdnSequence' => [
+            [
+              {
+                'value' => { 'utf8String' => 'example' },
+                'type' => '2.5.4.3'
+              }
+            ]
+          ]
+        }
+      },
+      {
+        'dNSName' => 'example.com'
+      }
+    ]
+  ]
+
+=cut back
+
+sub DecodedSubjectAltNames {
+    my $self = shift;
+    my @sans = ();
+    my $exts = $self->{'tbsCertificate'}->{'extensions'};
+    foreach my $ext ( @{$exts} ) {
+        if ( $ext->{'extnID'} eq '2.5.29.17' ) { #OID for subjectAltName
+            my $parsSubjAlt = _init('SubjectAltName');
+            my $altnames = $parsSubjAlt->decode( $ext->{'extnValue'} );
+            if ( $parsSubjAlt->error ) {
+                $self->{'_error'} = $parsSubjAlt->error;
+                return undef;
+            }
+            push @sans, $altnames;
+        }
+    }
+    return \@sans;
+}
+
 #########################################################################
 # accessors - authorityCertIssuer
 #########################################################################

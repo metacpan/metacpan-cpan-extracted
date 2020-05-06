@@ -1,9 +1,11 @@
 package Devel::ebug::Plugin::ActionPoints;
-$Devel::ebug::Plugin::ActionPoints::VERSION = '0.59';
+
 use strict;
 use warnings;
 use base qw(Exporter);
 our @EXPORT = qw(break_point break_point_delete break_point_subroutine break_points break_points_with_condition all_break_points_with_condition watch_point break_on_load);
+
+our $VERSION = '0.60'; # VERSION
 
 # set a break point (by default in the current file)
 sub break_point {
@@ -99,7 +101,7 @@ sub watch_point {
 sub break_on_load {
   my $self = shift;
   my($filename) = @_;
-  
+
   my $response = $self->talk({
     command   => "break_on_load",
     filename  => $filename,
@@ -108,3 +110,38 @@ sub break_on_load {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Devel::ebug::Plugin::ActionPoints
+
+=head1 VERSION
+
+version 0.60
+
+=head1 AUTHOR
+
+Original author: Leon Brocard E<lt>acme@astray.comE<gt>
+
+Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Brock Wilcox E<lt>awwaiid@thelackthereof.orgE<gt>
+
+Taisuke Yamada
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2005-2020 by Leon Brocard.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

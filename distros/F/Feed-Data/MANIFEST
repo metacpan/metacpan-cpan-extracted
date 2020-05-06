@@ -23,6 +23,7 @@ lib/Feed/Data/Parser/Meta.pm
 lib/Feed/Data/Parser/RSS.pm
 lib/Feed/Data/Parser/Table.pm
 lib/Feed/Data/Parser/Text.pm
+lib/Feed/Data/Parser/YAML.pm
 lib/Feed/Data/Stream.pm
 Makefile.PL
 MANIFEST			This list of files
@@ -40,6 +41,7 @@ t/08-okay.t
 t/09-json.t
 t/10-csv.t
 t/11-table.t
+t/12-yaml.t
 t/data/atom-10-example.xml
 t/data/atom-full.xml
 t/data/atom.xml
@@ -56,6 +58,7 @@ t/data/test.csv
 t/data/test.html
 t/data/test.json
 t/data/test.txt
+t/data/test.yml
 t/data/theory.atom
 t/data/theory.rss
 t/manifest.t

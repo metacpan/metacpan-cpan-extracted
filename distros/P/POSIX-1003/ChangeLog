@@ -2,20 +2,154 @@
 ====== version history of POSIX::1003
 
 All changes are made by Mark Overmeer, unless stated otherwise.
+# TODO:
 # . ::FS manual needs cleanup, f.i. split lists of constants
 # . the main component of exporter in POSIX::1003 useful enough to become
 #   a separate module.
 # . add epoll/epoll_ctl ?  Sys::Syscall
 # . add sendfile?  Sys::Sendfile
 # . add ioctl?
-# . add (bsd_)glob with its many flags
+# . add glob, fnmatch, wordexp  WDRE_ constants are enums
 # . add POSIX::RT::Semaphore logic?
 # . cleanup exampleValue(), probably doing too much
 # . charset of $!  strerror()  perl#119499
+# . linux: CAP_* capset etc
+# . linux: _LINUX_ properties
+# . *bsd: _BSD_ properties
+# . hpux: PRIV_*, pstat, priv_add_effective, priv_remove, privgrp
+# . aix: PV_*
+# . linux memfd* and F_*SEAL*
+# . *at() commands for FdIO
+# . proc  get/setpriority  (see BSD::Resource)
 
 # . implementation of nl_langinfo
 # . change in ::Module of detection of constants which need autogeneration
 # . charset of locale only via nl_langinfo(CODESET)
+
+version 1.00: Tue  5 May 14:49:33 CEST 2020
+
+FreeBSD has no _PC_LINK_MAX (t/62pathconf.t)
+http://www.cpantesters.org/cpan/report/153c7110-1a79-11e8-92d0-ae77c247440e
+Use _PC_FILESIZEBITS ?
+
+	Fixes:
+	- SETLK was missing
+	- The manual-page POSIX::1003::Fcntl was messed-up
+	- Use XPUSHs, not PUSHs [Lars Dɪᴇᴄᴋᴏᴡ 迪拉斯]
+
+	Improvements
+	- add AT_ constants for dirfd *at commands
+	- converted to GitHub
+
+version 0.99_08: Thu 17 Mar 12:10:13 CET 2016
+
+	Fixes:
+	- glob may return undef which is an SV*
+	- windows: no mknod
+	- cygwin glob test fails
+	- rlimit show example values of RLIM_
+
+	Improvements:
+	- rlimit display large contants as 2**
+	- added ::Time::strptime()
+	- use own ::Time::strftime() and ::mktime() with a simple hash
+	- added ::Proc::getpid() and ::getppid()
+	- add EPOLLEXCLUSIVE (Linux 4.5) EPOLLWAKEUP, and EPOLL_CLOEXEC
+
+version 0.99_07: Wed Apr  8 15:12:20 CEST 2015
+
+	Fixes:
+	- no glob() on Windows [cpantesters]
+	- freebsd glob error callback already shows trailing '/'
+	- export tags of some modules
+
+	Improvements:
+	- provide ::FS::fnmatch()
+	- remove preparations for unimplemented wordexp()
+	- start system/solaris.c [Abeltje]
+	- internally rename poll_table into events_table, to contain more
+	  collections.
+
+version 0.99_06: Tue Apr  7 09:51:30 CEST 2015
+
+	Fixes:
+	- openbsd has only one confstr.  Fix test [yary]
+	- windows major/minor/makedev/confstr/lockf missing [cpantesters]
+	- *posix_names failed for AF_DECnet, because of lowercase
+
+	Improvements:
+	- glob constants available everywhere (it seems)
+	- implementation of glob() interface and t/50glob.t
+	- document availability of ::FS::stat() and ::lstat()
+
+version 0.99_05: Wed Mar 18 11:44:50 CET 2015
+
+	Fixes:
+	- windows has other function with name strsignal
+
+	Improvements:
+	- extra LC_ constants
+	- locale POSIX or C fallback in manual.pl
+
+version 0.99_04: Wed Mar 11 23:10:22 CET 2015
+
+	Changes:
+	- removed ::FS export tag :perm (merged with :stat) because its
+	  role was too confusing.
+
+	Fixes:
+	- keep openbsd from testing ulimit
+	- keep systems from do not support ulimit from the attempt to
+	  test it.
+	- disable a few more things for Windows
+	- enforce locale en_US to produce (errno) tables
+
+	Improvements:
+	- separate table columns with '#'
+	- add SO_INCOMING_CPU, Linux 3.19
+	- add WRDE_* for wordexp to lists/glob.txt
+
+version 0.99_03: Fri Feb  6 22:28:40 CET 2015
+
+	Improvements:
+	- system/cygwin.c was missing from MANIFEST
+	- use diag to dump tables when AUTOMATED_TESTING
+	- do not use IO::File->close (breaks Perl 5.12)
+
+version 0.99_02: Tue Feb  3 11:44:33 CET 2015
+
+	Fixes:
+	- fix compilation for many platforms rt.cpan.org#101866 [Slaven Rezic]
+
+	Improvements:
+	- add system/cygwin.c
+	- other way to show defined constants in cpan-testers environment.
+	  Added t/99constindex.t
+
+version 0.99_01: Sat Jan 31 00:39:54 CET 2015
+
+	Fixes:
+	- openbsd build: skip ulimit
+	- add system/netbsd.c
+	- use in combinations with modules which use (old) POSIX
+
+	Improvements:
+	- added ::Socket
+	- change documentation style
+	- POLLRDHUP (linux 2.6.17)
+	- support linux >=3.15 file-private locks
+	- do not hack constants in Fcntl
+	- add GLOB_ and FMN_ constants
+	- math constants not from POSIX, to have them behave as
+	  all other constants.
+	- keep table of all missing labels, so we can warn for accidental
+	  typo's in constants.  ::Module::is_missing()
+	- include lists/locale.txt, lists/procs.txt, lists/os.txt,
+	  lists/math.txt, lists/time.txt, lists/user.txt
+	  do not use constants from POSIX:: anymore because they 'die'
+	  when missing.
+	- prefer core methods over POSIX versions.
+
 
 version 0.98: Tue Dec  3 08:31:16 CET 2013
 	Fixes:

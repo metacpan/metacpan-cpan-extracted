@@ -68,6 +68,9 @@ my @include = qw(
   Sub::Name
   YAML
   autodie
+  JSON::PP
+  Cpanel::JSON::XS
+  JSON::XS
 );
 
 my @exclude = qw(

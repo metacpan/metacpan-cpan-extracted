@@ -38,7 +38,8 @@ sub checkHeader {
     my $slave_header = 'HTTP_' . uc( $self->{conf}->{slaveHeaderName} );
     $slave_header =~ s/\-/_/g;
     my $headerContent = $req->env->{$slave_header};
-    $self->logger->debug("Required Slave header => $self->{conf}->{slaveHeaderName}");
+    $self->logger->debug(
+        "Required Slave header => $self->{conf}->{slaveHeaderName}");
     $self->logger->debug("Received Slave header content => $headerContent");
     return 1
       if (  $headerContent

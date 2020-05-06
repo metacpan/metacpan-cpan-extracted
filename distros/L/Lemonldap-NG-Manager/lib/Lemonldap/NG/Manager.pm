@@ -17,12 +17,15 @@ use JSON;
 use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::PSGI::Constants;
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Common::Conf::AccessLib',
   'Lemonldap::NG::Handler::PSGI::Router';
 
 has csp => ( is => 'rw' );
+
+has loadedPlugins  => ( is => 'rw', default => sub { [] } );
+has hLoadedPlugins => ( is => 'rw', default => sub { {} } );
 
 ## @method boolean init($args)
 # Launch initialization method
@@ -52,32 +55,50 @@ sub init {
         return 0;
     }
 
-    $self->{enabledModules} ||= "conf, sessions, notifications, 2ndFA";
+    my $conf = $self->confAcc->getConf;
+    $conf->{$_} = $args->{$_} foreach ( keys %$args );
+
+    $self->{enabledModules} ||= "conf, sessions, notifications, 2ndFA, api";
     my @links;
     my @enabledModules =
-      map { push @links, $_; "Lemonldap::NG::Manager::" . ucfirst($_) }
+      map {
+        my @res = ( "Lemonldap::NG::Manager::" . ucfirst($_) );
+        if ( my $tmp = $self->loadPlugin( @res, $conf ) ) {
+            $self->logger->debug("Plugin $_ loaded");
+            push @links, $_;
+            push @{ $self->loadedPlugins }, $tmp;
+            $self->hLoadedPlugins->{$_} = $tmp;
+        }
+        else {
+            $self->logger->error("Unable to load $_, skipping");
+            @res = ();
+        }
+        (@res);
+      }
       split( /[,\s]+/, $self->{enabledModules} );
-    extends 'Lemonldap::NG::Handler::PSGI::Router', @enabledModules;
-    my @working;
-    my $conf = $self->confAcc->getConf;
+    unless (@enabledModules) {
+        $self->logger->error('No plugins loaded, aborting');
+        return 0;
+    }
     unless ($conf) {
         require Lemonldap::NG::Manager::Conf::Zero;
         $conf = Lemonldap::NG::Manager::Conf::Zero::zeroConf();
     }
-    for ( my $i = 0 ; $i < @enabledModules ; $i++ ) {
-        my $mod = $enabledModules[$i];
-        no strict 'refs';
-        if ( &{"${mod}::addRoutes"}( $self, $conf ) ) {
-            $self->logger->debug("Module $mod enabled");
-            push @working, $mod;
-        }
-        else {
-            $links[$i] = undef;
-            $self->logger->error(
-                "Module $mod can not be enabled: " . $self->error );
-        }
-    }
-    return 0 unless (@working);
+
+    # TODO: -> loadPlugin
+    #for ( my $i = 0 ; $i < @enabledModules ; $i++ ) {
+    #    my $mod = $enabledModules[$i];
+    #    no strict 'refs';
+    #    if ( &{"${mod}::addRoutes"}( $self, $conf ) ) {
+    #        $self->logger->debug("Module $mod enabled");
+    #        push @working, $mod;
+    #    }
+    #    else {
+    #        $links[$i] = undef;
+    #        $self->logger->error(
+    #            "Module $mod can not be enabled: " . $self->error );
+    #    }
+    #}
     $self->addRoute( links     => 'links',  ['GET'] );
     $self->addRoute( 'psgi.js' => 'sendJs', ['GET'] );
 
@@ -88,13 +109,14 @@ sub init {
     );
 
     # Avoid restricted users to access configuration by default route
-    my $defaultMod       = $self->{defaultModule} || 'conf';
+    my $defaultMod = $self->{defaultModule} =
+      $self->{defaultModule} || $enabledModules[0];
     $self->logger->debug("Default module -> $defaultMod");
     my ($index) =
-      grep { $working[$_] =~ /::$defaultMod$/i } ( 0 .. $#working );
-    $index //= $#working;
+      grep { $enabledModules[$_] eq $defaultMod } ( 0 .. $#enabledModules );
+    $index //= 0;
     $self->logger->debug("Default index -> $index");
-    $self->defaultRoute( $working[$index]->defaultRoute );
+    $self->defaultRoute( $self->loadedPlugins->[$index]->defaultRoute );
 
 # Find out more glyphicones at https://www.w3schools.com/icons/bootstrap_icons_glyphicons.asp
     my $linksIcons = {
@@ -110,7 +132,7 @@ sub init {
         next unless ( defined $links[$i] );
         push @{ $self->links },
           {
-            target => $enabledModules[$i]->defaultRoute,
+            target => $self->loadedPlugins->[$i]->defaultRoute,
             title  => $links[$i],
             icon   => $linksIcons->{ $links[$i] }
           };
@@ -141,15 +163,22 @@ sub init {
 
 sub tplParams {
     my ( $self, $req ) = @_;
-    my $res = $self->brwRule->( $req, $req->{userData} ) || 0;
+    my $res = eval {
+        $self->hLoadedPlugins->{viewer}->brwRule->( $req, $req->{userData} );
+    } || 0;
     return ( VERSION => $VERSION, ALLOWBROWSER => $res );
 }
 
 sub javascript {
     my ( $self, $req ) = @_;
-    my $res       = $self->diffRule->( $req, $req->{userData} ) || 0;
-    my $impPrefix = $self->{impersonationPrefix};
-    my $ttl       = $self->{timeout} || 72000;
+    my $res = eval {
+             $self->hLoadedPlugins->{viewer}
+          && $self->hLoadedPlugins->{viewer}
+          ->diffRule->( $req, $req->{userData} );
+    } || 0;
+    print STDERR $@ if $@;
+    my $impPrefix = $self->{impersonationPrefix} || 'real_';
+    my $ttl       = $self->{timeout}             || 72000;
 
     return
 'var formPrefix=staticPrefix+"forms/";var confPrefix=scriptname+"confs/";var viewPrefix=scriptname+"view/";'
@@ -174,6 +203,32 @@ sub sendHtml {
       'X-Frame-Options'         => 'DENY',
       'X-XSS-Protection'        => '1; mode=block';
     return $res;
+}
+
+sub loadPlugin {
+    my ( $self, $plugin, $conf ) = @_;
+    unless ($plugin) {
+        require Carp;
+        Carp::confess('Calling loadPugin without arg !');
+    }
+    my $obj;
+    $plugin = "Lemonldap::NG::Manager$plugin" if ( $plugin =~ /^::/ );
+
+    eval "require $plugin";
+    if ($@) {
+        $self->logger->error("$plugin load error: $@");
+        return 0;
+    }
+    eval {
+        $obj = $plugin->new( { p => $self, conf => $conf } );
+        $self->logger->debug("Module $plugin loaded");
+    };
+    if ($@) {
+        $self->error("Unable to build $plugin object: $@");
+        return 0;
+    }
+    ( $obj and $obj->init($conf) ) or return 0;
+    return $obj;
 }
 
 1;

@@ -43,11 +43,11 @@ Storey
 Story
 Types
 WebService
-Will
+William
 autarch
 distro
 drolsky
 goschwald
 lib
 rafl
-will
+wstorey

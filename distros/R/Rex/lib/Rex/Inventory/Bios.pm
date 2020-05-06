@@ -9,7 +9,7 @@ package Rex::Inventory::Bios;
 use strict;
 use warnings;
 
-our $VERSION = '1.9.0'; # VERSION
+our $VERSION = '1.10.0'; # VERSION
 
 use Rex::Hardware::Host;
 use Rex::Logger;

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Cwd;
-our $VERSION = "1.92";
+our $VERSION = "1.93";
 
 #----------------------------------------------------------------------
 # Create object that returns files in a directory tree
@@ -117,7 +117,7 @@ sub initialize {
         $self->{$key} = $value if length $value;
     }
 
-     $self = bless($self, $pkg);
+    $self = bless($self, $pkg);
 
     $self->add_configurations($pkg, %configuration);
     $self->add_subpackages(%configuration);

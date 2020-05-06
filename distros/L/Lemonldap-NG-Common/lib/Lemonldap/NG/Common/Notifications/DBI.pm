@@ -11,7 +11,7 @@ use Time::Local;
 use DBI;
 use Encode;
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Common::Notifications';
 
@@ -92,6 +92,36 @@ sub get {
     return $result;
 }
 
+# Returns accepted notifications corresponding to the user $uid.
+# If $ref is set, returns only notification corresponding to this reference.
+sub getAccepted {
+    my ( $self, $uid, $ref ) = @_;
+    return () unless ($uid);
+    $self->_execute(
+        "SELECT * FROM "
+          . $self->dbiTable
+          . " WHERE uid=? AND ref=? ORDER BY date",
+        $uid,
+        ( $ref ? $ref : () )
+    ) or return ();
+    my $result;
+    while ( my $h = $self->sth->fetchrow_hashref() ) {
+
+        # Get XML message
+        my $xml = $h->{xml};
+
+        # Decode it to get the correct uncoded string
+        Encode::from_to( $xml, "utf8", "iso-8859-1", Encode::FB_CROAK );
+
+        # Store message in result
+        my $identifier =
+          &getIdentifier( $self, $h->{uid}, $h->{ref}, $h->{date} );
+        $result->{$identifier} = $xml;
+    }
+    $self->logger->warn( $self->sth->err() ) if ( $self->sth->err() );
+    return $result;
+}
+
 ## @method hashref getAll()
 # Return all pending notifications.
 # @return hashref where keys are internal reference and values are hashref with
@@ -120,9 +150,7 @@ sub getAll {
 # keys date, uid, ref and condition.
 sub getExisting {
     my $self = shift;
-    $self->_execute( 'SELECT * FROM '
-          . $self->dbiTable
-          . ' ORDER BY date' );
+    $self->_execute( 'SELECT * FROM ' . $self->dbiTable . ' ORDER BY date' );
     my $result;
     while ( my $h = $self->sth->fetchrow_hashref() ) {
         $result->{"$h->{date}#$h->{uid}#$h->{ref}"} = {
@@ -194,7 +222,12 @@ sub purge {
 # @return true if succeed
 sub newNotif {
     my ( $self, $date, $uid, $ref, $condition, $xml ) = @_;
-
+    my @t = split( /\D+/, $date );
+    $t[1]--;
+    eval {
+        timelocal( $t[5] || 0, $t[4] || 0, $t[3] || 0, $t[2], $t[1], $t[0] );
+    };
+    return ( 0, "Bad date" ) if ($@);
     my $res =
       $condition =~ /.+/
       ? $self->_execute( 'INSERT INTO '
@@ -220,8 +253,15 @@ sub getDone {
     my $result;
     while ( my $h = $self->sth->fetchrow_hashref() ) {
         my @t = split( /\D+/, $h->{date} );
-        my $done =
-          timelocal( $t[5] || 0, $t[4] || 0, $t[3] || 0, $t[2], $t[1], $t[0] );
+        $t[1]--;
+        my $done = eval {
+            timelocal( $t[5] || 0, $t[4] || 0, $t[3] || 0, $t[2], $t[1],
+                $t[0] );
+        };
+        if ($@) {
+            $self->logger->warn("Bad date: $h->{date}");
+            return {};
+        }
         $result->{"$h->{date}#$h->{uid}#$h->{ref}"} =
           { notified => $done, uid => $h->{uid}, ref => $h->{ref}, };
     }

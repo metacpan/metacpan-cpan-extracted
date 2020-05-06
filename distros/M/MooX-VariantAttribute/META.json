@@ -4,7 +4,7 @@
       "Robert Acock <thisusedtobeanemail@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -46,7 +46,7 @@
    "provides" : {
       "MooX::VariantAttribute" : {
          "file" : "lib/MooX/VariantAttribute.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "MooX::VariantAttribute::Role" : {
          "file" : "lib/MooX/VariantAttribute/Role.pm"
@@ -60,6 +60,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/MooX-VariantAttribute"
       }
    },
-   "version" : "0.09",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

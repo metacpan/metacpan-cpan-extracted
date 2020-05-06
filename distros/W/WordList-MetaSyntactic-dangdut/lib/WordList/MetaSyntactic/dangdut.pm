@@ -1,9 +1,11 @@
 package WordList::MetaSyntactic::dangdut;
 
-our $DATE = '2016-06-08'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-01'; # DATE
+our $DIST = 'WordList-MetaSyntactic-dangdut'; # DIST
+our $VERSION = '0.003'; # VERSION
 
-use parent qw(WordList::MetaSyntactic);
+use parent qw(WordListBase::MetaSyntactic);
 
 1;
 # ABSTRACT: Wordlist from Acme::MetaSyntactic::dangdut
@@ -20,7 +22,7 @@ WordList::MetaSyntactic::dangdut - Wordlist from Acme::MetaSyntactic::dangdut
 
 =head1 VERSION
 
-This document describes version 0.002 of WordList::MetaSyntactic::dangdut (from Perl distribution WordList-MetaSyntactic-dangdut), released on 2016-06-08.
+This document describes version 0.003 of WordList::MetaSyntactic::dangdut (from Perl distribution WordList-MetaSyntactic-dangdut), released on 2020-05-01.
 
 =head1 HOMEPAGE
 
@@ -40,8 +42,6 @@ feature.
 
 =head1 SEE ALSO
 
-L<WordList::MetaSyntactic>
-
 L<WordList>
 
 =head1 AUTHOR
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

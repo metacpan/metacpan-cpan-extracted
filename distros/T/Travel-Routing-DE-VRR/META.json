@@ -1,12 +1,12 @@
 {
    "abstract" : "unofficial interface to the efa.vrr.de German itinerary service",
    "author" : [
-      "Copyright (C) 2009-2015 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>"
+      "Copyright (C) 2009-2020 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4231",
    "license" : [
-      "unrestricted"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -43,31 +43,34 @@
    "provides" : {
       "Travel::Routing::DE::EFA" : {
          "file" : "lib/Travel/Routing/DE/EFA.pm",
-         "version" : "2.18"
+         "version" : "2.19"
       },
       "Travel::Routing::DE::EFA::Route" : {
          "file" : "lib/Travel/Routing/DE/EFA/Route.pm",
-         "version" : "2.18"
+         "version" : "2.19"
       },
       "Travel::Routing::DE::EFA::Route::Message" : {
          "file" : "lib/Travel/Routing/DE/EFA/Route/Message.pm",
-         "version" : "2.18"
+         "version" : "2.19"
       },
       "Travel::Routing::DE::EFA::Route::Part" : {
          "file" : "lib/Travel/Routing/DE/EFA/Route/Part.pm",
-         "version" : "2.18"
+         "version" : "2.19"
       },
       "Travel::Routing::DE::VRR" : {
          "file" : "lib/Travel/Routing/DE/VRR.pm",
-         "version" : "2.18"
+         "version" : "2.19"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "url" : "https://github.com/derf/Travel-Routing-DE-VRR"
       }
    },
-   "version" : "2.18",
+   "version" : "2.19",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

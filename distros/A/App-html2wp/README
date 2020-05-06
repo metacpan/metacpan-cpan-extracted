@@ -1,0 +1,164 @@
+NAME
+    App::html2wp - Publish HTML document to WordPress as blog post
+
+VERSION
+    This document describes version 0.004 of App::html2wp (from Perl
+    distribution App-html2wp), released on 2020-05-01.
+
+FUNCTIONS
+  html2wp
+    Usage:
+
+     html2wp(%args) -> [status, msg, payload, meta]
+
+    Publish HTML document to WordPress as blog post.
+
+    To use this program, first create "~/html2wp.conf" containing the API
+    credentials, e.g.:
+
+     proxy=https://YOURBLOGNAME.wordpress.com/xmlrpc.php
+     username=YOURUSERNAME
+     password=YOURPASSWORD
+
+    You can also put multiple credentials in the configuration file using
+    profile sections, e.g.:
+
+     [profile=blog1]
+     proxy=https://YOURBLOG1NAME.wordpress.com/xmlrpc.php
+     username=YOURUSERNAME
+     password=YOURPASSWORD
+ 
+     [profile=blog2]
+     proxy=https://YOURBLOG2NAME.wordpress.com/xmlrpc.php
+     username=YOURUSERNAME
+     password=YOURPASSWORD
+
+    and specify which profile you want using command-line option e.g.
+    "--config-profile blog1".
+
+    then:
+
+     % html2wp post1.html
+
+    (You should provide blog post title in your HTML in the "<title>" or
+    "<meta name="title" content="...">". You can also put categories in
+    "<meta name="categories" content="cat1,cat2,...">" and tags in "<meta
+    name="tags" content="tag1,tag2,...">".)
+
+    The above command will create a draft post. To publish directly:
+
+     % html2wp post1.html ... --publish
+
+    Note that this will also modify your HTML file and insert this element
+    at the beginning of the document:
+
+     <meta name="postid" content="1234">
+
+    where 1234 is the post ID retrieved from the server when creating the
+    post.
+
+    After the post is created, you can update using the same command:
+
+     % html2wp post1.html
+
+    You can use "--publish" to publish the post, or "--no-publish" to revert
+    it to draft.
+
+    To set more attributes:
+
+     % html2wp post1.html ... --comment-status open \ --extra-attr
+         ping_status=closed --extra-attr sticky=1
+
+    Another example, to schedule a post in the future:
+
+     % html2wp post1.html --schedule 20301225T00:00:00
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   comment_status => *str* (default: "closed")
+
+        Whether to allow comments (open) or not (closed).
+
+    *   extra_attrs => *hash*
+
+        Set extra post attributes, e.g. ping_status, post_format, etc.
+
+    *   filename* => *filename*
+
+        Path to HTML document to publish.
+
+    *   password* => *str*
+
+    *   proxy* => *str*
+
+        Example: C<https://YOURBLOGNAME.wordpress.com/xmlrpc.php>.
+
+    *   publish => *bool*
+
+        Whether to publish post or make it a draft.
+
+        Equivalent to "--extra-attr post_status=published", while
+        "--no-publish" is equivalent to "--extra-attr post_status=draft".
+
+    *   schedule => *date*
+
+        Schedule post to be published sometime in the future.
+
+        Equivalent to "--publish --extra-attr post_date=DATE". Note that
+        WordPress accepts date in the "YYYYMMDD"T"HH:MM:SS" format, but you
+        specify this option in regular ISO8601 format. Also note that time
+        is in your chosen local timezone setting.
+
+    *   username* => *str*
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-html2wp>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-html2wp>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-html2wp>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    org2wp.
+
+    pod2wp.
+
+    wp-xmlrpc.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

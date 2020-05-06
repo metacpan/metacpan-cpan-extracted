@@ -1,42 +1,66 @@
-0.266   2018-03-22 (PERLANCAR)
+0.269   2020-05-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Enable logging in CLI.
+
+
+0.268   2020-05-02  Released-By: PERLANCAR; Urgency: medium
+
+	- CLI now streams output; output starts immediately.
+
+        - Do not stop when a WordList::* module cannot be loaded; print error
+          message but continue.
+
+	- [removed] Remove option --random (-r) to ease transition to
+	  streaming output.
+
+	- wordlist -l --detail now also shows module path.
+
+
+0.267   2020-05-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Remove --type (-t) option; remove the use of deprecated
+	  WordList::Namespace.
+
+
+0.266   2018-03-22  Released-By: PERLANCAR
 
 	- Use WordList::Namespace.
 
 
-0.265   2018-03-19 (PERLANCAR)
+0.265   2018-03-19  Released-By: PERLANCAR
 
 	- Remove support for WordListC::* modules (WordListC was an
 	  experiment).
 
 
-0.264   2018-02-20 (PERLANCAR)
+0.264   2018-02-20  Released-By: PERLANCAR
 
 	- Support WordListC modules.
 
 
-0.263   2018-01-07 (PERLANCAR)
+0.263   2018-01-07  Released-By: PERLANCAR
 
 	- Highlight matching string, add option --color.
 
 
-0.262   2017-12-24 (PERLANCAR)
+0.262   2017-12-24  Released-By: PERLANCAR
 
 	- [Bugfix] Use length in graphemes instead of codepoints.
 
 
-0.261   2017-11-08 (PERLANCAR)
+0.261   2017-11-08  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Make %arg_wordlists accessible from other packages.
 
 
-0.260   2017-11-07 (PERLANCAR)
+0.260   2017-11-07  Released-By: PERLANCAR
 
 	- Add options --num (-n) & --random (-r).
 
 
-0.25    2016-09-26 (PERLANCAR)
+0.25    2016-09-26  Released-By: PERLANCAR
 
         - Exclude WordList::Base::* and WordList::MetaSyntactic because they are
           only base classes and not real wordlists.
@@ -44,51 +68,51 @@
         - [doc] Add example demonstrating --detail.
 
 
-0.24    2016-04-15 (PERLANCAR)
+0.24    2016-04-15  Released-By: PERLANCAR
 
 	- Makes --detail also cause grep result to contain wordlist name.
 
 	- Accept multiple -t & --lang.
 
 
-0.23    2016-04-15 (PERLANCAR)
+0.23    2016-04-15  Released-By: PERLANCAR
 
 	- [Bugfix] Fix completion for --lang.
 
 
-0.22    2016-04-15 (PERLANCAR)
+0.22    2016-04-15  Released-By: PERLANCAR
 
 	- Add options: --type (-t), --lang.
 
 	- [Bugfix] Fix logic error in doing -L which caused empty result.
 
 
-0.21    2016-02-29 (PERLANCAR)
+0.21    2016-02-29  Released-By: PERLANCAR
 
 	- Strip /^WordList::/ in output of -L, like in -l.
 
 	- Adjust to App::lcpan::Call 0.07.
 
 
-0.20    2016-02-06 (PERLANCAR)
+0.20    2016-02-06  Released-By: PERLANCAR
 
 	- [build] Rebuild with new App-GenPericmdCompleterScript 0.08 which
           fixes tab completion (update to Complete::Bash 0.27).
 
 
-0.19    2016-02-05 (PERLANCAR)
+0.19    2016-02-05  Released-By: PERLANCAR
 
 	- [Bugfix] decode argument to utf8 to make Unicode grepping work.
 
 
-0.18    2016-01-18 (PERLANCAR)
+0.18    2016-01-18  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to fix POD section ordering.
 
 
-0.17    2016-01-15 (PERLANCAR)
+0.17    2016-01-15  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -98,14 +122,14 @@
         - Add/update examples.
 
 
-0.16    2016-01-14 (PERLANCAR)
+0.16    2016-01-14  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to fix completer script.
 
 
-0.15    2016-01-14 (PERLANCAR)
+0.15    2016-01-14  Released-By: PERLANCAR
 
         - [Bugfix] Enable utf8 output.
 
@@ -113,14 +137,14 @@
           dependencies.
 
 
-0.14    2016-01-08 (PERLANCAR)
+0.14    2016-01-08  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Don't show results in POD (no need, very large).
 
 
-0.13    2016-01-07 (PERLANCAR)
+0.13    2016-01-07  Released-By: PERLANCAR
 
         - First (WordList::*-based) release. The older versions are based on
           Games::Word::Wordlist::* and is now moved to App-GamesWordlist

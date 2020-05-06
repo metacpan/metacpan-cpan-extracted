@@ -1,5 +1,9 @@
 Revision history for Perl module Test::Class::Tiny
 
+0.03 Sun 3 May 2020
+- Make assertions show the line number accurately. (Previously they showed
+  the line number where runtests() was called.)
+
 0.02 Sun 19 Jan 2020
 - Fix execution of startup/setup/teardown/shutdown methods.
 - Allow suffix-style naming alongside prefix-style naming.

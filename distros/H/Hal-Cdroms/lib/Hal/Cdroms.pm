@@ -1,8 +1,9 @@
 package Hal::Cdroms;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Copyright (C) 2008 Mandriva
+# Copyright (C) 2020 Mageia
 #
 # This program is free software; You can redistribute it and/or modify
 # it under the same terms as Perl itself. Either:
@@ -20,31 +21,32 @@ our $VERSION = 0.04;
 
 =head1 NAME
 
-Hal::Cdroms - access cdroms through HAL and D-Bus
+Hal::Cdroms - access removable media containing CD filesystems through UDisks2 and D-Bus
 
 =head1 SYNOPSIS
 
   use Hal::Cdroms;
 
-  my $hal_cdroms = Hal::Cdroms->new;
+  my $cdroms = Hal::Cdroms->new;
 
-  foreach my $hal_path ($hal_cdroms->list) {
-     my $m = $hal_cdroms->get_mount_point($hal_path);
-     print "$hal_path ", $m ? "is mounted in $m" : "is not mounted", "\n";
+  foreach my $udisks_path ($cdroms->list) {
+     my $m = $cdroms->get_mount_point($udisks_path);
+     print "$udisks_path ", $m ? "is mounted in $m" : "is not mounted", "\n";
   }
 
-  my $hal_path = $hal_cdroms->wait_for_insert;
-  my $m = $hal_cdroms->mount($hal_path);
-  print "$hal_path is now mounted in $m\n";
+  my $udisks_path = $cdroms->wait_for_insert;
+  my $m = $cdroms->mount($udisks_path);
+  print "$udisks_path is now mounted in $m\n";
 
 =head1 DESCRIPTION
 
-Access cdroms through HAL and D-Bus.
+Access removable media containing CD filesystems (iso9660 and udf) through
+UDisks2 and D-Bus. This includes CD-ROMS, DVD-ROMS, and USB flash drives.
 
 =cut
 
 # internal constant
-my $hal_dn = 'org.freedesktop.UDisks';
+my $dn = 'org.freedesktop.UDisks2';
 
 
 =head2 Hal::Cdroms->new
@@ -59,59 +61,72 @@ sub new {
     require Net::DBus;
     require Net::DBus::Reactor; # must be done before line below:
     my $dbus = Net::DBus->system;
-    my $hal = $dbus->get_service($hal_dn);
+    my $service = $dbus->get_service($dn);
 
-    bless { dbus => $dbus, hal => $hal }, $class;
+    bless { dbus => $dbus, service => $service }, $class;
 }
 
-=head2 $hal_cdroms->list
+=head2 $cdroms->list
 
-Returns the list of C<hal_path> of the cdroms (mounted or not).
+Return the list of C<udisks_path> of the removable media (mounted or not).
 
 =cut
 
 sub list {
     my ($o) = @_;
 
-    my $manager = $o->{hal}->get_object("/org/freedesktop/UDisks",
-					$hal_dn);
+    my $manager = $o->{service}->get_object('/org/freedesktop/UDisks2/Manager');
 
-    
-    grep { _GetProperty(_get_device($o, $_), 'DeviceIsOpticalDisc') } @{$manager->EnumerateDevices};
+    grep { _is_cdrom($o, $_); } @{$manager->GetBlockDevices(undef)};
 }
 
-=head2 $hal_cdroms->get_mount_point($hal_path)
+=head2 $cdroms->get_mount_point($udisks_path)
 
-Return the mount point associated to the C<hal_path>, or undef it is not mounted.
+Return the mount point associated to the C<udisks_path>, or undef it is not mounted.
 
 =cut
 
-sub _get_udisks_device {
-    my ($o, $hal_path) = @_;
-    $o->{hal}->get_object($hal_path, "$hal_dn.Device");
+sub _is_cdrom {
+    my ($o, $udisks_path) = @_;
+    my $device = _get_device($o, $udisks_path);
+    my $drive = _get_drive($o, $device);
+    return unless $drive && _get_property($drive, 'Drive', 'Removable');
+    return unless member(_get_property($device, 'Block', 'IdType'), 'iso9660', 'udf');
+    eval { _get_property($device, 'Filesystem', 'MountPoints') };
 }
 
 sub _get_device {
-    my ($o, $hal_path) = @_;
-    $o->{hal}->get_object($hal_path, 'org.freedesktop.DBus.Properties');
+    my ($o, $udisks_path, $o_interface_name) = @_;
+    $o->{service}->get_object($udisks_path, $o_interface_name);
 }
 
-sub _get_volume {
-    my ($o, $hal_path) = @_;
-    $o->{hal}->get_object($hal_path, "$hal_dn.Device.Volume");
+sub _get_drive {
+    my ($o, $device) = @_;
+    my $drive_path = _get_property($device, 'Block', 'Drive');
+    return if $drive_path eq '/';
+    $o->{service}->get_object($drive_path);
 }
 
-sub _GetProperty {
-    my ($device, $pname) = @_;
-    $device->Get('org.freedesktop.DBus.Properties', $pname);
+sub _get_property {
+    my ($device, $interface_name, $property_name) = @_;
+    $device->Get("$dn.$interface_name", $property_name);
 }
 
 sub get_mount_point {
-    my ($o, $hal_path) = @_;
+    my ($o, $udisks_path) = @_;
+    my $mounts = _get_mount_points($o, $udisks_path);
+    _int_array_to_string($$mounts[0]) if @{$mounts};
+}
 
-    my $device = _get_device($o, $hal_path);
-    eval { _GetProperty($device, 'DeviceIsMounted')
-	   && @{_GetProperty($device, 'DeviceMountPaths')}[0] };
+sub _get_mount_points {
+    my ($o, $udisks_path) = @_;
+    my $device = _get_device($o, $udisks_path);
+    eval { _get_property($device, 'Filesystem', 'MountPoints') } || [];
+}
+
+sub _int_array_to_string {
+    my ($array) = @_;
+    join('', map { $_ ? chr($_) : '' } @{$array});
 }
 
 sub _try {
@@ -125,121 +140,71 @@ sub _try {
     }
 }
 
-=head2 $hal_cdroms->ensure_mounted($hal_path)
+=head2 $cdroms->ensure_mounted($udisks_path)
 
-Mount the C<hal_path> if not already mounted.
-Return the mount point associated to the C<hal_path>, or undef it cannot be mounted successfully (see $hal_cdroms->{error}).
+Mount the C<udisks_path> if not already mounted.
+Return the mount point associated to the C<udisks_path>, or undef it cannot be mounted successfully (see $cdroms->{error}).
 
 =cut
 
 sub ensure_mounted {
-    my ($o, $hal_path) = @_;
+    my ($o, $udisks_path) = @_;
     
-    $o->get_mount_point($hal_path) # check if it is already mounted
-      || $o->mount($hal_path) # otherwise try to mount
-      || $o->get_mount_point($hal_path); # checking wether a volume manager did it for us
+    $o->get_mount_point($udisks_path) # check if it is already mounted
+      || $o->mount($udisks_path) # otherwise try to mount
+      || $o->get_mount_point($udisks_path); # checking wether a volume manager did it for us
 }
 
 
-=head2 $hal_cdroms->mount_through_hal($hal_path)
+=head2 $cdroms->mount($udisks_path)
 
-Mount the C<hal_path> through HAL
-Return the mount point associated to the C<hal_path>, or undef it cannot be mounted successfully (see $hal_cdroms->{error}).
-If the cdrom is listed in fstab, HAL will refuse to mount it.
-
-=cut
-
-sub mount_hal {
-    my ($o, $hal_path) = @_;
-
-    my $device = _get_device($o, $hal_path);
-    my $real_device = _get_udisks_device($o, $hal_path);
-
-    my $mountpoint;
-    _try($o, sub { $mountpoint = $real_device->FilesystemMount($fstype, []) }) or return;
-    $mountpoint;
-}
-
-=head2 $hal_cdroms->mount($hal_path)
-
-Mount the C<hal_path> through HAL or fallback to plain mount(8).
-Return the mount point associated to the C<hal_path>, or undef it cannot be mounted successfully (see $hal_cdroms->{error})
+Mount the C<udisks_path> through UDisks2.
+Return the mount point associated to the C<udisks_path>, or undef it cannot be mounted successfully (see $cdroms->{error}).
 
 =cut
 
 sub mount {
-    my ($o, $hal_path) = @_;
+    my ($o, $udisks_path) = @_;
 
-    my $mntpoint = mount_hal($o, $hal_path);
-    if (!$mntpoint) {
-	# this usually means HAL refused to mount a cdrom listed in fstab
-	my $dev = _GetProperty(_get_device($o, $hal_path), 'NativePath');
-	# try to get real path:
-	$dev =~ s!.*/!/dev/!;
-	if (my $wanted = $dev && _rdev($dev)) {
-	    my ($fstab_dev) = grep { $wanted == _rdev($_) } _fstab_devices();
-	    system("mount", $fstab_dev) == 0
-	      and $mntpoint = get_mount_point($o, $hal_path);
-	}
-    }
-    $mntpoint;
+    my $device = _get_device($o, $udisks_path, "$dn.Filesystem");
+
+    my $mountpoint;
+    _try($o, sub { $mountpoint = $device->Mount(undef) }) or return;
+    $mountpoint;
 }
 
-sub _rdev {
-    my ($dev) = @_;
-    (stat($dev))[6];
-}
-sub _fstab_devices() {
-    open(my $F, '<', '/etc/fstab') or return;
-    map { /(\S+)/ } <$F>;
-}
+=head2 $cdroms->unmount($udisks_path)
 
-=head2 $hal_cdroms->unmount($hal_path)
-
-Unmount the C<hal_path>. Return true on success (see $hal_cdroms->{error} on failure)
-If the cdrom is listed in not mounted by HAL, HAL will refuse to unmount it.
-
-=cut
-
-sub unmount_hal {
-    my ($o, $hal_path) = @_;
-
-    my $volume = _get_udisks_device($o, $hal_path);
-    _try($o, sub { $volume->FilesystemUnmount([]) });
-}
-
-=head2 $hal_cdroms->unmount($hal_path)
-
-Unmount the C<hal_path> through HAL or fallback on umount(8).
-Return true on success (see $hal_cdroms->{error} on failure)
+Unmount the C<udisks_path> through UDisks2.
+Return true on success (see $cdroms->{error} on failure)
 
 =cut
 
 sub unmount {
-    my ($o, $hal_path) = @_;
+    my ($o, $udisks_path) = @_;
 
-    unmount_hal($o, $hal_path) and return 1;
-
-    system('umount', get_mount_point($o, $hal_path)) == 0;
+    my $device = _get_device($o, $udisks_path, "$dn.Filesystem");
+    _try($o, sub { $device->Unmount(undef) });
 }
 
-=head2 $hal_cdroms->eject($hal_path)
+=head2 $cdroms->eject($udisks_path)
 
-Ejects the C<hal_path>. Return true on success (see $hal_cdroms->{error} on failure)
+Eject the C<udisks_path>. Return true on success (see $cdroms->{error} on failure).
 
 =cut
 
 sub eject {
-    my ($o, $hal_path) = @_;
+    my ($o, $udisks_path) = @_;
 
-    my $volume = _get_udisks_device($o, $hal_path);
-    _try($o, sub { $volume->FilesystemUnmount([]); $volume->DriveEject([]) });
+    my $device = _get_device($o, $udisks_path);
+    my $drive = _get_drive($o, $device);
+    _try($o, sub { $device->as_interface("$dn.Filesystem")->Unmount(undef); $drive->Eject(undef) });
 }
 
-=head2 $hal_cdroms->wait_for_insert([$timeout])
+=head2 $cdroms->wait_for_insert([$timeout])
 
-Waits until a cdrom is inserted.
-Returns the inserted C<hal_path> on success. Otherwise returns undef.
+Wait until media containing a CD filesystem is inserted.
+Return the inserted C<udisks_path> on success. Otherwise return undef.
 
 You can give an optional timeout in milliseconds.
 
@@ -250,18 +215,20 @@ sub wait_for_insert {
 
     return if $o->list;
 
-    _reactor_wait($o->{dbus}, $hal_dn, $o_timeout, sub {
+    _reactor_wait($o->{dbus}, $o_timeout, sub {
 	my ($msg) = @_;
-	my $path;
-	return unless member($msg->get_member, 'DeviceChanged', 'DeviceAdded') && ($path = ($msg->get_args_list)[0]);
-	_GetProperty(_get_device($o, $path), 'DeviceIsOpticalDisc');
+	return unless $msg->get_member eq 'InterfacesAdded';
+	my $udisks_path = ($msg->get_args_list)[0];
+	return unless $udisks_path =~ /block_devices/;
+	return unless _is_cdrom($o, $udisks_path);
+	$udisks_path;
     });
 }
 
-=head2 $hal_cdroms->wait_for_mounted([$timeout])
+=head2 $cdroms->wait_for_mounted([$timeout])
 
-Waits until a cdrom is inserted and mounted by a volume manager (eg: gnome-volume-manager).
-Returns the mounted C<hal_path> on success. Otherwise returns undef.
+Wait until media containing a CD filesystem is inserted and mounted by a volume manager (eg: gnome-volume-manager).
+Return the mounted C<udisks_path> on success. Otherwise return undef.
 
 You can give an optional timeout in milliseconds.
 
@@ -270,58 +237,56 @@ You can give an optional timeout in milliseconds.
 sub wait_for_mounted {
     my ($o, $o_timeout) = @_;
 
-    _reactor_wait($o->{dbus}, $hal_dn, $o_timeout, sub {
+    _reactor_wait($o->{dbus}, $o_timeout, sub {
 	my ($msg) = @_;
-	$msg->get_member eq 'PropertyModified' or return;
-
-	my (undef, $modified_properties) = $msg->get_args_list;
-	grep { $_->[0] eq 'volume.is_mounted' } @$modified_properties or return;
-
-	my $hal_path = $msg->get_path;
-	my $device = _get_device($o, $hal_path);
-
-	eval { _GetProperty(_get_device($o, $hal_path), 'DeviceIsMounted') } && $hal_path;
+	return unless member($msg->get_member, 'InterfacesAdded', 'PropertiesChanged');
+	my $udisks_path = $msg->get_member eq 'InterfacesAdded' ? ($msg->get_args_list)[0] : $msg->get_path;
+	return unless $udisks_path =~ /block_devices/;
+	return unless _is_cdrom($o, $udisks_path);
+	return unless @{_get_mount_points($o, $udisks_path)} > 0;
+	$udisks_path;
     });
 }
 
 sub _reactor_wait {
-    my ($dbus, $interface, $timeout, $check_found) = @_;
+    my ($dbus, $timeout, $check_found) = @_;
 
-    my $val;
+    my $found_val;
     my $reactor = Net::DBus::Reactor->main;
 
     my $con = $dbus->get_connection;
-    $con->add_match("type='signal',interface='$interface'");
+    $con->add_match("type='signal',sender='$dn'");
     $con->add_filter(sub {
 	my ($_con, $msg) = @_;
 
-	if ($val = $check_found->($msg)) {
-	    _reactor_shutdown($reactor);
+	if (my $val = $check_found->($msg)) {
+	    $found_val = $val;
+	    $reactor->shutdown;
 	}
+	1;
     });
     if ($timeout) {
 	$reactor->add_timeout($timeout, Net::DBus::Callback->new(method => sub { 
-	    _reactor_shutdown($reactor);
+	    $reactor->shutdown;
 	}));
     }
     $reactor->run;
 
-    $val;
+    $found_val;
 }
 
-sub _reactor_shutdown {
-    my ($reactor) = @_;
+=head2 member(SCALAR, LIST)
 
-    $reactor->shutdown;
+is the value in the list?
 
-    # ugly, but needed for shutdown to work...
-    $reactor->add_timeout(1, Net::DBus::Callback->new(method => sub {}));
-}
+=cut
 
+# From MDK::Common::DataStructure :
 sub member { my $e = shift; foreach (@_) { $e eq $_ and return 1 } 0 }
 
 =head1 AUTHOR
 
 Pascal Rigaux <pixel@mandriva.com>
+Martin Whitaker <martinw@mageia.org>
 
 =cut 

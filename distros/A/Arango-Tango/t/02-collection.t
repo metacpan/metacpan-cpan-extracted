@@ -44,6 +44,26 @@ my $ans = $collection->load;
 is $ans->{name}, "collection";
 is $ans->{type}, 2;
 
+my %ttl_idx_opts = (
+    type => 'ttl',
+    name => 'idx',
+    fields => ['t_x'],
+    expireAfter => 3600
+);
+
+my $idx = $db->create_ttl_index("collection", %ttl_idx_opts);
+ok !$idx->{error};
+is $idx->{type}, 'ttl';
+is $idx->{name}, 'idx';
+
+my $idxs = $db->get_indexes("collection");
+ok !$idxs->{error};
+is $idxs->{code}, 200;
+is $idxs->{indexes}->[0]->{name}, 'primary';
+is $idxs->{indexes}->[0]->{type}, 'primary';
+is $idxs->{indexes}->[1]->{name}, 'idx';
+is $idxs->{indexes}->[1]->{type}, 'ttl';
+
 $ans = $collection->load_indexes;
 ok $ans->{result};
 

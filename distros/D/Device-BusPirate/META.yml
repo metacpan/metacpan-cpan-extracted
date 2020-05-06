@@ -17,28 +17,28 @@ name: Device-BusPirate
 provides:
   Device::BusPirate:
     file: lib/Device/BusPirate.pm
-    version: '0.18'
+    version: '0.19'
   Device::BusPirate::Mode:
     file: lib/Device/BusPirate/Mode.pm
-    version: '0.18'
+    version: '0.19'
   Device::BusPirate::Mode::BB:
     file: lib/Device/BusPirate/Mode/BB.pm
-    version: '0.18'
+    version: '0.19'
   Device::BusPirate::Mode::I2C:
     file: lib/Device/BusPirate/Mode/I2C.pm
-    version: '0.18'
+    version: '0.19'
   Device::BusPirate::Mode::SPI:
     file: lib/Device/BusPirate/Mode/SPI.pm
-    version: '0.18'
+    version: '0.19'
   Device::Chip::Adapter::BusPirate:
     file: lib/Device/Chip/Adapter/BusPirate.pm
-    version: '0.18'
+    version: '0.19'
 requires:
   Device::Chip::Adapter: '0.02'
   Device::Chip::ProtocolBase::SPI: '0'
   Future: '0'
   Future::AsyncAwait: '0.25'
-  Future::IO: '0.03'
+  Future::IO: '0.04'
   Future::Mutex: '0'
   IO::Termios: '0.07'
   List::Util: '1.33'
@@ -46,5 +46,5 @@ requires:
   Time::HiRes: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.18'
+version: '0.19'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -2,10 +2,10 @@ package Time::HiRes::Sleep::Until;
 use strict;
 use warnings;
 use base qw{Package::New};
-use Time::HiRes qw{sleep time};
+use Time::HiRes qw{};
 use Math::Round qw{nhimult}; 
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -14,10 +14,11 @@ Time::HiRes::Sleep::Until - Provides common ways to sleep until...
 =head1 SYNOPSIS
 
   use Time::HiRes::Sleep::Until;
-  my $su=Time::HiRes::Sleep::Until->new;
-  $su->epoch(1420070400.0);       # sleep until 2015-01-01 00:00
-  $su->mark(20);                  # sleep until 20 second mark of the clock :00, :20, or :40
-  $su->second(45);                # sleep until 45 seconds after the minute
+  my $su    = Time::HiRes::Sleep::Until->new;
+  my $slept = $su->epoch($epoch); # epoch is a calculated time + $seconds
+  my $slept = $su->mark(20);      # sleep until 20 second mark of the clock :00, :20, or :40
+  my $slept = $su->second(45);    # sleep until 45 seconds after the minute
+
 
 =head1 DESCRIPTION
 
@@ -53,15 +54,19 @@ Perl One liner
 
 Sleep until provided epoch in float seconds.
 
-  my $slept=$su->epoch($epoch); #epoch is simply a calculated time + $seconds
+  while ($CONTINUE) {
+    my $sleep_epoch = $su->time + 60/8;
+    do_work();                #run process that needs to run back to back but not more than 8 times per minute
+    $su->epoch($sleep_epoch); #sleep(7.5 - runtime). if runtime > 7.5 seconds does not sleep
+  }
 
 =cut
 
 sub epoch {
   my $self  = shift;
   my $epoch = shift || 0; #default is 1970-01-01 00:00
-  my $sleep = $epoch - time;
-  return $sleep <= 0 ? 0 : sleep($sleep);
+  my $sleep = $epoch - Time::HiRes::time();
+  return $sleep <= 0 ? 0 : Time::HiRes::sleep($sleep);
 }
 
 =head2 mark
@@ -75,7 +80,7 @@ Sleep until next second mark;
 =cut
 
 sub mark {
-  my $time  = time;
+  my $time  = Time::HiRes::time();
   my $self  = shift;
   my $mark  = shift || 0;
   die("Error: mark requires parameter to be greater than zero.") unless $mark > 0;
@@ -93,7 +98,7 @@ Sleep until the provided seconds after the minute
 =cut
 
 sub second {
-  my $time     = time;
+  my $time     = Time::HiRes::time();
   my $self     = shift;
   my $second   = shift || 0; #default is top of the minute
   my $min_next = nhimult(60 => $time);
@@ -114,6 +119,25 @@ Sleep until the top of the minute
 sub top {
   my $self=shift;
   return $self->second(0);
+}
+
+=head2 time
+
+Method to access Time::HiRes time without another import.
+
+=cut
+
+sub time {return Time::HiRes::time()};
+
+=head2 sleep
+
+Method to access Time::HiRes sleep without another import.
+
+=cut
+
+sub sleep {
+  my $self  = shift;
+  return Time::HiRes::sleep(@_);
 }
 
 =head1 LIMITATIONS

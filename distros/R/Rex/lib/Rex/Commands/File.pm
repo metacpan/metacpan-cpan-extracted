@@ -62,7 +62,7 @@ use strict;
 use warnings;
 use Fcntl;
 
-our $VERSION = '1.9.0'; # VERSION
+our $VERSION = '1.10.0'; # VERSION
 
 require Rex::Exporter;
 use Data::Dumper;
@@ -623,7 +623,7 @@ sub file {
         $dir_option{mode} = $option->{mode};
       }
 
-      Rex::Commands::Fs::mkdir( $file, %dir_option );
+      Rex::Commands::Fs::mkdir( $file, %dir_option, on_change => $on_change );
     }
   }
 

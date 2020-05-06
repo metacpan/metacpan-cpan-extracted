@@ -21,7 +21,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SAML_SLO_ERROR
 );
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.8';
 
 # PROPERTIES
 
@@ -284,7 +284,7 @@ sub loadIDPs {
 
         # Set encryption mode
         my $encryption_mode = $self->conf->{samlIDPMetaDataOptions}->{$_}
-          ->{samlIDPMetaDataOptionsEncryptionMode};
+          ->{samlIDPMetaDataOptionsEncryptionMode} || "none";
         my $lasso_encryption_mode = $self->getEncryptionMode($encryption_mode);
 
         unless (
@@ -390,7 +390,7 @@ sub loadSPs {
 
         # Set encryption mode
         my $encryption_mode = $self->conf->{samlSPMetaDataOptions}->{$_}
-          ->{samlSPMetaDataOptionsEncryptionMode};
+          ->{samlSPMetaDataOptionsEncryptionMode} || "none";
         my $lasso_encryption_mode = $self->getEncryptionMode($encryption_mode);
 
         unless (
@@ -415,7 +415,7 @@ sub loadSPs {
                       . $self->p->HANDLER->tsv->{jail}->error );
                 next;
             }
-            $self->spRules->{$entityID} = $rule;
+            $self->spRules->{$_} = $rule;
         }
 
         # Load per-SP macros
@@ -574,7 +574,7 @@ sub checkMessage {
 # @return 1 if no error
 sub checkLassoError {
     my ( $self, $error, $level ) = @_;
-    $level ||= 'debug';
+    $level ||= 'error';
 
     # If $error is not a Lasso::Error object, display error string
     unless ( ref($error) and $error->isa("Lasso::Error") ) {
@@ -1020,11 +1020,11 @@ sub buildAuthnRequestMsg {
 # @param request SAML request
 # @return result
 sub processAuthnRequestMsg {
-    my ( $self, $login, $request ) = @_;
+    my ( $self, $login, $request, $level ) = @_;
 
     eval { Lasso::Login::process_authn_request_msg( $login, $request ); };
 
-    return $self->checkLassoError($@);
+    return $self->checkLassoError( $@, $level );
 }
 
 ## @method boolean validateRequestMsg(Lasso::Login login, boolean auth, boolean consent)
@@ -1743,6 +1743,8 @@ sub replayProtection {
                 return 0;
             }
         }
+    } else {
+        $self->logger->warn( "No assertion session found for request ID ".$samlID);
     }
 
     return 0;

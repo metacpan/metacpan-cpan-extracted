@@ -296,6 +296,43 @@ METHODS
       
         # sub { Foo::Bar::handler(..., @_) }
 
+ destroy
+
+      destroy() : Object
+
+    The destroy method attempts to wipe out a namespace and also remove it
+    and its children from %INC. NOTE: This can cause catastrophic failures
+    if used incorrectly.
+
+    destroy example #1
+
+        package main;
+      
+        use Data::Object::Space;
+      
+        my $space = Data::Object::Space->new('data/dumper');
+      
+        $space->load; # Data/Dumper
+      
+        $space->destroy;
+
+ eval
+
+      eval(Str @args) : Any
+
+    The eval method takes a list of strings and evaluates them under the
+    namespace represented by the instance.
+
+    eval example #1
+
+        package main;
+      
+        use Data::Object::Space;
+      
+        my $space = Data::Object::Space->new('foo');
+      
+        $space->eval('our $VERSION = 0.01');
+
  functions
 
       functions() : ArrayRef
@@ -387,6 +424,23 @@ METHODS
       
         # Foo_Bar
 
+ included
+
+      included() : Str
+
+    The included method returns the path of the namespace if it exists in
+    %INC.
+
+    included example #1
+
+        package main;
+      
+        my $space = Data::Object::Space->new('Data/Object/Space');
+      
+        $space->included;
+      
+        # lib/Data/Object/Space.pm
+
  inherits
 
       inherits() : ArrayRef
@@ -445,6 +499,71 @@ METHODS
         $space->load
       
         # CPAN
+
+ loaded
+
+      loaded() : Int
+
+    The loaded method checks whether the package namespace is already
+    loaded returns truthy or falsy.
+
+    loaded example #1
+
+        package main;
+      
+        use Data::Object::Space;
+      
+        my $space = Data::Object::Space->new('data/dumper');
+      
+        $space->loaded;
+      
+        # 0
+
+    loaded example #2
+
+        package main;
+      
+        use Data::Object::Space;
+      
+        my $space = Data::Object::Space->new('data/dumper');
+      
+        $space->load;
+      
+        $space->loaded;
+      
+        # 1
+
+ locate
+
+      locate() : Str
+
+    The locate method checks whether the package namespace is available in
+    @INC, i.e. on disk. This method returns the file if found or an empty
+    string.
+
+    locate example #1
+
+        package main;
+      
+        use Data::Object::Space;
+      
+        my $space = Data::Object::Space->new('foo');
+      
+        $space->locate;
+      
+        # ''
+
+    locate example #2
+
+        package main;
+      
+        use Data::Object::Space;
+      
+        my $space = Data::Object::Space->new('data/dumper');
+      
+        $space->locate;
+      
+        # /path/to/Data/Dumper.pm
 
  methods
 
@@ -604,6 +723,21 @@ METHODS
         $space->prepend('etc', 'tmp');
       
         # 'Etc/Tmp/Foo/Bar'
+
+ rebase
+
+      rebase(Str @args) : Object
+
+    The rebase method returns an object by prepending the package namespace
+    specified to the base of the current object's namespace.
+
+    rebase example #1
+
+        # given: synopsis
+      
+        $space->rebase('zoo');
+      
+        # Zoo/Bar
 
  root
 

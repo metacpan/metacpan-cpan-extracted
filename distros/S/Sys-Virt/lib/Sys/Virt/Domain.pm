@@ -1724,6 +1724,10 @@ Possible total temporary disk space for the job in bytes
 
 Current total temporary disk space for the job in bytes
 
+=item Sys::Virt::Domain::JOB_ERRMSG
+
+The error message from a failed job
+
 =back
 
 The values for the Sys::Virt::Domain::JOB_OPERATION field are

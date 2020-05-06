@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::App::CmdLine::From_ShirlHartSolver;
-$Games::Solitaire::Verify::App::CmdLine::From_ShirlHartSolver::VERSION = '0.2402';
+$Games::Solitaire::Verify::App::CmdLine::From_ShirlHartSolver::VERSION = '0.2403';
 use strict;
 use warnings;
 use autodie;
@@ -311,7 +311,7 @@ converting from Shirl Hart's solver's solutions to fc-solve ones.
 
 =head1 VERSION
 
-version 0.2402
+version 0.2403
 
 =head1 SYNOPSIS
 

@@ -4,19 +4,19 @@ use strict;
 use warnings FATAL => 'all';
 use base qw(Exporter);
 
-our $VERSION = '1.004000';
-$VERSION = eval $VERSION;
+our $VERSION = '1.004001';
+$VERSION =~ tr/_//d;
 
 sub _choose_json_module {
     return 'Cpanel::JSON::XS' if $INC{'Cpanel/JSON/XS.pm'};
-    return 'JSON::XS'         if $INC{'JSON/XS.pm'};
+    return 'JSON::XS'         if $INC{'JSON/XS.pm'} && eval { JSON::XS->VERSION(3.0); 1 };
 
     my @err;
 
     return 'Cpanel::JSON::XS' if eval { require Cpanel::JSON::XS; 1; };
     push @err, "Error loading Cpanel::JSON::XS: $@";
 
-    return 'JSON::XS' if eval { require JSON::XS; 1; };
+    return 'JSON::XS' if eval { require JSON::XS; JSON::XS->VERSION(3.0); 1; };
     push @err, "Error loading JSON::XS: $@";
 
     return 'JSON::PP' if eval { require JSON::PP; 1 };
@@ -204,6 +204,8 @@ and are used to represent JSON C<true> and C<false> values in Perl.
 Since this is a bare sub in the various backend classes, it cannot be called as
 a class method like the other interfaces; it must be called as a function, with
 no invocant.  It supports the representation used in all JSON backends.
+
+Available since version 1.002004.
 
 =head1 CONSTRUCTOR
 

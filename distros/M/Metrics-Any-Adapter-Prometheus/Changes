@@ -1,5 +1,10 @@
 Revision history for Metrics-Any-Adapter-Prometheus
 
+0.04    2020-05-04
+        [CHANGES]
+         * Provide more flexible ways for users to create Histogram buckets in
+           repeating decades
+
 0.03    2020-04-29
         [CHANGES]
          * Join multipart metric names on underscores

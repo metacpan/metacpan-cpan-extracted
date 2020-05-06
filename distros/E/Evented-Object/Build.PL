@@ -11,11 +11,12 @@ my $class = Module::Build->subclass(
             use Pod::Readme;
             use Pod::Select;
             use File::Copy;
-
+            use File::Path qw(make_path);
 
             my $self = shift;
             
             # Generate .pod files
+            make_path('doc/Evented/Object');
             podselect({ -output => 'doc/Evented/Object.pod' },
                 'lib/Evented/Object.pm');
             podselect({ -output => 'doc/Evented/Object/EventFire.pod' },

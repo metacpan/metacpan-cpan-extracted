@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# This example updates the CPC bid and status for a given ad group. To get
-# ad groups, run get_ad_groups.pl.
+# This example updates the CPC bid and status for a given ad group. To get ad
+# groups, run get_ad_groups.pl.
 
 use strict;
 use warnings;
@@ -60,8 +60,8 @@ sub update_ad_group {
       cpcBidMicros => $bid_micro_amount
     });
 
-  # Create an ad group operation for update, using the FieldMasks utility
-  # to derive the update mask.
+  # Create an ad group operation for update, using the FieldMasks utility to
+  # derive the update mask.
   my $ad_group_operation =
     Google::Ads::GoogleAds::V3::Services::AdGroupService::AdGroupOperation->new(
     {

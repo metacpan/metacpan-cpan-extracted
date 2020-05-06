@@ -3,8 +3,14 @@ package OPTIMADE::Filter::Property;
 use strict;
 use warnings;
 
+use parent 'OPTIMADE::Filter::Modifiable';
+
+use Scalar::Util qw(blessed);
+
 use overload '@{}' => sub { return $_[0]->{name} },
-             '""'  => sub { return $_[0]->to_filter };
+             '""'  => sub { return $_[0]->to_filter },
+             '=='  => sub { return $_[0]->_eq( $_[1] ) },
+             'eq'  => sub { return $_[0]->_eq( $_[1] ) };
 
 our $identifier_re = q/([a-z_][a-z0-9_]*)/;
 
@@ -68,6 +74,22 @@ sub validate
 {
     my $self = shift;
     die 'name undefined for OPTIMADE::Filter::Property' if !@$self;
+}
+
+sub _eq
+{
+    my( $a, $b ) = @_;
+
+    return '' if !blessed( $b );
+    return '' if !$b->isa( OPTIMADE::Filter::Property:: );
+
+    return '' if @$a != @$b;
+    for my $i (0..$#$a) {
+        return '' if defined $a->[$i] ^ defined $b->[$i];
+        next if  !defined $a->[$i];
+        return '' if $a->[$i] ne $b->[$i];
+    }
+    return 1;
 }
 
 1;

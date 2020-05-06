@@ -5,7 +5,7 @@ use strict;
 use Mouse;
 use JSON qw(from_json to_json);
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin',
   'Lemonldap::NG::Portal::Lib::U2F';
@@ -81,12 +81,11 @@ sub run {
     elsif ( $action eq 'registration' ) {
         my ( $resp, $challenge );
         $self->logger->debug('Registration response');
-        unless ($resp = $req->param('registration')
-            and $challenge = $req->param('challenge') )
-        {
-            return $self->p->sendError( $req, 'Missing registration parameter',
-                400 );
-        }
+        return $self->p->sendError( $req, 'Missing registration parameter',
+            400 )
+          unless ( $resp = $req->param('registration')
+            and $challenge = $req->param('challenge') );
+
         $self->logger->debug("Get registration data $resp");
         $self->logger->debug("Get challenge $challenge");
         eval { $challenge = from_json($challenge)->{challenge} };
@@ -168,29 +167,31 @@ sub run {
     elsif ( $action eq 'verify' ) {
         $self->logger->debug('Verification challenge req');
         my ( $err, $error ) = $self->loadUser($req);
-        if ( $err == -1 ) {
-            return $self->p->sendError( $req, "U2F error: $error", 200 );
-        }
-        elsif ( $err == 0 ) {
-            return $self->p->sendError( $req, "noU2FKeyFound" );
-        }
+
+        return $self->p->sendError( $req, "U2F error: $error", 200 )
+          if ( $err == -1 );
+        return $self->p->sendError( $req, "noU2FKeyFound" ) if ( $err == 0 );
 
         # Get a challenge (from first key)
         my $data = eval {
             from_json( $req->data->{crypter}->[0]->authenticationChallenge );
         };
-
         if ($@) {
             $self->logger->error( Crypt::U2F::Server::u2fclib_getError() );
             return $self->p->sendError( $req, "U2F error: $error", 200 );
         }
 
         # Get registered keys
-        my @rk;
-        foreach ( @{ $req->data->{crypter} } ) {
-            my $k = push @rk,
-              { keyHandle => $_->{keyHandle}, version => $data->{version} };
-        }
+
+        # my @rk;
+        # foreach ( @{ $req->data->{crypter} } ) {
+        #     my $k = push @rk,
+        #       { keyHandle => $_->{keyHandle}, version => $data->{version} };
+        # }
+
+        my @rk =
+          map { { keyHandle => $_->{keyHandle}, version => $data->{version} } }
+          @{ $req->data->{crypter} };
 
         # Serialize data
         $data = to_json( {
@@ -212,21 +213,15 @@ sub run {
 
     elsif ( $action eq 'signature' ) {
         $self->logger->debug('Verification response');
-        my ( $challenge, $resp );
-        unless ($challenge = $req->param('challenge')
-            and $resp = $req->param('signature') )
-        {
-            return $self->p->sendError( $req, 'Missing signature parameter',
-                400 );
-        }
+        my ( $challenge, $resp, $crypter );
+        return $self->p->sendError( $req, 'Missing signature parameter', 400 )
+          unless ( $challenge = $req->param('challenge')
+            and $resp = $req->param('signature') );
+
         my ( $err, $error ) = $self->loadUser($req);
-        if ( $err == -1 ) {
-            return $self->p->sendError( $req, "U2F loading error: $error",
-                500 );
-        }
-        elsif ( $err == 0 ) {
-            return $self->p->sendError( $req, "noU2FKeyFound" );
-        }
+        return $self->p->sendError( $req, "U2F loading error: $error", 500 )
+          if ( $err == -1 );
+        return $self->p->sendError( $req, "noU2FKeyFound" ) if ( $err == 0 );
 
         $self->logger->debug("Get verify response $resp");
         my $data = eval { JSON::from_json($resp) };
@@ -234,10 +229,15 @@ sub run {
             $self->logger->error("U2F response error: $@");
             return $self->p->sendError( $req, "U2FAnswerError" );
         }
-        my $crypter;
-        foreach ( @{ $req->data->{crypter} } ) {
-            $crypter = $_ if ( $_->{keyHandle} eq $data->{keyHandle} );
-        }
+
+        # my $crypter;
+        # foreach ( @{ $req->data->{crypter} } ) {
+        #     $crypter = $_ if ( $_->{keyHandle} eq $data->{keyHandle} );
+        # }
+        $crypter = $_
+          foreach grep { $_->{keyHandle} eq $data->{keyHandle} }
+          @{ $req->data->{crypter} };
+
         unless ($crypter) {
             $self->userLogger->error("Unregistered U2F key");
             return $self->p->sendError( $req, "U2FKeyUnregistered" );
@@ -261,9 +261,8 @@ sub run {
     elsif ( $action eq 'delete' ) {
 
         # Check if unregistration is allowed
-        unless ( $self->conf->{u2fUserCanRemoveKey} ) {
-            return $self->p->sendError( $req, 'notAuthorized', 200 );
-        }
+        return $self->p->sendError( $req, 'notAuthorized', 200 )
+          unless $self->conf->{u2fUserCanRemoveKey};
 
         my $epoch = $req->param('epoch')
           or return $self->p->sendError( $req, '"epoch" parameter is missing',
@@ -271,7 +270,7 @@ sub run {
 
         # Read existing 2FDevices
         $self->logger->debug("Looking for 2F Devices ...");
-        my $_2fDevices;
+        my ( $_2fDevices, $keyName );
         if ( $req->userData->{_2fDevices} ) {
             $_2fDevices = eval {
                 from_json( $req->userData->{_2fDevices},
@@ -288,10 +287,14 @@ sub run {
         }
 
         # Delete U2F device
-        my $keyName;
-        foreach (@$_2fDevices) {
-            $keyName = $_->{name} if $_->{epoch} eq $epoch;
-        }
+
+        # my $keyName;
+        # foreach (@$_2fDevices) {
+        #     $keyName = $_->{name} if $_->{epoch} eq $epoch;
+        # }
+
+        $keyName = $_->{name}
+          foreach grep { $_->{epoch} eq $epoch } @$_2fDevices;
         @$_2fDevices = grep { $_->{epoch} ne $epoch } @$_2fDevices;
         $self->logger->debug(
 "Delete 2F Device : { type => 'U2F', epoch => $epoch, name => $keyName }"
@@ -371,9 +374,8 @@ sub loadUser {
                     'U2F error: ' . Crypt::U2F::Server::u2fclib_getError() );
             }
         }
-        unless (@crypters) {
-            return -1;
-        }
+        return -1 unless @crypters;
+
         $req->data->{crypter} = \@crypters;
         return 1;
     }

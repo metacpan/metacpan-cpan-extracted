@@ -1,0 +1,34 @@
++STR
++DOC ---
++MAP
++MAP
+=VAL :x
+=VAL :y
+-MAP
+=VAL :z
+=VAL :a
+=VAL :b
+-MAP
+-DOC
++DOC ---
++MAP
+=VAL :top1
++MAP
++MAP
+=VAL :a
+=VAL :1
+-MAP
++MAP
+=VAL :b
++SEQ
+=VAL :c
+-SEQ
+-MAP
+=VAL :x
+=VAL :y
+-MAP
+=VAL :top2
+=VAL :value
+-MAP
+-DOC
+-STR

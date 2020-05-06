@@ -12,7 +12,6 @@ BEGIN {
 
 my $debug = 'error';
 my ( $issuer, $res );
-my %handlerOR = ( issuer => [] );
 
 eval { require XML::Simple };
 plan skip_all => "Missing dependencies: $@" if ($@);
@@ -84,13 +83,6 @@ count(1);
 
 clean_sessions();
 done_testing( count() );
-
-sub switch {
-    my $type = shift;
-    @Lemonldap::NG::Handler::Main::_onReload = @{
-        $handlerOR{$type};
-    };
-}
 
 sub issuer {
     return LLNG::Manager::Test->new( {

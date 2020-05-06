@@ -1,0 +1,52 @@
+{
+   "abstract" : "Use Mojolicious Templates for your Catalyst View",
+   "author" : [
+      "John Napiorkowski <jjn1056@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Catalyst-View-MojoTemplate",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst" : "0",
+            "Mojolicious" : "0",
+            "Moo" : "2.000001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0.34"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jjn1056/Catalyst-View-MojoTemplate/issues"
+      },
+      "homepage" : "https://github.com/jjn1056/Catalyst-View-MojoTemplate",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jjn1056/Catalyst-View-MojoTemplate",
+         "web" : "https://github.com/jjn1056/Catalyst-View-MojoTemplate"
+      }
+   },
+   "version" : "0.001",
+   "x_generated_by_perl" : "v5.30.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

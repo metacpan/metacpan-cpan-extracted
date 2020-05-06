@@ -1117,7 +1117,7 @@ $dom->find('ul li:not(:first-child, :last-child)')
   ->each(sub { push @e, shift->text });
 is_deeply \@e, [qw(C E F H)], 'found all odd li elements';
 @e = ();
-$dom->find('ul li:matches(:first-child, :last-child)')
+$dom->find('ul li:is(:first-child, :last-child)')
   ->each(sub { push @e, shift->text });
 is_deeply \@e, [qw(A I)], 'found all odd li elements';
 @e = ();
@@ -1225,16 +1225,21 @@ $dom = Mojo::DOM->new(<<EOF);
 <area href=/ alt=F>
 <div href=borked>very borked</div>
 EOF
+is $dom->find(':any-link')->map(sub { $_->tag })->join(','), 'a,link,area',
+  'right tags';
 is $dom->find(':link')->map(sub { $_->tag })->join(','), 'a,link,area',
   'right tags';
 is $dom->find(':visited')->map(sub { $_->tag })->join(','), 'a,link,area',
   'right tags';
-is $dom->at('a:link')->text,    'B', 'right result';
-is $dom->at('a:visited')->text, 'B', 'right result';
-is $dom->at('link:link')->{rel},    'D', 'right result';
-is $dom->at('link:visited')->{rel}, 'D', 'right result';
-is $dom->at('area:link')->{alt},    'F', 'right result';
-is $dom->at('area:visited')->{alt}, 'F', 'right result';
+is $dom->at('a:link')->text,     'B', 'right result';
+is $dom->at('a:any-link')->text, 'B', 'right result';
+is $dom->at('a:visited')->text,  'B', 'right result';
+is $dom->at('link:any-link')->{rel}, 'D', 'right result';
+is $dom->at('link:link')->{rel},     'D', 'right result';
+is $dom->at('link:visited')->{rel},  'D', 'right result';
+is $dom->at('area:link')->{alt},     'F', 'right result';
+is $dom->at('area:any-link')->{alt}, 'F', 'right result';
+is $dom->at('area:visited')->{alt},  'F', 'right result';
 
 # Sibling combinator
 $dom = Mojo::DOM->new(<<EOF);
@@ -2418,19 +2423,29 @@ EOF
 is $dom->find('.foo')->map('text')->join(','),            'A,B', 'right result';
 is $dom->find('.FOO')->map('text')->join(','),            'C',   'right result';
 is $dom->find('[class=foo]')->map('text')->join(','),     'A',   'right result';
+is $dom->find('[class=foo s]')->map('text')->join(','),   'A',   'right result';
+is $dom->find('[class=foo S]')->map('text')->join(','),   'A',   'right result';
 is $dom->find('[class=foo i]')->map('text')->join(','),   'A,C', 'right result';
 is $dom->find('[class="foo" i]')->map('text')->join(','), 'A,C', 'right result';
-is $dom->find('[class="foo bar"]')->size, 0, 'no results';
+is $dom->find('[class="foo" I]')->map('text')->join(','), 'A,C', 'right result';
+is $dom->find('[class="foo bar"]')->size,   0, 'no results';
+is $dom->find('[class="foo bar s"]')->size, 0, 'no results';
+is $dom->find('[class="foo bar S"]')->size, 0, 'no results';
 is $dom->find('[class="foo bar" i]')->map('text')->join(','), 'B',
   'right result';
-is $dom->find('[class~=foo]')->map('text')->join(','), 'A,B', 'right result';
+is $dom->find('[class~=foo]')->map('text')->join(','),   'A,B', 'right result';
+is $dom->find('[class~=foo s]')->map('text')->join(','), 'A,B', 'right result';
 is $dom->find('[class~=foo i]')->map('text')->join(','), 'A,B,C',
   'right result';
-is $dom->find('[class*=f]')->map('text')->join(','), 'A,B,D', 'right result';
+is $dom->find('[class*=f]')->map('text')->join(','),   'A,B,D', 'right result';
+is $dom->find('[class*=f s]')->map('text')->join(','), 'A,B,D', 'right result';
 is $dom->find('[class*=f i]')->map('text')->join(','), 'A,B,C,D',
   'right result';
-is $dom->find('[class^=F]')->map('text')->join(','), 'C', 'right result';
+is $dom->find('[class^=F]')->map('text')->join(','),   'C', 'right result';
+is $dom->find('[class^=F S]')->map('text')->join(','), 'C', 'right result';
 is $dom->find('[class^=F i]')->map('text')->join(','), 'A,B,C,D',
+  'right result';
+is $dom->find('[class^=F I]')->map('text')->join(','), 'A,B,C,D',
   'right result';
 is $dom->find('[class$=O]')->map('text')->join(','),   'C',   'right result';
 is $dom->find('[class$=O i]')->map('text')->join(','), 'A,C', 'right result';
@@ -2611,11 +2626,11 @@ $dom = Mojo::DOM->new->xml(1)->parse(<<EOF);
 </foo>
 EOF
 %ns = (foons => 'ns:foo', barns => 'ns:bar');
-ok $dom->at('foons|foo',                   %ns), 'result';
-ok $dom->at('foons|foo:not(barns|*)',      %ns), 'result';
-ok $dom->at('foo:not(|foo)',               %ns), 'result';
-ok $dom->at('foons|foo:root',              %ns), 'result';
-ok $dom->at('foo:matches(:root, foons|*)', %ns), 'result';
+ok $dom->at('foons|foo',              %ns), 'result';
+ok $dom->at('foons|foo:not(barns|*)', %ns), 'result';
+ok $dom->at('foo:not(|foo)',          %ns), 'result';
+ok $dom->at('foons|foo:root',         %ns), 'result';
+ok $dom->at('foo:is(:root, foons|*)', %ns), 'result';
 ok !$dom->at('foons|foo:not(:root)', %ns), 'no result';
 is $dom->at('foons|tag',       %ns)->{val}, 1, 'right value';
 is $dom->at('foons|tag:empty', %ns)->{val}, 1, 'right value';
@@ -2628,11 +2643,11 @@ ok $dom->at('foons|foo foons|tag[val="1"]',   %ns), 'result';
 ok $dom->at('barns|bar',                      %ns), 'result';
 ok $dom->at('barns|bar:not(foons|*)',         %ns), 'result';
 ok $dom->at('bar:not(|bar)',                  %ns), 'result';
-ok $dom->at('bar:matches(barns|*)',           %ns), 'result';
+ok $dom->at('bar:is(barns|*)',                %ns), 'result';
 ok !$dom->at('barns|bar:root', %ns), 'no result';
-ok $dom->at('barns|bar:not(:root)',              %ns), 'result';
-ok $dom->at('bar:matches(barns|*, :not(:root))', %ns), 'result';
-ok $dom->at('foons|foo barns|bar',               %ns), 'result';
+ok $dom->at('barns|bar:not(:root)',         %ns), 'result';
+ok $dom->at('bar:is(barns|*, :not(:root))', %ns), 'result';
+ok $dom->at('foons|foo barns|bar',          %ns), 'result';
 is $dom->at('barns|tag',       %ns)->{val}, 2, 'right value';
 is $dom->at('barns|tag:empty', %ns)->{val}, 2, 'right value';
 ok $dom->at('barns|tag[val="2"]',                           %ns), 'result';

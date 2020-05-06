@@ -77,7 +77,7 @@ cmp_deeply(
     $tzil->log_messages,
     superbagof(
         '[PromptIfStale] checking for stale modules, plugins...',
-        (map { re(qr/^\Q[PromptIfStale] comparing indexed vs. local version for Dist::Zilla::Plugin::$_: indexed=0; local version=\E/) } qw(GatherDir PromptIfStale)),
+        (map re(qr/^\Q[PromptIfStale] comparing indexed vs. local version for Dist::Zilla::Plugin::$_: indexed=0; local version=\E/), qw(GatherDir PromptIfStale)),
         re(qr/^\Q[DZ] writing DZT-Sample in /),
     ),
     'build completed successfully',
@@ -85,7 +85,7 @@ cmp_deeply(
 
 cmp_deeply(
     \@modules_queried,
-    bag('Carp', map { 'Dist::Zilla::Plugin::' . $_ } qw(GatherDir PromptIfStale FinderCode)),
+    bag('Carp', map 'Dist::Zilla::Plugin::'.$_, qw(GatherDir PromptIfStale FinderCode)),
     'all modules, from both configs, are checked',
 );
 

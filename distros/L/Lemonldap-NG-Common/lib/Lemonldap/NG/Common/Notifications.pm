@@ -4,7 +4,7 @@ use strict;
 use Mouse;
 use JSON qw(to_json);
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -19,6 +19,11 @@ sub import {
     }
 }
 
+has extension => (
+    is      => 'rw',
+    default => 'json'
+);
+
 has notifField => (
     is      => 'rw',
     builder => sub {
@@ -31,6 +36,14 @@ has notifField => (
     }
 );
 
+sub BUILD {
+    my $self = shift;
+    $self->extension('xml') if $self->conf->{oldNotifFormat};
+    $self->logger->debug( 'Use extension "'
+          . $self->extension
+          . '" to store notification files' );
+}
+
 sub getNotifications {
     my ( $self, $uid ) = @_;
     my $forAll = $self->get( $self->conf->{notificationWildcard} );
@@ -41,6 +54,19 @@ sub getNotifications {
         return ( $forAll ? { %$all, %$forAll } : $all );
     }
     my $forUser = $self->get($uid);
+    if ( $forUser and $forAll ) {
+        return { %$forUser, %$forAll };
+    }
+    else {
+        return ( ( $forUser ? $forUser : $forAll ), $forUser );
+    }
+}
+
+sub getAcceptedNotifs {
+    my ( $self, $uid, $ref ) = @_;
+    my $forAll =
+      $self->getAccepted( $self->conf->{notificationWildcard}, $ref );
+    my $forUser = $self->getAccepted( $uid, $ref );
     if ( $forUser and $forAll ) {
         return { %$forUser, %$forAll };
     }

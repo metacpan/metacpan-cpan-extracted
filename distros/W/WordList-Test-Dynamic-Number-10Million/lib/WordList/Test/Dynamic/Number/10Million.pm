@@ -1,24 +1,36 @@
 package WordList::Test::Dynamic::Number::10Million;
 
-our $DATE = '2018-04-02'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2020-05-04'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use WordList;
 our @ISA = qw(WordList);
 
+use Role::Tiny::With;
+with 'WordListRole::EachFromFirstNextReset';
+
 our $DYNAMIC = 1;
 
-sub each_word {
-    my ($self, $code) = @_;
-
-    for my $i (1..10_000_000) {
-        my $word = sprintf "%08d", $i;
-        my $res = $code->($word);
-        last if defined $res && $res == -2;
-    }
+sub reset_iterator {
+    my $self = shift;
+    $self->[0] = 0;
 }
 
-our %STATS = ("avg_word_len",8,"num_words_contains_unicode",0,"shortest_word_len",8,"num_words",10000000,"num_words_contains_nonword_chars",0,"num_words_contains_whitespace",0,"longest_word_len",8); # STATS
+sub first_word {
+    my $self = shift;
+    $self->reset_iterator;
+    $self->next_word;
+}
+
+sub next_word {
+    my $self = @_;
+
+    $self->[0] = 0 unless defined $self->[0];
+    return undef if $self->[0]++ >= 10_000_000;
+    sprintf "%08d", $self->[0];
+}
+
+our %STATS = ("num_words_contains_nonword_chars",0,"longest_word_len",8,"avg_word_len",8,"shortest_word_len",8,"num_words_contain_whitespace",0,"num_words_contain_nonword_chars",0,"num_words_contains_unicode",0,"num_words",10000000,"num_words_contain_unicode",0,"num_words_contains_whitespace",0); # STATS
 
 1;
 # ABSTRACT: 10 million numbers from "00000001" to "10000000"
@@ -35,7 +47,7 @@ WordList::Test::Dynamic::Number::10Million - 10 million numbers from "00000001" 
 
 =head1 VERSION
 
-This document describes version 0.002 of WordList::Test::Dynamic::Number::10Million (from Perl distribution WordList-Test-Dynamic-Number-10Million), released on 2018-04-02.
+This document describes version 0.003 of WordList::Test::Dynamic::Number::10Million (from Perl distribution WordList-Test-Dynamic-Number-10Million), released on 2020-05-04.
 
 =head1 SYNOPSIS
 
@@ -64,6 +76,9 @@ This document describes version 0.002 of WordList::Test::Dynamic::Number::10Mill
  | avg_word_len                     | 8        |
  | longest_word_len                 | 8        |
  | num_words                        | 10000000 |
+ | num_words_contain_nonword_chars  | 0        |
+ | num_words_contain_unicode        | 0        |
+ | num_words_contain_whitespace     | 0        |
  | num_words_contains_nonword_chars | 0        |
  | num_words_contains_unicode       | 0        |
  | num_words_contains_whitespace    | 0        |
@@ -94,7 +109,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

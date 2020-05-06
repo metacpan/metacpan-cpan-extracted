@@ -4,20 +4,19 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4001, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "IO-Async-Loop-Glib",
    "prereqs" : {
-      "build" : {
+      "configure" : {
          "requires" : {
-            "IO::Async::LoopTests" : "0.24",
-            "Test::More" : "0.88"
+            "Module::Build" : "0.4004"
          }
       },
       "runtime" : {
@@ -26,12 +25,18 @@
             "IO::Async::Loop" : "0.49",
             "Time::HiRes" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "IO::Async::LoopTests" : "0.76",
+            "Test::More" : "0.88"
+         }
       }
    },
    "provides" : {
       "IO::Async::Loop::Glib" : {
          "file" : "lib/IO/Async/Loop/Glib.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       }
    },
    "release_status" : "stable",
@@ -40,5 +45,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.21"
+   "version" : "0.22",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

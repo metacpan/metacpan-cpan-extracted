@@ -50,7 +50,7 @@ ok(
     'Auth query'
 );
 count(1);
-ok( $res->[2]->[0] =~ /<span trmsg="5"><\/span><\/div>/,
+ok( $res->[2]->[0] =~ /<span trmsg="5">/,
     'dwho rejected with PE_BADCREDENTIALS' )
   or print STDERR Dumper( $res->[2]->[0] );
 count(1);
@@ -105,7 +105,7 @@ ok(
 );
 count(1);
 ok(
-    $res->[2]->[0] =~ /<span trmsg="41"><\/span><\/div>/,
+    $res->[2]->[0] =~ /<span trmsg="41">/,
     'rtyler rejected with PE_SESSIONNOTGRANTED'
 ) or print STDERR Dumper( $res->[2]->[0] );
 count(1);
@@ -121,7 +121,7 @@ ok(
 );
 count(1);
 ok(
-    $res->[2]->[0] =~ /<span trmsg="5"><\/span><\/div>/,
+    $res->[2]->[0] =~ /<span trmsg="5">/,
     'rtyler rejected with PE_BADCREDENTIALS'
 ) or print STDERR Dumper( $res->[2]->[0] );
 count(1);

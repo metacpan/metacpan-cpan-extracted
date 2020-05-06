@@ -8,4 +8,6 @@ META.json
 META.yml
 README
 t/00use.t
+t/01test.t
+t/02detail.t
 t/99pod.t

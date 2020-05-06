@@ -362,6 +362,7 @@ This file contains:
           data: {
             description: "New app description",
             uri: "https://test.example.com/",
+            tooltip: "New app tooltip",
             logo: "network.png",
             display: "auto"
           }
@@ -393,6 +394,7 @@ This file contains:
             type: '',
             rule: '',
             logo: '',
+            level: '',
             label: '',
             over: []
           }

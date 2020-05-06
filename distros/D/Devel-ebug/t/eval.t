@@ -6,7 +6,7 @@ use Test::More tests => 9;
 use Devel::ebug;
 
 my $ebug = Devel::ebug->new;
-$ebug->program("t/calc.pl");
+$ebug->program("corpus/calc.pl");
 $ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 $ebug->break_point(6);

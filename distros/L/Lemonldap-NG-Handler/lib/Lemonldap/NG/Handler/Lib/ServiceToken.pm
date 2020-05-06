@@ -45,7 +45,8 @@ sub fetchId {
     }
 
     # Is token in good interval ?
-    my $ttl = $class->localConfig->{vhostOptions}->{$vhost}->{vhostServiceTokenTTL}
+    my $ttl =
+         $class->localConfig->{vhostOptions}->{$vhost}->{vhostServiceTokenTTL}
       || $class->tsv->{serviceTokenTTL}->{$vhost};
     $ttl = $class->tsv->{handlerServiceTokenTTL} unless ( $ttl and $ttl > 0 );
     my $now = time;

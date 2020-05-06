@@ -8,7 +8,7 @@ package IO::Async::Socket;
 use strict;
 use warnings;
 
-our $VERSION = '0.75';
+our $VERSION = '0.76';
 
 use base qw( IO::Async::Handle );
 

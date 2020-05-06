@@ -6,9 +6,6 @@ use Carp qw/croak/;
 use Class::Load qw/load_class/;
 use Types::Standard qw/Object ScalarRef Str/;
 
-
-our $VERSION = '0.01';
-
 has 'stream' => (
 	is  => 'ro',
 	isa => ScalarRef,
@@ -29,6 +26,8 @@ has 'parse_tag' => (
 			$tag = 'json';
 		} elsif ($$content =~ m/^([A-Za-z]+,)/) {
 			$tag = 'csv';
+		} elsif ($$content =~ m/---/) {
+			$tag = 'yaml';
 		} else {
 			while ( $$content =~ /<(\S+)/sg) {
 				(my $t = $1) =~ tr/a-zA-Z0-9:\-\?!//cd;
@@ -56,6 +55,7 @@ has 'parser_type' => (
 		return 'JSON' if $tag =~ /^json/;
 		return 'CSV' if $tag =~ /^csv/;
 		return 'Table' if $tag =~ /^table/;
+		return 'YAML' if $tag =~ /^yaml/;
 		return croak "Could not find a parser";
 	}
 );

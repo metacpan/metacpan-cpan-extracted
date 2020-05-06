@@ -1,8 +1,5 @@
 package CPANPLUS::Test::Dummy::HasScript;
-{
-  $CPANPLUS::Test::Dummy::HasScript::VERSION = '0.0004';
-}
-
+$CPANPLUS::Test::Dummy::HasScript::VERSION = '0.0006';
 #ABSTRACT: CPANPLUS Test Dummy
 
 use strict;
@@ -10,9 +7,11 @@ use warnings;
 
 q[Test me oh test me, test me if you think you've heard this one before];
 
-
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -20,7 +19,7 @@ CPANPLUS::Test::Dummy::HasScript - CPANPLUS Test Dummy
 
 =head1 VERSION
 
-version 0.0004
+version 0.0006
 
 =head1 SYNOPSIS
 
@@ -41,10 +40,9 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Chris Williams.
+This software is copyright (c) 2020 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

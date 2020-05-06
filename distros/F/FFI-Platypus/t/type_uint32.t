@@ -9,7 +9,9 @@ use Test::More;
 use FFI::Platypus;
 use FFI::CheckLib;
 
-foreach my $api (0, 1)
+my @lib = find_lib lib => 'test', symbol => 'f0', libpath => 't/ffi';
+
+foreach my $api (0, 1, 2)
 {
 
   subtest "api = $api" => sub {
@@ -20,8 +22,7 @@ foreach my $api (0, 1)
       warn $message;
     };
 
-    my $ffi = FFI::Platypus->new( api => $api );
-    $ffi->lib(find_lib lib => 'test', symbol => 'f0', libpath => 't/ffi');
+    my $ffi = FFI::Platypus->new( api => $api, lib => [@lib], experimental => ($api >= 2 ? $api : undef ) );
     $ffi->type('uint32 *' => 'uint32_p');
     $ffi->type('uint32 [10]' => 'uint32_a');
     $ffi->type('uint32 []' => 'uint32_a2');
@@ -57,14 +58,14 @@ foreach my $api (0, 1)
 
     is_deeply \@list, [2,3,4,5,6,7,8,9,10,11], 'array increment';
 
-    is null(), undef, 'null() == undef';
+    is_deeply [null()], [$api >= 2 ? (undef) : ()], 'null() == undef';
     is is_null(undef), 1, 'is_null(undef) == 1';
     is is_null(), 1, 'is_null() == 1';
     is is_null(\22), 0, 'is_null(22) == 0';
 
     is_deeply static_array(), [1,4,6,8,10,12,14,16,18,20], 'static_array = [1,4,6,8,10,12,14,16,18,20]';
 
-    is null2(), undef, 'null2() == undef';
+    is_deeply [null2()], [$api >= 2 ? (undef) : ()], 'null2() == undef';
 
     my $closure = $ffi->closure(sub { $_[0]+2 });
     $ffi->attach( [uint32_set_closure => 'set_closure'] => ['uint32_c'] => 'void');
@@ -101,29 +102,31 @@ foreach my $api (0, 1)
   };
 }
 
-subtest 'object' => sub {
+foreach my $api (1,2)
+{
+  subtest 'object' => sub {
 
-  { package Roger }
+    { package Roger }
 
-  my $ffi = FFI::Platypus->new( api => 1 );
-  $ffi->type('object(Roger,uint32)', 'roger_t');
+    my $ffi = FFI::Platypus->new( api => $api, lib => [@lib], experimental => ($api >= 2 ? $api : undef ) );
+    $ffi->type('object(Roger,uint32)', 'roger_t');
 
-  my $int = 211;
+    my $int = 211;
 
-  subtest 'argument' => sub {
+    subtest 'argument' => sub {
 
-    is $ffi->cast('roger_t' => 'uint32', bless(\$int, 'Roger')), $int;
+      is $ffi->cast('roger_t' => 'uint32', bless(\$int, 'Roger')), $int;
 
-  };
+    };
 
-  subtest 'return value' => sub {
+    subtest 'return value' => sub {
 
-    my $obj1 = $ffi->cast('uint32' => 'roger_t', $int);
-    isa_ok $obj1, 'Roger';
-    is $$obj1, $int;
+      my $obj1 = $ffi->cast('uint32' => 'roger_t', $int);
+      isa_ok $obj1, 'Roger';
+      is $$obj1, $int;
 
-  };
-
+    };
+  }
 };
 
 done_testing;

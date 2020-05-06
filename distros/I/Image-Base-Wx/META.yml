@@ -19,6 +19,19 @@ no_index:
     - inc
     - devel
     - xt
+provides:
+  Image::Base::Wx:
+    file: META.yml
+    version: '6'
+  Image::Base::Wx::Bitmap:
+    file: Image/Base/Wx/Bitmap.pm
+    version: '6'
+  Image::Base::Wx::DC:
+    file: Image/Base/Wx/DC.pm
+    version: '6'
+  Image::Base::Wx::Image:
+    file: Image/Base/Wx/Image.pm
+    version: '6'
 requires:
   Image::Base: '1.12'
   Wx: '0'
@@ -26,5 +39,5 @@ requires:
 resources:
   homepage: http://user42.tuxfamily.org/image-base-wx/index.html
   license: http://www.gnu.org/licenses/gpl.html
-version: '5'
+version: '6'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

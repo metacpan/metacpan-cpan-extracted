@@ -6,7 +6,7 @@ use Carp qw( croak );
 use base qw( FFI::Platypus::TypeParser );
 
 # ABSTRACT: FFI Type Parser Version Zero
-our $VERSION = '1.11'; # VERSION
+our $VERSION = '1.25'; # VERSION
 
 
 our @CARP_NOT = qw( FFI::Platypus FFI::Platypus::TypeParser );
@@ -70,8 +70,8 @@ sub parse
   if($name =~ /^ string \s* \( ([0-9]+) \) $/x)
   {
     return $self->types->{$name} = $self->create_type_record(
+      0,
       $1,    # size
-      undef, # record_class
     );
   }
 
@@ -85,8 +85,8 @@ sub parse
   if($name =~ /^ record \s* \( ([0-9]+) \) $/x)
   {
     return $self->types->{$name} = $self->create_type_record(
+      0,
       $1,             # size
-      undef,          # record_class
     );
   }
 
@@ -113,6 +113,7 @@ sub parse
       croak "$classname has not ffi_record_size or _ffi_record_size method";
     }
     return $self->global_types->{record}->{$classname} ||= $self->create_type_record(
+      0,
       $size,          # size
       $classname,     # record_class
     );
@@ -163,7 +164,7 @@ FFI::Platypus::TypeParser::Version0 - FFI Type Parser Version Zero
 
 =head1 VERSION
 
-version 1.11
+version 1.25
 
 =head1 SYNOPSIS
 

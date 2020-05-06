@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# This example adds a feed that syncs feed items from a Google My Business
-# (GMB) account and associates the feed with a customer.
+# This example adds a feed that syncs feed items from a Google My Business (GMB)
+# account and associates the feed with a customer.
 
 use strict;
 use warnings;
@@ -221,7 +221,7 @@ pod2usage(2)
 
 # Call the example.
 add_google_my_business_location_extensions(
-  $api_client,          $customer_id =~ s/-//gr, $gmb_email_address,
+  $api_client, $customer_id =~ s/-//gr, $gmb_email_address,
   $business_account_id, $gmb_access_token
 );
 

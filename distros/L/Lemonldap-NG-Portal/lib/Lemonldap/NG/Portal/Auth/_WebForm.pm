@@ -19,7 +19,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_MALFORMEDUSER
 );
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Portal::Main::Auth',
   'Lemonldap::NG::Portal::Lib::_tokenRule';
@@ -99,9 +99,11 @@ sub extractFormInfo {
     }
 
     # Security: check for captcha or token
-    if ( $self->captcha or $self->ottRule->( $req, {} ) ) {
+    if ( not $req->data->{'skipToken'}
+        and ( $self->captcha or $self->ottRule->( $req, {} ) ) )
+    {
         my $token;
-        unless ( $token = $req->param('token') ) {
+        unless ( $token = $req->param('token') or $self->captcha ) {
             $self->userLogger->error('Authentication tried without token');
             $self->ott->setToken($req);
             return PE_NOTOKEN;

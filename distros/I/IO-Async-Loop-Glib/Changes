@@ -1,5 +1,10 @@
 Revision history for IO-Async-Loop-Glib
 
+0.22    2020-05-05
+        [CHANGES]
+         * Support IO::Async 0.76
+            + ->watch_child API is now called ->watch_process
+
 0.21    CHANGES:
          * Implement the iO::Async 0.49 Loop API - watch_time/unwatch_time
          * Implement watch_child on specific PIDs using native GLib child

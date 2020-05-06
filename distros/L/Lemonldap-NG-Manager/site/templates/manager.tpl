@@ -47,6 +47,9 @@
                   <li ng-repeat="link in links"><a href="{{link.target}}" role="row"><i ng-if="link.icon" class="glyphicon glyphicon-{{link.icon}}"></i> {{translate(link.title)}}</a></li>
                   <li ng-repeat="menulink in menulinks"><a href="{{menulink.target}}" role="row"><i ng-if="menulink.icon" class="glyphicon glyphicon-{{menulink.icon}}"></i> {{translate(menulink.title)}}</a></li>
                   <li ng-include="'languages.html'"></li>
+                  <TMPL_IF NAME="INSTANCE_NAME">
+                    <li><a href="https://lemonldap-ng.org"><TMPL_VAR NAME="INSTANCE_NAME"></a></li>
+                  </TMPL_IF>
                 </ul>
               </li>
             </ul>

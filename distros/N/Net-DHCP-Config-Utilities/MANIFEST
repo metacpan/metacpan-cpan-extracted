@@ -2,6 +2,7 @@ Changes
 lib/Net/DHCP/Config/Utilities.pm
 lib/Net/DHCP/Config/Utilities/Generator/ISC_DHCPD.pm
 lib/Net/DHCP/Config/Utilities/INI_loader.pm
+lib/Net/DHCP/Config/Utilities/INI_check.pm
 lib/Net/DHCP/Config/Utilities/Options.pm
 lib/Net/DHCP/Config/Utilities/Subnet.pm
 Makefile.PL
@@ -10,6 +11,8 @@ README
 t/00-load.t
 t/01-load.t
 t/02-load.t
+t/03-load.t
+t/04-load.t
 t/ini/10.0.0.0.dhcp.ini
 t/ini/192.168.0.0.dhcp.ini
 t/ini-bad/10.0.10.0.dhcp.ini

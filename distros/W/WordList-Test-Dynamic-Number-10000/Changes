@@ -1,8 +1,14 @@
-0.002   2018-04-02 (PERLANCAR)
+0.003   2020-05-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to newer App::wordlist (which uses first_word() &
+	  next_word() now instead of each_word()).
+
+
+0.002   2018-04-02  Released-By: PERLANCAR
 
 	- [Bugfix] Forgot to set $DYNAMIC=1.
 
 
-0.001   2018-04-02 (PERLANCAR)
+0.001   2018-04-02  Released-By: PERLANCAR
 
         - First release.

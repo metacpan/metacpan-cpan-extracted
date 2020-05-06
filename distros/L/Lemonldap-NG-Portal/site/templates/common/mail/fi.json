@@ -4,6 +4,7 @@
 "autoMail":"Tämä sähköpostiviesti lähetetään automaattisesti",
 "click2Register":"Klikkaa tästä vahvistaaksesi käyttäjätunnuksesi rekisteröinnin",
 "click2Reset":"Klikkaa tästä nollataksesi salasanasi",
+"goToPortal":"Siirry portaaliin",
 "hello":"Hei",
 "mail2fSubject":"[LemonLDAP::NG] Your login code",
 "mailConfirmSubject":"[LemonLDAP::NG] Salasanan nollauksen vahvistus",

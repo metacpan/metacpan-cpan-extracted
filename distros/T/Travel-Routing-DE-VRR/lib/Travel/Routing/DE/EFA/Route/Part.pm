@@ -6,7 +6,7 @@ use 5.010;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '2.18';
+our $VERSION = '2.19';
 
 Travel::Routing::DE::EFA::Route::Part->mk_ro_accessors(
 	qw(arrival_platform arrival_stop
@@ -154,7 +154,7 @@ points, without interchanges
 
 =head1 VERSION
 
-version 2.18
+version 2.19
 
 =head1 DESCRIPTION
 
@@ -354,8 +354,8 @@ Class::Accessor(3pm).
 
 =head1 AUTHOR
 
-Copyright (C) 2011-2015 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2011-2017 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 
-  0. You just DO WHAT THE FUCK YOU WANT TO.
+This program is licensed under the same terms as Perl itself.

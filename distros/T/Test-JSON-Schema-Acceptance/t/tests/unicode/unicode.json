@@ -1,0 +1,71 @@
+[
+    {
+        "description": "ascii schema",
+        "schema": {
+          "const": "hello world"
+        },
+        "tests": [
+            {
+                "description": "ascii data",
+                "data": "hello world",
+                "valid": true
+            },
+            {
+                "description": "latin1 data",
+                "data": "Les hivers de mon enfance étaient des saisons longues, longues. Nous vivions en trois lieux: l'école, l'église et la patinoire; mais la vraie vie était sur la patinoire.",
+                "valid": true
+            },
+            {
+                "description": "very wide data",
+                "data": "ಠ_ಠ",
+                "valid": true
+            }
+        ]
+    },
+    {
+        "description": "latin1 schema",
+        "schema": {
+          "const": "Les hivers de mon enfance étaient des saisons longues, longues. Nous vivions en trois lieux: l'école, l'église et la patinoire; mais la vraie vie était sur la patinoire."
+        },
+        "tests": [
+            {
+                "description": "ascii data",
+                "data": "hello world",
+                "valid": true
+            },
+            {
+                "description": "latin1 data",
+                "data": "Les hivers de mon enfance étaient des saisons longues, longues. Nous vivions en trois lieux: l'école, l'église et la patinoire; mais la vraie vie était sur la patinoire.",
+                "valid": true
+            },
+            {
+                "description": "very wide data",
+                "data": "ಠ_ಠ",
+                "valid": true
+            }
+        ]
+    },
+    {
+        "description": "very wide schema",
+        "schema": {
+          "const": "ಠ_ಠ"
+        },
+        "tests": [
+            {
+                "description": "ascii data",
+                "data": "hello world",
+                "valid": true
+            },
+            {
+                "description": "latin1 data",
+                "data": "Les hivers de mon enfance étaient des saisons longues, longues. Nous vivions en trois lieux: l'école, l'église et la patinoire; mais la vraie vie était sur la patinoire.",
+                "valid": true
+            },
+            {
+                "description": "very wide data",
+                "data": "ಠ_ಠ",
+                "valid": true
+            }
+        ]
+    }
+]

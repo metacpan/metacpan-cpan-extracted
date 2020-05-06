@@ -7,7 +7,7 @@ use Devel::ebug;
 use File::Spec;
 
 my $ebug = Devel::ebug->new;
-$ebug->program("t/calc.pl");
+$ebug->program("corpus/calc.pl");
 $ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 
@@ -23,7 +23,7 @@ is(scalar(@trace), 1);
 
 my $trace = $trace[0];
 is($trace->package   , "main");
-is($trace->filename , File::Spec->catfile('t','calc.pl'), "trace is on correct file name");
+is($trace->filename , File::Spec->catfile('corpus','calc.pl'), "trace is on correct file name");
 is($trace->subroutine, "main::add");
 ok(! $trace->wantarray ); # Forced boolean context
 is($trace->line      , 5);
@@ -34,10 +34,10 @@ is(scalar(@trace), 1);
 is($trace[0], 'add(1, 2)');
 
 $ebug = Devel::ebug->new;
-$ebug->program("t/calc_oo.pl");
+$ebug->program("corpus/calc_oo.pl");
 $ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
-$ebug->break_point("t/Calc.pm", 19);
+$ebug->break_point("corpus/lib/Calc.pm", 19);
 
 $ebug->run;
 @trace = $ebug->stack_trace_human;
@@ -51,7 +51,7 @@ like($trace[1], qr{^Calc::fib1\("Calc=HASH\(.*\)", 15\)$});
 like($trace[0], qr{^fib1\("Calc=HASH\(.*\)", 14\)$});
 
 $ebug = Devel::ebug->new;
-$ebug->program("t/koremutake.pl");
+$ebug->program("corpus/koremutake.pl");
 $ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 
@@ -61,7 +61,7 @@ is(scalar(@trace), 1);
 is($trace[0], 'String::Koremutake->new()');
 
 $ebug = Devel::ebug->new;
-$ebug->program("t/koremutake.pl");
+$ebug->program("corpus/koremutake.pl");
 $ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 $ebug->break_point_subroutine("String::Koremutake::integer_to_koremutake");
@@ -72,7 +72,7 @@ is(scalar(@trace), 1);
 like($trace[0], qr{^String::Koremutake::integer_to_koremutake\("String::Koremutake=HASH\(.*\)", 65535\)$});
 
 $ebug = Devel::ebug->new;
-$ebug->program("t/stack.pl");
+$ebug->program("corpus/stack.pl");
 $ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 $ebug->break_point_subroutine("main::show");

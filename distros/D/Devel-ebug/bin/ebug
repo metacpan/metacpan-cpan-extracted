@@ -1,8 +1,13 @@
-#!/usr/bin/perl
+#!perl
+
 use strict;
 use warnings;
-use lib 'lib';
+#use lib::findbin '../lib'; # dev-only
 use Devel::ebug::Console;
+
+# PODNAME: ebug
+# ABSTRACT: A simple, extensible console Perl debugger
+our $VERSION = '0.60'; # VERSION
 
 my $backend;
 if ($ARGV[0] eq '--backend') {
@@ -15,9 +20,17 @@ $console->run($backend);
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 ebug - A simple, extensible console Perl debugger
+
+=head1 VERSION
+
+version 0.60
 
 =head1 SYNOPSIS
 
@@ -26,7 +39,7 @@ ebug - A simple, extensible console Perl debugger
 
 =head1 DESCRIPTION
 
-ebug is an interactive commmand-line front end to L<Devel::ebug>. It
+ebug is an interactive command-line front end to L<Devel::ebug>. It
 is a simple Perl debugger, much like perl5db.pl.
 
 =head1 SEE ALSO
@@ -35,11 +48,21 @@ L<Devel::ebug>
 
 =head1 AUTHOR
 
-Leon Brocard, C<< <acme@astray.com> >>
+Original author: Leon Brocard E<lt>acme@astray.comE<gt>
 
-=head1 COPYRIGHT
+Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 
-Copyright (C) 2005, Leon Brocard
+Contributors:
 
-This program is free software; you can redistribute it or modify it
-under the same terms as Perl itself.
+Brock Wilcox E<lt>awwaiid@thelackthereof.orgE<gt>
+
+Taisuke Yamada
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2005-2020 by Leon Brocard.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

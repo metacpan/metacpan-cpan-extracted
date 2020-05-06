@@ -345,8 +345,13 @@ sub splice_so {
 
   ##-- parse standoff
   if (!ref($opts{so})) {
-    $p->vlog($p->{traceLevel}, "splice_so(): parse standoff file $opts{so}");
-    $xp_so->parsefile($opts{so});
+    if (!$opts{so} || $opts{so} eq '-') {
+      $p->vlog($p->{traceLevel}, "splice_so(): parse standoff pipe - (stdin)");
+      $xp_so->parse(\*STDIN);
+    } else {
+      $p->vlog($p->{traceLevel}, "splice_so(): parse standoff file $opts{so}");
+      $xp_so->parsefile($opts{so});
+    }
   } elsif (UNIVERSAL::isa($opts{so},'SCALAR')) {
     $p->vlog($p->{traceLevel}, "splice_so(): parse standoff buffer");
     $xp_so->parse(${$opts{so}});
@@ -357,8 +362,13 @@ sub splice_so {
 
   ##-- parse source
   if (!ref($opts{base})) {
-    $p->vlog($p->{traceLevel}, "splice_so(): parse base file $opts{base}");
-    $xp_base->parsefile($opts{base});
+    if (!$opts{base} || $opts{base} eq '-') {
+      $p->vlog($p->{traceLevel}, "splice_so(): parse base pipe - (stdin)");
+      $xp_base->parse(\*STDIN);
+    } else {
+      $p->vlog($p->{traceLevel}, "splice_so(): parse base file $opts{base}");
+      $xp_base->parsefile($opts{base});
+    }
   } elsif (UNIVERSAL::isa($opts{base},'SCALAR')) {
     $p->vlog($p->{traceLevel}, "splice_so(): parse base buffer");
     $xp_base->parse(${$opts{base}});

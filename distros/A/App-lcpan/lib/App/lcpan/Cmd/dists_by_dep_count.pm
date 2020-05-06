@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::dists_by_dep_count;
 
-our $DATE = '2020-04-20'; # DATE
-our $VERSION = '1.051'; # VERSION
+our $DATE = '2020-05-06'; # DATE
+our $VERSION = '1.056'; # VERSION
 
 use 5.010;
 use strict;
@@ -85,7 +85,7 @@ App::lcpan::Cmd::dists_by_dep_count - List "heavy" distributions (ranked by numb
 
 =head1 VERSION
 
-This document describes version 1.051 of App::lcpan::Cmd::dists_by_dep_count (from Perl distribution App-lcpan), released on 2020-04-20.
+This document describes version 1.056 of App::lcpan::Cmd::dists_by_dep_count (from Perl distribution App-lcpan), released on 2020-05-06.
 
 =head1 FUNCTIONS
 

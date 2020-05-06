@@ -85,14 +85,14 @@ is(
 
 is(scalar @prompts, 0, 'there were no prompts') or diag 'got: ', explain \@prompts;
 
-my @expected_checked = (qw(Carp Storable), map { 'Dist::Zilla::Plugin::' . $_ } qw(GatherDir PromptIfStale FinderCode));
+my @expected_checked = (qw(Carp Storable), map 'Dist::Zilla::Plugin::'.$_, qw(GatherDir PromptIfStale FinderCode));
 
 cmp_deeply(
     $tzil->log_messages,
     superbagof(
         '[PromptIfStale] checking for stale modules, plugins...',
         '[PromptIfStale] checking for stale prerequisites...',
-        (map { re(qr/^\Q[PromptIfStale] comparing indexed vs. local version for $_: indexed=0; local version=\E/) } @expected_checked),
+        (map re(qr/^\Q[PromptIfStale] comparing indexed vs. local version for $_: indexed=0; local version=\E/), @expected_checked),
         re(qr/^\Q[DZ] writing DZT-Sample in /),
     ),
     'build completed successfully',

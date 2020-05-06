@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Move;
-$Games::Solitaire::Verify::Move::VERSION = '0.2402';
+$Games::Solitaire::Verify::Move::VERSION = '0.2403';
 use warnings;
 use strict;
 
@@ -102,7 +102,7 @@ sub _init
     {
         return $self->_from_fcs_string( $args->{fcs_string} );
     }
-    return;
+    return ();
 }
 
 
@@ -121,7 +121,7 @@ Solitaire move.
 
 =head1 VERSION
 
-version 0.2402
+version 0.2403
 
 =head1 SYNOPSIS
 

@@ -10,3 +10,5 @@ gettimeofday ?
 test _poll
 
 why are all SIG_ undef?
+
+prctl

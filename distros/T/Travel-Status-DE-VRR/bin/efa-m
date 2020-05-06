@@ -6,7 +6,7 @@ use utf8;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.15';
+our $VERSION = '1.17';
 
 binmode( STDOUT, ':encoding(utf-8)' );
 
@@ -15,7 +15,8 @@ use Getopt::Long qw(:config no_ignore_case bundling);
 use List::Util qw(first max);
 use Travel::Status::DE::EFA;
 
-my $efa_url = 'http://efa.vrr.de/vrr/XSLT_DM_REQUEST';
+my $efa_url = 'https://efa.vrr.de/vrr/XSLT_DM_REQUEST';
+my $efa_encoding;
 my ( $date, $time, $input_type, $list_lines, $offset, $relative_times );
 my ($full_routes);
 my ( $filter_via,    $track_via );
@@ -95,7 +96,8 @@ if ($service) {
 		);
 		exit 1;
 	}
-	$efa_url = $service_ref->{url};
+	$efa_url      = $service_ref->{url};
+	$efa_encoding = $service_ref->{encoding};
 }
 
 sub new_efa_by_url {
@@ -104,6 +106,7 @@ sub new_efa_by_url {
 		date           => $date,
 		developer_mode => $developer_mode,
 		efa_url        => $url,
+		efa_encoding   => $efa_encoding,
 		full_routes    => $full_routes,
 		place          => $place,
 		name           => $input,
@@ -372,7 +375,7 @@ I<city> [I<type>B<:>]I<name>
 
 =head1 VERSION
 
-version 1.15
+version 1.17
 
 =head1 DESCRIPTION
 
@@ -420,7 +423,7 @@ repeated)
 
 =item B<--list>
 
-List supported EFA services wit their URLs (see B<-u>) and abbreviations (see
+List supported EFA services with their URLs (see B<-u>) and abbreviations (see
 B<-s>).
 
 =item B<-m>, B<--mot> I<motlist>
@@ -554,7 +557,7 @@ use B<-s> I<service> when making requests.
 
 =head1 AUTHOR
 
-Copyright (C) 2011-2015 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2011-2020 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

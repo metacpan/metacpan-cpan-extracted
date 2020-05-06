@@ -1,4 +1,7 @@
 Revision history for DBIx-Perlish
+1.05 4 May 2020
+	Fixes for perl versions 5.20 and below
+
 1.04 15 Nov 2019
 	Add --beautify, --inline and --struct for perlish-deparse to help with running
 		copy-pasted code that may contain unknown variables.

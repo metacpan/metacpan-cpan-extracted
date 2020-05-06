@@ -1,0 +1,8 @@
+seq:
+    - seq: t/00..setup.t
+    - par:
+        - t/01..bom.t
+        - t/02..perlio-via.t
+        - t/03..exceptions.t
+        - t/04..pod.t
+    - seq: t/99..shutdown.t

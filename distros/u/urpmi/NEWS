@@ -1,3 +1,11 @@
+- cpan_testers:
+  o BSD: prevent failing due to broken deps generator
+  o do not skip network tests on pre-UsrMove distros (eg: Mageia 2)
+  o fix running genhlist2 with the right perl version
+  o fix running testsuite with rpm-4.9
+  o fix testuite if glibc-static-devel isn't installed on Mageia 2
+  o needs URPM 5.28 for maximal portability
+
 Version 8.122 - 28 April 2020
 
 - cpan_testers:

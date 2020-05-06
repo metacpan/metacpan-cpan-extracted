@@ -13,7 +13,7 @@
     },
     {
       "type": "build",
-      "outputPath": "../public",
+      "outputPath": "compiled/build",
       "babelOptions": {
         "targets": "Chrome >= 76, Firefox >= 68, edge >= 18"
       }

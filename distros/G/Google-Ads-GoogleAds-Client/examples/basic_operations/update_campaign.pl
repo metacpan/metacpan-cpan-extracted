@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# This example updates the status and network settings for a given campaign.
-# To get campaigns, run get_campaigns.pl.
+# This example updates the status and network settings for a given campaign. To
+# get campaigns, run get_campaigns.pl.
 
 use strict;
 use warnings;
@@ -62,8 +62,8 @@ sub update_campaign {
           targetSearchNetwork => "false"
         })});
 
-  # Create a campaign operation for update, using the FieldMasks utility
-  # to derive the update mask.
+  # Create a campaign operation for update, using the FieldMasks utility to
+  # derive the update mask.
   my $campaign_operation =
     Google::Ads::GoogleAds::V3::Services::CampaignService::CampaignOperation->
     new({

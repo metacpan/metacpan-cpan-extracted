@@ -15,7 +15,7 @@ use Rex::Helper::Run;
 use Rex::Commands::Gather;
 use Rex::Logger;
 
-our $VERSION = '1.9.0'; # VERSION
+our $VERSION = '1.10.0'; # VERSION
 
 use Data::Dumper;
 

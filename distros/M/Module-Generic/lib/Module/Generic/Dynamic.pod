@@ -1,0 +1,72 @@
+=encoding utf8
+
+=head1 NAME
+
+Module::Generic::Dynamic - Dynamic Object Class
+
+=head1 SYNOPSIS
+
+    package My::Module;
+    use parent qw( Module::Generic::Dynamic );
+
+    # Then, instantiating an object
+    my $object = My::Module->new({
+        name => $some_name,
+        quantity => 20,
+        metadata => $some_hash_reference,
+        tags => [qw( product entrepreneurship capital )],
+    });
+
+    # Then the methods corresponding to the data keys can be accessed
+    my $product_name = $object->name
+    # etc
+
+=head1 DESCRIPTION
+
+The purpose of this class/package is to provide a framework to create dynamically created class/package.
+
+For more ganular control over the method to be used for each data key-value, use L<Module::Generic/"_set_get_class">
+
+=head1 METHODS
+
+=head2 new
+
+Provided with an hash reference of data, this will create dynamically a class based on the class/pacakge name used to call B<new>
+
+It will then associate helper method sbased on the data type for each key of the hash reference. Precisely:
+
+=over 4
+
+=item I<hash>
+
+This would create method after the key name and a new class also based on the key name, and use the helper method L<Module::Generic/"_set_get_object">
+
+=item I<array>
+
+If the array contains hash references, this will create a new class/package dynamically and create an object for each hash reference in the array using L<Module::Generic/"_set_get_object_array">
+
+Otherwise, it will create the method using L<Module::Generic/"_set_get_array">
+
+=item I<string>
+
+This would create a method using the helper method L<Module::Generic/"_set_get_scalar">
+
+=item I<boolean>
+
+This would create a method using the helper method L<Module::Generic/"_set_get_boolean">
+
+=back
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2000-2020 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut
+

@@ -1,0 +1,5 @@
+name = "Data-Page-Navigation"
+# badges = ["travis-ci.com"]
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+

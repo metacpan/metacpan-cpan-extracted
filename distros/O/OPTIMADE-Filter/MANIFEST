@@ -12,6 +12,7 @@ lib/OPTIMADE/Filter/AndOr.pm
 lib/OPTIMADE/Filter/Comparison.pm
 lib/OPTIMADE/Filter/Known.pm
 lib/OPTIMADE/Filter/ListComparison.pm
+lib/OPTIMADE/Filter/Modifiable.pm
 lib/OPTIMADE/Filter/Negation.pm
 lib/OPTIMADE/Filter/Parser.yp
 lib/OPTIMADE/Filter/Property.pm
@@ -22,6 +23,7 @@ t/03modify.t
 t/04modify.t
 t/05modify.t
 t/06property.t
+t/07bigint.t
 tests/cases/parse_001.inp
 tests/cases/parse_002.inp
 tests/cases/parse_003.inp

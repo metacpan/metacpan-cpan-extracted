@@ -167,7 +167,7 @@ SKIP: {
     ok( $res->[2]->[0] =~ /<span trmsg="82"><\/span>/, 'Token expired' )
       or print STDERR Dumper( $res->[2]->[0] );
     ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu', );
-    my ( $host, $url, $query ) =
+    ( $host, $url, $query ) =
       expectForm( $res, '#', undef, 'user', 'password', 'token' );
 }
 count($maintests);

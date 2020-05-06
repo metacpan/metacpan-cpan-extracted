@@ -27,6 +27,7 @@ my $build = Module::Build->new(
       'File::Temp' => 0,
       'Test::Fatal' => 0,
       'Test::Identity' => 0,
+      'Test::Metrics::Any' => 0,
       'Test::More' => '0.88',
       'Test::Refcount' => 0,
    },

@@ -9,7 +9,7 @@
 #
 package Lemonldap::NG::Portal::Main::Run;
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -19,12 +19,22 @@ use JSON;
 
 has trOverCache => ( is => 'rw', default => sub { {} } );
 
+# The execution order between groups and macros can be
+# modified in config (#1877)
+sub groupsAndMacros {
+    return (
+        $_[0]->conf->{groupsBeforeMacros}
+        ? qw(setGroups setMacros)
+        : qw(setMacros setGroups)
+    );
+}
+
 # List constants
 sub authProcess { qw(extractFormInfo getUser authenticate) }
 
 sub sessionData {
-    qw(setAuthSessionInfo setSessionInfo setMacros setGroups setPersistentSessionInfo
-      setLocalGroups store secondFactor);
+    return qw(setAuthSessionInfo setSessionInfo), $_[0]->groupsAndMacros,
+      qw(setPersistentSessionInfo setLocalGroups store secondFactor);
 }
 
 sub validSession {
@@ -52,19 +62,25 @@ sub handler {
             $self->logger->error("Bad JSON content in cookie pdata");
             $req->pdata( {} );
         }
+
+        # Avoid fatal errors when using old keepPdata format
+        if ( $req->pdata->{keepPdata}
+            and not( ref $req->pdata->{keepPdata} eq "ARRAY" ) )
+        {
+            $req->pdata->{keepPdata} = [];
+        }
     }
     my $res = $self->Lemonldap::NG::Common::PSGI::Router::handler($req);
 
     # Avoid permanent loop 'Portal <-> _url' if pdata cookie is not removed
-    my $url64 = encode_base64( $req->userData->{_url}, '' )
-      if $req->userData->{_url};
-    if (    $url64
+    if (    $req->userData->{_url}
         and !$req->pdata->{keepPdata}
         and $req->userData->{_session_id}
         and $req->{env}->{HTTP_COOKIE}
-        and $req->{env}->{HTTP_COOKIE} =~ /$url64/ )
+        and $req->{env}->{HTTP_COOKIE} eq
+        encode_base64( $req->userData->{_url}, '' ) )
     {
-        $self->logger->debug("Force cleaning pdata");
+        $self->logger->info("Force cleaning pdata");
         $self->logger->warn("pdata cookie domain must be set")
           unless ( $self->conf->{pdataDomain} );
         $req->pdata( {} );
@@ -163,7 +179,8 @@ sub postAuthenticatedRequest {
 sub refresh {
     my ( $self, $req ) = @_;
     $req->mustRedirect(1);
-    my %data = %{ $req->userData };
+    my %data          = %{ $req->userData };
+    my $lastAuthLevel = $req->userData->{authenticationLevel};
     $self->userLogger->notice(
         'Refresh request for ' . $data{ $self->conf->{whatToTrace} } );
     $req->user( $data{_user} || $data{ $self->conf->{whatToTrace} } );
@@ -179,8 +196,12 @@ sub refresh {
             @{ $self->betweenAuthAndData },
             'setAuthSessionInfo',
             'setSessionInfo',
-            'setMacros',
-            'setGroups',
+            sub {
+                $req->sessionInfo->{authenticationLevel} = $lastAuthLevel
+                  ;    # Restore previous authentication level (#2179)
+                return PE_OK;
+            },
+            $self->groupsAndMacros,
             'setLocalGroups',
             sub {
                 $req->sessionInfo->{$_} = $data{$_} foreach ( keys %data );
@@ -245,11 +266,25 @@ sub do {
     if ( !$self->conf->{noAjaxHook} and $req->wantJSON ) {
         $self->logger->debug('Processing to JSON response');
         if ( ( $err > 0 and !$req->id ) or $err eq PE_SESSIONNOTGRANTED ) {
-            return [
-                401,
-                [ 'WWW-Authenticate' => "SSO " . $self->conf->{portal} ],
-                [qq'{"result":0,"error":$err}']
-            ];
+            my $json = { result => 0, error => $err };
+            if ( $req->wantErrorRender ) {
+                $json->{html} = $self->loadTemplate(
+                    $req,
+                    'errormsg',
+                    params => {
+                        AUTH_ERROR      => $err,
+                        AUTH_ERROR_TYPE => $req->error_type,
+                    }
+                );
+            }
+            return $self->sendJSONresponse(
+                $req, $json,
+                code    => 401,
+                headers => [
+                    'WWW-Authenticate' => "SSO " . $self->conf->{portal},
+                    "Content-Type"     => "application/javascript"
+                ],
+            );
         }
         elsif ( $err > 0 and $err != PE_PASSWORD_OK and $err != PE_LOGOUT_OK ) {
             return $self->sendJSONresponse(
@@ -346,6 +381,13 @@ sub autoRedirect {
             $req->data->{redirectFormMethod} = "get";
         }
         else {
+            if (    $req->{pdata}->{_url}
+                and $req->{pdata}->{_url} eq encode_base64( $req->{urldc}, '' )
+              )
+            {
+                $self->logger->info("Force cleaning pdata");
+                $req->pdata( {} );
+            }
             return [ 302, [ Location => $req->{urldc}, $req->spliceHdrs ], [] ];
         }
     }
@@ -514,13 +556,14 @@ sub updateSession {
     return () unless ( ref $infos eq 'HASH' and %$infos );
 
     # Recover session ID unless given
-    $id ||= $req->{id} || $req->userData->{_session_id};
+    $id ||= $req->id || $req->userData->{_session_id};
 
     if ($id) {
 
         # Update sessionInfo data
         ## sessionInfo updated if $id defined : quite strange !!
         ## See https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues/430
+        $self->logger->debug("Update session $id");
         foreach ( keys %$infos ) {
             $self->logger->debug("Update sessionInfo $_");
             $self->_dump( $infos->{$_} );
@@ -641,7 +684,7 @@ sub autoPost {
 
     # Display info before redirecting
     if ( $req->info() ) {
-        $req->{infoFormMethod} = $req->param('method') || "post";
+        $req->data->{infoFormMethod} = $req->param('method') || "post";
         return PE_INFO;
     }
 
@@ -753,7 +796,9 @@ sub cookie {
     $h{HttpOnly} //= $self->conf->{httpOnly};
     $h{max_age}  //= $self->conf->{cookieExpiration}
       if ( $self->conf->{cookieExpiration} );
-    foreach (qw(domain path expires max_age HttpOnly)) {
+    $h{SameSite} ||= $self->conf->{sameSite};
+
+    foreach (qw(domain path expires max_age HttpOnly SameSite)) {
         my $f = $_;
         $f =~ s/_/-/g;
         push @res, "$f=$h{$_}" if ( $h{$_} );
@@ -863,9 +908,17 @@ sub sendHtml {
     $csp .= ';';
 
     # Deny using portal in frame except if it is required
-    unless ( $req->frame or $self->conf->{portalAntiFrame} == 0 ) {
+    unless ( $req->frame
+        or $self->conf->{portalAntiFrame} == 0
+        or $self->conf->{cspFrameAncestors} )
+    {
         push @{ $res->[1] }, 'X-Frame-Options' => 'DENY';
         $csp .= "frame-ancestors 'none';";
+    }
+    if ( $self->conf->{cspFrameAncestors} ) {
+        push @{ $res->[1] }, 'X-Frame-Options' => 'ALLOW-FROM '
+          . "$self->{conf}->{cspFrameAncestors};";
+        $csp .= "frame-ancestors $self->{conf}->{cspFrameAncestors};";
     }
 
     # Check if frames need to be embedded
@@ -969,6 +1022,7 @@ sub tplParams {
         PORTAL_URL => $self->conf->{portal},
         SKIN_PATH  => $portalPath . "skins",
         SKIN_BG    => $self->conf->{portalSkinBackground},
+        CUSTOM_CSS => $self->conf->{portalCustomCss},
         ( $self->customParameters ? ( %{ $self->customParameters } ) : () ),
         %templateParams
     );
@@ -1065,7 +1119,19 @@ sub corsPreflight {
 sub sendJSONresponse {
     my ( $self, $req, $j, %args ) = @_;
     my $res = Lemonldap::NG::Common::PSGI::sendJSONresponse(@_);
-    if ( $self->conf->{corsEnabled} ) {
+
+    # If this is a cross-domain request from the portal itself
+    # (Ajax SSL to a different VHost)
+    # we allow CORS
+    if ( $req->origin and index( $self->conf->{portal}, $req->origin ) == 0 ) {
+        $self->logger->debug('AJAX request from portal, allowing CORS');
+        push @{ $res->[1] },
+          "Access-Control-Allow-Origin"      => $req->origin,
+          "Access-Control-Allow-Methods"     => "*",
+          "Access-Control-Allow-Credentials" => "true";
+
+    }
+    elsif ( $self->conf->{corsEnabled} ) {
         my @cors = split /;/, $self->cors;
         push @{ $res->[1] }, @cors;
         $self->logger->debug('Apply following CORS policy :');

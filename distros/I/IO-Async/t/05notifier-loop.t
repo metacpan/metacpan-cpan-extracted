@@ -5,6 +5,7 @@ use warnings;
 
 use Test::More;
 use Test::Fatal;
+use Test::Metrics::Any;
 use Test::Refcount;
 
 use IO::Async::Notifier;
@@ -122,6 +123,21 @@ is_refcount( $loop, 2, '$loop has refcount 2 initially' );
 
    is_oneref( $parent, '$parent has refcount 1 finally' );
    is_oneref( $child,  '$child has refcount 1 finally' );
+}
+
+# Metrics
+{
+   my $notifier = TestNotifier->new( \my $tmp );
+
+   $loop->add( $notifier );
+
+   is_metrics( { io_async_notifiers => 1 },
+      '$loop->add increments notifiers count' );
+
+   $loop->remove( $notifier );
+
+   is_metrics( { io_async_notifiers => 0 },
+      '$loop->remove decrements notifiers count' );
 }
 
 is_refcount( $loop, 2, '$loop has refcount 2 finally' );

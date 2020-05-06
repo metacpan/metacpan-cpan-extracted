@@ -22,7 +22,7 @@ our @EXPORT = qw(fio_filename_to_url fio_full_file_name fio_format_date
                  fio_same_file fio_set_date fio_split_filename
                  fio_to_file fio_visit fio_write_page);
 
-our $VERSION = "1.92";
+our $VERSION = "1.93";
 
 #----------------------------------------------------------------------
 # Convert filename to url
@@ -376,7 +376,7 @@ website. The optional extension, if passed, replaces the extension on the file.
 
 =item $date_string = fio_format_date($date, $format);
 
-Convert a date to a new formt. If the format is omitted, the ISO format is used.
+Convert a date to a new format. If the format is omitted, the ISO format is used.
 
 =item $filename = fio_full_file_name(@path);
 
@@ -414,14 +414,14 @@ a comma separated list of Unix wildcard patterns.
 
 =item $str = fio_read_page($filename, $binmode);
 
-Read a fie into a string. An the entire file is read from a string, there is no
+Read a file into a string. An the entire file is read from a string, there is no
 line at a time IO. This is because files are typically small and the parsing
 done is not line oriented. Binmode is an optional parameter that indicates file
 type if it is not a plain text file.
 
 =item fio_set_date($filename, $date);
 
-Set the modification date of a file.nDate is either in seconds or
+Set the modification date of a file. Date is either in seconds or
 is in ISO format.
 
 =item ($directory, $filename) = fio_split_filename($filename);

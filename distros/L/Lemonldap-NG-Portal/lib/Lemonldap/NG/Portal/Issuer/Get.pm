@@ -7,7 +7,7 @@ use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Portal::Main::Constants
   qw(PE_OK PE_BADURL PE_GET_SERVICE_NOT_ALLOWED);
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer';
 
@@ -24,7 +24,8 @@ sub init {
     my $rule =
       $hd->buildSub( $hd->substitute( $self->conf->{issuerDBGetRule} ) );
     unless ($rule) {
-        $self->error( "Bad GET rule -> " . $hd->tsv->{jail}->error );
+        my $error = $hd->tsv->{jail}->error || '???';
+        $self->error( "Bad GET activation rule -> $error" );
         return 0;
     }
     $self->{rule} = $rule;
@@ -44,7 +45,7 @@ sub run {
     }
 
     # Session ID
-    my $session_id = $req->{sessionInfo}->{_session_id} || $self->{id};
+    my $session_id = $req->{sessionInfo}->{_session_id} || $req->id;
 
     # Session creation timestamp
     my $time = $req->{sessionInfo}->{_utime} || time();

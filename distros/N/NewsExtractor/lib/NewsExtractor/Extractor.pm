@@ -24,6 +24,14 @@ use NewsExtractor::SiteSpecificExtractor::turnnewsapp_com;
 use NewsExtractor::SiteSpecificExtractor::news_cts_com_tw;
 use NewsExtractor::SiteSpecificExtractor::estate_ltn_com_tw;
 use NewsExtractor::SiteSpecificExtractor::www_upmedia_mg;
+use NewsExtractor::SiteSpecificExtractor::ctee_com_tw;
+use NewsExtractor::SiteSpecificExtractor::news_ebc_net_tw;
+use NewsExtractor::SiteSpecificExtractor::newnet_tw;
+use NewsExtractor::SiteSpecificExtractor::www_thestandnews_com;
+use NewsExtractor::SiteSpecificExtractor::www_hkcnews_com;
+use NewsExtractor::SiteSpecificExtractor::www_epochtimes_com;
+use NewsExtractor::SiteSpecificExtractor::www_ttv_com_tw;
+use NewsExtractor::SiteSpecificExtractor::www_idn_com_tw;
 use NewsExtractor::SiteSpecificExtractor::UDN;
 use NewsExtractor::SiteSpecificExtractor::ETtoday;
 use NewsExtractor::SiteSpecificExtractor::ChinaTimes;
@@ -41,6 +49,9 @@ has extractor => (
 
 use constant {
     SiteSpecificExtractorByHost => {
+        'www.epochtimes.com' => 'NewsExtractor::SiteSpecificExtractor::www_epochtimes_com',
+        'www.hkcnews.com' => 'NewsExtractor::SiteSpecificExtractor::www_hkcnews_com',
+        'www.thestandnews.com' => 'NewsExtractor::SiteSpecificExtractor::www_thestandnews_com',
         'www.allnews.tw' => 'NewsExtractor::SiteSpecificExtractor::www_allnews_tw',
         'www.rvn.com.tw' => 'NewsExtractor::SiteSpecificExtractor::www_rvn_com_tw',
         'www.chinatimes.com' => 'NewsExtractor::SiteSpecificExtractor::ChinaTimes',
@@ -66,6 +77,11 @@ use constant {
         'news.cts.com.tw' => 'NewsExtractor::SiteSpecificExtractor::news_cts_com_tw',
         'estate.ltn.com.tw' => 'NewsExtractor::SiteSpecificExtractor::estate_ltn_com_tw',
         'www.upmedia.mg' => 'NewsExtractor::SiteSpecificExtractor::www_upmedia_mg',
+        'ctee.com.tw' => 'NewsExtractor::SiteSpecificExtractor::ctee_com_tw',
+        'news.ebc.net.tw' => 'NewsExtractor::SiteSpecificExtractor::news_ebc_net_tw',
+        'newnet.tw' => 'NewsExtractor::SiteSpecificExtractor::newnet_tw',
+        'www.ttv.com.tw' => 'NewsExtractor::SiteSpecificExtractor::www_ttv_com_tw',
+        'www.idn.com.tw' => 'NewsExtractor::SiteSpecificExtractor::www_idn_com_tw',
     },
     CSSRuleSetByHost => {
         'www.taiwannews.com.tw' => {
@@ -75,22 +91,16 @@ use constant {
             content_text => 'article.article',
         },
         'udn.com' => {
-            headline   => '#story_art_title',
-            dateline   => '.story_bady_info_author > span:nth-child(1)',
-            journalist => '.story_bady_info_author > a:nth-child(2)',
-            content_text => 'div#article_body',
+            headline   => 'h1.article-content__title',
+            dateline   => '.authors time.article-content__time',
+            journalist => '.authors span.article-content__author',
+            content_text => 'div.article-content__paragraph section.article-content__editor',
         },
         'www.nownews.com' => {
             headline   => 'h1.entry-title',
             dateline   => 'span.td-post-date:nth-child(2) > time:nth-child(1)',
             journalist => '.td-post-author-name',
             content_text => '.td-post-content > span[itemprop=articleBody]',
-        },
-        'www.epochtimes.com' => {
-            headline     => 'h1.title',
-            dateline     => 'header[role=heading] time[datetime]',
-            journalist   => '#artbody > p:nth-last-child(4)',
-            content_text => '#artbody p',
         },
         'www.enewstw.com' =>  {
             headline     => 'td.blog_title > strong',

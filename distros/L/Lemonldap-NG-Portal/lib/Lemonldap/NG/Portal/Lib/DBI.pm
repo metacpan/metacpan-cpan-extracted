@@ -75,6 +75,11 @@ sub init {
     my ($self) = @_;
     $self->_dbh
       or $self->logger->error("DBI connection has failed, but let's continue");
+    unless ( $self->table ) {
+        $self->logger->error(
+            "SQL Table name is not set, can't load " . ref($self) );
+        return 0;
+    }
     return 1;
 }
 

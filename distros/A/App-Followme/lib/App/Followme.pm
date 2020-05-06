@@ -13,7 +13,7 @@ use IO::File;
 use File::Spec::Functions qw(splitdir catfile);
 use App::Followme::FIO;
 
-our $VERSION = "1.92";
+our $VERSION = "1.93";
 
 #----------------------------------------------------------------------
 # Read the default parameter values

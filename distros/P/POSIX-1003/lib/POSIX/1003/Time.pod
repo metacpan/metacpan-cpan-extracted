@@ -4,11 +4,6 @@
 
 POSIX::1003::Time - POSIX handling time
 
-=head1 INHERITANCE
-
- POSIX::1003::Time
-   is a POSIX::1003::Module
-
 =head1 SYNOPSIS
 
   use POSIX::1003::Time;
@@ -20,9 +15,13 @@ POSIX::1003::Time - POSIX handling time
   $str = asctime(localtime($timestamp))
 
   $str = strftime("%A, %B %d, %Y", 0, 0, 0, 12, 11, 95, 2);
+  $str = strftime("%A, %B %d, %Y", {day => 12, month => 12
+    , year => 1995, wday => 2});
   # $str contains "Tuesday, December 12, 1995"
 
   $timestamp = mktime(0, 30, 10, 12, 11, 95);
+  $timestamp = mktime {min => 30, hour => 10, day => 12
+    , month => 12, year => 1995};
   print "Date = ", ctime($timestamp);
 
   print scalar localtime;
@@ -31,24 +30,6 @@ POSIX::1003::Time - POSIX handling time
   $timespan  = difftime($end, $begin);
 
 =head1 DESCRIPTION
-
-See L<documentation in the base class|POSIX::1003::Module/"DESCRIPTION">.
- 
-=head1 METHODS
-
-See L<documentation in the base class|POSIX::1003::Module/"METHODS">.
- 
-=over 4
-
-=item POSIX::1003::Time-E<gt>B<exampleValue>(NAME)
-
-See L<POSIX::1003::Module/"METHODS">
-
-=item $obj-E<gt>B<import>()
-
-See L<POSIX::1003::Module/"METHODS">
-
-=back
 
 =head1 FUNCTIONS
 
@@ -63,14 +44,15 @@ not 1.  The year (C<year>) is given in years since 1900.  I.e., the year
 
 =over 4
 
-=item B<asctime>(SEC, MIN, HOUR, MDAY, MON, YEAR, ...)
+=item B<asctime>($sec, $min, $hour, $mday, $mon, $year, ...)
 
 The C<asctime> function uses C<strftime> with a fixed format, to produce
 timestamps with a trailing new-line.  Example:
 
   "Sun Sep 16 01:03:52 1973\n"
 
-The parameter order is the same as for L<strftime()|POSIX::1003::Time/"Standard POSIX"> without the C<$fmt>:
+The parameter order is the same as for L<strftime()|POSIX::1003::Time/"Standard POSIX"> without its C<$format>
+parameter:
 
   my $str = asctime($sec, $min, $hour, $mday, $mon, $year,
                  $wday, $yday, $isdst);
@@ -79,39 +61,38 @@ The parameter order is the same as for L<strftime()|POSIX::1003::Time/"Standard 
 
 The amount of spent processor time in microseconds.
 
-=item B<ctime>(TIMESTAMP)
+=item B<ctime>($timestamp)
 
   # equivalent
   my $str = ctime $timestamp;
   my $str = asctime localtime $timestamp;
 
-=item B<difftime>(TIMESTAMP, TIMESTAMP)
+=item B<difftime>($timestamp, $timestamp)
 
 Difference between two TIMESTAMPs, which are floats.
 
   $timespan = difftime($end, $begin);
 
-=item B<gmtime>([TIME])
+=item B<gmtime>( [$time] )
 
 Simply L<perlfunc/gmtime>
 
-=item B<localtime>([TIME])
+=item B<localtime>( [$time] )
 
 Simply L<perlfunc/localtime>
 
-=item B<mktime>(SEC, MIN, HOUR, MDAY, MON, YEAR, ...)
+=item B<mktime>(@tm|\%date)
 
-Convert date/time info to a calendar time.
-Returns "undef" on failure.
-
-   my $t = mktime(sec, min, hour, mday, mon, year,
-              wday = 0, yday = 0, isdst = -1)
+Convert date/time info to a calendar time.  Returns "undef" on failure.
 
   # Calendar time for December 12, 1995, at 10:30 am
-  $timestamp = mktime(0, 30, 10, 12, 11, 95);
-  print "Date = ", ctime($time_t);
+  my $ts = mktime 0, 30, 10, 12, 11, 95;
+  print "Date = ", ctime($ts);
 
-=item B<strftime>(FMT, SEC, MIN, HOUR, MDAY, MON, YEAR, ...)
+  my %tm = (min => 30, hour => 10, day => 12, month => 12, year => 1995);
+  my $ts = mktime \%tm;   # %tm will get updated, mday and yday added
+
+=item B<strftime>($format, @tm|\%date)
 
 The formatting of C<strftime> is extremely flexible but the parameters
 are quite tricky.  Read carefully!
@@ -119,7 +100,9 @@ are quite tricky.  Read carefully!
   my $str = strftime($fmt, $sec, $min, $hour,
       $mday, $mon, $year, $wday, $yday, $isdst);
 
-If you want your code to be portable, your format (FMT) argument
+  my $str = strftime($fmt, {month => 12, year => 2015};
+
+If you want your code to be portable, your $format argument
 should use only the conversion specifiers defined by the ANSI C
 standard (C89, to play safe).  These are C<aAbBcdHIjmMpSUwWxXyYZ%>.
 But even then, the results of some of the conversion specifiers are
@@ -127,6 +110,25 @@ non-portable.
 
 [0.95_5] This implementation of C<strftime()> is character-set aware,
 even when the LC_TIME table does not match the type of the format string.
+
+=item B<strptime>($timestring, $format)
+
+Translate the TIMESTRING into a time-stamp (seconds since epoch).
+The $format describes how the $timestring should be interpreted.
+
+Returned is a HASH with the usefull data from the 'tm' structure (as
+described in the standard strptime manual page)  The keys are stripped
+from the C<tm_> prefix.
+
+example: 
+
+   # traditional interface
+   my ($sec, $min, ...) = strptime "12:24", "%H:%S";
+
+   # date as hash
+   my $tm = strptime "12:24", "%H:%S";
+   print "$tm->{hour}/$tm->{min}\n";
+   my $time = mktime $tm;
 
 =item B<tzname>()
 
@@ -144,27 +146,28 @@ Set-up local timezone from C<$ENV{TZ}> and the OS.
 
 =head1 CONSTANTS
 
-=head2 Constants from time.h
+=for comment
+#TABLE_TIME_START
 
-  CLK_TCK CLOCKS_PER_SEC NULL
+The constant names for this module are inserted here during
+installation.
 
-=head2 Constants from limits.h
-
-  TXNAME_MAX
+=for comment
+#TABLE_TIME_END
 
 =head1 SEE ALSO
 
-This module is part of POSIX-1003 distribution version 0.98,
-built on December 03, 2013. Website: F<http://perl.overmeer.net>.  The code is based on L<POSIX>, which
+This module is part of POSIX-1003 distribution version 1.00,
+built on May 05, 2020. Website: F<http://perl.overmeer.net/CPAN>.  The code is based on L<POSIX>, which
 is released with Perl itself.  See also L<POSIX::Util> for
 additional functionality.
 
 =head1 COPYRIGHTS
 
-Copyrights 2011-2013 on the perl code and the related documentation
+Copyrights 2011-2020 on the perl code and the related documentation
  by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

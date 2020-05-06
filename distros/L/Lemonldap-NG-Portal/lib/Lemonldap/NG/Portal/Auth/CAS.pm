@@ -136,7 +136,7 @@ sub extractFormInfo {
             my $portalPath = $self->conf->{portal};
             $portalPath =~ s#^https?://[^/]+/?#/#;
 
-            $req->data->{list}            = $self->srvList;
+            $req->data->{list} = $self->srvList;
 
             $req->data->{login} = 1;
             return PE_IDPCHOICE;

@@ -1,3 +1,8 @@
+0.008   2020-05-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Use DBIx::Util::Schema instead of DBIx::Diff::Schema now.
+
+
 0.007   2020-04-20  Released-By: PERLANCAR; Urgency: medium
 
 	- Add subcommand: list-indexes.

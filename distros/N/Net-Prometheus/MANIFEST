@@ -28,7 +28,9 @@ t/13histogram.t
 t/20client.t
 t/21label-rendering.t
 t/22metric-grouping.t
-t/30psgi.t
+t/23collector.t
+t/30handle.t
+t/31psgi.t
 t/40process-collector.t
 t/41process-collector-linux.t
 t/99pod.t

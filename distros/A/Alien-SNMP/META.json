@@ -16,7 +16,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::Base::ModuleBuild" : "0",
+            "Alien::Base" : "0.020",
             "IO::Socket::SSL" : "1.56",
             "Net::SSLeay" : "1.49",
             "Software::License" : "0"
@@ -24,7 +24,7 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::Base" : "0.020",
+            "Alien::Base::ModuleBuild" : "0",
             "File::ShareDir" : "1.03",
             "Module::Build" : "0.42",
             "PkgConfig" : "0.14026",
@@ -51,7 +51,7 @@
    "provides" : {
       "Alien::SNMP" : {
          "file" : "lib/Alien/SNMP.pm",
-         "version" : "2.001000"
+         "version" : "2.002000"
       }
    },
    "release_status" : "stable",
@@ -63,6 +63,6 @@
          "url" : "http://github.com/ollyg/Alien-SNMP"
       }
    },
-   "version" : "2.001000",
+   "version" : "2.002000",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

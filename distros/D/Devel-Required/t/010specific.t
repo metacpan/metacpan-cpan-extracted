@@ -1,7 +1,4 @@
-BEGIN {				# Magic Perl CORE pragma
-    chdir 't' if -d 't';
-    unshift @INC,'../lib';
-}
+use lib '.';
 
 use Test::More tests => ( 3 * 3 ) + 11;
 use strict;

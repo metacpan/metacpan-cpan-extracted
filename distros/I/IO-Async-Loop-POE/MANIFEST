@@ -2,8 +2,8 @@ Build.PL
 Changes
 lib/IO/Async/Loop/POE.pm
 LICENSE
-Makefile.PL
 MANIFEST			This list of files
+META.json
 META.yml
 README
 t/00use.t
@@ -11,11 +11,10 @@ t/01loop-io.t
 t/02loop-timer.t
 t/03loop-signal.t
 t/04loop-idle.t
-t/05loop-child.t
+t/05loop-process.t
 t/06loop-control.t
 t/11share-io.t
 t/12share-timer.t
 t/13share-signal.t
-t/15share-child.t
+t/15share-process.t
 t/99pod.t
-META.json

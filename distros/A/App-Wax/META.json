@@ -36,11 +36,11 @@
             "Digest::SHA" : "0",
             "File::BaseDir" : "0.08",
             "File::Slurper" : "0.012",
-            "IPC::System::Simple" : "1.25",
-            "LWP" : "6.39",
+            "IPC::System::Simple" : "1.30",
+            "LWP" : "6.44",
             "MIME::Types" : "2.17",
             "Method::Signatures::Simple" : "1.07",
-            "Mouse" : "v2.5.6",
+            "Mouse" : "v2.5.10",
             "Parallel::parallel_map" : "0.02",
             "Try::Tiny" : "0.30",
             "URI" : "1.76",
@@ -52,12 +52,12 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/chocolateboy/App-Wax/issues"
+         "web" : "https://github.com/chocolateboy/wax/issues"
       },
       "repository" : {
-         "url" : "https://github.com/chocolateboy/App-Wax"
+         "url" : "https://github.com/chocolateboy/wax"
       }
    },
-   "version" : "v2.3.2",
+   "version" : "v2.3.3",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

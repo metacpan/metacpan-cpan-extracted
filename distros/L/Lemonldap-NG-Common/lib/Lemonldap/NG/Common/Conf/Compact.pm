@@ -4,12 +4,12 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Common::Conf::ReConstants;
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 sub compactConf {
     my ( $self, $conf ) = @_;
 
-    return $conf if ( $conf->{'dontCompactConf'} );
+    return $conf unless ( $conf->{'compactConf'} );
 
     # Remove unused auth parameters
     my %keep;

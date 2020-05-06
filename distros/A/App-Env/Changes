@@ -1,5 +1,16 @@
 Revision history for App-Env
 
+0.35      2020-05-04 11:14:40-04:00 America/New_York
+
+  [ENHANCMENT]
+
+    * new method, 'which', searches environment's path for executable
+
+  [BUILD]
+
+    * public repository is now on GitLab
+
+
 0.34      2018-04-02 11:03:48-04:00 America/New_York
 
   [BUG FIX]

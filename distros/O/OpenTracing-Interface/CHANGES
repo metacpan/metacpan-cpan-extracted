@@ -1,6 +1,14 @@
 CHANGE LOG
 ==========
 
+2020-05-06 v0.19
+----------------
+
+Fix return types for `get_active_scope`
+Add more tests from `Test::OpenTracing::Interface`
+
+
+
 2020-04-20 v0.18
 ----------------
 

@@ -1,12 +1,12 @@
 use strict;
 use warnings;
-no if "$]" >= 5.031008, feature => 'indirect';
 package Dist::Zilla::MintingProfile::Author::ETHER;
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
+# vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Mint distributions like ETHER does
 
-our $VERSION = '0.154';
+our $VERSION = '0.156';
 
+no if "$]" >= 5.031009, feature => 'indirect';
 use Moose;
 with 'Dist::Zilla::Role::MintingProfile' => { -version => '5.047' };
 use File::ShareDir;
@@ -40,7 +40,7 @@ Dist::Zilla::MintingProfile::Author::ETHER - Mint distributions like ETHER does
 
 =head1 VERSION
 
-version 0.154
+version 0.156
 
 =head1 SYNOPSIS
 

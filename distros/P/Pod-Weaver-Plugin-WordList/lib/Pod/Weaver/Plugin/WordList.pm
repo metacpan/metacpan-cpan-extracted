@@ -1,7 +1,7 @@
 package Pod::Weaver::Plugin::WordList;
 
-our $DATE = '2018-02-20'; # DATE
-our $VERSION = '0.060'; # VERSION
+our $DATE = '2020-05-04'; # DATE
+our $VERSION = '0.061'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -45,6 +45,10 @@ sub _process_module {
 
         push @pod, " # Call a callback for each word\n";
         push @pod, " \$wl->each_word(sub { my \$word = shift; ... });\n\n";
+
+        push @pod, " # Iterate\n";
+        push @pod, " my \$first_word = \$wl->first_word;\n";
+        push @pod, " while (defined(my \$word = \$wl->next_word)) { ... }\n\n";
 
         push @pod, " # Get all the words\n";
         push @pod, " my \@all_words = \$wl->all_words;\n\n";
@@ -111,7 +115,7 @@ Pod::Weaver::Plugin::WordList - Plugin to use when building WordList::* distribu
 
 =head1 VERSION
 
-This document describes version 0.060 of Pod::Weaver::Plugin::WordList (from Perl distribution Pod-Weaver-Plugin-WordList), released on 2018-02-20.
+This document describes version 0.061 of Pod::Weaver::Plugin::WordList (from Perl distribution Pod-Weaver-Plugin-WordList), released on 2020-05-04.
 
 =head1 SYNOPSIS
 
@@ -156,15 +160,13 @@ L<WordList>
 
 L<Dist::Zilla::Plugin::WordList>
 
-L<Pod::Weaver::Plugin::WordListC>
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

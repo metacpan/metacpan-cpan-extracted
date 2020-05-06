@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Notifier );
 
-our $VERSION = '0.75';
+our $VERSION = '0.76';
 
 use Carp;
 
@@ -136,7 +136,7 @@ sub _add_to_loop
       $self->remove_from_parent;
    } );
 
-   $loop->watch_child( $self->pid, $self->{cb} );
+   $loop->watch_process( $self->pid, $self->{cb} );
 }
 
 sub _remove_from_loop
@@ -144,7 +144,7 @@ sub _remove_from_loop
    my $self = shift;
    my ( $loop ) = @_;
 
-   $loop->unwatch_child( $self->pid );
+   $loop->unwatch_process( $self->pid );
 }
 
 sub notifier_name

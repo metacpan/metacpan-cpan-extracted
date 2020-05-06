@@ -1,0 +1,30 @@
+---
+abstract: 'chip driver for F<BNO055>'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::Device::Chip::Adapter: '0'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Device-Chip-BNO055
+provides:
+  Device::Chip::BNO055:
+    file: lib/Device/Chip/BNO055.pm
+    version: '0.01'
+requires:
+  Data::Bitfield: '0.03'
+  Device::Chip::Base::RegisteredI2C: '0.12'
+  Future::AsyncAwait: '0'
+  Object::Pad: '0.19'
+  perl: '5.026'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

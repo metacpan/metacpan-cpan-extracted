@@ -3,7 +3,7 @@ use strict;
 use IO::String;
 
 require 't/test-lib.pm';
-my $maintests = 18;
+my $maintests = 20;
 
 SKIP: {
     eval { require Crypt::U2F::Server; require Authen::U2F::Tester };
@@ -17,8 +17,9 @@ SKIP: {
                 logLevel            => 'error',
                 u2fSelfRegistration => 1,
                 u2fActivation       => 1,
-                portalMainLogo      => 'common/logos/logo_llng_old.png',
                 totp2fTTL           => 2,
+                sfManagerRule       => '$uid eq "davros"',
+                portalMainLogo      => 'common/logos/logo_llng_old.png',
             }
         }
     );
@@ -35,6 +36,18 @@ SKIP: {
         'Auth query'
     );
     my $id = expectCookie($res);
+
+    ok(
+        $res = $client->_get(
+            '/',
+            cookie => "lemonldap=$id",
+            accept => 'text/html'
+        ),
+        'Get Menu'
+    );
+    ok( $res->[2]->[0] !~ m%<span trspan="sfaManager">sfaManager</span>%,
+        'sfaManager link found' )
+      or print STDERR Dumper( $res->[2]->[0] );
 
     # U2F form
     ok(

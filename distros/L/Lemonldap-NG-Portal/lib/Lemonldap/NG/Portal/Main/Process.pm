@@ -1,6 +1,6 @@
 package Lemonldap::NG::Portal::Main::Process;
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -39,10 +39,17 @@ sub process {
             }
         }
     }
-    $self->logger->debug(
-        "Returned error: $err (" . portalConsts->{$err} . ")" )
+    $self->logger->debug( "Returned " . $self->_formatProcessResult($err) )
       if ($err);
     return $err;
+}
+
+sub _formatProcessResult {
+    my ( $self, $err ) = @_;
+    return ( ( $err > 0 ? "error" : "status" )
+        . ": $err ("
+          . portalConsts->{$err}
+          . ")" );
 }
 
 # First process block: check args
@@ -52,7 +59,7 @@ sub process {
 sub restoreArgs {
     my ( $self, $req ) = @_;
     $req->mustRedirect(1);
-    return PE_OK;
+    PE_OK;
 }
 
 sub importHandlerData {
@@ -129,21 +136,30 @@ sub controlUrl {
         }
 
         # Unprotected hosts
-        if ( $tmp and !$self->isTrustedUrl($tmp) ) {
+        my ( $vhost, $appuri ) = $tmp =~ m#^https?://([^/]*)(.*)#;
+        $vhost =~ s/:\d+$//;
+        $vhost = 'http://' . $self->HANDLER->resolveAlias($vhost);
+        $self->logger->debug( "Required URL (param: "
+              . ( $req->param('logout') ? 'HTTP Referer' : 'urldc' )
+              . " | value: $tmp | alias: $vhost)" );
+
+        if (    $tmp
+            and !$self->isTrustedUrl($tmp)
+            and !$self->isTrustedUrl($vhost) )
+        {
             $self->userLogger->error(
                     "URL contains a non protected host (param: "
                   . ( $req->param('logout') ? 'HTTP Referer' : 'urldc' )
-                  . " | value: $tmp)" );
+                  . " | value: $tmp | alias: $vhost)" );
             delete $req->{urldc};
             return PE_BADURL;
         }
 
-        $req->env->{urldc}  = $req->{urldc};
-        $req->env->{_url}   = $req->{_url};
-        $req->data->{_url}  = $url;
-        $req->pdata->{_url} = $url;
+        $req->env->{urldc} = $req->{urldc};
+        $req->env->{_url}  = $req->{_url};
+        $req->data->{_url} = $req->pdata->{_url} =
+          encode_base64( $req->{urldc}, '' );    # Avoid \n or \r
     }
-
     PE_OK;
 }
 
@@ -160,10 +176,7 @@ sub authLogout {
     my ( $self, $req ) = @_;
     my $res = $self->_authentication->authLogout($req);
     $self->logger->debug('Cleaning pdata');
-    my $tmp =
-      ( ref( $req->pdata->{keepPdata} ) eq 'ARRAY' )
-      ? $req->pdata->{keepPdata}
-      : [];
+    my $tmp = $req->pdata->{keepPdata} //= [];
     foreach my $k ( keys %{ $req->pdata } ) {
         delete $req->pdata->{$k} unless ( grep { $_ eq $k } @$tmp );
     }
@@ -189,7 +202,20 @@ sub deleteSession {
         }
     }
 
-    # TODO
+    # Merge logoutServices from user context (for example CAS logoutServices
+    # url) and from global configuration
+    if ( $self->conf->{logoutServices}
+        and %{ $self->conf->{logoutServices} } )
+    {
+
+        # Initialize logoutServices (if not already done)
+        $req->data->{logoutServices} ||= {};
+        $req->data->{logoutServices} = {
+            %{ $req->data->{logoutServices} },
+            %{ $self->conf->{logoutServices} }
+        };
+    }
+
     # Collect logout services and build hidden iFrames
     if ( $req->data->{logoutServices} and %{ $req->data->{logoutServices} } ) {
 
@@ -203,15 +229,12 @@ sub deleteSession {
         );
 
         foreach ( keys %{ $req->data->{logoutServices} } ) {
-            my $logoutServiceName = $_;
-            my $logoutServiceUrl =
-              $req->data->{logoutServices}->{$logoutServiceName};
+            my $logoutServiceUrl = $req->data->{logoutServices}->{$_};
 
-            $self->logger->debug(
-                "Find logout service $logoutServiceName ($logoutServiceUrl)");
+            $self->logger->debug("Find logout service $_ ($logoutServiceUrl)");
 
             my $iframe =
-                qq'<iframe src="$logoutServiceUrl" alt="$logoutServiceName"'
+                qq'<iframe src="$logoutServiceUrl" alt="$_"'
               . ' marginwidth="0" marginheight="0" scrolling="no"'
               . ' class="hiddenFrame" width="0" height="0"'
               . ' frameborder="0"></iframe>';
@@ -266,7 +289,6 @@ sub checkXSSAttack {
             "XSS attack detected (param: $name | value: $value)");
         return $self->conf->{checkXSS};
     }
-
     return 0;
 }
 
@@ -327,7 +349,6 @@ sub authenticate {
     # Ignore result, process will end at least with PE_BADCREDENTIALS
     my $tmp = $self->process($req);
     $ret = $tmp if ( $tmp == PE_WAIT );
-
     return $ret;
 }
 
@@ -349,7 +370,7 @@ sub setSessionInfo {
     my ( $self, $req ) = @_;
 
     # Set _user
-    $req->{sessionInfo}->{_user} //= $req->{user};
+    $req->{sessionInfo}->{_user} //= $req->user;
 
     # Get the current user module
     $req->{sessionInfo}->{_auth}   = $self->getModule( $req, "auth" );
@@ -382,7 +403,6 @@ sub setSessionInfo {
 
     # Call UserDB setSessionInfo
     return $self->_userDB->setSessionInfo($req);
-
     PE_OK;
 }
 
@@ -404,7 +424,7 @@ sub setPersistentSessionInfo {
     my ( $self, $req ) = @_;
 
     # Do not restore infos if session already opened
-    unless ( $req->{id} ) {
+    unless ( $req->id ) {
         my $key = $req->{sessionInfo}->{ $self->conf->{whatToTrace} };
 
         return PE_OK unless ( $key and length($key) );
@@ -450,7 +470,7 @@ sub store {
     $req->userData( $req->sessionInfo );
 
     # Create second session for unsecure cookie
-    if ( $self->conf->{securedCookie} == 2 and !$req->refresh() ) {
+    if ( $self->conf->{securedCookie} == 2 and !$req->refresh ) {
         my %infos = %{ $req->{sessionInfo} };
         $infos{_updateTime} = strftime( "%Y%m%d%H%M%S", localtime() );
         $self->logger->debug("Set _updateTime with $infos{_updateTime}");
@@ -479,22 +499,29 @@ sub store {
 
     # Main session
     my $session = $self->getApacheSession(
-        $req->{id},
+        $req->id,
         force => $req->{force},
         info  => $infos
     );
     return PE_APACHESESSIONERROR unless ($session);
-    $req->id( $session->{id} );
+
+    # Update current request
+    $req->id( $session->id );
+    unless ( $self->_sfEngine->searchForAuthorized2Fmodules($req) ) {
+        $self->logger->debug(
+            "No 2F module authorized -> Update current request");
+        $req->{sessionInfo}->{_session_id}   = $session->{id};
+        $req->{sessionInfo}->{_session_kind} = $session->{kind};
+    }
 
     # Compute unsecured cookie value if needed
-    if ( $self->conf->{securedCookie} == 3 and !$req->refresh() ) {
+    if ( $self->conf->{securedCookie} == 3 and !$req->refresh ) {
         $req->{sessionInfo}->{_httpSession} =
-          $self->conf->{cipher}->encryptHex( $req->{id}, "http" );
+          $self->conf->{cipher}->encryptHex( $req->id, "http" );
         $self->logger->debug( " -> Compute unsecured cookie value : "
               . $req->{sessionInfo}->{_httpSession} );
     }
     $req->refresh(0);
-
     PE_OK;
 }
 
@@ -504,7 +531,7 @@ sub buildCookie {
         $req->addCookie(
             $self->cookie(
                 name   => $self->conf->{cookieName},
-                value  => $req->{id},
+                value  => $req->id,
                 domain => $self->conf->{domain},
                 secure => $self->conf->{securedCookie},
             )
@@ -520,9 +547,14 @@ sub buildCookie {
             );
         }
     }
-    my $user_log = $req->{userData}->{ $self->conf->{whatToTrace} };
-    $self->userLogger->notice(
-"User $user_log successfully authenticated at level $req->{userData}->{authenticationLevel}"
+    my $ref = (
+        %{ $req->{sessionInfo} }
+        ? $req->{sessionInfo}
+        : $req->{userData}
+    );
+    $self->userLogger->notice( 'User '
+          . $ref->{ $self->conf->{whatToTrace} }
+          . " successfully authenticated at level $ref->{authenticationLevel}"
     );
     PE_OK;
 }

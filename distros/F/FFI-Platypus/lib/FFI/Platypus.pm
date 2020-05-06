@@ -8,7 +8,7 @@ use FFI::Platypus::Function;
 use FFI::Platypus::Type;
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '1.11'; # VERSION
+our $VERSION = '1.25'; # VERSION
 
 # Platypus Man,
 # Platypus Man,
@@ -69,6 +69,10 @@ sub new
     $tp = 'Version0';
   }
   elsif($api == 1)
+  {
+    $tp = 'Version1';
+  }
+  elsif($api == 2)
   {
     $tp = 'Version1';
   }
@@ -168,6 +172,8 @@ sub lang
       $type_map{pointer} = 'opaque' if $self->{tp}->isa('FFI::Platypus::TypeParser::Version0');
       $self->{tp}->type_map(\%type_map);
     }
+
+    $class->load_custom_types($self) if $class->can('load_custom_types');
   }
 
   $self->{lang};
@@ -402,6 +408,47 @@ sub alignof
 }
 
 
+sub kindof
+{
+  my($self, $name) = @_;
+  ref $self
+    ? $self->{tp}->parse($name)->kindof
+    : $self->new->kindof($name);
+}
+
+
+sub countof
+{
+  my($self, $name) = @_;
+  ref $self
+    ? $self->{tp}->parse($name)->countof
+    : $self->new->countof($name);
+}
+
+
+sub def
+{
+  my $self = shift;
+  my $package = shift || caller;
+  my $type = shift;
+  if(@_)
+  {
+    $self->type($type);
+    $self->{def}->{$package}->{$type} = shift;
+  }
+  $self->{def}->{$package}->{$type};
+}
+
+
+sub unitof
+{
+  my($self, $name) = @_;
+  ref $self
+    ? $self->{tp}->parse($name)->unitof
+    : $self->new->unitof($name);
+}
+
+
 sub find_lib
 {
   my $self = shift;
@@ -528,7 +575,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 1.11
+version 1.25
 
 =head1 SYNOPSIS
 
@@ -549,6 +596,7 @@ version 1.11
 
 Platypus is a library for creating interfaces to machine code libraries
 written in languages like C, L<C++|FFI::Platypus::Lang::CPP>,
+L<Go|FFI::Platypus::Lang::Go>,
 L<Fortran|FFI::Platypus::Lang::Fortran>,
 L<Rust|FFI::Platypus::Lang::Rust>,
 L<Pascal|FFI::Platypus::Lang::Pascal>. Essentially anything that gets
@@ -602,6 +650,7 @@ least some understanding of C, the C pre-processor, and some C++ caveats
 (since on some platforms Perl is compiled and linked with a C++
 compiler). Platypus on the other hand could be used to call other
 compiled languages, like L<Fortran|FFI::Platypus::Lang::Fortran>,
+L<Go|FFI::Platypus::Lang::Go>,
 L<Rust|FFI::Platypus::Lang::Rust>,
 L<Pascal|FFI::Platypus::Lang::Pascal>, L<C++|FFI::Platypus::Lang::CPP>,
 or even L<assembly|FFI::Platypus::Lang::ASM>, allowing you to focus
@@ -1064,6 +1113,65 @@ iterations.
 
 Returns the alignment of the given type in bytes.
 
+=head2 kindof
+
+[version 1.24]
+
+ my $kind = $ffi->kindof($type);
+
+Returns the kind of a type.  This is a string with a value of one of
+
+=over 4
+
+=item C<void>
+
+=item C<scalar>
+
+=item C<string>
+
+=item C<closure>
+
+=item C<record>
+
+=item C<record-value>
+
+=item C<pointer>
+
+=item C<array>
+
+=item C<object>
+
+=back
+
+=head2 countof
+
+[version 1.24]
+
+ my $count = $ffi->countof($type);
+
+For array types returns the number of elements in the array (returns 0 for variable length array).
+For the C<void> type returns 0.  Returns 1 for all other types.
+
+=head2 def
+
+[version 1.24]
+
+ $ffi->def($package, $type, $value);
+ my $value = $ff->def($package, $type);
+
+This method allows you to store data for types.  If the C<$package> is not provided, then the
+caller's package will be used.  C<$type> must be a legal Platypus type for the L<FFI::Platypus>
+instance.
+
+=head2 unitof
+
+[version 1.24]
+
+ my $unittype = $ffi->unitof($type);
+
+For array and pointer types, returns the basic type without the array or pointer part.
+In other words, for C<sin16[]> or C<sint16*> it will return C<sint16>.
+
 =head2 find_lib
 
 [version 0.20]
@@ -1235,40 +1343,49 @@ L<FFI::Platypus::Memory> module.
 
 =head2 structured data records
 
- package My::UnixTime;
+ use FFI::Platypus 1.00;
+ use FFI::C;
  
- use FFI::Platypus::Record;
+ my $ffi = FFI::Platypus->new(
+   api => 1,
+   lib => [undef],
+ );
+ FFI::C->ffi($ffi);
  
- record_layout_1(qw(
-     int    tm_sec
-     int    tm_min
-     int    tm_hour
-     int    tm_mday
-     int    tm_mon
-     int    tm_year
-     int    tm_wday
-     int    tm_yday
-     int    tm_isdst
-     long   tm_gmtoff
-     string tm_zone
- ));
+ package Unix::TimeStruct {
  
- my $ffi = FFI::Platypus->new( api => 1 );
- $ffi->lib(undef);
- # define a record class My::UnixTime and alias it to "tm"
- $ffi->type("record(My::UnixTime)*" => 'tm');
+   FFI::C->struct(tm => [
+     tm_sec    => 'int',
+     tm_min    => 'int',
+     tm_hour   => 'int',
+     tm_mday   => 'int',
+     tm_mon    => 'int',
+     tm_year   => 'int',
+     tm_wday   => 'int',
+     tm_yday   => 'int',
+     tm_isdst  => 'int',
+     tm_gmtoff => 'long',
+     _tm_zone  => 'opaque',
+   ]);
  
- # attach the C localtime function as a constructor
- $ffi->attach( localtime => ['time_t*'] => 'tm', sub {
-   my($inner, $class, $time) = @_;
-   $time = time unless defined $time;
-   $inner->(\$time);
- });
+   # For now 'string' is unsupported by FFI::C, but we
+   # can cast the time zone from an opaque pointer to
+   # string.
+   sub tm_zone {
+     my $self = shift;
+     $ffi->cast('opaque', 'string', $self->_tm_zone);
+   }
  
- package main;
+   # attach the C localtime function
+   $ffi->attach( localtime => ['time_t*'] => 'tm', sub {
+     my($inner, $class, $time) = @_;
+     $time = time unless defined $time;
+     $inner->(\$time);
+   });
+ }
  
  # now we can actually use our My::UnixTime class
- my $time = My::UnixTime->localtime;
+ my $time = Unix::TimeStruct->localtime;
  printf "time is %d:%d:%d %s\n",
    $time->tm_hour,
    $time->tm_min,
@@ -1279,16 +1396,19 @@ B<Discussion>: C and other machine code languages frequently provide
 interfaces that include structured data records (known as "structs" in
 C).  They sometimes provide an API in which you are expected to
 manipulate these records before and/or after passing them along to C
-functions.  There are a few ways of dealing with such interfaces, but
-the easiest way is demonstrated here defines a record class using a
-specific layout.  For more details see L<FFI::Platypus::Record>.
-(L<FFI::Platypus::Type> includes some other ways of manipulating
-structured data records).
+functions.  For C pointers to structs, unions and arrays of structs and
+unions, the easiest interface to use is via L<FFI::C>.  If you are
+working with structs that must be passed as values (not pointers),
+then you want to use the L<FFI::Platypus::Record> class instead.
+We will discuss this class later.
 
-The C C<localtime> function takes a pointer to a record, hence we suffix
-the type with a star: C<record(My::UnixTime)*>.  If the function takes
-a record in pass-by-value mode then we'd just say C<record(My::UnixTime)>
-with no star suffix.
+The C C<localtime> function takes a pointer to a C struct.  We simply define
+the members of the struct using the L<FFI::C> C<struct> method.  Because
+we used the C<ffi> method to tell L<FFI::C> to use our local instance of
+L<FFI::Platypus> it registers the C<tm> type for us, and we can just start
+using it as a return type!
+
+=head2 structured data records by-value
 
 =head2 libuuid
 
@@ -2160,6 +2280,14 @@ Type definitions for Platypus.
 Define structured data records (C "structs") for use with
 Platypus.
 
+=item L<FFI::C>
+
+Another interface for defining structured data records for use
+with Platypus.  Its advantage over L<FFI::Platypus::Record> is
+that it supports C<union>s and nested data structures.  Its
+disadvantage is that it doesn't support passing C<struct>s
+by-value.
+
 =item L<FFI::Platypus::API>
 
 The custom types API for Platypus.
@@ -2189,6 +2317,10 @@ language
 =item L<FFI::Platypus::Lang::Fortran>
 
 Documentation and tools for using Platypus with Fortran
+
+=item L<FFI::Platypus::Lang::Go>
+
+Documentation and tools for using Platypus with Go
 
 =item L<FFI::Platypus::Lang::Pascal>
 

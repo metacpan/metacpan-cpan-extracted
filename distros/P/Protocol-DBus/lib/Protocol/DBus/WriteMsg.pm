@@ -22,7 +22,7 @@ sub DESTROY {
 }
 
 sub enqueue_message {
-    my ($self, $buf_sr, $fds_ar) = @_;
+    my ($self, $buf_sr, $fds_ar, $on_send) = @_;
 
     push @{ $fh_fds{$self->get_write_fh()} }, ($fds_ar && @$fds_ar) ? $fds_ar : undef;
 
@@ -33,6 +33,8 @@ sub enqueue_message {
             # We’re done with the message, so we remove the FDs entry,
             # which by here should be undef.
             shift @{ $fh_fds{$self->get_write_fh()} };
+
+            $on_send->() if $on_send;
         },
     );
 

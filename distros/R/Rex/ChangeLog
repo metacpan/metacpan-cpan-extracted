@@ -1,5 +1,28 @@
 Revision history for Rex
 
+1.10.0 2020-05-05 Ferenc Erki <erkiferenc@gmail.com>
+ [BUG FIXES]
+ - Fix warning about redundant arguments when using sync with key
+   authentication
+ - Fix setting distributor when versioned feature flags are active
+ - Remove default host of test tasks
+ - Fix task hooks specified in Rexfile for tasks defined in modules
+
+ [DOCUMENTATION]
+ - Clarify sudo usage for multiple commands
+ - Clarify task hooks documentation
+ - Clarify usage and purpose of configuration methods
+ - Clarify mkdir usage
+
+ [ENHANCEMENTS]
+ - Add on_change option for mkdir
+ - Support package globs on FreeBSD
+
+ [NEW FEATURES]
+ - Add new configuration option to control attaching default authentication
+   info to tasks
+ - Initial support for package globs
+
 1.9.0 2020-04-05 Ferenc Erki <erkiferenc@gmail.com>
  [BUG FIXES]
  - Fix setting custom waitpid_blocking_sleep_time

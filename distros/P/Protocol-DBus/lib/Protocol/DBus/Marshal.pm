@@ -84,12 +84,7 @@ sub _marshal {
 
         # Anything else is a basic type.
         else {
-            if ($sct eq 'o') {
-                $datum =~ m<\A/(?:[A-Za-z0-9_]+(?:/[A-Za-z0-9_]+)*)?\z> or do {
-                    die "Invalid object path: “$datum”";
-                };
-            }
-            elsif ($sct eq 'h') {
+            if ($sct eq 'h') {
                 my $fd = fileno($datum);
                 die "fileno($datum) returned undef!" if !defined $fd;
 
@@ -101,6 +96,14 @@ sub _marshal {
                 }
 
                 $datum = $idx;
+            }
+            elsif ($sct eq 'o') {
+                $datum =~ m<\A/(?:[A-Za-z0-9_]+(?:/[A-Za-z0-9_]+)*)?\z> or do {
+                    die "Invalid object path: “$datum”";
+                };
+            }
+            elsif ($sct eq 's') {
+                utf8::encode($datum);
             }
 
             Protocol::DBus::Pack::align_str($$buf_sr, Protocol::DBus::Pack::ALIGNMENT()->{$sct});
@@ -267,14 +270,20 @@ sub _unmarshal_sct {
 
     my $val = unpack("\@$buf_offset ($pack_tmpl)$_ENDIAN_PACK", $$buf_sr);
 
+    my $strlen;
+
     if ($FILEHANDLES && $sct_sig eq 'h') {
         $val = $FILEHANDLES->[$val] || do {
             warn "UNIX_FD ($val) received that doesn’t refer to a received file descriptor!\n";
             $val;
         };
     }
+    elsif ($is_string) {
+        $strlen = length $val;
+        utf8::decode($val);
+    }
 
-    return ($val, $buf_offset - $buf_start + Protocol::DBus::Pack::WIDTH()->{$sct_sig} + ($is_string ? length($val) : 0));
+    return ($val, $buf_offset - $buf_start + Protocol::DBus::Pack::WIDTH()->{$sct_sig} + ($is_string ? $strlen : 0));
 }
 
 sub _unmarshal_variant {
@@ -366,22 +375,6 @@ sub _unmarshal_struct {
     return ($items_ar, ($buf_offset - $buf_start) + $len);
 }
 
-#----------------------------------------------------------------------
-# The logic below is unused. I was under the impression that I’d need a
-# way to determine if a message body’s length matches the given SIGNATURE,
-# but of course we don’t because the header includes the body length.
-#----------------------------------------------------------------------
-
-sub buffer_length_satisfies_signature_le {
-    local $_ENDIAN_PACK = '<';
-    return (_buffer_length_satisfies_signature(@_))[0];
-}
-
-sub buffer_length_satisfies_signature_be {
-    local $_ENDIAN_PACK = '>';
-    return (_buffer_length_satisfies_signature(@_))[0];
-}
-
 sub _buffer_length_satisfies_signature {
     my ($buf, $buf_offset, $sig) = @_;
 
@@ -454,6 +447,9 @@ sub _buffer_length_satisfies_signature {
 
 sub _add_uint32_variant_length {
     my ($buf_sr, $buf_offset_sr) = @_;
+use Data::Dumper;
+$Data::Dumper::Useqq = 1;
+print STDERR Dumper @_;
 
     Protocol::DBus::Pack::align( $$buf_offset_sr, 4 );
 

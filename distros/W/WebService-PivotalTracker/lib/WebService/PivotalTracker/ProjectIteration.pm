@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use WebService::PivotalTracker::PropertyAttributes;
 use WebService::PivotalTracker::Story;
@@ -38,7 +38,7 @@ sub stories {
             WebService::PivotalTracker::Story->new(
                 raw_content => $_,
                 pt_api      => $self->_pt_api,
-                )
+            )
         } @{ $self->raw_content->{stories} }
     ];
 }
@@ -73,7 +73,7 @@ WebService::PivotalTracker::ProjectIteration - A single iteration in a project
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -131,7 +131,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by MaxMind, Inc.
+This software is Copyright (c) 2016 - 2020 by MaxMind, Inc.
 
 This is free software, licensed under:
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More;
 
 use POE qw( Session Kernel Wheel::ReadWrite );
 use IO::Async::Loop::POE;
@@ -55,3 +55,5 @@ $loop->loop_once until defined $poe_line and defined $ioasync_line;
 
 is( $poe_line,     "Hello world!", 'POE read' );
 is( $ioasync_line, "Hello world!", 'IO::Async read' );
+
+done_testing;

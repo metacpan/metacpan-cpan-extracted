@@ -21,25 +21,25 @@ SKIP: {
     $dbh->do("INSERT INTO users VALUES ('rtyler','rtyler','Test user 1')");
 
     $client = iniCmb('[Dm] or [Ch]');
-    expectCookie( try('dwho') );
-    expectCookie( try( 'dvador', 'sql' ) );
+    $client->logout( expectCookie( try('dwho') ) );
+    $client->logout( expectCookie( try( 'dvador', 'sql' ) ) );
 
     $client = iniCmb('[Dm] and [Ch]');
-    expectCookie( try( 'rtyler', 'sql' ) );
-    expectCookie( try( 'dwho',   'demo' ) );
-    expectReject( try( 'dwho',   'sql' ) );
+    $client->logout( expectCookie( try( 'rtyler', 'sql' ) ) );
+    $client->logout( expectCookie( try( 'dwho',   'demo' ) ) );
+    expectReject( try( 'dwho', 'sql' ) );
 
     $client = iniCmb('if($env->{HTTP_X} eq "dwho") then [Dm] else [Ch]');
-    expectCookie( try('dwho') );
-    expectCookie( try( 'dvador', 'sql' ) );
+    $client->logout( expectCookie( try('dwho') ) );
+    $client->logout( expectCookie( try( 'dvador', 'sql' ) ) );
 
     $client = iniCmb(
 'if($env->{HTTP_X} eq "rtyler") then [Dm] and [Ch] else if($env->{HTTP_X} eq "dvador") then [Ch] else [Ch]'
     );
-    expectCookie( try( 'rtyler', 'sql' ) );
-    expectCookie( try( 'dvador', 'sql' ) );
-    expectCookie( try( 'dwho',   'demo' ) );
-    expectReject( try( 'dwho',   'sql' ) );
+    $client->logout( expectCookie( try( 'rtyler', 'sql' ) ) );
+    $client->logout( expectCookie( try( 'dvador', 'sql' ) ) );
+    $client->logout( expectCookie( try( 'dwho',   'demo' ) ) );
+    expectReject( try( 'dwho', 'sql' ) );
 }
 count($maintests);
 clean_sessions();

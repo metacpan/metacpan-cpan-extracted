@@ -7,18 +7,22 @@
 use Net::ARP;
 use Test::More qw( no_plan );
 
-$dev="enp3s0f1";
+BEGIN
+{
+    eval{ require Net::Pcap; };
+              
+    if($@ =~ /^Can\'t\slocate/)
+    {
+        $dev = "enp3s0f1";
+    }
+    else
+    {
+   	import Net::Pcap;
+        $dev = Net::Pcap::lookupdev(\$errbuf);
+    }
+}
+
 print "Using device $dev to test send_packet()\n";
-
-$ret = Net::ARP::send_packet("strange_dev",   # network interface
-	      	      '127.0.0.1',            # source ip
-	              '127.0.0.1',            # destination ip
-		      'aa:bb:cc:aa:bb:cc',    # source mac
-	              'ff:ff:ff:ff:ff:ff',    # destination mac
-	              'reply');               # ARP operation 
-
-ok( $ret == 0, "abort on strange dev value -> $ret" );
-
 
 $ret = Net::ARP::send_packet($dev,            # network interface
 	      	      'strange_src_ip',       # source ip
@@ -76,5 +80,3 @@ $ret = Net::ARP::send_packet($dev,            # network interface
 	              'reply');               # ARP operation 
 
 ok( $ret == 1, "send arp reply" );
-
-

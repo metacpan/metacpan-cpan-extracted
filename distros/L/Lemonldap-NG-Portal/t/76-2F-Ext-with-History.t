@@ -77,7 +77,8 @@ ok(
 );
 
 ( $host, $url, $query ) =
-  expectForm( $res, undef, '/ext2fcheck?skin=bootstrap', 'token', 'code', 'checkLogins' );
+  expectForm( $res, undef, '/ext2fcheck?skin=bootstrap', 'token', 'code',
+    'checkLogins' );
 
 ok(
     $res->[2]->[0] =~

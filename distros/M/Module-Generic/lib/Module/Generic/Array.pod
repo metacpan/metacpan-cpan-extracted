@@ -1,0 +1,165 @@
+=encoding utf8
+
+=head1 NAME
+
+Module::Generic::Array - An Array Manipulation Object Class
+
+=head1 SYNOPSIS
+
+    my $ar = Module::Generic::Array->new( [qw( Joe John Mary )] );
+    printf( "There are %d people\n", $ar->length );
+    # Adding one more
+    $ar->push( "Jack" );
+
+=head1 DESCRIPTION
+
+The purpose of this class/package is to provide an object-oriented approach at array manipulation
+
+=head1 METHODS
+
+=head2 new
+
+Provided with an optional array reference or an array object such as L<Module::Generic::Array>, this will create a new object and return it.
+
+=head2 as_hash
+
+Returns an hash reference with the keys being the array elements and the hash values their offset value.
+
+=head2 delete
+
+Provided with an offset value and an optional length, and this will remove data from the array at the given offset and for the given length.
+
+If no given length is provided, it removes all entries from the offset until the end.
+
+It returns a list of elements removed in list context or an array reference of it in scalar context.
+
+=head2 each
+
+Returns the next element in the array.
+
+=head2 exists
+
+Provided with a value and this returns true if it is found in the array, or false otherwise.
+
+=head2 for
+
+Provided with a subroutine reference and this will call the subroutine reference, passing it the offset number and the corresponding array value.
+
+    $ar->for(sub
+    {
+        my( $i, $val ) = @_;
+        # do something
+    })
+
+It returns the object itself so this can be chained.
+
+=head2 foreach
+
+Provided with a subroutine reference and this will call the subroutine reference, passing it the value for each entry in the array.
+
+    $ar->foreach(sub
+    {
+        my $val = shift( @_ );
+        # do something
+    })
+
+It returns the object itself so this can be chained.
+
+=head2 grep
+
+Provided with some data, and this will do a grep on the array.
+
+It returns a list of matches found in ilst context and a new L<Module::Generic::Array> in scalar context.
+
+=head2 join
+
+Provided with a string, or expression just as documented in L<perlfunc/"join"> and this will return a string.
+
+=head2 keys
+
+This works as documented in L<perlfunc/"keys"> and returns a list of offset values for each entry in the array.
+
+=head2 length
+
+Returns the size of the array, starting from 1.
+
+=head2 map
+
+Provided with a reference to a subroutine and this will call the subroutine for each element of the array and return the result.
+
+=head2 pop
+
+Returns the last entry in the array.
+
+=head2 push
+
+Provided with some data and this adds it at the end of the array.
+
+=head2 push_arrayref
+
+Provided with an array reference, and this add all its entry at the end of the array.
+
+    my $ar = Module::Generic::Array->new( [qw( John Joe Mary )]);
+    $ar->push_arrayref( [qw( Jack Peter )] );
+    print( $ar->join( "," ), "\n" );
+    # Now prints: John, Joe, Mary, Jack, Peter
+
+=head2 reset
+
+This empty the array, just like L</"undef">
+
+=head2 reverse
+
+Returns a the array in reverse order in list context or a new L<Module::Generic::Array> object of it in scalar context.
+
+=head2 set
+
+Provided with an array or an array-based object and this replace all the data in the current object by the ones provided.
+
+=head2 shift
+
+Remove the first entry and returns it.
+
+=head2 size
+
+Returns the size of the array starting from 1, and 0 if the array is empty.
+
+=head2 sort
+
+Sort the array and return the new array as a list in list context or a new L<Module::Generic::Array> object in scalar context.
+
+=head2 splice
+
+Takes the same arguments as the L<perlfunc/"splice"> function and returns the result.
+
+=head2 split
+
+Just like the normal L<perlfunct/"split"> function, it takes a string or expression and split the data provided into a list of elements.
+
+It returns the list in list context, and returns a new L<Module::Generic::Array> object in scalar context.
+
+=head2 undef
+
+Just like L</"reset">, this empty the array.
+
+=head2 unshift
+
+This add the given values at the beginning of the array.
+
+=head2 values
+
+Get a list of all the array values and return a list in list context or a ne L<Module::Generic::Array> object in scalar context.
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2000-2020 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut
+

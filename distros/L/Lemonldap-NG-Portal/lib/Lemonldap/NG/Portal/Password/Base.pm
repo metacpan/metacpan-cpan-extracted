@@ -8,14 +8,16 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADOLDPASSWORD
   PE_PASSWORD_OK
   PE_PASSWORD_MISMATCH
-  PE_PP_MUST_SUPPLY_OLD_PASSWORD
   PE_PP_PASSWORD_TOO_SHORT
+  PE_PP_NOT_ALLOWED_CHARACTER
+  PE_PP_NOT_ALLOWED_CHARACTERS
+  PE_PP_MUST_SUPPLY_OLD_PASSWORD
   PE_PP_INSUFFICIENT_PASSWORD_QUALITY
 );
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.8';
 
 # INITIALIZATION
 
@@ -25,7 +27,7 @@ sub init {
 
 # INTERFACE
 
-sub forAuthUser { '_modifyPassword' }
+use constant forAuthUser => '_modifyPassword';
 
 # RUNNING METHODS
 
@@ -40,8 +42,14 @@ sub _modifyPassword {
     return PE_PASSWORD_MISMATCH
       unless ( $req->data->{newpassword} eq $req->param('confirmpassword') );
 
+    my $rule =
+      $self->p->HANDLER->buildSub( $self->p->HANDLER->substitute( $self->conf->{portalRequireOldPassword} ) );
+    unless ($rule) {
+        my $error = $self->p->HANDLER->tsv->{jail}->error || '???';
+    }
+
     # Check if portal require old password
-    if ( $self->conf->{portalRequireOldPassword} or $requireOldPwd ) {
+    if ( $rule->($req, $req->userData) or $requireOldPwd ) {
 
         # TODO: verify oldpassword
         unless ( $req->data->{oldpassword} = $req->param('oldpassword') ) {
@@ -129,6 +137,29 @@ sub checkPasswordQuality {
             $self->logger->error("Password has not enough digit characters");
             return PE_PP_INSUFFICIENT_PASSWORD_QUALITY;
         }
+    }
+
+    ## Special characters policy
+    my $speChars = $self->conf->{passwordPolicySpecialChar};
+    $speChars =~ s/\s+//g;
+
+    # Min special characters
+    if ( $self->conf->{passwordPolicyMinSpeChar} && $speChars ) {
+        my $spe  = 0;
+        my $test = $password;
+        $spe = $test =~ s/[\Q$speChars\E]//g;
+        if ( $spe < $self->conf->{passwordPolicyMinSpeChar} ) {
+            $self->logger->error("Password has not enough special characters");
+            return PE_PP_INSUFFICIENT_PASSWORD_QUALITY;
+        }
+    }
+
+    # Fobidden special characters
+    $password =~ s/[\Q$speChars\E\w]//g;
+    if ($password) {
+        $self->logger->error(
+            'Password contains ' . length($password) . " forbidden character(s): $password");
+        return length($password) > 1 ? PE_PP_NOT_ALLOWED_CHARACTERS : PE_PP_NOT_ALLOWED_CHARACTER;
     }
 
     return PE_OK;

@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::State;
-$Games::Solitaire::Verify::State::VERSION = '0.2402';
+$Games::Solitaire::Verify::State::VERSION = '0.2403';
 use warnings;
 use strict;
 
@@ -38,7 +38,7 @@ sub set_freecells
 
     $self->_freecells($freecells);
 
-    return;
+    return ();
 }
 
 sub _assign_freecells_from_string
@@ -55,7 +55,7 @@ sub _assign_freecells_from_string
         )
     );
 
-    return;
+    return ();
 }
 
 
@@ -65,7 +65,7 @@ sub add_column
 
     push @{ $self->_columns() }, $col;
 
-    return;
+    return ();
 }
 
 
@@ -75,7 +75,7 @@ sub set_foundations
 
     $self->_foundations($foundations);
 
-    return;
+    return ();
 }
 
 sub _get_suits_seq
@@ -134,7 +134,7 @@ sub _from_string
         );
     }
 
-    return;
+    return ();
 }
 
 sub _fill_non_custom_variant
@@ -156,7 +156,7 @@ sub _fill_non_custom_variant
     $self->_variant_params($params);
     $self->_variant($variant);
 
-    return;
+    return ();
 }
 
 sub _set_variant
@@ -176,7 +176,7 @@ sub _set_variant
         $self->_fill_non_custom_variant($variant);
     }
 
-    return;
+    return ();
 }
 
 sub _init
@@ -192,7 +192,7 @@ sub _init
     {
         return $self->_from_string( $args->{string} );
     }
-    return;
+    return ();
 }
 
 
@@ -226,7 +226,7 @@ sub increment_foundation_value
 
     $self->_foundations()->increment( $suit, $idx );
 
-    return;
+    return ();
 }
 
 
@@ -745,7 +745,7 @@ sub verify_contents
             die Games::Solitaire::Verify::Exception::State::ExtraCards->new(
                 cards => [$card], );
         }
-        return;
+        return ();
     };
     for my $fc ( 0 .. $self->num_freecells - 1 )
     {
@@ -788,7 +788,7 @@ sub verify_contents
             cards => [], );
     }
 
-    return;
+    return ();
 }
 
 
@@ -822,7 +822,7 @@ states (or positions) of the entire board.
 
 =head1 VERSION
 
-version 0.2402
+version 0.2403
 
 =head1 SYNOPSIS
 

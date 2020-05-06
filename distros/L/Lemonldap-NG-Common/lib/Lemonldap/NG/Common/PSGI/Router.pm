@@ -4,15 +4,16 @@ use Mouse;
 use Lemonldap::NG::Common::PSGI;
 use Lemonldap::NG::Common::PSGI::Constants;
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Common::PSGI';
 
 # Properties
 has 'routes' => (
-    is      => 'rw',
-    isa     => 'HashRef',
-    default => sub { { GET => {}, POST => {}, PUT => {}, DELETE => {} } }
+    is  => 'rw',
+    isa => 'HashRef',
+    default =>
+      sub { { GET => {}, POST => {}, PUT => {}, PATCH => {}, DELETE => {} } }
 );
 has 'defaultRoute' => ( is => 'rw', default => 'index.html' );
 
@@ -20,7 +21,7 @@ has 'defaultRoute' => ( is => 'rw', default => 'index.html' );
 
 sub addRoute {
     my ( $self, $word, $dest, $methods, $transform ) = (@_);
-    $methods ||= [qw(GET POST PUT DELETE)];
+    $methods ||= [qw(GET POST PUT PATCH DELETE)];
     foreach my $method (@$methods) {
         $self->logger->debug("Add $method route:");
         $self->genRoute( $self->routes->{$method}, $word, $dest, $transform );
@@ -75,7 +76,7 @@ sub genRoute {
             elsif ( $t eq 'ARRAY' ) {
                 $routes->{$word} ||= {};
                 foreach my $w ( @{$dest} ) {
-                    $self->genRoute( $routes->{$word}, $w, $transform );
+                    $self->genRoute( $routes->{$word}, $w, $w, $transform );
                 }
                 return;
             }

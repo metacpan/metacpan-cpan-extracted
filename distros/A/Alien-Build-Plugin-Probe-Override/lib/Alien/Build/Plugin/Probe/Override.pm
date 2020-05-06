@@ -7,7 +7,7 @@ use Alien::Build::Plugin;
 use Path::Tiny qw( path );
 
 # ABSTRACT: Override on a per-alien basis
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 sub init
@@ -61,7 +61,7 @@ Alien::Build::Plugin::Probe::Override - Override on a per-alien basis
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -119,7 +119,11 @@ Fallback first on C<ALIEN_INSTALL_TYPE> and then on the L<alienfile> default.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Roy Storey (KIWIROY)
 
 =head1 COPYRIGHT AND LICENSE
 

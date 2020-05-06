@@ -3,7 +3,7 @@ package Alien::GSL;
 use strict;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 $VERSION = eval $VERSION;
 
 use parent 'Alien::Base';

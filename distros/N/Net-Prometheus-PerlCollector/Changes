@@ -1,4 +1,10 @@
 Revision history for Net-Prometheus-PerlCollector
 
+0.02    2020-05-01
+        [CHANGES]
+         * Optionally collect more detail about SVs classifying by type or
+           blessed class
+         * Use `perl_collector_detail` collector param to set level of detail
+
 0.01    2018-10-11 18:08:48
         First version, released on an unsuspecting world.

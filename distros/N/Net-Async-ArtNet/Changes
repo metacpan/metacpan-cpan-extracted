@@ -1,4 +1,10 @@
 Revision history for Net-Async-ArtNet
 
+0.02    2020-05-06
+        [CHANGES]
+         * Use ->bind method rather than directly constructing an
+           IO::Socket::INET thus allowing kernel-assigned port
+         * Add basic SYNOPSIS, example script, unit test
+
 0.01    2014/02/11 22:36:01
         First version, released on an unsuspecting world.

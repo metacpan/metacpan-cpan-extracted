@@ -26,7 +26,7 @@ use JSON 'to_json';
 use Lemonldap::NG::Common::Conf::ReConstants;
 use Lemonldap::NG::Manager::Attributes;
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Common::Conf::Compact';
 
@@ -51,7 +51,10 @@ has changes => ( is => 'rw', isa => 'ArrayRef', default => sub { return [] } );
 has message => (
     is      => 'rw',
     isa     => 'Str',
-    default => '',
+    lazy    => 1,
+    default => sub {
+        return join( ', ', map { $_->{message} } @{ $_[0]->errors } );
+    },
     trigger => sub {
         hdebug( "Message becomes " . $_[0]->{message} );
     }
@@ -94,8 +97,7 @@ sub hdebug {
 # Main method
 #@return result
 sub check {
-    my $self      = shift;
-    my $localConf = shift;
+    my ( $self, $localConf ) = @_;
 
     hdebug("# check()");
     unless ( $self->newConf ) {
@@ -107,7 +109,7 @@ sub check {
     }
     my $separator = $self->newConf->{multiValuesSeparator} || '; ';
     hdebug("  tests succeed");
-    my %conf          = %{ $self->newConf() };
+    my %conf          = %{ $self->newConf };
     my %compactedConf = %{ $self->compactConf( $self->newConf ) };
     my @removedKeys   = ();
     unless ( $self->confChanged ) {
@@ -115,20 +117,20 @@ sub check {
         $self->message('__confNotChanged__');
         return 0;
     }
-    unless ( $self->newConf->{dontCompactConf} ) {
-        foreach ( sort keys %conf ) {
-            push @removedKeys, $_ unless exists $compactedConf{$_};
-        }
-    }
+
+    # Return removed keys if conf compacted
+    @removedKeys = map { exists $compactedConf{$_} ? () : $_ } sort keys %conf
+      if ( $self->newConf->{compactConf} );
     push @{ $self->changes },
       (
-        $self->{newConf}->{dontCompactConf}
-        ? { confCompacted => '0' }
-        : {
+        $self->{newConf}->{compactConf}
+        ? {
             confCompacted => '1',
             removedKeys   => join( $separator, @removedKeys )
-        }
+          }
+        : { confCompacted => '0' }
       );
+
     return 1;
 }
 
@@ -266,7 +268,8 @@ sub _scanNodes {
                               $leaf->{comment}
                               ? "(?#$leaf->{comment})$leaf->{re}"
                               : $leaf->{re};
-                            $k .= "(?#AuthnLevel=$leaf->{level})" if $leaf->{level};
+                            $k .= "(?#AuthnLevel=$leaf->{level})"
+                              if $leaf->{level};
                             $self->set( $target, $key, $k, $leaf->{data} );
                         }
                         else {
@@ -334,7 +337,9 @@ sub _scanNodes {
                     hdebug("  SAML data is an array, serializing");
                     $leaf->{data} = join ';', @{ $leaf->{data} };
                 }
-                if ( $target =~ /^saml(?:S|ID)PMetaData(?:ExportedAttributes|Macros)$/ ) {
+                if ( $target =~
+                    /^saml(?:S|ID)PMetaData(?:ExportedAttributes|Macros)$/ )
+                {
                     if ( $leaf->{cnodes} ) {
                         hdebug("  $target: unopened node");
                         $self->newConf->{$target}->{$key} =
@@ -394,7 +399,9 @@ sub _scanNodes {
                     hdebug("  $target");
                     $self->set( $target, $key, $leaf->{data} );
                 }
-                elsif ( $target =~ /^oidc(?:O|R)PMetaData(?:ExportedVars|Macros)$/ ) {
+                elsif (
+                    $target =~ /^oidc(?:O|R)PMetaData(?:ExportedVars|Macros)$/ )
+                {
                     hdebug("  $target");
                     if ( $leaf->{cnodes} ) {
                         hdebug('    unopened');
@@ -463,7 +470,9 @@ sub _scanNodes {
                     $self->_scanNodes($subNodes);
                     $self->set( $target, $key, $leaf->{title}, $leaf->{data} );
                 }
-                elsif ( $target =~ /^cas(?:App|Srv)MetaData(?:ExportedVars|Macros)$/ ) {
+                elsif ( $target =~
+                    /^cas(?:App|Srv)MetaData(?:ExportedVars|Macros)$/ )
+                {
                     hdebug("  $target");
                     if ( $leaf->{cnodes} ) {
                         hdebug('    unopened');
@@ -671,7 +680,7 @@ sub _scanNodes {
             }
 
             # Create new apps
-            else {
+            if ( $leaf->{type} eq 'menuApp' ) {
                 hdebug('  new app');
                 $knownCat->{__id}++;
                 $cn->{$newapp} = {
@@ -822,7 +831,7 @@ sub _scanNodes {
                     foreach my $node ( @{ $leaf->{nodes} } ) {
                         my $tmp;
                         $tmp->{$_} = $node->{data}->{$_}
-                          foreach (qw(type rule logo label));
+                          foreach (qw(type rule logo level label));
                         $tmp->{over} = {};
                         foreach ( @{ $node->{data}->{over} } ) {
                             $tmp->{over}->{ $_->[0] } = $_->[1];
@@ -1086,8 +1095,7 @@ sub defaultValue {
 #
 #@return true if tests succeed
 sub testNewConf {
-    my $self      = shift;
-    my $localConf = shift;
+    my ( $self, $localConf ) = @_;
 
     hdebug('# testNewConf()');
     return $self->_unitTest( $self->newConf(), $localConf )
@@ -1106,7 +1114,8 @@ sub _unitTest {
     my $res   = 1;
 
     foreach my $key ( keys %$conf ) {
-        if (    $localConf->{skippedUnitTests}
+        if (    $localConf
+            and $localConf->{skippedUnitTests}
             and $localConf->{skippedUnitTests} =~ /\b$key\b/ )
         {
             $localConf->logger->debug("-> Ignore test for $key\n");
@@ -1114,17 +1123,33 @@ sub _unitTest {
         }
         hdebug("Testing $key");
         my $attr = $attrs->{$key};
-        my $type = $types->{ $attr->{type} };
+        my $type = $types->{ $attr->{type} } if $attr;
         unless ( $type or $attr->{test} ) {
-            $localConf->logger->debug("Unknown attribute $key, deleting it\n");
+            $localConf->logger->debug("Unknown attribute $key, deleting it\n")
+              if $localConf;
             delete $conf->{$key};
             next;
         }
 
-        if ( $attr->{type} and $attr->{type} eq 'subContainer' ) {
+        # Vhost, CAS, SAML, OIDC options
+        if ( $key =~
+/^(?^:(?:(?:(?:saml(?:ID|S)|oidc[OR])P|cas(?:App|Srv))MetaData|vhost)Options)$/
+          )
+        {
 
-            # TODO Recursive for SAML/OIDC nodes
+            # Iterate on vhost names, or saml/cas/oidc configuration keys
+            for my $vhost ( keys %{ $conf->{$key} } ) {
+                my $options = $conf->{$key}->{$vhost};
+                if ( ref($options) eq "HASH" ) {
+
+                    # Recurse on option list,
+                    # FIXME this does check for oidcRPMetaDataOptionsXXX appearing under
+                    # samlSPMetadataOptions
+                    $res = 0 unless $self->_unitTest( $options, $localConf, "$key/$vhost/" );
+                }
+            }
         }
+
         else {
 
             # Check if key exists
@@ -1151,8 +1176,6 @@ sub _unitTest {
             if (   $key =~ /^(?:$simpleHashKeys|$doubleHashKeys)$/o
                 or $attr->{type} =~ /Container$/ )
             {
-                my $keyMsg = $attr->{keyMsgFail} // $type->{keyMsgFail};
-                my $msg    = $attr->{msgFail}    // $type->{msgFail};
                 $res = 0
                   unless (
                     $self->_execTest( {
@@ -1199,7 +1222,14 @@ sub _execTest {
     if ( $ref eq 'CODE' ) {
         my ( $r, $m ) = ( $test->( $value, $conf, $attr ) );
         if ($m) {
-            push @{ $self->{ ( $r ? 'warnings' : 'errors' ) } },
+            push @{
+                $self->{ (
+                        $r > 0
+                        ? 'warnings'
+                        : ( $r < 0 ? 'needConfirmation' : 'errors' )
+                    )
+                }
+              },
               { message => "$key: $m" };
         }
         elsif ( !$r ) {
@@ -1239,8 +1269,7 @@ sub _execTest {
 #
 #@return true if tests succeed
 sub _globalTest {
-    my $self      = shift;
-    my $localConf = shift;
+    my ( $self, $localConf ) = @_;
 
     require Lemonldap::NG::Manager::Conf::Tests;
     hdebug('# _globalTest()');
@@ -1248,10 +1277,12 @@ sub _globalTest {
     my $tests  = &Lemonldap::NG::Manager::Conf::Tests::tests( $self->newConf );
 
     foreach my $name ( keys %$tests ) {
-        if (    $localConf->{skippedGlobalTests}
+        if (    $localConf
+            and $localConf->{skippedGlobalTests}
             and $localConf->{skippedGlobalTests} =~ /\b$name\b/ )
         {
-            $localConf->logger->debug("-> Ignore test for $name\n");
+            $localConf->logger->debug("-> Ignore test for $name\n")
+              if $localConf;
             next;
         }
         my $sub = $tests->{$name};
@@ -1273,7 +1304,7 @@ sub _globalTest {
         };
         if ($@) {
             push @{ $self->warnings }, "Test $name failed: $@";
-            $localConf->logger->debug("Test $name failed: $@\n");
+            $localConf->logger->debug("Test $name failed: $@\n") if $localConf;
         }
     }
     return $result;

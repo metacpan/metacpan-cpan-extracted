@@ -20,7 +20,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan-Manual
   homepage: https://metacpan.org/release/App-lcpan-Manual
   repository: git://github.com/perlancar/perl-App-lcpan-Manual.git
-version: 1.049.000
+version: 1.054.001
 x_Dist_Zilla:
   perl:
     version: '5.030002'

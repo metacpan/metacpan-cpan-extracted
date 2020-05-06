@@ -1,15 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
 package IO::Async::Loop::AnyEvent;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
-use constant API_VERSION => '0.33';
+our $VERSION = '0.04';
+use constant API_VERSION => '0.76';
 
 # Force AnyEvent to detect a suitable model now, before we load
 # IO::Async::Loop. Otherwise, AnyEvent will use AnyEvent::Impl::IOAsync
@@ -20,7 +20,11 @@ use constant API_VERSION => '0.33';
 use AnyEvent;
 BEGIN { AnyEvent::detect() }
 
-use parent qw( IO::Async::Loop );
+# use base qw( IO::Async::Loop );
+# Except, 'use base' breaks here if IO::Async::Loop is already loaded, causing
+# SUPER:: lookups not to work properly.
+BEGIN { require IO::Async::Loop; unshift our @ISA, qw( IO::Async::Loop ); }
+IO::Async::Loop->VERSION( '0.49' );
 
 use Carp;
 
@@ -32,18 +36,18 @@ C<IO::Async::Loop::AnyEvent> - use C<IO::Async> with C<AnyEvent>
 
 =head1 SYNOPSIS
 
- use IO::Async::Loop::AnyEvent;
+   use IO::Async::Loop::AnyEvent;
 
- my $loop = IO::Async::Loop::AnyEvent->new();
+   my $loop = IO::Async::Loop::AnyEvent->new();
 
- $loop->add( ... );
+   $loop->add( ... );
 
- $loop->add( IO::Async::Signal->new(
-       name => 'HUP',
-       on_receipt => sub { ... },
- ) );
+   $loop->add( IO::Async::Signal->new(
+         name => 'HUP',
+         on_receipt => sub { ... },
+   ) );
 
- $loop->loop_forever();
+   $loop->run;
 
 =head1 DESCRIPTION
 
@@ -53,7 +57,9 @@ This subclass of L<IO::Async::Loop> uses L<AnyEvent> to perform its work.
 
 =cut
 
-=head2 $loop = IO::Async::Loop::AnyEvent->new
+=head2 new
+
+   $loop = IO::Async::Loop::AnyEvent->new
 
 This function returns a new instance of a C<IO::Async::Loop::AnyEvent> object.
 
@@ -66,7 +72,7 @@ sub new
 
    my $self = $class->SUPER::__new( %args );
 
-   $self->{$_} = {} for qw( watch_r watch_w watch_time watch_signal watch_idle watch_child);
+   $self->{$_} = {} for qw( watch_r watch_w watch_time watch_signal watch_idle watch_child );
 
    return $self;
 }
@@ -147,37 +153,33 @@ sub unwatch_io
    }
 }
 
-sub enqueue_timer
+sub watch_time
 {
    my $self = shift;
    my %params = @_;
 
-   my $now = $self->time;
-   my $delay = $self->_build_time( %params, now => $now ) - $now;
-
    my $code = $params{code} or croak "Expected 'code' as CODE ref";
 
-   my $w = AnyEvent->timer( after => $delay, cb => $code );
+   my $w;
+   if( defined $params{at} ) {
+      $w = AnyEvent->timer( after => $params{at} - $self->time, cb => $code );
+   }
+   elsif( defined $params{after} ) {
+      $w = AnyEvent->timer( after => $params{after}, cb => $code );
+   }
+   else {
+      croak "Expected one of 'at' or 'after'";
+   }
 
-   $self->{watch_time}{$w} = [ $w, $code ];
-   return $w;
+   return $self->{watch_time}{$w} = $w;
 }
 
-sub cancel_timer
+sub unwatch_time
 {
    my $self = shift;
    my ( $id ) = @_;
 
    delete $self->{watch_time}{$id};
-}
-
-sub requeue_timer
-{
-   my $self = shift;
-   my ( $id, %params ) = @_;
-
-   my $code = ( delete $self->{watch_time}{$id} )->[1];
-   return $self->enqueue_timer( %params, code => $code );
 }
 
 sub watch_signal
@@ -232,7 +234,7 @@ sub unwatch_idle
    delete $self->{watch_idle}{$id};
 }
 
-sub watch_child
+sub watch_process
 {
    my $self = shift;
    my ( $pid, $code ) = @_;
@@ -240,7 +242,7 @@ sub watch_child
    $self->{watch_child}{$pid} = AnyEvent->child( pid => $pid, cb => $code );
 }
 
-sub unwatch_child
+sub unwatch_process
 {
    my $self = shift;
    my ( $pid ) = @_;

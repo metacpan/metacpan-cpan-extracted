@@ -17,7 +17,7 @@
 
 package Lemonldap::NG::Manager::Build::Tree;
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 # TODO: Missing:
 #  * activeTimer
@@ -54,6 +54,7 @@ sub tree {
                             nodes => [
                                 'portalMainLogo',
                                 'showLanguages',
+                                'portalCustomCss',
                                 'portalSkin',
                                 'portalSkinBackground',
                                 'portalSkinRules',
@@ -82,6 +83,8 @@ sub tree {
                                         'passwordPolicyMinLower',
                                         'passwordPolicyMinUpper',
                                         'passwordPolicyMinDigit',
+                                        'passwordPolicyMinSpeChar',
+                                        'passwordPolicySpecialChar',
                                         'portalDisplayPasswordPolicy',
                                     ]
                                 },
@@ -96,7 +99,8 @@ sub tree {
                                         'portalAntiFrame',
                                         'portalPingInterval',
                                         'portalErrorOnExpiredSession',
-                                        'portalErrorOnMailNotFound'
+                                        'portalErrorOnMailNotFound',
+                                        'portalDisplayRefreshMyRights',
                                     ]
                                 }
                             ]
@@ -303,6 +307,16 @@ sub tree {
                             ]
                         },
                         {
+                            title => 'githubParams',
+                            help  => 'authgithub.html',
+                            form  => 'simpleInputContainer',
+                            nodes => [
+                                'githubAuthnLevel',   'githubClientID',
+                                'githubClientSecret', 'githubUserField',
+                                'githubScope'
+                            ]
+                        },
+                        {
                             title => 'combinationParams',
                             help  => 'authcombination.html',
                             nodes => [ 'combination', 'combModules' ]
@@ -423,9 +437,9 @@ sub tree {
                             title => 'customParams',
                             help  => 'authcustom.html',
                             nodes => [
-                                'customAuth',     'customUserDB',
-                                'customPassword', 'customRegister',
-                                'customAddParams',
+                                'customAuth',            'customUserDB',
+                                'customPassword',        'customRegister',
+                                'customResetCertByMail', 'customAddParams',
                             ]
                         },
                     ],
@@ -526,7 +540,8 @@ sub tree {
                     nodes => [
                         'cookieName', '*domain',
                         'cda',        'securedCookie',
-                        'httpOnly',   'cookieExpiration'
+                        'httpOnly',   'cookieExpiration',
+                        'sameSite',
                     ]
                 },
                 {
@@ -553,7 +568,7 @@ sub tree {
                             form  => 'simpleInputContainer',
                             nodes => [
                                 'singleSession',  'singleIP',
-                                'singleUserByIP', 'singleSessionUserByIP',
+                                'singleUserByIP',
                                 'notifyDeleted',  'notifyOther'
                             ]
                         },
@@ -570,8 +585,7 @@ sub tree {
                 {
                     title => 'reloadParams',
                     help  => 'configlocation.html#configuration_reload',
-                    nodes =>
-                      [ 'reloadUrls', 'reloadTimeout', 'dontCompactConf' ]
+                    nodes => [ 'reloadTimeout', 'compactConf', 'reloadUrls' ]
                 },
                 {
                     title => 'plugins',
@@ -580,6 +594,7 @@ sub tree {
                         'stayConnected',
                         'portalStatus',
                         'upgradeSession',
+                        'refreshSessions',
                         {
                             title => 'portalServers',
                             help  => 'portalservers.html',
@@ -606,11 +621,12 @@ sub tree {
                             help  => 'notifications.html',
                             nodes => [
                                 'notification',
+                                'notificationsExplorer',
+                                'notificationWildcard',
                                 'oldNotifFormat',
+                                'notificationXSLTfile',
                                 'notificationStorage',
                                 'notificationStorageOptions',
-                                'notificationWildcard',
-                                'notificationXSLTfile',
                                 {
                                     title => 'serverNotification',
                                     help  => 'notifications.html#server',
@@ -656,34 +672,32 @@ sub tree {
                                     ]
                                 }
                             ]
-                         },
-                          {
+                        },
+                        {
                             title => 'certificateResetByMailManagement',
-                             form  => 'simpleInputContainer',
-                             nodes => [ {
-                                     title => 'certificateMailContent',
-                                     form  => 'simpleInputContainer',
-                                     nodes => [ 
-                                         'certificateResetByMailSender',
-                                         'certificateResetByMailReplyTo',
-                                         'certificateResetByMailStep1Subject',
-                                         'certificateResetByMailStep1Body',
-                                         'certificateResetByMailStep2Subject',
-                                         'certificateResetByMailStep2Body'
-                                      ]
-                                  },
-  
-                                  {
-                                      title => 'mailOther',
-                                      form  => 'simpleInputContainer',
-                                      nodes => [
-                                          'certificateResetByMailURL',
-                                          'certificateResetByMailCeaAttribute',
-                                          'certificateResetByMailCertificateAttribute',
-                                          'certificateResetByMailValidityDelay'
+                            help  => 'resetcertificate.html',
+                            nodes => [ {
+                                    title => 'certificateMailContent',
+                                    form  => 'simpleInputContainer',
+                                    nodes => [
+                                        'certificateResetByMailStep1Subject',
+                                        'certificateResetByMailStep1Body',
+                                        'certificateResetByMailStep2Subject',
+                                        'certificateResetByMailStep2Body'
                                     ]
-                                 } 
-                             ]
+                                },
+
+                                {
+                                    title => 'mailOther',
+                                    form  => 'simpleInputContainer',
+                                    nodes => [
+                                        'certificateResetByMailURL',
+                                        'certificateResetByMailCeaAttribute',
+'certificateResetByMailCertificateAttribute',
+                                        'certificateResetByMailValidityDelay'
+                                    ]
+                                }
+                            ]
                         },
                         {
                             title => 'register',
@@ -705,8 +719,11 @@ sub tree {
                             title => 'globalLogout',
                             help  => 'globallogout.html',
                             form  => 'simpleInputContainer',
-                            nodes =>
-                              [ 'globalLogoutRule', 'globalLogoutTimer', ],
+                            nodes => [
+                                'globalLogoutRule',
+                                'globalLogoutTimer',
+                                'globalLogoutCustomParam'
+                            ],
                         },
                         {
                             title => 'stateCheck',
@@ -723,8 +740,9 @@ sub tree {
                                 'checkUserIdRule',
                                 'checkUserHiddenAttributes',
                                 'checkUserSearchAttributes',
-                                'checkUserDisplayPersistentInfo',
+                                'checkUserDisplayEmptyHeaders',
                                 'checkUserDisplayEmptyValues',
+                                'checkUserDisplayPersistentInfo',
                             ]
                         },
                         {
@@ -761,7 +779,6 @@ sub tree {
                             help  => 'plugincustom.html',
                             nodes => [ 'customPlugins', 'customPluginsParams' ]
                         },
-                        'refreshSessions',
                     ]
                 },
                 {
@@ -806,6 +823,25 @@ sub tree {
                                 'u2fAuthnLevel',       'u2fLabel',
                                 'u2fLogo',
                             ]
+                        },
+                        {
+                            title => 'yubikey2f',
+                            help  => 'yubikey2f.html',
+                            form  => 'simpleInputContainer',
+                            nodes => [
+                                'yubikey2fActivation',
+                                'yubikey2fSelfRegistration',
+                                'yubikey2fClientID',
+                                'yubikey2fSecretKey',
+                                'yubikey2fNonce',
+                                'yubikey2fUrl',
+                                'yubikey2fPublicIDSize',
+                                'yubikey2fUserCanRemoveKey',
+                                'yubikey2fTTL',
+                                'yubikey2fAuthnLevel',
+                                'yubikey2fLabel',
+                                'yubikey2fLogo',
+                            ],
                         },
                         {
                             title => 'mail2f',
@@ -854,25 +890,6 @@ sub tree {
                                 'rest2fLabel',      'rest2fLogo',
                             ]
                         },
-                        {
-                            title => 'yubikey2f',
-                            help  => 'yubikey2f.html',
-                            form  => 'simpleInputContainer',
-                            nodes => [
-                                'yubikey2fActivation',
-                                'yubikey2fSelfRegistration',
-                                'yubikey2fClientID',
-                                'yubikey2fSecretKey',
-                                'yubikey2fNonce',
-                                'yubikey2fUrl',
-                                'yubikey2fPublicIDSize',
-                                'yubikey2fUserCanRemoveKey',
-                                'yubikey2fTTL',
-                                'yubikey2fAuthnLevel',
-                                'yubikey2fLabel',
-                                'yubikey2fLogo',
-                            ],
-                        },
                         'sfExtra',
                         {
                             title => 'sfRemovedNotification',
@@ -884,6 +901,7 @@ sub tree {
                                 'sfRemovedNotifMsg',
                             ],
                         },
+                        'sfManagerRule',
                         'sfRequired',
                     ]
                 },
@@ -893,6 +911,7 @@ sub tree {
                     nodes => [
                         'customFunctions',
                         'multiValuesSeparator',
+                        'groupsBeforeMacros',
                         {
                             title => 'SMTP',
                             help  => 'smtp.html',
@@ -926,12 +945,21 @@ sub tree {
                                 'trustedDomains',
                                 'useSafeJail',
                                 'checkXSS',
-                                'bruteForceProtection',
                                 'requireToken',
                                 'formTimeout',
                                 'tokenUseGlobalStorage',
+                                {
+                                    title => 'bruteForceAttackProtection',
+                                    help  => 'bruteforceprotection.html',
+                                    form  => 'simpleInputContainer',
+                                    nodes => [
+                                        'bruteForceProtection',
+                                        'bruteForceProtectionIncrementalTempo',
+                                    ]
+                                },
                                 'lwpOpts',
                                 'lwpSslOpts',
+
                                 {
                                     title => 'contentSecurityPolicy',
                                     help  => 'security.html#portal',
@@ -940,7 +968,7 @@ sub tree {
                                         'cspDefault', 'cspImg',
                                         'cspScript',  'cspStyle',
                                         'cspFont',    'cspFormAction',
-                                        'cspConnect',
+                                        'cspConnect', 'cspFrameAncestors'
                                     ]
                                 },
                                 {
@@ -1057,7 +1085,8 @@ sub tree {
                     help  => 'samlservice.html#organization',
                     form  => 'simpleInputContainer',
                     nodes => [
-                        'samlOrganizationDisplayName', 'samlOrganizationName',
+                        'samlOrganizationDisplayName',
+                        'samlOrganizationName',
                         'samlOrganizationURL'
                     ]
                 },
@@ -1139,10 +1168,11 @@ sub tree {
                     help  => 'samlservice.html#advanced',
                     nodes => [
                         'samlMetadataForceUTF8',
-                        'samlStorage',
-                        'samlStorageOptions',
                         'samlRelayStateTimeout',
                         'samlUseQueryStringSpecific',
+                        'samlOverrideIDPEntityID',
+                        'samlStorage',
+                        'samlStorageOptions',
                         {
                             title => 'samlCommonDomainCookie',
                             form  => 'simpleInputContainer',
@@ -1163,7 +1193,6 @@ sub tree {
                                 'samlDiscoveryProtocolIsPassive'
                             ]
                         },
-                        'samlOverrideIDPEntityID',
                     ]
                 }
             ]
@@ -1217,8 +1246,8 @@ sub tree {
                     title => "oidcServiceMetaDataSessions",
                     nodes => [ 'oidcStorage', 'oidcStorageOptions', ],
                 },
-		'oidcServiceDynamicRegistrationExportedVars',
-		'oidcServiceDynamicRegistrationExtraClaims',
+                'oidcServiceDynamicRegistrationExportedVars',
+                'oidcServiceDynamicRegistrationExtraClaims',
             ]
         },
         'oidcOPMetaDataNodes',

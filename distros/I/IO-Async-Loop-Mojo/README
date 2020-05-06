@@ -4,14 +4,14 @@ NAME
 
 SYNOPSIS
 
-     use IO::Async::Loop::Mojo;
+       use IO::Async::Loop::Mojo;
     
-     my $loop = IO::Async::Loop::Mojo->new();
+       my $loop = IO::Async::Loop::Mojo->new();
     
-     $loop->add( ... );
+       $loop->add( ... );
     
-     ...
-     # Rest of Mojolicious code here
+       ...
+       # Rest of Mojolicious code here
 
 DESCRIPTION
 
@@ -21,7 +21,9 @@ DESCRIPTION
 
 CONSTRUCTOR
 
- $loop = IO::Async::Loop::Mojo->new()
+ new
+
+       $loop = IO::Async::Loop::Mojo->new()
 
     This function returns a new instance of a IO::Async::Loop::Mojo object.
     It takes no special arguments.

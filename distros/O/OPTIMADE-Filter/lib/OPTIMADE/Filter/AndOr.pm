@@ -2,6 +2,9 @@ package OPTIMADE::Filter::AndOr;
 
 use strict;
 use warnings;
+
+use parent 'OPTIMADE::Filter::Modifiable';
+
 use Scalar::Util qw(blessed);
 
 sub new {
@@ -126,7 +129,7 @@ sub modify
     my $self = shift;
     my $code = shift;
 
-    $self->{operands} = [ map { OPTIMADE::Filter::modify( $_, $code, @_ ) }
+    $self->{operands} = [ map { OPTIMADE::Filter::Modifiable::modify( $_, $code, @_ ) }
                               @{$self->{operands}} ];
     return $code->( $self, @_ );
 }

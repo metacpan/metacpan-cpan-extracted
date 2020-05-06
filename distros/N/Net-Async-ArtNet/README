@@ -1,26 +1,57 @@
 NAME
-    "Net::Async::ArtNet" - use ArtNet with "IO::Async"
+
+    Net::Async::ArtNet - use ArtNet with IO::Async
+
+SYNOPSIS
+
+       use IO::Async::Loop;
+       use Net::Async::ArtNet;
+    
+       my $loop = IO::Async::Loop->new;
+    
+       $loop->add( Net::Async::ArtNet->new(
+          on_dmx => sub {
+             my $self = shift;
+             my ( $seq, $phy, $universe, $data ) = @_;
+    
+             return unless $phy == 0 and $universe == 0;
+    
+             my $ch10 = $data->[10 - 1];  # DMX channels are 1-indexed
+             print "Channel 10 now set to: $ch10\n";
+          }
+       ) );
+    
+       $loop->run;
 
 DESCRIPTION
+
     This object class allows you to use the Art-Net protocol with
-    "IO::Async". It receives Art-Net frames containing DMX data.
+    IO::Async. It receives Art-Net frames containing DMX data.
 
 EVENTS
-  on_dmx $seq, $phy, $uni, $data
+
+ on_dmx $seq, $phy, $uni, $data
+
     A new set of DMX control values has been received. $seq contains the
-    sequence number from the packet, $phy and $uni the physical and universe
-    numbers, and $data will be an ARRAY reference containing up to 512 DMX
-    control values.
+    sequence number from the packet, $phy and $uni the physical and
+    universe numbers, and $data will be an ARRAY reference containing up to
+    512 DMX control values.
 
 PARAMETERS
-    The following named parameters may be passed to "new" or "configure":
+
+    The following named parameters may be passed to new or configure.
+    Additionally, CODE references to set callbacks for events may be
+    passed.
 
     port => INT
-            Optional. Port number to listen for Art-Net packets on.
+
+      Optional. Port number to listen for Art-Net packets on.
 
 SEE ALSO
-    *   <http://en.wikipedia.org/wiki/Art-Net> - Art-Net - Wikipedia
+
+      * http://en.wikipedia.org/wiki/Art-Net - Art-Net - Wikipedia
 
 AUTHOR
+
     Paul Evans <leonerd@leonerd.org.uk>
 

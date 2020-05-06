@@ -3,6 +3,7 @@ use strict;
 use IO::String;
 
 my $userdb;
+
 BEGIN {
     eval {
         require 't/test-lib.pm';

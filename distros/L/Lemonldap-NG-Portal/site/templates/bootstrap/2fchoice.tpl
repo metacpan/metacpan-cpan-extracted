@@ -8,12 +8,12 @@
       <input type="hidden" id="checkLogins" name="checkLogins" value="<TMPL_VAR NAME="CHECKLOGINS">">
       <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
       <TMPL_LOOP NAME="MODULES">
-        <button type="submit" name="sf" value="<TMPL_VAR NAME="CODE">" class="mx-3">
-        <div class="card-header p-0">
+        <button type="submit" name="sf" value="<TMPL_VAR NAME="CODE">" class="mx-3 btn btn-light" role="button">
+        <div>
          <TMPL_IF LABEL>
-            <h4 class="mb-0"><TMPL_VAR NAME="LABEL"></h4>
+            <h4><TMPL_VAR NAME="LABEL"></h4>
             <TMPL_ELSE>
-            <h4 class="mb-0" trspan="<TMPL_VAR NAME="CODE">2f"></h4>
+            <h4 trspan="<TMPL_VAR NAME="CODE">2f"></h4>
             </TMPL_IF>
         </div>
           <img src="<TMPL_VAR NAME="STATIC_PREFIX"><TMPL_VAR NAME="SKIN">/<TMPL_VAR NAME="LOGO">" alt="<TMPL_VAR NAME="CODE">2F" title="<TMPL_VAR NAME="CODE">2F" />

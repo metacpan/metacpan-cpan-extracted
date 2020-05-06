@@ -13,7 +13,7 @@ my $symbols = $INC{'POSIX/1003/Symbols.pm'}
 #warn "writing $symbols";
 
 -w $symbols || chmod 0644, $symbols
-    or die "cannot make $symbols readible: $!";
+    or die "cannot make $symbols writable: $!";
 
 open SYMBOLS, '>', $symbols
     or die "cannot write to $symbols: $!";

@@ -1,3 +1,6 @@
+0.904		2020-05-06	T. R. Wyant
+    Add Test::More as a prerequisite for building (ooops!)
+
 0.903		2019-07-21	T. R. Wyant
     Fix broken POD links and add test to ensure they stay fixed.
 

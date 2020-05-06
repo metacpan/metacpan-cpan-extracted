@@ -5,7 +5,7 @@
       "Tom Wyant (wyant at cpan dot org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -25,7 +25,9 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {}
+         "requires" : {
+            "Test::More" : "0"
+         }
       },
       "configure" : {
          "requires" : {
@@ -57,15 +59,15 @@
    "provides" : {
       "DateTime::Fiction::JRRTolkien::Shire" : {
          "file" : "lib/DateTime/Fiction/JRRTolkien/Shire.pm",
-         "version" : "0.903"
+         "version" : "0.904"
       },
       "DateTime::Fiction::JRRTolkien::Shire::Duration" : {
          "file" : "lib/DateTime/Fiction/JRRTolkien/Shire/Duration.pm",
-         "version" : "0.903"
+         "version" : "0.904"
       },
       "DateTime::Fiction::JRRTolkien::Shire::Types" : {
          "file" : "lib/DateTime/Fiction/JRRTolkien/Shire/Types.pm",
-         "version" : "0.903"
+         "version" : "0.904"
       }
    },
    "release_status" : "stable",
@@ -83,6 +85,6 @@
          "web" : "https://github.com/trwyant/perl-DateTime-Fiction-JRRTolkien-Shire"
       }
    },
-   "version" : "0.903",
+   "version" : "0.904",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

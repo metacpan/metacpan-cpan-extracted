@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.50
+    version 0.52
 
 SYNOPSIS
 
@@ -48,11 +48,13 @@ CONTAINED AUTHORS
       FLORA => q[Florian Ragwitz],
       GENEHACK => q[John SJ Anderson],
       GETTY => q[Torsten Raudssus],
+      JAHERO => q[Jan Herout],
       JJNAPIORK => q[John Napiorkowski],
       JONASBN => q[jonasbn],
+      KWAKWA => q[Paul Williams],
       LESPEA => q[Adam Lesperance],
       LOGIE => q[Logan Bell],
-      MARCEL => q[base64.tokyo],
+      MARCEL => q[Marcel Gruenauer],
       MELO => q[Pedro Melo],
       MPERRY => q[Matt Perry],
       MRUIZ => q[Miquel Ruiz Martin],
@@ -64,6 +66,7 @@ CONTAINED AUTHORS
       SARTAK => q[Shawn M Moore],
       SCHWIGON => q[Steffen Schwigon],
       SHANTANU => q[Shantanu Bhadoria],
+      SHLOMIF => q[Shlomi Fish],
       SONGMU => q[Masayuki Matsuki],
       TOKUHIROM => q[Tokuhiro Matsuno''<xmp>],
       XAERXESS => q[Grzegorz Rozniecki],
@@ -82,7 +85,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2017 by Chris Williams.
+    This software is copyright (c) 2020 by Chris Williams.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

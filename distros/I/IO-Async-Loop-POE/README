@@ -1,33 +1,41 @@
 NAME
-    `IO::Async::Loop::POE' - use `IO::Async' with `POE'
+
+    IO::Async::Loop::POE - use IO::Async with POE
 
 SYNOPSIS
-     use IO::Async::Loop::POE;
 
-     my $loop = IO::Async::Loop::POE->new();
-
-     $loop->add( ... );
-
-     $loop->add( IO::Async::Signal->new(
-           name => 'HUP',
-           on_receipt => sub { ... },
-     ) );
-
-     $loop->loop_forever();
+       use IO::Async::Loop::POE;
+    
+       my $loop = IO::Async::Loop::POE->new();
+    
+       $loop->add( ... );
+    
+       $loop->add( IO::Async::Signal->new(
+             name => 'HUP',
+             on_receipt => sub { ... },
+       ) );
+    
+       $loop->loop_forever();
 
 DESCRIPTION
+
     This subclass of IO::Async::Loop uses POE to perform its work.
 
-    The entire `IO::Async' system is represented by a single long-lived
-    session within the `POE' core. It fully supports sharing the process
-    space with `POE'; such resources as signals are properly shared between
+    The entire IO::Async system is represented by a single long-lived
+    session within the POE core. It fully supports sharing the process
+    space with POE; such resources as signals are properly shared between
     both event systems.
 
 CONSTRUCTOR
-  $loop = IO::Async::Loop::POE->new( %args )
-    This function returns a new instance of a `IO::Async::Loop::POE' object.
+
+ new
+
+       $loop = IO::Async::Loop::POE->new( %args )
+
+    This function returns a new instance of a IO::Async::Loop::POE object.
     It takes the following named arguments:
 
 AUTHOR
+
     Paul Evans <leonerd@leonerd.org.uk>
 

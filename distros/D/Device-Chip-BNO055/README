@@ -1,0 +1,131 @@
+NAME
+
+    Device::Chip::BNO055 - chip driver for BNO055
+
+SYNOPSIS
+
+       use Device::Chip::BNO055;
+    
+       my $chip = Device::Chip::BNO055->new;
+       $chip->mount( Device::Chip::Adapter::...->new )->get;
+
+DESCRIPTION
+
+    This Device::Chip subclass provides specific communications to a Bosch
+    BNO055 orientation sensor chip.
+
+    The reader is presumed to be familiar with the general operation of
+    this chip; the documentation here will not attempt to explain or define
+    chip-specific concepts or features, only the use of this module to
+    access them.
+
+METHODS
+
+    The following methods documented with a trailing call to ->get return
+    Future instances.
+
+ read_ids
+
+       $ids = $chip->read_ids->get
+
+    Returns an 8-character string composed of the four ID registers. For a
+    BNO055 chip this should be the string
+
+       "A0FB320F"
+
+ read_config
+
+       $config = $chip->read_config->get
+
+    Returns the current chip configuration.
+
+ change_config
+
+       $chip->change_config( %changes )->get
+
+    Changes the configuration. Any field names not mentioned will be
+    preserved at their existing values.
+
+    This method can only be used while the chip is in config mode, and
+    cannot itself be used to set OPR_MODE. For that, use "set_opr_mode".
+
+ set_opr_mode
+
+       $chip->set_opr_mode( $mode )->get
+
+    Sets the OPR_MODE register.
+
+ read_accelerometer_raw
+
+       ( $x, $y, $z ) = $chip->read_accelerometer_raw->get
+
+    Returns the most recent accelerometer readings in raw 16bit signed
+    integers
+
+ read_accelerometer
+
+       ( $x, $y, $z ) = $chip->read_accelerometer->get
+
+    Returns the most recent accelerometer readings in converted units,
+    either m/s² or G depending on the chip's ACC_Unit configuration.
+
+ read_magnetometer_raw
+
+       ( $x, $y, $z ) = $chip->read_magnetometer_raw->get
+
+    Returns the most recent magnetometer readings in raw 16bit signed
+    integers
+
+ read_magnetometer
+
+       ( $x, $y, $z ) = $chip->read_magnetometer->get
+
+    Returns the most recent magnetometer readings in converted units of µT.
+
+ read_gyroscope_raw
+
+       ( $x, $y, $z ) = $chip->read_gyroscope_raw->get
+
+    Returns the most recent gyroscope readings in raw 16bit signed integers
+
+ read_gyroscope
+
+       ( $x, $y, $z ) = $chip->read_gyroscope->get
+
+    Returns the most recent gyroscope readings in converted units, either
+    dps or rps depending on the chip's GYR_Unit configuration.
+
+ read_euler_angles
+
+       ( $heading, $roll, $pitch ) = $chip->read_euler_angles->get
+
+    Returns the most recent Euler angle fusion readings in converted units,
+    either degrees or radians depending on the chip's EUL_units
+    configuration.
+
+ read_quarternion
+
+       ( $w, $x, $y, $z ) = $chip->read_quarternion->get
+
+    Returns the most recent quarternion fusion readings in converted units
+    as scaled numbers between -1 and 1.
+
+ read_linear_acceleration
+
+       ( $x, $y, $z ) = $chip->read_linear_acceleration->get
+
+    Returns the most recent linear acceleration fusion readings in
+    converted units, either m/s² or G depending on the chip's ACC_units
+    configuration.
+
+ read_linear_acceleration
+
+       ( $x, $y, $z ) = $chip->read_linear_acceleration->get
+
+    Returns the most recent gravity fusion readings in converted units,
+    either m/s² or G depending on the chip's ACC_units configuration.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

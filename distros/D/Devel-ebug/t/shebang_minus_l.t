@@ -5,14 +5,16 @@ use lib 'lib';
 use Devel::ebug;
 use Test::More;
 
-eval "use Test::Expect";
-plan skip_all => "Test::Expect required for testing ebug: $@" if $@;
-eval "use Expect::Simple";
-plan skip_all => "Expect::Simple required for testing ebug: $@" if $@;
+BEGIN {
+  eval { require Test::Expect; require Expect::Simple };
+  plan skip_all => 'This test requires Test::Expect and Expect::Simple' if $@;
+  Test::Expect->import;
+}
+
 plan tests => 4;
 
 expect_run(
-  command => "PERL_RL=\"o=0\" $^X bin/ebug --backend \"$^X bin/ebug_backend_perl\" t/shebang_minus_l.pl",
+  command => "PERL_RL=\"o=0\" $^X bin/ebug --backend \"$^X bin/ebug_backend_perl\" corpus/shebang_minus_l.pl",
   prompt  => 'ebug: ',
   quit    => 'q',
 );

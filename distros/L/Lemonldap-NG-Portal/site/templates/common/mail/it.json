@@ -4,6 +4,7 @@
 "autoMail":"Questa mail é stata inviata automaticamente",
 "click2Register":"Clicca qui per confermare la registrazione del tuo account",
 "click2Reset":"Clicca qui per reimpostare la password",
+"goToPortal":"Vai al portale",
 "hello":"Salve",
 "mail2fSubject":"[LemonLDAP :: NG] Il tuo codice di accesso",
 "mailConfirmSubject":"Conferma reimpostazione password [LemonLDAP::NG] ",

@@ -2,8 +2,8 @@ NAME
     App::diffdb - Compare two databases, line by line
 
 VERSION
-    This document describes version 0.003 of App::diffdb (from Perl
-    distribution App-diffdb), released on 2020-04-23.
+    This document describes version 0.004 of App::diffdb (from Perl
+    distribution App-diffdb), released on 2020-05-06.
 
 SYNOPSIS
     See included scripts diffdb, diffdb-sqlite, ...

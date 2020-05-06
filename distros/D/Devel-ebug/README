@@ -2,13 +2,17 @@ NAME
 
     Devel::ebug - A simple, extensible Perl debugger
 
+VERSION
+
+    version 0.60
+
 SYNOPSIS
 
       use Devel::ebug;
       my $ebug = Devel::ebug->new;
       $ebug->program("calc.pl");
       $ebug->load;
-    
+     
       print "At line: "       . $ebug->line       . "\n";
       print "In subroutine: " . $ebug->subroutine . "\n";
       print "In package: "    . $ebug->package    . "\n";
@@ -83,7 +87,7 @@ DESCRIPTION
     are debugging in the background under the backend (running it under
     perl -d:ebug code.pl). The backend starts a TCP server, which the
     frontend then connects to, and uses this to drive the backend. This
-    adds some flexibilty in the debugger. There is some minor security in
+    adds some flexibility in the debugger. There is some minor security in
     the client/server startup (a secret word), and a random port is used
     from 3141-4165 so that multiple debugging sessions can happen
     concurrently.
@@ -113,7 +117,7 @@ METHODS
  break_point
 
     The break_point method sets a break point in a program. If you are
-    run-ing through a program, the execution will stop at a break point.
+    running through a program, the execution will stop at a break point.
     Break points can be set in a few ways.
 
     A break point can be set at a line number in the current file:
@@ -236,11 +240,11 @@ METHODS
  eval
 
     The eval method evaluates Perl code in the current program and returns
-    the result. If the evalutation results in an exception, $@ is returned.
+    the result. If the evaluation results in an exception, $@ is returned.
 
       my $v = $ebug->eval('2 ** $exp');
 
-    In list context, eval also returns a flag indicating if the evalutation
+    In list context, eval also returns a flag indicating if the evaluation
     resulted in an exception.
 
       my( $v, $is_exception ) = $ebug->eval('die 123');
@@ -356,7 +360,7 @@ METHODS
 
  undo
 
-    The undo method undos the last action. It accomplishes this by
+    The undo method undoes the last action. It accomplishes this by
     restarting the process and passing (almost) all the previous commands
     to it. Note that commands which do not change state are ignored.
     Commands that change state are: break_point, break_point_delete,
@@ -371,7 +375,7 @@ METHODS
  watch_point
 
     The watch point method sets a watch point. A watch point has a
-    condition, and the debugger will stop run-ing as soon as this condition
+    condition, and the debugger will stop running as soon as this condition
     is true:
 
       $ebug->watch_point('$x > 100');
@@ -395,17 +399,20 @@ BUGS
 
 AUTHOR
 
-    Latest releases by Brock Wilcox, <awwaiid@thelackthereof.org>
+    Original author: Leon Brocard <acme@astray.com>
 
-    Leon Brocard, <acme@astray.com>
+    Current maintainer: Graham Ollis <plicease@cpan.org>
 
-COPYRIGHT
+    Contributors:
 
-    Copyright (C) 2005-2008, Leon Brocard Copyright (C) 2011-NOW, Brock
-    Wilcox
+    Brock Wilcox <awwaiid@thelackthereof.org>
 
-LICENSE
+    Taisuke Yamada
 
-    This module is free software; you can redistribute it or modify it
-    under the same terms as Perl itself.
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2005-2020 by Leon Brocard.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

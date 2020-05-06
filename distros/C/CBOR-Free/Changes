@@ -1,5 +1,8 @@
 Revision history for Perl module CBOR::Free
 
+0.31
+- Fix 5.10.0 compatibility.
+
 0.30
 - BUG FIX: The decoder no longer leaks an extra reference on indirect values.
 - BUG FIX: The decoder no longer leaks a scalar on indefinite-length strings.

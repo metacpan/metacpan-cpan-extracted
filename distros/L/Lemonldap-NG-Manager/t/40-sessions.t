@@ -148,7 +148,7 @@ count(5);
 foreach (@ids) {
     my $res;
     ok( $res = &client->_del("/sessions/global/$_"), "Delete $_" );
-    ok( $res->[0] == 200, 'Result code is 200' );
+    ok( $res->[0] == 200,                            'Result code is 200' );
     ok( from_json( $res->[2]->[0] )->{result} == 1,
         'Body is JSON and result==1' );
     count(3);

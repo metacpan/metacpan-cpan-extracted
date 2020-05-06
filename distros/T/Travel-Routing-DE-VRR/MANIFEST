@@ -1,6 +1,9 @@
+.github/workflows/perl.yml
 bin/efa
 Build.PL
 Changelog
+cpanfile
+Dockerfile
 lib/Travel/Routing/DE/EFA.pm
 lib/Travel/Routing/DE/EFA/Exception.pod
 lib/Travel/Routing/DE/EFA/Route.pm
@@ -10,6 +13,9 @@ lib/Travel/Routing/DE/VRR.pm
 MANIFEST			This list of files
 provides/zsh/completions/_efa
 README
+scripts/check-efa-urls
+scripts/makedeb-docker
+scripts/makedeb-docker-helper
 t/20-vrr.t
 t/21-vrr.t
 t/in/ambiguous

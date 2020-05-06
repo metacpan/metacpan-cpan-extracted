@@ -24,8 +24,10 @@ my %WriteMakefileArgs = (
   "NAME" => "App::LTSVUtils",
   "PREREQ_PM" => {
     "Data::Sah::Compiler::perl::TH::str" => 0,
+    "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
+    "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
     "Perinci::CmdLine::Any" => 0,
-    "Perinci::CmdLine::Lite" => "1.820",
+    "Perinci::CmdLine::Lite" => "1.827",
     "Sah::Schema::filename" => 0,
     "Text::CSV_XS" => 0,
     "strict" => 0,
@@ -40,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,13 +51,15 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Data::Sah::Compiler::perl::TH::str" => 0,
+  "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
+  "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
   "File::Slurper" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Perinci::CmdLine::Any" => 0,
-  "Perinci::CmdLine::Lite" => "1.820",
+  "Perinci::CmdLine::Lite" => "1.827",
   "Sah::Schema::filename" => 0,
   "Test::Exception" => 0,
   "Test::More" => "0.98",

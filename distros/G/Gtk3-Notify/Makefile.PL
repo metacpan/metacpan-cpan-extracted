@@ -14,7 +14,7 @@ sub main {
 		NAME          => 'Gtk3::Notify',
 		VERSION_FROM  => File::Spec->catfile('lib', 'Gtk3', 'Notify.pm'),
 		ABSTRACT_FROM => File::Spec->catfile('lib', 'Gtk3', 'Notify.pm'),
-		LICENSE       => 'perl, lgpl',
+		LICENSE       => 'lgpl',
 
 		PREREQ_PM     => {
 			'Glib::Object::Introspection' => 0,
@@ -22,11 +22,18 @@ sub main {
 		},
 
 		META_MERGE => {
+			'meta-spec' => { version => 2 },
 			resources => {
-				homepage    => 'https://github.com/potyl/perl-Gtk3-Notify',
-				bucktracker => 'https://github.com/potyl/perl-Gtk3-Notify/issues',
-				repository  => 'https://github.com/potyl/perl-Gtk3-Notify',
+				homepage    => 'https://github.com/soig/Gtk3-Notify',
+				bucktracker => 'https://github.com/soig/Gtk3-Notify/issues',
 			},
+
+			repository  => {
+				type => 'git',
+				url  => 'https://github.com/soig/Gtk3-Notify.git',
+				web  => 'https://github.com/soig/Gtk3-Notify',
+			},
+			release_status => 'stable',
 		},
 	);
 	WriteMakefile(@args);

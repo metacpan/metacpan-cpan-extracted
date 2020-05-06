@@ -76,6 +76,10 @@ use constant {
         'ETtoday星光雲',
         'TVBS新聞網',
         '台灣時報 | 電子報',
+        '大紀元',
+        '大纪元',
+        'Taipei Times',
+        '台視新聞',
     ],
 
     CATEGORY_NAMES => [

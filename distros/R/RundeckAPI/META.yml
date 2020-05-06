@@ -25,5 +25,5 @@ requires:
   LWP::UserAgent: '5.833'
   REST::Client: '272'
   Scalar::List::Utils: '1.27'
-version: v1.1.001
+version: v1.2.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

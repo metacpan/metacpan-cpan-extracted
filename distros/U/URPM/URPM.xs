@@ -137,6 +137,10 @@ typedef struct s_Package* URPM__Package;
 #endif
 #endif
 
+#if defined(RPM4_12_0) || defined(PATCHED_MGA) || defined(PATCHED_RH)
+#define WEAK_DEPS_ARE_SUPPORTED
+#endif
+
 static ssize_t write_nocheck(int fd, const void *buf, size_t count) {
   return write(fd, buf, count);
 }
@@ -794,8 +798,10 @@ pack_header(const URPM__Package pkg) {
     if (pkg->filesize == 0) pkg->filesize = get_filesize(pkg->h);
     if (pkg->requires == NULL)
       pkg->requires = pack_list(pkg->h, RPMTAG_REQUIRENAME, RPMTAG_REQUIREFLAGS, RPMTAG_REQUIREVERSION);
+#ifdef WEAK_DEPS_ARE_SUPPORTED
     if (pkg->recommends == NULL)
       pkg->recommends = pack_list(pkg->h, RPMTAG_RECOMMENDNAME, 0, 0);
+#endif
     if (pkg->obsoletes == NULL)
       pkg->obsoletes = pack_list(pkg->h, RPMTAG_OBSOLETENAME, RPMTAG_OBSOLETEFLAGS, RPMTAG_OBSOLETEVERSION);
     if (pkg->conflicts == NULL)
@@ -1919,7 +1925,9 @@ Pkg_obsoletes(pkg)
   case 1:  tag = RPMTAG_CONFLICTNAME; s = pkg->conflicts; flags = RPMTAG_CONFLICTFLAGS; tag_version = RPMTAG_CONFLICTVERSION; break;
   case 2:  tag = RPMTAG_PROVIDENAME;  s = pkg->provides;  flags = RPMTAG_PROVIDEFLAGS;  tag_version = RPMTAG_PROVIDEVERSION;  break;
   case 3:  tag = RPMTAG_REQUIRENAME;  s = pkg->requires;  flags = RPMTAG_REQUIREFLAGS;  tag_version = RPMTAG_REQUIREVERSION;  break;
+#ifdef WEAK_DEPS_ARE_SUPPORTED
   case 4:  tag = RPMTAG_RECOMMENDNAME;s = pkg->recommends;flags = RPMTAG_RECOMMENDFLAGS;tag_version = RPMTAG_RECOMMENDVERSION;break;
+#endif
   default: tag = RPMTAG_OBSOLETENAME; s = pkg->obsoletes; flags = RPMTAG_OBSOLETEFLAGS; tag_version = RPMTAG_OBSOLETEVERSION; break;
   }
   return_list_str(s, pkg->h, tag, flags, tag_version, callback_list_str_xpush, NULL);
@@ -1942,7 +1950,9 @@ Pkg_obsoletes_nosense(pkg)
   case 1:  tag = RPMTAG_CONFLICTNAME; s = pkg->conflicts; break;
   case 2:  tag = RPMTAG_PROVIDENAME;  s = pkg->provides;  break;
   case 3:  tag = RPMTAG_REQUIRENAME;  s = pkg->requires;  break;
+#ifdef WEAK_DEPS_ARE_SUPPORTED
   case 4:  tag = RPMTAG_RECOMMENDNAME;s = pkg->recommends; break;
+#endif
   default: tag = RPMTAG_OBSOLETENAME; s = pkg->obsoletes; break;
   }
   return_list_str(s, pkg->h, tag, 0, 0, callback_list_str_xpush, NULL);

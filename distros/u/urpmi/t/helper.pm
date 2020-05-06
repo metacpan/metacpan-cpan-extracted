@@ -53,7 +53,7 @@ sub need_downloader() {
     my @dl_helpers = qw(wget curl prozilla aria2c);
     my $found;
     foreach (@dl_helpers) {
-	-e "/bin/$_" and $found = 1;
+	-e "/bin/$_" || -e "/usr/bin/$_" and $found = 1;
     }
     if (!$found) {
 	warn "SKIPing because we're missing a downloader. We need one of wget/curl/prozilla/aria2c";

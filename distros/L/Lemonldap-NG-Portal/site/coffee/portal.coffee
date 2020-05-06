@@ -223,10 +223,15 @@ setCookie = (name, value, exdays) ->
 
 # Initialization
 datas = {}
-#$(document).ready ->
+
 $(window).on 'load', () ->
 	# Get application/init variables
 	datas = getValues()
+
+	# Keep the currently selected tab
+	if "datas" of window && "choicetab" of window.datas
+		datas.choicetab = window.datas.choicetab;
+
 	# Export datas for other scripts
 	window.datas = datas
 
@@ -256,6 +261,9 @@ $(window).on 'load', () ->
 	# Authentication choice tabs
 	authMenuTabs = $("#authMenu").tabs
 		active: 0
+	authMenuIndex = $('#authMenu a[href="#' + datas['displaytab'] + '"]').parent().index()
+	authMenuIndex = 0 if authMenuIndex < 0
+	authMenuTabs.tabs "option", "active", authMenuIndex
 
 	# TODO: cookie
 	# $("#authMenu").tabs
@@ -277,26 +285,48 @@ $(window).on 'load', () ->
 
 	# Complete removeOther link
 	if $("p.removeOther").length
-		action = $("form.login").attr "action"
-		method = $("form.login").attr "method"
+		action = $("#form").attr "action"
+		method = $("#form").attr "method"
+		console.log 'method=', method
+
+		hiddenParams = ""
+		if $("#form input[type=hidden]")
+			console.log 'Parse hidden values' 
+			$("#form input[type=hidden]").each (index) ->
+				console.log ' ->', $(this).attr("name"), $(this).val()
+				hiddenParams +=  "&" + $(this).attr("name") + "=" + $(this).val()
 
 		back_url = ""
-		if action.indexOf("?") != -1
-			action.substring(0, action.indexOf("?")) + "?"
-		else
-			back_url = action + "?"
+		if action
+			console.log 'action=', action
+			if action.indexOf("?") != -1
+				action.substring(0, action.indexOf("?")) + "?"
+			else
+				back_url = action + "?"
+			back_url += hiddenParams
+			hiddenParams = ""
 
-		$("form.login input[type=hidden]").each (index) ->
-			back_url +=  "&" + $(this).attr("name") + "=" + $(this).val()
-
-		link = $("p.removeOther a").attr("href") + "&method=" + method + "&url=" + btoa(back_url)
+		link = $("p.removeOther a").attr("href") + "&method=" + method + hiddenParams
+		link += "&url=" + btoa(back_url) if back_url
 		$("p.removeOther a").attr "href", link
 
 	# Language detection. Priority order:
+	#  0 - llnglanguage parameter
 	#  1 - cookie value
 	#  2 - first navigator.languages item that exists in window.availableLanguages
 	#  3 - first value of window.availableLanguages
-	lang = getCookie 'llnglanguage'
+	queryString = window.location.search
+	if queryString
+		console.log 'Parsed queryString:', queryString
+		urlParams = new URLSearchParams queryString
+	if urlParams
+		queryLang = urlParams.get('llnglanguage')
+		console.log 'Get lang from parameter' if queryLang
+		setCookieLang = urlParams.get('setCookieLang')
+		console.log 'Set lang cookie' if setCookieLang == 1
+	if !lang
+		lang = getCookie 'llnglanguage'
+		console.log 'Get lang from cookie' if lang && !queryLang
 	if !lang
 		if navigator
 			langs = []
@@ -317,13 +347,26 @@ $(window).on 'load', () ->
 					else if al.substring(0, 1) == nl.substring(0, 1)
 						langs2.push al
 			lang = if langs[0] then langs[0] else if langs2[0] then langs2[0] else window.availableLanguages[0]
+			console.log 'Get lang from navigator' if lang && !queryLang
 		else
 			lang = window.availableLanguages[0]
+			console.log 'Get lang from window' if lang && !queryLang
 	else if lang not in window.availableLanguages
 		lang = window.availableLanguages[0]
-	console.log 'Selected lang ->', lang
-	setCookie 'llnglanguage', lang
-	translatePage(lang)
+		console.log 'Lang not available -> Get default lang' if !queryLang
+	if queryLang
+		if queryLang not in window.availableLanguages
+			console.log 'Lang not available -> Get default lang'
+			queryLang = window.availableLanguages[0]
+		console.log 'Selected lang ->', queryLang
+		if setCookieLang
+			console.log 'Set cookie lang ->', queryLang
+			setCookie 'llnglanguage', queryLang
+		translatePage(queryLang)
+	else
+		console.log 'Selected lang ->', lang
+		setCookie 'llnglanguage', lang
+		translatePage(lang)
 
 	# Build language icons
 	langdiv = ''
@@ -346,5 +389,20 @@ $(window).on 'load', () ->
 
 	$('.oidcConsent').on 'click', () ->
 		removeOidcConsent $(this).attr 'partner'
+
+	# Functions to show/hide change password inputs
+	$('#show-hide-button').on 'click', () ->
+		if  $("#newpassword").attr('type') == 'password'
+			console.log 'Show passwords'
+			$("#newpassword").attr('type', 'input')
+			$("#confirmpassword").attr('type', 'input')
+			$("#show-hide-icon-button").removeClass 'fa-eye'
+			$("#show-hide-icon-button").addClass 'fa-eye-slash'
+		else
+			console.log 'Hide passwords'
+			$("#newpassword").attr('type', 'password')
+			$("#confirmpassword").attr('type', 'password')
+			$("#show-hide-icon-button").removeClass 'fa-eye-slash'
+			$("#show-hide-icon-button").addClass 'fa-eye'
 
 	#$('#formpass').on 'submit', changePwd

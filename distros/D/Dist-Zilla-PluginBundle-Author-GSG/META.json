@@ -43,9 +43,10 @@
             "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
             "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0",
             "Dist::Zilla::Plugin::StaticInstall" : "0",
-            "Dist::Zilla::Plugin::Test::Compile" : "0",
+            "Dist::Zilla::Plugin::Test::Compile" : "2.055",
             "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0",
             "Dist::Zilla::Role::LicenseProvider" : "0",
+            "Dist::Zilla::Role::Plugin" : "0",
             "Dist::Zilla::Role::PluginBundle::Easy" : "0",
             "Git::Wrapper" : "0",
             "Moose" : "0",
@@ -60,6 +61,7 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
+            "Dist::Zilla::Role::MetaProvider" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
@@ -79,11 +81,11 @@
    "provides" : {
       "Dist::Zilla::Plugin::Author::GSG" : {
          "file" : "lib/Dist/Zilla/Plugin/Author/GSG.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.2"
       },
       "Dist::Zilla::PluginBundle::Author::GSG" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/GSG.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.2"
       }
    },
    "release_status" : "stable",
@@ -98,7 +100,7 @@
          "web" : "https://github.com/GrantStreetGroup/p5-Dist-Zilla-PluginBundle-Author-GSG"
       }
    },
-   "version" : "v0.1.1",
+   "version" : "v0.1.2",
    "x_generated_by_perl" : "v5.18.2",
    "x_serialization_backend" : "JSON::XS version 3.04",
    "x_spdx_expression" : "Artistic-2.0",

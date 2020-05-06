@@ -19,5 +19,5 @@ no_index:
     - inc
 requires:
   Convert::ASN1: '0.19'
-version: '0.52'
+version: '0.53'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

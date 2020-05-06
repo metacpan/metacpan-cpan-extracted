@@ -6,12 +6,12 @@ SUBDIRS = bin lib thirdparty etc <%= ${package} eq 'callbackery' ? 'frontend' : 
 
 BIN = bin/$(MJ_SCRIPT).pl
 
-PUB := $(shell find public -type d \( -name ".??*" -o -name transpiled \) -prune -o -not -name "*db.json" -a -not -name "*.map" -a -not -name "*~" -a -not -name transpiled -a -not -name "*.tmp"  -a -type f -print )
-TEMPL := $(shell test -d templates && find templates -type f -name "*.ep")
-SHARE := $(shell test -d share && find share -type d -name ".??*" -prune -o -not -name ".*" -a -not -name "*~" -a -not -name "*.tmp"  -a -type f -print)
+PUB := $(shell find -L public -type d \( -name ".??*" -o -name transpiled \) -prune -o -not -name "*db.json" -a -not -name "*.map" -a -not -name "*~" -a -not -name transpiled -a -not -name "*.tmp"  -a -type f -print )
+TEMPL := $(shell test -d templates && find -L templates -type f -name "*.ep")
+SHARE := $(shell test -d share && find -L share -type d -name ".??*" -prune -o -not -name ".*" -a -not -name "*~" -a -not -name "*.tmp"  -a -type f -print)
 
-PERLTESTS := $(shell find t -name "*.t")
-PM := $(shell find lib -name "*.pm")
+PERLTESTS := $(shell find -L t -name "*.t")
+PM := $(shell find -L lib -name "*.pm")
 
 EXTRA_DIST = VERSION cpanfile COPYRIGHT LICENSE CHANGES AUTHORS bootstrap $(PUB) $(wildcard t/*.t) $(BIN) $(POD) $(TEMPL) $(PERLTESTS) $(SHARE)
 
@@ -42,13 +42,16 @@ all-local: share/messages.pot
 clean-local:
 	rm share/messages.pot
 
-share/messages.pot: $(PM)
+LANGUAGES := $(shell  $(PERL) -e 'use JSON::PP qw(decode_json); print join(" ", map {"share/".$$_.".po"} @{decode_json(join("",<>))->{locales}})' frontend/compile.json)
+CALLBACKERY_PM := $(shell find $(CALLBACKERY_QX)/.. -name "*.pm")
+
+share/messages.pot: $(PM) $(CALLBACKERY_PM)
 	mkdir -p share
-	$(XGETTEXT) --language=perl --package-name=$(PACKAGE) --package-version=$(VERSION) --from-code=UTF-8 --keyword=trm:1 --output=share/messages.pot $(PM)
-	sed -ie 's/charset=CHARSET/charset=UTF-8/g' share/messages.pot
-	touch share/en.po
-	for lang in share/*.po; do \
-		$(MSGMERGE) -U $$lang share/messages.pot; \
+	$(XGETTEXT) --language=perl --package-name=$(PACKAGE) --package-version=$(VERSION) --from-code=UTF-8 --keyword=trm:1 --output=share/messages.pot $(PM) $(CALLBACKERY_PM)
+	sed -i 's/; charset=CHARSET/; charset=UTF-8/' share/messages.pot
+	for lang in $(LANGUAGES); do \
+		( test -f $$lang || cp share/messages.pot $$lang ); \
+		$(MSGMERGE) --force-po -U $$lang share/messages.pot; \
 	done
 % }
 

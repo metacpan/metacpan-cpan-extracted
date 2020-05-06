@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
 
 package Net::Prometheus::Histogram;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Net::Prometheus::Metric );
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 use Carp;
 use List::Util 1.33 qw( any );
@@ -75,6 +75,19 @@ L<Net::Prometheus::Metric>, and additionally the following:
 
 A reference to an ARRAY containing numerical upper bounds for the buckets.
 
+=item bucket_min => NUM
+
+=item bucket_max => NUM
+
+=item buckets_per_decade => ARRAY[ NUM ]
+
+I<Since version 0.10.>
+
+A more flexible alternative to specifying literal bucket sizes. The values
+given in C<buckets_per_decade> are repeated, multiplied by various powers of
+10 to generate values between C<bucket_min> (or a default of 0.001 if not
+supplied) and C<bucket_max> (or a default of 1000 if not supplied).
+
 =back
 
 =cut
@@ -83,6 +96,10 @@ sub new
 {
    my $class = shift;
    my %opts = @_;
+
+   if( !$opts{buckets} and grep { m/^bucket/ } keys %opts ) {
+      _gen_buckets( \%opts );
+   }
 
    my $buckets = $opts{buckets} || DEFAULT_BUCKETS;
 
@@ -104,6 +121,53 @@ sub new
    }
 
    return $self;
+}
+
+sub _gen_buckets
+{
+   my ( $opts ) = @_;
+
+   my $min = $opts->{bucket_min} // 1E-3;
+   my $max = $opts->{bucket_max} // 1E3;
+
+   my @values_per_decade = @{ $opts->{buckets_per_decade} // [ 1 ] };
+
+   my $value;
+   my @buckets;
+
+   $value = 1;
+   while( $value >= $min ) {
+      unshift @buckets, map { $_ * $value } @values_per_decade;
+
+      $value /= 10;
+   }
+
+   $value = 10;
+   while( $value <= $max ) {
+      push @buckets, map { $_ * $value } @values_per_decade;
+
+      $value *= 10;
+   }
+
+   # Trim overgenerated ends
+   @buckets = grep { $min <= $_ and $_ <= $max } @buckets;
+
+   $opts->{buckets} = \@buckets;
+}
+
+=head2 bucket_bounds
+
+   @bounds = $histogram->bucket_bounds
+
+Returns the bounding values for each of the buckets, excluding the final
+C<+Inf> bucket.
+
+=cut
+
+sub bucket_bounds
+{
+   my $self = shift;
+   return @{ $self->{bounds} };
 }
 
 =head2 observe

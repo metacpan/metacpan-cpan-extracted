@@ -6,7 +6,7 @@ use Lemonldap::NG::Common::FormEncode;
 use XML::Simple;
 use Lemonldap::NG::Common::UserAgent;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.8';
 
 # PROPERTIES
 
@@ -441,6 +441,9 @@ sub validateST {
     {
         foreach my $k ( keys %$casAttr ) {
             my $v = $casAttr->{$k};
+            if ( ref($v) eq "ARRAY" ) {
+                $v = join( $self->conf->{multiValuesSeparator}, @$v );
+            }
             utf8::encode($v);
             $k =~ s/^cas://;
             $attrs->{$k} = $v;

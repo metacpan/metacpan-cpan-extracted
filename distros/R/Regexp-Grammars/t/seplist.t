@@ -26,6 +26,16 @@ my $list_empty = qr{
         \d+
 }xms;
 
+my $list_nonbracketed = qr{
+    <List>
+
+    <rule: List>
+        \(  <[Value]> ** (?: , | ; )  \)
+
+    <token: Value>
+        \d+
+}xms;
+
 no Regexp::Grammars;
 
 while (my $input = <DATA>) {
@@ -42,6 +52,12 @@ while (my $input = <DATA>) {
     ok +($input_copy =~ $list_empty) => 'Matched possibly-empty list:' . $list;
     is_deeply $/{List}{Value}, eval($data_structure)
                                 => 'Build correct structure';
+
+    if ($list !~ m{ \( \s* \) }xms) {
+        ok +($input_copy =~ $list_nonbracketed) => 'Matched nonbracketed list:' . $list;
+        is_deeply $/{List}{Value}, eval($data_structure)
+                                    => 'Build correct structure';
+    }
 }
 
 

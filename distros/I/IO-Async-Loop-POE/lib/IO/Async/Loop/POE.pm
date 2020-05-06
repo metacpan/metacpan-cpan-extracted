@@ -1,15 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2012 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2020 -- leonerd@leonerd.org.uk
 
 package IO::Async::Loop::POE;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
-use constant API_VERSION => '0.49';
+our $VERSION = '0.06';
+use constant API_VERSION => '0.76';
 
 use base qw( IO::Async::Loop );
 IO::Async::Loop->VERSION( '0.49' );
@@ -29,18 +29,18 @@ C<IO::Async::Loop::POE> - use C<IO::Async> with C<POE>
 
 =head1 SYNOPSIS
 
- use IO::Async::Loop::POE;
+   use IO::Async::Loop::POE;
 
- my $loop = IO::Async::Loop::POE->new();
+   my $loop = IO::Async::Loop::POE->new();
 
- $loop->add( ... );
+   $loop->add( ... );
 
- $loop->add( IO::Async::Signal->new(
-       name => 'HUP',
-       on_receipt => sub { ... },
- ) );
+   $loop->add( IO::Async::Signal->new(
+         name => 'HUP',
+         on_receipt => sub { ... },
+   ) );
 
- $loop->loop_forever();
+   $loop->loop_forever();
 
 =head1 DESCRIPTION
 
@@ -55,7 +55,9 @@ systems.
 
 =cut
 
-=head2 $loop = IO::Async::Loop::POE->new( %args )
+=head2 new
+
+   $loop = IO::Async::Loop::POE->new( %args )
 
 This function returns a new instance of a C<IO::Async::Loop::POE> object.
 It takes the following named arguments:
@@ -261,7 +263,7 @@ sub unwatch_idle
    $self->_call( alarm_remove => $id );
 }
 
-sub watch_child
+sub watch_process
 {
    my $self = shift;
    my ( $pid, $code ) = @_;
@@ -274,7 +276,7 @@ sub watch_child
    }
 }
 
-sub unwatch_child
+sub unwatch_process
 {
    my $self = shift;
    my ( $pid ) = @_;

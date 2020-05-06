@@ -152,7 +152,7 @@ WriteMakefile(
 	'MDV::Distribconf'	=> '4.100',
 	'Net::LDAP'		=> '0',
 	'Time::ZoneInfo'	=> '0',
-	'URPM'			=> 'v5.25',
+	'URPM'			=> 'v5.28',
 	'XML::LibXML'		=> '0',
 	'XML::LibXML::Reader'	=> '0',
     },
@@ -194,7 +194,7 @@ WriteMakefile(
 		},
 		'urpmi' => {
 		    file => 'urpmi.pm',
-		    version => 'v8.122',
+		    version => 'v8.123',
 		},
             },
             resources => {

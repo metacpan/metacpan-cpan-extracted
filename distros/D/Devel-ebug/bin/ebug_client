@@ -1,8 +1,26 @@
-#!/usr/bin/perl
+#!perl
+
+use strict;
+use warnings;
+#use lib::findbin '../lib'; # dev-only
+
+# PODNAME: ebug_client
+# ABSTRACT: Debugger client for remote debugging Perl script
+our $VERSION = '0.60'; # VERSION
+
+__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-ebug-client - Debugger client for remote debugging Perl script
+ebug_client - Debugger client for remote debugging Perl script
+
+=head1 VERSION
+
+version 0.60
 
 =head1 SYNOPSIS
 
@@ -40,20 +58,13 @@ a complete ripoff of Devel::ebug source.
 
 L<Devel::debug>, L<ebug>, L<ebug-server>
 
-=head1 AUTHOR
-
-Taisuke Yamada, <tyamadajp!list!rakugaki!org>
-
-=cut
+=head1 cut
 
 package Devel::ebug;
 
 use Devel::ebug;
 use IO::Socket::INET;
-use strict;
-use warnings;
 
-our $VERSION = $Devel::ebug::VERSION;
 our $ARG     = {};
 
 # Replace 'load' with one that just attaches
@@ -66,8 +77,6 @@ package main;
 
 use Devel::ebug::Console;
 use Getopt::Long;
-use strict;
-use warnings;
 
 GetOptions( my $OPT = {}, 'help', 'port=i', 'key=s' ) || help();
 help() if $OPT->{help};
@@ -84,3 +93,23 @@ EOF
     exit(1);
 }
 
+=head1 AUTHOR
+
+Original author: Leon Brocard E<lt>acme@astray.comE<gt>
+
+Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Brock Wilcox E<lt>awwaiid@thelackthereof.orgE<gt>
+
+Taisuke Yamada
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2005-2020 by Leon Brocard.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

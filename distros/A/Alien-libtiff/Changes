@@ -1,0 +1,7 @@
+Revision history for Alien::libtiff
+
+1.01 2020-05-04
+    - Fix library name in POD
+
+1.00 2020-05-04
+    - First release to CPAN

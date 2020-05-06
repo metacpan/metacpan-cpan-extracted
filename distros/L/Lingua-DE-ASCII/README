@@ -1,4 +1,4 @@
-Lingua/DE/ASCII version 0.11
+Lingua/DE/ASCII version 0.14
 ============================
 
 NAME
@@ -12,7 +12,7 @@ SYNOPSIS
                  "sind nicht im ASCII Format " .
                  "und werden deshalb umgeschrieben);
   print to_latin1("Dies muesste auch rueckwaerts funktionieren ma cherie");
-                 
+
 
 DESCRIPTION
 
@@ -37,7 +37,7 @@ To install this module type the following:
 
 The self test is very intensive,
 it may need 10 minutes as it tests with a huge german word list.
-If it is to long for, just look for the first few seconds, 
+If it is to long for, just look for the first few seconds,
 if no error occurs up till then, it shouldn't happen in the remaining minutes and
 it should be O.K. to skip the remaining test.
 (And to give you a feeling, a progress bar is shown)
@@ -59,5 +59,5 @@ Put the correct copyright and licence information here.
 Copyright (C) 2003 Janek Schleicher
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+it under the same terms as Perl itself.
 

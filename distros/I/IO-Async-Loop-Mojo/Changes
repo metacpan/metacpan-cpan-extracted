@@ -1,5 +1,11 @@
 Revision history for IO-Async-Loop-Mojo
 
+0.07    2020-05-05
+        [CHANGES]
+         * Support IO::Async 0.76
+            + ->watch_child API is now called ->watch_process
+            + Added ->is_running accessor
+
 0.06    2019-09-25 23:00:51
         [BUGFIXES]
          * Fix for spurious activations of wrapper callback if no read- or

@@ -35,7 +35,7 @@
    "provides" : {
       "Metrics::Any::Adapter::Prometheus" : {
          "file" : "lib/Metrics/Any/Adapter/Prometheus.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -44,6 +44,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

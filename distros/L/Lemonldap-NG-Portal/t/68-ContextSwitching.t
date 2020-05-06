@@ -2,23 +2,18 @@ use Test::More;
 use strict;
 use IO::String;
 
-BEGIN {
-    require 't/test-lib.pm';
-}
+require 't/test-lib.pm';
 
 my $res;
-
 my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel                       => 'error',
             authentication                 => 'Demo',
             userDB                         => 'Same',
             loginHistoryEnabled            => 0,
-            brutForceProtection            => 0,
             portalMainLogo                 => 'common/logos/logo_llng_old.png',
             requireToken                   => 0,
             checkUser                      => 0,
-            impersonationPrefix            => 'testPrefix_',
             securedCookie                  => 0,
             https                          => 0,
             checkUserDisplayPersistentInfo => 0,
@@ -61,10 +56,20 @@ ok(
     $res->[2]->[0] =~ m%<span trspan="connectedAs">Connected as</span> rtyler%,
     'Connected as rtyler'
 ) or print STDERR Dumper( $res->[2]->[0] );
+ok( $res->[2]->[0] =~ qr%<span id="languages"></span>%, 'Found language flags' )
+  or print STDERR Dumper( $res->[2]->[0] );
 expectAuthenticatedAs( $res, 'rtyler' );
 ok( $res->[2]->[0] !~ m%contextSwitching_ON%, 'Connected as dwho' )
   or print STDERR Dumper( $res->[2]->[0] );
-count(2);
+ok( $res->[2]->[0] =~ qr%href="http://test1\.example\.com/" title="Application Test 1"%, 'Found test1 & title' )
+  or print STDERR Dumper( $res->[2]->[0] );
+ok( $res->[2]->[0] =~ qr%href="http://test2\.example\.com/" title="A nice application!"%, 'Found test2 & title' )
+  or print STDERR Dumper( $res->[2]->[0] );
+
+my @appdesc = ($res->[2]->[0] =~ qr%class="appdesc%);
+ok( @appdesc == 1 , 'Found only one description' )
+  or print STDERR Dumper( $res->[2]->[0] );
+count(6);
 
 $client->logout($id);
 
@@ -373,9 +378,8 @@ ok(
 );
 count(6);
 
-ok( $res->[2]->[0] =~ m%<span trmsg="1"></span>%,
-    'Found PE_SESSIONEXPIRED' )
-  or explain( $res->[2]->[0], 'Sessuion expired' );
+ok( $res->[2]->[0] =~ m%<span trmsg="1">%, 'Found PE_SESSIONEXPIRED' )
+  or explain( $res->[2]->[0], 'Session expired' );
 ok(
     $res = $client->_get(
         '/',
@@ -402,7 +406,7 @@ expectOK($res);
 
 ok(
     $res->[2]->[0] =~
-m%<div class="message message-positive alert"><span trmsg="47"></span></div>%,
+m%<div class="message message-positive alert"><span trmsg="47">%,
     'Dwho has been well disconnected'
 ) or print STDERR Dumper( $res->[2]->[0] );
 count(2);

@@ -9,7 +9,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_MALFORMEDUSER
 );
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -29,33 +29,63 @@ has ott => (
         return $ott;
     }
 );
-has idRule => ( is => 'rw', default => sub { 1 } );
-has sorted => ( is => 'rw', default => sub { 0 } );
+has idRule                    => ( is => 'rw', default => sub { 1 } );
+has displayEmptyValuesRule    => ( is => 'rw', default => sub { 0 } );
+has displayEmptyHeadersRule   => ( is => 'rw', default => sub { 0 } );
+has displayPersistentInfoRule => ( is => 'rw', default => sub { 0 } );
+has sorted                    => ( is => 'rw', default => sub { 0 } );
+has merged                    => ( is => 'rw', default => '' );
 
 sub hAttr {
     $_[0]->{conf}->{checkUserHiddenAttributes} . ' '
       . $_[0]->{conf}->{hiddenAttributes};
 }
 
+sub persistentAttrs {
+    $_[0]->{conf}->{persistentSessionAttributes}
+      || '_loginHistory _2fDevices notification_';
+}
+
 sub init {
     my ($self) = @_;
-    my $hd = $self->p->HANDLER;
     $self->addAuthRoute( checkuser => 'check', ['POST'] );
     $self->addAuthRouteWithRedirect( checkuser => 'display', ['GET'] );
 
-    # Parse identity rule
-    $self->logger->debug(
-        "checkUser identities rule -> " . $self->conf->{checkUserIdRule} );
-    my $rule =
-      $hd->buildSub( $hd->substitute( $self->conf->{checkUserIdRule} ) );
-    unless ($rule) {
-        $self->error(
-            "Bad checkUser identities rule -> " . $hd->tsv->{jail}->error );
-        return 0;
-    }
-    $self->idRule($rule);
+    # Parse checkUser rules
+    $self->idRule(
+        $self->p->buildRule( $self->conf->{checkUserIdRule}, 'checkUserId' ) );
+    return 0 unless $self->idRule;
+
+    $self->displayEmptyValuesRule(
+        $self->p->buildRule(
+            $self->conf->{checkUserDisplayEmptyValues},
+            'checkUserDisplayEmptyValues'
+        )
+    );
+    return 0 unless $self->displayEmptyValuesRule;
+
+    $self->displayEmptyHeadersRule(
+        $self->p->buildRule(
+            $self->conf->{checkUserDisplayEmptyHeaders},
+            'checkUserDisplayEmptyHeaders'
+        )
+    );
+    return 0 unless $self->displayEmptyHeadersRule;
+
+    $self->displayPersistentInfoRule(
+        $self->p->buildRule(
+            $self->conf->{checkUserDisplayPersistentInfo},
+            'checkUserDisplayPersistentInfo'
+        )
+    );
+    return 0 unless $self->displayPersistentInfoRule;
+
+    # Init. other options
     $self->sorted( $self->conf->{impersonationRule}
           || $self->conf->{contextSwitchingRule} );
+    $self->merged( $self->conf->{impersonationMergeSSOgroups}
+          && $self->conf->{impersonationRule} ? 'Merged' : '' );
+
     return 1;
 }
 
@@ -69,9 +99,12 @@ sub display {
       if ( $self->conf->{impersonationRule} );
     $attrs = $req->userData;
 
+    $attrs = $self->_removePersistentAttributes($attrs)
+      unless $self->displayPersistentInfoRule->( $req, $req->userData );
+
     # Create an array of hashes for template loop
     $self->logger->debug("Delete hidden or empty attributes");
-    if ( $self->conf->{checkUserDisplayEmptyValues} ) {
+    if ( $self->displayEmptyValuesRule->( $req, $req->userData ) ) {
         foreach my $k ( sort keys %$attrs ) {
 
             # Ignore hidden attributes
@@ -93,24 +126,19 @@ sub display {
 
     # Display form
     my $params = {
-        PORTAL    => $self->conf->{portal},
-        MAIN_LOGO => $self->conf->{portalMainLogo},
-        SKIN      => $self->p->getSkin($req),
-        LANGS     => $self->conf->{showLanguages},
-        MSG       => (
-            $self->{conf}->{impersonationMergeSSOgroups} ? 'checkUserMerged'
-            : 'checkUser'
-        ),
-        ALERTE => (
-            $self->{conf}->{impersonationMergeSSOgroups} ? 'alert-warning'
-            : 'alert-info'
-        ),
+        PORTAL     => $self->conf->{portal},
+        MAIN_LOGO  => $self->conf->{portalMainLogo},
+        SKIN       => $self->p->getSkin($req),
+        LANGS      => $self->conf->{showLanguages},
+        MSG        => 'checkUser' . $self->merged,
+        ALERTE     => ( $self->merged ? 'alert-warning' : 'alert-info' ),
         LOGIN      => $req->{userData}->{ $self->conf->{whatToTrace} },
         ATTRIBUTES => $array_attrs->[2],
         MACROS     => $array_attrs->[1],
         GROUPS     => $array_attrs->[0],
         TOKEN      => (
-            $self->ottRule->( $req, {} ) ? $self->ott->createToken()
+              $self->ottRule->( $req, {} )
+            ? $self->ott->createToken()
             : ''
         )
     };
@@ -123,9 +151,7 @@ sub display {
 sub check {
     my ( $self, $req ) = @_;
     my ( $attrs, $array_attrs, $array_hdrs ) = ( {}, [], [] );
-    my $msg       = my $auth = my $compute = '';
-    my $authLevel = $req->userData->{authenticationLevel};
-    my $authMode  = $req->userData->{_auth};
+    my $msg = my $auth = my $compute = '';
 
     # Check token
     if ( $self->ottRule->( $req, {} ) ) {
@@ -241,27 +267,36 @@ sub check {
         $attrs       = {};
     }
     else {
-        $msg =
-          $self->{conf}->{impersonationMergeSSOgroups} eq 1
-          ? 'checkUserMerged'
-          : 'checkUser';
-        if ($compute) {
-            $msg                          = 'checkUserComputeSession';
-            $attrs->{authenticationLevel} = $authLevel;
-            $attrs->{_auth}               = $authMode;
+        $msg   = 'checkUser' . $self->merged;
+        $attrs = $self->_removePersistentAttributes($attrs)
+          unless $self->displayPersistentInfoRule->( $req, $req->userData );
 
+        if ($compute) {
+            $msg = 'checkUserComputeSession';
             if ( $self->conf->{impersonationRule} ) {
                 $self->logger->debug("Map real attributes...");
                 my %realAttrs = map {
                     ( "$self->{conf}->{impersonationPrefix}$_" => $attrs->{$_} )
                 } keys %$attrs;
                 $attrs = { %$attrs, %realAttrs };
+
+                # Compute groups and macros with real and spoofed attributes
+                $self->logger->debug(
+                    "Compute groups and macros with real and spoofed attributes"
+                );
+                $req->sessionInfo($attrs);
+                delete $req->sessionInfo->{groups};
+                $req->steps( [ $self->p->groupsAndMacros, 'setLocalGroups' ] );
+                if ( my $error = $self->p->process($req) ) {
+                    $self->logger->debug("Process returned error: $error");
+                    return $req->error($error);
+                }
             }
         }
 
         # Create an array of hashes for template loop
         $self->logger->debug("Delete hidden or empty attributes");
-        if ( $self->conf->{checkUserDisplayEmptyValues} ) {
+        if ( $self->displayEmptyValuesRule->( $req, $req->userData ) ) {
             foreach my $k ( sort keys %$attrs ) {
 
                 # Ignore hidden attributes
@@ -357,9 +392,13 @@ sub _urlFormat {
 
 sub _userData {
     my ( $self, $req ) = @_;
+    my $realAuthLevel = $req->userData->{authenticationLevel};
 
     # Compute session
-    my $steps = [ 'getUser', 'setSessionInfo', 'setMacros', 'setGroups' ];
+    my $steps = [
+        'getUser',        'setAuthSessionInfo',
+        'setSessionInfo', $self->p->groupsAndMacros,
+    ];
     $self->conf->{checkUserDisplayPersistentInfo}
       ? push @$steps, 'setPersistentSessionInfo', 'setLocalGroups'
       : push @$steps, 'setLocalGroups';
@@ -372,7 +411,7 @@ sub _userData {
                   . ")" );
         }
         $self->logger->debug("Process returned error: $error");
-        return $req->error($error);
+        return $req->error(PE_BADCREDENTIALS);
     }
 
     unless ( defined $req->sessionInfo->{uid} ) {
@@ -389,6 +428,16 @@ sub _userData {
         $req->{sessionInfo} = {};
         $self->logger->debug('Identity not authorized');
         return $req->error(PE_BADCREDENTIALS);
+    }
+
+    # Compute groups & macros again with real authenticationLevel
+    $req->sessionInfo->{authenticationLevel} = $realAuthLevel;
+    delete $req->sessionInfo->{groups};
+
+    $req->steps( [ $self->p->groupsAndMacros, 'setLocalGroups' ] );
+    if ( my $error = $self->p->process($req) ) {
+        $self->logger->debug("CheckUser: Process returned error: $error");
+        return $req->error($error);
     }
 
     $self->logger->debug("Return \"$req->{user}\" sessionInfo");
@@ -426,7 +475,14 @@ sub _headers {
     $self->p->HANDLER->headersInit( $self->{conf} );
     $self->logger->debug(
         "Return \"$attrs->{ $self->{conf}->{whatToTrace} }\" headers");
-    return $self->p->HANDLER->checkHeaders( $req, $attrs );
+    return $self->p->HANDLER->checkHeaders( $req, $attrs )
+      if ( $self->displayEmptyHeadersRule->( $req, $req->userData ) );
+
+    $self->logger->debug("Remove empty headers");
+    my @headers = grep $_->{value} =~ /.+/,
+      @{ $self->p->HANDLER->checkHeaders( $req, $attrs ) };
+
+    return \@headers;
 }
 
 sub _splitAttributes {
@@ -481,6 +537,16 @@ sub _splitAttributes {
         @$others = ( @$spoofedAttrs, @$realAttrs );
     }
     return [ $grps, $mcrs, $others ];
+}
+
+sub _removePersistentAttributes {
+    my ( $self, $attrs ) = @_;
+    my $regex = join '|',      split /\s+/, $self->persistentAttrs;
+    my @keys  = grep /$regex/, keys %$attrs;
+    $self->logger->debug("Remove persistent session attributes");
+    delete @$attrs{@keys};
+
+    return $attrs;
 }
 
 1;

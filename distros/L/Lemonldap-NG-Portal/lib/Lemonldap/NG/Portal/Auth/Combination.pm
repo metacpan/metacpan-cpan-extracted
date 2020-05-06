@@ -6,7 +6,7 @@ use Lemonldap::NG::Common::Combination::Parser;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_ERROR PE_FIRSTACCESS);
 use Scalar::Util 'weaken';
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 # TODO: See Lib::Wrapper
 extends 'Lemonldap::NG::Portal::Main::Auth';
@@ -137,9 +137,17 @@ sub authLogout {
 
     # Avoid warning msg at first access
     $req->userData->{_combinationTry} ||= 0;
-    my ( $res, $name ) =
+    my $sub =
       $req->data->{combinationStack}->[ $req->userData->{_combinationTry} ]
-      ->[0]->( 'authLogout', @_ );
+      ->[0];
+    unless ($sub) {
+        $self->logger->warn(
+                "Condition changed between login and logout for "
+              . $req->user
+              . ", unable to select good backend" );
+        return PE_OK;
+    }
+    my ( $res, $name ) = $sub->( 'authLogout', @_ );
     $self->logger->debug(qq'User disconnected using scheme "$name"');
     return $res;
 }
@@ -210,6 +218,13 @@ sub try {
 
     # If more than 1 scheme is available
     my ( $res, $name );
+    unless ( ref $stack->[$nb]->[$type] ) {
+        $self->logger->error(
+'Something went wrong in combination, unable to find any auth scheme (try == '
+              . ( $nb + 1 )
+              . ')' );
+        return PE_ERROR;
+    }
 
     if ( $nb < @$stack - 1 ) {
 

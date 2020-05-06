@@ -13,7 +13,7 @@ displayError = (j, status, err) ->
 	console.log 'Error', err
 	res = JSON.parse j.responseText
 	if res and res.error
-		res = res.error.replace /.* /, ''
+		res = res.error.replace(/.* /, '')
 		console.log 'Returned error', res
 		setMsg res, 'warning'
 

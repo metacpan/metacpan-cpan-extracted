@@ -4,6 +4,7 @@ use warnings;
 
 use JSON ();
 use Scalar::Util qw( blessed );
+use List::MoreUtils 'uniq';
 
 use Sub::Exporter -setup => {
     exports => [qw[
@@ -19,6 +20,7 @@ use Sub::Exporter -setup => {
         query_string
         custom_fields_for
         format_datetime
+        update_custom_fields
     ]]
 };
 
@@ -91,6 +93,19 @@ sub serialize_record {
         }
     }
 
+    # Add available values for Select RT::CustomField
+    if (ref($record) eq 'RT::CustomField' && $record->Type eq 'Select') {
+        my $values = $record->Values;
+        while (my $val = $values->Next) {
+            my $category = $record->BasedOn ? $val->Category : '';
+            if (exists $data{Values}) {
+                push @{$data{Values}}, {name => $val->Name, category => $category};
+            } else {
+                $data{Values} = [{name => $val->Name, category => $category}];
+            }
+        }
+    }
+
     # Replace UIDs with object placeholders
     for my $uid (grep ref eq 'SCALAR', values %data) {
         $uid = expand_uid($uid);
@@ -115,8 +130,13 @@ sub serialize_record {
     if (my $cfs = custom_fields_for($record)) {
         my %values;
         while (my $cf = $cfs->Next) {
-            my $key    = $cf->Id;
-            my $values = $values{$key} ||= [];
+            if (! defined $values{$cf->Id}) {
+                $values{$cf->Id} = {
+                    %{ expand_uid($cf->UID) },
+                    name   => $cf->Name,
+                    values => [],
+                };
+            }
             my $ocfvs  = $cf->ValuesForObject( $record );
             my $type   = $cf->Type;
             while (my $ocfv = $ocfvs->Next) {
@@ -131,11 +151,11 @@ sub serialize_record {
                         _url         => RT::Extension::REST2->base_uri . "/download/cf/" . $ocfv->id,
                     };
                 }
-                push @$values, $content;
+                push @{ $values{$cf->Id}{values} }, $content;
             }
         }
 
-        $data{CustomFields} = \%values;
+        push @{ $data{CustomFields} }, values %values;
     }
     return \%data;
 }
@@ -246,5 +266,135 @@ sub custom_fields_for {
 
     return;
 }
+
+sub update_custom_fields {
+    my $record = shift;
+    my $data = shift;
+
+    my @results;
+
+    foreach my $cfid (keys %{ $data }) {
+        my $val = $data->{$cfid};
+
+        my $cf = $record->LoadCustomFieldByIdentifier($cfid);
+        next unless $cf->ObjectTypeFromLookupType($cf->__Value('LookupType'))->isa(ref $record);
+
+        if ($cf->SingleValue) {
+            my %args;
+            my $old_val = $record->FirstCustomFieldValue($cfid);
+            if (!defined $val && $old_val) {
+                my ($ok, $msg) = $record->DeleteCustomFieldValue(
+                    Field => $cf,
+                    Value => $old_val,
+                );
+                push @results, $msg;
+                next;
+            }
+            elsif (ref($val) eq 'ARRAY') {
+                $val = $val->[0];
+            }
+            elsif (ref($val) eq 'HASH' && $cf->Type =~ /^(?:Image|Binary)$/) {
+                my @required_fields;
+                foreach my $field ('FileName', 'FileType', 'FileContent') {
+                    unless ($val->{$field}) {
+                        push @required_fields, "$field is a required field for Image/Binary ObjectCustomFieldValue";
+                    }
+                }
+                if (@required_fields) {
+                    push @results, @required_fields;
+                    next;
+                }
+                $args{ContentType} = delete $val->{FileType};
+                $args{LargeContent} = MIME::Base64::decode_base64(delete $val->{FileContent});
+                $val = delete $val->{FileName};
+            }
+            elsif (ref($val)) {
+                die "Invalid value type for CustomField $cfid";
+            }
+
+            my ($ok, $msg) = $record->AddCustomFieldValue(
+                Field => $cf,
+                Value => $val,
+                %args,
+            );
+            push @results, $msg;
+        }
+        else {
+            my %count;
+            my @vals = ref($val) eq 'ARRAY' ? @$val : $val;
+            my @content_vals;
+            my %args;
+            for my $value (@vals) {
+                if (ref($value) eq 'HASH' && $cf->Type =~ /^(?:Image|Binary)$/) {
+                    my @required_fields;
+                    foreach my $field ('FileName', 'FileType', 'FileContent') {
+                        unless ($value->{$field}) {
+                            push @required_fields, "$field is a required field for Image/Binary ObjectCustomFieldValue";
+                        }
+                    }
+                    if (@required_fields) {
+                        push @results, @required_fields;
+                        next;
+                    }
+                    my $key = delete $value->{FileName};
+                    $args{$key}->{ContentType} = delete $value->{FileType};
+                    $args{$key}->{LargeContent} = MIME::Base64::decode_base64(delete $value->{FileContent});
+                    $count{$key}++;
+                    push @content_vals, $key;
+                }
+                elsif (ref($value)) {
+                    die "Invalid value type for CustomField $cfid";
+                }
+                else {
+                    $count{$value}++;
+                }
+            }
+            @vals = @content_vals if @content_vals;
+
+            my $ocfvs = $cf->ValuesForObject( $record );
+            my %ocfv_id;
+            while (my $ocfv = $ocfvs->Next) {
+                my $content = $ocfv->Content;
+                $count{$content}--;
+                push @{ $ocfv_id{$content} }, $ocfv->Id;
+            }
+
+            # we want to provide a stable order, so first go by the order
+            # provided in the argument list, and then for any custom fields
+            # that are being removed, remove in sorted order
+            for my $key (uniq(@vals, sort keys %count)) {
+                my $count = $count{$key};
+                if ($count == 0) {
+                    # new == old, no change needed
+                }
+                elsif ($count > 0) {
+                    # new > old, need to add new
+                    while ($count-- > 0) {
+                        my ($ok, $msg) = $record->AddCustomFieldValue(
+                            Field => $cf,
+                            Value => $key,
+                            $args{$key} ? %{$args{$key}} : (),
+                        );
+                        push @results, $msg;
+                    }
+                }
+                elsif ($count < 0) {
+                    # old > new, need to remove old
+                    while ($count++ < 0) {
+                        my $id = shift @{ $ocfv_id{$key} };
+                        my ($ok, $msg) = $record->DeleteCustomFieldValue(
+                            Field   => $cf,
+                            ValueId => $id,
+                        );
+                        push @results, $msg;
+                    }
+                }
+            }
+        }
+    }
+
+    return @results;
+}
+
 
 1;

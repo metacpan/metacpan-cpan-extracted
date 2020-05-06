@@ -1,7 +1,7 @@
 package Calendar::Dates::CFA;
 
-our $DATE = '2020-02-13'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2020-05-05'; # DATE
+our $VERSION = '20200505.0.0'; # VERSION
 
 use 5.010001;
 use strict;
@@ -44,7 +44,7 @@ Calendar::Dates::CFA - CFA exam calendar
 
 =head1 VERSION
 
-This document describes version 0.010 of Calendar::Dates::CFA (from Perl distribution Calendar-Dates-CFA), released on 2020-02-13.
+This document describes version 20200505.0.0 of Calendar::Dates::CFA (from Perl distribution Calendar-Dates-CFA), released on 2020-05-05.
 
 =head1 SYNOPSIS
 
@@ -63,7 +63,7 @@ C<$entries> result:
      day     => 12,
      month   => 2,
      summary => "Standard registration fee deadline",
-     tags    => ["jun2020exam"],
+     tags    => ["jun2020exam", "cancelled"],
      year    => 2020,
    },
    {
@@ -71,7 +71,7 @@ C<$entries> result:
      day     => 11,
      month   => 3,
      summary => "Late registration fee deadline",
-     tags    => ["jun2020exam"],
+     tags    => ["jun2020exam", "cancelled"],
      year    => 2020,
    },
    {
@@ -79,7 +79,7 @@ C<$entries> result:
      day     => 6,
      month   => 6,
      summary => "Exam day: Asia-Pacific (Levels II & III), Americas and EMEA (all levels)",
-     tags    => ["jun2020exam", "l2", "l3"],
+     tags    => ["jun2020exam", "l2", "l3", "cancelled"],
      year    => 2020,
    },
    {
@@ -87,7 +87,7 @@ C<$entries> result:
      day     => 7,
      month   => 6,
      summary => "Exam day: Asia-Pacific (Level I only)",
-     tags    => ["jun2020exam", "l1"],
+     tags    => ["jun2020exam", "l1", "cancelled"],
      year    => 2020,
    },
    {
@@ -95,7 +95,7 @@ C<$entries> result:
      day     => 28,
      month   => 7,
      summary => "Exam results available (Jun 2020)",
-     tags    => ["jun2020exam", "l1", "l2"],
+     tags    => ["jun2020exam", "l1", "l2", "cancelled"],
      year    => 2020,
    },
    {
@@ -134,16 +134,16 @@ C<$entries> result:
      date    => "2020-12-05",
      day     => 5,
      month   => 12,
-     summary => "Exam day",
-     tags    => ["dec2020exam", "l1"],
+     summary => "Exam day (Americas, EMEA all levels)",
+     tags    => ["dec2020exam", "l1", "l2", "l3"],
      year    => 2020,
    },
    {
      date    => "2020-12-06",
      day     => 6,
      month   => 12,
-     summary => "Religious alternate exam date",
-     tags    => ["dec2020exam", "l1"],
+     summary => "Exam day (APAC)",
+     tags    => ["dec2020exam", "l1", "l2", "l3"],
      year    => 2020,
    },
  ]
@@ -170,49 +170,49 @@ This module provides CFA exam calendar using the L<Calendar::Dates> interface.
 
 Entries for year 2019:
 
- +------------+-----+-------+--------------------------------------------------------------------------+---------------------+------+
- | date       | day | month | summary                                                                  | tags                | year |
- +------------+-----+-------+--------------------------------------------------------------------------+---------------------+------+
- | 2019-01-23 | 23  | 1     | Exam results announcement (Dec 2018, Level I)                            | dec2018exam, l1     | 2019 |
- | 2019-02-13 | 13  | 2     | Standard registration fee deadline                                       | jun2019exam         | 2019 |
- | 2019-02-18 | 18  | 2     | Second deadline to request disability accommodations                     | jun2019exam         | 2019 |
- | 2019-03-13 | 13  | 3     | Final (late) registration fee deadline                                   | jun2019exam         | 2019 |
- | 2019-03-18 | 18  | 3     | Final deadline to request disability accommodations                      | jun2019exam         | 2019 |
- | 2019-06-11 | 11  | 6     | Deadline for submission of test center change requests                   | jun2019exam         | 2019 |
- | 2019-06-15 | 15  | 6     | Exam day: Asia-Pacific (Levels II & III), Americas and EMEA (all levels) | jun2019exam, l2, l3 | 2019 |
- | 2019-06-16 | 16  | 6     | Exam day: Asia-Pacific (Level I only)                                    | jun2019exam, l1     | 2019 |
- | 2019-06-16 | 16  | 6     | Religious alternate exam date (Americas and EMEA, all levels)            | jun2019exam         | 2019 |
- | 2019-06-17 | 17  | 6     | Religious alternate exam date (Asia Pacific, all levels)                 | jun2019exam         | 2019 |
- | 2019-08-06 | 6   | 8     | Exam results announcement (Jun 2019, Levels I & II)                      | jun2019exam, l1, l2 | 2019 |
- | 2019-08-20 | 20  | 8     | Exam results announcement (Jun 2019, Level III)                          | jun2019exam, l3     | 2019 |
- | 2019-01-24 | 24  | 1     | Exam registration open                                                   | dec2019exam         | 2019 |
- | 2019-03-27 | 27  | 3     | Early registration fee deadline                                          | dec2019exam         | 2019 |
- | 2019-08-14 | 14  | 8     | Standard registration fee deadline                                       | dec2019exam         | 2019 |
- | 2019-09-11 | 11  | 9     | Final (late) registration fee deadline                                   | dec2019exam         | 2019 |
- | 2019-12-03 | 3   | 12    | Test center change request submission deadline                           | dec2019exam         | 2019 |
- | 2019-12-07 | 7   | 12    | Exam day                                                                 | dec2019exam, l1     | 2019 |
- | 2019-12-08 | 8   | 12    | Religious alternate exam date                                            | dec2019exam, l1     | 2019 |
- | 2019-08-08 | 8   | 8     | Exam registration open                                                   | jun2020exam         | 2019 |
- | 2019-10-02 | 2   | 10    | Early registration fee deadline                                          | jun2020exam         | 2019 |
- +------------+-----+-------+--------------------------------------------------------------------------+---------------------+------+
+ +------------+-----+-------+--------------------------------------------------------------------------+------------------------+------+
+ | date       | day | month | summary                                                                  | tags                   | year |
+ +------------+-----+-------+--------------------------------------------------------------------------+------------------------+------+
+ | 2019-01-23 | 23  | 1     | Exam results announcement (Dec 2018, Level I)                            | dec2018exam, l1        | 2019 |
+ | 2019-02-13 | 13  | 2     | Standard registration fee deadline                                       | jun2019exam            | 2019 |
+ | 2019-02-18 | 18  | 2     | Second deadline to request disability accommodations                     | jun2019exam            | 2019 |
+ | 2019-03-13 | 13  | 3     | Final (late) registration fee deadline                                   | jun2019exam            | 2019 |
+ | 2019-03-18 | 18  | 3     | Final deadline to request disability accommodations                      | jun2019exam            | 2019 |
+ | 2019-06-11 | 11  | 6     | Deadline for submission of test center change requests                   | jun2019exam            | 2019 |
+ | 2019-06-15 | 15  | 6     | Exam day: Asia-Pacific (Levels II & III), Americas and EMEA (all levels) | jun2019exam, l2, l3    | 2019 |
+ | 2019-06-16 | 16  | 6     | Exam day: Asia-Pacific (Level I only)                                    | jun2019exam, l1        | 2019 |
+ | 2019-06-16 | 16  | 6     | Religious alternate exam date (Americas and EMEA, all levels)            | jun2019exam            | 2019 |
+ | 2019-06-17 | 17  | 6     | Religious alternate exam date (Asia Pacific, all levels)                 | jun2019exam            | 2019 |
+ | 2019-08-06 | 6   | 8     | Exam results announcement (Jun 2019, Levels I & II)                      | jun2019exam, l1, l2    | 2019 |
+ | 2019-08-20 | 20  | 8     | Exam results announcement (Jun 2019, Level III)                          | jun2019exam, l3        | 2019 |
+ | 2019-01-24 | 24  | 1     | Exam registration open                                                   | dec2019exam            | 2019 |
+ | 2019-03-27 | 27  | 3     | Early registration fee deadline                                          | dec2019exam            | 2019 |
+ | 2019-08-14 | 14  | 8     | Standard registration fee deadline                                       | dec2019exam            | 2019 |
+ | 2019-09-11 | 11  | 9     | Final (late) registration fee deadline                                   | dec2019exam            | 2019 |
+ | 2019-12-03 | 3   | 12    | Test center change request submission deadline                           | dec2019exam            | 2019 |
+ | 2019-12-07 | 7   | 12    | Exam day                                                                 | dec2019exam, l1        | 2019 |
+ | 2019-12-08 | 8   | 12    | Religious alternate exam date                                            | dec2019exam, l1        | 2019 |
+ | 2019-08-08 | 8   | 8     | Exam registration open                                                   | jun2020exam, cancelled | 2019 |
+ | 2019-10-02 | 2   | 10    | Early registration fee deadline                                          | jun2020exam, cancelled | 2019 |
+ +------------+-----+-------+--------------------------------------------------------------------------+------------------------+------+
 
 Entries for year 2020:
 
- +------------+-----+-------+--------------------------------------------------------------------------+---------------------+------+
- | date       | day | month | summary                                                                  | tags                | year |
- +------------+-----+-------+--------------------------------------------------------------------------+---------------------+------+
- | 2020-02-12 | 12  | 2     | Standard registration fee deadline                                       | jun2020exam         | 2020 |
- | 2020-03-11 | 11  | 3     | Late registration fee deadline                                           | jun2020exam         | 2020 |
- | 2020-06-06 | 6   | 6     | Exam day: Asia-Pacific (Levels II & III), Americas and EMEA (all levels) | jun2020exam, l2, l3 | 2020 |
- | 2020-06-07 | 7   | 6     | Exam day: Asia-Pacific (Level I only)                                    | jun2020exam, l1     | 2020 |
- | 2020-07-28 | 28  | 7     | Exam results available (Jun 2020)                                        | jun2020exam, l1, l2 | 2020 |
- | 2020-02-05 | 5   | 2     | Exam registration open                                                   | dec2020exam         | 2020 |
- | 2020-03-25 | 25  | 3     | Early registration fee deadline                                          | dec2020exam         | 2020 |
- | 2020-08-19 | 19  | 8     | Standard registration fee deadline                                       | dec2020exam         | 2020 |
- | 2020-09-09 | 9   | 9     | Final (late) registration fee deadline                                   | dec2020exam         | 2020 |
- | 2020-12-05 | 5   | 12    | Exam day                                                                 | dec2020exam, l1     | 2020 |
- | 2020-12-06 | 6   | 12    | Religious alternate exam date                                            | dec2020exam, l1     | 2020 |
- +------------+-----+-------+--------------------------------------------------------------------------+---------------------+------+
+ +------------+-----+-------+--------------------------------------------------------------------------+--------------------------------+------+
+ | date       | day | month | summary                                                                  | tags                           | year |
+ +------------+-----+-------+--------------------------------------------------------------------------+--------------------------------+------+
+ | 2020-02-12 | 12  | 2     | Standard registration fee deadline                                       | jun2020exam, cancelled         | 2020 |
+ | 2020-03-11 | 11  | 3     | Late registration fee deadline                                           | jun2020exam, cancelled         | 2020 |
+ | 2020-06-06 | 6   | 6     | Exam day: Asia-Pacific (Levels II & III), Americas and EMEA (all levels) | jun2020exam, l2, l3, cancelled | 2020 |
+ | 2020-06-07 | 7   | 6     | Exam day: Asia-Pacific (Level I only)                                    | jun2020exam, l1, cancelled     | 2020 |
+ | 2020-07-28 | 28  | 7     | Exam results available (Jun 2020)                                        | jun2020exam, l1, l2, cancelled | 2020 |
+ | 2020-02-05 | 5   | 2     | Exam registration open                                                   | dec2020exam                    | 2020 |
+ | 2020-03-25 | 25  | 3     | Early registration fee deadline                                          | dec2020exam                    | 2020 |
+ | 2020-08-19 | 19  | 8     | Standard registration fee deadline                                       | dec2020exam                    | 2020 |
+ | 2020-09-09 | 9   | 9     | Final (late) registration fee deadline                                   | dec2020exam                    | 2020 |
+ | 2020-12-05 | 5   | 12    | Exam day (Americas, EMEA all levels)                                     | dec2020exam, l1, l2, l3        | 2020 |
+ | 2020-12-06 | 6   | 12    | Exam day (APAC)                                                          | dec2020exam, l1, l2, l3        | 2020 |
+ +------------+-----+-------+--------------------------------------------------------------------------+--------------------------------+------+
 
 =for Pod::Coverage ^(filter_entry)$
 
@@ -303,18 +303,18 @@ __DATA__
 2019-12-08;Religious alternate exam date;dec2019exam,l1
 
 # jun2020exam
-2019-08-08;Exam registration open;jun2020exam
-2019-10-02;Early registration fee deadline;jun2020exam
-2020-02-12;Standard registration fee deadline;jun2020exam
-2020-03-11;Late registration fee deadline;jun2020exam
-2020-06-06;Exam day: Asia-Pacific (Levels II & III), Americas and EMEA (all levels);jun2020exam,l2,l3
-2020-06-07;Exam day: Asia-Pacific (Level I only);jun2020exam,l1
-2020-07-28;Exam results available (Jun 2020);jun2020exam,l1,l2
+2019-08-08;Exam registration open;jun2020exam,cancelled
+2019-10-02;Early registration fee deadline;jun2020exam,cancelled
+2020-02-12;Standard registration fee deadline;jun2020exam,cancelled
+2020-03-11;Late registration fee deadline;jun2020exam,cancelled
+2020-06-06;Exam day: Asia-Pacific (Levels II & III), Americas and EMEA (all levels);jun2020exam,l2,l3,cancelled
+2020-06-07;Exam day: Asia-Pacific (Level I only);jun2020exam,l1,cancelled
+2020-07-28;Exam results available (Jun 2020);jun2020exam,l1,l2,cancelled
 
 # dec2020exam
 2020-02-05;Exam registration open;dec2020exam
 2020-03-25;Early registration fee deadline;dec2020exam
 2020-08-19;Standard registration fee deadline;dec2020exam
 2020-09-09;Final (late) registration fee deadline;dec2020exam
-2020-12-05;Exam day;dec2020exam,l1
-2020-12-06;Religious alternate exam date;dec2020exam,l1
+2020-12-05;Exam day (Americas, EMEA all levels);dec2020exam,l1,l2,l3
+2020-12-06;Exam day (APAC);dec2020exam,l1,l2,l3

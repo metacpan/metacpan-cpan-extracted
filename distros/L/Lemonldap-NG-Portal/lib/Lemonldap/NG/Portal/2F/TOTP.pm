@@ -15,7 +15,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Portal::Main::SecondFactor',
   'Lemonldap::NG::Common::TOTP';
@@ -75,8 +75,7 @@ sub verify {
         return PE_FORMEMPTY;
     }
 
-    my $secret = '';
-    my $_2fDevices;
+    my ( $secret, $_2fDevices );
     if ( $session->{_2fDevices} ) {
         $self->logger->debug("Loading 2F Devices ...");
 
@@ -88,13 +87,10 @@ sub verify {
             return PE_ERROR;
         }
         $self->logger->debug("2F Device(s) found");
-        foreach (@$_2fDevices) {
-            $self->logger->debug("Reading TOTP secret if exists ...");
-            if ( $_->{type} eq 'TOTP' ) {
-                $secret = $_->{_secret};
-                last;
-            }
-        }
+        $self->logger->debug("Reading TOTP secret if exists...");
+
+        $secret = $_->{_secret}
+          foreach grep { $_->{type} eq 'TOTP' } @$_2fDevices;
     }
 
     unless ($secret) {
@@ -108,15 +104,15 @@ sub verify {
         $self->conf->{totp2fDigits},
         $secret, $code
     );
-    if ( $r == -1 ) { return PE_ERROR; }
-    elsif ($r) {
+    return PE_ERROR if ( $r == -1 );
+
+    if ($r) {
         $self->userLogger->info('TOTP succeed');
         return PE_OK;
     }
     else {
         $self->userLogger->notice( 'Invalid TOTP for '
-              . $session->{ $self->conf->{whatToTrace} }
-              . ')' );
+              . $session->{ $self->conf->{whatToTrace} } );
         return PE_BADOTP;
     }
 }

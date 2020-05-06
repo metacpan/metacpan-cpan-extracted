@@ -7,12 +7,11 @@ use lib '../..';
 
 use base qw(App::Followme::Module);
 
-use GD;
 use IO::File;
 use File::Spec::Functions qw(abs2rel rel2abs splitdir catfile);
 use App::Followme::FIO;
 
-our $VERSION = "1.92";
+our $VERSION = "1.93";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -22,10 +21,6 @@ sub parameters {
 
     return (
             thumb_suffix => '-thumb',
-            thumb_width => 0,
-            thumb_height => 0,
-            photo_width => 0,
-            photo_height => 0,
             template_file => 'create_gallery.htm',
             data_pkg => 'App::Followme::JpegData',
             );
@@ -37,105 +32,10 @@ sub parameters {
 sub run {
     my ($self, $directory) = @_;
 
-    eval {
-        $self->resize_photos($directory);
-        $self->update_folder($directory)
-    };
-
+    eval {$self->update_folder($directory)};
     $self->check_error($@, $directory);
 
     return;
-}
-
-#---------------------------------------------------------------------------
-# Calculate the new width and height of a photo
-
-sub new_size {
-    my($self, $field, $width, $height) = @_;
-
-    my $width_field = "${field}_width";
-    my $height_field = "${field}_height";
-
-    my $factor;
-    if ($self->{$width_field} && $self->{$height_field}) {
-        my $width_factor = $self->{$width_field} / $width;
-        my $height_factor = $self->{$height_field} / $height;
-        $factor = ($height_factor < $width_factor ? $height_factor : $width_factor);
-
-    } elsif ($self->{$width_field}) {
-       $factor = $self->{$width_field} / $width;
-
-    } elsif ($self->{$height_field}) {
-        $factor = $self->{$height_field} / $height;
-
-    } else {
-        $factor = 0.0;
-    }
-
-    my $new_height = int($factor * $height);
-    my $new_width  = int($factor * $width);
-
-    return ($new_width, $new_height);
-}
-
-#---------------------------------------------------------------------------
-# Resize a photo, return undef if it does not need to be resized
-
-sub resize_a_photo {
-    my ($self, $file, $new_width, $new_height, $width, $height) = @_;
-    return if $width == $new_width && $height == $new_height;
-
-    my $photo = GD::Image->new($file);
-    my $new_photo = GD::Image->new($width, $height);
-
-    $new_photo->copyResampled($photo,
-                          0, 0, 0, 0,
-                          $new_width, $new_height,
-                          $width, $height);
-
-    return $new_photo;
-}
-
-#---------------------------------------------------------------------------
-# Resize any new photos that has been added to a directory
-
-sub resize_photos {
-    my ($self, $folder) = @_;
-
-    my $index_file = $self->to_file($folder);
-    my $files = $self->{data}->build('files', $index_file);
-
-    foreach my $file (@$files) {
-        last if fio_is_newer($index_file, $file);
-
-        for my $field (qw(thumb photo)) {
-
-            my $width = ${$self->{data}->build('width', $file)};
-            my $height = ${$self->{data}->build('height', $file)};
-            my ($new_width, $new_height) =
-                $self->new_size($field, $width, $height);
-
-            if ($new_width && $new_height) {
-                my $new_photo = $self->resize_a_photo($file,
-                                                      $new_width,
-                                                      $new_height,
-                                                      $width,
-                                                      $height);
-                if ($new_photo) {
-                    my $photoname;
-                    if ($field eq 'photo') {
-                        $photoname = $file;
-                    } else {
-                        my $thumb_files = $self->{data}->build('thumb_file',
-                                                               $file);
-                        $photoname = $thumb_files->[0];
-                    }
-
-                    $self->write_photo($photoname, $new_photo);
-                }
-            }
-        }
-    }
 }
 
 #----------------------------------------------------------------------
@@ -213,28 +113,6 @@ The name of the template used to produce the photo gallery. The default is
 
 The suffix added to the photo name to produce the thumb photo name. The default
 is '-thumb'.
-
-=item thumb_width
-
-The width of the thumb photos. Leave at 0 if the width is defined to be
-proportional to the height.
-
-=item thumb_height
-
-The height of the thumb photos. Leave at 0 if the height is defined to be
-proportional to the width. If both thumb_width and thumb_height are 0, no
-thumb photo will be created.
-
-=item photo_width
-
-The width of the photo after resizing. Leave at 0 if the width is defined to be
-proportional to the height.
-
-=item photo_height
-
-The height of the photo after resizing. Leave at 0 if the height is defined to
-be proportional to the width. If both photo_width and photo_height are zero,
-the image will not be resized.
 
 =item data_pkg
 

@@ -1,0 +1,33 @@
+---
+abstract: 'easier Rex task argument handling'
+author:
+  - 'Steve Dondley <s@dondley.com>'
+build_requires:
+  Data::Dumper: '0'
+  Rex: '0'
+  Rex::Args: '0'
+  Rex::Commands: '0'
+  Rex::Config: '0'
+  Rex::RunList: '0'
+  Rex::Transaction: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Rex-Dondley-ProcessTaskArgs
+requires:
+  Exporter: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/sdondley/Rex-Dondley-ProcessTaskArgs/issues
+  repository: git://github.com/sdondley/Rex-Dondley-ProcessTaskArgs.git
+version: '0.009'
+x_generated_by_perl: v5.24.4
+x_serialization_backend: 'YAML::Tiny version 1.73'

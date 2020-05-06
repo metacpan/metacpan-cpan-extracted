@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-OEIS.
 #
@@ -27,7 +27,7 @@ our @ISA = ('Math::OEIS::SortedFile');
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-our $VERSION = 14;
+our $VERSION = 15;
 
 use constant base_filename => 'names';
 
@@ -110,7 +110,7 @@ L<http://oeis.org/wiki/The_OEIS_End-User_License_Agreement>
 
 =item C<$name = Math::OEIS::Names-E<gt>anum_to_name($anum)>
 
-For a given C<$anum> string such as "A000001" return the sequence name
+For a given C<$anum> string such as "A000001", return the sequence name
 as a string, or if not found then return C<undef>.
 
 The returned C<$name> may contain non-ASCII characters.  In Perl 5.8 up,
@@ -139,8 +139,8 @@ file.  The optional key/value parameters are
     fh       => $filehandle
 
 The default file is per C<default_filename()> below.  A different filename
-can be given or an open filehandle C<fh>.  For C<fh>, its C<filename> can be
-given too and might be used in diagnostics.
+can be given or an open filehandle C<fh>.  For C<fh>, the C<filename> option
+is used in diagnostics if present.
 
 =item C<$name = $obj-E<gt>anum_to_name($anum)>
 
@@ -150,7 +150,7 @@ string, or if not found then return C<undef>.
 =item C<$filename = $obj-E<gt>filename()>
 
 Return the F<names> filename from a given C<$obj> object.  This is the
-C<filename> parameter if given, or filename which was determined by
+C<filename> parameter if given, or the filename which was determined by
 C<default_filename()> otherwise.
 
 =item C<$filename = Math::OEIS::Names-E<gt>default_filename()>
@@ -158,7 +158,8 @@ C<default_filename()> otherwise.
 =item C<$filename = $obj-E<gt>default_filename()>
 
 Return the default filename which is used if no C<filename> or C<fh> option
-is given.  The file is F<names> in C<Math::OEIS-E<gt>local_directories()>.
+is given.  This is F<names> found sought in
+C<Math::OEIS-E<gt>local_directories()>.
 
 =item C<$obj-E<gt>close()>
 
@@ -192,7 +193,7 @@ L<http://user42.tuxfamily.org/math-oeis/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 Math-OEIS is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

@@ -10,7 +10,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Portal::Main::SecondFactor';
 
@@ -36,7 +36,8 @@ sub init {
         return 0;
     }
 
-    unless (
+    $self->error('Radius connect failed')
+      unless (
         $self->radius(
             Authen::Radius->new(
                 Host    => $self->conf->{radius2fServer},
@@ -44,10 +45,8 @@ sub init {
                 TimeOut => $self->conf->{radius2fTimeout},
             )
         )
-      )
-    {
-        $self->error('Radius connect failed');
-    }
+      );
+
     $self->prefix( $self->conf->{sfPrefix} )
       if ( $self->conf->{sfPrefix} );
     return $self->SUPER::init();
@@ -109,8 +108,9 @@ sub verify {
             "Radius server replied: " . $self->radius->get_error );
         return PE_BADOTP;
     }
+
     $self->logger->debug("Radius server accepted 2F credentials");
-    PE_OK;
+    return PE_OK;
 }
 
 1;

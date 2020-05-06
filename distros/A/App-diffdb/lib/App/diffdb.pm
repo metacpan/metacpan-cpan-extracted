@@ -1,9 +1,9 @@
 package App::diffdb;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-23'; # DATE
+our $DATE = '2020-05-06'; # DATE
 our $DIST = 'App-diffdb'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -226,7 +226,7 @@ sub _write_query_to_file {
 }
 
 sub _write_table_to_file {
-    require DBIx::Diff::Schema;
+    require DBIx::Util::Schema;
 
     my ($self, $which_dbh, $table) = @_;
 
@@ -245,7 +245,7 @@ sub _write_table_to_file {
 
     my @columns;
   COLUMN:
-    for my $column (DBIx::Diff::Schema::list_columns($dbh, $table)) {
+    for my $column (DBIx::Util::Schema::list_columns($dbh, $table)) {
         if ($self->{include_columns} && @{ $self->{include_columns} }) {
             next COLUMN unless grep { $column->{COLUMN_NAME} eq $_ } @{ $self->{include_columns} };
         }
@@ -258,7 +258,7 @@ sub _write_table_to_file {
 
     unless (length $order_by) {
         my @indexes = grep { $_->{is_unique} }
-            DBIx::Diff::Schema::list_indexes($dbh, $table);
+            DBIx::Util::Schema::list_indexes($dbh, $table);
         if (@indexes) {
             $order_by = join(",", map {qq($_)} @{ $indexes[0]{columns} });
         }
@@ -281,7 +281,7 @@ sub _diff_files {
 }
 
 sub _diff_db {
-    require DBIx::Diff::Schema;
+    require DBIx::Util::Schema;
 
     my $self = shift;
 
@@ -301,8 +301,8 @@ sub _diff_db {
 
     # now the case that is left is to diff one or more tables from two dbs
 
-    my @tables1 = DBIx::Diff::Schema::list_tables($self->{dbh1});
-    my @tables2 = DBIx::Diff::Schema::list_tables($self->{dbh2});
+    my @tables1 = DBIx::Util::Schema::list_tables($self->{dbh1});
+    my @tables2 = DBIx::Util::Schema::list_tables($self->{dbh2});
 
     # for now, we'll ignore schemas
     for (@tables1, @tables2) { s/.+\.// }
@@ -547,7 +547,7 @@ App::diffdb - Compare two databases, line by line
 
 =head1 VERSION
 
-This document describes version 0.003 of App::diffdb (from Perl distribution App-diffdb), released on 2020-04-23.
+This document describes version 0.004 of App::diffdb (from Perl distribution App-diffdb), released on 2020-05-06.
 
 =head1 SYNOPSIS
 

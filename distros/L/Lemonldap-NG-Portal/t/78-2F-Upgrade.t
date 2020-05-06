@@ -140,24 +140,12 @@ ok(
     'Post code'
 );
 count(1);
-
-$pdata = expectCookie( $res, 'lemonldappdata' );
-$id    = expectCookie($res);
-
 expectRedirection( $res, 'http://test1.example.com' );
+$id = expectCookie($res);
 
-# Make pdata was cleared and we aren't being redirected
-ok(
-    $res = $client->_get(
-        '/',
-        accept => 'text/html',
-        cookie => "lemonldap=$id;lemonldappdata=$pdata",
-    ),
-    'Post login'
-);
+my $cookies = getCookies($res);
+ok( !$cookies->{lemonldappdata}, " Make sure no pdata is returned" );
 count(1);
-
-expectOK($res);
 
 clean_sessions();
 

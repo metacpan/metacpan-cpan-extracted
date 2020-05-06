@@ -9,6 +9,11 @@ META.yml
 Makefile.PL
 Makefile.dev
 README
+bin/yamlpp-events
+bin/yamlpp-highlight
+bin/yamlpp-load
+bin/yamlpp-load-dump
+bin/yamlpp-parse-emit
 bin/yamlpp5-events
 bin/yamlpp5-highlight
 bin/yamlpp5-load
@@ -28,8 +33,12 @@ examples/external-vars-templates/ext.yaml
 examples/schema-ixhash.pm
 examples/schema-perl.pm
 examples/schemas.pl
+examples/strings.yaml
 examples/yaml-schema-modules.yaml
-examples/yaml-schema.yaml
+ext/yaml-test-schema/Makefile
+ext/yaml-test-schema/README.md
+ext/yaml-test-schema/etc/generate-schema-html.pl
+ext/yaml-test-schema/yaml-schema.yaml
 lib/YAML/PP.pm
 lib/YAML/PP/Common.pm
 lib/YAML/PP/Constructor.pm
@@ -119,6 +128,10 @@ t/valid/v019/===
 t/valid/v019/in.yaml
 t/valid/v019/out.yaml
 t/valid/v019/test.event
+t/valid/v020/===
+t/valid/v020/in.yaml
+t/valid/v020/out.yaml
+t/valid/v020/test.event
 test-suite/README.md
 test-suite/yaml-test-suite-data/229Q/===
 test-suite/yaml-test-suite-data/229Q/in.json

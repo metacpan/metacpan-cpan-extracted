@@ -11,7 +11,7 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(to_ascii to_latin1);
 our %EXPORT_TAGS = ( 'all' => [ @EXPORT ]);
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 our %ANSI_TO_ASCII_TRANSLITERATION = (qw(
         ¡ !

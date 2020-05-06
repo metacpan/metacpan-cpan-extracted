@@ -41,7 +41,7 @@ sub available {
     closedir D;
     @conf =
       sort { $a <=> $b }
-      map { /lmConf-(\d+)\.yaml/ ? ( $1 + 0 ) : () } @conf;
+      map  { /lmConf-(\d+)\.yaml/ ? ( $1 + 0 ) : () } @conf;
     return @conf;
 }
 

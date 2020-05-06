@@ -27,7 +27,7 @@
       },
       "test" : {
          "requires" : {
-            "IO::Async::LoopTests" : "0.24",
+            "IO::Async::LoopTests" : "0.76",
             "Test::More" : "0.88"
          }
       }
@@ -35,7 +35,7 @@
    "provides" : {
       "IO::Async::Loop::Mojo" : {
          "file" : "lib/IO/Async/Loop/Mojo.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -44,6 +44,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

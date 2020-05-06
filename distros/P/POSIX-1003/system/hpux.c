@@ -8,3 +8,9 @@
 #endif
 
 #undef HAS_STRSIGNAL
+#undef HAS_FCNTL_OWN_EX
+
+/* To get flock() compiled, we need to add
+ * -I/usr/include/ep -lcext
+ */
+#undef HAS_FLOCK

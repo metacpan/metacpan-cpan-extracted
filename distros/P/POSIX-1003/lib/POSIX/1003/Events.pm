@@ -1,34 +1,41 @@
-# Copyrights 2011-2013 by [Mark Overmeer].
+# Copyrights 2011-2020 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.01.
-use warnings;
-use strict;
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution POSIX-1003.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package POSIX::1003::Events;
 use vars '$VERSION';
-$VERSION = '0.98';
+$VERSION = '1.00';
 
 use base 'POSIX::1003::Module';
 
-my @constants;
+use warnings;
+use strict;
+
+my (@constants, @poll);
+
 my @functions = qw/
   FD_CLR FD_ISSET FD_SET FD_ZERO select
-  poll poll_names
+  poll events_names
  /;
-
-my @poll = qw(poll poll_names);
 
 our %EXPORT_TAGS =
  ( constants => \@constants
+ , poll      => \@poll
  , functions => \@functions
  );
 
-my  $poll;
+my $events;
 
 BEGIN {
-    $poll = poll_table;
-    push @constants, keys %$poll;
+    $events = events_table;
+    push @constants, keys %$events;
+
+    @poll = qw(poll events_names);
+    push @poll, grep /^POLL/, keys %$events;
 }
 
 
@@ -52,13 +59,11 @@ sub poll($;$)
 
 #----------------------
 
-sub poll_names() { keys %$poll }
+sub events_names() { keys %$events }
 
 sub _create_constant($)
 {   my ($class, $name) = @_;
-    $name =~ m/^POLL/
-        or die "constants expected to start with POLL, not $name\n";
-    my $val = $poll->{$name} // return sub() {undef};
+    my $val = $events->{$name} // return sub() {undef};
     sub() {$val};
 
 }

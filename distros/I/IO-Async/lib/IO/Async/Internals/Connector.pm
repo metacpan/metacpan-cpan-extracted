@@ -9,7 +9,7 @@ package # hide from CPAN
 use strict;
 use warnings;
 
-our $VERSION = '0.75';
+our $VERSION = '0.76';
 
 use Scalar::Util qw( weaken );
 

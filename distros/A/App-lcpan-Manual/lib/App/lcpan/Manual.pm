@@ -1,9 +1,9 @@
 package App::lcpan::Manual;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-19'; # DATE
+our $DATE = '2020-05-06'; # DATE
 our $DIST = 'App-lcpan-Manual'; # DIST
-our $VERSION = '1.049.000'; # VERSION
+our $VERSION = '1.054.001'; # VERSION
 
 1;
 # ABSTRACT: Manual for App::lcpan
@@ -20,7 +20,7 @@ App::lcpan::Manual - Manual for App::lcpan
 
 =head1 VERSION
 
-version 1.049.000
+version 1.054.001
 
 =head1 DESCRIPTION
 

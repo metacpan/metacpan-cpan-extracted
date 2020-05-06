@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 89 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 90 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/lcpan.pm',
@@ -50,6 +50,7 @@ my @module_files = (
     'App/lcpan/Cmd/extract_rel.pm',
     'App/lcpan/Cmd/extract_script.pm',
     'App/lcpan/Cmd/inject.pm',
+    'App/lcpan/Cmd/log.pm',
     'App/lcpan/Cmd/mentions.pm',
     'App/lcpan/Cmd/mentions_by_mod.pm',
     'App/lcpan/Cmd/mentions_by_script.pm',

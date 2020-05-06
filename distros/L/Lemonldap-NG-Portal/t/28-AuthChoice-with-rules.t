@@ -116,8 +116,7 @@ m%<form id="lformKerberos" action="#" method="post" class="login Kerberos">%,
     my $header = getHeader( $res, 'Content-Security-Policy' );
     ok( $header =~ m%;form-action \*  https://test.example.com;%,
         ' CSP URL found' )
-      or
-      explain( $res->[1], 'form-action *  https://test.example.com;' );
+      or explain( $res->[1], 'form-action *  https://test.example.com;' );
     ok( $res->[2]->[0] !~ /4_demo/, '4_Demo not displayed' );
     ok(
         $res->[2]->[0] =~ qr%<img src="/static/common/logos/logo_llng_old.png"%,

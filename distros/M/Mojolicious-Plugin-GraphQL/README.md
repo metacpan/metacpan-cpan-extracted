@@ -20,8 +20,8 @@ Mojolicious::Plugin::GraphQL - a plugin for adding GraphQL route handlers
     };
 
     # OR, equivalently:
-    plugin GraphQL => {handler => sub {
-      my ($c, $body, $execute) = @_;
+    plugin GraphQL => {schema => $schema, handler => sub {
+      my ($c, $body, $execute, $subscribe_fn) = @_;
       # returns JSON-able Perl data
       $execute->(
         $schema,
@@ -31,12 +31,13 @@ Mojolicious::Plugin::GraphQL - a plugin for adding GraphQL route handlers
         $body->{variables},
         $body->{operationName},
         undef, # $field_resolver
+        $subscribe_fn ? (undef, $subscribe_fn) : (), # only passed for subs
       );
     }};
 
     # OR, with bespoke user-lookup and caching:
-    plugin GraphQL => {handler => sub {
-      my ($c, $body, $execute) = @_;
+    plugin GraphQL => {schema => $schema, handler => sub {
+      my ($c, $body, $execute, $subscribe_fn) = @_;
       my $user = MyStuff::User->lookup($app->request->headers->header('X-Token'));
       die "Invalid user\n" if !$user; # turned into GraphQL { errors => [ ... ] }
       my $cached_result = MyStuff::RequestCache->lookup($user, $body->{query});
@@ -49,6 +50,7 @@ Mojolicious::Plugin::GraphQL - a plugin for adding GraphQL route handlers
         $body->{variables},
         $body->{operationName},
         undef, # $field_resolver
+        $subscribe_fn ? (undef, $subscribe_fn) : (), # only passed for subs
       ));
     };
 
@@ -58,13 +60,14 @@ Mojolicious::Plugin::GraphQL - a plugin for adding GraphQL route handlers
 # DESCRIPTION
 
 This plugin allows you to easily define a route handler implementing a
-GraphQL endpoint.
+GraphQL endpoint, including a websocket for subscriptions following
+Apollo's `subscriptions-transport-ws` protocol.
 
 As of version 0.09, it will supply the necessary `promise_code`
 parameter to ["execute" in GraphQL::Execution](https://metacpan.org/pod/GraphQL::Execution#execute). This means your resolvers
 can (and indeed should) return Promise objects to function
-asynchronously. Notice not necessarily "Promises/A+" - all that's needed
-is a two-arg `then` to work fine with GraphQL.
+asynchronously. As of 0.15 these must be "Promises/A+" as subscriptions
+require `resolve` and `reject` methods.
 
 The route handler code will be compiled to behave like the following:
 
@@ -93,8 +96,7 @@ String. Defaults to `/graphql`.
 
 ## schema
 
-A [GraphQL::Schema](https://metacpan.org/pod/GraphQL::Schema) object. If not supplied, your `handler` will need
-to be a closure that will pass a schema on to GraphQL.
+A [GraphQL::Schema](https://metacpan.org/pod/GraphQL::Schema) object. As of 0.15, must be supplied.
 
 ## root\_value
 
@@ -114,6 +116,10 @@ with at least one of a `data` key and/or an `errors` key.
 
 If it throws an exception, that will be turned into a GraphQL-formatted
 error.
+
+If being used for a subscription, it will be called with a fourth
+parameter as shown above. It is safe to not handle this if you are
+content with GraphQL's defaults.
 
 ## graphiql
 

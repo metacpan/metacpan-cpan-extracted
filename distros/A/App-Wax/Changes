@@ -1,5 +1,10 @@
 Revision history for Perl extension App::Wax.
 
+2.3.3 - 2020-05-04
+
+    - version bump to fix deletion of previous version from PAUSE
+    - update dependencies
+
 2.3.2 - 2020-04-30
 
     - documentation tweaks/fixes

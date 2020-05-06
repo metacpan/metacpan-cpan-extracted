@@ -1,0 +1,28 @@
+---
+abstract: 'Search for elements in a HTML::Element DOM tree using CSS selectors'
+author:
+  - 'Bart Lateur <bartl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-Selector-Element
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Exporter: '0'
+  HTML::TreeBuilder: '0'
+  perl: '5.008001'
+  strict: '0'
+version: '0.95'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

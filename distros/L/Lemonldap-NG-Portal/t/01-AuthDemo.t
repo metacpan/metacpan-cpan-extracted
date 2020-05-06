@@ -1,6 +1,7 @@
 use Test::More;
 use strict;
 use IO::String;
+use MIME::Base64;
 
 require 't/test-lib.pm';
 
@@ -14,6 +15,38 @@ my $client = LLNG::Manager::Test->new(
 ok( $res = $client->_get('/'), 'Unauth JSON request' );
 count(1);
 expectReject($res);
+
+# Test "first access" with an unprotected url
+ok(
+    $res = $client->_get(
+        '/',
+        query  => 'url=' . encode_base64( "http://test.example.fr/", '' ),
+        accept => 'text/html'
+    ),
+    'Get Menu'
+);
+ok( $res->[2]->[0] =~ /<span trmsg="37">/,
+    'Rejected with PE_BADURL' )
+  or print STDERR Dumper( $res->[2]->[0] );
+ok( $res->[2]->[0] =~ m%<span id="languages"></span>%, ' Language icons found' )
+  or print STDERR Dumper( $res->[2]->[0] );
+count(3);
+
+# Test "first access" with a wildcard-protected url
+ok(
+    $res = $client->_get(
+        '/',
+        query  => 'url=' . encode_base64( "http://test.example.llng/", '' ),
+        accept => 'text/html'
+    ),
+    'Get Menu'
+);
+ok( $res->[2]->[0] =~ /<span trmsg="9">/,
+    'Rejected with PE_FIRSTACCESS' )
+  or print STDERR Dumper( $res->[2]->[0] );
+ok( $res->[2]->[0] =~ m%<span id="languages"></span>%, ' Language icons found' )
+  or print STDERR Dumper( $res->[2]->[0] );
+count(3);
 
 # Test "first access" with good url
 ok(
@@ -40,15 +73,13 @@ ok(
     ),
     'Auth query'
 );
-count(1);
-ok( $res->[2]->[0] =~ /<span trmsg="5"><\/span><\/div>/,
+ok( $res->[2]->[0] =~ /<span trmsg="5">/,
     'jdoe rejected with PE_BADCREDENTIALS' )
   or print STDERR Dumper( $res->[2]->[0] );
-count(1);
 ok( $res->[2]->[0] =~ m%<span trspan="connect">Connect</span>%,
     'Found connect button' )
   or print STDERR Dumper( $res->[2]->[0] );
-count(1);
+count(3);
 
 # Try to authenticate with bad password
 # -------------------------------------
@@ -62,7 +93,7 @@ ok(
     'Auth query'
 );
 count(1);
-ok( $res->[2]->[0] =~ /<span trmsg="5"><\/span><\/div>/,
+ok( $res->[2]->[0] =~ /<span trmsg="5">/,
     'dwho rejected with PE_BADCREDENTIALS' )
   or print STDERR Dumper( $res->[2]->[0] );
 count(1);

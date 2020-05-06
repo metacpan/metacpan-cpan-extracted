@@ -16,15 +16,17 @@ my $client = LLNG::Manager::Test->new( {
             userDB                    => 'Same',
             loginHistoryEnabled       => 0,
             brutForceProtection       => 0,
-            checkUser                 => 1,
             requireToken              => 0,
+            checkUser                 => 1,
             checkUserIdRule           => '$uid ne "msmith"',
             checkUserSearchAttributes => 'employee_nbr  test1 _user test2 mail',
             checkUserDisplayPersistentInfo => 1,
-            checkUserDisplayEmptyValues    => 1,
+            checkUserDisplayEmptyHeaders   => '$uid eq "dwho"',
+            checkUserDisplayEmptyValues    => '$uid eq "dwho"',
             totp2fSelfRegistration         => 1,
             totp2fActivation               => 1,
             totp2fDigits                   => 6,
+            totp2fAuthnLevel               => 8,
             impersonationRule              => 1,
 
             #hiddenAttributes               => 'test',
@@ -172,7 +174,6 @@ ok(
 my ( $host, $url, $query ) = expectForm( $res, undef, '/totp2fcheck', 'token' );
 
 # Generate TOTP with LLNG
-
 my $totp = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 6 );
 
 $query =~ s/code=/code=$code/;
@@ -188,7 +189,6 @@ $id = expectCookie($res);
 
 # CheckUser form -> granted
 # ------------------------
-
 ok(
     $res = $client->_get(
         '/checkuser',
@@ -209,7 +209,15 @@ ok( $res->[2]->[0] =~ m%<td scope="row">dwho</td>%, 'Found value dwho' )
   or explain( $res->[2]->[0], 'Value dwho' );
 ok( $res->[2]->[0] !~ m%_2fDevices</td>%, '_2fDevices NOT Found!' )
   or explain( $res->[2]->[0], 'Value _2fDevices' );
-count(4);
+
+ok( $res->[2]->[0] =~ m%<td scope="row">authMode</td>%, 'Found macro authMode' )
+  or explain( $res->[2]->[0], 'Macro Key authMode' );
+ok( $res->[2]->[0] =~ m%<td scope="row">real_authMode</td>%,
+    'Found macro real_authMode' )
+  or explain( $res->[2]->[0], 'Macro Key real_authMode' );
+ok( $res->[2]->[0] =~ m%<td scope="row">TOTP</td>%, 'Found TOTP' )
+  or explain( $res->[2]->[0], 'Macro Value TOTP' );
+count(7);
 
 $query =~ s/url=/url=http%3A%2F%2Ftest1.example.com/;
 ok(
@@ -222,16 +230,20 @@ ok(
     ),
     'POST checkuser'
 );
-count(1);
-
 ( $host, $url, $query ) =
   expectForm( $res, undef, '/checkuser', 'user', 'url' );
 ok( $res->[2]->[0] =~ m%<span trspan="checkUser">%, 'Found trspan="checkUser"' )
   or explain( $res->[2]->[0], 'trspan="checkUser"' );
-
 count(2);
+
 ok( $res->[2]->[0] =~ m%Auth-User: %, 'Found Auth-User' )
   or explain( $res->[2]->[0], 'Header Key: Auth-User' );
+ok( $res->[2]->[0] =~ m%testHeader1: %, 'Found testHeader1' )
+  or explain( $res->[2]->[0], 'Header Key: testHeader1' );
+ok( $res->[2]->[0] =~ m%testHeader2: %, 'Found testHeader2' )
+  or explain( $res->[2]->[0], 'Header Key: testHeader2' );
+ok( $res->[2]->[0] =~ m%emptyHeader: %, 'Found emptyHeader' )
+  or explain( $res->[2]->[0], 'Header Key: emptyHeader' );
 ok( $res->[2]->[0] =~ m%: dwho<br/>%, 'Found dwho' )
   or explain( $res->[2]->[0], 'Header Value: dwho' );
 ok( $res->[2]->[0] =~ m%<td scope="row">_whatToTrace</td>%,
@@ -239,7 +251,11 @@ ok( $res->[2]->[0] =~ m%<td scope="row">_whatToTrace</td>%,
   or explain( $res->[2]->[0], 'Macro Key _whatToTrace' );
 ok( $res->[2]->[0] =~ m%<td scope="row">dwho</td>%, 'Found dwho' )
   or explain( $res->[2]->[0], 'Macro Value dwho' );
-count(3);
+ok( $res->[2]->[0] =~ m%<td scope="row">array</td>%, 'Found empty macro' )
+  or explain( $res->[2]->[0], 'Macro: empty' );
+ok( $res->[2]->[0] =~ m%<td scope="row">real_array</td>%, 'Found empty real_macro' )
+  or explain( $res->[2]->[0], 'Macro: empty real' );
+count(9);
 
 # Request with mail
 $query =~ s/user=dwho/user=dwho%40badwolf.org/;
@@ -259,7 +275,8 @@ count(1);
   expectForm( $res, undef, '/checkuser', 'user', 'url' );
 ok( $res->[2]->[0] =~ m%<span trspan="checkUser">%, 'Found trspan="checkUser"' )
   or explain( $res->[2]->[0], 'trspan="checkUser"' );
-ok( $res->[2]->[0] =~ m%value="dwho\@badwolf.org" trplaceholder="user"%, 'Found trplaceholder with mail' )
+ok( $res->[2]->[0] =~ m%value="dwho\@badwolf.org" trplaceholder="user"%,
+    'Found trplaceholder with mail' )
   or explain( $res->[2]->[0], 'trplaceholder with mail' );
 count(3);
 ok( $res->[2]->[0] =~ m%Auth-User: %, 'Found Auth-User' )
@@ -339,7 +356,7 @@ m%<div class="alert alert-danger"><div class="text-center"><b><span trspan="forb
 ) or explain( $res->[2]->[0], 'trspan="forbidden"' );
 count(2);
 
-# Request with allowed URL proteced by extended function
+# Request with allowed URL protected by extended function
 $query =~
 s#url=http%3A%2F%2Ftest1.example.com%2Ftest-restricted_uri%2Frtyler#url=http%3A%2F%2Ftest1.example.com/test-restricted_uri/rtyler/#;
 ok(
@@ -348,6 +365,7 @@ ok(
         IO::String->new($query),
         cookie => "lemonldap=$id",
         length => length($query),
+
         #accept => 'text/html',
     ),
     'POST checkuser'
@@ -355,30 +373,19 @@ ok(
 my $json;
 ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
   or print STDERR "$@\n" . Dumper($res);
-ok(
-    $json->{URL} eq 'http://test1.example.com/test-restricted_uri/rtyler/',
-    'Find well formated URL'
-) or explain( $json, "Find expected URL" );
-ok(
-    $json->{ALLOWED} eq 'allowed',
-    'Find "allowed"'
-) or explain( $json, 'Find "allowed"' );
-ok(
-    $json->{ALERTE} eq 'alert-info',
-    'Find "alert-info"'
-) or explain( $json, "Find alert-info" );
-ok(
-    $json->{ALERTE_AUTH} eq 'alert-success',
-    'Find "alert-success"'
-) or explain( $json, 'Find "alert-success"' );
-ok(
-    $json->{LOGIN} eq 'rtyler',
-    'Find "rtyler"'
-) or explain( $json, 'Find login "rtyler"' );
-ok(
-    $json->{MSG} eq 'checkUser',
-    'Find "checkUser"'
-) or explain( $json, 'Find message "checkUser"' );
+ok( $json->{URL} eq 'http://test1.example.com/test-restricted_uri/rtyler/',
+    'Find well formated URL' )
+  or explain( $json, "Find expected URL" );
+ok( $json->{ALLOWED} eq 'allowed', 'Find "allowed"' )
+  or explain( $json, 'Find "allowed"' );
+ok( $json->{ALERTE} eq 'alert-info', 'Find "alert-info"' )
+  or explain( $json, "Find alert-info" );
+ok( $json->{ALERTE_AUTH} eq 'alert-success', 'Find "alert-success"' )
+  or explain( $json, 'Find "alert-success"' );
+ok( $json->{LOGIN} eq 'rtyler', 'Find "rtyler"' )
+  or explain( $json, 'Find login "rtyler"' );
+ok( $json->{MSG} eq 'checkUser', 'Find "checkUser"' )
+  or explain( $json, 'Find message "checkUser"' );
 count(8);
 
 # Request with good VH & user
@@ -550,15 +557,6 @@ m%<div class="alert alert-warning alert"><div class="text-center"><span trspan="
     ' PE5 found'
 ) or explain( $res->[2]->[0], 'PE5 - Unvalid identity' );
 count(2);
-
-
-
-
-
-
-
-
-
 
 $client->logout($id);
 clean_sessions();

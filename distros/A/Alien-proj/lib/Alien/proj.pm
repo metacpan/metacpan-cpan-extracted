@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use parent qw( Alien::Base );
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 
 1;
@@ -36,13 +36,13 @@ Alien::proj - Compile the PROJ library
 
 PROJ is a generic coordinate transformation software.  See L<https://proj.org/about.html>.
 
-This Alien package is probably most useful for compilation of other modules, e.g. L<Geo::GDAL::FFI>.
+This Alien package is probably most useful for compilation of other modules, e.g. L<Geo::GDAL::FFI>,
+although there are also utility programs that could be of use.
 
 The Proj library can be accessed from Perl code via the L<Geo::Proj4> package.
 
-Note: As of version 1.05, share installs will not install version 7 or above.
-Version 7 needs libtiff and curl support, the latter of which needs
-some implementation work.
+Note: As of version 1.06, share installs will disable libtiff and curl support for proj 7,
+both of which need implementation work.
 
 
 =head1 User defined config args

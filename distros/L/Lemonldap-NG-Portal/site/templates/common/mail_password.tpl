@@ -8,7 +8,7 @@
 <span><img src="cid:key:../common/key.png" /></span>
 <b>$password</b>
 <TMPL_ELSE>
-<span trspan="pwdChanged">Your password was changed.</span> 
+<span trspan="pwdChanged">Your password has been successfully changed!</span> 
 </TMPL_IF>
 </p>
 

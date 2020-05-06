@@ -277,7 +277,7 @@ $res = &client->jsonResponse( '/sfa/persistent',
     'uid=*&groupBy=substr(uid,0)&U2FCheck=2&TOTPCheck=2&UBKCheck=2' );
 ok( $res->{result} == 1,
     'Search "uid"=* & UBK & TOTP & UBK - Result code = 1' );
-ok( $res->{count} == 1, 'Found 1 result' ) or print STDERR Dumper($res);
+ok( $res->{count} == 1,       'Found 1 result' ) or print STDERR Dumper($res);
 ok( @{ $res->{values} } == 1, 'List 1 result' );
 ok( $res->{values}->[0]->{value} && $res->{values}->[0]->{value} eq 'd',
     'Result match "uid=d"' )

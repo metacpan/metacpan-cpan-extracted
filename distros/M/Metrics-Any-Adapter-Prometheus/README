@@ -26,6 +26,32 @@ DESCRIPTION
     Timer metrics are implemented as distribution metrics with the units
     set to seconds.
 
+METHODS
+
+ make_distribution
+
+       $adapter->make_distribution( $name, %args )
+
+    In addition to the standard arguments, the following are recognised:
+
+    buckets => ARRAY[ NUM ]
+
+      If present, overrides the default Histogram bucket sizes.
+
+    bucket_min => NUM
+
+    bucket_max => NUM
+
+    buckets_per_decade => ARRAY[ NUM ]
+
+      Since version 0.04.
+
+      A more flexible alternative to specifying literal bucket sizes. The
+      values given in buckets_per_decade are repeated, multiplied by
+      various powers of 10 to generate values between bucket_min (or a
+      default of 0.001 if not supplied) and bucket_max (or a default of
+      1000 if not supplied).
+
 AUTHOR
 
     Paul Evans <leonerd@leonerd.org.uk>

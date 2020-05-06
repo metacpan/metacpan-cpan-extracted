@@ -6,7 +6,7 @@ use Test::More tests => 20;
 use Devel::ebug;
 
 my $ebug = Devel::ebug->new;
-$ebug->program("t/calc.pl");
+$ebug->program("corpus/calc.pl");
 $ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 
@@ -60,25 +60,25 @@ foreach my $l (@lines) {
 }
 
 $ebug = Devel::ebug->new;
-$ebug->program("t/calc_oo.pl");
+$ebug->program("corpus/calc_oo.pl");
 $ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
-@codelines = $ebug->codelines("t/calc_oo.pl", 7, 8);
+@codelines = $ebug->codelines("corpus/calc_oo.pl", 7, 8);
 is_deeply(\@codelines, [
   'my $calc = Calc->new;',
   'my $r = $calc->add(5, 10); # 15',
 ]);
 
-@codelines = $ebug->codelines("t/Calc.pm", 5, 6);
+@codelines = $ebug->codelines("corpus/lib/Calc.pm", 5, 6);
 is_deeply(\@codelines, [
   'use base qw(Class::Accessor::Chained::Fast);',
   'our $VERSION = "0.29";',
 ]);
 
-@codelines = $ebug->codelines("t/Calc.pm");
+@codelines = $ebug->codelines("corpus/Calc.pm");
 is(scalar(@codelines), 34);
 
-$ebug->program("t/pod.pl");
+$ebug->program("corpus/pod.pl");
 $ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 @codelines = $ebug->codelines();

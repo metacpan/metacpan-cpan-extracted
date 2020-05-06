@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2014, 2015 Kevin Ryde
+# Copyright 2012, 2014, 2015, 2020 Kevin Ryde
 
 # This file is part of Image-Base-Wx.
 #
@@ -50,6 +50,25 @@ WriteMakefile
        { suggests =>
          { 'Test::Weaken' => '2.000',
          },
+       },
+     },
+
+     # Image::Base::Wx gets the dist name, no actual module of that name
+     provides =>
+     { 'Image::Base::Wx' => { file => 'META.yml',
+                              version => 6,
+                            },
+       'Image::Base::Wx::Bitmap' =>
+       { file => 'Image/Base/Wx/Bitmap.pm',
+         version => 6,
+       },
+       'Image::Base::Wx::DC' =>
+       { file => 'Image/Base/Wx/DC.pm',
+         version => 6,
+       },
+       'Image::Base::Wx::Image' =>
+       { file => 'Image/Base/Wx/Image.pm',
+         version => 6,
        },
      },
    },

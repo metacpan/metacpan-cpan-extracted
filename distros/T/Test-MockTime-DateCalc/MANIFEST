@@ -13,8 +13,6 @@ devel/run.pl
 devel/time-fake.pl
 devel/time-mock.pl
 devel/time-warp.pl
-inc/my_pod2html
-inc/MyMakeMakerExtras.pm
 lib/Test/MockTime/DateCalc.pm
 Makefile.PL
 MANIFEST			This list of files
@@ -25,8 +23,12 @@ t/MockTime.t
 t/MyTestHelpers.pm
 t/not-before.t
 t/sub-identify.t
+xt/0-file-is-part-of.t
 xt/0-META-read.t
+xt/0-no-debug-left-on.t
+xt/0-Test-ConsistentVersion.t
 xt/0-Test-DistManifest.t
 xt/0-Test-Pod.t
 xt/0-Test-YAML-Meta.t
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

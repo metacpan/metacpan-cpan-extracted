@@ -12,9 +12,8 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 require 't/test-lib.pm';
 
 my $res;
-my $maintests = 8;
+my $maintests = 7;
 my $debug     = 'error';
-my %handlerOR = ( portal => [], app => [] );
 my $client;
 
 # Redefine LWP methods for tests
@@ -66,17 +65,21 @@ LWP::Protocol::PSGI->register(
     }
 );
 
-$client = LLNG::Manager::Test->new( {
-        ini => {
-            logLevel          => $debug,
-            useSafeJail       => 1,
-            cda               => 1,
-            restSessionServer => 1,
-            logger            => 'Lemonldap::NG::Common::Logger::Std',
-        }
+$client = register(
+    'portal',
+    sub {
+        LLNG::Manager::Test->new( {
+                ini => {
+                    logLevel          => $debug,
+                    useSafeJail       => 1,
+                    cda               => 1,
+                    restSessionServer => 1,
+                    logger            => 'Lemonldap::NG::Common::Logger::Std',
+                }
+            }
+        );
     }
 );
-$handlerOR{portal} = \@Lemonldap::NG::Handler::Main::_onReload;
 
 # CDA with unauthentified user
 ok(
@@ -111,16 +114,18 @@ use_ok('Lemonldap::NG::Common::PSGI::Cli::Lib');
 my ( $cli, $app );
 &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
 switch ('app');
-ok(
-    $app = Lemonldap::NG::Handler::Server->run( {
-            %{ $client->ini },
-            globalStorage => 'Lemonldap::NG::Common::Apache::Session::REST',
-            globalStorageOptions =>
-              { baseUrl => 'http://auth.example.com/sessions/global/' },
-            localSessionStorage => undef,
-        }
-    ),
-    'App'
+$app = register(
+    'app',
+    sub {
+        Lemonldap::NG::Handler::Server->run( {
+                %{ $client->ini },
+                globalStorage => 'Lemonldap::NG::Common::Apache::Session::REST',
+                globalStorageOptions =>
+                  { baseUrl => 'http://auth.example.com/sessions/global/' },
+                localSessionStorage => undef,
+            }
+        );
+    }
 );
 
 ok(
@@ -178,10 +183,3 @@ expectAuthenticatedAs( $res, 'dwho' );
 clean_sessions();
 
 done_testing( count($maintests) );
-
-sub switch {
-    my $type = shift;
-    @Lemonldap::NG::Handler::Main::_onReload = @{
-        $handlerOR{$type};
-    };
-}

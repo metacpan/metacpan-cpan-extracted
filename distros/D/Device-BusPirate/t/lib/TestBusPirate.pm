@@ -44,7 +44,7 @@ no warnings 'redefine';
 
 sub _stringify { sprintf "%v02X", $_[0] }
 
-*Device::BusPirate::_syswrite = sub {
+*Future::IO::syswrite_exactly = async sub {
    shift;
    my ( undef, $bytes ) = @_;
    my $e = $expectations[0];
@@ -58,6 +58,8 @@ sub _stringify { sprintf "%v02X", $_[0] }
 
    substr( $e->[1], 0, length $bytes ) = "";
    shift @expectations if !length $e->[1];
+
+   return length $bytes;
 };
 
 *Future::IO::sysread_exactly = async sub {

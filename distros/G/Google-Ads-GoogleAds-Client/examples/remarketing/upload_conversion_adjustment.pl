@@ -100,13 +100,21 @@ sub upload_conversion_adjustment {
       partialFailure        => "true"
     });
 
-  # Print the result.
+  # Print any partial errors returned.
+  if ($upload_conversion_adjustments_response->{partialFailureError}) {
+    printf "Partial error encountered: '%s'.\n",
+      $upload_conversion_adjustments_response->{partialFailureError}{message};
+  }
+
+  # Print the result if valid.
   my $uploaded_conversion_adjustment =
     $upload_conversion_adjustments_response->{results}[0];
-  printf "Uploaded conversion adjustment value of '%s' " .
-    "for Google Click ID '%s'.\n",
-    $uploaded_conversion_adjustment->{conversionAction},
-    $uploaded_conversion_adjustment->{gclidDateTimePair}{gclid};
+  if (%$uploaded_conversion_adjustment) {
+    printf "Uploaded conversion adjustment of the conversion action " .
+      "with resource name '%s' for Google Click ID '%s'.\n",
+      $uploaded_conversion_adjustment->{conversionAction},
+      $uploaded_conversion_adjustment->{gclidDateTimePair}{gclid};
+  }
 
   return 1;
 }
@@ -130,7 +138,7 @@ GetOptions(
   "adjustment_type=s"      => \$adjustment_type,
   "conversion_date_time=s" => \$conversion_date_time,
   "adjustment_date_time=s" => \$adjustment_date_time,
-  "restatement_value=i"    => \$restatement_value
+  "restatement_value=f"    => \$restatement_value
 );
 
 # Print the help message if the parameters are not initialized in the code nor
@@ -142,7 +150,7 @@ pod2usage(2)
 # Call the example.
 upload_conversion_adjustment($api_client, $customer_id =~ s/-//gr,
   $conversion_action_id, $gclid,
-  $adjustment_type, $conversion_date_time, $adjustment_date_time,
+  $adjustment_type,      $conversion_date_time, $adjustment_date_time,
   $restatement_value);
 
 =pod

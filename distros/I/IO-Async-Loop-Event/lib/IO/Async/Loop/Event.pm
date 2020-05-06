@@ -1,15 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2020 -- leonerd@leonerd.org.uk
 
 package IO::Async::Loop::Event;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
-use constant API_VERSION => '0.49';
+our $VERSION = '0.03';
+use constant API_VERSION => '0.76';
 
 use base qw( IO::Async::Loop );
 IO::Async::Loop->VERSION( '0.49' );
@@ -26,13 +26,13 @@ C<IO::Async::Loop::Event> - use C<IO::Async> with C<Event>
 
 =head1 SYNOPSIS
 
- use IO::Async::Loop::Event;
+   use IO::Async::Loop::Event;
 
- my $loop = IO::Async::Loop::Event->new();
+   my $loop = IO::Async::Loop::Event->new();
 
- $loop->add( ... );
+   $loop->add( ... );
 
- $loop->run;
+   $loop->run;
 
 =head1 DESCRIPTION
 

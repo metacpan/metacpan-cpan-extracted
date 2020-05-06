@@ -1,16 +1,22 @@
-package DB;
-$DB::VERSION = '0.59';
+package Devel::ebug::Backend;
+
 use strict;
 use warnings;
+
+our $VERSION = '0.60'; # VERSION
+
+package DB;
+
 use IO::Socket::INET;
 use String::Koremutake;
-# use YAML::Syck;
 use YAML;
 use Module::Pluggable
   search_path => 'Devel::ebug::Backend::Plugin',
   require     => 1;
 
 use vars qw(@dbline %dbline);
+
+our $VERSION = '0.60'; # VERSION
 
 # Let's catch INT signals and set a flag when they occur
 $SIG{INT} = sub {
@@ -52,7 +58,7 @@ sub DB {
     my %delete;
     foreach my $watch_point (@{ $context->{watch_points} }) {
       local $SIG{__WARN__} = sub { };
-      my $v = eval "package $package; $watch_point";
+      my $v = eval "package $package; $watch_point";  ## no critic (BuiltinFunctions::ProhibitStringyEval)
       if ($v) {
         $context->{watch_single} = 1;
         $delete{$watch_point} = 1;
@@ -71,9 +77,8 @@ sub DB {
     my $condition = break_point_condition($filename, $line);
     if ($condition) {
       local $SIG{__WARN__} = sub { };
-      my $v = eval "package $package; $condition";
+      my $v = eval "package $package; $condition";  ## no critic (BuiltinFunctions::ProhibitStringyEval)
       unless ($v) {
-
         # condition not true, go back to running
         $DB::single = 0;
         return;
@@ -141,7 +146,10 @@ sub get {
   exit unless $context->{socket};
   local $/= "\n";
   my $data = $context->{socket}->getline;
-  my $req = Load(pack("h*", $data));
+  my $req = do {
+    local $YAML::LoadBlessed = 1;
+    Load(pack("h*", $data));
+  };
   push @{ $context->{history} }, $req
     if exists $commands{ $req->{command} }->{record};
   return $req;
@@ -158,14 +166,14 @@ sub sub {
   $DB::single = 0 if defined $context->{mode} && $context->{mode} eq 'next';
 
   no strict 'refs';
-  if (wantarray) {
+  if (wantarray) { ## no critic (Freenode::Wantarray)
     my @ret   = &$sub;
     my $frame = pop @{ $context->{stack} };
     $DB::single = $frame->{single};
     $DB::single = 0 if defined $context->{mode} && $context->{mode} eq 'run' && !@{$context->{watch_points}};
 
-    if ($frame->{return}) {
-      return @{ $frame->{return} };
+    if ($frame->{'return'}) {
+      return @{ $frame->{'return'} };
     } else {
       return @ret;
     }
@@ -174,9 +182,9 @@ sub sub {
     my $frame = pop @{ $context->{stack} };
     $DB::single = $frame->{single};
     $DB::single = 0 if defined $context->{mode} && $context->{mode} eq 'run' && !@{$context->{watch_points}};
-    
-    if ($frame->{return}) {
-      return $frame->{return}->[0];
+
+    if ($frame->{'return'}) {
+      return $frame->{'return'}->[0];
     } else {
       return $ret;
     }
@@ -185,7 +193,7 @@ sub sub {
 
 sub DB::postponed {
     # If this is a subroutine, let postponed_sub() deal with it.
-    return &postponed_sub unless ref \$_[0] eq 'GLOB';
+    goto &postponed_sub unless ref \$_[0] eq 'GLOB';
 
     my ($filePath) = @_;
     $filePath =~ s/^.*_<//;
@@ -216,7 +224,7 @@ sub fetch_codelines {
   @codelines = map { defined($_) ? $_ : "" } @codelines;
 
   # remove newlines
-  @codelines = map { $_ =~ s/\s+$//; $_ } @codelines;
+  s/\s+$// for @codelines;
 
   # we run it with -d:ebug::Backend, so remove this extra line
   @codelines = grep { $_ ne 'use Devel::ebug::Backend;' } @codelines;
@@ -224,7 +232,7 @@ sub fetch_codelines {
   # for some reasons, the perl internals leave the opening POD line
   # around but strip the rest. so let's strip the opening POD line
   @codelines =
-    map { $_ =~ /^=(head|over|item|back|over|cut|pod|begin|end|for)/ ? "" : $_ }
+    map { /^=(head|over|item|back|over|cut|pod|begin|end|for)/ ? "" : $_ }
     @codelines;
 
   if (@lines) {
@@ -246,7 +254,7 @@ sub END {
 }
 
 package DB::fake;
-$DB::fake::VERSION = '0.59';
+
 sub at_exit {
   1;
 }
@@ -255,3 +263,37 @@ package DB;    # Do not trace this 1; below!
 
 1;
 
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Devel::ebug::Backend
+
+=head1 VERSION
+
+version 0.60
+
+=head1 AUTHOR
+
+Original author: Leon Brocard E<lt>acme@astray.comE<gt>
+
+Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Brock Wilcox E<lt>awwaiid@thelackthereof.orgE<gt>
+
+Taisuke Yamada
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2005-2020 by Leon Brocard.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

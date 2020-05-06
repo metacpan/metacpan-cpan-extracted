@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use File::Which qw( which );
 
@@ -41,7 +41,7 @@ Dist::Zilla::Plugin::DROLSKY::RunExtraTests - Subclasses RunExtraTests to always
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =for Pod::Coverage .*
 

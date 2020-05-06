@@ -155,6 +155,22 @@ my ($ticket_url, $ticket_id);
     $user->PrincipalObj->RevokeRight(Right => 'SeeQueue');
 }
 
+# Ticket Create Attachment created correctly
+{
+    my $ticket = RT::Ticket->new($user);
+    $ticket->Load($ticket_id);
+    my $transaction_id = $ticket->Transactions->Last->id;
+    my $attachments = $ticket->Attachments->ItemsArrayRef;
+
+    # 1 attachment
+    is(scalar(@$attachments), 1);
+
+    is($attachments->[0]->Parent, 0);
+    is($attachments->[0]->Subject, 'Ticket creation using REST');
+    ok(!$attachments->[0]->Filename);
+    is($attachments->[0]->ContentType, 'text/plain');
+}
+
 # Ticket Search
 {
     my $res = $mech->get("$rest_base_path/tickets?query=id>0",
@@ -164,6 +180,7 @@ my ($ticket_url, $ticket_id);
     my $content = $mech->json_response;
     is($content->{count}, 1);
     is($content->{page}, 1);
+    is($content->{pages}, 1);
     is($content->{per_page}, 20);
     is($content->{total}, 1);
     is(scalar @{$content->{items}}, 1);

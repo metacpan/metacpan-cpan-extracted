@@ -25,7 +25,8 @@ ok( $resBody = from_json( $res->[2]->[0] ), "Result body contains JSON text" );
 ok( $resBody->{result} == 1, "JSON response contains \"result:1\"" )
   or print STDERR Dumper($resBody);
 ok(
-    @{ $resBody->{details}->{__warnings__} } == 2,
+    $resBody->{details}->{__warnings__}
+      and @{ $resBody->{details}->{__warnings__} } == 2,
     'JSON response contains 2 warnings'
 ) or print STDERR Dumper($resBody);
 
@@ -38,14 +39,23 @@ foreach my $i ( 0 .. 1 ) {
 }
 
 ok(
-    @{ $resBody->{details}->{__changes__} } == 24,
+    $resBody->{details}->{__changes__}
+      and @{ $resBody->{details}->{__changes__} } == 24,
     'JSON response contains 24 changes'
 ) or print STDERR Dumper($resBody);
+ok( $resBody->{details}->{__changes__}->[23]->{confCompacted} == 1,
+    'Conf. has been compacted' )
+  or print STDERR Dumper($resBody);
+
+my @removedKeys = split /; /,
+  $resBody->{details}->{__changes__}->[23]->{removedKeys};
+ok( @removedKeys == 60, 'All removed keys found' )
+  or print STDERR Dumper( \@removedKeys );
 
 #print STDERR Dumper($resBody);
-
 ok( -f $confFiles->[1], 'File is created' );
-count(4);
+count(6);
+
 my @changes = @{&changes};
 my @cmsg    = @{ $resBody->{details}->{__changes__} };
 my $bug;
@@ -96,8 +106,7 @@ ok( @c2 == 15, '15 keys changed or created in conf 2' )
 
 count(5);
 
-ok( $res = &client->jsonResponse('/confs/latest'),
-    'Get last config metadata' );
+ok( $res = &client->jsonResponse('/confs/latest'), 'Get last config metadata' );
 ok( $res->{prev} == 1, ' Get previous configuration' );
 count(2);
 
@@ -110,8 +119,7 @@ done_testing( count() );
 `rm -rf t/sessions`;
 
 sub changes {
-    return [
-        {
+    return [ {
             'key' => 'portal',
             'new' => 'http://auth2.example.com/',
             'old' => 'http://auth.example.com/'

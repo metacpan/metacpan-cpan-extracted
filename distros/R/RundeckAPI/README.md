@@ -5,6 +5,8 @@ instance via REST API
 # SYNOPSIS
 
     use RundeckAPI;
+    use Storable qw(dclone);
+
     # create an object of type RundeckAPI :
     my $api = RundeckAPI->new(
         'url'           => "https://my.rundeck.instance:4440",
@@ -34,6 +36,7 @@ instance via REST API
 
 Returns a hash reference containing the data sent by Rundeck.
 See documentation for Rundeck's [API](https://docs.rundeck.com/docs/api/rundeck-api.html) and returned data
+
 
 # AUTHOR
     Xavier Humbert <xavier.humbert-at-ac-nancy-metz-dot-fr>

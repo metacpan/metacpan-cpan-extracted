@@ -1,0 +1,120 @@
+NAME
+    PYX::Optimization - PYX optimization Perl class.
+
+SYNOPSIS
+     use PYX::Optimization;
+
+     my $obj = PYX::Parser->new(%parameters);
+     $obj->parse($pyx, $out);
+     $obj->parse_file($pyx_file, $out);
+     $obj->parse_handle($pyx_file_handler, $out);
+
+METHODS
+  "new"
+     my $obj = PYX::Parser->new(%parameters);
+
+    Constructor.
+
+    Returns instance of object.
+
+    *       "output_handler"
+
+            Output handler. Default value is STDOUT.
+
+  "parse"
+     $obj->parse($pyx, $out);
+
+    Optimize PYX string $pyx. Output print to output handler. If $out not
+    present, use 'output_handler'.
+
+    Returns undef.
+
+  "parse_file"
+     $obj->parse_file($pux_file, $out);
+
+    Optimize PYX file $pyx_file. Output print to output handler. If $out not
+    present, use 'output_handler'.
+
+    Returns undef.
+
+  "parse_handler"
+     $obj->parse_handle($pyx_file_handler, $out);
+
+    Optimize PYX file handler $pyx_file_handler. Output print to output
+    handler. If $out not present, use 'output_handler'.
+
+    Returns undef.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use PYX::Optimization;
+
+     # Content.
+     my $pyx_to_optimize = <<'END';
+     (element
+     - data \n data
+     )element
+     _       comment
+     (element
+     -                                 \n foo
+     )element
+     END
+
+     PYX::Optimization->new->parse($pyx_to_optimize);
+
+     # Output:
+     # (element
+     # -data data
+     # )element
+     # _comment
+     # (element
+     # -foo
+     # )element
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use PYX::Optimization;
+
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 pyx_file\n";
+             exit 1;
+     }
+     my $pyx_file = $ARGV[0];
+
+     PYX::Optimization->new->parse_file($pyx_file);
+
+     # Output:
+     # Usage: __SCRIPT__ pyx_file
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, PYX, PYX::Parser, PYX::Utils.
+
+SEE ALSO
+    Task::PYX
+        Install the PYX modules.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/PYX-Optimization>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2011-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

@@ -9,7 +9,7 @@ package Rex::TaskList::Base;
 use strict;
 use warnings;
 
-our $VERSION = '1.9.0'; # VERSION
+our $VERSION = '1.10.0'; # VERSION
 
 BEGIN {
   use Rex::Shared::Var;
@@ -35,7 +35,7 @@ sub new {
   bless( $self, $proto );
 
   $self->{IN_TRANSACTION} = 0;
-  $self->{DEFAULT_AUTH}   = 1;
+  $self->{DEFAULT_AUTH}   = Rex::Config->get_default_auth();
   $self->{tasks}          = {};
 
   return $self;
@@ -383,7 +383,7 @@ sub modify {
       $_ =~ m/^\Q$package\E:/;
     }
     else {
-      $_ !~ m/:/;
+      $_;
     }
   } $self->get_all_tasks($task);
 

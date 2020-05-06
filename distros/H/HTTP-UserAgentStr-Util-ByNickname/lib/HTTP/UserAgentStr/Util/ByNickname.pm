@@ -1,7 +1,9 @@
 package HTTP::UserAgentStr::Util::ByNickname;
 
-our $DATE = '2019-05-10'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-01'; # DATE
+our $DIST = 'HTTP-UserAgentStr-Util-ByNickname'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -22,12 +24,12 @@ our %EXPORT_TAGS = (all => \@nicknames);
 sub _get {
     require HTTP::BrowserDetect;
     require Versioning::Scheme::Dotted;
-    require WordList::HTTP::UserAgentString::PERLANCAR;
+    require WordList::HTTP::UserAgentString::Browser::Firefox;
 
     my $nickname = shift;
 
     my @ua0;
-    my $wl = WordList::HTTP::UserAgentString::PERLANCAR->new;
+    my $wl = WordList::HTTP::UserAgentString::Browser::Firefox->new;
     $wl->each_word(
         sub {
             my $orig = shift;
@@ -46,23 +48,23 @@ sub _get {
     if ($nickname eq 'newest_firefox') {
         my $os = $^O eq 'MSWin32' ? 'windows' : 'linux';
         @ua = sort { Versioning::Scheme::Dotted->cmp_version($b->{version}, $a->{version}) }
-            grep { $_->{firefox} && $_->{os} eq $os } @ua0;
+            grep { $_->{firefox} && ($_->{os}//'') eq $os } @ua0;
     } elsif ($nickname eq 'newest_firefox_linux') {
         @ua = sort { Versioning::Scheme::Dotted->cmp_version($b->{version}, $a->{version}) }
-            grep { $_->{firefox} && $_->{os} eq 'linux' } @ua0;
+            grep { $_->{firefox} && ($_->{os}//'') eq 'linux' } @ua0;
     } elsif ($nickname eq 'newest_firefox_win') {
         @ua = sort { Versioning::Scheme::Dotted->cmp_version($b->{version}, $a->{version}) }
-            grep { $_->{firefox} && $_->{os} eq 'windows' } @ua0;
+            grep { $_->{firefox} && ($_->{os}//'') eq 'windows' } @ua0;
     } elsif ($nickname eq 'newest_chrome') {
         my $os = $^O eq 'MSWin32' ? 'windows' : 'linux';
         @ua = sort { Versioning::Scheme::Dotted->cmp_version($b->{version}, $a->{version}) }
-            grep { $_->{chrome} && $_->{os} eq $os } @ua0;
+            grep { $_->{chrome} && ($_->{os}//'') eq $os } @ua0;
     } elsif ($nickname eq 'newest_chrome_linux') {
         @ua = sort { Versioning::Scheme::Dotted->cmp_version($b->{version}, $a->{version}) }
-            grep { $_->{chrome} && $_->{os} eq 'linux' } @ua0;
+            grep { $_->{chrome} && ($_->{os}//'') eq 'linux' } @ua0;
     } elsif ($nickname eq 'newest_chrome_win') {
         @ua = sort { Versioning::Scheme::Dotted->cmp_version($b->{version}, $a->{version}) }
-            grep { $_->{chrome} && $_->{os} eq 'windows' } @ua0;
+            grep { $_->{chrome} && ($_->{os}//'') eq 'windows' } @ua0;
     } else {
         die "BUG: Unknown nickname";
     }
@@ -70,12 +72,13 @@ sub _get {
     $ua[0]{orig};
 }
 
-sub newest_firefox { _get("newest_firefox") }
-sub newest_firefox_linux { _get("newest_firefox_linux") }
-sub newest_firefox_win { _get("newest_firefox_win") }
-sub newest_chrome { _get("newest_chrome") }
-sub newest_chrome_linux { _get("newest_chrome_linux") }
-sub newest_chrome_win { _get("newest_chrome_win") }
+our %cache;
+sub newest_firefox       { $cache{newest_firefox}       //= _get("newest_firefox") }
+sub newest_firefox_linux { $cache{newest_firefox_linux} //= _get("newest_firefox_linux") }
+sub newest_firefox_win   { $cache{newest_firefox_win}   //= _get("newest_firefox_win") }
+sub newest_chrome        { $cache{newest_chrome}        //= _get("newest_chrome") }
+sub newest_chrome_linux  { $cache{newest_chrome_linux}  //= _get("newest_chrome_linux") }
+sub newest_chrome_win    { $cache{newest_chrome_win}    //= _get("newest_chrome_win") }
 
 1;
 # ABSTRACT: Get popular HTTP User-Agent string by nickname
@@ -92,7 +95,7 @@ HTTP::UserAgentStr::Util::ByNickname - Get popular HTTP User-Agent string by nic
 
 =head1 VERSION
 
-This document describes version 0.002 of HTTP::UserAgentStr::Util::ByNickname (from Perl distribution HTTP-UserAgentStr-Util-ByNickname), released on 2019-05-10.
+This document describes version 0.003 of HTTP::UserAgentStr::Util::ByNickname (from Perl distribution HTTP-UserAgentStr-Util-ByNickname), released on 2020-05-01.
 
 =head1 SYNOPSIS
 
@@ -149,7 +152,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

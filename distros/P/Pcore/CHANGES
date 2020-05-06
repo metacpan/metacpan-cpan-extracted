@@ -1,3 +1,14 @@
+v0.136.0 2020-05-04T23:51:30Z
+ - namesilo roundrobin
+
+v0.135.2 2020-05-04T11:00:09Z
+ - docker wrapper invocation fixed
+ - updated
+
+v0.135.1 2020-05-01T07:11:10Z
+ - namesilo
+ - passwd recovery email tmpl fixed
+
 v0.135.0 2020-04-30T00:52:28Z
  - namesilo
 

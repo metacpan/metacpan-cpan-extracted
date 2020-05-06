@@ -1,5 +1,10 @@
 Revision history for IO-Async-Loop-IO-Async
 
+0.03    2020-05-05
+        [CHANGES]
+         * Support IO::Async 0.76
+            + ->watch_child API is now called ->watch_process
+
 0.02    CHANGES:
          * Updated for IO::Async 0.33
 

@@ -223,8 +223,11 @@ LemonLDAP::NG Portal jQuery scripts
   datas = {};
 
   $(window).on('load', function() {
-    var action, al, authMenuTabs, back_url, i, l, lang, langdiv, langs, langs2, len, len1, len2, len3, link, m, menuIndex, menuTabs, method, n, nl, nlangs, re, ref, ref1, ref2;
+    var action, al, authMenuIndex, authMenuTabs, back_url, hiddenParams, i, l, lang, langdiv, langs, langs2, len, len1, len2, len3, link, m, menuIndex, menuTabs, method, n, nl, nlangs, queryLang, queryString, re, ref, ref1, ref2, setCookieLang, urlParams;
     datas = getValues();
+    if ("datas" in window && "choicetab" in window.datas) {
+      datas.choicetab = window.datas.choicetab;
+    }
     window.datas = datas;
     $("#appslist").sortable({
       axis: "y",
@@ -250,6 +253,11 @@ LemonLDAP::NG Portal jQuery scripts
     authMenuTabs = $("#authMenu").tabs({
       active: 0
     });
+    authMenuIndex = $('#authMenu a[href="#' + datas['displaytab'] + '"]').parent().index();
+    if (authMenuIndex < 0) {
+      authMenuIndex = 0;
+    }
+    authMenuTabs.tabs("option", "active", authMenuIndex);
     if (datas['choicetab']) {
       authMenuTabs.tabs("option", "active", $('#authMenu a[href="#' + datas['choicetab'] + '"]').parent().index());
     }
@@ -264,21 +272,55 @@ LemonLDAP::NG Portal jQuery scripts
       $('#appslist a').attr("target", "_blank");
     }
     if ($("p.removeOther").length) {
-      action = $("form.login").attr("action");
-      method = $("form.login").attr("method");
-      back_url = "";
-      if (action.indexOf("?") !== -1) {
-        action.substring(0, action.indexOf("?")) + "?";
-      } else {
-        back_url = action + "?";
+      action = $("#form").attr("action");
+      method = $("#form").attr("method");
+      console.log('method=', method);
+      hiddenParams = "";
+      if ($("#form input[type=hidden]")) {
+        console.log('Parse hidden values');
+        $("#form input[type=hidden]").each(function(index) {
+          console.log(' ->', $(this).attr("name"), $(this).val());
+          return hiddenParams += "&" + $(this).attr("name") + "=" + $(this).val();
+        });
       }
-      $("form.login input[type=hidden]").each(function(index) {
-        return back_url += "&" + $(this).attr("name") + "=" + $(this).val();
-      });
-      link = $("p.removeOther a").attr("href") + "&method=" + method + "&url=" + btoa(back_url);
+      back_url = "";
+      if (action) {
+        console.log('action=', action);
+        if (action.indexOf("?") !== -1) {
+          action.substring(0, action.indexOf("?")) + "?";
+        } else {
+          back_url = action + "?";
+        }
+        back_url += hiddenParams;
+        hiddenParams = "";
+      }
+      link = $("p.removeOther a").attr("href") + "&method=" + method + hiddenParams;
+      if (back_url) {
+        link += "&url=" + btoa(back_url);
+      }
       $("p.removeOther a").attr("href", link);
     }
-    lang = getCookie('llnglanguage');
+    queryString = window.location.search;
+    if (queryString) {
+      console.log('Parsed queryString:', queryString);
+      urlParams = new URLSearchParams(queryString);
+    }
+    if (urlParams) {
+      queryLang = urlParams.get('llnglanguage');
+      if (queryLang) {
+        console.log('Get lang from parameter');
+      }
+      setCookieLang = urlParams.get('setCookieLang');
+      if (setCookieLang === 1) {
+        console.log('Set lang cookie');
+      }
+    }
+    if (!lang) {
+      lang = getCookie('llnglanguage');
+      if (lang && !queryLang) {
+        console.log('Get lang from cookie');
+      }
+    }
     if (!lang) {
       if (navigator) {
         langs = [];
@@ -309,15 +351,37 @@ LemonLDAP::NG Portal jQuery scripts
           }
         }
         lang = langs[0] ? langs[0] : langs2[0] ? langs2[0] : window.availableLanguages[0];
+        if (lang && !queryLang) {
+          console.log('Get lang from navigator');
+        }
       } else {
         lang = window.availableLanguages[0];
+        if (lang && !queryLang) {
+          console.log('Get lang from window');
+        }
       }
     } else if (indexOf.call(window.availableLanguages, lang) < 0) {
       lang = window.availableLanguages[0];
+      if (!queryLang) {
+        console.log('Lang not available -> Get default lang');
+      }
     }
-    console.log('Selected lang ->', lang);
-    setCookie('llnglanguage', lang);
-    translatePage(lang);
+    if (queryLang) {
+      if (indexOf.call(window.availableLanguages, queryLang) < 0) {
+        console.log('Lang not available -> Get default lang');
+        queryLang = window.availableLanguages[0];
+      }
+      console.log('Selected lang ->', queryLang);
+      if (setCookieLang) {
+        console.log('Set cookie lang ->', queryLang);
+        setCookie('llnglanguage', queryLang);
+      }
+      translatePage(queryLang);
+    } else {
+      console.log('Selected lang ->', lang);
+      setCookie('llnglanguage', lang);
+      translatePage(lang);
+    }
     langdiv = '';
     ref2 = window.availableLanguages;
     for (n = 0, len3 = ref2.length; n < len3; n++) {
@@ -338,8 +402,23 @@ LemonLDAP::NG Portal jQuery scripts
       s = new Date($(this).attr("val") * 1000);
       return $(this).text(s.toLocaleString());
     });
-    return $('.oidcConsent').on('click', function() {
+    $('.oidcConsent').on('click', function() {
       return removeOidcConsent($(this).attr('partner'));
+    });
+    return $('#show-hide-button').on('click', function() {
+      if ($("#newpassword").attr('type') === 'password') {
+        console.log('Show passwords');
+        $("#newpassword").attr('type', 'input');
+        $("#confirmpassword").attr('type', 'input');
+        $("#show-hide-icon-button").removeClass('fa-eye');
+        return $("#show-hide-icon-button").addClass('fa-eye-slash');
+      } else {
+        console.log('Hide passwords');
+        $("#newpassword").attr('type', 'password');
+        $("#confirmpassword").attr('type', 'password');
+        $("#show-hide-icon-button").removeClass('fa-eye-slash');
+        return $("#show-hide-icon-button").addClass('fa-eye');
+      }
     });
   });
 

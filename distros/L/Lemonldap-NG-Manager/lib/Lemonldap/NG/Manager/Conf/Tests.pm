@@ -4,7 +4,7 @@ use utf8;
 use Lemonldap::NG::Common::Regexp;
 use Lemonldap::NG::Handler::Main;
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 ## @method hashref tests(hashref conf)
 # Return a hash ref where keys are the names of the tests and values
@@ -42,14 +42,8 @@ sub tests {
         # Check if portal URL is well formated
         portalURL => sub {
 
-            # Checking for ending slash
-            $conf->{portal} .= '/'
-              unless ( $conf->{portal} =~ qr#/$# );
-
-            # Deleting trailing ending slash
-            my $regex = qr#/+$#;
-            $conf->{portal} =~ s/$regex/\//;
-
+            # Append or remove trailing ending slashes
+            $conf->{portal} =~ s%/*$%/%;
             return 1;
         },
 
@@ -607,11 +601,11 @@ sub tests {
 
         # Warn if issuers token TTL is higher than 30s
         issuersTimeout => sub {
-            return 1 unless ( defined $conf->{issuerTimeout} );
+            return 1 unless ( defined $conf->{issuersTimeout} );
             return ( 0, "Issuers token TTL must be higher than 30s" )
-              unless ( $conf->{issuerTimeout} > 30 );
+              unless ( $conf->{issuersTimeout} > 30 );
             return ( 1, "Issuers token TTL should not be higher than 2mn" )
-              if ( $conf->{issuerTimeout} > 120 );
+              if ( $conf->{issuersTimeout} > 120 );
 
             # Return
             return 1;
@@ -687,7 +681,8 @@ sub tests {
                 || $conf->{yubikey2fActivation}
                 || $conf->{u2fActivation}
                 || $conf->{utotp2fActivation} );
-            return ( 1, "History enabled WITHOUT persistent session storage" )
+            return ( 1,
+                "History plugin enabled WITHOUT persistent session storage" )
               if ( $conf->{loginHistoryEnabled} );
             return ( 1,
                 "OIDC consents enabled WITHOUT persistent session storage" )
@@ -719,6 +714,21 @@ sub tests {
             return 1;
         },
 
+        # Warn if CertificateResetByMail dependencies seem missing
+        certResetByMailDependencies => sub {
+            return 1 unless ( $conf->{portalDisplayCertificateResetByMail} );
+            return ( 0,
+"LDAP RegisterDB is required to enable CertificateResetByMail plugin"
+            ) unless ( $conf->{registerDB} eq 'LDAP' );
+            eval "use DateTime::Format::RFC3339";
+            return ( 1,
+"DateTime::Format::RFC3339 module is required to enable CertificateResetByMail plugin"
+            ) if ($@);
+
+            # Return
+            return 1;
+        },
+
         # OIDC redirect URI must not be empty
         oidcRPRedirectURINotEmpty => sub {
             return 1
@@ -739,6 +749,35 @@ sub tests {
             return ( $res, join( ', ', @msg ) );
         },
 
+        # RS* OIDC algs require a signing key
+        oidcRPNeedRSAKey => sub {
+            return 1
+              unless ( $conf->{oidcRPMetaDataOptions}
+                and %{ $conf->{oidcRPMetaDataOptions} } );
+            my @usingRSA = grep {
+                $conf->{oidcRPMetaDataOptions}->{$_}
+                  ->{oidcRPMetaDataOptionsIDTokenSignAlg}
+                  and $conf->{oidcRPMetaDataOptions}->{$_}
+                  ->{oidcRPMetaDataOptionsIDTokenSignAlg} =~ /^RS/
+            } keys %{ $conf->{oidcRPMetaDataOptions} };
+
+            if ( @usingRSA and not $conf->{oidcServicePrivateKeySig} ) {
+                my $msg =
+                  join( ", ", @usingRSA )
+                  . ": using RS-type encryption, but no RSA key is defined in global OIDC configuration";
+                return ( 0, $msg );
+            }
+            return 1;
+        },
+
+        # Notification system required with removed SF notification
+        sfRemovedNotification => sub {
+            return 1 unless ( $conf->{sfRemovedMsgRule} );
+            return ( 1,
+'Notification system must be enabled to display a notification if a SF is removed'
+            ) if ( $conf->{sfRemovedUseNotif} and not $conf->{notification} );
+            return 1;
+        },
     };
 }
 

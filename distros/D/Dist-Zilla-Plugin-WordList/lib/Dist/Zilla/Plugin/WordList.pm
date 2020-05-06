@@ -1,7 +1,9 @@
 package Dist::Zilla::Plugin::WordList;
 
-our $DATE = '2018-03-23'; # DATE
-our $VERSION = '0.054'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-04'; # DATE
+our $DIST = 'Dist-Zilla-Plugin-WordList'; # DIST
+our $VERSION = '0.057'; # VERSION
 
 use 5.014;
 use strict;
@@ -11,7 +13,6 @@ use Moose;
 use namespace::autoclean;
 
 use Data::Dmp;
-use WordList::Namespace qw(is_actual_wordlist_module);
 
 with (
     'Dist::Zilla::Role::FileMunger',
@@ -37,24 +38,25 @@ sub munge_files {
 
         my $package_pm = $1;
         my $package = $2; $package =~ s!/!::!g;
-        unless (is_actual_wordlist_module($package)) {
-            $self->log(["Module %s is not an actual wordlist module, skipped", $package]);
-            next;
-        }
 
         my $content = $file->content;
 
         # Add statistics to %STATS variable
+      CREATE_STATS:
         {
             require $package_pm;
+            no strict 'refs';
+            my $param_spec = \%{"$package\::PARAMS"};
+            last CREATE_STATS if keys %$param_spec;
+
             my $wl = $package->new;
 
             my $total_len = 0;
             my %stats = (
                 num_words => 0,
-                num_words_contains_unicode => 0,
-                num_words_contains_whitespace => 0,
-                num_words_contains_nonword_chars => 0,
+                num_words_contain_unicode => 0,
+                num_words_contain_whitespace => 0,
+                num_words_contain_nonword_chars => 0,
                 shortest_word_len => undef,
                 longest_word_len => undef,
             );
@@ -74,9 +76,9 @@ sub munge_files {
                     $last_word = $word;
 
                     $stats{num_words}++;
-                    $stats{num_words_contains_unicode}++ if $word =~ /[\x80-\x{10ffff}]/;
-                    $stats{num_words_contains_whitespace}++ if $word =~ /\s/;
-                    $stats{num_words_contains_nonword_chars}++ if $word =~ /\W/u;
+                    $stats{num_words_contain_unicode}++ if $word =~ /[\x80-\x{10ffff}]/;
+                    $stats{num_words_contain_whitespace}++ if $word =~ /\s/;
+                    $stats{num_words_contain_nonword_chars}++ if $word =~ /\W/u;
                     my $len = __length_in_graphemes($word);
                     $total_len += $len;
                     $stats{shortest_word_len} = $len
@@ -87,6 +89,11 @@ sub munge_files {
                         $len > $stats{longest_word_len};
                 });
             $stats{avg_word_len} = $total_len / $stats{num_words} if $total_len;
+
+            # old alias, for backward compat
+            $stats{num_words_contains_unicode} = $stats{num_words_contain_unicode};
+            $stats{num_words_contains_whitespace} = $stats{num_words_contain_whitespace};
+            $stats{num_words_contains_nonword_chars} = $stats{num_words_contain_nonword_chars};
 
             $content =~ s{^(#\s*STATS)$}{"our \%STATS = ".dmp(%stats)."; " . $1}em
                 or die "Can't replace #STATS for ".$file->name.", make sure you put the #STATS placeholder in modules";
@@ -114,7 +121,7 @@ Dist::Zilla::Plugin::WordList - Plugin to use when building WordList::* distribu
 
 =head1 VERSION
 
-This document describes version 0.054 of Dist::Zilla::Plugin::WordList (from Perl distribution Dist-Zilla-Plugin-WordList), released on 2018-03-23.
+This document describes version 0.057 of Dist::Zilla::Plugin::WordList (from Perl distribution Dist-Zilla-Plugin-WordList), released on 2020-05-04.
 
 =head1 SYNOPSIS
 
@@ -167,7 +174,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

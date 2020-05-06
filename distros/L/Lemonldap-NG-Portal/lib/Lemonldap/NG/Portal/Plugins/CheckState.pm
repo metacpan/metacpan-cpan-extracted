@@ -8,7 +8,7 @@ package Lemonldap::NG::Portal::Plugins::CheckState;
 use strict;
 use Mouse;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -29,16 +29,15 @@ sub init {
 sub check {
     my ( $self, $req ) = @_;
     my @rep;
-    unless ($req->param('secret')
-        and $req->param('secret') eq $self->conf->{checkStateSecret} )
-    {
-        return $self->p->sendError( $req, 'Bad secret' );
-    }
+    return $self->p->sendError( $req, 'Bad secret' )
+      unless ( $req->param('secret')
+        and $req->param('secret') eq $self->conf->{checkStateSecret} );
     $req->steps( [ 'controlUrl', @{ $self->p->beforeAuth } ] );
     my $res = $self->p->process($req);
     if ( $res > 0 ) {
         push @rep, "Bad result before auth: $res";
     }
+    
     if ( my $user = $req->param('user') and my $pwd = $req->param('password') )
     {
         $req->user($user);
@@ -48,12 +47,9 @@ sub check {
         #  - "extractFormInfo" due to "token"
         #  - "buildCookie" useless here
         $req->steps( [
-                'getUser',
-                'authenticate',
-                @{ $self->p->betweenAuthAndData },
-                qw( setAuthSessionInfo setSessionInfo setMacros setGroups
-                  setPersistentSessionInfo setLocalGroups store secondFactor),
-                @{ $self->p->afterData }, 'storeHistory',
+                'getUser',                         'authenticate',
+                @{ $self->p->betweenAuthAndData }, $self->sessionData,
+                @{ $self->p->afterData },          'storeHistory',
                 @{ $self->p->endAuth }
             ]
         );
@@ -62,12 +58,9 @@ sub check {
         }
         $self->p->deleteSession($req);
     }
-    if (@rep) {
-        return $self->p->sendError( $req, join( ",\n", @rep ), 500 );
-    }
-    else {
-        return $self->p->sendJSONresponse( $req, { result => 1 } );
-    }
+
+    return $self->p->sendError( $req, join( ",\n", @rep ), 500 ) if (@rep);
+    return $self->p->sendJSONresponse( $req, { result => 1 } );
 }
 
 1;

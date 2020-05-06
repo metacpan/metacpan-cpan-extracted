@@ -1,6 +1,13 @@
 Changelog for Dist-Zilla-PluginBundle-Author-GSG
 
-v0.1.1 2020-04-28T21:20:42
+v0.1.2 2020-05-05T17:41:40
+ - Update README (Andrew Hewus Fresh)
+ - Don't recommend github.password (Andrew Hewus Fresh)
+ - Need new Dist::Zilla::PluginBundle::Test::Compile (Andrew Hewus Fresh)
+ - Add more sort-of dependencies to cpanfile (Andrew Hewus Fresh)
+ - More obviously document that release will git push (Andrew Hewus Fresh)
+
+v0.1.1 2020-04-28T21:19:05
  - Fix missing test parameter (Andrew Hewus Fresh)
  - Update README (Andrew Hewus Fresh)
  - Use named sub in `around` (Andrew Hewus Fresh)

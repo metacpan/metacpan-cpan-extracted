@@ -12,3 +12,9 @@ Revision history for Feed-Data
 
 0.05    2020-04-17
         - adds new parser Feed::Data::Parser::Table
+
+0.06    2020-05-04
+        - adds new parser Feed::Data::Parser::YAML
+
+0.06    2020-05-04
+        - Update Makefile dependencies

@@ -8,7 +8,7 @@ package IO::Async::Internals::ChildManager;
 use strict;
 use warnings;
 
-our $VERSION = '0.75';
+our $VERSION = '0.76';
 
 # Not a notifier
 
@@ -282,7 +282,7 @@ sub _spawn_in_parent
       }
    ) );
 
-   $loop->watch_child( $kid => sub { 
+   $loop->watch_process( $kid => sub { 
       ( my $kid, $exitcode ) = @_;
 
       if( $pipeclosed ) {

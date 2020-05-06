@@ -1,0 +1,21 @@
+Assert                T_FIDO_REF
+Cred                  T_FIDO_REF
+PublicKey_ES256       T_FIDO_REF
+PublicKey_RS256       T_FIDO_REF
+PublicKey_EDDSA       T_FIDO_REF
+
+OUTPUT
+T_FIDO_REF
+	sv_setref_pv($arg, \"FIDO::Raw::${(my $ntt = $ntype) =~ s/_/::/g;\$ntt}\", (void *) $var);
+
+INPUT
+T_FIDO_REF
+	if (sv_isobject($arg) && sv_derived_from ($arg, \"FIDO::Raw::${(my $ntt = $ntype) =~ s/_/::/g;\$ntt}\"))
+	{
+		$var = INT2PTR ($type, SvIV((SV *) SvRV($arg)));
+	}
+	else
+	{
+		$var = NULL;
+		croak (\"$var is not of type FIDO::Raw::${(my $ntt = $ntype) =~ s/_/::/g;\$ntt}\");
+	}

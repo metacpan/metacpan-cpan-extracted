@@ -1,15 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2020 -- leonerd@leonerd.org.uk
 
 package IO::Async::Loop::Mojo;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
-use constant API_VERSION => '0.49';
+our $VERSION = '0.07';
+use constant API_VERSION => '0.76';
 
 use base qw( IO::Async::Loop );
 IO::Async::Loop->VERSION( '0.49' );
@@ -25,14 +25,14 @@ C<IO::Async::Loop::Mojo> - use C<IO::Async> with C<Mojolicious>
 
 =head1 SYNOPSIS
 
- use IO::Async::Loop::Mojo;
+   use IO::Async::Loop::Mojo;
 
- my $loop = IO::Async::Loop::Mojo->new();
+   my $loop = IO::Async::Loop::Mojo->new();
 
- $loop->add( ... );
+   $loop->add( ... );
 
- ...
- # Rest of Mojolicious code here
+   ...
+   # Rest of Mojolicious code here
 
 =head1 DESCRIPTION
 
@@ -44,7 +44,9 @@ within a L<Mojolicious> application.
 
 =cut
 
-=head2 $loop = IO::Async::Loop::Mojo->new()
+=head2 new
+
+   $loop = IO::Async::Loop::Mojo->new()
 
 This function returns a new instance of a C<IO::Async::Loop::Mojo> object. It
 takes no special arguments.
@@ -59,6 +61,12 @@ sub new
    $self->{reactor} = Mojo::IOLoop->singleton->reactor;
 
    return $self;
+}
+
+sub is_running
+{
+   my $self = shift;
+   return $self->{reactor}->is_running;
 }
 
 =head1 METHODS

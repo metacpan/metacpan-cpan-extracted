@@ -531,7 +531,7 @@ static void html5_dom_css_serialize_entry(html5_css_selector_t *self, mycss_sele
 				}
 				
 				if (entry->key)
-					hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "value", 5)), newSVpv_utf8_auto_css(self, entry->key->data ? entry->key->data : "", entry->key->length), 0);
+					hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "value", 5)), newSVpv_utf8_auto_css(self, entry->key->length ? entry->key->data : "", entry->key->length), 0);
 			}
 			break;
 			case MyCSS_SELECTORS_TYPE_ATTRIBUTE:
@@ -540,12 +540,12 @@ static void html5_dom_css_serialize_entry(html5_css_selector_t *self, mycss_sele
 				
 				/* key */
 				if (entry->key)
-					hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "name", 4)), newSVpv_utf8_auto_css(self, entry->key->data ? entry->key->data : "", entry->key->length), 0);
+					hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "name", 4)), newSVpv_utf8_auto_css(self, entry->key->length ? entry->key->data : "", entry->key->length), 0);
 				
 				/* value */
 				if (mycss_selector_value_attribute(entry->value)->value) {
 					mycore_string_t *str_value = mycss_selector_value_attribute(entry->value)->value;
-					hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "value", 5)), newSVpv_utf8_auto_css(self, str_value->data ? str_value->data : "", str_value->length), 0);
+					hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "value", 5)), newSVpv_utf8_auto_css(self, str_value->length ? str_value->data : "", str_value->length), 0);
 				} else {
 					hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "value", 5)), newSVpv_utf8_auto_css(self, "", 0), 0);
 				}
@@ -622,7 +622,7 @@ static void html5_dom_css_serialize_entry(html5_css_selector_t *self, mycss_sele
 						hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "name", 4)), newSVpv_utf8_auto_css(self, "dir", 3), 0);
 						if (entry->value) {
 							mycore_string_t *str_fname = mycss_selector_value_string(entry->value);
-							hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "value", 5)), newSVpv_utf8_auto_css(self, str_fname->data ? str_fname->data : "", str_fname->length), 0);
+							hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "value", 5)), newSVpv_utf8_auto_css(self, str_fname->length ? str_fname->data : "", str_fname->length), 0);
 						} else {
 							hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "value", 5)), newSVpv_utf8_auto_css(self, "", 0), 0);
 						}
@@ -652,7 +652,7 @@ static void html5_dom_css_serialize_entry(html5_css_selector_t *self, mycss_sele
 						if (entry->value) {
 							mycss_selectors_value_lang_t *lang = mycss_selector_value_lang(entry->value);
 							while (lang) {
-								av_push(langs, newSVpv_utf8_auto_css(self, lang->str.data ? lang->str.data : "", lang->str.length));
+								av_push(langs, newSVpv_utf8_auto_css(self, lang->str.length ? lang->str.data : "", lang->str.length));
 								lang = lang->next;
 							}
 						}
@@ -1778,7 +1778,7 @@ CODE:
 				}
 				html5_dom_rtrim_mystring(&state.value, ' ');
 				
-				RETVAL = newSVpv_utf8_auto(self->tree, state.value.data ? state.value.data : "", state.value.length);
+				RETVAL = newSVpv_utf8_auto(self->tree, state.value.length ? state.value.data : "", state.value.length);
 				mycore_string_destroy(&state.value, 0);
 			}
 			// text, textContent
@@ -2606,7 +2606,7 @@ CODE:
 		if (ix == 0) {
 			myhtml_attribute_add(self, val_str, val_len, "", 0, MyENCODING_DEFAULT);
 		} else {
-			myhtml_attribute_add(self, root_name && root_name->key.data ? root_name->key.data : "", root_name ? root_name->key.length : 0, "", 0, MyENCODING_DEFAULT);
+			myhtml_attribute_add(self, root_name && root_name->key.length ? root_name->key.data : "", root_name ? root_name->key.length : 0, "", 0, MyENCODING_DEFAULT);
 		}
 		
 		const char *restrict_type_str = NULL;
@@ -2626,7 +2626,7 @@ CODE:
 				if (ix == 1) {
 					myhtml_attribute_add(self, "", 0, val_str, val_len, MyENCODING_DEFAULT);
 				} else {
-					myhtml_attribute_add(self, "", 0, public_id && public_id->value.data ? public_id->value.data : "", public_id ? public_id->value.length : 0, MyENCODING_DEFAULT);
+					myhtml_attribute_add(self, "", 0, public_id && public_id->value.length ? public_id->value.data : "", public_id ? public_id->value.length : 0, MyENCODING_DEFAULT);
 				}
 			}
 			
@@ -2634,7 +2634,7 @@ CODE:
 			if (ix == 2) {
 				myhtml_attribute_add(self, "", 0, val_str, val_len, MyENCODING_DEFAULT);
 			} else {
-				myhtml_attribute_add(self, "", 0, system_id && system_id->value.data ? system_id->value.data : "", system_id ? system_id->value.length : 0, MyENCODING_DEFAULT);
+				myhtml_attribute_add(self, "", 0, system_id && system_id->value.length ? system_id->value.data : "", system_id ? system_id->value.length : 0, MyENCODING_DEFAULT);
 			}
 		}
 		
@@ -2655,15 +2655,15 @@ CODE:
 		
 		switch (ix) {
 			case 0: /* name */
-				RETVAL = newSVpv_utf8_auto(self->tree, root_name && root_name->key.data ? root_name->key.data : "", root_name ? root_name->key.length : 0);
+				RETVAL = newSVpv_utf8_auto(self->tree, root_name && root_name->key.length ? root_name->key.data : "", root_name ? root_name->key.length : 0);
 			break;
 			
 			case 1: /* publicId */
-				RETVAL = newSVpv_utf8_auto(self->tree, public_id && public_id->value.data ? public_id->value.data : "", public_id ? public_id->value.length : 0);
+				RETVAL = newSVpv_utf8_auto(self->tree, public_id && public_id->value.length ? public_id->value.data : "", public_id ? public_id->value.length : 0);
 			break;
 			
 			case 2: /* systemId */
-				RETVAL = newSVpv_utf8_auto(self->tree, system_id && system_id->value.data ? system_id->value.data : "", system_id ? system_id->value.length : 0);
+				RETVAL = newSVpv_utf8_auto(self->tree, system_id && system_id->value.length ? system_id->value.data : "", system_id ? system_id->value.length : 0);
 			break;
 		}
 	}
@@ -2878,7 +2878,7 @@ CODE:
 	RETVAL = &PL_sv_undef;
 	while (entry) {
 		if (entry->type == MyCSS_SELECTORS_TYPE_PSEUDO_ELEMENT) {
-			RETVAL = newSVpv_utf8_auto_css(self->selector, entry->key->data ? entry->key->data : "", entry->key->length);
+			RETVAL = newSVpv_utf8_auto_css(self->selector, entry->key->length ? entry->key->data : "", entry->key->length);
 			break;
 		}
 		entry = entry->next;

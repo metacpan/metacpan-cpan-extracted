@@ -1,7 +1,9 @@
 package App::lcpan::Cmd::ver_cmp_list;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-06'; # DATE
+our $DIST = 'App-lcpan-CmdBundle-ver'; # DIST
+our $VERSION = '0.050'; # VERSION
 
 use 5.010001;
 use strict;
@@ -156,7 +158,7 @@ App::lcpan::Cmd::ver_cmp_list - Compare a list of module names+versions against 
 
 =head1 VERSION
 
-This document describes version 0.04 of App::lcpan::Cmd::ver_cmp_list (from Perl distribution App-lcpan-CmdBundle-ver), released on 2017-07-10.
+This document describes version 0.050 of App::lcpan::Cmd::ver_cmp_list (from Perl distribution App-lcpan-CmdBundle-ver), released on 2020-05-06.
 
 =head1 DESCRIPTION
 
@@ -169,7 +171,7 @@ This module handles the L<lcpan> subcommand C<ver-cmp-list>.
 
 Usage:
 
- handle_cmd(%args) -> [status, msg, result, meta]
+ handle_cmd(%args) -> [status, msg, payload, meta]
 
 Compare a list of module names+versions against database.
 
@@ -181,13 +183,18 @@ Arguments ('*' denotes required arguments):
 
 =item * B<cpan> => I<dirname>
 
-Location of your local CPAN mirror, e.g. /path/to/cpan.
+Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
 
 =item * B<index_name> => I<filename> (default: "index.db")
 
 Filename of index.
+
+If C<index_name> is a filename without any path, e.g. C<index.db> then index will
+be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
+C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
+using the C<index_name>.
 
 =item * B<list>* => I<str>
 
@@ -199,6 +206,14 @@ Each line should be in the form of:
 
 =item * B<show> => I<str> (default: "older-than-db")
 
+=item * B<use_bootstrap> => I<bool> (default: 1)
+
+Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+If you are indexing your private CPAN-like repository, you want to turn this
+off.
+
+
 =back
 
 Returns an enveloped result (an array).
@@ -206,7 +221,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -234,7 +249,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

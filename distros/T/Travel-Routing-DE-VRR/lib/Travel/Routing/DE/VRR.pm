@@ -6,7 +6,7 @@ use 5.010;
 
 no if $] >= 5.018, warnings => "experimental::smartmatch";
 
-our $VERSION = '2.18';
+our $VERSION = '2.19';
 
 use parent 'Travel::Routing::DE::EFA';
 
@@ -19,7 +19,6 @@ sub new {
 }
 
 1;
-
 
 __END__
 
@@ -50,7 +49,7 @@ Travel::Routing::DE::VRR - unofficial interface to the efa.vrr.de German itinera
 
 =head1 VERSION
 
-version 2.18
+version 2.19
 
 =head1 DESCRIPTION
 
@@ -103,8 +102,8 @@ None known.
 
 =head1 AUTHOR
 
-Copyright (C) 2009-2015 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2009-2020 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 
-  0. You just DO WHAT THE FUCK YOU WANT TO.
+This program is licensed under the same terms as Perl itself.

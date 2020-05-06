@@ -47,6 +47,8 @@
       "^/test-uri2": "varIsInUri($ENV{REQUEST_URI}, '/test-uri2/', $uid)",
       "^/test-restricted_uri": "varIsInUri($ENV{REQUEST_URI}, '/test-restricted_uri/', \"$uid/\", 1)",
       "^/skipif": "$ENV{REQUEST_URI} =~ /zz/ ? skip : 1",
+      "^/fortimelords": "inGroup('timelords')",
+      "^/fordaleks": "inGroup('daleks')",
       "^/logout": "logout_sso",
       "^/deny": "deny",
       "default": "accept"

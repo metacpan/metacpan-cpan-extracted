@@ -54,13 +54,13 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::Author::ETHER:
     file: lib/Dist/Zilla/MintingProfile/Author/ETHER.pm
-    version: '0.154'
+    version: '0.156'
   Dist::Zilla::PluginBundle::Author::ETHER:
     file: lib/Dist/Zilla/PluginBundle/Author/ETHER.pm
-    version: '0.154'
+    version: '0.156'
   Pod::Weaver::PluginBundle::Author::ETHER:
     file: lib/Pod/Weaver/PluginBundle/Author/ETHER.pm
-    version: '0.154'
+    version: '0.156'
 recommends:
   Dist::Zilla::Plugin::BlockRelease: '0'
   Dist::Zilla::Plugin::GitHub::Update: '0.40'
@@ -139,12 +139,13 @@ requires:
   Dist::Zilla::Plugin::MojibakeTests: '0.8'
   Dist::Zilla::Plugin::PodCoverageTests: '5.040'
   Dist::Zilla::Plugin::PodSyntaxTests: '5.040'
-  Dist::Zilla::Plugin::PodWeaver: '4.005'
+  Dist::Zilla::Plugin::PodWeaver: '4.008'
   Dist::Zilla::Plugin::Prereqs: '0'
   Dist::Zilla::Plugin::Prereqs::AuthorDeps: '0.006'
   Dist::Zilla::Plugin::PromptIfStale: '0.004'
   Dist::Zilla::Plugin::Readme: '0'
   Dist::Zilla::Plugin::ReadmeAnyFromPod: '0.142180'
+  Dist::Zilla::Plugin::RewriteVersion::Transitional: '0.006'
   Dist::Zilla::Plugin::Run::AfterBuild: '0.041'
   Dist::Zilla::Plugin::Run::AfterMint: '0'
   Dist::Zilla::Plugin::Run::AfterRelease: '0.038'
@@ -209,10 +210,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Author-ETHER
   homepage: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER
   repository: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER.git
-version: '0.154'
+version: '0.156'
 x_Dist_Zilla:
   perl:
-    version: '5.031010'
+    version: '5.031011'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -344,7 +345,7 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: '@Author::ETHER/stale modules, build'
-      version: '0.055'
+      version: '0.056'
     -
       class: Dist::Zilla::Plugin::FileFinder::ByName
       name: '@Author::ETHER/Examples'
@@ -357,6 +358,7 @@ x_Dist_Zilla:
             - CONTRIBUTING
             - INSTALL
             - LICENCE
+            - META.json
             - README.pod
           exclude_match: []
           follow_symlinks: 0
@@ -827,7 +829,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20200320'
+          Module::CoreList: '5.20200428'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.008'
     -
@@ -841,7 +843,7 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: '@Author::ETHER/stale modules, release'
-      version: '0.055'
+      version: '0.056'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -990,7 +992,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.154
+          tag: v0.156
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -1180,7 +1182,7 @@ x_contributors:
   - 'Randy Stauner <rwstauner@cpan.org>'
   - 'Roy Ivy III <rivy@cpan.org>'
   - 'Сергей Романов <sromanov@cpan.org>'
-x_generated_by_perl: v5.31.10
+x_generated_by_perl: v5.31.11
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 0

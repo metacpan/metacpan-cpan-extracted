@@ -1,6 +1,5 @@
 package Feed::Data::Object;
 
-our $VERSION = '0.01';
 use Moo;
 use Carp qw/croak/;
 use Class::Load qw/load_class/;

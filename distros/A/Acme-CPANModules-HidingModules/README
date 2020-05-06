@@ -2,48 +2,55 @@ NAME
     Acme::CPANModules::HidingModules - Hiding modules
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.004 of
     Acme::CPANModules::HidingModules (from Perl distribution
-    Acme-CPANModules-HidingModules), released on 2020-02-13.
+    Acme-CPANModules-HidingModules), released on 2020-04-30.
 
 DESCRIPTION
-    Hiding modules.
-
     So you want to convince some Perl code that some modules that are
-    installed, aren't (usually for testing purposes)? There are several ways
-    to go about it, with different effects and level of convincing.
+    actually installed, aren't? There are several ways to accomplish this,
+    with different effects and levels of convincing. This list details them.
 
-    Loading modules
+    Why?
 
-    Most of the time, you just want to make certain modules not loadable (by
-    "require" or "use"). To do this, you usually install a hook at the first
-    element of @INC. The hooks would die when it receives a request to load
-    a modules that you want to hide. Some modules that work this way
-    include:
+    First of all, why would you want to do this? Almost always, the answer
+    is: for testing purposes. For example, you want to make sure that your
+    code can work without an optional module. Or, alternatively, you want to
+    test how your code fails under the absence of certain modules.
 
-    lib::filter family, including lib::disallow. These family of modules
-    support hiding (non-)core modules in addition to the specific ones you
-    mentioned. It also supports recursive allowing (i.e. you want to allow
-    Moo and all the modules that Moo loads, and all the modules that they
-    load, and so on).
+    Making modules not loadable
 
-    Devel::Hide, which also plans to support hiding (non-)core modules.
+    Most of the time, you just want to make certain modules not loadable.
+    That is, making "require SomeModule" or "use Module" fail. To do this,
+    you usually install a hook at the first element of @INC. The hook would
+    die when it receives a request to load a module that you want to hide.
+    Some tools that work this way include:
+
+    lib::filter family, including its thin wrapper lib::disallow.
+    lib::filter et al supports hiding modules that you specify, as well as
+    hiding all core modules or all non-core modules. They also support
+    recursive allowing, i.e. you want to allow Moo and all the modules that
+    Moo loads, and all the modules that they load, and so on.
+
+    Devel::Hide. Devel::Hide also works by installing a hook in @INC. It
+    supports propagating the hiding to child process by setting PERL5OPT
+    environment variable.
 
     Test::Without::Module.
 
-    Finding module's path
+    Fooling module path finders
 
-    Depending on which module you use to find a module's path, here are some
+    Depending on which tool you use to find a module's path, here are some
     patches you can load to fool the finder.
 
     Module::Path::Patch::Hide
 
     Module::Path::More::Patch::Hide
 
-    Listing installed modules
+    Fooling module listers
 
-    Depending on which module you use to find a module's path, here are some
-    patches you can load to fool the lister.
+    Depending on which tool you use to find a module's path, here are some
+    patches you can load to fool the lister tool.
 
     Module::List::Patch::Hide
 
@@ -57,7 +64,8 @@ DESCRIPTION
 
     To fool code that tries to find the module files themselves without
     using any module, i.e. by iterating @INC, you will need to actually
-    (temporarily) rename the module files. LApp::pmrenamehide does this.
+    (temporarily) rename the module files. App::pmhiderename and
+    <lib::hiderename> does this.
 
 INCLUDED MODULES
     *   lib::filter
@@ -80,7 +88,7 @@ INCLUDED MODULES
 
     *   Module::List::Wildcard::Patch::Hide
 
-    *   App::pmrenamehide
+    *   App::pmhiderename
 
 FAQ
   What are ways to use this module?

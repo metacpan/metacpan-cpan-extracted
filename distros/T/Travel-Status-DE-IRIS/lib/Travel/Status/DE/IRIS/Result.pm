@@ -15,7 +15,7 @@ use List::Compare;
 use List::MoreUtils qw(none uniq firstval);
 use Scalar::Util qw(weaken);
 
-our $VERSION = '1.45';
+our $VERSION = '1.46';
 
 my %translation = (
 	2  => 'Polizeiliche Ermittlung',
@@ -841,7 +841,7 @@ arrival/departure received by Travel::Status::DE::IRIS
 
 =head1 VERSION
 
-version 1.45
+version 1.46
 
 =head1 DESCRIPTION
 
@@ -1356,7 +1356,7 @@ Source: correlation between IRIS and DB RIS (bahn.de).
 
 Source: correlation between IRIS and DB RIS (bahn.de).
 
-=item d 67 : "BehE<ouml>rdliche Anordnung"
+=item f 67 : "BehE<ouml>rdliche Anordnung"
 
 Source: L<https://twitter.com/DodoMedia/status/1238816272240070659>.
 

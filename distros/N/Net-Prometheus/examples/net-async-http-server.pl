@@ -19,12 +19,6 @@ $client->new_gauge(
 
 my $loop = IO::Async::Loop->new;
 
-my $httpserver = Net::Async::HTTP::Server::PSGI->new(
-   app => $client->psgi_app,
-);
-$loop->add( $httpserver );
-$httpserver->listen(
-   addr => { family => "inet6", socktype => "stream", port => LISTEN_PORT }
-)->get;
+$client->export_to_IO_Async( $loop, port => LISTEN_PORT );
 
 $loop->run;

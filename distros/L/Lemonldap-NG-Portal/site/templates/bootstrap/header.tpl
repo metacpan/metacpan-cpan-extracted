@@ -27,6 +27,9 @@
  <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX"><TMPL_VAR NAME="SKIN">/css/styles.css" />
 <!-- //endif -->
  <link rel="stylesheet" type="text/css" href="/portal.css" />
+ <TMPL_IF NAME="CUSTOM_CSS">
+ <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX"><TMPL_VAR NAME="CUSTOM_CSS">" />
+ </TMPL_IF>
  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
  <!--[if lt IE 9]>

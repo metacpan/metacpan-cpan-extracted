@@ -4,11 +4,6 @@
 
 POSIX::1003::Limit - POSIX access to ulimit and rlimit
 
-=head1 INHERITANCE
-
- POSIX::1003::Limit
-   is a POSIX::1003::Module
-
 =head1 SYNOPSIS
 
   # ULIMIT support
@@ -48,23 +43,7 @@ This module provides access to the "ulimit" (user limit) and "rlimit"
 (resource limit) handling.  On most systems, C<ulimit()> is succeeded
 by C<rlimit()> hence provides a very limited set of features.
 
-See L<documentation in the base class|POSIX::1003::Module/"DESCRIPTION">.
- 
 =head1 METHODS
-
-See L<documentation in the base class|POSIX::1003::Module/"METHODS">.
- 
-=over 4
-
-=item POSIX::1003::Limit-E<gt>B<exampleValue>(NAME)
-
-See L<POSIX::1003::Module/"METHODS">
-
-=item $obj-E<gt>B<import>()
-
-See L<POSIX::1003::Module/"METHODS">
-
-=back
 
 =head1 FUNCTIONS
 
@@ -72,19 +51,19 @@ See L<POSIX::1003::Module/"METHODS">
 
 =over 4
 
-=item B<getrlimit>(RESOURCE)
+=item B<getrlimit>($resource)
 
   my ($cur, $max, $success) = getrlimit('RLIMIT_CORE');
   my ($cur, $max) = getrlimit('RLIMIT_CORE');
 
-=item B<setrlimit>(RESOURCE, CUR, [MAX])
+=item B<setrlimit>( $resource, $cur, [$max] )
 
   my $success = setrlimit('RLIMIT_CORE', 1e6, 1e8);
 
-=item B<ulimit>(NAME)
+=item B<ulimit>($name)
 
-Returns the ulimit value related to the NAMEd constant.  The NAME
-must be a string. C<undef> will be returned when the NAME is not
+Returns the ulimit value related to the named constant.  The $name
+must be a string. C<undef> will be returned when the $name is not
 known by the system.
 
   my $filesize = ulimit('UL_GETFSIZE') || SSIZE_MAX;
@@ -130,18 +109,10 @@ For ulimit, with a value when it is a getter:
 =for comment
 #TABLE_ULIMIT_START
 
-  UL_GETFSIZE    9223372036854775807
-  UL_GETMAXBRK   undef
-  UL_GETOPENMAX  1024
-  UL_SETFSIZE    (setter)
-
+  During installation, a symbol table will get inserted here.
 
 =for comment
 #TABLE_ULIMIT_END
-
-
-
-
 
 The constant names for rlimit, with the soft and hard limits that
 L<getrlimit()|POSIX::1003::Limit/"Standard POSIX"> returned during installation of the module.
@@ -149,46 +120,24 @@ L<getrlimit()|POSIX::1003::Limit/"Standard POSIX"> returned during installation 
 =for comment
 #TABLE_RLIMIT_START
 
-  RLIMIT_AS          18446744073709551615, 18446744073709551615
-  RLIMIT_CORE        0, 18446744073709551615
-  RLIMIT_CPU         18446744073709551615, 18446744073709551615
-  RLIMIT_DATA        18446744073709551615, 18446744073709551615
-  RLIMIT_FSIZE       18446744073709551615, 18446744073709551615
-  RLIMIT_LOCKS       18446744073709551615, 18446744073709551615
-  RLIMIT_MEMLOCK     65536, 65536
-  RLIMIT_MSGQUEUE    819200, 819200
-  RLIMIT_NICE        0, 0
-  RLIMIT_NLIMITS     0, 15
-  RLIMIT_NOFILE      1024, 4096
-  RLIMIT_NPROC       61461, 61461
-  RLIMIT_OFILE       1024, 4096
-  RLIMIT_RSS         18446744073709551615, 18446744073709551615
-  RLIMIT_RTPRIO      0, 0
-  RLIMIT_RTTIME      18446744073709551615, 18446744073709551615
-  RLIMIT_SIGPENDING  61461, 61461
-  RLIMIT_STACK       8388608, 18446744073709551615
-
+  During installation, a symbol table will get inserted here.
 
 =for comment
 #TABLE_RLIMIT_END
 
-
-
-
-
 =head1 SEE ALSO
 
-This module is part of POSIX-1003 distribution version 0.98,
-built on December 03, 2013. Website: F<http://perl.overmeer.net>.  The code is based on L<POSIX>, which
+This module is part of POSIX-1003 distribution version 1.00,
+built on May 05, 2020. Website: F<http://perl.overmeer.net/CPAN>.  The code is based on L<POSIX>, which
 is released with Perl itself.  See also L<POSIX::Util> for
 additional functionality.
 
 =head1 COPYRIGHTS
 
-Copyrights 2011-2013 on the perl code and the related documentation
+Copyrights 2011-2020 on the perl code and the related documentation
  by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

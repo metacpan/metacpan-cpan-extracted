@@ -55,9 +55,9 @@ my @modules_checked;
                 my $mod = '0';
                 map {
                     my $phase = $_;
-                    map {
-                        [ 'Prereqs' => $phase . $_ => { 'Foo' . $mod++ => 0 } ]
-                    } qw(Requires Recommends Suggests)
+                    map
+                        [ 'Prereqs' => $phase . $_ => { 'Foo' . $mod++ => 0 } ],
+                        qw(Requires Recommends Suggests)
                 } qw(Runtime Test Develop);
             },
         ) . "\n\n; authordep Carp\n",
@@ -95,7 +95,7 @@ my @modules_checked;
         is($result->error, undef, 'no errors');
         is(
             $result->stdout,
-            join("\n", 'Carp', (map { 'Foo' . $_ } ('0' .. '8'))) . "\n",
+            join("\n", 'Carp', (map 'Foo'.$_, ('0' .. '8'))) . "\n",
             'stale prereqs and authordeps found with --all, despite no PromptIfStale plugins configured',
         );
 

@@ -11,7 +11,7 @@ use File::HomeBank;
 use Getopt::Long 2.38 qw(GetOptionsFromArray);
 use Pod::Usage;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 my %ACCOUNT_TYPES = (   # map HomeBank account types to Ledger accounts
     bank        => 'Assets:Bank',
@@ -261,7 +261,6 @@ sub convert_homebank_to_ledger {
         my $account = $homebank->find_account_by_key($transaction->{account});
         my $amount  = $transaction->{amount};
         my $status  = $STATUS_SYMBOLS{$transaction->{status} || ''} || '';
-        my $paymode = $transaction->{paymode} || ''; # internaltransfer
         my $memo    = $transaction->{wording} || '';
         my $payee   = $homebank->find_payee_by_key($transaction->{payee});
         my $tags    = _split_tags($transaction->{tags});
@@ -278,7 +277,7 @@ sub convert_homebank_to_ledger {
             tags        => $tags,
         };
 
-        if ($paymode eq 'internaltransfer') {
+        if ($transaction->{dst_account}) {  # is an internal transfer
             my $paired_transaction = $homebank->find_transaction_transfer_pair($transaction);
 
             my $dst_account = $homebank->find_account_by_key($transaction->{dst_account});
@@ -446,7 +445,7 @@ App::HomeBank2Ledger - A tool to convert HomeBank files to Ledger format
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

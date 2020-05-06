@@ -14,7 +14,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer',
   'Lemonldap::NG::Portal::Lib::CAS';
@@ -35,7 +35,8 @@ sub init {
     my $rule =
       $hd->buildSub( $hd->substitute( $self->conf->{issuerDBCASRule} ) );
     unless ($rule) {
-        $self->error( "Bad CAS rule -> " . $hd->tsv->{jail}->error );
+        my $error = $hd->tsv->{jail}->error || '???';
+        $self->error("Bad CAS activation rule -> $error");
         return 0;
     }
     $self->{rule} = $rule;
@@ -129,7 +130,7 @@ sub run {
     my $url = $req->uri();
 
     # Session ID
-    my $session_id = $req->{sessionInfo}->{_session_id} || $req->{id};
+    my $session_id = $req->{sessionInfo}->{_session_id} || $req->id;
 
     # Session creation timestamp
     my $time = $req->{sessionInfo}->{_utime} || time();
@@ -400,7 +401,7 @@ sub logout {
     my ( $self, $req ) = @_;
 
     # Session ID
-    my $session_id = $req->{sessionInfo}->{_session_id} || $req->{id};
+    my $session_id = $req->{sessionInfo}->{_session_id} || $req->id;
 
     # Delete linked CAS sessions
     $self->deleteCasSecondarySessions($session_id) if ($session_id);

@@ -9,23 +9,46 @@ my $on_automated_rig
   || $ENV{AUTOMATED_TESTING}
   || $ENV{TRAVIS}
   || $ENV{APPVEYOR};
+  #|| $ENV{CI};
 
 
 use Cwd;
 my $base_dir = getcwd();
 
 use Env qw( @PATH );
- 
+
 use Alien::sqlite;
-use Alien::curl;
-my $sep_char = $on_windows ? ';' : ':';
-unshift @PATH, Alien::sqlite->bin_dir, Alien::curl->bin_dir;
-  #  we should just add to the package config env var 
+unshift @PATH, Alien::sqlite->bin_dir;
+my @dep_aliens = ('Alien::sqlite');
+my $have_alien_curl = eval 'require Alien::curl';
+if ($have_alien_curl) {
+  unshift @PATH, 'Alien::curl'->bin_dir;
+  push @dep_aliens, 'Alien::curl';
+}
+#  does not exist at the time of writing
+my $have_alien_tiff = eval 'require Alien::libtiff';
+if ($have_alien_tiff) {
+  unshift @PATH, 'Alien::tiff'->bin_dir;
+  push @dep_aliens, 'Alien::tiff';
+}
+#do {
+#  #  limit scope
+#  #use Env qw / @PKG_CONFIG_PATH /;
+#  if (Alien::sqlite->install_type eq 'share') {
+#    #unshift @PKG_CONFIG_PATH,
+#    $ENV{PKG_CONFIG_PATH} .= 
+#      ':' . Alien::sqlite->dist_dir . '/lib/pkgconfig';
+#    $ENV{PKG_CONFIG_PATH} =~ s/^://;
+#  }
+#};
+#  we should just add path to $ENV{PKG_CONFIG_PATH}
+#  but are hitting sep char issues
 $ENV{SQLITE3_CFLAGS} = Alien::sqlite->cflags;
 $ENV{SQLITE3_LIBS} = Alien::sqlite->libs;
+say "Alien::sqlite has sqlite version " . Alien::sqlite->version;
 
 plugin 'Build::SearchDep' => (
-  aliens   => ['Alien::sqlite', 'Alien::curl'],
+  aliens   => [ @dep_aliens ],
   public_I => 1,
   public_l => 1,
 );
@@ -46,8 +69,8 @@ share {
   start_url 'http://download.osgeo.org/proj/';
   #start_url "file://$base_dir";  #  debug
   plugin Download => (
-    filter  => qr/^proj-6.([0-9\.]+)\.tar\.gz$/,
-    version => qr/^proj-6.([0-9\.]+)\.tar\.gz$/,
+    filter  => qr/^proj-([0-9\.]+)\.tar\.gz$/,
+    version => qr/^proj-([0-9\.]+)\.tar\.gz$/,
   );
 
   my $proj_version = get_proj_version() // 'not yet defined';
@@ -58,7 +81,7 @@ share {
 
   plugin 'Build::Autoconf' => ();
 
-  my $build_static = ($^O =~ /mswin/i) ? '' : '--disable-shared';
+  my $build_static = $on_windows ? '' : '--disable-shared';
   $build_static = '';
   $build_static = '--enable-static=no';  #  override - needed?  leftover from gdal
   $build_static = '' if $ENV{FORCE_DYNAMIC};
@@ -96,12 +119,23 @@ share {
     #    push @make_clean, '%{make} clean';
     #}
     #  clean up the build dir on cpan testers etc
-    plugin 'Cleanse::BuildDir';
+    #  but not github workflows
+    if (!$ENV{CI}) {
+      plugin 'Cleanse::BuildDir';
+    }
   }
   
   my $config_args = $ENV{ALIEN_PROJ_CONFIG_ARGS} // '';
   $config_args =~ s/[^-\s\w,=]//g;  #  overkill?
-  $config_args = "$with_local $with_cpp11 $build_static $config_args";
+  my $with_tiff = '';
+  if (!$have_alien_tiff && $proj_version ge 7) {
+    $with_tiff = '--disable-tiff';
+  }
+  my $with_curl = '--without-curl';  #  until Alien::libcurl provides dynamic curl-config
+  if (!$have_alien_curl && $proj_version ge 7) {
+    $with_curl = '--without-curl';  #  until Alien::libcurl provides dynamic curl-config
+  }
+  $config_args = "$with_local $with_cpp11 $with_tiff $with_curl $build_static $config_args";
   
   build [
     \&update_pkg_conf_path,
@@ -119,10 +153,15 @@ share {
 #    \&rename_la_files,
 #];
 #
+
 sub update_pkg_conf_path {
     return if !$on_windows;
     use Env qw /@PKG_CONFIG_PATH/;
+    say 'Modifying drive paths in PKG_CONFIG_PATH';
+    say $ENV{PKG_CONFIG_PATH};
+    #  msys-ificate drive paths
     @PKG_CONFIG_PATH = map {s{^([a-z]):}{/$1}ri} @PKG_CONFIG_PATH;
+    say $ENV{PKG_CONFIG_PATH};
     return;
 }
 

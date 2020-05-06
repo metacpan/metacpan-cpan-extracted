@@ -39,17 +39,17 @@
 /* Is a CAPATH given at configure time */
 #undef HAVE_DANE_CA_PATH
 
+/* Define to 1 if you have the declaration of `NID_ED25519', and to 0 if you
+   don't. */
+#undef HAVE_DECL_NID_ED25519
+
+/* Define to 1 if you have the declaration of `NID_ED448', and to 0 if you
+   don't. */
+#undef HAVE_DECL_NID_ED448
+
 /* Define to 1 if you have the declaration of `NID_secp384r1', and to 0 if you
    don't. */
 #undef HAVE_DECL_NID_SECP384R1
-
-/* Define to 1 if you have the declaration of `NID_X25519', and to 0 if you
-   don't. */
-#undef HAVE_DECL_NID_X25519
-
-/* Define to 1 if you have the declaration of `NID_X448', and to 0 if you
-   don't. */
-#undef HAVE_DECL_NID_X448
 
 /* Define to 1 if you have the declaration of `NID_X9_62_prime256v1', and to 0
    if you don't. */
@@ -81,6 +81,9 @@
 
 /* Define to 1 if you have the `ENGINE_load_cryptodev' function. */
 #undef HAVE_ENGINE_LOAD_CRYPTODEV
+
+/* Define to 1 if you have the `ERR_load_crypto_strings' function. */
+#undef HAVE_ERR_LOAD_CRYPTO_STRINGS
 
 /* Define to 1 if you have the `EVP_dss1' function. */
 #undef HAVE_EVP_DSS1
@@ -199,6 +202,12 @@
 
 /* Define to 1 if you have the <openssl/err.h> header file. */
 #undef HAVE_OPENSSL_ERR_H
+
+/* Define to 1 if you have the `OPENSSL_init_crypto' function. */
+#undef HAVE_OPENSSL_INIT_CRYPTO
+
+/* Define to 1 if you have the `OPENSSL_init_ssl' function. */
+#undef HAVE_OPENSSL_INIT_SSL
 
 /* Define to 1 if you have the <openssl/rand.h> header file. */
 #undef HAVE_OPENSSL_RAND_H
@@ -330,8 +339,14 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* Define this to enable RR type AMTRELAY. */
+#undef RRTYPE_AMTRELAY
+
 /* Define this to enable RR type AVC. */
 #undef RRTYPE_AVC
+
+/* Define this to enable RR type DOA. */
+#undef RRTYPE_DOA
 
 /* Define this to enable RR type NINFO. */
 #undef RRTYPE_NINFO
@@ -644,10 +659,10 @@ size_t strlcpy(char *dst, const char *src, size_t siz);
 
 #ifdef USE_WINSOCK
 #define SOCK_INVALID INVALID_SOCKET
-#define close_socket(_s) do { if (_s > SOCK_INVALID) {closesocket(_s); _s = SOCK_INVALID;} } while(0)
+#define close_socket(_s) do { if (_s != SOCK_INVALID) {closesocket(_s); _s = -1;} } while(0)
 #else
 #define SOCK_INVALID -1
-#define close_socket(_s) do { if (_s > SOCK_INVALID) {close(_s); _s = SOCK_INVALID;} } while(0)
+#define close_socket(_s) do { if (_s != SOCK_INVALID) {close(_s); _s = -1;} } while(0)
 #endif
 
 #ifdef __cplusplus

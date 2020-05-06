@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_BADCREDENTIALS);
 
 extends 'Lemonldap::NG::Common::Module';
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.8';
 
 # Sample accounts from Doctor Who characters
 our %demoAccounts = (
@@ -30,6 +30,12 @@ our %demoAccounts = (
         'cn'   => 'Doctor Who',
         'mail' => 'dwho@badwolf.org',
     },
+);
+
+our %demoGroups = (
+    'timelords'  => [qw(dwho)],
+    'earthlings' => [qw(msmith rtyler)],
+    'users'      => [qw(dwho msmith rtyler)],
 );
 
 # INITIALIZATION
@@ -82,6 +88,21 @@ sub setSessionInfo {
 # Do nothing
 # @return Lemonldap::NG::Portal constant
 sub setGroups {
+    my ( $self, $req ) = @_;
+    my $user = $req->user;
+    my $groups  = $req->sessionInfo->{groups}  || '';
+    my $hGroups = $req->sessionInfo->{hGroups} || {};
+    for my $grp ( keys %demoGroups ) {
+        if ( grep { $_ eq $user } @{ $demoGroups{$grp} } ) {
+            $hGroups->{$grp} = {};
+            $groups =
+              ($groups)
+              ? $groups . $self->conf->{multiValuesSeparator} . $grp
+              : $grp;
+        }
+    }
+    $req->sessionInfo->{groups}  = $groups;
+    $req->sessionInfo->{hGroups} = $hGroups;
     PE_OK;
 }
 

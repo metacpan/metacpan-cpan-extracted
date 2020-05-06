@@ -1,7 +1,6 @@
 <TMPL_INCLUDE NAME="header.tpl">
 
-  <title>LemonLDAP::NG Manager</title>
-  <link rel="prefetch" href="<TMPL_VAR NAME="STATIC_PREFIX">forms/home.html" />
+  <title>LemonLDAP::NG Comparator</title>
   <link rel="prefetch" href="<TMPL_VAR NAME="STATIC_PREFIX">struct.json" />
 </head>
 
@@ -29,12 +28,29 @@
             <a ng-show="cfg[1].next" class="input-group-addon link glyphicon glyphicon-arrow-right" href="#!/{{cfg[0].next}}/{{cfg[1].next}}" role="link"></a>
           </div>
         </div>
+        <table class="table table-striped">
+          <tr>
+            <th>{{translate('date')}}</th>
+            <td>{{cfg[0].date}}</td>
+            <td>{{cfg[1].date}}</td>
+          </tr>
+          <tr>
+            <th>{{translate('author')}}</th>
+            <td>{{cfg[0].cfgAuthor}}</td>
+            <td>{{cfg[1].cfgAuthor}}</td>
+          </tr>
+          <tr ng-if="cfg[0].cfgLog || cfg[1].cfgLog">
+            <th>{{translate('cfgLog')}}</th>
+            <td>{{cfg[0].cfgLog}}</td>
+            <td>{{cfg[1].cfgLog}}</td>
+          </tr>
+        </table>
       </div>
       <div class="region region-sidebar-first">
         <section id="block-superfish-1" class="block block-superfish clearfix">
           <div ui-tree data-drag-enabled="false" id="tree-root">
             <div ng-show="data.length==0" class="center">
-              <span class="label label-warning" trspan="noDatas"></span>
+              <span class="label label-warning">{{translate('noData')}}</span>
             </div>
             <ol ui-tree-nodes="" ng-model="data">
               <li ng-repeat="node in data" ui-tree-node ng-include="'nodes_renderer.html'" collapsed="true"></li>
@@ -47,6 +63,25 @@
 
     <!-- Right div -->
     <div id="right" class="col-lg-8 col-md-8 col-sm-7 col-xs-12 scrollable" ng-class="{'hidden-xs':showT&&!showM}">
+      <span class="visible-xs">
+      <div ng-if="currentNode"  class="lmmenu navbar navbar-default" ng-class="{'hidden-xs':!showM}">
+        <div class="navbar-collapse" ng-class="{'collapse':!showM}" id="formmenu">
+          <ul class="nav navbar-nav">
+            <li uib-dropdown class="visible-xs">
+              <a id="langmenu" name="menu" uib-dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Menu <span class="caret"></span></a>
+              <ul uib-dropdown-menu aria-labelled-by="langmenu" role="grid">
+                <li ng-repeat="link in links"><a href="{{link.target}}" role="row"><i ng-if="link.icon" class="glyphicon glyphicon-{{link.icon}}"></i> {{translate(link.title)}}</a></li>
+                <li ng-repeat="menulink in menulinks"><a href="{{menulink.target}}" role="row"><i ng-if="menulink.icon" class="glyphicon glyphicon-{{menulink.icon}}"></i> {{translate(menulink.title)}}</a></li>
+                <li ng-include="'languages.html'"></li>
+                <TMPL_IF NAME="INSTANCE_NAME">
+                  <li><a href="https://lemonldap-ng.org"><TMPL_VAR NAME="INSTANCE_NAME"></a></li>
+                </TMPL_IF>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+      </span>
       <h2 ng-if="message">{{message}}</h2>
       <div class="panel panel-default" ng-if="currentNode">
         <div class="panel-heading">

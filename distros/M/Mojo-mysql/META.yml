@@ -1,7 +1,7 @@
 ---
 abstract: 'Mojolicious and Async MySQL/MariaDB'
 author:
-  - 'Rolf Stöckli <tekki@cpan.org>'
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
 build_requires:
   Test::More: '0.90'
 configure_requires:
@@ -18,15 +18,15 @@ no_index:
     - t
     - inc
 requires:
-  DBD::mysql: '4.042'
-  DBI: '1.627'
+  DBD::mysql: '4.050'
+  DBI: '1.643'
   Mojolicious: '8.03'
   SQL::Abstract: '1.86'
 resources:
   bugtracker: https://github.com/jhthorsen/mojo-mysql/issues
   homepage: https://github.com/jhthorsen/mojo-mysql
   repository: https://github.com/jhthorsen/mojo-mysql.git
-version: '1.18'
+version: '1.19'
 x_contributors:
   - 'Curt Hochwender <hochwender@centurytel.net>'
   - 'Dan Book <dbook@cpan.org>'

@@ -6,7 +6,6 @@ lib/OPCUA/Open62541/Test/Client.pm
 lib/OPCUA/Open62541/Test/Logger.pm
 lib/OPCUA/Open62541/Test/Server.pm
 LICENSE
-Makefile
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP

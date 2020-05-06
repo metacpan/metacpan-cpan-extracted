@@ -52,15 +52,22 @@ in the below descriptions applies equally to hash keys.)
     friendly default for working with other languages that probably expect more
     reliably-typed strings.
 
-        This configuration is **NOT** recommended; it’s the default behavior because
-        it’s the only configuration that can reasonably fulfill that role. This is
-        also the only way to output text and binary strings in a single CBOR document.
+        This is (currently) the only way to output text and binary strings in a
+        single CBOR document. Unfortunately, because Perl itself doesn’t reliably
+        distinguish between text and binary strings, neither can CBOR::Free. If you
+        want to try, though:
+
+        - Be sure to use character-decoding logic that always
+        sets the string’s UTF8 flag, even if the input is plain ASCII.
+        (As of this writing, [Encode](https://metacpan.org/pod/Encode) and [Unicode::UTF8](https://metacpan.org/pod/Unicode::UTF8) work this way.)
+        - Whatever consumes your Perl-sourced CBOR should probably accept
+        “mis-typed” strings.
 
     - `encode_text`: Treats all strings as unencoded characters.
     All CBOR strings will be text.
 
-        This is probably what you want if you’re
-        following the receive-decode-process-encode-output workflow that
+        This is probably what you want if you
+        follow the receive-decode-process-encode-output workflow that
         [perlunitut](https://metacpan.org/pod/perlunitut) recommends (which you might be doing via `use utf8`)
         **AND** if you intend for your CBOR to contain exclusively text.
 
@@ -70,7 +77,8 @@ in the below descriptions applies equally to hash keys.)
         version.)
 
     - `as_text`: Treats all strings as octets of UTF-8.
-    Wide characters are thus invalid input. All CBOR strings will be text.
+    Wide characters (i.e., code points above 255) are thus invalid input.
+    All CBOR strings will be text.
 
         This is probably what you want if you forgo character decoding (and encoding),
         treating all input as octets, **BUT** you still intend for your CBOR to
@@ -80,24 +88,13 @@ in the below descriptions applies equally to hash keys.)
 
         (Perl internals note: if SvUTF8, the CBOR will be the downgraded version.)
 
-    - `as_binary`: It’s like `as_text`, but outputs CBOR binary
+    - `as_binary`: Like `as_text`, but outputs CBOR binary
     instead of text.
 
         This is probably what you want if your application is “all binary,
         all the time”.
 
         Think of this option as: “Just the bytes, ma’am.”
-
-- `text_keys` - EXPERIMENTAL. Encodes all Perl hash keys as CBOR text.
-If you use this mode then your strings **must** be properly decoded, or else
-the output CBOR may mangle your string.
-
-    For example, this:
-
-        CBOR::Free::encode( { "\xc3\xa9" => 1 }, text_keys => 1 )
-
-    … will create a CBOR map with key `"\xc3\x83\xc2\xa9"` because the key
-    in the hash that was sent to `encode()` was not properly decoded.
 
 - `preserve_references` - A boolean that makes the encoder encode
 multi-referenced values via [CBOR’s “shared references” tags](https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml). This allows encoding of shared
@@ -117,37 +114,16 @@ languages cannot represent.
 
 Notes on mapping Perl to CBOR:
 
-- The internal state of a defined Perl scalar (e.g., whether it’s an
+- The internal state of a Perl scalar (e.g., whether it’s an
 integer, float, string, etc.) determines its CBOR encoding.
 - Perl doesn’t currently provide reliable binary/character string types.
-CBOR::Free, in its default configuration, tries to distinguish anyway by
-looking at a string’s UTF8 flag: if
-set, then the string becomes CBOR text; otherwise, it’ll be CBOR binary.
-That’s not always going to work, though. A trivial example:
-
-        perl -MCBOR::Free -e'my $str = "abc"; utf8::decode($str); print CBOR::Free::encode($str)'
-
-    Since `utf8::decode()` doesn’t set the UTF8 flag unless it “has to”
-    (see [utf8](https://metacpan.org/pod/utf8)), that function is a no-op in the above.
-
-    The above _will_ produce a CBOR text string, though, if you use
-    [Unicode::UTF8](https://metacpan.org/pod/Unicode::UTF8) instead of [utf8](https://metacpan.org/pod/utf8):
-
-        perl -MUnicode::UTF8 -MCBOR::Free -e'print CBOR::Free::encode(Unicode::UTF8::decode_utf8("abc"))'
-
-    The crucial point, though, is that, because Perl itself doesn’t guarantee
-    the reliable string types that CBOR recognizes, any heuristics we apply
-    to distinguish one from the other are a “best-guess” merely.
-
-    **IMPORTANT:** If you use the default encoding configuration, whatever
-    consumes your Perl-sourced CBOR **MUST** account for the prospect of an
-    incorrectly-typed string.
-
+The various `string_encode_mode` options (described above) provide ways to
+deal with this problem.
 - The above applies also to strings vs. numbers: whatever consumes
 your Perl-sourced CBOR **MUST** account for the prospect of numbers that
 are in CBOR as strings, or vice-versa.
 - Perl hash keys are serialized as strings, either binary or text
-(following the algorithm described above).
+(according to the `string_encode_mode`).
 - [Types::Serialiser](https://metacpan.org/pod/Types::Serialiser) booleans are encoded as CBOR booleans.
 Perl undef is encoded as CBOR null. (NB: No Perl value encodes as CBOR
 undefined.)
@@ -177,8 +153,10 @@ CBOR binary strings become undecoded Perl strings.
 
     Notes:
 
-    - Invalid UTF-8 in a CBOR text string is considered
-    invalid input and will thus prompt a thrown exception.
+    - Invalid UTF-8 in a CBOR text string is usually considered
+    invalid input and will thus prompt a thrown exception. (See
+    [CBOR::Free::Decoder](https://metacpan.org/pod/CBOR::Free::Decoder) and [CBOR::Free::SequenceDecoder](https://metacpan.org/pod/CBOR::Free::SequenceDecoder) if you want
+    to tolerate invalid UTF-8.)
     - You can reliably use `utf8::is_utf8()` to determine if a given Perl
     string came from CBOR text or binary, but **ONLY** if you test the scalar as
     it appears in the newly-decoded data structure itself. Generally Perl code

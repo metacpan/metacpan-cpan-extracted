@@ -82,7 +82,7 @@ Get the default key bindings for mpv:
 
 VERSION
 
-2.3.2
+2.3.3
 
 SEE ALSO
 
@@ -109,7 +109,7 @@ This is free software; you can redistribute it and/or modify it under the terms 
 [1] https://metacpan.org/pod/LWP
 [2] https://github.com/jgm/pandoc/issues/1266
 [3] https://github.com/miyagawa/cpanminus/tree/devel/App-cpanminus#readme
-[4] https://github.com/chocolateboy/App-Wax/wiki/Zsh-completion-script
+[4] https://github.com/chocolateboy/wax/wiki/Zsh-completion-script
 [5] https://ccl.cse.nd.edu/software/parrot/
 [6] https://github.com/libfuse/sshfs
 [7] https://github.com/sindresorhus/tmpin

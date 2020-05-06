@@ -11,7 +11,6 @@ BEGIN {
 
 my $debug = 'error';
 my ( $issuer, $sp, $res, $spId, $idpId );
-my %handlerOR = ( issuer => [], sp => [] );
 
 LWP::Protocol::PSGI->register(
     sub {
@@ -63,14 +62,8 @@ LWP::Protocol::PSGI->register(
     }
 );
 
-ok( $issuer = issuer(), 'Issuer portal' );
-$handlerOR{issuer} = \@Lemonldap::NG::Handler::Main::_onReload;
-switch ('sp');
-&Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
-
-ok( $sp = sp(), 'SP portal' );
-$handlerOR{sp} = \@Lemonldap::NG::Handler::Main::_onReload;
-count(2);
+$issuer = register( 'issuer', \&issuer );
+$sp     = register( 'sp',     \&sp );
 
 # Simple SP access
 ok(
@@ -133,7 +126,7 @@ my $newId = $res->{session}->{_session_id};
 
 # Verify a key
 ok( $res = $issuer->_get("/sessions/global/$newId/uid"), 'Verify uid' );
-ok( $res->[2]->[0] eq 'zz', ' Uid is good' );
+ok( $res->[2]->[0] eq 'zz',                              ' Uid is good' );
 count(4);
 
 # Update a key
@@ -166,7 +159,7 @@ count(3);
 
 # Verify new key
 ok( $res = $issuer->_get("/sessions/global/$newId/cn"), 'Verify cn' );
-ok( $res->[2]->[0] eq 'CN', ' CN is good' );
+ok( $res->[2]->[0] eq 'CN',                             ' CN is good' );
 count(2);
 
 use_ok('Lemonldap::NG::Common::Apache::Session::REST');
@@ -304,13 +297,6 @@ clean_sessions();
 done_testing( count() );
 
 # Redefine LWP methods for tests
-sub switch {
-    my $type = shift;
-    @Lemonldap::NG::Handler::Main::_onReload = @{
-        $handlerOR{$type};
-    };
-}
-
 sub issuer {
     return LLNG::Manager::Test->new( {
             ini => {

@@ -4,7 +4,7 @@
       "Daniel Berrange <dan@berrange.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4229",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "gpl_1"
    ],
@@ -34,14 +34,14 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "v5.8.0"
+            "perl" : "v5.16.0"
          }
       }
    },
    "provides" : {
       "Sys::Virt" : {
          "file" : "lib/Sys/Virt.pm",
-         "version" : "v6.1.0"
+         "version" : "v6.3.0"
       },
       "Sys::Virt::Domain" : {
          "file" : "lib/Sys/Virt/Domain.pm"
@@ -96,10 +96,10 @@
          "http://www.gnu.org/licenses/gpl.html"
       ],
       "repository" : {
-         "url" : "https://libvirt.org/git/?p=libvirt-perl.git;a=summary"
+         "url" : "https://gitlab.com/libvirt/libvirt-perl"
       },
       "x_MailingList" : "http://www.redhat.com/mailman/listinfo/libvir-list"
    },
-   "version" : "v6.1.0",
+   "version" : "v6.3.0",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

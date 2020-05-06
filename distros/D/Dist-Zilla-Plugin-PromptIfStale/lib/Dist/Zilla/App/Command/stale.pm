@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 package Dist::Zilla::App::Command::stale;
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
+# vim: set ts=8 sts=2 sw=2 tw=115 et :
 # ABSTRACT: print your distribution's prerequisites and plugins that are out of date
 
-our $VERSION = '0.055';
+our $VERSION = '0.057';
 
 use Dist::Zilla::App -command;
 
@@ -25,7 +25,7 @@ sub stale_modules
 
     my $dzil7 = eval { Dist::Zilla::App->VERSION('7.000') };
 
-    my @plugins = grep { $_->isa('Dist::Zilla::Plugin::PromptIfStale') }
+    my @plugins = grep $_->isa('Dist::Zilla::Plugin::PromptIfStale'),
         $dzil7 ? $zilla->plugins : @{ $zilla->plugins };
 
     if (not @plugins)
@@ -41,7 +41,7 @@ sub stale_modules
     # (this really should be abstracted better in Dist::Zilla::Dist::Builder)
     if ($all or do { require List::Util; List::Util->VERSION('1.33'); List::Util::any(sub { $_->check_all_prereqs }, @plugins) })
     {
-        $_->before_build for grep { not $_->isa('Dist::Zilla::Plugin::PromptIfStale') }
+        $_->before_build for grep !$_->isa('Dist::Zilla::Plugin::PromptIfStale'),
             $dzil7 ? $zilla->plugins_with(-BeforeBuild) : @{ $zilla->plugins_with(-BeforeBuild) };
         $_->gather_files for $dzil7 ? $zilla->plugins_with(-FileGatherer) : @{ $zilla->plugins_with(-FileGatherer) };
         $_->set_file_encodings for $dzil7 ? $zilla->plugins_with(-EncodingProvider) : @{ $zilla->plugins_with(-EncodingProvider) };
@@ -49,9 +49,9 @@ sub stale_modules
         $_->munge_files  for $dzil7 ? $zilla->plugins_with(-FileMunger) : @{ $zilla->plugins_with(-FileMunger) };
         $_->register_prereqs for $dzil7 ? $zilla->plugins_with(-PrereqSource) : @{ $zilla->plugins_with(-PrereqSource) };
 
-        push @modules, map {
-            ( $all || $_->check_all_prereqs ? $_->_modules_prereq : () ),
-        } @plugins;
+        push @modules, map
+            $all || $_->check_all_prereqs ? $_->_modules_prereq : (),
+            @plugins;
     }
 
     foreach my $plugin (@plugins)
@@ -150,7 +150,7 @@ sub _missing_authordeps
 
     require Dist::Zilla::Util::AuthorDeps;
     Dist::Zilla::Util::AuthorDeps->VERSION(5.021);
-    my @authordeps = map { (%$_)[0] }
+    my @authordeps = map +(%$_)[0],
         @{ Dist::Zilla::Util::AuthorDeps::extract_author_deps(
             $root,          # repository root
             1,              # --missing
@@ -172,7 +172,7 @@ Dist::Zilla::App::Command::stale - print your distribution's prerequisites and p
 
 =head1 VERSION
 
-version 0.055
+version 0.057
 
 =head1 SYNOPSIS
 
@@ -233,7 +233,7 @@ L<http://dzil.org/#mailing-list>.
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.freenode.org>.
 
 =head1 AUTHOR
 

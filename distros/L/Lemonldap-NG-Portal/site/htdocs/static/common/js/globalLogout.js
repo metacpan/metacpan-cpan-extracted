@@ -20,6 +20,11 @@
   };
 
   $(document).ready(function() {
+    $(".data-epoch").each(function() {
+      var myDate;
+      myDate = new Date($(this).text() * 1000);
+      return $(this).text(myDate.toLocaleString());
+    });
     window.setTimeout(go, 30000);
     return window.setTimeout(timer, 1000);
   });

@@ -22,7 +22,7 @@ for ( my $i = 0 ; $i < @ARGV ; $i++ ) {
 
 $action ||= "help";
 
-if ( $action =~ /^(?:[gs]et|(?:add|del)Key|save|restore)$/ ) {
+if ( $action =~ /^(?:[gs]et|(?:add|del)Key|save|restore|rollback)$/ ) {
     eval { require Lemonldap::NG::Manager::Cli; };
     die "Manager libraries not available, aborting ($@)" if ($@);
     Lemonldap::NG::Manager::Cli->run(@ARGV);
@@ -50,6 +50,14 @@ Available actions:
  - save                          : export configuration to STDOUT
  - restore -                     : import configuration from STDIN
  - restore <file>                : import configuration from file
+ - rollback                      : restore previous configuration
+
+Options:
+ - yes <0|1>                     : accept confirmation prompt automatically
+ - log <msg>                     : set configuration log message
+ - safe <0|1>                    : fail in case the requested configuration is invalid
+ - force <0|1>                   : allow overwrite of existing config number
+ - cfgNum <num>                  : set new configuration number (requires -force 1)
 
 See Lemonldap::NG::Manager::Cli(3) for more
 };
@@ -75,12 +83,17 @@ Update local configuration cache
 Save configuration
 
   $ lemonldap-ng-cli save >conf.json
+  $ lemonldap-ng-cli -cfgNum 19 save >conf-19.json
 
 Restore configuration
 
   $ lemonldap-ng-cli restore conf.json
   # OR
   $ lemonldap-ng-cli restore - <conf.json
+
+Cancel the last configuration change
+
+  $ lemonldap-ng-cli rollback
 
 Get a configuration parameter value
 
@@ -91,6 +104,12 @@ Set some values
   $ lemonldap-ng-cli set portal http://auth.e.com/ domain e.com
   # add or set a key
   $ lemonldap-ng-cli addKey macro fullname '$givenName." ".$lastName'
+
+  # without changing the version number
+  $ lemonldap-ng-cli -force 1 -cfgNum 1 set portal http://auth.e.com/ domain e.com
+
+  # without asking for confirmation
+  $ lemonldap-ng-cli -yes 1 set portal http://auth.e.com/ domain e.com
 
 =head1 DESCRIPTION
 
@@ -117,6 +136,32 @@ and L<Lemonldap::NG::Common::Cli>
 =item addKey
 
 =item delKey
+
+=back
+
+=head2 Available options
+
+=over
+
+=item -yes
+
+Confirm modification automatically (default: 0)
+
+=item -log
+
+Allows you to set the log message that will be displayed in the manager
+
+=item -safe
+
+The configuration change will be aborted if it contains errors (default: 0)
+
+=item -cfgNum
+
+Choose a particular configuration number (default: latest)
+
+=item -force
+
+Allows you to force overwriting an existing configuration (default: 0)
 
 =back
 

@@ -317,8 +317,11 @@ foreach
                       $requestedAttribute->getAttribute("FriendlyName");
                     my $nameformat =
                       $requestedAttribute->getAttribute("NameFormat");
+                    my $required =
+                      ( $requestedAttribute->getAttribute("isRequired") =~
+                          /true/i ) ? 1 : 0;
                     $requestedAttributes->{$friendlyname} =
-                      "1;$name;$nameformat;$friendlyname";
+                      "$required;$name;$nameformat;$friendlyname";
                     if ( $opts{verbose} ) {
                         print
 "Attribute $friendlyname ($name) requested by SP $entityID\n";

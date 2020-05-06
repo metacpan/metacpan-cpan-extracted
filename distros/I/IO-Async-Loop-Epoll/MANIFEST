@@ -12,7 +12,8 @@ t/01loop-io.t
 t/02loop-timer.t
 t/03loop-signal.t
 t/04loop-idle.t
-t/05loop-child.t
+t/05loop-process.t
 t/06loop-control.t
+t/07loop-metrics.t
 t/10loop-fork.t
 t/99pod.t

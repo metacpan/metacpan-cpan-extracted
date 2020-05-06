@@ -21,8 +21,8 @@ SKIP: {
     $dbh->do("INSERT INTO users VALUES ('rtyler','rtyler','Test user 1')");
 
     $client = iniCmb('[Dm] or [DB]');
-    expectCookie( try('dwho') );
-    expectCookie( try('dvador') );
+    $client->logout( expectCookie( try('dwho') ) );
+    $client->logout( expectCookie( try('dvador') ) );
 }
 count($maintests);
 clean_sessions();
@@ -61,11 +61,11 @@ sub iniCmb {
                             for  => 0,
                             type => 'DBI',
                             over => {
-                                dbiAuthChain => "dbi:SQLite:dbname=$userdb",
-                                dbiAuthUser  => '',
-                                dbiAuthPassword     => '',
-                                dbiAuthTable        => 'users',
-                                dbiAuthLoginCol     => 'user',
+                                dbiAuthChain    => "dbi:SQLite:dbname=$userdb",
+                                dbiAuthUser     => '',
+                                dbiAuthPassword => '',
+                                dbiAuthTable    => 'users',
+                                dbiAuthLoginCol => 'user',
                                 dbiAuthPasswordCol  => 'password',
                                 dbiAuthPasswordHash => '',
                                 dbiExportedVars     => '{"user":"user"}',

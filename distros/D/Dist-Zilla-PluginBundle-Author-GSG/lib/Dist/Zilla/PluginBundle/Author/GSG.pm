@@ -2,7 +2,7 @@ package Dist::Zilla::PluginBundle::Author::GSG;
 
 # ABSTRACT: Grant Street Group CPAN dists
 use version;
-our $VERSION = 'v0.1.1'; # VERSION
+our $VERSION = 'v0.1.2'; # VERSION
 
 use Carp;
 use Git::Wrapper;
@@ -244,7 +244,7 @@ Dist::Zilla::PluginBundle::Author::GSG - Grant Street Group CPAN dists
 
 =head1 VERSION
 
-version v0.1.1
+version v0.1.2
 
 =head1 SYNOPSIS
 
@@ -539,7 +539,7 @@ dependency chain.
 
 =head2 Cutting a release
 
-    carton exec dzil release
+    carton exec -- dzil release
 
 This should calculate the new version number, build a new release tarball,
 add a release tag, create the release on GitHub and upload the tarball to it.
@@ -547,9 +547,15 @@ add a release tag, create the release on GitHub and upload the tarball to it.
 You can set the C<V> environment variable to force a specific version,
 as described by L<Dist::Zilla::Plugin::Git::NextVersion>.
 
-    V=2.0.0 carton exec dzil release
+    V=2.0.0 carton exec -- dzil release
 
 =over
+
+=item Make sure your local checkout has what you want to release
+
+Completing a C<< dzil release >> will commit any changes,
+tag the release version to the currently checked out commit,
+and push to the remote.
 
 =item Your git remote must be a format GitHub::UploadRelease understands
 
@@ -560,10 +566,9 @@ C<https://github.com/GrantsStreetGroup/$repo.git>.
 
 As shown in the "Fetch URL" from C<git remote -n $remote>,
 
-=item Set C<github.user> and either C<github.password> or C<github.token>
+=item Set C<github.user> and C<github.token>
 
-You should probably use a token instead of your password,
-which you can get by following
+You can get a GitHub token by following
 L<GitHub's instructions|https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line>.
 
     git config --global github.user  github_login_name

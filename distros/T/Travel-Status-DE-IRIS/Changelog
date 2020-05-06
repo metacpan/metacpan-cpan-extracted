@@ -1,3 +1,11 @@
+Travel::Status::DE::IRIS 1.46 - Mon May 04 2020
+
+    * Document LWP::Protocol::https dependency
+    * Discourage building with Geo::Distance 0.21.
+      Geo::Distance 0.21, released on 7 Mar 2019, is the only release using
+      GIS::Distance's distance_km method -- which was removed on 9 Mar 2019
+      in GIS::Distance 0.14
+
 Travel::Status::DE::IRIS 1.45 - Wed Mar 18 2020
 
     * Provide properly versioned Stations.pm file

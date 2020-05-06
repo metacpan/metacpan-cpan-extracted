@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More;
 
 use EV;
 use IO::Async::Loop::EV;
@@ -28,3 +28,5 @@ $loop->loop_once until defined $ev_timer and defined $ioasync_timer;
 
 is( $ev_timer,      1, 'EV timer' );
 is( $ioasync_timer, 1, 'IO::Async timer' );
+
+done_testing;

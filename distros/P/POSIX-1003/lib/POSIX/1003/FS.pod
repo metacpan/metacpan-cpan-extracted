@@ -4,11 +4,6 @@
 
 POSIX::1003::FS - POSIX for the file-system
 
-=head1 INHERITANCE
-
- POSIX::1003::FS
-   is a POSIX::1003::Module
-
 =head1 SYNOPSIS
 
   use POSIX::1003::FS ':access';
@@ -29,36 +24,80 @@ POSIX::1003::FS - POSIX for the file-system
 
 You may also need L<POSIX::1003::Pathconf|POSIX::1003::Pathconf>.
 
-See L<documentation in the base class|POSIX::1003::Module/"DESCRIPTION">.
- 
-=head1 METHODS
-
-See L<documentation in the base class|POSIX::1003::Module/"METHODS">.
- 
-=over 4
-
-=item POSIX::1003::FS-E<gt>B<exampleValue>(NAME)
-
-See L<POSIX::1003::Module/"METHODS">
-
-=item $obj-E<gt>B<import>()
-
-See L<POSIX::1003::Module/"METHODS">
-
-=back
-
 =head1 FUNCTIONS
 
 =head2 Standard POSIX
 
 =over 4
 
-=item B<access>(FILENAME, FLAGS)
+=item B<access>($filename, $flags)
 
 Read C<man filetest> before you start using this function!
-Use the C<*_OK> constants for FLAGS.
+Use the C<*_OK> constants for $flags.
 
-=item B<lchown>(UID, GID, FILENAMES)
+=item B<fnmatch>( $pattern, $name, [$flags] )
+
+Check whether $name matches $pattern, under control of $flags (FNM_*
+constants).  Do always check the return value for FNM_NOMATCH (true!!!)
+
+example: 
+
+  use POSIX::1003::FS  ':glob';
+  next if fnmatch('a*', 'ABC', FNM_CASEFOLD)==FNM_NOMATCH;
+
+=item B<glob>($pattern|\@patterns, %options)
+
+Returns a list of file and directory names which match the $pattern
+(or any of the @patterns), using the libc implementation of L<glob()|POSIX::1003::FS/"Standard POSIX">.
+Various system shells (sh, bash, tsh, etc) use this same function with
+different flags.  This function provides any possible combination.
+
+B<BE WARNED> that function returns bytes: file names are B<not
+printable strings> because the encoding used for file names on disk is
+not defined (on UNIXes).  Read more in L</Filenames to string>
+
+B<BE WARNED> that File::Glob does not use the system's libc C<glob()>,
+but includes the bare code of that implementation.  For that reason,
+it's C<bsd_glob()> does work on Windows and other platforms in the same
+way.  Also, C<bsd_glob()> supports the non-posix '{}' syntax as BSD has.
+It also adapts the defaults of the flags to match the default OS behavior.
+On the other hand, File::Glob does not support the C<on_error> callback.
+
+ -Option  --Default
+  flags     GLOB_NOSORT|GLOB_NOESCAPE|GLOB_BRACE
+  on_error  undef
+  unique    <false>
+
+=over 2
+
+=item flags => INTEGER
+
+There are many interesting flags to tune the expansion.  Sorting should
+happen in a locale context, so there is no use having glob() do it on
+bytes.  GLOB_APPEND will be used automatically, when needed.  GLOB_DOOFFS
+cannot be used (not needed)
+
+=item on_error => CODE
+
+What to do when an error is encountered.  The CODE will be called with
+the path causing the problem, and the error code.  When you want the
+search to continue, you have to return '0'.
+This function is B<not thread safe>
+
+=item unique => BOOLEAN
+
+When you use patterns which overlap, you may want to remove doubles.
+Still, this happens on bytes... there is a possibility that different
+byte strings display the same in utf8 space.
+
+=back
+
+example: 
+
+  my ($err, $fns) = glob(\@roots, flags => GLOB_NOSORT|GLOB_MARK,
+      on_error => sub { warn "skip $_[0]: error $_[1]"; 0} )
+
+=item B<lchown>($uid, $gid, $filenames)
 
 Like C<chown()>, but does not follow symlinks when encountered. Returns
 the number of files successfully changed.
@@ -79,30 +118,38 @@ than one filename, however, hinders correct error reporting.
   use POSIX::1003::FS 'lchown';
   my @successes = lchown($uid, $gid, @filenames);
 
-=item B<mkdir>([FILENAME [MASK]])
+=item B<lstat>( [$fh|$fn|$dirfh] )
+
+Simply C<CORE::lstat()>.  See also L<stat()|POSIX::1003::FS/"Standard POSIX">
+
+=item B<mkdir>( [$filename [$mask]] )
 
 Simple C<CORE::mkdir()>
 
-=item B<mkfifo>(FILENAME, MODE)
+=item B<mkfifo>($filename, $mode)
 
-=item B<mknod>(PATH, MODE, DEVICE)
+=item B<mknod>($path, $mode, $device)
 
-Create a special device node on PATH. Useful symbols for MODE can be
-collected from Fcntl (import tag C<:mode>).  The DEVICE number is
+Create a special device node on $path. Useful symbols for $mode can be
+collected from Fcntl (import tag C<:mode>).  The $device number is
 a combination from the type (I<major> number), a sequence number and
 usage information (combined in a I<minor> number).
 
-=item B<rename>(OLDNAME, NEWNAME)
+=item B<rename>($oldname, $newname)
 
 [0.93] Give a file or directory a new name, the basis of the UNIX C<mv>
 ('move') command.  This will use C<CORE::rename()>. 
 
 B<Be warned> that Window's C<rename> implementation will fail when
-NEWNAME exists.  That behavior is not POSIX compliant.  On many platforms
+$newname exists.  That behavior is not POSIX compliant.  On many platforms
 (especially the older), a C<rename> between different partitions is not
 allowed.
 
-=item B<utime>(ATIME, MTIME, FILENAMES)
+=item B<stat>( [$fh|$fn|$dirfh] )
+
+Simply C<CORE::stat()>.  See also L<lstat()|POSIX::1003::FS/"Standard POSIX">
+
+=item B<utime>($atime, $mtime, $filenames)
 
 Simply C<CORE::utime()>
 
@@ -117,11 +164,11 @@ B<Be Warned> that C<POSIX.pm> uses a different parameter order than CORE.
 
 =over 4
 
-=item B<S_ISBLK>(MODE)
+=item B<S_ISBLK>($mode)
 
-=item B<S_ISCHR>(MODE)
+=item B<S_ISCHR>($mode)
 
-=item B<S_ISDIR>(MODE)
+=item B<S_ISDIR>($mode)
 
 example: 
 
@@ -130,23 +177,23 @@ example:
 
   if(S_ISDIR((lstat $fn)[2])) ...
 
-=item B<S_ISFIFO>(MODE)
+=item B<S_ISFIFO>($mode)
 
-=item B<S_ISLNK>(MODE)
+=item B<S_ISLNK>($mode)
 
-=item B<S_ISREG>(MODE)
+=item B<S_ISREG>($mode)
 
-=item B<S_ISSOCK>(MODE)
+=item B<S_ISSOCK>($mode)
 
-=item B<S_ISVTX>(MODE)
+=item B<S_ISVTX>($mode)
 
-=item B<S_ISWHT>(MODE)
+=item B<S_ISWHT>($mode)
 
-=item B<major>(DEVICE)
+=item B<major>($device)
 
-=item B<makedev>(MAJOR, MINOR)
+=item B<makedev>($major, $minor)
 
-Combine MAJOR and MINOR into a single DEVICE number.
+Combine $major and $minor into a single DEVICE number.
 
  my $device      = (stat $filename)[6];
  my $device_type = major $device;
@@ -155,58 +202,68 @@ Combine MAJOR and MINOR into a single DEVICE number.
  my $device = makedev $major, $minor;
  mknod $specialfile, $mode, $device;
 
-=item B<minor>(DEVICE)
+=item B<minor>($device)
 
 =back
 
 =head1 CONSTANTS
 
 The following constants are exported, shown here with the values
-discovered during installation of this module:
+discovered during installation of this module.  When you ask for
+C<:constants>, you get all, but they are also grouped by tag.
+
+=head2 export tag :stat
+
+Export L<stat()|POSIX::1003::FS/"Standard POSIX"> and L<lstat()|POSIX::1003::FS/"Standard POSIX"> including their related constants.
+Besides, the node related functions L<mkfifo()|POSIX::1003::FS/"Standard POSIX">, L<mknod()|POSIX::1003::FS/"Standard POSIX">, L<mkdir()|POSIX::1003::FS/"Standard POSIX">,
+and L<lchown()|POSIX::1003::FS/"Standard POSIX">.  Also, the common C<S_IS*> C-level macro are provided
+as function.
 
 =for comment
-#TABLE_FSYS_START
+#TABLE_FSYS_STAT_START
 
-  F_OK          0       S_IFMT        61440   S_ISVTX       512
-  FILENAME_MAX  4096    S_IFREG       32768   S_IWGRP       16
-  MAX_CANON     255     S_IFSOCK      49152   S_IWOTH       2
-  NAME_MAX      255     S_IRGRP       32      S_IWUSR       128
-  PATH_MAX      4096    S_IROTH       4       S_IXGRP       8
-  R_OK          4       S_IRUSR       256     S_IXOTH       1
-  S_IFBLK       24576   S_IRWXG       56      S_IXUSR       64
-  S_IFCHR       8192    S_IRWXO       7       W_OK          2
-  S_IFDIR       16384   S_IRWXU       448     X_OK          1
-  S_IFIFO       4096    S_ISGID       1024    
-  S_IFLNK       40960   S_ISUID       2048    
-
+  During installation, a symbol table will get inserted here.
 
 =for comment
-#TABLE_FSYS_END
+#TABLE_FSYS_STAT_END
 
+=head2 export tag :access
 
+Exports function L<access()|POSIX::1003::FS/"Standard POSIX"> plus its related constants.
 
+=for comment
+#TABLE_FSYS_ACC_START
 
+  During installation, a symbol table will get inserted here.
 
-All functions and constants which start with C<S_*> can be imported
-using the C<:stat> tag, including all related C<S_IS*> functions.
+=for comment
+#TABLE_FSYS_ACC_END
 
-The C<*_OK> tags can be imported with C<:access>
+=head2 export tag :glob
 
-Permission flags get loaded with C<:perms>.
+The L<glob()|POSIX::1003::FS/"Standard POSIX"> and L<fnmatch()|POSIX::1003::FS/"Standard POSIX"> related constants.
+
+=for comment
+#TABLE_FSYS_GLOB_START
+
+  During installation, a symbol table will get inserted here.
+
+=for comment
+#TABLE_FSYS_GLOB_END
 
 =head1 SEE ALSO
 
-This module is part of POSIX-1003 distribution version 0.98,
-built on December 03, 2013. Website: F<http://perl.overmeer.net>.  The code is based on L<POSIX>, which
+This module is part of POSIX-1003 distribution version 1.00,
+built on May 05, 2020. Website: F<http://perl.overmeer.net/CPAN>.  The code is based on L<POSIX>, which
 is released with Perl itself.  See also L<POSIX::Util> for
 additional functionality.
 
 =head1 COPYRIGHTS
 
-Copyrights 2011-2013 on the perl code and the related documentation
+Copyrights 2011-2020 on the perl code and the related documentation
  by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

@@ -1,0 +1,111 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+strategy:
+  matrix:
+    windows-perl530:
+        PERL_VERSION: '5.30.2.1'
+        PERL_MAKE: 'gmake'
+        IMAGE: 'windows-latest'
+    linux-perl530:
+        PERL_VERSION: '5.30.2'
+        IMAGE: 'ubuntu-latest'
+    linux-perl528:
+        PERL_VERSION: '5.28.2'
+        IMAGE: 'ubuntu-latest'
+    linux-perl526:
+        PERL_VERSION: '5.26.3'
+        IMAGE: 'ubuntu-latest'
+    linux-perl524:
+        PERL_VERSION: '5.24.4'
+        IMAGE: 'ubuntu-latest'
+    linux-perl522:
+        PERL_VERSION: '5.22.4'
+        IMAGE: 'ubuntu-latest'
+    macos-perl530:
+        PERL_VERSION: '5.30.2'
+        IMAGE: 'macos-latest'
+    macos-perl528:
+        PERL_VERSION: '5.28.2'
+        IMAGE: 'macos-latest'
+    macos-perl526:
+        PERL_VERSION: '5.26.3'
+        IMAGE: 'macos-latest'
+    macos-perl524:
+        PERL_VERSION: '5.24.4'
+        IMAGE: 'macos-latest'
+    macos-perl522:
+        PERL_VERSION: '5.22.4'
+        IMAGE: 'macos-latest'
+
+pool:
+  vmImage: $(IMAGE)
+
+steps:
+- script: |
+    sudo apt-get -qq install libssl-dev libudev-dev
+  condition: startsWith(variables['IMAGE'], 'ubuntu')
+  displayName: 'Install dependencies (Ubuntu)'
+
+- script: |
+    PATH=~/perl5/bin:~/perl5/perlbrew/bin:~/perl5/perlbrew/perls/perl-$(PERL_VERSION)/bin:$PATH
+    echo "##vso[task.setvariable variable=PATH]$PATH"
+    wget -O - https://install.perlbrew.pl | bash
+    perlbrew install --notest perl-$(PERL_VERSION)
+    perl -V
+    curl -L https://cpanmin.us | perl - App::cpanminus
+  condition: or(startsWith(variables['IMAGE'], 'ubuntu'), startsWith(variables['IMAGE'], 'macos'))
+  displayName: 'Install perl (Unix)'
+
+- script: |
+    choco uninstall strawberryperl
+    choco install strawberryperl -y --version=$(PERL_VERSION)
+    perl -V
+  condition: startsWith(variables['IMAGE'], 'windows')
+  displayName: 'Install perl (Windows)'
+
+- script: |
+    call cpanm --quiet --notest Dist::Zilla Dist::Zilla::PluginBundle::Author::JACQUESG App::Ack
+    call dzil authordeps --missing | ack -v "inc::" | cpanm --quiet --notest
+    call dzil listdeps --missing | cpanm --quiet --notest
+  condition: startsWith(variables['IMAGE'], 'windows')
+  displayName: 'Install CPAN dependencies (Windows)'
+
+- script: |
+    cpanm --quiet --notest Dist::Zilla Dist::Zilla::PluginBundle::Author::JACQUESG App::Ack
+    dzil authordeps --missing | ack -v "inc::" | cpanm --quiet --notest
+    dzil listdeps --missing | cpanm --quiet --notest
+  condition: or(startsWith(variables['IMAGE'], 'ubuntu'), startsWith(variables['IMAGE'], 'macos'))
+  displayName: 'Install CPAN dependencies (Unix)'
+
+- script: |
+    dzil cover -ignore_re ^deps -ignore_re CORE -ignore_re ^const -ignore_re usr -test -report coveralls
+  condition: startsWith(variables['IMAGE'], 'ubuntu')
+  env:
+    COVERALLS_REPO_TOKEN: $(COVERALLS_REPO_TOKEN)
+    RELEASE_TESTING: 1
+    AUTOMATED_TESTING: 1
+  displayName: 'Build/Test (Linux)'
+
+- script: |
+    dzil test
+  condition: startsWith(variables['IMAGE'], 'macos')
+  env:
+    RELEASE_TESTING: 1
+    AUTOMATED_TESTING: 1
+  displayName: 'Build/Test (macOS)'
+
+- script: |
+    call dzil build --in FIDO-Raw
+    cd FIDO-Raw
+    set PATH=C:\Strawberry\perl\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\c\bin
+    perl Makefile.PL
+    $(PERL_MAKE) test
+  condition: startsWith(variables['IMAGE'], 'windows')
+  env:
+    RELEASE_TESTING: 1
+    AUTOMATED_TESTING: 1
+  displayName: 'Build/Test (Windows)'
+

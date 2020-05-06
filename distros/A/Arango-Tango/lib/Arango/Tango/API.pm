@@ -1,6 +1,6 @@
 # ABSTRACT: Internal module with the API specification
 package Arango::Tango::API;
-$Arango::Tango::API::VERSION = '0.011';
+$Arango::Tango::API::VERSION = '0.012';
 #use Arango::Tango::Database;
 #use Arango::Tango::Collection;
 
@@ -245,7 +245,7 @@ Arango::Tango::API - Internal module with the API specification
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 AUTHOR
 

@@ -1,6 +1,6 @@
 # ABSTRACT: ArangoDB Cursor object
 package Arango::Tango::Cursor;
-$Arango::Tango::Cursor::VERSION = '0.011';
+$Arango::Tango::Cursor::VERSION = '0.012';
 use warnings;
 use strict;
 
@@ -59,7 +59,7 @@ Arango::Tango::Cursor - ArangoDB Cursor object
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 USAGE
 

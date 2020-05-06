@@ -1,0 +1,45 @@
+==================================================
+Changes from 2015-05-08 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.04 at 2020-05-06 12:07:24 +0000
+-----------------------------------------
+
+  Change: ad16ae3be7aaa2824c91d3d9368cbff15bf97e33
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-05-06 13:07:24 +0000
+
+    Added Time::Piece as a prereq
+
+    It wasn't cored until v5.10.0
+
+    *sigh* 
+
+-----------------------------------------
+version 1.52 at 2020-05-03 10:57:42 +0000
+-----------------------------------------
+
+  Change: 331bef2052a6a98ee9c8e0eb9b7711b16b81d56f
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-05-03 11:57:42 +0000
+
+    Major refactoring
+
+    - Switch to use PoCo-SmokeBox-Recent-HTTP for uri retrieval
+
+    - Implemented better algorithm for upload polling 
+
+-----------------------------------------
+version 1.00 at 2020-05-01 12:08:49 +0000
+-----------------------------------------
+
+  Change: 37c1f3810a961dac632f9f5488e2d31135f57184
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-05-01 13:08:49 +0000
+
+    Initial check in and release 
+
+================
+End of releases.
+================

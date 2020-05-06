@@ -43,16 +43,16 @@ for my $check_prereqs ( 0, 1 ) {
                             my $mod = '0';
                             map {
                                 my $phase = $_;
-                                map {
-                                    [ 'Prereqs' => $phase . $_ => { 'Foo' . $mod++ => 0 } ]
-                                } qw(Requires Recommends Suggests)
+                                map
+                                    [ 'Prereqs' => $phase . $_ => { 'Foo' . $mod++ => 0 } ],
+                                    qw(Requires Recommends Suggests)
                             } qw(Runtime Test Develop);
                         },
                         [ 'PromptIfStale' => {
                                 phase => 'release',
                                 check_all_prereqs => $check_prereqs,
                                 # some of these are duplicated with prereqs
-                                module => [ 'Bar', map { 'Foo' . $_ } 0 .. 2 ]
+                                module => [ 'Bar', map 'Foo'.$_, 0 .. 2 ]
                             },
                         ],
                         [ 'FakeRelease' ],
@@ -72,7 +72,7 @@ for my $check_prereqs ( 0, 1 ) {
             my $wd = pushd $tzil->root;
             cmp_deeply(
                 [ Dist::Zilla::App::Command::stale->stale_modules($tzil) ],
-                [ 'Bar', map { 'Foo' . $_ } ('0' .. $last) ],
+                [ 'Bar', map 'Foo'.$_, ('0' .. $last) ],
                 'app finds stale modules',
             );
             Dist::Zilla::Plugin::PromptIfStale::__clear_already_checked();
@@ -81,12 +81,12 @@ for my $check_prereqs ( 0, 1 ) {
 
         my %expected_prompts = (
             before_release => [
-                map { '    ' . $_ . ' is not installed.' } 'Bar', map { 'Foo' . $_ } ('0' .. $last) ],
+                map '    '.$_.' is not installed.', 'Bar', map 'Foo'.$_, ('0' .. $last) ],
         );
 
-        my @expected_prompts = map {
-            "Issues found:\n" . join("\n", @{$expected_prompts{$_}}, 'Continue anyway?')
-        } qw(before_release);
+        my @expected_prompts = map
+            "Issues found:\n" . join("\n", @{$expected_prompts{$_}}, 'Continue anyway?'),
+            qw(before_release);
 
         $tzil->chrome->logger->set_debug(1);
 

@@ -4,7 +4,7 @@ WebService::PivotalTracker - Perl library for the Pivotal Tracker REST API
 
 # VERSION
 
-version 0.11
+version 0.12
 
 # SYNOPSIS
 
@@ -47,7 +47,8 @@ This creates a new object of this class. It accepts the following arguments:
 
 - token
 
-    An MD5 access token for Pivotal Tracker.
+    An MD5 access token for Pivotal Tracker. May be provided as a string or
+    something that stringifies to the token.
 
     This is required.
 
@@ -59,7 +60,7 @@ This creates a new object of this class. It accepts the following arguments:
 ## $pt->projects
 
 This method returns an array reference of
-[WebService::PivotalTracker::Project](https://metacpan.org/pod/WebService::PivotalTracker::Project) objects, one for each project to which
+[WebService::PivotalTracker::Project](https://metacpan.org/pod/WebService%3A%3APivotalTracker%3A%3AProject) objects, one for each project to which
 the token provides access.
 
 ## $pt->project\_stories\_where(...)
@@ -80,7 +81,7 @@ This method accepts the following arguments:
 
 ## $pt->story(...)
 
-This method returns a single [WebService::PivotalTracker::Story](https://metacpan.org/pod/WebService::PivotalTracker::Story) object, if
+This method returns a single [WebService::PivotalTracker::Story](https://metacpan.org/pod/WebService%3A%3APivotalTracker%3A%3AStory) object, if
 one exists for the given id.
 
 This method accepts the following arguments:
@@ -94,7 +95,7 @@ This method accepts the following arguments:
 ## $pt->create\_story(...)
 
 This creates a new story. This method accepts every attribute of a
-[WebService::PivotalTracker::Story](https://metacpan.org/pod/WebService::PivotalTracker::Story) object. The `project_id` and `name`
+[WebService::PivotalTracker::Story](https://metacpan.org/pod/WebService%3A%3APivotalTracker%3A%3AStory) object. The `project_id` and `name`
 parameters are required.
 
 It also accepts two additional optional parameters:
@@ -112,7 +113,7 @@ By default the story will be added as the last story in the icebox.
 ## $pt->project\_memberships(...)
 
 This looks up memberships in a project. It returns an array reference of
-[WebService::PivotalTracker::ProjectMembership](https://metacpan.org/pod/WebService::PivotalTracker::ProjectMembership) objects.
+[WebService::PivotalTracker::ProjectMembership](https://metacpan.org/pod/WebService%3A%3APivotalTracker%3A%3AProjectMembership) objects.
 
 It is useful if you need to discover information about a person who is a member
 of your project.
@@ -123,7 +124,7 @@ The `sort_by` parameter is optional.
 
 ## $pt->me
 
-This returns a [WebService::PivotalTracker::Me](https://metacpan.org/pod/WebService::PivotalTracker::Me) object for the user to which
+This returns a [WebService::PivotalTracker::Me](https://metacpan.org/pod/WebService%3A%3APivotalTracker%3A%3AMe) object for the user to which
 the token belongs.
 
 # SUPPORT
@@ -139,11 +140,11 @@ Dave Rolsky <autarch@urth.org>
 - Dave Rolsky <drolsky@maxmind.com>
 - Florian Ragwitz <rafl@debian.org>
 - Greg Oschwald <goschwald@maxmind.com>
-- Will Storey <will@summercat.com>
+- William Storey <wstorey@maxmind.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by MaxMind, Inc.
+This software is Copyright (c) 2016 - 2020 by MaxMind, Inc.
 
 This is free software, licensed under:
 

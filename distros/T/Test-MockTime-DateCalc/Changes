@@ -1,4 +1,4 @@
-Copyright 2009, 2010, 2011 Kevin Ryde
+Copyright 2009, 2010, 2011, 2019 Kevin Ryde
 
 This file is part of Test-MockTime-DateCalc.
 
@@ -17,8 +17,8 @@ with Test-MockTime-DateCalc.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
-Version 7, February 2011
-    - fixes for perl 5.6 and earlier
+Version 7, August 2019
+    - new email, bigger gpg key
 
 Version 6, October 2010
     - tests don't worry about warning messages loading Test::MockTime

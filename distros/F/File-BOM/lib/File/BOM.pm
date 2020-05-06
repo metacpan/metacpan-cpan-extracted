@@ -101,7 +101,7 @@ my @subs = qw(
 
 my @vars = qw( %bom2enc %enc2bom );
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 our @EXPORT = ();
 our @EXPORT_OK = ( @subs, @vars );
@@ -578,7 +578,7 @@ File::BOM can be used as a PerlIO::via interface.
 
     open(HANDLE, '<:via(File::BOM)', 'my_file.txt');
 
-    open(HANDLE, '>:encoding(UTF-16LE):via(File::BOM)', 'out_file.txt)
+    open(HANDLE, '>:encoding(UTF-16LE):via(File::BOM)', 'out_file.txt');
     print "foo\n"; # BOM is written to file here
 
 This method is less prone to errors on non-seekable files as spillage is
@@ -596,7 +596,7 @@ any BOM will be missed. If there is no BOM, no decoding will be done.
 
 Because of a limitation in PerlIO::via, read() always works on bytes, not characters. BOM decoding will still be done but output will be bytes of UTF-8.
 
-    open(BOM, '<:via(File::BOM)', $file)
+    open(BOM, '<:via(File::BOM)', $file);
     $bytes_read = read(BOM, $buffer, $length);
     $unicode = decode('UTF-8', $buffer, Encode::FB_QUIET);
 

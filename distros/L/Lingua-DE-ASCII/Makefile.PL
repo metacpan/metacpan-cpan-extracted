@@ -5,6 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     'NAME'		=> 'Lingua::DE::ASCII',
     'VERSION_FROM'	=> 'ASCII.pm', # finds $VERSION
+    'LICENSE'	        => 'perl',
     'PREREQ_PM'		=> {
         Test::More => 0,
     }, 

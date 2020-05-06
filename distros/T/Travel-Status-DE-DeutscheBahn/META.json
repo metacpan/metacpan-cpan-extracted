@@ -4,7 +4,7 @@
       "Copyright (C) 2015-2017 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -34,6 +34,7 @@
             "DateTime::Format::Strptime" : "0",
             "Getopt::Long" : "0",
             "JSON" : "0",
+            "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
             "List::MoreUtils" : "0",
             "List::Util" : "0",
@@ -46,19 +47,19 @@
    "provides" : {
       "Travel::Status::DE::DeutscheBahn" : {
          "file" : "lib/Travel/Status/DE/DeutscheBahn.pm",
-         "version" : "2.04"
+         "version" : "2.05"
       },
       "Travel::Status::DE::HAFAS" : {
          "file" : "lib/Travel/Status/DE/HAFAS.pm",
-         "version" : "2.04"
+         "version" : "2.05"
       },
       "Travel::Status::DE::HAFAS::Result" : {
          "file" : "lib/Travel/Status/DE/HAFAS/Result.pm",
-         "version" : "2.04"
+         "version" : "2.05"
       },
       "Travel::Status::DE::HAFAS::StopFinder" : {
          "file" : "lib/Travel/Status/DE/HAFAS/StopFinder.pm",
-         "version" : "2.04"
+         "version" : "2.05"
       }
    },
    "release_status" : "stable",
@@ -70,6 +71,6 @@
          "url" : "https://github.com/derf/Travel-Status-DE-DeutscheBahn"
       }
    },
-   "version" : "2.04",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "2.05",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

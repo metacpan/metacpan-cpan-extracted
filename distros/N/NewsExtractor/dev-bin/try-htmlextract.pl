@@ -1,7 +1,6 @@
 use v5.28;
 use warnings;
 
-use Try::Tiny;
 use JSON;
 use File::Slurp qw(read_file);
 use Encode qw(encode);
@@ -58,11 +57,7 @@ if ($opts{file}) {
         } else {
             my $article;
 
-            try {
-                ($err, $article) = $y->parse;
-            } catch {
-                $err = $_;
-            };
+            ($err, $article) = $y->parse;
 
             if ($article) {
                 print $json->encode({ url => $url, Article => $article });

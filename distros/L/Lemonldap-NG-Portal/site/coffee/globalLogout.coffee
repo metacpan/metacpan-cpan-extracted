@@ -13,5 +13,8 @@ timer = () ->
 	window.setTimeout timer, 1000
 
 $(document).ready ->
+		$(".data-epoch").each ->
+			myDate = new Date($(this).text() * 1000)
+			$(this).text(myDate.toLocaleString())
 		window.setTimeout go, 30000
 		window.setTimeout timer, 1000

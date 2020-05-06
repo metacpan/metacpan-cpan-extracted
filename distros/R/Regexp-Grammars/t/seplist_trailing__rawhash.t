@@ -11,13 +11,13 @@ my $raw_hash = qr{
     \Z
 
     <token: percentage>
-        \d{1,3} %%
+        \d{1,3} \%\%
 
     <token: perl_hash>
-        %% \w+
+        \%\% \w+
 
     <rule: perl_mod>
-        <perl_hash> %% <percentage>
+        <perl_hash> \%\% <percentage>
 
     <rule: solution>
         \d{1,3} \%\% solution

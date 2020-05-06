@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More;
 
 use POE qw( Session Kernel );
 use IO::Async::Loop::POE;
@@ -35,3 +35,5 @@ $loop->loop_once until defined $poe_timer and defined $ioasync_timer;
 
 is( $poe_timer,     1, 'POE timer' );
 is( $ioasync_timer, 1, 'IO::Async timer' );
+
+done_testing;

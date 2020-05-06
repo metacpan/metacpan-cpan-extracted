@@ -1,23 +1,41 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2020 -- leonerd@leonerd.org.uk
 
 package Net::Async::ArtNet;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use base qw( IO::Async::Socket );
-
-use IO::Socket::INET;
-use Socket qw( SOCK_DGRAM );
 
 =head1 NAME
 
 C<Net::Async::ArtNet> - use ArtNet with C<IO::Async>
+
+=head1 SYNOPSIS
+
+   use IO::Async::Loop;
+   use Net::Async::ArtNet;
+
+   my $loop = IO::Async::Loop->new;
+
+   $loop->add( Net::Async::ArtNet->new(
+      on_dmx => sub {
+         my $self = shift;
+         my ( $seq, $phy, $universe, $data ) = @_;
+
+         return unless $phy == 0 and $universe == 0;
+
+         my $ch10 = $data->[10 - 1];  # DMX channels are 1-indexed
+         print "Channel 10 now set to: $ch10\n";
+      }
+   ) );
+
+   $loop->run;
 
 =head1 DESCRIPTION
 
@@ -39,7 +57,8 @@ control values.
 
 =head1 PARAMETERS
 
-The following named parameters may be passed to C<new> or C<configure>:
+The following named parameters may be passed to C<new> or C<configure>.
+Additionally, CODE references to set callbacks for events may be passed.
 
 =over 8
 
@@ -95,16 +114,10 @@ sub _add_to_loop
    my ( $loop ) = @_;
 
    if( !defined $self->read_handle ) {
-      # TODO: IP?
-      my $sock = IO::Socket::INET->new(
-         Proto => "udp",
-         Type  => SOCK_DGRAM,
-         ReusePort => 1,
-         ReuseAddr => 1,
-         LocalPort => $self->{port},
-      ) or die "Cannot socket() - $@";
-
-      $self->set_handle( $sock );
+      return $self->bind(
+         service  => $self->{port},
+         socktype => "dgram",
+      )->get; # Blocking call, but numeric lookup so should be OK
    }
 
    $self->SUPER::_add_to_loop( @_ );

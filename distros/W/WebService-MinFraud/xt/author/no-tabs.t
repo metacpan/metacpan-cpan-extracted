@@ -75,6 +75,7 @@ my @files = (
     't/data/full-request.json',
     't/data/insights-response.json',
     't/data/score-response.json',
+    't/lib/Secret.pm',
     't/lib/Test/WebService/MinFraud.pm'
 );
 

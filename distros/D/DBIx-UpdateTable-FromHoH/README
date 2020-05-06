@@ -1,0 +1,121 @@
+NAME
+    DBIx::UpdateTable::FromHoH - Update database table from hash-of-hash
+
+VERSION
+    This document describes version 0.002 of DBIx::UpdateTable::FromHoH
+    (from Perl distribution DBIx-UpdateTable-FromHoH), released on
+    2020-05-06.
+
+DESCRIPTION
+    Currently only tested on SQLite.
+
+FUNCTIONS
+  update_table_from_hoh
+    Usage:
+
+     update_table_from_hoh(%args) -> [status, msg, payload, meta]
+
+    Update database table from hash-of-hash.
+
+    Given a table "t1" like this:
+
+     id    col1    col2    col3
+     --    ----    ----    ----
+     1     a       b       foo
+     2     c       c       bar
+     3     g       h       qux
+
+    this code:
+
+     my $res = update_table_from_hoh(
+         dbh => $dbh,
+         table => 't1',
+         key_column => 'id',
+         hoh => {
+             1 => {col1=>'a', col2=>'b'},
+             2 => {col1=>'c', col2=>'d'},
+             4 => {col1=>'e', col2=>'f'},
+         },
+     );
+
+    will perform these SQL queries:
+
+     UPDATE TABLE t1 SET col2='d' WHERE id='2';
+     INSERT INTO t1 (id,col1,col2) VALUES (4,'e','f');
+     DELETE FROM t1 WHERE id='3';
+
+    to make table "t1" become like this:
+
+     id    col1    col2    col3
+     --    ----    ----    ----
+     1     a       b       foo
+     2     c       d       bar
+     4     e       f       qux
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   data_columns => *array[str]*
+
+    *   dbh* => *obj*
+
+    *   extra_insert_columns => *hos*
+
+    *   extra_update_columns => *hos*
+
+    *   hoh* => *hoh*
+
+    *   key_column* => *str*
+
+    *   table* => *str*
+
+    *   use_tx => *bool* (default: 1)
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/DBIx-UpdateTable-FromHoH>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-DBIx-UpdateTable-FromHoH>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-UpdateTable-From
+    HoH>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    DBIx::UpdateHoH::FromTable
+
+    DBIx::Compare to compare database contents.
+
+    diffdb from App::diffdb which can compare two database (schema as well
+    as content) and display the result as the familiar colored unified-style
+    diff.
+
+    DBIx::Diff::Schema
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

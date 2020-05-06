@@ -107,6 +107,7 @@ sub store {
     $req->content( to_json($conf) );
     $req->header( 'Content-Type' => 'application/json' );
     my $resp = $self->ua->request($req);
+
     if ( $resp->is_success ) {
         my $res;
         eval { $res = from_json( $resp->content, { allow_nonref => 1 } ) };

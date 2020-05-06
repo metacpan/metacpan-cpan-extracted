@@ -300,13 +300,13 @@ of the variable.
 
 =head1 METHODS
 
-There is only one punlic method, build.
+There is only one public method, build.
 
 =over 4
 
 =item my %data = $meta->build($name, $filename);
 
-Build a variable's value. The firrst argument is the name of the variable
+Build a variable's value. The first argument is the name of the variable
 to be built. The second argument is the filename the variable is computed for.
 If the variable returned is a list of files, this variable should be left
 undefined.

@@ -1,20 +1,23 @@
 package Devel::ebug;
-$Devel::ebug::VERSION = '0.59';
+
 use strict;
 use warnings;
 use Carp;
 use Class::Accessor::Chained::Fast;
-use Devel::StackTrace;
+use Devel::StackTrace 2.00;
 use IO::Socket::INET;
 use Proc::Background;
 use String::Koremutake;
-# use YAML::Syck;
 use YAML;
 use Module::Pluggable require => 1;
-
-use FindBin qw($Bin);
+use File::Which ();
+use FindBin qw($Bin);  ## no critic (Freenode::DiscouragedModules)
 
 use base qw(Class::Accessor::Chained::Fast);
+
+# ABSTRACT: A simple, extensible Perl debugger
+our $VERSION = '0.60'; # VERSION
+
 __PACKAGE__->mk_accessors(qw(
     backend
     port
@@ -28,7 +31,7 @@ sub load {
   my $program = $self->program;
 
   # import all the plugins into our namespace
-  do { eval "use $_ " } for $self->plugins;
+  eval { $_->import } for $self->plugins;
 
   my $k = String::Koremutake->new;
   my $rand = int(rand(100_000));
@@ -36,7 +39,11 @@ sub load {
   my $port   = 3141 + ($rand % 1024);
 
   $ENV{SECRET} = $secret;
-  my $backend = $self->backend || "$Bin/ebug_backend_perl";
+  my $backend = $self->backend || do {
+    -x "$Bin/ebug_backend_perl"
+      ? "$Bin/ebug_backend_perl"
+      : File::Which::which("ebug_backend_perl");
+  };
   my $command = "$backend $program";;
   my $proc = Proc::Background->new(
     {'die_upon_destroy' => 1},
@@ -53,7 +60,7 @@ sub attach {
     my ($self, $port, $key) = @_;
 
     # import all the plugins into our namespace
-    do { eval "use $_ " } for $self->plugins;
+    eval { $_->import } for $self->plugins;
 
     # try and connect to the server
     my $socket;
@@ -88,15 +95,15 @@ sub attach {
 # FIXME : this would mean that plugin writers don't need to Export stuff
 #
 #sub load_plugins {
-#    my $self = shift;    
+#    my $self = shift;
 #    my $obj = Devel::Symdump->new($self->plugins);
-#    
+#
 #    for ($obj->functions) {
 #        my $name = (split /::/)[-1];
 #        next if substr($name,0,1) eq '_';
 #        *basic = \&$_;
 #    }
-#    
+#
 #}
 
 
@@ -111,8 +118,13 @@ sub talk {
   $socket->print($data . "\n");
   $data = <$socket>;
   if ($data) {
-    my $res = Load(pack("h*", $data));
+    my $res = do {
+      $YAML::LoadBlessed = 1;
+      Load(pack("h*", $data));
+    };
     return $res;
+  } else {
+    return undef;
   }
 }
 
@@ -120,12 +132,17 @@ sub talk {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Devel::ebug - A simple, extensible Perl debugger
 
-=for html
-<a href="https://travis-ci.org/awwaiid/Devel-ebug"><img src="https://travis-ci.org/awwaiid/Devel-ebug.png"></a>
+=head1 VERSION
+
+version 0.60
 
 =head1 SYNOPSIS
 
@@ -133,7 +150,7 @@ Devel::ebug - A simple, extensible Perl debugger
   my $ebug = Devel::ebug->new;
   $ebug->program("calc.pl");
   $ebug->load;
-
+ 
   print "At line: "       . $ebug->line       . "\n";
   print "In subroutine: " . $ebug->subroutine . "\n";
   print "In package: "    . $ebug->package    . "\n";
@@ -209,7 +226,7 @@ L<Devel::ebug>, which you interact with. The frontend starts the code
 you are debugging in the background under the backend (running it
 under perl -d:ebug code.pl). The backend starts a TCP server, which
 the frontend then connects to, and uses this to drive the
-backend. This adds some flexibilty in the debugger. There is some
+backend. This adds some flexibility in the debugger. There is some
 minor security in the client/server startup (a secret word), and a
 random port is used from 3141-4165 so that multiple debugging sessions
 can happen concurrently.
@@ -239,7 +256,7 @@ The load method loads the program and gets ready to debug it:
 =head2 break_point
 
 The break_point method sets a break point in a program. If you are
-run-ing through a program, the execution will stop at a break point.
+running through a program, the execution will stop at a break point.
 Break points can be set in a few ways.
 
 A break point can be set at a line number in the current file:
@@ -360,12 +377,12 @@ It can return a span of code lines in a file:
 =head2 eval
 
 The eval method evaluates Perl code in the current program and returns
-the result. If the evalutation results in an exception, C<$@> is
+the result. If the evaluation results in an exception, C<$@> is
 returned.
 
   my $v = $ebug->eval('2 ** $exp');
 
-In list context, eval also returns a flag indicating if the evalutation
+In list context, eval also returns a flag indicating if the evaluation
 resulted in an exception.
 
   my( $v, $is_exception ) = $ebug->eval('die 123');
@@ -481,7 +498,7 @@ The stack_trace_human method returns the current stack trace in a human-readable
 
 =head2 undo
 
-The undo method undos the last action. It accomplishes this by
+The undo method undoes the last action. It accomplishes this by
 restarting the process and passing (almost) all the previous commands
 to it. Note that commands which do not change state are
 ignored. Commands that change state are: break_point, break_point_delete,
@@ -496,7 +513,7 @@ It can also undo multiple commands:
 =head2 watch_point
 
 The watch point method sets a watch point. A watch point has a
-condition, and the debugger will stop run-ing as soon as this
+condition, and the debugger will stop running as soon as this
 condition is true:
 
   $ebug->watch_point('$x > 100');
@@ -520,16 +537,21 @@ Devel::ebug does not handle signals under Windows.
 
 =head1 AUTHOR
 
-Latest releases by Brock Wilcox, C<< <awwaiid@thelackthereof.org> >>
+Original author: Leon Brocard E<lt>acme@astray.comE<gt>
 
-Leon Brocard, C<< <acme@astray.com> >>
+Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 
-=head1 COPYRIGHT
+Contributors:
 
-Copyright (C) 2005-2008, Leon Brocard
-Copyright (C) 2011-NOW, Brock Wilcox
+Brock Wilcox E<lt>awwaiid@thelackthereof.orgE<gt>
 
-=head1 LICENSE
+Taisuke Yamada
 
-This module is free software; you can redistribute it or modify it
-under the same terms as Perl itself.
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2005-2020 by Leon Brocard.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

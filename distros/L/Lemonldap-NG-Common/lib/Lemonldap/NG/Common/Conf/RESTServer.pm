@@ -6,7 +6,7 @@ use Mouse;
 use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::Conf::ReConstants;
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Common::Conf::AccessLib';
 
@@ -198,8 +198,8 @@ sub virtualHosts {
             # If rule contains a comment or an AuthLevel, split them
             if ( $query eq 'locationRules' ) {
                 $res->{comment} = '';
-                $res->{level} = '';
-                $res->{level} = $1 if ( $r =~ s/\(\?#AuthnLevel=(-?\d+)\)// );
+                $res->{level}   = '';
+                $res->{level}   = $1 if ( $r =~ s/\(\?#AuthnLevel=(-?\d+)\)// );
                 if ( $r =~ s/\(\?#(.*?)\)// ) {
                     $res->{title} = $res->{comment} = $1;
                 }
@@ -269,9 +269,7 @@ sub _samlMetaDataNodes {
     my ( $id, $resp ) = ( 1, [] );
 
     # Return all exported attributes if asked
-    if ( $query =~
-        /^saml${type}MetaDataExportedAttributes|samlSPMetaDataMacros$/ )
-    {
+    if ( $query =~ /^saml${type}MetaDataExportedAttributes$/ ) {
         my $pk =
           eval { $self->getConfKey( $req, $query )->{$partner} } // {};
         return $self->sendError( $req, undef, 400 ) if ( $req->error );
@@ -282,6 +280,21 @@ sub _samlMetaDataNodes {
                 title => $h,
                 data  => [ split /;/, $pk->{$h} ],
                 type  => 'samlAttribute',
+              };
+        }
+        return $self->sendJSONresponse( $req, $resp );
+    }
+    elsif ( $query eq "samlSPMetaDataMacros" ) {
+        my $pk =
+          eval { $self->getConfKey( $req, $query )->{$partner} } // {};
+        return $self->sendError( $req, undef, 400 ) if ( $req->error );
+        foreach my $h ( sort keys %$pk ) {
+            push @$resp,
+              {
+                id    => "saml${type}MetaDataNodes/$partner/$query/" . $id++,
+                title => $h,
+                data  => $pk->{$h},
+                type  => 'keyText',
               };
         }
         return $self->sendJSONresponse( $req, $resp );
@@ -697,9 +710,9 @@ sub combModules {
     my $res = [];
     foreach my $mod ( keys %$val ) {
         my $tmp;
-        $tmp->{title} = $mod;
-        $tmp->{id}    = "combModules/$mod";
-        $tmp->{type}  = 'cmbModule';
+        $tmp->{title}      = $mod;
+        $tmp->{id}         = "combModules/$mod";
+        $tmp->{type}       = 'cmbModule';
         $tmp->{data}->{$_} = $val->{$mod}->{$_} foreach (qw(type for));
         my $over = $val->{$mod}->{over} // {};
         $tmp->{data}->{over} = [ map { [ $_, $over->{$_} ] } keys %$over ];
@@ -720,7 +733,7 @@ sub sfExtra {
         $tmp->{id}         = "sfExtra/$mod";
         $tmp->{type}       = 'sfExtra';
         $tmp->{data}->{$_} = $val->{$mod}->{$_}
-          foreach (qw(type rule logo label));
+          foreach (qw(type rule logo level label));
         my $over = $val->{$mod}->{over} // {};
         $tmp->{data}->{over} = [ map { [ $_, $over->{$_} ] } keys %$over ];
         push @$res, $tmp;
@@ -773,8 +786,8 @@ sub metadata {
         }
 
         # Find next and previous conf
-        my @a  = $self->confAcc->available;
-        my $id = -1;
+        my @a     = $self->confAcc->available;
+        my $id    = -1;
         my ($ind) = map { $id++; $_ == $res->{cfgNum} ? ($id) : () } @a;
         if ($ind) { $res->{prev} = $a[ $ind - 1 ]; }
         if ( defined $ind and $ind < $#a ) {

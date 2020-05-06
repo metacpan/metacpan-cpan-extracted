@@ -33,11 +33,12 @@ requires:
   Pegex: '0.64'
   Return::Type: '0'
   Type::Tiny: '0'
+  curry: '0'
   perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#graphql-perl
   bugtracker: https://github.com/graphql-perl/graphql-perl/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/graphql-perl/graphql-perl
-version: '0.38'
+version: '0.39'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

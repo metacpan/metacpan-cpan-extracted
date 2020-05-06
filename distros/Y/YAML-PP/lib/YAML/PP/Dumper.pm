@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Dumper;
 
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 use Scalar::Util qw/ blessed refaddr reftype /;
 use YAML::PP;
@@ -100,7 +100,8 @@ sub dump {
             implicit => $header_implicit,
         );
         if ($self->version_directive) {
-            $args{version_directive} = $self->representer->schema->yaml_version;
+            my ($major, $minor) = split m/\./, $self->representer->schema->yaml_version;
+            $args{version_directive} = { major => $major, minor => $minor };
         }
         $self->emitter->document_start_event( \%args );
         $self->init;

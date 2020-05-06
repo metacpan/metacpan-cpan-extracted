@@ -13,10 +13,11 @@ use Lemonldap::NG::Common::Conf::ReConstants;
 
 use feature 'state';
 
-extends 'Lemonldap::NG::Common::Conf::AccessLib',
+extends 'Lemonldap::NG::Manager::Plugin',
+  'Lemonldap::NG::Common::Conf::AccessLib',
   'Lemonldap::NG::Common::Session::REST';
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.8';
 
 #############################
 # I. INITIALIZATION METHODS #
@@ -24,7 +25,7 @@ our $VERSION = '2.0.2';
 
 use constant defaultRoute => '2ndfa.html';
 
-sub addRoutes {
+sub init {
     my ( $self, $conf ) = @_;
 
     # Remote Procedure are defined in Lemonldap::NG::Common::Session::REST
@@ -46,6 +47,7 @@ sub addRoutes {
     $self->{multiValuesSeparator} ||= '; ';
     $self->{hiddenAttributes} //= "_password";
     $self->{TOTPCheck} = $self->{U2FCheck} = $self->{UBKCheck} = '1';
+    return 1;
 }
 
 ###################

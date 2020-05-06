@@ -19,7 +19,7 @@ name: Dist-Zilla-Plugin-ContributorCovenant
 provides:
   Dist::Zilla::Plugin::ContributorCovenant:
     file: lib/Dist/Zilla/Plugin/ContributorCovenant.pm
-    version: '1.004001'
+    version: '2.000000'
 requires:
   Dist::Zilla::File::InMemory: '0'
   Dist::Zilla::Role::FileGatherer: '0'
@@ -35,11 +35,12 @@ resources:
   bugtracker: https://github.com/kyzn/Dist-Zilla-Plugin-ContributorCovenant/issues
   homepage: https://github.com/kyzn/Dist-Zilla-Plugin-ContributorCovenant
   repository: https://github.com/kyzn/Dist-Zilla-Plugin-ContributorCovenant.git
-version: '1.004001'
+version: '2.000000'
 x_contributor_covenant:
   version: 0.02
 x_contributors:
   - 'Joelle Maslak <jmaslak@antelope.net>'
   - 'Kivanc Yazan <kyzn@users.noreply.github.com>'
-x_generated_by_perl: v5.26.2
+  - 'Ruth Holloway <ruth@hiruthie.me>'
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

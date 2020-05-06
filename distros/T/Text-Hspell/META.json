@@ -53,7 +53,7 @@
    "provides" : {
       "Text::Hspell" : {
          "file" : "lib/Text/Hspell.pm",
-         "version" : "v0.2.3"
+         "version" : "v0.2.5"
       }
    },
    "release_status" : "stable",
@@ -68,7 +68,7 @@
          "web" : "https://github.com/shlomif/Text-Hspell"
       }
    },
-   "version" : "0.2.3",
+   "version" : "0.2.5",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

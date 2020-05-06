@@ -15,7 +15,7 @@ use HTML::Display qw();
 use HTML::TokeParser::Simple;
 use B::Deparse;
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 our @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -1017,14 +1017,14 @@ sub tick_all {
   my ($self,$tick,$name) = @_;
   eval {
     local $^W;
-    my $index = 0;
+    my $index = 1;
     while(my $input = $self->agent->current_form->find_input($name,'checkbox',$index)) {
       my $value = (grep { defined $_ } ($input->possible_values()))[0];
       $self->agent->$tick($name,$value);
       $index++;
     };
     $self->add_history( sprintf q{
-    { local $^W; my $index = 0;
+    { local $^W; my $index = 1;
       while(my $input = $agent->current_form->find_input('%s','checkbox',$index)) {
         my $value = (grep { defined $_ } ($input->possible_values()))[0];
         $agent->%s('%s',$value);
@@ -1834,7 +1834,7 @@ sub shell {
   use WWW::Mechanize::FormFiller;
   use base 'WWW::Mechanize::FormFiller::Value::Callback';
 
-  our $VERSION = '0.58';
+  our $VERSION = '0.59';
 
   sub new {
     my ($class,$name,$shell) = @_;
@@ -2090,7 +2090,7 @@ L<http://perlmonks.org/>.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
-Copyright (C) 2002-2017 Max Maischein
+Copyright (C) 2002-2020 Max Maischein
 
 =head1 AUTHOR
 

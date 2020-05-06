@@ -1,6 +1,6 @@
 # ABSTRACT: A simple interface to ArangoDB REST API
 package Arango::Tango;
-$Arango::Tango::VERSION = '0.011';
+$Arango::Tango::VERSION = '0.012';
 use base 'Arango::Tango::API';
 use Arango::Tango::Database;
 use Arango::Tango::Collection;
@@ -184,7 +184,7 @@ Arango::Tango - A simple interface to ArangoDB REST API
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSYS
 
@@ -490,6 +490,16 @@ check making the module to die on an invalid options.
 
 This module is written to die in any exception. Please use a try/catch
 module or eval, to detect them.
+
+=head1 CONTRIBUTORS
+
+=over 4
+
+=item *
+
+João Miguel Ferreira
+
+=back
 
 =head1 AUTHOR
 

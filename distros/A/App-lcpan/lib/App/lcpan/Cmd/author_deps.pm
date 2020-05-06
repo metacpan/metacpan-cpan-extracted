@@ -1,9 +1,9 @@
 package App::lcpan::Cmd::author_deps;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-20'; # DATE
+our $DATE = '2020-05-06'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.051'; # VERSION
+our $VERSION = '1.056'; # VERSION
 
 use 5.010;
 use strict;
@@ -96,7 +96,7 @@ App::lcpan::Cmd::author_deps - List dependencies for all of the dists of an auth
 
 =head1 VERSION
 
-This document describes version 1.051 of App::lcpan::Cmd::author_deps (from Perl distribution App-lcpan), released on 2020-04-20.
+This document describes version 1.056 of App::lcpan::Cmd::author_deps (from Perl distribution App-lcpan), released on 2020-05-06.
 
 =head1 FUNCTIONS
 
@@ -134,6 +134,22 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<added_after> => I<date>
+
+Include only records that are added after a certain date.
+
+=item * B<added_before> => I<date>
+
+Include only records that are added before a certain date.
+
+=item * B<added_in_last_n_updates> => I<posint>
+
+Include only records that are added during the last N index updates.
+
+=item * B<added_in_last_update> => I<true>
+
+Include only records that are added during the last index update.
 
 =item * B<author>* => I<str>
 
@@ -225,6 +241,22 @@ Set base Perl version for determining core modules.
 =item * B<phase> => I<str> (default: "runtime")
 
 =item * B<rel> => I<str> (default: "requires")
+
+=item * B<updated_after> => I<date>
+
+Include only records that are updated after a certain date.
+
+=item * B<updated_before> => I<date>
+
+Include only records that are updated before a certain date.
+
+=item * B<updated_in_last_n_updates> => I<posint>
+
+Include only records that are updated during the last N index updates.
+
+=item * B<updated_in_last_update> => I<true>
+
+Include only records that are updated during the last index update.
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 

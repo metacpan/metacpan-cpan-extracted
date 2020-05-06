@@ -1,16 +1,15 @@
-# todo, native Windows needs a different pl($@)
-
 use Test::Simple tests => 27;
 
 # chdir to t/
 $_ = $0;
 s~[^/]+$~~;
-chdir $_;
+chdir $_ if length;
 
 sub pl($@) {
     my $expect = shift;
-    open my $fh, '-|', $^X, '../pl',
-      $^O !~ /^MSWin/ ? @_ : map '"'.join('\"', split /"/).'"', @_;
+    my $win = require Win32::ShellQuote if $^O =~ /^MSWin/;
+    open my $fh, '-|', $^X, $win ? '..\pl' : '../pl',
+      $win ? map '"'.join('""', split /"/).'"', @_ : @_;
     local $/;
     my $ret = <$fh>;
     ok $ret eq $expect, join ' ', 'pl', map /[\s*?[\]{}\$\\'"]|^$/ ? "'$_'" : $_, @_;
@@ -57,28 +56,28 @@ eof
 end
 EOF
 
-my @bze = ('-rbecho "begin"', '-ze "eof"', '-e', 'e "end"');
+my @bze = ('-rbecho q{begin}', '-ze q{eof}', '-e', 'e q{end}');
 sub unbze { s/(?:begin|eof|end)\n//g }
-pl $_, @bze, 'echoN "$ARGIND;$ARGV;$.;$_"', @abc;
-pl $_, @bze, 'E "$I;$A;$.;$_"', @abc;
+pl $_, @bze, 'echoN qq{$ARGIND;$ARGV;$.;$_}', @abc;
+pl $_, @bze, 'E qq{$I;$A;$.;$_}', @abc;
 alter \&unbze,
-  '-r', 'echoN "$ARGIND;$ARGV;$.;$_"', @abc;
+  '-r', 'echoN qq{$ARGIND;$ARGV;$.;$_}', @abc;
 
 sub cut_from_34 { s/([0-9]).+,[34].+\n(?:\1.+\n)*//gm }
 alter \&cut_from_34,
-  @bze, 'last if /[34]/; E "$I;$A;$.;$_"', @abc;
+  @bze, 'last if /[34]/; E qq{$I;$A;$.;$_}', @abc;
 alter { cut_from_34; s/(?:begin|eof|end)\n//g }
-  '-r', 'last if /[34]/; E "$I;$A;$.;$_"', @abc;
+  '-r', 'last if /[34]/; E qq{$I;$A;$.;$_}', @abc;
 
 substr $bze[0], 1, 1, '';	# done testing -r
 
 sub renumber { my $i = 0; s/;\K([1-9])(?=;)/++$i/eg } # convert $. to count across all files
 renumber;
-pl $_, @bze, 'E "$I;$A;$.;$_"', @abc;
+pl $_, @bze, 'E qq{$I;$A;$.;$_}', @abc;
 
 sub cut_after_23 { s/([0-9]).+,[23].+\n\K(?:\1.+\n)*//gm }
 alter { cut_after_23; renumber }
-  @bze, 'E "$I;$A;$.;$_"; last if /[23]/', @abc;
+  @bze, 'E qq{$I;$A;$.;$_}; last if /[23]/', @abc;
 
 pl '', '-n', '', @abc;
 
@@ -109,4 +108,4 @@ chop; # extra [ on last line
 s/[0-9].*;//mg; # reduce to only file contents
 s/,/,][/g;
 substr $_, 0, 0, '[';
-pl $_, '-054n', 'E "[$_]"', @abc; # 054 is comma, also splits at file ends
+pl $_, '-054n', 'E qq{[$_]}', @abc; # 054 is comma, also splits at file ends

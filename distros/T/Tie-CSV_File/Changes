@@ -1,5 +1,8 @@
 Revision history for Perl extension Tie::CSV_File.
 
+0.25  Mon May 5, 2020
+       - add license perl to Makefile.PL
+
 0.24  Wed Mar 28, 2018
        - updated version nr (again)
 

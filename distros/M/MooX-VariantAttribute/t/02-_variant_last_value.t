@@ -1,4 +1,4 @@
-use Test::More;
+use Moonshine::Test qw/:all/;
 
 {
     package One::Two;
@@ -25,11 +25,44 @@ use Test::More;
 
 my $obj = One::Two->new;
 
-is $obj->_variant_last_value('refs', 'find', 'ARRAY'), 1, "YES we can find ARRAY";
-is $obj->_variant_last_value('refs', 'set', 'refs returned - ARRAY - one,two'), 1, "YES we can find ARRAY";
-is $obj->_variant_last_value('refs', 'find', 'ARRY'), undef, "No we can't find ARRY";
-is $obj->_variant_last_value('refs', 'set', 'refs returned - ARRY - one,two'), undef, "NO we can't find ARRY";
 
-is $obj->_variant_last_value('parser', 'find', 'Random::Parser::Two'), 1, 'Yes we can find Random::Parser::Two';
+moon_test(
+	name => 'Check One::Two',
+	build => {
+		class => 'One::Two'
+	},
+	instructions => [
+		{
+			test  => 'true',
+			func => '_variant_last_value',
+			args_list => 1,
+			args => ['refs', 'find', 'ARRAY'],
+		},
+		{
+			test => 'true',
+			func => '_variant_last_value',
+			args_list => 1,
+			args => ['refs', 'set', 'refs returned - ARRAY - one,two'],
+		},
+		{
+			test  => 'undef',
+			func => '_variant_last_value',
+			args_list => 1,
+			args => ['refs', 'find', 'ARRY'],
+		},
+		{
+			test => 'undef',
+			func => '_variant_last_value',
+			args_list => 1,
+			args => ['refs', 'set', 'refs returned - ARRY - one,two'],
+		},
+		{
+			test => 'true',
+			func => '_variant_last_value',
+			args_list => 1,
+			args => ['parser', 'find', 'Random::Parser::Two'],
+		}
+	]
+);
 
-done_testing();
+sunrise(6, flexing);

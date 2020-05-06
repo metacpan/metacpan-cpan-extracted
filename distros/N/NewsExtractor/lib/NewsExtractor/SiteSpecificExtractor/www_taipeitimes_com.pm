@@ -7,16 +7,13 @@ use Importer 'NewsExtractor::TextUtil' => 'normalize_whitespace';
 
 sub dateline {
     my ($self) = @_;
-    my $el = $self->dom->at('div#main div#content_left div#date h5');
-    my $txt = $el->all_text;
-    $txt = normalize_whitespace($txt);
-    $txt =~ s/ - Page [0-9]+\z//;
-    return $txt;
+    my $el = $self->dom->at("meta[property='article:published_time']");
+    return "". $el->attr('content');
 }
 
 sub journalist {
     my ($self) = @_;
-    my $el = $self->dom->at("div#main div#content_left div#front_boxd div.reporter");
+    my $el = $self->dom->at(".name");
     my $txt = $el->text;
     return normalize_whitespace($txt);
 }

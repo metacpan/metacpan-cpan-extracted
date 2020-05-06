@@ -1,5 +1,5 @@
 use Moonshine::Test qw/:all/;
-
+use lib '.';
 use t::odea::Test;
 
 {

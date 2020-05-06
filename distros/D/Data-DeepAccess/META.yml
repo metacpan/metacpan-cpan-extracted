@@ -1,0 +1,45 @@
+---
+abstract: 'Access or set data in deep structures'
+author:
+  - 'Dan Book <dbook@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-DeepAccess
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Data::DeepAccess:
+    file: lib/Data/DeepAccess.pm
+    version: '0.001'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Scalar::Util: '0'
+  perl: '5.008008'
+resources:
+  bugtracker: https://github.com/Grinnz/Data-DeepAccess/issues
+  homepage: https://github.com/Grinnz/Data-DeepAccess
+  repository: https://github.com/Grinnz/Data-DeepAccess.git
+version: '0.001'
+x_contributors:
+  - 'Dan Book <grinnz@grinnz.com>'
+x_generated_by_perl: v5.30.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

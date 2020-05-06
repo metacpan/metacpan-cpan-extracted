@@ -30,7 +30,100 @@ Zydeco::Manual::06_MethodModifiers - Method modifiers to easily wrap or override
 
 =head1 MANUAL
 
-TODO.
+Zydeco allows subclasses to modify the methods they inherit from their
+parents, allow roles to modify the methods in the classes that consume
+them, and allow classes to modify the methods they consume from roles.
+
+=head2 C<< before >> and C<< after >> modifiers.
+
+A C<before> modifier executes before the original method is called.
+Its return value is ignored. If it throws an exception, this will
+prevent the original method from being caused.
+
+An C<after> modifier executes after the original method is called.
+Its return value is also ignored.
+
+Both of these modifiers may see the parameters passed to the original
+method.
+
+  role Event {
+    method set_host (Person $host) {
+      ...;
+    }
+  }
+  
+  class LegalIssue with Throwable;
+  
+  class Wedding with Event {
+    before set_host (Person $host) {
+      $host->has_licence or LegalIssue->throw;
+    }
+  }
+
+Like with method definitions, C<< $self >> and C<< $class >> are available.
+
+Note that signatures are checked separately by the modifier and the
+original method. So it will be checked twice that C<< $host >> is a
+Person object. Because checking is performed at run-time, for
+performance you may wish to simplify the signature in your modifiers.
+
+  role Event {
+    method set_host (Person $host) {
+      ...;
+    }
+  }
+  
+  class LegalIssue with Throwable;
+  
+  class Wedding with Event {
+    before set_host ($host) {
+      $host->has_licence or LegalIssue->throw;
+    }
+  }
+
+This is especially true for C<after> modifiers, where the modifiers can
+be confident that the parameters have already passed the original method's
+signature checks.
+
+=head2 C<< around >> modifiers.
+
+Unlike C<before> and C<after> modifiers, C<around> modifiers can modify
+the arguments passed to the original method, can change the return value,
+and can even prevent the original method from being called. They allow
+you to wrap the original method in arbitrary ways.
+
+Here's an example:
+
+  package MyApp;
+  use Zydeco;
+  
+  class PriceAdder {
+    method add_prices ( ArrayRef[Num] $prices ) {
+      my $sum = 0;
+      $sum += $_ for @$prices;
+      return $sum;
+    }
+  }
+  
+  class PriceAdder::WithCommission extends PriceAdder {
+    has commission = 0;  # percent
+    
+    around add_prices ( $prices ) {
+      my $sum = $self->$next( $prices );
+      return $sum * ( 1 + ($self->commission/100) );
+    }
+  }
+  
+  my $adder = MyApp->new_priceadder_withcommission( commission => 5 );
+  say $adder->add_prices( [ 100, 400, 500 ] );   # ==> 1050
+
+Like with method definitions, C<< $self >> and C<< $class >> are available.
+C<< $next >> is also defined which contains a coderef for the next method
+to call. This may be the original method itself, but it may be another
+wrapper.
+
+If no signature is given, C<< $next >> is passed as part of C<< @_ >>
+before the invocant.
 
 =head1 KEYWORDS
 

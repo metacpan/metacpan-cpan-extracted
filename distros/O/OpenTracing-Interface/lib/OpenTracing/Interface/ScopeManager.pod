@@ -99,7 +99,7 @@ none
 
 =head3 Returns
 
-The C<Scope> that is currently active.
+The C<Scope> that is currently active or undef if none is yet active.
 
 =cut
 

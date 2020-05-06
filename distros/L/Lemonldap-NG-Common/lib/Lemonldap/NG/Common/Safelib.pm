@@ -64,8 +64,8 @@ sub checkLogonHours {
     # Use time_correction
     if ($time_correction) {
         my ( $sign, $time ) = ( $time_correction =~ /([+|-]?)(\d+)/ );
-        if ( $sign =~ /-/ ) { $hourpos -= $time; }
-        else                { $hourpos += $time; }
+        if   ( $sign =~ /-/ ) { $hourpos -= $time; }
+        else                  { $hourpos += $time; }
     }
 
     # Get the corresponding byte

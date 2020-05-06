@@ -1,14 +1,14 @@
 package WordList::Domain::PublicSuffix;
 
-our $DATE = '2018-12-17'; # DATE
-our $VERSION = '20181217.0.0'; # VERSION
+our $DATE = '2020-05-03'; # DATE
+our $VERSION = '20181217.0.1'; # VERSION
 
 use utf8;
 
 use WordList;
 our @ISA = qw(WordList);
 
-our %STATS = ("avg_word_len",10.5593594058257,"num_words_contains_unicode",448,"num_words",8617,"shortest_word_len",2,"longest_word_len",41,"num_words_contains_whitespace",0,"num_words_contains_nonword_chars",7083); # STATS
+our %STATS = ("num_words",8853,"num_words_contain_whitespace",0,"num_words_contain_nonword_chars",7339,"shortest_word_len",2,"avg_word_len",10.5835310064385,"longest_word_len",41,"num_words_contains_unicode",451,"num_words_contains_whitespace",0,"num_words_contains_nonword_chars",7339,"num_words_contain_unicode",451); # STATS
 
 1;
 # ABSTRACT: Mozilla Public Suffix
@@ -23,7 +23,7 @@ WordList::Domain::PublicSuffix - Mozilla Public Suffix
 
 =head1 VERSION
 
-This document describes version 20181217.0.0 of WordList::Domain::PublicSuffix (from Perl distribution WordList-Domain-PublicSuffix), released on 2018-12-17.
+This document describes version 20181217.0.1 of WordList::Domain::PublicSuffix (from Perl distribution WordList-Domain-PublicSuffix), released on 2020-05-03.
 
 =head1 SYNOPSIS
 
@@ -49,11 +49,14 @@ This document describes version 20181217.0.0 of WordList::Domain::PublicSuffix (
  +----------------------------------+------------------+
  | key                              | value            |
  +----------------------------------+------------------+
- | avg_word_len                     | 10.5593594058257 |
+ | avg_word_len                     | 10.5835310064385 |
  | longest_word_len                 | 41               |
- | num_words                        | 8617             |
- | num_words_contains_nonword_chars | 7083             |
- | num_words_contains_unicode       | 448              |
+ | num_words                        | 8853             |
+ | num_words_contain_nonword_chars  | 7339             |
+ | num_words_contain_unicode        | 451              |
+ | num_words_contain_whitespace     | 0                |
+ | num_words_contains_nonword_chars | 7339             |
+ | num_words_contains_unicode       | 451              |
  | num_words_contains_whitespace    | 0                |
  | shortest_word_len                | 2                |
  +----------------------------------+------------------+
@@ -82,7 +85,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -102,7 +105,9 @@ __DATA__
 *.advisor.ws
 *.alces.network
 *.awdev.ca
+*.azurecontainer.io
 *.bd
+*.bzz.dapps.earth
 *.ck
 *.cns.joyent.com
 *.compute-1.amazonaws.com
@@ -110,12 +115,15 @@ __DATA__
 *.compute.amazonaws.com.cn
 *.compute.estate
 *.cryptonomic.net
+*.customer-oci.com
+*.dapps.earth
+*.dev.adobeaemcloud.com
+*.dweb.link
 *.elb.amazonaws.com
 *.elb.amazonaws.com.cn
 *.er
 *.ex.futurecms.at
 *.ex.ortsinfo.at
-*.fj
 *.fk
 *.futurecms.at
 *.hosting.myjino.ru
@@ -127,16 +135,25 @@ __DATA__
 *.kobe.jp
 *.kunden.ortsinfo.at
 *.landing.myjino.ru
+*.lcl.dev
 *.magentosite.cloud
 *.mm
+*.moonscale.io
 *.nagoya.jp
 *.nom.br
 *.np
+*.oci.customer-oci.com
+*.ocp.customer-oci.com
+*.ocs.customer-oci.com
+*.on-k3s.io
+*.on-rancher.cloud
+*.on-rio.io
 *.otap.co
 *.pg
 *.platform.sh
 *.platformsh.site
 *.quipelements.com
+*.r.appspot.com
 *.s5y.io
 *.sapporo.jp
 *.sch.uk
@@ -144,17 +161,22 @@ __DATA__
 *.sensiosite.cloud
 *.spectrum.myjino.ru
 *.statics.cloud
+*.stg.dev
 *.stolos.io
+*.sys.qcx.io
+*.telebit.xyz
 *.transurl.be
 *.transurl.eu
 *.transurl.nl
 *.triton.zone
 *.uberspace.de
 *.vps.myjino.ru
+*.webhare.dev
 *.ye
 *.yokohama.jp
 0.bg
 001www.com
+0e.vc
 1.bg
 12hp.at
 12hp.ch
@@ -185,6 +207,7 @@ __DATA__
 9guacu.br
 a.bg
 a.prod.fastly.net
+a.run.app
 a.se
 a.ssl.fastly.net
 aa.no
@@ -219,6 +242,7 @@ ac.ci
 ac.cn
 ac.cr
 ac.cy
+ac.fj
 ac.gn
 ac.gov.br
 ac.id
@@ -231,6 +255,7 @@ ac.ke
 ac.kr
 ac.leg.br
 ac.lk
+ac.ls
 ac.ma
 ac.me
 ac.mu
@@ -269,13 +294,14 @@ achi.nagano.jp
 aco
 act.au
 act.edu.au
-active
 actor
 ad
 ad.jp
 adac
 adachi.tokyo.jp
 adm.br
+adobeaemcloud.com
+adobeaemcloud.net
 ads
 adult
 adult.ht
@@ -393,6 +419,7 @@ alstahaug.no
 alstom
 alt.za
 alta.no
+altervista.org
 alto-adige.it
 altoadige.it
 alvdal.no
@@ -406,6 +433,7 @@ ama.shimane.jp
 amagasaki.hyogo.jp
 amakusa.kumamoto.jp
 amami.kagoshima.jp
+amazon
 amber.museum
 ambulance.aero
 ambulance.museum
@@ -423,6 +451,7 @@ amli.no
 amot.no
 amsterdam
 amsterdam.museum
+amsw.nl
 amusement.aero
 an.it
 analytics
@@ -431,6 +460,7 @@ anan.nagano.jp
 anan.tokushima.jp
 anani.br
 ancona.it
+and.mom
 and.museum
 andasuolo.no
 andebu.no
@@ -476,17 +506,22 @@ ap.it
 ap.leg.br
 aparecida.br
 apartments
+api.stdlib.com
 apigee.io
 app
+app.banzaicloud.io
 app.lmpm.com
 app.os.fedoraproject.org
 app.os.stg.fedoraproject.org
+app.render.com
 appchizi.com
 apple
+applicationcloud.io
 applinzi.com
 apps.fbsbx.com
 apps.lair.io
 appspot.com
+aprendemas.cl
 aq
 aq.it
 aquarelle
@@ -542,6 +577,7 @@ arts.nf
 arts.ro
 arts.ve
 artsandcrafts.museum
+arvo.network
 as
 as.us
 asago.hyogo.jp
@@ -580,7 +616,6 @@ aso.kumamoto.jp
 ass.km
 assabu.hokkaido.jp
 assassination.museum
-assedic.fr
 assisi.museum
 assn.lk
 asso.bj
@@ -650,6 +685,7 @@ avoues.fr
 aw
 awaji.hyogo.jp
 aws
+awsmppl.com
 ax
 axa
 axis.museum
@@ -660,12 +696,13 @@ ayase.kanagawa.jp
 az
 az.us
 azerbaijan.su
+azimuth.network
 azumino.nagano.jp
 azure
 azure-mobile.net
-azurecontainer.io
 azurewebsites.net
 aéroport.ci
+b-data.io
 b.bg
 b.br
 b.se
@@ -689,12 +726,13 @@ bajddar.no
 balashov.su
 balat.no
 bale.museum
+balena-devices.com
 balestrand.no
 ballangen.no
 ballooning.aero
 balsan-sudtirol.it
 balsan-suedtirol.it
-balsan-südtirol.it
+balsan-südtirol.it
 balsan.it
 balsfjord.no
 baltimore.museum
@@ -721,6 +759,7 @@ barreau.bj
 barrel-of-knowledge.info
 barrell-of-knowledge.info
 barsy.bg
+barsy.ca
 barsy.club
 barsy.co.uk
 barsy.de
@@ -751,6 +790,7 @@ baseball.museum
 basel.museum
 bashkiria.ru
 bashkiria.su
+basicserver.io
 basilicata.it
 basketball
 baths.museum
@@ -851,8 +891,11 @@ biz.bb
 biz.cy
 biz.dk
 biz.et
+biz.fj
+biz.gl
 biz.id
 biz.ki
+biz.ls
 biz.mv
 biz.mw
 biz.ni
@@ -860,6 +903,7 @@ biz.nr
 biz.pk
 biz.pl
 biz.pr
+biz.ss
 biz.tj
 biz.tr
 biz.tt
@@ -877,7 +921,6 @@ bl.it
 black
 blackbaudcdn.net
 blackfriday
-blanco
 blockbuster
 blog
 blog.bo
@@ -972,7 +1015,6 @@ bms
 bmw
 bn
 bn.it
-bnl
 bnpparibas
 bnr.la
 bo
@@ -1017,8 +1059,9 @@ box
 boxfuse.io
 bozen-sudtirol.it
 bozen-suedtirol.it
-bozen-südtirol.it
+bozen-südtirol.it
 bozen.it
+bpl.biz
 bplaced.com
 bplaced.de
 bplaced.net
@@ -1059,6 +1102,7 @@ brønnøysund.no
 bs
 bs.it
 bsb.br
+bss.design
 bt
 bt.it
 bu.no
@@ -1068,10 +1112,11 @@ bugatti
 build
 builders
 building.museum
+builtwithdark.com
 bukhara.su
 bulsan-sudtirol.it
 bulsan-suedtirol.it
-bulsan-südtirol.it
+bulsan-südtirol.it
 bulsan.it
 bungoono.oita.jp
 bungotakada.oita.jp
@@ -1086,7 +1131,6 @@ buyshouses.net
 buzen.fukuoka.jp
 buzz
 bv
-bv.nl
 bw
 by
 bydgoszcz.pl
@@ -1120,6 +1164,7 @@ ca.it
 ca.na
 ca.us
 caa.aero
+caa.li
 cab
 cable-modem.org
 cadaques.museum
@@ -1164,9 +1209,9 @@ careers
 cargo.aero
 carrara-massa.it
 carraramassa.it
+carrd.co
 carrier.museum
 cars
-cartier
 cartoonart.museum
 casa
 casacam.net
@@ -1185,6 +1230,7 @@ catanzaro.it
 catering
 catering.aero
 catholic
+catholic.edu.au
 caxias.br
 cb.it
 cba
@@ -1267,9 +1313,9 @@ cern
 certification.aero
 certmgr.org
 cesena-forli.it
-cesena-forlì.it
+cesena-forlì.it
 cesenaforli.it
-cesenaforlì.it
+cesenaforlì.it
 cf
 cfa
 cfd
@@ -1336,7 +1382,6 @@ choyo.kumamoto.jp
 christiansburg.museum
 christmas
 chrome
-chrysler
 chtr.k12.ma.us
 chungbuk.kr
 chungnam.kr
@@ -1376,6 +1421,7 @@ claims
 clan.rip
 cleaning
 cleverapps.io
+clic2000.net
 click
 clinic
 clinique
@@ -1387,12 +1433,15 @@ cloud.fedoraproject.org
 cloud.goog
 cloud.metacentrum.cz
 cloud66.ws
+cloud66.zone
 cloudaccess.host
 cloudaccess.net
 cloudapp.net
+cloudapps.digital
 cloudcontrolapp.com
 cloudcontrolled.com
 cloudeity.net
+cloudera.site
 cloudfront.net
 cloudfunctions.net
 cloudns.asia
@@ -1425,10 +1474,13 @@ cnt.br
 co
 co.ae
 co.ag
+co.am
 co.ao
 co.at
 co.bb
 co.bi
+co.bn
+co.business
 co.bw
 co.ca
 co.ci
@@ -1438,6 +1490,9 @@ co.com
 co.cr
 co.cz
 co.dk
+co.education
+co.events
+co.financial
 co.gg
 co.gl
 co.gy
@@ -1462,18 +1517,21 @@ co.mu
 co.mw
 co.mz
 co.na
+co.network
 co.ni
 co.nl
 co.no
 co.nz
 co.om
 co.pl
+co.place
 co.pn
 co.pw
 co.rs
 co.rw
 co.st
 co.sz
+co.technology
 co.th
 co.tj
 co.tm
@@ -1497,6 +1555,7 @@ codespot.com
 cody.museum
 coffee
 cog.mi.us
+col.ng
 coldwar.museum
 collection.museum
 college
@@ -1512,6 +1571,7 @@ com.af
 com.ag
 com.ai
 com.al
+com.am
 com.ar
 com.au
 com.aw
@@ -1544,6 +1604,7 @@ com.ee
 com.eg
 com.es
 com.et
+com.fj
 com.fr
 com.ge
 com.gh
@@ -1609,7 +1670,6 @@ com.qa
 com.re
 com.ro
 com.ru
-com.rw
 com.sa
 com.sb
 com.sc
@@ -1620,6 +1680,7 @@ com.sh
 com.sl
 com.sn
 com.so
+com.ss
 com.st
 com.sv
 com.sy
@@ -1643,9 +1704,12 @@ com.ws
 com.zm
 comcast
 commbank
+commune.am
 communication.museum
 communications.museum
 community
+community-pro.de
+community-pro.net
 community.museum
 como.it
 company
@@ -1658,7 +1722,9 @@ comunicações.museum
 condos
 conf.au
 conf.lv
+conf.se
 conference.aero
+conn.uk
 construction
 consulado.st
 consultant.aero
@@ -1681,9 +1747,11 @@ coop.km
 coop.mv
 coop.mw
 coop.py
+coop.rw
 coop.tt
 cooperativa.bo
 copenhagen.museum
+copro.uk
 corporation.museum
 correios-e-telecomunicações.museum
 corsica
@@ -1691,6 +1759,7 @@ corvette.museum
 cosenza.it
 costume.museum
 couchpotatofries.org
+couk.me
 council.aero
 country
 countryestate.museum
@@ -1698,6 +1767,7 @@ county.museum
 coupon
 coupons
 courses
+cpa
 cpa.pro
 cq.cn
 cr
@@ -1706,6 +1776,7 @@ cr.ua
 crafting.xyz
 crafts.museum
 cranbrook.museum
+crd.co
 creation.museum
 credit
 creditcard
@@ -1734,6 +1805,7 @@ culture.museum
 cuneo.it
 cupcake.is
 curitiba.br
+curv.dev
 cust.dev.thingdust.io
 cust.disrec.thingdust.io
 cust.prod.thingdust.io
@@ -1760,11 +1832,13 @@ cz.it
 czeladz.pl
 czest.pl
 d.bg
+d.gv.vc
 d.se
 dabur
 dad
 daegu.kr
 daejeon.kr
+daemon.panel.gg
 dagestan.ru
 dagestan.su
 daigo.ibaraki.jp
@@ -1853,6 +1927,7 @@ devices.resinstaging.io
 df.gov.br
 df.leg.br
 dgca.aero
+dh.bytemark.co.uk
 dhl
 diamonds
 dielddanuorri.no
@@ -1860,14 +1935,18 @@ diet
 digital
 dinosaur.museum
 direct
+direct.quickconnect.to
 directory
 discount
+discourse.group
+discourse.team
 discover
 discovery.museum
 dish
 diskstation.eu
 diskstation.me
 diskstation.org
+diskussionsbereich.de
 ditchyourip.com
 divtasvuodna.no
 divttasvuotna.no
@@ -1893,16 +1972,15 @@ dnshome.de
 dnsiskinky.com
 dnsking.ch
 dnsup.net
+dnsupdate.info
 dnsupdater.de
 do
 docs
 doctor
-dodge
 does-it.net
 doesntexist.com
 doesntexist.org
 dog
-doha
 dolls.museum
 domains
 dominic.ua
@@ -1944,7 +2022,6 @@ dubai
 duck
 duckdns.org
 dunlop
-duns
 dupont
 durban
 durham.museum
@@ -1953,12 +2030,14 @@ dvr
 dvrcam.info
 dvrdns.org
 dy.fi
+dyn-berlin.de
 dyn-ip24.de
 dyn-o-saur.com
 dyn-vpn.de
 dyn.cosidns.de
 dyn.ddnss.de
 dyn.home-webserver.de
+dyn53.io
 dynalias.com
 dynalias.net
 dynalias.org
@@ -1980,6 +2059,7 @@ dyndns-web.com
 dyndns-wiki.com
 dyndns-work.com
 dyndns.biz
+dyndns.dappnode.io
 dyndns.ddnss.de
 dyndns.info
 dyndns.org
@@ -2024,6 +2104,7 @@ ed.cr
 ed.jp
 ed.pw
 edeka
+edgestack.me
 edogawa.tokyo.jp
 edu
 edu.ac
@@ -2089,6 +2170,7 @@ edu.lb
 edu.lc
 edu.lk
 edu.lr
+edu.ls
 edu.lv
 edu.ly
 edu.me
@@ -2122,7 +2204,6 @@ edu.py
 edu.qa
 edu.rs
 edu.ru
-edu.rw
 edu.sa
 edu.sb
 edu.sc
@@ -2130,6 +2211,8 @@ edu.sd
 edu.sg
 edu.sl
 edu.sn
+edu.so
+edu.ss
 edu.st
 edu.sv
 edu.sy
@@ -2150,8 +2233,10 @@ edu.za
 edu.zm
 education
 education.museum
+education.tas.edu.au
 educational.museum
 educator.aero
+edugit.org
 edunet.tn
 ee
 ee.eu.org
@@ -2186,6 +2271,7 @@ emiliaromagna.it
 emp.br
 empresa.bo
 emr.it
+en-root.fr
 en.it
 ena.gifu.jp
 encyclopedic.museum
@@ -2206,13 +2292,13 @@ eniwa.hokkaido.jp
 enna.it
 enonic.io
 ens.tn
+enterprisecloud.nu
 enterprises
 entertainment.aero
 entomology.museum
 environment.museum
 environmentalconservation.museum
 epilepsy.museum
-epost
 epson
 equipment
 equipment.aero
@@ -2267,7 +2353,6 @@ evenassi.no
 evenes.no
 events
 evenášši.no
-everbank
 evje-og-hornnes.no
 exchange
 exchange.aero
@@ -2305,9 +2390,12 @@ farmstead.museum
 farsund.no
 fashion
 fast
+fastly-terrarium.com
 fastlylb.net
 fastpanel.direct
 fastvps-server.com
+fastvps.host
+fastvps.site
 fauske.no
 fbx-os.fr
 fbxos.fr
@@ -2345,10 +2433,17 @@ fie.ee
 field.museum
 figueres.museum
 filatelia.museum
+filegear-au.me
+filegear-de.me
+filegear-gb.me
+filegear-ie.me
+filegear-jp.me
+filegear-sg.me
 filegear.me
 film
 film.hu
 film.museum
+fin.ci
 fin.ec
 fin.tn
 final
@@ -2371,6 +2466,7 @@ firm.dk
 firm.ht
 firm.in
 firm.nf
+firm.ng
 firm.ro
 firm.ve
 firmdale
@@ -2379,6 +2475,7 @@ fishing
 fit
 fitjar.no
 fitness
+fj
 fj.cn
 fjaler.no
 fjell.no
@@ -2405,7 +2502,6 @@ flowers
 flt.cloud.muni.cz
 fly
 flynnhosting.net
-flynnhub.com
 flå.no
 fm
 fm.br
@@ -2425,6 +2521,10 @@ for-more.biz
 for-our.info
 for-some.biz
 for-the.biz
+for.men
+for.mom
+for.one
+for.sale
 force.museum
 ford
 forde.no
@@ -2433,8 +2533,8 @@ forgot.her.name
 forgot.his.name
 forli-cesena.it
 forlicesena.it
-forlì-cesena.it
-forlìcesena.it
+forlì-cesena.it
+forlìcesena.it
 forsale
 forsand.no
 fortal.br
@@ -2458,6 +2558,7 @@ frankfurt.museum
 franziskaner.museum
 fredrikstad.no
 free
+free.hr
 freebox-os.com
 freebox-os.fr
 freeboxos.com
@@ -2470,7 +2571,6 @@ freesite.host
 freetls.fastly.net
 frei.no
 freiburg.museum
-freight.aero
 fresenius
 fribourg.museum
 friuli-v-giulia.it
@@ -2650,6 +2750,7 @@ garden.museum
 gateway.museum
 gaular.no
 gausdal.no
+gay
 gb
 gb.com
 gb.net
@@ -2667,16 +2768,19 @@ gea
 geek.nz
 geekgalaxy.com
 geelvinck.museum
+gehirn.ne.jp
 geisei.kochi.jp
 gemological.museum
 gen.in
 gen.mi.us
+gen.ng
 gen.nz
 gen.tr
 genkai.saga.jp
 genoa.it
 genova.it
 gent
+gentapps.com
 genting
 geology.museum
 geometre-expert.fr
@@ -2704,6 +2808,7 @@ ginan.gifu.jp
 ginowan.okinawa.jp
 ginoza.okinawa.jp
 giske.no
+git-pages.rit.edu
 git-repos.de
 github.io
 githubusercontent.com
@@ -2724,6 +2829,7 @@ glass.museum
 gle
 gleeze.com
 gliding.aero
+glitch.me
 gliwice.pl
 global
 global.prod.fastly.net
@@ -2814,7 +2920,6 @@ gouv.fr
 gouv.ht
 gouv.km
 gouv.ml
-gouv.rw
 gouv.sn
 gov
 gov.ac
@@ -2851,6 +2956,7 @@ gov.ec
 gov.ee
 gov.eg
 gov.et
+gov.fj
 gov.ge
 gov.gh
 gov.gi
@@ -2880,6 +2986,7 @@ gov.lb
 gov.lc
 gov.lk
 gov.lr
+gov.ls
 gov.lt
 gov.lv
 gov.ly
@@ -2916,10 +3023,13 @@ gov.rw
 gov.sa
 gov.sb
 gov.sc
+gov.scot
 gov.sd
 gov.sg
 gov.sh
 gov.sl
+gov.so
+gov.ss
 gov.st
 gov.sx
 gov.sy
@@ -2956,6 +3066,7 @@ grandrapids.museum
 grane.no
 granvin.no
 graphics
+graphox.us
 gratangen.no
 gratis
 graz.museum
@@ -3021,6 +3132,7 @@ guru
 gushikami.okinawa.jp
 gv.ao
 gv.at
+gv.vc
 gw
 gwangju.kr
 gwiddle.co.uk
@@ -3290,7 +3402,6 @@ honai.ehime.jp
 honbetsu.hokkaido.jp
 honda
 honefoss.no
-honeywell
 hongo.hiroshima.jp
 honjo.akita.jp
 honjo.saitama.jp
@@ -3322,6 +3433,8 @@ hoylandet.no
 hr
 hr.eu.org
 hs.kr
+hs.run
+hs.zone
 hsbc
 ht
 hu
@@ -3343,6 +3456,7 @@ hzc.io
 hábmer.no
 hámmárfeasta.no
 hápmir.no
+häkkinen.fi
 hå.no
 hægebostad.no
 hønefoss.no
@@ -3436,8 +3550,18 @@ immobilien
 imperia.it
 in
 in-addr.arpa
+in-berlin.de
+in-brb.de
+in-butter.de
+in-dsl.de
+in-dsl.net
+in-dsl.org
 in-the-band.net
+in-vpn.de
+in-vpn.net
+in-vpn.org
 in.eu.org
+in.london
 in.na
 in.net
 in.ni
@@ -3490,12 +3614,14 @@ info.co
 info.cx
 info.ec
 info.et
+info.fj
 info.gu
 info.ht
 info.hu
 info.ke
 info.ki
 info.la
+info.ls
 info.mv
 info.na
 info.nf
@@ -3518,6 +3644,7 @@ ing.pa
 ingatlan.hu
 ink
 ino.kochi.jp
+instantcloud.cn
 institute
 insurance
 insurance.aero
@@ -3537,7 +3664,6 @@ int.mw
 int.ni
 int.pt
 int.ru
-int.rw
 int.tj
 int.tt
 int.ve
@@ -3553,6 +3679,7 @@ inuyama.aichi.jp
 investments
 inzai.chiba.jp
 io
+iobb.net
 ip6.arpa
 ipifony.net
 ipiranga
@@ -3651,9 +3778,9 @@ isa.us
 isahaya.nagasaki.jp
 ise.mie.jp
 isehara.kanagawa.jp
-iselect
 isen.kagoshima.jp
 isernia.it
+iserv.dev
 isesaki.gunma.jp
 ishigaki.okinawa.jp
 ishikari.hokkaido.jp
@@ -3837,7 +3964,6 @@ k12.ok.us
 k12.or.us
 k12.pa.us
 k12.pr.us
-k12.ri.us
 k12.sc.us
 k12.tn.us
 k12.tr
@@ -3850,6 +3976,7 @@ k12.vt.us
 k12.wa.us
 k12.wi.us
 k12.wy.us
+kaas.gg
 kadena.okinawa.jp
 kadogawa.miyazaki.jp
 kadoma.osaka.jp
@@ -4025,6 +4152,7 @@ kharkov.ua
 kherson.ua
 khmelnitskiy.ua
 khmelnytskyi.ua
+khplay.nl
 ki
 kia
 kibichuo.okayama.jp
@@ -4046,6 +4174,7 @@ kimobetsu.hokkaido.jp
 kin.okinawa.jp
 kinder
 kindle
+kinghost.net
 kinko.kagoshima.jp
 kinokawa.wakayama.jp
 kira.aichi.jp
@@ -4175,6 +4304,7 @@ kraanghke.no
 kragero.no
 kragerø.no
 krakow.pl
+krasnik.pl
 krasnodar.su
 krd
 kred
@@ -4277,10 +4407,10 @@ la
 la-spezia.it
 la.us
 laakesvuemie.no
+lab.ms
 labor.museum
 labour.museum
 lacaixa
-ladbrokes
 lahppi.no
 lajolla.museum
 lakas.hu
@@ -4290,7 +4420,6 @@ lanbib.se
 lancashire.museum
 lancaster
 lancia
-lancome
 land
 land-4-sale.us
 landes.museum
@@ -4324,6 +4453,7 @@ lc.it
 lcube-server.de
 lds
 le.it
+leadpages.co
 leangaviika.no
 lease
 leasing.aero
@@ -4334,6 +4464,7 @@ lebtimnetz.de
 lecce.it
 lecco.it
 leclerc
+leczna.pl
 lefrak
 leg.br
 legal
@@ -4346,6 +4477,7 @@ leitungsen.de
 leka.no
 leksvik.no
 lel.br
+lelux.site
 lenug.su
 lenvik.no
 lerdal.no
@@ -4359,7 +4491,6 @@ lg.ua
 lgbt
 li
 li.it
-liaison
 lib.ak.us
 lib.al.us
 lib.ar.us
@@ -4458,6 +4589,7 @@ livorno.it
 lixil
 lk
 llc
+llp
 ln.cn
 lo.it
 loabat.no
@@ -4471,17 +4603,24 @@ locus
 lodi.it
 lodingen.no
 loft
+loginline.app
+loginline.dev
+loginline.io
+loginline.services
+loginline.site
 loginto.me
 logistics.aero
 logoip.com
 logoip.de
 lol
+lolipop.io
 lom.it
 lom.no
 lombardia.it
 lombardy.it
 lomza.pl
 london
+london.cloudapps.digital
 london.museum
 londrina.br
 loppa.no
@@ -4495,8 +4634,10 @@ louvre.museum
 love
 lowicz.pl
 loyalist.museum
+lpages.co
 lpl
 lplfinancial
+lpusercontent.com
 lr
 ls
 lt
@@ -4509,13 +4650,16 @@ ltd.cy
 ltd.gi
 ltd.hk
 ltd.lk
+ltd.ng
 ltd.ua
 ltd.uk
 ltda
 lu
 lu.eu.org
 lu.it
+lubartow.pl
 lubin.pl
+lublin.pl
 lucania.it
 lucca.it
 lucerne.museum
@@ -4663,6 +4807,7 @@ me
 me.eu.org
 me.it
 me.ke
+me.so
 me.tz
 me.uk
 me.us
@@ -4695,6 +4840,7 @@ meet
 meguro.tokyo.jp
 mein-iserv.de
 mein-vigor.de
+meinforum.net
 meiwa.gunma.jp
 meiwa.mie.jp
 meland.no
@@ -4703,6 +4849,7 @@ meldal.no
 melhus.no
 meloy.no
 meløy.no
+members.linode.com
 meme
 memorial
 memorial.museum
@@ -4769,6 +4916,7 @@ mil.co
 mil.do
 mil.ec
 mil.eg
+mil.fj
 mil.ge
 mil.gh
 mil.gt
@@ -4856,6 +5004,7 @@ minoh.osaka.jp
 minokamo.gifu.jp
 minowa.nagano.jp
 mint
+mintere.site
 misaki.okayama.jp
 misaki.osaka.jp
 misasa.tottori.jp
@@ -4920,6 +5069,7 @@ mn.it
 mn.us
 mo
 mo-i-rana.no
+mo-siemens.io
 mo.cn
 mo.it
 mo.us
@@ -4933,7 +5083,6 @@ mobi.ng
 mobi.tt
 mobi.tz
 mobile
-mobily
 mochizuki.nagano.jp
 mod.gi
 moda
@@ -4965,7 +5114,6 @@ monzabrianza.it
 monzaebrianza.it
 monzaedellabrianza.it
 moonscale.net
-mopar
 mordovia.ru
 mordovia.su
 morena.br
@@ -4997,7 +5145,6 @@ motoyama.kochi.jp
 mov
 movie
 movimiento.bo
-movistar
 mozilla-iot.org
 moåreke.no
 mp
@@ -5082,10 +5229,14 @@ mydatto.com
 mydatto.net
 myddns.rocks
 mydissent.net
+mydobiss.com
 mydrobo.com
 myds.me
 myeffect.net
+myfast.host
+myfast.space
 myfirewall.org
+myforum.community
 myfritz.net
 myftp.biz
 myftp.org
@@ -5126,7 +5277,6 @@ naamesjevuemie.no
 nab
 nabari.mie.jp
 nachikatsuura.wakayama.jp
-nadex
 nagahama.shiga.jp
 nagai.yamagata.jp
 nagano.jp
@@ -5182,6 +5332,7 @@ name.az
 name.cy
 name.eg
 name.et
+name.fj
 name.hr
 name.jo
 name.mk
@@ -5259,6 +5410,7 @@ nba
 nc
 nc.tr
 nc.us
+nctu.me
 nd.us
 ne
 ne.jp
@@ -5290,6 +5442,7 @@ net.af
 net.ag
 net.ai
 net.al
+net.am
 net.ar
 net.au
 net.az
@@ -5317,6 +5470,7 @@ net.ec
 net.eg
 net.et
 net.eu.org
+net.fj
 net.ge
 net.gg
 net.gl
@@ -5349,6 +5503,7 @@ net.lb
 net.lc
 net.lk
 net.lr
+net.ls
 net.lv
 net.ly
 net.ma
@@ -5391,6 +5546,7 @@ net.sg
 net.sh
 net.sl
 net.so
+net.ss
 net.st
 net.sy
 net.th
@@ -5415,6 +5571,7 @@ net.za
 net.zm
 netbank
 netflix
+netlify.app
 netlify.com
 network
 neues.museum
@@ -5439,9 +5596,13 @@ nfl
 nflfan.org
 nfshost.com
 ng
+ng.city
 ng.eu.org
+ng.ink
+ng.school
 ngo
 ngo.lk
+ngo.ng
 ngo.ph
 ngo.za
 ngrok.io
@@ -5453,6 +5614,7 @@ nhs.uk
 ni
 nic.in
 nic.tj
+nic.za
 nichinan.miyazaki.jp
 nichinan.tottori.jp
 nico
@@ -5525,6 +5687,7 @@ nobeoka.miyazaki.jp
 noboribetsu.hokkaido.jp
 noda.chiba.jp
 noda.iwate.jp
+nodebalancer.linode.com
 nodum.co
 nodum.io
 nogata.fukuoka.jp
@@ -5541,6 +5704,7 @@ nom.af
 nom.ag
 nom.ai
 nom.al
+nom.bz
 nom.cl
 nom.co
 nom.es
@@ -5554,6 +5718,7 @@ nom.im
 nom.ke
 nom.km
 nom.li
+nom.lv
 nom.mg
 nom.mk
 nom.nc
@@ -5636,12 +5801,10 @@ ntt
 nu
 nu.ca
 nu.it
-nuernberg.museum
 numata.gunma.jp
 numata.hokkaido.jp
 numazu.shizuoka.jp
 nuoro.it
-nuremberg.museum
 nv.us
 nx.cn
 ny.us
@@ -5650,8 +5813,10 @@ nyc.mn
 nyc.museum
 nym.by
 nym.bz
+nym.ec
 nym.gr
 nym.gy
+nym.hk
 nym.ie
 nym.kz
 nym.la
@@ -5705,7 +5870,11 @@ odessa.ua
 odo.br
 oe.yamagata.jp
 of.by
+of.fashion
+of.football
+of.london
 of.no
+of.work
 off
 off.ai
 office
@@ -5801,8 +5970,10 @@ on-aptible.com
 on-the-web.tv
 on-web.fr
 on.ca
+on.fashion
 onagawa.miyagi.jp
 one
+onfabrica.com
 ong
 ong.br
 onga.fukuoka.jp
@@ -5811,12 +5982,15 @@ onjuku.chiba.jp
 onl
 online
 online.museum
+online.th
 onna.okinawa.jp
 ono.fukui.jp
 ono.fukushima.jp
 ono.hyogo.jp
 onojo.fukuoka.jp
 onomichi.hiroshima.jp
+onred.one
+onrender.com
 ontario.museum
 onthewifi.com
 onyourside
@@ -5861,6 +6035,7 @@ org.af
 org.ag
 org.ai
 org.al
+org.am
 org.ar
 org.au
 org.az
@@ -5890,6 +6065,7 @@ org.ee
 org.eg
 org.es
 org.et
+org.fj
 org.ge
 org.gg
 org.gh
@@ -5965,6 +6141,7 @@ org.qa
 org.ro
 org.rs
 org.ru
+org.rw
 org.sa
 org.sb
 org.sc
@@ -5975,6 +6152,7 @@ org.sh
 org.sl
 org.sn
 org.so
+org.ss
 org.st
 org.sv
 org.sy
@@ -6008,6 +6186,7 @@ orkdal.no
 orland.no
 orskog.no
 orsta.no
+orx.biz
 os.hedmark.no
 os.hordaland.no
 osaka
@@ -6071,6 +6250,7 @@ ownprovider.com
 ox.rs
 oxford.museum
 oy.lc
+oya.to
 oyabe.toyama.jp
 oyama.tochigi.jp
 oyamazaki.kyoto.jp
@@ -6104,6 +6284,7 @@ palmas.br
 palmsprings.museum
 panama.museum
 panasonic
+panel.gg
 pantheonsite.io
 parachuting.aero
 paragliding.aero
@@ -6146,6 +6327,7 @@ per.sg
 perso.ht
 perso.sn
 perso.tn
+perspecta.cloud
 perugia.it
 pesaro-urbino.it
 pesarourbino.it
@@ -6177,7 +6359,6 @@ pi.gov.br
 pi.it
 pi.leg.br
 piacenza.it
-piaget
 pics
 pictet
 pictures
@@ -6209,8 +6390,12 @@ place
 planetarium.museum
 plantation.museum
 plants.museum
+platter-app.com
+platter-app.dev
+platterp.us
 play
 playstation
+playstation-cloud.com
 plaza.museum
 plc.co.im
 plc.ly
@@ -6247,7 +6432,9 @@ polkowice.pl
 poltava.ua
 pomorskie.pl
 pomorze.pl
+poniatowa.pl
 ponpes.id
+pony.club
 pordenone.it
 porn
 porsanger.no
@@ -6289,7 +6476,6 @@ press.ma
 press.museum
 press.se
 presse.ci
-presse.fr
 presse.km
 presse.ml
 pri.ee
@@ -6306,6 +6492,7 @@ pro.az
 pro.br
 pro.cy
 pro.ec
+pro.fj
 pro.ht
 pro.mv
 pro.na
@@ -6330,6 +6517,7 @@ protonet.io
 pru
 prudential
 pruszkow.pl
+prvcy.page
 przeworsk.pl
 ps
 psc.br
@@ -6347,6 +6535,7 @@ publ.pt
 public.museum
 publishproxy.com
 pubol.museum
+pubtls.org
 pueblo.bo
 pug.it
 puglia.it
@@ -6365,14 +6554,17 @@ q-a.eu.org
 q.bg
 qa
 qa2.com
+qbuser.com
 qc.ca
 qc.com
+qcx.io
 qh.cn
 qld.au
 qld.edu.au
 qld.gov.au
 qpon
 qsl.br
+qualifioapp.com
 quebec
 quebec.museum
 quest
@@ -6418,6 +6610,7 @@ re.kr
 read
 read-books.org
 readmyblog.org
+readthedocs.io
 realestate
 realestate.pl
 realm.cz
@@ -6462,6 +6655,8 @@ rentals
 rep.kp
 repair
 repbody.aero
+repl.co
+repl.run
 report
 republican
 res.aero
@@ -6564,6 +6759,7 @@ ru.net
 rugby
 ruhr
 run
+run.app
 ruovat.no
 russia.museum
 rv.ua
@@ -6779,10 +6975,12 @@ sc.gov.br
 sc.ke
 sc.kr
 sc.leg.br
+sc.ls
 sc.tz
 sc.ug
 sc.us
 sca
+scapp.io
 scb
 sch.ae
 sch.id
@@ -6793,6 +6991,7 @@ sch.ly
 sch.ng
 sch.qa
 sch.sa
+sch.so
 sch.zm
 schaeffler
 schlesisches.museum
@@ -6806,7 +7005,9 @@ school.museum
 school.na
 school.nz
 school.za
+schools.nsw.edu.au
 schule
+schulserver.de
 schwarz
 schweiz.museum
 sci.eg
@@ -6873,6 +7074,7 @@ semboku.akita.jp
 semine.miyagi.jp
 sener
 sennan.osaka.jp
+senseering.net
 seoul.kr
 sera.hiroshima.jp
 seranishi.hiroshima.jp
@@ -7025,7 +7227,10 @@ shop.ht
 shop.hu
 shop.pl
 shop.ro
+shop.th
+shopitsite.com
 shopping
+shopware.store
 shouji
 show
 show.aero
@@ -7055,6 +7260,7 @@ singles
 siracusa.it
 sirdal.no
 site
+siteleaf.net
 sites.static.land
 sj
 sjc.br
@@ -7085,6 +7291,7 @@ skodje.no
 skole.museum
 sky
 skydiving.aero
+skygearapp.com
 skype
 skánit.no
 skånland.no
@@ -7117,6 +7324,7 @@ so.gov.pl
 so.it
 sobetsu.hokkaido.jp
 soc.lk
+soc.srcf.net
 soccer
 sochi.su
 social
@@ -7168,6 +7376,7 @@ soy
 sp.gov.br
 sp.it
 sp.leg.br
+spa
 space
 space-to-rent.com
 space.museum
@@ -7177,7 +7386,6 @@ spb.su
 spdns.de
 spdns.eu
 spdns.org
-spiegel
 spjelkavik.no
 sport
 sport.hu
@@ -7193,15 +7401,17 @@ sr
 sr.gov.pl
 sr.it
 srl
-srt
 srv.br
+ss
 ss.it
 ssl.origin.cdn77-secure.org
 st
 st.no
+stackhero-network.com
 stada
 stadt.museum
 stage.nodeart.io
+staging.onred.one
 stalbans.museum
 stalowa-wola.pl
 stange.no
@@ -7209,7 +7419,6 @@ staples
 star
 starachowice.pl
 stargard.pl
-starhub
 starnberg.museum
 starostwo.gov.pl
 stat.no
@@ -7220,8 +7429,8 @@ stateofdelaware.museum
 stathelle.no
 static-access.net
 static.land
+static.observableusercontent.com
 station.museum
-statoil
 stavanger.no
 stavern.no
 stc
@@ -7230,6 +7439,7 @@ steam.museum
 steiermark.museum
 steigen.no
 steinkjer.no
+sth.ac.at
 stjohn.museum
 stjordal.no
 stjordalshalsen.no
@@ -7240,6 +7450,7 @@ stockholm.museum
 stokke.no
 stor-elvdal.no
 storage
+storage.yandexcloud.net
 stord.no
 stordal.no
 store
@@ -7302,7 +7513,6 @@ suzaka.nagano.jp
 suzu.ishikawa.jp
 suzuka.mie.jp
 suzuki
-südtirol.it
 sv
 sv.it
 svalbard.no
@@ -7314,6 +7524,7 @@ swatch
 sweden.museum
 sweetpepper.org
 swidnica.pl
+swidnik.pl
 swiebodzin.pl
 swiftcover
 swinoujscie.pl
@@ -7325,6 +7536,7 @@ sydney
 sydney.museum
 sykkylven.no
 symantec
+syncloud.it
 syno-ds.de
 synology-diskstation.de
 synology-ds.de
@@ -7348,6 +7560,7 @@ sør-varanger.no
 sørfold.no
 sørreisa.no
 sørum.no
+südtirol.it
 t.bg
 t.se
 t3l3p0rt.net
@@ -7460,6 +7673,7 @@ tax
 taxi
 taxi.br
 tc
+tc.br
 tci
 tcm.museum
 tcp4.me
@@ -7478,7 +7692,8 @@ tecnologia.bo
 tel
 tel.tr
 tele.amune.org
-telefonica
+telebit.app
+telebit.io
 telekommunikation.museum
 television.museum
 temasek
@@ -7512,6 +7727,7 @@ theater
 theater.museum
 theatre
 theworkpc.com
+thingdustdata.com
 thruhere.net
 tiaa
 tickets
@@ -7557,6 +7773,7 @@ to
 to.gov.br
 to.it
 to.leg.br
+to.work
 toba.mie.jp
 tobe.ehime.jp
 tobetsu.hokkaido.jp
@@ -7609,6 +7826,7 @@ tone.ibaraki.jp
 tono.iwate.jp
 tonosho.kagawa.jp
 tonsberg.no
+toolforge.org
 tools
 toon.ehime.jp
 top
@@ -7696,8 +7914,8 @@ trentin-sud-tirol.it
 trentin-sudtirol.it
 trentin-sued-tirol.it
 trentin-suedtirol.it
-trentin-süd-tirol.it
-trentin-südtirol.it
+trentin-süd-tirol.it
+trentin-südtirol.it
 trentino-a-adige.it
 trentino-aadige.it
 trentino-alto-adige.it
@@ -7708,8 +7926,8 @@ trentino-sud-tirol.it
 trentino-sudtirol.it
 trentino-sued-tirol.it
 trentino-suedtirol.it
-trentino-süd-tirol.it
-trentino-südtirol.it
+trentino-süd-tirol.it
+trentino-südtirol.it
 trentino.it
 trentinoa-adige.it
 trentinoaadige.it
@@ -7721,14 +7939,14 @@ trentinosud-tirol.it
 trentinosudtirol.it
 trentinosued-tirol.it
 trentinosuedtirol.it
-trentinosüd-tirol.it
-trentinosüdtirol.it
+trentinosüd-tirol.it
+trentinosüdtirol.it
 trentinsud-tirol.it
 trentinsudtirol.it
 trentinsued-tirol.it
 trentinsuedtirol.it
-trentinsüd-tirol.it
-trentinsüdtirol.it
+trentinsüd-tirol.it
+trentinsüdtirol.it
 trento.it
 treviso.it
 trieste.it
@@ -7744,11 +7962,13 @@ trust
 trust.museum
 trustee.museum
 trv
+trycloudflare.com
 trysil.no
 træna.no
 trøgstad.no
 ts.it
 tselinograd.su
+tsk.tr
 tsu.mie.jp
 tsubame.niigata.jp
 tsubata.ishikawa.jp
@@ -7821,10 +8041,12 @@ tysvær.no
 tz
 tønsberg.no
 u.bg
+u.channelsdvr.net
 u.se
 u2-local.xnbay.com
 u2.xnbay.com
 ua
+ua.rs
 ubank
 ube.yamaguchi.jp
 uber.space
@@ -7833,7 +8055,6 @@ uchihara.ibaraki.jp
 uchiko.ehime.jp
 uchinada.ishikawa.jp
 uchinomi.kagawa.jp
-uconnect
 ud.it
 uda.nara.jp
 udi.br
@@ -7847,6 +8068,7 @@ ug
 ug.gov.pl
 ugim.gov.pl
 uhren.museum
+ui.nabu.casa
 uji.kyoto.jp
 ujiie.tochigi.jp
 ujitawara.kyoto.jp
@@ -7854,6 +8076,8 @@ uk
 uk.com
 uk.eu.org
 uk.net
+uk0.bigv.io
+ukco.me
 uki.kumamoto.jp
 ukiha.fukuoka.jp
 uklugs.org
@@ -7870,6 +8094,7 @@ umi.fukuoka.jp
 umig.gov.pl
 unazuki.toyama.jp
 undersea.museum
+uni5.net
 unicom
 union.aero
 univ.sn
@@ -7898,6 +8123,7 @@ ureshino.mie.jp
 uri.arpa
 url.tw
 urn.arpa
+urown.cloud
 uruma.okinawa.jp
 uryu.hokkaido.jp
 us
@@ -7923,7 +8149,10 @@ usarts.museum
 uscountryestate.museum
 usculture.museum
 usdecorativearts.museum
+user.aseinet.ne.jp
 user.party.eus
+user.srcf.net
+usercontent.jp
 usgarden.museum
 ushiku.ibaraki.jp
 ushistory.museum
@@ -7945,6 +8174,7 @@ utwente.io
 uvic.museum
 uw.gov.pl
 uwajima.ehime.jp
+uwu.ai
 uy
 uy.com
 uz
@@ -7953,6 +8183,7 @@ uzhgorod.ua
 uzs.gov.pl
 v-info.info
 v.bg
+v.ua
 va
 va.it
 va.no
@@ -7983,10 +8214,10 @@ vallee-d-aoste.it
 valleeaoste.it
 valleedaoste.it
 valley.museum
-vallée-aoste.it
-vallée-d-aoste.it
-valléeaoste.it
-valléedaoste.it
+vallée-aoste.it
+vallée-d-aoste.it
+valléeaoste.it
+valléedaoste.it
 vana
 vang.no
 vanguard
@@ -8070,12 +8301,12 @@ virgin
 virginia.museum
 virtual-user.de
 virtual.museum
+virtualserver.io
 virtualuser.de
 virtueeldomein.nl
 virtuel.museum
 visa
 vision
-vistaprint
 viterbo.it
 viva
 vivo
@@ -8087,6 +8318,7 @@ vladikavkaz.su
 vladimir.ru
 vladimir.su
 vlog.br
+vm.bytemark.co.uk
 vn
 vn.ua
 voagat.no
@@ -8097,6 +8329,7 @@ volkswagen
 vologda.su
 volvo
 volyn.ua
+voorloper.cloud
 voss.no
 vossevangen.no
 vote
@@ -8126,6 +8359,7 @@ wa.edu.au
 wa.gov.au
 wa.us
 wada.nagano.jp
+wafflecell.com
 wajiki.tokushima.jp
 wajima.ishikawa.jp
 wakasa.fukui.jp
@@ -8146,7 +8380,6 @@ wanggou
 wanouchi.gifu.jp
 war.museum
 warabi.saitama.jp
-warman
 warmia.pl
 warszawa.pl
 washingtondc.museum
@@ -8163,6 +8396,7 @@ wazuka.kyoto.jp
 we.bs
 weather
 weatherchannel
+web.app
 web.bo
 web.co
 web.do
@@ -8186,6 +8420,7 @@ webhop.org
 webhosting.be
 webredirect.org
 website
+website.yandexcloud.net
 webspace.rocks
 wed
 wedding
@@ -8226,13 +8461,16 @@ withyoutube.com
 wiw.gov.pl
 wlocl.pl
 wloclawek.pl
+wmcloud.org
 wme
 wmflabs.org
+wnext.app
 wodzislaw.pl
 wolomin.pl
 wolterskluwer
 woodside
 work
+workers.dev
 workinggroup.aero
 workisboring.com
 works
@@ -8320,6 +8558,7 @@ yame.fukuoka.jp
 yanagawa.fukuoka.jp
 yanaizu.fukushima.jp
 yandex
+yandexcloud.net
 yao.osaka.jp
 yaotsu.gifu.jp
 yasaka.nagano.jp
@@ -8421,12 +8660,10 @@ zgorzelec.pl
 zhitomir.ua
 zhytomyr.ua
 zip
-zippo
 zj.cn
 zlg.br
 zm
 zone
-zone.id
 zoological.museum
 zoology.museum
 zp.gov.pl
@@ -8460,6 +8697,7 @@ zw
 øystre-slidre.no
 čáhcesuolo.no
 ελ
+ευ
 ак.срб
 бг
 бел
@@ -8522,7 +8760,7 @@ zw
 كوم
 مصر
 مليسيا
-موبايلي
+موريتانيا
 موقع
 همراه
 پاكستان
@@ -8557,6 +8795,7 @@ zw
 ไทย
 გე
 みんな
+アマゾン
 クラウド
 グーグル
 コム
@@ -8571,6 +8810,7 @@ zw
 中国
 中國
 中文网
+亚马逊
 京都.jp
 企业
 佐賀.jp
@@ -8617,7 +8857,6 @@ zw
 岡山.jp
 岩手.jp
 島根.jp
-工行
 广东
 広島.jp
 微博

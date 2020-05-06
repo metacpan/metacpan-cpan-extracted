@@ -3,16 +3,17 @@ NAME
     versions
 
 VERSION
-    This document describes version 0.04 of App::lcpan::CmdBundle::ver (from
-    Perl distribution App-lcpan-CmdBundle-ver), released on 2017-07-10.
+    This document describes version 0.050 of App::lcpan::CmdBundle::ver
+    (from Perl distribution App-lcpan-CmdBundle-ver), released on
+    2020-05-06.
 
 SYNOPSIS
 DESCRIPTION
     This bundle provides the following lcpan subcommands:
 
-    *   lcpan ver-cmp-list
-
     *   lcpan outdated
+
+    *   lcpan ver-cmp-list
 
     *   lcpan ver-cmp-installed
 
@@ -42,7 +43,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2017, 2016 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

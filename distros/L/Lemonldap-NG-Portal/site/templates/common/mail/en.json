@@ -4,6 +4,7 @@
 "autoMail":"This mail was sent automatically",
 "click2Register":"Click here to confirm your account registration",
 "click2Reset":"Click here to reset your password",
+"goToPortal":"Go to portal",
 "hello":"Hello",
 "mail2fSubject":"[LemonLDAP::NG] Your login code",
 "mailConfirmSubject": "[LemonLDAP::NG] Password reset confirmation",

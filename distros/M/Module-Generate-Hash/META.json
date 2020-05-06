@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Import::Export" : "1",
-            "Module::Generate" : "0.08",
+            "Module::Generate" : "0.11",
             "perl" : "5.006"
          }
       },
@@ -44,6 +44,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.04",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,9 +1,10 @@
+use 5.010;
 use strict;
 use warnings;
 use Test::More;
 use Alien::sqlite;
 
-diag( 'NAME=' . Alien::sqlite->config('name') );
+diag( 'NAME=' . Alien::sqlite->config('name') // '' );
 diag( 'VERSION=' . Alien::sqlite->config('version') );
 
 my $alien = Alien::sqlite->new;

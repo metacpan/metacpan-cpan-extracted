@@ -1,0 +1,59 @@
+Geo-Elevation-HGT
+
+NAME
+
+Geo::Elevation::HGT - Elevation service with terrain data provided by Mapzen and Amazon AWS S3 athttps://registry.opendata.aws/terrain-tiles
+
+VERSION
+
+Version 0.01 - initial release
+
+SYNOPSIS
+
+ use Geo::Elevation::HGT;
+ my ($lat, $lon) = (45.8325, 6.86444444444444);    # MontBlanc
+ my $geh = Geo::Elevation::HGT->new();
+ print $geh->get_elevation_hgt ($lat, $lon)."\n";
+ # 4790.99999999998
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Geo::Elevation::HGT
+
+You can also look for information at:
+
+  -- Note: not found on CPAN (yet) -- check again later --
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Elevation-HGT
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Geo-Elevation-HGT
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Geo-Elevation-HGT
+
+    Search CPAN
+        https://metacpan.org/release/Geo-Elevation-HGT
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2020 by Ulrich Buck.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

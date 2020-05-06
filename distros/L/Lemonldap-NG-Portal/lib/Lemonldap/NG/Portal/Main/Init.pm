@@ -8,7 +8,7 @@
 #                  of lemonldap-ng.ini) and underlying handler configuration
 package Lemonldap::NG::Portal::Main::Init;
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -123,13 +123,30 @@ sub init {
     Lemonldap::NG::Handler::Main->onReload( $self, 'reloadConf' );
 
     # Handler::PSGI::Try initialization
-    return 0 unless ( $self->SUPER::init( $self->localConfig ) );
+    unless ( $self->SUPER::init( $self->localConfig ) ) {
+        $self->logger->error( 'Initialization failed: ' . $self->error );
+        $self->error(
+"Initialization failed! Enable debug logs, reload your web server and catch main error..."
+        );
+        return 0;
+    }
     if ( $self->error ) {
         $self->logger->error( $self->error );
         return 0;
     }
 
-    # Handle requests (other path may be declared in enabled plugins)
+    # Default routes must point to routines declared above
+    $self->defaultAuthRoute('');
+    $self->defaultUnauthRoute('');
+    return 1;
+}
+
+sub setPortalRoutes {
+    my ($self) = @_;
+    $self->authRoutes(
+        { GET => {}, POST => {}, PUT => {}, DELETE => {}, OPTIONS => {} } );
+    $self->unAuthRoutes(
+        { GET => {}, POST => {}, PUT => {}, DELETE => {}, OPTIONS => {} } );
     $self
 
       # "/" or undeclared paths
@@ -167,10 +184,14 @@ sub init {
     $self->defaultAuthRoute('');
     $self->defaultUnauthRoute('');
     return 1;
+
 }
 
 sub reloadConf {
     my ( $self, $conf ) = @_;
+
+    # Handle requests (other path may be declared in enabled plugins)
+    $self->setPortalRoutes;
 
     # Reinitialize $self->conf
     %{ $self->{conf} } = %{ $self->localConfig };
@@ -203,9 +224,11 @@ sub reloadConf {
     {
         my $header = $_;
         my $prm    = $self->conf->{ 'cors' . $_ };
-        $header =~ s/_/-/;
-        $prm    =~ s/\s+//;
-        $cors .= "Access-Control-$header;$prm;";
+        if ( $header and $prm ) {
+            $header =~ s/_/-/;
+            $prm    =~ s/\s+//;
+            $cors .= "Access-Control-$header;$prm;";
+        }
     }
     $self->cors($cors);
     $self->logger->debug( "Initialized CORS headers : " . $self->cors );
@@ -356,11 +379,7 @@ sub reloadConf {
 
     # Clean $req->pdata after authentication
     push @{ $self->endAuth }, sub {
-
-        my $tmp =
-          ( ref( $_[0]->pdata->{keepPdata} ) eq 'ARRAY' )
-          ? $_[0]->pdata->{keepPdata}
-          : [];
+        my $tmp = $_[0]->pdata->{keepPdata} //= [];
         foreach my $k ( keys %{ $_[0]->pdata } ) {
             unless ( grep { $_ eq $k } @$tmp ) {
                 $self->logger->debug("Removing $k from pdata");
@@ -514,6 +533,27 @@ sub displayError {
     my ( $self, $req ) = @_;
     return $self->sendError( $req,
         'Portal error, contact your administrator', 500 );
+}
+
+# This helper method builds a rule from a string expression
+# - $rule: rule text
+# - $ruleDesc optional hint of what the rule is for, to display in error message
+# returns undef if the rule syntax was invalid
+sub buildRule {
+    my ( $self, $rule, $ruleDesc ) = @_;
+    if ($ruleDesc) {
+        $ruleDesc = " $ruleDesc ";
+    }
+    else {
+        $ruleDesc = " ";
+    }
+    my $compiledRule =
+      $self->HANDLER->buildSub( $self->HANDLER->substitute($rule) );
+    unless ($compiledRule) {
+        my $error = $self->HANDLER->tsv->{jail}->error || '???';
+        $self->logger->error( "Bad" . $ruleDesc . "rule: " . $error );
+    }
+    return $compiledRule,;
 }
 
 1;

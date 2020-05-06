@@ -73,8 +73,7 @@ ok( $res->[2]->[0] =~ m%<span trspan="decryptCipheredValue">%,
 count(2);
 
 # Decrypt ciphered value
-$query =~
-s%cipheredValue=%cipheredValue=lowercase%;
+$query =~ s%cipheredValue=%cipheredValue=lowercase%;
 ok(
     $res = $client->_post(
         '/decryptvalue',
@@ -85,7 +84,8 @@ ok(
     ),
     'POST decryptvalue with valid value'
 );
-ok( $res->[2]->[0] =~ m%<span trspan="LOWERCASE"></span>%, 'Found decryted value' )
+ok( $res->[2]->[0] =~ m%<span trspan="LOWERCASE"></span>%,
+    'Found decryted value' )
   or explain( $res->[2]->[0], 'Decryted value NOT found' );
 count(2);
 ( $host, $url, $query ) =

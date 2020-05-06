@@ -1,0 +1,8 @@
+% layout "layout.ep", title => "Hello";
+%= wrapper "wrapper.ep", header => "HEAD1", begin
+profile
+%end
+<%= $aaa %>
+% content 'test' => begin
+this <b>is</b> content
+% end;

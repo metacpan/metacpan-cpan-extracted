@@ -8,7 +8,7 @@ package Metrics::Any::Adapter::Prometheus;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Carp;
 
@@ -54,6 +54,10 @@ sub new
       use_histograms => $args{use_histograms} // 1,
    }, $class;
 }
+
+=head1 METHODS
+
+=cut
 
 sub mangle_name
 {
@@ -102,31 +106,73 @@ sub inc_counter_by
       ->inc( @labelvalues, $amount );
 }
 
-sub _exp125_buckets
-{
-   my ( $from, $to ) = @_;
-   my @ret;
-   while( $from < $to ) {
-      push @ret, 1*$from, 2*$from, 5*$from;
-      $from *= 10;
-   }
-   push @ret, $from if $from == $to;
-   return @ret;
-}
-sub _exp10_buckets
-{
-   my ( $from, $to ) = @_;
-   my @ret;
-   while( $from <= $to ) {
-      push @ret, $from;
-      $from *= 10;
-   }
-   return @ret;
-}
+=head2 make_distribution
+
+   $adapter->make_distribution( $name, %args )
+
+In addition to the standard arguments, the following are recognised:
+
+=over 4
+
+=item buckets => ARRAY[ NUM ]
+
+If present, overrides the default Histogram bucket sizes.
+
+=item bucket_min => NUM
+
+=item bucket_max => NUM
+
+=item buckets_per_decade => ARRAY[ NUM ]
+
+I<Since version 0.04.>
+
+A more flexible alternative to specifying literal bucket sizes. The values
+given in C<buckets_per_decade> are repeated, multiplied by various powers of
+10 to generate values between C<bucket_min> (or a default of 0.001 if not
+supplied) and C<bucket_max> (or a default of 1000 if not supplied).
+
+=back
+
+=cut
+
 my %BUCKETS_FOR_UNITS = (
-   bytes   => [ _exp10_buckets 100, 1E8 ],
+   bytes   => { bucket_min => 100, bucket_max => 1E8 },
    seconds => undef, # Prometheus defaults are fine
 );
+
+# TODO: This probably ought to live in Net::Prometheus::Histogram
+sub gen_buckets
+{
+   shift;
+   my ( $args ) = @_;
+
+   my $min = $args->{bucket_min} // 1E-3;
+   my $max = $args->{bucket_max} // 1E3;
+
+   my @values_per_decade = @{ $args->{buckets_per_decade} // [ 1 ] };
+
+   my $value;
+   my @buckets;
+
+   $value = 1;
+   while( $value >= $min ) {
+      unshift @buckets, map { $_ * $value } @values_per_decade;
+
+      $value /= 10;
+   }
+
+   $value = 10;
+   while( $value <= $max ) {
+      push @buckets, map { $_ * $value } @values_per_decade;
+
+      $value *= 10;
+   }
+
+   # Trim overgenerated ends
+   @buckets = grep { $min <= $_ and $_ <= $max } @buckets;
+
+   $args->{buckets} = \@buckets;
+}
 
 sub make_distribution
 {
@@ -140,7 +186,11 @@ sub make_distribution
    # Append _bytes et.al. if required
    $name .= "_$units" unless $name =~ m/_\Q$units\E$/;
 
-   $args{buckets} //= $BUCKETS_FOR_UNITS{$units} if $BUCKETS_FOR_UNITS{$units};
+   unless( $args{buckets} ) {
+      %args = ( %{ $BUCKETS_FOR_UNITS{$units} }, %args ) if $BUCKETS_FOR_UNITS{$units};
+
+      $self->gen_buckets( \%args ) if grep { m/^bucket/ } keys %args;
+   }
 
    my $metric_class = $self->{use_histograms} ? "Net::Prometheus::Histogram" :
                                                 "Net::Prometheus::Summary";

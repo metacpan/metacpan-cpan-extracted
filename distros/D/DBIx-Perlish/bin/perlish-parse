@@ -55,18 +55,21 @@ sub slurp($)
 	}
 }
 
-my $int  = 5;
+my $null  = undef;
+my $int  = 0;
+my $out_int  = 1;
 my $str  = 'x';
+my $our_str  = 'x';
 my $like = 'LIKE%';
 my $rx   = '.*';
 my @arr  = (1,2);
-my %hash = ( a => 1);
+my %hash = ( x => 1);
 my $arr_ref  = [1, 2];
-my $hash_ref = {a => 1};
-our $our_int  = 5;
+my $hash_ref = {x => 1};
+our $our_int  = 0;
 our @our_arr  = (1,2);
 our $arr_our_ref  = [1, 2];
-our $hash_our_ref = {a => 1};
+our $hash_our_ref = {x => 1};
 
 my ( $mode, $text );
 if ( 0 == @ARGV ) {

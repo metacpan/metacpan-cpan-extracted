@@ -17,7 +17,7 @@ use Params::Validate ();
 use Module::Find qw( );
 
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 use overload
   '%{}' => '_envhash',
@@ -876,7 +876,18 @@ sub exec
 }
 
 
+#-------------------------------------------------------
 
+sub which
+{
+    require File::Which;
+    my $self = shift;
+
+    {
+        local %ENV = %{$self};
+        return File::Which::which( @_ );
+    }
+}
 
 ###############################################
 ###############################################
@@ -1073,7 +1084,7 @@ App::Env - manage application specific environments
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 SYNOPSIS
 
@@ -1677,6 +1688,15 @@ B<IPC::System::Simple::capture> is called, which will cause this
 method to throw an exception if the command returned a non-zero exit
 value.  It also avoid invoking a shell to run the command if possible.
 
+=item which
+
+  $path = $env->which( $command );
+  @paths = $env->which( $command );
+
+Return the path (or paths in list mode) of the passed command using
+L<File::Which>.  It returns C<undef> or an empty list if the command
+is not found.
+
 =back
 
 =head2 Changing Default Option Values
@@ -1788,20 +1808,21 @@ option; this will either create a new environment if none exists or
 clone an existing one.  In either case the result won't be cached and
 any changes will be localized.
 
-=head1 BUGS
+=head1 SUPPORT
 
-Please report any bugs or feature requests on the bugtracker website
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-Env> or by email to
-L<bug-App-Env@rt.cpan.org|mailto:bug-App-Env@rt.cpan.org>.
+=head2 Bugs
 
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+Please report any bugs or feature requests to bug-app-env@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=App-Env
 
-=head1 SOURCE
+=head2 Source
 
-The development version is on github at L<https://github.com/djerius/app-env>
-and may be cloned from L<git://github.com/djerius/app-env.git>
+Source is available at
+
+  https://gitlab.com/djerius/App-Env
+
+and may be cloned from
+
+  https://gitlab.com/djerius/App-Env.git
 
 =head1 SEE ALSO
 

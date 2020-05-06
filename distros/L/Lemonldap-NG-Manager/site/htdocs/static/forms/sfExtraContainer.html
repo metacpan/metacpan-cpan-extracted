@@ -5,11 +5,12 @@
   <table class="table table-striped">
     <thead>
       <tr>
-        <th width="12%" trspan="name"></th>
-        <th width="11%" trspan="type"></th>
-        <th width="33%" trspan="label"></th>
-        <th width="11%" trspan="logo"></th>
-        <th width="33%" trspan="rule"></th>
+        <th trspan="name"></th>
+        <th trspan="type"></th>
+        <th trspan="label"></th>
+        <th trspan="logo"></th>
+        <th trspan="level"></th>
+        <th trspan="rule"></th>
         <th />
       </tr>
     </thead>
@@ -28,6 +29,9 @@
         </td>
         <td>
           <input class="form-control" ng-model="s.data.logo" />
+        </td>
+        <td>
+          <input class="form-control" ng-model="s.data.level" />
         </td>
         <td>
           <input class="form-control" ng-model="s.data.rule" />

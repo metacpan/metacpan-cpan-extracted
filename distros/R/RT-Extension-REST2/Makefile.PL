@@ -6,6 +6,7 @@ license  'gpl_2';
 githubmeta('github');
 
 requires_rt('4.2.4');
+rt_too_new('5.0.0');
 
 requires 'Encode';
 requires 'JSON';
@@ -20,7 +21,7 @@ requires 'Sub::Exporter';
 requires 'Web::Machine' => '0.12';
 requires 'Module::Path';
 requires 'Pod::POM';
-requires 'Path::Dispatcher';
+requires 'Path::Dispatcher' => '1.07';
 
 recommends 'JSON::XS';
 

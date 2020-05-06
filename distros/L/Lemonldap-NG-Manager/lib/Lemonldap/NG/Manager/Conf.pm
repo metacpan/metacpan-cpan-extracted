@@ -17,9 +17,10 @@ use URI::URL;
 
 use feature 'state';
 
-extends 'Lemonldap::NG::Common::Conf::RESTServer';
+extends 'Lemonldap::NG::Manager::Plugin',
+  'Lemonldap::NG::Common::Conf::RESTServer';
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 #############################
 # I. INITIALIZATION METHODS #
@@ -27,36 +28,11 @@ our $VERSION = '2.0.7';
 
 use constant defaultRoute => 'manager.html';
 
-has ua       => ( is => 'rw' );
-has diffRule => ( is => 'rw', default => sub { 0 } );
-has brwRule  => ( is => 'rw', default => sub { 0 } );
+has ua => ( is => 'rw' );
 
-sub addRoutes {
+sub init {
     my ( $self, $conf ) = @_;
     $self->ua( Lemonldap::NG::Common::UserAgent->new($conf) );
-    my $hd = "Lemonldap::NG::Handler::PSGI::Main";
-
-    # Parse Diff activation rule
-    $self->logger->debug(
-        "Diff activation rule -> " . ( $self->{viewerAllowDiff} // 0 ) );
-    my $rule = $hd->buildSub( $hd->substitute( $self->{viewerAllowDiff} ) );
-    unless ($rule) {
-        $self->error(
-            "Bad Diff activation rule -> " . $hd->tsv->{jail}->error );
-        return 0;
-    }
-    $self->diffRule($rule);
-
-    # Parse Browser activation rule
-    $self->logger->debug(
-        "Browser activation rule -> " . ( $self->{viewerAllowBrowser} // 0 ) );
-    $rule = $hd->buildSub( $hd->substitute( $self->{viewerAllowBrowser} ) );
-    unless ($rule) {
-        $self->error(
-            "Bad Browser activation rule -> " . $hd->tsv->{jail}->error );
-        return 0;
-    }
-    $self->brwRule($rule);
 
     # HTML template
     $self->addRoute( 'manager.html', undef, ['GET'] )
@@ -95,6 +71,7 @@ sub addRoutes {
 
       # Url loader
       ->addRoute( 'prx', undef, ['POST'] );
+    return 1;
 }
 
 # 35 - New RSA key pair on demand
@@ -268,7 +245,7 @@ sub newConf {
         }
     }
     if ( $res->{result} ) {
-        if ( $self->{demoMode} ) {
+        if ( $self->p->{demoMode} ) {
             $res->{message} = '__demoModeOn__';
         }
         else {
@@ -279,7 +256,7 @@ sub newConf {
               unless ( @{ $parser->{needConfirmation} } && !$args{force} );
             if ( $s > 0 ) {
                 $self->userLogger->notice(
-                    'User ' . $self->userId($req) . " has stored conf $s" );
+                    'User ' . $self->p->userId($req) . " has stored conf $s" );
                 $res->{result} = 1;
                 $res->{cfgNum} = $s;
                 if ( my $status = $self->applyConf( $parser->newConf ) ) {
@@ -291,7 +268,7 @@ sub newConf {
             else {
                 $self->userLogger->notice(
                     'Saving attempt rejected, asking for confirmation to '
-                      . $self->userId($req) );
+                      . $self->p->userId($req) );
                 $res->{result} = 0;
                 if ( $s == CONFIG_WAS_CHANGED ) {
                     $res->{needConfirm} = 1;
@@ -324,7 +301,7 @@ sub newRawConf {
     }
 
     my $res = {};
-    if ( $self->{demoMode} ) {
+    if ( $self->p->{demoMode} ) {
         $res->{message} = '__demoModeOn__';
     }
     else {
@@ -332,15 +309,16 @@ sub newRawConf {
         # chances to be equal to last config cfgNum
         my $s = $self->confAcc->saveConf( $new, force => 1 );
         if ( $s > 0 ) {
-            $self->userLogger->notice(
-                'User ' . $self->userId($req) . " has stored (raw) conf $s" );
+            $self->userLogger->notice( 'User '
+                  . $self->p->userId($req)
+                  . " has stored (raw) conf $s" );
             $res->{result} = 1;
             $res->{cfgNum} = $s;
         }
         else {
             $self->userLogger->notice(
                 'Raw saving attempt rejected, asking for confirmation to '
-                  . $self->userId($req) );
+                  . $self->p->userId($req) );
             $res->{result}      = 0;
             $res->{needConfirm} = 1 if ( $s == CONFIG_WAS_CHANGED );
             $res->{message} .= '__needConfirmation__';
@@ -359,7 +337,7 @@ sub applyConf {
     my $status;
 
     # 1 Apply conf locally
-    $self->api->checkConf();
+    $self->p->api->checkConf();
 
     # Get apply section values
     my %reloadUrls =

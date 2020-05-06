@@ -2,6 +2,8 @@
 
 #----------------------------------------
 # Contributed by Erik Huelsmann (ehuels@gmail.com)
+#
+# NB: This predates Protocol::DBus::Client::AnyEvent. Use that instead.
 #----------------------------------------
 
 use strict;

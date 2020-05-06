@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::PromptIfStale; # git description: v0.054-8-g735317d
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
+package Dist::Zilla::Plugin::PromptIfStale; # git description: v0.056-4-gfae9b39
+# vim: set ts=8 sts=2 sw=2 tw=115 et :
 # ABSTRACT: Check at build/release time if modules are out of date
 # KEYWORDS: prerequisites upstream dependencies modules metadata update stale
 
-our $VERSION = '0.055';
+our $VERSION = '0.057';
 
 use Moose;
 with 'Dist::Zilla::Role::BeforeBuild',
@@ -87,7 +87,7 @@ around dump_config => sub
     my $config = $self->$orig;
 
     $config->{+__PACKAGE__} = {
-        (map { $_ => $self->$_ ? 1 : 0 } qw(check_all_plugins check_all_prereqs run_under_travis)),
+        (map +($_ => $self->$_ ? 1 : 0), qw(check_all_plugins check_all_prereqs run_under_travis)),
         phase => $self->phase,
         skip => [ sort $self->skip ],
         modules => [ sort $self->_raw_modules ],
@@ -312,7 +312,7 @@ has _authordeps => (
         [
             grep { my $module = $_; none { $module eq $_ } @skip }
             uniq(
-                map { (%$_)[0] }
+                map +(%$_)[0],
                     @{ Dist::Zilla::Util::AuthorDeps::extract_author_deps($self->zilla->root) }
             )
         ];
@@ -328,9 +328,12 @@ has _modules_plugin => (
         my $self = shift;
         my @skip = $self->skip;
         [
+            # we look on disk since it is too early to check $zilla->files
+            # TODO: do this properly by moving the caller to after_build
+            grep { (my $filename = $_) =~ s{::}{/}g; !-f "${filename}.pm" }
             grep { my $module = $_; none { $module eq $_ } @skip }
             uniq
-            map { find_meta($_)->name }
+            map find_meta($_)->name,
             eval { Dist::Zilla->VERSION('7.000') } ? $self->zilla->plugins : @{ $self->zilla->plugins }
         ];
     },
@@ -347,10 +350,10 @@ has _modules_prereq => (
         my @skip = $self->skip;
         [
             grep { my $module = $_; none { $module eq $_ } @skip }
-            map { keys %$_ }
-            grep { defined }
-            map { @{$_}{qw(requires recommends suggests)} }
-            grep { defined }
+            map keys %$_,
+            grep defined,
+            map @{$_}{qw(requires recommends suggests)},
+            grep defined,
             values %$prereqs
         ];
     },
@@ -496,7 +499,7 @@ Dist::Zilla::Plugin::PromptIfStale - Check at build/release time if modules are 
 
 =head1 VERSION
 
-version 0.055
+version 0.057
 
 =head1 SYNOPSIS
 
@@ -637,7 +640,7 @@ L<http://dzil.org/#mailing-list>.
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.freenode.org>.
 
 =head1 AUTHOR
 

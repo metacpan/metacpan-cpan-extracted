@@ -1,17 +1,18 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2020 -- leonerd@leonerd.org.uk
 
 package IO::Async::Loop::IO::Async;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
-use constant API_VERSION => '0.33';
+our $VERSION = '0.03';
+use constant API_VERSION => '0.76';
 
 use base qw( IO::Async::Loop );
+IO::Async::Loop->VERSION( 0.49 );
 
 use Carp;
 
@@ -25,22 +26,22 @@ use IO::Async::PID;
 
 =head1 NAME
 
-L<IO::Async::Loop::IO::Async> - use C<IO::Async> with C<IO::Async>
+C<IO::Async::Loop::IO::Async> - use C<IO::Async> with C<IO::Async>
 
 =head1 SYNOPSIS
 
- use IO::Async::Loop::IO::Async;
+   use IO::Async::Loop::IO::Async;
 
- my $loop = IO::Async::Loop::IO::Async->new();
+   my $loop = IO::Async::Loop::IO::Async->new();
 
- $loop->add( ... );
+   $loop->add( ... );
 
- $loop->add( IO::Async::Signal->new(
-       name => 'HUP',
-       on_receipt => sub { ... },
- ) );
+   $loop->add( IO::Async::Signal->new(
+         name => 'HUP',
+         on_receipt => sub { ... },
+   ) );
 
- $loop->loop_forever();
+   $loop->run;
 
 =head1 DESCRIPTION
 
@@ -71,7 +72,9 @@ to attach some other event system on top of C<IO::Async>.
 
 =cut
 
-=head2 $loop = IO::Async::Loop::IO::Async->new()
+=head2 new
+
+   $loop = IO::Async::Loop::IO::Async->new()
 
 This function returns a new instance of a C<IO::Async::Loop::IO::Async> object.
 
@@ -93,9 +96,11 @@ sub new
 
 =cut
 
-=head2 $loop->parent_loop( $parent )
+=head2 parent_loop
 
-=head2 $parent = $loop->parent_loop
+   $loop->parent_loop( $parent )
+
+   $parent = $loop->parent_loop
 
 Accessor for the underlying C<IO::Async::Loop> that this loop will use. If one
 is not provided by the time that C<loop_once> is first invoked, one will be
@@ -185,17 +190,28 @@ sub unwatch_io
 
    if( !$ioa_handle->want_readready and !$ioa_handle->want_writeready ) {
       $self->{root_notifier}->remove_child( $ioa_handle );
+      delete $self->{handles}{$handle};
    }
 }
 
-sub enqueue_timer
+sub watch_time
 {
    my $self = shift;
    my %params = @_;
 
-   my $time = $self->_build_time( %params );
-
    my $code = $params{code} or croak "Expected 'code' as CODE ref";
+
+   my $time;
+   if( defined $params{at} ) {
+      $time = $params{at};
+   }
+   elsif( defined $params{after} ) {
+      my $now = $params{now} || $self->time;
+      $time = $now + $params{after};
+   }
+   else {
+      croak "Expected one of 'at' or 'after'; got @_";
+   }
 
    my $timer = IO::Async::Timer::Absolute->new(
       time => $time,
@@ -207,25 +223,13 @@ sub enqueue_timer
    return $timer;
 }
 
-sub cancel_timer
+sub unwatch_time
 {
    my $self = shift;
    my ( $timer ) = @_;
 
    $timer->stop if $timer->get_loop;
    $self->{root_notifier}->remove_child( $timer );
-}
-
-sub requeue_timer
-{
-   my $self = shift;
-   my ( $timer, %params ) = @_;
-
-   my $time = $self->_build_time( %params );
-
-   $timer->configure( time => $time );
-
-   return $timer;
 }
 
 sub watch_signal
@@ -277,14 +281,14 @@ sub unwatch_idle
    $self->parent_loop->unwatch_idle( $id );
 }
 
-sub watch_child
+sub watch_process
 {
    my $self = shift;
    my ( $pid, $code ) = @_;
 
    # Some more cheating
    if( $pid == 0 ) {
-      $self->parent_loop->watch_child( 0, $code );
+      $self->parent_loop->watch_process( 0, $code );
       return;
    }
 
@@ -306,23 +310,22 @@ sub watch_child
    $self->{root_notifier}->add_child( $ioa_pid );
 }
 
-sub unwatch_child
+sub unwatch_process
 {
    my $self = shift;
    my ( $pid ) = @_;
 
    if( $pid == 0 ) {
-      $self->parent_loop->unwatch_child( 0 );
+      $self->parent_loop->unwatch_process( 0 );
    }
 
    $self->{root_notifier}->remove_child( delete $self->{pids}{$pid} );
 }
 
-# Keep perl happy; keep Britain tidy
-1;
-
-__END__
-
 =head1 AUTHOR
 
 Paul Evans <leonerd@leonerd.org.uk>
+
+=cut
+
+0x55AA;

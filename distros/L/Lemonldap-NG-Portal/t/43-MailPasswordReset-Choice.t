@@ -13,7 +13,7 @@ my ( $res, $user, $pwd );
 my $maintests = 17;
 my $mailSend  = 0;
 
-my $mail2 = 0;
+my $mail2  = 0;
 my $userdb = tempdb();
 
 SKIP: {

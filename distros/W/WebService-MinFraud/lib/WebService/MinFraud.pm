@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.009001';
+our $VERSION = '1.010000';
 
 1;
 
@@ -22,7 +22,7 @@ WebService::MinFraud - API for MaxMind's minFraud Score, Insights, and Factors s
 
 =head1 VERSION
 
-version 1.009001
+version 1.010000
 
 =head1 SYNOPSIS
 
@@ -173,7 +173,7 @@ William Storey <wstorey@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 - 2019 by MaxMind, Inc.
+This software is copyright (c) 2015 - 2020 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

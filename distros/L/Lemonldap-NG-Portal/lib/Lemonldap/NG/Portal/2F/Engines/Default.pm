@@ -21,7 +21,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_TOKENEXPIRED
 );
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 with 'Lemonldap::NG::Portal::Lib::OverConf';
@@ -113,11 +113,13 @@ sub init {
         my $rule   = $self->conf->{sfExtra}->{$extraKey}->{rule} || 1;
         my $prefix = $m->prefix;
 
-        # Overwrite logo and label from user configuration
+        # Overwrite logo, label, level from user configuration
         $m->logo( $self->conf->{sfExtra}->{$extraKey}->{logo} )
           if $self->conf->{sfExtra}->{$extraKey}->{logo};
         $m->label( $self->conf->{sfExtra}->{$extraKey}->{label} )
           if $self->conf->{sfExtra}->{$extraKey}->{label};
+        $m->authnLevel( $self->conf->{sfExtra}->{$extraKey}->{level} )
+          if $self->conf->{sfExtra}->{$extraKey}->{level};
 
         # Compile rule
         $rule = $self->p->HANDLER->substitute($rule);
@@ -161,6 +163,8 @@ sub init {
 
     # Enable REST request only if more than 1 2F module is enabled
     if ( @{ $self->{sfModules} } > 1 ) {
+        $self->addAuthRoute( '2fchoice' => '_choice',   ['POST'] );
+        $self->addAuthRoute( '2fchoice' => '_redirect', ['GET'] );
         $self->addUnauthRoute( '2fchoice' => '_choice',   ['POST'] );
         $self->addUnauthRoute( '2fchoice' => '_redirect', ['GET'] );
     }
@@ -241,9 +245,10 @@ sub run {
 
             # Display message if required
             if ( $self->sfMsgRule->( $req, $req->sessionInfo ) ) {
-                my $uid   = $req->user;
-                my $date  = strftime "%Y-%m-%d", localtime;
-                my $ref   = $self->conf->{sfRemovedNotifRef} || 'RemoveSF';
+                my $uid  = $req->user;
+                my $date = strftime "%Y-%m-%d", localtime;
+                my $ref  = $self->conf->{sfRemovedNotifRef} || 'RemoveSF';
+                $ref .= '-' . time();
                 my $title = $self->conf->{sfRemovedNotifTitle}
                   || 'Second factor notification';
                 my $msg = $self->conf->{sfRemovedNotifMsg}
@@ -255,8 +260,11 @@ sub run {
                   ? { trspan => "expired2Fremoved, $removed" }
                   : { trspan => "oneExpired2Fremoved" };
 
+                my $notifEngine = $self->p->loadedModules->{
+                    'Lemonldap::NG::Portal::Plugins::Notifications'};
+
                 my $res =
-                  $self->conf->{sfRemovedUseNotif}
+                  ( $self->conf->{sfRemovedUseNotif} && $notifEngine )
                   ? $self->createNotification( $req, $uid, $date, $ref, $title,
                     $msg )
                   : $self->displayTemplate( $req, 'simpleInfo', $params );
@@ -266,15 +274,7 @@ sub run {
     }
 
     # Search for authorized modules for this user
-    my @am;
-    foreach my $m ( @{ $self->sfModules } ) {
-        $self->logger->debug(
-            'Looking if ' . $m->{m}->prefix . '2F is available' );
-        if ( $m->{r}->( $req, $req->sessionInfo ) ) {
-            $self->logger->debug(' -> OK');
-            push @am, $m->{m};
-        }
-    }
+    my @am = $self->searchForAuthorized2Fmodules($req);
 
     # If no 2F module is authorized, skipping 2F
     # Note that a rule may forbid access after (GrantSession plugin)
@@ -307,8 +307,10 @@ sub run {
     $req->sessionInfo->{_2fRealSession} = $req->id;
     $req->sessionInfo->{_2fUrldc}       = $req->urldc;
     $req->sessionInfo->{_2fUtime}       = $req->{sessionInfo}->{_utime};
-    $req->sessionInfo->{_impSpoofId}    = $spoofId;
-    $req->sessionInfo->{_impUser}       = $req->user;
+    if ( $self->conf->{impersonationRule} ) {
+        $req->sessionInfo->{_impSpoofId} = $spoofId;
+        $req->sessionInfo->{_impUser}    = $req->user;
+    }
     my $token = $self->ott->createToken( $req->sessionInfo );
     delete $req->{authResult};
 
@@ -327,6 +329,7 @@ sub run {
         params => {
             MAIN_LOGO => $self->conf->{portalMainLogo},
             SKIN      => $self->p->getSkin($req),
+            LANGS     => $self->conf->{showLanguages},
             TOKEN     => $token,
             MODULES   => [
                 map { {
@@ -421,8 +424,14 @@ sub _displayRegister {
             return $self->p->sendError( $req,
                 'Registration not authorized', 403 );
         }
-        return $self->p->sendHtml( $req, $m->{m}->template,
-            params => { MAIN_LOGO => $self->conf->{portalMainLogo} } );
+        return $self->p->sendHtml(
+            $req,
+            $m->{m}->template,
+            params => {
+                MAIN_LOGO => $self->conf->{portalMainLogo},
+                LANGS     => $self->conf->{showLanguages},
+            }
+        );
     }
 
     # If only one 2F is available, redirect to it
@@ -489,6 +498,7 @@ sub _displayRegister {
         params => {
             MAIN_LOGO    => $self->conf->{portalMainLogo},
             SKIN         => $self->p->getSkin($req),
+            LANGS        => $self->conf->{showLanguages},
             MODULES      => \@am,
             SFDEVICES    => $_2fDevices,
             ACTION       => $action,
@@ -544,6 +554,20 @@ sub restoreSession {
     return $req->method eq 'POST'
       ? $self->register( $req, @path )
       : $self->_displayRegister( $req, @path );
+}
+
+sub searchForAuthorized2Fmodules {
+    my ( $self, $req ) = @_;
+    my @am;
+    foreach my $m ( @{ $self->sfModules } ) {
+        $self->logger->debug(
+            'Looking if ' . $m->{m}->prefix . '2F is available' );
+        if ( $m->{r}->( $req, $req->sessionInfo ) ) {
+            $self->logger->debug(' -> OK');
+            push @am, $m->{m};
+        }
+    }
+    return @am;
 }
 
 1;

@@ -21,6 +21,7 @@ Name Class for Perl 5
 
 =includes
 
+method: dist
 method: file
 method: format
 method: label
@@ -45,6 +46,22 @@ method: path
 =description
 
 This package provides methods for converting "name" strings.
+
+=cut
+
+=method dist
+
+The dist method returns a package distribution representation of the name.
+
+=signature dist
+
+dist() : Str
+
+=example-1 dist
+
+  # given: synopsis
+
+  my $dist = $name->dist; # FooBar-Baz
 
 =cut
 
@@ -227,6 +244,13 @@ my $subs = $test->standard;
 
 $subs->synopsis(fun($tryable) {
   ok my $result = $tryable->result;
+
+  $result
+});
+
+$subs->example(-1, 'dist', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is $result, 'FooBar-Baz';
 
   $result
 });

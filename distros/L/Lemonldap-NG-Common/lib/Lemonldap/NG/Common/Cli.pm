@@ -4,7 +4,9 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Common::Conf;
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.8';
+
+extends 'Lemonldap::NG::Common::PSGI::Cli::Lib';
 
 has confAccess => (
     is      => 'rw',

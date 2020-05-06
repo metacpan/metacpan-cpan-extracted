@@ -8,7 +8,7 @@ package Net::Prometheus;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 use Carp;
 
@@ -65,6 +65,17 @@ facilities are provided to yield a L<PSGI> application that the containing
 program can embed in its own structure to provide the results, or the
 application can generate a plain-text result directly and serve them by its
 own means.
+
+=head2 Metrics::Any
+
+For more flexibility of metrics reporting, other modules may wish to use
+L<Metrics::Any> as an abstraction interface instead of directly using this
+API.
+
+By using C<Metrics::Any> instead, the module does not directly depend on
+C<Net::Prometheus>, and in addition program ultimately using the module gets
+the flexibility to use Prometheus (via L<Metrics::Any::Adapter::Prometheus>)
+or use another reporting system via a different adapter.
 
 =cut
 
@@ -269,7 +280,7 @@ sub new_metricgroup
 
 =head2 collect
 
-   @metricsamples = $prometheus->collect
+   @metricsamples = $prometheus->collect( $opts )
 
 Returns a list of L<Net::Prometheus::Types/MetricSamples> obtained from all
 of the currently-registered collectors.
@@ -279,10 +290,13 @@ of the currently-registered collectors.
 sub collect
 {
    my $self = shift;
+   my ( $opts ) = @_;
+
+   $opts //= {};
 
    my %samples_by_name;
    foreach my $collector ( $self->{registry}->collectors, Net::Prometheus::Registry->collectors ) {
-      push @{ $samples_by_name{ $_->fullname } }, $_ for $collector->collect;
+      push @{ $samples_by_name{ $_->fullname } }, $_ for $collector->collect( $opts );
    }
 
    return map {
@@ -303,6 +317,11 @@ sub collect
 
 Returns a string in the Prometheus text exposition format containing the
 current values of all the registered metrics.
+
+   $str = $prometheus->render( { options => "for collectors" } )
+
+An optional HASH reference may be provided; if so it will be passed into the
+C<collect> method of every registered collector.
 
 =cut
 
@@ -330,6 +349,7 @@ sub _render_labels
 sub render
 {
    my $self = shift;
+   my ( $opts ) = @_;
 
    return join "", map {
       my $metricsamples = $_;
@@ -349,7 +369,75 @@ sub render
             _render_labels( $sample->labels ),
             $sample->value
       } @{ $metricsamples->samples }
-   } $self->collect;
+   } $self->collect( $opts );
+}
+
+=head2 handle
+
+   $response = $prometheus->handle( $request )
+
+Given an HTTP request in an L<HTTP::Request> instance, renders the metrics in
+response to it and returns an L<HTTP::Response> instance.
+
+This application will respond to any C<GET> request, and reject requests for
+any other method. If a query string is present on the URI it will be parsed
+for collector options to pass into the L</render> method.
+
+This method is useful for integrating metrics into an existing HTTP server
+application which uses these objects. For example:
+
+   my $prometheus = Net::Prometheus->new;
+
+   sub serve_request
+   {
+      my ( $request ) = @_;
+
+      if( $request->uri->path eq "/metrics" ) {
+         return $prometheus->handle( $request );
+      }
+
+      ...
+   }
+
+=cut
+
+# Some handy pseudomethods to make working on HTTP::Response less painful
+my $set_header = sub {
+   my $resp = shift;
+   $resp->header( @_ );
+   $resp;
+};
+my $set_content = sub {
+   my $resp = shift;
+   $resp->content( @_ );
+   $resp;
+};
+my $fix_content_length = sub {
+   my $resp = shift;
+   $resp->content_length or $resp->content_length( length $resp->content );
+   $resp;
+};
+
+sub handle
+{
+   my $self = shift;
+   my ( $request ) = @_;
+
+   require HTTP::Response;
+
+   $request->method eq "GET" or return
+      HTTP::Response->new( 405 )
+         ->$set_header( Content_Type => "text/plain" )
+         ->$set_content( "Method " . $request->method . " not supported" )
+         ->$fix_content_length;
+
+   my $opts;
+   $opts = { $request->uri->query_form } if length $request->uri->query;
+
+   return HTTP::Response->new( 200 )
+      ->$set_header( Content_Type => "text/plain; version=0.0.4; charset=utf-8" )
+      ->$set_content( $self->render( $opts ) )
+      ->$fix_content_length;
 }
 
 =head2 psgi_app
@@ -361,13 +449,28 @@ will render the metrics in the Prometheus text exposition format, suitable for
 scraping by the Prometheus collector.
 
 This application will respond to any C<GET> request, and reject requests for
-any other method.
+any other method. If a C<QUERY_STRING> is present in the environment it will
+be parsed for collector options to pass into the L</render> method.
+
+This method is useful for integrating metrics into an existing HTTP server
+application which is uses or is based on PSGI. For example:
+
+   use Plack::Builder;
+
+   my $prometheus = Net::Prometheus::->new;
+
+   builder {
+      mount "/metrics" => $prometheus->psgi_app;
+      ...
+   }
 
 =cut
 
 sub psgi_app
 {
    my $self = shift;
+
+   require URI;
 
    return sub {
       my $env = shift;
@@ -379,12 +482,74 @@ sub psgi_app
          [ "Method $method not supported" ],
       ];
 
+      my $opts;
+      if( defined $env->{QUERY_STRING} ) {
+         $opts = +{ URI->new( "?$env->{QUERY_STRING}", "http" )->query_form };
+      }
+
       return [
          200,
          [ "Content-Type" => "text/plain; version=0.0.4; charset=utf-8" ],
-         [ $self->render ],
+         [ $self->render( $opts ) ],
       ];
    };
+}
+
+=head2 export_to_IO_Async
+
+   $prometheus->export_to_IO_Async( $loop, %args )
+
+Performs the necessary steps to create an HTTP server for exporting metrics
+over HTTP via L<IO::Async>. This will involve creating a new
+L<Net::Async::HTTP::Server> instance added to the loop.
+
+This new server will listen on its own port number for any incoming request,
+and will serve metrics regardless of path.
+
+Note this should only be used in applications that don't otherwise have an
+HTTP server, such as self-contained monitoring exporters or exporting metrics
+as a side-effect of other activity. For existing HTTP server applications it
+is better to integrate with the existing request/response processing of the
+application, such as by using the L</handle> or L</psgi_app> methods.
+
+Takes the following named arguments:
+
+=over 4
+
+=item port => INT
+
+Port number on which to listen for incoming HTTP requests.
+
+=back
+
+=cut
+
+sub export_to_IO_Async
+{
+   my $self = shift;
+   my ( $loop, %args ) = @_;
+
+   require IO::Async::Loop;
+   require Net::Async::HTTP::Server;
+
+   $loop //= IO::Async::Loop->new;
+
+   my $httpserver = Net::Async::HTTP::Server->new(
+      on_request => sub {
+         my $httpserver = shift;
+         my ( $req ) = @_;
+
+         $req->respond( $self->handle( $req->as_http_request ) );
+      },
+   );
+
+   $loop->add( $httpserver );
+
+   # Yes this is a blocking call
+   $httpserver->listen(
+      socktype => "stream",
+      service  => $args{port},
+   )->get;
 }
 
 {
@@ -423,12 +588,18 @@ L</render> method. A collector can be any object instance that has a method
 called C<collect>, which when invoked is passed no arguments and expected to
 return a list of L<Net::Prometheus::Types/MetricSamples> structures.
 
-   @metricsamples = $collector->collect
+   @metricsamples = $collector->collect( $opts )
 
 The L<Net::Prometheus::Metric> class is already a valid collector (and hence,
 so too are the individual metric type subclasses). This interface allows the
 creation of new custom collector objects, that more directly collect
 information to be exported.
+
+Collectors might choose to behave differently in the presence of some
+specifically-named option; typically to provide extra detail not normally
+provided (maybe at the expense of extra processing time to calculate it).
+Collectors must not complain about the presence of unrecognised options; the
+hash is shared among all potential collectors.
 
 =cut
 
@@ -439,6 +610,11 @@ information to be exported.
 =item *
 
 Histogram/Summary 'start_timer' support
+
+=item *
+
+Add other C<export_to_*> methods for other event systems and HTTP-serving
+frameworks, e.g. L<Mojo>.
 
 =back
 

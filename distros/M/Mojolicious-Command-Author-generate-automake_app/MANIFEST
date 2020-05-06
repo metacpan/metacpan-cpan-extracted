@@ -5,6 +5,7 @@ LICENSE
 Makefile.PL
 MANIFEST
 README.md
+lib/Mojolicious/Command/Author/generate/automake_app/cpanfile
 lib/Mojolicious/Command/Author/generate/automake_app/Makefile.am
 lib/Mojolicious/Command/Author/generate/automake_app/AUTHORS
 lib/Mojolicious/Command/Author/generate/automake_app/.gitignore
@@ -12,19 +13,15 @@ lib/Mojolicious/Command/Author/generate/automake_app/bin/Makefile.am
 lib/Mojolicious/Command/Author/generate/automake_app/bin/app.pl
 lib/Mojolicious/Command/Author/generate/automake_app/README.md
 lib/Mojolicious/Command/Author/generate/automake_app/bootstrap
-lib/Mojolicious/Command/Author/generate/automake_app/.github/workflows/unit-tests.yaml
 lib/Mojolicious/Command/Author/generate/automake_app/etc/app.cfg
 lib/Mojolicious/Command/Author/generate/automake_app/etc/Makefile.am
 lib/Mojolicious/Command/Author/generate/automake_app/COPYRIGHT
 lib/Mojolicious/Command/Author/generate/automake_app/CHANGES
-lib/Mojolicious/Command/Author/generate/automake_app/cpanfile
 lib/Mojolicious/Command/Author/generate/automake_app/lib/App/Controller/Example.pm
 lib/Mojolicious/Command/Author/generate/automake_app/lib/App.pm
 lib/Mojolicious/Command/Author/generate/automake_app/lib/Makefile.am
 lib/Mojolicious/Command/Author/generate/automake_app/configure.ac
 lib/Mojolicious/Command/Author/generate/automake_app/VERSION
-lib/Mojolicious/Command/Author/generate/automake_app/public/index.html
-lib/Mojolicious/Command/Author/generate/automake_app/t/basic.t
 lib/Mojolicious/Command/Author/generate/automake_app/thirdparty/Makefile.am
 lib/Mojolicious/Command/Author/generate/automake_app/templates/example/welcome.html.ep
 lib/Mojolicious/Command/Author/generate/automake_app/templates/layouts/default.html.ep
@@ -33,7 +30,6 @@ lib/Mojolicious/Command/Author/generate/automake_app.pm
 lib/Mojolicious/Command/Author/generate/callbackery_app/.gitignore
 lib/Mojolicious/Command/Author/generate/callbackery_app/frontend/Manifest.json
 lib/Mojolicious/Command/Author/generate/callbackery_app/frontend/compile.json
-lib/Mojolicious/Command/Author/generate/callbackery_app/frontend/DEADJOE
 lib/Mojolicious/Command/Author/generate/callbackery_app/frontend/Makefile.am
 lib/Mojolicious/Command/Author/generate/callbackery_app/frontend/package.json
 lib/Mojolicious/Command/Author/generate/callbackery_app/frontend/compile.js
@@ -43,15 +39,14 @@ lib/Mojolicious/Command/Author/generate/callbackery_app/frontend/source/class/ap
 lib/Mojolicious/Command/Author/generate/callbackery_app/frontend/source/class/app/__init__.js
 lib/Mojolicious/Command/Author/generate/callbackery_app/frontend/config.json
 lib/Mojolicious/Command/Author/generate/callbackery_app/t/basic.t
+lib/Mojolicious/Command/Author/generate/callbackery_app/cpanfile
 lib/Mojolicious/Command/Author/generate/callbackery_app/lib/App/GuiPlugin/Song.pm
 lib/Mojolicious/Command/Author/generate/callbackery_app/lib/App/GuiPlugin/SongForm.pm
 lib/Mojolicious/Command/Author/generate/callbackery_app/lib/App/Controller/RpcService.pm
 lib/Mojolicious/Command/Author/generate/callbackery_app/lib/App.pm
 lib/Mojolicious/Command/Author/generate/callbackery_app/bin/source-mode.sh
 lib/Mojolicious/Command/Author/generate/callbackery_app/bin/app.pl
-lib/Mojolicious/Command/Author/generate/callbackery_app/etc/app.dist.yaml
-lib/Mojolicious/Command/Author/generate/callbackery_app/etc/Makefile.am
-lib/Mojolicious/Command/Author/generate/callbackery_app/cpanfile
+lib/Mojolicious/Command/Author/generate/callbackery_app/etc/app.cfg.dist
 lib/Mojolicious/Command/Author/generate/callbackery_app/README.md
 lib/Mojolicious/Command/Author/generate/callbackery_app.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -16,8 +16,8 @@ extends 'Lemonldap::NG::Portal::Main::Plugin';
 
 # INTERFACE
 
-use constant endAuth => 'newDevice';
-use constant beforeAuth => 'check';
+use constant endAuth      => 'newDevice';
+use constant beforeAuth   => 'check';
 use constant beforeLogout => 'logout';
 
 # INITIALIZATION
@@ -119,7 +119,8 @@ sub storeBrowser {
             }
         }
         else {
-            $self->userLogger->error("StayConnected called with an expired token");
+            $self->userLogger->error(
+                "StayConnected called with an expired token");
         }
     }
     else {

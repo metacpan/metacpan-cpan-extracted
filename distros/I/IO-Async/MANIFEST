@@ -24,6 +24,7 @@ lib/IO/Async/Loop.pm
 lib/IO/Async/Loop/Poll.pm
 lib/IO/Async/Loop/Select.pm
 lib/IO/Async/LoopTests.pm
+lib/IO/Async/Metrics.pm
 lib/IO/Async/Notifier.pm
 lib/IO/Async/OS.pm
 lib/IO/Async/OS/cygwin.pm
@@ -65,10 +66,12 @@ t/12loop-poll-signal.t
 t/12loop-select-signal.t
 t/13loop-poll-idle.t
 t/13loop-select-idle.t
-t/14loop-poll-child.t
-t/14loop-select-child.t
+t/14loop-poll-process.t
+t/14loop-select-process.t
 t/15loop-poll-control.t
 t/15loop-select-control.t
+t/16loop-poll-metrics.t
+t/16loop-select-metrics.t
 t/18loop-poll-legacy.t
 t/18loop-select-legacy.t
 t/19loop-future.t

@@ -389,18 +389,14 @@ Also, L<i18n::Langinfo::Wide> and L<POSIX::Wide> offer some extras.
 
 =head2 General C Library Extension Interfaces
 
-Function C<fnmatch> can usually be avoided using L<perlfunc/glob>
-for collecting filenames in the file system.  When you already have
-a filename in a string, you need to rewrite the pattern into a
-regular expression.
-
-  my @scripts = glob "*.pl";
-  my @scripts = grep /\.pl$/, @filenames;
-
 Process your command-line options with C<Getopt::Std> or C<Getopt::Long>,
 which are more platform indepent and more flexible than the POSIX version
 (therefore they are missing)
   getopt, getsubopt, optarg, opterr, optind, optopt
+
+Generic functions:
+
+  fnmatch                         ::FS
 
 Some string functions have simple Perl work-arounds:
 
@@ -621,10 +617,10 @@ are provided by L<Fcntl>.
   alphasort   perlfunc/sort
   getdelim    perlvar/$INPUT_RECORD_SEPARATOR
   getline     $a = <FH>           IO::Handle
-  glob        perlfunc/glob       File::Glob
+  glob        perlfunc/glob       ::FS/posix_glob File::Glob/bsd_glob
   globfree    never needed
   mkdtemp     File::Temp/mkdtemp
-  scandir     perlfunc/glob
+  scandir     not supported
   dirfd       not supported
   fdopendir   not supported
 
@@ -640,7 +636,9 @@ supports their absolute brothers:
   nl_langinfo                     I18N::Langinfo/langinfo
 
 This interface is far to simple to really translate messages into various
-languages.  You may have a look at various implementations of C<gettext>.
+languages.  You may take a look at various implementations of C<gettext>,
+like L<Locale::gettext>, L<File::Gettext>, L<Locale::TextDomain>, and
+L<Log::Report::Lexicon>
 
   catclose                        Locale::Msgcat
   catgets                         Locale::Msgcat
@@ -688,8 +686,8 @@ all ending on C<_l>, like C<isalnum_l()>.
   fork          perlfunc          Windows::perlfork
   getpgrp       perlfunc    
   getpgid                         ::Proc
-  getpid        perlvar/$PID  $$
-  getppid       perlvar/$PPID
+  getpid        perlvar/$PID  $$  ::Proc
+  getppid       perlvar/$PPID     ::Proc
   getsid        not supported
   setsid                          ::Proc
   sleep         perlfunc          POSIX.pm (see warning)
@@ -871,7 +869,7 @@ B<Warning>, parameter order in POSIX.pm
   uname                           ::OS
   unsetenv    perlvar/%ENV        delete $ENV{PS1}
 
-The error constants are provided by Errno.
+The error constants are provided by L<Errno|Errno>.
 
 =head2 Symbolic Link Interfaces
 
@@ -996,7 +994,7 @@ Comparible functionality for functions which never made it into POSIX:
   l64a                            MIME::Base64/decode
   memccpy      $b = $1 if $a =~ m/(.*{,n}?)(?:c|$)/
   signgam      math, probably not supported
-  strptime                        Time::Piece
+  strptime                        ::Time Time::Piece
   swab         ($b,$a) = ($a,$b)
   timezone                        ::Time/tzname
   toascii      $c & 0x7f
@@ -1106,8 +1104,8 @@ The XSI signal interface is not supported, so no
   setlogmask                      Sys::Syslog
   syslog                          Sys::Syslog
 
-See also the many logging frameworks, like Log::Log4perl,
-Log::Dispatch, or Log::Report.
+See also the many logging frameworks, like L<Log::Log4perl>,
+L<Log::Dispatch>, or L<Log::Report>.
 
 =head2 XSI Timer Interfaces
 
@@ -1131,7 +1129,7 @@ Log::Dispatch, or Log::Report.
   setreuid     perlvar/$UID,$EUID ::User
   setutxent                       User::Utmp
 
-Non-standard, but commonly available.  See also L<POSIX::1003::User|POSIX::1003::User>.
+Non-standard, but commonly available.  See also L<POSIX::1003::User>.
 
   getresgid                       ::User
   getresuid                       ::User
@@ -1154,17 +1152,17 @@ constants can be read via L<POSIX::1003::Properties>.
 
 =head1 SEE ALSO
 
-This module is part of POSIX-1003 distribution version 0.98,
-built on December 03, 2013. Website: F<http://perl.overmeer.net>.  The code is based on L<POSIX>, which
+This module is part of POSIX-1003 distribution version 1.00,
+built on May 05, 2020. Website: F<http://perl.overmeer.net/CPAN>.  The code is based on L<POSIX>, which
 is released with Perl itself.  See also L<POSIX::Util> for
 additional functionality.
 
 =head1 COPYRIGHTS
 
-Copyrights 2011-2013 on the perl code and the related documentation
+Copyrights 2011-2020 on the perl code and the related documentation
  by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

@@ -1,10 +1,12 @@
 use strict;
 use warnings;
 
+use Error::Pure;
 use File::Object;
+use HTTP::Request;
 use Plack::App::Directory::PYX;
 use Plack::Test;
-use Test::More 'tests' => 6;
+use Test::More 'tests' => 9;
 use Test::NoWarnings;
 
 # Directories.
@@ -30,7 +32,7 @@ is($res->content, 'DIR', 'Get content of directory index.');
 
 # Test.
 $app = Plack::App::Directory::PYX->new(
-	'indent' => 1,
+	'indent' => 'Tags::Output::Indent',
 	'root' => $data_dir->s,
 );
 $test = Plack::Test->create($app);
@@ -57,7 +59,7 @@ is($res->content,
 # Test.
 $app = Plack::App::Directory::PYX->new(
 	'file' => $data_dir->file('ex1.pyx')->s,
-	'indent' => 1,
+	'indent' => 'Tags::Output::Indent',
 );
 $test = Plack::Test->create($app);
 $res = $test->request(HTTP::Request->new(GET => '/'));
@@ -79,3 +81,51 @@ chomp $right_ret;
 is($res->content,
 	$right_ret,
 	'Get content of ex1.pyx page in indent mode (version with one file).');
+
+# Test.
+$app = Plack::App::Directory::PYX->new(
+	'file' => $data_dir->file('ex1.pyx')->s,
+	'indent' => '__not_exist_module_name_',
+);
+$test = Plack::Test->create($app);
+$res = $test->request(HTTP::Request->new(GET => '/'));
+is($res->content, "Cannot load class '__not_exist_module_name_'.\n",
+	'Get error in case of not existing class.');
+
+
+# Test.
+$app = Plack::App::Directory::PYX->new(
+	'file' => $data_dir->file('ex1.pyx')->s,
+	'indent' => 'Error::Pure',
+);
+$test = Plack::Test->create($app);
+$res = $test->request(HTTP::Request->new(GET => '/'));
+is($res->content, "Cannot create object for 'Error::Pure' class.\n",
+	'Get error in case of not existent constructor of serialization class.');
+
+# Test.
+$app = Plack::App::Directory::PYX->new(
+	'file' => $data_dir->file('ex1.pyx')->s,
+	'indent' => 'Plack::App::Directory::PYX',
+);
+$test = Plack::Test->create($app);
+$res = $test->request(HTTP::Request->new(GET => '/'));
+is($res->content, "Bad 'Tags::Output' module to create PYX output.\n",
+	'Get error in case of bad indentation class (not Tags::Output).');
+
+# XXX RT#132460: Remove warnings of:
+# - WWW::Form::UrlEncoded::XS
+# - Cookie::Baker::XS
+my @warnings = Test::NoWarnings::warnings();
+my $warnings_in_tests = scalar @warnings;
+foreach my $warning (@warnings) {
+	if ($warning->getMessage =~ m/^Cookie::Baker::XS\ \d+\.\d+\ is require\. fallback to PP version at/ms) {
+		$warnings_in_tests--;
+	}
+	if ($warning->getMessage =~ m/^WWW::Form::UrlEncoded::XS\ \d+\.\d+\ is require\. fallback to PP version at/ms) {
+		$warnings_in_tests--;
+	}
+}
+if ($warnings_in_tests == 0) {
+	Test::NoWarnings::clear_warnings();
+}

@@ -1,0 +1,100 @@
+NAME
+    Bencher::Scenario::PerlPhase - Benchmark Perl::Phase
+
+VERSION
+    This document describes version 0.001 of Bencher::Scenario::PerlPhase
+    (from Perl distribution Bencher-Scenario-PerlPhase), released on
+    2020-02-05.
+
+SYNOPSIS
+    To run benchmark with default option:
+
+     % bencher -m PerlPhase
+
+    For more options (dump scenario, list/include/exclude/add participants,
+    list/include/exclude/add datasets, etc), see bencher or run "bencher
+    --help".
+
+DESCRIPTION
+    Packaging a benchmark script as a Bencher scenario makes it convenient
+    to include/exclude/add participants/datasets (either via CLI or Perl
+    code), send the result to a central repository, among others . See
+    Bencher and bencher (CLI) for more details.
+
+BENCHMARK PARTICIPANTS
+    *   GLOBAL_PHASE-compile_time (perl_code)
+
+        Code template:
+
+         ${^GLOBAL_PHASE} eq "START" ? 1:0
+
+    *   GLOBAL_PHASE-run_time (perl_code)
+
+        Code template:
+
+         ${^GLOBAL_PHASE} eq "RUN" ? 1:0
+
+    *   Perl::Phase::is_compile_time (perl_code)
+
+        Code template:
+
+         use Perl::Phase; Perl::Phase::is_compile_time() ? 1:0
+
+    *   Perl::Phase::is_run_time (perl_code)
+
+        Code template:
+
+         use Perl::Phase; Perl::Phase::is_run_time() ? 1:0
+
+SAMPLE BENCHMARK RESULTS
+    Run on: perl: *v5.30.0*, CPU: *Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz
+    (2 cores)*, OS: *GNU/Linux Ubuntu version 19.04*, OS kernel: *Linux
+    version 5.0.0-37-generic*.
+
+    Benchmark with default options ("bencher -m PerlPhase"):
+
+     #table1#
+     +------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+     | participant                  | rate (/s) | time (ns) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     +------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+     | Perl::Phase::is_compile_time |   4090000 |     245   |                 0.00% |               172.03% | 1.1e-10 |      20 |
+     | Perl::Phase::is_run_time     |   4600000 |     220   |                11.62% |               143.71% | 3.1e-10 |      20 |
+     | GLOBAL_PHASE-run_time        |  10500000 |      94.9 |               157.68% |                 5.57% | 5.5e-11 |      21 |
+     | GLOBAL_PHASE-compile_time    |  11000000 |      90   |               172.03% |                 0.00% | 2.1e-10 |      20 |
+     +------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+
+    To display as an interactive HTML table on a browser, you can add option
+    "--format html+datatables".
+
+BENCHMARK NOTES
+    Perl::Phase claims to be much faster than checking "${^GLOBAL_PHASE}",
+    because it's a numeric vs string comparison. This benchmark doesn't seem
+    to show that. And in 99.9% of the case, the speed won't matter.
+    Conclusion: just use the variable perl has provided, unless you're on
+    perl < 5.14.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenario-PerlPhase>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenario-PerlPhase>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenario-Perl
+    Phase>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

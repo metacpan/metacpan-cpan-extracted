@@ -1,11 +1,15 @@
-20200201
-	Initial release
+2020501
+	Revamped code in order to avoid overwrite of shadow hashes. Alway
+	use a temporay hash, and return a dclone() of it.
 
-20200220
-	Nice pod to make "make test" happy
+20200302
+	Add Token authentication
 
 2020227
 	Add a dirty test for checking failed auth
 
-20200302
-	Add Token authentication
+20200220
+	Nice pod to make "make test" happy
+
+20200201
+	Initial release

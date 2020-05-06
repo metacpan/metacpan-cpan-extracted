@@ -6,7 +6,7 @@
 # podDocumentation
 
 package Data::Edit::Xml::Reuse;
-our $VERSION = 20191221;
+our $VERSION = 20200503;
 use v5.26;
 use warnings FATAL => qw(all);
 use strict;
@@ -436,6 +436,13 @@ placed in the L<outputFolder|/outputFolder> as long as such content is at least
     tags              => {map {$_=>1} qw(table p)},
    );
 
+The actual number of times each block of content was reused can be found in
+report:
+
+ lists/reused_content_by_tag.txt
+
+in the L<reportsFolder|/reportsFolder>.
+
 =head2 Matching Similar Content
 
 Optionally, L<Data::Edit::Xml::Reuse> will also report similar content using
@@ -484,7 +491,7 @@ Check Xml for reuse opportunities.
 B<Example:>
 
 
-  if (1) {                                                                        
+  if (1) {
     owf($in[0], <<END);                                                           # Base file
     <concept id="c">
       <title>Ordering information</title>
@@ -503,7 +510,7 @@ B<Example:>
       </conbody>
     </concept>
   END
-  
+
     owf($in[1], <<END);                                                           # Similar file
     <concept id="c">
       <title>Ordering information</title>
@@ -523,9 +530,9 @@ B<Example:>
       </conbody>
     </concept>
   END
-  
+
     my $dictionary  = fpf($outputFolder, qw(dictionary xml));                     # Dictionary file name
-  
+
     my $r = Data::Edit::Xml::Reuse::𝗿𝗲𝘂𝘀𝗲
      (dictionary             => $dictionary,                                      # Reuse request
       inputFolder            => $inputFolder,
@@ -534,7 +541,7 @@ B<Example:>
       reportsFolder          => $reportsFolder,
       tags                   => {map {$_=>1} qw(p table)},
      );
-  
+
     ok readFile($dictionary) eq <<END;                                            # Resulting dictionary
   <concept id="dictionary">
     <title>Dictionary</title>
@@ -555,7 +562,7 @@ B<Example:>
     </conbody>
   </concept>
   END
-  
+
     if (my $h =                                                                   # Similar XML report
       readFile(fpe($reportsFolder, qw(similar tag_blocks_by_vocabulary txt))))
      {ok index($h, <<END) > 0;
@@ -564,7 +571,7 @@ B<Example:>
   2           aaa bbb ccc ddd fff  GUID-7472a890-4587-8393-9c34-0aa3859d2e21
   END
      }
-  
+
     ok readFile(fpe($testFolder, qw(out 1 xml))) eq <<END;                        # Deduplicated XML file - Sweden
   <concept id="c">
     <title>Ordering information</title>
@@ -578,7 +585,7 @@ B<Example:>
     </conbody>
   </concept>
   END
-  
+
     ok readFile(fpe($testFolder, qw(out 2 xml))) eq <<END;                        # Deduplicated XML file - Norway
   <concept id="c">
     <title>Ordering information</title>
@@ -593,9 +600,9 @@ B<Example:>
     </conbody>
   </concept>
   END
-  
+
    }
-  
+
 
 
 =head2 Data::Edit::Xml::Reuse Definition
@@ -815,7 +822,7 @@ mmm "Tests started";
 
 my $nFiles        = 1e2;
 my $testFolder    = temporaryFolder;
-   $testFolder    = q(/home/phil/perl/cpan/DataEditXmlReuse/lib/Data/Edit/Xml/tests/);
+#  $testFolder    = q(/home/phil/perl/cpan/DataEditXmlReuse/lib/Data/Edit/Xml/tests/);
 clearFolder($testFolder, $nFiles);
 
 my $inputFolder   = fpd($testFolder, qw(in));

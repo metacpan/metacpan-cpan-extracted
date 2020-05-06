@@ -1,0 +1,10 @@
+Revision history for Test2-Tools-PerlCritic
+
+0.03      2020-05-05 06:45:26 -0600
+  - Fixed test on windows (gh#1, gh#2)
+
+0.02      2020-05-01 09:40:44 -0600
+  - First CPAN release
+
+0.01      2019-06-08 13:30:23 -0400
+  - initial version

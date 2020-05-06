@@ -1,0 +1,39 @@
+=encoding utf8
+
+=head1 NAME
+
+Module::Generic::Tie - Object Access Control Class
+
+=head1 SYNOPSIS
+
+    my $o = My::Object->new;
+    tie( $o, 'Module::Generic::Tie', readonly => 1, perms => 4 );
+    # Attempting to change the debug level directly
+    $o->{debug} = 1;
+    # This fails, because the object is set with read only permision
+    # but this below will succeed
+    $o->debug( 1 );
+
+=head1 DESCRIPTION
+
+Given an object, and a set of parameters, this will restrict direct access to the object values, ensuring the object properties can only be modified from within the class/package if necessary.
+
+This is used in L<Module::Generic/"new"> using your module global variable C<OBJECT_PERMS> which should contain a unix permission which is a number from 1 to 7 representing a combinatin of 1 for execution, 2 for write privilege and 4 for read privilege
+
+=head1 METHODS
+
+No method is available
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2000-2020 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut
+

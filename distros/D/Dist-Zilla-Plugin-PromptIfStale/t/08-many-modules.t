@@ -92,7 +92,7 @@ sub do_tests
                 path(qw(source dist.ini)) => simple_ini(
                     [ GatherDir => ],
                     [ PromptIfStale => {
-                        modules => [ map { 'Unindexed' . $_ } 0..5 ],
+                        modules => [ map 'Unindexed'.$_, 0..5 ],
                         check_all_prereqs => 1,
                         phase => 'build',
                       } ],
@@ -105,7 +105,7 @@ sub do_tests
 
     # no need to test all combinations - we sort the module list
     my $prompt0 = "Issues found:\n"
-        . join("\n", map { '    Unindexed' . $_ . ' is not indexed.' } 0..5)
+        . join("\n", map '    Unindexed'.$_.' is not indexed.', 0..5)
         . "\nContinue anyway?";
     $tzil->chrome->set_response_for($prompt0, 'y');
 
@@ -121,7 +121,7 @@ sub do_tests
         my $wd = pushd $tzil->root;
         cmp_deeply(
             [ Dist::Zilla::App::Command::stale->stale_modules($tzil) ],
-            [ map { 'Unindexed' . $_ } 0..6 ],
+            [ map 'Unindexed'.$_, 0..6 ],
             'app finds stale modules',
         );
         @checked_via_02packages = ();
@@ -146,7 +146,7 @@ sub do_tests
 
     cmp_deeply(
         \@checked_via_02packages,
-        [ map { 'Unindexed' . $_ } 0..6 ],
+        [ map 'Unindexed'.$_, 0..6 ],
         'all modules checked using 02packages',
     );
 

@@ -16,14 +16,14 @@ WriteMakefile(
     "ExtUtils::MakeMaker" => '6.63_03',
   },
   "PREREQ_PM" => {
-    "Mojolicious" => '7.60', # Mojo::Promise->all
+    "Mojolicious" => '8.00', # Mojo::Promise->resolve
     "strict" => 0,
     "warnings" => 0,
     "Module::Runtime" => 0,
-    "GraphQL" => '0.26', # promises
+    "GraphQL" => '0.39', # subscriptions
+    "curry" => 0,
   },
   "TEST_REQUIRES" => {
-    "Mojolicious" => '7.60', # Mojo::Promise->all
     "Test::More" => "0.92",
   },
   META_MERGE => {

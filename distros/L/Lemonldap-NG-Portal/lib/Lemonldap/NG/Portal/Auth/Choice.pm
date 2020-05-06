@@ -4,7 +4,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_FIRSTACCESS PE_ERROR);
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Portal::Lib::Choice';
 
@@ -52,7 +52,10 @@ sub extractFormInfo {
     }
 
     my $res = $req->data->{enabledMods0}->[0]->extractFormInfo($req);
-    delete $req->pdata->{_choice} if ( $res > 0 );
+    if ( $res > 0 ) {
+        $self->setSecurity($req);
+        delete $req->pdata->{_choice};
+    }
     return $res;
 }
 

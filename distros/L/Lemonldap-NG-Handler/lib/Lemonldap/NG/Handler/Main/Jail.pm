@@ -27,15 +27,16 @@ has multiValuesSeparator => ( is => 'rw', isa => 'Maybe[Str]' );
 has jail                 => ( is => 'rw' );
 has error                => ( is => 'rw' );
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.8';
 our @builtCustomFunctions;
 
 ## @imethod protected build_jail()
 # Build and return the security jail used to compile rules and headers.
 # @return Safe object
 sub build_jail {
-    my ( $self, $api, $require ) = @_;
-
+    my ( $self, $api, $require, $dontDie ) = @_;
+    my $build = 1;
+    
     return $self->jail
       if (  $self->jail
         and $self->jail->useSafeJail
@@ -53,29 +54,34 @@ sub build_jail {
                 eval { require $f; };
             }
             if ($@) {
-                die "Unable to load '$f': $@";
+                $dontDie
+                  ? $api->logger->error($@)
+                  : die "Unable to load '$f': $@";
+                undef $build;
             }
         }
     }
 
-    @builtCustomFunctions =
-      $self->customFunctions ? split( /\s+/, $self->customFunctions ) : ();
-    foreach (@builtCustomFunctions) {
-        no warnings 'redefine';
-        $api->logger->debug("Custom function : $_");
-        my $sub = $_;
-        unless (/::/) {
-            $sub = "$self\::$_";
-        }
-        else {
-            s/^.*:://;
-        }
-        next if ( $self->can($_) );
-        eval "sub $_ {
+    if ($build) {
+        @builtCustomFunctions =
+          $self->customFunctions ? split( /\s+/, $self->customFunctions ) : ();
+        foreach (@builtCustomFunctions) {
+            no warnings 'redefine';
+            $api->logger->debug("Custom function: $_");
+            my $sub = $_;
+            unless (/::/) {
+                $sub = "$self\::$_";
+            }
+            else {
+                s/^.*:://;
+            }
+            next if ( $self->can($_) );
+            eval "sub $_ {
             return $sub(\@_)
         }";
-        $api->logger->error($@) if ($@);
-        $_ = "&$_";
+            $api->logger->error($@) if ($@);
+            $_ = "&$_";
+        }
     }
 
     if ( $self->useSafeJail ) {

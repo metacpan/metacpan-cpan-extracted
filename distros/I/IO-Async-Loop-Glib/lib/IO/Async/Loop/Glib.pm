@@ -1,15 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2007-2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2007-2020 -- leonerd@leonerd.org.uk
 
 package IO::Async::Loop::Glib;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.21';
-use constant API_VERSION => '0.49';
+our $VERSION = '0.22';
+use constant API_VERSION => '0.76';
 
 use base qw( IO::Async::Loop );
 IO::Async::Loop->VERSION( '0.49' );
@@ -24,26 +24,26 @@ C<IO::Async::Loop::Glib> - use C<IO::Async> with F<Glib> or F<GTK>
 
 =head1 SYNOPSIS
 
- use IO::Async::Loop::Glib;
+   use IO::Async::Loop::Glib;
 
- my $loop = IO::Async::Loop::Glib->new();
+   my $loop = IO::Async::Loop::Glib->new();
 
- $loop->add( ... );
+   $loop->add( ... );
 
- ...
- # Rest of GLib/Gtk program that uses GLib
+   ...
+   # Rest of GLib/Gtk program that uses GLib
 
- Glib::MainLoop->new->run();
-
-Or
-
- $loop->loop_forever();
+   Glib::MainLoop->new->run();
 
 Or
 
- while(1) {
-    $loop->loop_once();
- }
+   $loop->run;
+
+Or
+
+   while(1) {
+      $loop->loop_once();
+   }
 
 =head1 DESCRIPTION
 
@@ -62,7 +62,9 @@ required.
 
 =cut
 
-=head2 $loop = IO::Async::Loop::Glib->new()
+=head2 new
+
+   $loop = IO::Async::Loop::Glib->new()
 
 This function returns a new instance of a C<IO::Async::Loop::Glib> object. It
 takes no special arguments.
@@ -231,36 +233,36 @@ sub unwatch_time
    return;
 }
 
-sub watch_child
+sub watch_process
 {
    my $self = shift;
    my ( $pid, $code ) = @_;
 
    if( $pid == 0 ) {
-      return $self->SUPER::watch_child( @_ );
+      return $self->SUPER::watch_process( @_ );
    }
 
-   my $childwatches = $self->{childwatches};
+   my $processwatches = $self->{processwatches};
 
-   $childwatches->{$pid} = Glib::Child->watch_add( $pid,
+   $processwatches->{$pid} = Glib::Child->watch_add( $pid,
       sub {
          $code->( $_[0], $_[1] );
-         delete $childwatches->{$pid};
+         delete $processwatches->{$pid};
          return 0;
       },
    );
 }
 
-sub unwatch_child
+sub unwatch_process
 {
    my $self = shift;
    my ( $pid ) = @_;
 
    if( $pid == 0 ) {
-      return $self->SUPER::unwatch_child( @_ );
+      return $self->SUPER::unwatch_process( @_ );
    }
 
-   Glib::Source->remove( delete $self->{childwatches}{$pid} );
+   Glib::Source->remove( delete $self->{processwatches}{$pid} );
 }
 
 sub watch_idle
@@ -285,7 +287,9 @@ sub unwatch_idle
    Glib::Source->remove( $id );
 }
 
-=head2 $loop->loop_once( $timeout )
+=head2 loop_once
+
+   $loop->loop_once( $timeout )
 
 This method calls the C<iteration()> method on the underlying 
 C<Glib::MainContext>. If a timeout value is supplied, then a Glib timeout

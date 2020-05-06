@@ -7,6 +7,7 @@ use IO::Async::Test;
 
 use Test::More;
 use Test::Fatal;
+use Test::Metrics::Any;
 use Test::Refcount;
 
 use IO::File;
@@ -615,6 +616,33 @@ my @sub_lines;
    binmode STDIN; # Avoid harmless warning in case -CS is in effect
    my $stream = IO::Async::Stream->new_for_stdin;
    is( $stream->read_handle, \*STDIN, 'Stream->new_for_stdin->read_handle is STDIN' );
+}
+
+# Metrics
+{
+   my ( $rd, $wr ) = mkhandles;
+
+   my $done;
+   my $stream = IO::Async::Stream->new(
+      read_handle => $rd,
+      on_read => sub {
+         my ( $self, $bufref ) = @_;
+         $done = 1 if length $$bufref == 100;
+         return 0;
+      },
+   );
+
+   $loop->add( $stream );
+
+   $wr->syswrite( "X"x100 );
+
+   is_metrics_from(
+      sub { wait_for { $done } },
+      { io_async_stream_read => 100 },
+      'Stream reading increments metric'
+   );
+
+   $loop->remove( $stream );
 }
 
 done_testing;

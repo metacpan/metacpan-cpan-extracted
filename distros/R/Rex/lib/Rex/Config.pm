@@ -8,9 +8,23 @@
 
 Rex::Config - Handles Rex configuration
 
+=head1 SYNOPSIS
+
+ use Rex::Config;
+
+ # set a config option
+ Rex::Config->set_exec_autodie(TRUE);
+
+ # get value of a config option
+ my $user = Rex::Config->get_user();
+
 =head1 DESCRIPTION
 
-This module holds all configuration parameters for Rex, and also allows you to specify your own configuration parameters for your modules.
+This module holds all configuration options for Rex, and also allows you to specify your own ones for your modules.
+
+Please take a look at L<Rex::Commands> first, which provides convenience wrappers for many of these options.
+
+While it's possible to use the methods below to set a configuration option directly, their main intended purpose is to be used as internal plumbing, and to provide an escape hatch in case there are no better alternatives.
 
 =head1 EXPORTED METHODS
 
@@ -21,7 +35,7 @@ package Rex::Config;
 use strict;
 use warnings;
 
-our $VERSION = '1.9.0'; # VERSION
+our $VERSION = '1.10.0'; # VERSION
 
 use Rex::Helper::File::Spec;
 use Rex::Logger;
@@ -60,6 +74,7 @@ our (
   $use_template_ng,             $use_rex_kvm_agent,
   $autodie,                     $task_chaining_cmdline_args,
   $waitpid_blocking_sleep_time, $write_utf8_files,
+  $default_auth,
 );
 
 # some defaults
@@ -1589,6 +1604,27 @@ sub set_write_utf8_files {
 
 sub get_write_utf8_files {
   return $write_utf8_files;
+}
+
+=head2 set_default_auth
+
+=head2 get_default_auth
+
+Sets and gets the value of the C<$default_auth> configuration variable.
+
+This controls whether Rex should attach default authentication info to tasks.
+
+Default is C<1>.
+
+=cut
+
+sub set_default_auth {
+  my $self = shift;
+  $default_auth = shift;
+}
+
+sub get_default_auth {
+  return $default_auth // 1;
 }
 
 =head2 register_set_handler($handler_name, $code)

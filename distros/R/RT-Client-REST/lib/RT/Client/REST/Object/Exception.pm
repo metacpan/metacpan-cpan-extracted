@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Object::Exception;
-$RT::Client::REST::Object::Exception::VERSION = '0.57';
+$RT::Client::REST::Object::Exception::VERSION = '0.59';
 use base qw(RT::Client::REST::Exception);
 
 use RT::Client::REST::Exception (
@@ -65,45 +65,15 @@ RT::Client::REST::Object::Exception
 
 =head1 VERSION
 
-version 0.57
+version 0.59
 
-=head1 AUTHORS
+=head1 AUTHOR
 
-=over 4
-
-=item *
-
-Abhijit Menon-Sen <ams@wiw.org>
-
-=item *
-
-Dmitri Tikhonov <dtikhonov@yahoo.com>
-
-=item *
-
-Damien "dams" Krotkine <dams@cpan.org>
-
-=item *
-
-Dean Hamstead <dean@bytefoundry.com.au>
-
-=item *
-
-Miquel Ruiz <mruiz@cpan.org>
-
-=item *
-
-JLMARTIN
-
-=item *
-
-SRVSH
-
-=back
+Dmitri Tikhonov
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Dmitri Tikhonov.
+This software is copyright (c) 2020, 2018 by Dmitri Tikhonov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,6 +2,9 @@ package OPTIMADE::Filter::Zip;
 
 use strict;
 use warnings;
+
+use parent 'OPTIMADE::Filter::Modifiable';
+
 use Scalar::Util qw(blessed);
 
 sub new {
@@ -72,8 +75,8 @@ sub modify
     my $code = shift;
 
     $self->{properties} = [ map { $_->modify( $code, @_ ) } @{$self->{properties}} ];
-    $self->{values} = [ map { [ OPTIMADE::Filter::modify( $_->[0], $code, @_ ),
-                                OPTIMADE::Filter::modify( $_->[1], $code, @_ ) ] }
+    $self->{values} = [ map { [ OPTIMADE::Filter::Modifiable::modify( $_->[0], $code, @_ ),
+                                OPTIMADE::Filter::Modifiable::modify( $_->[1], $code, @_ ) ] }
                             @{$self->{values}} ];
     return $code->( $self, @_ );
 }

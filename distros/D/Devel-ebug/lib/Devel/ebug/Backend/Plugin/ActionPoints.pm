@@ -1,8 +1,10 @@
 package Devel::ebug::Backend::Plugin::ActionPoints;
-$Devel::ebug::Backend::Plugin::ActionPoints::VERSION = '0.59';
+
 use strict;
 use warnings;
 use File::Spec;
+
+our $VERSION = '0.60'; # VERSION
 
 sub register_commands {
   return (
@@ -11,7 +13,7 @@ sub register_commands {
   break_points_with_condition => { sub => \&break_points_with_condition },
   all_break_points_with_condition => { sub => \&all_break_points_with_condition },
   break_point_delete => { sub => \&break_point_delete, record => 1 },
-  break_point_subroutine => { sub => \&break_point_subroutine, record => 1 },  
+  break_point_subroutine => { sub => \&break_point_subroutine, record => 1 },
   watch_point => { sub => \&watch_point, record => 1 },
   break_on_load => { sub => \&break_on_load },
   );
@@ -113,7 +115,7 @@ sub set_break_point {
 sub break_on_load{
   my($req, $context) = @_;
   my $filename = $req->{filename};
-  
+
   $DB::break_on_load{$filename} = 1;
 
   if (!File::Spec->file_name_is_absolute( $filename )){
@@ -121,9 +123,44 @@ sub break_on_load{
     $filename = File::Spec->rel2abs( $filename);
     $DB::break_on_load{$filename} = 1;
   }
-       
+
   return {};
 }
 
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Devel::ebug::Backend::Plugin::ActionPoints
+
+=head1 VERSION
+
+version 0.60
+
+=head1 AUTHOR
+
+Original author: Leon Brocard E<lt>acme@astray.comE<gt>
+
+Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Brock Wilcox E<lt>awwaiid@thelackthereof.orgE<gt>
+
+Taisuke Yamada
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2005-2020 by Leon Brocard.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

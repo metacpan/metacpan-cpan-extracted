@@ -16,13 +16,14 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Alien::Base" : "0.020",
             "IO::Socket::SSL" : "1.56",
             "Net::SSLeay" : "1.49"
          }
       },
       "configure" : {
          "requires" : {
-            "Alien::Base" : "0.020",
+            "Alien::Base::ModuleBuild" : "0",
             "ExtUtils::CChecker" : "0.10",
             "File::ShareDir" : "1.03",
             "Module::Build" : "0.42",
@@ -50,7 +51,7 @@
    "provides" : {
       "Alien::SNMP::MAXTC" : {
          "file" : "lib/Alien/SNMP/MAXTC.pm",
-         "version" : "1.000001"
+         "version" : "1.001000"
       }
    },
    "release_status" : "stable",
@@ -59,6 +60,6 @@
          "http://opensource.org/licenses/BSD-3-Clause"
       ]
    },
-   "version" : "1.000001",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "1.001000",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

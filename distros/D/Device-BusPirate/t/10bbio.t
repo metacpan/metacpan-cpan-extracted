@@ -124,4 +124,15 @@ my $bbio;
    check_and_clear '->set_pwm';
 }
 
+# read_adc_voltage
+{
+   expect_write "\x14";
+   expect_read "\x01\x23";
+
+   my $volts = $bbio->read_adc_voltage->get;
+   is( sprintf( "%.3f", $volts ), "1.876", '->read_adc_voltage yields voltage' );
+
+   check_and_clear '->read_adc_voltage';
+}
+
 done_testing;

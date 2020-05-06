@@ -1,14 +1,15 @@
 pl - Swiss Army Knife of Perl One-Liners
 
-Just one small script extends "perl -E" with many bells & whistles: Various
-one-letter commands & magic variables (with meaningful aliases too) and more
-nifty loop options take Perl programming to the command line.  List::Util is
-fully imported.  Unless you pass a program on the command line, starts a
-simple Perl Shell.
+Just one small self-contained script extends "perl -E" with many bells &
+whistles: Various one-letter commands & magic variables (with meaningful
+aliases too) and more nifty loop options take Perl programming to the command
+line.  List::Util is fully imported.  Unless you pass a program on the command
+line, starts a simple Perl Shell.
 
-E(cho) 3 values, including 2 from "@A(RGV)".  And same for difficult values:
+How to "e(cho)" values, including from "@A(RGV)", with single "$q(uote)" &
+double "$Q(uote)".  Same for hard-to-print values:
 
-    pl 'e "Perl", @A' one liner
+    pl 'e "${q}Perl$q", "$Q@A$Q"' one liner
     pl 'e \"Perl", \@A, undef' one liner
 
 Print up to 3 matching lines, resetting count (and "$.") for each file:

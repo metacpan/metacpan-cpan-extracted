@@ -1,17 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2007-2011 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2007-2020 -- leonerd@leonerd.org.uk
 
 package IO::Async::Loop::Ppoll;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
-use constant API_VERSION => '0.49';
+our $VERSION = '0.10';
+use constant API_VERSION => '0.76';
 
-use IO::Async::Loop::Poll 0.18;
+use IO::Async::Loop::Poll 0.76;
 use base qw( IO::Async::Loop::Poll );
 
 use Carp;
@@ -29,18 +29,18 @@ C<IO::Async::Loop::Ppoll> - use C<IO::Async> with C<ppoll(2)>
 
 =head1 SYNOPSIS
 
- use IO::Async::Loop::Ppoll;
+   use IO::Async::Loop::Ppoll;
 
- my $loop = IO::Async::Loop::Ppoll->new();
+   my $loop = IO::Async::Loop::Ppoll->new();
 
- $loop->add( ... );
+   $loop->add( ... );
 
- $loop->add( IO::Async::Signal->new(
-       name =< 'HUP',
-       on_receipt => sub { ... },
- ) );
+   $loop->add( IO::Async::Signal->new(
+         name =< 'HUP',
+         on_receipt => sub { ... },
+   ) );
 
- $loop->loop_forever();
+   $loop->run;
 
 =head1 DESCRIPTION
 
@@ -57,7 +57,9 @@ mask during the poll, allowing it to handle file IO and signals concurrently.
 
 =cut
 
-=head2 $loop = IO::Async::Loop::Ppoll->new( %args )
+=head2 new
+
+   $loop = IO::Async::Loop::Ppoll->new( %args )
 
 This function returns a new instance of a C<IO::Async::Loop::Ppoll> object.
 It takes the following named arguments:
@@ -106,7 +108,9 @@ sub DESTROY
    }
 }
 
-=head2 $count = $loop->loop_once( $timeout )
+=head2 loop_once
+
+   $count = $loop->loop_once( $timeout )
 
 This method calls the C<poll()> method on the stored C<IO::Ppoll> object,
 passing in the value of C<$timeout>, and processes the results of that call.
@@ -125,7 +129,9 @@ sub loop_once
 
    my $poll = $self->{poll};
 
+   $self->pre_wait;
    my $pollret = $poll->poll( $timeout );
+   $self->post_wait;
 
    return undef if ( !defined $pollret or $pollret == -1 ) and $! != EINTR;
 

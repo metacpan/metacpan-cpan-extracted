@@ -972,7 +972,7 @@ sub extractFormInfo {
               or $a->{name} cmp $b->{name}
               or $a->{val} cmp $b->{val}
           } @list;
-        $req->data->{list}            = \@list;
+        $req->data->{list} = \@list;
 
         #TODO: check this
         $req->data->{login} = 1;
@@ -1472,7 +1472,8 @@ sub getIDP {
                 if ( $idpName eq $idpConfKey ) {
                     $idp = $_;
                     $self->logger->debug(
-                        "IDP $idp selected from idpName URL Parameter ($idpName)");
+"IDP $idp selected from idpName URL Parameter ($idpName)"
+                    );
                     last;
                 }
             }
@@ -1510,7 +1511,7 @@ sub getIDP {
         $idp = undef;
     }
 
-    return  $idp;
+    return $idp;
 }
 
 1;

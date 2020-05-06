@@ -8,14 +8,14 @@ package Device::BusPirate;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Carp;
 
 use Fcntl qw( O_NOCTTY O_NDELAY );
 use Future::AsyncAwait;
 use Future::Mutex;
-use Future::IO 0.03; # ->sysread_exactly
+use Future::IO 0.04; # ->syswrite_exactly
 use IO::Termios 0.07; # cfmakeraw
 use Time::HiRes qw( time );
 
@@ -149,7 +149,10 @@ sub write
 
    printf STDERR "PIRATE >> %v02x\n", $buf if PIRATE_DEBUG > 1;
 
-   $self->_syswrite( $self->{fh}, $buf );
+   my $f = Future::IO->syswrite_exactly( $self->{fh}, $buf );
+
+   return $f if wantarray;
+   $f->on_ready( sub { undef $f } );
 }
 
 async sub write_expect_ack
@@ -196,15 +199,6 @@ sub read
       $f,
       $self->sleep( $timeout // 2 )->then_fail( "Timeout waiting for $name" ),
    );
-}
-
-# Makes unit-testing a little easier
-sub _syswrite
-{
-   shift;
-   my ( $fh, $bytes ) = @_;
-
-   $fh->syswrite( $bytes );
 }
 
 =head2 sleep

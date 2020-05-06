@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Device::BusPirate::Mode );
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Carp;
 
@@ -17,6 +17,8 @@ use Future::AsyncAwait;
 use List::Util 1.33 qw( any );
 
 use constant MODE => "SPI";
+
+use constant PIRATE_DEBUG => $ENV{PIRATE_DEBUG} // 0;
 
 =head1 NAME
 
@@ -77,6 +79,7 @@ async sub start
    await $self->_start_mode_and_await( "\x01", "SPI" );
    ( $self->{version} ) = await $self->pirate->read( 1, "SPI start" );
 
+   print STDERR "PIRATE SPI STARTED\n" if PIRATE_DEBUG;
    return $self;
 }
 
@@ -217,6 +220,8 @@ sub chip_select
    my $self = shift;
    $self->{cs} = !!shift;
 
+   print STDERR "PIRATE SPI CHIP-SELECT(", $self->{cs} || "0", ")\n" if PIRATE_DEBUG;
+
    $self->pirate->write_expect_ack( $self->{cs} ? "\x03" : "\x02", "SPI chip_select" );
 }
 
@@ -239,6 +244,8 @@ async sub _writeread
    my $self = shift;
    my ( $bytes ) = @_;
 
+   printf STDERR "PIRATE SPI WRITEREAD %v02X\n", $bytes if PIRATE_DEBUG;
+
    # "Bulk Transfer" command can only send up to 16 bytes at once.
 
    # The Bus Pirate seems to have a bug, where at the lowest (30k) speed, bulk
@@ -256,6 +263,7 @@ async sub _writeread
       );
    }
 
+   printf STDERR "PIRATE SPI READ %v02X\n", $ret if PIRATE_DEBUG;
    return $ret;
 }
 

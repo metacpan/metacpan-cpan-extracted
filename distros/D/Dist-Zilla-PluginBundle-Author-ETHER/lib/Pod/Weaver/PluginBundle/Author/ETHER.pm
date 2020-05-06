@@ -1,12 +1,12 @@
 use strict;
 use warnings;
-no if "$]" >= 5.031008, feature => 'indirect';
 package Pod::Weaver::PluginBundle::Author::ETHER;
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
+# vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: A plugin bundle for pod woven by ETHER
 
-our $VERSION = '0.154';
+our $VERSION = '0.156';
 
+no if "$]" >= 5.031009, feature => 'indirect';
 use namespace::autoclean -also => ['_exp'];
 use Pod::Weaver::Config::Assembler;
 use Module::Runtime 'use_module';
@@ -58,7 +58,7 @@ sub configure {
     ($bugtracker_email && $bugtracker_email =~ /rt\.cpan\.org/)
     ? "Bugs may be submitted through L<the RT bug tracker|$bugtracker_web>\n(or L<$bugtracker_email|mailto:$bugtracker_email>)."
     : $bugtracker_web
-    ? "bugs may be submitted through L<$bugtracker_web>."
+    ? "Bugs may be submitted through L<$bugtracker_web>."
     : (),
 
     $distmeta->{resources}{x_MailingList} ? 'There is also a mailing list available for users of this distribution, at' . "\nL<" . $distmeta->{resources}{x_MailingList} . '>.' : (),
@@ -176,7 +176,7 @@ Pod::Weaver::PluginBundle::Author::ETHER - A plugin bundle for pod woven by ETHE
 
 =head1 VERSION
 
-version 0.154
+version 0.156
 
 =head1 SYNOPSIS
 

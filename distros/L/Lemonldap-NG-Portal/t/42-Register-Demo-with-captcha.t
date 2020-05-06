@@ -9,7 +9,7 @@ BEGIN {
     };
 }
 
-my $maintests = 26;
+my $maintests = 28;
 my ( $res, $user, $pwd, $host, $url, $query );
 my $mailSend = 0;
 
@@ -60,6 +60,12 @@ s/^.*token=([^&]+).*$/token=$1&firstname=who&lastname=doctor&mail=dwho%40badwolf
         $res->[2]->[0] =~ m%<img src="/static/common/logos/logo_llng_old.png"%,
         'Found custom Main Logo'
     ) or print STDERR Dumper( $res->[2]->[0] );
+    ok(
+        $res->[2]->[0] =~
+m#<img class="renewcaptchaclick" src="/static/common/icons/arrow_refresh.png" alt="Renew Captcha" title="Renew Captcha" class="img-thumbnail mb-3" />#,
+        ' Renew Captcha button found'
+    ) or explain( $res->[2]->[0], 'Renew captcha button not found' );
+    ok( $res->[2]->[0] =~ /captcha\.(?:min\.)?js/, 'Get captcha javascript' );
 
     $query .= "&captcha=$captcha";
 

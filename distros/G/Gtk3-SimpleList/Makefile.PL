@@ -4,7 +4,6 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 use File::Spec;
-use Data::Dumper;
 
 
 sub main {
@@ -14,19 +13,27 @@ sub main {
 		NAME          => 'Gtk3::SimpleList',
 		VERSION_FROM  => File::Spec->catfile('lib', 'Gtk3', 'SimpleList.pm'),
 		ABSTRACT_FROM => File::Spec->catfile('lib', 'Gtk3', 'SimpleList.pm'),
-		LICENSE       => 'perl, lgpl',
+		LICENSE       => 'lgpl',
 
+		'CONFIGURE_REQUIRES' => {
+			'ExtUtils::MakeMaker' => '6.64'
+		},
 		PREREQ_PM     => {
 			'Gtk3'                        => 0,
 		},
-		PREREQ_FATAL  => 1,
 
 		META_MERGE => {
+			'meta-spec' => { version => 2 },
 			resources => {
-				homepage    => 'https://github.com/potyl/perl-Gtk3-SimpleList',
-				bucktracker => 'https://github.com/potyl/perl-Gtk3-SimpleList/issues',
-				repository  => 'https://github.com/potyl/perl-Gtk3-SimpleList',
+				homepage    => 'https://github.com/soig/Gtk3-SimpleList',
+				bucktracker => 'https://github.com/soig/Gtk3-SimpleList/issues',
 			},
+			repository  => {
+				type => 'git',
+				url => 'https://github.com/soig/Gtk3-SimpleList.git',
+				web =>  'https://github.com/soig/Gtk3-SimpleList',
+			},
+			release_status => 'stable',
 		},
 	);
 	WriteMakefile(@args);

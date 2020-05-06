@@ -1,0 +1,24 @@
+Revision history for Rex-Dondley-ProcessTaskArgs
+
+0.008     2020-05-04 20:34:12-04:00 America/New_York
+- added strict/warnings pragmas
+
+0.007     2020-05-03 12:45:42-04:00 America/New_York
+- fix broken tests
+
+0.006     2020-05-01 14:47:59-04:00 America/New_York
+- improve doc formats
+- make error messages more consisten
+
+0.005     2020-05-01 09:36:06-04:00 America/New_York
+
+0.004     2020-05-01 09:32:32-04:00 America/New_York
+- add caller information to errors
+- added tests
+
+0.003     2020-04-15 16:36:06-04:00 America/New_York
+fix doc typos
+
+0.002     2020-04-15 16:31:02-04:00 America/New_York
+
+0.001     2020-04-15 16:27:37-04:00 America/New_York

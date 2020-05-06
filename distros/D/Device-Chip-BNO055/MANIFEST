@@ -1,0 +1,14 @@
+Build.PL
+Changes
+examples/bno055.pl
+lib/Device/Chip/BNO055.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01read-ids.t
+t/02config.t
+t/10readings.t
+t/99pod.t

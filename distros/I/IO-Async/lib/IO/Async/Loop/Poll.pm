@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2007-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2007-2020 -- leonerd@leonerd.org.uk
 
 package IO::Async::Loop::Poll;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.75';
+our $VERSION = '0.76';
 use constant API_VERSION => '0.49';
 
 use base qw( IO::Async::Loop );
@@ -228,6 +228,7 @@ sub loop_once
    if( my $poll = $self->{poll} ) {
       my $pollret;
 
+      $self->pre_wait;
       # There is a bug in IO::Poll at least version 0.07, where poll with no
       # registered masks returns immediately, rather than waiting for a timeout
       # This has been reported: 
@@ -253,11 +254,15 @@ sub loop_once
          $pollret = select( undef, undef, undef, $timeout );
       }
 
+      $self->post_wait;
+
       return undef unless defined $pollret;
       return $self->post_poll;
    }
    else {
       my @pollmasks = %{ $self->{pollmask} };
+
+      $self->pre_wait;
 
       # Perl 5.8.x's IO::Poll::_poll gets confused with no masks
       my $pollret;
@@ -278,6 +283,8 @@ sub loop_once
          # Workaround - we'll use select to fake a millisecond-accurate sleep
          $pollret = select( undef, undef, undef, $timeout );
       }
+
+      $self->post_wait;
 
       return undef unless defined $pollret;
 

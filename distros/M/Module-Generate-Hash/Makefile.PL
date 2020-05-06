@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
 	'Import::Export' => 1.00,
-	'Module::Generate' => 0.08
+	'Module::Generate' => 0.11
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Module-Generate-Hash-*' },

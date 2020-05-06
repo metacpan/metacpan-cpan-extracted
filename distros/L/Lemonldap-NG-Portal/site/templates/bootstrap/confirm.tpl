@@ -2,7 +2,7 @@
 
 <div id="logincontent" class="container">
 
-  <form id="form" action="#" method="<TMPL_VAR NAME="FORM_METHOD">" class="confirm" role="form">
+  <form id="form" action="<TMPL_VAR NAME="FORM_ACTION">" method="<TMPL_VAR NAME="FORM_METHOD">" class="confirm" role="form">
 
     <TMPL_VAR NAME="HIDDEN_INPUTS">
     <TMPL_IF NAME="AUTH_URL">

@@ -1,1 +1,1 @@
-<h3><TMPL_VAR NAME="number"> <span trmsg="ppGrace">authentications remaining, change your password!</span></h3>
+<h3><TMPL_VAR NAME="number"> <span trspan="ppGrace">authentications remaining, change your password!</span></h3>

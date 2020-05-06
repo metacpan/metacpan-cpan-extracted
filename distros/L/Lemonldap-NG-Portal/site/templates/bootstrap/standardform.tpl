@@ -36,7 +36,6 @@
     <span trspan="connect">Connect</span>
   </button>
 </div>
-</TMPL_IF>
 
 <div class="actions">
   <TMPL_IF NAME="DISPLAY_RESETPASSWORD">
@@ -60,3 +59,4 @@
   </a>
   </TMPL_IF>
 </div>
+</TMPL_IF>

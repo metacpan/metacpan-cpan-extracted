@@ -21,22 +21,22 @@ SKIP: {
     $dbh->do("INSERT INTO users VALUES ('rtyler','rtyler','Test user 1')");
 
     $client = iniCmb('[Dm] or [DB]');
-    expectCookie( try('dwho') );
-    expectCookie( try('dvador') );
+    $client->logout( expectCookie( try('dwho') ) );
+    $client->logout( expectCookie( try('dvador') ) );
 
     $client = iniCmb('[Dm] and [DB]');
-    expectCookie( try('rtyler') );
+    $client->logout( expectCookie( try('rtyler') ) );
     expectReject( try('dwho'), 401, 5 );
 
     $client = iniCmb('if($env->{HTTP_X} eq "dwho") then [Dm] else [DB]');
-    expectCookie( try('dwho') );
-    expectCookie( try('dvador') );
+    $client->logout( expectCookie( try('dwho') ) );
+    $client->logout( expectCookie( try('dvador') ) );
 
     $client = iniCmb(
 'if($env->{HTTP_X} eq "rtyler") then [Dm] and [DB] else if($env->{HTTP_X} eq "dvador") then [DB] else [DB]'
     );
-    expectCookie( try('rtyler') );
-    expectCookie( try('dvador') );
+    $client->logout( expectCookie( try('rtyler') ) );
+    $client->logout( expectCookie( try('dvador') ) );
     expectReject( try('dwho'), 401, 5 );
 }
 count($maintests);

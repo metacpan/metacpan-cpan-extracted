@@ -4,13 +4,14 @@ use base qw(Plack::App::Directory);
 use strict;
 use warnings;
 
+use English;
+use Error::Pure qw(err);
 use PYX::SGML::Tags;
 use Plack::Util::Accessor qw(indent);
-use Tags::Output::Indent;
 use Tags::Output::Raw;
 use Unicode::UTF8 qw(encode_utf8);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub serve_path {
 	my ($self, $env, $path_to_file_or_dir) = @_;
@@ -25,12 +26,7 @@ sub serve_path {
 		];
 	}
 
-	my $tags;
-	if ($self->indent) {
-		$tags = Tags::Output::Indent->new;
-	} else {
-		$tags = Tags::Output::Raw->new;
-	}
+	my $tags = $self->_get_tags;
 	my $pyx = PYX::SGML::Tags->new(
 		'tags' => $tags,
 	);
@@ -44,6 +40,32 @@ sub serve_path {
 		],
 		[encode_utf8($tags->flush)],
 	];
+}
+
+sub _get_tags {
+	my $self = shift;
+
+	my $tags;
+	if (! defined $self->indent) {
+		$tags = Tags::Output::Raw->new;
+	} else {
+		my $class = $self->indent;
+		eval "require $class;";
+		if ($EVAL_ERROR) {
+			err "Cannot load class '$class'.",
+				'Error', $EVAL_ERROR;
+		}
+		$tags = eval "$class->new";
+		if ($EVAL_ERROR) {
+			err "Cannot create object for '$class' class.",
+				'Error', $EVAL_ERROR;
+		}
+		if (! $tags->isa('Tags::Output')) {
+			err "Bad 'Tags::Output' module to create PYX output.";
+		}
+	}
+
+	return $tags;
 }
 
 1;
@@ -80,7 +102,9 @@ Returns instance of object.
 
 =item * C<indent>
 
-Set indent of SGML output.
+Set Tags::Output::* class for output serialization.
+
+Default value is Tags::Output::Raw.
 
 =back
 
@@ -173,7 +197,7 @@ Returns Plack::Component object.
  # Run application with one PYX file.
  my $app = Plack::App::Directory::PYX->new(
          'file' => $temp_pyx_file,
-         'indent' => 1,
+         'indent' => 'Tags::Output::Indent',
  )->to_app;
  Plack::Runner->new->run($app);
 
@@ -196,7 +220,10 @@ Returns Plack::Component object.
 
 =head1 DEPENDENCIES
 
+L<English>,
+L<Error::Pure>,
 L<Plack::App::Directory>,
+L<Plack::Util::Accessor>,
 L<PYX::SGML::Tags>,
 L<Tags::Output::Raw>,
 L<Unicode::UTF8>,
@@ -219,6 +246,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

@@ -3,6 +3,8 @@ package OPTIMADE::Filter::Known;
 use strict;
 use warnings;
 
+use parent 'OPTIMADE::Filter::Modifiable';
+
 sub new {
     my( $class, $is_known, $property ) = @_;
     return bless { is_known => $is_known, property => $property }, $class;
@@ -51,7 +53,7 @@ sub modify
     my $self = shift;
     my $code = shift;
 
-    $self->property( OPTIMADE::Filter::modify( $self->property, $code, @_ ) );
+    $self->property( $self->property->modify( $code, @_ ) );
     return $code->( $self, @_ );
 }
 

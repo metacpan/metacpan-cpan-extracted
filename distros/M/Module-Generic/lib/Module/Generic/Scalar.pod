@@ -1,0 +1,146 @@
+=encoding utf8
+
+=head1 NAME
+
+Module::Generic::Scalar - String Manipulation Object Class
+
+=head1 SYNOPSIS
+
+    my $s = Module::Generic::Scalar->new( "John Doe" );
+    print( $s->substr( 0, 4 ), "\n" );
+    # prints: John
+
+=head1 DESCRIPTION
+
+The purpos of this calss/package is to provide an object-oriented approach to string manipulation.
+
+The object is overloaded, so it returns the embedded string when used as a string.
+
+    print( "I met with $s\n" );
+
+Would produce: I met with John Doe
+
+=head1 METHODS
+
+=head2 new
+
+Provided with scalar reference, an array or just a regular string and this returns a new object.
+
+If an array reference or an array-based object is provided like L<Module::Generic::Array>, this will concatenate all the array elements
+
+=head2 as_string
+
+Returns the object string as a string.
+
+    my $s = Module::Generic::Scalar->new( "Mary Jane" );
+    print( "Hello $s\n" );
+    # Hello Mary Jane
+
+=head2 chomp
+
+Just like L<perlfunc/"chomp">, this remove the trailing new lines in the string, if any.
+
+=head2 chop
+
+Just like L<perlfunc/"chop">, this remove the trailing character in the string, no matter what it is.
+
+=head2 fc
+
+Just like L<perlfunc/"fc">, provided with a string, this enables comparison with casefolding.
+
+To quote from the manual: "Casefolding is the process of mapping strings to a form where case differences are erased".
+
+    lc($this) eq lc($that)    # Wrong!
+    # or
+    uc($this) eq uc($that)    # Also wrong!
+    # or
+    $this =~ /^\Q$that\E\z/i  # Right!
+    # And now
+    my $s = Module::Generic::Scalar( $this );
+    $s->fc( $that );
+
+=head2 hex
+
+Returns the hex value of the string.
+
+=head2 index
+
+Given a sub string and an optional position, and this returns the position at which the sub string was found.
+
+See L<oerlfunc/"index">
+
+=head2 lc
+
+Given a string, this return a new L<Module::Generic::Scalar> object with the string all in lower case.
+
+=head2 lcfirst
+
+Given a string, this return a new L<Module::Generic::Scalar> object with the first character of the string in lower case.
+
+=head2 length
+
+This returns the length of the string.
+
+=head2 ord
+
+This returns the value of L<perlfunc/"ord"> on the string.
+
+=head2 quotemeta
+
+Given a string, this return a new L<Module::Generic::Scalar> object with the given string characters escapeed with L<perlfunc/"quotemeta">.
+
+=head2 reset
+
+This empty the string inside the object.
+
+=head2 reverse
+
+Given a string, this return a new L<Module::Generic::Scalar> object with the given string cin reverse order.
+
+=head2 rindex
+
+Given a sub string and an optional position, and this returns the position at which the sub string was found, starting from the end.
+
+See L<oerlfunc/"rindex">
+
+=head2 set
+
+Provided with a scalar reference or scalar-based object like L<Module::Generic::Scalar> or an array reference and this sets the current string/.
+
+This acts the exact same way as for L</"new">, except it acts on the current object string.
+
+=head2 split
+
+Provided with a string or an expression and this returns the result.
+
+=head2 sprintf
+
+Provided with a list of arguments, and this replace the placeholders just like L<perlfunc/"sprintf"> does.
+
+=head2 substr
+
+Provided with an offset, an optional length and an optional replacement string, and this return a new L<Module::Generic::Scalar> object.
+
+See L<perlfunc/"substr"> for more information.
+
+=head2 uc
+
+Given a string, this return a new L<Module::Generic::Scalar> object with the string all in upper case.
+
+=head2 ucfirst
+
+Given a string, this return a new L<Module::Generic::Scalar> object with the first character of the string in upper case.
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2000-2020 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut
+

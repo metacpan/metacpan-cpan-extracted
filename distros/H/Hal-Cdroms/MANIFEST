@@ -3,5 +3,7 @@ lib/Hal/Cdroms.pm
 Makefile.PL
 MANIFEST
 t/00basic.t
+t/05-pod.t
+t/10-pod-coverage.t
 META.yml                                 Module meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -9,7 +9,7 @@ BEGIN {
     require 't/test-lib.pm';
 }
 
-my $maintests = 12;
+my $maintests = 13;
 my $client;
 
 # Redefine LWP methods for tests
@@ -63,7 +63,7 @@ my $combined = '<?xml version="1.0" encoding="UTF-8"?>
 <text>This is a test text</text>
 <check>I agree</check>
 </notification>
-<notification uid="rtyler" date="2016-05-31" reference="ABC2">
+<notification uid="rtyler" date="2016-05-31" reference="AB_C_2">
 <title>Test title</title>
 <subtitle>Test subtitle</subtitle>
 <text>This is a test text</text>
@@ -94,11 +94,12 @@ SKIP: {
 
     $client = LLNG::Manager::Test->new( {
             ini => {
-                logLevel                   => 'error',
-                useSafeJail                => 1,
-                notification               => 1,
-                notificationServer         => 1,
-                #notificationDefaultCond    => '$env->{REMOTE_ADDR} =~ /127.0.0.1/',
+                logLevel           => 'error',
+                useSafeJail        => 1,
+                notification       => 1,
+                notificationServer => 1,
+
+            #notificationDefaultCond    => '$env->{REMOTE_ADDR} =~ /127.0.0.1/',
                 notificationStorage        => 'File',
                 notificationStorageOptions => {
                     dirName => $main::tmpDir
@@ -201,6 +202,11 @@ SKIP: {
     expectOK($res);
     $id = expectCookie($res);
     expectForm( $res, undef, '/notifback', 'reference1x1' );
+    ok(
+        $res->[2]->[0] =~
+          m%<input type="hidden" name="reference1x1" value="AB-C-2">%,
+        'Reference found'
+    ) or print STDERR Dumper( $res->[2]->[0] );
     ok(
         $res->[2]->[0] =~
 m%<input type="checkbox" name="check1x1x1" id="check1x1x1" value="accepted">I agree</label>%,

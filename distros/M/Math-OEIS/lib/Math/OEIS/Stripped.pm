@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-OEIS.
 #
@@ -28,7 +28,7 @@ our @ISA = ('Math::OEIS::SortedFile');
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-our $VERSION = 14;
+our $VERSION = 15;
 
 use constant base_filename => 'stripped';
 
@@ -72,6 +72,7 @@ sub anum_to_values {
 sub values_split {
   my ($self, $values_str) = @_;
   if (! ref $self) { $self = $self->instance; }
+  ### values_split(): $self
 
   my @values = split /,/, $values_str;
   if (my $use_bigint = $self->{'use_bigint'}) {
@@ -79,6 +80,7 @@ sub values_split {
       if ($use_bigint eq '1'
           || ($use_bigint eq 'if_necessary'
               && length($value) > _IV_DECIMAL_DIGITS_MAX)) {
+        ### bignum of: $value
         $value = $self->bigint_class_load->new($value);  # mutate array
       }
     }
@@ -192,8 +194,7 @@ values list but these are removed here for convenience of subsequent
 C<split> or similar.
 
 In the past, draft sequences were in the stripped with an empty values list
-",,".  The return for them is an empty list, reckoning "no such A-number"
-when no values yet.
+",,".  The return for them is an empty list (meaning no values yet).
 
 If running in C<perl -T> taint mode then C<$values_str> and each value
 string in C<@values> is tainted in the usual way for reading from a file.
@@ -228,8 +229,8 @@ F<stripped> file.  The optional key/value parameters can be
 
 C<filename> defaults to F<~/OEIS/stripped> per
 C<Math::OEIS-E<gt>local_directories()>.  Another filename can be given, or
-an open filehandle.  If a handle is given then C<filename> may be used for
-diagnostics and so can be helpfully given too.
+an open filehandle.  If a handle is given then C<filename> is used in
+diagnostics so can be given too.
 
 C<use_bigint> controls conversion of values to bignum objects in
 C<anum_to_values()> etc.  Default C<"if_necessary"> converts values bigger
@@ -237,17 +238,19 @@ than a Perl integer, or option 1 or 0 for always or never convert.  When not
 converted, each value is a string suitable for any string operation but
 possibly not numeric operations.
 
-C<bigint_class> is the module name for bignum conversion.  It is
-C<require>'d when needed and values are created by
+C<bigint_class> is the module name for bignum conversion.  It is loaded with
+C<require> when needed and values are created by
 C<$classname-E<gt>new("123")>.  If the class has runtime options, such as
-C<Math::BigInt> choice of back-ends, then set that up from mainline code.
+the choice of back-ends in C<Math::BigInt>, then they should be setup in
+mainline code.
 
 =item C<@values = $obj-E<gt>anum_to_values($anum)>
 
 =item C<$values_str = $obj-E<gt>anum_to_values_str($anum)>
 
 Return the values from the F<stripped> file for an C<$anum> string such as
-"A000001", like the class method described above.
+"A000001", like the class method described above (but with C<values()>
+following the C<use_bigint> in C<$obj>).
 
 =item C<$filename = $obj-E<gt>filename()>
 
@@ -272,7 +275,7 @@ should be like
 
     A123456 ,1,6,9,-23,65,17,-5,997,
 
-Leading and trailing comma (and any trailing newline) are stripped so
+Leading and trailing comma (and any trailing newline) are discarded so
 C<$values_str> is like "1,2,3".
 
 If C<$line> is not A-number and values like this then return an empty list.
@@ -280,7 +283,8 @@ The stripped file starts with some comment lines (C<#>) and they get this
 empty return.
 
 In the past, draft sequences were included in the stripped file with empty
-values list.  They are reckoned non-lines since no values, so empty return.
+values list.  They are reckoned non-lines since no values, so an empty
+return.
 
 =item C<@values = Math::OEIS::Stripped-E<gt>values_split($values_str)>
 
@@ -289,8 +293,8 @@ values list.  They are reckoned non-lines since no values, so empty return.
 C<$values_str> is a string of integers and commas like "123,-456,789".
 Return them split to a list of integers.
 
-This a C<split()> on commas, but with the C<use_bigint> option applied to
-the result.  See C<new()> above on that option.
+This a C<split()> on commas, and apply the C<use_bigint> option to the
+result.  See C<new()> above about that option.
 
 =back
 
@@ -307,7 +311,7 @@ L<http://user42.tuxfamily.org/math-oeis/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2020 Kevin Ryde
 
 Math-OEIS is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

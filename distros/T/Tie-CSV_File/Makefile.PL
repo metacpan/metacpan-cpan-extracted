@@ -5,6 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     'NAME'		=> 'Tie::CSV_File',
     'VERSION_FROM'	=> 'CSV_File.pm', # finds $VERSION
+    'LICENSE'	        => 'perl',
     'PREREQ_PM'		=> {
         'Text::CSV_XS'    => 0,
         'Tie::File'       => 0,

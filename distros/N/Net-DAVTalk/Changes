@@ -1,5 +1,8 @@
 Revision history for Net-DAVTalk
 
+0.19    Wed May  6 12:34 2020
+  - fix handling of the UA timeout
+
 0.18    Tue Apr  7 15:54 2020
   - remove FATAL warnings from DAVTalk module
 

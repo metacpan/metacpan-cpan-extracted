@@ -1,7 +1,7 @@
 # ABSTRACT: ArangoDB Database object
 
 package Arango::Tango::Database;
-$Arango::Tango::Database::VERSION = '0.011';
+$Arango::Tango::Database::VERSION = '0.012';
 use Arango::Tango::Cursor;
 use Arango::Tango::API;
 
@@ -15,6 +15,24 @@ BEGIN {
             rest => [ delete => '{{database}}_api/collection/{colname}' ],
             signature => [ 'colname' ],
             inject_properties => [ { prop => 'name', as => 'database' } ],
+        },
+
+        get_indexes => {
+            rest => [ get => '{{database}}_api/index?collection={colname}' ],
+            signature => [ 'colname' ],
+            inject_properties => [ { prop => 'name', as => 'database' } ]
+        },
+
+        create_ttl_index => {
+            rest => [ post => '{{database}}_api/index?collection={colname}' ],
+            signature => [ 'colname' ],
+            inject_properties => [ { prop => 'name', as => 'database' } ],
+            schema => {
+                name => { type => 'string' },
+                type => { type => 'string', enum => ['ttl'] },
+                fields => { type => 'array', items => { type => 'string' } },
+                expireAfter => { type => 'integer' }
+            }
         },
 
         create_collection => {
@@ -119,7 +137,7 @@ Arango::Tango::Database - ArangoDB Database object
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 USAGE
 
@@ -176,16 +194,37 @@ Fetch the database or collection access level for a specific user.
 =head2 C<set_access_level>
 
     $db->set_access_level($user, "rw")
-    $db->set_sccess_level($user, "ro", $collection)
+    $db->set_access_level($user, "ro", $collection)
 
 Set the database or collection access level for a specific user.
 
 =head2 C<clear_access_level>
 
     $db->clear_access_level($user)
-    $db->clear_sccess_level($user, $collection)
+    $db->clear_access_level($user, $collection)
 
 Clears the database or collection access level for a specific user.
+
+=head2 C<get_indexes>
+
+   $idxs = $db->get_indexes("col_name");
+
+Returns an object containing an array reference with the details
+of the indexes presently defined for the given collection.
+
+=head2 C<create_ttl_index>
+
+   $idx = $db->create_ttl_index("col_name", %args);
+
+Creates a new index of type ttl for the given collection. The
+mandatory args are "type" (must be "ttl"), "name" (string,
+human name for the index), "fields" (array ref with the
+names of the document fields to be used as expiration timestamps)
+and "expireAfter" (integer, seconds).
+Returns an object containing the id of the created index and the
+confirmation of the provided arguments ("type", "name", "fields"
+and "expireAfter"). If an error occurs the error field will be
+true, otherwise false.
 
 =head1 AUTHOR
 

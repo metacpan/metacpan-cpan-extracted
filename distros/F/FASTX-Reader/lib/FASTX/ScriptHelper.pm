@@ -8,9 +8,14 @@ use Carp qw(confess cluck);
 use Data::Dumper;
 use FASTX::Reader;
 use File::Basename;
-$FASTX::PE::VERSION = '0.1.0';
-sub verbose ($);
-sub rc ($);
+use File::Spec;
+use Term::ANSIColor qw(color);
+use JSON::PP;
+use Capture::Tiny qw(capture);
+
+
+$FASTX::ScriptHelper::VERSION = '0.1.0';
+
 our @ISA = qw(Exporter);
 our @EXPORT = qw(rc fu_printfasta fu_printfastq verbose);
 our @EXPORT_OK = qw($fu_linesize $fu_verbose);  # symbols to export on request
@@ -45,7 +50,8 @@ sub new {
     my $object = bless $self, $class;
 
     if (defined $self->{logfile}) {
-      open my $logfh, '>>', "$object->{logfile}"  || confess("ERROR: Unable to write log file to $object->{logfile}\n");
+      verbose($self, "Ready to log in $object->{logfile}");
+      open my $logfh, '>', "$object->{logfile}"  || confess("ERROR: Unable to write log file to $object->{logfile}\n");
       $object->{logfh} = $logfh;
       $object->{do_log} = 1;
     }
@@ -146,20 +152,94 @@ sub split_string {
 }
 
 
-sub verbose ($) {
+sub verbose {
   my $self = undef;
   if ( ref($_[0]) eq 'FASTX::ScriptHelper' ) {
     $self = shift @_;
   }
-  my ($message) = @_;
-
-  if (defined $self and $self->{verbose}) {
-    say STDERR "$message";
-  } elsif (defined $main::opt_verbose and $main::opt_verbose) {
-    say STDERR "DEBUG $message";
+  my ($message, $reference, $reference_name) = @_;
+  my $variable_name = $reference_name // 'data';
+  my $timestamp = _getTimeStamp();
+  if ( (defined $self and $self->{verbose} ) or (defined $main::opt_verbose and $main::opt_verbose) ) {
+    if (defined $self->{do_log}) {
+      say {$self->{logfh}} "[$timestamp] $message";
+      say {$self->{logfh}}  Data::Dumper->Dump([$reference], [$variable_name])
+        if (defined $reference);
+    } 
+    say STDERR color('cyan'),"[$timestamp]", color('reset'), " $message";
+    say STDERR color('magenta'), Data::Dumper->Dump([$reference], [$variable_name])
+        if (defined $reference);
+  } else {
+    return -1;
   }
 
 }
+
+sub run  {
+  my $self = undef;
+  if ( ref($_[0]) eq 'FASTX::ScriptHelper' ) {
+    $self = shift @_;
+  }
+  my ($command, $options) = @_;
+
+  
+
+  my $cmd = _runCmd($command);
+  if ($cmd->{exit}) {
+    $cmd->{failed} = 1;
+    if (! $options->{candie}) {
+      confess("Execution of an external command failed:\n$command");
+    }
+  }
+  return ($cmd);
+
+
+}
+
+sub writelog  {
+  my $self = undef;
+  if ( ref($_[0]) eq 'FASTX::ScriptHelper' ) {
+    $self = shift @_;
+  }
+  my ($message, $reference) = @_;
+
+  if (defined $self and $self->{do_log}) {
+    say {$self->{logfh}} "[", _getTimeStamp() ,"] $message";
+  }
+
+
+}
+
+sub _getTimeStamp {
+
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)=localtime(time);
+    my $timestamp = sprintf ( "%04d-%02d-%02d %02d:%02d:%02d",
+                                   $year+1900,$mon+1,$mday,$hour,$min,$sec);
+    return $timestamp;
+}
+
+sub _runCmd(@) {
+  if ( ref($_[0]) eq 'FASTX::ScriptHelper' ) {
+     shift @_;
+  }
+  my @cmd = @_;
+  my $output;
+  $output->{cmd} = join(' ', @cmd);
+
+  my ($stdout, $stderr, $exit) = capture {
+    system( @cmd );
+  }; 
+  chomp($stderr);
+  chomp($stdout);
+  $output->{stdout} = $stdout;
+  $output->{stderr} = $stderr;
+  $output->{exit} = $exit;
+  
+  return $output;
+}
+
+
+
 1;
 
 __END__
@@ -174,7 +254,7 @@ FASTX::ScriptHelper - Shared routines for binaries using FASTX::Reader and FASTX
 
 =head1 VERSION
 
-version 0.88
+version 0.90
 
 =head2 new()
 
@@ -223,6 +303,19 @@ Returns a string with newlines at a width specified by 'linesize'
   arguments: message
 
 Prints to STDERR (and log) a message, only if verbose is set
+
+=head2 run
+
+  arguments: command, [%options]
+
+Execute a command. Options are:
+  * candie BOOL, to tolerate non zero exit
+
+=head2 writelog
+
+  arguments: message, []
+
+Writes a message to the log file and STDERR, regardless of --verbose
 
 =head1 AUTHOR
 

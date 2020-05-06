@@ -9,7 +9,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_ERROR
 );
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -32,10 +32,9 @@ sub init {
 sub run {
     my ( $self, $req, $action ) = @_;
     my $user = $req->userData->{ $self->conf->{whatToTrace} };
-    unless ($user) {
-        return $self->p->sendError( $req,
-            'No ' . $self->conf->{whatToTrace} . ' found in user data', 500 );
-    }
+    return $self->p->sendError( $req,
+        'No ' . $self->conf->{whatToTrace} . ' found in user data', 500 )
+      unless $user;
 
     if ( $action eq 'register' ) {
         my $otp     = $req->param('otp');
@@ -154,9 +153,8 @@ sub run {
     elsif ( $action eq 'delete' ) {
 
         # Check if unregistration is allowed
-        unless ( $self->conf->{yubikey2fUserCanRemoveKey} ) {
-            return $self->p->sendError( $req, 'notAuthorized', 400 );
-        }
+        return $self->p->sendError( $req, 'notAuthorized', 400 )
+          unless $self->conf->{yubikey2fUserCanRemoveKey};
 
         my $epoch = $req->param('epoch')
           or return $self->p->sendError( $req, '"epoch" parameter is missing',

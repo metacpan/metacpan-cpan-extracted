@@ -1,10 +1,10 @@
 use 5.014;
-#package Thread::Queue::Any '1.15'; # not supported by PAUSE or MetaCPAN :-(
+#package Thread::Queue::Any '1.16'; # not supported by PAUSE or MetaCPAN :-(
 package Thread::Queue::Any;         # please remove if no longer needed
 
 # initializations
 our @ISA= qw( Thread::Queue );
-our $VERSION= '1.15';               # please remove if no longer needed
+our $VERSION= '1.16';               # please remove if no longer needed
 
 # be as verbose as possble
 use warnings;
@@ -223,7 +223,7 @@ Thread::Queue::Any - thread-safe queues for any data-structure
 
 =head1 VERSION
 
-This documentation describes version 1.15.
+This documentation describes version 1.16.
 
 =head1 DESCRIPTION
 

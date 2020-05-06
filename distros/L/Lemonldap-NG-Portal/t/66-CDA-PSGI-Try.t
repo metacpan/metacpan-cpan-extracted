@@ -6,13 +6,13 @@ extends 'Lemonldap::NG::Handler::PSGI::Try';
 
 sub init {
     my ($self) = @_;
-    $self->SUPER::init($_[1]) or return 0;
-    $self->addAuthRouteWithRedirect('*' => 'my');
+    $self->SUPER::init( $_[1] ) or return 0;
+    $self->addAuthRouteWithRedirect( '*' => 'my' );
     return 1;
 }
 
 sub my {
-    return [200,[],['OK']];
+    return [ 200, [], ['OK'] ];
 }
 
 package main;
@@ -28,18 +28,21 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 require 't/test-lib.pm';
 
 my $res;
-my %handlerOR = ( portal => [], app => [] );
 
-my $client = LLNG::Manager::Test->new( {
-        ini => {
-            logLevel    => 'error',
-            useSafeJail => 1,
-            cda         => 1,
-            logger      => 'Lemonldap::NG::Common::Logger::Std',
-        }
+my $client = register(
+    'portal',
+    sub {
+        LLNG::Manager::Test->new( {
+                ini => {
+                    logLevel    => 'error',
+                    useSafeJail => 1,
+                    cda         => 1,
+                    logger      => 'Lemonldap::NG::Common::Logger::Std',
+                }
+            }
+        );
     }
 );
-$handlerOR{portal} = \@Lemonldap::NG::Handler::Main::_onReload;
 
 # CDA with unauthentified user
 ok(
@@ -75,9 +78,7 @@ use_ok('Lemonldap::NG::Common::PSGI::Cli::Lib');
 count(2);
 
 my ( $cli, $app );
-switch ('app');
-ok( $app = LocalApp->run( $client->ini ), 'App' );
-count(1);
+$app = register( 'app', sub { LocalApp->run( $client->ini ) } );
 
 ok(
     $res = $app->( {
@@ -136,11 +137,4 @@ expectAuthenticatedAs( $res, 'dwho' );
 clean_sessions();
 
 done_testing( count() );
-
-sub switch {
-    my $type = shift;
-    @Lemonldap::NG::Handler::Main::_onReload = @{
-        $handlerOR{$type};
-    };
-}
 

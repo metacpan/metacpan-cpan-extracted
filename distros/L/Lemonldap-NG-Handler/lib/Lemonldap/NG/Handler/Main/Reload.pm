@@ -1,6 +1,6 @@
 package Lemonldap::NG::Handler::Main::Reload;
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -185,7 +185,8 @@ sub jailInit {
             multiValuesSeparator => $conf->{multiValuesSeparator},
         }
     );
-    $class->tsv->{jail}->build_jail( $class, $conf->{require} );
+    $class->tsv->{jail}
+      ->build_jail( $class, $conf->{require}, $conf->{requireDontDie} );
 }
 
 ## @imethod protected void defaultValuesInit(hashRef args)
@@ -214,7 +215,7 @@ sub defaultValuesInit {
         # Override with vhost options
         if ( $conf->{vhostOptions} ) {
             my $name = 'vhost' . ucfirst($opt);
-            foreach my $vhost ( keys %{ $conf->{vhostOptions} } ) {
+            foreach my $vhost ( sort keys %{ $conf->{vhostOptions} } ) {
                 $conf->{vhostOptions}->{$vhost} ||= {};
                 my $val = $conf->{vhostOptions}->{$vhost}->{$name};
 
@@ -228,7 +229,7 @@ sub defaultValuesInit {
         }
     }
     if ( $conf->{vhostOptions} ) {
-        foreach my $vhost ( keys %{ $conf->{vhostOptions} } ) {
+        foreach my $vhost ( sort keys %{ $conf->{vhostOptions} } ) {
             $class->tsv->{type}->{$vhost} =
               $conf->{vhostOptions}->{$vhost}->{vhostType};
             $class->tsv->{authnLevel}->{$vhost} =
@@ -326,7 +327,7 @@ sub locationRulesInit {
 
 ## @imethod protected void sessionStorageInit(hashRef args)
 # Initialize the Apache::Session::* module choosed to share user's variables
-# and the Cache::Cache module choosed to cache sessions
+# and the Cache::Cache module chosen to cache sessions
 # @param $args reference to the configuration hash
 sub sessionStorageInit {
     my ( $class, $conf ) = @_;
@@ -363,13 +364,14 @@ sub sessionStorageInit {
         if ( $conf->{status} ) {
             my $params = "";
             if ( $class->tsv->{sessionCacheModule} ) {
-                $params = ' ' . join(
+                $params = $class->tsv->{sessionCacheModule} . ',{' . join(
                     ',',
-                    $class->tsv->{sessionCacheModule} . map {
-                        "$_ => "
-                          . $class->tsv->{sessionCacheOptions}->{$_}
-                    } keys %{ $class->tsv->{sessionCacheOptions} // {} }
-                );
+                    map {
+                        "$_ => '"
+                          . $class->tsv->{sessionCacheOptions}->{$_} . "'"
+                      }
+                      keys %{ $class->tsv->{sessionCacheOptions} // {} }
+                ) . '}';
             }
             $class->tsv->{statusPipe}->print("RELOADCACHE $params\n");
         }
@@ -594,6 +596,9 @@ sub substitute {
     $expr =~ s/\$ENV\{/\$r->{env}->\{/g;
     $expr =~ s/\$env->\{/\$r->{env}->\{/g;
     $expr =~ s/\bskip\b/q\{999_SKIP\}/g;
+
+    # handle inGroup
+    $expr =~ s/\binGroup\(([^)]*)\)/listMatch(\$s->{'hGroups'},$1,1),/g;
 
     return $expr;
 }

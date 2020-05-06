@@ -1,22 +1,28 @@
-0.04    2017-07-10 (PERLANCAR)
+0.050   2020-05-06  Released-By: PERLANCAR; Urgency: medium
+
+	- [subcommand ver-cmp-installed] Add options:
+	  --{include,exclude}-{,non}core.
+
+
+0.04    2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.03    2017-01-20 (PERLANCAR)
+0.03    2017-01-20  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dist] Use Pod::Weaver plugin PWP:App::lcpan.
 
 
-0.02    2016-01-21 (PERLANCAR)
+0.02    2016-01-21  Released-By: PERLANCAR
 
         - Add subcommand: outdated.
 
 
-0.01    2016-01-20 (PERLANCAR)
+0.01    2016-01-20  Released-By: PERLANCAR
 
         - First version.

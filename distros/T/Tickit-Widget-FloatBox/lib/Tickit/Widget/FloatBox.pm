@@ -6,7 +6,7 @@
 use 5.026; # signatures
 use Object::Pad 0.17;
 
-class Tickit::Widget::FloatBox 0.06
+class Tickit::Widget::FloatBox 0.07
    extends Tickit::ContainerWidget;
 
 use Carp;
@@ -355,7 +355,6 @@ Hide the float by hiding the window of its child widget.
 
 method hide ()
 {
-   my $self = shift;
    $_hidden = 1;
 
    $_child->window->hide if $_child->window;

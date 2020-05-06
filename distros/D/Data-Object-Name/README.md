@@ -20,6 +20,18 @@ This package provides methods for converting "name" strings.
 
 This package implements the following methods:
 
+## dist
+
+    dist() : Str
+
+The dist method returns a package distribution representation of the name.
+
+- dist example #1
+
+        # given: synopsis
+
+        my $dist = $name->dist; # FooBar-Baz
+
 ## file
 
     file() : Str

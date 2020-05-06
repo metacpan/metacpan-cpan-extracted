@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Test/Metrics/Any.pm
+MANIFEST			This list of files
+t/00use.t
+t/01metrics.t
+t/02predicates.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

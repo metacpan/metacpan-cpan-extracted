@@ -1,6 +1,6 @@
 <TMPL_INCLUDE NAME="header.tpl">
 
-  <title>LemonLDAP::NG notifications explorer</title>
+  <title>LemonLDAP::NG Notifications explorer</title>
 </head>
 
 <body ng-app="llngNotificationsExplorer" ng-controller="NotificationsExplorerCtrl" ng-csp>
@@ -15,18 +15,18 @@
       <div class="navbar navbar-default">
         <div class="navbar-collapse">
           <ul class="nav navbar-nav" role="grid">
-            <li><a id="a-actives" href="#" role="row"><i class="glyphicon glyphicon-eye-open"></i> {{translate('actives')}}</a></li>
-            <li><a id="a-done" href="#!/done" role="row"><i class="glyphicon glyphicon-check"></i> {{translate('dones')}}</a></li>
-            <li><a id="a-new" href="#!/new" role="row"><i class="glyphicon glyphicon-plus-sign"></i> {{translate('create')}}</a></li>
+            <li><a id="a-actives" href="#" role="row" ng-style="activesStyle"><i class="glyphicon glyphicon-eye-open"></i> {{translate('actives')}}</a></li>
+            <li><a id="a-done" href="#!/done" role="row" ng-style="doneStyle"><i class="glyphicon glyphicon-check"></i> {{translate('dones')}}</a></li>
+            <li><a id="a-new" href="#!/new" role="row" ng-style="newStyle"><i class="glyphicon glyphicon-plus-sign"></i> {{translate('create')}}</a></li>
           </ul>
         </div>
       </div>
-      <div ng-show="data.length!=0" class="text-center"><p class="badge">{{total}} <span trspan="notification_s"></span></p></div>
+      <div ng-show="data.length!=0" class="text-center"><p class="badge">{{total}} {{translate('notification_s')}}</p></div>
       <div class="region region-sidebar-first">
         <section id="block-superfish-1" class="block block-superfish clearfix">
           <div ui-tree data-drag-enabled="false" id="tree-root">
             <div ng-show="data.length==0" class="center">
-              <span class="label label-warning" trspan="noDatas"></span>
+              <span class="label label-warning">{{translate('noData')}}</span>
             </div>
             <ol ui-tree-nodes="" ng-model="data">
               <li ng-repeat="node in data track by node.id" ui-tree-node ng-include="'nodes_renderer.html'" collapsed="true"></li>
@@ -40,7 +40,7 @@
     <!-- Right(main) div -->
     <div id="right" class="col-lg-8 col-md-8 col-sm-7 col-xs-12 scrollable" ng-class="{'hidden-xs':showT&&!showM}">
       <!-- Menu buttons -->
-      <div ng-if="type=='new'||currentNotification" class="lmmenu navbar navbar-default" ng-class="{'hidden-xs':!showM}">
+      <div ng-if="type=='new'|| currentNotification" class="lmmenu navbar navbar-default" ng-class="{'hidden-xs':!showM}">
         <div class="navbar-collapse" ng-class="{'collapse':!showM}" id="formmenu">
           <ul class="nav navbar-nav">
             <li ng-repeat="button in menu[type]" ng-include="'menubutton.html'"></li>
@@ -50,6 +50,9 @@
                 <li ng-repeat="link in links"><a href="{{link.target}}" role="row"><i ng-if="link.icon" class="glyphicon glyphicon-{{link.icon}}"></i> {{translate(link.title)}}</a></li>
                 <li ng-repeat="menulink in menulinks"><a href="{{menulink.target}}" role="row"><i ng-if="menulink.icon" class="glyphicon glyphicon-{{menulink.icon}}"></i> {{translate(menulink.title)}}</a></li>
                 <li ng-include="'languages.html'"></li>
+                <TMPL_IF NAME="INSTANCE_NAME">
+                  <li><a href="https://lemonldap-ng.org"><TMPL_VAR NAME="INSTANCE_NAME"></a></li>
+                </TMPL_IF>
               </ul>
             </li>
           </ul>
@@ -62,20 +65,40 @@
         </div>
         <table class="table">
           <tr>
-            <th><span trspan="uid" /></th>
+            <th>{{translate('uid')}}</th>
             <td>{{currentNotification.uid}}</td>
           </tr>
           <tr>
-            <th><span trspan="reference" /></th>
+            <th>{{translate('reference')}}</th>
             <td>{{currentNotification.reference}}</td>
           </tr>
+          <tr ng-if="currentNotification.date">
+            <th>{{translate('date')}}</th>
+            <td>{{currentNotification.date}}</td>
+          </tr>
+          <tr ng-if="currentNotification.condition">
+            <th>{{translate('condition')}}</th>
+            <td>{{currentNotification.condition}}</td>
+          </tr>
+          <tr ng-if="currentNotification.title">
+            <th>{{translate('title')}}</th>
+            <td>{{currentNotification.title}}</td>
+          </tr>
+          <tr ng-if="currentNotification.subtitle">
+            <th>{{translate('subtitle')}}</th>
+            <td>{{currentNotification.subtitle}}</td>
+          </tr>
+          <tr ng-if="currentNotification.text">
+            <th>{{translate('text')}}</th>
+            <td><textarea rows=5 class="form-control">{{currentNotification.text}}</textarea></td>
+          </tr>
           <tr ng-if="currentNotification.done">
-            <th><span trspan="internalReference" /></th>
+            <th>{{translate('internalReference')}}</th>
             <td>{{currentNotification.done}}</td>
           </tr>
           <tr ng-if="currentNotification.notifications">
-            <th>Notifications</th>
-            <td><pre ng-repeat="n in currentNotification.notifications">{{n}}</pre></td>
+            <th>{{translate('notification')}}</th>
+            <td><textarea ng-repeat="n in currentNotification.notifications" rows=5 class="form-control">{{n}}</textarea></td>
           </tr>
         </table> 
       </div>
@@ -87,11 +110,11 @@
         <form>
         <table class="table">
           <tr>
-            <th><span trspan="uid" /></th>
+            <th>{{translate('uid')}}</th>
             <td><input type="text" class="form-control" ng-model="form.uid" /></td>
           </tr>
           <tr>
-            <th><span trspan="date" /></th>
+            <th>{{translate('date')}}</th>
             <td>
             <p class="input-group">
               <input type="text" class="form-control" uib-datepicker-popup="yyyy-MM-dd" ng-model="form.date"  min-date="minDate" is-open="popup.opened" datepicker-options="dateOptions" popup-placement="auto top-right"/>
@@ -102,19 +125,19 @@
             </td>
           </tr>
           <tr>
-            <th><span trspan="reference" /></th>
+            <th>{{translate('reference')}}</th>
             <td><input type="text" class="form-control" ng-model="form.reference" /></td>
           </tr>
           <tr>
-            <th><span trspan="condition" /></th>
+            <th>{{translate('condition')}}</th>
             <td><input type="text" class="form-control" ng-model="form.condition"/></td>
           </tr>
           <tr>
-            <th><span trspan="content" /></th>
+            <th>{{translate('content')}}</th>
             <td>
               <textarea rows=5 class="form-control" ng-model="form.xml"></textarea>
               <div class="alert alert-info">
-                <p><span trspan="allowedMarkups" /></p>
+                <p>{{translate('allowedMarkups')}}</p>
                 <table border="0">
                  <thead>
                   <tr><th>JSON</th><th>XML</th></tr>

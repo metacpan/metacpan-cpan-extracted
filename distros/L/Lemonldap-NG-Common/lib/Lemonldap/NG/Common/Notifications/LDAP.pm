@@ -9,11 +9,11 @@ package Lemonldap::NG::Common::Notifications::LDAP;
 use strict;
 use Mouse;
 use Time::Local;
-use MIME::Base64;
+use MIME::Base64 qw/encode_base64url/;
 use Net::LDAP;
 use utf8;
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Common::Notifications';
 
@@ -45,6 +45,16 @@ has ldapBindDN => (
     }
 );
 
+has ldapBindPassword => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        $_[0]
+          ->p->logger->warn('Warning: "ldapBindPassword" parameter is not set');
+        return '';
+    }
+);
+
 # Returns notifications corresponding to the user $uid.
 # If $ref is set, returns only notification corresponding to this reference.
 sub get {
@@ -57,7 +67,38 @@ sub get {
       . ( $ref ? '(description={ref}' . $ref . ')' : '' ) . ')';
     my @entries = _search( $self, $filter );
 
-    my $result = {};
+    my $result;
+    foreach my $entry (@entries) {
+        my @notifValues = $entry->get_value('description');
+        my $f           = {};
+        foreach (@notifValues) {
+            my ( $k, $v ) = ( $_ =~ /\{(.*?)\}(.*)/smg );
+            $v = decodeLdapValue($v);
+            $f->{$k} = $v;
+        }
+        my $xml = $f->{xml};
+        utf8::encode($xml);
+        my $identifier =
+          &getIdentifier( $self, $f->{uid}, $f->{ref}, $f->{date} );
+        $result->{$identifier} = "$xml";
+        $self->logger->info("notification $identifier found");
+
+    }
+    return $result;
+}
+
+# Returns accepted notifications corresponding to the user $uid.
+# If $ref is set, returns only notification corresponding to this reference.
+sub getAccepted {
+    my ( $self, $uid, $ref ) = @_;
+    return () unless ($uid);
+
+    my $filter =
+        '(&(objectClass=applicationProcess)(description={done}*)'
+      . "(description={uid}$uid)(description={ref}$ref))";
+    my @entries = _search( $self, $filter );
+
+    my $result;
     foreach my $entry (@entries) {
         my @notifValues = $entry->get_value('description');
         my $f           = {};
@@ -187,11 +228,16 @@ sub newNotif {
     my ( $self, $date, $uid, $ref, $condition, $xml ) = @_;
     my $fns = $self->conf->{fileNameSeparator};
     $fns ||= '_';
+    my @t = split( /\D+/, $date );
+    $t[1]--;
+    eval {
+        timelocal( $t[5] || 0, $t[4] || 0, $t[3] || 0, $t[2], $t[1], $t[0] );
+    };
+    return ( 0, "Bad date" ) if ($@);
     $date =~ s/-//g;
     return ( 0, "Bad date" ) unless ( $date =~ /^\d{8}/ );
-    my $cn = "${date}${fns}${uid}${fns}" . encode_base64( $ref, '' );
-    $cn .= "${fns}" . encode_base64( $condition, '' ) if $condition;
-    $xml = $xml->serialize();
+    my $cn = "${date}${fns}${uid}${fns}" . encode_base64url( $ref, '' );
+    $cn .= "${fns}" . encode_base64url( $condition, '' ) if $condition;
 
     my $fields =
       $condition =~ /.+/
@@ -230,16 +276,20 @@ sub getDone {
             $v = decodeLdapValue($v);
             $f->{$k} = $v;
         }
-        my @t    = split( /\D+/, $f->{done} );
-        my $done = timelocal( $t[5], $t[4], $t[3], $t[2], $t[1], $t[0] );
+        my @t = split( /\D+/, $f->{done} );
+        $t[1]--;
+        my $done =
+          eval { timelocal( $t[5], $t[4], $t[3], $t[2], $t[1], $t[0] ) };
+        if ($@) {
+            $self->logger->warn("Bad date: $f->{done}");
+            return {};
+        }
         $result->{"$f->{date}#$f->{uid}#$f->{ref}"} =
           { notified => $done, uid => $f->{uid}, ref => $f->{ref}, };
-
     }
 
     # $ldap->unbind() && delete $self->{ldap};
     return $result;
-
 }
 
 ## @method object private _ldap()
@@ -337,7 +387,7 @@ sub _store {
     );
 
     if ( $add->code ) {
-        $self->logError($add);
+        $self->logger->error( $add->error );
         return 0;
     }
 

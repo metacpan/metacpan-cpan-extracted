@@ -12,6 +12,7 @@ use Mouse;
 use MIME::Base64;
 use IO::String;
 use URI::Escape;
+use URI;
 use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
@@ -20,7 +21,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 # PROPERTIES
 
@@ -82,6 +83,11 @@ sub init {
 
 sub _redirect {
     my ( $self, $req, @path ) = @_;
+    if (    $req->pdata->{issuerTs}
+        and $req->pdata->{issuerTs} + $self->conf->{issuersTimeout} < time )
+    {
+        $self->cleanAllPdata($req);
+    }
     my $restore;
     my $ir;
     unless ( $self->can('ssoMatch') and not $self->ssoMatch($req) ) {
@@ -93,8 +99,9 @@ sub _redirect {
         $self->logger->debug(
             'Add ' . $self->ipath . ', ' . $self->ipath . 'Path in keepPdata' );
         push @{ $req->pdata->{keepPdata} }, $self->ipath, $self->ipath . 'Path';
-        $req->{urldc} = $self->conf->{portal} . '/' . $self->path;
-        $req->pdata->{_url} = encode_base64( $req->urldc, '' );
+        $req->{urldc}           = $self->conf->{portal} . '/' . $self->path;
+        $req->pdata->{_url}     = encode_base64( $req->urldc, '' );
+        $req->pdata->{issuerTs} = time;
     }
     else {
         $self->logger->debug('Not seen as Issuer request, skipping');
@@ -131,12 +138,21 @@ sub _redirect {
 sub _forAuthUser {
     my ( $self, $req, @path ) = @_;
 
+    if (    $req->pdata->{issuerTs}
+        and $req->pdata->{issuerTs} + $self->conf->{issuersTimeout} < time )
+    {
+        $self->cleanAllPdata($req);
+    }
     $self->logger->debug('Processing _forAuthUser');
     if ( my $r = $req->pdata->{ $self->ipath } ) {
         $self->logger->debug("Restoring request to $self->{path} issuer");
         $self->restoreRequest( $req, $r );
         @path = @{ $req->pdata->{ $self->ipath . 'Path' } }
           if ( $req->pdata->{ $self->ipath . 'Path' } );
+
+        # In case a confirm form is shown, we need it to POST on the
+        # current Path
+        $req->data->{confirmFormAction} = URI->new($req->uri)->path;
     }
 
     # Clean pdata: keepPdata has been set, so pdata must be cleaned here
@@ -158,9 +174,19 @@ sub _forAuthUser {
     );
 }
 
-sub cleanPdata {
+sub cleanAllPdata {
     my ( $self, $req ) = @_;
-    for my $s ( $self->ipath, $self->ipath . 'Path' ) {
+    foreach my $k ( keys %{ $req->pdata } ) {
+        if ( exists $req->pdata->{ $k . 'Path' } ) {
+            $self->cleanPdata( $req, $k );
+        }
+    }
+}
+
+sub cleanPdata {
+    my ( $self, $req, $path ) = @_;
+    $path ||= $self->ipath;
+    for my $s ( $path, $path . 'Path' ) {
         if ( $req->pdata->{$s} ) {
             $self->logger->debug("Removing $s key from pdata");
             delete $req->pdata->{$s};
@@ -169,8 +195,8 @@ sub cleanPdata {
     if ( $req->pdata->{keepPdata} and ref $req->pdata->{keepPdata} ) {
         @{ $req->pdata->{keepPdata} } =
           grep {
-                  $_ ne $self->ipath
-              and $_ ne $self->ipath . 'Path'
+                  $_ ne $path
+              and $_ ne $path . 'Path'
               ? 1
               : ( $self->logger->debug("Removing $_ from keepPdata") and 0 )
           } @{ $req->pdata->{keepPdata} };
@@ -220,6 +246,7 @@ qq'<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/auto
       encode_base64( $self->conf->{portal} . $req->path_info, '' );
     $req->pdata->{ $self->ipath } = $self->storeRequest($req);
     push @{ $req->pdata->{keepPdata} }, $self->ipath, $self->ipath . 'Path';
+    $req->pdata->{issuerTs} = time;
     return PE_RENEWSESSION;
 }
 

@@ -33,7 +33,7 @@
    "provides" : {
       "Net::Frame::Dump" : {
          "file" : "lib/Net/Frame/Dump.pm",
-         "version" : "1.17"
+         "version" : "1.18"
       },
       "Net::Frame::Dump::Offline" : {
          "file" : "lib/Net/Frame/Dump/Offline.pm"
@@ -54,6 +54,6 @@
          "http://www.perlfoundation.org/artistic_license_1_0"
       ]
    },
-   "version" : "1.17",
+   "version" : "1.18",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,6 +1,11 @@
 Revision history for Alien::sqlite
 
+1.05 2020-05-02
+    - Share installs: Remove .../Git/usr/bin from the path before
+      running configure (GH#3)
+
 1.04 2020-04-14
+    - Set sqlite target version for shared installs to 3.31.1
     - Release from system using Mojo::DOM58 so Mojolicious is not
       listed in the dependencies on CPAN (thanks Todd Rinaldo for flagging)
 

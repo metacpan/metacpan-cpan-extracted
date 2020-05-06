@@ -16,7 +16,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_U2FFAILED
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Portal::Main::SecondFactor',
   'Lemonldap::NG::Portal::Lib::U2F';
@@ -43,6 +43,7 @@ sub init {
     return 0
       unless ( $self->Lemonldap::NG::Portal::Main::SecondFactor::init()
         and $self->Lemonldap::NG::Portal::Lib::U2F::init() );
+
     1;
 }
 
@@ -71,12 +72,9 @@ sub run {
         }
 
         # Get registered keys
-        my @rk;
-        foreach ( @{ $req->data->{crypter} } ) {
-            push @rk,
-              { keyHandle => $_->{keyHandle}, version => $data->{version} };
-
-        }
+        my @rk =
+          map { { keyHandle => $_->{keyHandle}, version => $data->{version} } }
+          @{ $req->data->{crypter} };
 
         $self->ott->updateToken( $token, __ch => $data->{challenge} );
 
@@ -247,9 +245,8 @@ sub loadUser {
                     'U2F error: ' . Crypt::U2F::Server::u2fclib_getError() );
             }
         }
-        unless (@crypters) {
-            return -1;
-        }
+        return -1 unless (@crypters);
+
         $req->data->{crypter} = \@crypters;
         return 1;
     }

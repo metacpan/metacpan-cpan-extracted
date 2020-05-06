@@ -1,8 +1,16 @@
 CHANGES
 lib/Module/Generic.pm
+lib/Module/Generic/Array.pod
+lib/Module/Generic/Boolean.pod
+lib/Module/Generic/Dynamic.pod
+lib/Module/Generic/Exception.pod
+lib/Module/Generic/Null.pod
+lib/Module/Generic/Scalar.pod
+lib/Module/Generic/Tie.pod
 Makefile.PL
 MANIFEST
 META.yml
 README.md
 t/00.load.t
+t/01.pod.t
 META.json                                Module JSON meta-data (added by MakeMaker)

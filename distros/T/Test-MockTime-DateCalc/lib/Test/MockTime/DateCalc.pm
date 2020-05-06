@@ -1,4 +1,4 @@
-# Copyright 2009, 2010, 2011 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2019 Kevin Ryde
 
 # This file is part of Test-MockTime-DateCalc.
 #
@@ -18,9 +18,9 @@
 
 package Test::MockTime::DateCalc;
 use strict;
-use vars qw($VERSION);
 
-$VERSION = 6;
+use vars '$VERSION';
+$VERSION = 7;
 
 BEGIN {
   # Check that Date::Calc isn't already loaded.
@@ -122,7 +122,7 @@ Test::MockTime::DateCalc -- fake time for Date::Calc functions
 =head1 DESCRIPTION
 
 C<Test::MockTime::DateCalc> arranges for the functions in C<Date::Calc> to
-follow the Perl level C<time> function (see L<perlfunc>) and in particular
+follow the Perl level C<time()> function (see L<perlfunc>) and in particular
 any fake date/time set there by C<Test::MockTime>.  The following
 C<Date::Calc> functions are changed
 
@@ -138,8 +138,8 @@ C<Date::Calc> functions are changed
     Time_to_Date
 
 C<Gmtime>, C<Localtime>, C<Timezone> and C<Time_to_Date> are made to default
-to the Perl-level current C<time>.  When called with an explicit time
-argument they're unchanged.
+to the Perl-level current C<time()>.  When called with an explicit time
+argument, they're unchanged.
 
 =head2 Module Load Order
 
@@ -151,7 +151,7 @@ FUNCTIONS>.
 C<Test::MockTime::DateCalc> must be loaded before C<Date::Calc>.  If
 C<Date::Calc> is already loaded then its functions might have been imported
 into other modules and such imports are not affected by the redefinitions
-made.  For that reason C<Test::MockTime::DateCalc> demands it be the one to
+made.  For that reason, C<Test::MockTime::DateCalc> demands it be the one to
 load C<Date::Calc> for the first time.  Usually this simply means having
 C<Test::MockTime::DateCalc> at the start of a test script, before the things
 you're going to test.
@@ -167,7 +167,7 @@ you're going to test.
     is (My::Foo::Bar::something(), 1981);
     restore_time();
 
-In a test script it's often good to have your own modules early to check
+In a test script, it's often good to have your own modules early to check
 they correctly load their pre-requisites.  You might want a separate test
 script for that so as not to accidentally rely on
 C<Test::MockTime::DateCalc> loading C<Date::Calc>.
@@ -200,7 +200,7 @@ http://user42.tuxfamily.org/test-mocktime-datecalc/index.html
 
 =head1 COPYRIGHT
 
-Copyright 2009, 2010, 2011 Kevin Ryde
+Copyright 2009, 2010, 2011, 2019 Kevin Ryde
 
 Test-MockTime-DateCalc is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by

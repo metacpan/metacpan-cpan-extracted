@@ -86,30 +86,44 @@ sub _initialize {
     my $write_watch_r = \do { $self->{'_write_watch'} = undef };
 
     my $cb_r;
+
+    my $clear_watchers_cr = sub {
+        undef $$cb_r;
+        undef $$read_watch_r;
+        undef $$write_watch_r;
+    };
+
     my $cb = sub {
-        if ( $dbus->initialize() ) {
-            undef $$cb_r;
-            undef $$read_watch_r;
-            undef $$write_watch_r;
-            $y->();
-        }
+        my $ok = eval {
+            if ( $dbus->initialize() ) {
+                $clear_watchers_cr->();
+                $y->();
+            }
 
-        # It seems unlikely that we’d need a write watch here.
-        # But just in case …
-        elsif ($dbus->init_pending_send()) {
-            $$write_watch_r ||= do {
+            # It seems unlikely that we’d need a write watch here.
+            # But just in case …
+            elsif ($dbus->init_pending_send()) {
+                $$write_watch_r ||= do {
 
-                my $current_sub = $$cb_r;
+                    my $current_sub = $$cb_r;
 
-                AnyEvent->io(
-                    fh => $fileno,
-                    poll => 'w',
-                    cb => $current_sub,
-                );
-            };
-        }
-        else {
-            undef $$write_watch_r;
+                    AnyEvent->io(
+                        fh => $fileno,
+                        poll => 'w',
+                        cb => $current_sub,
+                    );
+                };
+            }
+            else {
+                undef $$write_watch_r;
+            }
+
+            1;
+        };
+
+        if (!$ok) {
+            $clear_watchers_cr->();
+            $n->($@);
         }
     };
 
@@ -145,23 +159,30 @@ sub _set_watches_and_create_messenger {
 
     my $fileno = $dbus->fileno();
 
+    my $write_watch_sr = \$self->{'_write_watch'};
+
+    my $flush_cr = sub {
+        _flush_send_queue( $dbus, $fileno, $write_watch_sr );
+    };
+
     if (!$self->{'_read_watch'}) {
 
-        my $watch = undef;
-        _flush_send_queue( $dbus, $fileno, \$watch );
-
-        $self->{'_send_watch_ref'} = \$watch;
+        $flush_cr->();
 
         $self->{'_read_watch'} = AnyEvent->io(
             fh => $fileno,
             poll => 'r',
             cb => $self->_create_get_message_callback(),
         );
+
+        my $read_watch_sr = \$self->{'_read_watch'};
+
+        $self->{'_stop_reading_cr'} = sub {
+            $$read_watch_sr = undef;
+        };
     }
 
-    my $watch_sr = $self->{'_send_watch_ref'};
-
-    return sub { _flush_send_queue( $dbus, $fileno, $watch_sr ) };
+    return $flush_cr;
 }
 
 1;

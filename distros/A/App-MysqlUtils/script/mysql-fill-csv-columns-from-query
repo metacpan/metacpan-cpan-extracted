@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/MysqlUtils/mysql_fill_csv_columns_from_query
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
+# and generated automatically using Perinci::CmdLine::Gen version 0.496
 
-our $DATE = '2019-12-24'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-06'; # DATE
 our $DIST = 'App-MysqlUtils'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,13 +41,13 @@ mysql-fill-csv-columns-from-query - Fill CSV columns with data from a query
 
 =head1 VERSION
 
-This document describes version 0.019 of mysql-fill-csv-columns-from-query (from Perl distribution App-MysqlUtils), released on 2019-12-24.
+This document describes version 0.020 of mysql-fill-csv-columns-from-query (from Perl distribution App-MysqlUtils), released on 2020-05-06.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % mysql-fill-csv-columns-from-query [options] <database> <filename> <query>
+ % mysql-fill-csv-columns-from-query [-c] [--config-path=path+] [--config-profile=profile | -P] [--count] [--debug] [--dry-run] [--format=name] [--header] [--host=s] [--json] [--log-level=level] [--(no)naked-res] [--no-config | -C] [--no-count] [--no-env] [--no-header] [--no-tsv] [--nocount] [--noheader] [--notsv] [--page-result[=program]] [--password=s] [--port=s] [--quiet] [--trace] [--tsv] [--username=s] [--verbose] <database> <filename> <query>
 
 =head1 DESCRIPTION
 
@@ -218,6 +219,10 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
+=item B<--page-result>
+
+Filter output through a pager.
+
 =back
 
 =head2 Other options
@@ -344,7 +349,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

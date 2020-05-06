@@ -13,7 +13,7 @@ my $build = Module::Build->new(
       'Module::Build' => '0.4004', # test_requires
    },
    test_requires => {
-      'IO::Async::LoopTests' => '0.24',
+      'IO::Async::LoopTests' => '0.76',
       'Test::More' => '0.88',
    },
    license => 'perl',

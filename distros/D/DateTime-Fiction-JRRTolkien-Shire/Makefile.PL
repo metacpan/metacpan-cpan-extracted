@@ -48,6 +48,9 @@ $mmv >= 6.31
 
 $mmv >= 6.4501
     and $args{META_MERGE} = {
+	build_requires	=> {
+	    'Test::More'	=> 0,
+	},
 	'meta-spec'	=> {
 	    version	=> 2,
 	},
@@ -76,7 +79,7 @@ $mmv >= 6.5702
     or $args{AUTHOR} = join ', ', @{ $args{AUTHOR} };
 
 my $build_requires = {
-#   'Test::More'	=> 0.88,	# Because of done_testing().
+    'Test::More'	=> 0,
 };
 
 $mmv >= 6.5501

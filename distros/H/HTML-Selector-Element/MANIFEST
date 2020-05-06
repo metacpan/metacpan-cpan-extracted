@@ -1,0 +1,17 @@
+Makefile.PL
+MANIFEST			This list of files
+lib/HTML/Selector/Element.pm
+lib/HTML/Selector/Element.pod
+lib/HTML/Selector/Element/Trait.pm
+t/000_load.t
+t/001_subclass.t
+t/002_monkeypatch.t
+t/003_parse.t
+t/004_find.t
+t/005_nth-of-type.t
+t/006_is.t
+t/007_attr.t
+t/008_query.t
+t/008_select.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

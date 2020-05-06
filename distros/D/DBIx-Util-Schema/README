@@ -1,0 +1,310 @@
+NAME
+    DBIx::Util::Schema - Utility routines related to database schema
+
+VERSION
+    This document describes version 0.002 of DBIx::Util::Schema (from Perl
+    distribution DBIx-Util-Schema), released on 2020-05-06.
+
+SYNOPSIS
+     use DBIx::Util::Schema qw(
+         table_exists
+         column_exists
+
+         list_tables
+         list_columns
+         list_indexes
+     );
+
+     say "Database has table named 'foo'" if table_exists($dbh, "foo");
+
+DESCRIPTION
+    DBI already provides methods to query schema information, e.g.
+    "table_info()", "column_info()", "statistics_info()", but simple things
+    like checking whether a table or a column exists is not straightforward
+    or easy enough. This module provides convenience routines for those
+    tasks.
+
+    Currently only tested on SQLite, MySQL, and Postgres.
+
+FUNCTIONS
+  column_exists
+    Usage:
+
+     column_exists($dbh, $table, $column) -> any
+
+    Alias for has_column().
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $column* => *str*
+
+        Table column name.
+
+    *   $dbh* => *obj*
+
+        DBI database handle.
+
+    *   $table* => *str*
+
+        Table name.
+
+    Return value: (any)
+
+  has_all_columns
+    Usage:
+
+     has_all_columns($dbh, $table, $columns, ...) -> any
+
+    Check whether a table has all specified columns.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $columns* => *array[str]*
+
+        Table column names.
+
+    *   $dbh* => *obj*
+
+        DBI database handle.
+
+    *   $table* => *str*
+
+        Table name.
+
+    Return value: (any)
+
+  has_all_tables
+    Usage:
+
+     has_all_tables($dbh, $tables, ...) -> any
+
+    Check whether database has all specified tables.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $dbh* => *obj*
+
+        DBI database handle.
+
+    *   $tables* => *array[str]*
+
+        Table names.
+
+    Return value: (any)
+
+  has_any_column
+    Usage:
+
+     has_any_column($dbh, $table, $columns, ...) -> any
+
+    Check whether a table has at least one of specified columns.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $columns* => *array[str]*
+
+        Table column names.
+
+    *   $dbh* => *obj*
+
+        DBI database handle.
+
+    *   $table* => *str*
+
+        Table name.
+
+    Return value: (any)
+
+  has_any_table
+    Usage:
+
+     has_any_table($dbh, $tables, ...) -> any
+
+    Check whether database has at least one of specified tables.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $dbh* => *obj*
+
+        DBI database handle.
+
+    *   $tables* => *array[str]*
+
+        Table names.
+
+    Return value: (any)
+
+  has_column
+    Usage:
+
+     has_column($dbh, $table, $column) -> any
+
+    Check whether a table has a specified column.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $column* => *str*
+
+        Table column name.
+
+    *   $dbh* => *obj*
+
+        DBI database handle.
+
+    *   $table* => *str*
+
+        Table name.
+
+    Return value: (any)
+
+  has_table
+    Usage:
+
+     has_table($dbh, $table) -> any
+
+    Check whether database has a certain table.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $dbh* => *obj*
+
+        DBI database handle.
+
+    *   $table* => *str*
+
+        Table name.
+
+    Return value: (any)
+
+  list_columns
+    Usage:
+
+     list_columns($dbh, $table) -> any
+
+    List columns of a table.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $dbh* => *obj*
+
+        DBI database handle.
+
+    *   $table* => *str*
+
+        Table name.
+
+    Return value: (any)
+
+  list_indexes
+    Usage:
+
+     list_indexes($dbh, $table) -> any
+
+    List indexes for a table in a database.
+
+    SQLite notes: information is retrieved from DBI's table_info().
+    Autoindex for primary key is not listed using table_info(), but this
+    function adds it by looking at "sqlite_master" table.
+
+    MySQL notes: information is retrieved from statistics_info(). Note that
+    a multi-column index is reported as separate rows by statistics_info(),
+    one for each indexed column. But this function merges them and returns
+    the list of columns in "columns".
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $dbh* => *obj*
+
+        DBI database handle.
+
+    *   $table* => *str*
+
+        Table name.
+
+    Return value: (any)
+
+  list_tables
+    Usage:
+
+     list_tables($dbh) -> any
+
+    List table names in a database.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $dbh* => *obj*
+
+        DBI database handle.
+
+    Return value: (any)
+
+  table_exists
+    Usage:
+
+     table_exists($dbh, $table) -> any
+
+    Alias for has_table().
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $dbh* => *obj*
+
+        DBI database handle.
+
+    *   $table* => *str*
+
+        Table name.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/DBIx-Util-Schema>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-DBIx-Util-Schema>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-Util-Schema>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Test::DBUnit currently has more methods.
+
+    DBI
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

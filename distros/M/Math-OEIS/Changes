@@ -17,6 +17,9 @@ with Math-OEIS.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
+Version 15, May 2020
+    - Stripped fix for bigints in class methods
+
 Version 14, April 2020
     - Grep fix for misleading mung headings
 

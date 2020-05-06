@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Schema::Tie::IxHash;
 
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 use base 'YAML::PP::Schema';
 

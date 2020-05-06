@@ -1,5 +1,5 @@
 package Acme::CPANAuthors::POE;
-$Acme::CPANAuthors::POE::VERSION = '0.84';
+$Acme::CPANAuthors::POE::VERSION = '0.86';
 #ABSTRACT: We are CPAN Authors of POE
 
 use strict;
@@ -14,7 +14,7 @@ use Acme::CPANAuthors::Register (
   AHOYING => q[Andrew Hoying],
   AIMASS => q[Alejandro Imass],
   AJCT => q[Adam Taylor],
-  ALTREUS => q[Alastair McGowan-Douglas],
+  ALTREUS => q[Alastair Douglas],
   ANDYPUR => q[Andrew V. Purshottam],
   APOCAL => q[Apocalypse],
   ARCANEZ => q[Justin Hunter],
@@ -33,8 +33,7 @@ use Acme::CPANAuthors::Register (
   CLAESJAC => q[Claes Jakobsson],
   CURTIS => q[Curtis Brandt],
   CWEST => q[Casey West],
-  DAEMON => q[Paul G Webster (Account no longer used)],
-  DAGOLDEN => q[David Golden],
+  DAEMON => q[Paul G Webster],
   DAMS => q[Damien Krotkine],
   DAVINCHI => q[Pavel Boldin],
   DAZJORZ => q[Sjors Gielen],
@@ -56,6 +55,7 @@ use Acme::CPANAuthors::Register (
   FRANCKC => q[Franck Cuny],
   FRODWITH => q[Paul Driver],
   GDSL => q[Sergey Skvortsov],
+  GENE => q[Gene Boggs],
   GETTY => q[Torsten Raudssus],
   GRAYKOT => q[Sergey Kotenko],
   GREGFAST => q[Greg Fast],
@@ -79,10 +79,8 @@ use Acme::CPANAuthors::Register (
   JQUELIN => q[Jerome Quelin],
   JROBINSON => q[Jess Robinson],
   JSN => q[dmitry kim],
-  KAKE => q[Kake],
   KARASIK => q[Dmitry Karasik],
   KESTEB => q[Kevin L. Esteb],
-  KIRILLM => q[Kirill Miazine],
   KITANO => q[dann],
   KIXX => q[Christian-Rolf Gruen],
   LOSYME => q[Loic TROCHET],
@@ -91,7 +89,7 @@ use Acme::CPANAuthors::Register (
   MAHEX => q[Mark A. Hershberger],
   MARTIJN => q[Martijn van Beers],
   MCHING => q[Michael Ching],
-  MCMIC => q[Come BERNIGAUD],
+  MCMIC => q[Come Chilliet],
   MDOM => q[Mario Domgoergen],
   MELO => q[Pedro Melo],
   MGV => q[Marius Gavrilescu],
@@ -111,9 +109,12 @@ use Acme::CPANAuthors::Register (
   MSCHILLI => q[Michael Schilli],
   MSERGEANT => q[MSERGEANT],
   NPEREZ => q[Nicholas Perez],
+  NSHP => q[Nicholas Shipp],
   NUFFIN => q[Yuval Kogman],
   OALDERS => q[Olaf Alders],
   OMNI => q[Michael Alexander],
+  ONEONETWO => q[Dominic Humphries],
+  PALIK => q[Alexei Pastuchov],
   PAULV => q[Paul Visscher],
   PEVANS => q[Paul Evans],
   PGUZIS => q[Peter Guzis],
@@ -142,13 +143,12 @@ use Acme::CPANAuthors::Register (
   SPADKINS => q[Stephen Adkins],
   SPARKY => q[Przemyslaw Iskra],
   STE => q[Steve James],
-  SUNGO => q[sungo],
   SUZUKI => q[Yuji Suzuki],
   TAG => q[Scott S. McCoy],
   TBR => q[Thiago Berlitz Rondon],
   TEEJAY => q[Aaron James Trevena],
   TONYC => q[Tony Cook],
-  TREEKI => q[Jan A.],
+  TREEKI => q[Ash Wolf],
   TYPESTER => q[Daisuke Murase],
   ULTRADM => q[George Patrascan],
   VANY => q[Ivan B. Serezhkin],
@@ -177,7 +177,7 @@ Acme::CPANAuthors::POE - We are CPAN Authors of POE
 
 =head1 VERSION
 
-version 0.84
+version 0.86
 
 =head1 SYNOPSIS
 
@@ -208,7 +208,7 @@ It is currently statically generated information, I hope to make it dynamic in t
   AHOYING => q[Andrew Hoying],
   AIMASS => q[Alejandro Imass],
   AJCT => q[Adam Taylor],
-  ALTREUS => q[Alastair McGowan-Douglas],
+  ALTREUS => q[Alastair Douglas],
   ANDYPUR => q[Andrew V. Purshottam],
   APOCAL => q[Apocalypse],
   ARCANEZ => q[Justin Hunter],
@@ -227,8 +227,7 @@ It is currently statically generated information, I hope to make it dynamic in t
   CLAESJAC => q[Claes Jakobsson],
   CURTIS => q[Curtis Brandt],
   CWEST => q[Casey West],
-  DAEMON => q[Paul G Webster (Account no longer used)],
-  DAGOLDEN => q[David Golden],
+  DAEMON => q[Paul G Webster],
   DAMS => q[Damien Krotkine],
   DAVINCHI => q[Pavel Boldin],
   DAZJORZ => q[Sjors Gielen],
@@ -250,6 +249,7 @@ It is currently statically generated information, I hope to make it dynamic in t
   FRANCKC => q[Franck Cuny],
   FRODWITH => q[Paul Driver],
   GDSL => q[Sergey Skvortsov],
+  GENE => q[Gene Boggs],
   GETTY => q[Torsten Raudssus],
   GRAYKOT => q[Sergey Kotenko],
   GREGFAST => q[Greg Fast],
@@ -273,10 +273,8 @@ It is currently statically generated information, I hope to make it dynamic in t
   JQUELIN => q[Jerome Quelin],
   JROBINSON => q[Jess Robinson],
   JSN => q[dmitry kim],
-  KAKE => q[Kake],
   KARASIK => q[Dmitry Karasik],
   KESTEB => q[Kevin L. Esteb],
-  KIRILLM => q[Kirill Miazine],
   KITANO => q[dann],
   KIXX => q[Christian-Rolf Gruen],
   LOSYME => q[Loic TROCHET],
@@ -285,7 +283,7 @@ It is currently statically generated information, I hope to make it dynamic in t
   MAHEX => q[Mark A. Hershberger],
   MARTIJN => q[Martijn van Beers],
   MCHING => q[Michael Ching],
-  MCMIC => q[Come BERNIGAUD],
+  MCMIC => q[Come Chilliet],
   MDOM => q[Mario Domgoergen],
   MELO => q[Pedro Melo],
   MGV => q[Marius Gavrilescu],
@@ -305,9 +303,12 @@ It is currently statically generated information, I hope to make it dynamic in t
   MSCHILLI => q[Michael Schilli],
   MSERGEANT => q[MSERGEANT],
   NPEREZ => q[Nicholas Perez],
+  NSHP => q[Nicholas Shipp],
   NUFFIN => q[Yuval Kogman],
   OALDERS => q[Olaf Alders],
   OMNI => q[Michael Alexander],
+  ONEONETWO => q[Dominic Humphries],
+  PALIK => q[Alexei Pastuchov],
   PAULV => q[Paul Visscher],
   PEVANS => q[Paul Evans],
   PGUZIS => q[Peter Guzis],
@@ -336,13 +337,12 @@ It is currently statically generated information, I hope to make it dynamic in t
   SPADKINS => q[Stephen Adkins],
   SPARKY => q[Przemyslaw Iskra],
   STE => q[Steve James],
-  SUNGO => q[sungo],
   SUZUKI => q[Yuji Suzuki],
   TAG => q[Scott S. McCoy],
   TBR => q[Thiago Berlitz Rondon],
   TEEJAY => q[Aaron James Trevena],
   TONYC => q[Tony Cook],
-  TREEKI => q[Jan A.],
+  TREEKI => q[Ash Wolf],
   TYPESTER => q[Daisuke Murase],
   ULTRADM => q[George Patrascan],
   VANY => q[Ivan B. Serezhkin],
@@ -368,7 +368,7 @@ Chris Williams
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Chris Williams.
+This software is copyright (c) 2020 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

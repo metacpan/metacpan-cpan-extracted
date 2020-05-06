@@ -15,3 +15,6 @@ Revision history for MooX-VariantAttribute
 
 0.09    26/02/2018
         - Update deps to include Type::Tiny - Types::Standard not declared as dependency - Andreas Koenig
+
+0.10 	04/05/2020
+	- Fix failing test from missing '.' in INC

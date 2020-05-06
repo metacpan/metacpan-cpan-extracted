@@ -1,3 +1,10 @@
+0.012  2020-05-04
+
+    - May the 4th be with you!
+    - Collection.pm
+      - new methods: get_indexes and create_ttl_index
+        (thanks to João Miguel Ferreira)
+
 0.011  2020-01-14
     
     - Changed access_level API: new parameter order.

@@ -3,8 +3,7 @@ use strict;
 use IO::String;
 
 require 't/test-lib.pm';
-my $maintests = 20;
-my $file      = '20190616_dwho_Tm90aWZpY2F0aW9uX1NG.json';
+my $maintests = 21;
 
 SKIP: {
     eval { require Convert::Base32 };
@@ -21,10 +20,11 @@ SKIP: {
                 totp2fTTL                  => 120,
                 sfRemovedMsgRule           => '$uid eq "dwho"',
                 sfRemovedUseNotif          => 1,
+                sfRemovedNotifRef          => 'Remov_e_TOTP',
                 portalMainLogo             => 'common/logos/logo_llng_old.png',
                 notification               => 1,
                 notificationStorage        => 'File',
-                notificationStorageOptions => { dirName => 't' },
+                notificationStorageOptions => { dirName => $main::tmpDir },
                 oldNotifFormat             => 0,
             }
         }
@@ -146,9 +146,11 @@ SKIP: {
     expectOK($res);
     ok(
         $res->[2]->[0] =~
-          qr%<input type="hidden" name="reference1x1" value="RemoveSF">%,
+qr%<input type="hidden" name="reference1x1" value="Remov-e-TOTP-(\d{10})">%,
         'Notification reference found'
     ) or print STDERR Dumper( $res->[2]->[0] );
+    ok( time() + 295 <= $1 && $1 <= time() + 305, 'Right reference found' )
+      or print STDERR Dumper( $res->[2]->[0] ), time(), " / $1";
     ok(
         $res->[2]->[0] =~
 qr%<p class="notifText">1 expired second factor\(s\) has/have been removed!</p>%,
@@ -158,7 +160,7 @@ qr%<p class="notifText">1 expired second factor\(s\) has/have been removed!</p>%
     $client->logout($id);
 }
 count($maintests);
-system 'rm -f t/*_dwho_UmVtb3ZlU0Y=.json';
+system 'rm -f t/*_dwho_*.json';
 clean_sessions();
 
 done_testing( count() );

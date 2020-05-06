@@ -4,34 +4,11 @@
 
 POSIX::1003::Events - POSIX for the file-system
 
-=head1 INHERITANCE
-
- POSIX::1003::Events
-   is a POSIX::1003::Module
-
 =head1 SYNOPSIS
 
   use POSIX::1003::Events;
 
 =head1 DESCRIPTION
-
-See L<documentation in the base class|POSIX::1003::Module/"DESCRIPTION">.
- 
-=head1 METHODS
-
-See L<documentation in the base class|POSIX::1003::Module/"METHODS">.
- 
-=over 4
-
-=item POSIX::1003::Events-E<gt>B<exampleValue>(NAME)
-
-See L<POSIX::1003::Module/"METHODS">
-
-=item $obj-E<gt>B<import>()
-
-See L<POSIX::1003::Module/"METHODS">
-
-=back
 
 =head1 FUNCTIONS
 
@@ -39,37 +16,37 @@ See L<POSIX::1003::Module/"METHODS">
 
 =over 4
 
-=item B<FD_CLR>(FD, SET)
+=item B<FD_CLR>($fd, $set)
 
-Remove the file descriptor FD from the SET. If FD is not a member of
+Remove the file descriptor $fd from the $set. If $fd is not a member of
 this set, there shall be no effect on the set, nor will an error be
 returned.
 
-=item B<FD_ISSET>(FD, SET)
+=item B<FD_ISSET>($fd, $set)
 
-Returns true if the file descriptor FD is a member of the SET
+Returns true if the file descriptor $fd is a member of the $set
 
-=item B<FD_SET>(FD, SET)
+=item B<FD_SET>($fd, $set)
 
-Add the file descriptor FD to the SET
-If the file descriptor FD is already in this set, there
+Add the file descriptor $fd to the $set
+If the file descriptor $fd is already in this set, there
 is no effect on the set, nor will an error be returned.
 
-=item B<FD_ZERO>(SET)
+=item B<FD_ZERO>($set)
 
 Clear the set
 
-=item B<poll>(HASH, [TIMEOUT])
+=item B<poll>( HASH, [$timeout] )
 
-If TIMEOUT is not defined, the poll will wait until something
+If $timeout is not defined, the poll will wait until something
 happend.  When C<undef> is returned, then there is an error.
 With an empy HASH returned, then the poll timed out.  Otherwise,
 the returned HASH contains the FDs where something happened.
 
-=item B<select>(RBITS, WBITS, EBITS, [TIMEOUT])
+=item B<select>( $rbits, $wbits, $ebits, [$timeout] )
 
 Perl core contains two functions named C<select>.  The second is the
-one we need here.  Without TIMEOUT, the select will wait until an event
+one we need here.  Without $timeout, the select will wait until an event
 emerges (or an interrupt).
 
 In the example below, C<$rin> is a bit-set indicating on which
@@ -91,7 +68,7 @@ You can better use L<poll()|POSIX::1003::Events/"Standard POSIX">.
 
 =over 4
 
-=item B<poll_names>()
+=item B<events_names>()
 
 Returns a list with all known names, unsorted.
 
@@ -106,32 +83,24 @@ where returned at that time.
 =for comment
 #TABLE_POLL_START
 
-  POLLERR     8         POLLOUT     4         POLLWRBAND  512
-  POLLHUP     16        POLLPRI     2         POLLWRNORM  256
-  POLLIN      1         POLLRDBAND  128       
-  POLLNVAL    32        POLLRDNORM  64        
-
+   If you install the module, the table will be filled-in here
 
 =for comment
 #TABLE_POLL_END
 
-
-
-
-
 =head1 SEE ALSO
 
-This module is part of POSIX-1003 distribution version 0.98,
-built on December 03, 2013. Website: F<http://perl.overmeer.net>.  The code is based on L<POSIX>, which
+This module is part of POSIX-1003 distribution version 1.00,
+built on May 05, 2020. Website: F<http://perl.overmeer.net/CPAN>.  The code is based on L<POSIX>, which
 is released with Perl itself.  See also L<POSIX::Util> for
 additional functionality.
 
 =head1 COPYRIGHTS
 
-Copyrights 2011-2013 on the perl code and the related documentation
+Copyrights 2011-2020 on the perl code and the related documentation
  by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

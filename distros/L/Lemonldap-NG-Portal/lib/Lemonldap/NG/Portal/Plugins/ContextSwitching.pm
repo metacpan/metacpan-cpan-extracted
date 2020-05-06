@@ -14,7 +14,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_IMPERSONATION_SERVICE_NOT_ALLOWED
 );
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -39,33 +39,25 @@ has idRule => ( is => 'rw', default => sub { 1 } );
 
 sub init {
     my ($self) = @_;
-    my $hd = $self->p->HANDLER;
     $self->addAuthRoute( switchcontext => 'run', ['POST'] )
       ->addAuthRoute( switchcontext => 'display', ['GET'] );
 
-    # Parse activation rule
-    $self->logger->debug(
-        'ContextSwitching rule -> ' . $self->conf->{contextSwitchingRule} );
-    my $rule =
-      $hd->buildSub( $hd->substitute( $self->conf->{contextSwitchingRule} ) );
-    unless ($rule) {
-        $self->error(
-            'Bad contextSwitching rule -> ' . $hd->tsv->{jail}->error );
-        return 0;
-    }
-    $self->rule($rule);
+    # Parse ContextSwitching rules
+    $self->rule(
+        $self->p->buildRule(
+            $self->conf->{contextSwitchingRule},
+            'contextSwitching'
+        )
+    );
+    return 0 unless $self->rule;
 
-    # Parse identity rule
-    $self->logger->debug( "ContextSwitching identities rule -> "
-          . $self->conf->{contextSwitchingIdRule} );
-    $rule =
-      $hd->buildSub( $hd->substitute( $self->conf->{contextSwitchingIdRule} ) );
-    unless ($rule) {
-        $self->error( "Bad contextSwitching identities rule -> "
-              . $hd->tsv->{jail}->error );
-        return 0;
-    }
-    $self->idRule($rule);
+    $self->idRule(
+        $self->p->buildRule(
+            $self->conf->{contextSwitchingIdRule},
+            'contextSwitchingId'
+        )
+    );
+    return 0 unless $self->idRule;
 
     return 1;
 }
@@ -74,25 +66,30 @@ sub init {
 
 sub display {
     my ( $self, $req ) = @_;
-    my $realSessionId =
-      $req->userData->{"$self->{conf}->{impersonationPrefix}_session_id"};
-    my $realSession;
-    unless ( $realSession = $self->p->getApacheSession($realSessionId) ) {
-        $self->userLogger->info(
-            "ContextSwitching: session $realSessionId expired");
-        return $self->p->do( $req, [ sub { PE_SESSIONEXPIRED } ] );
+    my ( $realSession, $realSessionId );
+    if ( $realSessionId =
+        $req->userData->{"$self->{conf}->{contextSwitchingPrefix}_session_id"} )
+    {
+        unless ( $realSession = $self->p->getApacheSession($realSessionId) ) {
+            $self->userLogger->info(
+                "ContextSwitching: session $realSessionId expired");
+            return $self->p->do( $req, [ sub { PE_SESSIONEXPIRED } ] );
+        }
     }
 
     # Check access rules
     unless ( $self->rule->( $req, $req->userData )
-        || $req->userData->{"$self->{conf}->{impersonationPrefix}_session_id"} )
+        || $req->userData->{
+            "$self->{conf}->{contextSwitchingPrefix}_session_id"} )
     {
         $self->userLogger->warn('ContextSwitching service NOT authorized');
         return $self->p->do( $req,
             [ sub { PE_IMPERSONATION_SERVICE_NOT_ALLOWED } ] );
     }
 
-    if ( $req->userData->{"$self->{conf}->{impersonationPrefix}_session_id"} ) {
+    if (
+        $req->userData->{"$self->{conf}->{contextSwitchingPrefix}_session_id"} )
+    {
         $self->logger->debug('Request to stop ContextSwitching');
         if ( $self->conf->{contextSwitchingStopWithLogout} ) {
             $self->userLogger->notice("Stop ContextSwitching for $req->{user}");
@@ -145,7 +142,8 @@ sub run {
             return $self->p->do( $req, [ sub { PE_NOTOKEN } ] );
         }
         unless ( $self->ott->getToken($token) ) {
-            $self->userLogger->warn('ContextSwitching called with an expired/bad token');
+            $self->userLogger->warn(
+                'ContextSwitching called with an expired/bad token');
             return $self->p->do( $req, [ sub { PE_TOKENEXPIRED } ] );
         }
     }
@@ -176,14 +174,9 @@ sub run {
 
     # Create spoofed session
     $req = $self->_switchContext( $req, $spoofId );
-    if ( $req->error ) {
-        if ( $req->error == PE_BADCREDENTIALS ) {
-            $statut = PE_MALFORMEDUSER;
-        }
-        else {
-            $statut = $req->error;
-        }
-    }
+    $statut =
+      ( $req->error == PE_BADCREDENTIALS ? PE_MALFORMEDUSER : $req->error )
+      if $req->error;
 
     # Main session
     $self->p->updateSession( $req, $req->sessionInfo );
@@ -196,26 +189,25 @@ sub run {
 sub _switchContext {
     my ( $self, $req, $spoofId ) = @_;
     my $realSessionId = $req->userData->{_session_id};
+    my $realAuthLevel = $req->userData->{authenticationLevel};
     my $realId        = $req->{user};
     my $raz           = 0;
     $req->{user} = $spoofId;
 
     # Search user in database & create session
     $req->steps( [
-            'getUser',        'setAuthSessionInfo',
-            'setSessionInfo', 'setMacros',
-            'setGroups',      'setPersistentSessionInfo',
-            'setLocalGroups', 'store',
-            'buildCookie'
+            'getUser',                  'setAuthSessionInfo',
+            'setSessionInfo',           $self->p->groupsAndMacros,
+            'setPersistentSessionInfo', 'setLocalGroups',
+            'store',                    'buildCookie'
         ]
     );
     if ( my $error = $self->p->process($req) ) {
-        if ( $error == PE_BADCREDENTIALS ) {
-            $self->userLogger->warn(
-                    'ContextSwitching requested for an unvalid user ('
-                  . $req->{user}
-                  . ")" );
-        }
+        $self->userLogger->warn(
+                'ContextSwitching requested for an unvalid user ('
+              . $req->{user}
+              . ")" )
+          if ( $error == PE_BADCREDENTIALS );
         $self->logger->debug("Process returned error: $error");
         $req->error($error);
         $raz = 1;
@@ -232,22 +224,35 @@ sub _switchContext {
         $raz = 1;
     }
 
-    $req->sessionInfo->{"$self->{conf}->{impersonationPrefix}_session_id"} =
+    $req->sessionInfo->{"$self->{conf}->{contextSwitchingPrefix}_session_id"} =
       $realSessionId;
-    $self->userLogger->notice(
-        "Start ContextSwitching: $realId becomes $spoofId ")
-      unless $raz;
 
-    return $raz
-      ? $self->_abortImpersonation( $req, $spoofId, $realId, 1 )
-      : $req;
+    return $self->_abortImpersonation( $req, $spoofId, $realId, 1 ) if $raz;
+
+    $self->logger->debug(
+        "Update sessionInfo with real authenticationLevel: $realAuthLevel");
+    $req->sessionInfo->{authenticationLevel} = $realAuthLevel;
+    delete $req->sessionInfo->{groups};
+
+    # Compute groups & macros again with real authenticationLevel
+    $req->steps(
+        [ 'setSessionInfo', $self->p->groupsAndMacros, 'setLocalGroups' ] );
+    if ( my $error = $self->p->process($req) ) {
+        $self->logger->debug(
+            "ContextSwitching: Process returned error: $error");
+        $req->error($error);
+    }
+
+    $self->userLogger->notice(
+        "Start ContextSwitching: $realId becomes $spoofId ");
+    return $req;
 }
 
 sub _abortImpersonation {
     my ( $self, $req, $spoofId, $realId, $abort ) = @_;
     my $type = $abort ? 'sessionInfo' : 'userData';
     my $realSessionId =
-      $req->{$type}->{"$self->{conf}->{impersonationPrefix}_session_id"};
+      $req->{$type}->{"$self->{conf}->{contextSwitchingPrefix}_session_id"};
     my $session;
     unless ( $session = $self->p->getApacheSession($realSessionId) ) {
         $self->userLogger->info("Session $session expired");
@@ -277,15 +282,16 @@ sub _abortImpersonation {
     $req->urldc( $self->conf->{portal} );
     $req->id($realSessionId);
     $self->p->buildCookie($req);
-    delete $req->{$type}->{"$self->{conf}->{impersonationPrefix}_session_id"};
+    delete $req->{$type}
+      ->{"$self->{conf}->{contextSwitchingPrefix}_session_id"};
 
     return $req;
 }
 
-sub displaySwitchContext {
+sub displayLink {
     my ( $self, $req ) = @_;
     return 'OFF'
-      if $req->userData->{"$self->{conf}->{impersonationPrefix}_session_id"};
+      if $req->userData->{"$self->{conf}->{contextSwitchingPrefix}_session_id"};
     return 'ON' if $self->rule->( $req, $req->userData );
 }
 

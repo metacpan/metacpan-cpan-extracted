@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla-Plugin-PromptIfStale
 
+0.057     2020-05-03 17:55:48Z
+          - fix tests on Dist::Zilla <6.0 (seen especially on perl 5.10, 5.12)
+
+0.056     2020-04-30 23:46:50Z
+          - filter out plugins in the local repository from being checked for
+
 0.055     2018-05-08 03:09:35Z
           - fix for Dist::Zilla 7: ensure that the proper directory is used
             for determining authordeps and local modules

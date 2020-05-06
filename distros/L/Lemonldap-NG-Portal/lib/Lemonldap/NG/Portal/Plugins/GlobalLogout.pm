@@ -3,6 +3,7 @@ package Lemonldap::NG::Portal::Plugins::GlobalLogout;
 use strict;
 use Mouse;
 use JSON qw(from_json to_json);
+use Time::Local;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
   PE_ERROR
@@ -11,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -39,22 +40,16 @@ sub init {
     $self->addAuthRoute( globallogout => 'globalLogout', [ 'POST', 'GET' ] );
 
     # Parse activation rule
-    my $hd = $self->p->HANDLER;
-    $self->logger->debug(
-        "GlobalLogout rule -> " . $self->conf->{globalLogoutRule} );
-    my $rule =
-      $hd->buildSub( $hd->substitute( $self->conf->{globalLogoutRule} ) );
-    unless ($rule) {
-        $self->error( "Bad globalLogout rule -> " . $hd->tsv->{jail}->error );
-        return 0;
-    }
-    $self->rule($rule);
+    $self->rule(
+        $self->p->buildRule( $self->conf->{globalLogoutRule}, 'globalLogout' )
+    );
+    return 0 unless $self->rule;
 
     return 1;
 }
 
 # RUNNING METHODS
-# Look for user active SSO sessions and propose to close them
+# Look for user active SSO sessions and suggest to close them
 sub run {
     my ( $self, $req ) = @_;
     my $user = $req->{userData}->{ $self->conf->{whatToTrace} };
@@ -101,6 +96,7 @@ sub run {
             SESSIONS  => $sessions,
             TOKEN     => $token,
             LOGIN     => $user,
+            CUSTOMPRM => $self->conf->{globalLogoutCustomParam}
         }
     );
     $req->response($tmp);
@@ -110,6 +106,7 @@ sub run {
 
 sub globalLogout {
     my ( $self, $req ) = @_;
+    my $res   = PE_OK;
     my $count = 0;
 
     if ( $req->param('all') ) {
@@ -120,7 +117,7 @@ sub globalLogout {
                 my $sessions = eval { from_json( $token->{sessions} ) };
                 if ($@) {
                     $self->logger->error("Bad encoding in OTT: $@");
-                    return PE_ERROR;
+                    $res = PE_ERROR;
                 }
                 my $as;
                 foreach (@$sessions) {
@@ -143,23 +140,24 @@ sub globalLogout {
                     else {
                         $self->userLogger->warn(
                             "GlobalLogout called with an unvalid token");
-                        return PE_TOKENEXPIRED;
+                        $res = PE_TOKENEXPIRED;
                     }
                 }
             }
             else {
                 $self->userLogger->error(
                     "GlobalLogout called with an expired token");
-                return PE_TOKENEXPIRED;
+                $res = PE_TOKENEXPIRED;
             }
         }
         else {
             $self->userLogger->error('GlobalLogout called without token');
-            return PE_NOTOKEN;
+            $res = PE_NOTOKEN;
         }
     }
-    $self->userLogger->info("$count remaining session(s) removed");
 
+    return $self->p->do( $req, [ sub { $res } ] ) if $res;
+    $self->userLogger->info("$count remaining session(s) have been removed");
     return $self->p->do( $req, [ 'authLogout', 'deleteSession' ] );
 }
 
@@ -168,9 +166,10 @@ sub activeSessions {
     my $activeSessions = [];
     my $sessions       = {};
     my $user           = $req->{userData}->{ $self->conf->{whatToTrace} };
+    my $customParam    = $self->conf->{globalLogoutCustomParam} || '';
 
-    # Try to retrieve session from sessions DB
-    $self->logger->debug('Try to retrieve session from DB');
+    # Try to retrieve sessions from sessions DB
+    $self->logger->debug('Try to retrieve sessions from DB');
     my $moduleOptions = $self->conf->{globalStorageOptions} || {};
     $moduleOptions->{backend} = $self->conf->{globalStorage};
     $self->logger->debug("Looking for \"$user\" sessions...");
@@ -179,15 +178,29 @@ sub activeSessions {
         $user );
 
     $self->logger->debug("Building array ref with sessions info...");
-    @$activeSessions = map { {
-            id         => $_,
-            UA         => $sessions->{$_}->{'UA'},
-            ipAddr     => $sessions->{$_}->{'ipAddr'},
-            authLevel  => $sessions->{$_}->{'authenticationLevel'},
-            startTime  => $sessions->{$_}->{'_startTime'},
-            updateTime => $sessions->{$_}->{'_updateTime'},
+    @$activeSessions =
+      map {
+        my $epoch;
+        my $regex = '^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$';
+        $_->{startTime} =~ /$regex/;
+        $epoch = timelocal( $6, $5, $4, $3, $2 - 1, $1 );
+        $_->{startTime} = $epoch;
+        if ( $_->{updateTime} ) {
+            $_->{updateTime} =~ /$regex/;
+            $epoch = timelocal( $6, $5, $4, $3, $2 - 1, $1 );
+            $_->{updateTime} = $epoch;
+        }
+        $_;
+      }
+      sort { $b->{startTime} cmp $a->{startTime} } map { {
+            id          => $_,
+            customParam => $sessions->{$_}->{$customParam},
+            ipAddr      => $sessions->{$_}->{ipAddr},
+            authLevel   => $sessions->{$_}->{authenticationLevel},
+            startTime   => $sessions->{$_}->{_startTime},
+            updateTime  => $sessions->{$_}->{_updateTime}
         };
-    } keys %$sessions;
+      } keys %$sessions;
 
     return $activeSessions;
 }

@@ -1,7 +1,7 @@
 # Main running methods file
 package Lemonldap::NG::Handler::Main::Run;
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -339,7 +339,10 @@ sub grant {
 # @return Constant $class->FORBIDDEN
 sub forbidden {
     my ( $class, $req, $session, $vhost ) = @_;
-    my $uri = $req->{env}->{REQUEST_URI};
+    my $uri    = $req->{env}->{REQUEST_URI};
+    my $portal = $class->tsv->{portal}->();
+    $portal = ( $portal =~ m#^https?://([^/]*).*# )[0];
+    $portal =~ s/:\d+$//;
     $vhost ||= $class->resolveAlias($req);
 
     if ( $session->{_logout} ) {
@@ -362,11 +365,12 @@ sub forbidden {
         $session->{ $class->tsv->{whatToTrace} } );
 
     # Redirect or Forbidden?
-    if ( $class->tsv->{useRedirectOnForbidden} ) {
-        $class->logger->debug("Use redirect for forbidden access");
+    if ( $class->tsv->{useRedirectOnForbidden} && $vhost ne $portal ) {
+        $class->logger->debug("Use redirect for forbidden access ");
         return $class->goToError( $req, $uri, 403 );
     }
     else {
+        $class->logger->debug("Self protected Portal URL") if $vhost eq $portal;
         $class->logger->debug("Return forbidden access");
         return $class->FORBIDDEN;
     }
@@ -437,15 +441,17 @@ sub goToError {
 # @return Value of the cookie if found, 0 else
 sub fetchId {
     my ( $class, $req ) = @_;
-    my $t                 = $req->{env}->{HTTP_COOKIE} or return 0;
-    my $vhost             = $class->resolveAlias($req);
+    my $t     = $req->{env}->{HTTP_COOKIE} or return 0;
+    my $vhost = $class->resolveAlias($req);
+    $class->logger->debug("VH $vhost is HTTPS")
+      if $class->_isHttps( $req, $vhost );
     my $lookForHttpCookie = ( $class->tsv->{securedCookie} =~ /^(2|3)$/
           and not $class->_isHttps( $req, $vhost ) );
     my $cn = $class->tsv->{cookieName};
     my $value =
       $lookForHttpCookie
       ? ( $t =~ /${cn}http=([^,; ]+)/o ? $1 : 0 )
-      : ( $t =~ /$cn=([^,; ]+)/o       ? $1 : 0 );
+      : ( $t =~ /$cn=([^,; ]+)/o ? $1 : 0 );
 
     if ( $value && $lookForHttpCookie && $class->tsv->{securedCookie} == 3 ) {
         $value = $class->tsv->{cipher}->decryptHex( $value, "http" );
@@ -479,6 +485,9 @@ sub retrieveSession {
     {
         $class->logger->debug("Get session $id from Handler internal cache");
         return $class->data;
+    }
+    else {
+        $class->data( {} );
     }
 
     # 2. Get the session from cache or backend
@@ -573,11 +582,8 @@ sub retrieveSession {
 # Returns the port on which this vhost is accessed
 # @param $s VHost name
 # @return PORT
-
 sub _getPort {
-
     my ( $class, $req, $vhost ) = @_;
-
     if ( defined $class->tsv->{port}->{$vhost}
         and ( $class->tsv->{port}->{$vhost} > 0 ) )
     {
@@ -594,15 +600,14 @@ sub _getPort {
         }
     }
 }
-## @cmethod private boot _isHttps(string s)
-# Returns whether this VHost should he accessed
+
+## @cmethod private bool _isHttps(string s)
+# Returns whether this VHost should be accessed
 # via HTTPS
 # @param $s VHost name
-# @return RUE if the vhost should be accessed over HTTPS
+# @return TRUE if the vhost should be accessed over HTTPS
 sub _isHttps {
-
     my ( $class, $req, $vhost ) = @_;
-
     if ( defined $class->tsv->{https}->{$vhost}
         and ( $class->tsv->{https}->{$vhost} > -1 ) )
     {
@@ -766,15 +771,11 @@ sub abort {
 sub localUnlog {
     my ( $class, $req, $id ) = @_;
     $class->logger->debug('Local handler logout');
-    if ( $id //= $class->fetchId($req) ) {
 
-        # Delete thread data
-        if (    $class->data->{_session_id}
-            and $id eq $class->data->{_session_id} )
-        {
-            $class->data( {} );
-        }
-        delete $req->data->{session};
+    # Delete thread data
+    delete $req->data->{session};
+    $class->data( {} );
+    if ( $id //= $class->fetchId($req) ) {
 
         # Delete local cache
         if (    $class->tsv->{refLocalStorage}

@@ -4,7 +4,7 @@ use strict;
 use Mouse;
 use JSON qw(from_json to_json);
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 sub newNotification {
     my ( $self, $jsonString, $defaultCond ) = @_;
@@ -15,10 +15,13 @@ sub newNotification {
         eval { $self->logger->error("Unable to decode JSON file: $err") };
         return 0;
     }
+
     my @notifs;
     $json = [$json] unless ( ref($json) eq 'ARRAY' );
+
     foreach my $notif (@$json) {
         my @data;
+        $notif->{reference} =~ s/_/-/g; # Remove underscores (#2135)
 
         # Mandatory information
         foreach (qw(date uid reference)) {
@@ -42,10 +45,11 @@ sub newNotification {
 
         unless ( exists $notif->{condition} ) {
             $self->userLogger->info(
-                "Set defaultCondition ($defaultCond) for notification $notif->{reference}");
+"Set defaultCondition ($defaultCond) for notification $notif->{reference}"
+            );
             $notif->{condition} = $defaultCond;
         }
-        
+
         push @data, ( $notif->{condition} );
         $notif->{date} =~ s/^(\d{4}-\d{2}-\d{2}).*$/$1/;
         my $body = to_json($notif);

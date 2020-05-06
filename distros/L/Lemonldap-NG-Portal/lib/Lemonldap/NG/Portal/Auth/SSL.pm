@@ -9,7 +9,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
 );
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
@@ -31,14 +31,29 @@ sub init {
 # @return Lemonldap::NG::Portal constant
 sub extractFormInfo {
     my ( $self, $req ) = @_;
-    my $field = $self->conf->{SSLVar};
-    if ( $req->env->{SSL_CLIENT_I_DN}
-        and my $tmp =
-        $self->conf->{SSLVarIf}->{ $req->env->{SSL_CLIENT_I_DN} } )
-    {
-        $field = $tmp;
+
+    # If this is the ajax query, allow response to contain HTML code
+    # to update the portal error message
+    if ( $req->wantJSON ) {
+        $req->wantErrorRender(1);
     }
-    if ( $req->user( $req->env->{$field} ) ) {
+
+    my $field = $self->conf->{SSLVar};
+    if ( $req->env->{SSL_CLIENT_I_DN} ) {
+        $self->logger->debug(
+            'Received SSL issuer ' . $req->env->{SSL_CLIENT_I_DN} );
+
+        if ( my $tmp =
+            $self->conf->{SSLVarIf}->{ $req->env->{SSL_CLIENT_I_DN} } )
+        {
+            $field = $tmp;
+        }
+    }
+    $req->env->{$field}
+      ? $self->logger->debug("Using SSL environment variable $field")
+      : $self->logger->notice(
+        "No name found in certificate, check your configuration");
+    if ( $req->env->{$field} and $req->user( $req->env->{$field} ) ) {
         $self->userLogger->notice( "GoodSSL authentication for " . $req->user );
         return PE_OK;
     }
@@ -47,6 +62,12 @@ sub extractFormInfo {
         return PE_BADCERTIFICATE;
     }
     elsif ( $self->conf->{sslByAjax} and not $req->param('nossl') ) {
+
+        # If this is the AJAX query
+        if ( $req->wantJSON ) {
+            return PE_CERTIFICATEREQUIRED;
+        }
+
         $self->logger->debug( 'Append ' . $self->{Name} . ' init/script' );
         $req->data->{customScript} .= $self->{AjaxInitScript};
         $self->logger->debug(
@@ -60,6 +81,7 @@ sub extractFormInfo {
             $req->data->{customScript} .= $self->{AjaxInitScript};
             $self->logger->debug(
                 "Send init/script -> " . $req->data->{customScript} );
+            return PE_BADCERTIFICATE;
         }
         $self->userLogger->warn('No certificate found');
         return PE_CERTIFICATEREQUIRED;

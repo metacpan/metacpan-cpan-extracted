@@ -1,0 +1,109 @@
+NAME
+
+    POE::Component::SmokeBox::Recent::HTTP - an extremely minimal HTTP
+    client
+
+VERSION
+
+    version 1.54
+
+SYNOPSIS
+
+      # Obtain the RECENT file from a given CPAN mirror.
+       use strict;
+       use warnings;
+       use File::Spec;
+       use POE qw(Component::SmokeBox::Recent::HTTP);
+       use URI;
+    
+       my $url = shift || die "You must provide a url parameter\n";
+    
+       my $uri = URI->new( $url );
+    
+       die "Unsupported scheme\n" unless $uri->scheme and $uri->scheme eq 'http';
+    
+       $uri->path( File::Spec::Unix->catfile( $uri->path(), 'RECENT' ) );
+    
+       POE::Session->create(
+          package_states => [
+            main => [qw(_start http_sockerr http_timeout http_response)],
+          ]
+       );
+    
+       $poe_kernel->run();
+       exit 0;
+    
+       sub _start {
+         POE::Component::SmokeBox::Recent::HTTP->spawn(
+            uri => $uri,
+         );
+         return;
+       }
+    
+       sub http_sockerr {
+         warn join ' ', @_[ARG0..$#_];
+         return;
+       }
+    
+       sub http_timeout {
+         warn $_[ARG0], "\n";
+         return;
+       }
+    
+       sub http_response {
+         my $http_response = $_[ARG0];
+         print $http_response->as_string;
+         return;
+       }
+
+DESCRIPTION
+
+    POE::Component::SmokeBox::Recent::HTTP is the small helper module used
+    by POE::Component::SmokeBox::Recent to do HTTP client duties.
+
+    It only implements a simple request with no following of redirections
+    and connection keep-alive, etc.
+
+CONSTRUCTOR
+
+    spawn
+
+      Takes a number of parameters:
+
+        'uri', a URI object for the URL you wish to retrieve, mandatory;
+        'session', optional if the poco is spawned from within another session;
+        'prefix', specify an event prefix other than the default of 'http';
+        'timeout', specify a timeout in seconds, default is 60;
+
+OUTPUT EVENTS
+
+    The component sends the following events. If you have changed the
+    prefix option in spawn then substitute http with the event prefix that
+    you specified.
+
+    http_sockerr
+
+      Generated if there is a problem connecting to the given HTTP
+      host/address. ARG0 contains the name of the operation that failed.
+      ARG1 and ARG2 hold numeric and string values for $!, respectively.
+
+    http_timeout
+
+      Triggered if we don't get a response from the HTTP server.
+
+    http_response
+
+      Emitted when the transfer has finished. ARG0 will be a HTTP::Response
+      object. It is up to you to check the status, etc. of the response.
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2020 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

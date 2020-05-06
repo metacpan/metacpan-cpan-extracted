@@ -5,16 +5,16 @@ MANIFEST
 README
 t/1.t
 t/special_characters.t
-t/words_with_umlaut_and_ß.t
+t/words_with_umlaut_and_szlig.t
 t/to_ascii.t
 t/to_latin1.t
 t/only_ascii.t
 
 t/words_with_foreign.dat
-t/words_with_ä.dat
-t/words_with_ö.dat
-t/words_with_ü.dat
-t/words_with_ß.dat
+t/words_with_auml.dat
+t/words_with_ouml.dat
+t/words_with_uuml.dat
+t/words_with_szlig.dat
 t/words_with_ae.dat
 t/words_with_oe.dat
 t/words_with_ue.dat

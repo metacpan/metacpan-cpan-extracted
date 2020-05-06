@@ -49,11 +49,12 @@
             "Type::Tiny" : "1.010001",
             "XML::Atom::Feed" : "0",
             "XML::RSS::LibXML" : "0.3105",
+            "YAML::XS" : "0.82",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.05",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

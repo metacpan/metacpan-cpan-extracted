@@ -12,9 +12,11 @@ my $build = Module::Build->new(
       'List::Util' => '1.33',
       'Ref::Util' => 0,
       'Struct::Dumb' => 0,
+      'URI' => 0,  # for parsing query string in ->psgi_app
    },
    test_requires => {
       'List::Util'  => '1.29', # pairgrep
+      'HTTP::Request' => 0,
       'Test::Fatal' => 0,
       'Test::More'  => '0.88', # done_testing
    },

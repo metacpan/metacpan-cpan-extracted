@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
- WriteMakefile (
+WriteMakefile (
  	NAME			=> 'RundeckAPI',
 	AUTHOR			=> q{Xavier Humbert <xavier.humbert@ac-nancy-metz.fr>},
 	VERSION_FROM	=> 'lib/RundeckAPI.pm',

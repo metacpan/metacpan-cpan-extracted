@@ -48,6 +48,7 @@ lib/App/lcpan/Cmd/extract_mod.pm
 lib/App/lcpan/Cmd/extract_rel.pm
 lib/App/lcpan/Cmd/extract_script.pm
 lib/App/lcpan/Cmd/inject.pm
+lib/App/lcpan/Cmd/log.pm
 lib/App/lcpan/Cmd/mentions.pm
 lib/App/lcpan/Cmd/mentions_by_mod.pm
 lib/App/lcpan/Cmd/mentions_by_script.pm
@@ -97,9 +98,15 @@ script/lcpanm
 script/lcpanm-namespace
 script/lcpanm-script
 t/00-compile.t
+t/01-basic.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
+t/data/minicpan1/RECENT
+t/data/minicpan1/authors/01mailrc.txt.gz
+t/data/minicpan1/authors/id/B/BU/BUDI/Foo-Bar-0.01.tar.gz
+t/data/minicpan1/modules/02packages.details.txt.gz
+t/data/minicpan1/modules/03modlist.data.gz
 t/release-rinci.t
 t/release-sql_schema_versioned.t
 weaver.ini

@@ -105,13 +105,19 @@ Send a METHOD_CALL message.
 and C<body>. These do as you’d expect, but note that C<body>, if given,
 must be an array reference.
 
-The return value is an instance of L<Promise::ES6> that will resolve when
-a METHOD_RETURN arrives in response, or reject when an ERROR arrives. The
-promise both resolves and rejects with a L<Protocol::DBus::Message> instance
-that represents the response.
+C<flags> may be given as an array reference of strings, e.g.,
+C<NO_REPLY_EXPECTED>. See the D-Bus Specification for all possible values.
 
-Note that exceptions can still happen (outside of the promise), e.g., if
-your input is invalid or if there’s a socket I/O error.
+The return value is an instance of L<Promise::ES6>. Normally this promise
+resolves when a METHOD_RETURN arrives in response. The resolution value is a
+a L<Protocol::DBus::Message> instance that represents the response. If,
+however, C<flags> is given and contains C<NO_REPLY_EXPECTED>, the promise
+resolves as soon as the message is sent.
+
+If an ERROR arrives in response instead, the promise will instead reject
+with a L<Protocol::DBus::Message> instance that represents that ERROR.
+The promise will also reject if some other error happens (e.g., an I/O
+error while sending the initial METHOD_CALL).
 
 =cut
 
@@ -134,40 +140,65 @@ sub _get_promise_class {
 sub send_call {
     my ($self, %opts) = @_;
 
-    $self->_send_msg(
-        %opts,
-        type => 'METHOD_CALL',
-    );
+    my ($res, $rej, $response_expected);
 
-    # Don’t create a promise if we were called in void context.
-    return defined(wantarray) && do {
+    my $ok;
+
+    my $promise_class = $self->_get_promise_class();
+
+    my $promise = $promise_class->new( sub {
+        ($res, $rej) = @_;
+
+        if ($opts{'flags'} && grep { $_ eq 'NO_REPLY_EXPECTED' } @{ $opts{'flags'} }) {
+            $response_expected = 0;
+        }
+        else {
+            $response_expected = 1;
+        }
+
+        $self->_send_msg(
+            $res,
+            %opts,
+            type => 'METHOD_CALL',
+        );
+
+        $ok = 1;
+    } );
+
+    if ($ok && $response_expected) {
         my $serial = $self->{'_last_sent_serial'};
 
         # Keep references to $self out of the callback
         # in order to avoid memory leaks.
         my $on_return_hr = $self->{'_on_return'} ||= {};
 
-        return $self->_get_promise_class()->new( sub {
-            my ($resolve, $reject) = @_;
+        my $orig_promise = $promise;
 
-            $on_return_hr->{$serial} = sub {
-                if ($_[0]->get_type() == _METHOD_RETURN_NUM()) {
-                    $resolve->($_[0]);
-                }
-                else {
-                    $reject->($_[0]);
-                }
-            };
+        $promise = $promise->then( sub {
+
+            return $promise_class->new( sub {
+                my ($res, $rej) = @_;
+
+                $on_return_hr->{$serial} = sub {
+                    if ($_[0]->get_type() == _METHOD_RETURN_NUM()) {
+                        $res->($_[0]);
+                    }
+                    else {
+                        $rej->($_[0]);
+                    }
+                };
+            } );
         } );
-    };
+    }
+
+    return $promise;
 }
 
-=head2 $flushed_yn = I<OBJ>->send_return( $ORIG_MSG, %OPTS )
+=head2 $promise = I<OBJ>->send_return( $ORIG_MSG, %OPTS )
 
 Send a METHOD_RETURN message.
 
-The return is a boolean that indicates whether the message is sent (truthy)
-or remains queued (falsy).
+The return is a promise that resolves when the message is sent.
 
 Arguments are similar to C<send_call()> except for the header differences
 that the D-Bus specification describes. Also, C<destination> is not given
@@ -179,13 +210,18 @@ undefined if this parameter is given directly.)
 sub send_return {
     my ($self, $orig_msg, @opts_kv) = @_;
 
-    return $self->_send_msg(
-        _response_fields_from_orig_msg($orig_msg, \@opts_kv),
-        type => 'METHOD_RETURN',
-    );
+    return $self->_get_promise_class()->new( sub {
+        my ($res) = @_;
+
+        $self->_send_msg(
+            $res,
+            _response_fields_from_orig_msg($orig_msg, \@opts_kv),
+            type => 'METHOD_RETURN',
+        );
+    } );
 }
 
-=head2 $flushed_yn = I<OBJ>->send_error( $ORIG_MSG, %OPTS )
+=head2 $promise = I<OBJ>->send_error( $ORIG_MSG, %OPTS )
 
 Like C<send_return()>, but sends an error instead. The
 C<error_name> parameter is required.
@@ -195,10 +231,15 @@ C<error_name> parameter is required.
 sub send_error {
     my ($self, $orig_msg, @opts_kv) = @_;
 
-    return $self->_send_msg(
-        _response_fields_from_orig_msg($orig_msg, \@opts_kv),
-        type => 'ERROR',
-    );
+    return $self->_get_promise_class()->new( sub {
+        my ($res) = @_;
+
+        $self->_send_msg(
+            $res,
+            _response_fields_from_orig_msg($orig_msg, \@opts_kv),
+            type => 'ERROR',
+        );
+    } );
 }
 
 sub _response_fields_from_orig_msg {
@@ -216,20 +257,24 @@ sub _response_fields_from_orig_msg {
     );
 }
 
-=head2 $flushed_yn = I<OBJ>->send_signal( %OPTS )
+=head2 $promise = I<OBJ>->send_signal( %OPTS )
 
 Like C<send_call()> but sends a signal rather than a method call.
-This also returns a boolean like C<send_return()>.
 
 =cut
 
 sub send_signal {
     my ($self, @opts_kv) = @_;
 
-    return $self->_send_msg(
-        @opts_kv,
-        type => 'SIGNAL',
-    );
+    return $self->_get_promise_class()->new( sub {
+        my ($res) = @_;
+
+        $self->_send_msg(
+            $res,
+            @opts_kv,
+            type => 'SIGNAL',
+        );
+    } );
 }
 
 #----------------------------------------------------------------------
@@ -341,7 +386,7 @@ sub _set_up_peer_io {
 }
 
 sub _send_msg {
-    my ($self, %opts) = @_;
+    my ($self, $on_send, %opts) = @_;
 
     my ($type, $body_ar, $flags) = delete @opts{'type', 'body', 'flags'};
 
@@ -372,7 +417,7 @@ sub _send_msg {
         die "Cannot send file descriptors without UNIX FD support!";
     }
 
-    $self->{'_io'}->enqueue_message( $buf_sr, $fds_ar );
+    $self->{'_io'}->enqueue_message( $buf_sr, $fds_ar, $on_send );
 
     return $self->{'_io'}->flush_write_queue();
 }

@@ -1,0 +1,15 @@
+% layout "layout.ep", title => "Hello";
+%= include "navbar.ep", myapp => "Example";
+this is a testdd
+<%= $test %>
+ggg
+
+% content 'test' => begin
+this <b>is</b> content <%= $test %>
+% end;
+
+<hr>
+
+%= now;
+%= `ps -o rss= -p $$`
+

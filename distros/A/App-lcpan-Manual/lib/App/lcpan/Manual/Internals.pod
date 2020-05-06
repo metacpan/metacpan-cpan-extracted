@@ -20,7 +20,7 @@ App::lcpan::Manual::Internals - App::lcpan internals
 
 =head1 VERSION
 
-version 1.049.000
+version 1.054.001
 
 =head1 INDEXING
 
@@ -30,8 +30,9 @@ can skip some passes if you don't need the information a pass gathers.
 =head2 First pass
 
 First, we parse F<authors/01mailrc.txt.gz> and insert the data into C<author>
-table. Some DarkPANs like those produced by L<OrePAN> has F<authors/00whois.xml>
-instead. Basically we're just assigning numeric ID's to PAUSE (author) ID's.
+table. Some DarkPANs like those produced by L<OrePAN> have
+F<authors/00whois.xml> instead. Basically we're just assigning numeric ID's to
+PAUSE (author) ID's.
 
 Then we parse F<modules/02packages.details.txt.gz>, which is the main meat of
 CPAN index. This file links package (module) names to release tarballs. A

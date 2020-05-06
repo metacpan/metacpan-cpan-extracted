@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Emitter;
 
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 use Data::Dumper;
 
 use YAML::PP::Common qw/
@@ -117,6 +117,10 @@ sub mapping_start_event {
                 $yaml .= ":";
                 $last->{type} = 'COMPLEXVALUE';
             }
+            elsif ($last->{type} eq 'COMPLEXVALUE') {
+                $yaml .= ":";
+                $last->{type} = 'MAP';
+            }
             else {
                 die "Unexpected";
             }
@@ -173,9 +177,14 @@ sub mapping_end_event {
     if ($last->{type} eq 'SEQ') {
     }
     elsif ($last->{type} eq 'MAP') {
-        $last->{type} = 'MAPVALUE';
     }
     elsif ($last->{type} eq 'MAPVALUE') {
+        $last->{type} = 'MAP';
+    }
+    elsif ($last->{type} eq 'COMPLEX') {
+        $last->{type} = 'COMPLEXVALUE';
+    }
+    elsif ($last->{type} eq 'COMPLEXVALUE') {
         $last->{type} = 'MAP';
     }
 }
@@ -285,8 +294,9 @@ sub sequence_end_event {
     }
     $last = $stack->[-1];
     $last->{column} = $column;
-    if ($last->{type} eq 'MAP') {
-        $last->{type} = 'MAPVALUE';
+    if ($last->{type} eq 'SEQ') {
+    }
+    elsif ($last->{type} eq 'MAP') {
     }
     elsif ($last->{type} eq 'MAPVALUE') {
         $last->{type} = 'MAP';
@@ -296,8 +306,6 @@ sub sequence_end_event {
     }
     elsif ($last->{type} eq 'COMPLEXVALUE') {
         $last->{type} = 'MAP';
-    }
-    elsif ($last->{type} eq 'SEQ') {
     }
 }
 
@@ -445,7 +453,7 @@ sub scalar_event {
         elsif ($forbidden_first{ $first }) {
             $style = YAML_SINGLE_QUOTED_SCALAR_STYLE;
         }
-        elsif (substr($value, 0, 3) =~ m/^---/) {
+        elsif (substr($value, 0, 3) =~ m/^(?:---|\.\.\.)/) {
             $style = YAML_SINGLE_QUOTED_SCALAR_STYLE;
         }
         elsif (substr($value, 0, 2) =~ m/^(?:[:?-] )/) {
@@ -697,7 +705,7 @@ sub document_start_event {
         if ($self->{open_ended}) {
             $self->writer->write("...\n");
         }
-        $self->writer->write("%YAML $info->{version_directive}\n");
+        $self->writer->write("%YAML $info->{version_directive}->{major}.$info->{version_directive}->{minor}\n");
         $self->{open_ended} = 0;
         $implicit = 0; # we need ---
     }

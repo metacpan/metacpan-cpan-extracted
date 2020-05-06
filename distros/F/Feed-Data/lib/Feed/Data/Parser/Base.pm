@@ -15,8 +15,6 @@ BEGIN {
 	);
 }
 
-our $VERSION = '0.01';
-
 has 'content_ref' => (
 	is => 'rw',
 	lazy => 1,

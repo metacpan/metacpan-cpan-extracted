@@ -25,13 +25,13 @@ all directories below it are checked.
 This version is the first beta release for version two of followme. The code
 changes have been made and pass test, but I need to update the documentation to
 match the code changes. The major changes are all internal. In the past the code
-qconstructed a hash and passed it to the template, which used the values in the
+constructed a hash and passed it to the template, which used the values in the
 hash to produce the web page. In version two the code passes an object to the
-template, which calls the build method for each vaiable in the template, passing
+template, which calls the build method for each variable in the template, passing
 the name of the variable and a filename to retrieve it from as arguments. The
 module then returns the value, which is used to fill in the template. The major
 user visible change is that the template syntax has changed, the new syntax is a
-subset of the previous syntax. Please see [App::Followme::Template](https://metacpan.org/pod/App::Followme::Template) for a
+subset of the previous syntax. Please see [App::Followme::Template](https://metacpan.org/pod/App%3A%3AFollowme%3A%3ATemplate) for a
 description of the template syntax. The other change is that the configuration
 parameters of some of the modules has changed. The new configuration parameters
 are described in each module. The motivation for the change is that placing the
@@ -144,7 +144,7 @@ bracketed section names.
 
 These modules are distributed with followme:
 
-- [App::Followme::FormatPage](https://metacpan.org/pod/App::Followme::FormatPage)
+- [App::Followme::FormatPage](https://metacpan.org/pod/App%3A%3AFollowme%3A%3AFormatPage)
 
     This module updates the web pages in a folder to match the most recently
     modified page. Each web page has sections that are different from other pages
@@ -172,7 +172,7 @@ These modules are distributed with followme:
     where folder\_name is the the folder the content is kept constant across. The
     folder name is not a full path, it is the last folder in the path.
 
-- [App::Followme::ConvertPage](https://metacpan.org/pod/App::Followme::ConvertPage)
+- [App::Followme::ConvertPage](https://metacpan.org/pod/App%3A%3AFollowme%3A%3AConvertPage)
 
     This module changes Markdown files to html files. Markdown format is described
     at:
@@ -189,7 +189,7 @@ These modules are distributed with followme:
     inside the section comments will be in the resulting page, editing the text
     outside it will have no effect on the resulting page.
 
-- [App::Followme::CreateIndex](https://metacpan.org/pod/App::Followme::CreateIndex)
+- [App::Followme::CreateIndex](https://metacpan.org/pod/App%3A%3AFollowme%3A%3ACreateIndex)
 
     This module builds an index for a directory containing links to all the files
     with the specified extension contained in it. The same variables mentioned above
@@ -201,21 +201,21 @@ These modules are distributed with followme:
     indicate the section of the template that is repeated for each file contained
     in the index.
 
-- [App::Followme::CreateNews](https://metacpan.org/pod/App::Followme::CreateNews)
+- [App::Followme::CreateNews](https://metacpan.org/pod/App%3A%3AFollowme%3A%3ACreateNews)
 
     This module generates an html file from the most recently updated files in the
     news directory. It also creates index files in each directory and
     subdirectory in the news directory. The same variables mentioned under
-    [App::Followme::ConvertPages](https://metacpan.org/pod/App::Followme::ConvertPages) are calculated for each file included in the
+    [App::Followme::ConvertPages](https://metacpan.org/pod/App%3A%3AFollowme%3A%3AConvertPages) are calculated for each file included in the
     indexes.
 
-- [App::Followme::CreateSitemap](https://metacpan.org/pod/App::Followme::CreateSitemap)
+- [App::Followme::CreateSitemap](https://metacpan.org/pod/App%3A%3AFollowme%3A%3ACreateSitemap)
 
     This module creates a sitemap file, which is a text file containing the url of
     every page on the site, one per line. It is also intended as a simple example of
     how to write a module that can be run by followme.
 
-- [App::Followme::UploadSite](https://metacpan.org/pod/App::Followme::UploadSite)
+- [App::Followme::UploadSite](https://metacpan.org/pod/App%3A%3AFollowme%3A%3AUploadSite)
 
     This module uploads changed files to a remote site. The default method to do the
     uploads is local copy, but that can be changed by changing the parameter upload\_pkg.
@@ -303,7 +303,7 @@ are examples of variables. The following commands are supported in templates:
 
 - else
 
-    The "if" and "for" commands can contain an `else`. The text beforethe "else"
+    The "if" and "for" commands can contain an `else`. The text before the "else"
     is included if the expression in the enclosing command is true and the
     text after the "else" is included if the "if" command is false or the "for"
     command does not execute. You can also place an "elsif" command inside a block,
@@ -344,12 +344,12 @@ The signature of the run method is
 
 where $obj is the object created by the new method and $directory is the name
 of the directory the module is being run on. All modules included in
-App::Followme use [App::Followme::Module](https://metacpan.org/pod/App::Followme::Module) as a base class, so they can use its
+App::Followme use [App::Followme::Module](https://metacpan.org/pod/App%3A%3AFollowme%3A%3AModule) as a base class, so they can use its
 methods, such as visiting all files in a directory and compiling a template. If
-you wish to write your own module, you can use [App::Followme::Sitemap](https://metacpan.org/pod/App::Followme::Sitemap) as a
+you wish to write your own module, you can use [App::Followme::Sitemap](https://metacpan.org/pod/App%3A%3AFollowme%3A%3ASitemap) as a
 guide. If you use App::Followme::Module as a base class, you should not supply
 your own new method, but rely on the new method in
-[App::Followme::ConfiguredObject](https://metacpan.org/pod/App::Followme::ConfiguredObject), which you will inherit.
+[App::Followme::ConfiguredObject](https://metacpan.org/pod/App%3A%3AFollowme%3A%3AConfiguredObject), which you will inherit.
 
 # LICENSE
 

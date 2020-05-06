@@ -7,6 +7,21 @@
 use Net::ARP;
 use Test::More qw( no_plan );
 
-$mac = Net::ARP::get_mac("enp3s0f1");
-ok( $mac ne "unknown", "not unkown mac enp3s0f1 -> $mac" );
+BEGIN
+{
+    eval{ require Net::Pcap; };
+              
+    if($@ =~ /^Can\'t\slocate/)
+    {
+        $dev = "enp3s0f1";
+    }
+    else
+    {
+   	import Net::Pcap;
+        $dev = Net::Pcap::lookupdev(\$errbuf);
+    }
+}
+
+$mac = Net::ARP::get_mac($dev);
+ok( $mac ne "unknown", "not unkown mac $dev -> $mac" );
 

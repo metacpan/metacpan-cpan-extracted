@@ -54,7 +54,7 @@ use Mouse;
 use JSON qw(from_json to_json);
 use MIME::Base64;
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 extends
   qw (Lemonldap::NG::Portal::Main::Plugin Lemonldap::NG::Portal::Lib::Captcha);
@@ -226,12 +226,16 @@ sub newSession {
     my $force = 0;
     if ( my $s = delete $infos->{__secret} ) {
         my $t;
-        if ( $t =
-                $self->conf->{cipher}->decrypt($s)
-            and $t <= time + $self->conf->{restClockTolerance}
-            and $t > time - $self->conf->{restClockTolerance} )
-        {
-            $force = 1;
+        if ( $t = $self->conf->{cipher}->decrypt($s) ) {
+            if (    $t <= time + $self->conf->{restClockTolerance}
+                and $t > time - $self->conf->{restClockTolerance} )
+            {
+                $force = 1;
+            }
+            else {
+                $self->userLogger->error( 'Clock drift between servers is'
+                      . ' beyond tolerance, force denied.' );
+            }
         }
         else {
             $self->userLogger->error('Bad key, force denied');
@@ -321,12 +325,16 @@ sub updateSession {
     my $force = 0;
     if ( my $s = delete $infos->{__secret} ) {
         my $t;
-        if ( $t =
-                $self->conf->{cipher}->decrypt($s)
-            and $t <= time + $self->conf->{restClockTolerance}
-            and $t > time - $self->conf->{restClockTolerance} )
-        {
-            $force = 1;
+        if ( $t = $self->conf->{cipher}->decrypt($s) ) {
+            if (    $t <= time + $self->conf->{restClockTolerance}
+                and $t > time - $self->conf->{restClockTolerance} )
+            {
+                $force = 1;
+            }
+            else {
+                $self->userLogger->error( 'Clock drift between servers is'
+                      . ' beyond tolerance, force denied.' );
+            }
         }
         else {
             $self->userLogger->error('Bad key, force denied');
@@ -578,7 +586,8 @@ sub removeSessions {
 }
 
 sub sendCaptcha {
-    my ( $self,  $req )   = @_;
+    my ( $self, $req ) = @_;
+    $self->logger->info("User request for captcha renew");
     my ( $token, $image ) = $self->captcha->getCaptcha($req);
 
     return $self->p->sendJSONresponse( $req,

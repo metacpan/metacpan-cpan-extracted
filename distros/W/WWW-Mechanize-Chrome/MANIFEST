@@ -22,7 +22,6 @@ lib/Chrome/DevToolsProtocol/Transport/Pipe/Mojo.pm
 lib/Chrome/DevToolsProtocol/Transport/Pipe/NetAsync.pm
 lib/Chrome/DevToolsProtocol/Transport/Win32PipeOpener.pm
 lib/HTTP/Cookies/ChromeDevTools.pm
-lib/StructDumbDebug.pm
 lib/WWW/Mechanize/Chrome.pm
 lib/WWW/Mechanize/Chrome/Contributing.pod
 lib/WWW/Mechanize/Chrome/Cookbook.pm
@@ -78,6 +77,8 @@ t/50-mech-start-url.t
 t/50-mech-status.t
 t/50-mech-text.t
 t/50-popup.t
+t/50-tick.html
+t/50-tick.t
 t/51-click-intrapage.t
 t/51-mech-form-with-fields.t
 t/51-mech-links-base.html
@@ -127,6 +128,8 @@ t/helper.pm
 t/mixi_jp_index.html
 t/rt127588.t
 t/rt130999.t
+t/select.html
+t/select.t
 t/sophos_co_jp_index.html
 t/test-input-with-class.html
 testrules.yml

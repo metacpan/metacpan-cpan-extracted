@@ -6,10 +6,14 @@ Makefile.PL
 MANIFEST			This list of files
 README.pod
 t/class.t
+t/class_no_module_run.t
 t/module.t
+t/no_module.t
 t/tlib/Test/Class/Simple/Class.pm
+t/tlib/Test/Class/Simple/ClassNoModuleRunTest.pm
 t/tlib/Test/Class/Simple/ClassTest.pm
 t/tlib/Test/Class/Simple/Module.pm
 t/tlib/Test/Class/Simple/ModuleTest.pm
+t/tlib/Test/Class/Simple/NoModuleTest.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

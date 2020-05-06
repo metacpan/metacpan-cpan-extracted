@@ -6,7 +6,7 @@ use Test::More tests => 22;
 use Devel::ebug;
 
 my $ebug = Devel::ebug->new;
-$ebug->program("t/calc.pl");
+$ebug->program("corpus/calc.pl");
 $ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 
@@ -40,7 +40,7 @@ foreach (1..9) {
 }
 
 $ebug = Devel::ebug->new;
-$ebug->program("t/stack.pl");
+$ebug->program("corpus/stack.pl");
 $ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 $ebug->break_point(22);

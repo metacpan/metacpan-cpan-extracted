@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.05
+    version 0.06
 
 SYNOPSIS
 
@@ -58,6 +58,16 @@ PROPERTIES
 
       If a regular expression is provided, this will include assets that
       match by name.
+
+ tags_only
+
+    Boolean value for those repositories that do not upgrade their tags to
+    releases. There are two different endpoints. One for releases
+    <https://developer.github.com/v3/repos/releases/#list-releases-for-a-repository>
+    and one for simple tags
+    <https://developer.github.com/v3/repos/#list-tags>. The default is to
+    interrogate the former for downloads. Passing a true value for
+    "tags_only" interrogates the latter for downloads.
 
  version
 

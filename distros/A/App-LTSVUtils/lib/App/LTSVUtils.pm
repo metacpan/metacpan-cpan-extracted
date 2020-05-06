@@ -1,9 +1,9 @@
 package App::LTSVUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-19'; # DATE
+our $DATE = '2020-05-03'; # DATE
 our $DIST = 'App-LTSVUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -86,7 +86,7 @@ sub ltsvutil {
         chomp($row0);
         my $row = {};
         for my $col0 (split /\t/, $row0) {
-            $col0 =~ /(.+):(.*)/ or die "Row $i: Invalid column '$col0': must be in LABEL:VAL format\n";
+            $col0 =~ /(.+?):(.*)/ or die "Row $i: Invalid column '$col0': must be in LABEL:VAL format\n";
             $row->{$1} = $2;
         }
         $row;
@@ -191,7 +191,7 @@ App::LTSVUtils - CLI utilities related to LTSV
 
 =head1 VERSION
 
-This document describes version 0.001 of App::LTSVUtils (from Perl distribution App-LTSVUtils), released on 2019-12-19.
+This document describes version 0.002 of App::LTSVUtils (from Perl distribution App-LTSVUtils), released on 2020-05-03.
 
 =head1 DESCRIPTION
 
@@ -232,6 +232,7 @@ Input LTSV file.
 
 Use C<-> to read from stdin.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -267,6 +268,7 @@ Input LTSV file.
 
 Use C<-> to read from stdin.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -301,6 +303,7 @@ Arguments ('*' denotes required arguments):
 Input LTSV file.
 
 Use C<-> to read from stdin.
+
 
 =back
 
@@ -351,7 +354,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -5,7 +5,7 @@ use strict;
 use Mouse;
 use JSON qw(from_json to_json);
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin', 'Lemonldap::NG::Common::TOTP';
 
@@ -133,10 +133,8 @@ sub run {
         }
 
         # Loading TOTP secret
-        foreach (@totp2f) {
-            $self->logger->debug("Reading TOTP secret if exists ...");
-            $secret = $_->{_secret};
-        }
+        $self->logger->debug("Reading TOTP secret if exists ...");
+        $secret = $_->{_secret} foreach (@totp2f);
 
         if ( $token->{_totp2fSecret} eq $secret ) {
             return $self->p->sendError( $req, 'totpExistingKey', 200 );
@@ -217,10 +215,8 @@ sub run {
         }
 
         # Loading TOTP secret
-        foreach (@totp2f) {
-            $self->logger->debug("Reading TOTP secret if exists ...");
-            $secret = $_->{_secret};
-        }
+        $self->logger->debug("Reading TOTP secret if exists ...");
+        $secret = $_->{_secret} foreach (@totp2f);
 
         if ( ( $req->param('newkey') and $self->conf->{totp2fUserCanChangeKey} )
             or not $secret )
@@ -274,9 +270,8 @@ sub run {
     elsif ( $action eq 'delete' ) {
 
         # Check if unregistration is allowed
-        unless ( $self->conf->{totp2fUserCanRemoveKey} ) {
-            return $self->p->sendError( $req, 'notAuthorized', 400 );
-        }
+        return $self->p->sendError( $req, 'notAuthorized', 400 )
+          unless $self->conf->{totp2fUserCanRemoveKey};
 
         my $epoch = $req->param('epoch')
           or return $self->p->sendError( $req, '"epoch" parameter is missing',

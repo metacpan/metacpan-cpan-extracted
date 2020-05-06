@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2007-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2007-2020 -- leonerd@leonerd.org.uk
 
 package IO::Async::Loop;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.75';
+our $VERSION = '0.76';
 
 # When editing this value don't forget to update the docs below
 use constant NEED_API_VERSION => '0.33';
@@ -36,6 +36,7 @@ use Scalar::Util qw( refaddr weaken );
 use Socket qw( SO_REUSEADDR AF_INET6 IPPROTO_IPV6 IPV6_V6ONLY );
 
 use IO::Async::OS;
+use IO::Async::Metrics '$METRICS';
 
 use constant HAVE_SIGNALS => IO::Async::OS->HAVE_SIGNALS;
 use constant HAVE_POSIX_FORK => IO::Async::OS->HAVE_POSIX_FORK;
@@ -402,6 +403,7 @@ sub _add_noparentcheck
    my $nkey = refaddr $notifier;
 
    $self->{notifiers}->{$nkey} = $notifier;
+   $METRICS and $METRICS->inc_gauge( notifiers => );
 
    $notifier->__set_loop( $self );
 
@@ -441,6 +443,7 @@ sub _remove_noparentcheck
    exists $self->{notifiers}->{$nkey} or croak "Notifier does not exist in collection";
 
    delete $self->{notifiers}->{$nkey};
+   $METRICS and $METRICS->dec_gauge( notifiers => );
 
    $notifier->__set_loop( undef );
 
@@ -774,7 +777,7 @@ A CODE reference to the handling callback.
 =back
 
 Attaching to C<SIGCHLD> is not recommended because of the way all child
-processes use it to report their termination. Instead, the C<watch_child>
+processes use it to report their termination. Instead, the C<watch_process>
 method should be used to watch for termination of a given child process. A
 warning will be printed if C<SIGCHLD> is passed here, but in future versions
 of L<IO::Async> this behaviour may be disallowed altogether.
@@ -794,9 +797,9 @@ sub attach_signal
    HAVE_SIGNALS or croak "This OS cannot ->attach_signal";
 
    if( $signal eq "CHLD" ) {
-      # We make special exception to allow $self->watch_child to do this
+      # We make special exception to allow $self->watch_process to do this
       caller eq "IO::Async::Loop" or
-         carp "Attaching to SIGCHLD is not advised - use ->watch_child instead";
+         carp "Attaching to SIGCHLD is not advised - use ->watch_process instead";
    }
 
    if( not $self->{sigattaches}->{$signal} ) {
@@ -2168,7 +2171,7 @@ be invoked in the following way:
 The second argument is passed the plain perl C<$?> value.
 
 This key is optional; if not supplied, the calling code should install a
-handler using the C<watch_child> method.
+handler using the C<watch_process> method.
 
 =item keep_signals => BOOL
 
@@ -2212,8 +2215,10 @@ sub fork
    }
 
    if( defined $params{on_exit} ) {
-      $self->watch_child( $kid => $params{on_exit} );
+      $self->watch_process( $kid => $params{on_exit} );
    }
+
+   $METRICS and $METRICS->inc_counter( forks => );
 
    return $kid;
 }
@@ -2359,6 +2364,19 @@ This method may be implemented using C<constant>; e.g
  use constant API_VERSION => '0.49';
 
 =cut
+
+sub pre_wait
+{
+   my $self = shift;
+   $METRICS and $self->{processing_start} and
+      $METRICS->inc_distribution_by( processing_time => Time::HiRes::tv_interval $self->{processing_start} );
+}
+
+sub post_wait
+{
+   my $self = shift;
+   $METRICS and $self->{processing_start} = [ Time::HiRes::gettimeofday ];
+}
 
 =head2 watch_io
 
@@ -2877,9 +2895,9 @@ sub _reap_children
    }
 }
 
-=head2 watch_child
+=head2 watch_process
 
-   $loop->watch_child( $pid, $code )
+   $loop->watch_process( $pid, $code )
 
 This method adds a new handler for the termination of the given child process
 PID, or all child processes.
@@ -2902,9 +2920,9 @@ The second argument is passed the plain perl C<$?> value.
 
 After invocation, the handler for a PID-specific watch is automatically
 removed. The all-child watch will remain until it is removed by
-C<unwatch_child>.
+C<unwatch_process>.
 
-This and C<unwatch_child> are optional; a subclass may implement neither, or
+This and C<unwatch_process> are optional; a subclass may implement neither, or
 both. If it implements neither then child watching will be performed by using
 C<watch_signal> to install a C<SIGCHLD> handler, which will use C<waitpid> to
 look for exited child processes.
@@ -2914,10 +2932,16 @@ ordering guarantee as to which will be called first.
 
 =cut
 
-sub watch_child
+sub watch_process
 {
    my $self = shift;
    my ( $pid, $code ) = @_;
+
+   if( $self->API_VERSION < 0.76 and
+      ( $self->can( "watch_child" ) // 0 ) != \&watch_child ) {
+      # Invoke legacy loop API
+      return $self->watch_child( @_ );
+   }
 
    my $childwatches = $self->{childwatches};
 
@@ -2940,18 +2964,27 @@ sub watch_child
    $childwatches->{$pid} = $code;
 }
 
-=head2 unwatch_child
+# Old name
+sub watch_child { shift->watch_process( @_ ) }
 
-   $loop->unwatch_child( $pid )
+=head2 unwatch_process
+
+   $loop->unwatch_process( $pid )
 
 This method removes a watch on an existing child process PID.
 
 =cut
 
-sub unwatch_child
+sub unwatch_process
 {
    my $self = shift;
    my ( $pid ) = @_;
+
+   if( $self->API_VERSION < 0.76 and
+      ( $self->can( "unwatch_child" ) // 0 ) != \&unwatch_child ) {
+      # Invoke legacy loop API
+      return $self->unwatch_child( @_ );
+   }
 
    my $childwatches = $self->{childwatches};
 
@@ -2961,6 +2994,9 @@ sub unwatch_child
       $self->detach_signal( CHLD => delete $self->{childwatch_sigid} );
    }
 }
+
+# Old name
+sub unwatch_child { shift->unwatch_process( @_ ) }
 
 =head1 METHODS FOR SUBCLASSES
 

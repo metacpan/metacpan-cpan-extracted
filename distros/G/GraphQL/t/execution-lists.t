@@ -12,6 +12,7 @@ BEGIN {
 
 sub check {
   my ($test_type, $test_data, $expected) = @_;
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
   my $data = +{ test => $test_data };
   my $data_type;
   $data_type = GraphQL::Type::Object->new(
@@ -54,7 +55,7 @@ sub all_checks {
       check($type, rsv(undef), $expected{returns_null});
     };
     subtest 'Rejected' => sub {
-      check($type, rj('bad'), $expected{rejected});
+      check($type, rj("bad\n"), $expected{rejected});
     };
   };
 
@@ -66,7 +67,7 @@ sub all_checks {
       check($type, [map rsv($_), 1, undef, 2], $expected{contains_null});
     };
     subtest 'Contains rejected' => sub {
-      check($type, [rsv(1), rj('bad'), rsv(2)], $expected{contains_rejected});
+      check($type, [rsv(1), rj("bad\n"), rsv(2)], $expected{contains_rejected});
     };
   };
 }
@@ -90,10 +91,10 @@ my $errors_null1 = [
   },
 ];
 my $errors_bad0 = [
-  { message => 'bad', locations => [{line=>1, column=>15}], path => [qw(nest test)] },
+  { message => "bad\n", locations => [{line=>1, column=>15}], path => [qw(nest test)] },
 ];
 my $errors_bad1 = [
-  { message => 'bad', locations => [{line=>1, column=>15}], path => [qw(nest test 1)] },
+  { message => "bad\n", locations => [{line=>1, column=>15}], path => [qw(nest test 1)] },
 ];
 
 subtest '[T]' => sub {

@@ -2,8 +2,8 @@ NAME
     DBIx::Diff::Schema - Compare schema of two DBI databases
 
 VERSION
-    This document describes version 0.096 of DBIx::Diff::Schema (from Perl
-    distribution DBIx-Diff-Schema), released on 2020-04-23.
+    This document describes version 0.097 of DBIx::Diff::Schema (from Perl
+    distribution DBIx-Diff-Schema), released on 2020-05-06.
 
 SYNOPSIS
      use DBIx::Diff::Schema qw(diff_db_schema diff_table_schema
@@ -23,27 +23,6 @@ DESCRIPTION
     Currently only tested on Postgres and SQLite.
 
 FUNCTIONS
-  check_table_exists
-    Usage:
-
-     check_table_exists($dbh, $table) -> any
-
-    Check whether a table exists.
-
-    This function is not exported by default, but exportable.
-
-    Arguments ('*' denotes required arguments):
-
-    *   $dbh* => *obj*
-
-        DBI database handle.
-
-    *   $table* => *str*
-
-        Table name.
-
-    Return value: (any)
-
   db_schema_eq
     Usage:
 
@@ -160,98 +139,6 @@ FUNCTIONS
 
         Second table name (assumed to be the same as first table name if
         unspecified).
-
-    Return value: (any)
-
-  list_columns
-    Usage:
-
-     list_columns($dbh, $table) -> any
-
-    List columns of a table.
-
-    This function is not exported by default, but exportable.
-
-    Arguments ('*' denotes required arguments):
-
-    *   $dbh* => *obj*
-
-        DBI database handle.
-
-    *   $table* => *str*
-
-        Table name.
-
-    Return value: (any)
-
-  list_indexes
-    Usage:
-
-     list_indexes($dbh, $table) -> any
-
-    List indexes for a table in a database.
-
-    General notes: information is retrieved from DBI's table_info().
-
-    SQLite notes: autoindex for primary key is also listed as the first
-    index, if it exists. This information is retrieved using "SELECT * FROM
-    sqlite_master". Autoindex is not listed using table_info().
-
-    This function is not exported by default, but exportable.
-
-    Arguments ('*' denotes required arguments):
-
-    *   $dbh* => *obj*
-
-        DBI database handle.
-
-    *   $table* => *str*
-
-        Table name.
-
-    Return value: (any)
-
-  list_table_indexes
-    Usage:
-
-     list_table_indexes($dbh, $table) -> any
-
-    List indexes for a table in a database.
-
-    General notes: information is retrieved from DBI's table_info().
-
-    SQLite notes: autoindex for primary key is also listed as the first
-    index, if it exists. This information is retrieved using "SELECT * FROM
-    sqlite_master". Autoindex is not listed using table_info().
-
-    This function is not exported by default, but exportable.
-
-    Arguments ('*' denotes required arguments):
-
-    *   $dbh* => *obj*
-
-        DBI database handle.
-
-    *   $table* => *str*
-
-        Table name.
-
-    Return value: (any)
-
-  list_tables
-    Usage:
-
-     list_tables($dbh) -> any
-
-    List table names in a database.
-
-    This function is not exported by default, but exportable.
-
-    Arguments ('*' denotes required arguments):
-
-    *   $dbh* => *obj*
-
-        DBI database handle.
 
     Return value: (any)
 

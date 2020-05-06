@@ -1,0 +1,23 @@
+[
+    {
+        "description": "empty schema",
+        "schema": {},
+        "tests": [
+            {
+                "description": "integer",
+                "data": 2,
+                "valid": true
+            },
+            {
+                "description": "boolean false",
+                "data": "false",
+                "valid": true
+            },
+            {
+                "description": "boolean true",
+                "data": "true",
+                "valid": true
+            }
+        ]
+    }
+]

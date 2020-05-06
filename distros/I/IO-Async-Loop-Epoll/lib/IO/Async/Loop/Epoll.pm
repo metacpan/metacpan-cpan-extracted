@@ -1,15 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2008-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2008-2020 -- leonerd@leonerd.org.uk
 
 package IO::Async::Loop::Epoll;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
-use constant API_VERSION => '0.49';
+our $VERSION = '0.21';
+use constant API_VERSION => '0.76';
 
 # Only Linux is known always to be able to report EOF conditions on
 # filehandles using EPOLLHUP
@@ -39,32 +39,32 @@ C<IO::Async::Loop::Epoll> - use C<IO::Async> with C<epoll> on Linux
 
 =head1 SYNOPSIS
 
- use IO::Async::Loop::Epoll;
+   use IO::Async::Loop::Epoll;
 
- use IO::Async::Stream;
- use IO::Async::Signal;
+   use IO::Async::Stream;
+   use IO::Async::Signal;
 
- my $loop = IO::Async::Loop::Epoll->new();
+   my $loop = IO::Async::Loop::Epoll->new;
 
- $loop->add( IO::Async::Stream->new(
-       read_handle => \*STDIN,
-       on_read => sub {
-          my ( $self, $buffref ) = @_;
-          while( $$buffref =~ s/^(.*)\r?\n// ) {
-             print "You said: $1\n";
-          }
-       },
- ) );
+   $loop->add( IO::Async::Stream->new(
+         read_handle => \*STDIN,
+         on_read => sub {
+            my ( $self, $buffref ) = @_;
+            while( $$buffref =~ s/^(.*)\r?\n// ) {
+               print "You said: $1\n";
+            }
+         },
+   ) );
 
- $loop->add( IO::Async::Signal->new(
-       name => 'INT',
-       on_receipt => sub {
-          print "SIGINT, will now quit\n";
-          $loop->loop_stop;
-       },
- ) );
+   $loop->add( IO::Async::Signal->new(
+         name => 'INT',
+         on_receipt => sub {
+            print "SIGINT, will now quit\n";
+            $loop->stop;
+         },
+   ) );
 
- $loop->loop_forever();
+   $loop->run;
 
 =head1 DESCRIPTION
 
@@ -151,6 +151,12 @@ sub DESTROY
    }
 }
 
+sub is_running
+{
+   my $self = shift;
+   return $self->{running};
+}
+
 =head2 loop_once
 
    $count = $loop->loop_once( $timeout )
@@ -176,7 +182,9 @@ sub loop_once
 
    $timeout = 0 if keys %{ $self->{fakeevents} };
 
+   $self->pre_wait;
    my $ret = $self->{epoll}->wait( $self->{maxevents}, $msec / 1000, $self->{sigmask} );
+   $self->post_wait;
 
    return undef if !defined $ret and $! != EINTR;
 

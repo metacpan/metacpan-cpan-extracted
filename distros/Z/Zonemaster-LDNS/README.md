@@ -11,8 +11,9 @@ Zonemaster LDNS
   * [Post-installation sanity check](#post-installation-sanity-check)
   * [Testing](#testing)
 * [Optional features](#optional-features)
-  * [IDN](#idn)
-  * [Internal ldns](#internal-ldns)
+  * [Ed25519]
+  * [IDN]
+  * [Internal ldns]
   * [Randomized capitalization](#randomized-capitalization)
 
 
@@ -29,9 +30,9 @@ Initially this module was named Net::LDNS.
 ## Dependencies and compatibility
 
 Run-time dependencies:
- * `openssl`
+ * `openssl` (openssl >= 1.1.1 unless [Ed25519] is disabled)
  * `libidn` (if [IDN] is enabled)
- * `libldns` (if [Internal ldns] is disabled)
+ * `libldns` (if [Internal ldns] is disabled; libldns >= 1.7.0, or libldns >= 1.7.1 if [Ed25519] is enabled)
 
 Compile-time dependencies (only when installing from source):
  * `make`
@@ -96,6 +97,18 @@ When installing from source, you can choose to enable or disable a number
 of optional features using command line options to the `perl Makefile.PL`
 commands.
 
+### Ed25519
+
+Enabled by default.
+Disabled with `--no-ed25519`
+
+Requires support for Ed25519 in both openssl and ldns.
+
+>
+> *Note:* Zonemaster Engine relies on this feature for its analysis when Ed25519
+> (algorithm 15) is being used in DNS records.
+>
+
 ### IDN
 
 Enabled by default.
@@ -132,5 +145,23 @@ Enable with `--randomize`.
 Randomizes the capitalization of returned domain names.
 
 
+### Custom OpenSSL
+
+Disabled by default.
+Enabled with `--prefix-openssl=/path/to/openssl`.
+
+Enabling this makes the build tools look for OpenSSL in a non-standard place.
+
+Technically this does two things:
+ * Libcrypto is sought in the `lib` directory under the given directory.
+ * The `include` directory under the given directory is added to the include
+   path.
+
+> **Note:** The `lib` directory under the given path must be known to the
+> dynamic linker or feature checks will fail.
+
+
 [IDN]: #idn
 [Internal ldns]: #internal-ldns
+[Ed25519]: #ed25519
+

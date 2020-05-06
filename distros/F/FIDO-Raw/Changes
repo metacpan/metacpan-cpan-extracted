@@ -1,0 +1,18 @@
+Revision history for FIDO-Raw
+
+0.03      2020-05-06 14:54:48+01:00 Europe/London
+
+ - Fixed issue with FreeBSD 11 and older
+ - Detect DragonFlyBSD
+
+0.02      2020-05-05 13:05:11+01:00 Europe/London
+
+ - Update to libfido2 9a0c852
+ - Added Cred methods:
+   - aaguid()
+ - Fixed MSVC build issues
+ - Added support for OpenBSD/FreeBSD
+
+0.01      2020-05-04 13:26:18+01:00 Europe/London
+
+ - Initial version

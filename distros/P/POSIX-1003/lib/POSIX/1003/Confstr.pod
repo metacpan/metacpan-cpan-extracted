@@ -4,11 +4,6 @@
 
 POSIX::1003::Confstr - POSIX access to confstr()
 
-=head1 INHERITANCE
-
- POSIX::1003::Confstr
-   is a POSIX::1003::Module
-
 =head1 SYNOPSIS
 
   use POSIX::1003::Confstr;   # import all
@@ -29,23 +24,7 @@ With C<confstr()> you can retreive string values from the operating
 system. It is the counterpart of C<sysconf()> which can only return
 numeric values.
 
-See L<documentation in the base class|POSIX::1003::Module/"DESCRIPTION">.
- 
 =head1 METHODS
-
-See L<documentation in the base class|POSIX::1003::Module/"METHODS">.
- 
-=over 4
-
-=item POSIX::1003::Confstr-E<gt>B<exampleValue>(NAME)
-
-See L<POSIX::1003::Module/"METHODS">
-
-=item $obj-E<gt>B<import>()
-
-See L<POSIX::1003::Module/"METHODS">
-
-=back
 
 =head1 FUNCTIONS
 
@@ -53,10 +32,10 @@ See L<POSIX::1003::Module/"METHODS">
 
 =over 4
 
-=item B<confstr>(NAME)
+=item B<confstr>($name)
 
-Returns the confstr value related to the NAMEd constant.  The NAME
-must be a string. C<undef> will be returned when the NAME is not
+Returns the confstr value related to the NAMEd constant.  The $name
+must be a string. C<undef> will be returned when the $name is not
 known by the system.
 
 example: 
@@ -94,93 +73,24 @@ where returned at that time.
 =for comment
 #TABLE_CONFSTR_START
 
-  _CS_GNU_LIBC_VERSION                 'glibc 2.15'
-  _CS_GNU_LIBPTHREAD_VERSION           'NPTL 2.15'
-  _CS_LFS64_CFLAGS                     '-D_LARGEFILE64_SOURCE'
-  _CS_LFS64_LDFLAGS                    ''
-  _CS_LFS64_LIBS                       ''
-  _CS_LFS64_LINTFLAGS                  '-D_LARGEFILE64_SOURCE'
-  _CS_LFS_CFLAGS                       ''
-  _CS_LFS_LDFLAGS                      ''
-  _CS_LFS_LIBS                         ''
-  _CS_LFS_LINTFLAGS                    ''
-  _CS_PATH                             '/bin:/usr/bin'
-  _CS_POSIX_V5_WIDTH_RESTRICTED_ENVS   'XBS5_LP64_OFF64'
-  _CS_POSIX_V6_ILP32_OFF32_CFLAGS      ''
-  _CS_POSIX_V6_ILP32_OFF32_LDFLAGS     ''
-  _CS_POSIX_V6_ILP32_OFF32_LIBS        ''
-  _CS_POSIX_V6_ILP32_OFF32_LINTFLAGS   ''
-  _CS_POSIX_V6_ILP32_OFFBIG_CFLAGS     ''
-  _CS_POSIX_V6_ILP32_OFFBIG_LDFLAGS    ''
-  _CS_POSIX_V6_ILP32_OFFBIG_LIBS       ''
-  _CS_POSIX_V6_ILP32_OFFBIG_LINTFLAGS  ''
-  _CS_POSIX_V6_LP64_OFF64_CFLAGS       '-m64'
-  _CS_POSIX_V6_LP64_OFF64_LDFLAGS      '-m64'
-  _CS_POSIX_V6_LP64_OFF64_LIBS         ''
-  _CS_POSIX_V6_LP64_OFF64_LINTFLAGS    ''
-  _CS_POSIX_V6_LPBIG_OFFBIG_CFLAGS     ''
-  _CS_POSIX_V6_LPBIG_OFFBIG_LDFLAGS    ''
-  _CS_POSIX_V6_LPBIG_OFFBIG_LIBS       ''
-  _CS_POSIX_V6_LPBIG_OFFBIG_LINTFLAGS  ''
-  _CS_POSIX_V6_WIDTH_RESTRICTED_ENVS   'POSIX_V6_LP64_OFF64'
-  _CS_POSIX_V7_ILP32_OFF32_CFLAGS      ''
-  _CS_POSIX_V7_ILP32_OFF32_LDFLAGS     ''
-  _CS_POSIX_V7_ILP32_OFF32_LIBS        ''
-  _CS_POSIX_V7_ILP32_OFF32_LINTFLAGS   ''
-  _CS_POSIX_V7_ILP32_OFFBIG_CFLAGS     ''
-  _CS_POSIX_V7_ILP32_OFFBIG_LDFLAGS    ''
-  _CS_POSIX_V7_ILP32_OFFBIG_LIBS       ''
-  _CS_POSIX_V7_ILP32_OFFBIG_LINTFLAGS  ''
-  _CS_POSIX_V7_LP64_OFF64_CFLAGS       '-m64'
-  _CS_POSIX_V7_LP64_OFF64_LDFLAGS      '-m64'
-  _CS_POSIX_V7_LP64_OFF64_LIBS         ''
-  _CS_POSIX_V7_LP64_OFF64_LINTFLAGS    ''
-  _CS_POSIX_V7_LPBIG_OFFBIG_CFLAGS     ''
-  _CS_POSIX_V7_LPBIG_OFFBIG_LDFLAGS    ''
-  _CS_POSIX_V7_LPBIG_OFFBIG_LIBS       ''
-  _CS_POSIX_V7_LPBIG_OFFBIG_LINTFLAGS  ''
-  _CS_POSIX_V7_WIDTH_RESTRICTED_ENVS   'POSIX_V7_LP64_OFF64'
-  _CS_V5_WIDTH_RESTRICTED_ENVS         'XBS5_LP64_OFF64'
-  _CS_V6_WIDTH_RESTRICTED_ENVS         'POSIX_V6_LP64_OFF64'
-  _CS_V7_WIDTH_RESTRICTED_ENVS         'POSIX_V7_LP64_OFF64'
-  _CS_XBS5_ILP32_OFF32_CFLAGS          ''
-  _CS_XBS5_ILP32_OFF32_LDFLAGS         ''
-  _CS_XBS5_ILP32_OFF32_LIBS            ''
-  _CS_XBS5_ILP32_OFF32_LINTFLAGS       ''
-  _CS_XBS5_ILP32_OFFBIG_CFLAGS         ''
-  _CS_XBS5_ILP32_OFFBIG_LDFLAGS        ''
-  _CS_XBS5_ILP32_OFFBIG_LIBS           ''
-  _CS_XBS5_ILP32_OFFBIG_LINTFLAGS      ''
-  _CS_XBS5_LP64_OFF64_CFLAGS           '-m64'
-  _CS_XBS5_LP64_OFF64_LDFLAGS          '-m64'
-  _CS_XBS5_LP64_OFF64_LIBS             ''
-  _CS_XBS5_LP64_OFF64_LINTFLAGS        ''
-  _CS_XBS5_LPBIG_OFFBIG_CFLAGS         ''
-  _CS_XBS5_LPBIG_OFFBIG_LDFLAGS        ''
-  _CS_XBS5_LPBIG_OFFBIG_LIBS           ''
-  _CS_XBS5_LPBIG_OFFBIG_LINTFLAGS      ''
-
+  During installation, a symbol table will get inserted here.
 
 =for comment
 #TABLE_CONFSTR_END
 
-
-
-
-
 =head1 SEE ALSO
 
-This module is part of POSIX-1003 distribution version 0.98,
-built on December 03, 2013. Website: F<http://perl.overmeer.net>.  The code is based on L<POSIX>, which
+This module is part of POSIX-1003 distribution version 1.00,
+built on May 05, 2020. Website: F<http://perl.overmeer.net/CPAN>.  The code is based on L<POSIX>, which
 is released with Perl itself.  See also L<POSIX::Util> for
 additional functionality.
 
 =head1 COPYRIGHTS
 
-Copyrights 2011-2013 on the perl code and the related documentation
+Copyrights 2011-2020 on the perl code and the related documentation
  by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

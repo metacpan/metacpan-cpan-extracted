@@ -1,0 +1,52 @@
+NAME
+    lib::hiderename - Hide modules by renaming them
+
+VERSION
+    This document describes version 0.001 of lib::hiderename (from Perl
+    distribution lib-hiderename), released on 2020-02-13.
+
+SYNOPSIS
+     use lib::hiderename 'Foo::Bar'; # Foo/Bar.pm will be renamed to Foo/Bar_hidden.pm
+
+     eval { require Foo::Bar }; # will fail
+
+     # Foo/Bar_hidden.pm will be renamed back to Foo/Bar.pm
+
+DESCRIPTION
+    EXPERIMENTAL.
+
+    lib::hiderename can temporarily hide modules for you, e.g. for testing
+    purposes. It uses Module::HideRename to rename module files on the
+    filesystem.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/lib-hiderename>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-lib-hiderename>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=lib-hiderename>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    lib::filter and lib::disallow, Devel::Hide, Test::Without::Module
+
+    Module::HideRename
+
+    pmhiderename and pmunhiderename from App::pmhiderename
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

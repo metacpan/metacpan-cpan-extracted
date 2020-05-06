@@ -15,6 +15,7 @@ sub new {
     unless ($res) {
         die 'Unable to load register module ' . $self->{conf}->{customRegister};
     }
+
     return $res;
 }
 

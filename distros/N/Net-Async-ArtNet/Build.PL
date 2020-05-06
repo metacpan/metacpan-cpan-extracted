@@ -9,13 +9,14 @@ my $build = Module::Build->new(
       'IO::Async::Loop' => '0.59',
       'IO::Async::Socket' => '0.59',
    },
-   build_requires => {
+   test_requires => {
       'IO::Async::Test' => 0,
       'Test::More' => '0.88', # done_testing
    },
-   auto_configure_requires => 0, # Don't add M::B to configure_requires
+   configure_requires => {
+      'Module::Build' => '0.4004', # test_requires
+   },
    license => 'perl',
-   create_makefile_pl => 'traditional',
    create_license => 1,
    create_readme  => 1,
 );

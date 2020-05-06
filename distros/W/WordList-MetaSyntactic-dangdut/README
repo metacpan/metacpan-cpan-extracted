@@ -1,6 +1,37 @@
+NAME
+    WordList::MetaSyntactic::dangdut - Wordlist from
+    Acme::MetaSyntactic::dangdut
+
+VERSION
+    This document describes version 0.003 of
+    WordList::MetaSyntactic::dangdut (from Perl distribution
+    WordList-MetaSyntactic-dangdut), released on 2020-05-01.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WordList-MetaSyntactic-dangdut>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WordList-MetaSyntactic-dangdut>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=WordList-MetaSyntacti
+    c-dangdut>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
 SEE ALSO
-
-    WordList::MetaSyntactic
-
     WordList
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

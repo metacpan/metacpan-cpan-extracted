@@ -4,13 +4,13 @@
       "Thierry Vignaud <tvignaud@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Gtk3-Notify",
    "no_index" : {
@@ -39,12 +39,14 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "X_bucktracker" : "https://github.com/potyl/perl-Gtk3-Notify/issues",
-      "homepage" : "https://github.com/potyl/perl-Gtk3-Notify",
-      "repository" : {
-         "url" : "https://github.com/potyl/perl-Gtk3-Notify"
-      }
+      "X_bucktracker" : "https://github.com/soig/Gtk3-Notify/issues",
+      "homepage" : "https://github.com/soig/Gtk3-Notify"
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.03",
+   "x_repository" : {
+      "type" : "git",
+      "url" : "https://github.com/soig/Gtk3-Notify.git",
+      "web" : "https://github.com/soig/Gtk3-Notify"
+   },
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

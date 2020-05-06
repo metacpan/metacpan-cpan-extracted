@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Column;
-$Games::Solitaire::Verify::Column::VERSION = '0.2402';
+$Games::Solitaire::Verify::Column::VERSION = '0.2403';
 use warnings;
 use strict;
 
@@ -41,7 +41,7 @@ sub _from_string
 
     $self->_recalc;
 
-    return;
+    return ();
 }
 
 sub _init
@@ -57,7 +57,7 @@ sub _init
         $self->_cards( $args->{cards} );
 
         $self->_recalc;
-        return;
+        return ();
     }
     else
     {
@@ -110,7 +110,7 @@ sub append_cards
     my ( $S, $c ) = @_;
     push @{ $S->_cards() }, @$c;
     $S->_recalc;
-    return;
+    return ();
 }
 
 
@@ -132,7 +132,7 @@ sub push
 
     $self->_recalc;
 
-    return;
+    return ();
 }
 
 
@@ -167,7 +167,7 @@ sub _recalc
     $self->_s(
         join( ' ', ':', ( map { $_->fast_s() } @{ $self->_cards() } ) ) );
 
-    return;
+    return ();
 }
 
 sub to_string
@@ -190,7 +190,7 @@ columns that are composed of a sequence of cards.
 
 =head1 VERSION
 
-version 0.2402
+version 0.2403
 
 =head1 SYNOPSIS
 

@@ -1,22 +1,26 @@
-# Copyrights 2011-2013 by [Mark Overmeer].
+# Copyrights 2011-2020 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.01.
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution POSIX-1003.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+package POSIX::1003;
+use vars '$VERSION';
+$VERSION = '1.00';
+
+
 use warnings;
 use strict;
 
-package POSIX::1003;
-use vars '$VERSION';
-$VERSION = '0.98';
-
-
 use Carp qw/croak/;
+use POSIX::1003::Module ();   # preload
 
 my %own_functions = map +($_ => 1), qw/
-  posix_1003_modules
-  posix_1003_names
-  show_posix_names
- /;
+    posix_1003_modules
+    posix_1003_names
+    show_posix_names
+   /;
 
 our (%EXPORT_TAGS, %IMPORT_FROM, %SUBSET);
 
@@ -33,6 +37,7 @@ my %tags =
   , fd =>          'POSIX::1003::FdIO'
   , filesystem =>  'POSIX::1003::FS'
   , fs =>          'POSIX::1003::FS'
+  , glob =>        'POSIX::1003::FS'
   , limit =>       'POSIX::1003::Limit'
   , limits =>      'POSIX::1003::Limit'
   , locale =>      'POSIX::1003::Locale'
@@ -51,6 +56,7 @@ my %tags =
   , sigaction =>   'POSIX::SigAction'
   , signals =>     [qw/POSIX::1003::Signals POSIX::SigSet POSIX::SigAction/]
   , sigset =>      'POSIX::SigSet'
+  , socket =>      'POSIX::1003::Socket'
   , sysconf =>     'POSIX::1003::Sysconf'
   , termio =>      'POSIX::1003::Termios'
   , termios =>     'POSIX::1003::Termios'
@@ -122,8 +128,8 @@ sub import(@)
     # no need for separate symbols when we need all
     delete $from{$_} for keys %mods;
 
-#   print "from $_ all\n"          for keys %mods;
-#   print "from $_ @{$from{$_}}\n" for keys %from;
+#print "from $_ all\n"          for keys %mods;
+#print "from $_ @{$from{$_}}\n" for keys %from;
 
     my $up = '+' . ($level+1);
     foreach my $tag (keys %mods)     # whole tags
@@ -213,5 +219,6 @@ sub show_posix_names(@)
     print "*** ".(keys %$pkg_of)." symbols in total\n";
 }
 
+#------------
 
 1;

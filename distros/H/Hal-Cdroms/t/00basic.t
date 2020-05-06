@@ -1,5 +1,3 @@
-use Test;
-BEGIN { plan tests => 1 }
-END   { ok($loaded) }
-use Hal::Cdroms;
-$loaded++;
+use Test::More;
+plan tests => 1;
+use_ok('Hal::Cdroms');

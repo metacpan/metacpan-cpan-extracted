@@ -33,6 +33,7 @@
       },
       "runtime" : {
          "requires" : {
+            "DBIx::Util::Schema" : "0",
             "Exporter" : "5.57",
             "List::Util" : "1.45",
             "Log::ger" : "0.037",
@@ -69,7 +70,7 @@
          "web" : "https://github.com/perlancar/perl-DBIx-Diff-Schema"
       }
    },
-   "version" : "0.096",
+   "version" : "0.097",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

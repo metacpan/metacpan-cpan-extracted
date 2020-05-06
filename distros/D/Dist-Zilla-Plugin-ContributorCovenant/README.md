@@ -35,10 +35,11 @@ Kivanc Yazan `<kyzn at cpan.org>`
 # CONTRIBUTORS
 
 Joelle Maslak `<jmaslak at antelope.net>`
+D Ruth Holloway `<ruth at hiruthie.me>`
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Kivanc Yazan.
+This software is copyright (c) 2020 by Kivanc Yazan.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -47,7 +48,7 @@ the same terms as the Perl 5 programming language system itself.
 
 \- This module is based heavily on [Dist::Zilla::Plugin::Covenant](https://metacpan.org/pod/Dist::Zilla::Plugin::Covenant).
 
-\- Covenant text is taken from [https://www.contributor-covenant.org/version/1/4/code-of-conduct.md](https://www.contributor-covenant.org/version/1/4/code-of-conduct.md).
+\- Covenant text is taken from [https://www.contributor-covenant.org/version/2/0/code\_of\_conduct/code\_of\_conduct.md](https://www.contributor-covenant.org/version/2/0/code_of_conduct/code_of_conduct.md).
 
 # SEE ALSO
 

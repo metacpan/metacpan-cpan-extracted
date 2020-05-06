@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2020 -- leonerd@leonerd.org.uk
 
 package IO::Async::LoopTests;
 
@@ -15,6 +15,7 @@ our @EXPORT = qw(
 
 use Test::More;
 use Test::Fatal;
+use Test::Metrics::Any;
 use Test::Refcount;
 
 use IO::Async::Test qw();
@@ -27,7 +28,7 @@ use POSIX qw( SIGTERM );
 use Socket qw( sockaddr_family AF_UNIX );
 use Time::HiRes qw( time );
 
-our $VERSION = '0.75';
+our $VERSION = '0.76';
 
 # Abstract Units of Time
 use constant AUT => $ENV{TEST_QUICK_TIMERS} ? 0.1 : 1;
@@ -89,11 +90,6 @@ sub run_tests
 {
    my ( $testclass, @tests ) = @_;
 
-   my $count = 0;
-   $count += __PACKAGE__->can( "count_tests_$_" )->() + 4 for @tests;
-
-   plan tests => $count;
-
    ( my $file = "$testclass.pm" ) =~ s{::}{/}g;
 
    eval { require $file };
@@ -118,6 +114,8 @@ sub run_tests
 
       is_oneref( $loop, '$loop has refcount 1 finally' );
    }
+
+   done_testing;
 }
 
 sub wait_for(&)
@@ -160,7 +158,6 @@ Tests the Loop's ability to watch filehandles for IO readiness
 
 =cut
 
-use constant count_tests_io => 18;
 sub run_tests_io
 {
    {
@@ -429,7 +426,6 @@ Tests the Loop's ability to handle timer events
 
 =cut
 
-use constant count_tests_timer => 21;
 sub run_tests_timer
 {
    my $done = 0;
@@ -580,7 +576,6 @@ Tests the Loop's ability to watch POSIX signals
 
 =cut
 
-use constant count_tests_signal => 15;
 sub run_tests_signal
 {
    unless( IO::Async::OS->HAVE_SIGNALS ) {
@@ -669,7 +664,6 @@ Tests the Loop's support for idle handlers
 
 =cut
 
-use constant count_tests_idle => 11;
 sub run_tests_idle
 {
    my $called = 0;
@@ -722,9 +716,11 @@ sub run_tests_idle
    is( $called, 4, '$loop->later shortcut works' );
 }
 
-=head2 child
+=head2 process
 
 Tests the Loop's support for watching child processes by PID
+
+(Previously called C<child>)
 
 =cut
 
@@ -738,8 +734,7 @@ sub run_in_child(&)
    die "Fell out of run_in_child!\n";
 }
 
-use constant count_tests_child => 7;
-sub run_tests_child
+sub run_tests_process
 {
    my $kid = run_in_child {
       exit( 3 );
@@ -747,9 +742,9 @@ sub run_tests_child
 
    my $exitcode;
 
-   $loop->watch_child( $kid => sub { ( undef, $exitcode ) = @_; } );
+   $loop->watch_process( $kid => sub { ( undef, $exitcode ) = @_; } );
 
-   is_oneref( $loop, '$loop has refcount 1 after watch_child' );
+   is_oneref( $loop, '$loop has refcount 1 after watch_process' );
    ok( !defined $exitcode, '$exitcode not defined before ->loop_once' );
 
    undef $exitcode;
@@ -772,7 +767,7 @@ sub run_tests_child
          exit( 0 );
       };
 
-      $loop->watch_child( $kid => sub { ( undef, $exitcode ) = @_; } );
+      $loop->watch_process( $kid => sub { ( undef, $exitcode ) = @_; } );
 
       kill SIGTERM, $kid;
 
@@ -784,7 +779,7 @@ sub run_tests_child
 
    my %kids;
 
-   $loop->watch_child( 0 => sub { my ( $kid ) = @_; delete $kids{$kid} } );
+   $loop->watch_process( 0 => sub { my ( $kid ) = @_; delete $kids{$kid} } );
 
    %kids = map { run_in_child { exit 0 } => 1 } 1 .. 3;
 
@@ -792,7 +787,17 @@ sub run_tests_child
 
    wait_for { !keys %kids };
    ok( !keys %kids, 'All child processes reclaimed' );
+
+   # Legacy API name
+   $kid = run_in_child { exit 2 };
+
+   undef $exitcode;
+   $loop->watch_child( $kid => sub { ( undef, $exitcode ) = @_; } );
+   wait_for { defined $exitcode };
+
+   is( ($exitcode >> 8), 2, '$exitcode after child exit from legacy ->watch_child' );
 }
+*run_tests_child = \&run_tests_process; # old name
 
 =head2 control
 
@@ -801,7 +806,6 @@ behave correctly
 
 =cut
 
-use constant count_tests_control => 9;
 sub run_tests_control
 {
    time_between { $loop->loop_once( 0 ) } 0, 0.1, 'loop_once(0) when idle';
@@ -854,6 +858,27 @@ sub run_tests_control
    alarm( 0 );
 
    ok( 1, '$loop->loop_forever interruptable by ->loop_stop' );
+}
+
+=head2 metrics
+
+Tests that metrics are generated appropriately using L<Metrics::Any>.
+
+=cut
+
+sub run_tests_metrics
+{
+   # The very first call won't create timing metrics because it isn't armed yet.
+   $loop->loop_once( 0 );
+
+   is_metrics_from(
+      sub { $loop->loop_once( 0.1 ) },
+      {
+         io_async_processing_count => 1,
+         io_async_processing_total => Test::Metrics::Any::positive,
+      },
+      'loop_once(0) creates timing metrics'
+   );
 }
 
 =head1 AUTHOR

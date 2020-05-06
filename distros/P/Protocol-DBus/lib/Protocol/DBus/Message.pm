@@ -280,6 +280,8 @@ sub _to_string {
 
 =item * Numeric and string types are represented as plain Perl scalars.
 
+=item * All strings are character-decoded.
+
 =item * UNIX_FDs are normally represented as Perl filehandle objects.
 If Protocol::DBus receives a UNIX_FD that doesn’t correspond to a received
 file descriptor, the UNIX_FD will be represented as the number passed in
@@ -303,7 +305,7 @@ methods defined (and aren’t even defined Perl namespaces).
 =over
 
 =item * Use plain Perl scalars to represent all numeric and string types.
-Strings B<MUST> be encoded to UTF-8.
+Strings B<MUST> be character-decoded.
 
 =item * Use plain Perl filehandle objects to represent UNIX_FDs.
 

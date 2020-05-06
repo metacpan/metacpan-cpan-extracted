@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Base;
-$Games::Solitaire::Verify::Base::VERSION = '0.2402';
+$Games::Solitaire::Verify::Base::VERSION = '0.2403';
 use strict;
 use warnings;
 
@@ -59,7 +59,7 @@ Games::Solitaire::Verify::Base - a base class.
 
 =head1 VERSION
 
-version 0.2402
+version 0.2403
 
 =head1 SYNOPSIS
 

@@ -9,6 +9,11 @@ use Cwd;
 
 set_path();
 
+# fix bundled genhdlist2 & co to use the right perl on CPAN smokers:
+system($^X, '-pi', '-e', qq(s@^#!/usr/bin/perl.*@#!$^X@), $_) foreach qw(gendistrib genhdlist2);
+
+my $is_bsd = $Config{archname} =~ /bsd/;
+
 warn ">> RPM version is: ", `LC_ALL=C rpm --version`, "\n";
 
 chdir 't' if -d 't';
@@ -18,7 +23,7 @@ foreach (qw(media tmp tmp/BUILD tmp/RPMS tmp/RPMS/noarch tmp/SRPMS)) {
 }
 my $genhdlist2 = 'genhdlist2 --xml-info';
 
-my $whereis_genhdlist2 = qx(whereis -b genhdlist2);
+my $whereis_genhdlist2 = `whereis -b genhdlist2`;
 $whereis_genhdlist2 =~ s/^genhdlist2:\s+//;
 ok("whereis genhdlist2", "genhdlist2 emplacement=$whereis_genhdlist2");
 
@@ -43,8 +48,8 @@ foreach my $dir (grep { -d $_ } glob("data/SPECS/*")) {
 }
 
 foreach my $spec (glob("data/SPECS/*.spec")) {
-    warn "SKIPPING /rpm-query-in-scriptlet/" if $spec =~ /rpm-query-in-scriptlet/ && $Config{archname} =~ /bsd/;
-    next if $spec =~ /rpm-query-in-scriptlet/ && $Config{archname} =~ /bsd/;
+    warn "SKIPPING /rpm-query-in-scriptlet/" if $spec =~ /rpm-query-in-scriptlet/ && $is_bsd;
+    next if $spec =~ /rpm-query-in-scriptlet/ && $is_bsd;
     my $name = rpmbuild($spec);
 
     if ($name eq 'various') {
@@ -86,11 +91,14 @@ sub rpmbuild {
 
     my $dir = getcwd();
     my ($target) = $spec =~ m!-(i586|x86_64)\.spec$!;
-    $target = $target ? "--target $target" : '';
+    my $extra_args = $target ? "--target $target" : '';
     # unsetting %__os_install_post fixes failure to build on FreeBSD:
-    my $nopost = " --define '__os_install_post %nil'";
-    my $rpmv = "--define 'rpm_version %(rpm -q --queryformat \"%{VERSION}\" rpm|sed -e \"s/\\\\.//g\")' ";
-    system_("rpmbuild --quiet $rpmv --define '_topdir $dir/tmp' --define '_tmppath $dir/tmp' -bb --clean --nodeps $nopost $target $spec");
+    $extra_args .= " --define '__os_install_post %nil'";
+    $extra_args .= qq( --define 'rpm_version %(rpm -q --queryformat "%{VERSION}" rpm|sed -e "s/\\\\.//g")' );
+    # some FreeBSD CPAN smokers sometimes fails with:
+    # error: Couldn't exec /usr/local/lib/rpm/elfdeps: No such file or directory
+    $extra_args .= " --define '__elf_provides %nil' --define '__elf_requires %nil'" if $is_bsd;
+    system_("rpmbuild --quiet --define '_topdir $dir/tmp' --define '_tmppath $dir/tmp' -bb --clean --nodeps $extra_args $spec");
 
     my ($name) = $spec =~ m!([^/]*)\.spec$!;
 

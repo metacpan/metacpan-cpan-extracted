@@ -4,11 +4,6 @@
 
 POSIX::1003::Locale - POSIX handling locale settings
 
-=head1 INHERITANCE
-
- POSIX::1003::Locale
-   is a POSIX::1003::Module
-
 =head1 SYNOPSIS
 
   use POSIX::1003::Locale;
@@ -21,24 +16,6 @@ POSIX::1003::Locale - POSIX handling locale settings
 
 See L<perllocale> for the details.
 
-See L<documentation in the base class|POSIX::1003::Module/"DESCRIPTION">.
- 
-=head1 METHODS
-
-See L<documentation in the base class|POSIX::1003::Module/"METHODS">.
- 
-=over 4
-
-=item POSIX::1003::Locale-E<gt>B<exampleValue>(NAME)
-
-See L<POSIX::1003::Module/"METHODS">
-
-=item $obj-E<gt>B<import>()
-
-See L<POSIX::1003::Module/"METHODS">
-
-=back
-
 =head1 FUNCTIONS
 
 =over 4
@@ -50,7 +27,7 @@ Get detailed information about the current locale
   my $info     = localeconv();            # is HASH
   print Dumper $info;  # use Data::Dumper to inspect
 
-=item B<setlocale>()
+=item B<setlocale>($lc, $lang)
 
 Locales describe national and language specific facts.  With
 L<setlocale()|POSIX::1003::Locale/"FUNCTIONS"> you change the locale.
@@ -61,28 +38,27 @@ L<setlocale()|POSIX::1003::Locale/"FUNCTIONS"> you change the locale.
 
 =head1 CONSTANTS
 
-=head2 Constants from limits.h
+=for comment
+#TABLE_LOCALE_START
 
-  MB_LEN_MAX   Max multi-byte length of a char across all locales
+  During installation, a symbol table will get inserted here.
 
-=head2 Constants from locale.h
-
-  LC_ALL LC_COLLATE LC_CTYPE LC_MESSAGES LC_MONETARY LC_NUMERIC
-  LC_TIME
+=for comment
+#TABLE_LOCALE_END
 
 =head1 SEE ALSO
 
-This module is part of POSIX-1003 distribution version 0.98,
-built on December 03, 2013. Website: F<http://perl.overmeer.net>.  The code is based on L<POSIX>, which
+This module is part of POSIX-1003 distribution version 1.00,
+built on May 05, 2020. Website: F<http://perl.overmeer.net/CPAN>.  The code is based on L<POSIX>, which
 is released with Perl itself.  See also L<POSIX::Util> for
 additional functionality.
 
 =head1 COPYRIGHTS
 
-Copyrights 2011-2013 on the perl code and the related documentation
+Copyrights 2011-2020 on the perl code and the related documentation
  by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

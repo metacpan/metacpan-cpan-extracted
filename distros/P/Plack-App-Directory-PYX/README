@@ -18,7 +18,9 @@ METHODS
 
     *   "indent"
 
-        Set indent of SGML output.
+        Set Tags::Output::* class for output serialization.
+
+        Default value is Tags::Output::Raw.
 
   "serve_path"
      my $psgi_ar = $obj->serve_path($env, $path_to_file_or_dir);
@@ -105,7 +107,7 @@ EXAMPLE2
      # Run application with one PYX file.
      my $app = Plack::App::Directory::PYX->new(
              'file' => $temp_pyx_file,
-             'indent' => 1,
+             'indent' => 'Tags::Output::Indent',
      )->to_app;
      Plack::Runner->new->run($app);
 
@@ -127,8 +129,8 @@ EXAMPLE2
      # </html>
 
 DEPENDENCIES
-    Plack::App::Directory, PYX::SGML::Tags, Tags::Output::Raw,
-    Unicode::UTF8,
+    English, Error::Pure, Plack::App::Directory, Plack::Util::Accessor,
+    PYX::SGML::Tags, Tags::Output::Raw, Unicode::UTF8,
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/Plack-App-Directory-PYX>
@@ -144,5 +146,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

@@ -1,0 +1,145 @@
+use 5.010;
+use alienfile;
+use Sort::Versions;
+
+my $on_windows = $^O =~ /mswin/i;
+my $on_automated_rig
+  =  $ENV{PERL_CPAN_REPORTER_DIR}
+  || $ENV{PERL_CPAN_REPORTER_CONFIG}
+  || $ENV{AUTOMATED_TESTING}
+  || $ENV{TRAVIS}
+  || $ENV{APPVEYOR};
+  #|| $ENV{CI};
+
+
+use Cwd;
+my $base_dir = getcwd();
+
+use Env qw { @PATH };
+
+
+my $min_target_version = '4.0.0';
+
+plugin 'PkgConfig' => (
+    pkg_name => 'libtiff-4',
+    minimum_version => $min_target_version,
+);
+
+
+share {
+
+  my $with_local = '';
+  my $with_cpp11 = '';
+
+  #  need to work out how to get latest without updating next lines
+  start_url 'https://download.osgeo.org/libtiff/';
+  plugin Download => (
+    filter  => qr/^tiff-([0-9\.]+)\.tar\.gz$/,
+    version => qr/^tiff-([0-9\.]+)\.tar\.gz$/,
+  );
+
+
+  
+  my $lib_version = get_lib_version() // 'not yet defined';
+  say "Downloaded version is $lib_version";
+  
+  plugin Extract => (format => 'tar.gz');
+
+
+  plugin 'Build::Autoconf' => ();
+
+  my $build_static = ($^O =~ /mswin/i) ? '' : '--disable-shared';
+  $build_static = '';
+  $build_static = '--enable-static=no';  #  override - needed?  leftover from gdal
+  $build_static = '' if $ENV{FORCE_DYNAMIC};
+  
+  
+  if ($^O =~ /bsd/) {
+    plugin 'Build::Make' => 'gmake';
+    if (-d '/usr/local') {
+        $with_local = ' --with-local=/usr/local ';
+    }
+  }
+  elsif ($^O =~ /dragonfly/) {
+    #  might need to be combined with bsd check above
+    #  but not sure if /usr/local is needed yet
+    plugin 'Build::Make' => 'gmake';
+  }
+
+  my $make_cmd = '%{make}';
+  my $make_inst_cmd = '%{make} install';
+  my @make_clean;
+  #  try not to exceed the cpan-testers log limits
+  if ($on_automated_rig) {
+    say "Running under CI or automated testing";
+    $make_cmd      .= q/ | perl -ne "BEGIN {$|=1; open our $log, q|>|, q|build.log|};   print qq|\n| if 0 == ($. %% 100); print q|.|; print {$log} $_;" || type build.log/;
+    $make_inst_cmd .= q/ | perl -ne "BEGIN {$|=1; open our $log, q|>|, q|install.log|}; print qq|\n| if 0 == ($. %% 100); print q|.|; print {$log} $_;" || type install.log/;
+    if (!$on_windows) {
+        $make_cmd =~ s/%%/%/;
+        $make_cmd =~ s/type/cat/;
+        $make_cmd =~ s/"/'/g;
+        $make_inst_cmd =~ s/%%/%/;
+        $make_inst_cmd =~ s/type/cat/;
+        $make_inst_cmd =~ s/"/'/g;
+    }
+    #if (! ($ENV{TRAVIS} || $ENV{APPVEYOR})) {
+    #    push @make_clean, '%{make} clean';
+    #}
+    #  clean up the build dir on cpan testers etc
+    plugin 'Cleanse::BuildDir';
+  }
+  
+  ##  remove any git utils from the path
+  ##say join ' ', @PATH;
+  #my $have_git_in_path = grep {$_ =~ m|Git[/\\]usr[/\\]bin|} @PATH;
+  #if ($on_windows && $have_git_in_path) {
+  #  warn 'Found Git/usr/bin in path and removed it for compilation';
+  #  #say $ENV{PATH};
+  #  @PATH = grep {not $_ =~ m|Git[/\\]usr[/\\]bin$|} @PATH;
+  #  #say $ENV{PATH};
+  #}
+
+  build [
+    "%{configure} $with_local $with_cpp11 $build_static",
+    \&pause,
+    $make_cmd,
+    $make_inst_cmd,
+    #@make_clean,
+  ];
+
+};
+
+sub pause {
+    return;  #  re-enable in case of debug
+    return if $on_automated_rig;
+    return if !$on_windows;
+
+    say "CONTINUE?";
+    my $response = <>;
+    while (not $response =~ /yes/) {
+        $response = <>;
+    }
+}
+
+
+sub get_lib_version {
+    my $h = get_alien_state_hash();
+    return $h->{runtime}{version};
+}
+
+sub get_alien_state_hash {
+    use JSON::PP;
+    my $root = "$base_dir/_alien";
+    my $f = "$root/state.json";
+    my $h = {};
+    if (-e $f) {
+        open my $fh, '<', $f or die $!;
+        my $d = do {
+            local $/ = undef;
+            <$fh>;
+        };
+        $h = JSON::PP::decode_json($d);
+    }
+    return $h;
+}
+

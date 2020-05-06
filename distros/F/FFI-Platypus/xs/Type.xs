@@ -43,6 +43,173 @@ sizeof(self)
   OUTPUT:
     RETVAL
 
+SV*
+unitof(self)
+    ffi_pl_type *self
+  PREINIT:
+    int type_code;
+  CODE:
+    type_code = self->type_code;
+
+    /* ignore custom asoect */
+    if((type_code & FFI_PL_SHAPE_MASK) == FFI_PL_SHAPE_CUSTOM_PERL)
+    {
+      type_code ^= FFI_PL_SHAPE_CUSTOM_PERL;
+    }
+
+    switch(type_code)
+    {
+      case FFI_PL_TYPE_SINT8 | FFI_PL_SHAPE_POINTER:
+      case FFI_PL_TYPE_SINT8 | FFI_PL_SHAPE_ARRAY:
+        XSRETURN_PV("sint8");
+      case FFI_PL_TYPE_UINT8 | FFI_PL_SHAPE_POINTER:
+      case FFI_PL_TYPE_UINT8 | FFI_PL_SHAPE_ARRAY:
+        XSRETURN_PV("uint8");
+      case FFI_PL_TYPE_SINT16 | FFI_PL_SHAPE_POINTER:
+      case FFI_PL_TYPE_SINT16 | FFI_PL_SHAPE_ARRAY:
+        XSRETURN_PV("sint16");
+      case FFI_PL_TYPE_UINT16 | FFI_PL_SHAPE_POINTER:
+      case FFI_PL_TYPE_UINT16 | FFI_PL_SHAPE_ARRAY:
+        XSRETURN_PV("uint16");
+      case FFI_PL_TYPE_SINT32 | FFI_PL_SHAPE_POINTER:
+      case FFI_PL_TYPE_SINT32 | FFI_PL_SHAPE_ARRAY:
+        XSRETURN_PV("sint32");
+      case FFI_PL_TYPE_UINT32 | FFI_PL_SHAPE_POINTER:
+      case FFI_PL_TYPE_UINT32 | FFI_PL_SHAPE_ARRAY:
+        XSRETURN_PV("uint32");
+      case FFI_PL_TYPE_SINT64 | FFI_PL_SHAPE_POINTER:
+      case FFI_PL_TYPE_SINT64 | FFI_PL_SHAPE_ARRAY:
+        XSRETURN_PV("sint64");
+      case FFI_PL_TYPE_UINT64 | FFI_PL_SHAPE_POINTER:
+      case FFI_PL_TYPE_UINT64 | FFI_PL_SHAPE_ARRAY:
+        XSRETURN_PV("uint64");
+      case FFI_PL_TYPE_FLOAT | FFI_PL_SHAPE_POINTER:
+      case FFI_PL_TYPE_FLOAT | FFI_PL_SHAPE_ARRAY:
+        XSRETURN_PV("float");
+      case FFI_PL_TYPE_DOUBLE | FFI_PL_SHAPE_POINTER:
+      case FFI_PL_TYPE_DOUBLE | FFI_PL_SHAPE_ARRAY:
+        XSRETURN_PV("double");
+#ifdef FFI_PL_PROBE_LONGDOUBLE
+      case FFI_PL_TYPE_LONG_DOUBLE | FFI_PL_SHAPE_POINTER:
+      case FFI_PL_TYPE_LONG_DOUBLE | FFI_PL_SHAPE_ARRAY:
+        XSRETURN_PV("longdouble");
+#endif
+#ifdef FFI_PL_PROBE_COMPLEX
+      case FFI_PL_TYPE_COMPLEX_FLOAT | FFI_PL_SHAPE_POINTER:
+      case FFI_PL_TYPE_COMPLEX_FLOAT | FFI_PL_SHAPE_ARRAY:
+        XSRETURN_PV("complex_float");
+
+      case FFI_PL_TYPE_COMPLEX_DOUBLE | FFI_PL_SHAPE_POINTER:
+      case FFI_PL_TYPE_COMPLEX_DOUBLE | FFI_PL_SHAPE_ARRAY:
+        XSRETURN_PV("complex_double");
+#endif
+      default:
+        XSRETURN_UNDEF;
+    }
+
+const char *
+kindof(self)
+    ffi_pl_type *self
+  PREINIT:
+    int type_code;
+  CODE:
+    type_code = self->type_code;
+
+    /* ignore custom asoect */
+    if((type_code & FFI_PL_SHAPE_MASK) == FFI_PL_SHAPE_CUSTOM_PERL)
+    {
+      type_code ^= FFI_PL_SHAPE_CUSTOM_PERL;
+    }
+
+    switch(type_code)
+    {
+      case FFI_PL_TYPE_VOID :
+        RETVAL = "void";
+        break;
+
+      case FFI_PL_TYPE_SINT8:
+      case FFI_PL_TYPE_UINT8:
+      case FFI_PL_TYPE_SINT16:
+      case FFI_PL_TYPE_UINT16:
+      case FFI_PL_TYPE_SINT32:
+      case FFI_PL_TYPE_UINT32:
+      case FFI_PL_TYPE_SINT64:
+      case FFI_PL_TYPE_UINT64:
+      case FFI_PL_TYPE_FLOAT:
+      case FFI_PL_TYPE_DOUBLE:
+      case FFI_PL_TYPE_LONG_DOUBLE:
+      case FFI_PL_TYPE_COMPLEX_FLOAT:
+      case FFI_PL_TYPE_COMPLEX_DOUBLE:
+      case FFI_PL_TYPE_OPAQUE:
+        RETVAL = "scalar";
+        break;
+
+      case FFI_PL_TYPE_STRING:
+        RETVAL = "string";
+        break;
+
+      case FFI_PL_TYPE_CLOSURE:
+        RETVAL = "closure";
+        break;
+
+      case FFI_PL_TYPE_RECORD:
+        RETVAL = "record";
+        break;
+
+      case FFI_PL_TYPE_RECORD_VALUE:
+        RETVAL = "record-value";
+        break;
+
+      default:
+        switch(type_code & FFI_PL_SHAPE_MASK)
+        {
+          case FFI_PL_SHAPE_POINTER:
+            RETVAL = "pointer";
+            break;
+          case FFI_PL_SHAPE_ARRAY:
+            RETVAL = "array";
+            break;
+          case FFI_PL_SHAPE_OBJECT:
+            RETVAL = "object";
+            break;
+          default:
+            croak("internal error computing type kind (%x)", type_code);
+        }
+    }
+  OUTPUT:
+    RETVAL
+
+int
+countof(self)
+    ffi_pl_type *self
+  CODE:
+    switch(self->type_code & FFI_PL_SHAPE_MASK)
+    {
+      case FFI_PL_SHAPE_SCALAR:
+      case FFI_PL_SHAPE_POINTER:
+      case FFI_PL_SHAPE_CUSTOM_PERL:
+      case FFI_PL_SHAPE_OBJECT:
+        switch(self->type_code)
+        {
+          case FFI_PL_TYPE_VOID:
+            RETVAL = 0;
+            break;
+          default:
+            RETVAL = 1;
+            break;
+        }
+        break;
+
+      case FFI_PL_SHAPE_ARRAY:
+        RETVAL = self->extra[0].array.element_count;
+        break;
+
+      default:
+        croak("internal error computing type kind (%x)", self->type_code);
+    }
+  OUTPUT:
+    RETVAL
+
 int
 type_code(self)
     ffi_pl_type *self
@@ -56,7 +223,8 @@ is_record(self)
     ffi_pl_type *self
   CODE:
     /* may not need this method anymore */
-    RETVAL = self->type_code == FFI_PL_TYPE_RECORD;
+    RETVAL = self->type_code == FFI_PL_TYPE_RECORD
+    ||       self->type_code == (FFI_PL_TYPE_RECORD | FFI_PL_SHAPE_CUSTOM_PERL);
   OUTPUT:
     RETVAL
 
@@ -64,7 +232,28 @@ int
 is_record_value(self)
     ffi_pl_type *self
   CODE:
-    RETVAL = self->type_code == FFI_PL_TYPE_RECORD_VALUE;
+    RETVAL = self->type_code == FFI_PL_TYPE_RECORD_VALUE
+    ||       self->type_code == (FFI_PL_TYPE_RECORD_VALUE | FFI_PL_SHAPE_CUSTOM_PERL);
+  OUTPUT:
+    RETVAL
+
+int
+is_customizable(self)
+    ffi_pl_type *self
+  PREINIT:
+    int shape;
+    int base;
+  CODE:
+    shape = self->type_code & FFI_PL_SHAPE_MASK;
+    base  = self->type_code & FFI_PL_BASE_MASK;
+    RETVAL = shape == FFI_PL_SHAPE_SCALAR
+          && (   base == FFI_PL_BASE_SINT
+              || base == FFI_PL_BASE_UINT
+              || base == FFI_PL_BASE_FLOAT
+              || base == FFI_PL_BASE_OPAQUE
+              || base == FFI_PL_BASE_RECORD
+              || base == (FFI_PL_BASE_RECORD | FFI_PL_BASE_OPAQUE)
+             );
   OUTPUT:
     RETVAL
 
@@ -103,9 +292,11 @@ DESTROY(self)
       if(!PL_dirty)
         Safefree(self->extra[0].closure.ffi_cif.arg_types);
     }
-    else if(self->type_code == FFI_PL_TYPE_RECORD_VALUE)
+    else if(self->type_code == FFI_PL_TYPE_RECORD
+    ||      self->type_code == FFI_PL_TYPE_RECORD_VALUE)
     {
-      Safefree(self->extra[0].record_value.class);
+      if(self->extra[0].record.class != NULL)
+        free(self->extra[0].record.class);
     }
     else
     {
@@ -123,12 +314,14 @@ DESTROY(self)
               SvREFCNT_dec(custom->perl_to_native_post);
             if(custom->native_to_perl != NULL)
               SvREFCNT_dec(custom->native_to_perl);
+            if(self->extra[0].record.class != NULL)
+              free(self->extra[0].record.class);
           }
           break;
         case FFI_PL_SHAPE_OBJECT:
           {
             if(self->extra[0].object.class != NULL)
-              Safefree(self->extra[0].object.class);
+              free(self->extra[0].object.class);
           }
           break;
         default:

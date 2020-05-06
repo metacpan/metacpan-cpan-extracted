@@ -17,6 +17,7 @@ my $base_dir = getcwd();
 #  make libtool noisy for debug purposes
 #$ENV{LTFLAGS} = "--debug --verbose" if $on_windows;
 
+use Env qw { @PATH };
 
 
 my $min_target_version = '3.26.0';
@@ -37,6 +38,7 @@ share {
   plugin Download => (
     version => '3.31.1',
   );
+
   
   my $lib_version = get_lib_version() // 'not yet defined';
   say "Downloaded version is $lib_version";
@@ -87,6 +89,16 @@ share {
     plugin 'Cleanse::BuildDir';
   }
   
+  #  remove any git utils from the path
+  #say join ' ', @PATH;
+  my $have_git_in_path = grep {$_ =~ m|Git[/\\]usr[/\\]bin|} @PATH;
+  if ($on_windows && $have_git_in_path) {
+    warn 'Found Git/usr/bin in path and removed it for compilation';
+    #say $ENV{PATH};
+    @PATH = grep {not $_ =~ m|Git[/\\]usr[/\\]bin$|} @PATH;
+    #say $ENV{PATH};
+  }
+
   build [
     "%{configure} $with_local $with_cpp11 $build_static",
     \&pause,

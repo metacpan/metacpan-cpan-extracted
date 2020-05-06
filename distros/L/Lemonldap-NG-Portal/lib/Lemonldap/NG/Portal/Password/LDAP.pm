@@ -29,12 +29,23 @@ sub confirm {
 sub modifyPassword {
     my ( $self, $req, $pwd ) = @_;
     my $dn;
+    my $requireOldPassword;
+    my $rule = $self->p->HANDLER->buildSub(
+        $self->p->HANDLER->substitute(
+            $self->conf->{portalRequireOldPassword}
+        )
+    );
+    unless ($rule) {
+        my $error = $self->p->HANDLER->tsv->{jail}->error || '???';
+    }
     if ( $req->userData->{_dn} ) {
         $dn = $req->userData->{_dn};
+        $requireOldPassword = $rule->( $req, $req->userData );
         $self->logger->debug("Get DN from request data: $dn");
     }
     else {
         $dn = $req->sessionInfo->{_dn};
+        $requireOldPassword = $rule->( $req, $req->sessionInfo );
         $self->logger->debug("Get DN from session data: $dn");
     }
     unless ($dn) {
@@ -48,7 +59,7 @@ sub modifyPassword {
 
     # Call the modify password method
     my $code =
-      $self->ldap->userModifyPassword( $dn, $pwd, $req->data->{oldpassword} );
+      $self->ldap->userModifyPassword( $dn, $pwd, $req->data->{oldpassword}, 0 , $requireOldPassword );
 
     unless ( $code == PE_PASSWORD_OK ) {
         return $code;

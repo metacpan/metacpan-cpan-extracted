@@ -29,7 +29,13 @@ ok(!defined $path4);
 
 use POSIX::1003::Confstr qw(confstr_names);
 my @names = confstr_names;
-cmp_ok(scalar @names, '>', 10, @names." names");
+if($^O eq 'openbsd')
+{   # there is only 1 name defined in openbsd
+    cmp_ok(scalar @names, '>=', 1, @names." names on $^O");
+}
+else
+{   cmp_ok(scalar @names, '>', 10, @names." names");
+}
 
 my $undefd = 0;
 foreach my $name (sort @names)

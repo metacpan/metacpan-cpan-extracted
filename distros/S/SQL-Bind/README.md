@@ -18,10 +18,16 @@ SQL::Bind - SQL flexible placeholders
     # Hashes
     my ($sql, @bind) = sql 'UPDATE bar SET :columns', columns => {foo => 'bar'};
 
-    # Raw values
+    # Raw values (!)
     my ($sql, @bind) = sql 'INSERT INTO bar (:keys!) VALUES (:values)',
       keys   => [qw/foo/],
       values => [qw/bar/];
+
+    # Recursive binding (*)
+    my ($sql, @bind) =
+      sql 'SELECT foo FROM bar WHERE :recursive_query*',
+      recursive_query => 'name = :name',
+      name            => 'hello';
 
 # DESCRIPTION
 
@@ -40,7 +46,7 @@ A placeholders is an alphanumeric sequence that is prefixed with `:` and can end
 
 ## `Scalar values`
 
-Every value is replace with a `?`.
+Every value is replaced with a `?`.
 
     my ($sql, @bind) =
       sql 'SELECT foo FROM bar WHERE id=:id AND status=:status',
@@ -79,6 +85,18 @@ a placeholder should be suffixed with a `!`.
 
     # INSERT INTO bar (foo) VALUES (?)
     # ['bar']
+
+## `Recursive binding`
+
+Recursive binding allows you to recursively parse already replaced values. This helps building complex subqueries.
+
+    my ($sql, @bind) =
+      sql 'SELECT foo FROM bar WHERE :recursive_query*',
+      recursive_query => 'name = :name',
+      name            => 'hello';
+
+    # 'SELECT foo FROM bar WHERE name = ?
+    # ['hello']
 
 # DEVELOPMENT
 

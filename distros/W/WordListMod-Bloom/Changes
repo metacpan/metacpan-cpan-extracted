@@ -1,0 +1,13 @@
+0.003   2020-05-01  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module {WordList::Mod,WordListMod}::BinarySearch.
+
+
+0.002   2018-04-02  Released-By: PERLANCAR
+
+	- Croak if given a dynamic wordlist.
+
+
+0.001   2018-04-02  Released-By: PERLANCAR
+
+        - First release.

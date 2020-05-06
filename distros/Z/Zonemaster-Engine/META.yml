@@ -26,16 +26,17 @@ no_index:
     - share
     - t
 recommends:
+  Net::IP::XS: 0
   Readonly::XS: 0
 requires:
   Clone: 0
+  Email::Valid: 0
   File::ShareDir: 1
   File::Slurp: 0
   IO::Socket::INET6: 2.69
   JSON::PP: 0
   List::MoreUtils: 0
-  Locale::TextDomain: 1.23
-  Mail::RFC822::Address: 0
+  Locale::TextDomain: 1.2
   Module::Find: 0.1
   Moose: 2.0401
   Net::IP: 1.26
@@ -47,4 +48,4 @@ resources:
   bugtracker: https://github.com/zonemaster/zonemaster-engine/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/zonemaster/zonemaster-engine
-version: '3.000003'
+version: '3.001000'

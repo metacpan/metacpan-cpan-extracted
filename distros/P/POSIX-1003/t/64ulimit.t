@@ -3,13 +3,22 @@ use lib 'lib', 'blib/lib', 'blib/arch';
 use warnings;
 use strict;
 
-use Test::More tests => 12;
+use Test::More;
 
 use POSIX::1003::Limit qw(ulimit %ulimit UL_GETFSIZE);
 
+BEGIN {
+   keys %ulimit
+       or plan skip_all => "ulimit not supported on $^O";
+
+   $^O ne 'openbsd'
+       or plan skip_all => "ulimit quite different on $^O";
+
+   plan tests => 12;
+}
+
 my $fsize = ulimit('UL_GETFSIZE');
 ok(defined $fsize, "UL_GETFSIZE via function = $fsize");
-if(!$fsize) {diag("key $_") for keys %ulimit}  # debug NetBSD
 
 my $fsize2 = UL_GETFSIZE;
 ok(defined $fsize2, "UL_GETFSIZE directly = $fsize2");

@@ -50,6 +50,7 @@
             "Pegex" : "0.64",
             "Return::Type" : "0",
             "Type::Tiny" : "0",
+            "curry" : "0",
             "perl" : "5.014"
          },
          "suggests" : {
@@ -80,6 +81,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#graphql-perl"
    },
-   "version" : "0.38",
+   "version" : "0.39",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

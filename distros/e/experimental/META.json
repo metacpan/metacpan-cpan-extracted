@@ -45,7 +45,7 @@
    "provides" : {
       "experimental" : {
          "file" : "lib/experimental.pm",
-         "version" : "0.021"
+         "version" : "0.022"
       }
    },
    "release_status" : "stable",
@@ -60,7 +60,7 @@
          "web" : "https://github.com/Dual-Life/experimental"
       }
    },
-   "version" : "0.021",
+   "version" : "0.022",
    "x_contributors" : [
       "brian greenfield <0briang0@gmail.com>",
       "Dagfinn Ilmari Manns\u00e5ker <ilmari@ilmari.org>",

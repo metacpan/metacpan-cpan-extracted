@@ -50,7 +50,7 @@ ok(
 ( $host, $url, $query ) =
   expectForm( $res, '#', undef, 'user', 'password', 'token' );
 
-ok( $res->[2]->[0] =~ /<span trmsg="5"><\/span><\/div>/,
+ok( $res->[2]->[0] =~ /<span trmsg="5">/,
     'dalek rejected with PE_BADCREDENTIALS' )
   or print STDERR Dumper( $res->[2]->[0] );
 

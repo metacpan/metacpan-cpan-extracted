@@ -7,7 +7,7 @@ use JSON;
 use Plack::Request;
 use URI::Escape;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.8';
 
 our @ISA = ('Plack::Request');
 
@@ -49,7 +49,8 @@ sub userData {
     return $self->{userData}
       || {
         ( $Lemonldap::NG::Handler::Main::tsv->{whatToTrace}
-              || '_whatToTrace' ) => $self->{user}, };
+              || '_whatToTrace' ) => $self->{user},
+      };
 }
 
 sub respHeaders {
@@ -68,6 +69,7 @@ sub encodings     { $_[0]->env->{HTTP_ACCEPT_ENCODING} }
 sub languages     { $_[0]->env->{HTTP_ACCEPT_LANGUAGE} }
 sub authorization { $_[0]->env->{HTTP_AUTHORIZATION} }
 sub hostname      { $_[0]->env->{HTTP_HOST} }
+sub origin        { $_[0]->env->{HTTP_ORIGIN} }
 sub referer       { $_[0]->env->{REFERER} }
 sub query_string  { $_[0]->env->{QUERY_STRING} }
 
@@ -126,18 +128,18 @@ PSGIs
 =head1 SYNOPSIS
 
   package My::PSGI;
-  
+
   use base Lemonldap::NG::Common::PSGI;
-  
+
   # See Lemonldap::NG::Common::PSGI
   ...
-  
+
   sub handler {
     my ( $self, $req ) = @_;
     # Do something and return a PSGI response
     # NB: $req is a Lemonldap::NG::Common::PSGI::Request object
     if ( $req->accept eq 'text/plain' ) { ... }
-    
+
     return [ 200, [ 'Content-Type' => 'text/plain' ], [ 'Body lines' ] ];
   }
 

@@ -1211,7 +1211,7 @@
       "id": "cookieExpiration",
       "title": "cookieExpiration",
       "type": "int",
-      "data": "a"
+      "data": 0
     }]
   }, {
     "id": "sessionParams",
@@ -1328,12 +1328,6 @@
         "type": "bool",
         "data": 0
       }, {
-        "default": 0,
-        "id": "singleSessionUserByIP",
-        "title": "singleSessionUserByIP",
-        "type": "bool",
-        "data": 0
-      }, {
         "default": 1,
         "id": "notifyDeleted",
         "title": "notifyDeleted",
@@ -1380,6 +1374,12 @@
     "id": "reloadUrls",
     "title": "reloadUrls",
     "type": "keyTextContainer"
+  }, {
+    "default": 0,
+    "id": "compactConf",
+    "title": "compactConf",
+    "type": "bool",
+    "data": 1
   }, {
     "id": "advancedParams",
     "title": "advancedParams",

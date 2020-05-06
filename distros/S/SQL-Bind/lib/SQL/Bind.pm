@@ -4,15 +4,23 @@ use warnings;
 use base 'Exporter';
 our @EXPORT_OK = qw(sql);
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 sub sql {
     my ($sql, %params) = @_;
 
     my @bind;
 
-    $sql =~ s{:([a-z_][a-z0-9_]*)(!)?}{
-        my ($replacement, @subbind) = _replace($1, $2, %params);
+    $sql =~ s{:([a-z_][a-z0-9_]*)(!|\*)?}{
+        my $options = $2
+          ? {
+            {
+                '!' => 'raw',
+                '*' => 'recursive'
+            }->{$2} => 1
+          }
+          : {};
+        my ($replacement, @subbind) = _replace($1, $options, %params);
 
         push @bind, @subbind;
 
@@ -23,7 +31,7 @@ sub sql {
 }
 
 sub _replace {
-    my ($placeholder, $raw, %params) = @_;
+    my ($placeholder, $options, %params) = @_;
 
     my @bind;
 
@@ -34,7 +42,7 @@ sub _replace {
     }
 
     if (ref $params{$placeholder} eq 'HASH') {
-        if ($raw) {
+        if ($options->{raw}) {
             $replacement = join ', ', map { $_ . '=' . $params{$placeholder}->{$_} }
               keys %{$params{$placeholder}};
         }
@@ -44,7 +52,7 @@ sub _replace {
         }
     }
     elsif (ref $params{$placeholder} eq 'ARRAY') {
-        if ($raw) {
+        if ($options->{raw}) {
             $replacement = join ', ', @{$params{$placeholder}};
         }
         else {
@@ -53,8 +61,14 @@ sub _replace {
         }
     }
     else {
-        if ($raw) {
+        if ($options->{raw}) {
             $replacement = $params{$placeholder};
+        }
+        elsif ($options->{recursive}) {
+            my ($subsql, @subbind) = sql($params{$placeholder}, %params);
+
+            $replacement = $subsql;
+            push @bind, @subbind;
         }
         else {
             $replacement = '?';
@@ -88,10 +102,16 @@ SQL::Bind - SQL flexible placeholders
     # Hashes
     my ($sql, @bind) = sql 'UPDATE bar SET :columns', columns => {foo => 'bar'};
 
-    # Raw values
+    # Raw values (!)
     my ($sql, @bind) = sql 'INSERT INTO bar (:keys!) VALUES (:values)',
       keys   => [qw/foo/],
       values => [qw/bar/];
+
+    # Recursive binding (*)
+    my ($sql, @bind) =
+      sql 'SELECT foo FROM bar WHERE :recursive_query*',
+      recursive_query => 'name = :name',
+      name            => 'hello';
 
 =head1 DESCRIPTION
 
@@ -110,7 +130,7 @@ A placeholders is an alphanumeric sequence that is prefixed with C<:> and can en
 
 =head2 C<Scalar values>
 
-Every value is replace with a C<?>.
+Every value is replaced with a C<?>.
 
     my ($sql, @bind) =
       sql 'SELECT foo FROM bar WHERE id=:id AND status=:status',
@@ -149,6 +169,18 @@ a placeholder should be suffixed with a C<!>.
 
     # INSERT INTO bar (foo) VALUES (?)
     # ['bar']
+
+=head2 C<Recursive binding>
+
+Recursive binding allows you to recursively parse already replaced values. This helps building complex subqueries.
+
+    my ($sql, @bind) =
+      sql 'SELECT foo FROM bar WHERE :recursive_query*',
+      recursive_query => 'name = :name',
+      name            => 'hello';
+
+    # 'SELECT foo FROM bar WHERE name = ?
+    # ['hello']
 
 =head1 DEVELOPMENT
 

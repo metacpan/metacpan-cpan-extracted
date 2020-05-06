@@ -26,8 +26,9 @@ my $client = LLNG::Manager::Test->new( {
             checkUserDisplayPersistentInfo => 0,
             checkUserDisplayEmptyValues    => 0,
             impersonationMergeSSOgroups    => 0,
-            checkUserHiddenAttributes      => '_loginHistory hGroups',
-            macros                         => {
+            checkUserHiddenAttributes =>
+              '_loginHistory hGroups _session_id _session_kind',
+            macros => {
                 test_impersonation => '"$testPrefix__user/$_user"',
                 _whatToTrace =>
                   '$_auth eq "SAML" ? "$_user@$_idpConfKey" : $_user',
@@ -54,7 +55,7 @@ ok(
     ),
     'Auth query'
 );
-ok( $res->[2]->[0] =~ m%<span trmsg="40"></span>%, ' PE40 found' )
+ok( $res->[2]->[0] =~ m%<span trmsg="40">%, ' PE40 found' )
   or explain( $res->[2]->[0], "PE40 - Bad formed user" );
 count(2);
 
@@ -82,7 +83,7 @@ ok(
 );
 ok(
     $res->[2]->[0] =~
-m%<div class="message message-negative alert"><span trmsg="5"></span></div>%,
+m%<div class="message message-negative alert"><span trmsg="5">%,
     ' PE5 found'
 ) or explain( $res->[2]->[0], "PE5 - Forbidden identity" );
 count(2);
@@ -111,7 +112,7 @@ ok(
 );
 ok(
     $res->[2]->[0] =~
-m%<div class="message message-negative alert"><span trmsg="93"></span></div>%,
+m%<div class="message message-negative alert"><span trmsg="93">%,
     ' PE93 found'
 ) or explain( $res->[2]->[0], "PE93 - Impersonation service not allowed" );
 count(2);
@@ -286,10 +287,6 @@ m%<div class="alert alert-success"><div class="text-center"><b><span trspan="all
 ok( $res->[2]->[0] =~ m%<span trspan="headers">%, 'Found trspan="headers"' )
   or explain( $res->[2]->[0], 'trspan="headers"' );
 
-ok( $res->[2]->[0] !~ m%<span trspan="groups_sso">%,
-    'trspan="groups_sso" NOT found' )
-  or explain( $res->[2]->[0], 'trspan="groups_sso"' );
-
 ok( $res->[2]->[0] =~ m%<span trspan="macros">%, 'Found trspan="macros"' )
   or explain( $res->[2]->[0], 'trspan="macros"' );
 ok( $res->[2]->[0] =~ m%<span trspan="attributes">%,
@@ -308,7 +305,7 @@ ok( $res->[2]->[0] =~ m%<td scope="row">_whatToTrace</td>%,
 ok( $res->[2]->[0] =~ m%<td scope="row">testPrefix_groups</td>%,
     'Found testPrefix_groups' )
   or explain( $res->[2]->[0], 'testPrefix_groups' );
-ok( $res->[2]->[0] =~ m%<td scope="row">su; su_test; test_su</td>%,
+ok( $res->[2]->[0] =~ m%<td scope="row">[^<]*su; su_test; test_su</td>%,
     'Found "su; su_test; test_su"' )
   or explain( $res->[2]->[0], 'su' );
 ok( $res->[2]->[0] =~ m%<td scope="row">testPrefix_uid</td>%,
@@ -321,11 +318,11 @@ ok( $res->[2]->[0] =~ m%<td scope="row">test_impersonation</td>%,
   or explain( $res->[2]->[0], 'test_impersonation' );
 ok( $res->[2]->[0] =~ m%<td scope="row">rtyler/dwho</td>%, 'Found rtyler/dwo' )
   or explain( $res->[2]->[0], 'Found rtyler/dwo' );
-count(16);
+count(15);
 
 my %attributes = map /<td scope="row">(.+)?<\/td>/g, $res->[2]->[0];
-ok( scalar keys %attributes == 35, 'Found 35 attributes' )
-  or print STDERR ( keys %attributes < 35 )
+ok( scalar keys %attributes == 34, 'Found 34 attributes' )
+  or print STDERR ( keys %attributes < 34 )
   ? "Missing attributes -> " . scalar keys %attributes
   : "Too much attributes -> " . scalar keys %attributes;
 ok( $attributes{'_auth'} eq 'Demo', '_auth' )

@@ -1,13 +1,13 @@
 use strict;
 use warnings;
-no if "$]" >= 5.031008, feature => 'indirect';
 package {{ $name }};
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
+# vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: ...
 # KEYWORDS: ...
 
 our $VERSION = '{{ $dist->version }}';
 
+no if "$]" >= 5.031009, feature => 'indirect';
 {{
     ($zilla_plugin) = ($name =~ /^Dist::Zilla::Plugin::(.+)$/g);
 
@@ -58,7 +58,7 @@ SYNOPSIS
 
 =head1 {{ $zilla_plugin ? 'CONFIGURATION OPTIONS' : 'FUNCTIONS/METHODS' }}
 
-=head2 C<foo>
+=head2 foo
 
 ...
 

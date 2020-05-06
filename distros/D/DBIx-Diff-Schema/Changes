@@ -1,3 +1,10 @@
+0.097   2020-05-06  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+
+	- [removed] Remove list_columns, list_tables,
+	  list_{table_,}indexes, check_table_exists; move those to
+	  DBIx::Util::Schema.
+
+
 0.096   2020-04-23  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] handle statistics_info() returning the same index twice.

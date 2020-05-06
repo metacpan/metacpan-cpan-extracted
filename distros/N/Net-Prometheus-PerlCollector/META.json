@@ -38,7 +38,7 @@
    "provides" : {
       "Net::Prometheus::PerlCollector" : {
          "file" : "lib/Net/Prometheus/PerlCollector.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -47,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

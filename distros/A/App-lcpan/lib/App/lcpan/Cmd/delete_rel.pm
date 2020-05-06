@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::delete_rel;
 
-our $DATE = '2020-04-20'; # DATE
-our $VERSION = '1.051'; # VERSION
+our $DATE = '2020-05-06'; # DATE
+our $VERSION = '1.056'; # VERSION
 
 use 5.010001;
 use strict;
@@ -73,7 +73,7 @@ App::lcpan::Cmd::delete_rel - Delete a release record in the database
 
 =head1 VERSION
 
-This document describes version 1.051 of App::lcpan::Cmd::delete_rel (from Perl distribution App-lcpan), released on 2020-04-20.
+This document describes version 1.056 of App::lcpan::Cmd::delete_rel (from Perl distribution App-lcpan), released on 2020-05-06.
 
 =head1 FUNCTIONS
 

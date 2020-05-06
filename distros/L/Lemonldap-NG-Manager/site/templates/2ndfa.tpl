@@ -12,9 +12,8 @@
       <div class="navbar navbar-default">
         <div class="navbar-collapse">
           <ul class="nav navbar-nav" role="grid">
-            <li><a id="a-persistent" role="row"><i class="glyphicon glyphicon-filter"></i> {{translate('2faSessions')}} &nbsp;&nbsp;</a></li>
-            <form name="filterForm">
-              <div class="form-check ">&nbsp;&nbsp;&nbsp;
+            <form class="navbar-form" name="filterForm">
+              <div class="form-check ">
                 <input type="checkbox" ng-model="U2FCheck" class="form-check-input"  ng-true-value="2" ng-false-value="1" ng-change="search2FA()"/>
                 <label class="form-check-label" for="U2FCheck">U2F</label>
                 &nbsp;&nbsp;&&nbsp;&nbsp;
@@ -26,8 +25,8 @@
               </div>
             </form>
           </ul>
-		  <div class="col-lg-6 col-md-6 col-sm-8 col-xs-14" >
-		    <form class="navbar-form" role="search">
+		      <div class="col-lg-6 col-md-6 col-sm-8 col-xs-14" >
+		        <form class="navbar-form" role="search">
               <div class="input-group add-on">
                 <input class="form-control" placeholder="{{translate('search')}}" type="text" ng-model="searchString" ng-init="" ng-keyup="search2FA()"/>
                 <div class="input-group-btn">
@@ -41,12 +40,12 @@
 
           <!-- Tree -->
 
-      <div class="text-center"><p class="badge">{{total}} <span trspan="session_s"></span></p></div>
+      <div ng-show="data.length!=0" class="text-center"><p class="badge">{{total}} {{translate('session_s')}}</p></div>
       <div class="region region-sidebar-first">
         <section id="block-superfish-1" class="block block-superfish clearfix">
           <div ui-tree data-drag-enabled="false" id="tree-root">
             <div ng-show="data.length==0" class="center">
-              <span class="label label-warning" trspan="noDatas"></span>
+              <span class="label label-warning">{{translate('noData')}}</span>
             </div>
             <ol ui-tree-nodes="" ng-model="data">
               <li ng-repeat="node in data track by node.id" ui-tree-node ng-include="'nodes_renderer.html'" collapsed="true"></li>
@@ -59,6 +58,25 @@
 
     <!-- Right(main) div -->
     <div id="right" class="col-lg-8 col-md-8 col-sm-7 col-xs-12 scrollable" ng-class="{'hidden-xs':showT&&!showM}">
+      <span class="visible-xs">
+      <div ng-if="currentSession"  class="lmmenu navbar navbar-default" ng-class="{'hidden-xs':!showM}">
+        <div class="navbar-collapse" ng-class="{'collapse':!showM}" id="formmenu">
+          <ul class="nav navbar-nav">
+            <li uib-dropdown class="visible-xs">
+              <a id="langmenu" name="menu" uib-dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Menu <span class="caret"></span></a>
+              <ul uib-dropdown-menu aria-labelled-by="langmenu" role="grid">
+                <li ng-repeat="link in links"><a href="{{link.target}}" role="row"><i ng-if="link.icon" class="glyphicon glyphicon-{{link.icon}}"></i> {{translate(link.title)}}</a></li>
+                <li ng-repeat="menulink in menulinks"><a href="{{menulink.target}}" role="row"><i ng-if="menulink.icon" class="glyphicon glyphicon-{{menulink.icon}}"></i> {{translate(menulink.title)}}</a></li>
+                <li ng-include="'languages.html'"></li>
+                <TMPL_IF NAME="INSTANCE_NAME">
+                  <li><a href="https://lemonldap-ng.org"><TMPL_VAR NAME="INSTANCE_NAME"></a></li>
+                </TMPL_IF>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+      </span>
       <div class="panel panel-default" ng-hide="currentSession===null">
         <div class="panel-heading">
           <h1 class="panel-title text-center">{{translate("sessionTitle")}} {{currentSession.id}}</h1>

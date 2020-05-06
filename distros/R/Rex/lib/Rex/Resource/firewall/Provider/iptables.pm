@@ -9,7 +9,7 @@ package Rex::Resource::firewall::Provider::iptables;
 use strict;
 use warnings;
 
-our $VERSION = '1.9.0'; # VERSION
+our $VERSION = '1.10.0'; # VERSION
 
 use Rex::Commands::Iptables;
 use Rex::Helper::Run;

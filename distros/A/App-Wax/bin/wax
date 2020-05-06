@@ -7,7 +7,7 @@ use App::Wax;
 
 # XXX this declaration must be on a single line
 # https://metacpan.org/pod/version#How-to-declare()-a-dotted-decimal-version
-use version; our $VERSION = version->declare('v2.3.2');
+use version; our $VERSION = version->declare('v2.3.3');
 
 exit App::Wax->new({ app_version => $VERSION })->run(\@ARGV);
 
@@ -208,7 +208,7 @@ etc.
 
 =head1 VERSION
 
-2.3.2
+2.3.3
 
 =head1 SEE ALSO
 
@@ -220,7 +220,7 @@ etc.
 
 =item * L<tmpin|https://github.com/sindresorhus/tmpin>
 
-=item * L<zsh completion script|https://github.com/chocolateboy/App-Wax/wiki/Zsh-completion-script>
+=item * L<zsh completion script|https://github.com/chocolateboy/wax/wiki/Zsh-completion-script>
 
 =back
 

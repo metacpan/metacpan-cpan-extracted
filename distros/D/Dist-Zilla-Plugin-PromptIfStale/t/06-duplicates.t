@@ -37,18 +37,18 @@ my $tzil = Builder->from_config(
                 [ GatherDir => ],
                 [ PromptIfStale => 'via_bundle' => {
                         phase => 'build',
-                        module => [ map { 'Foo' . $_ } qw(A B C J X) ],
+                        module => [ map 'Foo'.$_, qw(A B C J X) ],
                         check_all_prereqs => 1,
                     },
                 ],
                 [ Prereqs => RuntimeRequires => {
                         perl => 0,
-                        map { 'Foo' . $_ => 0 } qw(J K L A Y),
+                        map +('Foo'.$_ => 0), qw(J K L A Y),
                     },
                 ],
                 [ PromptIfStale => 'direct' => {
                         phase => 'release',
-                        module => [ map { 'Foo' . $_ } qw(X Y Z B K), ],
+                        module => [ map 'Foo'.$_, qw(X Y Z B K), ],
                     },
                 ],
             ),
@@ -65,14 +65,14 @@ my $tzil = Builder->from_config(
 
 my %expected_prompts = (
     before_build => [
-        map { '    Foo' . $_ . ' is not installed.' } qw(A B C J X) ],
+        map '    Foo'.$_.' is not installed.', qw(A B C J X) ],
     after_build => [
-        map { '    Foo' . $_ . ' is not installed.' } qw(K L Y) ],
+        map '    Foo'.$_.' is not installed.', qw(K L Y) ],
 );
 
-my @expected_prompts = ((map {
-    "Issues found:\n" . join("\n", @{$expected_prompts{$_}}, 'Continue anyway?')
-} qw(before_build after_build)),
+my @expected_prompts = (
+    (map "Issues found:\n".join("\n", @{$expected_prompts{$_}}, 'Continue anyway?'),
+        qw(before_build after_build)),
     'FooZ is not installed. Continue anyway?',
 );
 
@@ -83,7 +83,7 @@ if (not $checked_app++)
     my $wd = pushd $tzil->root;
     cmp_deeply(
         [ Dist::Zilla::App::Command::stale->stale_modules($tzil) ],
-        [ map { 'Foo' . $_ } qw(A B C J K L X Y Z) ],
+        [ map 'Foo'.$_, qw(A B C J K L X Y Z) ],
         'app finds stale modules',
     );
     Dist::Zilla::Plugin::PromptIfStale::__clear_already_checked();

@@ -4,13 +4,18 @@ use strict;
 use lib '.', 't';
 use helper;
 use Test::More 'no_plan';
+require urpm::select;
 
 my $medium_name = 'failing-scriptlets';
 
 need_root_and_prepare();
 
 test_install_rpm_fail('pre');
-test_install_rpm_fail('pretrans');
+if (urpm::select::_rpm_version() lt 4.10.0) {
+    test_install_rpm('pretrans');
+} else {
+    test_install_rpm_fail('pretrans');
+}
 test_install_rpm('post');
 require urpm::select;
 if (urpm::select::_rpm_version() lt 4.13.0 && -e '/etc/mageia-release') {

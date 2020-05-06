@@ -5,9 +5,17 @@ use Mouse;
 use SOAP::Lite;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_ERROR PE_BADCREDENTIALS);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.8';
 
 # INITIALIZATION
+
+has urn => (
+    is      => 'rw',
+    lazy    => 1,
+    default => sub {
+        $_[0]->conf->{soapProxyUrn};
+    }
+);
 
 sub init {
     my ($self) = @_;
@@ -30,8 +38,8 @@ no warnings 'once';
 sub getUser {
     my ( $self, $req ) = @_;
     return PE_OK if ( $req->data->{_proxyQueryDone} );
-    my $soap = SOAP::Lite->proxy( $self->conf->{proxyAuthService} )
-      ->uri('urn:Lemonldap/NG/Common/PSGI/SOAPService');
+    my $soap =
+      SOAP::Lite->proxy( $self->conf->{proxyAuthService} )->uri( $self->urn );
     my $r = $soap->getCookies( $req->{user}, $req->data->{password} );
     if ( $r->fault ) {
         $self->logger->error( "Unable to query authentication service: "
@@ -61,7 +69,7 @@ sub setSessionInfo {
     my ( $self, $req ) = @_;
     return PE_OK if ( $req->data->{_setSessionInfoDone} );
     my $soap = SOAP::Lite->proxy( $self->conf->{proxySessionService} )
-      ->uri('urn:Lemonldap/NG/Common/PSGI/SOAPService');
+      ->uri( $self->urn );
     my $r = $soap->getAttributes( $req->data->{_remoteId} );
     if ( $r->fault ) {
         $self->logger->error( "Unable to query authentication service"

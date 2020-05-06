@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Net::Prometheus::ProcessCollector );
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 use constant {
    TICKS_PER_SEC  => 100,

@@ -423,7 +423,8 @@ bool _decode_str( pTHX_ decode_ctx* decstate, union numbuf_or_sv* string_u ) {
     if (control->pieces.length_type == CBOR_LENGTH_INDEFINITE) {
         ++decstate->curbyte;
 
-        SV *string = newSVpvs_flags("", SVs_TEMP);
+        SV *string = newSVpvs("");  /* 5.10.0 lacks newSVpvs_flags() */
+        sv_2mortal(string);
         string_u->sv = string;
 
         while (1) {

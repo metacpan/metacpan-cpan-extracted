@@ -65,21 +65,10 @@ my %META = (
 
 my %MM_ARGS = ();
 
-if (! parse_args()->{PUREPERL_ONLY}) {
-  # we require Cpanel::JSON::XS, except if JSON::XS is already installed.
-  # (we also always recommend Cpanel::JSON::XS, just to make sure.)
-  $MM_ARGS{PREREQ_PM}{'Cpanel::JSON::XS'} = '2.3310'
-    if eval { require Cpanel::JSON::XS; 1 }
-      or (
-        not eval { require JSON::XS; 1; }
-        and can_compile_loadable_object(quiet => 1)
-      );
+## DYNAMIC PREREQS ###########################################################
 
-  # JSON::XS 3 changed its boolean handling - update it
-  # if JSON::XS is installed and < 3.0
-  $MM_ARGS{PREREQ_PM}{'JSON::XS'} = '3.00'
-    if eval { require JSON::XS; 1 }
-      and not eval { JSON::XS->VERSION('3.0'); 1 };
+if (! parse_args()->{PUREPERL_ONLY} && can_compile_loadable_object(quiet => 1)) {
+  $MM_ARGS{PREREQ_PM}{'Cpanel::JSON::XS'} = '2.3310';
 }
 
 use Text::ParseWords;
@@ -113,6 +102,9 @@ $MM_ARGS{NO_MYMETA} = 1
   if $mymeta_broken;
 $MM_ARGS{META_ADD} = { 'meta-spec' => { version => 2 }, %META }
   unless -f 'META.yml';
+$MM_ARGS{PL_FILES} ||= {};
+$MM_ARGS{NORECURS} = 1
+  if not exists $MM_ARGS{NORECURS};
 
 for (qw(configure build test runtime)) {
   my $key = $_ eq 'runtime' ? 'PREREQ_PM' : uc $_.'_REQUIRES';

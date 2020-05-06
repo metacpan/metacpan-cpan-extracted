@@ -3,7 +3,7 @@ package WebService::PivotalTracker::Types;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Type::Library
     -base,
@@ -70,11 +70,12 @@ class_type LabelObject, { class => 'WebService::PivotalTracker::Label' };
 class_type LWPObject, { class => 'LWP::UserAgent' };
 
 declare MD5Hex,
-    as Str,
+    as Defined,
     where {m/^[0-9a-f]{32}$/i},
     inline_as {
     $_[0]->parent->inline_check( $_[1] ) . " && $_[1] =~ m/^[0-9a-f]{32}\$/i"
-    };
+}
+message {'token does not stringify to an MD5 string'};
 
 class_type PersonObject, { class => 'WebService::PivotalTracker::Person' };
 
@@ -120,7 +121,7 @@ WebService::PivotalTracker::Types - Type definitions used in this distro
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 DESCRIPTION
 
@@ -138,7 +139,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by MaxMind, Inc.
+This software is Copyright (c) 2016 - 2020 by MaxMind, Inc.
 
 This is free software, licensed under:
 

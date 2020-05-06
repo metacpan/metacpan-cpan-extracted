@@ -19,6 +19,11 @@ has site_name => (
     isa => Maybe[Str],
 );
 
+has content_text => (
+    is => "lazy",
+    isa => Maybe[Str],
+);
+
 no Moo;
 
 sub _build_site_name {
@@ -35,7 +40,6 @@ sub _build_site_name {
 sub headline {
     my ($self) = @_;
 
-    my $site_name = $self->site_name;
     my ($title, $el);
     my $dom = $self->dom;
     if ($el = $dom->at("#story #news_title, #news_are .newsin_title, .data_midlle_news_box01 dl td:first-child")) {
@@ -51,7 +55,7 @@ sub headline {
     }
     $title .= "";
 
-    if ($site_name) {
+    if (my $site_name = $self->site_name) {
         $title =~ s/\s* \p{Punct} \s* $site_name \s* \z//x;
     }
     if (defined($title)) {
@@ -62,7 +66,7 @@ sub headline {
         $title =~ s/\A\s+//;
         $title =~ s/\s+\z//;
     }
-    return $title;
+    return $title && normalize_whitespace($title);
 }
 
 sub dateline {
@@ -115,7 +119,7 @@ sub dateline {
         ($dateline) = $guess->text =~ m#([0-9]{1,2}\s*月\s*[0-9]{1,2}(\s*日\s*)?,\s*[0-9]{4})#x;
     }
     elsif ($guess = $dom->at('#story #news_author')) {
-        ($dateline) = $guess->all_text =~ m{\A 【記者.+ 】 (.+) \z}x;
+        ($dateline) = $guess->all_text =~ m{\A 【記者.+ 】\s* (.+) \z}x;
     }
     elsif ($guess = $dom->at('.data_midlle_news_box01 dl dd ul li:first-child')) {
         ($dateline) = $guess->text;
@@ -149,7 +153,7 @@ sub journalist {
         $ret = $guess->attr('content');
     } elsif ( $guess = $dom->at('meta[name="author"]') ) {
         $ret = $guess->attr('content');
-    } elsif ( $guess = $dom->at('div.field-item a[href^=/author/], div.content_reporter a[itemprop=author], span[itemprop=author] a, div.author div.intro a div.name, div.article-author > h5 > a, div.article-meta > div.article-author > a, div.authorInfo li.authorName > a, .article .writer > p, .info_author, .news-info dd[itemprop=author], .content_reporter a, .top_title span.reporter_name, .post-heading time span, header .article-meta .article-author,  .article_header > .author > span:first-child, .mid-news > .m-left-side > .maintype-wapper > .subtype-sort, .newsCon > .newsInfo > span:first-child, .newsdetail_content > .title > h4 > a[href^="/news/searchresult/news?search_text="], .m-from-author > .m-from-author__name') ) {
+    } elsif ( $guess = $dom->at('div.field-item a[href^=/author/], div.content_reporter a[itemprop=author], span[itemprop=author] a, div.author div.intro a div.name, div.article-author > h5 > a, div.article-meta > div.article-author > a, div.authorInfo li.authorName > a, .article .writer > p, .info_author, .news-info dd[itemprop=author], .content_reporter a, .top_title span.reporter_name, .post-heading time span, header .article-meta .article-author,  .article_header > .author > span:first-child, .mid-news > .m-left-side > .maintype-wapper > .subtype-sort, .newsCon > .newsInfo > span:first-child, .newsdetail_content > .title > h4 > a[href^="/news/searchresult/news?search_text="], .m-from-author > .m-from-author__name, .post-author-name a[itemprop*=author]') ) {
         $ret = $guess->text;
     } elsif ($guess = $dom->at('.story_bady_info_author')) {
         if ($guess->find('a')->size() == 0) {
@@ -167,10 +171,10 @@ sub journalist {
         ($ret) = $guess->all_text =~ m{\A 【 (記者 .+) 】}x;
     } elsif ($guess = $dom->at('#details_block .left .name, .articleMain .article-author a.author-title, .article__credit a[href^="/author/"], span[itemprop=author] span[itemprop=name], .post-header-additional .post-meta-info a.nickname')) {
         $ret = $guess->text;
-    } elsif ($guess = $dom->at('.fncnews-content > .info > span.small-gray-text')) {
-        ($ret) = $guess->text =~ m<(責任編輯.+)\z>x;
     } elsif ($guess = $dom->at('div.single-post-meta a[rel="author"]')) {
         ($ret) = $guess->text =~ m<^工商時報 (.+)\z>x;
+    } elsif ($guess = $dom->at('#PostContent .head-section-content p.meta')) {
+        ($ret) = $guess->text =~ m<(記者.+?報導)>x;
     }
 
     $ret = undef if ($ret && is_NewspaperName($ret));
@@ -181,7 +185,8 @@ sub journalist {
             qr<\A 【(記者.+?報導)】>x,
             qr<\A 中評社 .+? \d+ 月 \d+ 日電（記者(.+?)）>x,
             qr<\A ( 記者[^／]+／.+?電 )>x,
-            qr<\A 匯流新聞網記者 (\p{Letter}+) ／綜合報導 >x,
+            qr<\A 匯流新聞網記者 (\p{Letter}+) ／(?:\p{Letter}+)報導 >x,
+            qr<\A 匯流新聞網記者\s*/\s*(\p{Letter}+)綜合報導>x,
             qr<（(中央社[记記]者 \S+ 日 專?[電电] | 大纪元记者\p{Letter}+报导 | 記者.+?報導/.+?)）>x,
             qr< \( ( \p{Letter}+ ／ \p{Letter}+ 報導 ) \) >x,
             qr<\A 文：記者(\p{Letter}+) \n>x,
@@ -199,6 +204,7 @@ sub journalist {
             qr<\A  （ (記者.+報導) ） >x,
             qr<\A 【(本報記者.+報導)】 >x,
             qr<\b ﹝記者(\p{Letter}+?)／.+?報導﹞ \b>x,
+            qr<\A〔新網記者 ( \p{Letter}+ (?:報導|特稿))〕\b>x,
         );
 
         for my $pat (@patterns) {
@@ -222,7 +228,7 @@ sub journalist {
     return $ret;
 }
 
-sub content_text {
+sub _build_content_text {
     my ($self) = @_;
     my ($el, $html);
 

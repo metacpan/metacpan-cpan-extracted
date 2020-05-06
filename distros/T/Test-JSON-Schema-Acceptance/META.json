@@ -15,7 +15,9 @@
    "name" : "Test-JSON-Schema-Acceptance",
    "no_index" : {
       "directory" : [
+         "examples",
          "inc",
+         "share",
          "t",
          "xt"
       ]
@@ -24,13 +26,13 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "Module::Build::Tiny" : "0.034",
-            "perl" : "5.013002"
+            "File::ShareDir::Install" : "0.06",
+            "perl" : "5.010"
          }
       },
       "develop" : {
          "recommends" : {
-            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.154",
+            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.156",
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
          },
          "requires" : {
@@ -44,6 +46,7 @@
             "Test::CPAN::Meta" : "0",
             "Test::CleanNamespaces" : "0.15",
             "Test::EOL" : "0",
+            "Test::File::ShareDir" : "0",
             "Test::Kwalitee" : "1.21",
             "Test::MinimumVersion" : "0",
             "Test::Mojibake" : "0",
@@ -53,16 +56,25 @@
             "Test::Pod::Coverage" : "1.08",
             "Test::Pod::No404s" : "0",
             "Test::Portability::Files" : "0",
-            "Test::Spelling" : "0.12"
+            "Test::Spelling" : "0.12",
+            "Test::Warnings" : "0",
+            "perl" : "5.006"
          }
       },
       "runtime" : {
          "requires" : {
-            "Cwd" : "0",
-            "JSON" : "0",
+            "File::ShareDir" : "0",
+            "JSON::MaybeXS" : "1.004001",
+            "List::Util" : "1.33",
+            "Moo" : "0",
+            "MooX::TypeTiny" : "0.002002",
+            "Path::Tiny" : "0",
             "Test::Fatal" : "0",
             "Test::More" : "0.88",
-            "perl" : "5.013002",
+            "Types::Standard" : "1.010002",
+            "if" : "0",
+            "namespace::clean" : "0",
+            "perl" : "v5.10.0",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -73,15 +85,17 @@
          },
          "requires" : {
             "File::Spec" : "0",
-            "JSON::MaybeXS" : "0",
             "Module::Metadata" : "0",
             "Test::Deep" : "0",
+            "Test::File::ShareDir" : "0",
             "Test::More" : "0.88",
             "Test::Tester" : "0.108",
+            "Test::Warnings" : "0",
             "feature" : "0",
-            "if" : "0",
             "lib" : "0",
-            "perl" : "5.013002"
+            "open" : "0",
+            "perl" : "v5.10.0",
+            "utf8" : "0"
          }
       },
       "x_Dist_Zilla" : {
@@ -116,7 +130,6 @@
             "Dist::Zilla::Plugin::InstallGuide" : "1.200005",
             "Dist::Zilla::Plugin::Keywords" : "0.004",
             "Dist::Zilla::Plugin::License" : "5.038",
-            "Dist::Zilla::Plugin::MakeMaker::Fallback" : "0.029",
             "Dist::Zilla::Plugin::Manifest" : "0",
             "Dist::Zilla::Plugin::MetaConfig" : "0",
             "Dist::Zilla::Plugin::MetaJSON" : "0",
@@ -125,22 +138,23 @@
             "Dist::Zilla::Plugin::MetaTests" : "0",
             "Dist::Zilla::Plugin::MetaYAML" : "0",
             "Dist::Zilla::Plugin::MinimumPerl" : "1.006",
-            "Dist::Zilla::Plugin::ModuleBuildTiny::Fallback" : "0.018",
             "Dist::Zilla::Plugin::MojibakeTests" : "0.8",
             "Dist::Zilla::Plugin::NextRelease" : "5.033",
             "Dist::Zilla::Plugin::PodCoverageTests" : "5.040",
             "Dist::Zilla::Plugin::PodSyntaxTests" : "5.040",
-            "Dist::Zilla::Plugin::PodWeaver" : "4.005",
+            "Dist::Zilla::Plugin::PodWeaver" : "4.008",
             "Dist::Zilla::Plugin::Prereqs" : "0",
             "Dist::Zilla::Plugin::Prereqs::AuthorDeps" : "0.006",
             "Dist::Zilla::Plugin::PromptIfStale" : "0",
             "Dist::Zilla::Plugin::Readme" : "0",
             "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0.142180",
-            "Dist::Zilla::Plugin::RewriteVersion::Transitional" : "0.004",
+            "Dist::Zilla::Plugin::RewriteVersion::Transitional" : "0.006",
             "Dist::Zilla::Plugin::Run::AfterBuild" : "0.041",
             "Dist::Zilla::Plugin::Run::AfterRelease" : "0.038",
+            "Dist::Zilla::Plugin::Run::BeforeBuild" : "0",
             "Dist::Zilla::Plugin::Run::BeforeRelease" : "0",
             "Dist::Zilla::Plugin::RunExtraTests" : "0.024",
+            "Dist::Zilla::Plugin::ShareDir" : "0",
             "Dist::Zilla::Plugin::StaticInstall" : "0.005",
             "Dist::Zilla::Plugin::Test::CPAN::Changes" : "0.012",
             "Dist::Zilla::Plugin::Test::ChangesHasContent" : "0",
@@ -166,7 +180,7 @@
    "provides" : {
       "Test::JSON::Schema::Acceptance" : {
          "file" : "lib/Test/JSON/Schema/Acceptance.pm",
-         "version" : "0.990"
+         "version" : "0.992"
       }
    },
    "release_status" : "stable",
@@ -181,12 +195,28 @@
          "web" : "https://github.com/karenetheridge/Test-JSON-Schema-Acceptance"
       }
    },
-   "version" : "0.990",
+   "version" : "0.992",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.031010"
+         "version" : "5.031011"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::Run::BeforeBuild",
+            "config" : {
+               "Dist::Zilla::Plugin::Run::Role::Runner" : {
+                  "fatal_errors" : 1,
+                  "quiet" : 0,
+                  "run" : [
+                     "git submodule update --init --recursive",
+                     "git submodule update --recursive"
+                  ],
+                  "version" : "0.048"
+               }
+            },
+            "name" : "Run::BeforeBuild",
+            "version" : "0.048"
+         },
          {
             "class" : "Dist::Zilla::Plugin::Run::BeforeRelease",
             "config" : {
@@ -194,7 +224,6 @@
                   "fatal_errors" : 1,
                   "quiet" : 0,
                   "run" : [
-                     "git submodule update --init --recursive",
                      "git submodule update --remote"
                   ],
                   "version" : "0.048"
@@ -229,7 +258,7 @@
                }
             },
             "name" : "@Author::ETHER/stale modules, build",
-            "version" : "0.055"
+            "version" : "0.057"
          },
          {
             "class" : "Dist::Zilla::Plugin::FileFinder::ByName",
@@ -241,7 +270,11 @@
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
                   "exclude_filename" : [
-                     "README.pod"
+                     "CONTRIBUTING",
+                     "INSTALL",
+                     "LICENCE",
+                     "README.pod",
+                     "share"
                   ],
                   "exclude_match" : [],
                   "follow_symlinks" : 0,
@@ -415,7 +448,7 @@
             "class" : "Dist::Zilla::Plugin::Test::MinimumVersion",
             "config" : {
                "Dist::Zilla::Plugin::Test::MinimumVersion" : {
-                  "max_target_perl" : 5.014
+                  "max_target_perl" : "5.014"
                }
             },
             "name" : "@Author::ETHER/Test::MinimumVersion",
@@ -738,7 +771,7 @@
             "version" : "1.006"
          },
          {
-            "class" : "Dist::Zilla::Plugin::MakeMaker::Fallback",
+            "class" : "inc::MakeMaker",
             "config" : {
                "Dist::Zilla::Plugin::MakeMaker" : {
                   "make_path" : "make",
@@ -747,51 +780,13 @@
                "Dist::Zilla::Plugin::MakeMaker::Awesome" : {
                   "version" : "0.48"
                },
-               "Dist::Zilla::Plugin::MakeMaker::Fallback" : {
-                  "skip_release_testing" : 0
-               },
                "Dist::Zilla::Role::TestRunner" : {
                   "default_jobs" : 9,
                   "version" : "6.014"
                }
             },
-            "name" : "@Author::ETHER/MakeMaker::Fallback",
-            "version" : "0.030"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::ModuleBuildTiny::Fallback",
-            "config" : {
-               "Dist::Zilla::Plugin::ModuleBuildTiny::Fallback" : {
-                  "mb_version" : "0.28",
-                  "plugins" : [
-                     {
-                        "class" : "Dist::Zilla::Plugin::ModuleBuild",
-                        "config" : {
-                           "Dist::Zilla::Role::TestRunner" : {
-                              "default_jobs" : 9
-                           }
-                        },
-                        "name" : "ModuleBuild, via ModuleBuildTiny::Fallback",
-                        "version" : "6.014"
-                     },
-                     {
-                        "class" : "Dist::Zilla::Plugin::ModuleBuildTiny",
-                        "config" : {
-                           "Dist::Zilla::Role::TestRunner" : {
-                              "default_jobs" : 9
-                           }
-                        },
-                        "name" : "ModuleBuildTiny, via ModuleBuildTiny::Fallback",
-                        "version" : "0.015"
-                     }
-                  ]
-               },
-               "Dist::Zilla::Role::TestRunner" : {
-                  "default_jobs" : 9
-               }
-            },
-            "name" : "@Author::ETHER/ModuleBuildTiny::Fallback",
-            "version" : "0.025"
+            "name" : "@Author::ETHER/=inc::MakeMaker",
+            "version" : null
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
@@ -811,8 +806,8 @@
             "class" : "Dist::Zilla::Plugin::StaticInstall",
             "config" : {
                "Dist::Zilla::Plugin::StaticInstall" : {
-                  "dry_run" : 1,
-                  "mode" : "auto"
+                  "dry_run" : 0,
+                  "mode" : "off"
                }
             },
             "name" : "@Author::ETHER/StaticInstall",
@@ -888,7 +883,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20200320"
+                  "Module::CoreList" : "5.20200428"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -907,7 +902,7 @@
                }
             },
             "name" : "@Author::ETHER/stale modules, release",
-            "version" : "0.055"
+            "version" : "0.057"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Check",
@@ -1078,7 +1073,10 @@
                },
                "Dist::Zilla::Role::Git::DirtyFiles" : {
                   "allow_dirty" : [
+                     "CONTRIBUTING",
                      "Changes",
+                     "INSTALL",
+                     "LICENCE",
                      "README.pod"
                   ],
                   "allow_dirty_match" : [],
@@ -1102,7 +1100,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.990",
+                  "tag" : "v0.992",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1252,23 +1250,45 @@
             "version" : "6.014"
          },
          {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "develop",
+                  "type" : "requires"
+               }
+            },
+            "name" : "DevelopRequires",
+            "version" : "6.014"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::Git::GatherDir",
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
-                  "exclude_filename" : [],
-                  "exclude_match" : [],
+                  "exclude_filename" : [
+                     "index.js",
+                     "package.json",
+                     "tox.ini"
+                  ],
+                  "exclude_match" : [
+                     "^bin/"
+                  ],
                   "follow_symlinks" : 0,
                   "include_dotfiles" : 0,
-                  "prefix" : "lib/Test/JSON/Schema/test_suite",
+                  "prefix" : "share",
                   "prune_directory" : [],
-                  "root" : "lib/Test/JSON/Schema/test_suite"
+                  "root" : "share"
                },
                "Dist::Zilla::Plugin::Git::GatherDir" : {
                   "include_untracked" : 0
                }
             },
-            "name" : "Git::GatherDir",
+            "name" : "Gather sharedir",
             "version" : "2.046"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "ShareDir",
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
@@ -1336,14 +1356,14 @@
    },
    "x_authority" : "cpan:RELEQUEST",
    "x_contributors" : [
-      "Ben Hutton <bh7@sanger.ac.uk>",
       "Karen Etheridge <ether@cpan.org>",
-      "Ben Hutton <relequestual@gmail.com>",
+      "Ben Hutton <relequestual@cpan.org>",
       "Daniel Perrett <dp13@sanger.ac.uk>"
    ],
-   "x_generated_by_perl" : "v5.31.10",
+   "x_generated_by_perl" : "v5.31.11",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "MIT",
+   "x_static_install" : 0,
    "x_use_unsafe_inc" : 0
 }
 

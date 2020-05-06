@@ -21,6 +21,8 @@ SKIP: {
                 totp2fTTL           => 120,
                 u2fTTL              => 120,
                 sfRemovedMsgRule    => 1,
+                sfRemovedUseNotif   => 1,
+                notification        => 0,
             }
         }
     );

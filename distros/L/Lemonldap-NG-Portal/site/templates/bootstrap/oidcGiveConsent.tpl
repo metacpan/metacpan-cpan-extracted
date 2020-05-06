@@ -8,7 +8,7 @@
    <li>
     <span trspan="<TMPL_VAR NAME="m">"><TMPL_VAR NAME="m"></span>
     <TMPL_IF NAME="n">
-     <i>(<TMPL_VAR NAME="n">)</i>
+     <i>(<TMPL_VAR NAME="n" ESCAPE=HTML>)</i>
     </TMPL_IF>
    </li>
   </TMPL_LOOP>

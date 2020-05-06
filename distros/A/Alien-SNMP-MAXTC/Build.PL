@@ -36,10 +36,12 @@ my %module_build_args = (
     exact_filename => 'net-snmp-5.7.3.tar.gz?raw=true',
   },
   alien_stage_install => 0,
-  build_requires      => {},
+  build_requires      => {
+    "Alien::Base"        => '0.020',
+  },
   configure_requires  => {
     "perl"               => '5.010001',
-    "Alien::Base"        => '0.020',
+    'Alien::Base::ModuleBuild' => '0',
     "ExtUtils::CChecker" => '0.10',
     "File::ShareDir"     => '1.03',
     "Module::Build"      => '0.42',

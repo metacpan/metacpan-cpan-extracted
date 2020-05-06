@@ -3,7 +3,7 @@ package WebService::MinFraud::Record::BillingAddress;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.009001';
+our $VERSION = '1.010000';
 
 with 'WebService::MinFraud::Role::Record::Address';
 
@@ -23,7 +23,7 @@ WebService::MinFraud::Record::BillingAddress - Contains data for the billing add
 
 =head1 VERSION
 
-version 1.009001
+version 1.010000
 
 =head1 SYNOPSIS
 
@@ -97,7 +97,7 @@ Mateu Hunter <mhunter@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 - 2019 by MaxMind, Inc.
+This software is copyright (c) 2015 - 2020 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

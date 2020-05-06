@@ -1,5 +1,9 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+0.013 2020-05-01
+    - Remove Makefile from MANIFEST and skip it.
+      [rt.cpan.org #132463] No rule to make target
+
 0.012 2020-04-30
     - Fix signal race in test server.
     - Use test server planning_nofork() to compute test numbers

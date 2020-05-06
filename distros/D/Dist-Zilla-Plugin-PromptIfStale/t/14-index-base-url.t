@@ -59,7 +59,7 @@ my $http_url;
                 path(qw(source dist.ini)) => simple_ini(
                     [ GatherDir => ],
                     [ PromptIfStale => {
-                        modules => [ map { 'Unindexed' . $_ } 0..5 ],
+                        modules => [ map 'Unindexed'.$_, 0..5 ],
                         phase => 'build',
                         index_base_url => 'http://gettysworld.org',
                         fatal => 1,
@@ -74,7 +74,7 @@ my $http_url;
         my $wd = pushd $tzil->root;
         cmp_deeply(
             [ Dist::Zilla::App::Command::stale->stale_modules($tzil) ],
-            [ map { 'Unindexed' . $_ } 0..5 ],
+            [ map 'Unindexed'.$_, 0..5 ],
             'app finds no stale modules',
         );
         Dist::Zilla::Plugin::PromptIfStale::__clear_already_checked();
@@ -95,7 +95,7 @@ my $http_url;
 
     cmp_deeply(
         \@checked_via_02packages,
-        [ map { 'Unindexed' . $_ } 0..5 ],
+        [ map 'Unindexed'.$_, 0..5 ],
         'all modules checked using 02packages',
     );
 
@@ -105,8 +105,8 @@ my $http_url;
         $tzil->log_messages,
         superbagof(
             '[PromptIfStale] checking for stale modules...',
-            "[PromptIfStale] Issues found:\n" . join("\n", map { '[PromptIfStale]     Unindexed' . $_ . ' is not indexed.' } 0..5),
-            "[PromptIfStale] Aborting build\n[PromptIfStale] To remedy, do: cpanm " . join(' ', map { 'Unindexed' . $_ } 0..5)
+            "[PromptIfStale] Issues found:\n" . join("\n", map '[PromptIfStale]     Unindexed'.$_.' is not indexed.', 0..5),
+            "[PromptIfStale] Aborting build\n[PromptIfStale] To remedy, do: cpanm " . join(' ', map 'Unindexed'.$_, 0..5)
         ),
         'build was aborted, with remedy instructions',
     );

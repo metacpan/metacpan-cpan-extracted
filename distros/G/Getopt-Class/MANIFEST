@@ -10,6 +10,7 @@ t/003_man.t
 t/004_missing.t
 t/005_regexp_mismatch.t
 t/006_pod.t
+t/007_object.t
 t/dictionary.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

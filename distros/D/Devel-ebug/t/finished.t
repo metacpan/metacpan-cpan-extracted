@@ -6,7 +6,7 @@ use Test::More tests => 10;
 use Devel::ebug;
 
 my $ebug = Devel::ebug->new;
-$ebug->program("t/yaml.pl");
+$ebug->program("corpus/yaml.pl");
 $ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 

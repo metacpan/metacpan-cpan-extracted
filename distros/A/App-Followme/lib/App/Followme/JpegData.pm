@@ -8,11 +8,11 @@ use lib '../..';
 
 use base qw(App::Followme::FileData);
 
-use GD;
+use Image::Size;
 use File::Spec::Functions qw(abs2rel rel2abs splitdir catfile);
 use App::Followme::FIO;
 
-our $VERSION = "1.92";
+our $VERSION = "1.93";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -35,10 +35,8 @@ sub fetch_from_file {
     return () unless -e $filename;
     return $self->SUPER::fetch_from_file($filename) if -T $filename;
 
-    my $photo = $self->read_photo($filename);
-
     my %dimensions;
-    ($dimensions{width}, $dimensions{height}) = $photo->getBounds();
+    ($dimensions{width}, $dimensions{height}) = imgsize($filename);
 
     return %dimensions;
 }
@@ -65,19 +63,6 @@ sub get_url {
 
     return $self->filename_to_url($self->{base_directory},
                                   $filename);
-}
-
-#---------------------------------------------------------------------------
-# Read a photo
-
-sub read_photo {
-    my ($self, $photoname) = @_;
-
-    GD::Image->trueColor(1);
-    my $photo = GD::Image->new($photoname);
-    die "Couldn't read $photoname" unless $photo;
-
-    return $photo;
 }
 
 #----------------------------------------------------------------------

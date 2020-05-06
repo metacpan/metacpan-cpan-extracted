@@ -1,0 +1,84 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::PYX::Optimization;
+
+our $VERSION = 0.01;
+
+# Run.
+exit App::PYX::Optimization->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+pyx-optimization - PYX optimization tool.
+
+=head1 SYNOPSIS
+
+ pyx-optimization [-h] [--version] [filename] [-]
+
+=head1 DESCRIPTION
+
+This tool optimize PYX code. It removes trailing whitespace from data and
+comment sections.
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-h>
+
+ Print help.
+
+=item * C<--version>
+
+ Print version of script.
+
+=item * C<filename>
+
+ PYX filename.
+
+=item * C<->
+
+ STDIN with PYX code.
+
+=back
+
+=head1 EXAMPLE
+
+ pyx-optimization __PYX_FILE__
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/App-PYX-Optimization>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2015-2020 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.01
+
+=cut

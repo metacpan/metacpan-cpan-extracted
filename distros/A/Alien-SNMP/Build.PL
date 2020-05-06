@@ -37,12 +37,12 @@ my %module_build_args = (
   },
   alien_stage_install => 0,
   build_requires      => {
-    'Alien::Base::ModuleBuild' => '0',
+    "Alien::Base"        => '0.020',
     'Software::License' => '0',
   },
   configure_requires  => {
     "perl"               => '5.010001',
-    "Alien::Base"        => '0.020',
+    'Alien::Base::ModuleBuild' => '0',
     "File::ShareDir"     => '1.03',
     "Module::Build"      => '0.42',
     "PkgConfig"          => '0.14026',

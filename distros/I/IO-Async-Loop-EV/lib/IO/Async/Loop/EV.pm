@@ -1,18 +1,22 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2020 -- leonerd@leonerd.org.uk
 
 package IO::Async::Loop::EV;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
-use constant API_VERSION => '0.49';
+our $VERSION = '0.03';
+use constant API_VERSION => '0.76';
 
 use base qw( IO::Async::Loop );
 IO::Async::Loop->VERSION( '0.49' );
+
+use Scalar::Util qw( weaken );
+
+use IO::Async::Metrics '$METRICS';
 
 use constant _CAN_SUBSECOND_ACCURATELY => 0;
 
@@ -26,18 +30,18 @@ C<IO::Async::Loop::EV> - use C<IO::Async> with C<EV>
 
 =head1 SYNOPSIS
 
- use IO::Async::Loop::EV;
+   use IO::Async::Loop::EV;
 
- my $loop = IO::Async::Loop::EV->new();
+   my $loop = IO::Async::Loop::EV->new();
 
- $loop->add( ... );
+   $loop->add( ... );
 
- $loop->add( IO::Async::Signal->new(
-       name => 'HUP',
-       on_receipt => sub { ... },
- ) );
+   $loop->add( IO::Async::Signal->new(
+         name => 'HUP',
+         on_receipt => sub { ... },
+   ) );
 
- $loop->loop_forever();
+   $loop->run;
 
 =head1 DESCRIPTION
 
@@ -50,7 +54,14 @@ sub new
    my $class = shift;
    my $self = $class->SUPER::__new( @_ );
 
-   $self->{$_} = {} for qw( watch_r watch_w watch_time watch_signal watch_idle watch_child );
+   $self->{$_} = {} for qw( watch_r watch_w watch_time watch_signal watch_idle watch_process );
+
+   # Check it's actually active
+   if( defined $METRICS and $METRICS->adapter and $METRICS ) {
+      weaken( my $weakself = $self );
+      $self->{watch_prepare} = EV::prepare sub { $weakself->pre_wait };
+      $self->{watch_check}   = EV::check   sub { $weakself->post_wait };
+   }
 
    return $self;
 }
@@ -174,23 +185,23 @@ sub unwatch_idle
    delete $self->{watch_idle}{$id};
 }
 
-sub watch_child
+sub watch_process
 {
    my $self = shift;
    my ( $pid, $code ) = @_;
 
-   $self->{watch_child}{$pid} = EV::child $pid, 0, sub {
+   $self->{watch_process}{$pid} = EV::child $pid, 0, sub {
       my $w = shift;
       $code->( $w->rpid, $w->rstatus );
    };
 }
 
-sub unwatch_child
+sub unwatch_process
 {
    my $self = shift;
    my ( $pid ) = @_;
 
-   delete $self->{watch_child}{$pid};
+   delete $self->{watch_process}{$pid};
 }
 
 =head1 AUTHOR

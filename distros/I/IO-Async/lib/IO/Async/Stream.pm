@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2006-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2006-2020 -- leonerd@leonerd.org.uk
 
 package IO::Async::Stream;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.75';
+our $VERSION = '0.76';
 
 use base qw( IO::Async::Handle );
 
@@ -20,6 +20,7 @@ use Encode 2.11 qw( find_encoding STOP_AT_PARTIAL );
 use Scalar::Util qw( blessed );
 
 use IO::Async::Debug;
+use IO::Async::Metrics '$METRICS';
 
 # Tuneable from outside
 # Not yet documented
@@ -833,6 +834,8 @@ sub _flush_one_write
       return 0;
    }
 
+   $METRICS and $METRICS->inc_counter_by( stream_written => $len );
+
    if( my $on_write = $head->on_write ) {
       $on_write->( $self, $len );
    }
@@ -1026,6 +1029,8 @@ sub _do_read
          $self->debug_printf( "READ len=%d", $len );
          IO::Async::Debug::log_hexdump( $data ) if $IO::Async::Debug::DEBUG_FLAGS{Sr};
       }
+
+      $METRICS and $METRICS->inc_counter_by( stream_read => $len );
 
       my $eof = $self->{read_eof} = ( $len == 0 );
 

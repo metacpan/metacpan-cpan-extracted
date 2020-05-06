@@ -7,7 +7,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants ':all';
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Common::PSGI::Request';
 
@@ -69,6 +69,9 @@ has frame => ( is => 'rw' );
 # Refresh flag to avoid double cookies sessions to be renewed
 has refresh => ( is => 'rw' );
 
+# Scalar to display lock time
+has lockTime => ( is => 'rw' );
+
 # Security
 #
 # Captcha
@@ -76,6 +79,10 @@ has captcha => ( is => 'rw' );
 
 # Token
 has token => ( is => 'rw' );
+
+# Whether or not to include a HTML render of the error message
+# in error responses
+has wantErrorRender => ( is => 'rw' );
 
 # Error type
 sub error_type {
@@ -102,14 +109,22 @@ sub error_type {
       if (
         scalar(
             grep { /^$code$/ } (
-                PE_INFO,                          PE_SESSIONEXPIRED,
-                PE_FORMEMPTY,                     PE_FIRSTACCESS,
-                PE_PP_GRACE,                      PE_PP_EXP_WARNING,
-                PE_NOTIFICATION,                  PE_BADURL,
-                PE_CONFIRM,                       PE_MAILFORMEMPTY,
-                PE_MAILCONFIRMATION_ALREADY_SENT, PE_PASSWORDFORMEMPTY,
-                PE_CAPTCHAEMPTY,                  PE_REGISTERFORMEMPTY,
-                PE_PP_CHANGE_AFTER_RESET,         PE_RESETCERTIFICATE_FOREMPTY,
+                PE_INFO,
+                PE_SESSIONEXPIRED,
+                PE_FORMEMPTY,
+                PE_FIRSTACCESS,
+                PE_PP_GRACE,
+                PE_PP_EXP_WARNING,
+                PE_NOTIFICATION,
+                PE_BADURL,
+                PE_CONFIRM,
+                PE_MAILFORMEMPTY,
+                PE_MAILCONFIRMATION_ALREADY_SENT,
+                PE_PASSWORDFORMEMPTY,
+                PE_CAPTCHAEMPTY,
+                PE_REGISTERFORMEMPTY,
+                PE_PP_CHANGE_AFTER_RESET,
+                PE_RESETCERTIFICATE_FORMEMPTY,
             )
         )
       );
@@ -217,8 +232,8 @@ is a LLNG best practice
 
 Free hash ref where plugins can store some persistent data: data are kept
 during auth process and cleaned after successful authentication, except if
-C<$req-E<gt>pdata-E<gt>{keepPdata}> is set to 1. In this case, module that
-has set this flag must remove it after its job ends.
+C<$req-E<gt>pdata-E<gt>{keepPdata}> is set to an array of values. In this
+case, module that has set these values must remove them after its job ends.
 
 =head3 User information
 

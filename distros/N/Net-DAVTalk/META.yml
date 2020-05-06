@@ -27,5 +27,5 @@ requires:
   XML::Fast: '0.11'
   XML::Spice: '0.03'
   perl: '5.006'
-version: '0.18'
+version: '0.19'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

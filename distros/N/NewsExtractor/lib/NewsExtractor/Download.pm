@@ -14,31 +14,29 @@ use Try::Tiny;
 
 sub parse {
     my $self = $_[0];
-    my ($err, $o);
-
-    my $x = NewsExtractor::Extractor->new( tx => $self->tx );
-    my %article;
-    $article{headline}     = $x->headline;
-    $article{article_body} = $x->content_text;
-
-    for my $it (qw(dateline journalist)) {
-        my $v = $x->$it;
-        if (defined($v)) {
-            $article{$it} = $v;
-        }
-    }
-
-    for my $it (qw(headline article_body)) {
-        if (is_empty($article{$it})) {
-            $err = NewsExtractor::Error->new(
-                message => u("Failed to extract: $it")
-            );
-            last;
-        }
-    }
-    return ($err, undef) if $err;
+    my ($err, $o, %article);
 
     try {
+        my $x = NewsExtractor::Extractor->new( tx => $self->tx );
+        $article{headline}     = $x->headline;
+        $article{article_body} = $x->content_text;
+
+        for my $it (qw(dateline journalist)) {
+            my $v = $x->$it;
+            if (defined($v)) {
+                $article{$it} = $v;
+            }
+        }
+
+        for my $it (qw(headline article_body)) {
+            if (is_empty($article{$it})) {
+                $err = NewsExtractor::Error->new(
+                    message => u("Failed to extract: $it")
+                );
+                last;
+            }
+        }
+
         $o = NewsExtractor::Article->new(%article);
     } catch {
         my $e = $_;

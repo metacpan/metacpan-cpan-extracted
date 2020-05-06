@@ -1,3 +1,23 @@
+v0.20.0 2020-05-05T21:22:48+0800
+  - CTS: rewritten for quicker extraction.
+
+v0.19.0 2020-05-04T14:01:50+0800
+  - UDN: Update the CSS ruleset for udn.com
+  - Add a site-specific extractor for www.idn.com.tw
+  - Niusnews: Extract journalist name
+  - SETN: Non-human journalist names are now extracted too.
+  - Properly handle non-article pages.
+
+v0.18.0 2020-05-03T19:53:12+0800
+  - Add a site-specific extractor for www.ttv.com.tw
+  - Add a site-specific extractor for www.hkcnews.com
+  - Add a site-specific extractor for www.thestandnews.com
+  - Add a site-specific extractor for www.epochtimes.com
+
+v0.17.0 2020-05-03T09:15:32+0800
+  - Improve the extraction of journalist names on cnews, EBC, CTEE and SETN
+  - Add a site-specific extractor for newnet.tw
+
 v0.16.0 2020-04-26T21:36:41+0800
   - Improve the extraction of journalist names on CTS, CTEE and rti.fr
 

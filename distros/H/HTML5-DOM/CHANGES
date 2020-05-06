@@ -23,4 +23,5 @@
                     - added parseChunkTree function for getting temporary tree when parsing by chunks.
                     - some fixes (encoding value parsing in options)
 2019-01-17  1.14    - fix docs
-2019-01-17  1.14    - fix setting encoding
+2019-01-17  1.15    - fix setting encoding
+2019-01-17  1.16    - fix random trash in innerText in some cases

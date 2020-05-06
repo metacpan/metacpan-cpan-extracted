@@ -119,7 +119,7 @@ ok(
 ok( $res->[0] == 200, 'Code is 200' ) or explain( $res->[0], 200 );
 count(2);
 
-my %headers = @{ $res->[1] };
+%headers = @{ $res->[1] };
 ok( $headers{'zero'} eq '0', 'Found "zero" header with "0"' )
   or print STDERR Data::Dumper::Dumper( $res->[1] );
 ok( $headers{'empty'} eq '', 'Found "empty" header without value' )

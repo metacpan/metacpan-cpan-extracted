@@ -1,5 +1,5 @@
 package Text::Hspell;
-$Text::Hspell::VERSION = '0.2.3';
+$Text::Hspell::VERSION = '0.2.5';
 use 5.014;
 use strict;
 use warnings;
@@ -39,7 +39,7 @@ Text::Hspell - wrapper for the hspell (= Hebrew speller) library
 
 =head1 VERSION
 
-version 0.2.3
+version 0.2.5
 
 =head1 SYNOPSIS
 

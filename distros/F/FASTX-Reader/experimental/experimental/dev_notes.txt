@@ -1,0 +1,11 @@
+# This repo structure
+ * './package' is the production Perl module
+ * './lib' contains prototypes
+
+# How to tell if a module is core?
+1. Install 'Module::CoreList' (cpanm Module::CoreList)
+2. Command: 'corelist Modulename' will report the first release to bundle the module
+
+# How to tell the installed version of a module?
+1. Install V (cpanm V)
+2. Command: 'perl -MV=ModuleName' (e.g. perl -MV=Moose)

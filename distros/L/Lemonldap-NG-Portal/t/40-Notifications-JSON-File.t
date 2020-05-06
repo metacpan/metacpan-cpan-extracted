@@ -94,7 +94,7 @@ ok(
 );
 count(1);
 expectOK($res);
-my $id = expectCookie($res);
+$id = expectCookie($res);
 expectForm( $res, undef, '/notifback', 'reference1x1', 'url' );
 
 # Verify that cookie is ciphered (session unvalid)
@@ -207,7 +207,6 @@ ok(
     $res = $client->_get(
         '/',
         cookie => "lemonldap=$id",
-        length => 64,
         accept => 'text/html',
     ),
     'New auth query'

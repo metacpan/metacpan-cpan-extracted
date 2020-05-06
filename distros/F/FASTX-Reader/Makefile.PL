@@ -21,11 +21,12 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.012",
   "NAME" => "FASTX::Reader",
   "PREREQ_PM" => {
+    "Capture::Tiny" => "0.40",
     "Carp" => "1.2",
     "Data::Dumper" => "2.1",
     "FindBin" => "1.3"
   },
-  "VERSION" => "0.88",
+  "VERSION" => "0.90",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -33,6 +34,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Capture::Tiny" => "0.40",
   "Carp" => "1.2",
   "Data::Dumper" => "2.1",
   "FindBin" => "1.3"

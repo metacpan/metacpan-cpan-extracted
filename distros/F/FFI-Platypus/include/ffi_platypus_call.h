@@ -12,7 +12,7 @@
  *    extra function call.  (`$ffi->function(...)->call(...)` and
  *    `$ffi->attach(foo => ...); foo(...)`).  This is obviously absurd.
  *
- * Maybe all each of these weird trade offs each save only a few ms on
+ * Maybe each of these weird trade offs each save only a few ms on
  * each call, but in the end the can add up.  As a result of this
  * priority set, FFI::Platypus does seem to perform considerably better
  * than any other FFI implementations available in Perl ( see
@@ -28,14 +28,15 @@
 #elif FFI_PL_CALL_RET_NO_NORMAL
 #define RESULT result_ptr
     void *result_ptr;
-    Newx_or_alloca(result_ptr, self->return_type->extra[0].record_value.size, char);
+    Newx_or_alloca(result_ptr, self->return_type->extra[0].record.size, char);
 #else
 #define RESULT result_ptr
     ffi_pl_result result;
     void *result_ptr;
-    if(self->return_type->type_code == FFI_PL_TYPE_RECORD_VALUE)
+    if(self->return_type->type_code == FFI_PL_TYPE_RECORD_VALUE
+    || self->return_type->type_code == (FFI_PL_TYPE_RECORD_VALUE | FFI_PL_SHAPE_CUSTOM_PERL))
     {
-      Newx_or_alloca(result_ptr, self->return_type->extra[0].record_value.size, char);
+      Newx_or_alloca(result_ptr, self->return_type->extra[0].record.size, char);
     }
     else
     {
@@ -66,6 +67,28 @@
       argument_pointers[i] = (void*) &arguments->slot[i];
 
       arg = perl_arg_index < items ? ST(perl_arg_index) : &PL_sv_undef;
+
+      int custom_flag = (type_code & FFI_PL_SHAPE_MASK) == FFI_PL_SHAPE_CUSTOM_PERL;
+      if(custom_flag)
+      {
+        arg = ffi_pl_custom_perl(
+          self->argument_types[i]->extra[0].custom_perl.perl_to_native,
+          arg, i
+        );
+        if(arg == NULL)
+        {
+          int max = self->argument_types[i]->extra[0].custom_perl.argument_count;
+          for(n=0; n < max; n++)
+          {
+            i++;
+            argument_pointers[i] = &arguments->slot[i];
+          }
+          continue;
+        }
+        av_push(MY_CXT.custom_keepers, newRV_inc(arg));
+        type_code ^= FFI_PL_SHAPE_CUSTOM_PERL;
+      }
+
       switch(type_code)
       {
 
@@ -159,7 +182,7 @@
           break;
         case FFI_PL_TYPE_RECORD_VALUE:
           {
-            const char *record_class = self->argument_types[i]->extra[0].record_value.class;
+            const char *record_class = self->argument_types[i]->extra[0].record.class;
             /* TODO if object is read-onyl ? */
             if(sv_isobject(arg) && sv_derived_from(arg, record_class))
             {
@@ -459,7 +482,15 @@
                       break;
 #ifdef FFI_PL_PROBE_LONGDOUBLE
                     case FFI_PL_TYPE_LONG_DOUBLE | FFI_PL_SHAPE_ARRAY:
-                      Newx(ptr, count, long double);
+                      /* gh#236: lets hope the compiler is smart enough to opitmize this */
+                      if(sizeof(long double) >= 16)
+                      {
+                        Newx(ptr, count, long double);
+                      }
+                      else
+                      {
+                        Newx(ptr, count*16, char);
+                      }
                       for(n=0; n<count; n++)
                       {
                         SV *sv = *av_fetch(av, n, 1);
@@ -524,70 +555,6 @@
               break;
 
 /*
- * ARGUMENT IN - CUSTOM
- */
-
-            case FFI_PL_SHAPE_CUSTOM_PERL:
-              {
-                SV *arg2 = ffi_pl_custom_perl(
-                  self->argument_types[i]->extra[0].custom_perl.perl_to_native,
-                  arg,
-                  i
-                );
-
-                if(arg2 != NULL)
-                {
-                  switch(type_code)
-                  {
-                    case FFI_PL_TYPE_UINT8 | FFI_PL_SHAPE_CUSTOM_PERL:
-                      ffi_pl_arguments_set_uint8(arguments, i, SvUV(arg2));
-                      break;
-                    case FFI_PL_TYPE_SINT8 | FFI_PL_SHAPE_CUSTOM_PERL:
-                      ffi_pl_arguments_set_sint8(arguments, i, SvIV(arg2));
-                      break;
-                    case FFI_PL_TYPE_UINT16 | FFI_PL_SHAPE_CUSTOM_PERL:
-                      ffi_pl_arguments_set_uint16(arguments, i, SvUV(arg2));
-                      break;
-                    case FFI_PL_TYPE_SINT16 | FFI_PL_SHAPE_CUSTOM_PERL:
-                      ffi_pl_arguments_set_sint16(arguments, i, SvIV(arg2));
-                      break;
-                    case FFI_PL_TYPE_UINT32 | FFI_PL_SHAPE_CUSTOM_PERL:
-                      ffi_pl_arguments_set_uint32(arguments, i, SvUV(arg2));
-                      break;
-                    case FFI_PL_TYPE_SINT32 | FFI_PL_SHAPE_CUSTOM_PERL:
-                      ffi_pl_arguments_set_sint32(arguments, i, SvIV(arg2));
-                      break;
-                    case FFI_PL_TYPE_UINT64 | FFI_PL_SHAPE_CUSTOM_PERL:
-                      ffi_pl_arguments_set_uint64(arguments, i, SvU64(arg2));
-                      break;
-                    case FFI_PL_TYPE_SINT64 | FFI_PL_SHAPE_CUSTOM_PERL:
-                      ffi_pl_arguments_set_sint64(arguments, i, SvI64(arg2));
-                      break;
-                    case FFI_PL_TYPE_FLOAT | FFI_PL_SHAPE_CUSTOM_PERL:
-                      ffi_pl_arguments_set_float(arguments, i, SvNV(arg2));
-                      break;
-                    case FFI_PL_TYPE_DOUBLE | FFI_PL_SHAPE_CUSTOM_PERL:
-                      ffi_pl_arguments_set_double(arguments, i, SvNV(arg2));
-                      break;
-                    case FFI_PL_TYPE_OPAQUE | FFI_PL_SHAPE_CUSTOM_PERL:
-                      ffi_pl_arguments_set_pointer(arguments, i, SvOK(arg2) ? INT2PTR(void*, SvIV(arg2)) : NULL);
-                      break;
-                    default:
-                      warn("argument type not supported (%d)", i);
-                      break;
-                  }
-                  SvREFCNT_dec(arg2);
-                }
-
-                for(n=0; n < self->argument_types[i]->extra[0].custom_perl.argument_count; n++)
-                {
-                  i++;
-                  argument_pointers[i] = &arguments->slot[i];
-                }
-              }
-              break;
-
-/*
  * ARGUMENT IN - OBJECT
  */
 
@@ -645,6 +612,17 @@
               break;
           }
       }
+
+      if(custom_flag)
+      {
+        int max = self->argument_types[i]->extra[0].custom_perl.argument_count;
+        SvREFCNT_dec(arg);
+        for(n=0; n < max; n++)
+        {
+          i++;
+          argument_pointers[i] = &arguments->slot[i];
+        }
+      }
     }
 
     /*
@@ -657,7 +635,7 @@
     {
       fprintf(stderr, "# [%d] <%04x> %p %p",
         i,
-        self->argument_types[i]->code_type,
+        self->argument_types[i]->type_code,
         argument_pointers[i],
         &arguments->slot[i]
       );
@@ -708,6 +686,7 @@
 /*
  * ARGUMENT OUT - SCALAR TYPES
  */
+
         case FFI_PL_TYPE_CLOSURE:
           {
             arg = perl_arg_index < items ? ST(perl_arg_index) : &PL_sv_undef;
@@ -726,7 +705,6 @@
 /*
  * ARGUMENT OUT - POINTER TYPES
  */
-
             case FFI_PL_SHAPE_POINTER:
               {
                 void *ptr = ffi_pl_arguments_get_pointer(arguments, i);
@@ -951,6 +929,11 @@
                     ffi_pl_custom_perl_cb(coderef, arg, i);
                   }
                 }
+                {
+                  SV *sv = av_pop(MY_CXT.custom_keepers);
+                  if(SvOK(sv))
+                    SvREFCNT_dec(sv);
+                }
               }
               break;
 
@@ -990,9 +973,31 @@
           {
             SV *value, *ref;
             value = newSV(0);
-            sv_setpvn(value, result_ptr, self->return_type->extra[0].record_value.size);
+            sv_setpvn(value, result_ptr, self->return_type->extra[0].record.size);
             ref = ST(0) = sv_2mortal(newRV_noinc(value));
-            sv_bless(ref, gv_stashpv(self->return_type->extra[0].record_value.class, GV_ADD));
+            sv_bless(ref, gv_stashpv(self->return_type->extra[0].record.class, GV_ADD));
+            ffi_pl_heap_free();
+            XSRETURN(1);
+          }
+          break;
+        case FFI_PL_TYPE_RECORD_VALUE | FFI_PL_SHAPE_CUSTOM_PERL:
+          {
+            SV *value, *ref;
+            value = newSV(0);
+            sv_setpvn(value, result_ptr, self->return_type->extra[0].record.size);
+            ref = sv_2mortal(newRV_noinc(value));
+            sv_bless(ref, gv_stashpv(self->return_type->extra[0].record.class, GV_ADD));
+
+            MY_CXT.current_argv = arguments;
+
+            ST(0) = ffi_pl_custom_perl(
+              self->return_type->extra[0].custom_perl.native_to_perl,
+              ref,
+              -1
+            );
+
+            MY_CXT.current_argv = NULL;
+
             ffi_pl_heap_free();
             XSRETURN(1);
           }
@@ -1068,7 +1073,14 @@
         case FFI_PL_TYPE_STRING:
           if(result.pointer == NULL)
           {
-            XSRETURN_EMPTY;
+            if(self->platypus_api >= 2)
+            {
+              XSRETURN_UNDEF;
+            }
+            else
+            {
+              XSRETURN_EMPTY;
+            }
           }
           else
           {
@@ -1134,30 +1146,79 @@
           break;
 #endif
         case FFI_PL_TYPE_RECORD:
+        case FFI_PL_TYPE_RECORD | FFI_PL_SHAPE_CUSTOM_PERL:
           if(result.pointer == NULL)
           {
-            XSRETURN_EMPTY;
-          }
-          else
-          {
-            SV *value = newSV(0);
-            sv_setpvn(value, result.pointer, self->return_type->extra[0].record.size);
-            if(self->return_type->extra[0].record.stash)
+            if((type_code & FFI_PL_SHAPE_MASK) == FFI_PL_SHAPE_CUSTOM_PERL)
             {
-              SV *ref = ST(0) = sv_2mortal(newRV_noinc(value));
-              sv_bless(ref, self->return_type->extra[0].record.stash);
+              MY_CXT.current_argv = arguments;
+
+              ST(0) = ffi_pl_custom_perl(
+                self->return_type->extra[0].custom_perl.native_to_perl,
+                &PL_sv_undef,
+                -1
+              );
+
+              MY_CXT.current_argv = NULL;
+              ffi_pl_heap_free();
+              XSRETURN(1);
+            }
+            if(self->platypus_api >= 2)
+            {
+              XSRETURN_UNDEF;
             }
             else
             {
-              ST(0) = sv_2mortal(value);
+              XSRETURN_EMPTY;
             }
+          }
+          else
+          {
+            SV *ref;
+            SV *value = newSV(0);
+            sv_setpvn(value, result.pointer, self->return_type->extra[0].record.size);
+            if(self->return_type->extra[0].record.class != NULL)
+            {
+              ref = sv_2mortal(newRV_noinc(value));
+              sv_bless(ref, gv_stashpv(self->return_type->extra[0].record.class, GV_ADD));
+            }
+            else
+            {
+              ref = sv_2mortal(value);
+            }
+
+            if((type_code & FFI_PL_SHAPE_MASK) == FFI_PL_SHAPE_CUSTOM_PERL)
+            {
+              MY_CXT.current_argv = arguments;
+
+              ST(0) = ffi_pl_custom_perl(
+                self->return_type->extra[0].custom_perl.native_to_perl,
+                ref,
+                -1
+              );
+
+              MY_CXT.current_argv = NULL;
+              ffi_pl_heap_free();
+            }
+            else
+            {
+              ST(0) = ref;
+            }
+
             XSRETURN(1);
           }
           break;
         case FFI_PL_SHAPE_OBJECT | FFI_PL_TYPE_OPAQUE:
           if(result.pointer == NULL)
           {
-            XSRETURN_EMPTY;
+            if(self->platypus_api >= 2)
+            {
+              XSRETURN_UNDEF;
+            }
+            else
+            {
+              XSRETURN_EMPTY;
+            }
           }
           else
           {
@@ -1181,7 +1242,14 @@
             case FFI_PL_SHAPE_POINTER:
               if(result.pointer == NULL)
               {
-                XSRETURN_EMPTY;
+                if(self->platypus_api >= 2)
+                {
+                  XSRETURN_UNDEF;
+                }
+                else
+                {
+                  XSRETURN_EMPTY;
+                }
               }
               else
               {
@@ -1214,7 +1282,7 @@
                     break;
                   case FFI_PL_TYPE_UINT64 | FFI_PL_SHAPE_POINTER:
                     value = newSV(0);
-                    sv_seti64(value, *((int64_t*) result.pointer));
+                    sv_setu64(value, *((uint64_t*) result.pointer));
                     break;
                   case FFI_PL_TYPE_SINT64 | FFI_PL_SHAPE_POINTER:
                     value = newSV(0);
@@ -1288,7 +1356,14 @@
             case FFI_PL_SHAPE_ARRAY:
               if(result.pointer == NULL)
               {
-                XSRETURN_EMPTY;
+                if(self->platypus_api >= 2)
+                {
+                  XSRETURN_UNDEF;
+                }
+                else
+                {
+                  XSRETURN_EMPTY;
+                }
               }
               else
               {
@@ -1437,6 +1512,7 @@
                 SV *ret_in=NULL, *ret_out;
                 switch(type_code)
                 {
+                  /* TODO: FFI_PL_BASE_VOID, FFI_PL_BASE_COMPLEX, FFI_PL_BASE_STRING, FFI_PL_BASE_CLOSURE, FFI_PL_BASE_RECORD */
                   case FFI_PL_TYPE_UINT8 | FFI_PL_SHAPE_CUSTOM_PERL:
 #if defined FFI_PL_PROBE_BIGENDIAN
                     ret_in = newSVuv(result.uint8_array[3]);
@@ -1528,7 +1604,14 @@
 
                 if(ret_out == NULL)
                 {
-                  XSRETURN_EMPTY;
+                  if(self->platypus_api >= 2)
+                  {
+                    XSRETURN_UNDEF;
+                  }
+                  else
+                  {
+                    XSRETURN_EMPTY;
+                  }
                 }
                 else
                 {

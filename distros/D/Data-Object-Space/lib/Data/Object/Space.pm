@@ -8,9 +8,11 @@ use routines;
 
 use parent 'Data::Object::Name';
 
-our $VERSION = '2.01'; # VERSION
+our $VERSION = '2.03'; # VERSION
 
 # METHODS
+
+my %has;
 
 method append(@args) {
   my $class = $self->class;
@@ -150,6 +152,30 @@ method cop($func, @args) {
   return sub { $next->(@args ? (@args, @_) : @_) };
 }
 
+method destroy() {
+  require Symbol;
+
+  Symbol::delete_package($self->package);
+
+  my $c_re = quotemeta $self->package;
+  my $p_re = quotemeta $self->path;
+
+  map {delete $has{$_}} grep /^$c_re/, keys %has;
+  map {delete $INC{$_}} grep /^$p_re/, keys %INC;
+
+  return $self;
+}
+
+method eval(@args) {
+  local $@;
+
+  my $result = eval join ' ', map "$_", "package @{[$self->package]};", @args;
+
+  Carp::confess $@ if $@;
+
+  return $result;
+}
+
 method functions() {
   my @functions;
 
@@ -197,12 +223,15 @@ method inherits() {
   return $self->array('ISA');
 }
 
-my $loaded_spaces = {};
+method included() {
+
+  return $INC{$self->format('path', '%s.pm')};
+}
 
 method load() {
   my $class = $self->package;
 
-  return $class if $loaded_spaces->{$class};
+  return $class if $has{$class};
 
   my $failed = !$class || $class !~ /^\w(?:[\w:']*\w)?$/;
   my $loaded;
@@ -230,9 +259,31 @@ method load() {
   or $failed
   or not $loaded;
 
-  $loaded_spaces->{$class} = 1;
+  $has{$class} = 1;
 
   return $class;
+}
+
+method loaded() {
+  my $class = $self->package;
+  my $pexpr = $self->format('path', '%s.pm');
+
+  my $is_loaded_eval = $has{$class};
+  my $is_loaded_used = $INC{$pexpr};
+
+  return ($is_loaded_eval || $is_loaded_used) ? 1 : 0;
+}
+
+method locate() {
+  my $found = '';
+
+  my $file = $self->format('path', '%s.pm');
+
+  for my $path (@INC) {
+    do { $found = "$path/$file"; last } if -f "$path/$file";
+  }
+
+  return $found;
 }
 
 method methods() {
@@ -290,6 +341,14 @@ method prepend(@args) {
     (map $class->new($_)->path, @args), $self->path;
 
   return $class->new($path);
+}
+
+method rebase(@args) {
+  my $class = $self->class;
+
+  my $path = join '/', map $class->new($_)->path, @args;
+
+  return $class->new($self->base)->prepend($path);
 }
 
 method root() {
@@ -375,16 +434,12 @@ method siblings() {
 
 method used() {
   my $class = $self->package;
-  my $loaded = $loaded_spaces->{$class};
   my $path = $self->path;
   my $regexp = quotemeta $path;
 
-  if ($loaded) {
+  return $path if $has{$class};
 
-    return $path;
-  }
   for my $item (keys %INC) {
-
     return $path if $item =~ /$regexp\.pm$/;
   }
 
@@ -784,6 +839,55 @@ and if successful returns a closure.
 
 =cut
 
+=head2 destroy
+
+  destroy() : Object
+
+The destroy method attempts to wipe out a namespace and also remove it and its
+children from C<%INC>. B<NOTE:> This can cause catastrophic failures if used
+incorrectly.
+
+=over 4
+
+=item destroy example #1
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('data/dumper');
+
+  $space->load; # Data/Dumper
+
+  $space->destroy;
+
+=back
+
+=cut
+
+=head2 eval
+
+  eval(Str @args) : Any
+
+The eval method takes a list of strings and evaluates them under the namespace
+represented by the instance.
+
+=over 4
+
+=item eval example #1
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('foo');
+
+  $space->eval('our $VERSION = 0.01');
+
+=back
+
+=cut
+
 =head2 functions
 
   functions() : ArrayRef
@@ -898,6 +1002,28 @@ The id method returns the fully-qualified package name as a label.
 
 =cut
 
+=head2 included
+
+  included() : Str
+
+The included method returns the path of the namespace if it exists in C<%INC>.
+
+=over 4
+
+=item included example #1
+
+  package main;
+
+  my $space = Data::Object::Space->new('Data/Object/Space');
+
+  $space->included;
+
+  # lib/Data/Object/Space.pm
+
+=back
+
+=cut
+
 =head2 inherits
 
   inherits() : ArrayRef
@@ -967,6 +1093,91 @@ C<meta>, or C<import> routine it will be recognized as having been loaded.
   $space->load
 
   # CPAN
+
+=back
+
+=cut
+
+=head2 loaded
+
+  loaded() : Int
+
+The loaded method checks whether the package namespace is already loaded
+returns truthy or falsy.
+
+=over 4
+
+=item loaded example #1
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('data/dumper');
+
+  $space->loaded;
+
+  # 0
+
+=back
+
+=over 4
+
+=item loaded example #2
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('data/dumper');
+
+  $space->load;
+
+  $space->loaded;
+
+  # 1
+
+=back
+
+=cut
+
+=head2 locate
+
+  locate() : Str
+
+The locate method checks whether the package namespace is available in
+C<@INC>, i.e. on disk. This method returns the file if found or an empty
+string.
+
+=over 4
+
+=item locate example #1
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('foo');
+
+  $space->locate;
+
+  # ''
+
+=back
+
+=over 4
+
+=item locate example #2
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('data/dumper');
+
+  $space->locate;
+
+  # /path/to/Data/Dumper.pm
 
 =back
 
@@ -1189,6 +1400,27 @@ parts.
   $space->prepend('etc', 'tmp');
 
   # 'Etc/Tmp/Foo/Bar'
+
+=back
+
+=cut
+
+=head2 rebase
+
+  rebase(Str @args) : Object
+
+The rebase method returns an object by prepending the package namespace
+specified to the base of the current object's namespace.
+
+=over 4
+
+=item rebase example #1
+
+  # given: synopsis
+
+  $space->rebase('zoo');
+
+  # Zoo/Bar
 
 =back
 

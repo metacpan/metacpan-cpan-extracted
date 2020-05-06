@@ -5,7 +5,7 @@ use Mouse;
 use Lemonldap::NG::Common::Conf::Constants;
 use JSON qw(from_json to_json);
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.8';
 
 has sessionTypes => ( is => 'rw' );
 
@@ -219,14 +219,16 @@ sub _session {
     my $apacheSession = $self->getApacheSession( $mod, $id )
       or return $self->sendError( $req, undef, 400 );
 
-    my %session = %{ $apacheSession->data };
-
+    my %session   = %{ $apacheSession->data };
     unless ($raw) {
+        my $separator = $self->separator();
         foreach my $k ( keys %session ) {
             $session{$k} = '**********'
               if ( $self->hAttr =~ /\b$k\b/ );
-            $session{$k} = [ split /$self->separator/o, $session{$k} ]
-              if ( $session{$k} =~ /$self->separator/o );
+            if ( $session{$k} =~ /$separator/ ) {
+                $self->logger->debug("Convert \"$k\" value to array");
+                $session{$k} = [ split /$separator/, $session{$k} ];
+            }
         }
     }
 
@@ -283,11 +285,11 @@ sub getMod {
     my ( $self, $req ) = @_;
     my ( $s, $m );
     unless ( $s = $req->params('sessionType') ) {
-        $self->error($req->error('Session type is required'));
+        $self->error( $req->error('Session type is required') );
         return ();
     }
     unless ( $m = $self->sessionTypes->{$s} ) {
-        $self->error($req->error('Unknown (or unconfigured) session type'));
+        $self->error( $req->error('Unknown (or unconfigured) session type') );
         return ();
     }
     if ( my $kind = $req->params('kind') ) {

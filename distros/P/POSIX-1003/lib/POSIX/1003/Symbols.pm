@@ -1,7 +1,7 @@
-# Copyrights 2011-2013 by [Mark Overmeer].
+# Copyrights 2011-2020 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.01.
+# Pod stripped from pm file by OODoc 2.02.
 # Warning: generated during module installation
 #  by ./symbols.PL
 #  at Fri Nov  8 18:06:34 2013
@@ -9,7 +9,7 @@
 
 package POSIX::1003;
 use vars '$VERSION';
-$VERSION = '0.98';
+$VERSION = '1.00';
 
 
 our %EXPORT_TAGS = (

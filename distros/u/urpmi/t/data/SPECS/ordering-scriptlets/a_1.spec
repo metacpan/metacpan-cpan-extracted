@@ -8,6 +8,8 @@ Release: 1
 License: x
 Provides: /bin/a
 #BuildRequires: gcc
+# Fix testsuite on eg: mga2 if static build fails and libc got included:
+Provides: rtld(GNU_HASH)
 %global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^libc.so|^ld
 %global __provides_exclude %{?__provides_exclude:%__provides_exclude|}^libc.so|^ld
 

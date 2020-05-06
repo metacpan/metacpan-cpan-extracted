@@ -8,7 +8,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_DECRYPTVALUE_SERVICE_NOT_ALLOWED
 );
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -30,20 +30,14 @@ has ott  => (
 
 sub init {
     my ($self) = @_;
-    my $hd = $self->p->HANDLER;
     $self->addAuthRoute( decryptvalue => 'run', ['POST'] )
       ->addAuthRouteWithRedirect( decryptvalue => 'display', ['GET'] );
 
     # Parse activation rule
-    $self->logger->debug(
-        'DecryptValue rule -> ' . $self->conf->{decryptValueRule} );
-    my $rule =
-      $hd->buildSub( $hd->substitute( $self->conf->{decryptValueRule} ) );
-    unless ($rule) {
-        $self->error( 'Bad decryptValue rule -> ' . $hd->tsv->{jail}->error );
-        return 0;
-    }
-    $self->rule($rule);
+    $self->rule(
+        $self->p->buildRule( $self->conf->{decryptValueRule}, 'decryptValue' )
+    );
+    return 0 unless $self->rule;
 
     return 1;
 }
@@ -81,7 +75,7 @@ sub display {
 
 sub run {
     my ( $self, $req ) = @_;
-    my ( $msg, $decryptedValue ) = ( '', '' );
+    my $msg = my $decryptedValue = '';
 
     # Check access rules
     unless ( $self->rule->( $req, $req->userData ) ) {

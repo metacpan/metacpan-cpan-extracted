@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Solution::Base;
-$Games::Solitaire::Verify::Solution::Base::VERSION = '0.2402';
+$Games::Solitaire::Verify::Solution::Base::VERSION = '0.2403';
 use strict;
 use warnings;
 
@@ -100,7 +100,7 @@ all Games::Solitaire::Verify::Solution::* classes.
 
 =head1 VERSION
 
-version 0.2402
+version 0.2403
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

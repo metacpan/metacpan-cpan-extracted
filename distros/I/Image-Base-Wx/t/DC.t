@@ -43,7 +43,7 @@ $dc->SetPen($pen);
 #------------------------------------------------------------------------------
 # VERSION
 
-my $want_version = 5;
+my $want_version = 6;
 is ($Image::Base::Wx::DC::VERSION,
     $want_version, 'VERSION variable');
 is (Image::Base::Wx::DC->VERSION,

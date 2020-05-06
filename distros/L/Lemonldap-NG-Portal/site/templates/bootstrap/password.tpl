@@ -55,9 +55,15 @@
       <input id="confirmpassword" name="confirmpassword" type="password" class="form-control" trplaceholder="confirmPwd" required aria-required="true"/>
     </div>
 
-    <button type="submit" class="btn btn-success">
-      <span class="fa fa-check-circle"></span>
-      <span trspan="submit">Submit</span>
-    </button>
+    <div class="buttons">
+      <button type="submit" class="btn btn-success">
+        <span class="fa fa-check-circle"></span>
+        <span trspan="submit">Submit</span>
+      </button>
+      <span id="show-hide-button" class="btn btn-info" role="button">
+        <span id='show-hide-icon-button' class="fa fa-eye"></span>
+        <span trspan="showhidePasswords">Show/Hide passwords</span>
+      </span>
+    </div>
   </div>
   </form>

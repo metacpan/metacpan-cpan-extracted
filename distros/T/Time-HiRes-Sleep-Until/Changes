@@ -1,5 +1,10 @@
 Revision history for Perl module Time::HiRes::Sleep::Until
 
+0.08 2020-04-30
+  - Updated lib/Time/HiRes/Sleep/Until.pm
+    - Added time and sleep wrappers
+    - Updated documentation
+
 0.07 2014-10-20
   - Updated tests to hopefully get a better pass rate from CPAN testers
 

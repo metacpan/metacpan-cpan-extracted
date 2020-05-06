@@ -116,8 +116,8 @@ ok(
     'POST checkuser'
 );
 my %attributes = map /<td scope="row">(.+)?<\/td>/g, $res->[2]->[0];
-ok( scalar keys %attributes == 17, 'Found 17 attributes' )
-  or print STDERR "Missing attributes -> " . scalar keys %attributes;
+ok( scalar keys %attributes == 19, 'Found 19 attributes' )
+  or print STDERR "Wrong number of attributes -> " . scalar keys %attributes;
 ok( $attributes{'_updateTime'} =~ /^\d{14}$/, 'Timestamp found' )
   or print STDERR Dumper( \%attributes );
 count(3);
@@ -184,8 +184,8 @@ ok(
     'POST checkuser'
 );
 my %attributes2 = map /<td scope="row">(.+)?<\/td>/g, $res->[2]->[0];
-ok( scalar keys %attributes2 == 17, 'Found 17 attributes' )
-  or print STDERR "Missing attributes -> " . scalar keys %attributes2;
+ok( scalar keys %attributes2 == 19, 'Found 19 attributes' )
+  or print STDERR "Wrong nunber of attributes -> " . scalar keys %attributes2;
 ok( $attributes2{'_updateTime'} =~ /^\d{14}$/, 'Timestamp found' )
   or print STDERR Dumper( \%attributes2 );
 count(3);
@@ -211,7 +211,7 @@ expectOK($res);
 
 ok(
     $res->[2]->[0] =~
-m%<div class="message message-positive alert"><span trmsg="47"></span></div>%,
+m%<div class="message message-positive alert"><span trmsg="47">%,
     'Dwho has been well disconnected'
 ) or print STDERR Dumper( $res->[2]->[0] );
 count(1);

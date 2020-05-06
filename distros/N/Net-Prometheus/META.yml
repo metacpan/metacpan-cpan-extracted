@@ -3,6 +3,7 @@ abstract: 'export monitoring metrics for F<prometheus>'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
+  HTTP::Request: '0'
   List::Util: '1.29'
   Test::Fatal: '0'
   Test::More: '0.88'
@@ -18,38 +19,39 @@ name: Net-Prometheus
 provides:
   Net::Prometheus:
     file: lib/Net/Prometheus.pm
-    version: '0.08'
+    version: '0.10'
   Net::Prometheus::Counter:
     file: lib/Net/Prometheus/Counter.pm
-    version: '0.08'
+    version: '0.10'
   Net::Prometheus::Gauge:
     file: lib/Net/Prometheus/Gauge.pm
-    version: '0.08'
+    version: '0.10'
   Net::Prometheus::Histogram:
     file: lib/Net/Prometheus/Histogram.pm
-    version: '0.08'
+    version: '0.10'
   Net::Prometheus::Metric:
     file: lib/Net/Prometheus/Metric.pm
-    version: '0.08'
+    version: '0.10'
   Net::Prometheus::ProcessCollector:
     file: lib/Net/Prometheus/ProcessCollector.pm
-    version: '0.08'
+    version: '0.10'
   Net::Prometheus::ProcessCollector::linux:
     file: lib/Net/Prometheus/ProcessCollector/linux.pm
-    version: '0.08'
+    version: '0.10'
   Net::Prometheus::Registry:
     file: lib/Net/Prometheus/Registry.pm
   Net::Prometheus::Summary:
     file: lib/Net/Prometheus/Summary.pm
-    version: '0.08'
+    version: '0.10'
   Net::Prometheus::Types:
     file: lib/Net/Prometheus/Types.pm
-    version: '0.08'
+    version: '0.10'
 requires:
   List::Util: '1.33'
   Ref::Util: '0'
   Struct::Dumb: '0'
+  URI: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.08'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

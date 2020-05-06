@@ -15,7 +15,7 @@ SKIP: {
 
     my @names = sort $res->addr2name( '8.8.8.8' );
     $count = $res->addr2name( '8.8.8.8' );
-    is_deeply( [map {lc($_)} @names], ['google-public-dns-a.google.com.'], 'expected names' );
+    is_deeply( [map {lc($_)} @names], ['dns.google.'], 'expected names' );
     is( $count, 1, 'expected name count' );
 }
 

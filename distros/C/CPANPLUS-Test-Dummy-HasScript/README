@@ -1,25 +1,31 @@
 NAME
+
     CPANPLUS::Test::Dummy::HasScript - CPANPLUS Test Dummy
 
 VERSION
-    version 0.0004
+
+    version 0.0006
 
 SYNOPSIS
-     # erm
 
+     # erm
+    
      cpanp -i ACME::CPANPLUS::Module::With::Core::PreReq
 
 DESCRIPTION
-    CPANPLUS::Test::Dummy::HasScript is a fake module that has a script file
-    so I can test something in CPANPLUS and CPANPLUS::YACSmoke
+
+    CPANPLUS::Test::Dummy::HasScript is a fake module that has a script
+    file so I can test something in CPANPLUS and CPANPLUS::YACSmoke
 
     No moving parts and nothing to see.
 
 AUTHOR
+
     Chris Williams <chris@bingosnet.co.uk>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2012 by Chris Williams.
+
+    This software is copyright (c) 2020 by Chris Williams.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

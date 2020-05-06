@@ -11,7 +11,7 @@ use Scalar::Util qw(looks_like_number);
 
 use parent 'App::HomeBank2Ledger::Formatter';
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 my %STATUS_SYMBOLS = (
     cleared => '*',
@@ -301,7 +301,7 @@ App::HomeBank2Ledger::Formatter::Beancount - Beancount formatter
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 DESCRIPTION
 

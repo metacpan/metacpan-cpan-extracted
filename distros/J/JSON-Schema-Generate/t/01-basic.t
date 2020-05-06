@@ -19,9 +19,14 @@ my $data = '{
 my $schem = JSON::Schema::Generate->new(
 	id => 'https://example.com/arrays.schema.json',
 	description => 'A representation of a person, company, organization, or place',
+	spec => {
+		id => {
+			title => 'The ID of the door',
+			description => 'This section represents the id of the door.'
+		}
+	}
 )->learn($data)->generate;
 
-diag explain $schem;
 use JSON::Schema;
 my $validator = JSON::Schema->new($schem);
 my $result = $validator->validate($data);

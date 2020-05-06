@@ -6,7 +6,7 @@ BEGIN {
     eval "use GSSAPI";
 }
 
-my $maintests = 9;
+my $maintests = 12;
 my $debug     = 'error';
 
 SKIP: {
@@ -43,9 +43,16 @@ SKIP: {
             }
         }
     );
-    ok( $res = $client->_get( '/', accept => 'text/html' ),
-        'First access with JS' );
+    ok(
+        $res = $client->_get(
+            '/',
+            query  => 'url=aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tCg==',
+            accept => 'text/html'
+        ),
+        'First access with JS'
+    );
 
+    my $pdata = expectCookie( $res, "lemonldappdata" );
     expectForm( $res, '#', undef, 'kerberos' );
     ok(
         $res->[2]->[0] =~ m%<input type="hidden" name="kerberos" value="0" />%,
@@ -56,22 +63,45 @@ SKIP: {
         $res = $client->_get(
             '/',
             query  => 'kerberos=1',
-            accept => 'application/json'
+            accept => 'application/json',
+            cookie => "lemonldappdata=$pdata"
         ),
         'Ajax access'
     );
     ok( $res->[0] == 401, 'Get 401' ) or explain( $res->[0], 401 );
+    $pdata = expectCookie( $res, "lemonldappdata" );
 
     ok(
         $res = $client->_get(
             '/',
             query  => 'kerberos=1',
             accept => 'application/json',
-            custom => { HTTP_AUTHORIZATION => 'Negotiate c29tZXRoaW5n' }
+            custom => { HTTP_AUTHORIZATION => 'Negotiate c29tZXRoaW5n' },
+            cookie => "lemonldappdata=$pdata"
         ),
         'Push fake kerberos'
     );
-    expectCookie($res);
+    my $id = expectCookie($res);
+    $pdata = expectCookie( $res, "lemonldappdata" );
+    ok( !$pdata, "Persistent data removed" );
+
+    # Redirect to application
+    ok(
+        $res = $client->_get(
+            '/',
+            query  => 'url=aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tCg==&kerberos=0',
+            accept => 'text/html',
+            cookie => "lemonldap=$id"
+        ),
+        'Go to portal after authentication'
+    );
+
+    expectRedirection( $res, qr#http://test1.example.com# );
+    my $cookies = getCookies($res);
+    ok(
+        !defined( $cookies->{lemonldappdata} ),
+        " Make sure no pdata is returned"
+    );
 
     #print STDERR Dumper($res);
 }

@@ -4,7 +4,7 @@ use IO::String;
 use Data::Dumper;
 
 require 't/test-lib.pm';
-my $maintests = 52;
+my $maintests = 56;
 
 SKIP: {
     eval { require Convert::Base32 };
@@ -26,6 +26,7 @@ SKIP: {
                 totp2fActivation       => 1,
                 u2fSelfRegistration    => 1,
                 u2fActivation          => 1,
+                sfManagerRule          => '$uid eq "dwho"',
                 portalMainLogo         => 'common/logos/logo_llng_old.png',
             }
         }
@@ -43,6 +44,18 @@ SKIP: {
         'Auth query'
     );
     my $id = expectCookie($res);
+
+    ok(
+        $res = $client->_get(
+            '/',
+            cookie => "lemonldap=$id",
+            accept => 'text/html'
+        ),
+        'Get Menu'
+    );
+    ok( $res->[2]->[0] =~ m%<span trspan="sfaManager">sfaManager</span>%,
+        'sfaManager link found' )
+      or print STDERR Dumper( $res->[2]->[0] );
 
     # TOTP form
     ok(
@@ -64,10 +77,13 @@ SKIP: {
     );
     ok( $res->[2]->[0] =~ /totpregistration\.(?:min\.)?js/, 'Found TOTP js' );
     ok(
-        $res->[2]->[0] =~ qr%<img src="/static/common/logos/logo_llng_old.png"%,
+        $res->[2]->[0] =~
+          qr%<img src="/static/common/logos/logo_llng_old\.png"%,
         'Found custom Main Logo'
     ) or print STDERR Dumper( $res->[2]->[0] );
-    count(1);
+    ok( $res->[2]->[0] =~ qr%<span id="languages"></span>%,
+        'Language icons found' )
+      or print STDERR Dumper( $res->[2]->[0] );
 
     # Register TOTP
     # JS query
@@ -228,7 +244,6 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
             version          => "U2F_V2"
         }
     );
-    my ( $host, $url, $query );
     $query = Lemonldap::NG::Common::FormEncode::build_urlencoded(
         registration => $registrationData,
         challenge    => $res->[2]->[0],

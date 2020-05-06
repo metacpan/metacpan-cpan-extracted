@@ -1,5 +1,5 @@
 This archive contains the distribution FASTX-Reader,
-version 0.88:
+version 0.90:
 
   A lightweight module to parse FASTA and FASTQ files, supporting compressed files and paired-ends.
 

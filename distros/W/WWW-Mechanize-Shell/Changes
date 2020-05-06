@@ -13,6 +13,11 @@ Todo:
     * Add set-cookie and delete-cookie commands
     * Add (optional) HTTP::Cookies::Find support
 
+0.59 2020-05-04
+    * HTML::Form::find_input() has a 1-based index
+      Reported by the CPAN testers, thanks!
+
+
 0.58 2019-09-30
     * Made the tests pass on IPv6 enabled systems
       Uncovered by making Test::HTTP::LocalServer work on IPv6 enabled systems.

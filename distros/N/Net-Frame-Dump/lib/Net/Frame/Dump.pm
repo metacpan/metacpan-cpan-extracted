@@ -1,11 +1,11 @@
 #
-# $Id: Dump.pm,v 89981a6995b9 2018/06/17 11:10:11 gomor $
+# $Id: Dump.pm,v a93481b098ec 2020/05/01 08:55:56 gomor $
 #
 package Net::Frame::Dump;
 use strict;
 use warnings;
 
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 
 use base qw(Class::Gomor::Array Exporter);
 
@@ -37,6 +37,7 @@ use constant NF_DUMP_LAYER_ERF            => 175;
 our @AS = qw(
    file
    filter
+   filterCodeOptimizer
    overwrite
    firstLayer
    isRunning
@@ -62,6 +63,7 @@ sub new {
       overwrite     => 0,
       isRunning     => 0,
       keepTimestamp => 0,
+      filterCodeOptimizer => 0,
       frames        => [],
       _framesStored => {},
       @_,
@@ -252,7 +254,7 @@ Patrice E<lt>GomoRE<gt> Auffret
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2006-2018, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2006-2020, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the Artistic license.
 See LICENSE.Artistic file in the source distribution archive.

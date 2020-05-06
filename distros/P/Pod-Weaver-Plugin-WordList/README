@@ -3,9 +3,9 @@ NAME
     distribution
 
 VERSION
-    This document describes version 0.060 of Pod::Weaver::Plugin::WordList
+    This document describes version 0.061 of Pod::Weaver::Plugin::WordList
     (from Perl distribution Pod-Weaver-Plugin-WordList), released on
-    2018-02-20.
+    2020-05-04.
 
 SYNOPSIS
     In your weaver.ini:
@@ -43,13 +43,11 @@ SEE ALSO
 
     Dist::Zilla::Plugin::WordList
 
-    Pod::Weaver::Plugin::WordListC
-
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018, 2016 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

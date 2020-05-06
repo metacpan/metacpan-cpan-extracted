@@ -4,7 +4,7 @@ use strict;
 use Mouse;
 use XML::LibXML;
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 # XML parser
 has parser => (
@@ -25,12 +25,15 @@ sub newNotification {
         eval { $self->logger->error("Unable to read XML file : $err") };
         return 0;
     }
+
     my @notifs;
     my ( $version, $encoding ) = ( $xml->version(), $xml->encoding() );
+
     foreach
       my $notif ( $xml->documentElement->getElementsByTagName('notification') )
     {
         my @data = ();
+        $notif->{reference} =~ s/_/-/g; # Remove underscores (#2135)
 
         # Mandatory information
         foreach (qw(date uid reference)) {
@@ -45,7 +48,7 @@ sub newNotification {
                 $self->logger->error("$err");
                 return 0;
             }
-            
+
             # Prevent to store time. Keep date only
             $tmp =~ s/^(\d{4}-\d{2}-\d{2}).*$/$1/;
             push @data, $tmp;
@@ -59,8 +62,8 @@ sub newNotification {
             }
             else {
                 $self->userLogger->info(
-                    "Set defaultCondition ($defaultCond) for notification " . $notif->{reference}
-                );
+                    "Set defaultCondition ($defaultCond) for notification "
+                      . $notif->{reference} );
                 push @data, $defaultCond;
             }
         }

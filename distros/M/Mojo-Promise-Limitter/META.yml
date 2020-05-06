@@ -1,0 +1,37 @@
+---
+abstract: 'limit outstanding calls to Mojo::Promise'
+author:
+  - 'Shoichi Kaji <skaji@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-Promise-Limitter
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Mojo::Promise::Limitter:
+    file: lib/Mojo/Promise/Limitter.pm
+    version: '0.001'
+requires:
+  Mojolicious: '8.42'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/skaji/Mojo-Promise-Limitter/issues
+  homepage: https://github.com/skaji/Mojo-Promise-Limitter
+  repository: https://github.com/skaji/Mojo-Promise-Limitter.git
+version: '0.001'
+x_generated_by_perl: v5.30.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_static_install: 1

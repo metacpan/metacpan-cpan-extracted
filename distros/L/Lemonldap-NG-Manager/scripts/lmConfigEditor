@@ -63,18 +63,17 @@ if (`diff $refFile $editFile`) {
     # Update author and date
     $VAR1->{cfgAuthor} = $ENV{SUDO_USER} || $ENV{LOGNAME} || "lmConfigEditor";
     $VAR1->{cfgAuthorIP} = $ENV{SSH_CONNECTION} || "localhost";
-    $VAR1->{cfgDate} = time();
+    $VAR1->{cfgDate}     = time();
     $VAR1->{cfgLog} ||= 'Edited by lmConfigEditor';
 
     # Test new configuration
-    my $parser = Lemonldap::NG::Manager::Conf::Parser->new(
-        {
+    my $parser = Lemonldap::NG::Manager::Conf::Parser->new( {
             refConf => $refConf,
             newConf => $VAR1,
             req     => 1,
         }
     );
-    unless ( $parser->testNewConf ) {
+    unless ( $parser->testNewConf(undef) ) {
         print STDERR "Configuration seems to have some errors:\n ";
         print STDERR Dumper(
             { errors => $parser->errors, warnings => $parser->warnings } );
@@ -95,7 +94,7 @@ if (`diff $refFile $editFile`) {
             print STDERR "Configuration has changed\n";
         }
         elsif ( $res == DATABASE_LOCKED ) {
-            print STDERR "Configuration database is or can nor be locked\n";
+            print STDERR "Configuration database is or can not be locked\n";
         }
         elsif ( $res == UPLOAD_DENIED ) {
             print STDERR "You're not authorized to save this configuration\n";

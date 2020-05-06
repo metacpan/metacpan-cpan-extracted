@@ -3,9 +3,9 @@
 ## no critic: (InputOutput::ProhibitReadlineInForLoop)
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-28'; # DATE
+our $DATE = '2020-05-01'; # DATE
 our $DIST = 'App-subsort'; # DIST
-our $VERSION = '0.045'; # VERSION
+our $VERSION = '0.046'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -74,7 +74,7 @@ _
         exit 0;
     },
     '<>' => optspec(
-        handler => sub {
+        destination => sub {
             my $val = shift;
             if (!defined $routine) {
                 $routine = $val;
@@ -99,7 +99,7 @@ _
         },
     ),
     'arg|A=s' => optspec(
-        handler => sub {
+        destination => sub {
             my $val = $_[1];
             die "subsort: Invalid syntax in --arg (-A), please use name=val: $val\n"
                 unless $val =~ /(.+?)=(.*)/;
@@ -225,7 +225,7 @@ subsort - Sort lines of text using Sort::Sub routines
 
 =head1 VERSION
 
-This document describes version 0.045 of subsort (from Perl distribution App-subsort), released on 2020-02-28.
+This document describes version 0.046 of subsort (from Perl distribution App-subsort), released on 2020-05-01.
 
 =head1 SYNOPSIS
 

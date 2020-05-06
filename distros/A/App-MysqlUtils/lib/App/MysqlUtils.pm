@@ -2,8 +2,8 @@ package App::MysqlUtils;
 
 ## no critic (InputOutput::RequireBriefOpen)
 
-our $DATE = '2019-12-24'; # DATE
-our $VERSION = '0.019'; # VERSION
+our $DATE = '2020-05-06'; # DATE
+our $VERSION = '0.020'; # VERSION
 
 use 5.010001;
 use strict;
@@ -823,13 +823,14 @@ _
 sub mysql_copy_rows_adjust_pk {
     require Data::Cmp;
     require DBIx::Diff::Schema;
+    require DBIx::Util::Schema;
 
     my %args = @_;
 
     my $dbh = _connect(%args);
 
     my @cols = map { $_->{COLUMN_NAME} }
-        DBIx::Diff::Schema::list_columns($dbh, $args{from});
+        DBIx::Util::Schema::list_columns($dbh, $args{from});
     my $pkidx = firstidx {$_ eq $args{pk_column}} @cols;
     $pkidx >= 0 or return [412, "PK column '$args{pk_column}' does not exist"];
 
@@ -956,6 +957,7 @@ $SPEC{mysql_find_identical_rows} = {
 };
 sub mysql_find_identical_rows {
     require Data::Cmp;
+    require DBIx::Util::Schema;
     require DBIx::Diff::Schema;
 
     my %args = @_;
@@ -966,7 +968,7 @@ sub mysql_find_identical_rows {
     my @cols1_orig =
         sort
         map { $_->{COLUMN_NAME} }
-        DBIx::Diff::Schema::list_columns($dbh, $args{t1});
+        DBIx::Util::Schema::list_columns($dbh, $args{t1});
     my @cols1 =
         grep { my $col = $_; !(grep {$col eq $_} @$exclude_columns) }
         @cols1_orig;
@@ -975,7 +977,7 @@ sub mysql_find_identical_rows {
         grep { my $col = $_; !(grep {$col eq $_} @$exclude_columns) }
         sort
         map { $_->{COLUMN_NAME} }
-        DBIx::Diff::Schema::list_columns($dbh, $args{t2});
+        DBIx::Util::Schema::list_columns($dbh, $args{t2});
 
     Data::Cmp::cmp_data(\@cols1, \@cols2) == 0 or
           return [412, "Columns are not the same between two tables"];
@@ -1122,7 +1124,7 @@ App::MysqlUtils - CLI utilities related to MySQL
 
 =head1 VERSION
 
-This document describes version 0.019 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2019-12-24.
+This document describes version 0.020 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2020-05-06.
 
 =head1 SYNOPSIS
 
@@ -1256,6 +1258,7 @@ Name of target table.
 
 Will try to get default from C<~/.my.cnf>.
 
+
 =back
 
 Special arguments:
@@ -1264,7 +1267,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -1315,6 +1318,7 @@ Will try to get default from C<~/.my.cnf>.
 
 Will try to get default from C<~/.my.cnf>.
 
+
 =back
 
 Special arguments:
@@ -1323,7 +1327,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -1391,6 +1395,7 @@ Will try to get default from C<~/.my.cnf>.
 
 Will try to get default from C<~/.my.cnf>.
 
+
 =back
 
 Special arguments:
@@ -1399,7 +1404,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -1469,6 +1474,7 @@ Will try to get default from C<~/.my.cnf>.
 
 Will try to get default from C<~/.my.cnf>.
 
+
 =back
 
 Special arguments:
@@ -1477,7 +1483,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -1561,6 +1567,7 @@ Inform that input file is in TSV (tab-separated) format instead of CSV.
 
 Will try to get default from C<~/.my.cnf>.
 
+
 =back
 
 Special arguments:
@@ -1569,7 +1576,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -1629,6 +1636,7 @@ Name of the second table.
 =item * B<username> => I<str>
 
 Will try to get default from C<~/.my.cnf>.
+
 
 =back
 
@@ -1696,6 +1704,7 @@ Will try to get default from C<~/.my.cnf>.
 
 Will try to get default from C<~/.my.cnf>.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1748,6 +1757,7 @@ always overwrite existing .txt file.
 
 =item * B<pl_files>* => I<array[filename]>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1797,6 +1807,7 @@ always overwrite existing .txt file.
 
 =item * B<sql_files>* => I<array[filename]>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1844,6 +1855,7 @@ Directory to put the SQL files into.
 
 =item * B<stop_after_table_pattern> => I<re>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1881,7 +1893,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

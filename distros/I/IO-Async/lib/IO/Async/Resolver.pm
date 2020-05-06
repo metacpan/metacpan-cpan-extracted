@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Function );
 
-our $VERSION = '0.75';
+our $VERSION = '0.76';
 
 # Socket 2.006 fails to getaddrinfo() AI_NUMERICHOST properly on MSWin32
 use Socket 2.007 qw(
@@ -18,6 +18,7 @@ use Socket 2.007 qw(
    EAI_NONAME
 );
 
+use IO::Async::Metrics '$METRICS';
 use IO::Async::OS;
 
 # Try to use HiRes alarm, but we don't strictly need it.
@@ -238,10 +239,13 @@ sub resolve
 
    my $timeout = $args{timeout} || 10;
 
+   $METRICS and $METRICS->inc_counter( resolver_lookups => $type );
+
    my $future = $self->call(
       args => [ $type, $timeout, @{$args{data}} ],
    )->else( sub {
       my ( $message, @detail ) = @_;
+      $METRICS and $METRICS->inc_counter( resolver_failures => $type );
       Future->fail( $message, resolve => $type => @detail );
    });
 

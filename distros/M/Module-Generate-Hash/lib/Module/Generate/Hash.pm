@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 use Module::Generate;
 use base 'Import::Export';
@@ -69,7 +69,7 @@ Module::Generate::Hash - Assisting with module generation.
 
 =head1 VERSION
 
-Version 0.04
+Version 0.06
 
 =cut
 

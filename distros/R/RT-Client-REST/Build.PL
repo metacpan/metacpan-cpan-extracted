@@ -21,16 +21,10 @@ my %module_build_args = (
   },
   "dist_abstract" => "Client for RT using REST API",
   "dist_author" => [
-    "Abhijit Menon-Sen <ams\@wiw.org>",
-    "Dmitri Tikhonov <dtikhonov\@yahoo.com>",
-    "Damien \"dams\" Krotkine <dams\@cpan.org>",
-    "Dean Hamstead <dean\@bytefoundry.com.au>",
-    "Miquel Ruiz <mruiz\@cpan.org>",
-    "JLMARTIN",
-    "SRVSH"
+    "Dmitri Tikhonov"
   ],
   "dist_name" => "RT-Client-REST",
-  "dist_version" => "0.57",
+  "dist_version" => "0.59",
   "license" => "perl",
   "module_name" => "RT::Client::REST",
   "recursive_test_files" => 1,

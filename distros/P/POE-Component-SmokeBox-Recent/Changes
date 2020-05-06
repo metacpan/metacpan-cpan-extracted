@@ -1,6 +1,26 @@
 ==================================================
-Changes from 2012-03-01 00:00:00 +0000 to present.
+Changes from 2015-05-06 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 1.54 at 2020-05-04 20:03:06 +0000
+-----------------------------------------
+
+  Change: ae35ed6dadca57d7eb174c47e87eecfc3f81d508
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-05-04 21:03:06 +0000
+
+    Removed HTTP client it has moved to a separate distribution 
+
+-----------------------------------------
+version 1.52 at 2020-05-01 18:52:01 +0000
+-----------------------------------------
+
+  Change: ded942aa9622657be4d63a3da6e29d07dc9672fd
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-05-01 19:52:01 +0000
+
+    HTTP component should request path and query 
 
 -----------------------------------------
 version 1.50 at 2017-02-28 11:57:44 +0000
@@ -28,56 +48,6 @@ version 1.48 at 2017-02-17 12:13:19 +0000
 
     Work around perls without dot in @INC when running Makefile.PL 
 
------------------------------------------
-version 1.46 at 2014-05-19 13:33:22 +0000
------------------------------------------
-
-  Change: b7a3302c4120506fe8d4e048ff57534ed2d59c6d
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2014-05-19 14:33:22 +0000
-
-    Ignore Perl6 modules uploaded to CPAN 
-
------------------------------------------
-version 1.44 at 2013-08-23 19:42:45 +0000
------------------------------------------
-
-  Change: 88a99ac7984e746a1a52c38e95e93780c149a18d
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-08-23 20:42:45 +0000
-
-    No changes, bumping version to resolve META issue 
-
------------------------------------------
-version 1.42 at 2012-11-29 13:14:02 +0000
------------------------------------------
-
-  Change: dd23ab0ff0320a2ad51df7f1b00ecc8c935e4042
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2012-11-29 13:14:02 +0000
-
-    Make the file URL handling way more generic so it works on MSWin32 
-
------------------------------------------
-version 1.40 at 2012-11-15 09:55:43 +0000
------------------------------------------
-
-  Change: 14be45dbc79ca5ba5e1007c97c9235f337decb66
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2012-11-15 09:55:43 +0000
-
-    Update live epoch test to use www.cpan.org 
-
------------------------------------------
-version 1.38 at 2012-07-20 09:16:41 +0000
------------------------------------------
-
-  Change: ce5acfd7fceab9f01e5e07c839a808f0384460f4
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2012-07-20 10:16:41 +0000
-
-    Set cpantesters.org test to TODO for the moment due to failing test 
-
 =================================================
-Plus 12 releases after 2012-03-01 00:00:00 +0000.
+Plus 17 releases after 2015-05-06 00:00:00 +0000.
 =================================================

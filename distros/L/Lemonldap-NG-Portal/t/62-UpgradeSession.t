@@ -52,7 +52,6 @@ ok(
 count(1);
 my $id = expectCookie($res);
 
-
 # Portal IS NOT a handler
 #########################
 ok(

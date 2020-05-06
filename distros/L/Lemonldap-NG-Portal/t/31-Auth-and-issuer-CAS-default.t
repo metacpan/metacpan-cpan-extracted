@@ -12,7 +12,6 @@ BEGIN {
 
 my $debug = 'error';
 my ( $issuer, $sp, $res );
-my %handlerOR = ( issuer => [], sp => [] );
 
 eval { require XML::Simple };
 plan skip_all => "Missing dependencies: $@" if ($@);
@@ -58,15 +57,8 @@ LWP::Protocol::PSGI->register(
     }
 );
 
-ok( $issuer = issuer(), 'Issuer portal' );
-$handlerOR{issuer} = \@Lemonldap::NG::Handler::Main::_onReload;
-count(1);
-switch ('sp');
-&Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
-
-ok( $sp = sp(), 'SP portal' );
-count(1);
-$handlerOR{sp} = \@Lemonldap::NG::Handler::Main::_onReload;
+$issuer = register( 'issuer', \&issuer );
+$sp     = register( 'sp',     \&sp );
 
 # Simple SP access
 ok(
@@ -153,7 +145,9 @@ ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
   or print STDERR $@;
 ok( $res->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
   or explain( $res, 'cn => Frédéric Accents' );
-count(3);
+ok( ref( $res->{multi} ) eq "ARRAY" and $res->{multi}->[0] =~ /value/ )
+  or explain( $res->{multi}, 'Multi valued attribute' );
+count(4);
 
 # Logout initiated by SP
 ok(
@@ -221,26 +215,21 @@ expectRedirection( $res,
 clean_sessions();
 done_testing( count() );
 
-sub switch {
-    my $type = shift;
-    @Lemonldap::NG::Handler::Main::_onReload = @{
-        $handlerOR{$type};
-    };
-}
-
 sub issuer {
     return LLNG::Manager::Test->new( {
             ini => {
-                logLevel               => $debug,
-                domain                 => 'idp.com',
-                portal                 => 'http://auth.idp.com',
-                authentication         => 'Demo',
-                userDB                 => 'Same',
-                issuerDBCASActivation  => 1,
-                casAttr                => 'uid',
-                casAttributes          => { cn => 'cn', uid => 'uid', },
+                logLevel              => $debug,
+                domain                => 'idp.com',
+                portal                => 'http://auth.idp.com',
+                authentication        => 'Demo',
+                userDB                => 'Same',
+                issuerDBCASActivation => 1,
+                casAttr               => 'uid',
+                casAttributes => { cn => 'cn', uid => 'uid', multi => 'multi' },
                 casAccessControlPolicy => 'none',
                 multiValuesSeparator   => ';',
+                macros =>
+                  { multi => '"value1;value2"', _whatToTrace => '$uid' },
             }
         }
     );
@@ -259,9 +248,10 @@ sub sp {
                 multiValuesSeparator       => ';',
                 casSrvMetaDataExportedVars => {
                     idp => {
-                        cn   => 'cn',
-                        mail => 'mail',
-                        uid  => 'uid',
+                        cn    => 'cn',
+                        mail  => 'mail',
+                        uid   => 'uid',
+                        multi => 'multi',
                     }
                 },
                 casSrvMetaDataOptions => {

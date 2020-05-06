@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Client for RT using REST API",
-  "AUTHOR" => "Abhijit Menon-Sen <ams\@wiw.org>, Dmitri Tikhonov <dtikhonov\@yahoo.com>, Damien \"dams\" Krotkine <dams\@cpan.org>, Dean Hamstead <dean\@bytefoundry.com.au>, Miquel Ruiz <mruiz\@cpan.org>, JLMARTIN, SRVSH",
+  "AUTHOR" => "Dmitri Tikhonov",
   "BUILD_REQUIRES" => {
     "HTTP::Server::Simple" => "0.44",
     "HTTP::Server::Simple::CGI" => 0,
@@ -50,7 +50,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.57",
+  "VERSION" => "0.59",
   "test" => {
     "TESTS" => "t/*.t"
   }

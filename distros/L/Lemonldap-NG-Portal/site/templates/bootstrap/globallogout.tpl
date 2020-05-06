@@ -7,24 +7,28 @@
     <TMPL_IF NAME="SESSIONS">
     <div class="card col border-secondary">
       <div class="text-center bg-light text-dark"><b><span trspan="activeSessions">ACTIVE SSO SESSIONS</span>: <u><TMPL_VAR NAME="LOGIN"></u></b></div>
-      <table class="table table-sm table-hover">
+      <table class="table table-sm table-hover text-center">
         <thead>
           <tr>
             <th scope="col"><span trspan="startTime">startTime</span></th>
             <th scope="col"><span trspan="updateTime">updateTime</span></th>
-            <th scope="col"><span trspan="authLevel">authLevel</span></th>
             <th scope="col"><span trspan="ipAddr">ipAddr</span></th>
-            <th scope="col"><span trspan="UA">UA</span></th>
+            <th scope="col"><span trspan="authLevel">authLevel</span></th>
+            <TMPL_IF NAME="CUSTOMPRM">
+              <th scope="col"><TMPL_VAR NAME="CUSTOMPRM"></th>
+            </TMPL_IF>
           </tr>
         </thead>
         <tbody>
           <TMPL_LOOP NAME="SESSIONS">
           <tr>
-            <td scope="row"><TMPL_VAR NAME="startTime"></td>
-            <td scope="row"><TMPL_VAR NAME="updateTime"></td>
-            <td scope="row"><TMPL_VAR NAME="authLevel"></td>
+            <td scope="row" class="data-epoch"><TMPL_VAR NAME="startTime"></td>
+            <td scope="row" class="data-epoch"><TMPL_VAR NAME="updateTime"></td>
             <td scope="row"><TMPL_VAR NAME="ipAddr"></td>
-            <td scope="row"><TMPL_VAR NAME="UA"></td>
+            <td scope="row"><TMPL_VAR NAME="authLevel"></td>
+            <TMPL_IF NAME="CUSTOMPRM">
+              <td scope="row"><TMPL_VAR NAME="customParam"></td>
+            </TMPL_IF>
           </tr>
           </TMPL_LOOP>
         </tbody>

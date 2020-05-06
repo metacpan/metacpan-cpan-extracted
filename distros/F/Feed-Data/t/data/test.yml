@@ -1,0 +1,15 @@
+---
+- author: Melody
+  category: Travel
+  date: Sat, 29 May 2004 23:39:25 -0800
+  description: Hello!...
+  link: http://localhost/weblog/2004/05/entry_two.html
+  permalink: http://localhost/weblog/2004/05/entry_two.html
+  title: Entry Two
+- category: Sports
+  date: Sat, 08 May 2004 23:03:28 -0800
+  description: This is a test. Why don't you come down to our place for a coffee and
+    a chat?...
+  link: http://localhost/weblog/2004/05/test.html
+  permalink: http://localhost/weblog/2004/05/test.html
+  title: Test

@@ -3,7 +3,7 @@ use strict;
 use IO::String;
 
 require 't/test-lib.pm';
-my $maintests = 18;
+my $maintests = 22;
 
 SKIP: {
     eval { require Convert::Base32 };
@@ -18,6 +18,8 @@ SKIP: {
                 totp2fSelfRegistration => 1,
                 totp2fActivation       => 1,
                 totp2fTTL              => 120,
+                sfManagerRule          => 0,
+                totp2fIssuer           => 'LLNG_Demo',
                 portalMainLogo         => 'common/logos/logo_llng_old.png',
             }
         }
@@ -35,6 +37,18 @@ SKIP: {
         'Auth query'
     );
     my $id = expectCookie($res);
+
+    ok(
+        $res = $client->_get(
+            '/',
+            cookie => "lemonldap=$id",
+            accept => 'text/html'
+        ),
+        'Get Menu'
+    );
+    ok( $res->[2]->[0] !~ m%<span trspan="sfaManager">sfaManager</span>%,
+        'sfaManager link found' )
+      or print STDERR Dumper( $res->[2]->[0] );
 
     # TOTP form
     ok(
@@ -73,8 +87,12 @@ SKIP: {
     ok( not($@), 'Content is JSON' )
       or explain( $res->[2]->[0], 'JSON content' );
     my ( $key, $token );
-    ok( $key   = $res->{secret}, 'Found secret' );
-    ok( $token = $res->{token},  'Found token' );
+    ok( $key   = $res->{secret}, 'Found secret' ) or print STDERR Dumper($res);
+    ok( $token = $res->{token},  'Found token' )  or print STDERR Dumper($res);
+    ok( $res->{portal} eq 'LLNG_Demo', 'Found issuer' )
+      or print STDERR Dumper($res);
+    ok( $res->{user} eq 'dwho', 'Found user' )
+      or print STDERR Dumper($res);
     $key = Convert::Base32::decode_base32($key);
 
     # Post code

@@ -15,10 +15,10 @@ IPC::Run - system() and background procs w/ piping, redirs, ptys (Unix, Win32)
    ## Using run() instead of system():
       use IPC::Run qw( run timeout );
 
-      run \@cat, \$in, \$out, \$err, timeout( 10 ) or die "cat: $?"
+      run \@cat, \$in, \$out, \$err, timeout( 10 ) or die "cat: $?";
 
       # Can do I/O to sub refs and filenames, too:
-      run \@cat, '<', "in.txt", \&out, \&err or die "cat: $?"
+      run \@cat, '<', "in.txt", \&out, \&err or die "cat: $?";
       run \@cat, '<', "in.txt", '>>', "out.txt", '2>>', "err.txt";
 
 
@@ -84,7 +84,7 @@ IPC::Run - system() and background procs w/ piping, redirs, ptys (Unix, Win32)
       finish $h;
 
    # Mixing input and output modes
-      run \@cat, 'in.txt', \&catch_some_out, \*ERR_LOG );
+      run \@cat, 'in.txt', \&catch_some_out, \*ERR_LOG;
 
    # Other redirection constructs
       run \@cat, '>&', \$out_and_err;
@@ -1015,7 +1015,7 @@ use Exporter ();
 use vars qw{$VERSION @ISA @FILTER_IMP @FILTERS @API @EXPORT_OK %EXPORT_TAGS};
 
 BEGIN {
-    $VERSION = '20180523.0';
+    $VERSION = '20200505.0';
     @ISA     = qw{ Exporter };
 
     ## We use @EXPORT for the end user's convenience: there's only one function
@@ -1589,7 +1589,14 @@ sub kill_kill {
       join " ", keys %options
       if keys %options;
 
-    $self->signal("TERM");
+    if (Win32_MODE) {
+	# immediate brutal death for Win32
+	# TERM has unfortunate side-effects
+	$self->signal("KILL")
+    }
+    else {
+	$self->signal("TERM");
+    }
 
     my $quitting_time = time + $grace;
     my $delay         = 0.01;
@@ -3510,18 +3517,25 @@ sub _assert_finished {
     croak "Harness not finished running" unless $self->{STATE} == _finished;
 }
 
+sub _child_result {
+    my IPC::Run $self = shift;
+
+    my ($which) = @_;
+    croak(
+        "Only ",
+        scalar( @{ $self->{KIDS} } ),
+        " child processes, no process $which"
+    ) unless $which >= 0 && $which <= $#{ $self->{KIDS} };
+    return $self->{KIDS}->[$which]->{RESULT};
+}
+
 sub result {
     &_assert_finished;
     my IPC::Run $self = shift;
 
     if (@_) {
         my ($which) = @_;
-        croak(
-            "Only ",
-            scalar( @{ $self->{KIDS} } ),
-            " child processes, no process $which"
-        ) unless $which >= 0 && $which <= $#{ $self->{KIDS} };
-        return $self->{KIDS}->[$which]->{RESULT} >> 8;
+        return $self->_child_result($which) >> 8;
     }
     else {
         return undef unless @{ $self->{KIDS} };
@@ -3575,14 +3589,19 @@ specified.  Throws an exception if an out-of-range child number is passed.
 =cut
 
 sub full_result {
-    goto &result if @_ > 1;
     &_assert_finished;
 
     my IPC::Run $self = shift;
 
-    return undef unless @{ $self->{KIDS} };
-    for ( @{ $self->{KIDS} } ) {
-        return $_->{RESULT} if $_->{RESULT};
+    if (@_) {
+        my ($which) = @_;
+        return $self->_child_result($which);
+    }
+    else {
+        return undef unless @{ $self->{KIDS} };
+        for ( @{ $self->{KIDS} } ) {
+            return $_->{RESULT} if $_->{RESULT};
+        }
     }
 }
 

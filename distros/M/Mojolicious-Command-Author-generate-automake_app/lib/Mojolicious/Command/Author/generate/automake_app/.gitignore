@@ -3,6 +3,9 @@ autom4te.cache/
 <%= ${filename} %>-*/
 *.tar.gz
 /blib/
+etc/<%= ${filename} %>.cfg
+etc/<%= ${filename} %>.yaml
+!etc/<%= ${filename} %>.dist*
 /.build/
 _build/
 cover_db/

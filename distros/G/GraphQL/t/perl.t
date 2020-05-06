@@ -1,3 +1,5 @@
+use strict;
+use warnings;
 use lib 't/lib';
 use GQLTest;
 
@@ -5,6 +7,7 @@ my $JSON = JSON::MaybeXS->new->allow_nonref->canonical;
 
 use GraphQL::Schema;
 use GraphQL::Execution qw(execute);
+use GraphQL::Subscription qw(subscribe);
 use GraphQL::Type::Scalar qw($String $Boolean);
 use GraphQL::Type::Object;
 use GraphQL::Type::Interface;
@@ -67,12 +70,37 @@ subtest 'nice errors Schema.from_ast' => sub {
 
 subtest 'test convert plugin' => sub {
   require_ok 'GraphQL::Plugin::Convert::Test';
-  my $converted = GraphQL::Plugin::Convert::Test->to_graphql;
+  my $converted = GraphQL::Plugin::Convert::Test->to_graphql(
+    sub {
+      my $text = $_[1]->{s};
+      my $ai = fake_promise_iterator();
+      $ai->publish({ timedEcho => $text });
+      $ai;
+    },
+  );
   run_test([
     $converted->{schema}, '{helloWorld}', $converted->{root_value}
   ],
     { data => { helloWorld => 'Hello, world!' } },
   );
+  run_test([
+    $converted->{schema},
+    'mutation m($s: String = "yo") { echo(s: $s) }',
+    $converted->{root_value},
+    undef,
+    { s => "hi" },
+  ],
+    { data => { echo => 'hi' } },
+  );
+  my $ai = subscribe(
+    $converted->{schema},
+    'subscription s { timedEcho(s: "argh") }',
+    $converted->{root_value},
+    (undef) x 4, fake_promise_code(),
+    $converted->{subscribe_resolver},
+  );
+  $ai = $ai->get;
+  promise_test($ai->next_p, [{ data => { timedEcho => 'argh' } }], '');
 };
 
 subtest 'multi-line description' => sub {
@@ -241,6 +269,7 @@ subtest 'test _debug', sub {
   require GraphQL::Debug;
   my @diags;
   {
+    no warnings 'redefine';
     local *Test::More::diag = sub { push @diags, @_ };
     GraphQL::Debug::_debug('message', +{ key => 1 });
   }
@@ -261,7 +290,7 @@ subtest 'test Scalar methods' => sub {
   throws_ok { $scalar->parse_value->('string') } qr{Fake}, 'fake parse_value';
   is $scalar->to_doc, qq{"d"\nscalar s\n}, 'to_doc';
   is $Boolean->serialize->(1), 1, 'Boolean serialize';
-  is $Boolean->parse_value->(1), 1, 'Boolean parse_value';
+  is $Boolean->parse_value->(JSON->true), 1, 'Boolean parse_value';
 };
 
 subtest 'exercise __type root field more'=> sub {
@@ -379,6 +408,170 @@ subtest 'error objects stringify' => sub {
   my $msg = 'Something is not right...';
   my $error = GraphQL::Error->new(message => $msg);
   is $error.'', $msg;
+};
+
+subtest 'fake promises' => sub {
+  my $p = FakePromise->resolve('yo');
+  promise_test($p, ['yo'], '');
+  $p = FakePromise->resolve('yo')->then(sub { shift . 'ga' });
+  is $p->get, 'yoga';
+  is $p->get, 'yoga'; # check can re-get
+  $p = FakePromise->reject("yo\n");
+  promise_test($p, [], "yo\n");
+  $p = FakePromise->reject("f\n")->catch(sub { shift });
+  promise_test($p, ["f\n"], "");
+  $p = FakePromise->resolve("yo\n")->then(sub { die shift });
+  promise_test($p, [], "yo\n");
+  $p = FakePromise->reject("f\n")->catch(sub { shift })->then(sub { die shift });
+  promise_test($p, [], "f\n");
+  $p = FakePromise->resolve("yo\n")->then(sub { die shift })->catch(sub { shift });
+  promise_test($p, ["yo\n"], "");
+  $p = FakePromise->resolve('yo')->then(sub { FakePromise->resolve('y2') });
+  promise_test($p, ["y2"], "");
+  $p = FakePromise->resolve("s\n")->then(sub { FakePromise->reject(shift) });
+  promise_test($p, [], "s\n");
+  $p = FakePromise->resolve("s\n")->then(sub { FakePromise->reject(shift) })->catch(sub { shift });
+  promise_test($p, ["s\n"], "");
+  $p = FakePromise->all(FakePromise->reject("s\n"))->catch(sub { shift });
+  promise_test($p, ["s\n"], "");
+  $p = FakePromise->all('hi', FakePromise->resolve("yo"))->then(sub {
+    map @$_, @_
+  });
+  promise_test($p, [qw(hi yo)], "");
+  $p = FakePromise->all(
+    'hi',
+    FakePromise->resolve("yo")->then(sub { "$_[0]!" }),
+  )->then(sub { map ucfirst $_->[0], @_ }),;
+  promise_test($p, [qw(Hi Yo!)], "");
+  $p = FakePromise->all(
+    FakePromise->resolve("hi")->then(sub { "$_[0]!" }),
+    FakePromise->resolve("yo")->then(sub { "$_[0]!" }),
+  )->then(sub { map ucfirst $_->[0], @_ }),;
+  promise_test($p, [qw(Hi! Yo!)], "");
+  $p = FakePromise->all(
+    FakePromise->all(
+      FakePromise->reject("yo\n")->then(
+        # simulates rejection that will skip first "then"
+        sub { "$_[0]/" }
+      )->then(
+        # first catch
+        undef,
+        sub { die "$_[0]!\n" },
+      )->then(
+        # second catch
+        undef,
+        sub { die ">$_[0]" },
+      ),
+    ),
+  )->then(undef, sub { map "^$_", @_ }),;
+  promise_test($p, ["^>yo\n!\n"], "");
+  $p = FakePromise->new;
+  is $p->status, undef;
+  $p->resolve('hi');
+  promise_test($p, ["hi"], "");
+  $p = FakePromise->new;
+  my $flag;
+  my $p2 = $p->then(sub { $flag = $_[0].'!' });
+  $p->resolve('hi');
+  is $flag, "hi!", 'appended then gets run on settling, not get';
+  promise_test($p2, ["hi!"], "");
+  $p2 = FakePromise->new;
+  $p = FakePromise->all($p2);
+  $p2->resolve('hi');
+  promise_test($p, [["hi"]], "");
+  $p2 = FakePromise->new;
+  $p = FakePromise->all($p2);
+  $p2->reject("hi\n");
+  promise_test($p, [], "hi\n");
+  $p = FakePromise->resolve(FakePromise->reject("yo\n"))->then(
+    sub { "replaced by then" },
+    sub { "replaced by catch" },
+  );
+  promise_test($p, ["replaced by catch"], "");
+  $p = FakePromise->all(FakePromise->resolve("hi"), 'there');
+  promise_test($p, [map [$_], qw(hi there)], "");
+};
+
+subtest 'pubsub' => sub {
+  require GraphQL::PubSub;
+  my $pubsub = GraphQL::PubSub->new;
+  my ($flag1, @flag2);
+  my $cb1 = sub { $flag1 = $_[0] };
+  my $cb2 = sub { @flag2 = @_ };
+  $pubsub->subscribe('channel1', $cb1);
+  $pubsub->subscribe('channel1', $cb2);
+  $pubsub->publish('channel1', 1);
+  is $flag1, 1, 'cb1 received first publish';
+  is_deeply \@flag2, [ 1 ], 'cb2 received first publish';
+  $pubsub->unsubscribe('channel1', $cb1);
+  $pubsub->publish('channel1', 2);
+  is $flag1, 1, 'cb1 did not receive second publish';
+  is_deeply \@flag2, [ 2 ], 'cb2 still received second publish';
+  $pubsub->subscribe('channel2', $cb1);
+  $pubsub->publish('channel1', 3);
+  is $flag1, 1, 'cb1 did not receive third publish';
+  is_deeply \@flag2, [ 3 ], 'cb2 still received third publish';
+  my $normal_cb_counter = 0;
+  my $normal_cb = sub { $normal_cb_counter++; die "aiiee" if $_[0] eq 'die' };
+  $pubsub->subscribe('errors', $normal_cb);
+  is_deeply [ $normal_cb_counter ], [ 0 ], 'init state';
+  $pubsub->publish('errors', 'live');
+  is_deeply [ $normal_cb_counter ], [ 1 ], 'normal';
+  $pubsub->publish('errors', 'die');
+  is_deeply [ $normal_cb_counter ], [ 2 ], 'call with an exception';
+  $pubsub->publish('errors', 'live');
+  is_deeply [ $normal_cb_counter ], [ 2 ], 'got unsubscribed so normal not run';
+  $normal_cb_counter = 0;
+  my $error_cb_called;
+  my $error_cb = sub { $error_cb_called = 1 };
+  $pubsub->subscribe('errors', $normal_cb, $error_cb);
+  is_deeply [ $normal_cb_counter, $error_cb_called ], [ 0, undef ], 'init state';
+  $pubsub->publish('errors', 'live');
+  is_deeply [ $normal_cb_counter, $error_cb_called ], [ 1, undef ], 'normal';
+  $pubsub->publish('errors', 'die');
+  is_deeply [ $normal_cb_counter, $error_cb_called ], [ 2, 1 ], 'error_cb called';
+};
+
+subtest 'asynciterator' => sub {
+  my $ai = fake_promise_iterator();
+  my $promised_value = $ai->next_p;
+  $ai->publish('hi');
+  promise_test($promised_value, ["hi"], "");
+  $ai->publish('yo');
+  promise_test($ai->next_p, ["yo"], "");
+  $ai->publish(1);
+  $ai->publish(2);
+  promise_test($ai->next_p, [1], "");
+  promise_test($ai->next_p, [2], "");
+  $ai->publish(3);
+  $ai->error("9\n");
+  $ai->publish(4);
+  promise_test($ai->next_p, [3], "");
+  promise_test($ai->next_p, [], "9\n");
+  my ($callcount1, $callcount2) = (0, 0);
+  my $ai2 = $ai->map_then(sub { $callcount1++; $_[0] + 100 });
+  my $ai3 = $ai2->map_then(sub { $callcount2++; $_[0] * 2 });
+  promise_test($ai->next_p, [4], "");
+  promise_test($ai2->next_p, [104], "");
+  promise_test($ai3->next_p, [208], "");
+  is $callcount1, 1;
+  is $callcount2, 1;
+  $promised_value = $ai3->next_p;
+  $ai->publish(5);
+  promise_test($ai->next_p, [5], "");
+  promise_test($ai2->next_p, [105], "");
+  is $callcount1, 2;
+  is $callcount2, 2;
+  promise_test($promised_value, [210], "");
+  $ai->close_tap;
+  is $ai->next_p, undef;
+  throws_ok { $ai->publish(6) } qr{closed}, 'publish to closed off';
+  is $ai2->next_p, undef; # close_tap propagates to children
+  $ai = fake_promise_iterator();
+  $ai2 = $ai->map_then(sub { $_[0] + 100 });
+  $ai2->close_tap;
+  is $ai2->next_p, undef;
+  is $ai->next_p, undef; # close_tap propagates to parents
 };
 
 done_testing;

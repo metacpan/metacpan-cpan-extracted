@@ -4,6 +4,7 @@
 "autoMail":"تم إرسال هذا البريد تلقائيا ",
 "click2Register":"انقر هنا لتأكيد تسجيل حسابك",
 "click2Reset":"انقر هنا لإعادة تعيين كلمة المرور",
+"goToPortal":"انتقل إلى البوابة",
 "hello":"مرحبا ",
 "mail2fSubject":"[LemonLDAP::NG] تسجيل الدخول الخاص بك هو ",
 "mailConfirmSubject":"تأكيد إعادة تعيين كلمة المرور[LemonLDAP::NG]",

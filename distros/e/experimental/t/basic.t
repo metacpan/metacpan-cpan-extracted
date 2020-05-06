@@ -5,6 +5,8 @@ use warnings;
 
 use Test::More 0.89;
 
+plan skip_all => 'This module is a no-op on perls earlier than 5.010' if "$]" < 5.010000;
+
 local $SIG{__WARN__} = sub { fail("Got unexpected warning"); diag($_[0]) };
 
 if ($] >= 5.010000) {

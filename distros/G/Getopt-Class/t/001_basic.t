@@ -16,7 +16,7 @@ require( './t/dictionary.pl' );
 my $opt = Getopt::Class->new({
     dictionary => $dict,
     debug => 0,
-});
+}) || BAIL_OUT( Getopt::Class->error, "\n" );
 # $opt->message( $opt->dumper( $dict ) ); exit;
 # my $params = $opt->parameters;
 # my $options = $opt->options;
@@ -25,10 +25,10 @@ my $opt = Getopt::Class->new({
 isa_ok( $opt, 'Getopt::Class' );
 
 {
-    local @ARGV = qw( --debug 3 --dry-run --name Bob --created 2020-04-12T07:30:10 --langs en -langs ja );
-    my $opts = $opt->exec;
+    local @ARGV = qw( --debug 3 --dry-run --name Bob --created 2020-04-12T07:30:10 --langs en ja );
+    my $opts = $opt->exec || diag( "Error: " . $opt->error );
     ok( defined( $opts ), 'No Getopt::Long error' );
-    is( ref( $opts ), 'HASH', 'Expecting a hash reference' );
+    is( Scalar::Util::reftype( $opts ), 'HASH', 'Expecting a hash reference' );
     is( $opts->{dry_run}, 1, 'Boolean option enabled' );
     is( $opts->{debug}, 3, 'Scalar reference of integer set' );
     is( $opts->{name}, 'Bob', 'String assignment' );
@@ -43,7 +43,7 @@ isa_ok( $opt, 'Getopt::Class' );
         is( $dt->year, 2020, 'DateTime year property' );
         is( $dt->iso8601, '2020-04-12T07:30:10', 'DateTime value' );
     };
-    is( ref( $opts->{langs} ), 'ARRAY', 'Array type' );
+    is( Scalar::Util::reftype( $opts->{langs} ), 'ARRAY', 'Array type' );
     is( scalar( @{$opts->{langs}} ), 2, 'Array size' );
     is( join( ',', @{$opts->{langs}} ), 'en,ja', 'Array values' );
 }

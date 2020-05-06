@@ -1,123 +1,49 @@
 ---
 abstract: 'A simple, extensible Perl debugger'
 author:
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Leon Brocard <acme@astray.com>'
   - 'Brock Wilcox <awwaiid@thelackthereof.org>'
 build_requires:
-  Test::More: '0'
+  Test::More: '0.94'
   perl: '5.008'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.008'
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Devel-ebug
-provides:
-  DB::fake:
-    file: lib/Devel/ebug/Backend.pm
-    version: '0.59'
-  Devel::ebug:
-    file: lib/Devel/ebug.pm
-    version: '0.59'
-  Devel::ebug::Backend::Plugin::ActionPoints:
-    file: lib/Devel/ebug/Backend/Plugin/ActionPoints.pm
-    version: '0.59'
-  Devel::ebug::Backend::Plugin::Basic:
-    file: lib/Devel/ebug/Backend/Plugin/Basic.pm
-    version: '0.59'
-  Devel::ebug::Backend::Plugin::Codelines:
-    file: lib/Devel/ebug/Backend/Plugin/Codelines.pm
-    version: '0.59'
-  Devel::ebug::Backend::Plugin::Commands:
-    file: lib/Devel/ebug/Backend/Plugin/Commands.pm
-    version: '0.59'
-  Devel::ebug::Backend::Plugin::Eval:
-    file: lib/Devel/ebug/Backend/Plugin/Eval.pm
-    version: '0.59'
-  Devel::ebug::Backend::Plugin::Filenames:
-    file: lib/Devel/ebug/Backend/Plugin/Filenames.pm
-    version: '0.59'
-  Devel::ebug::Backend::Plugin::Output:
-    file: lib/Devel/ebug/Backend/Plugin/Output.pm
-    version: '0.59'
-  Devel::ebug::Backend::Plugin::Pad:
-    file: lib/Devel/ebug/Backend/Plugin/Pad.pm
-    version: '0.59'
-  Devel::ebug::Backend::Plugin::Ping:
-    file: lib/Devel/ebug/Backend/Plugin/Ping.pm
-    version: '0.59'
-  Devel::ebug::Backend::Plugin::Run:
-    file: lib/Devel/ebug/Backend/Plugin/Run.pm
-    version: '0.59'
-  Devel::ebug::Backend::Plugin::StackTrace:
-    file: lib/Devel/ebug/Backend/Plugin/StackTrace.pm
-    version: '0.59'
-  Devel::ebug::Console:
-    file: lib/Devel/ebug/Console.pm
-    version: '0.59'
-  Devel::ebug::Plugin::ActionPoints:
-    file: lib/Devel/ebug/Plugin/ActionPoints.pm
-    version: '0.59'
-  Devel::ebug::Plugin::Basic:
-    file: lib/Devel/ebug/Plugin/Basic.pm
-    version: '0.59'
-  Devel::ebug::Plugin::Codelines:
-    file: lib/Devel/ebug/Plugin/Codelines.pm
-    version: '0.59'
-  Devel::ebug::Plugin::Eval:
-    file: lib/Devel/ebug/Plugin/Eval.pm
-    version: '0.59'
-  Devel::ebug::Plugin::Filenames:
-    file: lib/Devel/ebug/Plugin/Filenames.pm
-    version: '0.59'
-  Devel::ebug::Plugin::Output:
-    file: lib/Devel/ebug/Plugin/Output.pm
-    version: '0.59'
-  Devel::ebug::Plugin::Pad:
-    file: lib/Devel/ebug/Plugin/Pad.pm
-    version: '0.59'
-  Devel::ebug::Plugin::Run:
-    file: lib/Devel/ebug/Plugin/Run.pm
-    version: '0.59'
-  Devel::ebug::Plugin::StackTrace:
-    file: lib/Devel/ebug/Plugin/StackTrace.pm
-    version: '0.59'
 requires:
-  Carp: '0'
-  Class::Accessor::Chained::Fast: '0'
+  Class::Accessor::Chained: '0'
   Devel::StackTrace: '2.00'
-  Exporter: '0'
-  File::Spec: '0'
+  File::Which: '0'
   FindBin: '0'
-  Getopt::Long: '0'
   IO::Socket::INET: '0'
   Module::Pluggable: '0'
   PadWalker: '0'
   Proc::Background: '0'
-  Scalar::Util: '0'
   String::Koremutake: '0'
   Term::ReadLine: '0'
   YAML: '0'
   base: '0'
-  lib: '0'
   perl: '5.008'
   strict: '0'
-  vars: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/awwaiid/devel-ebug/issues
-  homepage: https://metacpan.org/release/Devel-ebug
-  repository: git://github.com/awwaiid/devel-ebug.git
-version: '0.59'
+  bugtracker: https://github.com/plicease/Devel-ebug/issues
+  homepage: https://metacpan.org/pod/Devel::ebug
+  repository: git://github.com/plicease/Devel-ebug.git
+version: '0.60'
 x_contributors:
+  - 'Leon Brocard <acme@astray.com>'
   - 'Graham Ollis <plicease@cpan.org>'
-  - 'Hobbestigrou <hobbestigrou@erakis.eu>'
-  - 'jchassler <jhassler@free.fr>'
-  - 'Kivanc Yazan <kivancyazan@gmail.com>'
-  - 'Paulo Custodio <pauloscustodio@gmail.com>'
-  - 'Paweł Murias <pawelmurias@gmail.com>'
-  - 'simbabque <simbabque@cpan.org>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+  - 'Brock Wilcox <awwaiid@thelackthereof.org>'
+  - 'Taisuke Yamada'
+x_generated_by_perl: v5.31.11
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

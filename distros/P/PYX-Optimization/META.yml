@@ -1,0 +1,41 @@
+---
+abstract: 'PYX optimization Perl class.'
+author:
+  - 'Michal Josef Spacek <skim@cpan.org>'
+build_requires:
+  English: 0
+  ExtUtils::MakeMaker: 6.36
+  File::Object: 0.07
+  Test::More: 0
+  Test::NoWarnings: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.19'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PYX-Optimization
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  Class::Utils: 0.05
+  Error::Pure: 0.15
+  PYX: 0.01
+  PYX::Parser: 0.01
+  PYX::Utils: 0.01
+  perl: 5.6.2
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=PYX-Optimization
+  homepage: https://github.com/michal-josef-spacek/PYX-Optimization
+  license: http://opensource.org/licenses/bsd-license.php
+  repository: git://github.com/michal-josef-spacek/PYX-Optimization
+version: '0.01'

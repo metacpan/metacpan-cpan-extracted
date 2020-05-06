@@ -3,6 +3,8 @@ package OPTIMADE::Filter::Negation;
 use strict;
 use warnings;
 
+use parent 'OPTIMADE::Filter::Modifiable';
+
 sub new {
     my( $class, $inner ) = @_;
     return bless { inner => $inner }, $class;
@@ -41,7 +43,7 @@ sub modify
     my $self = shift;
     my $code = shift;
 
-    $self->inner( OPTIMADE::Filter::modify( $self->inner, $code, @_ ) );
+    $self->inner( $self->inner->modify( $code, @_ ) );
     return $code->( $self, @_ );
 }
 

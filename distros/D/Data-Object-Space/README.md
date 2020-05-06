@@ -22,13 +22,13 @@ This package provides methods for parsing and manipulating package namespaces.
 
 This package inherits behaviors from:
 
-[Data::Object::Name](https://metacpan.org/pod/Data::Object::Name)
+[Data::Object::Name](https://metacpan.org/pod/Data%3A%3AObject%3A%3AName)
 
 # LIBRARIES
 
 This package uses type constraints from:
 
-[Types::Standard](https://metacpan.org/pod/Types::Standard)
+[Types::Standard](https://metacpan.org/pod/Types%3A%3AStandard)
 
 # METHODS
 
@@ -225,7 +225,7 @@ and if successful returns the resulting value.
 
     child(Str $arg1) : Object
 
-The child method returns a new [Data::Object::Space](https://metacpan.org/pod/Data::Object::Space) object for the child
+The child method returns a new [Data::Object::Space](https://metacpan.org/pod/Data%3A%3AObject%3A%3ASpace) object for the child
 package namespace.
 
 - child example #1
@@ -243,7 +243,7 @@ package namespace.
     children() : ArrayRef[Object]
 
 The children method searches `%INC` and `@INC` and retuns a list of
-[Data::Object::Space](https://metacpan.org/pod/Data::Object::Space) objects for each child namespace found (one level deep).
+[Data::Object::Space](https://metacpan.org/pod/Data%3A%3AObject%3A%3ASpace) objects for each child namespace found (one level deep).
 
 - children example #1
 
@@ -290,6 +290,43 @@ and if successful returns a closure.
         $space->cop('handler', $space->bless)
 
         # sub { Foo::Bar::handler(..., @_) }
+
+## destroy
+
+    destroy() : Object
+
+The destroy method attempts to wipe out a namespace and also remove it and its
+children from `%INC`. **NOTE:** This can cause catastrophic failures if used
+incorrectly.
+
+- destroy example #1
+
+        package main;
+
+        use Data::Object::Space;
+
+        my $space = Data::Object::Space->new('data/dumper');
+
+        $space->load; # Data/Dumper
+
+        $space->destroy;
+
+## eval
+
+    eval(Str @args) : Any
+
+The eval method takes a list of strings and evaluates them under the namespace
+represented by the instance.
+
+- eval example #1
+
+        package main;
+
+        use Data::Object::Space;
+
+        my $space = Data::Object::Space->new('foo');
+
+        $space->eval('our $VERSION = 0.01');
 
 ## functions
 
@@ -381,6 +418,22 @@ The id method returns the fully-qualified package name as a label.
 
         # Foo_Bar
 
+## included
+
+    included() : Str
+
+The included method returns the path of the namespace if it exists in `%INC`.
+
+- included example #1
+
+        package main;
+
+        my $space = Data::Object::Space->new('Data/Object/Space');
+
+        $space->included;
+
+        # lib/Data/Object/Space.pm
+
 ## inherits
 
     inherits() : ArrayRef
@@ -439,6 +492,71 @@ packages that only exist in-memory, if the package contains a `new`, `with`,
 
         # CPAN
 
+## loaded
+
+    loaded() : Int
+
+The loaded method checks whether the package namespace is already loaded
+returns truthy or falsy.
+
+- loaded example #1
+
+        package main;
+
+        use Data::Object::Space;
+
+        my $space = Data::Object::Space->new('data/dumper');
+
+        $space->loaded;
+
+        # 0
+
+- loaded example #2
+
+        package main;
+
+        use Data::Object::Space;
+
+        my $space = Data::Object::Space->new('data/dumper');
+
+        $space->load;
+
+        $space->loaded;
+
+        # 1
+
+## locate
+
+    locate() : Str
+
+The locate method checks whether the package namespace is available in
+`@INC`, i.e. on disk. This method returns the file if found or an empty
+string.
+
+- locate example #1
+
+        package main;
+
+        use Data::Object::Space;
+
+        my $space = Data::Object::Space->new('foo');
+
+        $space->locate;
+
+        # ''
+
+- locate example #2
+
+        package main;
+
+        use Data::Object::Space;
+
+        my $space = Data::Object::Space->new('data/dumper');
+
+        $space->locate;
+
+        # /path/to/Data/Dumper.pm
+
 ## methods
 
     methods() : ArrayRef
@@ -484,7 +602,7 @@ The name method returns the fully-qualified package name.
 
     parent() : Object
 
-The parent method returns a new [Data::Object::Space](https://metacpan.org/pod/Data::Object::Space) object for the parent
+The parent method returns a new [Data::Object::Space](https://metacpan.org/pod/Data%3A%3AObject%3A%3ASpace) object for the parent
 package namespace.
 
 - parent example #1
@@ -596,6 +714,21 @@ parts.
         $space->prepend('etc', 'tmp');
 
         # 'Etc/Tmp/Foo/Bar'
+
+## rebase
+
+    rebase(Str @args) : Object
+
+The rebase method returns an object by prepending the package namespace
+specified to the base of the current object's namespace.
+
+- rebase example #1
+
+        # given: synopsis
+
+        $space->rebase('zoo');
+
+        # Zoo/Bar
 
 ## root
 
@@ -718,7 +851,7 @@ names.
 
     sibling(Str $arg1) : Object
 
-The sibling method returns a new [Data::Object::Space](https://metacpan.org/pod/Data::Object::Space) object for the sibling
+The sibling method returns a new [Data::Object::Space](https://metacpan.org/pod/Data%3A%3AObject%3A%3ASpace) object for the sibling
 package namespace.
 
 - sibling example #1
@@ -734,7 +867,7 @@ package namespace.
     siblings() : ArrayRef[Object]
 
 The siblings method searches `%INC` and `@INC` and retuns a list of
-[Data::Object::Space](https://metacpan.org/pod/Data::Object::Space) objects for each sibling namespace found (one level
+[Data::Object::Space](https://metacpan.org/pod/Data%3A%3AObject%3A%3ASpace) objects for each sibling namespace found (one level
 deep).
 
 - siblings example #1

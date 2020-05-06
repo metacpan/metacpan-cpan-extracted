@@ -1,6 +1,6 @@
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl Crypt-X509.t'
-use Test::More tests => 68;
+use Test::More tests => 70;
 use Math::BigInt;
 BEGIN { use_ok('Crypt::X509') }
 
@@ -39,6 +39,7 @@ is( $decoded2->sig_algorithm,       "1.2.840.113549.1.1.5", "sig_algorithm" );
 is( length( $decoded2->pubkey ),    140,                    "Pubkey length" );
 is( length( $decoded2->signature ), 256,                    "Signature Length" );
 is( join( ',', @{ $decoded2->SubjectAltName } ), "rfc822Name=alexander.jung\@allianz.de", 'SubjectAltName parsed' );
+is_deeply( $decoded2->DecodedSubjectAltNames, [[{rfc822Name => 'alexander.jung@allianz.de'}]], 'DecodedSubjectAltName parsed' );
 
 $cert = loadcert('t/aj2.cer');
 $decoded3 = Crypt::X509->new( cert => $cert );
@@ -87,6 +88,10 @@ is( $mon + 1,            3,          "generalTime month" );
 is( $year + 1900,        2005,       "generalTime year" );
 is( join( ',', @{ $decoded->Issuer } ), 'C=DE,O=Deutsche Telekom AG,nameDistinguisher=1,CN=NKS CA 6:PN', 'Issuer for telesec' );
 is( join( ',', @{ $decoded->Subject } ), 'C=DE,nameDistinguisher=2,CN=Schefe, Jan', 'Subject for telesec' );
+is_deeply( $decoded->DecodedSubjectAltNames, [[
+    {otherName => {value => "0\x111\x0f0\x0d\x06\x03U\x04\x04\x14\x06Schefe", type => '0.2.262.1.10.3.0'}},
+    {otherName => {value => "0\x0e1\x0c0\x0a\x06\x03U\x04*\x14\x03Jan", type => '0.2.262.1.10.3.0'}}]],
+    'DecodedSubjectAltNames for telesec');
 
 $cert = loadcert('t/dsacert.der');
 $decoded = Crypt::X509->new( cert => $cert );

@@ -26,13 +26,27 @@ use CaptureDiagnostics;
     my $tempdir = Path::Tiny->tempdir(CLEANUP => 1);
     my $root = $tempdir->child('source');
     $root->mkpath;
-    my $wd = pushd $root;
-    path($root, 'dist.ini')->spew_utf8(simple_ini([ NonexistentPlugin => ]));
+    $root->child('dist.ini')->spew_utf8(
+        simple_ini(
+            [ NonexistentPlugin => ],
+            [ '=inc::LocalNotInstalled' => ],
+        ),
+    );
+    my $inc = $root->child('inc');
+    $inc->mkpath;
+    $inc->child('LocalInstalled.pm')->spew_utf8(
+        "package inc::LocalInstalled;\nuse Moose;\nwith 'Dist::Zilla::Role::Plugin';\n1;\n"
+    );
 
+    # TODO: when we have Dist::Zilla 7, we should not change directories.
+    my $wd = pushd $root;
     my $result = test_dzil('.', [ 'stale' ]);
 
     is($result->exit_code, 1, 'dzil would have exited 1');
-    is($result->stdout, "Dist::Zilla::Plugin::NonexistentPlugin\n", 'dzil authordeps ran to get missing plugins');
+    is($result->stdout,
+        "Dist::Zilla::Plugin::NonexistentPlugin\ninc::LocalNotInstalled\n",
+        'dzil authordeps ran to get missing plugins',
+    );
     is(
         colorstrip($result->stderr),
         "Some authordeps were missing. Run the stale command again to check for regular dependencies.\n",

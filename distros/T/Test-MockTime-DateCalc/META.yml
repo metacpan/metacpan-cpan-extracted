@@ -1,61 +1,32 @@
---- #YAML:1.0
-name:               Test-MockTime-DateCalc
-version:            6
-abstract:           Fake date/time for Date::Calc functions.
+---
+abstract: 'Fake date/time for Date::Calc functions.'
 author:
-    - Kevin Ryde <user42@zip.com.au>
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Kevin Ryde <user42_kevin@yahoo.com.au>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Date::Calc:  4
-    perl:        5
-    Test:        0
-resources:
-    homepage:  http://user42.tuxfamily.org/test-mocktime-datecalc/index.html
-    license:   http://www.gnu.org/licenses/gpl.html
-no_index:
-    directory:
-        - t
-        - inc
-        - devel
-    package:
-        - Date::Calc
-generated_by:       ExtUtils::MakeMaker version 6.55_02
+  ExtUtils::MakeMaker: '0'
+  Test: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
-optional_features:
-    maximum_devel:
-        description:  Stuff used variously for development.
-        requires:
-            base:               0
-            constant:           0
-            Devel::Peek:        0
-            Pod::Simple::HTML:  0
-            Sub::Identify:      0
-            Time::Fake:         0
-            Time::HiRes:        0
-            Time::Mock:         0
-            Time::Warp:         0
-            warnings::unused:   0
-    maximum_tests:
-        description:  Have "make test" do as much as possible.
-        requires:
-            File::Spec:          0
-            FindBin:             0
-            Parse::CPAN::Meta:   0
-            Sub::Identify:       0
-            Test::DistManifest:  0
-            Test::MockTime:      0
-            Test::Pod:           1.00
-            Test::YAML::Meta:    0.15
-            YAML:                0
-            YAML::Syck:          0
-            YAML::Tiny:          0
-            YAML::XS:            0
-recommends:
-    Test::MockTime:  0.12
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-MockTime-DateCalc
+no_index:
+  directory:
+    - t
+    - inc
+    - devel
+    - xt
+  package:
+    - Date::Calc
+requires:
+  Date::Calc: '4'
+  perl: '5'
+resources:
+  homepage: http://user42.tuxfamily.org/test-mocktime-datecalc/index.html
+  license: http://www.gnu.org/licenses/gpl.html
+version: '7'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

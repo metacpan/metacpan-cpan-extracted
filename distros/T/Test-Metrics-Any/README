@@ -1,0 +1,100 @@
+NAME
+
+    Test::Metrics::Any - assert that code produces metrics via Metrics::Any
+
+SYNOPSIS
+
+       use Test::More;
+       use Test::Metrics::Any;
+    
+       use Module::Under::Test;
+    
+       is_metrics_from(
+          sub { Module::Under::Test::do_a_thing for 1 .. 5 },
+          {
+             things_done => 5,
+             time_taken => Test::Metrics::Any::positive,
+          },
+          'do_a_thing reported some metrics'
+       );
+    
+       done_testing;
+
+DESCRIPTION
+
+    This test module helps write unit tests which assert that the code
+    under test reports metrics via Metrics::Any.
+
+    Loading this module automatically sets the Metrics::Any::Adapter type
+    to Test.
+
+FUNCTIONS
+
+ is_metrics
+
+       is_metrics( \%metrics, $name )
+
+    Asserts that the current value of every metric named in the given hash
+    reference is set to the value provided. Values can either be given as
+    exact numbers, or by one of the match functions mentioned in
+    "PREDICATES".
+
+    Key names in the given hash should match the name format used by
+    Metrics::Any::Adapter::Test. Name components are joined by underscores,
+    and any label tags are appended with spaces, as name:value.
+
+       {
+          "a_basic_metric"               => 123,
+          "a_labelled_metric label:here" => 456,
+       }
+
+    This function only checks the values of metrics actually mentioned in
+    the hash given as its argument. It is not a failure for more metrics to
+    have been reported by the code under test than are mentioned in the
+    hash. This helps to ensure that new metrics added in code do not break
+    existing tests that weren't set up to expect them.
+
+ is_metrics_from
+
+       is_metrics_from( $code, \%metrics, $name )
+
+    Asserts the value of metrics reported by running the given piece of
+    code.
+
+    The metrics in the test adapter are cleared, then the code is invoked,
+    then any metrics are checked in the same manner as "is_metrics".
+
+PREDICATES
+
+    As an alternative to expecting exact values for metrics, the following
+    test functions can be provided instead to assert that the metric is
+    behaving sensibly without needing to be an exact value. This could be
+    useful for example when the exact number of bytes or timing measures
+    can vary between test runs or platforms.
+
+    These predicates are not exported but must be invoked fully-qualified.
+
+ positive
+
+       metric => Test::Metrics::Any::positive
+
+    Asserts that the number is greater than zero. It must not be zero.
+
+ at_least
+
+       metric => Test::Metrics::Any::at_least( $n )
+
+    Asserts that the number at least that given - it can be equal or
+    greater.
+
+ greater_than
+
+       metric => Test::Metrics::Any::greater_than( $n )
+
+    Asserts that the number is greater than that given - it must not be
+    equal.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

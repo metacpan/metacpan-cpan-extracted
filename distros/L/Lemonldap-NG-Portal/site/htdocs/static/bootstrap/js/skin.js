@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(window).on("load", function() {
 
   // Adapt some class to fit Bootstrap theme
   $("div.message-positive").addClass("alert-success");
@@ -14,6 +14,11 @@ $(document).ready(function() {
     if (!$('.navbar-toggler').hasClass('collapsed')) {
       $(".navbar-toggler").trigger("click");
     }
+  });
+
+  // Remember selected tab
+  $('#authMenu .nav-link').on('click', function (e) {
+      window.datas.choicetab = e.target.hash.substr(1)
   });
 
 });

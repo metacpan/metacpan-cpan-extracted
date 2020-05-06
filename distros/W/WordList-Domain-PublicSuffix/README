@@ -2,9 +2,9 @@ NAME
     WordList::Domain::PublicSuffix - Mozilla Public Suffix
 
 VERSION
-    This document describes version 20181217.0.0 of
+    This document describes version 20181217.0.1 of
     WordList::Domain::PublicSuffix (from Perl distribution
-    WordList-Domain-PublicSuffix), released on 2018-12-17.
+    WordList-Domain-PublicSuffix), released on 2020-05-03.
 
 SYNOPSIS
      use WordList::Domain::PublicSuffix;
@@ -28,11 +28,14 @@ STATISTICS
      +----------------------------------+------------------+
      | key                              | value            |
      +----------------------------------+------------------+
-     | avg_word_len                     | 10.5593594058257 |
+     | avg_word_len                     | 10.5835310064385 |
      | longest_word_len                 | 41               |
-     | num_words                        | 8617             |
-     | num_words_contains_nonword_chars | 7083             |
-     | num_words_contains_unicode       | 448              |
+     | num_words                        | 8853             |
+     | num_words_contain_nonword_chars  | 7339             |
+     | num_words_contain_unicode        | 451              |
+     | num_words_contain_whitespace     | 0                |
+     | num_words_contains_nonword_chars | 7339             |
+     | num_words_contains_unicode       | 451              |
      | num_words_contains_whitespace    | 0                |
      | shortest_word_len                | 2                |
      +----------------------------------+------------------+
@@ -59,7 +62,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

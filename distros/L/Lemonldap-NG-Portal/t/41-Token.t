@@ -1,6 +1,8 @@
 use Test::More;
 use strict;
 use IO::String;
+use JSON;
+use Lemonldap::NG::Portal::Main::Constants 'PE_NOTOKEN';
 
 require 't/test-lib.pm';
 
@@ -41,6 +43,13 @@ ok(
 );
 count(1);
 expectReject($res);
+
+my $json;
+ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
+  or print STDERR "$@\n" . Dumper($res);
+ok( $json->{error} == PE_NOTOKEN, 'Response is PE_NOTOKEN' )
+  or explain( $json, "error => 81" );
+count(2);
 
 # Try to auth with token
 $query .= '&user=dwho&password=dwho';

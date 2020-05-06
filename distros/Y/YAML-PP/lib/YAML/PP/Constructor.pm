@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Constructor;
 
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 use YAML::PP;
 use YAML::PP::Common qw/ PRESERVE_ALL PRESERVE_ORDER PRESERVE_SCALAR_STYLE /;
@@ -84,6 +84,7 @@ sub document_start_event {
     my $stack = $self->stack;
     if ($event->{version_directive}) {
         my $version = $event->{version_directive};
+        $version = "$version->{major}.$version->{minor}";
         if ($self->{schemas}->{ $version }) {
             $self->set_yaml_version($version);
             $self->set_schema($self->schemas->{ $version });
@@ -283,7 +284,7 @@ sub alias_event {
 
 sub stringify_complex {
     my ($self, $data) = @_;
-    return $data if ref $data eq 'YAML::PP::Preserve::Scalar' and $self->preserve_scalar_style;
+    return $data if (ref $data eq 'YAML::PP::Preserve::Scalar' and $self->preserve_scalar_style);
     require Data::Dumper;
     local $Data::Dumper::Quotekeys = 0;
     local $Data::Dumper::Terse = 1;

@@ -1,61 +1,74 @@
 NAME
-    `IO::Async::Loop::Glib' - use `IO::Async' with Glib or GTK
+
+    IO::Async::Loop::Glib - use IO::Async with Glib or GTK
 
 SYNOPSIS
-     use IO::Async::Loop::Glib;
 
-     my $loop = IO::Async::Loop::Glib->new();
-
-     $loop->add( ... );
-
-     ...
-     # Rest of GLib/Gtk program that uses GLib
-
-     Glib::MainLoop->new->run();
-
-    Or
-
-     $loop->loop_forever();
+       use IO::Async::Loop::Glib;
+    
+       my $loop = IO::Async::Loop::Glib->new();
+    
+       $loop->add( ... );
+    
+       ...
+       # Rest of GLib/Gtk program that uses GLib
+    
+       Glib::MainLoop->new->run();
 
     Or
 
-     while(1) {
-        $loop->loop_once();
-     }
+       $loop->run;
+
+    Or
+
+       while(1) {
+          $loop->loop_once();
+       }
 
 DESCRIPTION
-    This subclass of `IO::Async::Loop' uses the `Glib::MainLoop' to perform
+
+    This subclass of IO::Async::Loop uses the Glib::MainLoop to perform
     read-ready and write-ready tests.
 
-    The appropriate `Glib::IO' sources are added or removed from the
-    `Glib::MainLoop' when notifiers are added or removed from the set, or
-    when they change their `want_writeready' status. The callbacks are
-    called automatically by Glib itself; no special methods on this loop
-    object are required.
+    The appropriate Glib::IO sources are added or removed from the
+    Glib::MainLoop when notifiers are added or removed from the set, or
+    when they change their want_writeready status. The callbacks are called
+    automatically by Glib itself; no special methods on this loop object
+    are required.
 
 CONSTRUCTOR
-  $loop = IO::Async::Loop::Glib->new()
-    This function returns a new instance of a `IO::Async::Loop::Glib'
-    object. It takes no special arguments.
+
+ new
+
+       $loop = IO::Async::Loop::Glib->new()
+
+    This function returns a new instance of a IO::Async::Loop::Glib object.
+    It takes no special arguments.
 
 METHODS
-    There are no special methods in this subclass, other than those provided
-    by the `IO::Async::Loop' base class.
 
-  $loop->loop_once( $timeout )
-    This method calls the `iteration()' method on the underlying
-    `Glib::MainContext'. If a timeout value is supplied, then a Glib timeout
-    will be installed, to interrupt the loop at that time. If Glib indicates
-    that any callbacks were fired, then this method will return 1 (however,
-    it does not mean that any `IO::Async' callbacks were invoked, as there
-    may be other parts of code sharing the Glib main context. Otherwise, it
-    will return 0.
+    There are no special methods in this subclass, other than those
+    provided by the IO::Async::Loop base class.
+
+ loop_once
+
+       $loop->loop_once( $timeout )
+
+    This method calls the iteration() method on the underlying
+    Glib::MainContext. If a timeout value is supplied, then a Glib timeout
+    will be installed, to interrupt the loop at that time. If Glib
+    indicates that any callbacks were fired, then this method will return 1
+    (however, it does not mean that any IO::Async callbacks were invoked,
+    as there may be other parts of code sharing the Glib main context.
+    Otherwise, it will return 0.
 
 SEE ALSO
-    *   Glib - Perl wrappers for the GLib utility and Object libraries
 
-    *   Gtk2 - Perl interface to the 2.x series of the Gimp Toolkit library
+      * Glib - Perl wrappers for the GLib utility and Object libraries
+
+      * Gtk2 - Perl interface to the 2.x series of the Gimp Toolkit library
 
 AUTHOR
+
     Paul Evans <leonerd@leonerd.org.uk>
 

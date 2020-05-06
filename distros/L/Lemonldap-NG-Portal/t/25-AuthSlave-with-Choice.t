@@ -15,7 +15,7 @@ my $client = LLNG::Manager::Test->new( {
             userDB            => 'Same',
             passwordDB        => 'Choice',
             authChoiceModules => {
-                '1_Demo' => 'Demo;Demo;Null',
+                '1_Demo'  => 'Demo;Demo;Null',
                 '2_Slave' => 'Slave;Demo;Null',
             },
             slaveUserHeader   => 'My-Test',
@@ -30,11 +30,11 @@ my $client = LLNG::Manager::Test->new( {
 ok(
     $res = $client->_get(
         '/',
-        query => 'lmAuth=1_Slave',
+        query  => 'lmAuth=1_Slave',
         ip     => '127.0.0.1',
         custom => {
-            HTTP_MY_TEST     => 'dwho',
-            HTTP_NAME        => 'Dr Who',
+            HTTP_MY_TEST => 'dwho',
+            HTTP_NAME    => 'Dr Who',
         }
 
     ),
@@ -51,7 +51,7 @@ count(4);
 ok(
     $res = $client->_get(
         '/',
-        query => 'lmAuth=2_Slave',
+        query  => 'lmAuth=2_Slave',
         ip     => '127.0.0.2',
         custom => {
             HTTP_MY_TEST => 'dwho',

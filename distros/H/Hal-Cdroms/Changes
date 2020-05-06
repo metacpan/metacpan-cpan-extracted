@@ -1,3 +1,11 @@
+0.05 Mon May  4 17:20:04 CEST 2020
+
+    - switch from UDisks to UDisks2 (mga#24949)
+    - support USB flash media as well as CD/DVD (mga#26564)
+    - fix "Use of uninitialized value" (mga#16142)
+    - drop mount_hal and unmount_hal - they are no longer needed
+       - UDisks2 correctly handles devices listed in fstab
+
 0.04 Sun Jan 29 04:26:19 CET 2012
 
      - switch from HAL to udisks (mga#3458 & #3639)

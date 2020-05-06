@@ -1,3 +1,14 @@
+0.004   2020-04-30  Released-By: PERLANCAR; Urgency: medium
+
+	- Grammar, grammar.
+
+
+0.003   2020-02-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Grammar, rewording, rename pmrenamehide to pmhiderename, mention
+	  lib::hiderename.
+
+
 0.002   2020-02-13  Released-By: PERLANCAR; Urgency: medium
 
 	- Rewrite, mention some more modules.

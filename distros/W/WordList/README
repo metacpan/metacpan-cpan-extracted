@@ -2,8 +2,8 @@ NAME
     WordList - Word lists
 
 VERSION
-    This document describes version 0.4.1 of WordList (from Perl
-    distribution WordList), released on 2018-04-03.
+    This document describes version 0.6.0 of WordList (from Perl
+    distribution WordList), released on 2020-05-04.
 
 SYNOPSIS
     Use one of the "WordList::*" modules.
@@ -38,11 +38,22 @@ DESCRIPTION
     Dynamic and non-deterministic wordlist. A dynamic wordlist must set
     package variable $DYNAMIC to either 1 (deterministic) or 2
     (non-deterministic). A dynamic wordlist does not put the wordlist in the
-    DATA section; instead, user relies on "each_word()" or "all_words()" to
-    get the list. A deterministic wordlist returns the same list everytime
-    "each_word()" or "all_words()" is called. A non-deterministic list can
-    return a different list for a different "each_word()" or "all_words()"
-    call.
+    DATA section; instead, user relies on "first_word()" + "next_word()", or
+    "each_word()", or "all_words()" to get the list. A deterministic
+    wordlist returns the same list everytime "each_word()" or "all_words()"
+    is called. A non-deterministic list can return a different list for a
+    different "each_word()" or "all_words()" call. See
+    WordListRole::Dynamic::FirstNextResetFromEach and
+    WordListRole::Dynamic::EachFromFirstNextReset if you want to write a
+    dynamic wordlist module. It is possible for a dynamic list to return
+    unordered or duplicate entries, but it is not encouraged.
+
+    Parameterized wordlist. When instantiating a wordlist class instance,
+    user can pass a list of key-value pairs as parameters. Normally only a
+    dynamic wordlist would accept parameters. Parameters are defined in the
+    %PARAMS package variable. It is a hash of parameter names as keys and
+    parameter specification as values. Parameter specification follows
+    function argument metadata specified in Rinci::function.
 
 DIFFERENCES WITH GAMES::WORD::WORDLIST
     Since this is a new and non-backward compatible interface from
@@ -88,6 +99,17 @@ METHODS
 
     If code return -2 will exit early.
 
+  first_word
+    Another way to iterate the word list is by calling "first_word" to get
+    the first word, then "next_word" repeatedly until you get "undef".
+
+  next_word
+    Get the next word. See "first_word" for more details.
+
+  reset_iterator
+    Reset iterator. Basically "first_word" is equivalent to "reset_iterator"
+    + "next_word".
+
   pick
     Usage:
 
@@ -109,8 +131,8 @@ METHODS
     Check whether $word is in the list.
 
     Algorithm in this implementation is linear scan (O(n)). Check out
-    WordList::Role::BinarySearch for an O(log n) implementation, or
-    WordList::Role::Bloom for O(1) implementation.
+    WordListRole::BinarySearch for an O(log n) implementation, or
+    WordListRole::Bloom for O(1) implementation.
 
   all_words
     Usage:
@@ -136,15 +158,20 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    "WordList::Role::*" modules.
+    "WordListRole::*" modules.
 
-    Other "WordList::*" modules.
+    "WordListMod::*" modules.
+
+    "WordList::*" modules.
+
+    Rinci.
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018, 2017, 2016 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

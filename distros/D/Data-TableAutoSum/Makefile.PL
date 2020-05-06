@@ -5,6 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     'NAME'		=> 'Data::TableAutoSum',
     'VERSION_FROM'	=> 'TableAutoSum.pm', # finds $VERSION
+    'LICENSE'	        => 'perl',
     'PREREQ_PM'		=> {
        Params::Validate   => 0,
        Regexp::Common     => 0,

@@ -1,5 +1,8 @@
 Revision history for Perl extension Alien::GSL.
 
+1.02 2020-05-03
+  - Chage to https from ftp (Plicease++)
+
 1.01 2017-03-10
   - Depend on Alien::Base::ModuleBuild in dependencies
 

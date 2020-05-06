@@ -13,9 +13,13 @@ require Lemonldap::NG::Common::Notifications;
 
 use feature 'state';
 
-extends 'Lemonldap::NG::Common::Conf::AccessLib';
+extends qw(
+  Lemonldap::NG::Manager::Plugin
+  Lemonldap::NG::Common::Conf::AccessLib
+  Lemonldap::NG::Common::PSGI::Router
+);
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 has notifAccess => ( is => 'rw' );
 has notifFormat => ( is => 'rw' );
@@ -26,7 +30,7 @@ has notifFormat => ( is => 'rw' );
 
 use constant defaultRoute => 'notifications.html';
 
-sub addRoutes {
+sub init {
     my ( $self, $conf ) = @_;
 
     if ( $conf->{oldNotifFormat} ) {
@@ -74,6 +78,7 @@ sub addRoutes {
           { done => { ':notificationId' => 'deleteDoneNotification' } },
         ['DELETE']
       );
+    return 1;
 }
 
 sub setNotifAccess {
@@ -268,6 +273,8 @@ sub newNotification {
     unless ( defined($json) ) {
         return $self->sendError( $req, undef, 200 );
     }
+
+    $json->{reference} =~ s/_/-/g;    # Remove underscores (#2135)
 
     foreach my $r (qw(uid reference xml)) {
         return $self->sendError( $req, "Missing $r", 200 )

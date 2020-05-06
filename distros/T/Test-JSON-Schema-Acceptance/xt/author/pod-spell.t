@@ -20,7 +20,6 @@ Karen
 Perrett
 Schema
 Test
-bh7
 dp13
 ether
 irc

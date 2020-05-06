@@ -31,7 +31,8 @@ my $client = LLNG::Manager::Test->new( {
                 test_impersonation => '"$testPrefix__user/$_user"',
                 _whatToTrace =>
                   '$_auth eq "SAML" ? "$_user@$_idpConfKey" : $_user',
-            },
+                mail => 'uc $mail'
+            }
         }
     }
 );
@@ -54,7 +55,7 @@ ok(
     ),
     'Auth query'
 );
-ok( $res->[2]->[0] =~ m%<span trmsg="40"></span>%, ' PE40 found' )
+ok( $res->[2]->[0] =~ m%<span trmsg="40">%, ' PE40 found' )
   or explain( $res->[2]->[0], "PE40 - Bad formed user" );
 count(2);
 
@@ -82,7 +83,7 @@ ok(
 );
 ok(
     $res->[2]->[0] =~
-m%<div class="message message-negative alert"><span trmsg="5"></span></div>%,
+m%<div class="message message-negative alert"><span trmsg="5">%,
     ' PE5 found'
 ) or explain( $res->[2]->[0], "PE5 - Forbidden identity" );
 count(2);
@@ -111,7 +112,7 @@ ok(
 );
 ok(
     $res->[2]->[0] =~
-m%<div class="message message-negative alert"><span trmsg="93"></span></div>%,
+m%<div class="message message-negative alert"><span trmsg="93">%,
     ' PE93 found'
 ) or explain( $res->[2]->[0], "PE93 - Impersonation service not allowed" );
 count(2);
@@ -196,7 +197,10 @@ ok( $res->[2]->[0] =~ m%<td scope="row">test_impersonation</td>%,
 ok( $res->[2]->[0] =~ m%<td scope="row">msmith/msmith</td>%,
     'Found msmith/msmith' )
   or explain( $res->[2]->[0], 'Found msmith/msmith' );
-count(2);
+my $nbr = $res->[2]->[0] =~ s%MSMITH\@BADWOLF\.ORG%%g;
+ok( $nbr == 2, 'Found two MSMITH@BADWOLF.ORG' )
+  or explain( $res->[2]->[0], 'Found two MSMITH@BADWOLF.ORG' );
+count(3);
 
 $client->logout($id);
 
@@ -284,10 +288,6 @@ m%<div class="alert alert-success"><div class="text-center"><b><span trspan="all
 ok( $res->[2]->[0] =~ m%<span trspan="headers">%, 'Found trspan="headers"' )
   or explain( $res->[2]->[0], 'trspan="headers"' );
 
-ok( $res->[2]->[0] !~ m%<span trspan="groups_sso">%,
-    'trspan="groups_sso" NOT found' )
-  or explain( $res->[2]->[0], 'trspan="groups_sso"' );
-
 ok( $res->[2]->[0] =~ m%<span trspan="macros">%, 'Found trspan="macros"' )
   or explain( $res->[2]->[0], 'trspan="macros"' );
 ok( $res->[2]->[0] =~ m%<span trspan="attributes">%,
@@ -306,7 +306,7 @@ ok( $res->[2]->[0] =~ m%<td scope="row">_whatToTrace</td>%,
 ok( $res->[2]->[0] =~ m%<td scope="row">testPrefix_groups</td>%,
     'Found testPrefix_groups' )
   or explain( $res->[2]->[0], 'testPrefix_groups' );
-ok( $res->[2]->[0] =~ m%<td scope="row">su; su_test; test_su</td>%,
+ok( $res->[2]->[0] =~ m%<td scope="row">[^<]*su; su_test; test_su</td>%,
     'Found "su; su_test; test_su"' )
   or explain( $res->[2]->[0], 'su' );
 ok( $res->[2]->[0] =~ m%<td scope="row">testPrefix_uid</td>%,
@@ -319,11 +319,18 @@ ok( $res->[2]->[0] =~ m%<td scope="row">test_impersonation</td>%,
   or explain( $res->[2]->[0], 'test_impersonation' );
 ok( $res->[2]->[0] =~ m%<td scope="row">rtyler/dwho</td>%, 'Found rtyler/dwo' )
   or explain( $res->[2]->[0], 'Found rtyler/dwo' );
-count(16);
+ok( $res->[2]->[0] =~ m%<td scope="row">_session_id</td>%, 'Found _session_id' )
+  or explain( $res->[2]->[0], 'Found _session_id' );
+ok( $res->[2]->[0] =~ m%<td scope="row">_session_kind</td>%,
+    'Found _session_id' )
+  or explain( $res->[2]->[0], 'Found _session_kind' );
+count(17);
 
 my %attributes = map /<td scope="row">(.+)?<\/td>/g, $res->[2]->[0];
-ok( keys %attributes == 33, 'Found 33 attributes' )
-  or print STDERR "Missing attributes -> " . scalar %attributes;
+ok( keys %attributes == 34, 'Found 34 attributes' )
+  or print STDERR ( keys %attributes < 34 )
+  ? "Missing attributes -> " . scalar keys (%attributes) . "\n"
+  : "Too much attributes -> " . scalar keys (%attributes). "\n";
 ok( $attributes{'_auth'} eq 'Demo', '_auth' )
   or print STDERR Dumper( \%attributes );
 ok( $attributes{'uid'}, 'uid' ) or print STDERR Dumper( \%attributes );

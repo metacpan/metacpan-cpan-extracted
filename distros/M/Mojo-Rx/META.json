@@ -42,7 +42,8 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.008001"
+            "Mojolicious" : "0",
+            "perl" : "5.010"
          }
       },
       "test" : {
@@ -54,25 +55,31 @@
    "provides" : {
       "Mojo::Rx" : {
          "file" : "lib/Mojo/Rx.pm",
-         "version" : "v0.11.0"
+         "version" : "v0.12.0"
       },
-      "Mojo::Rx::Extras" : {
-         "file" : "lib/Mojo/Rx/Extras.pm",
-         "version" : "v0.11.0"
+      "Mojo::Rx::ConnectableObservable" : {
+         "file" : "lib/Mojo/Rx/ConnectableObservable.pm",
+         "version" : "v0.12.0"
+      },
+      "Mojo::Rx::Observable" : {
+         "file" : "lib/Mojo/Rx/Observable.pm",
+         "version" : "v0.12.0"
+      },
+      "Mojo::Rx::Subject" : {
+         "file" : "lib/Mojo/Rx/Subject.pm",
+         "version" : "v0.12.0"
+      },
+      "Mojo::Rx::Subscription" : {
+         "file" : "lib/Mojo/Rx/Subscription.pm",
+         "version" : "v0.12.0"
+      },
+      "Mojo::Rx::Utils" : {
+         "file" : "lib/Mojo/Rx/Utils.pm",
+         "version" : "v0.12.0"
       }
    },
    "release_status" : "stable",
-   "resources" : {
-      "bugtracker" : {
-         "web" : "https://gitlab.com/karjala/fake-mojo-rx/issues"
-      },
-      "homepage" : "https://gitlab.com/karjala/fake-mojo-rx",
-      "repository" : {
-         "url" : "git://gitlab.com/karjala/fake-mojo-rx.git",
-         "web" : "https://gitlab.com/karjala/fake-mojo-rx"
-      }
-   },
-   "version" : "v0.11.0",
+   "version" : "v0.12.0",
    "x_authority" : "cpan:KARJALA",
    "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1

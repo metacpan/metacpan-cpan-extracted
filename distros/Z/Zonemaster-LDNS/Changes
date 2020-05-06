@@ -1,13 +1,28 @@
 Release history for Zonemaster component Zonemaster-LDNS
 
+
+2.1.0 2020-04-30
+
+ [Features]
+ - Updated to use libldns 1.7.0 or 1.7.1 (#85)
+ - Support for Ed25519 (algorithm 15) added (#85, #51, #84)
+ - Allow specifying which OpenSSL library to use (#97)
+ 
+ [Fixed]
+ - Exclude more ldns files from MANIFEST (#92)
+ - Fixing links and table of contents in main README.md (#94)
+ - Exclude LDNS.bs from distribution file (#101, #95)
+ - Eliminated locale dependency from unit test (#102, #103)
+ 
+
 2.0.1 2019-05-21
 
 - Removed
-  - Ubuntu 14.04 is no longer supported
+  - Ubuntu 14.04 is no longer supported (#74)
 
 - Changed
-  - inc::Module::install is no longer bundled
-  - Dependency declarations have been cleaned up
+  - inc::Module::install is no longer bundled (#72)
+  - Dependency declarations have been cleaned up (#73)
 
 
 2.0.0 2019-01-25 (pre-release version)

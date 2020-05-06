@@ -1,9 +1,10 @@
 use Test::More;
 use strict;
 use IO::String;
+use JSON qw(from_json);
 
 my $res;
-my $maintests = 9;
+my $maintests = 16;
 
 require 't/test-lib.pm';
 my $file = tempdb();
@@ -79,7 +80,8 @@ qq{INSERT INTO notifications VALUES ('rtyler','testref2','2050-05-30 00:00:00','
                 notificationStorageOptions => {
                     dbiChain => "dbi:SQLite:dbname=$file",
                 },
-                oldNotifFormat => 1,
+                oldNotifFormat        => 1,
+                notificationsExplorer => 1
             }
         }
     );
@@ -150,7 +152,7 @@ qq{INSERT INTO notifications VALUES ('rtyler','testref2','2050-05-30 00:00:00','
         !defined( $cookies->{lemonldappdata} ),
         " Make sure no pdata is returned"
     );
-    $client->logout($id);
+    $id = expectCookie($res);
 
     # Verify that notification was tagged as 'done'
     my $sth =
@@ -159,6 +161,32 @@ qq{INSERT INTO notifications VALUES ('rtyler','testref2','2050-05-30 00:00:00','
     my $i = 0;
     while ( $sth->fetchrow_hashref ) { $i++ }
     ok( $i == 2, 'Notification was deleted' );
+
+    # GET notifications explorer
+    ok(
+        $res = $client->_get(
+            '/mynotifications', cookie => "lemonldap=$id",
+        ),
+        'Notifications explorer query'
+    );
+
+    my $json;
+    ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
+      or print STDERR "$@\n" . Dumper($res);
+    ok( $json->{result} == 2, ' Result is 2' )
+      or explain( $json, "result => 2" );
+    ok( $json->{MSG} == 'myNotifications', ' MSG is myNotifications' )
+      or explain( $json, "result => 2" );
+    ok( $json->{NOTIFICATIONS}->[0]->{reference} =~ /testref2?/,
+        ' Notification 1 found' )
+      or explain( $json, "Notification 1" );
+    ok( $json->{NOTIFICATIONS}->[0]->{reference} =~ /testref2?/,
+        ' Notification 2 found' )
+      or explain( $json, "Notification 2" );
+    ok( $json->{NOTIFICATIONS}->[0]->{epoch} =~ /\d{10}/, ' epoch found' )
+      or explain( $json, "Epoch found" );
+
+    $client->logout($id);
 
     # Try to authenticate
     # -------------------

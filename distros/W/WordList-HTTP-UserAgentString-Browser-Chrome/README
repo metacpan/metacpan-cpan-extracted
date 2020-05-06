@@ -1,0 +1,75 @@
+NAME
+    WordList::HTTP::UserAgentString::Browser::Chrome - Collection of Chrome
+    browser User-Agent strings
+
+VERSION
+    This document describes version 20200501.0.0 of
+    WordList::HTTP::UserAgentString::Browser::Chrome (from Perl distribution
+    WordList-HTTP-UserAgentString-Browser-Chrome), released on 2020-05-01.
+
+SYNOPSIS
+     use WordList::HTTP::UserAgentString::Browser::Chrome;
+
+     my $wl = WordList::HTTP::UserAgentString::Browser::Chrome->new;
+
+     # Pick a (or several) random word(s) from the list
+     my $word = $wl->pick;
+     my @words = $wl->pick(3);
+
+     # Check if a word exists in the list
+     if ($wl->word_exists('foo')) { ... }
+
+     # Call a callback for each word
+     $wl->each_word(sub { my $word = shift; ... });
+
+     # Get all the words
+     my @all_words = $wl->all_words;
+
+DESCRIPTION
+    Taken from
+    https://useragentstring.com/pages/useragentstring.php?name=Chrome
+
+    Sorted by recency (newest first).
+
+STATISTICS
+     +----------------------------------+------------------+
+     | key                              | value            |
+     +----------------------------------+------------------+
+     | avg_word_len                     | 114.505300353357 |
+     | longest_word_len                 | 244              |
+     | num_words                        | 849              |
+     | num_words_contains_nonword_chars | 849              |
+     | num_words_contains_unicode       | 0                |
+     | num_words_contains_whitespace    | 849              |
+     | shortest_word_len                | 77               |
+     +----------------------------------+------------------+
+
+    The statistics is available in the %STATS package variable.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WordList-HTTP-UserAgentString-Browser-Chro
+    me>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WordList-HTTP-UserAgentString-Browser
+    -Chrome>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=WordList-HTTP-UserAge
+    ntString-Browser-Chrome>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

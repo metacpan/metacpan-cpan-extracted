@@ -31,7 +31,7 @@ is( PerlIO::Via::Base64->eol,"\n",		'check eol setting first time' );
 # Create the encoded test-file
 
 ok(
- open( my $out,'>:Via(PerlIO::Via::Base64)', $file ),
+ open( my $out,'>:via(PerlIO::Via::Base64)', $file ),
  "opening '$file' for writing"
 );
 
@@ -50,7 +50,7 @@ ok( close( $test ),			'close test handle' );
 # Check decoding _with_ layers
 
 ok(
- open( my $in,'<:Via(PerlIO::Via::Base64)', $file ),
+ open( my $in,'<:via(PerlIO::Via::Base64)', $file ),
  "opening '$file' for reading"
 );
 is( join( '',<$in> ),$decoded,		'check decoding' );
@@ -64,7 +64,7 @@ is( PerlIO::Via::Base64->eol,'',	'check eol setting second time' );
 # Create the encoded test-file
 
 ok(
- open( my $out,'>:Via(PerlIO::Via::Base64)', $file ),
+ open( my $out,'>:via(PerlIO::Via::Base64)', $file ),
  "opening '$file' for writing without eol"
 );
 
@@ -83,7 +83,7 @@ ok( close( $test ),			'close test handle without eol' );
 # Check decoding _with_ layers
 
 ok(
- open( my $in,'<:Via(PerlIO::Via::Base64)', $file ),
+ open( my $in,'<:via(PerlIO::Via::Base64)', $file ),
  "opening '$file' for reading without eol"
 );
 is( join( '',<$in> ),$decoded,		'check decoding without eol' );

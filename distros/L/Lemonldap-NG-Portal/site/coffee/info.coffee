@@ -6,6 +6,7 @@ _go = 1
 stop = () ->
 	_go = 0
 	$('#divToHide').hide();
+	$('#wait').hide();
 
 go = () ->
 	$("#form").submit() if _go
@@ -17,7 +18,8 @@ timer = () ->
 	$('#timer').html(h)
 	window.setTimeout timer, 1000
 
-$(document).ready ->
+#$(document).ready ->
+$(window).on 'load', () ->
 	if window.datas['activeTimer']
 		window.setTimeout go, 30000
 		window.setTimeout timer, 1000

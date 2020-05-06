@@ -34,7 +34,7 @@ use Params::ValidationCompiler 0.13 ();
 # namespace::autoclean.
 *__t = \&DateTime::Fiction::JRRTolkien::Shire::Types::t;
 
-our $VERSION = '0.903';
+our $VERSION = '0.904';
 
 use constant DAY_NUMBER_MIDYEARS_DAY	=> 183;
 
@@ -1956,7 +1956,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 Copyright (c) 2003 Tom Braun. All rights reserved.
 
-Copyright (C) 2017-2019 Thomas R. Wyant, III
+Copyright (C) 2017-2020 Thomas R. Wyant, III
 
 The calendar implemented on this module was created by J.R.R. Tolkien,
 and the copyright is still held by his estate.  The license and

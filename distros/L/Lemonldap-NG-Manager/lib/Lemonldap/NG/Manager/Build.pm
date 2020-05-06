@@ -456,15 +456,16 @@ our \$VERSION = '$Lemonldap::NG::Manager::Build::Attributes::VERSION';
 use constant HANDLER => 'Lemonldap::NG::Handler::PSGI::Main';
 use constant {
 EOF
-    for my $pe ( sort { $portalConstants{$a} <=> $portalConstants{$b} }
-        keys %portalConstants )
+    for my $pe (
+        sort { $portalConstants{$a} <=> $portalConstants{$b} }
+        keys %portalConstants
+      )
     {
         my $str = $portalConstants{$pe};
         $content .= "    $pe => $str,\n";
     }
 
-    my $exports = join ", ",
-      map  { "'$_'" }
+    my $exports = join ", ", map { "'$_'" }
       sort { $portalConstants{$a} <=> $portalConstants{$b} }
       keys %portalConstants;
 
@@ -569,7 +570,7 @@ sub scanTree {
         # Subnode
         elsif ( ref($leaf) ) {
             $jleaf->{title} = $jleaf->{id} = $leaf->{title};
-            $jleaf->{type} = $leaf->{form} if ( $leaf->{form} );
+            $jleaf->{type}  = $leaf->{form} if ( $leaf->{form} );
             if ( $leaf->{title} =~ /^((?:oidc|saml|cas)Service)MetaData$/ ) {
                 no strict 'refs';
                 my @tmp = $self->scanLeaf( $leaf->{nodes} );

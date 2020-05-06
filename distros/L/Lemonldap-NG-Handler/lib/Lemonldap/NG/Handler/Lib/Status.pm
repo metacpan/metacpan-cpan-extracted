@@ -69,7 +69,8 @@ sub run {
                 my ( $user, $uri, $code ) = ( $1, $2, $3 );
 
                 # Portal error translation
-                $code = portalConsts->{$code} || $code if ( $code =~ /^\-?\d+$/ );
+                $code = portalConsts->{$code} || $code
+                  if ( $code =~ /^\-?\d+$/ );
 
                 # Per user activity
                 $status->{user}->{$user}->{$code}++;

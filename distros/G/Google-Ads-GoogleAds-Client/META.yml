@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,43 +23,43 @@ name: Google-Ads-GoogleAds-Client
 provides:
   Google::Ads::GoogleAds::BaseEntity:
     file: lib/Google/Ads/GoogleAds/BaseEntity.pm
-    version: v3.0.0
+    version: v3.1.0
   Google::Ads::GoogleAds::BaseService:
     file: lib/Google/Ads/GoogleAds/BaseService.pm
-    version: v3.0.0
+    version: v3.1.0
   Google::Ads::GoogleAds::Client:
     file: lib/Google/Ads/GoogleAds/Client.pm
-    version: v3.0.0
+    version: v3.1.0
   Google::Ads::GoogleAds::Common::AuthError:
     file: lib/Google/Ads/GoogleAds/Common/AuthError.pm
-    version: v3.0.0
+    version: v3.1.0
   Google::Ads::GoogleAds::Common::AuthHandlerInterface:
     file: lib/Google/Ads/GoogleAds/Common/AuthHandlerInterface.pm
   Google::Ads::GoogleAds::Common::FieldMask:
     file: lib/Google/Ads/GoogleAds/Common/FieldMask.pm
   Google::Ads::GoogleAds::Common::OAuth2ApplicationsHandler:
     file: lib/Google/Ads/GoogleAds/Common/OAuth2ApplicationsHandler.pm
-    version: v3.0.0
+    version: v3.1.0
   Google::Ads::GoogleAds::Common::OAuth2BaseHandler:
     file: lib/Google/Ads/GoogleAds/Common/OAuth2BaseHandler.pm
-    version: v3.0.0
+    version: v3.1.0
   Google::Ads::GoogleAds::Common::OAuthApplicationsHandlerInterface:
     file: lib/Google/Ads/GoogleAds/Common/OAuthApplicationsHandlerInterface.pm
   Google::Ads::GoogleAds::Constants:
     file: lib/Google/Ads/GoogleAds/Constants.pm
-    version: v3.0.0
+    version: v3.1.0
   Google::Ads::GoogleAds::GoogleAdsException:
     file: lib/Google/Ads/GoogleAds/GoogleAdsException.pm
-    version: v3.0.0
+    version: v3.1.0
   Google::Ads::GoogleAds::Logging::DetailStats:
     file: lib/Google/Ads/GoogleAds/Logging/DetailStats.pm
-    version: v3.0.0
+    version: v3.1.0
   Google::Ads::GoogleAds::Logging::GoogleAdsLogger:
     file: lib/Google/Ads/GoogleAds/Logging/GoogleAdsLogger.pm
-    version: v3.0.0
+    version: v3.1.0
   Google::Ads::GoogleAds::Logging::SummaryStats:
     file: lib/Google/Ads/GoogleAds/Logging/SummaryStats.pm
-    version: v3.0.0
+    version: v3.1.0
   Google::Ads::GoogleAds::LongRunning::CancelOperationRequest:
     file: lib/Google/Ads/GoogleAds/LongRunning/CancelOperationRequest.pm
   Google::Ads::GoogleAds::LongRunning::DeleteOperationRequest:
@@ -74,25 +74,25 @@ provides:
     file: lib/Google/Ads/GoogleAds/LongRunning/PollOperationRequest.pm
   Google::Ads::GoogleAds::OAuth2ApplicationsHandler:
     file: lib/Google/Ads/GoogleAds/OAuth2ApplicationsHandler.pm
-    version: v3.0.0
+    version: v3.1.0
   Google::Ads::GoogleAds::Utils::FieldMasks:
     file: lib/Google/Ads/GoogleAds/Utils/FieldMasks.pm
-    version: v3.0.0
+    version: v3.1.0
   Google::Ads::GoogleAds::Utils::GoogleAdsHelper:
     file: lib/Google/Ads/GoogleAds/Utils/GoogleAdsHelper.pm
-    version: v3.0.0
+    version: v3.1.0
   Google::Ads::GoogleAds::Utils::MediaUtils:
     file: lib/Google/Ads/GoogleAds/Utils/MediaUtils.pm
-    version: v3.0.0
+    version: v3.1.0
   Google::Ads::GoogleAds::Utils::PartialFailureUtils:
     file: lib/Google/Ads/GoogleAds/Utils/PartialFailureUtils.pm
-    version: v3.0.0
+    version: v3.1.0
   Google::Ads::GoogleAds::Utils::SearchGoogleAdsIterator:
     file: lib/Google/Ads/GoogleAds/Utils/SearchGoogleAdsIterator.pm
-    version: v3.0.0
+    version: v3.1.0
   Google::Ads::GoogleAds::Utils::SearchStreamHandler:
     file: lib/Google/Ads/GoogleAds/Utils/SearchStreamHandler.pm
-    version: v3.0.0
+    version: v3.1.0
   Google::Ads::GoogleAds::V1::Common::AdImageAsset:
     file: lib/Google/Ads/GoogleAds/V1/Common/AdImageAsset.pm
   Google::Ads::GoogleAds::V1::Common::AdMediaBundleAsset:
@@ -4375,6 +4375,8 @@ provides:
     file: lib/Google/Ads/GoogleAds/V3/Common/CustomIntentInfo.pm
   Google::Ads::GoogleAds::V3::Common::CustomParameter:
     file: lib/Google/Ads/GoogleAds/V3/Common/CustomParameter.pm
+  Google::Ads::GoogleAds::V3::Common::CustomerMatchUserListMetadata:
+    file: lib/Google/Ads/GoogleAds/V3/Common/CustomerMatchUserListMetadata.pm
   Google::Ads::GoogleAds::V3::Common::DateRange:
     file: lib/Google/Ads/GoogleAds/V3/Common/DateRange.pm
   Google::Ads::GoogleAds::V3::Common::DateSpecificRuleUserListInfo:
@@ -4505,6 +4507,8 @@ provides:
     file: lib/Google/Ads/GoogleAds/V3/Common/MobileDeviceInfo.pm
   Google::Ads::GoogleAds::V3::Common::Money:
     file: lib/Google/Ads/GoogleAds/V3/Common/Money.pm
+  Google::Ads::GoogleAds::V3::Common::OfflineUserAddressInfo:
+    file: lib/Google/Ads/GoogleAds/V3/Common/OfflineUserAddressInfo.pm
   Google::Ads::GoogleAds::V3::Common::Operand:
     file: lib/Google/Ads/GoogleAds/V3/Common/Operand.pm
   Google::Ads::GoogleAds::V3::Common::OperatingSystemVersionInfo:
@@ -4581,6 +4585,12 @@ provides:
     file: lib/Google/Ads/GoogleAds/V3/Common/SimilarUserListInfo.pm
   Google::Ads::GoogleAds::V3::Common::SitelinkFeedItem:
     file: lib/Google/Ads/GoogleAds/V3/Common/SitelinkFeedItem.pm
+  Google::Ads::GoogleAds::V3::Common::StoreAttribute:
+    file: lib/Google/Ads/GoogleAds/V3/Common/StoreAttribute.pm
+  Google::Ads::GoogleAds::V3::Common::StoreSalesMetadata:
+    file: lib/Google/Ads/GoogleAds/V3/Common/StoreSalesMetadata.pm
+  Google::Ads::GoogleAds::V3::Common::StoreSalesThirdPartyMetadata:
+    file: lib/Google/Ads/GoogleAds/V3/Common/StoreSalesThirdPartyMetadata.pm
   Google::Ads::GoogleAds::V3::Common::StructuredSnippetFeedItem:
     file: lib/Google/Ads/GoogleAds/V3/Common/StructuredSnippetFeedItem.pm
   Google::Ads::GoogleAds::V3::Common::TagSnippet:
@@ -4619,10 +4629,16 @@ provides:
     file: lib/Google/Ads/GoogleAds/V3/Common/TextMessageFeedItem.pm
   Google::Ads::GoogleAds::V3::Common::TopicInfo:
     file: lib/Google/Ads/GoogleAds/V3/Common/TopicInfo.pm
+  Google::Ads::GoogleAds::V3::Common::TransactionAttribute:
+    file: lib/Google/Ads/GoogleAds/V3/Common/TransactionAttribute.pm
   Google::Ads::GoogleAds::V3::Common::UnknownListingDimensionInfo:
     file: lib/Google/Ads/GoogleAds/V3/Common/UnknownListingDimensionInfo.pm
   Google::Ads::GoogleAds::V3::Common::UrlCollection:
     file: lib/Google/Ads/GoogleAds/V3/Common/UrlCollection.pm
+  Google::Ads::GoogleAds::V3::Common::UserData:
+    file: lib/Google/Ads/GoogleAds/V3/Common/UserData.pm
+  Google::Ads::GoogleAds::V3::Common::UserIdentifier:
+    file: lib/Google/Ads/GoogleAds/V3/Common/UserIdentifier.pm
   Google::Ads::GoogleAds::V3::Common::UserInterestInfo:
     file: lib/Google/Ads/GoogleAds/V3/Common/UserInterestInfo.pm
   Google::Ads::GoogleAds::V3::Common::UserListActionInfo:
@@ -4949,6 +4965,12 @@ provides:
     file: lib/Google/Ads/GoogleAds/V3/Enums/MutateJobStatusEnum.pm
   Google::Ads::GoogleAds::V3::Enums::NegativeGeoTargetTypeEnum:
     file: lib/Google/Ads/GoogleAds/V3/Enums/NegativeGeoTargetTypeEnum.pm
+  Google::Ads::GoogleAds::V3::Enums::OfflineUserDataJobFailureReasonEnum:
+    file: lib/Google/Ads/GoogleAds/V3/Enums/OfflineUserDataJobFailureReasonEnum.pm
+  Google::Ads::GoogleAds::V3::Enums::OfflineUserDataJobStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V3/Enums/OfflineUserDataJobStatusEnum.pm
+  Google::Ads::GoogleAds::V3::Enums::OfflineUserDataJobTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V3/Enums/OfflineUserDataJobTypeEnum.pm
   Google::Ads::GoogleAds::V3::Enums::OperatingSystemVersionOperatorTypeEnum:
     file: lib/Google/Ads/GoogleAds/V3/Enums/OperatingSystemVersionOperatorTypeEnum.pm
   Google::Ads::GoogleAds::V3::Enums::PageOnePromotedStrategyGoalEnum:
@@ -5355,6 +5377,8 @@ provides:
     file: lib/Google/Ads/GoogleAds/V3/Resources/NetworkSettings.pm
   Google::Ads::GoogleAds::V3::Resources::OAuthInfo:
     file: lib/Google/Ads/GoogleAds/V3/Resources/OAuthInfo.pm
+  Google::Ads::GoogleAds::V3::Resources::OfflineUserDataJob:
+    file: lib/Google/Ads/GoogleAds/V3/Resources/OfflineUserDataJob.pm
   Google::Ads::GoogleAds::V3::Resources::OperatingSystemVersionConstant:
     file: lib/Google/Ads/GoogleAds/V3/Resources/OperatingSystemVersionConstant.pm
   Google::Ads::GoogleAds::V3::Resources::OptimizeAdRotationRecommendation:
@@ -6299,6 +6323,22 @@ provides:
     file: lib/Google/Ads/GoogleAds/V3/Services/MutateJobService/MutateJobResult.pm
   Google::Ads::GoogleAds::V3::Services::MutateJobService::RunMutateJobRequest:
     file: lib/Google/Ads/GoogleAds/V3/Services/MutateJobService/RunMutateJobRequest.pm
+  Google::Ads::GoogleAds::V3::Services::OfflineUserDataJobService:
+    file: lib/Google/Ads/GoogleAds/V3/Services/OfflineUserDataJobService.pm
+  Google::Ads::GoogleAds::V3::Services::OfflineUserDataJobService::AddOfflineUserDataJobOperationsRequest:
+    file: lib/Google/Ads/GoogleAds/V3/Services/OfflineUserDataJobService/AddOfflineUserDataJobOperationsRequest.pm
+  Google::Ads::GoogleAds::V3::Services::OfflineUserDataJobService::AddOfflineUserDataJobOperationsResponse:
+    file: lib/Google/Ads/GoogleAds/V3/Services/OfflineUserDataJobService/AddOfflineUserDataJobOperationsResponse.pm
+  Google::Ads::GoogleAds::V3::Services::OfflineUserDataJobService::CreateOfflineUserDataJobRequest:
+    file: lib/Google/Ads/GoogleAds/V3/Services/OfflineUserDataJobService/CreateOfflineUserDataJobRequest.pm
+  Google::Ads::GoogleAds::V3::Services::OfflineUserDataJobService::CreateOfflineUserDataJobResponse:
+    file: lib/Google/Ads/GoogleAds/V3/Services/OfflineUserDataJobService/CreateOfflineUserDataJobResponse.pm
+  Google::Ads::GoogleAds::V3::Services::OfflineUserDataJobService::GetOfflineUserDataJobRequest:
+    file: lib/Google/Ads/GoogleAds/V3/Services/OfflineUserDataJobService/GetOfflineUserDataJobRequest.pm
+  Google::Ads::GoogleAds::V3::Services::OfflineUserDataJobService::OfflineUserDataJobOperation:
+    file: lib/Google/Ads/GoogleAds/V3/Services/OfflineUserDataJobService/OfflineUserDataJobOperation.pm
+  Google::Ads::GoogleAds::V3::Services::OfflineUserDataJobService::RunOfflineUserDataJobRequest:
+    file: lib/Google/Ads/GoogleAds/V3/Services/OfflineUserDataJobService/RunOfflineUserDataJobRequest.pm
   Google::Ads::GoogleAds::V3::Services::OperatingSystemVersionConstantService:
     file: lib/Google/Ads/GoogleAds/V3/Services/OperatingSystemVersionConstantService.pm
   Google::Ads::GoogleAds::V3::Services::OperatingSystemVersionConstantService::GetOperatingSystemVersionConstantRequest:
@@ -6455,6 +6495,14 @@ provides:
     file: lib/Google/Ads/GoogleAds/V3/Services/TopicViewService.pm
   Google::Ads::GoogleAds::V3::Services::TopicViewService::GetTopicViewRequest:
     file: lib/Google/Ads/GoogleAds/V3/Services/TopicViewService/GetTopicViewRequest.pm
+  Google::Ads::GoogleAds::V3::Services::UserDataService:
+    file: lib/Google/Ads/GoogleAds/V3/Services/UserDataService.pm
+  Google::Ads::GoogleAds::V3::Services::UserDataService::UploadUserDataRequest:
+    file: lib/Google/Ads/GoogleAds/V3/Services/UserDataService/UploadUserDataRequest.pm
+  Google::Ads::GoogleAds::V3::Services::UserDataService::UploadUserDataResponse:
+    file: lib/Google/Ads/GoogleAds/V3/Services/UserDataService/UploadUserDataResponse.pm
+  Google::Ads::GoogleAds::V3::Services::UserDataService::UserDataOperation:
+    file: lib/Google/Ads/GoogleAds/V3/Services/UserDataService/UserDataOperation.pm
   Google::Ads::GoogleAds::V3::Services::UserInterestService:
     file: lib/Google/Ads/GoogleAds/V3/Services/UserInterestService.pm
   Google::Ads::GoogleAds::V3::Services::UserInterestService::GetUserInterestRequest:
@@ -6520,5 +6568,5 @@ requires:
   perl: v5.24.1
 resources:
   license: http://apache.org/licenses/LICENSE-2.0
-version: v3.0.0
+version: v3.1.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

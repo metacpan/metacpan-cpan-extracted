@@ -1,5 +1,5 @@
 package POE::Component::SmokeBox::Recent;
-$POE::Component::SmokeBox::Recent::VERSION = '1.50';
+$POE::Component::SmokeBox::Recent::VERSION = '1.54';
 #ABSTRACT: A POE component to retrieve recent CPAN uploads.
 
 use strict;
@@ -251,7 +251,7 @@ POE::Component::SmokeBox::Recent - A POE component to retrieve recent CPAN uploa
 
 =head1 VERSION
 
-version 1.50
+version 1.54
 
 =head1 SYNOPSIS
 
@@ -355,7 +355,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Chris Williams.
+This software is copyright (c) 2020 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

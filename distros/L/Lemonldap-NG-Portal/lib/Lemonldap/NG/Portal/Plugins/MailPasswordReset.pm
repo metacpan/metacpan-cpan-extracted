@@ -32,7 +32,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_USERNOTFOUND
 );
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin',
   'Lemonldap::NG::Portal::Lib::SMTP', 'Lemonldap::NG::Portal::Lib::_tokenRule';
@@ -188,9 +188,9 @@ sub _reset {
 
     # Search user in database
     $req->steps( [
-            'getUser',                  'setSessionInfo',
-            'setMacros',                'setGroups',
-            'setPersistentSessionInfo', 'setLocalGroups'
+            'getUser',                 'setSessionInfo',
+            $self->p->groupsAndMacros, 'setPersistentSessionInfo',
+            'setLocalGroups'
         ]
     );
     if ( my $error = $self->p->process( $req, useMail => $searchByMail ) ) {
@@ -525,7 +525,11 @@ sub setSecurity {
 
 sub display {
     my ( $self, $req ) = @_;
+    my $speChars = $self->conf->{passwordPolicySpecialChar};
+    $speChars =~ s/\s+/ /g;
+    $speChars =~ s/(?:^\s|\s$)//g;
     $self->logger->debug( 'Display called with code: ' . $req->error );
+    
     my %tplPrm = (
         SKIN_PATH       => $self->conf->{staticPrefix},
         SKIN            => $self->p->getSkin($req),
@@ -541,8 +545,7 @@ sub display {
         STARTMAILTIME   => $req->data->{startMailTime},
         MAILALREADYSENT => $req->data->{mailAlreadySent},
         MAIL            => (
-            $self->p->checkXSSAttack( 'mail', $req->{user} )
-            ? ''
+              $self->p->checkXSSAttack( 'mail', $req->{user} ) ? ''
             : $req->{user}
         ),
         DISPLAY_FORM            => 0,
@@ -555,6 +558,12 @@ sub display {
         PPOLICY_MINLOWER        => $self->conf->{passwordPolicyMinLower},
         PPOLICY_MINUPPER        => $self->conf->{passwordPolicyMinUpper},
         PPOLICY_MINDIGIT        => $self->conf->{passwordPolicyMinDigit},
+        PPOLICY_ALLOWEDSPECHAR  => $speChars,
+        (
+            $speChars
+            ? ( PPOLICY_MINSPECHAR => $self->conf->{passwordPolicyMinSpeChar} )
+            : ()
+        ),
         DISPLAY_GENERATE_PASSWORD =>
           $self->conf->{portalDisplayGeneratePassword},
     );

@@ -2,8 +2,8 @@ NAME
     App::lcpan - Manage your local CPAN mirror
 
 VERSION
-    This document describes version 1.051 of App::lcpan (from Perl
-    distribution App-lcpan), released on 2020-04-20.
+    This document describes version 1.056 of App::lcpan (from Perl
+    distribution App-lcpan), released on 2020-05-06.
 
 SYNOPSIS
     See lcpan script.
@@ -29,6 +29,22 @@ FUNCTIONS
     This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
+
+    *   added_after => *date*
+
+        Include only records that are added after a certain date.
+
+    *   added_before => *date*
+
+        Include only records that are added before a certain date.
+
+    *   added_in_last_n_updates => *posint*
+
+        Include only records that are added during the last N index updates.
+
+    *   added_in_last_update => *true*
+
+        Include only records that are added during the last index update.
 
     *   cpan => *dirname*
 
@@ -56,6 +72,23 @@ FUNCTIONS
         Search query.
 
     *   query_type => *str* (default: "any")
+
+    *   updated_after => *date*
+
+        Include only records that are updated after a certain date.
+
+    *   updated_before => *date*
+
+        Include only records that are updated before a certain date.
+
+    *   updated_in_last_n_updates => *posint*
+
+        Include only records that are updated during the last N index
+        updates.
+
+    *   updated_in_last_update => *true*
+
+        Include only records that are updated during the last index update.
 
     *   use_bootstrap => *bool* (default: 1)
 
@@ -100,6 +133,22 @@ FUNCTIONS
     This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
+
+    *   added_after => *date*
+
+        Include only records that are added after a certain date.
+
+    *   added_before => *date*
+
+        Include only records that are added before a certain date.
+
+    *   added_in_last_n_updates => *posint*
+
+        Include only records that are added during the last N index updates.
+
+    *   added_in_last_update => *true*
+
+        Include only records that are added during the last index update.
 
     *   cpan => *dirname*
 
@@ -188,6 +237,23 @@ FUNCTIONS
 
     *   rel => *str* (default: "requires")
 
+    *   updated_after => *date*
+
+        Include only records that are updated after a certain date.
+
+    *   updated_before => *date*
+
+        Include only records that are updated before a certain date.
+
+    *   updated_in_last_n_updates => *posint*
+
+        Include only records that are updated during the last N index
+        updates.
+
+    *   updated_in_last_update => *true*
+
+        Include only records that are updated during the last index update.
+
     *   use_bootstrap => *bool* (default: 1)
 
         Whether to use bootstrap database from App-lcpan-Bootstrap.
@@ -234,6 +300,22 @@ FUNCTIONS
     This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
+
+    *   added_after => *date*
+
+        Include only records that are added after a certain date.
+
+    *   added_before => *date*
+
+        Include only records that are added before a certain date.
+
+    *   added_in_last_n_updates => *posint*
+
+        Include only records that are added during the last N index updates.
+
+    *   added_in_last_update => *true*
+
+        Include only records that are added during the last index update.
 
     *   author => *str*
 
@@ -284,6 +366,23 @@ FUNCTIONS
 
         Sort the result.
 
+    *   updated_after => *date*
+
+        Include only records that are updated after a certain date.
+
+    *   updated_before => *date*
+
+        Include only records that are updated before a certain date.
+
+    *   updated_in_last_n_updates => *posint*
+
+        Include only records that are updated during the last N index
+        updates.
+
+    *   updated_in_last_update => *true*
+
+        Include only records that are updated during the last index update.
+
     *   use_bootstrap => *bool* (default: 1)
 
         Whether to use bootstrap database from App-lcpan-Bootstrap.
@@ -305,6 +404,50 @@ FUNCTIONS
     By default will return an array of distribution names. If you set
     "detail" to true, will return array of records.
 
+  log
+    Usage:
+
+     log(%args) -> [status, msg, payload, meta]
+
+    Show database index log.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   cpan => *dirname*
+
+        Location of your local CPAN mirror, e.g. /path/to/cpan.
+
+        Defaults to "~/cpan".
+
+    *   index_name => *filename* (default: "index.db")
+
+        Filename of index.
+
+        If "index_name" is a filename without any path, e.g. "index.db" then
+        index will be located in the top-level of "cpan". If "index_name"
+        contains a path, e.g. "./index.db" or "/home/ujang/lcpan.db" then
+        the index will be located solely using the "index_name".
+
+    *   use_bootstrap => *bool* (default: 1)
+
+        Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+        If you are indexing your private CPAN-like repository, you want to
+        turn this off.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   modules
     Usage:
 
@@ -315,6 +458,22 @@ FUNCTIONS
     This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
+
+    *   added_after => *date*
+
+        Include only records that are added after a certain date.
+
+    *   added_before => *date*
+
+        Include only records that are added before a certain date.
+
+    *   added_in_last_n_updates => *posint*
+
+        Include only records that are added during the last N index updates.
+
+    *   added_in_last_update => *true*
+
+        Include only records that are added during the last index update.
 
     *   author => *str*
 
@@ -373,6 +532,23 @@ FUNCTIONS
 
         Sort the result.
 
+    *   updated_after => *date*
+
+        Include only records that are updated after a certain date.
+
+    *   updated_before => *date*
+
+        Include only records that are updated before a certain date.
+
+    *   updated_in_last_n_updates => *posint*
+
+        Include only records that are updated during the last N index
+        updates.
+
+    *   updated_in_last_update => *true*
+
+        Include only records that are updated during the last index update.
+
     *   use_bootstrap => *bool* (default: 1)
 
         Whether to use bootstrap database from App-lcpan-Bootstrap.
@@ -404,6 +580,22 @@ FUNCTIONS
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
+
+    *   added_after => *date*
+
+        Include only records that are added after a certain date.
+
+    *   added_before => *date*
+
+        Include only records that are added before a certain date.
+
+    *   added_in_last_n_updates => *posint*
+
+        Include only records that are added during the last N index updates.
+
+    *   added_in_last_update => *true*
+
+        Include only records that are added during the last index update.
 
     *   cpan => *dirname*
 
@@ -440,6 +632,23 @@ FUNCTIONS
 
     *   to_level => *int*
 
+    *   updated_after => *date*
+
+        Include only records that are updated after a certain date.
+
+    *   updated_before => *date*
+
+        Include only records that are updated before a certain date.
+
+    *   updated_in_last_n_updates => *posint*
+
+        Include only records that are updated during the last N index
+        updates.
+
+    *   updated_in_last_update => *true*
+
+        Include only records that are updated during the last index update.
+
     *   use_bootstrap => *bool* (default: 1)
 
         Whether to use bootstrap database from App-lcpan-Bootstrap.
@@ -468,6 +677,22 @@ FUNCTIONS
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
+
+    *   added_after => *date*
+
+        Include only records that are added after a certain date.
+
+    *   added_before => *date*
+
+        Include only records that are added before a certain date.
+
+    *   added_in_last_n_updates => *posint*
+
+        Include only records that are added during the last N index updates.
+
+    *   added_in_last_update => *true*
+
+        Include only records that are added during the last index update.
 
     *   author => *str*
 
@@ -526,6 +751,23 @@ FUNCTIONS
 
         Sort the result.
 
+    *   updated_after => *date*
+
+        Include only records that are updated after a certain date.
+
+    *   updated_before => *date*
+
+        Include only records that are updated before a certain date.
+
+    *   updated_in_last_n_updates => *posint*
+
+        Include only records that are updated during the last N index
+        updates.
+
+    *   updated_in_last_update => *true*
+
+        Include only records that are updated during the last index update.
+
     *   use_bootstrap => *bool* (default: 1)
 
         Whether to use bootstrap database from App-lcpan-Bootstrap.
@@ -557,6 +799,22 @@ FUNCTIONS
     This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
+
+    *   added_after => *date*
+
+        Include only records that are added after a certain date.
+
+    *   added_before => *date*
+
+        Include only records that are added before a certain date.
+
+    *   added_in_last_n_updates => *posint*
+
+        Include only records that are added during the last N index updates.
+
+    *   added_in_last_update => *true*
+
+        Include only records that are added during the last index update.
 
     *   authors => *array[str]*
 
@@ -607,6 +865,23 @@ FUNCTIONS
 
     *   rel => *str* (default: "ALL")
 
+    *   updated_after => *date*
+
+        Include only records that are updated after a certain date.
+
+    *   updated_before => *date*
+
+        Include only records that are updated before a certain date.
+
+    *   updated_in_last_n_updates => *posint*
+
+        Include only records that are updated during the last N index
+        updates.
+
+    *   updated_in_last_update => *true*
+
+        Include only records that are updated during the last index update.
+
     *   use_bootstrap => *bool* (default: 1)
 
         Whether to use bootstrap database from App-lcpan-Bootstrap.
@@ -643,6 +918,22 @@ FUNCTIONS
     This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
+
+    *   added_after => *date*
+
+        Include only records that are added after a certain date.
+
+    *   added_before => *date*
+
+        Include only records that are added before a certain date.
+
+    *   added_in_last_n_updates => *posint*
+
+        Include only records that are added during the last N index updates.
+
+    *   added_in_last_update => *true*
+
+        Include only records that are added during the last index update.
 
     *   author => *str*
 
@@ -691,6 +982,23 @@ FUNCTIONS
 
     *   sort => *array[str]* (default: ["name"])
 
+    *   updated_after => *date*
+
+        Include only records that are updated after a certain date.
+
+    *   updated_before => *date*
+
+        Include only records that are updated before a certain date.
+
+    *   updated_in_last_n_updates => *posint*
+
+        Include only records that are updated during the last N index
+        updates.
+
+    *   updated_in_last_update => *true*
+
+        Include only records that are updated during the last index update.
+
     *   use_bootstrap => *bool* (default: 1)
 
         Whether to use bootstrap database from App-lcpan-Bootstrap.
@@ -715,6 +1023,13 @@ FUNCTIONS
      reset(%args) -> [status, msg, payload, meta]
 
     Reset (empty) the database index.
+
+    All data tables will be emptied. This includes all records in the "log"
+    table as well as "index_creation_time" record in the "meta" table, so
+    there is no records of previous indexing activity. There is also no
+    record of resetting in the "log".
+
+    Tables are not dropped and re-created. The "meta" table is not emptied.
 
     This function is not exported.
 

@@ -1,5 +1,8 @@
 Revision history for Alien-Build-Plugin-Download-GitHub
 
+0.06      2020-05-01 09:47:42 -0600
+  - Add tags_only property (gh#8 kiwiroy++)
+
 0.05      2019-09-27 05:48:35 -0600
   - Add include_assets property (gh#7 kiwiroy++)
 

@@ -1,4 +1,4 @@
-# Copyright 2009, 2010, 2011 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Test-MockTime-DateCalc.
 #
@@ -25,15 +25,15 @@ Source: libtest-mocktime-datecalc-perl
 Section: perl
 Priority: optional
 Build-Depends: cdbs, debhelper (>= 5), libtest-more-perl | perl (>= 5.6.2)
-Maintainer: Kevin Ryde <user42@zip.com.au>
-Standards-Version: 3.9.1
+Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
+Standards-Version: 4.2.1
 Homepage: http://user42.tuxfamily.org/test-mocktime-datecalc/index.html
-Bugs: mailto:user42@zip.com.au
+Bugs: mailto:user42_kevin@yahoo.com.au
 
 Package: libtest-mocktime-datecalc-perl
 Architecture: all
 Depends: libdate-calc-perl (>= 4), ${perl:Depends}, ${misc:Depends}
-Description: Fake date/time for Date::Calc functions.
+Description: Fake date/time for Date::Calc functions
  Test::MockTime::DateCalc arranges for the functions in Date::Calc to
  follow the Perl level time() function, and in particular any fake
  date/time set there by Test::MockTime and similar.

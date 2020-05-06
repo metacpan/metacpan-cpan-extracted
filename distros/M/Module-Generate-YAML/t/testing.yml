@@ -1,0 +1,33 @@
+---
+author: LNATION
+classes:
+  Foo:
+    abstract: A Testing Module
+    accessors:
+    - test
+    - testing
+    begin: "{\n\t\t\t\t$one = 'abc';\n\t\t\t}"
+    our: $one
+    subclass:
+      Bar:
+        abstract: A Testing Module
+        subs:
+        - different
+        - code: "{\n\t\t\t\t\t\t\t\t$_[1] + $_[2]\n\t\t\t\t\t\t\t}"
+          example: $foo->different(10, 10)
+          pod: A Sub routine
+        - another
+        - code: "sub {\n\t\t\t\t\t\t\t\t$_[2] - $_[1];\n\t\t\t\t\t\t\t}"
+          pod: Another Sub
+    subs:
+    - one
+    - code: sub { $one }
+    - name
+    - code: "sub {\n\t\t\t\t\t\t$_[1] + $_[2];\n\t\t\t\t\t}"
+      pod: A Sub routine
+    - another
+    - code: "sub {\n\t\t\t\t\t\t$_[2] - $_[1];\n\t\t\t\t\t}"
+      pod: Another Sub
+email: email@lnation.org
+lib: ./t/lib
+version: '0.01'

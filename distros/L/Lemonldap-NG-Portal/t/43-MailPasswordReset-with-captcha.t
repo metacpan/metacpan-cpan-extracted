@@ -10,7 +10,7 @@ BEGIN {
 }
 
 my ( $res, $host, $url, $query );
-my $maintests = 14;
+my $maintests = 16;
 my $mailSend  = 0;
 my $mail2     = 0;
 
@@ -67,6 +67,12 @@ m%<a class="btn btn-secondary" href="http://auth.example.com/resetpwd\?skin=boot
         $res->[2]->[0] =~ m%<img src="/static/common/logos/logo_llng_old.png"%,
         'Found custom Main Logo'
     ) or print STDERR Dumper( $res->[2]->[0] );
+    ok(
+        $res->[2]->[0] =~
+m#<img class="renewcaptchaclick" src="/static/common/icons/arrow_refresh.png" alt="Renew Captcha" title="Renew Captcha" class="img-thumbnail mb-3" />#,
+        ' Renew Captcha button found'
+    ) or explain( $res->[2]->[0], 'Renew captcha button not found' );
+    ok( $res->[2]->[0] =~ /captcha\.(?:min\.)?js/, 'Get captcha javascript' );
 
     $query .= "&captcha=$captcha";
 

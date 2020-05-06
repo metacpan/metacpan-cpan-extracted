@@ -6,6 +6,7 @@ use warnings;
 use IO::Async::Test;
 
 use Test::More;
+use Test::Metrics::Any;
 use Test::Refcount;
 
 use Errno qw( EAGAIN EWOULDBLOCK ECONNRESET );
@@ -474,6 +475,28 @@ SKIP: {
 {
    my $stream = IO::Async::Stream->new_for_stdout;
    is( $stream->write_handle, \*STDOUT, 'Stream->new_for_stdout->write_handle is STDOUT' );
+}
+
+# Metrics
+{
+   my ( $rd, $wr ) = mkhandles;
+
+   my $done;
+   my $stream = IO::Async::Stream->new(
+      write_handle => $wr,
+      on_outgoing_empty => sub { $done = 1 },
+   );
+   $stream->write( "X"x100 );
+
+   $loop->add( $stream );
+
+   is_metrics_from(
+      sub { wait_for { $done } },
+      { io_async_stream_written => 100 },
+      'Stream reading increments metric'
+   );
+
+   $loop->remove( $stream );
 }
 
 done_testing;

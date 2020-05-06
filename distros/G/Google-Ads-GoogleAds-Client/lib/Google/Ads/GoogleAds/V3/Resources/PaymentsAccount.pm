@@ -25,6 +25,7 @@ sub new {
   my $self = {
     currencyCode               => $args->{currencyCode},
     name                       => $args->{name},
+    payingManagerCustomer      => $args->{payingManagerCustomer},
     paymentsAccountId          => $args->{paymentsAccountId},
     paymentsProfileId          => $args->{paymentsProfileId},
     resourceName               => $args->{resourceName},

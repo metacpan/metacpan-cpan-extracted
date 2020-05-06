@@ -74,7 +74,8 @@ do { my $x = {
                                    'Test::LWP::UserAgent' => '0',
                                    'Test::More' => '1.302015',
                                    'URI::Escape' => '0',
-                                   'lib' => '0'
+                                   'lib' => '0',
+                                   'overload' => '0'
                                  }
                  }
      };

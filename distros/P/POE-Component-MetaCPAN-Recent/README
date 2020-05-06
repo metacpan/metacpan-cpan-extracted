@@ -1,0 +1,99 @@
+NAME
+
+    POE::Component::MetaCPAN::Recent - Obtain uploaded CPAN dists via
+    MetaCPAN.
+
+VERSION
+
+    version 1.04
+
+SYNOPSIS
+
+      use strict;
+      use POE qw(Component::MetaCPAN::Recent);
+    
+      $|=1;
+    
+      POE::Session->create(
+            package_states => [
+              'main' => [qw(_start upload)],
+            ],
+      );
+    
+      $poe_kernel->run();
+      exit 0;
+    
+      sub _start {
+        POE::Component::MetaCPAN::Recent->spawn(
+            event => 'upload',
+        );
+        return;
+      }
+    
+      sub upload {
+        use Data::Dumper;
+        print Dumper( $_[ARG0] ), "\n";
+        return;
+      }
+
+DESCRIPTION
+
+    POE::Component::MetaCPAN::Recent is a POE component that alerts newly
+    uploaded CPAN distributions. It obtains this information from polling
+    http://fastapi.metacpan.org/release/recent.
+
+CONSTRUCTOR
+
+    spawn
+
+      Takes a number of parameters:
+
+        'event', the event handler in your session where each new upload alert should be sent, mandatory;
+        'session', optional if the poco is spawned from within another session;
+
+      The 'session' parameter is only required if you wish the output event
+      to go to a different session than the calling session, or if you have
+      spawned the poco outside of a session.
+
+      Returns an object.
+
+METHODS
+
+    session_id
+
+      Returns the POE::Session ID of the component.
+
+    shutdown
+
+      Terminates the component.
+
+INPUT EVENTS
+
+    shutdown
+
+      Terminates the component.
+
+OUTPUT EVENTS
+
+    An event will be triggered for each new CPAN upload. The event will
+    have ARG0 set to the hashref of the upload
+
+SEE ALSO
+
+    POE
+
+    POE::Component::SmokeBox::Recent::HTTP
+
+    http://fastapi.metacpan.org/release/recent
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2020 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

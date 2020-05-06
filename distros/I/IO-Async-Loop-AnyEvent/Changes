@@ -1,5 +1,10 @@
 Revision history for IO-Async-Loop-AnyEvent
 
+0.04    2020-05-05
+        [CHANGES]
+         * Support IO::Async 0.76
+            + ->watch_child API is now called ->watch_process
+
 0.03    CHANGES:
          * Updated to cope with AnyEvent version 6 - one_event renamed to _poll
          * Try to defer loading IO::Async::Loop, whose presence can confuse

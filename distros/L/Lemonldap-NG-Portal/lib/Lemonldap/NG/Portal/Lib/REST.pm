@@ -31,8 +31,11 @@ sub restCall {
     unless ( $resp->is_success ) {
         die $resp->status_line;
     }
-    my $res = eval { from_json( $resp->content, { allow_nonref => 1 } ) };
+    my $res = eval { from_json( $resp->content ) };
     die "Bad REST response: $@" if ($@);
+    if ( ref($res) ne "HASH" ) {
+        die "Bad REST response: expecting a JSON HASH, got " . ref($res);
+    }
     return $res;
 }
 

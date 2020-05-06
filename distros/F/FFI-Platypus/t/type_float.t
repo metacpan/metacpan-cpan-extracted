@@ -4,7 +4,9 @@ use Test::More;
 use FFI::Platypus;
 use FFI::CheckLib;
 
-foreach my $api (0, 1)
+my @lib = find_lib lib => 'test', symbol => 'f0', libpath => 't/ffi';
+
+foreach my $api (0, 1, 2)
 {
 
   subtest "api = $api" => sub {
@@ -15,8 +17,7 @@ foreach my $api (0, 1)
       warn $message;
     };
 
-    my $ffi = FFI::Platypus->new( api => $api );
-    $ffi->lib(find_lib lib => 'test', symbol => 'f0', libpath => 't/ffi');
+    my $ffi = FFI::Platypus->new( api => $api, lib => [@lib], experimental => ($api >= 2 ? $api : undef) );
     $ffi->type('float *' => 'float_p');
     $ffi->type('float [10]' => 'float_a');
     $ffi->type('float []' => 'float_a2');
@@ -52,14 +53,14 @@ foreach my $api (0, 1)
 
     is_deeply \@list, [2,3,4,5,6,7,8,9,10,11], 'array increment';
 
-    is null(), undef, 'null() == undef';
+    is_deeply [null()], [$api >= 2 ? (undef) : ()], 'null() == undef';
     is is_null(undef), 1, 'is_null(undef) == 1';
     is is_null(), 1, 'is_null() == 1';
     is is_null(\22), 0, 'is_null(22) == 0';
 
     is_deeply static_array(), [-5.5, 5.5, -10, 10, -15.5, 15.5, 20, -20, 25.5, -25.5], 'static_array = [-5.5, 5.5, -10, 10, -15.5, 15.5, 20, -20, 25.5, -25.5]';
 
-    is null2(), undef, 'null2() == undef';
+    is_deeply [null2()], [$api >= 2 ? (undef) : ()], 'null2() == undef';
 
     my $closure = $ffi->closure(sub { $_[0]+2.25 });
     $ffi->attach( [float_set_closure => 'set_closure'] => ['float_c'] => 'void');

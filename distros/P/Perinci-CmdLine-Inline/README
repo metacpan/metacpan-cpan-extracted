@@ -2,8 +2,8 @@ NAME
     Perinci::CmdLine::Inline - Generate inline Perinci::CmdLine CLI script
 
 VERSION
-    This document describes version 0.548 of Perinci::CmdLine::Inline (from
-    Perl distribution Perinci-CmdLine-Inline), released on 2020-04-05.
+    This document describes version 0.550 of Perinci::CmdLine::Inline (from
+    Perl distribution Perinci-CmdLine-Inline), released on 2020-05-02.
 
 SYNOPSIS
      % gen-inline-pericmd-script /Perinci/Examples/gen_array -o gen-array
@@ -158,7 +158,7 @@ FUNCTIONS
         Currently does nothing, provided only for compatibility with
         Perinci::CmdLine::Base.
 
-    *   extra_urls_for_version => *array[str]*
+    *   extra_urls_for_version => *array[riap::url]*
 
         More URLs to show version for --version.
 
@@ -174,7 +174,7 @@ FUNCTIONS
         Currently does nothing, provided only for compatibility with
         Perinci::CmdLine::Base.
 
-    *   include => *array[str]*
+    *   include => *array[perl::modname]*
 
         Include extra modules.
 
@@ -188,7 +188,7 @@ FUNCTIONS
 
     *   meta_is_normalized => *bool*
 
-    *   output_file => *str*
+    *   output_file => *filename*
 
         Set output file, defaults to stdout.
 

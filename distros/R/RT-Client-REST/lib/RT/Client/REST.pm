@@ -24,7 +24,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST;
-$RT::Client::REST::VERSION = '0.57';
+$RT::Client::REST::VERSION = '0.59';
 use Error qw(:try);
 use HTTP::Cookies;
 use HTTP::Request::Common;
@@ -33,7 +33,7 @@ use RT::Client::REST::Forms;
 use RT::Client::REST::HTTPClient;
 
 # Generate accessors/mutators
-for my $method (qw(server _cookie timeout)) {
+for my $method (qw(server _cookie timeout verbose_errors user_agent_args)) {
     no strict 'refs'; ## no critic (ProhibitNoStrict)
     *{__PACKAGE__ . '::' . $method} = sub {
         my $self = shift;
@@ -587,9 +587,12 @@ sub _submit {
         # Example:
         # "RT/3.0.1 401 Credentials required"
         if ($status !~ m#^RT/\d+(?:\S+) (\d+) ([\w\s]+)$#) {
-            RT::Client::REST::MalformedRTResponseException->throw(
-                'Malformed RT response received from ' . $self->server,
-            );
+            my $err_msg = 'Malformed RT response received from ' . $self->server;
+            if ($self->verbose_errors) {
+                $err_msg = "Malformed RT response received from " . $self->_uri($uri) .
+                  " with this response: " . substr($text || '', 0, 200) . '....';
+            }
+            RT::Client::REST::MalformedRTResponseException->throw($err_msg);
         }
 
         # Our caller can pretend that the server returned a custom HTTP
@@ -660,9 +663,13 @@ sub _submit {
         $self->server($new_server);
         return $self->_submit($uri, $content, $auth);
     } else {
+        my $err_msg = $res->message;
+        if ($self->verbose_errors) {
+            $err_msg = $res->message . ' fetching ' . $self->_uri($uri);
+        };
         RT::Client::REST::HTTPException->throw(
             code    => $res->code,
-            message => $res->message,
+            message => $err_msg,
         );
     }
 
@@ -673,9 +680,14 @@ sub _ua {
     my $self = shift;
 
     unless (exists($self->{_ua})) {
+
+        my $args = $self->user_agent_args || {};
+        die "user_agent_args must be a hashref" unless ref($args) eq 'HASH';
         $self->{_ua} = RT::Client::REST::HTTPClient->new(
             agent => $self->_ua_string,
             env_proxy => 1,
+            max_redirect => 1,
+            %$args,
         );
         if ($self->timeout) {
             $self->{_ua}->timeout($self->timeout);
@@ -687,6 +699,11 @@ sub _ua {
 
     return $self->{_ua};
 }
+
+sub user_agent {
+    shift->_ua;
+}
+
 
 sub basic_auth_cb {
     my $self = shift;
@@ -703,6 +720,8 @@ sub basic_auth_cb {
 
     return $self->{_basic_auth_cb};
 }
+
+# Sometimes PodCoverageTests think LOGGER_METHODS is a vanilla sub
 
 use constant LOGGER_METHODS => (qw(debug warn info error));
 
@@ -872,7 +891,7 @@ sub _version { $RT::Client::REST::VERSION }
     # The problem with the second approach is that it creates unrelated
     # methods in RT::Client::REST namespace.
     package RT::Client::REST::NoopLogger;
-$RT::Client::REST::NoopLogger::VERSION = '0.57';
+$RT::Client::REST::NoopLogger::VERSION = '0.59';
 sub new { bless \(my $logger), __PACKAGE__ }
     for my $method (RT::Client::REST::LOGGER_METHODS) {
         no strict 'refs'; ## no critic (ProhibitNoStrict)
@@ -894,7 +913,7 @@ RT::Client::REST - Client for RT using REST API
 
 =head1 VERSION
 
-version 0.57
+version 0.59
 
 =head1 SYNOPSIS
 
@@ -927,6 +946,8 @@ B<RT::Client::REST> is B</usr/bin/rt> converted to a Perl module.  I needed
 to implement some RT interactions from my application, but did not feel that
 invoking a shell command is appropriate.  Thus, I took B<rt> tool, written
 by Abhijit Menon-Sen, and converted it to an object-oriented Perl module.
+
+=for Pod::Coverage LOGGER_METHODS
 
 =head1 USAGE NOTES
 
@@ -974,6 +995,15 @@ returns username and password:
     return ($username, $password);
   }
 
+=item B<user_agent_args>
+
+A hashref which will be passed to the user agent's constructor for
+maximum flexibility.
+
+=item B<user_agent>
+
+Accessor to the user_agent object.
+
 =item B<logger>
 
 A logger object.  It should be able to debug(), info(), warn() and
@@ -990,6 +1020,11 @@ Something like this will get you started:
     server => ... etc ...
     logger => $log
   );
+
+=item B<verbose_errors>
+
+On user-agent errors, report some more information about what is going
+wrong. Defaults are pretty laconic about the "Malformed RT response".
 
 =back
 
@@ -1311,15 +1346,20 @@ Most likely.  Please report.
 B<RT::Client::REST> does not (at the moment, see TODO file) retrieve forms from
 RT server, which is either good or bad, depending how you look at it.
 
-=head1 AUTHORS
+=head1 AUTHOR
 
-Original /usr/bin/rt was written by Abhijit Menon-Sen <ams@wiw.org>.  rt
-was later converted to this module by Dmitri Tikhonov <dtikhonov@yahoo.com>.
-In January of 2008, Damien "dams" Krotkine <dams@cpan.org> joined as the
-project's co-maintainer. JLMARTIN has become co-maintainer as of March 2010.
-SRVSH became a co-maintainer in November 2015.
+Dmitri Tikhonov
 
-=head1 AUTHORS
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020, 2018 by Dmitri Tikhonov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 CONTRIBUTORS
+
+=for stopwords Abhijit Menon-Sen belg4mit bobtfish Byron Ellacott Dean Hamstead dkrotkine Dmitri Tikhonov Marco Pessotto pplusdomain Sarvesh D Søren Lund Tom Harrison
 
 =over 4
 
@@ -1329,35 +1369,48 @@ Abhijit Menon-Sen <ams@wiw.org>
 
 =item *
 
-Dmitri Tikhonov <dtikhonov@yahoo.com>
+belg4mit <belg4mit>
 
 =item *
 
-Damien "dams" Krotkine <dams@cpan.org>
+bobtfish <bobtfish@bobtfish.net>
 
 =item *
 
-Dean Hamstead <dean@bytefoundry.com.au>
+Byron Ellacott <code@bje.id.au>
 
 =item *
 
-Miquel Ruiz <mruiz@cpan.org>
+Dean Hamstead <djzort@cpan.org>
 
 =item *
 
-JLMARTIN
+dkrotkine <dkrotkine@gmail.com>
 
 =item *
 
-SRVSH
+Dmitri Tikhonov <dmitri@cpan.org>
+
+=item *
+
+Marco Pessotto <melmothx@gmail.com>
+
+=item *
+
+pplusdomain <pplusdomain@gmail.com>
+
+=item *
+
+Sarvesh D <sarveshd@openmailbox.org>
+
+=item *
+
+Søren Lund <soren@lund.org>
+
+=item *
+
+Tom Harrison <tomh@apnic.net>
 
 =back
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020 by Dmitri Tikhonov.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

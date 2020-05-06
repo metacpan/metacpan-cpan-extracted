@@ -1,3 +1,17 @@
+Travel::Status::DE::VRR 1.17 - Sat May 02 2020
+
+    * Add MVV (Münchner Verkehrs- und Tarifverbund) and VAG (Freiburger
+      Verkehrs AG) services
+    * Fix encoding when using VOR or LinzAG services
+
+Travel::Status::DE::VRR 1.16 - Fri May 01 2020
+
+    * Use HTTPS for  DING, VOR, LinzAG, VGN, VRR, VRR2, VVS, NVBW, KVV and BSVG
+      services
+    * Update VGN, VVO, VMV and KVV service URLs
+    * Remove IVB, VVV and VRNdelfi services
+    * Re-add Verbundlinie service
+
 Travel::Status::DE::VRR 1.15 - Wed Jul 05 2017
 
     * Fix encoding issues caused by recent API changes
@@ -81,7 +95,7 @@ Travel::Status::DE::VRR 1.04 - Wed Oct 16 2013
     * Add ->is_cancelled accessor to Travel::Status::DE::VRR::Result
     * Travel::Status::DE::VRR::Result->delay will no longer return '-9999'
       for cancelled departures, check ->is_cancelled instead
-    * Allow Travel::Status::DE::VRR::Line and TraveL::Status::DE::VRR::Result
+    * Allow Travel::Status::DE::VRR::Line and Travel::Status::DE::VRR::Result
       to be serialized to JSON (via TO_JSON method)
 
 Travel::Status::DE::VRR 1.03 - Tue Sep 17 2013

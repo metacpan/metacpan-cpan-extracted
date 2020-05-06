@@ -1,0 +1,201 @@
+# NAME
+
+Catalyst::View::MojoTemplate - Use Mojolicious Templates for your Catalyst View
+
+# SYNOPSIS
+
+    package Example::View::HTML;
+
+    use Moose;
+    extends 'Catalyst::View::MojoTemplate';
+
+    __PACKAGE__->config(helpers => +{
+      now => sub {
+        my ($self, $c, @args) = @_;
+        return localtime;
+      },
+    });
+
+    __PACKAGE__->meta->make_immutable;
+
+Then called from a controller:
+
+    package Example::Controller::Root;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends 'Catalyst::Controller';
+
+    sub root :Chained(/) PathPart('') CaptureArgs(0) { } 
+
+      sub home :Chained(root) PathPart('') Args(0) {
+        my ($self, $c) = @_;
+        $c->stash(status => $c->model('Status'));
+      }
+
+      sub profile :Chained(root) PathPart(profile) Args(0) {
+        my ($self, $c) = @_;
+        $c->view('HTML' => 'profile.ep', +{ 
+          me => $c->user,
+        });
+      }
+
+    sub end : ActionClass('RenderView') {}
+
+    __PACKAGE__->config(namespace=>'');
+    __PACKAGE__->meta->make_immutable;
+
+# DESCRIPTION
+
+Use [Mojo::Template](https://metacpan.org/pod/Mojo::Template) as your [Catalyst](https://metacpan.org/pod/Catalyst) view.  While ths might strike some as
+odd, if you are using both [Catalyst](https://metacpan.org/pod/Catalyst) and [Mojolicious](https://metacpan.org/pod/Mojolicious) you might like the option to
+share the template code and expertise.  You might also just want to use a Perlish
+template system rather than a dedicated mini language (such as [Xslate](https://metacpan.org/pod/Xslate)) since you
+already know Perl and don't have the time or desire to become an expert in another
+system.
+
+This works just like many other [Catalyst](https://metacpan.org/pod/Catalyst) views.  It will load and render a template
+based on either the current action private name or a stash variable called `template`.
+It will use the stash to populate variables in the template.  It also offers an alternative
+interface that lets you set a template in the actual call to the view, and pass variables.
+
+By default we look for templates in `$APPHOME/root` which is the standard default location
+for [Catalyst](https://metacpan.org/pod/Catalyst) templates.
+
+Also like a lot of other template systems you can define helper methods which are injected
+into your template and can take parameters (including text blocks).
+
+The intention here is to try and make this as similar to how [Mojo::Template](https://metacpan.org/pod/Mojo::Template) is used
+in [Mojolicious](https://metacpan.org/pod/Mojolicious) so that people that need to work in both frameworks could in theory use
+this view in [Catalyst](https://metacpan.org/pod/Catalyst) and be able to switch between the two with less trouble (at least
+for doing view development).  To that end we've added some default helpers that hopefully
+work the same way as they do in [Mojolicious](https://metacpan.org/pod/Mojolicious).  These are helpers for template layouts
+and includes as well as for sharing data between them.  We've also added a 'wrapper'
+helper because the author has found that feature of Template::Toolkit ([Template](https://metacpan.org/pod/Template)) to be so
+useful he would have a hard time living without it.  We did not include the [Mojolicious](https://metacpan.org/pod/Mojolicious)
+tag helpers but there's no reason those could not be added as an add on role at a later
+date should people take an interest in this thing.
+
+There's an example of sorts in the `example` directory of the module distribution.  You can
+start the example server with the following command:
+
+     perl -Ilib -I example/lib/ example/lib/Example/Server.pm
+
+**NOTE** Warning, this is an early access module and I reserve the right to make breaking
+changes if it turns out I totally confused how [Mojolicious](https://metacpan.org/pod/Mojolicious) works.  There's actually
+not a ton of code here since its just a thin wrapper over [Mojo::Template](https://metacpan.org/pod/Mojo::Template) so you should
+be confortable looking that over and coping if there's issues.
+
+# CONFIGURATION
+
+This view defines the following configuration attributes.  For the most part these
+are just pass thru to the underlying [Mojo::Template](https://metacpan.org/pod/Mojo::Template).  You would do well to review
+those docs if you are not familiar.
+
+## auto\_escape
+
+## append
+
+## prepend
+
+## capture\_start
+
+## capture\_end
+
+## encoding
+
+## comment\_mark
+
+## escape\_mark
+
+## expression\_mark
+
+## line\_start
+
+## replace\_mark
+
+These are just pass thru to [Mojo::Template](https://metacpan.org/pod/Mojo::Template).  See that for details
+
+## content\_type
+
+The HTTP content-type that is set in the response unless it is already set.
+
+## helpers
+
+A hashref of helper functions.  For example:
+
+    __PACKAGE__->config(helpers=>+{
+      now => sub {
+        my ($self, $c, @args) = @_;
+        return localtime;
+      },
+    );
+
+All arguments are passed from the template.  If you are building a block
+helper then the last argument will be a coderef to the enclosed block.  You
+may wish to view the source code around the default helpers for more examples of
+this.
+
+## layout
+
+Set a default layout which will be used if none are defined.  Optional.
+
+# HELPERS
+
+The following is a list of the default helpers.
+
+## layout
+
+    % layout "layout.ep", title => "Hello";
+    <h1>The Awesome new Content</h1>
+    <p>You are doomed to discover you can never recover from the narcoleptic
+    country in which you once stood, where the fires alway burning but there's
+    never enough wood</p>
+
+`layout` sets a global template wrapper around your content.  Arguments passed
+get merged into the stash and are available to the layout.  The output of your
+template is placed into the 'main' content block.  See ["layout" in Mojolicious::Plugin::DefaultHelpers](https://metacpan.org/pod/Mojolicious::Plugin::DefaultHelpers#layout)
+for more.
+
+## include
+
+See ["include" in Mojolicious::Plugin::DefaultHelpers](https://metacpan.org/pod/Mojolicious::Plugin::DefaultHelpers#include)
+
+## content
+
+See ["content" in Mojolicious::Plugin::DefaultHelpers](https://metacpan.org/pod/Mojolicious::Plugin::DefaultHelpers#content)
+
+## wrapper
+
+Similar to the `layout` helper, the `wrapper` helper wraps the contained content
+inside a another template.  However unlike `layout` you can have more than one
+`wrapper` in your template.  Example:
+
+    %= wrapper "wrapper.ep", header => "The Story Begins...", begin
+      <p>
+        The story begins like many others; something interesting happend to someone
+        while sone other sort of interesting thing was happening all over.  And then
+        there wre monkeys.  Monkeys are great, you ever get stuck writing a story I
+        really recommend adding monkeys since they help the more boring story.
+      </p>
+    %end
+
+This works similar to the WRAPPER directive in Template::Toolkit, if you are familiar
+with that system.
+
+# AUTHOR
+
+    jnap - John Napiorkowski (cpan:JJNAPIORK)  L<email:jjnapiork@cpan.org>
+    With tremendous thanks to SRI and the Mojolicious team!
+
+# SEE ALSO
+
+[Catalyst](https://metacpan.org/pod/Catalyst), [Catalyst::View](https://metacpan.org/pod/Catalyst::View), [Mojolicious](https://metacpan.org/pod/Mojolicious)
+
+# COPYRIGHT & LICENSE
+
+Copyright 2020, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

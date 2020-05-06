@@ -33,16 +33,22 @@ lib/OpenTracing/Types.pm
 t/Interface/00_use_ok.t
 t/Interface/01_warnings.t
 t/Interface/ContextReference/00_use_ok.t
+t/Interface/ContextReference/01_can_all_ok.t
 t/Interface/ContextReference/07_pass_on_unmodified.t
 t/Interface/Scope/00_use_ok.t
+t/Interface/Scope/01_can_all_ok.t
 t/Interface/Scope/07_pass_on_unmodified.t
 t/Interface/ScopeManager/00_use_ok.t
+t/Interface/ScopeManager/01_can_all_ok.t
 t/Interface/ScopeManager/07_pass_on_unmodified.t
 t/Interface/Span/00_use_ok.t
+t/Interface/Span/01_can_all_ok.t
 t/Interface/Span/07_pass_on_unmodified.t
 t/Interface/SpanContext/00_use_ok.t
+t/Interface/SpanContext/01_can_all_ok.t
 t/Interface/SpanContext/07_pass_on_unmodified.t
 t/Interface/Tracer/00_use_ok.t
+t/Interface/Tracer/01_can_all_ok.t
 t/Interface/Tracer/07_pass_on_unmodified.t
 t/Types/00_use_ok.t
 t/Types/10_context_reference.t
@@ -52,6 +58,7 @@ t/Types/10_span.t
 t/Types/10_span_context.t
 t/Types/10_tracer.t
 t/lib/MockUtils.pm
+t/lib/RoleUtils.pm
 t/lib/TestUtils.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

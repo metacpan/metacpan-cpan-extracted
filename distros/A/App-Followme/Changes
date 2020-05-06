@@ -1,7 +1,13 @@
 Revision history for Perl extension App::Followme
 
+1.93 2020-05-02T14:15:11Z
+	- revised css for single column site and removed javascript
+	- CreateGallery no longer resizes images, must be done externally
+	- revised templates to use semantic html
+	- fixed typos in POD documentation
+
 1.92 2016-09-18T00:10:22Z
-    - Fixes to pass tests on Wndows and BSD
+    - Fixes to pass tests on Windows and BSD
 
 1.91 2016-09-02T19:08:15Z
     - Added required Perl Modules to cpanfile

@@ -12,7 +12,7 @@ use Digest::MD5 qw(md5_hex);
 use App::Followme::FIO;
 use App::Followme::Web;
 
-our $VERSION = "1.92";
+our $VERSION = "1.93";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -118,7 +118,7 @@ configuration files.
 =item exclude_dirs
 
 A filename pattern or comma separated list of filename patterns that match
-folders that should not be uploaded/ The default value is '.*,_*' whicj\h
+folders that should not be uploaded/ The default value is '.*,_*' which
 matches folders starting with a dot (hiddern folders) and starting with an
 underscore character.
 

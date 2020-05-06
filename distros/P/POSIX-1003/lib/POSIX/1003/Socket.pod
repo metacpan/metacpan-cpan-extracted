@@ -1,0 +1,157 @@
+=encoding utf8
+
+=head1 NAME
+
+POSIX::1003::Socket - POSIX constants and functions related to sockets
+
+=head1 SYNOPSIS
+
+  # SOCKET support
+
+  use POSIX::1003::Socket; # load all names
+  socket(Server, PF_INET, SOCK_STREAM, $proto);
+  setsockopt(Server, SOL_SOCKET, SO_REUSEADDR, 1);
+
+  use POSIX::1003::Socket qw(SOCK_DGRAM);
+  print SOCK_DGRAM;        # constants are subs
+
+  use POSIX::1003::Socket '%socket';
+  my $bits = $socket{SOCK_DGRAM};
+  $socket{SOCK_DGRAM} = $bits;
+
+  print "$_\n" for keys %socket;
+
+=head1 DESCRIPTION
+
+[added in release 0.99]
+This module provides access to the "socket" interface, especially a
+long list of constants starting with C<SO_>, C<SOL_>, C<SOCK_>, C<AF_>,
+and many more.
+
+The best way to work with sockets is via IO::Socket::IP.  This module
+provides many more constants than those modules do, but currently does
+not export the functions as the other modules of this suite do.
+
+The advantage of using the constants of this module, is that the list
+will be extended when new names are discovered, and then immediately
+available to older versions of Perl.
+
+=head1 METHODS
+
+=head1 FUNCTIONS
+
+=head2 Standard POSIX
+
+Many socket related functions are contained in Perl's core.
+
+=over 4
+
+=item $obj-E<gt>B<getsockopt>($socket, $level, $opt)
+
+Returns the value for $opt (some SO_ constant).  See also L<setsockopt()|POSIX::1003::Socket/"Standard POSIX">.
+
+=item $obj-E<gt>B<setsockopt>($socket, $level, $opt, $value)
+
+Set the $value on $opt for the $socket.
+
+There are a few minor tricks to make this function integrate better in
+Perl.  Firstly, for the boolean OPTs C<SO_DONTROUTE>, C<SO_KEEPALIVE>,
+and C<SO_REUSEADDR> the value is treated as a real Perl boolean.
+
+C<SO_LINGER> has three combinations.  "Linger off" is reprensed by 
+Other values mean "linger on" with a timeout.
+C<SO_RCVTIMEO> and C<SO_SNDTIME> get a timestamp in float.
+
+=back
+
+=head2 Additional
+
+=over 4
+
+=item B<socket_names>()
+
+Returns a list with all known names, unsorted.
+
+=back
+
+=head1 CONSTANTS
+
+=over 4
+
+=item B<%socket>
+
+This exported variable is a tied HASH which maps C<SO*> and C<AF_*>
+names to numbers, to be used with various socket related functions.
+
+=back
+
+The following constants where detected on your system when the module
+got installed.  The second column shows the value which where returned
+at that time.
+
+=head2 export tag :so
+
+=for comment
+#TABLE_SOCKET_SO_START
+
+  During installation, a symbol table will get inserted here.
+
+=for comment
+#TABLE_SOCKET_SO_END
+
+=head2 export tag :sol
+
+=for comment
+#TABLE_SOCKET_SOL_START
+
+  During installation, a symbol table will get inserted here.
+
+=for comment
+#TABLE_SOCKET_SOL_END
+
+=head2 export tag :sock
+
+=for comment
+#TABLE_SOCKET_START
+
+  During installation, a symbol table will get inserted here.
+
+=for comment
+#TABLE_SOCKET_END
+
+=head2 export tag :af
+
+=for comment
+#TABLE_SOCKET_AF_START
+
+  During installation, a symbol table will get inserted here.
+
+=for comment
+#TABLE_SOCKET_AF_END
+
+=head2 export tag :pf
+
+=for comment
+#TABLE_SOCKET_PF_START
+
+  During installation, a symbol table will get inserted here.
+
+=for comment
+#TABLE_SOCKET_PF_END
+
+=head1 SEE ALSO
+
+This module is part of POSIX-1003 distribution version 1.00,
+built on May 05, 2020. Website: F<http://perl.overmeer.net/CPAN>.  The code is based on L<POSIX>, which
+is released with Perl itself.  See also L<POSIX::Util> for
+additional functionality.
+
+=head1 COPYRIGHTS
+
+Copyrights 2011-2020 on the perl code and the related documentation
+ by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

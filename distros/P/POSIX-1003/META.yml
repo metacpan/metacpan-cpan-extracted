@@ -3,23 +3,28 @@ abstract: 'POSIX::1003, alternative for POSIX in core'
 author:
   - 'Mark Overmeer'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: POSIX-1003
 no_index:
   directory:
     - t
     - inc
 requires:
-  File::Spec: 0
-  POSIX: 0
-  Test::More: 0.47
-  XSLoader: 0
-version: 0.98
+  File::Spec: '0'
+  POSIX: '0'
+  Test::More: '0.47'
+  XSLoader: '0'
+resources:
+  homepage: http://perl.overmeer.net/CPAN/
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/markov2/perl5-POSIX-1003.git
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

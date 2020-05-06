@@ -2,14 +2,16 @@
 # Display functions for LemonLDAP::NG Portal
 package Lemonldap::NG::Portal::Main::Display;
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 package Lemonldap::NG::Portal::Main;
 use strict;
 use Mouse;
 use JSON;
+use URI;
 
-has skinRules => ( is => 'rw' );
+has skinRules     => ( is => 'rw' );
+has requireOldPwd => ( is => 'rw', default => sub { 1 } );
 
 sub displayInit {
     my ($self) = @_;
@@ -28,6 +30,13 @@ sub displayInit {
             }
         }
     }
+    my $rule = HANDLER->buildSub(
+        HANDLER->substitute( $self->conf->{portalRequireOldPassword} ) );
+    unless ($rule) {
+        my $error = HANDLER->tsv->{jail}->error || '???';
+        $self->logger->error( "Bad requireOldPwd rule: " . $error );
+    }
+    $self->requireOldPwd($rule);
 }
 
 # Call portal process and set template parameters
@@ -76,6 +85,7 @@ sub display {
             MSG             => $req->info,
             HIDDEN_INPUTS   => $self->buildHiddenForm($req),
             ACTIVE_TIMER    => $req->data->{activeTimer},
+            FORM_ACTION     => $req->data->{confirmFormAction} || "#",
             FORM_METHOD     => $self->conf->{confirmFormMethod},
             CHOICE_PARAM    => $self->conf->{authChoiceParam},
             CHOICE_VALUE    => $req->data->{_authChoice},
@@ -122,6 +132,8 @@ sub display {
 
     # 1.3 There is a message to display
     elsif ( my $info = $req->info ) {
+        my $method =
+          $req->data->{infoFormMethod} || $self->conf->{infoFormMethod};
         $self->logger->debug('Display: info detected');
         $self->logger->debug('Hidden values :');
         $self->logger->debug( " $_: " . $req->{portalHiddenFormValues}->{$_} )
@@ -133,12 +145,16 @@ sub display {
             AUTH_ERROR      => $self->error,
             AUTH_ERROR_TYPE => $req->error_type,
             MSG             => $info,
-            URL             => $req->{urldc},
-            HIDDEN_INPUTS   => $self->buildHiddenForm($req),
+            URL             => $req->{urldc} || $self->conf->{portal}, # Fix 2158
+            HIDDEN_INPUTS   => $self->buildOutgoingHiddenForm( $req, $method ),
             ACTIVE_TIMER    => $req->data->{activeTimer},
-            FORM_METHOD     => $self->conf->{infoFormMethod},
             CHOICE_PARAM    => $self->conf->{authChoiceParam},
             CHOICE_VALUE    => $req->data->{_authChoice},
+            FORM_METHOD     => $method,
+            (
+                  ( not $req->{urldc} ) ? ( SEND_PARAMS => 1 )
+                : ()
+            ),
             (
                 $req->data->{customScript}
                 ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
@@ -176,12 +192,14 @@ sub display {
 
     # 2.1 Redirection
     elsif ( $req->{error} == PE_REDIRECT ) {
+        my $method = $req->data->{redirectFormMethod} || 'get';
         $skinfile       = "redirect";
         %templateParams = (
             MAIN_LOGO     => $self->conf->{portalMainLogo},
+            LANGS         => $self->conf->{showLanguages},
             URL           => $req->{urldc},
-            HIDDEN_INPUTS => $self->buildHiddenForm($req),
-            FORM_METHOD   => $req->data->{redirectFormMethod} || 'get',
+            HIDDEN_INPUTS => $self->buildOutgoingHiddenForm( $req, $method ),
+            FORM_METHOD   => $method,
             (
                 $req->data->{customScript}
                 ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
@@ -192,7 +210,17 @@ sub display {
 
     # 2.2 Case : display menu (with error or not)
     elsif ( $req->error == PE_OK ) {
+        my $speChars = $self->conf->{passwordPolicySpecialChar};
+        $speChars =~ s/\s+/ /g;
+        $speChars =~ s/(?:^\s|\s$)//g;
         $skinfile = 'menu';
+
+        my $isPP =
+             $self->conf->{passwordPolicyMinSize}
+          || $self->conf->{passwordPolicyMinLower}
+          || $self->conf->{passwordPolicyMinUpper}
+          || $self->conf->{passwordPolicyMinDigit}
+          || $speChars;
 
         #utf8::decode($auth_user);
         %templateParams = (
@@ -203,13 +231,21 @@ sub display {
             LOGOUT_URL          => $self->conf->{portal} . "?logout=1",
             APPSLIST_ORDER      => $req->{sessionInfo}->{'_appsListOrder'},
             PING                => $self->conf->{portalPingInterval},
-            REQUIRE_OLDPASSWORD => $self->conf->{portalRequireOldPassword},
+            REQUIRE_OLDPASSWORD => $self->requireOldPwd->($req, $req->userData),
             HIDE_OLDPASSWORD    => 0,
             DISPLAY_PPOLICY     => $self->conf->{portalDisplayPasswordPolicy},
             PPOLICY_MINSIZE     => $self->conf->{passwordPolicyMinSize},
             PPOLICY_MINLOWER    => $self->conf->{passwordPolicyMinLower},
             PPOLICY_MINUPPER    => $self->conf->{passwordPolicyMinUpper},
             PPOLICY_MINDIGIT    => $self->conf->{passwordPolicyMinDigit},
+            PPOLICY_NOPOLICY    => !$isPP,
+            PPOLICY_ALLOWEDSPECHAR => $speChars,
+            (
+                $speChars
+                ? ( PPOLICY_MINSPECHAR =>
+                      $self->conf->{passwordPolicyMinSpeChar} )
+                : ()
+            ),
             $self->menu->params($req),
             (
                 $req->data->{customScript}
@@ -266,8 +302,6 @@ sub display {
             and $req->{error} != PE_FIRSTACCESS
             and $req->{error} != PE_BADCREDENTIALS
             and $req->{error} != PE_PP_PASSWORD_EXPIRED )
-
-       # and ( $req->{error} == PE_TOKENEXPIRED or $req->{error} == PE_NOTOKEN )
       )
     {
         $skinfile       = 'error';
@@ -276,6 +310,7 @@ sub display {
             LANGS           => $self->conf->{showLanguages},
             AUTH_ERROR      => $req->error,
             AUTH_ERROR_TYPE => $req->error_type,
+            LOCKTIME        => $req->lockTime(),
             (
                 $req->data->{customScript}
                 ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
@@ -306,13 +341,14 @@ sub display {
             ASK_LOGINS            => $req->param('checkLogins') || 0,
             DISPLAY_RESETPASSWORD => $self->conf->{portalDisplayResetPassword},
             DISPLAY_REGISTER      => $self->conf->{portalDisplayRegister},
-            DISPLAY_UPDATECERTIF  => $self->conf->{portalDisplayCertificateResetByMail},
-            MAILCERTIF_URL        => $self->conf->{certificateResetByMailURL},
-            MAIL_URL              => $self->conf->{mailUrl},
-            REGISTER_URL          => $self->conf->{registerUrl},
-            HIDDEN_INPUTS         => $self->buildHiddenForm($req),
-            STAYCONNECTED         => $self->conf->{stayConnected},
-            SPOOFID               => $self->conf->{impersonationRule},
+            DISPLAY_UPDATECERTIF =>
+              $self->conf->{portalDisplayCertificateResetByMail},
+            MAILCERTIF_URL => $self->conf->{certificateResetByMailURL},
+            MAIL_URL       => $self->conf->{mailUrl},
+            REGISTER_URL   => $self->conf->{registerUrl},
+            HIDDEN_INPUTS  => $self->buildHiddenForm($req),
+            STAYCONNECTED  => $self->conf->{stayConnected},
+            SPOOFID        => $self->conf->{impersonationRule},
             (
                 $req->data->{customScript}
                 ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
@@ -375,6 +411,7 @@ sub display {
 
         # Disable all forms on:
         # * Logout message
+        # * Account lock
         # * Bad URL error
         elsif ($req->{error} == PE_LOGOUT_OK
             or $req->{error} == PE_WAIT
@@ -388,6 +425,7 @@ sub display {
                 DISPLAY_YUBIKEY_FORM  => 0,
                 AUTH_LOOP             => [],
                 MSG                   => $req->info(),
+                LOCKTIME              => $req->lockTime(),
             );
 
         }
@@ -404,6 +442,7 @@ sub display {
                     AUTH_LOOP            => $authLoop,
                     CHOICE_PARAM         => $self->conf->{authChoiceParam},
                     CHOICE_VALUE         => $req->data->{_authChoice},
+                    DISPLAY_TAB          => scalar( $req->param("tab") ),
                     DISPLAY_FORM         => 0,
                     DISPLAY_OPENID_FORM  => 0,
                     DISPLAY_YUBIKEY_FORM => 0,
@@ -480,6 +519,29 @@ sub staticFile {
     ];
 }
 
+sub buildOutgoingHiddenForm {
+    my ( $self, $req, $method ) = @_;
+    my @keys = keys %{ $req->{portalHiddenFormValues} };
+
+    # Redirection URL contains query string. Before displaying a form,
+    # we must set the query string parameters as form fields so they can
+    # be preserved #2085
+
+    my $uri          = URI->new( $req->{urldc} );
+    my %query_params = $uri->query_form;
+    if (%query_params) {
+        $self->logger->debug(
+"urldc contains query parameters, setting them as hidden form values"
+        );
+        $self->clearHiddenFormValue($req);
+        foreach ( keys %query_params ) {
+            $self->setHiddenFormValue( $req, $_, $query_params{$_}, "", 0 );
+        }
+    }
+
+    return $self->buildHiddenForm($req);
+}
+
 sub buildHiddenForm {
     my ( $self, $req ) = @_;
     my @keys = keys %{ $req->{portalHiddenFormValues} };
@@ -506,7 +568,6 @@ sub buildHiddenForm {
 # TODO: create property for skinRule
 sub getSkin {
     my ( $self, $req ) = @_;
-
     my $skin = $self->conf->{portalSkin};
 
     # Fill sessionInfo to eval rule if empty (unauthenticated user)
@@ -578,6 +639,7 @@ sub mkSessionArray {
                         ip     => $session->{ipAddr},
                         values => [ map { { v => $session->{$_} } } @fields ],
                         error  => $session->{error},
+                        displayUser  => $displayUser,
                         displayError => $displayError,
                     }
                 } @$sessions

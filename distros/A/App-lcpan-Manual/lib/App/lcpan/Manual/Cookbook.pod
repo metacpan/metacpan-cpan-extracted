@@ -20,22 +20,98 @@ App::lcpan::Manual::Cookbook - App::lcpan cookbook
 
 =head1 VERSION
 
-version 1.049.000
+version 1.054.001
 
-=head1 FOR MODULE USERS
+=head1 DESCRIPTION
 
-=head1 FOR MODULE AUTHORS
+Items relevant to CPAN authors are tagged with C<[author]>.
 
-=head2 Checking if your distribution depends on a non-core Perl module
+=head1 QUERYING AUTHORS
 
-    % lcpan deps Your-Dist --exclude-core
+=head2 Listing recent authors
 
-=head2 Finding out if there is any broken prerequisites
+TODO.
+
+=head1 QUERYING DEPENDENCIES
+
+=head2 Checking if your distribution depends on a non-core Perl module [author]
+
+ % lcpan deps YOUR-DIST --exclude-core
+
+=head2 Checking if your distribution specifies a circular dependency
+
+TODO.
+
+=head2 Finding out if there is any broken prerequisites specified by one of your distributions [author]
 
 To find out which prerequisites that your distributions specify but are
-currently not indexed (i.e. cannot be installed by users):
+currently not indexed (i.e. probably cannot be installed by users):
 
-    % lcpan author-deps YOURCPANID --broken --dont-uniquify
+ % lcpan author-deps YOURCPANID --broken --dont-uniquify
+
+=head2 Listing distributions of other CPAN authors that depend on one of your modules [author]
+
+    % lcpan author-rdeps YOURCPANID --user-author-isnt YOURCPANID
+
+=head2 Listing distributions of other CPAN authors that recently depend on one of your modules [author]
+
+    # Show dependencies that were added in the last 2 weeks
+    % lcpan author-rdeps YOURCPANID --user-author-isnt YOURCPANID --added-after '2 weeks ago'
+
+    # Show dependencies that were updated in the last 2 weeks
+    % lcpan author-rdeps YOURCPANID --user-author-isnt YOURCPANID --updated-after '2 weeks ago'
+
+    # Show dependencies that were not present before your last 'lcpan update'
+    % lcpan author-rdeps YOURCPANID --user-author-isnt YOURCPANID --added-in-last-update
+
+=head2 Showing what other distributions you will have to download and install when you install a module
+
+TODO.
+
+=head1 QUERYING DISTRIBUTIONS
+
+=head2 Listing recent distributions
+
+TODO
+
+=head1 QUERYING MODULES
+
+=head2 Comparing version of installed modules vs local CPAN versions
+
+ % lcpan ver-cmp-installed
+ % lcpan ver-cmp-installed --older-than-db                ;# outdated modules (modules that need to be updated)
+ % lcpan ver-cmp-installed --older-than-db --exclude-core ;# noncore outdated modules (noncore modules that need to be updated)
+
+The C<ver-cmp-installed> subcommand is distributed in
+L<App::lcpan::CmdBundle::ver>.
+
+This can also be done using tools like L<cpan-outdated> (from
+L<App::cpanoutdated>) or L<cpan-outdated-coro> (from
+L<App::cpanoutdated::coro>).
+
+To update outdated modules:
+
+ % lcpan-ver-cmp-installed --older-than-db | td select module | lcpanm -n
+
+L<td> is provided by L<App::td>.
+
+=head2 Listing recent modules
+
+    # Show modules that were added in the last 2 weeks
+    % lcpan mods -l --added-after '2 weeks ago'
+
+    # Show modules that were updated in the last 2 weeks
+    % lcpan mods -l --updated-after '2 weeks ago'
+
+    # Show modules that were not present before the last 'lcpan update'
+    % lcpan mods -l --added-in-last-update
+
+=head2 Showing related modules
+
+You like L<Sub::Exporter> and wonder what other modules might be similar or
+related to it:
+
+    % lcpan related-mods Sub::Exporter
 
 =head1 AUTHOR
 

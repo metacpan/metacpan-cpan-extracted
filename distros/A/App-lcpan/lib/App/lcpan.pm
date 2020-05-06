@@ -1,9 +1,9 @@
 package App::lcpan;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-20'; # DATE
+our $DATE = '2020-05-06'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.051'; # VERSION
+our $VERSION = '1.056'; # VERSION
 
 use 5.010001;
 use strict;
@@ -241,6 +241,54 @@ our %finclude_unindexed_args = (
     },
 );
 
+our %fctime_args = (
+    added_before => {
+        summary => 'Include only records that are added before a certain date',
+        schema => ['date*', 'x.perl.coerce_rules' => ['From_str::natural']],
+        tags => ['category:filtering'],
+    },
+    added_after => {
+        summary => 'Include only records that are added after a certain date',
+        schema => ['date*', 'x.perl.coerce_rules' => ['From_str::natural']],
+        tags => ['category:filtering'],
+    },
+    added_in_last_update => {
+        summary => 'Include only records that are added during the last index update',
+        schema => 'true*',
+        tags => ['category:filtering'],
+    },
+    added_in_last_n_updates => {
+        summary => 'Include only records that are added during the last N index updates',
+        schema => 'posint*',
+        tags => ['category:filtering'],
+    },
+    # XXX choose one: added_before/after or added_in_last_update or added_in_last_n_updates
+);
+
+our %fmtime_args = (
+    updated_before => {
+        summary => 'Include only records that are updated before a certain date',
+        schema => ['date*', 'x.perl.coerce_rules' => ['From_str::natural']],
+        tags => ['category:filtering'],
+    },
+    updated_after => {
+        summary => 'Include only records that are updated after a certain date',
+        schema => ['date*', 'x.perl.coerce_rules' => ['From_str::natural']],
+        tags => ['category:filtering'],
+    },
+    updated_in_last_update => {
+        summary => 'Include only records that are updated during the last index update',
+        schema => 'true*',
+        tags => ['category:filtering'],
+    },
+    updated_in_last_n_updates => {
+        summary => 'Include only records that are updated during the last N index updates',
+        schema => 'posint*',
+        tags => ['category:filtering'],
+    },
+    # XXX choose one: updated_before/after or updated_in_last_update or updated_in_last_n_updates
+);
+
 our %perl_version_args = (
     perl_version => {
         summary => 'Set base Perl version for determining core modules',
@@ -475,6 +523,45 @@ sub _set_args_default {
     }
 }
 
+# set {added,updated}_after time when {added,update}_in_last_updated
+sub _set_added_updated_times {
+    my ($args, $dbh) = @_;
+
+    if ($args->{added_in_last_update} || $args->{updated_in_last_update}) {
+        my ($time) = $dbh->selectrow_array("SELECT date FROM log WHERE category='update_index' AND summary LIKE 'Begin%' ORDER BY date DESC");
+        if (delete $args->{added_in_last_update}) {
+            $args->{added_after} //= $time // 0;
+        }
+        if (delete $args->{updated_in_last_update}) {
+            $args->{updated_after} //= $time // 0;
+        }
+    }
+
+    {
+        last unless defined $args->{added_in_last_n_updates};
+        my $n = int($args->{added_in_last_n_updates});
+        last unless $n >= 1;
+        my $sth = $dbh->prepare("SELECT date FROM log WHERE category='update_index' AND summary LIKE 'Begin%' ORDER BY date DESC");
+        $sth->execute;
+        my $i = 0;
+        my $time;
+        1 while ++$i <= $n && (($time) = $sth->fetchrow_array);
+        $args->{added_after} //= $time // 0;
+    }
+
+    {
+        last unless defined $args->{updated_in_last_n_updates};
+        my $n = int($args->{updated_in_last_n_updates});
+        last unless $n >= 1;
+        my $sth = $dbh->prepare("SELECT date FROM log WHERE category='update_index' AND summary LIKE 'Begin%' ORDER BY date DESC");
+        $sth->execute;
+        my $i = 0;
+        my $time;
+        1 while ++$i <= $n && (($time) = $sth->fetchrow_array);
+        $args->{updated_after} //= $time // 0;
+    }
+}
+
 sub _fmt_time {
     require POSIX;
 
@@ -503,23 +590,40 @@ sub _relpath {
         substr($cpanid, 0, 2)."/$cpanid/$filename";
 }
 
+sub _dblog {
+    no strict 'refs';
+
+    my ($dbh, $level, $category, $summary) = @_;
+    $dbh->do("INSERT INTO log (date,lcpan_version,pid, level,category,summary) VALUES (?,?,?, ?,?,?)", {},
+             time(), ${__PACKAGE__ . "::VERSION"}, $$,
+             $level, $category, $summary);
+}
+
 sub _fill_namespace {
+    require DBIx::Util::Schema;
     my $dbh = shift;
 
+    my $has_rec_ctime = DBIx::Util::Schema::has_column($dbh, "namespace", "rec_ctime");
+    my $has_rec_mtime = DBIx::Util::Schema::has_column($dbh, "namespace", "rec_mtime");
     my $sth_sel_mod = $dbh->prepare("SELECT name FROM module");
-    my $sth_ins_ns  = $dbh->prepare("INSERT INTO namespace (name, num_sep, has_child, num_modules) VALUES (?,?,?,1)");
-    my $sth_upd_ns_inc_num_mod = $dbh->prepare("UPDATE namespace SET num_modules=num_modules+1, has_child=1 WHERE name=?");
+    my $sth_ins_ns  = $has_rec_ctime ?
+        $dbh->prepare("INSERT INTO namespace (name, rec_ctime, rec_mtime, num_sep, has_child, num_modules) VALUES (?,?,?,?,?,1)") :
+        $dbh->prepare("INSERT INTO namespace (name, num_sep, has_child, num_modules) VALUES (?,?,?,1)");
+    my $sth_upd_ns_inc_num_mod = $has_rec_mtime ?
+        $dbh->prepare("UPDATE namespace SET num_modules=num_modules+1, has_child=1, rec_mtime=? WHERE name=?") :
+        $dbh->prepare("UPDATE namespace SET num_modules=num_modules+1, has_child=1 WHERE name=?");
     $sth_sel_mod->execute;
     my %cache;
+    my $now = time();
     while (my ($mod) = $sth_sel_mod->fetchrow_array) {
         my $has_child = 0;
         while (1) {
             if ($cache{$mod}++) {
-                $sth_upd_ns_inc_num_mod->execute($mod);
+                $sth_upd_ns_inc_num_mod->execute(($has_rec_mtime ? ($now) : ()), $mod);
             } else {
                 my $num_sep = 0;
                 while ($mod =~ /::/g) { $num_sep++ }
-                $sth_ins_ns->execute($mod, $num_sep, $has_child);
+                $sth_ins_ns->execute($mod, ($has_rec_ctime ? ($now, $now) : ()), $num_sep, $has_child);
             }
             $mod =~ s/::\w+\z// or last;
             $has_child = 1;
@@ -530,19 +634,20 @@ sub _fill_namespace {
 sub _set_namespace {
     my ($dbh, $mod) = @_;
     my $sth_sel_ns  = $dbh->prepare("SELECT name FROM namespace WHERE name=?");
-    my $sth_ins_ns  = $dbh->prepare("INSERT INTO namespace (name, num_sep, has_child, num_modules) VALUES (?,?,?,1)");
-    my $sth_upd_ns_inc_num_mod = $dbh->prepare("UPDATE namespace SET num_modules=num_modules+1, has_child=1 WHERE name=?");
+    my $sth_ins_ns  = $dbh->prepare("INSERT INTO namespace (name, rec_ctime, rec_mtime, num_sep, has_child, num_modules) VALUES (?,?,?,?,?,1)");
+    my $sth_upd_ns_inc_num_mod = $dbh->prepare("UPDATE namespace SET num_modules=num_modules+1, has_child=1, rec_mtime=? WHERE name=?");
 
     my $has_child = 0;
+    my $now = time();
     while (1) {
         $sth_sel_ns->execute($mod);
         my $row = $sth_sel_ns->fetchrow_arrayref;
         if ($row) {
-            $sth_upd_ns_inc_num_mod->execute($mod);
+            $sth_upd_ns_inc_num_mod->execute($now, $mod);
         } else {
             my $num_sep = 0;
             while ($mod =~ /::/g) { $num_sep++ }
-            $sth_ins_ns->execute($mod, $num_sep, $has_child);
+            $sth_ins_ns->execute($mod, $now, $now, $num_sep, $has_child);
         }
         $mod =~ s/::\w+\z// or last;
         $has_child = 1;
@@ -550,14 +655,18 @@ sub _set_namespace {
 }
 
 our $db_schema_spec = {
-    latest_v => 12,
+    latest_v => 14,
 
     install => [
         'CREATE TABLE author (
              cpanid VARCHAR(20) NOT NULL PRIMARY KEY,
              fullname VARCHAR(255) NOT NULL,
-             email TEXT
+             email TEXT,
+             rec_ctime INT,
+             rec_mtime INT
          )',
+        'CREATE INDEX ix_author__rec_ctime ON author(rec_ctime)',
+        'CREATE INDEX ix_author__rec_mtime ON author(rec_mtime)',
 
         'CREATE TABLE file (
              id INTEGER NOT NULL PRIMARY KEY,
@@ -595,10 +704,15 @@ our $db_schema_spec = {
              has_metajson INTEGER,
              has_metayml INTEGER,
              has_makefilepl INTEGER,
-             has_buildpl INTEGER
+             has_buildpl INTEGER,
+
+             rec_ctime INT,
+             rec_mtime INT
         )',
         'CREATE UNIQUE INDEX ix_file__id ON file(id)', # not created automatically when there is another unique index?
         'CREATE UNIQUE INDEX ix_file__cpanid__name ON file(cpanid,name)',
+        'CREATE INDEX ix_file__rec_ctime ON file(rec_ctime)',
+        'CREATE INDEX ix_file__rec_mtime ON file(rec_mtime)',
 
         # files inside the release archive file
         'CREATE TABLE content (
@@ -607,11 +721,15 @@ our $db_schema_spec = {
              path TEXT NOT NULL,
              package TEXT, -- only the first package declaration will be recorded
              mtime INT,
-             size INT -- uncompressed size
+             size INT, -- uncompressed size
+             rec_ctime INT,
+             rec_mtime INT
         )',
         'CREATE UNIQUE INDEX ix_content__id ON content(id)', # not created automatically when there is another unique index?
         'CREATE UNIQUE INDEX ix_content__file_id__path ON content(file_id, path)',
         'CREATE INDEX ix_content__package ON content(package)',
+        'CREATE INDEX ix_content__rec_ctime ON content(rec_ctime)',
+        'CREATE INDEX ix_content__rec_mtime ON content(rec_mtime)',
 
         'CREATE TABLE module (
              id INTEGER NOT NULL PRIMARY KEY,
@@ -621,12 +739,16 @@ our $db_schema_spec = {
              version VARCHAR(20),
              version_numified DECIMAL,
              content_id INTEGER REFERENCES content(id),
-             abstract TEXT
+             abstract TEXT,
+             rec_ctime INT,
+             rec_mtime INT
          )',
         'CREATE UNIQUE INDEX ix_module__id ON module(id)', # not created automatically when there is another unique index?
         'CREATE UNIQUE INDEX ix_module__name ON module(name)',
         'CREATE INDEX ix_module__file_id ON module(file_id)',
         'CREATE INDEX ix_module__cpanid ON module(cpanid)',
+        'CREATE INDEX ix_module__rec_ctime ON module(rec_ctime)',
+        'CREATE INDEX ix_module__rec_mtime ON module(rec_mtime)',
 
         'CREATE TABLE script (
              id INTEGER NOT NULL PRIMARY KEY,
@@ -634,11 +756,15 @@ our $db_schema_spec = {
              cpanid VARCHAR(20) NOT NULL REFERENCES author(cpanid), -- [cache]
              name TEXT NOT NULL,
              content_id INT REFERENCES content(id),
-             abstract TEXT
+             abstract TEXT,
+             rec_ctime INT,
+             rec_mtime INT
         )',
         'CREATE UNIQUE INDEX ix_script__id ON script(id)', # not created automatically when there is another unique index?
         'CREATE UNIQUE INDEX ix_script__file_id__name ON script(file_id, name)',
         'CREATE INDEX ix_script__name ON script(name)',
+        'CREATE INDEX ix_script__rec_ctime ON script(rec_ctime)',
+        'CREATE INDEX ix_script__rec_mtime ON script(rec_mtime)',
 
         'CREATE TABLE mention (
              id INTEGER NOT NULL PRIMARY KEY,
@@ -646,20 +772,28 @@ our $db_schema_spec = {
              source_content_id INT NOT NULL REFERENCES content(id),
              module_id INTEGER, -- if mention module and module is known (listed in module table), only its id will be recorded here
              module_name TEXT,  -- if mention module and module is unknown (unlisted in module table), only the name will be recorded here
-             script_name TEXT   -- if mention script
+             script_name TEXT,  -- if mention script
+             rec_ctime INT,
+             rec_mtime INT
         )',
         'CREATE UNIQUE INDEX ix_mention__id ON mention(id)', # not created automatically when there is another unique index?
         'CREATE UNIQUE INDEX ix_mention__module_id__source_content_id   ON mention(module_id, source_content_id)',
         'CREATE UNIQUE INDEX ix_mention__module_name__source_content_id ON mention(module_name, source_content_id)',
         'CREATE UNIQUE INDEX ix_mention__script_name__source_content_id ON mention(script_name, source_content_id)',
+        'CREATE INDEX ix_mention__rec_ctime ON mention(rec_ctime)',
+        'CREATE INDEX ix_mention__rec_mtime ON mention(rec_mtime)',
 
         'CREATE TABLE namespace (
             name VARCHAR(255) NOT NULL,
             num_sep INT NOT NULL,
             has_child BOOL NOT NULL,
-            num_modules INT NOT NULL
+            num_modules INT NOT NULL,
+            rec_ctime INT,
+            rec_mtime INT
         )',
         'CREATE UNIQUE INDEX ix_namespace__name ON namespace(name)',
+        'CREATE INDEX ix_namespace__rec_ctime ON namespace(rec_ctime)',
+        'CREATE INDEX ix_namespace__rec_mtime ON namespace(rec_mtime)',
 
         'CREATE TABLE dist (
              id INTEGER NOT NULL PRIMARY KEY,
@@ -669,12 +803,16 @@ our $db_schema_spec = {
              file_id INTEGER NOT NULL,
              version VARCHAR(20),
              version_numified DECIMAL,
-             is_latest BOOLEAN -- [cache]
+             is_latest BOOLEAN, -- [cache]
+             rec_ctime INT,
+             rec_mtime INT
          )',
         'CREATE UNIQUE INDEX ix_dist__id ON dist(id)', # not created automatically when there is another unique index?
         'CREATE INDEX ix_dist__name ON dist(name)',
         'CREATE UNIQUE INDEX ix_dist__file_id ON dist(file_id)',
         'CREATE INDEX ix_dist__cpanid ON dist(cpanid)',
+        'CREATE INDEX ix_dist__rec_ctime ON dist(rec_ctime)',
+        'CREATE INDEX ix_dist__rec_mtime ON dist(rec_mtime)',
 
         'CREATE TABLE dep (
              file_id INTEGER,
@@ -685,6 +823,8 @@ our $db_schema_spec = {
              phase TEXT, -- runtime, ...
              version VARCHAR(20),
              version_numified DECIMAL,
+             rec_ctime INT,
+             rec_mtime INT,
              FOREIGN KEY (file_id) REFERENCES file(id),
              FOREIGN KEY (dist_id) REFERENCES dist(id),
              FOREIGN KEY (module_id) REFERENCES module(id)
@@ -696,17 +836,35 @@ our $db_schema_spec = {
         'CREATE INDEX ix_dep__file_id ON dep(file_id)',
         'CREATE INDEX ix_dep__dist_id ON dep(dist_id)',
         'CREATE INDEX ix_dep__module_id ON dep(module_id)',
+        'CREATE INDEX ix_dep__rec_ctime ON dep(rec_ctime)',
+        'CREATE INDEX ix_dep__rec_mtime ON dep(rec_mtime)',
 
         'CREATE TABLE sub (
              id INTEGER NOT NULL PRIMARY KEY,
              file_id INTEGER NOT NULL REFERENCES file(id), --[cache]
              content_id INTEGER NOT NULL REFERENCES content(id),
              name TEXT NOT NULL,
-             linum INTEGER NOT NULL
+             linum INTEGER NOT NULL,
+             rec_ctime INT,
+             rec_mtime INT
          )',
         'CREATE UNIQUE INDEX ix_sub__id ON sub(id)', # not created automatically when there is another unique index?
         'CREATE UNIQUE INDEX ix_sub__name__content_id ON sub(name, content_id)',
+        'CREATE INDEX ix_sub__rec_ctime ON sub(rec_ctime)',
+        'CREATE INDEX ix_sub__rec_mtime ON sub(rec_mtime)',
 
+        'CREATE TABLE log (
+             id INTEGER NOT NULL PRIMARY KEY,
+             date INTEGER NOT NULL,
+             lcpan_version TEXT,
+             pid INTEGER NOT NULL,
+             level INTEGER NOT NULL, -- like in Log::ger: fatal=10, error=20, warn=30, info=40, debug=50, trace=60
+             category TEXT NOT NULL,
+             summary TEXT NOT NULL
+         )',
+        'CREATE UNIQUE INDEX ix_log__id ON log(id)',
+        'CREATE INDEX ix_log__date ON log(date)',
+        'CREATE INDEX ix_log__category ON log(category)',
     ], # install
 
     upgrade_to_v2 => [
@@ -914,6 +1072,97 @@ our $db_schema_spec = {
         'CREATE UNIQUE INDEX ix_sub__id ON sub(id)', # not created automatically when there is another unique index?
     ],
 
+    upgrade_to_v13 => [
+        # add rec_ctime & rec_mtime column to all tables, so user can query
+        # recently added/modified authors, modules, ...
+
+        'ALTER TABLE author ADD COLUMN rec_ctime INT',
+        'ALTER TABLE author ADD COLUMN rec_mtime INT',
+        'CREATE INDEX ix_author__rec_ctime ON author(rec_ctime)',
+        'CREATE INDEX ix_author__rec_mtime ON author(rec_mtime)',
+        "UPDATE author SET rec_ctime=(SELECT value FROM meta WHERE name='last_index_time') WHERE rec_ctime IS NULL",
+        "UPDATE author SET rec_mtime=(SELECT value FROM meta WHERE name='last_index_time') WHERE rec_mtime IS NULL",
+
+        'ALTER TABLE file ADD COLUMN rec_ctime INT',
+        'ALTER TABLE file ADD COLUMN rec_mtime INT',
+        'CREATE INDEX ix_file__rec_ctime ON file(rec_ctime)',
+        'CREATE INDEX ix_file__rec_mtime ON file(rec_mtime)',
+        "UPDATE file SET rec_ctime=(SELECT value FROM meta WHERE name='last_index_time') WHERE rec_ctime IS NULL",
+        "UPDATE file SET rec_mtime=(SELECT value FROM meta WHERE name='last_index_time') WHERE rec_mtime IS NULL",
+
+        'ALTER TABLE content ADD COLUMN rec_ctime INT',
+        'ALTER TABLE content ADD COLUMN rec_mtime INT',
+        'CREATE INDEX ix_content__rec_ctime ON content(rec_ctime)',
+        'CREATE INDEX ix_content__rec_mtime ON content(rec_mtime)',
+        "UPDATE content SET rec_ctime=(SELECT value FROM meta WHERE name='last_index_time') WHERE rec_ctime IS NULL",
+        "UPDATE content SET rec_mtime=(SELECT value FROM meta WHERE name='last_index_time') WHERE rec_mtime IS NULL",
+
+        'ALTER TABLE module ADD COLUMN rec_ctime INT',
+        'ALTER TABLE module ADD COLUMN rec_mtime INT',
+        'CREATE INDEX ix_module__rec_ctime ON module(rec_ctime)',
+        'CREATE INDEX ix_module__rec_mtime ON module(rec_mtime)',
+        "UPDATE module SET rec_ctime=(SELECT value FROM meta WHERE name='last_index_time') WHERE rec_ctime IS NULL",
+        "UPDATE module SET rec_mtime=(SELECT value FROM meta WHERE name='last_index_time') WHERE rec_mtime IS NULL",
+
+        'ALTER TABLE script ADD COLUMN rec_ctime INT',
+        'ALTER TABLE script ADD COLUMN rec_mtime INT',
+        'CREATE INDEX ix_script__rec_ctime ON script(rec_ctime)',
+        'CREATE INDEX ix_script__rec_mtime ON script(rec_mtime)',
+        "UPDATE script SET rec_ctime=(SELECT value FROM meta WHERE name='last_index_time') WHERE rec_ctime IS NULL",
+        "UPDATE script SET rec_mtime=(SELECT value FROM meta WHERE name='last_index_time') WHERE rec_mtime IS NULL",
+
+        'ALTER TABLE mention ADD COLUMN rec_ctime INT',
+        'ALTER TABLE mention ADD COLUMN rec_mtime INT',
+        'CREATE INDEX ix_mention__rec_ctime ON mention(rec_ctime)',
+        'CREATE INDEX ix_mention__rec_mtime ON mention(rec_mtime)',
+        "UPDATE mention SET rec_ctime=(SELECT value FROM meta WHERE name='last_index_time') WHERE rec_ctime IS NULL",
+        "UPDATE mention SET rec_mtime=(SELECT value FROM meta WHERE name='last_index_time') WHERE rec_mtime IS NULL",
+
+        'ALTER TABLE namespace ADD COLUMN rec_ctime INT',
+        'ALTER TABLE namespace ADD COLUMN rec_mtime INT',
+        'CREATE INDEX ix_namespace__rec_ctime ON namespace(rec_ctime)',
+        'CREATE INDEX ix_namespace__rec_mtime ON namespace(rec_mtime)',
+        "UPDATE namespace SET rec_ctime=(SELECT value FROM meta WHERE name='last_index_time') WHERE rec_ctime IS NULL",
+        "UPDATE namespace SET rec_mtime=(SELECT value FROM meta WHERE name='last_index_time') WHERE rec_mtime IS NULL",
+
+        'ALTER TABLE dist ADD COLUMN rec_ctime INT',
+        'ALTER TABLE dist ADD COLUMN rec_mtime INT',
+        'CREATE INDEX ix_dist__rec_ctime ON dist(rec_ctime)',
+        'CREATE INDEX ix_dist__rec_mtime ON dist(rec_mtime)',
+        "UPDATE dist SET rec_ctime=(SELECT value FROM meta WHERE name='last_index_time') WHERE rec_ctime IS NULL",
+        "UPDATE dist SET rec_mtime=(SELECT value FROM meta WHERE name='last_index_time') WHERE rec_mtime IS NULL",
+
+        'ALTER TABLE dep ADD COLUMN rec_ctime INT',
+        'ALTER TABLE dep ADD COLUMN rec_mtime INT',
+        'CREATE INDEX ix_dep__rec_ctime ON dep(rec_ctime)',
+        'CREATE INDEX ix_dep__rec_mtime ON dep(rec_mtime)',
+        "UPDATE dep SET rec_ctime=(SELECT value FROM meta WHERE name='last_index_time') WHERE rec_ctime IS NULL",
+        "UPDATE dep SET rec_mtime=(SELECT value FROM meta WHERE name='last_index_time') WHERE rec_mtime IS NULL",
+
+        'ALTER TABLE sub ADD COLUMN rec_ctime INT',
+        'ALTER TABLE sub ADD COLUMN rec_mtime INT',
+        'CREATE INDEX ix_sub__rec_ctime ON sub(rec_ctime)',
+        'CREATE INDEX ix_sub__rec_mtime ON sub(rec_mtime)',
+        "UPDATE sub SET rec_ctime=(SELECT value FROM meta WHERE name='last_index_time') WHERE rec_ctime IS NULL",
+        "UPDATE sub SET rec_mtime=(SELECT value FROM meta WHERE name='last_index_time') WHERE rec_mtime IS NULL",
+    ],
+
+    upgrade_to_v14 => [
+        # add log table
+        'CREATE TABLE log (
+             id INTEGER NOT NULL PRIMARY KEY,
+             date INTEGER NOT NULL,
+             lcpan_version TEXT,
+             pid INTEGER NOT NULL,
+             level INTEGER NOT NULL, -- like in Log::ger: fatal=10, error=20, warn=30, info=40, debug=50, trace=60
+             category TEXT NOT NULL,
+             summary TEXT NOT NULL
+         )',
+        'CREATE UNIQUE INDEX ix_log__id ON log(id)',
+        'CREATE INDEX ix_log__date ON log(date)',
+        'CREATE INDEX ix_log__category ON log(category)',
+    ],
+
     # for testing
     install_v1 => [
         'CREATE TABLE author (
@@ -1099,6 +1348,7 @@ sub _parse_meta_yml {
 sub _add_prereqs {
     my ($file_id, $dist_id, $hash, $phase, $rel, $sth_ins_dep, $sth_sel_mod) = @_;
     log_trace("  Adding prereqs (%s %s): %s", $phase, $rel, $hash);
+    my $now = time();
     for my $mod (keys %$hash) {
         $sth_sel_mod->execute($mod);
         my $row = $sth_sel_mod->fetchrow_hashref;
@@ -1110,7 +1360,8 @@ sub _add_prereqs {
         }
         my $ver = $hash->{$mod};
         $sth_ins_dep->execute($file_id, $dist_id, $mod_id, $mod_name, $phase,
-                              $rel, $ver, _numify_ver($ver));
+                              $rel, $ver, _numify_ver($ver),
+                              $now, $now);
     }
 }
 
@@ -1149,7 +1400,7 @@ sub _index_pod {
                /mx) {
         $pkg = $1;
         log_trace("  found package declaration '%s'", $pkg);
-        $sth_set_content_package->execute($pkg, $content_id);
+        $sth_set_content_package->execute($pkg, $content_id, time());
 
         if ($type eq 'pm_or_pod') {
             # set module abstract if pkg refers to a known module
@@ -1160,7 +1411,7 @@ sub _index_pod {
                 $module_id = $row->{id};
                 if ($abstract) {
                     log_trace("  set abstract for module %s: %s", $pkg, $abstract);
-                    $sth_set_module_abstract->execute($abstract, $module_id);
+                    $sth_set_module_abstract->execute($abstract, $module_id, time());
                 }
             }
         }
@@ -1180,7 +1431,7 @@ sub _index_pod {
         # set script abstract
         if ($abstract) {
             log_trace("  set abstract for script %s (%s): %s", $script_name, $file_name, $abstract);
-            $sth_set_script_abstract->execute($abstract, $script_id);
+            $sth_set_script_abstract->execute($abstract, $script_id, time());
         }
     }
 
@@ -1233,7 +1484,8 @@ sub _index_sub {
         next unless $sub;
         next if $sub =~ /\A_/;
         log_trace("  found sub declaration '%s' (line %s)", $sub, $t->{line});
-        $sth_ins_sub->execute($sub, $t->{line}, $file_id, $content_id);
+        my $now = time();
+        $sth_ins_sub->execute($sub, $t->{line}, $file_id, $content_id, $now,$now);
     }
 }
 
@@ -1478,6 +1730,8 @@ sub _update_index {
         }
     }
 
+    _dblog($dbh, 40, "update_index", "Begin updating index");
+
     # parse 01mailrc.txt.gz and insert the parse result to 'author' table
   PARSE_MAILRC:
     {
@@ -1491,7 +1745,7 @@ sub _update_index {
         # i would like to use INSERT OR IGNORE, but rows affected returned by
         # execute() is always 1?
 
-        my $sth_ins_auth = $dbh->prepare("INSERT INTO author (cpanid,fullname,email) VALUES (?,?,?)");
+        my $sth_ins_auth = $dbh->prepare("INSERT INTO author (cpanid,fullname,email, rec_ctime,rec_mtime) VALUES (?,?,?, ?,?)");
         my $sth_sel_auth = $dbh->prepare("SELECT cpanid FROM author WHERE cpanid=?");
 
         $dbh->begin_work;
@@ -1505,7 +1759,8 @@ sub _update_index {
 
             $sth_sel_auth->execute($cpanid);
             next if $sth_sel_auth->fetchrow_arrayref;
-            $sth_ins_auth->execute($cpanid, $fullname, $email);
+            my $now = time();
+            $sth_ins_auth->execute($cpanid, $fullname, $email, $now, $now);
             log_trace("  new author: %s", $cpanid);
         }
         $dbh->commit;
@@ -1528,7 +1783,7 @@ sub _update_index {
         # i would like to use INSERT OR IGNORE, but rows affected returned by
         # execute() is always 1?
 
-        my $sth_ins_auth = $dbh->prepare("INSERT INTO author (cpanid,fullname,email) VALUES (?,?,NULL)");
+        my $sth_ins_auth = $dbh->prepare("INSERT INTO author (cpanid,fullname,email, rec_ctime,rec_mtime) VALUES (?,?,NULL, ?,?)");
         my $sth_sel_auth = $dbh->prepare("SELECT cpanid FROM author WHERE cpanid=?");
 
         $dbh->begin_work;
@@ -1536,7 +1791,8 @@ sub _update_index {
             my ($cpanid) = ($1);
             $sth_sel_auth->execute($cpanid);
             next if $sth_sel_auth->fetchrow_arrayref;
-            $sth_ins_auth->execute($cpanid, $cpanid);
+            my $now = time();
+            $sth_ins_auth->execute($cpanid, $cpanid, $now, $now);
             log_trace("  new author: %s", $cpanid);
         }
         $dbh->commit;
@@ -1556,9 +1812,9 @@ sub _update_index {
         open my($fh), "<:gzip", $path or die "Can't open $path (<:gzip): $!";
 
         my $sth_sel_file = $dbh->prepare("SELECT id FROM file WHERE name=? AND cpanid=?");
-        my $sth_ins_file = $dbh->prepare("INSERT INTO file (name,cpanid,mtime,size) VALUES (?,?,?,?)");
-        my $sth_ins_mod  = $dbh->prepare("INSERT INTO module (name,file_id,cpanid,version,version_numified) VALUES (?,?,?,?,?)");
-        my $sth_upd_mod  = $dbh->prepare("UPDATE module SET file_id=?,cpanid=?,version=?,version_numified=? WHERE name=?"); # sqlite currently does not have upsert
+        my $sth_ins_file = $dbh->prepare("INSERT INTO file (name,cpanid,mtime,size, rec_ctime,rec_mtime) VALUES (?,?,?,?, ?,?)");
+        my $sth_ins_mod  = $dbh->prepare("INSERT INTO module (name,file_id,cpanid,version,version_numified, rec_ctime,rec_mtime) VALUES (?,?,?,?,?, ?,?)");
+        my $sth_upd_mod  = $dbh->prepare("UPDATE module SET file_id=?,cpanid=?,version=?,version_numified=?, rec_mtime=? WHERE name=?"); # sqlite currently does not have upsert
 
         $dbh->begin_work;
 
@@ -1590,7 +1846,10 @@ sub _update_index {
                 my $path = _fullpath($file, $cpan, $author);
                 my @stat = stat $path;
                 unless ($sth_sel_file->fetchrow_arrayref) {
-                    $sth_ins_file->execute($file, $author, @stat ? $stat[9] : undef, @stat ? $stat[7] : undef);
+                    my $now = time();
+                    $sth_ins_file->execute(
+                        $file, $author, @stat ? $stat[9] : undef, @stat ? $stat[7] : undef,
+                        $now, $now);
                     $file_id = $dbh->last_insert_id("","","","");
                     log_trace("  New file: %s (author %s)", $file, $author);
                 }
@@ -1600,9 +1859,10 @@ sub _update_index {
 
             my $mod_id;
             if (($mod_id) = $dbh->selectrow_array("SELECT id FROM module WHERE name=?", {}, $pkg)) {
-                $sth_upd_mod->execute(      $file_id, $author, $ver, _numify_ver($ver), $pkg);
+                $sth_upd_mod->execute(      $file_id, $author, $ver, _numify_ver($ver), time(), $pkg);
             } else {
-                $sth_ins_mod->execute($pkg, $file_id, $author, $ver, _numify_ver($ver));
+                my $now = time();
+                $sth_ins_mod->execute($pkg, $file_id, $author, $ver, _numify_ver($ver), $now,$now);
                 $mod_id = $dbh->last_insert_id("","","","");
                 _set_namespace($dbh, $pkg);
             }
@@ -1673,7 +1933,8 @@ sub _update_index {
                 $pass == 2 ?
                 "SELECT * FROM file WHERE pod_status IS NULL AND file_status NOT IN ('nofile','unsupported','err') ORDER BY name" :
 
-                "SELECT * FROM file WHERE sub_status IS NULL AND file_status NOT IN ('nofile','unsupported','err') AND EXISTS(SELECT id FROM content WHERE file_id=file.id AND package IS NOT NULL) ORDER BY name"
+                "SELECT * FROM file WHERE sub_status IS NULL AND file_status NOT IN ('nofile','unsupported','err') ".
+                "AND EXISTS(SELECT id FROM content WHERE file_id=file.id AND package IS NOT NULL) ORDER BY name"
         );
         $sth->execute;
 
@@ -1682,31 +1943,31 @@ sub _update_index {
             push @files, $row;
         }
 
-        my $sth_set_file_status = $dbh->prepare("UPDATE file SET file_status=?,file_error=? WHERE id=?");
-        my $sth_ins_content = $dbh->prepare("INSERT INTO content (file_id,path,mtime,size) VALUES (?,?,?,?)");
-        my $sth_ins_script = $dbh->prepare("INSERT INTO script (name, cpanid, content_id, file_id) VALUES (?,?,?,?)");
+        my $sth_set_file_status = $dbh->prepare("UPDATE file SET file_status=?,file_error=?, rec_mtime=? WHERE id=?");
+        my $sth_ins_content = $dbh->prepare("INSERT OR REPLACE INTO content (file_id,path,mtime,size, rec_ctime,rec_mtime) VALUES (?,?,?,?, ?,?)");
+        my $sth_ins_script = $dbh->prepare("INSERT OR REPLACE INTO script (name, cpanid, content_id, file_id, rec_ctime,rec_mtime) VALUES (?,?,?,?, ?,?)");
 
-        my $sth_set_meta_status = $dbh->prepare("UPDATE file SET meta_status=?,meta_error=? WHERE id=?");
-        my $sth_set_meta_info = $dbh->prepare("UPDATE file SET has_metajson=?,has_metayml=?,has_makefilepl=?,has_buildpl=? WHERE id=?");
-        my $sth_ins_dist = $dbh->prepare("INSERT OR REPLACE INTO dist (name,cpanid,abstract,file_id,version,version_numified) VALUES (?,?,?,?,?,?)");
-        my $sth_upd_dist = $dbh->prepare("UPDATE dist SET cpanid=?,abstract=?,file_id=?,version=?,version_numified=? WHERE id=?");
-        my $sth_ins_dep = $dbh->prepare("INSERT OR REPLACE INTO dep (file_id,dist_id,module_id,module_name,phase,rel, version,version_numified) VALUES (?,?,?,?,?,?, ?,?)");
+        my $sth_set_meta_status = $dbh->prepare("UPDATE file SET meta_status=?,meta_error=?, rec_mtime=? WHERE id=?");
+        my $sth_set_meta_info = $dbh->prepare("UPDATE file SET has_metajson=?,has_metayml=?,has_makefilepl=?,has_buildpl=?, rec_mtime=? WHERE id=?");
+        my $sth_ins_dist = $dbh->prepare("INSERT OR REPLACE INTO dist (name,cpanid,abstract,file_id,version,version_numified, rec_ctime,rec_mtime) VALUES (?,?,?,?,?,?, ?,?)");
+        my $sth_upd_dist = $dbh->prepare("UPDATE dist SET cpanid=?,abstract=?,file_id=?,version=?,version_numified=?, rec_mtime=? WHERE id=?");
+        my $sth_ins_dep = $dbh->prepare("INSERT OR REPLACE INTO dep (file_id,dist_id,module_id,module_name,phase,rel, version,version_numified, rec_ctime,rec_mtime) VALUES (?,?,?,?,?,?, ?,?, ?,?)");
 
         my $sth_sel_mod  = $dbh->prepare("SELECT * FROM module WHERE name=?");
         my $sth_sel_script  = $dbh->prepare("SELECT * FROM script WHERE name=? AND file_id=?");
 
         # for pass 2
-        my $sth_set_pod_status = $dbh->prepare("UPDATE file SET pod_status=? WHERE id=?");
+        my $sth_set_pod_status = $dbh->prepare("UPDATE file SET pod_status=?, rec_mtime=? WHERE id=?");
         my $sth_sel_content = $dbh->prepare("SELECT * FROM content WHERE file_id=?");
-        my $sth_set_module_abstract = $dbh->prepare("UPDATE module SET abstract=? WHERE id=?");
-        my $sth_set_script_abstract = $dbh->prepare("UPDATE script SET abstract=? WHERE id=?");
-        my $sth_ins_mention = $dbh->prepare("INSERT OR IGNORE INTO mention (source_content_id,source_file_id,module_id,module_name,script_name) VALUES (?,?,?,?,?)");
-        my $sth_set_content_package = $dbh->prepare("UPDATE content SET package=? WHERE id=?");
+        my $sth_set_module_abstract = $dbh->prepare("UPDATE module SET abstract=?, rec_mtime=? WHERE id=?");
+        my $sth_set_script_abstract = $dbh->prepare("UPDATE script SET abstract=?, rec_mtime=? WHERE id=?");
+        my $sth_ins_mention = $dbh->prepare("INSERT OR IGNORE INTO mention (source_content_id,source_file_id,module_id,module_name,script_name, rec_ctime,rec_mtime) VALUES (?,?,?,?,?, ?,?)");
+        my $sth_set_content_package = $dbh->prepare("UPDATE content SET package=?, rec_mtime=? WHERE id=?");
 
         # for pass 3
         my $sth_sel_content__has_package = $dbh->prepare("SELECT * FROM content WHERE file_id=? AND package IS NOT NULL");
-        my $sth_ins_sub = $dbh->prepare("INSERT OR IGNORE INTO sub (name, linum, file_id, content_id) VALUES (?,?,?,?)");
-        my $sth_set_sub_status = $dbh->prepare("UPDATE file SET sub_status=? WHERE id=?");
+        my $sth_ins_sub = $dbh->prepare("INSERT OR IGNORE INTO sub (name, linum, file_id, content_id, rec_ctime,rec_mtime) VALUES (?,?,?,?, ?,?)");
+        my $sth_set_sub_status = $dbh->prepare("UPDATE file SET sub_status=?, rec_mtime=? WHERE id=?");
 
         my $module_ids; # hash, key=module name, value=module id
         my $module_file_ids; # hash, key=module name, value=file id
@@ -1784,14 +2045,14 @@ sub _update_index {
             if (!$file->{file_status}) {
                 unless (-f $path) {
                     log_error("File %s doesn't exist, skipped", $path);
-                    $sth_set_file_status->execute("nofile", undef, $file->{id});
-                    $sth_set_meta_status->execute("nometa", undef, $file->{id});
+                    $sth_set_file_status->execute("nofile", undef, $file->{id}, time());
+                    $sth_set_meta_status->execute("nometa", undef, $file->{id}, time());
                     next FILE;
                 }
                 if ($path !~ /(.+)\.(tar|tar\.gz|tar\.bz2|tar\.Z|tgz|tbz2?|zip)$/i) {
                     log_error("Doesn't support file type: %s, skipped", $file->{name});
-                    $sth_set_file_status->execute("unsupported", undef, $file->{id});
-                    $sth_set_meta_status->execute("nometa", undef, $file->{id});
+                    $sth_set_file_status->execute("unsupported", undef, $file->{id}, time());
+                    $sth_set_meta_status->execute("nometa", undef, $file->{id}, time());
                     next FILE;
                 }
             }
@@ -1800,8 +2061,8 @@ sub _update_index {
 
             my $la_res = _list_archive_members($path, $file->{name}, $file->{id});
             unless ($la_res->[0] == 200) {
-                $sth_set_file_status->execute("err", $la_res->[1], $la_res->[3]{'func.file_id'});
-                $sth_set_meta_status->execute("err", "file err", $la_res->[3]{'func.file_id'});
+                $sth_set_file_status->execute("err", $la_res->[1], $la_res->[3]{'func.file_id'}, time());
+                $sth_set_meta_status->execute("err", "file err", $la_res->[3]{'func.file_id'}, time());
                 next FILE;
             }
             my @members = @{ $la_res->[2] };
@@ -1858,12 +2119,17 @@ sub _update_index {
                     for my $member (@members) {
                         # skip directory/symlinks
                         next if $member->{isSymbolicLink} || $member->{fileName} =~ m!/\z!;
-                        $sth_ins_content->execute($file->{id}, $member->{fileName}, $member->{lastModFileDateTime}, $member->{uncompressedSize});
+                        my $now = time();
+                        $sth_ins_content->execute(
+                            $file->{id}, $member->{fileName}, $member->{lastModFileDateTime}, $member->{uncompressedSize},
+                            $now,$now);
                         my $content_id = $dbh->last_insert_id("","","","");
                         my ($script_name) = $code_is_script->($member->{fileName});
                         if (defined $script_name) {
                             unless ($script_names{$script_name}++) {
-                                $sth_ins_script->execute($script_name, $file->{cpanid}, $content_id, $file->{id});
+                                my $now = time();
+                                $sth_ins_script->execute($script_name, $file->{cpanid}, $content_id, $file->{id},
+                                                         $now,$now);
                             }
                         }
                     }
@@ -1873,17 +2139,22 @@ sub _update_index {
                         next if $member->{full_path} =~ m!/\z!;
                         next if !$member->{size};
                         next if $mem{$member->{full_path}}++;
-                        $sth_ins_content->execute($file->{id}, $member->{full_path}, $member->{mtime}, $member->{size});
+                        my $now = time();
+                        $sth_ins_content->execute(
+                            $file->{id}, $member->{full_path}, $member->{mtime}, $member->{size},
+                            $now,$now);
                         my $content_id = $dbh->last_insert_id("","","","");
                         my ($script_name) = $code_is_script->($member->{full_path});
                         if (defined $script_name) {
                             unless ($script_names{$script_name}++) {
-                                $sth_ins_script->execute($script_name, $file->{cpanid}, $content_id, $file->{id});
+                                my $now = time();
+                                $sth_ins_script->execute($script_name, $file->{cpanid}, $content_id, $file->{id},
+                                                     $now,$now);
                             }
                         }
                     }
                 }
-                $sth_set_file_status->execute("ok", undef, $file->{id});
+                $sth_set_file_status->execute("ok", undef, $file->{id}, time());
                 $file->{file_status} = 'ok';
             }
 
@@ -1912,8 +2183,8 @@ sub _update_index {
                 } else {
                     log_warn("  error in meta: %s", $gm_res->[1]);
                 }
-                $sth_set_meta_status->execute($meta ? "ok" : "nometa", undef, $file->{id});
-                $sth_set_meta_info->execute($has_metajson, $has_metayml, $has_makefilepl, $has_buildpl, $file->{id});
+                $sth_set_meta_status->execute($meta ? "ok" : "nometa", undef, $file->{id}, time());
+                $sth_set_meta_info->execute($has_metajson, $has_metayml, $has_makefilepl, $has_buildpl, $file->{id}, time());
             }
 
           GET_DEPS:
@@ -1929,9 +2200,10 @@ sub _update_index {
                 # insert dist record
                 my $dist_id;
                 if (($dist_id) = $dbh->selectrow_array("SELECT id FROM dist WHERE name=?", {}, $dist_name)) {
-                    $sth_upd_dist->execute(            $file->{cpanid}, $dist_abstract, $file->{id}, $dist_version, _numify_ver($dist_version), $dist_id);
+                    $sth_upd_dist->execute(            $file->{cpanid}, $dist_abstract, $file->{id}, $dist_version, _numify_ver($dist_version), $dist_id, time());
                 } else {
-                    $sth_ins_dist->execute($dist_name, $file->{cpanid}, $dist_abstract, $file->{id}, $dist_version, _numify_ver($dist_version));
+                    my $now = time();
+                    $sth_ins_dist->execute($dist_name, $file->{cpanid}, $dist_abstract, $file->{id}, $dist_version, _numify_ver($dist_version), $now,$now);
                     $dist_id = $dbh->last_insert_id("","","","");
                 }
 
@@ -2003,7 +2275,7 @@ sub _update_index {
                     );
                 } # for each content
 
-                $sth_set_pod_status->execute("ok", $file->{id});
+                $sth_set_pod_status->execute("ok", $file->{id}, time());
             } # PARSE_POD
 
           PARSE_SUB:
@@ -2012,16 +2284,19 @@ sub _update_index {
 
                 if (my $reason = $builtin_file_skip_list_sub{ $file->{name} }) {
                     log_info("Skipped indexing subs for file %s (reason: built-in file skip list for sub: %s)", $file->{name}, $reason);
+                    $sth_set_sub_status->execute("skipped", time(), $file->{id});
                     last;
                 }
 
                 if ($args{skip_sub_indexing_files} && first {$_ eq $file->{name}} @{ $args{skip_sub_indexing_files} }) {
                     log_info("Skipped indexing subs for file %s (reason: skip_sub_indexing_files)", $file->{name});
+                    $sth_set_sub_status->execute("skipped", time(), $file->{id});
                     last;
                 }
 
                 if ($args{skip_sub_indexing_file_patterns} && first {$file->{name} =~ $_} @{ $args{skip_sub_indexing_file_patterns} }) {
                     log_info("Skipped indexing subs for file %s (reason: skip_sub_indexing_file_patterns)", $file->{name});
+                    $sth_set_sub_status->execute("skipped", time(), $file->{id});
                     last;
                 }
 
@@ -2050,7 +2325,7 @@ sub _update_index {
                     );
                 } # for each content
 
-                $sth_set_sub_status->execute("ok", $file->{id});
+                $sth_set_sub_status->execute("ok", time(), $file->{id});
             } # PARSE_SUB
 
         } # for each file
@@ -2077,7 +2352,7 @@ sub _update_index {
         }
 
         my $sth_sel_mod = $dbh->prepare("SELECT * FROM module WHERE file_id=? ORDER BY name LIMIT 1");
-        my $sth_ins_dist = $dbh->prepare("INSERT INTO dist (name,cpanid,file_id,version,version_numified) VALUES (?,?,?,?,?)");
+        my $sth_ins_dist = $dbh->prepare("INSERT INTO dist (name,cpanid,file_id,version,version_numified, rec_ctime,rec_mtime) VALUES (?,?,?,?,?, ?,?)");
 
         $dbh->begin_work;
       FILE:
@@ -2087,7 +2362,8 @@ sub _update_index {
             my $dist_name = $row->{name};
             $dist_name =~ s/::/-/g;
             log_trace("Setting dist name for %s as %s", $row->{name}, $dist_name);
-            $sth_ins_dist->execute($dist_name, $file->{cpanid}, $file->{id}, $row->{version}, _numify_ver($row->{version}));
+            my $now = time();
+            $sth_ins_dist->execute($dist_name, $file->{cpanid}, $file->{id}, $row->{version}, _numify_ver($row->{version}), $now,$now);
         }
         $dbh->commit;
     }
@@ -2105,13 +2381,29 @@ sub _update_index {
                      " WHERE name IN (".join(", ", map {$dbh->quote($_)} sort keys %dists).")");
     }
 
-    $dbh->do("INSERT OR REPLACE INTO meta (name,value) VALUES (?,?)",
-             {}, 'last_index_time', time());
-    {
-        # record the module version that does the indexing
-        no strict 'refs';
+  UPDATE_TIMESTAMPS: {
+        my $now = time();
+
+        _dblog($dbh, 40, "update_index", "Finish updating index");
+
+        my ($index_creation_time_exists) = $dbh->selectrow_array(
+            "SELECT 1 FROM META WHERE name='index_creation_time'");
+        my ($last_index_time) = $dbh->selectrow_array(
+            "SELECT value FROM META WHERE name='last_index_time'");
+        unless ($index_creation_time_exists) {
+            $dbh->do("INSERT INTO meta (name,value) VALUES (?,?)",
+                     {}, 'index_creation_time',
+                     $last_index_time ? undef : $now);
+        }
         $dbh->do("INSERT OR REPLACE INTO meta (name,value) VALUES (?,?)",
-                 {}, 'indexer_version', ${__PACKAGE__.'::VERSION'});
+                 {}, 'last_index_time', $now);
+
+        # record the module version that does the indexing
+        {
+            no strict 'refs';
+            $dbh->do("INSERT OR REPLACE INTO meta (name,value) VALUES (?,?)",
+                     {}, 'indexer_version', ${__PACKAGE__.'::VERSION'});
+        }
     }
 
     [200];
@@ -2282,11 +2574,24 @@ sub _reset {
     $dbh->do("DELETE FROM content")   if _table_exists($dbh, "main", "content");
     $dbh->do("DELETE FROM file");
     $dbh->do("DELETE FROM author");
+    $dbh->do("DELETE FROM log")       if _table_exists($dbh, "main", "log");
+
+    $dbh->do("DELETE FROM meta WHERE name='index_creation_time'");
 }
 
 $SPEC{'reset'} = {
     v => 1.1,
     summary => 'Reset (empty) the database index',
+    description => <<'_',
+
+All data tables will be emptied. This includes all records in the `log` table as
+well as `index_creation_time` record in the `meta` table, so there is no records
+of previous indexing activity. There is also no record of resetting in the
+`log`.
+
+Tables are not dropped and re-created. The `meta` table is not emptied.
+
+_
     args => {
         %common_args,
     },
@@ -2351,6 +2656,11 @@ FROM file");
     ($stat->{num_subs}) = $dbh->selectrow_array("SELECT COUNT(*) FROM sub");
 
     {
+        my ($time) = $dbh->selectrow_array("SELECT value FROM meta WHERE name='index_creation_time'");
+        $stat->{raw_index_creation_time} = $time;
+        $stat->{index_creation_time} = _fmt_time($time);
+    }
+    {
         my ($time) = $dbh->selectrow_array("SELECT value FROM meta WHERE name='last_index_time'");
         $stat->{raw_last_index_time} = $time;
         $stat->{last_index_time} = _fmt_time($time);
@@ -2366,6 +2676,30 @@ FROM file");
     }
 
     [200, "OK", $stat];
+}
+
+$SPEC{'log'} = {
+    v => 1.1,
+    summary => 'Show database index log',
+    args => {
+        %common_args,
+    },
+};
+sub log {
+    my %args = @_;
+
+    my $state = _init(\%args, 'ro');
+    my $dbh = $state->{dbh};
+
+    my $sth = $dbh->prepare("SELECT * FROM log ORDER BY date");
+    $sth->execute;
+    my @rows;
+    while (my $row = $sth->fetchrow_hashref) { push @rows, $row }
+
+    [200, "OK", \@rows, {
+        'table.fields'        => ['id', 'date', 'pid', 'lcpan_version', 'level', 'category', 'summary'],
+        'table.field_formats' => [undef, 'iso8601_datetime', undef, undef, undef, undef, undef],
+    }];
 }
 
 sub _complete_mod {
@@ -2906,6 +3240,8 @@ $SPEC{authors} = {
                 },
             },
         },
+        %fctime_args,
+        %fmtime_args,
     },
     result => {
         description => <<'_',
@@ -2977,6 +3313,13 @@ sub authors {
             push @where, @q_where;
         }
     }
+
+    _set_added_updated_times(\%args, $dbh);
+    if (defined $args{added_before}  ) { push @where, "author.rec_ctime < ". (0+$args{added_before}) }
+    if (defined $args{added_after}   ) { push @where, "author.rec_ctime > ". (0+$args{added_after}) }
+    if (defined $args{updated_before}) { push @where, "author.rec_mtime < ". (0+$args{updated_before}) }
+    if (defined $args{updated_after} ) { push @where, "author.rec_mtime > ". (0+$args{updated_after}) }
+
     my $sql = "SELECT
   cpanid id,
   fullname name,
@@ -3045,6 +3388,8 @@ $SPEC{modules} = {
         %finclude_core_args,
         %finclude_noncore_args,
         %perl_version_args,
+        %fctime_args,
+        %fmtime_args,
         namespaces => {
             'x.name.is_plural' => 1,
             summary => 'Select modules belonging to certain namespace(s)',
@@ -3143,6 +3488,12 @@ sub modules {
         push @where, "NOT dist.is_latest";
     }
 
+    _set_added_updated_times(\%args, $dbh);
+    if (defined $args{added_before}  ) { push @where, "module.rec_ctime < ". (0+$args{added_before}) }
+    if (defined $args{added_after}   ) { push @where, "module.rec_ctime > ". (0+$args{added_after}) }
+    if (defined $args{updated_before}) { push @where, "module.rec_mtime < ". (0+$args{updated_before}) }
+    if (defined $args{updated_after} ) { push @where, "module.rec_mtime > ". (0+$args{updated_after}) }
+
     my @order;
     for (@$sort) { /\A(-?)(\w+)/ and push @order, $2 . ($1 ? " DESC" : "") }
 
@@ -3225,6 +3576,8 @@ $SPEC{dists} = {
         },
         %fauthor_args,
         %flatest_args,
+        %fctime_args,
+        %fmtime_args,
         has_makefilepl => {
             schema => 'bool',
             tags => ['category:filtering'],
@@ -3248,7 +3601,7 @@ $SPEC{dists} = {
             tags => ['category:filtering'],
         },
         rel_mtime_newer_than => {
-            schema => 'date*',
+            schema => ['date*', 'x.perl.coerce_rules' => ['From_str::natural']],
             tags => ['category:filtering'],
         },
         %sort_args_for_dists,
@@ -3397,6 +3750,12 @@ sub dists {
         push @bind, $args{rel_mtime_newer_than};
     }
 
+    _set_added_updated_times(\%args, $dbh);
+    if (defined $args{added_before}  ) { push @where, "d.rec_ctime < ". (0+$args{added_before}) }
+    if (defined $args{added_after}   ) { push @where, "d.rec_ctime > ". (0+$args{added_after}) }
+    if (defined $args{updated_before}) { push @where, "d.rec_mtime < ". (0+$args{updated_before}) }
+    if (defined $args{updated_after} ) { push @where, "d.rec_mtime > ". (0+$args{updated_after}) }
+
     my @order;
     for (@$sort) { /\A(-?)(\w+)/ and push @order, $2 . ($1 ? " DESC" : "") }
 
@@ -3470,6 +3829,8 @@ $SPEC{'releases'} = {
         has_makefilepl => {schema=>'bool'},
         has_buildpl    => {schema=>'bool'},
         %flatest_args,
+        %fctime_args,
+        %fmtime_args,
         %full_path_args,
         %no_path_args,
         %sort_args_for_rels,
@@ -3543,6 +3904,12 @@ sub releases {
     } elsif (defined $args{latest}) {
         push @where, "NOT(d.is_latest)";
     }
+
+    _set_added_updated_times(\%args, $dbh);
+    if (defined $args{added_before}  ) { push @where, "f1.rec_ctime < ". (0+$args{added_before}) }
+    if (defined $args{added_after}   ) { push @where, "f1.rec_ctime > ". (0+$args{added_after}) }
+    if (defined $args{updated_before}) { push @where, "f1.rec_mtime < ". (0+$args{updated_before}) }
+    if (defined $args{updated_after} ) { push @where, "f1.rec_mtime > ". (0+$args{updated_after}) }
 
     my @order;
     for (@$sort) { /\A(-?)(\w+)/ and push @order, $2 . ($1 ? " DESC" : "") }
@@ -3625,19 +3992,24 @@ sub _get_prereqs {
     }
     return [200, "OK", []] unless @dist_names;
 
-    my @wheres = ("dp.dist_id IN (SELECT id FROM dist WHERE name IN (".join(",",map {$dbh->quote($_)} grep {defined} @dist_names)."))");
-    my @binds = ();
+    my @where = ("dp.dist_id IN (SELECT id FROM dist WHERE name IN (".join(",",map {$dbh->quote($_)} grep {defined} @dist_names)."))");
+    my @bind  = ();
 
     if ($filters->{authors}) {
-        push @wheres, '('.join(' OR ', ('author=?') x @{$filters->{authors}}).')';
-        push @binds, @{$filters->{authors}};
+        push @where, '('.join(' OR ', ('author=?') x @{$filters->{authors}}).')';
+        push @bind , @{$filters->{authors}};
     }
     if ($filters->{authors_arent}) {
         for (@{ $filters->{authors_arent} }) {
-            push @wheres, 'author <> ?';
-            push @binds, $_;
+            push @where, 'author <> ?';
+            push @bind , $_;
         }
     }
+
+    if (defined $filters->{added_before}  ) { push @where, "dp.rec_ctime < ". (0+$filters->{added_before}) }
+    if (defined $filters->{added_after}   ) { push @where, "dp.rec_ctime > ". (0+$filters->{added_after}) }
+    if (defined $filters->{updated_before}) { push @where, "dp.rec_mtime < ". (0+$filters->{updated_before}) }
+    if (defined $filters->{updated_after} ) { push @where, "dp.rec_mtime > ". (0+$filters->{updated_after}) }
 
     # fetch the dependency information
     my $sth = $dbh->prepare("SELECT
@@ -3652,9 +4024,9 @@ sub _get_prereqs {
   rel,
   version
 FROM dep dp
-WHERE ".join(" AND ", @wheres)."
+WHERE ".join(" AND ", @where)."
 ORDER BY module".($level > 1 ? " DESC" : ""));
-    $sth->execute(@binds);
+    $sth->execute(@bind);
     my @res;
   MOD:
     while (my $row = $sth->fetchrow_hashref) {
@@ -3760,21 +4132,26 @@ sub _get_revdeps {
     }
     return [200, "OK", []] unless @mod_names;
 
-    my @wheres = ('module IN ('.join(",", map {$dbh->quote($_)} @mod_names).')');
-    my @binds  = ();
+    my @where = ('module IN ('.join(",", map {$dbh->quote($_)} @mod_names).')');
+    my @bind  = ();
 
-    push @wheres, "dist IS NOT NULL";
+    push @where, "dist IS NOT NULL";
 
     if ($filters->{authors}) {
-        push @wheres, '('.join(' OR ', ('author=?') x @{$filters->{authors}}).')';
-        push @binds, @{$filters->{authors}};
+        push @where, '('.join(' OR ', ('author=?') x @{$filters->{authors}}).')';
+        push @bind , @{$filters->{authors}};
     }
     if ($filters->{authors_arent}) {
         for (@{ $filters->{authors_arent} }) {
-            push @wheres, 'author <> ?';
-            push @binds, $_;
+            push @where, 'author <> ?';
+            push @bind , $_;
         }
     }
+
+    if (defined $filters->{added_before}  ) { push @where, "dp.rec_ctime < ". (0+$filters->{added_before}) }
+    if (defined $filters->{added_after}   ) { push @where, "dp.rec_ctime > ". (0+$filters->{added_after}) }
+    if (defined $filters->{updated_before}) { push @where, "dp.rec_mtime < ". (0+$filters->{updated_before}) }
+    if (defined $filters->{updated_after} ) { push @where, "dp.rec_mtime > ". (0+$filters->{updated_after}) }
 
     # get all dists that depend on that module
     my $sth = $dbh->prepare("SELECT
@@ -3790,9 +4167,9 @@ sub _get_revdeps {
   rel,
   version req_version
 FROM dep dp
-WHERE ".join(" AND ", @wheres)."
+WHERE ".join(" AND ", @where)."
 ORDER BY dist".($level > 1 ? " DESC" : ""));
-    $sth->execute(@binds);
+    $sth->execute(@bind);
     my @res;
     while (my $row = $sth->fetchrow_hashref) {
         next unless $phase eq 'ALL' || $row->{phase} eq $phase;
@@ -3957,6 +4334,8 @@ _
     },
     %finclude_indexed_args,
     %finclude_unindexed_args,
+    %fctime_args,
+    %fmtime_args,
 );
 
 our $deps_args_rels = {
@@ -4006,6 +4385,7 @@ sub deps {
     my $include_indexed = $args{include_indexed} // 1;
     my $include_unindexed = $args{include_unindexed} // 1;
 
+    _set_added_updated_times(\%args, $dbh);
     my $filters = {
         include_core => $include_core,
         include_noncore => $include_noncore,
@@ -4013,6 +4393,10 @@ sub deps {
         include_unindexed => $include_unindexed,
         authors => $args{authors},
         authors_arent => $args{authors_arent},
+        added_before => $args{added_before},
+        added_after  => $args{added_after},
+        updated_before => $args{updated_before},
+        updated_after  => $args{updated_after},
     };
 
     my $res = _get_prereqs($mods, $dbh, {}, {},
@@ -4087,6 +4471,8 @@ _
         completion => \&_complete_cpanid,
         tags => ['category:filtering'],
     },
+    %fctime_args,
+    %fmtime_args,
 );
 
 our $rdeps_args_rels = {
@@ -4112,9 +4498,14 @@ sub rdeps {
     my $authors =  $args{authors} ? [map {uc} @{$args{authors}}] : undef;
     my $authors_arent = $args{authors_arent} ? [map {uc} @{$args{authors_arent}}] : undef;
 
+    _set_added_updated_times(\%args, $dbh);
     my $filters = {
         authors => $authors,
         authors_arent => $authors_arent,
+        added_before => $args{added_before},
+        added_after  => $args{added_after},
+        updated_before => $args{updated_before},
+        updated_after  => $args{updated_after},
     };
 
     my $res = _get_revdeps($mods, $dbh, {}, {}, 1, $level, $filters, $args{flatten}, $args{dont_uniquify}, $args{phase}, $args{rel});
@@ -4177,6 +4568,8 @@ $SPEC{namespaces} = {
             default => 'name',
             tags => ['category:sorting'],
         },
+        %fctime_args,
+        %fmtime_args,
     },
 };
 sub namespaces {
@@ -4223,6 +4616,13 @@ sub namespaces {
         push @where, "(num_sep = ?)";
         push @bind, $args{level}-1;
     }
+
+    _set_added_updated_times(\%args, $dbh);
+    if (defined $args{added_before}  ) { push @where, "namespace.rec_ctime < ". (0+$args{added_before}) }
+    if (defined $args{added_after}   ) { push @where, "namespace.rec_ctime > ". (0+$args{added_after}) }
+    if (defined $args{updated_before}) { push @where, "namespace.rec_mtime < ". (0+$args{updated_before}) }
+    if (defined $args{updated_after} ) { push @where, "namespace.rec_mtime > ". (0+$args{updated_after}) }
+
     my $order = 'name';
     if ($args{sort} eq 'num_modules') {
         $order = "num_modules";
@@ -4263,7 +4663,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.051 of App::lcpan (from Perl distribution App-lcpan), released on 2020-04-20.
+This document describes version 1.056 of App::lcpan (from Perl distribution App-lcpan), released on 2020-05-06.
 
 =head1 SYNOPSIS
 
@@ -4300,6 +4700,22 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<added_after> => I<date>
+
+Include only records that are added after a certain date.
+
+=item * B<added_before> => I<date>
+
+Include only records that are added before a certain date.
+
+=item * B<added_in_last_n_updates> => I<posint>
+
+Include only records that are added during the last N index updates.
+
+=item * B<added_in_last_update> => I<true>
+
+Include only records that are added during the last index update.
+
 =item * B<cpan> => I<dirname>
 
 Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
@@ -4326,6 +4742,22 @@ When there are more than one query, perform OR instead of AND logic.
 Search query.
 
 =item * B<query_type> => I<str> (default: "any")
+
+=item * B<updated_after> => I<date>
+
+Include only records that are updated after a certain date.
+
+=item * B<updated_before> => I<date>
+
+Include only records that are updated before a certain date.
+
+=item * B<updated_in_last_n_updates> => I<posint>
+
+Include only records that are updated during the last N index updates.
+
+=item * B<updated_in_last_update> => I<true>
+
+Include only records that are updated during the last index update.
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 
@@ -4379,6 +4811,22 @@ This function is not exported by default, but exportable.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<added_after> => I<date>
+
+Include only records that are added after a certain date.
+
+=item * B<added_before> => I<date>
+
+Include only records that are added before a certain date.
+
+=item * B<added_in_last_n_updates> => I<posint>
+
+Include only records that are added during the last N index updates.
+
+=item * B<added_in_last_update> => I<true>
+
+Include only records that are added during the last index update.
 
 =item * B<cpan> => I<dirname>
 
@@ -4463,6 +4911,22 @@ Set base Perl version for determining core modules.
 
 =item * B<rel> => I<str> (default: "requires")
 
+=item * B<updated_after> => I<date>
+
+Include only records that are updated after a certain date.
+
+=item * B<updated_before> => I<date>
+
+Include only records that are updated before a certain date.
+
+=item * B<updated_in_last_n_updates> => I<posint>
+
+Include only records that are updated during the last N index updates.
+
+=item * B<updated_in_last_update> => I<true>
+
+Include only records that are updated during the last index update.
+
 =item * B<use_bootstrap> => I<bool> (default: 1)
 
 Whether to use bootstrap database from App-lcpan-Bootstrap.
@@ -4522,6 +4986,22 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<added_after> => I<date>
+
+Include only records that are added after a certain date.
+
+=item * B<added_before> => I<date>
+
+Include only records that are added before a certain date.
+
+=item * B<added_in_last_n_updates> => I<posint>
+
+Include only records that are added during the last N index updates.
+
+=item * B<added_in_last_update> => I<true>
+
+Include only records that are added during the last index update.
+
 =item * B<author> => I<str>
 
 Filter by author.
@@ -4571,6 +5051,22 @@ Search query.
 
 Sort the result.
 
+=item * B<updated_after> => I<date>
+
+Include only records that are updated after a certain date.
+
+=item * B<updated_before> => I<date>
+
+Include only records that are updated before a certain date.
+
+=item * B<updated_in_last_n_updates> => I<posint>
+
+Include only records that are updated during the last N index updates.
+
+=item * B<updated_in_last_update> => I<true>
+
+Include only records that are updated during the last index update.
+
 =item * B<use_bootstrap> => I<bool> (default: 1)
 
 Whether to use bootstrap database from App-lcpan-Bootstrap.
@@ -4598,6 +5094,58 @@ true, will return array of records.
 
 
 
+=head2 log
+
+Usage:
+
+ log(%args) -> [status, msg, payload, meta]
+
+Show database index log.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<cpan> => I<dirname>
+
+Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
+
+Defaults to C<~/cpan>.
+
+=item * B<index_name> => I<filename> (default: "index.db")
+
+Filename of index.
+
+If C<index_name> is a filename without any path, e.g. C<index.db> then index will
+be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
+C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
+using the C<index_name>.
+
+=item * B<use_bootstrap> => I<bool> (default: 1)
+
+Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+If you are indexing your private CPAN-like repository, you want to turn this
+off.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
 =head2 modules
 
 Usage:
@@ -4611,6 +5159,22 @@ This function is not exported by default, but exportable.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<added_after> => I<date>
+
+Include only records that are added after a certain date.
+
+=item * B<added_before> => I<date>
+
+Include only records that are added before a certain date.
+
+=item * B<added_in_last_n_updates> => I<posint>
+
+Include only records that are added during the last N index updates.
+
+=item * B<added_in_last_update> => I<true>
+
+Include only records that are added during the last index update.
 
 =item * B<author> => I<str>
 
@@ -4668,6 +5232,22 @@ Search query.
 =item * B<sort> => I<array[str]> (default: ["module"])
 
 Sort the result.
+
+=item * B<updated_after> => I<date>
+
+Include only records that are updated after a certain date.
+
+=item * B<updated_before> => I<date>
+
+Include only records that are updated before a certain date.
+
+=item * B<updated_in_last_n_updates> => I<posint>
+
+Include only records that are updated during the last N index updates.
+
+=item * B<updated_in_last_update> => I<true>
+
+Include only records that are updated during the last index update.
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 
@@ -4710,6 +5290,22 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<added_after> => I<date>
+
+Include only records that are added after a certain date.
+
+=item * B<added_before> => I<date>
+
+Include only records that are added before a certain date.
+
+=item * B<added_in_last_n_updates> => I<posint>
+
+Include only records that are added during the last N index updates.
+
+=item * B<added_in_last_update> => I<true>
+
+Include only records that are added during the last index update.
+
 =item * B<cpan> => I<dirname>
 
 Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
@@ -4744,6 +5340,22 @@ Search query.
 =item * B<sort> => I<str> (default: "name")
 
 =item * B<to_level> => I<int>
+
+=item * B<updated_after> => I<date>
+
+Include only records that are updated after a certain date.
+
+=item * B<updated_before> => I<date>
+
+Include only records that are updated before a certain date.
+
+=item * B<updated_in_last_n_updates> => I<posint>
+
+Include only records that are updated during the last N index updates.
+
+=item * B<updated_in_last_update> => I<true>
+
+Include only records that are updated during the last index update.
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 
@@ -4781,6 +5393,22 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<added_after> => I<date>
+
+Include only records that are added after a certain date.
+
+=item * B<added_before> => I<date>
+
+Include only records that are added before a certain date.
+
+=item * B<added_in_last_n_updates> => I<posint>
+
+Include only records that are added during the last N index updates.
+
+=item * B<added_in_last_update> => I<true>
+
+Include only records that are added during the last index update.
 
 =item * B<author> => I<str>
 
@@ -4839,6 +5467,22 @@ Search query.
 
 Sort the result.
 
+=item * B<updated_after> => I<date>
+
+Include only records that are updated after a certain date.
+
+=item * B<updated_before> => I<date>
+
+Include only records that are updated before a certain date.
+
+=item * B<updated_in_last_n_updates> => I<posint>
+
+Include only records that are updated during the last N index updates.
+
+=item * B<updated_in_last_update> => I<true>
+
+Include only records that are updated during the last index update.
+
 =item * B<use_bootstrap> => I<bool> (default: 1)
 
 Whether to use bootstrap database from App-lcpan-Bootstrap.
@@ -4879,6 +5523,22 @@ This function is not exported by default, but exportable.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<added_after> => I<date>
+
+Include only records that are added after a certain date.
+
+=item * B<added_before> => I<date>
+
+Include only records that are added before a certain date.
+
+=item * B<added_in_last_n_updates> => I<posint>
+
+Include only records that are added during the last N index updates.
+
+=item * B<added_in_last_update> => I<true>
+
+Include only records that are added during the last index update.
 
 =item * B<authors> => I<array[str]>
 
@@ -4929,6 +5589,22 @@ Recurse for a number of levels (-1 means unlimited).
 
 =item * B<rel> => I<str> (default: "ALL")
 
+=item * B<updated_after> => I<date>
+
+Include only records that are updated after a certain date.
+
+=item * B<updated_before> => I<date>
+
+Include only records that are updated before a certain date.
+
+=item * B<updated_in_last_n_updates> => I<posint>
+
+Include only records that are updated during the last N index updates.
+
+=item * B<updated_in_last_update> => I<true>
+
+Include only records that are updated during the last index update.
+
 =item * B<use_bootstrap> => I<bool> (default: 1)
 
 Whether to use bootstrap database from App-lcpan-Bootstrap.
@@ -4972,6 +5648,22 @@ This function is not exported by default, but exportable.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<added_after> => I<date>
+
+Include only records that are added after a certain date.
+
+=item * B<added_before> => I<date>
+
+Include only records that are added before a certain date.
+
+=item * B<added_in_last_n_updates> => I<posint>
+
+Include only records that are added during the last N index updates.
+
+=item * B<added_in_last_update> => I<true>
+
+Include only records that are added during the last index update.
 
 =item * B<author> => I<str>
 
@@ -5020,6 +5712,22 @@ Search query.
 
 =item * B<sort> => I<array[str]> (default: ["name"])
 
+=item * B<updated_after> => I<date>
+
+Include only records that are updated after a certain date.
+
+=item * B<updated_before> => I<date>
+
+Include only records that are updated before a certain date.
+
+=item * B<updated_in_last_n_updates> => I<posint>
+
+Include only records that are updated during the last N index updates.
+
+=item * B<updated_in_last_update> => I<true>
+
+Include only records that are updated during the last index update.
+
 =item * B<use_bootstrap> => I<bool> (default: 1)
 
 Whether to use bootstrap database from App-lcpan-Bootstrap.
@@ -5050,6 +5758,13 @@ Usage:
  reset(%args) -> [status, msg, payload, meta]
 
 Reset (empty) the database index.
+
+All data tables will be emptied. This includes all records in the C<log> table as
+well as C<index_creation_time> record in the C<meta> table, so there is no records
+of previous indexing activity. There is also no record of resetting in the
+C<log>.
+
+Tables are not dropped and re-created. The C<meta> table is not emptied.
 
 This function is not exported.
 

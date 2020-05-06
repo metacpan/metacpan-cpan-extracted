@@ -6,7 +6,7 @@ use Test::More tests => 8;
 use Devel::ebug;
 
 my $ebug = Devel::ebug->new;
-$ebug->program("t/calc.pl");
+$ebug->program("corpus/calc.pl");
 $ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 
@@ -17,7 +17,7 @@ is($ebug->line, 7);
 is($ebug->pad->{'$e'}, 4);
 
 $ebug = Devel::ebug->new;
-$ebug->program("t/calc.pl");
+$ebug->program("corpus/calc.pl");
 $ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 

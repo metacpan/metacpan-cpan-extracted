@@ -41,33 +41,55 @@ ok( $h{'Auth-User'} eq 'dwho', 'Header Auth-User is set to "dwho"' )
 count(1);
 
 # Request an URI protected by custom function -> allowed
-ok( $res = $client->_get( '/test-restricted_uri/dwho/', undef, undef, "lemonldap=$sessionId" ),
-    'Authentified query' );
-ok( $res->[0] == 200, '/test-restricted_uri -> Code is 200' ) or explain( $res, 200 );
+ok(
+    $res = $client->_get(
+        '/test-restricted_uri/dwho/', undef, undef, "lemonldap=$sessionId"
+    ),
+    'Authentified query'
+);
+ok( $res->[0] == 200, '/test-restricted_uri -> Code is 200' )
+  or explain( $res, 200 );
 count(2);
 
 # Request an URI protected by custom function -> denied
-ok( $res = $client->_get( '/test-restricted_uri/dwho', undef, undef, "lemonldap=$sessionId" ),
-    'Denied query' );
-ok( $res->[0] == 403, '/test-restricted_uri -> Code is 403' ) or explain( $res->[0], 403 );
+ok(
+    $res = $client->_get(
+        '/test-restricted_uri/dwho', undef, undef, "lemonldap=$sessionId"
+    ),
+    'Denied query'
+);
+ok( $res->[0] == 403, '/test-restricted_uri -> Code is 403' )
+  or explain( $res->[0], 403 );
 count(2);
 
 # Request an URI protected by custom function -> allowed
-ok( $res = $client->_get( '/test-uri2/dwho/dummy', undef, undef, "lemonldap=$sessionId" ),
-    'Authentified query' );
+ok(
+    $res = $client->_get(
+        '/test-uri2/dwho/dummy', undef, undef, "lemonldap=$sessionId"
+    ),
+    'Authentified query'
+);
 ok( $res->[0] == 200, '/test-uri2 -> Code is 200' ) or explain( $res, 200 );
 count(2);
 
 # Request an URI protected by custom function -> denied
-ok( $res = $client->_get( '/test-uri1/dwho/', undef, undef, "lemonldap=$sessionId" ),
-    'Denied query' );
-ok( $res->[0] == 403, '/test-uri1 -> Code is 403' ) or explain( $res->[0], 403 );
+ok(
+    $res =
+      $client->_get( '/test-uri1/dwho/', undef, undef, "lemonldap=$sessionId" ),
+    'Denied query'
+);
+ok( $res->[0] == 403, '/test-uri1 -> Code is 403' )
+  or explain( $res->[0], 403 );
 count(2);
 
 # Request an URI protected by custom function -> denied
-ok( $res = $client->_get( '/test-uri1/dwh', undef, undef, "lemonldap=$sessionId" ),
-    'Denied query' );
-ok( $res->[0] == 403, '/test-uri1 -> Code is 403' ) or explain( $res->[0], 403 );
+ok(
+    $res =
+      $client->_get( '/test-uri1/dwh', undef, undef, "lemonldap=$sessionId" ),
+    'Denied query'
+);
+ok( $res->[0] == 403, '/test-uri1 -> Code is 403' )
+  or explain( $res->[0], 403 );
 count(2);
 
 # Denied query

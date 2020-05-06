@@ -10,7 +10,7 @@ use base qw(App::Followme::FileData);
 use App::Followme::FIO;
 use App::Followme::Web;
 
-our $VERSION = "1.92";
+our $VERSION = "1.93";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -86,7 +86,7 @@ sub fetch_sections {
 
 =head1 NAME
 
-App::Followme::WebData - Read metadatafrom a web file
+App::Followme::WebData - Read metadata from a web file
 
 =head1 SYNOPSIS
 

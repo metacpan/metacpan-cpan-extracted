@@ -4,9 +4,9 @@
       "Thierry Vignaud <tvignaud@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -27,7 +27,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
@@ -38,12 +38,14 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "X_bucktracker" : "https://github.com/potyl/perl-Gtk3-SimpleList/issues",
-      "homepage" : "https://github.com/potyl/perl-Gtk3-SimpleList",
-      "repository" : {
-         "url" : "https://github.com/potyl/perl-Gtk3-SimpleList"
-      }
+      "X_bucktracker" : "https://github.com/soig/Gtk3-SimpleList/issues",
+      "homepage" : "https://github.com/soig/Gtk3-SimpleList"
    },
-   "version" : "0.18",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.21",
+   "x_repository" : {
+      "type" : "git",
+      "url" : "https://github.com/soig/Gtk3-SimpleList.git",
+      "web" : "https://github.com/soig/Gtk3-SimpleList"
+   },
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

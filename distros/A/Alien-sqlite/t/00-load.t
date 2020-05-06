@@ -16,5 +16,11 @@ diag(
     )
 );
 
+#  something of a canary so we don't pack Mojolicious
+#  when packaging for CPAN
+if (!eval 'require Mojo::DOM58') {
+    diag 'testing without Mojo::DOM58';
+}
+
 done_testing();
 

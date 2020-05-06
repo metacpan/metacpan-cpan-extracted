@@ -63,7 +63,7 @@ use PerlIO::encoding;
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-our $VERSION = 14;
+our $VERSION = 15;
 $|=1;
 
 # output coding for the benefit of Math::OEIS::Grep printing sequence names

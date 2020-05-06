@@ -2,13 +2,14 @@ package FFI::Platypus::Buffer;
 
 use strict;
 use warnings;
+use FFI::Platypus;
 use base qw( Exporter );
 
 our @EXPORT = qw( scalar_to_buffer buffer_to_scalar );
-our @EXPORT_OK = qw ( scalar_to_pointer );
+our @EXPORT_OK = qw ( scalar_to_pointer grow set_used_length );
 
 # ABSTRACT: Convert scalars to C buffers
-our $VERSION = '1.11'; # VERSION
+our $VERSION = '1.25'; # VERSION
 
 
 use constant _incantation =>
@@ -48,7 +49,7 @@ FFI::Platypus::Buffer - Convert scalars to C buffers
 
 =head1 VERSION
 
-version 1.11
+version 1.25
 
 =head1 SYNOPSIS
 
@@ -136,6 +137,99 @@ scalar.
 Because of the way memory management works in Perl, the buffer is copied
 from the buffer into the scalar.  If this pointer was returned from C
 land, then you should only free it if you allocated it.
+
+=head2 grow
+
+ grow $scalar, $size, \%options;
+
+Ensure that the scalar can contain at least C<$size> bytes.  The
+following are recognized:
+
+=over
+
+=item clear => I<boolean>
+
+If true, C<$scalar> is cleared prior to being enlarged.  This
+avoids copying the existing contents to the reallocated memory
+if they are not needed.
+
+  For example, after
+ 
+   $scalar = "my string";
+   grow $scalar, 100, { clear => 0 };
+
+C<$scalar == "my string">, while after
+
+   $scalar = "my string";
+   grow $scalar, 100;
+
+C<length($scalar) == 0>
+
+It defaults to C<true>.
+
+=item set_length => I<boolean>
+
+If true, the length of the I<string> in the C<$scalar> is set to C<$size>.
+(See the discussion in L</set_used_length>.)  This is useful if a
+foreign function writes exactly C<$size> bytes to C<$scalar>, as it avoids
+a subsequent call to C<set_used_length>.  Contrast this
+
+  grow my $scalar, 100;
+  read_exactly_100_bytes_into_scalar( scalar_to_pointer($scalar) );
+  @chars = unpack( 'c*', $scalar );
+
+with this:
+
+  grow my $scalar, 100, { set_length => 0 };
+  read_exactly_100_bytes_into_scalar( scalar_to_pointer($scalar) );
+  set_used_length( $scalar, 100 );
+  @chars = unpack( 'c*', $scalar );
+
+It defaults to C<true>.
+
+=back
+
+Any pointers obtained with C<scalar_to_pointer> or C<scalar_to_buffer>
+are no longer valid after growing the scalar.
+
+Not exported by default, but may be exported on request.
+
+=head2 set_used_length
+
+ set_used_length $scalar, $length;
+
+Update Perl's notion of the length of the string in the scalar. A
+string scalar keeps track of two lengths: the number of available
+bytes and the number of used bytes.  When a string scalar is
+used as a buffer by a foreign function, it is necessary to indicate
+to Perl how many bytes were actually written to it so that Perl's
+string functions (such as C<substr> or C<unpack>) will work correctly.
+
+If C<$length> is larger than what the scalar can hold, it is set to the
+maximum possible size.
+
+In the following example, the foreign routine C<read_doubles>
+may fill the buffer with up to a set number of doubles, returning the
+number actually written.
+
+  my $sizeof_double = $ffi->sizeof( 'double' );
+  my $max_doubles = 100;
+  my $max_length = $max_doubles * $sizeof_double;
+ 
+  my $buffer;                   # length($buffer) == 0
+  grow $buffer, $max_length;    # length($buffer) is still  0
+  my $pointer = scalar_to_pointer($buffer);
+ 
+  my $num_read = read_doubles( $pointer, $max_doubles );
+                                # length($buffer) is still == 0
+ 
+  set_used_length $buffer, $num_read * $sizeof_double;
+                                # length($buffer) is finally != 0
+ 
+  # unpack the native doubles into a Perl array
+  my @doubles = unpack( 'd*', $buffer );  # @doubles == $num_read
+
+Not exported by default, but may be exported on request.
 
 =head1 SEE ALSO
 

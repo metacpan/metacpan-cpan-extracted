@@ -4,11 +4,6 @@
 
 POSIX::1003::Math - POSIX handling time
 
-=head1 INHERITANCE
-
- POSIX::1003::Math
-   is a POSIX::1003::Module
-
 =head1 SYNOPSIS
 
   use POSIX::1003::Math qw/ceil floor sqrt/;
@@ -26,24 +21,6 @@ B<Be warned> that these functions do not have an obligatory scalar
 parameter, but only an optional parameter (defaults to C<$_>). This
 means that they have the lowest (is list) priority.
 
-See L<documentation in the base class|POSIX::1003::Module/"DESCRIPTION">.
- 
-=head1 METHODS
-
-See L<documentation in the base class|POSIX::1003::Module/"METHODS">.
- 
-=over 4
-
-=item POSIX::1003::Math-E<gt>B<exampleValue>(NAME)
-
-See L<POSIX::1003::Module/"METHODS">
-
-=item $obj-E<gt>B<import>()
-
-See L<POSIX::1003::Module/"METHODS">
-
-=back
-
 =head1 FUNCTIONS
 
 =head2 Standard POSIX via this module (via POSIX.xs)
@@ -53,49 +30,49 @@ there is a scalar context (missing from POSIX.pm).
 
 =over 4
 
-=item B<acos>(EXPR)
+=item B<acos>($expr)
 
-=item B<asin>(EXPR)
+=item B<asin>($expr)
 
-=item B<atan>(EXPR)
+=item B<atan>($expr)
 
-=item B<ceil>(EXPR)
+=item B<ceil>($expr)
 
-=item B<cosh>(EXPR)
+=item B<cosh>($expr)
 
-=item B<div>(NUMER, DENOM)
+=item B<div>($numer, $denominator)
 
-Devide NUMER by DENOminator. The result is a list of two: quotient and
+Devide $numer by $denominator. The result is a list of two: quotient and
 remainder.  Implemented in Perl for completeness, currently not with the
 speed of XS.
 
   my ($quotient, $remainder) = div($number, $denom);
 
-=item B<floor>(EXPR)
+=item B<floor>($expr)
 
-=item B<fmod>(EXPR, EXPR)
+=item B<fmod>($expr, $expr)
 
-=item B<frexp>(EXPR)
+=item B<frexp>($expr)
 
-=item B<ldexp>(EXPR)
+=item B<ldexp>($expr)
 
-=item B<log10>(EXPR)
+=item B<log10>($expr)
 
-=item B<modf>(EXPR, EXPR)
+=item B<modf>($expr, $expr)
 
-=item B<pow>(EXPR1, EXPR2)
+=item B<pow>($expr1, $expr2)
 
-Returns C<EXPR1 ** EXPR2>
+Returns C<$expr1 ** $expr2>
 
-=item B<rint>(NUMBER)
+=item B<rint>($number)
 
 Round to the closest integer.  Implemented in Perl for completeness.
 
-=item B<sinh>(EXPR)
+=item B<sinh>($expr)
 
-=item B<tan>(EXPR)
+=item B<tan>($expr)
 
-=item B<tanh>(EXPR)
+=item B<tanh>($expr)
 
 =back
 
@@ -107,23 +84,23 @@ it simply gets ignored.
 
 =over 4
 
-=item B<abs>([EXPR])
+=item B<abs>( [$expr] )
 
-=item B<atan2>(EXPR, EXPR)
+=item B<atan2>($expr, $expr)
 
-=item B<cos>([EXPR])
+=item B<cos>( [$expr] )
 
-=item B<exp>([EXPR])
+=item B<exp>( [$expr] )
 
-=item B<log>([EXPR])
+=item B<log>( [$expr] )
 
-=item B<rand>([EXPR])
+=item B<rand>( [$expr] )
 
-=item B<sin>([EXPR])
+=item B<sin>( [$expr] )
 
-=item B<sqrt>([EXPR])
+=item B<sqrt>( [$expr] )
 
-=item B<srand>([EXPR])
+=item B<srand>( [$expr] )
 
 =back
 
@@ -162,7 +139,7 @@ String to double translation.  Returns the parsed number and the number
 of characters in the unparsed portion of the string.  When called in a
 scalar context C<strtod> returns the parsed number.
 
-=item B<strtol>(STRING, BASE)
+=item B<strtol>(STRING, $base)
 
 String to integer translation.  Returns the parsed number and
 the number of characters in the unparsed portion of the string.
@@ -175,7 +152,7 @@ octal; any other leading characters mean decimal.  Thus, "1234" is
 parsed as a decimal number, "01234" as an octal number, and "0x1234"
 as a hexadecimal number.
 
-=item B<strtoul>(STRING, BASE)
+=item B<strtoul>(STRING, $base)
 
 String to unsigned integer translation, which behaves like C<strtol>.
 
@@ -189,74 +166,25 @@ discovered during installation of this module:
 =for comment
 #TABLE_MATH_START
 
-  CHAR_BIT         8
-  CHAR_MAX         127
-  CHAR_MIN         -128
-  DBL_DIG          15
-  DBL_EPSILON      2.22044604925031e-16
-  DBL_MANT_DIG     53
-  DBL_MAX          1.79769313486232e+308
-  DBL_MAX_10_EXP   308
-  DBL_MAX_EXP      1024
-  DBL_MIN          2.2250738585072e-308
-  DBL_MIN_10_EXP   -307
-  DBL_MIN_EXP      -1021
-  FLT_DIG          6
-  FLT_EPSILON      1.19209289550781e-07
-  FLT_MANT_DIG     24
-  FLT_MAX          3.40282346638529e+38
-  FLT_MAX_10_EXP   38
-  FLT_MAX_EXP      128
-  FLT_MIN          1.17549435082229e-38
-  FLT_MIN_10_EXP   -37
-  FLT_MIN_EXP      -125
-  FLT_RADIX        2
-  FLT_ROUNDS       1
-  HUGE_VAL         inf
-  INT_MAX          2147483647
-  INT_MIN          -2147483648
-  LDBL_DIG         18
-  LDBL_EPSILON     undef
-  LDBL_MANT_DIG    64
-  LDBL_MAX         undef
-  LDBL_MAX_10_EXP  4932
-  LDBL_MAX_EXP     16384
-  LDBL_MIN         undef
-  LDBL_MIN_10_EXP  -4931
-  LDBL_MIN_EXP     -16381
-  LONG_MAX         9223372036854775807
-  LONG_MIN         -9223372036854775808
-  RAND_MAX         2147483647
-  SCHAR_MAX        127
-  SCHAR_MIN        -128
-  SHRT_MAX         32767
-  SHRT_MIN         -32768
-  UCHAR_MAX        255
-  UINT_MAX         4294967295
-  ULONG_MAX        18446744073709551615
-  USHRT_MAX        65535
-
+The constant names for this math module are inserted here during
+installation.
 
 =for comment
 #TABLE_MATH_END
 
-
-
-
-
 =head1 SEE ALSO
 
-This module is part of POSIX-1003 distribution version 0.98,
-built on December 03, 2013. Website: F<http://perl.overmeer.net>.  The code is based on L<POSIX>, which
+This module is part of POSIX-1003 distribution version 1.00,
+built on May 05, 2020. Website: F<http://perl.overmeer.net/CPAN>.  The code is based on L<POSIX>, which
 is released with Perl itself.  See also L<POSIX::Util> for
 additional functionality.
 
 =head1 COPYRIGHTS
 
-Copyrights 2011-2013 on the perl code and the related documentation
+Copyrights 2011-2020 on the perl code and the related documentation
  by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

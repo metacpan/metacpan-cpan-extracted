@@ -77,4 +77,14 @@ subtest 'names' => sub {
     is_deeply \@bind, [1, 'active'];
 };
 
+subtest 'recursive' => sub {
+    my ($sql, @bind) =
+      sql 'SELECT foo FROM bar WHERE :recursive_query*',
+      recursive_query => 'name = :name',
+      name            => 'hello';
+
+    is $sql, 'SELECT foo FROM bar WHERE name = ?';
+    is_deeply \@bind, ['hello'];
+};
+
 done_testing;

@@ -6,13 +6,18 @@ use strict;
 use warnings;
 use routines;
 
-our $VERSION = '2.01'; # VERSION
+our $VERSION = '2.02'; # VERSION
 
 # BUILD
 
 my $sep = qr/'|__|::|\\|\//;
 
 # METHODS
+
+method dist() {
+
+  return $self->label =~ s/_/-/gr;
+}
 
 method file() {
   return $$self if $self->lookslike_a_file;
@@ -119,6 +124,24 @@ This package provides methods for converting "name" strings.
 =head1 METHODS
 
 This package implements the following methods:
+
+=cut
+
+=head2 dist
+
+  dist() : Str
+
+The dist method returns a package distribution representation of the name.
+
+=over 4
+
+=item dist example #1
+
+  # given: synopsis
+
+  my $dist = $name->dist; # FooBar-Baz
+
+=back
 
 =cut
 

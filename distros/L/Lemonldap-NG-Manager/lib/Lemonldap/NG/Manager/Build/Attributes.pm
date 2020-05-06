@@ -6,7 +6,7 @@
 
 package Lemonldap::NG::Manager::Build::Attributes;
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 use strict;
 use Regexp::Common qw/URI/;
 
@@ -25,8 +25,9 @@ sub perlExpr {
         $Lemonldap::NG::Common::Safelib::functions );
     $cpt->reval("BEGIN { 'warnings'->unimport; } $val");
     my $err = join( '',
-        grep { $_ =~ /Undefined subroutine/ ? () : $_ } split( /\n/, $@ ) );
-    return $err ? ( 1, "__badExpression__: $err" ) : (1);
+        grep { $_ =~ /(?:Undefined subroutine|Devel::StackTrace)/ ? () : $_ }
+          split( /\n/, $@ ) );
+    return $err ? ( -1, "__badExpression__: $err" ) : (1);
 }
 
 my $url = $RE{URI}{HTTP}{ -scheme => "https?" };
@@ -54,8 +55,8 @@ sub types {
             msgFail => '__badUrl__',
         },
         PerlModule => {
-            form    => 'text',
-            test    => qr/^[a-zA-Z][a-zA-Z0-9]*(?:::[a-zA-Z][a-zA-Z0-9]*)*$/,
+            form => 'text',
+            test => qr/^(?:[a-zA-Z][a-zA-Z0-9]*)*(?:::[a-zA-Z][a-zA-Z0-9]*)*$/,
             msgFail => '__badPerlPackageName__',
         },
         hostname => {
@@ -115,6 +116,7 @@ sub types {
         },
         select => {
             test => sub {
+                return ( 0, "Value is not a scalar" ) if ref( $_[0] );
                 my $test = grep ( { $_ eq $_[0] }
                     map ( { $_->{k} } @{ $_[2]->{select} } ) );
                 return $test
@@ -357,6 +359,10 @@ sub attributes {
             test          => $url,
             msgFail       => '__badUrl__',
         },
+        portalCustomCss => {
+            type          => 'text',
+            documentation => 'Path to custom CSS file',
+        },
         portalStatus => {
             type          => 'bool',
             default       => 0,
@@ -390,10 +396,10 @@ sub attributes {
             msgFail       => '__badUrl__',
             documentation => 'URL to call on reload',
         },
-        dontCompactConf => {
+        compactConf => {
             type          => 'bool',
             default       => 0,
-            documentation => 'Don t compact configuration',
+            documentation => 'Compact configuration',
         },
         portalMainLogo => {
             type          => 'text',
@@ -408,6 +414,11 @@ sub attributes {
         staticPrefix => {
             type          => 'text',
             documentation => 'Prefix of static files for HTML templates',
+        },
+        groupsBeforeMacros => {
+            type          => 'bool',
+            default       => 0,
+            documentation => 'Compute groups before macros',
         },
         multiValuesSeparator => {
             type          => 'authParamsText',
@@ -457,14 +468,20 @@ sub attributes {
         },
         checkUserDisplayPersistentInfo => {
             default       => 0,
-            type          => 'bool',
-            documentation => 'Display persistent session info',
+            type          => 'boolOrExpr',
+            documentation => 'Display persistent session info rule',
             flags         => 'p',
         },
         checkUserDisplayEmptyValues => {
             default       => 0,
-            type          => 'bool',
-            documentation => 'Display session empty values',
+            type          => 'boolOrExpr',
+            documentation => 'Display session empty values rule',
+            flags         => 'p',
+        },
+        checkUserDisplayEmptyHeaders => {
+            default       => 0,
+            type          => 'boolOrExpr',
+            documentation => 'Display empty headers rule',
             flags         => 'p',
         },
         globalLogoutRule => {
@@ -477,6 +494,11 @@ sub attributes {
             default       => 1,
             type          => 'bool',
             documentation => 'Global logout auto accept time',
+            flags         => 'p',
+        },
+        globalLogoutCustomParam => {
+            type          => 'text',
+            documentation => 'Custom session parameter to display',
             flags         => 'p',
         },
         impersonationMergeSSOgroups => {
@@ -533,6 +555,12 @@ sub attributes {
             type          => 'bool',
             default       => 1,
             documentation => 'Stop context switching by logout',
+            flags         => 'p',
+        },
+        contextSwitchingPrefix => {
+            type          => 'text',
+            default       => 'switching',
+            documentation => 'Prefix to store real session Id',
             flags         => 'p',
         },
         decryptValueRule => {
@@ -772,6 +800,24 @@ sub attributes {
             documentation =>
               'Brute force attack protection -> Max allowed failed login',
         },
+        bruteForceProtectionMaxLockTime => {
+            default       => 900,
+            type          => 'int',
+            documentation => 'Brute force attack protection -> Max lock time',
+        },
+        bruteForceProtectionIncrementalTempo => {
+            default => 0,
+            help    => 'bruteforceprotection.html',
+            type    => 'bool',
+            documentation =>
+              'Enable incremental lock time for brute force attack protection',
+        },
+        bruteForceProtectionLockTimes => {
+            type    => 'text',
+            default => '5 15 60 300 600',
+            documentation =>
+              'Incremental lock time values for brute force attack protection',
+        },
         grantSessionRules => {
             type          => 'grantContainer',
             keyTest       => sub { return perlExpr(@_) },
@@ -783,6 +829,11 @@ sub attributes {
             type          => 'text',
             default       => '_password _2fDevices',
             documentation => 'Name of attributes to hide in logs',
+        },
+        persistentSessionAttributes => {
+            type          => 'text',
+            default       => '_loginHistory _2fDevices notification_',
+            documentation => 'Persistent session attributes to hide',
         },
         key => {
             type          => 'password',
@@ -864,6 +915,11 @@ sub attributes {
             type          => 'text',
             default       => "'self'",
             documentation => 'Font source for Content-Security-Policy',
+        },
+        cspFrameAncestors => {
+            type          => 'text',
+            default       => '',
+            documentation => 'Frame-Ancestors for Content-Security-Policy',
         },
         portalAntiFrame => {
             default       => 1,
@@ -1022,6 +1078,11 @@ sub attributes {
             documentation =>
               'Display password generate box in reset password form',
         },
+        portalDisplayRefreshMyRights => {
+            default       => 1,
+            type          => 'bool',
+            documentation => 'Displays the link to refresh the user session',
+        },
 
         # Cookies
         cookieExpiration => {
@@ -1071,6 +1132,17 @@ sub attributes {
             documentation => 'Cookie securisation method',
             flags         => 'hp',
         },
+        sameSite => {
+            type   => 'select',
+            select => [
+                { k => 'Strict', v => 'Strict' },
+                { k => 'Lax',    v => 'Lax' },
+                { k => 'None',   v => 'None' },
+            ],
+            default       => 'None',
+            documentation => 'Cookie SameSite value',
+            flags         => 'hp',
+        },
 
         # Viewer
         viewerHiddenKeys => {
@@ -1109,6 +1181,16 @@ sub attributes {
             default       => 0,
             type          => 'bool',
             documentation => 'Notification activation',
+        },
+        notificationsExplorer => {
+            default       => 0,
+            type          => 'bool',
+            documentation => 'Notifications explorer activation',
+        },
+        notificationsMaxRetrieve => {
+            default       => 3,
+            type          => 'int',
+            documentation => 'Max number of displayed notifications',
         },
         notificationServer => {
             default       => 0,
@@ -1343,8 +1425,8 @@ sub attributes {
         },
         portalRequireOldPassword => {
             default       => 1,
-            type          => 'bool',
-            documentation => 'Old password is required to change the password',
+            type          => 'boolOrExpr',
+            documentation => 'Rule to require old password to change the password',
         },
         hideOldPassword => {
             default       => 0,
@@ -1370,6 +1452,17 @@ sub attributes {
             default       => 0,
             type          => 'int',
             documentation => 'Password policy: minimal digit characters',
+        },
+        passwordPolicyMinSpeChar => {
+            default       => 0,
+            type          => 'int',
+            documentation => 'Password policy: minimal special characters',
+        },
+        passwordPolicySpecialChar => {
+            default       => '! @ # $ % & * ( ) - = + [ ] { } ; : , . / ?',
+            type          => 'text',
+            test          => qr/^[\s\W_]*$/,
+            documentation => 'Password policy: allowed special characters',
         },
         portalDisplayPasswordPolicy => {
             default       => 0,
@@ -1458,51 +1551,40 @@ sub attributes {
             default       => 'http://auth.example.com/resetpwd',
             documentation => 'URL of password reset page',
         },
-                   # Certificate reset by mail
+
+        # Certificate reset by mail
         certificateResetByMailCeaAttribute => {
-            type          => 'text',
-            default       => 'description'
+            type    => 'text',
+            default => 'description'
         },
         certificateResetByMailCertificateAttribute => {
-            type          => 'text',
-            default       => 'userCertificate;binary',
-        },
-        certificateResetByMailStep1Body => {
-            type          => 'longtext',
-            documentation => 'Custom Certificate reset mail body',
-        },
-
-        certificateResetByMailStep2Body => {
-            type          => 'longtext',
-            documentation => 'Custom confirm Certificate reset mail body',
-        },
-        certificateResetByMailStep2Subject => {
-            type          => 'text',
-            documentation => 'Mail subject for reset confirmation',
+            type    => 'text',
+            default => 'userCertificate;binary',
         },
         certificateResetByMailStep1Subject => {
             type          => 'text',
             documentation => 'Mail subject for certificate reset email',
         },
-
+        certificateResetByMailStep1Body => {
+            type          => 'longtext',
+            documentation => 'Custom Certificate reset mail body',
+        },
+        certificateResetByMailStep2Subject => {
+            type          => 'text',
+            documentation => 'Mail subject for reset confirmation',
+        },
+        certificateResetByMailStep2Body => {
+            type          => 'longtext',
+            documentation => 'Custom confirm Certificate reset mail body',
+        },
         certificateResetByMailURL => {
             type          => 'url',
             default       => 'http://auth.example.com/certificateReset',
             documentation => 'URL of certificate reset page',
         },
-        certificateResetByMailSender => {
-            type          => 'text',
-            default       => 'noreply@example.com',
-            documentation => 'URL of certificate reset page',
-        },
-        certificateResetByMailReplyTo => {
-            type          => 'text',
-            default       => 'noreply@example.com',
-            documentation => 'URL of certificate reset page',
-        },
         certificateResetByMailValidityDelay => {
-            type          => 'int',
-            default       => 0
+            type    => 'int',
+            default => 0
         },
 
         # Registration
@@ -1892,23 +1974,18 @@ sub attributes {
         },
         singleSession => {
             default       => 0,
-            type          => 'bool',
+            type          => 'boolOrExpr',
             documentation => 'Allow only one session per user',
         },
         singleIP => {
             default       => 0,
-            type          => 'bool',
+            type          => 'boolOrExpr',
             documentation => 'Allow only one session per IP',
         },
         singleUserByIP => {
             default       => 0,
-            type          => 'bool',
+            type          => 'boolOrExpr',
             documentation => 'Allow only one user per IP',
-        },
-        singleSessionUserByIP => {
-            default       => 0,
-            type          => 'bool',
-            documentation => 'Allow only one session per user on an IP',
         },
 
         # REST server
@@ -1962,6 +2039,13 @@ sub attributes {
             default       => 0,
             type          => 'bool',
             documentation => 'Enable /portal.wsdl server',
+        },
+
+        # SOAP Procy client
+        soapProxyUrn => {
+            default       => 'urn:Lemonldap/NG/Common/PSGI/SOAPService',
+            type          => 'text',
+            documentation => 'SOAP URN for Proxy',
         },
 
         # AutoSignin
@@ -2821,6 +2905,7 @@ sub attributes {
                 { k => 'AD',          v => 'Active Directory' },
                 { k => 'DBI',         v => 'Database (DBI)' },
                 { k => 'Facebook',    v => 'Facebook' },
+                { k => 'GitHub',      v => 'GitHub' },
                 { k => 'GPG',         v => 'GPG' },
                 { k => 'Kerberos',    v => 'Kerberos' },
                 { k => 'LDAP',        v => 'LDAP' },
@@ -2888,6 +2973,13 @@ sub attributes {
             default       => 0,
             help          => 'secondfactor.html',
             documentation => 'Second factor required',
+        },
+        sfManagerRule => {
+            type    => 'boolOrExpr',
+            default => 1,
+            help    => 'secondfactor.html',
+            documentation =>
+              'Rule to display second factor Manager link',
         },
         sfRemovedMsgRule => {
             type    => 'boolOrExpr',
@@ -3138,6 +3230,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         },
         SSLVarIf => {
             type    => 'keyTextContainer',
+            keyTest => sub { 1 },
             default => {}
         },
         sslByAjax => {
@@ -3335,6 +3428,17 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         linkedInScope =>
           { type => 'text', default => 'r_liteprofile r_emailaddress' },
 
+        # GitHub
+        githubAuthnLevel => {
+            type          => 'int',
+            default       => 1,
+            documentation => 'GitHub authentication level',
+        },
+        githubClientID     => { type => 'text', },
+        githubClientSecret => { type => 'password', },
+        githubScope        => { type => 'text', default => 'user:email' },
+        githubUserField    => { type => 'text', default => 'login' },
+
         # WebID
         webIDAuthnLevel => {
             type          => 'int',
@@ -3395,7 +3499,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         # Apache
         apacheAuthnLevel => {
             type          => 'int',
-            default       => 4,
+            default       => 3,
             documentation => 'Apache authentication level',
         },
 
@@ -3481,6 +3585,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
                     { k => 'DBI',           v => 'Database (DBI)' },
                     { k => 'Demo',          v => 'Demo' },
                     { k => 'Facebook',      v => 'Facebook' },
+                    { k => 'GitHub',        v => 'GitHub' },
                     { k => 'GPG',           v => 'GPG' },
                     { k => 'Kerberos',      v => 'Kerberos' },
                     { k => 'LDAP',          v => 'LDAP' },
@@ -3549,6 +3654,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
                 { k => 'AD',       v => 'Active Directory' },
                 { k => 'DBI',      v => 'Database (DBI)' },
                 { k => 'Facebook', v => 'Facebook' },
+                { k => 'GitHub',   v => 'GitHub' },
                 { k => 'GPG',      v => 'GPG' },
                 { k => 'Kerberos', v => 'Kerberos' },
                 { k => 'LDAP',     v => 'LDAP' },
@@ -3600,6 +3706,10 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         customRegister => {
             type          => 'text',
             documentation => 'Custom register module',
+        },
+        customResetCertByMail => {
+            type          => 'text',
+            documentation => 'Custom certificateResetByMail module',
         },
         customAddParams => {
             type          => 'keyTextContainer',
@@ -3742,7 +3852,8 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
               'OpenID Connect exported variables for dynamic registration',
         },
         oidcServiceDynamicRegistrationExtraClaims => {
-            type => 'keyTextContainer',
+            type    => 'keyTextContainer',
+            keyTest => qr/^[\x21\x23-\x5B\x5D-\x7E]+$/,
             documentation =>
               'OpenID Connect extra claims for dynamic registration',
         },
@@ -3856,14 +3967,20 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             ],
             default => 'HS512',
         },
-        oidcRPMetaDataOptionsIDTokenExpiration           => { type => 'int' },
-        oidcRPMetaDataOptionsIDTokenForceClaims          => { type => 'bool' },
+        oidcRPMetaDataOptionsIDTokenExpiration => { type => 'int' },
+        oidcRPMetaDataOptionsIDTokenForceClaims =>
+          { type => 'bool', default => 0 },
+        oidcRPMetaDataOptionsAdditionalAudiences  =>
+          { type => 'text' },
         oidcRPMetaDataOptionsAccessTokenExpiration       => { type => 'int' },
         oidcRPMetaDataOptionsAuthorizationCodeExpiration => { type => 'int' },
         oidcRPMetaDataOptionsOfflineSessionExpiration    => { type => 'int' },
         oidcRPMetaDataOptionsRedirectUris                => { type => 'text', },
-        oidcRPMetaDataOptionsExtraClaims =>
-          { type => 'keyTextContainer', default => {} },
+        oidcRPMetaDataOptionsExtraClaims                 => {
+            type    => 'keyTextContainer',
+            keyTest => qr/^[\x21\x23-\x5B\x5D-\x7E]+$/,
+            default => {}
+        },
         oidcRPMetaDataOptionsBypassConsent => {
             type    => 'bool',
             help    => 'openidconnectclaims.html',
@@ -3878,7 +3995,8 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             type   => 'select',
             select => [
                 { k => 'front', v => 'Front Channel' },
-                { k => 'back',  v => 'Back Channel' },
+                #TODO #1194
+                # { k => 'back',  v => 'Back Channel' },
             ],
             default       => 'front',
             documentation => 'Logout type',
@@ -3902,6 +4020,12 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             type          => 'bool',
             default       => 0,
             documentation => 'Allow offline access',
+        },
+        oidcRPMetaDataOptionsAllowPasswordGrant => {
+            type    => 'bool',
+            default => 0,
+            documentation =>
+              'Allow OAuth2 Resource Owner Password Credentials Grant',
         },
         oidcRPMetaDataOptionsRefreshToken => {
             type          => 'bool',

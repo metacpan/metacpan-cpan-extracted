@@ -15,18 +15,18 @@ name: Data-Edit-Xml-Reuse
 provides:
   Data::Edit::Xml::Reuse:
     file: lib/Data/Edit/Xml/Reuse.pm
-    version: '20191221'
+    version: '20200503'
 requires:
   Carp: '0'
   Data::Dump: '0'
-  Data::Edit::Xml: '20191119'
-  Data::Edit::Xml::Xref: '20191121'
-  Data::Table::Text: '20191204'
+  Data::Edit::Xml: '20200218'
+  Data::Edit::Xml::Xref: '20200424'
+  Data::Table::Text: '20200418'
   Dita::GB::Standard: '20190911'
   Test2::API: '0'
   Test::More: '0'
   utf8: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20191221'
+version: '20200503'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

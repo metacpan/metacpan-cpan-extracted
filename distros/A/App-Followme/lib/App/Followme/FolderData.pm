@@ -12,7 +12,7 @@ use File::Spec::Functions qw(abs2rel catfile rel2abs splitdir);
 use base qw(App::Followme::BaseData);
 use App::Followme::FIO;
 
-our $VERSION = "1.92";
+our $VERSION = "1.93";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -735,7 +735,7 @@ above the filename passed as the argument.
 
 =item @files
 
-A list of matching filles in a directory.
+A list of matching files in a directory.
 
 =item @folders
 

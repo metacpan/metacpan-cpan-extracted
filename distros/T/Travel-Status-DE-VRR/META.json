@@ -4,13 +4,13 @@
       "Copyright (C) 2013-2015 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Travel-Status-DE-VRR",
    "prereqs" : {
@@ -41,31 +41,34 @@
    "provides" : {
       "Travel::Status::DE::EFA" : {
          "file" : "lib/Travel/Status/DE/EFA.pm",
-         "version" : "1.15"
+         "version" : "1.17"
       },
       "Travel::Status::DE::EFA::Line" : {
          "file" : "lib/Travel/Status/DE/EFA/Line.pm",
-         "version" : "1.15"
+         "version" : "1.17"
       },
       "Travel::Status::DE::EFA::Result" : {
          "file" : "lib/Travel/Status/DE/EFA/Result.pm",
-         "version" : "1.15"
+         "version" : "1.17"
       },
       "Travel::Status::DE::EFA::Stop" : {
          "file" : "lib/Travel/Status/DE/EFA/Stop.pm",
-         "version" : "1.15"
+         "version" : "1.17"
       },
       "Travel::Status::DE::VRR" : {
          "file" : "lib/Travel/Status/DE/VRR.pm",
-         "version" : "1.15"
+         "version" : "1.17"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://github.com/derf/Travel-Status-DE-VRR"
+      }
    },
-   "version" : "1.15",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "1.17",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

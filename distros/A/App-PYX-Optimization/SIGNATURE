@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA256 4aec036cdffb861932657b7ac1d0e02d56f911fd3483c3fc9eec06ad30dd14e3 Changes
+SHA256 b47dd6a3ac3bf4d241874909d8e985bccf84a062fcbda326ef686955f83f7f88 LICENSE
+SHA256 46a4c0303982f4de09e111baf9bb3cd756a306ea2223559cf448aa62c0bf661a MANIFEST
+SHA256 1c7ade42dc1f086f774cd5c2b93038c83d5a2f822fa1247fa833e3669f41d950 META.yml
+SHA256 d9060c5280397169d7db0f646887806b42db2eff5b557c3c0ba4d584a16c92d5 Makefile.PL
+SHA256 bcf837586d1c8737c3d74bae4264eaae5e5188d20b28327b538d43ed2617cd24 Optimization.pm
+SHA256 ed8767f4b63f0a9fc8bd21f584683432c3c743b55e4104d2b87081c4af63ad04 README
+SHA256 5c17650f1272e7b8c0da48703d19d1479800426b83c8b1b1b46b12f2034719ea bin/pyx-optimization
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 751bc4e2f98074c05c9e23d484f2406cef042099664b6c87a73d6530bbeda427 inc/Module/Install/Scripts.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 feeb10798f80df96d70904ac4f15b7542a3d589b8a795e2571d91a528ddb8c65 t/App-PYX-Optimization/01-use.t
+SHA256 9d5dd60a0d393e3b39908438b960d35ea0414f29724a53a2337debf886d1fe85 t/App-PYX-Optimization/02-version.t
+SHA256 c9f39bcd195647c9aeebf215aa16e0f698ddb67abec999ddc26587eb598bcf08 t/App-PYX-Optimization/03-new.t
+SHA256 985884f5dcb217b768611bf40124aaec4f078eb87fddf741f8ae858dd11f66d5 xt/App-PYX-Optimization/01-pod_coverage.t
+SHA256 8c2d01712fe9c33c27a7e51650e2dd884c03dcb280f4e3e0ac7e9dcca8aec3c2 xt/App-PYX-Optimization/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl6sV78ACgkQKyiOZjWe
+rHalyAf+OePtMXe18CCqEi//aRexVYyRGQrblWkibM+slHfHECkqp7bP8YYXB3da
+SAGe5z/IVBFTc0Y4j//m5SH2dOGz4WsrcEaMLoXrBdpZINorNBcvseilDyTZDJsf
+I2TDdt7cjGTGmwfCEzwdRivpNxl9jGz/ueRQOdiFsKyIFE6VPqJbadSU5iBJtaF+
+lwhLIlXFFVA0w25/1ywlgwIhH0VLMh8tHyrsL9NbdIcnCE0/6Q/r0mAiENYYq1X6
+axzsYV3fUVoS56eqUqMMeNXaqJjiF50S7pp/TFLQx7YH7ZFzh26XjmKbDE6GJR2h
+E5r5QWTNs3opuBu2sjxj0nKi6swFQg==
+=bkPP
+-----END PGP SIGNATURE-----

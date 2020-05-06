@@ -1,14 +1,18 @@
-.travis.yml
 bin/hafas-m
 Build.PL
 Changelog
 COPYING
+cpanfile
+Dockerfile
 lib/Travel/Status/DE/DeutscheBahn.pm
 lib/Travel/Status/DE/HAFAS.pm
 lib/Travel/Status/DE/HAFAS/Result.pm
 lib/Travel/Status/DE/HAFAS/StopFinder.pm
 MANIFEST			This list of files
 README
+scripts/check-hafas-urls
+scripts/makedeb-docker
+scripts/makedeb-docker-helper
 t/00-compile-pm.t
 t/01-compile-pl.t
 t/10-pod-coverage.t

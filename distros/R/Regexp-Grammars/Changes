@@ -488,3 +488,27 @@ Revision history for Regexp-Grammars
 1.052  Wed Jul 17 08:17:29 2019
 
     * Fixed bug in <nocontext:> handling (thanks, Alex!)
+
+
+1.053  Sun May  3 06:41:38 2020
+
+    * Fixed irritating "Satisified" typo in interface
+      (thanks, Stéphane!)
+
+    * Fixed equally irritating "???/!!!" typo in docs
+      (thanks, Stéphane!)
+
+    * Other minor doc fixes
+
+    * INCOMPATIBLE CHANGE: <, %, and %% are now never treated as literal.
+      They are now always either part of the module's metasyntax,
+      or else a fatal error. All literal <, %, and %% characters
+      must henceforth be quoted by backslashing: \<, \%, and \%\%
+      (thanks, Hugo!)
+
+
+
+1.054  Tue May  5 06:16:58 2020
+
+    * Fixed bug in positive lookahead translation
+      (thanks Hugo!)

@@ -49,7 +49,7 @@ sub addAuthRouteWithRedirect {
 sub _auth_and_redirect {
     my ( $self, $req ) = @_;
     $self->api->goToPortal( $req, $req->{env}->{REQUEST_URI} );
-    return [ 302, [$req->spliceHdrs], [] ];
+    return [ 302, [ $req->spliceHdrs ], [] ];
 }
 
 sub defaultAuthRoute {
@@ -73,7 +73,7 @@ sub _run {
         if ( $res->[0] < 300 ) {
             $self->routes( $self->authRoutes );
             $req->userData( $self->api->data );
-            $req->respHeaders($res->[1]);
+            $req->respHeaders( $res->[1] );
         }
         elsif ( $res->[0] != 403 and not $req->data->{noTry} ) {
 

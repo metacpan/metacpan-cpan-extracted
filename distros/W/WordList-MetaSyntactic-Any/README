@@ -1,0 +1,52 @@
+NAME
+    WordList::MetaSyntactic::Any - Wordlist from any Acme::MetaSyntactic::*
+    module
+
+VERSION
+    This document describes version 0.001 of WordList::MetaSyntactic::Any
+    (from Perl distribution WordList-MetaSyntactic-Any), released on
+    2020-05-04.
+
+SYNOPSIS
+     use WordList::MetaSyntactic::Any;
+
+     my $wl = WordList::MetaSyntactic::Any->new(theme => 'dangdut');
+     $wl->each_word(sub { ... });
+
+DESCRIPTION
+    This is a dynamic, parameterized wordlist to get list of words from an
+    Acme::MetaSyntactic::* module.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WordList-MetaSyntactic-Any>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WordList-MetaSyntactic-Any>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=WordList-MetaSyntacti
+    c-Any>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    WordList
+
+    Acme::MetaSyntactic
+
+    Some "Acme::MetaSyntactic::*" modules get their names from wordlist,
+    e.g. Acme::MetaSyntactic::countries.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -2,7 +2,7 @@
 # into "plugins" list in lemonldap-ng.ini, section "portal"
 package Lemonldap::NG::Portal::Main::Plugins;
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.8';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -14,24 +14,25 @@ use Mouse;
 # Developers: 2FA must be loaded before Notifications
 # Developers: GlobalLogout must be the last loaded plugin
 our @pList = (
-    portalDisplayResetPassword => '::Plugins::MailPasswordReset',
-    portalStatus               => '::Plugins::Status',
-    cda                        => '::Plugins::CDA',
-    notification               => '::Plugins::Notifications',
-    portalCheckLogins          => '::Plugins::History',
-    stayConnected              => '::Plugins::StayConnected',
-    bruteForceProtection       => '::Plugins::BruteForceProtection',
-    grantSessionRules          => '::Plugins::GrantSession',
-    upgradeSession             => '::Plugins::Upgrade',
-    autoSigninRules            => '::Plugins::AutoSignin',
-    checkState                 => '::Plugins::CheckState',
-    portalForceAuthn           => '::Plugins::ForceAuthn',
-    checkUser                  => '::Plugins::CheckUser',
-    impersonationRule          => '::Plugins::Impersonation',
-    contextSwitchingRule       => '::Plugins::ContextSwitching',
-    decryptValueRule           => '::Plugins::DecryptValue',
-    globalLogoutRule           => '::Plugins::GlobalLogout',
-    refreshSessions            => '::Plugins::Refresh',
+    portalDisplayResetPassword          => '::Plugins::MailPasswordReset',
+    portalDisplayCertificateResetByMail => '::Plugins::CertificateResetByMail',
+    portalStatus                        => '::Plugins::Status',
+    cda                                 => '::Plugins::CDA',
+    notification                        => '::Plugins::Notifications',
+    portalCheckLogins                   => '::Plugins::History',
+    stayConnected                       => '::Plugins::StayConnected',
+    bruteForceProtection                => '::Plugins::BruteForceProtection',
+    grantSessionRules                   => '::Plugins::GrantSession',
+    upgradeSession                      => '::Plugins::Upgrade',
+    autoSigninRules                     => '::Plugins::AutoSignin',
+    checkState                          => '::Plugins::CheckState',
+    portalForceAuthn                    => '::Plugins::ForceAuthn',
+    checkUser                           => '::Plugins::CheckUser',
+    impersonationRule                   => '::Plugins::Impersonation',
+    contextSwitchingRule                => '::Plugins::ContextSwitching',
+    decryptValueRule                    => '::Plugins::DecryptValue',
+    globalLogoutRule                    => '::Plugins::GlobalLogout',
+    refreshSessions                     => '::Plugins::Refresh',
 );
 
 ##@method list enabledPlugins
@@ -50,17 +51,17 @@ sub enabledPlugins {
         }
     }
 
-    # Load static plugin list
-    for ( my $i = 0 ; $i < @pList ; $i += 2 ) {
-        push @res, $pList[ $i + 1 ] if ( $conf->{ $pList[$i] } );
-    }
-
     # Load single session
     push @res, '::Plugins::SingleSession'
       if ( $conf->{singleSession}
         or $conf->{singleIP}
         or $conf->{singleUserByIP}
         or $conf->{notifyOther} );
+
+    # Load static plugin list
+    for ( my $i = 0 ; $i < @pList ; $i += 2 ) {
+        push @res, $pList[ $i + 1 ] if ( $conf->{ $pList[$i] } );
+    }
 
     # Check if SOAP is enabled
     push @res, '::Plugins::SOAPServer'
@@ -77,8 +78,6 @@ sub enabledPlugins {
     # Check if register is enabled
     push @res, '::Plugins::Register'
       if ( $conf->{registerDB} and $conf->{registerDB} ne 'Null' );
-    push @res, '::Plugins::CertificateResetByMail'
-      if ( $conf->{portalDisplayCertificateResetByMail});
 
     # Check if custom plugins are required
     # TODO: change this name

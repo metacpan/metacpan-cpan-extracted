@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Data::Compare;
 use Data::Dumper;
-use OPTIMADE::Filter;
+use OPTIMADE::Filter::Modifiable;
 use OPTIMADE::Filter::Parser;
 use Scalar::Util qw(blessed);
 use Test::More tests => 1;
@@ -15,7 +15,7 @@ my $parser = new OPTIMADE::Filter::Parser;
 my $tree = $parser->parse_string( 'value.list HAS ALL "a", "b", "c"' );
 
 my @traverse_order;
-OPTIMADE::Filter::modify( $tree,
+OPTIMADE::Filter::Modifiable::modify( $tree,
     sub {
         my( $node, $traverse_order ) = @_;
 

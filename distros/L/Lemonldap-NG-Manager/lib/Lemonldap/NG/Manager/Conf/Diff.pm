@@ -5,7 +5,7 @@ use Mouse;
 use Lemonldap::NG::Manager::Conf::Parser;
 use Lemonldap::NG::Common::Conf::Constants;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.8';
 
 *defaultValue = \&Lemonldap::NG::Manager::Conf::Parser::defaultValue;
 
@@ -202,7 +202,7 @@ sub _copyAppList {
     my ( $self, $conf ) = @_;
     my %res;
     if ( $conf->{type} eq 'category' ) {
-        foreach ( grep { $_ !~ /^(?:catname|type)$/ } keys %$conf ) {
+        foreach ( grep { $_ !~ /^(?:catname|type|order)$/ } keys %$conf ) {
             my @tmp = _copyAppList( $self, $conf->{$_} );
             $res{ $tmp[0] } = $tmp[1];
         }

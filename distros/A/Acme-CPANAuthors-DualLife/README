@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.46
+    version 0.48
 
 SYNOPSIS
 
@@ -75,7 +75,6 @@ CONTAINED AUTHORS
       OVID => q[Curtis 'Ovid' Poe],
       PEVANS => q[Paul Evans],
       PJACKLAM => q[Peter John Acklam],
-      PJF => q[Paul Jamieson Fenwick],
       PMQS => q[Paul Marquess],
       RGARCIA => q[Rafael Garcia-Suarez],
       RJBS => q[Ricardo SIGNES],
@@ -107,7 +106,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2019 by Chris Williams.
+    This software is copyright (c) 2020 by Chris Williams.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

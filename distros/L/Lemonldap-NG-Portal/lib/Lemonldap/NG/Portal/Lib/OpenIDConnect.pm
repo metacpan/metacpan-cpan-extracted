@@ -383,6 +383,10 @@ sub buildHybridAuthnResponse {
             ? ( token_type => 'bearer', access_token => $access_token )
             : ()
         ),
+        (
+            $id_token ? ( id_token => $id_token )
+            : ()
+        ),
         ( $expires_in    ? ( expires_in    => $expires_in )    : () ),
         ( $state         ? ( state         => $state )         : () ),
         ( $session_state ? ( session_state => $session_state ) : () )
@@ -1710,6 +1714,26 @@ sub force_id_claims {
     my ( $self, $rp ) = @_;
     return $self->conf->{oidcRPMetaDataOptions}->{$rp}
       ->{oidcRPMetaDataOptionsIDTokenForceClaims};
+}
+
+# https://openid.net/specs/openid-connect-core-1_0.html#IDToken
+# Audience(s) that this ID Token is intended for. It MUST contain the OAuth 2.0
+# client_id of the Relying Party as an audience value. It MAY also contain
+# identifiers for other audiences. In the general case, the aud value is an
+# array of case sensitive strings. In the common special case when there is one
+# audience, the aud value MAY be a single case sensitive string.
+sub getAudiences {
+    my ( $self, $rp ) = @_;
+
+    my $client_id = $self->oidcRPList->{$rp}->{oidcRPMetaDataOptionsClientID};
+    my @addAudiences = split /\s+/,
+      ( $self->oidcRPList->{$rp}->{oidcRPMetaDataOptionsAdditionalAudiences}
+          || '' );
+
+    my $result = [$client_id];
+    push @{$result}, @addAudiences;
+
+    return $result;
 }
 
 1;

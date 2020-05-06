@@ -8,7 +8,7 @@ use Test::More tests => 1;
 
 my $EIGHT_BIT_CHAR    = "[" .chr(128) . "-" . chr(255) . "]";
 
-local @ARGV = (map "t/words_with_$_.dat", "ä", "ö", "ü", "ß", 'foreign');
+local @ARGV = (map "t/words_with_$_.dat", "auml", "ouml", "uuml", "szlig", 'foreign');
 while (<>) {
     chomp;
     to_ascii($_) !~ /$EIGHT_BIT_CHAR/o

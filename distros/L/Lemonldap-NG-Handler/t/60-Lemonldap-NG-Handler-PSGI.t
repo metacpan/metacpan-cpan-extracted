@@ -81,6 +81,23 @@ ok( $res = $client->_get( '/deny', undef, undef, "lemonldap=$sessionId" ),
 ok( $res->[0] == 403, 'Code is 403' ) or explain( $res->[0], 403 );
 count(2);
 
+# Required "timelords" group
+ok(
+    $res =
+      $client->_get( '/fortimelords', undef, undef, "lemonldap=$sessionId" ),
+    'Require Timelords group'
+);
+ok( $res->[0] == 200, 'Code is 200' ) or explain( $res, 200 );
+count(2);
+
+# Required "dalek" group
+ok(
+    $res = $client->_get( '/fordaleks', undef, undef, "lemonldap=$sessionId" ),
+    'Require Dalek group'
+);
+ok( $res->[0] == 403, 'Code is 403' ) or explain( $res, 403 );
+count(2);
+
 # Required AuthnLevel = 1
 ok( $res = $client->_get( '/AuthWeak', undef, undef, "lemonldap=$sessionId" ),
     'Weak Authentified query' );

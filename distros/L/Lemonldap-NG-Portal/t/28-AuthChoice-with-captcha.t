@@ -5,7 +5,7 @@ use strict;
 require 't/test-lib.pm';
 
 my $res;
-my $maintests = 14;
+my $maintests = 16;
 SKIP: {
     eval 'use GD::SecurityImage;use Image::Magick;';
     if ($@) {
@@ -39,6 +39,12 @@ SKIP: {
     ok( $token = $1, ' Token value is defined' );
     ok( $res->[2]->[0] =~ m#<img id="captcha" src="data:image/png;base64#,
         ' Captcha image inserted' );
+    ok(
+        $res->[2]->[0] =~
+m#<img class="renewcaptchaclick" src="/static/common/icons/arrow_refresh.png" alt="Renew Captcha" title="Renew Captcha" class="img-thumbnail mb-3" />#,
+        ' Renew Captcha button found'
+    ) or explain( $res->[2]->[0], 'Renew captcha button not found' );
+    ok( $res->[2]->[0] =~ /captcha\.(?:min\.)?js/, 'Get captcha javascript' );
 
     my @form = ( $res->[2]->[0] =~ m#<form.*?</form>#sg );
     ok( @form == 2, 'Display 2 choices' );
@@ -64,7 +70,7 @@ SKIP: {
     ( $host, $url, $query ) =
       expectForm( $res, '#', undef, 'user', 'password', 'token' );
 
-    ok( $res->[2]->[0] =~ /<span trmsg="5"><\/span><\/div>/,
+    ok( $res->[2]->[0] =~ /<span trmsg="5">/,
         'dalek rejected with PE_BADCREDENTIALS' )
       or print STDERR Dumper( $res->[2]->[0] );
 

@@ -13,7 +13,7 @@ use App::Followme::Web;
 
 use base qw(App::Followme::ConfiguredObject);
 
-our $VERSION = "1.92";
+our $VERSION = "1.93";
 
 use constant COMMAND_START => '<!-- ';
 use constant COMMAND_END => '-->';
@@ -195,7 +195,7 @@ This module has one public method:
 
 =item $sub = $self->compile($template_file);
 
-Compile a template and return the compiled subroutine. A template if a file
+Compile a template and return the compiled subroutine. A template is a file
 containing commands and variables that describe how data is to be represented.
 The method returns a subroutine reference, which when called with a metadata
 object, returns a web page containing the fields from the metadata substituted
@@ -252,24 +252,24 @@ code will expand the text in the for block once for each element in the list.
 
     <ul>
     <!-- for @files -->
-	<li><a href="$url">$title</a></li>
-	<!-- endfor -->
-	</ul>
+    <li><a href="$url">$title</a></li>
+    <!-- endfor -->
+    </ul>
 
 =item if
 
 The text until the matching C<endif> is included only if the expression in the
 "if" command is true. If false, the text is skipped.
 
-	<div class="column">
+    <div class="column">
     <!-- for @files -->
     <!-- if $count % 20 == 0 -->
     </div>
-	<div class="column">
+    <div class="column">
     <!-- endif -->
-	$title<br />
-	<!-- endfor -->
-	</div>
+    $title<br />
+    <!-- endfor -->
+    </div>
 
 =item else
 

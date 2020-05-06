@@ -1,9 +1,10 @@
 ---
-abstract: 'simplify your unit tests writing based on Test::Class'
+abstract: 'Simplify your unit tests writing based on Test::Class'
 author:
   - 'Oleksii Kysil'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Module::Metadata: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -20,7 +21,7 @@ no_index:
 provides:
   Test::Class::Simple:
     file: lib/Test/Class/Simple.pm
-    version: '0.04'
+    version: '0.06'
 requires:
   Carp: '0'
   Test::Class: '0.50'
@@ -28,10 +29,10 @@ requires:
   Test::MockModule: '0.13'
   Test::MockObject::Extends: '1.20161202'
   parent: '0'
-  perl: '5.008004'
+  perl: '5.010000'
   strict: '0'
   warnings: '0'
 resources:
   repository: https://gitlab.com/oleksii.kysil/test-class-simple.git
-version: '0.04'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,10 +1,17 @@
 package WordList::Test::Dynamic::Number::10000;
 
-our $DATE = '2018-04-02'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-04'; # DATE
+our $DIST = 'WordList-Test-Dynamic-Number-10000'; # DIST
+our $VERSION = '0.003'; # VERSION
+
+use strict;
 
 use WordList;
 our @ISA = qw(WordList);
+
+use Role::Tiny::With;
+with 'WordListRole::FirstNextResetFromEach';
 
 our $DYNAMIC = 1;
 
@@ -18,7 +25,7 @@ sub each_word {
     }
 }
 
-our %STATS = ("longest_word_len",5,"avg_word_len",5,"num_words_contains_unicode",0,"num_words_contains_whitespace",0,"shortest_word_len",5,"num_words_contains_nonword_chars",0,"num_words",10000); # STATS
+our %STATS = ("longest_word_len",5,"avg_word_len",5,"num_words_contain_nonword_chars",0,"num_words",10000,"num_words_contain_whitespace",0,"num_words_contain_unicode",0,"num_words_contains_unicode",0,"shortest_word_len",5,"num_words_contains_nonword_chars",0,"num_words_contains_whitespace",0); # STATS
 
 1;
 # ABSTRACT: 10 million numbers from "00001" to "10000"
@@ -35,7 +42,7 @@ WordList::Test::Dynamic::Number::10000 - 10 million numbers from "00001" to "100
 
 =head1 VERSION
 
-This document describes version 0.002 of WordList::Test::Dynamic::Number::10000 (from Perl distribution WordList-Test-Dynamic-Number-10000), released on 2018-04-02.
+This document describes version 0.003 of WordList::Test::Dynamic::Number::10000 (from Perl distribution WordList-Test-Dynamic-Number-10000), released on 2020-05-04.
 
 =head1 SYNOPSIS
 
@@ -64,6 +71,9 @@ This document describes version 0.002 of WordList::Test::Dynamic::Number::10000 
  | avg_word_len                     | 5     |
  | longest_word_len                 | 5     |
  | num_words                        | 10000 |
+ | num_words_contain_nonword_chars  | 0     |
+ | num_words_contain_unicode        | 0     |
+ | num_words_contain_whitespace     | 0     |
  | num_words_contains_nonword_chars | 0     |
  | num_words_contains_unicode       | 0     |
  | num_words_contains_whitespace    | 0     |
@@ -94,7 +104,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

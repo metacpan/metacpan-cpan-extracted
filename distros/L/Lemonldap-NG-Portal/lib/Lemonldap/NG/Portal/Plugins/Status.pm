@@ -11,7 +11,7 @@ use JSON qw(from_json);
 use MIME::Base64;
 use IO::Socket::INET;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -41,9 +41,8 @@ sub status {
                 }
             }
         }
-        unless ($out) {
-            return $self->p->sendError( $req, 'No status connection' );
-        }
+        return $self->p->sendError( $req, 'No status connection' )
+          unless ($out);
 
         $p->print("STATUS json=1$args\n");
         while ( $_ = $out->getline ) {

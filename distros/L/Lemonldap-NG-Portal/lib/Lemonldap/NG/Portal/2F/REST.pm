@@ -10,7 +10,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.8';
 
 extends 'Lemonldap::NG::Portal::Main::SecondFactor',
   'Lemonldap::NG::Portal::Lib::REST';
@@ -122,7 +122,7 @@ sub verify {
         $args->{$k} = (
               $k eq 'code'
             ? $code
-            : $req->sessionInfo->{ $self->{vrfyAttrs}->{$k} }
+            : $session->{ $self->{vrfyAttrs}->{$k} }
         );
     }
 
@@ -141,7 +141,7 @@ sub verify {
               . $session->{ $self->conf->{whatToTrace} } );
         return PE_BADOTP;
     }
-    PE_OK;
+    return PE_OK;
 }
 
 1;

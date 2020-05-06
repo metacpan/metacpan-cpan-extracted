@@ -9,7 +9,7 @@ our @ISA = qw(Exporter);
 
 # I export nothing, so there aren't any @EXPORT* declarations
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Params::Validate qw/:all/;
 use Regexp::Common;
@@ -109,7 +109,7 @@ sub as_string {
 sub store {
     local $| = 1;
     my ($self, $filename) = @_;
-    open FILE, ">$filename" or die "Can't open $filename to store the table";
+    defined($filename) && (open FILE, ">$filename") or die "Can't open filename '" . ($filename // '') . "'  to store the table";
     print FILE $self->as_string;
     close FILE;
     return $self;
@@ -117,6 +117,7 @@ sub store {
 
 sub read {
     my ($class, $filename) = @_;
+    defined($filename) or die "Can't open undefined fileman in Data::TableAutoSum->read";
     tie my @data, 'Tie::CSV_File', $filename, sep_char     => "\t",
                                               quote_char   => undef,
                                               escape_char  => undef;

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2014, 2015, 2016, 2017, 2019 Kevin Ryde
+# Copyright 2014, 2015, 2016, 2017, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-OEIS.
 #
@@ -19,7 +19,7 @@
 
 use 5.006;
 use strict;
-use Test::More tests => 22;
+use Test::More tests => 24;
 
 use lib 't';
 use MyTestHelpers;
@@ -35,7 +35,7 @@ use Math::OEIS::Stripped;
 # VERSION
 
 {
-  my $want_version = 14;
+  my $want_version = 15;
   is ($Math::OEIS::Stripped::VERSION, $want_version,
       'VERSION variable');
   is (Math::OEIS::Stripped->VERSION,  $want_version,
@@ -49,6 +49,19 @@ use Math::OEIS::Stripped;
       1,
       "VERSION class check $check_version");
 }
+
+#------------------------------------------------------------------------------
+# instance()
+
+{
+  my $stripped = Math::OEIS::Stripped->instance;
+  isa_ok($stripped, 'Math::OEIS::Stripped');
+  is ($stripped->{'use_bigint'},
+      'if_necessary',
+      "use_bigint default");
+}
+
+
 
 #------------------------------------------------------------------------------
 # _IV_DECIMAL_DIGITS_MAX()
@@ -114,12 +127,13 @@ diag "test filename: ",$test_stripped_filename;
  SKIP: {
     # bigint if_necessary
     if (Math::OEIS::Stripped::_IV_DECIMAL_DIGITS_MAX() >= 90) {
-      skip "due to _IV_DECIMAL_DIGITS_MAX bigger than 90";
+      skip "due to _IV_DECIMAL_DIGITS_MAX bigger than 90", 3;
     }
     my @values = $stripped->anum_to_values('A000004');
     is (scalar(@values), 1);
     is (length($values[0]), 90);
-    isa_ok($values[0], 'Math::BigInt');
+    isa_ok($values[0], 'Math::BigInt',
+           "use_bigint if_necessary in object default");
   }
 }
 
