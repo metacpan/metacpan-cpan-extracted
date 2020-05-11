@@ -8,7 +8,7 @@ package Net::Async::ArtNet;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use base qw( IO::Async::Socket );
 
@@ -62,9 +62,18 @@ Additionally, CODE references to set callbacks for events may be passed.
 
 =over 8
 
-=item port => INT
+=item family  => INT or STRING
 
-Optional. Port number to listen for Art-Net packets on.
+=item host    => INT or STRING 
+
+=item service => INT or STRING
+
+Optional. C<getaddrinfo> parameters to create socket listen for Art-Net
+packets on.
+
+=item port => INT or STRING
+
+Synonym for C<service> parameter.
 
 =back
 
@@ -75,7 +84,7 @@ sub _init
    my $self = shift;
    $self->SUPER::_init( @_ );
 
-   $self->{port} = 0x1936; # Art-Net
+   $self->{service} = 0x1936; # Art-Net
 }
 
 sub configure
@@ -83,7 +92,9 @@ sub configure
    my $self = shift;
    my %params = @_;
 
-   foreach (qw( port on_dmx )) {
+   $params{service} = delete $params{port} if exists $params{port};
+
+   foreach (qw( family host service on_dmx )) {
       $self->{$_} = delete $params{$_} if exists $params{$_};
    }
 
@@ -115,7 +126,7 @@ sub _add_to_loop
 
    if( !defined $self->read_handle ) {
       return $self->bind(
-         service  => $self->{port},
+         ( map { $_, $self->{$_} } qw( family host service ) ),
          socktype => "dgram",
       )->get; # Blocking call, but numeric lookup so should be OK
    }

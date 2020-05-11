@@ -12,8 +12,8 @@ my $module = Wasm::Wasmtime::Module->new(wat => q{
   )
 });
 
-my $externtype_foo = $module->get_export('foo');
-print $externtype_foo->kind, "\n";  # func
+my $foo = $module->exports->foo;
+print $foo->kind, "\n";  # functype
 
-my $externtype_bar = $module->get_export('bar');
-print $externtype_bar->kind, "\n";  # memory
+my $bar = $module->exports->bar;
+print $bar->kind, "\n";  # memorytype

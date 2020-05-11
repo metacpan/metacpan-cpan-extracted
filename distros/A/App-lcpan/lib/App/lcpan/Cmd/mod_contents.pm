@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::mod_contents;
 
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '1.056'; # VERSION
+our $DATE = '2020-05-07'; # DATE
+our $VERSION = '1.057'; # VERSION
 
 use 5.010;
 use strict;
@@ -68,7 +68,7 @@ App::lcpan::Cmd::mod_contents - List contents inside a module's distribution
 
 =head1 VERSION
 
-This document describes version 1.056 of App::lcpan::Cmd::mod_contents (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of App::lcpan::Cmd::mod_contents (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 FUNCTIONS
 
@@ -106,6 +106,10 @@ Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 Defaults to C<~/cpan>.
 
 =item * B<detail> => I<bool>
+
+=item * B<file_id> => I<posint>
+
+Filter by file ID.
 
 =item * B<index_name> => I<filename> (default: "index.db")
 

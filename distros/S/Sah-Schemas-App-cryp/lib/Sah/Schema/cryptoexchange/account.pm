@@ -1,9 +1,9 @@
 package Sah::Schema::cryptoexchange::account;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-08'; # DATE
+our $DATE = '2020-05-08'; # DATE
 our $DIST = 'Sah-Schemas-App-cryp'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 our $schema = [str => {
     summary => 'Account at a cryptocurrency exchange',
@@ -58,22 +58,36 @@ Sah::Schema::cryptoexchange::account - Account at a cryptocurrency exchange
 
 =head1 VERSION
 
-This document describes version 0.009 of Sah::Schema::cryptoexchange::account (from Perl distribution Sah-Schemas-App-cryp), released on 2020-03-08.
+This document describes version 0.010 of Sah::Schema::cryptoexchange::account (from Perl distribution Sah-Schemas-App-cryp), released on 2020-05-08.
 
 =head1 SYNOPSIS
 
-Using with L<Data::Sah>:
+To check data against this schema (requires L<Data::Sah>):
 
  use Data::Sah qw(gen_validator);
- my $vdr = gen_validator("cryptoexchange::account*");
- say $vdr->($data) ? "valid" : "INVALID!";
+ my $validator = gen_validator("cryptoexchange::account*");
+ say $validator->($data) ? "valid" : "INVALID!";
 
- # Data::Sah can also create a validator to return error message, coerced value,
- # even validators in other languages like JavaScript, from the same schema.
- # See its documentation for more details.
+ # Data::Sah can also create validator that returns nice error message string
+ # and/or coerced value. Data::Sah can even create validator that targets other
+ # language, like JavaScript. All from the same schema. See its documentation
+ # for more details.
 
-Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
+To validate function parameters against this schema (requires L<Params::Sah>):
 
+ use Params::Sah qw(gen_validator);
+
+ sub myfunc {
+     my @args = @_;
+     state $validator = gen_validator("cryptoexchange::account*");
+     $validator->(\@args);
+     ...
+ }
+
+To specify schema in L<Rinci> function metadata and use the metadata with
+L<Perinci::CmdLine> to create a CLI:
+
+ # in lib/MyApp.pm
  package MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
@@ -91,6 +105,21 @@ Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
      my %args = @_;
      ...
  }
+ 1;
+
+ # in myapp.pl
+ package main;
+ use Perinci::CmdLine::Any;
+ Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+
+ # in command-line
+ % ./myapp.pl --help
+ myapp - Routine to do blah ...
+ ...
+
+ % ./myapp.pl --version
+
+ % ./myapp.pl --arg1 ...
 
 Sample data:
 

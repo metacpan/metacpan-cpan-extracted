@@ -1,9 +1,9 @@
 package Sah::Schemas::Collection;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-02'; # DATE
+our $DATE = '2020-05-08'; # DATE
 our $DIST = 'Sah-Schemas-Collection'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 1;
 # ABSTRACT: Various Sah collection (array/hash) schemas
@@ -20,7 +20,7 @@ Sah::Schemas::Collection - Various Sah collection (array/hash) schemas
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::Schemas::Collection (from Perl distribution Sah-Schemas-Collection), released on 2020-03-02.
+This document describes version 0.008 of Sah::Schemas::Collection (from Perl distribution Sah-Schemas-Collection), released on 2020-05-08.
 
 =head1 SAH SCHEMAS
 

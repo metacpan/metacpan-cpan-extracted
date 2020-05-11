@@ -18,9 +18,9 @@ use ClientTest;
 plan tests => $ClientTest::TEST_COUNT;
 
 SKIP: {
-    eval { require AnyEvent; 1 } or skip "AnyEvent isn’t available: $@", $ClientTest::TEST_COUNT;
+    eval { require AnyEvent::Loop; 1 } or skip "AnyEvent isn’t available: $@", $ClientTest::TEST_COUNT;
 
-    diag "Using AnyEvent $AnyEvent::VERSION";
+    diag "Using AnyEvent $AnyEvent::VERSION; backend: " . AnyEvent::detect();
 
     require Net::Curl::Promiser::AnyEvent;
 

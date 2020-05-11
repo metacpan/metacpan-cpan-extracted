@@ -1,7 +1,9 @@
 package App::lcpan::Cmd::related_mods;
 
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '1.056'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-07'; # DATE
+our $DIST = 'App-lcpan'; # DIST
+our $VERSION = '1.057'; # VERSION
 
 use 5.010;
 use strict;
@@ -69,7 +71,7 @@ sub handle_cmd {
 
     my @join = (
         "LEFT JOIN module m2 ON mtn1.module_id=m2.id",
-        "LEFT JOIN dist d ON m2.file_id=d.file_id",
+        "LEFT JOIN file f ON m2.file_id=f.id",
     );
 
     my @where = (
@@ -77,15 +79,15 @@ sub handle_cmd {
         "m2.name NOT IN ($modules_s)",
     );
 
-    my @dist_ids;
+    my @dist_names;
     if ($args{skip_same_dist}) {
         my $sth = $dbh->prepare(
-            "SELECT id FROM dist WHERE file_id IN (SELECT file_id FROM module WHERE name IN ($modules_s))");
+            "SELECT DISTINCT dist_name FROM file WHERE dist_name IS NOT NULL AND id IN (SELECT file_id FROM module WHERE name IN ($modules_s))");
         $sth->execute;
-        while (my ($id) = $sth->fetchrow_array) {
-            push @dist_ids, $id;
+        while (my ($dist_name) = $sth->fetchrow_array) {
+            push @dist_names, $dist_name;
         }
-        push @where, "d.id NOT IN (".join(", ", @dist_ids).")";
+        push @where, "f.dist_name NOT IN (".join(", ", map { $dbh->quote($_) } @dist_names).")";
     }
 
     my @order = map {/(-?)(.+)/; $2 . ($1 ? " DESC" : "")} @{$args{sort}};
@@ -101,7 +103,7 @@ sub handle_cmd {
   COUNT(*) num_mentions_together,
   ($sp_pct_mentions_together) pct_mentions_together,
   (COUNT(*) * COUNT(*) * ($sp_pct_mentions_together)) score,
-  d.name dist,
+  f.dist_name dist,
   m2.cpanid author
 FROM mention mtn1
 ".join("\n", @join)."
@@ -141,7 +143,7 @@ App::lcpan::Cmd::related_mods - List other modules related to module(s)
 
 =head1 VERSION
 
-This document describes version 1.056 of App::lcpan::Cmd::related_mods (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of App::lcpan::Cmd::related_mods (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 FUNCTIONS
 

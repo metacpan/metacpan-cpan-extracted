@@ -13,13 +13,12 @@ no warnings qw( threads recursion uninitialized numeric );
 
 package MCE::Shared::Base;
 
-our $VERSION = '1.864';
+our $VERSION = '1.868';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 
 use Scalar::Util qw( looks_like_number );
-use bytes;
 
 ##
 #  Several methods in MCE::Shared::{ Array, Cache, Hash, Minidb, and Ordhash }
@@ -308,7 +307,7 @@ MCE::Shared::Base - Base package for helper classes
 
 =head1 VERSION
 
-This document describes MCE::Shared::Base version 1.864
+This document describes MCE::Shared::Base version 1.868
 
 =head1 DESCRIPTION
 

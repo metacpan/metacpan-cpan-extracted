@@ -3,7 +3,7 @@ package Data::Hopen::G::Runnable;
 use strict;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000015';
+our $VERSION = '0.000017';
 
 use Data::Hopen;
 use Data::Hopen::Scope::Hash;
@@ -135,11 +135,17 @@ Parameters are C<-phase> and C<-visitor>, and are always passed by name
 (C<< -phase=>$p, -visitor=>$v >>).  C<_run> is always called in scalar context,
 and B<must> return a new hashref.
 
+I recommend starting your C<_run> function with:
+
+    my ($self, %args) = getparameters('self', [qw(; phase visitor)], @_);
+
+and working from there.
+
 =cut
 
 sub _run {
-    my ($self, %args) = getparameters('self', [qw(; phase visitor)], @_);
-    ...
+    # uncoverable subroutine
+    die('Unimplemented'); # uncoverable statement
 }
 
 =head2 passthrough
@@ -150,7 +156,7 @@ by L<Data::Hopen::Scope/local>.  Usage:
     my $hashref = $runnable->passthrough([-context => $outer_scope]);
         # To use $outer_scope as the context
     my $hashref = $runnable->passthrough(-nocontext => 1);
-        # To leave the context untouched
+        # To ignore the context
 
 Other valid options include L<-levels|Data::Hopen::Scope/$levels>.
 

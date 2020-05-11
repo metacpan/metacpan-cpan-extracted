@@ -1,5 +1,5 @@
 #
-# $Id: Temperature.pm,v c11497d88a72 2015/12/28 18:20:13 gomor $
+# $Id$
 #
 # hardware::temperature Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::File::Text);
 
 sub brik_properties {
    return {
-      revision => '$Revision: c11497d88a72 $',
+      revision => '$Revision$',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',

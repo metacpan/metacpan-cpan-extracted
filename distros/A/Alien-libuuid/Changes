@@ -1,5 +1,9 @@
 Revision history for Alien-libuuid
 
+0.04      2020-05-08 07:50:23 -0600
+  - patch .pc file to include include/uuid for share install
+    (gh#4, gh#6, tib++)
+
 0.03      2020-04-30 07:07:51 -0600
   - updated documentation
   - improved diagnostics

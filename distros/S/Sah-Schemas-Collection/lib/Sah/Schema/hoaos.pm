@@ -1,9 +1,9 @@
 package Sah::Schema::hoaos;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-02'; # DATE
+our $DATE = '2020-05-08'; # DATE
 our $DIST = 'Sah-Schemas-Collection'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 our $schema = [hash => {
     summary => 'Hash of (defined-)array-of-(defined-)strings',
@@ -12,17 +12,17 @@ our $schema = [hash => {
 _
     of => ['aos', {req=>1}, {}],
     examples => [
-        {data=>'a', valid=>0},
-        {data=>[], valid=>0},
-        {data=>{}, valid=>1},
-        {data=>{k=>undef}, valid=>0},
-        {data=>{k=>'a'}, valid=>0},
-        {data=>{k=>[]}, valid=>1},
-        {data=>{k=>{}}, valid=>0},
-        {data=>{k=>[], k2=>['a']}, valid=>1},
-        {data=>{k=>[], k2=>[[]]}, valid=>0},
-        {data=>{k=>[], k2=>[{}]}, valid=>0},
-        {data=>{k=>[], k2=>[undef]}, valid=>0},
+        {value=>'a', valid=>0},
+        {value=>[], valid=>0},
+        {value=>{}, valid=>1},
+        {value=>{k=>undef}, valid=>0},
+        {value=>{k=>'a'}, valid=>0},
+        {value=>{k=>[]}, valid=>1},
+        {value=>{k=>{}}, valid=>0},
+        {value=>{k=>[], k2=>['a']}, valid=>1},
+        {value=>{k=>[], k2=>[[]]}, valid=>0},
+        {value=>{k=>[], k2=>[{}]}, valid=>0},
+        {value=>{k=>[], k2=>[undef]}, valid=>0},
     ],
 }, {}];
 
@@ -41,9 +41,68 @@ Sah::Schema::hoaos - Hash of (defined-)array-of-(defined-)strings
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::Schema::hoaos (from Perl distribution Sah-Schemas-Collection), released on 2020-03-02.
+This document describes version 0.008 of Sah::Schema::hoaos (from Perl distribution Sah-Schemas-Collection), released on 2020-05-08.
 
 =head1 SYNOPSIS
+
+To check data against this schema (requires L<Data::Sah>):
+
+ use Data::Sah qw(gen_validator);
+ my $validator = gen_validator("hoaos*");
+ say $validator->($data) ? "valid" : "INVALID!";
+
+ # Data::Sah can also create validator that returns nice error message string
+ # and/or coerced value. Data::Sah can even create validator that targets other
+ # language, like JavaScript. All from the same schema. See its documentation
+ # for more details.
+
+To validate function parameters against this schema (requires L<Params::Sah>):
+
+ use Params::Sah qw(gen_validator);
+
+ sub myfunc {
+     my @args = @_;
+     state $validator = gen_validator("hoaos*");
+     $validator->(\@args);
+     ...
+ }
+
+To specify schema in L<Rinci> function metadata and use the metadata with
+L<Perinci::CmdLine> to create a CLI:
+
+ # in lib/MyApp.pm
+ package MyApp;
+ our %SPEC;
+ $SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['hoaos*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my %args = @_;
+     ...
+ }
+ 1;
+
+ # in myapp.pl
+ package main;
+ use Perinci::CmdLine::Any;
+ Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+
+ # in command-line
+ % ./myapp.pl --help
+ myapp - Routine to do blah ...
+ ...
+
+ % ./myapp.pl --version
+
+ % ./myapp.pl --arg1 ...
 
 Sample data:
 

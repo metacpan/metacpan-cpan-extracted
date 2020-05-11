@@ -8,7 +8,7 @@ use FFI::Platypus::Function;
 use FFI::Platypus::Type;
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '1.25'; # VERSION
+our $VERSION = '1.26'; # VERSION
 
 # Platypus Man,
 # Platypus Man,
@@ -285,7 +285,7 @@ sub function
   my $wrapper;
   $wrapper = pop if ref $_[-1] eq 'CODE';
 
-  croak "usage \$ffi->function( name, [ arguments ], return_type)" unless @_ >= 4 && @_ <= 6;
+  croak "usage \$ffi->function( \$name, \\\@arguments, [\\\@var_args], [\$return_type])" unless @_ >= 3 && @_ <= 6;
 
   my $self = shift;
   my $name = shift;
@@ -293,6 +293,7 @@ sub function
   my $var_args;
   $var_args = shift if defined $_[0] && ref($_[0]) eq 'ARRAY';
   my $ret = shift;
+  $ret = 'void' unless defined $ret;
 
   # special case: treat a single void argument type as an empty list of
   # arguments, a la olde timey C compilers.
@@ -382,10 +383,17 @@ sub cast
 
 sub attach_cast
 {
-  my($self, $name, $type1, $type2) = @_;
+  my($self, $name, $type1, $type2, $wrapper) = @_;
   my $caller = caller;
   $name = join '::', $caller, $name unless $name =~ /::/;
-  $self->attach([0 => $name] => [$type1] => $type2 => '$');
+  if(defined $wrapper && ref($wrapper) eq 'CODE')
+  {
+    $self->attach([0 => $name] => [$type1] => $type2 => '$', $wrapper);
+  }
+  else
+  {
+    $self->attach([0 => $name] => [$type1] => $type2 => '$');
+  }
   $self;
 }
 
@@ -575,7 +583,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 1.25
+version 1.26
 
 =head1 SYNOPSIS
 
@@ -972,6 +980,8 @@ Examples:
 
  my $function = $ffi->function( $name => \@fixed_argument_types => \@var_argument_types => $return_type);
  my $function = $ffi->function( $name => \@fixed_argument_types => \@var_argument_types => $return_type, \&wrapper);
+ my $function = $ffi->function( $name => \@fixed_argument_types => \@var_argument_types);
+ my $function = $ffi->function( $name => \@fixed_argument_types => \@var_argument_types => \&wrapper);
 
 Version 0.91 and later allows you to creat functions for c variadic functions
 (such as printf, scanf, etc) which can take a variable number of arguments.
@@ -990,6 +1000,10 @@ each time:
 Some older versions of libffi and possibly some platforms may not support
 variadic functions.  If you try to create a one, then an exception will be
 thrown.
+
+[version 1.26]
+
+If the return type is omitted then C<void> will be the assumed return type.
 
 =head2 attach
 
@@ -1075,10 +1089,16 @@ Something that won't work is trying to cast an array to anything:
 =head2 attach_cast
 
  $ffi->attach_cast("cast_name", $original_type, $converted_type);
+ $ffi->attach_cast("cast_name", $original_type, $converted_type, \&wrapper);
  my $converted_value = cast_name($original_value);
 
 This function attaches a cast as a permanent xsub.  This will make it
 faster and may be useful if you are calling a particular cast a lot.
+
+[version 1.26]
+
+A wrapper may be added as the last argument to C<attach_cast> and works
+just like the wrapper for C<attach> and C<function> methods.
 
 =head2 sizeof
 

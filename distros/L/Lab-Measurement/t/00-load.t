@@ -74,6 +74,7 @@ my %depencencies = (
             Lab/Moose/Instrument/SpectrumAnalyzer.pm
             Lab/Moose/Instrument/HP8596E.pm
             Lab/Moose/Instrument/Rigol_DSA815.pm
+            Lab/Moose/Instrument/HPE4400B.pm
             }
     ],
 

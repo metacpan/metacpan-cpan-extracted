@@ -1,4 +1,5 @@
 use Test2::V0 -no_srand => 1;
+use Test2::Plugin::Wasm;
 use lib 't/lib';
 use Test2::Tools::Wasm;
 use Wasm::Wasmtime::Linker;
@@ -38,12 +39,14 @@ is(
     call [ isa => 'Wasm::Wasmtime::Linker' ] => T();
     call [ allow_shadowing => 1 ] => D();
     call [ allow_shadowing => 0 ] => D();
-    call [ define => 'xx', 'add0', $instance->get_export('add') ] => D();
-    call [ define => 'xx', 'add1', $instance->get_export('add')->as_func ] => D();
+    call [ define => 'xx', 'add0', $instance->exports->add ] => D();
     call [ define_wasi => $wasi ] => T();
     call [ define_instance => "foo", $instance2 ] => T();
     call [ instantiate => $module2 ] => object {
       call [ isa => 'Wasm::Wasmtime::Instance' ] => T();
+    };
+    call store => object {
+      call [ isa => 'Wasm::Wasmtime::Store' ] => T();
     };
   },
   'basics'

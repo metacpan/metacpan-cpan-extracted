@@ -1,5 +1,5 @@
 #
-# $Id: Www.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
+# $Id$
 #
 # client::www Brik
 #
@@ -7,11 +7,11 @@ package Metabrik::Client::Www;
 use strict;
 use warnings;
 
-use base qw(Metabrik::System::Package);
+use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6bd6acfc81d5 $',
+      revision => '$Revision$',
       tags => [ qw(unstable browser http javascript screenshot) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -78,9 +78,9 @@ sub brik_properties {
          get_last_code => [ ],
       },
       require_modules => {
+         'IO::Socket::SSL' => [ ],
          'Progress::Any::Output' => [ ],
          'Progress::Any::Output::TermProgressBarColor' => [ ],
-         'Net::SSL' => [ ],
          'Data::Dumper' => [ ],
          'HTML::TreeBuilder' => [ ],
          'LWP::UserAgent' => [ ],
@@ -91,7 +91,6 @@ sub brik_properties {
          'Mozilla::CA' => [ ],
          'HTML::Form' => [ ],
          'Metabrik::File::Write' => [ ],
-         'Metabrik::Client::Ssl' => [ ],
          'Metabrik::System::File' => [ ],
          'Metabrik::Network::Address' => [ ],
       },
@@ -100,13 +99,6 @@ sub brik_properties {
       },
       optional_binaries => {
          phantomjs => [ ],
-      },
-      need_packages => {
-         ubuntu => [ qw(libssl-dev phantomjs) ],
-         debian => [ qw(libssl-dev phantomjs) ],
-         kali => [ qw(libssl-dev phantomjs) ],
-         centos => [ qw(openssl-devel) ],
-         redhat => [ qw(openssl-devel) ],
       },
    };
 }
@@ -118,29 +110,13 @@ sub create_user_agent {
    $self->log->debug("create_user_agent: creating agent");
 
    $uri ||= $self->uri;
-   if ($self->ssl_verify) {
-      if (! defined($uri)) {
-         return $self->log->error("create_user_agent: you have to give URI argument to check SSL");
-      }
 
-      # We have to use a different method to check certificate because all 
-      # IO::Socket::SSL, Net::SSL, Net::SSLeay, Net::HTTPS, AnyEvent::TLS just sucks.
-      # So we have to perform a first TCP connexion to verify cert, then a second 
-      # One to actually negatiate an unverified session.
-      my $cs = Metabrik::Client::Ssl->new_from_brik_init($self) or return;
-      my $verified = $cs->verify_server($uri);
-      if (! defined($verified)) {
-         return;
-      }
-      if ($verified == 0) {
-         return $self->log->error("create_user_agent: server [$uri] not verified");
-      }
-   }
-
-   # Net::SSL doesn't support timeouts on HTTPS(?)
-   # We have to use IO::Socket::SSL which supports it.
-   #$ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = 'Net::SSL';
+   # Use IO::Socket::SSL which supports timeouts among other things.
    $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = 'IO::Socket::SSL';
+
+   my $ssl_verify = $self->ssl_verify
+      ? IO::Socket::SSL::SSL_VERIFY_PEER()
+      : IO::Socket::SSL::SSL_VERIFY_NONE();
 
    my %args = (
       stack_depth => 0,  # Default is infinite, and will eat-up whole memory.
@@ -148,8 +124,11 @@ sub create_user_agent {
       autocheck => 0,  # Do not throw on error by checking HTTP code. Let us do it.
       timeout => $self->rtimeout,
       ssl_opts => {
-         verify_hostname => 0,
+         verify_hostname => $self->ssl_verify,
+         SSL_verify_mode => $ssl_verify,
          SSL_ca_file => Mozilla::CA::SSL_ca_file(),
+         # SNI support - defaults to PeerHost
+         # SSL_hostname => 'hostname',
       },
    );
 
@@ -848,7 +827,7 @@ Metabrik::Client::Www - client::www Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

@@ -1,5 +1,5 @@
 #
-# $Id: Compress.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
+# $Id$
 #
 # file::compress brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6bd6acfc81d5 $',
+      revision => '$Revision$',
       tags => [ qw(unstable gzip unzip gunzip uncompress) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -160,7 +160,7 @@ sub gzip {
    $self->brik_help_run_undef_arg('gzip', $input) or return;
    $self->brik_help_run_file_not_found('gzip', $input) or return;
 
-   my $cmd = "gzip \"$input\"";
+   my $cmd = "gzip -f \"$input\"";
 
    $self->execute($cmd) or return;
 
@@ -219,7 +219,7 @@ Metabrik::File::Compress - file::compress Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

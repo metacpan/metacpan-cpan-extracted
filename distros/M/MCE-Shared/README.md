@@ -1,6 +1,6 @@
 ## MCE::Shared for Perl
 
-This document describes MCE::Shared version 1.864.
+This document describes MCE::Shared version 1.868.
 
 ### Description
 
@@ -114,6 +114,7 @@ MCE::Shared utilizes the following modules:
     Carp
     Errno
     IO::FDPass  1.2+ (optional, recommended on UNIX and Windows)
+    IO::Handle
     MCE::Mutex  1.832+
     MCE::Util   1.832+
     MCE::Signal 1.832+
@@ -123,7 +124,6 @@ MCE::Shared utilizes the following modules:
     Sereal::Encoder 3.015+ (optional)
     Socket
     Storable    2.04+ (default when Sereal isn't available)
-    Symbol
     Test::More  0.45+ (for make test only)
     Time::HiRes
 
@@ -140,7 +140,7 @@ and [MCE Cookbook](https://github.com/marioroy/mce-cookbook) for recipes.
 
 ### Copyright and Licensing
 
-Copyright (C) 2016-2019 by Mario E. Roy <marioeroy AT gmail DOT com>
+Copyright (C) 2016-2020 by Mario E. Roy <marioeroy AT gmail DOT com>
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself:

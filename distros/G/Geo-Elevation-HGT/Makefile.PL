@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
     NAME             => 'Geo::Elevation::HGT',
-    AUTHOR           => q{Ulrich Buck <ulibuck@web.de>},
+    AUTHOR           => q{Ulrich Buck <ulibuck@cpan.org>},
     VERSION_FROM     => 'lib/Geo/Elevation/HGT.pm',
     ABSTRACT_FROM    => 'lib/Geo/Elevation/HGT.pm',
     LICENSE          => 'artistic_2',
@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
         'HTTP::Tiny'                    => 0,
         'POSIX'                         => 0,
         'File::Find'                    => 0,
-        'List::Util'                    => 0,
+        'List::Util'                    => 1.33,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Geo-Elevation-HGT-*' },

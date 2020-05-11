@@ -10,6 +10,22 @@ use Test::More tests => 7;
 use lib '../..';
 
 #----------------------------------------------------------------------
+# Change the modification date of a file
+
+sub age {
+	my ($filename, $sec) = @_;
+	return unless -e $filename;
+	return if $sec <= 0;
+	
+    my @stats = stat($filename);
+    my $date = $stats[9];
+    $date -= $sec;
+    utime($date, $date, $filename);
+    
+    return; 
+}
+
+#----------------------------------------------------------------------
 # Load package
 
 my @path = splitdir(rel2abs($0));
@@ -26,8 +42,10 @@ my $test_dir = catdir(@path, 'test');
 
 rmtree($test_dir);
 mkdir $test_dir;
+chmod 0755, $test_dir;
 my $sub = catfile($test_dir, "sub");
 mkdir $sub;
+chmod 0755, $sub;
 chdir $test_dir;
 
 #----------------------------------------------------------------------
@@ -105,13 +123,15 @@ EOQ
     fio_write_page($prototype_file, $index);
     fio_write_page(catfile($template_directory, $template_file), $template);
 
+	my $sec = 40;
     foreach my $count (qw(four three two one)) {
-        sleep(1);
         my $output = $text;
         $output =~ s/%%/$count/g;
 
         my $filename = "$count.md";
         fio_write_page($filename, $output);
+        age($filename, $sec);
+        $sec -= 10;
     }
 };
 

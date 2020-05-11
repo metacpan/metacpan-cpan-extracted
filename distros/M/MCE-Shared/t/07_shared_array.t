@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use utf8;
 
 use Test::More;
 
@@ -564,6 +565,47 @@ cmp_array(
    [ $a5->range(-1, -1) ], [ 'three' ],
    'shared array, check range 5'
 );
+
+## --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+
+## https://sacred-texts.com/cla/usappho/sph02.htm (I)
+
+my $sappho_text =
+  "Ποικιλόθρον᾽ ὰθάνατ᾽ ᾽Αφροδιτα,
+   παῖ Δίοσ, δολόπλοκε, λίσσομαί σε
+   μή μ᾽ ἄσαισι μήτ᾽ ὀνίαισι δάμνα,
+   πότνια, θῦμον.";
+
+my $translation =
+  "Shimmering-throned immortal Aphrodite,
+   Daughter of Zeus, Enchantress, I implore thee,
+   Spare me, O queen, this agony and anguish,
+   Crush not my spirit.";
+
+$a5->assign( $sappho_text );
+is( $a5->get(0), $sappho_text, 'shared array, check unicode assign' );
+
+$a5->clear, $a5->set( 0, $sappho_text );
+is( $a5->get(0), $sappho_text, 'shared array, check unicode set' );
+is( $a5->len(0), length($sappho_text), 'shared array, check unicode len' );
+
+$a5->clear, $a5->push( $sappho_text );
+is( $a5->get(0), $sappho_text, 'shared array, check unicode push' );
+
+$a5->clear, $a5->unshift( $sappho_text );
+is( $a5->get(0), $sappho_text, 'shared array, check unicode unshift' );
+
+$a5->clear, $a5->splice( 0, 0, $sappho_text );
+is( $a5->get(0), $sappho_text, 'shared array, check unicode splice' );
+
+cmp_array(
+   [ $a5->pairs('val =~ /δολόπλοκε/') ], [ 0, $sappho_text ],
+   'shared array, check unicode find values =~ match (pairs)'
+);
+
+my $length = $a5->append(0, "Ǣ");
+is( $a5->get(0), $sappho_text . "Ǣ", 'shared array, check unicode append' );
+is( $length, length($sappho_text) + 1, 'shared array, check unicode length' );
 
 done_testing;
 

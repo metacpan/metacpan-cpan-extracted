@@ -24,7 +24,7 @@ my %module_build_args = (
     "Dmitri Tikhonov"
   ],
   "dist_name" => "RT-Client-REST",
-  "dist_version" => "0.59",
+  "dist_version" => "0.60",
   "license" => "perl",
   "module_name" => "RT::Client::REST",
   "recursive_test_files" => 1,

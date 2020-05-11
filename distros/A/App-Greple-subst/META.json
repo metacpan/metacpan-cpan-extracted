@@ -62,7 +62,7 @@
    "provides" : {
       "App::Greple::subst" : {
          "file" : "lib/App/Greple/subst.pm",
-         "version" : "2.13"
+         "version" : "2.1401"
       },
       "App::Greple::subst::Dict" : {
          "file" : "lib/App/Greple/subst/Dict.pm"
@@ -72,6 +72,9 @@
       },
       "App::Greple::subst::SmartString" : {
          "file" : "lib/App/Greple/subst.pm"
+      },
+      "App::Greple::subst::dyncmap" : {
+         "file" : "lib/App/Greple/subst/dyncmap.pm"
       }
    },
    "release_status" : "stable",
@@ -85,7 +88,7 @@
          "web" : "https://github.com/kaz-utashiro/greple-subst"
       }
    },
-   "version" : "2.13",
+   "version" : "2.1401",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

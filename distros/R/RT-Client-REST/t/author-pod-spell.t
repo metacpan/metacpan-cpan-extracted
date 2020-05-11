@@ -22,6 +22,7 @@ Abhijit
 Attachment
 Byron
 Client
+DJ
 Dean
 Dmitri
 Ellacott
@@ -41,6 +42,7 @@ REST
 RT
 Sarvesh
 SearchResult
+Stauffer
 Søren
 Ticket
 Tikhonov
@@ -51,6 +53,7 @@ ams
 belg4mit
 bobtfish
 code
+dj
 djzort
 dkrotkine
 dmitri

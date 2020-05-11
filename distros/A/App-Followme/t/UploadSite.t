@@ -27,9 +27,13 @@ my $state_dir = catdir(@path, 'test', 'local', '_state');
 
 rmtree($test_dir);
 mkdir $test_dir;
+chmod 0755, $test_dir;
 mkdir $local_dir;
+chmod 0755, $local_dir;
 mkdir $remote_dir;
+chmod 0755, $remote_dir;
 mkdir $state_dir;
+chmod 0755, $state_dir;
 chdir $local_dir;
 
 my %configuration = (
@@ -118,6 +122,7 @@ EOQ
     foreach my $dir (@dirs) {
         if ($dir) {
             mkdir $dir;
+            chmod 0755, $dir;
             $local->{$dir} = 1;
             $hash_ok->{$dir} = 'dir';
         }

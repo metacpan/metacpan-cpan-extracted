@@ -15,7 +15,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Test::More' => 0,
         'Dancer2'    => '0.200000',
-        'Dancer2::Plugin::Auth::Extensible' => '0.620',
+        'Dancer2::Plugin::Auth::Extensible' => '0.709',
         'Dancer2::Plugin::DBIC' => '0.0012',
         'Dancer2::Plugin::Passphrase' => 3.000002,
     },
@@ -23,9 +23,9 @@ WriteMakefile(
     clean => { FILES => 'Dancer2-Plugin-Auth-Extensible-Provider-Usergroup-*' },
     META_MERGE => {
         resources => {
-            repository => 'https://github.com/hvoers/Dancer2-Plugin-Auth-Extensible-Provider-Usergroup',
-            bugtracker => 'https://github.com/hvoers/Dancer2-Plugin-Auth-Extensible-Provider-Usergroup/issues',
-            homepage   => 'https://github.com/hvoers/Dancer2-Plugin-Auth-Extensible-Provider-Usergroup/',
+            repository => 'https://github.com/SysPete/Dancer2-Plugin-Auth-Extensible-Provider-Usergroup',
+            bugtracker => 'https://github.com/SysPete/Dancer2-Plugin-Auth-Extensible-Provider-Usergroup/issues',
+            homepage   => 'https://github.com/SysPete/Dancer2-Plugin-Auth-Extensible-Provider-Usergroup/',
         },
     },
 );

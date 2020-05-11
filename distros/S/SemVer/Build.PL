@@ -22,9 +22,9 @@ Module::Build->new(
     },
     meta_merge         => {
         resources => {
-            homepage    => 'http://search.cpan.org/dist/SemVer/',
-            bugtracker  => 'http://github.com/theory/semver/issues/',
-            repository  => 'http://github.com/theory/semver',
+            homepage    => 'https://metacpan.org/release/SemVer',
+            bugtracker  => 'https://github.com/theory/semver/issues/',
+            repository  => 'https://github.com/theory/semver',
         }
     },
 )->create_build_script;

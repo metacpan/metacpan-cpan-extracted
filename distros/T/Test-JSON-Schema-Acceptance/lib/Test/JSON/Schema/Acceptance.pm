@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v0.991-12-ge50ddad
+package Test::JSON::Schema::Acceptance; # git description: v0.992-10-gd7c73dd
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators like JSON::Schema
 
-our $VERSION = '0.992';
+our $VERSION = '0.993';
 
 no if "$]" >= 5.031009, feature => 'indirect';
 use Test::More ();
@@ -13,9 +13,9 @@ use JSON::MaybeXS 1.004001;
 use File::ShareDir 'dist_dir';
 use Moo;
 use MooX::TypeTiny 0.002002;
-use Types::Standard 1.010002 qw(Str InstanceOf ArrayRef HashRef Dict Any HasMethods);
+use Types::Standard 1.010002 qw(Str InstanceOf ArrayRef HashRef Dict Any HasMethods Bool);
 use Path::Tiny;
-use List::Util 1.33 'any';
+use List::Util 1.33 qw(any max);
 use namespace::clean;
 
 has specification => (
@@ -31,6 +31,12 @@ has test_dir => (
   coerce => sub { path($_[0])->absolute('.') },
   lazy => 1,
   default => sub { path(dist_dir('Test-JSON-Schema-Acceptance'), 'tests', $_[0]->specification) },
+);
+
+has verbose => (
+  is => 'ro',
+  isa => Bool,
+  default => 0,
 );
 
 around BUILDARGS => sub {
@@ -104,12 +110,24 @@ sub _run_tests {
     }
   }
 
-  Test::More::note '';
-  Test::More::note sprintf('%-25s pass  fail', 'filename');
-  Test::More::note '-'x36;
-  Test::More::note sprintf('%-25s  %3d   %3d', $_, $results{$_}{pass} // 0, $results{$_}{fail} // 0)
+  my $diag = sub { Test::More->builder->${\ ($self->verbose ? 'diag' : 'note') }(@_) };
+
+  $diag->("\n\n".'Results using '.ref($self).' '.$self->VERSION);
+  my $submodule_status = path($self->test_dir)->parent->parent->child('submodule_status');
+  if ($submodule_status->exists) {
+    chomp(my ($commit, $url) = $submodule_status->lines);
+    $diag->('with commit '.$commit);
+    $diag->('from '.$url.':');
+  }
+
+  $diag->('');
+  my $length = max(map length $_->{file}, @$tests);
+  $diag->(sprintf('%-'.$length.'s  pass  fail', 'filename'));
+  $diag->('-'x($length + 12));
+  $diag->(sprintf('%-'.$length.'s   %3d   %3d',
+      $_, $results{$_}{pass} // 0, $results{$_}{fail} // 0))
     foreach sort keys %results;
-  Test::More::note '';
+  $diag->('');
 }
 
 sub _run_test {
@@ -119,6 +137,8 @@ sub _run_test {
     local $::TODO = 'Test marked TODO via "skip_tests"'
       if ref $options->{skip_tests} eq 'ARRAY' and
         grep +(($test_group->{description}.' - '.$test->{description}) =~ /$_/), @{$options->{skip_tests}};
+
+    my $test_name = $one_file->{file}.': "'.$test_group->{description}.'" - "'.$test->{description}.'"';
 
     my $result;
     my $exception = Test::Fatal::exception {
@@ -132,11 +152,8 @@ sub _run_test {
 
     local $Test::Builder::Level = $Test::Builder::Level + 3;
 
-    my $pass = Test::More::is($got, $expected,
-      $one_file->{file}.': "'.$test_group->{description}.'" - "'.$test->{description}.'"');
-    $pass = Test::More::fail($exception) if $exception;
-
-    return $pass;
+    return Test::More::fail($test_name.' died: '.$exception) if $exception;
+    return Test::More::is($got, $expected, $test_name);
   }
 }
 
@@ -147,20 +164,23 @@ has _json_decoder => (
   default => sub { JSON::MaybeXS->new(allow_nonref => 1, utf8 => 1) },
 );
 
+# see JSON::MaybeXS::is_bool
+my $json_bool = InstanceOf[qw(JSON::XS::Boolean Cpanel::JSON::XS::Boolean JSON::PP::Boolean)];
+
 has _test_data => (
   is => 'lazy',
   isa => ArrayRef[Dict[
            file => Str,
            json => ArrayRef[Dict[
              description => Str,
-             schema => InstanceOf['JSON::PP::Boolean']|HashRef,
+             schema => $json_bool|HashRef,
              tests => ArrayRef[Dict[
                data => Any,
                description => Str,
-               valid => InstanceOf['JSON::PP::Boolean'],
+               valid => $json_bool,
              ]],
            ]],
-          ]],
+         ]],
 );
 
 sub _build__test_data {
@@ -197,7 +217,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 0.992
+version 0.993
 
 =head1 SYNOPSIS
 
@@ -335,6 +355,11 @@ The subroutine should return truthy or falsey depending on if the schema was val
 not.
 
 Either C<validate_data> or C<validate_json_string> is required.
+
+=head3 verbose
+
+Optional. When true, prints version information and test result table such that it is visible
+during C<make test> or C<prove>.
 
 =head3 tests
 

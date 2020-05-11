@@ -21,6 +21,8 @@ use Alien::Base::Wrapper qw( Alien::Libxml2 );
 use ExtUtils::MakeMaker;
 use Config;
 
+my $SKIP_SAX_INSTALL = $ENV{SKIP_SAX_INSTALL};
+
 my %ConfigReqs = (
   "Alien::Libxml2" => '0.14',
   "Alien::Base::Wrapper" => 0,
@@ -140,6 +142,26 @@ delete $WriteMakefileArgs{LICENSE}
   unless eval { ExtUtils::MakeMaker->VERSION('6.31') };
 
 WriteMakefile(%WriteMakefileArgs);
+
+# append the install method to include the SAX parser INI file changes
+sub MY::install {
+   package MY;
+   my $script = shift->SUPER::install(@_);
+   if ( $SKIP_SAX_INSTALL ) {
+       warn "Note: 'make install' will skip XML::LibXML::SAX registration with XML::SAX!\n";
+   }
+   else {
+       $script =~ s/install :: (.*)$/install :: $1 install_sax_driver/m;
+       $script .= <<"INSTALL";
+
+install_sax_driver :
+\t-\@\$(PERL) -I\$(INSTALLSITELIB) -I\$(INSTALLSITEARCH) -MXML::SAX -e "XML::SAX->add_parser(q(XML::LibXML::SAX::Parser))->save_parsers()"
+\t-\@\$(PERL) -I\$(INSTALLSITELIB) -I\$(INSTALLSITEARCH) -MXML::SAX -e "XML::SAX->add_parser(q(XML::LibXML::SAX))->save_parsers()"
+
+INSTALL
+   }
+   return $script;
+}
 
 # helper functions to build the Makefile
 sub MY::manifypods {

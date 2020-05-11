@@ -38,6 +38,7 @@ use Date::Parse;
 use DateTime;
 
 use AsposeSlidesCloud::Object::Axes;
+use AsposeSlidesCloud::Object::ChartCategory;
 use AsposeSlidesCloud::Object::ChartTitle;
 use AsposeSlidesCloud::Object::ChartWall;
 use AsposeSlidesCloud::Object::EffectFormat;
@@ -316,7 +317,7 @@ __PACKAGE__->method_documentation({
     	read_only => '',
     		},
     'categories' => {
-    	datatype => 'ARRAY[string]',
+    	datatype => 'ARRAY[ChartCategory]',
     	base_name => 'Categories',
     	description => 'Gets or sets the categories for chart data',
     	format => '',
@@ -394,7 +395,7 @@ __PACKAGE__->swagger_types( {
     'chart_type' => 'string',
     'show_data_labels_over_maximum' => 'boolean',
     'series' => 'ARRAY[Series]',
-    'categories' => 'ARRAY[string]',
+    'categories' => 'ARRAY[ChartCategory]',
     'title' => 'ChartTitle',
     'back_wall' => 'ChartWall',
     'side_wall' => 'ChartWall',

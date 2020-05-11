@@ -4,13 +4,13 @@
       "Henk van Oers <hvo.pm@xs4all.nl>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dancer2-Plugin-Auth-Extensible-Provider-Usergroup",
    "no_index" : {
@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Dancer2" : "0.200000",
-            "Dancer2::Plugin::Auth::Extensible" : "0.620",
+            "Dancer2::Plugin::Auth::Extensible" : "0.709",
             "Dancer2::Plugin::DBIC" : "0.0012",
             "Dancer2::Plugin::Passphrase" : "3.000002",
             "Test::More" : "0",
@@ -44,13 +44,13 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/hvoers/Dancer2-Plugin-Auth-Extensible-Provider-Usergroup/issues"
+         "web" : "https://github.com/SysPete/Dancer2-Plugin-Auth-Extensible-Provider-Usergroup/issues"
       },
-      "homepage" : "https://github.com/hvoers/Dancer2-Plugin-Auth-Extensible-Provider-Usergroup/",
+      "homepage" : "https://github.com/SysPete/Dancer2-Plugin-Auth-Extensible-Provider-Usergroup/",
       "repository" : {
-         "url" : "https://github.com/hvoers/Dancer2-Plugin-Auth-Extensible-Provider-Usergroup"
+         "url" : "https://github.com/SysPete/Dancer2-Plugin-Auth-Extensible-Provider-Usergroup"
       }
    },
-   "version" : "0.620",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.709",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

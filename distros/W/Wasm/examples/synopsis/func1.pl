@@ -14,5 +14,5 @@ my $module = Wasm::Wasmtime::Module->new( wat => q{
 });
 
 my $instance = Wasm::Wasmtime::Instance->new($module);
-my $add = $instance->get_export('add')->as_func;
+my $add = $instance->exports->add;
 print $add->call(1,2), "\n";  # 3

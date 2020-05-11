@@ -13,6 +13,7 @@ dist.ini
 lib/Alien/libuuid.pm
 maint/cip-before-install
 maint/cip-test
+patch/uuid.pc.in.patch
 t/00_diag.t
 t/01_use.t
 t/alien_libuuid.t

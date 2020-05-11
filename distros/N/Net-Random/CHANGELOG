@@ -1,3 +1,6 @@
+2.32  2020-05-10   Add dependency on LWP::Protocol::https which has
+                     been split out into a separate dist on the CPAN
+
 2.31  2014-04-05   Update to make it work with recent JSON.pm. Now
                      requires JSON.pm 2.90 or higher.
 

@@ -8,7 +8,7 @@ use routines;
 
 use parent 'Data::Object::Name';
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.05'; # VERSION
 
 # METHODS
 
@@ -1157,7 +1157,7 @@ string.
 
   use Data::Object::Space;
 
-  my $space = Data::Object::Space->new('foo');
+  my $space = Data::Object::Space->new('brianne_spinka');
 
   $space->locate;
 

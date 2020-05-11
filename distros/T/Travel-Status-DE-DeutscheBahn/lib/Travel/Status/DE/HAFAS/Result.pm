@@ -8,17 +8,32 @@ no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
 use parent 'Class::Accessor';
 
-our $VERSION = '2.05';
+our $VERSION = '3.00';
 
 Travel::Status::DE::HAFAS::Result->mk_ro_accessors(
-	qw(date datetime info raw_e_delay raw_delay time train route_end));
+	qw(sched_date date sched_datetime datetime info raw_e_delay raw_delay
+	  sched_time time train route_end)
+);
 
 sub new {
 	my ( $obj, %conf ) = @_;
 
 	my $ref = \%conf;
+	bless( $ref, $obj );
 
-	return bless( $ref, $obj );
+	if ( my $delay = $ref->delay ) {
+		$ref->{datetime}
+		  = $ref->{sched_datetime}->clone->add( minutes => $delay );
+		$ref->{date} = $ref->{datetime}->strftime('%d.%m.%Y');
+		$ref->{time} = $ref->{datetime}->strftime('%H:%M');
+	}
+	else {
+		$ref->{datetime} = $ref->{sched_datetime};
+		$ref->{date}     = $ref->{sched_date};
+		$ref->{time}     = $ref->{sched_time};
+	}
+
+	return $ref;
 }
 
 sub countdown {
@@ -190,7 +205,7 @@ arrival/departure received by Travel::Status::DE::HAFAS
 
 =head1 VERSION
 
-version 2.05
+version 3.00
 
 =head1 DESCRIPTION
 
@@ -279,9 +294,21 @@ Returns the last element of the route.  Depending on how you set up
 Travel::Status::DE::HAFAS (arrival or departure listing), this is
 either the result's destination or its origin station.
 
+=item $result->sched_date
+
+Scheduled arrival/departure date in "dd.mm.yyyy" format.
+
+=item $result->sched_datetime
+
+DateTime object holding the scheduled arrival/departure date and time.
+
+=item $result->sched_time
+
+Scheduled arrival/departure time in "hh:mm" format.
+
 =item $result->time
 
-Returns the arrival/departure time as string in "hh:mm" format.
+Arrival/Departure time in "hh:mm" format.
 
 =item $result->type
 
@@ -312,7 +339,7 @@ Travel::Status::DE::HAFAS(3pm).
 
 =head1 AUTHOR
 
-Copyright (C) 2015-2017 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2015-2020 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

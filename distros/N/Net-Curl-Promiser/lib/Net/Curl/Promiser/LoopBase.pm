@@ -38,10 +38,6 @@ use parent qw( Net::Curl::Promiser );
 
 use Net::Curl ();
 
-# In production there’s probably little reason to care about this,
-# but it might be useful for debugging.
-use constant _STRICT_STOP_POLL => 0;
-
 #----------------------------------------------------------------------
 
 *_process_in_loop = __PACKAGE__->can('SUPER::process');
@@ -62,7 +58,7 @@ sub _GET_FD_ACTION {
 sub _handle_extra_stop_poll {
     my ($self, $fd) = @_;
 
-    if (_STRICT_STOP_POLL) {
+    if (Net::Curl::Promiser::_DEBUG) {
         my $version = Net::Curl::LIBCURL_VERSION();
 
         if ( $version =~ m<\A([0-9]+\.[0-9]+)> ) {

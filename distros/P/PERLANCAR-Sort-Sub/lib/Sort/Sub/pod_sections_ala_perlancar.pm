@@ -1,9 +1,9 @@
 package Sort::Sub::pod_sections_ala_perlancar;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-13'; # DATE
+our $DATE = '2020-02-15'; # DATE
 our $DIST = 'PERLANCAR-Sort-Sub'; # DIST
-our $VERSION = '0.080'; # VERSION
+our $VERSION = '0.081'; # VERSION
 
 use 5.010001;
 use strict;
@@ -62,6 +62,7 @@ our $SORT_SPEC = [
     'SOURCE',
     qr/^.+'S BUGS$/i, # in a forked module, i put the original module's BUGS in ORIGMODULE'S BUGS
     'BUGS',
+    'GOTCHAS',
     'SEE ALSO',
 
     # author & copyright
@@ -105,7 +106,7 @@ Sort::Sub::pod_sections_ala_perlancar - Sort POD sections (headings) PERLANCAR-s
 
 =head1 VERSION
 
-This document describes version 0.080 of Sort::Sub::pod_sections_ala_perlancar (from Perl distribution PERLANCAR-Sort-Sub), released on 2020-02-13.
+This document describes version 0.081 of Sort::Sub::pod_sections_ala_perlancar (from Perl distribution PERLANCAR-Sort-Sub), released on 2020-02-15.
 
 =head1 SYNOPSIS
 

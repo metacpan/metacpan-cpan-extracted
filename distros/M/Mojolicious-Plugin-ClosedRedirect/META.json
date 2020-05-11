@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojolicious-Plugin-ClosedRedirect",
    "no_index" : {
@@ -52,6 +52,6 @@
          "web" : "https://github.com/Akron/Mojolicious-Plugin-ClosedRedirect"
       }
    },
-   "version" : "0.14",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.15",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::Common;
 #ABSTRACT: Role for common commands declared mandatory by IEEE 488.2
-$Lab::Moose::Instrument::Common::VERSION = '3.692';
+$Lab::Moose::Instrument::Common::VERSION = '3.701';
 use Moose::Role;
 use MooseX::Params::Validate;
 
@@ -29,7 +29,7 @@ sub idn {
 sub idn_manufacturer {
     my ( $self, %args ) = validated_getter( \@_ );
     my $i=$self->query( command => '*IDN?', %args );
-    my ($man, $mod, $ser, $fir) = split /,/, $i, 4;
+    my ($man, $mod, $ser, $fir) = split /,\s*/, $i, 4;
     return $man;
 }
 
@@ -37,7 +37,7 @@ sub idn_manufacturer {
 sub idn_model {
     my ( $self, %args ) = validated_getter( \@_ );
     my $i=$self->query( command => '*IDN?', %args );
-    my ($man, $mod, $ser, $fir) = split /,/, $i, 4;
+    my ($man, $mod, $ser, $fir) = split /,\s*/, $i, 4;
     return $mod;
 }
 
@@ -45,7 +45,7 @@ sub idn_model {
 sub idn_serial {
     my ( $self, %args ) = validated_getter( \@_ );
     my $i=$self->query( command => '*IDN?', %args );
-    my ($man, $mod, $ser, $fir) = split /,/, $i, 4;
+    my ($man, $mod, $ser, $fir) = split /,\s/, $i, 4;
     return $ser;
 }
 
@@ -53,7 +53,7 @@ sub idn_serial {
 sub idn_firmware {
     my ( $self, %args ) = validated_getter( \@_ );
     my $i=$self->query( command => '*IDN?', %args );
-    my ($man, $mod, $ser, $fir) = split /,/, $i, 4;
+    my ($man, $mod, $ser, $fir) = split /,\s/, $i, 4;
     return $fir;
 }
 
@@ -105,7 +105,7 @@ Lab::Moose::Instrument::Common - Role for common commands declared mandatory by 
 
 =head1 VERSION
 
-version 3.692
+version 3.701
 
 =head1 METHODS
 
@@ -161,6 +161,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
             2018       Andreas K. Huettel
+            2020       Sam Bingner
 
 
 This is free software; you can redistribute it and/or modify it under

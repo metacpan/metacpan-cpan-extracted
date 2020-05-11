@@ -177,7 +177,7 @@ fqlen.pl - A demo implementation to filter fastx files by length
 
 =head1 VERSION
 
-version 0.90
+version 0.92
 
 =head1 AUTHOR
 

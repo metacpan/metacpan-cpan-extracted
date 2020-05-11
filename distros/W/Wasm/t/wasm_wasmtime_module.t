@@ -12,6 +12,7 @@ is(
     call store => object {
       call ['isa', 'Wasm::Wasmtime::Store'] => T();
     };
+    call to_string => "(module)\n";
   },
   'autocreate store',
 );
@@ -56,12 +57,18 @@ is(
 );
 
 is(
-  Wasm::Wasmtime::Module->new(file => 'examples/gcd.wat'),
+  Wasm::Wasmtime::Module->new(file => 'examples/wasmtime/gcd.wat'),
   object {
     call ['isa', 'Wasm::Wasmtime::Module'] => T();
     call store => object {
       call ['isa', 'Wasm::Wasmtime::Store'] => T();
     };
+    call to_string => join("\n",
+                        '(module',
+                        '  (func (export "gcd") (param i32 i32) (result i32))',
+                        ')',
+                        '',
+                      )
   },
   'file key',
 );
@@ -137,38 +144,37 @@ is(
     )
   }),
   object {
-    call [ get_export => 'add' ] => object {
-      call [ isa => 'Wasm::Wasmtime::ExternType' ] => T();
+    call exports => object {
+      call [ isa => 'Wasm::Wasmtime::Module::Exports' ] => T();
+      call add => object {
+        call [ isa => 'Wasm::Wasmtime::FuncType' ] => T();
+      };
     };
-    call [ get_export => 'foo' ] => U();
-    call_list imports => [];
-    call_list exports => array {
+    call_list sub { @{ shift->imports } } => [];
+    call_list sub { @{ shift->exports } } => array {
       item object {
         call [ isa => 'Wasm::Wasmtime::ExportType' ] => T();
         call name => 'add';
         call type => object {
-          call [ isa => 'Wasm::Wasmtime::ExternType' ] => T();
-          call kind => 'func';
-          call as_functype => object {
-            call [ isa => 'Wasm::Wasmtime::FuncType' ] => T();
-            call_list params => array {
-              item object {
-                call [ isa => 'Wasm::Wasmtime::ValType' ] => T();
-                call kind => 'i32';
-              };
-              item object {
-                call [ isa => 'Wasm::Wasmtime::ValType' ] => T();
-                call kind => 'i32';
-              };
-              end;
+          call [ isa => 'Wasm::Wasmtime::FuncType' ] => T();
+          call kind => 'functype';
+          call_list params => array {
+            item object {
+              call [ isa => 'Wasm::Wasmtime::ValType' ] => T();
+              call kind => 'i32';
             };
-            call_list results => array {
-              item object {
-                call [ isa => 'Wasm::Wasmtime::ValType' ] => T();
-                call kind => 'i32';
-              };
-              end;
+            item object {
+              call [ isa => 'Wasm::Wasmtime::ValType' ] => T();
+              call kind => 'i32';
             };
+            end;
+          };
+          call_list results => array {
+            item object {
+              call [ isa => 'Wasm::Wasmtime::ValType' ] => T();
+              call kind => 'i32';
+            };
+            end;
           };
         };
       };
@@ -176,28 +182,25 @@ is(
         call [ isa => 'Wasm::Wasmtime::ExportType' ] => T();
         call name => 'sub';
         call type => object {
-          call [ isa => 'Wasm::Wasmtime::ExternType' ] => T();
-          call kind => 'func';
-          call as_functype => object {
-            call [ isa => 'Wasm::Wasmtime::FuncType' ] => T();
-            call_list params => array {
-              item object {
-                call [ isa => 'Wasm::Wasmtime::ValType' ] => T();
-                call kind => 'i64';
-              };
-              item object {
-                call [ isa => 'Wasm::Wasmtime::ValType' ] => T();
-                call kind => 'i64';
-              };
-              end;
+          call kind => 'functype';
+          call [ isa => 'Wasm::Wasmtime::FuncType' ] => T();
+          call_list params => array {
+            item object {
+              call [ isa => 'Wasm::Wasmtime::ValType' ] => T();
+              call kind => 'i64';
             };
-            call_list results => array {
-              item object {
-                call [ isa => 'Wasm::Wasmtime::ValType' ] => T();
-                call kind => 'i64';
-              };
-              end;
+            item object {
+              call [ isa => 'Wasm::Wasmtime::ValType' ] => T();
+              call kind => 'i64';
             };
+            end;
+          };
+          call_list results => array {
+            item object {
+              call [ isa => 'Wasm::Wasmtime::ValType' ] => T();
+              call kind => 'i64';
+            };
+            end;
           };
         };
       };
@@ -205,9 +208,8 @@ is(
         call [ isa => 'Wasm::Wasmtime::ExportType' ] => T();
         call name => 'frooble';
         call type => object {
-          call [ isa => 'Wasm::Wasmtime::ExternType' ] => T();
-          call kind => 'memory';
-          call as_functype => U();
+          call [ isa => 'Wasm::Wasmtime::MemoryType' ] => T();
+          call kind => 'memorytype';
         };
       };
       end;

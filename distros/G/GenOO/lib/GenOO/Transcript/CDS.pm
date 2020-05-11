@@ -35,7 +35,7 @@ GenOO::Transcript::CDS - Transcript part (coding sequence)
 # Let the code begin...
 
 package GenOO::Transcript::CDS;
-$GenOO::Transcript::CDS::VERSION = '1.5.1';
+$GenOO::Transcript::CDS::VERSION = '1.5.2';
 use Moose;
 use namespace::autoclean;
 

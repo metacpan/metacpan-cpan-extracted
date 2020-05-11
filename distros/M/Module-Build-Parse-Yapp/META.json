@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Module-Build-Parse-Yapp",
    "prereqs" : {
@@ -22,6 +22,7 @@
       "runtime" : {
          "requires" : {
             "File::Find" : "0",
+            "File::Path" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
             "Module::Build" : "0",
@@ -42,7 +43,7 @@
          "web" : "https://github.com/merkys/module-build-parse-yapp"
       }
    },
-   "version" : "0.1.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "version" : "0.1.2",
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

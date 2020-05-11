@@ -21,7 +21,7 @@ use DateTime::Format::ISO8601;
 use Web::Microformats2::Parser;
 use Web::Mention::Author;
 
-our $VERSION = '0.710';
+our $VERSION = '0.711';
 
 Readonly my @VALID_RSVP_TYPES => qw(yes no maybe interested);
 
@@ -104,7 +104,7 @@ has 'author' => (
 );
 
 has 'type' => (
-    isa => Enum[qw(rsvp reply like repost quotation mention)],
+    isa => Maybe[Enum[qw(rsvp reply like repost quotation mention)]],
     traits => ['Enumeration'],
     handles => [qw(is_rsvp is_reply is_like is_repost is_quotation is_mention)],
     is => 'lazy',

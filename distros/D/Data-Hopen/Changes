@@ -1,5 +1,14 @@
 Revision history for Data-Hopen
 
+0.000017    2020-05-09
+    - Fix dependencies
+    - No functional changes since 0.000016
+
+0.000016    2020-05-09 (TRIAL RELEASE)
+    - cpanfile now provided for easier installation of dependencies
+    - An edge can have multiple links, and they run in sequence
+    - More tests
+
 0.000015    2019-06-04
     - No changes - stable release of 0.000014
 

@@ -1,3 +1,9 @@
+0.018   2020-05-08  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Handle value of 'x.completion' attribute correctly,
+	  either 'modname' or [modname=>\%args].
+
+
 0.017   2020-03-02  Released-By: PERLANCAR; Urgency: medium
 
 	- Add xt/release/sah-schema.t. Remove code that checks for normalized

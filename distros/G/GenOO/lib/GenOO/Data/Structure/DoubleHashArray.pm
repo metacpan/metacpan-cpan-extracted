@@ -26,7 +26,7 @@ GenOO::Data::Structure::DoubleHashArray - Object for a data structure which corr
 # Let the code begin...
 
 package GenOO::Data::Structure::DoubleHashArray;
-$GenOO::Data::Structure::DoubleHashArray::VERSION = '1.5.1';
+$GenOO::Data::Structure::DoubleHashArray::VERSION = '1.5.2';
 
 #######################################################################
 #######################   Load External modules   #####################

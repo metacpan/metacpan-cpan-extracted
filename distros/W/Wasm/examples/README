@@ -1,0 +1,15 @@
+This directory contains these subdirectories:
+
+ synopsis/
+   - includes the synopsis examples from the POD
+     of this distribution.  Useful for showing
+     basic usage
+ wasmtime/
+   - Examples translated from the Python extension
+     wasmtime-py into Perl using the lower level
+     Wasm::Wasmtime interface
+ wasm/
+   - Examples based on the wasmtime examples (and
+     others) using the simpler Perlish Wasm.pm
+     interface.
+     

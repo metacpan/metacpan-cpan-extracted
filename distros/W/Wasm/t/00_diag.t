@@ -11,9 +11,12 @@ my $post_diag;
 
 $modules{$_} = $_ for qw(
   Alien::wasmtime
-  Convert::Binary::C
+  Capture::Tiny
   Devel::GlobalDestruction
   ExtUtils::MakeMaker
+  FFI::C
+  FFI::C::StructDef
+  FFI::C::Util
   FFI::CheckLib
   FFI::Platypus
   FFI::Platypus::Buffer
@@ -23,8 +26,10 @@ $modules{$_} = $_ for qw(
   Ref::Util
   Sub::Install
   Test2::API
+  Test2::Mock
   Test2::V0
   Test::Alien::Diag
+  YAML
 );
 
 $post_diag = sub {

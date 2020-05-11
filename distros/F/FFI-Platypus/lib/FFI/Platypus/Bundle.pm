@@ -5,7 +5,7 @@ use warnings;
 use Carp ();
 
 # ABSTRACT: Bundle foreign code with your Perl module
-our $VERSION = '1.25'; # VERSION
+our $VERSION = '1.26'; # VERSION
 
 
 package FFI::Platypus;
@@ -149,7 +149,7 @@ FFI::Platypus::Bundle - Bundle foreign code with your Perl module
 
 =head1 VERSION
 
-version 1.25
+version 1.26
 
 =head1 SYNOPSIS
 

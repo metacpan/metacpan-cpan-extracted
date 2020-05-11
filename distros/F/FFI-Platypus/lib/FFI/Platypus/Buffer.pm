@@ -9,7 +9,7 @@ our @EXPORT = qw( scalar_to_buffer buffer_to_scalar );
 our @EXPORT_OK = qw ( scalar_to_pointer grow set_used_length );
 
 # ABSTRACT: Convert scalars to C buffers
-our $VERSION = '1.25'; # VERSION
+our $VERSION = '1.26'; # VERSION
 
 
 use constant _incantation =>
@@ -49,7 +49,7 @@ FFI::Platypus::Buffer - Convert scalars to C buffers
 
 =head1 VERSION
 
-version 1.25
+version 1.26
 
 =head1 SYNOPSIS
 

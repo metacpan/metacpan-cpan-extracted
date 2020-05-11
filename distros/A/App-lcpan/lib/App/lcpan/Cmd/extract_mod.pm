@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::extract_mod;
 
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '1.056'; # VERSION
+our $DATE = '2020-05-07'; # DATE
+our $VERSION = '1.057'; # VERSION
 
 use 5.010;
 use strict;
@@ -67,7 +67,7 @@ App::lcpan::Cmd::extract_mod - Extract a module's latest release file to current
 
 =head1 VERSION
 
-This document describes version 1.056 of App::lcpan::Cmd::extract_mod (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of App::lcpan::Cmd::extract_mod (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 FUNCTIONS
 

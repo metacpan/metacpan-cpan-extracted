@@ -22,7 +22,7 @@ use Ref::Util qw/ is_coderef /;
 use Time::HiRes;
 use Try::Tiny;
 
-our $VERSION = 'v0.4.4';
+our $VERSION = 'v0.4.5';
 
 # Note: You may be able to omit the client if there is a client
 # defined in the environment hash at C<psgix.monitor.statsd>, and the
@@ -178,7 +178,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 =head1 VERSION
 
-version v0.4.4
+version v0.4.5
 
 =head1 SYNOPSIS
 
@@ -351,6 +351,13 @@ See L<Plack::Middleware::XSendfile> for more information.
 =item C<psgi.worker.pid>
 
 The worker PID is added to the set.
+
+Note that this is set after the request is processed.  This means that
+while the set size can be used to indicate the number of active
+workers, if the workers are busy (i.e. longer request processing
+times), then this will show a lower number.
+
+This was added in v0.3.10.
 
 =item C<psgix.harakiri>
 

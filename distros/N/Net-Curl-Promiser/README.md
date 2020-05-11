@@ -1,13 +1,13 @@
 # NAME
 
-Net::Curl::Promiser - A Promise interface for [Net::Curl::Multi](https://metacpan.org/pod/Net::Curl::Multi)
+Net::Curl::Promiser - Asynchronous [libcurl](https://curl.haxx.se/libcurl/), the easy way!
 
 # DESCRIPTION
 
-This module wraps [Net::Curl::Multi](https://metacpan.org/pod/Net::Curl::Multi) to facilitate asynchronous
-requests with Promise objects. Net::Curl::Promiser interfaces with
-Net::Curl::Multi’s polling callbacks to simplify your task of coordinating
-multiple concurrent requests.
+[Net::Curl::Multi](https://metacpan.org/pod/Net::Curl::Multi) is powerful but tricky to use: polling, callbacks,
+timers, etc. This module does all of that for you and puts a Promise
+interface on top of it, so asynchronous I/O becomes almost as simple as
+synchronous I/O.
 
 [Net::Curl::Promiser](https://metacpan.org/pod/Net::Curl::Promiser) itself is a base class; you’ll need to provide
 an interface to whatever event loop you use. See ["SUBCLASS INTERFACE"](#subclass-interface)
@@ -65,10 +65,19 @@ error that [Net::Curl::Multi](https://metacpan.org/pod/Net::Curl::Multi) object�
 **IMPORTANT:** As with libcurl itself, HTTP-level failures
 (e.g., 4xx and 5xx responses) are **NOT** considered failures at this level.
 
+## $obj = _OBJ_->cancel\_handle( $EASY )
+
+Prematurely cancels $EASY. The associated promise will be abandoned
+in pending state, never to resolve nor reject.
+
+Returns _OBJ_.
+
 ## $obj = _OBJ_->fail\_handle( $EASY, $REASON )
 
-Prematurely fails $EASY. The given $REASON will be the associated
-Promise object’s rejection value.
+Like `cancel_handle()` but rejects $EASY’s associated promise
+with the given $REASON.
+
+Returns _OBJ_.
 
 ## $obj = _OBJ_->setopt( … )
 

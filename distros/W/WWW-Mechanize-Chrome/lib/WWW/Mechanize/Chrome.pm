@@ -24,7 +24,7 @@ use HTML::Selector::XPath 'selector_to_xpath';
 use HTTP::Cookies::ChromeDevTools;
 use POSIX ':sys_wait_h';
 
-our $VERSION = '0.51';
+our $VERSION = '0.53';
 our @CARP_NOT;
 
 =encoding utf-8
@@ -166,22 +166,6 @@ tab will be created.
 By default, C<autoclose> is set to true, closing the tab opened when running
 your code. If C<autoclose> is set to a false value, the tab will remain open
 even after the program has finished.
-
-=item B<host>
-
-Set the host the browser listens on:
-
-  host => '192.168.1.2'
-  host => 'localhost'
-
-Defaults to C<127.0.0.1>. The browser will listen for commands on the
-specified host. The host address should be inaccessible from the internet.
-=item B<log>
-
-  log => $object   # specify the object used for logging
-
-Can be used to supply a L<Log::Log4perl> object that has been manually
-constructed.
 
 =item B<launch_exe>
 
@@ -1750,13 +1734,32 @@ sub close {
 
     if( $pid and kill 0 => $pid) {
         local $SIG{CHLD} = 'IGNORE';
+        undef $!;
         if( ! kill $_[0]->{cleanup_signal} => $pid ) {
             # The child already has gone away?!
             warn "Couldn't kill browser child process $pid with $_[0]->{cleanup_signal}: $!";
             # Gobble up any exit status
-            waitpid -1, WNOHANG;
+            warn waitpid -1, WNOHANG;
         } else {
-            waitpid $pid, 0;
+
+            if( $^O =~ /darwin/i ) {
+                # Busy-wait until the kid has gone away since on OSX this caused
+                # infinite hangs at least on Travis CI !?
+                my $timeout = time+2;
+                while( time < $timeout ) {
+                    my $res = waitpid $pid, WNOHANG;
+                    if( $res != -1 and $res != $pid ) {
+                        warn "Couldn't wait for child '$pid' ($res)?"
+                            if $res != 0;
+                        sleep 0.1;
+                    } else {
+                        last;
+                    };
+                };
+            } else {
+                # on Linux and Windows, plain waitpid Just Works
+                waitpid $pid, WNOHANG;
+            };
         };
 
         if( my $path = $_[0]->{wait_file}) {
@@ -2853,6 +2856,8 @@ sub _scroll_to_bottom {
 
     print $self->document->{nodeId};
 
+Returns the C<document> node.
+
 This is WWW::Mechanize::Chrome specific.
 
 =cut
@@ -3113,16 +3118,18 @@ sub make_link {
     };
 
     if (defined $url) {
+        #my $text  => $node->get_attribute('text'),
+        my $text = $node->get_text;
+        $text =~ s!\A\s+!!s;
+        $text =~ s!\s+\z!!s;
         my $res = WWW::Mechanize::Link->new({
             tag   => $tag,
             name  => $node->get_attribute('name'),
             base  => $base,
             url   => $url,
-            #text  => $node->get_attribute('innerHTML'),
-            text  => $node->get_attribute('text'),
+            text  => $text,
             attrs => {},
         });
-
         return $res
     } else {
         ()
@@ -3734,7 +3741,6 @@ sub xpath( $self, $query, %options) {
     if ('ARRAY' ne (ref $query||'')) {
         $query = [$query];
     };
-
     if( not exists $options{ frames }) {
         $options{ frames }= $self->{frames};
     };

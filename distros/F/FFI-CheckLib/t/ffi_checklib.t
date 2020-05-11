@@ -1,6 +1,5 @@
 use lib 't/lib';
 use Test2::V0 -no_srand => 1;
-use Test2::Mock;
 use Test2::Plugin::FauxOS 'linux';
 use Test2::Tools::FauxDynaLoader;
 use FFI::CheckLib qw( find_lib which where has_symbols );
@@ -40,8 +39,7 @@ subtest 'which' => sub {
 
   my %find_lib_args;
 
-  my $mock = Test2::Mock->new(
-    class => 'FFI::CheckLib',
+  my $mock = mock 'FFI::CheckLib' => (
     override => [
       find_lib => sub {
         %find_lib_args = @_;
@@ -66,8 +64,7 @@ subtest 'which' => sub {
 
   my %find_lib_args;
 
-  my $mock = Test2::Mock->new(
-    class => 'FFI::CheckLib',
+  my $mock = mock 'FFI::CheckLib' => (
     override => [
       find_lib => sub {
         %find_lib_args = @_;

@@ -21,6 +21,7 @@ pod_spelling_system:
     - ie
     - libc
     - WASI
+    - TOML
 
 pod_coverage:
   skip: 0
@@ -30,3 +31,11 @@ pod_coverage:
     - Wasm::Wasmtime::ExternType#new
     - Wasm::Wasmtime::Extern#new
     - Wasm::Wasmtime::Table#new
+    - Wasm::Wasmtime::Instance::Exports#new
+    - Wasm::Wasmtime::Instance::Exports#can
+    - Wasm::Wasmtime::Module::Exports#new
+    - Wasm::Wasmtime::Module::Exports#can
+    - Wasm::Wasmtime::Module::Imports#new
+    - Wasm::Wasmtime::Module::Imports#can
+    - Wasm::Memory#new
+    - Test2::Plugin::Wasm

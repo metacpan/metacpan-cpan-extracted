@@ -116,7 +116,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                     for (var key in s.actionSet) {
                         buttonMap[key].set(s.actionSet[key]);
                     }
-                }             
+                }
 
                 if (!s.key){
                     return;
@@ -228,8 +228,15 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                     if (that._form) {
                         var statusData = {};
                         that._cfg.form.forEach(function(item){
-                            if (item.set && item.set.readOnly && data){
-                                statusData[item.key] = data[item.key];
+                            if (data[item.key]) {
+                                if (item.reloadOnFormReset === true) {
+                                    statusData[item.key] = data[item.key];
+                                }
+                                else if (item.reloadOnFormReset !== false){
+                                    if (item.set && item.set.readOnly){
+                                        statusData[item.key] = data[item.key];
+                                    }
+                                }
                             }
                         });
                         that._form.setData(statusData,true);

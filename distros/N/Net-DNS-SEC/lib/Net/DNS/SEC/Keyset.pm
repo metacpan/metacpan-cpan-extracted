@@ -1,9 +1,9 @@
 package Net::DNS::SEC::Keyset;
 
 #
-# $Id: Keyset.pm 1705 2018-08-23 10:24:02Z willem $
+# $Id: Keyset.pm 1777 2020-05-07 08:24:01Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1705 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1777 $)[1];
 
 
 =head1 NAME
@@ -34,7 +34,7 @@ use strict;
 use integer;
 use warnings;
 use Carp;
-use File::Spec::Functions;
+use File::Spec;
 
 use Net::DNS::ZoneFile;
 
@@ -73,7 +73,7 @@ Sets keyset_err and returns undef on failure.
 sub _new_from_file {
 	my ( $class, $name, @path ) = @_;
 
-	my $file = catfile( @path, $name );
+	my $file = File::Spec->catfile( @path, $name );
 
 	my @rr = new Net::DNS::ZoneFile($file)->read;
 
@@ -102,7 +102,7 @@ sub _new_from_keys {
 	my @sigrr;
 	foreach my $key ( grep $_->type eq 'DNSKEY', @$keylist ) {
 		my $keyname = $key->privatekeyname;
-		my $keyfile = catfile( @keypath, $keyname );
+		my $keyfile = File::Spec->catfile( @keypath, $keyname );
 		my @rrsig   = Net::DNS::RR::RRSIG->create( $keylist, $keyfile );
 		push @sigrr, grep defined, @rrsig;
 	}
@@ -344,13 +344,13 @@ prepended to the domain name to form the keyset filename.
 sub writekeyset {
 	my $self = shift;
 	my ( $arg1, @path ) = @_;
-	@path = shift() if $arg1 && file_name_is_absolute($arg1);
+	@path = shift() if $arg1 && File::Spec->file_name_is_absolute($arg1);
 	my $prefix = shift || 'keyset-';
 
 	my @keysetrr   = ( $self->keys, $self->sigs );
 	my $domainname = $keysetrr[0]->name;
 	my $keysetname = "$prefix$domainname.";
-	my $filename   = catfile( @path, $keysetname );
+	my $filename   = File::Spec->catfile( @path, $keysetname );
 	$filename =~ s/[.]+/\./;	## avoid antisocial consequences of $path with ..
 	open( KEYSET, ">$filename" ) or croak qq(open: "$filename" $!);
 	select( ( select(KEYSET), $self->print )[0] );

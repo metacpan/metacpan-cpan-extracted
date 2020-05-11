@@ -14,20 +14,22 @@ is(
     )
   }),
   object {
-    call_list exports => array {
+    call_list sub { @{ shift->exports } } => array {
       item object {
         call [ isa => 'Wasm::Wasmtime::ExportType' ] => T();
         call name => 'foo';
         call type => object {
-          call [ isa => 'Wasm::Wasmtime::ExternType' ] => T();
+          call [ isa => 'Wasm::Wasmtime::FuncType' ] => T();
         };
+        call to_string => '(func (export "foo") (param i32 i32) (result i32))';
       };
       item object {
         call [ isa => 'Wasm::Wasmtime::ExportType' ] => T();
         call name => 'bar';
         call type => object {
-          call [ isa => 'Wasm::Wasmtime::ExternType' ] => T();
+          call [ isa => 'Wasm::Wasmtime::MemoryType' ] => T();
         };
+        call to_string => '(memory (export "bar") 2 3)';
       };
       end;
     };

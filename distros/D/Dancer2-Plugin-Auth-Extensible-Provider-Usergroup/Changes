@@ -1,5 +1,12 @@
 Revision history for Dancer2-Plugin-Auth-Extensible-Provider-Usergroup
 
+0.709 Sat  9 May 17:09:34 CEST 2020
+
+    * Bump dep on D2PAE
+    * Cleanup MANIFEST
+    * change upstream repo
+    * refresh README.md
+
 0.620 Fri  4 Nov 10:35:28 CET 2016
 
     * Updates for compatibility with plugin v0.620

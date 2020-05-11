@@ -18,5 +18,5 @@ resources:
   bugtracker: https://github.com/merkys/graph-nauty/issues
   homepage: http://search.cpan.org/dist/
   repository: git://github.com/merkys/graph-nauty.git
-version: 0.1.0
+version: 0.1.1
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -4,6 +4,8 @@ author:
   - 'Thomas R. Wyant, III (wyant at cpan dot org)'
 build_requires:
   Carp: '0'
+  Test::More: '0'
+  Test::Perl::Critic::Policy: '0'
   lib: '0'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
@@ -24,7 +26,7 @@ no_index:
 provides:
   Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter:
     file: lib/Perl/Critic/Policy/Variables/ProhibitUnusedVarsStricter.pm
-    version: '0.106'
+    version: '0.107'
 recommends:
   File::Which: '0'
 requires:
@@ -44,5 +46,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter.git
-version: '0.106'
+version: '0.107'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

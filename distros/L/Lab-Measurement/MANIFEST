@@ -200,6 +200,7 @@ lib/Lab/Moose/Instrument/HP34410A.pm
 lib/Lab/Moose/Instrument/HP34420A.pm
 lib/Lab/Moose/Instrument/HP3458A.pm
 lib/Lab/Moose/Instrument/HP8596E.pm
+lib/Lab/Moose/Instrument/HPE4400B.pm
 lib/Lab/Moose/Instrument/Keithley2400.pm
 lib/Lab/Moose/Instrument/Keysight34470A.pm
 lib/Lab/Moose/Instrument/KeysightB2901A.pm
@@ -323,6 +324,8 @@ t/Moose/Instrument/HP34420A.t
 t/Moose/Instrument/HP34420A.yml
 t/Moose/Instrument/HP8596E.t
 t/Moose/Instrument/HP8596E.yml
+t/Moose/Instrument/HPE4400B.t
+t/Moose/Instrument/HPE4400B.yml
 t/Moose/Instrument/Keithley2400.t
 t/Moose/Instrument/Keithley2400.yml
 t/Moose/Instrument/KeysightB2901A.t

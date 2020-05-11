@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation manual for Lab::Measurement
 
 =head1 VERSION
 
-version 3.692
+version 3.701
 
 =head1 OVERVIEW
 
@@ -195,6 +195,8 @@ alias: L<Lab::Moose::Instrument::Agilent34410A>
 =item * L<Lab::Moose::Instrument::RS_FSV>
 
 =item * L<Lab::Moose::Instrument::HP8596E>
+
+=item * L<Lab::Moose::Instrument::HPE4400B>
 
 =item * L<Lab::Moose::Instrument::Rigol_DSA815>
 
@@ -675,6 +677,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
   Copyright 2017       Simon Reinhardt
             2018       Andreas K. Huettel, Simon Reinhardt
             2019       Simon Reinhardt
+            2020       Sam Bingner
 
 
 This is free software; you can redistribute it and/or modify it under

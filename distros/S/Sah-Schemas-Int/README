@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::Int - Sah schemas for various integers
 
 VERSION
-    This document describes version 0.071 of Sah::Schemas::Int (from Perl
-    distribution Sah-Schemas-Int), released on 2018-04-03.
+    This document describes version 0.074 of Sah::Schemas::Int (from Perl
+    distribution Sah-Schemas-Int), released on 2020-05-08.
 
 SAH SCHEMAS
     *   byte
@@ -41,7 +41,7 @@ SAH SCHEMAS
         Natural numbers are those used for counting and ordering. Some
         definitions, like ISO 80000-2 begin the natural numbers with 0. But
         in this definition, natural numbers start with 1. For integers that
-        start at 0, see "nonnegint".
+        start at 0, see "uint".
 
     *   negeven
 
@@ -76,7 +76,7 @@ SAH SCHEMAS
         Positive integer (1, 2, ...).
 
         Zero is not included in this schema because zero is neither positive
-        nor negative. See also "nonnegint" for integers that start from 0.
+        nor negative. See also "uint" for integers that start from 0.
 
     *   posodd
 
@@ -114,7 +114,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/sharyanto/perl-Sah-Schema-Int>.
+    <https://github.com/perlancar/perl-Sah-Schemas-Int>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
@@ -132,7 +132,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2016, 2014 by
+    This software is copyright (c) 2020, 2018, 2017, 2016, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

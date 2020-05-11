@@ -1,12 +1,12 @@
 package Sah::SchemaR::perl::podname;
 
-our $DATE = '2020-02-15'; # DATE
-our $VERSION = '0.027'; # VERSION
+our $DATE = '2020-05-08'; # DATE
+our $VERSION = '0.031'; # VERSION
 
-our $rschema = ["str",[{description=>"\nPerl POD name, e.g. `Config`, `Some::Other::POD`.\n\nBasically the same as `perl::modname`, but with a different completion.\n\n",match=>"\\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*\\z",summary=>"Perl POD name","x.completion"=>"perl_modname","x.perl.coerce_rules"=>["From_str::normalize_perl_modname"]}],["str"]];
+our $rschema = ["str",[{description=>"\nPerl POD name, e.g. `Config`, `Some::Other::POD`.\n\nBasically the same as `perl::modname`, but with a different completion.\n\n",match=>"\\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*\\z",summary=>"Perl POD name, e.g. Moose::Cookbook","x.completion"=>"perl_modname","x.perl.coerce_rules"=>["From_str::normalize_perl_modname"]}],["str"]];
 
 1;
-# ABSTRACT: Perl POD name
+# ABSTRACT: Perl POD name, e.g. Moose::Cookbook
 
 __END__
 
@@ -16,11 +16,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::perl::podname - Perl POD name
+Sah::SchemaR::perl::podname - Perl POD name, e.g. Moose::Cookbook
 
 =head1 VERSION
 
-This document describes version 0.027 of Sah::SchemaR::perl::podname (from Perl distribution Sah-Schemas-Perl), released on 2020-02-15.
+This document describes version 0.031 of Sah::SchemaR::perl::podname (from Perl distribution Sah-Schemas-Perl), released on 2020-05-08.
 
 =head1 DESCRIPTION
 

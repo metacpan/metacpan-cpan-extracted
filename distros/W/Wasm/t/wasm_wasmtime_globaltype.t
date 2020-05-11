@@ -10,9 +10,13 @@ is(
       call kind => 'i32';
     };
     call mutability => 'const';
-    call as_externtype => object {
-      call [ isa => 'Wasm::Wasmtime::ExternType' ] => T();
-    }
+    call to_string => "(const i32)";
+
+    call is_functype   => F();
+    call is_globaltype => T();
+    call is_tabletype  => F();
+    call is_memorytype => F();
+    call kind          => 'globaltype';
   },
   'i32,const',
 );
@@ -26,9 +30,7 @@ is(
       call kind => 'i64';
     };
     call mutability => 'var';
-    call as_externtype => object {
-      call [ isa => 'Wasm::Wasmtime::ExternType' ] => T();
-    }
+    call to_string => "(var i64)";
   },
   'i64,var',
 );
@@ -42,9 +44,7 @@ is(
       call kind => 'f32';
     };
     call mutability => 'var';
-    call as_externtype => object {
-      call [ isa => 'Wasm::Wasmtime::ExternType' ] => T();
-    }
+    call to_string => "(var f32)";
   },
   '(i64),var',
 );

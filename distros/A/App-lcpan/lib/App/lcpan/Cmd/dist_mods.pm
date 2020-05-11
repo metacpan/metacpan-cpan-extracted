@@ -1,9 +1,11 @@
 package App::lcpan::Cmd::dist_mods;
 
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '1.056'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-07'; # DATE
+our $DIST = 'App-lcpan'; # DIST
+our $VERSION = '1.057'; # VERSION
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
 
@@ -35,8 +37,7 @@ sub handle_cmd {
   module.abstract abstract
 FROM module
 LEFT JOIN file ON module.file_id=file.id
-LEFT JOIN dist ON file.id=dist.file_id
-WHERE dist.name=?
+WHERE file.dist_name=?
 ORDER BY name DESC");
     $sth->execute($dist);
     my @res;
@@ -64,7 +65,7 @@ App::lcpan::Cmd::dist_mods - List modules in a distribution
 
 =head1 VERSION
 
-This document describes version 1.056 of App::lcpan::Cmd::dist_mods (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of App::lcpan::Cmd::dist_mods (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 FUNCTIONS
 

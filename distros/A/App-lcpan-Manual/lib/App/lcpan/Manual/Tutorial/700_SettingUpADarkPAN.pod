@@ -1,0 +1,121 @@
+package App::lcpan::Manual::Tutorial::700_SettingUpADarkPAN;
+
+# DATE
+# VERSION
+
+1;
+# ABSTRACT: Setting up a DarkPAN mirror
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+App::lcpan::Manual::Tutorial::700_SettingUpADarkPAN - Setting up a DarkPAN mirror
+
+=head1 VERSION
+
+version 1.057.000
+
+=head1 DESCRIPTION
+
+A DarkPAN is a term to refer to a CPAN-like directory structure which contains
+regular CPAN modules plus some of your own private modules, or perhaps purely
+your own module only. It can be available over the Internet, but often not at
+all (hence the term "dark"). The use of CPAN-like directory makes it possible to
+use existing toolchain used for CPAN, including installer like
+L<cpanm|App::cpanminus>.
+
+=head1 SETTING UP YOUR DARKPAN
+
+=head2 Adding distributions
+
+To setup a darkpan with lcpan, you have two options. First, you can use a
+regular mini CPAN mirror as a basis then add some of your own. The second is you
+start with an empty repository and add modules as you go.
+
+To use a mini CPAN mirror as a basis, you perform the usual steps (see
+L<200__SettingUpAMiniCPAN|App::lcpan::Manual::Tutorial::200_SettingUpAMiniCPAN>),
+then inject your distributions using:
+
+ % lcpan inject /path/to/Your-Distribution-1.23.tar.gz
+
+F<Your-Distribution-1.23.tar.gz> is produced by whatever distribution builder
+you choose to use (e.g. L<Dist::Zilla>). The above command will make lcpan, via
+L<OrePAN>, copy the file to the local CPAN mirror as well as modify
+F<modules/02packages.details.txt.gz> to include the modules inside the
+distribution.
+
+B<However, the next 'lcpan update' will again remove your distribution from the
+index as lcpan will synchronize to the remote CPAN index>. Either you never
+update the CPAN mirror, or you re-inject your distributions after every 'lcpan
+update', both of which are not convenient. The future lcpan version will add a
+pinning mechanism to retain your injected distribution and when that version is
+released this page will be updated accordingly.
+
+To start from an empty repository, you can use L<OrePAN>:
+
+ % mkdir -p /path/to/your/darkpan
+ % orepan.pl --destination=/path/to/your/darkpan --pause=YOURID /path/to/Your-Distribution-1.23.tar.gz
+
+C<YOURID> is an arbitrary PAUSE-ID-like ID you can choose.
+
+After that, to index this repository using lcpan, you can add these lines to
+your lcpan configuration:
+
+ [profile=darkpan]
+ cpan=/path/to/your/darkpan
+ use_bootstrap=0
+
+ % lcpan --config-profile=darkpan update --verbose
+
+The C<use_bootstrap=0> setting will prevent lcpan from using a mini CPAN index
+bootstrap. You can add a shell alias to make the above command more convenient
+e.g.:
+
+ alias lcpan-darkpan="lcpan --config-profile=darkpan"
+
+=head1 USING YOUR DARKPAN
+
+=head2 Installing modules
+
+To install modules from your DarkPAN, you can use:
+
+ % cpanm --mirror file:/path/to/your/darkpan -n MODULE::NAME
+
+This will make cpanm fallback to a regular remote CPAN mirror when a module or a
+dependency does not exist on the DarkPAN. To add more mirrors, you simply
+specify more:
+
+ % cpanm --mirror file:/path/to/your/darkpan --mirror file:/path/to/cpan -n MODULE::NAME
+
+=head2 Querying information
+
+Using the previously created alias:
+
+ % lcpan-darkpan mods -l ;# list all modules in your DarkPAN
+ # and so on
+
+If you want to query over HTTP, there's L<App::lcpan::Daemon> which is a L<PSGI>
+application you can run with a PSGI-compliant webserver.
+
+If you want a nice web interface like L<MetaCPAN|https://metacpan.org> for your
+local mini CPAN mirror, currently you're out of luck. Maybe I or someone else
+will get around to it. Note that you can also setup a MetaCPAN of your own, but
+it's more involved.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

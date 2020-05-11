@@ -2,7 +2,7 @@
 # PODNAME: TestRail::Utils
 
 package TestRail::Utils;
-$TestRail::Utils::VERSION = '0.044';
+$TestRail::Utils::VERSION = '0.046';
 use strict;
 use warnings;
 
@@ -12,6 +12,7 @@ use TestRail::API;
 
 use IO::Interactive::Tiny ();
 use Term::ANSIColor 2.01 qw(colorstrip);
+use Term::ReadKey ();
 use Scalar::Util qw{blessed};
 
 sub help {
@@ -24,10 +25,19 @@ sub help {
 }
 
 sub userInput {
-    local $| = 1;
-    my $rt = <STDIN>;
-    chomp $rt;
-    return $rt;
+    my ($echo_ok) = @_;
+    my $input = "";
+
+    # I'm going to be super paranoid here and consider everything to be sensitive info by default.
+    Term::ReadKey::ReadMode('noecho') unless $echo_ok;
+    {
+        local $SIG{'INT'} = sub { Term::ReadKey::ReadMode(0); exit 130; };
+        $input = <STDIN>;
+        chomp($input) if $input;
+    }
+    Term::ReadKey::ReadMode(0) unless $echo_ok;
+    print "\n";
+    return $input;
 }
 
 sub interrogateUser {
@@ -35,7 +45,7 @@ sub interrogateUser {
     foreach my $key (@keys) {
         if ( !$options->{$key} ) {
             print "Type the $key for your TestRail install below:\n";
-            $options->{$key} = TestRail::Utils::userInput();
+            $options->{$key} = TestRail::Utils::userInput( $key ne 'password' );
             die "$key cannot be blank!" unless $options->{$key};
         }
     }
@@ -199,7 +209,7 @@ TestRail::Utils - Utilities for the testrail command line functions, and their m
 
 =head1 VERSION
 
-version 0.044
+version 0.046
 
 =head1 SCRIPT HELPER FUNCTIONS
 
@@ -268,12 +278,12 @@ George S. Baugh <teodesian@cpan.org>
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/teodesian/TestRail-Perl>
+The development version is on github at L<https://github.com/teodesian/TestRail-Perl>
 and may be cloned from L<git://github.com/teodesian/TestRail-Perl.git>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by George S. Baugh.
+This software is copyright (c) 2020 by George S. Baugh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

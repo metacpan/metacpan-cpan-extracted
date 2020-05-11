@@ -1,28 +1,91 @@
-SYNOPSIS
+NAME
+    Params::Sah - Validate method/function parameters using Sah schemas
 
+VERSION
+    This document describes version 0.072 of Params::Sah (from Perl
+    distribution Params-Sah), released on 2020-05-10.
+
+SYNOPSIS
      use Params::Sah qw(gen_validator);
-    
-     # for subroutines that accept positional parameters
+
+     # for subroutines that accept positional parameters. all parameters required,
+     # but you can pass undef to the third param.
      sub mysub1 {
-         state $validator = gen_validator('str*', 'int');
+         state $validator = gen_validator('str*', ['array*', min_len=>1], 'int');
          $validator->(\@_);
+         ...
      }
-    
-     # for subroutines that accept named parameters
+     mysub1("john", ['a']);        # dies, the third argument is not passed
+     mysub1("john", ['a'], 2);     # ok
+     mysub1("john", ['a'], 2, 3);  # dies, extra parameter
+     mysub1("john", ['a'], undef); # ok, even though the third argument is undef
+     mysub1([],     ['a'], undef); # dies, first argument does not validate
+     mysub1("john", [], undef);    # dies, second argument does not validate
+
+     # for subroutines that accept positional parameters (this time arrayref instead
+     # of array), some parameters optional. also this time we use 'allow_extra'
+     # option to allow additional positional parameters.
+     sub mysub1b {
+         my $args = shift;
+         state $validator = gen_validator({optional_params=>[2], allow_extra=>1}, 'str*', 'array*', 'int');
+         $validator->($args);
+         ...
+     }
+     mysub1b(["john", ['a']]);        # ok, the third argument is optional
+     mysub1b(["john", ['a'], 2]);     # ok
+     mysub1b(["john", ['a'], undef]); # ok
+     mysub1b(["john", ['a'], 2, 3]);  # ok, extra params allowed
+
+     # for subroutines that accept named parameters (as hash). all parameters
+     # required, but you can pass undef to the 'age' parameter.
      sub mysub2 {
          my %args = @_;
-    
-         state $validator = gen_validator({named=>1}, name=>'str*', age=>'int');
+
+         state $validator = gen_validator({named=>1}, name=>'str*', tags=>['array*', min_len=>1], age=>'int');
          $validator->(\%args);
+         ...
      }
+     mysub2(name=>"john", tags=>['a']);             # dies, the 'age' argument is not passed
+     mysub2(name=>"john", tags=>['a'], age=>32);    # ok
+     mysub2(name=>"john", tags=>['a'], age=>undef); # ok, even though the 'age' argument is undef
+     mysub2(name=>[],     tags=>['a'], age=>undef); # dies, the 'name' argument does not validate
+     mysub2(name=>"john", tags=>[],    age=>undef); # dies, the 'tags' argument does not validate
 
-    Examples for more complex schemas:
+     # for subroutines that accept named parameters (this time as hashref). some
+     # parameters optional. also this time we want to allow extra named parameters.
+     sub mysub2b {
+         my $args = shift;
 
-     gen_validator(
-         {named => 1},
-         name => ['str*', min_len=>4, match=>qr/\S/],
-         age  => ['int', min=>17, max=>120],
-     );
+         state $validator = gen_validator(
+             {named=>1, optional_params=>['age'], allow_extra=>1},
+             name=>'str*',
+             tags=>['array*', min_len=>1],
+             age=>'int*',
+         );
+         $validator->($args);
+         ...
+     }
+     mysub2b({name=>"john", tags=>['a']});                  # ok
+     mysub2b({name=>"john", tags=>['a'], age=>32});         # ok
+     mysub2b({name=>"john", tags=>['a'], age=>32, foo=>1}); # ok, extra param 'foo' allowed
+     mysub2b({name=>"john", tags=>['a'], age=>undef});      # dies, this time, 'age' cannot be undef
+
+    Example with more complex schemas, with default value and coercion
+    rules:
+
+     sub mysub2c {
+         my %args = @_;
+         state $validator = gen_validator(
+             {named => 1, optional_params => ['age']},
+             name => ['str*', min_len=>4, match=>qr/\S/, default=>'noname'],
+             age  => ['int', min=>17, max=>120],
+             tags => ['array*', min_len=>1, of=>['str*', match=>qr/\A\w+\z/], 'x.perl.coerce_rules'=>['From_str::comma_sep']],
+         );
+         $validator->(\%args);
+         ...
+     }
+     mysub2c(tags=>['a']);                   # after validation, %args will be: (name=>'noname', tags=>['a'])
+     mysub2c(name=>"mark", tags=>['b,c,d']); # after validation, %args will be: (name=>'mark', tags=>['b','c','d'])
 
     Validator generation options:
 
@@ -30,112 +93,167 @@ SYNOPSIS
      gen_validator({on_invalid=>'croak'}, ...);
 
 DESCRIPTION
-
     This module provides a way for functions to validate their parameters
     using Sah schemas.
 
-    The interface is rather different than Params::Validate because it
-    returns a validator code instead of directly validating parameters. The
-    returned validator code is the actual routine that performs parameters
-    checking. This is done for performance reason. For efficiency, you need
-    to cache this validator code instead of producing them at each function
-    call, thus the use of state variables.
+VARIABLES
+  $DEBUG
+    Bool. If set to true will print validator code when generated.
 
-    Performance is faster than Params::Validate, since you can avoid
-    recompiling specification or copying array/hash twice. Sah also
-    provides a rich way to validate data structures.
+  $OPT_BACKEND
+    Str. Used to set default for "backend" option.
+
+  $OPT_ALLOW_EXTRA
+    Bool. Used to set default for "allow_extra" option.
+
+  $OPT_ON_INVALID
+    String. Used to set default for "on_invalid" option.
+
+  $OPT_ERR_DETAIL
+    Bool. Used to set default for "err_detail" option.
+
+  $OPT_DISABLE
+    Bool. Used to set default for "disable" option.
+
+  $OPT_NAMED
+    Bool. Used to set default for "named" option.
+
+PERFORMANCE NOTES
+    See benchmarks in Bencher::Scenarios::ParamsSah.
 
 FUNCTIONS
-
     None exported by default, but exportable.
 
- gen_validator([\%opts, ] ...) => code
-
+  gen_validator([\%opts, ] ...) => code
     Generate code for subroutine validation. It accepts an optional hashref
     as the first argument for options. The rest of the arguments are Sah
-    schemas that correspond to the function parameters in the same
-    position, i.e. the first schema will validate the function's first
-    argument, and so on. Example:
+    schemas that correspond to the function parameters in the same position,
+    i.e. the first schema will validate the function's first argument, and
+    so on. Example:
 
      gen_validator('schema1', 'schema2', ...);
      gen_validator({option=>'val', ...}, 'schema1', 'schema2', ...);
 
     Will return a coderef which is the validator code. The code accepts an
-    arrayref (usually \@_).
+    arrayref (usually "\@_").
 
     Known options:
 
-      * named => bool (default: 0)
+    *   backend => str (default: Data::Sah)
 
-      If set to true, it means we are generating validator for subroutine
-      that accepts named parameters (e.g. f(name=>'val', other=>'val2'))
-      instead of positional (e.g. f('val', 'val2')). The validator will
-      accept the parameters as a hashref. And the arguments of
-      gen_validator are assumed to be a hash of parameter names and schemas
-      instead of a list of schemas, for example:
+        Can be set to the experimental Data::Sah::Tiny to speed up validator
+        generation for simpler schemas.
 
-       gen_validator({named=>1}, arg1=>'schema1', arg2=>'schema2', ...);
+    *   named => bool (default: 0)
 
-      * on_invalid => str (default: 'croak')
+        If set to true, it means we are generating validator for subroutine
+        that accepts named parameters (e.g. "f(name=>'val', other=>'val2')")
+        instead of positional (e.g. "f('val', 'val2')"). The validator will
+        accept the parameters as a hashref. And the arguments of
+        "gen_validator" are assumed to be a hash of parameter names and
+        schemas instead of a list of schemas, for example:
 
-      What should the validator code do when function parameters are
-      invalid? The default is to croak (see Carp) to report error to STDERR
-      from the caller perspective. Other valid choices include: warn, carp,
-      die, bool (return false on invalid, or true on valid), str (return an
-      error message on invalid, or empty string on valid).
+         gen_validator({named=>1}, arg1=>'schema1', arg2=>'schema2', ...);
 
-PERFORMANCE NOTES
+    *   optional_params => array
 
-    Sample benchmark against Params::Validate:
+        By default all parameters are required. This option specifies which
+        parameters should be made optional. For positional parameters,
+        specify the index (0-based).
 
-    #EXAMPLE: devscripts/bench
+    *   allow_extra => bool (default: 0)
 
-    Sample benchmark result on my laptop:
+        If set to one then additional positional or named parameters are
+        allowed (and not validated). By default, no extra parameters are
+        allowed.
 
-                                       Rate P::V, named, str+int P::V, pos, str+int P::V, pos, str P::Sah, named, str+int P::Sah, pos, str+int P::Sah, pos, str
-     P::V, named, str+int    77993.2+-0.14/s                   --             -28.3%         -72.3%                 -83.0%               -90.7%           -92.9%
-     P::V, pos, str+int        108710+-140/s         39.38+-0.18%                 --         -61.4%                 -76.3%               -87.0%           -90.1%
-     P::V, pos, str            281590+-530/s        261.04+-0.68%      159.03+-0.59%             --                 -38.6%               -66.4%           -74.4%
-     P::Sah, named, str+int    458440+-180/s               487.8%      321.71+-0.57%   62.81+-0.31%                     --               -45.2%           -58.3%
-     P::Sah, pos, str+int      837250+-880/s          973.5+-1.1%        670.2+-1.3%  197.33+-0.64%            82.63+-0.2%                   --           -23.9%
-     P::Sah, pos, str       1.0997e+06+-24/s              1310.0%        911.6+-1.3%  290.54+-0.73%                 139.9%         31.35+-0.14%               --
+    *   on_invalid => str (default: 'croak')
+
+        What should the validator code do when function parameters are
+        invalid? The default is to croak (see Carp) to report error to
+        STDERR from the caller perspective. Other valid choices include:
+        "warn", "carp", "die", "bool" (return false on invalid, or true on
+        valid), "str" (return an error message on invalid, or empty string
+        on valid).
+
+    *   invalid_detail => bool (default: 0)
+
+        If set to true, will generate a more detailed error message. For
+        example, with this schema:
+
+         [str => {min_len=>4}]
+
+        then the string 'foo' will fail to validate with this error message
+        "Length must be at least 4". Otherwise, the error message will just
+        be something like: "Fail schema ['str', {min_len=>1}]". By default
+        this option is set to false for slightly faster validation.
+
+    *   disable => bool (default: 0)
+
+        If set to 1, will return an empty coderef validator. Used to disable
+        parameter checking. Usually via setting "$OPT_DISABLE" to disable
+        globally.
 
 FAQ
+  How do I learn more about Sah (the schema language)?
+    See the specification: Sah. The Sah::Examples distribution also contains
+    more examples. Also, for other examples, lots of my distributions
+    contain Rinci metadata which includes schemas for each function
+    arguments.
 
- How do I learn more about Sah (the schema language)?
-
-    See the specification: Sah. The Sah::Examples distribution also
-    contains more examples. Also, for other examples, lots of my
-    distributions contain Rinci metadata which includes schemas for each
-    function arguments.
-
- Why does the validator code accept arrayref/hashref instead of array/hash?
-
+  Why does the validator code accept arrayref/hashref instead of array/hash?
     To be able to modify the original array/hash, e.g. set default value.
 
- How to give default value to parameters?
+  What if my subroutine accepts a mix of positional and named parameters?
+    You can put all your parameters in a hash first, then feed it to the
+    validator. For example:
 
-    By using the Sah default clause:
+     sub mysub {
+         my %args;
+         %args = %{shift} if req $_[0] eq 'HASH'; # accept optional hashref
+         ($args{x}, $args{y}) = @_; # positional params
+         state $validator = gen_validator(
+             {named=>1, optional_params=>['opt1','opt2']},
+             x=>"posint*",
+             y=>"negint*",
+             opt1=>"str*",
+             opt2=>"str",
+         );
+         $validator->(\%args);
+         ...
+     }
+     mysub(1, -2);                # ok, after validation %args will become (x=>1, y=>-2)
+     mysub({}, 1, -2);            # ok, after validation %args will become (x=>1, y=>-2)
+     mysub({opt1=>"foo"}, 1, -2); # ok, after validation %args will become (x=>1, y=>-2, opt1=>"foo")
+     mysub({opt3=>"foo"}, 1, -2); # dies, unknown option 'opt3'
+     mysub({opt1=>"foo"}, 1);     # dies, missing required arg 'x'
+     mysub({opt1=>[]}, 1, -2);    # dies, 'opt1' argument doesn't validate
+
+  How to give default value to parameters?
+    By using the Sah "default" clause in your schema:
 
      gen_validator(['str*', default=>'green']);
 
- Why is my program failing with error message: Can't call method "state" on
- an undefined value?
+  How to make some parameters optional?
+    By using the "optional_params" option, which is an array of parameter
+    names to make optional. To set a positional parameter optional, specify
+    its index (0-based) as name.
 
-    You need to use Perl 5.10 or newer and enable the 5.10 feature 'state':
+  Why is my program failing with error message: Can't call method "state" on an undefined value?
+    You need to specify that you want to use "state" variables, either by:
 
+     # at least
      use 5.010;
 
     or:
 
      use feature 'state';
 
- How do I see the validator code being generated?
-
-    Set $Params::Sah::DEBUG=1 before gen_validator(), for example:
+  How do I see the validator code being generated?
+    Set "$Params::Sah::DEBUG=1" before "gen_validator()", for example:
 
      use Params::Sah qw(gen_validator);
-    
+
      $Params::Sah::DEBUG = 1;
      gen_validator('int*', 'str');
 
@@ -168,15 +286,32 @@ FAQ
         |
       26|};
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Params-Sah>.
 
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Params-Sah>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Params-Sah>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Sah, Data::Sah
 
-    Params::Validate
+    Alternative modules: Params::ValidationCompiler (a compiled version of
+    Params::Validate), Type::Params (from Type::Tiny).
 
-    Perinci::Sub::Wrapper, if you want to do more than parameter
-    validation.
+AUTHOR
+    perlancar <perlancar@cpan.org>
 
-    Perinci::Sub::ValidateArgs and Data::Sah::Params, an accidental
-    reimplementation of the same idea a year later :-)
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

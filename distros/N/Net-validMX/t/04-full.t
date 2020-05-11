@@ -14,6 +14,6 @@ sub test {
   return $rv;
 }
 
-is( &test('kevin.mcgrail@thoughtworthy.com'), 1, 'Test for valid email format');
+is( &test('kevin.mcgrail@peregrinehw.com'), 1, 'Test for valid email format');
 is( &test('kevin.mcgrail@aol'), 1, 'Test for valid email format with sanitize');
-is( &test('kevin.mcgrail @ ThoughtWorthy .com'), 1, 'Test for valid email with spaces');
+is( &test('kevin.mcgrail @ peregrine hw .com'), 1, 'Test for valid email with spaces');

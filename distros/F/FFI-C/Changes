@@ -1,5 +1,12 @@
 Revision history for FFI-C},
 
+0.06      2020-05-09 04:41:32 -0600
+  - Bumped Test2::Suite prereq to get float (gh#33)
+  - Fixes for Perls with 32bit IV (gh#34)
+
+0.05      2020-05-07 04:58:02 -0600
+  - Added set_array_count function to FFI::C::Util (gh#31)
+
 0.04      2020-05-05 09:24:13 -0600
   - non-generated struct/union objects properly support can (gh#28)
   - Added nullable property to FFI::C::Def class (gh#30)

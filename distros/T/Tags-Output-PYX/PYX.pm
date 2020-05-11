@@ -1,11 +1,9 @@
 package Tags::Output::PYX;
 
-# Pragmas.
 use base qw(Tags::Output);
 use strict;
 use warnings;
 
-# Modules.
 use Error::Pure qw(err);
 use Readonly;
 use Tags::Utils qw(encode_newline);
@@ -14,8 +12,7 @@ use Tags::Utils qw(encode_newline);
 Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $SPACE => q{ };
 
-# Version.
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Attributes.
 sub _put_attribute {
@@ -105,6 +102,7 @@ __END__
 =head1 SYNOPSYS
 
  use Tags::Output::PYX;
+
  my $obj = Tags::Output::PYX->new(%parameters);
  $obj->finalize;
  my $ret = $obj->flush($reset_flag);
@@ -210,11 +208,9 @@ __END__
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Tags::Output::PYX;
 
  # Object.
@@ -270,17 +266,22 @@ Install the Tags modules.
 
 =back
 
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/Tags-Output-PYX>
+
 =head1 AUTHOR
 
-Michal Špaček L<skim@cpan.org>
+Michal Josef Špaček L<skim@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2011-2015 Michal Špaček
- BSD 2-Clause License
+© 2011-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

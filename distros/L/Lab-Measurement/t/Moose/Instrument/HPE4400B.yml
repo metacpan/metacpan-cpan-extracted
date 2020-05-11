@@ -1,0 +1,336 @@
+---
+command: '*IDN?'
+id: 0
+method: Query
+retval: "Hewlett-Packard, E4401B, US00000000, A.14.01\n"
+---
+command: '*IDN?'
+id: 1
+method: Query
+retval: "Hewlett-Packard, E4401B, US00000000, A.14.01\n"
+---
+id: 2
+method: Clear
+---
+command: '*CLS'
+id: 3
+method: Write
+---
+command: :DISP:WIN:TRACe:Y:SCALe:RLEV -30
+id: 4
+method: Write
+---
+command: :DISP:WIN:TRACe:Y:SCALe:RLEV?
+id: 5
+method: Query
+retval: '-3.000000E+01
+
+'
+---
+command: :DISP:WIN:TRACe:Y:SCALe:RLEV -10
+id: 6
+method: Write
+---
+command: :DISP:WIN:TRACe:Y:SCALe:RLEV?
+id: 7
+method: Query
+retval: '-1.000000E+01
+
+'
+---
+command: :DISP:WIN:TRACe:Y:SCALe:RLEV -20
+id: 8
+method: Write
+---
+command: :DISP:WIN:TRACe:Y:SCALe:RLEV?
+id: 9
+method: Query
+retval: '-2.000000E+01
+
+'
+---
+command: SENS:BAND 3000
+id: 10
+method: Write
+---
+command: SENS:BAND?
+id: 11
+method: Query
+retval: '3000
+
+'
+---
+command: SENS:BAND 30000
+id: 12
+method: Write
+---
+command: SENS:BAND?
+id: 13
+method: Query
+retval: '30000
+
+'
+---
+command: SENS:BAND 300000
+id: 14
+method: Write
+---
+command: SENS:BAND?
+id: 15
+method: Query
+retval: '300000
+
+'
+---
+command: SENS:BAND:VIDEO 1000
+id: 16
+method: Write
+---
+command: SENS:BAND:VIDEO?
+id: 17
+method: Query
+retval: '1000
+
+'
+---
+command: SENS:BAND:VIDEO 10000
+id: 18
+method: Write
+---
+command: SENS:BAND:VIDEO?
+id: 19
+method: Query
+retval: '10000
+
+'
+---
+command: SENS:BAND:VIDEO 100000
+id: 20
+method: Write
+---
+command: SENS:BAND:VIDEO?
+id: 21
+method: Query
+retval: '100000
+
+'
+---
+command: SENS:FREQ:STAR 1000000
+id: 22
+method: Write
+---
+command: SENS:FREQ:STAR?
+id: 23
+method: Query
+retval: '1000000
+
+'
+---
+command: SENS:FREQ:STAR 10000000
+id: 24
+method: Write
+---
+command: SENS:FREQ:STAR?
+id: 25
+method: Query
+retval: '10000000
+
+'
+---
+command: SENS:FREQ:STAR 100000000
+id: 26
+method: Write
+---
+command: SENS:FREQ:STAR?
+id: 27
+method: Query
+retval: '100000000
+
+'
+---
+command: SENS:FREQ:STOP 110000000
+id: 28
+method: Write
+---
+command: SENS:FREQ:STOP?
+id: 29
+method: Query
+retval: '110000000
+
+'
+---
+command: SENS:FREQ:STOP 210000000
+id: 30
+method: Write
+---
+command: SENS:FREQ:STOP?
+id: 31
+method: Query
+retval: '210000000
+
+'
+---
+command: SENS:FREQ:STOP 310000000
+id: 32
+method: Write
+---
+command: SENS:FREQ:STOP?
+id: 33
+method: Query
+retval: '310000000
+
+'
+---
+command: SENS:POW:RF:ATT 20
+id: 34
+method: Write
+---
+command: SENS:POW:RF:ATT?
+id: 35
+method: Query
+retval: '20
+
+'
+---
+command: SENS:POW:RF:ATT 10
+id: 36
+method: Write
+---
+command: SENS:POW:RF:ATT?
+id: 37
+method: Query
+retval: '10
+
+'
+---
+command: SENS:POW:RF:ATT 0
+id: 38
+method: Write
+---
+command: SENS:POW:RF:ATT?
+id: 39
+method: Query
+retval: '0
+
+'
+---
+command: SENS:SWE:TIME 0.1
+id: 40
+method: Write
+---
+command: SENS:SWE:TIME?
+id: 41
+method: Query
+retval: '1.000000E-01
+
+'
+---
+command: SENS:SWE:TIME 0.4
+id: 42
+method: Write
+---
+command: SENS:SWE:TIME?
+id: 43
+method: Query
+retval: '4.000000E-01
+
+'
+---
+command: SENS:SWE:TIME 0.8
+id: 44
+method: Write
+---
+command: SENS:SWE:TIME?
+id: 45
+method: Query
+retval: "8.000000E-01\n\n"
+---
+command: UNIT:POWer DBMV
+id: 46
+method: Write
+---
+command: UNIT:POWer?
+id: 47
+method: Query
+retval: "DBMV\n"
+---
+command: UNIT:POWer V
+id: 48
+method: Write
+---
+command: UNIT:POWer?
+id: 49
+method: Query
+retval: "V\n"
+---
+command: UNIT:POWer DBM
+id: 50
+method: Write
+---
+command: UNIT:POWer?
+id: 51
+method: Query
+retval: "DBM\n"
+---
+command: SENS:SWE:POIN 10
+id: 52
+method: Write
+---
+command: SENS:SWE:POIN?
+id: 53
+method: Query
+retval: "10\n"
+---
+command: SENS:SWE:POIN 40
+id: 54
+method: Write
+---
+command: SENS:SWE:POIN?
+id: 55
+method: Query
+retval: "40\n"
+---
+command: SENS:SWE:POIN 100
+id: 56
+method: Write
+---
+command: SENS:SWE:POIN?
+id: 57
+method: Query
+retval: "100\n"
+---
+command: SENS:SWE:POIN?
+id: 58
+method: Query
+retval: "100\n"
+---
+command: TRAC? TRACE1
+command: FORM?
+id: 59
+method: Query
+retval: "REAL,32\n"
+---
+command: TRAC? TRACE1
+id: 60
+method: Query
+retval: 2339303030303030303034f2c0a0c2f233a2c27c659dc2f151a0c28e1f9dc206aca1c27e5d9fc27482a1c21198a3c22d2aa0c2ede89fc278669bc2f57c9fc2aa3ea2c256439fc24f219ec242f99dc2528f9bc251e99ec28135a1c2684da0c2f1ec9fc29f9e9ec21ece9cc2acec9ac24550a2c25c80a0c2804c9fc237d49fc2f7939ec2b4759fc22c57a1c2ddc0a1c26a00a2c22a36a0c2880da3c2e2f49fc26b7aa1c2f53da1c258e6a0c2b0b79fc267239fc2bd3da1c29053a4c2a6baa0c28f5ca3c28a87a0c295d3a1c2f5b89fc2d35ca0c21906a1c2bde79bc2e830a2c234129fc2791ea2c2affca2c2e62ca1c2827da0c2b66da0c214c99fc2c259a2c2ce369fc2c8d0a2c26324a2c22ccd9dc2357aa3c2d788a1c2f8bea0c2b7a89cc25080a2c28e2e9ec2f0019fc2e5f69ec271239ac24fc89dc28874a1c2b5b19ec27c679fc2234a9bc25f7d99c20c7a9bc298e69ec22534a2c27ddea1c2dd909bc2743c9bc245d599c2e56d99c2566c9cc2b5089cc27f199cc28c4d9ac213c591c26b0f99c28d11a2c25118a3c2aa309fc2a4d597c2525e99c2a89a9dc26
+retval_enc: hex
+---
+command: SENS:SWE:POIN?
+id: 61
+method: Query
+retval: "100\n"
+---
+command: SENS:FREQ:STAR?
+id: 62
+method: Query
+retval: '100000000
+
+'
+---
+command: SENS:FREQ:STOP?
+id: 63
+method: Query
+retval: '310000000
+
+'

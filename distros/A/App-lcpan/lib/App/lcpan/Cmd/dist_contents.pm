@@ -1,7 +1,9 @@
 package App::lcpan::Cmd::dist_contents;
 
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '1.056'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-07'; # DATE
+our $DIST = 'App-lcpan'; # DIST
+our $VERSION = '1.057'; # VERSION
 
 use 5.010;
 use strict;
@@ -41,9 +43,9 @@ sub handle_cmd {
     my $state = App::lcpan::_init(\%args, 'ro');
     my $dbh = $state->{dbh};
 
-    my ($dist_id) = $dbh->selectrow_array(
-        "SELECT id FROM dist WHERE name=?", {}, $args{dist});
-    $dist_id or return [404, "No such dist '$args{dist}'"];
+    my ($file_id) = $dbh->selectrow_array(
+        "SELECT id FROM file WHERE dist_name=?", {}, $args{dist});
+    $file_id or return [404, "No such dist '$args{dist}'"];
 
     App::lcpan::Cmd::contents::handle_cmd(%args);
 }
@@ -63,7 +65,7 @@ App::lcpan::Cmd::dist_contents - List contents inside a distribution
 
 =head1 VERSION
 
-This document describes version 1.056 of App::lcpan::Cmd::dist_contents (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of App::lcpan::Cmd::dist_contents (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 FUNCTIONS
 
@@ -103,6 +105,10 @@ Defaults to C<~/cpan>.
 =item * B<detail> => I<bool>
 
 =item * B<dist>* => I<perl::distname>
+
+=item * B<file_id> => I<posint>
+
+Filter by file ID.
 
 =item * B<index_name> => I<filename> (default: "index.db")
 

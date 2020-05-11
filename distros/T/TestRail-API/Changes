@@ -1,5 +1,13 @@
 Revision history for Perl module TestRail::API
 
+0.046 2020-05-8 TEODESIAN
+    - Hide password entry in bin/ utilities.
+    - Add bin/testrail-replay to re-play the results of runs and plans.
+
+0.045 2019-05-11 TEODESIAN
+    - Add getReports and runReport methods to TestRail::API
+    - Use a cookie jar when doing requests to use testrail sessions if enabled for the API
+
 0.044 2018-10-9 TEODESIAN
     - Add getCaseFields and addCaseField methods to TestRail::API
     - Correct argument POD for createRunInPlan

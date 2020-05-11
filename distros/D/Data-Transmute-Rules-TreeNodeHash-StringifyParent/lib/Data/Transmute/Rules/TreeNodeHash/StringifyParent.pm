@@ -3,7 +3,7 @@ package Data::Transmute::Rules::TreeNodeHash::StringifyParent;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-02-13'; # DATE
 our $DIST = 'Data-Transmute-Rules-TreeNodeHash-StringifyParent'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -36,7 +36,7 @@ Data::Transmute::Rules::TreeNodeHash::StringifyParent - Stringify parent attribu
 
 =head1 VERSION
 
-This document describes version 0.001 of Data::Transmute::Rules::TreeNodeHash::StringifyParent (from Perl distribution Data-Transmute-Rules-TreeNodeHash-StringifyParent), released on 2020-02-13.
+This document describes version 0.002 of Data::Transmute::Rules::TreeNodeHash::StringifyParent (from Perl distribution Data-Transmute-Rules-TreeNodeHash-StringifyParent), released on 2020-02-13.
 
 =head1 DESCRIPTION
 
@@ -68,6 +68,8 @@ feature.
 =head1 SEE ALSO
 
 L<Data::Transmute::Rules::TreeNodeHash::StringifyChildren>
+
+More specialized tree dumpers, e.g.: L<Tree::Dump>, L<Tree::To::TextLines>.
 
 =head1 AUTHOR
 

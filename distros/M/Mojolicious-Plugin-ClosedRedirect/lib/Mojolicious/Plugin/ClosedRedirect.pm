@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::ByteStream 'b';
 use Mojo::Util qw/secure_compare url_unescape quote/;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 # TODO: Support domain whitelisting, like
 #       https://github.com/sdsdkkk/safe_redirect
@@ -361,7 +361,7 @@ L<Mojolicious>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016-2018, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2016-2020, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.

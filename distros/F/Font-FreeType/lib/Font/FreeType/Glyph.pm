@@ -290,6 +290,15 @@ The left side bearing, which is the distance from the origin to
 the left of the glyph image.  Usually positive for horizontal layouts
 and negative for vertical ones.
 
+=item load()
+
+Tell FreeType to load the glyph. There are very few reasons to use
+this as it is called implicitly if needed, by most of the other methods.
+
+A few of these reasons include: timing or profiling tests of
+FreeType, debugging FreeType via side effects of glyph loading
+(by setting FT2_DEBUG).
+
 =item name()
 
 The name of the glyph, if the font format supports glyph names,

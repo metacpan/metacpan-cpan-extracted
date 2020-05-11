@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::mentions_by_mod;
 
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '1.056'; # VERSION
+our $DATE = '2020-05-07'; # DATE
+our $VERSION = '1.057'; # VERSION
 
 use 5.010;
 use strict;
@@ -59,7 +59,7 @@ App::lcpan::Cmd::mentions_by_mod - List POD mentions by module(s)
 
 =head1 VERSION
 
-This document describes version 1.056 of App::lcpan::Cmd::mentions_by_mod (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of App::lcpan::Cmd::mentions_by_mod (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 FUNCTIONS
 

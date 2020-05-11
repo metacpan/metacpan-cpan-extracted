@@ -1,9 +1,11 @@
 package App::lcpan::Cmd::script2mod;
 
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '1.056'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-07'; # DATE
+our $DIST = 'App-lcpan'; # DIST
+our $VERSION = '1.057'; # VERSION
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
 
@@ -44,7 +46,6 @@ SELECT
   (SELECT name FROM module WHERE file_id=file.id LIMIT 1) module
 FROM script
 LEFT JOIN file   ON script.file_id=file.id
-LEFT JOIN dist   ON file.id=dist.file_id
 WHERE script.name IN ($scripts_s)
 ");
 
@@ -87,7 +88,7 @@ App::lcpan::Cmd::script2mod - Get module(s) of script(s)
 
 =head1 VERSION
 
-This document describes version 1.056 of App::lcpan::Cmd::script2mod (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of App::lcpan::Cmd::script2mod (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 FUNCTIONS
 

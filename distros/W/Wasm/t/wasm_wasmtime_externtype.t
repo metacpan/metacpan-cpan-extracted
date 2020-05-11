@@ -16,59 +16,49 @@ is(
     )
   }),
   object {
-    call [ get_export => 'foo' ] => object {
-      call [ isa => 'Wasm::Wasmtime::ExternType' ] => T();
-      call kind => 'func';
-      call kind_num => match qr/^[0-9]+$/;
-      call as_functype => object {
+    call exports => object {
+      call foo => object {
         call [ isa => 'Wasm::Wasmtime::FuncType' ] => T();
+        call kind => 'functype';
+        call is_functype   => T();
+        call is_globaltype => F();
+        call is_tabletype  => F();
+        call is_memorytype => F();
       };
-      call as_globaltype => U();
-      call as_tabletype => U();
-      call as_memorytype => U();
-    };
-    call [ get_export => 'bar' ] => object {
-      call [ isa => 'Wasm::Wasmtime::ExternType' ] => T();
-      call kind => 'memory';
-      call kind_num => match qr/^[0-9]+$/;
-      call as_functype => U();
-      call as_globaltype => U();
-      call as_tabletype => U();
-      call as_memorytype => object {
-        call [ isa => 'Wasm::Wasmtime::MemoryType' ] => T();
-      };
-    };
-    call [ get_export => 'baz' ] => object {
-      call [ isa => 'Wasm::Wasmtime::ExternType' ] => T();
-      call kind => 'global';
-      call kind_num => match qr/^[0-9]+$/;
-      call as_functype => U();
-      call as_globaltype => object {
+      call baz => object {
         call [ isa => 'Wasm::Wasmtime::GlobalType' ] => T();
+        call kind => 'globaltype';
+        call is_functype   => F();
+        call is_globaltype => T();
+        call is_tabletype  => F();
+        call is_memorytype => F();
         call content => object {
           call [ isa => 'Wasm::Wasmtime::ValType' ] => T();
           call kind => 'i32';
         };
         call mutability => 'var';
       };
-      call as_tabletype => U();
-      call as_memorytype => U();
-    };
-    call [ get_export => 'frooble' ] => object {
-      call [ isa => 'Wasm::Wasmtime::ExternType' ] => T();
-      call kind => 'table';
-      call kind_num => match qr/^[0-9]+$/;
-      call as_functype => U();
-      call as_globaltype => U();
-      call as_tabletype => object {
+      call frooble => object {
         call [ isa => 'Wasm::Wasmtime::TableType' ] => T();
+        call kind => 'tabletype';
+        call is_functype   => F();
+        call is_globaltype => F();
+        call is_tabletype  => T();
+        call is_memorytype => F();
         call element => object {
           call [ isa => 'Wasm::Wasmtime::ValType' ] => T();
           call kind => 'funcref';
         };
         call limits => [ 1, 3 ];
       };
-      call as_memorytype => U();
+      call bar => object {
+        call [ isa => 'Wasm::Wasmtime::MemoryType' ] => T();
+        call kind => 'memorytype';
+        call is_functype   => F();
+        call is_globaltype => F();
+        call is_tabletype  => F();
+        call is_memorytype => T();
+      };
     };
   },
   'test extern types'

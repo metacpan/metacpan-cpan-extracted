@@ -1,1 +1,16 @@
 Changelog for Data-Object-Data
+
+2.02 2020-05-10T19:12:02
+ - No changes found
+
+2.01 2020-03-16T00:21:54
+ - Built release version 2.01
+ - Added release updates
+ - Enable auto-release
+ - Add missing "from" attribute
+
+2.00 2020-02-23T19:17:31
+ - Built release version 2.00
+ - Added release updates
+ - Initial implementation
+ - Initial commit

@@ -1,5 +1,5 @@
 #
-# $Id: Read.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
+# $Id$
 #
 # network::read Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Network::Frame);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6bd6acfc81d5 $',
+      revision => '$Revision$',
       tags => [ qw(unstable ethernet ip raw socket) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -22,6 +22,7 @@ sub brik_properties {
          protocol => [ qw(tcp|udp) ],
          layer => [ qw(2|3|4) ],
          filter => [ qw(pcap_filter) ],
+         filter_code_optimizer => [ qw(0|1) ],
          count => [ qw(count) ],
          _dump => [ qw(INTERNAL) ],
       },
@@ -32,6 +33,7 @@ sub brik_properties {
          protocol => 'tcp',
          rtimeout => 5,
          filter => '',
+         filter_code_optimizer => 0,
       },
       commands => {
          open => [ qw(layer|OPTIONAL device|OPTIONAL filter|OPTIONAL) ],
@@ -84,13 +86,16 @@ sub open {
          dev => $device,
          timeoutOnNext => $self->rtimeout,
          filter => $filter,
+         filterCodeOptimizer => $self->filter_code_optimizer,
       ) or return $self->log->error("open: Net::Frame::Dump::Online2->new failed");
    }
    elsif ($self->layer != 3) {
       return $self->log->error("open: not implemented");
    }
 
-   $dump->start or return $self->log->error("open: Net::Frame::Dump::Online2->start failed");
+   $dump->start
+      or return $self->log->error("open: Net::Frame::Dump::Online2->start ".
+         "failed with device [$device], filter [$filter] and layer [$layer]");
 
    return $self->_dump($dump);
 }
@@ -265,7 +270,7 @@ Metabrik::Network::Read - network::read Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

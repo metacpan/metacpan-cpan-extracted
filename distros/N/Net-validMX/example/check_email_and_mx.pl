@@ -22,7 +22,7 @@ if (scalar(@ARGV) > 0) {
     }
   }
 } else {
-  print "Error: Insufficient Number of Arguments\n\n\tperl check_email_and_mx.pl kevin.mcgrail\@thoughtworthy.com\n\n";
+  print "Error: Insufficient Number of Arguments\n\n\tperl check_email_and_mx.pl kevin.mcgrail\@peregrinehw.com\n\n";
 } 
 
 exit;

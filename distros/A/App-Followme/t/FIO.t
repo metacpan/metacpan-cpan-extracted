@@ -9,6 +9,22 @@ use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
 
 #----------------------------------------------------------------------
+# Change the modification date of a file
+
+sub age {
+	my ($filename, $sec) = @_;
+	return unless -e $filename;
+	return if $sec <= 0;
+	
+    my @stats = stat($filename);
+    my $date = $stats[9];
+    $date -= $sec;
+    utime($date, $date, $filename);
+    
+    return; 
+}
+
+#----------------------------------------------------------------------
 # Load package
 
 my @path = splitdir(rel2abs($0));
@@ -25,6 +41,7 @@ my $test_dir = catdir(@path, 'test');
 
 rmtree($test_dir);
 mkdir $test_dir;
+chmod 0755, $test_dir;
 chdir $test_dir;
 $test_dir = cwd();
 
@@ -106,6 +123,7 @@ EOQ
     foreach my $dir (('', 'sub-one', 'sub-two')) {
         if ($dir ne '') {
             mkdir $dir;
+            chmod 0755, $dir;
             push(@ok_folders, catfile($test_dir, $dir));
         }
 
@@ -177,13 +195,15 @@ EOQ
     my $template_name = 'template.htm';
     fio_write_page(catfile($test_dir, $template_name), $template);
 
+	my $sec = 40;
     foreach my $count (qw(four three two one)) {
-        sleep(1);
         my $output = $code;
         $output =~ s/%%/Page $count/g;
 
         my $filename = catfile($test_dir, "$count.html");
         fio_write_page($filename, $output);
+        age($filename, $sec);
+        $sec -= 10;
     }
 
     my $newer = fio_is_newer('three.html', 'two.html', 'one.html');

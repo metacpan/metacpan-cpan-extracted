@@ -1,6 +1,15 @@
 Revision history for Perl extension Net::DNS::SEC.
 
 
+**** 1.16 May 11, 2020
+
+	Improve testing of verify() functions.
+
+	Rework code in Digest.pm
+
+	SEC.xs code reduction.
+
+
 **** 1.15 February 3, 2020
 
 	Provide access to OpenSSL message digest implementations.
@@ -11,8 +20,6 @@ Revision history for Perl extension Net::DNS::SEC.
 	Improve exception capture in test scripts.
 
 	Support more efficient algorithm mapping in Net::DNS.
-
-	SEC.xs code reduction.
 
 
 **** 1.13 May 6, 2019
@@ -631,4 +638,4 @@ Net::DNS. The history of those is documented below.
 
 
 ---------------------------------------------------------------------------
-$Id: Changes 1766 2020-02-03 14:17:59Z willem $
+$Id: Changes 1780 2020-05-11 09:19:56Z willem $

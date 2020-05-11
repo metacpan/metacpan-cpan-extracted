@@ -4,7 +4,7 @@ Geo::Elevation::HGT - Elevation service with terrain data provided by [Mapzen an
 
 # Version
 
-Version 0.01
+Version 0.03
 
 # Synopsis
 
@@ -105,7 +105,7 @@ Valid parameters, all optional:
 
 \* `folder` - the path to a folder where the terrain tiles to use are stored; no default
 
-\* `url` - the url of the terrain tiles to use; default [https://elevation-tiles-prod.s3.amazonaws.com/skadi](https://elevation-tiles-prod.s3.amazonaws.com/skadi)
+\* `url` - the url of the terrain tiles to use; default `https://elevation-tiles-prod.s3.amazonaws.com/skadi`
 
 \* `cache_folder` path to an existing folder where the terrain tiles downloaded from `$geh->{url}` will be stored for subsequent use; no default
 
@@ -141,7 +141,7 @@ Returns the elevation for this latitude and longitude in meters
 
 \- `Cached` - the tile was found under the `$geh->{cache_folder}` path
 
-\- `Url`    - the tile was downloaded from the C$geh->{url}> path, unless subsequent `Failed` indicates failure
+\- `Url`    - the tile was downloaded from the `$geh->{url}` path, unless subsequent `Failed` indicates failure
 
 \- `Failed` - access to the tile under `$geh->{url}` failed
 
@@ -181,7 +181,7 @@ The rows at the north and south edges as well as the columns at the east and wes
 
 # HGT directory tree
 
-[https://elevation-tiles-prod.s3.amazonaws.com/skadi](https://elevation-tiles-prod.s3.amazonaws.com/skadi) stores HGT files in subdirectories by their latitude
+`https://elevation-tiles-prod.s3.amazonaws.com/skadi` stores HGT files in subdirectories by their latitude
 
     ...
     ├── N45
@@ -223,8 +223,6 @@ You can find documentation for this module with the perldoc command.
     perldoc Geo::Elevation::HGT
 
 You can also look for information at:
-
-    -- Note: not found on CPAN (yet) -- check again later --
 
 - RT: CPAN's request tracker (report bugs here)
 

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '1.056'; # VERSION
+our $DATE = '2020-05-07'; # DATE
+our $VERSION = '1.057'; # VERSION
 
 use 5.010;
 use strict;
@@ -65,7 +65,7 @@ lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.056 of lcpan (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of lcpan (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 SYNOPSIS
 
@@ -452,7 +452,7 @@ index.
 
 =head2 B<deps>
 
-List dependencies.
+List dependencies of distributions.
 
 By default only runtime requires are displayed. To see prereqs for other phases
 (e.g. configure, or build, or ALL) or for other relationships (e.g. recommends,
@@ -1134,7 +1134,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.30.2"
+ "v5.30.0"
 
 =item B<--phase>=I<s>
 
@@ -1234,7 +1234,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.30.2"
+ "v5.30.0"
 
 =item B<--phase>=I<s>
 
@@ -1522,7 +1522,11 @@ Filter by author.
 
 =item B<--detail>, B<-l>
 
-=item B<--dist>=I<s>
+=item B<--dist>=I<s>, B<-d>
+
+Filter by distribution.
+
+=item B<--file-id>=I<s>
 
 Filter by file ID.
 
@@ -1638,6 +1642,18 @@ Alias for --exclude-indexed --include-unindexed.
 
 See C<--exclude-unindexed>.
 
+=item B<--dist>=I<s@>*
+
+Distribution names (with optional version suffix, e.g. Foo-Bar@1.23).
+
+Can be specified multiple times.
+
+=item B<--dists-json>=I<s>
+
+Distribution names (with optional version suffix, e.g. Foo-Bar@1.23) (JSON-encoded).
+
+See C<--dist>.
+
 =item B<--dont-uniquify>
 
 Allow showing multiple modules for different dists.
@@ -1701,21 +1717,13 @@ Default value:
 
  1
 
-=item B<--module>=I<s@>*
-
-Can be specified multiple times.
-
-=item B<--modules-json>=I<s>
-
-See C<--module>.
-
 =item B<--perl-version>=I<s>, B<-V>
 
 Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.30.2"
+ "v5.30.0"
 
 =item B<--phase>=I<s>
 
@@ -1805,7 +1813,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.30.2"
+ "v5.30.0"
 
 =item B<--phase>=I<s>
 
@@ -1840,6 +1848,10 @@ Filter by author.
 =item B<--detail>, B<-l>
 
 =item B<--dist>=I<s>*
+
+=item B<--file-id>=I<s>
+
+Filter by file ID.
 
 =item B<--or>
 
@@ -1915,9 +1927,13 @@ See C<--level>.
 
 =item B<--dist>=I<s@>*
 
+Distribution names (e.g. Foo-Bar).
+
 Can be specified multiple times.
 
 =item B<--dists-json>=I<s>
+
+Distribution names (e.g. Foo-Bar) (JSON-encoded).
 
 See C<--dist>.
 
@@ -1929,9 +1945,13 @@ See C<--dist>.
 
 =item B<--dist>=I<s@>*
 
+Distribution names (e.g. Foo-Bar).
+
 Can be specified multiple times.
 
 =item B<--dists-json>=I<s>
+
+Distribution names (e.g. Foo-Bar) (JSON-encoded).
 
 See C<--dist>.
 
@@ -2627,6 +2647,10 @@ Filter by author.
 
 =item B<--detail>, B<-l>
 
+=item B<--file-id>=I<s>
+
+Filter by file ID.
+
 =item B<--module>=I<s>*
 
 =item B<--or>
@@ -2737,7 +2761,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.30.2"
+ "v5.30.0"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -2939,7 +2963,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.30.2"
+ "v5.30.0"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -4213,6 +4237,7 @@ List of available configuration parameters:
  author (see --author)
  detail (see --detail)
  dist (see --dist)
+ file_id (see --file-id)
  or (see --or)
  package (see --package)
  query (see --query)
@@ -4245,6 +4270,7 @@ List of available configuration parameters:
  added_before (see --added-before)
  added_in_last_n_updates (see --added-in-last-n-updates)
  added_in_last_update (see --added-in-last-update)
+ dists (see --dist)
  dont_uniquify (see --dont-uniquify)
  flatten (see --flatten)
  include_core (see --exclude-core)
@@ -4252,7 +4278,6 @@ List of available configuration parameters:
  include_noncore (see --exclude-noncore)
  include_unindexed (see --exclude-unindexed)
  level (see --level)
- modules (see --module)
  perl_version (see --perl-version)
  phase (see --phase)
  rel (see --rel)
@@ -4282,6 +4307,7 @@ List of available configuration parameters:
  author (see --author)
  detail (see --detail)
  dist (see --dist)
+ file_id (see --file-id)
  or (see --or)
  package (see --package)
 
@@ -4437,6 +4463,7 @@ List of available configuration parameters:
 
  author (see --author)
  detail (see --detail)
+ file_id (see --file-id)
  module (see --module)
  or (see --or)
  package (see --package)

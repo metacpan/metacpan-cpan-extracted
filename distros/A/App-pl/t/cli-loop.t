@@ -58,10 +58,10 @@ EOF
 
 my @bze = ('-rbecho q{begin}', '-ze q{eof}', '-e', 'e q{end}');
 sub unbze { s/(?:begin|eof|end)\n//g }
-pl $_, @bze, 'echoN qq{$ARGIND;$ARGV;$.;$_}', @abc;
+pl $_, @bze, 'Echo qq{$ARGIND;$ARGV;$.;$_}', @abc;
 pl $_, @bze, 'E qq{$I;$A;$.;$_}', @abc;
 alter \&unbze,
-  '-r', 'echoN qq{$ARGIND;$ARGV;$.;$_}', @abc;
+  '-r', 'Echo qq{$ARGIND;$ARGV;$.;$_}', @abc;
 
 sub cut_from_34 { s/([0-9]).+,[34].+\n(?:\1.+\n)*//gm }
 alter \&cut_from_34,

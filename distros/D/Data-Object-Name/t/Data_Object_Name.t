@@ -29,6 +29,7 @@ method: lookslike_a_file
 method: lookslike_a_label
 method: lookslike_a_package
 method: lookslike_a_path
+method: lookslike_a_pragma
 method: new
 method: package
 method: path
@@ -126,7 +127,7 @@ lookslike_a_file() : Bool
 
   # given: synopsis
 
-  my $is_file = $name->lookslike_a_file; # falsey
+  my $is_file = $name->lookslike_a_file; # falsy
 
 =cut
 
@@ -143,7 +144,7 @@ lookslike_a_label() : Bool
 
   # given: synopsis
 
-  my $is_label = $name->lookslike_a_label; # falsey
+  my $is_label = $name->lookslike_a_label; # falsy
 
 =cut
 
@@ -160,7 +161,7 @@ lookslike_a_package() : Bool
 
   # given: synopsis
 
-  my $is_package = $name->lookslike_a_package; # falsey
+  my $is_package = $name->lookslike_a_package; # falsy
 
 =cut
 
@@ -177,6 +178,30 @@ lookslike_a_path() : Bool
   # given: synopsis
 
   my $is_path = $name->lookslike_a_path; # truthy
+
+=cut
+
+=method lookslike_a_pragma
+
+The lookslike_a_pragma method returns truthy if its state resembles a pragma.
+
+=signature lookslike_a_pragma
+
+lookslike_a_pragma() : Bool
+
+=example-1 lookslike_a_pragma
+
+  # given: synopsis
+
+  my $is_pragma = $name->lookslike_a_pragma; # falsy
+
+=example-2 lookslike_a_pragma
+
+  use Data::Object::Name;
+
+  my $name = Data::Object::Name->new('[strict]');
+
+  my $is_pragma = $name->lookslike_a_pragma; # truthy
 
 =cut
 
@@ -295,6 +320,18 @@ $subs->example(-1, 'lookslike_a_package', 'method', fun($tryable) {
 });
 
 $subs->example(-1, 'lookslike_a_path', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+
+  $result
+});
+
+$subs->example(-1, 'lookslike_a_pragma', 'method', fun($tryable) {
+  ok !(my $result = $tryable->result);
+
+  $result
+});
+
+$subs->example(-2, 'lookslike_a_pragma', 'method', fun($tryable) {
   ok my $result = $tryable->result;
 
   $result

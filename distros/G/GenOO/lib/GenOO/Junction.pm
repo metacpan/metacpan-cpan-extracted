@@ -37,7 +37,7 @@ GenOO::Junction - A junction (eg exon-exon) object with features
 # Let the code begin...
 
 package GenOO::Junction;
-$GenOO::Junction::VERSION = '1.5.1';
+$GenOO::Junction::VERSION = '1.5.2';
 
 #######################################################################
 #######################   Load External modules   #####################

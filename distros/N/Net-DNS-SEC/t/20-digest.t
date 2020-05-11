@@ -1,4 +1,4 @@
-# $Id: 20-digest.t 1766 2020-02-03 14:17:59Z willem $	-*-perl-*-
+# $Id: 20-digest.t 1777 2020-05-07 08:24:01Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -16,7 +16,7 @@ foreach my $package ( sort keys %prerequisite ) {
 plan skip_all => 'unable to access OpenSSL libcrypto library'
 		unless eval { Net::DNS::SEC::libcrypto->can('EVP_MD_CTX_new') };
 
-plan tests => 12;
+plan tests => 22;
 
 
 my $text = 'The quick brown fox jumps over the lazy dog';
@@ -41,8 +41,12 @@ use_ok('Net::DNS::SEC::Digest');
 sub test {
 	my ( $mnemonic, $class, @parameter ) = @_;
 	my $object = $class->new(@parameter);
+	my ( $head, $tail ) = unpack 'a20 a*', $text;
 	$object->add($text);
 	is( unpack( 'H*', $object->digest ), $digest{$mnemonic}, "message digest $mnemonic" );
+	$object->add($head);
+	$object->add($tail);
+	is( unpack( 'H*', $object->digest ), $digest{$mnemonic}, "concatenated digest $mnemonic" );
 }
 
 
@@ -59,7 +63,7 @@ test( 'SHA384', 'Net::DNS::SEC::Digest::SHA', 384 );
 test( 'SHA512', 'Net::DNS::SEC::Digest::SHA', 512 );
 
 SKIP: {
-	skip( 'SHA3 digest algorithm not supported', 4 )
+	skip( 'SHA3 digest algorithm not supported', 8 )
 			unless eval { Net::DNS::SEC::libcrypto->can('EVP_sha3_256') };
 	test( 'SHA3_224', 'Net::DNS::SEC::Digest::SHA3', 224 );
 	test( 'SHA3_256', 'Net::DNS::SEC::Digest::SHA3', 256 );

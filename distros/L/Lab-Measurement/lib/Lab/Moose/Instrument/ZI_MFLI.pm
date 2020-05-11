@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::ZI_MFLI;
-$Lab::Moose::Instrument::ZI_MFLI::VERSION = '3.692';
+$Lab::Moose::Instrument::ZI_MFLI::VERSION = '3.701';
 #ABSTRACT: Zurich Instruments MFLI Lock-in Amplifier
 
 use 5.010;
@@ -8,7 +8,8 @@ use MooseX::Params::Validate;
 use Lab::Moose::Instrument::Cache;
 use Carp;
 use namespace::autoclean;
-use Lab::Moose::Instrument 'validated_setter';
+use Moose::Util::TypeConstraints 'enum';
+use Lab::Moose::Instrument qw/validated_setter validated_getter/;
 use Lab::Moose::Instrument::Cache;
 use constant {
     ZI_LIST_NODES_RECURSIVE => 1,
@@ -28,11 +29,23 @@ has num_demods => (
     init_arg => undef,
 );
 
+my %oscillator_arg
+    = ( oscillator => { isa => 'Lab::Moose::PosInt', optional => 1 } );
 has oscillator => (
     is      => 'ro',
     isa     => 'Lab::Moose::PosInt',
-    default => 1
+    default => 0
 );
+
+sub _get_oscillator {
+    my $self = shift;
+    my %args = @_;
+    my $osc  = delete $args{oscillator};
+    if ( not defined $osc ) {
+        $osc = $self->oscillator();
+    }
+    $osc;
+}
 
 sub _get_num_demods {
     my $self  = shift;
@@ -59,10 +72,16 @@ sub _get_num_demods {
 cache frequency => ( getter => 'get_frequency' );
 
 sub get_frequency {
-    my $self = shift;
+    my ( $self, %args ) = validated_hash(
+        \@_,
+        %oscillator_arg,
+    );
+
+    my $osc = $self->_get_oscillator(%args);
+
     return $self->cached_frequency(
         $self->get_value(
-            path => $self->device() . "/oscs/0/freq",
+            path => $self->device() . "/oscs/$osc/freq",
             type => 'D'
         )
     );
@@ -79,15 +98,17 @@ sub get_frq {
 sub set_frequency {
     my ( $self, $value, %args ) = validated_setter(
         \@_,
+        %oscillator_arg,
         value => { isa => 'Num' },
     );
-
+    my $osc = $self->_get_oscillator(%args);
     return $self->cached_frequency(
         $self->sync_set_value(
-            path  => $self->device() . "/oscs/0/freq", type => 'D',
+            path  => $self->device() . "/oscs/$osc/freq", type => 'D',
             value => $value
         )
     );
+
 }
 
 
@@ -148,36 +169,6 @@ sub set_current_sens {
     return $self->cached_current_sens(
         $self->sync_set_value(
             path  => $self->device() . "/currins/0/range",
-            type  => 'D',
-            value => $value
-        )
-    );
-}
-
-
-cache amplitude => ( getter => 'get_amplitude' );
-
-sub get_amplitude {
-    my $self = shift;
-    my $osc  = $self->oscillator();
-    return $self->cached_amplitude(
-        $self->get_value(
-            path => $self->device() . "/sigouts/0/amplitudes/$osc",
-            type => 'D'
-        )
-    );
-}
-
-
-sub set_amplitude {
-    my ( $self, $value, %args ) = validated_setter(
-        \@_,
-        value => { isa => 'Num' }
-    );
-    my $osc = $self->oscillator();
-    return $self->cached_amplitude(
-        $self->sync_set_value(
-            path  => $self->device() . "/sigouts/0/amplitudes/$osc",
             type  => 'D',
             value => $value
         )
@@ -294,9 +285,53 @@ sub set_voltage {
     $self->set_offset_voltage( value => $value );
 }
 
+my %adcselect_signals = (
+    0   => 'sigin1',
+    1   => 'currin1',
+    2   => 'trigger1',
+    3   => 'trigger2',
+    4   => 'auxout1',
+    5   => 'auxout2',
+    6   => 'auxout3',
+    7   => 'auxout4',
+    8   => 'auxin1',
+    9   => 'auxin2',
+    174 => 'constant_input',
+);
+my %adcselect_signals_revers = reverse %adcselect_signals;
+my @adcselect_signals        = values %adcselect_signals;
+
 #
 # Demodulators
 #
+
+
+sub set_input {
+    my ( $self, $value, %args ) = validated_setter(
+        \@_,
+        value => { isa => enum( [@adcselect_signals] ) },
+        demod => { isa => 'Int' },
+    );
+
+    $value = $adcselect_signals_revers{$value};
+    my $demod = delete $args{demod};
+    $self->sync_set_value(
+        path => $self->device() . "/demods/$demod/adcselect",
+        type => 'I', value => $value
+    );
+}
+
+sub get_input {
+    my $self = shift;
+    my ($demod) = validated_list(
+        \@_, demod => { isa => 'Int' },
+    );
+    my $v = $self->get_value(
+        path => $self->device() . "/demods/$demod/adcselect",
+        type => 'I'
+    );
+    return $adcselect_signals{$v};
+}
 
 
 cache phase => ( getter => 'get_phase', index_arg => 'demod' );
@@ -406,6 +441,60 @@ sub set_order {
 }
 
 
+cache amplitude => ( getter => 'get_amplitude' );
+
+sub get_amplitude {
+    my ( $self, %args ) = validated_getter(
+        \@_,
+        demod => { isa => 'Int' },
+    );
+
+    my $demod = delete $args{demod};
+    return $self->cached_amplitude(
+        $self->get_value(
+            path => $self->device() . "/sigouts/0/amplitudes/$demod",
+            type => 'D'
+        )
+    );
+}
+
+
+sub set_amplitude {
+    my ( $self, $value, %args ) = validated_setter(
+        \@_,
+        value => { isa => 'Num' },
+        demod => { isa => 'Int' },
+    );
+    my $osc   = $self->_get_oscillator(%args);
+    my $demod = delete $args{demod};
+    return $self->cached_amplitude(
+        $self->sync_set_value(
+            path  => $self->device() . "/sigouts/0/amplitudes/$demod",
+            type  => 'D',
+            value => $value
+        )
+    );
+}
+
+
+sub get_amplitude_rms {
+    my $self  = shift;
+    my $value = $self->get_amplitude(@_);
+    return $value / sqrt(2);
+}
+
+sub set_amplitude_rms {
+    my $self = shift;
+    my %args = @_;
+    $args{value} *= sqrt(2);
+    return $self->set_amplitude(%args);
+}
+
+#
+# Output commands
+#
+
+
 sub get_xy {
     my $self = shift;
     my ($demod) = validated_list(
@@ -436,7 +525,7 @@ Lab::Moose::Instrument::ZI_MFLI - Zurich Instruments MFLI Lock-in Amplifier
 
 =head1 VERSION
 
-version 3.692
+version 3.701
 
 =head1 SYNOPSIS
 
@@ -445,7 +534,7 @@ version 3.692
  my $mfli = instrument(
      type => 'ZI_MFLI',
      connection_type => 'Zhinst',
-     oscillator => 1, # 1 is default
+     oscillator => 1, # 0 is default
      connection_options => {
          host => '132.188.12.13',
          port => 8004,
@@ -471,9 +560,11 @@ C<set_tc> will not work.
 
 =head2 get_frequency
 
+ # Get oscillator frequency of default oscillator.
  my $freq = $mfli->get_frequency();
 
-Get oscillator frequency.
+
+ my $freq = $mfli->get_frequency(oscillator => ...);
 
 =head2 get_frq
 
@@ -513,18 +604,6 @@ Get sensitivity (range) of current input.
 
 Set sensitivity (range) of current input.
 
-=head2 get_amplitude
-
- my $amplitude = $mfli->get_amplitude();
-
-Get amplitude of voltage output. The oscillator is determined by the C<oscillator> attribute.
-
-=head2 set_amplitude
-
- $mfli->set_amplitude(value => 300e-3);
-
-Set amplitude of voltage output. The oscillator is determined by the C<oscillator> attribute.
-
 =head2 get_amplitude_range
 
  my $amplitude_range = $mfli->get_amplitude_range();
@@ -558,6 +637,15 @@ Set DC offset.
 
  $mfli->set_offset_status(value => 1); # Enable offset voltage
  $mfli->set_offset_status(value => 0); # Disable offset voltage
+
+=head2 set_input/get_input
+
+ $mfli->set_input(demod => 0, value => 'CurrIn1');
+ my $signal = $mfli->get_input(demod => 0);
+
+Valid inputs:   currin1, trigger1, trigger2, auxout1, auxout2, auxout3, auxout4, auxin1, auxin2, constant_input
+
+t
 
 =head2 get_phase
 
@@ -595,6 +683,27 @@ Get demodulator filter order.
 
 Set demodulator filter order.
 
+=head2 get_amplitude
+
+ # set amplitude for default oscillator
+ my $amplitude = $mfli->get_amplitude();
+
+ # set amplitude of oscillator 1
+ my $amplitude = $mfli->get_amplitude(oscillator => 1);
+
+Get peak amplitude of voltage output. The default oscillator is determined by the C<oscillator> attribute.
+
+=head2 set_amplitude
+
+ $mfli->set_amplitude(value => 300e-3);
+ $mfli->set_amplitude(value => ..., demod => ...);
+
+Set peak amplitude of voltage output. The oscillator is determined by the C<oscillator> attribute.
+
+=head2 get_amplitude_rms/set_amplitude_rms
+
+Get/Set root mean square value of amplitude. These are wrappers around get_amplitude/set_amplitude and divide/multiply the peak amplitude with sqrt(2).
+
 =head2 get_xy
 
  my $xy_0 = $mfli->get_xy(demod => 0);
@@ -609,7 +718,7 @@ Get demodulator X and Y output measurement values.
 This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Andreas K. Huettel, Simon Reinhardt
-            2019       Simon Reinhardt
+            2019-2020  Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

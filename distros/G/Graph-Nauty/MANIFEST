@@ -12,4 +12,6 @@ t/01_use.t
 t/02_pentagon.t
 t/03_pentagon.t
 t/04_methanol.t
+t/05_single_node.t
+t/06_empty.t
 typemap

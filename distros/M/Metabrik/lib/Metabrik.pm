@@ -1,12 +1,12 @@
 #
-# $Id: Metabrik.pm,v a38b58d4db2f 2019/03/13 10:00:56 gomor $
+# $Id$
 #
 package Metabrik;
 use strict;
 use warnings;
 
 # Breaking.Feature.Fix
-our $VERSION = '1.40';
+our $VERSION = '1.41';
 our $FIX = '0';
 
 use base qw(Class::Gomor::Hash);
@@ -51,7 +51,7 @@ sub brik_license {
 
 sub brik_properties {
    return {
-      revision => '$Revision: a38b58d4db2f $',
+      revision => '$Revision$',
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
       tags => [ ],
@@ -422,7 +422,7 @@ sub new {
          *{'Metabrik::Core::Loglite::error'} = sub {
             my $self = shift;
             my ($msg) = @_;
-            return 1 if ($self->level < 1);
+            return if ($self->level < 1);
             $msg = _msg($self, $msg);
             print("[-] $msg\n");
             return;
@@ -1485,7 +1485,7 @@ L<Metabrik>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

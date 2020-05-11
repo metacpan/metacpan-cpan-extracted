@@ -14,7 +14,7 @@ use Data::Hopen::G::DAG;
 use Data::Hopen::Scope::Hash;
 
 sub run {
-    # Modified from t/021-dag-single-goal.t
+    # Modified from t/121-dag-single-goal.t
     my $outermost_scope = Data::Hopen::Scope::Hash->new()->put(foo => 42);
 
     my $dag = hnew DAG => 'dag';

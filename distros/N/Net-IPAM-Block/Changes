@@ -1,5 +1,8 @@
 Revision history for Net-IPAM-Block
 
+1.13    Mon, 11 May 2020 08:50:10 +0200
+        * speed up a bit, swap param security for speed
+
 1.12    Mon, 27 Apr 2020 16:50:46 +0200
         * outsourcing private functions in own package
 

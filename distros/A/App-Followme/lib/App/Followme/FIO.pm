@@ -22,7 +22,7 @@ our @EXPORT = qw(fio_filename_to_url fio_full_file_name fio_format_date
                  fio_same_file fio_set_date fio_split_filename
                  fio_to_file fio_visit fio_write_page);
 
-our $VERSION = "1.93";
+our $VERSION = "1.94";
 
 #----------------------------------------------------------------------
 # Convert filename to url
@@ -338,7 +338,7 @@ sub fio_write_page {
     my ($filename, $page, $binmode) = @_;
 
     my $fd = IO::File->new($filename, 'w');
-    die "Couldn't write $filename" unless $fd;
+    die "Couldn't write $filename: $!" unless $fd;
 
     binmode($fd, $binmode) if defined $binmode;
     print $fd $page;

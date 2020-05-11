@@ -4,7 +4,7 @@
       "DQNEO"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.7",
+   "generated_by" : "Minilla/v3.1.8",
    "license" : [
       "perl_5"
    ],
@@ -67,7 +67,7 @@
    "provides" : {
       "Amazon::S3::Thin" : {
          "file" : "lib/Amazon/S3/Thin.pm",
-         "version" : "0.28"
+         "version" : "0.29"
       },
       "Amazon::S3::Thin::Credentials" : {
          "file" : "lib/Amazon/S3/Thin/Credentials.pm"
@@ -93,7 +93,7 @@
          "web" : "https://github.com/DQNEO/Amazon-S3-Thin"
       }
    },
-   "version" : "0.28",
+   "version" : "0.29",
    "x_contributors" : [
       "Bob Showalter <showaltb@gmail.com>",
       "Bob Stockdale <bstockdale@zappos.com>",

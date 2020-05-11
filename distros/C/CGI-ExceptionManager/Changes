@@ -1,26 +1,33 @@
-Revision history for Perl extension CGI::ExceptionManager
+Revision history for Perl module CGI::ExceptionManager
 
-0.06
+0.07 2020-05-10T12:30:01Z
+
+    - fixed test case
+
+0.06 2012-06-28
 
     - modernized package, use M::B instead of Module::Install.
 
-0.05
+0.05 2009-01-31
 
     - fixed UUV(by yappo++)
 
-0.04
+0.04 2008-12-08
 
     - CGI::ExceptionManager->run returns collback's return value
       or detach()'s argument
 
-0.03
+0.03 2008-11-24
 
-    - fix generation of bogus error message when error is propagated from a eval(by kazuho++)
+    - fix generation of bogus error message when error is propagated
+      from an eval (by kazuho++)
 
-0.02
+0.02 2008-11-19
 
     - delay load of CGI::ExceptionManager::StackTrace(by kazuho++)
-    - relax parser rules(by kazuho++)
+    - relax parser rules (by kazuho++)
 
-0.01    Thu Nov 20 00:59:17 2008
+0.01 2008-11-19
+
     - original version
+

@@ -25,16 +25,6 @@ $bytes = substr( $ip->bytes, 1 );
 eval { Net::IPAM::IP->new_from_bytes($bytes) };
 like( $@, qr/illegal input/i, 'new_from_bytes: wrong number of bytes' );
 
-$ip    = Net::IPAM::IP->new('fe80::1');
-eval { $ip->cmp() };
-like( $@, qr/wrong or missing/i, 'cmp: wrong or missing arg' );
-
-eval { $ip->cmp('foo') };
-like( $@, qr/wrong or missing/i, 'cmp: wrong or missing arg' );
-
-eval { $ip->cmp(bless {}, 'foo') };
-like( $@, qr/wrong or missing/i, 'cmp: wrong or missing arg' );
-
 $ip = Net::IPAM::IP->new('fe80::1');
 $ip->{binary} = substr( $ip->{binary}, 1 );
 eval { $ip->expand };

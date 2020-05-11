@@ -23,6 +23,7 @@ lib/Metabrik/Binjitsu/Pattern.pm
 lib/Metabrik/Brik/Search.pm
 lib/Metabrik/Brik/Tool.pm
 lib/Metabrik/Client/Dns.pm
+lib/Metabrik/Client/Elasticsearch/Cat.pm
 lib/Metabrik/Client/Elasticsearch/Cluster.pm
 lib/Metabrik/Client/Elasticsearch/Indices.pm
 lib/Metabrik/Client/Elasticsearch.pm
@@ -30,6 +31,7 @@ lib/Metabrik/Client/Elasticsearch/Query.pm
 lib/Metabrik/Client/Elasticsearch/Tasks.pm
 lib/Metabrik/Client/Imap.pm
 lib/Metabrik/Client/Kafka.pm
+lib/Metabrik/Client/Memcached.pm
 lib/Metabrik/Client/Mongodb.pm
 lib/Metabrik/Client/Mysql.pm
 lib/Metabrik/Client/Openssh.pm
@@ -79,6 +81,7 @@ lib/Metabrik/File/Javascript.pm
 lib/Metabrik/File/Json.pm
 lib/Metabrik/File/Ole.pm
 lib/Metabrik/File/Pcap.pm
+lib/Metabrik/File/Pdf.pm
 lib/Metabrik/File/Psv.pm
 lib/Metabrik/File/Raw.pm
 lib/Metabrik/File/Readelf.pm

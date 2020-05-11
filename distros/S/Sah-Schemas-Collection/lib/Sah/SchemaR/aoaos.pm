@@ -1,9 +1,9 @@
 package Sah::SchemaR::aoaos;
 
-our $DATE = '2020-03-02'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2020-05-08'; # DATE
+our $VERSION = '0.008'; # VERSION
 
-our $rschema = ["array",[{description=>"\n",examples=>[{data=>"a",valid=>0},{data=>[],valid=>1},{data=>{},valid=>0},{data=>[undef],valid=>0},{data=>["a"],valid=>0},{data=>[[]],valid=>1},{data=>[[],[]],valid=>1},{data=>[["a"],[]],valid=>1},{data=>[["a","b"],[]],valid=>1},{data=>[["a",[]],[]],valid=>0},{data=>[[undef],[]],valid=>0}],of=>["aos",{req=>1},{}],summary=>"Array of (defined-)array-of-(defined-)strings"}],["array"]];
+our $rschema = ["array",[{description=>"\n",examples=>[{valid=>0,value=>"a"},{valid=>1,value=>[]},{valid=>0,value=>{}},{valid=>0,value=>[undef]},{valid=>0,value=>["a"]},{valid=>1,value=>[[]]},{valid=>1,value=>[[],[]]},{valid=>1,value=>[["a"],[]]},{valid=>1,value=>[["a","b"],[]]},{valid=>0,value=>[["a",[]],[]]},{valid=>0,value=>[[undef],[]]}],of=>["aos",{req=>1},{}],summary=>"Array of (defined-)array-of-(defined-)strings"}],["array"]];
 
 1;
 # ABSTRACT: Array of (defined-)array-of-(defined-)strings
@@ -20,7 +20,7 @@ Sah::SchemaR::aoaos - Array of (defined-)array-of-(defined-)strings
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::SchemaR::aoaos (from Perl distribution Sah-Schemas-Collection), released on 2020-03-02.
+This document describes version 0.008 of Sah::SchemaR::aoaos (from Perl distribution Sah-Schemas-Collection), released on 2020-05-08.
 
 =head1 DESCRIPTION
 

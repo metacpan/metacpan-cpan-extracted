@@ -90,6 +90,7 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::CopyFilesFromRelease' => '0',
                                            'Dist::Zilla::Plugin::EnsureLatestPerl' => '0',
                                            'Dist::Zilla::Plugin::FileFinder::ByName' => '0',
+                                           'Dist::Zilla::Plugin::GenerateFile' => '0',
                                            'Dist::Zilla::Plugin::GenerateFile::FromShareDir' => '0',
                                            'Dist::Zilla::Plugin::Git::Check' => '0',
                                            'Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch' => '0.004',

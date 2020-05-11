@@ -43,9 +43,18 @@ PARAMETERS
     Additionally, CODE references to set callbacks for events may be
     passed.
 
-    port => INT
+    family => INT or STRING
 
-      Optional. Port number to listen for Art-Net packets on.
+    host => INT or STRING
+
+    service => INT or STRING
+
+      Optional. getaddrinfo parameters to create socket listen for Art-Net
+      packets on.
+
+    port => INT or STRING
+
+      Synonym for service parameter.
 
 SEE ALSO
 

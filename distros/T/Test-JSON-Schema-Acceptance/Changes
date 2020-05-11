@@ -1,10 +1,21 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+0.993     2020-05-08 16:55:43Z
+        - soften type constraints so as to tolerate older Cpanel::JSON::XS,
+          which inflates booleans to different types
+        - print information about this module's version, and the commit and
+          version of the test suite data we are using
+        - new "verbose" option, for more helpful output when running under
+          "make test" or "prove"
+        - improved handling of exceptions from the tested implementation
+        - updated test suite to commit 9d0e0eb31d6be6bebd3bacdd6be119a8841e9999
+
 0.992     2020-05-04 22:40:44Z
         - fix minimum declared version for List::Util (RT#132461)
         - increase minimum version for JSON::MaybeXS, to ensure that booleans
           are JSON::PP::Boolean, not JSON::XS::Boolean
         - include tabular results of passes, fails for each test file (GH #3)
+        - updated test suite to commit 361620ecf18b71883f8522cb4c7e95e3e0adcdce
 
 0.991     2020-04-30 23:56:50Z
         - switch from JSON.pm to JSON::MaybeXS (GH #1)
@@ -22,10 +33,11 @@ Revision history for Test-JSON-Schema-Acceptance
           pass yet (GH #6)
         - non-ascii characters are not corrupted during decoding (GH #13)
         - always read test data files in sorted order, for consistent results
+        - updated test suite to commit ab9e3d5c53abe0a0d2a5a21429fb12524b0926a0
 
 0.990     2020-04-23 18:00:40Z
         - updated distribution packaging
-        - updated test suite with latest tests
+        - updated test suite with latest tests (to commit c4d3e0f92ced13c288d1713815c00539b09c9d2e)
 
 0.0.2   2015-09-04
         Fixed Github issue #7 - Draft tested is dependant on last call to new, not object instance.

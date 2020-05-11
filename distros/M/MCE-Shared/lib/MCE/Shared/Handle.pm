@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.864';
+our $VERSION = '1.868';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (InputOutput::ProhibitTwoArgOpen)
@@ -23,7 +23,6 @@ our $VERSION = '1.864';
 
 use MCE::Shared::Base ();
 use Errno ();
-use bytes;
 
 my $LF = "\012"; Internals::SvREADONLY($LF, 1);
 my $_tid = $INC{'threads.pm'} ? threads->tid() : 0;
@@ -135,9 +134,9 @@ sub READ {
    my ($fh, $len, $auto) = ($_[0], $_[2]);
 
    if (lc(substr $len, -1, 1) eq 'm') {
-      $auto = 1;  chop $len;  $len *= 1024 * 1024;
+      $auto = 1, chop $len;  $len *= 1024 * 1024;
    } elsif (lc(substr $len, -1, 1) eq 'k') {
-      $auto = 1;  chop $len;  $len *= 1024;
+      $auto = 1, chop $len;  $len *= 1024;
    }
 
    # normal use-case
@@ -229,6 +228,8 @@ sub PRINTF {
 }
 
 sub WRITE {
+   use bytes;
+
    # based on IO::SigGuard::syswrite 0.011 by Felipe Gasper (FELIPE)
    my $wrote = 0;
 
@@ -271,7 +272,7 @@ sub WRITE {
    };
 
    my (
-      $_DAU_R_SOCK_REF, $_DAU_R_SOCK, $_obj, $_thaw,
+      $_DAU_R_SOCK_REF, $_DAU_R_SOCK, $_obj, $_freeze, $_thaw,
       $_id, $_len, $_ret
    );
 
@@ -340,9 +341,9 @@ sub WRITE {
          chomp($_len = <$_DAU_R_SOCK>);
 
          if (lc(substr $_a3, -1, 1) eq 'm') {
-            $_auto = 1, chop $_a3; $_a3 *= 1024 * 1024;
+            $_auto = 1, chop $_a3;  $_a3 *= 1024 * 1024;
          } elsif (lc(substr $_a3, -1, 1) eq 'k') {
-            $_auto = 1, chop $_a3; $_a3 *= 1024;
+            $_auto = 1, chop $_a3;  $_a3 *= 1024;
          }
 
          local $/; read($_DAU_R_SOCK, $/, $_len) if $_len;
@@ -383,8 +384,10 @@ sub WRITE {
          }
 
          if (defined $_ret) {
-            print {$_DAU_R_SOCK} "$.$LF" . length($_buf).$LF, $_buf;
-         } else {
+            $_ret = length($_buf), $_buf = $_freeze->(\$_buf);
+            print {$_DAU_R_SOCK} "$.$LF" . length($_buf).$LF, $_buf, $_ret.$LF;
+         }
+         else {
             print {$_DAU_R_SOCK} "$.$LF" . ( (0+$!) * -1 ).$LF;
          }
 
@@ -420,6 +423,7 @@ sub WRITE {
          }
 
          if (defined $_buf) {
+            $_buf = $_freeze->(\$_buf);
             print {$_DAU_R_SOCK} "$.$LF" . length($_buf).$LF, $_buf;
          } else {
             print {$_DAU_R_SOCK} "$.$LF" . ( (0+$!) * -1 ).$LF;
@@ -435,13 +439,14 @@ sub WRITE {
          chomp($_len = <$_DAU_R_SOCK>),
 
          read($_DAU_R_SOCK, my($_buf), $_len);
-         print {$_obj->{ $_id }} $_buf;
+         print {$_obj->{ $_id }} ${ $_thaw->($_buf) };
 
          return;
       },
 
       SHR_O_WRI.$LF => sub {                      # Handle WRITE
          $_DAU_R_SOCK = ${ $_DAU_R_SOCK_REF };
+         use bytes;
 
          chomp($_id  = <$_DAU_R_SOCK>),
          chomp($_len = <$_DAU_R_SOCK>),
@@ -472,7 +477,7 @@ sub WRITE {
 
    sub _init_mgr {
       my $_function;
-      ( $_DAU_R_SOCK_REF, $_obj, $_function, $_thaw ) = @_;
+      ( $_DAU_R_SOCK_REF, $_obj, $_function, $_freeze, $_thaw ) = @_;
 
       for my $key ( keys %_output_function ) {
          last if exists($_function->{$key});
@@ -506,11 +511,11 @@ no overloading;
 my $_is_MSWin32 = ($^O eq 'MSWin32') ? 1 : 0;
 
 my ($_DAT_LOCK, $_DAT_W_SOCK, $_DAU_W_SOCK, $_dat_ex, $_dat_un, $_chn, $_obj,
-    $_freeze);
+    $_freeze, $_thaw);
 
 sub _init_handle {
    ($_DAT_LOCK, $_DAT_W_SOCK, $_DAU_W_SOCK, $_dat_ex, $_dat_un, $_chn, $_obj,
-    $_freeze) = @_;
+    $_freeze, $_thaw) = @_;
 
    return;
 }
@@ -555,9 +560,7 @@ sub OPEN {
 
    {
       local $MCE::Signal::IPC = 1;
-
-      CORE::lock $_DAT_LOCK if $_is_MSWin32;
-      $_dat_ex->() if !$_is_MSWin32;
+      $_is_MSWin32 ? CORE::lock $_DAT_LOCK : $_dat_ex->();
 
       print({$_DAT_W_SOCK} 'O~OPN'.$LF . $_chn.$LF),
       print({$_DAU_W_SOCK} $_id.$LF . $_fd.$LF . length($_buf).$LF . $_buf);
@@ -588,9 +591,7 @@ sub READ {
 
    {
       local $MCE::Signal::IPC = 1;
-
-      CORE::lock $_DAT_LOCK if $_is_MSWin32;
-      $_dat_ex->() if !$_is_MSWin32;
+      $_is_MSWin32 ? CORE::lock $_DAT_LOCK : $_dat_ex->();
 
       print({$_DAT_W_SOCK} 'O~REA'.$LF . $_chn.$LF),
       print({$_DAU_W_SOCK} $_[0]->[0].$LF . $_[2].$LF . length($/).$LF . $/);
@@ -600,9 +601,18 @@ sub READ {
       chomp($_len = <$_DAU_W_SOCK>);
 
       if ($_len && $_len > 0) {
-         (defined $_[3])
-            ? read($_DAU_W_SOCK, $_[1], $_len, $_[3])
-            : read($_DAU_W_SOCK, $_[1], $_len);
+         read($_DAU_W_SOCK, my $_buf, $_len);
+         chomp($_len = <$_DAU_W_SOCK>);
+
+         my $_ref = \$_[1];
+         if (defined $_[3]) {
+            no bytes;
+            substr($$_ref, $_[3], length($$_ref) - $_[3], '');
+            substr($$_ref, $_[3], $_len, ${ $_thaw->($_buf) });
+         }
+         else {
+            $$_ref = ${ $_thaw->($_buf) };
+         }
       }
 
       $_dat_un->() if !$_is_MSWin32;
@@ -619,8 +629,10 @@ sub READ {
    else {
       my $_ref = \$_[1];
       if (defined $_[3]) {
+         no bytes;
          substr($$_ref, $_[3], length($$_ref) - $_[3], '');
-      } else {
+      }
+      else {
          $$_ref = '';
       }
    }
@@ -637,9 +649,7 @@ sub READLINE {
 
    {
       local $MCE::Signal::IPC = 1;
-
-      CORE::lock $_DAT_LOCK if $_is_MSWin32;
-      $_dat_ex->() if !$_is_MSWin32;
+      $_is_MSWin32 ? CORE::lock $_DAT_LOCK : $_dat_ex->();
 
       print({$_DAT_W_SOCK} 'O~RLN'.$LF . $_chn.$LF),
       print({$_DAU_W_SOCK} $_[0]->[0].$LF . length($/).$LF . $/);
@@ -663,27 +673,35 @@ sub READLINE {
    }
 
    $. = $_ret, $! = 0;
-   $_buf;
+   $_buf ? ${ $_thaw->($_buf) } : $_buf;
 }
 
 sub PRINT {
+   no bytes;
    my $_id  = shift()->[0];
    my $_buf = join(defined $, ? $, : "", @_);
 
    $_buf .= $\ if defined $\;
 
-   (length $_buf)
-      ? _req2('O~PRI', $_id.$LF . length($_buf).$LF, $_buf)
-      : 1;
+   if (length $_buf) {
+      $_buf = $_freeze->(\$_buf);
+      _req2('O~PRI', $_id.$LF . length($_buf).$LF, $_buf);
+   } else {
+      1;
+   }
 }
 
 sub PRINTF {
+   no bytes;
    my $_id  = shift()->[0];
    my $_buf = sprintf(shift, @_);
 
-   (length $_buf)
-      ? _req2('O~PRI', $_id.$LF . length($_buf).$LF, $_buf)
-      : 1;
+   if (length $_buf) {
+      $_buf = $_freeze->(\$_buf);
+      _req2('O~PRI', $_id.$LF . length($_buf).$LF, $_buf);
+   } else {
+      1;
+   }
 }
 
 sub WRITE {
@@ -697,9 +715,7 @@ sub WRITE {
 
    {
       local $MCE::Signal::IPC = 1;
-
-      CORE::lock $_DAT_LOCK if $_is_MSWin32;
-      $_dat_ex->() if !$_is_MSWin32;
+      $_is_MSWin32 ? CORE::lock $_DAT_LOCK : $_dat_ex->();
 
       if (@_ == 1 || (@_ == 2 && $_[1] == length($_[0]))) {
          print({$_DAT_W_SOCK} 'O~WRI'.$LF . $_chn.$LF),
@@ -737,7 +753,7 @@ MCE::Shared::Handle - Handle helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Handle version 1.864
+This document describes MCE::Shared::Handle version 1.868
 
 =head1 DESCRIPTION
 

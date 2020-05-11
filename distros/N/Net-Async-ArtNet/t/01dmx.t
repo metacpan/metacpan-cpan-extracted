@@ -16,6 +16,7 @@ testing_loop( $loop );
 
 my @dmx;
 my $artnet = Net::Async::ArtNet->new(
+   family => "inet", # Force IPv4 so we can use 127.0.0.1 to test on
    port => 0, # kernel-allocated
    on_dmx => sub {
       my $self = shift;

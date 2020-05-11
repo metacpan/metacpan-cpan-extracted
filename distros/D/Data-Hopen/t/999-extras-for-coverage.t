@@ -28,11 +28,15 @@ package TestDataHopen {
         like exception { hnew('MY::ReturnsFalsyInstance') },
             qr/Could not create instance/, 'hnew(<existent but falsy>) throws';
 
-        ok hnew(DAG => 'foo'), 'hnew DAG works';
+        my $dag = hnew(DAG => 'foo');
+        ok $dag, 'hnew DAG works';
+        like exception { $dag->connect() }, qr/argument/, 'DAG::connect() throws with 0 args';
+        like exception { $dag->connect(1) }, qr/argument/, 'DAG::connect() throws with 1 arg';
+        like exception { $dag->connect(1..5) }, qr/argument/, 'DAG::connect() throws with 5 args';
     }
 
     sub test_loadfrom {
-        my $pkgname;
+        my ($pkgname, $msg, $retval);
 
         $pkgname = loadfrom('Data::Hopen::Scope');
         is $pkgname, 'Data::Hopen::Scope', 'loadfrom finds literal name';
@@ -47,6 +51,25 @@ package TestDataHopen {
         # Invalid invocations
         like exception { loadfrom(); }, qr/Need a class/,
             'loadfrom dies without a class name';
+
+        # Verbose output, unsuccessful
+        $msg = capture_stderr {
+            local $QUIET = false;
+            local $VERBOSE = 3;
+            loadfrom('MY::NONEXISTENT');
+        };
+        like $msg, qr/loadfrom\s+MY::NONEXISTENT/, 'loadfrom verbose: Name logged';
+        like $msg, qr/Can't locate\s+MY[\/\\]NONEXISTENT\b/, 'loadfrom verbose: Error message logged';
+
+        # Verbose output, successful
+        $msg = capture_stderr {
+            $QUIET = false;
+            $VERBOSE = 3;
+            $retval = loadfrom('Data::Hopen');
+        };
+        like $msg, qr/loadfrom\s+Data::Hopen/, 'loadfrom verbose ok: Name logged';
+        unlike $msg, qr/Can't locate/, 'loadfrom verbose ok: No error message';
+        is $retval, 'Data::Hopen', 'loadfrom verbose ok: return value';
     }
 
     sub test_hlog {
@@ -58,6 +81,8 @@ package TestDataHopen {
             ('normal', 1, false, qr/\b42\b/)
             ('normal level 2 verbose 1', 1, false, qr/^$/, 2)
             ('normal level 2 verbose 2', 2, false, qr/\b42\b/, 2)
+            ('normal level 3 verbose 3', 3, false, qr/\b42\b.+\(at/, 3)
+            ('normal level 4 verbose 3', 3, false, qr//, 4)
         ;
 
         for my $lrTest (@{ $tests->arr }) {
@@ -86,19 +111,10 @@ package TestDataHopen {
         $VERBOSE = 0;
     } #test_hlog()
 
-    sub test_isMYH {
-        ok isMYH('MY.hopen.pl'), 'MY.hopen.pl is MYH';
-        ok !isMYH('foo'), 'foo is not MYH';
-
-        ok(isMYH, 'MY.hopen.pl is MYH ($_)') for 'MY.hopen.pl';
-        ok(!isMYH, 'foo is not MYH ($_)') for 'foo';
-    }
-
     sub run {
         test_hnew;
         test_loadfrom;
         test_hlog;
-        test_isMYH;
     }
 } #package DH
 
@@ -151,6 +167,67 @@ package TestDataHopenGNode {
         is_deeply $n->outputs, {}, 'Node->outputs defaults to {}';
     }
 } #package DHGN
+
+package TestDataHopenUtilData {
+    use HopenTest;
+    use Data::Hopen::Util::Data qw(boolify clone dedent forward_opts);
+    use List::AutoNumbered;
+    use Scalar::Util qw(refaddr);
+    use Test::Fatal;
+
+    my @TESTS;
+    push @TESTS, sub {  # boolify
+        ok(boolify($_), "$_ -> truthy") foreach qw(1 true yes on);
+        ok(!boolify($_), ($_//'<undef>') . " -> falsy")
+            foreach (qw(false off no), 0, undef);
+    };
+
+    push @TESTS, sub {  # clone
+        cmp_ok(clone(42), '==', 42, 'Clone ==');
+        is(clone('foo'), 'foo', 'Clone eq');
+        my $x = [1, 'foo', {bar => 'bat'}];
+        my $clone_x = clone($x);
+        is_deeply($clone_x, $x, 'Clone deeply');
+        cmp_ok(refaddr($x), '!=', refaddr($clone_x), "Clone isn't original");
+    };
+
+    push @TESTS, sub {  # dedent
+        my $tests = List::AutoNumbered->new(__LINE__);
+        $tests->load([" some\n multiline string"], "some\nmultiline string")->
+        (["no NL"], "no NL")
+        (["  leading WS"],"leading WS")
+        (["trailing WS  "], "trailing WS  ")
+        ([ [], q(
+        very indented
+    ) ], "very indented\n")
+        (["not\nindented\nat all"], "not\nindented\nat all")
+        (["\ninitial newline\n  and some more"], "\ninitial newline\n  and some more")
+        (["    \nleading WS on nonblank line not stripped"], "    \nleading WS on nonblank line not stripped")
+        ;
+
+        for my $test (@$tests) {
+            my @args = @{$test->[1]};
+            my $got = dedent @args;
+            is($got, $test->[2], 'dedent (line ' . $test->[0] . ')');
+
+            # Test $_
+            local $_ = pop @args;
+            $got = dedent @args;
+            is($got, $test->[2], 'dedent $_ (line ' . $test->[0] . ')');
+        }
+    };
+
+    push @TESTS, sub {
+        like(exception { forward_opts; }, qr/Need/, 'forward_opts requires arg');
+        like(exception { forward_opts [] }, qr/hashref/, 'forward_opts requires hashref');
+        is_deeply(+{forward_opts({foo=>42}, 'foo')}, {foo=>42}, 'forward_opts: plain');
+        is_deeply(+{forward_opts({foo=>42}, {}, 'foo')}, {foo=>42}, 'forward_opts: empty opts');
+        is_deeply(+{forward_opts({FOO=>42}, {lc=>1}, 'FOO')}, {foo=>42}, 'forward_opts: lc');
+        is_deeply(+{forward_opts({foo=>42}, {'-'=>1}, 'foo')}, {-foo=>42}, 'forward_opts: -');
+    };
+
+    sub run { &$_ foreach @TESTS; }
+} #package DHUD
 
 use PackagesInThisFile 'run';   # every package above that has a sub run()
 (diag($_), $_->run) foreach @PIF;

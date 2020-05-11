@@ -1,0 +1,74 @@
+{
+   "abstract" : "Command-line Interface Abstraction for Perl 5",
+   "author" : [
+      "Al Newkirk <awncorp@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-Object-Cli",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Object" : "2.05",
+            "Data::Object::Args" : "2.00",
+            "Data::Object::Class" : "2.02",
+            "Data::Object::ClassHas" : "2.01",
+            "Data::Object::Data" : "2.02",
+            "Data::Object::Opts" : "2.00",
+            "Data::Object::Types" : "0.04",
+            "Data::Object::Vars" : "2.01",
+            "perl" : "5.014",
+            "routines" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Object" : "2.05",
+            "Data::Object::Args" : "2.00",
+            "Data::Object::Class" : "2.02",
+            "Data::Object::ClassHas" : "2.01",
+            "Data::Object::Data" : "2.02",
+            "Data::Object::Opts" : "2.00",
+            "Data::Object::Types" : "0.04",
+            "Data::Object::Vars" : "2.01",
+            "Test::Auto" : "0.10",
+            "Test::Trap" : "v0.3.4",
+            "perl" : "5.014",
+            "routines" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/iamalnewkirk/data-object-cli/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/iamalnewkirk/data-object-cli.git",
+         "web" : "https://github.com/iamalnewkirk/data-object-cli"
+      }
+   },
+   "version" : "2.00",
+   "x_authority" : "cpan:AWNCORP",
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

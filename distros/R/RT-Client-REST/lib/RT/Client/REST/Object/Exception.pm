@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Object::Exception;
-$RT::Client::REST::Object::Exception::VERSION = '0.59';
+$RT::Client::REST::Object::Exception::VERSION = '0.60';
 use base qw(RT::Client::REST::Exception);
 
 use RT::Client::REST::Exception (
@@ -65,7 +65,7 @@ RT::Client::REST::Object::Exception
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 AUTHOR
 

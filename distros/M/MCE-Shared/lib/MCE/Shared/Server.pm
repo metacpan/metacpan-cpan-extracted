@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized numeric once );
 
 package MCE::Shared::Server;
 
-our $VERSION = '1.864';
+our $VERSION = '1.868';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -87,8 +87,6 @@ use constant {
    SHR_M_INC => 'M~INC',  # Increment count
    SHR_M_OBJ => 'M~OBJ',  # Object request
    SHR_M_OB0 => 'M~OB0',  # Object request - thaw'less
-   SHR_M_OB1 => 'M~OB1',  # Object request - thaw'less
-   SHR_M_OB2 => 'M~OB2',  # Object request - thaw'less
    SHR_M_DES => 'M~DES',  # Destroy request
    SHR_M_EXP => 'M~EXP',  # Export request
    SHR_M_INX => 'M~INX',  # Iterator next
@@ -110,7 +108,7 @@ use constant {
 ##
 ###############################################################################
 
-my ($_SVR, %_all, %_obj, %_ob2, %_ob3, %_itr, %_new) = (undef);
+my ($_SVR, $_stopped, %_all, %_obj, %_ob2, %_ob3, %_itr, %_new) = (undef);
 my ($_next_id, $_is_client, $_init_pid, $_svr_pid) = (0, 1);
 my $LF = "\012"; Internals::SvREADONLY($LF, 1);
 my %_export_nul;
@@ -194,9 +192,7 @@ sub _new {
 
    {
       local $MCE::Signal::IPC = 1;
-
-      CORE::lock $_DAT_LOCK if $_is_MSWin32;
-      $_DAT_LOCK->lock() if !$_is_MSWin32;
+      $_is_MSWin32 ? CORE::lock $_DAT_LOCK : $_DAT_LOCK->lock();
 
       print({$_DAT_W_SOCK} SHR_M_NEW.$LF . $_chn.$LF),
       print({$_DAU_W_SOCK} length($_buf).$LF, $_buf, length($_bu2).$LF, $_bu2,
@@ -252,9 +248,7 @@ sub _incr_count {
 
    {
       local $MCE::Signal::IPC = 1;
-
-      CORE::lock $_DAT_LOCK if $_is_MSWin32;
-      $_DAT_LOCK->lock() if !$_is_MSWin32;
+      $_is_MSWin32 ? CORE::lock $_DAT_LOCK : $_DAT_LOCK->lock();
 
       print({$_DAT_W_SOCK} SHR_M_INC.$LF . $_chn.$LF),
       print({$_DAU_W_SOCK} $_[0].$LF);
@@ -320,8 +314,7 @@ sub _share {
    $_ob3{"$_id:count"} = 1;
 
    if ($_class eq 'MCE::Shared::Handle' && reftype $_item eq 'ARRAY') {
-      require Symbol unless $INC{'Symbol.pm'};
-      $_obj{ $_id } = Symbol::gensym();
+      $_obj{ $_id } = IO::Handle->new();
       $_export_nul{ $_class } = undef;
 
       bless $_obj{ $_id }, $_class;
@@ -366,15 +359,16 @@ sub _start {
       eval 'PDL::no_clone_skip_warning()';
    }
 
-   local $_;  $_init_pid = "$$.$_tid";
+   local $_;  $_init_pid = "$$.$_tid", $_stopped = undef;
 
    my $_data_channels = ($_init_pid eq $_oid) ? DATA_CHANNELS : 2;
 
    $_SVR = { _data_channels => $_data_channels };
 
    # Defaults to the misc channel used by _new, _get_hobo_data, and export.
-   MCE::Util::_sock_pair($_SVR, qw(_dat_r_sock _dat_w_sock), $_)
-      for (0 .. $_data_channels + 1);
+   MCE::Util::_sock_pair($_SVR, qw(_dat_r_sock _dat_w_sock), 0);
+   MCE::Util::_sock_pair($_SVR, qw(_dat_r_sock _dat_w_sock), $_, 1)
+      for (1 .. $_data_channels + 1);
 
    setsockopt($_SVR->{_dat_r_sock}[0], SOL_SOCKET, SO_RCVBUF, 4096)
       if ($^O ne 'aix' && $^O ne 'linux');
@@ -413,6 +407,7 @@ sub _start {
 }
 
 sub _stop {
+   $_stopped = 1;
    return unless ($_is_client && $_init_pid && $_init_pid eq "$$.$_tid");
 
    MCE::Child->finish('MCE') if $INC{'MCE/Child.pm'};
@@ -600,7 +595,7 @@ sub _loop {
          : CORE::exit($?);
    };
 
-   my ($_id, $_fcn, $_wa, $_len, $_le2, $_func, $_var);
+   my ($_id, $_fcn, $_wa, $_len, $_func, $_var);
    my ($_channel_id, $_done) = (0, 0);
 
    my $_channels   = $_SVR->{_dat_r_sock};
@@ -611,29 +606,13 @@ sub _loop {
       if ( $_wa == WA_ARRAY ) {
          my @_ret = eval { $_var->$_fcn(@_) };
          my $_buf = $_freeze->(\@_ret);
-         return print {$_DAU_R_SOCK} length($_buf).'1'.$LF, $_buf;
+         return print {$_DAU_R_SOCK} length($_buf).$LF, $_buf;
       }
 
       my $_ret = eval { $_var->$_fcn(@_) };
-
-      return print {$_DAU_R_SOCK} length($_ret).'0'.$LF, $_ret
-         if ( !looks_like_number $_ret && !ref $_ret && defined $_ret );
-
       my $_buf = $_freeze->([ $_ret ]);
 
-      return print {$_DAU_R_SOCK} length($_buf).'1'.$LF, $_buf;
-   };
-
-   my $_fetch = sub {
-      return print {$_DAU_R_SOCK} '-1'.$LF if !defined($_[0]);
-      return print {$_DAU_R_SOCK} length($_[0]).'0'.$LF, $_[0]
-         if ( !looks_like_number $_[0] && !ref $_[0] && defined $_[0] );
-
-      my $_buf = ( blessed($_[0]) && $_[0]->can('SHARED_ID') )
-         ? $_ob2{ $_[0]->[0] } || $_freeze->([ $_[0] ])
-         : $_freeze->([ $_[0] ]);
-
-      print {$_DAU_R_SOCK} length($_buf).'1'.$LF, $_buf;
+      print {$_DAU_R_SOCK} length($_buf).$LF, $_buf;
    };
 
    my $_obj_keys = sub {
@@ -721,10 +700,10 @@ sub _loop {
       return;
    };
 
-   my $_warn0 = sub {
+   my $_warn = sub {
       if ( $_wa ) {
          my $_buf = $_freeze->([ ]);
-         print {$_DAU_R_SOCK} length($_buf).'1'.$LF, $_buf;
+         print {$_DAU_R_SOCK} length($_buf).$LF, $_buf;
       }
    };
 
@@ -783,7 +762,7 @@ sub _loop {
          }
          elsif (reftype $_obj{ $_item->[0] } eq 'GLOB') {
             MCE::Shared::Handle::_init_mgr(
-               \$_DAU_R_SOCK, \%_obj, \%_output_function, $_thaw
+               \$_DAU_R_SOCK, \%_obj, \%_output_function, $_freeze, $_thaw
             ) if $INC{'MCE/Shared/Handle.pm'};
          }
          elsif ($_class eq 'MCE::Shared::Condvar') {
@@ -828,13 +807,12 @@ sub _loop {
 
          read($_DAU_R_SOCK, my($_buf), $_len);
 
-         $_var = $_obj{ $_id } || do { return $_warn0->($_fcn) };
+         $_var = $_obj{ $_id } || do { return $_warn->($_fcn) };
 
          $_wa  ? $_auto_reply->(@{ $_thaw->($_buf) })
                : eval { $_var->$_fcn(@{ $_thaw->($_buf) }) };
 
          warn $@ if $@;
-
          return;
       },
 
@@ -843,7 +821,7 @@ sub _loop {
          chomp($_fcn = <$_DAU_R_SOCK>),
          chomp($_wa  = <$_DAU_R_SOCK>);
 
-         $_var = $_obj{ $_id } || do { return $_warn0->($_fcn) };
+         $_var = $_obj{ $_id } || do { return $_warn->($_fcn) };
 
          my $_code = $_var->can($_fcn) || do {
             if ( ($_fcn eq 'keys' || $_fcn eq 'SCALAR') &&
@@ -860,62 +838,18 @@ sub _loop {
          if ( $_wa == WA_ARRAY ) {
             my @_ret = eval { $_code->($_var) };
             my $_buf = $_freeze->(\@_ret);
-            print {$_DAU_R_SOCK} length($_buf).'1'.$LF, $_buf;
+            print {$_DAU_R_SOCK} length($_buf).$LF, $_buf;
          }
          elsif ( $_wa ) {
             my $_ret = eval { $_code->($_var) };
-            if ( !looks_like_number $_ret && !ref $_ret && defined $_ret ) {
-               print {$_DAU_R_SOCK} length($_ret).'0'.$LF, $_ret;
-            }
-            else {
-               my $_buf = $_freeze->([ $_ret ]);
-               print {$_DAU_R_SOCK} length($_buf).'1'.$LF, $_buf;
-            }
+            my $_buf = $_freeze->([ $_ret ]);
+            print {$_DAU_R_SOCK} length($_buf).$LF, $_buf;
          }
          else {
             eval { $_code->($_var) };
          }
 
          warn $@ if $@;
-
-         return;
-      },
-
-      SHR_M_OB1.$LF => sub {                      # Object request - thaw'less
-         chomp($_id  = <$_DAU_R_SOCK>),
-         chomp($_fcn = <$_DAU_R_SOCK>),
-         chomp($_wa  = <$_DAU_R_SOCK>),
-         chomp($_len = <$_DAU_R_SOCK>),
-
-         read($_DAU_R_SOCK, my($_arg1), $_len);
-
-         $_var = $_obj{ $_id } || do { return $_warn0->($_fcn) };
-
-         $_wa  ? $_auto_reply->($_arg1)
-               : eval { $_var->$_fcn($_arg1) };
-
-         warn $@ if $@;
-
-         return;
-      },
-
-      SHR_M_OB2.$LF => sub {                      # Object request - thaw'less
-         chomp($_id  = <$_DAU_R_SOCK>),
-         chomp($_fcn = <$_DAU_R_SOCK>),
-         chomp($_wa  = <$_DAU_R_SOCK>),
-         chomp($_len = <$_DAU_R_SOCK>),
-         chomp($_le2 = <$_DAU_R_SOCK>),
-
-         read($_DAU_R_SOCK, my($_arg1), $_len),
-         read($_DAU_R_SOCK, my($_arg2), $_le2);
-
-         $_var = $_obj{ $_id } || do { return $_warn0->($_fcn) };
-
-         $_wa  ? $_auto_reply->($_arg1, $_arg2)
-               : eval { $_var->$_fcn($_arg1, $_arg2) };
-
-         warn $@ if $@;
-
          return;
       },
 
@@ -928,7 +862,7 @@ sub _loop {
          $_var = undef; local $@;
 
          eval {
-            my $_ret = (exists $_all{ $_id }) ? '1' : '0';
+            my $_ret = exists($_all{ $_id }) ? '1' : '0';
             _destroy({}, $_obj{ $_id }, $_id) if $_ret;
          };
 
@@ -1094,7 +1028,6 @@ sub _loop {
          eval { $_var->$_fcn() };
 
          warn $@ if $@;
-
          return;
       },
 
@@ -1109,12 +1042,19 @@ sub _loop {
             return print {$_DAU_R_SOCK} '-1'.$LF;
          };
 
-         $_len ? ( chop $_key )
-                 ? $_fetch->( eval { $_var->$_fcn(@{ $_thaw->($_key) }) } )
-                 : $_fetch->( eval { $_var->$_fcn($_key) } )
-               :   $_fetch->( eval { $_var->$_fcn() } );
+         my $_buf = $_len
+            ? eval { $_var->$_fcn( chop $_key ? ${ $_thaw->($_key) } : $_key ) }
+            : eval { $_var->$_fcn() };
 
          warn $@ if $@;
+
+         return print {$_DAU_R_SOCK} '-1'.$LF if ( !defined $_buf );
+
+         my $_ret = ( blessed($_buf) && $_buf->can('SHARED_ID') && $_ob2{ $_buf->[0] } ) 
+            ? $_ob2{ $_buf->[0] }
+            : $_freeze->([ $_buf ]);
+
+         print {$_DAU_R_SOCK} length($_ret).$LF, $_ret;
 
          return;
       },
@@ -1123,7 +1063,10 @@ sub _loop {
          chomp($_id  = <$_DAU_R_SOCK>),
          chomp($_fcn = <$_DAU_R_SOCK>);
 
-         $_var = $_obj{ $_id } || do { return $_warn0->($_fcn) };
+         $_var = $_obj{ $_id } || do {
+             print {$_DAU_R_SOCK} $LF if $_wa;
+             return;
+         };
 
          my $_code = $_var->can($_fcn) || do {
             if ( ($_fcn eq 'keys' || $_fcn eq 'SCALAR') &&
@@ -1131,7 +1074,9 @@ sub _loop {
                $_obj_keys;
             }
             else {
-               $_wa = 2, $_auto_reply->();
+               $_len = eval { $_var->$_fcn() };
+               print {$_DAU_R_SOCK} $_len.$LF;
+
                warn $@ if $@;
                return;
             }
@@ -1141,7 +1086,6 @@ sub _loop {
          print {$_DAU_R_SOCK} $_len.$LF;
 
          warn $@ if $@;
-
          return;
       },
 
@@ -1152,7 +1096,7 @@ sub _loop {
    ) if $INC{'MCE/Shared/Queue.pm'};
 
    MCE::Shared::Handle::_init_mgr(
-      \$_DAU_R_SOCK, \%_obj, \%_output_function, $_thaw
+      \$_DAU_R_SOCK, \%_obj, \%_output_function, $_freeze, $_thaw
    ) if $INC{'MCE/Shared/Handle.pm'};
 
    MCE::Shared::Condvar::_init_mgr(
@@ -1295,6 +1239,7 @@ sub CLONE {
 # Private functions.
 
 sub DESTROY {
+   return if $_stopped;
    return unless ( $_is_client && defined $_svr_pid && defined $_[0] );
 
    if ( $_spawn_child && $_init_pid && $_init_pid eq "$$.$_tid" ) {
@@ -1388,9 +1333,7 @@ sub _get_channel_id {
 
    {
       local $MCE::Signal::IPC = 1;
-
-      CORE::lock $_DAT_LOCK if $_is_MSWin32;
-      $_dat_ex->() if !$_is_MSWin32;
+      $_is_MSWin32 ? CORE::lock $_DAT_LOCK : $_dat_ex->();
 
       print {$_DAT_W_SOCK} 'M~CID'.$LF . $_chn.$LF;
       chomp($_ret = <$_DAU_W_SOCK>);
@@ -1426,50 +1369,33 @@ sub _init {
 
 # Called by AUTOLOAD, STORE, set, and keys.
 
-my %_nofreeze = map { $_ => undef } qw( enqueue decrby incrby );
-
 sub _auto {
    my $_wa = !defined wantarray ? _UNDEF : wantarray ? _ARRAY : _SCALAR;
 
    local $\ = undef if (defined $\);
    local $MCE::Signal::SIG;
 
-   my ( $_buf, $_frozen );
+   my $_buf;
 
    {
       local $MCE::Signal::IPC = 1;
-
-      CORE::lock $_DAT_LOCK if $_is_MSWin32;
-      $_dat_ex->() if !$_is_MSWin32;
+      $_is_MSWin32 ? CORE::lock $_DAT_LOCK : $_dat_ex->();
 
       if ( @_ == 2 ) {
          print({$_DAT_W_SOCK} 'M~OB0'.$LF . $_chn.$LF),
          print({$_DAU_W_SOCK} $_[1]->[_ID].$LF . $_[0].$LF . $_wa.$LF);
       }
-      elsif ( @_ == 3 && ( !looks_like_number $_[2] || exists $_nofreeze{ $_[0] } )
-                      && !ref $_[2] && defined $_[2] ) {
-         print({$_DAT_W_SOCK} 'M~OB1'.$LF . $_chn.$LF),
-         print({$_DAU_W_SOCK} $_[1]->[_ID].$LF . $_[0].$LF . $_wa.$LF .
-            length($_[2]).$LF, $_[2]);
-      }
-      elsif ( @_ == 4 && !looks_like_number $_[3] && !ref $_[3] && defined $_[3]
-                      && !looks_like_number $_[2] && !ref $_[2] && defined $_[2] ) {
-         print({$_DAT_W_SOCK} 'M~OB2'.$LF . $_chn.$LF),
-         print({$_DAU_W_SOCK} $_[1]->[_ID].$LF . $_[0].$LF . $_wa.$LF .
-            length($_[2]).$LF . length($_[3]).$LF, $_[2], $_[3]);
-      }
       else {
-         my ( $_fcn, $_id, $_tmp ) = ( shift, shift()->[_ID], $_freeze->([ @_ ]) );
-         my $_buf = $_id.$LF . $_fcn.$LF . $_wa.$LF . length($_tmp).$LF;
-
+         my ( $_fcn, $_id, $_buf ) = ( shift, shift()->[_ID], $_freeze->([ @_ ]) );
+         my $_tmp = $_id.$LF . $_fcn.$LF . $_wa.$LF . length($_buf).$LF;
          print({$_DAT_W_SOCK} 'M~OBJ'.$LF . $_chn.$LF),
-         print({$_DAU_W_SOCK} $_buf, $_tmp);
+         print({$_DAU_W_SOCK} $_tmp, $_buf);
       }
 
       if ( $_wa ) {
          local $/ = $LF if ($/ ne $LF);
          chomp(my $_len = <$_DAU_W_SOCK>);
-         $_frozen = chop($_len), read($_DAU_W_SOCK, $_buf, $_len);
+         read($_DAU_W_SOCK, $_buf, $_len);
       }
 
       $_dat_un->() if !$_is_MSWin32;
@@ -1478,10 +1404,7 @@ sub _auto {
    CORE::kill($MCE::Signal::SIG, $$) if $MCE::Signal::SIG;
 
    return unless $_wa;
-
-   return ( $_wa != _ARRAY )
-      ? $_frozen ? $_thaw->($_buf)[0] : $_buf
-      : @{ $_thaw->($_buf) };
+   return ( $_wa != _ARRAY ) ? $_thaw->($_buf)[0] : @{ $_thaw->($_buf) };
 }
 
 # Called by MCE::Hobo ( ->join, ->wait_one ).
@@ -1500,9 +1423,7 @@ sub _get_hobo_data {
 
    {
       local $MCE::Signal::IPC = 1;
-
-      CORE::lock $_DAT_LOCK if $_is_MSWin32;
-      $_dat_ex->() if !$_is_MSWin32;
+      $_is_MSWin32 ? CORE::lock $_DAT_LOCK : $_dat_ex->();
 
       print({$_DAT_W_SOCK} 'O~DAT'.$LF . $_chn.$LF),
       print({$_DAU_W_SOCK} $_[0]->[_ID].$LF . $_[1].$_[2].$LF);
@@ -1537,9 +1458,7 @@ sub _req1 {
 
    {
       local $MCE::Signal::IPC = 1;
-
-      CORE::lock $_DAT_LOCK if $_is_MSWin32;
-      $_dat_ex->() if !$_is_MSWin32;
+      $_is_MSWin32 ? CORE::lock $_DAT_LOCK : $_dat_ex->();
 
       print({$_DAT_W_SOCK} $_[0].$LF . $_chn.$LF),
       print({$_DAU_W_SOCK} $_[1]);
@@ -1561,9 +1480,7 @@ sub _req2 {
 
    {
       local $MCE::Signal::IPC = 1;
-
-      CORE::lock $_DAT_LOCK if $_is_MSWin32;
-      $_dat_ex->() if !$_is_MSWin32;
+      $_is_MSWin32 ? CORE::lock $_DAT_LOCK : $_dat_ex->();
 
       print({$_DAT_W_SOCK} $_[0].$LF . $_chn.$LF),
       print({$_DAU_W_SOCK} $_[1], $_[2]);
@@ -1589,9 +1506,7 @@ sub _req3 {
 
    {
       local $MCE::Signal::IPC = 1;
-
-      CORE::lock $_DAT_LOCK if $_is_MSWin32;
-      $_dat_ex->() if !$_is_MSWin32;
+      $_is_MSWin32 ? CORE::lock $_DAT_LOCK : $_dat_ex->();
 
       print({$_DAT_W_SOCK} 'O~CLR'.$LF . $_chn.$LF),
       print({$_DAU_W_SOCK} $self->[_ID].$LF . $_fcn.$LF);
@@ -1611,25 +1526,21 @@ sub _req4 {
    local $/ = $LF   if ($/ ne $LF );
    local $MCE::Signal::SIG;
 
-   my ( $_key, $_len, $_buf, $_frozen );
+   my ( $_key, $_len, $_buf );
 
    if ( @_ == 3 ) {
-      $_key = ( !looks_like_number $_[2] || ref $_[2] )
-         ? $_[2].'0' : $_freeze->([ $_[2] ]).'1';
+      $_key = ref($_[2]) ? $_[2].'0' : $_freeze->(\$_[2]).'1';
    }
 
    {
       local $MCE::Signal::IPC = 1;
-
-      CORE::lock $_DAT_LOCK if $_is_MSWin32;
-      $_dat_ex->() if !$_is_MSWin32;
+      $_is_MSWin32 ? CORE::lock $_DAT_LOCK : $_dat_ex->();
 
       print({$_DAT_W_SOCK} 'O~FCH'.$LF . $_chn.$LF),
       print({$_DAU_W_SOCK} $_[1]->[_ID].$LF . $_[0].$LF . length($_key).$LF, $_key);
       chomp($_len = <$_DAU_W_SOCK>);
 
-      $_frozen = chop($_len), read($_DAU_W_SOCK, $_buf, $_len)
-         if ($_len >= 0);
+      read($_DAU_W_SOCK, $_buf, $_len) if ($_len >= 0);
 
       $_dat_un->() if !$_is_MSWin32;
    }
@@ -1639,11 +1550,11 @@ sub _req4 {
    return undef if ($_len < 0);
 
    if ( $_[1]->[_DECODE] && $_[0] eq 'FETCH' ) {
-      local $@; $_buf = $_thaw->($_buf)[0] if $_frozen;
+      local $@; $_buf = $_thaw->($_buf)[0];
       return eval { $_[1]->[_DECODE]->($_buf) } || $_buf;
    }
 
-   $_frozen ? $_thaw->($_buf)[0] : $_buf;
+   $_thaw->($_buf)[0];
 }
 
 # Called by FETCHSIZE, SCALAR, keys, and pending.
@@ -1657,9 +1568,7 @@ sub _size {
 
    {
       local $MCE::Signal::IPC = 1;
-
-      CORE::lock $_DAT_LOCK if $_is_MSWin32;
-      $_dat_ex->() if !$_is_MSWin32;
+      $_is_MSWin32 ? CORE::lock $_DAT_LOCK : $_dat_ex->();
 
       print({$_DAT_W_SOCK} 'O~SZE'.$LF . $_chn.$LF),
       print({$_DAU_W_SOCK} $_[1]->[_ID].$LF . $_[0].$LF);
@@ -1760,9 +1669,7 @@ sub export {
 
       {
          local $MCE::Signal::IPC = 1;
-
-         CORE::lock $_DAT_LOCK if $_is_MSWin32;
-         $_dat_ex->() if !$_is_MSWin32;
+         $_is_MSWin32 ? CORE::lock $_DAT_LOCK : $_dat_ex->();
 
          print({$_DAT_W_SOCK} 'M~EXP'.$LF . $_chn.$LF),
          print({$_DAU_W_SOCK} $_buf, $_tmp); undef $_buf;
@@ -1886,9 +1793,7 @@ sub next {
 
    {
       local $MCE::Signal::IPC = 1;
-
-      CORE::lock $_DAT_LOCK if $_is_MSWin32;
-      $_dat_ex->() if !$_is_MSWin32;
+      $_is_MSWin32 ? CORE::lock $_DAT_LOCK : $_dat_ex->();
 
       print({$_DAT_W_SOCK} 'M~INX'.$LF . $_chn.$LF),
       print({$_DAU_W_SOCK} $_[0]->[_ID].$LF);
@@ -2027,7 +1932,7 @@ MCE::Shared::Server - Server/Object packages for MCE::Shared
 
 =head1 VERSION
 
-This document describes MCE::Shared::Server version 1.864
+This document describes MCE::Shared::Server version 1.868
 
 =head1 DESCRIPTION
 

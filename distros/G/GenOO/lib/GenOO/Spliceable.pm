@@ -35,7 +35,7 @@ GenOO::Spliceable - Role for a region that can be spliced
 # Let the code begin...
 
 package GenOO::Spliceable;
-$GenOO::Spliceable::VERSION = '1.5.1';
+$GenOO::Spliceable::VERSION = '1.5.2';
 use Moose::Role;
 use Moose::Util::TypeConstraints;
 use namespace::autoclean;

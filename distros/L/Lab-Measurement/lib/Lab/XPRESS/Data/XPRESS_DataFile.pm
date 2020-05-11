@@ -1,6 +1,7 @@
 package Lab::XPRESS::Data::XPRESS_DataFile;
+$Lab::XPRESS::Data::XPRESS_DataFile::VERSION = '3.701';
 #ABSTRACT: XPRESS data file module
-$Lab::XPRESS::Data::XPRESS_DataFile::VERSION = '3.692';
+
 use strict;
 use Time::HiRes qw/usleep/, qw/time/;
 use Storable qw(dclone);
@@ -8,11 +9,11 @@ use File::Copy;
 use Lab::XPRESS::Data::XPRESS_logger;
 use Lab::XPRESS::Sweep;
 
-
 our $counter        = 0;
 our $GLOBAL_PATH    = "./";
 our $GLOBAL_FOLDER  = undef;
 our $DEFAULT_FOLDER = "MEAS";
+our $DEFAULT_HEADER = "#";
 
 sub new {
     my $proto = shift;
@@ -288,7 +289,7 @@ sub start_log {
         $self->{logger}->LOG( $self->{CONFIG} );
     }
     if ( defined @{ $self->{COLUMNS} }[0] ) {
-        my $columns = "#";
+        my $columns = $DEFAULT_HEADER;
         $columns .= join( "\t", @{ $self->{COLUMNS} } );
 
         $self->{logger}->LOG($columns);
@@ -609,7 +610,7 @@ Lab::XPRESS::Data::XPRESS_DataFile - XPRESS data file module
 
 =head1 VERSION
 
-version 3.692
+version 3.701
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -620,6 +621,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
             2014       Christian Butschkow
             2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
+            2020       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

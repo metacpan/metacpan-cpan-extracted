@@ -94,13 +94,14 @@
          "web" : "https://github.com/RT-Client-REST/RT-Client-REST"
       }
    },
-   "version" : "0.59",
+   "version" : "0.60",
    "x_contributors" : [
       "Abhijit Menon-Sen <ams@wiw.org>",
       "belg4mit <belg4mit>",
       "bobtfish <bobtfish@bobtfish.net>",
       "Byron Ellacott <code@bje.id.au>",
       "Dean Hamstead <djzort@cpan.org>",
+      "DJ Stauffer <dj@djstauffer.com>",
       "dkrotkine <dkrotkine@gmail.com>",
       "Dmitri Tikhonov <dmitri@cpan.org>",
       "Marco Pessotto <melmothx@gmail.com>",

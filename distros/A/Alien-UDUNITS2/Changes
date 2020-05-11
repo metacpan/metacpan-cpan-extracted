@@ -1,3 +1,11 @@
+0.007 2020-05-10 16:39:02-0500
+  - No changes since 0.006_01.
+
+0.006_01 2020-05-07 16:10:51-0500
+  - Use HTTPS for download. Thanks to thibaultduponchelle!
+    See <https://github.com/EntropyOrg/p5-Alien-UDUNITS2/pull/10>,
+    <https://github.com/EntropyOrg/p5-Alien-UDUNITS2/pull/11>.
+
 0.006 2016-04-17 13:27:17-0500
   - fix previous release; changes are the same
 

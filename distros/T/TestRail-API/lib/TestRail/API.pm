@@ -2,7 +2,7 @@
 # PODNAME: TestRail::API
 
 package TestRail::API;
-$TestRail::API::VERSION = '0.044';
+$TestRail::API::VERSION = '0.046';
 
 use 5.010;
 
@@ -21,6 +21,7 @@ use Type::Params qw( compile );
 use JSON::MaybeXS 1.001000 ();
 use HTTP::Request;
 use LWP::UserAgent;
+use HTTP::CookieJar::LWP;
 use Data::Validate::URI qw{is_uri};
 use List::Util 1.33;
 use Encode ();
@@ -51,8 +52,9 @@ sub new {
         tr_fields       => undef,
         default_request => undef,
         global_limit    => 250,                   #Discovered by experimentation
-        browser         => new LWP::UserAgent(
+        browser         => LWP::UserAgent->new(
             keep_alive => 10,
+            cookie_jar => HTTP::CookieJar::LWP->new(),
         ),
         do_post_redirect => $do_post_redirect,
         max_tries        => $max_tries // 1,
@@ -80,7 +82,7 @@ sub new {
       ( Encode->encodings(":all") );
 
     #Create default request to pass on to LWP::UserAgent
-    $self->{'default_request'} = new HTTP::Request();
+    $self->{'default_request'} = HTTP::Request->new();
     $self->{'default_request'}->authorization_basic( $user, $pass );
 
     bless( $self, $class );
@@ -997,7 +999,7 @@ sub getPlanSummary {
     $runs  = $self->getChildRuns($runs);
     @$runs = $self->getRunSummary( @{$runs} );
     my $total_sum = 0;
-    my $ret = { plan => $plan_id };
+    my $ret       = { plan => $plan_id };
 
     #Compile totals
     foreach my $summary (@$runs) {
@@ -1302,6 +1304,19 @@ sub getTestResults {
     return $self->_doRequest($url);
 }
 
+sub getResultsForCase {
+    state $check = compile( Object, Int, Int,
+        Optional [ Maybe [Int] ],
+        Optional [ Maybe [Int] ]
+    );
+    my ( $self, $run_id, $case_id, $limit, $offset ) = $check->(@_);
+
+    my $url = "index.php?/api/v2/get_results_for_case/$run_id/$case_id";
+    $url .= "&limit=$limit"   if $limit;
+    $url .= "&offset=$offset" if defined($offset);
+    return $self->_doRequest($url);
+}
+
 sub getConfigurationGroups {
     state $check = compile( Object, Int );
     my ( $self, $project_id ) = $check->(@_);
@@ -1389,6 +1404,20 @@ sub translateConfigNamesToIds {
     return _X_in_my_Y( $self, $configs, 'id', @names );
 }
 
+sub getReports {
+    state $check = compile( Object, Int );
+    my ( $self, $project_id ) = $check->(@_);
+    my $url = "index.php?/api/v2/get_reports/$project_id";
+    return $self->_doRequest( $url, 'GET' );
+}
+
+sub runReport {
+    state $check = compile( Object, Int );
+    my ( $self, $report_id ) = $check->(@_);
+    my $url = "index.php?/api/v2/run_report/$report_id";
+    return $self->_doRequest( $url, 'GET' );
+}
+
 #Convenience method for building stepResults
 sub buildStepResults {
     state $check = compile( Str, Str, Str, Int );
@@ -1416,7 +1445,7 @@ TestRail::API - Provides an interface to TestRail's REST api via HTTP
 
 =head1 VERSION
 
-version 0.044
+version 0.046
 
 =head1 SYNOPSIS
 
@@ -1464,7 +1493,7 @@ Creates new C<TestRail::API> object.
 
 =item STRING C<ENCODING> - The character encoding used by the caller.  Defaults to 'UTF-8', see L<Encode::Supported> and  for supported encodings.
 
-=item BOOLEAN C<DEBUG> (optional) - Print the JSON responses from TL with your requests. Default false.
+=item BOOLEAN C<DEBUG> (optional) - Print the JSON responses from TestRail with your requests. Default false.
 
 =item BOOLEAN C<DO_POST_REDIRECT> (optional) - Follow redirects on POST requests (most add/edit/delete calls are POSTs).  Default false.
 
@@ -1510,7 +1539,7 @@ Returns ARRAYREF of user definition HASHREFs.
 =head2 B<getUserByEmail(email)>
 
 Get user definition hash by ID, Name or Email.
-Returns user def HASHREF.
+Returns user definition HASHREF.
 
 For efficiency's sake, these methods cache the result of getUsers until you explicitly run it again.
 
@@ -1583,7 +1612,7 @@ Gets some project definition hash by it's name
 
 =back
 
-Returns desired project def HASHREF, false otherwise.
+Returns desired project definition HASHREF, false otherwise.
 
     $project = $tl->getProjectByName('FunProject');
 
@@ -1597,7 +1626,7 @@ Gets some project definition hash by it's ID
 
 =back
 
-Returns desired project def HASHREF, false otherwise.
+Returns desired project definition HASHREF, false otherwise.
 
     $projects = $tl->getProjectByID(222);
 
@@ -2613,6 +2642,24 @@ Get the recorded results for desired test, limiting output to 'limit' entries.
 
 Returns ARRAYREF of result definition HASHREFs.
 
+=head2 B<getResultsForCase(run_id,case_id,limit,offset)>
+
+Get the recorded results for a test run and case combination., limiting output to 'limit' entries.
+
+=over 4
+
+=item INTEGER C<RUN_ID> - ID of desired run
+
+=item INTEGER C<CASE_ID> - ID of desired case
+
+=item POSITIVE INTEGER C<LIMIT> (OPTIONAL) - provide no more than this number of results.
+
+=item INTEGER C<OFFSET> (OPTIONAL) - Offset to begin viewing result set at.
+
+=back
+
+Returns ARRAYREF of result definition HASHREFs.
+
 =head1 CONFIGURATION METHODS
 
 =head2 B<getConfigurationGroups(project_id)>
@@ -2753,6 +2800,32 @@ Transforms a list of configuration names into a list of config IDs.
 
 Returns ARRAY of configuration names, with undef values for unknown configuration names.
 
+=head1 REPORT METHODS
+
+=head2 getReports
+
+Return the ARRAYREF of reports available for the provided project.
+
+Requires you to mark a particular report as accessible in the API via the TestRail report interface.
+
+=over 4
+
+=item INTEGER C<PROJECT_ID> - Relevant project ID.
+
+=back
+
+=head2 runReport
+
+Compute the provided report using currently available data.
+
+Returns HASHREF describing URLs to access completed reports.
+
+=over 4
+
+=item INTEGER C<REPORT_ID> - Relevant report ID.
+
+=back
+
 =head1 STATIC METHODS
 
 =head2 B<buildStepResults(content,expected,actual,status_id)>
@@ -2791,9 +2864,21 @@ George S. Baugh <teodesian@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Mohammad S Anwar Neil Bowers Ryan Sherer
+=for stopwords George S. Baugh Matthew Spahr Mohammad S Anwar Neil Bowers Ryan Sherer Todd Rinaldo
 
 =over 4
+
+=item *
+
+George S. Baugh <doge@teodesian.net>
+
+=item *
+
+George S. Baugh <george.b@cpanel.net>
+
+=item *
+
+Matthew Spahr <matthew.spahr@cpanel.net>
 
 =item *
 
@@ -2807,16 +2892,20 @@ Neil Bowers <neil@bowers.com>
 
 Ryan Sherer <ryan.sherer@cpanel.net>
 
+=item *
+
+Todd Rinaldo <toddr@cpan.org>
+
 =back
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/teodesian/TestRail-Perl>
+The development version is on github at L<https://github.com/teodesian/TestRail-Perl>
 and may be cloned from L<git://github.com/teodesian/TestRail-Perl.git>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by George S. Baugh.
+This software is copyright (c) 2020 by George S. Baugh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

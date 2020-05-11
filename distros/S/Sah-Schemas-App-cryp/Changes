@@ -1,3 +1,12 @@
+0.010   2020-05-08  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with newest Pod::Weaver::Plugin::Sah::Schemas which
+          shows how to use with Params::Sah in addition to with Data::Sah and
+          Perinci::CmdLine.
+
+
 0.009   2020-03-08  Released-By: PERLANCAR; Urgency: medium
 
         - No functional changes.

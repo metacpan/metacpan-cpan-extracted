@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200427120032;
+our $VERSION = 1.20200511123716;
 
 my $formatters = [
                 {
@@ -33,10 +33,7 @@ my $formatters = [
                 },
                 {
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '
-            14|
-            [3-9]
-          ',
+                  'leading_digits' => '[13-9]',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})'
                 },
@@ -50,6 +47,7 @@ my $formatters = [
 my $validators = {
                 'fixed_line' => '
           (?:
+            1[0689]|
             2\\d|
             3[2-9]|
             4[2-5]|
@@ -59,6 +57,7 @@ my $validators = {
         ',
                 'geographic' => '
           (?:
+            1[0689]|
             2\\d|
             3[2-9]|
             4[2-5]|
@@ -80,6 +79,10 @@ my $validators = {
                 'voip' => '6[08]\\d{7}'
               };
 my %areanames = ();
+$areanames{en}->{6610} = "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan";
+$areanames{en}->{6616} = "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan";
+$areanames{en}->{6618} = "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan";
+$areanames{en}->{6619} = "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan";
 $areanames{en}->{662} = "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan";
 $areanames{en}->{6632} = "Phetchaburi\/Prachuap\ Khiri\ Khan\/Ratchaburi";
 $areanames{en}->{6633} = "Chachoengsao\/Chon\ Buri\/Rayong";
@@ -103,6 +106,10 @@ $areanames{en}->{6674} = "Phatthalung\/Satun\/Songkhla";
 $areanames{en}->{6675} = "Krabi\/Nakhon\ Si\ Thammarat\/Trang";
 $areanames{en}->{6676} = "Phang\ Nga\/Phuket";
 $areanames{en}->{6677} = "Chumphon\/Ranong\/Surat\ Thani";
+$areanames{th}->{6610} = "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ";
+$areanames{th}->{6616} = "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ";
+$areanames{th}->{6618} = "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ";
+$areanames{th}->{6619} = "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ";
 $areanames{th}->{662} = "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ";
 $areanames{th}->{6632} = "เพชรบุรี\/ประจวบคีรีขันธ์\/ราชบุรี";
 $areanames{th}->{6633} = "ฉะเชิงเทรา\/ชลบุรี\/ระยอง";

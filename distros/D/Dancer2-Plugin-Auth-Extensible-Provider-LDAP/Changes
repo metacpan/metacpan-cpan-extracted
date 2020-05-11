@@ -1,8 +1,19 @@
 Revision history for Dancer2-Plugin-Auth-Extensible-Provider-LDAP
 
+0.705 Sat  9 May 16:02:07 CEST 2020
+
+    * Bump dependency on D2PAE to version which handles Dancer2's switch
+      to RFC 7231 redirects.
+
+0.704 Thu  7 May 19:45:58 CEST 2020
+
+    [ENHANCEMENTS]
+
+    * Add role_member_attribute_name (Scott O'Neil GH#7, stefano bianchi GH#4)
+
 0.703 Mon 23 Dec 17:45:20 CET 2019
 
-    [ENHANCEMENTS}
+    [ENHANCEMENTS]
 
     * Allow anonymous bind (Jason A. Crome, GH#6).
 

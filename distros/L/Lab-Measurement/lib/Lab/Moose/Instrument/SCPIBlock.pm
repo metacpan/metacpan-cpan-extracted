@@ -1,11 +1,13 @@
 package Lab::Moose::Instrument::SCPIBlock;
-$Lab::Moose::Instrument::SCPIBlock::VERSION = '3.692';
+$Lab::Moose::Instrument::SCPIBlock::VERSION = '3.701';
 #ABSTRACT: Role for handling SCPI/IEEE 488.2 block data
 
 use Moose::Role;
 use MooseX::Params::Validate;
 
-use Lab::Moose::Instrument 'precision_param';
+use Lab::Moose::Instrument qw/
+    precision_param
+    /;
 
 use Carp;
 
@@ -50,6 +52,13 @@ sub block_to_array {
         croak 'does not look like binary data';
     }
 
+    my %endians = (
+        native => '',
+        big    => '>',
+        little => '<'
+        );
+    my $endianflag = $endians{$self->endian};
+
     my $num_digits = substr( $binary, 1, 1 );
     my $num_bytes  = substr( $binary, 2, $num_digits );
     my $expected_length = $num_bytes + $num_digits + 2;
@@ -61,7 +70,7 @@ sub block_to_array {
     }
 
     my @floats = unpack(
-        $precision eq 'single' ? 'f*' : 'd*',
+        $precision eq 'single' ? "f$endianflag*" : "d$endianflag*",
         substr( $binary, 2 + $num_digits, $num_bytes )
     );
 
@@ -100,7 +109,7 @@ Lab::Moose::Instrument::SCPIBlock - Role for handling SCPI/IEEE 488.2 block data
 
 =head1 VERSION
 
-version 3.692
+version 3.701
 
 =head1 DESCRIPTION
 
@@ -142,6 +151,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
+            2020       Sam Bingner
 
 
 This is free software; you can redistribute it and/or modify it under

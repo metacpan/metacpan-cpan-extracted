@@ -1,6 +1,6 @@
 package Net::IPAM::IP;
 
-our $VERSION = '1.20';
+our $VERSION = '1.21';
 
 use 5.10.0;
 use strict;
@@ -8,7 +8,6 @@ use warnings;
 use utf8;
 
 use Carp            ();
-use Scalar::Util    ();
 use Socket          ();
 use Net::IPAM::Util ();
 
@@ -234,15 +233,11 @@ IPv4 addresses are B<always> treated as smaller than IPv6 addresses (::ffff:0.0.
 
 =cut
 
+# the first byte is the version: IPv4 is sorted before IPv6
+# there is no utf8-flag in packed values,
+# we can just use string compare for the bytes
 sub cmp {
-  Carp::croak "wrong or missing arg"
-    unless Scalar::Util::blessed( $_[1] ) && $_[1]->isa(__PACKAGE__);
-
-  # the first byte is the version: IPv4 is sorted before IPv6
-  # there is no utf8-flag in packed values,
-  # we can just use string compare for the bytes
-
-  return $_[0]->{binary} cmp $_[1]->{binary};
+  $_[0]->{binary} cmp $_[1]->{binary};
 }
 
 =head2 version
@@ -254,7 +249,7 @@ Returns 4 or 6.
 =cut
 
 sub version {
-  return $_[0]->{version};
+  $_[0]->{version};
 }
 
 =head2 to_string
@@ -324,7 +319,7 @@ sub incr {
   return unless defined $n_plus1;
 
   # sort of cloning
-  return $_[0]->new_from_bytes($n_plus1);
+  $_[0]->new_from_bytes($n_plus1);
 }
 
 =head2 expand
@@ -433,7 +428,7 @@ sub getname {
     return;
   }
 
-  return $name;
+  $name;
 }
 
 =head2 bytes
@@ -448,10 +443,9 @@ Returns the packed IP address as byte-string. It's the opposite to L</"new_from_
 
 =cut
 
+# drop first byte (version) and return the packed IP address,
 sub bytes {
-
-  # drop first byte (version) and return the packed IP address,
-  return substr( $_[0]->{binary}, 1 );
+  substr( $_[0]->{binary}, 1 );
 }
 
 =head1 OPERATORS

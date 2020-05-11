@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use utf8;
 
 use Test::More;
 
@@ -605,17 +606,17 @@ is(
 
 is(
    $db->lassign('k2', qw/ foo bar baz /), 3,
-   'shared minidb hash, check lassign count'
+   'shared minidb list, check lassign count'
 );
 
 cmp_array(
    [ $db->lkeys('k2') ], [ qw/ 0 1 2 / ],
-   'shared minidb hash, check lassign keys'
+   'shared minidb list, check lassign keys'
 );
 
 cmp_array(
    [ $db->lvals('k2') ], [ qw/ foo bar baz / ],
-   'shared minidb hash, check lassign vals'
+   'shared minidb list, check lassign vals'
 );
 
 ## lpush/rpush, lpop/rpop
@@ -849,6 +850,78 @@ is ( $db->lappend('k1', 0, 'ba'), 4, 'shared minidb list, check lappend' );
 is ( $db->lget('k1', 0), '77ba', 'shared minidb list, check value after lappend' );
 is ( $db->lgetset('k1', 0, '77bc'), '77ba', 'shared minidb list, check lgetset' );
 is ( $db->lget('k1', 0), '77bc', 'shared minidb list, check value after lgetset' );
+
+## --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+
+## https://sacred-texts.com/cla/usappho/sph02.htm (III)
+
+my $sappho_text =
+  "ἄρμ᾽ ὐποζεύξαια, κάλοι δέ σ᾽ ἆγον
+   ὤκεεσ στροῦθοι περὶ γᾶσ μελαίνασ
+   πύκνα δινεῦντεσ πτέῤ ἀπ᾽ ὠράνω
+   αἴθεροσ διὰ μέσσω.";
+
+my $translation =
+  "With chariot yoked to thy fleet-winged coursers,
+   Fluttering swift pinions over earth's darkness,
+   And bringing thee through the infinite, gliding
+   Downwards from heaven.";
+
+my $length;
+
+$db->hassign( "utf8", text => $sappho_text );
+is( $db->hget("utf8", "text"), $sappho_text, 'shared minidb hash, check unicode assign' );
+
+$db->hclear("utf8"), $db->hset( "utf8", text => $sappho_text );
+is( $db->hget("utf8", "text"), $sappho_text, 'shared minidb hash, check unicode set' );
+is( $db->hlen("utf8", "text"), length($sappho_text), 'shared minidb hash, check unicode len' );
+
+$db->hclear("utf8"), $db->hset( "utf8", "ἀθάνατῳ", $sappho_text );
+is( $db->hget("utf8", "ἀθάνατῳ"), $sappho_text, 'shared minidb hash, check unicode get' );
+is( $db->hexists("utf8", "ἀθάνατῳ"), 1, 'shared minidb hash, check unicode exists' );
+
+@keys = $db->hkeys("utf8");
+@vals = $db->hvals("utf8");
+
+is( $keys[0], "ἀθάνατῳ", 'shared minidb hash, check unicode keys' );
+is( $vals[0], $sappho_text, 'shared minidb hash, check unicode vals' );
+
+cmp_array(
+   [ $db->hpairs('utf8', 'key =~ /ἀθάνατῳ/') ], [ "ἀθάνατῳ", $sappho_text ],
+   'shared minidb hash, check unicode find keys =~ match (pairs)'
+);
+cmp_array(
+   [ $db->hpairs('utf8', 'val =~ /δινεῦντεσ/') ], [ "ἀθάνατῳ", $sappho_text ],
+   'shared minidb hash, check unicode find values =~ match (pairs)'
+);
+
+$length = $db->happend("utf8", "ἀθάνατῳ", "Ǣ");
+is( $db->hget("utf8", "ἀθάνατῳ"), $sappho_text . "Ǣ", 'shared minidb hash, check unicode append' );
+is( $length, length($sappho_text) + 1, 'shared minidb hash, check unicode length' );
+
+##
+
+$db->lassign( "utf8", $sappho_text );
+is( $db->lget("utf8", 0), $sappho_text, 'shared minidb list, check unicode assign' );
+
+$db->lclear("utf8"), $db->lset( "utf8", 0 => $sappho_text );
+is( $db->lget("utf8", 0), $sappho_text, 'shared minidb list, check unicode set' );
+is( $db->llen("utf8", 0), length($sappho_text), 'shared minidb list, check unicode len' );
+
+@keys = $db->lkeys("utf8");
+@vals = $db->lvals("utf8");
+
+is( $keys[0], 0, 'shared minidb list, check unicode keys' );
+is( $vals[0], $sappho_text, 'shared minidb list, check unicode vals' );
+
+cmp_array(
+   [ $db->lpairs('utf8', 'val =~ /δινεῦντεσ/') ], [ 0, $sappho_text ],
+   'shared minidb list, check unicode find values =~ match (pairs)'
+);
+
+$length = $db->lappend("utf8", 0, "Ǣ");
+is( $db->lget("utf8", 0), $sappho_text . "Ǣ", 'shared minidb list, check unicode append' );
+is( $length, length($sappho_text) + 1, 'shared minidb list, check unicode length' );
 
 done_testing;
 

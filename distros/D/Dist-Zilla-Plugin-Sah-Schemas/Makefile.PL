@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Dist::Zilla::Plugin::Sah::Schemas",
   "PREREQ_PM" => {
-    "Data::Dmp" => "0.21",
+    "Data::Dmp" => "0.240",
     "Data::Sah::Normalize" => 0,
     "Data::Sah::Resolve" => "0.003",
     "Data::Sah::Util::Subschema" => 0,
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.017",
+  "VERSION" => "0.018",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,7 +48,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Dmp" => "0.21",
+  "Data::Dmp" => "0.240",
   "Data::Sah::Normalize" => 0,
   "Data::Sah::Resolve" => "0.003",
   "Data::Sah::Util::Subschema" => 0,

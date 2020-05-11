@@ -603,11 +603,21 @@ subtest 'cast' => sub {
     my $pointer2 = cast3($closure);
 
     $testname = 'static';
-    $ffi->function(string_set_closure => ['opaque'] => 'void')->call($pointer2);
-    $ffi->function(string_call_closure => ['string'] => 'void')->call("testvalue");
+    $ffi->function(string_set_closure => ['opaque'])->call($pointer2);
+    $ffi->function(string_call_closure => ['string'])->call("testvalue");
 
-    $ffi->function(string_set_closure => ['(string)->void'] => 'void')->call($pointer2);
-    $ffi->function(string_call_closure => ['string'] => 'void')->call("testvalue");
+    $ffi->function(string_set_closure => ['(string)->void'])->call($pointer2);
+    $ffi->function(string_call_closure => ['string'])->call("testvalue");
+  };
+
+  subtest 'attach cast with wrapper' => sub {
+    $ffi->attach_cast('cast4', 'int', 'int', sub {
+      my($xsub, $in) = @_;
+      my $out = $xsub->($in);
+      return $out + 4;
+    });
+    is(cast4(4), 8);
+    is(prototype \&cast4, '$');
   };
 };
 

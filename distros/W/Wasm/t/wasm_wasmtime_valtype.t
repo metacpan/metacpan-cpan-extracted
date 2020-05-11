@@ -10,6 +10,7 @@ foreach my $name (qw( i32 i64 f32 f64 anyref funcref ))
     object {
       call [ isa => 'Wasm::Wasmtime::ValType' ] => T();
       call kind => $name;
+      call to_string => $name;
       call kind_num => match qr/^[0-9]+$/;
     },
     "use $name",

@@ -24,6 +24,7 @@ require App::Followme;
 my $test_dir = catdir(@path, 'test');
 rmtree($test_dir);
 mkdir $test_dir;
+chmod 0755, $test_dir;
 chdir $test_dir;
 
 $test_dir = getcwd();
@@ -60,6 +61,7 @@ do {
     my $directory;
     foreach my $dir (qw(one two three)) {
         mkdir($dir);
+        chmod 0755, $dir;
         chdir ($dir);
         $directory = getcwd();
 

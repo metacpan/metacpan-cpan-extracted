@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::script2dist;
 
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '1.056'; # VERSION
+our $DATE = '2020-05-07'; # DATE
+our $VERSION = '1.057'; # VERSION
 
 use 5.010;
 use strict;
@@ -33,10 +33,9 @@ sub handle_cmd {
     my $sth = $dbh->prepare("
 SELECT
   script.name script,
-  dist.name dist
+  file.dist_name dist
 FROM script
 LEFT JOIN file ON script.file_id=file.id
-LEFT JOIN dist ON file.id=dist.file_id
 WHERE script.name IN ($scripts_s)");
 
     my @res;
@@ -78,7 +77,7 @@ App::lcpan::Cmd::script2dist - Get distribution(s) of script(s)
 
 =head1 VERSION
 
-This document describes version 1.056 of App::lcpan::Cmd::script2dist (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of App::lcpan::Cmd::script2dist (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 FUNCTIONS
 

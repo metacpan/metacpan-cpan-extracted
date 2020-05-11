@@ -41,23 +41,23 @@
    "provides" : {
       "Metabrik" : {
          "file" : "lib/Metabrik.pm",
-         "version" : "1.40"
+         "version" : "1.41"
       },
       "Metabrik::Core::Context" : {
          "file" : "lib/Metabrik/Core/Context.pm",
-         "version" : "1.40"
+         "version" : "1.41"
       },
       "Metabrik::Core::Global" : {
          "file" : "lib/Metabrik/Core/Global.pm",
-         "version" : "1.40"
+         "version" : "1.41"
       },
       "Metabrik::Core::Log" : {
          "file" : "lib/Metabrik/Core/Log.pm",
-         "version" : "1.40"
+         "version" : "1.41"
       },
       "Metabrik::Core::Shell" : {
          "file" : "lib/Metabrik/Core/Shell.pm",
-         "version" : "1.40"
+         "version" : "1.41"
       }
    },
    "release_status" : "stable",
@@ -66,6 +66,6 @@
          "http://opensource.org/licenses/BSD-3-Clause"
       ]
    },
-   "version" : "1.40",
+   "version" : "1.41",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

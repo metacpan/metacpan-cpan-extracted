@@ -1,6 +1,12 @@
 Revision history for Perl extension App::Followme
 
-1.93 2020-05-02T14:15:11Z
+1.94 2020-05-11T14:05:39Z
+	- set permissions on directory when creating files for testing
+	- set file modify times instead of sleeping in tests
+	- make Text::Markdown a required module
+	- add system error message to file write error message
+
+1.93 2020-05-02T14:45:16Z
 	- revised css for single column site and removed javascript
 	- CreateGallery no longer resizes images, must be done externally
 	- revised templates to use semantic html

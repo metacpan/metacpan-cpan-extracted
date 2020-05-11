@@ -3,7 +3,7 @@ use 5.012;
 use warnings;
 use Carp qw(confess);
 use Data::Dumper;
-$FASTX::Reader::VERSION = '0.90';
+$FASTX::Reader::VERSION = '0.92';
 require Exporter;
 our @ISA = qw(Exporter);
 #ABSTRACT: A lightweight module to parse FASTA and FASTQ files, supporting compressed files and paired-ends.
@@ -391,7 +391,7 @@ FASTX::Reader - A lightweight module to parse FASTA and FASTQ files, supporting 
 
 =head1 VERSION
 
-version 0.90
+version 0.92
 
 =head1 SYNOPSIS
 

@@ -677,7 +677,7 @@ locate() : Str
 
   use Data::Object::Space;
 
-  my $space = Data::Object::Space->new('foo');
+  my $space = Data::Object::Space->new('brianne_spinka');
 
   $space->locate;
 

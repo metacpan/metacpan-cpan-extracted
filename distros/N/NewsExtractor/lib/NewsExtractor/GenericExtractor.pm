@@ -59,7 +59,7 @@ sub headline {
         $title =~ s/\s* \p{Punct} \s* $site_name \s* \z//x;
     }
     if (defined($title)) {
-        my $delim = qr<(?: \p{Punct} | \| )>x;
+        my $delim = qr<(?: \p{Punct} | \| | │ )>x;
         $title =~ s/ \s* $delim \s* $RE{newspaper_names} \s* \z//x;
         $title =~ s/\A $RE{newspaper_names} \s* $delim \s* //x;
         $title =~ s/\r\n/\n/g;
@@ -153,7 +153,7 @@ sub journalist {
         $ret = $guess->attr('content');
     } elsif ( $guess = $dom->at('meta[name="author"]') ) {
         $ret = $guess->attr('content');
-    } elsif ( $guess = $dom->at('div.field-item a[href^=/author/], div.content_reporter a[itemprop=author], span[itemprop=author] a, div.author div.intro a div.name, div.article-author > h5 > a, div.article-meta > div.article-author > a, div.authorInfo li.authorName > a, .article .writer > p, .info_author, .news-info dd[itemprop=author], .content_reporter a, .top_title span.reporter_name, .post-heading time span, header .article-meta .article-author,  .article_header > .author > span:first-child, .mid-news > .m-left-side > .maintype-wapper > .subtype-sort, .newsCon > .newsInfo > span:first-child, .newsdetail_content > .title > h4 > a[href^="/news/searchresult/news?search_text="], .m-from-author > .m-from-author__name, .post-author-name a[itemprop*=author]') ) {
+    } elsif ( $guess = $dom->at('.bt_xmic span[itemprop=author], div.tdb_single_author a.tdb-author-name, div.field-item a[href^=/author/], div.content_reporter a[itemprop=author], span[itemprop=author] a, div.author div.intro a div.name, div.article-author > h5 > a, div.article-meta > div.article-author > a, div.authorInfo li.authorName > a, .article .writer > p, .info_author, .news-info dd[itemprop=author], .content_reporter a, .top_title span.reporter_name, .post-heading time span, header .article-meta .article-author,  .article_header > .author > span:first-child, .mid-news > .m-left-side > .maintype-wapper > .subtype-sort, .newsCon > .newsInfo > span:first-child, .newsdetail_content > .title > h4 > a[href^="/news/searchresult/news?search_text="], .m-from-author > .m-from-author__name, .post-author-name a[itemprop*=author], a.post-author-avatar .post-author-name > b, div#news_content div.author') ) {
         $ret = $guess->text;
     } elsif ($guess = $dom->at('.story_bady_info_author')) {
         if ($guess->find('a')->size() == 0) {
@@ -205,6 +205,7 @@ sub journalist {
             qr<\A 【(本報記者.+報導)】 >x,
             qr<\b ﹝記者(\p{Letter}+?)／.+?報導﹞ \b>x,
             qr<\A〔新網記者 ( \p{Letter}+ (?:報導|特稿))〕\b>x,
+            qr<\A（芋傳媒記者(\p{Letter}+)報導）\b>x,
         );
 
         for my $pat (@patterns) {

@@ -1,7 +1,9 @@
 package App::lcpan::Cmd::mods_from_same_dist;
 
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '1.056'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-07'; # DATE
+our $DIST = 'App-lcpan'; # DIST
+our $VERSION = '1.057'; # VERSION
 
 use 5.010;
 use strict;
@@ -31,20 +33,20 @@ sub handle_cmd {
 
     my $emods = join(",", map {$dbh->quote($_)} @{ $args{modules} });
     my @where;
-    push @where, "dist.name IN (SELECT name FROM dist WHERE file_id IN (SELECT file_id FROM module WHERE name IN ($emods)))";
+    push @where, "f.id IN (SELECT file_id FROM module WHERE name IN ($emods))";
     if ($args{latest}) {
-        push @where, "dist.is_latest";
+        push @where, "f.is_latest_dist";
     } elsif (defined $args{latest}) {
-        push @where, "NOT(dist.is_latest)";
+        push @where, "NOT(f.is_latest_dist)";
     }
     my $sth = $dbh->prepare("SELECT
   module.name name,
   module.version version,
   module.abstract abstract,
-  dist.name dist,
-  dist.version dist_version
+  f.dist_name dist,
+  f.dist_version dist_version
 FROM module
-JOIN dist ON module.file_id=dist.file_id
+JOIN file f ON module.file_id=f.id
 WHERE ".join(" AND ", @where)."
 ORDER BY name DESC");
     $sth->execute;
@@ -73,7 +75,7 @@ App::lcpan::Cmd::mods_from_same_dist - Given a module, list all modules in the s
 
 =head1 VERSION
 
-This document describes version 1.056 of App::lcpan::Cmd::mods_from_same_dist (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of App::lcpan::Cmd::mods_from_same_dist (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 FUNCTIONS
 

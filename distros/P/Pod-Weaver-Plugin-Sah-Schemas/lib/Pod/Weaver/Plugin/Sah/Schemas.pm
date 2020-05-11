@@ -1,9 +1,9 @@
 package Pod::Weaver::Plugin::Sah::Schemas;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-03'; # DATE
+our $DATE = '2020-05-08'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Sah-Schemas'; # DIST
-our $VERSION = '0.061'; # VERSION
+our $VERSION = '0.063'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -107,20 +107,33 @@ sub weave_section {
 
                 # example on how to use
                 {
-                    push @pod, "Using with L<Data::Sah>:\n\n";
                     push @pod, <<"_";
+To check data against this schema (requires L<Data::Sah>):
+
  use Data::Sah qw(gen_validator);
- my \$vdr = gen_validator("$sch_name*");
- say \$vdr->(\$data) ? "valid" : "INVALID!";
+ my \$validator = gen_validator("$sch_name*");
+ say \$validator->(\$data) ? "valid" : "INVALID!";
 
- # Data::Sah can also create a validator to return error message, coerced value,
- # even validators in other languages like JavaScript, from the same schema.
- # See its documentation for more details.
+ # Data::Sah can also create validator that returns nice error message string
+ # and/or coerced value. Data::Sah can even create validator that targets other
+ # language, like JavaScript. All from the same schema. See its documentation
+ # for more details.
 
-_
+To validate function parameters against this schema (requires L<Params::Sah>):
 
-                    push @pod, "Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):\n\n";
-                    push @pod, <<"_";
+ use Params::Sah qw(gen_validator);
+
+ sub myfunc {
+     my \@args = \@_;
+     state \$validator = gen_validator("$sch_name*");
+     \$validator->(\\\@args);
+     ...
+ }
+
+To specify schema in L<Rinci> function metadata and use the metadata with
+L<Perinci::CmdLine> to create a CLI:
+
+ # in lib/MyApp.pm
  package MyApp;
  our \%SPEC;
  \$SPEC{myfunc} = {
@@ -138,6 +151,21 @@ _
      my \%args = \@_;
      ...
  }
+ 1;
+
+ # in myapp.pl
+ package main;
+ use Perinci::CmdLine::Any;
+ Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+
+ # in command-line
+ % ./myapp.pl --help
+ myapp - Routine to do blah ...
+ ...
+
+ % ./myapp.pl --version
+
+ % ./myapp.pl --arg1 ...
 
 _
                 }
@@ -150,12 +178,21 @@ _
                     push @pod, "Sample data:\n\n";
                     for my $eg (@$egs) {
                         # XXX if dump is too long, use Data::Dump instead
-                        push @pod, " ", Data::Dmp::dmp($eg->{data});
+                        my $value = exists $eg->{value} ? $eg->{value} :
+                            $eg->{data};
+                        push @pod, " ", Data::Dmp::dmp($value);
                         if ($eg->{valid}) {
                             push @pod, "  # valid";
-                            push @pod, ", becomes ",
-                                Data::Dmp::dmp($eg->{res})
-                                  if exists $eg->{res};
+                            my $has_validated_value;
+                            my $validated_value;
+                            if (exists $eg->{validated_value}) {
+                                $has_validated_value++; $validated_value = $eg->{validated_value};
+                            } elsif (exists $eg->{res}) {
+                                $has_validated_value++; $validated_value = $eg->{res};
+                            }
+                            if ($has_validated_value) {
+                                push @pod, ", becomes ", Data::Dmp::dmp($validated_value);
+                            }
                         } else {
                             push @pod, "  # INVALID";
                             push @pod, " ($eg->{summary})"
@@ -205,7 +242,7 @@ Pod::Weaver::Plugin::Sah::Schemas - Plugin to use when building Sah::Schemas::* 
 
 =head1 VERSION
 
-This document describes version 0.061 of Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution Pod-Weaver-Plugin-Sah-Schemas), released on 2020-03-03.
+This document describes version 0.063 of Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution Pod-Weaver-Plugin-Sah-Schemas), released on 2020-05-08.
 
 =head1 SYNOPSIS
 

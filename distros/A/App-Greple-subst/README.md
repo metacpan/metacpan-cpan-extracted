@@ -4,7 +4,7 @@ subst - Greple module for text search and substitution
 
 # VERSION
 
-Version 2.13
+Version 2.1401
 
 # SYNOPSIS
 
@@ -74,12 +74,12 @@ warned (**--warn-overlap** by default) and ignored.
 
 This version uses [Getopt::EX::termcolor](https://metacpan.org/pod/Getopt::EX::termcolor) module.  It sets option
 **--light-screen** or **--dark-screen** depending on the terminal on
-which the command run, or **BRIGHTNESS** environment variable.
+which the command run, or **TERM\_BGCOLOR** environment variable.
 
 Some terminals (eg: "Apple\_Terminal" or "iTerm") are detected
-automatically and no action is required.  Otherwise set **BRIGHTNESS**
-environment to 0 (black) to 100 (white) digit depending on terminal
-background color.
+automatically and no action is required.  Otherwise set
+**TERM\_BGCOLOR** environment to #000000 (black) to #FFFFFF (white)
+digit depending on terminal background color.
 
 # OPTIONS
 

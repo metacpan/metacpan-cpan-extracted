@@ -8,7 +8,7 @@ use IO::File;
 use MIME::Base64  qw(decode_base64);
 use File::Spec::Functions qw(splitdir catfile);
 
-our $VERSION = "1.93";
+our $VERSION = "1.94";
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -116,7 +116,8 @@ sub create_dirs {
         my $path = catfile(@path);
 
         if (! -d $path) {
-            mkdir ($path) or die "Couldn't create $path: $!\n";
+            mkdir($path) or die "Couldn't create $path: $!\n";
+            chmod(0755, $path) or die "Couldn't set permissions: $!\n";
         }
     }
 

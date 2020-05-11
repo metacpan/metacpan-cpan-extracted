@@ -1,19 +1,19 @@
 #
-# $Id: Context.pm,v a38b58d4db2f 2019/03/13 10:00:56 gomor $
+# $Id$
 #
 package Metabrik::Core::Context;
 use strict;
 use warnings;
 
 # Breaking.Feature.Fix
-our $VERSION = '1.40';
+our $VERSION = '1.41';
 our $FIX = '0';
 
 use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: a38b58d4db2f $',
+      revision => '$Revision$',
       tags => [ qw(main core) ],
       attributes => {
          _lp => [ qw(INTERNAL) ],
@@ -982,7 +982,7 @@ L<Metabrik>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

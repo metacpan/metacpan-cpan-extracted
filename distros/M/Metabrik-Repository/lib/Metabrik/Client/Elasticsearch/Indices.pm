@@ -1,5 +1,5 @@
 #
-# $Id: Indices.pm,v de840f30afaa 2019/01/22 08:00:11 gomor $
+# $Id$
 #
 # client::elasticsearch::indices Brik
 #
@@ -15,7 +15,7 @@ use base qw(Metabrik::Client::Elasticsearch);
 
 sub brik_properties {
    return {
-      revision => '$Revision: de840f30afaa $',
+      revision => '$Revision$',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -28,11 +28,16 @@ sub brik_properties {
          list => [ qw(indices|OPTIONAL) ],
          get_settings => [ qw(indices|OPTIONAL) ],
          put_settings => [ qw(settings indices|OPTIONAL) ],
+         set_indices_readonly => [ qw(indices) ],
+         clear_indices_readonly => [ qw(indices) ],
+         move_indices_to_node => [ qw(indices node) ],
+         reset_indices_node => [ qw(indices node) ],
          move_indices_to_rack => [ qw(indices rack) ],
          reset_indices_rack => [ qw(indices) ],
          remove_indices_replicas => [ qw(indices) ],
          forcemerge_indices => [ qw(indices) ],
          check_forcemerge_indices => [ qw(indices) ],
+         shrink_index => [ qw(index size rack|OPTIONAL) ],
       },
    };
 }
@@ -79,6 +84,80 @@ sub put_settings {
    $self->brik_help_run_invalid_arg('put', $settings, 'HASH') or return;
 
    return $self->_es->indices->put_settings(body => $settings);
+}
+
+sub set_indices_readonly {
+   my $self = shift;
+   my ($indices) = @_;
+
+   $self->brik_help_run_undef_arg('set_indices_readonly', $indices) or return;
+
+   my $settings = {
+      'index.blocks.write' => 'true',
+   };
+
+   my %args = (
+      index => $indices,
+      body => $settings,
+   );
+
+   return $self->_es->indices->put_settings(%args);
+}
+
+sub clear_indices_readonly {
+   my $self = shift;
+   my ($indices) = @_;
+
+   $self->brik_help_run_undef_arg('clear_indices_readonly', $indices)
+      or return;
+
+   my $settings = {
+      'index.blocks.write' => undef,
+   };
+
+   my %args = (
+      index => $indices,
+      body => $settings,
+   );
+
+   return $self->_es->indices->put_settings(%args);
+}
+
+sub move_indices_to_node {
+   my $self = shift;
+   my ($indices, $node) = @_;
+
+   $self->brik_help_run_undef_arg('move_indices_to_node', $indices) or return;
+   $self->brik_help_run_undef_arg('move_indices_to_node', $node) or return;
+
+   my $settings = {
+      'index.routing.allocation.require._name' => $node,
+   };
+
+   my %args = (
+      index => $indices,
+      body => $settings,
+   );
+
+   return $self->_es->indices->put_settings(%args);
+}
+
+sub reset_indices_node {
+   my $self = shift;
+   my ($indices) = @_;
+
+   $self->brik_help_run_undef_arg('reset_indices_node', $indices) or return;
+
+   my $settings = {
+      'index.routing.allocation.require._name' => undef,
+   };
+
+   my %args = (
+      index => $indices,
+      body => $settings,
+   );
+
+   return $self->_es->indices->put_settings(%args);
 }
 
 #
@@ -194,6 +273,44 @@ sub check_forcemerge_indices {
 # 3. Put back replicas settings
 #
 
+sub shrink_index {
+   my $self = shift;
+   my ($index, $size, $rack) = @_;
+
+   $self->brik_help_run_undef_arg('shrink_index', $index) or return;
+   $self->brik_help_run_undef_arg('shrink_index', $size) or return;
+
+   my $target = "$index.shrink";
+
+   my $body = {
+      settings => {
+         'index.number_of_shards' => $size,
+      },
+      #aliases => {
+      #},
+   };
+
+   if (defined($rack)) {
+      $body->{settings}{'index.routing.allocation.require.rack'} = $rack;
+   }
+
+   my %args = (
+      index => $index,
+      target => $target,
+      body => $body,
+      #copy_settings => 'true',  # Does not work yet.
+   );
+
+   my $r = $self->_es->indices->shrink(%args);
+
+   #if (defined($rack)) {
+      #sleep(5);  # Wait for Shrink to start, then move to rack if given
+      #$self->move_indices_to_rack($target, $rack);
+   #}
+
+   return $r;
+}
+
 1;
 
 __END__
@@ -204,7 +321,7 @@ Metabrik::Client::Elasticsearch::Indices - client::elasticsearch::indices Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

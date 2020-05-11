@@ -1,3 +1,10 @@
+v0.22.0 2020-05-11T23:40:22+0800
+  - Improve the extraction of journalist names
+
+v0.21.0 2020-05-10T07:53:41+0800
+  - Improve the extraction of journalist names on news.tnn.tw
+  - Improve the extraction of journalist names on NTDTV
+
 v0.20.0 2020-05-05T21:22:48+0800
   - CTS: rewritten for quicker extraction.
 
@@ -22,7 +29,7 @@ v0.16.0 2020-04-26T21:36:41+0800
   - Improve the extraction of journalist names on CTS, CTEE and rti.fr
 
 v0.15.0 2020-04-23T09:17:50+0800
-  - Reduce the amonut of warnings.
+  - Reduce the amount of warnings.
 
 v0.14.0 2020-04-08T00:00:54+0800
   - Improve the extraction of journalist names on ETToday and CNA

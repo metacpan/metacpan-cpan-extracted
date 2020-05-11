@@ -24,11 +24,12 @@ my $test_dir = catdir(@path, 'test');
 
 rmtree($test_dir);
 mkdir $test_dir;
-
+chmod 0755, $test_dir;
 chdir $test_dir;
 
 my $archive_dir = catfile($test_dir, 'archive');
 mkdir($archive_dir);
+chmod 0755, $archive_dir;
 
 #----------------------------------------------------------------------
 # Create object

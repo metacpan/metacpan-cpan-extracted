@@ -1,5 +1,9 @@
 Revision history for Perl extension Amazon-S3-Thin
 
+0.29 2020-05-08T11:20:28Z
+
+   - [core] copy_object(): handle 200 error response and rewrite the status code to 500
+
 0.28 2019-12-06T08:04:13Z
 
    - [bugfix] fix an incorrect signature calculation in delete_multiple_objects() (broken since version 0.20)

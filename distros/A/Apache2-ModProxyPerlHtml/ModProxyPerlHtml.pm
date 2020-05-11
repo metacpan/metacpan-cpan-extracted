@@ -3,8 +3,8 @@
 # Name     : ModProxyPerlHtml.pm
 # Language : perl 5
 # Authors  : Gilles Darold, gilles at darold dot net
-# Copyright: Copyright (c) 2005-2013: Gilles Darold - All rights reserved -
-# Description : This mod_perl2 module is a replacement for mod_proxy_html.c
+# Copyright: Copyright (c) 2005-2020: Gilles Darold - All rights reserved -
+# Description : This mod_perl module is a replacement for mod_proxy_html.c
 #		with far better URL HTML rewriting.
 # Usage    : See documentation in this file with perldoc.
 #------------------------------------------------------------------------------
@@ -29,7 +29,7 @@ use Apache2::ServerRec;
 use Apache2::URI;
 
 
-$Apache2::ModProxyPerlHtml::VERSION = '3.6';
+$Apache2::ModProxyPerlHtml::VERSION = '4.0';
 
 
 %Apache2::ModProxyPerlHtml::linkElements = (
@@ -85,6 +85,7 @@ sub handler
 		my $badcontenttype = $f->r->dir_config->get('ProxyHTMLExcludeContentType');
 		$badcontenttype ||= '(application\/vnd\.openxml)';
 		my @exclude = $f->r->dir_config->get('ProxyHTMLExcludeUri');
+		my @obfuscation = $f->r->dir_config->get('ProxyHTMLRot13Links');
 
 		my $ct = $f->ctx;
 		$ct->{data} = '';
@@ -98,6 +99,15 @@ sub handler
 		$ct->{badcontenttype} = $badcontenttype;
 		foreach my $u (@exclude) {
 			push(@{$ct->{excluded}}, $u);
+		}
+		foreach my $o (@obfuscation) {
+			my ($elt, $attr) = split(/:/, $o);
+			if (uc($elt) eq 'ALL') {
+				$ct->{rot13elements} = 'All';
+				last;
+			} else {
+				$ct->{rot13elements}->{$elt} = $attr;
+			}
 		}
 		$f->ctx($ct);
 	}
@@ -171,8 +181,7 @@ sub handler
 				# Replace links if pattern match
 				foreach my $p (@{$ctx->{pattern}}) {
 					my ($match, $substitute) = split(/[\s\t]+/, $p, 2);
-					&link_replacement(\$ctx->{data}, $match, $substitute, $parsed_uri);
-
+					&link_replacement(\$ctx->{data}, $match, $substitute, $parsed_uri, $ctx->{rot13elements});
 				}
 				# Rewrite code if rewrite pattern match
 				foreach my $p (@{$ctx->{rewrite}}) {
@@ -214,6 +223,7 @@ sub handler
 			$ctx->{pattern} = ();
 			$ctx->{rewrite} = ();
 			$ctx->{excluded} = ();
+			$ctx->{rot13elements} = ();
 			$ctx->{contenttype} = '';
 			$ctx->{badcontenttype} = '';
 			$ctx->{keepalives} = $c->keepalives;
@@ -226,27 +236,62 @@ sub handler
 
 sub link_replacement
 {
-	my ($data, $pattern, $replacement, $uri) = @_;
+	my ($data, $pattern, $replacement, $uri, $rot13elements) = @_;
 
 	return if (!$$data);
 
 	my $old_terminator = $/;
 	$/ = '';
-	my @TODOS = ();
+	my %TODOS = ();
+	my %ROT13TODOS = ();
 	my $i = 0;
+
+	# Detect parts that need to be deobfuscated before replacement
+	if ($rot13elements ne 'All') {
+		foreach my $tag (keys %{$rot13elements}) {
+			while ($$data =~ s/(<$tag\s+[^>]*\b$rot13elements->{$tag}=['"\s]*)([^'"\s>]+)([^>]*>)/ROT13REPLACE_$i\$\$/i) {
+				$ROT13TODOS{$i} = "$1ROT13$2ROT13$3";
+				$i++;
+			}
+		}
+	} elsif ($rot13elements eq 'All') {
+		foreach my $tag (keys %Apache2::ModProxyPerlHtml::linkElements) {
+			next if ($$data !~ /<$tag/i);
+			foreach my $attr (@{$Apache2::ModProxyPerlHtml::linkElements{$tag}}) {
+				while ($$data =~ s/(<$tag\s+[^>]*\b$attr=['"\s]*)([^'"\s>]+)([^>]*>)/ROT13REPLACE_$i\$\$/i) {
+					$ROT13TODOS{$i} = "$1ROT13$2ROT13$3";
+					$i++;
+				}
+			}
+		}
+	}
+	# Decode ROT13 links now
+	foreach my $k (keys %ROT13TODOS) {
+		my $repl = rot13_decode($ROT13TODOS{$k});
+		$$data =~ s/ROT13REPLACE_$k\$\$/$repl/;
+	}
+
 	# Replace standard link into attributes of any element
 	foreach my $tag (keys %Apache2::ModProxyPerlHtml::linkElements) {
 		next if ($$data !~ /<$tag/i);
 		foreach my $attr (@{$Apache2::ModProxyPerlHtml::linkElements{$tag}}) {
-			while ($$data =~ s/(<$tag[\t\s]+[^>]*\b$attr=['"]*)($replacement|$pattern)([^'"\s>]+)/NEEDREPLACE_$i$$/i) {
-				push(@TODOS, "$1$replacement$3");
+			while ($$data =~ s/(<$tag[\t\s]+[^>]*\b$attr=['"]*)($replacement|$pattern)([^'"\s>]+)/\$\$NEEDREPLACE$i\$\$/i) {
+				$TODOS{$i} = "$1$replacement$3";
 				$i++;
 			}
-		
 		}
 	}
-	# Replace all links in javascript code
-	$$data =~ s/([^\\]['"])($replacement|$pattern)([^'"]*['"])/$1$replacement$3/ig;
+	# Replace all links in javascript code after hiding javascript replacement pattern
+	my %replace_fct = ();
+	while ($$data =~ s/(\.replace\([^,]+,[^\)]+\))/\%\%REPLACE$i\%\%/) {
+		$replace_fct{$i} = $1;
+		$i++;
+	}
+
+	$$data =~ s/([^\\\/]['"])($replacement|$pattern)([^'"]*['"])/$1$replacement$3/ig;
+
+	$$data =~ s/\%\%REPLACE(\d+)\%\%/$replace_fct{$1}/g;
+
 	# Some use escaped quote - Do you have better regexp ?
 	$$data =~ s/(\&quot;)($replacement|$pattern)(.*\&quot;)/$1$replacement$3/ig;
 
@@ -267,13 +312,35 @@ sub link_replacement
 	$$data =~ s/($replacement|$pattern)>/\/>/ig;
 	
 	# Replace todos now
-	for ($i = 0; $i <= $#TODOS; $i++) {
+	$$data =~ s/\$\$NEEDREPLACE(\d+)\$\$/$TODOS{$1}/g;
 
-		$$data =~ s/NEEDREPLACE_$i$$/$TODOS[$i]/i;
+	# Detect parts that need to be obfuscated after replacement
+	if ($rot13elements ne 'All') {
+		foreach my $tag (keys %{$rot13elements}) {
+			while ($$data =~ s/(<$tag\s+[^>]*\b$rot13elements->{$tag}=['"\s]*)([^'"\s>]+)([^>]*>)/ROT13REPLACE_$i\$\$/i) {
+				$ROT13TODOS{$i} = "$1ROT13$2ROT13$3";
+				$i++;
+			}
+		}
+	} elsif ($rot13elements eq 'All') {
+		foreach my $tag (keys %Apache2::ModProxyPerlHtml::linkElements) {
+			next if ($$data !~ /<$tag/i);
+			foreach my $attr (@{$Apache2::ModProxyPerlHtml::linkElements{$tag}}) {
+				while ($$data =~ s/(<$tag\s+[^>]*\b$attr=['"\s]*)([^'"\s>]+)([^>]*>)/ROT13REPLACE_$i\$\$/i) {
+					$ROT13TODOS{$i} = "$1ROT13$2ROT13$3";
+					$i++;
+				}
+			}
+		}
+	}
+
+	# Encode ROT13 links now
+	foreach my $k (keys %ROT13TODOS) {
+		my $repl = rot13_encode($ROT13TODOS{$k});
+		$$data =~ s/ROT13REPLACE_$k\$\$/$repl/;
 	}
 
 	$/ = $old_terminator;
-
 }
 
 sub rewrite_content
@@ -293,10 +360,34 @@ sub rewrite_content
 
 }
 
+sub rot13_decode
+{
+	my $str = shift;
+
+	my @parts = split(/ROT13/, $str);
+        $parts[1] =~ tr/nopqrstuvwxyzabcdefghijklmNOPQRSTUVWXYZABCDEFGHIJKLM/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/;
+
+	return join('', @parts);
+}
+
+sub rot13_encode
+{
+	my $str = shift;
+
+	my @parts = split(/ROT13/, $str);
+        $parts[1] =~ tr/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/nopqrstuvwxyzabcdefghijklmNOPQRSTUVWXYZABCDEFGHIJKLM/;
+
+	return join('', @parts);
+}
+
 
 1;
 
 __END__
+
+=head1 NAME
+
+Apache2::ModProxyPerlHtml - rewrite HTTP headers and HTML links for reverse proxy usage
 
 =head1 DESCRIPTION
 
@@ -305,9 +396,9 @@ HTTP headers and HTML links for reverse proxy usage. It is written in Perl and
 exceeds all mod_proxy_html.c limitations without performance lost.
 
 Apache2::ModProxyPerlHtml is very simple and has far better parsing/replacement
-of URL than the original C code. It also support meta tag, CSS, and javascript
-URL rewriting and can be use with compressed HTTP. You can now replace any code
-by other, like changing images name or anything else. mod_proxy_html can't do
+of URL than the original C code. It also supports meta tag, CSS, and javascript
+URL rewriting and can be used with compressed HTTP. You can now replace any code
+by other, like changing image names or anything else. mod_proxy_html can't do
 all of that. Since release 3.x ModProxyPerlHtml is also able to rewrite HTTP
 headers with Refresh url redirection and Referer. 
 
@@ -322,18 +413,71 @@ The replacement capability concern only the following HTTP content type:
 
 other kind of file, will be left untouched (or see ProxyHTMLContentType and ProxyHTMLExcludeContentType).
 
-=head1 AVAIBILITY
+=head1 AVAILIBILITY
 
 You can get the latest version of Apache2::ModProxyPerlHtml from CPAN
 (http://search.cpan.org/).
 
 =head1 PREREQUISITES
 
-You must have Apache2, mod_perl2 and IO::Compress::Zlib perl modules installed
-on your system.
+You must have Apache2, mod_proxy, mod_perl and IO::Compress::Zlib perl modules
+installed on your system.
 
-You also need to install the mod_proxy Apache modules. See documentation at
-http://httpd.apache.org/docs/2.0/mod/mod_proxy.html
+=head2 Installation on RH/CentOs
+
+Install Apache2, apxs, the Epel repository (for mod_perl install) and the
+Perl Module IO::Compress:
+ 
+	yum install httpd httpd-devel
+	yum install epel-release
+	yum install perl-IO-Compress
+
+Install ModPerl, minimal version to work with Apache 2.4 is 2.0.10:
+
+	yum list | grep mod_perl
+	yum --enablerepo=epel -y install mod_perl mod_perl-devel
+
+Enable mod_perl:
+
+	a2enconf mod_perl
+	systemctl reload apache2
+
+The Apache module mod_ssl is not available by default, install it:
+
+        yum install mod_ssl
+
+If the firewall is enabled you might want to allow access to the Apache services
+
+	firewall-cmd --permanent --add-service=http
+	firewall-cmd --permanent --add-service=https
+	firewall-cmd --reload
+
+
+=head2 Installation on Debian/Ubuntu
+
+To have Apache2 server and apxs command:
+
+	apt install apache2 apache2-dev
+
+ModPerl can be installed using:
+
+	apt install libapache2-mod-perl2 libapache2-mod-perl2-dev
+
+ModProxyPerlHtml need additional Perl module IO::Compress:
+
+	apt install libio-compress-perl
+
+Enable mod_proxy:
+
+	a2enmod proxy
+	a2enmod proxy_http
+	a2enmod proxy_ftp
+	a2enmod proxy_connect
+
+Enable the configuration and mod_perl:
+
+	a2enmod perl
+
 
 =head1 INSTALLATION
 
@@ -342,19 +486,9 @@ http://httpd.apache.org/docs/2.0/mod/mod_proxy.html
 
 =head1 APACHE CONFIGURATION
 
-In your Apache configuration file you have to load the following DSO modules:
-
-    LoadModule deflate_module modules/mod_deflate.so
-    LoadModule headers_module modules/mod_headers.so
-    LoadModule proxy_module modules/mod_proxy.so
-    LoadModule proxy_connect_module modules/mod_proxy_connect.so
-    LoadModule proxy_ftp_module modules/mod_proxy_ftp.so
-    LoadModule proxy_http_module modules/mod_proxy_http.so
-    LoadModule ssl_module modules/mod_ssl.so
-    LoadModule perl_module  modules/mod_perl.so
-
-Then in your Apache site or virtualhost configuration file use ModProxyPerlHtml*
-as follow:
+On Debian/Ubuntu set the following configuration into the VirtualHost section
+of files /etc/apache2/sites-available/default-ssl.conf and /etc/apache2/sites-available/000-default.conf.
+On CentOS/RedHat add it to /etc/httpd/conf.d/vhost.conf.
 
     ProxyRequests Off
     ProxyPreserveHost Off
@@ -363,7 +497,7 @@ as follow:
     PerlInputFilterHandler Apache2::ModProxyPerlHtml
     PerlOutputFilterHandler Apache2::ModProxyPerlHtml
     SetHandler perl-script
-    # Use line below iand comment line above if you experience error:
+    # Use line below and comment line above if you experience error:
     # "Attempt to serve directory". The reason is that with SetHandler
     # DirectoryIndex is not working 
     # AddHandler perl-script *
@@ -517,6 +651,22 @@ authentified users through their own Internet acces. There's also one acces to
 an Intranet portal that have links to the webcal and webmail application. Those
 links must be rewritten twice to works.
 
+=head1 ROT13 obfuscation
+
+Some links can be obfucated to be hidden from google or other robots. To enable
+encode/decode of those links you can use the ProxyHTMLRot13Links directive as
+follow:
+
+	PerlAddVar ProxyHTMLRot13Links All
+
+All links in the page will be decoded before being rewritten and re-encoded.
+
+If obfuscation occurs on some attributs only you can set the value as a pair
+of element:attribut where the decoding/encoding must be applied. For example:
+
+	PerlAddVar ProxyHTMLRot13Links a:data-href
+	PerlAddVar ProxyHTMLRot13Links a:href
+
 =head1 BUGS 
 
 Apache2::ModProxyPerlHtml is still under development and is pretty
@@ -525,7 +675,7 @@ requests.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2005-2013 - Gilles Darold
+Copyright (c) 2005-2020 - Gilles Darold
 
 All rights reserved.  This program is free software; you may redistribute
 it and/or modify it under the same terms as Perl itself.

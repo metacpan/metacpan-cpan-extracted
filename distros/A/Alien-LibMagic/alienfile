@@ -1,0 +1,22 @@
+use alienfile;
+
+share {
+	plugin Download => (
+		url => 'https://astron.com/pub/file/',
+		version => qr/file-([\d\.]+)\.tar\.gz/,
+	);
+
+	plugin Extract => 'tar.gz';
+
+	plugin 'Build::Autoconf';
+	my $enable_static = $^O ne 'MSWin32';
+	build [
+		join(' ', (
+			'%{configure}',
+			$enable_static ? '--enable-static' : '--disable-static',
+			'--enable-shared'
+		)),
+		'%{make}',
+		'%{make} install',
+	];
+};

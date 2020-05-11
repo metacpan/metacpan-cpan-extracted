@@ -161,6 +161,18 @@ sub try {
             $h->{version} = $version if $version;
         }
     }
+    elsif ( index($d->ua, 'KOCMOHABT ') > -1 ) {
+        $h = {
+            name   => 'KOCMOHABT',
+            is_bot => 1,
+        };
+    }
+    elsif ( index($d->ua, 'Hexometer') > -1 ) {
+        $h = {
+            name   => 'Hexometer',
+            is_bot => 1,
+        };
+    }
 
     return $h;
 }

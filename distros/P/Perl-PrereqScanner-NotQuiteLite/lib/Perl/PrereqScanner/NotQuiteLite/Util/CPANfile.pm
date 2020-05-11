@@ -67,6 +67,7 @@ sub __replace_prereqs {
       }
     }
   }
+  delete $self->{_prereqs}{cpanmeta} unless $feature_id;  # to rebuild cpanmeta
   $added;
 }
 

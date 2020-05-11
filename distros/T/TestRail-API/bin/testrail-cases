@@ -1,9 +1,9 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 # ABSTRACT: get information about cases inside various testsuites/sections.
 # PODNAME: TestRail::Bin::Cases
 
 package TestRail::Bin::Cases;
-$TestRail::Bin::Cases::VERSION = '0.044';
+$TestRail::Bin::Cases::VERSION = '0.046';
 use strict;
 use warnings;
 use utf8;
@@ -56,7 +56,7 @@ sub run {
 
     #Mutual exclusivity
     $opts->{'no-missing'} = !$opts->{'missing'};
-    $opts->{'update'} = !( $opts->{'orphans'} || $opts->{'missing'} );
+    $opts->{'update'}     = !( $opts->{'orphans'} || $opts->{'missing'} );
     die("orphans and mising options are mutually exclusive.")
       if $opts->{'orphans'} && $opts->{'missing'};
     delete $opts->{'missing'};
@@ -99,7 +99,7 @@ TestRail::Bin::Cases - get information about cases inside various testsuites/sec
 
 =head1 VERSION
 
-version 0.044
+version 0.046
 
 =head1 SYNOPSIS
 
@@ -191,12 +191,12 @@ George S. Baugh <teodesian@cpan.org>
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/teodesian/TestRail-Perl>
+The development version is on github at L<https://github.com/teodesian/TestRail-Perl>
 and may be cloned from L<git://github.com/teodesian/TestRail-Perl.git>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by George S. Baugh.
+This software is copyright (c) 2020 by George S. Baugh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

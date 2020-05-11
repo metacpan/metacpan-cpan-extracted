@@ -57,7 +57,9 @@
             "Time::HiRes" : "0",
             "Try::Tiny" : "0",
             "parent" : "0",
-            "perl" : "v5.10.0"
+            "perl" : "v5.10.0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -86,7 +88,7 @@
    "provides" : {
       "Plack::Middleware::Statsd" : {
          "file" : "lib/Plack/Middleware/Statsd.pm",
-         "version" : "v0.4.4"
+         "version" : "v0.4.5"
       }
    },
    "release_status" : "stable",
@@ -101,7 +103,7 @@
          "web" : "https://github.com/robrwo/Plack-Middleware-Statsd"
       }
    },
-   "version" : "v0.4.4",
+   "version" : "v0.4.5",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",

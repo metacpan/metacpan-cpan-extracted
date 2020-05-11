@@ -1,9 +1,11 @@
 package App::lcpan::Cmd::dist2author;
 
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '1.056'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-07'; # DATE
+our $DIST = 'App-lcpan'; # DIST
+our $VERSION = '1.057'; # VERSION
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
 
@@ -32,10 +34,10 @@ sub handle_cmd {
     } @$dists);
 
     my $sth = $dbh->prepare("SELECT
-  dist.name dist,
-  dist.cpanid author
-FROM dist
-WHERE dist.name IN ($dists_s)");
+  f.dist_name dist,
+  f.cpanid author
+FROM file f
+WHERE f.dist_name IN ($dists_s)");
 
     my @res;
     $sth->execute;
@@ -44,7 +46,7 @@ WHERE dist.name IN ($dists_s)");
     }
 
     if (@$dists == 1) {
-        @res = map { $_->{dist} } @res;
+        @res = map { $_->{author} } @res;
         if (!@res) {
             return [404, "No such dist"];
         } elsif (@res == 1) {
@@ -72,7 +74,7 @@ App::lcpan::Cmd::dist2author - Get author of distribution(s)
 
 =head1 VERSION
 
-This document describes version 1.056 of App::lcpan::Cmd::dist2author (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of App::lcpan::Cmd::dist2author (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 FUNCTIONS
 
@@ -98,6 +100,8 @@ Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 Defaults to C<~/cpan>.
 
 =item * B<dists>* => I<array[perl::distname]>
+
+Distribution names (e.g. Foo-Bar).
 
 =item * B<index_name> => I<filename> (default: "index.db")
 

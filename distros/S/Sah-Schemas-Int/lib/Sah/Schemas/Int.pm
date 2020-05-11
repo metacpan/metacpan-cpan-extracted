@@ -1,7 +1,7 @@
 package Sah::Schemas::Int;
 
-our $DATE = '2018-04-03'; # DATE
-our $VERSION = '0.071'; # VERSION
+our $DATE = '2020-05-08'; # DATE
+our $VERSION = '0.074'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas for various integers
@@ -18,7 +18,7 @@ Sah::Schemas::Int - Sah schemas for various integers
 
 =head1 VERSION
 
-This document describes version 0.071 of Sah::Schemas::Int (from Perl distribution Sah-Schemas-Int), released on 2018-04-03.
+This document describes version 0.074 of Sah::Schemas::Int (from Perl distribution Sah-Schemas-Int), released on 2020-05-08.
 
 =head1 SAH SCHEMAS
 
@@ -58,7 +58,7 @@ Same as posint.
 
 Natural numbers are those used for counting and ordering. Some definitions, like
 ISO 80000-2 begin the natural numbers with 0. But in this definition, natural
-numbers start with 1. For integers that start at 0, see C<nonnegint>.
+numbers start with 1. For integers that start at 0, see C<uint>.
 
 
 =item * L<negeven|Sah::Schema::negeven>
@@ -95,7 +95,7 @@ Positive even number.
 Positive integer (1, 2, ...).
 
 Zero is not included in this schema because zero is neither positive nor
-negative. See also C<nonnegint> for integers that start from 0.
+negative. See also C<uint> for integers that start from 0.
 
 
 =item * L<posodd|Sah::Schema::posodd>
@@ -137,7 +137,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Sah-Schema-Int>.
+Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Int>.
 
 =head1 BUGS
 
@@ -159,7 +159,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017, 2016, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

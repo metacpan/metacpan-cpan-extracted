@@ -1,5 +1,13 @@
 Revision history for Text::Layout
 
+0.018.2	2020-05-09
+
+0.018.2	2020-05-09
+
+	Avoid testing PDF::Builder if it is of an incompatible
+	version. As of 3.018 PDF::Builder changed the font metrics to
+	incompatible values.
+
 0.018.1	2020-02-27
 
 0.018	2020-02-06

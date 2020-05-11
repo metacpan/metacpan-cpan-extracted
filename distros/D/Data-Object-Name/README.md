@@ -79,7 +79,7 @@ The lookslike\_a\_file method returns truthy if its state resembles a filename.
 
         # given: synopsis
 
-        my $is_file = $name->lookslike_a_file; # falsey
+        my $is_file = $name->lookslike_a_file; # falsy
 
 ## lookslike\_a\_label
 
@@ -92,7 +92,7 @@ constant).
 
         # given: synopsis
 
-        my $is_label = $name->lookslike_a_label; # falsey
+        my $is_label = $name->lookslike_a_label; # falsy
 
 ## lookslike\_a\_package
 
@@ -105,7 +105,7 @@ name.
 
         # given: synopsis
 
-        my $is_package = $name->lookslike_a_package; # falsey
+        my $is_package = $name->lookslike_a_package; # falsy
 
 ## lookslike\_a\_path
 
@@ -118,6 +118,26 @@ The lookslike\_a\_path method returns truthy if its state resembles a file path.
         # given: synopsis
 
         my $is_path = $name->lookslike_a_path; # truthy
+
+## lookslike\_a\_pragma
+
+    lookslike_a_pragma() : Bool
+
+The lookslike\_a\_pragma method returns truthy if its state resembles a pragma.
+
+- lookslike\_a\_pragma example #1
+
+        # given: synopsis
+
+        my $is_pragma = $name->lookslike_a_pragma; # falsy
+
+- lookslike\_a\_pragma example #2
+
+        use Data::Object::Name;
+
+        my $name = Data::Object::Name->new('[strict]');
+
+        my $is_pragma = $name->lookslike_a_pragma; # truthy
 
 ## new
 

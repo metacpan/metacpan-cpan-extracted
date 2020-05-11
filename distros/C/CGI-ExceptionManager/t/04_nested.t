@@ -20,4 +20,4 @@ CGI::ExceptionManager->run(
 like $out, qr/Status: 500/;
 like $out, qr/ERROR/;
 like $out, qr/Powered by menta/;
-like $out, qr/Can&#39;t use string /;
+like $out, qr/Can&#39;t use /;

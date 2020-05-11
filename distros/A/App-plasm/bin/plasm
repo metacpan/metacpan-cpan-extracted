@@ -1,0 +1,86 @@
+#!perl
+
+use strict;
+use warnings;
+#use lib::findbin '../lib';  # dev-only
+use App::plasm;
+
+# PODNAME: plasm
+# ABSTRACT: Perl WebAssembly command line tool
+our $VERSION = '0.01'; # VERSION
+
+
+exit App::plasm->main(@ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+plasm - Perl WebAssembly command line tool
+
+=head1 VERSION
+
+version 0.01
+
+=head1 SYNOPSIS
+
+ % plasm run program.wasm [ arguments ]
+ % plasm dump program.wasm
+ % plasm --help
+ % plasm --version
+
+For full documentation:
+
+ % perldoc plasm
+
+=head1 DESCRIPTION
+
+C<plasm> is the Perl WebAssembly command line tool.
+
+=head1 SUBCOMMANDS
+
+=head2 run
+
+ % plasm run program.wasm [ arguments ]
+ % plasm run --help
+
+Runs the given WebAssembly program.  The arguments after
+C<program.wasm> are passed on to the WebAssembly program.
+
+=head2 dump
+
+ % plasm dump program.wasm
+ % plasm dump --help
+
+Dumps the import and exports of the given WebAssembly module.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Wasm>
+
+Write Perl extensions using Wasm!
+
+=item L<Wasm::Wasmtime>
+
+Low-level Wasmtime bindings for Perl.
+
+=back
+
+=head1 AUTHOR
+
+Graham Ollis <plicease@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Graham Ollis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

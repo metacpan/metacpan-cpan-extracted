@@ -1,9 +1,9 @@
 package Sah::SchemaR::aoms;
 
-our $DATE = '2020-03-02'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2020-05-08'; # DATE
+our $VERSION = '0.008'; # VERSION
 
-our $rschema = ["array",[{description=>"\n",examples=>[{data=>"a",valid=>0},{data=>[],valid=>1},{data=>{},valid=>0},{data=>["a"],valid=>1},{data=>[undef],valid=>1},{data=>["a",[]],valid=>0},{data=>[["a"]],valid=>0}],of=>["str",{},{}],summary=>"Array of maybe-strings"}],["array"]];
+our $rschema = ["array",[{description=>"\n",examples=>[{valid=>0,value=>"a"},{valid=>1,value=>[]},{valid=>0,value=>{}},{valid=>1,value=>["a"]},{valid=>1,value=>[undef]},{valid=>0,value=>["a",[]]},{valid=>0,value=>[["a"]]}],of=>["str",{},{}],summary=>"Array of maybe-strings"}],["array"]];
 
 1;
 # ABSTRACT: Array of maybe-strings
@@ -20,7 +20,7 @@ Sah::SchemaR::aoms - Array of maybe-strings
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::SchemaR::aoms (from Perl distribution Sah-Schemas-Collection), released on 2020-03-02.
+This document describes version 0.008 of Sah::SchemaR::aoms (from Perl distribution Sah-Schemas-Collection), released on 2020-05-08.
 
 =head1 DESCRIPTION
 

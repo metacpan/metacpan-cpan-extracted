@@ -1,5 +1,5 @@
 package App::Notifier::Client::Notifier_App;
-$App::Notifier::Client::Notifier_App::VERSION = '0.0302';
+$App::Notifier::Client::Notifier_App::VERSION = '0.0400';
 use strict;
 use warnings;
 
@@ -104,7 +104,11 @@ sub run
     {
         if ( !defined($to) )
         {
-            $to = 'default';
+            $to = $ENV{'NOTIFIER_TO'};
+            if ( !defined($to) )
+            {
+                $to = 'default';
+            }
         }
 
         my $config_fn = ( $ENV{'NOTIFIER_CONFIG'}
@@ -153,7 +157,7 @@ App::Notifier::Client::Notifier_App
 
 =head1 VERSION
 
-version 0.0302
+version 0.0400
 
 =head1 SYNOPSIS
 

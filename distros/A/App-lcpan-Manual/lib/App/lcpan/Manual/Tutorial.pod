@@ -18,7 +18,7 @@ App::lcpan::Manual::Tutorial - App::lcpan tutorial series
 
 =head1 VERSION
 
-version 1.054.001
+version 1.057.000
 
 =head1 DESCRIPTION
 
@@ -27,6 +27,10 @@ This tutorial series contains the following tutorial pages:
 =over
 
 =item * L<App::lcpan::Manual::Tutorial::100_WhatIsLcpan>
+
+=item * L<App::lcpan::Manual::Tutorial::200_SettingUpAMiniCPAN>
+
+=item * L<App::lcpan::Manual::Tutorial::700_SettingUpADarkPAN>
 
 =item * L<App::lcpan::Manual::Tutorial::800_WritingASubcommand>
 

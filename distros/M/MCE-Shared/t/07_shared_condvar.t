@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use utf8;
 
 use Test::More;
 
@@ -93,6 +94,30 @@ is( $cv->append('ba'), 4, 'shared condvar, check append' );
 is( $cv->get(), '20ba', 'shared condvar, check value after append' );
 is( $cv->getset('foo'), '20ba', 'shared condvar, check getset' );
 is( $cv->get(), 'foo', 'shared condvar, check value after getset' );
+
+## --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+
+## https://sacred-texts.com/cla/usappho/sph02.htm (VII)
+
+my $sappho_text =
+  "ἔλθε μοι καὶ νῦν, χαλεπᾶν δὲ λῦσον
+   ἐκ μερίμναν ὄσσα δέ μοι τέλεσσαι
+   θῦμοσ ἰμμέρρει τέλεσον, σὐ δ᾽ αὔτα
+   σύμμαχοσ ἔσσο.";
+
+my $translation =
+  "Come then, I pray, grant me surcease from sorrow,
+   Drive away care, I beseech thee, O goddess
+   Fulfil for me what I yearn to accomplish,
+   Be thou my ally.";
+
+$cv->set( $sappho_text );
+is( $cv->get(), $sappho_text, 'shared scalar, check unicode set' );
+is( $cv->len(), length($sappho_text), 'shared scalar, check unicode len' );
+
+my $length = $cv->append("Ǣ");
+is( $cv->get(), $sappho_text . "Ǣ", 'shared scalar, check unicode append' );
+is( $length, length($sappho_text) + 1, 'shared scalar, check unicode length' );
 
 done_testing;
 

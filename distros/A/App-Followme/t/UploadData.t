@@ -25,7 +25,9 @@ my $state_dir = catdir(@path, 'test', '_state');
 
 rmtree($test_dir);
 mkdir $test_dir;
+chmod 0755, $test_dir;
 mkdir $state_dir;
+chmod 0755, $state_dir;
 chdir $test_dir;
 
 my %configuration = (
@@ -60,6 +62,7 @@ my @files_ok;
 foreach my $dir (@dirs) {
     if ($dir) {
         mkdir $dir;
+        chmod 0755, $dir;
         push(@folders_ok, catfile($test_dir, $dir));
     }
 

@@ -12,7 +12,7 @@ GetOptions(
    'i|interval=i'   => \(my $INTERVAL = 10),
    'p|print-config' => \my $PRINT_CONFIG,
 
-   'adapter|A=s' => \( my $ADAPTER = "BusPirate" ),
+   'adapter|A=s' => \my $ADAPTER,
 ) or exit 1;
 
 my $chip = Device::Chip::HTU21D->new;
@@ -32,9 +32,6 @@ if( $PRINT_CONFIG ) {
    my $config = $chip->read_config->get;
    printf "%20s: %s\n", $_, $config->{$_} for sort keys %$config;
 }
-
-my $gain = 1;
-my $smallcount;
 
 while(1) {
    my $temp = $chip->read_temperature->get;

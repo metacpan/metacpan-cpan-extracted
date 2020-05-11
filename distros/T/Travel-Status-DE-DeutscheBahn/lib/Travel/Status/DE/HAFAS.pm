@@ -16,7 +16,7 @@ use Travel::Status::DE::HAFAS::Result;
 use Travel::Status::DE::HAFAS::StopFinder;
 use XML::LibXML;
 
-our $VERSION = '2.05';
+our $VERSION = '3.00';
 
 my %hafas_instance = (
 
@@ -348,18 +348,18 @@ sub results {
 		push(
 			@{ $self->{results} },
 			Travel::Status::DE::HAFAS::Result->new(
-				date         => $date,
-				datetime     => $datetime,
-				datetime_now => $self->{datetime_now},
-				raw_delay    => $delay,
-				raw_e_delay  => $e_delay,
-				messages     => \@messages,
-				time         => $time,
-				train        => $train,
-				route_end    => $dest,
-				platform     => $platform,
-				new_platform => $new_platform,
-				info         => $info,
+				sched_date     => $date,
+				sched_datetime => $datetime,
+				datetime_now   => $self->{datetime_now},
+				raw_delay      => $delay,
+				raw_e_delay    => $e_delay,
+				messages       => \@messages,
+				sched_time     => $time,
+				train          => $train,
+				route_end      => $dest,
+				platform       => $platform,
+				new_platform   => $new_platform,
+				info           => $info,
 			)
 		);
 	}
@@ -430,7 +430,7 @@ monitors
 
 =head1 VERSION
 
-version 2.05
+version 3.00
 
 =head1 DESCRIPTION
 
@@ -594,7 +594,7 @@ Travel::Status::DE::HAFAS::Result(3pm), Travel::Status::DE::HAFAS::StopFinder(3p
 
 =head1 AUTHOR
 
-Copyright (C) 2015-2017 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2015-2020 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

@@ -19,7 +19,7 @@ GenOO::Module::Search::Binary - Module that offers methods for searching in an a
 # Let the code begin...
 
 package GenOO::Module::Search::Binary;
-$GenOO::Module::Search::Binary::VERSION = '1.5.1';
+$GenOO::Module::Search::Binary::VERSION = '1.5.2';
 
 #######################################################################
 #######################   Load External modules   #####################

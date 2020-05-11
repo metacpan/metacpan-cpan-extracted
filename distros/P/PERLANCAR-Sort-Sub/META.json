@@ -57,7 +57,7 @@
          "web" : "https://github.com/perlancar/perl-PERLANCAR-Sort-Sub"
       }
    },
-   "version" : "0.080",
+   "version" : "0.081",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

@@ -1,5 +1,8 @@
 Revision history for Net-IPAM-IP
 
+1.21    Mon, 11 May 2020 08:30:30 +0200
+        * make cmp() 2x faster, get rid of param check for speed
+
 1.20    Mon, 27 Apr 2020 01:29:42 +0200
         * outsource inet_ntop_pp() and inet_pton_pp to Net::IPAM::Util
 

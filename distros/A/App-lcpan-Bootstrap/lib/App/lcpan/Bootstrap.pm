@@ -1,7 +1,7 @@
 package App::lcpan::Bootstrap;
 
-our $DATE = '2020-04-19'; # DATE
-our $VERSION = '20200419.0.0'; # VERSION
+our $DATE = '2020-05-08'; # DATE
+our $VERSION = '20200508.0.0'; # VERSION
 
 1;
 # ABSTRACT: Bootstrap database for lcpan
@@ -18,7 +18,7 @@ App::lcpan::Bootstrap - Bootstrap database for lcpan
 
 =head1 VERSION
 
-This document describes version 20200419.0.0 of App::lcpan::Bootstrap (from Perl distribution App-lcpan-Bootstrap), released on 2020-04-19.
+This document describes version 20200508.0.0 of App::lcpan::Bootstrap (from Perl distribution App-lcpan-Bootstrap), released on 2020-05-08.
 
 =head1 SYNOPSIS
 
@@ -29,6 +29,24 @@ you can save time when setting up your local CPAN mirror the first time. Without
 a boostrap database, indexing the mirror for the first time can take several
 hours. With a fairly recent bootstrap database, indexing time can be reduced to
 an hour or much less.
+
+Note however, that this particular bootstrap is produced with this lcpan
+configuration:
+
+ max_file_size=209715200
+ skip_index_file_patterns = ^eBay-API-\d
+ skip_index_file_patterns = ^Google-Ads-GoogleAds-Client-\d
+ skip_index_file_patterns = ^Google-Ads-AdWords-Client-\d
+ skip_index_file_patterns = ^GOOGLE-ADWORDS-PERL-CLIENT-\d
+ skip_index_file_patterns = ^Microsoft-AdCenter-\d
+ skip_index_file_patterns = ^Paws-\d
+ skip_index_file_patterns = ^VMOMI-\d
+
+which means release files over 200MB as well as those matching the above
+patterns are not processed (their distribution metadata are not extracted and
+parsed, their PODs are also not parsed). This should be fine for many use-cases,
+but if you do not want the above configuration, you'll not be able to use this
+bootstrap.
 
 The compressed bootstrap database is stored in the distribution's share
 directory. lcpan will search for this bootstrap database the first time it is

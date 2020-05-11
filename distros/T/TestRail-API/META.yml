@@ -16,12 +16,12 @@ build_requires:
   Test::Deep: '0'
   Test::Fatal: '0'
   Test::LWP::UserAgent: '0'
+  Test::MockModule: '0'
   Test::More: '0'
-  blib: '1.01'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,28 +30,28 @@ name: TestRail-API
 provides:
   App::Prove::Plugin::TestRail:
     file: lib/App/Prove/Plugin/TestRail.pm
-    version: '0.044'
+    version: '0.046'
   Test::Rail::Harness:
     file: lib/Test/Rail/Harness.pm
-    version: '0.044'
+    version: '0.046'
   Test::Rail::Parser:
     file: lib/Test/Rail/Parser.pm
-    version: '0.044'
+    version: '0.046'
   TestRail::API:
     file: lib/TestRail/API.pm
-    version: '0.044'
+    version: '0.046'
   TestRail::Utils:
     file: lib/TestRail/Utils.pm
-    version: '0.044'
+    version: '0.046'
   TestRail::Utils::Find:
     file: lib/TestRail/Utils/Find.pm
-    version: '0.044'
+    version: '0.046'
   TestRail::Utils::Lock:
     file: lib/TestRail/Utils/Lock.pm
-    version: '0.044'
+    version: '0.046'
   TestRail::Utils::Results:
     file: lib/TestRail/Utils/Results.pm
-    version: '0.044'
+    version: '0.046'
 requires:
   Carp: '0'
   Clone: '0'
@@ -62,6 +62,7 @@ requires:
   File::Find: '0'
   File::HomeDir: '0'
   Getopt::Long: '0'
+  HTTP::CookieJar::LWP: '0'
   HTTP::Request: '0'
   Hash::Merge: '0'
   IO::Interactive::Tiny: '0'
@@ -78,6 +79,7 @@ requires:
   TAP::Harness: '0'
   TAP::Parser: '0'
   Term::ANSIColor: '2.01'
+  Term::ReadKey: '0'
   Try::Tiny: '0'
   Type::Params: '0'
   Types::Standard: '0'
@@ -91,9 +93,14 @@ resources:
   bugtracker: https://github.com/teodesian/TestRail-Perl/issues
   homepage: https://github.com/teodesian/TestRail-Perl
   repository: git://github.com/teodesian/TestRail-Perl.git
-version: '0.044'
+version: '0.046'
 x_contributors:
+  - 'George S. Baugh <doge@teodesian.net>'
+  - 'George S. Baugh <george.b@cpanel.net>'
+  - 'Matthew Spahr <matthew.spahr@cpanel.net>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Neil Bowers <neil@bowers.com>'
   - 'Ryan Sherer <ryan.sherer@cpanel.net>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+  - 'Todd Rinaldo <toddr@cpan.org>'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

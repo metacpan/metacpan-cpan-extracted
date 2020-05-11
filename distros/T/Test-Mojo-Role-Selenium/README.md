@@ -59,21 +59,21 @@ Test::Mojo::Role::Selenium - Test::Mojo in a real browser
 
 # DESCRIPTION
 
-[Test::Mojo::Role::Selenium](https://metacpan.org/pod/Test::Mojo::Role::Selenium) is a role that extends [Test::Mojo](https://metacpan.org/pod/Test::Mojo) with
+[Test::Mojo::Role::Selenium](https://metacpan.org/pod/Test%3A%3AMojo%3A%3ARole%3A%3ASelenium) is a role that extends [Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo) with
 additional methods which checks behaviour in a browser. All the heavy lifting
-is done by [Selenium::Remote::Driver](https://metacpan.org/pod/Selenium::Remote::Driver).
+is done by [Selenium::Remote::Driver](https://metacpan.org/pod/Selenium%3A%3ARemote%3A%3ADriver).
 
-Some of the [Selenium::Remote::Driver](https://metacpan.org/pod/Selenium::Remote::Driver) methods are available directly in this
+Some of the [Selenium::Remote::Driver](https://metacpan.org/pod/Selenium%3A%3ARemote%3A%3ADriver) methods are available directly in this
 role, while the rest are available through the object held by the ["driver"](#driver)
 attribute. Please create an issue if you think more tests or methods should be
-provided directly by [Test::Mojo::Role::Selenium](https://metacpan.org/pod/Test::Mojo::Role::Selenium).
+provided directly by [Test::Mojo::Role::Selenium](https://metacpan.org/pod/Test%3A%3AMojo%3A%3ARole%3A%3ASelenium).
 
 # OPTIONAL DEPENDENCIES
 
-[Selenium::Remote::Driver](https://metacpan.org/pod/Selenium::Remote::Driver) require some external dependencies to work. Here
+[Selenium::Remote::Driver](https://metacpan.org/pod/Selenium%3A%3ARemote%3A%3ADriver) require some external dependencies to work. Here
 are a quick intro to install some of the dependencies to make this module work.
 
-- [Selenium::Chrome](https://metacpan.org/pod/Selenium::Chrome)
+- [Selenium::Chrome](https://metacpan.org/pod/Selenium%3A%3AChrome)
 
         # macOS
         $ brew install chromedriver
@@ -86,8 +86,8 @@ are a quick intro to install some of the dependencies to make this module work.
 
 # CAVEAT
 
-["tx" in Test::Mojo](https://metacpan.org/pod/Test::Mojo#tx) is only populated, if the request went through an ["Internal app"](#internal-app).
-This means that methods such as ["header\_is" in Test::Mojo](https://metacpan.org/pod/Test::Mojo#header_is) will not work or
+["tx" in Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo#tx) is only populated, if the request went through an ["Internal app"](#internal-app).
+This means that methods such as ["header\_is" in Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo#header_is) will not work or
 probably fail completely when testing an ["External app"](#external-app).
 
 # ENVIRONMENT VARIABLES
@@ -95,8 +95,8 @@ probably fail completely when testing an ["External app"](#external-app).
 ## MOJO\_SELENIUM\_BASE\_URL
 
 Setting this variable will make this test send the requests to a remote server,
-instead of starting a local server. Note that this will disable [Test::Mojo](https://metacpan.org/pod/Test::Mojo)
-methods such as ["status\_is"](#status_is), since ["tx" in Test::Mojo](https://metacpan.org/pod/Test::Mojo#tx) will not be set. See
+instead of starting a local server. Note that this will disable [Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo)
+methods such as ["status\_is"](#status_is), since ["tx" in Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo#tx) will not be set. See
 also ["CAVEAT"](#caveat).
 
 This variable will get the value of ["TEST\_SELENIUM"](#test_selenium) if it looks like a URL.
@@ -106,17 +106,17 @@ This variable will get the value of ["TEST\_SELENIUM"](#test_selenium) if it loo
 In some cases you may want to override the host of your test server, when
 running Selenium on a separate server or in a pod-style networking environment
 this still retains the automatically generated port. This will not disable the
-[Test::Mojo](https://metacpan.org/pod/Test::Mojo) methods.
+[Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo) methods.
 
 ## MOJO\_SELENIUM\_DRIVER
 
-This variable can be set to a classname, such as [Selenium::Chrome](https://metacpan.org/pod/Selenium::Chrome) which will
+This variable can be set to a classname, such as [Selenium::Chrome](https://metacpan.org/pod/Selenium%3A%3AChrome) which will
 force the selenium driver. It can also be used to pass on arguments to the
 driver's constructor. Example:
 
     MOJO_SELENIUM_DRIVER='Selenium::Remote::Driver&browser_name=firefox&port=4444'
 
-The arguments will be read using ["parse" in Mojo::Parameters](https://metacpan.org/pod/Mojo::Parameters#parse), which means they
+The arguments will be read using ["parse" in Mojo::Parameters](https://metacpan.org/pod/Mojo%3A%3AParameters#parse), which means they
 follow standard URL format rules.
 
 ## TEST\_SELENIUM
@@ -130,7 +130,7 @@ this test. Will also set ["MOJO\_SELENIUM\_BASE\_URL"](#mojo_selenium_base_url) 
 
     $driver = $self->driver;
 
-An instance of [Selenium::Remote::Driver](https://metacpan.org/pod/Selenium::Remote::Driver).
+An instance of [Selenium::Remote::Driver](https://metacpan.org/pod/Selenium%3A%3ARemote%3A%3ADriver).
 
 ## driver\_args
 
@@ -209,7 +209,7 @@ Test the current browser URL against a regex.
 
 Test if an element is displayed on the web page.
 
-See ["is\_displayed" in Selenium::Remote::WebElement](https://metacpan.org/pod/Selenium::Remote::WebElement#is_displayed).
+See ["is\_displayed" in Selenium::Remote::WebElement](https://metacpan.org/pod/Selenium%3A%3ARemote%3A%3AWebElement#is_displayed).
 
 ## element\_is\_hidden
 
@@ -217,7 +217,7 @@ See ["is\_displayed" in Selenium::Remote::WebElement](https://metacpan.org/pod/S
 
 Test if an element is hidden on the web page.
 
-See ["is\_hidden" in Selenium::Remote::WebElement](https://metacpan.org/pod/Selenium::Remote::WebElement#is_hidden).
+See ["is\_hidden" in Selenium::Remote::WebElement](https://metacpan.org/pod/Selenium%3A%3ARemote%3A%3AWebElement#is_hidden).
 
 ## go\_back
 
@@ -225,7 +225,7 @@ See ["is\_hidden" in Selenium::Remote::WebElement](https://metacpan.org/pod/Sele
 
 Equivalent to hitting the back button on the browser.
 
-See ["go\_back" in Selenium::Remote::Driver](https://metacpan.org/pod/Selenium::Remote::Driver#go_back).
+See ["go\_back" in Selenium::Remote::Driver](https://metacpan.org/pod/Selenium%3A%3ARemote%3A%3ADriver#go_back).
 
 ## go\_forward
 
@@ -233,14 +233,14 @@ See ["go\_back" in Selenium::Remote::Driver](https://metacpan.org/pod/Selenium::
 
 Equivalent to hitting the forward button on the browser.
 
-See ["go\_forward" in Selenium::Remote::Driver](https://metacpan.org/pod/Selenium::Remote::Driver#go_forward).
+See ["go\_forward" in Selenium::Remote::Driver](https://metacpan.org/pod/Selenium%3A%3ARemote%3A%3ADriver#go_forward).
 
 ## if\_tx
 
     $self = $self->if_tx(sub { ... }, @args);
     $self = $self->if_tx($method, @args);
 
-Call either a code ref or a method on `$self` if ["tx" in Test::Mojo](https://metacpan.org/pod/Test::Mojo#tx) is defined.
+Call either a code ref or a method on `$self` if ["tx" in Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo#tx) is defined.
 `tx()` is undefined if ["navigate\_ok"](#navigate_ok) is called on an external resource.
 
 Examples:
@@ -253,7 +253,7 @@ Examples:
 
 Checks that the selector finds the correct number of elements in the browser.
 
-See ["element\_count\_is" in Test::Mojo](https://metacpan.org/pod/Test::Mojo#element_count_is).
+See ["element\_count\_is" in Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo#element_count_is).
 
 ## live\_element\_exists
 
@@ -261,7 +261,7 @@ See ["element\_count\_is" in Test::Mojo](https://metacpan.org/pod/Test::Mojo#ele
 
 Checks that the selector finds an element in the browser.
 
-See ["element\_exists" in Test::Mojo](https://metacpan.org/pod/Test::Mojo#element_exists).
+See ["element\_exists" in Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo#element_exists).
 
 ## live\_element\_exists\_not
 
@@ -271,7 +271,7 @@ Checks that the selector does not find an element in the browser.
 
     $self = $self->live_element_exists("div.foo");
 
-See ["element\_exists\_not" in Test::Mojo](https://metacpan.org/pod/Test::Mojo#element_exists_not).
+See ["element\_exists\_not" in Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo#element_exists_not).
 
 ## live\_text\_is
 
@@ -313,7 +313,7 @@ Open a browser window and go to the given location.
     $self = $class->new;
     $self = $class->new($app);
 
-Same as ["new" in Test::Mojo](https://metacpan.org/pod/Test::Mojo#new), but will not build `$app` if
+Same as ["new" in Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo#new), but will not build `$app` if
 ["MOJO\_SELENIUM\_BASE\_URL"](#mojo_selenium_base_url) is set.
 
 ## refresh
@@ -322,7 +322,7 @@ Same as ["new" in Test::Mojo](https://metacpan.org/pod/Test::Mojo#new), but will
 
 Equivalent to hitting the refresh button on the browser.
 
-See ["refresh" in Selenium::Remote::Driver](https://metacpan.org/pod/Selenium::Remote::Driver#refresh).
+See ["refresh" in Selenium::Remote::Driver](https://metacpan.org/pod/Selenium%3A%3ARemote%3A%3ADriver#refresh).
 
 ## send\_keys\_ok
 
@@ -330,7 +330,7 @@ See ["refresh" in Selenium::Remote::Driver](https://metacpan.org/pod/Selenium::R
     $self->send_keys_ok(undef, [\"return"]);
 
 Used to send keys to a given element. Scalar refs will be sent as
-[Selenium::Remote::WDKeys](https://metacpan.org/pod/Selenium::Remote::WDKeys) strings. Passing in `undef` as the first argument
+[Selenium::Remote::WDKeys](https://metacpan.org/pod/Selenium%3A%3ARemote%3A%3AWDKeys) strings. Passing in `undef` as the first argument
 will cause the keys to be sent to the currently active element.
 
 List of some of the special keys:
@@ -352,7 +352,7 @@ Set the browser window size.
 
     $self = $self->setup_or_skip_all;
 
-Will ["skip\_all" in skip all#Test::More](https://metacpan.org/pod/skip&#x20;all#Test::More#skip_all) tests unless `TEST_SELENIUM` is set and
+Will ["skip\_all" in skip all#Test::More](https://metacpan.org/pod/skip%20all%23Test%3A%3AMore#skip_all) tests unless `TEST_SELENIUM` is set and
 and ["driver"](#driver) can be built.
 
 Will also set ["MOJO\_SELENIUM\_BASE\_URL"](#mojo_selenium_base_url) if `TEST_SELENIUM` looks like a URL.
@@ -363,7 +363,7 @@ Will also set ["MOJO\_SELENIUM\_BASE\_URL"](#mojo_selenium_base_url) if `TEST_SE
 
 Submit a form, either by selector or the current active form.
 
-See ["submit" in Selenium::Remote::WebElement](https://metacpan.org/pod/Selenium::Remote::WebElement#submit).
+See ["submit" in Selenium::Remote::WebElement](https://metacpan.org/pod/Selenium%3A%3ARemote%3A%3AWebElement#submit).
 
 ## toggle\_checked\_ok
 
@@ -393,12 +393,12 @@ Simpler version of ["wait\_until"](#wait_until) for the most common use cases:
 - String
 
     Wait for an element matching the CSS selector with some additional modifiers:
-    [:enabled](https://metacpan.org/pod/Selenium::Remote::WebElement#is_enabled),
-    [:hidden](https://metacpan.org/pod/Selenium::Remote::WebElement#is_hidden),
-    [:selected](https://metacpan.org/pod/Selenium::Remote::WebElement#is_selected) and
-    [:visible](https://metacpan.org/pod/Selenium::Remote::WebElement#is_displayed).
+    [:enabled](https://metacpan.org/pod/Selenium%3A%3ARemote%3A%3AWebElement%23is_enabled),
+    [:hidden](https://metacpan.org/pod/Selenium%3A%3ARemote%3A%3AWebElement%23is_hidden),
+    [:selected](https://metacpan.org/pod/Selenium%3A%3ARemote%3A%3AWebElement%23is_selected) and
+    [:visible](https://metacpan.org/pod/Selenium%3A%3ARemote%3A%3AWebElement%23is_displayed).
 
-    Check out [Selenium::Remote::WebElement](https://metacpan.org/pod/Selenium::Remote::WebElement) for details about the modifiers.
+    Check out [Selenium::Remote::WebElement](https://metacpan.org/pod/Selenium%3A%3ARemote%3A%3AWebElement) for details about the modifiers.
 
 ## wait\_until
 
@@ -408,7 +408,7 @@ Simpler version of ["wait\_until"](#wait_until) for the most common use cases:
     # Use it as a sleep(0.8)
     $self = $self->wait_until(sub { 0 }, {timeout => 0.8, skip => 1});
 
-Start [Mojo::IOLoop](https://metacpan.org/pod/Mojo::IOLoop) and run it until the callback returns true. Note that
+Start [Mojo::IOLoop](https://metacpan.org/pod/Mojo%3A%3AIOLoop) and run it until the callback returns true. Note that
 `$_[0]` is `$self` and `$_` is ["driver"](#driver). `%args` is optional, but can
 contain these values:
 
@@ -438,6 +438,6 @@ the terms of the Artistic License version 2.0.
 
 # SEE ALSO
 
-[Test::Mojo](https://metacpan.org/pod/Test::Mojo).
+[Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo).
 
-[Selenium::Remote::Driver](https://metacpan.org/pod/Selenium::Remote::Driver)
+[Selenium::Remote::Driver](https://metacpan.org/pod/Selenium%3A%3ARemote%3A%3ADriver)

@@ -11,12 +11,14 @@ lib/Sah/Schema/sah/array_schema.pm
 lib/Sah/Schema/sah/clause_set.pm
 lib/Sah/Schema/sah/extras.pm
 lib/Sah/Schema/sah/schema.pm
+lib/Sah/Schema/sah/schema_modname.pm
 lib/Sah/Schema/sah/str_schema.pm
 lib/Sah/Schema/sah/type_name.pm
 lib/Sah/SchemaR/sah/array_schema.pm
 lib/Sah/SchemaR/sah/clause_set.pm
 lib/Sah/SchemaR/sah/extras.pm
 lib/Sah/SchemaR/sah/schema.pm
+lib/Sah/SchemaR/sah/schema_modname.pm
 lib/Sah/SchemaR/sah/str_schema.pm
 lib/Sah/SchemaR/sah/type_name.pm
 lib/Sah/Schemas/Sah.pm
@@ -24,4 +26,5 @@ t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
+t/release-sah-schema.t
 weaver.ini

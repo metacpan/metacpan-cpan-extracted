@@ -1,0 +1,28 @@
+[
+    {
+        "description": "exception handling",
+        "schema": true,
+        "tests": [
+            {
+              "description": "no exception; expect invalid: want test failure",
+              "data": { "exception": false },
+              "valid": false
+            },
+            {
+              "description": "no exception; expect valid: want test pass",
+              "data": { "exception": false },
+              "valid": true
+            },
+            {
+              "description": "exception; expect invalid: want test failure (via exception)",
+              "data": { "exception": true },
+              "valid": false
+            },
+            {
+              "description": "exception; expect valid: want test failure (via exception)",
+              "data": { "exception": true },
+              "valid": true
+            }
+        ]
+    }
+]

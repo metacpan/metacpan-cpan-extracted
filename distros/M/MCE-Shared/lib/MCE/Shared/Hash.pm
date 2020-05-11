@@ -13,13 +13,12 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.864';
+our $VERSION = '1.868';
 
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
 use MCE::Shared::Base ();
 use base 'MCE::Shared::Base::Common';
-use bytes;
 
 use overload (
    q("")    => \&MCE::Shared::Base::_stringify,
@@ -312,7 +311,7 @@ MCE::Shared::Hash - Hash helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Hash version 1.864
+This document describes MCE::Shared::Hash version 1.868
 
 =head1 DESCRIPTION
 

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-08-03'; # DATE
-our $VERSION = '0.27'; # VERSION
+our $DATE = '2020-05-08'; # DATE
+our $VERSION = '0.28'; # VERSION
 
 use 5.010001;
 use strict;
@@ -30,7 +30,7 @@ peri-pipe - Default Riap::Simple server over pipe
 
 =head1 VERSION
 
-This document describes version 0.27 of peri-pipe (from Perl distribution Perinci-Access-Simple-Server), released on 2017-08-03.
+This document describes version 0.28 of peri-pipe (from Perl distribution Perinci-Access-Simple-Server), released on 2020-05-08.
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -58,7 +58,7 @@ GenOO::GenomicRegion - Object that corresponds to a region on a genome
 # Let the code begin...
 
 package GenOO::GenomicRegion;
-$GenOO::GenomicRegion::VERSION = '1.5.1';
+$GenOO::GenomicRegion::VERSION = '1.5.2';
 
 #######################################################################
 #######################   Load External modules   #####################

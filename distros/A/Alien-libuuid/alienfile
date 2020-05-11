@@ -8,6 +8,12 @@ share {
   plugin Extract => 'tar.gz';
   plugin 'Build::Autoconf';
 
+  patch [
+      # Patch pkg-config so we can #include <uuid.h> and #include <uuid/uuid.h>
+      '%{patch} -p0 < %{.install.patch}/uuid.pc.in.patch',
+  ];
+
+
   build [
     '%{configure}',
     '%{make}',

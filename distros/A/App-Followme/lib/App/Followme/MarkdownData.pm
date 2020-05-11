@@ -11,7 +11,7 @@ use Text::Markdown;
 use App::Followme::FIO;
 use App::Followme::Web;
 
-our $VERSION = "1.93";
+our $VERSION = "1.94";
 
 #----------------------------------------------------------------------
 # Read the default parameter values

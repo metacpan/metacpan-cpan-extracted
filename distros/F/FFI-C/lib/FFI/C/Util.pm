@@ -3,16 +3,16 @@ package FFI::C::Util;
 use strict;
 use warnings;
 use 5.008001;
-use Ref::Util qw( is_blessed_ref is_plain_arrayref is_plain_hashref is_ref );
+use Ref::Util qw( is_blessed_ref is_plain_arrayref is_plain_hashref is_ref is_blessed_hashref );
 use Sub::Identify ();
 use Carp ();
 use Class::Inspector;
 use base qw( Exporter );
 
-our @EXPORT_OK = qw( perl_to_c c_to_perl take owned );
+our @EXPORT_OK = qw( perl_to_c c_to_perl take owned set_array_count );
 
 # ABSTRACT: Utility functions for dealing with structured C data
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 sub perl_to_c ($$)
@@ -79,7 +79,7 @@ sub c_to_perl ($)
 
       # get the value;
       my $value = $inst->$key;
-      $value = &c_to_perl($value) if is_blessed_ref $value;
+      $value = &c_to_perl($value) if is_blessed_hashref $value;
       $value = [@$value] if is_plain_arrayref $value;
       $h{$key} = $value;
     }
@@ -106,6 +106,17 @@ sub take ($)
   $ptr;
 }
 
+
+sub set_array_count ($$)
+{
+  my($inst, $count) = @_;
+  Carp::croak("Not a FFI::C::Array")
+    unless is_blessed_ref $inst && $inst->isa('FFI::C::Array');
+  Carp::croak("This array already has a size")
+    if $inst->{count};
+  $inst->{count} = $count;
+}
+
 1;
 
 __END__
@@ -120,7 +131,7 @@ FFI::C::Util - Utility functions for dealing with structured C data
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -204,6 +215,15 @@ So don't try to get/set any of its members, or pass it into a function.
 
 The returned pointer can be cast into something else or passed into
 a function that takes an C<opaque> argument.
+
+=head2 set_array_count
+
+ set_array_count $inst, $count;
+
+This function sets the element count on a variable array returned from
+C (where normally there is no way to know from just the return value).
+If you try to set a count on a non-array or a fixed sized array an
+exception will be thrown.
 
 =head1 SEE ALSO
 

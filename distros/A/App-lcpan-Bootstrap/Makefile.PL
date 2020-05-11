@@ -22,14 +22,16 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "App-lcpan-Bootstrap",
   "LICENSE" => "perl",
   "NAME" => "App::lcpan::Bootstrap",
-  "PREREQ_PM" => {},
+  "PREREQ_PM" => {
+    "App::lcpan" => "1.057"
+  },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "20200419.0.0",
+  "VERSION" => "20200508.0.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,6 +39,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "App::lcpan" => "1.057",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

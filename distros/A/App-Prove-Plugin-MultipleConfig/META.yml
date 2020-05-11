@@ -1,0 +1,55 @@
+---
+abstract: 'set multiple configs for parallel prove tests'
+author:
+  - takahito.yamada
+build_requires:
+  DBD::mysql: '2.1026'
+  DBI: '1.612'
+  Redis: '1.996'
+  Test::More: '1.302174'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Prove-Plugin-MultipleConfig
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::Prove::Plugin::MultipleConfig:
+    file: lib/App/Prove/Plugin/MultipleConfig.pm
+    version: '0.01'
+  ConfigCache:
+    file: lib/ConfigCache.pm
+  TAP::Formatter::Console::NoRulerParallelSession:
+    file: lib/TAP/Formatter/Console/NoRulerParallelSession.pm
+  TAP::Formatter::MultipleConfig:
+    file: lib/TAP/Formatter/MultipleConfig.pm
+  TAP::Harness::MultipleConfig:
+    file: lib/TAP/Harness/MultipleConfig.pm
+requires:
+  App::Prove: '3.42'
+  Cache::FastMmap: '1.49'
+  POSIX::AtFork: '0.04'
+  Test::Harness: '3.42'
+  parent: '0.238'
+resources:
+  bugtracker: https://github.com/YamadaTakahito/App-Prove-Plugin-MultipleConfig/issues
+  homepage: https://github.com/YamadaTakahito/App-Prove-Plugin-MultipleConfig
+  repository: git://github.com/YamadaTakahito/App-Prove-Plugin-MultipleConfig.git
+version: '0.01'
+x_contributors:
+  - 'YamadaTakahito <d_p.t.a.d.fighter@icloud.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

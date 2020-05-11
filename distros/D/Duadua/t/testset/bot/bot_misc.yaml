@@ -190,3 +190,19 @@
   is_windows: false
   is_chromeos: false
   version: '1.0'
+- ua: 'KOCMOHABT (https://kozmonavt.tk/) Mozilla/5.0 (Web Explorer)'
+  name: 'KOCMOHABT'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+- ua: 'Hexometer'
+  name: 'Hexometer'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false

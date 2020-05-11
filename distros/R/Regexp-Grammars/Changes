@@ -512,3 +512,9 @@ Revision history for Regexp-Grammars
 
     * Fixed bug in positive lookahead translation
       (thanks Hugo!)
+
+
+1.055  Thu May  7 22:53:14 2020
+
+    * Fixed bug in parsing (??{...}) constructs
+      (thanks Hugo)

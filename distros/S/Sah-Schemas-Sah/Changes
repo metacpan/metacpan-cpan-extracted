@@ -1,3 +1,14 @@
+0.9.49.1  2020-05-08  Released-By: PERLANCAR; Urgency: medium
+
+	  - [Incompatible change] Rename schema sah::schema_module ->
+	    sah::schema_modname to be more consistent with perl::modname.
+
+
+0.9.49.0  2020-05-08  Released-By: PERLANCAR; Urgency: medium
+
+	  - Add schema: sah::schema_module.
+
+
 0.9.46.0  2019-07-19  Released-By: PERLANCAR; Urgency: medium
 
           - Update to Sah 0.9.46 (new clauses: examples & invalid_examples).

@@ -7,11 +7,12 @@ use Wasm::Wasmtime::Module;
 use Wasm::Wasmtime::Extern;
 use Wasm::Wasmtime::Func;
 use Wasm::Wasmtime::Trap;
+use Wasm::Wasmtime::Instance::Exports;
 use Ref::Util qw( is_ref is_blessed_ref is_plain_coderef is_plain_scalarref );
 use Carp ();
 
 # ABSTRACT: Wasmtime instance class
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 $ffi_prefix = 'wasm_instance_';
@@ -25,34 +26,34 @@ sub _cast_import
   {
     return $ii->{ptr};
   }
-  elsif(is_blessed_ref($ii) && $ii->can('as_extern'))
+  elsif(is_blessed_ref($ii) && $ii->isa('Wasm::Wasmtime::Extern'))
   {
-    return $ii->as_extern->{ptr};
+    return $ii->{ptr};
   }
   elsif(is_plain_coderef($ii))
   {
-    if($mi->type->kind eq 'func')
+    if($mi->type->kind eq 'functype')
     {
       my $f = Wasm::Wasmtime::Func->new(
         $store,
-        $mi->type->as_functype,
+        $mi->type,
         $ii,
       );
       push @$keep, $f;
-      return $f->as_extern->{ptr};
+      return $f->{ptr};
     }
   }
   elsif(is_plain_scalarref($ii) || !defined $ii)
   {
-    if($mi->type->kind eq 'memory')
+    if($mi->type->kind eq 'memorytype')
     {
       my $m = Wasm::Wasmtime::Memory->new(
         $store,
-        $mi->type->as_memorytype,
+        $mi->type,
       );
       $$ii = $m if defined $ii;
       push @$keep, $m;
-      return $m->as_extern->{ptr};
+      return $m->{ptr};
     }
   }
   Carp::croak("Non-extern object as import");
@@ -86,7 +87,7 @@ $ffi->attach( new => ['wasm_store_t','wasm_module_t','opaque[]','opaque*'] => 'w
     my $store = $module->store;
 
     {
-      my @mi = $module->imports;
+      my @mi = @{ $module->imports };
       if(@mi != @imports)
       {
         Carp::croak("Got @{[ scalar @imports ]} imports, but expected @{[ scalar @mi ]}");
@@ -116,27 +117,15 @@ $ffi->attach( new => ['wasm_store_t','wasm_module_t','opaque[]','opaque*'] => 'w
 });
 
 
-sub get_export
-{
-  my($self, $name) = @_;
-  $self->{exports} ||= do {
-    my @exports = $self->exports;
-    my @module_exports   = $self->module->exports;
-    my %exports;
-    foreach my $i (0..$#exports)
-    {
-      $exports{$module_exports[$i]->name} = $exports[$i];
-    }
-    \%exports;
-  };
-  $self->{exports}->{$name};
-}
-
-
 sub module { shift->{module} }
 
 
-$ffi->attach( exports => ['wasm_instance_t','wasm_extern_vec_t*'] => sub {
+sub exports
+{
+  Wasm::Wasmtime::Instance::Exports->new(shift);
+}
+
+$ffi->attach( [ exports => '_exports' ] => ['wasm_instance_t','wasm_extern_vec_t*'] => sub {
   my($xsub, $self) = @_;
   my $externs = Wasm::Wasmtime::ExternVec->new;
   $xsub->($self, $externs);
@@ -159,7 +148,7 @@ Wasm::Wasmtime::Instance - Wasmtime instance class
 
 =head1 VERSION
 
-version 0.06
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -212,15 +201,6 @@ access it from Perl space, but at least it won't die.
 
 =head1 METHODS
 
-=head2 get_export
-
- my $extern = $instance->get_export($name);
-
-Returns a L<Wasm::Wasmtime::Extern> object with the given C<$name>.
-If no such object exists, then C<undef> will be returned.
-
-Extern objects represent functions, globals, tables or memory in WebAssembly.
-
 =head2 module
 
  my $module = $instance->module;
@@ -229,10 +209,10 @@ Returns the L<Wasm::Wasmtime::Module> for this instance.
 
 =head2 exports
 
- my @externs = $instance->exports;
+ my $exports = $instance->exports;
 
-Returns a list of L<Wasm::Wasmtime::Extern> objects for the functions,
-globals, tables and memory exported by the WebAssembly instance.
+Returns the L<Wasm:Wasmtime::Instance::Exports> object for this instance.
+This can be used to query and call exports from the instance.
 
 =head1 SEE ALSO
 

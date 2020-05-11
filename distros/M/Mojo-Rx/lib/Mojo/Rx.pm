@@ -17,7 +17,7 @@ our @EXPORT_OK = qw/
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v0.12.0";
+our $VERSION = "v0.12.1";
 
 sub import {
     my ($class, @keywords) = @_;

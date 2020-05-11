@@ -76,7 +76,7 @@ GenOO::Gene - Gene object
 # Let the code begin...
 
 package GenOO::Gene;
-$GenOO::Gene::VERSION = '1.5.1';
+$GenOO::Gene::VERSION = '1.5.2';
 use Moose;
 use namespace::autoclean;
 

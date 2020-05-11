@@ -1,6 +1,6 @@
 package Net::IPAM::Block;
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 use 5.10.0;
 use strict;
@@ -90,20 +90,20 @@ Returns undef on illegal input.
 =cut
 
 sub new {
-  Carp::croak 'missing argument' unless defined $_[1];
-
   my $self  = bless( {}, $_[0] );
-  my $input = $_[1];
+  my $input = $_[1] // Carp::croak 'missing argument';
 
   return Net::IPAM::Block::Private::_fromIP( $self, $input ) if ref $input;
 
   # handle CIDR: 2001:db8::/32
   my $idx = index( $input, '/' );
-  return Net::IPAM::Block::Private::_fromCIDR( $self, $input, $idx ) if $idx >= 0;
+  return Net::IPAM::Block::Private::_fromCIDR( $self, $input, $idx )
+    if $idx >= 0;
 
   # handle range: 192.168.1.17-192.168.1.35
   $idx = index( $input, '-' );
-  return Net::IPAM::Block::Private::_fromRange( $self, $input, $idx ) if $idx >= 0;
+  return Net::IPAM::Block::Private::_fromRange( $self, $input, $idx )
+    if $idx >= 0;
 
   # handle address: fe80::1
   return Net::IPAM::Block::Private::_fromAddr( $self, $input );
@@ -488,8 +488,6 @@ cmp() returns -1, 0, +1:
 =cut
 
 sub cmp {
-  Carp::croak "wrong or missing arg" unless ref $_[1] && $_[1]->isa(__PACKAGE__);
-
   return -1 if $_[0]->{base}->cmp( $_[1]->{base} ) < 0;
   return 1  if $_[0]->{base}->cmp( $_[1]->{base} ) > 0;
 
@@ -518,7 +516,6 @@ Returns true if the blocks are disjunct
 =cut
 
 sub is_disjunct_with {
-  Carp::croak "wrong or missing arg" unless ref $_[1] && $_[1]->isa(__PACKAGE__);
 
   #  a       |----------|
   #  b |---|
@@ -552,7 +549,6 @@ Returns true if the blocks overlap.
 =cut
 
 sub overlaps_with {
-  Carp::croak "wrong or missing arg" unless ref $_[1] && $_[1]->isa(__PACKAGE__);
 
   # false if a == b
   return if $_[0]->cmp( $_[1] ) == 0;
@@ -590,8 +586,10 @@ The argument may also be a Net::IPAM::IP address object.
 # polymorphic: arg may be block or ip
 sub contains {
   if ( ref $_[1] ) {
-    return Net::IPAM::Block::Private::_contains_ip(@_)    if $_[1]->isa('Net::IPAM::IP');
-    return Net::IPAM::Block::Private::_contains_block(@_) if $_[1]->isa('Net::IPAM::Block');
+    return Net::IPAM::Block::Private::_contains_ip(@_)
+      if $_[1]->isa('Net::IPAM::IP');
+    return Net::IPAM::Block::Private::_contains_block(@_)
+      if $_[1]->isa('Net::IPAM::Block');
   }
   Carp::croak 'wrong argument,';
 }
@@ -713,7 +711,8 @@ sub aggregate {
     $i = $j;
 
     # last has changed, calculate new mask, returns undef if no CIDR
-    $this->{mask} = Net::IPAM::Block::Private::_get_mask_ip( $this->{base}, $this->{last} );
+    $this->{mask} =
+      Net::IPAM::Block::Private::_get_mask_ip( $this->{base}, $this->{last} );
 
     push @packed, $this;
   }

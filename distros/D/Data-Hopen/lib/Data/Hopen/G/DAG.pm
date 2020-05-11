@@ -3,7 +3,7 @@ package Data::Hopen::G::DAG;
 use strict;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000015';
+our $VERSION = '0.000017';
 
 use parent 'Data::Hopen::G::Op';
 use Class::Tiny {
@@ -28,7 +28,7 @@ use Class::Tiny {
     # TODO? also support fini to run operations after _graph runs?
 };
 
-use Data::Hopen qw(hlog getparameters $QUIET);
+use Data::Hopen qw(hlog getparameters *QUIET);
 use Data::Hopen::G::Goal;
 use Data::Hopen::G::Link;
 use Data::Hopen::G::Node;
@@ -37,13 +37,14 @@ use Data::Hopen::Util::Data qw(forward_opts);
 use Data::Hopen::OrderedPredecessorGraph;
 use Getargs::Mixed; # parameters, which doesn't permit undef
 use Hash::Merge;
+use Regexp::Assemble;
 use Scalar::Util qw(refaddr);
 use Storable ();
 
 # Class data {{{1
 
 use constant {
-    LINKS => 'link_list',    # Graph edge attr: array of BHG::Link instances
+    LINKS => 'link_list',    # Graph edge attr: array of DHG::Link instances
 };
 
 # A counter used for making unique names
@@ -80,17 +81,17 @@ precedence.  Valid values (case-insensitive) are:
 
 =over
 
-=item C<undef>
+=item C<undef> or C<'combine'>
 
 (the default): L<Hash::Merge/Retainment Precedence>.  Same-name keys
 are merged, so no data is lost.
 
-=item C<"first">
+=item C<'first'> or C<'keep'>
 
 L<Hash::Merge/Left Precedence>.  The first predecessor to add a value
 under a particular key will win.
 
-=item C<"last">
+=item C<'last'> or C<'replace'>
 
 L<Hash::Merge/Right Precedence>.  The last predecessor to add a value
 under a particular key will win.
@@ -132,7 +133,7 @@ each goal's outputs as the values under that name.  Usage:
     my $hrOutputs = $dag->run([-context=>$scope][, other options])
 
 C<$scope> must be a L<Data::Hopen::Scope> or subclass if provided.
-Other options are as L<Data::Hopen::Runnable/run>.
+Other options are as L<Data::Hopen::G::Runnable/run>.
 
 When evaluating a node, the edges from its predecessors are traversed in
 the order those predecessors were added to the graph.
@@ -179,12 +180,18 @@ sub _run {
 
     # --- Set up for the merge ---
 
-    my $merge_strategy =
-        !defined $self->winner ? 'combine' :
-            $self->winner =~ /^first$/i ? 'keep' :
-                $self->winner =~ /^last$/i ? 'replace' :
-                    undef;
-    die "Invalid winner value ${[$self->winner]}" if !defined $merge_strategy;
+    state $STRATEGIES = {   # regex => strategy
+        '(<undef>|combine)' => 'combine',
+        '(first|keep)' => 'keep',
+        '(last|replace)' => 'replace',
+    };
+    state $STRATEGY_MAP = Regexp::Assemble->new->flags('i')->track(1)
+        ->anchor_string_begin->anchor_string_end
+        ->add(keys %$STRATEGIES);
+
+    my $merge_strategy_idx = $STRATEGY_MAP->match($self->winner // '<undef>');
+    die "Invalid winner value @{[$self->winner]}" unless defined $merge_strategy_idx;
+    my $merge_strategy = $STRATEGIES->{$merge_strategy_idx};
 
     # --- Traverse ---
 
@@ -205,7 +212,7 @@ sub _run {
         # The scope stack is (outer to inner) DAG's inputs, DAG's overrides,
         # then $node_inputs, then the individual node's overrides.
         my $node_inputs = Data::Hopen::Scope::Hash->new;
-            # TODO make this a BH::Scope::Inputs once it's implemented
+            # TODO make this a DH::Scope::Inputs once it's implemented
         $node_inputs->outer($self->scope);
             # Data specifically being provided to the current node, e.g.,
             # on input edges, beats the scope of the DAG as a whole.
@@ -236,29 +243,39 @@ sub _run {
             }
 
             # More complex case: Process all the links
+
+            # Helper function to wrap a hashref in the right scope for a link input
+            local *make_link_inputs = sub {
+                my $hrIn = shift;
+                my $scLinkInputs = Data::Hopen::Scope::Hash->new->put(%$hrIn);
+                    # All links get the same outer scope --- they are parallel,
+                    # not in series.
+                    # TODO? use the predecessor's identity as the set.
+                $scLinkInputs->outer($self->scope);
+                    # The links run at the same scope level as the node.
+                $scLinkInputs->local(true);
+                return $scLinkInputs;
+            };
+
+            # Make the first link's input scope
             my $hrPredOutputs = $pred->outputs;
                 # In one test, outputs was undef if not on its own line.
-            my $link_inputs = Data::Hopen::Scope::Hash->new->put(%{$hrPredOutputs});
-                # All links get the same outer scope --- they are parallel,
-                # not in series.
-                # TODO use the predecessor's identity as the set.
-            $link_inputs->outer($self->scope);
-                # The links run at the same scope level as the node.
-            $link_inputs->local(true);
+            my $scLinkInputs = make_link_inputs($hrPredOutputs);
 
             # Run the links in series - not parallel!
-            my $link_outputs = $link_inputs->as_hashref(-levels=>'local');
+            my $hrLinkOutputs = $scLinkInputs->as_hashref(-levels=>'local');
             foreach my $link (@$links) {
                 hlog { ('From', $pred->name, 'via', $link->name, 'to', $node->name) };
 
-                $link_outputs = $link->run(
-                    -context=>$link_inputs,
+                $hrLinkOutputs = $link->run(
+                    -context=>$scLinkInputs,
                     forward_opts(\%args, {'-'=>1}, 'phase')
                     # visitor not passed to links.
                 );
+                $scLinkInputs = make_link_inputs($hrLinkOutputs);
             } #foreach incoming link
 
-            $node_inputs->merge(%{$link_outputs});
+            $node_inputs->merge(%$hrLinkOutputs);
                 # TODO specify which set these are.
 
         } #foreach predecessor node
@@ -279,6 +296,9 @@ sub _run {
         } else {
             $args{visitor}->visit_node($node, $node_inputs) if $args{visitor};
         }
+
+        hlog { 'Finished node', $node->name, 'with outputs',
+            Dumper $node->outputs } 10;
 
     } #foreach node in topo-sort order
 
@@ -316,47 +336,56 @@ sub goal {
 
 =head2 connect
 
-   - C<DAG:connect(<op1>, <out-edge>, <in-edge>, <op2>)>:
-     connects output C<< out-edge >> of operation C<< op1 >> as input C<< in-edge >> of
-     operation C<< op2 >>.  No processing is done between output and input.
-     - C<< out-edge >> and C<< in-edge >> can be anything usable as a table index,
-       provided that table index appears in the corresponding operation's
-       descriptor.
-   - C<DAG:connect(<op1>, <op2>)>: creates a dependency edge from C<< op1 >> to
-     C<< op2 >>, indicating that C<< op1 >> must be run before C<< op2 >>.
-     Does not transfer any data from C<< op1 >> to C<< op2 >>.
-   - C<DAG:connect(<op1>, <Link>, <op2>)>: Connects C<< op1 >> to
-     C<< op2 >> via L<Data::Hopen::G::Link> C<< Link >>.
+=over 4
+
+=item - C<< DAG:connect(<op1>, <out-edge>, <in-edge>, <op2>) >>
+
+B<Not yet implemented>.
+Connects output C<out-edge> of operation C<op1> as input C<in-edge> of
+operation C<op2>.  No processing is done between output and input.
+C<out-edge> and C<in-edge> can be anything usable as a table index, provided
+that table index appears in the corresponding operation's descriptor.
+
+=item - C<< DAG:connect(<op1>, <op2>) >>
+
+Creates a dependency edge from C<op1> to C<op2>, indicating that C<op1> must be
+run before C<op2>.  Does not transfer any data from C<op1> to C<op2>.
+
+=item - C<< DAG:connect(<op1>, <Link>, <op2>) >>
+
+Connects C<op1> to C<op2> via L<Data::Hopen::G::Link> C<Link>.
+C<Link> may be undef, in which case this is treated as the two-parameter form.
+
+If there are already link(s) on the edge from C<op1> to C<op2>, the new link
+is added after the last existing link.
+
+=back
 
 TODO return the name of the edge?  The edge instance itself?  Maybe a
 fluent interface to the DAG for chaining C<connect> calls?
+
+TODO remove the out-edge and in-edge parameters?
 
 =cut
 
 sub connect {
     my $self = shift or croak 'Need an instance';
-    my ($op1, $out_edge, $in_edge, $op2) = @_;
+    my ($op1, $out_edge, $in_edge, $op2, $link);
 
-    my $link;
-    if(!defined($in_edge)) {    # dependency edge
-        $op2 = $out_edge;
-        $out_edge = false;      # No outputs
-        $in_edge = false;       # No inputs
-    } elsif(!defined($op2)) {
-        $op2 = $in_edge;
-        $link = $out_edge;
-        $out_edge = false;      # No outputs TODO
-        $in_edge = false;       # No inputs TODO
+    # Unpack args
+    #if(@_ == 4) {
+    #    ($op2, $out_edge, $in_edge, $op2) = @_;
+    #} else the following
+    if(@_ == 3) {
+        ($op1, $link, $op2) = @_;
+    } elsif(@_ == 2) {
+        ($op1, $op2) = @_;
+    } else {
+        die "Invalid arguments";
     }
 
-#    # Create the link
-#    unless($link) {
-#        $link = Data::Hopen::G::Link->new(
-#            name => 'link_' . $op1->name . '_' . $op2->name,
-#            in => [$out_edge],      # Output of op1
-#            out => [$in_edge],      # Input to op2
-#        );
-#    }
+    #my $out_edge = false;      # No outputs    TODO use these?
+    #my $in_edge = false;       # No inputs
 
     hlog { 'DAG::connect(): Edge from', $op1->name,
             'via', $link ? $link->name : '(no link)',
@@ -364,9 +393,9 @@ sub connect {
 
     # Add it to the graph (idempotent)
     $self->_graph->add_edge($op1, $op2);
-    #$self->_node_by_name->{$_->name} = $_ foreach ($op1, $op2);
+    # $self->_node_by_name->{$_->name} = $_ foreach ($op1, $op2);
 
-    # Save the BHG::Link as an edge attribute (not idempotent!)
+    # Save the DHG::Link as an edge attribute (not idempotent!)
     if($link) {
         my $attrs = $self->_graph->get_edge_attribute($op1, $op2, LINKS) || [];
         push @$attrs, $link;
@@ -506,12 +535,18 @@ long as everything is hooked in before the DAG is run.
 
 The following is TODO:
 
-   - C<DAG::inject(<op1>,<op2>[, after/before'])>: Returns an operation that
-     lives on the edge between C<op1> and C<op2>.  If the third parameter is
-     false, C<'before'>, or omitted, the new operation will be the first
-     operation on that edge.  If the third parameter is true or C<'after'>,
-     the new operation will be the last operation on that edge.  Any number
-     of operations can be injected on any edge.
+=over 4
+
+=item - C<< DAG::inject(<op1>,<op2>[, after/before]) >>
+
+Returns an operation that
+lives on the edge between C<op1> and C<op2>.  If the third parameter is
+false, C<'before'>, or omitted, the new operation will be the first
+operation on that edge.  If the third parameter is true or C<'after'>,
+the new operation will be the last operation on that edge.  Any number
+of operations can be injected on any edge.
+
+=back
 
 =cut
 

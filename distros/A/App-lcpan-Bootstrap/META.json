@@ -28,6 +28,11 @@
             "Test::Pod::Coverage" : "1.08"
          }
       },
+      "runtime" : {
+         "requires" : {
+            "App::lcpan" : "1.057"
+         }
+      },
       "test" : {
          "requires" : {
             "File::Spec" : "0",
@@ -49,7 +54,7 @@
          "web" : "https://github.com/perlancar/perl-App-lcpan-Bootstrap"
       }
    },
-   "version" : "20200419.0.0",
+   "version" : "20200508.0.0",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 610;
+use Test::More tests => 941;
 #use Test::More 'no_plan';
 
 use FindBin qw($Bin);
@@ -29,7 +29,6 @@ can_ok $CLASS, qw(
 # Try the basics.
 isa_ok my $version = $CLASS->new('0.1.0'), $CLASS, 'An instance';
 isa_ok $SemVer::VERSION, $CLASS, q{SemVer's own $VERSION};
-my $is_vpp = !!grep { $_ eq 'version::vpp' } @version::ISA;
 
 for my $v (qw(
     1.2.2
@@ -45,19 +44,16 @@ for my $v (qw(
     v1.2.2
     999993333.0.0
 )) {
-    isa_ok my $semver =$CLASS->new($v), $CLASS, "new($v)";
+    isa_ok my $semver = $CLASS->new($v), $CLASS, "new($v)";
     my $str = $v =~ /^v/ ? substr $v, 1 : $v;
     is "$semver", $str, qq{$v should stringify to "$str"};
     $str =~ s/(\d)([a-z].+)$/$1-$2/;
     is $semver->normal, $str, qq{$v should normalize to "$str"};
 
-    SKIP: {
-        skip 'Boolean comparison broken with version::vpp', 1, $is_vpp;
-        if ($v =~ /0\.0\.0/) {
-            ok !$semver, "$v should be false";
-        } else {
-            ok !!$semver, "$v should be true";
-        }
+    if ($v =~ /0\.0\.0/) {
+        ok !$semver, "$v should be false";
+    } else {
+        ok !!$semver, "$v should be true";
     }
 
     ok $semver->is_qv, "$v should be dotted-decimal";
@@ -146,6 +142,63 @@ for my $spec (
     cmp_ok $l, 'ge', $r, "$l ge $r";
 }
 
+# Test equivalents with declare()
+for my $spec (
+    [ '1.2.0',                '1.2' ],
+    [ '0.0.0',                '0' ],
+    [ '1.4_0',                '1.4' ],
+    [ '1.08',                 '1.8' ],
+    [ 1.02_30,                '1.23.0' ],
+    [ '1.02_30',              '1.23.0' ],
+    [ '999.888.7777-alpha.3', '999.888.7777-alpha.3' ],
+    [ '0.1.2-beta3',          '0.1.2-beta3' ],
+    [ '1.0.0-rc-1',           '1.0.0-RC-1' ],
+) {
+    my $l = $CLASS->declare($spec->[0]);
+    my $r = $CLASS->declare($spec->[1]);
+    is $l->vcmp($r), 0, "declare $l->vcmp($r) == 0";
+    is $l <=> $r, 0, "declare $l <=> $r == 0";
+    is $r <=> $l, 0, "declare $r <=> $l == 0";
+    cmp_ok $l, '==', $r, "declare $l == $r";
+    cmp_ok $l, '==', $r, "declare $l == $r";
+    cmp_ok $l, '<=', $r, "declare $l <= $r";
+    cmp_ok $l, '>=', $r, "declare $l >= $r";
+    is $l cmp $r, 0, "declare $l cmp $r == 0";
+    is $r cmp $l, 0, "declare $r cmp $l == 0";
+    cmp_ok $l, 'eq', $r, "declare $l eq $r";
+    cmp_ok $l, 'eq', $r, "declare $l eq $r";
+    cmp_ok $l, 'le', $r, "declare $l le $r";
+    cmp_ok $l, 'ge', $r, "declare $l ge $r";
+}
+
+# Test equivalents with parse()
+for my $spec (
+    [ '1.02.0',               '1.2.0' ],
+    [ '0.0.0',                '0' ],
+    [ '1.4_0',                '1.4' ],
+    [ 1.02_30,                '1.23.0' ],
+    [ '1.02_30',              '1.23.0' ],
+    [ '999.888.7777-alpha.3', '999.888.7777-alpha.3' ],
+    [ '0.1.2-beta3',          '0.1.2-beta3' ],
+    [ '1.0.0-rc-1',           '1.0.0-RC-1' ],
+) {
+    my $l = $CLASS->parse($spec->[0]);
+    my $r = $CLASS->parse($spec->[1]);
+    is $l->vcmp($r), 0, "parse $l->vcmp($r) == 0";
+    is $l <=> $r, 0, "parse $l <=> $r == 0";
+    is $r <=> $l, 0, "parse $r <=> $l == 0";
+    cmp_ok $l, '==', $r, "parse $l == $r";
+    cmp_ok $l, '==', $r, "parse $l == $r";
+    cmp_ok $l, '<=', $r, "parse $l <= $r";
+    cmp_ok $l, '>=', $r, "parse $l >= $r";
+    is $l cmp $r, 0, "parse $l cmp $r == 0";
+    is $r cmp $l, 0, "parse $r cmp $l == 0";
+    cmp_ok $l, 'eq', $r, "parse $l eq $r";
+    cmp_ok $l, 'eq', $r, "parse $l eq $r";
+    cmp_ok $l, 'le', $r, "parse $l le $r";
+    cmp_ok $l, 'ge', $r, "parse $l ge $r";
+}
+
 # Test not equal.
 for my $spec (
     ['1.2.2',   '1.2.3'],
@@ -162,6 +215,44 @@ for my $spec (
     cmp_ok $l->vcmp($r), '!=', 0, "$l->vcmp($r) != 0";
     cmp_ok $l, '!=', $r, "$l != $r";
     cmp_ok $l, 'ne', $r, "$l ne $r";
+}
+
+# Test not equal with declare.
+for my $spec (
+    ['1.2.2',   '1.2.3'],
+    ['0.0.1',   '1.0.0'],
+    ['1.0.1',   '1.1.0'],
+    ['1.1.1',   '1.1.0'],
+    ['1.2.3-b', '1.2.3'],
+    ['1.2.3',   '1.2.3-b'],
+    ['1.2.3-a', '1.2.3-b'],
+    ['1.2_0',   '1.20' ],
+    ['1.2.3-aaaaaaa1', '1.2.3-aaaaaaa2'],
+) {
+    my $l = $CLASS->declare($spec->[0]);
+    my $r = $CLASS->declare($spec->[1]);
+    cmp_ok $l->vcmp($r), '!=', 0, "declare $l->vcmp($r) != 0";
+    cmp_ok $l, '!=', $r, "declare $l != $r";
+    cmp_ok $l, 'ne', $r, "declare $l ne $r";
+}
+
+# Test not equal with parse.
+for my $spec (
+    ['1.2.2',   '1.2.3'],
+    ['0.0.1',   '1.0.0'],
+    ['1.0.1',   '1.1.0'],
+    ['1.1.1',   '1.1.0'],
+    ['1.2.3-b', '1.2.3'],
+    ['1.2.3',   '1.2.3-b'],
+    ['1.2.3-a', '1.2.3-b'],
+    ['1.2_0',   '1.2.0' ],
+    ['1.2.3-aaaaaaa1', '1.2.3-aaaaaaa2'],
+) {
+    my $l = $CLASS->parse($spec->[0]);
+    my $r = $CLASS->parse($spec->[1]);
+    cmp_ok $l->vcmp($r), '!=', 0, "parse $l->vcmp($r) != 0";
+    cmp_ok $l, '!=', $r, "parse $l != $r";
+    cmp_ok $l, 'ne', $r, "parse $l ne $r";
 }
 
 # Test >, >=, <, and <=.
@@ -224,21 +315,27 @@ for my $v (qw(
     cmp_ok $v, 'eq', $semver, qq{"$v" eq $semver};
 }
 
+# Tweak tweak v prefix regex? Some versions of version:vpp do it differently.
+my $vq = qr/^\d+[.][^.]+$/;
+if ($CLASS->declare('0')->stringify eq 'v0') {
+    $vq = qr/^\d+([.]?[^.]+)?$/;
+}
+
 # Test declare() and parse.
 for my $spec (
     ['1.2.2',          '1.2.2'],
     ['01.2.2',         '1.2.2'],
     ['1.02.2',         '1.2.2'],
     ['1.2.02',         '1.2.2'],
-#    ['1.2.02b',        '1.2.2-b'],
-#    ['1.2.02beta-3  ', '1.2.2-beta-3'],
-#    ['1.02.02rc1',     '1.2.2-rc1'],
+    ['1.2.02-b',       '1.2.2-b'],
+    ['1.2.02-beta-3 ', '1.2.2-beta-3'],
+    ['1.02.02-rc1',    '1.2.2-rc1'],
     ['1.0',            '1.0.0'],
     ['1.1',            '1.1.0',   '1.100.0'],
     [ 1.1,             '1.1.0',   '1.100.0'],
-#    ['1.1b1',          '1.1.0-b1', '1.100.0-b1'],
-#    ['1b',             '1.0.0-b'],
-#    ['9.0beta4',       '9.0.0-beta4'],
+    ['1.1-b1',         '1.1.0-b1', '1.100.0-b1'],
+    ['1-b',            '1.0.0-b'],
+    ['9.0-beta4',      '9.0.0-beta4'],
     ['  012.2.2',      '12.2.2'],
     ['99999998',       '99999998.0.0'],
     ['1.02_30',        '1.23.0'],
@@ -251,7 +348,7 @@ for my $spec (
     ['9',              '9.0.0' ],
     ['0',              '0.0.0' ],
     [0,                '0.0.0' ],
-#    ['0rc1',           '0.0.0-rc1' ],
+    ['0-rc1',          '0.0.0-rc1' ],
 ) { SKIP: {
         skip 'Two-integer vstrings weak on Perl 5.8', 12
             if $no_2digitvst && Scalar::Util::isvstring($spec->[0]);
@@ -262,11 +359,8 @@ for my $spec (
     $string =~ s/^\s+//;
     $string =~ s/\s+$//;
     $string += 0 if $string =~ s/_//g;
-    my $vstring = $string =~ /^\d+[.][^.]+$/ ? "v$string" : $string;
-    SKIP: {
-        skip 'Stringification broken with version::vpp', 1, $is_vpp;
-        is $l->stringify, $vstring, qq{... And it should stringify to "$vstring"};
-    }
+    my $vstring = $string =~ $vq ? "v$string" : $string;
+    is $l->stringify, $vstring, qq{... And it should stringify to "$vstring"};
     is $l->normal, $spec->[1],  qq{... And it should normalize to "$spec->[1]"};
 
     # Compare the non-semantic version string to the semantic one.

@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -39,22 +39,22 @@
    "provides" : {
       "SemVer" : {
          "file" : "lib/SemVer.pm",
-         "version" : "v0.7.0"
+         "version" : "v0.10.0"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/theory/semver/issues/"
+         "web" : "https://github.com/theory/semver/issues/"
       },
-      "homepage" : "http://search.cpan.org/dist/SemVer/",
+      "homepage" : "https://metacpan.org/release/SemVer",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "http://github.com/theory/semver"
+         "url" : "https://github.com/theory/semver"
       }
    },
-   "version" : "v0.7.0",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "v0.10.0",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

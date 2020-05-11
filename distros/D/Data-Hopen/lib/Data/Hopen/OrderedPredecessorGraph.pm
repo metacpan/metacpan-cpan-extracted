@@ -3,7 +3,7 @@ package Data::Hopen::OrderedPredecessorGraph;
 use strict;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000015';
+our $VERSION = '0.000017';
 
 use parent 'Graph';
 
@@ -41,7 +41,8 @@ the predecessors in random order.
 # Internals
 
 use constant _EDGE_ID => (__PACKAGE__ . '_edge_id');    # attribute name
-my $_edge_id = 0;   # unique ID for each edge added
+my $_edge_id = 0;   # unique ID for each edge added.
+                    # INTERNAL PRECONDITION: real edge IDs are > 0.
 
 =head1 FUNCTIONS
 
@@ -74,6 +75,10 @@ stable order.
 sub ordered_predecessors {
     croak 'Need instance, vertex' unless @_ == 2;
     my ($self, $to) = @_;
+    die 'Multiedged graphs are not yet supported' if $self->multiedged;
+        # TODO use get_multiedge_ids to get the edge IDs, then get the
+        # attributes for each edge, then sort.
+
     my @p = $self->predecessors($to);
     return sort {
         ( $self->get_edge_attribute($a, $to, _EDGE_ID) // 0 )
@@ -86,6 +91,7 @@ sub ordered_predecessors {
 
 Add a multiedge.  Exactly as L<Graph/add_edge_by_id> except that it also
 creates the new edge attribute to hold the order.  Returns the graph.
+Can only be used on a multiedged graph.
 
 =cut
 
@@ -101,7 +107,7 @@ sub add_edge_by_id {
 
 Add a multiedge.  Exactly as L<Graph/add_edge_get_id> except that it also
 creates the new edge attribute to hold the order.  Returns the ID of the
-new edge.
+new edge.  Can only be used on a multiedged graph.
 
 =cut
 

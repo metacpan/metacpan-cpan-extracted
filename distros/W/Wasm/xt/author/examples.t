@@ -5,17 +5,7 @@ use File::Glob qw( bsd_glob );
 
 skip_all 'not tested with ciperl:static' if defined $ENV{CIPSTATIC} && $ENV{CIPSTATIC} eq 'true';
 
-foreach my $example (bsd_glob 'examples/*.pl')
-{
-  my $out = '';
-  my $err = '';
-  script_compiles $example;
-  script_runs $example, { stdout => \$out, stderr => \$err };
-  note "[out]\n$out" if $out ne '';
-  note "[err]\n$err" if $err ne '';
-}
-
-foreach my $example (bsd_glob 'examples/synopsis/*.pl')
+foreach my $example (map { bsd_glob "examples/$_/*.pl" } qw( synopsis wasmtime wasm ))
 {
   my $out = '';
   my $err = '';

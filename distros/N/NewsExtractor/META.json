@@ -4,7 +4,7 @@
       "Kang-min Liu <gugod@gugod.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.027",
+   "generated_by" : "App::ModuleBuildTiny version 0.026",
    "license" : [
       "unrestricted"
    ],
@@ -21,7 +21,7 @@
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.027"
+            "App::ModuleBuildTiny" : "0.026"
          }
       },
       "runtime" : {
@@ -45,7 +45,7 @@
    "provides" : {
       "NewsExtractor" : {
          "file" : "lib/NewsExtractor.pm",
-         "version" : "v0.20.0"
+         "version" : "v0.22.0"
       },
       "NewsExtractor::Article" : {
          "file" : "lib/NewsExtractor/Article.pm"
@@ -169,8 +169,8 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.20.0",
-   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "version" : "v0.22.0",
+   "x_serialization_backend" : "JSON::PP version 4.02",
    "x_spdx_expression" : "CC0-1.0",
    "x_static_install" : "1"
 }

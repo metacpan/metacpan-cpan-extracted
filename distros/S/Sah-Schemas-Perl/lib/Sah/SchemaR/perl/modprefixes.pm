@@ -1,12 +1,12 @@
 package Sah::SchemaR::perl::modprefixes;
 
-our $DATE = '2020-02-15'; # DATE
-our $VERSION = '0.027'; # VERSION
+our $DATE = '2020-05-08'; # DATE
+our $VERSION = '0.031'; # VERSION
 
-our $rschema = ["array",[{description=>"\nArray of Perl module prefixes, where each element is of `perl::modprefix`\nschema, e.g. `Foo::`, `Foo::Bar::`.\n\nContains coercion rule that expands wildcard, so you can specify:\n\n    Module::C*\n\nand it will be expanded to e.g.:\n\n    [\"Module::CPANTS::\", \"Module::CPANfile::\", \"Module::CheckVersion::\", \"Module::CoreList::\"]\n\nThe wildcard syntax supports jokers (`?`, '*`) and brackets (`[abc]`). See the\n`unix` type of wildcard in <pm:Regexp::Wildcards>, which this coercion rule\nuses.\n\n",of=>["perl::modprefix",{req=>1},{}],summary=>"Perl module prefixes","x.element_completion"=>"perl_modprefix","x.perl.coerce_rules"=>["From_str_or_array::expand_perl_modprefix_wildcard"]}],["array"]];
+our $rschema = ["array",[{description=>"\nArray of Perl module prefixes, where each element is of `perl::modprefix`\nschema, e.g. `Foo::`, `Foo::Bar::`.\n\nContains coercion rule that expands wildcard, so you can specify:\n\n    Module::C*\n\nand it will be expanded to e.g.:\n\n    [\"Module::CPANTS::\", \"Module::CPANfile::\", \"Module::CheckVersion::\", \"Module::CoreList::\"]\n\nThe wildcard syntax supports jokers (`?`, '*`) and brackets (`[abc]`). See the\n`unix` type of wildcard in <pm:Regexp::Wildcards>, which this coercion rule\nuses.\n\n",of=>["perl::modprefix",{req=>1},{}],summary=>"Perl module prefixes, e.g. [\"\", \"Foo::\", \"Foo::Bar::\"]","x.element_completion"=>"perl_modprefix","x.perl.coerce_rules"=>["From_str_or_array::expand_perl_modprefix_wildcard"]}],["array"]];
 
 1;
-# ABSTRACT: Perl module prefixes
+# ABSTRACT: Perl module prefixes, e.g. ["", "Foo::", "Foo::Bar::"]
 
 __END__
 
@@ -16,11 +16,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::perl::modprefixes - Perl module prefixes
+Sah::SchemaR::perl::modprefixes - Perl module prefixes, e.g. ["", "Foo::", "Foo::Bar::"]
 
 =head1 VERSION
 
-This document describes version 0.027 of Sah::SchemaR::perl::modprefixes (from Perl distribution Sah-Schemas-Perl), released on 2020-02-15.
+This document describes version 0.031 of Sah::SchemaR::perl::modprefixes (from Perl distribution Sah-Schemas-Perl), released on 2020-05-08.
 
 =head1 DESCRIPTION
 

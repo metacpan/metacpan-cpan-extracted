@@ -6,19 +6,21 @@ use warnings;
 
 use Test::More;
 
-plan tests => 13 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 15 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Sah/Schema/sah/array_schema.pm',
     'Sah/Schema/sah/clause_set.pm',
     'Sah/Schema/sah/extras.pm',
     'Sah/Schema/sah/schema.pm',
+    'Sah/Schema/sah/schema_modname.pm',
     'Sah/Schema/sah/str_schema.pm',
     'Sah/Schema/sah/type_name.pm',
     'Sah/SchemaR/sah/array_schema.pm',
     'Sah/SchemaR/sah/clause_set.pm',
     'Sah/SchemaR/sah/extras.pm',
     'Sah/SchemaR/sah/schema.pm',
+    'Sah/SchemaR/sah/schema_modname.pm',
     'Sah/SchemaR/sah/str_schema.pm',
     'Sah/SchemaR/sah/type_name.pm',
     'Sah/Schemas/Sah.pm'

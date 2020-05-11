@@ -26,7 +26,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=PERLANCAR-Sort-Sub
   homepage: https://metacpan.org/release/PERLANCAR-Sort-Sub
   repository: git://github.com/perlancar/perl-PERLANCAR-Sort-Sub.git
-version: '0.080'
+version: '0.081'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use utf8;
 
 use Test::More;
 
@@ -43,6 +44,20 @@ MCE::Shared->start() unless $INC{'IO/FDPass.pm'};
 
 ###############################################################################
 
+## https://sacred-texts.com/cla/usappho/sph02.htm (VI)
+
+my $sappho_text =
+  "καὶ γάρ αἰ φεύγει, ταχέωσ διώξει,
+   αἰ δὲ δῶρα μὴ δέκετ ἀλλά δώσει,
+   αἰ δὲ μὴ φίλει ταχέωσ φιλήσει,
+   κωὐκ ἐθέλοισα." . "Ǣ";
+
+my $translation =
+  "For if now she flees, quickly she shall follow
+   And if she spurns gifts, soon shall she offer them
+   Yea, if she knows not love, soon shall she feel it
+   Even reluctant.";
+
 sub check_clear {
    my ($description) = @_;
    is( $q->_get_aref(5), undef, $description );
@@ -61,6 +76,16 @@ sub check_insertp {
 sub check_pending {
    my ($description, $pending) = @_;
    is( $pending, 14, $description );
+}
+
+sub check_unicode_in {
+   my ($description) = @_;
+   is( join('', @{ $q->_get_aref(5) }), $sappho_text, $description );
+}
+
+sub check_unicode_out {
+   my ($description, $value) = @_;
+   is( $value, $sappho_text, $description );
 }
 
 sub check {
@@ -125,6 +150,16 @@ mce_flow sub {
    $w = MCE->do('check', 'fifo, check peekp at index -15', undef, $q->peekp(5, -15));
    $w = MCE->do('check', 'fifo, check peekp at index -20', undef, $q->peekp(5, -20));
 
+   $q->clear;
+
+   $q->enqueuep(5, $sappho_text);
+   $w = MCE->do('check_unicode_in',  'fifo, check unicode enqueuep');
+   $w = MCE->do('check_unicode_out', 'fifo, check unicode dequeue', $q->dequeue);
+
+   $q->insertp(5, 0, $sappho_text);
+   $w = MCE->do('check_unicode_out', 'fifo, check unicode peekp', $q->peekp(5, 0));
+   $w = MCE->do('check_unicode_out', 'fifo, check unicode insertp', $q->dequeue_nb);
+
    return;
 };
 
@@ -186,6 +221,16 @@ mce_flow sub {
    $w = MCE->do('check', 'lifo, check peekp at index -14',   'n', $q->peekp(5, -14));
    $w = MCE->do('check', 'lifo, check peekp at index -15', undef, $q->peekp(5, -15));
    $w = MCE->do('check', 'lifo, check peekp at index -20', undef, $q->peekp(5, -20));
+
+   $q->clear;
+
+   $q->enqueuep(5, $sappho_text);
+   $w = MCE->do('check_unicode_in',  'lifo, check unicode enqueuep');
+   $w = MCE->do('check_unicode_out', 'lifo, check unicode dequeue', $q->dequeue);
+
+   $q->insertp(5, 0, $sappho_text);
+   $w = MCE->do('check_unicode_out', 'lifo, check unicode peekp', $q->peekp(5, 0));
+   $w = MCE->do('check_unicode_out', 'lifo, check unicode insertp', $q->dequeue_nb);
 
    return;
 };

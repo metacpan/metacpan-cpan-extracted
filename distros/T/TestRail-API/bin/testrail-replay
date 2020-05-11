@@ -1,0 +1,214 @@
+#!/usr/bin/perl
+# ABSTRACT: List runs in a TestRail project matching the provided filters
+# PODNAME: TestRail::Bin::Replay
+
+package TestRail::Bin::Replay;
+$TestRail::Bin::Replay::VERSION = '0.046';
+use strict;
+use warnings;
+
+use TestRail::API;
+use TestRail::Utils;
+use TestRail::Utils::Find;
+
+use Getopt::Long qw{GetOptionsFromArray};
+use File::HomeDir qw{my_home};
+
+if ( !caller() ) {
+    my ( $out, $code ) = run( 'args' => \@ARGV );
+    print $out;
+    exit $code;
+}
+
+sub run {
+    my %params = @_;
+    my $opts   = {};
+
+    # Parse config file
+    my $homedir = my_home() || '.';
+    if ( -e $homedir . '/.testrailrc' ) {
+        $opts = TestRail::Utils::parseConfig($homedir);
+    }
+
+    GetOptionsFromArray(
+        $params{'args'},
+        'apiurl=s'     => \$opts->{'apiurl'},
+        'password=s'   => \$opts->{'password'},
+        'user=s'       => \$opts->{'user'},
+        'j|project=s'  => \$opts->{'project'},
+        'e|encoding=s' => \$opts->{'encoding'},
+        'p|plan'       => \$opts->{'plan'},
+        'v|verbose'    => \$opts->{'verbose'},
+        'w|watch'      => \$opts->{'watch'},
+        'h|help'       => \$opts->{'help'},
+    );
+
+    if ( $opts->{help} ) { return ( '', TestRail::Utils::help() ); }
+
+    $opts->{'browser'} = $params{'browser'};
+    TestRail::Utils::interrogateUser( $opts, qw{apiurl user password project} );
+
+    my $tr      = TestRail::Utils::getHandle($opts);
+    my $project = $tr->getProjectByName( $opts->{'project'} );
+    return ( "No such project '$opts->{project}'", 2 ) unless $project;
+
+    my $subject = $ARGV[0];
+    my ( $runs, $plan );
+
+    if ( $opts->{'plan'} ) {
+        $plan = $tr->getPlanByName( $project->{'id'}, $subject );
+        $runs = $tr->getChildRuns($plan) if $plan;
+    }
+    else {
+        my $run = $tr->getRunByName( $project->{'id'}, $subject );
+        push( @$runs, $run ) if $run;
+    }
+
+    return ( "No runs found matching your criterion.\n", 1 )
+      unless ref $runs eq 'ARRAY' && @$runs;
+
+    my @tests;
+    foreach my $run (@$runs) {
+        my $tests = $tr->getTests( $run->{id} );
+        @$tests = map { $_->{config} = $run->{config}; $_ } @$tests;
+        push( @tests, @{$tests} ) if ref $tests eq 'ARRAY' && @$tests;
+    }
+
+    #TODO get status ids for untested/retest, check em
+    my @retry_status_ids = $tr->statusNamesToIds(qw{untested retest});
+    my @bad_status_ids   = $tr->statusNamesToIds(qw{failed todo_pass});
+
+    my $rc = 0;
+    while ( my $test = shift @tests ) {
+        my $results = $tr->getTestResults( $test->{id}, 1 );
+        if ( !( ref $results eq 'ARRAY' ) || !@$results ) {
+            push( @tests, $test ) if $opts->{watch};
+            next;
+        }
+        my $result = $results->[0];
+        next unless ref $result eq 'HASH';
+        if ( !grep { $result->{status_id} eq $_ } @retry_status_ids ) {
+            print $result->{comment} . "\n" if $opts->{verbose};
+            my $line = $test->{title};
+            $line .= " ($test->{config})" if $test->{config};
+            $line .= " ...";
+            if ( grep { $result->{status_id} eq $_ } @bad_status_ids ) {
+                $rc = 3;
+                $line .= ' not';
+            }
+            print "# $opts->{apiurl}/index.php?/tests/view/$test->{id}\n";
+            print "$line ok\n";
+            next;
+        }
+        push( @tests, $test ) if $opts->{watch};
+
+        # If we have to wait, back off a little to not slam the server
+        sleep 1;
+    }
+
+    return ( "Done", $rc );
+}
+
+1;
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+TestRail::Bin::Replay - List runs in a TestRail project matching the provided filters
+
+=head1 VERSION
+
+version 0.046
+
+=head1 SYNOPSIS
+
+  testrail-replay [OPTIONS] NAME
+
+  require `which testrail-runs`;
+  TestRail::Bin::Replay::run('args' => \@args);
+
+=head1 DESCRIPTION
+
+testrail-replay - Re-play the results of a test run or plan as though executed by prove.
+Optionally wait for results to come in.
+
+Can be used as the modulino TestRail::Bin::Replay.
+Has a single 'run' function which accepts a hash with the 'args' parameter being the array of arguments.
+
+=head1 PARAMETERS:
+
+=head2 MANDATORY PARAMETERS
+
+=over 4
+
+--apiurl     : full URL to get to TestRail index document
+
+--password   : Your TestRail Password, or a valid API key (TestRail 4.2 and above).
+
+--user       : Your TestRail User Name.
+
+-j --project : desired project name.
+
+=back
+
+All mandatory options not passed with the above switches, or in your ~/.testrailrc will be prompted for.
+
+=head2 OPTIONAL PARAMETERS
+
+=over 4
+
+-p --plan     : Instead of a run to look for, look for a plan with the provided NAME.
+
+-e --encoding : Character encoding of arguments.  Defaults to UTF-8. See L<Encode::Supported> for supported encodings.
+
+-v --verbose  : Print full test output rather than summaries with links to the testrail result.
+
+-w --watch    : Watch tests until all report results other than untested or re-test.
+
+=back
+
+=head1 CONFIGURATION FILE
+
+In your \$HOME, (or the current directory, if your system has no concept of a home directory) put a file called .testrailrc with key=value syntax separated by newlines.
+Valid Keys are the same as documented by L<App::Prove::Plugin::TestRail>.
+All options specified thereby are overridden by passing the command-line switches above.
+
+=head1 MISCELLANEOUS OPTIONS:
+
+=over 4
+
+--help : show this output
+
+=back
+
+=head1 SPECIAL THANKS
+
+Thanks to cPanel Inc, for graciously funding the creation of this distribution.
+
+=head1 AUTHOR
+
+George S. Baugh <teodesian@cpan.org>
+
+=head1 SOURCE
+
+The development version is on github at L<https://github.com/teodesian/TestRail-Perl>
+and may be cloned from L<git://github.com/teodesian/TestRail-Perl.git>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by George S. Baugh.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+__END__
+
+L<TestRail::API>
+
+L<File::HomeDir> for the finding of .testrailrc
+

@@ -6,7 +6,7 @@ use 5.008001;
 use base qw( Alien::Base );
 
 # ABSTRACT: Find or download and install libuuid
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 
@@ -29,7 +29,7 @@ Alien::libuuid - Find or download and install libuuid
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -87,7 +87,11 @@ L<Alien>, L<Alien::Base>, L<Alien::Build::Manual::AlienUser>
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Thibault Duponchelle (tib)
 
 =head1 COPYRIGHT AND LICENSE
 

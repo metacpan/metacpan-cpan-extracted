@@ -1,3 +1,14 @@
+0.33.1 2020-05-08 22:35:47 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix merge issue
+
+0.33.0 2020-05-08 22:31:28 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - Add a new property reloadOnFormReset to form items.
+   If set to true, it makes the form field reload its value when "a triggerFormReset => true happens".
+   If set to false, no update happens.
+   If reloadOnFormReset is not set, the old behavior applies. (contrib by @maettu)
+
 0.32.6 2020-04-28 11:33:40 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - make js source compatible with qx 5 compiler

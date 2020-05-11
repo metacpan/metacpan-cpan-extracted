@@ -1,5 +1,12 @@
 Revision history for Plack-Middleware-Statsd
 
+v0.4.5    2020-05-11 18:29:17+01:00 Europe/London
+  [Documentation]
+  - Updated section on the psgi.worker.pid metric.
+
+  [Other]
+  - Stop removing strict and warnings from prerequisites.
+
 v0.4.4    2020-04-30 14:04:10+01:00 Europe/London
   [Documentation]
   - Added example with Plack::Middleware::SizeLimit.

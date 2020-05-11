@@ -1,5 +1,5 @@
 package App::Notifier::Client;
-$App::Notifier::Client::VERSION = '0.0302';
+$App::Notifier::Client::VERSION = '0.0400';
 use strict;
 use warnings;
 
@@ -63,7 +63,7 @@ App::Notifier::Client
 
 =head1 VERSION
 
-version 0.0302
+version 0.0400
 
 =head1 SYNOPSIS
 

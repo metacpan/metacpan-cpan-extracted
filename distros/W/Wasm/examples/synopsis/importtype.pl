@@ -8,8 +8,8 @@ my $module = Wasm::Wasmtime::Module->new( wat => q{
   )
 });
 
-my($hello) = $module->imports;
+my $hello = $module->imports->[0];
 
 print $hello->module, "\n";     # xx
 print $hello->name, "\n";       # hello
-print $hello->type->kind, "\n"; # func
+print $hello->type->kind, "\n"; # functype

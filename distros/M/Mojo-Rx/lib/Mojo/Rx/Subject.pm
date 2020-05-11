@@ -7,7 +7,7 @@ use base 'Mojo::Rx::Observable';
 use Mojo::Rx 'rx_observable';
 use Mojo::Rx::Utils 'get_subscription_from_subscriber';
 
-our $VERSION = "v0.12.0";
+our $VERSION = "v0.12.1";
 
 sub new {
     my ($class) = @_;

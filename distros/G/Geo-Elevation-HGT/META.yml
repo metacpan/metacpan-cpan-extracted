@@ -1,7 +1,7 @@
 ---
 abstract: 'Elevation service with terrain data provided by L<Mapzen and Amazon AWS S3|https://registry.opendata.aws/terrain-tiles/>'
 author:
-  - 'Ulrich Buck <ulibuck@web.de>'
+  - 'Ulrich Buck <ulibuck@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
@@ -23,8 +23,8 @@ requires:
   File::Find: '0'
   HTTP::Tiny: '0'
   IO::Uncompress::AnyUncompress: '0'
-  List::Util: '0'
+  List::Util: '1.33'
   POSIX: '0'
   perl: '5.010'
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

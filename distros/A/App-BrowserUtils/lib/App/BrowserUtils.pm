@@ -1,9 +1,9 @@
 package App::BrowserUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-11'; # DATE
+our $DATE = '2020-05-07'; # DATE
 our $DIST = 'App-BrowserUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -37,7 +37,7 @@ our %argopt_users = (
         'x.name.is_plural' => 1,
         'x.name.singular' => 'user',
         summary => 'Kill browser processes that belong to certain user(s) only',
-        schema => ['array*', of=>'unix::local_uid*'],
+        schema => ['array*', of=>'unix::local_uid*', 'x.perl.coerce_rules' => ['From_str::comma_sep']],
     },
 );
 
@@ -58,7 +58,7 @@ A modern browser now runs complex web pages and applications. Despite browser's
 power management feature, these pages/tabs on the browser often still eat
 considerable CPU cycles even though they only run in the background. Stopping
 (kill -STOP) the browser processes is a simple and effective way to stop CPU
-eating on Unix. It can be performed whenever you are not using your browsers for
+eating on Unix. It can be performed whenever you are not using your browser for
 a little while, e.g. when you are typing on an editor or watching a movie. When
 you want to use your browser again, simply unpause it.
 
@@ -99,7 +99,7 @@ sub _do_browser {
     } elsif ($which_action eq 'terminate') {
         kill KILL => @pids;
         [200, "OK", "", {"func.pids" => \@pids}];
-    } elsif ($which_action eq 'is_paused') {
+    } elsif ($which_action eq 'is_paused' || $which_action eq 'is_running') {
         my $num_stopped = 0;
         my $num_unstopped = 0;
         my $num_total = 0;
@@ -107,15 +107,26 @@ sub _do_browser {
             $num_total++;
             if ($proc->{state} eq 'stop') { $num_stopped++ } else { $num_unstopped++ }
         }
-        my $is_paused = $num_total == 0 ? undef : $num_stopped == $num_total ? 1 : 0;
-        my $msg = $num_total == 0 ? "There are no $which_browser processes" :
-            $num_stopped   == $num_total ? "$which_browser is paused (all processes are in stop state)" :
-            $num_unstopped == $num_total ? "$which_browser is NOT paused (all processes are not in stop state)" :
-            "$which_browser is NOT paused (some processes are not in stop state)";
-        return [200, "OK", $is_paused, {
-            'cmdline.exit_code' => $is_paused ? 0:1,
-            'cmdline.result' => $args{quiet} ? '' : $msg,
-        }];
+        if ($which_action eq 'is_paused') {
+            my $is_paused  = $num_total == 0 ? undef : $num_stopped == $num_total ? 1 : 0;
+            my $msg = $num_total == 0 ? "There are NO $which_browser processes" :
+                $num_stopped   == $num_total ? "$which_browser is paused (all processes are in stop state)" :
+                $num_unstopped == $num_total ? "$which_browser is NOT paused (all processes are not in stop state)" :
+                "$which_browser is NOT paused (some processes are not in stop state)";
+            return [200, "OK", $is_paused, {
+                'cmdline.exit_code' => $is_paused ? 0:1,
+                'cmdline.result' => $args{quiet} ? '' : $msg,
+            }];
+        } else {
+            my $is_running = $num_total == 0 ? undef : $num_unstopped > 0 ? 1 : 0;
+            my $msg = $num_total == 0 ? "There are NO $which_browser processes" :
+                $num_unstopped > 0 ? "$which_browser is running (some processes are not in stop state)" :
+                "$which_browser exists but is NOT running (all processes are in stop state)";
+            return [200, "OK", $is_running, {
+                'cmdline.exit_code' => $is_running ? 0:1,
+                'cmdline.result' => $args{quiet} ? '' : $msg,
+            }];
+        }
     } else {
         die "BUG: unknown command";
     }
@@ -212,7 +223,7 @@ sub browsers_are_paused {
 
 $SPEC{terminate_browsers} = {
     v => 1.1,
-    summary => "Terminate  (kill -KILL) browsers",
+    summary => "Terminate (kill -KILL) browsers",
     args => {
         %args_common,
     },
@@ -244,7 +255,7 @@ App::BrowserUtils - Utilities related to browsers, particularly modern GUI ones
 
 =head1 VERSION
 
-This document describes version 0.004 of App::BrowserUtils (from Perl distribution App-BrowserUtils), released on 2020-04-11.
+This document describes version 0.006 of App::BrowserUtils (from Perl distribution App-BrowserUtils), released on 2020-05-07.
 
 =head1 SYNOPSIS
 
@@ -324,7 +335,7 @@ A modern browser now runs complex web pages and applications. Despite browser's
 power management feature, these pages/tabs on the browser often still eat
 considerable CPU cycles even though they only run in the background. Stopping
 (kill -STOP) the browser processes is a simple and effective way to stop CPU
-eating on Unix. It can be performed whenever you are not using your browsers for
+eating on Unix. It can be performed whenever you are not using your browser for
 a little while, e.g. when you are typing on an editor or watching a movie. When
 you want to use your browser again, simply unpause it.
 
@@ -394,7 +405,7 @@ Usage:
 
  terminate_browsers(%args) -> [status, msg, payload, meta]
 
-Terminate  (kill -KILL) browsers.
+Terminate (kill -KILL) browsers.
 
 This function is not exported.
 

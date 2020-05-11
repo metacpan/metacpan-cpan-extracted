@@ -13,6 +13,12 @@
       "version" : 2
    },
    "name" : "Wasm",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "examples"
+      ]
+   },
    "prereqs" : {
       "configure" : {
          "requires" : {
@@ -36,6 +42,7 @@
             "Test::CPAN::Changes" : "0",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
+            "Test::Memory::Cycle" : "0",
             "Test::More" : "0.98",
             "Test::NoTabs" : "0",
             "Test::Pod" : "0",
@@ -48,23 +55,28 @@
       },
       "runtime" : {
          "requires" : {
-            "Convert::Binary::C" : "0",
             "Devel::GlobalDestruction" : "0",
+            "FFI::C" : "0.05",
+            "FFI::C::StructDef" : "0",
+            "FFI::C::Util" : "0",
             "FFI::CheckLib" : "0.26",
-            "FFI::Platypus" : "1.00",
+            "FFI::Platypus" : "1.26",
             "FFI::Platypus::Buffer" : "0",
             "FFI::Platypus::Record" : "0",
             "FFI::Platypus::Type::PtrObject" : "0.02",
             "Path::Tiny" : "0",
             "Ref::Util" : "0",
             "Sub::Install" : "0",
+            "Test2::API" : "1.302015",
+            "Test2::Mock" : "0.000060",
             "perl" : "5.008001"
          }
       },
       "test" : {
          "requires" : {
-            "Test2::API" : "1.302015",
+            "Capture::Tiny" : "0",
             "Test2::V0" : "0.000060",
+            "YAML" : "0",
             "perl" : "5.008001"
          }
       }
@@ -79,10 +91,11 @@
          "type" : "git",
          "url" : "git://github.com/perlwasm/Wasm.git",
          "web" : "https://github.com/perlwasm/Wasm"
-      }
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.06",
-   "x_generated_by_perl" : "v5.31.10",
+   "version" : "0.09",
+   "x_generated_by_perl" : "v5.31.11",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0

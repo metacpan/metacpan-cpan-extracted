@@ -1,18 +1,47 @@
 package Alien::LibMagic;
-$Alien::LibMagic::VERSION = '0.002';
+$Alien::LibMagic::VERSION = '0.003';
 use strict;
 use warnings;
 
+use Path::Tiny;
 use parent 'Alien::Base';
 
+sub cflags {
+	my ($self) = @_;
+	my $top_include = File::Spec->catfile( File::Spec->rel2abs($self->dist_dir), qw(include) );
+	return "-I$top_include";
+}
+
+sub libs {
+	my ($self) = @_;
+	my $top_lib = File::Spec->catfile( File::Spec->rel2abs($self->dist_dir), qw(lib) );
+	my $la_file = path( File::Spec->catfile( $top_lib, 'libmagic.la' ) );
+	my ($deps) = $la_file->slurp_utf8 =~ /^dependency_libs=' (.*)'$/m;
+	return "-L$top_lib -lmagic $deps";
+}
+
 sub Inline {
-	return unless $_[-1] eq 'C'; # Inline's error message is good
-	my $self = __PACKAGE__->new;
-	+{
-		LIBS => $self->libs,
-		INC => $self->cflags,
-		AUTO_INCLUDE => '#include "magic.h"',
-	};
+	my ($self, $lang) = @_;
+
+	if( $lang eq 'C' ) {
+		my $params = Alien::Base::Inline(@_);
+		$params->{MYEXTLIB} .= ' ' .
+			join( " ",
+				map { File::Spec->catfile(
+					File::Spec->rel2abs($self->dist_dir),
+					'lib',  $_ ) }
+				qw(libmagic.a)
+			);
+		# Use static linking instead of dynamic linking on macOS.
+		if( $^O eq 'darwin' ) {
+			$params->{LIBS} =~ s/-lmagic//g;
+		}
+		return $params;
+	}
+}
+
+sub inline_auto_include {
+	return  [ 'magic.h' ];
 }
 
 1;
@@ -27,7 +56,7 @@ Alien::LibMagic - Alien package for the libmagic library
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 Inline support
 

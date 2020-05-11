@@ -1,5 +1,10 @@
 Revision history for Perl extension Mojo-Rx
 
+v0.12.1 2020-05-08T05:45:26Z
+
+    - fixed bug in rx_timer, where a timer's $id could get M::IOLoop->remove'd after its timer's expiry
+    - added public git repo
+
 v0.12.0 2020-05-05T20:53:48Z
 
     - original version

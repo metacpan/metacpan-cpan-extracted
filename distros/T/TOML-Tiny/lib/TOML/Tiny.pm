@@ -1,6 +1,6 @@
 package TOML::Tiny;
 # ABSTRACT: a minimal, pure perl TOML parser and serializer
-$TOML::Tiny::VERSION = '0.06';
+$TOML::Tiny::VERSION = '0.07';
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -76,7 +76,7 @@ TOML::Tiny - a minimal, pure perl TOML parser and serializer
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -159,6 +159,79 @@ Homogenous array strictures are enabled by passing C<strict_arrays>:
   # Croaks
   my $toml = to_toml({mixed => [1, 2, "three"]}, strict_arrays => 1);
 
+=head3 mapping perl to TOML types
+
+=head4 table
+
+=over
+
+=item C<HASH> ref
+
+=back
+
+=head4 array
+
+=over
+
+=item C<ARRAY> ref
+
+=back
+
+=head4 boolean
+
+=over
+
+=item C<\0> or C<\1>
+
+=item L<JSON::PP::Boolean>
+
+=item L<Types::Serializer::Boolean>
+
+=back
+
+=head4 numeric types
+
+These are tricky in perl. When encountering a C<Math::Big[Int|Float]>,
+that representation is used.
+
+If the value is a defined (non-ref) scalar with the C<SVf_IOK> or C<SVf_NOK>
+flags set, the value will be emitted unchanged. This is in line with most
+other packages, so the normal hinting hacks for typed output apply:
+
+  number => 0 + $number,
+  string => "" . $string,
+
+=over
+
+=item L<Math::BigInt>
+
+=item L<Math::BigFloat>
+
+=item numerical scalars
+
+=back
+
+=head4 datetime
+
+=over
+
+=item RFC3339-formatted string
+
+e.g., C<"1985-04-12T23:20:50.52Z">
+
+=item L<DateTime>
+
+L<DateTime>s are formatted as L<DateTime::Format::RFC3339>, as expected by
+C<TOML>. However, C<TOML> supports the concept of a "local" time zone, which
+strays from C<RFC3339> by allowing a datetime without a time zone offset. This
+is represented in perl by a C<DateTime> with a floating time zone.
+
+=back
+
+=head4 string
+
+All other non-ref scalars are treated as strings.
+
 =head1 OBJECT API
 
 =head2 new
@@ -175,8 +248,12 @@ a routine to intercept those as they are generated:
 
   my $parser = TOML::Tiny->new(
     inflate_datetime => sub{
-      my $dt_string = shift;
-      return DateTime::Format::RFC3339->parse_datetime($dt_string);
+      my ($dt_string) = @_;
+      # DateTime::Format::RFC3339 will set the resulting DateTime's formatter
+      # to itself. Fallback is the DateTime default, ISO8601, with a possibly
+      # floating time zone.
+      return eval{ DateTime::Format::RFC3339->parse_datetime($dt_string) }
+          || DateTime::Format::ISO8601->parse_datetime($dt_string);
     },
   );
 
@@ -215,7 +292,7 @@ which may be upgraded as needed by the caller.
 =item inflate_float
 
 TOML floats are 64 bit and may not match the size of the compiled perl's
-internal float type. By default, integers are left as-is as perl strings which
+internal float type. By default, floats are left as-is as perl strings which
 may be upgraded as needed by the caller.
 
   my $parser = TOML::Tiny->new(
@@ -305,6 +382,16 @@ Regexp scraps used by C<TOML::Tiny> to parse TOML source.
 Thanks to L<ZipRecruiter|https://www.ziprecruiter.com> for encouraging their
 employees to contribute back to the open source ecosystem. Without their
 dedication to quality software development this distribution would not exist.
+
+A big thank you to those who have contributed code or bug reports:
+
+=over
+
+=item L<ijackson|https://github.com/ijackson>
+
+=item L<noctux|https://github.com/noctux>
+
+=back
 
 =head1 AUTHOR
 

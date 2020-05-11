@@ -1,7 +1,7 @@
 package Sah::SchemaR::cryptoexchange::account;
 
-our $DATE = '2020-03-08'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2020-05-08'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 our $rschema = ["str",[{description=>"\nThe format of this data is \"<cryptoexchange>/<account>\" where \"<cryptoexchange>\"\nis the name of cryptoexchange (can be code, name or safename, but will be\nnormalized to its safename) and <account> is account nickname in the\ncryptoexchange and must match /\\A[A-Za-z0-9_-]+\\z/. The \"/<account>\" part is\noptional and will be assumed to be \"/default\" if not specified.\n\n",examples=>[{summary=>"Invalid account syntax",valid=>0,value=>"indodax/a b"},{summary=>"Account too long",valid=>0,value=>"indodax/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},{summary=>"Unknown cryptoexchange",valid=>0,value=>"foo/acc1"},{summary=>"Valid",valid=>1,validated_value=>"indodax/default",value=>"indodax"}],summary=>"Account at a cryptocurrency exchange","x.completion"=>"cryptoexchange_account","x.perl.coerce_rules"=>["From_str::normalize_cryptoexchange_account"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::cryptoexchange::account - Account at a cryptocurrency exchange
 
 =head1 VERSION
 
-This document describes version 0.009 of Sah::SchemaR::cryptoexchange::account (from Perl distribution Sah-Schemas-App-cryp), released on 2020-03-08.
+This document describes version 0.010 of Sah::SchemaR::cryptoexchange::account (from Perl distribution Sah-Schemas-App-cryp), released on 2020-05-08.
 
 =head1 DESCRIPTION
 

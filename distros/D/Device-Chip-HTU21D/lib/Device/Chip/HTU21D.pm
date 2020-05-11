@@ -1,17 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
 
-package Device::Chip::HTU21D;
+use 5.026;
+use Object::Pad 0.19;
 
-use strict;
-use warnings;
-use base qw( Device::Chip );
+class Device::Chip::HTU21D 0.05
+   extends Device::Chip;
 
 use Carp;
-
-our $VERSION = '0.04';
 
 use Data::Bitfield 0.02 qw( bitfield boolfield );
 use List::Util qw( first );
@@ -103,10 +101,8 @@ Writes updates to the user register.
 
 my @RES_VALUES = ( "12/14", "8/12", "10/13", "11/11" );
 
-async sub read_config
+async method read_config ()
 {
-   my $self = shift;
-
    my %config = unpack_REG_USER(
       await $self->protocol->write_then_read( pack( "C", CMD_READ_REG ), 1 )
    );
@@ -117,11 +113,8 @@ async sub read_config
    return \%config;
 }
 
-async sub change_config
+async method change_config ( %changes )
 {
-   my $self = shift;
-   my %changes = @_;
-
    my $config = await $self->read_config;
 
    $config->{$_} = $changes{$_} for keys %changes;
@@ -141,11 +134,8 @@ async sub change_config
    await $self->protocol->write( pack "C a", CMD_WRITE_REG, $val );
 }
 
-async sub _trigger_nohold
+async method _trigger_nohold ( $cmd )
 {
-   my $self = shift;
-   my ( $cmd ) = @_;
-
    my $protocol = $self->protocol;
 
    await $self->protocol->write( pack "C", $cmd );
@@ -175,10 +165,8 @@ Triggers a reading of the temperature sensor, returning a number in degrees C.
 
 =cut
 
-async sub read_temperature
+async method read_temperature ()
 {
-   my $self = shift;
-
    my $val = await $self->_trigger_nohold( CMD_TRIGGER_TEMP_NOHOLD );
 
    return -46.85 + 175.72 * ( $val / 2**16 );
@@ -192,10 +180,8 @@ Triggers a reading of the humidity sensor, returning a number in % RH.
 
 =cut
 
-async sub read_humidity
+async method read_humidity ()
 {
-   my $self = shift;
-
    my $val = await $self->_trigger_nohold( CMD_TRIGGER_HUMID_NOHOLD );
 
    return -6 + 125 * ( $val / 2**16 );

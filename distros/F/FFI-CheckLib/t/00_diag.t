@@ -14,7 +14,6 @@ $modules{$_} = $_ for qw(
   ExtUtils::MakeMaker
   FFI::Platypus
   Test2::API
-  Test2::Mock
   Test2::Require::EnvVar
   Test2::Require::Module
   Test2::V0

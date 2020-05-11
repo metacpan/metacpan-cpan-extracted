@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/PMUtils/pmunlink
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
+# and generated automatically using Perinci::CmdLine::Gen version 0.496
 
-our $DATE = '2020-01-31'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-10'; # DATE
 our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.730'; # VERSION
+our $VERSION = '0.733'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,13 +40,16 @@ pmunlink - Unlink (remove) locally installed Perl module
 
 =head1 VERSION
 
-This document describes version 0.730 of pmunlink (from Perl distribution App-PMUtils), released on 2020-01-31.
+This document describes version 0.733 of pmunlink (from Perl distribution App-PMUtils), released on 2020-05-10.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % pmunlink [options] <module> ...
+ % pmunlink [-a] [--all] [--debug] [--dry-run] [--format=name] [--json]
+     [--log-level=level] [--(no)naked-res] [--no-all] [--noall]
+     [--page-result[=program]] [--pm=s] [--pmc=s] [--pod=s] [--quiet]
+     [--trace] [--verbose] <module> ...
 
 =head1 OPTIONS
 
@@ -149,6 +153,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
 
 =back
 

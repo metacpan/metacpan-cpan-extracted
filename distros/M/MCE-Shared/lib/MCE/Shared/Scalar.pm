@@ -13,12 +13,11 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.864';
+our $VERSION = '1.868';
 
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
 use MCE::Shared::Base ();
-use bytes;
 
 use overload (
    q("")    => \&MCE::Shared::Base::_stringify,
@@ -101,7 +100,7 @@ MCE::Shared::Scalar - Scalar helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Scalar version 1.864
+This document describes MCE::Shared::Scalar version 1.868
 
 =head1 DESCRIPTION
 

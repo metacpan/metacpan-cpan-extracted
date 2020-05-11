@@ -2,27 +2,33 @@ package Wasm::Wasmtime::Global;
 
 use strict;
 use warnings;
+use base qw( Wasm::Wasmtime::Extern );
 use Ref::Util qw( is_ref );
 use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::Store;
 use Wasm::Wasmtime::GlobalType;
-use Wasm::Wasmtime::CBC qw( perl_to_wasm wasm_allocate wasm_to_perl );
+use constant is_global => 1;
+use constant kind => 'global';
 
 # ABSTRACT: Wasmtime global class
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 $ffi_prefix = 'wasm_global_';
 $ffi->load_custom_type('::PtrObject' => 'wasm_global_t' => __PACKAGE__);
 
 
-$ffi->attach( new => ['wasm_store_t', 'wasm_globaltype_t', 'string'] => 'wasm_global_t' => sub {
+$ffi->attach( new => ['wasm_store_t', 'wasm_globaltype_t', 'wasm_val_t'] => 'wasm_global_t' => sub {
   my $xsub = shift;
   my $class = shift;
   if(is_ref $_[0])
   {
     my($store, $globaltype, $value) = @_;
-    my $self = $xsub->($store, $globaltype, perl_to_wasm([$value], [$globaltype->content]));
+    $value = Wasm::Wasmtime::Val->new({
+      kind => $globaltype->content->kind_num,
+      of => { $globaltype->content->kind => $value },
+    });
+    my $self = $xsub->($store, $globaltype, $value);
     $self->{store} = $store;
     return $self;
   }
@@ -45,29 +51,37 @@ $ffi->attach( type => ['wasm_global_t'] => 'wasm_globaltype_t' => sub {
 });
 
 
-$ffi->attach( get => ['wasm_global_t', 'string'] => sub {
+$ffi->attach( get => ['wasm_global_t', 'wasm_val_t'] => sub {
   my($xsub, $self) = @_;
-  my $value = wasm_allocate(1);
+  my $value = Wasm::Wasmtime::Val->new;
   $xsub->($self, $value);
-  ($value) = wasm_to_perl($value);
-  $value;
+  $value->to_perl;
 });
 
 
-$ffi->attach( set => ['wasm_global_t','string'] => sub {
+$ffi->attach( set => ['wasm_global_t','wasm_val_t'] => sub {
   my($xsub, $self, $value) = @_;
-  $xsub->($self, perl_to_wasm([$value],[$self->type->content]));
+    $value = Wasm::Wasmtime::Val->new({
+      kind => $self->type->content->kind_num,
+      of => { $self->type->content->kind => $value },
+    });
+  $xsub->($self, $value);
 });
 
 
-# actually returns a wasm_extern_t, but recursion
-$ffi->attach( as_extern => ['wasm_global_t'] => 'opaque' => sub {
-  my($xsub, $self) = @_;
-  require Wasm::Wasmtime::Extern;
-  my $ptr = $xsub->($self);
-  Wasm::Wasmtime::Extern->new($ptr, $self->{owner} || $self);
-});
+sub tie
+{
+  my $self = shift;
+  my $ref;
+  tie $ref, __PACKAGE__, $self;
+  \$ref;
+}
 
+sub TIESCALAR { $_[1] }
+*FETCH = \&get;
+*STORE = \&set;
+
+__PACKAGE__->_cast(1);
 _generate_destroy();
 
 1;
@@ -84,7 +98,7 @@ Wasm::Wasmtime::Global - Wasmtime global class
 
 =head1 VERSION
 
-version 0.06
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -139,11 +153,11 @@ Gets the global value.
 
 Sets the global to the given value.
 
-=head2 as_extern
+=head2 tie
 
- my $extern = $global->as_extern;
+ my $ref = $global->tie;
 
-Returns the L<Wasm::Wasmtime::Extern> for this global object.
+Returns a reference to a tied scalar that can be used to get/set the global.
 
 =head1 SEE ALSO
 

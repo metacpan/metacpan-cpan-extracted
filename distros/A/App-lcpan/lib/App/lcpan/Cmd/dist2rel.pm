@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::dist2rel;
 
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '1.056'; # VERSION
+our $DATE = '2020-05-07'; # DATE
+our $VERSION = '1.057'; # VERSION
 
 use 5.010;
 use strict;
@@ -30,12 +30,11 @@ sub handle_cmd {
     my $dist = $args{dist};
 
     my $row = $dbh->selectrow_hashref("SELECT
-  file.cpanid cpanid,
-  file.name name
-FROM dist
-LEFT JOIN file ON dist.file_id=file.id
-WHERE dist.name=?
-ORDER BY version_numified DESC", {}, $dist);
+  cpanid cpanid,
+  dist_name name
+FROM file
+WHERE dist_name=?
+ORDER BY dist_version_numified DESC", {}, $dist);
     my $rel;
 
     if ($row) {
@@ -65,7 +64,7 @@ App::lcpan::Cmd::dist2rel - Get (latest) release name of a distribution
 
 =head1 VERSION
 
-This document describes version 1.056 of App::lcpan::Cmd::dist2rel (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of App::lcpan::Cmd::dist2rel (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 FUNCTIONS
 

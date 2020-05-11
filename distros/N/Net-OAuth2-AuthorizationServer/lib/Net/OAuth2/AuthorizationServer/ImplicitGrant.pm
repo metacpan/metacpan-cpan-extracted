@@ -4,6 +4,8 @@ package Net::OAuth2::AuthorizationServer::ImplicitGrant;
 
 Net::OAuth2::AuthorizationServer::ImplicitGrant - OAuth2 Resource Owner Implicit Grant
 
+You "SHOULD NOT" use this grant type (see L<https://tools.ietf.org/html/draft-ietf-oauth-security-topics-15>)
+
 =head1 SYNOPSIS
 
   my $Grant = Net::OAuth2::AuthorizationServer::ImplicitGrant->new(

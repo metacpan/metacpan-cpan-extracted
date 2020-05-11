@@ -1,5 +1,5 @@
 #
-# $Id: Smtp.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
+# $Id$
 #
 # network::smtp Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6bd6acfc81d5 $',
+      revision => '$Revision$',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -22,12 +22,14 @@ sub brik_properties {
          username => [ qw(username) ],
          password => [ qw(password) ],
          auth_mechanism => [ qw(none|GSSAPI) ],
+         use_starttls => [ qw(0|1) ],
          _smtp => [ qw(INTERNAL) ],
       },
       attributes_default => {
          server => 'localhost',
          port => 25,
          auth_mechanism => 'none',
+         use_starttls => 0,
       },
       commands => {
          open => [ qw(server|OPTIONAL port|OPTIONAL username|OPTIONAL password|OPTIONAL) ],
@@ -99,6 +101,9 @@ sub open {
       my $r = $smtp->auth($sasl);
       $self->log->info("open: auth: returned [$r]");
    }
+   elsif ($self->use_starttls) {
+      $smtp->starttls() or return $self->log->error("open: can't STARTTLS");
+   }
 
    #$self->log->info(Data::Dumper::Dumper($smtp));
 
@@ -127,7 +132,7 @@ Metabrik::Network::Smtp - network::smtp Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

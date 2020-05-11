@@ -13,6 +13,7 @@ sub try {
         || $class->_golang($d)
         || $class->_ruby($d)
         || $class->_vb($d)
+        || $class->_tool($d)
     ;
 }
 
@@ -376,6 +377,23 @@ sub _vb {
 
         if ($d->opt_version) {
             my ($version) = ($d->ua =~ m! WinHttp\.WinHttpRequest\.([\d.]+)!);
+            $h->{version} = $version if $version;
+        }
+
+        return $h;
+    }
+}
+
+sub _tool {
+    my ($class, $d) = @_;
+
+    if ( index($d->ua, 'PostmanRuntime') > -1 ) {
+        my $h = {
+            name => 'Postman',
+        };
+
+        if ($d->opt_version) {
+            my ($version) = ($d->ua =~ m!PostmanRuntime/([\d.]+)!);
             $h->{version} = $version if $version;
         }
 

@@ -2,8 +2,8 @@ NAME
     App::lcpan - Manage your local CPAN mirror
 
 VERSION
-    This document describes version 1.056 of App::lcpan (from Perl
-    distribution App-lcpan), released on 2020-05-06.
+    This document describes version 1.057 of App::lcpan (from Perl
+    distribution App-lcpan), released on 2020-05-07.
 
 SYNOPSIS
     See lcpan script.
@@ -116,7 +116,26 @@ FUNCTIONS
 
      deps(%args) -> [status, msg, payload, meta]
 
-    List dependencies.
+    List dependencies of distributions.
+
+    Examples:
+
+    *   List what modules Module-List requires:
+
+         deps( dists => ["Module-List"]);
+
+    *   List modules Module-List requires (module name will be converted to
+        distro name):
+
+         deps( dists => ["Module::List"]);
+
+    *   List non-core modules Module-List requires:
+
+         deps( dists => ["Module-List"], include_core => 0);
+
+    *   List dependencies of a specific distribution release:
+
+         deps( dists => ["Module-List\@0.004"]);
 
     By default only runtime requires are displayed. To see prereqs for other
     phases (e.g. configure, or build, or ALL) or for other relationships
@@ -155,6 +174,11 @@ FUNCTIONS
         Location of your local CPAN mirror, e.g. /path/to/cpan.
 
         Defaults to "~/cpan".
+
+    *   dists* => *array[perl::distname_with_optional_ver]*
+
+        Distribution names (with optional version suffix, e.g.
+        Foo-Bar@1.23).
 
     *   dont_uniquify => *bool*
 
@@ -227,9 +251,7 @@ FUNCTIONS
 
         Recurse for a number of levels (-1 means unlimited).
 
-    *   modules* => *array[perl::modname]*
-
-    *   perl_version => *str* (default: "v5.30.2")
+    *   perl_version => *str* (default: "v5.30.0")
 
         Set base Perl version for determining core modules.
 
@@ -518,7 +540,7 @@ FUNCTIONS
 
         When there are more than one query, perform OR instead of AND logic.
 
-    *   perl_version => *str* (default: "v5.30.2")
+    *   perl_version => *str* (default: "v5.30.0")
 
         Set base Perl version for determining core modules.
 
@@ -737,7 +759,7 @@ FUNCTIONS
 
         When there are more than one query, perform OR instead of AND logic.
 
-    *   perl_version => *str* (default: "v5.30.2")
+    *   perl_version => *str* (default: "v5.30.0")
 
         Set base Perl version for determining core modules.
 

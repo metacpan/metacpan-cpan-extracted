@@ -1,5 +1,5 @@
 #
-# $Id: Number.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
+# $Id$
 #
 # format::number Brik
 #
@@ -11,25 +11,33 @@ use base qw(Metabrik::Shell::Command Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6bd6acfc81d5 $',
+      revision => '$Revision$',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
       attributes => {
+         thousands_sep => [ qw(char) ],
+         decimal_point => [ qw(char) ],
          kibi_suffix => [ qw(string) ],
          kilo_suffix => [ qw(string) ],
          mebi_suffix => [ qw(string) ],
          mega_suffix => [ qw(string) ],
          gibi_suffix => [ qw(string) ],
          giga_suffix => [ qw(string) ],
+         tebi_suffix => [ qw(string) ],
+         tera_suffix => [ qw(string) ],
       },
       attributes_default => {
+         thousands_sep => '.',
+         decimal_point => ',',
          kibi_suffix => 'Kb',
          kilo_suffix => 'KB',
          mebi_suffix => 'Mb',
          mega_suffix => 'MB',
          gibi_suffix => 'Gb',
          giga_suffix => 'GB',
+         tebi_suffix => 'Tb',
+         tera_suffix => 'TB',
       },
       commands => {
          from_number => [ qw(number) ],
@@ -45,6 +53,8 @@ sub _new {
    my $self = shift;
 
    my $x = Number::Format->new(
+      -thousands_sep => $self->thousands_sep,
+      -decimal_point => $self->decimal_point,
       -kibi_suffix => $self->kibi_suffix,
       -kilo_suffix => $self->kilo_suffix,
       -mebi_suffix => $self->mebi_suffix,
@@ -79,6 +89,19 @@ sub to_number {
 
    my $x = $self->_new;
 
+   my $tebi = $self->tebi_suffix;
+   my $tera = $self->tera_suffix;
+
+   # Number::Format does not support TB
+   if ($string =~ s{${tera}$}{}) {
+      $string *= 1024;
+      $string .= $self->giga_suffix;
+   }
+   elsif ($string =~ s{${tebi}$}{}) {
+      $string *= 1024 / 8;
+      $string .= $self->gibi_suffix;
+   }
+
    return $x->unformat_number($string);
 }
 
@@ -92,7 +115,7 @@ Metabrik::Format::Number - format::number Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

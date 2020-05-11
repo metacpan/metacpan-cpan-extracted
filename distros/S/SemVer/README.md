@@ -1,5 +1,5 @@
-SemVer version 0.7.0
-====================
+SemVer version 0.10.0
+=====================
 
 This module subclasses [`version`] to create semantic versions, as defined by
 the [Semantic Versioning 2.0.0 Specification]
@@ -51,8 +51,8 @@ formatting, are:
    Example: `1.0.0-alpha < 1.0.0-alpha.1 < 1.0.0-alpha.beta < 1.0.0-beta < 1.0.0-beta.2 < 1.0.0-beta.11 < 1.0.0-rc.1 < 1.0.0`.
 
 
-[`version`]: http://search.cpan.org/perldoc?version
-[Semantic Versioning 2.0.0 Specification]: http://semver.org/spec/v2.0.0.html
+[`version`]: https://metacpan.org/pod/version
+[Semantic Versioning 2.0.0 Specification]: https://semver.org/spec/v2.0.0.html
 
 Installation
 ============
@@ -72,7 +72,7 @@ SemVer requires version.
 Copyright and License
 ---------------------
 
-Copyright (c) 2010-2018 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2010-2020 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

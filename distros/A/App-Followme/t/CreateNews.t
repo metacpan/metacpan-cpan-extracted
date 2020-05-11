@@ -8,6 +8,22 @@ use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
 use Test::More tests => 7;
 
 #----------------------------------------------------------------------
+# Change the modification date of a file
+
+sub age {
+	my ($filename, $sec) = @_;
+	return unless -e $filename;
+	return if $sec <= 0;
+	
+    my @stats = stat($filename);
+    my $date = $stats[9];
+    $date -= $sec;
+    utime($date, $date, $filename);
+    
+    return; 
+}
+
+#----------------------------------------------------------------------
 # Load package
 
 my @path = splitdir(rel2abs($0));
@@ -24,6 +40,7 @@ my $test_dir = catdir(@path, 'test');
 
 rmtree($test_dir);
 mkdir $test_dir;
+chmod 0755, $test_dir;
 chdir $test_dir;
 my $archive_dir = catfile($test_dir, 'archive');
 
@@ -46,6 +63,7 @@ can_ok($idx, qw(new run)); # test 2
 
 do {
     mkdir($archive_dir);
+    chmod 0755, $archive_dir;
     chdir($test_dir);
 
    my $page = <<'EOQ';
@@ -120,13 +138,15 @@ EOQ
     fio_write_page($idx->{news_template_file}, $archive_template);
     fio_write_page($idx->{index_template_file}, $index_template);
 
+	my $sec = 40;
     foreach my $count (qw(four three two one)) {
-        sleep(2);
         my $output = $page;
         $output =~ s/%%/$count/g;
 
         my $filename = catfile('archive',"$count.html");
         fio_write_page($filename, $output);
+        age($filename, $sec);
+        $sec -= 10;
     }
 };
 

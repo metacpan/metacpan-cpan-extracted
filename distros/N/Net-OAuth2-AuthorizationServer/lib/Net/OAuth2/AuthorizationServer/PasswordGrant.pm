@@ -4,6 +4,8 @@ package Net::OAuth2::AuthorizationServer::PasswordGrant;
 
 Net::OAuth2::AuthorizationServer::PasswordGrant - OAuth2 Resource Owner Password Credentials Grant
 
+You "MUST NOT" use this grant type (see L<https://tools.ietf.org/html/draft-ietf-oauth-security-topics-15>)
+
 =head1 SYNOPSIS
 
   my $Grant = Net::OAuth2::AuthorizationServer::PasswordGrant->new(

@@ -9,10 +9,11 @@ lib/Travel/Status/DE/HAFAS.pm
 lib/Travel/Status/DE/HAFAS/Result.pm
 lib/Travel/Status/DE/HAFAS/StopFinder.pm
 MANIFEST			This list of files
-README
+README.md
 scripts/check-hafas-urls
 scripts/makedeb-docker
 scripts/makedeb-docker-helper
+scripts/update-readme
 t/00-compile-pm.t
 t/01-compile-pl.t
 t/10-pod-coverage.t

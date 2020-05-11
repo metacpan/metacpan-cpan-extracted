@@ -36,7 +36,7 @@ GenOO::Data::DB::DBIC::Species::Schema::SampleResultBase::v3 - DBIC Result class
 # Let the code begin...
 
 package GenOO::Data::DB::DBIC::Species::Schema::SampleResultBase::v3;
-$GenOO::Data::DB::DBIC::Species::Schema::SampleResultBase::v3::VERSION = '1.5.1';
+$GenOO::Data::DB::DBIC::Species::Schema::SampleResultBase::v3::VERSION = '1.5.2';
 
 #######################################################################
 #######################   Load External modules   #####################

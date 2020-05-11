@@ -6,7 +6,7 @@ Geo::Elevation::HGT - Elevation service with terrain data provided by Mapzen and
 
 VERSION
 
-Version 0.01 - initial release
+Version 0.03
 
 SYNOPSIS
 
@@ -33,8 +33,6 @@ perldoc command.
     perldoc Geo::Elevation::HGT
 
 You can also look for information at:
-
-  -- Note: not found on CPAN (yet) -- check again later --
 
     RT, CPAN's request tracker (report bugs here)
         https://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Elevation-HGT

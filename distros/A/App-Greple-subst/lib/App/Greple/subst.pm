@@ -6,7 +6,7 @@ subst - Greple module for text search and substitution
 
 =head1 VERSION
 
-Version 2.13
+Version 2.1401
 
 =head1 SYNOPSIS
 
@@ -76,12 +76,12 @@ warned (B<--warn-overlap> by default) and ignored.
 
 This version uses L<Getopt::EX::termcolor> module.  It sets option
 B<--light-screen> or B<--dark-screen> depending on the terminal on
-which the command run, or B<BRIGHTNESS> environment variable.
+which the command run, or B<TERM_BGCOLOR> environment variable.
 
 Some terminals (eg: "Apple_Terminal" or "iTerm") are detected
-automatically and no action is required.  Otherwise set B<BRIGHTNESS>
-environment to 0 (black) to 100 (white) digit depending on terminal
-background color.
+automatically and no action is required.  Otherwise set
+B<TERM_BGCOLOR> environment to #000000 (black) to #FFFFFF (white)
+digit depending on terminal background color.
 
 =head1 OPTIONS
 
@@ -256,7 +256,7 @@ it under the same terms as Perl itself.
 
 package App::Greple::subst;
 
-our $VERSION = '2.13';
+our $VERSION = '2.1401';
 
 use v5.14;
 use strict;
@@ -441,6 +441,7 @@ sub subst_show_stat {
 	push @show, [ $i, $p, $hash ];
     }
     if ($opt_show_numbers) {
+	no warnings 'uninitialized';
 	printf "HIT_PATTERN=%d/%d NG=%d, OK=%d, TOTAL=%d\n",
 	    $stat{hit}, $stat{total},
 	    $stat{ng}, $stat{ok}, $stat{ng} + $stat{ok};
@@ -475,7 +476,7 @@ sub subst_show_stat {
 sub read_dict {
     my $file = shift;
     say $file if $opt_dictname;
-    open my $fh, $file or die "$file: $!\n";
+    open my $fh, "<", $file or die "$file: $!\n";
     read_dict_fh($fh);
 }
 
@@ -653,6 +654,7 @@ sub subst_diff {
 	$orig = sprintf "/dev/fd/%d", $io->fileno;
     }
 
+    @subst_diffcmd or confess "Empty diff command";
     exec @subst_diffcmd, $orig, "-";
     die "exec: $!\n";
 }
@@ -684,7 +686,7 @@ sub subst_create {
     };
 	
     close STDOUT;
-    open  STDOUT, ">$create" or die "open: $!\n";
+    open  STDOUT, ">", $create or die "open: $!\n";
 }
 
 1;
@@ -725,57 +727,15 @@ option --divert-stdout --prologue __PACKAGE__::divert_stdout \
 option --with-stat     --epilogue subst_show_stat
 option --stat          --divert-stdout --with-stat
 
+autoload -Msubst::dyncmap --dyncmap
+
 help	--subst-color-light light terminal color
-option	--subst-color-light \
-	--cm 555D/100,000/433 \
-	--cm 555D/010,000/343 \
-	--cm 555D/001,000/334 \
-	--cm 555D/011,000/344 \
-	--cm 555D/101,000/434 \
-	--cm 555D/110,000/443 \
-	--cm 555D/111,000/444 \
-	--cm 555D/021,000/354 \
-	--cm 555D/201,000/534 \
-	--cm 555D/210,000/543 \
-	--cm 555D/012,000/345 \
-	--cm 555D/102,000/435 \
-	--cm 555D/120,000/453 \
-	--cm 555D/200,000/533 \
-	--cm 555D/020,000/353 \
-	--cm 555D/002,000/335 \
-	--cm 555D/022,000/355 \
-	--cm 555D/202,000/535 \
-	--cm 555D/220,000/553 \
-	--cm 555D/211,000/544 \
-	--cm 555D/121,000/454 \
-	--cm 555D/112,000/445 \
-	--cm 555D/122,000/455 \
-	--cm 555D/212,000/545 \
-	--cm 555D/221,000/554 \
-	--cm 555D/222,000/L23 \
-	$<move(0,0)>
+option	--subst-color-light --colormap --dyncmap \
+	range=0-2,except=000:111:222,shift=3,even="555D/%s",odd="I;000/%s"
 
 help	--subst-color-dark dark terminal color
-option	--subst-color-dark \
-	--cm DS;433,544/L01 \
-	--cm DS;343,454/L01 \
-	--cm DS;334,445/L01 \
-	--cm DS;344,455/L01 \
-	--cm DS;434,545/L01 \
-	--cm DS;443,554/L01 \
-	--cm DS;243,354/L01 \
-	--cm DS;423,534/L01 \
-	--cm DS;432,543/L01 \
-	--cm DS;234,345/L01 \
-	--cm DS;324,435/L01 \
-	--cm DS;342,453/L01 \
-	--cm DS;422,533/L01 \
-	--cm DS;242,353/L01 \
-	--cm DS;224,335/L01 \
-	--cm DS;244,355/L01 \
-	--cm DS;424,535/L01 \
-	--cm DS;442,553/L01 \
-	$<move(0,0)>
+option	--subst-color-dark --colormap --dyncmap \
+	range=2-4,except=222:333:444,shift=1,even="DS;%s",odd="I;%s/L01"
 
 ##
 ## Handle included sample dictionaries.

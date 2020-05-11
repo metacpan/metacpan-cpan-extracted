@@ -2,6 +2,14 @@
 Feature oriented Revision history for Test-DBIC-ExpectedQueries
 ===============================================================
 
+2.002 -- 2020-05-09 13:55:33 UTC
+
+* Fix issue #6, sub-selects identifis table as "select".
+
+  New option "report_subselect_tables" to try to find the first table
+  actually selected from.
+
+
 2.001 -- 2019-08-12 17:39:31 UTC
 
 * Support a test description, and report the test correctly.

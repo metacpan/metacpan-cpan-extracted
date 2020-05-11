@@ -1,3 +1,8 @@
+0.081   2020-02-15  Released-By: PERLANCAR; Urgency: medium
+
+	- [pod_sections_ala_perlancar] Add GOTCHAS section.
+
+
 0.080   2020-02-13  Released-By: PERLANCAR; Urgency: medium
 
 	- Add sort sub: pod_sections_ala_perlancar (sort spec moved from

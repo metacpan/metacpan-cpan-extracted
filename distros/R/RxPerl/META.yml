@@ -1,0 +1,39 @@
+---
+abstract: "It's new $module"
+author:
+  - 'Alexander Karelas <karjala@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RxPerl
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  RxPerl:
+    file: lib/RxPerl.pm
+    version: v0.0.1
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://gitlab.com/karjala/rxperl/issues
+  homepage: https://gitlab.com/karjala/rxperl
+  repository: git://gitlab.com/karjala/rxperl.git
+version: v0.0.1
+x_authority: cpan:KARJALA
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

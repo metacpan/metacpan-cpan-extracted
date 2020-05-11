@@ -4,6 +4,17 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.701 2020-05-10
+  * HPE4400B driver requires PDL::Graphics::Gnuplot installed
+
+3.700 2020-05-09
+  * Add endian flag to instruments
+  * Support HP E4400B spectrum analyzer series
+  * OI magnet PSUs: add check for persistent mode
+  * ZI MFLI: re-work driver; add input selection, RMS
+  * Lakeshore 340: add resistance readout, ZONE functions
+  * Make XPRESS data file header more configurable
+
 3.692 2020-03-03
   * Lakeshore 340: add more functions
   * PD11042: Fix inifile and logfile for non-Activeperls

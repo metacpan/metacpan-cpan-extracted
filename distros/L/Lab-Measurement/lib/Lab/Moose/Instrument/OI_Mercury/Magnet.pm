@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_Mercury::Magnet;
-$Lab::Moose::Instrument::OI_Mercury::Magnet::VERSION = '3.692';
+$Lab::Moose::Instrument::OI_Mercury::Magnet::VERSION = '3.701';
 #ABSTRACT: Oxford Instruments Mercury magnet power supply
 
 use 5.010;
@@ -227,6 +227,21 @@ sub heater_off {
     my $self = shift;
     $self->oim_set_heater( value => 'OFF' );
     countdown( $self->heater_delay(), "OI Mercury heater OFF: " );
+}
+
+
+sub in_persistent_mode {
+    my $self = shift;
+    my $rv   = $self->oim_get_heater(@_);
+    if ( $rv eq 'ON' ) {
+        return;
+    }
+    elsif ( $rv eq 'OFF' ) {
+        return 1;
+    }
+    else {
+        croak("unknown heater setting $rv");
+    }
 }
 
 
@@ -514,7 +529,7 @@ Lab::Moose::Instrument::OI_Mercury::Magnet - Oxford Instruments Mercury magnet p
 
 =head1 VERSION
 
-version 3.692
+version 3.701
 
 =head1 SYNOPSIS
 
@@ -659,6 +674,14 @@ Nothing happens if the power supply thinks the magnet current and the lead curre
 Enable/disable switch heater. Wait for 60s after changing the state of the
 heater.
 
+=head2 in_persistent_mode
+
+ if ($m->in_persistent_mode()) {
+    ...
+ }
+
+Return 1 if in persistent mode; otherwise return false.
+
 =head2 oim_force_heater
 
 Switches the persistent mode switch heater. Parameter is "ON" or "OFF". 
@@ -740,7 +763,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
             2018       Andreas K. Huettel, Simon Reinhardt
-            2019       Simon Reinhardt
+            2019-2020  Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

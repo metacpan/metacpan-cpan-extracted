@@ -2,7 +2,9 @@
 # t/011-scope-env.t: test Data::Hopen::Scope::Environment
 use rlib 'lib';
 use HopenTest;
+use Data::Hopen::Scope;
 use Data::Hopen::Scope::Hash;
+use Test::Fatal;
 
 $Data::Hopen::VERBOSE=@ARGV;
     # say `perl -Ilib t/011-scope-env.t -- foo` to turn on verbose output
@@ -16,6 +18,9 @@ ok($s->DOES('Data::Hopen::Scope'), 'Scope::Environment DOES Scope');
 $s->put(foo_hopen => 42);
 cmp_ok($ENV{foo_hopen}, '==', 42, 'put() updates %ENV');
 cmp_ok($s->find('foo_hopen'), '==', 42, 'Retrieving previously-set variable works');
+cmp_ok($s->find('foo_hopen', -set => 0), '==', 42, 'Retrieving previously-set variable works (set 0)');
+cmp_ok($s->find('foo_hopen', -set => FIRST_ONLY), '==', 42, 'Retrieving previously-set variable works (set FIRST_ONLY)');
+is_deeply($s->find('foo_hopen', -set => '*'), {0=>42}, 'Retrieving previously-set variable works (set *)');
 
 foreach my $varname (qw(SHELL COMSPEC PATH)) {
     is($s->find($varname), $ENV{$varname}, "Finds existing env var $varname")
@@ -46,6 +51,10 @@ ok(!$outer->names->has($varname_env),'$ENV{}-set var is not in scope in outer');
 ok($s->names->has($varname_env), '$ENV{}-set var is in scope');
 ok($inner->names->has($varname_env), '$ENV{}-set var is in scope starting from inner');
 is($inner->find($varname_env), 'C=128', 'find() from inner up to Scope::Environment works');
+
+# Misc.
+ok(!defined exception { $s->put; }, 'empty put() allowed');
+like(exception { $s->put('oops'); }, qr/odd number/, 'put() rejects odd number of params');
 
 done_testing();
 # vi: set fenc=utf8:

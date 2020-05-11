@@ -16,7 +16,7 @@ name: Net-IPAM-Block
 provides:
   Net::IPAM::Block:
     file: lib/Net/IPAM/Block.pm
-    version: '1.12'
+    version: '1.13'
   Net::IPAM::Block::Private:
     file: lib/Net/IPAM/Block/Private.pm
 requires:
@@ -26,5 +26,5 @@ requires:
   Net::IPAM::Util: '0'
   Scalar::Util: '1.39'
   perl: v5.10.0
-version: '1.12'
+version: '1.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

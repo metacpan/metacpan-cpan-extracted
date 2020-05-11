@@ -1,5 +1,5 @@
 #
-# $Id: Keystore.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
+# $Id$
 #
 # database::keystore Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::File::Text);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6bd6acfc81d5 $',
+      revision => '$Revision$',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -23,9 +23,13 @@ sub brik_properties {
          decrypt => [ qw(db|OPTIONAL) ],
          encrypt => [ qw($data) ],
          save => [ qw($data db|OPTIONAL) ],
+         load => [ qw(db|OPTIONAL) ],
+         add => [ qw(db|OPTIONAL) ],
       },
       require_modules => {
          'Metabrik::Crypto::Aes' => [ ],
+         'Metabrik::File::Write' => [ ],
+         'Metabrik::String::Password' => [ ],
       },
    };
 }
@@ -92,6 +96,53 @@ sub save {
    return $db;
 }
 
+sub load {
+   my $self = shift;
+   my ($db) = @_;
+
+   $db ||= $self->db;
+   $self->brik_help_run_undef_arg('load', $db) or return;
+
+   my $decrypted = $self->decrypt;
+
+   my @lines = split(/\n/, $decrypted);
+
+   return \@lines;
+}
+
+sub add {
+   my $self = shift;
+   my ($db) = @_;
+
+   $db ||= $self->db;
+   $self->brik_help_run_undef_arg('add', $db) or return;
+
+   my $sp = Metabrik::String::Password->new_from_brik_init($self) or return;
+   my $fw = Metabrik::File::Write->new_from_brik_init($self) or return;
+   $fw->overwrite(1);
+   $fw->append(0);
+
+   my $lines = $self->load($db) or return;
+
+   print "Enter entry name: ";
+   chomp(my $name = <>);
+
+   print "Enter login or identity description: ";
+   chomp(my $login = <>);
+
+   my $passwd = $sp->generate->[0];
+
+   push @$lines, "$name: $login $passwd";
+
+   my $content = join("\n", @$lines);
+   my $encrypted = $self->encrypt($content) or return;
+
+   $fw->open($db) or return;
+   $fw->write($encrypted) or return;
+
+   return $db;
+}
+
 1;
 
 __END__
@@ -102,7 +153,7 @@ Metabrik::Database::Keystore - database::keystore Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

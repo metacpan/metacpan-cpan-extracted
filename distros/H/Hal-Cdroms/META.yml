@@ -5,10 +5,10 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -17,5 +17,9 @@ no_index:
   directory:
     - t
     - inc
-version: 0.05
+requires:
+  perl: '5.008000'
+resources:
+  repository: git://git.mageia.org/software/perl/perl-Hal-Cdroms/
+version: 0.06
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

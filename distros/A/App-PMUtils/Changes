@@ -1,3 +1,31 @@
+0.733   2020-05-10  Released-By: PERLANCAR; Urgency: medium
+
+	- [cli pmcost] Fix schema for module argument to allow args, e.g.
+	  Foo::Bar=export1.
+
+
+0.732   2020-05-02  Released-By: PERLANCAR; Urgency: high
+
+        - Merge two releases 0.731 & 0.731.1.
+
+
+0.731.1 2020-04-27  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with newer Perinci::CmdLine::POD to render a more
+          complete usage line of Perinci::CmdLine scripts in POD (now all
+          options are listed, not just '[options]').
+
+        - UPDATE 2020-05-02: rename version to 0.731.1.
+
+
+0.731   2020-04-16  Released-By: PERLANCAR; Urgency: medium
+
+	- pmlist: Add --with-path (-x) option, also return module path in
+	  --detail (-l).
+
+
 0.730   2020-01-31  Released-By: PERLANCAR; Urgency: low
 
 	[pmuninst]

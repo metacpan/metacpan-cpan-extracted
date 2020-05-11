@@ -1,5 +1,7 @@
 use Test2::V0 -no_srand => 1;
+use Test2::Plugin::Wasm;
 use Wasm;
+use YAML qw( Dump );
 
 try_ok  { Wasm->import( -api => 0 );    }                                                   'works with -api => 0 ';
 is(dies { Wasm->import( -api => 2 );    }, match qr/Currently only -api => 0 is supported/, 'dies with non 0 api level');
@@ -7,7 +9,7 @@ is(dies { Wasm->import( -foo => 'bar'); }, match qr/You MUST specify an api leve
                                                                                             'bad key ');
 is(dies { Wasm->import( -api => 0, -api => 0 ) },
                                            match qr/Specified -api more than once/,         'api more than once');
-try_ok  { Wasm->import( -api => 0, -wat => '(module)' ) }                                   'empty module';
+try_ok  { package Empty; Wasm->import( -api => 0, -wat => '(module)' ) }                    'empty module';
 
 {
   package Foo0;
@@ -28,6 +30,14 @@ try_ok  { Wasm->import( -api => 0, -wat => '(module)' ) }                       
 
 is( Foo0::add(1,2), 3, '1+2=3' );
 is( Foo0::subtract(3,2), 1, '3-2=1' );
+is(
+  $Foo0::frooble,
+  object {
+    call [ isa => 'Wasm::Memory' ] => T();
+    call_list limits => [ 2, 2, 3 ];
+  },
+  'memory region exported',
+);
 
 {
   package Foo1;
@@ -102,26 +112,6 @@ is( Foo6::subtract(3,2), 1, '3-2=1' );
 is( Foo9::add(1,2), 3, '1+2=3' );
 is( Foo9::subtract(3,2), 1, '3-2=1' );
 
-{
-  # huh?
-  # Exception: trap in wasm function call: wasm trap: call stack exhausted, source location: @- at t/wasm.t line 117
-  # same thing works in t/wasm_wasmtime_instance.t
-  my $it_worked;
-  {
-    package Foo10;
-    use Wasm -api => 0, -imports => [sub { warn 'here'; $it_worked = 1 }], -wat => q{
-      (module
-        (func $hello (import "" "hello"))
-        (func (export "run") (call $hello))
-      )
-    }
-  }
-
-  if(0)
-  {
-    try_ok { Foo10::run() } 'Foo10::run()';
-    is $it_worked, T();
-  }
-}
+note Dump(\%Wasm::WASM);
 
 done_testing;

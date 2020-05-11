@@ -14,8 +14,8 @@ my $instance = Wasm::Wasmtime::Instance->new(
   }),
 );
 
-my $externtype_foo = $instance->get_export('foo');
-print $externtype_foo->kind, "\n";  # func
+my $foo = $instance->exports->foo;
+print $foo->kind, "\n";  # func
 
-my $externtype_bar = $instance->get_export('bar');
-print $externtype_bar->kind, "\n";  # memory
+my $bar = $instance->exports->bar;
+print $bar->kind, "\n";  # memory

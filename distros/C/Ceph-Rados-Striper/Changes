@@ -1,0 +1,6 @@
+Revision history for Perl extension Ceph::Rados::Striper.
+
+0.01  Tue Apr 21 17:47:20 2020
+	- original version; created by h2xs 1.23 with options
+		-n Ceph::Rados::Striper radosstriper/libradosstriper.h
+

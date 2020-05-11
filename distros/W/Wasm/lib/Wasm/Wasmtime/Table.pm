@@ -2,13 +2,16 @@ package Wasm::Wasmtime::Table;
 
 use strict;
 use warnings;
+use base qw( Wasm::Wasmtime::Extern );
 use Ref::Util qw( is_ref );
 use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::Store;
 use Wasm::Wasmtime::TableType;
+use constant is_table => 1;
+use constant kind => 'table';
 
 # ABSTRACT: Wasmtime table class
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 $ffi_prefix = 'wasm_table_';
@@ -38,15 +41,7 @@ $ffi->attach( type => ['wasm_table_t'] => 'wasm_tabletype_t' => sub {
 
 $ffi->attach( size => ['wasm_table_t'] => 'uint32' );
 
-
-# actually returns a wasm_extern_t, but recursion
-$ffi->attach( as_extern => ['wasm_table_t'] => 'opaque' => sub {
-  my($xsub, $self) = @_;
-  require Wasm::Wasmtime::Extern;
-  my $ptr = $xsub->($self);
-  Wasm::Wasmtime::Extern->new($ptr, $self->{owner} || $self);
-});
-
+__PACKAGE__->_cast(2);
 _generate_destroy();
 
 1;
@@ -63,7 +58,7 @@ Wasm::Wasmtime::Table - Wasmtime table class
 
 =head1 VERSION
 
-version 0.06
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -77,7 +72,7 @@ version 0.06
    }),
  );
  
- my $table = $instance->get_export('table')->as_table;
+ my $table = $instance->exports->table;
  print $table->type->element->kind, "\n";   # funcref
  print $table->size, "\n";                  # 1
 
@@ -101,12 +96,6 @@ Returns the L<Wasm::Wasmtime::TableType> object for this table object.
  my $size = $table->size;
 
 Returns the size of the table.
-
-=head2 as_extern
-
- my $extern = $table->as_extern;
-
-Returns the L<Wasm::Wasmtime::Extern> for this table object.
 
 =head1 SEE ALSO
 

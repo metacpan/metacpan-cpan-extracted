@@ -1,5 +1,5 @@
 #!perl
-# t/022-dag-visitor.t: test Data::Hopen::G::DAG's invoking of a visitor
+# t/122-dag-visitor.t: test Data::Hopen::G::DAG's invoking of a visitor
 use rlib 'lib';
 use HopenTest;
 use Test::Deep;
@@ -15,7 +15,7 @@ $Data::Hopen::VERBOSE = @ARGV;
 
 run();
 
-sub make_dag {  # See t/021-dag-single-goal.t for the explanation of this
+sub make_dag {  # See t/121-dag-single-goal.t for the explanation of this
 
     my $dag = hnew DAG => 'dag';
     my $goal = $dag->goal('all');

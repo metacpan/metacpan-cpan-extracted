@@ -53,7 +53,7 @@ GenOO::Transcript - Corresponds to a gene transcript
 # Let the code begin...
 
 package GenOO::Transcript;
-$GenOO::Transcript::VERSION = '1.5.1';
+$GenOO::Transcript::VERSION = '1.5.2';
 use Moose;
 use namespace::autoclean;
 

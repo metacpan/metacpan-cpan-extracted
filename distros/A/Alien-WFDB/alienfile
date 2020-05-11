@@ -1,0 +1,35 @@
+use alienfile;
+
+share {
+	requires 'Alien::gmake' => 0.14;
+	requires 'Path::Tiny' => 0;
+
+	# https://github.com/bemoody/wfdb
+	plugin Download => (
+		url => 'https://archive.physionet.org/physiotools/archives/',
+		# the -no-docs archive is smaller, if it exists
+		version => qr/wfdb-([\d\.]+)-no-docs\.tar\.gz/,
+	);
+
+	plugin Extract => 'tar.gz';
+
+	patch sub {
+		# the -no-docs tarball does not have a doc directory, but the build
+		# script still looks for one --- so we create an empty one if it
+		# doesn't exist and add stub Makefile (with 'install' and 'clean'
+		# targets)
+		my $doc_makefile = Path::Tiny->new('doc/Makefile');
+		$doc_makefile->parent->mkpath;
+		$doc_makefile->spew_utf8(<<'EOF');
+install:
+
+clean:
+
+EOF
+	};
+
+	build [
+		"sh ./configure --prefix=%{.install.prefix}",
+		'%{make} WFDBROOT=%{.install.prefix} install',
+	];
+};

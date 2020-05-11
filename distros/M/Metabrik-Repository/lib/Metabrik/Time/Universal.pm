@@ -1,5 +1,5 @@
 #
-# $Id: Universal.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
+# $Id$
 #
 # time::universal Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6bd6acfc81d5 $',
+      revision => '$Revision$',
       tags => [ qw(unstable timezone) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -29,9 +29,12 @@ sub brik_properties {
          list_timezones => [ ],
          search_timezone => [ qw(string) ],
          localtime => [ qw(timezone|OPTIONAL) ],
+         hour => [ ],
          today => [ qw(separator|OPTIONAL) ],
          yesterday => [ qw(separator|OPTIONAL) ],
          day => [ qw(timestamp|OPTIONAL) ],
+         week => [ qw(timestamp|OPTIONAL) ],
+         year => [ qw(timestamp|OPTIONAL) ],
          date => [ qw(timestamp|OPTIONAL) ],
          gmdate => [ qw(timestamp|OPTIONAL) ],
          month => [ qw(timezone|OPTIONAL) ],
@@ -48,6 +51,7 @@ sub brik_properties {
          'POSIX' => [ qw(strftime) ],
          'Time::Local' => [ qw(timelocal) ],
          'Time::HiRes' => [ qw(time) ],
+         'Date::Calc' => [ qw(Today Day_of_Week) ],
       },
    };
 }
@@ -109,6 +113,15 @@ sub localtime {
    return $time;
 }
 
+sub hour {
+   my $self = shift;
+
+   my @a = CORE::localtime();
+   my $h = $a[2];
+
+   return sprintf("%02d", $h);
+}
+
 sub today {
    my $self = shift;
    my ($sep) = @_;
@@ -150,6 +163,29 @@ sub day {
    my $day = $t[3];
 
    return sprintf("%04d-%02d-%02d", $year, $month, $day);
+}
+
+sub week {
+   my $self = shift;
+   my ($timestamp) = @_;
+
+   $timestamp ||= $self->timestamp;
+
+   my ($year, $month, $day) = Date::Calc::Localtime($timestamp);
+   my $week = Date::Calc::Week_of_Year($year, $month, $day);
+
+   return sprintf("%02d", $week);
+}
+
+sub year {
+   my $self = shift;
+   my ($timestamp) = @_;
+
+   my $day = $self->day($timestamp) or return;
+
+   my ($year) = $day =~ m{^(\d{4})};
+
+   return $year;
 }
 
 sub date {
@@ -343,6 +379,20 @@ sub to_timestamp {
          $timestamp .= sprintf(".%03d", $msec);
       }
    }
+   # 2019-10-23T18:15Z
+   elsif ($string =~ m{^(\d{4})\-(\d{2})\-(\d{2})T(\d{2}):(\d{2})Z$}) {
+      my $mon = $2 - 1;
+      my $mday = $3;
+      my $hour = $4;
+      my $min = $5;
+      my $sec = 0;
+      my $year = $1;
+      my $msec = 0;
+      $timestamp = Time::Local::timelocal($sec, $min, $hour, $mday, $mon, $year);
+      if ($self->use_hires) {
+         $timestamp .= sprintf(".%03d", $msec);
+      }
+   }
    # 2017-10-11 07:40:55.612514
    elsif ($string =~ m{^(\d{4})\-(\d{2})\-(\d{2}) (\d{2}):(\d{2}):(\d{2})\.(\d{6})$}) {
       my $mon = $2 - 1;
@@ -376,6 +426,16 @@ sub to_timestamp {
       my $year = $1;
       $timestamp = Time::Local::timelocal($sec, $min, $hour, $mday, $mon, $year);
    }
+   # 11/04/19 11:40:00
+   elsif ($string =~ m{^(\d{2})/(\d{2})/(\d{2}) (\d{2}):(\d{2}):(\d{2})$}) {
+      my $mon = $1 - 1;
+      my $mday = $2;
+      my $hour = $4;
+      my $min = $5;
+      my $sec = $6;
+      my $year = $3 + 2000;  # Y2100 bug.
+      $timestamp = Time::Local::timelocal($sec, $min, $hour, $mday, $mon, $year);
+   }
    # 2000-10-20T00:00:00.000-04:00
    elsif ($string =~ m{^(\d{4})\-(\d{2})\-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.(\d{3})}) {
       my $mon = $2 - 1;
@@ -407,7 +467,7 @@ Metabrik::Time::Universal - time::universal Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

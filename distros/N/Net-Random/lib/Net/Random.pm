@@ -4,7 +4,7 @@ use strict;
 local $^W = 1;
 use vars qw($VERSION %randomness);
 
-$VERSION = '2.31';
+$VERSION = '2.32';
 
 require LWP::UserAgent;
 use Sys::Hostname;

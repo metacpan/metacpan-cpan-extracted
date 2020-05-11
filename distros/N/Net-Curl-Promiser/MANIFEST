@@ -24,6 +24,7 @@ t/Net-Curl-Promiser-IOAsync.t
 t/Net-Curl-Promiser-Mojo.t
 t/Net-Curl-Promiser-Select.t
 t/Net-Curl-Promiser-Select_setopt_fail.t
+t/cancel_fail.t
 t/lib/ClientTest.pm
 t/lib/MyServer.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -4,6 +4,7 @@ use Test::More 0.98;
 use_ok $_ for qw(
     App::Greple::subst
     App::Greple::subst::Dict
+    App::Greple::subst::dyncmap
 );
 
 done_testing;

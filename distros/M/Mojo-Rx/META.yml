@@ -26,26 +26,30 @@ no_index:
 provides:
   Mojo::Rx:
     file: lib/Mojo/Rx.pm
-    version: v0.12.0
+    version: v0.12.1
   Mojo::Rx::ConnectableObservable:
     file: lib/Mojo/Rx/ConnectableObservable.pm
-    version: v0.12.0
+    version: v0.12.1
   Mojo::Rx::Observable:
     file: lib/Mojo/Rx/Observable.pm
-    version: v0.12.0
+    version: v0.12.1
   Mojo::Rx::Subject:
     file: lib/Mojo/Rx/Subject.pm
-    version: v0.12.0
+    version: v0.12.1
   Mojo::Rx::Subscription:
     file: lib/Mojo/Rx/Subscription.pm
-    version: v0.12.0
+    version: v0.12.1
   Mojo::Rx::Utils:
     file: lib/Mojo/Rx/Utils.pm
-    version: v0.12.0
+    version: v0.12.1
 requires:
   Mojolicious: '0'
   perl: '5.010'
-version: v0.12.0
+resources:
+  bugtracker: https://gitlab.com/karjala/p5-mojo-rx/issues
+  homepage: https://gitlab.com/karjala/p5-mojo-rx
+  repository: git://gitlab.com/karjala/p5-mojo-rx.git
+version: v0.12.1
 x_authority: cpan:KARJALA
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -1,5 +1,5 @@
 #
-# $Id: Read.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
+# $Id$
 #
 # file::read Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6bd6acfc81d5 $',
+      revision => '$Revision$',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -134,31 +134,33 @@ sub read {
 
    if ($self->as_array) {
       my @out = ();
-      while (<$fd>) {
+      # Don't play with $_, it may be tricky:
+      # https://www.perlmonks.org/bare/?node_id=570088
+      while (my $line = <$fd>) {
          if ($skip_comment) {
-            next if m{^\s*#};
+            next if $line =~ m{^\s*#};
          }
          if ($skip_blank_line) {
-            next if m{^\s*$};
+            next if $line =~ m{^\s*$};
          }
          if ($strip_crlf) {
-            s/[\r\n]*$//;
+            $line =~ s/[\r\n]*$//;
          }
-         push @out, $_;
+         push @out, $line;
       }
       $self->eof(1);
       return \@out;
    }
    else {
       my $out = '';
-      while (<$fd>) {
+      while (my $line = <$fd>) {
          if ($skip_comment) {
-            next if m{^\s*#};
+            next if $line =~ m{^\s*#};
          }
          if ($skip_blank_line) {
-            next if m{^\s*$};
+            next if $line =~ m{^\s*$};
          }
-         $out .= $_;
+         $out .= $line;
       }
       $self->eof(1);
       if ($strip_crlf) {
@@ -181,15 +183,15 @@ sub read_until_blank_line {
 
    if ($self->as_array) {
       my @out = ();
-      while (<$fd>) {
+      while (my $line = <$fd>) {
          if ($skip_comment) {
-            next if m{^\s*#};
+            next if $line =~ m{^\s*#};
          }
-         last if /^\s*$/;
+         last if $line =~ /^\s*$/;
          if ($strip_crlf) {
-            s/[\r\n]*$//;
+            $line =~ s/[\r\n]*$//;
          }
-         push @out, $_;
+         push @out, $line;
       }
       if (eof($fd)) {
          $self->eof(1);
@@ -198,12 +200,12 @@ sub read_until_blank_line {
    }
    else {
       my $out = '';
-      while (<$fd>) {
+      while (my $line = <$fd>) {
          if ($skip_comment) {
-            next if m{^\s*#};
+            next if $line =~ m{^\s*#};
          }
-         last if /^\s*$/;
-         $out .= $_;
+         last if $line =~ /^\s*$/;
+         $out .= $line;
       }
       if (eof($fd)) {
          $self->eof(1);
@@ -231,19 +233,19 @@ sub read_until_ini_block {
    my $offset = 0;
    if ($self->as_array) {
       my @out = ();
-      while (<$fd>) {
+      while (my $line = <$fd>) {
          if ($skip_comment) {
-            next if m{^\s*#};
+            next if $line =~ m{^\s*#};
          }
          if ($skip_blank_line) {
-            next if m{^\s*$};
+            next if $line =~ m{^\s*$};
          }
          if ($strip_crlf) {
-            s/[\r\n]*$//;
+            $line =~ s/[\r\n]*$//;
          }
-         if (/^\s*\[\s*\S+\s*\]\s*$/) {
+         if ($line =~ /^\s*\[\s*\S+\s*\]\s*$/) {
             if (!defined($block)) {
-               $block = $_;
+               $block = $line;
             }
             else {
                $self->seek($offset);  # New block starting, restore to previous offset
@@ -251,7 +253,7 @@ sub read_until_ini_block {
                last;
             }
          }
-         push @out, $_;
+         push @out, $line;
          $offset = $self->offset($fd) or return;
       }
       if (eof($fd)) {
@@ -261,16 +263,16 @@ sub read_until_ini_block {
    }
    else {
       my $out = '';
-      while (<$fd>) {
+      while (my $line = <$fd>) {
          if ($skip_comment) {
-            next if m{^\s*#};
+            next if $line =~ m{^\s*#};
          }
          if ($skip_blank_line) {
-            next if m{^\s*$};
+            next if $line =~ m{^\s*$};
          }
-         if (/^\s*\[\s*\S+\s*\]\s*$/) {
+         if ($line =~ /^\s*\[\s*\S+\s*\]\s*$/) {
             if (!defined($block)) {
-               $block = $_;
+               $block = $line;
             }
             else {
                $self->seek($offset);  # New block starting, restore to previous offset 
@@ -278,7 +280,7 @@ sub read_until_ini_block {
                last;
             }
          }
-         $out .= $_;
+         $out .= $line;
          $offset = $self->offset($fd) or return;
       }
       if (eof($fd)) {
@@ -309,17 +311,17 @@ sub read_line {
    if ($self->as_array) {
       my @out = ();
       my $this = 1;
-      while (<$fd>) {
+      while (my $line = <$fd>) {
          if ($skip_comment) {
-            next if m{^\s*#};
+            next if $line =~ m{^\s*#};
          }
          if ($skip_blank_line) {
-            next if m{^\s*$};
+            next if $line =~ m{^\s*$};
          }
          if ($strip_crlf) {
-            s/[\r\n]*$//;
+            $line =~ s/[\r\n]*$//;
          }
-         push @out, $_;
+         push @out, $line;
          last if $this == $count;
          $count++;
       }
@@ -331,15 +333,15 @@ sub read_line {
    else {
       my $out = '';
       my $this = 1;
-      while (<$fd>) {
+      while (my $line = <$fd>) {
          if ($skip_comment) {
-            next if m{^\s*#};
+            next if $line =~ m{^\s*#};
          }
          if ($skip_blank_line) {
-            next if m{^\s*$};
+            next if $line =~ m{^\s*$};
          }
-         last if /^\s*$/;
-         $out .= $_;
+         last if $line =~ /^\s*$/;
+         $out .= $line;
          last if $this == $count;
          $count++;
       }
@@ -371,7 +373,7 @@ Metabrik::File::Read - file::read Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

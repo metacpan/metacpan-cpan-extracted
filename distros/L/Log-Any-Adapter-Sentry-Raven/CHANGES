@@ -1,119 +1,26 @@
-==================================================
-Changes from 2019-04-23 00:00:00 +0000 to present.
-==================================================
+Changelog for Log-Any-Adapter-Sentry-Raven
 
--------------------------------------------
-version v0.0.3 at 2020-04-22 14:12:25 +0000
--------------------------------------------
+v0.0.4 2020-05-07T22:07:45
+ - run `make update` for v0.0.4 (Jonathan Rubin)
+ - Properly set default test behavior (Jonathan Rubin)
+ - Move custom test package to the top (Jonathan Rubin)
 
-  Change: 06f6b44099a44c17bad3051d25e4f57efa4fed71
-  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
-  Date : 2020-04-09 07:23:03 +0000
+v0.0.3 2020-04-16T18:20:11
+ - Run `make update` (Jonathan Rubin)
+ - Extract traces from singular exceptions (Jonathan Rubin)
+ - Require Devel::StackTrace (Jonathan Rubin)
 
-    Run `make update` 
+v0.0.2 2020-03-10T18:01:36
+ - Run make update (Mark Flickinger)
+ - Require a minimum version of Log::Any (jrubinator)
 
-  Change: b19c37e6c624f6302c201ca58ed3b3242f8988fa
-  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
-  Date : 2020-04-09 07:20:26 +0000
-
-    Extract traces from singular exceptions
-
-    This is helpful when we have exception-handling code that simply
-    tries to log our exception. In that case, we want the trace for the
-    exception, not the trace for the exception-handling code. 
-
-  Change: 488bde3f090abfc8cc467d36ca9c45a185412d19
-  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
-  Date : 2020-04-09 07:11:48 +0000
-
-    Require Devel::StackTrace
-
-    There might be someone who doesn't want this behavior, and it's fine
-    to be open to that patch.
-
-    But adding the complication before there's proof that that someone
-    exists is overkill.
-
-    Additionally, it's rather unlikely that anyone will be including
-    Devel::StackTrace::Extract on their own, and it performs a highly
-    useful addition here (see next commit). 
-
--------------------------------------------
-version v0.0.2 at 2020-03-10 18:01:36 +0000
--------------------------------------------
-
-  Change: 3928d4bde3991be3ef5ed82d2ab131a897dd3233
-  Author: Mark Flickinger <mark.flickinger@grantstreet.com>
-  Date : 2020-03-10 11:10:07 +0000
-
-    Run make update 
-
-  Change: 97231d156828cbd81078f17622efc2b5505f4e1d
-  Author: jrubinator <jjrs.pam+github@gmail.com>
-  Date : 2020-03-10 10:47:06 +0000
-
-    Require a minimum version of Log::Any
-
-    As diagnosed by statistical analysis 
-
--------------------------------------------
-version v0.0.1 at 2020-02-03 16:09:17 +0000
--------------------------------------------
-
-  Change: 5a36e232cfbc3419f87f2aa3f72c223be3c3617f
-  Author: Mark Flickinger <mark.flickinger@grantstreet.com>
-  Date : 2020-01-31 10:23:29 +0000
-
-    Run make update 
-
-  Change: b0a6b8e34a37068ecaf375702d51f277543271fa
-  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
-  Date : 2020-01-21 16:11:16 +0000
-
-    Update README 
-
-  Change: 730a32fe10e07045a931fe6a90d4ac7dc6ba9af2
-  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
-  Date : 2019-12-27 09:37:10 +0000
-
-    Log::Any context = Sentry tags 
-
-  Change: ccb5fe47da30a6897de741d4ac338e4d8bc8ede9
-  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
-  Date : 2019-12-27 09:16:38 +0000
-
-    cpanfile updates 
-
-  Change: 2516c1488557e66a2802c8ed0fd1f65bd8555986
-  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
-  Date : 2019-12-26 10:18:44 +0000
-
-    Add tests 
-
-  Change: 9d0d8c9a576366ea56b8a314bbab5ef229753c12
-  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
-  Date : 2019-12-26 09:48:11 +0000
-
-    cpanfile for new adapter 
-
-  Change: 766a18070c765fa9d084f40bea30a05fe543b873
-  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
-  Date : 2019-12-26 09:48:11 +0000
-
-    Add Sentry adapter 
-
-  Change: 674c6796aeb827d6eb6729e1e3b036b86876e0eb
-  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
-  Date : 2019-12-23 10:06:13 +0000
-
-    Create distribution files 
-
-  Change: 2b6624304f17cf485eaf246ecf91c2d64747d23a
-  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
-  Date : 2019-12-23 09:43:34 +0000
-
-    Initial Commit 
-
-================
-End of releases.
-================
+v0.0.1 2020-02-03T16:09:17
+ - Run make update (Mark Flickinger)
+ - Update README (Jonathan Rubin)
+ - Log::Any context = Sentry tags (Jonathan Rubin)
+ - cpanfile updates (Jonathan Rubin)
+ - Add tests (Jonathan Rubin)
+ - cpanfile for new adapter (Jonathan Rubin)
+ - Add Sentry adapter (Jonathan Rubin)
+ - Create distribution files (Jonathan Rubin)
+ - Initial Commit (Jonathan Rubin)

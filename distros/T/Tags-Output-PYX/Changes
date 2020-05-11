@@ -1,3 +1,14 @@
+0.04 2020-05-11T15:37:49+02:00
+ - Add REPOSITORY section to doc.
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Fix warnings in tests caused in new version of Tags::Output (RT#132534).
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.03 2015-10-15T22:03:52+02:00
  - Clean Error::Pure structure after error in tests.
  - Improve SEE ALSO section in doc.

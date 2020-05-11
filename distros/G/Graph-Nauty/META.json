@@ -38,7 +38,7 @@
          "web" : "https://github.com/merkys/graph-nauty"
       }
    },
-   "version" : "0.1.0",
+   "version" : "0.1.1",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

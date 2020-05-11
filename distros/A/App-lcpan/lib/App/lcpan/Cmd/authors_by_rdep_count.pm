@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::authors_by_rdep_count;
 
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '1.056'; # VERSION
+our $DATE = '2020-05-07'; # DATE
+our $VERSION = '1.057'; # VERSION
 
 use 5.010;
 use strict;
@@ -43,18 +43,18 @@ sub handle_cmd {
         push @where, "(rel=?)";
         push @binds, $args{rel};
     }
-    push @where, "d.is_latest";
-    push @where, "d.cpanid <> m.cpanid" if $args{exclude_same_author};
+    push @where, "f.is_latest_dist";
+    push @where, "f.cpanid <> m.cpanid" if $args{exclude_same_author};
     @where = (1) if !@where;
 
     my $sql = "SELECT
   m.cpanid id,
   a.fullname name,
-  COUNT(DISTINCT d.id) AS rdep_count
+  COUNT(DISTINCT f.id) AS rdep_count
 FROM module m
 JOIN dep dp ON dp.module_id=m.id
 LEFT JOIN author a ON a.cpanid=m.cpanid
-LEFT JOIN dist d ON d.id=dp.dist_id
+LEFT JOIN file f ON f.id=dp.file_id
 WHERE ".join(" AND ", @where)."
 GROUP BY m.cpanid
 ORDER BY rdep_count DESC
@@ -86,7 +86,7 @@ App::lcpan::Cmd::authors_by_rdep_count - List authors ranked by number of distri
 
 =head1 VERSION
 
-This document describes version 1.056 of App::lcpan::Cmd::authors_by_rdep_count (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of App::lcpan::Cmd::authors_by_rdep_count (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 FUNCTIONS
 

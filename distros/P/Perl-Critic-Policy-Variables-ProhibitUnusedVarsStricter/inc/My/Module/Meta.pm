@@ -9,7 +9,7 @@ use Carp;
 
 use Exporter qw{ import };
 
-our $VERSION = '0.106';
+our $VERSION = '0.107';
 
 our @EXPORT_OK = qw{
     meta_merge
@@ -79,6 +79,8 @@ sub build_required_module_versions {
     return (
         'lib'       => 0,
         'Carp'      => 0,
+        'Test::More' => 0,
+        'Test::Perl::Critic::Policy'    => 0,
     );
 }
 

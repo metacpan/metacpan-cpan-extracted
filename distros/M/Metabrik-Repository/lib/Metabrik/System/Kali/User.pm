@@ -1,5 +1,5 @@
 #
-# $Id: User.pm,v f667706b9103 2019/03/13 09:57:07 gomor $
+# $Id$
 #
 # system::kali::user Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::System::Ubuntu::User);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f667706b9103 $',
+      revision => '$Revision$',
       tags => [ qw(unstable manage management creation group create) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -39,7 +39,7 @@ Metabrik::System::Kali::User - system::kali::user Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

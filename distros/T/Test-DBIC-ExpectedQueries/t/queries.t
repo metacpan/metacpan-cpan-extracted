@@ -10,14 +10,16 @@ my $queries = Test::DBIC::ExpectedQueries->new({
     schema => "don't run",
     queries => [
         Test::DBIC::ExpectedQueries::Query->new({
-            sql => "UPDATE datum SET is_valid = ? WHERE ( id = ? )",
-            stack_trace => "not under test",
+            sql                     => "UPDATE datum SET is_valid = ? WHERE ( id = ? )",
+            stack_trace             => "not under test",
+            report_subselect_tables => 0,
         }),
         Test::DBIC::ExpectedQueries::Query->new({
             sql => "
 sELECT *
 from file",
             stack_trace => "not under test",
+            report_subselect_tables => 0,
         }),
     ],
 });

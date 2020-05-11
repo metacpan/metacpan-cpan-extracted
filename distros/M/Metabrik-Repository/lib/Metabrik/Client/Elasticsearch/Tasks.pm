@@ -1,5 +1,5 @@
 #
-# $Id: Tasks.pm,v de840f30afaa 2019/01/22 08:00:11 gomor $
+# $Id$
 #
 # client::elasticsearch::tasks Brik
 #
@@ -15,7 +15,7 @@ use base qw(Metabrik::Client::Elasticsearch);
 
 sub brik_properties {
    return {
-      revision => '$Revision: de840f30afaa $',
+      revision => '$Revision$',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -135,7 +135,7 @@ Metabrik::Client::Elasticsearch::Tasks - client::elasticsearch::tasks Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

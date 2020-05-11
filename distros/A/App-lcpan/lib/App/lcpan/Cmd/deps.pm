@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::deps;
 
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '1.056'; # VERSION
+our $DATE = '2020-05-07'; # DATE
+our $VERSION = '1.057'; # VERSION
 
 use 5.010;
 use strict;
@@ -15,7 +15,7 @@ $SPEC{handle_cmd} = $App::lcpan::SPEC{deps};
 *handle_cmd = \&App::lcpan::deps;
 
 1;
-# ABSTRACT: List dependencies
+# ABSTRACT: List dependencies of distributions
 
 __END__
 
@@ -25,11 +25,11 @@ __END__
 
 =head1 NAME
 
-App::lcpan::Cmd::deps - List dependencies
+App::lcpan::Cmd::deps - List dependencies of distributions
 
 =head1 VERSION
 
-This document describes version 1.056 of App::lcpan::Cmd::deps (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of App::lcpan::Cmd::deps (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 FUNCTIONS
 
@@ -40,7 +40,29 @@ Usage:
 
  handle_cmd(%args) -> [status, msg, payload, meta]
 
-List dependencies.
+List dependencies of distributions.
+
+Examples:
+
+=over
+
+=item * List what modules Module-List requires:
+
+ handle_cmd( dists => ["Module-List"]);
+
+=item * List modules Module-List requires (module name will be converted to distro name):
+
+ handle_cmd( dists => ["Module::List"]);
+
+=item * List non-core modules Module-List requires:
+
+ handle_cmd( dists => ["Module-List"], include_core => 0);
+
+=item * List dependencies of a specific distribution release:
+
+ handle_cmd( dists => ["Module-List\@0.004"]);
+
+=back
 
 By default only runtime requires are displayed. To see prereqs for other phases
 (e.g. configure, or build, or ALL) or for other relationships (e.g. recommends,
@@ -81,6 +103,10 @@ Include only records that are added during the last index update.
 Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
+
+=item * B<dists>* => I<array[perl::distname_with_optional_ver]>
+
+Distribution names (with optional version suffix, e.g. Foo-Bar@1.23).
 
 =item * B<dont_uniquify> => I<bool>
 
@@ -149,9 +175,7 @@ using the C<index_name>.
 
 Recurse for a number of levels (-1 means unlimited).
 
-=item * B<modules>* => I<array[perl::modname]>
-
-=item * B<perl_version> => I<str> (default: "v5.30.2")
+=item * B<perl_version> => I<str> (default: "v5.30.0")
 
 Set base Perl version for determining core modules.
 

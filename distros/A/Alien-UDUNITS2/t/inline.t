@@ -6,15 +6,6 @@ use File::Spec;
 use Alien::UDUNITS2;
 use Test::Number::Delta;
 
-# for dev testing, get the headers out of the build directory
-my ($built_udunits2) = glob '_alien/udunits-*/lib/udunits2.h';
-my ($built_unitsdb) = glob '_alien/udunits-*/lib/udunits2.xml';
-my @inc_built = ();
-if( -f $built_udunits ) {
-	my $built_dir =  File::Spec->rel2abs(dirname($built_udunits2));
-	@inc_built = (INC => "-I$built_dir")
-}
-
 SKIP: {
 	eval { load 'Inline::C' } or do {
 		my $error = $@;
@@ -44,7 +35,7 @@ SKIP: {
 		}
 	},
 		ENABLE => AUTOWRAP => @inc_built );
-	$built_unitsdb ||= Alien::UDUNITS2->new->units_xml;
+	my $built_unitsdb = Alien::UDUNITS2->new->units_xml;
 
 	# 100 inches is 2.54 metres
 	my $eps = 1e-10;

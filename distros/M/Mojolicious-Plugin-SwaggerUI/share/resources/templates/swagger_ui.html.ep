@@ -1,7 +1,10 @@
 <html>
 <head>
-    <title>Swagger UI</title>
+    <title><%= $title %></title>
     <link rel="stylesheet" type="text/css" href="/swagger-ui/swagger-ui.css">
+    % if (defined $favicon) {                                                                                           
+       <link rel="icon" type="image/png" href=<%= $favicon %> />                                                        
+    % }
     <style>
       html
       {

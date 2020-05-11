@@ -4,8 +4,6 @@ use strict;
 use warnings;
 
 use Test::More;
-use bytes;
-
 use MCE::Signal qw( $tmp_dir );
 
 BEGIN {
@@ -14,6 +12,8 @@ BEGIN {
 }
 
 ## --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+
+# https://perldoc.perl.org/PerlIO.html
 
 my ($buf, $fno, $ret1, $ret2, $ret3, $ret4, $ret5) = ('');
 my $tmp_file = "$tmp_dir/test.txt";
@@ -37,9 +37,9 @@ close $fh;
 
 ## --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-# mce_open $fh, "<:raw", $tmp_file or die "open error: $!";
+# MCE::Shared->open($fh, "<:raw", $tmp_file);
 
-MCE::Shared->open($fh, "<:raw", $tmp_file);
+mce_open $fh, "<:raw", $tmp_file or die "open error: $!";
 
 $ret1 = eof $fh;
 

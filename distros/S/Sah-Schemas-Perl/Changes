@@ -1,3 +1,32 @@
+0.031   2020-05-08  Released-By: PERLANCAR; Urgency: medium
+
+        - [build] Rebuild with newest Pod::Weaver::Plugin::Sah::Schemas that
+          shows how to use the schemas with Params::Sah as well as Data::Sah and
+          Perinci::CmdLine.
+
+
+0.030   2020-05-08  Released-By: PERLANCAR; Urgency: medium
+
+        - [build] Rebuild with updated Pod::Weaver::Plugin::Sah::Schemas to fix
+          rendered examples.
+
+
+0.029   2020-05-08  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Tweak abstracts of schema modules (add example to make it
+          clearer).
+
+        - [testing][doc] Add some examples to schema modules.
+
+        - Rename schema perl::modargs -> perl::modname_with_optional_args (old
+          name preserved).
+
+
+0.028   2020-05-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Add schemas: perl::{mod,dist}name_with_{,optional_}var.
+
+
 0.027   2020-02-15  Released-By: PERLANCAR; Urgency: medium
 
 	- Add schema: perl::release::version.

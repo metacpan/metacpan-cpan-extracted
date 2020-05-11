@@ -22,7 +22,7 @@ notifier
 
 =head1 VERSION
 
-version 0.0302
+version 0.0400
 
 =head1 DESCRIPTION
 
@@ -35,7 +35,7 @@ notifier -- A command line client for the HTTP L<App::Notifier::Service>.
 =head1 USAGE
 
     notifier notify --to=myhost
-    notifier notify # Same as --to=default
+    notifier notify # Same as --to=${NOTIFIER_TO:-default}
     notifier notify --url=http://myhost.mydomain.tld:6300/mypath
     notifier notify --cmd=shine
 
@@ -46,6 +46,9 @@ notifier -- A command line client for the HTTP L<App::Notifier::Service>.
     --cmd=$CMD - the command ID to notify about (see App::Notifier::Service)
     --msg="$MSG" - the message to display (using text_params)
     -m "$MSG"    - same as --msg="$MSG"
+
+If C<--to> was not given, it defaults to the C<NOTIFIER_TO> environment
+variable and then to the string 'default'.
 
 =head1 AUTHOR
 

@@ -43,7 +43,7 @@ GenOO::RegionCollection::Factory::RegionArray - Factory for creating a RegionCol
 # Let the code begin...
 
 package GenOO::RegionCollection::Factory::RegionArray;
-$GenOO::RegionCollection::Factory::RegionArray::VERSION = '1.5.1';
+$GenOO::RegionCollection::Factory::RegionArray::VERSION = '1.5.2';
 use Moose;
 use namespace::autoclean;
 

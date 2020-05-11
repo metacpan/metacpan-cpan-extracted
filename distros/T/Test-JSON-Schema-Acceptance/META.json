@@ -114,6 +114,7 @@
             "Dist::Zilla::Plugin::CopyFilesFromRelease" : "0",
             "Dist::Zilla::Plugin::EnsureLatestPerl" : "0",
             "Dist::Zilla::Plugin::FileFinder::ByName" : "0",
+            "Dist::Zilla::Plugin::GenerateFile" : "0",
             "Dist::Zilla::Plugin::GenerateFile::FromShareDir" : "0",
             "Dist::Zilla::Plugin::Git::Check" : "0",
             "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch" : "0.004",
@@ -180,7 +181,7 @@
    "provides" : {
       "Test::JSON::Schema::Acceptance" : {
          "file" : "lib/Test/JSON/Schema/Acceptance.pm",
-         "version" : "0.992"
+         "version" : "0.993"
       }
    },
    "release_status" : "stable",
@@ -195,7 +196,7 @@
          "web" : "https://github.com/karenetheridge/Test-JSON-Schema-Acceptance"
       }
    },
-   "version" : "0.992",
+   "version" : "0.993",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.031011"
@@ -1100,7 +1101,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.992",
+                  "tag" : "v0.993",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1284,6 +1285,11 @@
             },
             "name" : "Gather sharedir",
             "version" : "2.046"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenerateFile",
+            "name" : "GenerateFile",
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",

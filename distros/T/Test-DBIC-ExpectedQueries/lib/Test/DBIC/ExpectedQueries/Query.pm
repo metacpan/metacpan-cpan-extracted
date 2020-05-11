@@ -1,11 +1,13 @@
 package Test::DBIC::ExpectedQueries::Query;
-$Test::DBIC::ExpectedQueries::Query::VERSION = '2.001';
+$Test::DBIC::ExpectedQueries::Query::VERSION = '2.002';
 use Moo;
 
 
 
-has sql         => ( is => "ro", required => 1 );
-has stack_trace => ( is => "ro", required => 1 ); # Just a string
+has sql                     => ( is => "ro", required => 1 );
+has stack_trace             => ( is => "ro", required => 1 ); # Just a string
+has report_subselect_tables => (is => "ro", required => 1);
+
 has table       => ( is => "rw" );
 has operation   => ( is => "rw" );
 
@@ -19,6 +21,7 @@ sub analyze_sql {
         [^\w.]*     # optional quote
         ([\w.]+)  # capture table
     /x;
+    my $select_table = qr/^ \s* select\s+ .+? \s? from \s+ $table (.*) /ixsm;
 
     if($sql =~ /^ \s* insert\s+ into \s+ $table /ixsm) {
         $self->table($1);
@@ -32,9 +35,22 @@ sub analyze_sql {
         $self->table($1);
         $self->operation("delete");
     }
-    elsif($sql =~ /^ \s* select\s+ .+? \s? from \s+ $table /ixsm) {
-        $self->table($1);
-        $self->operation("select");
+    elsif($sql =~ $select_table) {
+        my ($table, $rest_sql) = ($1, $2);
+
+        if ($self->report_subselect_tables) {
+            while ( uc($table) eq "SELECT" && ("select $rest_sql" =~ $select_table) ) {
+                ($table, $rest_sql) = ($1, $2);
+            }
+            if ($table && uc($table) ne "SELECT") {
+                $self->table($table);
+                $self->operation("select");
+            }
+        }
+        else {
+            $self->table($table);
+            $self->operation("select");
+        }
     }
 
     return $self;

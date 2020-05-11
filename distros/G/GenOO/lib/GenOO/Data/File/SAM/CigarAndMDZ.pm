@@ -27,7 +27,7 @@ GenOO::Data::File::SAM::CigarAndMDZ - Role that combines SAM CIGAR string with M
 # Let the code begin...
 
 package GenOO::Data::File::SAM::CigarAndMDZ;
-$GenOO::Data::File::SAM::CigarAndMDZ::VERSION = '1.5.1';
+$GenOO::Data::File::SAM::CigarAndMDZ::VERSION = '1.5.2';
 
 #######################################################################
 #######################   Load External modules   #####################

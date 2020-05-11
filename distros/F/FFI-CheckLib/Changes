@@ -1,5 +1,8 @@
 Revision history for FFI-CheckLib
 
+0.27      2020-05-11 14:24:08 -0400
+  - Added a FAQ section to the documentation (gh#22)
+
 0.26      2020-01-22 05:54:02 -0700
   - Name check on alien option is always done, even if the Alien is already
     loaded (gh#21)

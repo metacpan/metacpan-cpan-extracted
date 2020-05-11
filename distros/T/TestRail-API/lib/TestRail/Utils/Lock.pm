@@ -2,7 +2,7 @@
 # PODNAME: TestRail::Utils::Lock
 
 package TestRail::Utils::Lock;
-$TestRail::Utils::Lock::VERSION = '0.044';
+$TestRail::Utils::Lock::VERSION = '0.046';
 use 5.010;
 
 use strict;
@@ -61,7 +61,7 @@ sub pickAndLockTest {
 
     my ( $title, $test );
     while (@$cases) {
-        $test = shift @$cases;
+        $test  = shift @$cases;
         $title = lockTest( $test, $lock_status_id, $opts->{'hostname'}, $tr );
         last if $title;
     }
@@ -143,7 +143,7 @@ TestRail::Utils::Lock - Pick high priority cases for execution and lock them via
 
 =head1 VERSION
 
-version 0.044
+version 0.046
 
 =head1 DESCRIPTION
 
@@ -163,7 +163,7 @@ testrail-lock's primary routine.
 
 =over 4
 
-=item HASHREF C<OPTIONS> - valid keys/values correspond to the long names of arguments taken by L<testrail-lock>.
+=item HASHREF C<OPTIONS> - valid keys/values correspond to the long names of arguments taken by testrail-lock.
 
 =item TestRail::API C<HANDLE> - Instance of TestRail::API, in the case where the caller already has a valid object.
 
@@ -203,12 +203,12 @@ George S. Baugh <teodesian@cpan.org>
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/teodesian/TestRail-Perl>
+The development version is on github at L<https://github.com/teodesian/TestRail-Perl>
 and may be cloned from L<git://github.com/teodesian/TestRail-Perl.git>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by George S. Baugh.
+This software is copyright (c) 2020 by George S. Baugh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

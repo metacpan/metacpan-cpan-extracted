@@ -16,8 +16,8 @@ do { my $x = {
                       'requires' => {
                                       'Carp' => '0',
                                       'Data::Dumper' => '0',
+                                      'DateTime::Format::RFC3339' => '0',
                                       'Exporter' => '0',
-                                      'Scalar::Util' => '1.14',
                                       'perl' => '5.018'
                                     }
                     },
@@ -27,7 +27,7 @@ do { my $x = {
                                    },
                    'requires' => {
                                    'Data::Dumper' => '0',
-                                   'DateTime::Format::RFC3339' => '0',
+                                   'DateTime::Format::ISO8601' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'Math::BigInt' => '1.999718',

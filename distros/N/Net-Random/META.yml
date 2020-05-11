@@ -3,25 +3,29 @@ abstract: unknown
 author:
   - unknown
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.94, CPAN::Meta::Converter version 2.120351'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Net-Random
 no_index:
   directory:
     - t
     - inc
 requires:
-  Encode::Locale: 1.01
-  JSON: 2.9
-  LWP::UserAgent: 0
-  Test::MockObject: 1.07
-  Test::More: 0.64
-resources: {}
-version: 2.31
+  Encode::Locale: '1.01'
+  JSON: '2.9'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  Test::MockObject: '1.07'
+  Test::More: '0.64'
+resources:
+  bugtracker: https://github.com/DrHyde/perl-modules-Net-Random/issues
+  repository: https://github.com/DrHyde/perl-modules-Net-Random
+version: '2.32'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,5 @@
 #!perl
-# t/021-dag-single-goal.t: basic tests of Data::Hopen::G::DAG with one goal
+# t/121-dag-single-goal.t: basic tests of Data::Hopen::G::DAG with one goal
 use rlib 'lib';
 use HopenTest;
 use Test::Deep;

@@ -200,7 +200,7 @@ FASTX::PE - A Paired-End FASTQ files reader, based on FASTX::Reader.
 
 =head1 VERSION
 
-version 0.90
+version 0.92
 
 =head1 SYNOPSIS
 

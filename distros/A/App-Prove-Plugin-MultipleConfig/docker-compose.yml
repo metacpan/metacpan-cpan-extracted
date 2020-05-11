@@ -1,0 +1,44 @@
+version: '3'
+services:
+  db1:
+    image: mysql:5.7.22
+    container_name: "db1"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "10001:3306"
+    volumes:
+      - ./volumes/db1:/var/db/lib/mysql
+  db2:
+    image: mysql:5.7.22
+    container_name: "db2"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "10002:3306"
+    volumes:
+      - ./volumes/db2:/var/db/lib/mysql
+  db3:
+    image: mysql:5.7.22
+    container_name: "db3"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "10003:3306"
+    volumes:
+      - ./volumes/db3:/var/db/lib/mysql
+  redis1:
+    image: redis:latest
+    container_name: "redis1"
+    ports:
+      - "20001:6379"
+  redis2:
+    image: redis:latest
+    container_name: "redis2"
+    ports:
+      - "20002:6379"
+  redis3:
+    image: redis:latest
+    container_name: "redis3"
+    ports:
+      - "20003:6379"

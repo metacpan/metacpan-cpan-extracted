@@ -1,6 +1,10 @@
 ﻿Revision history for Perl module RT::Client::REST
 
-0.59 Mon May 5 2020 "Dean Hamstead" <dean@fragfest.com.au>
+0.60 Wed May 6 2020 "Dean Hamstead" <dean@fragfest.com.au>
+  - PR#25 GH#23 Fix get_attachments_metadata
+  - PR#24 GH#22 Fix get_attachments_metadata
+
+0.59 Mon May 4 2020 "Dean Hamstead" <dean@fragfest.com.au>
   - Worked around what appears to be a bug in PodChecker in perl 5.20
   - Adjusted travis and dist.ini
   - No functional changes

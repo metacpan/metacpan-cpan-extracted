@@ -5,13 +5,12 @@ use HopenTest;
 use Test::Deep::NoTest;     # NoTest since I am using eq_deeply directly
 use Test::Fatal;
 
+use Data::Hopen qw(:v);
+use Data::Hopen::G::DAG;
 use Data::Hopen::G::Op;
 use Data::Hopen::G::NoOp;
 
-BEGIN {
-    use_ok 'Data::Hopen::G::DAG';
-    diag "Testing Data::Hopen::G::DAG from $INC{'Data/Hopen/G/DAG.pm'}";
-}
+diag "Testing Data::Hopen::G::DAG from $INC{'Data/Hopen/G/DAG.pm'}";
 
 my $dag = Data::Hopen::G::DAG->new(name=>'foo');
 isa_ok($dag, 'Data::Hopen::G::DAG');
@@ -40,7 +39,10 @@ is($dag->default_goal->name, 'all', 'First call to DAG::goal() sets default goal
 
 # add()
 my $op = Data::Hopen::G::NoOp->new(name => 'some operation');
-$dag->add($op);
+{
+    local $VERBOSE = 3;     # for coverage of the hlog
+    $dag->add($op);
+}
 ok($dag->_graph->has_vertex($op), 'add() adds node');
 cmp_ok($dag->_graph->get_vertex_count($op), '==', 1, 'add() initial count 1');
 $dag->add($op);
@@ -61,21 +63,22 @@ package MY::AppendOp {
 # Make a dummy DAG so it will run - what we care about is the init graph
 $dag = Data::Hopen::G::DAG->new(name=>'dag_with_init');
 my $goal = $dag->goal('some goal');
-$dag->connect(Data::Hopen::G::NoOp->new, $goal);
+{
+    local $VERBOSE = 1;     # for coverage
+    $dag->connect(Data::Hopen::G::NoOp->new, $goal);
+}
 
-$op = MY::AppendOp->new(name => '1');
+my @ops = map { MY::AppendOp->new(name => "$_") } qw(1 2 3);
 cmp_ok($dag->_init_graph->vertices, '==', 1, 'Init graph initially has 1 vertex');
-$dag->init($op);
+$dag->init($ops[0]);
 cmp_ok($dag->_init_graph->vertices, '==', 2, 'init() adds a vertex to the init graph');
-ok($dag->_init_graph->has_vertex($op), 'init() adds node');
-cmp_ok($dag->_init_graph->get_vertex_count($op), '==', 1, 'init() initial count 1');
-$dag->init($op);
-cmp_ok($dag->_init_graph->get_vertex_count($op), '==', 1, 'init() count still 1');
+ok($dag->_init_graph->has_vertex($ops[0]), 'init() adds node');
+cmp_ok($dag->_init_graph->get_vertex_count($ops[0]), '==', 1, 'init() initial count 1');
+$dag->init($ops[0]);
+cmp_ok($dag->_init_graph->get_vertex_count($ops[0]), '==', 1, 'init() count still 1');
 
-$op = MY::AppendOp->new(name => '2');
-$dag->init($op);
-$op = MY::AppendOp->new(name => '3');
-$dag->init($op, true);
+$dag->init($ops[1]);
+$dag->init($ops[2], true);
 cmp_ok($dag->_init_graph->vertices, '==', 4,
     'right number of vertices in the init graph before running');
 
@@ -88,6 +91,11 @@ $dag->run;      # Fills in @results
 ok( eq_deeply(\@results, [3,1,2]) ||
     eq_deeply(\@results, [3,2,1]),
     'Init operations ran in the expected order' );
+
+# Make a cycle in the init graph
+$dag->_init_graph->add_edge($ops[$_], $ops[2]) foreach (0, 1);
+like( exception { $dag->run }, qr/Initializations contain a cycle/,
+    'Detects cycles in init graph');
 
 # Extra tests for coverage
 

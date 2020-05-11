@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Forms;
-$RT::Client::REST::Forms::VERSION = '0.59';
+$RT::Client::REST::Forms::VERSION = '0.60';
 use Exporter;
 
 use vars qw(@EXPORT @ISA);
@@ -227,7 +227,7 @@ RT::Client::REST::Forms - This package provides functions from RT::Interface::RE
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head2 METHODS
 

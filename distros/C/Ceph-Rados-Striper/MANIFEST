@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+typemap
+Striper.xs
+t/000_smoke.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Ceph/Rados/Striper.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

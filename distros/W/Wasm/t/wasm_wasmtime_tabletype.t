@@ -10,9 +10,13 @@ is(
       call kind => 'i32';
     };
     call limits => [3,4];
-    call as_externtype => object {
-      call [ isa => 'Wasm::Wasmtime::ExternType' ] => T();
-    }
+    call is_functype   => F();
+    call is_globaltype => F();
+    call is_tabletype  => T();
+    call is_memorytype => F();
+    call kind          => 'tabletype';
+
+    call to_string => '3 4 i32';
   },
   'i32,const',
 );
@@ -26,9 +30,7 @@ is(
       call kind => 'i64';
     };
     call limits => [9,0xffffffff];
-    call as_externtype => object {
-      call [ isa => 'Wasm::Wasmtime::ExternType' ] => T();
-    }
+    call to_string => '9 i64';
   },
   'i64,var',
 );
@@ -42,9 +44,7 @@ is(
       call kind => 'f32';
     };
     call limits => [1,6];
-    call as_externtype => object {
-      call [ isa => 'Wasm::Wasmtime::ExternType' ] => T();
-    }
+    call to_string => '1 6 f32';
   },
   '(i64),var',
 );

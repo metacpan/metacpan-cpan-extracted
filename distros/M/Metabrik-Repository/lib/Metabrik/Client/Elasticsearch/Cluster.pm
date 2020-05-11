@@ -1,5 +1,5 @@
 #
-# $Id: Cluster.pm,v df6bb56e9d04 2019/01/22 07:59:49 gomor $
+# $Id$
 #
 # client::elasticsearch::cluster Brik
 #
@@ -15,7 +15,7 @@ use base qw(Metabrik::Client::Elasticsearch);
 
 sub brik_properties {
    return {
-      revision => '$Revision: df6bb56e9d04 $',
+      revision => '$Revision$',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -182,7 +182,7 @@ Metabrik::Client::Elasticsearch::Cluster - client::elasticsearch::cluster Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

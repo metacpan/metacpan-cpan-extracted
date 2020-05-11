@@ -1,5 +1,5 @@
 #
-# $Id: Build.PL,v ecface00b50a 2016/01/02 17:50:23 gomor $
+# $Id$
 #
 use strict;
 use warnings;

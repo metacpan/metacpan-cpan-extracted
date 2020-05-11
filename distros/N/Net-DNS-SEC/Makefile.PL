@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1763 2020-02-02 21:48:03Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1777 2020-05-07 08:24:01Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -25,7 +25,9 @@ my %metadata = (
 
 
 my %prerequisite = (
+	'Carp'	       => 1.10,
 	'DynaLoader'   => 1.04,
+	'Exporter'     => 5.56,
 	'File::Find'   => 1.05,
 	'File::Spec'   => 0.86,
 	'IO::File'     => 1.08,

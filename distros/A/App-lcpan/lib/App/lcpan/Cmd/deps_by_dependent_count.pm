@@ -1,7 +1,9 @@
 package App::lcpan::Cmd::deps_by_dependent_count;
 
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '1.056'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-07'; # DATE
+our $DIST = 'App-lcpan'; # DIST
+our $VERSION = '1.057'; # VERSION
 
 use 5.010;
 use strict;
@@ -65,14 +67,14 @@ sub handle_cmd {
     my $include_noncore = $args{include_noncore} // 1;
     my $plver   = $args{perl_version} // "$^V";
 
-    # first, get the dist ID's of the requested modules
-    my @dist_ids;
+    # first, get the file ID's of the requested modules
+    my @file_ids;
     {
         my $mods_s = join(", ", map {$dbh->quote($_)} @{$args{modules}});
-        my $sth = $dbh->prepare("SELECT id FROM dist WHERE is_latest AND file_id IN (SELECT file_id FROM module WHERE name IN ($mods_s))");
+        my $sth = $dbh->prepare("SELECT id FROM file WHERE is_latest_dist AND id IN (SELECT file_id FROM module WHERE name IN ($mods_s))");
         $sth->execute;
-        while (my ($id) = $sth->fetchrow_array) { push @dist_ids, $id }
-        return [404, "No such module(s)"] unless @dist_ids;
+        while (my ($id) = $sth->fetchrow_array) { push @file_ids, $id }
+        return [404, "No such module(s)"] unless @file_ids;
     }
 
     my @cols = (
@@ -86,7 +88,7 @@ sub handle_cmd {
 
     my @wheres = (
         "m.id IS NOT NULL",
-        "dep.dist_id IN (".join(",", @dist_ids).")",
+        "dep.file_id IN (".join(",", @file_ids).")",
     );
     my @binds;
 
@@ -148,7 +150,7 @@ App::lcpan::Cmd::deps_by_dependent_count - List dependencies, sorted by number o
 
 =head1 VERSION
 
-This document describes version 1.056 of App::lcpan::Cmd::deps_by_dependent_count (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of App::lcpan::Cmd::deps_by_dependent_count (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 FUNCTIONS
 
@@ -203,7 +205,7 @@ using the C<index_name>.
 
 =item * B<modules>* => I<array[perl::modname]>
 
-=item * B<perl_version> => I<str> (default: "v5.30.2")
+=item * B<perl_version> => I<str> (default: "v5.30.0")
 
 Set base Perl version for determining core modules.
 

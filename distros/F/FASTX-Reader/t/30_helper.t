@@ -20,5 +20,5 @@ ok(defined $script->{logfile}, "[Helper] log file defined: $script->{logfile}");
 ok('ATT' eq $script->rc("AAT"), "[Helper] rev complementary done");
 my $execution = $script->run('pwd', { candie => 1});
 ok(defined $execution->{exit}, "[Run] Comand returned exit status");
-ok(defined $execution->{stdout} or defined $execution->{stderr}, "[Run] Returned STDOUT and/or STDERR");
+ok( $execution->{stdout} or  $execution->{stderr}, "[Run] Returned STDOUT and/or STDERR");
 done_testing();

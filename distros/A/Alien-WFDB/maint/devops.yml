@@ -1,0 +1,13 @@
+native:
+  debian:
+    packages:
+      - libcurl4-gnutls-dev
+      - libexpat1-dev
+  macos-homebrew:
+    packages:
+      - curl
+      - expat
+  msys2-mingw64:
+    packages:
+      - mingw-w64-x86_64-curl
+      - mingw-w64-x86_64-expat

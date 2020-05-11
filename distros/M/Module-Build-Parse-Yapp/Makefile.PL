@@ -17,13 +17,14 @@ my %WriteMakefileArgs = (
   "NAME" => "Module::Build::Parse::Yapp",
   "PREREQ_PM" => {
     "File::Find" => 0,
+    "File::Path" => 0,
     "File::Spec" => 0,
     "File::Temp" => 0,
     "Module::Build" => 0,
     "Parse::Yapp" => 0,
     "Test::Simple" => 0
   },
-  "VERSION" => "0.1.1",
+  "VERSION" => "0.1.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,6 +33,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "File::Find" => 0,
+  "File::Path" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,
   "Module::Build" => 0,

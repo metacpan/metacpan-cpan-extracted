@@ -10,7 +10,7 @@ use Moo;
 
 require Carp;
 
-our $VERSION = '2.01'; # VERSION
+our $VERSION = '2.02'; # VERSION
 
 # BUILD
 
@@ -21,7 +21,7 @@ has data => (
 );
 
 fun new_data($self) {
-  my $file = $self->file or die [];
+  my $file = $self->file;
   my $data = $self->parser($self->lines);
 
   return $data;
@@ -78,7 +78,7 @@ method item($name) {
 }
 
 method lines() {
-  my $file = $self->file;
+  my $file = $self->file or return '';
 
   open my $fh, '<', $file or Carp::confess "$!: $file";
   my $lines = join "\n", <$fh>;

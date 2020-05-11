@@ -1,0 +1,9 @@
+--- uuid.pc.in	2014-08-12 10:07:18.000000000 +0200
++++ uuid.pc.in	2020-05-08 15:13:40.515784809 +0200
+@@ -7,5 +7,5 @@
+ Description: Universally unique id library
+ Version: @LIBUUID_VERSION@
+ Requires:
+-Cflags: -I${includedir}/uuid
++Cflags: -I${includedir}/uuid -I${includedir}
+ Libs: -L${libdir} -luuid

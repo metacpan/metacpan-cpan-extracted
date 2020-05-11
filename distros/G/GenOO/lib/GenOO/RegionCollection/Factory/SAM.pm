@@ -43,7 +43,7 @@ GenOO::RegionCollection::Factory::SAM - Factory for creating GenOO::RegionCollec
 # Let the code begin...
 
 package GenOO::RegionCollection::Factory::SAM;
-$GenOO::RegionCollection::Factory::SAM::VERSION = '1.5.1';
+$GenOO::RegionCollection::Factory::SAM::VERSION = '1.5.2';
 use Moose;
 use namespace::autoclean;
 

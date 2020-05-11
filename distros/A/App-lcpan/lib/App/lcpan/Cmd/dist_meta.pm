@@ -1,7 +1,9 @@
 package App::lcpan::Cmd::dist_meta;
 
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '1.056'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-07'; # DATE
+our $DIST = 'App-lcpan'; # DIST
+our $VERSION = '1.057'; # VERSION
 
 use 5.010;
 use strict;
@@ -15,6 +17,7 @@ $SPEC{'handle_cmd'} = {
     v => 1.1,
     summary => 'Get distribution metadata',
     args => {
+        %App::lcpan::common_args,
         %App::lcpan::dist_args,
     },
 };
@@ -24,9 +27,9 @@ sub handle_cmd {
     my $state = App::lcpan::_init(\%args, 'ro');
     my $dbh = $state->{dbh};
 
-    my ($dist_id, $cpanid, $file_name, $file_id, $has_metajson, $has_metayml) = $dbh->selectrow_array(
-        "SELECT d.id, d.cpanid, f.name, f.id, f.has_metajson, f.has_metayml FROM dist d JOIN file f ON d.file_id=f.id WHERE d.is_latest AND d.name=?", {}, $args{dist});
-    $dist_id or return [404, "No such dist '$args{dist}'"];
+    my ($cpanid, $file_name, $file_id, $has_metajson, $has_metayml) = $dbh->selectrow_array(
+        "SELECT cpanid, name, id, has_metajson, has_metayml FROM file WHERE is_latest_dist AND dist_name=?", {}, $args{dist});
+    $file_id or return [404, "No such dist '$args{dist}'"];
     $has_metajson || $has_metayml or return [412, "Dist does not have metadata"];
 
     my $path = App::lcpan::_fullpath($file_name, $state->{cpan}, $cpanid);
@@ -53,7 +56,7 @@ App::lcpan::Cmd::dist_meta - Get distribution metadata
 
 =head1 VERSION
 
-This document describes version 1.056 of App::lcpan::Cmd::dist_meta (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of App::lcpan::Cmd::dist_meta (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 FUNCTIONS
 
@@ -72,7 +75,29 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<cpan> => I<dirname>
+
+Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
+
+Defaults to C<~/cpan>.
+
 =item * B<dist>* => I<perl::distname>
+
+=item * B<index_name> => I<filename> (default: "index.db")
+
+Filename of index.
+
+If C<index_name> is a filename without any path, e.g. C<index.db> then index will
+be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
+C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
+using the C<index_name>.
+
+=item * B<use_bootstrap> => I<bool> (default: 1)
+
+Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+If you are indexing your private CPAN-like repository, you want to turn this
+off.
 
 
 =back

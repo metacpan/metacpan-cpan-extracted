@@ -27,5 +27,5 @@ resources:
   bugtracker: https://github.com/robinsmidsrod/App-GitHubPullRequest/issues
   homepage: https://metacpan.org/module/App::GitHubPullRequest
   repository: git://github.com/robinsmidsrod/App-GitHubPullRequest.git
-version: 0.5.0
+version: 0.6.0
 x_serialization_backend: 'YAML::Tiny version 1.70'

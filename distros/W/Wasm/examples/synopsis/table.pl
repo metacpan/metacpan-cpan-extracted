@@ -10,6 +10,6 @@ my $instance = Wasm::Wasmtime::Instance->new(
   }),
 );
 
-my $table = $instance->get_export('table')->as_table;
+my $table = $instance->exports->table;
 print $table->type->element->kind, "\n";   # funcref
 print $table->size, "\n";                  # 1

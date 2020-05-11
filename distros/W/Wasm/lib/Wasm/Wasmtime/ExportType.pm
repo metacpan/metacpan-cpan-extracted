@@ -2,24 +2,25 @@ package Wasm::Wasmtime::ExportType;
 
 use strict;
 use warnings;
+use Ref::Util qw( is_blessed_ref );
 use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::ExternType;
 
 # ABSTRACT: Wasmtime export type class
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 $ffi_prefix = 'wasm_exporttype_';
 $ffi->load_custom_type('::PtrObject' => 'wasm_exporttype_t' => __PACKAGE__);
 
 
-$ffi->attach( new => ['wasm_byte_vec_t*', 'wasm_externtype_t'] => 'wasm_exporttype_t' => sub {
+$ffi->attach( new => ['wasm_byte_vec_t*', 'opaque'] => 'wasm_exporttype_t' => sub {
   my $xsub = shift;
   my $class = shift;
-  if(defined $_[1] && ref($_[1]) eq 'Wasm::Wasmtime::ExternType')
+
+  # not sure this is actually useful...
+  if(defined $_[1] && is_blessed_ref $_[1] && $_[1]->isa('Wasm::Wasmtime::ExternType'))
   {
-    # not sure this is actually useful?
-    # doesn't seem to bee a way to new an wasm_externtype_t
     my $name = Wasm::Wasmtime::ByteVec->new(shift);
     my $externtype = shift;
     my $self = $xsub->($name, $externtype->{ptr});
@@ -51,6 +52,16 @@ $ffi->attach( type => ['wasm_exporttype_t'] => 'wasm_externtype_t' => sub {
   $type;
 });
 
+
+sub to_string
+{
+  my($self) = @_;
+  my $kind   = $self->type->kind;
+  $kind =~ s/type$//;
+  # TODO: escape strings ?
+  sprintf '(%s (export "%s") %s)', $kind, $self->name, $self->type->to_string;
+}
+
 _generate_destroy();
 _generate_vec_class();
 
@@ -68,7 +79,7 @@ Wasm::Wasmtime::ExportType - Wasmtime export type class
 
 =head1 VERSION
 
-version 0.06
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -84,7 +95,8 @@ version 0.06
    )
  });
  
- my($foo, $bar) = $module->exports;
+ 
+ my($foo, $bar) = @{ $module->exports };
  
  print $foo->name, "\n";        # foo
  print $foo->type->kind, "\n";  # func
@@ -121,6 +133,12 @@ Returns the name of the export.
  my $externtype = $exporttype->type;
 
 Returns the L<Wasm::Wasmtime::ExternType> for the export.
+
+=head2 to_string
+
+ my $string = $exporttype->to_string;
+
+Converts the type into a string for diagnostics.
 
 =head1 SEE ALSO
 

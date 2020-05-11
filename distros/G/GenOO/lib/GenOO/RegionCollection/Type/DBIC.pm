@@ -46,7 +46,7 @@ GenOO::RegionCollection::Type::DBIC - Class for a collection of GenOO::Region ob
 # Let the code begin...
 
 package GenOO::RegionCollection::Type::DBIC;
-$GenOO::RegionCollection::Type::DBIC::VERSION = '1.5.1';
+$GenOO::RegionCollection::Type::DBIC::VERSION = '1.5.2';
 
 #######################################################################
 #######################   Load External modules   #####################

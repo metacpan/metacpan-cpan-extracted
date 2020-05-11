@@ -1,5 +1,8 @@
 #!perl
-# readme_md.pl: Make README.md from a Perl file.
+package # Hide from PAUSE
+    Data::Hopen::readme_pl;
+
+# readme.pl: Make README.md from a Perl file.
 # Part of Data::Hopen.
 
 use 5.014;

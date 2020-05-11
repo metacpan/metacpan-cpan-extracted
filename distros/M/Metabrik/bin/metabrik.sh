@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: metabrik.sh,v 5e03901df915 2015/10/17 10:29:48 gomor $
+# $Id$
 #
 
 PATH=$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin

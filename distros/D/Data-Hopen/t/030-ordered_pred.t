@@ -2,38 +2,124 @@
 # t\030-ordered_pred.t: tests of Data::Hopen::OrderedPredecessorGraph
 use rlib 'lib';
 use HopenTest;
+use Test::Fatal;
 
 use Data::Hopen::OrderedPredecessorGraph;
 
-my $g2 = Data::Hopen::OrderedPredecessorGraph->new;
-isa_ok($g2, 'Data::Hopen::OrderedPredecessorGraph');
-
-$g2->add_edge('a','a');
-$g2->add_edge('a','b');
-$g2->add_edge('b','c');
-$g2->add_edge('a','c');
-$g2->add_edge(1,'c');
-$g2->add_edge('e','c');
-
-# Test that the order doesn't change over 20 runs.
-my @preds = $g2->ordered_predecessors('c');
-cmp_ok(@preds, '==', 4, 'Right number of predecessors of c');
-is_deeply([$g2->ordered_predecessors('c')], \@preds, "c $_") foreach 1..19;
-
-# Initial part of the order shouldn't change even after you add an edge.
-$g2->add_edge('f', 'c');
-is_deeply([@{ [$g2->ordered_predecessors('c')] }[0..3]], \@preds,
-    "Adding edge doesn't change the first part of the order");
-
-# And a few more checks with the new edge.
-@preds = $g2->ordered_predecessors('c');
-cmp_ok(@preds, '==', 5, 'Right number of predecessors of c after adding edge');
-is_deeply([$g2->ordered_predecessors('c')], \@preds, "c2 $_") foreach 1..5;
-
-# Another edge
-$g2->add_edge('c','b');
-@preds = $g2->ordered_predecessors('b');
-cmp_ok(@preds, '==', 2, 'Right number of predecessors of b');
-is_deeply([$g2->ordered_predecessors('b')], \@preds, "b $_") foreach 1..5;
-
+basic();
+undef_order();
+add_edge();
 done_testing();
+
+sub basic {
+    my $g2 = Data::Hopen::OrderedPredecessorGraph->new;
+    isa_ok($g2, 'Data::Hopen::OrderedPredecessorGraph');
+
+    # a -> a
+    # + -> b -> c
+    # + ------> c
+    #      1 -> c
+    #      e -> c
+    $g2->add_edge('a','a');
+    $g2->add_edge('a','b');
+    $g2->add_edge('b','c');
+    $g2->add_edge('a','c');
+    $g2->add_edge(1,'c');
+    $g2->add_edge('e','c');
+
+    # Test that the order doesn't change over 20 runs (in case hash randomization
+    # or other internal factors might otherwise change the order).
+    my @preds = $g2->ordered_predecessors('c');
+    cmp_ok(@preds, '==', 4, 'Right number of predecessors of c');
+    is_deeply([$g2->ordered_predecessors('c')], \@preds, "c $_") foreach 1..19;
+
+    # Initial part of the order shouldn't change even after you add an edge.
+    $g2->add_edge('f', 'c');
+    is_deeply([@{ [$g2->ordered_predecessors('c')] }[0..3]], \@preds,
+        "Adding edge doesn't change the first part of the order");
+
+    # And a few more checks with the new edge.
+    @preds = $g2->ordered_predecessors('c');
+    cmp_ok(@preds, '==', 5, 'Right number of predecessors of c after adding edge');
+    is_deeply([$g2->ordered_predecessors('c')], \@preds, "c2 $_") foreach 1..5;
+
+    # Another edge
+    $g2->add_edge('c','b');
+    @preds = $g2->ordered_predecessors('b');
+    cmp_ok(@preds, '==', 2, 'Right number of predecessors of b');
+    is_deeply([$g2->ordered_predecessors('b')], \@preds, "b $_") foreach 1..5;
+
+    # For coverage
+    like exception { $g2->$_ }, qr{\bNeed\b}, "$_ throws with no args"
+        foreach qw(add_edge ordered_predecessors add_edge_by_id add_edge_get_id);
+}
+
+sub undef_order {
+    # If somehow an edge winds up with an undef order, it sorts to the front.
+    # This is because it gets edge ID 0, and all real edges have IDs > 0
+    # (see "INTERNAL PRECONDITION" on $D::H::OPG::_edge_id).
+    my $g = Data::Hopen::OrderedPredecessorGraph->new;
+    isa_ok($g, 'Data::Hopen::OrderedPredecessorGraph');
+
+    # a -> b -> c
+    #      d -> c
+    $g->add_edge('a', 'b');
+    $g->add_edge('b', 'c');
+    $g->add_edge('d', 'c');
+    my @preds = $g->ordered_predecessors('c');
+    cmp_ok(@preds, '==', 2, 'Predecessor count (plain)');
+    is($preds[0], 'b', 'First predecessor');
+    is($preds[1], 'd', 'Second predecessor');
+
+    my $ID = Data::Hopen::OrderedPredecessorGraph::_EDGE_ID;
+    my $dc_id = $g->get_edge_attribute('d', 'c', $ID);
+
+    # Tweak the later predecessor's ID
+    $g->set_edge_attribute('d', 'c', $ID, undef);
+    @preds = $g->ordered_predecessors('c');
+    cmp_ok(@preds, '==', 2, 'Predecessor count (later undef)');
+    is($preds[0], 'd', 'First predecessor');
+    is($preds[1], 'b', 'Second predecessor');
+
+    $g->set_edge_attribute('d', 'c', $ID, 0);
+    @preds = $g->ordered_predecessors('c');
+    cmp_ok(@preds, '==', 2, 'Predecessor count (later 0)');
+    is($preds[0], 'd', 'First predecessor');
+    is($preds[1], 'b', 'Second predecessor');
+
+    $g->set_edge_attribute('d', 'c', $ID, $dc_id);
+
+    # Tweak the earlier predecessor's ID, for coverage.  This should
+    # not change the order.
+    $g->set_edge_attribute('b', 'c', $ID, undef);
+    @preds = $g->ordered_predecessors('c');
+    cmp_ok(@preds, '==', 2, 'Predecessor count (earlier undef)');
+    is($preds[0], 'b', 'First predecessor');
+    is($preds[1], 'd', 'Second predecessor');
+
+    $g->set_edge_attribute('b', 'c', $ID, 0);
+    @preds = $g->ordered_predecessors('c');
+    cmp_ok(@preds, '==', 2, 'Predecessor count (earlier 0)');
+    is($preds[0], 'b', 'First predecessor');
+    is($preds[1], 'd', 'Second predecessor');
+}
+
+sub add_edge {
+    my $g = Data::Hopen::OrderedPredecessorGraph->new(multiedged => 1);
+    isa_ok($g, 'Data::Hopen::OrderedPredecessorGraph');
+
+    # a -> b -> c
+    #      d -> c
+    $g->add_edge_by_id('a', 'b', 'ab');
+    my $id = $g->add_edge_get_id('b', 'c');
+    ok(defined $id, 'defined autogenerated ID');
+    $g->add_edge_get_id('d', 'c');
+
+    # Not yet supported
+    my @preds;
+    like exception { @preds = $g->ordered_predecessors('c') },
+        qr/not yet supported/, 'Multiedged graphs are not yet supported';
+    #cmp_ok(@preds, '==', 2, 'Predecessor count (earlier 0)');
+    #is($preds[0], 'b', 'First predecessor');
+    #is($preds[1], 'd', 'Second predecessor');
+}

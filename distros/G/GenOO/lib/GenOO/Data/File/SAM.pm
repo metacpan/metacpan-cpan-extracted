@@ -33,7 +33,7 @@ GenOO::Data::File::SAM - Object implementing methods for accessing SAM formatted
 # Let the code begin...
 
 package GenOO::Data::File::SAM;
-$GenOO::Data::File::SAM::VERSION = '1.5.1';
+$GenOO::Data::File::SAM::VERSION = '1.5.2';
 
 #######################################################################
 #######################   Load External modules   #####################

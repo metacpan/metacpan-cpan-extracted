@@ -3,8 +3,8 @@ NAME
     GUI ones
 
 VERSION
-    This document describes version 0.004 of App::BrowserUtils (from Perl
-    distribution App-BrowserUtils), released on 2020-04-11.
+    This document describes version 0.006 of App::BrowserUtils (from Perl
+    distribution App-BrowserUtils), released on 2020-05-07.
 
 SYNOPSIS
 DESCRIPTION
@@ -69,7 +69,7 @@ FUNCTIONS
     often still eat considerable CPU cycles even though they only run in the
     background. Stopping (kill -STOP) the browser processes is a simple and
     effective way to stop CPU eating on Unix. It can be performed whenever
-    you are not using your browsers for a little while, e.g. when you are
+    you are not using your browser for a little while, e.g. when you are
     typing on an editor or watching a movie. When you want to use your
     browser again, simply unpause it.
 

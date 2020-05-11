@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step::Magnet;
-$Lab::Moose::Sweep::Step::Magnet::VERSION = '3.692';
+$Lab::Moose::Sweep::Step::Magnet::VERSION = '3.701';
 #ABSTRACT: Step/list sweep of magnetic field
 
 
@@ -31,6 +31,7 @@ sub BUILD {
 
     if ( $self->persistent_mode ) {
         $self->_current_rate( $self->start_rate );
+
         # the _field_setter needs a well-defined initial state
         $self->set_persistent_mode();
     }
@@ -53,6 +54,10 @@ sub _build_setter {
 sub set_persistent_mode {
     my $self       = shift;
     my $instrument = $self->instrument();
+    if ( $instrument->in_persistent_mode ) {
+        return;
+    }
+
     $instrument->heater_off();
     my $rate = $self->_current_rate;
     $instrument->sweep_to_field( target => 0, rate => $rate );
@@ -60,8 +65,11 @@ sub set_persistent_mode {
 }
 
 sub unset_persistent_mode {
-    my $self             = shift;
-    my $instrument       = $self->instrument();
+    my $self       = shift;
+    my $instrument = $self->instrument();
+    if ( not $instrument->in_persistent_mode ) {
+        return;
+    }
     my $persistent_field = $instrument->get_persistent_field();
     my $rate             = $self->_current_rate;
     $instrument->sweep_to_field( target => $persistent_field, rate => $rate );
@@ -98,7 +106,7 @@ Lab::Moose::Sweep::Step::Magnet - Step/list sweep of magnetic field
 
 =head1 VERSION
 
-version 3.692
+version 3.701
 
 =head1 SYNOPSIS
 
@@ -132,7 +140,7 @@ Default filename extension: C<'Field='>
 
 This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
-  Copyright 2018-2019  Simon Reinhardt
+  Copyright 2018-2020  Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

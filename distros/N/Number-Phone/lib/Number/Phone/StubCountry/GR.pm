@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200427120030;
+our $VERSION = 1.20200511123714;
 
 my $formatters = [
                 {
@@ -192,7 +192,8 @@ my $validators = {
           8(?:
             0[16]|
             12|
-            25
+            [27]5|
+            50
           )\\d{7}
         )|(90[19]\\d{7})|(5005000\\d{3})',
                 'toll_free' => '800\\d{7}',

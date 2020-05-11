@@ -143,12 +143,11 @@ is($fail, 'Fail: fwd:http://example.com/cool.php?crto=9809dfc8b938498b70e3b0a290
 $fail = '';
 
 # Fail required
-$t->get_ok('/local?fwd=')
+$t->get_ok('/local')
   ->status_is(403)
   ->content_is('fail-no-required')
   ;
 ok(!$fail, 'No hook');
-
 
 # Check all
 $t->get_ok('/all?fwd=hallo')

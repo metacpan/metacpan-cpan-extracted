@@ -43,7 +43,7 @@ GenOO::RegionCollection::Factory::BED - Factory for creating GenOO::RegionCollec
 # Let the code begin...
 
 package GenOO::RegionCollection::Factory::BED;
-$GenOO::RegionCollection::Factory::BED::VERSION = '1.5.1';
+$GenOO::RegionCollection::Factory::BED::VERSION = '1.5.2';
 
 #######################################################################
 #######################   Load External modules   #####################

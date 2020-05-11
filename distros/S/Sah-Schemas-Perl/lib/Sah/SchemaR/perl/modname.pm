@@ -1,12 +1,12 @@
 package Sah::SchemaR::perl::modname;
 
-our $DATE = '2020-02-15'; # DATE
-our $VERSION = '0.027'; # VERSION
+our $DATE = '2020-05-08'; # DATE
+our $VERSION = '0.031'; # VERSION
 
-our $rschema = ["str",[{description=>"\nPerl module name, e.g. `Foo`, `Foo::Bar`.\n\nContains coercion rule so you can also input `Foo-Bar`, `Foo/Bar`, or\n`Foo/Bar.pm` and it will be normalized into `Foo::Bar`.\n\nSee also: `perl::modargs`.\n\n",match=>"\\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*\\z",summary=>"Perl module name","x.completion"=>"perl_modname","x.perl.coerce_rules"=>["From_str::normalize_perl_modname"]}],["str"]];
+our $rschema = ["str",[{description=>"\nContains coercion rule so you can also input `Foo-Bar`, `Foo/Bar`, `Foo/Bar.pm`\nor even 'Foo.Bar' and it will be normalized into `Foo::Bar`.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"Foo::Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo-Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar.pm"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo.Bar"},{valid=>0,value=>"Foo|Bar"}],match=>"\\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*\\z",summary=>"Perl module name, e.g. Foo::Bar","x.completion"=>"perl_modname","x.perl.coerce_rules"=>["From_str::normalize_perl_modname"]}],["str"]];
 
 1;
-# ABSTRACT: Perl module name
+# ABSTRACT: Perl module name, e.g. Foo::Bar
 
 __END__
 
@@ -16,11 +16,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::perl::modname - Perl module name
+Sah::SchemaR::perl::modname - Perl module name, e.g. Foo::Bar
 
 =head1 VERSION
 
-This document describes version 0.027 of Sah::SchemaR::perl::modname (from Perl distribution Sah-Schemas-Perl), released on 2020-02-15.
+This document describes version 0.031 of Sah::SchemaR::perl::modname (from Perl distribution Sah-Schemas-Perl), released on 2020-05-08.
 
 =head1 DESCRIPTION
 

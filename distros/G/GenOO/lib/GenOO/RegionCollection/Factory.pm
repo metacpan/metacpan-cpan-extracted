@@ -38,7 +38,7 @@ GenOO::RegionCollection::Factory - Factory for creating L<GenOO::RegionCollectio
 # Let the code begin...
 
 package GenOO::RegionCollection::Factory;
-$GenOO::RegionCollection::Factory::VERSION = '1.5.1';
+$GenOO::RegionCollection::Factory::VERSION = '1.5.2';
 use MooseX::AbstractFactory;
 
 # Role that the implementations should implement

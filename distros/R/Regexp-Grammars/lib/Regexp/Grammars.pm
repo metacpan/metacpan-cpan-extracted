@@ -12,7 +12,7 @@ use vars ();
 use Scalar::Util qw< blessed reftype >;
 use Data::Dumper qw< Dumper  >;
 
-our $VERSION = '1.054';
+our $VERSION = '1.055';
 
 my $anon_scalar_ref = \do{my $var};
 my $MAGIC_VARS = q{my ($CAPTURE, $CONTEXT, $DEBUG, $INDEX, $MATCH, %ARG, %MATCH);};
@@ -1670,8 +1670,8 @@ sub _translate_subrule_calls {
                          (?: \\. | (?&PARENCODE) | (?&PARENS) | (?&CHARSET) | [^][()\\<>]++ )*+
                       \)
         )
-        (?<BRACES>    \{      (?: \\. | (?&BRACES)    | [^{}\\]++   )*+  \}     )
-        (?<PARENCODE> \(\?[{] (?: \\. | (?&BRACES)    | [^{}\\]++   )*+  [}]\)  )
+        (?<BRACES>    \{        (?: \\. | (?&BRACES)    | [^{}\\]++   )*+  \}   )
+        (?<PARENCODE> \(\?\??\{ (?: \\. | (?&BRACES)    | [^{}\\]++   )*+  \}\) )
         (?<HASH>      \% (?&IDENT) (?: :: (?&IDENT) )*                          )
         (?<CHARSET>   \[ \^?+ \]?+ (?: \[:\w+:\] | \\. | [^]] )*+        \]     )
         (?<IDENT>     [^\W\d]\w*+                                               )
@@ -2710,7 +2710,7 @@ Regexp::Grammars - Add grammatical parsing features to Perl 5.10 regexes
 
 =head1 VERSION
 
-This document describes Regexp::Grammars version 1.054
+This document describes Regexp::Grammars version 1.055
 
 
 =head1 SYNOPSIS

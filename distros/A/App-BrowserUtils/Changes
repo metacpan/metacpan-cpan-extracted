@@ -1,3 +1,24 @@
+0.006   2020-05-02  Released-By: PERLANCAR; Urgency: high
+
+        - Merge two releases 0.005 and 0.005.1.
+
+
+0.005.1 2020-04-27  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with newer Perinci::CmdLine::POD to render a more
+          complete usage line of Perinci::CmdLine scripts in POD (now all
+          options are listed, not just '[options]').
+
+        - UPDATE 2020-05-02: rename version to 0.005.1.
+
+
+0.005   2020-04-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Support action 'is_running'.
+
+
 0.004   2020-04-11  Released-By: PERLANCAR; Urgency: medium
 
         - [build] Rebuild to update Sah coerce rule modules

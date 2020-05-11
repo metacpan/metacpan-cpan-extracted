@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use utf8;
 
 use Test::More;
 
@@ -536,6 +537,76 @@ cmp_array(
 );
 
 is( $h5->mdel(qw/ 4 5 6 /), 3, 'shared hash, check mdel' );
+
+## --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+
+## https://sacred-texts.com/cla/usappho/sph02.htm (II)
+
+my $sappho_text =
+  "ἀλλά τυίδ᾽ ἔλθ᾽, αἴποτα κἀτέρωτα
+   τᾶσ ἔμασ αύδωσ αἴοισα πήλγι
+   ἔκλυεσ πάτροσ δὲ δόμον λίποισα
+   χρύσιον ἦλθεσ.";
+
+my $translation =
+  "Whenever before thou has hearkened to me--
+   To my voice calling to thee in the distance,
+   And heeding, thou hast come, leaving thy father's
+   Golden dominions.";
+
+$h5->assign( text => $sappho_text );
+is( $h5->get("text"), $sappho_text, 'shared hash, check unicode assign' );
+
+$h5->clear, $h5->set( text => $sappho_text );
+is( $h5->get("text"), $sappho_text, 'shared hash, check unicode set' );
+is( $h5->len("text"), length($sappho_text), 'shared hash, check unicode len' );
+
+$h5->clear, $h5->set( "ἀθάνατῳ", $sappho_text );
+is( $h5->get("ἀθάνατῳ"), $sappho_text, 'shared hash, check unicode get' );
+is( $h5->exists("ἀθάνατῳ"), 1, 'shared hash, check unicode exists' );
+
+my @keys = $h5->keys;
+my @vals = $h5->vals;
+
+is( $keys[0], "ἀθάνατῳ", 'shared hash, check unicode keys' );
+is( $vals[0], $sappho_text, 'shared hash, check unicode vals' );
+
+cmp_array(
+   [ $h5->pairs('key =~ /ἀθάνατῳ/') ], [ "ἀθάνατῳ", $sappho_text ],
+   'shared hash, check unicode find keys =~ match (pairs)'
+);
+cmp_array(
+   [ $h5->pairs('val =~ /ἔκλυεσ/') ], [ "ἀθάνατῳ", $sappho_text ],
+   'shared hash, check unicode find values =~ match (pairs)'
+);
+
+my $length = $h5->append("ἀθάνατῳ", "Ǣ");
+is( $h5->get("ἀθάνατῳ"), $sappho_text . "Ǣ", 'shared hash, check unicode append' );
+is( $length, length($sappho_text) + 1, 'shared hash, check unicode length' );
+
+$h5->clear();
+
+@vals = $h5->pipeline(
+   [ "set", foo => $sappho_text ],
+   [ "mget", qw/ foo / ]
+);
+
+cmp_array(
+   [ @vals ], [ $sappho_text ],
+   'shared hash, check unicode pipeline list'
+);
+
+@vals = $h5->pipeline_ex(
+   [ "set", bar => $sappho_text ],
+   [ "set", baz => $sappho_text ],
+);
+
+cmp_array(
+   [ @vals ], [ $sappho_text, $sappho_text ],
+   'shared hash, check unicode pipeline_ex list'
+);
+
+is( $h5->len('foo'), length($sappho_text), 'shared hash, check unicode length' );
 
 done_testing;
 

@@ -2,6 +2,9 @@ This is the changelog for FASTX::Reader. Version prior to v 0.1 are preliminary 
 Some APIs *can change* with the release of the first stable release (v 1.0).
 Version 0.61 has been available via BioConda
 
+0.91  2020-05-06
+  * Updated ScriptHelper (new function download[url, destdir])
+
 0.90  2020-05-03
   * Updated dist.ini dependency
   

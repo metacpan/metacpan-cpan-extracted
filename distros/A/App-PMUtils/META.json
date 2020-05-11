@@ -58,9 +58,9 @@
             "File::Which" : "0",
             "HTTP::Tiny" : "0.057",
             "IO::Prompt::I18N" : "0",
-            "IPC::System::Options" : "0.332",
+            "IPC::System::Options" : "0.335",
             "JSON::MaybeXS" : "0",
-            "Log::ger" : "0.027",
+            "Log::ger" : "0.037",
             "Module::CoreList" : "0",
             "Module::CoreList::More" : "0",
             "Module::List" : "0",
@@ -70,7 +70,7 @@
             "PERLANCAR::AppUtil::PerlStripper" : "0.03",
             "PERLANCAR::Module::List" : "0.004004",
             "Perinci::CmdLine::Any" : "0.13",
-            "Perinci::CmdLine::Lite" : "1.820",
+            "Perinci::CmdLine::Lite" : "1.827",
             "Perinci::Sub::Util" : "0.46",
             "Perl::MinimumVersion" : "0",
             "Perl::Stripper" : "0",
@@ -107,7 +107,7 @@
          "web" : "https://github.com/perlancar/perl-App-PMUtils"
       }
    },
-   "version" : "0.730",
+   "version" : "0.733",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -116,7 +116,7 @@
          {
             "class" : "Dist::Zilla::Plugin::InsertBlock",
             "name" : "InsertBlock",
-            "version" : "0.09"
+            "version" : "0.100"
          },
          {
             "class" : "Dist::Zilla::Plugin::InsertExample",
@@ -126,12 +126,12 @@
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript pmunlink",
-            "version" : "0.421"
+            "version" : "0.422"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript pmgrep",
-            "version" : "0.421"
+            "version" : "0.422"
          },
          {
             "class" : "Dist::Zilla::Plugin::InsertExecsList",
@@ -220,11 +220,6 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::FileFinder::ByName",
-            "name" : "@Author::PERLANCAR/FileFinder::ByName PERLANCAR",
-            "version" : "6.012"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::PERLANCAR/ExecDir script",
             "version" : "6.012"
@@ -232,7 +227,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.599"
+            "version" : "0.600"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -288,7 +283,7 @@
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
             "name" : "@Author::PERLANCAR/IfBuilt",
-            "version" : "0.02"
+            "version" : "0.03"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
@@ -457,7 +452,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
-                        "version" : "0.07"
+                        "version" : "0.082"
                      }
                   ]
                }
@@ -523,12 +518,14 @@
             "config" : {
                "Dist::Zilla::Plugin::Test::Perl::Critic::Subset" : {
                   "finder" : [
-                     "@Author::PERLANCAR/FileFinder::ByName PERLANCAR"
+                     ":ExecFiles",
+                     ":InstallModules",
+                     ":TestFiles"
                   ]
                }
             },
             "name" : "@Author::PERLANCAR/Test::Perl::Critic::Subset",
-            "version" : "3.001.003"
+            "version" : "3.001.005"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",

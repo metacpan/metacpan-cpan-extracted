@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use routines;
 
-our $VERSION = '2.02'; # VERSION
+our $VERSION = '2.03'; # VERSION
 
 # BUILD
 
@@ -66,6 +66,12 @@ method lookslike_a_path() {
   return $string =~ /^[A-Z](?:(?:\w|\\|\/|[\:\.]{1}[a-zA-Z0-9])*[a-zA-Z0-9])?$/;
 }
 
+method lookslike_a_pragma() {
+  my $string = $$self;
+
+  return $string =~ /^\[\w+\]$/;
+}
+
 method new($class: $name = '') {
 
   return bless \$name, $class;
@@ -73,6 +79,8 @@ method new($class: $name = '') {
 
 method package() {
   return $$self if $self->lookslike_a_package;
+
+  return substr($$self, 1, -1) if $self->lookslike_a_pragma;
 
   my $string = $$self;
 
@@ -212,7 +220,7 @@ The lookslike_a_file method returns truthy if its state resembles a filename.
 
   # given: synopsis
 
-  my $is_file = $name->lookslike_a_file; # falsey
+  my $is_file = $name->lookslike_a_file; # falsy
 
 =back
 
@@ -231,7 +239,7 @@ constant).
 
   # given: synopsis
 
-  my $is_label = $name->lookslike_a_label; # falsey
+  my $is_label = $name->lookslike_a_label; # falsy
 
 =back
 
@@ -250,7 +258,7 @@ name.
 
   # given: synopsis
 
-  my $is_package = $name->lookslike_a_package; # falsey
+  my $is_package = $name->lookslike_a_package; # falsy
 
 =back
 
@@ -269,6 +277,36 @@ The lookslike_a_path method returns truthy if its state resembles a file path.
   # given: synopsis
 
   my $is_path = $name->lookslike_a_path; # truthy
+
+=back
+
+=cut
+
+=head2 lookslike_a_pragma
+
+  lookslike_a_pragma() : Bool
+
+The lookslike_a_pragma method returns truthy if its state resembles a pragma.
+
+=over 4
+
+=item lookslike_a_pragma example #1
+
+  # given: synopsis
+
+  my $is_pragma = $name->lookslike_a_pragma; # falsy
+
+=back
+
+=over 4
+
+=item lookslike_a_pragma example #2
+
+  use Data::Object::Name;
+
+  my $name = Data::Object::Name->new('[strict]');
+
+  my $is_pragma = $name->lookslike_a_pragma; # truthy
 
 =back
 

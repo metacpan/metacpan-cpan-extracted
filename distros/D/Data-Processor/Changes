@@ -1,3 +1,6 @@
+1.0.6  2020-05-10 06:17:19 CEST
+    - (hadfl) complete array allow_empty
+
 1.0.5  2020-04-28 18:40:56 CEST
     - add allow_empty option for arrays (thanks, hadfl)
 

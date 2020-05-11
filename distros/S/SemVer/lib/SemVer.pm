@@ -9,29 +9,16 @@ use overload (
     '""'   => 'stringify',
     '<=>'  => 'vcmp',
     'cmp'  => 'vcmp',
+    'bool' => 'vbool',
 );
 
 our @ISA = qw(version);
-our $VERSION = '0.7.0'; # For Module::Build
+our $VERSION = '0.10.0'; # For Module::Build
 
 sub _die { require Carp; Carp::croak(@_) }
 
 # Prevent version.pm from mucking with our internals.
 sub import {}
-
-# Adapted from version.pm.
-my $STRICT_INTEGER_PART = qr/0|[1-9][0-9]*/;
-my $DOT_SEPARATOR = qr/\./;
-my $PLUS_SEPARATOR = qr/\+/;
-my $DASH_SEPARATOR = qr/-/;
-my $STRICT_DOTTED_INTEGER_PART = qr/$DOT_SEPARATOR$STRICT_INTEGER_PART/;
-my $STRICT_DOTTED_INTEGER_VERSION = qr/ $STRICT_INTEGER_PART $STRICT_DOTTED_INTEGER_PART{2,} /x;
-my $IDENTIFIER = qr/[-0-9A-Za-z]+/;
-my $DOTTED_IDENTIFIER = qr/(?:$DOT_SEPARATOR$IDENTIFIER)*/;
-my $PRERELEASE = qr/$IDENTIFIER$DOTTED_IDENTIFIER/;
-my $METADATA = qr/$IDENTIFIER$DOTTED_IDENTIFIER/;
-
-my $OPTIONAL_EXTRA_PART = qr/$PRERELEASE($PLUS_SEPARATOR$METADATA)?/;
 
 sub new {
     my ($class, $ival) = @_;
@@ -43,71 +30,64 @@ sub new {
     if (eval { $ival->isa('version') }) {
         my $self = $class->SUPER::new($ival);
         $self->{extra} = $ival->{extra};
-        $self->{dash}  = $ival->{dash};
-        $self->_evalPreRelease($self->{extra});
+        $self->{patch} = $ival->{patch};
+        $self->{prerelease} = $ival->{prerelease};
         return $self;
     }
 
-    my ($val, $dash, $extra) = (
-        $ival =~ /^v?($STRICT_DOTTED_INTEGER_VERSION)(?:($DASH_SEPARATOR)($OPTIONAL_EXTRA_PART))?$/
+    # Regex taken from https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string.
+    my ($major, $minor, $patch, $prerelease, $meta) = (
+        $ival =~ /^v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
     );
     _die qq{Invalid semantic version string format: "$ival"}
-        unless defined $val;
+        unless defined $major;
 
-    my $self = $class->SUPER::new($val);
-    $self->{dash}  = $dash;
-    $self->{extra} = $extra;
-    $self->_evalPreRelease($self->{extra});
-
-    return $self;
+    return _init($class->SUPER::new("$major.$minor.$patch"), $prerelease, $meta);
 }
 
-# Internal function to split up given string into prerelease- and patch-components
-sub _evalPreRelease {
-    no warnings 'uninitialized';
-    my $self = shift;
-    my $v = shift;
-    my ($preRelease, $plus, $patch) = (
-       $v =~ /^($PRERELEASE)(?:($PLUS_SEPARATOR)($METADATA))?$/
-    );
-    @{$self->{prerelease}} = split $DOT_SEPARATOR,$preRelease;
-    $self->{plus} = $plus;
-    @{$self->{patch}} = (split $DOT_SEPARATOR, $patch || undef);
-    return;
+sub _init {
+    my ($self, $pre, $meta) = @_;
+    if (defined $pre) {
+        $self->{extra} = "-$pre";
+        @{$self->{prerelease}} = split /[.]/, $pre;
+    }
+    if (defined $meta) {
+        $self->{extra} .= "+$meta";
+        @{$self->{patch}} = split /[.]/, $meta;
+    }
+
+    return $self;
 }
 
 $VERSION = __PACKAGE__->new($VERSION); # For ourselves.
 
-sub declare {
-    my ($class, $ival) = @_;
+sub _lenient {
+    my ($class, $ctor, $ival) = @_;
     return $class->new($ival) if Scalar::Util::isvstring($ival)
         or eval { $ival->isa('version') };
 
-    (my $v = $ival) =~ s/^v?$STRICT_DOTTED_INTEGER_VERSION(?:($DASH_SEPARATOR)($OPTIONAL_EXTRA_PART))[[:space:]]*$//;
-    my $dash  = $1;
-    my $extra = $2;
-    $v += 0 if $v =~ s/_//g; # ignore underscores.
-    my $self = $class->SUPER::declare($v);
-    $self->{dash}  = $dash;
-    $self->{extra} = $extra;
-    $self->_evalPreRelease($self->{extra});
-    return $self;
+    # Use official regex for prerelease and meta, use more lenient version num matching and whitespace.
+    my ($v, $prerelease, $meta) = (
+        $ival =~ /^[[:space:]]*
+            v?([\d_]+(?:\.[\d_]+(?:\.[\d_]+)?)?)
+            (?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?
+        [[:space:]]*$/x
+    );
+
+    _die qq{Invalid semantic version string format: "$ival"}
+        unless defined $v;
+
+    $v += 0 if $v && $v =~ s/_//g; # ignore underscores.
+    my $code = $class->can("SUPER::$ctor");
+    return _init($code->($class, $v), $prerelease, $meta);
+}
+
+sub declare {
+    shift->_lenient('declare', @_);
 }
 
 sub parse {
-    my ($class, $ival) = @_;
-    return $class->new($ival) if Scalar::Util::isvstring($ival)
-        or eval { $ival->isa('version') };
-
-    (my $v = $ival) =~ s/^v?$STRICT_DOTTED_INTEGER_VERSION(?:($DASH_SEPARATOR)($OPTIONAL_EXTRA_PART))[[:space:]]*$//;
-    my $dash  = $1;
-    my $extra = $2;
-    $v += 0 if $v =~ s/_//g; # ignore underscores.
-    my $self = $class->SUPER::parse($v);
-    $self->{dash}  = $dash;
-    $self->{extra} = $extra;
-    $self->_evalPreRelease($self->{extra});
-    return $self;
+    shift->_lenient('parse', @_);
 }
 
 sub stringify {
@@ -122,12 +102,15 @@ sub normal   {
     my $self = shift;
     (my $norm = $self->SUPER::normal) =~ s/^v//;
     $norm =~ s/_/./g;
-    return $norm . ($self->{extra} ? "-$self->{extra}" : '');
+    return $norm . ($self->{extra} || '');
 }
 
 sub numify   { _die 'Semantic versions cannot be numified'; }
 sub is_alpha { !!shift->{extra} }
-
+sub vbool {
+    my $self = shift;
+    return version::vcmp($self, $self->new("0.0.0"), 1);
+}
 
 # Sort Ordering:
 # Precedence refers to how versions are compared to each other when ordered. Precedence MUST be calculated by
@@ -231,7 +214,7 @@ SemVer - Use semantic version numbers
 =head1 Description
 
 This module subclasses L<version> to create semantic versions, as defined by
-the L<Semantic Versioning 2.0.0 Specification|http://semver.org/spec/v2.0.0.html>.
+the L<Semantic Versioning 2.0.0 Specification|https://semver.org/spec/v2.0.0.html>.
 The three salient points of the specification, for the purposes of version
 formatting, are:
 
@@ -283,7 +266,7 @@ shown as returned by C<normal()>:
   '  012.2.2' | <error>  | 12.2.2      | 12.2.2
   '1.1'       | <error>  | 1.1.0       | 1.100.0
    1.1        | <error>  | 1.1.0       | 1.100.0
-  '1.1.0b1'   | <error>  | 1.1.0-b1    | 1.1.0-b1
+  '1.1.0+b1'  | 1.1.0+b1 | 1.1.0+b1    | 1.1.0+b1
   '1.1-b1'    | <error>  | 1.1.0-b1    | 1.100.0-b1
   '1.2.b1'    | <error>  | 1.2.0-b1    | 1.2.0-b1
   '9.0-beta4' | <error>  | 9.0.0-beta4 | 9.0.0-beta4
@@ -303,7 +286,8 @@ As with L<version> objects, the comparison and stringification operators are
 all overloaded, so that you can compare semantic versions. You can also
 compare semantic versions with version objects (but not the other way around,
 alas). Boolean operators are also overloaded, such that all semantic version
-objects except for those consisting only of zeros are considered true.
+objects except for those consisting only of zeros (ignoring prerelease and
+metadata) are considered true.
 
 =head1 Interface
 
@@ -347,10 +331,10 @@ inconsistencies. Included only for proper compatibility with L<version>.
   SemVer->parse('1.02_30')->normal       # 1.230.0
   SemVer->parse(1.02_30)->normal         # 1.23.0
 
-Returns a normalized representation of the version. This string will always be
-a strictly-valid dotted-integer semantic version string suitable for passing
-to C<new()>. Unlike L<version>'s C<normal> method, there will be no leading
-"v".
+Returns a normalized representation of the version string. This string will
+always be a strictly-valid dotted-integer semantic version string suitable
+for passing to C<new()>. Unlike L<version>'s C<normal> method, there will be
+no leading "v".
 
 =head3 C<stringify>
 
@@ -374,9 +358,17 @@ there.
 
   my $is_alpha = $semver->is_alpha;
 
-Returns true if an ASCII string is appended to the end of the version string.
-This also means that the version number is a "special version", in the
-semantic versioning specification meaning of the phrase.
+Returns true if a prerelease and/or metadata string is appended to the end of
+the version string. This also means that the version number is a "special
+version", in the semantic versioning specification meaning of the phrase.
+
+=head3 C<vbool>
+
+  say "Version $semver" if $semver;
+  say "Not a $semver" if !$semver;
+
+Returns true for a non-zero semantic semantic version object, without regard
+to the prerelease or build metadata parts. Overloads boolean operations.
 
 =head3 C<vcmp>
 
@@ -385,7 +377,7 @@ returns 0 if they're the same, -1 if the invocant is smaller than the
 argument, and 1 if the invocant is greater than the argument.
 
 Mostly you don't need to worry about this: Just use the comparison operators
-instead. They will use this method:
+instead:
 
   if ($semver < $another_semver) {
       die "Need $another_semver or higher";
@@ -399,7 +391,7 @@ also compare regular L<version> objects:
   }
 
 You can also pass in a version string. It will be turned into a semantic
-version object using C<declare>. So if you're using integer versions, you may
+version object using C<declare>. So if you're using numeric versions, you may
 or may not get what you want:
 
   my $semver  = version::Semver->new('1.2.0');
@@ -408,15 +400,15 @@ or may not get what you want:
 
 If that's not what you want, pass the string to C<parse> first:
 
-  my $semver  = version::Semver->new('1.2.0');
-  my $version = version::Semver->parse('1.2'); # 1.200.0
+  my $semver  = Semver->new('1.2.0');
+  my $version = Semver->parse('1.2'); # 1.200.0
   my $bool    = $semver == $version; # false
 
 =head1 See Also
 
 =over
 
-=item * L<Semantic Versioning Specification|http://semver.org/>.
+=item * L<Semantic Versioning Specification|https://semver.org/>.
 
 =item * L<version>
 
@@ -427,12 +419,11 @@ If that's not what you want, pass the string to C<parse> first:
 =head1 Support
 
 This module is managed in an open
-L<GitHub repository|http://github.com/theory/semver/>. Feel free to fork and
-contribute, or to clone L<git://github.com/theory/semver.git> and send
+L<GitHub repository|https://github.com/theory/semver/>. Feel free to fork and
+contribute, or to clone L<https://github.com/theory/semver.git> and send
 patches!
 
-Found a bug? Please L<post|http://github.com/theory/semver/issues> or
-L<email|mailto:bug-semver@rt.cpan.org> a report!
+Found a bug? Please L<post|https://github.com/theory/semver/issues> a report!
 
 =head1 Acknowledgements
 
@@ -451,7 +442,7 @@ debugging help.
 
 =head1 Copyright and License
 
-Copyright (c) 2010-2018 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2010-2020 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

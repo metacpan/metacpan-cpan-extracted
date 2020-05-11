@@ -1,7 +1,9 @@
 package App::lcpan::Cmd::mod2dist;
 
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '1.056'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-07'; # DATE
+our $DIST = 'App-lcpan'; # DIST
+our $VERSION = '1.057'; # VERSION
 
 use 5.010;
 use strict;
@@ -32,10 +34,9 @@ sub handle_cmd {
     my $sth = $dbh->prepare("
 SELECT
   module.name module,
-  dist.name dist
+  file.dist_name dist
 FROM module
 LEFT JOIN file ON module.file_id=file.id
-LEFT JOIN dist ON file.id=dist.file_id
 WHERE module.name IN ($mods_s)");
 
     my $res;
@@ -67,7 +68,7 @@ App::lcpan::Cmd::mod2dist - Get distribution name of module(s)
 
 =head1 VERSION
 
-This document describes version 1.056 of App::lcpan::Cmd::mod2dist (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of App::lcpan::Cmd::mod2dist (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 FUNCTIONS
 

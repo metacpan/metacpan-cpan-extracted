@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use utf8;
 
 use Test::More;
 
@@ -648,6 +649,52 @@ cmp_array(
 );
 
 is( $h5->mdel(qw/ 4 5 6 /), 3, 'shared ordhash, check mdel' );
+
+## --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+
+## https://sacred-texts.com/cla/usappho/sph02.htm (IV)
+
+my $sappho_text =
+  "αῖψα δ᾽ ἐχίκοντο, σὺ δ᾽, ὦ μάσαιρα
+   μειδιάσαισ᾽ ἀθάνατῳ προσώπῳ,
+   ἤρἐ ὄττι δηὖτε πέπονθα κὤττι
+   δἦγτε κάλημι.";
+
+my $translation =
+  "Then, soon they arrived and thou, blessed goddess,
+   With divine contenance smiling, didst ask me
+   What new woe had befallen me now and why,
+   Thus I had called the.";
+
+$h5->assign( text => $sappho_text );
+is( $h5->get("text"), $sappho_text, 'shared ordhash, check unicode assign' );
+
+$h5->clear, $h5->set( text => $sappho_text );
+is( $h5->get("text"), $sappho_text, 'shared ordhash, check unicode set' );
+is( $h5->len("text"), length($sappho_text), 'shared ordhash, check unicode len' );
+
+$h5->clear, $h5->splice( 0, 0, "ἀθάνατῳ" => $sappho_text );
+is( $h5->get("ἀθάνατῳ"), $sappho_text, 'shared ordhash, check unicode splice' );
+is( $h5->exists("ἀθάνατῳ"), 1, 'shared ordhash, check unicode exists' );
+
+my @keys = $h5->keys;
+my @vals = $h5->vals;
+
+is( $keys[0], "ἀθάνατῳ", 'shared ordhash, check unicode keys' );
+is( $vals[0], $sappho_text, 'shared ordhash, check unicode vals' );
+
+cmp_array(
+   [ $h5->pairs('key =~ /ἀθάνατῳ/') ], [ "ἀθάνατῳ", $sappho_text ],
+   'shared ordhash, check unicode find keys =~ match (pairs)'
+);
+cmp_array(
+   [ $h5->pairs('val =~ /πέπονθα/') ], [ "ἀθάνατῳ", $sappho_text ],
+   'shared ordhash, check unicode find values =~ match (pairs)'
+);
+
+my $length = $h5->append("ἀθάνατῳ", "Ǣ");
+is( $h5->get("ἀθάνατῳ"), $sappho_text . "Ǣ", 'shared ordhash, check unicode append' );
+is( $length, length($sappho_text) + 1, 'shared ordhash, check unicode length' );
 
 done_testing;
 

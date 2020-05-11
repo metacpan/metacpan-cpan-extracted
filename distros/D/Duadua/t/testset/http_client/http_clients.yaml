@@ -301,3 +301,12 @@
   is_windows: false
   is_chromeos: false
   version: '2.1.0'
+- ua: 'PostmanRuntime/7.19.0'
+  name: 'Postman'
+  is_bot: false
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '7.19.0'

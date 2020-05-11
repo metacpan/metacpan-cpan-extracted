@@ -26,6 +26,7 @@ my $data_dir = catdir(@path, 'tdata');
 
 rmtree($test_dir);
 mkdir $test_dir;
+chmod 0755, $test_dir;
 chdir $test_dir;
 
 my $template_name = catfile($test_dir, 'gallery_template.htm');
@@ -71,6 +72,7 @@ EOQ
 
     my $gallery_dir = catfile($test_dir, 'gallery');
     mkdir($gallery_dir);
+    chmod 0755, $gallery_dir;
     chdir($gallery_dir);
 
     my $gal = App::Followme::CreateGallery->new(%configuration);

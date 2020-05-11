@@ -9,7 +9,7 @@ use Perl::Tidy;
 use Data::Dumper;
 use Module::Starter;
 $Data::Dumper::Deparse = 1;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 our %CLASS;
 our $SUB_INDEX = 1;
 
@@ -144,7 +144,7 @@ sub accessor {
 	};
 	$CLASS{CURRENT}{SUBS}{CURRENT}{CODE} = eval "sub {
 		my (\$self, \$value) = \@_;
-		if (\$value) {
+		if (defined \$value) {
 			\$self->{$sub} = \$value;
 		}
 		return \$self->{$sub}
@@ -450,7 +450,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 

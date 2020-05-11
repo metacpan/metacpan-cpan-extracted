@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use File::Object;
 use Tags::Output::PYX;
 use Test::More 'tests' => 3;

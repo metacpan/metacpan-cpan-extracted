@@ -1,9 +1,9 @@
 package Pod::Weaver::Plugin::PERLANCAR::SortSections;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-16'; # DATE
+our $DATE = '2020-02-19'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-PERLANCAR-SortSections'; # DIST
-our $VERSION = '0.081'; # VERSION
+our $VERSION = '0.082'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -11,7 +11,7 @@ use Moose;
 with 'Pod::Weaver::Role::Finalizer';
 with 'Pod::Weaver::Role::SortSections';
 
-use Sort::Sub::pod_sections_ala_perlancar;
+use Sort::Sub::pod_section_ala_perlancar;
 use namespace::autoclean;
 
 sub finalize_document {
@@ -19,7 +19,7 @@ sub finalize_document {
 
     $self->sort_sections(
         $document,
-        $Sort::Sub::pod_sections_ala_perlancar::SORT_SPEC,
+        $Sort::Sub::pod_section_ala_perlancar::SORT_SPEC,
     );
 }
 
@@ -39,7 +39,7 @@ Pod::Weaver::Plugin::PERLANCAR::SortSections - Sort POD sections like PERLANCAR
 
 =head1 VERSION
 
-This document describes version 0.081 of Pod::Weaver::Plugin::PERLANCAR::SortSections (from Perl distribution Pod-Weaver-Plugin-PERLANCAR-SortSections), released on 2020-02-16.
+This document describes version 0.082 of Pod::Weaver::Plugin::PERLANCAR::SortSections (from Perl distribution Pod-Weaver-Plugin-PERLANCAR-SortSections), released on 2020-02-19.
 
 =head1 SYNOPSIS
 

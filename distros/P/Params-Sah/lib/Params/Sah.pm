@@ -1,46 +1,83 @@
 package Params::Sah;
 
-our $DATE = '2016-06-05'; # DATE
-our $VERSION = '0.06'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-10'; # DATE
+our $DIST = 'Params-Sah'; # DIST
+our $VERSION = '0.072'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-
-use Carp;
-use Data::Dmp qw(dmp);
+use Log::ger;
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(gen_validator);
 
+our $OPT_BACKEND        = 'Data::Sah';
+our $OPT_ON_INVALID     = 'croak';
+our $OPT_INVALID_DETAIL = 0;
+our $OPT_NAMED          = 0;
+our $OPT_DISABLE        = 0;
+our $OPT_ALLOW_EXTRA    = 0;
 our $DEBUG;
 
-sub gen_validator {
+sub _plc {
     require Data::Sah;
-
     state $sah = Data::Sah->new;
     state $plc = $sah->get_compiler('perl');
+    $plc;
+}
 
-    my $opts;
-    if (ref($_[0]) eq 'HASH') {
-        $opts = shift;
-    } else {
-        $opts = {};
+sub gen_validator {
+    my ($opt_backend,
+        $opt_on_invalid, $opt_named, $opt_disable, $opt_allow_extra,
+        $opt_invalid_detail, $opt_optional_params);
+    {
+        my $opts;
+        if (ref($_[0]) eq 'HASH') {
+            $opts = {%{shift()}};
+        } else {
+            $opts = {};
+        }
+
+        $opt_backend = delete $opts->{backend} // $OPT_BACKEND // 'Data::Sah';
+        die "Invalid backend value, must be: Data::Sah|Data::Sah::Tiny"
+            unless $opt_backend =~ /\A(Data::Sah::Tiny|Data::Sah)\z/;
+        $opt_on_invalid = delete $opts->{on_invalid} // $OPT_ON_INVALID //
+            'croak';
+        die "Invalid on_invalid value, must be: croak|carp|warn|die|return"
+            unless $opt_on_invalid =~ /\A(croak|carp|warn|die|return)\z/;
+
+        $opt_invalid_detail = delete $opts->{invalid_detail} // $OPT_INVALID_DETAIL // 0;
+        die "Data::Sah::Tiny does not support invalid_detail=>1"
+            if $opt_backend eq 'Data::Sah::Tiny' && $opt_invalid_detail;
+        $opt_named = delete $opts->{named} // $OPT_NAMED // 0;
+        $opt_disable = delete $opts->{disable} // $OPT_DISABLE // 0;
+        $opt_allow_extra = delete $opts->{allow_extra} // $OPT_ALLOW_EXTRA // 0;
+        $opt_optional_params = delete $opts->{optional_params} // [];
+        keys(%$opts) and die "Uknown gen_validator() option(s) specified: ".
+            join(", ", sort keys %$opts);
     }
-    $opts->{on_invalid} //= 'croak';
-    croak "Invalid on_invalid value, must be: croak|carp|warn|die|bool|str"
-        unless $opts->{on_invalid} =~ /\A(croak|carp|warn|die|bool|str)\z/;
+    if ($opt_disable) {
+        return $opt_on_invalid eq 'str' ? sub {''} : sub {1};
+    }
+
+    require Carp;
+    require Data::Dmp;
 
     my %schemas;
-    if ($opts->{named}) {
+    my @schema_keys;
+    if ($opt_named) {
         %schemas = @_;
-        for (keys %schemas) {
-            croak "Invalid argument name, must be alphanums only"
-                unless /\A[A-Za-z_]\w*\z/;
+        @schema_keys = sort keys %schemas;
+        for (@schema_keys) {
+            Carp::croak("Invalid argument name, must be alphanums only")
+                  unless /\A[A-Za-z_][A-Za-z0-9_]*\z/;
         }
     } else {
         my $i = 0;
         %schemas = map {$i++ => $_} @_;
+        @schema_keys = reverse 0..$i-1;
     }
 
     my $src = '';
@@ -49,35 +86,83 @@ sub gen_validator {
     my @modules_for_all_args;
     my %mentioned_vars;
 
+    my $code_get_err_stmt = sub {
+        my ($err_term_detail, $err_term_generic) = @_;
+        if ($opt_on_invalid =~ /\A(croak|carp|warn|die)\z/) {
+            my $stmt = $opt_on_invalid =~ /\A(croak|carp)\z/ ?
+                "Carp::$opt_on_invalid" : $opt_on_invalid;
+            return "$stmt(".($opt_invalid_detail ? $err_term_detail : $err_term_generic // $err_term_detail).")";
+        } else {
+            # return
+            if ($opt_invalid_detail) {
+                return "return $err_term_detail";
+            } else {
+                return "return 0";
+            }
+        }
+    };
+
     # currently prototype won't force checking
-    if ($opts->{named}) {
-        $src .= "sub(\\%) {\n";
-    } else {
-        $src .= "sub(\\@) {\n";
-    }
+    #if ($opt_named) {
+    #    $src .= "sub(\\%) {\n";
+    #} else {
+    #    $src .= "sub(\\@) {\n";
+    #}
+    $src .= "sub {\n";
 
     $src .= "    my \$_ps_args = shift;\n";
-    $src .= "    my \$_ps_res;\n" unless $opts->{on_invalid} eq 'bool';
+    $src .= "    my \$_ps_res;\n" if $opt_invalid_detail;
 
-    for my $argname (sort keys %schemas) {
-        $src .= "\n\n    ### validating $argname:\n";
+    unless ($opt_allow_extra) {
+        $src .= "\n    ### checking unknown arguments\n";
+        if ($opt_named) {
+            $src .= "    state \$_ps_known_args = ".Data::Dmp::dmp({map {$_=>1} @schema_keys}).";\n";
+            $src .= "    my \@_ps_unknown_args;\n";
+            $src .= "    for (keys %\$_ps_args) { push \@_ps_unknown_args, \$_ unless exists \$_ps_known_args->{\$_} }\n";
+            $src .= "    if (\@_ps_unknown_args) { ".$code_get_err_stmt->(qq("There are extra unknown parameter(s): ".join(", ", \@_ps_unknown_args)))." }\n";
+        } else {
+            $src .= "    if (\@\$_ps_args > ".(scalar keys %schemas).") {\n";
+            $src .= "        ".$code_get_err_stmt->(qq("There are extra additional parameter(s)")).";\n";
+            $src .= "    }\n";
+        }
+    }
+
+    for my $argname (@schema_keys) {
+        unless (grep { $argname eq $_ } @$opt_optional_params) {
+            $src .= "\n    ### checking $argname exists:\n";
+            if ($opt_named) {
+                $src .= "\n    unless (exists \$_ps_args->{".Data::Dmp::dmp($argname)."}) { ".$code_get_err_stmt->(qq("Missing required parameter '$argname'"))." }\n";
+            } else {
+                $src .= "\n    if (\@\$_ps_args <= $argname) { ".$code_get_err_stmt->(qq("Missing required parameter [$argname]"))." }\n";
+            }
+        }
+
+        $src .= "\n    ### validating $argname:\n";
         my ($argterm, $data_name);
-        if ($opts->{named}) {
-            $argterm = '$_ps_args->{'.dmp($argname).'}';
+        if ($opt_named) {
+            $argterm = '$_ps_args->{'.Data::Dmp::dmp($argname).'}';
             $data_name = $argname;
         } else {
             $argterm = '$_ps_args->['.$argname.']';
             $data_name = "arg$argname";
         }
-        my $return_type = $opts->{on_invalid} eq 'bool' ? 'bool' : 'str';
-        my $cd = $plc->compile(
-            data_name    => $data_name,
-            data_term    => $argterm,
-            err_term     => '$_ps_res',
-            schema       => $schemas{$argname},
-            return_type  => $return_type,
-            indent_level => 1,
-        );
+        my $cd;
+        if ($opt_backend eq 'Data::Sah') {
+            $cd = _plc->compile(
+                data_name    => $data_name,
+                data_term    => $argterm,
+                err_term     => '$_ps_res',
+                schema       => $schemas{$argname},
+                return_type  => $opt_invalid_detail ? 'str' : 'bool',
+                indent_level => 1,
+            );
+        } else {
+            require Data::Sah::Tiny;
+            $cd = Data::Sah::Tiny::gen_validator($schemas{$argname}, {
+                hash => 1,
+                data_term => $argterm,
+            });
+        }
         die "Incompatible Data::Sah version (cd v=$cd->{v}, expected 2)" unless $cd->{v} == 2;
         for my $mod_rec (@{ $cd->{modules} }) {
             next unless $mod_rec->{phase} eq 'runtime';
@@ -89,33 +174,19 @@ sub gen_validator {
         for my $var (sort keys %{$cd->{vars}}) {
             next if $mentioned_vars{$var}++;
             my $val = $cd->{vars}{$var};
-            $src .= "    my \$$var" . (defined($val) ? " = ".dmp($val) : "").
+            $src .= "    my \$$var" . (defined($val) ? " = ".Data::Dmp::dmp($val) : "").
                 ";\n";
         }
-        if ($opts->{on_invalid} =~ /\A(croak|carp|warn|die)\z/) {
-            my $stmt = $opts->{on_invalid} =~ /\A(croak|carp)\z/ ?
-                "Carp::$opts->{on_invalid}" : $opts->{on_invalid};
-            $src .= "    undef \$_ps_res;\n" if
-                $i && $opts->{on_invalid} =~ /\A(carp|warn)\z/;
-            $src .= "    $stmt(\"$data_name: \$_ps_res\") ".
-                "if !($cd->{result});\n";
-        } else {
-            if ($return_type eq 'str') {
-                $src .= "    return \"$data_name: \$_ps_res\" ".
-                    "if !($cd->{result});\n";
-            } else {
-                $src .= "    return 0 if !($cd->{result});\n";
-            }
-        }
+        $src .= "    undef \$_ps_res;\n" if
+            $i && $opt_on_invalid =~ /\A(carp|warn)\z/;
+        $src .= "    ".$code_get_err_stmt->(qq("$data_name: \$_ps_res"), qq("$data_name: fail schema ".).Data::Dmp::dmp($schemas{$argname}))." if !($cd->{result});\n";
         $i++;
     } # for $argname
 
-    if ($opts->{on_invalid} eq 'bool') {
-        $src .= "    return 1\n";
-    } elsif ($opts->{on_invalid} eq 'str') {
-        $src .= "    return '';\n";
+    if ($opt_invalid_detail) {
+        $src .= "\n    return '';\n";
     } else {
-        $src .= "    return;\n";
+        $src .= "\n    return 1;\n";
     }
 
     $src .= "\n};";
@@ -145,33 +216,89 @@ Params::Sah - Validate method/function parameters using Sah schemas
 
 =head1 VERSION
 
-This document describes version 0.06 of Params::Sah (from Perl distribution Params-Sah), released on 2016-06-05.
+This document describes version 0.072 of Params::Sah (from Perl distribution Params-Sah), released on 2020-05-10.
 
 =head1 SYNOPSIS
 
  use Params::Sah qw(gen_validator);
 
- # for subroutines that accept positional parameters
+ # for subroutines that accept positional parameters. all parameters required,
+ # but you can pass undef to the third param.
  sub mysub1 {
-     state $validator = gen_validator('str*', 'int');
+     state $validator = gen_validator('str*', ['array*', min_len=>1], 'int');
      $validator->(\@_);
+     ...
  }
+ mysub1("john", ['a']);        # dies, the third argument is not passed
+ mysub1("john", ['a'], 2);     # ok
+ mysub1("john", ['a'], 2, 3);  # dies, extra parameter
+ mysub1("john", ['a'], undef); # ok, even though the third argument is undef
+ mysub1([],     ['a'], undef); # dies, first argument does not validate
+ mysub1("john", [], undef);    # dies, second argument does not validate
 
- # for subroutines that accept named parameters
+ # for subroutines that accept positional parameters (this time arrayref instead
+ # of array), some parameters optional. also this time we use 'allow_extra'
+ # option to allow additional positional parameters.
+ sub mysub1b {
+     my $args = shift;
+     state $validator = gen_validator({optional_params=>[2], allow_extra=>1}, 'str*', 'array*', 'int');
+     $validator->($args);
+     ...
+ }
+ mysub1b(["john", ['a']]);        # ok, the third argument is optional
+ mysub1b(["john", ['a'], 2]);     # ok
+ mysub1b(["john", ['a'], undef]); # ok
+ mysub1b(["john", ['a'], 2, 3]);  # ok, extra params allowed
+
+ # for subroutines that accept named parameters (as hash). all parameters
+ # required, but you can pass undef to the 'age' parameter.
  sub mysub2 {
      my %args = @_;
 
-     state $validator = gen_validator({named=>1}, name=>'str*', age=>'int');
+     state $validator = gen_validator({named=>1}, name=>'str*', tags=>['array*', min_len=>1], age=>'int');
      $validator->(\%args);
+     ...
  }
+ mysub2(name=>"john", tags=>['a']);             # dies, the 'age' argument is not passed
+ mysub2(name=>"john", tags=>['a'], age=>32);    # ok
+ mysub2(name=>"john", tags=>['a'], age=>undef); # ok, even though the 'age' argument is undef
+ mysub2(name=>[],     tags=>['a'], age=>undef); # dies, the 'name' argument does not validate
+ mysub2(name=>"john", tags=>[],    age=>undef); # dies, the 'tags' argument does not validate
 
-Examples for more complex schemas:
+ # for subroutines that accept named parameters (this time as hashref). some
+ # parameters optional. also this time we want to allow extra named parameters.
+ sub mysub2b {
+     my $args = shift;
 
- gen_validator(
-     {named => 1},
-     name => ['str*', min_len=>4, match=>qr/\S/],
-     age  => ['int', min=>17, max=>120],
- );
+     state $validator = gen_validator(
+         {named=>1, optional_params=>['age'], allow_extra=>1},
+         name=>'str*',
+         tags=>['array*', min_len=>1],
+         age=>'int*',
+     );
+     $validator->($args);
+     ...
+ }
+ mysub2b({name=>"john", tags=>['a']});                  # ok
+ mysub2b({name=>"john", tags=>['a'], age=>32});         # ok
+ mysub2b({name=>"john", tags=>['a'], age=>32, foo=>1}); # ok, extra param 'foo' allowed
+ mysub2b({name=>"john", tags=>['a'], age=>undef});      # dies, this time, 'age' cannot be undef
+
+Example with more complex schemas, with default value and coercion rules:
+
+ sub mysub2c {
+     my %args = @_;
+     state $validator = gen_validator(
+         {named => 1, optional_params => ['age']},
+         name => ['str*', min_len=>4, match=>qr/\S/, default=>'noname'],
+         age  => ['int', min=>17, max=>120],
+         tags => ['array*', min_len=>1, of=>['str*', match=>qr/\A\w+\z/], 'x.perl.coerce_rules'=>['From_str::comma_sep']],
+     );
+     $validator->(\%args);
+     ...
+ }
+ mysub2c(tags=>['a']);                   # after validation, %args will be: (name=>'noname', tags=>['a'])
+ mysub2c(name=>"mark", tags=>['b,c,d']); # after validation, %args will be: (name=>'mark', tags=>['b','c','d'])
 
 Validator generation options:
 
@@ -183,89 +310,39 @@ Validator generation options:
 This module provides a way for functions to validate their parameters using
 L<Sah> schemas.
 
-The interface is rather different than L<Params::Validate> because it returns a
-validator I<code> instead of directly validating parameters. The returned
-validator code is the actual routine that performs parameters checking. This is
-done for performance reason. For efficiency, you need to cache this validator
-code instead of producing them at each function call, thus the use of C<state>
-variables.
+=head1 VARIABLES
 
-Performance is faster than Params::Validate, since you can avoid recompiling
-specification or copying array/hash twice. Sah also provides a rich way to
-validate data structures.
+=head2 $DEBUG
+
+Bool. If set to true will print validator code when generated.
+
+=head2 $OPT_BACKEND
+
+Str. Used to set default for C<backend> option.
+
+=head2 $OPT_ALLOW_EXTRA
+
+Bool. Used to set default for C<allow_extra> option.
+
+=head2 $OPT_ON_INVALID
+
+String. Used to set default for C<on_invalid> option.
+
+=head2 $OPT_ERR_DETAIL
+
+Bool. Used to set default for C<err_detail> option.
+
+=head2 $OPT_DISABLE
+
+Bool. Used to set default for C<disable> option.
+
+=head2 $OPT_NAMED
+
+Bool. Used to set default for C<named> option.
 
 =head1 PERFORMANCE NOTES
 
-Sample benchmark against Params::Validate:
-
- #!/usr/bin/env perl
- 
- use 5.010;
- use strict;
- use warnings;
- use FindBin '$Bin';
- use lib "$Bin/../lib";
- 
- use Benchmark::Dumb qw(cmpthese);
- use Params::Sah qw(gen_validator);
- use Params::Validate qw(:all);
- 
- my @data1_pos   = ("ujang");
- 
- my @data2_named = (name=>"ujang", age=>30);
- my @data2_pos   = ("ujang", 30);
- 
- cmpthese(0, {
-     'P::Sah, pos, str' => sub {
-         state $validator = gen_validator(
-             'str*',
-         );
-         $validator->(\@data1_pos);
-     },
-     'P::V, pos, str' => sub {
-         validate_pos(@data1_pos,
-              {type=>SCALAR},
-         );
-     },
- 
-     'P::Sah, pos, str+int' => sub {
-         state $validator = gen_validator(
-             'str*',
-             'int',
-         );
-         $validator->(\@data2_pos);
-     },
-     'P::V, pos, str+int' => sub {
-         validate_pos(@data2_pos,
-              {type=>SCALAR},
-              {type=>SCALAR, regex=>qr/\A\d+\z/, optional=>1},
-         );
-     },
-     'P::Sah, named, str+int' => sub {
-         state $validator = gen_validator(
-             {named=>1},
-             name => 'str*',
-             age  => 'int',
-         );
-         $validator->({@data2_named});
-     },
-     'P::V, named, str+int' => sub {
-         validate(@data2_named, {
-             name => {type=>SCALAR},
-             age  => {type=>SCALAR, regex=>qr/\A\d+\z/, optional=>1},
-         });
-     },
- });
-
-Sample benchmark result on my laptop:
-
-                                   Rate P::V, named, str+int P::V, pos, str+int P::V, pos, str P::Sah, named, str+int P::Sah, pos, str+int P::Sah, pos, str
- P::V, named, str+int    77993.2+-0.14/s                   --             -28.3%         -72.3%                 -83.0%               -90.7%           -92.9%
- P::V, pos, str+int        108710+-140/s         39.38+-0.18%                 --         -61.4%                 -76.3%               -87.0%           -90.1%
- P::V, pos, str            281590+-530/s        261.04+-0.68%      159.03+-0.59%             --                 -38.6%               -66.4%           -74.4%
- P::Sah, named, str+int    458440+-180/s               487.8%      321.71+-0.57%   62.81+-0.31%                     --               -45.2%           -58.3%
- P::Sah, pos, str+int      837250+-880/s          973.5+-1.1%        670.2+-1.3%  197.33+-0.64%            82.63+-0.2%                   --           -23.9%
- P::Sah, pos, str       1.0997e+06+-24/s              1310.0%        911.6+-1.3%  290.54+-0.73%                 139.9%         31.35+-0.14%               --
+See benchmarks in L<Bencher::Scenarios::ParamsSah>.
 
 =head1 FUNCTIONS
 
@@ -288,6 +365,11 @@ Known options:
 
 =over
 
+=item * backend => str (default: Data::Sah)
+
+Can be set to the experimental L<Data::Sah::Tiny> to speed up validator
+generation for simpler schemas.
+
 =item * named => bool (default: 0)
 
 If set to true, it means we are generating validator for subroutine that accepts
@@ -298,6 +380,16 @@ a hash of parameter names and schemas instead of a list of schemas, for example:
 
  gen_validator({named=>1}, arg1=>'schema1', arg2=>'schema2', ...);
 
+=item * optional_params => array
+
+By default all parameters are required. This option specifies which parameters
+should be made optional. For positional parameters, specify the index (0-based).
+
+=item * allow_extra => bool (default: 0)
+
+If set to one then additional positional or named parameters are allowed (and
+not validated). By default, no extra parameters are allowed.
+
 =item * on_invalid => str (default: 'croak')
 
 What should the validator code do when function parameters are invalid? The
@@ -305,6 +397,23 @@ default is to croak (see L<Carp>) to report error to STDERR from the caller
 perspective. Other valid choices include: C<warn>, C<carp>, C<die>, C<bool>
 (return false on invalid, or true on valid), C<str> (return an error message on
 invalid, or empty string on valid).
+
+=item * invalid_detail => bool (default: 0)
+
+If set to true, will generate a more detailed error message. For example, with
+this schema:
+
+ [str => {min_len=>4}]
+
+then the string C<'foo'> will fail to validate with this error message "Length
+must be at least 4". Otherwise, the error message will just be something like:
+"Fail schema ['str', {min_len=>1}]". By default this option is set to false for
+slightly faster validation.
+
+=item * disable => bool (default: 0)
+
+If set to 1, will return an empty coderef validator. Used to disable parameter
+checking. Usually via setting L</$OPT_DISABLE> to disable globally.
 
 =back
 
@@ -320,16 +429,48 @@ L<Rinci> metadata which includes schemas for each function arguments.
 
 To be able to modify the original array/hash, e.g. set default value.
 
+=head2 What if my subroutine accepts a mix of positional and named parameters?
+
+You can put all your parameters in a hash first, then feed it to the validator.
+For example:
+
+ sub mysub {
+     my %args;
+     %args = %{shift} if req $_[0] eq 'HASH'; # accept optional hashref
+     ($args{x}, $args{y}) = @_; # positional params
+     state $validator = gen_validator(
+         {named=>1, optional_params=>['opt1','opt2']},
+         x=>"posint*",
+         y=>"negint*",
+         opt1=>"str*",
+         opt2=>"str",
+     );
+     $validator->(\%args);
+     ...
+ }
+ mysub(1, -2);                # ok, after validation %args will become (x=>1, y=>-2)
+ mysub({}, 1, -2);            # ok, after validation %args will become (x=>1, y=>-2)
+ mysub({opt1=>"foo"}, 1, -2); # ok, after validation %args will become (x=>1, y=>-2, opt1=>"foo")
+ mysub({opt3=>"foo"}, 1, -2); # dies, unknown option 'opt3'
+ mysub({opt1=>"foo"}, 1);     # dies, missing required arg 'x'
+ mysub({opt1=>[]}, 1, -2);    # dies, 'opt1' argument doesn't validate
+
 =head2 How to give default value to parameters?
 
-By using the Sah C<default> clause:
+By using the Sah C<default> clause in your schema:
 
  gen_validator(['str*', default=>'green']);
 
+=head2 How to make some parameters optional?
+
+By using the C<optional_params> option, which is an array of parameter names to make
+optional. To set a positional parameter optional, specify its index (0-based) as name.
+
 =head2 Why is my program failing with error message: Can't call method "state" on an undefined value?
 
-You need to use Perl 5.10 or newer and enable the 5.10 feature 'state':
+You need to specify that you want to use C<state> variables, either by:
 
+ # at least
  use 5.010;
 
 or:
@@ -394,12 +535,8 @@ feature.
 
 L<Sah>, L<Data::Sah>
 
-L<Params::Validate>
-
-L<Perinci::Sub::Wrapper>, if you want to do more than parameter validation.
-
-L<Perinci::Sub::ValidateArgs> and L<Data::Sah::Params>, an accidental
-reimplementation of the same idea a year later :-)
+Alternative modules: L<Params::ValidationCompiler> (a compiled version of
+L<Params::Validate>), L<Type::Params> (from L<Type::Tiny>).
 
 =head1 AUTHOR
 
@@ -407,7 +544,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

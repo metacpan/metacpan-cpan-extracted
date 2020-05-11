@@ -49,6 +49,14 @@
   is_linux: false
   is_windows: false
   is_chromeos: false
+- ua: 'AppEngine-Google; (+http://code.google.com/appengine; appid: s~foobarbaz)'
+  name: 'AppEngine-Google'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
 - ua: 'Mozilla/5.0 (compatible; Google-Site-Verification/1.0)'
   name: 'Google-Site-Verification'
   is_bot: true

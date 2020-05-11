@@ -26,7 +26,7 @@ resources:
   bugtracker: https://github.com/iamalnewkirk/data-object-name/issues
   homepage: https://metacpan.org/release/Data-Object-Name
   repository: git://github.com/iamalnewkirk/data-object-name.git
-version: '2.02'
+version: '2.03'
 x_authority: cpan:AWNCORP
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

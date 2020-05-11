@@ -1,3 +1,14 @@
+0.003 2020-05-10 16:33:14-0500
+  - No changes since 0.002_01.
+
+0.002_01 2020-05-07 16:05:28-0500
+  - Switch to Alien::Build. See PR
+    <https://github.com/zmughal-p5CPAN/p5-Alien-LibMagic/pull/8>.
+
+  - Use HTTPS to retrieve tarball instead of FTP.
+    Thanks to thibaultduponchelle! See
+    <https://github.com/zmughal-p5CPAN/p5-Alien-LibMagic/pull/6>.
+
 0.002 2016-04-17 13:09:07-0500
   - Added a minimum version version for Alien::Base `configure_requires`.
     Thanks to Graham Ollis (PLICEASE++)!

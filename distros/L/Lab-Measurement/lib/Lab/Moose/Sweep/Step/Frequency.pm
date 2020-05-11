@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step::Frequency;
-$Lab::Moose::Sweep::Step::Frequency::VERSION = '3.692';
+$Lab::Moose::Sweep::Step::Frequency::VERSION = '3.701';
 #ABSTRACT: Frequency sweep.
 
 
@@ -41,7 +41,7 @@ Lab::Moose::Sweep::Step::Frequency - Frequency sweep.
 
 =head1 VERSION
 
-version 3.692
+version 3.701
 
 =head1 Description
 

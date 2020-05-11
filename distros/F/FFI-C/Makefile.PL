@@ -71,9 +71,9 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Capture::Tiny"         => 0,
     "FFI::Platypus::Record" => 0,
-    "Test2::V0"             => "0.000060"
+    "Test2::V0"             => "0.000081"
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.06",
   "test"    => {
     "TESTS" => "t/*.t"
   }
@@ -89,7 +89,7 @@ my %FallbackPrereqs = (
   "Sub::Identify"         => 0,
   "Sub::Install"          => 0,
   "Sub::Util"             => 0,
-  "Test2::V0"             => "0.000060"
+  "Test2::V0"             => "0.000081"
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

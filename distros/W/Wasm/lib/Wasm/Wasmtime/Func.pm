@@ -2,13 +2,16 @@ package Wasm::Wasmtime::Func;
 
 use strict;
 use warnings;
+use base qw( Wasm::Wasmtime::Extern );
 use Ref::Util qw( is_blessed_ref is_plain_arrayref );
 use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::FuncType;
 use Wasm::Wasmtime::Trap;
-use Wasm::Wasmtime::CBC qw( perl_to_wasm wasm_allocate wasm_to_perl wasm_type wasm_memcpy );
+use FFI::C::Util qw( set_array_count );
 use Sub::Install;
 use Carp ();
+use constant is_func => 1;
+use constant kind => 'func';
 use overload
   '&{}' => sub { my $self = shift; sub { $self->call(@_) } },
   bool => sub { 1 },
@@ -16,14 +19,14 @@ use overload
   ;
 
 # ABSTRACT: Wasmtime function class
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 $ffi_prefix = 'wasm_func_';
 $ffi->load_custom_type('::PtrObject' => 'wasm_func_t' => __PACKAGE__);
 
 
-$ffi->attach( new => ['wasm_store_t', 'wasm_functype_t', 'opaque'] => 'wasm_func_t' => sub {
+$ffi->attach( new => ['wasm_store_t', 'wasm_functype_t', '(opaque,opaque)->opaque'] => 'wasm_func_t' => sub {
   my $xsub = shift;
   my $class = shift;
   if(is_blessed_ref $_[0] && $_[0]->isa('Wasm::Wasmtime::Store'))
@@ -39,7 +42,11 @@ $ffi->attach( new => ['wasm_store_t', 'wasm_functype_t', 'opaque'] => 'wasm_func
     my $wrapper = $ffi->closure(sub {
       my($params, $results) = @_;
 
-      my @args = $param_arity ? wasm_to_perl($params) : ();
+      my @args = $param_arity ? do {
+        my $args = Wasm::Wasmtime::ValVec->from_c($params);
+        set_array_count($args, $param_arity);
+        $args->to_perl;
+      } : ();
 
       local $@ = '';
       my @ret = eval {
@@ -52,13 +59,22 @@ $ffi->attach( new => ['wasm_store_t', 'wasm_functype_t', 'opaque'] => 'wasm_func
       }
       else
       {
-        wasm_memcpy($results, perl_to_wasm(\@ret, [$functype->results])) if $result_arity;
+        if($result_arity)
+        {
+          $results = Wasm::Wasmtime::ValVec->from_c($results);
+          my @types = $functype->results;
+          foreach my $i (0..$#types)
+          {
+            my $kind = $types[$i]->kind;
+            my $result = $results->get($i);
+            $result->kind($types[$i]->kind_num);
+            $result->of->$kind(shift @ret);
+          }
+        }
         return undef;
       }
     });
-    my $wasm_type = wasm_type($param_arity);
-    my $fptr = $ffi->cast("($wasm_type,opaque)->opaque", => 'opaque', $wrapper);
-    my $self = $xsub->($store, $functype, $fptr);
+    my $self = $xsub->($store, $functype, $wrapper);
     $self->{store} = $store;
     $self->{wrapper} = $wrapper;
     return $self;
@@ -74,11 +90,11 @@ $ffi->attach( new => ['wasm_store_t', 'wasm_functype_t', 'opaque'] => 'wasm_func
 });
 
 
-$ffi->attach( call => ['wasm_func_t', 'string', 'string'] => 'wasm_trap_t' => sub {
+$ffi->attach( call => ['wasm_func_t', 'wasm_val_vec_t', 'wasm_val_vec_t'] => 'wasm_trap_t' => sub {
   my $xsub = shift;
   my $self = shift;
-  my $args = perl_to_wasm(\@_, [$self->type->params]);
-  my $results = wasm_allocate( $self->result_arity );
+  my $args = Wasm::Wasmtime::ValVec->from_perl(\@_, [$self->type->params]);
+  my $results = $self->result_arity ? Wasm::Wasmtime::ValVec->new($self->result_arity) : undef;
 
   my $trap = $xsub->($self, $args, $results);
 
@@ -88,7 +104,7 @@ $ffi->attach( call => ['wasm_func_t', 'string', 'string'] => 'wasm_trap_t' => su
     Carp::croak("trap in wasm function call: $message");
   }
   return unless defined $results;
-  my @results = wasm_to_perl($results);
+  my @results = $results->to_perl;
   wantarray ? @results : $results[0]; ## no critic (Freenode::Wantarray)
 });
 
@@ -129,15 +145,7 @@ $ffi->attach( result_arity => ['wasm_func_t'] => 'size_t' => sub {
   $xsub->($self);
 });
 
-
-# actually returns a wasm_extern_t, but recursion
-$ffi->attach( as_extern => ['wasm_func_t'] => 'opaque' => sub {
-  my($xsub, $self) = @_;
-  require Wasm::Wasmtime::Extern;
-  my $ptr = $xsub->($self);
-  Wasm::Wasmtime::Extern->new($ptr, $self->{owner} || $self);
-});
-
+__PACKAGE__->_cast(0);
 _generate_destroy();
 
 1;
@@ -154,7 +162,7 @@ Wasm::Wasmtime::Func - Wasmtime function class
 
 =head1 VERSION
 
-version 0.06
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -171,7 +179,7 @@ version 0.06
  });
  
  my $instance = Wasm::Wasmtime::Instance->new($module);
- my $add = $instance->get_export('add')->as_func;
+ my $add = $instance->exports->add;
  print $add->call(1,2), "\n";  # 3
 
  # Call Perl from Wasm
@@ -192,7 +200,7 @@ version 0.06
  );
  
  my $instance = Wasm::Wasmtime::Instance->new($module, [$hello]);
- $instance->get_export("run")->as_func->call(); # hello world!
+ $instance->exports->run->call(); # hello world!
 
 =head1 DESCRIPTION
 
@@ -261,12 +269,6 @@ Returns the number of arguments the function takes.
  my $num = $func->param_arity;
 
 Returns the number of results the function returns.
-
-=head2 as_extern
-
- my $extern = $func->as_extern;
-
-Returns the L<Wasm::Wasmtime::Extern> for this function.
 
 =head1 SEE ALSO
 

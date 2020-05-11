@@ -1,5 +1,5 @@
 package Alien::UDUNITS2;
-$Alien::UDUNITS2::VERSION = '0.006';
+$Alien::UDUNITS2::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -10,29 +10,73 @@ our @EXPORT_OK = qw(Inline);
 use Perl::OSType qw(os_type);
 use File::Spec;
 
-sub Inline {
-	return unless $_[-1] eq 'C'; # Inline's error message is good
-	my $self = __PACKAGE__->new;
-	+{
-		LIBS => $self->libs,
-		INC => $self->cflags,
-		AUTO_INCLUDE => '#include "udunits2.h"',
-	};
+sub inline_auto_include {
+	[ 'udunits2.h' ];
+}
+
+sub cflags {
+	my ($class) = @_;
+
+	$class->install_type eq 'share'
+		? '-I' . File::Spec->catfile($class->dist_dir, qw(include))
+		: $class->SUPER::cflags;
 }
 
 sub libs {
-	my ($self) = @_;
-	if( os_type() eq 'Windows' ) {
-		my $libs = $self->SUPER::libs;
-		$libs .= " -lexpat";
-		return $libs;
+	my ($class) = @_;
+
+	my $path = $class->install_type eq 'share'
+		? '-L' . File::Spec->catfile($class->dist_dir, qw(lib))
+		: $class->SUPER::cflags;
+
+	join ' ', (
+		$path,
+		'-ludunits2',
+		( $^O eq 'darwin' || $^O eq 'MSWin32' ? '-lexpat' : '')
+	);
+
+}
+
+sub Inline {
+	my ($class, $lang) = @_;
+	return unless $lang eq 'C'; # Inline's error message is good
+	my $params = Alien::Base::Inline(@_);
+
+	# Use static linking instead of dynamic linking. This works
+	# better on some platforms. On macOS, to use dynamic linking,
+	# the `install_name` of the library must be set, but since this
+	# is the final path by default, linking to the `.dylib` under
+	# `blib/` at test time does not work without using `@rpath`.
+	if( $^O eq 'darwin' and $class->install_type eq 'share' ) {
+		$params->{MYEXTLIB} .= ' ' .
+			join( " ",
+				map { File::Spec->catfile(
+					File::Spec->rel2abs($class->dist_dir),
+					'lib',  $_ ) }
+				qw(libudunits2.a)
+			);
+		$params->{LIBS} =~ s/-ludunits2//g;
 	}
-	$self->SUPER::libs;
+
+	$params;
 }
 
 sub units_xml {
 	my ($self) = @_;
-	my ($file) = grep { -f } map { ( "$_/share/udunits/udunits2.xml", "$_/lib/udunits2.xml" ) } ($self->dist_dir);
+
+	my ($file) = grep
+		{ -f }
+		map {
+			(
+				"$_/share/xml/udunits/udunits2.xml",
+				"$_/share/udunits/udunits2.xml",
+				"$_/lib/udunits2.xml"
+			)
+		} (
+			$self->install_type eq 'share'
+			? $self->dist_dir
+			: "/usr"
+		);
 
 	$file;
 }
@@ -49,7 +93,7 @@ Alien::UDUNITS2 - Alien package for the UDUNITS-2 physical unit manipulation and
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 Inline support
 

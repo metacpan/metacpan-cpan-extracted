@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Lakeshore340;
-$Lab::Moose::Instrument::Lakeshore340::VERSION = '3.692';
+$Lab::Moose::Instrument::Lakeshore340::VERSION = '3.701';
 #ABSTRACT: Lakeshore Model 340 Temperature Controller
 
 use 5.010;
@@ -26,6 +26,12 @@ has input_channel => (
     default => 'A',
 );
 
+has default_loop => (
+    is      => 'ro',
+    isa     => enum( [ 1 .. 2 ] ),
+    default => 1,
+);
+
 sub BUILD {
     my $self = shift;
     $self->clear();
@@ -33,7 +39,7 @@ sub BUILD {
 }
 
 my %channel_arg = ( channel => { isa => enum( [qw/A B/] ), optional => 1 } );
-my %loop_arg = ( loop => { isa => enum( [qw/1 2/] ) } );
+my %loop_arg    = ( loop    => { isa => enum( [qw/1 2/] ), optional => 1 } );
 
 
 sub get_T {
@@ -51,12 +57,22 @@ sub get_value {
 }
 
 
+sub get_sensor_units_reading {
+    my ( $self, %args ) = validated_getter(
+        \@_,
+        %channel_arg
+    );
+    my $channel = delete $args{channel} // $self->input_channel();
+    return $self->query( command => "SRDG? $channel", %args );
+}
+
+
 sub get_setpoint {
     my ( $self, %args ) = validated_getter(
         \@_,
         %loop_arg
     );
-    my $loop = delete $args{loop};
+    my $loop = delete $args{loop} // $self->default_loop;
     return $self->query( command => "SETP? $loop", %args );
 }
 
@@ -65,7 +81,7 @@ sub set_setpoint {
         \@_,
         %loop_arg
     );
-    my $loop = delete $args{loop};
+    my $loop = delete $args{loop} // $self->default_loop;
 
     # Device bug. The 340 cannot parse values with too many digits.
     $value = sprintf( "%.6G", $value );
@@ -99,7 +115,7 @@ sub set_control_mode {
         value => { isa => enum( [ ( 1 .. 6 ) ] ) },
         %loop_arg
     );
-    my $loop = delete $args{loop};
+    my $loop = delete $args{loop} // $self->default_loop;
     return $self->write( command => "CMODE $loop,$value", %args );
 }
 
@@ -108,7 +124,7 @@ sub get_control_mode {
         \@_,
         %loop_arg
     );
-    my $loop = delete $args{loop};
+    my $loop = delete $args{loop} // $self->default_loop;
     return $self->query( command => "CMODE? $loop", %args );
 }
 
@@ -126,6 +142,7 @@ sub set_control_parameters {
 
     my ( $loop, $units, $state, $powerup_enable )
         = delete @args{qw/loop units state powerup_enable/};
+    $loop = $loop // $self->default_loop;
     $self->write( command => "CSET $loop, $channel, $units, $state,"
             . "$powerup_enable", %args );
 }
@@ -135,9 +152,9 @@ sub get_control_parameters {
         \@_,
         %loop_arg
     );
-    my $loop = delete $args{loop};
-    my $rv   = $self->query( command => "CSET? $loop", %args );
-    my @rv   = split /,/, $rv;
+    my $loop = delete $args{loop} // $self->default_loop();
+    my $rv = $self->query( command => "CSET? $loop", %args );
+    my @rv = split /,/, $rv;
     return (
         channel        => $rv[0], units => $rv[1], state => $rv[2],
         powerup_enable => $rv[3]
@@ -186,8 +203,9 @@ sub set_pid {
         D => { isa => 'Lab::Moose::PosNum' }
     );
     my ( $loop, $P, $I, $D ) = delete @args{qw/loop P I D/};
+    $loop = $loop // $self->default_loop();
     $self->write(
-        command => sprintf( "PID $loop %f.1 %f.1 %d", $P, $I, $D ),
+        command => sprintf( "PID $loop, %f.1, %f.1, %d", $P, $I, $D ),
         %args
     );
 }
@@ -197,11 +215,57 @@ sub get_pid {
         \@_,
         %loop_arg
     );
-    my $loop = delete $args{loop};
+    my $loop = delete $args{loop} // $self->default_loop;
     my $pid = $self->query( command => "PID? $loop", %args );
     my %pid;
     @pid{qw/P I D/} = split /,/, $pid;
     return %pid;
+}
+
+
+sub set_zone {
+    my ( $self, %args ) = validated_getter(
+        \@_,
+        %loop_arg,
+        zone => { isa => enum( [ 1 .. 10 ] ) },
+        top  => { isa => 'Lab::Moose::PosNum' },
+        P    => { isa => 'Lab::Moose::PosNum' },
+        I    => { isa => 'Lab::Moose::PosNum' },
+        D    => { isa => 'Lab::Moose::PosNum' },
+        mout => { isa => 'Lab::Moose::PosNum', optional => 1 },
+        range => { isa => enum( [ 0 .. 5 ] ) },
+    );
+    my ( $loop, $zone, $top, $P, $I, $D, $mout, $range )
+        = delete @args{qw/loop zone top P I D mout range/};
+    $loop = $loop // $self->default_loop;
+    if ( defined $mout ) {
+        $mout = sprintf( "%.1f", $mout );
+    }
+    else {
+        $mout = ' ';
+    }
+
+    $self->write(
+        command => sprintf(
+            "ZONE $loop, $zone, %.6G, %.1f, %.1f, %d, $mout, $range", $top,
+            $P, $I, $D
+        ),
+        %args
+    );
+}
+
+sub get_zone {
+    my ( $self, %args ) = validated_getter(
+        \@_,
+        %loop_arg,
+        zone => { isa => enum( [ 1 .. 10 ] ) }
+    );
+    my ( $loop, $zone ) = delete @args{qw/loop zone/};
+    $loop = $loop // $self->default_loop;
+    my $result = $self->query( command => "ZONE? $loop, $zone", %args );
+    my %zone;
+    @zone{qw/top P I D mout range/} = split /,/, $result;
+    return %zone;
 }
 
 
@@ -221,7 +285,7 @@ Lab::Moose::Instrument::Lakeshore340 - Lakeshore Model 340 Temperature Controlle
 
 =head1 VERSION
 
-version 3.692
+version 3.701
 
 =head1 SYNOPSIS
 
@@ -251,6 +315,12 @@ C<$channel> can be 'A' or 'B'. The default can be set in the constructor.
 =head2 get_value
 
 alias for C<get_T>.
+
+=head2 get_sensor_units_reading
+
+ my $reading = $lakeshore->get_sensor_units_reading(channel => $channel);
+
+Get sensor units reading (like resistance) of an input channel.
 
 =head2 set_setpoint/get_setpoint
  # set/get SP for loop 1 in whatever units the setpoint is using
@@ -306,6 +376,20 @@ Valid entries: 1 = local, 2 = remote, 3 = remote with local lockout.
  $lakeshore->set_pid(loop => 1, P => 1, I => 50, D => 50)
  my %PID = $lakeshore->get_pid(loop => 1);
  # %PID = (P => $P, I => $I, D => $D);
+
+=head2 set_zone/get_zone
+
+ $lakeshore->set_zone(
+     loop => 1,
+     zone => 1,
+     top  => 10,
+     P    => 25,
+     I    => 10,
+     D    => 20,
+     range => 1
+ );
+
+ my %zone = $lakeshore->get_zone(loop => 1, zone => 1);
 
 =head2 Consumed Roles
 

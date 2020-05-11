@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Queue;
-$RT::Client::REST::Queue::VERSION = '0.59';
+$RT::Client::REST::Queue::VERSION = '0.60';
 use Params::Validate qw(:types);
 use RT::Client::REST 0.20;
 use RT::Client::REST::Object 0.01;
@@ -139,7 +139,7 @@ RT::Client::REST::Queue - queue object representation.
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 

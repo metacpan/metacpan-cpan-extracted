@@ -1,9 +1,9 @@
 package App::lcpan::Cmd::rdeps_scripts;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-06'; # DATE
+our $DATE = '2020-05-07'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.056'; # VERSION
+our $VERSION = '1.057'; # VERSION
 
 use 5.010;
 use strict;
@@ -58,16 +58,15 @@ sub handle_cmd {
     push @dists, $_->{dist} for @{ $res->[2] };
 
     my @where;
-    push @where, "dist.name IN (".
+    push @where, "file.dist_name IN (".
         join(",", map { $dbh->quote($_) } @dists).")";
     my $sql = "SELECT
   script.name name,
-  dist.name dist,
+  file.dist_name dist,
   script.cpanid author,
   script.abstract abstract
 FROM script
 LEFT JOIN file ON script.file_id=file.id
-LEFT JOIN dist ON file.id=dist.file_id
 WHERE ".join(" AND ", @where)."
 ";
 
@@ -97,7 +96,7 @@ App::lcpan::Cmd::rdeps_scripts - List scripts that depend on specified modules
 
 =head1 VERSION
 
-This document describes version 1.056 of App::lcpan::Cmd::rdeps_scripts (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of App::lcpan::Cmd::rdeps_scripts (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 FUNCTIONS
 

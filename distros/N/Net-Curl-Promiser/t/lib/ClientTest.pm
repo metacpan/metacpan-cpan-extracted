@@ -33,7 +33,7 @@ sub run {
         $easy->setopt( CURLOPT_HEADERDATA() => \$easy->{'_head'} );
         $easy->setopt( CURLOPT_FILE() => \$easy->{'_body'} );
 
-        # Even on the slowest machines this ought to be it.
+        # Even on the slowest machines this ought to do it.
         $easy->setopt( CURLOPT_TIMEOUT() => 30 );
 
         $promiser->add_handle($easy)->then(

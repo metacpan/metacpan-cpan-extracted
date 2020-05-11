@@ -2,13 +2,16 @@ package Wasm::Wasmtime::GlobalType;
 
 use strict;
 use warnings;
+use base qw( Wasm::Wasmtime::ExternType );
 use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::ValType;
 use Ref::Util qw( is_ref );
 use Carp ();
+use constant is_globaltype => 1;
+use constant kind => 'globaltype';
 
 # ABSTRACT: Wasmtime global type class
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 $ffi_prefix = 'wasm_globaltype_';
@@ -71,14 +74,13 @@ $ffi->attach( mutability => ['wasm_globaltype_t'] => 'uint8' => sub {
 });
 
 
-# actually returns a wasm_externtype_t, but recursion
-$ffi->attach( as_externtype => ['wasm_globaltype_t'] => 'opaque' => sub {
-  my($xsub, $self) = @_;
-  require Wasm::Wasmtime::ExternType;
-  my $ptr = $xsub->($self);
-  Wasm::Wasmtime::ExternType->new($ptr, $self->{owner} || $self);
-});
+sub to_string
+{
+  my($self) = @_;
+  return sprintf("(%s %s)", $self->mutability, $self->content->to_string);
+}
 
+__PACKAGE__->_cast(1);
 _generate_destroy();
 
 1;
@@ -95,7 +97,7 @@ Wasm::Wasmtime::GlobalType - Wasmtime global type class
 
 =head1 VERSION
 
-version 0.06
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -146,11 +148,11 @@ Returns the L<Wasm::Wasmtime::ValType> for this global type.
 
 Returns the mutability for this global type.  One of either C<const> or C<var>.
 
-=head2 as_externtype
+=head2 to_string
 
- my $externtype = $globaltype->as_externtype
+ my $string = $globaltype->to_string;
 
-Returns the L<Wasm::Wasmtime::ExternType> for this global type.
+Converts the type into a string for diagnostics.
 
 =head1 SEE ALSO
 

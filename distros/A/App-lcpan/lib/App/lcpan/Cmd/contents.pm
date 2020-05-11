@@ -1,7 +1,9 @@
 package App::lcpan::Cmd::contents;
 
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '1.056'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-07'; # DATE
+our $DIST = 'App-lcpan'; # DIST
+our $VERSION = '1.057'; # VERSION
 
 use 5.010;
 use strict;
@@ -87,7 +89,7 @@ sub handle_cmd {
         push @bind, $author;
     }
     if ($dist) {
-        push @where, "(file.id=(SELECT file_id FROM dist WHERE name=?))";
+        push @where, "file.dist_name=?";
         push @bind, $dist;
     }
     if ($package) {
@@ -138,7 +140,7 @@ App::lcpan::Cmd::contents - List contents inside releases
 
 =head1 VERSION
 
-This document describes version 1.056 of App::lcpan::Cmd::contents (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of App::lcpan::Cmd::contents (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 FUNCTIONS
 
@@ -171,7 +173,11 @@ Defaults to C<~/cpan>.
 
 =item * B<detail> => I<bool>
 
-=item * B<dist> => I<posint>
+=item * B<dist> => I<perl::distname>
+
+Filter by distribution.
+
+=item * B<file_id> => I<posint>
 
 Filter by file ID.
 

@@ -3,7 +3,7 @@ NAME
     attributes in tree nodes to make the tree more dump-friendly
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Data::Transmute::Rules::TreeNodeHash::StringifyParent (from Perl
     distribution Data-Transmute-Rules-TreeNodeHash-StringifyParent),
     released on 2020-02-13.
@@ -38,6 +38,8 @@ BUGS
 
 SEE ALSO
     Data::Transmute::Rules::TreeNodeHash::StringifyChildren
+
+    More specialized tree dumpers, e.g.: Tree::Dump, Tree::To::TextLines.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

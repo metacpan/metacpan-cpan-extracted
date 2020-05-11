@@ -1,7 +1,7 @@
 package Sah::Schema::natnum;
 
-our $DATE = '2018-04-03'; # DATE
-our $VERSION = '0.071'; # VERSION
+our $DATE = '2020-05-08'; # DATE
+our $VERSION = '0.074'; # VERSION
 
 our $schema = ['posint', {
     summary => 'Same as posint',
@@ -9,9 +9,14 @@ our $schema = ['posint', {
 
 Natural numbers are those used for counting and ordering. Some definitions, like
 ISO 80000-2 begin the natural numbers with 0. But in this definition, natural
-numbers start with 1. For integers that start at 0, see `nonnegint`.
+numbers start with 1. For integers that start at 0, see `uint`.
 
 _
+    examples => [
+        {data=>1, valid=>1},
+        {data=>2, valid=>1},
+        {data=>0, valid=>0},
+    ],
 }, {}];
 
 1;
@@ -29,13 +34,82 @@ Sah::Schema::natnum - Same as posint
 
 =head1 VERSION
 
-This document describes version 0.071 of Sah::Schema::natnum (from Perl distribution Sah-Schemas-Int), released on 2018-04-03.
+This document describes version 0.074 of Sah::Schema::natnum (from Perl distribution Sah-Schemas-Int), released on 2020-05-08.
+
+=head1 SYNOPSIS
+
+To check data against this schema (requires L<Data::Sah>):
+
+ use Data::Sah qw(gen_validator);
+ my $validator = gen_validator("natnum*");
+ say $validator->($data) ? "valid" : "INVALID!";
+
+ # Data::Sah can also create validator that returns nice error message string
+ # and/or coerced value. Data::Sah can even create validator that targets other
+ # language, like JavaScript. All from the same schema. See its documentation
+ # for more details.
+
+To validate function parameters against this schema (requires L<Params::Sah>):
+
+ use Params::Sah qw(gen_validator);
+
+ sub myfunc {
+     my @args = @_;
+     state $validator = gen_validator("natnum*");
+     $validator->(\@args);
+     ...
+ }
+
+To specify schema in L<Rinci> function metadata and use the metadata with
+L<Perinci::CmdLine> to create a CLI:
+
+ # in lib/MyApp.pm
+ package MyApp;
+ our %SPEC;
+ $SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['natnum*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my %args = @_;
+     ...
+ }
+ 1;
+
+ # in myapp.pl
+ package main;
+ use Perinci::CmdLine::Any;
+ Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+
+ # in command-line
+ % ./myapp.pl --help
+ myapp - Routine to do blah ...
+ ...
+
+ % ./myapp.pl --version
+
+ % ./myapp.pl --arg1 ...
+
+Sample data:
+
+ 1  # valid
+
+ 2  # valid
+
+ 0  # INVALID
 
 =head1 DESCRIPTION
 
 Natural numbers are those used for counting and ordering. Some definitions, like
 ISO 80000-2 begin the natural numbers with 0. But in this definition, natural
-numbers start with 1. For integers that start at 0, see C<nonnegint>.
+numbers start with 1. For integers that start at 0, see C<uint>.
 
 =head1 HOMEPAGE
 
@@ -43,7 +117,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Sah-Schema-Int>.
+Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Int>.
 
 =head1 BUGS
 
@@ -59,7 +133,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017, 2016, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

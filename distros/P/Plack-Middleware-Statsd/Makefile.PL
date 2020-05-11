@@ -22,7 +22,9 @@ my %WriteMakefileArgs = (
     "Ref::Util" => 0,
     "Time::HiRes" => 0,
     "Try::Tiny" => 0,
-    "parent" => 0
+    "parent" => 0,
+    "strict" => 0,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -41,7 +43,7 @@ my %WriteMakefileArgs = (
     "Test::Warnings" => 0,
     "lib" => 0
   },
-  "VERSION" => "v0.4.4",
+  "VERSION" => "v0.4.5",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -69,7 +71,9 @@ my %FallbackPrereqs = (
   "Time::HiRes" => 0,
   "Try::Tiny" => 0,
   "lib" => 0,
-  "parent" => 0
+  "parent" => 0,
+  "strict" => 0,
+  "warnings" => 0
 );
 
 

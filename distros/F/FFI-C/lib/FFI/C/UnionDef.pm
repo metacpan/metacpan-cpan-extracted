@@ -9,7 +9,7 @@ use constant _is_union => 1;
 use base qw( FFI::C::StructDef );
 
 # ABSTRACT: Union data definition for FFI
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 1;
@@ -26,7 +26,7 @@ FFI::C::UnionDef - Union data definition for FFI
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 SYNOPSIS
 

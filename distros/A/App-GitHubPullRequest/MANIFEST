@@ -6,6 +6,7 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
+TODO.txt
 bin/git-pr
 dist.ini
 lib/App/GitHubPullRequest.pm

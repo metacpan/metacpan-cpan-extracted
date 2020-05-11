@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::App::cryp - Various Sah schemas for the 'cryp' app family
 
 VERSION
-    This document describes version 0.009 of Sah::Schemas::App::cryp (from
-    Perl distribution Sah-Schemas-App-cryp), released on 2020-03-08.
+    This document describes version 0.010 of Sah::Schemas::App::cryp (from
+    Perl distribution Sah-Schemas-App-cryp), released on 2020-05-08.
 
 HOMEPAGE
     Please visit the project's homepage at

@@ -13,6 +13,8 @@ lib/App/lcpan/Manual/FAQ.pod
 lib/App/lcpan/Manual/Internals.pod
 lib/App/lcpan/Manual/Tutorial.pod
 lib/App/lcpan/Manual/Tutorial/100_WhatIsLcpan.pod
+lib/App/lcpan/Manual/Tutorial/200_SettingUpAMiniCPAN.pod
+lib/App/lcpan/Manual/Tutorial/700_SettingUpADarkPAN.pod
 lib/App/lcpan/Manual/Tutorial/800_WritingASubcommand.pod
 t/00-compile.t
 t/author-critic.t

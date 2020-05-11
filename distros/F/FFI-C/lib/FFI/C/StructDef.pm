@@ -18,7 +18,7 @@ use base qw( FFI::C::Def );
 our @CARP_NOT = qw( FFI::C::Util FFI::C );
 
 # ABSTRACT: Structured data definition for FFI
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 sub _is_kind
@@ -270,7 +270,7 @@ FFI::C::StructDef - Structured data definition for FFI
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 SYNOPSIS
 

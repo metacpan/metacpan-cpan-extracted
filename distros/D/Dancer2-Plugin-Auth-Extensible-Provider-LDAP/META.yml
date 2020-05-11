@@ -21,7 +21,7 @@ no_index:
 requires:
   Carp: '0'
   Dancer2::Core::Types: '0'
-  Dancer2::Plugin::Auth::Extensible: '0.620'
+  Dancer2::Plugin::Auth::Extensible: '0.709'
   Moo: '2.000000'
   Net::LDAP: '0'
   YAML: '0'
@@ -32,5 +32,5 @@ resources:
   bugtracker: https://github.com/PerlDancer/Dancer2-Plugin-Auth-Extensible-Provider-LDAP/issues
   homepage: https://github.com/PerlDancer/Dancer2-Plugin-Auth-Extensible-Provider-LDAP/
   repository: https://github.com/PerlDancer/Dancer2-Plugin-Auth-Extensible-Provider-LDAP
-version: '0.703'
+version: '0.705'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

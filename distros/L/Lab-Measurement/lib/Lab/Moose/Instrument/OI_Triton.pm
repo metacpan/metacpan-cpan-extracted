@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_Triton;
-$Lab::Moose::Instrument::OI_Triton::VERSION = '3.692';
+$Lab::Moose::Instrument::OI_Triton::VERSION = '3.701';
 #ABSTRACT: Oxford Instruments Triton gas handling system control
 
 use 5.010;
@@ -261,7 +261,7 @@ Lab::Moose::Instrument::OI_Triton - Oxford Instruments Triton gas handling syste
 
 =head1 VERSION
 
-version 3.692
+version 3.701
 
 =head1 SYNOPSIS
 

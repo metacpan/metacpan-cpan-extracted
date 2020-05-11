@@ -25,6 +25,7 @@ my $test_dir = catdir(@path, 'test');
 
 rmtree($test_dir);
 mkdir $test_dir;
+chmod 0755, $test_dir;
 
 #----------------------------------------------------------------------
 # Create object

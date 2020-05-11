@@ -4,9 +4,9 @@ use 5.026_000;
 use strict;
 use warnings;
 use utf8;
-use WebService::Hexonet::Connector::SocketConfig;
 use WebService::Hexonet::Connector::Response;
 use WebService::Hexonet::Connector::ResponseTemplateManager;
+use WebService::Hexonet::Connector::SocketConfig;
 use LWP::UserAgent;
 use Carp;
 use Readonly;
@@ -14,9 +14,12 @@ use Data::Dumper;
 use Config;
 use POSIX;
 
-Readonly my $SOCKETTIMEOUT => 300;    # 300s or 5 min
+Readonly my $SOCKETTIMEOUT                => 300;                                      # 300s or 5 min
+Readonly my $IDX4                         => 4;                                        # Index 4 constant
+Readonly our $ISPAPI_CONNECTION_URL       => 'https://api.ispapi.net/api/call.cgi';    # Default Connection Setup URL
+Readonly our $ISPAPI_CONNECTION_URL_PROXY => 'http://127.0.0.1/api/call.cgi';          # High Speed Connection Setup URL
 
-use version 0.9917; our $VERSION = version->declare('v2.3.0');
+use version 0.9917; our $VERSION = version->declare('v2.5.0');
 
 my $rtm = WebService::Hexonet::Connector::ResponseTemplateManager->getInstance();
 
@@ -24,12 +27,13 @@ my $rtm = WebService::Hexonet::Connector::ResponseTemplateManager->getInstance()
 sub new {
     my $class = shift;
     my $self  = bless {
-        socketURL    => 'https://api.ispapi.net/api/call.cgi',
+        socketURL    => $ISPAPI_CONNECTION_URL,
         debugMode    => 0,
         socketConfig => WebService::Hexonet::Connector::SocketConfig->new(),
-        ua           => q{}
+        ua           => q{},
+        curlopts     => {}
     }, $class;
-    $self->setURL('https://api.ispapi.net/api/call.cgi');
+    $self->setURL($ISPAPI_CONNECTION_URL);
     $self->useLIVESystem();
     return $self;
 }
@@ -56,19 +60,9 @@ sub getPOSTData {
     if ( ( ref $cmd ) eq 'HASH' ) {
         foreach my $key ( sort keys %{$cmd} ) {
             if ( defined $cmd->{$key} ) {
-                if ( ref( $cmd->{$key} ) eq 'ARRAY' ) {
-                    my @val = @{ $cmd->{$key} };
-                    my $idx = 0;
-                    for my $str (@val) {
-                        $str =~ s/[\r\n]//gmsx;
-                        $tmp .= "${key}${idx}=${str}\n";
-                        $idx++;
-                    }
-                } else {
-                    my $val = $cmd->{$key};
-                    $val =~ s/[\r\n]//gmsx;
-                    $tmp .= "${key}=${val}\n";
-                }
+                my $val = $cmd->{$key};
+                $val =~ s/[\r\n]//gmsx;
+                $tmp .= "${key}=${val}\n";
             }
         }
     }
@@ -100,7 +94,7 @@ sub getURL {
 sub getUserAgent {
     my $self = shift;
     if ( !( length $self->{ua} ) ) {
-        my $arch = (POSIX::uname)[ 4 ];
+        my $arch = (POSIX::uname)[ $IDX4 ];
         my $os   = (POSIX::uname)[ 0 ];
         my $rv   = $self->getVersion();
         $self->{ua} = "PERL-SDK ($os; $arch; rv:$rv) perl/$Config{version}";
@@ -111,10 +105,50 @@ sub getUserAgent {
 
 sub setUserAgent {
     my ( $self, $str, $rv ) = @_;
-    my $arch = (POSIX::uname)[ 4 ];
+    my $arch = (POSIX::uname)[ $IDX4 ];
     my $os   = (POSIX::uname)[ 0 ];
     my $rv2  = $self->getVersion();
     $self->{ua} = "$str ($os; $arch; rv:$rv) perl-sdk/$rv2 perl/$Config{version}";
+    return $self;
+}
+
+
+sub getProxy {
+    my ($self) = @_;
+    if ( exists $self->{curlopts}->{'PROXY'} ) {
+        return $self->{curlopts}->{'PROXY'};
+    }
+    return;
+}
+
+
+sub setProxy {
+    my ( $self, $proxy ) = @_;
+    if ( length($proxy) == 0 ) {
+        delete $self->{curlopts}->{'PROXY'};
+    } else {
+        $self->{curlopts}->{'PROXY'} = $proxy;
+    }
+    return $self;
+}
+
+
+sub getReferer {
+    my ($self) = @_;
+    if ( exists $self->{curlopts}->{'REFERER'} ) {
+        return $self->{curlopts}->{'REFERER'};
+    }
+    return;
+}
+
+
+sub setReferer {
+    my ( $self, $referer ) = @_;
+    if ( length($referer) == 0 ) {
+        delete $self->{curlopts}->{'REFERER'};
+    } else {
+        $self->{curlopts}->{'REFERER'} = $referer;
+    }
     return $self;
 }
 
@@ -243,12 +277,26 @@ sub logout {
 
 sub request {
     my ( $self, $cmd ) = @_;
-    my $data = $self->getPOSTData($cmd);
+    # flatten nested api command bulk parameters
+    my $newcmd = $self->_flattenCommand($cmd);
+    # auto convert umlaut names to punycode
+    $newcmd = $self->_autoIDNConvert($newcmd);
+
+    # request command to API
+    my $data = $self->getPOSTData($newcmd);
 
     my $ua = LWP::UserAgent->new();
     $ua->agent( $self->getUserAgent() );
     $ua->default_header( 'Expect', q{} );
     $ua->timeout($SOCKETTIMEOUT);
+    my $referer = $self->getReferer();
+    if ($referer) {
+        $ua->default_header( 'Referer', $referer );
+    }
+    my $proxy = $self->getProxy();
+    if ($proxy) {
+        $ua->proxy( [ 'http', 'https' ], $proxy );
+    }
 
     my $post = $self->getPOSTData($cmd);
     my $r = $ua->post( $self->{socketURL}, $post );
@@ -268,13 +316,13 @@ sub request {
             print {*STDERR} Dumper($r);
         }
     }
-    return WebService::Hexonet::Connector::Response->new( $r, $cmd );
+    return WebService::Hexonet::Connector::Response->new( $r, $newcmd );
 }
 
 
 sub requestNextResponsePage {
     my ( $self, $rr ) = @_;
-    my $mycmd = $self->_toUpperCaseKeys( $rr->getCommand() );
+    my $mycmd = $rr->getCommand();
     if ( defined $mycmd->{LAST} ) {
         croak 'Parameter LAST in use! Please remove it to avoid issues in requestNextPage.';
     }
@@ -327,6 +375,18 @@ sub resetUserView {
 }
 
 
+sub useDefaultConnectionSetup {
+    my $self = shift;
+    return $self->setURL($ISPAPI_CONNECTION_URL);
+}
+
+
+sub useHighPerformanceConnectionSetup {
+    my $self = shift;
+    return $self->setURL($ISPAPI_CONNECTION_URL_PROXY);
+}
+
+
 sub useOTESystem {
     my $self = shift;
     $self->{socketConfig}->setSystemEntity('1234');
@@ -341,12 +401,60 @@ sub useLIVESystem {
 }
 
 
-sub _toUpperCaseKeys {
+sub _flattenCommand {
     my ( $self, $cmd ) = @_;
     for my $key ( keys %{$cmd} ) {
         my $newkey = uc $key;
         if ( $newkey ne $key ) {
             $cmd->{$newkey} = delete $cmd->{$key};
+        }
+        if ( ref( $cmd->{$newkey} ) eq 'ARRAY' ) {
+            my @val = @{ $cmd->{$newkey} };
+            my $idx = 0;
+            for my $str (@val) {
+                $str =~ s/[\r\n]//gmsx;
+                $cmd->{"${key}${idx}"} = $str;
+                $idx++;
+            }
+            delete $cmd->{$newkey};
+        }
+    }
+    return $cmd;
+}
+
+
+sub _autoIDNConvert {
+    my ( $self, $cmd ) = @_;
+    if ( $cmd->{'COMMAND'} =~ /^CONVERTIDN$/imsx ) {
+        return $cmd;
+    }
+    my @keys = grep {/^(DOMAIN|NAMESERVER|DNSZONE)(\d*)$/imsx} keys %{$cmd};
+    if ( scalar @keys == 0 ) {
+        return $cmd;
+    }
+    my @toconvert = ();
+    my @idxs      = ();
+    foreach my $key (@keys) {
+        my $val = $cmd->{$key};
+        if ( $val =~ /[^[:lower:]\d. -]/imsx ) {
+            push @toconvert, $val;
+            push @idxs,      $key;
+        }
+    }
+    my $r = $self->request(
+        {   COMMAND => 'ConvertIDN',
+            DOMAIN  => \@toconvert
+        }
+    );
+    if ( $r->isSuccess() ) {
+        my $col = $r->getColumn('ACE');
+        if ($col) {
+            my $data = $col->getData();
+            my $idx  = 0;
+            foreach my $pc ( @{$data} ) {
+                $cmd->{ $idxs[ $idx ] } = $pc;
+                $idx++;
+            }
         }
     }
     return $cmd;
@@ -474,6 +582,14 @@ Specify the API command for the request by $command.
 This method is internally used by the request method.
 Returns a hash.
 
+=item C<getProxy>
+
+Returns the configured Proxy URL to use for API communication as string.
+
+=item C<getReferer>
+
+Returns the configured HTTP Header `Referer` value to use for API communication as string.
+
 =item C<getSession>
 
 Returns the API session in use as string.
@@ -511,6 +627,16 @@ Returns the current L<WebService::Hexonet::Connector::APIClient|WebService::Hexo
 =item C<setOTP( $otpcode )>
 
 Set your otp code. To be used in case of active 2FA.
+Returns the current L<WebService::Hexonet::Connector::APIClient|WebService::Hexonet::Connector::APIClient> instance in use for method chaining.
+
+=item C<setProxy( $proxy )>
+
+Set the Proxy URL to use for API communication.
+Returns the current L<WebService::Hexonet::Connector::APIClient|WebService::Hexonet::Connector::APIClient> instance in use for method chaining.
+
+=item C<setReferer( $referer )>
+
+Set the HTTP Header `Referer` value to use for API communication.
 Returns the current L<WebService::Hexonet::Connector::APIClient|WebService::Hexonet::Connector::APIClient> instance in use for method chaining.
 
 =item C<setSession( $sessionid )>
@@ -590,11 +716,14 @@ Returns the current L<WebService::Hexonet::Connector::APIClient|WebService::Hexo
 Reset the data view activated by setUserView.
 Returns the current L<WebService::Hexonet::Connector::APIClient|WebService::Hexonet::Connector::APIClient> instance in use for method chaining.
 
-=item C<useOTESystem>
+=item C<useDefaultConnectionSetup>
 
-Use the OT&E Backend System as communication endpoint.
-No costs - free of charge. To get in touch with our systems.
-This is NOT the default!
+Use the Default Setup to connect to our backend systems. This is the default!
+Returns the current L<WebService::Hexonet::Connector::APIClient|WebService::Hexonet::Connector::APIClient> instance in use for method chaining.
+
+=item C<useHighPerformanceConnectionSetup>
+
+Use the High Performance Connection Setup to connect to our backend systems. This is not the default! Read README.md for Details.
 Returns the current L<WebService::Hexonet::Connector::APIClient|WebService::Hexonet::Connector::APIClient> instance in use for method chaining.
 
 =item C<useLIVESystem>
@@ -605,10 +734,16 @@ As long as you don't have charged your account, you cannot order.
 This is the default!
 Returns the current L<WebService::Hexonet::Connector::APIClient|WebService::Hexonet::Connector::APIClient> instance in use for method chaining.
 
-=item C<_toUpperCaseKeys( $hash )>
+=item C<_flattenCommand( $cmd )>
 
-Private method. Converts all keys of the given hash into upper case letters.
-Returns a hash.
+Private method. Converts all keys of the given hash into upper case letters and flattens parameters using nested arrays to string parameters.
+Returns the new command.
+
+
+=item C<_autoIDNConvert( $cmd )>
+
+Private method. Converts all affected parameter values to punycode as our API only works with punycode domain names, not with IDN.
+Returns the new command.
 
 =back
 

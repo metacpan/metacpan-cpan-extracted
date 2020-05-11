@@ -12,6 +12,47 @@ use Test::MockObject;
 
 BEGIN { use_ok('Log::Any::Adapter::Sentry::Raven') };
 
+{
+    package My::Test::Exception;
+    use overload '""' => sub { ${ shift() } };
+
+    our $WEIRD_TRACE = 0;
+
+    sub new {
+        my ($class, $message) = @_;
+        bless \$message, $class;
+    }
+
+    sub trace {
+        return "without a trace" if $WEIRD_TRACE;
+
+        my $self = shift;
+        my $trace = Devel::StackTrace->new(
+            message => "$self",
+            skip_frames => -1,
+        );
+        $trace->frames(
+            Devel::StackTrace::Frame->new(
+                [
+                    'Imaginary',    # package
+                    'Imaginary.pm', # filename
+                    -1,             # line
+                    'dream',        # subroutine
+                    # more caller vals would follow in the wild
+                ],
+                [], # params
+
+                # these are all the default from Devel::StackTrace
+                undef,       # respect_overload,
+                undef,       # max_arg_length
+                "$self",     # message
+                undef,       # indent
+            )
+        );
+        return $trace;
+    }
+}
+
 subtest test_init => sub {
     ok exception { Log::Any::Adapter->set('Sentry::Raven') },
        "sentry object required";
@@ -156,46 +197,5 @@ subtest test_logging => sub {
         isnt @{$stack_trace->{frames}}, 1, "didn't extract handled exception trace";
     }
 };
-
-{
-    package My::Test::Exception;
-    use overload '""' => sub { ${ shift() } };
-
-    our $WEIRD_TRACE = 1;
-
-    sub new {
-        my ($class, $message) = @_;
-        bless \$message, $class;
-    }
-
-    sub trace {
-        return "without a trace" if $WEIRD_TRACE;
-
-        my $self = shift;
-        my $trace = Devel::StackTrace->new(
-            message => "$self",
-            skip_frames => -1,
-        );
-        $trace->frames(
-            Devel::StackTrace::Frame->new(
-                [
-                    'Imaginary',    # package
-                    'Imaginary.pm', # filename
-                    -1,             # line
-                    'dream',        # subroutine
-                    # more caller vals would follow in the wild
-                ],
-                [], # params
-
-                # these are all the default from Devel::StackTrace
-                undef,       # respect_overload,
-                undef,       # max_arg_length
-                "$self",     # message
-                undef,       # indent
-            )
-        );
-        return $trace;
-    }
-}
 
 done_testing;

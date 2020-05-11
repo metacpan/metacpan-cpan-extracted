@@ -1,7 +1,9 @@
 #!perl
-# t/010-scope.t: test Data::Hopen::Scope
+# t/010-scope-hash.t: test Data::Hopen::Scope::Hash
 use rlib 'lib';
 use HopenTest 'Data::Hopen::Scope::Hash';
+use Test::Fatal;
+use Data::Hopen::Scope;
 
 sub makeset {
     my $set = Set::Scalar->new;
@@ -9,12 +11,16 @@ sub makeset {
     return $set;
 }
 
-# --- creation and put -----------------------------------------------
+# --- creation, put, and get -----------------------------------------
 my $s = $DUT->new();
 isa_ok($s, "$DUT");
 
 $s->put(foo => 42);
 cmp_ok($s->find('foo'), '==', 42, 'Retrieving works');
+cmp_ok($s->find('foo', 0), '==', 42, 'Retrieving from set 0 works');
+cmp_ok($s->find('foo', "0"), '==', 42, 'Retrieving from set "0" works');
+cmp_ok($s->find('foo', FIRST_ONLY), '==', 42, 'Retrieving from set FIRST_ONLY works');
+is_deeply($s->find('foo', '*'), {'0' => 42}, 'Retrieving from set "*" works');
 
 ok($s->names->is_equal(makeset('foo')), 'names works with a non-nested scope');
 ok($s->names(0)->is_equal(makeset('foo')), 'names(0) works with a non-nested scope');
@@ -35,6 +41,12 @@ ok($u->names(1)->is_equal(makeset(qw(bar quux))), 'names(1) works with a doubly-
 ok($u->names(0)->is_equal(makeset(qw(quux))), 'names(0) works with a doubly-nested scope');
 
 cmp_ok($s->find('foo'), '==', 42, 'Retrieving from a grandparent scope works');
+
+ok(!defined exception { $s->put; }, 'empty put() allowed');
+
+# Error cases
+like( exception { Data::Hopen::Scope::Hash::put() }, qr/Need an instance/, 'dies without instance');
+like( exception { $s->put('oops') }, qr/odd number/, 'dies with odd number of params');
 
 # --- merge ----------------------------------------------------------
 
@@ -88,6 +100,24 @@ $s->put(foo=>1);
 $s->merge(foo=>2);
 is_deeply($s->as_hashref, {foo=>2}, 'Replace retainment works');
 cmp_ok($s->find('foo'), '==', 2, 'Replace retainment works (find)');
+
+# Error cases
+like( exception { Data::Hopen::Scope::Hash::merge() }, qr/Need an instance/, 'dies without instance');
+like( exception { $s->merge('oops') }, qr/odd number/, 'dies with odd number of params');
+
+# --- adopt_hash -----------------------------------------------------
+
+$s = $DUT->new;
+$s->put(foo => 1);
+is_deeply($s->as_hashref, {foo=>1}, 'before adopt');
+$s->adopt_hash({bar=>42});
+is_deeply($s->as_hashref, {bar=>42}, 'after adopt');
+
+# Error cases
+like( exception { Data::Hopen::Scope::Hash::adopt_hash() }, qr/Need an instance/, 'dies without instance');
+like( exception { $s->adopt_hash }, qr/Need a hash/, 'dies with no params');
+like( exception { $s->adopt_hash(42) }, qr/Cannot adopt a non-hash/, 'dies with scalar');
+like( exception { $s->adopt_hash([42]) }, qr/Cannot adopt a non-hash/, 'dies with non-hash');
 
 done_testing();
 # vi: set fenc=utf8:

@@ -91,6 +91,22 @@ is
   'profiler: unknown profiler'
 ;
 
+foreach my $prop (qw( static_memory_maximum_size static_memory_guard_size dynamic_memory_guard_size ))
+{
+  eval {
+    $config->$prop(1024);
+  };
+  if(my $error = $@)
+  {
+    is($error, match qr/property $prop is not available/, "$prop(1024)");
+    note "not available";
+  }
+  else
+  {
+    pass "$prop(1024)";
+  }
+}
+
 unlink $_ for bsd_glob('jit-*.dump');
 
 done_testing;

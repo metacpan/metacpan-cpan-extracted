@@ -1,5 +1,5 @@
 #
-# $Id: Tool.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
+# $Id$
 #
 # brik::tool Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6bd6acfc81d5 $',
+      revision => '$Revision$',
       tags => [ qw(unstable program) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -39,6 +39,7 @@ sub brik_properties {
          install_required_modules => [ qw(Brik) ],
          install_required_briks => [ qw(Brik) ],
          install => [ qw(Brik) ],
+         get_dependencies => [ qw(Brik) ],
          create_tool => [ qw(filename.pl Repository|OPTIONAL) ],
          create_brik => [ qw(Brik Repository|OPTIONAL) ],
          update_core => [ ],
@@ -61,7 +62,7 @@ sub brik_properties {
          #hg => [ ],
       #},
       require_modules => {
-         'Metabrik::Devel::Mercurial' => [ ],
+         'Metabrik::Devel::Git' => [ ],
          'Metabrik::File::Find' => [ ],
          'Metabrik::File::Text' => [ ],
          'Metabrik::Perl::Module' => [ ],
@@ -528,6 +529,64 @@ sub install {
    return 1;
 }
 
+sub get_dependencies {
+   my $self = shift;
+   my ($brik_list) = @_;
+
+   $self->brik_help_run_undef_arg('get_dependencies', $brik_list) or return;
+   my $ref = $self->brik_help_run_invalid_arg('get_dependencies', $brik_list,
+      'ARRAY', 'SCALAR') or return;
+
+   if ($ref eq 'SCALAR') {
+      $brik_list = [ $brik_list ];
+   }
+
+   my $briks = [];
+   my $packages = [];
+   my $modules = [];
+   for my $brik (@$brik_list) {
+      my $this_packages = $self->get_need_packages_recursive($brik) or return;
+      my $this_modules = $self->get_require_modules_recursive($brik) or return;
+      my $this_briks = $self->get_require_briks_recursive($brik) or return;
+      my $this_hierarchy = $self->get_brik_hierarchy($brik) or return;
+      push @$packages, @$this_packages;
+      push @$modules, @$this_modules;
+      push @$briks, @$this_briks;
+      push @$briks, @$this_hierarchy;
+
+      for my $this_brik (@$this_briks) {
+         my $this_sub_packages = $self->get_need_packages_recursive(
+            $this_brik) or next;
+         my $this_sub_modules = $self->get_require_modules_recursive(
+            $this_brik) or next;
+         my $this_sub_briks = $self->get_require_briks_recursive(
+            $this_brik) or next;
+         my $this_sub_hierarchy = $self->get_brik_hierarchy(
+            $this_brik) or next;
+         push @$packages, @$this_sub_packages;
+         push @$modules, @$this_sub_modules;
+         push @$briks, @$this_sub_briks;
+         push @$briks, @$this_sub_hierarchy;
+      }
+   }
+
+   my $uniq_packages = {};
+   my $uniq_modules = {};
+   my $uniq_briks = {};
+   for (@$packages) { $uniq_packages->{$_}++; }
+   for (@$modules) { $uniq_modules->{$_}++; }
+   for (@$briks) { $uniq_briks->{$_}++; }
+   $packages = [ sort { $a cmp $b } keys %$uniq_packages ];
+   $modules = [ sort { $a cmp $b } keys %$uniq_modules ];
+   $briks = [ sort { $a cmp $b } keys %$uniq_briks ];
+
+   return {
+      packages => $packages,
+      modules => $modules,
+      briks => $briks,
+   };
+}
+
 sub create_tool {
    my $self = shift;
    my ($filename, $repository) = @_;
@@ -705,7 +764,7 @@ $package - $brik Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.
@@ -728,18 +787,18 @@ sub update_core {
 
    my $datadir = $self->datadir;
 
-   my $url = 'https://www.metabrik.org/hg/core';
+   my $url = 'https://github.com/onyphe/metabrik-core';
 
-   my $dm = Metabrik::Devel::Mercurial->new_from_brik_init($self) or return;
-   $dm->use_pager(0);
+   my $dg = Metabrik::Devel::Git->new_from_brik_init($self) or return;
+   $dg->use_pager(0);
    my $pm = Metabrik::Perl::Module->new_from_brik_init($self) or return;
    $pm->use_pager(0);
 
    if (! -d $datadir.'/core') {
-      $dm->clone($url, $datadir.'/core') or return;
+      $dg->clone($url, $datadir.'/core') or return;
    }
    else {
-      $dm->update($datadir.'/core') or return;
+      $dg->update($datadir.'/core') or return;
    }
 
    $pm->build($datadir.'/core') or return;
@@ -759,18 +818,18 @@ sub update_repository {
    my $datadir = $self->datadir;
    my $repository = $datadir.'/repository';
 
-   my $url = 'https://www.metabrik.org/hg/repository';
+   my $url = 'https://github.com/onyphe/metabrik-repository';
 
-   my $dm = Metabrik::Devel::Mercurial->new_from_brik_init($self) or return;
-   $dm->use_pager(0);
+   my $dg = Metabrik::Devel::Git->new_from_brik_init($self) or return;
+   $dg->use_pager(0);
    my $pm = Metabrik::Perl::Module->new_from_brik_init($self) or return;
    $pm->use_pager(0);
 
    if (! -d $repository) {
-      $dm->clone($url, $repository) or return;
+      $dg->clone($url, $repository) or return;
    }
    else {
-      $dm->update($repository) or return;
+      $dg->update($repository) or return;
    }
 
    $pm->build($repository) or return;
@@ -1003,7 +1062,7 @@ Metabrik::Brik::Tool - brik::tool Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

@@ -2,11 +2,14 @@ package Wasm::Wasmtime::MemoryType;
 
 use strict;
 use warnings;
+use base qw( Wasm::Wasmtime::ExternType );
 use Ref::Util qw( is_ref is_plain_arrayref );
 use Wasm::Wasmtime::FFI;
+use constant is_memorytype => 1;
+use constant kind => 'memorytype';
 
 # ABSTRACT: Wasmtime memory type class
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 $ffi_prefix = 'wasm_memorytype_';
@@ -42,14 +45,16 @@ $ffi->attach( limits => ['wasm_memorytype_t'] => 'uint32[2]' => sub {
 });
 
 
-# actually returns a wasm_externtype_t, but recursion
-$ffi->attach( as_externtype => ['wasm_memorytype_t'] => 'opaque' => sub {
-  my($xsub, $self) = @_;
-  require Wasm::Wasmtime::ExternType;
-  my $ptr = $xsub->($self);
-  Wasm::Wasmtime::ExternType->new($ptr, $self->{owner} || $self);
-});
+sub to_string
+{
+  my($self) = @_;
+  my($min, $max) = @{ $self->limits };
+  my $string = "$min";
+  $string .= " $max" if $max != 0xffffffff;
+  return $string;
+}
 
+__PACKAGE__->_cast(3);
 _generate_destroy();
 
 1;
@@ -66,7 +71,7 @@ Wasm::Wasmtime::MemoryType - Wasmtime memory type class
 
 =head1 VERSION
 
-version 0.06
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -100,11 +105,11 @@ Creates a new memory type object.
 
 Returns the minimum and maximum number of pages as an array reference.
 
-=head2 as_externtype
+=head2 to_string
 
- my $externtype = $memorytype->as_externtype
+ my $string = $memorytype->to_string;
 
-Returns the L<Wasm::Wasmtime::ExternType> for this memory type.
+Converts the type into a string for diagnostics.
 
 =head1 SEE ALSO
 

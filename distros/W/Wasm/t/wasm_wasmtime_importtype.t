@@ -10,19 +10,43 @@ is(
     )
   }),
   object {
-    call_list imports => array {
+    call_list sub { @{ shift->imports } } => array {
       item object {
         call [ isa => 'Wasm::Wasmtime::ImportType' ] => T();
         call name => 'hello';
         call type => object {
-          call [ isa => 'Wasm::Wasmtime::ExternType' ] => T();
+          call [ isa => 'Wasm::Wasmtime::FuncType' ] => T();
         };
         call module => 'xx';
+        call to_string => '(func (import "xx" "hello") )';
       };
       end;
     };
   },
   'import types are good'
+);
+
+is(
+  wasm_module_ok(q{
+    (module
+      (func $hello (import "xx" "hello") (param i32 i32 i32) (result f32))
+    )
+  }),
+  object {
+    call_list sub { @{ shift->imports } } => array {
+      item object {
+        call [ isa => 'Wasm::Wasmtime::ImportType' ] => T();
+        call name => 'hello';
+        call type => object {
+          call [ isa => 'Wasm::Wasmtime::FuncType' ] => T();
+        };
+        call module => 'xx';
+        call to_string => '(func (import "xx" "hello") (param i32 i32 i32) (result f32))';
+      };
+      end;
+    };
+  },
+  'import with function arguments'
 );
 
 done_testing;

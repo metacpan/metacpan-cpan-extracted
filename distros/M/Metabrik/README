@@ -48,6 +48,13 @@ DEPENDENCIES
    C. For CentOS-based systems (CentOS, RedHat)
 
    yum
+   perl-Module-Build
+   perl-File-HomeDir
+   perl-IO-All
+   perl-Lexical-Persistence
+   perl-PPI
+   perl-Term-ReadLine-Gnu
+   perl-IPC-Run3
    sudo
    mercurial
    less
@@ -81,7 +88,7 @@ DEPENDENCIES
 
 COPYRIGHT AND LICENSE
 
-   Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
+   Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
 
    You may distribute this module under the terms of The BSD 3-Clause License.
    See LICENSE file in the source distribution archive.

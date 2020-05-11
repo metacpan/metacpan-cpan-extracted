@@ -1,3 +1,10 @@
+0.005 2020-05-10 18:28:17-0500
+  - Switch to alienfile build. See PR
+    <https://github.com/EntropyOrg/p5-Alien-WFDB/pull/6>.
+
+  - Update download URL. See PR
+    <https://github.com/EntropyOrg/p5-Alien-WFDB/pull/7>.
+
 0.004 2016-04-17 13:14:00-0500
   - Added a minimum version version for Alien::Base `configure_requires`.
     Thanks to Graham Ollis (PLICEASE++)!

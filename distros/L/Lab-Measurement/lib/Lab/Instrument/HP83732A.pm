@@ -1,6 +1,6 @@
 package Lab::Instrument::HP83732A;
 #ABSTRACT: HP 83732A Series Synthesized Signal Generator
-$Lab::Instrument::HP83732A::VERSION = '3.692';
+$Lab::Instrument::HP83732A::VERSION = '3.701';
 use strict;
 use Lab::Instrument;
 use Time::HiRes qw (usleep);
@@ -128,7 +128,7 @@ Lab::Instrument::HP83732A - HP 83732A Series Synthesized Signal Generator
 
 =head1 VERSION
 
-version 3.692
+version 3.701
 
 =head1 CAVEATS/BUGS
 

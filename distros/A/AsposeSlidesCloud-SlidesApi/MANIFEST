@@ -12,12 +12,15 @@ lib/AsposeSlidesCloud/Object/Axes.pm
 lib/AsposeSlidesCloud/Object/Axis.pm
 lib/AsposeSlidesCloud/Object/Base64InputFile.pm
 lib/AsposeSlidesCloud/Object/BlurEffect.pm
+lib/AsposeSlidesCloud/Object/BoxAndWhiskerSeries.pm
 lib/AsposeSlidesCloud/Object/BubbleChartDataPoint.pm
 lib/AsposeSlidesCloud/Object/BubbleSeries.pm
 lib/AsposeSlidesCloud/Object/Chart.pm
+lib/AsposeSlidesCloud/Object/ChartCategory.pm
 lib/AsposeSlidesCloud/Object/ChartTitle.pm
 lib/AsposeSlidesCloud/Object/ChartWall.pm
 lib/AsposeSlidesCloud/Object/ColorScheme.pm
+lib/AsposeSlidesCloud/Object/CommonSlideViewProperties.pm
 lib/AsposeSlidesCloud/Object/Connector.pm
 lib/AsposeSlidesCloud/Object/CustomDashPattern.pm
 lib/AsposeSlidesCloud/Object/DiscUsage.pm
@@ -65,6 +68,7 @@ lib/AsposeSlidesCloud/Object/MasterSlides.pm
 lib/AsposeSlidesCloud/Object/Merge.pm
 lib/AsposeSlidesCloud/Object/MergingSource.pm
 lib/AsposeSlidesCloud/Object/NoFill.pm
+lib/AsposeSlidesCloud/Object/NormalViewRestoredProperties.pm
 lib/AsposeSlidesCloud/Object/NotesSlide.pm
 lib/AsposeSlidesCloud/Object/NotesSlideExportFormat.pm
 lib/AsposeSlidesCloud/Object/ObjectExist.pm
@@ -148,6 +152,8 @@ lib/AsposeSlidesCloud/Object/TiffExportOptions.pm
 lib/AsposeSlidesCloud/Object/UpdateBackground.pm
 lib/AsposeSlidesCloud/Object/UpdateShape.pm
 lib/AsposeSlidesCloud/Object/VideoFrame.pm
+lib/AsposeSlidesCloud/Object/ViewProperties.pm
+lib/AsposeSlidesCloud/Object/WaterfallSeries.pm
 lib/AsposeSlidesCloud/Object/XpsExportOptions.pm
 lib/AsposeSlidesCloud/SlidesApi.pm
 LICENSE

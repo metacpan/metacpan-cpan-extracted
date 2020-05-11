@@ -11,10 +11,11 @@ use Test::DBIC::ExpectedQueries;
 sub query {
     my ($table, $operation) = @_;
     return Test::DBIC::ExpectedQueries::Query->new({
-        sql         => "$operation on $table",
-        stack_trace => "not under test",
-        table       => $table,
-        operation   => $operation,
+        sql                     => "$operation on $table",
+        stack_trace             => "not under test",
+        table                   => $table,
+        operation               => $operation,
+        report_subselect_tables => 0,
     });
 }
 
@@ -30,8 +31,9 @@ sub add_queries {
         query("magic", "select"),
         query("dragon", "delete"),
         Test::DBIC::ExpectedQueries::Query->new({
-            sql         => "create table abc",
-            stack_trace => "",
+            sql                     => "create table abc",
+            stack_trace             => "",
+            report_subselect_tables => 0,
         }),
     ]);
 }

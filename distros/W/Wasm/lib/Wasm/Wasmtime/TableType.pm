@@ -2,12 +2,15 @@ package Wasm::Wasmtime::TableType;
 
 use strict;
 use warnings;
+use base qw( Wasm::Wasmtime::ExternType );
 use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::ValType;
 use Ref::Util qw( is_ref is_plain_arrayref );
+use constant is_tabletype => 1;
+use constant kind => 'tabletype';
 
 # ABSTRACT: Wasmtime table type class
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 $ffi_prefix = 'wasm_tabletype_';
@@ -60,14 +63,16 @@ $ffi->attach( limits => ['wasm_tabletype_t'] => 'uint32[2]' => sub {
 });
 
 
-# actually returns a wasm_externtype_t, but recursion
-$ffi->attach( as_externtype => ['wasm_tabletype_t'] => 'opaque' => sub {
-  my($xsub, $self) = @_;
-  require Wasm::Wasmtime::ExternType;
-  my $ptr = $xsub->($self);
-  Wasm::Wasmtime::ExternType->new($ptr, $self->{owner} || $self);
-});
+sub to_string
+{
+  my($self) = @_;
+  my($min, $max) = @{ $self->limits };
+  my $string = "$min ";
+  $string .= "$max " if $max != 0xffffffff;
+  $string .= $self->element->to_string;
+}
 
+__PACKAGE__->_cast(2);
 _generate_destroy();
 
 1;
@@ -84,7 +89,7 @@ Wasm::Wasmtime::TableType - Wasmtime table type class
 
 =head1 VERSION
 
-version 0.06
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -125,11 +130,11 @@ Returns the L<Wasm::Wasmtime::ValType> for this table type.
 
 Returns the limits as an array reference.
 
-=head2 as_externtype
+=head2 to_string
 
- my $externtype = $tabletype->as_externtype
+ my $string = $tabletype->to_string;
 
-Returns the L<Wasm::Wasmtime::ExternType> for this table type.
+Converts the type into a string for diagnostics.
 
 =head1 SEE ALSO
 

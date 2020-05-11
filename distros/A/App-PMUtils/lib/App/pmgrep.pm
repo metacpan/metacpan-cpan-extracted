@@ -2,8 +2,8 @@
 
 package App::pmgrep;
 
-our $DATE = '2020-01-31'; # DATE
-our $VERSION = '0.730'; # VERSION
+our $DATE = '2020-05-10'; # DATE
+our $VERSION = '0.733'; # VERSION
 
 use 5.010001;
 use strict;
@@ -136,7 +136,7 @@ App::pmgrep - Print lines from installed Perl module sources matching a pattern
 
 =head1 VERSION
 
-This document describes version 0.730 of App::pmgrep (from Perl distribution App-PMUtils), released on 2020-01-31.
+This document describes version 0.733 of App::pmgrep (from Perl distribution App-PMUtils), released on 2020-05-10.
 
 =head1 FUNCTIONS
 

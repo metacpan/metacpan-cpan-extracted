@@ -1,13 +1,12 @@
 ---
-abstract: 'A Promise interface for L<Net::Curl::Multi>'
+abstract: 'Asynchronous L<libcurl|https://curl.haxx.se/libcurl/>, the easy way!'
 author:
   - 'Felipe Gasper (FELIPE)'
 build_requires:
-  Carp::Always: '0'
   ExtUtils::MakeMaker: '0'
   FindBin: '0'
   Test::Class::Tiny: '0'
-  Test::Deep: '0'
+  Test::Deep: '1.120'
   Test::FailWarnings: '0'
   Test::Fatal: '0'
   Test::More: '0'
@@ -26,10 +25,10 @@ no_index:
     - t
     - inc
 requires:
-  Net::Curl: '0'
+  Net::Curl: '0.44'
   Promise::ES6: '0.07'
 resources:
   bugtracker: https://github.com/FGasper/p5-Net-Curl-Promiser/issues
   repository: git://github.com/FGasper/p5-Net-Curl-Promiser.git
-version: '0.08'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

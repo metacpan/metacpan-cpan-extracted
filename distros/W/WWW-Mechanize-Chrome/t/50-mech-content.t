@@ -11,12 +11,13 @@ Log::Log4perl->easy_init($ERROR);  # Set priority of root logger to ERROR
 
 # What instances of Chrome will we try?
 my @instances = t::helper::browser_instances();
+my $testcount = 6;
 
 if (my $err = t::helper::default_unavailable) {
     plan skip_all => "Couldn't connect to Chrome: $@";
     exit
 } else {
-    plan tests => 5*@instances;
+    plan tests => $testcount*@instances;
 };
 
 sub new_mech {
@@ -27,7 +28,7 @@ sub new_mech {
     );
 };
 
-t::helper::run_across_instances(\@instances, \&new_mech, 5, sub {
+t::helper::run_across_instances(\@instances, \&new_mech, $testcount, sub {
     my ($browser_instance, $mech) = @_;
 
     isa_ok $mech, 'WWW::Mechanize::Chrome';
@@ -44,4 +45,11 @@ t::helper::run_across_instances(\@instances, \&new_mech, 5, sub {
     my $text2;
     my $lives = eval { $mech->content( format => 'bogus' ); 1 };
     ok !$lives, "A bogus content format raises an error";
+
+    {
+        local $TODO = "Chrome devtools doesn't return the XML declaration of a document";
+        $mech->get_local('xhtml.xhtml');
+        $html = $mech->content;
+        like $html, qr/^<?xml\b/, "->content preserves the XHTML directive";
+    }
 });

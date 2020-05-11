@@ -1,1 +1,1 @@
-@perl pl %*
+@perl %~dpn0 %*

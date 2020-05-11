@@ -5,7 +5,12 @@ use warnings;
 use utf8;
 use Test::More;
 if ( eval { require PDF::Builder } ) {
-    plan tests => 27;
+    if ( $PDF::Builder::VERSION ge '3.018') {
+	plan skip_all => "PDF::Builder incompatible version";
+    }
+    else {
+	plan tests => 27;
+    }
 }
 else {
     plan skip_all => "PDF::Builder not installed";
@@ -57,11 +62,11 @@ ok( $a->{height} >  17.99 && $a->{height} <  18.01, "pixel_size height $a->{heig
 
 # get_size should return the same, since we're not using Pango units.
 @a = $layout->get_size;
-ok( $a[0] > 166.07 && $a[0] < 166.09, "size width" );
-ok( $a[1] >  17.99 && $a[1] <  18.01, "size height" );
+ok( $a[0] > 166.07 && $a[0] < 166.09, "size width $a[0]" );
+ok( $a[1] >  17.99 && $a[1] <  18.01, "size height $a[1]" );
 $a = $layout->get_size;
-ok( $a->{width}  > 166.07 && $a->{width}  < 166.09, "size width" );
-ok( $a->{height} >  17.99 && $a->{height} <  18.01, "size height" );
+ok( $a->{width}  > 166.07 && $a->{width}  < 166.09, "size width $a->{width}" );
+ok( $a->{height} >  17.99 && $a->{height} <  18.01, "size height $a->{height}" );
 
 # Get extents
 my @ink = qw( ink layout );

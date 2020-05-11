@@ -71,7 +71,7 @@ sub get_by_contract {
     my $contract = shift;
     my $ts = shift;
 
-    return $self->client()->get("/team/v2/snapshots/contracts/" . $contract . "/" . $ts);
+    return $self->client()->get("/team/v3/snapshots/contracts/" . $contract . "/" . $ts);
 }
 
 =item update_by_contract
@@ -104,7 +104,7 @@ sub update_by_contract {
     my $ts = shift;
     my %params = @_;
 
-    return $self->client()->put("/team/v2/snapshots/contracts/" . $contract . "/" . $ts, %params);
+    return $self->client()->put("/team/v3/snapshots/contracts/" . $contract . "/" . $ts, %params);
 }
 
 =item delete_by_contract

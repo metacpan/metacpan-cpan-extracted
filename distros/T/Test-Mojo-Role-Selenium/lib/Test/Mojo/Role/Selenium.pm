@@ -18,7 +18,7 @@ $ENV{MOJO_SELENIUM_BASE_URL} ||= $ENV{TEST_SELENIUM} =~ /^http/ ? $ENV{TEST_SELE
 
 sub S { Mojo::JSON::encode_json($_[0]) }
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 my $SCRIPT_NAME = File::Basename::basename($0);
 my $SCREENSHOT  = 1;
@@ -77,7 +77,7 @@ sub active_element_is {
   my $el     = $self->_find_element($selector);
   my $same   = $active && $el ? $driver->compare_elements($active, $el) : 0;
 
-  return $self->_test('ok', $same, _desc($desc, "active element is @{[S $selector]}"));
+  return $self->test('ok', $same, _desc($desc, "active element is @{[S $selector]}"));
 }
 
 sub capture_screenshot {
@@ -92,7 +92,7 @@ sub capture_screenshot {
 
 sub click_ok {
   my ($self, $selector) = @_;
-  my $el = $selector ? $self->_find_element($selector) : $self->driver->get_active_element;
+  my $el  = $selector ? $self->_find_element($selector) : $self->driver->get_active_element;
   my $err = 'no such element';
 
   if ($el) {
@@ -101,27 +101,27 @@ sub click_ok {
     $err = '' if $el->click;
   }
 
-  return $self->_test('ok', !$err, _desc("click on @{[S $selector]} $err"));
+  return $self->test('ok', !$err, _desc("click on @{[S $selector]} $err"));
 }
 
 sub current_url_is {
   my $self = shift;
   my $url  = $self->_live_abs_url(shift);
 
-  return $self->_test('is', $self->driver->get_current_url,
+  return $self->test('is', $self->driver->get_current_url,
     $url->to_string, _desc('exact match for current url'));
 }
 
 sub current_url_like {
   my ($self, $match, $desc) = @_;
-  return $self->_test('like', $self->driver->get_current_url,
+  return $self->test('like', $self->driver->get_current_url,
     $match, _desc($desc, 'current url is similar'));
 }
 
 sub element_is_displayed {
   my ($self, $selector, $desc) = @_;
   my $el = $self->_find_element($selector);
-  return $self->_test(
+  return $self->test(
     'ok',
     ($el && $el->is_displayed),
     _desc($desc, "element @{[S $selector]} is displayed")
@@ -131,7 +131,7 @@ sub element_is_displayed {
 sub element_is_hidden {
   my ($self, $selector, $desc) = @_;
   my $el = $self->_find_element($selector);
-  return $self->_test('ok', ($el && $el->is_hidden),
+  return $self->test('ok', ($el && $el->is_hidden),
     _desc($desc, "element @{[S $selector]} is hidden"));
 }
 
@@ -153,33 +153,33 @@ SKIP: {
 sub live_element_count_is {
   my ($self, $selector, $count, $desc) = @_;
   my $els = $self->_proxy(find_elements => $selector);
-  return $self->_test('is', int(@$els), $count,
+  return $self->test('is', int(@$els), $count,
     _desc($desc, "element count for selector @{[S $selector]}"));
 }
 
 sub live_element_exists {
   my ($self, $selector, $desc) = @_;
   $desc = _desc($desc, "element for selector @{[S $selector]} exists");
-  return $self->_test('ok', $self->_find_element($selector), $desc);
+  return $self->test('ok', $self->_find_element($selector), $desc);
 }
 
 sub live_element_exists_not {
   my ($self, $selector, $desc) = @_;
   $desc = _desc($desc, "no element for selector @{[S $selector]}");
-  return $self->_test('ok', !$self->_find_element($selector), $desc);
+  return $self->test('ok', !$self->_find_element($selector), $desc);
 }
 
 sub live_text_is {
   my ($self, $selector, $value, $desc) = @_;
-  return $self->_test(
-    'is', $self->_element_data(get_text => $selector),
+  return $self->test(
+    'is',   $self->_element_data(get_text => $selector),
     $value, _desc($desc, "exact text for selector @{[S $selector]}")
   );
 }
 
 sub live_text_like {
   my ($self, $selector, $regex, $desc) = @_;
-  return $self->_test(
+  return $self->test(
     'like', $self->_element_data(get_text => $selector),
     $regex, _desc($desc, "similar text for selector @{[S $selector]}")
   );
@@ -187,15 +187,15 @@ sub live_text_like {
 
 sub live_value_is {
   my ($self, $selector, $value, $desc) = @_;
-  return $self->_test(
-    'is', $self->_element_data(get_value => $selector),
+  return $self->test(
+    'is',   $self->_element_data(get_value => $selector),
     $value, _desc($desc, "exact value for selector @{[S $selector]}")
   );
 }
 
 sub live_value_like {
   my ($self, $selector, $regex, $desc) = @_;
-  return $self->_test(
+  return $self->test(
     'like', $self->_element_data(get_value => $selector),
     $regex, _desc($desc, "similar value for selector @{[S $selector]}")
   );
@@ -219,7 +219,7 @@ sub navigate_ok {
     $desc = "navigate to $url (\$t->tx() is not set)";
   }
 
-  return $self->_test('ok', !$err, _desc($desc));
+  return $self->test('ok', !$err, _desc($desc));
 }
 
 sub new {
@@ -260,7 +260,7 @@ sub send_keys_ok {
   }
 
   $keys = Mojo::Util::url_escape(join '', @$keys);
-  return $self->_test('ok', $el, _desc($desc, "keys ($keys) sent to @{[S $selector]}"));
+  return $self->test('ok', $el, _desc($desc, "keys ($keys) sent to @{[S $selector]}"));
 }
 
 sub set_window_size {
@@ -285,7 +285,7 @@ sub submit_ok {
   my ($self, $selector, $desc) = @_;
   my $el = $self->_find_element($selector);
   $el->submit if $el;
-  return $self->_test('ok', $el, _desc($desc, "click on @{[S $selector]}"));
+  return $self->test('ok', $el, _desc($desc, "click on @{[S $selector]}"));
 }
 
 sub toggle_checked_ok {
@@ -305,7 +305,7 @@ sub toggle_checked_ok {
     }
   }
 
-  return $self->_test('ok', $el, _desc("click on @{[S $selector]}"));
+  return $self->test('ok', $el, _desc("click on @{[S $selector]}"));
 }
 
 sub wait_for {
@@ -341,7 +341,7 @@ sub wait_for {
 
   $driver->set_timeout(implicit => $prev_implicit_timeout);
 
-  return $self->_test('ok', $ok, _desc($desc));
+  return $self->test('ok', $ok, _desc($desc));
 }
 
 sub wait_until {
@@ -365,14 +365,14 @@ sub wait_until {
   $ioloop->remove($_) for @tid;
 
   return $self if $args->{skip};
-  return $self->_test('ok', !$err, _desc($args->{desc} || "waited for @{[time - $t0]}s"));
+  return $self->test('ok', !$err, _desc($args->{desc} || "waited for @{[time - $t0]}s"));
 }
 
 sub window_size_is {
   my ($self, $exp, $desc) = @_;
   my $size = $self->driver->get_window_size;
 
-  return $self->_test('is_deeply', [@$size{qw(width height)}],
+  return $self->test('is_deeply', [@$size{qw(width height)}],
     $exp, _desc($desc, "window size is $exp->[0]x$exp->[1]"));
 }
 

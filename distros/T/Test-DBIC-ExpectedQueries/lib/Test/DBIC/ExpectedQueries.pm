@@ -58,7 +58,10 @@ single-row queries in the future.
 
 =head2 Flexible
 
-    my $queries = Test::DBI::ExpectedQueries->new({ schema => $schema }});
+    my $queries = Test::DBIC::ExpectedQueries->new({
+        schema                  => $schema,
+        report_subselect_tables => 1,
+    });
     $queries->run(sub {
         $schema->resultset("Book")->find(34);
         $schema->resultset("Author")->create( ... );
@@ -232,11 +235,19 @@ use C<stack_trace => 1>.
 
 =head1 METHODS
 
-=head2 new({ schema => $schema }}) : $new_object
+=head2 new({ schema => $schema, report_subselect_tables => 0 }}) : $new_object
 
 Create new test object.
 
 $schema is a DBIx::Class::Schema object.
+
+If C<report_subselect_tables> is false (default), any SQL query like
+
+    select * from (select abc from def);
+
+will report a select on the table C<select>. However, if you specify
+C<report_subselect_tables>, it will try to find the C<def> table
+inside the subselect.
 
 
 =head2 run( $sub_ref ) : $result | @result
@@ -342,7 +353,7 @@ queries until after they have been run.
 =cut
 
 package Test::DBIC::ExpectedQueries;
-$Test::DBIC::ExpectedQueries::VERSION = '2.001';
+$Test::DBIC::ExpectedQueries::VERSION = '2.002';
 use Moo;
 use Exporter::Tiny;
 BEGIN {extends "Exporter::Tiny"};
@@ -391,6 +402,12 @@ sub expected_queries {
 has schema => (
     is       => "ro",
     required => 1,
+);
+
+has report_subselect_tables => (
+    is      => "ro",
+    default => sub { 0 },
+    lazy    => 1,
 );
 
 has queries => (
@@ -492,8 +509,9 @@ sub run {
         push(
             @queries,
             Test::DBIC::ExpectedQueries::Query->new({
-                sql         => $sql,
-                stack_trace => $self->_stack_trace(),
+                sql                     => $sql,
+                stack_trace             => $self->_stack_trace(),
+                report_subselect_tables => $self->report_subselect_tables,
             }),
         );
     } );

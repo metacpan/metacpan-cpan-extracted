@@ -1,3 +1,12 @@
+1.057.000  2020-05-08  Released-By: PERLANCAR; Urgency: medium
+
+	   - Add two tutorial pages: 200_SettingUpAMiniCPAN,
+	     700_SettingUpADarkPAN.
+
+	   - Correct wrong information: there's no numeric ID on 'author'
+	     table.
+
+
 1.054.001  2020-05-06  Released-By: PERLANCAR; Urgency: medium
 
 	   - Fix recipe.

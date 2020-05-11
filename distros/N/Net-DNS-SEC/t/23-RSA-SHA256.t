@@ -1,4 +1,4 @@
-# $Id: 23-RSA-SHA256.t 1758 2019-10-14 13:17:11Z willem $	-*-perl-*-
+# $Id: 23-RSA-SHA256.t 1777 2020-05-07 08:24:01Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -75,12 +75,12 @@ ok( $signature, 'signature created using private key' );
 
 
 my $verified = Net::DNS::SEC::RSA->verify( $sigdata, $key, $signature );
-ok( $verified, 'signature verified using public key' );
+is( $verified, 1, 'signature verified using public key' );
 
 
 my $corrupt = 'corrupted data';
 my $verifiable = Net::DNS::SEC::RSA->verify( $corrupt, $key, $signature );
-ok( !$verifiable, 'signature not verifiable if data corrupt' );
+is( $verifiable, 0, 'signature not verifiable if data corrupt' );
 
 
 exit;

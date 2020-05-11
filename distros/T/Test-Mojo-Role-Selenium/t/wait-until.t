@@ -9,7 +9,7 @@ $ENV{MOJO_SELENIUM_DRIVER} = t::Helper->mock_driver;
 my $t = t::Helper->t;
 
 # Avoid failing tests from wait_until()
-Mojo::Util::monkey_patch(ref($t), _test => sub { return shift });
+Mojo::Util::monkey_patch(ref($t), test => sub { return shift });
 
 $t::Helper::x = 1;
 $t->wait_until(sub { $_->x });

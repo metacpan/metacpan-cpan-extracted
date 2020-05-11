@@ -3,8 +3,8 @@
 # NO_PERINCI_CMDLINE_SCRIPT
 # FRAGMENT id=shcompgen-hint command=_cpanm-namespace
 
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '1.056'; # VERSION
+our $DATE = '2020-05-07'; # DATE
+our $VERSION = '1.057'; # VERSION
 
 use strict;
 use warnings;
@@ -47,10 +47,9 @@ my %seen_dists; # key = distname, val = modname
     my $sth = $dbh->prepare("
 SELECT
   module.name module,
-  dist.name dist
+  file.dist_name dist
 FROM module
 LEFT JOIN file ON module.file_id=file.id
-LEFT JOIN dist ON file.id=dist.file_id
 WHERE $where
 ");
     $sth->execute;
@@ -88,7 +87,7 @@ lcpanm-namespace - cpanm wrapper (set mirror to local CPAN by default, install a
 
 =head1 VERSION
 
-This document describes version 1.056 of lcpanm-namespace (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of lcpanm-namespace (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 SYNOPSIS
 

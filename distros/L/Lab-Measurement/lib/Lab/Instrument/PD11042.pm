@@ -1,5 +1,5 @@
 package Lab::Instrument::PD11042;
-$Lab::Instrument::PD11042::VERSION = '3.692';
+$Lab::Instrument::PD11042::VERSION = '3.701';
 #ABSTRACT: Trinamic PD-110-42 low-cost 42mm stepper motor
 
 use strict;
@@ -770,7 +770,7 @@ Lab::Instrument::PD11042 - Trinamic PD-110-42 low-cost 42mm stepper motor
 
 =head1 VERSION
 
-version 3.692
+version 3.701
 
 =head1 SYNOPSIS
 

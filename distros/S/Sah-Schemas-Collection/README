@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::Collection - Various Sah collection (array/hash) schemas
 
 VERSION
-    This document describes version 0.004 of Sah::Schemas::Collection (from
-    Perl distribution Sah-Schemas-Collection), released on 2020-03-02.
+    This document describes version 0.008 of Sah::Schemas::Collection (from
+    Perl distribution Sah-Schemas-Collection), released on 2020-05-08.
 
 SAH SCHEMAS
     *   aoaoms

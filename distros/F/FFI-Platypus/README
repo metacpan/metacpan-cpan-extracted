@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.25
+    version 1.26
 
 SYNOPSIS
 
@@ -378,6 +378,8 @@ METHODS
 
      my $function = $ffi->function( $name => \@fixed_argument_types => \@var_argument_types => $return_type);
      my $function = $ffi->function( $name => \@fixed_argument_types => \@var_argument_types => $return_type, \&wrapper);
+     my $function = $ffi->function( $name => \@fixed_argument_types => \@var_argument_types);
+     my $function = $ffi->function( $name => \@fixed_argument_types => \@var_argument_types => \&wrapper);
 
     Version 0.91 and later allows you to creat functions for c variadic
     functions (such as printf, scanf, etc) which can take a variable number
@@ -396,6 +398,11 @@ METHODS
     Some older versions of libffi and possibly some platforms may not
     support variadic functions. If you try to create a one, then an
     exception will be thrown.
+
+    [version 1.26]
+
+    If the return type is omitted then void will be the assumed return
+    type.
 
  attach
 
@@ -480,10 +487,16 @@ METHODS
  attach_cast
 
      $ffi->attach_cast("cast_name", $original_type, $converted_type);
+     $ffi->attach_cast("cast_name", $original_type, $converted_type, \&wrapper);
      my $converted_value = cast_name($original_value);
 
     This function attaches a cast as a permanent xsub. This will make it
     faster and may be useful if you are calling a particular cast a lot.
+
+    [version 1.26]
+
+    A wrapper may be added as the last argument to attach_cast and works
+    just like the wrapper for attach and function methods.
 
  sizeof
 

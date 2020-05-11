@@ -1,9 +1,9 @@
 package App::lcpan::Cmd::dist_scripts;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-06'; # DATE
+our $DATE = '2020-05-07'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.056'; # VERSION
+our $VERSION = '1.057'; # VERSION
 
 use 5.010;
 use strict;
@@ -29,16 +29,15 @@ sub handle_cmd {
     my $dbh = $state->{dbh};
 
     my @wheres;
-    push @wheres, "dist.name IN (".join(",", map {$dbh->quote($_)} @{ $args{dists} }).")";
+    push @wheres, "file.dist_name IN (".join(",", map {$dbh->quote($_)} @{ $args{dists} }).")";
     my $detail = $args{detail};
 
     my $sth = $dbh->prepare("SELECT
   script.name name,
-  dist.name dist,
+  file.dist_name dist,
   script.abstract abstract
 FROM script
 LEFT JOIN file ON script.file_id=file.id
-LEFT JOIN dist ON file.id=dist.file_id
 WHERE ".join(" AND ", @wheres)."
 ORDER BY name DESC");
     $sth->execute();
@@ -68,7 +67,7 @@ App::lcpan::Cmd::dist_scripts - List scripts in a distribution
 
 =head1 VERSION
 
-This document describes version 1.056 of App::lcpan::Cmd::dist_scripts (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of App::lcpan::Cmd::dist_scripts (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 FUNCTIONS
 
@@ -96,6 +95,8 @@ Defaults to C<~/cpan>.
 =item * B<detail> => I<bool>
 
 =item * B<dists>* => I<array[perl::distname]>
+
+Distribution names (e.g. Foo-Bar).
 
 =item * B<index_name> => I<filename> (default: "index.db")
 

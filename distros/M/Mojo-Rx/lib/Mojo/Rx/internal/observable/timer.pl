@@ -11,11 +11,12 @@ use Mojo::IOLoop;
         my ($subscriber) = @_;
 
         my $counter = 0;
-        my @ids;
-        push @ids, Mojo::IOLoop->timer($after, sub {
+        my $id;
+        $id = Mojo::IOLoop->timer($after, sub {
+            undef $id;
             $subscriber->{next}->($counter++) if defined $subscriber->{next};
             if (defined $period) {
-                push @ids, Mojo::IOLoop->recurring($period, sub {
+                $id = Mojo::IOLoop->recurring($period, sub {
                     $subscriber->{next}->($counter++) if defined $subscriber->{next};
                 });
             } else {
@@ -24,7 +25,7 @@ use Mojo::IOLoop;
         });
 
         return sub {
-            Mojo::IOLoop->remove($_) foreach @ids;
+            Mojo::IOLoop->remove($id) if defined $id;
         };
     });
 };

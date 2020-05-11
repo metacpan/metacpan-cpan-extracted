@@ -4,7 +4,7 @@
       "Tudor Marghidanu"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4229",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "artistic_2"
    ],
@@ -29,7 +29,7 @@
    "provides" : {
       "Mojolicious::Plugin::SwaggerUI" : {
          "file" : "lib/Mojolicious/Plugin/SwaggerUI.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.0.4"
       }
    },
    "release_status" : "stable",
@@ -41,7 +41,7 @@
          "url" : "https://gitlab.com/marghidanu/mojolicious-plugin-swaggerui.git"
       }
    },
-   "version" : "v0.0.3",
+   "version" : "v0.0.4",
    "x_contributors" : [
       "Tudor Marghidanu <tudor@marghidanu.com>"
    ],

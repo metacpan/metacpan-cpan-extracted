@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::HTTPClient;
-$RT::Client::REST::HTTPClient::VERSION = '0.59';
+$RT::Client::REST::HTTPClient::VERSION = '0.60';
 use base 'LWP::UserAgent';
 
 
@@ -47,7 +47,7 @@ RT::Client::REST::HTTPClient - Subclass LWP::UserAgent in order to support basic
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 METHODS
 

@@ -1,5 +1,5 @@
 #
-# $Id: Ffmpeg.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
+# $Id$
 #
 # video::ffmpeg Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6bd6acfc81d5 $',
+      revision => '$Revision$',
       tags => [ qw(unstable audio sound record micro) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -25,7 +25,7 @@ sub brik_properties {
       },
       commands => {
          install => [ ],  # Inherited
-         record_desktop => [ qw(output.mkv) ],
+         record_desktop => [ qw(output.mkv resolution|OPTIONAL) ],
          convert_to_youtube => [ qw(input.mkv output.mp4) ],
       },
       require_binaries => {
@@ -86,7 +86,7 @@ Metabrik::Video::Ffmpeg - video::ffmpeg Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

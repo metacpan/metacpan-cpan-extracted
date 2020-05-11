@@ -31,5 +31,5 @@ resources:
   bugtracker: https://github.com/oposs/mojolicious-automake/issues
   license: http://opensource.org/licenses/MIT
   repository: https://github.com/oposs/mojolicious-automake
-version: v0.5.1
+version: v0.6.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

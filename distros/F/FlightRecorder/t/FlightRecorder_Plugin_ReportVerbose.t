@@ -116,7 +116,7 @@ $subs->example(-1, 'generate', 'method', fun($tryable) {
   my $process = qr/\[\d+\]/;
   my $begin = qr/BEGIN/;
 
-  my $line1 = join ' ', (
+  my $line1 = join qr/\s+/, (
     $dow,
     $mon,
     $day,

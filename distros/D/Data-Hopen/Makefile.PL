@@ -98,6 +98,7 @@ sub get_perl_filename {
         # installed.
 
         my $make_readme_md = File::Spec->catfile(qw(support readme.pl));
+        my $make_cpanfile = File::Spec->catfile(qw(support cpanfile.pl));
         return <<EOT;
 authortest:
 \tRELEASE_TESTING=1 prove -lvj4 xt
@@ -111,8 +112,12 @@ README.md: @{[$VERSION_FROM]} Makefile.PL $make_readme_md
 README: @{[$VERSION_FROM]} Makefile.PL $make_readme_md
 \t"$secure_perl_path" "$make_readme_md" -i "\$<" -o "\$@" -f text --appveyor hopenbuild/Data-Hopen --travis hopenbuild/Data-Hopen
 
-all :: README.md README
-dist :: README.md README
+# Update cpanfile, but if the dev dependencies aren't installed, it's OK.
+cpanfile: @{[$VERSION_FROM]} Makefile.PL $make_cpanfile MYMETA.json
+\t-"$secure_perl_path" "$make_cpanfile"
+
+all :: README.md README cpanfile
+dist :: README.md README cpanfile
 
 # Uninstallation: mimic what the normal "uninstall" target does, but actually
 # carry out the actions.
@@ -197,13 +202,12 @@ my %opts = (
         'Carp' => '0',
 
         'Class::Method::Modifiers' => '2.10',   # most recent code change
-        'Class::Tiny' => '1.000',   # New API.  NOTE: <1.001 has no BUILDARGS
+        'Class::Tiny' => '1.001',       # BUILDARGS
         #'Class::Tiny::Antlers' => '0',
 
         #'Class::Tiny::Chained' => '0.002',
             # - Looks like it might be handy.
             # 0.002+ because that has only core dependencies.
-
 
         ## 'Class::XPath' => '1.4',
         #'Clone::Choose' => '0.008',     # as used by Hash::Merge
@@ -259,6 +263,8 @@ my %opts = (
 
         #'Role::Tiny' => '1.000000',            # version num from Antlers
 
+        #'List::Util' => '1.29',     # for pairkeys, pairvalues
+        'Regexp::Assemble' => '0.38',
         'Scalar::Util' => '0',
         'Set::Scalar' => '1.27',    # For correct metadata
         'Storable' => '3.06',
@@ -268,6 +274,7 @@ my %opts = (
         'Sub::ScopeFinalizer' => '0.02',        # For correct META.yml
 
         'strict' => '0',
+        'vars::i' => '2.000000',
         'warnings' => '0',
     },
 
@@ -289,6 +296,9 @@ my %opts = (
             develop => {
                 requires => {
                     'App::RewriteVersion' => '0',   # for perl-bump-version
+                    'CPAN::Meta' => '0',
+                    'File::Slurp' => '9999.26',
+                    'Module::CPANfile' => '0.9020', # for from_prereqs()
                     'Module::Metadata' => '1.000016',
                     'Test::Kwalitee' => '0',
                 },

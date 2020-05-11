@@ -4,7 +4,7 @@
       "Grant Street Group <developers@grantstreet.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -54,7 +54,7 @@
    "provides" : {
       "Log::Any::Adapter::Sentry::Raven" : {
          "file" : "lib/Log/Any/Adapter/Sentry/Raven.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.0.4"
       }
    },
    "release_status" : "stable",
@@ -68,10 +68,8 @@
          "web" : "https://github.com/GrantStreetGroup/p5-Log-Any-Adapter-Sentry-Raven"
       }
    },
-   "version" : "v0.0.3",
-   "x_generated_by_perl" : "v5.18.2",
+   "version" : "v0.0.4",
    "x_serialization_backend" : "JSON::XS version 4.02",
-   "x_spdx_expression" : "Artistic-2.0",
    "x_static_install" : 1
 }
 

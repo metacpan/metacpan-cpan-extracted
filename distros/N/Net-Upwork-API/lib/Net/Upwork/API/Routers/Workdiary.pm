@@ -46,6 +46,43 @@ sub new {
     return Net::Upwork::API::init_router($class, $api, ENTRY_POINT);
 }
 
+=item get
+
+    Get Workdiary
+
+B<Parameters>
+
+$company
+
+    Company ID
+
+$username
+
+    User ID
+
+$date
+
+    Date
+
+$params
+
+    Hash of parameters
+
+B<Return value>
+
+    JSON response as a string
+
+=cut
+
+sub get {
+    my $self = shift;
+    my $company = shift;
+    my $date = shift;
+    my %params = @_;
+
+    return $self->client()->get("/team/v3/workdiaries/companies/" . $company . "/" . $date, %params);
+}
+
 =item get_by_contract
 
     Get Workdiary by Contract
@@ -76,7 +113,7 @@ sub get_by_contract {
     my $date = shift;
     my %params = @_;
 
-    return $self->client()->get("/team/v2/workdiaries/contracts/" . $contract . "/" . $date, %params);
+    return $self->client()->get("/team/v3/workdiaries/contracts/" . $contract . "/" . $date, %params);
 }
 
 =back

@@ -5,9 +5,9 @@ use warnings;
 
 use Test::More;
 use Test::Exception;
-use Test::RequiresInternet ( 'api.ispapi.net' => 80 );
+use Test::RequiresInternet ( 'api.ispapi.net' => 443 );
 
-use version 0.9917; our $VERSION = version->declare('v2.3.0');
+use version 0.9917; our $VERSION = version->declare('v2.5.0');
 
 # T1-4: test import modules
 use_ok('Config');
@@ -355,12 +355,6 @@ $validate = {
     's_entity'  => '54cd',
     's_command' => "COMMAND=QueryDomainOptions\nDOMAIN0=example1.com\nDOMAIN1=example2.com"
 };
-$enc = $cl->getPOSTData(
-    {   COMMAND => 'QueryDomainOptions',
-        DOMAIN  => [ 'example1.com', 'example2.com' ]
-    }
-);
-is_deeply( $enc, $validate, 'AC: Check getPOSTData result. #4' );
 
 # ~> enableDebugMode method test
 $cl->enableDebugMode();
@@ -379,12 +373,30 @@ $cl->setSession(q{});
 
 # T69 ~> getURL method test
 my $url = $cl->getURL();
-is( $url, 'https://api.ispapi.net/api/call.cgi', 'AC: Check getURL result.' );
+is( $url, $WebService::Hexonet::Connector::APIClient::ISPAPI_CONNECTION_URL, 'AC: Check getURL result. #1' );
+# check highperformance connection setup
+$cl->useHighPerformanceConnectionSetup();
+$url = $cl->getURL();
+is( $url, $WebService::Hexonet::Connector::APIClient::ISPAPI_CONNECTION_URL_PROXY, 'AC: Check getURL result. #2' );
+# check default connection setup
+$cl->useDefaultConnectionSetup();
+$url = $cl->getURL();
+is( $url, $WebService::Hexonet::Connector::APIClient::ISPAPI_CONNECTION_URL, 'AC: Check getURL result. #3' );
+# check get-/setreferer
+$cl->setReferer('https://www.hexonet.net/');
+is( $cl->getReferer(), 'https://www.hexonet.net/', 'AC: Check setReferer result. #1' );
+$cl->setReferer(q{});
+is( $cl->getReferer(), undef, 'AC: Check setReferer result. #2' );
+# check get-/setproxy
+$cl->setProxy('https://www.hexonet.net/');
+is( $cl->getProxy(), 'https://www.hexonet.net/', 'AC: Check setProxy result. #1' );
+$cl->setProxy(q{});
+is( $cl->getProxy(), undef, 'AC: Check setProxy result. #2' );
 
 # T70 ~> setURL method test
-$url = $cl->setURL('http://api.ispapi.net/api/call.cgi')->getURL();
-is( $url, 'http://api.ispapi.net/api/call.cgi', 'AC: Check if setURL working.' );
-$cl->setURL('https://api.ispapi.net/api/call.cgi');
+$url = $cl->setURL($WebService::Hexonet::Connector::APIClient::ISPAPI_CONNECTION_URL_PROXY)->getURL();
+is( $url, $WebService::Hexonet::Connector::APIClient::ISPAPI_CONNECTION_URL_PROXY, 'AC : Check if setURL working.' );
+$cl->setURL($WebService::Hexonet::Connector::APIClient::ISPAPI_CONNECTION_URL);
 
 # - T72 ~> setOTP method test
 $cl->setOTP('12345678');
@@ -394,7 +406,7 @@ $validate = {
     's_otp'     => '12345678',
     's_command' => 'COMMAND=StatusAccount'
 };
-is_deeply( $d, $validate, 'AC: Check if setOTP method is working. #1' );
+is_deeply( $d, $validate, 'AC : Check if setOTP method is working. #1' );
 $cl->setOTP(q{});
 $d = $cl->getPOSTData( { COMMAND => 'StatusAccount' } );
 $validate = {
@@ -601,6 +613,33 @@ $r = $cl->request( { COMMAND => 'GetUserIndex' } );
 $cls = blessed($r);
 is( $cls, 'WebService::Hexonet::Connector::Response', 'AC: Check if resetUserView method is working. #1' );
 is( $r->isSuccess(), 1, 'AC: Check if resetUserView method is working. #2' );
+
+# ~> request method test
+# check flattening
+$r   = $cl->request( { COMMAND => 'CheckDomains', DOMAIN => [ 'example.com', 'example.net' ] } );
+$cls = blessed($r);
+$cmd = $r->getCommand();
+is( $cls,                     'WebService::Hexonet::Connector::Response', 'AC: Check if command flattening is working. #1' );
+is( $r->isSuccess(),          1,                                          'AC: Check if command flattening is working. #2' );
+is( exists $cmd->{'DOMAIN'},  q{},                                        'AC: Check if command flattening is working. #3' );
+is( exists $cmd->{'DOMAIN0'}, 1,                                          'AC: Check if command flattening is working. #4' );
+is( exists $cmd->{'DOMAIN1'}, 1,                                          'AC: Check if command flattening is working. #5' );
+is( $cmd->{'DOMAIN0'},        'example.com',                              'AC: Check if command flattening is working. #7' );
+is( $cmd->{'DOMAIN1'},        'example.net',                              'AC: Check if command flattening is working. #8' );
+
+# check auto idn conversion
+$r   = $cl->request( { COMMAND => 'CheckDomains', DOMAIN => [ 'example.com', 'dömäin.example', 'example.net' ] } );
+$cls = blessed($r);
+$cmd = $r->getCommand();
+is( $cls,                     'WebService::Hexonet::Connector::Response', 'AC: Check if command flattening is working. #1' );
+is( $r->isSuccess(),          1,                                          'AC: Check if command flattening is working. #2' );
+is( exists $cmd->{'DOMAIN'},  q{},                                        'AC: Check if command flattening is working. #3' );
+is( exists $cmd->{'DOMAIN0'}, 1,                                          'AC: Check if command flattening is working. #4' );
+is( exists $cmd->{'DOMAIN1'}, 1,                                          'AC: Check if command flattening is working. #5' );
+is( exists $cmd->{'DOMAIN2'}, 1,                                          'AC: Check if command flattening is working. #6' );
+is( $cmd->{'DOMAIN0'},        'example.com',                              'AC: Check if command flattening is working. #7' );
+is( $cmd->{'DOMAIN1'},        'xn--dmin-moa0i.example',                   'AC: Check if command flattening is working. #8' );
+is( $cmd->{'DOMAIN2'},        'example.net',                              'AC: Check if command flattening is working. #9' );
 
 # ~> getUserAgent method test
 my $arch       = ( uname() )[ $UNAME_IDX_4 ];

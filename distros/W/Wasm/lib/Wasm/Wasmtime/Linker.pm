@@ -12,7 +12,7 @@ use Ref::Util qw( is_blessed_ref );
 use Carp ();
 
 # ABSTRACT: Wasmtime linker class
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 $ffi_prefix = 'wasmtime_linker_';
@@ -36,60 +36,55 @@ $ffi->attach( allow_shadowing => [ 'wasmtime_linker_t', 'bool' ] => sub {
 
 if(Wasm::Wasmtime::Error->can('new'))
 {
-  $ffi->attach( define => ['wasmtime_linker_t', 'wasm_byte_vec_t*', 'wasm_byte_vec_t*', 'wasm_extern_t'] => 'wasmtime_error_t' => sub {
+  $ffi->attach( define => ['wasmtime_linker_t', 'wasm_byte_vec_t*', 'wasm_byte_vec_t*', 'opaque'] => 'wasmtime_error_t' => sub {
     my $xsub   = shift;
     my $self   = shift;
     my $module = Wasm::Wasmtime::ByteVec->new(shift);
     my $name   = Wasm::Wasmtime::ByteVec->new(shift);
     my $extern = shift;
 
-    if(ref($extern) eq 'Wasm::Wasmtime::Extern')
+    # Fix this sillyness when/if ::Extern becomes a base class for extern classes
+    if(is_blessed_ref($extern) && (   $extern->isa('Wasm::Wasmtime::Extern')
+                                   || $extern->isa('Wasm::Wasmtime::Func')
+                                   || $extern->isa('Wasm::Wasmtime::Memory')
+                                   || $extern->isa('Wasm::Wasmtime::Global')
+                                   || $extern->isa('Wasm::Wasmtime::Table')))
     {
-      # nothing, okay.
-    }
-    elsif(is_blessed_ref($extern) && $extern->can('as_extern'))
-    {
-      $extern = $extern->as_extern;
+      my $error = $xsub->($self, $module, $name, $extern->{ptr});
+      Carp::croak($error->message) if $error;
+      return $self;
     }
     else
     {
       Carp::croak("not an extern: $extern");
     }
-
-    my $error = $xsub->($self, $module, $name, $extern);
-    Carp::croak($error->message) if $error;
-    $self;
   });
 }
 else
 {
-  $ffi->attach( define => ['wasmtime_linker_t', 'wasm_byte_vec_t*', 'wasm_byte_vec_t*', 'wasm_extern_t'] => 'bool' => sub {
+  $ffi->attach( define => ['wasmtime_linker_t', 'wasm_byte_vec_t*', 'wasm_byte_vec_t*', 'opaque'] => 'bool' => sub {
     my $xsub   = shift;
     my $self   = shift;
     my $module = Wasm::Wasmtime::ByteVec->new(shift);
     my $name   = Wasm::Wasmtime::ByteVec->new(shift);
     my $extern = shift;
 
-    if(ref($extern) eq 'Wasm::Wasmtime::Extern')
+    # Fix this sillyness when/if ::Extern becomes a base class for extern classes
+    if(is_blessed_ref($extern) && (   $extern->isa('Wasm::Wasmtime::Extern')
+                                   || $extern->isa('Wasm::Wasmtime::Func')
+                                   || $extern->isa('Wasm::Wasmtime::Memory')
+                                   || $extern->isa('Wasm::Wasmtime::Global')
+                                   || $extern->isa('Wasm::Wasmtime::Table')))
     {
-      # nothing, okay.
-    }
-    elsif(is_blessed_ref($extern) && $extern->can('as_extern'))
-    {
-      $extern = $extern->as_extern;
+      my $ret = $xsub->($self, $module, $name, $extern->{ptr});
+      Carp::croak("Unknown error in define") unless $ret;
+      return $self;
     }
     else
     {
       Carp::croak("not an extern: $extern");
     }
 
-    my $ret = $xsub->($self, $module, $name, $extern);
-    unless($ret)
-    {
-      Carp::croak("Unknown error in define");
-    }
-
-    $self;
   });
 }
 
@@ -185,6 +180,9 @@ else
   });
 }
 
+
+sub store { shift->{store} }
+
 _generate_destroy();
 
 1;
@@ -201,7 +199,7 @@ Wasm::Wasmtime::Linker - Wasmtime linker class
 
 =head1 VERSION
 
-version 0.06
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -280,7 +278,7 @@ version 0.06
      },
    ),
  );
- $caller->get_export('run')->as_func->();
+ $caller->exports->run->();
 
 =head1 DESCRIPTION
 
@@ -329,6 +327,7 @@ Define WASI instance.
 =head2 define_instance
 
  $linker->define_instance(
+   $name,       # string
    $instance,   # Wasm::Wasmtime::Instance
  );
 
@@ -341,6 +340,12 @@ Define WebAssembly instance.
  );
 
 Instantiate the module using the linker.  Returns the new L<Wasm::Wasmtime::Instance> object.
+
+=head2 store
+
+ my $store = $linker->store;
+
+Returns the L<Wasm::Wasmtime::Store> for the linker.
 
 =head1 SEE ALSO
 

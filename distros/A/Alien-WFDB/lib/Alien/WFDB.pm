@@ -1,18 +1,28 @@
 package Alien::WFDB;
-$Alien::WFDB::VERSION = '0.004';
+$Alien::WFDB::VERSION = '0.005';
 use strict;
 use warnings;
 
 use parent 'Alien::Base';
 
+
+sub inline_auto_include {
+	[ 'wfdb.h' ];
+}
+
+sub libs {
+	my ($class) = @_;
+	join ' ', (
+		$class->install_type eq 'share' ? ('-L' . File::Spec->catfile($class->dist_dir, qw(lib)) ) : (),
+		'-lwfdb',
+	);
+}
+
 sub Inline {
+	my ($self, $lang) = @_;
 	return unless $_[-1] eq 'C'; # Inline's error message is good
-	my $self = __PACKAGE__->new;
-	+{
-		LIBS => $self->libs,
-		INC => $self->cflags,
-		AUTO_INCLUDE => '#include "wfdb.h"',
-	};
+
+	my $params = Alien::Base::Inline(@_);
 }
 
 1;
@@ -30,7 +40,7 @@ Alien::WFDB - Alien package for the WFDB (WaveForm DataBase) library
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 Inline support
 

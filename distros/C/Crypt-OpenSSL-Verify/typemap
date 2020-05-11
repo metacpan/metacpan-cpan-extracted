@@ -1,0 +1,2 @@
+Crypt::OpenSSL::Verify T_PTROBJ
+Crypt::OpenSSL::X509 T_PTROBJ

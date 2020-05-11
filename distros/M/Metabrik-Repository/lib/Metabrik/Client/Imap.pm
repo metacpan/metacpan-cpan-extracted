@@ -1,5 +1,5 @@
 #
-# $Id: Imap.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
+# $Id$
 #
 # client::imap Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::String::Uri);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6bd6acfc81d5 $',
+      revision => '$Revision$',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -20,6 +20,8 @@ sub brik_properties {
          input => [ qw(imap_uri) ],
          as_array => [ qw(0|1) ],
          strip_crlf => [ qw(0|1) ],
+         username => [ qw(username) ],
+         password => [ qw(password) ],
          _imap => [ qw(INTERNAL) ],
          _id => [ qw(INTERNAL) ],
          _count => [ qw(INTERNAL) ],
@@ -41,6 +43,8 @@ sub brik_properties {
          close => [ ],
       },
       require_modules => {
+         'URI::imap' => [ ],
+         'URI::imaps' => [ ],
          'Metabrik::Email::Message' => [ ],
          'Net::IMAP::Simple' => [ ],
       },
@@ -57,8 +61,8 @@ sub open {
    my $parsed = $self->SUPER::parse($input) or return;
    my $host = $parsed->{host};
    my $port = $parsed->{port};
-   my $user = $parsed->{user};
-   my $password = $parsed->{password};
+   my $user = $parsed->{user} || $self->username;
+   my $password = $parsed->{password} || $self->password;
    my $path = $parsed->{path} || 'INBOX';
    $path =~ s{^/*}{};
 
@@ -111,20 +115,20 @@ sub read_next {
 
    my $current = $self->_id;
 
-   my $lines = $imap->get($current--);
+   my @lines = $imap->get($current--);
 
    $self->_id($current);
 
    if ($self->as_array) {
       if ($self->strip_crlf) {
-         for (@$lines) {
+         for (@lines) {
             s{[\r\n]*$}{};
          }
       }
-      return [ @$lines ];  # unbless it
+      return [ @lines ];
    }
 
-   return join('', @$lines);
+   return join("\n", @lines);
 }
 
 sub read_next_with_subject {
@@ -224,7 +228,7 @@ Metabrik::Client::Imap - client::imap Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

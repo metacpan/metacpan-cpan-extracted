@@ -8,7 +8,7 @@ use Moo;
 with "Dancer2::Plugin::Auth::Extensible::Role::Provider";
 use namespace::clean;
 
-our $VERSION = '0.703';
+our $VERSION = '0.705';
 
 =head1 NAME 
 
@@ -164,10 +164,26 @@ has role_filter => (
     default => '(objectClass=groupOfNames)',
 );
 
+=head2 role_member_attribute_name
+
+The attribute of a user object who's value should be the value used to identify
+which roles a specific user is a member of.
+
+Defaults to 'dn'
+
+=cut
+
+has role_member_attribute_name => (
+    is      => 'ro',
+    isa     => Str,
+    default => 'dn',
+);
+
 =head2 role_member_attribute
 
-The attribute who's value should be a user's DN to show the user has the
-specific L</role_attribute>'s value.
+The attribute of a role object who's value should be the value of a user's
+L</role_member_attribute_name> attribute to look up which roles a user is a
+member of.
 
 Defaults to 'member'.
 
@@ -279,12 +295,18 @@ sub get_user_details {
 
         # now get the roles
 
+        my $role_member_attribute_value;
+        if ( $self->role_member_attribute_name eq 'dn' ) {
+            $role_member_attribute_value = $entry->dn;
+        } else {
+            $role_member_attribute_value = $entry->get_value( $self->role_member_attribute_name );
+        }
         $mesg = $ldap->search(
             base   => $self->basedn,
             filter => '(&'
               . $self->role_filter . '('
               . $self->role_member_attribute . '='
-              . $entry->dn . '))',
+              . $role_member_attribute_value . '))',
         );
 
         if ( $mesg->is_error ) {

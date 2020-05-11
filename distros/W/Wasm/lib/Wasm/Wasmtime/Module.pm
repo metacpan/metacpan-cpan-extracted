@@ -4,12 +4,14 @@ use strict;
 use warnings;
 use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::Store;
+use Wasm::Wasmtime::Module::Exports;
+use Wasm::Wasmtime::Module::Imports;
 use Wasm::Wasmtime::ImportType;
 use Wasm::Wasmtime::ExportType;
 use Carp ();
 
 # ABSTRACT: Wasmtime module class
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 $ffi_prefix = 'wasm_module_';
@@ -112,7 +114,12 @@ else
 }
 
 
-$ffi->attach( exports => [ 'wasm_module_t', 'wasm_exporttype_vec_t*' ] => sub {
+sub exports
+{
+  Wasm::Wasmtime::Module::Exports->new(shift);
+}
+
+$ffi->attach( [ exports => '_exports' ]=> [ 'wasm_module_t', 'wasm_exporttype_vec_t*' ] => sub {
   my($xsub, $self) = @_;
   my $exports = Wasm::Wasmtime::ExportTypeVec->new;
   $xsub->($self, $exports);
@@ -120,7 +127,12 @@ $ffi->attach( exports => [ 'wasm_module_t', 'wasm_exporttype_vec_t*' ] => sub {
 });
 
 
-$ffi->attach( imports => [ 'wasm_module_t', 'wasm_importtype_vec_t*' ] => sub {
+sub imports
+{
+  Wasm::Wasmtime::Module::Imports->new(shift);
+}
+
+$ffi->attach( [ imports => '_imports' ] => [ 'wasm_module_t', 'wasm_importtype_vec_t*' ] => sub {
   my($xsub, $self) = @_;
   my $imports = Wasm::Wasmtime::ImportTypeVec->new;
   $xsub->($self, $imports);
@@ -131,19 +143,17 @@ $ffi->attach( imports => [ 'wasm_module_t', 'wasm_importtype_vec_t*' ] => sub {
 sub store { shift->{store} }
 
 
-sub get_export
+sub to_string
 {
-  my($self, $name) = @_;
-  $self->{exports} ||= do {
-    my @exports = $self->exports;
-    my %exports;
-    foreach my $export (@exports)
-    {
-      $exports{$export->name} = $export->type;
-    }
-    \%exports;
-  };
-  $self->{exports}->{$name};
+  my($self) = @_;
+  my @externs = (@{ $self->imports }, @{ $self->exports });
+  return "(module)\n" unless @externs;
+  my $string = "(module\n";
+  foreach my $extern (@externs)
+  {
+    $string .= "  " . $extern->to_string . "\n";
+  }
+  $string .= ")\n";
 }
 
 _generate_destroy();
@@ -162,7 +172,7 @@ Wasm::Wasmtime::Module - Wasmtime module class
 
 =head1 VERSION
 
-version 0.06
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -239,13 +249,13 @@ a useful diagnostic for why it was invalid.
 
 =head2 exports
 
- my @exporttypes = $module->exports;
+ my $exports = $module->exports;
 
-Returns a list of L<Wasm::Wasmtime::ExportType> objects for the objects exported by the WebAssembly module.
+Returns a L<Wasm::Wasmtime::Module::Exports> object that can be used to query the module exports.
 
 =head2 imports
 
- my @importtypes = $module->imports;
+ my $imports = $module->imports;
 
 Returns a list of L<Wasm::Wasmtime::ImportType> objects for the objects imported by the WebAssembly module.
 
@@ -255,12 +265,11 @@ Returns a list of L<Wasm::Wasmtime::ImportType> objects for the objects imported
 
 Returns the L<Wasm::Wasmtime::Store> object used by this module.
 
-=head2 get_export
+=head2 to_string
 
- my $exporttype = $module->get_export($name);
+ my $string = $module->to_string;
 
-Returns the L<Wasm::Wasmtime::ExportType> with the given C<$name> as exported by the WebAssembly module.
-If no such export exists, then C<undef> is returned.
+Converts the module imports and exports into a string for diagnostics.
 
 =head1 SEE ALSO
 

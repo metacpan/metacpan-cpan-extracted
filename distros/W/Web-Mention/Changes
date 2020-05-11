@@ -1,5 +1,9 @@
 Revision history for Web::Mention
 
+0.711 2020-05-08T23:30:36Z
+
+    - Fixing bug that would handle unprocessed webmentions poorly in certain circumstances.
+
 0.710 2020-04-28T23:06:05Z
 
     - For the sake of faster load time, swapped out all use of Moose

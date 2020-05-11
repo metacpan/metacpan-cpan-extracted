@@ -6,7 +6,7 @@ use Mojo::ByteStream qw(b);
 
 extends 'Catalyst::View';
 
-our $VERSION = 0.001;
+our $VERSION = 0.002;
 
 has app => (is=>'ro');
 has auto_escape => (is=>'ro', required=>1, default=>1);
@@ -202,7 +202,6 @@ sub template_vars {
   my %template_args = (
     base => $c->req->base,
     name => $c->config->{name} || '',
-    model => $c->model,
     self => $self,
     %{$c->stash||+{}},
   );

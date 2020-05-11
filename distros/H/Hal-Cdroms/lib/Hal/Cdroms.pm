@@ -1,6 +1,8 @@
 package Hal::Cdroms;
 
-our $VERSION = 0.05;
+use strict;
+
+our $VERSION = 0.06;
 
 # Copyright (C) 2008 Mandriva
 # Copyright (C) 2020 Mageia
@@ -77,7 +79,7 @@ sub list {
 
     my $manager = $o->{service}->get_object('/org/freedesktop/UDisks2/Manager');
 
-    grep { _is_cdrom($o, $_); } @{$manager->GetBlockDevices(undef)};
+    grep { _is_cdrom($o, $_) } @{$manager->GetBlockDevices(undef)};
 }
 
 =head2 $cdroms->get_mount_point($udisks_path)
@@ -90,8 +92,8 @@ sub _is_cdrom {
     my ($o, $udisks_path) = @_;
     my $device = _get_device($o, $udisks_path);
     my $drive = _get_drive($o, $device);
-    return unless $drive && _get_property($drive, 'Drive', 'Removable');
-    return unless member(_get_property($device, 'Block', 'IdType'), 'iso9660', 'udf');
+    return if !($drive && _get_property($drive, 'Drive', 'Removable'));
+    return unless _member(_get_property($device, 'Block', 'IdType'), 'iso9660', 'udf');
     eval { _get_property($device, 'Filesystem', 'MountPoints') };
 }
 
@@ -115,7 +117,7 @@ sub _get_property {
 sub get_mount_point {
     my ($o, $udisks_path) = @_;
     my $mounts = _get_mount_points($o, $udisks_path);
-    _int_array_to_string($$mounts[0]) if @{$mounts};
+    _int_array_to_string($mounts->[0]) if @$mounts;
 }
 
 sub _get_mount_points {
@@ -126,7 +128,7 @@ sub _get_mount_points {
 
 sub _int_array_to_string {
     my ($array) = @_;
-    join('', map { $_ ? chr($_) : '' } @{$array});
+    join('', map { $_ ? chr($_) : '' } @$array);
 }
 
 sub _try {
@@ -239,7 +241,7 @@ sub wait_for_mounted {
 
     _reactor_wait($o->{dbus}, $o_timeout, sub {
 	my ($msg) = @_;
-	return unless member($msg->get_member, 'InterfacesAdded', 'PropertiesChanged');
+	return unless _member($msg->get_member, 'InterfacesAdded', 'PropertiesChanged');
 	my $udisks_path = $msg->get_member eq 'InterfacesAdded' ? ($msg->get_args_list)[0] : $msg->get_path;
 	return unless $udisks_path =~ /block_devices/;
 	return unless _is_cdrom($o, $udisks_path);
@@ -275,18 +277,13 @@ sub _reactor_wait {
     $found_val;
 }
 
-=head2 member(SCALAR, LIST)
-
-is the value in the list?
-
-=cut
-
 # From MDK::Common::DataStructure :
-sub member { my $e = shift; foreach (@_) { $e eq $_ and return 1 } 0 }
+sub _member { my $e = shift; foreach (@_) { $e eq $_ and return 1 } 0 }
 
 =head1 AUTHOR
 
 Pascal Rigaux <pixel@mandriva.com>
+Thierry Vignaud <thierry.vignaud@gmail.com>
 Martin Whitaker <martinw@mageia.org>
 
 =cut 

@@ -5,7 +5,6 @@ use warnings;
 use strict;
 
 use lib qw(t/);
-
 use Lab::Test import => ['file_ok_crlf'];
 use Test::More tests => 1;
 use File::Spec::Functions;
@@ -46,7 +45,8 @@ say "folder: $folder";
 
 # ugly, but seems the only way to use temporary files
 $Lab::XPRESS::Data::XPRESS_DataFile::GLOBAL_PATH = $folder;
-my $file     = 'voltage';
+my $file = 'voltage';
+
 my $DataFile = DataFile($file);
 $DataFile->add_column('volt');
 

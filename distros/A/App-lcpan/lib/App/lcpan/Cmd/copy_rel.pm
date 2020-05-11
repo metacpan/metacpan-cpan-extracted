@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::copy_rel;
 
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '1.056'; # VERSION
+our $DATE = '2020-05-07'; # DATE
+our $VERSION = '1.057'; # VERSION
 
 use 5.010;
 use strict;
@@ -74,7 +74,7 @@ App::lcpan::Cmd::copy_rel - Copy a release file to current directory
 
 =head1 VERSION
 
-This document describes version 1.056 of App::lcpan::Cmd::copy_rel (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of App::lcpan::Cmd::copy_rel (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 FUNCTIONS
 

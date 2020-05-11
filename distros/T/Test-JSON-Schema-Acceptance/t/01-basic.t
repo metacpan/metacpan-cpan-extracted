@@ -17,12 +17,12 @@ my $accepter = Test::JSON::Schema::Acceptance->new(7);
 
 my $parser = SchemaParser->new;
 my ($premature, @results) = run_tests(
-    sub {
-        $accepter->acceptance(sub {
-            my ($schema, $data_string) = @_;
-            return $parser->validate_json_string($data_string, $schema);
-        });
-    }
+  sub {
+  $accepter->acceptance(sub {
+    my ($schema, $data_string) = @_;
+      return $parser->validate_json_string($data_string, $schema);
+    });
+  }
 );
 
 cmp_deeply(

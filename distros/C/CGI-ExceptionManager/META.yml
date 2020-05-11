@@ -1,34 +1,48 @@
 ---
 abstract: 'DebugScreen with detach!'
 author:
-  - 'Tokuhiro Matsuno E<lt>tokuhirom@gmail.comE<gt>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
 build_requires:
-  IO::Scalar: 0
-  Test::More: 0.98
+  IO::Scalar: '2.113'
+  Test::More: '0.98'
 configure_requires:
-  Module::Build: 0.38
+  Module::Build: '0.38'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: CGI-ExceptionManager
 no_index:
   directory:
-    - inc
     - t
     - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
 provides:
   CGI::ExceptionManager:
     file: lib/CGI/ExceptionManager.pm
-    version: 0.06
+    version: '0.07'
   CGI::ExceptionManager::StackTrace:
     file: lib/CGI/ExceptionManager/StackTrace.pm
-    version: 0
 requires:
-  Filter::Util::Call: 0
-  perl: 5.00800
+  perl: '5.00800'
 resources:
-  license: http://dev.perl.org/licenses/
-version: 0.06
+  bugtracker: https://github.com/tokuhirom/CGI-ExceptionManager/issues
+  homepage: https://github.com/tokuhirom/CGI-ExceptionManager
+  repository: git://github.com/tokuhirom/CGI-ExceptionManager.git
+version: '0.07'
+x_contributors:
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'drry <drry@d0d07461-0603-4401-acd4-de1884942a52>'
+  - 'kazuho <kazuho@d0d07461-0603-4401-acd4-de1884942a52>'
+  - 'tokuhirom <tokuhirom@d0d07461-0603-4401-acd4-de1884942a52>'
+  - 'yappo <yappo@d0d07461-0603-4401-acd4-de1884942a52>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

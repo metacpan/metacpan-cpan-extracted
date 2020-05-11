@@ -1,16 +1,16 @@
 {
    "abstract" : "Postmodern Perl solves all problems",
    "author" : [
-      "Frank Wiegand <frank.wiegand@gmail.com>"
+      "Frank Wiegand <fwie@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Acme-Postmodern-Perl",
    "no_index" : {
@@ -33,10 +33,11 @@
       "runtime" : {
          "requires" : {
             "Test::More" : "0",
-            "perl" : "5.022"
+            "perl" : "5.032"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.09"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

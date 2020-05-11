@@ -1,5 +1,19 @@
 Revision history for Net-OAuth2-AuthorizationServer
 
+0.24     2020-05-06
+        - Add "FURTHER READING" section to Manual
+
+        - Audit code from "OAuth 2.0 Security Best Current Practice" draft
+        - The above states "clients SHOULD NOT use the implicit grant"
+        - The above states "The resource owner password credentials grant MUST NOT be used"
+        - Add some documentation to note the above, with links
+
+        - The above draft also reveals:
+        - PKCE will be required (https://tools.ietf.org/html/rfc7636)
+        - "authorization codes MUST be invalidated by the AS after their first use at the token endpoint"
+        - "configured to return an AS identitifier [sic] ("iss") as a non-standard parameter"
+        - "Authorization server MUST utilize ... methods to detect refresh token replay"
+
 0.24     2019-12-09
         - Remove hard dependency on Mojo::JWT (GH #26, with thanks to ap)
 

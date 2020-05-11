@@ -17,11 +17,13 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: App-lcpan-Bootstrap
+requires:
+  App::lcpan: '1.057'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan-Bootstrap
   homepage: https://metacpan.org/release/App-lcpan-Bootstrap
   repository: git://github.com/perlancar/perl-App-lcpan-Bootstrap.git
-version: 20200419.0.0
+version: 20200508.0.0
 x_Dist_Zilla:
   perl:
     version: '5.030002'

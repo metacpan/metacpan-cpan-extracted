@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::scripts;
 
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '1.056'; # VERSION
+our $DATE = '2020-05-07'; # DATE
+our $VERSION = '1.057'; # VERSION
 
 use 5.010;
 use strict;
@@ -99,11 +99,13 @@ sub handle_cmd {
         push @bind, $author;
     }
     if ($dist) {
-        push @where, "(script.file_id=(SELECT file_id FROM dist WHERE name=?))";
+        push @where, "(script.file_id=(SELECT id FROM file WHERE dist_name=?))";
         push @bind, $dist;
     }
 
     my $sql = "SELECT
+  file.dist_name dist,
+  file.dist_version dist_version,
   file.name release,
   script.cpanid cpanid,
   script.name name,
@@ -119,7 +121,7 @@ LEFT JOIN file ON file.id=script.file_id".
         push @res, $detail ? $row : $row->{name};
     }
     my $resmeta = {};
-    $resmeta->{'table.fields'} = [qw/name abstract release cpanid/]
+    $resmeta->{'table.fields'} = [qw/name abstract dist dist_version release cpanid/]
         if $detail;
     [200, "OK", \@res, $resmeta];
 }
@@ -139,7 +141,7 @@ App::lcpan::Cmd::scripts - List scripts
 
 =head1 VERSION
 
-This document describes version 1.056 of App::lcpan::Cmd::scripts (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of App::lcpan::Cmd::scripts (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 FUNCTIONS
 

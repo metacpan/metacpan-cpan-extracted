@@ -11,10 +11,9 @@ use warnings;
 
 no warnings qw( uninitialized once );
 
-our $VERSION = '1.866';
+our $VERSION = '1.868';
 
 use base 'MCE::Channel';
-use bytes;
 
 my $LF = "\012"; Internals::SvREADONLY($LF, 1);
 my $is_MSWin32 = ( $^O eq 'MSWin32' ) ? 1 : 0;
@@ -38,7 +37,6 @@ sub new {
 
 sub end {
    my ( $self ) = @_;
-   return if $self->{ended};
 
    local $\ = undef if (defined $\);
    MCE::Util::_sock_ready_w( $self->{p_sock} ) if $is_MSWin32;
@@ -55,12 +53,7 @@ sub enqueue {
    MCE::Util::_sock_ready_w( $self->{p_sock} ) if $is_MSWin32;
 
    while ( @_ ) {
-      my $data;
-      if ( ref $_[0] || !defined $_[0] ) {
-         $data = $freeze->([ shift ]), $data .= '1';
-      } else {
-         $data = shift, $data .= '0';
-      }
+      my $data = $freeze->([ shift ]);
       print { $self->{p_sock} } pack('i', length $data) . $data;
    }
 
@@ -91,9 +84,7 @@ sub dequeue {
          ? MCE::Channel::_read( $self->{c_sock}, $data, $len )
          : read( $self->{c_sock}, $data, $len );
 
-      chop( $data )
-         ? wantarray ? @{ $thaw->($data) } : ( $thaw->($data) )->[-1]
-         : wantarray ? ( $data ) : $data;
+      wantarray ? @{ $thaw->($data) } : ( $thaw->($data) )->[-1];
    }
    else {
       my ( $plen, @ret );
@@ -116,7 +107,7 @@ sub dequeue {
             ? MCE::Channel::_read( $self->{c_sock}, $data, $len )
             : read( $self->{c_sock}, $data, $len );
 
-         push @ret, chop($data) ? @{ $thaw->($data) } : $data;
+         push @ret, @{ $thaw->($data) };
       }
 
       wantarray ? @ret : $ret[-1];
@@ -150,7 +141,7 @@ sub dequeue_nb {
          ? MCE::Channel::_read( $self->{c_sock}, $data, $len )
          : read( $self->{c_sock}, $data, $len );
 
-      push @ret, chop($data) ? @{ $thaw->($data) } : $data;
+      push @ret, @{ $thaw->($data) };
    }
 
    wantarray ? @ret : $ret[-1];
@@ -166,12 +157,7 @@ sub send {
    my $self = shift;
    return MCE::Channel::_ended('send') if $self->{ended};
 
-   my $data;
-   if ( @_ > 1 || ref $_[0] || !defined $_[0] ) {
-      $data = $freeze->([ @_ ]), $data .= '1';
-   } else {
-      $data = $_[0], $data .= '0';
-   }
+   my $data = $freeze->([ @_ ]);
 
    local $\ = undef if (defined $\);
    MCE::Util::_sock_ready_w( $self->{p_sock} ) if $is_MSWin32;
@@ -201,9 +187,7 @@ sub recv {
       ? MCE::Channel::_read( $self->{c_sock}, $data, $len )
       : read( $self->{c_sock}, $data, $len );
 
-   chop( $data )
-      ? wantarray ? @{ $thaw->($data) } : ( $thaw->($data) )->[-1]
-      : wantarray ? ( $data ) : $data;
+   wantarray ? @{ $thaw->($data) } : ( $thaw->($data) )->[-1];
 }
 
 sub recv_nb {
@@ -229,9 +213,7 @@ sub recv_nb {
       ? MCE::Channel::_read( $self->{c_sock}, $data, $len )
       : read( $self->{c_sock}, $data, $len );
 
-   chop( $data )
-      ? wantarray ? @{ $thaw->($data) } : ( $thaw->($data) )->[-1]
-      : wantarray ? ( $data ) : $data;
+   wantarray ? @{ $thaw->($data) } : ( $thaw->($data) )->[-1];
 }
 
 ###############################################################################
@@ -242,13 +224,7 @@ sub recv_nb {
 
 sub send2 {
    my $self = shift;
-
-   my $data;
-   if ( @_ > 1 || ref $_[0] || !defined $_[0] ) {
-      $data = $freeze->([ @_ ]), $data .= '1';
-   } else {
-      $data = $_[0], $data .= '0';
-   }
+   my $data = $freeze->([ @_ ]);
 
    local $\ = undef if (defined $\);
    local $MCE::Signal::SIG;
@@ -282,9 +258,7 @@ sub recv2 {
       ? MCE::Channel::_read( $self->{p_sock}, $data, $len )
       : read( $self->{p_sock}, $data, $len );
 
-   chop( $data )
-      ? wantarray ? @{ $thaw->($data) } : ( $thaw->($data) )->[-1]
-      : wantarray ? ( $data ) : $data;
+   wantarray ? @{ $thaw->($data) } : ( $thaw->($data) )->[-1];
 }
 
 sub recv2_nb {
@@ -307,9 +281,7 @@ sub recv2_nb {
       ? MCE::Channel::_read( $self->{p_sock}, $data, $len )
       : read( $self->{p_sock}, $data, $len );
 
-   chop( $data )
-      ? wantarray ? @{ $thaw->($data) } : ( $thaw->($data) )->[-1]
-      : wantarray ? ( $data ) : $data;
+   wantarray ? @{ $thaw->($data) } : ( $thaw->($data) )->[-1];
 }
 
 1;
@@ -328,7 +300,7 @@ MCE::Channel::Simple - Channel tuned for one producer and one consumer
 
 =head1 VERSION
 
-This document describes MCE::Channel::Simple version 1.866
+This document describes MCE::Channel::Simple version 1.868
 
 =head1 DESCRIPTION
 

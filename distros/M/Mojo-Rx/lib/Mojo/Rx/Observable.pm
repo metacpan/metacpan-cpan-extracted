@@ -23,7 +23,7 @@ use Scalar::Util 'reftype';
 #   (body)      This method calls the $function that Mojo::Rx::Observable->new received as argument (and that initiates the subscription)
 #   (return)    This method returns a new Mojo::Rx::Subscription object, that contains the "cleanup subref" returned by $function
 
-our $VERSION = "v0.12.0";
+our $VERSION = "v0.12.1";
 
 sub new {
     my ($class, $function) = @_;

@@ -24,7 +24,7 @@ WriteMakefile1(
     LICENSE      => 'perl',
 
     PREREQ_PM => {
-        'Net::Curl' => 0,
+        'Net::Curl' => 0.44,    # fixes some memory-handling bugs
         'Promise::ES6' => 0.07,
     },
 
@@ -34,9 +34,8 @@ WriteMakefile1(
         'Test::More'      => 0,
         'Test::FailWarnings' => 0,
         'Test::Fatal'       => 0,
-        'Test::Deep' => 0,
+        'Test::Deep' => '1.120',    # has none()
         'Test::Class::Tiny' => 0,
-'Carp::Always' => 0,
     },
 );
 

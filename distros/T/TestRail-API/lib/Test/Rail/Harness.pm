@@ -1,7 +1,7 @@
 # ABSTRACT: TestRail testing harness
 # PODNAME: Test::Rail::Harness
 package Test::Rail::Harness;
-$Test::Rail::Harness::VERSION = '0.044';
+$Test::Rail::Harness::VERSION = '0.046';
 use strict;
 use warnings;
 
@@ -32,7 +32,7 @@ sub make_parser {
     $args->{'plan'}     = $ENV{'TESTRAIL_PLAN'};
     @configs = split( /:/, $ENV{'TESTRAIL_CONFIGS'} )
       if $ENV{'TESTRAIL_CONFIGS'};
-    $args->{'configs'} = \@configs if scalar(@configs);
+    $args->{'configs'}        = \@configs if scalar(@configs);
     $args->{'result_options'} = { 'version' => $ENV{'TESTRAIL_VERSION'} }
       if $ENV{'TESTRAIL_VERSION'};
     $args->{'step_results'}    = $ENV{'TESTRAIL_STEPS'};
@@ -44,7 +44,7 @@ sub make_parser {
 
     @sections = split( /:/, $ENV{'TESTRAIL_SECTIONS'} )
       if $ENV{'TESTRAIL_SECTIONS'};
-    $args->{'sections'} = \@sections if scalar(@sections);
+    $args->{'sections'}  = \@sections if scalar(@sections);
     $args->{'autoclose'} = $ENV{'TESTRAIL_AUTOCLOSE'};
 
     #for Testability of plugin XXX probably some of the last remaining grotiness
@@ -82,7 +82,7 @@ Test::Rail::Harness - TestRail testing harness
 
 =head1 VERSION
 
-version 0.044
+version 0.046
 
 =head1 DESCRIPTION
 
@@ -118,12 +118,12 @@ George S. Baugh <teodesian@cpan.org>
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/teodesian/TestRail-Perl>
+The development version is on github at L<https://github.com/teodesian/TestRail-Perl>
 and may be cloned from L<git://github.com/teodesian/TestRail-Perl.git>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by George S. Baugh.
+This software is copyright (c) 2020 by George S. Baugh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

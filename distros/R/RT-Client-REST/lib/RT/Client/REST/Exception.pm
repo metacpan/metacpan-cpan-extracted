@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Exception;
-$RT::Client::REST::Exception::VERSION = '0.59';
+$RT::Client::REST::Exception::VERSION = '0.60';
 use base qw(Exception::Class);
 
 use vars qw($VERSION);
@@ -210,7 +210,7 @@ RT::Client::REST::Exception - Exceptions thrown by RT::Client::REST
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 DESCRIPTION
 

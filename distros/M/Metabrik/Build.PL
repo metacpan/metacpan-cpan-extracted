@@ -1,5 +1,5 @@
 #
-# $Id: Build.PL,v 6bddaf5ad3d2 2016/10/04 04:54:14 gomor $
+# $Id$
 #
 use strict;
 use warnings;

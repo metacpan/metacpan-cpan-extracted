@@ -27,6 +27,7 @@ my $test_dir = catdir(@path, 'test');
 
 rmtree($test_dir);
 mkdir $test_dir;
+chmod 0755, $test_dir;
 chdir $test_dir;
 $test_dir = cwd();
 
@@ -72,6 +73,7 @@ do {
     foreach my $dir (qw(2013 12december)) {
         $path = catfile($path, $dir);
         mkdir($path);
+        chmod 0755, $path;
     }
 
     foreach my $count (qw(first second third)) {
@@ -83,7 +85,7 @@ do {
 
         $followme->run($path);
         $file =~ s/md$/html/;
-        sleep(1);
+        sleep(2);
 
         chomp($text);
         my $page = fio_read_page($file);

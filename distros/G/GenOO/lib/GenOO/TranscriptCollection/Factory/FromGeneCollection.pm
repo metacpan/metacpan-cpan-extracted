@@ -38,7 +38,7 @@ GenOO::TranscriptCollection::Factory::FromGeneCollection - Factory to create Gen
 # Let the code begin...
 
 package GenOO::TranscriptCollection::Factory::FromGeneCollection;
-$GenOO::TranscriptCollection::Factory::FromGeneCollection::VERSION = '1.5.1';
+$GenOO::TranscriptCollection::Factory::FromGeneCollection::VERSION = '1.5.2';
 
 #######################################################################
 #######################   Load External modules   #####################

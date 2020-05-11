@@ -1,5 +1,5 @@
 #
-# $Id: Whois.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
+# $Id$
 #
 # network::whois Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6bd6acfc81d5 $',
+      revision => '$Revision$',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -19,6 +19,7 @@ sub brik_properties {
          datadir => [ qw(datadir) ],
          rtimeout => [ qw(timeout) ],
          last_server => [ qw(server) ],
+         src_ip => [ qw(ip_list) ],
       },
       attributes_default => {
          rtimeout => 2,
@@ -106,7 +107,7 @@ Metabrik::Network::Whois - network::whois Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

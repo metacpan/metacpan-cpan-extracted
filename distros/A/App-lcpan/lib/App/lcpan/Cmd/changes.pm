@@ -1,9 +1,11 @@
 package App::lcpan::Cmd::changes;
 
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '1.056'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-07'; # DATE
+our $DIST = 'App-lcpan'; # DIST
+our $VERSION = '1.057'; # VERSION
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
 
@@ -71,7 +73,7 @@ sub handle_cmd {
         # search in dist or script
         unless ($mod_or_dist_or_script =~ /::/) {
             my $dist_found;
-            my $sth = $dbh->prepare("SELECT file_id FROM dist WHERE name=? ORDER BY version_numified DESC LIMIT 1");
+            my $sth = $dbh->prepare("SELECT id FROM file WHERE dist_name=? ORDER BY dist_version_numified DESC LIMIT 1");
             $sth->execute($mod_or_dist_or_script);
             while (my ($e) = $sth->fetchrow_array) {
                 $dist_found++;
@@ -163,7 +165,7 @@ App::lcpan::Cmd::changes - Show Changes of distribution/module
 
 =head1 VERSION
 
-This document describes version 1.056 of App::lcpan::Cmd::changes (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of App::lcpan::Cmd::changes (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 FUNCTIONS
 

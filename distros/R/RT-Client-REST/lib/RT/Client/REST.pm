@@ -24,7 +24,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST;
-$RT::Client::REST::VERSION = '0.59';
+$RT::Client::REST::VERSION = '0.60';
 use Error qw(:try);
 use HTTP::Cookies;
 use HTTP::Request::Common;
@@ -173,8 +173,8 @@ sub get_attachments_metadata {
     }
     return map {
       # Matches: '50008989: (Unnamed) (text/plain / 1.9k),'
-      my @c = $_ =~ m/^\s*(\d+):\s+(.+)\s+\(([^\s]+)\s+\/\s+([^\s]+)\)\s*,\s*$/;
-      { id => $c[0], Filename => $c[1] eq '(Unnamed)' ? undef : $c[1], Type => $c[2], Size => $c[3] };
+      my @c = $_ =~ m/^\s*(\d+):\s+(.+)\s+\(([^\s]+)\s+\/\s+([^\s]+)\)\s*,?\s*$/;
+      { id => $c[0], Filename => ( defined($c[1]) && ( $c[1] eq '(Unnamed)' ) ) ? undef : $c[1], Type => $c[2], Size => $c[3] };
     } split(/\n/, $k->{Attachments});
 }
 
@@ -891,7 +891,7 @@ sub _version { $RT::Client::REST::VERSION }
     # The problem with the second approach is that it creates unrelated
     # methods in RT::Client::REST namespace.
     package RT::Client::REST::NoopLogger;
-$RT::Client::REST::NoopLogger::VERSION = '0.59';
+$RT::Client::REST::NoopLogger::VERSION = '0.60';
 sub new { bless \(my $logger), __PACKAGE__ }
     for my $method (RT::Client::REST::LOGGER_METHODS) {
         no strict 'refs'; ## no critic (ProhibitNoStrict)
@@ -913,7 +913,7 @@ RT::Client::REST - Client for RT using REST API
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 
@@ -1359,7 +1359,7 @@ the same terms as the Perl 5 programming language system itself.
 
 =head1 CONTRIBUTORS
 
-=for stopwords Abhijit Menon-Sen belg4mit bobtfish Byron Ellacott Dean Hamstead dkrotkine Dmitri Tikhonov Marco Pessotto pplusdomain Sarvesh D Søren Lund Tom Harrison
+=for stopwords Abhijit Menon-Sen belg4mit bobtfish Byron Ellacott Dean Hamstead DJ Stauffer dkrotkine Dmitri Tikhonov Marco Pessotto pplusdomain Sarvesh D Søren Lund Tom Harrison
 
 =over 4
 
@@ -1382,6 +1382,10 @@ Byron Ellacott <code@bje.id.au>
 =item *
 
 Dean Hamstead <djzort@cpan.org>
+
+=item *
+
+DJ Stauffer <dj@djstauffer.com>
 
 =item *
 

@@ -24,9 +24,12 @@ is(
     };
     call param_arity => 2;
     call result_arity => 1;
-    call as_extern => object {
-      call [ isa => 'Wasm::Wasmtime::Extern' ] => T();
-    };
+
+    call is_func   => T();
+    call is_global => F();
+    call is_table  => F();
+    call is_memory => F();
+    call kind      => 'func';
   },
   'call add',
 );

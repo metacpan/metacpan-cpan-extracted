@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_IPS;
-$Lab::Moose::Instrument::OI_IPS::VERSION = '3.692';
+$Lab::Moose::Instrument::OI_IPS::VERSION = '3.701';
 #ABSTRACT: Oxford Instruments IPS Intelligent Power Supply
 
 use 5.010;
@@ -207,6 +207,24 @@ sub active {
 }
 
 
+sub in_persistent_mode {
+    my ( $self, %args ) = validated_getter( \@_ );
+    my $status = $self->examine_status(@_);
+    my $n = substr( $status, 8, 1 );
+    if ( $n == 0 || $n == 2 ) {
+
+        # heater off
+        return 1;
+    }
+    elsif ( $n == 1 ) {
+        return;
+    }
+    else {
+        croak "bad heater status $n";
+    }
+}
+
+
 sub wait {
     my ( $self, %args ) = validated_getter( \@_ );
     my $verbose = $self->verbose();
@@ -353,7 +371,7 @@ Lab::Moose::Instrument::OI_IPS - Oxford Instruments IPS Intelligent Power Supply
 
 =head1 VERSION
 
-version 3.692
+version 3.701
 
 =head1 SYNOPSIS
 
@@ -416,6 +434,14 @@ Return status (XmnAnCnHnMmnPmn).
 
 Return true value if IPS is sweeping. Return false when sweep finished.
 
+=head2 in_persistent_mode
+
+ if ($ips->in_persistent_mode()) {
+    ...
+ }
+
+Return 1 if in persistent mode; otherwise return false.
+
 =head2 wait
 
  $ips->wait();
@@ -455,7 +481,7 @@ This driver consumes the following roles:
 
 This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
-  Copyright 2019       Simon Reinhardt
+  Copyright 2019-2020  Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

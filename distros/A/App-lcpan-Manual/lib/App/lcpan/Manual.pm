@@ -1,9 +1,9 @@
 package App::lcpan::Manual;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-06'; # DATE
+our $DATE = '2020-05-08'; # DATE
 our $DIST = 'App-lcpan-Manual'; # DIST
-our $VERSION = '1.054.001'; # VERSION
+our $VERSION = '1.057.000'; # VERSION
 
 1;
 # ABSTRACT: Manual for App::lcpan
@@ -20,7 +20,7 @@ App::lcpan::Manual - Manual for App::lcpan
 
 =head1 VERSION
 
-version 1.054.001
+version 1.057.000
 
 =head1 DESCRIPTION
 
@@ -37,6 +37,10 @@ This distribution contains the following documentation pages:
 =item * L<App::lcpan::Manual::Tutorial>
 
 =item * L<App::lcpan::Manual::Tutorial::100_WhatIsLcpan>
+
+=item * L<App::lcpan::Manual::Tutorial::200_SettingUpAMiniCPAN>
+
+=item * L<App::lcpan::Manual::Tutorial::700_SettingUpADarkPAN>
 
 =item * L<App::lcpan::Manual::Tutorial::800_WritingASubcommand>
 

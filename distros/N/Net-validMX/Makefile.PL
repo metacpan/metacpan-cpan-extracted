@@ -19,7 +19,7 @@ my (%MAKEFILE);
                        SUFFIX => 'gz', 
                        PREOP => "cd \$(DISTVNAME) && pod2text lib/Net/validMX.pm > README && \$(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'eval { maniadd({q{README} => q{Module README created from pod2text}}) } '"
                      },
-  'AUTHOR'        => 'Kevin A. McGrail <kevin.mcgrail@thoughtworthy.com>',
+  'AUTHOR'        => 'The McGrail Foundation & Kevin A. McGrail <kevin.mcgrail-netvalidmx@mcgrail.com>',
   'ABSTRACT'      => 'Perl DNS mail exchange & email format validation module',
 );
 
@@ -36,7 +36,7 @@ sub metafile {
 
   my ($echo, $extra);
 
-  ($echo) = $self->echo('license: perl', '$(DISTVNAME)/META.yml', 1);
+  ($echo) = $self->echo('license: artistic', '$(DISTVNAME)/META.yml', 1);
   $extra .= "\t$echo\n";
 
   ($echo) = $self->echo('abstract: '.$MAKEFILE{'ABSTRACT'}, '$(DISTVNAME)/META.yml', 1);

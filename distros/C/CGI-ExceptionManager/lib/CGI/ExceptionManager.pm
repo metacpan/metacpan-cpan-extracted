@@ -2,7 +2,7 @@ package CGI::ExceptionManager;
 use strict;
 use warnings;
 use 5.00800;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub detach { die bless [@_], 'CGI::ExceptionManager::Exception' }
 

@@ -1,0 +1,19 @@
+Crypt::OpenSSL::Verify - OpenSSL Verify certificate verification in XS.
+
+This module provides certificate verification, along the lines of
+"openssl verify". While Crypt::OpenSSL::CA can do this, and is
+fully-featured, it uses Inline::C, which can present deployment
+problems.
+
+It was initially based on the work of Chris Andrew's in 
+Crypt::OpenSSL::VerifyX509 but as that module is no longer maintained
+this module re-implements that module but attempts to provide more
+of the features of the 'openssl verify' command.
+
+In addition it will also include support for passing all certificates 
+X509 base64 encoded strings
+
+Major dependency:
+ * Crypt::OpenSSL::X509
+
+

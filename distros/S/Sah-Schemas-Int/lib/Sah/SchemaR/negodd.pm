@@ -1,9 +1,9 @@
 package Sah::SchemaR::negodd;
 
-our $DATE = '2018-04-03'; # DATE
-our $VERSION = '0.071'; # VERSION
+our $DATE = '2020-05-08'; # DATE
+our $VERSION = '0.074'; # VERSION
 
-our $rschema = ["int",[{max=>-1,summary=>"Negative integer (-1, -2, ...)"},{div_by=>2,"div_by.op"=>"not",summary=>"Negative odd number"}],["negint","int"]];
+our $rschema = ["int",[{examples=>[{data=>-1,valid=>1},{data=>0,valid=>0}],max=>-1,summary=>"Negative integer (-1, -2, ...)"},{div_by=>2,"div_by.op"=>"not",examples=>[{data=>-1,valid=>1},{data=>-2,valid=>0}],summary=>"Negative odd number"}],["negint","int"]];
 
 1;
 # ABSTRACT: Negative odd number
@@ -20,7 +20,7 @@ Sah::SchemaR::negodd - Negative odd number
 
 =head1 VERSION
 
-This document describes version 0.071 of Sah::SchemaR::negodd (from Perl distribution Sah-Schemas-Int), released on 2018-04-03.
+This document describes version 0.074 of Sah::SchemaR::negodd (from Perl distribution Sah-Schemas-Int), released on 2020-05-08.
 
 =head1 DESCRIPTION
 
@@ -34,7 +34,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Sah-Schema-Int>.
+Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Int>.
 
 =head1 BUGS
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017, 2016, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

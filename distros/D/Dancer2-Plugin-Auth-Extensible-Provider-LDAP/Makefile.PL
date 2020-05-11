@@ -20,7 +20,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Carp'                              => 0,
         'Dancer2::Core::Types'              => 0,
-        'Dancer2::Plugin::Auth::Extensible' => '0.620',
+        'Dancer2::Plugin::Auth::Extensible' => '0.709',
         'Moo'                               => '2.000000',
         'namespace::clean'                  => 0,
         'Net::LDAP'                         => 0,

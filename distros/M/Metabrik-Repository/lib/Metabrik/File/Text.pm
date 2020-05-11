@@ -1,5 +1,5 @@
 #
-# $Id: Text.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
+# $Id$
 #
 # file::text Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::File::Write);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6bd6acfc81d5 $',
+      revision => '$Revision$',
       tags => [ qw(unstable read write) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -35,6 +35,7 @@ sub brik_properties {
          read_split_by_blank_line => [ qw(input) ],
          read_split_by_ini_block => [ qw(input) ],
          write => [ qw($data|$data_ref|$data_list output) ],
+         is_eof => [ qw(ret) ],
       },
       require_modules => {
          'Metabrik::File::Read' => [ ],
@@ -77,6 +78,7 @@ sub read {
 
 #
 # Just return next available line
+# Returns 0 on EOF.
 #
 sub read_line {
    my $self = shift;
@@ -180,6 +182,17 @@ sub write {
    return 1;
 }
 
+sub is_eof {
+   my $self = shift;
+   my ($r) = @_;
+
+   if (defined($r) && $r == 0 && !defined($self->_fr)) {
+      return 1;
+   }
+
+   return 0;
+}
+
 1;
 
 __END__
@@ -190,7 +203,7 @@ Metabrik::File::Text - file::text Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

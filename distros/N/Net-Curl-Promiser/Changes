@@ -1,6 +1,15 @@
 Revision history for Perl module Net::Curl::Promiser
 
-0.08
+0.10 Sat 9 May 2020
+- Make event loop tests use distributed (pure-Perl) event loops.
+- Tweak internal debug code
+
+0.09 Fri 8 May 2020
+- Add cancel_handle() method.
+- Lazy-load modules platform-neutrally (rather than assuming *nix).
+- Tweak docs wording.
+
+0.08 Wed 26 Feb 2020
 - Remove redundant stat() checks on file descriptors.
 - Clarify event loop requirement not to close FDs.
 

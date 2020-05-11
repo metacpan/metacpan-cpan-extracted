@@ -5,7 +5,7 @@ use warnings;
 use Wasm::Wasmtime::FFI;
 
 # ABSTRACT: Wasmtime value type class
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 $ffi_prefix = 'wasm_valtype_';
@@ -54,6 +54,9 @@ sub kind { $kind{shift->kind_num} }
 
 $ffi->attach( [kind => 'kind_num'] => ['wasm_valtype_t'] => 'uint8' );
 
+
+*to_string = \&kind;
+
 _generate_destroy();
 _generate_vec_class( delete => 0 );
 
@@ -77,7 +80,7 @@ Wasm::Wasmtime::ValType - Wasmtime value type class
 
 =head1 VERSION
 
-version 0.06
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -141,6 +144,14 @@ Returns the value type as a string (ie C<i32>).
  my $kind = $valtype->kind_num;
 
 Returns the number used internally to represent the type.
+
+=head2 to_string
+
+ my $string = $valtype->to_string;
+
+Converts the type into a string for diagnostics.
+For this class, this does the same thing as the kind
+method.
 
 =head1 SEE ALSO
 

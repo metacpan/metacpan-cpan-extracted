@@ -1,12 +1,12 @@
 package Sah::SchemaR::perl::funcname;
 
-our $DATE = '2020-02-15'; # DATE
-our $VERSION = '0.027'; # VERSION
+our $DATE = '2020-05-08'; # DATE
+our $VERSION = '0.031'; # VERSION
 
-our $rschema = ["str",[{description=>"\nCurrently function name is restricted to this regex:\n\n    \\A[A-Za-z_][A-Za-z_0-9]*\\z\n\ncan be qualified (prefixed) by a package name, which is restricted to this regex:\n\n    [A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*\n\n",match=>"\\A(?:[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*::)?[A-Za-z_]([A-Za-z_0-9]+)*\\z",summary=>"Perl function name, either qualified or unqualified with a package name"}],["str"]];
+our $rschema = ["str",[{description=>"\nCurrently function name is restricted to this regex:\n\n    \\A[A-Za-z_][A-Za-z_0-9]*\\z\n\nFunction name can be qualified (prefixed) by a package name, which is restricted\nto this regex:\n\n    [A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*\n\n",match=>"\\A(?:[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*::)?[A-Za-z_]([A-Za-z_0-9]+)*\\z",summary=>"Perl function name, either qualified with package name (e.g. Foo::subname) or unqualified (e.g. subname)"}],["str"]];
 
 1;
-# ABSTRACT: Perl function name, either qualified or unqualified with a package name
+# ABSTRACT: Perl function name, either qualified with package name (e.g. Foo::subname) or unqualified (e.g. subname)
 
 __END__
 
@@ -16,11 +16,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::perl::funcname - Perl function name, either qualified or unqualified with a package name
+Sah::SchemaR::perl::funcname - Perl function name, either qualified with package name (e.g. Foo::subname) or unqualified (e.g. subname)
 
 =head1 VERSION
 
-This document describes version 0.027 of Sah::SchemaR::perl::funcname (from Perl distribution Sah-Schemas-Perl), released on 2020-02-15.
+This document describes version 0.031 of Sah::SchemaR::perl::funcname (from Perl distribution Sah-Schemas-Perl), released on 2020-05-08.
 
 =head1 DESCRIPTION
 

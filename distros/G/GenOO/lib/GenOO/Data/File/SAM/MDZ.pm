@@ -33,7 +33,7 @@ GenOO::Data::File::SAM::MDZ - Role - The MD:Z tag in a SAM file
 # Let the code begin...
 
 package GenOO::Data::File::SAM::MDZ;
-$GenOO::Data::File::SAM::MDZ::VERSION = '1.5.1';
+$GenOO::Data::File::SAM::MDZ::VERSION = '1.5.2';
 
 #######################################################################
 #######################   Load External modules   #####################

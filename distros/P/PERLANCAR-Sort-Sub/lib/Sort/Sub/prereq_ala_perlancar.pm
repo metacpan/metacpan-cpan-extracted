@@ -1,9 +1,9 @@
 package Sort::Sub::prereq_ala_perlancar;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-13'; # DATE
+our $DATE = '2020-02-15'; # DATE
 our $DIST = 'PERLANCAR-Sort-Sub'; # DIST
-our $VERSION = '0.080'; # VERSION
+our $VERSION = '0.081'; # VERSION
 
 use 5.010001;
 use strict;
@@ -59,7 +59,7 @@ Sort::Sub::prereq_ala_perlancar - Sort prereqs PERLANCAR-style
 
 =head1 VERSION
 
-This document describes version 0.080 of Sort::Sub::prereq_ala_perlancar (from Perl distribution PERLANCAR-Sort-Sub), released on 2020-02-13.
+This document describes version 0.081 of Sort::Sub::prereq_ala_perlancar (from Perl distribution PERLANCAR-Sort-Sub), released on 2020-02-15.
 
 =head1 SYNOPSIS
 

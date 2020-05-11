@@ -74,12 +74,14 @@ use constant {
         '翻爆 - 翻報',
         '澎湖時報',
         'ETtoday星光雲',
-        'TVBS新聞網',
         '台灣時報 | 電子報',
         '大紀元',
         '大纪元',
         'Taipei Times',
         '台視新聞',
+        'The News Lens 關鍵評論網',
+        '立場新聞',
+        '農傳媒',
     ],
 
     CATEGORY_NAMES => [

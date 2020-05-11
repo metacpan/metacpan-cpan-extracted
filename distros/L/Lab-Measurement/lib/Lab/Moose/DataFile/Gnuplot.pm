@@ -1,5 +1,5 @@
 package Lab::Moose::DataFile::Gnuplot;
-$Lab::Moose::DataFile::Gnuplot::VERSION = '3.692';
+$Lab::Moose::DataFile::Gnuplot::VERSION = '3.701';
 #ABSTRACT: Text based data file ('Gnuplot style')
 
 use 5.010;
@@ -627,7 +627,7 @@ Lab::Moose::DataFile::Gnuplot - Text based data file ('Gnuplot style')
 
 =head1 VERSION
 
-version 3.692
+version 3.701
 
 =head1 SYNOPSIS
 

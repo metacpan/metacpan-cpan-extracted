@@ -1,12 +1,13 @@
 package TOML::Tiny::Writer;
-$TOML::Tiny::Writer::VERSION = '0.06';
+$TOML::Tiny::Writer::VERSION = '0.07';
 use strict;
 use warnings;
 no warnings qw(experimental);
 use v5.18;
 
+use B qw(svref_2object SVf_IOK SVf_NOK);
 use Data::Dumper;
-use Scalar::Util qw(looks_like_number);
+use DateTime::Format::RFC3339;
 use TOML::Tiny::Grammar;
 use TOML::Tiny::Util qw(is_strict_array);
 
@@ -107,8 +108,26 @@ sub to_toml {
       return $$data ? 'true' : 'false';
     }
 
+    when (/Types::Serializer::Boolean/) {
+      return $data ? 'true' : 'false';
+    }
+
     when (/DateTime/) {
-      return $data->stringify;
+      # TOML uses RFC3339 for datetimes, but supports a "local datetime"
+      # which excludes the timezone offset. A DateTime with a floating
+      # time zone indicates a TOML local datetime.
+      #
+      # DateTime::Format::RFC3339 requires a time zone, however, and defaults
+      # to +00:00 for floating time zones. To support local datetimes in
+      # output, format the datetime as RFC3339 and strip the timezone
+      # when encountering a floating time zone.
+      my $dt = DateTime::Format::RFC3339->new->format_datetime($data);
+
+      if ($data->time_zone_short_name eq 'floating') {
+        $dt =~ s/\+00:00$//;
+      }
+
+      return $dt;
     }
 
     when ('Math::BigInt') {
@@ -120,19 +139,12 @@ sub to_toml {
     }
 
     when ('') {
-      for ($data) {
-        when (looks_like_number($_)) {
-          return $data;
-        }
-
-        when (/$DateTime/) {
-          return $data;
-        }
-
-        default{
-          return to_toml_string($data);
-        }
-      }
+      # Thanks to ikegami on Stack Overflow for the trick!
+      # https://stackoverflow.com/questions/12686335/how-to-tell-apart-numeric-scalars-and-string-scalars-in-perl/12693984#12693984
+      # note: this must come before any regex can flip this flag off
+      return $data if svref_2object(\$data)->FLAGS & (SVf_IOK | SVf_NOK);
+      return $data if $data =~ /$DateTime/;
+      return to_toml_string($data);
     }
 
     default{
@@ -190,7 +202,7 @@ TOML::Tiny::Writer
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 AUTHOR
 

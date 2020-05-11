@@ -10,13 +10,16 @@ is(
     )
   }),
   object {
-    call [ get_export => 'frooble' ] => object {
-      call as_memorytype => object {
+    call exports => object {
+      call frooble => object {
         call [ isa => 'Wasm::Wasmtime::MemoryType' ] => T();
         call limits => [2,6];
-        call as_externtype => object {
-          call [ isa => 'Wasm::Wasmtime::ExternType' ] => T();
-        };
+        call is_functype   => F();
+        call is_globaltype => F();
+        call is_tabletype  => F();
+        call is_memorytype => T();
+        call kind          => 'memorytype';
+        call to_string     => '2 6';
       };
     };
   },
@@ -27,10 +30,8 @@ is(
   Wasm::Wasmtime::MemoryType->new([2,3]),
   object {
     call [ isa => 'Wasm::Wasmtime::MemoryType' ] => T();
-    call limits => [2,3];
-    call as_externtype => object {
-      call [ isa => 'Wasm::Wasmtime::ExternType' ] => T();
-    };
+    call limits    => [2,3];
+    call to_string => '2 3';
   },
   'standalone',
 );

@@ -3,6 +3,7 @@ NAME
 
 SYNOPSYS
      use Tags::Output::PYX;
+
      my $obj = Tags::Output::PYX->new(%parameters);
      $obj->finalize;
      my $ret = $obj->flush($reset_flag);
@@ -90,11 +91,9 @@ ERRORS
              Ending bad tag: '%s' in block of tag '%s'.
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Tags::Output::PYX;
 
      # Object.
@@ -138,13 +137,17 @@ SEE ALSO
     Task::Tags
         Install the Tags modules.
 
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Tags-Output-PYX>
+
 AUTHOR
-    Michal Špaček skim@cpan.org
+    Michal Josef Špaček skim@cpan.org
 
 LICENSE AND COPYRIGHT
-     © 2011-2015 Michal Špaček
-     BSD 2-Clause License
+    © 2011-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

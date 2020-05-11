@@ -1,12 +1,12 @@
 package Sah::SchemaR::perl::modnames;
 
-our $DATE = '2020-02-15'; # DATE
-our $VERSION = '0.027'; # VERSION
+our $DATE = '2020-05-08'; # DATE
+our $VERSION = '0.031'; # VERSION
 
-our $rschema = ["array",[{description=>"\nArray of Perl module names, where each element is of `perl::modname` schema,\ne.g. `Foo`, `Foo::Bar`.\n\nContains coercion rule that expands wildcard, so you can specify:\n\n    Module::P*\n\nand it will be expanded to e.g.:\n\n    [\"Module::Patch\", \"Module::Path\", \"Module::Pluggable\"]\n\nThe wildcard syntax supports jokers (`?`, `*`, `**`), brackets (`[abc]`), and\nbraces (`{one,two}`).\n\n",of=>["perl::modname",{req=>1},{}],summary=>"Perl module names","x.element_completion"=>"perl_modname","x.perl.coerce_rules"=>["From_str_or_array::expand_perl_modname_wildcard"]}],["array"]];
+our $rschema = ["array",[{description=>"\nArray of Perl module names, where each element is of `perl::modname` schema,\ne.g. `Foo`, `Foo::Bar`.\n\nContains coercion rule that expands wildcard, so you can specify:\n\n    Module::P*\n\nand it will be expanded to e.g.:\n\n    [\"Module::Patch\", \"Module::Path\", \"Module::Pluggable\"]\n\nThe wildcard syntax supports jokers (`?`, `*`, `**`), brackets (`[abc]`), and\nbraces (`{one,two}`).\n\n",of=>["perl::modname",{req=>1},{}],summary=>"Array of Perl module names, e.g. [\"Foo::Bar\", \"Baz\"]","x.element_completion"=>"perl_modname","x.perl.coerce_rules"=>["From_str_or_array::expand_perl_modname_wildcard"]}],["array"]];
 
 1;
-# ABSTRACT: Perl module names
+# ABSTRACT: Array of Perl module names, e.g. ["Foo::Bar", "Baz"]
 
 __END__
 
@@ -16,11 +16,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::perl::modnames - Perl module names
+Sah::SchemaR::perl::modnames - Array of Perl module names, e.g. ["Foo::Bar", "Baz"]
 
 =head1 VERSION
 
-This document describes version 0.027 of Sah::SchemaR::perl::modnames (from Perl distribution Sah-Schemas-Perl), released on 2020-02-15.
+This document describes version 0.031 of Sah::SchemaR::perl::modnames (from Perl distribution Sah-Schemas-Perl), released on 2020-05-08.
 
 =head1 DESCRIPTION
 

@@ -5,5 +5,12 @@ MANIFEST
 t/00basic.t
 t/05-pod.t
 t/10-pod-coverage.t
+t/20-mount-unmount.t
+t/21-ensure-mounted.t
+t/22-eject.t
+t/23-wait-for-insert.t
+t/24-wait-for-mounted.t
+t/cdroms-test.iso
+t/helper.pm
 META.yml                                 Module meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

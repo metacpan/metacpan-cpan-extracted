@@ -2,13 +2,16 @@ package Wasm::Wasmtime::Memory;
 
 use strict;
 use warnings;
-use Ref::Util qw( is_ref );
+use base qw( Wasm::Wasmtime::Extern );
+use Ref::Util qw( is_ref is_plain_arrayref );
 use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::Store;
 use Wasm::Wasmtime::MemoryType;
+use constant is_memory => 1;
+use constant kind => 'memory';
 
 # ABSTRACT: Wasmtime memory class
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 $ffi_prefix = 'wasm_memory_';
@@ -21,6 +24,8 @@ $ffi->attach( new => ['wasm_store_t', 'wasm_memorytype_t'] => 'wasm_memory_t' =>
   if(is_ref $_[0])
   {
     my($store, $memorytype) = @_;
+    $memorytype = Wasm::Wasmtime::MemoryType->new($memorytype)
+      if is_plain_arrayref $memorytype;
     return $xsub->($store, $memorytype);
   }
   else
@@ -65,15 +70,7 @@ $ffi->attach( grow => ['wasm_memory_t', 'uint32'] => 'bool' => sub {
   $xsub->($self, $delta);
 });
 
-
-# actually returns a wasm_extern_t, but recursion
-$ffi->attach( as_extern => ['wasm_memory_t'] => 'opaque' => sub {
-  my($xsub, $self) = @_;
-  require Wasm::Wasmtime::Extern;
-  my $ptr = $xsub->($self);
-  Wasm::Wasmtime::Extern->new($ptr, $self->{owner} || $self);
-});
-
+__PACKAGE__->_cast(3);
 _generate_destroy();
 
 1;
@@ -90,7 +87,7 @@ Wasm::Wasmtime::Memory - Wasmtime memory class
 
 =head1 VERSION
 
-version 0.06
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -166,12 +163,6 @@ Returns the current size of the memory in pages.
  my $bool = $memory->grow($delta);
 
 Tries to increase the page size by the given C<$delta>.  Returns true on success, false otherwise.
-
-=head2 as_extern
-
- my $extern = $memory->as_extern;
-
-Returns the L<Wasm::Wasmtime::Extern> for this memory object.
 
 =head1 SEE ALSO
 

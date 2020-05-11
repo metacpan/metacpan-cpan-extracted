@@ -5,7 +5,7 @@ use warnings;
 use Wasm::Wasmtime::FFI;
 
 # ABSTRACT: Global configuration for Wasm::Wasmtime::Engine
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 $ffi_prefix = 'wasm_config_';
@@ -26,6 +26,25 @@ foreach my $prop (qw( debug_info wasm_threads wasm_reference_types
     $xsub->($self, $value);
     $self;
   });
+}
+
+
+foreach my $prop (qw( static_memory_maximum_size static_memory_guard_size dynamic_memory_guard_size ))
+{
+  my $f = eval { $ffi->function( "wasmtime_config_${prop}_set" => [ 'wasm_config_t', 'uint64' ] => 'void' => sub {
+    my($xsub, $self, $value) = @_;
+    $xsub->($self, $value);
+    $self;
+  }) };
+  if($f)
+  {
+    $f->attach($prop);
+  }
+  else
+  {
+    no strict 'refs';
+    *$prop = sub { Carp::croak("property $prop is not available") };
+  }
 }
 
 
@@ -115,6 +134,21 @@ if(Wasm::Wasmtime::Error->can('new'))
     }
     $self;
   });
+
+
+  $ffi->attach( [ 'wasmtime_config_cache_config_load' => 'cache_config_load' ] => [ 'wasm_config_t', 'string' ] => sub {
+    my($xsub, $self, $value) = @_;
+    Carp::croak("undef passed in as cache config") unless defined $value;
+    $xsub->($self, $value);
+    $self;
+  });
+
+  $ffi->attach( [ 'wasmtime_config_cache_config_load' => 'cache_config_default' ] => [ 'wasm_config_t', 'string' ] => sub {
+    my($xsub, $self) = @_;
+    $xsub->($self, undef);
+    $self;
+  });
+
 }
 else
 {
@@ -133,6 +167,15 @@ else
     }
     $self;
   });
+
+  *cache_config_load    = sub { Carp::croak("property cache_config_load is not available")    };
+
+  *cache_config_default = sub
+  {
+    # silenty ignore
+    my($self) = @_;
+    $self;
+  };
 }
 
 1;
@@ -149,7 +192,7 @@ Wasm::Wasmtime::Config - Global configuration for Wasm::Wasmtime::Engine
 
 =head1 VERSION
 
-version 0.06
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -218,9 +261,29 @@ L<https://github.com/webassembly/bulk-memory>
 
 =head2 wasm_multi_value
 
+ $config->wasm_multi_value($bool)
+
 Configures whether the wasm multi value proposal is enabled.
 
 L<https://github.com/webassembly/multi-value>
+
+=head2 static_memory_maximum_size
+
+ $config->static_memory_maximum_size($size);
+
+Configure the static memory maximum size.
+
+=head2 static_memory_guard_size
+
+ $config->static_memory_guard_size($size);
+
+Configure the static memory guard size.
+
+=head2 dynamic_memory_guard_size
+
+ $config->dynamic_memory_guard_size($size);
+
+Configure the dynamic memory guard size.
 
 =head2 strategy
 
@@ -277,6 +340,18 @@ Acceptable values for C<$profiler> are:
 =item C<jitdump>
 
 =back
+
+=head2 cache_config_load
+
+ $config->cache_config_load($toml_config);
+
+Path to the cache configuration TOML file.
+
+=head2 cache_config_default
+
+ $config->cache_config_default;
+
+Enable the default caching configuration.
 
 =head1 SEE ALSO
 

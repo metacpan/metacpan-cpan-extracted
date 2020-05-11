@@ -7,6 +7,10 @@ sub journalist {
     my ($self) = @_;
     my $text = $self->content_text;
     my ($name) = $text =~ m{（(?:大紀元記者|大纪元记者) (\p{Letter}+?) (?:综合|綜合|编译|編譯)?(?:报导|報導)）}x;
+
+    unless ($name) {
+        ($name) = $text =~ m{(?:責任編輯：|责任编辑：)(\p{Letter}+)#\z}x;
+    }
     return $name;
 }
 

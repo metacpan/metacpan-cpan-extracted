@@ -37,7 +37,7 @@ GenOO::Data::File::SAM::Record - Object representing a record of a sam file
 # Let the code begin...
 
 package GenOO::Data::File::SAM::Record;
-$GenOO::Data::File::SAM::Record::VERSION = '1.5.1';
+$GenOO::Data::File::SAM::Record::VERSION = '1.5.2';
 
 #######################################################################
 #######################   Load External modules   #####################
@@ -285,6 +285,23 @@ sub is_secondary {
 	else {
 		return 0;
 	}
+}
+
+sub add_tag {
+	my ($self, $tag, $value) = @_;
+
+	my $t = $self->tag($tag);
+	if (defined $t) {
+		die "tag $tag already exists in \"" . $self->to_string . "\"\n";
+	}
+	$self->add_field("$tag:$value");
+	$self->tags->{$tag} = $value;
+}
+
+sub set_flag {
+	my ($self, $value) = @_;
+	
+	$self->fields->[1] = $value;
 }
 
 

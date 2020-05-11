@@ -26,8 +26,11 @@ my $remote_dir = catdir($test_dir, 'there');
 rmtree($test_dir);
 
 mkdir $test_dir;
+chmod 0755, $test_dir;
 mkdir $local_dir;
+chmod 0755, $local_dir;
 mkdir $remote_dir;
+chmod 0755, $remote_dir;
 
 chdir $local_dir;
 

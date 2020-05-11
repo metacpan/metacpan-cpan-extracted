@@ -26,6 +26,7 @@ t/07_shared_cache.t
 t/07_shared_cache_lru.t
 t/07_shared_condvar.t
 t/07_shared_handle.t
+t/07_shared_handle_utf8.t
 t/07_shared_hash.t
 t/07_shared_minidb.t
 t/07_shared_ordhash.t

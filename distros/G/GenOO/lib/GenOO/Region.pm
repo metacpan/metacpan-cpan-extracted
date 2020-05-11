@@ -33,7 +33,7 @@ GenOO::Region - Role that represents a region on a reference sequence
 # Let the code begin...
 
 package GenOO::Region;
-$GenOO::Region::VERSION = '1.5.1';
+$GenOO::Region::VERSION = '1.5.2';
 
 #######################################################################
 #######################   Load External modules   #####################

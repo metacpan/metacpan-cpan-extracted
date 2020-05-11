@@ -1,9 +1,9 @@
 package Data::Sah::Coerce::perl::To_array::From_str_or_array::expand_perl_modprefix_wildcard;
 
 # AUTHOR
-our $DATE = '2020-02-15'; # DATE
+our $DATE = '2020-05-08'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.027'; # VERSION
+our $VERSION = '0.031'; # VERSION
 
 use 5.010001;
 use strict;
@@ -62,7 +62,7 @@ Data::Sah::Coerce::perl::To_array::From_str_or_array::expand_perl_modprefix_wild
 
 =head1 VERSION
 
-This document describes version 0.027 of Data::Sah::Coerce::perl::To_array::From_str_or_array::expand_perl_modprefix_wildcard (from Perl distribution Sah-Schemas-Perl), released on 2020-02-15.
+This document describes version 0.031 of Data::Sah::Coerce::perl::To_array::From_str_or_array::expand_perl_modprefix_wildcard (from Perl distribution Sah-Schemas-Perl), released on 2020-05-08.
 
 =head1 DESCRIPTION
 

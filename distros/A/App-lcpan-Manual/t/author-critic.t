@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/lcpan/Manual.pm','lib/App/lcpan/Manual/Cookbook.pod','lib/App/lcpan/Manual/FAQ.pod','lib/App/lcpan/Manual/Internals.pod','lib/App/lcpan/Manual/Tutorial.pod','lib/App/lcpan/Manual/Tutorial/100_WhatIsLcpan.pod','lib/App/lcpan/Manual/Tutorial/800_WritingASubcommand.pod'];
+my $filenames = ['lib/App/lcpan/Manual.pm','lib/App/lcpan/Manual/Cookbook.pod','lib/App/lcpan/Manual/FAQ.pod','lib/App/lcpan/Manual/Internals.pod','lib/App/lcpan/Manual/Tutorial.pod','lib/App/lcpan/Manual/Tutorial/100_WhatIsLcpan.pod','lib/App/lcpan/Manual/Tutorial/200_SettingUpAMiniCPAN.pod','lib/App/lcpan/Manual/Tutorial/700_SettingUpADarkPAN.pod','lib/App/lcpan/Manual/Tutorial/800_WritingASubcommand.pod'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

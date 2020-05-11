@@ -1,5 +1,18 @@
+0.15 2020-05-11 dmol@cpan.org
+ - fix tests for RT#132543
+
+0.14 2020-05-11 htl10@users.sourceforge.net
+ - update glyph->load method()
+
 0.13 2018-10-19 dmol@cpan.org
  - update tests, as freetype changed font metrices under hood
+
+0.12 2018-08-14 htl10@users.sourceforge.net
+ - Added the face->load_flags getter and setter methods
+ - Fixed bugs loading glyph index 0 by name (".notdef") or by index.
+
+0.12 2018-08-11 htl10@users.sourceforge.net
+ - Added an explicit glyph->load method
 
 0.12 2018-08-12 dmol@cpan.org
  - Fix MANIFEST

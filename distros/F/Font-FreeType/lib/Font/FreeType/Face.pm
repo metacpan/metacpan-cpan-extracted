@@ -255,6 +255,14 @@ Leave the measurements in font units, without scaling, and without hinting.
 
 =back
 
+=item load_flags()
+
+Retrieve the I<load_flags> option used.
+
+=item load_flags(I<load_flags>)
+
+Setting the I<load_flags> option. Returns the newly set value.
+
 =item number_of_faces()
 
 The number of faces contained in the file from which this one

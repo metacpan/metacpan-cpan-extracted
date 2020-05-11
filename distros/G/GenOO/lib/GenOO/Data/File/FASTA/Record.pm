@@ -28,7 +28,7 @@ GenOO::Data::File::FASTA::Record - Object representing a record of a fasta file
 # Let the code begin...
 
 package GenOO::Data::File::FASTA::Record;
-$GenOO::Data::File::FASTA::Record::VERSION = '1.5.1';
+$GenOO::Data::File::FASTA::Record::VERSION = '1.5.2';
 
 #######################################################################
 #######################   Load External modules   #####################

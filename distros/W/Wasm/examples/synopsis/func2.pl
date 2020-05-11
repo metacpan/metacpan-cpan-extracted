@@ -19,5 +19,5 @@ my $hello = Wasm::Wasmtime::Func->new(
 );
 
 my $instance = Wasm::Wasmtime::Instance->new($module, [$hello]);
-$instance->get_export("run")->as_func->call(); # hello world!
+$instance->exports->run->call(); # hello world!
 

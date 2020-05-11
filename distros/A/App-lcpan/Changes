@@ -1,3 +1,36 @@
+1.057   2020-05-07  Released-By: PERLANCAR; Urgency: high
+
+	- [bugfix] Fix several misplaced parameters in SQL update query which
+	  caused module & script abstract as well as distro information to not
+	  be set. This version will bump database schema version to v15 which
+	  will reset the database for reindexing.
+
+        - [enhancement] Aside from full reindexing, the database schema is also
+          changed. We now remove the 'dist' table and merge the information to
+          'file' table for simplicity. 'dist' has a 1:1 relattonship with 'file'
+          anyway. The 'file' table now adds several columns to store distro
+          information: dist_name, dist_abstract, dist_version, and
+          is_latest_dist.
+
+        - [subcommand deps] The subcommand can now show dependencies of older
+          distros, as long as it's still indexed in 02packages. Use this syntax:
+          'lcpan deps Foo-Bar@1.23' to show dependencies of a specific version.
+          Otherwise, without the version suffix, dependencies of the latest
+          Foo-Bar will be shown.
+
+	- [bugfix] Fix regex to catch META.json or META.yml on top-level
+	  dir, which has path 'META.yml' instead of '/META.yml'.
+
+	- [subcommand update][bugfix] Update authors or deleted authors were not
+	  reflected in the author table.
+
+        - [subcommand dist2author][bugfix] Didn't return author name when there
+          is only one input dist.
+
+        - [testing] Add more tests which uncovered a few other bugs, some listed
+          above.
+
+
 1.056   2020-05-06  Released-By: PERLANCAR; Urgency: medium
 
 	- [testing] Avoid error when testing database schema version upgrades.

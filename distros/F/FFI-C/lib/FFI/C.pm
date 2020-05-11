@@ -7,7 +7,7 @@ use Carp ();
 use Ref::Util qw( is_ref is_plain_arrayref is_plain_hashref );
 
 # ABSTRACT: C data types for FFI
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 our %ffi;
@@ -111,7 +111,7 @@ FFI::C - C data types for FFI
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 SYNOPSIS
 

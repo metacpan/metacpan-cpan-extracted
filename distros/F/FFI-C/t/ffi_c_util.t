@@ -1,5 +1,5 @@
-use Test2::V0 -no_srand => 1;
-use FFI::C::Util qw( owned take perl_to_c c_to_perl );
+use Test2::V0 0.000081 -no_srand => 1;
+use FFI::C::Util qw( owned take perl_to_c c_to_perl set_array_count );
 use FFI::Platypus::Memory qw( free );
 use FFI::C::StructDef;
 use FFI::C::UnionDef;
@@ -192,6 +192,76 @@ subtest 'perl_to_c / c_to_perl' => sub {
     );
 
   };
+
+};
+
+subtest 'var-to-fixed' => sub {
+
+  imported_ok 'set_array_count';
+
+  my $ffi = FFI::Platypus->new( api => 1 );
+  my $def = FFI::C::ArrayDef->new(
+    $ffi,
+    name => 'array_t',
+    members => [
+      FFI::C::StructDef->new(
+        members => [ x => 'uint32' ],
+      ),
+    ],
+  );
+
+  my $fixed = $def->create([ map { { x => $_ } } 0..9 ]);
+  is(
+    $fixed,
+    object {
+      call [ isa => 'FFI::C::Array' ] => T();
+      call count => 10;
+    },
+    'fixed is okay'
+  );
+
+  is(
+    dies { set_array_count $fixed, 5 },
+    match qr/This array already has a size/,
+    'Trying to set count on already existing array fails',
+  );
+
+  # casting looses the count.
+  my $huh = $ffi->cast('array_t','array_t', $fixed);
+
+  is(
+    $huh,
+    object {
+      call [ isa => 'FFI::C::Array' ] => T();
+      call count => U();
+      call [ get => $_ ] => object {
+        call [ isa => 'FFI::C::Struct' ] => T();
+        call x => $_;
+      } for 0..9;
+    },
+    'huh is okay',
+  );
+
+  set_array_count $huh, 5;
+
+  is(
+    $huh,
+    object {
+      call [ isa => 'FFI::C::Array' ] => T();
+      call count => 5;
+      call [ get => $_ ] => object {
+        call [ isa => 'FFI::C::Struct' ] => T();
+        call x => $_;
+      } for 0..4;
+    },
+    'huh is okay',
+  );
+
+  is(
+    dies { $huh->get(5) },
+    match qr/OOB array index/,
+    'oob error on set count'
+  );
 
 };
 

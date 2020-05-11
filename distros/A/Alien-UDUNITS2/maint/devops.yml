@@ -1,0 +1,10 @@
+native:
+  debian:
+    packages:
+      - libexpat1-dev
+  macos-homebrew:
+    packages:
+      - expat
+  msys2-mingw64:
+    packages:
+      - mingw-w64-x86_64-expat

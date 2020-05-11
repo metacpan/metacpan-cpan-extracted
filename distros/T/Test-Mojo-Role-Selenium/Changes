@@ -1,5 +1,8 @@
 Revision history for perl distribution Test-Mojo-Role-Selenium
 
+0.17 2020-05-07T11:00:18+0900
+ - Compatible with Mojolicious 8.36
+
 0.16 2019-01-10T12:26:41+0900
  - Stop using delay() inside wait_until()
  - Fix default element description when passing in a hash

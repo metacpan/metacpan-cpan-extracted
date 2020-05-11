@@ -67,7 +67,8 @@ subtest 'example' => sub {
       field u8 => 42;
       field u16 => match qr/^[0-9]+$/;
       field u32 => match qr/^[0-9]+$/;
-      field u64 => match qr/^[0-9]+$/;
+      field u64 => D();  # on 32bit this can be a scalar ref that
+                         # confuses Test2
       end;
     },
     'create instance union'
@@ -132,7 +133,8 @@ subtest 'with type name' => sub {
       field u8 => 42;
       field u16 => match qr/^[0-9]+$/;
       field u32 => match qr/^[0-9]+$/;
-      field u64 => match qr/^[0-9]+$/;
+      field u64 => D();  # On 32bit this can be a scalar ref
+                         # (blessed) that confuses Test2
       end;
     },
     'create instance union'

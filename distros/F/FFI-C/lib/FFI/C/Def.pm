@@ -12,7 +12,7 @@ use Sub::Util ();
 our @CARP_NOT = qw( FFI::C );
 
 # ABSTRACT: Data definition for FFI
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 sub new
@@ -312,7 +312,7 @@ FFI::C::Def - Data definition for FFI
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 SYNOPSIS
 

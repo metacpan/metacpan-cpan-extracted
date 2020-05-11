@@ -1,11 +1,16 @@
-0.04    2017-07-10 (PERLANCAR)
+0.050   2020-05-08  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Read lcpan.conf in addition fo lcpand-simple.conf.
+
+
+0.04    2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.03    2016-01-17 (PERLANCAR)
+0.03    2016-01-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -13,7 +18,7 @@
           fix ordering of POD sections.
 
 
-0.02    2016-01-16 (PERLANCAR)
+0.02    2016-01-16  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -21,6 +26,6 @@
 	  app.
 
 
-0.01    2016-01-16 (PERLANCAR)
+0.01    2016-01-16  Released-By: PERLANCAR
 
         - First version.

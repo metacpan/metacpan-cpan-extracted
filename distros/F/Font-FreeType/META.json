@@ -49,6 +49,6 @@
          "url" : "https://github.com/zmughal/p5-Font-FreeType"
       }
    },
-   "version" : "0.13",
+   "version" : "0.15",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

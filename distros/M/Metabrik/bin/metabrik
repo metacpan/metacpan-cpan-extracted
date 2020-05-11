@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: metabrik,v f05913296371 2017/11/06 11:08:56 gomor $
+# $Id$
 #
 use strict;
 use warnings;

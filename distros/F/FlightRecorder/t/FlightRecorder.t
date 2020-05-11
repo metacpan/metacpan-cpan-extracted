@@ -454,7 +454,7 @@ $subs->example(-1, 'info', 'method', fun($tryable) {
 
 $subs->example(-1, 'output', 'method', fun($tryable) {
   ok my $result = $tryable->result;
-  like $result, qr/\w+ \w+ \d+ [\d:]+ \d+ \[0001\] \@debug test began/;
+  like $result, qr/\w+ \w+\s+\d+ [\d:]+ \d+ \[0001\] \@debug test began/;
 
   $result
 });

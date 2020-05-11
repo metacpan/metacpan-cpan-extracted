@@ -1,3 +1,9 @@
+0.082   2020-02-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Update renamed dependency
+	  (Sort::Sub::pod_section{s,}_ala_perlancar).
+
+
 0.081   2020-02-16  Released-By: PERLANCAR; Urgency: low
 
 	- [refactor] Extract sort spec to

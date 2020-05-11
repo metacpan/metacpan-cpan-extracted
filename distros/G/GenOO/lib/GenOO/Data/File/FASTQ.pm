@@ -27,7 +27,7 @@ GenOO::Data::File::FASTQ - Object implementing methods for accessing fastq forma
 # Let the code begin...
 
 package GenOO::Data::File::FASTQ;
-$GenOO::Data::File::FASTQ::VERSION = '1.5.1';
+$GenOO::Data::File::FASTQ::VERSION = '1.5.2';
 
 #######################################################################
 #######################   Load External modules   #####################

@@ -20,7 +20,7 @@ App::lcpan::Manual::FAQ - FAQ on App::lcpan
 
 =head1 VERSION
 
-version 1.054.001
+version 1.057.000
 
 =head1 DESCRIPTION
 

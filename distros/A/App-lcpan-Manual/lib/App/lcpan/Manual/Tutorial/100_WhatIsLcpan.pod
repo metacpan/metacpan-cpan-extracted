@@ -18,7 +18,7 @@ App::lcpan::Manual::Tutorial::100_WhatIsLcpan - What is lcpan
 
 =head1 VERSION
 
-version 1.054.001
+version 1.057.000
 
 =head1 DESCRIPTION
 

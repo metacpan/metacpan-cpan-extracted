@@ -4,7 +4,7 @@ use Data::Hopen;
 use strict;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000015';
+our $VERSION = '0.000017';
 
 use parent 'Exporter';
 our (@EXPORT, @EXPORT_OK, %EXPORT_TAGS);
@@ -43,20 +43,15 @@ Convert a scalar to a Boolean as Perl does, except:
 
 C</^(false|off|no)$/i>
 
-=item * Truthy
-
-C<"0">
-
 =back
 
-So C<false>, C<off>, C<no>, empty string, C<undef>, and numeric C<0> are falsy,
-and all other values (including string C<'0'>) are truthy.
+So C<false>, C<off>, C<no>, empty string, C<undef>, numeric C<0>, and
+string C<'0'> are falsy, and all other values are truthy.
 
 =cut
 
 sub boolify {
-    return false if $_[0] =~ /^(false|off|no)$/i;
-    return true if $_[0] =~ /^0$/;
+    return false if ($_[0]//'') =~ /^(false|off|no)$/i;
     return !!$_[0];
 } #boolify()
 
@@ -106,14 +101,25 @@ sub dedent {
     my $val = @_ ? $_[0] : $_;
     my $initial_NL;
 
-    if($val =~ /\A\n/) {
+    if(substr($val, 0, 1) eq "\n") {
         $initial_NL = true;
-        $val =~ s/^\A\n//;
+        $val = substr($val, 1);
     }
 
-    if($val =~ m/^(?<ws>\h+)\S/m) {
-        $val =~ s/^$+{ws}//gm;
+    # Find first nonblank
+    my $ws;
+    while($val =~ m/^(.*)$/mg) {
+        my $line = $1;
+        if($line =~ m/^(?<ws>\h+)\S/m) { # nonblank with leading ws
+            $ws = $+{ws};
+            last;
+        } elsif($line =~ m/\S/) {       # nonblank without leading ws
+            last;
+        }
     }
+
+    # Strip leading WS
+    $val =~ s/^\Q$ws\E//gm if defined $ws;
 
     $val =~ s/^\h+\z//m if $extra_trim;
 
@@ -162,58 +168,59 @@ sub forward_opts {
     return %result;
 } #forward_opts()
 
-=head2 identical
-
-Return truthy if the given parameters are identical objects.
-Taken from L<Test::Identity> by Paul Evans, which is licensed under the same
-terms as Perl itself.
-
-=cut
-
-sub _describe
-{
-    my ( $ref ) = @_;
-
-    if( !defined $ref ) {
-        return "undef";
-    }
-    elsif( !refaddr $ref ) {
-        return "a non-reference";
-    }
-    elsif( blessed $ref ) {
-        return "a reference to a " . ref( $ref );
-    }
-    else {
-        return "an anonymous " . ref( $ref ) . " ref";
-    }
-} #_describe()
-
-sub identical($$)
-{
-    my ( $got, $expected ) = @_;
-
-    my $got_desc = _describe $got;
-    my $exp_desc = _describe $expected;
-
-    # TODO: Consider if undef/undef ought to do this...
-    if( $got_desc ne $exp_desc ) {
-        return false;
-    }
-
-    if( !defined $got ) {
-        # Two undefs
-        return true;
-    }
-
-    my $got_addr = refaddr $got;
-    my $exp_addr = refaddr $expected;
-
-    if( $got_addr != $exp_addr ) {
-        return false;
-    }
-
-    return true;
-} #identical()
+# The following are commented out as they are not currently in use.
+#=head2 identical
+#
+#Return truthy if the given parameters are identical objects.
+#Taken from L<Test::Identity> by Paul Evans, which is licensed under the same
+#terms as Perl itself.
+#
+#=cut
+#
+#sub _describe
+#{
+#    my ( $ref ) = @_;
+#
+#    if( !defined $ref ) {
+#        return "undef";
+#    }
+#    elsif( !refaddr $ref ) {
+#        return "a non-reference";
+#    }
+#    elsif( blessed $ref ) {
+#        return "a reference to a " . ref( $ref );
+#    }
+#    else {
+#        return "an anonymous " . ref( $ref ) . " ref";
+#    }
+#} #_describe()
+#
+#sub identical($$)
+#{
+#    my ( $got, $expected ) = @_;
+#
+#    my $got_desc = _describe $got;
+#    my $exp_desc = _describe $expected;
+#
+#    # TODO: Consider if undef/undef ought to do this...
+#    if( $got_desc ne $exp_desc ) {
+#        return false;
+#    }
+#
+#    if( !defined $got ) {
+#        # Two undefs
+#        return true;
+#    }
+#
+#    my $got_addr = refaddr $got;
+#    my $exp_addr = refaddr $expected;
+#
+#    if( $got_addr != $exp_addr ) {
+#        return false;
+#    }
+#
+#    return true;
+#} #identical()
 
 1;
 __END__

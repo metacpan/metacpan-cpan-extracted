@@ -1,7 +1,7 @@
 package Sah::Schema::sah::type_name;
 
-our $DATE = '2019-07-19'; # DATE
-our $VERSION = '0.9.46.0'; # VERSION
+our $DATE = '2020-05-08'; # DATE
+our $VERSION = '0.9.49.1'; # VERSION
 
 our $schema = [str => {
     match => '\A[A-Za-z][A-Za-z0-9_]*(::[A-Za-z][A-Za-z0-9_]*)*\z',
@@ -22,7 +22,39 @@ Sah::Schema::sah::type_name - Type name
 
 =head1 VERSION
 
-This document describes version 0.9.46.0 of Sah::Schema::sah::type_name (from Perl distribution Sah-Schemas-Sah), released on 2019-07-19.
+This document describes version 0.9.49.1 of Sah::Schema::sah::type_name (from Perl distribution Sah-Schemas-Sah), released on 2020-05-08.
+
+=head1 SYNOPSIS
+
+Using with L<Data::Sah>:
+
+ use Data::Sah qw(gen_validator);
+ my $vdr = gen_validator("sah::type_name*");
+ say $vdr->($data) ? "valid" : "INVALID!";
+
+ # Data::Sah can also create a validator to return error message, coerced value,
+ # even validators in other languages like JavaScript, from the same schema.
+ # See its documentation for more details.
+
+Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
+
+ package MyApp;
+ our %SPEC;
+ $SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['sah::type_name*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my %args = @_;
+     ...
+ }
 
 =head1 HOMEPAGE
 
@@ -46,7 +78,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

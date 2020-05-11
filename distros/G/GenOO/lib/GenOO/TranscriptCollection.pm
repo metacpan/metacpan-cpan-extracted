@@ -20,7 +20,7 @@ GenOO::TranscriptCollection - Role for a collection of GenOO::Transcript objects
 # Let the code begin...
 
 package GenOO::TranscriptCollection;
-$GenOO::TranscriptCollection::VERSION = '1.5.1';
+$GenOO::TranscriptCollection::VERSION = '1.5.2';
 use Moose::Role;
 use namespace::autoclean;
 use GenOO::TranscriptCollection::Factory;

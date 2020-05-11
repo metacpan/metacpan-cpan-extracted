@@ -75,4 +75,4 @@ my $caller = $linker->instantiate(
     },
   ),
 );
-$caller->get_export('run')->as_func->();
+$caller->exports->run->();

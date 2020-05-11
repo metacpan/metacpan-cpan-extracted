@@ -1,5 +1,12 @@
 Revision history for Perl-PrereqScanner-NotQuiteLite
 
+0.9911 2020/05/10
+  - Remove cached cpanmeta if prereqs are replaced
+
+0.9910 2020/05/10
+  - changed ::App->run to return processed cpanfile object if cpanfile option is set
+  - changed ::App->run not to print unless print option is set
+
 0.9909 2019/11/30
   - allowed full package names for Plack Middleware (Graham TerMarsch++)
 

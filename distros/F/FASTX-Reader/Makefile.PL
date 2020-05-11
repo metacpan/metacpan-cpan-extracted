@@ -24,9 +24,10 @@ my %WriteMakefileArgs = (
     "Capture::Tiny" => "0.40",
     "Carp" => "1.2",
     "Data::Dumper" => "2.1",
-    "FindBin" => "1.3"
+    "FindBin" => "1.3",
+    "Time::HiRes" => 0
   },
-  "VERSION" => "0.90",
+  "VERSION" => "0.92",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,7 +38,8 @@ my %FallbackPrereqs = (
   "Capture::Tiny" => "0.40",
   "Carp" => "1.2",
   "Data::Dumper" => "2.1",
-  "FindBin" => "1.3"
+  "FindBin" => "1.3",
+  "Time::HiRes" => 0
 );
 
 

@@ -7,7 +7,7 @@ use Importer 'NewsExtractor::TextUtil' => 'normalize_whitespace';
 
 sub journalist {
     my ($self) = @_;
-    my ($txt) = $self->content_text =~ m{【記者([ \p{Letter}]+?)(?:/\p{Letter}+)?報導】};
+    my ($txt) = $self->content_text =~ m{[〔【]記者([ \p{Letter}]+?)(?:[／/]\p{Letter}+)?報導[〕】]};
     return $txt;
 }
 

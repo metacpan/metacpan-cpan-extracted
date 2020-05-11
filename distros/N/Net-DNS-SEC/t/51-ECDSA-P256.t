@@ -1,4 +1,4 @@
-# $Id: 51-ECDSA-P256.t 1677 2018-05-22 11:59:10Z willem $	-*-perl-*-
+# $Id: 51-ECDSA-P256.t 1777 2020-05-07 08:24:01Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -102,21 +102,21 @@ ok( $signature, 'signature created using private key' );
 
 
 my $verified = Net::DNS::SEC::ECDSA->verify( $sigdata, $key, $signature );
-ok( $verified, 'signature verified using public key' );
+is( $verified, 1, 'signature verified using public key' );
 
 
 my $corrupt = 'corrupted data';
 my $verifiable = Net::DNS::SEC::ECDSA->verify( $corrupt, $key, $signature );
-ok( !$verifiable, 'signature not verifiable if data corrupted' );
+is( $verifiable, 0, 'signature not verifiable if data corrupted' );
 
 
-ok( !eval { Net::DNS::SEC::ECDSA->sign( $sigdata, $wrongprivate ) },
+is( eval { Net::DNS::SEC::ECDSA->sign( $sigdata, $wrongprivate ) }, undef,
 	'signature not created using wrong private key' );
 
-ok( !eval { Net::DNS::SEC::ECDSA->verify( $sigdata, $wrongkey, $signature ) },
+is( eval { Net::DNS::SEC::ECDSA->verify( $sigdata, $wrongkey, $signature ) }, undef,
 	'signature not verifiable using wrong public key' );
 
-ok( !eval { Net::DNS::SEC::ECDSA->verify( $sigdata, $key, undef ) },
+is( eval { Net::DNS::SEC::ECDSA->verify( $sigdata, $key, undef ) }, undef,
 	'verify fails if signature undefined' );
 
 exit;

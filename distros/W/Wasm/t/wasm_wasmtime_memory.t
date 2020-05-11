@@ -1,4 +1,5 @@
 use Test2::V0 -no_srand => 1;
+use Test2::Plugin::Wasm;
 use lib 't/lib';
 use Test2::Tools::Wasm;
 use Wasm::Wasmtime::Memory;
@@ -12,9 +13,8 @@ is(
     )
   }),
   object {
-    call [get_export => 'frooble'] => object {
-      call [ isa => 'Wasm::Wasmtime::Extern' ] => T();
-      call as_memory => object {
+    call exports => object {
+      call frooble => object {
         call [ isa => 'Wasm::Wasmtime::Memory' ] => T();
         call type => object {
           call [ isa => 'Wasm::Wasmtime::MemoryType' ] => T();
@@ -24,9 +24,11 @@ is(
         call size => 2;
         call [ grow => 3] => T();
         call size => 5;
-        call as_extern => object {
-          call [ isa => 'Wasm::Wasmtime::Extern' ] => T();
-        };
+        call is_func   => F();
+        call is_global => F();
+        call is_table  => F();
+        call is_memory => T();
+        call kind      => 'memory';
       };
     };
   },
@@ -42,6 +44,17 @@ is(
     call [ isa => 'Wasm::Wasmtime::Memory' ] => T();
   },
   'standalone',
+);
+
+is(
+  Wasm::Wasmtime::Memory->new(
+    Wasm::Wasmtime::Store->new,
+    [1,2],
+  ),
+  object {
+    call [ isa => 'Wasm::Wasmtime::Memory' ] => T();
+  },
+  'standalone (ii)',
 );
 
 done_testing;

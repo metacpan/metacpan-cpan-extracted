@@ -6,6 +6,7 @@ README.md
 cpanfile
 lib/App/Greple/subst.pm
 lib/App/Greple/subst/Dict.pm
+lib/App/Greple/subst/dyncmap.pm
 minil.toml
 share/Makefile
 share/all-katakana.dict

@@ -3,20 +3,20 @@ package Net::Curl::Promiser;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 =encoding utf-8
 
 =head1 NAME
 
-Net::Curl::Promiser - A Promise interface for L<Net::Curl::Multi>
+Net::Curl::Promiser - Asynchronous L<libcurl|https://curl.haxx.se/libcurl/>, the easy way!
 
 =head1 DESCRIPTION
 
-This module wraps L<Net::Curl::Multi> to facilitate asynchronous
-requests with Promise objects. Net::Curl::Promiser interfaces with
-Net::Curl::Multi’s polling callbacks to simplify your task of coordinating
-multiple concurrent requests.
+L<Net::Curl::Multi> is powerful but tricky to use: polling, callbacks,
+timers, etc. This module does all of that for you and puts a Promise
+interface on top of it, so asynchronous I/O becomes almost as simple as
+synchronous I/O.
 
 L<Net::Curl::Promiser> itself is a base class; you’ll need to provide
 an interface to whatever event loop you use. See L</SUBCLASS INTERFACE>
@@ -63,7 +63,7 @@ This will override C<PROMISE_CLASS()>.
 
 use Net::Curl::Multi ();
 
-use constant _DEBUG => 1;
+use constant _DEBUG => 0;
 
 use constant _DEFAULT_TIMEOUT => 1000;
 
@@ -149,9 +149,12 @@ sub add_handle {
         die "bad promise engine: [$env_engine]";
     }
     else {
-        my $module = $self->PROMISE_CLASS() . '.pm';
-        $module =~ s<::></>g;
-        require $module;
+        $self->PROMISE_CLASS()->can('new') or do {
+            my $class = $self->PROMISE_CLASS();
+
+            local $@;
+            die if !eval "require $class";
+        };
 
         $promise = $self->PROMISE_CLASS()->new( sub {
             $self->{'callbacks'}{$easy} = \@_;
@@ -161,17 +164,36 @@ sub add_handle {
     return $promise;
 }
 
+=head2 $obj = I<OBJ>->cancel_handle( $EASY )
+
+Prematurely cancels $EASY. The associated promise will be abandoned
+in pending state, never to resolve nor reject.
+
+Returns I<OBJ>.
+
+=cut
+
+sub cancel_handle {
+    my ($self, $easy) = @_;
+
+    $self->{'to_fail'}{$easy} = [ $easy ];
+
+    return $self;
+}
+
 =head2 $obj = I<OBJ>->fail_handle( $EASY, $REASON )
 
-Prematurely fails $EASY. The given $REASON will be the associated
-Promise object’s rejection value.
+Like C<cancel_handle()> but rejects $EASY’s associated promise
+with the given $REASON.
+
+Returns I<OBJ>.
 
 =cut
 
 sub fail_handle {
     my ($self, $easy, $reason) = @_;
 
-    $self->{'to_fail'}{$easy} = [ $easy, $reason ];
+    $self->{'to_fail'}{$easy} = [ $easy, \$reason ];
 
     return $self;
 }
@@ -360,15 +382,23 @@ sub _socket_fn {
     my ( $fd, $action, $self ) = @_[2, 3, 5];
 
     if ($action == Net::Curl::Multi::CURL_POLL_IN) {
+        print STDERR "FD $fd, IN\n" if _DEBUG;
+
         $self->_SET_POLL_IN($fd);
     }
     elsif ($action == Net::Curl::Multi::CURL_POLL_OUT) {
+        print STDERR "FD $fd, OUT\n" if _DEBUG;
+
         $self->_SET_POLL_OUT($fd);
     }
     elsif ($action == Net::Curl::Multi::CURL_POLL_INOUT) {
+        print STDERR "FD $fd, INOUT\n" if _DEBUG;
+
         $self->_SET_POLL_INOUT($fd);
     }
     elsif ($action == Net::Curl::Multi::CURL_POLL_REMOVE) {
+        print STDERR "FD $fd, STOP\n" if _DEBUG;
+
         $self->_STOP_POLL($fd);
 
         # In case we got a read and a remove right away.
@@ -385,6 +415,11 @@ sub _socket_fn {
 sub _finish_handle {
     my ($self, $easy, $cb_idx, $payload) = @_;
 
+    # If $cb_idx == 0, then $payload is a promise resolution.
+    # If $cb_idx == 1, then $payload is either:
+    #   undef       - request canceled
+    #   scalar ref  - promise rejection
+
     my $err = $@;
 
     # Don’t depend on the caller to report failures.
@@ -393,11 +428,11 @@ sub _finish_handle {
         delete $self->{'to_fail'}{$easy};
 
         if ( my $cb_ar = delete $self->{'callbacks'}{$easy} ) {
-            $cb_ar->[$cb_idx]->($payload);
+            $cb_ar->[$cb_idx]->($cb_idx ? $$payload : $payload) if !$cb_idx || $payload;
         }
         elsif ( my $deferred = delete $self->{'deferred'}{$easy} ) {
             if ($cb_idx) {
-                $deferred->reject($payload);
+                $deferred->reject($$payload) if $payload;
             }
             else {
                 $deferred->resolve($payload);
@@ -424,8 +459,8 @@ sub _clear_failed {
     my ($self) = @_;
 
     for my $val_ar ( values %{ $self->{'to_fail'} } ) {
-        my ($easy, $reason) = @$val_ar;
-        $self->_finish_handle( $easy, 1, $reason );
+        my ($easy, $reason_sr) = @$val_ar;
+        $self->_finish_handle( $easy, 1, $reason_sr );
     }
 
     %{ $self->{'to_fail'} } = ();
@@ -446,7 +481,7 @@ sub _process_pending {
 
         $self->_finish_handle(
             $easy,
-            ($result == 0) ? ( 0 => $easy ) : ( 1 => $result ),
+            ($result == 0) ? ( 0 => $easy ) : ( 1 => \$result ),
         );
     }
 

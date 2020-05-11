@@ -111,15 +111,15 @@ sub wasm_func_ok ($$;$)
     return 0;
   }
 
-  my $extern = $instance->get_export($f);
+  my $extern = eval { $instance->exports->{$f} };
   return $ctx->fail_and_release($name, "no export $f") unless $extern;
 
-  my $kind = $extern->type->kind;
+  my $kind = $extern->kind;
   return $ctx->fail_and_release($name, "$f is a $kind, expected a func") unless $kind eq 'func';
 
   $ctx->pass_and_release($name);
 
-  return $extern->as_func;
+  return $extern;
 }
 
 1;

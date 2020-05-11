@@ -1,0 +1,81 @@
+NAME
+    Data::Sah::Tiny - Validate Sah schemas with as little code as possible
+
+VERSION
+    This document describes version 0.000 of Data::Sah::Tiny (from Perl
+    distribution Data-Sah-Tiny), released on 2020-05-10.
+
+SYNOPSIS
+     use Data::Sah::Tiny qw(normalize_schema gen_validator);
+
+     my $v = gen_validator([int => min=>1]);
+     say $v->(0); # false
+     say $v->(2); # true
+
+DESCRIPTION
+    Early release. Not all types and clauses are supported.
+
+    This is a tiny alternative to Data::Sah, with fewer dependencies and
+    much faster compilation speed. But it supports only a subset of
+    Data::Sah's features.
+
+PERFORMANCE NOTES
+    Validator generation is several times faster than Data::Sah, so
+    Params::Sah with Data::Sah::Tiny backend is in the same order of
+    magnitude with other validator generators like Type::Params and
+    Params::ValidationCompiler. See Bencher::Scenarios::ParamsSah.
+
+FUNCTIONS
+  gen_validator($sch[, \%opts ]) => code|str
+    See Data::Sah's documentation. Supported options:
+
+    *   schema_is_normalized
+
+        Bool.
+
+    *   return_type
+
+        Str. Only "bool_valid" and "bool_valid+val" are supported.
+
+    *   data_term
+
+        Str. Defaults to $_[0].
+
+    *   source
+
+        Bool. Set to 1 to return source code instead of compiled coderef.
+
+    *   hash*
+
+        Bool. If set to 1 will return compilation result details.
+
+  normalize_schema
+    See Data::Sah::Normalize's documentation.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Sah-Tiny>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Sah-Tiny>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-Tiny>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Data::Sah
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

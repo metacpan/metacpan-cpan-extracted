@@ -1,10 +1,10 @@
 #!perl
-# t/023-dag-warnings.t: test Data::Hopen::G::DAG's warnings on _run()
+# t/123-dag-warnings.t: test Data::Hopen::G::DAG's warnings on _run()
 use rlib 'lib';
 use HopenTest;
 use Test::Warn;
 
-use Data::Hopen qw(:default $QUIET);
+use Data::Hopen qw(:default *QUIET);
 use Data::Hopen::Scope::Hash;
 use Data::Hopen::Scope::Environment;
 use Data::Hopen::G::Link;
@@ -15,7 +15,7 @@ diag '"Last item in order isn\'t _final!" warnings are OK in this test.';
 run();
 done_testing();
 
-sub make_dag {  # See t/021-dag-single-goal.t for the explanation of this
+sub make_dag {  # See t/121-dag-single-goal.t for the explanation of this
 
     my $dag = hnew DAG => 'dag';
     my $goal = $dag->goal('all');

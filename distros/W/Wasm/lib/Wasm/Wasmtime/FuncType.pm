@@ -2,12 +2,15 @@ package Wasm::Wasmtime::FuncType;
 
 use strict;
 use warnings;
+use base qw( Wasm::Wasmtime::ExternType );
 use Ref::Util qw( is_arrayref );
 use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::ValType;
+use constant is_functype => 1;
+use constant kind => 'functype';
 
 # ABSTRACT: Wasmtime function type class
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 $ffi_prefix = 'wasm_functype_';
@@ -48,14 +51,20 @@ $ffi->attach( results => ['wasm_functype_t'] => 'wasm_valtype_vec_t*' => sub {
 });
 
 
-# actually returns a wasm_externtype_t, but recursion
-$ffi->attach( as_externtype => ['wasm_functype_t'] => 'opaque' => sub {
-  my($xsub, $self) = @_;
-  require Wasm::Wasmtime::ExternType;
-  my $ptr = $xsub->($self);
-  Wasm::Wasmtime::ExternType->new($ptr, $self->{owner} || $self);
-});
+sub to_string
+{
+  my($self) = @_;
+  my @params  = map { $_->to_string } $self->params;
+  my @results = map { $_->to_string } $self->results;
 
+  my $string = '';
+  $string .= "(param @params)" if @params;
+  $string .= ' ' if $string && @results;
+  $string .= "(result @results)" if @results;
+  $string;
+}
+
+__PACKAGE__->_cast(0);
 _generate_destroy();
 
 1;
@@ -72,7 +81,7 @@ Wasm::Wasmtime::FuncType - Wasmtime function type class
 
 =head1 VERSION
 
-version 0.06
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -116,11 +125,11 @@ Returns a list of the parameter types for the function type, as L<Wasm::Wasmtime
 
 Returns a list of the result types for the function type, as L<Wasm::Wasmtime::ValType> objects.
 
-=head2 as_externtype
+=head2 to_string
 
- my $externtype = $functype->as_externtype
+ my $string = $functype->to_string;
 
-Returns the L<Wasm::Wasmtime::ExternType> for this function type.
+Converts the type into a string for diagnostics.
 
 =head1 SEE ALSO
 

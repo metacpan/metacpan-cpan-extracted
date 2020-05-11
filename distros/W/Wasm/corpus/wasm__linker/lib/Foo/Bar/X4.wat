@@ -1,0 +1,10 @@
+(module
+  (global $g (import "Foo::Bar::X3" "x3") (mut i32))
+  (func $hello (import "Foo::Bar::X3" "hello"))
+  (func (export "get_x3") (result i32)
+    (global.get $g))
+  (func (export "inc_x3")
+    (global.set $g
+      (i32.add (global.get $g) (i32.const 1))))
+  (func (export "run") (call $hello))  
+)

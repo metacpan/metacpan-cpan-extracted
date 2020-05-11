@@ -1,11 +1,17 @@
 package Sah::Schema::perl::pod_filename;
 
-our $DATE = '2020-02-15'; # DATE
-our $VERSION = '0.027'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-08'; # DATE
+our $DIST = 'Sah-Schemas-Perl'; # DIST
+our $VERSION = '0.031'; # VERSION
 
 our $schema = [str => {
-    summary => 'Filename (.pod files)',
+    summary => 'A .pod filename, e.g. /path/Foo.pod',
     description => <<'_',
+
+Use this schema if you want to accept a filesystem path containing Perl POD. The
+value of this schema is in the convenience of CLI completion, as well as
+coercion from POD name.
 
 String containing filename of a Perl .pod file. For convenience, when value is
 in the form of:
@@ -54,7 +60,7 @@ _
 }, {}];
 
 1;
-# ABSTRACT: Filename (.pod files)
+# ABSTRACT: A .pod filename, e.g. /path/Foo.pod
 
 __END__
 
@@ -64,13 +70,78 @@ __END__
 
 =head1 NAME
 
-Sah::Schema::perl::pod_filename - Filename (.pod files)
+Sah::Schema::perl::pod_filename - A .pod filename, e.g. /path/Foo.pod
 
 =head1 VERSION
 
-This document describes version 0.027 of Sah::Schema::perl::pod_filename (from Perl distribution Sah-Schemas-Perl), released on 2020-02-15.
+This document describes version 0.031 of Sah::Schema::perl::pod_filename (from Perl distribution Sah-Schemas-Perl), released on 2020-05-08.
+
+=head1 SYNOPSIS
+
+To check data against this schema (requires L<Data::Sah>):
+
+ use Data::Sah qw(gen_validator);
+ my $validator = gen_validator("perl::pod_filename*");
+ say $validator->($data) ? "valid" : "INVALID!";
+
+ # Data::Sah can also create validator that returns nice error message string
+ # and/or coerced value. Data::Sah can even create validator that targets other
+ # language, like JavaScript. All from the same schema. See its documentation
+ # for more details.
+
+To validate function parameters against this schema (requires L<Params::Sah>):
+
+ use Params::Sah qw(gen_validator);
+
+ sub myfunc {
+     my @args = @_;
+     state $validator = gen_validator("perl::pod_filename*");
+     $validator->(\@args);
+     ...
+ }
+
+To specify schema in L<Rinci> function metadata and use the metadata with
+L<Perinci::CmdLine> to create a CLI:
+
+ # in lib/MyApp.pm
+ package MyApp;
+ our %SPEC;
+ $SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['perl::pod_filename*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my %args = @_;
+     ...
+ }
+ 1;
+
+ # in myapp.pl
+ package main;
+ use Perinci::CmdLine::Any;
+ Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+
+ # in command-line
+ % ./myapp.pl --help
+ myapp - Routine to do blah ...
+ ...
+
+ % ./myapp.pl --version
+
+ % ./myapp.pl --arg1 ...
 
 =head1 DESCRIPTION
+
+Use this schema if you want to accept a filesystem path containing Perl POD. The
+value of this schema is in the convenience of CLI completion, as well as
+coercion from POD name.
 
 String containing filename of a Perl .pod file. For convenience, when value is
 in the form of:
@@ -109,6 +180,14 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head1 SEE ALSO
+
+L<Sah::Schema::perl::filename>
+
+L<Sah::Schema::perl::pod_or_pm_filename>
+
+L<Sah::Schema::perl::pm_filename>
 
 =head1 AUTHOR
 

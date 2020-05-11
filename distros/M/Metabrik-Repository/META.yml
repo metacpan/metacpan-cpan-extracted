@@ -55,6 +55,8 @@ provides:
     file: lib/Metabrik/Client/Dns.pm
   Metabrik::Client::Elasticsearch:
     file: lib/Metabrik/Client/Elasticsearch.pm
+  Metabrik::Client::Elasticsearch::Cat:
+    file: lib/Metabrik/Client/Elasticsearch/Cat.pm
   Metabrik::Client::Elasticsearch::Cluster:
     file: lib/Metabrik/Client/Elasticsearch/Cluster.pm
   Metabrik::Client::Elasticsearch::Indices:
@@ -67,6 +69,8 @@ provides:
     file: lib/Metabrik/Client/Imap.pm
   Metabrik::Client::Kafka:
     file: lib/Metabrik/Client/Kafka.pm
+  Metabrik::Client::Memcached:
+    file: lib/Metabrik/Client/Memcached.pm
   Metabrik::Client::Mongodb:
     file: lib/Metabrik/Client/Mongodb.pm
   Metabrik::Client::Mysql:
@@ -165,6 +169,8 @@ provides:
     file: lib/Metabrik/File/Ole.pm
   Metabrik::File::Pcap:
     file: lib/Metabrik/File/Pcap.pm
+  Metabrik::File::Pdf:
+    file: lib/Metabrik/File/Pdf.pm
   Metabrik::File::Psv:
     file: lib/Metabrik/File/Psv.pm
   Metabrik::File::Raw:
@@ -339,7 +345,7 @@ provides:
     file: lib/Metabrik/Remote/Wmi.pm
   Metabrik::Repository:
     file: lib/Metabrik/Repository.pm
-    version: '1.40'
+    version: '1.41'
   Metabrik::Server::Dns:
     file: lib/Metabrik/Server/Dns.pm
   Metabrik::Server::Elasticsearch:
@@ -531,5 +537,5 @@ requires:
   perl: v5.6.1
 resources:
   license: http://opensource.org/licenses/BSD-3-Clause
-version: '1.40'
+version: '1.41'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

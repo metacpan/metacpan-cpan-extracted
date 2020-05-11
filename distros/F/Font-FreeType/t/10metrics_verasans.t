@@ -12,21 +12,21 @@ use utf8;
 use Test::More;
 use File::Spec::Functions;
 use Font::FreeType;
+use version;
 
 my $Tests;
 
 my $data_dir = catdir(qw( t data ));
 
 # Load the Vera Sans face.
-BEGIN { $Tests = 2 }
 my $ft = Font::FreeType->new;
+my $actual_version = version->parse(scalar($ft->version()));
 my $vera = $ft->face(catfile($data_dir, 'Vera.ttf'));
 ok($vera, 'FreeType->face() should return an object');
 is(ref $vera, 'Font::FreeType::Face',
     'FreeType->face() should return blessed ref');
 
 # Test general properties of the face.
-BEGIN { $Tests += 5 }
 is($vera->number_of_faces, 1, '$face->number_of_faces() is right');
 is($vera->current_face_index, 0, '$face->current_face_index() is right');
 
@@ -51,7 +51,6 @@ my %expected_flags = (
     is_sfnt => 1,
 );
 
-BEGIN { $Tests += 10 }
 foreach my $method (sort keys %expected_flags) {
     my $expected = $expected_flags{$method};
     my $got = $vera->$method();
@@ -64,7 +63,6 @@ foreach my $method (sort keys %expected_flags) {
 }
 
 # Some other general properties.
-BEGIN { $Tests += 8 }
 is($vera->number_of_glyphs, 268, '$face->number_of_glyphs() is right');
 is($vera->units_per_em, 2048, '$face->units_per_em() is right');
 my $underline_position = $vera->underline_position;
@@ -79,8 +77,6 @@ is($vera->height, 2384, 'height');
 # Test getting the set of fixed sizes available.
 my @fixed_sizes = $vera->fixed_sizes;
 is(scalar @fixed_sizes, 0, 'Vera has no fixed sizes');
-
-BEGIN { $Tests += 3 }
 
 subtest "charmaps" => sub {
     subtest "default charmap" => sub {
@@ -131,7 +127,6 @@ my $character_list_filename = catfile($data_dir, 'vera_characters.txt');
 open my $character_list, '<', $character_list_filename
   or die "error opening file for list of glyphs: $!";
 
-BEGIN { $Tests += 256*2 + 1 }
 $vera->foreach_char(sub {
     die "shouldn't be any arguments passed in" unless @_ == 0;
     my $line = <$character_list>;
@@ -152,7 +147,6 @@ my $glyph_list_filename = catfile($data_dir, 'vera_glyphs.txt');
 open my $glyph_list, '<', $glyph_list_filename
   or die "error opening file for list of glyphs: $!";
 
-BEGIN { $Tests += 268*3 + 1 }
 $vera->foreach_glyph(sub {
     die "shouldn't be any arguments passed in" unless @_ == 0;
     my $line = <$glyph_list>;
@@ -184,7 +178,6 @@ my @glyph_metrics = (
 # Set the size to match the em size, so that the values are in font units.
 $vera->set_char_size(2048, 2048, 72, 72);
 
-BEGIN { $Tests += 5*4*7 }
 foreach my $get_by (qw/char code index name/) {
     foreach (@glyph_metrics) {
         my $glyph;
@@ -219,7 +212,61 @@ foreach my $get_by (qw/char code index name/) {
     }
 }
 
-BEGIN { $Tests += 5 }
+# The 12 glyphs which don't have char code.
+my @glyph_metrics_nochar = (
+    { name => '.notdef', index => 0, advance => 1229, LBearing => 102, RBearing => 103 },
+    { name => '.null', index => 1, advance => 0, LBearing => 0, RBearing => 0 },
+    { name => 'nonmarkingreturn', index => 2, advance => 651, LBearing => 0, RBearing => 651 },
+    { name => 'c6459', index => 259, advance => 1024, LBearing => 215, RBearing => 215 },
+    { name => 'c6460', index => 260, advance => 1024, LBearing => 371, RBearing => 272 },
+    { name => 'c6461', index => 261, advance => 1024, LBearing => 182, RBearing => 182 },
+    { name => 'c6462', index => 262, advance => 1024, LBearing => 268, RBearing => 373 },
+    { name => 'c6463', index => 263, advance => 1024, LBearing => 207, RBearing => 207 },
+    { name => 'c6466', index => 264, advance => 1024, LBearing => 207, RBearing => 207 },
+    { name => 'c6467', index => 265, advance => 821, LBearing => 63, RBearing => 65 },
+    { name => 'c6468', index => 266, advance => 1024, LBearing => 199, RBearing => 199 },
+    { name => 'c6469', index => 267, advance => 1024, LBearing => 410, RBearing => 410 },
+);
+
+foreach my $get_by (qw/index name/) {
+    foreach (@glyph_metrics_nochar) {
+        my $glyph;
+        if ($get_by eq "index") {
+            $glyph = $vera->glyph_from_index($_->{index});
+        }
+        elsif ($get_by eq "name") {
+            $glyph = $vera->glyph_from_name($_->{name});
+        }
+        is($glyph->name, $_->{name},
+           "name of glyph '$_->{index}', by $get_by");
+        is($glyph->index, $_->{index},
+            "index of glyph '$_->{index}', by $get_by");
+        is($glyph->char_code, undef,
+            "char code of glyph '$_->{index}', by $get_by");
+        is($glyph->horizontal_advance, $_->{advance},
+           "advance width of glyph '$_->{index}', by $get_by");
+        is($glyph->left_bearing, $_->{LBearing},
+           "left bearing of glyph '$_->{index}', by $get_by");
+        is($glyph->right_bearing, $_->{RBearing},
+           "right bearing of glyph '$_->{index}', by $get_by");
+        is($glyph->width, $_->{advance} - $_->{LBearing} - $_->{RBearing},
+           "width of glyph '$_->{index}', by $get_by");
+    }
+}
+is($vera->load_flags, FT_LOAD_DEFAULT, "FT_LOAD_DEFAULT");
+
+SKIP: {
+    my $min_version = version->parse('2.6.1');
+    skip "library version $actual_version is not enough to test (required $min_version)", 2
+        if $actual_version < $min_version;
+    is($vera->load_flags(FT_LOAD_COMPUTE_METRICS), FT_LOAD_COMPUTE_METRICS, "FT_LOAD_COMPUTE_METRICS");
+    is($vera->load_flags, FT_LOAD_COMPUTE_METRICS, "FT_LOAD_COMPUTE_METRICS");
+}
+
+$vera->foreach_glyph(sub {
+ok defined eval {$_->load(); $_->name; }
+;});
+
 for (@glyph_metrics) {
     my $ix = $vera->get_name_index($_->{name});
     is($ix, $_->{index},
@@ -234,7 +281,6 @@ my %kerning = (
     'T.' => -243,
 );
 
-BEGIN { $Tests += 4*2 }
 foreach my $pair (sort keys %kerning) {
     my ($kern_x, $kern_y) = $vera->kerning(
         map { $vera->glyph_from_char($_)->index } split //, $pair);
@@ -243,7 +289,6 @@ foreach my $pair (sort keys %kerning) {
 }
 
 # Get just the horizontal kerning more conveniently.
-BEGIN { $Tests += 6 }
 my $kern_x = $vera->kerning(
     map { $vera->glyph_from_char($_)->index } 'A', 'V');
 is($kern_x, -131, "horizontal kerning of 'AV' in scalar context");
@@ -258,6 +303,6 @@ is $missing_glyph->horizontal_advance, 1229, "missing glyph has horizontal advan
 is $vera->glyph_from_char_code(ord '˗', 0), undef, "no fallback glyph";
 isnt $vera->glyph_from_char_code(ord '˗', 1), undef, "missing glyph is defined";
 
-BEGIN { plan tests => $Tests }
+done_testing;
 
 # vim:ft=perl ts=4 sw=4 expandtab:

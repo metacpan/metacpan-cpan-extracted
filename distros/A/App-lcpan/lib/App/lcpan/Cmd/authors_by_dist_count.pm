@@ -1,9 +1,11 @@
 package App::lcpan::Cmd::authors_by_dist_count;
 
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '1.056'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-07'; # DATE
+our $DIST = 'App-lcpan'; # DIST
+our $VERSION = '1.057'; # VERSION
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
 
@@ -27,8 +29,9 @@ sub handle_cmd {
     my $sql = "SELECT
   cpanid author,
   COUNT(*) AS dist_count,
-  ROUND(100.0 * COUNT(*) / (SELECT COUNT(*) FROM dist), 4) dist_count_pct
-FROM dist d
+  ROUND(100.0 * COUNT(*) / (SELECT COUNT(*) FROM file), 4) dist_count_pct
+FROM file f
+WHERE f.dist_name IS NOT NULL AND f.is_latest_dist
 GROUP BY cpanid
 ORDER BY dist_count DESC
 ";
@@ -59,7 +62,7 @@ App::lcpan::Cmd::authors_by_dist_count - List authors ranked by number of dists
 
 =head1 VERSION
 
-This document describes version 1.056 of App::lcpan::Cmd::authors_by_dist_count (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of App::lcpan::Cmd::authors_by_dist_count (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 FUNCTIONS
 

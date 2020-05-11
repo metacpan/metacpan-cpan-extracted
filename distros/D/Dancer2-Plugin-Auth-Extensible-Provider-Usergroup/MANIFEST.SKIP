@@ -1,4 +1,4 @@
-^\.git/*
+.git
 \.swp$
 Makefile\.old
 README\.md

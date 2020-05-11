@@ -4,10 +4,11 @@ use strict;
 use warnings;
 use base 'Module::Build';
 
-our $VERSION = '0.1.1'; # VERSION
+our $VERSION = '0.1.2'; # VERSION
 # ABSTRACT: build Parse::Yapp parsers from source
 
 use File::Find;
+use File::Path qw( make_path );
 use File::Spec::Functions qw( catdir splitdir );
 use Parse::Yapp;
 
@@ -38,6 +39,7 @@ sub _find_parser {
     shift @namespace;
     $namespace[-1] =~ s/\.yp$//;
 
+    make_path( catdir( @pmpath[0..$#pmpath-1] ) );
     _make_parser( $File::Find::name,
                   catdir( @pmpath ),
                   join '::', @namespace );
@@ -66,7 +68,7 @@ Module::Build::Parse::Yapp - build Parse::Yapp parsers from source
 
 =head1 VERSION
 
-version 0.1.1
+version 0.1.2
 
 =head1 SYNOPSIS
 

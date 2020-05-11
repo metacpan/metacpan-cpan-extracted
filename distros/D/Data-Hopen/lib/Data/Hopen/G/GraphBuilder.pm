@@ -7,7 +7,7 @@ use Exporter 'import';
 
 our @EXPORT; BEGIN { @EXPORT=qw(make_GraphBuilder); }
 
-our $VERSION = '0.000015';
+our $VERSION = '0.000017';
 
 use Class::Tiny {
     name => 'ANON',     # Name is optional; it's here so the

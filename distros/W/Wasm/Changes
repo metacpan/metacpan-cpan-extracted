@@ -1,5 +1,61 @@
 Revision history for Wasm},
 
+0.09      2020-05-10 15:59:01 -0600
+  - Wasm::Wasmtime::Memory constructor can take a array reference in place
+    of the Wasm::Wasmtime::MemoryType (gh#48, gh#49)
+  - Added Wasm::Func (gh#50, gh#51)
+  - Added Wasm::Global (gh#50, gh#51)
+  - Added Wasm::Memory (gh#48, gh#49)
+  - Added to_string method to all Wasm::Wasmtime::*Type classes
+    and Wasm::Wasmtime::Module (gh#52)
+  - Added cache_config_load and cache_config_default methods to
+    Wasm::Wasmtime::Config (gh#39, gh#54)
+
+0.08      2020-05-08 18:18:40 -0600
+  - Added tie method to Wasm::Wasmtime::Global (gh#46)
+  - Added store method to Wasm::Wasmtime::Linker (gh#31, gh#47)
+  - Wasm.pm uses Wasm::Wasmtime::Linker internally now, which means
+    that Wasm modules can import/export between themselves (gh#31, gh#47)
+  - Added %Wasm::WASM hash that maps Wasm modules to the files
+    they were loaded from (gh#31, gh#47)
+  - Exported globals of Wasm modules are now imported into the
+    corresponding Perl namespace via a tied scalar (gh#31, gh#47)
+  - Functions and globals can be imported into Wasm (gh#31, gh47)
+
+  [Warning: breaking changes]
+
+  - The -imports option was removed from Wasm.pm (gh#31, gh#47)
+
+0.07      2020-05-07 13:52:00 -0600
+  - Add Test2::Plugin::Wasm (gh#36)
+  - Add Wasm::Wasmtime::Instance::Exports class (gh#38, gh#44)
+  - Add Wasm::Wasmtime::Module::Exports class (gh#38, gh#44)
+  - Add Wasm::Wasmtime::Module::Imports class (gh#38, gh#44)
+
+  [Warning: numerous breaking changes]
+
+  - Wasm::Wasmtime::Extern, amd ::ExternType are now base classes
+    and no longer require casting (gh#37, gh#40)
+  - Removed as_externtype method from the Wasm::Wasmtime::FuncType,
+    ::GlobalType, ::MemoryType and ::TableType classes (gh#37, gh#40)
+  - Removed as_extern method from the Wasm::Wasmtime::Func, ::Global,
+    ::Memory and ::Table classes (gh#37, gh#40)
+  - Added predicate methods is_func, is_global, is_table and is_memory
+    to Wasm::Wasmtime::Extern class (gh#37, gh#40)
+  - Added predicate methods is_functype, is_globaltype, is_tabletype
+    and is_memorytype to Wasm::Wasmtime::ExternType class (gh#37, gh#40)
+  - Removed the get_export method on Wasm::Wasmtime::Module (gh#38, gh#44)
+  - Removed the get_export method on Wasm::Wasmtime::Instance (gh#38, gh#44)
+  - The Wasm::Wasmtime::Module method exports returns a
+    Wasm::Wasmtime::Module::Exports object instead of a list of
+    exports (gh#38, gh#44)
+  - The Wasm::Wasmtime::Module method imports returns a
+    Wasm::Wasmtime::Module::Imports object instead of a list of
+    imports (gh#38, gh#44)
+  - The Wasm::Wasmtime::Instance method exports returns a
+    Wasm::Wasmtime::Instance::Exports object instead of a list of
+    exports (gh#38, gh#44)
+
 0.06      2020-04-27 06:47:38 -0600
   - Improved type safety (gh#32)
 
@@ -36,5 +92,3 @@ Revision history for Wasm},
 
 0.01      2020-04-10 17:41:13 -0600
   - initial version
-
-

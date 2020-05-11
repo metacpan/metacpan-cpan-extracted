@@ -1,5 +1,4 @@
-package
-  Math;
+package Math;
 
 use strict;
 use warnings;

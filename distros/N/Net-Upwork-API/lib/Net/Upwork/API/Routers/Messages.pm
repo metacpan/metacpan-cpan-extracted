@@ -83,6 +83,25 @@ sub get_room_details {
     return $self->client()->get("/messages/v3/" . $company . "/rooms/" . $room_id, %params);
 }
 
+=item get_room_messages
+
+    Get messages from a specific room
+
+B<Return value>
+
+    JSON response as a string
+
+=cut
+
+sub get_room_messages {
+    my $self = shift;
+    my $company = shift;
+    my $room_id = shift;
+    my %params = @_;
+
+    return $self->client()->get("/messages/v3/" . $company . "/rooms/" . $room_id . "/stories", %params);
+}
+
 =item get_room_by_offer
 
     Get a specific room by offer ID

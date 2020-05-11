@@ -1,6 +1,10 @@
 Changelog for Data-Object-Space
 
-2.03 2020-05-06T02:30:17
+2.05 2020-05-07T03:19:05
+ - No changes found
+
+2.03 2020-05-06T02:30:19
+ - Built release version 2.03
  - Added release updates
  - Add "locate" method
  - Add "rebase" method

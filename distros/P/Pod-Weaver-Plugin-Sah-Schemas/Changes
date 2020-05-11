@@ -1,3 +1,14 @@
+0.063   2020-05-08  Released-By: PERLANCAR; Urgency: medium
+
+	- In generated Synopsis, show how to use with Params::Sah and show
+	  how to create CLI with Perinci::CmdLine in more detail.
+
+
+0.062   2020-05-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Update property names for value & validated value.
+
+
 0.061   2020-03-03  Released-By: PERLANCAR; Urgency: medium
 
 	- Render example on how to use the Sah::Schema module with

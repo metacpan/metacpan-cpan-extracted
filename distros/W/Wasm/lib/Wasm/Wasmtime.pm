@@ -23,7 +23,7 @@ use Wasm::Wasmtime::WasiConfig;
 use Wasm::Wasmtime::WasiInstance;
 
 # ABSTRACT: Perl interface to Wasmtime
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 1;
@@ -40,7 +40,7 @@ Wasm::Wasmtime - Perl interface to Wasmtime
 
 =head1 VERSION
 
-version 0.06
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -100,16 +100,16 @@ version 0.06
  my $instance = Wasm::Wasmtime::Instance->new( $module, [\&hello] );
  
  # call a WebAssembly function that calls back into Perl space
- $instance->get_export('call_hello')->as_func;
+ $instance->exports->call_hello;
  
  # call plain WebAssembly function
- my $gcd = $instance->get_export('gcd')->as_func;
+ my $gcd = $instance->exports->gcd;
  print $gcd->(6,27), "\n";      # 3
  
  # write to memory from Perl and read it from WebAssembly
- my $memory = $instance->get_export('memory')->as_memory;
+ my $memory = $instance->exports->memory;
  poke($memory->data + 10, 42);  # set offset 10 to 42
- my $load = $instance->get_export('load')->as_func;
+ my $load = $instance->exports->load;
  print $load->(10), "\n";       # 42
  poke($memory->data + 10, 52);  # set offset 10 to 52
  print $load->(10), "\n";       # 52
@@ -125,6 +125,14 @@ appropriate classes.
 If you are just getting your feet wet with WebAssembly and Perl then you probably want to
 take a look at L<Wasm>, which is a simple interface that automatically imports functions
 from Wasm space into Perl space.
+
+=head1 ENVIRONMENT
+
+=head2 PERL_WASM_WASMTIME_MEMORY
+
+This environment variable, if set, should be a colon separated list of values for
+C<static_memory_maximum_size>, C<static_memory_guard_size> and C<dynamic_memory_guard_size>.
+See L<Wasm::Wasmtime::Config> for more details on these limits.
 
 =head1 SEE ALSO
 

@@ -6,6 +6,9 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Device::Chip::HTU21D',
    requires => {
+      'perl' => '5.026',
+      'Object::Pad' => '0.19',
+
       'Data::Bitfield' => '0.02',
       'Device::Chip' => '0.03',
       'Future::AsyncAwait' => 0,

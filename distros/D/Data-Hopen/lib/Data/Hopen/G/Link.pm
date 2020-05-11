@@ -3,7 +3,7 @@ package Data::Hopen::G::Link;
 use strict;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000015';
+our $VERSION = '0.000017';
 
 use parent 'Data::Hopen::G::Runnable';
 use Class::Tiny {
@@ -32,6 +32,9 @@ Copy the inputs to the outputs.
     my $hrOutputs = $op->run($scope)
 
 The output is C<{}> if no inputs are provided.
+
+By default, the output is a copy of the inputs
+(see L<Data::Hopen::G::Runnable/passthrough>).
 
 =cut
 

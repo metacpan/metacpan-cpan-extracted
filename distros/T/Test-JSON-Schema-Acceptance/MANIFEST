@@ -20,6 +20,7 @@ share/remotes/name-defs.json
 share/remotes/name.json
 share/remotes/subSchemas-defs.json
 share/remotes/subSchemas.json
+share/submodule_status
 share/test-schema.json
 share/tests/draft2019-09/additionalItems.json
 share/tests/draft2019-09/additionalProperties.json
@@ -254,7 +255,9 @@ t/06-subset-of-tests.t
 t/07-skip-tests-deprecated.t
 t/08-todo-tests.t
 t/09-unicode.t
+t/10-exception.t
 t/lib/SchemaParser.pm
+t/tests/bad/invalid-schema.json
 t/tests/simple-booleans/bar.json
 t/tests/simple-booleans/foo.json
 t/tests/subset/bar.json

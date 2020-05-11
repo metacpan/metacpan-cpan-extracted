@@ -19,6 +19,7 @@ lib/Duadua/Parser/Bot/Feedbin.pm
 lib/Duadua/Parser/Bot/Feedeen.pm
 lib/Duadua/Parser/Bot/Feedly.pm
 lib/Duadua/Parser/Bot/Feedspot.pm
+lib/Duadua/Parser/Bot/Flipboard.pm
 lib/Duadua/Parser/Bot/Googlebot.pm
 lib/Duadua/Parser/Bot/GooglebotAd.pm
 lib/Duadua/Parser/Bot/GooglebotMisc.pm
@@ -87,6 +88,7 @@ t/testset/bot/feedbin.yaml
 t/testset/bot/feedeen.yaml
 t/testset/bot/feedly.yaml
 t/testset/bot/feedspot.yaml
+t/testset/bot/flipboard.yaml
 t/testset/bot/google_read.yaml
 t/testset/bot/googlebot.yaml
 t/testset/bot/googlebot_ad.yaml

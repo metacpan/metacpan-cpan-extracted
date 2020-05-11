@@ -1,5 +1,5 @@
 #
-# $Id: Process.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
+# $Id$
 #
 # system::process Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6bd6acfc81d5 $',
+      revision => '$Revision$',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -34,6 +34,7 @@ sub brik_properties {
          is_running_from_string => [ qw(string) ],
          get_pid_from_string => [ qw(string) ],
          get_pid_list_from_string => [ qw(string) ],
+         get_pid_list_from_regex => [ qw(regex) ],
          get_process_info => [ qw(process) ],
          kill => [ qw(process|pid) ],
          start => [ qw($sub) ],
@@ -183,6 +184,26 @@ sub get_pid_list_from_string {
    for my $this (@$list) {
       my $command = $this->{COMMAND};
       if ($command =~ m{$string}i) {
+         push @pids, $this->{PID};
+      }
+   }
+
+   return \@pids;
+}
+
+sub get_pid_list_from_regex {
+   my $self = shift;
+   my ($regex) = @_;
+
+   $self->brik_help_run_undef_arg('get_pid_list_from_regex', $regex)
+      or return;
+
+   my @pids = ();
+
+   my $list = $self->list or return;
+   for my $this (@$list) {
+      my $command = $this->{COMMAND};
+      if ($command =~ m{$regex}i) {
          push @pids, $this->{PID};
       }
    }
@@ -549,7 +570,7 @@ Metabrik::System::Process - system::process Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

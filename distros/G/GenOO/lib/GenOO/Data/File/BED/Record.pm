@@ -49,7 +49,7 @@ GenOO::Data::File::BED::Record - Object representing a record of a bed file
 # Let the code begin...
 
 package GenOO::Data::File::BED::Record;
-$GenOO::Data::File::BED::Record::VERSION = '1.5.1';
+$GenOO::Data::File::BED::Record::VERSION = '1.5.2';
 use Moose;
 use namespace::autoclean;
 

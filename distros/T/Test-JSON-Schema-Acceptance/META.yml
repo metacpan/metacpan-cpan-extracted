@@ -36,7 +36,7 @@ no_index:
 provides:
   Test::JSON::Schema::Acceptance:
     file: lib/Test/JSON/Schema/Acceptance.pm
-    version: '0.992'
+    version: '0.993'
 requires:
   File::ShareDir: '0'
   JSON::MaybeXS: '1.004001'
@@ -56,7 +56,7 @@ resources:
   bugtracker: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance/issues
   homepage: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance
   repository: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance.git
-version: '0.992'
+version: '0.993'
 x_Dist_Zilla:
   perl:
     version: '5.031011'
@@ -746,7 +746,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.992
+          tag: v0.993
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -881,6 +881,10 @@ x_Dist_Zilla:
           include_untracked: 0
       name: 'Gather sharedir'
       version: '2.046'
+    -
+      class: Dist::Zilla::Plugin::GenerateFile
+      name: GenerateFile
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: ShareDir

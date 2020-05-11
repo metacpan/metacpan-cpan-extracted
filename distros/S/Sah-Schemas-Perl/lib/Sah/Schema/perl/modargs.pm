@@ -1,35 +1,16 @@
 package Sah::Schema::perl::modargs;
 
-our $DATE = '2020-02-15'; # DATE
-our $VERSION = '0.027'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-08'; # DATE
+our $DIST = 'Sah-Schemas-Perl'; # DIST
+our $VERSION = '0.031'; # VERSION
 
-our $schema = [str => {
-    summary => 'Perl module name with optional arguments',
-    description => <<'_',
-
-Perl module name with optional arguments which will be used as import arguments,
-just like the `-MMODULE=ARGS` shortcut that `perl` provides. Examples:
-
-    Foo
-    Foo::Bar
-    Foo::Bar=arg1,arg2
-
-See also: `perl::modname`.
-
-_
-    match => '\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*(?:=.*)?\z',
-
-    #'x.perl.coerce_rules' => [
-    #    'From_str::normalize_perl_modname',
-    #],
-
-    # XXX also provide completion for arguments
-    'x.completion' => 'perl_modname',
-
+our $schema = ['perl::modname_with_optional_args' => {
+    summary => 'Shorter alias for perl::modname_with_optional_args',
 }, {}];
 
 1;
-# ABSTRACT: Perl module name with optional arguments
+# ABSTRACT: Shorter alias for perl::modname_with_optional_args
 
 __END__
 
@@ -39,22 +20,72 @@ __END__
 
 =head1 NAME
 
-Sah::Schema::perl::modargs - Perl module name with optional arguments
+Sah::Schema::perl::modargs - Shorter alias for perl::modname_with_optional_args
 
 =head1 VERSION
 
-This document describes version 0.027 of Sah::Schema::perl::modargs (from Perl distribution Sah-Schemas-Perl), released on 2020-02-15.
+This document describes version 0.031 of Sah::Schema::perl::modargs (from Perl distribution Sah-Schemas-Perl), released on 2020-05-08.
 
-=head1 DESCRIPTION
+=head1 SYNOPSIS
 
-Perl module name with optional arguments which will be used as import arguments,
-just like the C<-MMODULE=ARGS> shortcut that C<perl> provides. Examples:
+To check data against this schema (requires L<Data::Sah>):
 
- Foo
- Foo::Bar
- Foo::Bar=arg1,arg2
+ use Data::Sah qw(gen_validator);
+ my $validator = gen_validator("perl::modargs*");
+ say $validator->($data) ? "valid" : "INVALID!";
 
-See also: C<perl::modname>.
+ # Data::Sah can also create validator that returns nice error message string
+ # and/or coerced value. Data::Sah can even create validator that targets other
+ # language, like JavaScript. All from the same schema. See its documentation
+ # for more details.
+
+To validate function parameters against this schema (requires L<Params::Sah>):
+
+ use Params::Sah qw(gen_validator);
+
+ sub myfunc {
+     my @args = @_;
+     state $validator = gen_validator("perl::modargs*");
+     $validator->(\@args);
+     ...
+ }
+
+To specify schema in L<Rinci> function metadata and use the metadata with
+L<Perinci::CmdLine> to create a CLI:
+
+ # in lib/MyApp.pm
+ package MyApp;
+ our %SPEC;
+ $SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['perl::modargs*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my %args = @_;
+     ...
+ }
+ 1;
+
+ # in myapp.pl
+ package main;
+ use Perinci::CmdLine::Any;
+ Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+
+ # in command-line
+ % ./myapp.pl --help
+ myapp - Routine to do blah ...
+ ...
+
+ % ./myapp.pl --version
+
+ % ./myapp.pl --arg1 ...
 
 =head1 HOMEPAGE
 

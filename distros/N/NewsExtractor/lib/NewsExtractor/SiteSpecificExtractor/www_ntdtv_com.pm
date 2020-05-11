@@ -23,9 +23,12 @@ sub journalist {
         \n
         (
             新唐人亞太電視\p{Letter}+?報導
+            | ( 新唐人記者[\p{Letter}、]+報導 )
+            | ( 新唐人\p{Letter}+記者站綜合報導 )
             | （\s* 記者\p{Letter}+報導/責任編輯：\p{Letter}+ \s*）
             | （\s* 責任編輯：\p{Letter}+ \s*）
             | （轉自\p{Letter}+/責任編輯：\p{Letter}+ \s*）
+            | ( 採訪/\p{Letter}+ \s+ 編輯/\p{Letter}+ \s+ 後製/\p{Letter}+ )
         )
         \z}xs;
 

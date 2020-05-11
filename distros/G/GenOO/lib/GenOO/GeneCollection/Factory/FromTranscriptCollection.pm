@@ -47,7 +47,7 @@ GenOO::GeneCollection::Factory::FromTranscriptCollection - Factory for creating 
 # Let the code begin...
 
 package GenOO::GeneCollection::Factory::FromTranscriptCollection;
-$GenOO::GeneCollection::Factory::FromTranscriptCollection::VERSION = '1.5.1';
+$GenOO::GeneCollection::Factory::FromTranscriptCollection::VERSION = '1.5.2';
 use Moose;
 use namespace::autoclean;
 

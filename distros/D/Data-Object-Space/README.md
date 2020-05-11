@@ -22,13 +22,13 @@ This package provides methods for parsing and manipulating package namespaces.
 
 This package inherits behaviors from:
 
-[Data::Object::Name](https://metacpan.org/pod/Data%3A%3AObject%3A%3AName)
+[Data::Object::Name](https://metacpan.org/pod/Data::Object::Name)
 
 # LIBRARIES
 
 This package uses type constraints from:
 
-[Types::Standard](https://metacpan.org/pod/Types%3A%3AStandard)
+[Types::Standard](https://metacpan.org/pod/Types::Standard)
 
 # METHODS
 
@@ -225,7 +225,7 @@ and if successful returns the resulting value.
 
     child(Str $arg1) : Object
 
-The child method returns a new [Data::Object::Space](https://metacpan.org/pod/Data%3A%3AObject%3A%3ASpace) object for the child
+The child method returns a new [Data::Object::Space](https://metacpan.org/pod/Data::Object::Space) object for the child
 package namespace.
 
 - child example #1
@@ -243,7 +243,7 @@ package namespace.
     children() : ArrayRef[Object]
 
 The children method searches `%INC` and `@INC` and retuns a list of
-[Data::Object::Space](https://metacpan.org/pod/Data%3A%3AObject%3A%3ASpace) objects for each child namespace found (one level deep).
+[Data::Object::Space](https://metacpan.org/pod/Data::Object::Space) objects for each child namespace found (one level deep).
 
 - children example #1
 
@@ -539,7 +539,7 @@ string.
 
         use Data::Object::Space;
 
-        my $space = Data::Object::Space->new('foo');
+        my $space = Data::Object::Space->new('brianne_spinka');
 
         $space->locate;
 
@@ -602,7 +602,7 @@ The name method returns the fully-qualified package name.
 
     parent() : Object
 
-The parent method returns a new [Data::Object::Space](https://metacpan.org/pod/Data%3A%3AObject%3A%3ASpace) object for the parent
+The parent method returns a new [Data::Object::Space](https://metacpan.org/pod/Data::Object::Space) object for the parent
 package namespace.
 
 - parent example #1
@@ -851,7 +851,7 @@ names.
 
     sibling(Str $arg1) : Object
 
-The sibling method returns a new [Data::Object::Space](https://metacpan.org/pod/Data%3A%3AObject%3A%3ASpace) object for the sibling
+The sibling method returns a new [Data::Object::Space](https://metacpan.org/pod/Data::Object::Space) object for the sibling
 package namespace.
 
 - sibling example #1
@@ -867,7 +867,7 @@ package namespace.
     siblings() : ArrayRef[Object]
 
 The siblings method searches `%INC` and `@INC` and retuns a list of
-[Data::Object::Space](https://metacpan.org/pod/Data%3A%3AObject%3A%3ASpace) objects for each sibling namespace found (one level
+[Data::Object::Space](https://metacpan.org/pod/Data::Object::Space) objects for each sibling namespace found (one level
 deep).
 
 - siblings example #1

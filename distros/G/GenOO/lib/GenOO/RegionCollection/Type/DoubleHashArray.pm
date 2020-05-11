@@ -38,7 +38,7 @@ GenOO::RegionCollection::Type::DoubleHashArray - Object for a collection of GenO
 # Let the code begin...
 
 package GenOO::RegionCollection::Type::DoubleHashArray;
-$GenOO::RegionCollection::Type::DoubleHashArray::VERSION = '1.5.1';
+$GenOO::RegionCollection::Type::DoubleHashArray::VERSION = '1.5.2';
 
 #######################################################################
 #######################   Load External modules   #####################

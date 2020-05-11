@@ -5,7 +5,7 @@ use Mojo::File qw(path);
 
 use File::ShareDir qw(dist_dir);
 
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.4';
 
 sub register {
     my ($self, $app, $config) = @_;
@@ -21,7 +21,13 @@ sub register {
 
     # --- Adding the route
     my $url = $config->{url} // '/v1';
-    $prefix->get(q(/) => { url => $url })
+    my $title = $config->{title} // 'Swagger UI';
+    my $favicon
+        = (defined $config->{favicon} and $app->static()->file($config->{favicon}))
+        ? $config->{favicon}
+        : undef;
+
+    $prefix->get(q(/) => { url => $url, title => $title, favicon => $favicon })
         ->name('swagger_ui');
 
     return;
@@ -42,6 +48,16 @@ Mojolicious::Plugin::SwaggerUI - Swagger UI plugin for Mojolicious
         route => app->routes()->any('/swagger'),
         url => '/swagger.json',
     };
+    
+    # Mojolicious Full
+    $app->plugin(
+        SwaggerUI => {
+            route   => $app->routes()->any('api'),
+            url     => "/api/v1",
+            title   => "Mojolicious App",
+            favicon => "/images/favicon.png"
+        }
+    );
 
 =head1 DESCRIPTION
 
@@ -78,9 +94,32 @@ B<NOTE:>
 L<Mojolicious::Plugin::OpenAPI> can expose the JSON Swagger spec under the base path route. 
 You can just point the path in her and it will automatically work.
 
+=head2 title
+
+    plugin 'SwaggerUI' => {
+        title => 'Project Title'
+    };
+
+The HTML title that you want to show on swagger-ui page. Deafult to 'Swagger UI'
+
+=head2 favicon
+
+    plugin 'SwaggerUI' => {
+        favicon => '/images/favicon.png'
+    };
+
+Favicon which you want to associate with swagger-ui page.
+
+It will be served automatically from a 'public' directory if it exists.
+In case of non existence mojolicious default favicon will be displayed.
+
 =head1 AUTHOR
 
-Tudor Marghidanu L<tudor@marghidanu.com>
+Tudor Marghidanu C<tudor@marghidanu.com>
+
+=head1 CREDITS
+
+Gaurav Rai C<gauravrai7860@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

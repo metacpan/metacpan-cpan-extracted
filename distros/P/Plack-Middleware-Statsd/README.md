@@ -4,7 +4,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 # VERSION
 
-version v0.4.4
+version v0.4.5
 
 # SYNOPSIS
 
@@ -165,6 +165,13 @@ The following metrics are logged:
 - `psgi.worker.pid`
 
     The worker PID is added to the set.
+
+    Note that this is set after the request is processed.  This means that
+    while the set size can be used to indicate the number of active
+    workers, if the workers are busy (i.e. longer request processing
+    times), then this will show a lower number.
+
+    This was added in v0.3.10.
 
 - `psgix.harakiri`
 

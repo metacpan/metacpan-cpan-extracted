@@ -1,3 +1,6 @@
+0.15 2020-05-08
+        - Fix test behaviour for recent Mojolicious versions.
+
 0.14 2018-08-11
         - Remove memory leak in validator check.
 

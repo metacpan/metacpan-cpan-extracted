@@ -1,5 +1,5 @@
 #
-# $Id: Dns.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
+# $Id$
 #
 # network::dns Brik
 #
@@ -12,7 +12,7 @@ use base qw(Metabrik);
 # Default attribute values put here will BE inherited by subclasses
 sub brik_properties {
    return {
-      revision => '$Revision: 6bd6acfc81d5 $',
+      revision => '$Revision$',
       tags => [ qw(unstable ns nameserver) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -214,11 +214,17 @@ sub background_lookup {
    };
    if ($@) {
       chomp($@);
-      return $self->log->error("background_lookup: bgsend exception [$@]");
+      my $ns = ref($nameserver) eq 'ARRAY' ? join('|', @$nameserver)
+         : $nameserver;
+      return $self->log->error("background_lookup: bgsend exception [$@], ".
+         "with nameservers [$ns] and port [$port]");
    }
    elsif (! defined($handle)) {
+      my $ns = ref($nameserver) eq 'ARRAY' ? join('|', @$nameserver)
+         : $nameserver;
       return $self->log->error("background_lookup: query failed [".
-         $resolver->errorstring."]");
+         $resolver->errorstring."], with nameservers [$ns] and ".
+         "port [$port]");
    }
 
    return $handle;
@@ -235,7 +241,7 @@ sub background_read {
       or return;
 
    # Answer not ready
-   if (! $resolver->bgisready($handle)) {
+   if ($resolver->bgbusy($handle)) {
       return 0;
    }
 
@@ -343,7 +349,7 @@ Metabrik::Network::Dns - network::dns Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

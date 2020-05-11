@@ -1,7 +1,9 @@
 package App::lcpan::Cmd::extract_dist;
 
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '1.056'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-07'; # DATE
+our $DIST = 'App-lcpan'; # DIST
+our $VERSION = '1.057'; # VERSION
 
 use 5.010;
 use strict;
@@ -31,12 +33,11 @@ sub handle_cmd {
     my $dist = $args{dist};
 
     my $row = $dbh->selectrow_hashref("SELECT
-  file.cpanid cpanid,
-  file.name name
-FROM dist
-LEFT JOIN file ON dist.file_id=file.id
-WHERE dist.name=?
-ORDER BY version_numified DESC
+  cpanid cpanid,
+  name name
+FROM file
+WHERE dist_name=? AND is_latest_dist=1
+ORDER BY dist_version_numified DESC
 ", {}, $dist);
 
     return [404, "No release for distribution '$dist'"] unless $row;
@@ -67,7 +68,7 @@ App::lcpan::Cmd::extract_dist - Extract a distribution's latest release file to 
 
 =head1 VERSION
 
-This document describes version 1.056 of App::lcpan::Cmd::extract_dist (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of App::lcpan::Cmd::extract_dist (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 FUNCTIONS
 

@@ -1,9 +1,9 @@
 package Dist::Zilla::Plugin::Sah::Schemas;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-02'; # DATE
+our $DATE = '2020-05-08'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-Sah-Schemas'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 use 5.010001;
 use strict;
@@ -266,15 +266,15 @@ sub register_prereqs {
         my $nsch = ${"$mod\::schema"};
         my $rsch = Data::Sah::Resolve::resolve_schema($nsch);
         # add prereqs to XCompletion modules
-        if (my $xc = $nsch->[1]{'x.completion'}) {
-            my @c = ref($xc) eq 'CODE' ? () :
-                ref($xc) eq 'ARRAY' ? @$xc : ($xc);
-            for my $c (@c) {
-                my $xcmod = "Perinci::Sub::XCompletion::$c";
-                next if $self->is_package_declared($xcmod);
-                $self->log(["Adding prereq to %s", $xcmod]);
-                $self->zilla->register_prereqs({phase=>'runtime'}, $xcmod => version_from_pmversions($xcmod) // 0);
-            }
+        {
+            my $xc = $nsch->[1]{'x.completion'};
+            last unless $xc;
+            last if ref $xc eq 'CODE';
+            $xc = $xc->[0] if ref $xc eq 'ARRAY';
+            my $xcmod = "Perinci::Sub::XCompletion::$xc";
+            next if $self->is_package_declared($xcmod);
+            $self->log(["Adding prereq to %s", $xcmod]);
+            $self->zilla->register_prereqs({phase=>'runtime'}, $xcmod => version_from_pmversions($xcmod) // 0);
         }
         # add prereqs to coerce modules
         for my $key ('x.coerce_rules', 'x.perl.coerce_rules') {
@@ -307,7 +307,7 @@ Dist::Zilla::Plugin::Sah::Schemas - Plugin to use when building Sah-Schemas-* di
 
 =head1 VERSION
 
-This document describes version 0.017 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2020-03-02.
+This document describes version 0.018 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2020-05-08.
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,8 @@
+0.1.2 2020-05-11
+
+    - Creating a directory for the generated parser prior to its
+      generation.
+
 0.1.1 2020-02-25
  
     - Added explicit import for File::Spec::Functions::catdir().

@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.496
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-11'; # DATE
+our $DATE = '2020-05-07'; # DATE
 our $DIST = 'App-BrowserUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,13 +40,15 @@ pause-browsers - Pause (kill -STOP) browsers
 
 =head1 VERSION
 
-This document describes version 0.004 of pause-browsers (from Perl distribution App-BrowserUtils), released on 2020-04-11.
+This document describes version 0.006 of pause-browsers (from Perl distribution App-BrowserUtils), released on 2020-05-07.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % pause-browsers [options]
+ % pause-browsers [--debug] [--format=name] [--json] [--log-level=level]
+     [--(no)naked-res] [--page-result[=program]] [--quiet] [--trace]
+     [--user=s+] [--users-json=s] [--verbose]
 
 =head1 DESCRIPTION
 
@@ -54,7 +56,7 @@ A modern browser now runs complex web pages and applications. Despite browser's
 power management feature, these pages/tabs on the browser often still eat
 considerable CPU cycles even though they only run in the background. Stopping
 (kill -STOP) the browser processes is a simple and effective way to stop CPU
-eating on Unix. It can be performed whenever you are not using your browsers for
+eating on Unix. It can be performed whenever you are not using your browser for
 a little while, e.g. when you are typing on an editor or watching a movie. When
 you want to use your browser again, simply unpause it.
 

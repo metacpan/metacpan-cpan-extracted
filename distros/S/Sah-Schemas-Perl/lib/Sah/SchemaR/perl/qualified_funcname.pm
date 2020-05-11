@@ -1,12 +1,12 @@
 package Sah::SchemaR::perl::qualified_funcname;
 
-our $DATE = '2020-02-15'; # DATE
-our $VERSION = '0.027'; # VERSION
+our $DATE = '2020-05-08'; # DATE
+our $VERSION = '0.031'; # VERSION
 
-our $rschema = ["str",[{description=>"\nCurrently function name is restricted to this regex:\n\n    \\A[A-Za-z_][A-Za-z_0-9]*\\z\n\nand package name is restricted to this regex:\n\n    [A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*\n\nThis schema includes syntax validity check only; it does not check whether the\nfunction actually exists.\n\n",match=>"\\A(?:[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*::)[A-Za-z_]([A-Za-z_0-9]+)*\\z",summary=>"Perl function name, qualified with a package name"}],["str"]];
+our $rschema = ["str",[{description=>"\nCurrently function name is restricted to this regex:\n\n    \\A[A-Za-z_][A-Za-z_0-9]*\\z\n\nand package name is restricted to this regex:\n\n    [A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*\n\nThis schema includes syntax validity check only; it does not check whether the\nfunction actually exists.\n\n",match=>"\\A(?:[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*::)[A-Za-z_]([A-Za-z_0-9]+)*\\z",summary=>"Perl function name qualified with a package name, e.g. Foo::subname"}],["str"]];
 
 1;
-# ABSTRACT: Perl function name, qualified with a package name
+# ABSTRACT: Perl function name qualified with a package name, e.g. Foo::subname
 
 __END__
 
@@ -16,11 +16,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::perl::qualified_funcname - Perl function name, qualified with a package name
+Sah::SchemaR::perl::qualified_funcname - Perl function name qualified with a package name, e.g. Foo::subname
 
 =head1 VERSION
 
-This document describes version 0.027 of Sah::SchemaR::perl::qualified_funcname (from Perl distribution Sah-Schemas-Perl), released on 2020-02-15.
+This document describes version 0.031 of Sah::SchemaR::perl::qualified_funcname (from Perl distribution Sah-Schemas-Perl), released on 2020-05-08.
 
 =head1 DESCRIPTION
 

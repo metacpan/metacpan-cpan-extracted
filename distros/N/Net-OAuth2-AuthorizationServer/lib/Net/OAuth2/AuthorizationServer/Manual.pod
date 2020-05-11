@@ -43,10 +43,8 @@ issuance of refresh tokens) and is optimized for public clients known to operate
 a particular redirection URI. These clients are typically implemented in a browser
 using a scripting language such as JavaScript.
 
-The "Password Grant" type is suitable in cases where the resource owner has a trust
-relationship with the client, such as the device operating system or a highly
-privileged application. The authorization server should take special care when
-enabling this grant type and only allow it when other flows are not viable.
+The "Password Grant" type MUST NOT be used according to recent draft RFC
+L<https://tools.ietf.org/html/draft-ietf-oauth-security-topics-15>
 
 The "Client Credentials Grant" can request an access token using only its client
 credentials (or other supported means of authentication) when the client is
@@ -706,6 +704,26 @@ L<https://stackoverflow.com/questions/1626575/best-practices-around-generating-o
 L<https://stackoverflow.com/questions/1878830/securly-storing-openid-identifiers-and-oauth-tokens>
 
 L<https://stackoverflow.com/questions/4419915/how-to-keep-the-oauth-consumer-secret-safe-and-how-to-react-when-its-compromis>
+
+=head1 FURTHER READING
+
+L<http://tools.ietf.org/html/rfc6749> - The OAuth 2.0 Authorization Framework.
+
+L<https://tools.ietf.org/html/rfc6819> - OAuth 2.0 Threat Model and Security Considerations.
+
+L<https://tools.ietf.org/html/rfc6750> - The OAuth 2.0 Authorization Framework: Bearer Token Usage.
+
+L<https://tools.ietf.org/html/rfc7521> - Assertion Framework for OAuth 2.0.
+
+L<https://tools.ietf.org/html/rfc7522> - Security Assertion Markup Language (SAML) 2.0 Profile for OAuth 2.0 Client Authentication and Authorization Grants.
+
+L<https://tools.ietf.org/html/rfc7523> - JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication and Authorization Grants.
+
+L<https://tools.ietf.org/html/rfc7636> - Proof Key for Code Exchange by OAuth Public Clients
+
+L<https://tools.ietf.org/html/rfc8705> - OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens, 
+
+L<https://tools.ietf.org/html/draft-ietf-oauth-security-topics-15> - OAuth 2.0 Security Best Current Practice (Draft).
 
 =head1 REFERENCES
 

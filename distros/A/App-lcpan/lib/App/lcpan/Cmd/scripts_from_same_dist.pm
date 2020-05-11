@@ -1,7 +1,9 @@
 package App::lcpan::Cmd::scripts_from_same_dist;
 
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '1.056'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-07'; # DATE
+our $DIST = 'App-lcpan'; # DIST
+our $VERSION = '1.057'; # VERSION
 
 use 5.010;
 use strict;
@@ -31,18 +33,18 @@ sub handle_cmd {
 
     my $escripts = join(",", map {$dbh->quote($_)} @{ $args{scripts} });
     my @where;
-    push @where, "dist.name IN (SELECT name FROM dist WHERE file_id IN (SELECT file_id FROM script WHERE name IN ($escripts)))";
+    push @where, "f1.dist_name IN (SELECT dist_name FROM file f2 WHERE id IN (SELECT file_id FROM script WHERE name IN ($escripts)))";
     if ($args{latest}) {
-        push @where, "dist.is_latest";
+        push @where, "f1.is_latest_dist";
     } elsif (defined $args{latest}) {
-        push @where, "NOT(dist.is_latest)";
+        push @where, "NOT(f1.is_latest_dist)";
     }
     my $sth = $dbh->prepare("SELECT
   script.name name,
-  dist.name dist,
-  dist.version dist_version
+  f1.dist_name dist,
+  f1.dist_version dist_version
 FROM script
-JOIN dist ON script.file_id=dist.file_id
+JOIN file f1 ON script.file_id=f1.id
 WHERE ".join(" AND ", @where)."
 ORDER BY name DESC");
     $sth->execute;
@@ -71,7 +73,7 @@ App::lcpan::Cmd::scripts_from_same_dist - Given a script, list all scripts in th
 
 =head1 VERSION
 
-This document describes version 1.056 of App::lcpan::Cmd::scripts_from_same_dist (from Perl distribution App-lcpan), released on 2020-05-06.
+This document describes version 1.057 of App::lcpan::Cmd::scripts_from_same_dist (from Perl distribution App-lcpan), released on 2020-05-07.
 
 =head1 FUNCTIONS
 
