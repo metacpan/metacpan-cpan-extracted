@@ -1,3 +1,4 @@
+# ABSTRACT: Test Automation, Docs Generation
 package Test::Auto;
 
 use strict;
@@ -16,7 +17,7 @@ use base 'Exporter';
 
 our @EXPORT = 'testauto';
 
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
 # ATTRIBUTES
 
@@ -342,7 +343,8 @@ This method returns a L<Test::Auto::Subtests> object.
 
 The specification is designed to accommodate typical package declarations. It
 is used by the parser to provide the content used in the test automation and
-document generation.
+document generation. Note: when code blocks are evaluated I<"redefined">
+warnings are now automatically disabled.
 
 =head2 name
 

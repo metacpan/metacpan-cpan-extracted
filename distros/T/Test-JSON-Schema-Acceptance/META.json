@@ -71,6 +71,7 @@
             "Path::Tiny" : "0",
             "Test::Fatal" : "0",
             "Test::More" : "0.88",
+            "Types::Common::Numeric" : "0",
             "Types::Standard" : "1.010002",
             "if" : "0",
             "namespace::clean" : "0",
@@ -181,7 +182,7 @@
    "provides" : {
       "Test::JSON::Schema::Acceptance" : {
          "file" : "lib/Test/JSON/Schema/Acceptance.pm",
-         "version" : "0.993"
+         "version" : "0.994"
       }
    },
    "release_status" : "stable",
@@ -196,7 +197,7 @@
          "web" : "https://github.com/karenetheridge/Test-JSON-Schema-Acceptance"
       }
    },
-   "version" : "0.993",
+   "version" : "0.994",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.031011"
@@ -1101,7 +1102,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.993",
+                  "tag" : "v0.994",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

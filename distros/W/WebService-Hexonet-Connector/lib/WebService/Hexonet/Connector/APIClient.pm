@@ -4,6 +4,7 @@ use 5.026_000;
 use strict;
 use warnings;
 use utf8;
+use WebService::Hexonet::Connector::Logger;
 use WebService::Hexonet::Connector::Response;
 use WebService::Hexonet::Connector::ResponseTemplateManager;
 use WebService::Hexonet::Connector::SocketConfig;
@@ -19,7 +20,7 @@ Readonly my $IDX4                         => 4;                                 
 Readonly our $ISPAPI_CONNECTION_URL       => 'https://api.ispapi.net/api/call.cgi';    # Default Connection Setup URL
 Readonly our $ISPAPI_CONNECTION_URL_PROXY => 'http://127.0.0.1/api/call.cgi';          # High Speed Connection Setup URL
 
-use version 0.9917; our $VERSION = version->declare('v2.5.0');
+use version 0.9917; our $VERSION = version->declare('v2.9.0');
 
 my $rtm = WebService::Hexonet::Connector::ResponseTemplateManager->getInstance();
 
@@ -31,10 +32,28 @@ sub new {
         debugMode    => 0,
         socketConfig => WebService::Hexonet::Connector::SocketConfig->new(),
         ua           => q{},
-        curlopts     => {}
+        curlopts     => {},
+        logger       => WebService::Hexonet::Connector::Logger->new()
     }, $class;
     $self->setURL($ISPAPI_CONNECTION_URL);
     $self->useLIVESystem();
+    $self->setDefaultLogger();
+    return $self;
+}
+
+
+sub setDefaultLogger {
+    my $self = shift;
+    $self->{logger} = WebService::Hexonet::Connector::Logger->new();
+    return $self;
+}
+
+
+sub setCustomLogger {
+    my ( $self, $logger ) = shift;
+    if ( defined($logger) && $logger->can('log') ) {
+        $self->{logger} = $logger;
+    }
     return $self;
 }
 
@@ -54,17 +73,25 @@ sub disableDebugMode {
 
 
 sub getPOSTData {
-    my ( $self, $cmd ) = @_;
+    my ( $self, $cmd, $secured ) = @_;
     my $post = $self->{socketConfig}->getPOSTData();
-    my $tmp  = q{};
+    if ( defined($secured) && $secured == 1 ) {
+        $post->{s_pw} = '***';
+    }
+    my $tmp = q{};
     if ( ( ref $cmd ) eq 'HASH' ) {
         foreach my $key ( sort keys %{$cmd} ) {
             if ( defined $cmd->{$key} ) {
                 my $val = $cmd->{$key};
-                $val =~ s/[\r\n]//gmsx;
+                $val =~ s/[\r\n]//msx;
                 $tmp .= "${key}=${val}\n";
             }
         }
+    } else {
+        $tmp = $cmd;
+    }
+    if ( defined($secured) && $secured == 1 ) {
+        $tmp =~ s/PASSWORD\=[^\n]+/PASSWORD=***/gmsx;
     }
     $tmp =~ s/\n$//msx;
     if ( utf8::is_utf8($tmp) ) {
@@ -104,11 +131,15 @@ sub getUserAgent {
 
 
 sub setUserAgent {
-    my ( $self, $str, $rv ) = @_;
+    my ( $self, $str, $rv, $modules ) = @_;
     my $arch = (POSIX::uname)[ $IDX4 ];
     my $os   = (POSIX::uname)[ 0 ];
     my $rv2  = $self->getVersion();
-    $self->{ua} = "$str ($os; $arch; rv:$rv) perl-sdk/$rv2 perl/$Config{version}";
+    my $mods = q{};
+    if ( defined $modules && length($modules) > 0 ) {
+        $mods = q{ } . join q{ }, @{$modules};
+    }
+    $self->{ua} = "$str ($os; $arch; rv:$rv)$mods perl-sdk/$rv2 perl/$Config{version}";
     return $self;
 }
 
@@ -283,7 +314,9 @@ sub request {
     $newcmd = $self->_autoIDNConvert($newcmd);
 
     # request command to API
-    my $data = $self->getPOSTData($newcmd);
+    my $cfg     = { CONNECTION_URL => $self->{socketURL} };
+    my $post    = $self->getPOSTData($newcmd);
+    my $secured = $self->getPOSTData( $newcmd, 1 );
 
     my $ua = LWP::UserAgent->new();
     $ua->agent( $self->getUserAgent() );
@@ -298,25 +331,19 @@ sub request {
         $ua->proxy( [ 'http', 'https' ], $proxy );
     }
 
-    my $post = $self->getPOSTData($cmd);
-    my $r = $ua->post( $self->{socketURL}, $post );
+    my $r = $ua->post( $cfg->{CONNECTION_URL}, $post );
     if ( $r->is_success ) {
-        $r = $r->decoded_content;
+        $r = WebService::Hexonet::Connector::Response->new( $r->decoded_content, $newcmd, $cfg );
         if ( $self->{debugMode} ) {
-            print {*STDOUT} Dumper($cmd);
-            print {*STDOUT} Dumper($post);
-            print {*STDOUT} Dumper($r);
+            $self->{logger}->log( $secured, $r );
         }
     } else {
-        my $err = $r->status_line;
-        $r = $rtm->getTemplate('httperror')->getPlain();
+        $r = WebService::Hexonet::Connector::Response->new( $rtm->getTemplate('httperror')->getPlain(), $newcmd, $cfg );
         if ( $self->{debugMode} ) {
-            print {*STDERR} Dumper($cmd);
-            print {*STDERR} Dumper($post);
-            print {*STDERR} Dumper($r);
+            $self->{logger}->log( $secured, $r, $r->status_line );
         }
     }
-    return WebService::Hexonet::Connector::Response->new( $r, $newcmd );
+    return $r;
 }
 
 
@@ -575,10 +602,11 @@ Returns the current L<WebService::Hexonet::Connector::APIClient|WebService::Hexo
 Deactivates the debug mode. Debug mode is inactive by default.
 Returns the current L<WebService::Hexonet::Connector::APIClient|WebService::Hexonet::Connector::APIClient> instance in use for method chaining.
 
-=item C<getPOSTData( $command )>
+=item C<getPOSTData( $command, $secured )>
 
 Get POST data fields ready to use for HTTP communication based on LWP::UserAgent.
 Specify the API command for the request by $command.
+Specify if password data has to be replaced with asterix to secure it for output purposes by $secured. Optional.
 This method is internally used by the request method.
 Returns a hash.
 
@@ -664,10 +692,11 @@ specified account specified by $user.
 The specified password $pw belongs to the role user, not to the account.
 Returns the current L<WebService::Hexonet::Connector::APIClient|WebService::Hexonet::Connector::APIClient> instance in use for method chaining.
 
-=item C<setUserAgent( $str, $rv )>
+=item C<setUserAgent( $str, $rv, $modules )>
 
 Set a custom user agent header. This is useful for tools that use our SDK.
 Specify the client label in $str and the revision number in $rv.
+Specify further libraries in use by array $modules. This is optional. Entry Format: "modulename/version".
 Returns the current L<WebService::Hexonet::Connector::APIClient|WebService::Hexonet::Connector::APIClient> instance in use for method chaining .
 
 =item C<login( $otpcode )>

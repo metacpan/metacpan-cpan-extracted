@@ -1,3 +1,7 @@
+0.16 2020-05-12 dmol@cpan.org
+ - fix cpan-testers failures
+ - fix C++ usages instead of C
+
 0.15 2020-05-11 dmol@cpan.org
  - fix tests for RT#132543
 

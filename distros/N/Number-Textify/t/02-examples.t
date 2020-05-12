@@ -63,7 +63,7 @@ my $time_converter_digital_neat = Number::Textify
           ],
 
           joiner => '',
-          formatter => sub { my $format = $_[ 1 ] // '%02d';
+          formatter => sub { my $format = defined $_[ 1 ] ? $_[ 1 ] : '%02d';
                              sprintf $format,
                                $_[ 0 ];
                            },
@@ -122,6 +122,13 @@ for my $case
       '5.5 days',
       '05:13:00:24',
       '5d 13:00:24',
+    ],
+    [ -( ( ( ( 5 * 24 ) + 13 ) * 60 + 0 ) * 60 + 24),
+      '-5 days 13 hours 0 minutes 24 seconds',
+      '-5 days 13 hours 24 seconds',
+      '-5.5 days',
+      '-05:13:00:24',
+      '-5d 13:00:24',
     ],
     [ ( ( ( 54 * 24 ) + 13 ) * 60 + 0 ) * 60 + 24,
       '54 days 13 hours 0 minutes 24 seconds',

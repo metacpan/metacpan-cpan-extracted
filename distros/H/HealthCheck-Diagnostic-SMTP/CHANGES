@@ -1,0 +1,16 @@
+Changelog for HealthCheck-Diagnostic-SMTP
+
+v0.0.3 2020-05-12T16:07:02
+ - No changes found
+
+v0.0.2 2020-05-12T15:19:16
+ - Convert to Dist::Zilla::PluginBundle::Author::GSG (Andrew Hewus Fresh)
+
+v0.0.1 2019-06-28T13:31:49
+ - Unit tests that mock SMTP connections (Mitch McCracken)
+ - Use smtp_connect wrapper & renmae server param (Mitch McCracken)
+ - Make server required & set default port (Mitch McCracken)
+ - Initial working code (Mitch McCracken)
+ - Create distribution files (Mitch McCracken)
+ - Initial Commit (Mitch McCracken)
+ - Initial dist.ini (Mitch McCracken)

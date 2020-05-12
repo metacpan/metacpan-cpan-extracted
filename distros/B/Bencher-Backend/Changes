@@ -1,3 +1,16 @@
+1.049   2020-05-10  Released-By: PERLANCAR; Urgency: medium
+
+	- When profiling, observe --precision to set a repetition loop.
+
+
+1.048   2020-04-29  Released-By: PERLANCAR; Urgency: low
+
+	- Tweak Rinci metadata: replace deprecated
+	  x.schema.{,element_}entity with more specific schema.
+
+	- Avoid perl undef warning.
+
+
 1.047   2020-01-12  Released-By: PERLANCAR; Urgency: medium
 
 	- Allow specifying field format in add_field().

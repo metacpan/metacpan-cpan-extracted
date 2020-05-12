@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "CGI::Util" : "0",
+            "Capture::Tiny" : "0",
             "File::Spec" : "0.82",
             "HTTP::Tiny" : "0",
             "JSON::XS" : "0",
@@ -59,5 +60,5 @@
       },
       "x_IRC" : "irc://irc.perl.org/#smoke"
    },
-   "version" : "1.74"
+   "version" : "1.76"
 }

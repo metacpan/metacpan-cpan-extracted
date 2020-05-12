@@ -2,18 +2,18 @@ NAME
     Bencher::Scenarios::ParamsSah - Benchmark Params::Sah
 
 VERSION
-    This document describes version 0.001 of Bencher::Scenarios::ParamsSah
+    This document describes version 0.002 of Bencher::Scenarios::ParamsSah
     (from Perl distribution Bencher-Scenarios-ParamsSah), released on
-    2020-05-08.
+    2020-05-10.
 
 DESCRIPTION
     This distribution contains the following Bencher scenario modules:
 
-    *   Bencher::Scenario::ParamsSah::Startup
+    *   Bencher::Scenario::ParamsSah::Compile
 
     *   Bencher::Scenario::ParamsSah::Validate
 
-    *   Bencher::Scenario::ParamsSah::Compile
+    *   Bencher::Scenario::ParamsSah::Startup
 
 HOMEPAGE
     Please visit the project's homepage at

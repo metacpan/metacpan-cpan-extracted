@@ -6,6 +6,7 @@ use routines;
 
 use Test::Auto;
 use Test::More;
+use Test::Trap;
 
 =name
 
@@ -45,7 +46,9 @@ method: warn
 
   use FlightRecorder;
 
-  my $f = FlightRecorder->new;
+  my $f = FlightRecorder->new(
+    auto => undef
+  );
 
   # $f->begin('try');
   # $f->debug('something happend');
@@ -61,6 +64,7 @@ Types::Standard
 
 =attributes
 
+auto: ro, opt, Maybe[FileHandle]
 head: rw, opt, Str
 item: ro, opt, HashRef
 refs: ro, opt, HashRef
@@ -220,7 +224,8 @@ info(Str @message) : Object
 =method output
 
 The output method outputs the last event using the format defined in the
-C<format> attribute.
+C<format> attribute. This method is called automatically after each log-event
+if the C<auto> attribute is set, which is by default set to C<STDOUT>.
 
 =signature output
 
@@ -231,6 +236,26 @@ output(FileHandle $handle) : Str
   # given: synopsis
 
   $f->begin('test')->output
+
+=example-2 output
+
+  package main;
+
+  use FlightRecorder;
+
+  my $f = FlightRecorder->new;
+
+  $f->begin('try');
+
+  # $f->output
+
+  $f->debug('something happened');
+
+  # $f->output
+
+  $f->end;
+
+  # $f->output
 
 =cut
 
@@ -453,10 +478,20 @@ $subs->example(-1, 'info', 'method', fun($tryable) {
 });
 
 $subs->example(-1, 'output', 'method', fun($tryable) {
-  ok my $result = $tryable->result;
-  like $result, qr/\w+ \w+\s+\d+ [\d:]+ \d+ \[0001\] \@debug test began/;
+  ok my $result = trap { $tryable->result };
+  like $trap->stdout, qr/\w+ \w+\s+\d+ [\d:]+ \d+ \[0001\] \@debug test began/;
 
   $result
+});
+
+$subs->example(-2, 'output', 'method', fun($tryable) {
+  ok my $result = trap { $tryable->result };
+  my $lines = [split /\n/, $trap->stdout];
+  like $lines->[0], qr/\w+ \w+\s+\d+ [\d:]+ \d+ \[0001\] \@debug try began/;
+  like $lines->[1], qr/\w+ \w+\s+\d+ [\d:]+ \d+ \[0001\] \@debug something happened/;
+  like $lines->[2], qr/\w+ \w+\s+\d+ [\d:]+ \d+ \[0001\] \@debug try ended/;
+
+  ''
 });
 
 $subs->example(-1, 'report', 'method', fun($tryable) {

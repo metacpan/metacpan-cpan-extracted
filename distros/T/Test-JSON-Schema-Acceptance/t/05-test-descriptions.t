@@ -7,7 +7,6 @@ use Test::Tester 0.108;
 use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::Deep;
-use Test::File::ShareDir -share => { -dist => { 'Test-JSON-Schema-Acceptance' => 'share' } };
 use Test::JSON::Schema::Acceptance;
 use lib 't/lib';
 use SchemaParser;

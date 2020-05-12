@@ -1,9 +1,9 @@
 package Bencher::Scenarios::ParamsSah;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-08'; # DATE
+our $DATE = '2020-05-10'; # DATE
 our $DIST = 'Bencher-Scenarios-ParamsSah'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Benchmark Params::Sah
@@ -20,7 +20,7 @@ Bencher::Scenarios::ParamsSah - Benchmark Params::Sah
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenarios::ParamsSah (from Perl distribution Bencher-Scenarios-ParamsSah), released on 2020-05-08.
+This document describes version 0.002 of Bencher::Scenarios::ParamsSah (from Perl distribution Bencher-Scenarios-ParamsSah), released on 2020-05-10.
 
 =head1 DESCRIPTION
 
@@ -28,11 +28,11 @@ This distribution contains the following L<Bencher> scenario modules:
 
 =over
 
-=item * L<Bencher::Scenario::ParamsSah::Startup>
+=item * L<Bencher::Scenario::ParamsSah::Compile>
 
 =item * L<Bencher::Scenario::ParamsSah::Validate>
 
-=item * L<Bencher::Scenario::ParamsSah::Compile>
+=item * L<Bencher::Scenario::ParamsSah::Startup>
 
 =back
 

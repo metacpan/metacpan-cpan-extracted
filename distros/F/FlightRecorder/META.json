@@ -6,7 +6,7 @@
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "apache_2_0"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -40,6 +40,7 @@
             "Data::Object::Role::Pluggable" : "0.01",
             "Data::Object::Role::Throwable" : "2.00",
             "Test::Auto" : "0.07",
+            "Test::Trap" : "v0.3.4",
             "perl" : "5.014",
             "routines" : "0",
             "strict" : "0",
@@ -55,10 +56,10 @@
          "web" : "https://github.com/iamalnewkirk/FlightRecorder"
       }
    },
-   "version" : "0.04",
+   "version" : "0.06",
    "x_authority" : "cpan:AWNCORP",
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
-   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+   "x_spdx_expression" : "Apache-2.0"
 }
 

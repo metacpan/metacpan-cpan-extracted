@@ -7,6 +7,7 @@ docs/apiclient.html
 docs/column.html
 docs/connector.html
 docs/hexonet.html
+docs/logger.html
 docs/record.html
 docs/response.html
 docs/responseparser.html
@@ -18,6 +19,7 @@ lib/WebService/Hexonet.pm
 lib/WebService/Hexonet/Connector.pm
 lib/WebService/Hexonet/Connector/APIClient.pm
 lib/WebService/Hexonet/Connector/Column.pm
+lib/WebService/Hexonet/Connector/Logger.pm
 lib/WebService/Hexonet/Connector/Record.pm
 lib/WebService/Hexonet/Connector/Response.pm
 lib/WebService/Hexonet/Connector/ResponseParser.pm

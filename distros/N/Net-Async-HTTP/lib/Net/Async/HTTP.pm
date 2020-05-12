@@ -10,7 +10,7 @@ use warnings;
 use 5.010;  # //
 use base qw( IO::Async::Notifier );
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 our $DEFAULT_UA = "Perl + " . __PACKAGE__ . "/$VERSION";
 our $DEFAULT_MAXREDIR = 3;
@@ -31,7 +31,10 @@ use IO::Async::Loop 0.59; # ->connect( handle ) ==> $stream
 use Future 0.28; # ->set_label
 use Future::Utils 0.16 qw( repeat );
 
+use Metrics::Any 0.03 '$metrics';
+
 use Scalar::Util qw( blessed reftype );
+use Time::HiRes qw( time );
 use List::Util 1.29 qw( first pairs pairgrep );
 use Socket 2.010 qw(
    SOCK_STREAM IPPROTO_IP IP_TOS
@@ -127,6 +130,33 @@ behaviour of connections made to differing hostnames, or differing ports on
 the same hostname.
 
 =cut
+
+$metrics->make_gauge( in_flight =>
+   name        => [qw( http client requests_in_flight )],
+   description => "Count of the number of requests sent that have not yet been completed",
+   # no labels
+);
+$metrics->make_counter( requests  =>
+   name        => [qw( http client requests )],
+   description => "Number of HTTP requests sent",
+   labels      => [qw( method )],
+);
+$metrics->make_counter( responses =>
+   name        => [qw( http client responses )],
+   description => "Number of HTTP responses received",
+   labels      => [qw( method code )],
+);
+$metrics->make_timer( duration =>
+   name        => [qw( http client request duration )],
+   description => "Duration of time spent waiting for responses",
+   # no labels
+);
+$metrics->make_distribution( response_size =>
+   name        => [qw( http client response bytes )],
+   description => "The size in bytes of responses received",
+   units       => "bytes",
+   # no labels
+);
 
 sub _init
 {
@@ -734,6 +764,7 @@ sub _do_one_request
    my $request = delete $args{request};
    my $SSL     = delete $args{SSL};
 
+   my $start_time = time;
    my $stall_timeout = $args{stall_timeout} // $self->{stall_timeout};
 
    $self->prepare_request( $request );
@@ -741,6 +772,11 @@ sub _do_one_request
    if( $self->{require_SSL} and not $SSL ) {
       return Future->fail( "Non-SSL request is not allowed with 'require_SSL' set",
          http => undef, $request );
+   }
+
+   if( $metrics ) {
+      $metrics->inc_gauge( in_flight => );
+      $metrics->inc_counter( requests => $request->method );
    }
 
    return $self->get_connection(
@@ -766,6 +802,17 @@ sub _do_one_request
          stall_timeout => $stall_timeout,
          %args,
          $SSL ? ( SSL => 1 ) : (),
+         on_done => sub {
+            my ( $ctx ) = @_;
+
+            if( $metrics ) {
+               $metrics->dec_gauge( in_flight => );
+               # TODO: Some sort of error counter instead for errors?
+               $metrics->inc_counter( responses => $request->method, $ctx->resp_header->code );
+               $metrics->inc_timer_by( duration => time - $start_time );
+               $metrics->inc_distribution_by( response_size => $ctx->resp_bytes );
+            }
+         },
       );
    } );
 }

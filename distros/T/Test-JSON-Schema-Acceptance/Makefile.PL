@@ -35,6 +35,7 @@ my %WriteMakefileArgs = (
     "Path::Tiny" => 0,
     "Test::Fatal" => 0,
     "Test::More" => "0.88",
+    "Types::Common::Numeric" => 0,
     "Types::Standard" => "1.010002",
     "if" => 0,
     "namespace::clean" => 0,
@@ -54,7 +55,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.993",
+  "VERSION" => "0.994",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -75,6 +76,7 @@ my %FallbackPrereqs = (
   "Test::More" => "0.88",
   "Test::Tester" => "0.108",
   "Test::Warnings" => 0,
+  "Types::Common::Numeric" => 0,
   "Types::Standard" => "1.010002",
   "feature" => 0,
   "if" => 0,

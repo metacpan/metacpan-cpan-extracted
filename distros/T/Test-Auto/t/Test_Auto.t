@@ -202,7 +202,8 @@ subtests() : Subtests
 
 The specification is designed to accommodate typical package declarations. It
 is used by the parser to provide the content used in the test automation and
-document generation.
+document generation. Note: when code blocks are evaluated I<"redefined">
+warnings are now automatically disabled.
 
 +=head2 name
 

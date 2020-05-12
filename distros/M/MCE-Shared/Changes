@@ -1,6 +1,18 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.869 Mon May 11 22:00:00 EST 2020
+
+  * Disabled unicode testing for MCE::Shared::Cache on Perl 5.10.1.
+    Testing for keys containing unicode is failing on RedHat 6.x,
+    but passing in meta::cpan (smoke tests). Thank you, Paul Howarth.
+
+  * Share array and hash deeply; only when using the TIE interface.
+    This resolves an edge case for the OO interface and passing
+    nested items during construction. Thank you, Nick Tonkin.
+
+  * Bumped MCE dependency to 1.868.
+
 1.868 Sun May 10 22:00:00 EST 2020
 
   * Completed threads-like detach capability in MCE::Hobo.

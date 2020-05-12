@@ -2,7 +2,6 @@
 
 use strict;
 use warnings;
-use utf8;
 
 use Test::More;
 
@@ -45,25 +44,25 @@ BEGIN {
    is_deeply(\@test_order, \@keys, "basic promote");
 
    # try the culling
-   $cache->set("さあ", "私は祈る");  # "Come then" => "I pray"
+   $cache->set("baz", "bike");
    $cache->set("bing", "bong");
    $cache->set("zip", "zap");
-   # should be zip, bing, さあ, bar, car
+   # should be zip, bing, baz, bar, car
 
-   @test_order = ("zip", "bing", "さあ", "foo", "car");
+   @test_order = ("zip", "bing", "baz", "foo", "car");
    @keys = $cache->keys;
    is_deeply(\@test_order, \@keys, "basic cull");
 
    # try deleting from the end
    $cache->del("car");
-   is_deeply([ ("zip", "bing", "さあ", "foo") ], [ $cache->keys ], "end delete");
+   is_deeply([ ("zip", "bing", "baz", "foo") ], [ $cache->keys ], "end delete");
 
    # try from the front
    $cache->del("zip");
-   is_deeply([ ("bing", "さあ", "foo") ], [ $cache->keys ], "front delete");
+   is_deeply([ ("bing", "baz", "foo") ], [ $cache->keys ], "front delete");
 
    # try in the middle
-   $cache->del("さあ");
+   $cache->del("baz");
    is_deeply([ ("bing", "foo") ], [ $cache->keys ], "middle delete");
 
    # add a bunch of stuff and make sure the index doesn't grow
@@ -112,16 +111,16 @@ BEGIN {
    ok(defined $cache, "new");
 
    $cache->set("foo", "bar");
-   $cache->set("さあ", "baz");
+   $cache->set("car", "baz");
    $cache->set("cnt", 0);
 
    is($cache->peek("foo"), "bar", "peek foo");
-   is($cache->peek("さあ"), "baz", "peek utf8");
-   is_deeply( [ ("cnt", "0", "さあ", "baz", "foo", "bar") ], [ $cache->pairs ] );
+   is($cache->peek("car"), "baz", "peek car");
+   is_deeply( [ ("cnt", "0", "car", "baz", "foo", "bar") ], [ $cache->pairs ] );
 
    is($cache->get("foo"), "bar", "fetch foo");
-   is($cache->get("さあ"), "baz", "fetch utf8");
-   is_deeply( [ ("さあ", "baz", "foo", "bar", "cnt", "0") ], [ $cache->pairs ] );
+   is($cache->get("car"), "baz", "fetch car");
+   is_deeply( [ ("car", "baz", "foo", "bar", "cnt", "0") ], [ $cache->pairs ] );
 
    $cache->incr("cnt") for 1 .. 4;
    $cache->incrby("cnt", 5);
@@ -129,7 +128,7 @@ BEGIN {
 
    sleep 3;
    ok(!$cache->exists("foo"), "expired foo");
-   ok(!$cache->get("さあ"),   "expired utf8");
+   ok(!$cache->get("car"),   "expired car");
 
    # test raising max_age
    $cache->max_age(60);

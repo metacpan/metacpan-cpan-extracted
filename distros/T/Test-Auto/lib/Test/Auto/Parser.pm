@@ -8,7 +8,7 @@ use Test::Auto::Types ();
 
 require Carp;
 
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
 # ATTRIBUTES
 
@@ -564,9 +564,18 @@ sub check_methods {
   return 1 if !%$methods;
 
   while (my($key, $val) = each(%$methods)) {
-    return 0 unless $val->{usage};
-    return 0 unless $val->{signature};
-    return 0 unless $val->{examples};
+    unless ($val->{usage} && @{$val->{usage}}) {
+      warn "Missing: $key (usage)";
+      return 0;
+    }
+    unless ($val->{signature} && @{$val->{signature}}) {
+      warn "Missing: $key (signature)";
+      return 0;
+    }
+    unless ($val->{examples}) {
+      warn "Missing: $key (examples)";
+      return 0;
+    }
   }
 
   return 1;
@@ -621,9 +630,18 @@ sub check_functions {
   return 1 if !%$functions;
 
   while (my($key, $val) = each(%$functions)) {
-    return 0 unless $val->{usage};
-    return 0 unless $val->{signature};
-    return 0 unless $val->{examples};
+    unless ($val->{usage} && @{$val->{usage}}) {
+      warn "Missing: $key (usage)";
+      return 0;
+    }
+    unless ($val->{signature} && @{$val->{signature}}) {
+      warn "Missing: $key (signature)";
+      return 0;
+    }
+    unless ($val->{examples}) {
+      warn "Missing: $key (examples)";
+      return 0;
+    }
   }
 
   return 1;
@@ -678,9 +696,18 @@ sub check_routines {
   return 1 if !%$routines;
 
   while (my($key, $val) = each(%$routines)) {
-    return 0 unless $val->{usage};
-    return 0 unless $val->{signature};
-    return 0 unless $val->{examples};
+    unless ($val->{usage} && @{$val->{usage}}) {
+      warn "Missing: $key (usage)";
+      return 0;
+    }
+    unless ($val->{signature} && @{$val->{signature}}) {
+      warn "Missing: $key (signature)";
+      return 0;
+    }
+    unless ($val->{examples}) {
+      warn "Missing: $key (examples)";
+      return 0;
+    }
   }
 
   return 1;

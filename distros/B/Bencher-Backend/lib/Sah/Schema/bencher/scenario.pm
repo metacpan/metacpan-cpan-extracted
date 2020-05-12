@@ -1,7 +1,7 @@
 package Sah::Schema::bencher::scenario;
 
-our $DATE = '2020-01-12'; # DATE
-our $VERSION = '1.047'; # VERSION
+our $DATE = '2020-05-12'; # DATE
+our $VERSION = '1.049'; # VERSION
 
 use strict;
 use warnings;
@@ -65,7 +65,39 @@ Sah::Schema::bencher::scenario - Bencher scenario
 
 =head1 VERSION
 
-This document describes version 1.047 of Sah::Schema::bencher::scenario (from Perl distribution Bencher-Backend), released on 2020-01-12.
+This document describes version 1.049 of Sah::Schema::bencher::scenario (from Perl distribution Bencher-Backend), released on 2020-05-12.
+
+=head1 SYNOPSIS
+
+Using with L<Data::Sah>:
+
+ use Data::Sah qw(gen_validator);
+ my $vdr = gen_validator("bencher::scenario*");
+ say $vdr->($data) ? "valid" : "INVALID!";
+
+ # Data::Sah can also create a validator to return error message, coerced value,
+ # even validators in other languages like JavaScript, from the same schema.
+ # See its documentation for more details.
+
+Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
+
+ package MyApp;
+ our %SPEC;
+ $SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['bencher::scenario*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my %args = @_;
+     ...
+ }
 
 =head1 HOMEPAGE
 

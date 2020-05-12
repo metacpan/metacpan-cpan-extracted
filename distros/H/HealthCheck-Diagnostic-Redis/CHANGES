@@ -1,0 +1,20 @@
+Changelog for HealthCheck-Diagnostic-Redis
+
+v0.0.4 2020-05-12T16:06:24
+ - No changes found
+
+v0.0.3 2020-05-12T15:19:10
+ - No changes found
+
+v0.0.2 2020-05-12T15:19:10
+ - Update README (Andrew Hewus Fresh)
+ - Convert to Dist::Zilla::PluginBundle::Author::GSG (Andrew Hewus Fresh)
+
+v0.0.1 2019-09-04T18:44:08
+ - Fix dist.ini to build the module. (Josh Ballard)
+ - Add Jenkinsfile (Josh Ballard)
+ - Add failure case around randomkey. (Josh Ballard)
+ - Add tests for Redis check with mock Redis. (Josh Ballard)
+ - Create base HealthCheck module (Josh Ballard)
+ - Create distribution files (Josh Ballard)
+ - Initial Commit (Josh Ballard)

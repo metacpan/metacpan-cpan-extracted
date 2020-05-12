@@ -1,5 +1,14 @@
 Revision history for Metrics-Any
 
+0.04    2020-05-12
+        [CHANGES]
+         * Add documentation to Metrics::Any::Adapter
+         * Support METRICS_ANY_ADAPTER environment variable to override Null
+           default
+         * Added Metrics::Any::Adapter::File and ::Stderr
+         * Metrics::Any::Adapter::Test now checks that reported metric types
+           match those they were declared as
+
 0.03    2020-04-29
         [CHANGES]
          * Support and encourage hierarchial metric names to be specified by

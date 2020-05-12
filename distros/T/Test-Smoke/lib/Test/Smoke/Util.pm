@@ -782,13 +782,11 @@ sub get_patch {
 
         if ( $patch_level ) {
             if ($patch_level =~ /\s/) {
-                my ($branch, $date, $sha, $describe) = split(' ', $patch_level);
+                my ($branch, $sha, $describe) = (split ' ', $patch_level)[0, -2, -1];
                 (my $short_describe = $describe) =~ s/^GitLive-//;
                 return [$sha, $short_describe, $branch];
             }
-            else {
-                return [$patch_level];
-            }
+	    return [$patch_level];
         }
         return [ '' ];
     }

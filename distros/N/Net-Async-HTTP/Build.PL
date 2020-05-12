@@ -15,8 +15,10 @@ my $build = Module::Build->new(
       'IO::Async::Stream' => '0.59',
       'IO::Async::Timer::Countdown' => 0,
       'List::Util' => "1.29", # pairs()
+      'Metrics::Any' => '0.03',
       'Socket' => '2.010',
       'Struct::Dumb' => '0.07',
+      'Time::HiRes' => 0,
       'URI' => 0,
       'perl' => '5.010', #  //
    },
@@ -27,6 +29,7 @@ my $build = Module::Build->new(
       'HTTP::Cookies' => 0,
       'IO::Async::Test' => 0,
       'Test::Identity' => 0,
+      'Test::Metrics::Any' => 0,
       'Test::More' => '0.88', # done_testing
       'Test::Refcount' => 0,
    },

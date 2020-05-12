@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized once );
 
-our $VERSION = '1.868';
+our $VERSION = '1.869';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitSubroutinePrototypes)
@@ -42,6 +42,8 @@ sub import {
 
    return;
 }
+
+my $_share_deeply = 0;
 
 ###############################################################################
 ## ----------------------------------------------------------------------------
@@ -80,6 +82,8 @@ sub share {
 
    # class construction failed: e.g. share( class->new(...) )
    return '' if @_ && !$_[0] && $!;
+
+   $_share_deeply = 1 if $_params->{_DEEPLY_};
 
    # blessed object, \@array, \%hash, or \$scalar
    if ( $_class ) {
@@ -158,18 +162,22 @@ sub AUTOLOAD {
       delete $_params->{module};
 
       if ( scalar @_ ) {
-         $_params->{_DEEPLY_} = 1;
-         if ( $_fcn eq 'array' ) {
-            for ( my $i = 0; $i <= $#_; $i += 1 ) {
-               &_share($_params, $_obj, $_[$i]) if ref($_[$i]);
-            }
-         } else {
-            for ( my $i = 1; $i <= $#_; $i += 2 ) {
-               &_share($_params, $_obj, $_[$i]) if ref($_[$i]);
+         if ( $_share_deeply ) {
+            $_params->{_DEEPLY_} = 1;
+            if ( $_fcn eq 'array' ) {
+               for ( my $i = 0; $i <= $#_; $i += 1 ) {
+                  &_share($_params, $_obj, $_[$i]) if ref($_[$i]);
+               }
+            } else {
+               for ( my $i = 1; $i <= $#_; $i += 2 ) {
+                  &_share($_params, $_obj, $_[$i]) if ref($_[$i]);
+               }
             }
          }
          $_obj->assign(@_);
       }
+
+      $_share_deeply = 0;
 
       return $_obj;
    }
@@ -248,8 +256,9 @@ sub open (@) {
 ###############################################################################
 
 sub TIEARRAY {
-   shift; ( ref($_[0]) eq 'HASH' && exists $_[0]->{'module'} )
+   shift; $_share_deeply = 1;
 
+   ( ref($_[0]) eq 'HASH' && exists $_[0]->{'module'} )
       ? _tie('TIEARRAY', @_) : MCE::Shared->array(@_);
 }
 
@@ -277,7 +286,7 @@ sub TIEHANDLE {
 }
 
 sub TIEHASH {
-   shift;
+   shift; $_share_deeply = 1;
 
    return _tie('TIEHASH', @_) if (
       ref($_[0]) eq 'HASH' && exists $_[0]->{'module'}
@@ -306,8 +315,9 @@ sub TIEHASH {
 }
 
 sub TIESCALAR {
-   shift; ( ref($_[0]) eq 'HASH' && exists $_[0]->{'module'} )
+   shift;
 
+   ( ref($_[0]) eq 'HASH' && exists $_[0]->{'module'} )
       ? _tie('TIESCALAR', @_) : MCE::Shared->scalar(@_);
 }
 
@@ -389,6 +399,8 @@ sub _tie {
 
    $_obj->[6] = MCE::Mutex->new( impl => 'Channel' );
 
+   $_share_deeply = 0;
+
    return $_obj;
 }
 
@@ -449,7 +461,7 @@ MCE::Shared - MCE extension for sharing data supporting threads and processes
 
 =head1 VERSION
 
-This document describes MCE::Shared version 1.868
+This document describes MCE::Shared version 1.869
 
 =head1 SYNOPSIS
 
@@ -1844,7 +1856,7 @@ are given. Otherwise, resets the iterator with given criteria.
 
 =item store ( key, value )
 
-Deep-sharing a non-blessed structure recursively is possible with C<store>,
+Deeply sharing a non-blessed structure recursively is possible with C<store>,
 an alias to C<STORE>.
 
  use MCE::Shared;

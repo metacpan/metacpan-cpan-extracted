@@ -1,0 +1,86 @@
+Revision history for Test2-Roo
+
+1.005     2020-05-12 15:21:53-04:00 America/New_York
+
+    [CHANGES]
+
+    - Forked from Test::Roo v. 1.004 Thanks, DAGOLDEN!
+
+    - Renamed from Test::Roo to Test2::Roo
+    
+    - Switched from Test::More to Test2.
+
+
+1.004     2014-08-05 16:38:43-04:00 America/New_York
+
+    [FIXED]
+
+    - Requires Capture::Tiny 0.12 or later to avoid test failures
+
+1.003     2014-06-27 23:04:39-04:00 America/New_York
+
+    [ADDED]
+
+    - Test::Roo now additionally exports 'top_test' for
+      more simple testing (Arthur Axel fREW Schmidt)
+
+1.002     2013-09-25 14:03:55 America/New_York
+
+    [FIXES]
+
+    - Compile test could hang on Windows
+
+    [PREREQS]
+
+    - Dropped configure_requires for ExtUtils::MakeMaker to 6.17
+
+1.001     2013-09-11 10:13:42 America/New_York
+
+    [CHANGED]
+
+    - modifiers on 'each_test' are now included in the subtest block so
+      that any tests run in the modifiers are listed with other tests in
+      the block
+
+    [DOCUMENTED]
+
+    - Enhanced SYNOPSIS
+
+1.000     2013-03-08 18:59:20 America/New_York
+
+    [INCOMPATIBLE CHANGES]
+
+    - importing Test::Roo makes the current class a subclass of
+      Test::Roo::Class; all methods moved there instead of being exported
+    
+    - Test::Roo now only exports 'test' and 'run_me'
+
+    - done_testing is never called automatically
+
+    [ADDED]
+
+    - Test::Roo::Class has 'run_tests' method for creating and running
+      tests; can be called as object or class method
+
+    - Test::Roo::Class has lazy 'description' attribute for generating
+      descriptions from test attributes
+
+    - Added 'each_test' hook for global actions before/after every test
+
+    [DOCUMENTED]
+
+    - Includes Test::Roo::Cookbook with examples
+
+    - Test::Roo docs explain differences from Test::Routine
+
+0.002     2013-02-25 14:25:09 America/New_York
+
+    [ADDED]
+
+    - Refactored test run code into a new 'run_me' method to allow manual
+      control over test runs, including multiple, parameterized runs.
+
+0.001     2013-02-25 12:23:27 America/New_York
+
+    - First release
+

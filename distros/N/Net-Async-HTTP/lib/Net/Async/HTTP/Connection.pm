@@ -8,7 +8,7 @@ package Net::Async::HTTP::Connection;
 use strict;
 use warnings;
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 use Carp;
 
@@ -22,7 +22,8 @@ use HTTP::Response;
 my $CRLF = "\x0d\x0a"; # More portable than \r\n
 
 use Struct::Dumb;
-struct Responder => [qw( on_read on_error stall_timer is_done )];
+struct RequestContext => [qw( req on_read stall_timer resp_header resp_bytes on_done is_done f )],
+   named_constructor => 1;
 
 # Detect whether HTTP::Message properly trims whitespace in header values. If
 # it doesn't, we have to deploy a workaround to fix them up.
@@ -148,8 +149,8 @@ sub on_read
    my $self = shift;
    my ( $buffref, $closed ) = @_;
 
-   while( my $head = $self->{responder_queue}[0]) {
-      shift @{ $self->{responder_queue} } and next if $head->is_done;
+   while( my $head = $self->{request_queue}[0]) {
+      shift @{ $self->{request_queue} } and next if $head->is_done;
 
       $head->stall_timer->reset if $head->stall_timer;
 
@@ -164,7 +165,7 @@ sub on_read
 
       $head->is_done or die "ARGH: undef return without being marked done";
 
-      shift @{ $self->{responder_queue} };
+      shift @{ $self->{request_queue} };
       return 1 if !$closed and length $$buffref;
       return;
    }
@@ -187,8 +188,8 @@ sub error_all
 {
    my $self = shift;
 
-   while( my $head = shift @{ $self->{responder_queue} } ) {
-      $head->on_error->( @_ ) unless $head->is_done;
+   while( my $head = shift @{ $self->{request_queue} } ) {
+      $head->f->fail( @_ ) unless $head->is_done or $head->f->is_ready;
    }
 }
 
@@ -249,6 +250,17 @@ sub request
 
       $f->on_ready( $remove_timer );
    }
+
+   push @{ $self->{request_queue} }, my $ctx = RequestContext(
+      req         => $req,
+      on_read     => undef, # will be set later
+      stall_timer => $stall_timer,
+      resp_header => undef, # will be set later
+      resp_bytes  => 0,
+      on_done     => $args{on_done},
+      is_done     => 0,
+      f           => $f,
+   );
 
    my $on_body_write;
    if( $stall_timer or $args{on_body_write} ) {
@@ -325,13 +337,8 @@ sub request
 
    $self->{requests_in_flight}++;
 
-   push @{ $self->{responder_queue} }, Responder(
-      $self->_mk_on_read_header(
-         $req, $args{previous_response}, $expect_continue ? $write_request_body : undef, $on_header, $stall_timer, $f
-      ),
-      sub { $f->fail( @_ ) unless $f->is_ready; }, # on_error
-      $stall_timer,
-      0, # is_done
+   $ctx->on_read = $self->_mk_on_read_header(
+      $args{previous_response}, $expect_continue ? $write_request_body : undef, $on_header
    );
 
    return $f;
@@ -340,10 +347,14 @@ sub request
 sub _mk_on_read_header
 {
    shift; # $self
-   my ( $req, $previous_response, $write_request_body, $on_header, $stall_timer, $f ) = @_;
+   my ( $previous_response, $write_request_body, $on_header ) = @_;
 
    sub {
-      my ( $self, $buffref, $closed, $responder ) = @_;
+      my ( $self, $buffref, $closed, $ctx ) = @_;
+
+      my $req         = $ctx->req;
+      my $stall_timer = $ctx->stall_timer;
+      my $f           = $ctx->f;
 
       if( $stall_timer ) {
          $stall_timer->reason = "receiving response header";
@@ -365,9 +376,13 @@ sub _mk_on_read_header
          return 0;
       }
 
+      $ctx->resp_bytes += $+[0];
+
       my $header = HTTP::Response->parse( $1 );
       # HTTP::Response doesn't strip the \rs from this
       ( my $status_line = $header->status_line ) =~ s/\r$//;
+
+      $ctx->resp_header = $header;
 
       unless( HTTP_MESSAGE_TRIMS_LWS ) {
          my @headers;
@@ -434,6 +449,10 @@ sub _mk_on_read_header
          return 1;
       };
       my $on_done = sub {
+         my ( $ctx ) = @_;
+
+         $ctx->is_done++;
+
          # TODO: IO::Async probably ought to do this. We need to fire the
          # on_closed event _before_ calling on_body_chunk, to clear the
          # connection cache in case another request comes - e.g. HEAD->GET
@@ -452,6 +471,8 @@ sub _mk_on_read_header
          my $response = $on_body_chunk->();
          my $e = eval { $f->done( $response ) unless $f->is_cancelled; 1 } ? undef : $@;
 
+         $ctx->on_done->( $ctx ) if $ctx->on_done;
+
          $self->{requests_in_flight}--;
          $self->debug_printf( "DONE remaining in-flight=$self->{requests_in_flight}" );
          $self->ready;
@@ -469,9 +490,7 @@ sub _mk_on_read_header
       # 204 (No Content) nor 304 (Not Modified)
       if( $req->method eq "HEAD" or $code =~ m/^1..$/ or $code eq "204" or $code eq "304" ) {
          $self->debug_printf( "BODY done [none]" );
-         $responder->is_done++;
-
-         return $on_done->();
+         return $on_done->( $ctx );
       }
 
       my $transfer_encoding = $header->header( "Transfer-Encoding" );
@@ -481,26 +500,24 @@ sub _mk_on_read_header
          $self->debug_printf( "BODY chunks" );
 
          $stall_timer->reason = "receiving body chunks" if $stall_timer;
-         return $self->_mk_on_read_chunked( $req, $on_more, $on_done, $f );
+         return $self->_mk_on_read_chunked( $on_more, $on_done );
       }
       elsif( defined $content_length ) {
          $self->debug_printf( "BODY length $content_length" );
 
          if( $content_length == 0 ) {
             $self->debug_printf( "BODY done [length=0]" );
-            $responder->is_done++;
-
-            return $on_done->();
+            return $on_done->( $ctx );
          }
 
          $stall_timer->reason = "receiving body" if $stall_timer;
-         return $self->_mk_on_read_length( $content_length, $req, $on_more, $on_done, $f );
+         return $self->_mk_on_read_length( $content_length, $on_more, $on_done );
       }
       else {
          $self->debug_printf( "BODY until EOF" );
 
          $stall_timer->reason = "receiving body until EOF" if $stall_timer;
-         return $self->_mk_on_read_until_eof( $req, $on_more, $on_done, $f );
+         return $self->_mk_on_read_until_eof( $on_more, $on_done );
       }
    };
 }
@@ -508,15 +525,19 @@ sub _mk_on_read_header
 sub _mk_on_read_chunked
 {
    shift; # $self
-   my ( $req, $on_more, $on_done, $f ) = @_;
+   my ( $on_more, $on_done ) = @_;
 
    my $chunk_length;
 
    sub {
-      my ( $self, $buffref, $closed, $responder ) = @_;
+      my ( $self, $buffref, $closed, $ctx ) = @_;
+
+      my $req = $ctx->req;
+      my $f   = $ctx->f;
 
       if( !defined $chunk_length and $$buffref =~ s/^(.*?)$CRLF// ) {
          my $header = $1;
+         $ctx->resp_bytes += $+[0];
 
          # Chunk header
          unless( $header =~ s/^([A-Fa-f0-9]+).*// ) {
@@ -535,12 +556,15 @@ sub _mk_on_read_chunked
       if( defined $chunk_length and length( $$buffref ) >= $chunk_length + 2 ) {
          # Chunk body
          my $chunk = substr( $$buffref, 0, $chunk_length, "" );
+         $ctx->resp_bytes += length $chunk;
 
          unless( $$buffref =~ s/^$CRLF// ) {
             $self->debug_printf( "ERROR chunk without CRLF" );
             $f->fail( "Chunk of size $chunk_length wasn't followed by CRLF", http => undef, $req ) unless $f->is_cancelled;
             $self->close;
          }
+
+         $ctx->resp_bytes += $+[0];
 
          undef $chunk_length;
 
@@ -558,12 +582,15 @@ sub _mk_on_read_chunked
 sub _mk_on_read_chunk_trailer
 {
    shift; # $self
-   my ( $req, $on_more, $on_done, $f ) = @_;
+   my ( undef, $on_more, $on_done ) = @_;
 
    my $trailer = "";
 
    sub {
-      my ( $self, $buffref, $closed, $responder ) = @_;
+      my ( $self, $buffref, $closed, $ctx ) = @_;
+
+      my $req = $ctx->req;
+      my $f   = $ctx->f;
 
       if( $closed ) {
          $self->debug_printf( "ERROR closed" );
@@ -572,37 +599,38 @@ sub _mk_on_read_chunk_trailer
 
       $$buffref =~ s/^(.*)$CRLF// or return 0;
       $trailer .= $1;
+      $ctx->resp_bytes += $+[0];
 
       return 1 if length $1;
 
       # TODO: Actually use the trailer
 
       $self->debug_printf( "BODY done [chunked]" );
-      $responder->is_done++;
-
-      return $on_done->();
+      return $on_done->( $ctx );
    };
 }
 
 sub _mk_on_read_length
 {
    shift; # $self
-   my ( $content_length, $req, $on_more, $on_done, $f ) = @_;
+   my ( $content_length, $on_more, $on_done ) = @_;
 
    sub {
-      my ( $self, $buffref, $closed, $responder ) = @_;
+      my ( $self, $buffref, $closed, $ctx ) = @_;
+
+      my $req = $ctx->req;
+      my $f   = $ctx->f;
 
       # This will truncate it if the server provided too much
       my $content = substr( $$buffref, 0, $content_length, "" );
       $content_length -= length $content;
+      $ctx->resp_bytes += length $content;
 
       return undef unless $on_more->( $content );
 
       if( $content_length == 0 ) {
          $self->debug_printf( "BODY done [length]" );
-         $responder->is_done++;
-
-         return $on_done->();
+         return $on_done->( $ctx );
       }
 
       if( $closed ) {
@@ -616,21 +644,21 @@ sub _mk_on_read_length
 sub _mk_on_read_until_eof
 {
    shift; # $self
-   my ( $req, $on_more, $on_done, $f ) = @_;
+   my ( $on_more, $on_done ) = @_;
 
    sub {
-      my ( $self, $buffref, $closed, $responder ) = @_;
+      my ( $self, $buffref, $closed, $ctx ) = @_;
 
       my $content = $$buffref;
       $$buffref = "";
+      $ctx->resp_bytes += length $content;
 
       return undef unless $on_more->( $content );
 
       return 0 unless $closed;
 
       $self->debug_printf( "BODY done [eof]" );
-      $responder->is_done++;
-      return $on_done->();
+      return $on_done->( $ctx );
    };
 }
 

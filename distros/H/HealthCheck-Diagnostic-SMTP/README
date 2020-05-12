@@ -1,0 +1,58 @@
+NAME
+
+    HealthCheck::Diagnostic::SMTP - Verify connectivity to an SMTP mail
+    server
+
+VERSION
+
+    version v0.0.3
+
+SYNOPSIS
+
+    Check that you can talk to the server.
+
+        my $health_check = HealthCheck->new( checks => [
+            HealthCheck::Diagnostic::SMTP->new(
+                host    => 'smtp.gmail.com',
+                timeout => 5,
+        ]);
+
+DESCRIPTION
+
+    Determines if the SMTP mail server is available. Sets the status to
+    "OK" if the connection was successful, or "CRITICAL" otherwise.
+
+ATTRIBUTES
+
+    Can be passed either to new or check.
+
+ host
+
+    required Either a string of the hostname or a coderef that returns a
+    hostname string.
+
+ port
+
+    The port to connect to. Defaults to 25.
+
+ timeout
+
+    The number of seconds to timeout after trying to establish a
+    connection. Defaults to 5.
+
+DEPENDENCIES
+
+    HealthCheck::Diagnostic Net::SMTP
+
+AUTHOR
+
+    Grant Street Group <developers@grantstreet.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2019 - 2020 by Grant Street Group.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

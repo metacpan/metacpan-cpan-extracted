@@ -1,5 +1,9 @@
 Changes for InfluxDB::LineProtocol
 
+1.012   2020-05-12T14:48:25
+    - Bugfix encoding for big floats (fixes #14) (Adrian Popa)
+
+
 1.011	2018-10-31T17:30:56
     - Made TODO entry clickable. (Mohammad S Anwar)
 

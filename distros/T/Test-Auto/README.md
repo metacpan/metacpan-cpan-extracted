@@ -193,7 +193,8 @@ This method returns a [Test::Auto::Subtests](https://metacpan.org/pod/Test::Auto
 
 The specification is designed to accommodate typical package declarations. It
 is used by the parser to provide the content used in the test automation and
-document generation.
+document generation. Note: when code blocks are evaluated _"redefined"_
+warnings are now automatically disabled.
 
 ## name
 

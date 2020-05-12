@@ -6,8 +6,9 @@ no if "$]" >= 5.031009, feature => 'indirect';
 use Test::Tester 0.108;
 use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::File::ShareDir -share => { -dist => { 'Test-JSON-Schema-Acceptance' => 'share' } };
+use Test::Deep;
 use Test::JSON::Schema::Acceptance;
+use List::Util 'sum';
 use lib 't/lib';
 use SchemaParser;
 
@@ -16,25 +17,25 @@ my $parser = SchemaParser->new;
 
 foreach my $test (
   # run tests in this file
-  { count => 9, tests => { file => 'foo.json' } },
+  { count => [0,0,9], tests => { file => 'foo.json' } },
 
   # run tests in these files
-  { count => 9+3, tests => { file => [ 'foo.json', 'baz.json' ] } },
+  { count => [0,3,9], tests => { file => [ 'foo.json', 'baz.json' ] } },
 
   # run tests in any file, with this group description
-  { count => 3+3, tests => { group_description => 'false schema' } },
+  { count => [3,'0 but true',3], tests => { group_description => 'false schema' } },
 
   # run tests in this file with this group description
-  { count => 3, tests => { file => 'foo.json', group_description => 'false schema' } },
+  { count => [0,0,3], tests => { file => 'foo.json', group_description => 'false schema' } },
 
   # run tests in this file with these group descriptions
   {
-    count => 3+3,
+    count => [0,0,3+3],
     tests => { file => 'foo.json', group_description => [ 'true schema', 'false schema' ], },
   },
 
   # run tests in this file with this group description and test description
-  { count => 1, tests => {
+  { count => [0,0,1], tests => {
       file => 'foo.json',
       group_description => 'true schema',
       test_description => 'boolean false',
@@ -42,7 +43,7 @@ foreach my $test (
   },
 
   # run tests in this file with this group description and these test descriptions
-  { count => 2, tests => {
+  { count => [2,0,0], tests => {
       file => 'bar.json',
       group_description => 'false schema',
       test_description => [ 'boolean true', 'boolean false' ],
@@ -50,14 +51,14 @@ foreach my $test (
   },
 
   # run tests in any file with this group description and this test description
-  { count => 1+1+1, tests => {
+  { count => [1,1,1], tests => {
       group_description => 'empty schema',
       test_description => [ 'boolean true' ],
     }
   },
 
   # run tests in any file with any group description with this test description
-  { count => 3+3+1, tests => {
+  { count => [3,1,3], tests => {
       test_description => [ 'boolean true' ],
     }
   },
@@ -75,7 +76,21 @@ foreach my $test (
     }
   );
 
-  is(scalar(@results), $count, 'ran '.$count.' tests');
+  is(scalar(@results), sum(@$count), 'ran ('.join('+',@$count).') tests');
+
+  cmp_deeply(
+    $accepter->results,
+    [
+      map +(
+        $count->[$_] ? +{
+          file => str([ qw(bar.json baz.json foo.json) ]->[$_]),
+          pass => 0+$count->[$_],
+          fail => 0,
+        } : ()
+      ), (0..2)
+    ],
+    'result data was populated',
+  );
 }
 
 done_testing;

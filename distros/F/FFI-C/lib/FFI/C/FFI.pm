@@ -6,7 +6,7 @@ use FFI::Platypus 1.24;
 use base qw( Exporter );
 
 # ABSTRACT: Private module for FFI::C
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 our @EXPORT_OK = qw( malloc free memset memcpy_addr );
@@ -48,7 +48,7 @@ FFI::C::FFI - Private module for FFI::C
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

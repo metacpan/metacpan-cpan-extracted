@@ -37,6 +37,7 @@ is(
       call [ isa => 'FFI::C::Struct' ] => T();
       call sub { my $self = shift; dies { $self->foo } } => match qr/No such member/;
     };
+    call trim_string => F();
   },
   'unnamed, empty struct',
 );
@@ -56,6 +57,7 @@ is(
       call [ isa => 'FFI::C::Struct' ] => T();
       call sub { my $self = shift; dies { $self->foo } } => match qr/No such member/;
     };
+    call trim_string => F();
   },
   'named, empty struct',
 );
@@ -75,6 +77,7 @@ is(
       call [ isa => 'FFI::C::Struct' ] => T();
       call sub { my $self = shift; dies { $self->foo } } => match qr/No such member/;
     };
+    call trim_string => F();
   },
   'named, empty struct, explicit Platypus',
 );
@@ -113,6 +116,7 @@ is(
       call [ roger => undef ] => U();
       call roger              => U();
     };
+    call trim_string => F();
   },
   'with members',
 );
@@ -139,7 +143,8 @@ is(
       call bar => object {
         call baz             => -9999;
       };
-    },
+    };
+    call trim_string => F();
   },
   'nested'
 );
@@ -158,7 +163,8 @@ is(
       call bar => object {
         call baz            => -9999;
       }
-    },
+    };
+    call trim_string => F();
   },
   'nested'
 );
@@ -173,9 +179,47 @@ is(
       call foo                => "\0\0\0\0\0\0\0\0\0\0";
       call [ foo => "hello" ] => "hello\0\0\0\0\0";
       call foo                => "hello\0\0\0\0\0";
-    },
+    };
+    call trim_string => F();
   },
   'fixed string',
+);
+
+is(
+  FFI::C::StructDef->new(
+    members => [
+      foo => 'string(10)',
+    ],
+    trim_string => 1,
+  ),
+  object {
+    call [ isa => 'FFI::C::StructDef' ] => T();
+    call create => object {
+      call foo                => "";
+      call [ foo => "hello" ] => "hello";
+      call foo                => "hello";
+    };
+    call trim_string => T();
+  },
+  'fixed string, trim',
+);
+
+is(
+  do {
+    FFI::C::StructDef->new(
+      class => 'String10',
+      members => [ foo => 'string(10)' ],
+      trim_string => 1,
+    );
+    String10->new,
+  },
+  object {
+    call [ isa => 'String10' ] => T();
+    call foo                => "";
+    call [ foo => "hello" ] => "hello";
+    call foo                => "hello";
+  },
+  'fixed string, generated, trim',
 );
 
 {
@@ -445,6 +489,5 @@ is(
   U(),
   'nullable okay'
 );
-
 
 done_testing;

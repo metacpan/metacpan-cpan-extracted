@@ -245,6 +245,12 @@ my @tests = (
         [ 'metric', {int=>42, float=>0.5}, {inttag=>8,floattag=>13.13} ]
     ],
 
+    # https://github.com/domm/InfluxDB-LineProtocol/issues/14
+    [   0,
+        [ 'metric', '7.51696501241595e+50' ],
+        'metric value=7.51696501241595e+50',
+        [ 'metric', { value => '7.51696501241595e+50' }, undef ]
+    ],
 );
 
 

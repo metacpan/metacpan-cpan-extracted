@@ -1,9 +1,9 @@
 package Bencher::Scenario::ParamsSah::Startup;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-08'; # DATE
+our $DATE = '2020-05-10'; # DATE
 our $DIST = 'Bencher-Scenarios-ParamsSah'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -34,7 +34,7 @@ Bencher::Scenario::ParamsSah::Startup - Benchmark startup
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenario::ParamsSah::Startup (from Perl distribution Bencher-Scenarios-ParamsSah), released on 2020-05-08.
+This document describes version 0.002 of Bencher::Scenario::ParamsSah::Startup (from Perl distribution Bencher-Scenarios-ParamsSah), released on 2020-05-10.
 
 =head1 SYNOPSIS
 
@@ -52,9 +52,9 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Params::Sah> 0.070
+L<Params::Sah> 0.072
 
-L<Type::Params> 1.010001
+L<Type::Params> 1.004004
 
 L<Params::ValidationCompiler> 0.30
 
@@ -84,19 +84,19 @@ L<Params::ValidationCompiler>
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.30.2 >>, CPU: I<< Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz (4 cores) >>, OS: I<< GNU/Linux LinuxMint version 19 >>, OS kernel: I<< Linux version 4.15.0-91-generic >>.
+Run on: perl: I<< v5.30.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores) >>, OS: I<< GNU/Linux Ubuntu version 19.10 >>, OS kernel: I<< Linux version 5.3.0-46-generic >>.
 
 Benchmark with default options (C<< bencher -m ParamsSah::Startup >>):
 
  #table1#
- +----------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
- | participant                | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
- +----------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
- | Type::Params               |        38 |                33 |                 0.00% |               653.18% |   0.00016 |      20 |
- | Params::ValidationCompiler |        24 |                19 |                58.69% |               374.62% | 7.5e-05   |      20 |
- | Params::Sah                |        10 |                 5 |               288.09% |                94.07% |   0.00019 |      21 |
- | perl -e1 (baseline)        |         5 |                 0 |               653.18% |                 0.00% |   0.00015 |      20 |
- +----------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
+ +----------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
+ | participant                | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +----------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
+ | Type::Params               |      41.4 |              34   |                 0.00% |               462.34% | 3.3e-05 |      22 |
+ | Params::ValidationCompiler |      29.9 |              22.5 |                38.45% |               306.18% | 1.3e-05 |      21 |
+ | Params::Sah                |      11   |               3.6 |               273.87% |                50.41% |   2e-05 |      20 |
+ | perl -e1 (baseline)        |       7.4 |               0   |               462.34% |                 0.00% | 2.4e-05 |      20 |
+ +----------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.

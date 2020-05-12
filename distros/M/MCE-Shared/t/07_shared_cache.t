@@ -526,49 +526,56 @@ is( $h5->mdel(qw/ 4 5 6 /), 3, 'shared cache, check mdel' );
 
 ## --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-## https://sacred-texts.com/cla/usappho/sph02.htm (II)
+if ( $] gt '5.010001' ) {
+   ## MCE::Shared::Cache stores keys with expiration using dualvar.
+   ## Testing for keys containing unicode is failing on RedHat 6.x.
+   ## Interestingly, smoke testing on meta::cpan report passing
+   ## for Perl 5.10.1.
 
-my $sappho_text =
-  "ἀλλά τυίδ᾽ ἔλθ᾽, αἴποτα κἀτέρωτα
-   τᾶσ ἔμασ αύδωσ αἴοισα πήλγι
-   ἔκλυεσ πάτροσ δὲ δόμον λίποισα
-   χρύσιον ἦλθεσ.";
+   ## https://sacred-texts.com/cla/usappho/sph02.htm (II)
 
-my $translation =
-  "Whenever before thou has hearkened to me--
-   To my voice calling to thee in the distance,
-   And heeding, thou hast come, leaving thy father's
-   Golden dominions.";
+   my $sappho_text =
+     "ἀλλά τυίδ᾽ ἔλθ᾽, αἴποτα κἀτέρωτα
+      τᾶσ ἔμασ αύδωσ αἴοισα πήλγι
+      ἔκλυεσ πάτροσ δὲ δόμον λίποισα
+      χρύσιον ἦλθεσ.";
 
-$h5->assign( text => $sappho_text );
-is( $h5->get("text"), $sappho_text, 'shared cache, check unicode assign' );
+   my $translation =
+     "Whenever before thou has hearkened to me--
+      To my voice calling to thee in the distance,
+      And heeding, thou hast come, leaving thy father's
+      Golden dominions.";
 
-$h5->clear, $h5->set( text => $sappho_text );
-is( $h5->get("text"), $sappho_text, 'shared cache, check unicode set' );
-is( $h5->len("text"), length($sappho_text), 'shared cache, check unicode len' );
+   $h5->assign( text => $sappho_text );
+   is( $h5->get("text"), $sappho_text, 'shared cache, check unicode assign' );
 
-$h5->clear, $h5->set( "ἀθάνατῳ", $sappho_text );
-is( $h5->get("ἀθάνατῳ"), $sappho_text, 'shared cache, check unicode get' );
-is( $h5->exists("ἀθάνατῳ"), 1, 'shared cache, check unicode exists' );
+   $h5->clear, $h5->set( text => $sappho_text );
+   is( $h5->get("text"), $sappho_text, 'shared cache, check unicode set' );
+   is( $h5->len("text"), length($sappho_text), 'shared cache, check unicode len' );
 
-my @keys = $h5->keys;
-my @vals = $h5->vals;
+   $h5->clear, $h5->set( "ἀθάνατῳ", $sappho_text );
+   is( $h5->get("ἀθάνατῳ"), $sappho_text, 'shared cache, check unicode get' );
+   is( $h5->exists("ἀθάνατῳ"), 1, 'shared cache, check unicode exists' );
 
-is( $keys[0], "ἀθάνατῳ", 'shared cache, check unicode keys' );
-is( $vals[0], $sappho_text, 'shared cache, check unicode vals' );
+   my @keys = $h5->keys;
+   my @vals = $h5->vals;
 
-cmp_array(
-   [ $h5->pairs('key =~ /ἀθάνατῳ/') ], [ "ἀθάνατῳ", $sappho_text ],
-   'shared cache, check unicode find keys =~ match (pairs)'
-);
-cmp_array(
-   [ $h5->pairs('val =~ /ἔκλυεσ/') ], [ "ἀθάνατῳ", $sappho_text ],
-   'shared cache, check unicode find values =~ match (pairs)'
-);
+   is( $keys[0], "ἀθάνατῳ", 'shared cache, check unicode keys' );
+   is( $vals[0], $sappho_text, 'shared cache, check unicode vals' );
 
-my $length = $h5->append("ἀθάνατῳ", "Ǣ");
-is( $h5->get("ἀθάνατῳ"), $sappho_text . "Ǣ", 'shared cache, check unicode append' );
-is( $length, length($sappho_text) + 1, 'shared cache, check unicode length' );
+   cmp_array(
+      [ $h5->pairs('key =~ /ἀθάνατῳ/') ], [ "ἀθάνατῳ", $sappho_text ],
+      'shared cache, check unicode find keys =~ match (pairs)'
+   );
+   cmp_array(
+      [ $h5->pairs('val =~ /ἔκλυεσ/') ], [ "ἀθάνατῳ", $sappho_text ],
+      'shared cache, check unicode find values =~ match (pairs)'
+   );
+
+   my $length = $h5->append("ἀθάνατῳ", "Ǣ");
+   is( $h5->get("ἀθάνατῳ"), $sappho_text . "Ǣ", 'shared cache, check unicode append' );
+   is( $length, length($sappho_text) + 1, 'shared cache, check unicode length' );
+}
 
 done_testing;
 

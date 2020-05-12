@@ -33,23 +33,30 @@
    "provides" : {
       "Metrics::Any" : {
          "file" : "lib/Metrics/Any.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Metrics::Any::Adapter" : {
          "file" : "lib/Metrics/Any/Adapter.pm",
-         "version" : "0.03"
+         "version" : "0.04"
+      },
+      "Metrics::Any::Adapter::File" : {
+         "file" : "lib/Metrics/Any/Adapter/File.pm",
+         "version" : "0.04"
       },
       "Metrics::Any::Adapter::Null" : {
          "file" : "lib/Metrics/Any/Adapter/Null.pm",
-         "version" : "0.03"
+         "version" : "0.04"
+      },
+      "Metrics::Any::Adapter::Stderr" : {
+         "file" : "lib/Metrics/Any/Adapter/Stderr.pm"
       },
       "Metrics::Any::Adapter::Test" : {
          "file" : "lib/Metrics/Any/Adapter/Test.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Metrics::Any::Collector" : {
          "file" : "lib/Metrics/Any/Collector.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -58,6 +65,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

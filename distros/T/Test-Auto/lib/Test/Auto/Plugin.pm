@@ -6,7 +6,7 @@ use warnings;
 use Moo;
 use Test::Auto::Types ();
 
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
 # ATTRIBUTES
 

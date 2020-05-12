@@ -21,6 +21,8 @@ my @files = (
     't/08-todo-tests.t',
     't/09-unicode.t',
     't/10-exception.t',
+    't/11-additional-resources.t',
+    't/12-include-optional.t',
     't/lib/SchemaParser.pm',
     't/tests/bad/invalid-schema.json',
     't/tests/simple-booleans/bar.json',

@@ -47,6 +47,7 @@ do { my $x = {
                                       'Path::Tiny' => '0',
                                       'Test::Fatal' => '0',
                                       'Test::More' => '0.88',
+                                      'Types::Common::Numeric' => '0',
                                       'Types::Standard' => '1.010002',
                                       'if' => '0',
                                       'namespace::clean' => '0',

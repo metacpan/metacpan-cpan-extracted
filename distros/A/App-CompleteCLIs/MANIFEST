@@ -50,7 +50,8 @@ script/complete-riap-url
 script/complete-riap-url-clientless
 script/complete-service-name
 script/complete-service-port
-script/complete-tz
+script/complete-tz-name
+script/complete-tz-offset
 script/complete-uid
 script/complete-user
 script/complete-weaver-bundle

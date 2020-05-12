@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Complete/Regexp/Pattern/complete_regexp_pattern_module
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
+# and generated automatically using Perinci::CmdLine::Gen version 0.493
 
-our $DATE = '2019-07-18'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-02'; # DATE
 our $DIST = 'App-CompleteCLIs'; # DIST
-our $VERSION = '0.142'; # VERSION
+our $VERSION = '0.143'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +38,7 @@ complete-regexp-pattern-module - Complete with Regexp::Pattern::* module, withou
 
 =head1 VERSION
 
-This document describes version 0.142 of complete-regexp-pattern-module (from Perl distribution App-CompleteCLIs), released on 2019-07-18.
+This document describes version 0.143 of complete-regexp-pattern-module (from Perl distribution App-CompleteCLIs), released on 2020-03-02.
 
 =head1 SYNOPSIS
 
@@ -109,6 +110,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
 
 =back
 
@@ -182,7 +187,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

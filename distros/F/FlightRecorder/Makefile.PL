@@ -13,7 +13,7 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "FlightRecorder",
-  "LICENSE" => "perl",
+  "LICENSE" => "apache",
   "MIN_PERL_VERSION" => "5.014",
   "NAME" => "FlightRecorder",
   "PREREQ_PM" => {
@@ -33,11 +33,12 @@ my %WriteMakefileArgs = (
     "Data::Object::Role::Pluggable" => "0.01",
     "Data::Object::Role::Throwable" => "2.00",
     "Test::Auto" => "0.07",
+    "Test::Trap" => "0.3.4",
     "routines" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,6 +52,7 @@ my %FallbackPrereqs = (
   "Data::Object::Role::Pluggable" => "0.01",
   "Data::Object::Role::Throwable" => "2.00",
   "Test::Auto" => "0.07",
+  "Test::Trap" => "0.3.4",
   "routines" => 0,
   "strict" => 0,
   "warnings" => 0

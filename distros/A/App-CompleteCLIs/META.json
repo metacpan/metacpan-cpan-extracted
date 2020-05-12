@@ -36,7 +36,7 @@
             "Complete::Dist" : "0",
             "Complete::Dist::Zilla" : "0",
             "Complete::Env" : "0",
-            "Complete::File" : "0",
+            "Complete::File" : "0.440",
             "Complete::Host" : "0.03",
             "Complete::Kernel" : "0",
             "Complete::Language" : "0",
@@ -53,10 +53,10 @@
             "Complete::Regexp::Pattern" : "0",
             "Complete::Riap" : "0",
             "Complete::Riap::Clientless" : "0",
-            "Complete::TZ" : "0",
+            "Complete::TZ" : "0.080",
             "Complete::Unix" : "0.07",
-            "Complete::Util" : "0.602",
-            "Data::Sah::Coerce::perl::str::str_normalize_perl_modprefix" : "0",
+            "Complete::Util" : "0.608",
+            "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modprefix" : "0",
             "Data::Sah::Compiler::perl::TH::any" : "0",
             "Data::Sah::Compiler::perl::TH::array" : "0",
             "Data::Sah::Compiler::perl::TH::bool" : "0",
@@ -97,110 +97,110 @@
          "web" : "https://github.com/perlancar/perl-App-CompleteCLIs"
       }
    },
-   "version" : "0.142",
+   "version" : "0.143",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.028002"
+         "version" : "5.030000"
       },
       "plugins" : [
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_acme_metasyntactic_meta_category",
+            "name" : "GenPericmdScript complete-acme-metasyntactic-meta-category",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_acme_metasyntactic_meta_theme",
+            "name" : "GenPericmdScript complete-acme-metasyntactic-meta-theme",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_acme_metasyntactic_meta_theme_and_category",
+            "name" : "GenPericmdScript complete-acme-metasyntactic-meta-theme-and-category",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_array_elem",
+            "name" : "GenPericmdScript complete-array-elem",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_country_code",
+            "name" : "GenPericmdScript complete-country-code",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_currency_code",
+            "name" : "GenPericmdScript complete-currency-code",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_cwalitee_indicator",
+            "name" : "GenPericmdScript complete-cwalitee-indicator",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_dist",
+            "name" : "GenPericmdScript complete-dist",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_dzil_bundle",
+            "name" : "GenPericmdScript complete-dzil-bundle",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_dzil_plugin",
+            "name" : "GenPericmdScript complete-dzil-plugin",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_dzil_role",
+            "name" : "GenPericmdScript complete-dzil-role",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_env",
+            "name" : "GenPericmdScript complete-env",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_env_elem",
+            "name" : "GenPericmdScript complete-env-elem",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_file",
+            "name" : "GenPericmdScript complete-file",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_float",
+            "name" : "GenPericmdScript complete-float",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_gid",
+            "name" : "GenPericmdScript complete-gid",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_group",
+            "name" : "GenPericmdScript complete-group",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_hash_key",
+            "name" : "GenPericmdScript complete-hash-key",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_int",
+            "name" : "GenPericmdScript complete-int",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_kernel",
+            "name" : "GenPericmdScript complete-kernel",
             "version" : "0.421"
          },
          {
@@ -210,142 +210,147 @@
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_known_mac",
+            "name" : "GenPericmdScript complete-known-mac",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_language_code",
+            "name" : "GenPericmdScript complete-language-code",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_locale",
+            "name" : "GenPericmdScript complete-locale",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_manpage",
+            "name" : "GenPericmdScript complete-manpage",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_manpage_section",
+            "name" : "GenPericmdScript complete-manpage-section",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_module",
+            "name" : "GenPericmdScript complete-module",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_path_env_elem",
+            "name" : "GenPericmdScript complete-path-env-elem",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_perl_builtin_function",
+            "name" : "GenPericmdScript complete-perl-builtin-function",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_perl_builtin_symbol",
+            "name" : "GenPericmdScript complete-perl-builtin-symbol",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_perl_version",
+            "name" : "GenPericmdScript complete-perl-version",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_pid",
+            "name" : "GenPericmdScript complete-pid",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_pod",
+            "name" : "GenPericmdScript complete-pod",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_ppr_subpattern",
+            "name" : "GenPericmdScript complete-ppr-subpattern",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_proc_name",
+            "name" : "GenPericmdScript complete-proc-name",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_program",
+            "name" : "GenPericmdScript complete-program",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_regexp_pattern_module",
+            "name" : "GenPericmdScript complete-regexp-pattern-module",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_regexp_pattern_pattern",
+            "name" : "GenPericmdScript complete-regexp-pattern-pattern",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_service_name",
+            "name" : "GenPericmdScript complete-service-name",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_service_port",
+            "name" : "GenPericmdScript complete-service-port",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_riap_url",
+            "name" : "GenPericmdScript complete-riap-url",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_riap_url_clientless",
+            "name" : "GenPericmdScript complete-riap-url-clientless",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_tz",
+            "name" : "GenPericmdScript complete-tz-name",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_uid",
+            "name" : "GenPericmdScript complete-tz-offset",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_user",
+            "name" : "GenPericmdScript complete-uid",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_weaver_bundle",
+            "name" : "GenPericmdScript complete-user",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_weaver_plugin",
+            "name" : "GenPericmdScript complete-weaver-bundle",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_weaver_role",
+            "name" : "GenPericmdScript complete-weaver-plugin",
             "version" : "0.421"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript complete_weaver_section",
+            "name" : "GenPericmdScript complete-weaver-role",
+            "version" : "0.421"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript complete-weaver-section",
             "version" : "0.421"
          },
          {
@@ -435,6 +440,11 @@
             "version" : "6.012"
          },
          {
+            "class" : "Dist::Zilla::Plugin::FileFinder::ByName",
+            "name" : "@Author::PERLANCAR/FileFinder::ByName PERLANCAR",
+            "version" : "6.012"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::PERLANCAR/ExecDir script",
             "version" : "6.012"
@@ -442,7 +452,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.597"
+            "version" : "0.599"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -483,7 +493,7 @@
                   ]
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000033",
+                  "Module::Metadata" : "1.000036",
                   "version" : "0.006"
                }
             },
@@ -493,12 +503,12 @@
          {
             "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
             "name" : "@Author::PERLANCAR/CopyrightYearFromGit",
-            "version" : "0.003"
+            "version" : "0.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
             "name" : "@Author::PERLANCAR/IfBuilt",
-            "version" : "0.02"
+            "version" : "0.03"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
@@ -528,7 +538,7 @@
          {
             "class" : "Dist::Zilla::Plugin::OurPkgVersion",
             "name" : "@Author::PERLANCAR/OurPkgVersion",
-            "version" : "0.15"
+            "version" : "0.21"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodWeaver",
@@ -667,7 +677,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
-                        "version" : "0.06"
+                        "version" : "0.081"
                      }
                   ]
                }
@@ -688,7 +698,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddPrereqs",
             "name" : "@Author::PERLANCAR/Rinci::AddPrereqs",
-            "version" : "0.142"
+            "version" : "0.144"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddToDb",
@@ -729,9 +739,16 @@
             "version" : "2.058"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Test::Perl::Critic",
-            "name" : "@Author::PERLANCAR/Test::Perl::Critic",
-            "version" : "3.001"
+            "class" : "Dist::Zilla::Plugin::Test::Perl::Critic::Subset",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::Perl::Critic::Subset" : {
+                  "finder" : [
+                     "@Author::PERLANCAR/FileFinder::ByName PERLANCAR"
+                  ]
+               }
+            },
+            "name" : "@Author::PERLANCAR/Test::Perl::Critic::Subset",
+            "version" : "3.001.003"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",
@@ -856,8 +873,8 @@
       }
    },
    "x_authority" : "cpan:PERLANCAR",
-   "x_generated_by_perl" : "v5.28.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_static_install" : 1
 }
 

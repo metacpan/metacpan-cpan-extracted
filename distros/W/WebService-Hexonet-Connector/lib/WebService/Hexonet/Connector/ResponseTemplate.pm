@@ -4,18 +4,25 @@ use 5.026_000;
 use strict;
 use warnings;
 use WebService::Hexonet::Connector::ResponseParser;
+use WebService::Hexonet::Connector::ResponseTemplateManager;
 
-use version 0.9917; our $VERSION = version->declare('v2.5.0');
+use version 0.9917; our $VERSION = version->declare('v2.9.0');
+
+my $rtm = WebService::Hexonet::Connector::ResponseTemplateManager->getInstance();
 
 
 sub new {
     my ( $class, $raw ) = @_;
     my $self = {};
     if ( !defined $raw || length $raw == 0 ) {
-        $raw = "[RESPONSE]\r\nCODE=423\r\nDESCRIPTION=Empty API response. Probably unreachable API end point\r\nEOF\r\n";
+        $raw = "[RESPONSE]\r\nCODE=423\r\nDESCRIPTION=Empty API response. Probably unreachable API end point {CONNECTION_URL}\r\nEOF\r\n";
     }
     $self->{raw}  = $raw;
     $self->{hash} = WebService::Hexonet::Connector::ResponseParser::parse($raw);
+    if ( !defined $self->{hash}->{'DESCRIPTION'} || !defined $self->{hash}->{'CODE'} ) {
+        $self->{raw}  = $rtm->getTemplate('invalid')->getPlain();
+        $self->{hash} = WebService::Hexonet::Connector::ResponseParser::parse( $self->{raw} );
+    }
     return bless $self, $class;
 }
 

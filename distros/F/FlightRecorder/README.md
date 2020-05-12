@@ -12,7 +12,9 @@ Logging for Distributed Systems
 
     use FlightRecorder;
 
-    my $f = FlightRecorder->new;
+    my $f = FlightRecorder->new(
+      auto => undef
+    );
 
     # $f->begin('try');
     # $f->debug('something happend');
@@ -41,6 +43,12 @@ This package uses type constraints from:
 # ATTRIBUTES
 
 This package has the following attributes:
+
+## auto
+
+    auto(Maybe[FileHandle])
+
+This attribute is read-only, accepts `(Maybe[FileHandle])` values, and is optional.
 
 ## format
 
@@ -187,13 +195,34 @@ The info method logs an `info` level event with context.
     output(FileHandle $handle) : Str
 
 The output method outputs the last event using the format defined in the
-`format` attribute.
+`format` attribute. This method is called automatically after each log-event
+if the `auto` attribute is set, which is by default set to `STDOUT`.
 
 - output example #1
 
         # given: synopsis
 
         $f->begin('test')->output
+
+- output example #2
+
+        package main;
+
+        use FlightRecorder;
+
+        my $f = FlightRecorder->new;
+
+        $f->begin('try');
+
+        # $f->output
+
+        $f->debug('something happened');
+
+        # $f->output
+
+        $f->end;
+
+        # $f->output
 
 ## report
 

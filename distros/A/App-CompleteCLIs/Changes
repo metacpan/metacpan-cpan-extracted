@@ -1,3 +1,10 @@
+0.143   2020-02-27  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: complete-tz-offset.
+
+        - Rename complete-tz to complete-tz-name.
+
+
 0.142   2019-07-18  Released-By: PERLANCAR; Urgency: medium
 
 	- Add CLIs: complete-language-code, complete-currency-code.

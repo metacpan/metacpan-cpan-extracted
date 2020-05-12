@@ -18,6 +18,24 @@ like dies {
 
 like dies {
   Number::Textify
+      -> new( undef,
+            );
+},
+  qr/Ranges should be defined as array of arrays/,
+  'dies with undef insted of ranges array';
+
+
+like dies {
+  Number::Textify
+      -> new( 'scalar',
+            );
+},
+  qr/Ranges should be defined as array of arrays/,
+  'dies with non arrayref insted of ranges array';
+
+
+like dies {
+  Number::Textify
       -> new( [],
             );
 },
@@ -27,12 +45,33 @@ like dies {
 
 like dies {
   Number::Textify
+      -> new( [ undef,
+              ],
+            );
+},
+  qr/Ranges should be defined as array of arrays/,
+  'dies with ranges array with not arrayrefs, but undef';
+
+
+like dies {
+  Number::Textify
       -> new( [ 'one',
               ],
             );
 },
   qr/Ranges should be defined as array of arrays/,
-  'dies with ranges array with not arrayrefs';
+  'dies with ranges array with not arrayrefs, but scalar';
+
+
+like dies {
+  Number::Textify
+      -> new( [ { one => 1,
+                },
+              ],
+            );
+},
+  qr/Ranges should be defined as array of arrays/,
+  'dies with ranges array with not arrayrefs, but hashref';
 
 
 like dies {
@@ -43,6 +82,16 @@ like dies {
 },
   qr/Ranges should be defined as array of arrays/,
   'dies with ranges array with empty arrayrefs';
+
+
+like dies {
+  Number::Textify
+      -> new( [ [ -2 ],
+              ],
+            );
+},
+  qr/Ranges should be defined as array of arrays/,
+  'dies with ranges array with arrayref with negative value';
 
 
 like dies {
@@ -67,14 +116,40 @@ like dies {
 
 like dies {
   Number::Textify
-      -> new( [ [ 60, 'minute' ],
-                [ 60 * 60, 'hour' ],
+      -> new( [ [ 60 * 60, 'hour' ],
+                [ 60, 'minute' ],
               ],
               ':',
             );
 },
   qr/Incorrect number of additional parameters/,
   'dies when odd number of additional parameters';
+
+{
+  my $converter = Number::Textify
+    -> new( [ [ 10 ],
+              [ 0 ],
+            ],
+          );
+
+  like dies {
+    $converter
+      -> new( [ [ 20 ],
+                [ 0 ],
+              ],
+            );
+  },
+    qr/I'm only a class method!/,
+    'dies when called on object';
+}
+
+# and one for object method on class
+like dies {
+  Number::Textify
+      -> textify( 20 );
+},
+  qr/I'm only an object method!/,
+  'object method dies on class';
 
 done_testing;
 

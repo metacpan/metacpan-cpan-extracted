@@ -4,7 +4,7 @@ use 5.026_000;
 use strict;
 use warnings;
 
-use version 0.9917; our $VERSION = version->declare('v2.5.0');
+use version 0.9917; our $VERSION = version->declare('v2.9.0');
 
 
 sub parse {
@@ -31,9 +31,6 @@ sub parse {
                 $hash{ uc $attr } = $value;
             }
         }
-    }
-    if ( !defined $hash{DESCRIPTION} ) {
-        $hash{DESCRIPTION} = q{};
     }
     return \%hash;
 }

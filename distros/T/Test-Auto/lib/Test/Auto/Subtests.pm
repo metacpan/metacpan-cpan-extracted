@@ -13,7 +13,7 @@ use Type::Registry;
 
 require Carp;
 
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
 # ATTRIBUTES
 
@@ -387,7 +387,7 @@ sub evaluator {
 
   local $@;
 
-  my $returned = eval "$context";
+  my $returned = eval "no warnings 'redefine';\n\n$context";
   my $failures = $@;
 
   if ($failures) {

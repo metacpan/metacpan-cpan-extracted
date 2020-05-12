@@ -3,3 +3,7 @@ Revision history for Number-Textify
 20200511  2020-05-11 00:09:52-07:00 America/Los_Angeles
   Initial version
 
+20200512  2020-05-12 07:05:33+00:00 UTC
+  Make it usable with old perls
+  Kwalitee issues
+

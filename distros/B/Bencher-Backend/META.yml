@@ -26,10 +26,10 @@ requires:
   Capture::Tiny: '0'
   Chart::Gnuplot: '0'
   Complete::Module: '0'
-  Complete::Util: '0.606'
+  Complete::Util: '0.608'
   Data::Clean::ForJSON: '0'
   Data::Clone: '0'
-  Data::Dmp: '0.21'
+  Data::Dmp: '0.240'
   Data::Dump: '0'
   Devel::Platform::Info: '0'
   Devel::Size: '0'
@@ -41,7 +41,7 @@ requires:
   JSON::MaybeXS: '0'
   List::MoreUtils: '0'
   List::Util: '1.45'
-  Log::ger: '0.027'
+  Log::ger: '0.037'
   Math::ScientificNotation::Util: '0'
   Module::Load: '0'
   Module::Path::More: '0.32'
@@ -68,7 +68,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Backend
   homepage: https://metacpan.org/release/Bencher-Backend
   repository: git://github.com/perlancar/perl-Bencher-Backend.git
-version: '1.047'
+version: '1.049'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -138,17 +138,13 @@ x_Dist_Zilla:
       name: '@Filter/@Filter/ConfirmRelease'
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::FileFinder::ByName
-      name: '@Filter/FileFinder::ByName PERLANCAR'
-      version: '6.012'
-    -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Filter/ExecDir script'
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Filter/PERLANCAR::BeforeBuild'
-      version: '0.599'
+      version: '0.600'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Filter/Rinci::AbstractFromMeta'
@@ -191,7 +187,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Filter/IfBuilt'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Filter/MetaJSON'
@@ -327,11 +323,11 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.07'
+              version: '0.082'
             -
               class: Pod::Weaver::Plugin::Sah::Schemas
               name: -Sah::Schemas
-              version: '0.05'
+              version: '0.061'
       name: '@Filter/PodWeaver'
       version: '4.008'
     -

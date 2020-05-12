@@ -1,0 +1,15 @@
+Revision history for FFI-Platypus-Type-Enum},
+
+0.03      2020-05-12 09:26:39 -0600
+  - Fixed unclear documentation. (gh#3)
+  - Type is included in the \@map list now (gh#3)
+
+0.02      2020-05-12 05:40:49 -0600
+  - It is now an error to specify the same named value
+    twice (gh#2)
+  - Added maps option (gh#2)
+
+0.01      2020-05-12 00:41:57 -0400
+  - initial version
+
+

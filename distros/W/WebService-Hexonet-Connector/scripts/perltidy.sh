@@ -4,6 +4,7 @@ perltidy -pro=.perltidyrc lib/WebService/Hexonet.pm
 perltidy -pro=.perltidyrc lib/WebService/Hexonet/Connector.pm
 perltidy -pro=.perltidyrc lib/WebService/Hexonet/Connector/APIClient.pm
 perltidy -pro=.perltidyrc lib/WebService/Hexonet/Connector/Column.pm
+perltidy -pro=.perltidyrc lib/WebService/Hexonet/Connector/Logger.pm
 perltidy -pro=.perltidyrc lib/WebService/Hexonet/Connector/Record.pm
 perltidy -pro=.perltidyrc lib/WebService/Hexonet/Connector/Response.pm
 perltidy -pro=.perltidyrc lib/WebService/Hexonet/Connector/ResponseParser.pm

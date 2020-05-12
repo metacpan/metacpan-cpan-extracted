@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Number-Textify",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Number::Textify",
   "PREREQ_PM" => {
     "strict" => 0,
@@ -24,7 +25,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::More" => 0
   },
-  "VERSION" => 20200511,
+  "VERSION" => 20200512,
   "test" => {
     "TESTS" => "t/*.t"
   }

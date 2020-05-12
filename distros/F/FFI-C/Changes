@@ -1,5 +1,8 @@
 Revision history for FFI-C},
 
+0.07      2020-05-11 19:50:38 -0400
+  - Added trim_string property to FFI::C::StructDef (gh#35)
+
 0.06      2020-05-09 04:41:32 -0600
   - Bumped Test2::Suite prereq to get float (gh#33)
   - Fixes for Perls with 32bit IV (gh#34)

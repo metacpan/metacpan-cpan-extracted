@@ -12,7 +12,7 @@ use base qw( Exporter );
 our @EXPORT_OK = qw( perl_to_c c_to_perl take owned set_array_count );
 
 # ABSTRACT: Utility functions for dealing with structured C data
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 sub perl_to_c ($$)
@@ -131,7 +131,7 @@ FFI::C::Util - Utility functions for dealing with structured C data
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

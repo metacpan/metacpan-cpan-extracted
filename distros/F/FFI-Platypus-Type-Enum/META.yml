@@ -1,0 +1,31 @@
+---
+abstract: 'Custom platypus type for dealing with C enumerated types'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  FFI::Platypus: '1.00'
+  Test2::V0: '0.000060'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FFI-Platypus-Type-Enum
+requires:
+  Ref::Util: '0'
+  constant: '1.32'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/Perl5-FFI/FFI-Platypus-Type-Enum/issues
+  homepage: https://metacpan.org/pod/FFI::Platypus::Type::Enum
+  repository: git://github.com/Perl5-FFI/FFI-Platypus-Type-Enum.git
+version: '0.03'
+x_generated_by_perl: v5.31.11
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

@@ -11,6 +11,13 @@ use Net::Prometheus::PerlCollector;
 # Client should automatically include ::PerlCollector
 my $client = Net::Prometheus->new;
 
+# perl_info
+{
+   like( $client->render,
+      qr/^perl_info\{version="5\.\d+\.\d+"\} 1$/m,
+      'Render output contains perl platform info' );
+}
+
 # perl_heap_arenas
 {
    like( $client->render,

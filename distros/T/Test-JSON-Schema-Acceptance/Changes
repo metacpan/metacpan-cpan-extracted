@@ -1,5 +1,11 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+0.994     2020-05-12 18:43:17Z
+        - added "additional_resources" attribute, for accessing
+          remotely-referenced content
+        - new "include_optional" feature, for including optional tests (GH #12)
+        - test results are now available via the "results" accessor method
+
 0.993     2020-05-08 16:55:43Z
         - soften type constraints so as to tolerate older Cpanel::JSON::XS,
           which inflates booleans to different types

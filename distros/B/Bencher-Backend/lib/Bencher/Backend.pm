@@ -1,9 +1,9 @@
 package Bencher::Backend;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-12'; # DATE
+our $DATE = '2020-05-12'; # DATE
 our $DIST = 'Bencher-Backend'; # DIST
-our $VERSION = '1.047'; # VERSION
+our $VERSION = '1.049'; # VERSION
 
 use 5.010001;
 use strict;
@@ -2423,6 +2423,9 @@ iterations to do (e.g. 10, or 100). Or, can also be set to a negative number
 When benchmarking with <pm:Benchmark::Dumb::SimpleTime>, this value is a
 positive integer which means the number of iterations to perform.
 
+When profiling, a number greater than 1 will set a repetition loop (e.g. C<<
+for(1..100){ ... } >>).
+
 This setting overrides `default_precision` property in the scenario.
 
 _
@@ -3158,8 +3161,7 @@ _
 
         result_dir => {
             summary => 'Directory to use when saving benchmark result',
-            schema => 'str*',
-            'x.schema.entity' => 'dirname',
+            schema => 'dirname*',
             tags => ['category:result'],
             description => <<'_',
 
@@ -3170,8 +3172,7 @@ _
         },
         result_filename => {
             summary => 'Filename to use when saving benchmark result',
-            schema => 'str*',
-            'x.schema.entity' => 'filename',
+            schema => 'filename*',
             tags => ['category:result'],
             description => <<'_',
 
@@ -3523,7 +3524,7 @@ sub bencher {
             # unravel subroutine
             $code =~ s/.+?sub \{\s*//; $code =~ s/\}\s*\z//;
             # if start=no, activate profiler
-            $code = "DB::enable_profile(); $code";
+            $code = "DB::enable_profile(); ".($args{precision} > 1 ? "for(1..$args{precision}) { $code }" : $code);;
             my @cmd = (
                 $^X,
                 "-d:NYTProf",
@@ -4264,7 +4265,7 @@ Bencher::Backend - Backend for Bencher
 
 =head1 VERSION
 
-This document describes version 1.047 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2020-01-12.
+This document describes version 1.049 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2020-05-12.
 
 =head1 FUNCTIONS
 
@@ -4346,7 +4347,7 @@ You can specify C<A & B> to exclude datasets that have I<both> tags A and B.
 
 =item * B<exclude_datasets> => I<array[str]>
 
-Exclude datasets whose seq/name matches this.
+Exclude datasets whose seqE<sol>name matches this.
 
 =item * B<exclude_function_pattern> => I<re>
 
@@ -4370,7 +4371,7 @@ Exclude items whose sequence number matches this.
 
 =item * B<exclude_items> => I<array[str]>
 
-Exclude items whose seq/name matches this.
+Exclude items whose seqE<sol>name matches this.
 
 =item * B<exclude_module_pattern> => I<re>
 
@@ -4400,7 +4401,7 @@ You can specify C<A & B> to exclude participants that have I<both> tags A and B.
 
 =item * B<exclude_participants> => I<array[str]>
 
-Exclude participants whose seq/name matches this.
+Exclude participants whose seqE<sol>name matches this.
 
 =item * B<exclude_perls> => I<array[str]>
 
@@ -4434,7 +4435,7 @@ You can specify C<A & B> to include datasets that have I<both> tags A and B.
 
 =item * B<include_datasets> => I<array[str]>
 
-Only include datasets whose seq/name matches this.
+Only include datasets whose seqE<sol>name matches this.
 
 =item * B<include_function_pattern> => I<re>
 
@@ -4458,7 +4459,7 @@ Only include items whose sequence number matches this.
 
 =item * B<include_items> => I<array[str]>
 
-Only include items whose seq/name matches this.
+Only include items whose seqE<sol>name matches this.
 
 =item * B<include_module_pattern> => I<re>
 
@@ -4488,7 +4489,7 @@ You can specify C<A & B> to include participants that have I<both> tags A and B.
 
 =item * B<include_participants> => I<array[str]>
 
-Only include participants whose seq/name matches this.
+Only include participants whose seqE<sol>name matches this.
 
 =item * B<include_path> => I<array[str]>
 
@@ -4579,6 +4580,9 @@ iterations to do (e.g. 10, or 100). Or, can also be set to a negative number
 When benchmarking with L<Benchmark::Dumb::SimpleTime>, this value is a
 positive integer which means the number of iterations to perform.
 
+When profiling, a number greater than 1 will set a repetition loop (e.g. C<<
+for(1..100){ ... } >>).
+
 This setting overrides C<default_precision> property in the scenario.
 
 =item * B<precision_limit> => I<float>
@@ -4601,14 +4605,14 @@ Show "raw" data.
 When action=show-items-result, will print result as-is instead of dumping as
 Perl.
 
-=item * B<result_dir> => I<str>
+=item * B<result_dir> => I<dirname>
 
 Directory to use when saving benchmark result.
 
 Default is from C<BENCHER_RESULT_DIR> environment variable, or the home
 directory.
 
-=item * B<result_filename> => I<str>
+=item * B<result_filename> => I<filename>
 
 Filename to use when saving benchmark result.
 
@@ -4720,6 +4724,7 @@ Also return memory usage of each item code's result (return value).
 
 Memory size is measured using L<Devel::Size>.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -4763,9 +4768,12 @@ Enveloped result from bencher.
 
 =item * B<output_file>* => I<str>
 
+.
+
 =item * B<overwrite> => I<bool>
 
 =item * B<title> => I<str>
+
 
 =back
 
@@ -4786,7 +4794,7 @@ Return value:  (any)
 
 Usage:
 
- format_result($envres, $formatters, $options, $exclude_formatters) -> [status, msg, payload, meta]
+ format_result( [ \%optional_named_args ] , $envres, $formatters, $options) -> [status, msg, payload, meta]
 
 Format bencher result.
 
@@ -4800,7 +4808,7 @@ Arguments ('*' denotes required arguments):
 
 Enveloped result from bencher.
 
-=item * B<$exclude_formatters> => I<any>
+=item * B<exclude_formatters> => I<any>
 
 Exclude Formatters specification.
 
@@ -4809,6 +4817,7 @@ Exclude Formatters specification.
 Formatters specification.
 
 =item * B<$options> => I<hash>
+
 
 =back
 
@@ -4842,6 +4851,7 @@ Arguments ('*' denotes required arguments):
 =item * B<scenario> => I<hash>
 
 Unparsed scenario.
+
 
 =back
 
@@ -4895,6 +4905,7 @@ Enveloped result from bencher.
 Fields to split the results on.
 
 =item * B<$options> => I<hash>
+
 
 =back
 

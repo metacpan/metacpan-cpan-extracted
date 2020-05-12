@@ -1,5 +1,9 @@
 Revision history for Perl module Net::Whois::Raw.
 
+2.99028  May 9 2020 Eugeny Subachev
+    - Deleting duplicates from notfound and servers
+    - Fix whois server of xn--ses554g tld
+
 2.99027  Feb 24 2020 Alexander Nalobin
     - pwhois script refactoring
     - Can pass arbitrary query part to pwhois script

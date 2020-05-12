@@ -11,7 +11,11 @@ use Test::JSON::Schema::Acceptance;
 use lib 't/lib';
 use SchemaParser;
 
-my $accepter = Test::JSON::Schema::Acceptance->new(specification => 'draft2019-09', verbose => 1);
+my $accepter = Test::JSON::Schema::Acceptance->new(
+  specification => 'draft2019-09',
+  verbose => 1,
+  include_optional => 1,
+);
 
 my $parser = SchemaParser->new;
 $accepter->acceptance(

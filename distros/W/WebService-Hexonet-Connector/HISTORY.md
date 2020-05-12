@@ -1,3 +1,52 @@
+# [2.9.0](https://github.com/hexonet/perl-sdk/compare/v2.8.1...v2.9.0) (2020-05-12)
+
+
+### Features
+
+* **logger:** possibility to override debug mode's default logging mechanism. See README.md ([038cc0c](https://github.com/hexonet/perl-sdk/commit/038cc0cd8657e0b3e1e30eb6655ff6f61ad68a41))
+
+## [2.8.1](https://github.com/hexonet/perl-sdk/compare/v2.8.0...v2.8.1) (2020-05-12)
+
+
+### Bug Fixes
+
+* **apiclient:** fixes POD part of getPOSTData method ([bc3e748](https://github.com/hexonet/perl-sdk/commit/bc3e748c53afd61b7d0f2841c6fd402f007759dc))
+
+# [2.8.0](https://github.com/hexonet/perl-sdk/compare/v2.7.1...v2.8.0) (2020-05-12)
+
+
+### Features
+
+* **apiclient:** allow to specify additional libraries via setUserAgent ([26cb7e4](https://github.com/hexonet/perl-sdk/commit/26cb7e439e22709f042d4a2983857f24f6c2f8ea))
+
+## [2.7.1](https://github.com/hexonet/perl-sdk/compare/v2.7.0...v2.7.1) (2020-05-12)
+
+
+### Bug Fixes
+
+* **security:** replace passwords whereever they could be used for output ([b055db5](https://github.com/hexonet/perl-sdk/commit/b055db543f3f7cce7c19ca9dec852a46f301d55f))
+
+# [2.7.0](https://github.com/hexonet/perl-sdk/compare/v2.6.1...v2.7.0) (2020-05-12)
+
+
+### Features
+
+* **response:** added getCommandPlain (getting used command in plain text) ([aeed347](https://github.com/hexonet/perl-sdk/commit/aeed347c901444fc1edbda7d9fcf34da4c3f4f00))
+
+## [2.6.1](https://github.com/hexonet/perl-sdk/compare/v2.6.0...v2.6.1) (2020-05-12)
+
+
+### Bug Fixes
+
+* **messaging:** return a specific error template in case code or description are missing ([f519750](https://github.com/hexonet/perl-sdk/commit/f5197508a73d25db15c11829275db984ce7a00a4))
+
+# [2.6.0](https://github.com/hexonet/perl-sdk/compare/v2.5.0...v2.6.0) (2020-05-12)
+
+
+### Features
+
+* **response:** possibility of placeholder vars in standard responses to improve error details ([9e2f076](https://github.com/hexonet/perl-sdk/commit/9e2f076f87d43a91d62cb858815393335b7bcde7))
+
 # [2.5.0](https://github.com/hexonet/perl-sdk/compare/v2.4.0...v2.5.0) (2020-05-11)
 
 

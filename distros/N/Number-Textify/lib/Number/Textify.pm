@@ -1,5 +1,5 @@
 package Number::Textify;
-$Number::Textify::VERSION = '20200511';
+$Number::Textify::VERSION = '20200512';
 
 use strict;
 use utf8;
@@ -13,7 +13,7 @@ Number::Textify - turn number into some string.
 
 =head1 VERSION
 
-version 20200511
+version 20200512
 
 =head1 SYNOPSIS
 
@@ -258,8 +258,11 @@ sub _formatter {
 
     sprintf '%s %s%s',
       $value,
-      $string // '',
-      $value == 1 ? '' : 's',
+      defined $string ?
+      ( $string,
+        $value == 1 ? '' : 's',
+      )
+      : ( '', '' ),
       ;
   }
 }

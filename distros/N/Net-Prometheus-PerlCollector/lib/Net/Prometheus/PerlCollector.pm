@@ -8,7 +8,7 @@ package Net::Prometheus::PerlCollector;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, $VERSION );
@@ -117,6 +117,10 @@ sub new
    return bless {}, $class;
 }
 
+# Might as well keep these as constants
+use constant
+   PERL_VERSION => ( $^V =~ m/^v(.*)$/ )[0];
+
 sub collect
 {
    shift;
@@ -127,6 +131,8 @@ sub collect
    my ( $arenas, $svs, $svs_by_type, $svs_by_class ) = count_heap( $DETAIL );
 
    my @ret = (
+      MetricSamples( "perl_info", gauge => "Information about the Perl interpreter",
+         [ Sample( "perl_info", [ version => PERL_VERSION ], 1 ) ] ),
       MetricSamples( "perl_heap_arenas", gauge => "Number of arenas in the Perl heap",
          [ Sample( "perl_heap_arenas", [], $arenas ) ] ),
       MetricSamples( "perl_heap_svs", gauge => "Number of SVs in the Perl heap",

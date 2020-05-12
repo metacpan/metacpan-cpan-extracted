@@ -1,7 +1,7 @@
 package Bencher::Role::ResultMunger;
 
-our $DATE = '2020-01-12'; # DATE
-our $VERSION = '1.047'; # VERSION
+our $DATE = '2020-05-12'; # DATE
+our $VERSION = '1.049'; # VERSION
 
 use 5.010;
 use strict;
@@ -26,7 +26,7 @@ Bencher::Role::ResultMunger - Result munger role
 
 =head1 VERSION
 
-This document describes version 1.047 of Bencher::Role::ResultMunger (from Perl distribution Bencher-Backend), released on 2020-01-12.
+This document describes version 1.049 of Bencher::Role::ResultMunger (from Perl distribution Bencher-Backend), released on 2020-05-12.
 
 =for Pod::Coverage .*
 

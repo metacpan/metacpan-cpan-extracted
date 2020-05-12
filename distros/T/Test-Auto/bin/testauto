@@ -88,3 +88,66 @@ sub main {
 }
 
 main(helptext(), options());
+
+=encoding utf8
+
+=head1 NAME
+
+testauto
+
+=cut
+
+=head1 ABSTRACT
+
+Generate POD from Tests
+
+=cut
+
+=head1 SYNOPSIS
+
+  testauto -i t -o lib -t ./mytemplate
+
+=cut
+
+=head1 DESCRIPTION
+
+This tool lets you generate POD documents from test files that adhere to the
+specification, L<Test::Auto/SPECIFICATION>.
+
+=cut
+
+=head1 OPTIONS
+
+  -h --help      Display help text.
+  -t --template  Filepath for POD template.
+  -p --pattern   Pattern to use to filter files.
+  -o --output    Directory for .pod files.
+  -i --input     Directory for .t files.
+
+=cut
+
+=head1 AUTHOR
+
+Al Newkirk, C<awncorp@cpan.org>
+
+=head1 LICENSE
+
+Copyright (C) 2011-2019, Al Newkirk, et al.
+
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the
+L<"license file"|https://github.com/iamalnewkirk/test-auto/blob/master/LICENSE>.
+
+=head1 PROJECT
+
+L<Wiki|https://github.com/iamalnewkirk/test-auto/wiki>
+
+L<Project|https://github.com/iamalnewkirk/test-auto>
+
+L<Initiatives|https://github.com/iamalnewkirk/test-auto/projects>
+
+L<Milestones|https://github.com/iamalnewkirk/test-auto/milestones>
+
+L<Issues|https://github.com/iamalnewkirk/test-auto/issues>
+
+=cut

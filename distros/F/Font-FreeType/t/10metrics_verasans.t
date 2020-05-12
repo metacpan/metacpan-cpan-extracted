@@ -259,8 +259,9 @@ SKIP: {
     my $min_version = version->parse('2.6.1');
     skip "library version $actual_version is not enough to test (required $min_version)", 2
         if $actual_version < $min_version;
-    is($vera->load_flags(FT_LOAD_COMPUTE_METRICS), FT_LOAD_COMPUTE_METRICS, "FT_LOAD_COMPUTE_METRICS");
-    is($vera->load_flags, FT_LOAD_COMPUTE_METRICS, "FT_LOAD_COMPUTE_METRICS");
+    my $flag = eval "FT_LOAD_COMPUTE_METRICS();";
+    is($vera->load_flags($flag), $flag, "FT_LOAD_COMPUTE_METRICS");
+    is($vera->load_flags, $flag, "FT_LOAD_COMPUTE_METRICS");
 }
 
 $vera->foreach_glyph(sub {

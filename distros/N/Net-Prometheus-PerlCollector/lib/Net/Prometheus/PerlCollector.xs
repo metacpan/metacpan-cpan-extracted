@@ -90,7 +90,7 @@ PPCODE:
         }
     }
 
-    EXTEND(SP, 3);
+    EXTEND(SP, 4);
     mPUSHu(arenas);
     mPUSHu(svs);
     if(svs_by_type)

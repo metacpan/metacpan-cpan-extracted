@@ -1,0 +1,135 @@
+{
+   "abstract" : "Composable, reusable tests with roles and Moo",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test2-Roo",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "examples",
+         "t",
+         "xt"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17",
+            "perl" : "5.008001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::MetaResources" : "0",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::Plugin::RemovePrereqs" : "0",
+            "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.079",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Software::License::Apache_2_0" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "1",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "bareword::filehandles" : "0",
+            "indirect" : "0",
+            "multidimensional" : "0"
+         },
+         "requires" : {
+            "Moo" : "1.000008",
+            "MooX::Types::MooseLike::Base" : "0",
+            "Sub::Install" : "0",
+            "Test2::API" : "0",
+            "perl" : "5.008001",
+            "strictures" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Capture::Tiny" : "0.12",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Test2::Tools::Exports" : "0",
+            "Test2::Tools::LoadModule" : "0",
+            "Test2::V0" : "0",
+            "Test::More" : "0",
+            "lib" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test2::Roo" : {
+         "file" : "lib/Test2/Roo.pm",
+         "version" : "1.005"
+      },
+      "Test2::Roo::Class" : {
+         "file" : "lib/Test2/Roo/Class.pm",
+         "version" : "1.005"
+      },
+      "Test2::Roo::Cookbook" : {
+         "file" : "lib/Test2/Roo/Cookbook.pm",
+         "version" : "1.005"
+      },
+      "Test2::Roo::Role" : {
+         "file" : "lib/Test2/Roo/Role.pm",
+         "version" : "1.005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-test2-roo@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Test2-Roo"
+      },
+      "repository" : {
+         "url" : "https://gitlab.com/djerius/Test2-Roo.git",
+         "web" : "https://gitlab.com/djerius/Test2-Roo"
+      }
+   },
+   "version" : "1.005",
+   "x_authority" : "cpan:DJERIUS",
+   "x_contributors" : [
+      "Arthur Axel 'fREW' Schmidt <frioux@gmail.com>",
+      "Diab Jerius <djerius@cfa.harvard.edu>"
+   ],
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
+   "x_spdx_expression" : "Apache-2.0"
+}
+

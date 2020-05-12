@@ -7,7 +7,7 @@ use FFI::C::FFI ();
 use Ref::Util qw( is_ref is_plain_arrayref );
 
 # ABSTRACT: Structured data instance for FFI
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 sub AUTOLOAD
@@ -79,6 +79,7 @@ sub AUTOLOAD
 
     my $value = $ffi->cast( 'opaque' => $member->{spec} . "*", $ptr );
     $value = $$value unless $member->{rec};
+    $value =~ s/\0.*$// if $member->{trim_string};
     return $value;
   }
   else
@@ -157,7 +158,7 @@ FFI::C::Struct - Structured data instance for FFI
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v0.992-10-gd7c73dd
+package Test::JSON::Schema::Acceptance; # git description: v0.993-9-gdda778b
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators like JSON::Schema
 
-our $VERSION = '0.993';
+our $VERSION = '0.994';
 
 no if "$]" >= 5.031009, feature => 'indirect';
 use Test::More ();
@@ -13,7 +13,8 @@ use JSON::MaybeXS 1.004001;
 use File::ShareDir 'dist_dir';
 use Moo;
 use MooX::TypeTiny 0.002002;
-use Types::Standard 1.010002 qw(Str InstanceOf ArrayRef HashRef Dict Any HasMethods Bool);
+use Types::Standard 1.010002 qw(Str InstanceOf ArrayRef HashRef Dict Any HasMethods Bool Optional);
+use Types::Common::Numeric 'PositiveOrZeroInt';
 use Path::Tiny;
 use List::Util 1.33 qw(any max);
 use namespace::clean;
@@ -33,10 +34,34 @@ has test_dir => (
   default => sub { path(dist_dir('Test-JSON-Schema-Acceptance'), 'tests', $_[0]->specification) },
 );
 
+has additional_resources => (
+  is => 'ro',
+  isa => InstanceOf['Path::Tiny'],
+  coerce => sub { path($_[0])->absolute('.') },
+  lazy => 1,
+  default => sub { $_[0]->test_dir->parent->parent->child('remotes') },
+);
+
 has verbose => (
   is => 'ro',
   isa => Bool,
   default => 0,
+);
+
+has include_optional => (
+  is => 'ro',
+  isa => Bool,
+  default => 0,
+);
+
+has results => (
+  is => 'rwp',
+  init_arg => undef,
+  isa => ArrayRef[Dict[
+           file => InstanceOf['Path::Tiny'],
+           pass => PositiveOrZeroInt,
+           fail => PositiveOrZeroInt,
+         ]],
 );
 
 around BUILDARGS => sub {
@@ -72,9 +97,11 @@ sub _run_tests {
 
   warn "'skip_tests' option is deprecated" if $options->{skip_tests};
 
-  my %results; # results by file
+  # [ { file => .., pass => .., fail => .. }, ... ]
+  my @results;
 
   foreach my $one_file (@$tests) {
+    my %results;
     next if $options->{tests} and $options->{tests}{file}
       and not grep $_ eq $one_file->{file},
         (ref $options->{tests}{file} eq 'ARRAY'
@@ -105,10 +132,14 @@ sub _run_tests {
             @{$options->{todo_tests}};
 
         my $result = $self->_run_test($one_file, $test_group, $test, $options);
-        ++$results{$one_file->{file}}->{ $result ? 'pass' : 'fail' };
+        ++$results{ $result ? 'pass' : 'fail' };
       }
     }
+
+    push @results, { file => $one_file->{file}, pass => 0, fail => 0, %results };
   }
+
+  $self->_set_results(\@results);
 
   my $diag = sub { Test::More->builder->${\ ($self->verbose ? 'diag' : 'note') }(@_) };
 
@@ -124,9 +155,8 @@ sub _run_tests {
   my $length = max(map length $_->{file}, @$tests);
   $diag->(sprintf('%-'.$length.'s  pass  fail', 'filename'));
   $diag->('-'x($length + 12));
-  $diag->(sprintf('%-'.$length.'s   %3d   %3d',
-      $_, $results{$_}{pass} // 0, $results{$_}{fail} // 0))
-    foreach sort keys %results;
+  $diag->(sprintf('%-'.$length.'s   %3d   %3d', @{$_}{qw(file pass fail)}))
+    foreach @results;
   $diag->('');
 }
 
@@ -134,7 +164,7 @@ sub _run_test {
   my ($self, $one_file, $test_group, $test, $options) = @_;
 
   TODO: {
-    local $::TODO = 'Test marked TODO via "skip_tests"'
+    local $::TODO = 'Test marked TODO via deprecated "skip_tests"'
       if ref $options->{skip_tests} eq 'ARRAY' and
         grep +(($test_group->{description}.' - '.$test->{description}) =~ /$_/), @{$options->{skip_tests}};
 
@@ -170,9 +200,10 @@ my $json_bool = InstanceOf[qw(JSON::XS::Boolean Cpanel::JSON::XS::Boolean JSON::
 has _test_data => (
   is => 'lazy',
   isa => ArrayRef[Dict[
-           file => Str,
+           file => InstanceOf['Path::Tiny'],
            json => ArrayRef[Dict[
              description => Str,
+             comment => Optional[Str],
              schema => $json_bool|HashRef,
              tests => ArrayRef[Dict[
                data => Any,
@@ -187,18 +218,28 @@ sub _build__test_data {
   my $self = shift;
   my @test_groups;
 
-  # note that we do not recurse into subdirs by default.
-  foreach my $file (sort $self->test_dir->children) {
-    next if not $file->is_file;
-    next if $file !~ /\.json$/;
+  $self->test_dir->visit(
+    sub {
+      my ($path) = @_;
+      return if not $path->is_file;
+      return if $path !~ /\.json$/;
+      my $file = $path->relative($self->test_dir);
+      push @test_groups, [
+        scalar(()= split('/', $file)),
+        {
+          file => $file,
+          json => $self->_json_decoder->decode($path->slurp_raw),
+        },
+      ];
+    },
+    { recurse => $self->include_optional },
+  );
 
-    push @test_groups, {
-      file => $file->basename,
-      json => $self->_json_decoder->decode($file->slurp_raw),
-    };
-  }
-
-  return \@test_groups;
+  return [
+    map $_->[1],
+      sort { $a->[0] <=> $b->[0] || $a->[1]{file} cmp $b->[1]{file} }
+      @test_groups
+  ];
 }
 
 1;
@@ -217,13 +258,16 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 0.993
+version 0.994
 
 =head1 SYNOPSIS
 
-This module allows the L<JSON Schema Test Suite|https://github.com/json-schema/JSON-Schema-Test-Suite> tests to be used in perl to test a module that implements the JSON Schema specification ("json-schema").
-These are the same tests that many modules (libraries, plugins, packages, etc.) use to confirm support of json-schema.
-Using this module to confirm support gives assurance of interoperability with other modules that run the same tests in different languages.
+This module allows the
+L<JSON Schema Test Suite|https://github.com/json-schema/JSON-Schema-Test-Suite> tests to be used in
+perl to test a module that implements the JSON Schema specification ("json-schema"). These are the
+same tests that many modules (libraries, plugins, packages, etc.) use to confirm support of
+json-schema. Using this module to confirm support gives assurance of interoperability with other
+modules that run the same tests in different languages.
 
 In the JSON::Schema module, a test could look like the following:
 
@@ -243,11 +287,13 @@ In the JSON::Schema module, a test could look like the following:
 
   done_testing();
 
-This would determine if JSON::Schema's C<validate> method returns the right result for all of the cases in the JSON Schema Test Suite, except for those listed in C<$skip_tests>.
+This would determine if JSON::Schema's C<validate> method returns the right result for all of the
+cases in the JSON Schema Test Suite, except for those listed in C<$skip_tests>.
 
 =head1 DESCRIPTION
 
-L<JSON Schema|http://json-schema.org> is an IETF draft (at time of writing) which allows you to define the structure of JSON.
+L<JSON Schema|http://json-schema.org> is an IETF draft (at time of writing) which allows you to
+define the structure of JSON.
 
 From the overview of the L<draft 2019-09 version of the
 specification|https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.3>:
@@ -266,9 +312,12 @@ complex JSON data structures, or based on some sort of condition.
 
 =back
 
-This module allows other perl modules (for example JSON::Schema) to test that they are JSON Schema-compliant, by running the tests from the official test suite, without having to manually convert them to perl tests.
+This module allows other perl modules (for example JSON::Schema) to test that they are JSON
+Schema-compliant, by running the tests from the official test suite, without having to manually
+convert them to perl tests.
 
-You are unlikely to want this module, unless you are attempting to write a module which implements JSON Schema the specification, and want to test your compliance.
+You are unlikely to want this module, unless you are attempting to write a module which implements
+JSON Schema the specification, and want to test your compliance.
 
 =head1 CONSTRUCTOR
 
@@ -276,7 +325,7 @@ You are unlikely to want this module, unless you are attempting to write a modul
 
 Create a new instance of Test::JSON::Schema::Acceptance.
 
-Available options are:
+Available options (which are also available as accessor methods on the object) are:
 
 =head2 specification
 
@@ -311,17 +360,34 @@ C<latest> (alias for C<draft2019-09>)
 
 =back
 
-The default is C<latest>, but in the synopsis example, L<JSON::Schema> is testing draft 3 compliance.
+The default is C<latest>, but in the synopsis example, L<JSON::Schema> is testing draft 3
+compliance.
 
-(For backwards compatibility, C<new> can be called with a single numeric argument of 3 to 7, which maps to
-C<draft3> through C<draft7>.)
+(For backwards compatibility, C<new> can be called with a single numeric argument of 3 to 7, which
+maps to C<draft3> through C<draft7>.)
 
 =head2 test_dir
 
-Instead of specifying a draft specification to test against, which will select the most appropriate tests,
-you can pass in the name of a directory of tests to run directly. Files in this directory should be F<.json>
-files following the format described in
+Instead of specifying a draft specification to test against, which will select the most appropriate
+tests, you can pass in the name of a directory of tests to run directly. Files in this directory
+should be F<.json> files following the format described in
 L<https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/master/README.md>.
+
+=head2 additional_resources
+
+A directory of additional resources which should be made available to the implementation under the
+base URI C<http://localhost:1234>. This is automatically provided if you did not override
+C</test_dir>; otherwise, you need to supply it yourself, if any tests require it (for example by
+containing C<< {"$ref": "http://localhost:1234/foo.json/#a/b/c"} >>).
+
+=head2 verbose
+
+Optional. When true, prints version information and test result table such that it is visible
+during C<make test> or C<prove>.
+
+=head2 include_optional
+
+Optional. When true, tests in subdirectories (most notably F<optional/> are also included.
 
 =head1 SUBROUTINES/METHODS
 
@@ -355,11 +421,6 @@ The subroutine should return truthy or falsey depending on if the schema was val
 not.
 
 Either C<validate_data> or C<validate_json_string> is required.
-
-=head3 verbose
-
-Optional. When true, prints version information and test result table such that it is visible
-during C<make test> or C<prove>.
 
 =head3 tests
 
@@ -410,6 +471,27 @@ the same hashref structure as L</tests> above, which are ORed together.
     { file => 'boolean_schema.json', test_description => 'array is invalid' },
     # .. etc
   ]
+
+=head2 results
+
+After calling L</acceptance>, a list of test results are provided here. It is an arrayref of
+hashrefs with three keys:
+
+=over 4
+
+=item *
+
+file - the filename
+
+=item *
+
+pass - the number of pass results for that file
+
+=item *
+
+fail - the number of fail results for that file (including TODO tests)
+
+=back
 
 =head1 ACKNOWLEDGEMENTS
 

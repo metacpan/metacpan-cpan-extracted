@@ -16,7 +16,8 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.008"
          }
       },
       "develop" : {
@@ -29,6 +30,7 @@
       },
       "runtime" : {
          "requires" : {
+            "perl" : "5.008",
             "strict" : "0",
             "utf8" : "0",
             "warnings" : "0"
@@ -37,12 +39,19 @@
       "test" : {
          "requires" : {
             "Test2::V0" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "perl" : "5.008"
          }
       }
    },
+   "provides" : {
+      "Number::Textify" : {
+         "file" : "lib/Number/Textify.pm",
+         "version" : "20200512"
+      }
+   },
    "release_status" : "stable",
-   "version" : "20200511",
+   "version" : "20200512",
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

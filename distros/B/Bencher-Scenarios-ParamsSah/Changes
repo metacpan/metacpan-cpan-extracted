@@ -1,3 +1,10 @@
+0.002   2020-05-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Benchmark Params::Sah with Data::Sah::Tiny backend.
+
+	- Adjust to Params::Sah 0.071, no longer support on_invalid=bool.
+
+
 0.001   2020-05-08  Released-By: PERLANCAR
 
         - First release, modified from the older

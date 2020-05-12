@@ -40,6 +40,7 @@ t/30timeout.t
 t/31cancel.t
 t/32remove.t
 t/40socks.t
+t/70metrics.t
 t/80cross-http.t
 t/81cross-https.t
 t/90rt75615.t

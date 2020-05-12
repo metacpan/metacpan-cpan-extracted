@@ -1,5 +1,13 @@
 Revision history for Net-Prometheus-PerlCollector
 
+0.03    2020-05-12
+        [CHANGES]
+         * Report a platform info metric containing the Perl interpreter
+           version
+
+        [BUGFIXES]
+         * Fix off-by-one in stack EXTEND() logic in XS function
+
 0.02    2020-05-01
         [CHANGES]
          * Optionally collect more detail about SVs classifying by type or

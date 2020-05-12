@@ -1,9 +1,9 @@
 package Bencher::Scenario::ParamsSah::Validate;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-08'; # DATE
+our $DATE = '2020-05-10'; # DATE
 our $DIST = 'Bencher-Scenarios-ParamsSah'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,12 +38,6 @@ our $scenario = {
             tags => ['int_int[]'],
         },
         {
-            name => 'Params::Sah(on_invalid-bool)-int_int[]',
-            module => 'Params::Sah',
-            code_template => q(state $validator = Params::Sah::gen_validator({on_invalid=>"bool"}, "int*", ["array*",of=>"int*"]); $validator->(<args>)),
-            tags => ['int_int[]'],
-        },
-        {
             name => 'Type::Params-int_int[]',
             module => 'Type::Params',
             code_template => q(use Type::Params qw(compile); use Types::Standard qw(Int ArrayRef); state $validator = compile(Int, ArrayRef[Int]); $validator->(@{<args>})),
@@ -60,12 +54,6 @@ our $scenario = {
             name => 'Params::Sah-str[]',
             module => 'Params::Sah',
             code_template => q(state $validator = Params::Sah::gen_validator(["array*",of=>"str*"]); $validator->(<args>)),
-            tags => ['str[]'],
-        },
-        {
-            name => 'Params::Sah(on_invalid-bool)-str[]',
-            module => 'Params::Sah',
-            code_template => q(state $validator = Params::Sah::gen_validator({on_invalid=>"bool"}, ["array*",of=>"str*"]); $validator->(<args>)),
             tags => ['str[]'],
         },
         {
@@ -177,7 +165,7 @@ Bencher::Scenario::ParamsSah::Validate - Measure validation speed
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenario::ParamsSah::Validate (from Perl distribution Bencher-Scenarios-ParamsSah), released on 2020-05-08.
+This document describes version 0.002 of Bencher::Scenario::ParamsSah::Validate (from Perl distribution Bencher-Scenarios-ParamsSah), released on 2020-05-10.
 
 =head1 SYNOPSIS
 
@@ -199,9 +187,9 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Params::Sah> 0.070
+L<Params::Sah> 0.072
 
-L<Type::Params> 1.010001
+L<Type::Params> 1.004004
 
 L<Params::ValidationCompiler> 0.30
 
@@ -241,14 +229,6 @@ Code template:
 
 
 
-=item * Params::Sah(on_invalid-bool)-int_int[] (perl_code) [int_int[]]
-
-Code template:
-
- state $validator = Params::Sah::gen_validator({on_invalid=>"bool"}, "int*", ["array*",of=>"int*"]); $validator->(<args>)
-
-
-
 =item * Type::Params-int_int[] (perl_code) [int_int[]]
 
 Code template:
@@ -270,14 +250,6 @@ Code template:
 Code template:
 
  state $validator = Params::Sah::gen_validator(["array*",of=>"str*"]); $validator->(<args>)
-
-
-
-=item * Params::Sah(on_invalid-bool)-str[] (perl_code) [str[]]
-
-Code template:
-
- state $validator = Params::Sah::gen_validator({on_invalid=>"bool"}, ["array*",of=>"str*"]); $validator->(<args>)
 
 
 
@@ -359,48 +331,42 @@ Code template:
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.30.2 >>, CPU: I<< Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz (4 cores) >>, OS: I<< GNU/Linux LinuxMint version 19 >>, OS kernel: I<< Linux version 4.15.0-91-generic >>.
+Run on: perl: I<< v5.30.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores) >>, OS: I<< GNU/Linux Ubuntu version 19.10 >>, OS kernel: I<< Linux version 5.3.0-46-generic >>.
 
 Benchmark with default options (C<< bencher -m ParamsSah::Validate >>):
 
  #table1#
- +----------------------------------------+----------------+--------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | participant                            | dataset        | p_tags       | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
- +----------------------------------------+----------------+--------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | Params::Sah-strwithlen[]               | [(foobar)x100] | strwithlen[] |     26200 | 38.1      |                 0.00% |             12397.17% | 1.3e-08 |      22 |
- | Params::Sah-int_int[]                  | 1,[1..100]     | int_int[]    |     31100 | 32.1      |                18.67% |             10430.78% | 1.3e-08 |      21 |
- | Type::Params-strwithlen[]              | [(foobar)x100] | strwithlen[] |     35000 | 28        |                34.94% |              9160.96% | 5.2e-08 |      21 |
- | Params::Sah(on_invalid-bool)-int_int[] | 1,[1..100]     | int_int[]    |     38700 | 25.9      |                47.39% |              8379.14% | 1.3e-08 |      20 |
- | Params::Sah-str[]                      | [("a")x100]    | str[]        |     42600 | 23.5      |                62.46% |              7592.45% | 6.7e-09 |      20 |
- | Params::Sah(on_invalid-bool)-str[]     | [("a")x100]    | str[]        |     56400 | 17.7      |               115.12% |              5709.47% | 6.4e-09 |      22 |
- | Params::Sah-strwithlen[]               | [(foobar)x10]  | strwithlen[] |    157842 |  6.33545  |               501.58% |              1977.39% |   0     |      20 |
- | Params::Sah-int_int[]                  | 1,[1..10]      | int_int[]    |    184250 |  5.4273   |               602.24% |              1679.61% | 5.8e-12 |      26 |
- | Params::ValidationCompiler-str[]       | [("a")x100]    | str[]        |    201379 |  4.96577  |               667.51% |              1528.27% |   0     |      30 |
- | Type::Params-str[]                     | [("a")x100]    | str[]        |    201731 |  4.95709  |               668.85% |              1525.43% |   0     |      20 |
- | Params::Sah-str[]                      | [("a") x 10]   | str[]        |    230000 |  4.3      |               789.98% |              1304.21% | 6.7e-09 |      20 |
- | Params::Sah(on_invalid-bool)-int_int[] | 1,[1..10]      | int_int[]    |    254000 |  3.94     |               866.49% |              1193.05% | 1.7e-09 |      20 |
- | Type::Params-strwithlen[]              | [(foobar)x10]  | strwithlen[] |    308500 |  3.2415   |              1075.77% |               962.89% | 5.8e-12 |      20 |
- | Params::ValidationCompiler-int_int[]   | 1,[1..100]     | int_int[]    |    350000 |  2.86     |              1232.51% |               837.87% | 2.7e-09 |      31 |
- | Params::Sah(on_invalid-bool)-str[]     | [("a") x 10]   | str[]        |    350000 |  2.8      |              1239.71% |               832.82% |   4e-09 |      22 |
- | Type::Params-int_int[]                 | 1,[1..100]     | int_int[]    |    358000 |  2.8      |              1263.50% |               816.55% | 8.1e-10 |      21 |
- | Params::Sah-int_int[]                  | 1,[]           | int_int[]    |    440000 |  2.3      |              1583.81% |               642.20% | 2.5e-09 |      20 |
- | Params::Sah-str[]                      | []             | str[]        |    530000 |  1.9      |              1903.66% |               523.72% | 3.3e-09 |      20 |
- | Params::Sah(on_invalid-bool)-int_int[] | 1,[]           | int_int[]    |    754760 |  1.3249   |              2776.61% |               334.44% | 5.7e-12 |      20 |
- | Params::Sah(on_invalid-bool)-str[]     | []             | str[]        |   1002900 |  0.997107 |              3722.34% |               226.95% |   0     |      20 |
- | Params::ValidationCompiler-int_int[]   | 1,[1..10]      | int_int[]    |   1000000 |  0.98     |              3775.49% |               222.47% | 1.1e-09 |      26 |
- | Type::Params-int_int[]                 | 1,[1..10]      | int_int[]    |   1060000 |  0.945    |              3931.47% |               209.99% | 4.3e-10 |      20 |
- | Params::ValidationCompiler-str[]       | [("a") x 10]   | str[]        |   1212670 |  0.824625 |              4521.83% |               170.39% |   0     |      20 |
- | Type::Params-str[]                     | [("a") x 10]   | str[]        |   1232800 |  0.81119  |              4598.38% |               165.99% | 5.5e-12 |      25 |
- | Params::ValidationCompiler-int_int[]   | 1,[]           | int_int[]    |   1382840 |  0.723152 |              5170.37% |               137.12% |   0     |      20 |
- | Type::Params-int_int[]                 | 1,[]           | int_int[]    |   1510330 |  0.662106 |              5656.29% |               117.10% |   0     |      24 |
- | Type::Params-int                       | 1              | int          |   1700000 |  0.57     |              6564.73% |                87.51% | 6.3e-10 |      20 |
- | Params::ValidationCompiler-int         | 1              | int          |   1800000 |  0.54     |              6914.35% |                78.17% | 8.3e-10 |      20 |
- | Type::Params-strwithlen                | str-foobar     | str          |   2090000 |  0.477    |              7884.62% |                56.52% | 2.1e-10 |      20 |
- | Params::Sah-int                        | 1              | int          |   2207000 |  0.4532   |              8309.78% |                48.60% | 2.8e-11 |      20 |
- | Params::Sah-strwithlen                 | str-foobar     | str          |   2300000 |  0.44     |              8625.78% |                43.22% | 7.5e-10 |      25 |
- | Params::ValidationCompiler-str[]       | []             | str[]        |   3080000 |  0.325    |             11639.02% |                 6.46% |   1e-10 |      20 |
- | Type::Params-str[]                     | []             | str[]        |   3300000 |  0.3      |             12397.17% |                 0.00% | 3.1e-10 |      20 |
- +----------------------------------------+----------------+--------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ +--------------------------------------+----------------+--------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | participant                          | dataset        | p_tags       | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +--------------------------------------+----------------+--------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | Params::Sah-int_int[]                | 1,[1..100]     | int_int[]    |     16000 |   64      |                 0.00% |             17031.73% | 2.1e-07 |      20 |
+ | Params::Sah-strwithlen[]             | [(foobar)x100] | strwithlen[] |     20000 |   50      |                27.42% |             13345.08% | 3.9e-07 |      20 |
+ | Type::Params-strwithlen[]            | [(foobar)x100] | strwithlen[] |     30000 |   33      |                90.68% |              8884.44% | 5.3e-08 |      20 |
+ | Params::Sah-str[]                    | [("a")x100]    | str[]        |     45000 |   22      |               185.94% |              5891.35% | 2.7e-08 |      20 |
+ | Params::Sah-int_int[]                | 1,[1..10]      | int_int[]    |    110000 |    9.4    |               580.88% |              2416.12% |   2e-08 |      20 |
+ | Params::Sah-strwithlen[]             | [(foobar)x10]  | strwithlen[] |    100000 |    8      |               720.27% |              1988.55% |   3e-07 |      29 |
+ | Params::ValidationCompiler-str[]     | [("a")x100]    | str[]        |    140000 |    7.2    |               785.67% |              1834.33% | 1.3e-08 |      20 |
+ | Type::Params-int_int[]               | 1,[1..100]     | int_int[]    |    150000 |    6.9    |               831.03% |              1740.07% | 1.7e-08 |      20 |
+ | Type::Params-str[]                   | [("a")x100]    | str[]        |    160000 |    6.3    |               912.17% |              1592.57% | 9.8e-09 |      21 |
+ | Type::Params-strwithlen[]            | [(foobar)x10]  | strwithlen[] |    259000 |    3.86   |              1551.87% |               937.11% | 1.4e-09 |      29 |
+ | Params::ValidationCompiler-int_int[] | 1,[1..100]     | int_int[]    |    276980 |    3.6104 |              1666.82% |               869.63% | 2.3e-11 |      20 |
+ | Params::Sah-str[]                    | [("a") x 10]   | str[]        |    290000 |    3.5    |              1736.57% |               832.81% | 6.7e-09 |      20 |
+ | Params::Sah-int_int[]                | 1,[]           | int_int[]    |    400000 |    2      |              2544.54% |               547.81% | 1.1e-07 |      24 |
+ | Type::Params-int_int[]               | 1,[1..10]      | int_int[]    |    450000 |    2.2    |              2766.24% |               497.71% | 6.7e-09 |      20 |
+ | Params::ValidationCompiler-int_int[] | 1,[]           | int_int[]    |    610000 |    1.6    |              3771.30% |               342.53% |   5e-09 |      20 |
+ | Type::Params-int_int[]               | 1,[]           | int_int[]    |    620000 |    1.6    |              3867.86% |               331.76% | 3.3e-09 |      20 |
+ | Params::Sah-str[]                    | []             | str[]        |    831800 |    1.202  |              5206.17% |               222.86% | 2.3e-11 |      20 |
+ | Params::ValidationCompiler-int_int[] | 1,[1..10]      | int_int[]    |    881000 |    1.14   |              5517.24% |               204.98% | 3.6e-10 |      27 |
+ | Params::ValidationCompiler-str[]     | [("a") x 10]   | str[]        |    997100 |    1.003  |              6260.44% |               169.35% | 2.3e-11 |      24 |
+ | Type::Params-str[]                   | [("a") x 10]   | str[]        |   1010000 |    0.993  |              6323.35% |               166.71% | 3.7e-10 |      26 |
+ | Params::Sah-strwithlen               | str-foobar     | str          |   1000000 |    0.7    |              8528.76% |                98.54% | 2.7e-08 |      20 |
+ | Params::ValidationCompiler-int       | 1              | int          |   1550000 |    0.643  |              9818.60% |                72.72% | 2.1e-10 |      20 |
+ | Type::Params-int                     | 1              | int          |   1570000 |    0.639  |              9888.10% |                71.52% | 2.1e-10 |      20 |
+ | Type::Params-strwithlen              | str-foobar     | str          |   1800000 |    0.57   |             11070.04% |                53.37% | 8.3e-10 |      20 |
+ | Params::Sah-int                      | 1              | int          |   1912000 |    0.523  |             12096.43% |                40.47% | 2.3e-11 |      20 |
+ | Params::ValidationCompiler-str[]     | []             | str[]        |   2600000 |    0.39   |             16376.44% |                 3.98% | 6.3e-10 |      20 |
+ | Type::Params-str[]                   | []             | str[]        |   2690000 |    0.372  |             17031.73% |                 0.00% | 1.6e-10 |      36 |
+ +--------------------------------------+----------------+--------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
 
 Benchmark module startup overhead (C<< bencher -m ParamsSah::Validate --module-startup >>):
@@ -409,10 +375,10 @@ Benchmark module startup overhead (C<< bencher -m ParamsSah::Validate --module-s
  +----------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
  | participant                | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
  +----------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
- | Type::Params               |        38 |                32 |                 0.00% |               552.54% | 0.00013 |      20 |
- | Params::ValidationCompiler |        24 |                18 |                58.61% |               311.42% | 0.00017 |      20 |
- | Params::Sah                |         8 |                 2 |               356.85% |                42.83% | 0.00012 |      20 |
- | perl -e1 (baseline)        |         6 |                 0 |               552.54% |                 0.00% | 0.00023 |      21 |
+ | Type::Params               |      41.2 |              33.9 |                 0.00% |               467.20% | 3.9e-05 |      20 |
+ | Params::ValidationCompiler |      30   |              22.7 |                37.20% |               313.41% | 1.9e-05 |      20 |
+ | Params::Sah                |      11.1 |               3.8 |               272.43% |                52.30% | 6.2e-06 |      20 |
+ | perl -e1 (baseline)        |       7.3 |               0   |               467.20% |                 0.00% | 1.9e-05 |      20 |
  +----------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
 
 

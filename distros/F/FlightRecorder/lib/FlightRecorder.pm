@@ -14,9 +14,15 @@ use Data::Object::ClassHas;
 with 'Data::Object::Role::Pluggable';
 with 'Data::Object::Role::Throwable';
 
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 # ATTRIBUTES
+
+has 'auto' => (
+  is => 'ro',
+  isa => 'Maybe[FileHandle]',
+  def => sub{\*STDOUT},
+);
 
 has 'head' => (
   is => 'ro',
@@ -78,6 +84,8 @@ method begin(Str $name) {
   $self->context($name);
   $self->message('debug', join(' ', $self->name, 'began'), [1,2]);
 
+  $self->output($self->auto) if $self->auto;
+
   return $self;
 }
 
@@ -89,6 +97,8 @@ method branch(Str $name) {
 
   $self->context($name);
   $self->message('debug', join(' ', $self->name, 'began'), [1,2]);
+
+  $self->output($self->auto) if $self->auto;
 
   return $self;
 }
@@ -113,11 +123,15 @@ method data(HashRef[Str] $data) {
 method debug(Str @messages) {
   $self->message('debug', join(' ', @messages), [1,2]);
 
+  $self->output($self->auto) if $self->auto;
+
   return $self;
 }
 
 method end() {
   $self->message('debug', join(' ', $self->name, 'ended'), [1,2]);
+
+  $self->output($self->auto) if $self->auto;
 
   return $self;
 }
@@ -125,11 +139,15 @@ method end() {
 method error(Str @messages) {
   $self->message('error', join(' ', @messages), [1,2]);
 
+  $self->output($self->auto) if $self->auto;
+
   return $self;
 }
 
 method fatal(Str @messages) {
   $self->message('fatal', join(' ', @messages), [1,2]);
+
+  $self->output($self->auto) if $self->auto;
 
   return $self;
 }
@@ -204,6 +222,8 @@ method head_level() {
 method info(Str @messages) {
   $self->message('info', join(' ', @messages), [1,2]);
 
+  $self->output($self->auto) if $self->auto;
+
   return $self;
 }
 
@@ -212,6 +232,8 @@ method initialize(Tuple[Int, Int] $frames) {
 
   $self->context('main');
   $self->message('debug', join(' ', $self->name, 'began'), $index);
+
+  $self->output($self->auto) if $self->auto;
 
   return $self;
 }
@@ -387,7 +409,9 @@ Logging for Distributed Systems
 
   use FlightRecorder;
 
-  my $f = FlightRecorder->new;
+  my $f = FlightRecorder->new(
+    auto => undef
+  );
 
   # $f->begin('try');
   # $f->debug('something happend');
@@ -424,6 +448,14 @@ L<Types::Standard>
 =head1 ATTRIBUTES
 
 This package has the following attributes:
+
+=cut
+
+=head2 auto
+
+  auto(Maybe[FileHandle])
+
+This attribute is read-only, accepts C<(Maybe[FileHandle])> values, and is optional.
 
 =cut
 
@@ -634,7 +666,8 @@ The info method logs an C<info> level event with context.
   output(FileHandle $handle) : Str
 
 The output method outputs the last event using the format defined in the
-C<format> attribute.
+C<format> attribute. This method is called automatically after each log-event
+if the C<auto> attribute is set, which is by default set to C<STDOUT>.
 
 =over 4
 
@@ -643,6 +676,30 @@ C<format> attribute.
   # given: synopsis
 
   $f->begin('test')->output
+
+=back
+
+=over 4
+
+=item output example #2
+
+  package main;
+
+  use FlightRecorder;
+
+  my $f = FlightRecorder->new;
+
+  $f->begin('try');
+
+  # $f->output
+
+  $f->debug('something happened');
+
+  # $f->output
+
+  $f->end;
+
+  # $f->output
 
 =back
 

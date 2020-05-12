@@ -2,8 +2,8 @@ NAME
     Bencher::Backend - Backend for Bencher
 
 VERSION
-    This document describes version 1.047 of Bencher::Backend (from Perl
-    distribution Bencher-Backend), released on 2020-01-12.
+    This document describes version 1.049 of Bencher::Backend (from Perl
+    distribution Bencher-Backend), released on 2020-05-12.
 
 FUNCTIONS
   bencher
@@ -324,6 +324,9 @@ FUNCTIONS
         When benchmarking with Benchmark::Dumb::SimpleTime, this value is a
         positive integer which means the number of iterations to perform.
 
+        When profiling, a number greater than 1 will set a repetition loop
+        (e.g. "for(1..100){ ... }").
+
         This setting overrides "default_precision" property in the scenario.
 
     *   precision_limit => *float*
@@ -348,14 +351,14 @@ FUNCTIONS
         When action=show-items-result, will print result as-is instead of
         dumping as Perl.
 
-    *   result_dir => *str*
+    *   result_dir => *dirname*
 
         Directory to use when saving benchmark result.
 
         Default is from "BENCHER_RESULT_DIR" environment variable, or the
         home directory.
 
-    *   result_filename => *str*
+    *   result_filename => *filename*
 
         Filename to use when saving benchmark result.
 
@@ -509,6 +512,8 @@ FUNCTIONS
 
     *   output_file* => *str*
 
+        .
+
     *   overwrite => *bool*
 
     *   title => *str*
@@ -527,7 +532,7 @@ FUNCTIONS
   format_result
     Usage:
 
-     format_result($envres, $formatters, $options, $exclude_formatters) -> [status, msg, payload, meta]
+     format_result( [ \%optional_named_args ] , $envres, $formatters, $options) -> [status, msg, payload, meta]
 
     Format bencher result.
 
@@ -539,7 +544,7 @@ FUNCTIONS
 
         Enveloped result from bencher.
 
-    *   $exclude_formatters => *any*
+    *   exclude_formatters => *any*
 
         Exclude Formatters specification.
 

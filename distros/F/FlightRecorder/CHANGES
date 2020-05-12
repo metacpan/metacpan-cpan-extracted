@@ -1,7 +1,20 @@
 Changelog for FlightRecorder
 
-0.04 2020-05-09T14:23:20
+0.06 2020-05-12T20:49:16
  - No changes found
+
+0.05 2020-05-12T19:41:22
+ - Built release version 0.05
+ - Added release updates
+ - Update release workflow
+ - Add ability to trigger "output" automatically (#15)
+
+0.04 2020-05-09T14:14:00
+ - Built release version 0.04
+ - Added release updates
+ - Updated documentation
+ - Miscellaneous housekeeping
+ - Fix regexp in test issue
 
 0.03 2020-03-15T03:36:46
  - Built release version 0.03

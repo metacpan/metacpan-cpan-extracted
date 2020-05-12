@@ -7,7 +7,7 @@ use Test::More;
 use Test::Exception;
 use Test::RequiresInternet ( 'api.ispapi.net' => 443 );
 
-use version 0.9917; our $VERSION = version->declare('v2.5.0');
+use version 0.9917; our $VERSION = version->declare('v2.9.0');
 
 # T1-4: test import modules
 use_ok('Config');
@@ -59,21 +59,15 @@ is( $cls, 'WebService::Hexonet::Connector::ResponseTemplateManager', 'RTM: Insta
 $rtm->addTemplate( 'OK', $rtm->generateTemplate( '200', 'Command completed successfully' ) );
 $rtm->addTemplate( 'listP0', "[RESPONSE]\r\nPROPERTY[TOTAL][0]=2701\r\nPROPERTY[FIRST][0]=0\r\nPROPERTY[DOMAIN][0]=0-60motorcycletimes.com\r\nPROPERTY[DOMAIN][1]=0-be-s01-0.com\r\nPROPERTY[COUNT][0]=2\r\nPROPERTY[LAST][0]=1\r\nPROPERTY[LIMIT][0]=2\r\nDESCRIPTION=Command completed successfully\r\nCODE=200\r\nQUEUETIME=0\r\nRUNTIME=0.023\r\nEOF\r\n" );
 
-# T11 ~> parse method
-my $plain = $rtm->generateTemplate( '421', q{} );
-$plain =~ s/\r\nDESCRIPTION=//msx;
-my $h = WebService::Hexonet::Connector::ResponseParser::parse($plain);
-is( length $h->{DESCRIPTION}, 0, 'RP: Description Property length check' );
-
 # T12 ~> serialize method #1
 my $r = $rtm->getTemplate('OK');
-$h = $r->getHash();
+my $h = $r->getHash();
 $h->{PROPERTY} = {
     DOMAIN => [ 'mydomain1.com', 'mydomain2.com', 'mydomain3.com' ],
     RATING => [ 0,               1,               2 ],
     SUM    => [ 2 ],
 };
-$plain = WebService::Hexonet::Connector::ResponseParser::serialize($h);
+my $plain = WebService::Hexonet::Connector::ResponseParser::serialize($h);
 is( $plain, "[RESPONSE]\r\nPROPERTY[DOMAIN][0]=mydomain1.com\r\nPROPERTY[DOMAIN][1]=mydomain2.com\r\nPROPERTY[DOMAIN][2]=mydomain3.com\r\nPROPERTY[RATING][0]=0\r\nPROPERTY[RATING][1]=1\r\nPROPERTY[RATING][2]=2\r\nPROPERTY[SUM][0]=2\r\nCODE=200\r\nDESCRIPTION=Command completed successfully\r\nEOF\r\n", 'RP: Serialize result check #1' );
 
 # T13 ~> serialize method #2
@@ -104,33 +98,38 @@ my $d  = $sc->getPOSTData();
 is( %{$d}, 0, 'SocketConfig: Check initial POST data' );
 
 # ---- Module "ResponseTemplate" ---- #
+# invalid API response test
+$tpl = WebService::Hexonet::Connector::ResponseTemplate->new("[RESPONSE]\r\ncode=200\r\nqueuetime=0\r\nEOF\r\n");
+is( $tpl->getCode(), $TMP_ERR_423, 'ResponseTemplate: Check response code of template `invalid`' );
+is( $tpl->getDescription(), 'Invalid API response. Contact Support', 'ResponseTemplate: Check response description of template `invalid`' );
+
 # - T17 ~> constructor test
 $tpl = WebService::Hexonet::Connector::ResponseTemplate->new(q{});
 is( $tpl->getCode(), $TMP_ERR_423, 'ResponseTemplate: Check response code of template `empty` #1' );
-is( $tpl->getDescription(), 'Empty API response. Probably unreachable API end point', 'ResponseTemplate: Check response description of template `empty` #1' );
+is( $tpl->getDescription(), 'Empty API response. Probably unreachable API end point {CONNECTION_URL}', 'ResponseTemplate: Check response description of template `empty` #1' );
 
 # - T19 ~> getHash method test
 $tpl = WebService::Hexonet::Connector::ResponseTemplate->new();
 $h   = $tpl->getHash();
 is( $h->{CODE}, $TMP_ERR_423, 'ResponseTemplate: Check response code of template `empty` #2' );
-is( $h->{DESCRIPTION}, 'Empty API response. Probably unreachable API end point', 'ResponseTemplate: Check response description of template `empty` #2' );
+is( $h->{DESCRIPTION}, 'Empty API response. Probably unreachable API end point {CONNECTION_URL}', 'ResponseTemplate: Check response description of template `empty` #2' );
 
 # - T21 ~> getQueuetime method test
 $tpl = WebService::Hexonet::Connector::ResponseTemplate->new();
 is( $tpl->getQueuetime(), 0, 'ResponseTemplate: Check response queuetime of template `empty`' );
-$tpl = WebService::Hexonet::Connector::ResponseTemplate->new("[RESPONSE]\r\ncode=423\r\ndescription=Empty API response. Probably unreachable API end point\r\nqueuetime=0\r\nEOF\r\n");
+$tpl = WebService::Hexonet::Connector::ResponseTemplate->new("[RESPONSE]\r\ncode=423\r\ndescription=Empty API response. Probably unreachable API end point {CONNECTION_URL}\r\nqueuetime=0\r\nEOF\r\n");
 is( $tpl->getQueuetime(), 0, 'ResponseTemplate: Check response queuetime' );
 
 # - T23 ~> getRuntime method test
 $tpl = WebService::Hexonet::Connector::ResponseTemplate->new();
 is( $tpl->getRuntime(), 0, 'ResponseTemplate: Check response runtime of template `empty`' );
-$tpl = WebService::Hexonet::Connector::ResponseTemplate->new("[RESPONSE]\r\ncode=423\r\ndescription=Empty API response. Probably unreachable API end point\r\nruntime=0.12\r\nEOF\r\n");
+$tpl = WebService::Hexonet::Connector::ResponseTemplate->new("[RESPONSE]\r\ncode=423\r\ndescription=Empty API response. Probably unreachable API end point {CONNECTION_URL}\r\nruntime=0.12\r\nEOF\r\n");
 is( $tpl->getRuntime(), $RES_RUNTIME, 'ResponseTemplate: Check response runtime' );
 
 # ~> isPending method test
 $tpl = WebService::Hexonet::Connector::ResponseTemplate->new();
 is( $tpl->isPending(), 0, 'ResponseTemplate: Check response pending value of template `empty`' );
-$tpl = WebService::Hexonet::Connector::ResponseTemplate->new("[RESPONSE]\r\ncode=423\r\ndescription=Empty API response. Probably unreachable API end point\r\npending=1\r\nEOF\r\n");
+$tpl = WebService::Hexonet::Connector::ResponseTemplate->new("[RESPONSE]\r\ncode=423\r\ndescription=Empty API response. Probably unreachable API end point {CONNECTION_URL}\r\npending=1\r\nEOF\r\n");
 is( $tpl->isPending(), 1, 'ResponseTemplate: Check response pending value' );
 
 # ---- Module "ResponseTemplateManager" ---- #
@@ -162,6 +161,23 @@ $tpl = WebService::Hexonet::Connector::ResponseTemplate->new();
 is( $rtm->isTemplateMatchPlain( $tpl->getPlain(), 'empty' ), 1, 'RTM: Check plain template match.' );
 
 # ---- Module "Response" ---- #
+# variable place holder replacement tests
+$r = WebService::Hexonet::Connector::Response->new(q{});
+is( $r->getDescription() =~ /[{][[:upper:]_]+[}]/gsmx, q{}, 'R: Check place holder var replacement. #1' );
+
+$r = WebService::Hexonet::Connector::Response->new( q{}, { COMMAND => 'StatusAccount' }, { CONNECTION_URL => '123HXPHFOUND123' } );
+is( $r->getDescription() =~ /[{][[:upper:]_]+[}]/gsmx, q{}, 'R: Check place holder var replacement. #2' );
+is( $r->getDescription() =~ /123HXPHFOUND123/gsmx,     1,   'R: Check place holder var replacement. #3' );
+
+# getCommandPlain test
+$r = WebService::Hexonet::Connector::Response->new( q{}, { COMMAND => 'QueryDomainOptions', DOMAIN0 => 'example.com', DOMAIN1 => 'example.net' } );
+my $expected = "COMMAND = QueryDomainOptions\nDOMAIN0 = example.com\nDOMAIN1 = example.net\n";
+is( $r->getCommandPlain(), $expected, 'R: Check getCommandPlain result.' );
+
+$r = WebService::Hexonet::Connector::Response->new( q{}, { COMMAND => 'CheckAuthentication', SUBUSER => 'test.user', PASSWORD => 'test.passw0rd' } );
+$expected = "COMMAND = CheckAuthentication\nPASSWORD = ***\nSUBUSER = test.user\n";
+is( $r->getCommandPlain(), $expected, 'R: Check getCommandPlain result.' );
+
 # - T36 ~> getCurrentPageNumber method test
 $tpl = $rtm->getTemplate('listP0');
 $r   = WebService::Hexonet::Connector::Response->new( $tpl->getPlain() );
@@ -335,7 +351,7 @@ my $enc = $cl->getPOSTData( { COMMAND => 'ModifyDomain', AUTH => 'gwrgwqg%&\\44t
 is_deeply( $enc, $validate, 'AC: Check getPOSTData result. #1' );
 $validate = {
     's_entity'  => '54cd',
-    's_command' => q{}
+    's_command' => 'gregergege'
 };
 $enc = $cl->getPOSTData('gregergege');
 is_deeply( $enc, $validate, 'AC: Check getPOSTDate result. #2' );
@@ -351,10 +367,23 @@ $enc = $cl->getPOSTData(
 );
 is_deeply( $enc, $validate, 'AC: Check getPOSTData result. #3' );
 
+# test secured return value of method getPOSTData
 $validate = {
     's_entity'  => '54cd',
-    's_command' => "COMMAND=QueryDomainOptions\nDOMAIN0=example1.com\nDOMAIN1=example2.com"
+    's_login'   => 'test.user',
+    's_pw'      => '***',
+    's_command' => "COMMAND=CheckAuthentication\nPASSWORD=***\nSUBUSER=test.user"
 };
+$cl->setCredentials( 'test.user', 'test.passw0rd' );
+$enc = $cl->getPOSTData(
+    {   COMMAND  => 'CheckAuthentication',
+        SUBUSER  => 'test.user',
+        PASSWORD => 'test.passw0rd'
+    },
+    1
+);
+$cl->setCredentials( '', '' );
+is_deeply( $enc, $validate, 'AC: Check secured getPOSTData result.' );
 
 # ~> enableDebugMode method test
 $cl->enableDebugMode();
@@ -655,6 +684,13 @@ $cls        = blessed( $cl->setUserAgent( 'WHMCS', '7.7.0' ) );
 $ua         = $cl->getUserAgent();
 is( $cls, 'WebService::Hexonet::Connector::APIClient', 'AC: Check if setUserAgent method is working. #1' );
 is( $ua, $uaexpected, 'AC: Check if setUserAgent method is working. #2' );
+
+$uaexpected = "WHMCS ($os; $arch; rv:7.7.0) reg/2.6.2 ssl/7.2.2 dc/8.2.2 perl-sdk/$rv perl/$Config{version}";
+my $mods = [ 'reg/2.6.2', 'ssl/7.2.2', 'dc/8.2.2' ];
+$cls = blessed( $cl->setUserAgent( 'WHMCS', '7.7.0', $mods ) );
+$ua = $cl->getUserAgent();
+is( $cls, 'WebService::Hexonet::Connector::APIClient', 'AC: Check if setUserAgent method is working. #3' );
+is( $ua, $uaexpected, 'AC: Check if setUserAgent method is working. #4' );
 
 done_testing();
 

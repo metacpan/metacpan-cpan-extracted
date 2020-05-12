@@ -2,7 +2,9 @@ Build.PL
 Changes
 lib/Metrics/Any.pm
 lib/Metrics/Any/Adapter.pm
+lib/Metrics/Any/Adapter/File.pm
 lib/Metrics/Any/Adapter/Null.pm
+lib/Metrics/Any/Adapter/Stderr.pm
 lib/Metrics/Any/Adapter/Test.pm
 lib/Metrics/Any/Collector.pm
 LICENSE
@@ -16,4 +18,5 @@ t/02adapter-early.t
 t/03adapter-late.t
 t/10adapter-null.t
 t/11adapter-test.t
+t/12adapter-file.t
 t/99pod.t

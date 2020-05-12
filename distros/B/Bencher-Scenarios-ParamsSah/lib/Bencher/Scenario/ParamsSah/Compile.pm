@@ -1,9 +1,9 @@
 package Bencher::Scenario::ParamsSah::Compile;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-08'; # DATE
+our $DATE = '2020-05-10'; # DATE
 our $DIST = 'Bencher-Scenarios-ParamsSah'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,8 +13,12 @@ our $scenario = {
     summary => 'Measure compilation speed',
     participants => [
         {
-            name => 'Params::Sah',
+            name => 'Params::Sah+Data::Sah',
             fcall_template => q(Params::Sah::gen_validator("int*", ["array*",of=>"int*"])),
+        },
+        {
+            name => 'Params::Sah+Data::Sah::Tiny',
+            fcall_template => q(Params::Sah::gen_validator({backend=>"Data::Sah::Tiny"}, "int*", ["array*",of=>"int*"])),
         },
         {
             name => 'Type::Params',
@@ -44,7 +48,7 @@ Bencher::Scenario::ParamsSah::Compile - Measure compilation speed
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenario::ParamsSah::Compile (from Perl distribution Bencher-Scenarios-ParamsSah), released on 2020-05-08.
+This document describes version 0.002 of Bencher::Scenario::ParamsSah::Compile (from Perl distribution Bencher-Scenarios-ParamsSah), released on 2020-05-10.
 
 =head1 SYNOPSIS
 
@@ -66,9 +70,9 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Params::Sah> 0.070
+L<Params::Sah> 0.072
 
-L<Type::Params> 1.010001
+L<Type::Params> 1.004004
 
 L<Params::ValidationCompiler> 0.30
 
@@ -76,11 +80,19 @@ L<Params::ValidationCompiler> 0.30
 
 =over
 
-=item * Params::Sah (perl_code)
+=item * Params::Sah+Data::Sah (perl_code)
 
 Function call template:
 
  Params::Sah::gen_validator("int*", ["array*",of=>"int*"])
+
+
+
+=item * Params::Sah+Data::Sah::Tiny (perl_code)
+
+Function call template:
+
+ Params::Sah::gen_validator({backend=>"Data::Sah::Tiny"}, "int*", ["array*",of=>"int*"])
 
 
 
@@ -104,18 +116,19 @@ Code template:
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.30.2 >>, CPU: I<< Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz (4 cores) >>, OS: I<< GNU/Linux LinuxMint version 19 >>, OS kernel: I<< Linux version 4.15.0-91-generic >>.
+Run on: perl: I<< v5.30.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores) >>, OS: I<< GNU/Linux Ubuntu version 19.10 >>, OS kernel: I<< Linux version 5.3.0-46-generic >>.
 
 Benchmark with default options (C<< bencher -m ParamsSah::Compile >>):
 
  #table1#
- +----------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | participant                | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
- +----------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | Params::Sah                |       566 |      1.77 |                 0.00% |               871.27% | 6.9e-07 |      20 |
- | Params::ValidationCompiler |      3800 |      0.27 |               566.09% |                45.82% | 3.7e-07 |      20 |
- | Type::Params               |      5500 |      0.18 |               871.27% |                 0.00% | 1.9e-07 |      24 |
- +----------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ +-----------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | participant                 | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +-----------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | Params::Sah+Data::Sah       |       460 |     2.2   |                 0.00% |               948.76% | 7.7e-06 |      20 |
+ | Params::ValidationCompiler  |      3200 |     0.31  |               598.08% |                50.23% | 8.3e-07 |      21 |
+ | Params::Sah+Data::Sah::Tiny |      4370 |     0.229 |               843.02% |                11.21% | 2.1e-07 |      20 |
+ | Type::Params                |      4900 |     0.21  |               948.76% |                 0.00% | 4.2e-07 |      21 |
+ +-----------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
 
 Benchmark module startup overhead (C<< bencher -m ParamsSah::Compile --module-startup >>):
@@ -124,10 +137,10 @@ Benchmark module startup overhead (C<< bencher -m ParamsSah::Compile --module-st
  +----------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
  | participant                | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
  +----------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
- | Type::Params               |        38 |                33 |                 0.00% |               671.59% | 0.00018 |      20 |
- | Params::ValidationCompiler |        25 |                20 |                54.11% |               400.69% | 0.00016 |      20 |
- | Params::Sah                |         9 |                 4 |               342.67% |                74.30% | 0.00018 |      20 |
- | perl -e1 (baseline)        |         5 |                 0 |               671.59% |                 0.00% | 0.00021 |      20 |
+ | Type::Params               |      41   |              33.8 |                 0.00% |               476.05% | 4.3e-05 |      20 |
+ | Params::ValidationCompiler |      30   |              22.8 |                37.86% |               317.85% | 3.1e-05 |      20 |
+ | Params::Sah                |      11   |               3.8 |               273.42% |                54.26% | 1.5e-05 |      20 |
+ | perl -e1 (baseline)        |       7.2 |               0   |               476.05% |                 0.00% | 1.6e-05 |      20 |
  +----------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
 
 

@@ -142,10 +142,21 @@ sub check_dot_patch {
     if ( open DOTPATCH, "< $dot_patch" ) {
         chomp( $patch_level = <DOTPATCH> );
         close DOTPATCH;
+        # From rsync:
+        # blead 2019-11-06.00:32:06 +0100 cc8ba724ccabff255f384ab68d6f6806ac2eae7c v5.31.5-174-gcc8ba72
+        # from make_dot_patch.pl:
+        # blead 2019-11-05.23:32:06 cc8ba724ccabff255f384ab68d6f6806ac2eae7c v5.31.5-174-gcc8ba724cc
         if ( $patch_level ) {
             my @dot_patch = split ' ', $patch_level;
-            $self->{patchlevel} = $dot_patch[2] || $dot_patch[0];
-            $self->{patchdescr} = $dot_patch[3] || $dot_patch[0];
+
+            # As we do not use time information, we can just pick the first and
+            # the last two elements
+            my ($branch, $sha, $describe) = @dot_patch[0, -2, -1];
+            # $sha      -> sysinfo.git_id
+            # $describe -> sysinfo.git_describe
+
+            $self->{patchlevel} = $sha      || $branch;
+            $self->{patchdescr} = $describe || $branch;
             return $self->{patchlevel};
         }
     }

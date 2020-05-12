@@ -8,7 +8,9 @@ package Metrics::Any::Adapter::Test;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
+
+use Carp;
 
 =head1 NAME
 
@@ -160,6 +162,9 @@ sub inc_counter_by
    my $self = shift;
    my ( $handle, $amount, @labelvalues ) = @_;
 
+   $self->{$handle}{type} eq "counter" or
+      croak "$handle is not a counter metric";
+
    $metrics{ $self->_key( $handle, undef, @labelvalues ) } += $amount;
 }
 
@@ -169,6 +174,9 @@ sub inc_distribution_by
 {
    my $self = shift;
    my ( $handle, $amount, @labelvalues ) = @_;
+
+   $self->{$handle}{type} eq "distribution" or
+      croak "$handle is not a distribution metric";
 
    # TODO: Some buckets?
    $metrics{ $self->_key( $handle, "_count", @labelvalues ) } += 1;
@@ -182,6 +190,9 @@ sub inc_gauge_by
    my $self = shift;
    my ( $handle, $amount, @labelvalues ) = @_;
 
+   $self->{$handle}{type} eq "gauge" or
+      croak "$handle is not a gauge metric";
+
    $metrics{ $self->_key( $handle, undef, @labelvalues ) } += $amount;
 }
 
@@ -189,6 +200,9 @@ sub set_gauge_to
 {
    my $self = shift;
    my ( $handle, $amount, @labelvalues ) = @_;
+
+   $self->{$handle}{type} eq "gauge" or
+      croak "$handle is not a gauge metric";
 
    $metrics{ $self->_key( $handle, undef, @labelvalues ) } = $amount;
 }
@@ -199,6 +213,9 @@ sub inc_timer_by
 {
    my $self = shift;
    my ( $handle, $duration, @labelvalues ) = @_;
+
+   $self->{$handle}{type} eq "timer" or
+      croak "$handle is not a timer metric";
 
    $duration = $timer_duration if defined $timer_duration;
 
