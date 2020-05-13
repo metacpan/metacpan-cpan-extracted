@@ -1,4 +1,8 @@
-#!/usr/bin/perl
+package Mail::DKIM::PublicKey;
+use strict;
+use warnings;
+our $VERSION = '1.20200513.1'; # VERSION
+# ABSTRACT: Represents a DKIM key
 
 # Copyright 2005 Messiah College. All rights reserved.
 # Jason Long <jlong@messiah.edu>
@@ -6,11 +10,6 @@
 # Copyright (c) 2004 Anthony D. Urso. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
-
-use strict;
-use warnings;
-
-package Mail::DKIM::PublicKey;
 
 use base ( 'Mail::DKIM::KeyValueList', 'Mail::DKIM::Key' );
 *calculate_EM = \&Mail::DKIM::Key::calculate_EM;
@@ -32,26 +31,6 @@ sub new {
     bless $self, $type;
 }
 
-=head1 CONSTRUCTOR
-
-=head2 fetch() - retrieve a public key record from DNS
-
-  my $public_key = Mail::DKIM::PublicKey->fetch(
-                      Protocol => 'dns',
-                      Selector => 'brisbane',
-                      Domain => 'example.com',
-                    );
-
-If the public key is found, a L<Mail::DKIM::PublicKey> object
-is returned, representing the information found in DNS.
-If the public key does not exist in DNS, then C<undef> is
-returned.
-If a DNS error occurs while fetching the key, then this method
-will C<die>.
-If the public key was found, but is not valid (e.g. it is "revoked"),
-then this method will C<die>.
-
-=cut
 
 sub fetch {
     my $class  = shift;
@@ -133,9 +112,6 @@ sub fetch_async {
     return $waiter;
 }
 
-=head1 METHODS
-
-=cut
 
 # check syntax of the public key
 # throw an error if any errors are detected
@@ -348,21 +324,6 @@ sub verify {
     return $rtrn;
 }
 
-=head2 granularity() - get or set the granularity (g=) field
-
-  my $g = $public_key->granularity;
-
-  $public_key->granularity('*');
-
-Granularity of the key. The value must match the Local-part of the
-effective "i=" tag of the DKIM-Signature header field.
-The granularity is a literal value, or a pattern with a single '*'
-wildcard character that matches zero or more characters.
-
-If no granularity is defined, then the default value, '*', will
-be returned.
-
-=cut
 
 sub granularity {
     my $self = shift;
@@ -490,3 +451,103 @@ sub verify_digest {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Mail::DKIM::PublicKey - Represents a DKIM key
+
+=head1 VERSION
+
+version 1.20200513.1
+
+=head1 CONSTRUCTOR
+
+=head2 fetch() - retrieve a public key record from DNS
+
+  my $public_key = Mail::DKIM::PublicKey->fetch(
+                      Protocol => 'dns',
+                      Selector => 'brisbane',
+                      Domain => 'example.com',
+                    );
+
+If the public key is found, a L<Mail::DKIM::PublicKey> object
+is returned, representing the information found in DNS.
+If the public key does not exist in DNS, then C<undef> is
+returned.
+If a DNS error occurs while fetching the key, then this method
+will C<die>.
+If the public key was found, but is not valid (e.g. it is "revoked"),
+then this method will C<die>.
+
+=head1 METHODS
+
+=head2 granularity() - get or set the granularity (g=) field
+
+  my $g = $public_key->granularity;
+
+  $public_key->granularity('*');
+
+Granularity of the key. The value must match the Local-part of the
+effective "i=" tag of the DKIM-Signature header field.
+The granularity is a literal value, or a pattern with a single '*'
+wildcard character that matches zero or more characters.
+
+If no granularity is defined, then the default value, '*', will
+be returned.
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Jason Long <jason@long.name>
+
+=item *
+
+Marc Bradshaw <marc@marcbradshaw.net>
+
+=item *
+
+Bron Gondwana <brong@fastmailteam.com> (ARC)
+
+=back
+
+=head1 THANKS
+
+Work on ensuring that this module passes the ARC test suite was
+generously sponsored by Valimail (https://www.valimail.com/)
+
+=head1 COPYRIGHT AND LICENSE
+
+=over 4
+
+=item *
+
+Copyright (C) 2013 by Messiah College
+
+=item *
+
+Copyright (C) 2010 by Jason Long
+
+=item *
+
+Copyright (C) 2017 by Standcore LLC
+
+=item *
+
+Copyright (C) 2020 by FastMail Pty Ltd
+
+=back
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

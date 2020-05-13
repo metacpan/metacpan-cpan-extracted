@@ -1,7 +1,9 @@
 package Dist::Zilla::Plugin::Acme::CPANModules;
 
-our $DATE = '2018-01-09'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-01'; # DATE
+our $DIST = 'Dist-Zilla-Plugin-Acme-CPANModules'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -103,17 +105,28 @@ sub munge_file {
 
     my $abstract = $self->_get_abstract_from_list_summary($file->name, $file->content);
 
+    my $pkg = do {
+        my $pkg = $file->name;
+        $pkg =~ s!^lib/!!;
+        $pkg =~ s!\.pm$!!;
+        $pkg =~ s!/!::!g;
+        $pkg;
+    };
+    my $list;
+    {
+        no strict 'refs';
+        $list = ${"$pkg\::LIST"};
+    }
+
+  CHECK_LIST: {
+        $self->log_fatal("List does not have 'entries' property")
+            unless $list->{entries};
+        $self->log_fatal("List does not have any entries")
+            unless @{ $list->{entries} };
+    } # CHECK_LIST
+
   ADD_X_MENTIONS_PREREQS:
     {
-        my $pkg = do {
-            my $pkg = $file->name;
-            $pkg =~ s!^lib/!!;
-            $pkg =~ s!\.pm$!!;
-            $pkg =~ s!/!::!g;
-            $pkg;
-        };
-        no strict 'refs';
-        my $list = ${"$pkg\::LIST"};
         my @mods;
         for my $entry (@{ $list->{entries} }) {
             push @mods, $entry->{module};
@@ -128,7 +141,7 @@ sub munge_file {
             $self->zilla->register_prereqs(
                 {phase=>'x_mentions', type=>'x_mentions'}, $mod, 0);
         }
-    }
+    } # ADD_X_MENTIONS_PREREQS
 
   SET_ABSTRACT:
     {
@@ -137,7 +150,7 @@ sub munge_file {
             or die "Can't insert abstract for " . $file->name;
         $self->log(["inserting abstract for %s (%s)", $file->name, $abstract]);
         $file->content($content);
-    }
+    } # SET_ABSTRACT
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -156,7 +169,7 @@ Dist::Zilla::Plugin::Acme::CPANModules - Plugin to use when building Acme::CPANM
 
 =head1 VERSION
 
-This document describes version 0.001 of Dist::Zilla::Plugin::Acme::CPANModules (from Perl distribution Dist-Zilla-Plugin-Acme-CPANModules), released on 2018-01-09.
+This document describes version 0.002 of Dist::Zilla::Plugin::Acme::CPANModules (from Perl distribution Dist-Zilla-Plugin-Acme-CPANModules), released on 2020-03-01.
 
 =head1 SYNOPSIS
 
@@ -170,6 +183,8 @@ This plugin is to be used when building C<Acme::CPANModules::*> distribution. It
 currently does the following:
 
 =over
+
+=item * Abort the build if there are no entries in $LIST
 
 =item * Fill the Abstract from list's summary
 
@@ -207,7 +222,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

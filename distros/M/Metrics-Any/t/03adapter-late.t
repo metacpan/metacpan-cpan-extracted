@@ -23,12 +23,12 @@ BEGIN { $metrics->make_counter( handle => name => "the_name" ); }
 
 use Metrics::Any::Adapter 'Testing';
 
-$metrics->inc_counter( handle => 2, 3 );
+$metrics->inc_counter( handle => );
 
 is_deeply( \@method_call_args,
    [
       [qw( make_counter main/handle name the_name )],
-      [qw( inc_counter_by main/handle 1 2 3 )],
+      [qw( inc_counter_by main/handle 1 )],
    ],
    'Adapter methods invoked'
 );

@@ -52,7 +52,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-BagIt/issues
   homepage: https://github.com/LibreCat/Catmandu-BagIt
   repository: https://github.com/LibreCat/Catmandu-BagIt.git
-version: '0.250'
+version: '0.260'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Nicolas Franck <nicolas.franck@ugent.be>'

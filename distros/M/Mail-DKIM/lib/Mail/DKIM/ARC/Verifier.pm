@@ -1,4 +1,8 @@
-#!/usr/bin/perl
+package Mail::DKIM::ARC::Verifier;
+use strict;
+use warnings;
+our $VERSION = '1.20200513.1'; # VERSION
+# ABSTRACT: verifies an ARC-Sealed message
 
 # Copyright 2017 FastMail Pty Ltd.  All Rights Reserved.
 # Bron Gondwana <brong@fastmailteam.com>
@@ -6,118 +10,13 @@
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
-use strict;
-use warnings;
 
-=head1 NAME
 
-Mail::DKIM::ARC::Verifier - verifies an ARC-Sealed message
-
-=head1 SYNOPSIS
-
-  use Mail::DKIM::ARC::Verifier;
-
-  # create a verifier object
-  my $arc = Mail::DKIM::ARC::Verifier->new();
-
-  # read an email from a file handle
-  $arc->load(*STDIN);
-
-  # or read an email and pass it into the verifier, incrementally
-  while (<STDIN>)
-  {
-      # remove local line terminators
-      chomp;
-      s/\015$//;
-
-      # use SMTP line terminators
-      $arc->PRINT("$_\015\012");
-  }
-  $arc->CLOSE;
-
-  # what is the result of the verify?
-  my $result = $arc->result;
-
-  # print the results for all the message-signatures and seals on the message
-  foreach my $signature ($arc->signatures)
-  {
-      print $signature->prefix() . ' v=' . $signature->instance .
-                                     ' ' . $signature->result_detail . "\n";
-  }
-
-  # example output.  Note that to pass, only the MOST RECENT ARC-Message-Signature
-  # must match, because other steps may have modified the signature.  What matters
-  # is that all ARC-Seals pass, and the most recent ARC-Message-Signature passes.
-
-=cut
-
-=head1 DESCRIPTION
-
-The verifier object allows an email message to be scanned for ARC
-seals and their associated signatures to be verified. The verifier
-tracks the state of the message as it is read into memory. When the
-message has been completely read, the signatures are verified and the
-results of the verification can be accessed.
-
-To use the verifier, first create the verifier object. Then start
-"feeding" it the email message to be verified. When all the _headers_
-have been read, the verifier:
-
- 1. checks whether any ARC signatures were found
- 2. queries for the public keys needed to verify the signatures
- 3. sets up the appropriate algorithms and canonicalization objects
- 4. canonicalizes the headers and computes the header hash
-
-Then, when the _body_ of the message has been completely fed into the
-verifier, the body hash is computed and the signatures are verified.
-
-The results of the verification can be checked with L</"result()">
-or L</"signatures()">.
-
-The final result is calculated by the algorithm layed out in
-https://tools.ietf.org/html/draft-ietf-dmarc-arc-protocol-06 -
-if ALL ARC-Seal headers pass and the highest index (i=)
-ARC-Message-Signature passes, then the seal is intact.
-
-=head1 CONSTRUCTOR
-
-=head2 new()
-
-Constructs an object-oriented verifier.
-
-  my $arc = Mail::DKIM::ARC::Verifier->new();
-
-  my $arc = Mail::DKIM::ARC::Verifier->new(%options);
-
-The only options supported at this time are:
-
-=over
-
-=item AS_Canonicalization
-
-if specified, the canonicalized message for the ARC-Seal
-is written to the referenced string or file handle.
-
-=item AMA_Canonicalization
-
-if specified, the canonicalized message for the ARC-Message-Signature
-is written to the referenced string or file handle.
-
-=item Strict
-
-If true, rejects sha1 hashes and signing keys shorter than 1024 bits.
-
-=back
-
-=cut
-
-package Mail::DKIM::ARC::Verifier;
 use base 'Mail::DKIM::Common';
 use Mail::DKIM::ARC::MessageSignature;
 use Mail::DKIM::ARC::Seal;
 use Mail::Address;
 use Carp;
-our $VERSION                   = 0.58;
 our $MAX_SIGNATURES_TO_PROCESS = 50;
 
 sub init {
@@ -699,6 +598,125 @@ sub result_detail {
     return $self->{result} . ' (' . join( ', ', @items ) . ')';
 }
 
+
+
+sub signatures {
+    my $self = shift;
+    croak 'unexpected argument' if @_;
+
+    return @{ $self->{signatures} };
+}
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Mail::DKIM::ARC::Verifier - verifies an ARC-Sealed message
+
+=head1 VERSION
+
+version 1.20200513.1
+
+=head1 SYNOPSIS
+
+  use Mail::DKIM::ARC::Verifier;
+
+  # create a verifier object
+  my $arc = Mail::DKIM::ARC::Verifier->new();
+
+  # read an email from a file handle
+  $arc->load(*STDIN);
+
+  # or read an email and pass it into the verifier, incrementally
+  while (<STDIN>)
+  {
+      # remove local line terminators
+      chomp;
+      s/\015$//;
+
+      # use SMTP line terminators
+      $arc->PRINT("$_\015\012");
+  }
+  $arc->CLOSE;
+
+  # what is the result of the verify?
+  my $result = $arc->result;
+
+  # print the results for all the message-signatures and seals on the message
+  foreach my $signature ($arc->signatures)
+  {
+      print $signature->prefix() . ' v=' . $signature->instance .
+                                     ' ' . $signature->result_detail . "\n";
+  }
+
+  # example output.  Note that to pass, only the MOST RECENT ARC-Message-Signature
+  # must match, because other steps may have modified the signature.  What matters
+  # is that all ARC-Seals pass, and the most recent ARC-Message-Signature passes.
+
+=head1 DESCRIPTION
+
+The verifier object allows an email message to be scanned for ARC
+seals and their associated signatures to be verified. The verifier
+tracks the state of the message as it is read into memory. When the
+message has been completely read, the signatures are verified and the
+results of the verification can be accessed.
+
+To use the verifier, first create the verifier object. Then start
+"feeding" it the email message to be verified. When all the _headers_
+have been read, the verifier:
+
+ 1. checks whether any ARC signatures were found
+ 2. queries for the public keys needed to verify the signatures
+ 3. sets up the appropriate algorithms and canonicalization objects
+ 4. canonicalizes the headers and computes the header hash
+
+Then, when the _body_ of the message has been completely fed into the
+verifier, the body hash is computed and the signatures are verified.
+
+The results of the verification can be checked with L</"result()">
+or L</"signatures()">.
+
+The final result is calculated by the algorithm layed out in
+https://tools.ietf.org/html/draft-ietf-dmarc-arc-protocol-06 -
+if ALL ARC-Seal headers pass and the highest index (i=)
+ARC-Message-Signature passes, then the seal is intact.
+
+=head1 CONSTRUCTOR
+
+=head2 new()
+
+Constructs an object-oriented verifier.
+
+  my $arc = Mail::DKIM::ARC::Verifier->new();
+
+  my $arc = Mail::DKIM::ARC::Verifier->new(%options);
+
+The only options supported at this time are:
+
+=over
+
+=item AS_Canonicalization
+
+if specified, the canonicalized message for the ARC-Seal
+is written to the referenced string or file handle.
+
+=item AMA_Canonicalization
+
+if specified, the canonicalized message for the ARC-Message-Signature
+is written to the referenced string or file handle.
+
+=item Strict
+
+If true, rejects sha1 hashes and signing keys shorter than 1024 bits.
+
+=back
+
 =head1 METHODS
 
 =head2 PRINT()
@@ -814,8 +832,6 @@ Returned if no ARC-* headers were found.
 
 =back
 
-=cut
-
 =head2 result_detail()
 
 Access the result, plus details if available.
@@ -870,27 +886,54 @@ the verification results of each signature.
 
 Use $signature->instance and $signature->prefix to find the
 instance and header-name for each signature.
-=cut
 
-sub signatures {
-    my $self = shift;
-    croak 'unexpected argument' if @_;
+=head1 AUTHORS
 
-    return @{ $self->{signatures} };
-}
+=over 4
 
-=head1 AUTHOR
+=item *
 
-Bron Gondwana, E<lt>brong@fastmailteam.comE<gt>
+Jason Long <jason@long.name>
+
+=item *
+
+Marc Bradshaw <marc@marcbradshaw.net>
+
+=item *
+
+Bron Gondwana <brong@fastmailteam.com> (ARC)
+
+=back
+
+=head1 THANKS
+
+Work on ensuring that this module passes the ARC test suite was
+generously sponsored by Valimail (https://www.valimail.com/)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 FastMail Pty Ltd.
+=over 4
+
+=item *
+
+Copyright (C) 2013 by Messiah College
+
+=item *
+
+Copyright (C) 2010 by Jason Long
+
+=item *
+
+Copyright (C) 2017 by Standcore LLC
+
+=item *
+
+Copyright (C) 2020 by FastMail Pty Ltd
+
+=back
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.6 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut
-
-1;

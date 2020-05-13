@@ -46,12 +46,14 @@
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.00",
             "Test::Requires" : "0",
+            "Test::Strict" : "0",
             "Test::TCP" : "0",
-            "Test::Warn" : "0"
+            "Test::Warn" : "0",
+            "YAML::Tiny" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.013",
+   "version" : "0.014",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

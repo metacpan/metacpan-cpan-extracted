@@ -1,6 +1,8 @@
 \B\.github\b
 \.tar\.gz$
 \.log$
+\.utf8$
+\.yaml$
 \bOpen62541.bs$
 \bOpen62541.c$
 \bOpen62541.o$

@@ -23,10 +23,10 @@
          "rdfs:comment" : "The upper value of some characteristic or property.",
          "rdfs:label" : "maxValue",
          "schema:domainIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:PropertyValue",
             "schema:MonetaryAmount",
-            "schema:PropertyValueSpecification"
+            "schema:QuantitativeValue",
+            "schema:PropertyValueSpecification",
+            "schema:PropertyValue"
          ],
          "schema:rangeIncludes" : "schema:Number"
       },
@@ -37,9 +37,9 @@
          "rdfs:label" : "minValue",
          "schema:domainIncludes" : [
             "schema:PropertyValueSpecification",
+            "schema:QuantitativeValue",
             "schema:MonetaryAmount",
-            "schema:PropertyValue",
-            "schema:QuantitativeValue"
+            "schema:PropertyValue"
          ],
          "schema:rangeIncludes" : "schema:Number"
       },

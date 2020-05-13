@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Function );
 
-our $VERSION = '0.76';
+our $VERSION = '0.77';
 
 # Socket 2.006 fails to getaddrinfo() AI_NUMERICHOST properly on MSWin32
 use Socket 2.007 qw(
@@ -239,13 +239,13 @@ sub resolve
 
    my $timeout = $args{timeout} || 10;
 
-   $METRICS and $METRICS->inc_counter( resolver_lookups => $type );
+   $METRICS and $METRICS->inc_counter( resolver_lookups => [ type => $type ] );
 
    my $future = $self->call(
       args => [ $type, $timeout, @{$args{data}} ],
    )->else( sub {
       my ( $message, @detail ) = @_;
-      $METRICS and $METRICS->inc_counter( resolver_failures => $type );
+      $METRICS and $METRICS->inc_counter( resolver_failures => [ type => $type ] );
       Future->fail( $message, resolve => $type => @detail );
    });
 

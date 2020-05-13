@@ -9,6 +9,7 @@ tests:
         spf=pass smtp.mfrom=jqd@d1.example;
         dkim=pass (1024-bit key) header.i=@d1.example;
         dmarc=pass
+      Authentication-Results: Garbage Authentication-Results Header - SHOULD NOT PARSE
       MIME-Version: 1.0
       Return-Path: <jqd@d1.example.org>
       Received: by 10.157.14.6 with HTTP; Tue, 3 Jan 2017 12:22:54 -0800 (PST)

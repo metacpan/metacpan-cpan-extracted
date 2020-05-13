@@ -11,14 +11,14 @@
          "rdfs:comment" : "The overall rating, based on a collection of reviews or ratings, of the item.",
          "rdfs:label" : "aggregateRating",
          "schema:domainIncludes" : [
-            "schema:Place",
+            "schema:Product",
+            "schema:Organization",
             "schema:Service",
             "schema:Offer",
-            "schema:Organization",
-            "schema:Event",
-            "schema:Product",
+            "schema:Brand",
             "schema:CreativeWork",
-            "schema:Brand"
+            "schema:Place",
+            "schema:Event"
          ],
          "schema:rangeIncludes" : "schema:AggregateRating"
       },
@@ -27,12 +27,12 @@
          "rdfs:comment" : "The geographic area where a service or offered item is provided.",
          "rdfs:label" : "areaServed",
          "schema:domainIncludes" : [
+            "schema:ContactPoint",
             "schema:DeliveryChargeSpecification",
-            "schema:Demand",
-            "schema:Offer",
-            "schema:Organization",
             "schema:Service",
-            "schema:ContactPoint"
+            "schema:Organization",
+            "schema:Demand",
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
@@ -46,11 +46,11 @@
          "rdfs:comment" : "An intended audience, i.e. a group for whom something was created.",
          "rdfs:label" : "audience",
          "schema:domainIncludes" : [
+            "schema:CreativeWork",
             "schema:LodgingBusiness",
             "schema:Service",
-            "schema:Event",
-            "schema:CreativeWork",
             "schema:Product",
+            "schema:Event",
             "schema:PlayAction"
          ],
          "schema:rangeIncludes" : "schema:Audience"
@@ -67,11 +67,11 @@
          "rdfs:comment" : "An award won by or for this item.",
          "rdfs:label" : "award",
          "schema:domainIncludes" : [
-            "schema:Service",
-            "schema:Person",
-            "schema:Product",
             "schema:CreativeWork",
-            "schema:Organization"
+            "schema:Service",
+            "schema:Organization",
+            "schema:Person",
+            "schema:Product"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -81,9 +81,9 @@
          "rdfs:label" : "brand",
          "schema:domainIncludes" : [
             "schema:Service",
-            "schema:Person",
+            "schema:Organization",
             "schema:Product",
-            "schema:Organization"
+            "schema:Person"
          ],
          "schema:rangeIncludes" : [
             "schema:Organization",
@@ -96,13 +96,13 @@
          "rdfs:label" : "broker",
          "schema:domainIncludes" : [
             "schema:Order",
-            "schema:Reservation",
             "schema:Service",
+            "schema:Reservation",
             "schema:Invoice"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:category" : {
@@ -115,20 +115,20 @@
          "rdfs:label" : "category",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:Invoice",
-            "schema:Recommendation",
-            "schema:Product",
-            "schema:Offer",
-            "schema:Service",
             "schema:PhysicalActivity",
+            "schema:Invoice",
+            "schema:Product",
+            "schema:Recommendation",
+            "schema:ActionAccessSpecification",
+            "schema:Offer",
             "schema:SpecialAnnouncement",
-            "schema:ActionAccessSpecification"
+            "schema:Service"
          ],
          "schema:rangeIncludes" : [
             "schema:URL",
-            "schema:Text",
             "schema:Thing",
-            "schema:PhysicalActivityCategory"
+            "schema:PhysicalActivityCategory",
+            "schema:Text"
          ]
       },
       "schema:hasOfferCatalog" : {
@@ -137,8 +137,8 @@
          "rdfs:label" : "hasOfferCatalog",
          "schema:domainIncludes" : [
             "schema:Service",
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ],
          "schema:rangeIncludes" : "schema:OfferCatalog"
       },
@@ -147,9 +147,9 @@
          "rdfs:comment" : "The hours during which this service or contact is available.",
          "rdfs:label" : "hoursAvailable",
          "schema:domainIncludes" : [
-            "schema:ContactPoint",
             "schema:Service",
-            "schema:LocationFeatureSpecification"
+            "schema:LocationFeatureSpecification",
+            "schema:ContactPoint"
          ],
          "schema:rangeIncludes" : "schema:OpeningHoursSpecification"
       },
@@ -159,12 +159,12 @@
          "rdfs:comment" : "A pointer to another, somehow related product (or multiple products).",
          "rdfs:label" : "isRelatedTo",
          "schema:domainIncludes" : [
-            "schema:Product",
-            "schema:Service"
-         ],
-         "schema:rangeIncludes" : [
             "schema:Service",
             "schema:Product"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Product",
+            "schema:Service"
          ]
       },
       "schema:isSimilarTo" : {
@@ -173,8 +173,8 @@
          "rdfs:comment" : "A pointer to another, functionally similar product (or multiple products).",
          "rdfs:label" : "isSimilarTo",
          "schema:domainIncludes" : [
-            "schema:Service",
-            "schema:Product"
+            "schema:Product",
+            "schema:Service"
          ],
          "schema:rangeIncludes" : [
             "schema:Service",
@@ -188,15 +188,15 @@
          "rdfs:label" : "logo",
          "rdfs:subPropertyOf" : "schema:image",
          "schema:domainIncludes" : [
-            "schema:Product",
-            "schema:Organization",
             "schema:Service",
+            "schema:Organization",
+            "schema:Brand",
             "schema:Place",
-            "schema:Brand"
+            "schema:Product"
          ],
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:ImageObject"
+            "schema:ImageObject",
+            "schema:URL"
          ]
       },
       "schema:offers" : {
@@ -207,18 +207,18 @@
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
             "schema:Product",
-            "schema:CreativeWork",
-            "schema:AggregateOffer",
-            "schema:EducationalOccupationalProgram",
+            "schema:MenuItem",
+            "schema:Service",
             "schema:Trip",
             "schema:Event",
-            "schema:MenuItem",
-            "schema:Service"
+            "schema:AggregateOffer",
+            "schema:EducationalOccupationalProgram",
+            "schema:CreativeWork"
          ],
          "schema:inverseOf" : "schema:itemOffered",
          "schema:rangeIncludes" : [
-            "schema:Demand",
-            "schema:Offer"
+            "schema:Offer",
+            "schema:Demand"
          ]
       },
       "schema:produces" : {
@@ -236,17 +236,17 @@
          "rdfs:label" : "provider",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
-            "schema:Invoice",
-            "schema:ParcelDelivery",
-            "schema:CreativeWork",
+            "schema:Reservation",
             "schema:Service",
             "schema:Trip",
-            "schema:Reservation",
-            "schema:EducationalOccupationalProgram"
+            "schema:Invoice",
+            "schema:EducationalOccupationalProgram",
+            "schema:CreativeWork",
+            "schema:ParcelDelivery"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:providerMobility" : {
@@ -261,14 +261,14 @@
          "rdfs:comment" : "A review of the item.",
          "rdfs:label" : "review",
          "schema:domainIncludes" : [
+            "schema:Place",
             "schema:Organization",
+            "schema:Event",
             "schema:Product",
             "schema:CreativeWork",
-            "schema:Brand",
             "schema:Service",
-            "schema:Place",
             "schema:Offer",
-            "schema:Event"
+            "schema:Brand"
          ],
          "schema:rangeIncludes" : "schema:Review"
       },
@@ -278,13 +278,13 @@
          "rdfs:label" : "serviceArea",
          "schema:domainIncludes" : [
             "schema:Service",
-            "schema:Organization",
-            "schema:ContactPoint"
+            "schema:ContactPoint",
+            "schema:Organization"
          ],
          "schema:rangeIncludes" : [
             "schema:AdministrativeArea",
-            "schema:Place",
-            "schema:GeoShape"
+            "schema:GeoShape",
+            "schema:Place"
          ],
          "schema:supersededBy" : "schema:areaServed"
       },
@@ -309,8 +309,8 @@
          "rdfs:label" : "serviceType",
          "schema:domainIncludes" : "schema:Service",
          "schema:rangeIncludes" : [
-            "schema:GovernmentBenefitsType",
-            "schema:Text"
+            "schema:Text",
+            "schema:GovernmentBenefitsType"
          ]
       },
       "schema:slogan" : {
@@ -318,10 +318,10 @@
          "rdfs:comment" : "A slogan or motto associated with the item.",
          "rdfs:label" : "slogan",
          "schema:domainIncludes" : [
+            "schema:Place",
+            "schema:Organization",
             "schema:Product",
             "schema:Brand",
-            "schema:Organization",
-            "schema:Place",
             "schema:Service"
          ],
          "schema:rangeIncludes" : "schema:Text"

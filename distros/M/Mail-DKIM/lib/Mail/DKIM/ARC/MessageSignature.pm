@@ -1,4 +1,8 @@
-#!/usr/bin/perl
+package Mail::DKIM::ARC::MessageSignature;
+use strict;
+use warnings;
+our $VERSION = '1.20200513.1'; # VERSION
+# ABSTRACT: Subclass of Mail::DKIM::Signature which represents a ARC-Message-Signature header
 
 # Copyright 2017 FastMail Pty Ltd. All Rights Reserved.
 # Bron Gondwana <brong@fastmailteam.com>
@@ -6,42 +10,9 @@
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
-use strict;
-use warnings;
-
-package Mail::DKIM::ARC::MessageSignature;
 use base 'Mail::DKIM::Signature';
 use Carp;
 
-=head1 NAME
-
-Mail::DKIM::ARC::Signature - represents a ARC-Message-Signature header
-
-This is a subclass of Mail::DKIM::Signature
-
-=head1 CONSTRUCTORS
-
-=head2 new() - create a new signature from parameters
-
-  my $signature = Mail::DKIM::ARC::MessageSignature->new(
-                      [ Algorithm => 'rsa-sha256', ]
-                      [ Signature => $base64, ]
-                      [ Method => 'relaxed', ]
-                      [ Domain => 'example.org', ]
-                      [ Instance => 1, ]
-                      [ Headers => 'from:subject:date:message-id', ]
-                      [ Query => 'dns', ]
-                      [ Selector => 'alpha', ]
-                      [ Timestamp => time(), ]
-                      [ Expiration => time() + 86400, ]
-                  );
-
-
-The only differences between this module and Mail::DKIM::Signature are
-the header name, and that 'instance' is an integer rather than a base64
-encoded value.
-
-=cut
 
 sub new {
     my $class = shift;
@@ -68,17 +39,6 @@ sub DEFAULT_PREFIX {
     return 'ARC-Message-Signature:';
 }
 
-=head2 instance() - get or set the signing instance (i=) field
-
-  my $i = $signature->instance;
-
-Instances must be integers less than 1024 according to the spec.
-
-NOTE: the i= field is "Identity" in DKIM and is a base64 value, but in
-ARC it is "Instance" and an integer.  The parsing routine does not
-check that the i= value is a number.
-
-=cut
 
 sub instance {
     my $self = shift;
@@ -94,22 +54,105 @@ sub instance {
     return $i;
 }
 
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Mail::DKIM::ARC::MessageSignature - Subclass of Mail::DKIM::Signature which represents a ARC-Message-Signature header
+
+=head1 VERSION
+
+version 1.20200513.1
+
+=head1 CONSTRUCTORS
+
+=head2 new() - create a new signature from parameters
+
+  my $signature = Mail::DKIM::ARC::MessageSignature->new(
+                      [ Algorithm => 'rsa-sha256', ]
+                      [ Signature => $base64, ]
+                      [ Method => 'relaxed', ]
+                      [ Domain => 'example.org', ]
+                      [ Instance => 1, ]
+                      [ Headers => 'from:subject:date:message-id', ]
+                      [ Query => 'dns', ]
+                      [ Selector => 'alpha', ]
+                      [ Timestamp => time(), ]
+                      [ Expiration => time() + 86400, ]
+                  );
+
+The only differences between this module and Mail::DKIM::Signature are
+the header name, and that 'instance' is an integer rather than a base64
+encoded value.
+
+=head2 instance() - get or set the signing instance (i=) field
+
+  my $i = $signature->instance;
+
+Instances must be integers less than 1024 according to the spec.
+
+NOTE: the i= field is "Identity" in DKIM and is a base64 value, but in
+ARC it is "Instance" and an integer.  The parsing routine does not
+check that the i= value is a number.
+
 =head1 SEE ALSO
 
 L<Mail::DKIM::Signature> for DKIM-Signature headers
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Bron Gondwana, E<lt>brong@fastmailteam.comE<gt>
+=over 4
+
+=item *
+
+Jason Long <jason@long.name>
+
+=item *
+
+Marc Bradshaw <marc@marcbradshaw.net>
+
+=item *
+
+Bron Gondwana <brong@fastmailteam.com> (ARC)
+
+=back
+
+=head1 THANKS
+
+Work on ensuring that this module passes the ARC test suite was
+generously sponsored by Valimail (https://www.valimail.com/)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by FastMail Pty Ltd
+=over 4
+
+=item *
+
+Copyright (C) 2013 by Messiah College
+
+=item *
+
+Copyright (C) 2010 by Jason Long
+
+=item *
+
+Copyright (C) 2017 by Standcore LLC
+
+=item *
+
+Copyright (C) 2020 by FastMail Pty Ltd
+
+=back
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.6 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut
-
-1;

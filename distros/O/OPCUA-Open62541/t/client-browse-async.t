@@ -298,7 +298,8 @@ throws_ok {
 	undef,
 	[],
     );
-} (qr/reqId is not a scalar reference /, "sendAsyncBrowseRequest ref reqid");
+} (qr/Output parameter outoptReqId is not a scalar reference /,
+    "sendAsyncBrowseRequest ref reqid");
 
 no_leaks_ok { eval {
     $client->{client}->sendAsyncBrowseRequest(
@@ -323,7 +324,7 @@ throws_ok {
 	undef,
 	undef,
     );
-} (qr/client is not of type OPCUA::Open62541::Client /,
+} (qr/Self client is not a OPCUA::Open62541::Client /,
     "sendAsyncBrowseRequest undef client");
 
 no_leaks_ok { eval {
@@ -349,7 +350,7 @@ throws_ok {
 	undef,
 	undef,
     );
-} (qr/XS_unpack_UA_BrowseRequest: Not a HASH reference /,
+} (qr/Parameter request is undefined /,
     "sendAsyncBrowseRequest undef request");
 
 no_leaks_ok { eval {

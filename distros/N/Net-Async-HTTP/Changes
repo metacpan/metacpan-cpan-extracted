@@ -1,5 +1,9 @@
 Revision history for Net-Async-HTTP
 
+0.47    2020-05-13
+        [CHANGES]
+         * Updated for Metrics::Any 0.05
+
 0.46    2020-05-12
         [CHANGES]
          * Report client-side HTTP metrics using Metrics::Any, analogous to

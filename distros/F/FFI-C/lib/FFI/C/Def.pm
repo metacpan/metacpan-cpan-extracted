@@ -12,7 +12,7 @@ use Sub::Util ();
 our @CARP_NOT = qw( FFI::C );
 
 # ABSTRACT: Data definition for FFI
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 
 sub new
@@ -298,6 +298,19 @@ sub ffi_custom_type_api_1
   }
 }
 
+package FFI::C::EnumDef;
+
+sub new
+{
+  my($class, %self) = @_;
+  bless \%self, $class;
+}
+
+sub str_lookup { shift->{str_lookup} }
+sub int_lookup { shift->{int_lookup} }
+sub type { shift->{type} }
+sub rev { shift->{rev} }
+
 1;
 
 __END__
@@ -312,7 +325,7 @@ FFI::C::Def - Data definition for FFI
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

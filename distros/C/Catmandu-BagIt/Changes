@@ -1,10 +1,13 @@
 Revision history for Catmandu-BagIt
 
+0.260  2020-05-13 10:06:14 CEST
+    - Adding support fot the default_case option for stores
+    
 0.250  2020-02-19 11:06:45 CET
     - Add support for BagIt version 1.0
     - Add suportt for deep nested bags
     - Adding a script/bagit.pl to test the perl modules
-    
+
 0.240  2019-12-16 16:31:15 CET
     - Using the Catmandu::FileBag file_streamer instead of own code
 

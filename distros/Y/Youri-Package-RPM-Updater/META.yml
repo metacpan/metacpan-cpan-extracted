@@ -1,30 +1,31 @@
---- #YAML:1.0
-name:               Youri-Package-RPM-Updater
-version:            0.6.0
-abstract:           ~
+---
+abstract: unknown
 author:
-    - Youri project <youri@zarb.org>
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Youri project <youri@zarb.org>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    DateTime:         0
-    List::MoreUtils:  0
-    LWP::UserAgent:   0
-    Readonly:         0
-    SVN::Client:      0
-    Test::Exception:  0
-    version:          0
-    YAML::AppConfig:  0
-    Youri::Package:   0.002
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Youri-Package-RPM-Updater
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DateTime: '0'
+  LWP::UserAgent: '0'
+  List::MoreUtils: '0'
+  Readonly: '0'
+  SVN::Client: '0'
+  Test::Exception: '0'
+  YAML::AppConfig: '0'
+  Youri::Package: '0.002'
+  version: '0'
+version: 0.6.3
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

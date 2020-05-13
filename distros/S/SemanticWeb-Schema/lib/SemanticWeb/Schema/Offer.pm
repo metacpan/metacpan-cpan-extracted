@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.4';
+our $VERSION = 'v8.0.0';
 
 
 has accepted_payment_method => (
@@ -330,6 +330,14 @@ has serial_number => (
 
 
 
+has shipping_details => (
+    is        => 'rw',
+    predicate => '_has_shipping_details',
+    json_ld   => 'shippingDetails',
+);
+
+
+
 has sku => (
     is        => 'rw',
     predicate => '_has_sku',
@@ -378,7 +386,7 @@ SemanticWeb::Schema::Offer - An offer to transfer some rights to an item or to p
 
 =head1 VERSION
 
-version v7.0.4
+version v8.0.0
 
 =head1 DESCRIPTION
 
@@ -1227,6 +1235,25 @@ A serial_number should be one of the following types:
 =head2 C<_has_serial_number>
 
 A predicate for the L</serial_number> attribute.
+
+=head2 C<shipping_details>
+
+C<shippingDetails>
+
+=for html <p>Indicates information about the shipping policies and options associated
+with an <a class="localLink" href="http://schema.org/Offer">Offer</a>.<p>
+
+A shipping_details should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::OfferShippingDetails']>
+
+=back
+
+=head2 C<_has_shipping_details>
+
+A predicate for the L</shipping_details> attribute.
 
 =head2 C<sku>
 

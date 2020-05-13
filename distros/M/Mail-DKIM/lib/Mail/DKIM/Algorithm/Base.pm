@@ -1,4 +1,8 @@
-#!/usr/bin/perl
+package Mail::DKIM::Algorithm::Base;
+use strict;
+use warnings;
+our $VERSION = '1.20200513.1'; # VERSION
+# ABSTRACT: base class for DKIM "algorithms"
 
 # Copyright 2005-2007 Messiah College. All rights reserved.
 # Jason Long <jlong@messiah.edu>
@@ -7,15 +11,11 @@
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
-use strict;
-use warnings;
-
 use Mail::DKIM::Canonicalization::nowsp;
 use Mail::DKIM::Canonicalization::relaxed;
 use Mail::DKIM::Canonicalization::simple;
 use Mail::DKIM::Canonicalization::seal;
 
-package Mail::DKIM::Algorithm::Base;
 use Carp;
 use MIME::Base64;
 
@@ -75,47 +75,6 @@ sub get_canonicalization_class {
     return $class;
 }
 
-=head1 NAME
-
-Mail::DKIM::Algorithm::Base - base class for DKIM "algorithms"
-
-=head1 SYNOPSIS
-
-  my $algorithm = new Mail::DKIM::Algorithm::rsa_sha1(
-                      Signature => $dkim_signature
-                  );
-
-  # add headers
-  $algorithm->add_header("Subject: this is the subject\015\012");
-  $algorithm->finish_header;
-
-  # add body
-  $algorithm->add_body("This is the body.\015\012");
-  $algorithm->add_body("Another line of the body.\015\012");
-  $algorithm->finish_body;
-
-  # now sign or verify...
-  # TODO...
-
-=head1 CONSTRUCTOR
-
-You should not create an object of this class directly. Instead, use one
-of the DKIM algorithm implementation classes, such as rsa_sha1:
-
-  my $algorithm = new Mail::DKIM::Algorithm::rsa_sha1(
-                      Signature => $dkim_signature
-                  );
-
-=head1 METHODS
-
-=head2 add_body() - feeds part of the body into the algorithm/canonicalization
-
-  $algorithm->add_body("This is the body.\015\012");
-  $algorithm->add_body("Another line of the body.\015\012");
-
-The body should be fed one "line" at a time.
-
-=cut
 
 sub add_body {
     my $self = shift;
@@ -123,30 +82,12 @@ sub add_body {
     $canon->add_body(@_);
 }
 
-=head2 add_header() - feeds a header field into the algorithm/canonicalization
-
-  $algorithm->add_header("Subject: this is the subject\015\012");
-
-The header must start with the header field name and continue through any
-folded lines (including the embedded <CRLF> sequences). It terminates with
-the <CRLF> at the end of the header field.
-
-=cut
 
 sub add_header {
     my $self = shift;
     $self->{canon}->add_header(@_);
 }
 
-=head2 finish_body() - signals the end of the message body
-
-  $algorithm->finish_body
-
-Call this method when all lines from the body have been submitted.
-After calling this method, use sign() or verify() to get the results
-from the algorithm.
-
-=cut
 
 sub finish_body {
     my $self = shift;
@@ -155,13 +96,6 @@ sub finish_body {
     $self->finish_message;
 }
 
-=head2 finish_header() - signals the end of the header field block
-
-  $algorithm->finish_header;
-
-Call this method when all the headers have been submitted.
-
-=cut
 
 sub finish_header {
     my $self = shift;
@@ -219,23 +153,12 @@ sub finish_message {
     $self->{canon}->output($canonicalized);
 }
 
-=head2 sign() - generates a signature using a private key
-
-  $base64 = $algorithm->sign($private_key);
-
-=cut
 
 # override this method, please...
 sub sign {
     die 'Not implemented';
 }
 
-=head2 signature() - get/set the signature worked on by this algorithm
-
-  my $old_signature = $algorithm->signature;
-  $algorithm->signature($new_signature);
-
-=cut
 
 sub signature {
     my $self = shift;
@@ -243,6 +166,95 @@ sub signature {
       and $self->{Signature} = shift;
     return $self->{Signature};
 }
+
+
+# override this method, please...
+sub verify {
+    die 'Not implemented';
+}
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Mail::DKIM::Algorithm::Base - base class for DKIM "algorithms"
+
+=head1 VERSION
+
+version 1.20200513.1
+
+=head1 SYNOPSIS
+
+  my $algorithm = new Mail::DKIM::Algorithm::rsa_sha1(
+                      Signature => $dkim_signature
+                  );
+
+  # add headers
+  $algorithm->add_header("Subject: this is the subject\015\012");
+  $algorithm->finish_header;
+
+  # add body
+  $algorithm->add_body("This is the body.\015\012");
+  $algorithm->add_body("Another line of the body.\015\012");
+  $algorithm->finish_body;
+
+  # now sign or verify...
+  # TODO...
+
+=head1 CONSTRUCTOR
+
+You should not create an object of this class directly. Instead, use one
+of the DKIM algorithm implementation classes, such as rsa_sha1:
+
+  my $algorithm = new Mail::DKIM::Algorithm::rsa_sha1(
+                      Signature => $dkim_signature
+                  );
+
+=head1 METHODS
+
+=head2 add_body() - feeds part of the body into the algorithm/canonicalization
+
+  $algorithm->add_body("This is the body.\015\012");
+  $algorithm->add_body("Another line of the body.\015\012");
+
+The body should be fed one "line" at a time.
+
+=head2 add_header() - feeds a header field into the algorithm/canonicalization
+
+  $algorithm->add_header("Subject: this is the subject\015\012");
+
+The header must start with the header field name and continue through any
+folded lines (including the embedded <CRLF> sequences). It terminates with
+the <CRLF> at the end of the header field.
+
+=head2 finish_body() - signals the end of the message body
+
+  $algorithm->finish_body
+
+Call this method when all lines from the body have been submitted.
+After calling this method, use sign() or verify() to get the results
+from the algorithm.
+
+=head2 finish_header() - signals the end of the header field block
+
+  $algorithm->finish_header;
+
+Call this method when all the headers have been submitted.
+
+=head2 sign() - generates a signature using a private key
+
+  $base64 = $algorithm->sign($private_key);
+
+=head2 signature() - get/set the signature worked on by this algorithm
+
+  my $old_signature = $algorithm->signature;
+  $algorithm->signature($new_signature);
 
 =head2 verify() - verifies a signature
 
@@ -256,28 +268,54 @@ is valid, false indicates it is invalid.
 For an invalid signature, details may be obtained from
 $algorithm->{verification_details} or $@.
 
-=cut
-
-# override this method, please...
-sub verify {
-    die 'Not implemented';
-}
-
-1;
-
-__END__
-
 =head1 SEE ALSO
 
 L<Mail::DKIM>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Jason Long, E<lt>jlong@messiah.eduE<gt>
+=over 4
+
+=item *
+
+Jason Long <jason@long.name>
+
+=item *
+
+Marc Bradshaw <marc@marcbradshaw.net>
+
+=item *
+
+Bron Gondwana <brong@fastmailteam.com> (ARC)
+
+=back
+
+=head1 THANKS
+
+Work on ensuring that this module passes the ARC test suite was
+generously sponsored by Valimail (https://www.valimail.com/)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2007 by Messiah College
+=over 4
+
+=item *
+
+Copyright (C) 2013 by Messiah College
+
+=item *
+
+Copyright (C) 2010 by Jason Long
+
+=item *
+
+Copyright (C) 2017 by Standcore LLC
+
+=item *
+
+Copyright (C) 2020 by FastMail Pty Ltd
+
+=back
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.6 or,

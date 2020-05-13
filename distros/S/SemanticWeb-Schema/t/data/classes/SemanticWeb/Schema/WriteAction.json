@@ -13,11 +13,11 @@
          "rdfs:label" : "inLanguage",
          "schema:category" : "issue-2382",
          "schema:domainIncludes" : [
-            "schema:PronounceableText",
-            "schema:BroadcastService",
             "schema:LinkRole",
-            "schema:WriteAction",
+            "schema:PronounceableText",
             "schema:CommunicateAction",
+            "schema:BroadcastService",
+            "schema:WriteAction",
             "schema:Event",
             "schema:CreativeWork"
          ],

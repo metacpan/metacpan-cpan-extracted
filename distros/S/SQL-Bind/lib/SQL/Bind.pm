@@ -4,14 +4,17 @@ use warnings;
 use base 'Exporter';
 our @EXPORT_OK = qw(sql);
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
+
+our $PlaceholderPrefix = ':';
+our $PlaceholderRegex  = qr/(?i)([a-z_][a-z0-9_]*)/;
 
 sub sql {
     my ($sql, %params) = @_;
 
     my @bind;
 
-    $sql =~ s{:([a-z_][a-z0-9_]*)(!|\*)?}{
+    $sql =~ s{${PlaceholderPrefix}${PlaceholderRegex}(!|\*)?}{
         my $options = $2
           ? {
             {
@@ -25,7 +28,7 @@ sub sql {
         push @bind, @subbind;
 
         $replacement;
-    }gei;
+    }ge;
 
     return ($sql, @bind);
 }
@@ -118,15 +121,29 @@ SQL::Bind - SQL flexible placeholders
 L<SQL::Bind> simplifies SQL queries maintenance by introducing placeholders. The behavior of the replacement depends on
 the type of the value. Scalars, Arrays and Hashes are supported.
 
+=head2 C<Configuration>
+
+=head3 C<$PlaceholderPrefix>
+
+Placeholder prefix (C<:> by default) can be changed by setting the C<$PlaceholderPrefix> global variable:
+
+    local $SQL::Bind::PlaceholderPrefix = '@';
+
+    my ($sql, @bind) =
+      sql 'SELECT foo FROM bar WHERE id=@id',
+      id => 1;
+
 =head2 C<Placeholders>
 
-A placeholders is an alphanumeric sequence that is prefixed with C<:> and can end with C<!> for raw values. Some examples:
+A placeholders is an alphanumeric sequence that is prefixed with C<:> (by default) and can end with C<!> for raw values
+or C<*> for recursive binding. Some examples:
 
     :name
     :status
     :CamelCase
     :Value_123
     :ThisWillBeInsertedAsIs!
+    :recursive*
 
 =head2 C<Scalar values>
 

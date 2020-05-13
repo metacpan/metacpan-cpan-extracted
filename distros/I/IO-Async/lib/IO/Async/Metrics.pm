@@ -12,8 +12,10 @@ use warnings;
 our $METRICS;
 eval {
    require Metrics::Any and
-      Metrics::Any->VERSION( '0.03' ) and
-      Metrics::Any->import( '$METRICS' );
+      Metrics::Any->VERSION( '0.05' ) and
+      Metrics::Any->import( '$METRICS',
+         name_prefix => [qw( io_async )],
+      );
 };
 
 =head1 NAME
@@ -90,42 +92,43 @@ for SSL connections this will only be able to count bytes of plaintext.
 if( defined $METRICS ) {
    # Loop metrics
    $METRICS->make_gauge( notifiers =>
-      name => [qw( io_async notifiers )],
       description => "Number of IO::Async::Notifiers registered with the Loop",
    );
    $METRICS->make_counter( forks =>
-      name => [qw( io_async forks )],
       description => "Number of times IO::Async has fork()ed a process",
    );
-   $METRICS->make_distribution( processing_time =>
-      name => [qw( io_async processing )],
+   $METRICS->make_timer( processing_time =>
+      name => [qw( processing )],
       description => "Time spent by IO::Async:Loop processing IO",
-      units => "seconds",
       # Override bucket generation
       bucket_min => 0.001, bucket_max => 1, # 1msec to 1sec
       buckets_per_decade => [qw( 1 2.5 5 )],
    );
+   $METRICS->make_gauge( loops =>
+      description => "Count of IO::Async::Loop instances by class",
+      labels => [qw( class )],
+   );
 
    # Resolver metrics
    $METRICS->make_counter( resolver_lookups =>
-      name => [qw( io_async resolver lookups )],
+      name => [qw( resolver lookups )],
       description => "Number of IO::Async::Resolver lookups by type",
       labels => [qw( type )],
    );
    $METRICS->make_counter( resolver_failures =>
-      name => [qw( io_async resolver failures )],
+      name => [qw( resolver failures )],
       description => "Number of IO::Async::Resolver lookups that failed by type",
       labels => [qw( type )],
    );
 
    # Stream metrics
    $METRICS->make_counter( stream_written =>
-      name => [qw( io_async stream written )],
+      name => [qw( stream written )],
       description => "Bytes written by IO::Async::Streams",
       units => "bytes",
    );
    $METRICS->make_counter( stream_read =>
-      name => [qw( io_async stream read )],
+      name => [qw( stream read )],
       description => "Bytes read by IO::Async::Streams",
       units => "bytes",
    );

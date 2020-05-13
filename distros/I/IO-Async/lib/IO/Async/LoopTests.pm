@@ -28,7 +28,7 @@ use POSIX qw( SIGTERM );
 use Socket qw( sockaddr_family AF_UNIX );
 use Time::HiRes qw( time );
 
-our $VERSION = '0.76';
+our $VERSION = '0.77';
 
 # Abstract Units of Time
 use constant AUT => $ENV{TEST_QUICK_TIMERS} ? 0.1 : 1;
@@ -868,6 +868,18 @@ Tests that metrics are generated appropriately using L<Metrics::Any>.
 
 sub run_tests_metrics
 {
+   my $loopclass = ref $loop;
+
+   return unless $IO::Async::Metrics::METRICS;
+
+   # We should already at least have the loop-type metric
+   is_metrics(
+      {
+         "io_async_loops class:$loopclass" => 1,
+      },
+      'Constructing the loop creates a loop type metric'
+   );
+
    # The very first call won't create timing metrics because it isn't armed yet.
    $loop->loop_once( 0 );
 

@@ -1,0 +1,7 @@
+# This stores useful objects for our recipes
+dbh:
+    $class: DBI
+    $method: connect
+    $args:
+        - dbi:SQLite:RECENT.db
+

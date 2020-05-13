@@ -33,8 +33,8 @@
          "schema:domainIncludes" : "schema:Article",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:Text"
          ]
       },
       "schema:pageEnd" : {
@@ -44,10 +44,10 @@
          "rdfs:comment" : "The page on which the work ends; for example \"138\" or \"xvi\".",
          "rdfs:label" : "pageEnd",
          "schema:domainIncludes" : [
-            "schema:PublicationVolume",
             "schema:Article",
-            "schema:Chapter",
-            "schema:PublicationIssue"
+            "schema:PublicationIssue",
+            "schema:PublicationVolume",
+            "schema:Chapter"
          ],
          "schema:rangeIncludes" : [
             "schema:Integer",
@@ -61,10 +61,10 @@
          "rdfs:comment" : "The page on which the work starts; for example \"135\" or \"xiii\".",
          "rdfs:label" : "pageStart",
          "schema:domainIncludes" : [
-            "schema:PublicationVolume",
             "schema:Chapter",
-            "schema:Article",
-            "schema:PublicationIssue"
+            "schema:PublicationVolume",
+            "schema:PublicationIssue",
+            "schema:Article"
          ],
          "schema:rangeIncludes" : [
             "schema:Integer",
@@ -78,10 +78,10 @@
          "rdfs:comment" : "Any description of pages that is not separated into pageStart and pageEnd; for example, \"1-6, 9, 55\" or \"10-12, 46-49\".",
          "rdfs:label" : "pagination",
          "schema:domainIncludes" : [
-            "schema:PublicationIssue",
-            "schema:PublicationVolume",
             "schema:Article",
-            "schema:Chapter"
+            "schema:Chapter",
+            "schema:PublicationVolume",
+            "schema:PublicationIssue"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -92,8 +92,8 @@
          "rdfs:label" : "speakable",
          "schema:category" : "issue-1389",
          "schema:domainIncludes" : [
-            "schema:Article",
-            "schema:WebPage"
+            "schema:WebPage",
+            "schema:Article"
          ],
          "schema:rangeIncludes" : [
             "schema:SpeakableSpecification",

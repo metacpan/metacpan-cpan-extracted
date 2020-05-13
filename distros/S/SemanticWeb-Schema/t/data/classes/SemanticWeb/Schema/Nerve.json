@@ -15,9 +15,9 @@
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:AnatomicalStructure",
          "schema:supersededBy" : [
-            "schema:veinBranch",
+            "schema:arterialBranch",
             "schema:nerveBranch",
-            "schema:arterialBranch"
+            "schema:veinBranch"
          ]
       },
       "schema:nerveMotor" : {

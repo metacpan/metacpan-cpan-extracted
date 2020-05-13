@@ -1,0 +1,30 @@
+# This file contains our recipes
+# Download a list of recent changes to CPAN
+RECENT-6h.json:
+    commands:
+        - curl -O https://www.cpan.org/RECENT-6h.json
+# Parse that JSON file into a CSV using an external program
+RECENT-6h.csv:
+    requires:
+        - RECENT-6h.json
+    commands:
+        - yfrom json RECENT-6h.json | yq '.recent.[]' | yto csv > RECENT-6h.csv
+# Build a SQLite database to hold the recent data
+RECENT.db:
+    $class: Beam::Make::DBI::Schema
+    dbh: { $ref: 'container.yml:dbh' }
+    schema:
+        - table: recent
+          columns:
+            - path: VARCHAR(255)
+            - epoch: DOUBLE
+            - type: VARCHAR(10)
+# Load the recent data CSV into the SQLite database
+cpan-recent:
+    $class: Beam::Make::DBI::CSV
+    requires:
+        - RECENT.db
+        - RECENT-6h.csv
+    dbh: { $ref: 'container.yml:dbh' }
+    table: recent
+    file: RECENT-6h.csv

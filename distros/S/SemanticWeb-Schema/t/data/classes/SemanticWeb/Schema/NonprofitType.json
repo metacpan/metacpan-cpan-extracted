@@ -1,0 +1,12 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2543",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "NonprofitType enumerates several kinds of official non-profit types of which a non-profit organization can be.",
+      "rdfs:label" : "NonprofitType",
+      "rdfs:subClassOf" : "schema:Enumeration",
+      "schema:category" : "issue-2543",
+      "schema:isPartOf" : "http:pending.schema.org"
+   },
+   "properties" : {}
+}

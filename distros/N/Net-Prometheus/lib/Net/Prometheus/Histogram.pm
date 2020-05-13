@@ -5,11 +5,12 @@
 
 package Net::Prometheus::Histogram;
 
+use 5.010; # //
 use strict;
 use warnings;
 use base qw( Net::Prometheus::Metric );
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Carp;
 use List::Util 1.33 qw( any );
@@ -132,21 +133,21 @@ sub _gen_buckets
 
    my @values_per_decade = @{ $opts->{buckets_per_decade} // [ 1 ] };
 
+   my $power = 0;
    my $value;
    my @buckets;
 
-   $value = 1;
-   while( $value >= $min ) {
+   while( ( $value = 10 ** $power ) >= $min ) {
       unshift @buckets, map { $_ * $value } @values_per_decade;
 
-      $value /= 10;
+      $power--;
    }
 
-   $value = 10;
-   while( $value <= $max ) {
+   $power = 1;
+   while( ( $value = 10 ** $power ) <= $max ) {
       push @buckets, map { $_ * $value } @values_per_decade;
 
-      $value *= 10;
+      $power++;
    }
 
    # Trim overgenerated ends

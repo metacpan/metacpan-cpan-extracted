@@ -1,6 +1,6 @@
 package Catmandu::Store::File::BagIt::Index;
 
-our $VERSION = '0.250';
+our $VERSION = '0.260';
 
 use Catmandu::Sane;
 use Moo;
@@ -53,6 +53,13 @@ sub generator {
             $id =~ s/^0+//;
         }
 
+        if ($self->store->default_case eq 'upper') {
+            $id = uc($id);
+        }
+        else {
+            $id = lc($id);
+        }
+        
         $self->get($id);
     };
 }

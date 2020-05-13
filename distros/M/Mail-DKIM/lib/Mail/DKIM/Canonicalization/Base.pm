@@ -1,4 +1,8 @@
-#!/usr/bin/perl
+package Mail::DKIM::Canonicalization::Base;
+use strict;
+use warnings;
+our $VERSION = '1.20200513.1'; # VERSION
+# ABSTRACT: base class for canonicalization methods
 
 # Copyright 2005-2007 Messiah College. All rights reserved.
 # Jason Long <jlong@messiah.edu>
@@ -7,10 +11,6 @@
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
-use strict;
-use warnings;
-
-package Mail::DKIM::Canonicalization::Base;
 use base 'Mail::DKIM::MessageParser';
 use Carp;
 
@@ -75,9 +75,17 @@ sub result {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Mail::DKIM::Canonicalization::Base - base class for canonicalization methods
+
+=head1 VERSION
+
+version 1.20200513.1
 
 =head1 SYNOPSIS
 
@@ -176,13 +184,50 @@ itself, and can be accessed using this method.
 
 L<Mail::DKIM>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Jason Long, E<lt>jlong@messiah.eduE<gt>
+=over 4
+
+=item *
+
+Jason Long <jason@long.name>
+
+=item *
+
+Marc Bradshaw <marc@marcbradshaw.net>
+
+=item *
+
+Bron Gondwana <brong@fastmailteam.com> (ARC)
+
+=back
+
+=head1 THANKS
+
+Work on ensuring that this module passes the ARC test suite was
+generously sponsored by Valimail (https://www.valimail.com/)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006-2007 by Messiah College
+=over 4
+
+=item *
+
+Copyright (C) 2013 by Messiah College
+
+=item *
+
+Copyright (C) 2010 by Jason Long
+
+=item *
+
+Copyright (C) 2017 by Standcore LLC
+
+=item *
+
+Copyright (C) 2020 by FastMail Pty Ltd
+
+=back
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.6 or,

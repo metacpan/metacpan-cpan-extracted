@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Metrics::Any::Adapter::Statsd );
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Carp;
 
@@ -61,7 +61,7 @@ sub send
 }
 
 # DogStatsd has a native "histogram" format; we'll use that
-sub inc_distribution_by
+sub report_distribution
 {
    my $self = shift;
    my ( $handle, $amount, @labelvalues ) = @_;
@@ -72,6 +72,8 @@ sub inc_distribution_by
 
    $self->send( { $meta->{name} => $value }, $meta->{labels}, \@labelvalues );
 }
+
+*inc_distribution_by = \&report_distribution;
 
 =head1 AUTHOR
 

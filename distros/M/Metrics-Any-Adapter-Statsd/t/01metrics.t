@@ -42,11 +42,11 @@ my $socket = IO::Socket::INET->new(
       name => "the.distribution",
    );
 
-   $metrics->inc_distribution_by( distribution => 20 );
+   $metrics->report_distribution( distribution => 20 );
 
    $socket->recv( my $packet, 512 );
    is( $packet, "the.distribution.count:1|c\nthe.distribution.sum:20|c",
-      '->inc_distribution sends statsd packet'
+      '->report_distribution sends statsd packet'
    );
 }
 
@@ -85,11 +85,11 @@ my $socket = IO::Socket::INET->new(
       name => "the.timer",
    );
 
-   $metrics->inc_timer_by( timer => 0.25 ); # seconds
+   $metrics->report_timer( timer => 0.25 ); # seconds
 
    $socket->recv( my $packet, 512 );
    is( $packet, "the.timer:250|ms",
-      '->inc_timer sends statsd packet'
+      '->report_timer sends statsd packet'
    );
 }
 

@@ -52,6 +52,8 @@ METHODS
       default of 0.001 if not supplied) and bucket_max (or a default of
       1000 if not supplied).
 
+      For more information, see Net::Prometheus::Histogram.
+
 AUTHOR
 
     Paul Evans <leonerd@leonerd.org.uk>

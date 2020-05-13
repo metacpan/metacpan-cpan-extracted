@@ -1,0 +1,165 @@
+NAME
+
+    Mojolicious::Plugin::ContextAuth - Role-based access with context
+
+VERSION
+
+    version 0.01
+
+SYNOPSIS
+
+        # Mojolicious::Lite app
+        app->plugin(
+            'ContextAuth' => {
+                dsn => 'sqlite:' . $db,
+            },
+        );
+    
+        # Mojolicious app in sub startup
+        $self->plugin(
+            'ContextAuth' => {
+                dsn => 'sqlite:' . $db,
+            },
+        );
+    
+        # in your controller
+        my $has_permission = $c->auth->has_permission(
+            $session_id, 
+            context    => 'project_a',
+            permission => 'title.update',
+        )
+
+DESCRIPTION
+
+    This addon implements a role based authorization with contexts. There
+    are systems where the user can have different roles in different
+    contexts: e.g. in a company that develops software, one user can have
+    the projectmanager role in one project, but not in an other project.
+
+    With this module it is easy to implement it. It creates the database
+    and provides some methods to do the authentication and authorization.
+
+DATABASE
+
+           .---------------.         .---------------------------.              .---------------------.
+           | corbac_users  |         | corbac_user_context_roles |              |   corbac_contexts   |
+           |---------------|         |---------------------------|              |---------------------|
+           | user_id       |<--------| user_id                   |------------->| context_id          |
+           | username      |         | context_id                |              | context_name        |
+           | user_password |         | role_id                   |              | context_description |
+           '---------------'         '---------------------------'              '---------------------'
+                   ^                               ^                                       ^
+                   |                               |                                       |
+                   |                               |                                       |
+                   |                               |                                       |
+                   |                               |                                       |
+       .----------------------.          .------------------.                              |
+       | corbac_user_sessions |          |   corbac_roles   |                              |
+       |----------------------|          |------------------|                              |
+       | user_id              |          | role_id          |                              |
+       | session_id           |          | role_name        |------------------------------'
+       | access_tree          |          | role_description |
+       | session_started      |          | context_id       |
+       '----------------------'          | is_valid         |
+                                         '------------------'
+                                                   ^
+                                                   |
+                                      .-------------------------.
+                                      | corbac_role_permissions |
+                                      |-------------------------|
+                      .---------------| role_id                 |------------.
+                      |               | permission_id           |            |
+                      |               | resource_id             |            |
+                      |               '-------------------------'            |
+                      |                                                      |
+                      v                                                      v
+         .------------------------.                              .----------------------.
+         |   corbac_permissions   |                              |   corbac_resources   |
+         |------------------------|                              |----------------------|
+         | permission_id          |                              | resource_id          |
+         | permission_name        |----------------------------->| resource_name        |
+         | permission_label       |                              | resource_label       |
+         | permission_description |                              | resource_description |
+         | resource_id            |                              '----------------------'
+         '------------------------'
+
+    Currently only SQLite is supported.
+
+ENTITIES
+
+    We use some entities that are described in the subsequent paragraphs.
+    But one example might describe it as well:
+
+      Mr Johnson can update the project description in project A as he is the project manager
+       ^            ^               ^                     ^                     ^
+       |            |               |                     |                     |
+      user        permission     resource              context                 role
+
+ User
+
+    The user of the system
+
+ Context
+
+    The context the user does an action. In a project management software
+    this could be "system", "project a", "project b". You can define any
+    context you want.
+
+ Role
+
+    The role an user has in the given context. A user can be the project
+    manager in one project, but a developer in an other project.
+
+ Resource
+
+    This is any resource you have in your system. This could be "title" and
+    "members" for a project.
+
+ Permission
+
+    Any permission is bind to a resource. You can define whatever
+    permissions you want. For the project name this could be "update", for
+    the project members it coule be "add", "delete", "set_role".
+
+METHODS
+
+ register
+
+    Configuration:
+
+      * dsn
+
+      Required.
+
+      This is a dsn used for Mojo::SQLite, Mojo::mysql or Mojo::Pg.
+
+      * prefix
+
+      Optional (default: 'auth').
+
+      Used to name the helpers (see below)
+
+HELPERS
+
+    Those helpers are defined by the plugin:
+
+ <prefix>
+
+    Returns a Mojolicious::Plugin::ContextAuth::Auth object.
+
+ <prefix>_db
+
+    Returns a Mojolicious::Plugin::ContextAuth::DB object.
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2020 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

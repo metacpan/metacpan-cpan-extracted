@@ -5,13 +5,13 @@
       "Christian Eder <christian.eder@apa.at>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Date-Extract-DE",
    "prereqs" : {
@@ -42,7 +42,7 @@
    "provides" : {
       "Date::Extract::DE" : {
          "file" : "lib/Date/Extract/DE.pm",
-         "version" : "v0.0.2"
+         "version" : "v0.0.3"
       }
    },
    "release_status" : "stable",
@@ -51,12 +51,12 @@
          "web" : "https://github.com/apa-it/date-extract-de/issues"
       },
       "license" : [
-         "http://opensource.org/licenses/gpl-2.0.php"
+         "http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt"
       ],
       "repository" : {
          "url" : "https://github.com/apa-it/date-extract-de"
       }
    },
-   "version" : "v0.0.2",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "v0.0.3",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

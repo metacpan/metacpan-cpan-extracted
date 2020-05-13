@@ -7,7 +7,7 @@ use DBI;
 
 use ConfigCache;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub load {
     my ($class, $prove) = @_;

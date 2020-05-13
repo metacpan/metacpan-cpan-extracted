@@ -22,7 +22,7 @@ Test::OpenTracing::Interface::Span - compliance testing
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 use Test::OpenTracing::Interface;

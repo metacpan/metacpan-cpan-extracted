@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 
-use Metrics::Any '$metrics';
+use Metrics::Any 0.05 '$metrics';
 use Metrics::Any::Adapter 'Prometheus';
 
 use Net::Prometheus;
@@ -33,7 +33,7 @@ my $prom = Net::Prometheus->new;
       units => "bytes",
    );
 
-   $metrics->inc_distribution_by( distribution => 10000 );
+   $metrics->report_distribution( distribution => 10000 );
 
    like( $prom->render,
       qr/^the_distribution_bytes_count 1\nthe_distribution_bytes_sum 10000/m,
@@ -79,7 +79,7 @@ my $prom = Net::Prometheus->new;
       name => "the_timer",
    );
 
-   $metrics->inc_timer_by( timer => 0.25 );
+   $metrics->report_timer( timer => 0.25 );
 
    like( $prom->render,
       qr/^the_timer_seconds_count 1\nthe_timer_seconds_sum 0\.25/m,

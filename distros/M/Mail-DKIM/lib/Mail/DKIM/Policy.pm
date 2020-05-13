@@ -1,4 +1,8 @@
-#!/usr/bin/perl
+package Mail::DKIM::Policy;
+use strict;
+use warnings;
+our $VERSION = '1.20200513.1'; # VERSION
+# ABSTRACT: abstract base class for originator "signing" policies
 
 # Copyright 2005-2007 Messiah College.
 # Jason Long <jlong@messiah.edu>
@@ -7,44 +11,8 @@
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
-use strict;
-use warnings;
-
-package Mail::DKIM::Policy;
-
 use Mail::DKIM::DNS;
 
-=head1 NAME
-
-Mail::DKIM::Policy - abstract base class for originator "signing" policies
-
-=head1 SYNOPSIS
-
-  # get all policies that apply to a verified message
-  foreach my $policy ($dkim->policies)
-  {
-
-      # the name of this policy
-      my $name = $policy->name;
-
-      # the location in DNS where this policy was found
-      my $location = $policy->location;
-
-      # apply this policy to the message being verified
-      my $result = $policy->apply($dkim);
-
-  }
-
-=head1 DESCRIPTION
-
-Between the various versions of the DomainKeys/DKIM standards, several
-different forms of sender "signing" policies have been defined.
-In order for the L<Mail::DKIM> library to support these different
-policies, it uses several different subclasses. All subclasses support
-this general interface, so that a program using L<Mail::DKIM> can
-support any and all policies found for a message.
-
-=cut
 
 sub fetch {
     my $class  = shift;
@@ -133,6 +101,95 @@ sub parse {
     return bless \%prms, $class;
 }
 
+
+sub apply {
+    my $self = shift;
+    my ($dkim) = @_;
+
+    my $first_party;
+    foreach my $signature ( $dkim->signatures ) {
+        next if $signature->result ne 'pass';
+
+        my $oa = $dkim->message_sender->address;
+        if ( $signature->identity_matches($oa) ) {
+
+            # found a first party signature
+            $first_party = 1;
+            last;
+        }
+    }
+
+    return 'accept' if $first_party;
+    return 'reject' if ( $self->signall && !$self->testing );
+    return 'neutral';
+}
+
+
+sub as_string {
+    my $self = shift;
+
+    return join(
+        '; ', map { "$_=" . $self->{tags}->{$_} }
+          keys %{ $self->{tags} }
+    );
+}
+
+
+sub is_implied_default_policy {
+    my $self           = shift;
+    my $default_policy = ref($self)->default;
+    return ( $self == $default_policy );
+}
+
+
+sub location {
+    my $self = shift;
+    return $self->{Domain};
+}
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Mail::DKIM::Policy - abstract base class for originator "signing" policies
+
+=head1 VERSION
+
+version 1.20200513.1
+
+=head1 SYNOPSIS
+
+  # get all policies that apply to a verified message
+  foreach my $policy ($dkim->policies)
+  {
+
+      # the name of this policy
+      my $name = $policy->name;
+
+      # the location in DNS where this policy was found
+      my $location = $policy->location;
+
+      # apply this policy to the message being verified
+      my $result = $policy->apply($dkim);
+
+  }
+
+=head1 DESCRIPTION
+
+Between the various versions of the DomainKeys/DKIM standards, several
+different forms of sender "signing" policies have been defined.
+In order for the L<Mail::DKIM> library to support these different
+policies, it uses several different subclasses. All subclasses support
+this general interface, so that a program using L<Mail::DKIM> can
+support any and all policies found for a message.
+
 =head1 METHODS
 
 These methods are supported by all classes implementing the
@@ -166,47 +223,12 @@ policy. It can be considered suspicious.
 
 =back
 
-=cut
-
-sub apply {
-    my $self = shift;
-    my ($dkim) = @_;
-
-    my $first_party;
-    foreach my $signature ( $dkim->signatures ) {
-        next if $signature->result ne 'pass';
-
-        my $oa = $dkim->message_sender->address;
-        if ( $signature->identity_matches($oa) ) {
-
-            # found a first party signature
-            $first_party = 1;
-            last;
-        }
-    }
-
-    return 'accept' if $first_party;
-    return 'reject' if ( $self->signall && !$self->testing );
-    return 'neutral';
-}
-
 =head2 as_string()
 
 The policy as a string.
 
 Note that the string returned by this method will not necessarily have
 the tags ordered the same as the text record found in DNS.
-
-=cut
-
-sub as_string {
-    my $self = shift;
-
-    return join(
-        '; ', map { "$_=" . $self->{tags}->{$_} }
-          keys %{ $self->{tags} }
-    );
-}
 
 =head2 is_implied_default_policy()
 
@@ -218,14 +240,6 @@ If you fetch the policy for a particular domain, but that domain
 does not have a policy published, then the "default policy" is
 in effect. Use this method to detect when that happens.
 
-=cut
-
-sub is_implied_default_policy {
-    my $self           = shift;
-    my $default_policy = ref($self)->default;
-    return ( $self == $default_policy );
-}
-
 =head2 location()
 
 Where the policy was fetched from.
@@ -236,23 +250,12 @@ was published.
 If nothing is published for the domain, and the default policy
 was returned instead, the location will be C<undef>.
 
-=cut
-
-sub location {
-    my $self = shift;
-    return $self->{Domain};
-}
-
 =head2 name()
 
 Identify what type of policy this is.
 
 This currently returns strings like "sender", "author", and "ADSP".
 It is subject to change in the next version of Mail::DKIM.
-
-=cut
-
-1;
 
 =head1 SEE ALSO
 
@@ -264,13 +267,50 @@ L<Mail::DKIM::DkimPolicy> - for early draft DKIM sender signing policies
 L<Mail::DKIM::AuthorDomainPolicy> - for Author Domain Signing Practices
 (ADSP)
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Jason Long, E<lt>jlong@messiah.eduE<gt>
+=over 4
+
+=item *
+
+Jason Long <jason@long.name>
+
+=item *
+
+Marc Bradshaw <marc@marcbradshaw.net>
+
+=item *
+
+Bron Gondwana <brong@fastmailteam.com> (ARC)
+
+=back
+
+=head1 THANKS
+
+Work on ensuring that this module passes the ARC test suite was
+generously sponsored by Valimail (https://www.valimail.com/)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006-2009 by Messiah College
+=over 4
+
+=item *
+
+Copyright (C) 2013 by Messiah College
+
+=item *
+
+Copyright (C) 2010 by Jason Long
+
+=item *
+
+Copyright (C) 2017 by Standcore LLC
+
+=item *
+
+Copyright (C) 2020 by FastMail Pty Ltd
+
+=back
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.6 or,

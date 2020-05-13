@@ -31,5 +31,6 @@ t/Test/OpenTracing/Interface/SpanContext/11_can_all_ok.t
 t/Test/OpenTracing/Interface/Tracer/00_use_ok.t
 t/Test/OpenTracing/Interface/Tracer/01_can_ok.t
 t/Test/OpenTracing/Interface/Tracer/11_can_all_ok.t
+xt/class_name.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

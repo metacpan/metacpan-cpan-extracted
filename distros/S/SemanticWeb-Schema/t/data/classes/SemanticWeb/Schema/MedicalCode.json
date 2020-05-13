@@ -4,8 +4,8 @@
       "rdfs:comment" : "A code for a medical entity.",
       "rdfs:label" : "MedicalCode",
       "rdfs:subClassOf" : [
-         "schema:MedicalIntangible",
-         "schema:CategoryCode"
+         "schema:CategoryCode",
+         "schema:MedicalIntangible"
       ],
       "schema:isPartOf" : "http:health-lifesci.schema.org"
    },
@@ -18,8 +18,8 @@
          "rdfs:subPropertyOf" : "schema:termCode",
          "schema:category" : "issue-894",
          "schema:domainIncludes" : [
-            "schema:MedicalCode",
-            "schema:CategoryCode"
+            "schema:CategoryCode",
+            "schema:MedicalCode"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:Text"

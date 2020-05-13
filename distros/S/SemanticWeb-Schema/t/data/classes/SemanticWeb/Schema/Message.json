@@ -25,9 +25,9 @@
          "rdfs:subPropertyOf" : "schema:recipient",
          "schema:domainIncludes" : "schema:Message",
          "schema:rangeIncludes" : [
+            "schema:Organization",
             "schema:Person",
-            "schema:ContactPoint",
-            "schema:Organization"
+            "schema:ContactPoint"
          ]
       },
       "schema:dateRead" : {
@@ -68,20 +68,20 @@
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
             "schema:ReturnAction",
-            "schema:PayAction",
-            "schema:CommunicateAction",
-            "schema:GiveAction",
+            "schema:Message",
             "schema:DonateAction",
             "schema:AuthorizeAction",
-            "schema:Message",
+            "schema:GiveAction",
+            "schema:TipAction",
+            "schema:CommunicateAction",
             "schema:SendAction",
-            "schema:TipAction"
+            "schema:PayAction"
          ],
          "schema:rangeIncludes" : [
             "schema:ContactPoint",
-            "schema:Person",
+            "schema:Audience",
             "schema:Organization",
-            "schema:Audience"
+            "schema:Person"
          ]
       },
       "schema:sender" : {
@@ -107,9 +107,9 @@
          "schema:domainIncludes" : "schema:Message",
          "schema:rangeIncludes" : [
             "schema:Audience",
-            "schema:Person",
+            "schema:Organization",
             "schema:ContactPoint",
-            "schema:Organization"
+            "schema:Person"
          ]
       }
    }

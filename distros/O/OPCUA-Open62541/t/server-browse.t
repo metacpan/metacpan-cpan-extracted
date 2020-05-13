@@ -3,7 +3,7 @@ use warnings;
 use OPCUA::Open62541 qw(:all);
 
 use OPCUA::Open62541::Test::Server;
-use Test::More tests => OPCUA::Open62541::Test::Server::planning() + 11;
+use Test::More tests => OPCUA::Open62541::Test::Server::planning() + 13;
 use Test::Deep;
 use Test::NoWarnings;
 
@@ -41,24 +41,35 @@ is (ref($objectref), "HASH", "object reference hash");
 
 my $expected_object = {
     ReferenceDescription_nodeId => {
-	ExpandedNodeId_nodeId => $nodes{some_object_0}{nodeId},
-	ExpandedNodeId_serverIndex => 0,
-	ExpandedNodeId_namespaceUri => undef,
+	ExpandedNodeId_nodeId		=> $nodes{some_object_0}{nodeId},
+	ExpandedNodeId_serverIndex	=> 0,
+	ExpandedNodeId_namespaceUri	=> undef,
     },
-    ReferenceDescription_nodeClass => NODECLASS_OBJECT,
-    ReferenceDescription_isForward => 1,
-    ReferenceDescription_browseName => $nodes{some_object_0}{browseName},
-    ReferenceDescription_displayName =>
+    ReferenceDescription_nodeClass	=> NODECLASS_OBJECT,
+    ReferenceDescription_isForward	=> 1,
+    ReferenceDescription_browseName	=> $nodes{some_object_0}{browseName},
+    ReferenceDescription_displayName	=>
 	$nodes{some_object_0}{attributes}{ObjectAttributes_displayName},
     ReferenceDescription_typeDefinition => {
-	ExpandedNodeId_namespaceUri => undef,
-	ExpandedNodeId_nodeId => $nodes{some_object_0}{typeDefinition},
-	ExpandedNodeId_serverIndex => 0
+	ExpandedNodeId_namespaceUri	=> undef,
+	ExpandedNodeId_nodeId		=>
+	    $nodes{some_object_0}{typeDefinition},
+	ExpandedNodeId_serverIndex	=> 0
     },
-    ReferenceDescription_referenceTypeId => $nodes{some_object_0}{referenceTypeId},
+    ReferenceDescription_referenceTypeId	=>
+	$nodes{some_object_0}{referenceTypeId},
 };
 
 is_deeply($objectref, $expected_object, "browseresult some_object_0");
+
+my $variant;
+is($server->{server}->readValue($nodes{some_variable_0}{nodeId},\$variant),
+    STATUSCODE_GOOD, "readValue statuscode");
+
+is_deeply(
+    $variant,
+    $nodes{some_variable_0}{attributes}{VariableAttributes_value},
+    "readValue some_variable_0");
 
 $server->run();
 $server->stop();

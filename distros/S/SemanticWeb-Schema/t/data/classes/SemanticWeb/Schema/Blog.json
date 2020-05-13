@@ -30,9 +30,9 @@
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:domainIncludes" : [
             "schema:WebSite",
-            "schema:Dataset",
+            "schema:Blog",
             "schema:CreativeWorkSeries",
-            "schema:Blog"
+            "schema:Dataset"
          ],
          "schema:rangeIncludes" : "schema:Text"
       }

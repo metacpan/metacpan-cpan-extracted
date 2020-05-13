@@ -31,18 +31,32 @@ SQL::Bind - SQL flexible placeholders
 
 # DESCRIPTION
 
-[SQL::Bind](https://metacpan.org/pod/SQL::Bind) simplifies SQL queries maintenance by introducing placeholders. The behavior of the replacement depends on
+[SQL::Bind](https://metacpan.org/pod/SQL%3A%3ABind) simplifies SQL queries maintenance by introducing placeholders. The behavior of the replacement depends on
 the type of the value. Scalars, Arrays and Hashes are supported.
+
+## `Configuration`
+
+### `$PlaceholderPrefix`
+
+Placeholder prefix (`:` by default) can be changed by setting the `$PlaceholderPrefix` global variable:
+
+    local $SQL::Bind::PlaceholderPrefix = '@';
+
+    my ($sql, @bind) =
+      sql 'SELECT foo FROM bar WHERE id=@id',
+      id => 1;
 
 ## `Placeholders`
 
-A placeholders is an alphanumeric sequence that is prefixed with `:` and can end with `!` for raw values. Some examples:
+A placeholders is an alphanumeric sequence that is prefixed with `:` (by default) and can end with `!` for raw values
+or `*` for recursive binding. Some examples:
 
     :name
     :status
     :CamelCase
     :Value_123
     :ThisWillBeInsertedAsIs!
+    :recursive*
 
 ## `Scalar values`
 

@@ -1,5 +1,9 @@
 Revision history for App-gimpgitbuild
 
+0.16.2   2020-05-13
+    - Some code cleanups and refactorings.
+        - https://en.wikipedia.org/wiki/Code_refactoring
+
 0.16.1   2020-04-02
     - Require xvfb-run
     - Add --enable-debug to gimp build

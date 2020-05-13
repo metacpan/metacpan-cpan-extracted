@@ -9,7 +9,9 @@ use 5.010;  # //
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
+
+use Carp;
 
 =head1 NAME
 
@@ -52,12 +54,24 @@ unit tests:
 
    $ METRICS_ANY_ADAPTER=Stderr ./Build test
 
-Additional arguments can be specified, separated by commas or equals signs.
+Additional arguments can be specified after a colon, separated by commas or
+equals signs.
 
-   $ METRICS_ANY_ADAPTER=File,path=metrics.log ./program.pl
+   $ METRICS_ANY_ADAPTER=File:path=metrics.log ./program.pl
 
 Note that if a program requests a specific adapter that will override this
 variable.
+
+A limited attempt is made at supporting nested arguments wrapped in square
+brackets, to allow basic operation of the L<Metrics::Any::Adapter::Tee>
+adapter via this variable to itself pass arguments into child adapters:
+
+   $ METRICS_ANY_ADAPTER=Tee:Prometheus,[File:path=metrics.log] perl ...
+
+This should be considered a best-effort scenario useful for short-term testing
+and debugging. For more complex requirements in your script or program, it is
+better to use the import arguments directly as then any perl data structures
+can be passed around.
 
 =cut
 
@@ -68,10 +82,51 @@ sub import
    $pkg->import_into( $caller, @_ );
 }
 
+# Class method so Metrics::Any::Adapter::Tee can share it
+sub split_type_string
+{
+   shift;
+   my ( $str ) = @_;
+
+   my ( $type, $argstr ) = split m/[:,]/, $str, 2;
+   my @args;
+
+   while( length $argstr ) {
+      if( $argstr =~ m/^\[/ ) {
+         # Extract the entire contents of the [...] bracket
+         # TODO: Support deeper nesting somehow? Currently this is only used
+         # for using the Tee adapter via the $METRICS_ANY_ADAPTER variable
+         $argstr =~ s/^\[(.*?)\](?:,|=|$)// or
+            croak "Missing close bracket ] in adapter type string";
+         push @args, $1;
+      }
+      else {
+         # All up to the next , = or endofstring
+         $argstr =~ s/^(.*?)(?:,|=|$)//;
+         push @args, $1;
+      }
+   }
+
+   return ( $type, @args );
+}
+
+sub class_for_type
+{
+   shift;
+   my ( $type ) = @_;
+
+   my $class = "Metrics::Any::Adapter::$type";
+   unless( $class->can( 'new' ) ) {
+      ( my $file = "$class.pm" ) =~ s{::}{/}g;
+      require $file;
+   }
+   return $class;
+}
+
 my $adaptertype = "Null";
 my @adapterargs;
 if( my $val = $ENV{METRICS_ANY_ADAPTER} ) {
-   ( $adaptertype, @adapterargs ) = split m/[,=]/, $val;
+   ( $adaptertype, @adapterargs ) = __PACKAGE__->split_type_string( $val );
 }
 
 sub import_into
@@ -87,14 +142,7 @@ sub adapter
 {
    shift;
 
-   return $adapter //= do {
-      my $class = "Metrics::Any::Adapter::$adaptertype";
-      unless( $class->can( 'new' ) ) {
-         ( my $file = "$class.pm" ) =~ s{::}{/}g;
-         require $file;
-      }
-      $class->new( @adapterargs );
-   };
+   return $adapter //= __PACKAGE__->class_for_type( $adaptertype )->new( @adapterargs );
 }
 
 =head1 AUTHOR

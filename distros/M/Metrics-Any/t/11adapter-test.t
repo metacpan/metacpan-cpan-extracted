@@ -46,13 +46,32 @@ ok( $metrics, '$metrics is still true' );
       labels => [qw( x y )],
    );
 
+   # inc by ARRAYref
+   $metrics->inc_counter( ghi => [ label => "value" ] );
+   $metrics->inc_counter( jkl => [ x => 10, y => 20 ] );
+   is( Metrics::Any::Adapter::Test->metrics,
+      "the_GHI_counter label:value = 1\n" .
+      "the_JKL_counter x:10 y:20 = 1\n",
+      'Metrics::Any::Adapter::Test->metrics after increment with label by ARRAYref'
+   );
+
+   # inc by HASHref
+   $metrics->inc_counter( ghi => { label => "value" } );
+   $metrics->inc_counter( jkl => { x => 10, y => 20 } );
+   is( Metrics::Any::Adapter::Test->metrics,
+      "the_GHI_counter label:value = 2\n" .
+      "the_JKL_counter x:10 y:20 = 2\n",
+      'Metrics::Any::Adapter::Test->metrics after increment with label by HASHref'
+   );
+
+   # legacy inc by list of values
    $metrics->inc_counter( ghi => "value" );
    $metrics->inc_counter( jkl => 10, 20 );
 
    is( Metrics::Any::Adapter::Test->metrics,
-      "the_GHI_counter label:value = 1\n" .
-      "the_JKL_counter x:10 y:20 = 1\n",
-      'Metrics::Any::Adapter::Test->metrics after increment with label'
+      "the_GHI_counter label:value = 3\n" .
+      "the_JKL_counter x:10 y:20 = 3\n",
+      'Metrics::Any::Adapter::Test->metrics after increment with label by legacy value list'
    );
 }
 
@@ -62,12 +81,12 @@ ok( $metrics, '$metrics is still true' );
 
    $metrics->make_distribution( distribution => name => "the_ABC_distribution" );
 
-   $metrics->inc_distribution_by( distribution => 150 );
+   $metrics->report_distribution( distribution => 150 );
 
    is( Metrics::Any::Adapter::Test->metrics,
       "the_ABC_distribution_count = 1\n" .
       "the_ABC_distribution_total = 150\n",
-      'Metrics::Any::Adapter::Test->metrics after ->inc_distribution_by'
+      'Metrics::Any::Adapter::Test->metrics after ->report_distribution'
    );
 }
 
@@ -98,12 +117,12 @@ ok( $metrics, '$metrics is still true' );
 
    $metrics->make_timer( timer => name => "the_ABC_timer" );
 
-   $metrics->inc_timer_by( timer => 0.02 );
+   $metrics->report_timer( timer => 0.02 );
 
    is( Metrics::Any::Adapter::Test->metrics,
       "the_ABC_timer_count = 1\n" .
       "the_ABC_timer_total = 0.02\n",
-      'Metrics::Any::Adapter::Test->metrics after ->inc_timer_by'
+      'Metrics::Any::Adapter::Test->metrics after ->report_timer'
    );
 }
 

@@ -8,7 +8,7 @@ package Metrics::Any::Adapter::Test;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Carp;
 
@@ -170,7 +170,7 @@ sub inc_counter_by
 
 sub make_distribution { shift->_make( distribution => @_ ) }
 
-sub inc_distribution_by
+sub report_distribution
 {
    my $self = shift;
    my ( $handle, $amount, @labelvalues ) = @_;
@@ -209,7 +209,7 @@ sub set_gauge_to
 
 sub make_timer { shift->_make( timer => @_ ) }
 
-sub inc_timer_by
+sub report_timer
 {
    my $self = shift;
    my ( $handle, $duration, @labelvalues ) = @_;

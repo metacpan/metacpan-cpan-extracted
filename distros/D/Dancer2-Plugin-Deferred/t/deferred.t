@@ -1,7 +1,7 @@
 use 5.010;
 use strict;
 use warnings;
-use Test::More 0.96 import => ['!pass'];
+use Test2::V0;
 use Plack::Test;
 use HTTP::Request::Common;
 use HTTP::Cookies;
@@ -79,7 +79,7 @@ my $loc;
     my $res = $test->request($req);
     ok( $res->is_redirect, 'indirect/goodbye redirects' );
     $loc = $res->header('Location')->as_string;
-    like( $loc, qr{^http://localhost/fake}, 'to /fake' );
+    like( $loc, qr{/fake}, 'to /fake' );
     $jar->extract_cookies($res);
 }
 
@@ -89,12 +89,12 @@ my $loc;
     my $res = $test->request($req);
     ok( $res->is_redirect, '/fake redirects' );
     $loc = $res->header('Location')->as_string;
-    like( $loc, qr{^http://localhost/show}, 'to /show' );
+    like( $loc, qr{/show}, 'to /show' );
     $jar->extract_cookies($res);
 }
 
 {
-    my $req = GET $loc;
+    my $req = GET "http://localhost$loc";
     $jar->add_cookie_header($req);
     my $res = $test->request($req);
     like $res->content, qr/^message: goodbye/sm, "message set and returned";

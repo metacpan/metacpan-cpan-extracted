@@ -8,7 +8,7 @@ package Metrics::Any::Adapter::Null;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -34,9 +34,9 @@ sub new
 # All of these are empty methods
 foreach my $method (qw(
    make_counter      inc_counter_by
-   make_distribution inc_distribution_by
+   make_distribution report_distribution
    make_gauge        inc_gauge_by  set_gauge_to
-   make_timer        inc_timer_by
+   make_timer        report_timer
 )) {
    no strict 'refs';
    *$method = sub {};

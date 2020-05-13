@@ -1,6 +1,6 @@
 ## MCE::Shared for Perl
 
-This document describes MCE::Shared version 1.869.
+This document describes MCE::Shared version 1.871.
 
 ### Description
 
@@ -119,7 +119,7 @@ MCE::Shared utilizes the following modules:
     MCE::Util   1.832+
     MCE::Signal 1.832+
     POSIX
-    Scalar::Util
+    Scalar::Util 1.22+
     Sereal::Decoder 3.015+ (optional)
     Sereal::Encoder 3.015+ (optional)
     Socket

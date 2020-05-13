@@ -1,5 +1,15 @@
 Revision history for InfluxDB-Client
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+0.01    2020-04-27
+        First version, barely tested.
 
+0.02    2020-04-28
+        - Fix POD issues
+        - Add some POD documentation
+        - Minor API changes
+
+0.03    2020-05-13
+        - Add strict_udp option
+        - Switch to JSON (previously JSON::MaybeXS)
+        - Make database optional in methods
+        - Add send_data() method

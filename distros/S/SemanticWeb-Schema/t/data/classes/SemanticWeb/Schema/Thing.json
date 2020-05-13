@@ -43,8 +43,8 @@
          "rdfs:label" : "identifier",
          "schema:domainIncludes" : "schema:Thing",
          "schema:rangeIncludes" : [
-            "schema:Text",
             "schema:URL",
+            "schema:Text",
             "schema:PropertyValue"
          ]
       },
@@ -101,8 +101,8 @@
          "schema:domainIncludes" : "schema:Thing",
          "schema:inverseOf" : "schema:about",
          "schema:rangeIncludes" : [
-            "schema:CreativeWork",
-            "schema:Event"
+            "schema:Event",
+            "schema:CreativeWork"
          ]
       },
       "schema:url" : {

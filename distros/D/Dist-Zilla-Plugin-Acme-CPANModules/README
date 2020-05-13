@@ -3,9 +3,9 @@ NAME
     Acme::CPANModules::* distribution
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Dist::Zilla::Plugin::Acme::CPANModules (from Perl distribution
-    Dist-Zilla-Plugin-Acme-CPANModules), released on 2018-01-09.
+    Dist-Zilla-Plugin-Acme-CPANModules), released on 2020-03-01.
 
 SYNOPSIS
     In dist.ini:
@@ -15,6 +15,8 @@ SYNOPSIS
 DESCRIPTION
     This plugin is to be used when building "Acme::CPANModules::*"
     distribution. It currently does the following:
+
+    *   Abort the build if there are no entries in $LIST
 
     *   Fill the Abstract from list's summary
 
@@ -46,7 +48,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

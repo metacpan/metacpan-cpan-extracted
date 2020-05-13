@@ -11,23 +11,26 @@
          "rdfs:comment" : "Physical address of the item.",
          "rdfs:label" : "address",
          "schema:domainIncludes" : [
-            "schema:Place",
-            "schema:GeoShape",
             "schema:GeoCoordinates",
             "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Place",
+            "schema:GeoShape"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:PostalAddress"
+            "schema:PostalAddress",
+            "schema:Text"
          ]
       },
       "schema:addressCountry" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The country. For example, USA. You can also provide the two-letter <a href=\"http://en.wikipedia.org/wiki/ISO_3166-1\">ISO 3166-1 alpha-2 country code</a>.",
          "rdfs:label" : "addressCountry",
+         "schema:category" : "issue-2506",
          "schema:domainIncludes" : [
             "schema:GeoCoordinates",
+            "schema:DefinedRegion",
             "schema:GeoShape",
             "schema:PostalAddress"
          ],
@@ -45,8 +48,8 @@
             "schema:GeoShape"
          ],
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:Text"
+            "schema:Text",
+            "schema:Number"
          ]
       },
       "schema:latitude" : {
@@ -58,8 +61,8 @@
             "schema:Place"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Number"
+            "schema:Number",
+            "schema:Text"
          ]
       },
       "schema:longitude" : {
@@ -76,13 +79,16 @@
          ]
       },
       "schema:postalCode" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The postal code. For example, 94043.",
          "rdfs:label" : "postalCode",
+         "schema:category" : "issue-2506",
          "schema:domainIncludes" : [
+            "schema:DefinedRegion",
             "schema:PostalAddress",
-            "schema:GeoCoordinates",
-            "schema:GeoShape"
+            "schema:GeoShape",
+            "schema:GeoCoordinates"
          ],
          "schema:rangeIncludes" : "schema:Text"
       }

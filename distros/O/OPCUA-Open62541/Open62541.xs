@@ -121,13 +121,9 @@ croak_status(const char *func, UA_StatusCode status, char *pat, ...)
 #define CROAKS(sc, pat, args...)	croak_status(__func__, sc, pat, ##args)
 
 /* types.h */
-typedef UA_UInt32 *		OPCUA_Open62541_UInt32;
 typedef const UA_DataType *	OPCUA_Open62541_DataType;
-typedef UA_NodeId *		OPCUA_Open62541_NodeId;
-typedef UA_LocalizedText *	OPCUA_Open62541_LocalizedText;
 
-/* types_generated.h */
-typedef UA_Variant *		OPCUA_Open62541_Variant;
+#include "Open62541-typedef.xsh"
 
 /* plugin/log.h */
 typedef struct OPCUA_Open62541_Logger {
@@ -330,15 +326,23 @@ static UA_String
 XS_unpack_UA_String(SV *in)
 {
 	dTHX;
+	char *str;
 	UA_String out;
 
-	/* XXX
-	 * Converting undef to NULL string may be dangerous, check
-	 * that all users of UA_String cope with NULL strings, before
-	 * implementing that feature.  Currently Perl will warn about
-	 * undef and convert to empty string.
-	 */
-	out.data = SvPVutf8(in, out.length);
+	if (!SvOK(in)) {
+		UA_String_init(&out);
+		return out;
+	}
+
+	str = SvPVutf8(in, out.length);
+	if (out.length > 0) {
+		out.data = UA_malloc(out.length);
+		if (out.data == NULL)
+			CROAKE("UA_malloc");
+		memcpy(out.data, str, out.length);
+	} else {
+		out.data = UA_EMPTY_ARRAY_SENTINEL;
+	}
 	return out;
 }
 
@@ -402,15 +406,23 @@ static UA_ByteString
 XS_unpack_UA_ByteString(SV *in)
 {
 	dTHX;
+	char *str;
 	UA_ByteString out;
 
-	/* XXX
-	 * Converting undef to NULL string may be dangerous, check
-	 * that all users of UA_ByteString cope with NULL strings, before
-	 * implementing that feature.  Currently Perl will warn about
-	 * undef and convert to empty string.
-	 */
-	out.data = SvPV(in, out.length);
+	if (!SvOK(in)) {
+		UA_ByteString_init(&out);
+		return out;
+	}
+
+	str = SvPV(in, out.length);
+	if (out.length > 0) {
+		out.data = UA_malloc(out.length);
+		if (out.data == NULL)
+			CROAKE("UA_malloc");
+		memcpy(out.data, str, out.length);
+	} else {
+		out.data = UA_EMPTY_ARRAY_SENTINEL;
+	}
 	return out;
 }
 
@@ -694,7 +706,6 @@ OPCUA_Open62541_Variant_setScalar(OPCUA_Open62541_Variant variant, SV *in,
     OPCUA_Open62541_DataType type)
 {
 	void *scalar;
-	UA_StatusCode status;
 
 	if (unpack_UA_table[type->typeIndex] == NULL) {
 		CROAK("No unpack conversion for type '%s' index %u",
@@ -708,13 +719,7 @@ OPCUA_Open62541_Variant_setScalar(OPCUA_Open62541_Variant variant, SV *in,
 	}
 	(unpack_UA_table[type->typeIndex])(in, scalar);
 
-	status = UA_Variant_setScalarCopy(variant, scalar, type);
-	/* Free, not destroy.  The nested data structures belong to Perl. */
-	UA_free(scalar);
-	if (status != UA_STATUSCODE_GOOD) {
-		CROAKS(status, "UA_Variant_setScalarCopy type '%s' index %u",
-		    type->typeName, type->typeIndex);
-	}
+	UA_Variant_setScalar(variant, scalar, type);
 }
 
 static void
@@ -727,7 +732,6 @@ OPCUA_Open62541_Variant_setArray(OPCUA_Open62541_Variant variant, SV *in,
 	ssize_t i, top;
 	char *p;
 	void *array;
-	UA_StatusCode status;
 
 	if (!SvOK(in)) {
 		UA_Variant_setArray(variant, NULL, 0, type);
@@ -755,15 +759,7 @@ OPCUA_Open62541_Variant_setArray(OPCUA_Open62541_Variant variant, SV *in,
 		p += type->memSize;
 	}
 
-	status = UA_Variant_setArrayCopy(variant, array, top + 1, type);
-	/* Free, not destroy.  The nested data structures belong to Perl. */
-	if (array != UA_EMPTY_ARRAY_SENTINEL)
-		UA_free(array);
-	if (status != UA_STATUSCODE_GOOD) {
-		CROAKS(status,
-		    "UA_Variant_setArrayCopy size %zd, type '%s' index %u",
-		    top + 1, type->typeName, type->typeIndex);
-	}
+	UA_Variant_setArray(variant, array, top + 1, type);
 }
 
 static UA_Variant
@@ -774,6 +770,7 @@ XS_unpack_UA_Variant(SV *in)
 	OPCUA_Open62541_DataType type;
 	SV **svp, **scalar, **array;
 	HV *hv;
+	int count;
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
@@ -781,6 +778,10 @@ XS_unpack_UA_Variant(SV *in)
 	}
 	UA_Variant_init(&out);
 	hv = (HV*)SvRV(in);
+
+	count = hv_iterinit(hv);
+	if (count == 0)
+		return out;
 
 	svp = hv_fetchs(hv, "Variant_type", 0);
 	if (svp == NULL)
@@ -854,11 +855,11 @@ XS_pack_UA_Variant(SV *out, UA_Variant in)
 	SV *sv;
 	HV *hv;
 
+	hv = newHV();
 	if (UA_Variant_isEmpty(&in)) {
-		sv_set_undef(out);
+		sv_setsv(out, sv_2mortal(newRV_noinc((SV*)hv)));
 		return;
 	}
-	hv = newHV();
 
 	sv = newSV(0);
 	XS_pack_OPCUA_Open62541_DataType(sv, in.type);
@@ -1425,18 +1426,45 @@ clientAsyncBrowseCallback(UA_Client *client, void *userdata,
 }
 
 static void
-clientAsyncReadValueAttributeCallback(UA_Client *client, void *userdata,
-    UA_UInt32 requestId, UA_Variant *var)
+clientAsyncBrowseNextCallback(UA_Client *client, void *userdata,
+    UA_UInt32 requestId, UA_BrowseNextResponse *response)
 {
 	dTHX;
 	SV *sv;
 
 	sv = newSV(0);
-	if (var != NULL)
-		XS_pack_UA_Variant(sv, *var);
+	if (response != NULL)
+		XS_pack_UA_BrowseNextResponse(sv, *response);
 
 	clientCallbackPerl(client, userdata, requestId, sv);
 }
+
+static void
+clientAsyncReadDataTypeCallback(UA_Client *client, void *userdata,
+    UA_UInt32 requestId, UA_NodeId *nodeId)
+{
+	dTHX;
+	SV *sv;
+	UV index;
+
+	sv = newSV(0);
+	if (nodeId != NULL) {
+		/*
+		 * Convert NodeId to DataType, see XS_unpack_UA_NodeId() for
+		 * the opposite direction.
+		 */
+		for (index = 0; index < UA_TYPES_COUNT; index++) {
+			if (UA_NodeId_equal(nodeId, &UA_TYPES[index].typeId))
+				break;
+		}
+		if (index < UA_TYPES_COUNT)
+			XS_pack_OPCUA_Open62541_DataType(sv, &UA_TYPES[index]);
+	}
+
+	clientCallbackPerl(client, userdata, requestId, sv);
+}
+
+#include "Open62541-client-read-callback.xsh"
 
 /* 16.4 Logging Plugin API, log and clear callbacks */
 
@@ -1756,57 +1784,7 @@ STATUSCODE_UNKNOWN()
 INCLUDE: Open62541-statuscode.xsh
 
 #############################################################################
-MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::UInt32	PREFIX = UA_UInt32_
-
-# 6.1.18 UInt32, types.h
-# pointer needed for optional function arguments
-
-void
-UA_UInt32_DESTROY(uint32)
-	OPCUA_Open62541_UInt32		uint32
-    CODE:
-	DPRINTF("uint32 %p", uint32);
-	UA_UInt32_delete(uint32);
-
-#############################################################################
-MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::NodeId	PREFIX = UA_NodeId_
-
-# 6.1.18 NodeId, types_generated_handling.h
-# pointer needed for optional function arguments
-
-void
-UA_NodeId_DESTROY(nodeid)
-	OPCUA_Open62541_NodeId		nodeid
-    CODE:
-	DPRINTF("nodeid %p", nodeid);
-	UA_NodeId_delete(nodeid);
-
-#############################################################################
-MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::LocalizedText	PREFIX = UA_LocalizedText_
-
-# 6.1.21 LocalizedText, types.h
-
-OPCUA_Open62541_LocalizedText
-UA_LocalizedText_new(class)
-	char *				class
-    INIT:
-	if (strcmp(class, "OPCUA::Open62541::LocalizedText") != 0)
-		CROAK("Class '%s' is not OPCUA::Open62541::LocalizedText",
-		    class);
-    CODE:
-	RETVAL = UA_LocalizedText_new();
-	if (RETVAL == NULL)
-		CROAKE("UA_LocalizedText_new");
-	DPRINTF("localizedText %p", RETVAL);
-    OUTPUT:
-	RETVAL
-
-void
-UA_LocalizedText_DESTROY(localizedText)
-	OPCUA_Open62541_LocalizedText		localizedText
-    CODE:
-	DPRINTF("localizedText %p", localizedText);
-	UA_LocalizedText_delete(localizedText);
+INCLUDE: Open62541-destroy.xsh
 
 #############################################################################
 MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::Variant	PREFIX = UA_Variant_
@@ -1826,13 +1804,6 @@ UA_Variant_new(class)
 	DPRINTF("variant %p", RETVAL);
     OUTPUT:
 	RETVAL
-
-void
-UA_Variant_DESTROY(variant)
-	OPCUA_Open62541_Variant		variant
-    CODE:
-	DPRINTF("variant %p", variant);
-	UA_Variant_delete(variant);
 
 UA_Boolean
 UA_Variant_isEmpty(variant)
@@ -2033,25 +2004,21 @@ UA_Server_run_shutdown(server)
 UA_StatusCode
 UA_Server_readValue(server, nodeId, outValue)
 	OPCUA_Open62541_Server		server
-	UA_NodeId			nodeId
+	OPCUA_Open62541_NodeId		nodeId
 	OPCUA_Open62541_Variant		outValue
-    INIT:
-	if (!SvOK(ST(2)) || !(SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) < SVt_PVAV))
-		CROAK("outValue is not a scalar reference");
     CODE:
-	RETVAL = UA_Server_readValue(server->sv_server, nodeId, outValue);
-	if (outValue != NULL)
-		XS_pack_UA_Variant(SvRV(ST(2)), *outValue);
+	RETVAL = UA_Server_readValue(server->sv_server, *nodeId, outValue);
+	XS_pack_UA_Variant(SvRV(ST(2)), *outValue);
     OUTPUT:
 	RETVAL
 
 UA_StatusCode
 UA_Server_writeValue(server, nodeId, value)
 	OPCUA_Open62541_Server		server
-	UA_NodeId			nodeId
-	UA_Variant			value
+	OPCUA_Open62541_NodeId		nodeId
+	OPCUA_Open62541_Variant		value
     CODE:
-	RETVAL = UA_Server_writeValue(server->sv_server, nodeId, value);
+	RETVAL = UA_Server_writeValue(server->sv_server, *nodeId, *value);
     OUTPUT:
 	RETVAL
 
@@ -2059,145 +2026,159 @@ UA_Server_writeValue(server, nodeId, value)
 
 UA_BrowseResult
 UA_Server_browse(server, maxReferences, bd)
-	OPCUA_Open62541_Server		server
-	UA_UInt32			maxReferences
-	UA_BrowseDescription		bd
+	OPCUA_Open62541_Server			server
+	UA_UInt32				maxReferences
+	OPCUA_Open62541_BrowseDescription	bd
     CODE:
-	RETVAL = UA_Server_browse(server->sv_server, maxReferences, &bd);
+	RETVAL = UA_Server_browse(server->sv_server, maxReferences, bd);
     OUTPUT:
 	RETVAL
 
 # 11.9 Node Addition and Deletion
 
 UA_StatusCode
-UA_Server_addVariableNode(server, requestedNewNodeId, parentNodeId, referenceTypeId, browseName, typeDefinition, attr, nodeContext, outNewNodeId)
+UA_Server_addVariableNode(server, requestedNewNodeId, parentNodeId, referenceTypeId, browseName, typeDefinition, attr, nodeContext, outoptNewNodeId)
 	OPCUA_Open62541_Server		server
-	UA_NodeId			requestedNewNodeId
-	UA_NodeId			parentNodeId
-	UA_NodeId			referenceTypeId
-	UA_QualifiedName		browseName
-	UA_NodeId			typeDefinition
-	UA_VariableAttributes		attr
+	OPCUA_Open62541_NodeId		requestedNewNodeId
+	OPCUA_Open62541_NodeId		parentNodeId
+	OPCUA_Open62541_NodeId		referenceTypeId
+	OPCUA_Open62541_QualifiedName	browseName
+	OPCUA_Open62541_NodeId		typeDefinition
+	OPCUA_Open62541_VariableAttributes	attr
 	void *				nodeContext
-	OPCUA_Open62541_NodeId		outNewNodeId
+	OPCUA_Open62541_NodeId		outoptNewNodeId
     CODE:
 	RETVAL = UA_Server_addVariableNode(server->sv_server,
-	    requestedNewNodeId, parentNodeId, referenceTypeId, browseName,
-	    typeDefinition, attr, nodeContext, outNewNodeId);
+	    *requestedNewNodeId, *parentNodeId, *referenceTypeId, *browseName,
+	    *typeDefinition, *attr, nodeContext, outoptNewNodeId);
+	if (outoptNewNodeId != NULL)
+		XS_pack_UA_NodeId(SvRV(ST(8)), *outoptNewNodeId);
     OUTPUT:
 	RETVAL
 
 UA_StatusCode
-UA_Server_addVariableTypeNode(server, requestedNewNodeId, parentNodeId, referenceTypeId, browseName, typeDefinition, attr, nodeContext, outNewNodeId)
+UA_Server_addVariableTypeNode(server, requestedNewNodeId, parentNodeId, referenceTypeId, browseName, typeDefinition, attr, nodeContext, outoptNewNodeId)
 	OPCUA_Open62541_Server		server
-	UA_NodeId			requestedNewNodeId
-	UA_NodeId			parentNodeId
-	UA_NodeId			referenceTypeId
-	UA_QualifiedName		browseName
-	UA_NodeId			typeDefinition
-	UA_VariableTypeAttributes	attr
+	OPCUA_Open62541_NodeId		requestedNewNodeId
+	OPCUA_Open62541_NodeId		parentNodeId
+	OPCUA_Open62541_NodeId		referenceTypeId
+	OPCUA_Open62541_QualifiedName	browseName
+	OPCUA_Open62541_NodeId		typeDefinition
+	OPCUA_Open62541_VariableTypeAttributes	attr
 	void *				nodeContext
-	OPCUA_Open62541_NodeId		outNewNodeId
+	OPCUA_Open62541_NodeId		outoptNewNodeId
     CODE:
 	RETVAL = UA_Server_addVariableTypeNode(server->sv_server,
-	    requestedNewNodeId, parentNodeId, referenceTypeId, browseName,
-	    typeDefinition, attr, nodeContext, outNewNodeId);
+	    *requestedNewNodeId, *parentNodeId, *referenceTypeId, *browseName,
+	    *typeDefinition, *attr, nodeContext, outoptNewNodeId);
+	if (outoptNewNodeId != NULL)
+		XS_pack_UA_NodeId(SvRV(ST(8)), *outoptNewNodeId);
     OUTPUT:
 	RETVAL
 
 UA_StatusCode
-UA_Server_addObjectNode(server, requestedNewNodeId, parentNodeId, referenceTypeId, browseName, typeDefinition, attr, nodeContext, outNewNodeId)
+UA_Server_addObjectNode(server, requestedNewNodeId, parentNodeId, referenceTypeId, browseName, typeDefinition, attr, nodeContext, outoptNewNodeId)
 	OPCUA_Open62541_Server		server
-	UA_NodeId			requestedNewNodeId
-	UA_NodeId			parentNodeId
-	UA_NodeId			referenceTypeId
-	UA_QualifiedName		browseName
-	UA_NodeId			typeDefinition
-	UA_ObjectAttributes		attr
+	OPCUA_Open62541_NodeId		requestedNewNodeId
+	OPCUA_Open62541_NodeId		parentNodeId
+	OPCUA_Open62541_NodeId		referenceTypeId
+	OPCUA_Open62541_QualifiedName	browseName
+	OPCUA_Open62541_NodeId		typeDefinition
+	OPCUA_Open62541_ObjectAttributes	attr
 	void *				nodeContext
-	OPCUA_Open62541_NodeId		outNewNodeId
+	OPCUA_Open62541_NodeId		outoptNewNodeId
     CODE:
 	RETVAL = UA_Server_addObjectNode(server->sv_server,
-	    requestedNewNodeId, parentNodeId, referenceTypeId, browseName,
-	    typeDefinition, attr, nodeContext, outNewNodeId);
+	    *requestedNewNodeId, *parentNodeId, *referenceTypeId, *browseName,
+	    *typeDefinition, *attr, nodeContext, outoptNewNodeId);
+	if (outoptNewNodeId != NULL)
+		XS_pack_UA_NodeId(SvRV(ST(8)), *outoptNewNodeId);
     OUTPUT:
 	RETVAL
 
 UA_StatusCode
-UA_Server_addObjectTypeNode(server, requestedNewNodeId, parentNodeId, referenceTypeId, browseName, attr, nodeContext, outNewNodeId)
+UA_Server_addObjectTypeNode(server, requestedNewNodeId, parentNodeId, referenceTypeId, browseName, attr, nodeContext, outoptNewNodeId)
 	OPCUA_Open62541_Server		server
-	UA_NodeId			requestedNewNodeId
-	UA_NodeId			parentNodeId
-	UA_NodeId			referenceTypeId
-	UA_QualifiedName		browseName
-	UA_ObjectTypeAttributes		attr
+	OPCUA_Open62541_NodeId		requestedNewNodeId
+	OPCUA_Open62541_NodeId		parentNodeId
+	OPCUA_Open62541_NodeId		referenceTypeId
+	OPCUA_Open62541_QualifiedName	browseName
+	OPCUA_Open62541_ObjectTypeAttributes	attr
 	void *				nodeContext
-	OPCUA_Open62541_NodeId		outNewNodeId
+	OPCUA_Open62541_NodeId		outoptNewNodeId
     CODE:
 	RETVAL = UA_Server_addObjectTypeNode(server->sv_server,
-	    requestedNewNodeId, parentNodeId, referenceTypeId, browseName,
-	    attr, nodeContext, outNewNodeId);
+	    *requestedNewNodeId, *parentNodeId, *referenceTypeId, *browseName,
+	    *attr, nodeContext, outoptNewNodeId);
+	if (outoptNewNodeId != NULL)
+		XS_pack_UA_NodeId(SvRV(ST(7)), *outoptNewNodeId);
     OUTPUT:
 	RETVAL
 
 UA_StatusCode
-UA_Server_addViewNode(server, requestedNewNodeId, parentNodeId, referenceTypeId, browseName, attr, nodeContext, outNewNodeId)
+UA_Server_addViewNode(server, requestedNewNodeId, parentNodeId, referenceTypeId, browseName, attr, nodeContext, outoptNewNodeId)
 	OPCUA_Open62541_Server		server
-	UA_NodeId			requestedNewNodeId
-	UA_NodeId			parentNodeId
-	UA_NodeId			referenceTypeId
-	UA_QualifiedName		browseName
-	UA_ViewAttributes		attr
+	OPCUA_Open62541_NodeId		requestedNewNodeId
+	OPCUA_Open62541_NodeId		parentNodeId
+	OPCUA_Open62541_NodeId		referenceTypeId
+	OPCUA_Open62541_QualifiedName	browseName
+	OPCUA_Open62541_ViewAttributes	attr
 	void *				nodeContext
-	OPCUA_Open62541_NodeId		outNewNodeId
+	OPCUA_Open62541_NodeId		outoptNewNodeId
     CODE:
 	RETVAL = UA_Server_addViewNode(server->sv_server,
-	    requestedNewNodeId, parentNodeId, referenceTypeId, browseName,
-	    attr, nodeContext, outNewNodeId);
+	    *requestedNewNodeId, *parentNodeId, *referenceTypeId, *browseName,
+	    *attr, nodeContext, outoptNewNodeId);
+	if (outoptNewNodeId != NULL)
+		XS_pack_UA_NodeId(SvRV(ST(7)), *outoptNewNodeId);
     OUTPUT:
 	RETVAL
 
 UA_StatusCode
-UA_Server_addReferenceTypeNode(server, requestedNewNodeId, parentNodeId, referenceTypeId, browseName, attr, nodeContext, outNewNodeId)
+UA_Server_addReferenceTypeNode(server, requestedNewNodeId, parentNodeId, referenceTypeId, browseName, attr, nodeContext, outoptNewNodeId)
 	OPCUA_Open62541_Server		server
-	UA_NodeId			requestedNewNodeId
-	UA_NodeId			parentNodeId
-	UA_NodeId			referenceTypeId
-	UA_QualifiedName		browseName
-	UA_ReferenceTypeAttributes	attr
+	OPCUA_Open62541_NodeId		requestedNewNodeId
+	OPCUA_Open62541_NodeId		parentNodeId
+	OPCUA_Open62541_NodeId		referenceTypeId
+	OPCUA_Open62541_QualifiedName	browseName
+	OPCUA_Open62541_ReferenceTypeAttributes	attr
 	void *				nodeContext
-	OPCUA_Open62541_NodeId		outNewNodeId
+	OPCUA_Open62541_NodeId		outoptNewNodeId
     CODE:
 	RETVAL = UA_Server_addReferenceTypeNode(server->sv_server,
-	    requestedNewNodeId, parentNodeId, referenceTypeId, browseName,
-	    attr, nodeContext, outNewNodeId);
+	    *requestedNewNodeId, *parentNodeId, *referenceTypeId, *browseName,
+	    *attr, nodeContext, outoptNewNodeId);
+	if (outoptNewNodeId != NULL)
+		XS_pack_UA_NodeId(SvRV(ST(7)), *outoptNewNodeId);
     OUTPUT:
 	RETVAL
 
 UA_StatusCode
-UA_Server_addDataTypeNode(server, requestedNewNodeId, parentNodeId, referenceTypeId, browseName, attr, nodeContext, outNewNodeId)
+UA_Server_addDataTypeNode(server, requestedNewNodeId, parentNodeId, referenceTypeId, browseName, attr, nodeContext, outoptNewNodeId)
 	OPCUA_Open62541_Server		server
-	UA_NodeId			requestedNewNodeId
-	UA_NodeId			parentNodeId
-	UA_NodeId			referenceTypeId
-	UA_QualifiedName		browseName
-	UA_DataTypeAttributes		attr
+	OPCUA_Open62541_NodeId		requestedNewNodeId
+	OPCUA_Open62541_NodeId		parentNodeId
+	OPCUA_Open62541_NodeId		referenceTypeId
+	OPCUA_Open62541_QualifiedName	browseName
+	OPCUA_Open62541_DataTypeAttributes	attr
 	void *				nodeContext
-	OPCUA_Open62541_NodeId		outNewNodeId
+	OPCUA_Open62541_NodeId		outoptNewNodeId
     CODE:
 	RETVAL = UA_Server_addDataTypeNode(server->sv_server,
-	    requestedNewNodeId, parentNodeId, referenceTypeId, browseName,
-	    attr, nodeContext, outNewNodeId);
+	    *requestedNewNodeId, *parentNodeId, *referenceTypeId, *browseName,
+	    *attr, nodeContext, outoptNewNodeId);
+	if (outoptNewNodeId != NULL)
+		XS_pack_UA_NodeId(SvRV(ST(7)), *outoptNewNodeId);
     OUTPUT:
 	RETVAL
 
 UA_StatusCode
 UA_Server_deleteNode(server, nodeId, deleteReferences)
 	OPCUA_Open62541_Server		server
-	UA_NodeId			nodeId
+	OPCUA_Open62541_NodeId		nodeId
 	UA_Boolean			deleteReferences
     CODE:
-	RETVAL = UA_Server_deleteNode(server->sv_server, nodeId,
+	RETVAL = UA_Server_deleteNode(server->sv_server, *nodeId,
 	    deleteReferences);
     OUTPUT:
 	RETVAL
@@ -2207,27 +2188,27 @@ UA_Server_deleteNode(server, nodeId, deleteReferences)
 UA_StatusCode
 UA_Server_addReference(server, sourceId, refTypeId, targetId, isForward)
 	OPCUA_Open62541_Server		server
-	UA_NodeId			sourceId
-	UA_NodeId			refTypeId
-	UA_ExpandedNodeId		targetId
+	OPCUA_Open62541_NodeId		sourceId
+	OPCUA_Open62541_NodeId		refTypeId
+	OPCUA_Open62541_ExpandedNodeId	targetId
 	UA_Boolean			isForward
     CODE:
-	RETVAL = UA_Server_addReference(server->sv_server, sourceId, refTypeId,
-	    targetId, isForward);
+	RETVAL = UA_Server_addReference(server->sv_server, *sourceId,
+	    *refTypeId, *targetId, isForward);
     OUTPUT:
 	RETVAL
 
 UA_StatusCode
 UA_Server_deleteReference(server, sourceNodeId, referenceTypeId, isForward, targetNodeId, deleteBidirectional)
 	OPCUA_Open62541_Server		server
-	UA_NodeId			sourceNodeId
-	UA_NodeId			referenceTypeId
+	OPCUA_Open62541_NodeId		sourceNodeId
+	OPCUA_Open62541_NodeId		referenceTypeId
 	UA_Boolean			isForward
-	UA_ExpandedNodeId		targetNodeId
+	OPCUA_Open62541_ExpandedNodeId	targetNodeId
 	UA_Boolean			deleteBidirectional
     CODE:
-	RETVAL = UA_Server_deleteReference(server->sv_server, sourceNodeId,
-	    referenceTypeId, isForward, targetNodeId, deleteBidirectional);
+	RETVAL = UA_Server_deleteReference(server->sv_server, *sourceNodeId,
+	    *referenceTypeId, isForward, *targetNodeId, deleteBidirectional);
     OUTPUT:
 	RETVAL
 
@@ -2267,20 +2248,20 @@ UA_StatusCode
 UA_ServerConfig_setMinimal(config, portNumber, certificate)
 	OPCUA_Open62541_ServerConfig	config
 	UA_UInt16			portNumber
-	UA_ByteString			certificate;
+	OPCUA_Open62541_ByteString	certificate;
     CODE:
 	RETVAL = UA_ServerConfig_setMinimal(config->svc_serverconfig,
-	    portNumber, &certificate);
+	    portNumber, certificate);
     OUTPUT:
 	RETVAL
 
 void
 UA_ServerConfig_setCustomHostname(config, customHostname)
 	OPCUA_Open62541_ServerConfig	config
-	UA_String			customHostname
+	OPCUA_Open62541_String		customHostname
     CODE:
 	UA_ServerConfig_setCustomHostname(config->svc_serverconfig,
-	    customHostname);
+	    *customHostname);
 
 OPCUA_Open62541_Logger
 UA_ServerConfig_getLogger(config)
@@ -2301,7 +2282,8 @@ UA_BuildInfo
 UA_ServerConfig_getBuildInfo(config)
 	OPCUA_Open62541_ServerConfig	config
     CODE:
-	RETVAL = config->svc_serverconfig->buildInfo;
+	/* Build info is part of the server memory.  Typemap clears retval. */
+	UA_BuildInfo_copy(&config->svc_serverconfig->buildInfo, &RETVAL);
     OUTPUT:
 	RETVAL
 
@@ -2430,16 +2412,13 @@ UA_Client_disconnect(client)
 	RETVAL
 
 UA_StatusCode
-UA_Client_disconnect_async(client, requestId)
+UA_Client_disconnect_async(client, outoptReqId)
 	OPCUA_Open62541_Client		client
-	OPCUA_Open62541_UInt32		requestId
-    INIT:
-	if (SvOK(ST(1)) && !(SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) < SVt_PVAV))
-		CROAK("requestId is not a scalar reference");
+	OPCUA_Open62541_UInt32		outoptReqId
     CODE:
-	RETVAL = UA_Client_disconnect_async(client->cl_client, requestId);
-	if (requestId != NULL)
-		XS_pack_UA_UInt32(SvRV(ST(1)), *requestId);
+	RETVAL = UA_Client_disconnect_async(client->cl_client, outoptReqId);
+	if (outoptReqId != NULL)
+		XS_pack_UA_UInt32(SvRV(ST(1)), *outoptReqId);
     OUTPUT:
 	RETVAL
 
@@ -2452,121 +2431,66 @@ UA_Client_getState(client)
 	RETVAL
 
 UA_StatusCode
-UA_Client_sendAsyncBrowseRequest(client, request, callback, data, reqId)
+UA_Client_sendAsyncBrowseRequest(client, request, callback, data, outoptReqId)
 	OPCUA_Open62541_Client		client
-	UA_BrowseRequest		request
+	OPCUA_Open62541_BrowseRequest	request
 	SV *				callback
 	SV *				data
-	OPCUA_Open62541_UInt32		reqId
+	OPCUA_Open62541_UInt32		outoptReqId
     PREINIT:
 	ClientCallbackData		ccd;
-    INIT:
-	if (SvOK(ST(4)) && !(SvROK(ST(4)) && SvTYPE(SvRV(ST(4))) < SVt_PVAV))
-		CROAK("reqId is not a scalar reference");
     CODE:
 	ccd = newClientCallbackData(callback, ST(0), data);
-	RETVAL = UA_Client_sendAsyncBrowseRequest(client->cl_client, &request,
-	    clientAsyncBrowseCallback, ccd, reqId);
+	RETVAL = UA_Client_sendAsyncBrowseRequest(client->cl_client, request,
+	    clientAsyncBrowseCallback, ccd, outoptReqId);
 	if (RETVAL != UA_STATUSCODE_GOOD)
 		deleteClientCallbackData(ccd);
-	if (reqId != NULL)
-		XS_pack_UA_UInt32(SvRV(ST(4)), *reqId);
+	if (outoptReqId != NULL)
+		XS_pack_UA_UInt32(SvRV(ST(4)), *outoptReqId);
+    OUTPUT:
+	RETVAL
+
+UA_StatusCode
+UA_Client_sendAsyncBrowseNextRequest(client, request, callback, data, outoptReqId)
+	OPCUA_Open62541_Client		client
+	OPCUA_Open62541_BrowseNextRequest	request
+	SV *				callback
+	SV *				data
+	OPCUA_Open62541_UInt32		outoptReqId
+    PREINIT:
+	ClientCallbackData		ccd;
+    CODE:
+	ccd = newClientCallbackData(callback, ST(0), data);
+	RETVAL = UA_Client_sendAsyncRequest(client->cl_client, request,
+	    &UA_TYPES[UA_TYPES_BROWSENEXTREQUEST],
+	    (UA_ClientAsyncServiceCallback)clientAsyncBrowseNextCallback,
+	    &UA_TYPES[UA_TYPES_BROWSENEXTRESPONSE], ccd, outoptReqId);
+	if (RETVAL != UA_STATUSCODE_GOOD)
+		deleteClientCallbackData(ccd);
+	if (outoptReqId != NULL)
+		XS_pack_UA_UInt32(SvRV(ST(4)), *outoptReqId);
     OUTPUT:
 	RETVAL
 
 UA_BrowseResponse
 UA_Client_Service_browse(client, request)
 	OPCUA_Open62541_Client		client
-	UA_BrowseRequest		request
+	OPCUA_Open62541_BrowseRequest	request
     CODE:
-	RETVAL = UA_Client_Service_browse(client->cl_client, request);
-    OUTPUT:
-	RETVAL
-
-UA_StatusCode
-UA_Client_readValueAttribute_async(client, nodeId, callback, data, reqId)
-	OPCUA_Open62541_Client		client
-	UA_NodeId			nodeId
-	SV *				callback
-	SV *				data
-	OPCUA_Open62541_UInt32		reqId
-    PREINIT:
-	ClientCallbackData		ccd;
-    INIT:
-	if (SvOK(ST(4)) && !(SvROK(ST(4)) && SvTYPE(SvRV(ST(4))) < SVt_PVAV))
-		CROAK("reqId is not a scalar reference");
-    CODE:
-	ccd = newClientCallbackData(callback, ST(0), data);
-	RETVAL = UA_Client_readValueAttribute_async(client->cl_client, nodeId,
-	    clientAsyncReadValueAttributeCallback, ccd, reqId);
-	if (RETVAL != UA_STATUSCODE_GOOD)
-		deleteClientCallbackData(ccd);
-	if (reqId != NULL)
-		XS_pack_UA_UInt32(SvRV(ST(4)), *reqId);
-    OUTPUT:
-	RETVAL
-
-UA_StatusCode
-UA_Client_readDisplayNameAttribute(client, nodeId, outDisplayName)
-	OPCUA_Open62541_Client		client
-	UA_NodeId			nodeId
-	OPCUA_Open62541_LocalizedText	outDisplayName
-    INIT:
-	if (!SvOK(ST(2)) || !(SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) < SVt_PVAV))
-		CROAK("outDisplayName is not a scalar reference");
-    CODE:
-	RETVAL = UA_Client_readDisplayNameAttribute(client->cl_client, nodeId,
-	    outDisplayName);
-	if (outDisplayName != NULL)
-		XS_pack_UA_LocalizedText(SvRV(ST(2)), *outDisplayName);
-    OUTPUT:
-	RETVAL
-
-UA_StatusCode
-UA_Client_readDescriptionAttribute(client, nodeId, outDescription)
-	OPCUA_Open62541_Client		client
-	UA_NodeId			nodeId
-	OPCUA_Open62541_LocalizedText	outDescription
-    INIT:
-	if (!SvOK(ST(2)) || !(SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) < SVt_PVAV))
-		CROAK("outDescription is not a scalar reference");
-    CODE:
-	RETVAL = UA_Client_readDescriptionAttribute(client->cl_client, nodeId,
-	    outDescription);
-	if (outDescription != NULL)
-		XS_pack_UA_LocalizedText(SvRV(ST(2)), *outDescription);
-    OUTPUT:
-	RETVAL
-
-UA_StatusCode
-UA_Client_readValueAttribute(client, nodeId, outValue)
-	OPCUA_Open62541_Client		client
-	UA_NodeId			nodeId
-	OPCUA_Open62541_Variant		outValue
-    INIT:
-	if (!SvOK(ST(2)) || !(SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) < SVt_PVAV))
-		CROAK("outValue is not a scalar reference");
-    CODE:
-	RETVAL = UA_Client_readValueAttribute(client->cl_client, nodeId,
-	    outValue);
-	if (outValue != NULL)
-		XS_pack_UA_Variant(SvRV(ST(2)), *outValue);
+	RETVAL = UA_Client_Service_browse(client->cl_client, *request);
     OUTPUT:
 	RETVAL
 
 UA_StatusCode
 UA_Client_readDataTypeAttribute(client, nodeId, outDataType)
 	OPCUA_Open62541_Client		client
-	UA_NodeId			nodeId
+	OPCUA_Open62541_NodeId		nodeId
 	SV *				outDataType
     PREINIT:
 	UA_NodeId			outNodeId;
 	UV				index;
-    INIT:
-	if (!SvOK(ST(2)) || !(SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) < SVt_PVAV))
-		CROAK("outDataType is not a scalar reference");
     CODE:
-	RETVAL = UA_Client_readDataTypeAttribute(client->cl_client, nodeId,
+	RETVAL = UA_Client_readDataTypeAttribute(client->cl_client, *nodeId,
 	    &outNodeId);
 	/*
 	 * Convert NodeId to DataType, see XS_unpack_UA_NodeId() for
@@ -2581,6 +2505,28 @@ UA_Client_readDataTypeAttribute(client, nodeId, outDataType)
 		    &UA_TYPES[index]);
     OUTPUT:
 	RETVAL
+
+UA_StatusCode
+UA_Client_readDataTypeAttribute_async(client, nodeId, callback, data, outoptReqId)
+	OPCUA_Open62541_Client		client
+	OPCUA_Open62541_NodeId		nodeId
+	SV *				callback
+	SV *				data
+	OPCUA_Open62541_UInt32		outoptReqId
+    PREINIT:
+	ClientCallbackData		ccd;
+    CODE:
+	ccd = newClientCallbackData(callback, ST(0), data);
+	RETVAL = UA_Client_readDataTypeAttribute_async(client->cl_client,
+	    *nodeId, clientAsyncReadDataTypeCallback, ccd, outoptReqId);
+	if (RETVAL != UA_STATUSCODE_GOOD)
+		deleteClientCallbackData(ccd);
+	if (outoptReqId != NULL)
+		XS_pack_UA_UInt32(SvRV(ST(4)), *outoptReqId);
+    OUTPUT:
+	RETVAL
+
+INCLUDE: Open62541-client-read.xsh
 
 #############################################################################
 MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::ClientConfig	PREFIX = UA_ClientConfig_

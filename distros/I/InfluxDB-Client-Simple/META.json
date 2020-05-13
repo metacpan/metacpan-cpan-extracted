@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "IO::Socket::INET" : "0",
-            "JSON::MaybeXS" : "0",
+            "JSON" : "0",
             "LWP::UserAgent" : "0",
             "URI" : "0",
             "perl" : "5.006"
@@ -42,6 +42,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

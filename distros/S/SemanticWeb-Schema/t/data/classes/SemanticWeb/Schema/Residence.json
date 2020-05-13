@@ -13,8 +13,8 @@
          "rdfs:label" : "accommodationFloorPlan",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
-            "schema:Residence",
-            "schema:Accommodation"
+            "schema:Accommodation",
+            "schema:Residence"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:FloorPlan"

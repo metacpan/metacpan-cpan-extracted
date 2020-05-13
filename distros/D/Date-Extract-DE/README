@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    0.0.2
+    0.0.3
 
 INSTALLATION
 
@@ -43,7 +43,7 @@ METHODS
 
 AUTHORS
 
-    Andreas Mager <andreas@rainofbits.com>
+    Andreas Mager <quattro at cpan org>
 
     Christian Eder <christian.eder@apa.at>
 

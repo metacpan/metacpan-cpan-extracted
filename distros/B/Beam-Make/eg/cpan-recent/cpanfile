@@ -1,0 +1,5 @@
+
+requires 'Beam::Make';
+requires 'DBD::SQLite';
+requires 'ETL::Yertl';
+

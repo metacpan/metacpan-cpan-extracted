@@ -4,7 +4,7 @@ use warnings;
 
 package Dancer2::Plugin::Deferred;
 our $AUTHORITY = 'cpan:YANICK';
-$Dancer2::Plugin::Deferred::VERSION = '0.007018';
+$Dancer2::Plugin::Deferred::VERSION = '0.008000';
 # ABSTRACT: Defer messages or data across redirections
 # VERSION
 
@@ -167,7 +167,7 @@ Dancer2::Plugin::Deferred - Defer messages or data across redirections
 
 =head1 VERSION
 
-version 0.007018
+version 0.008000
 
 =head1 SYNOPSIS
 
@@ -279,7 +279,7 @@ Deluxaran <deluxaran@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018, 2016 by David Golden.
+This software is Copyright (c) 2020, 2018, 2016 by David Golden.
 
 This is free software, licensed under:
 

@@ -1,0 +1,109 @@
+{
+   "abstract" : "Recipes to declare and resolve dependencies between things",
+   "author" : [
+      "Doug Bell <preaction@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Beam-Make",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Beam::Runner" : "0",
+            "Beam::Service" : "0",
+            "Beam::Wire" : "1.023",
+            "List::Util" : "1.39",
+            "Log::Any" : "1.708",
+            "Moo" : "2.004000",
+            "Text::CSV" : "0",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900",
+            "DBD::SQLite" : "1.56"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Beam::Make" : {
+         "file" : "lib/Beam/Make.pm",
+         "version" : "0.001"
+      },
+      "Beam::Make::Cache" : {
+         "file" : "lib/Beam/Make/Cache.pm",
+         "version" : "0.001"
+      },
+      "Beam::Make::DBI" : {
+         "file" : "lib/Beam/Make/DBI.pm",
+         "version" : "0.001"
+      },
+      "Beam::Make::DBI::CSV" : {
+         "file" : "lib/Beam/Make/DBI/CSV.pm",
+         "version" : "0.001"
+      },
+      "Beam::Make::DBI::Schema" : {
+         "file" : "lib/Beam/Make/DBI/Schema.pm",
+         "version" : "0.001"
+      },
+      "Beam::Make::File" : {
+         "file" : "lib/Beam/Make/File.pm",
+         "version" : "0.001"
+      },
+      "Beam::Make::Recipe" : {
+         "file" : "lib/Beam/Make/Recipe.pm",
+         "version" : "0.001"
+      },
+      "Beam::Runner::Command::make" : {
+         "file" : "lib/Beam/Runner/Command/make.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/preaction/Beam-Make/issues"
+      },
+      "homepage" : "https://github.com/preaction/Beam-Make",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/preaction/Beam-Make.git",
+         "web" : "https://github.com/preaction/Beam-Make"
+      }
+   },
+   "version" : "0.001",
+   "x_authority" : "cpan:PREACTION",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
+}
+

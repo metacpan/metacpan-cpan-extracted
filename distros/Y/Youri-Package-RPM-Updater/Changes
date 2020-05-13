@@ -1,3 +1,13 @@
+2019-05-12 Pascal Terjan <pterjan@mageia.org> 0.6.3
+	* fix unescaped left brace in regex
+	* support using global instead of define
+
+2012-12-04 Pascal Terjan <pterjan@zarb.org> 0.6.2
+        * accept 0 as a valid revision
+
+2011-01-30 Guillaume Rousse <guillomovitch@zarb.org> 0.6.1
+	* more RPM/RPM4 fixes
+
 2011-01-22 Guillaume Rousse <guillomovitch@zarb.org> 0.6.0
 	* compatibility with either RPM or RPM4 perl bindings
 

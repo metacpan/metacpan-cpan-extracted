@@ -1,4 +1,4 @@
-# $Id: Updater.pm 2301 2011-01-22 12:10:08Z guillomovitch $
+# $Id$
 
 package Youri::Package::RPM::Updater;
 
@@ -135,8 +135,8 @@ use SVN::Client;
 use Readonly;
 use YAML::AppConfig;
 use Youri::Package::RPM 0.002;
-use version; our $VERSION = qv('0.6.0');
-use feature qw/switch/;
+use version; our $VERSION = qv('0.6.3');
+use experimental qw/switch/;
 
 # default values
 Readonly::Scalar my $defaults => <<'EOF';
@@ -467,7 +467,7 @@ sub _update_spec {
     my $old_version = $header->tag('version');
     return if $options{check_new_version} &&
               $new_version                &&
-              RPM4::rpmvercmp($old_version, $new_version) >= 0;
+              $wrapper_class->compare_revisions($old_version, $new_version) >= 0;
 
     my $new_release = $options{release} || '';
     my $epoch       = $header->tag('epoch');
@@ -809,7 +809,7 @@ sub _get_new_version {
 
     return unless $line =~ /^
         (
-            %define \s+              # macro
+            %(?:define|global) \s+   # macro
                 (?:
                     version
                 |
@@ -835,7 +835,7 @@ sub _get_new_release {
 
     return unless $line =~ /^
     (
-        %define \s+      # macro
+        %(?:define|global) \s+      # macro
             (?:
                 rel
             |
@@ -857,7 +857,7 @@ sub _get_new_release {
             my ($macro_name, $macro_spacing, $macro_value) = ($1, $2, $3);
             $macro_value = _get_new_release_number($macro_value, $new_version, $release_suffix);
             $value = '%' . $macro_name . $macro_spacing . $macro_value;
-        } elsif ($value =~ /^% { (\w+) (\s+) (\S+) } $/x) {
+        } elsif ($value =~ /^% \{ (\w+) (\s+) (\S+) \} $/x) {
             my ($macro_name, $macro_spacing, $macro_value) = ($1, $2, $3);
             $macro_value = _get_new_release_number($macro_value, $new_version, $release_suffix);
             $value = '%{' . $macro_name . $macro_spacing . $macro_value . '}';
@@ -883,7 +883,7 @@ sub _get_new_release_number {
             $value =~ /^(.*?)(\d+)($release_suffix)?$/;
 
         croak "Unable to extract release number from value '$value'"
-            unless $number;
+            unless defined($number);
 
         $number++;
     }

@@ -6,7 +6,7 @@ use warnings;
 
 use Carp;
 use IO::Socket::INET;
-use JSON::MaybeXS;
+use JSON;
 use LWP::UserAgent;
 use URI;
 
@@ -16,11 +16,11 @@ InfluxDB::Client::Simple - The lightweight InfluxDB client
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -45,48 +45,55 @@ InfluxDB::Client::Simple provides an easy way to interact with an InfluxDB serve
     $result = $client->write("testing,host=containment,repo=cadi-libs,file=testfile statement=42,pod=85", database => 'dbname');
 
     ########################## UDP ##########################
-    $client = InfluxDB::Client::Simple->new( host => 'server.address.com', port => 8089, protocol => 'udp' ) or die "Can't instantiate client";
+    $client = InfluxDB::Client::Simple->new( host => 'server.address.com', port => 8089, protocol => 'udp', database => 'grafana' ) or die "Can't instantiate client";
 
     # UDP allows only write()
-    $result = $client->write("testing,host=containment,repo=cadi-libs,file=testfile statement=47,pod=89", database => 'grafana');
+    $result = $client->write("testing,host=containment,repo=cadi-libs,file=testfile statement=47,pod=89");
 
 =head1 WHY
 
 In its current state this module offers few additional features over InfluxDB::HTTP (from which it's derived) 
 
 The only reasons why you would use this module are:
+
 =over
 
 =item *
-Less dependencies (no Object::Result and its dependencies)
+Minimal dependencies (no Object::Result and its dependencies)
 
 =item *
 You want to use UDP protocol for writing (WIP)
 
 =back
 
-=cut
-
 =head1 SUBROUTINES/METHODS
 
 =head2 new ( [%options] )
 
 Constructor.
-%otions is an hash with the following keys:
+%otions is a hash with the following keys:
 
 =over
 
-=item*
+=item *
+database - Database name (default: 'grafana')
+
+=item *
 host - Server hostname (default: 'localhost')
 
-=item*
+=item *
 port - Server port (default: 8086)
 
-=item*
-timeout - Timeout value in seconds (default: 180)
+=item *
+protocol - Transport protocol 'udp' or 'tcp' (default: 'tcp')
+Note that when using the udp protocol, the default behaviour is to avoid dying on errors.
+(You can change that with the 'strict_udp' option)
 
-=item*
-protocol - Transport protocol (default: 'tcp')
+=item *
+strict_udp - Boolean value to die on UDP error (false by default)
+
+=item *
+timeout - Timeout value in seconds (default: 180)
 
 =back
 
@@ -94,17 +101,19 @@ protocol - Transport protocol (default: 'tcp')
 
 sub new {
     my $class = shift;
-    my %args = ( host     => 'localhost',
+    my %args = ( database => 'grafana',
+                 host     => 'localhost',
                  port     => 8086,
-                 timeout  => 180,
                  protocol => 'tcp',
+                 timeout  => 180,
                  @_,
     );
-    my ( $host, $port, $timeout, $protocol ) = map { lc } @args{ 'host', 'port', 'timeout', 'protocol' };
+    my ( $host, $port, $protocol, $strict_udp, $timeout ) = map { lc }  @args{ 'host', 'port', 'protocol', 'strict_udp', 'timeout' };
 
     my $self = { host => $host,
                  port => $port,
-                 protocol => $protocol
+                 protocol => $protocol,
+                 options => { database => $args{database} }
     };
 
     if ( $protocol eq 'tcp' ) {
@@ -118,7 +127,12 @@ sub new {
         my $socket = IO::Socket::INET->new( PeerAddr => "$host:$port",
                                             Proto    => $protocol,
                                             Blocking => 0
-        ) || die("Can't open socket: $@");
+        );
+
+        if ($strict_udp) {
+          die("Can't open socket: $@") unless $socket;
+        }
+
         $self->{udp} = $socket;
     }
 
@@ -131,18 +145,18 @@ sub new {
 
 Check the server connectivity.
 
-Returns an hashref which evaluates to true if the connection is ok and to false otherwise.
+Returns a hashref which evaluates to true if the connection is ok and to false otherwise.
 The hashref has the following keys:
 
 =over
 
-=item*
+=item *
 raw - The raw response from the server
 
-=item*
+=item *
 error - The error message returned by the server (empty on success)
 
-=item*
+=item *
 version - The InfluxDB verstion returned by the server through the 'X-Influxdb-Version' header
 
 =back
@@ -170,6 +184,38 @@ sub ping {
 }
 
 =head2 query( $query [, %options] )
+
+Query the InfluxDB database using the $query passed as first parameter.
+Optionally %options can be passed as a hash 
+Allowed keys for options are:
+
+=over
+
+=item *
+database - The database to be queried on the InfluxDB server
+
+=item *
+chunksize - The size of the chunks used for the returned data
+
+=item *
+epoch - The precision format (h, m, s, ms, u, ns) for epoch timestamps
+
+=back
+
+Returns a hashref whose keys are:
+
+=over
+
+=item *
+raw - The raw response from the server
+
+=item *
+error - The error message returned by the server (empty on success)
+
+=item *
+data - The InfluxDB data returned by the server
+
+=back
 
 =cut
 
@@ -225,14 +271,43 @@ sub query {
     };
 }
 
-=head2 write
+=head2 write ($measurement | \@measurements, [%options])
+
+$measurement is the data to be send encoded according to the LineProtocol.
+
+%options can have the following keys:
+
+=over
+
+=item *
+database - The database to be queried on the InfluxDB server
+
+=item *
+retention_policy - The retention policy to be used (if different from the default one)
+
+=item *
+precision - The precision used in the data (if diffectent from the default 'ns')
+
+=back
+
+Returns a hashref whose keys are:
+
+=over
+
+=item *
+raw - The raw response from the server (obviously empty when using UDP)
+
+=item *
+error - The error message returned by the server (empty on success)
+
+=back
 
 =cut
 
 sub write {
     my $self        = shift;
     my $measurement = shift;
-    my %args        = @_;
+    my %args        = (%{$self->{options}},  @_);
     my ( $database, $precision, $retention_policy ) = @args{ 'database', 'precision', 'retention_policy' };
 
     die "Missing argument 'measurement'"                                        if !$measurement;
@@ -263,23 +338,79 @@ sub write {
 
         return { raw   => $response,
                  error => $error,
-                 data  => 0,
         };
     }
 
     return { raw   => $response,
              error => undef,
-             data  => 1,
     };
 
   } else {
-  # Udp send
-  my $bytes = $self->{udp}->send($measurement);
-        return { raw   => undef,
-                 error => undef,
-                 data  => $bytes?1:0,
-        };
+
+    # Udp send
+    my $bytes = $self->{udp}?$self->{udp}->send($measurement):0;
+
+    # should be more picky here : compare $bytes with length of $measurement ?
+    return { raw   => undef,
+             error => $bytes?undef:"Undefinded error while sending data (udp)",
+    };
   }
+}
+
+
+=head2 send_data ($measurement, \%tags, \%fields, [%options])
+
+Write data to the influxDB after converting them into LineProtocol format.
+(call write() underneath)
+
+$measurement is the name to be used for measurement
+
+\%tags is the tag set associated to this datapoint
+
+\%fields are the field set associated to this datapoint
+
+$timestamp is an optional timestamp value
+
+\%options
+
+%options can have the following keys:
+
+=over
+
+=item *
+database - The database to be queried on the InfluxDB server
+
+=item *
+retention_policy - The retention policy to be used (if different from the default one)
+
+=item *
+precision - The precision used in the data (if diffectent from the default 'ns')
+
+=back
+
+Returns a hashref whose keys are:
+
+=over
+
+=item *
+raw - The raw response from the server (obviously empty when using UDP)
+
+=item *
+error - The error message returned by the server (empty on success)
+
+=back
+
+=cut
+
+sub send_data {
+  my $self = shift;
+  my $measurement = shift;
+  my $tags = shift;
+  my $fields = shift;
+  my %options = @_;
+
+  return $self->write(_line_protocol($measurement, $tags, $fields), %options);
+
 }
 
 sub _get_influxdb_http_api_uri {
@@ -297,6 +428,66 @@ sub _get_influxdb_http_api_uri {
     return $uri;
 }
 
+# Blatantly stolen from InfluxDB::LineProtocol
+sub _format_value {
+    my $k = shift;
+    my $v = shift;
+ 
+    if ( $v =~ /^(-?\d+)(?:i?)$/ ) {
+        $v = $1 . 'i';
+    }
+    elsif ( $v =~ /^[Ff](?:ALSE|alse)?$/ ) {
+        $v = 'FALSE';
+    }
+    elsif ( $v =~ /^[Tt](?:RUE|rue)?$/ ) {
+        $v = 'TRUE';
+    }
+    elsif ( $v =~ /^-?\d+(?:\.\d+)?(?:e(?:-|\+)?\d+)?$/ ) {
+        # pass it on, no mod
+    }
+    else {
+        # string actually, but this should be quoted differently?
+        $v =~ s/(["\\])/\\$1/g;
+        $v = '"' . $v . '"';
+    }
+ 
+    return $v;
+}
+
+
+sub _line_protocol {
+  my $measurement = shift;
+  my $tags = shift;
+  my $fields = shift;
+
+  # sort and encode (LineProtocol) tags
+  my @tags;
+  foreach my $k ( sort keys %$tags ) {
+    my $v = $tags->{$k};
+    next unless defined($v);
+    $k =~ s/([,\s])/\\$1/g;
+    $v =~ s/([,\s])/\\$1/g;
+
+    push( @tags, $k . '=' . $v );
+  }
+  my $tag_string = join( ',', @tags );
+
+
+  # sort and encode (LineProtocol) fields
+  my @fields;
+  foreach my $k ( sort keys %$fields ) {
+    my $v = $fields->{$k} || '';
+    my $esc_k = $k;
+    $esc_k =~ s/([,\s])/\\$1/g;
+    my $esc_v = _format_value($k, $v);
+
+    push( @fields, $esc_k . '=' . $esc_v );
+  }
+  my $field_string = join( ',', @fields );
+
+  return sprintf( "%s,%s %s", $measurement, $tag_string, $field_string );
+}
+
 1;
 
 =head1 AUTHOR
@@ -312,6 +503,7 @@ automatically be notified of progress on your bug as I make changes.
 =head1 SEE ALSO
 
 This module is derived from InfluxDB::HTTP.
+This module borowed code from InfluxDB::LineProtocol
 
 =head1 SUPPORT
 

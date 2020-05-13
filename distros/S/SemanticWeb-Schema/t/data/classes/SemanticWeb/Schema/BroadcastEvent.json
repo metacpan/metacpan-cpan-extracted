@@ -27,10 +27,10 @@
          "rdfs:label" : "subtitleLanguage",
          "schema:category" : "issue-2110",
          "schema:domainIncludes" : [
-            "schema:ScreeningEvent",
+            "schema:BroadcastEvent",
             "schema:TVEpisode",
             "schema:Movie",
-            "schema:BroadcastEvent"
+            "schema:ScreeningEvent"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
@@ -43,8 +43,8 @@
          "rdfs:comment" : "The type of screening or video broadcast used (e.g. IMAX, 3D, SD, HD, etc.).",
          "rdfs:label" : "videoFormat",
          "schema:domainIncludes" : [
-            "schema:BroadcastEvent",
             "schema:ScreeningEvent",
+            "schema:BroadcastEvent",
             "schema:BroadcastService"
          ],
          "schema:rangeIncludes" : "schema:Text"

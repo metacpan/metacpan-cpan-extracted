@@ -5,15 +5,15 @@
       "rdfs:comment" : "A payment method using a credit, debit, store or other card to associate the payment with an account.",
       "rdfs:label" : "PaymentCard",
       "rdfs:subClassOf" : [
-         "schema:PaymentMethod",
-         "schema:FinancialProduct"
+         "schema:FinancialProduct",
+         "schema:PaymentMethod"
       ]
    },
    "properties" : {
       "schema:cashBack" : {
          "dc:source" : [
-            "schemadotorgsources:FIBO",
-            "https://github.com/schemaorg/schemaorg/issues/1253"
+            "https://github.com/schemaorg/schemaorg/issues/1253",
+            "schemadotorgsources:FIBO"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A cardholder benefit that pays the cardholder a small percentage of their net expenditures.",
@@ -28,8 +28,8 @@
       },
       "schema:contactlessPayment" : {
          "dc:source" : [
-            "schemadotorgsources:FIBO",
-            "https://github.com/schemaorg/schemaorg/issues/1253"
+            "https://github.com/schemaorg/schemaorg/issues/1253",
+            "schemadotorgsources:FIBO"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A secure method for consumers to purchase products or services via debit, credit or smartcards by using RFID or NFC technology.",
@@ -41,8 +41,8 @@
       },
       "schema:floorLimit" : {
          "dc:source" : [
-            "schemadotorgsources:FIBO",
-            "https://github.com/schemaorg/schemaorg/issues/1253"
+            "https://github.com/schemaorg/schemaorg/issues/1253",
+            "schemadotorgsources:FIBO"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A floor limit is the amount of money above which credit card transactions must be authorized.",

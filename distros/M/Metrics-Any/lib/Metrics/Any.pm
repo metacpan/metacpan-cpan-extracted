@@ -9,7 +9,7 @@ use 5.010;  # //
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Metrics::Any::Collector;
 
@@ -21,14 +21,12 @@ C<Metrics::Any> - abstract collection of monitoring metrics
 
 In a module:
 
-   use Metrics::Any '$metrics';
-
-   $metrics->make_counter( thing =>
-      name => "things_done",
-   );
+   use Metrics::Any '$metrics',
+      strict => 0,
+      name_prefix => [ 'my_module_name' ];
 
    sub do_thing {
-      $metrics->inc_counter( 'thing' );
+      $metrics->inc_counter( 'things_done' );
    }
 
 In a program or top-level program-like module:

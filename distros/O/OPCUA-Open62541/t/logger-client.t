@@ -25,7 +25,8 @@ sub clear {
     is($context, "client", "clear context");
 
     fail "clear function is not called for client in open62541 1.0.1";
-    # https://github.com/open62541/open62541/commit/280012ee016e2f42ab9b1386174a8c12e6b29821
+    # https://github.com/open62541/open62541/commit/
+    #   280012ee016e2f42ab9b1386174a8c12e6b29821
 }
 
 {

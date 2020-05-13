@@ -27,11 +27,11 @@
          "rdfs:label" : "inLanguage",
          "schema:category" : "issue-2382",
          "schema:domainIncludes" : [
-            "schema:PronounceableText",
-            "schema:BroadcastService",
             "schema:LinkRole",
-            "schema:WriteAction",
+            "schema:PronounceableText",
             "schema:CommunicateAction",
+            "schema:BroadcastService",
+            "schema:WriteAction",
             "schema:Event",
             "schema:CreativeWork"
          ],
@@ -59,20 +59,20 @@
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
             "schema:ReturnAction",
-            "schema:PayAction",
-            "schema:CommunicateAction",
-            "schema:GiveAction",
+            "schema:Message",
             "schema:DonateAction",
             "schema:AuthorizeAction",
-            "schema:Message",
+            "schema:GiveAction",
+            "schema:TipAction",
+            "schema:CommunicateAction",
             "schema:SendAction",
-            "schema:TipAction"
+            "schema:PayAction"
          ],
          "schema:rangeIncludes" : [
             "schema:ContactPoint",
-            "schema:Person",
+            "schema:Audience",
             "schema:Organization",
-            "schema:Audience"
+            "schema:Person"
          ]
       }
    }

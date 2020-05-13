@@ -13,17 +13,17 @@
          "rdfs:label" : "endDate",
          "schema:category" : "issue-2486",
          "schema:domainIncludes" : [
-            "schema:Event",
-            "schema:DatedMoneySpecification",
-            "schema:Schedule",
             "schema:CreativeWorkSeries",
             "schema:Role",
+            "schema:DatedMoneySpecification",
+            "schema:Schedule",
+            "schema:EducationalOccupationalProgram",
             "schema:CreativeWorkSeason",
-            "schema:EducationalOccupationalProgram"
+            "schema:Event"
          ],
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
          ]
       },
       "schema:namedPosition" : {
@@ -43,8 +43,8 @@
          "rdfs:label" : "roleName",
          "schema:domainIncludes" : "schema:Role",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:URL"
+            "schema:URL",
+            "schema:Text"
          ]
       },
       "schema:startDate" : {
@@ -55,16 +55,16 @@
          "schema:category" : "issue-2486",
          "schema:domainIncludes" : [
             "schema:CreativeWorkSeries",
-            "schema:Role",
             "schema:DatedMoneySpecification",
+            "schema:EducationalOccupationalProgram",
             "schema:CreativeWorkSeason",
-            "schema:Schedule",
             "schema:Event",
-            "schema:EducationalOccupationalProgram"
+            "schema:Role",
+            "schema:Schedule"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       }
    }

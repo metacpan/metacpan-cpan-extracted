@@ -1,5 +1,15 @@
 Revision history for Net-Prometheus
 
+0.11    2020-05-13
+        [CHANGES]
+         * Include the Net::Prometheus::PerlCollector module
+         * Optionally skip building the XS part of PerlCollector if a C
+           compiler is not available
+
+        [BUGFIXES]
+         * Fix for Histogram bucket generation for values less than 1 on
+           -Duselongdouble platforms
+
 0.10    2020-05-05
         [CHANGES]
          * Optional convenience creation of Histogram bucket bounds by

@@ -1,5 +1,56 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+0.014
+    - Server build info is copied to return value and uses regular
+      typemap clear.
+    - The NULL string and NULL byte string is unpacked from undef.
+      Perl undef has a meaning different from "" and is represented
+      in the open62541 objects.
+    - Use Test::Strict to check all Perl source files.  This is a
+      new test dependency.
+    - Generate all client read XS wrapper functions with a script.
+      This includes the regular and async methods and the callback
+      with the matching return value for each type.  The
+      readDataTypeAttribute functions are implemented manually as
+      they have to convert NodeId to DataType before providing the
+      output value.
+    - Memory management for all input and output parameter is done
+      in the typemap.  Except for DESTROY destructors the XS functions
+      do not call clear() or delete() anymore.
+    - Better error message for missing mandatory parameter.
+    - The typemap identifies the reqId parameter as optional
+      output parameter by its new name outoptReqId.
+    - Implement client sendAsyncBrowseNextRequest().
+    - Code scanner cppcheck passes with C code generated from XS.
+    - Test server setup_complex_objects() method can handle name
+      space, access level, and got various other improvements.
+    - An empty UA_Variant is now represented as an empty Perl hash.
+    - The open62541 parameters of the XS functions are allocated
+      in the typemap and stored as mortal Perl objects.  Now Perl
+      is responsible to free them.  The open62541 objects are deleted
+      in the Perl destructor.  The XS wrapper functions do not have
+      to care about calling clear() or delete() anymore.
+    - Server add node functions fill output parameter outNewNodeId
+      as hash.
+    - Parameter passing to XS functions is stricter.  The typemap
+      does all the checks at a central place.
+    - Add more than 100 test cases for all possible typemap
+      conversions of the input paramteter.
+    - Test Unicode conversions in XS packed functions, Perl hashes,
+      and YAML output.  YAML::Tiny is a new test dependency.
+    - In the XS functions the open62541 output value has to be
+      cleared after converting it to an SV.  This fixes a memory
+      leak.
+    - In the XS functions the temporary open62541 parameter objects
+      have to be cleared before return.  This fixes a memory leak.
+    - Setting scalars or arrays in a variant passes the reponsibility
+      for memory lifetime to the open62541 library.
+    - Memory for strings and byte strings is allocated dynamically.
+      Reusing the Perl data does not allow sane lifetime management.
+    - The unpack conversions use UA_Array_new() instead of calloc(3)
+      to construct arrays.
+    - Remove LocalizedText new() constructor, it was never used.
+
 0.013 2020-05-01
     - Remove Makefile from MANIFEST and skip it.
       [rt.cpan.org #132463] No rule to make target

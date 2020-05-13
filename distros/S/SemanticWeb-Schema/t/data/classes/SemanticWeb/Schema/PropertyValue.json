@@ -13,10 +13,10 @@
          "rdfs:comment" : "The upper value of some characteristic or property.",
          "rdfs:label" : "maxValue",
          "schema:domainIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:PropertyValue",
             "schema:MonetaryAmount",
-            "schema:PropertyValueSpecification"
+            "schema:QuantitativeValue",
+            "schema:PropertyValueSpecification",
+            "schema:PropertyValue"
          ],
          "schema:rangeIncludes" : "schema:Number"
       },
@@ -27,15 +27,15 @@
          "rdfs:label" : "measurementTechnique",
          "schema:category" : "issue-1425",
          "schema:domainIncludes" : [
-            "schema:DataDownload",
             "schema:DataCatalog",
+            "schema:Dataset",
             "schema:PropertyValue",
-            "schema:Dataset"
+            "schema:DataDownload"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ]
       },
       "schema:minValue" : {
@@ -45,9 +45,9 @@
          "rdfs:label" : "minValue",
          "schema:domainIncludes" : [
             "schema:PropertyValueSpecification",
+            "schema:QuantitativeValue",
             "schema:MonetaryAmount",
-            "schema:PropertyValue",
-            "schema:QuantitativeValue"
+            "schema:PropertyValue"
          ],
          "schema:rangeIncludes" : "schema:Number"
       },
@@ -57,8 +57,8 @@
          "rdfs:label" : "propertyID",
          "schema:domainIncludes" : "schema:PropertyValue",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ]
       },
       "schema:unitCode" : {
@@ -67,9 +67,9 @@
          "rdfs:comment" : "The unit of measurement given using the UN/CEFACT Common Code (3 characters) or a URL. Other codes than the UN/CEFACT Common Code may be used with a prefix followed by a colon.",
          "rdfs:label" : "unitCode",
          "schema:domainIncludes" : [
-            "schema:UnitPriceSpecification",
             "schema:TypeAndQuantityNode",
             "schema:PropertyValue",
+            "schema:UnitPriceSpecification",
             "schema:QuantitativeValue"
          ],
          "schema:rangeIncludes" : [
@@ -100,10 +100,10 @@
             "schema:QuantitativeValue"
          ],
          "schema:rangeIncludes" : [
-            "schema:Boolean",
-            "schema:StructuredValue",
             "schema:Number",
-            "schema:Text"
+            "schema:Text",
+            "schema:StructuredValue",
+            "schema:Boolean"
          ]
       },
       "schema:valueReference" : {
@@ -112,16 +112,16 @@
          "rdfs:comment" : "A pointer to a secondary value that provides additional information on the original value, e.g. a reference temperature.",
          "rdfs:label" : "valueReference",
          "schema:domainIncludes" : [
+            "schema:PropertyValue",
             "schema:QualitativeValue",
-            "schema:QuantitativeValue",
-            "schema:PropertyValue"
+            "schema:QuantitativeValue"
          ],
          "schema:rangeIncludes" : [
-            "schema:StructuredValue",
             "schema:Enumeration",
             "schema:QuantitativeValue",
-            "schema:QualitativeValue",
-            "schema:PropertyValue"
+            "schema:StructuredValue",
+            "schema:PropertyValue",
+            "schema:QualitativeValue"
          ]
       }
    }

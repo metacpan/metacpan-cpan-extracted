@@ -20,7 +20,7 @@ gimpgitbuild - command line utility to automatically build GIMP and its dependen
 
 =head1 VERSION
 
-version 0.16.1
+version 0.16.2
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

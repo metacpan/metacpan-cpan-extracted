@@ -1,0 +1,6 @@
+*.json
+*.db
+*.csv
+local/
+cpanfile.snapshot
+.Beamfile.cache

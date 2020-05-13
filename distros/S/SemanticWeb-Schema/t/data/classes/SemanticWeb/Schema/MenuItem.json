@@ -14,8 +14,8 @@
          "schema:category" : "issue-1541",
          "schema:domainIncludes" : "schema:MenuItem",
          "schema:rangeIncludes" : [
-            "schema:MenuSection",
-            "schema:MenuItem"
+            "schema:MenuItem",
+            "schema:MenuSection"
          ]
       },
       "schema:nutrition" : {
@@ -36,18 +36,18 @@
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
             "schema:Product",
-            "schema:CreativeWork",
-            "schema:AggregateOffer",
-            "schema:EducationalOccupationalProgram",
+            "schema:MenuItem",
+            "schema:Service",
             "schema:Trip",
             "schema:Event",
-            "schema:MenuItem",
-            "schema:Service"
+            "schema:AggregateOffer",
+            "schema:EducationalOccupationalProgram",
+            "schema:CreativeWork"
          ],
          "schema:inverseOf" : "schema:itemOffered",
          "schema:rangeIncludes" : [
-            "schema:Demand",
-            "schema:Offer"
+            "schema:Offer",
+            "schema:Demand"
          ]
       },
       "schema:suitableForDiet" : {
@@ -55,8 +55,8 @@
          "rdfs:comment" : "Indicates a dietary restriction or guideline for which this recipe or menu item is suitable, e.g. diabetic, halal etc.",
          "rdfs:label" : "suitableForDiet",
          "schema:domainIncludes" : [
-            "schema:Recipe",
-            "schema:MenuItem"
+            "schema:MenuItem",
+            "schema:Recipe"
          ],
          "schema:rangeIncludes" : "schema:RestrictedDiet"
       }

@@ -1,6 +1,6 @@
 # NAME
 
-Test::Auto
+Test::Auto - Test Automation
 
 # ABSTRACT
 
@@ -148,6 +148,7 @@ This method returns a [Test::Auto::Subtests](https://metacpan.org/pod/Test::Auto
 
     =name
     =abstract
+    =tagline
     =includes
     =synopsis
     =description
@@ -206,6 +207,17 @@ warnings are now automatically disabled.
 
 The `name` block should contain the package name. This is tested for
 loadability.
+
+## tagline
+
+    =tagline
+
+    Path Finder
+
+    =cut
+
+The `tagline` block should contain a tagline for the package. This is optional
+but if present is concatenated with the `name` during POD generation.
 
 ## abstract
 

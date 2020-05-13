@@ -84,7 +84,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-BagIt"
       }
    },
-   "version" : "0.250",
+   "version" : "0.260",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Nicolas Franck <nicolas.franck@ugent.be>",

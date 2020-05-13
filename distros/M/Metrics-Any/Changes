@@ -1,5 +1,19 @@
 Revision history for Metrics-Any
 
+0.05    2020-05-13
+        [CHANGES]
+         * Renamed distribution and timer reporting methods to more clearly
+           convey their operation; now named ->report_distribution and
+           ->report_timer
+         * Optional name prefix in Collector to simplify use in modules
+         * Use metric handle (combined with prefix) if no other name supplied
+         * Nicer API for supplying label values to reporting methods
+         * Check that reported label names match the declared names
+         * Support non-strict mode where metrics are lazily registered when
+           first reported
+         * Added Metrics::Any::Adapter::Tee
+         * More flexible parsing of METRICS_ANY_ADAPTER variable
+
 0.04    2020-05-12
         [CHANGES]
          * Add documentation to Metrics::Any::Adapter

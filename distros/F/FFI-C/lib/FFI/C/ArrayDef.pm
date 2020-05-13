@@ -13,7 +13,7 @@ use base qw( FFI::C::Def );
 our @CARP_NOT = qw( FFI::C );
 
 # ABSTRACT: Array data definition for FFI
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 
 sub new
@@ -151,7 +151,7 @@ FFI::C::ArrayDef - Array data definition for FFI
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

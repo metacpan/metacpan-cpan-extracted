@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Metrics::Any::Adapter::Statsd );
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # See also
 #   https://docs.signalfx.com/en/latest/integrations/agent/monitors/collectd-statsd.html

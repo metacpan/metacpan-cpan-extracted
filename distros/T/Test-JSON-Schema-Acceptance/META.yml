@@ -36,14 +36,14 @@ no_index:
 provides:
   Test::JSON::Schema::Acceptance:
     file: lib/Test/JSON/Schema/Acceptance.pm
-    version: '0.994'
+    version: '0.995'
 requires:
   File::ShareDir: '0'
   JSON::MaybeXS: '1.004001'
   List::Util: '1.33'
   Moo: '0'
   MooX::TypeTiny: '0.002002'
-  Path::Tiny: '0'
+  Path::Tiny: '0.062'
   Test::Fatal: '0'
   Test::More: '0.88'
   Types::Common::Numeric: '0'
@@ -57,7 +57,7 @@ resources:
   bugtracker: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance/issues
   homepage: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance
   repository: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance.git
-version: '0.994'
+version: '0.995'
 x_Dist_Zilla:
   perl:
     version: '5.031011'
@@ -82,6 +82,7 @@ x_Dist_Zilla:
           quiet: 0
           run:
             - 'git submodule update --remote'
+            - 'echo "run `update-share` to commit submodule updates to share/"'
           version: '0.048'
       name: Run::BeforeRelease
       version: '0.048'
@@ -747,7 +748,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.994
+          tag: v0.995
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:

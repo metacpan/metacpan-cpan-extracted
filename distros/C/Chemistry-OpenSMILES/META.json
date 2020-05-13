@@ -1,0 +1,45 @@
+{
+   "abstract" : "OpenSMILES format reader",
+   "author" : [
+      "Andrius Merkys <merkys@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Chemistry-OpenSMILES",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28",
+            "Module::Build::Parse::Yapp" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28",
+            "Module::Build::Parse::Yapp" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Parse::Yapp" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "List::Util" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.1.0",
+   "x_serialization_backend" : "JSON::XS version 3.04"
+}
+

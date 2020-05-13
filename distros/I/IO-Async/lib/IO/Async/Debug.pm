@@ -8,7 +8,7 @@ package IO::Async::Debug;
 use strict;
 use warnings;
 
-our $VERSION = '0.76';
+our $VERSION = '0.77';
 
 our $DEBUG = $ENV{IO_ASYNC_DEBUG} || 0;
 our $DEBUG_FD   = $ENV{IO_ASYNC_DEBUG_FD};

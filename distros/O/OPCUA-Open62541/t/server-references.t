@@ -17,22 +17,22 @@ cmp_ok($server->{server}->run_iterate(0), ">", 0, "iterate");
 my %nodes = $server->setup_complex_objects();
 
 my $node_objecttypes = {
-    NodeId_namespaceIndex => 0,
-    NodeId_identifierType => NODEIDTYPE_NUMERIC,
-    NodeId_identifier     => NS0ID_OBJECTTYPESFOLDER,
+    NodeId_namespaceIndex	=> 0,
+    NodeId_identifierType	=> NODEIDTYPE_NUMERIC,
+    NodeId_identifier		=> NS0ID_OBJECTTYPESFOLDER,
 };
 my $node_organizes = {
-    NodeId_namespaceIndex => 0,
-    NodeId_identifierType => NODEIDTYPE_NUMERIC,
-    NodeId_identifier     => NS0ID_ORGANIZES,
+    NodeId_namespaceIndex	=> 0,
+    NodeId_identifierType	=> NODEIDTYPE_NUMERIC,
+    NodeId_identifier		=> NS0ID_ORGANIZES,
 };
 
 sub get_objecttypes_reference {
     my @browse_args = (
 	0,
 	{
-	    BrowseDescription_nodeId => $node_objecttypes,
-	    BrowseDescription_resultMask => BROWSERESULTMASK_ALL,
+	    BrowseDescription_nodeId		=> $node_objecttypes,
+	    BrowseDescription_resultMask	=> BROWSERESULTMASK_ALL,
 	},
     );
 
@@ -44,8 +44,9 @@ sub get_objecttypes_reference {
     is(ref($references), "ARRAY", "browseresult object types references");
 
     my ($objectref) = grep {
-	$_->{ReferenceDescription_nodeId}{ExpandedNodeId_nodeId}
-	    ->{NodeId_identifier} eq $nodes{some_object_type}{nodeId}{NodeId_identifier}
+	$_->{ReferenceDescription_nodeId}{ExpandedNodeId_nodeId}->
+	    {NodeId_identifier} eq
+	    $nodes{some_object_type}{nodeId}{NodeId_identifier}
     } @$references;
 
     return $objectref;
@@ -57,7 +58,10 @@ is(
     $server->{server}->addReference(
 	$node_objecttypes,
 	$node_organizes,
-	{ ExpandedNodeId_nodeId => $nodes{some_object_type}{nodeId} },
+	{
+	    ExpandedNodeId_namespaceUri => undef,
+	    ExpandedNodeId_nodeId => $nodes{some_object_type}{nodeId}
+	},
 	1,
     ),
     STATUSCODE_GOOD, "add reference");

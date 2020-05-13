@@ -8,7 +8,7 @@ package Metrics::Any::Adapter::Statsd;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Carp;
 
@@ -35,13 +35,16 @@ C<Metrics::Any::Adapter::Statsd> - a metrics reporting adapter for statsd
 This L<Metrics::Any> adapter type reports metrics to statsd via the local UDP
 socket. Each metric value reported will result in a new UDP packet being sent.
 
-The location of the statsd server is set by two package variables, defaulting
-to
+The default location of the statsd server is set by two package variables,
+defaulting to
 
    $Net::Statsd::HOST = "127.0.0.1";
    $Net::Statsd::PORT = 8125
 
-The configuration can be changed by setting new values.
+The configuration can be changed by setting new values or by passing arguments
+to the import line:
+
+   use Metrics::Any::Adapter 'Statsd', port => 8200;
 
 =head1 METRIC HANDLING
 
@@ -72,6 +75,16 @@ L<Metrics::Any::Adapter::SignalFx> - a metrics reporting adapter for SignalFx
 
 =back
 
+=head1 ARGUMENTS
+
+The following additional arguments are recognised
+
+=head2 host
+
+=head2 port
+
+Provides specific values for the statsd server location.
+
 =cut
 
 sub new
@@ -80,6 +93,8 @@ sub new
    my ( %args ) = @_;
 
    return bless {
+      host => $args{host},
+      port => $args{port},
       metrics => {},
       gauge_initialised => {},
    }, $class;
@@ -103,8 +118,8 @@ sub socket
 
    return $self->{socket} //= IO::Socket::INET->new(
       Proto    => "udp",
-      PeerHost => $Net::Statsd::HOST,
-      PeerPort => $Net::Statsd::PORT,
+      PeerHost => $self->{host} // $Net::Statsd::HOST,
+      PeerPort => $self->{port} // $Net::Statsd::PORT,
    );
 }
 
@@ -151,7 +166,7 @@ sub inc_counter_by
 
 *make_distribution = \&_make;
 
-sub inc_distribution_by
+sub report_distribution
 {
    my $self = shift;
    my ( $handle, $amount, @labelvalues ) = @_;
@@ -167,6 +182,8 @@ sub inc_distribution_by
          "$meta->{name}.count" => "1|c",
       }, $meta->{labels}, \@labelvalues );
 }
+
+*inc_distribution_by = \&report_distribution;
 
 *make_gauge = \&_make;
 
@@ -206,7 +223,7 @@ sub set_gauge_to
 
 *make_timer = \&_make;
 
-sub inc_timer_by
+sub report_timer
 {
    my $self = shift;
    my ( $handle, $duration, @labelvalues ) = @_;
@@ -217,6 +234,8 @@ sub inc_timer_by
 
    $self->send( { $meta->{name} => $value }, $meta->{labels}, \@labelvalues );
 }
+
+*inc_timer_by = \&report_timer;
 
 =head1 TODO
 

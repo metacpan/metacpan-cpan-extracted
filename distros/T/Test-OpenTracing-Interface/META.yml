@@ -26,5 +26,5 @@ requires:
   Test::Builder: '0'
   Types::Standard: '1.010'
   syntax: '0'
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

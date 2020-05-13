@@ -87,4 +87,16 @@ subtest 'recursive' => sub {
     is_deeply \@bind, ['hello'];
 };
 
+subtest 'changeable placeholder prefix' => sub {
+    local $SQL::Bind::PlaceholderPrefix = '@';
+
+    my ($sql, @bind) =
+      sql 'SELECT foo FROM bar WHERE id=@id AND status=@status',
+      id     => 1,
+      status => 'active';
+
+    is $sql, 'SELECT foo FROM bar WHERE id=? AND status=?';
+    is_deeply \@bind, [1, 'active'];
+};
+
 done_testing;

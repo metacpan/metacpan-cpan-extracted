@@ -54,7 +54,7 @@
    "provides" : {
       "SQL::Bind" : {
          "file" : "lib/SQL/Bind.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       }
    },
    "release_status" : "stable",
@@ -68,10 +68,10 @@
          "web" : "https://github.com/vti/perl-SQL-Bind"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_contributors" : [
       "vti <viacheslav.t@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1
 }

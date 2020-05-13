@@ -526,11 +526,15 @@ is( $h5->mdel(qw/ 4 5 6 /), 3, 'shared cache, check mdel' );
 
 ## --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-if ( $] gt '5.010001' ) {
-   ## MCE::Shared::Cache stores keys with expiration using dualvar.
-   ## Testing for keys containing unicode is failing on RedHat 6.x.
-   ## Interestingly, smoke testing on meta::cpan report passing
-   ## for Perl 5.10.1.
+##
+# MCE::Shared::Cache stores the key with expiration using a dualvar variable.
+#
+# Perl 5.10.1 ships with 1.21. It is too late at this stage for vendors to
+# update Perl on older Operating Systems. Therefore, continue testing only
+# if Perl has minimally Scalar::Util 1.22.
+##
+
+if ( Scalar::Util->VERSION gt '1.21' ) {
 
    ## https://sacred-texts.com/cla/usappho/sph02.htm (II)
 

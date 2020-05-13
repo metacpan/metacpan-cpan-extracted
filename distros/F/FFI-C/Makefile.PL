@@ -60,36 +60,38 @@ my %WriteMakefileArgs = (
     "lib/FFI/C/Util.pm"      => "\$(INST_LIB)/FFI/C/Util.pm"
   },
   "PREREQ_PM" => {
-    "Class::Inspector"      => 0,
-    "FFI::Platypus"         => "1.24",
-    "FFI::Platypus::Memory" => 0,
-    "Ref::Util"             => 0,
-    "Sub::Identify"         => 0,
-    "Sub::Install"          => 0,
-    "Sub::Util"             => 0
+    "Class::Inspector"          => 0,
+    "FFI::Platypus"             => "1.24",
+    "FFI::Platypus::Memory"     => 0,
+    "FFI::Platypus::Type::Enum" => "0.03",
+    "Ref::Util"                 => 0,
+    "Sub::Identify"             => 0,
+    "Sub::Install"              => 0,
+    "Sub::Util"                 => 0
   },
   "TEST_REQUIRES" => {
     "Capture::Tiny"         => 0,
     "FFI::Platypus::Record" => 0,
     "Test2::V0"             => "0.000081"
   },
-  "VERSION" => "0.07",
+  "VERSION" => "0.08",
   "test"    => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
-  "Capture::Tiny"         => 0,
-  "Class::Inspector"      => 0,
-  "FFI::Platypus"         => "1.24",
-  "FFI::Platypus::Memory" => 0,
-  "FFI::Platypus::Record" => 0,
-  "Ref::Util"             => 0,
-  "Sub::Identify"         => 0,
-  "Sub::Install"          => 0,
-  "Sub::Util"             => 0,
-  "Test2::V0"             => "0.000081"
+  "Capture::Tiny"             => 0,
+  "Class::Inspector"          => 0,
+  "FFI::Platypus"             => "1.24",
+  "FFI::Platypus::Memory"     => 0,
+  "FFI::Platypus::Record"     => 0,
+  "FFI::Platypus::Type::Enum" => "0.03",
+  "Ref::Util"                 => 0,
+  "Sub::Identify"             => 0,
+  "Sub::Install"              => 0,
+  "Sub::Util"                 => 0,
+  "Test2::V0"                 => "0.000081"
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

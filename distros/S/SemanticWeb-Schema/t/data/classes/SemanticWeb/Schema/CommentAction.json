@@ -12,8 +12,8 @@
          "rdfs:label" : "resultComment",
          "rdfs:subPropertyOf" : "schema:result",
          "schema:domainIncludes" : [
-            "schema:CommentAction",
-            "schema:ReplyAction"
+            "schema:ReplyAction",
+            "schema:CommentAction"
          ],
          "schema:rangeIncludes" : "schema:Comment"
       }

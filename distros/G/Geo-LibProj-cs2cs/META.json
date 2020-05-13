@@ -1,0 +1,65 @@
+{
+   "abstract" : "IPC interface to PROJ cs2cs",
+   "author" : [
+      "Arne Johannessen <ajnn@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Geo-LibProj-cs2cs",
+   "no_index" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Alien::proj" : "1.06"
+         },
+         "requires" : {
+            "IPC::Run3" : "0",
+            "Scalar::Util" : "1.10",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.96",
+            "Test::Warnings" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Geo::LibProj::cs2cs" : {
+         "file" : "lib/Geo/LibProj/cs2cs.pm",
+         "version" : "1.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/johannessen/cs2cs-perl/issues"
+      },
+      "homepage" : "https://github.com/johannessen/cs2cs-perl",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/johannessen/cs2cs-perl.git",
+         "web" : "https://github.com/johannessen/cs2cs-perl"
+      }
+   },
+   "version" : "1.01",
+   "x_generated_by_perl" : "v5.30.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-2.0"
+}
+

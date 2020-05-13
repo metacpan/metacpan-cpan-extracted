@@ -4,8 +4,8 @@
       "rdfs:comment" : "A health club.",
       "rdfs:label" : "HealthClub",
       "rdfs:subClassOf" : [
-         "schema:HealthAndBeautyBusiness",
-         "schema:SportsActivityLocation"
+         "schema:SportsActivityLocation",
+         "schema:HealthAndBeautyBusiness"
       ]
    },
    "properties" : {}

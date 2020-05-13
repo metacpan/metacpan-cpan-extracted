@@ -3,7 +3,7 @@ abstract: 'a metrics reporting adapter for statsd'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
-  Metrics::Any: '0.02'
+  Metrics::Any: '0.05'
   Test::More: '0.88'
 configure_requires:
   Module::Build: '0.4004'
@@ -17,16 +17,16 @@ name: Metrics-Any-Adapter-Statsd
 provides:
   Metrics::Any::Adapter::DogStatsd:
     file: lib/Metrics/Any/Adapter/DogStatsd.pm
-    version: '0.01'
+    version: '0.02'
   Metrics::Any::Adapter::SignalFx:
     file: lib/Metrics/Any/Adapter/SignalFx.pm
-    version: '0.01'
+    version: '0.02'
   Metrics::Any::Adapter::Statsd:
     file: lib/Metrics/Any/Adapter/Statsd.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   IO::Socket::INET: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

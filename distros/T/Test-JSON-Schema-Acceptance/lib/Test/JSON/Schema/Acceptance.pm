@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v0.993-9-gdda778b
+package Test::JSON::Schema::Acceptance; # git description: v0.994-5-g16d6c1b
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators like JSON::Schema
 
-our $VERSION = '0.994';
+our $VERSION = '0.995';
 
 no if "$]" >= 5.031009, feature => 'indirect';
 use Test::More ();
@@ -15,7 +15,7 @@ use Moo;
 use MooX::TypeTiny 0.002002;
 use Types::Standard 1.010002 qw(Str InstanceOf ArrayRef HashRef Dict Any HasMethods Bool Optional);
 use Types::Common::Numeric 'PositiveOrZeroInt';
-use Path::Tiny;
+use Path::Tiny 0.062;
 use List::Util 1.33 qw(any max);
 use namespace::clean;
 
@@ -237,7 +237,7 @@ sub _build__test_data {
 
   return [
     map $_->[1],
-      sort { $a->[0] <=> $b->[0] || $a->[1]{file} cmp $b->[1]{file} }
+      sort { $a->[0] <=> $b->[0] && $a->[1]{file} cmp $b->[1]{file} }
       @test_groups
   ];
 }
@@ -258,7 +258,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 0.994
+version 0.995
 
 =head1 SYNOPSIS
 

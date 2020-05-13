@@ -68,7 +68,7 @@
             "List::Util" : "1.33",
             "Moo" : "0",
             "MooX::TypeTiny" : "0.002002",
-            "Path::Tiny" : "0",
+            "Path::Tiny" : "0.062",
             "Test::Fatal" : "0",
             "Test::More" : "0.88",
             "Types::Common::Numeric" : "0",
@@ -182,7 +182,7 @@
    "provides" : {
       "Test::JSON::Schema::Acceptance" : {
          "file" : "lib/Test/JSON/Schema/Acceptance.pm",
-         "version" : "0.994"
+         "version" : "0.995"
       }
    },
    "release_status" : "stable",
@@ -197,7 +197,7 @@
          "web" : "https://github.com/karenetheridge/Test-JSON-Schema-Acceptance"
       }
    },
-   "version" : "0.994",
+   "version" : "0.995",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.031011"
@@ -226,7 +226,8 @@
                   "fatal_errors" : 1,
                   "quiet" : 0,
                   "run" : [
-                     "git submodule update --remote"
+                     "git submodule update --remote",
+                     "echo \"run `update-share` to commit submodule updates to share/\""
                   ],
                   "version" : "0.048"
                }
@@ -1102,7 +1103,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.994",
+                  "tag" : "v0.995",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

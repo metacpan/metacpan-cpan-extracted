@@ -20,7 +20,7 @@ no_leaks_ok { eval { OPCUA::Open62541::ServerConfig::setDefault() } }
     "config missing leak";
 
 throws_ok { OPCUA::Open62541::ServerConfig::setDefault(1) }
-    (qr/config is not of type OPCUA::Open62541::ServerConfig /,
+    (qr/Self config is not a OPCUA::Open62541::ServerConfig /,
     "config type");
 no_leaks_ok { eval { OPCUA::Open62541::ServerConfig::setDefault(1) } }
     "config type leak";

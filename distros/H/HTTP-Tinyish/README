@@ -43,8 +43,8 @@ BACKEND SELECTION
 
 COMPATIBILITIES
 
-    All request related methods such as get, post, put, delete, request and
-    mirror are supported.
+    All request related methods such as get, post, put, delete, request,
+    patch and mirror are supported.
 
  LWP
 

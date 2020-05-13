@@ -7,7 +7,7 @@ require Exporter;
 use parent 'Exporter';
 use OPCUA::Open62541::Constant;
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 our @EXPORT_OK = @OPCUA::Open62541::Constant::EXPORT_OK;
 our %EXPORT_TAGS = %OPCUA::Open62541::Constant::EXPORT_TAGS;
@@ -98,19 +98,19 @@ magically.
 
 =item \%browseResult = $server->browse($maxReferences, \%browseDescription)
 
-=item $status_code = $server->addVariableNode(\%requestedNewNodeId, \%parentNodeId, \%referenceTypeId, \%browseName, \%typeDefinition, \%attr, $nodeContext, \$outNewNodeId)
+=item $status_code = $server->addVariableNode(\%requestedNewNodeId, \%parentNodeId, \%referenceTypeId, \%browseName, \%typeDefinition, \%attr, $nodeContext, \%outNewNodeId)
 
-=item $status_code = $server->addVariableTypeNode(\%requestedNewNodeId, \%parentNodeId, \%referenceTypeId, \%browseName, \%typeDefinition, \%attr, \%nodeContext, \%outNewNodeId)
+=item $status_code = $server->addVariableTypeNode(\%requestedNewNodeId, \%parentNodeId, \%referenceTypeId, \%browseName, \%typeDefinition, \%attr, $nodeContext, \%outNewNodeId)
 
-=item $status_code = $server->addObjectNode(\%requestedNewNodeId, \%parentNodeId, \%referenceTypeId, \%browseName, \%typeDefinition, \%attr, \%nodeContext, \%outNewNodeId)
+=item $status_code = $server->addObjectNode(\%requestedNewNodeId, \%parentNodeId, \%referenceTypeId, \%browseName, \%typeDefinition, \%attr, $nodeContext, \%outNewNodeId)
 
-=item $status_code = $server->addObjectTypeNode(\%requestedNewNodeId, \%parentNodeId, \%referenceTypeId, \%browseName, \%attr, \%nodeContext, \%outNewNodeId)
+=item $status_code = $server->addObjectTypeNode(\%requestedNewNodeId, \%parentNodeId, \%referenceTypeId, \%browseName, \%attr, $nodeContext, \%outNewNodeId)
 
-=item $status_code = $server->addViewNode(\%requestedNewNodeId, \%parentNodeId, \%referenceTypeId, \%browseName, \%attr, \%nodeContext, \%outNewNodeId)
+=item $status_code = $server->addViewNode(\%requestedNewNodeId, \%parentNodeId, \%referenceTypeId, \%browseName, \%attr, $nodeContext, \%outNewNodeId)
 
-=item $status_code = $server->addReferenceTypeNode(\%requestedNewNodeId, \%parentNodeId, \%referenceTypeId, \%browseName, \%attr, \%nodeContext, \%outNewNodeId)
+=item $status_code = $server->addReferenceTypeNode(\%requestedNewNodeId, \%parentNodeId, \%referenceTypeId, \%browseName, \%attr, $nodeContext, \%outNewNodeId)
 
-=item $status_code = $server->addDataTypeNode(\%requestedNewNodeId, \%parentNodeId, \%referenceTypeId, \%browseName, \%attr, \%nodeContext, \%outNewNodeId)
+=item $status_code = $server->addDataTypeNode(\%requestedNewNodeId, \%parentNodeId, \%referenceTypeId, \%browseName, \%attr, $nodeContext, \%outNewNodeId)
 
 =item $status_code = $server->deleteNode(\%nodeId, $deleteReferences)
 

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: parse.t 2134 2009-06-02 20:17:24Z guillomovitch $
+# $Id$
 
 use strict;
 use Test::More;

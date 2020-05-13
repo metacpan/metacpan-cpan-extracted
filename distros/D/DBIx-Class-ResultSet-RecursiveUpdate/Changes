@@ -1,5 +1,16 @@
 Revision history for DBIx::Class::ResultSet::RecursiveUpdate
 
+0.41      2020-05-13 13:13:33+02:00 Europe/Vienna
+    - Fix missing Test::Exception test dependency
+    - Get rid of discard_changes for each created row
+      To further reduce the number of queries. This required to remove support
+      for populating a column used by a has_many relationship by a related row.
+    - Reduce select queries for has_many relationships where the foreign key
+      column and the relationship is named the same and the related row is
+      specified as a hashref containing the foreign column
+    - Don't execute select queries for any relationships of created rows
+      because no related rows can already exist
+
 0.40      2019-10-29 14:16:34+01:00 Europe/Vienna
     - Fix missing Try::Tiny dependency
     - Don't try to find a row by primary key if not all primary key columns are

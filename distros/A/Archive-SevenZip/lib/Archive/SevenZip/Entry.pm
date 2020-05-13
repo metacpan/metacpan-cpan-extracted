@@ -5,11 +5,11 @@ use Time::Piece; # for strptime
 use File::Basename ();
 use Path::Class ();
 
-our $VERSION= '0.11';
+our $VERSION= '0.12';
 
 sub new {
     my( $class, %options) = @_;
-    
+
     bless \%options => $class
 }
 
@@ -19,17 +19,17 @@ sub archive {
 
 sub fileName {
     my( $self ) = @_;
-    
+
     my $res = $self->{Path};
-    
+
     # Normalize to unixy path names
     $res =~ s!\\!/!g;
-    
+
     # If we're a directory, append the slash:
     if( $self->{Folder} eq '+') {
         $res .= '/';
     };
-    
+
     $res
 }
 
@@ -108,7 +108,7 @@ sub extractToFileNamed {
 
 =head1 REPOSITORY
 
-The public repository of this module is 
+The public repository of this module is
 L<https://github.com/Corion/archive-sevenzip>.
 
 =head1 SUPPORT

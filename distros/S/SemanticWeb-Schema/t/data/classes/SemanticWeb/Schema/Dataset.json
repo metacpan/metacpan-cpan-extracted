@@ -2,9 +2,9 @@
    "class" : {
       "dc:source" : "schemadotorgsources:source_DatasetClass",
       "owl:equivalentClass" : [
+         "void:Dataset",
          "dcmitype:Dataset",
-         "dcat:Dataset",
-         "void:Dataset"
+         "dcat:Dataset"
       ],
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A body of structured information describing some topic(s) of interest.",
@@ -60,9 +60,9 @@
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:domainIncludes" : [
             "schema:WebSite",
-            "schema:Dataset",
+            "schema:Blog",
             "schema:CreativeWorkSeries",
-            "schema:Blog"
+            "schema:Dataset"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -73,15 +73,15 @@
          "rdfs:label" : "measurementTechnique",
          "schema:category" : "issue-1425",
          "schema:domainIncludes" : [
-            "schema:DataDownload",
             "schema:DataCatalog",
+            "schema:Dataset",
             "schema:PropertyValue",
-            "schema:Dataset"
+            "schema:DataDownload"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ]
       },
       "schema:variableMeasured" : {

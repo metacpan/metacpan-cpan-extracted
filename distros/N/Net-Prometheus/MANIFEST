@@ -8,6 +8,8 @@ lib/Net/Prometheus/Counter.pm
 lib/Net/Prometheus/Gauge.pm
 lib/Net/Prometheus/Histogram.pm
 lib/Net/Prometheus/Metric.pm
+lib/Net/Prometheus/PerlCollector.pm
+lib/Net/Prometheus/PerlCollector.xs
 lib/Net/Prometheus/ProcessCollector.pm
 lib/Net/Prometheus/ProcessCollector/linux.pm
 lib/Net/Prometheus/Registry.pm
@@ -33,4 +35,6 @@ t/30handle.t
 t/31psgi.t
 t/40process-collector.t
 t/41process-collector-linux.t
+t/50perl-collector.t
+t/51perl-collector-detail.t
 t/99pod.t

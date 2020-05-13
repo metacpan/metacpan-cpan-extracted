@@ -16,6 +16,8 @@ severity = 2
 [BuiltinFunctions::ProhibitStringyEval]
 [BuiltinFunctions::RequireGlobFunction]
 [ClassHierarchies::ProhibitOneArgBless]
+[CodeLayout::ProhibitHardTabs]
+severity = 2
 [ControlStructures::ProhibitDeepNests]
 [ControlStructures::ProhibitLabelsWithSpecialBlockNames]
 [ControlStructures::ProhibitMutatingListFunctions]

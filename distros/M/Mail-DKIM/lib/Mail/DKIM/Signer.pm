@@ -1,4 +1,8 @@
-#!/usr/bin/perl
+package Mail::DKIM::Signer;
+use strict;
+use warnings;
+our $VERSION = '1.20200513.1'; # VERSION
+# ABSTRACT: generates a DKIM signature for a message
 
 # Copyright 2005-2007 Messiah College. All rights reserved.
 # Jason Long <jlong@messiah.edu>
@@ -7,145 +11,12 @@
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
-use strict;
-use warnings;
-
 use Mail::DKIM::PrivateKey;
 use Mail::DKIM::Signature;
 
-=head1 NAME
 
-Mail::DKIM::Signer - generates a DKIM signature for a message
-
-=head1 SYNOPSIS
-
-  use Mail::DKIM::Signer;
-  use Mail::DKIM::TextWrap;  #recommended
-
-  # create a signer object
-  my $dkim = Mail::DKIM::Signer->new(
-                  Algorithm => 'rsa-sha1',
-                  Method => 'relaxed',
-                  Domain => 'example.org',
-                  Selector => 'selector1',
-                  KeyFile => 'private.key',
-                  Headers => 'x-header:x-header2',
-             );
-
-  # read an email from a file handle
-  $dkim->load(*STDIN);
-
-  # or read an email and pass it into the signer, one line at a time
-  while (<STDIN>)
-  {
-      # remove local line terminators
-      chomp;
-      s/\015$//;
-
-      # use SMTP line terminators
-      $dkim->PRINT("$_\015\012");
-  }
-  $dkim->CLOSE;
-
-  # what is the signature result?
-  my $signature = $dkim->signature;
-  print $signature->as_string;
-
-=head1 DESCRIPTION
-
-This class is the part of L<Mail::DKIM> responsible for generating
-signatures for a given message. You create an object of this class,
-specifying the parameters of the signature you wish to create, or
-specifying a callback function so that the signature parameters can
-be determined later. Next, you feed it the entire message using
-L</"PRINT()">, completing with L</"CLOSE()">. Finally, use the
-L</"signatures()"> method to access the generated signatures.
-
-=head2 Pretty Signatures
-
-L<Mail::DKIM> includes a signature-wrapping module (which inserts
-linebreaks into the generated signature so that it looks nicer in the
-resulting message. To enable this module, simply call
-
-  use Mail::DKIM::TextWrap;
-
-in your program before generating the signature.
-
-=head1 CONSTRUCTOR
-
-=head2 new()
-
-Construct an object-oriented signer.
-
-  # create a signer using the default policy
-  my $dkim = Mail::DKIM::Signer->new(
-                  Algorithm => 'rsa-sha1',
-                  Method => 'relaxed',
-                  Domain => 'example.org',
-                  Selector => 'selector1',
-                  KeyFile => 'private.key',
-                  Headers => 'x-header:x-header2',
-             );
-
-  # create a signer using a custom policy
-  my $dkim = Mail::DKIM::Signer->new(
-                  Policy => $policyfn,
-             );
-
-The "default policy" is to create a DKIM signature using the specified
-parameters, but only if the message's sender matches the domain.
-The following parameters can be passed to this new() method to
-influence the resulting signature:
-Algorithm, Method, Domain, Selector, KeyFile, Identity, Timestamp.
-
-If you want different behavior, you can provide a "signer policy"
-instead. A signer policy is a subroutine or class that determines
-signature parameters after the message's headers have been parsed.
-See the section L</"SIGNER POLICIES"> below for more information.
-
-See L<Mail::DKIM::SignerPolicy> for more information about policy objects.
-
-In addition to the parameters demonstrated above, the following
-are recognized:
-
-=over
-
-=item Key
-
-rather than using C<KeyFile>, use C<Key> to use an already-loaded
-L<Mail::DKIM::PrivateKey> object.
-
-=item Headers
-
-A colon separated list of headers to sign, this is added to the list
-of default headers as shown in in the DKIM specification.
-
-For each specified header all headers of that type which are
-present in the message will be signed, but we will not oversign
-or sign headers which are not present.
-
-If you require greater control over signed headers please use
-the extended_headers() method instead.
-
-The list of headers signed by default is as follows
-
-    From Sender Reply-To Subject Date
-    Message-ID To Cc MIME-Version
-    Content-Type Content-Transfer-Encoding Content-ID Content-Description
-    Resent-Date Resent-From Resent-Sender Resent-To Resent-cc
-    Resent-Message-ID
-    In-Reply-To References
-    List-Id List-Help List-Unsubscribe List-Subscribe
-    List-Post List-Owner List-Archive
-
-=back
-
-=cut
-
-package Mail::DKIM::Signer;
 use base 'Mail::DKIM::Common';
 use Carp;
-our $VERSION = 0.58;
 
 # PROPERTIES
 #
@@ -325,74 +196,6 @@ sub finish_body {
     }
 }
 
-=head1 METHODS
-
-=head2 PRINT()
-
-Feed part of the message to the signer.
-
-  $dkim->PRINT("a line of the message\015\012");
-
-Feeds content of the message being signed into the signer.
-The API is designed this way so that the entire message does NOT need
-to be read into memory at once.
-
-Please note that although the PRINT() method expects you to use
-SMTP-style line termination characters, you should NOT use the
-SMTP-style dot-stuffing technique described in RFC 2821 section 4.5.2.
-Nor should you use a <CR><LF>.<CR><LF> sequence to terminate the
-message.
-
-=head2 CLOSE()
-
-Call this when finished feeding in the message.
-
-  $dkim->CLOSE;
-
-
-This method finishes the canonicalization process, computes a hash,
-and generates a signature.
-
-=head2 extended_headers()
-
-This method overrides the headers to be signed and allows more
-control than is possible with the Headers property in the constructor.
-
-The method expects a HashRef to be passed in.
-
-The Keys are the headers to sign, and the values are either the
-number of headers of that type to sign, or the special values
-'*' and '+'.
-
-* will sign ALL headers of that type present in the message.
-
-+ will sign ALL + 1 headers of that type present in the message
-to prevent additional headers being added.
-
-You may override any of the default headers by including them
-in the hashref, and disable them by giving them a 0 value.
-
-Keys are case insensitive with the values being added upto the
-highest value.
-
-    Headers => {
-        'X-test'  => '*',
-        'x-test'  => '1',
-        'Subject' => '+',
-        'Sender'  => 0,
-    },
-
-=head2 add_signature()
-
-Used by signer policy to create a new signature.
-
-  $dkim->add_signature(new Mail::DKIM::Signature(...));
-
-Signer policies can use this method to specify complete parameters for
-the signature to add, including what type of signature. For more information,
-see L<Mail::DKIM::SignerPolicy>.
-
-=cut
 
 sub add_signature {
     my $self      = shift;
@@ -410,15 +213,6 @@ sub add_signature {
     return;
 }
 
-=head2 algorithm()
-
-Get or set the selected algorithm.
-
-  $alg = $dkim->algorithm;
-
-  $dkim->algorithm('rsa-sha1');
-
-=cut
 
 sub algorithm {
     my $self = shift;
@@ -428,15 +222,6 @@ sub algorithm {
     return $self->{Algorithm};
 }
 
-=head2 domain()
-
-Get or set the selected domain.
-
-  $alg = $dkim->domain;
-
-  $dkim->domain('example.org');
-
-=cut
 
 sub domain {
     my $self = shift;
@@ -446,28 +231,7 @@ sub domain {
     return $self->{Domain};
 }
 
-=head2 load()
 
-Load the entire message from a file handle.
-
-  $dkim->load($file_handle);
-
-Reads a complete message from the designated file handle,
-feeding it into the signer.  The message must use <CRLF> line
-terminators (same as the SMTP protocol).
-
-=cut
-
-=head2 headers()
-
-Determine which headers to put in signature.
-
-  my $headers = $dkim->headers;
-
-This is a string containing the names of the header fields that
-will be signed, separated by colons.
-
-=cut
 
 # these are headers that "should" be included in the signature,
 # according to the DKIM spec.
@@ -597,6 +361,293 @@ sub want_header {
     return scalar grep { lc($_) eq lc($header_name) } @DEFAULT_HEADERS;
 }
 
+
+sub key {
+    my $self = shift;
+    if (@_) {
+        $self->{Key}     = shift;
+        $self->{KeyFile} = undef;
+    }
+    return $self->{Key};
+}
+
+
+sub key_file {
+    my $self = shift;
+    if (@_) {
+        $self->{Key}     = undef;
+        $self->{KeyFile} = shift;
+    }
+    return $self->{KeyFile};
+}
+
+
+sub method {
+    my $self = shift;
+    if ( @_ == 1 ) {
+        $self->{Method} = shift;
+    }
+    return $self->{Method};
+}
+
+
+
+sub selector {
+    my $self = shift;
+    if ( @_ == 1 ) {
+        $self->{Selector} = shift;
+    }
+    return $self->{Selector};
+}
+
+
+sub signatures {
+    my $self = shift;
+    croak 'no arguments allowed' if @_;
+    return map { $_->signature } @{ $self->{algorithms} };
+}
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Mail::DKIM::Signer - generates a DKIM signature for a message
+
+=head1 VERSION
+
+version 1.20200513.1
+
+=head1 SYNOPSIS
+
+  use Mail::DKIM::Signer;
+  use Mail::DKIM::TextWrap;  #recommended
+
+  # create a signer object
+  my $dkim = Mail::DKIM::Signer->new(
+                  Algorithm => 'rsa-sha1',
+                  Method => 'relaxed',
+                  Domain => 'example.org',
+                  Selector => 'selector1',
+                  KeyFile => 'private.key',
+                  Headers => 'x-header:x-header2',
+             );
+
+  # read an email from a file handle
+  $dkim->load(*STDIN);
+
+  # or read an email and pass it into the signer, one line at a time
+  while (<STDIN>)
+  {
+      # remove local line terminators
+      chomp;
+      s/\015$//;
+
+      # use SMTP line terminators
+      $dkim->PRINT("$_\015\012");
+  }
+  $dkim->CLOSE;
+
+  # what is the signature result?
+  my $signature = $dkim->signature;
+  print $signature->as_string;
+
+=head1 DESCRIPTION
+
+This class is the part of L<Mail::DKIM> responsible for generating
+signatures for a given message. You create an object of this class,
+specifying the parameters of the signature you wish to create, or
+specifying a callback function so that the signature parameters can
+be determined later. Next, you feed it the entire message using
+L</"PRINT()">, completing with L</"CLOSE()">. Finally, use the
+L</"signatures()"> method to access the generated signatures.
+
+=head2 Pretty Signatures
+
+L<Mail::DKIM> includes a signature-wrapping module (which inserts
+linebreaks into the generated signature so that it looks nicer in the
+resulting message. To enable this module, simply call
+
+  use Mail::DKIM::TextWrap;
+
+in your program before generating the signature.
+
+=head1 CONSTRUCTOR
+
+=head2 new()
+
+Construct an object-oriented signer.
+
+  # create a signer using the default policy
+  my $dkim = Mail::DKIM::Signer->new(
+                  Algorithm => 'rsa-sha1',
+                  Method => 'relaxed',
+                  Domain => 'example.org',
+                  Selector => 'selector1',
+                  KeyFile => 'private.key',
+                  Headers => 'x-header:x-header2',
+             );
+
+  # create a signer using a custom policy
+  my $dkim = Mail::DKIM::Signer->new(
+                  Policy => $policyfn,
+             );
+
+The "default policy" is to create a DKIM signature using the specified
+parameters, but only if the message's sender matches the domain.
+The following parameters can be passed to this new() method to
+influence the resulting signature:
+Algorithm, Method, Domain, Selector, KeyFile, Identity, Timestamp.
+
+If you want different behavior, you can provide a "signer policy"
+instead. A signer policy is a subroutine or class that determines
+signature parameters after the message's headers have been parsed.
+See the section L</"SIGNER POLICIES"> below for more information.
+
+See L<Mail::DKIM::SignerPolicy> for more information about policy objects.
+
+In addition to the parameters demonstrated above, the following
+are recognized:
+
+=over
+
+=item Key
+
+rather than using C<KeyFile>, use C<Key> to use an already-loaded
+L<Mail::DKIM::PrivateKey> object.
+
+=item Headers
+
+A colon separated list of headers to sign, this is added to the list
+of default headers as shown in in the DKIM specification.
+
+For each specified header all headers of that type which are
+present in the message will be signed, but we will not oversign
+or sign headers which are not present.
+
+If you require greater control over signed headers please use
+the extended_headers() method instead.
+
+The list of headers signed by default is as follows
+
+    From Sender Reply-To Subject Date
+    Message-ID To Cc MIME-Version
+    Content-Type Content-Transfer-Encoding Content-ID Content-Description
+    Resent-Date Resent-From Resent-Sender Resent-To Resent-cc
+    Resent-Message-ID
+    In-Reply-To References
+    List-Id List-Help List-Unsubscribe List-Subscribe
+    List-Post List-Owner List-Archive
+
+=back
+
+=head1 METHODS
+
+=head2 PRINT()
+
+Feed part of the message to the signer.
+
+  $dkim->PRINT("a line of the message\015\012");
+
+Feeds content of the message being signed into the signer.
+The API is designed this way so that the entire message does NOT need
+to be read into memory at once.
+
+Please note that although the PRINT() method expects you to use
+SMTP-style line termination characters, you should NOT use the
+SMTP-style dot-stuffing technique described in RFC 2821 section 4.5.2.
+Nor should you use a <CR><LF>.<CR><LF> sequence to terminate the
+message.
+
+=head2 CLOSE()
+
+Call this when finished feeding in the message.
+
+  $dkim->CLOSE;
+
+This method finishes the canonicalization process, computes a hash,
+and generates a signature.
+
+=head2 extended_headers()
+
+This method overrides the headers to be signed and allows more
+control than is possible with the Headers property in the constructor.
+
+The method expects a HashRef to be passed in.
+
+The Keys are the headers to sign, and the values are either the
+number of headers of that type to sign, or the special values
+'*' and '+'.
+
+* will sign ALL headers of that type present in the message.
+
++ will sign ALL + 1 headers of that type present in the message
+to prevent additional headers being added.
+
+You may override any of the default headers by including them
+in the hashref, and disable them by giving them a 0 value.
+
+Keys are case insensitive with the values being added upto the
+highest value.
+
+    Headers => {
+        'X-test'  => '*',
+        'x-test'  => '1',
+        'Subject' => '+',
+        'Sender'  => 0,
+    },
+
+=head2 add_signature()
+
+Used by signer policy to create a new signature.
+
+  $dkim->add_signature(new Mail::DKIM::Signature(...));
+
+Signer policies can use this method to specify complete parameters for
+the signature to add, including what type of signature. For more information,
+see L<Mail::DKIM::SignerPolicy>.
+
+=head2 algorithm()
+
+Get or set the selected algorithm.
+
+  $alg = $dkim->algorithm;
+
+  $dkim->algorithm('rsa-sha1');
+
+=head2 domain()
+
+Get or set the selected domain.
+
+  $alg = $dkim->domain;
+
+  $dkim->domain('example.org');
+
+=head2 load()
+
+Load the entire message from a file handle.
+
+  $dkim->load($file_handle);
+
+Reads a complete message from the designated file handle,
+feeding it into the signer.  The message must use <CRLF> line
+terminators (same as the SMTP protocol).
+
+=head2 headers()
+
+Determine which headers to put in signature.
+
+  my $headers = $dkim->headers;
+
+This is a string containing the names of the header fields that
+will be signed, separated by colons.
+
 =head2 key()
 
 Get or set the private key object.
@@ -613,17 +664,6 @@ are stored out-of-process.)
 If you use this method to specify a private key,
 do not use L</"key_file()">.
 
-=cut
-
-sub key {
-    my $self = shift;
-    if (@_) {
-        $self->{Key}     = shift;
-        $self->{KeyFile} = undef;
-    }
-    return $self->{Key};
-}
-
 =head2 key_file()
 
 Get or set the filename containing the private key.
@@ -635,17 +675,6 @@ Get or set the filename containing the private key.
 If you use this method to specify a private key file,
 do not use L</"key()">.
 
-=cut
-
-sub key_file {
-    my $self = shift;
-    if (@_) {
-        $self->{Key}     = undef;
-        $self->{KeyFile} = shift;
-    }
-    return $self->{KeyFile};
-}
-
 =head2 method()
 
 Get or set the selected canonicalization method.
@@ -653,16 +682,6 @@ Get or set the selected canonicalization method.
   $alg = $dkim->method;
 
   $dkim->method('relaxed');
-
-=cut
-
-sub method {
-    my $self = shift;
-    if ( @_ == 1 ) {
-        $self->{Method} = shift;
-    }
-    return $self->{Method};
-}
 
 =head2 message_originator()
 
@@ -703,9 +722,6 @@ transmission of the message. For example, if a secretary were to send a
 message for another person, the "sender" would be the secretary and
 the "originator" would be the actual author.
 
-
-=cut
-
 =head2 selector()
 
 Get or set the current key selector.
@@ -713,16 +729,6 @@ Get or set the current key selector.
   $alg = $dkim->selector;
 
   $dkim->selector('alpha');
-
-=cut
-
-sub selector {
-    my $self = shift;
-    if ( @_ == 1 ) {
-        $self->{Selector} = shift;
-    }
-    return $self->{Selector};
-}
 
 =head2 signature()
 
@@ -745,14 +751,6 @@ Access list of generated signature objects.
   my @signatures = $dkim->signatures;
 
 Returns all generated signatures, as a list.
-
-=cut
-
-sub signatures {
-    my $self = shift;
-    croak 'no arguments allowed' if @_;
-    return map { $_->signature } @{ $self->{algorithms} };
-}
 
 =head1 SIGNER POLICIES
 
@@ -812,18 +810,53 @@ specified in the new() constructor.
 
 L<Mail::DKIM::SignerPolicy>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Jason Long, E<lt>jlong@messiah.eduE<gt>
+=over 4
+
+=item *
+
+Jason Long <jason@long.name>
+
+=item *
+
+Marc Bradshaw <marc@marcbradshaw.net>
+
+=item *
+
+Bron Gondwana <brong@fastmailteam.com> (ARC)
+
+=back
+
+=head1 THANKS
+
+Work on ensuring that this module passes the ARC test suite was
+generously sponsored by Valimail (https://www.valimail.com/)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006-2007 by Messiah College
+=over 4
+
+=item *
+
+Copyright (C) 2013 by Messiah College
+
+=item *
+
+Copyright (C) 2010 by Jason Long
+
+=item *
+
+Copyright (C) 2017 by Standcore LLC
+
+=item *
+
+Copyright (C) 2020 by FastMail Pty Ltd
+
+=back
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.6 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut
-
-1;

@@ -8,13 +8,15 @@ package Metrics::Any::Adapter::Prometheus;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Carp;
 
 use Net::Prometheus::Registry;
 
 use Net::Prometheus::Counter;
+use Net::Prometheus::Gauge;
+use Net::Prometheus::Histogram 0.10;
 
 =head1 NAME
 
@@ -81,7 +83,7 @@ sub make_counter
 
    if( my $units = delete $args{units} ) {
       # Append _bytes et.al. if required
-      $name .= "_$units" unless $name =~ m/_\Q$units\E$/;
+      $name .= "_$units" if length $units and $name !~ m/_\Q$units\E$/;
    }
    else {
       # Prometheus policy says unitless counters take _total suffix
@@ -131,6 +133,8 @@ given in C<buckets_per_decade> are repeated, multiplied by various powers of
 10 to generate values between C<bucket_min> (or a default of 0.001 if not
 supplied) and C<bucket_max> (or a default of 1000 if not supplied).
 
+For more information, see L<Net::Prometheus::Histogram>.
+
 =back
 
 =cut
@@ -139,40 +143,6 @@ my %BUCKETS_FOR_UNITS = (
    bytes   => { bucket_min => 100, bucket_max => 1E8 },
    seconds => undef, # Prometheus defaults are fine
 );
-
-# TODO: This probably ought to live in Net::Prometheus::Histogram
-sub gen_buckets
-{
-   shift;
-   my ( $args ) = @_;
-
-   my $min = $args->{bucket_min} // 1E-3;
-   my $max = $args->{bucket_max} // 1E3;
-
-   my @values_per_decade = @{ $args->{buckets_per_decade} // [ 1 ] };
-
-   my $value;
-   my @buckets;
-
-   $value = 1;
-   while( $value >= $min ) {
-      unshift @buckets, map { $_ * $value } @values_per_decade;
-
-      $value /= 10;
-   }
-
-   $value = 10;
-   while( $value <= $max ) {
-      push @buckets, map { $_ * $value } @values_per_decade;
-
-      $value *= 10;
-   }
-
-   # Trim overgenerated ends
-   @buckets = grep { $min <= $_ and $_ <= $max } @buckets;
-
-   $args->{buckets} = \@buckets;
-}
 
 sub make_distribution
 {
@@ -184,12 +154,10 @@ sub make_distribution
    my $help  = delete $args{description} // "Metrics::Any $units distribution $handle";
 
    # Append _bytes et.al. if required
-   $name .= "_$units" unless $name =~ m/_\Q$units\E$/;
+   $name .= "_$units" if length $units and $name !~ m/_\Q$units\E$/;
 
    unless( $args{buckets} ) {
       %args = ( %{ $BUCKETS_FOR_UNITS{$units} }, %args ) if $BUCKETS_FOR_UNITS{$units};
-
-      $self->gen_buckets( \%args ) if grep { m/^bucket/ } keys %args;
    }
 
    my $metric_class = $self->{use_histograms} ? "Net::Prometheus::Histogram" :
@@ -204,7 +172,7 @@ sub make_distribution
    );
 }
 
-sub inc_distribution_by
+sub report_distribution
 {
    my $self = shift;
    my ( $handle, $amount, @labelvalues ) = @_;
@@ -214,6 +182,8 @@ sub inc_distribution_by
    ( $self->{metrics}{$handle} or croak "No such distribution named '$handle'" )
       ->observe( @labelvalues, $amount );
 }
+
+*inc_distribution_by = \&report_distribution;
 
 sub make_gauge
 {
@@ -263,7 +233,8 @@ sub make_timer
    );
 }
 
-*inc_timer_by = \&inc_distribution_by;
+*report_timer = \&report_distribution;
+*inc_timer_by = \&report_distribution;
 
 =head1 AUTHOR
 

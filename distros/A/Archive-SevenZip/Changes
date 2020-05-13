@@ -1,3 +1,7 @@
+0.12 2020-05-12
+    * Recognize 7zip Windows 64bit version (Reported at RT #132570)
+    * Docfixes (Reported at RT #132570)
+
 0.11 2019-07-30
     * Properly respect $ENV{PERL_ARCHIVE_SEVENZIP_BIN} and do not search
       the path anymore if it is set.

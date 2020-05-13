@@ -12,8 +12,8 @@
          "rdfs:comment" : "An amenity feature (e.g. a characteristic or service) of the Accommodation. This generic property does not make a statement about whether the feature is included in an offer for the main accommodation or available at extra costs.",
          "rdfs:label" : "amenityFeature",
          "schema:domainIncludes" : [
-            "schema:Place",
             "schema:Accommodation",
+            "schema:Place",
             "schema:FloorPlan",
             "schema:LodgingBusiness"
          ],
@@ -24,11 +24,11 @@
          "rdfs:comment" : "An intended audience, i.e. a group for whom something was created.",
          "rdfs:label" : "audience",
          "schema:domainIncludes" : [
+            "schema:CreativeWork",
             "schema:LodgingBusiness",
             "schema:Service",
-            "schema:Event",
-            "schema:CreativeWork",
             "schema:Product",
+            "schema:Event",
             "schema:PlayAction"
          ],
          "schema:rangeIncludes" : "schema:Audience"
@@ -38,10 +38,10 @@
          "rdfs:comment" : "A language someone may use with or at the item, service or place. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"http://schema.org/inLanguage\">inLanguage</a>",
          "rdfs:label" : "availableLanguage",
          "schema:domainIncludes" : [
-            "schema:ServiceChannel",
-            "schema:LodgingBusiness",
             "schema:TouristAttraction",
-            "schema:ContactPoint"
+            "schema:ServiceChannel",
+            "schema:ContactPoint",
+            "schema:LodgingBusiness"
          ],
          "schema:rangeIncludes" : [
             "schema:Language",
@@ -57,8 +57,8 @@
             "schema:LodgingReservation"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Time"
+            "schema:Time",
+            "schema:DateTime"
          ]
       },
       "schema:checkoutTime" : {
@@ -66,12 +66,12 @@
          "rdfs:comment" : "The latest someone may check out of a lodging establishment.",
          "rdfs:label" : "checkoutTime",
          "schema:domainIncludes" : [
-            "schema:LodgingReservation",
-            "schema:LodgingBusiness"
+            "schema:LodgingBusiness",
+            "schema:LodgingReservation"
          ],
          "schema:rangeIncludes" : [
-            "schema:Time",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Time"
          ]
       },
       "schema:numberOfRooms" : {
@@ -80,13 +80,13 @@
          "rdfs:comment" : "The number of rooms (excluding bathrooms and closets) of the accommodation or lodging business.\nTypical unit code(s): ROM for room or C62 for no unit. The type of room can be put in the unitText property of the QuantitativeValue.",
          "rdfs:label" : "numberOfRooms",
          "schema:domainIncludes" : [
-            "schema:LodgingBusiness",
-            "schema:SingleFamilyResidence",
-            "schema:Apartment",
-            "schema:Suite",
-            "schema:House",
             "schema:Accommodation",
-            "schema:FloorPlan"
+            "schema:Apartment",
+            "schema:House",
+            "schema:FloorPlan",
+            "schema:Suite",
+            "schema:SingleFamilyResidence",
+            "schema:LodgingBusiness"
          ],
          "schema:rangeIncludes" : [
             "schema:QuantitativeValue",
@@ -99,14 +99,14 @@
          "rdfs:comment" : "Indicates whether pets are allowed to enter the accommodation or lodging business. More detailed information can be put in a text value.",
          "rdfs:label" : "petsAllowed",
          "schema:domainIncludes" : [
-            "schema:LodgingBusiness",
-            "schema:ApartmentComplex",
             "schema:Accommodation",
-            "schema:FloorPlan"
+            "schema:ApartmentComplex",
+            "schema:FloorPlan",
+            "schema:LodgingBusiness"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Boolean"
+            "schema:Boolean",
+            "schema:Text"
          ]
       },
       "schema:starRating" : {

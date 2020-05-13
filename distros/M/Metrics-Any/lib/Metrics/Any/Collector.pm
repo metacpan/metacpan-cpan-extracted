@@ -8,9 +8,13 @@ package Metrics::Any::Collector;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
+
+use Carp;
 
 use Metrics::Any::Adapter;
+
+use List::Util 1.29 qw( pairkeys );
 
 =head1 NAME
 
@@ -18,14 +22,12 @@ C<Metrics::Any::Collector> - module-side of the monitoring metrics reporting API
 
 =head1 SYNOPSIS
 
-   use Metrics::Any '$metrics';
-
-   $metrics->make_counter( thing =>
-      name => [qw( things done )],
-   );
+   use Metrics::Any '$metrics',
+      strict => 0,
+      name_prefix => [ 'my_module_name' ];
 
    sub do_thing {
-      $metrics->inc_counter( 'thing' );
+      $metrics->inc_counter( 'things_done' );
    }
 
 =head1 DESCRIPTION
@@ -51,12 +53,15 @@ during program startup.
 sub new
 {
    my $class = shift;
-   my ( $pkg ) = @_;
+   my ( $pkg, %args ) = @_;
 
    return bless {
       pkg => $pkg,
       adapter => undef,
       deferred => [],
+      name_prefix => $args{name_prefix},
+      metrics => {},
+      strict => $args{strict} // 1,
    }, $class;
 }
 
@@ -68,11 +73,146 @@ sub adapter
    my $adapter = $self->{adapter} = Metrics::Any::Adapter->adapter;
    foreach my $call ( @{ $self->{deferred} } ) {
       my ( $method, @args ) = @$call;
-      $self->$method( @args );
+      $adapter->$method( @args );
    }
    undef $self->{deferred};
    return $adapter;
 }
+
+sub _adapter_call
+{
+   my $self = shift;
+   my ( $method, @args ) = @_;
+
+   if( $self->{adapter} ) {
+      $self->{adapter}->$method( @args );
+   }
+   else {
+      push @{ $self->{deferred} }, [ $method, @args ];
+   }
+}
+
+sub _metricname
+{
+   my $self = shift;
+   my ( $suffix ) = @_;
+
+   return $suffix unless defined $self->{name_prefix};
+   return [ @{ $self->{name_prefix} }, @$suffix ];
+}
+
+sub _labelvalues
+{
+   my $self = shift;
+   my ( $type, $handle, @args ) = @_;
+
+   my $meta = $self->{$handle};
+   if( $meta ) {
+      $meta->[0] eq $type or croak "Metric '$handle' is not a $type";
+   }
+   elsif( !$self->{strict} ) {
+      my @labelnames;
+      if( !@args ) {
+         # no labels
+      }
+      elsif( ref $args[0] eq "ARRAY" ) {
+         @labelnames = pairkeys @{ $args[0] };
+      }
+      elsif( ref $args[0] eq "HASH" ) {
+         carp "Lazily creating a labelled metric with multiple labels using a HASH reference yields unreliable label order"
+            if keys %{ $args[0] } > 1;
+         @labelnames = keys %{ $args[0] };
+      }
+      else {
+         croak "Cannot lazily create a labelled metric from label values specified in a flat list";
+      }
+
+      my $make_method = "make_$type";
+      $self->$make_method( $handle, labels => \@labelnames );
+
+      $meta = $self->{$handle};
+   }
+   else {
+      croak "No such metric '$handle'";
+   }
+
+   my ( undef, @labelnames ) = @$meta;
+
+   if( !@args ) {
+      return;
+   }
+   elsif( ref $args[0] ) {
+      warn "Received additional arguments to metrics reporting function\n" if @args > 1;
+      my ( $arg ) = @args;
+      my %v = ( ref $arg eq "ARRAY" ) ? @$arg : %$arg;
+
+      my @labelvalues;
+      ( defined $v{$_} or croak "Missing value for label '$_'" ) and push @labelvalues, delete $v{$_}
+         for @labelnames;
+
+      # Warn but don't complain about extra values
+      carp "Found extra label value for '$_'" for keys %v;
+
+      return @labelvalues;
+   }
+   else {
+      return @args;
+   }
+}
+
+=head1 ARGUMENTS
+
+=head2 name_prefix
+
+I<Since version 0.05.>
+
+Optional prefix to prepend to any name provided to the C<make_*> functions.
+
+If set, this value and the registered names must be given as array references,
+not simple strings.
+
+   use Metrics::Any '$metrics', name_prefix => [qw( my_program_name )];
+
+   $metrics->make_counter( events =>
+      name => "events",
+   );
+
+   # Will create a counter named ["my_program_name", "events"] formed by the
+   # adapter.
+
+=head2 strict
+
+I<Since version 0.05.>
+
+Optional boolean which controls whether metrics must be registered by a
+C<make_> method before they can be used (when true), or whether to attempt
+lazily registering them when first encountered by a reporting method (when
+false).
+
+When strict mode is off and a reporting method (e.g. C<inc_counter>) is
+invoked on an unrecognised handle, it will be lazily registered. If the metric
+is reported with values, an attempt is made to determine what the list of
+label names is; which will depend on the form the label values are given in.
+Labels passed by array reference, or by hash reference for a single label will
+work fine. If a hash reference is passed with multiple keys, a warning is
+printed that the order may not be reliable. Finally, for (discouraged) flat
+lists of values directly it is not possible to recover label name information
+so an exception is thrown.
+
+For this reason, when operating with strict mode off, it is recommended always
+to use the array reference form of supplying labels, to ensure they are
+registered correctly.
+
+In the current version this parameter defaults true, and thus all metrics must
+be registered in advance. This may be changed in a future version for
+convenience in smaller modules, so paranoid authors should set it explicitly:
+
+   use Metrics::Any::Adapter '$metrics', strict => 1;
+
+If strict mode is switched off, it is recommended to set a name prefix to
+ensure that lazily-registered metrics will at least have a useful name.
+
+=cut
 
 =head1 BOOLEAN OVERRIDE
 
@@ -107,14 +247,17 @@ the following common arguments:
 
 =item name => ARRAY[ STRING ] | STRING
 
-An array of string parts, or a plain string name to use for reporting this
-metric to its upstream service.
+Optional. An array of string parts, or a plain string name to use for
+reporting this metric to its upstream service.
 
 Modules should preferrably use an array of string parts to specify their
 metric names, as different adapter types may have different ways to represent
 this hierarchially. Base-level parts of the name should come first, followed
 by more specific parts. It is common for related metrics to be grouped by name
 having identical prefixes but differing only in the final part.
+
+The name is optional; if unspecified then the handle will be used to form the
+name, combined with a C<name_prefix> argument if one was set for the package.
 
 =item description => STRING
 
@@ -125,9 +268,19 @@ purposes.
 
 Optional reference to an array of string names to use as label names.
 
-A labelled metric will expect to receive as many additional values to a call
-to its reporting method as there are label names. Each additional value will
-be associated with the corresponding label.
+A labelled metric will expect to receive additional information in its
+reporting method to give values for these labels. This information should be
+in either an even-length array reference of name/value pairs, or a hash
+reference. E.g.
+
+   $metrics->inc_counter( handle => [ labelname => $labelvalue ] );
+   $metrics->inc_counter( handle => { labelname => $labelvalue } );
+
+A legacy form where a plain list of values is passed, each corresponding to a
+named label in the same order, is currently accepted but discouraged in favour
+of the above forms.
+
+   $metrics->inc_counter( handle => $labelvalue );
 
 Note that not all metric reporting adapters may be able to represent all of
 the labels. Each should document what its behaviour will be.
@@ -180,17 +333,17 @@ sub make_counter
    my $self = shift;
    my ( $handle, %args ) = @_;
 
-   if( !$self->{adapter} ) {
-      push @{ $self->{deferred} }, [ make_counter => $handle, %args ];
-      return;
-   }
+   $args{name} = $self->_metricname( $args{name} // [ $handle ] );
 
-   $self->adapter->make_counter( "$self->{pkg}/$handle", %args );
+   $self->{$handle} and croak "Already have a metric '$handle'";
+   $self->{$handle} = [ counter => @{ $args{labels} // [] } ];
+
+   $self->_adapter_call( make_counter => "$self->{pkg}/$handle", %args );
 }
 
 =head2 inc_counter
 
-   $collector->inc_counter( $handle, @labelvalues )
+   $collector->inc_counter( $handle, $labels )
 
 Reports that the counter metric value be incremented by one. The C<$handle>
 name must match one earlier created by L</make_counter>.
@@ -200,14 +353,16 @@ name must match one earlier created by L</make_counter>.
 sub inc_counter
 {
    my $self = shift;
-   my ( $handle, @labelvalues ) = @_;
+   my ( $handle, @args ) = @_;
+
+   my @labelvalues = $self->_labelvalues( counter => $handle, @args );
 
    $self->adapter->inc_counter_by( "$self->{pkg}/$handle", 1, @labelvalues );
 }
 
 =head2 inc_counter_by
 
-   $collector->inc_counter_by( $handle, $amount, @labelvalues )
+   $collector->inc_counter_by( $handle, $amount, $labels )
 
 Reports that a counter metric value be incremented by some specified value.
 
@@ -216,7 +371,9 @@ Reports that a counter metric value be incremented by some specified value.
 sub inc_counter_by
 {
    my $self = shift;
-   my ( $handle, $amount, @labelvalues ) = @_;
+   my ( $handle, $amount, @args ) = @_;
+
+   my @labelvalues = $self->_labelvalues( counter => $handle, @args );
 
    $self->adapter->inc_counter_by( "$self->{pkg}/$handle", $amount, @labelvalues );
 }
@@ -225,7 +382,7 @@ sub inc_counter_by
 
 The L</make_distribution> method creates a new metric which counts individual
 observations of some numerical quantity (which may or may not be integral).
-New observations can be added by the L</inc_distribution_by> method.
+New observations can be added by the L</report_distribution> method.
 
 Some adapter types may only store an aggregated total; others may store some
 sort of statistical breakdown, either total + count, or a bucketed histogram.
@@ -271,34 +428,47 @@ sub make_distribution
    my $self = shift;
    my ( $handle, %args ) = @_;
 
+   $args{name} = $self->_metricname( $args{name} // [ $handle ] );
+
    $args{units} //= "bytes";
 
-   if( !$self->{adapter} ) {
-      push @{ $self->{deferred} }, [ make_distribution => $handle, %args ];
-      return;
-   }
+   $self->{$handle} and croak "Already have a metric '$handle'";
+   $self->{$handle} = [ distribution => @{ $args{labels} // [] } ];
 
-   $self->adapter->make_distribution( "$self->{pkg}/$handle", %args );
+   $self->_adapter_call( make_distribution => "$self->{pkg}/$handle", %args );
 }
 
-=head2 inc_distribution_by
+=head2 report_distribution
 
-   $collector->inc_distribution_by( $handle, $amount, @labelvalues )
+   $collector->report_distribution( $handle, $amount, $labels )
+
+I<Since version 0.05.>
 
 Reports a new observation for the distribution metric. The C<$handle> name
 must match one earlier created by L</make_distribution>. The C<$amount> may
 be interpreted by the adapter depending on the defined C<units> type for the
 distribution.
 
+This method used to be called C<inc_distribution_by> and is currently still
+available as an alias.
+
 =cut
 
-sub inc_distribution_by
+sub report_distribution
 {
    my $self = shift;
-   my ( $handle, $amount, @labelvalues ) = @_;
+   my ( $handle, $amount, @args ) = @_;
 
-   $self->adapter->inc_distribution_by( "$self->{pkg}/$handle", $amount, @labelvalues );
+   my @labelvalues = $self->_labelvalues( distribution => $handle, @args );
+
+   my $adapter = $self->adapter;
+
+   # Support new and legacy name
+   my $method = $adapter->can( "report_distribution" ) // "inc_distribution_by";
+   $adapter->$method( "$self->{pkg}/$handle", $amount, @labelvalues );
 }
+
+*inc_distribution_by = \&report_distribution;
 
 =head2 Gauge
 
@@ -326,29 +496,29 @@ sub make_gauge
    my $self = shift;
    my ( $handle, %args ) = @_;
 
-   if( !$self->{adapter} ) {
-      push @{ $self->{deferred} }, [ make_gauge => $handle, %args ];
-      return;
-   }
+   $args{name} = $self->_metricname( $args{name} // [ $handle ] );
 
-   $self->adapter->make_gauge( "$self->{pkg}/$handle", %args );
+   $self->{$handle} and croak "Already have a metric '$handle'";
+   $self->{$handle} = [ gauge => @{ $args{labels} // [] } ];
+
+   $self->_adapter_call( make_gauge => "$self->{pkg}/$handle", %args );
 }
 
 =head2 inc_gauge
 
-   $collector->inc_gauge( $handle, @labelvalues )
+   $collector->inc_gauge( $handle, $labels )
 
 =head2 dec_gauge
 
-   $collector->dec_gauge( $handle, @labelvalues )
+   $collector->dec_gauge( $handle, $labels )
 
 =head2 inc_gauge_by
 
-   $collector->inc_gauge_by( $handle, $amount, @labelvalues )
+   $collector->inc_gauge_by( $handle, $amount, $labels )
 
 =head2 dec_gauge_by
 
-   $collector->dec_gauge_by( $handle, $amount, @labelvalues )
+   $collector->dec_gauge_by( $handle, $amount, $labels )
 
 Reports that the observed value of the gauge has increased or decreased by the
 given amount (or 1).
@@ -358,7 +528,9 @@ given amount (or 1).
 sub inc_gauge
 {
    my $self = shift;
-   my ( $handle, @labelvalues ) = @_;
+   my ( $handle, @args ) = @_;
+
+   my @labelvalues = $self->_labelvalues( gauge => $handle, @args );
 
    $self->adapter->inc_gauge_by( "$self->{pkg}/$handle", 1, @labelvalues );
 }
@@ -366,7 +538,9 @@ sub inc_gauge
 sub dec_gauge
 {
    my $self = shift;
-   my ( $handle, @labelvalues ) = @_;
+   my ( $handle, @args ) = @_;
+
+   my @labelvalues = $self->_labelvalues( gauge => $handle, @args );
 
    $self->adapter->inc_gauge_by( "$self->{pkg}/$handle", -1, @labelvalues );
 }
@@ -374,7 +548,9 @@ sub dec_gauge
 sub inc_gauge_by
 {
    my $self = shift;
-   my ( $handle, $amount, @labelvalues ) = @_;
+   my ( $handle, $amount, @args ) = @_;
+
+   my @labelvalues = $self->_labelvalues( gauge => $handle, @args );
 
    $self->adapter->inc_gauge_by( "$self->{pkg}/$handle", $amount, @labelvalues );
 }
@@ -382,14 +558,16 @@ sub inc_gauge_by
 sub dec_gauge_by
 {
    my $self = shift;
-   my ( $handle, $amount, @labelvalues ) = @_;
+   my ( $handle, $amount, @args ) = @_;
+
+   my @labelvalues = $self->_labelvalues( gauge => $handle, @args );
 
    $self->adapter->inc_gauge_by( "$self->{pkg}/$handle", -$amount, @labelvalues );
 }
 
 =head2 set_gauge_to
 
-   $collector->set_gauge_to( $handle, $amount, @labelvalues )
+   $collector->set_gauge_to( $handle, $amount, $labels )
 
 Reports that the observed value of the gauge is now the given amount.
 
@@ -400,7 +578,9 @@ The C<$handle> name must match one earlier created by L</make_gauge>.
 sub set_gauge_to
 {
    my $self = shift;
-   my ( $handle, $amount, @labelvalues ) = @_;
+   my ( $handle, $amount, @args ) = @_;
+
+   my @labelvalues = $self->_labelvalues( gauge => $handle, @args );
 
    $self->adapter->set_gauge_to( "$self->{pkg}/$handle", $amount, @labelvalues );
 }
@@ -409,7 +589,7 @@ sub set_gauge_to
 
 The L</make_timer> method creates a new metric which measures durations of
 time consumed by the application. New observations of durations can be added
-by the L</inc_timer> method.
+by the L</report_timer> method.
 
 Timer metrics may be handled by the adapter similarly to distribution metrics.
 Moreover, adapters may choose to implement timers as distributions with units
@@ -430,31 +610,44 @@ sub make_timer
    my $self = shift;
    my ( $handle, %args ) = @_;
 
-   if( !$self->{adapter} ) {
-      push @{ $self->{deferred} }, [ make_timer => $handle, %args ];
-      return;
-   }
+   $args{name} = $self->_metricname( $args{name} // [ $handle ] );
 
-   $self->adapter->make_timer( "$self->{pkg}/$handle", %args );
+   $self->{$handle} and croak "Already have a metric '$handle'";
+   $self->{$handle} = [ timer => @{ $args{labels} // [] } ];
+
+   $self->_adapter_call( make_timer => "$self->{pkg}/$handle", %args );
 }
 
-=head2 inc_timer_by
+=head2 report_timer
 
-   $collector->inc_timer_by( $handle, $duration, @labelvalues )
+   $collector->report_timer( $handle, $duration, $labels )
+
+I<Since version 0.05.>
 
 Reports a new duration for the timer metric. The C<$handle> name must match
 one earlier created by L</make_timer>. The C<$duration> gives a time measured
 in seconds, and may be fractional.
 
+This method used to called C<inc_timer_by> and is currently still available as
+an alias.
+
 =cut
 
-sub inc_timer_by
+sub report_timer
 {
    my $self = shift;
-   my ( $handle, $duration, @labelvalues ) = @_;
+   my ( $handle, $duration, @args ) = @_;
 
-   $self->adapter->inc_timer_by( "$self->{pkg}/$handle", $duration, @labelvalues );
+   my @labelvalues = $self->_labelvalues( timer => $handle, @args );
+
+   my $adapter = $self->adapter;
+
+   # Support new and legacy name
+   my $method = $adapter->can( "report_timer" ) // "inc_timer_by";
+   $adapter->$method( "$self->{pkg}/$handle", $duration, @labelvalues );
 }
+
+*inc_timer_by = \&report_timer;
 
 =head1 AUTHOR
 

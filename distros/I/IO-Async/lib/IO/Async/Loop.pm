@@ -8,7 +8,7 @@ package IO::Async::Loop;
 use strict;
 use warnings;
 
-our $VERSION = '0.76';
+our $VERSION = '0.77';
 
 # When editing this value don't forget to update the docs below
 use constant NEED_API_VERSION => '0.33';
@@ -174,6 +174,8 @@ sub __new
       os            => {}, # A generic scratchpad for IO::Async::OS to store whatever it wants
    }, $class;
 
+   $METRICS and $METRICS->inc_gauge( loops => [ class => ref $self ] );
+
    # It's possible this is a specific subclass constructor. We still want the
    # magic IO::Async::Loop->new constructor to yield this if it's the first
    # one
@@ -192,6 +194,13 @@ sub __new
    $self->{old_timer} = $old_timer;
 
    return $self;
+}
+
+sub DESTROY
+{
+   my $self = shift;
+
+   $METRICS and $METRICS->dec_gauge( loops => [ class => ref $self ] );
 }
 
 =head1 MAGIC CONSTRUCTOR
@@ -2369,7 +2378,7 @@ sub pre_wait
 {
    my $self = shift;
    $METRICS and $self->{processing_start} and
-      $METRICS->inc_distribution_by( processing_time => Time::HiRes::tv_interval $self->{processing_start} );
+      $METRICS->report_timer( processing_time => Time::HiRes::tv_interval $self->{processing_start} );
 }
 
 sub post_wait

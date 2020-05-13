@@ -1,0 +1,10 @@
+
+sqlite:
+    $class: DBI
+    $method: connect
+    $args:
+        - 'dbi:SQLite:db.sqlite3'
+        - ~
+        - ~
+        - RaiseError: 1
+

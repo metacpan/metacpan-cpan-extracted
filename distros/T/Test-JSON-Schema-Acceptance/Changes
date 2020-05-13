@@ -1,5 +1,10 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+0.995     2020-05-13 17:11:29Z
+        - fix sorting of results table so tests in subdirectories appear last
+        - fix minimum declared version for Path::Tiny
+        - updated test suite to commit 2f2e7cf8bd7c4378107db6115d6af5aae062b105
+
 0.994     2020-05-12 18:43:17Z
         - added "additional_resources" attribute, for accessing
           remotely-referenced content

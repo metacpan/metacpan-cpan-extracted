@@ -4,11 +4,13 @@ use Test::More;
 use Test::Warn;
 use Test::Trap;
 use DBIx::Class::ResultSet::RecursiveUpdate;
+use Test::DBIC::ExpectedQueries;
 
 use lib 't/lib';
 use DBSchema;
 
 my $schema = DBSchema->get_test_schema();
+my $queries = Test::DBIC::ExpectedQueries->new({ schema => $schema });
 
 # moosified tests
 #use DBSchemaMoose;
@@ -144,15 +146,42 @@ $updates = {
     },
     liner_notes => { notes => 'test note', },
     like_has_many  => [ { key2 => 1 } ],
-    like_has_many2 => [
-        {
-            onekey => { name => 'aaaaa' },
-            key2   => 1
-        }
-    ],
 };
 
-my $dvd = $dvd_rs->recursive_update($updates);
+my $dvd = $queries->run(sub {
+    $dvd_rs->recursive_update($updates);
+});
+$queries->test({
+    dvd => {
+        # one for create new dvd
+        insert => 1,
+    },
+    dvdtag => {
+        # two for create links from dvd to tag
+        insert => 2,
+    },
+    liner_notes => {
+        # one for new
+        insert => 1,
+        # one for check if related row exists
+        select => 1,
+    },
+    tag => {
+        # one for check if related row exists
+        # one for DBIx::Class multi-create code because of { id => '3' }
+        select => 2,
+    },
+    twokeys => {
+        # one for new like_has_many
+        insert => 1,
+    },
+    usr => {
+        # one new current_borrower
+        insert => 1,
+        # two for DBIx::Class insert of dvd (multi-create?)
+        select => 2,
+    },
+});
 $expected_user_count++;
 
 is( $dvd_rs->count, $initial_dvd_count + 2, 'Dvd created' );
@@ -169,17 +198,6 @@ ok(
       ->find( { dvd_name => 'Test name', key2 => 1 } ),
     'Twokeys created'
 );
-my $onekey = $schema->resultset('Onekey')->search( { name => 'aaaaa' } )->first;
-ok( $onekey, 'Onekey created' );
-ok(
-    $schema->resultset('Twokeys_belongsto')
-      ->find( { key1 => $onekey->id, key2 => 1 } ),
-    'Twokeys_belongsto created'
-);
-TODO: {
-    local $TODO = 'value of fk from a multi relationship';
-    is( $dvd->twokeysfk, $onekey->id, 'twokeysfk in Dvd' );
-}
 is( $dvd->name, 'Test name', 'Dvd name set' );
 
 # changing existing records

@@ -12,13 +12,16 @@ DESCRIPTION
     UDP socket. Each metric value reported will result in a new UDP packet
     being sent.
 
-    The location of the statsd server is set by two package variables,
-    defaulting to
+    The default location of the statsd server is set by two package
+    variables, defaulting to
 
        $Net::Statsd::HOST = "127.0.0.1";
        $Net::Statsd::PORT = 8125
 
-    The configuration can be changed by setting new values.
+    The configuration can be changed by setting new values or by passing
+    arguments to the import line:
+
+       use Metrics::Any::Adapter 'Statsd', port => 8200;
 
 METRIC HANDLING
 
@@ -43,6 +46,16 @@ METRIC HANDLING
 
       * Metrics::Any::Adapter::SignalFx - a metrics reporting adapter for
       SignalFx
+
+ARGUMENTS
+
+    The following additional arguments are recognised
+
+ host
+
+ port
+
+    Provides specific values for the statsd server location.
 
 TODO
 

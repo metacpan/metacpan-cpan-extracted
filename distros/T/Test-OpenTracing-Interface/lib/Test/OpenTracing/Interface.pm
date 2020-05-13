@@ -3,7 +3,17 @@ package Test::OpenTracing::Interface;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
+
+BEGIN {
+    $ENV{PERL_TYPE_TINY_XS} = undef unless exists $ENV{PERL_TYPE_TINY_XS};
+}
+#
+# ClassName seems to have incompatible implementations (TOBYINK )
+#
+# Turning off the XS version during these tests solve the problem, these tests
+# only test if the tests work properly. As long as this package will not be used
+# in other code, Type::Tiny::XS will still be loaded is possible.
 
 
 
@@ -35,7 +45,10 @@ has message => (
 sub this_name {
     my $self = shift;
     
-    return blessed( $self->test_this ) // $self->test_this;
+    my $this_name = defined blessed( $self->test_this ) ?
+        blessed( $self->test_this ) : $self->test_this;
+    
+    return $this_name
 }
 
 

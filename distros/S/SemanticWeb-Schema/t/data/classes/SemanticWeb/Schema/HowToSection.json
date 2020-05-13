@@ -5,8 +5,8 @@
       "rdfs:label" : "HowToSection",
       "rdfs:subClassOf" : [
          "schema:ItemList",
-         "schema:CreativeWork",
-         "schema:ListItem"
+         "schema:ListItem",
+         "schema:CreativeWork"
       ]
    },
    "properties" : {
@@ -19,9 +19,9 @@
             "schema:HowTo"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
+            "schema:ItemList",
             "schema:CreativeWork",
-            "schema:ItemList"
+            "schema:Text"
          ],
          "schema:supersededBy" : "schema:step"
       }

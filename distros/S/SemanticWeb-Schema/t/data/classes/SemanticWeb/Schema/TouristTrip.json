@@ -1,8 +1,8 @@
 {
    "class" : {
       "dc:source" : [
-         "schemadotorgsources:IIT-CNR.it",
-         "schemadotorgsources:Tourism"
+         "schemadotorgsources:Tourism",
+         "schemadotorgsources:IIT-CNR.it"
       ],
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A tourist trip. A created itinerary of visits to one or more places of interest (<a class=\"localLink\" href=\"http://schema.org/TouristAttraction\">TouristAttraction</a>/<a class=\"localLink\" href=\"http://schema.org/TouristDestination\">TouristDestination</a>) often linked by a similar theme, geographic area, or interest to a particular <a class=\"localLink\" href=\"http://schema.org/touristType\">touristType</a>. The <a href=\"http://www2.unwto.org/\">UNWTO</a> defines tourism trip as the Trip taken by visitors.\n  (See examples below).",
@@ -22,13 +22,13 @@
          "rdfs:label" : "touristType",
          "schema:category" : "issue-1810",
          "schema:domainIncludes" : [
-            "schema:TouristAttraction",
             "schema:TouristDestination",
-            "schema:TouristTrip"
+            "schema:TouristTrip",
+            "schema:TouristAttraction"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Audience"
+            "schema:Audience",
+            "schema:Text"
          ]
       }
    }

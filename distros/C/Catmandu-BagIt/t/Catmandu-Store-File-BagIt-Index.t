@@ -76,6 +76,15 @@ note("add");
     ok -d "$bag_dir/000/001/234", 'found a container on disk';
 }
 
+note("get");
+{
+    my $c = $index->get(1234);
+
+    ok $c , 'get(1234)';
+
+    is $c->{_id} , 1234 , 'correct id';
+}
+
 note("delete");
 {
     ok $index->delete('1234'), 'delete(1234)';

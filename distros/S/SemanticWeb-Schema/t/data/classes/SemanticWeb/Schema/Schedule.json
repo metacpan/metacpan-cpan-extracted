@@ -18,8 +18,8 @@
          "schema:domainIncludes" : "schema:Schedule",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:DayOfWeek",
-            "schema:Text"
+            "schema:Text",
+            "schema:DayOfWeek"
          ]
       },
       "schema:byMonth" : {
@@ -44,25 +44,25 @@
       },
       "schema:duration" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1698",
-            "https://github.com/schemaorg/schemaorg/issues/1457"
+            "https://github.com/schemaorg/schemaorg/issues/1457",
+            "https://github.com/schemaorg/schemaorg/issues/1698"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The duration of the item (movie, audio recording, event, etc.) in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>.",
          "rdfs:label" : "duration",
          "schema:category" : [
-            "issue-1698",
-            "issue-1457"
+            "issue-1457",
+            "issue-1698"
          ],
          "schema:domainIncludes" : [
-            "schema:QuantitativeValueDistribution",
-            "schema:MusicRelease",
-            "schema:MusicRecording",
-            "schema:Event",
             "schema:Movie",
-            "schema:MediaObject",
             "schema:Schedule",
-            "schema:Audiobook"
+            "schema:Event",
+            "schema:QuantitativeValueDistribution",
+            "schema:Audiobook",
+            "schema:MusicRelease",
+            "schema:MediaObject",
+            "schema:MusicRecording"
          ],
          "schema:rangeIncludes" : "schema:Duration"
       },
@@ -73,17 +73,17 @@
          "rdfs:label" : "endDate",
          "schema:category" : "issue-2486",
          "schema:domainIncludes" : [
-            "schema:Event",
-            "schema:DatedMoneySpecification",
-            "schema:Schedule",
             "schema:CreativeWorkSeries",
             "schema:Role",
+            "schema:DatedMoneySpecification",
+            "schema:Schedule",
+            "schema:EducationalOccupationalProgram",
             "schema:CreativeWorkSeason",
-            "schema:EducationalOccupationalProgram"
+            "schema:Event"
          ],
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
          ]
       },
       "schema:endTime" : {
@@ -93,8 +93,8 @@
          "rdfs:label" : "endTime",
          "schema:category" : "issue-2493",
          "schema:domainIncludes" : [
-            "schema:FoodEstablishmentReservation",
             "schema:MediaObject",
+            "schema:FoodEstablishmentReservation",
             "schema:Action",
             "schema:Schedule"
          ],
@@ -112,8 +112,8 @@
          "schema:domainIncludes" : "schema:Schedule",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
          ]
       },
       "schema:repeatCount" : {
@@ -136,8 +136,8 @@
          "schema:domainIncludes" : "schema:Schedule",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Duration"
+            "schema:Duration",
+            "schema:Text"
          ]
       },
       "schema:scheduleTimezone" : {
@@ -158,16 +158,16 @@
          "schema:category" : "issue-2486",
          "schema:domainIncludes" : [
             "schema:CreativeWorkSeries",
-            "schema:Role",
             "schema:DatedMoneySpecification",
+            "schema:EducationalOccupationalProgram",
             "schema:CreativeWorkSeason",
-            "schema:Schedule",
             "schema:Event",
-            "schema:EducationalOccupationalProgram"
+            "schema:Role",
+            "schema:Schedule"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       },
       "schema:startTime" : {
@@ -178,9 +178,9 @@
          "schema:category" : "issue-2493",
          "schema:domainIncludes" : [
             "schema:Schedule",
-            "schema:FoodEstablishmentReservation",
+            "schema:Action",
             "schema:MediaObject",
-            "schema:Action"
+            "schema:FoodEstablishmentReservation"
          ],
          "schema:rangeIncludes" : [
             "schema:Time",

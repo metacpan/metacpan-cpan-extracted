@@ -10,7 +10,7 @@ BEGIN {
   extends 'Types::Standard';
 }
 
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 declare 'Data',
   as InstanceOf['Test::Auto::Data'];

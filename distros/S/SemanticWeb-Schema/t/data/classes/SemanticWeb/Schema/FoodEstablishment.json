@@ -12,8 +12,8 @@
          "rdfs:label" : "acceptsReservations",
          "schema:domainIncludes" : "schema:FoodEstablishment",
          "schema:rangeIncludes" : [
-            "schema:Boolean",
             "schema:Text",
+            "schema:Boolean",
             "schema:URL"
          ]
       },
@@ -24,8 +24,8 @@
          "schema:domainIncludes" : "schema:FoodEstablishment",
          "schema:rangeIncludes" : [
             "schema:URL",
-            "schema:Text",
-            "schema:Menu"
+            "schema:Menu",
+            "schema:Text"
          ]
       },
       "schema:menu" : {
@@ -34,9 +34,9 @@
          "rdfs:label" : "menu",
          "schema:domainIncludes" : "schema:FoodEstablishment",
          "schema:rangeIncludes" : [
-            "schema:URL",
+            "schema:Menu",
             "schema:Text",
-            "schema:Menu"
+            "schema:URL"
          ],
          "schema:supersededBy" : "schema:hasMenu"
       },

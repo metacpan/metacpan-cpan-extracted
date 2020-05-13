@@ -59,7 +59,8 @@ sub test_object { bless {}, $_[0]->test_class_name() }
 
 sub ok_message {
     my $self = shift;
-    my $test_class = shift // $self->test_class_name;
+    my $test_class = shift;
+    $test_class = $self->test_class_name unless defined $test_class;
     my $interface_name = $self->interface_name;
     return "ok 1 - $test_class->can_all_ok( '$interface_name' )"
 }

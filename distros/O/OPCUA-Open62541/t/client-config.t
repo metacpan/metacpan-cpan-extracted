@@ -19,7 +19,7 @@ throws_ok { OPCUA::Open62541::Client::getConfig() }
 no_leaks_ok { eval { OPCUA::Open62541::Client::getConfig() } }
     "config missing leak";
 throws_ok { OPCUA::Open62541::Client::getConfig(undef) }
-    (qr/client is not of type OPCUA::Open62541::Client /,
+    (qr/Self client is not a OPCUA::Open62541::Client /,
     "config undef");
 no_leaks_ok { eval { OPCUA::Open62541::Client::getConfig(undef) } }
     "config undef leak";

@@ -5,8 +5,8 @@
       "rdfs:comment" : "A patient is any person recipient of health care services.",
       "rdfs:label" : "Patient",
       "rdfs:subClassOf" : [
-         "schema:MedicalAudience",
-         "schema:Person"
+         "schema:Person",
+         "schema:MedicalAudience"
       ],
       "schema:isPartOf" : "http:health-lifesci.schema.org"
    },
@@ -28,9 +28,9 @@
          "rdfs:label" : "drug",
          "schema:domainIncludes" : [
             "schema:Patient",
-            "schema:DrugClass",
             "schema:TherapeuticProcedure",
-            "schema:MedicalCondition"
+            "schema:MedicalCondition",
+            "schema:DrugClass"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Drug"

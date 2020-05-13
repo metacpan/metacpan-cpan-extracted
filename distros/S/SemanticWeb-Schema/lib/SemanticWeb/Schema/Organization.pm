@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.4';
+our $VERSION = 'v8.0.0';
 
 
 has actionable_feedback_policy => (
@@ -386,6 +386,14 @@ has naics => (
 
 
 
+has nonprofit_status => (
+    is        => 'rw',
+    predicate => '_has_nonprofit_status',
+    json_ld   => 'nonprofitStatus',
+);
+
+
+
 has number_of_employees => (
     is        => 'rw',
     predicate => '_has_number_of_employees',
@@ -530,7 +538,7 @@ SemanticWeb::Schema::Organization - An organization such as a school
 
 =head1 VERSION
 
-version v7.0.4
+version v8.0.0
 
 =head1 DESCRIPTION
 
@@ -1427,6 +1435,25 @@ A naics should be one of the following types:
 =head2 C<_has_naics>
 
 A predicate for the L</naics> attribute.
+
+=head2 C<nonprofit_status>
+
+C<nonprofitStatus>
+
+nonprofit Status indicates the legal status of a non-profit organization in
+its primary place of business.
+
+A nonprofit_status should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::NonprofitType']>
+
+=back
+
+=head2 C<_has_nonprofit_status>
+
+A predicate for the L</nonprofit_status> attribute.
 
 =head2 C<number_of_employees>
 

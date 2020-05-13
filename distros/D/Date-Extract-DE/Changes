@@ -1,5 +1,8 @@
 Revision history for Date::Extract::DE
 
+v0.0.3  Wed Apr  29 15:30:00 2020
+        changed e-Mail
+
 v0.0.2  Wed Apr  29 12:30:00 2020
         'lookback_days' added
 

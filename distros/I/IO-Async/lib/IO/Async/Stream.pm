@@ -8,7 +8,7 @@ package IO::Async::Stream;
 use strict;
 use warnings;
 
-our $VERSION = '0.76';
+our $VERSION = '0.77';
 
 use base qw( IO::Async::Handle );
 
@@ -834,7 +834,7 @@ sub _flush_one_write
       return 0;
    }
 
-   $METRICS and $METRICS->inc_counter_by( stream_written => $len );
+   $METRICS and $METRICS->inc_counter_by( stream_written => $len ) if $len;
 
    if( my $on_write = $head->on_write ) {
       $on_write->( $self, $len );
@@ -1030,7 +1030,7 @@ sub _do_read
          IO::Async::Debug::log_hexdump( $data ) if $IO::Async::Debug::DEBUG_FLAGS{Sr};
       }
 
-      $METRICS and $METRICS->inc_counter_by( stream_read => $len );
+      $METRICS and $METRICS->inc_counter_by( stream_read => $len ) if $len;
 
       my $eof = $self->{read_eof} = ( $len == 0 );
 

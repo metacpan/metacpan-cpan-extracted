@@ -1,5 +1,10 @@
 Revision history for Net-Async-HTTP-Server
 
+0.13    2020-05-13
+        [CHANGES]
+         * Use Test::Metrics::Any for metrics testing
+         * Updated for Metrics::Any 0.05
+
 0.12    2020-04-29
         [CHANGES]
          * Improved metrics reporting using Metrics::Any 0.03

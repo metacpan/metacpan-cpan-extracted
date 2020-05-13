@@ -37,14 +37,15 @@ $br = $server->{server}->browse(
     },
 );
 
-is($br->{BrowseResult_statusCode}, STATUSCODE_GOOD, "browseresult object type found");
+is($br->{BrowseResult_statusCode}, STATUSCODE_GOOD,
+    "browseresult object type found");
 
 my $references = $br->{BrowseResult_references};
 is(ref($references), "ARRAY", "browseresult object type references");
 
 my ($objectref) = grep {
-    $_->{ReferenceDescription_nodeId}{ExpandedNodeId_nodeId}
-      ->{NodeId_identifier} eq $nodes{some_variable_0}{nodeId}{NodeId_identifier}
+    $_->{ReferenceDescription_nodeId}{ExpandedNodeId_nodeId}{NodeId_identifier}
+	eq $nodes{some_variable_0}{nodeId}{NodeId_identifier}
 } @$references;
 
 is(ref($objectref), "HASH", "object reference hash");
@@ -75,14 +76,15 @@ $br = $server->{server}->browse(
     },
 );
 
-is($br->{BrowseResult_statusCode}, STATUSCODE_GOOD, "browseresult object type found");
+is($br->{BrowseResult_statusCode}, STATUSCODE_GOOD,
+    "browseresult object type found");
 
 $references = $br->{BrowseResult_references};
 is(ref($references), "ARRAY", "browseresult object type references");
 
 ($objectref) = grep {
-    $_->{ReferenceDescription_nodeId}{ExpandedNodeId_nodeId}
-      ->{NodeId_identifier} eq $nodes{some_variable_0}{nodeId}{NodeId_identifier}
+    $_->{ReferenceDescription_nodeId}{ExpandedNodeId_nodeId}{NodeId_identifier}
+    eq $nodes{some_variable_0}{nodeId}{NodeId_identifier}
 } @$references;
 
 is(ref($objectref), "", "object reference hash");

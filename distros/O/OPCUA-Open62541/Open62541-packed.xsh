@@ -216,9 +216,9 @@ XS_unpack_UA_Argument(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.arrayDimensions = calloc(top + 1, sizeof(UA_UInt32));
+		out.arrayDimensions = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_UINT32]);
 		if (out.arrayDimensions == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -455,9 +455,9 @@ XS_unpack_UA_ApplicationDescription(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.discoveryUrls = calloc(top + 1, sizeof(UA_String));
+		out.discoveryUrls = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STRING]);
 		if (out.discoveryUrls == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -642,9 +642,9 @@ XS_unpack_UA_ResponseHeader(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.stringTable = calloc(top + 1, sizeof(UA_String));
+		out.stringTable = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STRING]);
 		if (out.stringTable == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -774,9 +774,9 @@ XS_unpack_UA_FindServersRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.localeIds = calloc(top + 1, sizeof(UA_String));
+		out.localeIds = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STRING]);
 		if (out.localeIds == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -794,9 +794,9 @@ XS_unpack_UA_FindServersRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.serverUris = calloc(top + 1, sizeof(UA_String));
+		out.serverUris = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STRING]);
 		if (out.serverUris == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -866,9 +866,9 @@ XS_unpack_UA_FindServersResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.servers = calloc(top + 1, sizeof(UA_ApplicationDescription));
+		out.servers = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_APPLICATIONDESCRIPTION]);
 		if (out.servers == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -954,9 +954,9 @@ XS_unpack_UA_ServerOnNetwork(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.serverCapabilities = calloc(top + 1, sizeof(UA_String));
+		out.serverCapabilities = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STRING]);
 		if (out.serverCapabilities == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -1042,9 +1042,9 @@ XS_unpack_UA_FindServersOnNetworkRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.serverCapabilityFilter = calloc(top + 1, sizeof(UA_String));
+		out.serverCapabilityFilter = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STRING]);
 		if (out.serverCapabilityFilter == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -1122,9 +1122,9 @@ XS_unpack_UA_FindServersOnNetworkResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.servers = calloc(top + 1, sizeof(UA_ServerOnNetwork));
+		out.servers = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_SERVERONNETWORK]);
 		if (out.servers == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -1339,9 +1339,9 @@ XS_unpack_UA_EndpointDescription(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.userIdentityTokens = calloc(top + 1, sizeof(UA_UserTokenPolicy));
+		out.userIdentityTokens = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_USERTOKENPOLICY]);
 		if (out.userIdentityTokens == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -1436,9 +1436,9 @@ XS_unpack_UA_GetEndpointsRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.localeIds = calloc(top + 1, sizeof(UA_String));
+		out.localeIds = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STRING]);
 		if (out.localeIds == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -1456,9 +1456,9 @@ XS_unpack_UA_GetEndpointsRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.profileUris = calloc(top + 1, sizeof(UA_String));
+		out.profileUris = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STRING]);
 		if (out.profileUris == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -1528,9 +1528,9 @@ XS_unpack_UA_GetEndpointsResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.endpoints = calloc(top + 1, sizeof(UA_EndpointDescription));
+		out.endpoints = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_ENDPOINTDESCRIPTION]);
 		if (out.endpoints == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -1633,9 +1633,9 @@ XS_unpack_UA_RegisteredServer(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.serverNames = calloc(top + 1, sizeof(UA_LocalizedText));
+		out.serverNames = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_LOCALIZEDTEXT]);
 		if (out.serverNames == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -1661,9 +1661,9 @@ XS_unpack_UA_RegisteredServer(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.discoveryUrls = calloc(top + 1, sizeof(UA_String));
+		out.discoveryUrls = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STRING]);
 		if (out.discoveryUrls == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -1844,9 +1844,9 @@ XS_unpack_UA_MdnsDiscoveryConfiguration(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.serverCapabilities = calloc(top + 1, sizeof(UA_String));
+		out.serverCapabilities = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STRING]);
 		if (out.serverCapabilities == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -1924,9 +1924,9 @@ XS_unpack_UA_RegisterServer2Request(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.discoveryConfiguration = calloc(top + 1, sizeof(UA_ExtensionObject));
+		out.discoveryConfiguration = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_EXTENSIONOBJECT]);
 		if (out.discoveryConfiguration == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -2005,9 +2005,9 @@ XS_unpack_UA_RegisterServer2Response(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.configurationResults = calloc(top + 1, sizeof(UA_StatusCode));
+		out.configurationResults = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STATUSCODE]);
 		if (out.configurationResults == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -2025,9 +2025,9 @@ XS_unpack_UA_RegisterServer2Response(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.diagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.diagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -2651,9 +2651,9 @@ XS_unpack_UA_CreateSessionResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.serverEndpoints = calloc(top + 1, sizeof(UA_EndpointDescription));
+		out.serverEndpoints = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_ENDPOINTDESCRIPTION]);
 		if (out.serverEndpoints == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -2671,9 +2671,9 @@ XS_unpack_UA_CreateSessionResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.serverSoftwareCertificates = calloc(top + 1, sizeof(UA_SignedSoftwareCertificate));
+		out.serverSoftwareCertificates = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_SIGNEDSOFTWARECERTIFICATE]);
 		if (out.serverSoftwareCertificates == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -3019,9 +3019,9 @@ XS_unpack_UA_ActivateSessionRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.clientSoftwareCertificates = calloc(top + 1, sizeof(UA_SignedSoftwareCertificate));
+		out.clientSoftwareCertificates = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_SIGNEDSOFTWARECERTIFICATE]);
 		if (out.clientSoftwareCertificates == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -3039,9 +3039,9 @@ XS_unpack_UA_ActivateSessionRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.localeIds = calloc(top + 1, sizeof(UA_String));
+		out.localeIds = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STRING]);
 		if (out.localeIds == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -3136,9 +3136,9 @@ XS_unpack_UA_ActivateSessionResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.results = calloc(top + 1, sizeof(UA_StatusCode));
+		out.results = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STATUSCODE]);
 		if (out.results == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -3156,9 +3156,9 @@ XS_unpack_UA_ActivateSessionResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.diagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.diagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -3553,9 +3553,9 @@ XS_unpack_UA_VariableAttributes(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.arrayDimensions = calloc(top + 1, sizeof(UA_UInt32));
+		out.arrayDimensions = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_UINT32]);
 		if (out.arrayDimensions == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -3867,9 +3867,9 @@ XS_unpack_UA_VariableTypeAttributes(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.arrayDimensions = calloc(top + 1, sizeof(UA_UInt32));
+		out.arrayDimensions = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_UINT32]);
 		if (out.arrayDimensions == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -4338,9 +4338,9 @@ XS_unpack_UA_AddNodesRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.nodesToAdd = calloc(top + 1, sizeof(UA_AddNodesItem));
+		out.nodesToAdd = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_ADDNODESITEM]);
 		if (out.nodesToAdd == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -4419,9 +4419,9 @@ XS_unpack_UA_AddNodesResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.results = calloc(top + 1, sizeof(UA_AddNodesResult));
+		out.results = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_ADDNODESRESULT]);
 		if (out.results == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -4439,9 +4439,9 @@ XS_unpack_UA_AddNodesResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.diagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.diagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -4590,9 +4590,9 @@ XS_unpack_UA_AddReferencesRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.referencesToAdd = calloc(top + 1, sizeof(UA_AddReferencesItem));
+		out.referencesToAdd = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_ADDREFERENCESITEM]);
 		if (out.referencesToAdd == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -4671,9 +4671,9 @@ XS_unpack_UA_AddReferencesResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.results = calloc(top + 1, sizeof(UA_StatusCode));
+		out.results = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STATUSCODE]);
 		if (out.results == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -4691,9 +4691,9 @@ XS_unpack_UA_AddReferencesResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.diagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.diagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -4810,9 +4810,9 @@ XS_unpack_UA_DeleteNodesRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.nodesToDelete = calloc(top + 1, sizeof(UA_DeleteNodesItem));
+		out.nodesToDelete = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DELETENODESITEM]);
 		if (out.nodesToDelete == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -4891,9 +4891,9 @@ XS_unpack_UA_DeleteNodesResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.results = calloc(top + 1, sizeof(UA_StatusCode));
+		out.results = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STATUSCODE]);
 		if (out.results == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -4911,9 +4911,9 @@ XS_unpack_UA_DeleteNodesResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.diagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.diagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -5054,9 +5054,9 @@ XS_unpack_UA_DeleteReferencesRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.referencesToDelete = calloc(top + 1, sizeof(UA_DeleteReferencesItem));
+		out.referencesToDelete = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DELETEREFERENCESITEM]);
 		if (out.referencesToDelete == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -5135,9 +5135,9 @@ XS_unpack_UA_DeleteReferencesResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.results = calloc(top + 1, sizeof(UA_StatusCode));
+		out.results = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STATUSCODE]);
 		if (out.results == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -5155,9 +5155,9 @@ XS_unpack_UA_DeleteReferencesResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.diagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.diagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -5490,9 +5490,9 @@ XS_unpack_UA_BrowseResult(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.references = calloc(top + 1, sizeof(UA_ReferenceDescription));
+		out.references = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_REFERENCEDESCRIPTION]);
 		if (out.references == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -5578,9 +5578,9 @@ XS_unpack_UA_BrowseRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.nodesToBrowse = calloc(top + 1, sizeof(UA_BrowseDescription));
+		out.nodesToBrowse = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_BROWSEDESCRIPTION]);
 		if (out.nodesToBrowse == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -5659,9 +5659,9 @@ XS_unpack_UA_BrowseResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.results = calloc(top + 1, sizeof(UA_BrowseResult));
+		out.results = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_BROWSERESULT]);
 		if (out.results == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -5679,9 +5679,9 @@ XS_unpack_UA_BrowseResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.diagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.diagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -5759,9 +5759,9 @@ XS_unpack_UA_BrowseNextRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.continuationPoints = calloc(top + 1, sizeof(UA_ByteString));
+		out.continuationPoints = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_BYTESTRING]);
 		if (out.continuationPoints == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -5840,9 +5840,9 @@ XS_unpack_UA_BrowseNextResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.results = calloc(top + 1, sizeof(UA_BrowseResult));
+		out.results = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_BROWSERESULT]);
 		if (out.results == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -5860,9 +5860,9 @@ XS_unpack_UA_BrowseNextResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.diagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.diagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -5987,9 +5987,9 @@ XS_unpack_UA_RelativePath(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.elements = calloc(top + 1, sizeof(UA_RelativePathElement));
+		out.elements = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_RELATIVEPATHELEMENT]);
 		if (out.elements == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -6153,9 +6153,9 @@ XS_unpack_UA_BrowsePathResult(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.targets = calloc(top + 1, sizeof(UA_BrowsePathTarget));
+		out.targets = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_BROWSEPATHTARGET]);
 		if (out.targets == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -6225,9 +6225,9 @@ XS_unpack_UA_TranslateBrowsePathsToNodeIdsRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.browsePaths = calloc(top + 1, sizeof(UA_BrowsePath));
+		out.browsePaths = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_BROWSEPATH]);
 		if (out.browsePaths == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -6306,9 +6306,9 @@ XS_unpack_UA_TranslateBrowsePathsToNodeIdsResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.results = calloc(top + 1, sizeof(UA_BrowsePathResult));
+		out.results = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_BROWSEPATHRESULT]);
 		if (out.results == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -6326,9 +6326,9 @@ XS_unpack_UA_TranslateBrowsePathsToNodeIdsResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.diagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.diagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -6398,9 +6398,9 @@ XS_unpack_UA_RegisterNodesRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.nodesToRegister = calloc(top + 1, sizeof(UA_NodeId));
+		out.nodesToRegister = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_NODEID]);
 		if (out.nodesToRegister == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -6470,9 +6470,9 @@ XS_unpack_UA_RegisterNodesResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.registeredNodeIds = calloc(top + 1, sizeof(UA_NodeId));
+		out.registeredNodeIds = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_NODEID]);
 		if (out.registeredNodeIds == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -6542,9 +6542,9 @@ XS_unpack_UA_UnregisterNodesRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.nodesToUnregister = calloc(top + 1, sizeof(UA_NodeId));
+		out.nodesToUnregister = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_NODEID]);
 		if (out.nodesToUnregister == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -6670,9 +6670,9 @@ XS_unpack_UA_ContentFilterElement(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.filterOperands = calloc(top + 1, sizeof(UA_ExtensionObject));
+		out.filterOperands = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_EXTENSIONOBJECT]);
 		if (out.filterOperands == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -6734,9 +6734,9 @@ XS_unpack_UA_ContentFilter(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.elements = calloc(top + 1, sizeof(UA_ContentFilterElement));
+		out.elements = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_CONTENTFILTERELEMENT]);
 		if (out.elements == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -6980,9 +6980,9 @@ XS_unpack_UA_SimpleAttributeOperand(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.browsePath = calloc(top + 1, sizeof(UA_QualifiedName));
+		out.browsePath = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_QUALIFIEDNAME]);
 		if (out.browsePath == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7069,9 +7069,9 @@ XS_unpack_UA_ContentFilterElementResult(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.operandStatusCodes = calloc(top + 1, sizeof(UA_StatusCode));
+		out.operandStatusCodes = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STATUSCODE]);
 		if (out.operandStatusCodes == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7089,9 +7089,9 @@ XS_unpack_UA_ContentFilterElementResult(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.operandDiagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.operandDiagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.operandDiagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7162,9 +7162,9 @@ XS_unpack_UA_ContentFilterResult(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.elementResults = calloc(top + 1, sizeof(UA_ContentFilterElementResult));
+		out.elementResults = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_CONTENTFILTERELEMENTRESULT]);
 		if (out.elementResults == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7182,9 +7182,9 @@ XS_unpack_UA_ContentFilterResult(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.elementDiagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.elementDiagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.elementDiagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7350,9 +7350,9 @@ XS_unpack_UA_ReadRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.nodesToRead = calloc(top + 1, sizeof(UA_ReadValueId));
+		out.nodesToRead = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_READVALUEID]);
 		if (out.nodesToRead == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7431,9 +7431,9 @@ XS_unpack_UA_ReadResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.results = calloc(top + 1, sizeof(UA_DataValue));
+		out.results = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DATAVALUE]);
 		if (out.results == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7451,9 +7451,9 @@ XS_unpack_UA_ReadResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.diagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.diagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7586,9 +7586,9 @@ XS_unpack_UA_WriteRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.nodesToWrite = calloc(top + 1, sizeof(UA_WriteValue));
+		out.nodesToWrite = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_WRITEVALUE]);
 		if (out.nodesToWrite == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7667,9 +7667,9 @@ XS_unpack_UA_WriteResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.results = calloc(top + 1, sizeof(UA_StatusCode));
+		out.results = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STATUSCODE]);
 		if (out.results == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7687,9 +7687,9 @@ XS_unpack_UA_WriteResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.diagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.diagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7767,9 +7767,9 @@ XS_unpack_UA_CallMethodRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.inputArguments = calloc(top + 1, sizeof(UA_Variant));
+		out.inputArguments = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_VARIANT]);
 		if (out.inputArguments == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7857,9 +7857,9 @@ XS_unpack_UA_CallMethodResult(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.inputArgumentResults = calloc(top + 1, sizeof(UA_StatusCode));
+		out.inputArgumentResults = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STATUSCODE]);
 		if (out.inputArgumentResults == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7877,9 +7877,9 @@ XS_unpack_UA_CallMethodResult(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.inputArgumentDiagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.inputArgumentDiagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.inputArgumentDiagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7897,9 +7897,9 @@ XS_unpack_UA_CallMethodResult(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.outputArguments = calloc(top + 1, sizeof(UA_Variant));
+		out.outputArguments = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_VARIANT]);
 		if (out.outputArguments == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7969,9 +7969,9 @@ XS_unpack_UA_CallRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.methodsToCall = calloc(top + 1, sizeof(UA_CallMethodRequest));
+		out.methodsToCall = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_CALLMETHODREQUEST]);
 		if (out.methodsToCall == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -8050,9 +8050,9 @@ XS_unpack_UA_CallResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.results = calloc(top + 1, sizeof(UA_CallMethodResult));
+		out.results = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_CALLMETHODRESULT]);
 		if (out.results == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -8070,9 +8070,9 @@ XS_unpack_UA_CallResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.diagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.diagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -8244,9 +8244,9 @@ XS_unpack_UA_EventFilter(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.selectClauses = calloc(top + 1, sizeof(UA_SimpleAttributeOperand));
+		out.selectClauses = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_SIMPLEATTRIBUTEOPERAND]);
 		if (out.selectClauses == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -8459,9 +8459,9 @@ XS_unpack_UA_EventFilterResult(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.selectClauseResults = calloc(top + 1, sizeof(UA_StatusCode));
+		out.selectClauseResults = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STATUSCODE]);
 		if (out.selectClauseResults == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -8479,9 +8479,9 @@ XS_unpack_UA_EventFilterResult(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.selectClauseDiagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.selectClauseDiagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.selectClauseDiagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -8768,9 +8768,9 @@ XS_unpack_UA_CreateMonitoredItemsRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.itemsToCreate = calloc(top + 1, sizeof(UA_MonitoredItemCreateRequest));
+		out.itemsToCreate = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_MONITOREDITEMCREATEREQUEST]);
 		if (out.itemsToCreate == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -8849,9 +8849,9 @@ XS_unpack_UA_CreateMonitoredItemsResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.results = calloc(top + 1, sizeof(UA_MonitoredItemCreateResult));
+		out.results = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_MONITOREDITEMCREATERESULT]);
 		if (out.results == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -8869,9 +8869,9 @@ XS_unpack_UA_CreateMonitoredItemsResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.diagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.diagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9067,9 +9067,9 @@ XS_unpack_UA_ModifyMonitoredItemsRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.itemsToModify = calloc(top + 1, sizeof(UA_MonitoredItemModifyRequest));
+		out.itemsToModify = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_MONITOREDITEMMODIFYREQUEST]);
 		if (out.itemsToModify == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9148,9 +9148,9 @@ XS_unpack_UA_ModifyMonitoredItemsResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.results = calloc(top + 1, sizeof(UA_MonitoredItemModifyResult));
+		out.results = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_MONITOREDITEMMODIFYRESULT]);
 		if (out.results == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9168,9 +9168,9 @@ XS_unpack_UA_ModifyMonitoredItemsResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.diagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.diagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9256,9 +9256,9 @@ XS_unpack_UA_SetMonitoringModeRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.monitoredItemIds = calloc(top + 1, sizeof(UA_UInt32));
+		out.monitoredItemIds = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_UINT32]);
 		if (out.monitoredItemIds == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9337,9 +9337,9 @@ XS_unpack_UA_SetMonitoringModeResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.results = calloc(top + 1, sizeof(UA_StatusCode));
+		out.results = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STATUSCODE]);
 		if (out.results == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9357,9 +9357,9 @@ XS_unpack_UA_SetMonitoringModeResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.diagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.diagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9454,9 +9454,9 @@ XS_unpack_UA_SetTriggeringRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.linksToAdd = calloc(top + 1, sizeof(UA_UInt32));
+		out.linksToAdd = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_UINT32]);
 		if (out.linksToAdd == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9474,9 +9474,9 @@ XS_unpack_UA_SetTriggeringRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.linksToRemove = calloc(top + 1, sizeof(UA_UInt32));
+		out.linksToRemove = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_UINT32]);
 		if (out.linksToRemove == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9573,9 +9573,9 @@ XS_unpack_UA_SetTriggeringResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.addResults = calloc(top + 1, sizeof(UA_StatusCode));
+		out.addResults = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STATUSCODE]);
 		if (out.addResults == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9593,9 +9593,9 @@ XS_unpack_UA_SetTriggeringResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.addDiagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.addDiagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.addDiagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9613,9 +9613,9 @@ XS_unpack_UA_SetTriggeringResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.removeResults = calloc(top + 1, sizeof(UA_StatusCode));
+		out.removeResults = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STATUSCODE]);
 		if (out.removeResults == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9633,9 +9633,9 @@ XS_unpack_UA_SetTriggeringResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.removeDiagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.removeDiagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.removeDiagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9713,9 +9713,9 @@ XS_unpack_UA_DeleteMonitoredItemsRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.monitoredItemIds = calloc(top + 1, sizeof(UA_UInt32));
+		out.monitoredItemIds = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_UINT32]);
 		if (out.monitoredItemIds == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9794,9 +9794,9 @@ XS_unpack_UA_DeleteMonitoredItemsResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.results = calloc(top + 1, sizeof(UA_StatusCode));
+		out.results = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STATUSCODE]);
 		if (out.results == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9814,9 +9814,9 @@ XS_unpack_UA_DeleteMonitoredItemsResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.diagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.diagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -10202,9 +10202,9 @@ XS_unpack_UA_SetPublishingModeRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.subscriptionIds = calloc(top + 1, sizeof(UA_UInt32));
+		out.subscriptionIds = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_UINT32]);
 		if (out.subscriptionIds == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -10283,9 +10283,9 @@ XS_unpack_UA_SetPublishingModeResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.results = calloc(top + 1, sizeof(UA_StatusCode));
+		out.results = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STATUSCODE]);
 		if (out.results == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -10303,9 +10303,9 @@ XS_unpack_UA_SetPublishingModeResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.diagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.diagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -10383,9 +10383,9 @@ XS_unpack_UA_NotificationMessage(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.notificationData = calloc(top + 1, sizeof(UA_ExtensionObject));
+		out.notificationData = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_EXTENSIONOBJECT]);
 		if (out.notificationData == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -10502,9 +10502,9 @@ XS_unpack_UA_EventFieldList(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.eventFields = calloc(top + 1, sizeof(UA_Variant));
+		out.eventFields = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_VARIANT]);
 		if (out.eventFields == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -10668,9 +10668,9 @@ XS_unpack_UA_PublishRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.subscriptionAcknowledgements = calloc(top + 1, sizeof(UA_SubscriptionAcknowledgement));
+		out.subscriptionAcknowledgements = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_SUBSCRIPTIONACKNOWLEDGEMENT]);
 		if (out.subscriptionAcknowledgements == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -10774,9 +10774,9 @@ XS_unpack_UA_PublishResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.availableSequenceNumbers = calloc(top + 1, sizeof(UA_UInt32));
+		out.availableSequenceNumbers = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_UINT32]);
 		if (out.availableSequenceNumbers == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -10802,9 +10802,9 @@ XS_unpack_UA_PublishResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.results = calloc(top + 1, sizeof(UA_StatusCode));
+		out.results = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STATUSCODE]);
 		if (out.results == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -10822,9 +10822,9 @@ XS_unpack_UA_PublishResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.diagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.diagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -10996,9 +10996,9 @@ XS_unpack_UA_DeleteSubscriptionsRequest(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.subscriptionIds = calloc(top + 1, sizeof(UA_UInt32));
+		out.subscriptionIds = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_UINT32]);
 		if (out.subscriptionIds == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -11077,9 +11077,9 @@ XS_unpack_UA_DeleteSubscriptionsResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.results = calloc(top + 1, sizeof(UA_StatusCode));
+		out.results = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_STATUSCODE]);
 		if (out.results == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -11097,9 +11097,9 @@ XS_unpack_UA_DeleteSubscriptionsResponse(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.diagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.diagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -11536,9 +11536,9 @@ XS_unpack_UA_DataChangeNotification(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.monitoredItems = calloc(top + 1, sizeof(UA_MonitoredItemNotification));
+		out.monitoredItems = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_MONITOREDITEMNOTIFICATION]);
 		if (out.monitoredItems == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -11556,9 +11556,9 @@ XS_unpack_UA_DataChangeNotification(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
+		out.diagnosticInfos = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
 		if (out.diagnosticInfos == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -11620,9 +11620,9 @@ XS_unpack_UA_EventNotificationList(SV *in)
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
-		out.events = calloc(top + 1, sizeof(UA_EventFieldList));
+		out.events = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_EVENTFIELDLIST]);
 		if (out.events == NULL) {
-			CROAKE("calloc");
+			CROAKE("UA_Array_new");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);

@@ -3,7 +3,7 @@ use warnings;
 use OPCUA::Open62541 ':all';
 
 use OPCUA::Open62541::Test::Server;
-use Test::More tests => OPCUA::Open62541::Test::Server::planning_nofork() + 11;
+use Test::More tests => OPCUA::Open62541::Test::Server::planning_nofork() + 12;
 use Test::Exception;
 use Test::LeakTrace;
 use Test::NoWarnings;
@@ -70,20 +70,22 @@ my $outNewNodeId;
 is($server->{server}->addVariableNode(\%requestedNewNodeId, \%parentNodeId,
     \%referenceTypeId, \%browseName, \%typeDefinition, \%attr, 0,
     \$outNewNodeId), STATUSCODE_GOOD, "add variable out");
-is(ref($outNewNodeId), 'OPCUA::Open62541::NodeId', "class out node");
+is(ref($outNewNodeId), 'HASH', "class out node");
+note explain $outNewNodeId;
+is_deeply($outNewNodeId, \%requestedNewNodeId, "new out node");
+undef $outNewNodeId;
 no_leaks_ok {
     $server->{server}->addVariableNode(\%requestedNewNodeId, \%parentNodeId,
 	\%referenceTypeId, \%browseName, \%typeDefinition, \%attr, 0,
 	\$outNewNodeId);
 } "out node leak";
-undef $outNewNodeId;
 
 my %outNewNodeId;
 throws_ok {
     $server->{server}->addVariableNode(\%requestedNewNodeId, \%parentNodeId,
 	\%referenceTypeId, \%browseName, \%typeDefinition, \%attr, 0,
 	\%outNewNodeId);
-} (qr/outNewNodeId is not a scalar reference/, "empty out node");
+} (qr/outoptNewNodeId is not a scalar reference/, "empty out node");
 no_leaks_ok { eval {
     $server->{server}->addVariableNode(\%requestedNewNodeId, \%parentNodeId,
 	\%referenceTypeId, \%browseName, \%typeDefinition, \%attr, 0,

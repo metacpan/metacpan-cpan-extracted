@@ -97,7 +97,8 @@ SKIP: {
 }
 
 # Metrics
-{
+SKIP: {
+   skip "Metrics are unavailable" unless $IO::Async::Metrics::METRICS;
    is_metrics_from(
       sub { $loop->fork( code => sub {}, on_exit => sub {} ) },
       { io_async_forks => 1 },

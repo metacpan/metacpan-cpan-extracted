@@ -1,0 +1,58 @@
+---
+abstract: 'Role-based access with context'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires:
+  Pod::Coverage::TrustPod: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-ContextAuth
+provides:
+  Mojolicious::Plugin::ContextAuth:
+    file: lib/Mojolicious/Plugin/ContextAuth.pm
+    version: '0.01'
+  Mojolicious::Plugin::ContextAuth::Auth:
+    file: lib/Mojolicious/Plugin/ContextAuth/Auth.pm
+    version: '0.01'
+  Mojolicious::Plugin::ContextAuth::DB:
+    file: lib/Mojolicious/Plugin/ContextAuth/DB.pm
+    version: '0.01'
+  Mojolicious::Plugin::ContextAuth::DB::Context:
+    file: lib/Mojolicious/Plugin/ContextAuth/DB/Context.pm
+    version: '0.01'
+  Mojolicious::Plugin::ContextAuth::DB::Permission:
+    file: lib/Mojolicious/Plugin/ContextAuth/DB/Permission.pm
+    version: '0.01'
+  Mojolicious::Plugin::ContextAuth::DB::Resource:
+    file: lib/Mojolicious/Plugin/ContextAuth/DB/Resource.pm
+    version: '0.01'
+  Mojolicious::Plugin::ContextAuth::DB::Role:
+    file: lib/Mojolicious/Plugin/ContextAuth/DB/Role.pm
+    version: '0.01'
+  Mojolicious::Plugin::ContextAuth::DB::User:
+    file: lib/Mojolicious/Plugin/ContextAuth/DB/User.pm
+    version: '0.01'
+requires:
+  Crypt::Eksblowfish::Bcrypt: '0'
+  Crypt::URandom: '0'
+  Data::UUID: '0'
+  List::Util: '0'
+  Mojo::SQLite: '0'
+  Mojolicious: '8'
+  Session::Token: '0'
+  Try::Tiny: '0'
+  perl: '5.020'
+resources:
+  bugtracker: https://gitlab.com/reneeb/Mojolicious-Plugin-ContextAuth/issues
+  homepage: https://gitlab.com/reneeb/Mojolicious-Plugin-ContextAuth
+  repository: https://gitlab.com/reneeb/Mojolicious-Plugin-ContextAuth.git
+version: '0.01'
+x_contributors:
+  - 'reneeb <info@perl-services.de>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

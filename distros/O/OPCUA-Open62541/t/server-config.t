@@ -19,7 +19,7 @@ throws_ok { OPCUA::Open62541::Server::getConfig() }
 no_leaks_ok { eval { OPCUA::Open62541::Server::getConfig() } }
     "server missing leak";
 throws_ok { OPCUA::Open62541::Server::getConfig(undef) }
-    (qr/server is not of type OPCUA::Open62541::Server /, "server undef");
+    (qr/Self server is not a OPCUA::Open62541::Server /, "server undef");
 no_leaks_ok { eval { OPCUA::Open62541::Server::getConfig(undef) } }
     "server undef leak";
 
@@ -51,13 +51,13 @@ no_leaks_ok {
 } "class undef leak";
 
 throws_ok { OPCUA::Open62541::Server->newWithConfig(undef) }
-    (qr/config is not of type OPCUA::Open62541::ServerConfig /,
+    (qr/Parameter config is undefined /,
     "config undef");
 no_leaks_ok { eval { OPCUA::Open62541::Server->newWithConfig(undef) } }
     "config undef leak";
 
 throws_ok { OPCUA::Open62541::Server->newWithConfig($server) }
-    (qr/config is not of type OPCUA::Open62541::ServerConfig /,
+    (qr/Parameter config is not a OPCUA::Open62541::ServerConfig /,
     "config type");
 no_leaks_ok { eval { OPCUA::Open62541::Server->newWithConfig($server) } }
     "config type leak";

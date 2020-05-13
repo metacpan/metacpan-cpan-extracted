@@ -4,7 +4,7 @@ Dancer2::Plugin::Deferred - Defer messages or data across redirections
 
 # VERSION
 
-version 0.007018
+version 0.008000
 
 # SYNOPSIS
 
@@ -99,7 +99,7 @@ what it does and putting up with my dumb ideas along the way.
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018, 2016 by David Golden.
+This software is Copyright (c) 2020, 2018, 2016 by David Golden.
 
 This is free software, licensed under:
 

@@ -24,14 +24,14 @@ chmod 644 Changes
 
 %build
 %{__perl} Makefile.PL INSTALLDIRS=vendor
-%make
+%make_build
 
 %check
 %{__make} test
 
 %install
 rm -rf %{buildroot}
-%makeinstall_std
+%make_install
 
 %clean
 rm -rf %{buildroot}

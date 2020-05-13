@@ -13,8 +13,8 @@
          "rdfs:label" : "endTime",
          "schema:category" : "issue-2493",
          "schema:domainIncludes" : [
-            "schema:FoodEstablishmentReservation",
             "schema:MediaObject",
+            "schema:FoodEstablishmentReservation",
             "schema:Action",
             "schema:Schedule"
          ],
@@ -32,8 +32,8 @@
             "schema:TaxiReservation"
          ],
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Integer"
+            "schema:Integer",
+            "schema:QuantitativeValue"
          ]
       },
       "schema:startTime" : {
@@ -44,9 +44,9 @@
          "schema:category" : "issue-2493",
          "schema:domainIncludes" : [
             "schema:Schedule",
-            "schema:FoodEstablishmentReservation",
+            "schema:Action",
             "schema:MediaObject",
-            "schema:Action"
+            "schema:FoodEstablishmentReservation"
          ],
          "schema:rangeIncludes" : [
             "schema:Time",

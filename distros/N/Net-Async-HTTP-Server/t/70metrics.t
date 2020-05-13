@@ -4,13 +4,12 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Metrics::Any;
 
 use IO::Async::Loop;
 use IO::Async::Test;
 
 use Net::Async::HTTP::Server;
-
-use Metrics::Any::Adapter 'Test';
 
 my $CRLF = "\x0d\x0a";
 
@@ -52,22 +51,13 @@ sub connect_client
 
    my $buffer = "";
    wait_for_stream { $buffer =~ m/$CRLF$CRLF/ } $client => $buffer;
+
+   is_metrics( {
+      "http_server_requests_in_flight"  => 0,
+      "http_server_requests method:GET" => 1,
+      "http_server_responses method:GET code:200" => 1,
+      "http_server_response_bytes_total" => Test::Metrics::Any::positive,
+   }, 'Metrics are created for a request/response cycle' );
 }
-
-like( Metrics::Any::Adapter::Test->metrics,
-   qr/^http_server_requests_in_flight = 0/m,
-   'Metrics::Any test adapter contains requests in flight gauge' );
-
-like( Metrics::Any::Adapter::Test->metrics,
-   qr/^http_server_requests method:GET = 1/m,
-   'Metrics::Any test adapter contains request counter' );
-
-like( Metrics::Any::Adapter::Test->metrics,
-   qr/^http_server_responses method:GET code:200 = 1/m,
-   'Metrics::Any test adapter contains responses counter' );
-
-like( Metrics::Any::Adapter::Test->metrics,
-   qr/^http_server_response_bytes_total = ([1-9]\d+)/m,
-   'Metrics::Any test adapter contains non-zero response bytes' );
 
 done_testing;

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: test.t 2290 2011-01-22 11:47:31Z guillomovitch $
+# $Id$
 
 use strict;
 use DateTime;
@@ -30,6 +30,7 @@ $wrapper_class->add_macro("packager $packager");
 
 # ensure changelog is not truncated
 $wrapper_class->add_macro("_changelog_truncate 0");
+$wrapper_class->add_macro("_changelog_trimtime 0");
 
 my $updater = Youri::Package::RPM::Updater->new();
 isa_ok($updater, 'Youri::Package::RPM::Updater');

@@ -1,8 +1,8 @@
 {
    "class" : {
       "dc:source" : [
-         "https://github.com/schemaorg/schemaorg/issues/1253",
-         "schemadotorgsources:FIBO"
+         "schemadotorgsources:FIBO",
+         "https://github.com/schemaorg/schemaorg/issues/1253"
       ],
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "The act of transferring money from one place to another place. This may occur electronically or physically.",
@@ -14,32 +14,32 @@
    "properties" : {
       "schema:amount" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1698",
-            "https://github.com/schemaorg/schemaorg/issues/1253"
+            "https://github.com/schemaorg/schemaorg/issues/1253",
+            "https://github.com/schemaorg/schemaorg/issues/1698"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The amount of money.",
          "rdfs:label" : "amount",
          "schema:category" : [
-            "issue-1698",
-            "issue-1253"
+            "issue-1253",
+            "issue-1698"
          ],
          "schema:domainIncludes" : [
             "schema:MoneyTransfer",
-            "schema:MonetaryGrant",
-            "schema:InvestmentOrDeposit",
             "schema:DatedMoneySpecification",
-            "schema:LoanOrCredit"
+            "schema:MonetaryGrant",
+            "schema:LoanOrCredit",
+            "schema:InvestmentOrDeposit"
          ],
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:MonetaryAmount"
+            "schema:MonetaryAmount",
+            "schema:Number"
          ]
       },
       "schema:beneficiaryBank" : {
          "dc:source" : [
-            "schemadotorgsources:FIBO",
-            "https://github.com/schemaorg/schemaorg/issues/1253"
+            "https://github.com/schemaorg/schemaorg/issues/1253",
+            "schemadotorgsources:FIBO"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A bank or bankâs branch, financial institution or international financial institution operating the beneficiaryâs bank account or releasing funds for the beneficiary",
@@ -48,8 +48,8 @@
          "schema:domainIncludes" : "schema:MoneyTransfer",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:BankOrCreditUnion",
-            "schema:Text"
+            "schema:Text",
+            "schema:BankOrCreditUnion"
          ]
       }
    }

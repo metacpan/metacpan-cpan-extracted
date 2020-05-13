@@ -619,7 +619,8 @@ my @sub_lines;
 }
 
 # Metrics
-{
+SKIP: {
+   skip "Metrics are unavailable" unless $IO::Async::Metrics::METRICS;
    my ( $rd, $wr ) = mkhandles;
 
    my $done;

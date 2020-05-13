@@ -1,58 +1,68 @@
 Revision history for Dancer2-Plugin-Deferred
 
-0.007018 2018-10-27
-  - fix syntax error in SYNOPSIS. (GH#11, Julien Fiegehenn)
+0.008000 2020-05-12
+ [BUG FIXES]
+ - Fix test breakage that appeared with Dancer2 v0.3.3 (GH#12)
 
-  [ STATISTICS ]
-    - code churn: 2 files changed, 10 insertions(+), 4 deletions(-)
+ [ENHANCEMENTS]
+ - Move tests to Test2::V0.
+
+ [STATISTICS]
+ - code churn: 11 files changed, 190 insertions(+), 112 deletions(-)
+
+0.007018 2018-10-27
+ - fix syntax error in SYNOPSIS. (GH#11, Julien Fiegehenn)
+
+ [STATISTICS]
+ - code churn: 2 files changed, 10 insertions(+), 4 deletions(-)
 
 0.007017 2016-07-11
-  - Update the plugin to be compatible with new Plugin2 system. (GH#9,
-    syspete)
+ - Update the plugin to be compatible with new Plugin2 system. (GH#9,
+   syspete)
 
-  [ STATISTICS ]
-    - code churn: 5 files changed, 94 insertions(+), 222 deletions(-)
+ [STATISTICS]
+ - code churn: 5 files changed, 94 insertions(+), 222 deletions(-)
 
 0.007016 2016-01-03
-  - Use 'Test::Plack' instead of 'Test::TCP' in tests. (GH#7, xsawyerx)  
-  - make plugin compatible with the upcoming backward-compatible layer.
-    (GH#8, xsawyerx)
+ - Use 'Test::Plack' instead of 'Test::TCP' in tests. (GH#7, xsawyerx)
+ - make plugin compatible with the upcoming backward-compatible layer.
+   (GH#8, xsawyerx)
 
-  [ STATISTICS ]
-    - code churn: 4 files changed, 133 insertions(+), 101 deletions(-)
+ [STATISTICS]
+ - code churn: 4 files changed, 133 insertions(+), 101 deletions(-)
 
 0.007015 2014-07-20T16:02:39Z America/New_York
-  [ CHANGED ]
-    - Removed context calls for all versions starting with version 0.150000
-      of Dancer2.
-    - Keeping the backward compatible version with all the lower versions. 
+ [CHANGED]
+ - Removed context calls for all versions starting with version 0.150000 of
+   Dancer2.
+ - Keeping the backward compatible version with all the lower versions.
 
 0.007001 2014-07-20T16:02:39Z America/New_York
-  [ CHANGED ]
-    - Updated internal workarounds to use new features in Dancer2. Removed
-      the Dancer2 version prereq.
-    - Dancer2::Plugin now used without dsl. Updated tests to work on both
-      newer and also on older versions of Dancer2.
+ [CHANGED]
+ - Updated internal workarounds to use new features in Dancer2. Removed the
+   Dancer2 version prereq.
+ - Dancer2::Plugin now used without dsl. Updated tests to work on both
+   newer and also on older versions of Dancer2.
 
 0.005 2013-07-20T16:02:39Z America/New_York
-  [ CHANGED ]
-    - Updated internal workarounds to use new features in Dancer2. Bumped
-      Dancer2 prereq to 0.05.
+ [CHANGED]
+ - Updated internal workarounds to use new features in Dancer2. Bumped
+   Dancer2 prereq to 0.05.
 
 0.004 2013-03-06T20:48:23Z America/New_York
-  [ CHANGED ]
-    - Forked into Dancer2::Plugin::Deferred for proper Dancer2 support
-    - Previous history applies to Dancer::Plugin::Deferred *****
+ [CHANGED]
+ - Forked into Dancer2::Plugin::Deferred for proper Dancer2 support
+ - Previous history applies to Dancer::Plugin::Deferred *****
 
 0.003 2012-12-26T11:31:06Z America/New_York
-  [ FIXED ]
-    - Tests fixed for changes in Dancer 2 alpha
+ [FIXED]
+ - Tests fixed for changes in Dancer 2 alpha
 
 0.002 2012-12-20T12:31:41Z America/New_York
-  [ ADDED ]
-    - Added abillity to preserve the message and attach message parameters
-      manually to an arbitrary URI.
+ [ADDED]
+ - Added abillity to preserve the message and attach message parameters
+   manually to an arbitrary URI.
 
 0.001 2012-12-19T21:56:38Z America/New_York
-  - First release
-  - vim: ts=2 sts=2 sw=2 et:
+ - First release
+ - vim: ts=2 sts=2 sw=2 et:

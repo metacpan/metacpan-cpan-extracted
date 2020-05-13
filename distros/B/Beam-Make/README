@@ -1,0 +1,89 @@
+Beam::Make
+
+"Beam::Make" allows an author to describe how to build some thing (a
+file, some data in a database, an image, a container, etc...) and the
+relationships between things. This is similar to the classic "make"
+program used to build some software packages.
+
+Each thing is a "recipe" and can depend on other recipes. A user runs
+the "beam make" command to build the recipes they want, and "Beam::Make"
+ensures that the recipe's dependencies are satisfied before building the
+recipe.
+
+This class is a Beam::Runnable object and can be embedded in other
+Beam::Wire containers.
+
+  Recipe Classes
+
+Unlike "make", "Beam::Make" recipes can do more than just execute a
+series of shell scripts. Each recipe is a Perl class that describes how
+to build the desired thing and how to determine if that thing needs to
+be rebuilt.
+
+These recipe classes come with "Beam::Make":
+
+*   File - The default recipe class that creates a file using one or
+    more shell commands (a la "make")
+
+*   DBI - Write data to a database
+
+*   DBI::Schema - Create a database schema
+
+*   DBI::CSV - Load data from a CSV into a database table
+
+Future recipe class ideas are:
+
+*   Template rendering: Files could be generated from a configuration
+    file or database and a template.
+
+*   Docker image, container, compose: A Docker container could depend on
+    a Docker image. When the image is updated, the container would get
+    rebuilt and restarted. The Docker image could depend on a directory
+    and get rebuilt if the directory or its Dockerfile changes.
+
+*   System services (init daemon, systemd service, etc...): Services
+    could depend on their configuration files (built with a template)
+    and be restarted when their configuration file is updated.
+
+  Beamfile
+
+The "Beamfile" defines the recipes. To avoid the pitfalls of "Makefile",
+this is a YAML file containing a mapping of recipe names to recipe
+configuration. Each recipe configuration is a mapping containing the
+attributes for the recipe class. The $class special configuration key
+declares the recipe class to use. If no $class is specified, the default
+Beam::Wire::File recipe class is used. All recipe classes inherit from
+Beam::Class::Recipe and have the name and requires attributes.
+
+For examples, see the Beam::Wire examples directory on Github
+<https://github.com/preaction/Beam-Make/tree/master/eg>.
+
+  Object Containers
+
+For additional configuration, create a Beam::Wire container and
+reference the objects inside using "$ref: "<container>:<service>"" as
+the value for a recipe attribute.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

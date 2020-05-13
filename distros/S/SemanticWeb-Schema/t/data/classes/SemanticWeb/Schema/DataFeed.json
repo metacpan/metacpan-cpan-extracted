@@ -12,9 +12,9 @@
          "rdfs:label" : "dataFeedElement",
          "schema:domainIncludes" : "schema:DataFeed",
          "schema:rangeIncludes" : [
-            "schema:Text",
+            "schema:Thing",
             "schema:DataFeedItem",
-            "schema:Thing"
+            "schema:Text"
          ]
       }
    }

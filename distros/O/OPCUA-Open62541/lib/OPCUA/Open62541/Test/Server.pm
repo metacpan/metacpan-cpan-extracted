@@ -3,7 +3,7 @@ use warnings;
 
 package OPCUA::Open62541::Test::Server;
 use OPCUA::Open62541::Test::Logger;
-use OPCUA::Open62541 qw(:NODEIDTYPE :STATUSCODE :TYPES);
+use OPCUA::Open62541 qw(:ACCESSLEVELMASK :NODEIDTYPE :STATUSCODE :TYPES);
 use Carp 'croak';
 use Errno 'EINTR';
 use Net::EmptyPort qw(empty_port);
@@ -69,6 +69,7 @@ sub start {
 
 sub setup_complex_objects {
     my OPCUA::Open62541::Test::Server $self = shift;
+    my $namespace = shift // 1;
     my $server = $self->{server};
 
     # SOME_OBJECT_0
@@ -88,121 +89,127 @@ sub setup_complex_objects {
     my %nodes;
     $nodes{some_variable_type} = {
 	nodeId => {
-	    NodeId_namespaceIndex => 1,
-	    NodeId_identifierType => NODEIDTYPE_STRING,
-	    NodeId_identifier     => "SOME_VARIABLE_TYPE",
+	    NodeId_namespaceIndex	=> $namespace,
+	    NodeId_identifierType	=> NODEIDTYPE_STRING,
+	    NodeId_identifier		=> "SOME_VARIABLE_TYPE",
 	},
 	parentNodeId => {
-	    NodeId_namespaceIndex => 0,
-	    NodeId_identifierType => NODEIDTYPE_NUMERIC,
-	    NodeId_identifier     => OPCUA::Open62541::NS0ID_BASEDATAVARIABLETYPE,
+	    NodeId_namespaceIndex	=> 0,
+	    NodeId_identifierType	=> NODEIDTYPE_NUMERIC,
+	    NodeId_identifier		=>
+		OPCUA::Open62541::NS0ID_BASEDATAVARIABLETYPE,
 	},
 	referenceTypeId => {
-	    NodeId_namespaceIndex => 0,
-	    NodeId_identifierType => NODEIDTYPE_NUMERIC,
-	    NodeId_identifier     => OPCUA::Open62541::NS0ID_HASSUBTYPE,
+	    NodeId_namespaceIndex	=> 0,
+	    NodeId_identifierType	=> NODEIDTYPE_NUMERIC,
+	    NodeId_identifier		=> OPCUA::Open62541::NS0ID_HASSUBTYPE,
 	},
 	browseName => {
-	    QualifiedName_namespaceIndex => 1,
-	    QualifiedName_name           => "SVT",
+	    QualifiedName_namespaceIndex	=> $namespace,
+	    QualifiedName_name			=> "SVT",
 	},
 	typeDefinition => {
-	    NodeId_namespaceIndex => 0,
-	    NodeId_identifierType => NODEIDTYPE_NUMERIC,
-	    NodeId_identifier     => 0,
+	    NodeId_namespaceIndex	=> 0,
+	    NodeId_identifierType	=> NODEIDTYPE_NUMERIC,
+	    NodeId_identifier		=> 0,
 	},
 	attributes => {
-	    VariableTypeAttributes_dataType => TYPES_INT32,
+	    VariableTypeAttributes_dataType	=> TYPES_INT32,
 	    VariableTypeAttributes_displayName => {
-		LocalizedText_text => 'Some Variable Type'
+		LocalizedText_text	=> 'Some Variable Type'
 	    },
 	},
     };
     $nodes{some_object_type} = {
 	nodeId => {
-	    NodeId_namespaceIndex => 1,
-	    NodeId_identifierType => NODEIDTYPE_STRING,
-	    NodeId_identifier     => "SOME_OBJECT_TYPE",
+	    NodeId_namespaceIndex	=> $namespace,
+	    NodeId_identifierType	=> NODEIDTYPE_STRING,
+	    NodeId_identifier		=> "SOME_OBJECT_TYPE",
 	},
 	parentNodeId => {
-	    NodeId_namespaceIndex => 0,
-	    NodeId_identifierType => NODEIDTYPE_NUMERIC,
-	    NodeId_identifier     => OPCUA::Open62541::NS0ID_BASEOBJECTTYPE,
+	    NodeId_namespaceIndex	=> 0,
+	    NodeId_identifierType	=> NODEIDTYPE_NUMERIC,
+	    NodeId_identifier		=>
+		OPCUA::Open62541::NS0ID_BASEOBJECTTYPE,
 	},
 	referenceTypeId => {
-	    NodeId_namespaceIndex => 0,
-	    NodeId_identifierType => NODEIDTYPE_NUMERIC,
-	    NodeId_identifier     => OPCUA::Open62541::NS0ID_HASSUBTYPE,
+	    NodeId_namespaceIndex	=> 0,
+	    NodeId_identifierType	=> NODEIDTYPE_NUMERIC,
+	    NodeId_identifier		=> OPCUA::Open62541::NS0ID_HASSUBTYPE,
 	},
 	browseName => {
-	    QualifiedName_namespaceIndex => 1,
-	    QualifiedName_name           => "SOT",
+	    QualifiedName_namespaceIndex	=> $namespace,
+	    QualifiedName_name			=> "SOT",
 	},
 	attributes => {
 	    ObjectTypeAttributes_displayName => {
-		LocalizedText_text => 'Some Object Type'
+		LocalizedText_text	=> 'Some Object Type'
 	    },
 	},
     };
     $nodes{some_variable_0} = {
 	nodeId => {
-	    NodeId_namespaceIndex => 1,
-	    NodeId_identifierType => NODEIDTYPE_STRING,
-	    NodeId_identifier     => "SOME_VARIABLE_0",
+	    NodeId_namespaceIndex	=> $namespace,
+	    NodeId_identifierType	=> NODEIDTYPE_STRING,
+	    NodeId_identifier		=> "SOME_VARIABLE_0",
 	},
-	parentNodeId => $nodes{some_object_type}{nodeId},
+	parentNodeId			=> $nodes{some_object_type}{nodeId},
 	referenceTypeId => {
-	    NodeId_namespaceIndex => 0,
-	    NodeId_identifierType => NODEIDTYPE_NUMERIC,
-	    NodeId_identifier     => OPCUA::Open62541::NS0ID_HASCOMPONENT,
+	    NodeId_namespaceIndex	=> 0,
+	    NodeId_identifierType	=> NODEIDTYPE_NUMERIC,
+	    NodeId_identifier		=> OPCUA::Open62541::NS0ID_HASCOMPONENT,
 	},
 	browseName => {
-	    QualifiedName_namespaceIndex => 1,
-	    QualifiedName_name           => "SV0",
+	    QualifiedName_namespaceIndex	=> $namespace,
+	    QualifiedName_name			=> "SV0",
 	},
 	typeDefinition => {
-	    NodeId_namespaceIndex => 1,
-	    NodeId_identifierType => NODEIDTYPE_STRING,
-	    NodeId_identifier     => "SOME_VARIABLE_TYPE",
+	    NodeId_namespaceIndex	=> $namespace,
+	    NodeId_identifierType	=> NODEIDTYPE_STRING,
+	    NodeId_identifier		=> "SOME_VARIABLE_TYPE",
 	},
 	attributes => {
+	    VariableAttributes_dataType	=> TYPES_INT32,
 	    VariableAttributes_displayName => {
-		LocalizedText_text => 'Some Variable 0'
+		LocalizedText_text	=> 'Some Variable 0'
 	    },
-	    Variable_value    => {
-		Variant_type   => TYPES_INT32,
-		Variant_scalar => 42,
+	    VariableAttributes_value => {
+		Variant_type		=> TYPES_INT32,
+		Variant_scalar		=> 42,
 	    },
+	    VariableAttributes_accessLevel	=>
+		ACCESSLEVELMASK_READ | ACCESSLEVELMASK_WRITE,
 	},
     };
     $nodes{some_object_0} = {
 	nodeId => {
-	    NodeId_namespaceIndex => 1,
-	    NodeId_identifierType => NODEIDTYPE_STRING,
-	    NodeId_identifier     => "SOME_OBJECT_0",
+	    NodeId_namespaceIndex	=> $namespace,
+	    NodeId_identifierType	=> NODEIDTYPE_STRING,
+	    NodeId_identifier		=> "SOME_OBJECT_0",
 	},
 	parentNodeId => {
-	    NodeId_namespaceIndex => 0,
-	    NodeId_identifierType => NODEIDTYPE_NUMERIC,
-	    NodeId_identifier     => OPCUA::Open62541::NS0ID_OBJECTSFOLDER,
+	    NodeId_namespaceIndex	=> 0,
+	    NodeId_identifierType	=> NODEIDTYPE_NUMERIC,
+	    NodeId_identifier		=>
+		OPCUA::Open62541::NS0ID_OBJECTSFOLDER,
 	},
 	referenceTypeId => {
-	    NodeId_namespaceIndex => 0,
-	    NodeId_identifierType => NODEIDTYPE_NUMERIC,
-	    NodeId_identifier     => OPCUA::Open62541::NS0ID_ORGANIZES,
+	    NodeId_namespaceIndex	=> 0,
+	    NodeId_identifierType	=> NODEIDTYPE_NUMERIC,
+	    NodeId_identifier		=> OPCUA::Open62541::NS0ID_ORGANIZES,
 	},
 	browseName => {
-	    QualifiedName_namespaceIndex => 1,
-	    QualifiedName_name           => "SO0",
+	    QualifiedName_namespaceIndex	=> $namespace,
+	    QualifiedName_name			=> "SO0",
 	},
 	typeDefinition => {
-	    NodeId_namespaceIndex => 1,
-	    NodeId_identifierType => NODEIDTYPE_STRING,
-	    NodeId_identifier     => "SOME_OBJECT_TYPE",
+	    NodeId_namespaceIndex	=> $namespace,
+	    NodeId_identifierType	=> NODEIDTYPE_STRING,
+	    NodeId_identifier		=> "SOME_OBJECT_TYPE",
 	},
 	attributes => {
 	    ObjectAttributes_displayName => {
-		LocalizedText_text => 'Some Object 0'
+		LocalizedText_text	=> 'Some Object 0'
 	    },
 	},
     };
@@ -311,7 +318,7 @@ sub child {
     while ($running) {
 	# for signal handling we have to return to Perl regulary
 	if ($self->{singlestep}) {
-	    $sigset= POSIX::SigSet->new(SIGUSR2);  # do not step on SIGUSR2
+	    $sigset = POSIX::SigSet->new(SIGUSR2);  # do not step on SIGUSR2
 	    !POSIX::sigsuspend($sigset) && $!{EINTR}
 		or die "sigsuspend failed: $!";
 	    $self->{log}->{fh}->print("server: singlestep\n");
@@ -490,9 +497,9 @@ Must be called after start() for that.
 
 Configure the server.
 
-=item $server->setup_complex_objects()
+=item $server->setup_complex_objects($namespace)
 
-Adds the following nodes to the server:
+Adds the following nodes in the given namespace to the server:
 
  some_object_0
  | HasTypeDefinition
@@ -501,6 +508,8 @@ Adds the following nodes to the server:
  some_variable_0
  | HasTypeDefinition
  some_variable_type
+
+The namespace defaults to 1 if it is not passed as an argument.
 
 Returns the definitions for each node as a hash ref with the above names as hash
 keys.

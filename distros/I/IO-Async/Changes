@@ -1,5 +1,17 @@
 Revision history for IO-Async
 
+0.77    2020-05-13
+        [CHANGES]
+         * Updated for Metrics::Any 0.05
+         * Report an info-type gauge metric to track loop types
+         * Loop processing time should be a timer metric, not a distribution
+         * Don't bother reporting zero-byte stream read/write metrics
+
+        [BUGFIXES]
+         * Skip metrics-related unit tests if metrics aren't active, even
+           though we depend on Test::Metrics::Any
+         * Account for MSWin32's EWOULDBLOCK in t/70future-io.t
+
 0.76    2020-05-05
         [CHANGES]
          * Initial attempt at providing metrics via Metrics::Any

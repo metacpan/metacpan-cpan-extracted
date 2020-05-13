@@ -16,6 +16,7 @@ $modules{$_} = $_ for qw(
   FFI::Platypus
   FFI::Platypus::Memory
   FFI::Platypus::Record
+  FFI::Platypus::Type::Enum
   Math::Int64
   Ref::Util
   Sub::Identify

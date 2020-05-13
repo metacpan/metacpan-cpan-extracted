@@ -9,7 +9,7 @@ my $build = Module::Build->new(
       'IO::Socket::INET' => 0,
    },
    test_requires => {
-      'Metrics::Any' => '0.02',
+      'Metrics::Any' => '0.05',
       'Test::More' => '0.88', # done_testing
    },
    configure_requires => {

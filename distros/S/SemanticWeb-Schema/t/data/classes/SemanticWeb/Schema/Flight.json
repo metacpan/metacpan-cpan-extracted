@@ -12,8 +12,8 @@
          "rdfs:label" : "aircraft",
          "schema:domainIncludes" : "schema:Flight",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Vehicle"
+            "schema:Vehicle",
+            "schema:Text"
          ]
       },
       "schema:arrivalAirport" : {
@@ -120,15 +120,15 @@
          "rdfs:label" : "seller",
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
-            "schema:Demand",
+            "schema:Flight",
             "schema:Offer",
-            "schema:Order",
             "schema:BuyAction",
-            "schema:Flight"
+            "schema:Demand",
+            "schema:Order"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:webCheckinTime" : {

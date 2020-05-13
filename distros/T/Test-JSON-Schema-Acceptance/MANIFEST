@@ -53,10 +53,10 @@ share/tests/draft2019-09/not.json
 share/tests/draft2019-09/oneOf.json
 share/tests/draft2019-09/optional/bignum.json
 share/tests/draft2019-09/optional/content.json
-share/tests/draft2019-09/optional/ecmascript-regex.json
 share/tests/draft2019-09/optional/format/date-time.json
 share/tests/draft2019-09/optional/format/date.json
 share/tests/draft2019-09/optional/format/duration.json
+share/tests/draft2019-09/optional/format/ecmascript-regex.json
 share/tests/draft2019-09/optional/format/email.json
 share/tests/draft2019-09/optional/format/hostname.json
 share/tests/draft2019-09/optional/format/idn-email.json
@@ -216,9 +216,9 @@ share/tests/draft7/not.json
 share/tests/draft7/oneOf.json
 share/tests/draft7/optional/bignum.json
 share/tests/draft7/optional/content.json
-share/tests/draft7/optional/ecmascript-regex.json
 share/tests/draft7/optional/format/date-time.json
 share/tests/draft7/optional/format/date.json
+share/tests/draft7/optional/format/ecmascript-regex.json
 share/tests/draft7/optional/format/email.json
 share/tests/draft7/optional/format/hostname.json
 share/tests/draft7/optional/format/idn-email.json
@@ -266,6 +266,7 @@ t/tests/subset/bar.json
 t/tests/subset/baz.json
 t/tests/subset/foo.json
 t/tests/unicode/unicode.json
+update-share
 xt/author/00-compile.t
 xt/author/changes_has_content.t
 xt/author/clean-namespaces.t

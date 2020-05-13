@@ -69,7 +69,7 @@ CONSTRUCTOR
 
       If present and true, this instance will not load perl-specific
       collector from Net::Prometheus::PerlCollector. If absent or false
-      this collector is loaded if the module is installed and useable.
+      this collector is loaded by default.
 
       These two options are provided for testing purposes, or for specific
       use-cases where such features are not required. Usually it's best

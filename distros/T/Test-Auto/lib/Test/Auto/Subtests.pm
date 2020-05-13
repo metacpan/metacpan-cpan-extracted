@@ -13,7 +13,7 @@ use Type::Registry;
 
 require Carp;
 
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 # ATTRIBUTES
 

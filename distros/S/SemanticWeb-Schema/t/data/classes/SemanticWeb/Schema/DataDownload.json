@@ -15,15 +15,15 @@
          "rdfs:label" : "measurementTechnique",
          "schema:category" : "issue-1425",
          "schema:domainIncludes" : [
-            "schema:DataDownload",
             "schema:DataCatalog",
+            "schema:Dataset",
             "schema:PropertyValue",
-            "schema:Dataset"
+            "schema:DataDownload"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ]
       }
    }

@@ -1,6 +1,6 @@
 package Catmandu::Store::File::BagIt;
 
-our $VERSION = '0.250';
+our $VERSION = '0.260';
 
 use Catmandu::Sane;
 use Moo;
@@ -17,6 +17,7 @@ with 'Catmandu::Droppable';
 has root    => (is => 'ro', required => '1');
 has uuid    => (is => 'ro', trigger  => 1);
 has keysize => (is => 'ro', default  => 9, trigger => 1);
+has default_case => (is => 'ro', default => sub { 'upper'} , trigger => 1);
 
 sub _trigger_keysize {
     my $self = shift;
@@ -31,18 +32,37 @@ sub _trigger_uuid {
     $self->{keysize} = 36;
 }
 
+sub _trigger_default_case {
+    my $self = shift;
+
+    croak "default_case need to be `upper' or `lower`"
+        unless $self->default_case =~ /^(upper|lower)$/;
+}
+
 sub path_string {
     my ($self, $key) = @_;
 
     my $keysize = $self->keysize;
 
-    my $h = "[0-9A-F]"; # uc
+    my $h;
+
+    if ($self->default_case eq 'upper') {
+        $h = "[0-9A-F]";
+        $key = uc $key;
+    }
+    elsif ($self->default_case eq 'lower') {
+        $h = "[0-9a-f]";
+        $key = lc $key;
+    }
+    else {
+        croak "unkown default_case found";
+    }
 
     # If the key is a UUID then the matches need to be exact
     if ($self->uuid) {
         return undef unless $key =~ qr/\A${h}{8}-${h}{4}-${h}{4}-${h}{4}-${h}{12}\z/;
     }
-    elsif ($key =~ qr/\A${h}+\z/) {
+    elsif ($key =~ qr/\A\d+\z/) {
         return undef unless length($key) && length($key) <= $keysize;
         $key =~ s/^0+//;
         $key = sprintf "%-${keysize}.${keysize}d", $key;
@@ -143,7 +163,7 @@ flat files.
 
 =head1 METHODS
 
-=head2 new(root => $path , [ keysize => NUM , uuid => 1])
+=head2 new(root => $path , [ keysize => NUM , uuid => 1 , default_case => 'upper|lower'])
 
 Create a new Catmandu::Store::File::BagIt with the following configuration
 parameters:
@@ -163,6 +183,12 @@ All the container keys of a L<Catmandu::Store::File::BagIt> must be integers.
 =item uuid
 
 If the to a true value, then the Simple store will require UUID-s as keys
+
+=item default_case
+
+When set to 'upper' all stored identifier paths will be translated to uppercase
+(e.g. for UUID paths). When set to 'lower' all identifier paths will be
+translated to lowercase. Default: 'upper'
 
 =back
 

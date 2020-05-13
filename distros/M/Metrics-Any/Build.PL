@@ -7,8 +7,10 @@ my $build = Module::Build->new(
    module_name => 'Metrics::Any',
    requires => {
       'perl' => '5.010', # // operator
+      'List::Util' => '1.29', # core since 5.20
    },
    test_requires => {
+      'Test::Fatal' => 0,
       'Test::More' => '0.88', # done_testing
    },
    configure_requires => {

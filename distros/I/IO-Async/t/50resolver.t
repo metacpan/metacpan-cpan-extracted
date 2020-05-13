@@ -407,7 +407,9 @@ my ( $testerr, $testhost, $testserv ) = getnameinfo( $testaddr );
 }
 
 # Metrics
-{
+SKIP: {
+   skip "Metrics are unavailable" unless $IO::Async::Metrics::METRICS;
+
    is_metrics_from(
       sub {
          $resolver->getnameinfo( addr => $testaddr )->get;

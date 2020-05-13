@@ -13,13 +13,13 @@
          "rdfs:label" : "sport",
          "schema:category" : "issue-1951",
          "schema:domainIncludes" : [
-            "schema:SportsOrganization",
-            "schema:SportsEvent"
+            "schema:SportsEvent",
+            "schema:SportsOrganization"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ]
       }
    }

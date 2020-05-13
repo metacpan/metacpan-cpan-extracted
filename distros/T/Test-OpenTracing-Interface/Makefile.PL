@@ -5,6 +5,6 @@ WriteMakefile(
     'VERSION_FROM'  => 'lib/Test/OpenTracing/Interface.pm',
     'LICENSE'       => 'perl',
     test            => {
-        TESTS       => 't/Test/OpenTracing/Interface/*/*.t',
+        TESTS       => 't/Test/OpenTracing/Interface/*/*.t xt/class_name.t',
     },
 );

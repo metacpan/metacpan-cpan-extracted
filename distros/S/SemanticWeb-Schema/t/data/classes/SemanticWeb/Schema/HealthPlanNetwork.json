@@ -16,8 +16,8 @@
          "rdfs:label" : "healthPlanCostSharing",
          "schema:category" : "issue-1062",
          "schema:domainIncludes" : [
-            "schema:HealthPlanFormulary",
-            "schema:HealthPlanNetwork"
+            "schema:HealthPlanNetwork",
+            "schema:HealthPlanFormulary"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:Boolean"

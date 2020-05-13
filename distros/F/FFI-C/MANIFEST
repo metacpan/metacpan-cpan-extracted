@@ -43,6 +43,7 @@ t/ffi_c.t
 t/ffi_c_array.t
 t/ffi_c_arraydef.t
 t/ffi_c_def.t
+t/ffi_c_enumdef.t
 t/ffi_c_ffi.t
 t/ffi_c_struct.t
 t/ffi_c_structdef.t

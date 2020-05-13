@@ -15,10 +15,10 @@
          "rdfs:comment" : "A language someone may use with or at the item, service or place. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"http://schema.org/inLanguage\">inLanguage</a>",
          "rdfs:label" : "availableLanguage",
          "schema:domainIncludes" : [
-            "schema:ServiceChannel",
-            "schema:LodgingBusiness",
             "schema:TouristAttraction",
-            "schema:ContactPoint"
+            "schema:ServiceChannel",
+            "schema:ContactPoint",
+            "schema:LodgingBusiness"
          ],
          "schema:rangeIncludes" : [
             "schema:Language",
@@ -35,13 +35,13 @@
          "rdfs:label" : "touristType",
          "schema:category" : "issue-1810",
          "schema:domainIncludes" : [
-            "schema:TouristAttraction",
             "schema:TouristDestination",
-            "schema:TouristTrip"
+            "schema:TouristTrip",
+            "schema:TouristAttraction"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Audience"
+            "schema:Audience",
+            "schema:Text"
          ]
       }
    }

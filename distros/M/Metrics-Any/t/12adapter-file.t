@@ -47,12 +47,12 @@ ok( $metrics, '$metrics is still true' );
 {
    $metrics->make_distribution( d => name => "distribution" );
 
-   $metrics->inc_distribution_by( d => 5 );
+   $metrics->report_distribution( d => 5 );
 
    is( readall( $buf ), "METRIC DISTRIBUTION distribution +5 => 5/1 [avg=5]\n",
       'Distribution metric written' );
 
-   $metrics->inc_distribution_by( d => 3 );
+   $metrics->report_distribution( d => 3 );
 
    is( readall( $buf ), "METRIC DISTRIBUTION distribution +3 => 8/2 [avg=4]\n",
       'Distribution persists total and count' );
@@ -77,12 +77,12 @@ ok( $metrics, '$metrics is still true' );
 {
    $metrics->make_timer( t => name => "timer" );
 
-   $metrics->inc_timer_by( t => 0.02 );
+   $metrics->report_timer( t => 0.02 );
 
    is( readall( $buf ), "METRIC TIMER timer +0.02 => 0.02/1 [avg=0.02]\n",
       'Timer metric written' );
 
-   $metrics->inc_timer_by( t => 0.04 );
+   $metrics->report_timer( t => 0.04 );
 
    is( readall( $buf ), "METRIC TIMER timer +0.04 => 0.06/2 [avg=0.03]\n",
       'Timer persists total and count' );

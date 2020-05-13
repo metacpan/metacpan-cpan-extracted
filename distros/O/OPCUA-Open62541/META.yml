@@ -15,8 +15,10 @@ build_requires:
   Test::Perl::Critic: '0'
   Test::Pod: '1.00'
   Test::Requires: '0'
+  Test::Strict: '0'
   Test::TCP: '0'
   Test::Warn: '0'
+  YAML::Tiny: '0'
 configure_requires:
   Devel::CheckLib: '0'
 dynamic_config: 1
@@ -31,5 +33,5 @@ no_index:
     - t
     - inc
 requires: {}
-version: '0.013'
+version: '0.014'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

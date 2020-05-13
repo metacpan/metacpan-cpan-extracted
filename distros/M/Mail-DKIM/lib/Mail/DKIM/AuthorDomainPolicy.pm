@@ -1,4 +1,8 @@
-#!/usr/bin/perl
+package Mail::DKIM::AuthorDomainPolicy;
+use strict;
+use warnings;
+our $VERSION = '1.20200513.1'; # VERSION
+# ABSTRACT: represents an Author Domain Signing Practices (ADSP) record
 
 # Copyright 2005-2009 Messiah College.
 # Jason Long <jlong@messiah.edu>
@@ -7,52 +11,12 @@
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
-use strict;
-use warnings;
-
-package Mail::DKIM::AuthorDomainPolicy;
 use base 'Mail::DKIM::Policy';
 
 # base class is used for parse(), as_string()
 
 use Mail::DKIM::DNS;
 
-=head1 NAME
-
-Mail::DKIM::AuthorDomainPolicy - represents an Author Domain Signing Practices (ADSP) record
-
-=head1 DESCRIPTION
-
-The Author Domain Signing Policies (ADSP) record can be published by any
-domain to help a receiver know what to do when it encounters an unsigned
-message claiming to originate from that domain.
-
-The record is published as a DNS TXT record at _adsp._domainkey.DOMAIN
-where DOMAIN is the domain of the message's "From" address.
-
-More details about this record can be found by reading the specification
-itself at L<http://tools.ietf.org/html/rfc5617>.
-
-=head1 CONSTRUCTORS
-
-=head2 fetch()
-
-Lookup an ADSP record in DNS.
-
-  my $policy = Mail::DKIM::AuthorDomainPolicy->fetch(
-            Protocol => 'dns',
-            Author => 'jsmith@example.org',
-          );
-
-If the ADSP record is found and appears to be valid, an object
-containing that record's information will be constructed and returned.
-If the ADSP record is blank or simply does not exist, an object
-representing the default policy will be returned instead.
-(See also L</"is_implied_default_policy()">.)
-If a DNS error occurs (e.g. SERVFAIL or time-out), this method
-will "die".
-
-=cut
 
 sub fetch {
     my $class = shift;
@@ -111,29 +75,12 @@ sub get_lookup_name {
     return '_adsp._domainkey.' . $prms->{Domain};
 }
 
-=head2 new()
-
-Construct a default policy object.
-
-  my $policy = Mail::DKIM::AuthorDomainPolicy->new;
-
-=cut
 
 sub new {
     my $class = shift;
     return $class->parse( String => '' );
 }
 
-=head2 parse()
-
-Construct an ADSP record from a string.
-
-  my $policy = Mail::DKIM::AuthorDomainPolicy->parse(
-          String => 'dkim=all',
-          Domain => 'aaa.example',
-      );
-
-=cut
 
 #undocumented private class method
 our $DEFAULT_POLICY;
@@ -155,6 +102,144 @@ sub nxdomain_policy {
     }
     return $NXDOMAIN_POLICY;
 }
+
+
+sub apply {
+    my $self = shift;
+    my ($dkim) = @_;
+
+    # first_party indicates whether there is a DKIM signature with
+    # a d= tag matching the address in the From: header
+    my $first_party;
+
+    my @passing_signatures =
+      grep { $_->result && $_->result eq 'pass' } $dkim->signatures;
+
+    foreach my $signature (@passing_signatures) {
+        my $author_domain = $dkim->message_originator->host;
+        if ( lc $author_domain eq lc $signature->domain ) {
+
+            # found a first party signature
+            $first_party = 1;
+            last;
+        }
+    }
+
+    return 'accept' if $first_party;
+    return 'reject' if ( $self->signall_strict );
+
+    return 'neutral';
+}
+
+
+sub is_implied_default_policy {
+    my $self           = shift;
+    my $default_policy = ref($self)->default;
+    return ( $self == $default_policy );
+}
+
+
+sub location {
+    my $self = shift;
+    return $self->{Domain};
+}
+
+sub name {
+    return 'ADSP';
+}
+
+
+sub policy {
+    my $self = shift;
+
+    (@_)
+      and $self->{tags}->{dkim} = shift;
+
+    if ( defined $self->{tags}->{dkim} ) {
+        return $self->{tags}->{dkim};
+    }
+    else {
+        return 'unknown';
+    }
+}
+
+
+sub signall {
+    my $self = shift;
+
+    return $self->policy
+      && ( $self->policy =~ /all/i );
+}
+
+
+sub signall_strict {
+    my $self = shift;
+
+    return $self->policy
+      && ( $self->policy =~ /discardable/i );
+}
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Mail::DKIM::AuthorDomainPolicy - represents an Author Domain Signing Practices (ADSP) record
+
+=head1 VERSION
+
+version 1.20200513.1
+
+=head1 DESCRIPTION
+
+The Author Domain Signing Policies (ADSP) record can be published by any
+domain to help a receiver know what to do when it encounters an unsigned
+message claiming to originate from that domain.
+
+The record is published as a DNS TXT record at _adsp._domainkey.DOMAIN
+where DOMAIN is the domain of the message's "From" address.
+
+More details about this record can be found by reading the specification
+itself at L<http://tools.ietf.org/html/rfc5617>.
+
+=head1 CONSTRUCTORS
+
+=head2 fetch()
+
+Lookup an ADSP record in DNS.
+
+  my $policy = Mail::DKIM::AuthorDomainPolicy->fetch(
+            Protocol => 'dns',
+            Author => 'jsmith@example.org',
+          );
+
+If the ADSP record is found and appears to be valid, an object
+containing that record's information will be constructed and returned.
+If the ADSP record is blank or simply does not exist, an object
+representing the default policy will be returned instead.
+(See also L</"is_implied_default_policy()">.)
+If a DNS error occurs (e.g. SERVFAIL or time-out), this method
+will "die".
+
+=head2 new()
+
+Construct a default policy object.
+
+  my $policy = Mail::DKIM::AuthorDomainPolicy->new;
+
+=head2 parse()
+
+Construct an ADSP record from a string.
+
+  my $policy = Mail::DKIM::AuthorDomainPolicy->parse(
+          String => 'dkim=all',
+          Domain => 'aaa.example',
+      );
 
 =head1 METHODS
 
@@ -196,35 +281,6 @@ Note: in the future, these values may become:
  temperror - transient error occurred
  permerror - non-transient error occurred
 
-=cut
-
-sub apply {
-    my $self = shift;
-    my ($dkim) = @_;
-
-    # first_party indicates whether there is a DKIM signature with
-    # a d= tag matching the address in the From: header
-    my $first_party;
-
-    my @passing_signatures =
-      grep { $_->result && $_->result eq 'pass' } $dkim->signatures;
-
-    foreach my $signature (@passing_signatures) {
-        my $author_domain = $dkim->message_originator->host;
-        if ( lc $author_domain eq lc $signature->domain ) {
-
-            # found a first party signature
-            $first_party = 1;
-            last;
-        }
-    }
-
-    return 'accept' if $first_party;
-    return 'reject' if ( $self->signall_strict );
-
-    return 'neutral';
-}
-
 =head2 is_implied_default_policy()
 
 Tells whether this policy implied.
@@ -234,14 +290,6 @@ Tells whether this policy implied.
 If you fetch the policy for a particular domain, but that domain
 does not have a policy published, then the "default policy" is
 in effect. Use this method to detect when that happens.
-
-=cut
-
-sub is_implied_default_policy {
-    my $self           = shift;
-    my $default_policy = ref($self)->default;
-    return ( $self == $default_policy );
-}
 
 =head2 location()
 
@@ -254,17 +302,6 @@ If the policy is user-specific, TBD.
 
 If nothing is published for the domain, and the default policy
 was returned instead, the location will be C<undef>.
-
-=cut
-
-sub location {
-    my $self = shift;
-    return $self->{Domain};
-}
-
-sub name {
-    return 'ADSP';
-}
 
 =head2 policy()
 
@@ -300,49 +337,13 @@ DNS.
 
 =back
 
-=cut
-
-sub policy {
-    my $self = shift;
-
-    (@_)
-      and $self->{tags}->{dkim} = shift;
-
-    if ( defined $self->{tags}->{dkim} ) {
-        return $self->{tags}->{dkim};
-    }
-    else {
-        return 'unknown';
-    }
-}
-
 =head2 signall()
 
 True if policy is "all".
 
-=cut
-
-sub signall {
-    my $self = shift;
-
-    return $self->policy
-      && ( $self->policy =~ /all/i );
-}
-
 =head2 signall_discardable()
 
 True if policy is "strict".
-
-=cut
-
-sub signall_strict {
-    my $self = shift;
-
-    return $self->policy
-      && ( $self->policy =~ /discardable/i );
-}
-
-1;
 
 =head1 BUGS
 
@@ -358,13 +359,50 @@ not be treated the same as example.org being nonexistent.
 
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Jason Long, E<lt>jlong@messiah.eduE<gt>
+=over 4
+
+=item *
+
+Jason Long <jason@long.name>
+
+=item *
+
+Marc Bradshaw <marc@marcbradshaw.net>
+
+=item *
+
+Bron Gondwana <brong@fastmailteam.com> (ARC)
+
+=back
+
+=head1 THANKS
+
+Work on ensuring that this module passes the ARC test suite was
+generously sponsored by Valimail (https://www.valimail.com/)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006-2009 by Messiah College
+=over 4
+
+=item *
+
+Copyright (C) 2013 by Messiah College
+
+=item *
+
+Copyright (C) 2010 by Jason Long
+
+=item *
+
+Copyright (C) 2017 by Standcore LLC
+
+=item *
+
+Copyright (C) 2020 by FastMail Pty Ltd
+
+=back
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.6 or,

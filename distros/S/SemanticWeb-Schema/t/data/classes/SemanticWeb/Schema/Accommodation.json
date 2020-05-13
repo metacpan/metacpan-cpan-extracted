@@ -25,8 +25,8 @@
          "rdfs:label" : "accommodationFloorPlan",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
-            "schema:Residence",
-            "schema:Accommodation"
+            "schema:Accommodation",
+            "schema:Residence"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:FloorPlan"
@@ -37,8 +37,8 @@
          "rdfs:comment" : "An amenity feature (e.g. a characteristic or service) of the Accommodation. This generic property does not make a statement about whether the feature is included in an offer for the main accommodation or available at extra costs.",
          "rdfs:label" : "amenityFeature",
          "schema:domainIncludes" : [
-            "schema:Place",
             "schema:Accommodation",
+            "schema:Place",
             "schema:FloorPlan",
             "schema:LodgingBusiness"
          ],
@@ -72,14 +72,14 @@
          "rdfs:label" : "leaseLength",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
+            "schema:Offer",
             "schema:RealEstateListing",
-            "schema:Accommodation",
-            "schema:Offer"
+            "schema:Accommodation"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Duration"
+            "schema:Duration",
+            "schema:QuantitativeValue"
          ]
       },
       "schema:numberOfBathroomsTotal" : {
@@ -89,8 +89,8 @@
          "rdfs:label" : "numberOfBathroomsTotal",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
-            "schema:FloorPlan",
-            "schema:Accommodation"
+            "schema:Accommodation",
+            "schema:FloorPlan"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:Integer"
@@ -102,9 +102,9 @@
          "rdfs:label" : "numberOfBedrooms",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
-            "schema:ApartmentComplex",
             "schema:Accommodation",
-            "schema:FloorPlan"
+            "schema:FloorPlan",
+            "schema:ApartmentComplex"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
@@ -144,13 +144,13 @@
          "rdfs:comment" : "The number of rooms (excluding bathrooms and closets) of the accommodation or lodging business.\nTypical unit code(s): ROM for room or C62 for no unit. The type of room can be put in the unitText property of the QuantitativeValue.",
          "rdfs:label" : "numberOfRooms",
          "schema:domainIncludes" : [
-            "schema:LodgingBusiness",
-            "schema:SingleFamilyResidence",
-            "schema:Apartment",
-            "schema:Suite",
-            "schema:House",
             "schema:Accommodation",
-            "schema:FloorPlan"
+            "schema:Apartment",
+            "schema:House",
+            "schema:FloorPlan",
+            "schema:Suite",
+            "schema:SingleFamilyResidence",
+            "schema:LodgingBusiness"
          ],
          "schema:rangeIncludes" : [
             "schema:QuantitativeValue",
@@ -171,14 +171,14 @@
          "rdfs:comment" : "Indicates whether pets are allowed to enter the accommodation or lodging business. More detailed information can be put in a text value.",
          "rdfs:label" : "petsAllowed",
          "schema:domainIncludes" : [
-            "schema:LodgingBusiness",
-            "schema:ApartmentComplex",
             "schema:Accommodation",
-            "schema:FloorPlan"
+            "schema:ApartmentComplex",
+            "schema:FloorPlan",
+            "schema:LodgingBusiness"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Boolean"
+            "schema:Boolean",
+            "schema:Text"
          ]
       },
       "schema:tourBookingPage" : {

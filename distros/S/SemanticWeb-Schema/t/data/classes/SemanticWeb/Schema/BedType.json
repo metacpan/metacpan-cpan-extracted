@@ -1,8 +1,8 @@
 {
    "class" : {
       "dc:source" : [
-         "schemadotorgsources2:STI_Accommodation_Ontology",
-         "https://github.com/schemaorg/schemaorg/issues/1262"
+         "https://github.com/schemaorg/schemaorg/issues/1262",
+         "schemadotorgsources2:STI_Accommodation_Ontology"
       ],
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A type of bed. This is used for indicating the bed or beds available in an accommodation.",

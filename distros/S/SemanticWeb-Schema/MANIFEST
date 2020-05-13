@@ -215,6 +215,7 @@ lib/SemanticWeb/Schema/DeleteAction.pm
 lib/SemanticWeb/Schema/DeliveryChargeSpecification.pm
 lib/SemanticWeb/Schema/DeliveryEvent.pm
 lib/SemanticWeb/Schema/DeliveryMethod.pm
+lib/SemanticWeb/Schema/DeliveryTimeSettings.pm
 lib/SemanticWeb/Schema/Demand.pm
 lib/SemanticWeb/Schema/Dentist.pm
 lib/SemanticWeb/Schema/DepartAction.pm
@@ -525,6 +526,7 @@ lib/SemanticWeb/Schema/NewsArticle.pm
 lib/SemanticWeb/Schema/NewsMediaOrganization.pm
 lib/SemanticWeb/Schema/Newspaper.pm
 lib/SemanticWeb/Schema/NightClub.pm
+lib/SemanticWeb/Schema/NonprofitType.pm
 lib/SemanticWeb/Schema/Notary.pm
 lib/SemanticWeb/Schema/NoteDigitalDocument.pm
 lib/SemanticWeb/Schema/NutritionInformation.pm
@@ -600,6 +602,7 @@ lib/SemanticWeb/Schema/PoliceStation.pm
 lib/SemanticWeb/Schema/Pond.pm
 lib/SemanticWeb/Schema/PostOffice.pm
 lib/SemanticWeb/Schema/PostalAddress.pm
+lib/SemanticWeb/Schema/PostalCodeRangeSpecification.pm
 lib/SemanticWeb/Schema/Poster.pm
 lib/SemanticWeb/Schema/PreOrderAction.pm
 lib/SemanticWeb/Schema/PrependAction.pm
@@ -706,6 +709,8 @@ lib/SemanticWeb/Schema/Service.pm
 lib/SemanticWeb/Schema/ServiceChannel.pm
 lib/SemanticWeb/Schema/ShareAction.pm
 lib/SemanticWeb/Schema/SheetMusic.pm
+lib/SemanticWeb/Schema/ShippingDeliveryTime.pm
+lib/SemanticWeb/Schema/ShippingRateSettings.pm
 lib/SemanticWeb/Schema/ShoeStore.pm
 lib/SemanticWeb/Schema/ShoppingCenter.pm
 lib/SemanticWeb/Schema/ShortStory.pm
@@ -1048,6 +1053,7 @@ t/data/classes/SemanticWeb/Schema/DeleteAction.json
 t/data/classes/SemanticWeb/Schema/DeliveryChargeSpecification.json
 t/data/classes/SemanticWeb/Schema/DeliveryEvent.json
 t/data/classes/SemanticWeb/Schema/DeliveryMethod.json
+t/data/classes/SemanticWeb/Schema/DeliveryTimeSettings.json
 t/data/classes/SemanticWeb/Schema/Demand.json
 t/data/classes/SemanticWeb/Schema/Dentist.json
 t/data/classes/SemanticWeb/Schema/DepartAction.json
@@ -1361,6 +1367,7 @@ t/data/classes/SemanticWeb/Schema/NewsArticle.json
 t/data/classes/SemanticWeb/Schema/NewsMediaOrganization.json
 t/data/classes/SemanticWeb/Schema/Newspaper.json
 t/data/classes/SemanticWeb/Schema/NightClub.json
+t/data/classes/SemanticWeb/Schema/NonprofitType.json
 t/data/classes/SemanticWeb/Schema/Notary.json
 t/data/classes/SemanticWeb/Schema/NoteDigitalDocument.json
 t/data/classes/SemanticWeb/Schema/NutritionInformation.json
@@ -1436,6 +1443,7 @@ t/data/classes/SemanticWeb/Schema/PoliceStation.json
 t/data/classes/SemanticWeb/Schema/Pond.json
 t/data/classes/SemanticWeb/Schema/PostOffice.json
 t/data/classes/SemanticWeb/Schema/PostalAddress.json
+t/data/classes/SemanticWeb/Schema/PostalCodeRangeSpecification.json
 t/data/classes/SemanticWeb/Schema/Poster.json
 t/data/classes/SemanticWeb/Schema/PreOrderAction.json
 t/data/classes/SemanticWeb/Schema/PrependAction.json
@@ -1543,6 +1551,8 @@ t/data/classes/SemanticWeb/Schema/Service.json
 t/data/classes/SemanticWeb/Schema/ServiceChannel.json
 t/data/classes/SemanticWeb/Schema/ShareAction.json
 t/data/classes/SemanticWeb/Schema/SheetMusic.json
+t/data/classes/SemanticWeb/Schema/ShippingDeliveryTime.json
+t/data/classes/SemanticWeb/Schema/ShippingRateSettings.json
 t/data/classes/SemanticWeb/Schema/ShoeStore.json
 t/data/classes/SemanticWeb/Schema/ShoppingCenter.json
 t/data/classes/SemanticWeb/Schema/ShortStory.json

@@ -1,4 +1,5 @@
 TYPEMAP
+# the packed conversion works only for types that do not allocate memory
 UA_Boolean				T_PACKED
 UA_SByte				T_PACKED
 UA_Byte					T_PACKED
@@ -6,100 +7,204 @@ UA_Int16				T_PACKED
 UA_UInt16				T_PACKED
 UA_Int32				T_PACKED
 UA_UInt32				T_PACKED
-OPCUA_Open62541_UInt32			T_PTROBJ_OPTIONAL
-# XXX this only works for Perl on 64 bit platforms
+# XXX the 64 bit types can only use IV and UV of Perl on 64 bit platforms
 UA_Int64				T_PACKED
 UA_UInt64				T_PACKED
 UA_Float				T_PACKED
 UA_Double				T_PACKED
 UA_StatusCode				T_PACKED
-UA_String				T_PACKED
 UA_Guid					T_PACKED
-UA_ByteString				T_PACKED
-UA_Variant				T_PACKED
 enum UA_NodeIdType			T_ENUM
-UA_NodeId				T_PACKED
-UA_BrowseDescription			T_PACKED
-UA_BrowseRequest			T_PACKED
-UA_BrowseResponse			T_PACKED
-UA_BrowseResult				T_PACKED
-OPCUA_Open62541_NodeId			T_PTROBJ_OPTIONAL
-OPCUA_Open62541_LocalizedText		T_PTROBJ_REFERENCE
-UA_QualifiedName			T_PACKED
+UA_ClientState				T_ENUM
+# these are enums with a magic pack function to show the strings
+UA_LogLevel				T_PACKED
+UA_LogCategory				T_PACKED
+# data type is special as it points to constant data
 OPCUA_Open62541_DataType		T_PACKED
-OPCUA_Open62541_Variant			T_PTROBJ_REFERENCE
-UA_DataTypeAttributes			T_PACKED
-UA_ObjectAttributes			T_PACKED
-UA_ObjectTypeAttributes			T_PACKED
-UA_ReferenceTypeAttributes		T_PACKED
-UA_VariableAttributes			T_PACKED
-UA_VariableTypeAttributes		T_PACKED
-UA_ViewAttributes			T_PACKED
-UA_BuildInfo				T_PACKED
+# these are used only as return value
+UA_BrowseResponse			T_RETVAL_PACKED
+UA_BrowseResult				T_RETVAL_PACKED
+UA_BuildInfo				T_RETVAL_PACKED
+# these are needed to pass an output parameter
+OPCUA_Open62541_Boolean			T_PTROBJ_PACKED
+OPCUA_Open62541_Byte			T_PTROBJ_PACKED
+OPCUA_Open62541_Int32			T_PTROBJ_PACKED
+OPCUA_Open62541_UInt32			T_PTROBJ_PACKED
+OPCUA_Open62541_Double			T_PTROBJ_PACKED
+# conversions that allocate memory may need a mortal object destroyed later
+OPCUA_Open62541_String			T_PTROBJ_PACKED
+OPCUA_Open62541_ByteString		T_PTROBJ_PACKED
+OPCUA_Open62541_BrowseDescription	T_PTROBJ_PACKED
+OPCUA_Open62541_BrowseNextRequest	T_PTROBJ_PACKED
+OPCUA_Open62541_BrowseRequest		T_PTROBJ_PACKED
+OPCUA_Open62541_NodeId			T_PTROBJ_PACKED
+OPCUA_Open62541_ExpandedNodeId		T_PTROBJ_PACKED
+OPCUA_Open62541_LocalizedText		T_PTROBJ_PACKED
+OPCUA_Open62541_QualifiedName		T_PTROBJ_PACKED
+OPCUA_Open62541_Variant			T_PTROBJ_PACKED
+OPCUA_Open62541_NodeClass		T_PTROBJ_PACKED
+OPCUA_Open62541_DataTypeAttributes	T_PTROBJ_PACKED
+OPCUA_Open62541_ObjectAttributes	T_PTROBJ_PACKED
+OPCUA_Open62541_ObjectTypeAttributes	T_PTROBJ_PACKED
+OPCUA_Open62541_ReferenceTypeAttributes	T_PTROBJ_PACKED
+OPCUA_Open62541_VariableAttributes	T_PTROBJ_PACKED
+OPCUA_Open62541_VariableTypeAttributes	T_PTROBJ_PACKED
+OPCUA_Open62541_ViewAttributes		T_PTROBJ_PACKED
+# special objects, not converted to hashes
 OPCUA_Open62541_Server			T_PTROBJ_SPECIAL
 OPCUA_Open62541_ServerConfig		T_PTROBJ_SPECIAL
 OPCUA_Open62541_Client			T_PTROBJ_SPECIAL
 OPCUA_Open62541_ClientConfig		T_PTROBJ_SPECIAL
-UA_ClientState				T_ENUM
 OPCUA_Open62541_Logger			T_PTROBJ_SPECIAL
-UA_LogLevel				T_PACKED
-UA_LogCategory				T_PACKED
-UA_ExpandedNodeId			T_PACKED
 
 #############################################################################
 INPUT
-T_PTROBJ_OPTIONAL
-	if (!SvOK($arg)) {
-		/* Argument is optional, do not output anything if undef. */
+T_PTROBJ_PACKED
+	if (($argoff) == 0) {
+		if (!(${(my $ntt=$ntype)=~s/_/::/g;
+		    # isself will be 1 for self pointer, 0 for other parameter
+		    # a self pointer of wrong type will cause C syntax error
+		    my $isself = $ntt eq $Package ? 1 : \"bad self\";
+		    $isself = 0 if $argoff != 0;
+		    \$isself}) ||
+		    (!(SvOK($arg) && SvROK($arg) &&
+		    sv_derived_from($arg, \"$Package\")))) {
+			CROAK(\"Self %s is not a %s\", \"$var\", \"$Package\");
+		}
+		/*
+		 * object reference of the correct type
+		 *
+		 * Use the existing object.
+		 *
+		 * This is needed for the DESTROY function and
+		 * self pointer of variant method.
+		 */
+		$var = INT2PTR($type, SvIV(SvRV($arg)));
+	} else if (!SvOK($arg)) {
+		if (!(${my $outopt=(${var}=~/^out/)?1:0; \$outopt})) {
+			CROAK(\"Parameter %s is undefined\", \"$var\");
+		}
+		if (!(${my $outopt=(${var}=~/^outopt/)?1:0; \$outopt})) {
+			CROAK(\"Output parameter %s is undefined\", \"$var\");
+		}
+		/*
+		 * undef
+		 *
+		 * Parameter is optional, do create an object pointer.
+		 * Optional output parameter have the prefix outopt.
+		 *
+		 * This is needed for passing optional output parameter.
+		 * Note that the code using this feature should
+		 * cope with the NULL pointer.
+		 */
 		$var = NULL;
-	} else if (SvROK($arg) && sv_derived_from($arg,
-	    \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\")) {
-		/* Already an object pointer. */
-		$var = INT2PTR($type, SvIV(SvRV($arg)));
-	} else if (SvROK($arg) && SvTYPE(SvRV($arg)) < SVt_PVAV) {
-		/* Scalar reference, set referenced variable to pointer. */
-		$var = UA_${(my $ntt=${ntype})=~s/.*_//g;\$ntt}_new();
-		if ($var == NULL)
-			CROAK(\"UA_${(my $ntt=${ntype})=~s/.*_//g;\$ntt}_new\");
-		DPRINTF(\"${(my $ntt=lc(${ntype}))=~s/.*_//g;\$ntt} %p\", $var);
-		sv_setref_pv(SvRV($arg),
-		    \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\", $var);
+		if (!(${my $outopt=(${var}=~/^outopt/)?1:0; \$outopt})) {
+			/* cppcheck does not detect the if before the = NULL */
+			abort(); /* NOTREACHED */
+		}
+	} else if (${my $out=($var=~/^out/)?1:0; \$out}) {
+		if (!(SvROK($arg) && SvTYPE(SvRV($arg)) < SVt_PVAV) ||
+		    sv_isobject($arg)) {
+			CROAK(\"Output parameter %s is not a scalar reference\",
+			    \"$var\");
+		}
+		/*
+		 * scalar reference
+		 *
+		 * Create an object pointer of the correct type
+		 * using the UA_new() function.  Store it in a new
+		 * mortal SV, then it will be destroyed at the end
+		 * of the XS function.  Note that a DESTROY function
+		 * that calls US_delete() should exist!
+		 *
+		 * This is needed for passing output parameter.
+		 * Output parameter have the prefix out.
+		 * Note that the pack into the output object should be
+		 * be done manually in the XS function.
+		 */
+		SV *svm_$var = sv_newmortal();
+		$var = UA_${(my $ntt=$ntype)=~s/.*_//g;\$ntt}_new();
+		if ($var == NULL) {
+			CROAKE(
+			    \"UA_${(my $ntt=$ntype)=~s/.*_//g;\$ntt}_new\");
+		}
+		DPRINTF(\"${(my $ntt=lc($ntype))=~s/.*_//g;\$ntt} %p\", $var);
+		sv_setref_pv(svm_$var,
+		    \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\", $var);
+	} else if ((!SvROK($arg) ||
+	    (SvTYPE(SvRV($arg)) == SVt_PVAV) ||
+	    (SvTYPE(SvRV($arg)) == SVt_PVHV))) {
+		/*
+		 * scalar or array or hash
+		 *
+		 * Create an object pointer of the correct type
+		 * using the UA_new() function.  Store it in a new
+		 * mortal SV, then it will be destroyed at the end
+		 * of the XS function.  Note that a DESTROY function
+		 * that calls US_delete() should exist!  The input
+		 * SV is unpacked into the object at the mortal SV.
+		 *
+		 * This is needed for passing input parameter.
+		 */
+		SV *svm_$var = sv_newmortal();
+		$var = UA_${(my $ntt=$ntype)=~s/.*_//g;\$ntt}_new();
+		if ($var == NULL) {
+			CROAKE(
+			    \"UA_${(my $ntt=$ntype)=~s/.*_//g;\$ntt}_new\");
+		}
+		DPRINTF(\"${(my $ntt=lc($ntype))=~s/.*_//g;\$ntt} %p\", $var);
+		sv_setref_pv(svm_$var,
+		    \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\", $var);
+		*$var =
+		    XS_unpack_UA_${(my $ntt=$ntype)=~s/.*_//g;\$ntt}($arg);
 	} else {
-		CROAK(\"%s: %s is not a scalar reference\",
-		    ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]}, \"$var\");
-	}
-T_PTROBJ_REFERENCE
-	if (SvROK($arg) && sv_derived_from($arg,
-	    \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\")) {
-		/* Already an object pointer. */
-		$var = INT2PTR($type, SvIV(SvRV($arg)));
-	} else if (SvROK($arg) && SvTYPE(SvRV($arg)) < SVt_PVAV) {
-		/* Scalar reference, set referenced variable to pointer. */
-		$var = UA_${(my $ntt=${ntype})=~s/.*_//g;\$ntt}_new();
-		if ($var == NULL)
-			CROAK(\"UA_${(my $ntt=${ntype})=~s/.*_//g;\$ntt}_new\");
-		DPRINTF(\"${(my $ntt=lc(${ntype}))=~s/.*_//g;\$ntt} %p\", $var);
-		sv_setref_pv(SvRV($arg),
-		    \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\", $var);
-	} else {
-		CROAK(\"%s: %s is not a scalar reference\",
-		    ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]}, \"$var\");
+		CROAK(\"Parameter %s is not scalar or array or hash\",
+		    \"$var\");
 	}
 T_PTROBJ_SPECIAL
-	if (SvROK($arg) && sv_derived_from($arg,
-	    \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\")) {
+	if (($argoff) == 0) {
+		if (!(${(my $ntt=$ntype)=~s/_/::/g;
+		    # isself will be 1 for self pointer, 0 for other parameter
+		    # a self pointer of wrong type will cause C syntax error
+		    my $isself = $ntt eq $Package ? 1 : \"bad self\";
+		    $isself = 0 if $argoff != 0;
+		    \$isself}) ||
+		    (!(SvOK($arg) && SvROK($arg) &&
+		    sv_derived_from($arg, \"$Package\")))) {
+			CROAK(\"Self %s is not a %s\", \"$var\", \"$Package\");
+		}
+		/*
+		 * object reference of the correct type
+		 *
+		 * Use the existing object.
+		 *
+		 * This is needed for the DESTROY function and
+		 * self pointer of server, client, config, logger method.
+		 */
+		$var = INT2PTR($type, SvIV(SvRV($arg)));
+	} else if (!SvOK($arg)) {
+		CROAK(\"Parameter %s is undefined\", \"$var\");
+	} else if (SvROK($arg) && sv_derived_from($arg,
+	    \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")) {
+		/*
+		 * object reference of the correct type
+		 *
+		 * Use the existing object.
+		 *
+		 * This is needed for method parameter.
+		 */
 		$var = INT2PTR($type, SvIV(SvRV($arg)));
 	} else {
-		CROAK(\"%s: %s is not of type %s\",
-		    ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-		    \"$var\", \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\");
-		/* NOTREACHED, but cppcheck does not know this. */
-		exit(255);
+		CROAK(\"Parameter %s is not a %s\",
+		    \"$var\", \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\");
 	}
 
 #############################################################################
 OUTPUT
-T_PTROBJ_REFERENCE
-	sv_setref_pv($arg, \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\", $var);
+T_RETVAL_PACKED
+	XS_pack_$ntype($arg, $var);
+	UA_${(my $ntt=$ntype)=~s/.*_//g;\$ntt}_clear(&$var);
+T_PTROBJ_PACKED
+	sv_setref_pv($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\", $var);
 T_PTROBJ_SPECIAL
-	sv_setref_pv($arg, \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\", $var);
+	sv_setref_pv($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\", $var);

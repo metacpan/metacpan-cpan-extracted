@@ -20,8 +20,8 @@
          "rdfs:label" : "broadcastFrequency",
          "schema:category" : "issue-1004",
          "schema:domainIncludes" : [
-            "schema:BroadcastChannel",
-            "schema:BroadcastService"
+            "schema:BroadcastService",
+            "schema:BroadcastChannel"
          ],
          "schema:rangeIncludes" : [
             "schema:BroadcastFrequencySpecification",
@@ -40,13 +40,13 @@
          "rdfs:comment" : "Genre of the creative work, broadcast channel or group.",
          "rdfs:label" : "genre",
          "schema:domainIncludes" : [
+            "schema:MusicGroup",
             "schema:CreativeWork",
-            "schema:BroadcastChannel",
-            "schema:MusicGroup"
+            "schema:BroadcastChannel"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:URL"
+            "schema:URL",
+            "schema:Text"
          ]
       },
       "schema:inBroadcastLineup" : {

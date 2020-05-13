@@ -1,5 +1,14 @@
 Revision history for Metrics-Any-Adapter-Prometheus
 
+0.05    2020-05-13
+        [CHANGES]
+         * Updated for Metrics::Any 0.05
+         * No need to reïmplement flexible Histogram bucket generation now
+           it's in Net::Prometheus 0.10
+
+        [BUGFIXES]
+         * Don't append units to metric name if it is an empty string
+
 0.04    2020-05-04
         [CHANGES]
          * Provide more flexible ways for users to create Histogram buckets in

@@ -25,8 +25,8 @@ ok( defined eval { $metrics->inc_counter( "events" ); 1 },
 ok( defined eval { $metrics->make_distribution( "bytes" ); 1 },
    '$metrics->make_distribution' ) or diag( $@ );
 
-ok( defined eval { $metrics->inc_distribution_by( "bytes", 20 ); 1 },
-   '$metrics->inc_distribution_by' ) or diag( $@ );
+ok( defined eval { $metrics->report_distribution( "bytes", 20 ); 1 },
+   '$metrics->report_distribution' ) or diag( $@ );
 
 ok( defined eval { $metrics->make_gauge( "size" ); 1 },
    '$metrics->make_gauge' ) or diag( $@ );
@@ -40,8 +40,8 @@ ok( defined eval { $metrics->set_gauge_to( "size", 50 ); 1 },
 ok( defined eval { $metrics->make_timer( "duration" ); 1 },
    '$metrics->make_timer' ) or diag( $@ );
 
-ok( defined eval { $metrics->inc_timer_by( "duration", 20 ); 1 },
-   '$metrics->inc_timer_by' ) or diag( $@ );
+ok( defined eval { $metrics->report_timer( "duration", 20 ); 1 },
+   '$metrics->report_timer' ) or diag( $@ );
 
 ok( !$metrics, '$metrics is still false at EOF' );
 

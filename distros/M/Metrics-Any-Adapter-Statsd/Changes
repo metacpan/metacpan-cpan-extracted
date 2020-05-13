@@ -1,4 +1,9 @@
 Revision history for Metrics-Any-Adapter-Statsd
 
+0.02    2020-05-13
+        [CHANGES]
+         * Updated for Metrics::Any 0.05
+         * Accept host/port override as adapter args
+
 0.01    2020-04-29
         First version, released on an unsuspecting world.

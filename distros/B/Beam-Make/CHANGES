@@ -1,0 +1,9 @@
+Changelog for Beam-Make
+
+0.001     2020-05-12 22:43:13-05:00 America/Chicago
+
+    [Added]
+
+    - Added basic Make functionality to create files from shell scripts
+    - Added recipe classes for running database queries, loading
+      database schemas, and loading data from CSV files

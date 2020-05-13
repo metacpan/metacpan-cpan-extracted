@@ -1,5 +1,5 @@
 package App::gimpgitbuild::Command::build;
-$App::gimpgitbuild::Command::build::VERSION = '0.16.1';
+$App::gimpgitbuild::Command::build::VERSION = '0.16.2';
 use strict;
 use warnings;
 use 5.014;
@@ -46,20 +46,44 @@ sub _check
     return ( length( $ENV{SKIP_CHECK} ) ? "true" : "make check" );
 }
 
+my $skip_builds_re;
+
+BEGIN
+{
+    my $KEY = "GIMPGITBUILD__SKIP_BUILDS_RE";
+    if ( exists $ENV{$KEY} )
+    {
+        my $re_str = $ENV{$KEY};
+        $skip_builds_re = qr/$re_str/;
+    }
+}
+my $MESON_BUILD_DIR = ( $ENV{GIMPGITBUILD__MESON_BUILD_DIR}
+        // "to-del--gimpgitbuild--meson-build" );
+
+# See:
+# https://github.com/libfuse/libfuse/issues/212
+# Ubuntu/etc. places it under $prefix/lib/$arch by default.
+my $UBUNTU_MESON_LIBDIR_OVERRIDE = "-D libdir=lib";
+
+my $PAR_JOBS = ( $ENV{GIMPGITBUILD__PAR_JOBS_FLAGS} // '-j4' );
+
+sub _git_sync
+{
+    my ( $self, $args ) = @_;
+    return
+qq#$^X -MGit::Sync::App -e "Git::Sync::App->new->run" -- sync origin "$args->{branch}"#;
+}
+
 sub _git_build
 {
+    my $self                 = shift;
     my $args                 = shift;
     my $id                   = $args->{id};
     my $extra_configure_args = ( $args->{extra_configure_args} // [] );
 
-    my $KEY = "GIMPGITBUILD__SKIP_BUILDS_RE";
-    if ( exists $ENV{$KEY} )
+    if ( defined($skip_builds_re) and $id =~ $skip_builds_re )
     {
-        my $re = $ENV{$KEY};
-        if ( $id =~ /$re/ )
-        {
-            return;
-        }
+        return;
     }
     $args->{branch} //= 'master';
     $args->{tag}    //= 'false';
@@ -71,22 +95,20 @@ sub _git_build
         _do_system( { cmd => [qq#git clone "$args->{url}" "$git_co"#] } );
     }
 
-    # See:
-    # https://github.com/libfuse/libfuse/issues/212
-    # Ubuntu/etc. places it under $prefix/lib/$arch by default.
-    my $UBUNTU_MESON_LIBDIR_OVERRIDE = "-D libdir=lib";
-    my $MESON_BUILD_DIR              = ( $ENV{GIMPGITBUILD__MESON_BUILD_DIR}
-            // "to-del--gimpgitbuild--meson-build" );
-    my $PAR_JOBS = ( $ENV{GIMPGITBUILD__PAR_JOBS_FLAGS} // '-j4' );
-    my $meson1 =
+    my $meson_build_shell_cmd =
 qq#mkdir -p "$MESON_BUILD_DIR" && cd "$MESON_BUILD_DIR" && meson --prefix="$args->{prefix}" $UBUNTU_MESON_LIBDIR_OVERRIDE .. && ninja $PAR_JOBS && ninja $PAR_JOBS test && ninja $PAR_JOBS install#;
-    my $autoconf1 =
+    my $autoconf_build_shell_cmd =
 qq#NOCONFIGURE=1 ./autogen.sh && ./configure @{$extra_configure_args} --prefix="$args->{prefix}" && make $PAR_JOBS && @{[_check()]} && make install#;
+    my $sync_cmd = $self->_git_sync( { branch => $args->{branch}, } );
     _do_system(
         {
             cmd => [
-qq#cd "$git_co" && git checkout "$args->{branch}" && ($args->{tag} || $^X -MGit::Sync::App -e "Git::Sync::App->new->run" -- sync origin "$args->{branch}") && #
-                    . ( $args->{use_meson} ? $meson1 : $autoconf1 )
+qq#cd "$git_co" && git checkout "$args->{branch}" && ( $args->{tag} || $sync_cmd ) && #
+                    . (
+                      $args->{use_meson}
+                    ? $meson_build_shell_cmd
+                    : $autoconf_build_shell_cmd
+                    )
             ]
         }
     );
@@ -123,7 +145,7 @@ sub execute
     my $base_src_dir = $obj->base_git_clones_dir;
 
     my $GNOME_GIT = 'https://gitlab.gnome.org/GNOME';
-    _git_build(
+    $self->_git_build(
         {
             id        => "babl",
             git_co    => "$base_src_dir/babl/git/babl",
@@ -132,7 +154,7 @@ sub execute
             use_meson => 1,
         }
     );
-    _git_build(
+    $self->_git_build(
         {
             id        => "gegl",
             git_co    => "$base_src_dir/gegl/git/gegl",
@@ -141,7 +163,7 @@ sub execute
             use_meson => 1,
         }
     );
-    _git_build(
+    $self->_git_build(
         {
             id        => "libmypaint",
             git_co    => "$base_src_dir/libmypaint/git/libmypaint",
@@ -152,7 +174,7 @@ sub execute
             tag       => "true",
         }
     );
-    _git_build(
+    $self->_git_build(
         {
             id        => "mypaint-brushes",
             git_co    => "$base_src_dir/libmypaint/git/mypaint-brushes",
@@ -167,7 +189,7 @@ sub execute
     my $GIMP_BUILD = ( exists( $ENV{$KEY} ) ? $ENV{$KEY} : 1 );
 
 # autoconf_git_build "$base_src_dir/git/gimp" "$GNOME_GIT"/gimp "$HOME/apps/gimp-devel"
-    _git_build(
+    $self->_git_build(
         {
             id                   => "gimp",
             extra_configure_args => [ qw# --enable-debug #, ],
@@ -194,7 +216,7 @@ __END__
 
 =head1 VERSION
 
-version 0.16.1
+version 0.16.2
 
 =begin foo return (
         [ "output|o=s", "Output path" ],

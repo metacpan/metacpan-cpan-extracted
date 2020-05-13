@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: pod.t 2318 2011-01-22 12:59:02Z guillomovitch $
+# $Id$
 
 use strict;
 use warnings;

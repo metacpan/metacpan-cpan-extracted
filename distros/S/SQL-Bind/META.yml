@@ -26,14 +26,14 @@ no_index:
 provides:
   SQL::Bind:
     file: lib/SQL/Bind.pm
-    version: '1.01'
+    version: '1.02'
 requires:
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/vti/perl-SQL-Bind/issues
   homepage: https://github.com/vti/perl-SQL-Bind
   repository: git://github.com/vti/perl-SQL-Bind.git
-version: '1.01'
+version: '1.02'
 x_contributors:
   - 'vti <viacheslav.t@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

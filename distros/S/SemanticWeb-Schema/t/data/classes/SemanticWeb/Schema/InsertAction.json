@@ -13,8 +13,8 @@
          "rdfs:subPropertyOf" : "schema:location",
          "schema:domainIncludes" : [
             "schema:ExerciseAction",
-            "schema:MoveAction",
             "schema:TransferAction",
+            "schema:MoveAction",
             "schema:InsertAction"
          ],
          "schema:rangeIncludes" : "schema:Place"

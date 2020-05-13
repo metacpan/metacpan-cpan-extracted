@@ -6,7 +6,7 @@ use warnings;
 use Moo;
 use Try::Tiny ();
 
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 # ATTRIBUTES
 

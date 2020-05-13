@@ -12,10 +12,10 @@
          "rdfs:comment" : "A property-value pair representing an additional characteristics of the entitity, e.g. a product feature or another characteristic for which there is no matching property in schema.org.<br/><br/>\n\nNote: Publishers should be aware that applications designed to use specific schema.org properties (e.g. http://schema.org/width, http://schema.org/color, http://schema.org/gtin13, ...) will typically expect such data to be provided using those properties, rather than using the generic property/value mechanism.",
          "rdfs:label" : "additionalProperty",
          "schema:domainIncludes" : [
-            "schema:QualitativeValue",
-            "schema:QuantitativeValue",
+            "schema:Product",
             "schema:Place",
-            "schema:Product"
+            "schema:QuantitativeValue",
+            "schema:QualitativeValue"
          ],
          "schema:rangeIncludes" : "schema:PropertyValue"
       },
@@ -25,10 +25,10 @@
          "rdfs:comment" : "The upper value of some characteristic or property.",
          "rdfs:label" : "maxValue",
          "schema:domainIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:PropertyValue",
             "schema:MonetaryAmount",
-            "schema:PropertyValueSpecification"
+            "schema:QuantitativeValue",
+            "schema:PropertyValueSpecification",
+            "schema:PropertyValue"
          ],
          "schema:rangeIncludes" : "schema:Number"
       },
@@ -39,9 +39,9 @@
          "rdfs:label" : "minValue",
          "schema:domainIncludes" : [
             "schema:PropertyValueSpecification",
+            "schema:QuantitativeValue",
             "schema:MonetaryAmount",
-            "schema:PropertyValue",
-            "schema:QuantitativeValue"
+            "schema:PropertyValue"
          ],
          "schema:rangeIncludes" : "schema:Number"
       },
@@ -51,9 +51,9 @@
          "rdfs:comment" : "The unit of measurement given using the UN/CEFACT Common Code (3 characters) or a URL. Other codes than the UN/CEFACT Common Code may be used with a prefix followed by a colon.",
          "rdfs:label" : "unitCode",
          "schema:domainIncludes" : [
-            "schema:UnitPriceSpecification",
             "schema:TypeAndQuantityNode",
             "schema:PropertyValue",
+            "schema:UnitPriceSpecification",
             "schema:QuantitativeValue"
          ],
          "schema:rangeIncludes" : [
@@ -84,10 +84,10 @@
             "schema:QuantitativeValue"
          ],
          "schema:rangeIncludes" : [
-            "schema:Boolean",
-            "schema:StructuredValue",
             "schema:Number",
-            "schema:Text"
+            "schema:Text",
+            "schema:StructuredValue",
+            "schema:Boolean"
          ]
       },
       "schema:valueReference" : {
@@ -96,16 +96,16 @@
          "rdfs:comment" : "A pointer to a secondary value that provides additional information on the original value, e.g. a reference temperature.",
          "rdfs:label" : "valueReference",
          "schema:domainIncludes" : [
+            "schema:PropertyValue",
             "schema:QualitativeValue",
-            "schema:QuantitativeValue",
-            "schema:PropertyValue"
+            "schema:QuantitativeValue"
          ],
          "schema:rangeIncludes" : [
-            "schema:StructuredValue",
             "schema:Enumeration",
             "schema:QuantitativeValue",
-            "schema:QualitativeValue",
-            "schema:PropertyValue"
+            "schema:StructuredValue",
+            "schema:PropertyValue",
+            "schema:QualitativeValue"
          ]
       }
    }

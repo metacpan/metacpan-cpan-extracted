@@ -1,72 +1,17 @@
-#!/usr/bin/perl
+package Mail::DKIM::DNS;
+use strict;
+use warnings;
+our $VERSION = '1.20200513.1'; # VERSION
+# ABSTRACT: performs DNS queries for Mail::DKIM
 
 # Copyright 2007, 2012 Messiah College. All rights reserved.
 # Jason Long <jlong@messiah.edu>
 
-use strict;
-use warnings;
-
-=head1 NAME
-
-Mail::DKIM::DNS - performs DNS queries for Mail::DKIM
-
-=head1 DESCRIPTION
-
-This is the module that performs DNS queries for L<Mail::DKIM>.
-
-=head1 CONFIGURATION
-
-This module has a couple configuration settings that the caller
-may want to use to customize the behavior of this module.
-
-=head2 $Mail::DKIM::DNS::TIMEOUT
-
-This global variable specifies the maximum amount of time (in seconds)
-to wait for a single DNS query to complete. The default is 10.
-
-=head2 Mail::DKIM::DNS::resolver()
-
-Use this global subroutine to get or replace the instance of
-L<Net::DNS::Resolver> that Mail::DKIM uses. If set to undef (the default),
-then a brand new default instance of L<Net::DNS::Resolver> will be
-created the first time a DNS query is needed.
-
-You will call this subroutine if you want to specify non-default options
-to L<Net::DNS::Resolver>, such as different timeouts, or to enable use
-of a persistent socket. For example:
-
-  # first, construct a custom DNS resolver
-  my $res = Net::DNS::Resolver->new(
-                    udp_timeout => 3, tcp_timeout => 3, retry => 2,
-                 );
-  $res->udppacketsize(1240);
-  $res->persistent_udp(1);
-
-  # then, tell Mail::DKIM to use this resolver
-  Mail::DKIM::DNS::resolver($res);
-
-=head2 Mail::DKIM::DNS::enable_EDNS0()
-
-This is a convenience subroutine that will construct an appropriate DNS
-resolver that uses EDNS0 (Extension mechanisms for DNS) to support large
-DNS replies, and configure Mail::DKIM to use it. (As such, it should NOT
-be used in conjunction with the resolver() subroutine described above.)
-
-  Mail::DKIM::DNS::enable_EDNS0();
-
-Use of EDNS0 is recommended, since it reduces the need for falling back to TCP
-when dealing with large DNS packets. However, it is not enabled by default
-because some Internet firewalls which do deep inspection of packets are not able
-to process EDNS0-enabled packets. When there is a firewall on a path to a DNS
-resolver, the EDNS0 feature should be specifically tested before enabling.
-
-=cut
 
 # This class contains a method to perform synchronous DNS queries.
 # Hopefully some day it will have a method to perform
 # asynchronous DNS queries.
 
-package Mail::DKIM::DNS;
 use Net::DNS;
 our $TIMEOUT = 10;
 our $RESOLVER;
@@ -182,6 +127,12 @@ sub query {
             }
         }
     }
+    if ( $rslv->errorstring eq 'NOERROR' ) {
+        return;
+    }
+    if ( $rslv->errorstring =~ /\bno error\b/ ) {
+        return;
+    }
     die 'DNS error: ' . $rslv->errorstring . "\n";
 }
 
@@ -221,13 +172,114 @@ sub query_async {
 
 1;
 
-=head1 AUTHOR
+__END__
 
-Jason Long, E<lt>jlong@messiah.eduE<gt>
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Mail::DKIM::DNS - performs DNS queries for Mail::DKIM
+
+=head1 VERSION
+
+version 1.20200513.1
+
+=head1 DESCRIPTION
+
+This is the module that performs DNS queries for L<Mail::DKIM>.
+
+=head1 CONFIGURATION
+
+This module has a couple configuration settings that the caller
+may want to use to customize the behavior of this module.
+
+=head2 $Mail::DKIM::DNS::TIMEOUT
+
+This global variable specifies the maximum amount of time (in seconds)
+to wait for a single DNS query to complete. The default is 10.
+
+=head2 Mail::DKIM::DNS::resolver()
+
+Use this global subroutine to get or replace the instance of
+L<Net::DNS::Resolver> that Mail::DKIM uses. If set to undef (the default),
+then a brand new default instance of L<Net::DNS::Resolver> will be
+created the first time a DNS query is needed.
+
+You will call this subroutine if you want to specify non-default options
+to L<Net::DNS::Resolver>, such as different timeouts, or to enable use
+of a persistent socket. For example:
+
+  # first, construct a custom DNS resolver
+  my $res = Net::DNS::Resolver->new(
+                    udp_timeout => 3, tcp_timeout => 3, retry => 2,
+                 );
+  $res->udppacketsize(1240);
+  $res->persistent_udp(1);
+
+  # then, tell Mail::DKIM to use this resolver
+  Mail::DKIM::DNS::resolver($res);
+
+=head2 Mail::DKIM::DNS::enable_EDNS0()
+
+This is a convenience subroutine that will construct an appropriate DNS
+resolver that uses EDNS0 (Extension mechanisms for DNS) to support large
+DNS replies, and configure Mail::DKIM to use it. (As such, it should NOT
+be used in conjunction with the resolver() subroutine described above.)
+
+  Mail::DKIM::DNS::enable_EDNS0();
+
+Use of EDNS0 is recommended, since it reduces the need for falling back to TCP
+when dealing with large DNS packets. However, it is not enabled by default
+because some Internet firewalls which do deep inspection of packets are not able
+to process EDNS0-enabled packets. When there is a firewall on a path to a DNS
+resolver, the EDNS0 feature should be specifically tested before enabling.
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Jason Long <jason@long.name>
+
+=item *
+
+Marc Bradshaw <marc@marcbradshaw.net>
+
+=item *
+
+Bron Gondwana <brong@fastmailteam.com> (ARC)
+
+=back
+
+=head1 THANKS
+
+Work on ensuring that this module passes the ARC test suite was
+generously sponsored by Valimail (https://www.valimail.com/)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006-2007, 2012-2013 by Messiah College
+=over 4
+
+=item *
+
+Copyright (C) 2013 by Messiah College
+
+=item *
+
+Copyright (C) 2010 by Jason Long
+
+=item *
+
+Copyright (C) 2017 by Standcore LLC
+
+=item *
+
+Copyright (C) 2020 by FastMail Pty Ltd
+
+=back
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.6 or,

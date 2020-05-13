@@ -24,7 +24,7 @@ use HTML::Selector::XPath 'selector_to_xpath';
 use HTTP::Cookies::ChromeDevTools;
 use POSIX ':sys_wait_h';
 
-our $VERSION = '0.53';
+our $VERSION = '0.54';
 our @CARP_NOT;
 
 =encoding utf-8
@@ -2129,8 +2129,7 @@ subframes do not get loaded properly.
 
 =cut
 
-sub get_local {
-    my ($self, $htmlfile, %options) = @_;
+sub _local_url( $self, $htmlfile, %options ) {
     my $basedir;
     if( exists $options{ basedir }) {
         $basedir = $options{ basedir };
@@ -2148,6 +2147,11 @@ sub get_local {
     } else {
         $url= "file://$fn";
     };
+    return $url
+}
+
+sub get_local( $self, $htmlfile, %options ) {
+    my $url = $self->_local_url( $htmlfile, %options );
     my $res = $self->get($url, %options);
     ## Chrome is not helpful with its error messages for local URLs
     #if( 0+$res->headers->header_field_names and ([$res->headers->header_field_names]->[0] ne 'x-www-mechanize-Chrome-fake-success' or $self->uri ne 'about:blank')) {
@@ -4026,8 +4030,7 @@ C<selector> or C<xpath>, consider using C<< ->click >> instead.
 
 =cut
 
-sub click_button {
-    my ($self,%options) = @_;
+sub click_button($self,%options) {
     my $node;
     my $xpath;
     my $user_message;
@@ -4044,7 +4047,7 @@ sub click_button {
     } elsif (exists $options{ id }) {
         my $v = delete $options{ id };
         $xpath = sprintf '//*[@id="%s"]', $v;
-        $user_message = "Button name '$v' unknown";
+        $user_message = "Button id '$v' unknown";
     } elsif (exists $options{ number }) {
         my $v = delete $options{ number };
         $xpath = sprintf '//*[translate(local-name(.), "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz") = "button" or (translate(local-name(.), "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz") = "input" and @type="submit")][%s]', $v;
@@ -5296,20 +5299,7 @@ our %extensions = (
     'text/stylesheet'  => '.css',
 );
 
-# Allow the options to specify whether to filter duplicates here
-sub fetchResources_future( $self, %options ) {
-    $options{ save } ||= undef;
-    $options{ seen } ||= {};
-    $options{ names } ||= {};
-    my $seen = $options{ seen };
-    my $names = $options{ names };
-    my $save = $options{ save };
-
-    my $s = $self;
-    weaken $s;
-
-    $self->getResourceTree_future
-    ->then( sub( $tree ) {
+sub _saveResourceTree( $self, $tree, $names, $seen, $wanted, $save, $base_dir ) {
         my @requested;
         # Also fetch the frame itself?!
         # Or better reuse ->content?!
@@ -5319,45 +5309,81 @@ sub fetchResources_future( $self, %options ) {
         # This should become a separate method
         # Also something like get_page_resources, that returns the linear
         # list of resources for all frames etc.
+        my @wanted;
         for my $res ($tree->{frame}, @{ $tree->{resources}}) {
-            # Also include childFrames and subresources here, recursively
-
-            if( $names->{ $res->{url} } ) {
+            if( $seen->{ $res->{url} } ) {
                 #warn "Skipping $res->{url} (already saved)";
                 next;
             };
+            next if $wanted->($res);
 
-            # we will only scrape HTTP resources
-            next if $res->{url} !~ /^https?:/i;
-            warn $res->{url};
-            my $target = $s->filenameFromUrl( $res->{url}, $extensions{ $res->{mimeType} });
-            my %filenames = reverse %$names;
+            my $target;
+            if( exists $names->{ $res->{url}}) {
+                # User-specified names always take precedence
+                $target = $names->{ $res->{url}};
+                $names->{ $res->{url} } = $target;
 
-            my $duplicates;
-            my $old_target = $target;
-            while( $filenames{ $target }) {
-                $duplicates++;
-                ( $target = $old_target )=~ s!\.(\w+)$!_$duplicates.$1!;
+            } else {
+                # find a non-duplicate name
+                $target = $self->filenameFromUrl( $res->{url}, $extensions{ $res->{mimeType} });
+                my %filenames = reverse %$names;
+
+                my $duplicates;
+                my $old_target = $target;
+                while( $filenames{ $target }) {
+                    $duplicates++;
+                    ( $target = $old_target )=~ s!\.(\w+)$!_$duplicates.$1!;
+                };
+                $names->{ $res->{url} } = File::Spec->catfile( $base_dir, $target );
             };
-            $names->{ $res->{url} } = $target;
+
+            push @wanted, $res;
         };
 
         # retrieve and save the resource content for each resource
-        for my $res ($tree->{frame}, @{ $tree->{resources}}) {
-            next if $seen->{ $res->{url} };
-
-            # we will only scrape HTTP resources
-            next if $res->{url} !~ /^https?:/i;
-            my $fetch = $s->getResourceContent_future( $res );
+        for my $res (@wanted) {
+            my $fetch = $self->getResourceContent_future( $res );
             if( $save ) {
                 #warn "Will save $res->{url}";
-                $fetch = $fetch->then( $save );
+                $fetch = $fetch->then( $save )->else(sub {
+                    warn "Fetch failed:";
+                    warn "@_";
+                });
             };
             push @requested, $fetch;
         };
+
+        # recurse through the subframes
+        if( my $t = $tree->{childFrames}) {
+            for my $child (@$t) {
+                push @requested, $self->_saveResourceTree( $child, $names, $seen, $wanted, $save, $base_dir );
+            };
+        };
+
         return Future->wait_all( @requested )->catch(sub {
             warn $@;
         });
+}
+
+# Allow the options to specify whether to filter duplicates here
+sub fetchResources_future( $self, %options ) {
+    $options{ save } ||= undef;
+    $options{ seen } ||= {};
+    $options{ names } ||= {};
+    $options{ target_dir } ||= '.';
+    $options{ wanted } ||= sub( $res ) { $res->{url} =~ /^(https?):/i };
+    my $seen = $options{ seen };
+    my $names = $options{ names };
+    my $wanted = $options{ wanted };
+    my $save = $options{ save };
+    my $base_dir = $options{ target_dir };
+
+    my $s = $self;
+    weaken $s;
+
+    $self->getResourceTree_future
+    ->then( sub( $tree ) {
+        $s->_saveResourceTree($tree, $names, $seen, $wanted, $save, $base_dir);
     })->catch(sub {
         warn $@;
     });
@@ -5368,6 +5394,7 @@ sub fetchResources_future( $self, %options ) {
     my $file_map = $mech->saveResources_future(
         target_file => 'this_page.html',
         target_dir  => 'this_page_files/',
+        wanted      => sub { $_[0]->{url} =~ m!^https?:!i },
     )->get();
 
 Rough prototype of "Save Complete Page" feature
@@ -5392,7 +5419,6 @@ sub saveResources_future( $self, %options ) {
     my $s = $self;
     weaken $s;
     $self->fetchResources_future( save => sub( $resource ) {
-
         # For mime/html targets without a name, use the title?!
         # Rewrite all HTML, CSS links
 
@@ -5408,8 +5434,8 @@ sub saveResources_future( $self, %options ) {
         CORE::close( $fh );
 
         Future->done( $resource );
-    }, names => \%names, seen => \my %seen )->then( sub( @resources ) {
-        Future->done( %names );
+    }, names => \%names, seen => \my %seen, target_dir => $target_dir )->then( sub( @resources ) {
+        Future->done( \%names );
     })->catch(sub {
         warn $@;
     });

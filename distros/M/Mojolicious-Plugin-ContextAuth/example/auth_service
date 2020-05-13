@@ -1,0 +1,454 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Mojolicious::Lite;
+
+my $db = app->home->child('db')->make_path->child('ContextAuth.db');
+
+app->plugin(
+    'ContextAuth' => {
+        prefix => 'auth',
+        dsn    => 'sqlite:' . $db,
+    },
+);
+
+get '/' => sub { shift->redirect_to('login') };
+
+get( '/register' )->name('register');
+post( '/register' => sub {
+    my ($c) = @_;
+
+    my $new_user = $c->auth->db->add(
+        user =>
+            username => $c->param('username'),
+            user_password => $c->param('password'),
+    );
+
+    if ( !$new_user ) {
+        $c->flash( username => $c->param('username') );
+        return $c->redirect_to('register');
+    }
+
+    $c->redirect_to('login');
+})->name('send-register');
+
+get('/login')->name('login');
+post('/login' => sub {
+    my ($c) = @_;
+
+    my $session_id = $c->auth->login(
+        $c->param('username'),
+        $c->param('password'),
+    );
+
+    if ( !$session_id ) {
+        $c->flash( error => 1 );
+        return $c->redirect_to('login');
+    }
+
+    $c->session( session_id => $session_id );
+    $c->redirect_to('dashboard');
+})->name('send-login');
+
+under '/' => sub {
+    my ($c) = @_;
+
+    my $user = $c->auth->user_from_session( $c->session('session_id') );
+    if ( !$user ) {
+        $c->redirect_to('login');
+        return;
+    }
+
+    return 1;
+};
+
+get('/dashboard' => sub {
+    my ($c) = @_;
+
+    my $user      = $c->auth->user_from_session( $c->session('session_id') );
+    my @contexts  = map{ $c->auth->db->get('context' => $_) }$c->auth->db->search('context');
+    my @resources = map{ $c->auth->db->get('resource' => $_) }$c->auth->db->search('resource');
+
+    $c->stash(
+        username  => $user->username,
+        contexts  => \@contexts,
+        resources => \@resources,
+    );
+
+    $c->render('dashboard');
+} )->name('dashboard');
+
+get('/context/:id' => sub {
+    my ($c) = @_;
+
+    my $id      = $c->param('id');
+    my $context = $c->auth->db->get(
+      'context' => $id,
+    );
+
+    my @roles = map{ $c->auth->db->get('role' => $_) }$c->auth->db->search('role', context_id => $id );
+
+    $c->stash(
+        context => $context,
+        roles   => \@roles,
+    );
+
+    $c->render( 'contexts' );
+})->name('context');
+
+get('/context' => sub{
+    my ($c) = @_;
+
+    $c->stash(
+        context => $c->auth->db->object('context'),
+        roles   => [],
+    );
+
+    $c->render('contexts');
+})->name('context-form');
+
+post('/context' => \&_save_context)->name('send-context');
+
+get('/role/:id' => sub {
+    my ($c) = @_;
+
+    my $id      = $c->param('id');
+    my $role = $c->auth->db->get(
+      'role' => $id,
+    );
+
+    $c->stash(
+        role => $role,
+    );
+
+    $c->render( 'roles' );
+})->name('role');
+
+get('/role' => sub{
+    my ($c) = @_;
+
+    my $role = $c->auth->db->object('role');
+    $role->context_id( $c->param('context-id') );
+
+    $c->stash(
+        role => $role,
+    );
+
+    $c->render('roles');
+})->name('role-form');
+
+post('/role' => \&_save_role)->name('send-role');
+
+get('/resource/:id' => sub {
+    my ($c) = @_;
+
+    my $id       = $c->param('id');
+    my $resource = $c->auth->db->get(
+      'resource' => $id,
+    );
+
+    my @permissions = map{
+        $c->auth->db->get('permission' => $_)
+    }$c->auth->db->search('permission', resource_id => $id );
+
+    $c->stash(
+        resource    => $resource,
+        permissions => \@permissions,
+    );
+
+    $c->render( 'resources' );
+})->name('resource');
+
+get('/resource' => sub{
+    my ($c) = @_;
+
+    my $resource = $c->auth->db->object('resource');
+
+    $c->stash(
+        resource    => $resource,
+        permissions => undef,
+    );
+
+    $c->render('resources');
+})->name('resource-form');
+
+post('/resource' => \&_save_resource)->name('send-resource');
+
+get('/permission/:id' => sub {
+    my ($c) = @_;
+
+    my $id         = $c->param('id');
+    my $permission = $c->auth->db->get(
+      'permission' => $id,
+    );
+
+    $c->stash(
+        permission => $permission,
+    );
+
+    $c->render( 'permissions' );
+})->name('permission');
+
+get('/permission' => sub{
+    my ($c) = @_;
+
+    my $permission = $c->auth->db->object('permission');
+    $permission->resource_id( $c->param('resource-id') );
+
+    $c->stash(
+        permission => $permission,
+    );
+
+    $c->render('permissions');
+})->name('permission-form');
+
+post('/permission' => \&_save_permission)->name('send-permission');
+
+
+app->start;
+
+sub _save_context {
+    my $c = shift;
+
+    my %data   = (
+        context_name        => $c->param('context-name') // '',
+        context_description => $c->param('context-description') // '',
+    );
+
+    my $id = $c->param('context-id');
+
+    my $result = $id ?
+        $c->auth->db->update('context', $id, %data ) :
+        $c->auth->db->add('context', %data);
+
+    if ( !$result ) {
+        $c->app->log->warn( $c->auth->db->error );
+    }
+
+    $c->redirect_to('dashboard');
+}
+
+sub _save_role {
+    my $c = shift;
+
+    my $context_id = $c->param('context-id') // '';
+    my %data       = (
+        role_name        => $c->param('role-name') // '',
+        role_description => $c->param('role-description') // '',
+        context_id       => $context_id // '',
+    );
+
+    my $id = $c->param('role-id');
+
+    my $result = $id ?
+        $c->auth->db->update('role', $id, %data ) :
+        $c->auth->db->add('role', %data);
+
+    if ( !$result ) {
+        $c->app->log->warn( $c->auth->db->error );
+    }
+
+    $c->redirect_to('context', id => $context_id);
+}
+
+sub _save_resource {
+    my $c = shift;
+    
+    my %data       = (
+        resource_name        => $c->param('resource-name') // '',
+        resource_description => $c->param('resource-description') // '',
+    );
+
+    my $id = $c->param('resource-id');
+
+    my $result = $id ?
+        $c->auth->db->update('resource', $id, %data ) :
+        $c->auth->db->add('resource', %data);
+
+    if ( !$result ) {
+        $c->app->log->warn( $c->auth->db->error );
+    }
+
+    $c->redirect_to('dashboard');
+}
+
+sub _save_permission {
+    my $c = shift;
+
+    my $resource_id = $c->param('resource-id') // '';
+    my %data       = (
+        permission_name        => $c->param('permission-name') // '',
+        permission_description => $c->param('permission-description') // '',
+        resource_id            => $resource_id // '',
+    );
+
+    my $id = $c->param('permission-id');
+
+    my $result = $id ?
+        $c->auth->db->update('permission', $id, %data ) :
+        $c->auth->db->add('permission', %data);
+
+    if ( !$result ) {
+        $c->app->log->warn( $c->auth->db->error );
+    }
+
+    $c->redirect_to('resource', id => $resource_id);
+}
+
+
+__DATA__
+@@ dashboard.html.ep
+% if ( flash('context_error') ) {
+    <b>Context does not exist</b>
+% }
+
+<div>Welcome, <%= $username %></div>
+
+<div>
+    <a href="<%= url_for('context-form') %>">Add Context</a> |
+    <a href="<%= url_for('resource') %>">Add Resource</a> |
+    <a href="<%= url_for('check') %>">Check Permission</a>
+</div>
+
+<h2>Contexts</h2>
+<table>
+    <tr>
+        <th>name</th><th>description</th><th>details</th>
+    </tr>
+% for my $context ( @{$contexts} ) {
+    <tr>
+        <td><%= $context->context_name %></td>
+        <td><%= $context->context_description %></td>
+        <td>
+            <a href="<%= url_for('context', id => $context->context_id) %>">details</a>
+        </td>
+    </tr>
+% }
+</table>
+
+<h2>Resources</h2>
+<table>
+    <tr>
+        <th>name</th><th>description</th><th>details</th>
+    </tr>
+% for my $resource ( @{$resources} ) {
+    <tr>
+        <td><%= $resource->resource_name %></td>
+        <td><%= $resource->resource_description %></td>
+        <td>
+            <a href="<%= url_for('resource', id => $resource->resource_id) %>">details</a>
+        </td>
+    </tr>
+% }
+</table>
+
+@@ register.html.ep
+
+<form action="<%= url_for('send-register') %>" method="post">
+    Username: <input type="text" value="<%= flash('username') %>" name="username"><br />
+    Password: <input type="password" name="password"><br />
+    <button type="submit">Register</button>
+</form>
+
+@@ login.html.ep
+% if ( flash('error') ) {
+    <b>Login failed</b>
+% }
+
+<form action="<%= url_for('send-login') %>" method="post">
+    Username: <input type="text" name="username"><br />
+    Password: <input type="password" name="password"><br />
+    <button type="submit">Login</button>
+</form>
+
+Not registered, yet? <a href="<%= url_for('register') %>">register...</a>
+
+@@ contexts.html.ep
+
+<a href="<%= url_for('dashboard') %>">Back to dashboard</a>
+
+<form action="<%= url_for('send-context') %>" method="post">
+    Context name: <input type="text" name="context-name" value="<%= $context->context_name %>"><br />
+    Context description: <textarea name="context-description"><%= $context->context_description %></textarea>
+    <input type="hidden" name="context-id" value="<%= $context->context_id %>">
+    <br />
+    <button type="submit">Add Context</button>
+</form>
+
+
+<a href="<%= url_for('role-form')->query( 'context-id' => $context->context_id ) %>">Add Role</a>
+<h2>Roles</h2>
+<table>
+    <tr>
+        <th>name</th><th>description</th><th>details</th>
+    </tr>
+% for my $role ( @{$roles} ) {
+    <tr>
+        <td><%= $role->role_name %></td>
+        <td><%= $role->role_description %></td>
+        <td>
+            <a href="<%= url_for('role', id => $role->role_id) %>">details</a>
+        </td>
+    </tr>
+% }
+</table>
+
+@@ roles.html.ep
+
+<a href="<%= url_for('context', id => $role->context_id) %>">Back to context</a>
+
+<form action="<%= url_for('send-role') %>" method="post">
+    Role name: <input type="text" name="role-name" value="<%= $role->role_name %>"><br />
+    Role description: <textarea name="role-description"><%= $role->role_description %></textarea>
+    <input type="hidden" name="role-id" value="<%= $role->role_id %>">
+    <input type="hidden" name="context-id" value="<%= $role->context_id %>">
+    <br />
+    <button type="submit">Add Role</button>
+</form>
+
+
+@@ resources.html.ep
+
+<a href="<%= url_for('dashboard') %>">Back to dashboard</a>
+
+<form action="<%= url_for('send-resource') %>" method="post">
+    Resource name: <input type="text" name="resource-name" value="<%= $resource->resource_name %>"><br />
+    Resource description: <textarea name="resource-description"><%= $resource->resource_description %></textarea>
+    <input type="hidden" name="resource-id" value="<%= $resource->resource_id %>">
+    <br />
+    <button type="submit">Add Resource</button>
+</form>
+
+% if ( $permissions ) {
+    <a href="<%= url_for('permission-form')->query( 'resource-id' => $resource->resource_id ) %>">Add permission</a>
+    <h2>permissions</h2>
+    <table>
+        <tr>
+            <th>name</th><th>description</th><th>details</th>
+        </tr>
+% for my $permission ( @{$permissions} ) {
+        <tr>
+            <td><%= $permission->permission_name %></td>
+            <td><%= $permission->permission_description %></td>
+            <td>
+                <a href="<%= url_for('permission', id => $permission->permission_id) %>">details</a>
+            </td>
+        </tr>
+% }
+    </table>
+% }
+
+@@ permissions.html.ep
+
+<a href="<%= url_for('resource', id => $permission->resource_id) %>">Back to resource</a>
+
+<form action="<%= url_for('send-permission') %>" method="post">
+    permission name: <input type="text" name="permission-name" value="<%= $permission->permission_name %>"><br />
+    permission description: <textarea name="permission-description"><%= $permission->permission_description %></textarea>
+    <input type="hidden" name="permission-id" value="<%= $permission->permission_id %>">
+    <input type="hidden" name="resource-id" value="<%= $permission->resource_id %>">
+    <br />
+    <button type="submit">Add Permission</button>
+</form>

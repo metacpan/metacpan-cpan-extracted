@@ -9,15 +9,94 @@
       "schema:isPartOf" : "http:pending.schema.org"
    },
    "properties" : {
+      "schema:deliveryTime" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The total delay between the receipt of the order and the goods reaching the final customer.",
+         "rdfs:label" : "deliveryTime",
+         "schema:category" : "issue-2506",
+         "schema:domainIncludes" : [
+            "schema:DeliveryTimeSettings",
+            "schema:OfferShippingDetails"
+         ],
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:ShippingDeliveryTime"
+      },
+      "schema:doesNotShip" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates, as part of an <a class=\"localLink\" href=\"http://schema.org/OfferShippingDetails\">OfferShippingDetails</a>, when shipping to a particular <a class=\"localLink\" href=\"http://schema.org/shippingDestination\">shippingDestination</a> is not available.",
+         "rdfs:label" : "doesNotShip",
+         "schema:category" : "issue-2506",
+         "schema:domainIncludes" : [
+            "schema:ShippingRateSettings",
+            "schema:OfferShippingDetails"
+         ],
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Boolean"
+      },
       "schema:shippingDestination" : {
          "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "indicates (posssibly multiple) shipping destinations. These can be defined in several ways e.g. postalCode ranges.",
+         "rdfs:comment" : "indicates (possibly multiple) shipping destinations. These can be defined in several ways e.g. postalCode ranges.",
          "rdfs:label" : "shippingDestination",
+         "schema:category" : "issue-2506",
+         "schema:domainIncludes" : [
+            "schema:ShippingRateSettings",
+            "schema:DeliveryTimeSettings",
+            "schema:OfferShippingDetails"
+         ],
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:DefinedRegion"
+      },
+      "schema:shippingLabel" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Label to match an <a class=\"localLink\" href=\"http://schema.org/OfferShippingDetails\">OfferShippingDetails</a> with a <a class=\"localLink\" href=\"http://schema.org/ShippingRateSettings\">ShippingRateSettings</a> (within the context of a <a class=\"localLink\" href=\"http://schema.org/shippingSettingsLink\">shippingSettingsLink</a> cross-reference).",
+         "rdfs:label" : "shippingLabel",
+         "schema:category" : "issue-2506",
+         "schema:domainIncludes" : [
+            "schema:OfferShippingDetails",
+            "schema:ShippingRateSettings"
+         ],
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:shippingRate" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The shipping rate is the cost of shipping to the specified destination. Typically, the maxValue and currency values (of the <a class=\"localLink\" href=\"http://schema.org/MonetaryAmount\">MonetaryAmount</a>) are most appropriate.",
+         "rdfs:label" : "shippingRate",
+         "schema:category" : "issue-2506",
+         "schema:domainIncludes" : [
+            "schema:ShippingRateSettings",
+            "schema:OfferShippingDetails"
+         ],
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:MonetaryAmount"
+      },
+      "schema:shippingSettingsLink" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Link to a page containing <a class=\"localLink\" href=\"http://schema.org/ShippingRateSettings\">ShippingRateSettings</a> and <a class=\"localLink\" href=\"http://schema.org/DeliveryTimeSettings\">DeliveryTimeSettings</a> details.",
+         "rdfs:label" : "shippingSettingsLink",
          "schema:category" : "issue-2506",
          "schema:domainIncludes" : "schema:OfferShippingDetails",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:DefinedRegion"
+         "schema:rangeIncludes" : "schema:URL"
+      },
+      "schema:transitTimeLabel" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Label to match an <a class=\"localLink\" href=\"http://schema.org/OfferShippingDetails\">OfferShippingDetails</a> with a <a class=\"localLink\" href=\"http://schema.org/DeliveryTimeSettings\">DeliveryTimeSettings</a> (within the context of a <a class=\"localLink\" href=\"http://schema.org/shippingSettingsLink\">shippingSettingsLink</a> cross-reference).",
+         "rdfs:label" : "transitTimeLabel",
+         "schema:category" : "issue-2506",
+         "schema:domainIncludes" : [
+            "schema:DeliveryTimeSettings",
+            "schema:OfferShippingDetails"
+         ],
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
       }
    }
 }

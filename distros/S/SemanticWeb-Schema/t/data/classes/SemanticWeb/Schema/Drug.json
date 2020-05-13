@@ -13,10 +13,10 @@
          "rdfs:comment" : "An active ingredient, typically chemical compounds and/or biologic substances.",
          "rdfs:label" : "activeIngredient",
          "schema:domainIncludes" : [
+            "schema:Substance",
             "schema:Drug",
             "schema:DietarySupplement",
-            "schema:DrugStrength",
-            "schema:Substance"
+            "schema:DrugStrength"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"
@@ -83,8 +83,8 @@
          "rdfs:comment" : "A dosing schedule for the drug for a given population, either observed, recommended, or maximum dose based on the type used.",
          "rdfs:label" : "doseSchedule",
          "schema:domainIncludes" : [
-            "schema:TherapeuticProcedure",
-            "schema:Drug"
+            "schema:Drug",
+            "schema:TherapeuticProcedure"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:DoseSchedule"
@@ -102,8 +102,8 @@
          "rdfs:comment" : "The unit in which the drug is measured, e.g. '5 mg tablet'.",
          "rdfs:label" : "drugUnit",
          "schema:domainIncludes" : [
-            "schema:DrugCost",
-            "schema:Drug"
+            "schema:Drug",
+            "schema:DrugCost"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"
@@ -166,15 +166,15 @@
          "rdfs:comment" : "The drug or supplement's legal status, including any controlled substance schedules that apply.",
          "rdfs:label" : "legalStatus",
          "schema:domainIncludes" : [
-            "schema:Drug",
             "schema:MedicalEntity",
-            "schema:DietarySupplement"
+            "schema:DietarySupplement",
+            "schema:Drug"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
+            "schema:MedicalEnumeration",
             "schema:DrugLegalStatus",
-            "schema:MedicalEnumeration"
+            "schema:Text"
          ]
       },
       "schema:manufacturer" : {
@@ -183,8 +183,8 @@
          "rdfs:label" : "manufacturer",
          "schema:domainIncludes" : [
             "schema:Product",
-            "schema:DietarySupplement",
-            "schema:Drug"
+            "schema:Drug",
+            "schema:DietarySupplement"
          ],
          "schema:rangeIncludes" : "schema:Organization"
       },
@@ -193,9 +193,9 @@
          "rdfs:comment" : "Recommended intake of this supplement for a given population as defined by a specific recommending authority.",
          "rdfs:label" : "maximumIntake",
          "schema:domainIncludes" : [
-            "schema:DietarySupplement",
-            "schema:DrugStrength",
             "schema:Substance",
+            "schema:DrugStrength",
+            "schema:DietarySupplement",
             "schema:Drug"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",

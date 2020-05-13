@@ -39,10 +39,6 @@ __PACKAGE__->add_columns(
     data_type => 'datetime',
     is_nullable => 1,
   },
-  'twokeysfk' => {
-    data_type => 'integer',
-    is_nullable => 1,
-  },
 );
 __PACKAGE__->set_primary_key('dvd_id');
 __PACKAGE__->belongs_to('owner', 'DBSchema::Result::User', 'owner');
@@ -55,14 +51,10 @@ __PACKAGE__->might_have(
     { proxy => [ qw/notes/ ] },
 );
 __PACKAGE__->add_relationship('like_has_many', 'DBSchema::Result::Twokeys', { 'foreign.dvd_name' => 'self.name' }, { accessor => 'multi', accessor_name => 'like_has_many' } );
-__PACKAGE__->add_relationship('like_has_many2', 'DBSchema::Result::Twokeys_belongsto', 
-    { 'foreign.key1' => 'self.twokeysfk' }, 
-    { accessor => 'multi' },
-);
+
 __PACKAGE__->has_many(
     keysbymethod => 'KeysByMethod',
     { 'foreign.dvd' => 'self.dvd_id' }
 );
 
 1;
-

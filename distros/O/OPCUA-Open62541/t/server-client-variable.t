@@ -13,7 +13,7 @@ use OPCUA::Open62541::Test::Server;
 use OPCUA::Open62541::Test::Client;
 use Test::More tests =>
     OPCUA::Open62541::Test::Server::planning() +
-    OPCUA::Open62541::Test::Client::planning() + 19;
+    OPCUA::Open62541::Test::Client::planning() + 29;
 use Test::LeakTrace;
 use Test::NoWarnings;
 
@@ -102,21 +102,22 @@ is($client->{client}->readValueAttribute_async(
     sub {
 	my ($c, $d, $i, $v) = @_;
 
-	is($c, $client->{client}, "client");
-	is($$d, "foo", "data in");
+	is($c, $client->{client}, "readValueAttribute_async client");
+	is($$d, "foo", "readValueAttribute_async data in");
 	$$d = "bar";
-	is($i, $reqid, "reqid");
-	is_deeply($v, $attr{VariableAttributes_value}, "value");
+	is($i, $reqid, "readValueAttribute_async reqid");
+	is_deeply($v, $attr{VariableAttributes_value},
+	    "readValueAttribute_async value");
 
 	$read = 1;
     },
     \$data,
     \$reqid,
-), STATUSCODE_GOOD, "readValueAttribute_async");
-is($data, "foo", "data unchanged");
-like($reqid, qr/^\d+$/, "reqid number");
-$client->iterate(\$read, "read deep");
-is($data, 'bar', "data out");
+), STATUSCODE_GOOD, "readValueAttribute_async status");
+is($data, "foo", "readValueAttribute_async data unchanged");
+like($reqid, qr/^\d+$/, "readValueAttribute_async reqid number");
+$client->iterate(\$read, "readValueAttribute_async read deep");
+is($data, 'bar', "readValueAttribute_async data out");
 
 no_leaks_ok {
     $read = 0;
@@ -131,6 +132,46 @@ no_leaks_ok {
     );
     $client->iterate(\$read);
 } "readValueAttribute_async leak";
+
+$data = "foo",
+$reqid = undef;
+$read = 0;
+$out = undef;
+is($client->{client}->readDataTypeAttribute_async(
+    \%requestedNewNodeId,
+    sub {
+	my ($c, $d, $i, $v) = @_;
+
+	is($c, $client->{client}, "readDataTypeAttribute_async client");
+	is($$d, "foo", "readDataTypeAttribute_async data in");
+	$$d = "bar";
+	is($i, $reqid, "readDataTypeAttribute_async reqid");
+	is_deeply($v, $attr{VariableAttributes_dataType},
+	    "readDataTypeAttribute_async data type");
+
+	$read = 1;
+    },
+    \$data,
+    \$reqid,
+), STATUSCODE_GOOD, "readDataTypeAttribute_async status");
+is($data, "foo", "readDataTypeAttribute_async data unchanged");
+like($reqid, qr/^\d+$/, "readDataTypeAttribute_async reqid number");
+$client->iterate(\$read, "readDataTypeAttribute_async read deep");
+is($data, 'bar', "readDataTypeAttribute_async data out");
+
+no_leaks_ok {
+    $read = 0;
+    $client->{client}->readDataTypeAttribute_async(
+	\%requestedNewNodeId,
+	sub {
+	    my ($c, $d, $i, $v) = @_;
+	    $read = 1;
+	},
+	$data,
+	\$reqid,
+    );
+    $client->iterate(\$read);
+} "readDataTypeAttribute_async leak";
 
 $client->stop();
 $server->stop();

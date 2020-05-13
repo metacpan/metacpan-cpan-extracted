@@ -9,12 +9,13 @@ my $build = Module::Build->new(
       'HTTP::Request' => 0,
       'IO::Async' => '0.54',
       'IO::Async::Listener' => '0.61',
-      'Metrics::Any' => '0.03',
+      'Metrics::Any' => '0.05',
    },
    test_requires => {
       'HTTP::Response' => 0,
       'IO::Async::Test' => 0,
       'Test::Identity' => 0,
+      'Test::Metrics::Any' => 0,
       'Test::More' => '0.88', # done_testing
       'Test::Refcount' => 0,
    },

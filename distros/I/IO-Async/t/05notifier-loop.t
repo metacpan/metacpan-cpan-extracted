@@ -126,7 +126,9 @@ is_refcount( $loop, 2, '$loop has refcount 2 initially' );
 }
 
 # Metrics
-{
+SKIP: {
+   skip "Metrics are unavailable" unless $IO::Async::Metrics::METRICS;
+
    my $notifier = TestNotifier->new( \my $tmp );
 
    $loop->add( $notifier );

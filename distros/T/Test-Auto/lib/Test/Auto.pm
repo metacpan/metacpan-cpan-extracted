@@ -1,4 +1,3 @@
-# ABSTRACT: Test Automation, Docs Generation
 package Test::Auto;
 
 use strict;
@@ -17,7 +16,7 @@ use base 'Exporter';
 
 our @EXPORT = 'testauto';
 
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 # ATTRIBUTES
 
@@ -100,7 +99,7 @@ sub subtests {
 
 =head1 NAME
 
-Test::Auto
+Test::Auto - Test Automation
 
 =cut
 
@@ -298,6 +297,7 @@ This method returns a L<Test::Auto::Subtests> object.
 
   =name
   =abstract
+  =tagline
   =includes
   =synopsis
   =description
@@ -356,6 +356,17 @@ warnings are now automatically disabled.
 
 The C<name> block should contain the package name. This is tested for
 loadability.
+
+=head2 tagline
+
+  =tagline
+
+  Path Finder
+
+  =cut
+
+The C<tagline> block should contain a tagline for the package. This is optional
+but if present is concatenated with the C<name> during POD generation.
 
 =head2 abstract
 

@@ -13,9 +13,9 @@
          "rdfs:label" : "drug",
          "schema:domainIncludes" : [
             "schema:Patient",
-            "schema:DrugClass",
             "schema:TherapeuticProcedure",
-            "schema:MedicalCondition"
+            "schema:MedicalCondition",
+            "schema:DrugClass"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Drug"

@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "List::Util" => "1.33",
     "Moo" => 0,
     "MooX::TypeTiny" => "0.002002",
-    "Path::Tiny" => 0,
+    "Path::Tiny" => "0.062",
     "Test::Fatal" => 0,
     "Test::More" => "0.88",
     "Types::Common::Numeric" => 0,
@@ -55,7 +55,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.994",
+  "VERSION" => "0.995",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -69,7 +69,7 @@ my %FallbackPrereqs = (
   "Module::Metadata" => 0,
   "Moo" => 0,
   "MooX::TypeTiny" => "0.002002",
-  "Path::Tiny" => 0,
+  "Path::Tiny" => "0.062",
   "Test::Deep" => 0,
   "Test::Fatal" => 0,
   "Test::File::ShareDir" => 0,

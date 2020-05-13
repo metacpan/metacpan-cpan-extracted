@@ -56,7 +56,8 @@ $server->stop();
 
 throws_ok {
     $client->{client}->disconnect_async("foo");
-} (qr/requestId is not a scalar reference /, "disconnect noref requestid");
+} (qr/Output parameter outoptReqId is not a scalar reference /,
+    "disconnect noref requestid");
 no_leaks_ok { eval {
     $client->{client}->disconnect_async("foo");
 } } "disconnect noref requestid leak";

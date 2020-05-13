@@ -1,21 +1,29 @@
-#!/usr/bin/perl
-
+package Mail::DKIM;
 use strict;
 use warnings;
+our $VERSION = '1.20200513.1'; # VERSION
+# ABSTRACT: Signs/verifies Internet mail with DKIM/DomainKey signatures
 
 #require 5.010;
 
-package Mail::DKIM;
-our $VERSION = 0.58;
 
 our $SORTTAGS = 0;
 
 1;
+
 __END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
 Mail::DKIM - Signs/verifies Internet mail with DKIM/DomainKey signatures
+
+=head1 VERSION
+
+version 1.20200513.1
 
 =head1 SYNOPSIS
 
@@ -97,15 +105,59 @@ https://rt.cpan.org/Public/Dist/Display.html?Name=Mail-DKIM
 
 https://github.com/fastmail/mail-dkim/issues
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Jason Long E<lt>jlong@messiah.eduE<gt>
+=over 4
+
+=item *
+
+Jason Long <jason@long.name>
+
+=item *
+
+Marc Bradshaw <marc@marcbradshaw.net>
+
+=item *
+
+Bron Gondwana <brong@fastmailteam.com> (ARC)
+
+=back
 
 =head1 CONTRIBUTORS
 
-Marc Bradshaw E<lt>marc@marcbradshaw.netE<gt>,
-Bron Gondwana E<lt>brong@fastmailteam.comE<gt>,
-John Levine E<lt>john.levine@standcore.comE<gt>
+=for stopwords Bron Gondwana Damien MASCRÉ jasonlong José Borges Ferreira Martijn van de Streek Martin H. Sluka Mohammad S Anwar
+
+=over 4
+
+=item *
+
+Bron Gondwana <brong@fastmail.fm>
+
+=item *
+
+Damien MASCRÉ <damienmascre@free.fr>
+
+=item *
+
+jasonlong <jasonlong@f38efd27-133c-0410-a3cc-a5f95e9cf04f>
+
+=item *
+
+José Borges Ferreira <jose.ferreira@bitsighttech.com>
+
+=item *
+
+Martijn van de Streek <martijn@vandestreek.net>
+
+=item *
+
+Martin H. Sluka <martin@sluka.de>
+
+=item *
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=back
 
 =head1 THANKS
 
@@ -114,9 +166,25 @@ generously sponsored by Valimail (https://www.valimail.com/)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006-2007, 2009 by Messiah College
-Copyright (C) 2017 by FastMail Pty Ltd
+=over 4
+
+=item *
+
+Copyright (C) 2013 by Messiah College
+
+=item *
+
+Copyright (C) 2010 by Jason Long
+
+=item *
+
 Copyright (C) 2017 by Standcore LLC
+
+=item *
+
+Copyright (C) 2020 by FastMail Pty Ltd
+
+=back
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.6 or,

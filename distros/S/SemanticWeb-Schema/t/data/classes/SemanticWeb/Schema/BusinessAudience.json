@@ -11,8 +11,8 @@
          "rdfs:comment" : "The number of employees in an organization e.g. business.",
          "rdfs:label" : "numberOfEmployees",
          "schema:domainIncludes" : [
-            "schema:Organization",
-            "schema:BusinessAudience"
+            "schema:BusinessAudience",
+            "schema:Organization"
          ],
          "schema:rangeIncludes" : "schema:QuantitativeValue"
       },

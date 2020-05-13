@@ -50,7 +50,7 @@ testing_loop( IO::Async::Loop->new_builtin );
 
    $wr->autoflush();
    1 while $wr->syswrite( "X" x 4096 ); # This will eventually return undef/EAGAIN
-   $! == Errno::EAGAIN or
+   $! == Errno::EAGAIN or $! == Errno::EWOULDBLOCK or
       die "Expected EAGAIN, got $!";
 
    my $f = Future::IO->syswrite( $wr, "ABCD" );

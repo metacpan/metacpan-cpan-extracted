@@ -12,6 +12,7 @@ use_ok( "Metrics::Any::Collector" );
 use_ok( "Metrics::Any::Adapter::File" );
 use_ok( "Metrics::Any::Adapter::Null" );
 use_ok( "Metrics::Any::Adapter::Stderr" );
+use_ok( "Metrics::Any::Adapter::Tee" );
 use_ok( "Metrics::Any::Adapter::Test" );
 
 done_testing;

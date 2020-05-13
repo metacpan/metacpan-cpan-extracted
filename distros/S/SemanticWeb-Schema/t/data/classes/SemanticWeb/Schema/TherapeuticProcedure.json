@@ -24,8 +24,8 @@
          "rdfs:comment" : "A dosing schedule for the drug for a given population, either observed, recommended, or maximum dose based on the type used.",
          "rdfs:label" : "doseSchedule",
          "schema:domainIncludes" : [
-            "schema:TherapeuticProcedure",
-            "schema:Drug"
+            "schema:Drug",
+            "schema:TherapeuticProcedure"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:DoseSchedule"
@@ -36,9 +36,9 @@
          "rdfs:label" : "drug",
          "schema:domainIncludes" : [
             "schema:Patient",
-            "schema:DrugClass",
             "schema:TherapeuticProcedure",
-            "schema:MedicalCondition"
+            "schema:MedicalCondition",
+            "schema:DrugClass"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Drug"

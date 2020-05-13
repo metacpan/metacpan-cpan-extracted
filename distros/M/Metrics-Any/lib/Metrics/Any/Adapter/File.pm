@@ -8,7 +8,7 @@ package Metrics::Any::Adapter::File;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Carp;
 
@@ -30,7 +30,7 @@ For example, by setting the C<METRICS_ANY_ADAPTER> environment variable to
 configure the adapter, a metric log will be written as a side-effect of
 running a unit test:
 
-   $ METRICS_ANY_ADAPTER=File,path=metrics.log perl -Mblib t/01test.t
+   $ METRICS_ANY_ADAPTER=File:path=metrics.log perl -Mblib t/01test.t
 
 The generated file can then be inspected to see what metric values were
 reported while the program was running.
@@ -39,7 +39,7 @@ In particular, specifying the file F</dev/null> allows the full metrics
 generation path to be tested with the code under test seeing a "real" adapter
 even though the output goes nowhere.
 
-   $ METRICS_ANY_ADAPTER=File,path=/dev/null ./Build test
+   $ METRICS_ANY_ADAPTER=File:path=/dev/null ./Build test
 
 Distribution and timing metrics are tracked with a running total and count of
 observations.
@@ -129,7 +129,7 @@ sub inc_counter_by
 
 sub make_distribution { shift->_make( distribution => @_ ) }
 
-sub inc_distribution_by
+sub report_distribution
 {
    my $self = shift;
    my ( $handle, $amount, @labelvalues ) = @_;
@@ -172,7 +172,7 @@ sub set_gauge_to
 
 sub make_timer { shift->_make( timer => @_ ) }
 
-sub inc_timer_by
+sub report_timer
 {
    my $self = shift;
    my ( $handle, $duration, @labelvalues ) = @_;

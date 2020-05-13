@@ -8,7 +8,7 @@ package Net::Prometheus;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Carp;
 
@@ -22,10 +22,9 @@ use Net::Prometheus::Histogram;
 use Net::Prometheus::Registry;
 
 use Net::Prometheus::ProcessCollector;
+use Net::Prometheus::PerlCollector;
 
 use Net::Prometheus::Types qw( MetricSamples );
-
-use constant HAVE_PERLCOLLECTOR => defined eval { require Net::Prometheus::PerlCollector };
 
 =head1 NAME
 
@@ -103,7 +102,7 @@ collector will be loaded by default.
 
 If present and true, this instance will not load perl-specific collector from
 L<Net::Prometheus::PerlCollector>. If absent or false this collector is loaded
-if the module is installed and useable.
+by default.
 
 These two options are provided for testing purposes, or for specific use-cases
 where such features are not required. Usually it's best just to leave these
@@ -127,7 +126,7 @@ sub new
       $self->register( $process_collector );
    }
 
-   if( not $args{disable_perl_collector} and HAVE_PERLCOLLECTOR ) {
+   if( not $args{disable_perl_collector} ) {
       $self->register( Net::Prometheus::PerlCollector->new );
    }
 

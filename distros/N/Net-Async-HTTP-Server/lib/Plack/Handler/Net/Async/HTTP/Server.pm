@@ -11,7 +11,7 @@ use warnings;
 use Net::Async::HTTP::Server::PSGI;
 use IO::Async::Loop;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 NAME
 

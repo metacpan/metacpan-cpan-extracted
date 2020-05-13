@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
         'IO::Socket::INET' => '0',
-        'JSON::MaybeXS' => '0',
+        'JSON' => '0',
         'LWP::UserAgent' => '0',
         'URI' => '0'
     },

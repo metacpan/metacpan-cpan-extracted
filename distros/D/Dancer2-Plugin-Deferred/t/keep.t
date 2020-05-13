@@ -1,7 +1,7 @@
 use 5.010;
 use strict;
 use warnings;
-use Test::More 0.96 import => ['!pass'];
+use Test2::V0;
 use Plack::Test;
 use HTTP::Request::Common;
 use HTTP::Cookies;

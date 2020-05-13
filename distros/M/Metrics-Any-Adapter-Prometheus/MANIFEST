@@ -1,11 +1,12 @@
 Build.PL
 Changes
 lib/Metrics/Any/Adapter/Prometheus.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01metrics.t
+t/02distribution-buckets.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json

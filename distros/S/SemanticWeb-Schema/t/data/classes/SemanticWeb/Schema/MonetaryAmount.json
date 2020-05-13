@@ -14,11 +14,11 @@
          "rdfs:label" : "currency",
          "schema:category" : "issue-1253",
          "schema:domainIncludes" : [
-            "schema:MonetaryAmount",
-            "schema:ExchangeRateSpecification",
-            "schema:MonetaryAmountDistribution",
             "schema:DatedMoneySpecification",
-            "schema:LoanOrCredit"
+            "schema:MonetaryAmount",
+            "schema:MonetaryAmountDistribution",
+            "schema:LoanOrCredit",
+            "schema:ExchangeRateSpecification"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -28,10 +28,10 @@
          "rdfs:comment" : "The upper value of some characteristic or property.",
          "rdfs:label" : "maxValue",
          "schema:domainIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:PropertyValue",
             "schema:MonetaryAmount",
-            "schema:PropertyValueSpecification"
+            "schema:QuantitativeValue",
+            "schema:PropertyValueSpecification",
+            "schema:PropertyValue"
          ],
          "schema:rangeIncludes" : "schema:Number"
       },
@@ -42,9 +42,9 @@
          "rdfs:label" : "minValue",
          "schema:domainIncludes" : [
             "schema:PropertyValueSpecification",
+            "schema:QuantitativeValue",
             "schema:MonetaryAmount",
-            "schema:PropertyValue",
-            "schema:QuantitativeValue"
+            "schema:PropertyValue"
          ],
          "schema:rangeIncludes" : "schema:Number"
       },
@@ -55,16 +55,16 @@
          "rdfs:label" : "validFrom",
          "schema:domainIncludes" : [
             "schema:MonetaryAmount",
-            "schema:OpeningHoursSpecification",
+            "schema:Permit",
             "schema:LocationFeatureSpecification",
             "schema:PriceSpecification",
-            "schema:Offer",
+            "schema:OpeningHoursSpecification",
             "schema:Demand",
-            "schema:Permit"
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       },
       "schema:validThrough" : {
@@ -73,17 +73,17 @@
          "rdfs:comment" : "The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours.",
          "rdfs:label" : "validThrough",
          "schema:domainIncludes" : [
-            "schema:MonetaryAmount",
-            "schema:OpeningHoursSpecification",
             "schema:Demand",
-            "schema:LocationFeatureSpecification",
+            "schema:OpeningHoursSpecification",
             "schema:PriceSpecification",
-            "schema:JobPosting",
-            "schema:Offer"
+            "schema:Offer",
+            "schema:LocationFeatureSpecification",
+            "schema:MonetaryAmount",
+            "schema:JobPosting"
          ],
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
          ]
       },
       "schema:value" : {
@@ -97,10 +97,10 @@
             "schema:QuantitativeValue"
          ],
          "schema:rangeIncludes" : [
-            "schema:Boolean",
-            "schema:StructuredValue",
             "schema:Number",
-            "schema:Text"
+            "schema:Text",
+            "schema:StructuredValue",
+            "schema:Boolean"
          ]
       }
    }

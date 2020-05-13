@@ -47,8 +47,8 @@
          "rdfs:label" : "healthPlanDrugTier",
          "schema:category" : "issue-1062",
          "schema:domainIncludes" : [
-            "schema:HealthInsurancePlan",
-            "schema:HealthPlanFormulary"
+            "schema:HealthPlanFormulary",
+            "schema:HealthInsurancePlan"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:Text"
@@ -102,8 +102,8 @@
          "schema:domainIncludes" : "schema:HealthInsurancePlan",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ]
       }
    }

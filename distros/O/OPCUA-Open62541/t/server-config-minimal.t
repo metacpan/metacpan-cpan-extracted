@@ -21,14 +21,14 @@ no_leaks_ok { eval { OPCUA::Open62541::ServerConfig::setMinimal() } }
     "config missing leak";
 
 throws_ok { OPCUA::Open62541::ServerConfig::setMinimal(undef, 8404, "") }
-    (qr/config is not of type OPCUA::Open62541::ServerConfig /,
+    (qr/Self config is not a OPCUA::Open62541::ServerConfig /,
     "config undef");
 no_leaks_ok {
     eval { OPCUA::Open62541::ServerConfig::setMinimal(undef, 8404, "") }
 } "config undef leak";
 
 throws_ok { OPCUA::Open62541::ServerConfig::setMinimal(1, 8404, "") }
-    (qr/config is not of type OPCUA::Open62541::ServerConfig /,
+    (qr/Self config is not a OPCUA::Open62541::ServerConfig /,
     "config type");
 no_leaks_ok {
     eval { OPCUA::Open62541::ServerConfig::setMinimal(1, 8404, "") }
@@ -43,11 +43,10 @@ no_leaks_ok {
     OPCUA::Open62541::ServerConfig::setMinimal($config, undef, "");
 } "port undef leak";
 
-warning_like {
+throws_ok {
     OPCUA::Open62541::ServerConfig::setMinimal($config, 8404, undef)
-} (qr/Use of uninitialized value in subroutine entry /,
-    "certificate undef warning");
-no_leaks_ok {
-    no warnings 'uninitialized';
+} (qr/Parameter certificate is undefined /,
+    "certificate undef");
+no_leaks_ok { eval {
     OPCUA::Open62541::ServerConfig::setMinimal($config, 8404, undef);
-} "certificate undef leak";
+} } "certificate undef leak";

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: mangle.t 2268 2010-11-06 20:31:04Z guillomovitch $
+# $Id$
 
 use strict;
 use Test::More;

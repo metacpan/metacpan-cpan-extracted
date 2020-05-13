@@ -14,9 +14,9 @@
          "rdfs:label" : "artist",
          "schema:category" : "Comics",
          "schema:domainIncludes" : [
-            "schema:VisualArtwork",
             "schema:ComicIssue",
-            "schema:ComicStory"
+            "schema:ComicStory",
+            "schema:VisualArtwork"
          ],
          "schema:isPartOf" : "http:bib.schema.org",
          "schema:rangeIncludes" : "schema:Person"
@@ -28,8 +28,8 @@
          "schema:category" : "Comics",
          "schema:domainIncludes" : [
             "schema:ComicIssue",
-            "schema:VisualArtwork",
-            "schema:ComicStory"
+            "schema:ComicStory",
+            "schema:VisualArtwork"
          ],
          "schema:isPartOf" : "http:bib.schema.org",
          "schema:rangeIncludes" : "schema:Person"
@@ -40,8 +40,8 @@
          "rdfs:label" : "inker",
          "schema:category" : "Comics",
          "schema:domainIncludes" : [
-            "schema:VisualArtwork",
             "schema:ComicIssue",
+            "schema:VisualArtwork",
             "schema:ComicStory"
          ],
          "schema:isPartOf" : "http:bib.schema.org",
@@ -53,9 +53,9 @@
          "rdfs:label" : "letterer",
          "schema:category" : "Comics",
          "schema:domainIncludes" : [
-            "schema:VisualArtwork",
+            "schema:ComicIssue",
             "schema:ComicStory",
-            "schema:ComicIssue"
+            "schema:VisualArtwork"
          ],
          "schema:isPartOf" : "http:bib.schema.org",
          "schema:rangeIncludes" : "schema:Person"
@@ -67,8 +67,8 @@
          "schema:category" : "Comics",
          "schema:domainIncludes" : [
             "schema:ComicIssue",
-            "schema:VisualArtwork",
-            "schema:ComicStory"
+            "schema:ComicStory",
+            "schema:VisualArtwork"
          ],
          "schema:isPartOf" : "http:bib.schema.org",
          "schema:rangeIncludes" : "schema:Person"

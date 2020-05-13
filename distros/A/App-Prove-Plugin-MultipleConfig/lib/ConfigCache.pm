@@ -4,7 +4,7 @@ use warnings;
 
 use Cache::FastMmap;
 
-my $CACHE = Cache::FastMmap->new(cache_size => '1k');
+my $CACHE = Cache::FastMmap->new(cache_size => '1m', expire_time => '1d');
 my $CONFIGS_KEY = 'CONFIGS';
 
 sub set_configs {

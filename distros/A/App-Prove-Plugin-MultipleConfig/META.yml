@@ -29,7 +29,7 @@ no_index:
 provides:
   App::Prove::Plugin::MultipleConfig:
     file: lib/App/Prove/Plugin/MultipleConfig.pm
-    version: '0.01'
+    version: '0.02'
   ConfigCache:
     file: lib/ConfigCache.pm
   TAP::Formatter::Console::NoRulerParallelSession:
@@ -48,7 +48,7 @@ resources:
   bugtracker: https://github.com/YamadaTakahito/App-Prove-Plugin-MultipleConfig/issues
   homepage: https://github.com/YamadaTakahito/App-Prove-Plugin-MultipleConfig
   repository: git://github.com/YamadaTakahito/App-Prove-Plugin-MultipleConfig.git
-version: '0.01'
+version: '0.02'
 x_contributors:
   - 'YamadaTakahito <d_p.t.a.d.fighter@icloud.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

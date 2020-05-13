@@ -8,11 +8,17 @@ use Test::Auto::Types ();
 
 require Carp;
 
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 # ATTRIBUTES
 
 has name => (
+  is => 'ro',
+  isa => Test::Auto::Types::Strings(),
+  required => 0
+);
+
+has tagline => (
   is => 'ro',
   isa => Test::Auto::Types::Strings(),
   required => 0
@@ -94,6 +100,7 @@ sub BUILD {
   my $source = $self->source->data;
 
   $self->build_name;
+  $self->build_tagline;
   $self->build_abstract;
   $self->build_synopsis;
   $self->build_includes;
@@ -142,6 +149,22 @@ sub check_name {
   return 0 if $name->[0] =~ /[^\w\'\:']/;
 
   return 1;
+}
+
+sub build_tagline {
+  my ($self) = @_;
+
+  $self->parse_tagline;
+
+  return $self->tagline;
+}
+
+sub parse_tagline {
+  my ($self) = @_;
+
+  my $source = $self->source->data;
+
+  return $self->{tagline} = $source->content('tagline');
 }
 
 sub build_abstract {

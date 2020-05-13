@@ -10,37 +10,34 @@ use warnings;
 use base qw( IO::Async::Listener );
 IO::Async::Listener->VERSION( '0.61' );
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Carp;
 
 use Net::Async::HTTP::Server::Protocol;
 use Net::Async::HTTP::Server::Request;
 
-use Metrics::Any 0.03 '$metrics';
+use Metrics::Any 0.05 '$metrics',
+   strict      => 1,
+   name_prefix => [qw( http server )];
 
-$metrics->make_gauge( in_flight =>
-   name        => [qw( http server requests_in_flight )],
+$metrics->make_gauge( requests_in_flight =>
    description => "Count of the number of requests received that have not yet been completed",
    # no labels
 );
 $metrics->make_counter( requests  =>
-   name        => [qw( http server requests )],
    description => "Number of HTTP requests received",
    labels      => [qw( method )],
 );
 $metrics->make_counter( responses =>
-   name        => [qw( http server responses )],
    description => "Number of HTTP responses served",
    labels      => [qw( method code )],
 );
-$metrics->make_timer( duration =>
-   name        => [qw( http server request duration )],
+$metrics->make_timer( request_duration =>
    description => "Duration of time spent processing requests",
    # no labels
 );
-$metrics->make_distribution( response_size =>
-   name        => [qw( http server response bytes )],
+$metrics->make_distribution( response_bytes =>
    description => "The size in bytes of responses sent",
    units       => "bytes",
    # no labels
@@ -207,9 +204,9 @@ sub _received_request
    my ( $request ) = @_;
 
    if( $metrics ) {
-      $metrics->inc_gauge( in_flight => );
+      $metrics->inc_gauge( requests_in_flight => );
 
-      $metrics->inc_counter( requests => $request->method );
+      $metrics->inc_counter( requests => [ method => $request->method ] );
       $self->{request_received_timestamp}{$request} = $self->loop->time;
    }
 
@@ -224,11 +221,11 @@ sub _done_request
    if( $metrics ) {
       my $received_timestamp = delete $self->{request_received_timestamp}{$request};
 
-      $metrics->dec_gauge( in_flight => );
+      $metrics->dec_gauge( requests_in_flight => );
 
-      $metrics->inc_counter( responses => $request->method, $request->response_status_code );
-      $metrics->inc_timer_by( duration => $self->loop->time - $received_timestamp );
-      $metrics->inc_distribution_by( response_size => $request->bytes_written );
+      $metrics->inc_counter( responses => [ method => $request->method, code => $request->response_status_code ] );
+      $metrics->report_timer( request_duration => $self->loop->time - $received_timestamp );
+      $metrics->report_distribution( response_bytes => $request->bytes_written );
    }
 }
 

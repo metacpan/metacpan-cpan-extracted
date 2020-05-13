@@ -23,7 +23,8 @@ $server->start();
 # client that never did a name lookup.  The OpenBSD port has a patch
 # that fixes the bug.  Use the buildinfo from the library to figure
 # out if we are affected.  Then skip the tests that trigger it.
-# https://github.com/open62541/open62541/commit/f9ceec7be7940495cf2ee091bed1bb5acec74551
+# https://github.com/open62541/open62541/commit/
+#   f9ceec7be7940495cf2ee091bed1bb5acec74551
 
 my $skip_freeaddrinfo;
 ok(my $buildinfo = $server->{config}->getBuildInfo());

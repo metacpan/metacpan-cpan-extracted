@@ -26,7 +26,7 @@
       },
       "test" : {
          "requires" : {
-            "Metrics::Any" : "0.02",
+            "Metrics::Any" : "0.05",
             "Test::More" : "0.88"
          }
       }
@@ -34,15 +34,15 @@
    "provides" : {
       "Metrics::Any::Adapter::DogStatsd" : {
          "file" : "lib/Metrics/Any/Adapter/DogStatsd.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Metrics::Any::Adapter::SignalFx" : {
          "file" : "lib/Metrics/Any/Adapter/SignalFx.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Metrics::Any::Adapter::Statsd" : {
          "file" : "lib/Metrics/Any/Adapter/Statsd.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -51,6 +51,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -11,8 +11,8 @@
          "rdfs:comment" : "A food or drink item contained in a menu or menu section.",
          "rdfs:label" : "hasMenuItem",
          "schema:domainIncludes" : [
-            "schema:Menu",
-            "schema:MenuSection"
+            "schema:MenuSection",
+            "schema:Menu"
          ],
          "schema:rangeIncludes" : "schema:MenuItem"
       },

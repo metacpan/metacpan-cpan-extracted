@@ -1,0 +1,34 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'runtime' => {
+                      'requires' => {
+                                      'Beam::Runner' => '0',
+                                      'Beam::Service' => '0',
+                                      'Beam::Wire' => '1.023',
+                                      'List::Util' => '1.39',
+                                      'Log::Any' => '1.708',
+                                      'Moo' => '2.004000',
+                                      'Text::CSV' => '0',
+                                      'perl' => '5.020'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900',
+                                     'DBD::SQLite' => '1.56'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

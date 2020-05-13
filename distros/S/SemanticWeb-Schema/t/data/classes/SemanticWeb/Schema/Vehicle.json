@@ -36,9 +36,9 @@
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:category" : "issue-2109",
          "schema:domainIncludes" : [
-            "schema:BroadcastService",
             "schema:Vehicle",
-            "schema:Person"
+            "schema:Person",
+            "schema:BroadcastService"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:Text"
@@ -114,9 +114,9 @@
             "schema:EngineSpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:URL",
             "schema:Text",
-            "schema:QualitativeValue"
+            "schema:QualitativeValue",
+            "schema:URL"
          ]
       },
       "schema:knownVehicleDamages" : {
@@ -135,9 +135,9 @@
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:isPartOf" : "http:auto.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
             "schema:QualitativeValue",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ]
       },
       "schema:mileageFromOdometer" : {
@@ -175,8 +175,8 @@
          "rdfs:label" : "numberOfAxles",
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Number"
          ]
       },
       "schema:numberOfDoors" : {
@@ -197,8 +197,8 @@
          "rdfs:label" : "numberOfForwardGears",
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Number"
          ]
       },
       "schema:numberOfPreviousOwners" : {
@@ -208,8 +208,8 @@
          "rdfs:label" : "numberOfPreviousOwners",
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Number"
+            "schema:Number",
+            "schema:QuantitativeValue"
          ]
       },
       "schema:payload" : {
@@ -346,8 +346,8 @@
          "rdfs:label" : "vehicleSeatingCapacity",
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Number"
          ]
       },
       "schema:vehicleSpecialUsage" : {
@@ -358,8 +358,8 @@
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:isPartOf" : "http:auto.schema.org",
          "schema:rangeIncludes" : [
-            "schema:CarUsageType",
-            "schema:Text"
+            "schema:Text",
+            "schema:CarUsageType"
          ]
       },
       "schema:vehicleTransmission" : {
@@ -369,9 +369,9 @@
          "rdfs:label" : "vehicleTransmission",
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:rangeIncludes" : [
-            "schema:Text",
             "schema:URL",
-            "schema:QualitativeValue"
+            "schema:QualitativeValue",
+            "schema:Text"
          ]
       },
       "schema:weightTotal" : {

@@ -44,11 +44,11 @@ my $socket = IO::Socket::INET->new(
       labels => [qw( label )],
    );
 
-   $metrics->inc_distribution_by( distribution => 20, "labvalue" );
+   $metrics->report_distribution( distribution => 20, "labvalue" );
 
    $socket->recv( my $packet, 512 );
    is( $packet, "the.distribution:20|h#label:labvalue",
-      '->inc_distribution sends statsd packet'
+      '->report_distribution sends statsd packet'
    );
 }
 
@@ -74,11 +74,11 @@ my $socket = IO::Socket::INET->new(
       labels => [qw( label )],
    );
 
-   $metrics->inc_timer_by( timer => 0.25, "labvalue" ); # seconds
+   $metrics->report_timer( timer => 0.25, "labvalue" ); # seconds
 
    $socket->recv( my $packet, 512 );
    is( $packet, "the.timer:250|ms#label:labvalue",
-      '->inc_timer sends statsd packet'
+      '->report_timer sends statsd packet'
    );
 }
 

@@ -18,20 +18,20 @@
          "rdfs:label" : "availabilityEnds",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:Offer",
+            "schema:ActionAccessSpecification",
             "schema:Demand",
-            "schema:ActionAccessSpecification"
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : [
-            "schema:Time",
             "schema:Date",
+            "schema:Time",
             "schema:DateTime"
          ]
       },
       "schema:availabilityStarts" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1741",
-            "schemadotorgsources:source_GoodRelationsTerms"
+            "schemadotorgsources:source_GoodRelationsTerms",
+            "https://github.com/schemaorg/schemaorg/issues/1741"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The beginning of the availability of the product or service included in the offer.",
@@ -39,13 +39,13 @@
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
             "schema:ActionAccessSpecification",
-            "schema:Offer",
-            "schema:Demand"
+            "schema:Demand",
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : [
-            "schema:Time",
             "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Time"
          ]
       },
       "schema:category" : {
@@ -58,20 +58,20 @@
          "rdfs:label" : "category",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:Invoice",
-            "schema:Recommendation",
-            "schema:Product",
-            "schema:Offer",
-            "schema:Service",
             "schema:PhysicalActivity",
+            "schema:Invoice",
+            "schema:Product",
+            "schema:Recommendation",
+            "schema:ActionAccessSpecification",
+            "schema:Offer",
             "schema:SpecialAnnouncement",
-            "schema:ActionAccessSpecification"
+            "schema:Service"
          ],
          "schema:rangeIncludes" : [
             "schema:URL",
-            "schema:Text",
             "schema:Thing",
-            "schema:PhysicalActivityCategory"
+            "schema:PhysicalActivityCategory",
+            "schema:Text"
          ]
       },
       "schema:eligibleRegion" : {
@@ -85,15 +85,15 @@
          "rdfs:subPropertyOf" : "schema:areaServed",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:Demand",
             "schema:Offer",
             "schema:ActionAccessSpecification",
-            "schema:DeliveryChargeSpecification"
+            "schema:DeliveryChargeSpecification",
+            "schema:Demand"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
+            "schema:Place",
             "schema:GeoShape",
-            "schema:Place"
+            "schema:Text"
          ]
       },
       "schema:expectsAcceptanceOf" : {
@@ -103,8 +103,8 @@
          "rdfs:label" : "expectsAcceptanceOf",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:ConsumeAction",
             "schema:ActionAccessSpecification",
+            "schema:ConsumeAction",
             "schema:MediaSubscription"
          ],
          "schema:rangeIncludes" : "schema:Offer"
@@ -116,16 +116,16 @@
          "rdfs:label" : "ineligibleRegion",
          "schema:category" : "issue-2242",
          "schema:domainIncludes" : [
-            "schema:ActionAccessSpecification",
-            "schema:DeliveryChargeSpecification",
             "schema:Demand",
+            "schema:DeliveryChargeSpecification",
+            "schema:ActionAccessSpecification",
             "schema:Offer"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:GeoShape",
+            "schema:Text",
             "schema:Place",
-            "schema:Text"
+            "schema:GeoShape"
          ]
       },
       "schema:requiresSubscription" : {
@@ -139,8 +139,8 @@
             "schema:MediaObject"
          ],
          "schema:rangeIncludes" : [
-            "schema:Boolean",
-            "schema:MediaSubscription"
+            "schema:MediaSubscription",
+            "schema:Boolean"
          ]
       }
    }

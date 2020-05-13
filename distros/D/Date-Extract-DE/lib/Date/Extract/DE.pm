@@ -2,7 +2,7 @@ package Date::Extract::DE;
 
 use Moose;
 
-use version; our $VERSION = qv('0.0.2');
+use version; our $VERSION = qv('0.0.3');
 
 use Date::Range;
 use Date::Simple ( 'date', 'today' );
@@ -301,7 +301,7 @@ Date::Extract::DE -  Extract dates from german text
 
 =head1 VERSION
 
-0.0.2
+0.0.3
 
 =begin readme
 
@@ -352,7 +352,7 @@ Tries to extract dates from the text and returns an arrayref of L<Date::Simple> 
 
 =over 4
 
-=item Andreas Mager  C<< <andreas@rainofbits.com> >>
+=item Andreas Mager  C<< <quattro at cpan org> >>
 
 =item Christian Eder  C<< <christian.eder@apa.at> >>
 

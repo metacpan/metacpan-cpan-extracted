@@ -127,8 +127,6 @@ $queries->run(sub {
 $queries->test({
     dvd => {
         insert => 1,
-        # one by the discard_changes call for created rows
-        select => 1,
     },
 }, 'expected queries with has_many relationship and cache');
 
@@ -168,11 +166,6 @@ $queries->test({
         # one for tag 3 of 'existing DVD'
         # two for tags 2 and 3 of 'new DVD'
         insert => 3,
-        # one for the find of existing tag 3 of 'existing DVD'
-        # one from the discard_changes call for created tag 3 of 'existing DVD'
-        # two for the find of the two existing tags of 'new DVD'
-        # two from the discard_changes call for created tags of 'new DVD'
-        select => 6,
         # this is the cleanup query which deletes all tags of a dvd not
         # passed to tags, in this case the 'crime' tag created above
         delete => 1,

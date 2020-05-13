@@ -8,7 +8,7 @@ package IO::Async::File;
 use strict;
 use warnings;
 
-our $VERSION = '0.76';
+our $VERSION = '0.77';
 
 use base qw( IO::Async::Timer::Periodic );
 

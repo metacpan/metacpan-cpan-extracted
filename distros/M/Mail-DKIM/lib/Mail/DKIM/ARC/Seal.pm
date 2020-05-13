@@ -1,4 +1,8 @@
-#!/usr/bin/perl
+package Mail::DKIM::ARC::Seal;
+use strict;
+use warnings;
+our $VERSION = '1.20200513.1'; # VERSION
+# ABSTRACT: represents a ARC-Seal header
 
 # Copyright 2017 FastMail Pty Ltd. All Rights Reserved.
 # Bron Gondwana <brong@fastmailteam.com>
@@ -6,15 +10,73 @@
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
-use strict;
-use warnings;
-
-package Mail::DKIM::ARC::Seal;
 use base 'Mail::DKIM::ARC::MessageSignature';
+
+
+sub new {
+    my $class = shift;
+    my %prms  = @_;
+    my $self  = {};
+    bless $self, $class;
+
+    $self->instance( $prms{'Instance'} ) if exists $prms{'Instance'};
+    $self->algorithm( $prms{'Algorithm'} || 'rsa-sha256' );
+    $self->signature( $prms{'Signature'} );
+    $self->canonicalization( $prms{'Method'} ) if exists $prms{'Method'};
+    $self->chain( $prms{'Chain'} || 'none' );
+    $self->domain( $prms{'Domain'} );
+    $self->selector( $prms{'Selector'} );
+    $self->timestamp(
+        defined $prms{'Timestamp'} ? $prms{'Timestamp'} : time() );
+    $self->expiration( $prms{'Expiration'} ) if defined $prms{'Expiration'};
+    $self->key( $prms{'Key'} )               if defined $prms{'Key'};
+
+    return $self;
+}
+
+sub body_hash {
+
+    # Not defined for ARC-Seal
+    return;
+}
+
+sub DEFAULT_PREFIX {
+    return 'ARC-Seal:';
+}
+
+
+sub chain {
+    my $self = shift;
+    if (@_) {
+        my $cv = shift;
+        die "INVALID chain value $cv"
+          unless grep { $cv eq $_ } qw(none fail pass);
+        $self->set_tag( 'cv', $cv );
+    }
+    return $self->get_tag('cv');
+}
+
+
+sub canonicalization {
+    return ( 'seal', 'seal' );
+}
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
 Mail::DKIM::ARC::Seal - represents a ARC-Seal header
+
+=head1 VERSION
+
+version 1.20200513.1
 
 =head1 CONSTRUCTORS
 
@@ -69,57 +131,11 @@ https://tools.ietf.org/html/draft-ietf-dmarc-arc-protocol-06
    o  t = timestamp; syntax is the same as the "t=" tag defined in
       Section 3.5 of [RFC6376].
 
-=cut
-
-sub new {
-    my $class = shift;
-    my %prms  = @_;
-    my $self  = {};
-    bless $self, $class;
-
-    $self->instance( $prms{'Instance'} ) if exists $prms{'Instance'};
-    $self->algorithm( $prms{'Algorithm'} || 'rsa-sha256' );
-    $self->signature( $prms{'Signature'} );
-    $self->canonicalization( $prms{'Method'} ) if exists $prms{'Method'};
-    $self->chain( $prms{'Chain'} || 'none' );
-    $self->domain( $prms{'Domain'} );
-    $self->selector( $prms{'Selector'} );
-    $self->timestamp(
-        defined $prms{'Timestamp'} ? $prms{'Timestamp'} : time() );
-    $self->expiration( $prms{'Expiration'} ) if defined $prms{'Expiration'};
-    $self->key( $prms{'Key'} )               if defined $prms{'Key'};
-
-    return $self;
-}
-
-sub body_hash {
-
-    # Not defined for ARC-Seal
-    return;
-}
-
-sub DEFAULT_PREFIX {
-    return 'ARC-Seal:';
-}
-
 =head2 chain() - get or set the chain parameter (cv=) field
 
 This must be one of "pass", "fail" or "none".  For a chain to be valid,
 the very first (i=1) seal MUST be cv=none, and all further seals MUST be
 cv=pass.
-
-=cut
-
-sub chain {
-    my $self = shift;
-    if (@_) {
-        my $cv = shift;
-        die "INVALID chain value $cv"
-          unless grep { $cv eq $_ } qw(none fail pass);
-        $self->set_tag( 'cv', $cv );
-    }
-    return $self->get_tag('cv');
-}
 
 =head2 instance() - get or set the signing instance (i=) field
 
@@ -127,30 +143,59 @@ sub chain {
 
 Instances must be integers less than 1024 according to the spec.
 
-=cut
-
-sub canonicalization {
-    return ( 'seal', 'seal' );
-}
-
 =head1 SEE ALSO
 
 L<Mail::DKIM::Signature> for DKIM-Signature headers
 
 L<Mail::DKIM::ARC::MessageSignature> for ARC-Message-Signature headers
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Bron Gondwana, E<lt>brong@fastmailteam.comE<gt>
+=over 4
+
+=item *
+
+Jason Long <jason@long.name>
+
+=item *
+
+Marc Bradshaw <marc@marcbradshaw.net>
+
+=item *
+
+Bron Gondwana <brong@fastmailteam.com> (ARC)
+
+=back
+
+=head1 THANKS
+
+Work on ensuring that this module passes the ARC test suite was
+generously sponsored by Valimail (https://www.valimail.com/)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by FastMail Pty Ltd
+=over 4
+
+=item *
+
+Copyright (C) 2013 by Messiah College
+
+=item *
+
+Copyright (C) 2010 by Jason Long
+
+=item *
+
+Copyright (C) 2017 by Standcore LLC
+
+=item *
+
+Copyright (C) 2020 by FastMail Pty Ltd
+
+=back
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.6 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut
-
-1;

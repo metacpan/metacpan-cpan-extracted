@@ -185,10 +185,10 @@
             "issue-2521"
          ],
          "schema:domainIncludes" : [
-            "schema:RealEstateListing",
-            "schema:JobPosting",
             "schema:SpecialAnnouncement",
-            "schema:CDCPMDRecord"
+            "schema:RealEstateListing",
+            "schema:CDCPMDRecord",
+            "schema:JobPosting"
          ],
          "schema:rangeIncludes" : [
             "schema:Date",

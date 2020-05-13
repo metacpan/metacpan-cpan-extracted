@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+
+# update Changes file with new 'share' commit and commit.
+use Path::Tiny;
+chomp(my $str = `git submodule status`);
+my ($sha) = split(' ', $str, 2);
+$sha =~ s/^\+//;
+
+my ($seen_next, $seen_blank);
+path('Changes')->edit_lines_utf8(sub {
+  if ($seen_next ||= /^\{\{\$NEXT\}\}/ and not $seen_blank and /^$/) {
+    s/^$/        - updated test suite to commit $sha\n/;
+    $seen_blank = 1;
+  }
+});
+
+exec 'git commit -m"update test suite to latest commit" Changes share';

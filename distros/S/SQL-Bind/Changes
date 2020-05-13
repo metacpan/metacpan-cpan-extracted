@@ -1,5 +1,9 @@
 Revision history for Perl extension SQL-Bind
 
+1.02 2020-05-13T12:14:28Z
+
+    - Changeable placeholder prefix ($PlaceholderPrefix)
+
 1.01 2020-05-02T06:55:27Z
 
     - Recursive binding (*)

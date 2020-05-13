@@ -11,8 +11,8 @@
          "rdfs:comment" : "The organization issuing the ticket or permit.",
          "rdfs:label" : "issuedBy",
          "schema:domainIncludes" : [
-            "schema:Ticket",
-            "schema:Permit"
+            "schema:Permit",
+            "schema:Ticket"
          ],
          "schema:rangeIncludes" : "schema:Organization"
       },
@@ -49,16 +49,16 @@
          "rdfs:label" : "validFrom",
          "schema:domainIncludes" : [
             "schema:MonetaryAmount",
-            "schema:OpeningHoursSpecification",
+            "schema:Permit",
             "schema:LocationFeatureSpecification",
             "schema:PriceSpecification",
-            "schema:Offer",
+            "schema:OpeningHoursSpecification",
             "schema:Demand",
-            "schema:Permit"
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       },
       "schema:validIn" : {

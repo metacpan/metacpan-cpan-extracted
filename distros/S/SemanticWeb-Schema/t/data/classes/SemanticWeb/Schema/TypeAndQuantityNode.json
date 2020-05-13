@@ -21,8 +21,8 @@
          "rdfs:comment" : "The business function (e.g. sell, lease, repair, dispose) of the offer or component of a bundle (TypeAndQuantityNode). The default is http://purl.org/goodrelations/v1#Sell.",
          "rdfs:label" : "businessFunction",
          "schema:domainIncludes" : [
-            "schema:TypeAndQuantityNode",
             "schema:Demand",
+            "schema:TypeAndQuantityNode",
             "schema:Offer"
          ],
          "schema:rangeIncludes" : "schema:BusinessFunction"
@@ -33,12 +33,12 @@
          "rdfs:comment" : "The product that this structured value is referring to.",
          "rdfs:label" : "typeOfGood",
          "schema:domainIncludes" : [
-            "schema:TypeAndQuantityNode",
-            "schema:OwnershipInfo"
+            "schema:OwnershipInfo",
+            "schema:TypeAndQuantityNode"
          ],
          "schema:rangeIncludes" : [
-            "schema:Product",
-            "schema:Service"
+            "schema:Service",
+            "schema:Product"
          ]
       },
       "schema:unitCode" : {
@@ -47,9 +47,9 @@
          "rdfs:comment" : "The unit of measurement given using the UN/CEFACT Common Code (3 characters) or a URL. Other codes than the UN/CEFACT Common Code may be used with a prefix followed by a colon.",
          "rdfs:label" : "unitCode",
          "schema:domainIncludes" : [
-            "schema:UnitPriceSpecification",
             "schema:TypeAndQuantityNode",
             "schema:PropertyValue",
+            "schema:UnitPriceSpecification",
             "schema:QuantitativeValue"
          ],
          "schema:rangeIncludes" : [

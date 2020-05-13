@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.4';
+our $VERSION = 'v8.0.0';
 
 
 has applicant_location_requirements => (
@@ -62,6 +62,14 @@ has education_requirements => (
     is        => 'rw',
     predicate => '_has_education_requirements',
     json_ld   => 'educationRequirements',
+);
+
+
+
+has eligibility_to_work_requirement => (
+    is        => 'rw',
+    predicate => '_has_eligibility_to_work_requirement',
+    json_ld   => 'eligibilityToWorkRequirement',
 );
 
 
@@ -306,7 +314,7 @@ SemanticWeb::Schema::JobPosting - A listing that describes a job opening in a ce
 
 =head1 VERSION
 
-version v7.0.4
+version v8.0.0
 
 =head1 DESCRIPTION
 
@@ -428,6 +436,25 @@ A education_requirements should be one of the following types:
 =head2 C<_has_education_requirements>
 
 A predicate for the L</education_requirements> attribute.
+
+=head2 C<eligibility_to_work_requirement>
+
+C<eligibilityToWorkRequirement>
+
+The legal requirements such as citizenship, visa and other documentation
+required for an applicant to this job.
+
+A eligibility_to_work_requirement should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_eligibility_to_work_requirement>
+
+A predicate for the L</eligibility_to_work_requirement> attribute.
 
 =head2 C<employer_overview>
 

@@ -14,8 +14,8 @@
          "rdfs:label" : "eligibleQuantity",
          "schema:domainIncludes" : [
             "schema:Demand",
-            "schema:PriceSpecification",
-            "schema:Offer"
+            "schema:Offer",
+            "schema:PriceSpecification"
          ],
          "schema:rangeIncludes" : "schema:QuantitativeValue"
       },
@@ -25,8 +25,8 @@
          "rdfs:comment" : "The transaction volume, in a monetary unit, for which the offer or price specification is valid, e.g. for indicating a minimal purchasing volume, to express free shipping above a certain order volume, or to limit the acceptance of credit cards to purchases to a certain minimal amount.",
          "rdfs:label" : "eligibleTransactionVolume",
          "schema:domainIncludes" : [
-            "schema:PriceSpecification",
             "schema:Demand",
+            "schema:PriceSpecification",
             "schema:Offer"
          ],
          "schema:rangeIncludes" : "schema:PriceSpecification"
@@ -52,9 +52,9 @@
          "rdfs:comment" : "The offer price of a product, or of a price component when attached to PriceSpecification and its subtypes.<br/><br/>\n\nUsage guidelines:<br/><br/>\n\n<ul>\n<li>Use the <a class=\"localLink\" href=\"http://schema.org/priceCurrency\">priceCurrency</a> property (with standard formats: <a href=\"http://en.wikipedia.org/wiki/ISO_4217\">ISO 4217 currency format</a> e.g. \"USD\"; <a href=\"https://en.wikipedia.org/wiki/List_of_cryptocurrencies\">Ticker symbol</a> for cryptocurrencies e.g. \"BTC\"; well known names for <a href=\"https://en.wikipedia.org/wiki/Local_exchange_trading_system\">Local Exchange Tradings Systems</a> (LETS) and other currency types e.g. \"Ithaca HOUR\") instead of including <a href=\"http://en.wikipedia.org/wiki/Dollar_sign#Currencies_that_use_the_dollar_or_peso_sign\">ambiguous symbols</a> such as '$' in the value.</li>\n<li>Use '.' (Unicode 'FULL STOP' (U+002E)) rather than ',' to indicate a decimal point. Avoid using these symbols as a readability separator.</li>\n<li>Note that both <a href=\"http://www.w3.org/TR/xhtml-rdfa-primer/#using-the-content-attribute\">RDFa</a> and Microdata syntax allow the use of a \"content=\" attribute for publishing simple machine-readable values alongside more human-friendly formatting.</li>\n<li>Use values from 0123456789 (Unicode 'DIGIT ZERO' (U+0030) to 'DIGIT NINE' (U+0039)) rather than superficially similiar Unicode symbols.</li>\n</ul>\n",
          "rdfs:label" : "price",
          "schema:domainIncludes" : [
+            "schema:PriceSpecification",
             "schema:Offer",
-            "schema:TradeAction",
-            "schema:PriceSpecification"
+            "schema:TradeAction"
          ],
          "schema:rangeIncludes" : [
             "schema:Number",
@@ -66,11 +66,11 @@
          "rdfs:comment" : "The currency of the price, or a price component when attached to <a class=\"localLink\" href=\"http://schema.org/PriceSpecification\">PriceSpecification</a> and its subtypes.<br/><br/>\n\nUse standard formats: <a href=\"http://en.wikipedia.org/wiki/ISO_4217\">ISO 4217 currency format</a> e.g. \"USD\"; <a href=\"https://en.wikipedia.org/wiki/List_of_cryptocurrencies\">Ticker symbol</a> for cryptocurrencies e.g. \"BTC\"; well known names for <a href=\"https://en.wikipedia.org/wiki/Local_exchange_trading_system\">Local Exchange Tradings Systems</a> (LETS) and other currency types e.g. \"Ithaca HOUR\".",
          "rdfs:label" : "priceCurrency",
          "schema:domainIncludes" : [
-            "schema:Reservation",
+            "schema:Offer",
             "schema:PriceSpecification",
             "schema:Ticket",
-            "schema:TradeAction",
-            "schema:Offer"
+            "schema:Reservation",
+            "schema:TradeAction"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -81,16 +81,16 @@
          "rdfs:label" : "validFrom",
          "schema:domainIncludes" : [
             "schema:MonetaryAmount",
-            "schema:OpeningHoursSpecification",
+            "schema:Permit",
             "schema:LocationFeatureSpecification",
             "schema:PriceSpecification",
-            "schema:Offer",
+            "schema:OpeningHoursSpecification",
             "schema:Demand",
-            "schema:Permit"
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       },
       "schema:validThrough" : {
@@ -99,17 +99,17 @@
          "rdfs:comment" : "The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours.",
          "rdfs:label" : "validThrough",
          "schema:domainIncludes" : [
-            "schema:MonetaryAmount",
-            "schema:OpeningHoursSpecification",
             "schema:Demand",
-            "schema:LocationFeatureSpecification",
+            "schema:OpeningHoursSpecification",
             "schema:PriceSpecification",
-            "schema:JobPosting",
-            "schema:Offer"
+            "schema:Offer",
+            "schema:LocationFeatureSpecification",
+            "schema:MonetaryAmount",
+            "schema:JobPosting"
          ],
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
          ]
       },
       "schema:valueAddedTaxIncluded" : {
