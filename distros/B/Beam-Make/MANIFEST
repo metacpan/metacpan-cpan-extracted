@@ -19,6 +19,9 @@ lib/Beam/Make/Cache.pm
 lib/Beam/Make/DBI.pm
 lib/Beam/Make/DBI/CSV.pm
 lib/Beam/Make/DBI/Schema.pm
+lib/Beam/Make/Docker/Container.pm
+lib/Beam/Make/Docker/Image.pm
+lib/Beam/Make/Docker/Image/Hub.pm
 lib/Beam/Make/File.pm
 lib/Beam/Make/Recipe.pm
 lib/Beam/Runner/Command/make.pm
@@ -27,7 +30,10 @@ t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/cache.t
 t/dbi.t
+t/docker.t
 t/make.t
 t/share/dbi.csv
 t/share/dbi.yml
+t/share/docker/Dockerfile
+t/share/docker/ticker.sh
 weaver.ini

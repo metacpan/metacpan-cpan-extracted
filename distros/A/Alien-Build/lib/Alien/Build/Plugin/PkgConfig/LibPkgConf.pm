@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use Carp ();
 
 # ABSTRACT: Probe system and determine library or tool properties using PkgConfig::LibPkgConf
-our $VERSION = '2.22'; # VERSION
+our $VERSION = '2.23'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -83,7 +83,7 @@ sub init
       if($atleast_version)
       {
         require PkgConfig::LibPkgConf::Util;
-        if(PkgConfig::LibPkgConf::Util::compare_version($pkg->version, $atleast_version) == -1)
+        if(PkgConfig::LibPkgConf::Util::compare_version($pkg->version, $atleast_version) < 0)
         {
           die "package $pkg_name is version @{[ $pkg->version ]}, but at least $atleast_version is required.";
         }
@@ -101,7 +101,7 @@ sub init
       if($self->max_version)
       {
         require PkgConfig::LibPkgConf::Util;
-        if(PkgConfig::LibPkgConf::Util::compare_version($pkg->version, $self->max_version) == 1)
+        if(PkgConfig::LibPkgConf::Util::compare_version($pkg->version, $self->max_version) > 0)
         {
           die "package $pkg_name is version @{[ $pkg->version ]}, but max @{[ $self->max_version ]} is required.";
         }
@@ -166,7 +166,7 @@ Alien::Build::Plugin::PkgConfig::LibPkgConf - Probe system and determine library
 
 =head1 VERSION
 
-version 2.22
+version 2.23
 
 =head1 SYNOPSIS
 

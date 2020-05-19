@@ -13,7 +13,7 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Data-Object-Args",
-  "LICENSE" => "perl",
+  "LICENSE" => "apache",
   "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Data::Object::Args",
   "PREREQ_PM" => {
@@ -32,12 +32,12 @@ my %WriteMakefileArgs = (
     "Data::Object::Role::Buildable" => "0.02",
     "Data::Object::Role::Proxyable" => "2.03",
     "Data::Object::Role::Stashable" => "2.01",
-    "Test::Auto" => "0.10",
+    "Test::Auto" => "0.12",
     "routines" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "2.00",
+  "VERSION" => "2.01",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,7 +50,7 @@ my %FallbackPrereqs = (
   "Data::Object::Role::Buildable" => "0.02",
   "Data::Object::Role::Proxyable" => "2.03",
   "Data::Object::Role::Stashable" => "2.01",
-  "Test::Auto" => "0.10",
+  "Test::Auto" => "0.12",
   "routines" => 0,
   "strict" => 0,
   "warnings" => 0

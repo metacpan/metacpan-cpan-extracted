@@ -19,7 +19,7 @@ sub myWriteMakefile
   {
     $args{PREREQ_PM}->{'Alien::nragent'} = '0.06';
   }
-  
+
   WriteMakefile(%args);
 }
 

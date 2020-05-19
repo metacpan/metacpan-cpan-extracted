@@ -1,16 +1,16 @@
 ---
-abstract: 'Interface to the LiveJournal API'
+abstract: '(Deprecated) Interface to the LiveJournal API'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
-  Test::More: '0.94'
+  Test::More: '0.98'
   Time::HiRes: '0'
   perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: v5.10.0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.003, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,6 +28,11 @@ requires:
   perl: '5.010'
 resources:
   bugtracker: https://github.com/plicease/WebService-LiveJournal/issues
-  homepage: http://perl.wdlabs.com/WebService-LiveJournal
+  homepage: https://metacpan.org/pod/WebService::LiveJournal
   repository: git://github.com/plicease/WebService-LiveJournal.git
-version: '0.08'
+version: '0.09'
+x_deprecated: 1
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

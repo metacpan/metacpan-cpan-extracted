@@ -54,6 +54,7 @@ my %WriteMakefileArgs = (
     "lib/Wasm/Func.pm"                      => "\$(INST_LIB)/Wasm/Func.pm",
     "lib/Wasm/Global.pm"                    => "\$(INST_LIB)/Wasm/Global.pm",
     "lib/Wasm/Memory.pm"                    => "\$(INST_LIB)/Wasm/Memory.pm",
+    "lib/Wasm/Table.pm"                     => "\$(INST_LIB)/Wasm/Table.pm",
     "lib/Wasm/Wasmtime.pm"                  => "\$(INST_LIB)/Wasm/Wasmtime.pm",
     "lib/Wasm/Wasmtime/Config.pm"           => "\$(INST_LIB)/Wasm/Wasmtime/Config.pm",
     "lib/Wasm/Wasmtime/Engine.pm"           => "\$(INST_LIB)/Wasm/Wasmtime/Engine.pm",
@@ -104,7 +105,7 @@ my %WriteMakefileArgs = (
     "Test2::V0"     => "0.000060",
     "YAML"          => 0
   },
-  "VERSION" => "0.09",
+  "VERSION" => "0.10",
   "test"    => {
     "TESTS" => "t/*.t"
   }
@@ -132,7 +133,7 @@ my %FallbackPrereqs = (
 
 # inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.037
 if ( do { use FFI::CheckLib 0.26; !find_lib lib => 'wasmtime' } ) {
-  requires( 'Alien::wasmtime', '0.07' );
+  requires( 'Alien::wasmtime', '0.09' );
 }
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

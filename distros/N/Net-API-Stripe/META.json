@@ -58,7 +58,6 @@
             "Net::API::REST" : "v0.5.3",
             "Net::IP" : "1.26",
             "Net::OAuth" : "0.28",
-            "Number::Format" : "1.75",
             "Scalar::Util" : "1.54",
             "TryCatch" : "1.003002",
             "URI::Escape" : "3.31",
@@ -79,6 +78,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.0",
+   "version" : "v1.0.3",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

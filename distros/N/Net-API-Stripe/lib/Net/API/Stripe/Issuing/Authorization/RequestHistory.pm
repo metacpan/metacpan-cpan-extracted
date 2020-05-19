@@ -1,21 +1,18 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Issuing/Authorization/RequestHistory.pm
-## Version 0.2
+## Version v0.200.0
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <jack@deguest.jp>
+## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/11/02
-## Modified 2020/04/11
-## All rights reserved
+## Modified 2020/05/15
 ## 
-## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::Stripe::Issuing::Authorization::RequestHistory;
 BEGIN
 {
     use strict;
     use parent qw( Net::API::Stripe::Generic );
-    our( $VERSION ) = '0.2';
+    our( $VERSION ) = 'v0.200.0';
 };
 
 sub approved { shift->_set_get_boolean( 'approved', @_ ); }
@@ -56,7 +53,7 @@ Net::API::Stripe::Issuing::Authorization::RequestHistory - A Stripe Authorizatio
 
 =head1 VERSION
 
-    0.2
+    v0.200.0
 
 =head1 DESCRIPTION
 

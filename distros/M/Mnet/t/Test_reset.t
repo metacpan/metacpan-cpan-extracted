@@ -5,19 +5,18 @@
 use warnings;
 use strict;
 use File::Temp;
+use Mnet::T;
 use Test::More tests => 4;
 
 # create temp test/record/replay file
 my ($fh, $file) = File::Temp::tempfile( UNLINK => 1 );
 
-# use current perl for tests
-my $perl = $^X;
-
 # init script used to test --test-reset option
-my $script = '
+my $perl = '
     use warnings;
     use strict;
-    # use Mnet::Log; use Mnet::Opts::Set::Debug;
+    use Mnet::Log;
+    use Mnet::Log::Test;
     use Mnet::Opts::Cli;
     use Mnet::Test;
     Mnet::Opts::Cli::define({
@@ -30,29 +29,56 @@ my $script = '
     syswrite STDOUT, "extras = @extras\n" if @extras;
 ';
 
-# save record file with test-opt and extra cli opts
-Test::More::is(`$perl -e '$script' -- --record $file --test-opt 2 extra 2>&1`,
-'test-opt = 2
-extras = extra
-', 'record with test-opt and extra cli arg');
+# record with test-opt and extra cli arg
+Mnet::T::test_perl({
+    name    => 'record with test-opt and extra cli arg',
+    perl    => $perl,
+    args    => "--record $file --test-opt 2 extra",
+    filter  => 'grep -v ^--- | grep -v ^inf',
+    expect  => <<'    expect-eof',
+        test-opt = 2
+        extras = extra
+    expect-eof
+    debug   => "--debug",
+});
 
-# replay file with test-opt and extra cli opts
-Test::More::is(`$perl -e '$script' -- --replay $file 2>&1`,
-'test-opt = 2
-extras = extra
-', 'replay with test-opt and extra arg');
+# replay with test-opt and extra arg
+Mnet::T::test_perl({
+    name    => 'replay with test-opt and extra arg',
+    perl    => $perl,
+    args    => "--replay $file",
+    filter  => 'grep -v ^--- | grep -v ^inf',
+    expect  => <<'    expect-eof',
+        test-opt = 2
+        extras = extra
+    expect-eof
+    debug   => "--debug",
+});
 
-# replay file with --test-reset test-opt
-Test::More::is(
-`$perl -e '$script' -- --replay $file --test-reset test-opt 2>&1`,
-'test-opt = 1
-extras = extra
-', 'replay with reset of cli test-opt');
+# replay with reset of cli test-opt
+Mnet::T::test_perl({
+    name    => 'replay with reset of cli test-opt',
+    perl    => $perl,
+    args    => "--replay $file --test-reset test-opt",
+    filter  => 'grep -v ^--- | grep -v ^inf',
+    expect  => <<'    expect-eof',
+        test-opt = 1
+        extras = extra
+    expect-eof
+    debug   => "--debug",
+});
 
-# replay file with --test-reset extra cli args
-Test::More::is(`$perl -e '$script' -- --replay $file --test-reset 2>&1`,
-'test-opt = 2
-', 'replay with reset of extra cli args');
+# replay with reset of extra cli args
+Mnet::T::test_perl({
+    name    => 'replay with reset of extra cli args',
+    perl    => $perl,
+    args    => "--replay $file --test-reset",
+    filter  => 'grep -v ^--- | grep -v ^inf',
+    expect  => <<'    expect-eof',
+        test-opt = 2
+    expect-eof
+    debug   => "--debug",
+});
 
 # finished
 exit;

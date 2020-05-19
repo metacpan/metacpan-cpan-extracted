@@ -44,10 +44,16 @@ use OverloadTestClasses;
 # fiddle with debug switch to get full code coverage there
 BEGIN { $IPC::Run3::Shell::DEBUG = 0 }
 use IPC::Run3::Shell;
+use IPC::Run3::Shell::CLIWrapper;
 output_is {
 	IPC::Run3::Shell::debug("testing 123");
 	IPC::Run3::Shell->import(':run',':make_cmd','perl');
+	{ package FooBar; IPC::Run3::Shell->import(':AUTOLOAD'); }
 	is perl('-e','print "foo"'), "foo", "dummy test";
+	my $perl = IPC::Run3::Shell::CLIWrapper->new(
+		'perl', '-wMstrict', '-e', '1', '--' );
+	$perl->foo("bar");
+	$perl->();
 	my $s = IPC::Run3::Shell->new();
 	is $s->perl('-e','print "foo"'), "foo", "dummy test";
 	$IPC::Run3::Shell::DEBUG = 1;
@@ -58,6 +64,7 @@ is IPC::Run3::Shell::_cmd2str("foo",undef,"bar"),  ## no critic (ProtectPrivateS
 	"foo  bar", "_cmd2str coverage";
 
 IPC::Run3::Shell::Autoload::DESTROY();
+IPC::Run3::Shell::CLIWrapper::DESTROY();
 
 { # cover the overload bug workaround code branch
 	local $overload::VERSION='1.03';

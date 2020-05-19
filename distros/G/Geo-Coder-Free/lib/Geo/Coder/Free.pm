@@ -17,11 +17,11 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 =head1 VERSION
 
-Version 0.22
+Version 0.23
 
 =cut
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 our $alternatives;
 
@@ -64,11 +64,15 @@ You can see a sample website at L<https://geocode.nigelhorne.com/>.
 Takes one optional parameter, openaddr, which is the base directory of
 the OpenAddresses data downloaded from L<http://results.openaddresses.io>.
 
-The database also will include data from Who's On First L<https://whosonfirst.org>.
+The database also will include data from Who's On First
+L<https://whosonfirst.org>.
 
 Takes one optional parameter, directory,
-which tells the library where to find the MaxMind and GeoNames files admin1db, admin2.db and cities.[sql|csv.gz].
-If that parameter isn't given, the module will attempt to find the databases, but that can't be guaranteed.
+which tells the library where to find the MaxMind and GeoNames files admin1db,
+admin2.db and cities.[sql|csv.gz].
+If that parameter isn't given,
+the module will attempt to find the databases,
+but that can't be guaranteed.
 
 =cut
 
@@ -152,7 +156,7 @@ sub geocode {
 	} elsif(@_ % 2 == 0) {
 		%param = @_;
 	} else {
-		$param{location} = shift;
+		$param{'location'} = shift;
 	}
 
 	if($self->{'openaddr'}) {
@@ -206,9 +210,8 @@ sub geocode {
 		if(wantarray) {
 			my @rc = $self->{'maxmind'}->geocode(\%param);
 			return @rc;
-		} else {
-			return $self->{'maxmind'}->geocode(\%param);
 		}
+		return $self->{'maxmind'}->geocode(\%param);
 	}
 	if(!$param{'scantext'}) {
 		Carp::croak('Usage: geocode(location => $location|scantext => $text)');
@@ -380,6 +383,7 @@ Both are in their early days, but I have examples which do surprisingly well.
 The local copy of the database is built using the createdatabase.PL script which is bundled with G:C:F.
 That script creates a single SQLite file from downloaded copies of the databases listed above, to create the database you will need
 to first install L<App::csv2sqlite>.
+If REDIS_SERVER is set, the data are also stored on a Redis Server.
 Running 'make' will download GeoNames and MaxMind, but OpenAddresses and WhosOnFirst need to be downloaded manually if you decide to use them - they are treated as optional by G:C:F.
 
 There is a sample website at L<https://geocode.nigelhorne.com/>.  The source code for that site is included in the G:C:F distribution.
@@ -405,7 +409,7 @@ L<http://results.openaddresses.io/>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2019 Nigel Horne.
+Copyright 2017-2020 Nigel Horne.
 
 The program code is released under the following licence: GPL for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)

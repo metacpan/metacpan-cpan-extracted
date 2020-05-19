@@ -44,8 +44,8 @@ Mnet::T::test_perl({
         ' >$EXPECT
     pre-eof
     perl    => $perl,
-    post    => 'rm $EXPECT',
     args    => '--username user',
+    post    => 'rm $EXPECT',
     expect  => 'prompt = (^|\r|\n)prompt% \r?$'."\n",
     debug   => '--debug --noquiet',
 });
@@ -61,8 +61,8 @@ Mnet::T::test_perl({
         ' >$EXPECT
     pre-eof
     perl    => $perl,
-    post    => 'rm $EXPECT',
     args    => '--password pass',
+    post    => 'rm $EXPECT',
     expect  => 'prompt = (^|\r|\n)prompt# \r?$'."\n",
     debug   => '--debug --noquiet',
 });
@@ -166,13 +166,13 @@ Mnet::T::test_perl({
         inf - Mnet::Expect log txt: prompt$'.' '.'
         inf - Mnet::Expect log txt: prompt$'.' '.'
         dbg - Mnet::Expect log txt: test
-        --- - Mnet::Log finished with no errors
+        --- - Mnet::Log finished, no errors
     ',
     debug   => '--debug --noquiet',
 });
 
 # new login with spurious prompt, no trailing spaces prompt>
-#? try enabling this test after everything else works
+#? try enabling prompt-detect test after everything else works
 #Mnet::T::test_perl({
 #    name    => 'new login with spurious prompt, no trailing spaces prompt>',
 #    pre     => <<'    pre-eof',

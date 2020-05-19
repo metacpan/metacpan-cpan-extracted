@@ -13,6 +13,14 @@ use Test::Mojo;
     }
 }
 
+{
+    package WRog::Fake;
+    use Mojo::Base -role;
+    sub another_answer {
+	return 43;
+    }
+}
+
 my $class = Mojo::Base->with_roles('+PromiseClass');
 ok(defined $class, "base->with_roles works");
 my $obj = $class->new;
@@ -25,6 +33,14 @@ $obj->promise_roles('+Fake');
 ok($obj->promise_class->does('Mojo::Promise::Role::Fake'));
 is($obj->promise_class->new->the_answer_to_everything, '42');
 is($obj->promise_class, $obj->promise_roles('+Fake')->promise_class, "twice");
+
+$obj->promise_roles('WRog::Fake');
+ok($obj->promise_class->does('WRog::Fake'), "by full name");
+{
+my $p = $obj->promise_class->new;
+is($p->another_answer, '43');
+is($p->the_answer_to_everything, '42', "cumulative");
+}
 
 $class = Mojo::UserAgent->with_roles('+PromiseClass');
 ok(defined $class, "ua->with_roles works");

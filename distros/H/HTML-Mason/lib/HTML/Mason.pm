@@ -2,7 +2,7 @@ package HTML::Mason;
 # Copyright (c) 1998-2005 by Jonathan Swartz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-$HTML::Mason::VERSION = '1.58';
+$HTML::Mason::VERSION = '1.59';
 use 5.006;
 
 use HTML::Mason::Interp;
@@ -28,7 +28,7 @@ HTML::Mason - High-performance, dynamic web site authoring system
 
 =head1 VERSION
 
-version 1.58
+version 1.59
 
 =head1 SYNOPSIS
 
@@ -94,6 +94,15 @@ Beyond this trivial example, components can also embed serious chunks
 of Perl code (say, to pull records from a database). They can also
 call other components, cache results for later reuse, and perform all
 the tricks you expect from a regular Perl program.
+
+=head1 MAINTENANCE HELP NEEDED
+
+I (Dave Rolsky) am no longer using HTML::Mason and I would love to find some
+co-maintainers to help. Specifically, I'd like people to review issues and
+PRs, create new PRs, and ultimately take on the task of uploading new releases
+to CPAN. If you're interested the best way to start is to fix one or more of
+the issues in the L<issue
+tracker|https://github.com/houseabsolute/HTML-Mason/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc>.
 
 =head1 WAIT - HAVE YOU SEEN MASON 2?
 
@@ -202,7 +211,7 @@ Bugs and feature requests will be tracked at RT:
 
 =head1 SUPPORT
 
-Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Mason> or via email to L<bug-html-mason@rt.cpan.org|mailto:bug-html-mason@rt.cpan.org>.
+Bugs may be submitted at L<https://github.com/houseabsolute/HTML-Mason/issues>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
@@ -230,7 +239,7 @@ Ken Williams <ken@mathforum.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ævar Arnfjörð Bjarmason Alex Balhatchet Vandiver John Williams Kent Fredric Kevin Falcone Patrick Kane Ricardo Signes Shlomi Fish
+=for stopwords Ævar Arnfjörð Bjarmason Alex Balhatchet Vandiver Florian Schlichting John Williams Kent Fredric Kevin Falcone Patrick Kane Ricardo Signes Shlomi Fish
 
 =over 4
 
@@ -245,6 +254,10 @@ Alex Balhatchet <kaoru@slackwise.net>
 =item *
 
 Alex Vandiver <alex@chmrr.net>
+
+=item *
+
+Florian Schlichting <fsfs@debian.org>
 
 =item *
 
@@ -274,7 +287,7 @@ Shlomi Fish <shlomif@shlomifish.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 1998 - 2017 by Jonathan Swartz.
+This software is copyright (c) 1998 - 2020 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

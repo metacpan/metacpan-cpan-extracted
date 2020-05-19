@@ -1,0 +1,155 @@
+#!/usr/bin/env perl
+
+use Modern::Perl;
+use Daemonise;
+use Getopt::Long;
+
+# PODNAME: workflow.rabbit
+
+my $pid;
+my $debug;
+my $conf = '/etc/daemonise/bunny.conf';
+my $foreground;
+
+GetOptions(
+    "debug|d"      => \$debug,
+    "config|c=s"   => \$conf,
+    "pidfile|p=s"  => \$pid,
+    "foreground|f" => \$foreground,
+) or die;
+
+my $d = Daemonise->new();
+$d->debug(1)       if $debug;
+$d->debug(1)       if ($d->hostname =~ m/devel/);
+$d->foreground(1)  if $foreground;
+$d->pid_file($pid) if $pid;
+$d->config_file($conf);
+$d->configure;
+$d->load_plugin('JobQueue');
+$d->is_worker(1);
+$d->dont_log_worker;
+
+$d->start(\&process);
+
+sub process {
+    my ($msg) = @_;
+
+    my $command = $msg->{meta}->{workflow} || $msg->{data}->{command};
+
+    # make sure meta->workflow always exists from now on
+    $msg->{meta}->{workflow} = $command
+        unless exists $msg->{meta}->{workflow}
+        and defined $msg->{meta}->{workflow};
+
+    unless ($command) {
+        $msg->{error} = "workflow parameter missing";
+        $d->update_job($msg);
+        return $msg;
+    }
+
+    $d->couchdb->db('workflow');
+    my $wf = $d->couchdb->get_view({
+        view => 'workflow/name',
+        opts => { key => $command },
+    });
+
+    unless ($wf and exists $wf->{$command}) {
+        $msg->{error} = "Could not find a workflow for [$command]";
+        $d->update_job($msg);
+        return $msg;
+    }
+
+    my $path = $wf->{$command};
+    my $next_hop;
+
+    if ($msg->{meta}->{log}) {
+        my @log  = @{ $msg->{meta}->{log} };
+        my $last = pop(@log);
+        my @path = @$path;
+
+        # if we removed the first step, make sure to start from beginning
+        if (defined $last) {
+            $d->log("LAST: $last | path: " . join(' -> ', @path));
+
+            my %index;
+            @index{@path} = (0 .. $#path);
+            $next_hop = $path[ ++$index{$last} ];
+        }
+        else {
+            $next_hop = $path[0];
+        }
+
+        if (!$next_hop) {
+            if (exists $msg->{meta}->{reply_to}) {
+                $d->log('replying and done');
+                $d->job_done($msg);
+                $d->queue($msg->{meta}->{reply_to}, $d->job->{message});
+
+                return $d->job->{message};
+            }
+            elsif (!exists($msg->{error})) {
+                $d->log('done');
+                $d->job_done($msg);
+                return $d->job->{message};
+            }
+
+            return $msg;
+        }
+    }
+    else {
+        $next_hop = $path->[0];
+        my ($job, $duplicate) = $d->create_job($msg);
+        $msg = $job->{message};
+
+        if ($duplicate) {
+            $d->log('checking on existing job');
+
+            # check for 20 secs if job has come to a final state
+            my $try = 1;
+            while (($job->{status} !~ /^(done|failed)$/) and ($try <= 20)) {
+                sleep 1;
+                $job = $d->get_job($job->{_id});
+                $try++;
+            }
+
+            $d->log('giving up on job') if ($try > 20);
+
+            # make sure we have the latest job message
+            $msg = $job->{message};
+
+            # TODO: what to do when still pending?
+            # job might still be in pending state and has probably died,
+            # but we have to reply nevertheless
+            if (exists $msg->{meta}->{reply_to}) {
+                $d->log('replying to ' . $msg->{meta}->{reply_to});
+                $d->queue($msg->{meta}->{reply_to}, $msg);
+            }
+            return $msg;
+        }
+    }
+
+    $d->log("next worker: $next_hop");
+
+    $d->couchdb->db('workflow');
+    my $worker = $d->couchdb->get_view({
+        view => 'worker/name',
+        opts => { key => $next_hop },
+    });
+    unless ($worker and exists $worker->{$next_hop}) {
+        $msg->{error} = "Could not find worker [$next_hop]";
+        $d->update_job($msg);
+
+        return $msg;
+    }
+    $worker = $worker->{$next_hop};
+
+    $msg->{meta}->{worker}   = $next_hop;
+    $msg->{meta}->{workflow} = $msg->{data}->{command}
+        unless $msg->{meta}->{workflow};
+    $msg->{data}->{command} = $worker->{command};
+
+    # send to next worker
+    $d->queue($worker->{queue}, $msg, 'workflow');
+
+    return $msg;
+}

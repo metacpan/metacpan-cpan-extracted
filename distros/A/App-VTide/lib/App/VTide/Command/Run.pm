@@ -19,7 +19,7 @@ use IO::Prompt qw/prompt/;
 
 extends 'App::VTide::Command';
 
-our $VERSION = version->new('0.1.10');
+our $VERSION = version->new('0.1.11');
 our $NAME    = 'run';
 our $OPTIONS = [
     'name|n=s',
@@ -38,7 +38,6 @@ sub run {
 
     my ( $name ) = $self->session_dir($self->defaults->{name});
     my $cmd = $self->options->files->[0] || '';
-    print "Running $name - $cmd\n";
     $ENV{VTIDE_TERM} = $cmd;
 
     my $params = $self->params( $cmd );
@@ -46,6 +45,13 @@ sub run {
 
     @ARGV = ();
     if ( !( $self->first && $params->{watch} && $params->{wait} ) ) {
+
+        if ( $params->{clear} ) {
+            system 'clear';
+        }
+        if ( $self->first ) {
+            print "Running $name - $cmd\n";
+        }
 
         if ( $params->{heading} ) {
             # show terminal heading if desired
@@ -103,6 +109,13 @@ sub restart {
         q => {
             msg  => 'quit',
             exec => sub { 0; },
+        },
+        c => {
+            msg  => 'clear screen',
+            exec => sub {
+                system "clear";
+                $self->restart($cmd, $no_watch);
+            },
         },
         r => {
             msg  => 'restart',
@@ -164,7 +177,7 @@ sub watch {
 
     while (1) {
         my $done = 0;
-        local $SIG{INT} = sub { $done = $self->restart($cmd, 1); };
+        local $SIG{INT} = sub { $done = $self->restart($cmd, 1) ? 1 : undef; };
 
         sleep 1;
 
@@ -233,13 +246,21 @@ sub command {
     eval { require Term::Title; }
         and Term::Title::set_titlebar($params->{title} || $globs[0]);
 
-    my $helper = $self->config->get->{editor}{helper};
+    my $helper_text = $self->config->get->{editor}{helper};
+    my $helper;
     eval {
-        if ($helper) {
-            $helper = eval $helper;  ## no critic
+        if ($helper_text) {
+            $helper = eval $helper_text;  ## no critic
+            die "No helper generated!" if !$helper;
+        }
+        else {
+            warn "No helper text";
         }
         1;
-    } or do { warn $@ };
+    } or do {
+        warn $helper_text;
+        warn $@
+    };
 
     my $groups = $self->config->get->{editor}{files};
     my @files = $self->_globs2files($groups, $helper, @globs);
@@ -250,9 +271,11 @@ sub command {
 sub _globs2files {
     my ($self, $groups, $helper, @globs) = @_;
     my @files;
+    my $count = 0;
 
     GLOB:
     while ( my $glob = shift @globs ) {
+        last if $count++ > 30;
         my ($not_glob) = $glob =~ /^[!](.*)$/;
 
         if ( $not_glob ) {
@@ -273,7 +296,8 @@ sub _globs2files {
             } or do { warn $@ };
 
             if (@g) {
-                unshift @globs, @g;
+                push @files, grep { -f $_ } @g;
+                unshift @globs, grep { ! -f $_ } @g;
                 next GLOB;
             }
         }
@@ -348,7 +372,7 @@ App::VTide::Command::Run - Run a terminal command
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Run version 0.1.10
+This documentation refers to App::VTide::Command::Run version 0.1.11
 
 =head1 SYNOPSIS
 

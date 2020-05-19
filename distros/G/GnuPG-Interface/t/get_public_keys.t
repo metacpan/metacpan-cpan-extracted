@@ -19,7 +19,7 @@ TEST
 {
     reset_handles();
 
-    my @returned_keys = $gnupg->get_public_keys_with_sigs( '0xF950DA9C' );
+    my @returned_keys = $gnupg->get_public_keys_with_sigs( '0x93AFC4B1B0288A104996B44253AE596EF950DA9C' );
 
     return 0 unless @returned_keys == 1;
 
@@ -54,6 +54,7 @@ TEST
       );
 
 
+    # Note, blank user_id_string and different validity for expired sig in GPG 2.2.x
     my $uid0 = GnuPG::UserId->new( as_string =>  'GnuPG test key (for testing purposes only)',
                                    validity => '-');
     $uid0->push_signatures(
@@ -67,14 +68,9 @@ TEST
                             sig_class => 0x13,
                             validity => '!'),
       GnuPG::Signature->new(
+                            get_expired_test_sig_params($gnupg),
                             date => 953180097,
-                            algo_num => 17,
-                            is_exportable => 1,
-                            user_id_string => 'Frank J. Tobin <ftobin@neverending.org>',
-                            date_string => '2000-03-16',
-                            hex_id => '56FFD10A260C4FA3',
-                            sig_class => 0x10,
-                            validity => '!'),
+      ),
       GnuPG::Signature->new(
                             date => 949813093,
                             algo_num => 17,
@@ -83,8 +79,19 @@ TEST
                             date_string => '2000-02-06',
                             hex_id => '53AE596EF950DA9C',
                             sig_class => 0x13,
-                            validity => '!'));
+                            validity => '!'),
+      GnuPG::Signature->new(
+                            date => 1177086329,
+                            algo_num => 17,
+                            is_exportable => 1,
+                            user_id_string => 'GnuPG test key (for testing purposes only)',
+                            date_string => '2007-04-20',
+                            hex_id => '53AE596EF950DA9C',
+                            sig_class => 0x13,
+                            validity => '!'),
+                          );
 
+    # Note, blank user_id_string and different validity for expired sig in GPG 2.2.x
     my $uid1 = GnuPG::UserId->new( as_string =>  'Foo Bar (1)',
                                    validity => '-');
     $uid1->push_signatures(
@@ -98,14 +105,9 @@ TEST
                             sig_class => 0x13,
                             validity => '!'),
       GnuPG::Signature->new(
+                            get_expired_test_sig_params($gnupg),
                             date => 953180103,
-                            algo_num => 17,
-                            is_exportable => 1,
-                            user_id_string => 'Frank J. Tobin <ftobin@neverending.org>',
-                            date_string => '2000-03-16',
-                            hex_id => '56FFD10A260C4FA3',
-                            sig_class => 0x10,
-                            validity => '!'),
+      ),
       GnuPG::Signature->new(
                             date => 953179891,
                             algo_num => 17,
@@ -115,8 +117,6 @@ TEST
                             hex_id => '53AE596EF950DA9C',
                             sig_class => 0x13,
                             validity => '!'));
-
-
 
     $handmade_key->push_user_ids($uid0, $uid1);
 
@@ -175,7 +175,7 @@ TEST
     ];
 
     my $subkey = GnuPG::SubKey->new
-      ( validity                 => 'u',
+      ( validity                 => '-',
         length                   => 768,
         algo_num                 => 16,
         hex_id                   => 'ADB99D9C2E854A6B',
@@ -218,5 +218,40 @@ TEST
 
 TEST
 {
+    # Some versions of GnuPG 2.2.x give same user_id and validity for expired sig as 1.4
+    # this forces them to be consistent and still test them with 2.2 codepath
+    no warnings qw(redefine once);
+    local *GnuPG::Signature::compare = sub {
+        my ($self, $other) = @_;
+        if ($gnupg->cmp_version($gnupg->version, '2.2') > 0) {
+            if ( defined $self->user_id_string and
+                     $self->user_id_string eq 'Frank J. Tobin <ftobin@neverending.org>') {
+                $self->user_id_string('');
+                $self->validity('?');
+            }
+        }
+
+        my @compared_fields = qw(
+                                    validity
+                                    algo_num
+                                    hex_id
+                                    date
+                                    date_string
+                                    sig_class
+                                    is_exportable
+                            );
+
+        foreach my $field ( @compared_fields ) {
+            return 0 unless $self->$field eq $other->$field;
+        }
+        # check for expiration if present?
+        return 0 unless (defined $self->expiration_date) == (defined $other->expiration_date);
+        if (defined $self->expiration_date) {
+            return 0 unless (($self->expiration_date == $other->expiration_date) ||
+                                 ($self->expiration_date_string eq $other->expiration_date_string));
+        }
+        return 1;
+    };
+
     $handmade_key->compare( $given_key, 1 );
 };

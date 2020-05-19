@@ -6,7 +6,23 @@ use warnings;
 
 use lib 't/lib';
 
-use MyTest tests => 160;
+use MyTest tests => 265;
+
+license_covered(
+	'aal',
+	name => 'Attribution Assurance License',
+	text => <<EOF,
+1. Redistributions of source code, in whole or part and with or without modification (the "Code"), must prominently display this GPG-signed text in verifiable form.
+EOF
+);
+
+license_covered(
+	'abstyles',
+	name => 'Abstyles License',
+	text => <<EOF,
+Permission is granted to copy and distribute modified versions of this document under the conditions for verbatim copying, provided that the entire resulting derived work is distributed under the terms of a permission notice identical to this one.
+EOF
+);
 
 license_covered(
 	'adobe_2006',
@@ -37,6 +53,14 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 Adobe shall not be liable to any party for any loss of revenue or profit or for indirect, incidental, special, consequential, or other similar damages, whether based on tort (including without limitation negligence or strict liability), contract or other legal or equitable grounds even if Adobe has been advised or had reason to know of the possibility of such damages.
 The Adobe materials are provided on an "AS IS" basis.
 Adobe specifically disclaims all express, statutory, or implied warranties relating to the Adobe materials, including but not limited to those concerning merchantability or fitness for a particular purpose or non-infringement of any third party rights regarding the Adobe materials.
+EOF
+);
+
+license_covered(
+	'adsl',
+	name => 'Amazon Digital Services License',
+	text => <<EOF,
+Your use of this software code is at your own risk and you waive any claim against Amazon Digital Services, Inc. or its affiliates with respect to your use of this software code.
 EOF
 );
 
@@ -103,6 +127,14 @@ EOF
 );
 
 license_covered(
+	'afmparse',
+	name => 'Afmparse License',
+	text => <<EOF,
+2) If the file has been modified in any way, a notice of such modification is conspicuously indicated.
+EOF
+);
+
+license_covered(
 	'agpl',
 	name  => 'GNU Affero General Public License',
 	grant => <<EOF,
@@ -118,6 +150,18 @@ license_covered(
 * d) If the Program as you received it is intended to interact with users through a computer network and if, in the version you received, any user interacting with the Program was given the opportunity to request transmission to that user of the Program's complete source code, you must not remove that facility from your modified version of the Program or work based on the Program, and must offer an equivalent opportunity for all users interacting with your Program through a computer network to request immediate transmission by HTTP of the complete source code of your modified version or other derivative work.
 EOF
 	TODO => [qw(grant_grant)]
+);
+
+license_covered(
+	'agpl_1_only',
+	name => 'GNU Affero General Public License version 1 only',
+	TODO => [qw(subject_iri subject_license)]
+);
+
+license_covered(
+	'agpl_1_or_later',
+	name => 'GNU Affero General Public License version 1 or later',
+	TODO => [qw(subject_iri subject_license)]
 );
 
 license_covered(
@@ -143,6 +187,18 @@ EOF
 );
 
 license_covered(
+	'agpl_3_only',
+	name => 'GNU Affero General Public License version 3 only',
+	TODO => [qw(subject_iri subject_license)]
+);
+
+license_covered(
+	'agpl_3_or_later',
+	name => 'GNU Affero General Public License version 3 or later',
+	TODO => [qw(subject_iri subject_license)]
+);
+
+license_covered(
 	'aladdin',
 	name  => 'Aladdin Free Public License',
 	grant => <<EOF,
@@ -164,6 +220,7 @@ Aladdin Enterprises hereby grants to anyone the permission to apply this License
 
 This License applies to the computer program known as "Aladdin Ghostscript." The "Program", below, refers to such program.
 EOF
+	TODO => [qw(name_name grant_grant)]
 );
 
 license_covered(
@@ -182,6 +239,43 @@ This License attempts to ensure that those who receive, redistribute, and contri
 0. Subject Matter
 
 This License applies to the computer programs known as "AFPL Ghostscript", "AFPL Ghostscript PCL5e", "AFPL Ghostscript PCL5c", and "AFPL Ghostscript PXL".&nbsp; The "Program", below, refers to such program.
+EOF
+	TODO => [qw(name_name grant_grant)]
+);
+
+license_covered(
+	'amdplpa',
+	name => "AMD's plpa_map.c License",
+	text => <<EOF,
+Neither the names nor trademarks of Advanced Micro Devices, Inc. or any copyright holders or contributors may be used to endorse or promote products derived from this material without specific prior written permission.
+EOF
+);
+
+license_covered(
+	'aml',
+	name => 'Apple MIT License',
+	text => <<EOF,
+In consideration of your agreement to abide by the following terms, and subject to these terms, Apple grants you a personal, non-exclusive license, under Apple's copyrights in this original Apple software (the "Apple Software"),
+EOF
+);
+
+license_covered(
+	'ampas',
+	name => 'Academy of Motion Picture Arts and Sciences BSD',
+	text => <<EOF,
+* Redistributions of source code must retain the above copyright notice, this list of conditions and the Disclaimer of Warranty.
+
+* Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the Disclaimer of Warranty in the documentation and/or other materials provided with the distribution.
+
+* Nothing in this license shall be deemed to grant any rights to trademarks,
+EOF
+);
+
+license_covered(
+	'antlr_pd',
+	name => 'ANTLR Software Rights Notice',
+	text => <<EOF,
+We reserve no legal rights to the ANTLR--it is fully in the public domain.
 EOF
 );
 
@@ -207,6 +301,73 @@ license_covered(
 	text => <<EOF,
 This file and the 14 PostScript(R) AFM files it accompanies may be used, copied, and distributed for any purpose and without charge, with or without modification, provided that all copyright notices are retained; that the AFM files are not distributed without this file; that all modifications to this file or any of the AFM files are prominently noted in the modified file(s); and that this paragraph is not modified.
 Adobe Systems has no responsibility or obligation to support the use of the AFM files.
+EOF
+);
+
+license_covered(
+	'apl',
+	name => 'Adaptive Public License',
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'apl_1',
+	name  => 'Adaptive Public License 1.0',
+	grant => <<EOF,
+Licensed under the Adaptive Public License version 1.0
+EOF
+	text => <<EOF,
+THE LICENSED WORK IS PROVIDED UNDER THE TERMS OF THIS ADAPTIVE PUBLIC LICENSE ("LICENSE").
+EOF
+);
+
+license_covered(
+	'apsl',
+	name => 'Apple Public Source License',
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'apsl_1',
+	name  => 'Apple Public Source License 1.0',
+	grant => <<EOF,
+Licensed under the Apple Public Source License version 1.0
+EOF
+	text => <<EOF,
+This License applies to any program or other work which Apple Computer, Inc. ("Apple") publicly announces as subject to this Apple Public Source License and which contains a notice placed by Apple identifying such program or work as "Original Code" and stating that it is subject to the terms of this Apple Public Source License version 1.0 (or subsequent version thereof), as it may be revised from time to time by Apple ("License").
+EOF
+);
+
+license_covered(
+	'apsl_1_1',
+	name  => 'Apple Public Source License 1.1',
+	grant => <<EOF,
+Licensed under the Apple Public Source License version 1.1
+EOF
+	text => <<EOF,
+This License applies to any program or other work which Apple Computer, Inc. ("Apple") publicly announces as subject to this Apple Public Source License and which contains a notice placed by Apple identifying such program or work as "Original Code" and stating that it is subject to the terms of this Apple Public Source License version 1.1 (or subsequent version thereof), as it may be revised from time to time by Apple ("License").
+EOF
+);
+
+license_covered(
+	'apsl_1_2',
+	name  => 'Apple Public Source License 1.2',
+	grant => <<EOF,
+Licensed under the Apple Public Source License version 1.2
+EOF
+	text => <<EOF,
+This License applies to any program or other work which Apple Computer, Inc. ("Apple") makes publicly available and which contains a notice placed by Apple identifying such program or work as "Original Code" and stating that it is subject to the terms of this Apple Public Source License version 1.2 (or subsequent version thereof) ("License").
+EOF
+);
+
+license_covered(
+	'apsl_2',
+	name  => 'Apple Public Source License 2.0',
+	grant => <<EOF,
+Licensed under the Apple Public Source License version 2.0
+EOF
+	text => <<EOF,
+This License applies to any program or other work which Apple Inc. ("Apple") makes publicly available and which contains a notice placed by Apple identifying such program or work as "Original Code" and stating that it is subject to the terms of this Apple Public Source License version 2.0 ("License").
 EOF
 );
 
@@ -241,7 +402,7 @@ Such use shall not be construed as a distribution of this Package.
 
 9. The name of the Copyright Holder may not be used to endorse or promote products derived from this software without specific prior written permission.
 EOF
-	TODO => [qw(subject_license not_iri_name)]
+	TODO => [qw(name_name subject_license not_iri_name)]
 );
 
 license_covered(
@@ -258,6 +419,7 @@ Such use shall not be construed as a distribution of this Package.
 
 9. The name of the Copyright Holder may not be used to endorse or promote products derived from this software without specific prior written permission.
 EOF
+	TODO => [qw(name_name)]
 );
 
 license_covered(
@@ -286,6 +448,22 @@ EOF
 );
 
 license_covered(
+	'bahyph',
+	name => 'Bahyph License',
+	text => <<EOF,
+These patterns were developed for internal GMV use and are made public in the hope that they will benefit others.
+EOF
+);
+
+license_covered(
+	'barr',
+	name => 'Barr License',
+	text => <<'EOF',
+This is a package of commutative diagram macros built on top of Xy-pic by Michael Barr (email: barr@barrs.org).
+EOF
+);
+
+license_covered(
 	'bdwgc',
 	name => 'bdwgc',
 	iri  => 'http://www.hboehm.info/gc/license.txt',
@@ -306,6 +484,50 @@ Permission to modify the code and to distribute modified code is granted, provid
 You must also retain the Availability information below, of the original version.
 EOF
 	TODO => [qw(subject_iri)]
+);
+
+license_covered(
+	'bittorrent',
+	name => 'BitTorrent Open Source License',
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'bittorrent_1',
+	name  => 'BitTorrent Open Source License v1.0',
+	grant => <<EOF,
+Licensed under the BitTorrent Open Source License version 1.0
+EOF
+	text => <<EOF,
+BitTorrent Open Source License
+
+Version 1.0
+
+This BitTorrent Open Source License (the "License") applies to the BitTorrent client and related software products as well as any updates or maintenance releases of that software ("BitTorrent Products") that are distributed by BitTorrent, Inc. ("Licensor").
+EOF
+);
+
+license_covered(
+	'bittorrent_1_1',
+	name  => 'BitTorrent Open Source License v1.1',
+	grant => <<EOF,
+Licensed under the BitTorrent Open Source License version 1.1
+EOF
+	text => <<EOF,
+BitTorrent Open Source License
+
+Version 1.1
+
+This BitTorrent Open Source License (the "License") applies to the BitTorrent client and related software products as well as any updates or maintenance releases of that software ("BitTorrent Products") that are distributed by BitTorrent, Inc. ("Licensor").
+EOF
+);
+
+license_covered(
+	'borceux',
+	name => 'Borceux license',
+	text => <<EOF,
+You may freely use, modify, and/or distribute each of the files in this package without limitation.
+EOF
 );
 
 license_covered(
@@ -363,7 +585,7 @@ license_covered(
 	'bsl',
 	name => 'Boost Software License',
 	iri  => 'http://www.boost.org/LICENSE_1_0.txt',
-	TODO => [qw(subject_license)]
+	TODO => [qw(subject_license not_iri_name)]
 );
 
 license_covered(
@@ -379,6 +601,60 @@ and to permit third-parties to whom the Software is furnished to do so,
 all subject to the following:
 EOF
 	TODO => [qw(text_license not_iri_name)]
+);
+
+license_covered(
+	'bzip2',
+	name => 'bzip2 and libbzip2 License',
+	text => <<EOF,
+• Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+• The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+
+• Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+
+• The name of the author may not be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+EOF
+);
+
+license_covered(
+	'bzip2_1_0_5',
+	name => 'bzip2 and libbzip2 License v1.0.5',
+	text => <<EOF,
+This program, bzip2, the associated library libbzip2, and all documentation, are copyright © 1996-2007 Julian Seward. All rights reserved.
+EOF
+);
+
+license_covered(
+	'bzip2_1_0_6',
+	name => 'bzip2 and libbzip2 License v1.0.6',
+	text => <<EOF,
+This program, "bzip2", the associated library "libbzip2", and all documentation, are copyright (C) 1996-2010 Julian R Seward. All rights reserved.
+EOF
+);
+
+license_covered(
+	'caldera',
+	name => 'BSD Source Caldera License',
+	text => <<EOF,
+Caldera International, Inc. hereby grants a fee free license that includes the rights use, modify and distribute this named source code, including creating derived binary products created from the source code.
+EOF
+);
+
+license_covered(
+	'catosl',
+	name => 'Computer Associates Trusted Open Source License',
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'catosl_1_1',
+	name => 'Computer Associates Trusted Open Source License 1.1',
+	text => <<EOF,
+1.1 Contribution means (a) in the case of CA, the Original Program;
+EOF
 );
 
 license_covered(
@@ -428,7 +704,7 @@ license_covered(
 This work is licensed under the Creative Commons Attribution 3.0 Unported License.
 To view a copy of this license, visit http://creativecommons.org/licenses/by/3.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
 EOF
-	TODO => [qw(not_grant_iri)]
+	TODO => [qw(name_name grant_grant not_grant_iri)]
 );
 
 license_covered(
@@ -439,7 +715,7 @@ license_covered(
 This work is licensed under the Creative Commons Attribution 4.0 International License.
 To view a copy of this license, visit http://creativecommons.org/licenses/by/4.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
 EOF
-	TODO => [qw(not_grant_iri)]
+	TODO => [qw(name_name grant_grant not_grant_iri)]
 );
 
 license_covered(
@@ -490,7 +766,7 @@ license_covered(
 This work is licensed under the Creative Commons Attribution-NonCommercial 3.0 Unported License.
 To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/3.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
 EOF
-	TODO => [qw(not_grant_iri)]
+	TODO => [qw(name_name grant_grant not_grant_iri)]
 );
 
 license_covered(
@@ -502,7 +778,7 @@ license_covered(
 This work is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License.
 To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/4.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
 EOF
-	TODO => [qw(not_grant_iri)]
+	TODO => [qw(name_name grant_grant not_grant_iri)]
 );
 
 license_covered(
@@ -557,7 +833,7 @@ license_covered(
 This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/3.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
 EOF
-	TODO => [qw(not_grant_iri)]
+	TODO => [qw(name_name grant_grant not_grant_iri)]
 );
 
 license_covered(
@@ -569,7 +845,7 @@ license_covered(
 This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
 EOF
-	TODO => [qw(not_grant_iri)]
+	TODO => [qw(name_name grant_grant not_grant_iri)]
 );
 
 license_covered(
@@ -624,7 +900,7 @@ license_covered(
 This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
 To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
 EOF
-	TODO => [qw(not_grant_iri)]
+	TODO => [qw(name_name grant_grant not_grant_iri)]
 );
 
 license_covered(
@@ -636,7 +912,7 @@ license_covered(
 This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/4.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
 EOF
-	TODO => [qw(not_grant_iri)]
+	TODO => [qw(name_name grant_grant not_grant_iri)]
 );
 
 license_covered(
@@ -687,7 +963,7 @@ license_covered(
 This work is licensed under the Creative Commons Attribution-NoDerivs 3.0 Unported License.
 To view a copy of this license, visit http://creativecommons.org/licenses/by-nd/3.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
 EOF
-	TODO => [qw(not_grant_iri)]
+	TODO => [qw(name_name grant_grant not_grant_iri)]
 );
 
 license_covered(
@@ -699,7 +975,7 @@ license_covered(
 This work is licensed under the Creative Commons Attribution-NoDerivatives 4.0 International License.
 To view a copy of this license, visit http://creativecommons.org/licenses/by-nd/4.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
 EOF
-	TODO => [qw(not_grant_iri)]
+	TODO => [qw(name_name grant_grant not_grant_iri)]
 );
 
 license_covered(
@@ -750,7 +1026,7 @@ license_covered(
 This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported License.
 To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
 EOF
-	TODO => [qw(not_grant_iri)]
+	TODO => [qw(name_name grant_grant not_grant_iri)]
 );
 
 license_covered(
@@ -762,7 +1038,7 @@ license_covered(
 This work is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License.
 To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
 EOF
-	TODO => [qw(not_grant_iri)]
+	TODO => [qw(name_name grant_grant not_grant_iri)]
 );
 
 license_covered(
@@ -1005,6 +1281,46 @@ EOF
 );
 
 license_covered(
+	'cnri_jython',
+	name => 'CNRI Jython License',
+	text => <<EOF,
+5. CNRI is making the Software available to Licensee on an "AS IS" basis.
+EOF
+);
+
+license_covered(
+	'cnri_python',
+	name => '',
+	text => <<EOF,
+4. CNRI is making Python 1.6b1 available to Licensee on an "AS IS" basis.
+EOF
+);
+
+license_covered(
+	'cnri_python_gpl_compat',
+	name => 'CNRI Python Open Source GPL Compatible License Agreement',
+	text => <<EOF,
+4. CNRI is making Python 1.6.1 available to Licensee on an "AS IS" basis.
+EOF
+);
+
+license_covered(
+	'cpal',
+	name => 'Common Public Attribution License',
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'cpal_1',
+	name => 'Common Public Attribution License 1.0',
+	text => <<EOF,
+Common Public Attribution License Version 1.0 (CPAL)
+
+1. "Definitions"
+EOF
+);
+
+license_covered(
 	'cpl',
 	name => 'Common Public License',
 	TODO => [qw(not_iri_name subject_license)]
@@ -1025,6 +1341,32 @@ DEFINITIONS
 a) in the case of the initial Contributor, the initial code and documentation distributed under this Agreement, and
 EOF
 	TODO => [qw(not_iri_name subject_iri)]
+);
+
+license_covered(
+	'cpol',
+	name => 'The Code Project Open License',
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'cpol_1_02',
+	name => 'The Code Project Open License 1.02',
+	text => <<EOF,
+This License governs Your use of the Work.
+EOF
+	TODO => [qw(name_name)]
+);
+
+license_covered(
+	'cryptix',
+	name => 'Cryptix Public License',
+	text => <<EOF,
+1. Redistributions of source code must retain the copyright notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE CRYPTIX FOUNDATION LIMITED AND CONTRIBUTORS ``AS IS''
+EOF
 );
 
 license_covered(
@@ -1056,6 +1398,30 @@ license_covered(
 	text => <<EOF,
 This program discloses material protectable under copyright laws of the United States.
 EOF
+);
+
+license_covered(
+	'ecl',
+	name => 'Educational Community License',
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'ecl_1',
+	name => 'Educational Community License, Version 1.0',
+	text => <<EOF,
+Licensed under the Educational Community License version 1.0
+EOF
+	TODO => [qw(not_iri_name subject_iri)]
+);
+
+license_covered(
+	'ecl_2',
+	name => 'Educational Community License, Version 2.0',
+	text => <<EOF,
+Licensed under the Educational Community License, Version 2.0 (the "License");
+EOF
+	TODO => [qw(not_iri_name subject_iri)]
 );
 
 license_covered(
@@ -1099,6 +1465,48 @@ THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS ECLIPSE PUBLIC LICE
 a) in the case of the initial Contributor, the initial content Distributed
 EOF
 	TODO => [qw(not_iri_name subject_iri)]
+);
+
+license_covered(
+	'eupl',
+	name => 'European Union Public License',
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'eupl_1',
+	name => 'European Union Public License, Version 1.0',
+	text => <<EOF,
+The Original Work is provided under the terms of this Licence when the Licensor (as defined below) has placed the following notice immediately following the copyright notice for the Original Work:
+
+Licensed under the EUPL V.1.0
+
+or has expressed by any other mean his willingness to license under the EUPL.
+EOF
+);
+
+license_covered(
+	'eupl_1_1',
+	name => 'European Union Public License, Version 1.1',
+	text => <<EOF,
+The Original Work is provided under the terms of this Licence when the Licensor (as defined below) has placed the following notice immediately following the copyright notice for the Original Work:
+
+Licensed under the EUPL V.1.1
+
+or has expressed by any other mean his willingness to license under the EUPL.
+EOF
+);
+
+license_covered(
+	'eupl_1_2',
+	name => 'European Union Public License, Version 1.2',
+	text => <<EOF,
+The Work is provided under the terms of this Licence when the Licensor (as defined below) has placed the following notice immediately following the copyright notice for the Work:
+
+Licensed under the EUPL
+
+or has expressed by any other means his willingness to license under the EUPL.
+EOF
 );
 
 license_covered(
@@ -1161,6 +1569,107 @@ EOF
 );
 
 license_covered(
+	'gfdl_1_1',
+	name => 'GNU Free Documentation License, Version 1.1',
+	text => <<EOF,
+This License applies to any manual or other work that contains a notice placed by the copyright holder saying it can be distributed under the terms of this License.
+EOF
+	TODO => [qw(grant_grant)]
+);
+
+license_covered(
+	'gfdl_1_1_only',
+	name => 'GNU Free Documentation License, Version 1.1 only',
+	TODO => [qw(subject_iri subject_license)]
+);
+
+license_covered(
+	'gfdl_1_1_or_later',
+	name => 'GNU Free Documentation License, Version 1.1 or later',
+	TODO => [qw(subject_iri subject_license)]
+);
+
+license_covered(
+	'gfdl_1_2',
+	name => 'GNU Free Documentation License, Version 1.2',
+	text => <<EOF,
+GNU Free Documentation License
+Version 1.2, November 2002
+EOF
+	TODO => [qw(grant_grant)]
+);
+
+license_covered(
+	'gfdl_1_2_only',
+	name => 'GNU Free Documentation License, Version 1.2 only',
+	TODO => [qw(subject_iri subject_license)]
+);
+
+license_covered(
+	'gfdl_1_2_or_later',
+	name => 'GNU Free Documentation License, Version 1.2 or later',
+	TODO => [qw(subject_iri subject_license)]
+);
+
+license_covered(
+	'gfdl_1_3',
+	name => 'GNU Free Documentation License, Version 1.3',
+	text => <<EOF,
+GNU Free Documentation License
+Version 1.3, 3 November 2008
+EOF
+	TODO => [qw(grant_grant)]
+);
+
+license_covered(
+	'gfdl_1_3_only',
+	name => 'GNU Free Documentation License, Version 1.3 only',
+	TODO => [qw(subject_iri subject_license)]
+);
+
+license_covered(
+	'gfdl_1_3_or_later',
+	name => 'GNU Free Documentation License, Version 1.3 or later',
+	TODO => [qw(subject_iri subject_license)]
+);
+
+license_covered(
+	'gpl_1_only',
+	name => 'GNU General Public License version 1 only',
+	TODO => [qw(subject_iri subject_license)]
+);
+
+license_covered(
+	'gpl_1_or_later',
+	name => 'GNU General Public License version 1 or later',
+	TODO => [qw(subject_iri subject_license)]
+);
+
+license_covered(
+	'gpl_2_only',
+	name => 'GNU General Public License version 2 only',
+	TODO => [qw(subject_iri subject_license)]
+);
+
+license_covered(
+	'gpl_2_or_later',
+	name => 'GNU General Public License version 2 or later',
+	TODO => [qw(subject_iri subject_license)]
+);
+
+license_covered(
+	'gpl_3_only',
+	name => 'GNU General Public License version 3 only',
+	TODO => [qw(subject_iri subject_license)]
+);
+
+license_covered(
+	'gpl_3_or_later',
+	name => 'GNU General Public License version 3 or later',
+	TODO => [qw(subject_iri subject_license)]
+);
+
+license_covered(
 	'isc',
 	name => 'ISC License',
 	text => <<EOF,
@@ -1205,11 +1714,67 @@ EOF
 license_covered(
 	'lgpl',
 	name => 'GNU Library General Public License',
-	text => <<EOF,
-GNU LESSER GENERAL PUBLIC LICENSE
-Version 3, 29 June 2007
-EOF
 	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'lgpl_2',
+	name => 'GNU Library General Public License version 2',
+	text => <<EOF,
+This license, the Library General Public License, applies to some specially designated Free Software Foundation software
+EOF
+);
+
+license_covered(
+	'lgpl_2_only',
+	name => 'GNU Library General Public License version 2 only',
+	TODO => [qw(subject_iri subject_license)]
+);
+
+license_covered(
+	'lgpl_2_or_later',
+	name => 'GNU Library General Public License version 2 or newer',
+	TODO => [qw(subject_iri subject_license)]
+);
+
+license_covered(
+	'lgpl_2_1',
+	name => 'GNU Lesser General Public License version 2.1',
+	text => <<EOF,
+This license, the Lesser General Public License, applies to some specially designated software packages
+EOF
+);
+
+license_covered(
+	'lgpl_2_1_only',
+	name => 'GNU Lesser General Public License version 2.1 only',
+	TODO => [qw(subject_iri subject_license)]
+);
+
+license_covered(
+	'lgpl_2_1_or_later',
+	name => 'GNU Lesser General Public License version 2.1 or newer',
+	TODO => [qw(subject_iri subject_license)]
+);
+
+license_covered(
+	'lgpl_3',
+	name => 'GNU Lesser General Public License version 3',
+	text => <<EOF,
+As used herein, "this License" refers to version 3 of the GNU Lesser General Public License
+EOF
+);
+
+license_covered(
+	'lgpl_3_only',
+	name => 'GNU Lesser General Public License version 3 only',
+	TODO => [qw(subject_iri subject_license)]
+);
+
+license_covered(
+	'lgpl_3_or_later',
+	name => 'GNU Lesser General Public License version 3 or newer',
+	TODO => [qw(subject_iri subject_license)]
 );
 
 license_covered(
@@ -1243,6 +1808,54 @@ The Contributing Authors and Group 42, Inc. specifically permit, without fee, an
 If you use this source code in a product, acknowledgment is not required but would be appreciated.
 EOF
 	TODO => [qw(name_name)],
+);
+
+license_covered(
+	'lppl',
+	name => 'LaTeX Project Public License',
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'lppl_1',
+	name => 'LaTeX Project Public License 1.0',
+	text => <<EOF,
+LPPL Version 1.0 1999-03-01 Copyright 1999 LaTeX3 Project
+EOF
+);
+
+license_covered(
+	'lppl_1_1',
+	name => 'LaTeX Project Public License 1.1',
+	text => <<EOF,
+LPPL Version 1.1 1999-07-10 Copyright 1999 LaTeX3 Project
+EOF
+);
+
+license_covered(
+	'lppl_1_2',
+	name => 'LaTeX Project Public License 1.2',
+	text => <<EOF,
+LPPL Version 1.2 1999-09-03 Copyright 1999 LaTeX3 Project
+EOF
+);
+
+license_covered(
+	'lppl_1_3a',
+	name => 'LaTeX Project Public License 1.3a',
+	text => <<EOF,
+LPPL Version 1.3a 2004-10-01 Copyright 1999 2002-04 LaTeX3 Project
+EOF
+	TODO => [qw(name_name)]
+);
+
+license_covered(
+	'lppl_1_3c',
+	name => 'LaTeX Project Public License 1.3c',
+	text => <<EOF,
+LPPL Version 1.3c 2008-05-04 Copyright 1999 2002-2008 LaTeX3 Project
+EOF
+	TODO => [qw(name_name)]
 );
 
 license_covered(
@@ -1404,6 +2017,44 @@ license_covered(
 );
 
 license_covered(
+	'ngpl',
+	name => 'Nethack General Public License',
+	text => <<EOF,
+1. You may copy and distribute verbatim copies of NetHack source code as you receive it,
+EOF
+);
+
+license_covered(
+	'npl',
+	name => 'Netscape Public License',
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'npl_1',
+	name => 'Netscape Public License version 1.0',
+	text => <<EOF,
+NETSCAPE PUBLIC LICENSE
+
+Version 1.0
+
+1. Definitions.
+EOF
+);
+
+license_covered(
+	'npl_1_1',
+	name => 'Netscape Public License version 1.1',
+	text => <<EOF,
+Netscape Public LIcense version 1.1
+
+AMENDMENTS
+
+The Netscape Public License Version 1.1 ("NPL") consists of the Mozilla Public License Version 1.1 with the following Amendments,
+EOF
+);
+
+license_covered(
 	'ntp',
 	name => 'NTP License',
 	text => <<EOF,
@@ -1426,10 +2077,33 @@ EOF
 );
 
 license_covered(
+	'oclc',
+	name => 'OCLC Research Public License',
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'oclc_1',
+	name => 'OCLC Research Public License 1.0',
+	text => <<EOF,
+If you distribute the Program or any derivative work of the Program in a form to which the recipient can make Modifications, you must ensure
+EOF
+	TODO => [qw(subject_iri)]
+);
+
+license_covered(
+	'oclc_2',
+	name => 'OCLC Research Public License 2.0',
+	text => <<EOF,
+The Program must be distributed without charge beyond the costs of physically transferring the files to the recipient.
+EOF
+);
+
+license_covered(
 	'ofl',
 	name => 'SIL Open Font License',
 	iri  => 'http://scripts.sil.org/OFL',
-	TODO => [qw(subject_license)]
+	TODO => [qw(subject_license not_iri_name)]
 );
 
 license_covered(
@@ -1475,6 +2149,14 @@ EOF
 );
 
 license_covered(
+	'ogtsl',
+	name => 'Open Group Test Suite License',
+	text => <<EOF,
+rename any non-standard executables and testcases so the names do not conflict with standard executables and testcases,
+EOF
+);
+
+license_covered(
 	'openssl',
 	name => 'OpenSSL License',
 	text => <<'EOF',
@@ -1491,6 +2173,87 @@ Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com) All rights reserved.
 This package is an SSL implementation written by Eric Young (eay@cryptsoft.com). The implementation was written so as to conform with Netscapes SSL.
 
 This library is free for commercial and non-commercial use as long as the following conditions are aheared to.
+EOF
+);
+
+license_covered(
+	'osl',
+	name => 'Open Software License',
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'osl_1',
+	name  => 'Open Software License 1.0',
+	grant => <<EOF,
+Licensed under the Open Software License version 1.0
+EOF
+	text => <<EOF,
+This Open Software License (the "License") applies to any original work of authorship (the "Original Work") whose owner (the "Licensor") has placed the following notice immediately following the copyright notice for the Original Work:
+
+"Licensed under the Open Software License version 1.0"
+
+License Terms
+EOF
+);
+
+license_covered(
+	'osl_1_1',
+	name  => 'Open Software License 1.1',
+	grant => <<EOF,
+Licensed under the Open Software License version 1.1
+EOF
+	text => <<EOF,
+This Open Software License (the "License") applies to any original work of authorship (the "Original Work") whose owner (the "Licensor") has placed the following notice immediately following the copyright notice for the Original Work:
+
+Licensed under the Open Software License version 1.1
+
+1) Grant of Copyright License.
+EOF
+);
+
+license_covered(
+	'osl_2',
+	name  => 'Open Software License 2.0',
+	trant => <<EOF,
+Licensed under the Open Software License version 2.0
+EOF
+	text => <<EOF,
+This Open Software License (the "License") applies to any original work of authorship (the "Original Work") whose owner (the "Licensor") has placed the following notice immediately following the copyright notice for the Original Work:
+
+Licensed under the Open Software License version 2.0
+
+1) Grant of Copyright License.
+EOF
+);
+
+license_covered(
+	'osl_2_1',
+	name  => 'Open Software License 2.1',
+	grant => <<EOF,
+Licensed under the Open Software License version 2.1
+EOF
+	text => <<EOF,
+This Open Software License (the "License") applies to any original work of authorship (the "Original Work") whose owner (the "Licensor") has placed the following notice immediately following the copyright notice for the Original Work:
+
+Licensed under the Open Software License version 2.1
+
+1) Grant of Copyright License.
+EOF
+);
+
+license_covered(
+	'osl_3',
+	name  => 'Open Software License 3.0',
+	grant => <<EOF,
+Licensed under the Open Software License version 3.0
+EOF
+	text => <<EOF,
+This Open Software License (the "License") applies to any original work of authorship (the "Original Work") whose owner (the "Licensor") has placed the following licensing notice adjacent to the copyright notice for the Original Work:
+
+Licensed under the Open Software License version 3.0
+
+1) Grant of Copyright License.
 EOF
 );
 
@@ -1531,6 +2294,52 @@ license_covered(
 );
 
 license_covered(
+	'qpl_1',
+	name => 'Q Public License 1.0',
+	text => <<EOF,
+This license applies to any software containing a notice placed by the copyright holder saying that it may be distributed under the terms of the Q Public License version 1.0. Such software is herein referred to as the Software.
+EOF
+);
+
+license_covered(
+	'rpl',
+	name => 'Reciprocal Public License',
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'rpl_1',
+	name => 'Reciprocal Public License, Version 1.0',
+	text => <<EOF,
+1.0 General; Applicability & Definitions. This Reciprocal Public License Version 1.0 ("License") applies to any programs or other works
+EOF
+);
+
+license_covered(
+	'rpl_1_1',
+	name => 'Reciprocal Public License, Version 1.1',
+	text => <<EOF,
+1.0 General; Applicability & Definitions. This Reciprocal Public License Version 1.1 ("License") applies to any programs or other works
+EOF
+);
+
+license_covered(
+	'rpl_1_3',
+	name => 'Reciprocal Public License, Version 1.3',
+	text => <<EOF,
+1.0 General; Applicability & Definitions. This Reciprocal Public License Version 1.3 ("License") applies to any programs or other works
+EOF
+);
+
+license_covered(
+	'rpl_1_5',
+	name => 'Reciprocal Public License, Version 1.5',
+	text => <<EOF,
+1.0 General; Applicability & Definitions. This Reciprocal Public License Version 1.5 ("License") applies to any programs or other works
+EOF
+);
+
+license_covered(
 	'rpsl',
 	name => 'RealNetworks Public Source License',
 	TODO => [qw(subject_license)]
@@ -1541,6 +2350,22 @@ license_covered(
 	name => 'RealNetworks Public Source License 1.0',
 	text => <<EOF,
 1. General Definitions. This License applies to any program or other work which RealNetworks, Inc., or any other entity that elects to use this license,
+EOF
+);
+
+license_covered(
+	'ruby',
+	name => 'Ruby License',
+	text => <<EOF,
+4. You may modify and include the part of the software into any other software (possibly commercial).
+EOF
+);
+
+license_covered(
+	'rscpl',
+	name => 'Ricoh Source Code Public License',
+	text => <<EOF,
+5.2. Endorsements. The names "Ricoh," "Ricoh Silicon Valley," and "RSV" must not be used
 EOF
 );
 
@@ -1591,6 +2416,42 @@ EOF
 );
 
 license_covered(
+	'spl',
+	name => 'Sun Public License',
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'spl_1',
+	name  => 'Sun Public License 1.0',
+	grant => <<EOF,
+The contents of this file are subject to the Sun Public License Version 1.0 (the License);
+EOF
+	text => <<EOF,
+Exhibit A -Sun Public License Notice.
+
+The contents of this file are subject to the Sun Public License Version 1.0
+EOF
+	TODO => [qw(grant_grant)]
+);
+
+license_covered(
+	'sugarcrm',
+	name => 'SugarCRM Public License',
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'sugarcrm_1_1_3',
+	name => 'SugarCRM Public License v1.1.3',
+	text => <<EOF,
+Version 1.1.3
+
+The SugarCRM Public License Version ("SPL") consists of the Mozilla Public License Version 1.1,
+EOF
+);
+
+license_covered(
 	'unicode_strict',
 	text => <<EOF,
 This file is provided as-is by Unicode, Inc. (The Unicode Consortium).
@@ -1611,8 +2472,31 @@ EOF
 );
 
 license_covered(
+	'unlicense',
+	name => 'the Unlicense',
+	text => <<EOF,
+This is free and unencumbered software released into the public domain.
+EOF
+);
+
+license_covered(
+	'watcom',
+	name => 'Sybase Open Watcom Public License',
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'watcom_1',
+	name => 'Sybase Open Watcom Public License 1.0',
+	text => <<EOF,
+USE OF THE SYBASE OPEN WATCOM SOFTWARE DESCRIBED BELOW ("SOFTWARE") IS SUBJECT TO THE TERMS AND CONDITIONS SET FORTH IN THE SYBASE OPEN WATCOM PUBLIC LICENSE SET FORTH BELOW ("LICENSE").
+EOF
+);
+
+license_covered(
 	'wtfpl',
 	name  => 'Do What The F*ck You Want To Public License',
+	iri   => 'http://www.wtfpl.net/',
 	grant => 'This input method table is licensed under the WTFPL.',
 );
 

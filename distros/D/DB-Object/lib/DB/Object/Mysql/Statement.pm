@@ -71,29 +71,29 @@ sub distinct
 ## Customised for MySQL
 sub dump
 {
-	my $self  = shift( @_ );
-	my $args  = @_ == 1 ? shift( @_ ) : { @_ };
-	my $vsep  = ",";
-	my $hsep  = "\n";
-	my $width = 35;
-	my $fh    = IO::File->new;
-	$fh->fdopen( fileno( STDOUT ), "w" );
-	$vsep  = $args->{vsep} if( exists( $args->{vsep} ) );
-	$hsep  = $args->{hsep} if( exists( $args->{hsep} ) );
-	$width = $args->{width} if( exists( $args->{width} ) );
-	my @fields = @{$self->{sth}->FETCH( 'NAME' )};
-	return( $self->error( "No query to dump." ) ) if( !exists( $self->{sth} ) );
-	if( exists( $args->{file} ) )
-	{
-		my $file = $args->{file};
-		$file = File::Spec->catfile( File::Spec->tmpdir(), $file ) if( !File::Spec->file_name_is_absolute( $file ) );
-		$fh = File::IO->new( ">$file" ) || return( $self->error( "Unable to open file $file in write mode: $!" ) );
-		$fh->binmode( ':utf8' );
-		my @header = sort{ $fields->{ $a } <=> $fields->{ $b } } keys( %$fields );
-		my $date = DateTime->now;
-		my $table = $self->{table};
-		$fh->printf( "## Generated on %s for table $table\n", $date->strftime( '%c' ) );
-		$fh->print( "## ", CORE::join( "\t", @header ), "\n" );
+    my $self  = shift( @_ );
+    my $args  = @_ == 1 ? shift( @_ ) : { @_ };
+    my $vsep  = ",";
+    my $hsep  = "\n";
+    my $width = 35;
+    my $fh    = IO::File->new;
+    $fh->fdopen( fileno( STDOUT ), "w" );
+    $vsep  = $args->{vsep} if( exists( $args->{vsep} ) );
+    $hsep  = $args->{hsep} if( exists( $args->{hsep} ) );
+    $width = $args->{width} if( exists( $args->{width} ) );
+    my @fields = @{$self->{sth}->FETCH( 'NAME' )};
+    return( $self->error( "No query to dump." ) ) if( !exists( $self->{sth} ) );
+    if( exists( $args->{file} ) )
+    {
+        my $file = $args->{file};
+        $file = File::Spec->catfile( File::Spec->tmpdir(), $file ) if( !File::Spec->file_name_is_absolute( $file ) );
+        $fh = File::IO->new( ">$file" ) || return( $self->error( "Unable to open file $file in write mode: $!" ) );
+        $fh->binmode( ':utf8' );
+        my @header = sort{ $fields->{ $a } <=> $fields->{ $b } } keys( %$fields );
+        my $date = DateTime->now;
+        my $table = $self->{table};
+        $fh->printf( "## Generated on %s for table $table\n", $date->strftime( '%c' ) );
+        $fh->print( "## ", CORE::join( "\t", @header ), "\n" );
         my @data = ();
         while( @data = $self->fetchrow() )
         {
@@ -102,35 +102,35 @@ sub dump
         $fh->close();
         $self->finish();
         return( $self );
-	}
-	elsif( exists( $args->{ 'fh' } ) )
-	{
-		if( !fileno( $args->{ 'fh' } ) )
-		{
-			return( $self->error( "The file descriptor provided does not seem to be valid (not open)" ) );
-		}
-		$fh = IO::File->new_from_fd( $args->{ 'fh' }, 'w' ) || return( $self->error( $! ) );
-	}
-	my $max    = 0;
-	## foreach my $field ( keys( %$fields ) )
-	foreach my $field ( @fields )
-	{
-		$max = length( $field ) if( length( $field ) > $max );
-	}
-	my $template = '';
-	## foreach my $field ( sort{ $fields->{ $a } <=> $fields->{ $b } } keys( %$fields ) )
-	foreach my $field ( @fields )
-	{
-		$template .= "$field" . ( '.' x ( $max - length( $field ) ) ) . ": %s\n";
-	}
-	$template .= "\n";
-	my @data = ();
-	while( @data = $self->fetchrow() )
-	{
-		$fh->printf( $template, @data );
-	}
-	$self->finish();
-	return( $self );
+    }
+    elsif( exists( $args->{ 'fh' } ) )
+    {
+        if( !fileno( $args->{ 'fh' } ) )
+        {
+            return( $self->error( "The file descriptor provided does not seem to be valid (not open)" ) );
+        }
+        $fh = IO::File->new_from_fd( $args->{ 'fh' }, 'w' ) || return( $self->error( $! ) );
+    }
+    my $max    = 0;
+    ## foreach my $field ( keys( %$fields ) )
+    foreach my $field ( @fields )
+    {
+        $max = length( $field ) if( length( $field ) > $max );
+    }
+    my $template = '';
+    ## foreach my $field ( sort{ $fields->{ $a } <=> $fields->{ $b } } keys( %$fields ) )
+    foreach my $field ( @fields )
+    {
+        $template .= "$field" . ( '.' x ( $max - length( $field ) ) ) . ": %s\n";
+    }
+    $template .= "\n";
+    my @data = ();
+    while( @data = $self->fetchrow() )
+    {
+        $fh->printf( $template, @data );
+    }
+    $self->finish();
+    return( $self );
 }
 
 ## Inherited from DB::Object::Statement
@@ -191,7 +191,7 @@ sub ignore
 
 sub only
 {
-	return( shift->error( "SELECT | DELETE | UPDATE ONLY is not supported by Mysql." ) );
+    return( shift->error( "SELECT | DELETE | UPDATE ONLY is not supported by Mysql." ) );
 }
 
 sub priority

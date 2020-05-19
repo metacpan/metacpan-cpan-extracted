@@ -7,7 +7,7 @@ use AnyEvent::RabbitMQ::LocalQueue;
 use AnyEvent;
 use Scalar::Util qw( looks_like_number weaken );
 use Devel::GlobalDestruction;
-use Carp qw(croak);
+use Carp qw(croak cluck);
 use POSIX qw(ceil);
 BEGIN { *Dumper = \&AnyEvent::RabbitMQ::Dumper }
 
@@ -18,8 +18,6 @@ use constant {
     _ST_OPENING => 1,
     _ST_OPEN => 2,
 };
-
-our $VERSION = '1.16';
 
 sub new {
     my $class = shift;
@@ -432,9 +430,10 @@ sub publish {
 
     defined($header_args) or $header_args = {};
     defined($body) or $body = '';
-    defined($ack_cb) or defined($nack_cb) or defined($return_cb)
-       and !$self->{_is_confirm}
-       and croak "Can't set on_ack/on_nack/on_return callback when not in confirm mode";
+    if ( defined($ack_cb) or defined($nack_cb) or defined($return_cb) ) {
+        cluck "Can't set on_ack/on_nack/on_return callback when not in confirm mode"
+            unless $self->{_is_confirm};
+    }
 
     my $tag;
     if ($self->{_is_confirm}) {
@@ -671,9 +670,9 @@ sub qos {
         'Basic::Qos',
         {
             prefetch_count => 1,
-            %args,
             prefetch_size  => 0,
             global         => 0,
+            %args,
         },
         'Basic::QosOk',
         $cb,
@@ -915,6 +914,31 @@ sub _push_read_header_and_body {
     my ($type, $frame, $cb, $failure_cb,) = @_;
     my $response = {$type => $frame};
     my $body_size = 0;
+    my $body_payload = "";
+
+    weaken(my $wcontq = $self->{_content_queue});
+    my $w_body_frame;
+    my $body_frame = sub {
+        my $frame = shift;
+
+        return $failure_cb->('Received data is not body frame')
+            if !$frame->isa('Net::AMQP::Frame::Body');
+
+        $body_payload .= $frame->payload;
+
+        if (length($body_payload) < $body_size) {
+            # More to come
+            my $contq = $wcontq or return;
+            $contq->get($w_body_frame);
+        }
+        else {
+            $frame->payload($body_payload);
+            $response->{body} = $frame;
+            $cb->($response);
+        }
+    };
+    $w_body_frame = $body_frame;
+    weaken($w_body_frame);
 
     $self->{_content_queue}->get(sub{
         my $frame = shift;
@@ -929,36 +953,16 @@ sub _push_read_header_and_body {
         ) if !$header_frame->isa('Net::AMQP::Protocol::Basic::ContentHeader');
 
         $response->{header} = $header_frame;
+
         $body_size = $frame->body_size;
-    });
-
-    weaken(my $wcontq = $self->{_content_queue});
-    my $body_payload = "";
-    my $w_next_frame;
-    my $next_frame = sub {
-        my $frame = shift;
-
-        my $contq = $wcontq or return;
-
-        return $failure_cb->('Received data is not body frame')
-            if !$frame->isa('Net::AMQP::Frame::Body');
-
-        $body_payload .= $frame->payload;
-
-        if (length($body_payload) < $body_size) {
-            # More to come
-            $contq->get($w_next_frame);
-        }
-        else {
-            $frame->payload($body_payload);
-            $response->{body} = $frame;
+        if ( $body_size ) {
+            my $contq = $wcontq or return;
+            $contq->get($body_frame);
+        } else {
+            $response->{body} = undef;
             $cb->($response);
         }
-    };
-    $w_next_frame = $next_frame;
-    weaken($w_next_frame);
-
-    $self->{_content_queue}->get($next_frame);
+    });
 
     return $self;
 }
@@ -1191,36 +1195,6 @@ Flushes the contents of a queue.
 
 Deletes a queue. The queue may not have any active consumers.
 
-=head2 publish
-
-Publish a message to an exchange
-
-Arguments:
-
-=over
-
-=item body
-
-The text body of the message to send.
-
-=item header
-
-Customer headers for the message (if any).
-
-=item exchange
-
-The name of the exchange to send the message to.
-
-=item routing_key
-
-The routing key with which to publish the message.
-
-=item on_ack
-
-Callback (if any) for confirming acknowledgment when in confirm mode.
-
-=back
-
 =head2 consume
 
 Subscribe to consume messages from a queue.
@@ -1243,7 +1217,7 @@ L<Net::AMQP::Frame::Body>, and C<deliver> a L<Net::AMQP::Frame::Method>.
 
 =item on_cancel
 
-Callback called if consumption is canceled.  This may be at client request
+Callback called if consumption is cancelled.  This may be at client request
 or as a side effect of queue deletion.  (Notification of queue deletion is a
 RabbitMQ extension.)
 
@@ -1275,6 +1249,14 @@ Arguments:
 
 =over
 
+=item exchange
+
+The name of the exchange to send the message to.
+
+=item routing_key
+
+The routing key with which to publish the message.
+
 =item header
 
 Hash of AMQP message header info, including the confusingly similar element "headers",
@@ -1282,7 +1264,7 @@ which may contain arbitrary string key/value pairs.
 
 =item body
 
-Message body.
+The text body of the message to send.
 
 =item mandatory
 

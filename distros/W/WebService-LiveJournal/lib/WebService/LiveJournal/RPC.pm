@@ -9,8 +9,9 @@ use RPC::XML::Client;
 our @ISA = qw/ Exporter /;
 our @EXPORT_OK = qw/ xml2hashref xml2hash /;
 
-# ABSTRACT: RPC utilities for WebService::LiveJournal
-our $VERSION = '0.08'; # VERSION
+# ABSTRACT: (Deprecated) RPC utilities for WebService::LiveJournal
+our $VERSION = '0.09'; # VERSION
+
 
 my $parser = new RPC::XML::ParserFactory;
 
@@ -34,11 +35,18 @@ __END__
 
 =head1 NAME
 
-WebService::LiveJournal::RPC - RPC utilities for WebService::LiveJournal
+WebService::LiveJournal::RPC - (Deprecated) RPC utilities for WebService::LiveJournal
 
 =head1 VERSION
 
-version 0.08
+version 0.09
+
+=head1 DESCRIPTION
+
+B<NOTE>: This distribution is deprecated.  It uses the outmoded XML-RPC protocol.
+LiveJournal has also been compromised.  I recommend using DreamWidth instead
+(L<https://www.dreamwidth.org/>) which is in keeping with the original philosophy
+LiveJournal regarding advertising.
 
 =head1 SEE ALSO
 

@@ -23,8 +23,8 @@ use constant NEWRELIC_STATUS_CODE_STARTING => 1;
 use constant NEWRELIC_STATUS_CODE_STOPPING => 2;
 use constant NEWRELIC_STATUS_CODE_STARTED  => 3;
 
-# ABSTRACT: Procedural interface for NewRelic APM
-our $VERSION = '0.09'; # VERSION
+# ABSTRACT: (Deprecated) Procedural interface for NewRelic APM
+our $VERSION = '0.10'; # VERSION
 
 
 my $ffi;
@@ -65,7 +65,7 @@ $ffi->attach( newrelic_init => [ 'opaque', 'opaque', 'opaque', 'opaque' ] => 'in
     free($old);
   }
   $olds = \@new;
-  
+
   $ret;
 });
 
@@ -125,7 +125,7 @@ $ffi->attach( newrelic_enable_instrumentation => ['int'] => 'void' );
 #  state $cb_code;
 #  state $cb_closure;
 #  state $cb_ptr;
-#  
+#
 #  if(ref $cb eq 'CODE')
 #  {
 #    $cb_code = $cb;
@@ -154,11 +154,11 @@ __END__
 
 =head1 NAME
 
-NewRelic::Agent::FFI::Procedural - Procedural interface for NewRelic APM
+NewRelic::Agent::FFI::Procedural - (Deprecated) Procedural interface for NewRelic APM
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -179,6 +179,9 @@ version 0.09
  my $rc = newrelic_transaction_end $tx;
 
 =head1 DESCRIPTION
+
+B<NOTE>: This module is deprecated.  It is based on the NewRelic Agent SDK, which was only
+ever released as beta software.  Please use L<NewFangle> instead.
 
 This module provides bindings for the L<NewRelic|https://docs.newrelic.com/docs/agents/agent-sdk/getting-started/new-relic-agent-sdk> Agent SDK.
 
@@ -387,10 +390,10 @@ create a closure with L<FFI::Platypus>, like so:
  {
    # input SQL
    my($sql) = @_;
-   
+ 
    # make some kind of transformation
    $sql =~ tr/a-z/z-a/;
-   
+ 
    # because C has a different ownership model than Perl for functions
    # that return a string, you need to create a C pointer to a copy of
    # the return value.  On the next call we will free the previous copy.

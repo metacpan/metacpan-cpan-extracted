@@ -17,9 +17,10 @@ plan tests => 2 * scalar @cases;
 
 for (@cases) {
     my $parser   = Chemistry::OpenSMILES::Parser->new;
-    my( $graph ) = $parser->parse( $_ );
+    my( $graph ) = $parser->parse( $_, { raw => 1 } );
     is( $graph->vertices, 1 );
     $_ = "[$_]" unless /^\[/;
+    s/H([\]\-])/H1$1/;
     is( join( '', map { Chemistry::OpenSMILES::Parser::_sprint_atom( $_ ) }
                       $graph->vertices ),
         $_ );

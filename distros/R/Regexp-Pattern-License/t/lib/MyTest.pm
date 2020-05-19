@@ -5,7 +5,8 @@ my $CLASS = __PACKAGE__;
 use open ':std', ':encoding(utf8)';
 
 use parent qw(Test::Builder::Module);
-@EXPORT = qw(license_covered done_testing);
+@EXPORT
+	= qw(license_is license_isnt TODO_license_is TODO_license_isnt license_covered done_testing);
 
 use strict;
 use warnings;
@@ -25,6 +26,8 @@ my @subjects = sort keys %coverage;
 # main pattern is the "best" available, according to this custom priority list
 my @subjectstack = qw(license grant name iri trait);
 my @scopestack   = qw(line sentence paragraph);
+
+#my $defaultsubject = 'anydistinct';
 
 sub license_covered (@)
 {
@@ -152,6 +155,80 @@ sub _covered (@)
 			if (
 			$type eq 'main' ? $todo{"not_$_"} : $todo{"not_${_}_$subject"} );
 	}
+}
+
+sub license_is ($$;@)
+{
+	my ( $corpus, $expected, %args ) = @_;
+
+	for ( ref($expected) eq 'ARRAY' ? @{$expected} : $expected ) {
+		_license( $corpus, $_, %args );
+	}
+}
+
+sub license_isnt ($$;@)
+{
+	my ( $corpus, $expected, %args ) = @_;
+
+	for ( ref($expected) eq 'ARRAY' ? @{$expected} : $expected ) {
+		_license( $corpus, undef, $_, %args );
+	}
+}
+
+sub TODO_license_is ($$;@)
+{
+	my ( $corpus, $expected, %args ) = @_;
+	my $tb = $CLASS->builder;
+
+	$tb->todo_start;
+	for ( ref($expected) eq 'ARRAY' ? @{$expected} : $expected ) {
+		_license( $corpus, $_, %args );
+	}
+	$tb->todo_end;
+}
+
+sub TODO_license_isnt ($$;@)
+{
+	my ( $corpus, $expected, %args ) = @_;
+	my $tb = $CLASS->builder;
+
+	$tb->todo_start;
+	for ( ref($expected) eq 'ARRAY' ? @{$expected} : $expected ) {
+		_license( $corpus, undef, $_, %args );
+	}
+	$tb->todo_end;
+}
+
+sub _license ($$;@)
+{
+	my ( $corpus, $expected, $unexpected, %args ) = @_;
+	my $tb = $CLASS->builder;
+
+	# corpus is either scalar (string), array (list of strings)
+	for ( ref($corpus) eq 'ARRAY' ? @{$corpus} : $corpus ) {
+		$tb->croak($expected) if !$_ and $expected;
+		$tb->like(
+			$_, _re( $expected, %args ),
+			"match for licensepattern $expected"
+		) if $expected;
+
+		$tb->unlike(
+			$_, _re( $unexpected, %args ),
+			"no match for licensepattern $unexpected"
+		) if ($unexpected);
+	}
+}
+
+sub _re ($;$)
+{
+#	my ( $id, %args ) = @_;
+#	my $re = re( "License::$id", %args );
+	my ( $id, $subject ) = @_;
+
+#	my $re = re( "License::$id", $subject ? { subject => $subject } : () );
+	my $re = re( "License::$id", subject => $subject );
+	return '' unless $re;
+	return ( ref($re) eq 'Regexp' ) ? $re : qr/$re/;
 }
 
 sub done_testing ()

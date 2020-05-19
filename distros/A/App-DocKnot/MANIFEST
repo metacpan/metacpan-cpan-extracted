@@ -1,8 +1,9 @@
+.github/workflows/build.yaml
 .gitignore
-.travis.yml
 bin/docknot
 Build.PL
 Changes
+cpanfile
 docs/metadata/blurb
 docs/metadata/description
 docs/metadata/metadata.json

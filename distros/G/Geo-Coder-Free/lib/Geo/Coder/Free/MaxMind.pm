@@ -34,7 +34,7 @@ my %known_locations = (
 
 =head1 NAME
 
-Geo::Coder::Free::Maxmind - Provides a geocoding functionality using the MaxMind and GeoNames databases
+Geo::Coder::Free::MaxMind - Provides a geocoding functionality using the MaxMind and GeoNames databases
 
 =head1 VERSION
 
@@ -81,7 +81,7 @@ sub new {
 	my($proto, %param) = @_;
 	my $class = ref($proto) || $proto;
 
-	# Geo::Coder::Free->new not Geo::Coder::Free::new
+	# Use Geo::Coder::Free->new, not Geo::Coder::Free::new
 	return unless($class);
 
 	# Geo::Coder::Free::DB::init(directory => 'lib/Geo/Coder/Free/databases');
@@ -137,7 +137,7 @@ sub geocode {
 			'lat' => $rc->{'latitude'},
 			'long' => $rc->{'longitude'},
 			'location' => $location,
-			'database' => 'Maxmind'
+			'database' => 'MaxMind'
 		});
 	}
 
@@ -214,7 +214,7 @@ sub geocode {
 		} elsif($admin1cache{$country} && !defined($state)) {
 			$concatenated_codes = $admin1cache{$country};
 		} else {
-			$self->{'admin1'} //= Geo::Coder::Free::DB::MaxMind::admin1->new() or die "Can't open the admin1 database";
+			$self->{'admin1'} //= Geo::Coder::Free::DB::MaxMind::admin1->new(no_entry => 1) or die "Can't open the admin1 database";
 
 			if(my $admin1 = $self->{'admin1'}->fetchrow_hashref(asciiname => $country)) {
 				$concatenated_codes = $admin1->{'concatenated_codes'};
@@ -255,15 +255,14 @@ sub geocode {
 			$county = $twoletterstate;
 		}
 	} elsif(($country eq 'Canada') && $state && (length($state) > 2)) {
-		# ::diag(__LINE__, ": $county");
-		if(my $twoletterstate = Locale::CA->new()->{province2code}{uc($state)}) {
+		# ::diag(__LINE__, ": $state");
+		if(Locale::CA->new()->{province2code}{uc($state)}) {
 			# FIXME:  I can't see that province locations are stored in cities.csv
 			return unless(defined($location));	# OK if searching for a city, that works
-			# $state = $twoletterstate;
 		}
 	}
 
-	$self->{'admin2'} //= Geo::Coder::Free::DB::MaxMind::admin2->new() or die "Can't open the admin2 database";
+	$self->{'admin2'} //= Geo::Coder::Free::DB::MaxMind::admin2->new(no_entry => 1) or die "Can't open the admin2 database";
 
 	if(defined($county) && ($county =~ /^[A-Z]{2}$/) && ($country =~ /^(United States|USA|US)$/)) {
 		# US state. Not Canadian province.
@@ -281,7 +280,7 @@ sub geocode {
 		# ::diag(__LINE__);
 		if(defined($county) && ($county eq 'London')) {
 			@admin2s = $self->{'admin2'}->selectall_hash(asciiname => $location);
-		} else {
+		} elsif(defined($county)) {
 		# ::diag(__LINE__, ": $county");
 			@admin2s = $self->{'admin2'}->selectall_hash(asciiname => $county);
 		}
@@ -340,17 +339,19 @@ sub geocode {
 					last;
 				}
 			}
-		} else {
+		} elsif(defined($county)) {
 			# e.g. states in the US
 			if(!defined($self->{'admin1'})) {
-				$self->{'admin1'} = Geo::Coder::Free::DB::MaxMind::admin1->new() or die "Can't open the admin1 database";
+				$self->{'admin1'} = Geo::Coder::Free::DB::MaxMind::admin1->new(no_entry => 1) or die "Can't open the admin1 database";
 			}
 			my @admin1s = $self->{'admin1'}->selectall_hash(asciiname => $county);
 			foreach my $admin1(@admin1s) {
 				# ::diag(__LINE__, Data::Dumper->new([$admin1])->Dump());
 				if($admin1->{'concatenated_codes'} =~ /^$concatenated_codes\./i) {
 					$region = $admin1->{'concatenated_codes'};
-					$admin1cache{$county} = $region;
+					if(scalar(@admin1s) == 1) {
+						$admin1cache{$county} = $region;
+					}
 					last;
 				}
 			}
@@ -359,7 +360,9 @@ sub geocode {
 
 	if(!defined($self->{'cities'})) {
 		$self->{'cities'} = Geo::Coder::Free::DB::MaxMind::cities->new(
-			cache => $self->{cache} || CHI->new(driver => 'Memory', datastore => {}));
+			cache => $self->{cache} || CHI->new(driver => 'Memory', datastore => {}),
+			no_entry => 1,
+		);
 	}
 
 	my $options;
@@ -377,10 +380,14 @@ sub geocode {
 		if($country_code) {
 			$options->{'Country'} = lc($country_code);
 		}
-		if($state) {
-			$admin2cache{$state} = $region;
-		} elsif($county) {
-			$admin2cache{$county} = $region;
+		# If there's more than one match, don't cache as we don't
+		# know which one will be matched later
+		if(scalar(@admin2s) == 1) {
+			if($state) {
+				$admin2cache{$state} = $region;
+			} elsif($county) {
+				$admin2cache{$county} = $region;
+			}
 		}
 	}
 
@@ -394,7 +401,12 @@ sub geocode {
 	if(wantarray) {
 		my @rc = $self->{'cities'}->selectall_hash($options);
 		if(scalar(@rc) == 0) {
-			@rc = $self->{'cities'}->selectall_hash('Region' => $options->{'Region'});
+			if((!defined($region)) && !defined($param{'region'})) {
+				# Add code for this area to Makefile.PL and rebuild
+				Carp::carp(__PACKAGE__, ": didn't determine region from $location");
+				return;
+			}
+			@rc = $self->{'cities'}->selectall_hash('Region' => ($region || $param{'region'}));
 			if(scalar(@rc) == 0) {
 	 			# ::diag(__LINE__, ': no matches: ', Data::Dumper->new([$options])->Dump());
 				return;
@@ -437,12 +449,17 @@ sub geocode {
 		my @locations;
 
 		foreach my $l(@rc) {
-			push @locations, Geo::Location::Point->new({
-				'lat' => $l->{'latitude'},
-				'long' => $l->{'longitude'},
-				'location' => $location,
-				'database' => 'Maxmind'
-			});
+			if(exists($l->{'latitude'})) {
+				push @locations, Geo::Location::Point->new({
+					'lat' => $l->{'latitude'},
+					'long' => $l->{'longitude'},
+					'location' => $location,
+					'database' => 'MaxMind'
+				});
+			# } else {
+				# Carp::carp(__PACKAGE__, ": $location has latitude of 0");
+				# return;
+			}
 		}
 
 		return @locations;
@@ -466,8 +483,10 @@ sub geocode {
 
 	# ::diag(__LINE__, ': ', Data::Dumper->new([$city])->Dump());
 	if(defined($city) && defined($city->{'Latitude'})) {
-		$city->{'confidence'} = $confidence;
-		return Geo::Location::Point->new($city);
+		return Geo::Location::Point->new({
+			%{$city},
+			('database' => 'MaxMind', 'confidence' => $confidence)
+		});
 	}
 	# return $city;
 	return;
@@ -514,12 +533,13 @@ sub reverse_geocode {
 
 	if(!defined($self->{'cities'})) {
 		$self->{'cities'} = Geo::Coder::Free::DB::MaxMind::cities->new(
-			cache => $self->{cache} || CHI->new(driver => 'Memory', datastore => {})
+			cache => $self->{cache} || CHI->new(driver => 'Memory', datastore => {}),
+			no_entry => 1,
 		);
 	}
 
 	if(wantarray) {
-		my @locs = $self->{'cities'}->execute("SELECT * FROM cities WHERE (ABS(Latitude - $latitude) < 0.01) AND (ABS(Longitude - $longitude) < 0.01)");
+		my @locs = $self->{'cities'}->execute("SELECT * FROM cities WHERE ((ABS(Latitude - $latitude)) < 0.01) AND ((ABS(Longitude - $longitude)) < 0.01)");
 		foreach my $loc(@locs) {
 			$self->_prepare($loc);
 		}
@@ -527,7 +547,7 @@ sub reverse_geocode {
 	}
 	# Try close in then zoom out, to a reasonable limit
 	foreach my $radius(0.000001, 0.00001, 0.0001, 0.001, 0.01) {
-		if(my $rc = $self->{'cities'}->execute("SELECT * FROM cities WHERE (ABS(Latitude - $latitude) < $radius) AND (ABS(Longitude - $longitude) < $radius) LIMIT 1")) {
+		if(my $rc = $self->{'cities'}->execute("SELECT * FROM cities WHERE ((ABS(Latitude - $latitude)) < $radius) AND ((ABS(Longitude - $longitude)) < $radius) LIMIT 1")) {
 			$self->_prepare($rc);
 			return Geo::Location::Point->new($rc)->as_string();
 		}
@@ -550,7 +570,7 @@ sub _prepare {
 		if($county) {
 			$loc->{'Region'} = $county;
 		} else {
-			$self->{'admin2'} //= Geo::Coder::Free::DB::MaxMind::admin2->new() or die "Can't open the admin2 database";
+			$self->{'admin2'} //= Geo::Coder::Free::DB::MaxMind::admin2->new(no_entry => 1) or die "Can't open the admin2 database";
 			my $row = $self->{'admin2'}->execute("SELECT name FROM admin2 WHERE concatenated_codes LIKE '" . uc($loc->{'Country'}) . '.%.' . uc($region) . "' LIMIT 1");
 			if(ref($row) && $row->{'name'}) {
 				$admin2cache{$row->{'name'}} = $region;

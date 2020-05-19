@@ -1,0 +1,40 @@
+Version History
+
+0.13
+    Bugfixes
+        e2cdf3a Increment Version 0.13
+        457a2c7 Add pod info for strict_certs
+        1c623db Indent pod to fix formatting
+        cf42091 Increment Version, Update changes and add =pod to Verify.xs
+
+0.12-TRIAL
+    Bugfixes
+        9156a97 Merge pull request #7 from timlegge/new-as-object
+        92ffc20 Fixes #8 openssh returns different error on freebsd
+        1c12f9c Update Changes
+
+0.11-TRIAL Fri May 15 2020 00:10:51 UTC
+    Bugfixes
+        176adeb Change to use object for Crypt::OpenSSL::Verify
+        6af1067 Update LICENSE info and add Documentation to Verify.xs
+        83f714d Add a Contributing Statement
+        a6b3828 inc issue with Module::Install
+        9071d2e Add Changes
+        4149e9d Remove META.yml that was added by mistake
+        f64897a Disable author tests by default and t/06-verify-expired-cert.t as it is not ready
+        88e952b File::Slurp is a Dependency for tests
+        9f11632 Add Github Action
+        7920d43 Fixes #5 - Replace Certs and CAs with files that will pass without overides
+        aa3d47b Fixes #4 - Test re-declare variables
+        510ec69 Add to .gitignore and Update time or v0.10
+
+
+0.10 Sun May 10 2020 12:45:28 UTC
+    Bugfixes:
+        e55f868 Fixes #3 - Change log is missing
+        7888906 Fixes #2 fix dash in option name causes issues
+        44ea736 Fixes #1 Pod format is bad
+        00f91c0 Initial version with Crypt::OpenSSL::VerifyX509 compatibility
+
+0.10-TRIAL Sun, 10 May 2020 03:05:33 GMT
+    Initial version with Crypt::OpenSSL::VerifyX509 compatibility

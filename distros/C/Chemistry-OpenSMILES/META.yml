@@ -5,11 +5,11 @@ author:
 build_requires:
   List::Util: '0'
   Module::Build: '0.28'
-  Module::Build::Parse::Yapp: '0'
+  Module::Build::Parse::Yapp: v0.1.2
   Test::More: '0'
 configure_requires:
   Module::Build: '0.28'
-  Module::Build::Parse::Yapp: '0'
+  Module::Build::Parse::Yapp: v0.1.2
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: bsd
@@ -18,6 +18,12 @@ meta-spec:
   version: '1.4'
 name: Chemistry-OpenSMILES
 requires:
+  Graph::Undirected: '0'
   Parse::Yapp: '0'
-version: 0.1.0
+  perl: '5.0100'
+resources:
+  bugtracker: https://github.com/merkys/chemistry-opensmiles/issues
+  homepage: http://search.cpan.org/dist/
+  repository: git://github.com/merkys/chemistry-opensmiles.git
+version: 0.1.3
 x_serialization_backend: 'YAML::Tiny version 1.70'

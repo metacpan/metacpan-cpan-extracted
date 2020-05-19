@@ -7,6 +7,44 @@ Home page:    <https://metacpan.org/release/App-Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.0.47	2020-05-17
+
+ [ Bug Fixes ]
+ - fix resolve SPDX keyword for *_or_later (broken in commit 1bcccbdv3.0.40
+   released since  v3.0.40)
+ - stepwise: fix detect leading version
+
+ [ Documentation ]
+ - add some TODOs
+
+ [ Test Suite ]
+ - adjust for normalized license names in legacy output
+ - update author tests
+ - update detection of EUPL since Regexp::Pattern::License v3.3.1
+ - update test related to lgpl_* patterns covered since
+   Regexp::Pattern::License v3.3.2
+
+ [ Packaging ]
+ - tighten to require more recent Regexp::Pattern::License
+
+ [ Other ]
+ - append extrainfo to final legacy license string (previously appended
+   each license but only for custom match)
+ - avoid misdetecting license caldera as license-group bsd
+ - avoid misdetecting license python_2 as cnri_python
+ - drop custom GPL fulltext resolving (unused since
+   Regexp::Pattern::License 3.3.1)
+ - drop obsolete custom patterns
+ - improve log messages
+ - optimize: include left-anchoring when pre-compile clean_comments regexes
+ - quirk: avoid-step-wise for cua_opl_1
+ - revert: avoid detecting grant for license group (broken)
+ - skip custom LGPL grant resolving when (not only GPL-2 but also) LGPL-2
+   or LGPL-2.1 fulltext detected (needed since Regexp::Pattern::License
+   3.3.1)
+ - stepwise: optimize: match name left-anchored
+ - use usage patterns (i.e. *_only *_or_later)
+
 v3.0.46	2020-03-13
 
  [ Bug Fixes ]

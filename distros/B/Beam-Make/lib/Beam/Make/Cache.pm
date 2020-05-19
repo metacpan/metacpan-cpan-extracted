@@ -1,5 +1,5 @@
 package Beam::Make::Cache;
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 # ABSTRACT: Store information about recipes performed
 
 #pod =head1 SYNOPSIS
@@ -126,7 +126,7 @@ Beam::Make::Cache - Store information about recipes performed
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 

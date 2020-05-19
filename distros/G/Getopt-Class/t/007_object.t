@@ -6,7 +6,7 @@ use Test::More qw( no_plan );
 use strict;
 use warnings;
 
-BEGIN { use_ok( 'Getopt::Class' ); }
+BEGIN { use_ok( 'Getopt::Class' ) || BAIL_OUT( "Unable to load Getopt::Class" ); }
 
 our( $dict, $DEBUG, $VERBOSE, $VERSION, $HELP, $MAN );
 
@@ -25,7 +25,7 @@ my $opt = Getopt::Class->new({
     isa_ok( $obj->debug, 'Module::Generic::Scalar', 'Class for scalar' );
     isa_ok( $obj->dry_run, 'Module::Generic::Boolean', 'Class for boolean' );
     isa_ok( $obj->created, 'DateTime', 'Class for datetime' );
-    isa_ok( $obj->age, 'Text::Number', 'Class for numbers' );
+    isa_ok( $obj->age, 'Module::Generic::Number', 'Class for numbers' );
     is( $obj->name->length, 3, 'Accessing scalar method' );
     isa_ok( $obj->langs, 'Module::Generic::Array', 'Class for array' );
     is( $obj->langs->length, 2, 'Accessing array length' );

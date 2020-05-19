@@ -74,28 +74,28 @@ sub distinct
 ## Customised for Postgres
 sub dump
 {
-	my $self  = shift( @_ );
-	my $args  = @_ == 1 ? shift( @_ ) : { @_ };
-	my $vsep  = ",";
-	my $hsep  = "\n";
-	my $width = 35;
-	my $fh    = IO::File->new;
-	$fh->fdopen( fileno( STDOUT ), "w" );
-	$vsep  = $args->{vsep} if( exists( $args->{vsep} ) );
-	$hsep  = $args->{hsep} if( exists( $args->{hsep} ) );
-	$width = $args->{width} if( exists( $args->{width} ) );
-	my @fields = @{$self->{sth}->FETCH( 'NAME' )};
-	return( $self->error( "No query to dump." ) ) if( !exists( $self->{sth} ) );
-	if( exists( $args->{file} ) )
-	{
-		my $file = $args->{file};
-		$fh = IO::File->new( ">$file" ) || return( $self->error( "Unable to open file $file in write mode: $!" ) );
-		$fh->binmode( ':utf8' );
-		my @header = sort{ $fields->{ $a } <=> $fields->{ $b } } keys( %$fields );
-		my $date = DateTime->now;
-		my $table = $self->{ 'table' };
-		$fh->printf( "## Generated on %s for table $table\n", $date->strftime( '%c' ) );
-		$fh->print( "## ", CORE::join( "\t", @header ), "\n" );
+    my $self  = shift( @_ );
+    my $args  = @_ == 1 ? shift( @_ ) : { @_ };
+    my $vsep  = ",";
+    my $hsep  = "\n";
+    my $width = 35;
+    my $fh    = IO::File->new;
+    $fh->fdopen( fileno( STDOUT ), "w" );
+    $vsep  = $args->{vsep} if( exists( $args->{vsep} ) );
+    $hsep  = $args->{hsep} if( exists( $args->{hsep} ) );
+    $width = $args->{width} if( exists( $args->{width} ) );
+    my @fields = @{$self->{sth}->FETCH( 'NAME' )};
+    return( $self->error( "No query to dump." ) ) if( !exists( $self->{sth} ) );
+    if( exists( $args->{file} ) )
+    {
+        my $file = $args->{file};
+        $fh = IO::File->new( ">$file" ) || return( $self->error( "Unable to open file $file in write mode: $!" ) );
+        $fh->binmode( ':utf8' );
+        my @header = sort{ $fields->{ $a } <=> $fields->{ $b } } keys( %$fields );
+        my $date = DateTime->now;
+        my $table = $self->{ 'table' };
+        $fh->printf( "## Generated on %s for table $table\n", $date->strftime( '%c' ) );
+        $fh->print( "## ", CORE::join( "\t", @header ), "\n" );
         my @data = ();
         while( @data = $self->fetchrow() )
         {
@@ -104,35 +104,35 @@ sub dump
         $fh->close();
         $self->finish();
         return( $self );
-	}
-	elsif( exists( $args->{fh} ) )
-	{
-		if( !fileno( $args->{fh} ) )
-		{
-			return( $self->error( "The file descriptor provided does not seem to be valid (not open)" ) );
-		}
-		$fh = IO::File->new_from_fd( $args->{fh}, 'w' ) || return( $self->error( $! ) );
-	}
-	my $max    = 0;
-	## foreach my $field ( keys( %$fields ) )
-	foreach my $field ( @fields )
-	{
-		$max = length( $field ) if( length( $field ) > $max );
-	}
-	my $template = '';
-	## foreach my $field ( sort{ $fields->{ $a } <=> $fields->{ $b } } keys( %$fields ) )
-	foreach my $field ( @fields )
-	{
-		$template .= "$field" . ( '.' x ( $max - length( $field ) ) ) . ": %s\n";
-	}
-	$template .= "\n";
-	my @data = ();
-	while( @data = $self->fetchrow() )
-	{
-		$fh->printf( $template, @data );
-	}
-	$self->finish();
-	return( $self );
+    }
+    elsif( exists( $args->{fh} ) )
+    {
+        if( !fileno( $args->{fh} ) )
+        {
+            return( $self->error( "The file descriptor provided does not seem to be valid (not open)" ) );
+        }
+        $fh = IO::File->new_from_fd( $args->{fh}, 'w' ) || return( $self->error( $! ) );
+    }
+    my $max    = 0;
+    ## foreach my $field ( keys( %$fields ) )
+    foreach my $field ( @fields )
+    {
+        $max = length( $field ) if( length( $field ) > $max );
+    }
+    my $template = '';
+    ## foreach my $field ( sort{ $fields->{ $a } <=> $fields->{ $b } } keys( %$fields ) )
+    foreach my $field ( @fields )
+    {
+        $template .= "$field" . ( '.' x ( $max - length( $field ) ) ) . ": %s\n";
+    }
+    $template .= "\n";
+    my @data = ();
+    while( @data = $self->fetchrow() )
+    {
+        $fh->printf( $template, @data );
+    }
+    $self->finish();
+    return( $self );
 }
 
 ## Inherited from DB::Object::Statement
@@ -158,7 +158,7 @@ sub dump
 
 sub ignore
 {
-	return( shift->error( "INSERT | UPDATE | ALTER IGNORE is not supported by Postgres." ) );
+    return( shift->error( "INSERT | UPDATE | ALTER IGNORE is not supported by Postgres." ) );
 }
 
 ## Inherited from DB::Object::Statement
@@ -169,8 +169,8 @@ sub ignore
 
 sub only
 {
-	my $self     = shift( @_ );
-	my $table    = $self->{ 'table' } ||
+    my $self     = shift( @_ );
+    my $table    = $self->{ 'table' } ||
     return( $self->error( "No table provided to perform select statement." ) );
     my $q        = $self->query_object || return( $self->error( "No query formatter object was set" ) );
     my $tbl_o    = $q->table_object || $self->{ 'table_object' } || return( $self->error( "No table object is set." ) );
@@ -180,30 +180,30 @@ sub only
     my @query = ();
     if( $type eq "SELECT" )
     {
-    	my $fields = $q->selected_fields;
-    	@query = $multi_db ? ( "SELECT $fields FROM ONLY $db.$table" ) : ( "SELECT $fields FROM ONLY $table" );
+        my $fields = $q->selected_fields;
+        @query = $multi_db ? ( "SELECT $fields FROM ONLY $db.$table" ) : ( "SELECT $fields FROM ONLY $table" );
     }
     elsif( $type eq "DELETE" )
     {
-    	@query = $multi_db ? ( "DELETE FROM ONLY $db.$table" ) : ( "DELETE FROM ONLY $table" );
+        @query = $multi_db ? ( "DELETE FROM ONLY $db.$table" ) : ( "DELETE FROM ONLY $table" );
     }
     elsif( $type eq "UPDATE" )
     {
-    	my $qv = $q->query_values || return( $self->error( "Something wen wrong. No query values found. Please investigate." ) );
-    	return( $self->error( "I was expecting a scalar reference for uery values, but got instead '$qv'." ) ) if( ref( $qv ) ne 'SCALAR' );
-    	my $values = $$qv;
-    	@query = ( "UPDATE ONLY $table SET $values" );
+        my $qv = $q->query_values || return( $self->error( "Something wen wrong. No query values found. Please investigate." ) );
+        return( $self->error( "I was expecting a scalar reference for uery values, but got instead '$qv'." ) ) if( ref( $qv ) ne 'SCALAR' );
+        my $values = $$qv;
+        @query = ( "UPDATE ONLY $table SET $values" );
     }
     ## Other type such as INSERT or TRUNCATE are not applicable, so we just ignore if we were ever called by mistake.
     else
     {
-    	return( $self );
+        return( $self );
     }
     my $clauses = $q->_query_components;
     push( @query, @$clauses ) if( @$clauses );
-	my $query = $q->{ 'query' } = CORE::join( ' ', @query );
-	my $sth = $tbl_o->_cache_this( $q );
-	if( !defined( $sth ) )
+    my $query = $q->{ 'query' } = CORE::join( ' ', @query );
+    my $sth = $tbl_o->_cache_this( $q );
+    if( !defined( $sth ) )
     {
         return( $self->error( "Error while preparing query to select on table '$self->{ 'table' }':\n$query", $self->errstr() ) );
     }
@@ -217,7 +217,7 @@ sub only
 
 sub priority
 {
-	return( shift->error( "Priority is not supported in Postgres." ) );
+    return( shift->error( "Priority is not supported in Postgres." ) );
 }
 
 ## rollback is called using the dbh handler and is located in DB::Object::Postgres
@@ -231,7 +231,7 @@ sub priority
 ## Does nothing in Postgres. This is a Mysql feature
 sub wait
 {
-	return( shift( @_ ) );
+    return( shift( @_ ) );
 }
 
 DESTROY

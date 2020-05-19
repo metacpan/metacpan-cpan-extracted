@@ -15,17 +15,17 @@ Mnet::Stanza - Manipulate stanza outline text
     $sh_run = Mnet::Stanza::trim($sh_run);
 
     # parse existing version of secure acl from current config
-    my $acl_old = Mnet::Stanza::parse($sh_run, /^ip access-list SECURE/);
+    my $acl_old = Mnet::Stanza::parse($sh_run, qr/^ip access-list DMZ/);
 
     # note latest version of secure acl, trim extra spaces
     my $acl_new = Mnet::Stanza::trim("
-        ip access-list SECURE
+        ip access-list DMZ
          permit 192.168.0.0 0.0.255.255
     ");
 
     # print config to update acl if current acl is different than latest
     if (Mnet::Stanza::diff($acl_old, $acl_new)) {
-        print "no ip access-list SECURE\n" if $acl_old;
+        print "no ip access-list DMZ\n" if $acl_old;
         print "$acl_new\n";
     }
 
@@ -33,10 +33,10 @@ Mnet::Stanza - Manipulate stanza outline text
     my @ints = Mnet::Stanza::parse($sh_run, /^interface/);
     foreach my $int (@ints) {
         next if $int !~ /^\s*shutdown/m;
-        next if $int =~ /^\s*ip access-group SECURE in/m;
+        next if $int =~ /^\s*ip access-group DMZ in/m;
         die "error, $int" if $int !~ /^interface (\S+)/;
         print "interface $1\n";
-        print " ip access-group SECURE in\n";
+        print " ip access-group DMZ in\n";
     }
 
 =head1 DESCRIPTION
@@ -139,8 +139,8 @@ sub parse {
 
 =head2 parse
 
-    @output = Mnet::Stanza::parse($input, /$match_re/)
-    $output = Mnet::Stanza::parse($input, /$match_re/)
+    @output = Mnet::Stanza::parse($input, qr/$match_re/)
+    $output = Mnet::Stanza::parse($input, qr/$match_re/)
 
 The parse function can be used to output one or more matching stanza sections
 from the input text, either as a list of matching stanzas or a single string.
@@ -162,6 +162,8 @@ Using an input match_re of qr/^interface/ the following two stanzas are output:
     interface Ethernet2
      ip address 1.2.3.4 255.255.255.0
 
+Note that blank lines don't terminate stanzas.
+
 Refer also to the trim function in this module.
 
 =cut
@@ -177,12 +179,12 @@ Refer also to the trim function in this module.
 
     # loop through lines, set matching output stanzas
     #   use indent var to track indent level of current matched stanza line
-    #   if line matches current indent then append to current output stanza
+    #   if line matches current indent or is blank then append to output stanza
     #   elsif line matches input mathc_re then push to a new output stanza
     #   else reset current indet to undef, to wait for a new match_re line
     my $indent = undef;
     foreach my $line (split(/\n/, $input)) {
-        if (defined $indent and $line =~ /^$indent/) {
+        if (defined $indent and $line =~ /^($indent|\s*$)/) {
             $output[-1] .= "$line\n";
         } elsif ($line =~ $match_re) {
             push @output, "$line\n";

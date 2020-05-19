@@ -1,10 +1,10 @@
 {
-   "abstract" : "Interface to the LiveJournal API",
+   "abstract" : "(Deprecated) Interface to the LiveJournal API",
    "author" : [
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.003, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -21,16 +21,13 @@
          }
       },
       "develop" : {
-         "recommends" : {
-            "YAML::XS" : "0"
-         },
          "requires" : {
             "File::Spec" : "0",
             "FindBin" : "0",
             "Test::CPAN::Changes" : "0",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
-            "Test::More" : "0.94",
+            "Test::More" : "0.98",
             "Test::NoTabs" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Spelling::CommonMistakes" : "0",
@@ -54,7 +51,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.94",
+            "Test::More" : "0.98",
             "Time::HiRes" : "0",
             "perl" : "5.010"
          }
@@ -65,13 +62,18 @@
       "bugtracker" : {
          "web" : "https://github.com/plicease/WebService-LiveJournal/issues"
       },
-      "homepage" : "http://perl.wdlabs.com/WebService-LiveJournal",
+      "homepage" : "https://metacpan.org/pod/WebService::LiveJournal",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/plicease/WebService-LiveJournal.git",
          "web" : "https://github.com/plicease/WebService-LiveJournal"
       }
    },
-   "version" : "0.08"
+   "version" : "0.09",
+   "x_deprecated" : 1,
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_use_unsafe_inc" : 0
 }
 

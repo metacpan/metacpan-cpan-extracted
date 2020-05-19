@@ -4,11 +4,12 @@ use warnings;
 
 package Dist::Zilla::Plugin::Prereqs::AuthorDeps;
 # ABSTRACT: Add Dist::Zilla authordeps to META files as develop prereqs
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use Moose;
 use MooseX::Types::Moose qw( HashRef ArrayRef Str );
 use List::Util qw/min/;
+use Path::Tiny;
 
 use Dist::Zilla::Util::AuthorDeps 5.021;
 use Dist::Zilla 4;
@@ -81,6 +82,10 @@ sub register_prereqs {
     for my $req (@$authordeps) {
         my ( $mod, $version ) = each %$req;
         next if $self->_exclude_hash->{$mod};
+
+        (my $filename = $mod) =~ s{::}{/}g;
+        next if path($self->zilla->root, $filename.'.pm')->exists;
+
         $zilla->register_prereqs( { phase => $phase, type => $relation }, $mod, $version );
     }
 
@@ -109,7 +114,7 @@ Dist::Zilla::Plugin::Prereqs::AuthorDeps - Add Dist::Zilla authordeps to META fi
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -144,7 +149,7 @@ L<Dist::Zilla::Plugin::Prereqs::Plugins> is similar but puts all plugins after
 expanding any bundles into prerequisites, which is a much longer list that you
 would get from C<dzil authordeps>.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 

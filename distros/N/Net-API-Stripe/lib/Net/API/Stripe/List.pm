@@ -1,14 +1,11 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/List.pm
-## Version 0.1
+## Version v0.200.2
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <jack@deguest.jp>
+## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/11/02
-## Modified 2020/03/29
-## All rights reserved
+## Modified 2020/05/15
 ## 
-## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::Stripe::List;
 ## To be inherited
@@ -18,7 +15,7 @@ BEGIN
     use parent qw( Net::API::Stripe::Generic );
 	# use B;
 	# use B::Deparse;
-    our( $VERSION ) = '0.2.2';
+    our( $VERSION ) = 'v0.200.2';
 };
 
 ## Provide our own version of as_hash to avoid our helper methods from being called by Module::Generic::as_hash
@@ -276,7 +273,7 @@ Net::API::Stripe::List - Stripe List Object
 
 =head1 VERSION
 
-    0.2.2
+    v0.200.2
 
 =head1 DESCRIPTION
 
@@ -397,6 +394,10 @@ Moves to the previous entry in the array
 =head2 v0.1
 
 Initial version
+
+=head2 v0.200
+
+Change in version numbering
 
 =head1 AUTHOR
 

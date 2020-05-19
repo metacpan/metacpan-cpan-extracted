@@ -3,15 +3,15 @@ abstract: unknown
 author:
   - 'Dmitry Karasik <dmitry@karasik.eu.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: DBIx-Perlish
 no_index:
   directory:
@@ -22,12 +22,12 @@ no_index:
   file:
     - Makefile.PL
 requires:
-  DBI: 0
-  Devel::Caller: 0
-  Keyword::Pluggable: 1.04
-  Pod::Markdown: 3.1
-  perl: 5.014001
+  DBI: '0'
+  Devel::Caller: '0'
+  Keyword::Pluggable: '1.04'
+  Pod::Markdown: '3.1'
+  perl: '5.014001'
 resources:
   repository: http://github.com/dk/DBIx-Perlish
-version: 1.05
-x_serialization_backend: YAML version 1.30
+version: '1.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

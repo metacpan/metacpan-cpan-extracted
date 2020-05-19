@@ -37,6 +37,7 @@ my $builder = $class->new(
 
     requires => {
         'perl'            => '5.10.0',
+        'Carp'            => 0,
         'Class::Std'      => '0.01',
         'Clone'           => 0,
         'Config::Any'     => 0,

@@ -1,5 +1,9 @@
 Revision history for Perl extension X11::Xlib.
 
+0.19 - 2020-05-17
+    - Detect lib paths needed for MacOS and OpenBSD
+    - Fix warnings in XS code
+
 0.18 - 2018-06-05
     - In Display->get_cached_xobj, allow constructor args to be hashref
     - Include version number on every object

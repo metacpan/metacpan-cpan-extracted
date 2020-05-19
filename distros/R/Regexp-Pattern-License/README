@@ -2,7 +2,7 @@ NAME
     Regexp::Pattern::License - Regular expressions for legal licenses
 
 VERSION
-    Version v3.3.0
+    Version v3.3.1
 
 DESCRIPTION
     Regexp::Pattern::License provides a hash of regular expression patterns
@@ -14,12 +14,18 @@ PATTERNS
   Single licenses
     Patterns each covering a single license.
 
-    Each of these patterns has exactly one of these tags: type:singleversion:*
-    type:unversioned type:versioned:decimal .
+    Each of these patterns has exactly one of these tags: type:unversioned
+    type:versioned:decimal type:singleversion:* type:usage:*:* .
+
+    *   aal
+
+    *   abstyles
 
     *   adobe_2006
 
     *   adobe_glyph
+
+    *   adsl
 
     *   afl
 
@@ -33,19 +39,37 @@ PATTERNS
 
     *   afl_3
 
+    *   afmparse
+
     *   agpl
 
     *   agpl_1
 
+    *   agpl_1_only
+
+    *   agpl_1_or_later
+
     *   agpl_2
 
     *   agpl_3
+
+    *   agpl_3_only
+
+    *   agpl_3_or_later
 
     *   aladdin
 
     *   aladdin_8
 
     *   aladdin_9
+
+    *   amdplpa
+
+    *   aml
+
+    *   ampas
+
+    *   antlr_pd
 
     *   apache
 
@@ -57,6 +81,20 @@ PATTERNS
 
     *   apafml
 
+    *   apl
+
+    *   apl_1
+
+    *   apsl
+
+    *   apsl_1
+
+    *   apsl_1_1
+
+    *   apsl_1_2
+
+    *   apsl_2
+
     *   artistic
 
     *   artistic_1
@@ -67,11 +105,23 @@ PATTERNS
 
     *   artistic_2
 
+    *   bahyph
+
+    *   barr
+
     *   bdwgc
 
     *   bdwgc_matlab
 
     *   beerware
+
+    *   bittorrent
+
+    *   bittorrent_1
+
+    *   bittorrent_1_1
+
+    *   borceux
 
     *   bsd_2_clause
 
@@ -82,6 +132,18 @@ PATTERNS
     *   bsl
 
     *   bsl_1
+
+    *   bzip2
+
+    *   bzip2_1_0_5
+
+    *   bzip2_1_0_6
+
+    *   caldera
+
+    *   catosl
+
+    *   catosl_1_1
 
     *   cc_by
 
@@ -197,9 +259,29 @@ PATTERNS
 
     *   cecill_c_1
 
+    *   cnri_jython
+
+    *   cnri_python
+
+    *   cnri_python_gpl_compat
+
+    *   cpal
+
+    *   cpal_1
+
     *   cpl
 
     *   cpl_1
+
+    *   cpol
+
+    *   cpol_1_02
+
+    *   cryptix
+
+    *   cua_opl
+
+    *   cua_opl_1
 
     *   cube
 
@@ -207,11 +289,25 @@ PATTERNS
 
     *   dsdp
 
+    *   ecl
+
+    *   ecl_1
+
+    *   ecl_2
+
     *   epl
 
     *   epl_1
 
     *   epl_2
+
+    *   eupl
+
+    *   eupl_1
+
+    *   eupl_1_1
+
+    *   eupl_1_2
 
     *   eurosym
 
@@ -225,15 +321,45 @@ PATTERNS
 
     *   gfdl
 
+    *   gfdl_1_1
+
+    *   gfdl_1_1_only
+
+    *   gfdl_1_1_or_later
+
+    *   gfdl_1_2
+
+    *   gfdl_1_2_only
+
+    *   gfdl_1_2_or_later
+
+    *   gfdl_1_3
+
+    *   gfdl_1_3_only
+
+    *   gfdl_1_3_or_later
+
     *   gfdl_niv
 
     *   gpl
 
     *   gpl_1
 
+    *   gpl_1_only
+
+    *   gpl_1_or_later
+
     *   gpl_2
 
+    *   gpl_2_only
+
+    *   gpl_2_or_later
+
     *   gpl_3
+
+    *   gpl_3_only
+
+    *   gpl_3_or_later
 
     *   isc
 
@@ -251,11 +377,41 @@ PATTERNS
 
     *   lgpl
 
+    *   lgpl_2
+
+    *   lgpl_2_only
+
+    *   lgpl_2_or_later
+
+    *   lgpl_2_1
+
+    *   lgpl_2_1_only
+
+    *   lgpl_2_1_or_later
+
+    *   lgpl_3
+
+    *   lgpl_3_only
+
+    *   lgpl_3_or_later
+
     *   lgpl_bdwgc
 
     *   libpng
 
     *   llgpl
+
+    *   lppl
+
+    *   lppl_1
+
+    *   lppl_1_1
+
+    *   lppl_1_2
+
+    *   lppl_1_3a
+
+    *   lppl_1_3c
 
     *   mit_advertising
 
@@ -291,9 +447,23 @@ PATTERNS
 
     *   ms_rl
 
+    *   ngpl
+
+    *   npl
+
+    *   npl_1
+
+    *   npl_1_1
+
     *   ntp
 
     *   ntp_disclaimer
+
+    *   oclc
+
+    *   oclc_1
+
+    *   oclc_2
 
     *   ofl
 
@@ -309,7 +479,21 @@ PATTERNS
 
     *   ofl_1_1_rfn
 
+    *   ogtsl
+
     *   openssl
+
+    *   osl
+
+    *   osl_1
+
+    *   osl_1_1
+
+    *   osl_2
+
+    *   osl_2_1
+
+    *   osl_3
 
     *   postgresql
 
@@ -321,9 +505,25 @@ PATTERNS
 
     *   qpl
 
+    *   qpl_1
+
+    *   rpl
+
+    *   rpl_1
+
+    *   rpl_1_1
+
+    *   rpl_1_3
+
+    *   rpl_1_5
+
     *   rpsl
 
     *   rpsl_1
+
+    *   ruby
+
+    *   rscpl
 
     *   sgi_b
 
@@ -333,11 +533,25 @@ PATTERNS
 
     *   sgi_b_2
 
+    *   spl
+
+    *   spl_1
+
     *   ssleay
+
+    *   sugarcrm
+
+    *   sugarcrm_1_1_3
 
     *   unicode_strict
 
     *   unicode_tou
+
+    *   unlicense
+
+    *   watcom
+
+    *   watcom_1
 
     *   wtfpl
 
@@ -417,6 +631,10 @@ PATTERNS
     *   version_number
 
     *   version_numberstring
+
+    *   version_number_suffix
+
+    *   version_only
 
     *   version_prefix
 
@@ -524,12 +742,16 @@ STRUCTURE
 
         Pattern covers a license part of a family of licenses.
 
-    *   license:contains:grant
+    *   license:contains:grant:*
 
         License mentions a preferred form for granting the license.
 
         This implies that license is commonly granted by use of a different
         (typically far shorter) text.
+
+        Fourth part (optional) is the key to corresponding license pattern,
+        for a grant belonging to a different license (when omitted then a
+        grant for same license is assumed).
 
     *   license:contains:license:*
 
@@ -540,6 +762,12 @@ STRUCTURE
     *   license:contains:name:*
 
         License mentions name of another license.
+
+    *   license:includes:license:*
+
+        License references coverage of another license.
+
+        Wildcard is the key to corresponding license pattern.
 
     *   license:is:grant
 
@@ -577,7 +805,7 @@ STRUCTURE
 
         Pattern covers a specific version of a license.
 
-        Last part of tag is the key of the corresponding non-version-specific
+        Third part is the key of the corresponding non-version-specific
         pattern.
 
     *   type:trait

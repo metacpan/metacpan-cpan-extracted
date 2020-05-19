@@ -211,12 +211,16 @@ subtest 'NextVersion' => sub {
     is $tzil->version, 'v0.0.1', 'First version is v0.0.1';
 
     my ($version_plugin)
-        = $tzil->plugin_named('@Author::GSG/Git::NextVersion');
+        = $tzil->plugin_named('@Author::GSG/GSG::Git::NextVersion');
     my ($changelog_plugin)
         = $tzil->plugin_named('@Author::GSG/ChangelogFromGit::CPAN::Changes');
+    my ($git_tag_plugin)
+        = $tzil->plugin_named('@Author::GSG/Git::Tag');
 
     my @versions = (
         [ 'v0.0.1'              => 'v0.0.2' ],
+        # XXX: NextVersion won't work but ChangelogFromGit::CPAN::Changes will
+        [ '0.90'                => 'v0.0.2' ],
         [ 'v1.2.3.4'            => 'v1.2.4' ],
         [ 'dist/v2.31.1.2/prod' => 'v2.31.2' ],
     );
@@ -231,8 +235,15 @@ subtest 'NextVersion' => sub {
             '--allow-empty' );
         $version_plugin->git->tag($have);
 
-        is $version_plugin->provide_version, $expect,
+        my $provided = $version_plugin->provide_version;
+
+        is $provided, $expect,
             "Version after $have is $expect";
+
+        $tzil->version($provided);
+
+        is $git_tag_plugin->_build_tag, $expect,
+            "Git::Tag found version after $have is $expect";
     }
 
     for (
@@ -250,7 +261,29 @@ subtest 'NextVersion' => sub {
         $version_plugin->git->commit( { m => $_ },
             '--allow-empty' );
     }
-    $version_plugin->git->tag('v3.0.0');
+
+    for my $v ( 'v1.2.3.4', 'version', 'v1.2.3-TRIAL', '1.002_00' ) {
+        local $ENV{V} = $v;
+
+        local $@;
+        eval { local $SIG{__DIE__}; $version_plugin->provide_version };
+        like $@, qr/\QInvalid version '$v' in \E\$ENV\{V\}/,
+            "Failed to build with invalid version";
+    }
+
+    for my $v ( '3', '3.0', '3.0.0', 'v3', 'v3.0', 'v3.0.0' ) {
+        local $ENV{V} = $v;
+
+        my $provided = $version_plugin->provide_version;
+        is $provided, 'v3.0.0', "New version 'V=$v' provided correct version";
+
+        $tzil->version($provided);
+
+        is $git_tag_plugin->_build_tag, 'v3.0.0',
+            "Git::Tag built version tag 'v3.0.0'";
+    }
+
+    $version_plugin->git->tag('v4.0.0');
 
     # For debugging, you can see the log here.
     #diag $_ for $version_plugin->git->RUN('log', '--decorate' );
@@ -283,14 +316,21 @@ subtest 'NextVersion' => sub {
     my %expect = (
         'Changelog for Versioned' => [],
         'v0.0.1'                  => ['No changes found'],
-        'v1.2.3.4'                => ['Changes for v1.2.3.4'],
+        '0.90'                    => [
+            'Changes for 0.90',
+            'Changes for v0.0.1',
+            'init',
+        ],
+        'v1.2.3.4'                => [
+            'Changes for v1.2.3.4',
+            'Changes for 0.90',
+        ],
         'v2.31.1.2'               => [
             'Changes for dist/v2.31.1.2/prod',
             'Changes for v1.2.3.4',
-            'Changes for v0.0.1',
-            'init'
         ],
-        'v3.0.0' => [
+        'v3.0.0' => ['No changes found'],
+        'v4.0.0' => [
             'A New Release',
             'Merge remote-tracking branch \'origin/stage\' into prod',
             'Merge remote-tracking branch \'origin/test\' into stage',
@@ -438,7 +478,7 @@ subtest "Set correct GitHub Remote" => sub {
     );
 
     $git->remote(
-        add => 0 => "https://fake.GitHub.com/GrantStreetGroup/Fake.git" );
+        add => 0 => "git\@fake.github.com:GrantStreetGroup/Fake.git" );
 
     {
         ok my $tzil = Builder->from_config(@config),

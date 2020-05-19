@@ -3,7 +3,7 @@ NAME
     META files as develop prereqs
 
 VERSION
-    version 0.006
+    version 0.007
 
 SYNOPSIS
         # in dist.ini:

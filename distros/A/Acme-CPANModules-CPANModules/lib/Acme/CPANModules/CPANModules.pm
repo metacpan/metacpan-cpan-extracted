@@ -1,7 +1,12 @@
 package Acme::CPANModules::CPANModules;
 
-our $DATE = '2019-11-19'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-01'; # DATE
+our $DIST = 'Acme-CPANModules-CPANModules'; # DIST
+our $VERSION = '0.002'; # VERSION
+
+use strict;
+use Acme::CPANModulesUtil::Misc;
 
 our $LIST = {
     summary => 'Modules related to Acme::CPANModules',
@@ -69,12 +74,7 @@ _
     'x.app.cpanmodules.show_entries' => 0,
 };
 
-$LIST->{entries} = [
-    map { +{module=>$_} }
-        do { my %seen; grep { !$seen{$_}++ }
-             ($LIST->{description} =~ /<pm:(\w+(?:::\w+)*)>/g)
-         }
-];
+Acme::CPANModulesUtil::Misc::populate_entries_from_module_links_in_description;
 
 1;
 # ABSTRACT: Modules related to Acme::CPANModules
@@ -91,7 +91,7 @@ Acme::CPANModules::CPANModules - Modules related to Acme::CPANModules
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::CPANModules (from Perl distribution Acme-CPANModules-CPANModules), released on 2019-11-19.
+This document describes version 0.002 of Acme::CPANModules::CPANModules (from Perl distribution Acme-CPANModules-CPANModules), released on 2020-03-01.
 
 =head1 DESCRIPTION
 
@@ -181,6 +181,23 @@ This does not prevent duplicates. To do so:
 
 =back
 
+=head1 FAQ
+
+=head2 What are ways to use this module?
+
+Aside from reading it, you can install all the listed modules using
+L<cpanmodules>:
+
+    % cpanmodules ls-entries CPANModules | cpanm -n
+
+or L<Acme::CM::Get>:
+
+    % perl -MAcme::CM::Get=CPANModules -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+This module also helps L<lcpan> produce a more meaningful result for C<lcpan
+related-mods> when it comes to finding related modules for the modules listed
+in this Acme::CPANModules module.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Acme-CPANModules-CPANModules>.
@@ -209,7 +226,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

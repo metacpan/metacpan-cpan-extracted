@@ -22,7 +22,7 @@ name: CLI-Startup
 provides:
   CLI::Startup:
     file: lib/CLI/Startup.pm
-    version: '0.24'
+    version: '0.25'
 recommends:
   Config::INI::Writer: '0'
   Config::Tiny: '0'
@@ -30,6 +30,7 @@ recommends:
   XML::Simple: '0'
   YAML::Any: '0'
 requires:
+  Carp: '0'
   Class::Std: '0.01'
   Clone: '0'
   Config::Any: '0'
@@ -49,5 +50,5 @@ requires:
   perl: v5.10.0
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.24'
+version: '0.25'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,7 +4,9 @@ lib/Module/Generic/Array.pod
 lib/Module/Generic/Boolean.pod
 lib/Module/Generic/Dynamic.pod
 lib/Module/Generic/Exception.pod
+lib/Module/Generic/Hash.pod
 lib/Module/Generic/Null.pod
+lib/Module/Generic/Number.pod
 lib/Module/Generic/Scalar.pod
 lib/Module/Generic/Tie.pod
 Makefile.PL
@@ -13,4 +15,9 @@ META.yml
 README.md
 t/00.load.t
 t/01.pod.t
+t/02.num.t
+t/03.hash.t
+t/04.colour.t
+t/05.scalar.t
+t/06.array.t
 META.json                                Module JSON meta-data (added by MakeMaker)

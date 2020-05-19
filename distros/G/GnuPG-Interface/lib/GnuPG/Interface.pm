@@ -28,13 +28,32 @@ use Math::BigInt try => 'GMP';
 use GnuPG::Options;
 use GnuPG::Handles;
 
-$VERSION = '0.52';
+$VERSION = '1.00';
 
 has $_ => (
     isa     => 'Any',
     is      => 'rw',
     clearer => 'clear_' . $_,
 ) for qw(call passphrase);
+
+# NB: GnuPG versions
+#
+# There are now two supported versions of GnuPG: legacy 1.4 and stable 2.2
+# They are detected and each behave slightly differently.
+#
+# When using features specific to branches, check that the system's
+# version of gpg corresponds to the branch.
+#
+# legacy: 1.4
+# stable: >= 2.2
+#
+# You can find examples of version comparison in the tests.
+has version => (
+    isa      => 'Str',
+    is       => 'ro',
+    reader   => 'version',
+    writer   => '_set_version',
+);
 
 has options => (
     isa        => 'GnuPG::Options',
@@ -52,6 +71,7 @@ sub BUILD {
 
     $self->hash_init( call => 'gpg' );
     $self->hash_init(%$args);
+    $self->_set_version($self->_version());
 }
 
 struct(
@@ -77,17 +97,18 @@ sub wrap_call( $% ) {
     $handles->stdout('>&STDOUT') unless $handles->stdout();
     $handles->stderr('>&STDERR') unless $handles->stderr();
 
-    # so call me sexist; English just doen't cope well
-    my $needs_passphrase_handled_for_him
-        = ( $self->passphrase() and not $handles->passphrase() ) ? 1 : 0;
+    $self->passphrase("\n") unless $self->passphrase();
 
-    if ($needs_passphrase_handled_for_him) {
+    my $needs_passphrase_handled
+        = ( $self->passphrase() =~ m/\S/ and not $handles->passphrase() ) ? 1 : 0;
+
+    if ($needs_passphrase_handled) {
         $handles->passphrase( IO::Handle->new() );
     }
 
     my $pid = $self->fork_attach_exec(%args);
 
-    if ($needs_passphrase_handled_for_him) {
+    if ($needs_passphrase_handled) {
         my $passphrase_handle = $handles->passphrase();
         print $passphrase_handle $self->passphrase();
         close $passphrase_handle;
@@ -106,6 +127,16 @@ sub fork_attach_exec( $% ) {
     my ( $self, %args ) = @_;
 
     my $handles = $args{handles} or croak 'no GnuPG::Handles passed';
+    my $use_loopback_pinentry = 0;
+
+    # Don't use loopback pintentry for legacy (1.4) GPG
+    #
+    # Check that $version is populated before running cmp_version. If
+    # we are invoked as part of BUILD to populate $version, then any
+    # methods that depend on $version will fail. We don't care about
+    # loopback when we're called just to check gpg version.
+    $use_loopback_pinentry = 1
+      if ($handles->passphrase() && $self->version && $self->cmp_version($self->version, '2.2') > 0 );
 
     # deprecation support
     $args{commands} ||= $args{gnupg_commands};
@@ -293,8 +324,12 @@ sub fork_attach_exec( $% ) {
             $self->options->$option($fileno);
         }
 
+        my @args = $self->options->get_args();
+        push @args, '--pinentry-mode', 'loopback'
+          if $use_loopback_pinentry;
+
         my @command = (
-            $self->call(), $self->options->get_args(),
+            $self->call(), @args,
             @commands,     @command_args
         );
 
@@ -659,15 +694,16 @@ sub encrypt( $% ) {
 
 sub encrypt_symmetrically( $% ) {
     my ( $self, %args ) = @_;
-    # Strip the homedir and put it back after encrypting; gpg 2.0.x
-    # fails symmetric encryption when one is passed.
+    # Strip the homedir and put it back after encrypting;
     my $homedir = $self->options->homedir;
-    $self->options->clear_homedir;
+    $self->options->clear_homedir
+        unless $self->cmp_version($self->version, '2.2') >= 0;
     my $pid = $self->wrap_call(
         %args,
         commands => ['--symmetric']
     );
-    $self->options->homedir($homedir);
+    $self->options->homedir($homedir)
+        unless $self->cmp_version($self->version, '2.2') >= 0;
     return $pid;
 }
 
@@ -762,15 +798,36 @@ sub search_keys( $% ) {
     );
 }
 
-sub version {
+sub _version {
     my ( $self ) = @_;
 
     my $out = IO::Handle->new;
     my $handles = GnuPG::Handles->new( stdout => $out );
-    $self->wrap_call( commands => [ '--version' ], handles => $handles );
+    my $pid = $self->wrap_call( commands => [ '--no-options', '--version' ], handles => $handles );
     my $line = $out->getline;
     $line =~ /(\d+\.\d+\.\d+)/;
-    return $1;
+
+    my $version = $1;
+    unless ($self->cmp_version($version, '2.2') >= 0 or
+        ($self->cmp_version($version, '1.4') >= 0 and $self->cmp_version($version, '1.5') < 0 )) {
+        croak "GnuPG Version 1.4 or 2.2+ required";
+    }
+    waitpid $pid, 0;
+
+    return $version;
+}
+
+sub cmp_version($$) {
+    my ( $self, $a, $b ) = (@_);
+    my @a = split '\.', $a;
+    my @b = split '\.', $b;
+    @a > @b
+        ? push @b, (0) x (@a-@b)
+        : push @a, (0) x (@b-@a);
+    for ( my $i = 0; $i < @a; $i++ ) {
+        return $a[$i] <=> $b[$i] if $a[$i] <=> $b[$i];
+    }
+    return 0;
 }
 
 sub test_default_key_passphrase() {
@@ -808,7 +865,7 @@ sub test_default_key_passphrase() {
 
     # all we realy want to check is the status fh
     while (<$status>) {
-        if (/^\[GNUPG:\]\s*GOOD_PASSPHRASE/) {
+        if (/^\[GNUPG:\]\s*(GOOD_PASSPHRASE|SIG_CREATED)/) {
             waitpid $pid, 0;
             return 1;
         }
@@ -833,8 +890,8 @@ GnuPG::Interface - Perl interface to GnuPG
   # A simple example
   use IO::Handle;
   use GnuPG::Interface;
-  
-  # settting up the situation
+
+  # setting up the situation
   my $gnupg = GnuPG::Interface->new();
   $gnupg->options->hash_init( armor   => 1,
 			      homedir => '/home/foobar' );
@@ -852,7 +909,7 @@ GnuPG::Interface - Perl interface to GnuPG
   # Now we'll go about encrypting with the options already set
   my @plaintext = ( 'foobar' );
   my $pid = $gnupg->encrypt( handles => $handles );
-  
+
   # Now we write to the input of GnuPG
   print $input @plaintext;
   close $input;
@@ -905,6 +962,19 @@ and then calling a method which invokes GnuPG, such as
 B<clearsign>.  One then interacts with with the handles
 appropriately, as described in
 L<perlipc/"Bidirectional Communication with Another Process">.
+
+=head1 GnuPG Versions
+
+As of this version of GnuPG::Interface, there are two supported
+versions of GnuPG: 1.4.x and 2.2.x. The
+L<GnuPG download page|https://gnupg.org/download/index.html> has
+updated information on the currently supported versions.
+
+GnuPG released 2.0 and 2.1 versions in the past and some packaging
+systems may still provide these if you install the default C<gpg>,
+C<gnupg>, C<gnupg2>, etc. packages. This modules supports only
+version 2.2.x, so you may need to find additional package
+repositories or build from source to get the updated version.
 
 =head1 OBJECT METHODS
 
@@ -1005,12 +1075,24 @@ and standard error will be tied to the running program's standard error,
 standard output, or standard error.  If the B<status> or B<logger> handle
 is not defined, this channel of communication is never established with GnuPG,
 and so this information is not generated and does not come into play.
+
 If the B<passphrase> data member handle of the B<handles> object
 is not defined, but the the B<passphrase> data member handle of GnuPG::Interface
 object is, GnuPG::Interface will handle passing this information into GnuPG
-for the user as a convience.  Note that this will result in
+for the user as a convenience.  Note that this will result in
 GnuPG::Interface storing the passphrase in memory, instead of having
 it simply 'pass-through' to GnuPG via a handle.
+
+If neither the B<passphrase> data member of the GnuPG::Interface nor
+the B<passphrase> data member of the B<handles> object is defined,
+then GnuPG::Interface assumes that access and control over the secret
+key will be handled by the running gpg-agent process.  This represents
+the simplest mode of operation with the GnuPG "stable" suite (version
+2.2 and later).  It is also the preferred mode for tools intended to
+be user-facing, since the user will be prompted directly by gpg-agent
+for use of the secret key material.  Note that for programmatic use,
+this mode requires the gpg-agent and pinentry to already be correctly
+configured.
 
 =back
 
@@ -1130,9 +1212,14 @@ The following setup can be done before any of the following examples:
 
   $gnupg->options->hash_init( armor    => 1,
                               recipients => [ 'ftobin@uiuc.edu',
-                                              '0xABCD1234' ],
+                                              '0xABCD1234ABCD1234ABCD1234ABCD1234ABCD1234' ],
                               meta_interactive => 0 ,
                             );
+
+   $gnupg->options->debug_level(4);
+
+   $gnupg->options->logger_file("/tmp/gnupg-$$-decrypt-".time().".log");
+
 
 =head2 Encrypting
 
@@ -1144,7 +1231,7 @@ The following setup can be done before any of the following examples:
 
   my $handles = GnuPG::Handles->new( stdin    => $input,
                                      stdout   => $output );
-   
+
   # this sets up the communication
   # Note that the recipients were specified earlier
   # in the 'options' data member of the $gnupg object.
@@ -1175,7 +1262,7 @@ The following setup can be done before any of the following examples:
 				   );
 
   # indicate our pasphrase through the
-  # convience method
+  # convenience method
   $gnupg->passphrase( $passphrase );
 
   # this sets up the communication
@@ -1220,7 +1307,7 @@ The following setup can be done before any of the following examples:
   # a file written to disk
   # Make sure you "use IO::File" if you use this module!
   my $cipher_file = IO::File->new( 'encrypted.gpg' );
-   
+
   # this sets up the communication
   my $pid = $gnupg->decrypt( handles => $handles );
 
@@ -1252,20 +1339,20 @@ The following setup can be done before any of the following examples:
   # This time we'll just let GnuPG print to our own output
   # and read from our input, because no input is needed!
   my $handles = GnuPG::Handles->new();
-  
-  my @ids = ( 'ftobin', '0xABCD1234' );
+
+  my @ids = ( 'ftobin', '0xABCD1234ABCD1234ABCD1234ABCD1234ABCD1234' );
 
   # this time we need to specify something for
   # command_args because --list-public-keys takes
   # search ids as arguments
   my $pid = $gnupg->list_public_keys( handles      => $handles,
                                       command_args => [ @ids ] );
-  
+
    waitpid $pid, 0;
 
 =head2 Creating GnuPG::PublicKey Objects
 
-  my @ids = [ 'ftobin', '0xABCD1234' ];
+  my @ids = [ 'ftobin', '0xABCD1234ABCD1234ABCD1234ABCD1234ABCD1234' ];
 
   my @keys = $gnupg->get_public_keys( @ids );
 
@@ -1280,7 +1367,7 @@ The following setup can be done before any of the following examples:
       command_args => [ qw( test/key.1.asc ) ],
       handles      => $handles,
     );
-    
+
     my @out = <$handles->stdout()>;
     waitpid $pid, 0;
 
@@ -1334,12 +1421,23 @@ one should all B<wait> to clean up GnuPG from the process table.
 
 =head1 BUGS
 
+=head2 Large Amounts of Data
+
 Currently there are problems when transmitting large quantities
 of information over handles; I'm guessing this is due
 to buffering issues.  This bug does not seem specific to this package;
 IPC::Open3 also appears affected.
 
-I don't know yet how well this modules handles parsing OpenPGP v3 keys.
+=head2 OpenPGP v3 Keys
+
+I don't know yet how well this module handles parsing OpenPGP v3 keys.
+
+=head2 RHEL 7 Test Failures
+
+Testing with the updates for version 1.00 we saw intermittent test failures
+on RHEL 7 with GnuPG version 2.2.20. In some cases the tests would all pass
+for several runs, then one would fail. We're unable to reliably reproduce
+this so we would be interested in feedback from other users.
 
 =head1 SEE ALSO
 
@@ -1357,7 +1455,7 @@ under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-GnuPg::Interface is currently maintained by Jesse Vincent <jesse@cpan.org>.  
+GnuPG::Interface is currently maintained by Best Practical Solutions <BPS@cpan.org>.
 
 Frank J. Tobin, ftobin@cpan.org was the original author of the package.
 

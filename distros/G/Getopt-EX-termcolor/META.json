@@ -43,7 +43,7 @@
       "runtime" : {
          "requires" : {
             "Capture::Tiny" : "0",
-            "Getopt::EX" : "v1.16.0",
+            "Getopt::EX" : "v1.18.0",
             "List::Util" : "1.45",
             "Term::ReadKey" : "0",
             "perl" : "v5.14.0"
@@ -58,7 +58,7 @@
    "provides" : {
       "Getopt::EX::termcolor" : {
          "file" : "lib/Getopt/EX/termcolor.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       },
       "Getopt::EX::termcolor::Apple_Terminal" : {
          "file" : "lib/Getopt/EX/termcolor/Apple_Terminal.pm"
@@ -81,7 +81,7 @@
          "web" : "https://github.com/kaz-utashiro/Getopt-EX-termcolor"
       }
    },
-   "version" : "1.05",
+   "version" : "1.06",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

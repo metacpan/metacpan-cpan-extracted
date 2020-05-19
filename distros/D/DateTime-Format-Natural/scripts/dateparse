@@ -34,6 +34,7 @@ sub parse_switches
                           h|help
                           l|lang=s
                           p|prefer_future
+                          P|demand_future
                           s|supported
                           t|time_zone=s
                           T|trace
@@ -91,6 +92,7 @@ sub set_values
         l => 'lang',
         f => 'format',
         p => 'prefer_future',
+        P => 'demand_future',
         t => 'time_zone',
     );
 
@@ -111,6 +113,7 @@ Usage: $0 [switches]
    -h, --help                  this help screen
    -l, --lang=<code>           language code
    -p, --prefer_future         prefer future dates
+   -P, --demand_future         demand future dates
    -s, --supported             list of supported languages
    -t, --time_zone=<string>    time zone string
    -T, --trace                 print trace after processing
@@ -197,6 +200,7 @@ dateparse - frontend to DateTime::Format::Natural
    -h, --help                  this help screen
    -l, --lang=<code>           language code
    -p, --prefer_future         prefer future dates
+   -P, --demand_future         demand future dates
    -s, --supported             list of supported languages
    -t, --time_zone=<string>    time zone string
    -T, --trace                 print trace after processing

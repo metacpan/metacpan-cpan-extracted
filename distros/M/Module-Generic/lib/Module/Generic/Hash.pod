@@ -1,0 +1,304 @@
+=encoding utf8
+
+=head1 NAME
+
+Module::Generic::Hash - Hash Manipulation Object Class
+
+=head1 SYNOPSIS
+
+    my $h = Module::Generic::Hash->new({
+        first_name => 'John',
+        last_name => 'Doe',
+        age => 30,
+        email => 'john.doe@example.com',
+    });
+
+    # or
+
+    my $h = Module::Generic::Hash->new({
+        first_name => 'John',
+        last_name => 'Doe',
+        age => 30,
+        email => 'john.doe@example.com',
+    }, { debug => 2 });
+
+    my $keys = $h->keys # Module::Generic::Array returned
+    $h->keys->length # e.g. 10
+    $keys->pop # See Module::Generic::Array
+    print( $h->as_string, "\n" );
+    # or
+    print( "$h\n" );
+    # Produces:
+    {
+    "age" => 30,
+    "email" => "john.doe\@example.com",
+    "first_name" => "John",
+    "last_name" => "Doe"
+    }
+
+    $h->json({ pretty => 1 });
+    # Produces
+    {
+    "age" : 30,
+    "email" : "john.doe@example.com",
+    "first_name" : "John",
+    "last_name" : "Doe"
+    }
+    # Or
+    $h->json
+    # Produces
+    {"age":30,"email":"john.doe@example.com","first_name":"John","last_name":"Doe"}
+    # Adding a key and value as usual:
+    $h->{role} = 'customer';
+    $h->defined( 'role' ) # True
+    $h->delete( 'role' ) # Removes and returns 'customer'
+    $h->each(sub
+    {
+        my( $k, $v ) = @_;
+        print( "Key $k has value '$v'\n" );
+    });
+    exists( $h->{age} );
+    # same as
+    $h->exists( 'age' );
+    # Same as $h->foreach(sub{ #.. });
+    $h->for(sub{
+        my( $k, $v ) = @_;
+        print( "Key $k has value '$v'\n" );
+    });
+    $h->length # Returns a Module::Generic::Number
+    my $hash2 =
+    {
+        address =>
+        {
+        line1 => '1-2-3 Kudan-minami, Chiyoda-ku',
+        line2 => 'Big bld 7F',
+        postal_code => '123-4567',
+        city => 'Tokyo',
+        country => 'jp',
+        },
+        last_name => 'Smith',
+    };
+    my $h2 = Module::Generic::Hash->new( $hash2 );
+    $h->merge( $hash2 );
+    # same as $h->merge( $h2 );
+    $h > $h2 # True
+    $h gt $h2 # True
+    $h >= $h2 # True
+    $h2 < $h # True
+    $h2 lt $h # True
+    $h2 <= $h # True
+    3 < $h # True
+
+    # Merge $hash2 into $h, but without overwriting existing entries
+    $h->merge( $hash2, { overwrite => 0 });
+    # Otherwise, bluntly overwriting existing entries, if any
+    $h->merge( $hash2 );
+
+    # Same copy
+    my $h3 = $h->clone;
+
+    my $vals = $h->values; # Returns a Module::Generic::Array
+    # Must return an empty list to prevent the entry from being added to the result, as per perlfunc documentation, see map
+    my $vals = $h->values(sub{
+        ref( $_[0] ) ? () : $_[0];
+    }, { sort => 1 });
+
+
+=head1 DESCRIPTION
+
+The purpos of this class/package is to provide a lightweight object-oriented approach to hash manipulation.
+
+This uses perl core functions only and L<Clone> for cloning. This module's methods act as a wrapper to them.
+
+The object is overloaded, so it returns the hash representation, as dumped by L<Data::Dumper> when used as a string.
+
+    print( "I have a nice $hash\n" );
+
+Would produce something like:
+
+    I have a nice {
+    "age" => 30,
+    "email" => "john.doe\@example.com",
+    "first_name" => "John",
+    "last_name" => "Doe"
+    }
+
+Because the object is overloaded, you can use the variable with comparison perl operators, such as :
+
+    $h > 3 # True
+    $h <= 3 # False
+    # etc...
+
+You can also compare two hashes reliably, such as :
+
+    $h1 eq $h2 # True
+
+But if you use C<==>, it will compare the hash size, i.e. the number of keys
+
+    $h1 == $h2
+
+Which could be true if both hashes have the same number of keys (C<==>), but may not be true if they are not the same (C<eq>)
+
+Otherwise, the hash can be accessed like a regular hash. For example :
+
+    print( "Customer is $h->{first_name} $h->{last_name}\n" );
+
+=head1 METHODS
+
+=head2 new
+
+Provided with a hash reference, some optional parameters and this returns a new object.
+
+Possible optional parameters are:
+
+=over 4
+
+=item I<debug>
+
+Provided with an integer and this actives or deactivates debugging messages. Nothing meaningful happens below 3
+
+=back
+
+=head2 as_string
+
+Return a string version of the hash as produced by L<Data::Dumper>
+
+    print( "$h\n" );
+    # or
+    print( $h->as_string, "\n" );
+
+    # Produces
+    {
+    "age" => 30,
+    "email" => "john.doe\@example.com",
+    "first_name" => "John",
+    "last_name" => "Doe"
+    }
+
+=head2 clone
+
+Produce a deep clone of the hash and return a new object. This uses L<Clone/"clone"> to achieve that.
+
+=head2 debug
+
+Sets or gets the debug level
+
+=head2 defined
+
+Provided with a hash key and this returns true if there is a value defined for this key. See L<perlfunc/"defined">
+
+=head2 delete
+
+Provided with a hash key and this remove the hash entry and return the previous value, exactly as L<perlfunc/"delete"> does.
+
+=head2 dump
+
+Returns a string representation of the hash. This uses L<Data::Dumper> to produce the result.
+
+=head2 each
+
+Provided with with a reference to a subroutine, this will do a loop using L<perlfunc/"each"> and this will call the code, passing it the hash key and its value.
+
+If the code returns false, it will exit the L<perlfunc/"while"> loop.
+
+=head2 exists
+
+Given a hash key, this will return true or false depending if the hash key exists. This uses L<perlfunc/"exists">.
+
+=head2 for
+
+Same as L<perlfunc/"foreach">, given a reference to a subroutine, and this will execute foreach and call the code providing it as arguments the hash key and value.
+
+It exists the foreach loop if the code returns false.
+
+=head2 json
+
+This returns a L<JSON> representation of the hash. You can provided optionally an hash reference of parameters. Currently, only one parameter is supported: I<pretty>, which will make the json result more human readable. With it enabled, you would get something like this :
+
+    {
+    "age" : 30,
+    "email" : "john.doe@example.com",
+    "first_name" : "John",
+    "last_name" : "Doe"
+    }
+
+Otherwise, you would get a more terse result, such as :
+
+    {"age":30,"email":"john.doe@example.com","first_name":"John","last_name":"Doe"}
+
+=head2 keys
+
+Returns the hash keys as a L<Module::Generic::Array> object.
+
+Also note that if you have a multi-level hash, this will return only the first level keys, just like L<perlfunc/"keys"> would do.
+
+    printf( "%d hash keys found\n", $h->keys->length );
+
+And even, chaining through different objects :
+
+    if( $h->keys->length->is_positive )
+    {
+        # Do something
+    }
+
+This returns the keys as an L<Module::Generic::Array> object, then returns the size of the array as a L<Module::Generic::Number> object.
+
+=head2 length
+
+This returns the number of keys in the hash, as a L<Module::Generic::Number> object.
+
+=head2 merge
+
+Provided with an hash reference and an optional hash of parameters and this will mergge the given hash with hash in our object. It does so recursively and prevents looping by using L<Scalar::Util/"refaddr">.
+
+Currently the only parameter possible is I<overwrite>. By default this is set to a true value, and you can provide this argument to specifically indicates you do not want the hash key value to be overwriten.
+
+=head2 reset
+
+This simply empty the hash. See also L</"undef"> for the same result.
+
+=head2 undef
+
+This simply empty the hash. See also L</"reset"> for the same result.
+
+=head2 values
+
+This returns the values of the hash as a L<Module::Generic::Array>, but please note that jsut like the L<perlfunc/"values">, it only provides the first level values.
+
+If an optional reference to a subroutine is provided, the code will be called for each value as its sole argument, and the subroutine can decide what to do with it, possibly altering the value and discarding it by returning the value, possibly altered, or an empty list to indicte this entry shoul be discarded. For example :
+
+    my $vals = $h->values(sub{
+        ref( $_[0] ) ? () : $_[0];
+    });
+
+This will make sure to get all values, except the ones that are reference (L<perlref>)
+
+To return entries with uppercase first :
+
+    my $vals = $h->values(sub{
+        join( ' ', map( ucfirst( lc( $_ ) ), split( /[[:blank:]]+/, $_[0] ) ) );
+    });
+
+And if one of the value were C<JohN  DOE>, this would result in C<John Doe>
+
+If the parameter I<sort> is provided, then it will sort the array before returning the values and before executing the reference of the subroutine on each entry.
+
+=head1 SEE ALSO
+
+L<Module::Generic::Scalar>, L<Module::Generic::Array>, L<Module::Generic::Boolean>, L<Module::Generic::Number>, L<Module::Generic::Dynamic>
+
+L<Math::BigInt>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2000-2020 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut
+

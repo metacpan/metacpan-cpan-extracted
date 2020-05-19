@@ -6,9 +6,13 @@ set_encoding('utf8');
 
 use Docker::Names::Random qw( :all );
 
-my $dn = docker_name();
+plan( tests => 2000 );
 
-isnt( $dn, undef, 'Not undef' );
+for (1..1000) {
+    my $dn = docker_name();
+    isnt( $dn, undef, 'Not undef' );
+    like( $dn, qr/^ [[:word:]]{1,} _ [[:word:]]{1,} $/msx, 'Looks like a docker name' );
+}
 
 done_testing;
 

@@ -472,9 +472,8 @@ _get_list(self, client, type)
 
 
 void
-_get_variable(self, client, key)
+_get_variable(self, key)
     pkgconf_pkg_t *self
-    my_client_t *client
     const char *key
   INIT:
     pkgconf_node_t *node;
@@ -520,8 +519,16 @@ int
 compare_version(a,b)
     const char *a
     const char *b
+  INIT:
+    int ret;
   CODE:
-    RETVAL = pkgconf_compare_version(a,b);
+    ret = pkgconf_compare_version(a,b);
+    if(ret < 0)
+      RETVAL = -1;
+    else if(ret > 0)
+      RETVAL = 1;
+    else
+      RETVAL = 0;
   OUTPUT:
     RETVAL
 

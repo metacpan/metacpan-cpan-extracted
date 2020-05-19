@@ -14,11 +14,11 @@ BEGIN {
 
 CITIES: {
 	Geo::Coder::Free::DB::init(directory => 'lib/Geo/Coder/Free/MaxMind/databases');
-	my $admin1 = new_ok('Geo::Coder::Free::DB::MaxMind::admin1' => [logger => new_ok('MyLogger')]);
+	my $admin1 = new_ok('Geo::Coder::Free::DB::MaxMind::admin1' => [logger => new_ok('MyLogger'), no_entry => 1]);
 
 	my $england = $admin1->fetchrow_hashref({ concatenated_codes => 'GB.ENG' });
-	ok($england->{asciiname} eq 'England');
+	is($england->{asciiname}, 'England');
 
 	$england = $admin1->fetchrow_hashref({ asciiname => 'England' });
-	ok($england->{concatenated_codes} eq 'GB.ENG');
+	is($england->{concatenated_codes}, 'GB.ENG');
 }

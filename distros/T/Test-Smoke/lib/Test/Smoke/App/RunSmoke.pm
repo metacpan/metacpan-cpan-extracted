@@ -65,7 +65,7 @@ sub run {
         Test::Smoke::Util::Win32ErrorMode::lower_error_settings();
     }
 
-   $self->run_smoke();
+   $self->run_smoke(@{ $self->option('pass_option') });
    chdir $cwd;
 }
 

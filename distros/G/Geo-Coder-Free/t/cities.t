@@ -16,7 +16,7 @@ BEGIN {
 CITIES: {
 	Geo::Coder::Free::DB::init(directory => 'lib/Geo/Coder/Free/MaxMind/databases');
 
-	my $cities = new_ok('Geo::Coder::Free::DB::MaxMind::cities' => [logger => new_ok('MyLogger')]);
+	my $cities = new_ok('Geo::Coder::Free::DB::MaxMind::cities' => [logger => new_ok('MyLogger'), no_entry => 1]);
 
 	# diag($cities->population(Country => 'gb', City => 'ramsgate'));
 	ok($cities->population(Country => 'gb', City => 'ramsgate') == 38624);

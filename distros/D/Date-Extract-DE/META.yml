@@ -17,7 +17,7 @@ name: Date-Extract-DE
 provides:
   Date::Extract::DE:
     file: lib/Date/Extract/DE.pm
-    version: v0.0.3
+    version: v0.0.4
 requires:
   Date::Range: '0'
   Date::Simple: '0'
@@ -32,5 +32,5 @@ resources:
   bugtracker: https://github.com/apa-it/date-extract-de/issues
   license: http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
   repository: https://github.com/apa-it/date-extract-de
-version: v0.0.3
+version: v0.0.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

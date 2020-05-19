@@ -22,6 +22,7 @@ use IO::Seekable;
 use File::Compare;
 use Exporter;
 use Class::Struct;
+use File::Temp qw (tempdir);
 
 use GnuPG::Interface;
 use GnuPG::Handles;
@@ -38,12 +39,25 @@ use vars qw( @ISA           @EXPORT
               texts                  file_match
             );
 
-$gnupg = GnuPG::Interface->new( passphrase => 'test' );
+my $homedir;
+if (-f "test/gnupghome") {
+  my $record = IO::File->new( "< test/gnupghome" );
+  $homedir = <$record>;
+  $record->close();
+} else {
+  $homedir = tempdir( DIR => '/tmp');
+  my $record = IO::File->new( "> test/gnupghome" );
+  $record->write($homedir);
+  $record->close();
+}
 
-$gnupg->options->hash_init( homedir              => 'test',
+$ENV{'GNUPGHOME'} = $homedir;
+
+$gnupg = GnuPG::Interface->new( passphrase => 'test' );
+$gnupg->options->hash_init( homedir              => $homedir,
                             armor                => 1,
                             meta_interactive     => 0,
-                            meta_signing_key_id  => '0xF950DA9C',
+                            meta_signing_key_id  => '0x93AFC4B1B0288A104996B44253AE596EF950DA9C',
                             always_trust         => 1,
                           );
 
@@ -52,8 +66,14 @@ struct( Text => { fn => "\$", fh => "\$", data => "\$" } );
 $texts{plain} = Text->new();
 $texts{plain}->fn( 'test/plain.1.txt' );
 
+$texts{alt_plain} = Text->new();
+$texts{alt_plain}->fn( 'test/plain.2.txt' );
+
 $texts{encrypted} = Text->new();
 $texts{encrypted}->fn( 'test/encrypted.1.gpg' );
+
+$texts{alt_encrypted} = Text->new();
+$texts{alt_encrypted}->fn( 'test/encrypted.2.gpg' );
 
 $texts{signed} = Text->new();
 $texts{signed}->fn( 'test/signed.1.asc' );
@@ -65,7 +85,7 @@ $texts{temp} = Text->new();
 $texts{temp}->fn( 'test/temp' );
 
 
-foreach my $name ( qw( plain encrypted signed key ) )
+foreach my $name ( qw( plain alt_plain encrypted alt_encrypted signed key ) )
 {
     my $entry = $texts{$name};
     my $filename = $entry->fn();
@@ -87,7 +107,7 @@ sub reset_handles
         stderr  => $stderr
       );
 
-    foreach my $name ( qw( plain encrypted signed key ) )
+    foreach my $name ( qw( plain alt_plain encrypted alt_encrypted signed key ) )
     {
         my $entry = $texts{$name};
         my $filename = $entry->fn();
@@ -123,5 +143,28 @@ sub file_match
 }
 
 
+
+# blank user_id_string and different validity for expired sig in GPG 2.2.x vs 1.x, 2.1
+sub get_expired_test_sig_params {
+    my $gnupg = shift;
+    my $version = $gnupg->version;
+
+    my %sig_params = (
+        date_string => '2000-03-16',
+        hex_id => '56FFD10A260C4FA3',
+        sig_class => 0x10,
+        algo_num => 17,
+        is_exportable => 1,
+    );
+    if ($gnupg->cmp_version($gnupg->version, '2.2') > 0) {
+        $sig_params{user_id_string} = '';
+        $sig_params{validity} = '?';
+    }
+    else {
+        $sig_params{user_id_string} = 'Frank J. Tobin <ftobin@neverending.org>',
+        $sig_params{validity} = '!';
+    }
+    return %sig_params
+}
 
 1;

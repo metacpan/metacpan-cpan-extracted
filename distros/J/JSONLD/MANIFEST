@@ -21,6 +21,7 @@ meta/changes.ttl
 README.md
 t/00.load.t
 t/simple.t
+xt/earl.pl
 xt/compact.t
 xt/expand.t
 xt/to-rdf.t

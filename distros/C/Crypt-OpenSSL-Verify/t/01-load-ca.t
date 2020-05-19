@@ -4,7 +4,7 @@ use Crypt::OpenSSL::Verify;
 my $v = Crypt::OpenSSL::Verify->new('t/cacert.pem');
 ok($v);
 
-my $v = Crypt::OpenSSL::Verify->new(
+$v = Crypt::OpenSSL::Verify->new(
     CAfile => 't/cacert.pem',
     CApath => '/etc/ssl/certs',
     noCAfile => 0,

@@ -6,7 +6,7 @@
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "apache_2_0"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -23,10 +23,9 @@
          "requires" : {
             "Data::Object::Class" : "2.02",
             "Data::Object::ClassHas" : "2.01",
+            "Data::Object::Role" : "2.01",
             "Data::Object::Role::Buildable" : "0.03",
-            "Data::Object::Role::Errable" : "0.01",
-            "Data::Object::Role::Stashable" : "2.01",
-            "Data::Object::Role::Tryable" : "2.00",
+            "Data::Object::RoleHas" : "2.01",
             "Data::Object::Space" : "2.01",
             "perl" : "5.014",
             "routines" : "0",
@@ -38,12 +37,11 @@
          "requires" : {
             "Data::Object::Class" : "2.02",
             "Data::Object::ClassHas" : "2.01",
+            "Data::Object::Role" : "2.01",
             "Data::Object::Role::Buildable" : "0.03",
-            "Data::Object::Role::Errable" : "0.01",
-            "Data::Object::Role::Stashable" : "2.01",
-            "Data::Object::Role::Tryable" : "2.00",
+            "Data::Object::RoleHas" : "2.01",
             "Data::Object::Space" : "2.01",
-            "Test::Auto" : "0.10",
+            "Test::Auto" : "0.12",
             "perl" : "5.014",
             "routines" : "0",
             "strict" : "0",
@@ -63,10 +61,10 @@
          "web" : "https://github.com/iamalnewkirk/data-object-role-formulatable"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_authority" : "cpan:AWNCORP",
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
-   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+   "x_spdx_expression" : "Apache-2.0"
 }
 

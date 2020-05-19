@@ -6,7 +6,7 @@ use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::Config;
 
 # ABSTRACT: Wasmtime engine class
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 $ffi_prefix = 'wasm_engine_';
@@ -44,7 +44,7 @@ Wasm::Wasmtime::Engine - Wasmtime engine class
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

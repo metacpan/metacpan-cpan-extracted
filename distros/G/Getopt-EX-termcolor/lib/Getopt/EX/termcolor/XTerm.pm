@@ -112,7 +112,7 @@ sub ask {
     open my $tty, "+<", "/dev/tty" or return;
     ReadMode "cbreak", $tty;
     printflush $tty $request;
-    my $timeout = 0.01;
+    my $timeout = 0.1;
     my $answer = '';
     while (defined (my $key = ReadKey $timeout, $tty)) {
 	if (0 and $debug) {

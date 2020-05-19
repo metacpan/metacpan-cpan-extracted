@@ -18,14 +18,16 @@ use FindBin ();
 use lib $FindBin::Bin;
 use IPC_Run3_Shell_Testlib;
 
-use Test::More tests=>14; # remember to keep in sync with done_testing
+use Test::More tests=>16; # remember to keep in sync with done_testing
 use Test::Fatal 'exception';
 
 BEGIN {
 	use_ok 'IPC::Run3';
 	use_ok 'IPC::Run3::Shell';
+	use_ok 'IPC::Run3::Shell::CLIWrapper';
 }
-is $IPC::Run3::Shell::VERSION, '0.56', 'version matches tests';
+is $IPC::Run3::Shell::VERSION, '0.58', 'version matches tests';
+is $IPC::Run3::Shell::CLIWrapper::VERSION, '0.58', 'version matches tests';
 use warnings FATAL=>'IPC::Run3::Shell';
 
 # Note that for testing, we're basically only calling an external perl process.
@@ -68,5 +70,5 @@ is $serr, "warn0\nerr", 'simple test stderr';
 
 if (my $cnt = grep {!$_} Test::More->builder->summary)
 	{ BAIL_OUT("$cnt smoke tests failed") }
-done_testing(14);
+done_testing(16);
 

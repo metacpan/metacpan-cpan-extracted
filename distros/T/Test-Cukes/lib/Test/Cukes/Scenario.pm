@@ -1,5 +1,5 @@
 package Test::Cukes::Scenario;
-use Any::Moose;
+use Moose;
 
 has name => (
     is => "rw",
@@ -37,5 +37,5 @@ sub BUILDARGS {
 }
 
 __PACKAGE__->meta->make_immutable;
-no Any::Moose;
+no Moose;
 1;

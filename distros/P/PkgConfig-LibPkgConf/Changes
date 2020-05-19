@@ -1,5 +1,9 @@
 Revision history for PkgConfig-LibPkgConf
 
+0.11 2020-05-15 18:18:52 -0400
+  - Work around for bug with pkgconf_compare_version
+    on arm64 (gh#9)
+
 0.10 2018-12-26 21:29:54 -0500
   - Explicitly require EUMM 6.98
   - Explicitly require Test::More 0.98

@@ -5,8 +5,8 @@ SYNOPSIS
       # A simple example
       use IO::Handle;
       use GnuPG::Interface;
-  
-      # settting up the situation
+
+      # setting up the situation
       my $gnupg = GnuPG::Interface->new();
       $gnupg->options->hash_init( armor   => 1,
                                   homedir => '/home/foobar' );
@@ -24,7 +24,7 @@ SYNOPSIS
       # Now we'll go about encrypting with the options already set
       my @plaintext = ( 'foobar' );
       my $pid = $gnupg->encrypt( handles => $handles );
-  
+
       # Now we write to the input of GnuPG
       print $input @plaintext;
       close $input;
@@ -66,6 +66,18 @@ DESCRIPTION
     invokes GnuPG, such as clearsign. One then interacts with with the
     handles appropriately, as described in "Bidirectional Communication with
     Another Process" in perlipc.
+
+GnuPG Versions
+    As of this version of GnuPG::Interface, there are two supported versions
+    of GnuPG: 1.4.x and 2.2.x. The GnuPG download page
+    <https://gnupg.org/download/index.html> has updated information on the
+    currently supported versions.
+
+    GnuPG released 2.0 and 2.1 versions in the past and some packaging
+    systems may still provide these if you install the default "gpg",
+    "gnupg", "gnupg2", etc. packages. This modules supports only version
+    2.2.x, so you may need to find additional package repositories or build
+    from source to get the updated version.
 
 OBJECT METHODS
   Initialization Methods
@@ -140,13 +152,26 @@ OBJECT METHODS
         standard error, standard output, or standard error. If the status or
         logger handle is not defined, this channel of communication is never
         established with GnuPG, and so this information is not generated and
-        does not come into play. If the passphrase data member handle of the
-        handles object is not defined, but the the passphrase data member
-        handle of GnuPG::Interface object is, GnuPG::Interface will handle
-        passing this information into GnuPG for the user as a convience.
-        Note that this will result in GnuPG::Interface storing the
-        passphrase in memory, instead of having it simply 'pass-through' to
-        GnuPG via a handle.
+        does not come into play.
+
+        If the passphrase data member handle of the handles object is not
+        defined, but the the passphrase data member handle of
+        GnuPG::Interface object is, GnuPG::Interface will handle passing
+        this information into GnuPG for the user as a convenience. Note that
+        this will result in GnuPG::Interface storing the passphrase in
+        memory, instead of having it simply 'pass-through' to GnuPG via a
+        handle.
+
+        If neither the passphrase data member of the GnuPG::Interface nor
+        the passphrase data member of the handles object is defined, then
+        GnuPG::Interface assumes that access and control over the secret key
+        will be handled by the running gpg-agent process. This represents
+        the simplest mode of operation with the GnuPG "stable" suite
+        (version 2.2 and later). It is also the preferred mode for tools
+        intended to be user-facing, since the user will be prompted directly
+        by gpg-agent for use of the secret key material. Note that for
+        programmatic use, this mode requires the gpg-agent and pinentry to
+        already be correctly configured.
 
   Other Methods
     get_public_keys( @search_strings )
@@ -228,9 +253,13 @@ EXAMPLES
 
       $gnupg->options->hash_init( armor    => 1,
                                   recipients => [ 'ftobin@uiuc.edu',
-                                                  '0xABCD1234' ],
+                                                  '0xABCD1234ABCD1234ABCD1234ABCD1234ABCD1234' ],
                                   meta_interactive => 0 ,
                                 );
+
+       $gnupg->options->debug_level(4);
+
+       $gnupg->options->logger_file("/tmp/gnupg-$$-decrypt-".time().".log");
 
   Encrypting
       # We'll let the standard error of GnuPG pass through
@@ -241,7 +270,7 @@ EXAMPLES
 
       my $handles = GnuPG::Handles->new( stdin    => $input,
                                          stdout   => $output );
-   
+
       # this sets up the communication
       # Note that the recipients were specified earlier
       # in the 'options' data member of the $gnupg object.
@@ -271,7 +300,7 @@ EXAMPLES
                                        );
 
       # indicate our pasphrase through the
-      # convience method
+      # convenience method
       $gnupg->passphrase( $passphrase );
 
       # this sets up the communication
@@ -315,7 +344,7 @@ EXAMPLES
       # a file written to disk
       # Make sure you "use IO::File" if you use this module!
       my $cipher_file = IO::File->new( 'encrypted.gpg' );
-   
+
       # this sets up the communication
       my $pid = $gnupg->decrypt( handles => $handles );
 
@@ -346,19 +375,19 @@ EXAMPLES
       # This time we'll just let GnuPG print to our own output
       # and read from our input, because no input is needed!
       my $handles = GnuPG::Handles->new();
-  
-      my @ids = ( 'ftobin', '0xABCD1234' );
+
+      my @ids = ( 'ftobin', '0xABCD1234ABCD1234ABCD1234ABCD1234ABCD1234' );
 
       # this time we need to specify something for
       # command_args because --list-public-keys takes
       # search ids as arguments
       my $pid = $gnupg->list_public_keys( handles      => $handles,
                                           command_args => [ @ids ] );
-  
+
        waitpid $pid, 0;
 
   Creating GnuPG::PublicKey Objects
-      my @ids = [ 'ftobin', '0xABCD1234' ];
+      my @ids = [ 'ftobin', '0xABCD1234ABCD1234ABCD1234ABCD1234ABCD1234' ];
 
       my @keys = $gnupg->get_public_keys( @ids );
 
@@ -372,7 +401,7 @@ EXAMPLES
           command_args => [ qw( test/key.1.asc ) ],
           handles      => $handles,
         );
-    
+
         my @out = <$handles->stdout()>;
         waitpid $pid, 0;
 
@@ -411,12 +440,21 @@ NOTES
     the process table.
 
 BUGS
+  Large Amounts of Data
     Currently there are problems when transmitting large quantities of
     information over handles; I'm guessing this is due to buffering issues.
     This bug does not seem specific to this package; IPC::Open3 also appears
     affected.
 
-    I don't know yet how well this modules handles parsing OpenPGP v3 keys.
+  OpenPGP v3 Keys
+    I don't know yet how well this module handles parsing OpenPGP v3 keys.
+
+  RHEL 7 Test Failures
+    Testing with the updates for version 1.00 we saw intermittent test
+    failures on RHEL 7 with GnuPG version 2.2.20. In some cases the tests
+    would all pass for several runs, then one would fail. We're unable to
+    reliably reproduce this so we would be interested in feedback from other
+    users.
 
 SEE ALSO
     GnuPG::Options, GnuPG::Handles, GnuPG::PublicKey, GnuPG::SecretKey, gpg,
@@ -427,8 +465,8 @@ LICENSE
     under the same terms as Perl itself.
 
 AUTHOR
-    GnuPg::Interface is currently maintained by Jesse Vincent
-    <jesse@cpan.org>.
+    GnuPG::Interface is currently maintained by Best Practical Solutions
+    <BPS@cpan.org>.
 
     Frank J. Tobin, ftobin@cpan.org was the original author of the package.
 

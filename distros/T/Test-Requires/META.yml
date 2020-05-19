@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 0
-generated_by: 'Minilla/v2.4.2, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Test::Requires:
     file: lib/Test/Requires.pm
-    version: '0.10'
+    version: '0.11'
 requires:
   Test::Builder::Module: '0'
   Test::More: '0.47'
@@ -35,10 +35,12 @@ resources:
   bugtracker: https://github.com/tokuhirom/Test-Requires/issues
   homepage: https://github.com/tokuhirom/Test-Requires
   repository: git://github.com/tokuhirom/Test-Requires.git
-version: '0.10'
+version: '0.11'
 x_contributors:
-  - 'gfx <gfuji@cpan.org>'
-  - 'Toby Inkster <mail@tobyinkster.co.uk>'
   - 'Neil Bowers <neil@bowers.com>'
   - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Toby Inkster <mail@tobyinkster.co.uk>'
   - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+  - 'gfx <gfuji@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

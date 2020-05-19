@@ -9,7 +9,7 @@ BEGIN { use_ok('Net::IPAM::IP') || print "Bail out!\n"; }
 can_ok( 'Net::IPAM::IP', 'new' );
 
 # valid
-foreach my $txt (qw/:: fE80::0:1 1.2.3.4 ::ffff:127.0.0.1 ::ff:0 caFe::/) {
+foreach my $txt (qw/:: 0.0.0.0 fE80::0:1 1.2.3.4 ::ffff:127.0.0.1 ::ff:0 caFe::/) {
   ok( Net::IPAM::IP->new($txt), "is valid ($txt)" );
 }
 

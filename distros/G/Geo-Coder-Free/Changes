@@ -1,5 +1,16 @@
 Revision history for Geo-Coder-Free
 
+0.23	Sat May 16 22:16:30 EDT 2020
+	WhosOnFirst: Use raw geojson files from GitHub
+	Don't store items in MaxMind cache when there are more than one match,
+		it was causing some subsequent searches to fail
+	Sanity check to MaxMind records
+	Don't look up where we've already failed to find a location
+	Save database in Redis server as well if REDIS_SERVER is set
+	Fixed reverse_geocode in Local.pm for UK addresses
+	Fixed reverse_geocode in Local.pm when you know the name but not the
+		number
+
 0.22	Sat 12 Oct 15:14:01 EDT 2019
 	When looking up Tyne and Wear, also lookup Borough of North Tyneside
 	Make createdatabase.PL and openaddress.pm agree on how to handle St. Louis, MO

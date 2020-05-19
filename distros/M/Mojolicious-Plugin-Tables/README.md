@@ -26,15 +26,14 @@ Building a distribution
 -----------------------
 ```
 # (bump VERSION)
-git log >CHANGES
-# (commit to master)
-perl Makefile.PL
-git rm *Tables*tar.gz
-make test
-make manifest
-make dist
-mojo cpanify -u USER -p PASS *Tables*tar.gz
-git add *Tables*tar.gz
-git commit -m 'Build version X.YY'
+ perl Makefile.PL 
+ make test
+ make manifest
+ make dist
+ mojo cpanify -u USER -p PASS *Tables*tar.gz
+ git commit -m 'Build version X.YY'
+ git log >CHANGES
+ git add CHANGES lib/Mojolicious/Plugin/Tables.pm
+ git commit -m 'Built version X.YY'
 # (git push)
 ```

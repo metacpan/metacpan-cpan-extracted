@@ -5,7 +5,7 @@
 use warnings;
 use strict;
 use Mnet::Stanza;
-use Test::More tests => 12;
+use Test::More tests => 13;
 
 # check trim function
 Test::More::is(
@@ -40,6 +40,12 @@ Test::More::is(
         stanza3
         extra
     "), qr/^\s*stanza/)), "stanza1\n stanza2\nstanza3", "parse string"
+);
+
+# check parse function, with blank line in stanza
+Test::More::is(
+    scalar(Mnet::Stanza::parse("stanza\n\n indent\nextra", qr/^\s*stanza/)),
+        "stanza\n\n indent", "parse string"
 );
 
 # check diff function, with a variety of inputs

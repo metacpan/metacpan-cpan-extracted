@@ -12,6 +12,7 @@ Readonly::Hash my %ACADVER => (
 	# ACADVER => Version of AutoCAD
 	'MC0.0' => 'Version 1.0',
 	'AC1.2' => 'Version 1.2',
+	'AC1.3' => 'Version 1.3',
 	'AC1.40' => 'Version 1.40',
 	'AC1.50' => 'Version 2.05',
 	'AC2.10' => 'Version 2.10',
@@ -24,16 +25,31 @@ Readonly::Hash my %ACADVER => (
 	'AC1006' => 'Release 10',
 	'AC1009' => 'Release 11/12',
 	'AC1012' => 'Release 13',
+	'AC1013' => '??',
 	'AC1014' => 'Release 14',
-	'AC1015' => 'AutoCAD 2000/2000i/2002',
-	'AC1018' => 'AutoCAD 2004/2005/2006',
-	'AC1021' => 'AutoCAD 2007/2008/2009',
-	'AC1024' => 'AutoCAD 2010/2011/2012',
-	'AC1027' => 'AutoCAD 2013/2014/2015/2016/2017',
-	'AC1032' => 'AutoCAD 2018/2019/2020',
+	'AC1015' => 'AutoCAD 2000',
+	'AC1016' => 'AutoCAD 2000i',
+	'AC1017' => 'AutoCAD 2002',
+	'AC1018' => 'AutoCAD 2004',
+	'AC1019' => 'AutoCAD 2005',
+	'AC1020' => 'AutoCAD 2006',
+	'AC1021' => 'AutoCAD 2007',
+	'AC1022' => 'AutoCAD 2008',
+	'AC1023' => 'AutoCAD 2009',
+	'AC1024' => 'AutoCAD 2010',
+	'AC1025' => 'AutoCAD 2011',
+	'AC1026' => 'AutoCAD 2012',
+	'AC1027' => 'AutoCAD 2013',
+	'AC1028' => 'AutoCAD 2014',
+	'AC1029' => 'AutoCAD 2015',
+	'AC1030' => 'AutoCAD 2016',
+	'AC1031' => 'AutoCAD 2017',
+	'AC1032' => 'AutoCAD 2018',
+	'AC1033' => 'AutoCAD 2019',
+	'AC1034' => 'AutoCAD 2020',
 );
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -79,6 +95,12 @@ __END__
 
 CAD::AutoCAD::Version - Class which work with AutoCAD versions.
 
+=head1 DESCRIPTION
+
+This class describes AutoCAD versions and it's identifiers.
+
+List of identifiers is in L<Wikipedia article|https://en.wikipedia.org/wiki/AutoCAD_version_history>.
+
 =head1 SYNOPSIS
 
  use CAD::AutoCAD::Version;
@@ -95,11 +117,15 @@ CAD::AutoCAD::Version - Class which work with AutoCAD versions.
 
 Constructor.
 
+Returns instance of object.
+
 =head2 C<list_of_acad_identifiers>
 
  my @acad_identifiers = $obj->list_of_acad_identifiers;
 
-List AutoCAD identifiers used as DWG file magic string or $ACADVER in DXF file.
+List AutoCAD release identifiers.
+This identifiers are used e.g. as magic string in DWG file or as $ACADVER in DXF
+files.
 
 Returns array of identifiers.
 
@@ -107,7 +133,9 @@ Returns array of identifiers.
 
  my @acad_identifiers_real = $obj->list_of_acad_identifiers_real;
 
-List AutoCAD identifiers used as DWG file magic string or $ACADVER in DXF file.
+List AutoCAD release identifiers.
+This identifiers are used e.g. as magic string in DWG file or as $ACADVER in DXF
+files.
 Ordered by date of AutoCAD releases.
 
 Returns array of identifiers.
@@ -138,26 +166,42 @@ Returns array of identifiers.
  # Output:
  # [
  #     [0]  "AC1.2",
- #     [1]  "AC1.40",
- #     [2]  "AC1.50",
- #     [3]  "AC1001",
- #     [4]  "AC1002",
- #     [5]  "AC1003",
- #     [6]  "AC1004",
- #     [7]  "AC1006",
- #     [8]  "AC1009",
- #     [9]  "AC1012",
- #     [10] "AC1014",
- #     [11] "AC1015",
- #     [12] "AC1018",
- #     [13] "AC1021",
- #     [14] "AC1024",
- #     [15] "AC1027",
- #     [16] "AC1032",
- #     [17] "AC2.10",
- #     [18] "AC2.21",
- #     [19] "AC2.22",
- #     [20] "MC0.0"
+ #     [1]  "AC1.3",
+ #     [2]  "AC1.40",
+ #     [3]  "AC1.50",
+ #     [4]  "AC1001",
+ #     [5]  "AC1002",
+ #     [6]  "AC1003",
+ #     [7]  "AC1004",
+ #     [8]  "AC1006",
+ #     [9]  "AC1009",
+ #     [10] "AC1012",
+ #     [11] "AC1013",
+ #     [12] "AC1014",
+ #     [13] "AC1015",
+ #     [14] "AC1016",
+ #     [15] "AC1017",
+ #     [16] "AC1018",
+ #     [17] "AC1019",
+ #     [18] "AC1020",
+ #     [19] "AC1021",
+ #     [20] "AC1022",
+ #     [21] "AC1023",
+ #     [22] "AC1024",
+ #     [23] "AC1025",
+ #     [24] "AC1026",
+ #     [25] "AC1027",
+ #     [26] "AC1028",
+ #     [27] "AC1029",
+ #     [28] "AC1030",
+ #     [29] "AC1031",
+ #     [30] "AC1032",
+ #     [31] "AC1033",
+ #     [32] "AC1034",
+ #     [33] "AC2.10",
+ #     [34] "AC2.21",
+ #     [35] "AC2.22",
+ #     [36] "MC0.0"
  # ]
 
 =head1 EXAMPLE2
@@ -181,25 +225,41 @@ Returns array of identifiers.
  # [
  #     [0]  "MC0.0"
  #     [1]  "AC1.2",
- #     [2]  "AC1.40",
- #     [3]  "AC1.50",
- #     [4]  "AC2.10",
- #     [5]  "AC2.21",
- #     [6]  "AC2.22",
- #     [7]  "AC1001",
- #     [8]  "AC1002",
- #     [9]  "AC1003",
- #     [10] "AC1004",
- #     [11] "AC1006",
- #     [12] "AC1009",
- #     [13] "AC1012",
- #     [14] "AC1014",
- #     [15] "AC1015",
- #     [16] "AC1018",
- #     [17] "AC1021",
- #     [18] "AC1024",
- #     [19] "AC1027",
- #     [20] "AC1032",
+ #     [2]  "AC1.3",
+ #     [3]  "AC1.40",
+ #     [4]  "AC1.50",
+ #     [5]  "AC2.10",
+ #     [6]  "AC2.21",
+ #     [7]  "AC2.22",
+ #     [8]  "AC1001",
+ #     [9]  "AC1002",
+ #     [10] "AC1003",
+ #     [11] "AC1004",
+ #     [12] "AC1006",
+ #     [13] "AC1009",
+ #     [14] "AC1012",
+ #     [15] "AC1013",
+ #     [16] "AC1014",
+ #     [17] "AC1015",
+ #     [18] "AC1016",
+ #     [19] "AC1017",
+ #     [20] "AC1018",
+ #     [21] "AC1019",
+ #     [22] "AC1020",
+ #     [23] "AC1021",
+ #     [24] "AC1022",
+ #     [25] "AC1023",
+ #     [26] "AC1024",
+ #     [27] "AC1025",
+ #     [28] "AC1026",
+ #     [29] "AC1027",
+ #     [30] "AC1028",
+ #     [31] "AC1029",
+ #     [32] "AC1030",
+ #     [33] "AC1031",
+ #     [34] "AC1032",
+ #     [35] "AC1033",
+ #     [36] "AC1034",
  # ]
 
 =head1 DEPENDENCIES
@@ -239,6 +299,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

@@ -10,7 +10,7 @@ use Test::More;
 use strict;
 use Time::HiRes qw(gettimeofday usleep tv_interval sleep time);
 
-BEGIN { plan tests => 101 }
+BEGIN { plan tests => 102 }
 BEGIN { require "./t/test_utils.pl"; }
 
 BEGIN { $Parallel::Forker::Debug = 1; }
@@ -33,7 +33,7 @@ ok(1, "sig");
 {
     if (!$ENV{PARALLELFORKER_AUTHOR_SITE}) {
 	warn "(skip author only test)\n";
-	skip("author only test (harmless)", 97);
+	skip("author only test (harmless)", 98);
     }
     test_waitall();
     test_poll();
@@ -228,17 +228,20 @@ sub test_ss {
     ok( $fork->use_sig_child, "use_sig_child" );
 
     my $done;
+    my $preforked = 0;
     $fork->schedule(
-		    name => 'f1',
-		    run_on_start => sub {},
-		    run_on_finish => sub { $done = 1 },
-		    );
+	name => 'f1',
+	run_pre_start => sub { $preforked++ },
+	run_on_start => sub {},
+	run_on_finish => sub { $done = 1 },
+	);
 
     $fork->ready_all;
     $fork->poll;
 
     # should be 1 running process now
     is( scalar(grep { $_->is_running } $fork->processes), 1, "one running" );
+    is($preforked, 1);
 
     sleep 2;
     $fork->{_activity} = 0;

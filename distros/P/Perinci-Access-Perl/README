@@ -3,8 +3,8 @@ NAME
     Riap
 
 VERSION
-    This document describes version 0.892 of Perinci::Access::Perl (from
-    Perl distribution Perinci-Access-Perl), released on 2020-03-04.
+    This document describes version 0.893 of Perinci::Access::Perl (from
+    Perl distribution Perinci-Access-Perl), released on 2020-05-18.
 
 SYNOPSIS
     First write your code and add Rinci metadata to them:

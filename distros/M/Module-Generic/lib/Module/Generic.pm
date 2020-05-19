@@ -1,22 +1,19 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.12.1
+## Version v0.12.4
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <jack@deguest.jp>
+## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/08/24
-## Modified 2020/05/03
-## All rights reserved
+## Modified 2020/05/16
 ## 
-## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Module::Generic;
 BEGIN
 {
     require 5.6.0;
     use strict;
-    use warnings;
+    use warnings::register;
     use Scalar::Util qw( openhandle );
     use Data::Dumper;
     use Data::Printer 
@@ -28,7 +25,6 @@ BEGIN
         }
     };
     use Devel::StackTrace;
-    use Text::Number;
     use Number::Format;
     use TryCatch;
     use B;
@@ -44,7 +40,7 @@ BEGIN
     @EXPORT      = qw( );
     @EXPORT_OK   = qw( subclasses );
     %EXPORT_TAGS = ();
-    $VERSION     = 'v0.12.1';
+    $VERSION     = 'v0.12.4';
     $VERBOSE     = 0;
     $DEBUG       = 0;
     $SILENT_AUTOLOAD      = 1;
@@ -52,14 +48,21 @@ BEGIN
     $CALLER_LEVEL         = 0;
     $OPTIMIZE_MESG_SUB    = 0;
     $COLOUR_NAME_TO_RGB   = {};
-    local $^W;
+    # local $^W;
     no strict qw(refs);
+    use constant COLOUR_OPEN => '<';
+    use constant COLOUR_CLOSE => '>';
 };
 
 INIT
 {
     our $true  = ${"Module::Generic::Boolean::true"};
     our $false = ${"Module::Generic::Boolean::false"};
+    while( <DATA> )
+    {
+        chomp;
+        print( "INIT: found colour data: '$_'\n" );
+    }
 };
 
 {
@@ -274,6 +277,8 @@ sub clone
     }
 }
 
+sub colour_close { return( shift->_set_get( 'colour_close', @_ ) ); }
+
 sub colour_closest
 {
     my $self    = shift( @_ );
@@ -304,6 +309,7 @@ sub colour_closest
                 my( $r, $g, $b, $name ) = split( /[[:blank:]]+/, $_, 4 );
                 $COLOUR_NAME_TO_RGB->{ lc( $name ) } = [ $r, $g, $b ];
             }
+            close( DATA );
         }
         if( CORE::exists( $COLOUR_NAME_TO_RGB->{ lc( $colour ) } ) )
         {
@@ -395,34 +401,16 @@ sub colour_format
     ## To make it possible to use either text or message property
     $opts->{text} = CORE::delete( $opts->{message} ) if( CORE::length( $opts->{message} ) && !CORE::length( $opts->{text} ) );
     return( $self->error( "No text was provided to format." ) ) if( !CORE::length( $opts->{text} ) );
+    
+    $opts->{colour} //= CORE::delete( $opts->{color} ) || CORE::delete( $opts->{fg_colour} ) || CORE::delete( $opts->{fg_color} ) || CORE::delete( $opts->{fgcolour} ) || CORE::delete( $opts->{fgcolor} );
+    $opts->{bgcolour} //= CORE::delete( $opts->{bgcolor} ) || CORE::delete( $opts->{bg_colour} ) || CORE::delete( $opts->{bg_color} );
+    
     my $bold      = "\e[1m";
     my $underline = "\e[4m";
     my $reverse   = "\e[7m";
     my $normal    = "\e[m";
     my $cls       = "\e[H\e[2J";
-    my $colours =
-    {
-    black   => 30,
-    red     => 31,
-    green   => 32,
-    yellow  => 33,
-    blue    => 34,
-    magenta => 35,
-    cyan    => 36,
-    white   => 37,
-    };
-    my $bg_colours =
-    {
-    black   => 40,
-    red     => 41,
-    green   => 42,
-    yellow  => 43,
-    blue    => 44,
-    magenta => 45,
-    cyan    => 46,
-    white   => 47,
-    };
-    my $styles =
+   my $styles =
     {
     # Bold
     b       => 1,
@@ -448,6 +436,34 @@ sub colour_format
     striked  => 9,
     striken  => 9,
     };
+    
+    local $convert_24_To_8bits = sub
+    {
+        my( $r, $g, $b ) = @_;
+        $self->message( 9, "Converting $r, $g, $b to 8 bits" );
+        return( ( POSIX::floor( $r * 7 / 255 ) << 5 ) +
+                ( POSIX::floor( $g * 7 / 255 ) << 2 ) +
+                ( POSIX::floor( $b * 3 / 255 ) ) 
+              );
+    };
+    
+    ## opacity * original + (1-opacity)*background = resulting pixel
+    ## https://stackoverflow.com/a/746934/4814971
+    local $colour_with_alpha = sub
+    {
+        my( $r, $g, $b, $a, $bg ) = @_;
+        ## Assuming a white background (255)
+        my( $bg_r, $bg_g, $bg_b ) = ( 255, 255, 255 );
+        if( ref( $bg ) eq 'HASH' )
+        {
+            ( $bg_r, $bg_g, $bg_b ) = @$bg{qw( red green blue )};
+        }
+        $r = POSIX::round( ( $a * $r ) + ( ( 1 - $a ) * $bg_r ) );
+        $g = POSIX::round( ( $a * $g ) + ( ( 1 - $a ) * $bg_g ) );
+        $b = POSIX::round( ( $a * $b ) + ( ( 1 - $a ) * $bg_b ) );
+        return( [$r, $g, $b] );
+    };
+    
     local $check_colour = sub
     {
         my $col = shift( @_ );
@@ -457,87 +473,181 @@ sub colour_format
         my $code;
         my $light;
         ## Example: 'light red' or 'light_red'
-        if( $col =~ /(?<light>bright|light)[[:blank:]\_]+(?<colour>(?:[a-zA-Z]+|rgb[a]?\([[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*(?:\,[[:blank:]]*\d(?:\.\d+)?)?[[:blank:]]*\)))/i )
+        if( $col =~ /^(?:(?<light>bright|light)[[:blank:]\_]+)?
+        (?<colour>
+            (?:[a-zA-Z]+)(?:[[:blank:]]+\w+)?
+            |
+            (?<rgb_type>rgb[a]?)\([[:blank:]]*(?<red>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<green>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<blue>\d{1,3})
+            (?:[[:blank:]]*\,[[:blank:]]*(?<opacity>\d(?:\.\d+)?))?[[:blank:]]*
+            \)
+        )$/xi )
         {
-            ## $self->message( 3, "Light colour request '$col'" );
+            my %regexp = %+;
+            $self->message( 9, "Light colour request '$col'. Capture: ", sub{ $self->dumper( \%regexp ) } );
             ( $light, $col ) = ( $+{light}, $+{colour} );
-        }
-        if( $col =~ /(?<rgb_type>rgb[a]?)\([[:blank:]]*(?<red>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<green>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<blue>\d{1,3})[[:blank:]]*(?:\,[[:blank:]]*(?<opacity>\d(?:\.\d+)?))?[[:blank:]]*\)/i )
-        {
-            $col = CORE::sprintf( 'rgb(%03d%03d%03d)', $+{red}, $+{green}, $+{blue} );
-            ## $self->message( 3, "Ensuring proper formatting of rgb to '$col'." );
-            if( lc( $+{rgb_type} ) eq 'rgba' )
+            if( CORE::length( $+{rgb_type} ) &&
+                CORE::length( $+{red} ) &&
+                CORE::length( $+{green} ) &&
+                CORE::length( $+{blue} ) )
             {
-                $light = ( $+{opacity} < 1 );
+                if( $+{opacity} || $light )
+                {
+                    my $opacity = CORE::length( $+{opacity} )
+                        ? $+{opacity}
+                        : $light
+                            ? 0.5
+                            : 1;
+                    $col = CORE::sprintf( 'rgba(%03d%03d%03d,%.1f)', $+{red}, $+{green}, $+{blue}, $opacity );
+                }
+                else
+                {
+                    $col = CORE::sprintf( 'rgb(%03d%03d%03d)', $+{red}, $+{green}, $+{blue} );
+                }
+            }
+            else
+            {
+                $self->message( 9, "Colour '$col' is not rgb[a]" );
+            }
+        }
+        elsif( $col =~ /^(?<rgb_type>rgb[a]?)\([[:blank:]]*(?<red>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<green>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<blue>\d{1,3})[[:blank:]]*(?:\,[[:blank:]]*(?<opacity>\d(?:\.\d+)?))?[[:blank:]]*\)$/i )
+        {
+            if( $+{opacity} )
+            {
+                $col = CORE::sprintf( 'rgba(%03d%03d%03d,%.1f)', $+{red}, $+{green}, $+{blue}, $+{opacity} );
+            }
+            else
+            {
+                $col = CORE::sprintf( '%03d%03d%03d', $+{red}, $+{green}, $+{blue} );
             }
         }
         else
         {
-            ## $self->message( 3, "Colour '$col' failed to match our rgba regexp." );
+            $self->message( 9, "Colour '$col' failed to match our rgba regexp." );
         }
         
-        if( CORE::exists( $map->{ $col } ) )
+        my $col_ref;
+        if( $col =~ /^rgb[a]?\((?<red>\d{3})(?<green>\d{3})(?<blue>\d{3})\)$/i )
         {
-            ## $self->message( 3, "Setting up colour $col" );
-            $code = $map->{ $col };
-        }
-        elsif( $col =~ /^rgb\((?<rgb>\d{9})\)$/i )
-        {
-            ## $self->message( 3, "Got a rgb '$+{rgb}'. Trying to get the closest colour." );
-            my $colour = $self->colour_closest( $+{rgb} );
-            ## $self->message( 3, "Got the closest colour as being '$colour'." );
-            $code = $map->{ $colour } if( CORE::exists( $map->{ $colour } ) );
-            ## $self->message( 3, "Colour code found: '$code'." );
+            $col_ref = {};
+            %$col_ref = %+;
+            $self->message( 9, "Rgb colour '$+{red}', '$+{green}' and '$+{blue}' found: ", sub{ $self->dumper( $col_ref ) });
+            return({
+                _24bits => [@$col_ref{qw( red green blue )}],
+                _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
+            });
         }
         ## Treating opacity to make things lighter; not ideal, but standard scheme
-        elsif( $col =~ /^rgba\((?<rgb>\d{9})[[:blank:]]*\,[[:blank:]]*(?<opacity>\d(?:\.\d)?)\)$/i )
+        elsif( $col =~ /^rgba\((?<red>\d{3})(?<green>\d{3})(?<blue>\d{3})[[:blank:]]*\,[[:blank:]]*(?<opacity>\d(?:\.\d)?)\)$/i )
         {
-            ## $self->message( 3, "Got a rgb '$+{rgb}' and opacity '$+{opacity}'. Trying to get the closest colour." );
-            my $colour = $self->colour_closest( $+{rgb} );
-            $light = 1 if( $+{opactiy} < 1 );
-            ## $self->message( 3, "Got the closest colour as being '$colour'." );
-            $code = $map->{ $colour } if( CORE::exists( $map->{ $colour } ) );
+            $col_ref = {};
+            %$col_ref = %+;
+            $self->message( 9, "Rgba colour '$+{red}', '$+{green}' and '$+{blue}' found with opacity $+{opacity}: ", sub{ $self->dumper( $col_ref ) });
+            if( $+{opacity} )
+            {
+                my $opacity = $+{opacity};
+                $self->message( 9, "Opacity of $opacity found, applying the factor to the colour." );
+                my $bg;
+                if( $opts->{bgcolour} )
+                {
+                    $bg = $self->colour_to_rgb( $opts->{bgcolour} );
+                    $self->message( 9, "Calculating new rgb with opacity and background information: ", sub{ $self->dumper( $bg ) });
+                }
+                my $new_col = $colour_with_alpha->( @$col_ref{qw( red green blue )}, $opacity, $bg );
+                $self->message( 9, "New colour with opacity applied: ", sub{ $self->dumper( $new_col ) });
+                @$col_ref{qw( red green blue )} = @$new_col;
+                $self->message( 9, "Colour $+{red}, $+{green}, $+{blue} * $opacity => $col_ref->{red}, $col_red->{green}, $col_ref->{blue}" );
+            }
+            return({
+                _24bits => [@$col_ref{qw( red green blue )}],
+                _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
+            });
         }
-        my $is_bg = ( CORE::substr( $code, 0, 1 ) == 4 );
-        if( CORE::length( $code ) && $light )
+        elsif( $self->message( 9, "Checking if rgb value exists for colour '$col'" ) &&
+               ( $col_ref = $self->colour_to_rgb( $col ) ) )
         {
-            ## If the colour is a background colour, replace 4 by 10 (e.g.: 42 becomes 103)
-            ## and if foreground colour, replace 3 by 9
-            CORE::substr( $code, 0, 1 ) = ( $is_bg ? 10 : 9 );
+            $self->message( 9, "Setting up colour '$col' with data: ", sub{ $self->dumper( $col_ref ) });
+            ## $code = $map->{ $col };
+            return({
+                _24bits => [@$col_ref{qw( red green blue )}],
+                _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
+            });
         }
-        return( $code );
+        else
+        {
+            $self->message( 9, "Could not find a match for colour '$col'." );
+            return( {} );
+        }
+#         my $is_bg = ( CORE::substr( $code, 0, 1 ) == 4 );
+#         if( CORE::length( $code ) && $light )
+#         {
+#             ## If the colour is a background colour, replace 4 by 10 (e.g.: 42 becomes 103)
+#             ## and if foreground colour, replace 3 by 9
+#             CORE::substr( $code, 0, 1 ) = ( $is_bg ? 10 : 9 );
+#         }
+#         return( $code );
     };
     my $data = [];
     my $params = [];
-    if( $opts->{style} )
-    {
-        ## $self->message( 3, "Style '$opts->{style}' provided." );
-        my $those_styles = [CORE::split( /\|/, $opts->{style} )];
-        ## $self->message( 3, "Split styles: ", sub{ $self->dumper( $those_styles ) } );
-        foreach my $s ( @$those_styles )
-        {
-            ## $self->message( 3, "Adding style '$s'" ) if( CORE::exists( $styles->{lc($s)} ) );
-            CORE::push( @$params, $styles->{lc($s)} ) if( CORE::exists( $styles->{lc($s)} ) );
-        }
-    }
+    ## 8 bits parameters compatible
+    my $params8 = [];
     if( $opts->{colour} || $opts->{color} || $opts->{fgcolour} || $opts->{fgcolor} || $opts->{fg_colour} || $opts->{fg_color} )
     {
         $opts->{colour} ||= CORE::delete( $opts->{color} ) || CORE::delete( $opts->{fg_colour} ) || CORE::delete( $opts->{fg_color} ) || CORE::delete( $opts->{fgcolour} ) || CORE::delete( $opts->{fgcolor} );
-        my $col = $check_colour->( $opts->{colour}, $colours );
-        CORE::push( @$params, $col ) if( CORE::length( $col ) );
+        my $col_ref = $check_colour->( $opts->{colour}, $colours );
+        ## CORE::push( @$params, $col ) if( CORE::length( $col ) );
+        if( scalar( keys( %$col_ref ) ) )
+        {
+            $self->message( 9, "Foreground colour '$opts->{colour}' data are: ", sub{ $self->dumper( $col_ref ) });
+            CORE::push( @$params8, sprintf( '38;5;%d', $col_ref->{_8bits} ) );
+            CORE::push( @$params, sprintf( '38;2;%d;%d;%d', @{$col_ref->{_24bits}} ) );
+        }
+        else
+        {
+            $self->message( 9, "Could not resolve the foreground colour '$opts->{colour}'." );
+        }
     }
     if( $opts->{bgcolour} || $opts->{bgcolor} || $opts->{bg_colour} || $opts->{bg_color} )
     {
         $opts->{bgcolour} ||= CORE::delete( $opts->{bgcolor} ) || CORE::delete( $opts->{bg_colour} ) || CORE::delete( $opts->{bg_color} );
-        my $col = $check_colour->( $opts->{bgcolour}, $bg_colours );
-        CORE::push( @$params, $col ) if( CORE::length( $col ) );
+        my $col_ref = $check_colour->( $opts->{bgcolour}, $bg_colours );
+        ## CORE::push( @$params, $col ) if( CORE::length( $col ) );
+        if( scalar( keys( %$col_ref ) ) )
+        {
+            $self->message( 9, "Foreground colour '$opts->{bgcolour}' data are: ", sub{ $self->dumper( $col_ref ) });
+            CORE::push( @$params8, sprintf( '48;5;%d', $col_ref->{_8bits} ) );
+            CORE::push( @$params, sprintf( '48;2;%d;%d;%d', @{$col_ref->{_24bits}} ) );
+        }
+        else
+        {
+            $self->message( 9, "Could not resolve the background colour '$opts->{colour}'." );
+        }
     }
-    CORE::push( @$data, "\e[" . CORE::join( ';', @$params ) . "m" );
+    if( $opts->{style} )
+    {
+        ## $self->message( 9, "Style '$opts->{style}' provided." );
+        my $those_styles = [CORE::split( /\|/, $opts->{style} )];
+        ## $self->message( 9, "Split styles: ", sub{ $self->dumper( $those_styles ) } );
+        foreach my $s ( @$those_styles )
+        {
+            ## $self->message( 9, "Adding style '$s'" ) if( CORE::exists( $styles->{lc($s)} ) );
+            if( CORE::exists( $styles->{lc($s)} ) )
+            {
+                CORE::push( @$params, $styles->{lc($s)} );
+                ## We add the 8 bits compliant version only if any colour was provided, i.e.
+                ## This is not just a style definition
+                CORE::push( @$params8, $styles->{lc($s)} ) if( scalar( @$params8 ) );
+            }
+        }
+    }
+    CORE::push( @$data, "\e[" . CORE::join( ';', @$params8 ) . "m" ) if( scalar( @$params8 ) );
+    CORE::push( @$data, "\e[" . CORE::join( ';', @$params ) . "m" ) if( scalar( @$params ) );
+    $self->message( 9, "Pre final colour data contains: ", sub{ $self->dumper( $data ) });
     ## If the text contains libe breaks, we must stop the formatting before, or else there would be an ugly formatting on the entire screen following the line break
     if( scalar( @$params ) && $opts->{text} =~ /\n+/ )
     {
         my $text_parts = [CORE::split( /\n/, $opts->{text} )];
         my $fmt = CORE::join( '', @$data );
+        my $fmt8 = CORE::join( '', @$data8 );
         for( my $i = 0; $i < scalar( @$text_parts ); $i++ )
         {
             ## Empty due to \n repeated
@@ -550,22 +660,24 @@ sub colour_format
     else
     {
         CORE::push( @$data, $opts->{text} );
-        CORE::push( @$data, $normal ) if( scalar( @$params ) );
+        CORE::push( @$data, $normal, $normal ) if( scalar( @$params ) );
     }
     ## $self->message( "Returning '", quotemeta( CORE::join( '', @$data ) ), "'" );
     return( CORE::join( '', @$data ) );
 }
+
+sub colour_open { return( shift->_set_get( 'colour_open', @_ ) ); }
 
 sub colour_parse
 {
     my $self = shift( @_ );
     my $txt  = join( '', @_ );
     my $this  = $self->_obj2h;
-    my $open  = $this->{colour_open} || '{';
-    my $close = $this->{colour_close} || '}';
-    ## $self->message( 3, "Color open is '${open}' and close is '${close}'." );
-    ## $self->message( 3, "Parsing text '$txt'" );
-    my $colour_re = qr/(?:(?:bright|light)[[:blank:]])?(?:[a-zA-Z]+|rgb[a]?\([[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*(?:\,[[:blank:]]*\d(?:\.\d)?)?[[:blank:]]*\))/;
+    my $open  = $this->{colour_open} || COLOUR_OPEN;
+    my $close = $this->{colour_close} || COLOUR_CLOSE;
+    $self->message( 9, "Color open is '${open}' and close is '${close}'." );
+        ## $self->message( 3, "Parsing text '$txt'" );
+    my $colour_re = qr/(?:(?:bright|light)[[:blank:]])?(?:[a-zA-Z]+(?:[[:blank:]]+[\w\-]+)?|rgb[a]?\([[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*(?:\,[[:blank:]]*\d(?:\.\d)?)?[[:blank:]]*\))/;
     my $style_re = qr/(?:bold|faint|italic|underline|blink|reverse|conceal|strike)/;
     local $parse = sub
     {
@@ -580,23 +692,24 @@ sub colour_parse
         my $data = [];
         my $chunk_len = CORE::length( $$chunk );
         my $i;
-        ## $self->message( 3, "Parsing text $$chunk starting from position $start" );
+        $self->message( 9, "Parsing text $$chunk starting from position $start" );
         for( $i = $start; $i < $chunk_len; $i++ )
         {
             my $c = CORE::substr( $$chunk, $i, 1 );
-            # $self->message( 3, "Checking character '$c' at position $i" );
+            # $self->message( 9, "Checking character '$c' at position $i" );
             if( $c eq $open )
             {
                 ## Is this the closing element?
                 if( CORE::substr( $$chunk, $i, 3 ) eq "${open}/${close}" )
                 {
-                    ## $self->message( 3, "Found closing element." );
+                    $self->message( 9, "Found closing element and buffered text '$def->{text}' and definition is: ", sub{ $self->dumper( $def ) } );
                     ## $def includes the property text containing concatenated text
                     my $res = CORE::length( $def->{text} ) ? $self->colour_format( $def ) : '';
+                    $self->message( 9, "Resulting formatted text is: '$res'." );
                     ## If this is a child, we return right now, the section we processed
                     if( $opts->{is_child} )
                     {
-                        ## $self->message( 3, "Being a child, return formatted text '$res' and position ", $i + 3, " for text '$$chunk'" );
+                        $self->message( 9, "Being a child, return formatted text '$res' and position ", $i + 3, " for text '$$chunk'" );
                         return({ text => $res, position => $i + 3 });
                     }
                     ## Otherwise we push it to the data stack
@@ -612,10 +725,10 @@ sub colour_parse
                 ## this means this is an embedded text, we call $parse recursively
                 elsif( CORE::scalar( keys( %$def ) ) )
                 {
-                    ## $self->message( 3, "Found a sub style, calling parse recursively starting from position $i. \$def has ", sub{ $self->dumper( $def ) } );
+                    $self->message( 9, "Found a sub style, calling parse recursively starting from position $i. \$def has ", sub{ $self->dumper( $def ) } );
                     my $res = $parse->({ text => $chunk, start => $i, is_child => 1 });
                     $def->{text} .= $res->{text};
-                    ## $self->message( 3, "Resuming parsing at position $res->{position} in text '$$chunk'." );
+                    ## $self->message( 9, "Resuming parsing at position $res->{position} in text '$$chunk'." );
                     $i = $res->{position};
                     $i--;
                     next;
@@ -626,14 +739,14 @@ sub colour_parse
                 {
                     next unless( CORE::substr( $$chunk, $j, 1 ) eq $close );
                     $this_def = CORE::substr( $$chunk, $i, ( $j + 1 ) - $i );
-                    ## $self->message( 3, "Found a style at position $i, ending at position ", ( $j + 1 ), ": '$this_def'" );
+                    $self->message( 9, "Found a style at position $i, ending at position ", ( $j + 1 ), ": '$this_def'" );
                     
                     if( $this_def =~ /^\Q${open}\E[[:blank:]]*(?:(?<style1>$style_re)[[:blank:]]+)?(?<fg_colour>$colour_re)(?:[[:blank:]]+(?<style2>$style_re))?(?:[[:blank:]]+on[[:blank:]]+(?<bg_colour>$colour_re))?[[:blank:]]*\Q${close}\E$/i )
                     {
                         $style = $+{style1} || $+{style2};
                         $fg = $+{fg_colour};
                         $bg = $+{bg_colour};
-                        ## $self->message( 3, "Found style '$style', colour '$fg' and background colour '$bg'." );
+                        $self->message( 9, "Found style '$style', colour '$fg' and background colour '$bg'." );
                         $def = 
                         {
                         style => $style,
@@ -643,7 +756,7 @@ sub colour_parse
                     }
                     else
                     {
-                        ## $self->message( 3, "Evaluating the styling '$this_def'." );
+                        $self->message( 9, "Evaluating the styling '$this_def'." );
                         $def = eval( $this_def );
                         if( $@ || ref( $def ) ne 'HASH' )
                         {
@@ -662,7 +775,7 @@ sub colour_parse
                 }
                 if( !CORE::length( $this_def ) )
                 {
-                    ## $self->message( 3, "Reaching the end of the string and could not find a closeing curly bracket." );
+                    $self->message( 9, "Reaching the end of the string and could not find a closing curly bracket \"${close}\"." );
                     $self->error( "Failed to find a closing curly bracket for opening style." );
                     $def->{error} = 'no closeing curly bracket';
                 }
@@ -673,18 +786,75 @@ sub colour_parse
             elsif( scalar( keys( %$def ) ) )
             {
                 $def->{text} .= $c;
-                ## $self->message( 3, "Text buffer now is '$def->{text}'." );
+                ## $self->message( 9, "Text buffer now is '$def->{text}'." );
             }
             else
             {
                 CORE::push( @$data, $c );
-                ## $self->message( 3, "Adding text outside formatting. \$data now is: '", join( '', @$data ), "'." );
+                ## $self->message( 9, "Adding text outside formatting. \$data now is: '", join( '', @$data ), "'." );
             }
         }
         ## Return the text with replacement performed
+        $self->message( 9, "Final formatted text is: ", quotemeta( CORE::join( '', @$data ) ) );
         return( $opts->{is_child} ? { text => CORE::join( '', @$data ), position => $i } : CORE::join( '', @$data ) );
     };
     return( $parse->({ text => \$txt }) );
+}
+
+sub colour_to_rgb
+{
+    my $self    = shift( @_ );
+    my $colour  = lc( shift( @_ ) );
+    my $this  = $self->_obj2h;
+    my( $red, $green, $blue ) = ( '', '', '' );
+    $self->message( 9, "Checking rgb value for '$colour'. Called from line ", (caller)[2] );
+    if( $colour =~ /^[A-Za-z]+([\w\-]+)*([[:blank:]]+\w+)?$/ )
+    {
+        $self->message( 9, "Checking colour '$colour' as string. Looking up its rgb value." );
+        if( !scalar( keys( %$COLOUR_NAME_TO_RGB ) ) )
+        {
+            $self->message( 9, "Processing colour map in <DATA> section." );
+            my $colour_data = $self->__colour_data;
+            $COLOUR_NAME_TO_RGB = eval( $colour_data );
+            if( $@ )
+            {
+                return( $self->error( "An error occurred loading data from __colour_data: $@" ) );
+            }
+        }
+        if( CORE::exists( $COLOUR_NAME_TO_RGB->{ $colour } ) )
+        {
+            ( $red, $green, $blue ) = @{$COLOUR_NAME_TO_RGB->{ $colour }};
+            $self->message( 9, "Found rgb '$red, $green, $blue' for colour '$colour'." );
+        }
+        else
+        {
+            $self->message( 9, "Could not find colour '$colour' in our colour map." );
+            return( '' );
+        }
+    }
+    ## Colour all in decimal??
+    elsif( $colour =~ /^\d{9}$/ )
+    {
+        ## $self->message( 9, "Got colour all in decimal. Less work to do..." );
+        $red   = substr( $colour, 0, 3 );
+        $green = substr( $colour, 3, 3 );
+        $blue  = substr( $colour, 6, 3 );
+    }
+    ## Colour in hexadecimal, convert it
+    elsif( $colour =~ /^[A-F0-9]+$/ )
+    {
+        $red   = hex( substr( $colour, 0, 2 ) );
+        $green = hex( substr( $colour, 2, 2 ) );
+        $blue  = hex( substr( $colour, 4, 2 ) );
+    }
+    ## Clueless
+    else
+    {
+        $self->message( 9, "Clueless about what to do with colour '$colour'." );
+        ## Not undef, but rather empty string. Undef is associated with an error
+        return( '' );
+    }
+    return({ red => $red, green => $green, blue => $blue });
 }
 
 sub coloured
@@ -695,19 +865,19 @@ sub coloured
     my $this  = $self->_obj2h;
     my( $style, $fg, $bg );
     ## my $colour_re = qr/(?:(?:bright|light)[[:blank:]])?[a-zA-Z]+/;
-    my $colour_re = qr/(?:(?:bright|light)[[:blank:]])?(?:[a-zA-Z]+|rgb[a]?\([[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*(?:\,[[:blank:]]*\d(?:\.\d)?)?[[:blank:]]*\))/;
+    my $colour_re = qr/(?:(?:bright|light)[[:blank:]])?(?:[a-zA-Z]+(?:[[:blank:]]+[\w\-]+)?|rgb[a]?\([[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*(?:\,[[:blank:]]*\d(?:\.\d)?)?[[:blank:]]*\))/;
     my $style_re = qr/(?:bold|faint|italic|underline|blink|reverse|conceal|strike)/;
     if( $pref =~ /^(?:(?<style1>$style_re)[[:blank:]]+)?(?<fg_colour>$colour_re)(?:[[:blank:]]+(?<style2>$style_re))?(?:[[:blank:]]+on[[:blank:]]+(?<bg_colour>$colour_re))?$/i )
     {
         $style = $+{style1} || $+{style2};
         $fg = $+{fg_colour};
         $bg = $+{bg_colour};
-        ## $self->message( 3, "Found style '$style', colour '$fg' and background colour '$bg'." );
+        ## $self->message( 9, "Found style '$style', colour '$fg' and background colour '$bg'." );
         return( $self->colour_format({ text => $text, style => $style, colour => $fg, bg_colour => $bg }) );
     }
     else
     {
-        $self->message( 3, "No match." );
+        $self->message( 9, "No match." );
         return( '' );
     }
 }
@@ -842,6 +1012,7 @@ sub error
             $args->{message} = join( '', map( ( ref( $_ ) eq 'CODE' && !$this->{_msg_no_exec_sub} ) ? $_->() : $_, @_ ) );
         }
         $args->{message} = substr( $args->{message}, 0, $this->{error_max_length} ) if( $this->{error_max_length} > 0 && length( $args->{message} ) > $this->{error_max_length} );
+        # Reset it
         $this->{_msg_no_exec_sub} = 0;
         my $n = 1;
         # $n++ while( ( caller( $n ) )[0] eq 'Module::Generic' );
@@ -853,25 +1024,40 @@ sub error
         
         ## Get the warnings status of the caller. We use caller(1) to skip one frame further, ie our caller's caller
         ## This can be changed by using 'no warnings'
-        my $call_offset = 0;
-        ## my $bitmask = '';
-        while( my @call_data = caller( $call_offset ) )
+        my $should_display_warning = 0;
+        my $no_use_warnings = 1;
+        ## Try to get the warnings status if is enabled at all.
+        try
         {
-            ## printf( STDERR "[$call_offset] In file $call_data[1] at line $call_data[2] from subroutine %s has bitmask $call_data[9]\n", (caller($call_offset+1))[3] );
-            unless( $call_offset > 0 && $call_data[0] ne $class && (caller($call_offset-1))[0] eq $class )
-            {
-                ## print( STDERR "Skipping package $call_data[0]\n" );
-                $call_offset++;
-                next;
-            }
-            last if( $call_data[9] || ( $call_offset > 0 && (caller($call_offset-1))[0] ne $class ) );
-            $call_offset++;
+            $should_display_warning = $self->_warnings_is_enabled;
+            $no_use_warnings = 0;
         }
-        ## print( STDERR "Using offset $call_offset with bitmask ", ( caller( $call_offset ) )[9], "\n" );
-        my $bitmask = ( caller( $call_offset ) )[9];
-        my $offset = $warnings::Offsets{uninitialized};
-        ## $self->message( 3, "Caller (2)'s bitmask is '$bitmask', warnings offset is '$offset' and vector is '", vec( $bitmask, $offset, 1 ), "'." );
-        my $should_display_warning = vec( $bitmask, $offset, 1 );
+        catch( $e )
+        {
+            # 
+        }
+        
+        if( $no_use_warnings )
+        {
+            my $call_offset = 0;
+            while( my @call_data = caller( $call_offset ) )
+            {
+                ## printf( STDERR "[$call_offset] In file $call_data[1] at line $call_data[2] from subroutine %s has bitmask $call_data[9]\n", (caller($call_offset+1))[3] );
+                unless( $call_offset > 0 && $call_data[0] ne $class && (caller($call_offset-1))[0] eq $class )
+                {
+                    ## print( STDERR "Skipping package $call_data[0]\n" );
+                    $call_offset++;
+                    next;
+                }
+                last if( $call_data[9] || ( $call_offset > 0 && (caller($call_offset-1))[0] ne $class ) );
+                $call_offset++;
+            }
+            ## print( STDERR "Using offset $call_offset with bitmask ", ( caller( $call_offset ) )[9], "\n" );
+            my $bitmask = ( caller( $call_offset ) )[9];
+            my $offset = $warnings::Offsets{uninitialized};
+            ## $self->message( 3, "Caller (2)'s bitmask is '$bitmask', warnings offset is '$offset' and vector is '", vec( $bitmask, $offset, 1 ), "'." );
+            $should_display_warning = vec( $bitmask, $offset, 1 );
+        }
         
         my $r;
         $r = Apache2::RequestUtil->request if( $MOD_PERL );
@@ -922,7 +1108,10 @@ sub error
         ## return( undef() );
         ## return;
         ## As of 2019-10-13, Module::Generic version 0.6, we use this special package Module::Generic::Null to be returned in chain without perl causing the error that a method was called on an undefined value
-        if( want( 'OBJECT' ) )
+        ## 2020-05-12: Added the no_return_null_object to instruct not to return a null object
+        ## This is especially needed when an error is called from TIEHASH that returns a special object.
+        ## A Null object would trigger a fatal perl segmentation fault
+        if( !$args->{no_return_null_object} && want( 'OBJECT' ) )
         {
             my $null = Module::Generic::Null->new( $o, { debug => $this->{debug}, has_error => 1 });
             rreturn( $null );
@@ -954,8 +1143,8 @@ sub init
     $this->{debug}   = ${ $pkg . '::DEBUG' } if( !length( $this->{debug} ) );
     $this->{version} = ${ $pkg . '::VERSION' } if( !defined( $this->{version} ) );
     $this->{level}   = 0;
-    $self->{colour_open} = '{';
-    $self->{colour_close} = '}';
+    $self->{colour_open} = COLOUR_OPEN;
+    $self->{colour_close} = COLOUR_CLOSE;
     ## If no debug level was provided when calling message, this level will be assumed
     ## Example: message( "Hello" );
     ## If _message_default_level was set to 3, this would be equivalent to message( 3, "Hello" )
@@ -966,11 +1155,13 @@ sub init
         $this->{ $this->{_data_repo} } = {} if( !$this->{ $this->{_data_repo} } );
         $data = $this->{ $this->{_data_repo} };
     }
+    @_ = () if( @_ == 1 && !defined( $_[0] ) );
     if( @_ )
     {
         my @args = @_;
         my $vals;
-        if( ref( $args[0] ) eq 'HASH' )
+        if( ref( $args[0] ) eq 'HASH' ||
+            ( Scalar::Util::blessed( $args[0] ) && $args[0]->isa( 'Module::Generic::Hash' ) ) )
         {
             ## $self->_message( 3, "Got an hash ref" );
             my $h = shift( @args );
@@ -1054,15 +1245,15 @@ sub init
                 {
                     if( ref( $data->{ $name } ) eq 'ARRAY' )
                     {
-                        return( $self->error( "$name parameter expects an array reference, but instead got '$val'." ) ) if( ref( $val ) ne 'ARRAY' );
+                        return( $self->error( "$name parameter expects an array reference, but instead got '$val'." ) ) if( Scalar::Util::reftype( $val ) ne 'ARRAY' );
                     }
                     elsif( ref( $data->{ $name } ) eq 'HASH' )
                     {
-                        return( $self->error( "$name parameter expects an hash reference, but instead got '$val'." ) ) if( ref( $val ) ne 'HASH' );
+                        return( $self->error( "$name parameter expects an hash reference, but instead got '$val'." ) ) if( Scalar::Util::reftype( $val ) ne 'HASH' );
                     }
                     elsif( ref( $data->{ $name } ) eq 'SCALAR' )
                     {
-                        return( $self->error( "$name parameter expects a scalar reference, but instead got '$val'." ) ) if( ref( $val ) ne 'SCALAR' );
+                        return( $self->error( "$name parameter expects a scalar reference, but instead got '$val'." ) ) if( Scalar::Util::reftype( $val ) ne 'SCALAR' );
                     }
                 }
             }
@@ -1416,7 +1607,7 @@ sub message_check
                 ( length( $target_re ) && $class =~ /^$target_re$/ && ${ $class . '::GLOBAL_DEBUG' } >= $message_level ) )
             {
                 ## print( STDERR ref( $self ) . "::message_check(): debug is '$hash->{debug}', verbose '$hash->{verbose}', DEBUG '", ${ $class . '::DEBUG' }, "', debug_level = $hash->{debug_level}\n" );
-                return( \@_ );
+                return( [ @_ ] );
             }
             else
             {
@@ -1707,6 +1898,16 @@ sub will
     return( undef() );
 }
 
+## Initially those data were stored after the __END__, but it seems some module is interfering with <DATA>
+## and so those data could not be loaded reliably
+## This is called once by colour_to_rgb to generate the hash reference COLOUR_NAME_TO_RGB
+sub __colour_data
+{
+    my $colour_data = <<'EOT';
+{'alice blue' => ['240','248','255'],'aliceblue' => ['240','248','255'],'antique white' => ['250','235','215'],'antiquewhite' => ['250','235','215'],'antiquewhite1' => ['255','239','219'],'antiquewhite2' => ['238','223','204'],'antiquewhite3' => ['205','192','176'],'antiquewhite4' => ['139','131','120'],'aquamarine' => ['127','255','212'],'aquamarine1' => ['127','255','212'],'aquamarine2' => ['118','238','198'],'aquamarine3' => ['102','205','170'],'aquamarine4' => ['69','139','116'],'azure' => ['240','255','255'],'azure1' => ['240','255','255'],'azure2' => ['224','238','238'],'azure3' => ['193','205','205'],'azure4' => ['131','139','139'],'beige' => ['245','245','220'],'bisque' => ['255','228','196'],'bisque1' => ['255','228','196'],'bisque2' => ['238','213','183'],'bisque3' => ['205','183','158'],'bisque4' => ['139','125','107'],'black' => ['0','0','0'],'blanched almond' => ['255','235','205'],'blanchedalmond' => ['255','235','205'],'blue' => ['0','0','255'],'blue violet' => ['138','43','226'],'blue1' => ['0','0','255'],'blue2' => ['0','0','238'],'blue3' => ['0','0','205'],'blue4' => ['0','0','139'],'blueviolet' => ['138','43','226'],'brown' => ['165','42','42'],'brown1' => ['255','64','64'],'brown2' => ['238','59','59'],'brown3' => ['205','51','51'],'brown4' => ['139','35','35'],'burlywood' => ['222','184','135'],'burlywood1' => ['255','211','155'],'burlywood2' => ['238','197','145'],'burlywood3' => ['205','170','125'],'burlywood4' => ['139','115','85'],'cadet blue' => ['95','158','160'],'cadetblue' => ['95','158','160'],'cadetblue1' => ['152','245','255'],'cadetblue2' => ['142','229','238'],'cadetblue3' => ['122','197','205'],'cadetblue4' => ['83','134','139'],'chartreuse' => ['127','255','0'],'chartreuse1' => ['127','255','0'],'chartreuse2' => ['118','238','0'],'chartreuse3' => ['102','205','0'],'chartreuse4' => ['69','139','0'],'chocolate' => ['210','105','30'],'chocolate1' => ['255','127','36'],'chocolate2' => ['238','118','33'],'chocolate3' => ['205','102','29'],'chocolate4' => ['139','69','19'],'coral' => ['255','127','80'],'coral1' => ['255','114','86'],'coral2' => ['238','106','80'],'coral3' => ['205','91','69'],'coral4' => ['139','62','47'],'cornflower blue' => ['100','149','237'],'cornflowerblue' => ['100','149','237'],'cornsilk' => ['255','248','220'],'cornsilk1' => ['255','248','220'],'cornsilk2' => ['238','232','205'],'cornsilk3' => ['205','200','177'],'cornsilk4' => ['139','136','120'],'cyan' => ['0','255','255'],'cyan1' => ['0','255','255'],'cyan2' => ['0','238','238'],'cyan3' => ['0','205','205'],'cyan4' => ['0','139','139'],'dark blue' => ['0','0','139'],'dark cyan' => ['0','139','139'],'dark goldenrod' => ['184','134','11'],'dark gray' => ['169','169','169'],'dark green' => ['0','100','0'],'dark grey' => ['169','169','169'],'dark khaki' => ['189','183','107'],'dark magenta' => ['139','0','139'],'dark olive green' => ['85','107','47'],'dark orange' => ['255','140','0'],'dark orchid' => ['153','50','204'],'dark red' => ['139','0','0'],'dark salmon' => ['233','150','122'],'dark sea green' => ['143','188','143'],'dark slate blue' => ['72','61','139'],'dark slate gray' => ['47','79','79'],'dark slate grey' => ['47','79','79'],'dark turquoise' => ['0','206','209'],'dark violet' => ['148','0','211'],'darkblue' => ['0','0','139'],'darkcyan' => ['0','139','139'],'darkgoldenrod' => ['184','134','11'],'darkgoldenrod1' => ['255','185','15'],'darkgoldenrod2' => ['238','173','14'],'darkgoldenrod3' => ['205','149','12'],'darkgoldenrod4' => ['139','101','8'],'darkgray' => ['169','169','169'],'darkgreen' => ['0','100','0'],'darkgrey' => ['169','169','169'],'darkkhaki' => ['189','183','107'],'darkmagenta' => ['139','0','139'],'darkolivegreen' => ['85','107','47'],'darkolivegreen1' => ['202','255','112'],'darkolivegreen2' => ['188','238','104'],'darkolivegreen3' => ['162','205','90'],'darkolivegreen4' => ['110','139','61'],'darkorange' => ['255','140','0'],'darkorange1' => ['255','127','0'],'darkorange2' => ['238','118','0'],'darkorange3' => ['205','102','0'],'darkorange4' => ['139','69','0'],'darkorchid' => ['153','50','204'],'darkorchid1' => ['191','62','255'],'darkorchid2' => ['178','58','238'],'darkorchid3' => ['154','50','205'],'darkorchid4' => ['104','34','139'],'darkred' => ['139','0','0'],'darksalmon' => ['233','150','122'],'darkseagreen' => ['143','188','143'],'darkseagreen1' => ['193','255','193'],'darkseagreen2' => ['180','238','180'],'darkseagreen3' => ['155','205','155'],'darkseagreen4' => ['105','139','105'],'darkslateblue' => ['72','61','139'],'darkslategray' => ['47','79','79'],'darkslategray1' => ['151','255','255'],'darkslategray2' => ['141','238','238'],'darkslategray3' => ['121','205','205'],'darkslategray4' => ['82','139','139'],'darkslategrey' => ['47','79','79'],'darkturquoise' => ['0','206','209'],'darkviolet' => ['148','0','211'],'deep pink' => ['255','20','147'],'deep sky blue' => ['0','191','255'],'deeppink' => ['255','20','147'],'deeppink1' => ['255','20','147'],'deeppink2' => ['238','18','137'],'deeppink3' => ['205','16','118'],'deeppink4' => ['139','10','80'],'deepskyblue' => ['0','191','255'],'deepskyblue1' => ['0','191','255'],'deepskyblue2' => ['0','178','238'],'deepskyblue3' => ['0','154','205'],'deepskyblue4' => ['0','104','139'],'dim gray' => ['105','105','105'],'dim grey' => ['105','105','105'],'dimgray' => ['105','105','105'],'dimgrey' => ['105','105','105'],'dodger blue' => ['30','144','255'],'dodgerblue' => ['30','144','255'],'dodgerblue1' => ['30','144','255'],'dodgerblue2' => ['28','134','238'],'dodgerblue3' => ['24','116','205'],'dodgerblue4' => ['16','78','139'],'firebrick' => ['178','34','34'],'firebrick1' => ['255','48','48'],'firebrick2' => ['238','44','44'],'firebrick3' => ['205','38','38'],'firebrick4' => ['139','26','26'],'floral white' => ['255','250','240'],'floralwhite' => ['255','250','240'],'forest green' => ['34','139','34'],'forestgreen' => ['34','139','34'],'gainsboro' => ['220','220','220'],'ghost white' => ['248','248','255'],'ghostwhite' => ['248','248','255'],'gold' => ['255','215','0'],'gold1' => ['255','215','0'],'gold2' => ['238','201','0'],'gold3' => ['205','173','0'],'gold4' => ['139','117','0'],'goldenrod' => ['218','165','32'],'goldenrod1' => ['255','193','37'],'goldenrod2' => ['238','180','34'],'goldenrod3' => ['205','155','29'],'goldenrod4' => ['139','105','20'],'gray' => ['190','190','190'],'gray0' => ['0','0','0'],'gray1' => ['3','3','3'],'gray10' => ['26','26','26'],'gray100' => ['255','255','255'],'gray11' => ['28','28','28'],'gray12' => ['31','31','31'],'gray13' => ['33','33','33'],'gray14' => ['36','36','36'],'gray15' => ['38','38','38'],'gray16' => ['41','41','41'],'gray17' => ['43','43','43'],'gray18' => ['46','46','46'],'gray19' => ['48','48','48'],'gray2' => ['5','5','5'],'gray20' => ['51','51','51'],'gray21' => ['54','54','54'],'gray22' => ['56','56','56'],'gray23' => ['59','59','59'],'gray24' => ['61','61','61'],'gray25' => ['64','64','64'],'gray26' => ['66','66','66'],'gray27' => ['69','69','69'],'gray28' => ['71','71','71'],'gray29' => ['74','74','74'],'gray3' => ['8','8','8'],'gray30' => ['77','77','77'],'gray31' => ['79','79','79'],'gray32' => ['82','82','82'],'gray33' => ['84','84','84'],'gray34' => ['87','87','87'],'gray35' => ['89','89','89'],'gray36' => ['92','92','92'],'gray37' => ['94','94','94'],'gray38' => ['97','97','97'],'gray39' => ['99','99','99'],'gray4' => ['10','10','10'],'gray40' => ['102','102','102'],'gray41' => ['105','105','105'],'gray42' => ['107','107','107'],'gray43' => ['110','110','110'],'gray44' => ['112','112','112'],'gray45' => ['115','115','115'],'gray46' => ['117','117','117'],'gray47' => ['120','120','120'],'gray48' => ['122','122','122'],'gray49' => ['125','125','125'],'gray5' => ['13','13','13'],'gray50' => ['127','127','127'],'gray51' => ['130','130','130'],'gray52' => ['133','133','133'],'gray53' => ['135','135','135'],'gray54' => ['138','138','138'],'gray55' => ['140','140','140'],'gray56' => ['143','143','143'],'gray57' => ['145','145','145'],'gray58' => ['148','148','148'],'gray59' => ['150','150','150'],'gray6' => ['15','15','15'],'gray60' => ['153','153','153'],'gray61' => ['156','156','156'],'gray62' => ['158','158','158'],'gray63' => ['161','161','161'],'gray64' => ['163','163','163'],'gray65' => ['166','166','166'],'gray66' => ['168','168','168'],'gray67' => ['171','171','171'],'gray68' => ['173','173','173'],'gray69' => ['176','176','176'],'gray7' => ['18','18','18'],'gray70' => ['179','179','179'],'gray71' => ['181','181','181'],'gray72' => ['184','184','184'],'gray73' => ['186','186','186'],'gray74' => ['189','189','189'],'gray75' => ['191','191','191'],'gray76' => ['194','194','194'],'gray77' => ['196','196','196'],'gray78' => ['199','199','199'],'gray79' => ['201','201','201'],'gray8' => ['20','20','20'],'gray80' => ['204','204','204'],'gray81' => ['207','207','207'],'gray82' => ['209','209','209'],'gray83' => ['212','212','212'],'gray84' => ['214','214','214'],'gray85' => ['217','217','217'],'gray86' => ['219','219','219'],'gray87' => ['222','222','222'],'gray88' => ['224','224','224'],'gray89' => ['227','227','227'],'gray9' => ['23','23','23'],'gray90' => ['229','229','229'],'gray91' => ['232','232','232'],'gray92' => ['235','235','235'],'gray93' => ['237','237','237'],'gray94' => ['240','240','240'],'gray95' => ['242','242','242'],'gray96' => ['245','245','245'],'gray97' => ['247','247','247'],'gray98' => ['250','250','250'],'gray99' => ['252','252','252'],'green' => ['0','255','0'],'green yellow' => ['173','255','47'],'green1' => ['0','255','0'],'green2' => ['0','238','0'],'green3' => ['0','205','0'],'green4' => ['0','139','0'],'greenyellow' => ['173','255','47'],'grey' => ['190','190','190'],'grey0' => ['0','0','0'],'grey1' => ['3','3','3'],'grey10' => ['26','26','26'],'grey100' => ['255','255','255'],'grey11' => ['28','28','28'],'grey12' => ['31','31','31'],'grey13' => ['33','33','33'],'grey14' => ['36','36','36'],'grey15' => ['38','38','38'],'grey16' => ['41','41','41'],'grey17' => ['43','43','43'],'grey18' => ['46','46','46'],'grey19' => ['48','48','48'],'grey2' => ['5','5','5'],'grey20' => ['51','51','51'],'grey21' => ['54','54','54'],'grey22' => ['56','56','56'],'grey23' => ['59','59','59'],'grey24' => ['61','61','61'],'grey25' => ['64','64','64'],'grey26' => ['66','66','66'],'grey27' => ['69','69','69'],'grey28' => ['71','71','71'],'grey29' => ['74','74','74'],'grey3' => ['8','8','8'],'grey30' => ['77','77','77'],'grey31' => ['79','79','79'],'grey32' => ['82','82','82'],'grey33' => ['84','84','84'],'grey34' => ['87','87','87'],'grey35' => ['89','89','89'],'grey36' => ['92','92','92'],'grey37' => ['94','94','94'],'grey38' => ['97','97','97'],'grey39' => ['99','99','99'],'grey4' => ['10','10','10'],'grey40' => ['102','102','102'],'grey41' => ['105','105','105'],'grey42' => ['107','107','107'],'grey43' => ['110','110','110'],'grey44' => ['112','112','112'],'grey45' => ['115','115','115'],'grey46' => ['117','117','117'],'grey47' => ['120','120','120'],'grey48' => ['122','122','122'],'grey49' => ['125','125','125'],'grey5' => ['13','13','13'],'grey50' => ['127','127','127'],'grey51' => ['130','130','130'],'grey52' => ['133','133','133'],'grey53' => ['135','135','135'],'grey54' => ['138','138','138'],'grey55' => ['140','140','140'],'grey56' => ['143','143','143'],'grey57' => ['145','145','145'],'grey58' => ['148','148','148'],'grey59' => ['150','150','150'],'grey6' => ['15','15','15'],'grey60' => ['153','153','153'],'grey61' => ['156','156','156'],'grey62' => ['158','158','158'],'grey63' => ['161','161','161'],'grey64' => ['163','163','163'],'grey65' => ['166','166','166'],'grey66' => ['168','168','168'],'grey67' => ['171','171','171'],'grey68' => ['173','173','173'],'grey69' => ['176','176','176'],'grey7' => ['18','18','18'],'grey70' => ['179','179','179'],'grey71' => ['181','181','181'],'grey72' => ['184','184','184'],'grey73' => ['186','186','186'],'grey74' => ['189','189','189'],'grey75' => ['191','191','191'],'grey76' => ['194','194','194'],'grey77' => ['196','196','196'],'grey78' => ['199','199','199'],'grey79' => ['201','201','201'],'grey8' => ['20','20','20'],'grey80' => ['204','204','204'],'grey81' => ['207','207','207'],'grey82' => ['209','209','209'],'grey83' => ['212','212','212'],'grey84' => ['214','214','214'],'grey85' => ['217','217','217'],'grey86' => ['219','219','219'],'grey87' => ['222','222','222'],'grey88' => ['224','224','224'],'grey89' => ['227','227','227'],'grey9' => ['23','23','23'],'grey90' => ['229','229','229'],'grey91' => ['232','232','232'],'grey92' => ['235','235','235'],'grey93' => ['237','237','237'],'grey94' => ['240','240','240'],'grey95' => ['242','242','242'],'grey96' => ['245','245','245'],'grey97' => ['247','247','247'],'grey98' => ['250','250','250'],'grey99' => ['252','252','252'],'honeydew' => ['240','255','240'],'honeydew1' => ['240','255','240'],'honeydew2' => ['224','238','224'],'honeydew3' => ['193','205','193'],'honeydew4' => ['131','139','131'],'hot pink' => ['255','105','180'],'hotpink' => ['255','105','180'],'hotpink1' => ['255','110','180'],'hotpink2' => ['238','106','167'],'hotpink3' => ['205','96','144'],'hotpink4' => ['139','58','98'],'indian red' => ['205','92','92'],'indianred' => ['205','92','92'],'indianred1' => ['255','106','106'],'indianred2' => ['238','99','99'],'indianred3' => ['205','85','85'],'indianred4' => ['139','58','58'],'ivory' => ['255','255','240'],'ivory1' => ['255','255','240'],'ivory2' => ['238','238','224'],'ivory3' => ['205','205','193'],'ivory4' => ['139','139','131'],'khaki' => ['240','230','140'],'khaki1' => ['255','246','143'],'khaki2' => ['238','230','133'],'khaki3' => ['205','198','115'],'khaki4' => ['139','134','78'],'lavender' => ['230','230','250'],'lavender blush' => ['255','240','245'],'lavenderblush' => ['255','240','245'],'lavenderblush1' => ['255','240','245'],'lavenderblush2' => ['238','224','229'],'lavenderblush3' => ['205','193','197'],'lavenderblush4' => ['139','131','134'],'lawn green' => ['124','252','0'],'lawngreen' => ['124','252','0'],'lemon chiffon' => ['255','250','205'],'lemonchiffon' => ['255','250','205'],'lemonchiffon1' => ['255','250','205'],'lemonchiffon2' => ['238','233','191'],'lemonchiffon3' => ['205','201','165'],'lemonchiffon4' => ['139','137','112'],'light blue' => ['173','216','230'],'light coral' => ['240','128','128'],'light cyan' => ['224','255','255'],'light goldenrod' => ['238','221','130'],'light goldenrod yellow' => ['250','250','210'],'light gray' => ['211','211','211'],'light green' => ['144','238','144'],'light grey' => ['211','211','211'],'light pink' => ['255','182','193'],'light salmon' => ['255','160','122'],'light sea green' => ['32','178','170'],'light sky blue' => ['135','206','250'],'light slate blue' => ['132','112','255'],'light slate gray' => ['119','136','153'],'light slate grey' => ['119','136','153'],'light steel blue' => ['176','196','222'],'light yellow' => ['255','255','224'],'lightblue' => ['173','216','230'],'lightblue1' => ['191','239','255'],'lightblue2' => ['178','223','238'],'lightblue3' => ['154','192','205'],'lightblue4' => ['104','131','139'],'lightcoral' => ['240','128','128'],'lightcyan' => ['224','255','255'],'lightcyan1' => ['224','255','255'],'lightcyan2' => ['209','238','238'],'lightcyan3' => ['180','205','205'],'lightcyan4' => ['122','139','139'],'lightgoldenrod' => ['238','221','130'],'lightgoldenrod1' => ['255','236','139'],'lightgoldenrod2' => ['238','220','130'],'lightgoldenrod3' => ['205','190','112'],'lightgoldenrod4' => ['139','129','76'],'lightgoldenrodyellow' => ['250','250','210'],'lightgray' => ['211','211','211'],'lightgreen' => ['144','238','144'],'lightgrey' => ['211','211','211'],'lightpink' => ['255','182','193'],'lightpink1' => ['255','174','185'],'lightpink2' => ['238','162','173'],'lightpink3' => ['205','140','149'],'lightpink4' => ['139','95','101'],'lightsalmon' => ['255','160','122'],'lightsalmon1' => ['255','160','122'],'lightsalmon2' => ['238','149','114'],'lightsalmon3' => ['205','129','98'],'lightsalmon4' => ['139','87','66'],'lightseagreen' => ['32','178','170'],'lightskyblue' => ['135','206','250'],'lightskyblue1' => ['176','226','255'],'lightskyblue2' => ['164','211','238'],'lightskyblue3' => ['141','182','205'],'lightskyblue4' => ['96','123','139'],'lightslateblue' => ['132','112','255'],'lightslategray' => ['119','136','153'],'lightslategrey' => ['119','136','153'],'lightsteelblue' => ['176','196','222'],'lightsteelblue1' => ['202','225','255'],'lightsteelblue2' => ['188','210','238'],'lightsteelblue3' => ['162','181','205'],'lightsteelblue4' => ['110','123','139'],'lightyellow' => ['255','255','224'],'lightyellow1' => ['255','255','224'],'lightyellow2' => ['238','238','209'],'lightyellow3' => ['205','205','180'],'lightyellow4' => ['139','139','122'],'lime green' => ['50','205','50'],'limegreen' => ['50','205','50'],'linen' => ['250','240','230'],'magenta' => ['255','0','255'],'magenta1' => ['255','0','255'],'magenta2' => ['238','0','238'],'magenta3' => ['205','0','205'],'magenta4' => ['139','0','139'],'maroon' => ['176','48','96'],'maroon1' => ['255','52','179'],'maroon2' => ['238','48','167'],'maroon3' => ['205','41','144'],'maroon4' => ['139','28','98'],'medium aquamarine' => ['102','205','170'],'medium blue' => ['0','0','205'],'medium orchid' => ['186','85','211'],'medium purple' => ['147','112','219'],'medium sea green' => ['60','179','113'],'medium slate blue' => ['123','104','238'],'medium spring green' => ['0','250','154'],'medium turquoise' => ['72','209','204'],'medium violet red' => ['199','21','133'],'mediumaquamarine' => ['102','205','170'],'mediumblue' => ['0','0','205'],'mediumorchid' => ['186','85','211'],'mediumorchid1' => ['224','102','255'],'mediumorchid2' => ['209','95','238'],'mediumorchid3' => ['180','82','205'],'mediumorchid4' => ['122','55','139'],'mediumpurple' => ['147','112','219'],'mediumpurple1' => ['171','130','255'],'mediumpurple2' => ['159','121','238'],'mediumpurple3' => ['137','104','205'],'mediumpurple4' => ['93','71','139'],'mediumseagreen' => ['60','179','113'],'mediumslateblue' => ['123','104','238'],'mediumspringgreen' => ['0','250','154'],'mediumturquoise' => ['72','209','204'],'mediumvioletred' => ['199','21','133'],'midnight blue' => ['25','25','112'],'midnightblue' => ['25','25','112'],'mint cream' => ['245','255','250'],'mintcream' => ['245','255','250'],'misty rose' => ['255','228','225'],'mistyrose' => ['255','228','225'],'mistyrose1' => ['255','228','225'],'mistyrose2' => ['238','213','210'],'mistyrose3' => ['205','183','181'],'mistyrose4' => ['139','125','123'],'moccasin' => ['255','228','181'],'navajo white' => ['255','222','173'],'navajowhite' => ['255','222','173'],'navajowhite1' => ['255','222','173'],'navajowhite2' => ['238','207','161'],'navajowhite3' => ['205','179','139'],'navajowhite4' => ['139','121','94'],'navy' => ['0','0','128'],'navy blue' => ['0','0','128'],'navyblue' => ['0','0','128'],'old lace' => ['253','245','230'],'oldlace' => ['253','245','230'],'olive drab' => ['107','142','35'],'olivedrab' => ['107','142','35'],'olivedrab1' => ['192','255','62'],'olivedrab2' => ['179','238','58'],'olivedrab3' => ['154','205','50'],'olivedrab4' => ['105','139','34'],'orange' => ['255','165','0'],'orange red' => ['255','69','0'],'orange1' => ['255','165','0'],'orange2' => ['238','154','0'],'orange3' => ['205','133','0'],'orange4' => ['139','90','0'],'orangered' => ['255','69','0'],'orangered1' => ['255','69','0'],'orangered2' => ['238','64','0'],'orangered3' => ['205','55','0'],'orangered4' => ['139','37','0'],'orchid' => ['218','112','214'],'orchid1' => ['255','131','250'],'orchid2' => ['238','122','233'],'orchid3' => ['205','105','201'],'orchid4' => ['139','71','137'],'pale goldenrod' => ['238','232','170'],'pale green' => ['152','251','152'],'pale turquoise' => ['175','238','238'],'pale violet red' => ['219','112','147'],'palegoldenrod' => ['238','232','170'],'palegreen' => ['152','251','152'],'palegreen1' => ['154','255','154'],'palegreen2' => ['144','238','144'],'palegreen3' => ['124','205','124'],'palegreen4' => ['84','139','84'],'paleturquoise' => ['175','238','238'],'paleturquoise1' => ['187','255','255'],'paleturquoise2' => ['174','238','238'],'paleturquoise3' => ['150','205','205'],'paleturquoise4' => ['102','139','139'],'palevioletred' => ['219','112','147'],'palevioletred1' => ['255','130','171'],'palevioletred2' => ['238','121','159'],'palevioletred3' => ['205','104','137'],'palevioletred4' => ['139','71','93'],'papaya whip' => ['255','239','213'],'papayawhip' => ['255','239','213'],'peach puff' => ['255','218','185'],'peachpuff' => ['255','218','185'],'peachpuff1' => ['255','218','185'],'peachpuff2' => ['238','203','173'],'peachpuff3' => ['205','175','149'],'peachpuff4' => ['139','119','101'],'peru' => ['205','133','63'],'pink' => ['255','192','203'],'pink1' => ['255','181','197'],'pink2' => ['238','169','184'],'pink3' => ['205','145','158'],'pink4' => ['139','99','108'],'plum' => ['221','160','221'],'plum1' => ['255','187','255'],'plum2' => ['238','174','238'],'plum3' => ['205','150','205'],'plum4' => ['139','102','139'],'powder blue' => ['176','224','230'],'powderblue' => ['176','224','230'],'purple' => ['160','32','240'],'purple1' => ['155','48','255'],'purple2' => ['145','44','238'],'purple3' => ['125','38','205'],'purple4' => ['85','26','139'],'red' => ['255','0','0'],'red1' => ['255','0','0'],'red2' => ['238','0','0'],'red3' => ['205','0','0'],'red4' => ['139','0','0'],'rosy brown' => ['188','143','143'],'rosybrown' => ['188','143','143'],'rosybrown1' => ['255','193','193'],'rosybrown2' => ['238','180','180'],'rosybrown3' => ['205','155','155'],'rosybrown4' => ['139','105','105'],'royal blue' => ['65','105','225'],'royalblue' => ['65','105','225'],'royalblue1' => ['72','118','255'],'royalblue2' => ['67','110','238'],'royalblue3' => ['58','95','205'],'royalblue4' => ['39','64','139'],'saddle brown' => ['139','69','19'],'saddlebrown' => ['139','69','19'],'salmon' => ['250','128','114'],'salmon1' => ['255','140','105'],'salmon2' => ['238','130','98'],'salmon3' => ['205','112','84'],'salmon4' => ['139','76','57'],'sandy brown' => ['244','164','96'],'sandybrown' => ['244','164','96'],'sea green' => ['46','139','87'],'seagreen' => ['46','139','87'],'seagreen1' => ['84','255','159'],'seagreen2' => ['78','238','148'],'seagreen3' => ['67','205','128'],'seagreen4' => ['46','139','87'],'seashell' => ['255','245','238'],'seashell1' => ['255','245','238'],'seashell2' => ['238','229','222'],'seashell3' => ['205','197','191'],'seashell4' => ['139','134','130'],'sienna' => ['160','82','45'],'sienna1' => ['255','130','71'],'sienna2' => ['238','121','66'],'sienna3' => ['205','104','57'],'sienna4' => ['139','71','38'],'sky blue' => ['135','206','235'],'skyblue' => ['135','206','235'],'skyblue1' => ['135','206','255'],'skyblue2' => ['126','192','238'],'skyblue3' => ['108','166','205'],'skyblue4' => ['74','112','139'],'slate blue' => ['106','90','205'],'slate gray' => ['112','128','144'],'slate grey' => ['112','128','144'],'slateblue' => ['106','90','205'],'slateblue1' => ['131','111','255'],'slateblue2' => ['122','103','238'],'slateblue3' => ['105','89','205'],'slateblue4' => ['71','60','139'],'slategray' => ['112','128','144'],'slategray1' => ['198','226','255'],'slategray2' => ['185','211','238'],'slategray3' => ['159','182','205'],'slategray4' => ['108','123','139'],'slategrey' => ['112','128','144'],'snow' => ['255','250','250'],'snow1' => ['255','250','250'],'snow2' => ['238','233','233'],'snow3' => ['205','201','201'],'snow4' => ['139','137','137'],'spring green' => ['0','255','127'],'springgreen' => ['0','255','127'],'springgreen1' => ['0','255','127'],'springgreen2' => ['0','238','118'],'springgreen3' => ['0','205','102'],'springgreen4' => ['0','139','69'],'steel blue' => ['70','130','180'],'steelblue' => ['70','130','180'],'steelblue1' => ['99','184','255'],'steelblue2' => ['92','172','238'],'steelblue3' => ['79','148','205'],'steelblue4' => ['54','100','139'],'tan' => ['210','180','140'],'tan1' => ['255','165','79'],'tan2' => ['238','154','73'],'tan3' => ['205','133','63'],'tan4' => ['139','90','43'],'thistle' => ['216','191','216'],'thistle1' => ['255','225','255'],'thistle2' => ['238','210','238'],'thistle3' => ['205','181','205'],'thistle4' => ['139','123','139'],'tomato' => ['255','99','71'],'tomato1' => ['255','99','71'],'tomato2' => ['238','92','66'],'tomato3' => ['205','79','57'],'tomato4' => ['139','54','38'],'turquoise' => ['64','224','208'],'turquoise1' => ['0','245','255'],'turquoise2' => ['0','229','238'],'turquoise3' => ['0','197','205'],'turquoise4' => ['0','134','139'],'violet' => ['238','130','238'],'violet red' => ['208','32','144'],'violetred' => ['208','32','144'],'violetred1' => ['255','62','150'],'violetred2' => ['238','58','140'],'violetred3' => ['205','50','120'],'violetred4' => ['139','34','82'],'wheat' => ['245','222','179'],'wheat1' => ['255','231','186'],'wheat2' => ['238','216','174'],'wheat3' => ['205','186','150'],'wheat4' => ['139','126','102'],'white' => ['255','255','255'],'white smoke' => ['245','245','245'],'whitesmoke' => ['245','245','245'],'yellow' => ['255','255','0'],'yellow green' => ['154','205','50'],'yellow1' => ['255','255','0'],'yellow2' => ['238','238','0'],'yellow3' => ['205','205','0'],'yellow4' => ['139','139','0'],'yellowgreen' => ['154','205','50']}
+EOT
+}
+
 sub __instantiate_object
 {
     my $self  = shift( @_ );
@@ -1721,6 +1922,7 @@ sub __instantiate_object
         my $rc = eval{ Class::Load::load_class( $class ); };
         return( $self->error( "Unable to load class $class: $@" ) ) if( $@ );
         # $self->message( 3, "Called with args: ", sub{ $self->dumper( \@_ ) } );
+        @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
         $o = @_ ? $class->new( @_ ) : $class->new;
         $o->debug( $this->{debug} ) if( $o->can( 'debug' ) );
         return( $self->pass_error( "Unable to instantiate an object of class $class: ", $class->error ) ) if( !defined( $o ) );
@@ -1757,11 +1959,11 @@ sub _obj2h
 {
     my $self = shift( @_ );
     ## print( STDERR "_obj2h(): Getting a hash refernece out of the object '$self'\n" );
-    if( UNIVERSAL::isa( $self, 'HASH' ) )
+    if( Scalar::Util::reftype( $self ) eq 'HASH' )
     {
         return( $self );
     }
-    elsif( UNIVERSAL::isa( $self, 'GLOB' ) )
+    elsif( Scalar::Util::reftype( $self ) eq 'GLOB' )
     {
         ## print( STDERR "Returning a reference to an hash for glob $self\n" );
         return( \%{*$self} );
@@ -1779,7 +1981,7 @@ sub _obj2h
         };
         ## XXX 
         ## print( STDERR "Called with '$self' with debug value '$hash->{debug}' and verbose '$hash->{verbose}'\n" );
-        return( $hash );
+        return( bless( $hash => $class ) );
     }
     ## Because object may be accessed as My::Package->method or My::Package::method
     ## there is not always an object available, so we need to fake it to avoid error
@@ -1958,7 +2160,7 @@ sub _set_get_boolean
         {
             $data->{ $field } = $val;
         }
-        elsif( ref( $val ) eq 'SCALAR' )
+        elsif( Scalar::Util::reftype( $val ) eq 'SCALAR' )
         {
             $data->{ $field } = $$val ? Module::Generic::Boolean->true : Module::Generic::Boolean->false;
         }
@@ -2297,7 +2499,42 @@ sub _set_get_hash
             return( $self->error( "Method $field takes only a hash or reference to a hash, but value provided ($val) is not supported" ) );
         }
         # $self->message( 3, "Setting value $val for field $field" );
-        $data->{ $field } = $val;
+         $data->{ $field } = $val;
+    }
+    return( $data->{ $field } );
+}
+
+sub _set_get_hash_as_mix_object
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    # $self->message( 3, "Called for field '$field' with data '", join( "', '", @_ ), "'." );
+    @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
+    if( @_ )
+    {
+        my $val;
+        if( ref( $_[0] ) eq 'HASH' )
+        {
+            $val = shift( @_ );
+        }
+        elsif( ( @_ % 2 ) )
+        {
+            $val = { @_ };
+        }
+        else
+        {
+            my $val = shift( @_ );
+            return( $self->error( "Method $field takes only a hash or reference to a hash, but value provided ($val) is not supported" ) );
+        }
+        # $self->message( 3, "Setting value $val for field $field" );
+        $data->{ $field } = Module::Generic::Hash->new( $val );
+    }
+    if( $data->{ $field } && !$self->_is_object( $data->{ $field } ) )
+    {
+        my $o = Module::Generic::Hash->new( $data->{ $field } );
+        $data->{ $field } = $o;
     }
     return( $data->{ $field } );
 }
@@ -2309,11 +2546,12 @@ sub _set_get_hash_as_object
     # $self->message( 3, "Called with args: ", $self->dumper( \@_ ) );
     my $field = shift( @_ ) || return( $self->error( "No field provided for _set_get_hash_as_object" ) );
     my $class;
+    @_ = () if( @_ == 1 && !defined( $_[0] ) );
     if( @_ )
     {
         ## No class was provided
         # if( ref( $_[0] ) eq 'HASH' )
-        if( UNIVERSAL::isa( $_[0], 'HASH' ) )
+        if( Scalar::Util::reftype( $_[0] ) eq 'HASH' )
         {
             my $new_class = $field;
             $new_class =~ tr/-/_/;
@@ -2340,8 +2578,6 @@ sub _set_get_hash_as_object
     }
     # my $class = shift( @_ );
     my $data = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    ## Remove any @_ if there is just one entry and it is undef
-    @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
     unless( Class::Load::is_class_loaded( $class ) )
     {
         my $perl = <<EOT;
@@ -2349,6 +2585,7 @@ package $class;
 BEGIN
 {
     use strict;
+    use warnings::register;
     use Module::Generic;
     use parent -norequire, qw( Module::Generic::Dynamic );
 };
@@ -2359,13 +2596,14 @@ EOT
         # print( STDERR __PACKAGE__, "::_set_get_hash_as_object(): Evaluating\n$perl\n" );
         my $rc = eval( $perl );
         # print( STDERR __PACKAGE__, "::_set_get_hash_as_object(): Returned $rc\n" );
-        die( "Unable to dynamically create module $class: $@" ) if( $@ );
+        die( "Unable to dynamically create module \"$class\" for field \"$field\" based on our own class \"", ref( $self ), "\": $@" ) if( $@ );
     }
     
     if( @_ )
     {
         my $hash = shift( @_ );
         # my $o = $class->new( $hash );
+        # print( STDERR ref( $self ), "::_set_get_hash_as_object instantiating hash with ref (", ref( $hash ), ") ", overload::StrVal( $hash ), "\n" );
         my $o = $self->__instantiate_object( $field, $class, $hash );
         $self->message( 3, "Resulting object contains: ", sub{ $self->dumper( $o ) } );
         $data->{ $field } = $o;
@@ -2387,7 +2625,7 @@ sub _set_get_number
     @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
     if( @_ )
     {
-        $data->{ $field } = Text::Number->new( shift( @_ ) );
+        $data->{ $field } = Module::Generic::Number->new( shift( @_ ) );
     }
     return( $data->{ $field } );
 }
@@ -2758,6 +2996,8 @@ sub _set_get_uri
     }
     return( $data->{ $field } );
 }
+
+sub _warnings_is_enabled { return( warnings::enabled( ref( $_[0] ) || $_[0] ) ); }
 
 sub __dbh
 {
@@ -3160,7 +3400,7 @@ sub trace { return( shift->_set_get_object( 'trace', 'Devel::StackTrace', @_ ) )
 
 sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
 
-sub _obj_eq 
+sub _obj_eq
 {
     ##return overload::StrVal( $_[0] ) eq overload::StrVal( $_[1] );
     no overloading;
@@ -3226,6 +3466,7 @@ BEGIN
                   'ne'     => sub { !_obj_eq(@_) },
                   fallback => 1,
                  );
+    use Want;
     our( $VERSION ) = '0.2';
 };
 
@@ -3283,6 +3524,7 @@ BEGIN
 {
     use strict;
     use parent qw( Module::Generic );
+    use warnings::register;
     use Scalar::Util ();
     # use Class::ISA;
     our( $VERSION ) = '0.1';
@@ -3303,7 +3545,7 @@ sub new
     }
     elsif( @_ )
     {
-        CORE::warn( "Parameter provided is not an hash reference: '", join( "', '", @_ ), "'\n" );
+        CORE::warn( "Parameter provided is not an hash reference: '", join( "', '", @_ ), "'\n" ) if( $this->_warnings_is_enabled );
     }
     ## $self->message( 3, "Data provided are: ", sub{ $self->dumper( $hash ) } );
     ## print( STDERR __PACKAGE__, "::new(): Got for hash: '", join( "', '", sort( keys( %$hash ) ) ), "'\n" );
@@ -3453,6 +3695,8 @@ BEGIN
     our( $VERSION ) = '0.1';
 };
 
+sub new { return( $_[1] ? $true : $false ); }
+
 our $true  = do{ bless( \( my $dummy = 1 ) => Module::Generic::Boolean ) };
 our $false = do{ bless( \( my $dummy = 0 ) => Module::Generic::Boolean ) };
 
@@ -3475,7 +3719,19 @@ package Module::Generic::Array;
 BEGIN
 {
     use common::sense;
+    use warnings;
+    use warnings::register;
     use Scalar::Util ();
+    use Want;
+    ## use Data::Dumper;
+    use overload ('""'  => 'as_string',
+                  '=='  => sub { _obj_eq(@_) },
+                  '!='  => sub { !_obj_eq(@_) },
+                  'eq'  => sub { _obj_eq(@_) },
+                  'ne'  => sub { !_obj_eq(@_) },
+                  '%{}' => 'as_hash',
+                  fallback => 1,
+                 );
     our( $VERSION ) = '0.1';
 };
 
@@ -3490,11 +3746,24 @@ sub new
 sub as_hash
 {
     my $self = CORE::shift( @_ );
+    ## print( STDERR ref( $self ), "::as_hash\n" );
     my $ref = {};
     my( @offsets ) = $self->keys;
     @$ref{ @$self } = @offsets;
-    return( $ref );
+    ## print( ref( $self ), "::as_hash -> dump: ", Data::Dumper::Dumper( $ref ), "\n" );
+    return( Module::Generic::Hash->new( $ref ) );
 }
+
+sub as_string
+{
+    my $self = CORE::shift( @_ );
+    my $sort = 0;
+    $sort = CORE::shift( @_ ) if( @_ );
+    return( $self->sort->as_string ) if( $sort );
+    return( "@$self" );
+}
+
+sub clone { return( $_[0]->new( [ @{$_[0]} ] ) ); }
 
 sub delete
 {
@@ -3502,23 +3771,57 @@ sub delete
     my( $offset, $length ) = @_;
     if( defined( $offset ) )
     {
-        my @removed = CORE::splice( @$self, $offset, defined( $length ) ? int( $length ) : 1 );
-        return( wantarray() ? @removed : $self->new( \@removed ) );
+        if( $offset !~ /^\-?\d+$/ )
+        {
+            warn( "Non integer offset \"$offset\" provided to delete array element\n" ) if( $self->_warnings_is_enabled );
+            return( $self );
+        }
+        if( CORE::defined( $length ) && $length !~ /^\-?\d+$/ )
+        {
+            warn( $self, "Non integer length \"$length\" provided to delete array element\n" ) if( $self->_warnings_is_enabled );
+            return( $self );
+        }
+        my @removed = CORE::splice( @$self, $offset, CORE::defined( $length ) ? CORE::int( $length ) : 1 );
+        if( Want::want( 'LIST' ) )
+        {
+            rreturn( @removed );
+        }
+        else
+        {
+            rreturn( $self->new( \@removed ) );
+        }
+        # Required to make the compiler happy, as per Want documentation
+        return;
     }
-    return;
+    return( $self );
 }
 
 sub each
 {
-    my $self = CORE::shift( @_ );
-    return( CORE::each( @$self ) );
+    my $self = shift( @_ );
+    my $code = shift( @_ ) || do
+    {
+        warn( "No subroutine callback as provided for each\n" ) if( $self->_warnings_is_enabled );
+        return;
+    };
+    if( ref( $code ) ne 'CODE' )
+    {
+        warn( "I was expecting a reference to a subroutine for the callback to each, but got '$code' instead.\n" ) if( $self->_warnings_is_enabled );
+        return;
+    }
+    ## Index starts from 0
+    while( my( $i, $v ) = CORE::each( @$self ) )
+    {
+        $code->( $i, $v ) || CORE::last;
+    }
+    return( $self );
 }
 
 sub exists
 {
     my $self = CORE::shift( @_ );
     my $this = CORE::shift( @_ );
-    return( scalar( CORE::grep( /^$this$/, @$self ) ) );
+    return( $self->_number( CORE::scalar( CORE::grep( /^$this$/, @$self ) ) ) );
 }
 
 sub for
@@ -3526,9 +3829,9 @@ sub for
     my $self = CORE::shift( @_ );
     my $code = CORE::shift( @_ );
     return if( ref( $code ) ne 'CODE' );
-    CORE::for( my $i; $i < scalar( @$self ); $i++ )
+    CORE::for( my $i = 0; $i < scalar( @$self ); $i++ )
     {
-        $code->( $i, $self->[ $i ] );
+        $code->( $i, $self->[ $i ] ) || CORE::last;
     }
     return( $self );
 }
@@ -3540,7 +3843,7 @@ sub foreach
     return if( ref( $code ) ne 'CODE' );
     CORE::foreach my $v ( @$self )
     {
-        $code->( $v );
+        $code->( $v ) || CORE::last;
     }
     return( $self );
 }
@@ -3548,8 +3851,20 @@ sub foreach
 sub grep
 {
     my $self = CORE::shift( @_ );
-    my $ref = [ CORE::grep( $_[0], @$self ) ];
-    if( wantarray() )
+    my $expr = shift( @_ );
+    my $ref;
+    if( ref( $expr ) eq 'CODE' )
+    {
+        $ref = [CORE::grep( $expr->( $_ ), @$self )];
+    }
+    else
+    {
+        $expr = ref( $expr ) eq 'Regexp'
+            ? $expr
+            : qr/\Q$expr\E/;
+        $ref = [ CORE::grep( $_ =~ /$expr/, @$self ) ];
+    }
+    if( Want::want( 'LIST' ) )
     {
         return( @$ref );
     }
@@ -3562,23 +3877,31 @@ sub grep
 sub join
 {
     my $self = CORE::shift( @_ );
-    return( CORE::join( $_[0], @$self ) );
+    return( $self->_scalar( CORE::join( $_[0], @$self ) ) );
 }
 
 sub keys
 {
     my $self = CORE::shift( @_ );
-    return( CORE::keys( @$self ) );
+    return( $self->new( [ CORE::keys( @$self ) ] ) );
 }
 
-sub length { return( scalar( @{$_[0]} ) ); }
+sub length { return( $_[0]->_number( scalar( @{$_[0]} ) ) ); }
 
 sub map
 {
     my $self = CORE::shift( @_ );
     my $code = CORE::shift( @_ );
     return if( ref( $code ) ne 'CODE' );
-    return( CORE::map( $code->( $_ ), @$self ) );
+    my $ref = [ CORE::map( $code->( $_ ), @$self ) ];
+    if( Want::want( 'LIST' ) )
+    {
+        return( @$ref );
+    }
+    else
+    {
+        return( $self->new( $ref ) );
+    }
 }
 
 sub pop
@@ -3590,7 +3913,8 @@ sub pop
 sub push
 {
     my $self = CORE::shift( @_ );
-    return( CORE::push( @$self, @_ ) );
+    CORE::push( @$self, @_ );
+    return( $self );
 }
 
 sub push_arrayref
@@ -3598,7 +3922,8 @@ sub push_arrayref
     my $self = CORE::shift( @_ );
     my $ref = CORE::shift( @_ );
     return( $self->error( "Data provided ($ref) is not an array reference." ) ) if( !UNIVERSAL::isa( $ref, 'ARRAY' ) );
-    return( CORE::push( @$self, @$ref ) );
+    CORE::push( @$self, @$ref );
+    return( $self );
 }
 
 sub reset
@@ -3636,13 +3961,25 @@ sub shift
     return( CORE::shift( @$self ) );
 }
 
-sub size { return( CORE::shift->length ); }
+sub size { return( $_[0]->_number( $_[0]->length ) ); }
 
 sub sort
 {
     my $self = CORE::shift( @_ );
-    my $ref = [ CORE::sort( @$self ) ];
-    if( wantarray() )
+    my $code = CORE::shift( @_ );
+    my $ref;
+    if( ref( $code ) eq 'CODE' )
+    {
+        $ref = [sort 
+        {
+            $code->( $a, $b );
+        } @$self];
+    }
+    else
+    {
+        $ref = [ CORE::sort( @$self ) ];
+    }
+    if( Want::want( 'LIST' ) )
     {
         return( @$ref );
     }
@@ -3655,20 +3992,36 @@ sub sort
 sub splice
 {
     my $self = CORE::shift( @_ );
-    return( CORE::splice( @$self, @_ ) );
-}
-
-sub split
-{
-    my $self = CORE::shift( @_ );
-    my $ref = [ CORE::split( @_ ) ];
-    if( wantarray() )
+    my( $offset, $length, @list ) = @_;
+    if( defined( $offset ) && $offset !~ /^\-?\d+$/ )
     {
-        return( @$ref );
+        warn( "Offset provided for splice \"$offset\" is not an integer.\n" ) if( $self->_warnings_is_enabled );
+        ## If a list was provided, the user is not looking to get an element removed, but add it, so we return out object
+        return( $self ) if( scalar( @list ) );
+        return;
+    }
+    if( defined( $length ) && $length !~ /^\-?\d+$/ )
+    {
+        warn( "Length provided for splice \"$length\" is not an integer.\n" ) if( $self->_warnings_is_enabled );
+        return( $self ) if( scalar( @list ) );
+        return;
+    }
+    ## Adding elements, so we return our object and allow chaining
+    ## @_ = offset, length, replacement list
+    if( scalar( @_ ) > 2 )
+    {
+        CORE::splice( @$self, $offset, $length, @list );
+        return( $self );
+    }
+    elsif( !scalar( @_ ) )
+    {
+        CORE::splice( @$self );
+        return( $self );
     }
     else
     {
-        return( $self->new( $ref ) );
+        return( CORE::splice( @$self, $offset, $length ) ) if( CORE::defined( $offset ) && CORE::defined( $length ) );
+        return( CORE::splice( @$self, $offset ) ) if( CORE::defined( $offset ) );
     }
 }
 
@@ -3682,14 +4035,15 @@ sub undef
 sub unshift
 {
     my $self = CORE::shift( @_ );
-    return( CORE::unshift( @$self, @_ ) );
+    CORE::unshift( @$self, @_ );
+    return( $self );
 }
 
 sub values
 {
     my $self = CORE::shift( @_ );
     my $ref = [ CORE::values( @$self ) ];
-    if( wantarray() )
+    if( Want::want( 'LIST' ) )
     {
         return( @$ref );
     }
@@ -3699,14 +4053,99 @@ sub values
     }
 }
 
+sub _number
+{
+    my $self = CORE::shift( @_ );
+    my $num = CORE::shift( @_ );
+    return if( !defined( $num ) );
+    return( $num ) if( !CORE::length( $num ) );
+    return( Module::Generic::Number->new( $num ) );
+}
+
+sub _obj_eq
+{
+    no overloading;
+    my $self = CORE::shift( @_ );
+    my $other = CORE::shift( @_ );
+    ## Sorted
+    my $strA = $self->as_string(1);
+    my $strB;
+    if( Scalar::Util::blessed( $other ) && $other->isa( 'Module::Generic::Array' ) )
+    {
+        $strB = $other->as_string(1);
+    }
+    ## Compare error message
+    elsif( Scalar::Util::reftype( $other ) eq 'ARRAY' )
+    {
+        $strB = $self->new( $other )->as_string(1);
+    }
+    else
+    {
+        return( 0 );
+    }
+    ## print( STDERR ref( $self ), "::_obj_eq: Comparing array A (", CORE::scalar( @$self ), ") with '$strA' to array B (", CORE::scalar( @$other ), ") with '$strB'\n" );
+    return( $strA eq $strB ) ;
+}
+
+sub _scalar
+{
+    my $self = CORE::shift( @_ );
+    my $str  = CORE::shift( @_ );
+    return if( !defined( $str ) );
+    ## Whether empty or not, return an object
+    return( Module::Generic::Scalar->new( $str ) );
+}
+
+sub _warnings_is_enabled { return( warnings::enabled( ref( $_[0] ) || $_[0] ) ); }
+
 package Module::Generic::Scalar;
 BEGIN
 {
     use common::sense;
     use Scalar::Util ();
-    use overload ('""'     => 'as_string',
-                  fallback => 1,
-                 );
+    use Want;
+    use warnings;
+    use warnings::register;
+    use overload (
+        '""'    => 'as_string',
+        '.='    => sub
+        {
+            my( $self, $other, $swap ) = @_;
+            ## print( STDERR ref( $self ), "::concatenate: Got here with other = '$other', and swap = '$swap'\n" );
+            ## print( STDERR "Module::Generic::Scalar::overload->.=: Received arguments '", join( "', '", @_ ), "'\n" );
+            my $expr;
+            if( $swap )
+            {
+                $expr = "\$other .= \$$self";
+                return( $other );
+            }
+            else
+            {
+                $$self .= $other;
+                return( $self );
+            }
+        },
+        'x'     => sub
+        {
+            my( $self, $other, $swap ) = @_;
+            ## print( STDERR "Module::Generic::Scalar::overload->x: Received arguments '", join( "', '", @_ ), "'\n" );
+            my $expr = $swap ? "\"$other" x \"$$self\"" : "\"$$self\" x \"$other\"";
+            my $res  = eval( $expr );
+            if( $@ )
+            {
+                CORE::warn( $@ );
+                return;
+            }
+            return( $self->new( $res ) );
+        },
+        fallback => 1,
+    );
+#     overload::constant 'qr' => sub
+#     {
+#         no overloading;
+#         my( $re ) = @_;
+#         print( STDERR "overload->qr: Received arguments '", join( "', '", @_ ), "'\n" );
+#     };
     our( $VERSION ) = '0.1';
 };
 
@@ -3724,7 +4163,7 @@ sub new
     }
     elsif( ref( $_[0] ) )
     {
-        warn( "I do not know what to do with \"", $_[0], "\"\n" );
+        warn( "I do not know what to do with \"", $_[0], "\"\n" ) if( $this->_warnings_is_enabled );
         return;
     }
     else
@@ -3734,33 +4173,197 @@ sub new
     return( bless( \$init => ( ref( $this ) || $this ) ) );
 }
 
+sub as_boolean { return( Module::Generic::Boolean->new( ${$_[0]} ? 1 : 0 ) ); }
+
 sub as_string { return( ${$_[0]} ); }
+
+## Credits: John Gruber, Aristotle Pagaltzis
+## https://gist.github.com/gruber/9f9e8650d68b13ce4d78
+sub capitalise
+{
+    my $self = CORE::shift( @_ );
+    my @small_words = qw( (?<!q&)a an and as at(?!&t) but by en for if in of on or the to v[.]? via vs[.]? );
+    my $small_re = CORE::join( '|', @small_words );
+
+    my $apos = qr/ (?: ['’] [[:lower:]]* )? /x;
+    
+    my $copy = $$self;
+	$copy =~ s{\A\s+}{}, s{\s+\z}{};
+	$copy = CORE::lc( $copy ) if( not /[[:lower:]]/ );
+	$copy =~ s{
+		\b (_*) (?:
+			( (?<=[ ][/\\]) [[:alpha:]]+ [-_[:alpha:]/\\]+ |   # file path or
+			  [-_[:alpha:]]+ [@.:] [-_[:alpha:]@.:/]+ $apos )  # URL, domain, or email
+			|
+			( (?i: $small_re ) $apos )                         # or small word (case-insensitive)
+			|
+			( [[:alpha:]] [[:lower:]'’()\[\]{}]* $apos )       # or word w/o internal caps
+			|
+			( [[:alpha:]] [[:alpha:]'’()\[\]{}]* $apos )       # or some other word
+		) (_*) \b
+	}{
+		$1 . (
+		  defined $2 ? $2         # preserve URL, domain, or email
+		: defined $3 ? "\L$3"     # lowercase small word
+		: defined $4 ? "\u\L$4"   # capitalize word w/o internal caps
+		: $5                      # preserve other kinds of word
+		) . $6
+	}xeg;
+
+
+	# Exceptions for small words: capitalize at start and end of title
+	$copy =~ s{
+		(  \A [[:punct:]]*         # start of title...
+		|  [:.;?!][ ]+             # or of subsentence...
+		|  [ ]['"“‘(\[][ ]*     )  # or of inserted subphrase...
+		( $small_re ) \b           # ... followed by small word
+	}{$1\u\L$2}xig;
+
+	$copy =~ s{
+		\b ( $small_re )      # small word...
+		(?= [[:punct:]]* \Z   # ... at the end of the title...
+		|   ['"’”)\]] [ ] )   # ... or of an inserted subphrase?
+	}{\u\L$1}xig;
+
+	# Exceptions for small words in hyphenated compound words
+	## e.g. "in-flight" -> In-Flight
+	$copy =~ s{
+		\b
+		(?<! -)					# Negative lookbehind for a hyphen; we don't want to match man-in-the-middle but do want (in-flight)
+		( $small_re )
+		(?= -[[:alpha:]]+)		# lookahead for "-someword"
+	}{\u\L$1}xig;
+
+	## # e.g. "Stand-in" -> "Stand-In" (Stand is already capped at this point)
+	$copy =~ s{
+		\b
+		(?<!…)					# Negative lookbehind for a hyphen; we don't want to match man-in-the-middle but do want (stand-in)
+		( [[:alpha:]]+- )		# $1 = first word and hyphen, should already be properly capped
+		( $small_re )           # ... followed by small word
+		(?!	- )					# Negative lookahead for another '-'
+	}{$1\u$2}xig;
+
+    return( $self->new( $copy ) );
+}
 
 sub chomp { return( CORE::chomp( ${$_[0]} ) ); }
 
 sub chop { return( CORE::chop( ${$_[0]} ) ); }
 
+sub clone
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        return( $self->new( @_ ) );
+    }
+    else
+    {
+        return( $self->new( ${$self} ) );
+    }
+}
+
+sub crypt { return( __PACKAGE__->new( CORE::crypt( ${$_[0]}, $_[1] ) ) ); }
+
+sub defined { return( CORE::defined( ${$_[0]} ) ); }
+
 sub fc { return( CORE::fc( ${$_[0]} ) eq CORE::fc( $_[1] ) ); }
 
-sub hex { return( CORE::hex( ${$_[0]} ) ); }
+sub hex { return( $_[0]->_number( CORE::hex( ${$_[0]} ) ) ); }
 
 sub index
 {
     my $self = shift( @_ );
     my( $substr, $pos ) = @_;
-    return( CORE::index( ${$self}, $substr, $pos ) ) if( CORE::defined( $pos ) );
-    return( CORE::index( ${$self}, $substr ) );
+    return( $self->_number( CORE::index( ${$self}, $substr, $pos ) ) ) if( CORE::defined( $pos ) );
+    return( $self->_number( CORE::index( ${$self}, $substr ) ) );
 }
+
+sub is_alpha { return( ${$_[0]} =~ /^[[:alpha:]]+$/ ); }
+
+sub is_alpha_numeric { return( ${$_[0]} =~ /^[[:alnum:]]+$/ ); }
+
+sub is_empty { return( CORE::length( ${$_[0]} ) == 0 ); }
+
+sub is_lower { return( ${$_[0]} =~ /^[[:lower:]]+$/ ); }
+
+sub is_numeric { return( Scalar::Util::looks_like_number( ${$_[0]} ) ); }
+
+sub is_upper { return( ${$_[0]} =~ /^[[:upper:]]+$/ ); }
 
 sub lc { return( __PACKAGE__->new( CORE::lc( ${$_[0]} ) ) ); }
 
 sub lcfirst { return( __PACKAGE__->new( CORE::lcfirst( ${$_[0]} ) ) ); }
 
-sub length { return( CORE::length( ${$_[0]} ) ); }
+sub left { return( $_[0]->new( CORE::substr( ${$_[0]}, 0, CORE::int( $_[1] ) ) ) ); }
 
-sub ord { return( CORE::ord( ${$_[0]} ) ); }
+sub length { return( $_[0]->_number( CORE::length( ${$_[0]} ) ) ); }
+
+sub ltrim
+{
+    my $self = shift( @_ );
+    my $str = shift( @_ );
+    $str = CORE::defined( $str ) 
+        ? ref( $str ) eq 'Regexp'
+            ? $str
+            : qr/(?:\Q$str\E)+/
+        : qr/[[:blank:]\r\n]*/;
+    $$self =~ s/^$str//g;
+    return( $self );
+}
+
+sub match
+{
+    my( $self, $re ) = @_;
+    $re = CORE::defined( $re ) 
+        ? ref( $re ) eq 'Regexp'
+            ? $re
+            : qr/(?:\Q$re\E)+/
+        : $re;
+    return( $$self =~ /$re/ );
+}
+
+sub ord { return( $_[0]->_number( CORE::ord( ${$_[0]} ) ) ); }
+
+sub pad
+{
+    my $self = shift( @_ );
+    my( $n, $str ) = @_;
+    $str //= ' ';
+    if( !CORE::length( $n ) )
+    {
+        warn( "No number provided to pad the string object.\n" ) if( $self->_warnings_is_enabled );
+    }
+    elsif( $n !~ /^\-?\d+$/ )
+    {
+        warn( "Number provided \"$n\" to pad string is not an integer.\n" ) if( $self->_warnings_is_enabled );
+    }
+    
+    if( $n < 0 )
+    {
+        $$self .= ( "$str" x CORE::abs( $n ) );
+    }
+    else
+    {
+        CORE::substr( $$self, 0, 0 ) = ( "$str" x $n );
+    }
+    return( $self );
+}
 
 sub quotemeta { return( __PACKAGE__->new( CORE::quotemeta( ${$_[0]} ) ) ); }
+
+sub right { return( $_[0]->new( CORE::substr( ${$_[0]}, ( CORE::int( $_[1] ) * -1 ) ) ) ); }
+
+sub replace
+{
+    my( $self, $re, $replacement ) = @_;
+    $re = CORE::defined( $re ) 
+        ? ref( $re ) eq 'Regexp'
+            ? $re
+            : qr/(?:\Q$re\E)+/
+        : $re;
+    return( $$self =~ s/$re/$replacement/gs );
+}
 
 sub reset { ${$_[0]} = ''; return( $_[0] ); }
 
@@ -3770,8 +4373,21 @@ sub rindex
 {
     my $self = shift( @_ );
     my( $substr, $pos ) = @_;
-    return( CORE::rindex( ${$self}, $substr, $pos ) ) if( CORE::defined( $pos ) );
-    return( CORE::rindex( ${$self}, $substr ) );
+    return( $self->_number( CORE::rindex( ${$self}, $substr, $pos ) ) ) if( CORE::defined( $pos ) );
+    return( $self->_number( CORE::rindex( ${$self}, $substr ) ) );
+}
+
+sub rtrim
+{
+    my $self = shift( @_ );
+    my $str = shift( @_ );
+    $str = CORE::defined( $str ) 
+        ? ref( $str ) eq 'Regexp'
+            ? $str
+            : qr/(?:\Q$str\E)+/
+        : qr/[[:blank:]\r\n]*/;
+    $$self =~ s/${str}$//g;
+    return( $self );
 }
 
 sub set
@@ -3788,7 +4404,7 @@ sub set
     }
     elsif( ref( $_[0] ) )
     {
-        warn( "I do not know what to do with \"", $_[0], "\"\n" );
+        warn( "I do not know what to do with \"", $_[0], "\"\n" ) if( $self->_warnings_is_enabled );
         return;
     }
     else
@@ -3799,7 +4415,31 @@ sub set
     return( $self );
 }
 
-sub split { return( CORE::split( $_[1], ${$_[0]} ) ); }
+sub split
+{
+    my $self = CORE::shift( @_ );
+    my( $expr, $limit ) = @_;
+    my $ref;
+    $limit = "$limit";
+    if( CORE::defined( $limit ) && $limit =~ /^\d+$/ )
+    {
+        $ref = [ CORE::split( $expr, $$self, $limit ) ];
+    }
+    else
+    {
+        $ref = [ CORE::split( $expr, $$self ) ];
+    }
+    if( Want::want( 'OBJECT' ) ||
+        Want::want( 'SCALAR' ) )
+    {
+        rreturn( $self->_array( $ref ) );
+    }
+    elsif( Want::want( 'LIST' ) )
+    {
+        rreturn( @$ref );
+    }
+    return;
+}
 
 sub sprintf { return( __PACKAGE__->new( CORE::sprintf( ${$_[0]}, @_[1..$#_] ) ) ); }
 
@@ -3807,14 +4447,1296 @@ sub substr
 {
     my $self = CORE::shift( @_ );
     my( $offset, $length, $replacement ) = @_;
-    return( __PACKAGE__->new( CORE::substr( ${$self}, $offset, $length, $replace ) ) ) if( CORE::defined( $length ) && CORE::defined( $replacement ) );
+    return( __PACKAGE__->new( CORE::substr( ${$self}, $offset, $length, $replacement ) ) ) if( CORE::defined( $length ) && CORE::defined( $replacement ) );
     return( __PACKAGE__->new( CORE::substr( ${$self}, $offset, $length ) ) ) if( CORE::defined( $length ) );
     return( __PACKAGE__->new( CORE::substr( ${$self}, $offset ) ) );
+}
+
+sub trim
+{
+    my $self = shift( @_ );
+    my $str  = shift( @_ );
+    $str = CORE::defined( $str ) ? CORE::quotemeta( $str ) : qr/[[:blank:]\r\n]*/;
+    $$self =~ s/^$str|$str$//gs;
+    return( $self );
 }
 
 sub uc { return( __PACKAGE__->new( CORE::uc( ${$_[0]} ) ) ); }
 
 sub ucfirst { return( __PACKAGE__->new( CORE::ucfirst( ${$_[0]} ) ) ); }
+
+sub undef
+{
+    my $self = shift( @_ );
+    $$self = undef;
+    return( $self );
+}
+
+sub _array
+{
+    my $self = shift( @_ );
+    my $arr  = shift( @_ );
+    return if( !defined( $arr ) );
+    return( $arr ) if( Scalar::Util::reftype( $arr ) ne 'ARRAY' );
+    return( Module::Generic::Array->new( $arr ) );
+}
+
+sub _number
+{
+    my $self = shift( @_ );
+    my $num = shift( @_ );
+    return if( !defined( $num ) );
+    return( $num ) if( !CORE::length( $num ) );
+    return( Module::Generic::Number->new( $num ) );
+}
+
+sub _warnings_is_enabled { return( warnings::enabled( ref( $_[0] ) || $_[0] ) ); }
+
+package Module::Generic::Number;
+BEGIN
+{
+    use strict;
+    use parent -norequire, qw( Module::Generic );
+    use warnings::register;
+    use Number::Format;
+    use TryCatch;
+    use Regexp::Common qw( number );
+    use POSIX ();
+    our( $VERSION ) = '0.2';
+};
+
+use overload (
+    ## I know there is the nomethod feature, but I need to provide return_object set to true or false
+    ## And I do not necessarily want to catch all the operation.
+    '""' => sub { return( shift->{_number} ); },
+    '-' => sub { return( shift->compute( @_, { op => '-', return_object => 1 }) ); },
+    '+' => sub { return( shift->compute( @_, { op => '+', return_object => 1 }) ); },
+    '*' => sub { return( shift->compute( @_, { op => '*', return_object => 1 }) ); },
+    '/' => sub { return( shift->compute( @_, { op => '/', return_object => 1 }) ); },
+    '%' => sub { return( shift->compute( @_, { op => '%', return_object => 1 }) ); },
+    ## Exponent
+    '**' => sub { return( shift->compute( @_, { op => '**', return_object => 1 }) ); },
+    ## Bitwise AND
+    '&' => sub { return( shift->compute( @_, { op => '&', return_object => 1 }) ); },
+    ## Bitwise OR
+    '|' => sub { return( shift->compute( @_, { op => '|', return_object => 1 }) ); },
+    ## Bitwise XOR
+    '^' => sub { return( shift->compute( @_, { op => '^', return_object => 1 }) ); },
+    ## Bitwise shift left
+    '<<' => sub { return( shift->compute( @_, { op => '<<', return_object => 1 }) ); },
+    ## Bitwise shift right
+    '>>' => sub { return( shift->compute( @_, { op => '>>', return_object => 1 }) ); },
+    'x' => sub { return( shift->compute( @_, { op => 'x', return_object => 1, type => 'scalar' }) ); },
+    '+=' => sub { return( shift->compute( @_, { op => '+=', return_object => 1 }) ); },
+    '-=' => sub { return( shift->compute( @_, { op => '-=', return_object => 1 }) ); },
+    '*=' => sub { return( shift->compute( @_, { op => '*=', return_object => 1 }) ); },
+    '/=' => sub { return( shift->compute( @_, { op => '/=', return_object => 1 }) ); },
+    '%=' => sub { return( shift->compute( @_, { op => '%=', return_object => 1 }) ); },
+    '**=' => sub { return( shift->compute( @_, { op => '**=', return_object => 1 }) ); },
+    '<<=' => sub { return( shift->compute( @_, { op => '<<=', return_object => 1 }) ); },
+    '>>=' => sub { return( shift->compute( @_, { op => '>>=', return_object => 1 }) ); },
+    'x=' => sub { return( shift->compute( @_, { op => 'x=', return_object => 1 }) ); },
+    ## '.=' => sub { return( shift->compute( @_, { op => '.=', return_object => 1 }) ); },
+    '.=' => sub
+    {
+        my( $self, $other, $swap ) = @_;
+        my $op = '.=';
+        my $operation = $swap ? "${other} ${op} \$self->{_number}" : "\$self->{_number} ${op} ${other}";
+        my $res = eval( $operation );
+        warn( "Error with formula \"$operation\": $@" ) if( $@ && $self->_warnings_is_enabled );
+        return if( $@ );
+        ## Concatenated something. If it still look like a number, we return it as an object
+        if( $res =~ /^$RE{num}{real}$/ )
+        {
+            return( $self->clone( $res ) );
+        }
+        ## Otherwise we pass it to the scalar module
+        else
+        {
+            return( Module::Generic::Scalar->new( "$res" ) );
+        }
+    },
+    '<' => sub { return( shift->compute( @_, { op => '<', boolean => 1 }) ); },
+    '<=' => sub { return( shift->compute( @_, { op => '<=', boolean => 1 }) ); },
+    '>' => sub { return( shift->compute( @_, { op => '>', boolean => 1 }) ); },
+    '>=' => sub { return( shift->compute( @_, { op => '>=', boolean => 1 }) ); },
+    '<=>' => sub { return( shift->compute( @_, { op => '<=>', return_object => 0 }) ); },
+    '==' => sub { return( shift->compute( @_, { op => '==', boolean => 1 }) ); },
+    '!=' => sub { return( shift->compute( @_, { op => '!=', boolean => 1 }) ); },
+    'eq' => sub { return( shift->compute( @_, { op => 'eq', boolean => 1 }) ); },
+    'ne' => sub { return( shift->compute( @_, { op => 'ne', boolean => 1 }) ); },
+    '++' => sub
+    {
+        my( $self ) = @_;
+        return( ++$self->{_number} );
+    },
+    '--' => sub
+    {
+        my( $self ) = @_;
+        return( --$self->{_number} );
+    },
+    'fallback' => 1,
+);
+
+sub init
+{
+    my $self = shift( @_ );
+    my $num  = shift( @_ );
+    return( $self->error( "No number was provided." ) ) if( !CORE::length( $num ) );
+    return( Module::Generic::Infinity->new( $num ) ) if( POSIX::isinf( $num ) );
+    return( Module::Generic::Nan->new( $num ) ) if( POSIX::isnan( $num ) );
+    use utf8;
+    $self->{thousand}   = ',';
+    $self->{decimal}    = '.';
+    $self->{symbol}     = '€';
+    $self->{precision}  = 2;
+    $self->{precede}    = 1;
+    $self->{lang}       = '';
+    my $args = {};
+    $args = ref( $_[0] ) ? $_[0] : !( @_ % 2 ) ? { @_ } : {};
+    $self->SUPER::init( @_ );
+    if( $self->{lang} )
+    {
+        $self->message( 3, "Language requested '$self->{lang}'." );
+        try
+        {
+            my $curr_locale = POSIX::setlocale( &POSIX::LC_ALL );
+            ## $self->message( 3, "Current locale is: '$curr_locale'" );
+            if( my $loc = POSIX::setlocale( &POSIX::LC_ALL, $self->{lang} ) )
+            {
+                ## $self->message( 3, "Succeeded in setting locale to '$self->{lang}'." );
+                my $lconv = POSIX::localeconv();
+                ## Set back the LC_ALL to what it was, because we do not want to disturb the user environment
+                POSIX::setlocale( &POSIX::LC_ALL, $curr_locale );
+                ## $self->messagef( 3, "POSIX::localeconv() returned %d items", scalar( keys( %$lconv ) ) );
+                if( !CORE::length( $args->{decimal} ) && 
+                    ( CORE::length( $lconv->{decimal_point} ) || CORE::length( $lconv->{mon_decimal_point} ) ) )
+                {
+                    $self->{decimal} = CORE::length( $lconv->{decimal_point} ) 
+                        ? $lconv->{decimal_point}
+                        : $lconv->{mon_decimal_point};
+                }
+                if( !CORE::length( $args->{thousand} ) && 
+                    ( CORE::length( $lconv->{thousands_sep} ) || CORE::length( $lconv->{mon_thousands_sep} ) ) )
+                {
+                    $self->{thousand} = CORE::length( $lconv->{thousands_sep} )
+                        ? $lconv->{thousands_sep}
+                        : $lconv->{mon_thousands_sep};
+                }
+                if( !CORE::length( $args->{symbol} ) &&
+                    CORE::length( $lconv->{currency_symbol} ) )
+                {
+                    $self->{symbol} = $lconv->{currency_symbol};
+                }
+                if( !CORE::length( $args->{precision} ) && 
+                    ( CORE::length( $lconv->{frac_digits} ) || CORE::length( $lconv->{int_frac_digits} ) ) )
+                {
+                    $self->{precision} = CORE::length( $lconv->{frac_digits} )
+                        ? $lconv->{frac_digits}
+                        : $lconv->{int_frac_digits};
+                }
+                if( !CORE::length( $args->{precede} ) &&
+                    ( CORE::length( $lconv->{p_cs_precedes} ) || CORE::length( $lconv->{int_p_cs_precedes} ) ) )
+                {
+                    $self->{precede} = CORE::length( $lconv->{p_cs_precedes} )
+                        ? $lconv->{p_cs_precedes}
+                        : $lconv->{int_p_cs_precedes};
+                }
+            }
+            else
+            {
+                return( $self->error( "Language \"$self->{lang}\" is not supported by your system." ) );
+            }
+        }
+        catch( $e )
+        {
+            return( $self->error( "An error occurred while getting the locale information for \"$self->{lang}\": $e" ) );
+        }
+    }
+    $Number::Format::DEFAULT_LOCALE->{int_curr_symbol} = 'EUR';
+    try
+    {
+        $self->{_fmt} = Number::Format->new(
+            thousands_sep => $self->{thousand},
+            decimal_point => $self->{decimal},
+            int_curr_symbol => $self->{currency},
+            decimal_digits => $self->{precision},
+            p_cs_precedes => $self->{precede},
+            n_cs_precedes => $self->{precede},
+        );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Unable to crete a Number::Format object: $e" ) );
+    }
+    $self->{_original} = $num;
+    try
+    {
+        $self->{_number} = $self->{_fmt}->unformat_number( $num );
+        return( $self->error( "Invalid number: $num" ) ) if( !defined( $self->{_number} ) );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Invalid number: $num" ) );
+    }
+    return( $self );
+}
+
+sub abs { return( shift->_func( 'abs' ) ); }
+
+# sub asin { return( shift->_func( 'asin', { posix => 1 } ) ); }
+
+sub atan { return( shift->_func( 'atan', { posix => 1 } ) ); }
+
+sub atan2 { return( shift->_func( 'atan2', @_ ) ); }
+
+sub as_boolean { return( Module::Generic::Boolean->new( shift->{_number} ? 1 : 0 ) ); }
+
+sub as_string { return( shift->{_number} ) }
+
+sub cbrt { return( shift->_func( 'cbrt', { posix => 1 } ) ); }
+
+sub ceil { return( shift->_func( 'ceil', { posix => 1 } ) ); }
+
+sub chr { return( Module::Generic::Scalar->new( CORE::chr( $_[0]->{_number} ) ) ); }
+
+sub clone
+{
+    my $self = shift( @_ );
+    my $num  = @_ ? shift( @_ ) : $self->{_number};
+    return( Module::Generic::Infinity->new( $num ) ) if( POSIX::isinf( $num ) );
+    return( Module::Generic::Nan->new( $num ) ) if( POSIX::isnan( $num ) );
+    my @keys = qw( thousand decimal symbol precision );
+    my $hash = {};
+    @$hash{ @keys } = @$self{ @keys };
+    return( $self->new( $num, $hash ) );
+}
+
+sub compute
+{
+    my( $self, $other, $swap, $opts ) = @_;
+    my $other_val = Scalar::Util::blessed( $other ) ? $other : "\"$other\"";
+    my $operation = $swap ? "${other_val} $opts->{op} \$self->{_number}" : "\$self->{_number} $opts->{op} ${other_val}";
+    if( $opts->{return_object} )
+    {
+        my $res = eval( $operation );
+        no overloading;
+        warn( "Error with return formula \"$operation\" using object $self having number '$self->{_number}': $@" ) if( $@ && $self->_warnings_is_enabled );
+        return if( $@ );
+        return( Module::Generic::Scalar->new( $res ) ) if( $opts->{type} eq 'scalar' );
+        return( Module::Generic::Infinity->new( $res ) ) if( POSIX::isinf( $res ) );
+        return( Module::Generic::Nan->new( $res ) ) if( POSIX::isnan( $res ) );
+        ## undef may be returned for example on platform supporting NaN when using <=>
+        return( $self->clone( $res ) ) if( defined( $res ) );
+        return;
+    }
+    elsif( $opts->{boolean} )
+    {
+        my $res = eval( $operation );
+        no overloading;
+        warn( "Error with boolean formula \"$operation\" using object $self having number '$self->{_number}': $@" ) if( $@ && $self->_warnings_is_enabled );
+        return if( $@ );
+        return( $res ? $self->true : $self->false );
+    }
+    else
+    {
+        return( eval( $operation ) );
+    }
+}
+
+sub cos { return( shift->_func( 'cos' ) ); }
+
+sub currency { return( shift->_set_get_prop( 'symbol', @_ ) ); }
+
+sub decimal { return( shift->_set_get_prop( 'decimal', @_ ) ); }
+
+sub exp { return( shift->_func( 'exp' ) ); }
+
+sub floor { return( shift->_func( 'floor', { posix => 1 } ) ); }
+
+sub format
+{
+    my $self = shift( @_ );
+    my $precision = ( @_ && $_[0] =~ /^\d+$/ ) ? shift( @_ ) : $self->precision;
+    no overloading;
+    my $num  = $self->{_number};
+    ## If value provided was undefined, we leave it undefined, otherwise we would be at risk of returning 0, and 0 is very different from undefined
+    return( $num ) if( !defined( $num ) );
+    my $fmt = $self->{_fmt};
+    try
+    {
+        ## Amazingly enough, when a precision > 0 is provided, format_number will discard it if the number, before formatting, did not have decimals... Then, what is the point of formatting a number then?
+        ## To circumvent this, we provide the precision along with the "add trailing zeros" parameter expected by Number::Format
+        ## return( $fmt->format_number( $num, $precision, 1 ) );
+        my $res = $fmt->format_number( "$num", $precision, 1 );
+        return if( !defined( $res ) );
+        return( Module::Generic::Scalar->new( $res ) );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Error formatting number \"$num\": $e" ) );
+    }
+}
+
+sub format_binary { return( Module::Generic::Scalar->new( CORE::sprintf( '%b', shift->{_number} ) ) ); }
+
+sub format_bytes
+{
+    my $self = shift( @_ );
+    # no overloading;
+    my $num  = $self->{_number};
+    ## See comment in format() method
+    return( $num ) if( !defined( $num ) );
+    my $fmt = $self->{_fmt};
+    try
+    {
+        ## return( $fmt->format_bytes( $num, @_ ) );
+        my $res = $fmt->format_bytes( "$num", @_ );
+        return if( !defined( $res ) );
+        return( Module::Generic::Scalar->new( $res ) );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Error formatting number \"$num\": $e" ) );
+    }
+}
+
+sub format_hex { return( Module::Generic::Scalar->new( CORE::sprintf( '0x%X', shift->{_number} ) ) ); }
+
+sub format_money
+{
+    my $self = shift( @_ );
+    my $precision = ( @_ && $_[0] =~ /^\d+$/ ) ? shift( @_ ) : $self->precision;
+    my $currency_symbol = @_ ? shift( @_ ) : $self->currency;
+    # no overloading;
+    my $num  = $self->{_number};
+    ## See comment in format() method
+    return( $num ) if( !defined( $num ) );
+    my $fmt = $self->{_fmt};
+    try
+    {
+        ## Even though the Number::Format instantiated is set with a currency symbol, 
+        ## Number::Format will not respect it, and revert to USD if nothing was provided as argument
+        ## This highlights that Number::Format is designed to be used more for exporting function rather than object methods
+        $self->message( 3, "Passing Number = '$num', precision = '$precision', currency symbol = '$currency_symbol'." );
+        ## return( $fmt->format_price( $num, $precision, $currency_symbol ) );
+        my $res = $fmt->format_price( "$num", "$precision", "$currency_symbol" );
+        return if( !defined( $res ) );
+        return( Module::Generic::Scalar->new( $res ) );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Error formatting number \"$num\": $e" ) );
+    }
+}
+
+sub format_negative
+{
+    my $self = shift( @_ );
+    # no overloading;
+    my $num  = $self->{_number};
+    ## See comment in format() method
+    return( $num ) if( !defined( $num ) );
+    my $fmt = $self->{_fmt};
+    try
+    {
+        my $new = $self->format;
+        ## return( $fmt->format_negative( $new, @_ ) );
+        my $res = $fmt->format_negative( "$new", @_ );
+        return if( !defined( $res ) );
+        return( Module::Generic::Scalar->new( $res ) );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Error formatting number \"$num\": $e" ) );
+    }
+}
+
+sub format_picture
+{
+    my $self = shift( @_ );
+    no overloading;
+    my $num  = $self->{_number};
+    ## See comment in format() method
+    return( $num ) if( !defined( $num ) );
+    my $fmt = $self->{_fmt};
+    try
+    {
+        ## return( $fmt->format_picture( $num, @_ ) );
+        my $res = $fmt->format_picture( "$num", @_ );
+        return if( !defined( $res ) );
+        return( Module::Generic::Scalar->new( $res ) );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Error formatting number \"$num\": $e" ) );
+    }
+}
+
+sub formatter { return( shift->_set_get_object( 'formatter', 'Number::Format', @_ ) ); }
+
+## https://stackoverflow.com/a/483708/4814971
+sub from_binary
+{
+    my $self = shift( @_ );
+    my $binary = shift( @_ );
+    return if( !defined( $binary ) || !CORE::length( $binary ) );
+    try
+    {
+        ## Nice trick to convert from binary to decimal. See perlfunc -> oct
+        my $res = CORE::oct( "0b${binary}" );
+        return if( !defined( $res ) );
+        return( $self->clone( $res ) );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Error while getting number from hexadecimal value \"$hex\": $e" ) );
+    }
+}
+
+sub from_hex
+{
+    my $self = shift( @_ );
+    my $hex = shift( @_ );
+    return if( !defined( $hex ) || !CORE::length( $hex ) );
+    try
+    {
+        my $res = CORE::hex( $hex );
+        return if( !defined( $res ) );
+        return( $self->clone( $res ) );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Error while getting number from hexadecimal value \"$hex\": $e" ) );
+    }
+}
+
+sub int { return( shift->_func( 'int' ) ); }
+
+*is_decimal = \&is_float;
+
+sub is_finite { return( shift->_func( 'isfinite', { posix => 1 }) ); }
+
+sub is_float { return( (POSIX::modf( shift->{_number} ))[0] != 0 ); }
+
+# sub is_infinite { return( !(shift->is_finite) ); }
+sub is_infinite { return( shift->_func( 'isinf', { posix => 1 }) ); }
+
+sub is_int { return( (POSIX::modf( shift->{_number} ))[0] == 0 ); }
+
+sub is_nan { return( shift->_func( 'isnan', { posix => 1}) ); }
+
+*is_neg = \&is_negative;
+
+sub is_negative { return( shift->_func( 'signbit', { posix => 1 }) != 0 ); }
+
+sub is_normal { return( shift->_func( 'isnormal', { posix => 1}) ); }
+
+*is_pos = \&is_positive;
+
+sub is_positive { return( shift->_func( 'signbit', { posix => 1 }) == 0 ); }
+
+sub length { return( $_[0]->clone( CORE::length( $_[0]->{_number} ) ) ); }
+
+sub log { return( shift->_func( 'log' ) ); }
+
+sub log2 { return( shift->_func( 'log2', { posix => 1 } ) ); }
+
+sub log10 { return( shift->_func( 'log10', { posix => 1 } ) ); }
+
+sub max { return( shift->_func( 'fmax', @_, { posix => 1 } ) ); }
+
+sub min { return( shift->_func( 'fmin', @_, { posix => 1 } ) ); }
+
+sub mod { return( shift->_func( 'fmod', @_, { posix => 1 } ) ); }
+
+## This is used so that we can change formatter when the user changes thousand separator, decimal separator, precision or currency
+sub new_formatter
+{
+    my $self = shift( @_ );
+    my $hash = {};
+    if( @_ )
+    {
+        if( @_ == 1 && $self->_is_hash( $_[0] ) )
+        {
+            $hash = shift( @_ );
+        }
+        elsif( !( @_ % 2 ) )
+        {
+            $hash = { @_ };
+        }
+        else
+        {
+            return( $self->error( "Invalid parameters provided: '", join( "', '", @_ ), "'." ) );
+        }
+    }
+    else
+    {
+        my @keys = qw( thousand decimal currency precision precede );
+        @$hash{ @keys } = @$self{ @keys };
+    }
+    try
+    {
+        return( Number::Format->new(
+            thousands_sep => $hash->{thousand},
+            decimal_point => $hash->{decimal},
+            int_curr_symbol => $hash->{currency},
+            decimal_digits => $hash->{precision},
+            p_cs_precedes => $hash->{precede},
+            n_cs_precedes => $hash->{precede},
+        ) );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Error while trying to get a Number::Format object: $e" ) );
+    }
+}
+
+sub oct { return( shift->_func( 'oct' ) ); }
+
+sub pow { return( shift->_func( 'pow', @_, { posix => 1 } ) ); }
+
+sub precede { return( shift->_set_get_prop( 'precede', @_ ) ); }
+
+sub precision { return( shift->_set_get_prop( 'precision', @_ ) ); }
+
+sub rand { return( shift->_func( 'rand' ) ); }
+
+sub round { return( $_[0]->clone( CORE::sprintf( '%.*f', CORE::int( CORE::length( $_[1] ) ? $_[1] : 0 ), $_[0]->{_number} ) ) ); }
+
+sub round_zero { return( shift->_func( 'round', @_, { posix => 1 } ) ); }
+
+sub round2
+{
+    my $self = shift( @_ );
+    no overloading;
+    my $num  = $self->{_number};
+    ## See comment in format() method
+    return( $num ) if( !defined( $num ) );
+    my $fmt = $self->{_fmt};
+    try
+    {
+        ## return( $fmt->round( $num, @_ ) );
+        my $res = $fmt->round( $num, @_ );
+        return if( !defined( $res ) );
+        my $clone = $self->clone;
+        $clone->{_number} = $res;
+        return( $clone );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Error rounding number \"$num\": $e" ) );
+    }
+}
+
+sub sin { return( shift->_func( 'sin' ) ); }
+
+sub sqrt { return( shift->_func( 'sqrt' ) ); }
+
+sub symbol { return( shift->_set_get_prop( 'symbol', @_ ) ); }
+
+sub tan { return( shift->_func( 'tan', { posix => 1 } ) ); }
+
+sub thousand { return( shift->_set_get_prop( 'thousand', @_ ) ); }
+
+sub unformat
+{
+    my $self = shift( @_ );
+    my $num = shift( @_ );
+    return if( !defined( $num ) );
+    try
+    {
+        my $num2 = $self->{_fmt}->unformat_number( $num );
+        my $clone = $self->clone;
+        $clone->{_original} = $num;
+        $clone->{_number} = $num2;
+        return( $clone );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Unable to unformat the number \"$num\": $e" ) );
+    }
+}
+
+sub _func
+{
+    my $self = shift( @_ );
+    my $func = shift( @_ ) || return( $self->error( "No function was provided." ) );
+    ## $self->message( 3, "Arguments received are: '", join( "', '", @_ ), "'." );
+    my $opts = {};
+    $opts = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
+    my $namespace = $opts->{posix} ? 'POSIX' : 'CORE';
+    my $val  = @_ ? shift( @_ ) : undef;
+    my $expr = defined( $val ) ? "${namespace}::${func}( \$self->{_number}, $val )" : "${namespace}::${func}( \$self->{_number} )";
+    ## $self->message( 3, "Evaluating '$expr'" );
+    my $res = eval( $expr );
+    $self->message( 3, "Error: $@" ) if( $@ );
+    return( $self->pass_error( $@ ) ) if( $@ );
+    return if( !defined( $res ) );
+    return( Module::Generic::Infinity->new( $res ) ) if( POSIX::isinf( $res ) );
+    return( Module::Generic::Nan->new( $res ) ) if( POSIX::isnan( $res ) );
+    return( $self->clone( $res ) );
+}
+
+sub _set_get_prop
+{
+    my $self = shift( @_ );
+    my $prop = shift( @_ );
+    if( @_ )
+    {
+        my $val = shift( @_ );
+        if( $val ne $self->{ $prop } )
+        {
+            # $self->{ $prop } = $val;
+            $self->_set_get_scalar_as_object( $prop, $val );
+            ## If an error was set, we return nothing
+            $self->formatter( $self->new_formatter ) || return;
+        }
+    }
+    # return( $self->{ $prop } );
+    return( $self->_set_get_scalar_as_object( $prop ) );
+}
+
+AUTOLOAD
+{
+    my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
+    my $self = shift( @_ ) || return;
+    my $fmt_obj = $self->{_fmt} || return;
+    my $code = $fmt_obj->can( $method );
+    if( $code )
+    {
+        try
+        {
+            return( $code->( $fmt_obj, @_ ) );
+        }
+        catch( $e )
+        {
+            CORE::warn( $e );
+            return;
+        }
+    }
+    return;
+};
+
+package Module::Generic::NumberSpecial;
+BEGIN
+{
+    use strict;
+    use warnings;
+    use parent -norequire, qw( Module::Generic::Number );
+    use overload ('""'      => sub{ $_[0]->{_number} },
+                  '+='      => sub{ &_catchall( @_[0..2], '+' ) },
+                  '-='      => sub{ &_catchall( @_[0..2], '-' ) },
+                  '*='      => sub{ &_catchall( @_[0..2], '*' ) },
+                  '/='      => sub{ &_catchall( @_[0..2], '/' ) },
+                  '%='      => sub{ &_catchall( @_[0..2], '%' ) },
+                  '**='      => sub{ &_catchall( @_[0..2], '**' ) },
+                  '<<='      => sub{ &_catchall( @_[0..2], '<<' ) },
+                  '>>='      => sub{ &_catchall( @_[0..2], '>>' ) },
+                  'x='      => sub{ &_catchall( @_[0..2], 'x' ) },
+                  '.='      => sub{ &_catchall( @_[0..2], '.' ) },
+                  nomethod  => \&_catchall,
+                  fallback  => 1,
+                 );
+    use Want;
+    use POSIX ();
+    our( $VERSION ) = '0.1';
+};
+
+sub new
+{
+    my $this = shift( @_ );
+    return( bless( { _number => CORE::shift( @_ ) } => ( ref( $this ) || $this ) ) );
+}
+
+sub clone { return( shift->new( @_ ) ); }
+
+sub is_finite { return( 0 ); }
+
+sub is_float { return( 0 ); }
+
+sub is_infinite { return( 0 ); }
+
+sub is_int { return( 0 ); }
+
+sub is_nan { return( 0 ); }
+
+sub is_normal { return( 0 ); }
+
+sub length { return( CORE::length( $self->{_number} ) ); }
+
+sub _catchall
+{
+    my( $self, $other, $swap, $op ) = @_;
+    my $expr = $swap ? "$other $op $self->{_number}" : "$self->{_number} $op $other";
+    my $res = eval( $expr );
+    ## print( ref( $self ), "::_catchall: evaluating $expr => $res\n" );
+    CORE::warn( "Error evaluating expression \"$expr\": $@" ) if( $@ );
+    return if( $@ );
+    return( Module::Generic::Number->new( $res ) ) if( POSIX::isnormal( $res ) );
+    return( Module::Generic::Infinity->new( $res ) ) if( POSIX::isinf( $res ) );
+    return( Module::Generic::Nan->new( $res ) ) if( POSIX::isnan( $res ) );
+    return( $res );
+}
+
+sub _func
+{
+    my $self = shift( @_ );
+    my $func = shift( @_ ) || return( $self->error( "No function was provided." ) );
+    my $opts = {};
+    $opts = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
+    my $namespace = $opts->{posix} ? 'POSIX' : 'CORE';
+    my $val  = @_ ? shift( @_ ) : undef;
+    my $expr = defined( $val ) ? "${namespace}::${func}( $self->{_number}, $val )" : "${namespace}::${func}( $self->{_number} )";
+    my $res = eval( $expr );
+    ## $self->message( 3, "Error: $@" ) if( $@ );
+    ## print( STDERR ref( $self ), "::_func -> evaluating '$expr' -> '$res'\n" );
+    CORE::warn( $@ ) if( $@ );
+    return if( !defined( $res ) );
+    return( Module::Generic::Number->new( $res ) ) if( POSIX::isnormal( $res ) );
+    return( Module::Generic::Infinity->new( $res ) ) if( POSIX::isinf( $res ) );
+    return( Module::Generic::Nan->new( $res ) ) if( POSIX::isnan( $res ) );
+    return( $res );
+}
+
+AUTOLOAD
+{
+    my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
+    ## print( STDERR "$AUTOLOAD: called for method \"$method\"\n" );
+    ## If we are chained, return our null object, so the chain continues to work
+    if( want( 'OBJECT' ) )
+    {
+        ## No, this is NOT a typo. rreturn() is a function of module Want
+        print( STDERR "$AUTOLOAD: Returning the object itself (", ref( $_[0] ), ")\n" );
+        rreturn( $_[0] );
+    }
+    ## Otherwise, we return infinity, whether positive or negative or NaN depending on what was set
+    ## print( STDERR "$AUTOLOAD: returning '", $_[0]->{_number}, "'\n" );
+    return( $_[0]->{_number} );
+};
+
+DESTROY {};
+
+## Purpose is to allow chaining of methods when infinity is returned
+## At the end of the chain, Inf or -Inf is returned
+package Module::Generic::Infinity;
+BEGIN
+{
+    use strict;
+    use warnings;
+    use parent -norequire, qw( Module::Generic::NumberSpecial );
+    our( $VERSION ) = '0.1';
+};
+
+sub is_infinite { return( 1 ); }
+
+package Module::Generic::Nan;
+BEGIN
+{
+    use strict;
+    use warnings;
+    use parent -norequire, qw( Module::Generic::NumberSpecial );
+    our( $VERSION ) = '0.1';
+};
+
+sub is_nan { return( 1 ); }
+
+
+package Module::Generic::Hash;
+BEGIN
+{
+    use strict;
+    use warnings::register;
+    use parent -norequire, qw( Module::Generic );
+    use overload (
+        ## '""'    => 'as_string',
+        'eq'    => sub { _obj_eq(@_) },
+        'ne'    => sub { !_obj_eq(@_) },
+        '<'     => sub { _obj_comp( @_, '<') },
+        '>'     => sub { _obj_comp( @_, '>') },
+        '<='     => sub { _obj_comp( @_, '<=') },
+        '>='     => sub { _obj_comp( @_, '>=') },
+        '=='     => sub { _obj_comp( @_, '>=') },
+        '!='     => sub { _obj_comp( @_, '>=') },
+        'lt'     => sub { _obj_comp( @_, 'lt') },
+        'gt'     => sub { _obj_comp( @_, 'gt') },
+        'le'     => sub { _obj_comp( @_, 'le') },
+        'ge'     => sub { _obj_comp( @_, 'ge') },
+        fallback => 1,
+    );
+    use Data::Dumper;
+    use JSON;
+    use Clone ();
+    use Regexp::Common;
+};
+
+sub new
+{
+    my $that = shift( @_ );
+    my $class = ref( $that ) || $that;
+    my $data = shift( @_ ) ||
+    return( $that->error( "No hash was provided to initiate a $class hash object." ) );
+    return( $that->error( "I was expecting an hash, but instead got '$data'." ) ) if( Scalar::Util::reftype( $data ) ne 'HASH' );
+    my $tied = tied( %$data );
+    return( $that->error( "Hash provided is already tied to ", ref( $tied ), " and our package $class cannot use it, or it would disrupt the tie." ) ) if( $tied );
+    my %hash = ();
+    ## This enables access to the hash just like a real hash while still the user an call our object methods
+    my $obj = tie( %hash, 'Module::Generic::TieHash', {
+        disable => ['Module::Generic'],
+        debug => 0,
+    });
+    my $self = bless( \%hash => $class );
+    $obj->enable( 1 );
+    my @keys = keys( %$data );
+    @hash{ @keys } = @$data{ @keys };
+    $obj->enable( 0 );
+    $self->SUPER::init( @_ );
+    $obj->enable( 1 );
+    return( $self );
+}
+
+sub as_string { return( shift->dump ); }
+
+sub clone
+{
+    my $self = shift( @_ );
+    $self->_tie_object->enable( 0 );
+    my $data = $self->{data};
+    my $clone = Clone::clone( $data );
+    $self->_tie_object->enable( 1 );
+    return( $self->new( $clone ) );
+}
+
+sub debug { return( shift->_internal( 'debug', '_set_get_number', @_ ) ); }
+
+sub defined { CORE::defined( $_[0]->{ $_[1] } ); }
+
+sub delete { return( CORE::delete( shift->{ shift( @_ ) } ) ); }
+
+sub dump
+{
+    my $self = shift( @_ );
+    return( $self->_dumper( $self ) );
+}
+
+sub each
+{
+    my $self = shift( @_ );
+    my $code = shift( @_ ) || return( $self->error( "No subroutine callback as provided for each" ) );
+    return( $self->error( "I was expecting a reference to a subroutine for the callback to each, but got '$code' instead." ) ) if( ref( $code ) ne 'CODE' );
+    while( my( $k, $v ) = CORE::each( %$self ) )
+    {
+        $code->( $k, $v ) || CORE::last;
+    }
+    return( $self );
+}
+
+sub exists { return( CORE::exists( shift->{ shift( @_ ) } ) ); }
+
+sub for { return( shift->foreach( @_ ) ); }
+
+sub foreach
+{
+    my $self = shift( @_ );
+    my $code = shift( @_ ) || return( $self->error( "No subroutine callback as provided for each" ) );
+    return( $self->error( "I was expecting a reference to a subroutine for the callback to each, but got '$code' instead." ) ) if( ref( $code ) ne 'CODE' );
+    CORE::foreach my $k ( keys( %$self ) )
+    {
+        $code->( $k, $self->{ $k } ) || CORE::last;
+    }
+    return( $self );
+}
+
+sub json
+{
+    my $self = shift( @_ );
+    my $opts = {};
+    $opts = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
+    $self->_tie_object->enable( 0 );
+    my $data = $self->{data};
+    my $json;
+    if( $opts->{pretty} )
+    {
+        $json = JSON->new->pretty->utf8->indent(1)->relaxed(1)->canonical(1)->allow_nonref->encode( $data );
+    }
+    else
+    {
+        $json = JSON->new->utf8->canonical(1)->allow_nonref->encode( $data );
+    }
+    $self->_tie_object->enable( 1 );
+    return( Module::Generic::Scalar->new( $json ) );
+}
+
+# $h->keys->sort
+sub keys { return( Module::Generic::Array->new( [ CORE::keys( %{$_[0]} ) ] ) ); }
+
+sub length { return( Module::Generic::Number->new( CORE::scalar( CORE::keys( %{$_[0]} ) ) ) ); }
+
+sub merge
+{
+    my $self = shift( @_ );
+    my $hash = {};
+    $hash = shift( @_ );
+    return( $self->error( "No valid hash provided." ) ) if( !$hash || Scalar::Util::reftype( $hash ) ne 'HASH' );
+    ## $self->message( 3, "Hash provided is: ", sub{ $self->dumper( $hash ) } );
+    my $opts = {};
+    $opts = pop( @_ ) if( @_ && ref( $_[-1] ) eq 'HASH' );
+    $opts->{overwrite} = 1 unless( CORE::exists( $opts->{overwrite} ) );
+    $self->_tie_object->enable( 0 );
+    my $data = $self->{data};
+    my $seen = {};
+    local $copy = sub
+    {
+        my $this = shift( @_ );
+        my $to = shift( @_ );
+        my $p  = {};
+        $p = shift( @_ ) if( @_ && ref( $_[-1] ) eq 'HASH' );
+        ## $self->message( 3, "Merging hash ", sub{ $self->dumper( $this ) }, " to hash ", sub{ $self->dumper( $to ) }, " and with parameters ", sub{ $self->dumper( $p ) } );
+        CORE::foreach my $k ( CORE::keys( %$this ) )
+        {
+            # $self->message( 3, "Skipping existing property '$k'." ) if( CORE::exists( $to->{ $k } ) && !$p->{overwrite} );
+            next if( CORE::exists( $to->{ $k } ) && !$p->{overwrite} );
+            if( ref( $this->{ $k } ) eq 'HASH' || 
+                ( Scalar::Util::blessed( $this->{ $k } ) && $this->{ $k }->isa( 'Module::Generic::Hash' ) ) )
+            {
+                my $addr = Scalar::Util::refaddr( $this->{ $k } );
+                # $self->message( 3, "Checking if hash in property '$k' was already processed with address '$addr'." );
+                if( CORE::exists( $seen->{ $addr } ) )
+                {
+                    $to->{ $k } = $seen->{ $addr };
+                    next;
+                }
+                else
+                {
+                    $to->{ $k } = {} unless( Scalar::Util::reftype( $to->{ $k } ) eq 'HASH' );
+                    $copy->( $this->{ $k }, $to->{ $k } );
+                }
+                $seen->{ $addr } = $this->{ $k };
+            }
+            else
+            {
+                $to->{ $k } = $this->{ $k };
+            }
+        }
+    };
+    ## $self->message( 3, "Propagating hash ", sub{ $self->dumper( $hash ) }, " to hash ", sub{ $self->dumper( $data ) } );
+    $copy->( $hash, $data, $opts );
+    $self->_tie_object->enable( 1 );
+    return( $self );
+}
+
+sub reset { %{$_[0]} = () };
+
+sub undef { %{$_[0]} = () };
+
+sub values
+{
+    my $self = shift( @_ );
+    my $code;
+    $code = shift( @_ ) if( @_ && ref( $_[0] ) eq 'CODE' );
+    my $opts = {};
+    $opts = pop( @_ ) if( Scalar::Util::reftype( $_[-1] ) eq 'HASH' );
+    if( $code )
+    {
+        if( $opts->{sort} )
+        {
+            return( Module::Generic::Array->new( [ CORE::map( $code->( $_ ), CORE::sort( CORE::values( %$self ) ) ) ] ) );
+        }
+        else
+        {
+            return( Module::Generic::Array->new( [ CORE::map( $code->( $_ ), CORE::values( %$self ) ) ] ) );
+        }
+    }
+    else
+    {
+        if( $opts->{sort} )
+        {
+            return( Module::Generic::Array->new( [ CORE::sort( CORE::values( %$self ) ) ] ) );
+        }
+        else
+        {
+            return( Module::Generic::Array->new( [ CORE::values( %$self ) ] ) );
+        }
+    }
+}
+
+# sub _dumper
+# {
+#     my $self = shift( @_ );
+#     if( !$self->{_dumper} )
+#     {
+#         my $d = Data::Dumper->new;
+#         $d->Indent( 1 );
+#         $d->Useqq( 1 );
+#         $d->Terse( 1 );
+#         $d->Sortkeys( 1 );
+#         $self->{_dumper} = $d;
+#     }
+#     return( $self->{_dumper}->Dumper( @_ ) );
+# }
+# 
+sub _dumper
+{
+    my $self = shift( @_ );
+    $self->_tie_object->enable( 0 );
+    my $data = $self->{data};
+    my $d = Data::Dumper->new( [ $data ] );
+    $d->Indent( 1 );
+    $d->Useqq( 1 );
+    $d->Terse( 1 );
+    $d->Sortkeys( 1 );
+    # $d->Freezer( '' );
+    $d->Bless( '' );
+    # return( $d->Dump );
+    my $str = $d->Dump;
+    $self->_tie_object->enable( 1 );
+    return( $str );
+}
+
+sub _internal
+{
+    my $self = shift( @_ );
+    my $field = shift( @_ );
+    my $meth  = shift( @_ );
+    # print( STDERR ref( $self ), "::_internal -> Caling method '$meth' for field '$field' with value '", join( "', '", @_ ), "'\n" );
+    $self->_tie_object->enable( 0 );
+    my( @resA, $resB );
+    if( wantarray )
+    {
+        @resA = $self->$meth( $field, @_ );
+        # $self->message( "Resturn list value is: '@resA'" );
+    }
+    else
+    {
+        $resB = $self->$meth( $field, @_ );
+        # $self->message( "Resturn scalar value is: '$resB'" );
+    }
+    $self->_tie_object->enable( 1 );
+    return( wantarray ? @resA : $resB );
+}
+
+sub _obj_comp
+{
+    my( $self, $other, $swap, $op ) = @_;
+    my( $lA, $lB );
+    $lA = $self->length;
+    if( Scalar::Util::blessed( $other ) && $other->isa( 'Module::Generic::Hash' ) )
+    {
+        $lB = $other->length;
+    }
+    elsif( $other =~ /^$RE{num}{real}$/ )
+    {
+        $lB = $other;
+    }
+    else
+    {
+        return;
+    }
+    my $expr = $swap ? "$lB $op $lA" : "$lA $op $lB";
+    return( eval( $expr ) );
+}
+
+sub _printer { return( shift->printer( @_ ) ); }
+
+sub _obj_eq
+{
+    no overloading;
+    my $self = shift( @_ );
+    my $other = shift( @_ );
+    my $strA = $self->_dumper( $self );
+    my $strB;
+    if( Scalar::Util::blessed( $other ) && $other->isa( 'Module::Generic::Hash' ) )
+    {
+        $strB = $other->dump;
+    }
+    elsif( Scalar::Util::reftype( $other ) eq 'HASH' )
+    {
+        $strB = $self->_dumper( $other )
+    }
+    else
+    {
+        return( 0 );
+    }
+    return( $strA eq $strB );
+}
+
+sub _tie_object
+{
+    my $self = shift( @_ );
+    return( tied( %$self ) );
+}
+
+package Module::Generic::TieHash;
+BEGIN
+{
+    use strict;
+    use warnings::register;
+    use parent -norequire, qw( Module::Generic );
+    use Scalar::Util ();
+};
+
+sub TIEHASH
+{
+    my $self  = shift( @_ );
+    my $opts  = {};
+    $opts = shift( @_ ) if( @_ );
+    if( Scalar::Util::reftype( $opts ) ne 'HASH' )
+    {
+        warn( "Parameters provided ($opts) is not an hash reference.\n" ) if( $self->_warnings_is_enabled );
+        return;
+    }
+    my $disable = [];
+    $disable = $opts->{disable} if( Scalar::Util::reftype( $opts->{disable} ) );
+    my $list = {};
+    @$list{ @$disable } = ( 1 ) x scalar( @$disable );
+    my $hash =
+    {
+    ## The caller sets this to its class, so we can differentiate calls from inside and outside our caller's package
+    disable => $list,
+    debug => $opts->{debug},
+    ## When disabled, the Tie::Hash system will return hash key values directly under $self instead of $self->{data}
+    ## Disabled by default so the new() method can access its setup data directly under $self
+    ## Then new() can call enable to active it
+    enable => 0,
+    ## Where to store the actual hash data
+    data  => {},
+    };
+    my $class = ref( $self ) || $self;
+    return( bless( $hash => $class ) );
+}
+
+sub CLEAR
+{
+    my $self = shift( @_ );
+    my $data = $self->{data};
+    %$data = ();
+}
+
+sub DELETE
+{
+    my $self = shift( @_ );
+    my $data = $self->{data};
+    my $key  = shift( @_ );
+    my $caller = caller;
+    if( $self->_exclude( $caller ) || !$self->{enable} )
+    # if( !$self->{enable} )
+    {
+        CORE::delete( $self->{ $key } );
+    }
+    else
+    {
+        CORE::delete( $data->{ $key } );
+    }
+}
+
+sub EXISTS
+{
+    my $self = shift( @_ );
+    my $data = $self->{data};
+    my $key  = shift( @_ );
+    my $caller = caller;
+    if( $self->_exclude( $caller ) || !$self->{enable} )
+    # if( !$self->{enable} )
+    {
+        CORE::exists( $self->{ $key } );
+    }
+    else
+    {
+        CORE::exists( $data->{ $key } );
+    }
+}
+
+sub FETCH
+{
+    my $self = shift( @_ );
+    my $data = $self->{data};
+    my $key  = shift( @_ );
+    my $caller = caller;
+    ## print( STDERR "FETCH($caller)[enable=$self->{enable}] <- '$key''\n" );
+    if( $self->_exclude( $caller ) || !$self->{enable} )
+    # if( !$self->{enable} )
+    {
+        #print( STDERR "FETCH($caller)[owner calling, enable=$self->{enable}] <- '$key' <- '$self->{$key}'\n" );
+        return( $self->{ $key } )
+    }
+    else
+    {
+        #print( STDERR "FETCH($caller)[enable=$self->{enable}] <- '$key' <- '$data->{$key}'\n" );
+        return( $data->{ $key } );
+    }
+}
+
+sub FIRSTKEY
+{
+    my $self = shift( @_ );
+    my $data = $self->{data};
+    my @keys = ();
+    my $caller = caller;
+    if( $self->_exclude( $caller ) || !$self->{enable} )
+    # if( !$self->{enable} )
+    {
+        @keys = keys( %$self );
+    }
+    else
+    {
+        @keys = keys( %$data );
+    }
+    $self->{ITERATOR} = \@keys;
+    return( shift( @keys ) );
+}
+
+sub NEXTKEY
+{
+    my $self = shift( @_ );
+    my $data = $self->{data};
+    my $keys = ref( $self->{ITERATOR} ) ? $self->{ITERATOR} : [];
+    return( shift( @$keys ) );
+}
+
+sub SCALAR
+{
+    my $self  = shift( @_ );
+    my $data = $self->{data};
+    my $caller = caller;
+    if( $self->_exclude( $caller ) || !$self->{enable} )
+    # if( !$self->{enable} )
+    {
+        return( scalar( keys( %$self ) ) );
+    }
+    else
+    {
+        return( scalar( keys( %$data ) ) );
+    }
+}
+
+sub STORE
+{
+    my $self  = shift( @_ );
+    my $data = $self->{data};
+    my( $key, $val ) = @_;
+    my $caller = caller;
+    if( $self->_exclude( $caller ) || !$self->{enable} )
+    # if( !$self->{enable} )
+    {
+        #print( STDERR "STORE($caller)[owner calling] <- '$key' -> '$val'\n" );
+        $self->{ $key } = $val;
+    }
+    else
+    {
+        #print( STDERR "STORE($caller)[enable=$self->{enable}] <- '$key' -> '$val'\n" );
+        $data->{ $key } = $val;
+    }
+}
+
+sub enable { return( shift->_set_get_boolean( 'enable', @_ ) ); }
+
+sub _exclude
+{
+    my $self = shift( @_ );
+    my $caller = shift( @_ );
+    ## $self->message( 3, "Disable hash contains: ", sub{ $self->dump( $self->{disable} ) });
+    return( CORE::exists( $self->{disable}->{ $caller } ) );
+}
 
 package Module::Generic::Tie;
 use Tie::Hash;
@@ -3976,759 +5898,6 @@ sub STORE
 
 __END__
 
-255 250 250             snow
-248 248 255             ghost white
-248 248 255             GhostWhite
-245 245 245             white smoke
-245 245 245             WhiteSmoke
-220 220 220             gainsboro
-255 250 240             floral white
-255 250 240             FloralWhite
-253 245 230             old lace
-253 245 230             OldLace
-250 240 230             linen
-250 235 215             antique white
-250 235 215             AntiqueWhite
-255 239 213             papaya whip
-255 239 213             PapayaWhip
-255 235 205             blanched almond
-255 235 205             BlanchedAlmond
-255 228 196             bisque
-255 218 185             peach puff
-255 218 185             PeachPuff
-255 222 173             navajo white
-255 222 173             NavajoWhite
-255 228 181             moccasin
-255 248 220             cornsilk
-255 255 240             ivory
-255 250 205             lemon chiffon
-255 250 205             LemonChiffon
-255 245 238             seashell
-240 255 240             honeydew
-245 255 250             mint cream
-245 255 250             MintCream
-240 255 255             azure
-240 248 255             alice blue
-240 248 255             AliceBlue
-230 230 250             lavender
-255 240 245             lavender blush
-255 240 245             LavenderBlush
-255 228 225             misty rose
-255 228 225             MistyRose
-255 255 255             white
-  0   0   0             black
- 47  79  79             dark slate gray
- 47  79  79             DarkSlateGray
- 47  79  79             dark slate grey
- 47  79  79             DarkSlateGrey
-105 105 105             dim gray
-105 105 105             DimGray
-105 105 105             dim grey
-105 105 105             DimGrey
-112 128 144             slate gray
-112 128 144             SlateGray
-112 128 144             slate grey
-112 128 144             SlateGrey
-119 136 153             light slate gray
-119 136 153             LightSlateGray
-119 136 153             light slate grey
-119 136 153             LightSlateGrey
-190 190 190             gray
-190 190 190             grey
-211 211 211             light grey
-211 211 211             LightGrey
-211 211 211             light gray
-211 211 211             LightGray
- 25  25 112             midnight blue
- 25  25 112             MidnightBlue
-  0   0 128             navy
-  0   0 128             navy blue
-  0   0 128             NavyBlue
-100 149 237             cornflower blue
-100 149 237             CornflowerBlue
- 72  61 139             dark slate blue
- 72  61 139             DarkSlateBlue
-106  90 205             slate blue
-106  90 205             SlateBlue
-123 104 238             medium slate blue
-123 104 238             MediumSlateBlue
-132 112 255             light slate blue
-132 112 255             LightSlateBlue
-  0   0 205             medium blue
-  0   0 205             MediumBlue
- 65 105 225             royal blue
- 65 105 225             RoyalBlue
-  0   0 255             blue
- 30 144 255             dodger blue
- 30 144 255             DodgerBlue
-  0 191 255             deep sky blue
-  0 191 255             DeepSkyBlue
-135 206 235             sky blue
-135 206 235             SkyBlue
-135 206 250             light sky blue
-135 206 250             LightSkyBlue
- 70 130 180             steel blue
- 70 130 180             SteelBlue
-176 196 222             light steel blue
-176 196 222             LightSteelBlue
-173 216 230             light blue
-173 216 230             LightBlue
-176 224 230             powder blue
-176 224 230             PowderBlue
-175 238 238             pale turquoise
-175 238 238             PaleTurquoise
-  0 206 209             dark turquoise
-  0 206 209             DarkTurquoise
- 72 209 204             medium turquoise
- 72 209 204             MediumTurquoise
- 64 224 208             turquoise
-  0 255 255             cyan
-224 255 255             light cyan
-224 255 255             LightCyan
- 95 158 160             cadet blue
- 95 158 160             CadetBlue
-102 205 170             medium aquamarine
-102 205 170             MediumAquamarine
-127 255 212             aquamarine
-  0 100   0             dark green
-  0 100   0             DarkGreen
- 85 107  47             dark olive green
- 85 107  47             DarkOliveGreen
-143 188 143             dark sea green
-143 188 143             DarkSeaGreen
- 46 139  87             sea green
- 46 139  87             SeaGreen
- 60 179 113             medium sea green
- 60 179 113             MediumSeaGreen
- 32 178 170             light sea green
- 32 178 170             LightSeaGreen
-152 251 152             pale green
-152 251 152             PaleGreen
-  0 255 127             spring green
-  0 255 127             SpringGreen
-124 252   0             lawn green
-124 252   0             LawnGreen
-  0 255   0             green
-127 255   0             chartreuse
-  0 250 154             medium spring green
-  0 250 154             MediumSpringGreen
-173 255  47             green yellow
-173 255  47             GreenYellow
- 50 205  50             lime green
- 50 205  50             LimeGreen
-154 205  50             yellow green
-154 205  50             YellowGreen
- 34 139  34             forest green
- 34 139  34             ForestGreen
-107 142  35             olive drab
-107 142  35             OliveDrab
-189 183 107             dark khaki
-189 183 107             DarkKhaki
-240 230 140             khaki
-238 232 170             pale goldenrod
-238 232 170             PaleGoldenrod
-250 250 210             light goldenrod yellow
-250 250 210             LightGoldenrodYellow
-255 255 224             light yellow
-255 255 224             LightYellow
-255 255   0             yellow
-255 215   0             gold
-238 221 130             light goldenrod
-238 221 130             LightGoldenrod
-218 165  32             goldenrod
-184 134  11             dark goldenrod
-184 134  11             DarkGoldenrod
-188 143 143             rosy brown
-188 143 143             RosyBrown
-205  92  92             indian red
-205  92  92             IndianRed
-139  69  19             saddle brown
-139  69  19             SaddleBrown
-160  82  45             sienna
-205 133  63             peru
-222 184 135             burlywood
-245 245 220             beige
-245 222 179             wheat
-244 164  96             sandy brown
-244 164  96             SandyBrown
-210 180 140             tan
-210 105  30             chocolate
-178  34  34             firebrick
-165  42  42             brown
-233 150 122             dark salmon
-233 150 122             DarkSalmon
-250 128 114             salmon
-255 160 122             light salmon
-255 160 122             LightSalmon
-255 165   0             orange
-255 140   0             dark orange
-255 140   0             DarkOrange
-255 127  80             coral
-240 128 128             light coral
-240 128 128             LightCoral
-255  99  71             tomato
-255  69   0             orange red
-255  69   0             OrangeRed
-255   0   0             red
-255 105 180             hot pink
-255 105 180             HotPink
-255  20 147             deep pink
-255  20 147             DeepPink
-255 192 203             pink
-255 182 193             light pink
-255 182 193             LightPink
-219 112 147             pale violet red
-219 112 147             PaleVioletRed
-176  48  96             maroon
-199  21 133             medium violet red
-199  21 133             MediumVioletRed
-208  32 144             violet red
-208  32 144             VioletRed
-255   0 255             magenta
-238 130 238             violet
-221 160 221             plum
-218 112 214             orchid
-186  85 211             medium orchid
-186  85 211             MediumOrchid
-153  50 204             dark orchid
-153  50 204             DarkOrchid
-148   0 211             dark violet
-148   0 211             DarkViolet
-138  43 226             blue violet
-138  43 226             BlueViolet
-160  32 240             purple
-147 112 219             medium purple
-147 112 219             MediumPurple
-216 191 216             thistle
-255 250 250             snow1
-238 233 233             snow2
-205 201 201             snow3
-139 137 137             snow4
-255 245 238             seashell1
-238 229 222             seashell2
-205 197 191             seashell3
-139 134 130             seashell4
-255 239 219             AntiqueWhite1
-238 223 204             AntiqueWhite2
-205 192 176             AntiqueWhite3
-139 131 120             AntiqueWhite4
-255 228 196             bisque1
-238 213 183             bisque2
-205 183 158             bisque3
-139 125 107             bisque4
-255 218 185             PeachPuff1
-238 203 173             PeachPuff2
-205 175 149             PeachPuff3
-139 119 101             PeachPuff4
-255 222 173             NavajoWhite1
-238 207 161             NavajoWhite2
-205 179 139             NavajoWhite3
-139 121  94             NavajoWhite4
-255 250 205             LemonChiffon1
-238 233 191             LemonChiffon2
-205 201 165             LemonChiffon3
-139 137 112             LemonChiffon4
-255 248 220             cornsilk1
-238 232 205             cornsilk2
-205 200 177             cornsilk3
-139 136 120             cornsilk4
-255 255 240             ivory1
-238 238 224             ivory2
-205 205 193             ivory3
-139 139 131             ivory4
-240 255 240             honeydew1
-224 238 224             honeydew2
-193 205 193             honeydew3
-131 139 131             honeydew4
-255 240 245             LavenderBlush1
-238 224 229             LavenderBlush2
-205 193 197             LavenderBlush3
-139 131 134             LavenderBlush4
-255 228 225             MistyRose1
-238 213 210             MistyRose2
-205 183 181             MistyRose3
-139 125 123             MistyRose4
-240 255 255             azure1
-224 238 238             azure2
-193 205 205             azure3
-131 139 139             azure4
-131 111 255             SlateBlue1
-122 103 238             SlateBlue2
-105  89 205             SlateBlue3
- 71  60 139             SlateBlue4
- 72 118 255             RoyalBlue1
- 67 110 238             RoyalBlue2
- 58  95 205             RoyalBlue3
- 39  64 139             RoyalBlue4
-  0   0 255             blue1
-  0   0 238             blue2
-  0   0 205             blue3
-  0   0 139             blue4
- 30 144 255             DodgerBlue1
- 28 134 238             DodgerBlue2
- 24 116 205             DodgerBlue3
- 16  78 139             DodgerBlue4
- 99 184 255             SteelBlue1
- 92 172 238             SteelBlue2
- 79 148 205             SteelBlue3
- 54 100 139             SteelBlue4
-  0 191 255             DeepSkyBlue1
-  0 178 238             DeepSkyBlue2
-  0 154 205             DeepSkyBlue3
-  0 104 139             DeepSkyBlue4
-135 206 255             SkyBlue1
-126 192 238             SkyBlue2
-108 166 205             SkyBlue3
- 74 112 139             SkyBlue4
-176 226 255             LightSkyBlue1
-164 211 238             LightSkyBlue2
-141 182 205             LightSkyBlue3
- 96 123 139             LightSkyBlue4
-198 226 255             SlateGray1
-185 211 238             SlateGray2
-159 182 205             SlateGray3
-108 123 139             SlateGray4
-202 225 255             LightSteelBlue1
-188 210 238             LightSteelBlue2
-162 181 205             LightSteelBlue3
-110 123 139             LightSteelBlue4
-191 239 255             LightBlue1
-178 223 238             LightBlue2
-154 192 205             LightBlue3
-104 131 139             LightBlue4
-224 255 255             LightCyan1
-209 238 238             LightCyan2
-180 205 205             LightCyan3
-122 139 139             LightCyan4
-187 255 255             PaleTurquoise1
-174 238 238             PaleTurquoise2
-150 205 205             PaleTurquoise3
-102 139 139             PaleTurquoise4
-152 245 255             CadetBlue1
-142 229 238             CadetBlue2
-122 197 205             CadetBlue3
- 83 134 139             CadetBlue4
-  0 245 255             turquoise1
-  0 229 238             turquoise2
-  0 197 205             turquoise3
-  0 134 139             turquoise4
-  0 255 255             cyan1
-  0 238 238             cyan2
-  0 205 205             cyan3
-  0 139 139             cyan4
-151 255 255             DarkSlateGray1
-141 238 238             DarkSlateGray2
-121 205 205             DarkSlateGray3
- 82 139 139             DarkSlateGray4
-127 255 212             aquamarine1
-118 238 198             aquamarine2
-102 205 170             aquamarine3
- 69 139 116             aquamarine4
-193 255 193             DarkSeaGreen1
-180 238 180             DarkSeaGreen2
-155 205 155             DarkSeaGreen3
-105 139 105             DarkSeaGreen4
- 84 255 159             SeaGreen1
- 78 238 148             SeaGreen2
- 67 205 128             SeaGreen3
- 46 139  87             SeaGreen4
-154 255 154             PaleGreen1
-144 238 144             PaleGreen2
-124 205 124             PaleGreen3
- 84 139  84             PaleGreen4
-  0 255 127             SpringGreen1
-  0 238 118             SpringGreen2
-  0 205 102             SpringGreen3
-  0 139  69             SpringGreen4
-  0 255   0             green1
-  0 238   0             green2
-  0 205   0             green3
-  0 139   0             green4
-127 255   0             chartreuse1
-118 238   0             chartreuse2
-102 205   0             chartreuse3
- 69 139   0             chartreuse4
-192 255  62             OliveDrab1
-179 238  58             OliveDrab2
-154 205  50             OliveDrab3
-105 139  34             OliveDrab4
-202 255 112             DarkOliveGreen1
-188 238 104             DarkOliveGreen2
-162 205  90             DarkOliveGreen3
-110 139  61             DarkOliveGreen4
-255 246 143             khaki1
-238 230 133             khaki2
-205 198 115             khaki3
-139 134  78             khaki4
-255 236 139             LightGoldenrod1
-238 220 130             LightGoldenrod2
-205 190 112             LightGoldenrod3
-139 129  76             LightGoldenrod4
-255 255 224             LightYellow1
-238 238 209             LightYellow2
-205 205 180             LightYellow3
-139 139 122             LightYellow4
-255 255   0             yellow1
-238 238   0             yellow2
-205 205   0             yellow3
-139 139   0             yellow4
-255 215   0             gold1
-238 201   0             gold2
-205 173   0             gold3
-139 117   0             gold4
-255 193  37             goldenrod1
-238 180  34             goldenrod2
-205 155  29             goldenrod3
-139 105  20             goldenrod4
-255 185  15             DarkGoldenrod1
-238 173  14             DarkGoldenrod2
-205 149  12             DarkGoldenrod3
-139 101   8             DarkGoldenrod4
-255 193 193             RosyBrown1
-238 180 180             RosyBrown2
-205 155 155             RosyBrown3
-139 105 105             RosyBrown4
-255 106 106             IndianRed1
-238  99  99             IndianRed2
-205  85  85             IndianRed3
-139  58  58             IndianRed4
-255 130  71             sienna1
-238 121  66             sienna2
-205 104  57             sienna3
-139  71  38             sienna4
-255 211 155             burlywood1
-238 197 145             burlywood2
-205 170 125             burlywood3
-139 115  85             burlywood4
-255 231 186             wheat1
-238 216 174             wheat2
-205 186 150             wheat3
-139 126 102             wheat4
-255 165  79             tan1
-238 154  73             tan2
-205 133  63             tan3
-139  90  43             tan4
-255 127  36             chocolate1
-238 118  33             chocolate2
-205 102  29             chocolate3
-139  69  19             chocolate4
-255  48  48             firebrick1
-238  44  44             firebrick2
-205  38  38             firebrick3
-139  26  26             firebrick4
-255  64  64             brown1
-238  59  59             brown2
-205  51  51             brown3
-139  35  35             brown4
-255 140 105             salmon1
-238 130  98             salmon2
-205 112  84             salmon3
-139  76  57             salmon4
-255 160 122             LightSalmon1
-238 149 114             LightSalmon2
-205 129  98             LightSalmon3
-139  87  66             LightSalmon4
-255 165   0             orange1
-238 154   0             orange2
-205 133   0             orange3
-139  90   0             orange4
-255 127   0             DarkOrange1
-238 118   0             DarkOrange2
-205 102   0             DarkOrange3
-139  69   0             DarkOrange4
-255 114  86             coral1
-238 106  80             coral2
-205  91  69             coral3
-139  62  47             coral4
-255  99  71             tomato1
-238  92  66             tomato2
-205  79  57             tomato3
-139  54  38             tomato4
-255  69   0             OrangeRed1
-238  64   0             OrangeRed2
-205  55   0             OrangeRed3
-139  37   0             OrangeRed4
-255   0   0             red1
-238   0   0             red2
-205   0   0             red3
-139   0   0             red4
-255  20 147             DeepPink1
-238  18 137             DeepPink2
-205  16 118             DeepPink3
-139  10  80             DeepPink4
-255 110 180             HotPink1
-238 106 167             HotPink2
-205  96 144             HotPink3
-139  58  98             HotPink4
-255 181 197             pink1
-238 169 184             pink2
-205 145 158             pink3
-139  99 108             pink4
-255 174 185             LightPink1
-238 162 173             LightPink2
-205 140 149             LightPink3
-139  95 101             LightPink4
-255 130 171             PaleVioletRed1
-238 121 159             PaleVioletRed2
-205 104 137             PaleVioletRed3
-139  71  93             PaleVioletRed4
-255  52 179             maroon1
-238  48 167             maroon2
-205  41 144             maroon3
-139  28  98             maroon4
-255  62 150             VioletRed1
-238  58 140             VioletRed2
-205  50 120             VioletRed3
-139  34  82             VioletRed4
-255   0 255             magenta1
-238   0 238             magenta2
-205   0 205             magenta3
-139   0 139             magenta4
-255 131 250             orchid1
-238 122 233             orchid2
-205 105 201             orchid3
-139  71 137             orchid4
-255 187 255             plum1
-238 174 238             plum2
-205 150 205             plum3
-139 102 139             plum4
-224 102 255             MediumOrchid1
-209  95 238             MediumOrchid2
-180  82 205             MediumOrchid3
-122  55 139             MediumOrchid4
-191  62 255             DarkOrchid1
-178  58 238             DarkOrchid2
-154  50 205             DarkOrchid3
-104  34 139             DarkOrchid4
-155  48 255             purple1
-145  44 238             purple2
-125  38 205             purple3
- 85  26 139             purple4
-171 130 255             MediumPurple1
-159 121 238             MediumPurple2
-137 104 205             MediumPurple3
- 93  71 139             MediumPurple4
-255 225 255             thistle1
-238 210 238             thistle2
-205 181 205             thistle3
-139 123 139             thistle4
-  0   0   0             gray0
-  0   0   0             grey0
-  3   3   3             gray1
-  3   3   3             grey1
-  5   5   5             gray2
-  5   5   5             grey2
-  8   8   8             gray3
-  8   8   8             grey3
- 10  10  10             gray4
- 10  10  10             grey4
- 13  13  13             gray5
- 13  13  13             grey5
- 15  15  15             gray6
- 15  15  15             grey6
- 18  18  18             gray7
- 18  18  18             grey7
- 20  20  20             gray8
- 20  20  20             grey8
- 23  23  23             gray9
- 23  23  23             grey9
- 26  26  26             gray10
- 26  26  26             grey10
- 28  28  28             gray11
- 28  28  28             grey11
- 31  31  31             gray12
- 31  31  31             grey12
- 33  33  33             gray13
- 33  33  33             grey13
- 36  36  36             gray14
- 36  36  36             grey14
- 38  38  38             gray15
- 38  38  38             grey15
- 41  41  41             gray16
- 41  41  41             grey16
- 43  43  43             gray17
- 43  43  43             grey17
- 46  46  46             gray18
- 46  46  46             grey18
- 48  48  48             gray19
- 48  48  48             grey19
- 51  51  51             gray20
- 51  51  51             grey20
- 54  54  54             gray21
- 54  54  54             grey21
- 56  56  56             gray22
- 56  56  56             grey22
- 59  59  59             gray23
- 59  59  59             grey23
- 61  61  61             gray24
- 61  61  61             grey24
- 64  64  64             gray25
- 64  64  64             grey25
- 66  66  66             gray26
- 66  66  66             grey26
- 69  69  69             gray27
- 69  69  69             grey27
- 71  71  71             gray28
- 71  71  71             grey28
- 74  74  74             gray29
- 74  74  74             grey29
- 77  77  77             gray30
- 77  77  77             grey30
- 79  79  79             gray31
- 79  79  79             grey31
- 82  82  82             gray32
- 82  82  82             grey32
- 84  84  84             gray33
- 84  84  84             grey33
- 87  87  87             gray34
- 87  87  87             grey34
- 89  89  89             gray35
- 89  89  89             grey35
- 92  92  92             gray36
- 92  92  92             grey36
- 94  94  94             gray37
- 94  94  94             grey37
- 97  97  97             gray38
- 97  97  97             grey38
- 99  99  99             gray39
- 99  99  99             grey39
-102 102 102             gray40
-102 102 102             grey40
-105 105 105             gray41
-105 105 105             grey41
-107 107 107             gray42
-107 107 107             grey42
-110 110 110             gray43
-110 110 110             grey43
-112 112 112             gray44
-112 112 112             grey44
-115 115 115             gray45
-115 115 115             grey45
-117 117 117             gray46
-117 117 117             grey46
-120 120 120             gray47
-120 120 120             grey47
-122 122 122             gray48
-122 122 122             grey48
-125 125 125             gray49
-125 125 125             grey49
-127 127 127             gray50
-127 127 127             grey50
-130 130 130             gray51
-130 130 130             grey51
-133 133 133             gray52
-133 133 133             grey52
-135 135 135             gray53
-135 135 135             grey53
-138 138 138             gray54
-138 138 138             grey54
-140 140 140             gray55
-140 140 140             grey55
-143 143 143             gray56
-143 143 143             grey56
-145 145 145             gray57
-145 145 145             grey57
-148 148 148             gray58
-148 148 148             grey58
-150 150 150             gray59
-150 150 150             grey59
-153 153 153             gray60
-153 153 153             grey60
-156 156 156             gray61
-156 156 156             grey61
-158 158 158             gray62
-158 158 158             grey62
-161 161 161             gray63
-161 161 161             grey63
-163 163 163             gray64
-163 163 163             grey64
-166 166 166             gray65
-166 166 166             grey65
-168 168 168             gray66
-168 168 168             grey66
-171 171 171             gray67
-171 171 171             grey67
-173 173 173             gray68
-173 173 173             grey68
-176 176 176             gray69
-176 176 176             grey69
-179 179 179             gray70
-179 179 179             grey70
-181 181 181             gray71
-181 181 181             grey71
-184 184 184             gray72
-184 184 184             grey72
-186 186 186             gray73
-186 186 186             grey73
-189 189 189             gray74
-189 189 189             grey74
-191 191 191             gray75
-191 191 191             grey75
-194 194 194             gray76
-194 194 194             grey76
-196 196 196             gray77
-196 196 196             grey77
-199 199 199             gray78
-199 199 199             grey78
-201 201 201             gray79
-201 201 201             grey79
-204 204 204             gray80
-204 204 204             grey80
-207 207 207             gray81
-207 207 207             grey81
-209 209 209             gray82
-209 209 209             grey82
-212 212 212             gray83
-212 212 212             grey83
-214 214 214             gray84
-214 214 214             grey84
-217 217 217             gray85
-217 217 217             grey85
-219 219 219             gray86
-219 219 219             grey86
-222 222 222             gray87
-222 222 222             grey87
-224 224 224             gray88
-224 224 224             grey88
-227 227 227             gray89
-227 227 227             grey89
-229 229 229             gray90
-229 229 229             grey90
-232 232 232             gray91
-232 232 232             grey91
-235 235 235             gray92
-235 235 235             grey92
-237 237 237             gray93
-237 237 237             grey93
-240 240 240             gray94
-240 240 240             grey94
-242 242 242             gray95
-242 242 242             grey95
-245 245 245             gray96
-245 245 245             grey96
-247 247 247             gray97
-247 247 247             grey97
-250 250 250             gray98
-250 250 250             grey98
-252 252 252             gray99
-252 252 252             grey99
-255 255 255             gray100
-255 255 255             grey100
-169 169 169             dark grey
-169 169 169             DarkGrey
-169 169 169             dark gray
-169 169 169             DarkGray
-0     0 139             dark blue
-0     0 139             DarkBlue
-0   139 139             dark cyan
-0   139 139             DarkCyan
-139   0 139             dark magenta
-139   0 139             DarkMagenta
-139   0   0             dark red
-139   0   0             DarkRed
-144 238 144             light green
-144 238 144             LightGreen
-
 =encoding utf8
 
 =head1 NAME
@@ -4747,7 +5916,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.12.1
+    v0.12.4
 
 =head1 DESCRIPTION
 
@@ -5517,7 +6686,7 @@ The advantage of this over B<_set_get_hash_as_object> is that here one controls 
 
 Provided with an object property name, a dictionary to create a dynamic class with L</"__create_class"> and an array reference of hash references and this will create an array of object, each one matching a set of data provided in the array reference. So for example, imagine you had a method such as below in your module :
 
-    sub products { return( 'products', shift->_set_get_class_array(
+    sub products { return( shift->_set_get_class_array( 'products', 
     {
     name        => { type => 'scalar' },
     customer    => { type => 'object', class => 'My::Customer' },
@@ -5595,7 +6764,7 @@ Then populating the data :
 
 =head2 _set_get_number
 
-Provided with an object property name and a number, and this will create a L<Text::Number> object and return it.
+Provided with an object property name and a number, and this will create a L<Module::Generic::Number> object and return it.
 
 =head2 _set_get_number_or_object
 
@@ -5690,9 +6859,9 @@ Return the value of your global variable I<VERBOSE>, if any.
 
 =head1 SEE ALSO
 
-L<Module::Generic::Exception>, L<Module::Generic::Array>, L<Module::Generic::Scalar>, L<Module::Generic::Boolean>, L<Module::Generic::Null>, L<Module::Generic::Dynamic> and L<Module::Generic::Tie>
+L<Module::Generic::Exception>, L<Module::Generic::Array>, L<Module::Generic::Scalar>, L<Module::Generic::Boolean>, L<Module::Generic::Number>, L<Module::Generic::Null>, L<Module::Generic::Dynamic> and L<Module::Generic::Tie>
 
-L<Text::Number>, L<Number::Format>, L<Class::Load>, L<Scalar::Util>
+L<Number::Format>, L<Class::Load>, L<Scalar::Util>
 
 =head1 AUTHOR
 

@@ -12,6 +12,7 @@ BEGIN {
     use_ok('App::VTide::Command::Edit');
     use_ok('App::VTide::Command::Grep');
     use_ok('App::VTide::Command::Help');
+    use_ok('App::VTide::Command::History');
     use_ok('App::VTide::Command::Init');
     use_ok('App::VTide::Command::Who');
     use_ok('App::VTide::Command::Recent');
@@ -22,7 +23,6 @@ BEGIN {
     use_ok('App::VTide::Command::Start');
     use_ok('App::VTide::Config');
     use_ok('App::VTide::Hooks');
-
 }
 
 diag( "Testing App::VTide $App::VTide::VERSION, Perl $], $^X" );

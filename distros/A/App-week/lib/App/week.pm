@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.08";
+our $VERSION = "0.09";
 
 
 
@@ -14,7 +14,7 @@ __END__
 
 =head1 NAME
 
-week - colorful calender command
+week - colorful calendar command
 
 =head1 SYNOPSIS
 

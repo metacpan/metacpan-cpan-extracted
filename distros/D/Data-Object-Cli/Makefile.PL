@@ -13,7 +13,7 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Data-Object-Cli",
-  "LICENSE" => "perl",
+  "LICENSE" => "apache",
   "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Data::Object::Cli",
   "PREREQ_PM" => {
@@ -38,13 +38,13 @@ my %WriteMakefileArgs = (
     "Data::Object::Opts" => "2.00",
     "Data::Object::Types" => "0.04",
     "Data::Object::Vars" => "2.01",
-    "Test::Auto" => "0.10",
+    "Test::Auto" => "0.12",
     "Test::Trap" => "0.3.4",
     "routines" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "2.00",
+  "VERSION" => "2.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -60,7 +60,7 @@ my %FallbackPrereqs = (
   "Data::Object::Opts" => "2.00",
   "Data::Object::Types" => "0.04",
   "Data::Object::Vars" => "2.01",
-  "Test::Auto" => "0.10",
+  "Test::Auto" => "0.12",
   "Test::Trap" => "0.3.4",
   "routines" => 0,
   "strict" => 0,

@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 40;
+use Test::Most tests => 75;
 use Test::Number::Delta;
 use Test::Carp;
 use Test::Deep;
@@ -53,6 +53,20 @@ LOCAL: {
 	}
 
 	check($geo_coder,
+		'Minster Cemetery, 116 Tothill Street, Minster, Thanet, Kent, England',
+		51.34203083,
+		1.31609075,
+		'Minster Cemetery, 116 Tothill St, Minster, Thanet, Kent, GB',
+	);
+
+	check($geo_coder,
+		'Minster Cemetery, Tothill Street, Minster, Thanet, Kent, England',
+		51.34203083,
+		1.31609075,
+		'Minster Cemetery, 116 Tothill St, Minster, Thanet, Kent, GB',
+	);
+
+	check($geo_coder,
 		'106 Tothill St, Ramsgate, Kent, GB',
 		51.33995174,
 		1.31570211
@@ -60,13 +74,38 @@ LOCAL: {
 
 	cmp_deeply($geo_coder->geocode(location => '106 Tothill St, Minster, Thanet, Kent, England'),
 		methods('lat' => num(51.34, 1e-2), 'long' => num(1.32, 1e-2)));
+
+	does_croak(sub {
+		my $location = $geo_coder->geocode();
+	});
+
+	does_croak(sub {
+		my $location = $geo_coder->reverse_geocode();
+	});
+
+	SKIP: {
+		eval 'use Test::Memory::Cycle';
+		if($@) {
+			skip('Test::Memory::Cycle required to check for cicular memory references', 1);
+		} else {
+			memory_cycle_ok($geo_coder);
+		}
+	}
 }
 
 sub check {
-	my ($geo_coder, $location, $lat, $long) = @_;
+	my ($geo_coder, $location, $lat, $long, $expect) = @_;
 
 	$location = uc($location);
-	# ::diag($location);
+	if(defined($expect)) {
+		$expect = uc($expect);
+	} else {
+		$expect = $location;
+	}
+	if($location =~ /(.+)\s+STREET,\s+(.+)/) {
+		$location = "$1 ST, $2";
+	}
+	# diag($location);
 	my @rc = $geo_coder->geocode({ location => $location });
 	# diag(Data::Dumper->new([\@rc])->Dump());
 	ok(scalar(@rc) > 0);
@@ -87,19 +126,21 @@ sub check {
 	ok(scalar(@rc) > 0);
 	my $found;
 
-	if($location =~ /(.+),\s+USA$/) {
-		$location = "$1, US";
+	if($expect =~ /(.+),\s+USA$/) {
+		$expect = "$1, US";
 	}
 
 	foreach my $loc(@rc) {
-		if(uc($loc) eq $location) {
+		# diag(uc($loc), '<->', $expect);
+		if(uc($loc) eq $expect) {
+			# diag("match: $expect");
 			$found = 1;
 			last;
 		}
 	}
 
 	if(!$found) {
-		diag("Failed reverse lookup $location");
+		diag(__LINE__, ": failed reverse lookup $expect");
 		diag(Data::Dumper->new([\@rc])->Dump());
 	}
 	ok($found);
@@ -109,14 +150,14 @@ sub check {
 	$found = 0;
 
 	foreach my $loc(@rc) {
-		if(uc($loc) eq $location) {
+		if(uc($loc) eq $expect) {
 			$found = 1;
 			last;
 		}
 	}
 
 	if(!$found) {
-		diag("Failed reverse lookup $location");
+		diag(__LINE__, ": failed reverse lookup $expect");
 		diag(Data::Dumper->new([\@rc])->Dump());
 	}
 	ok($found);
@@ -126,14 +167,14 @@ sub check {
 	$found = 0;
 
 	foreach my $loc(@rc) {
-		if(uc($loc) eq $location) {
+		if(uc($loc) eq $expect) {
 			$found = 1;
 			last;
 		}
 	}
 
 	if(!$found) {
-		diag("Failed reverse lookup $location");
+		diag(__LINE__, ": failed reverse lookup $expect");
 		diag(Data::Dumper->new([\@rc])->Dump());
 	}
 	ok($found);
@@ -143,14 +184,14 @@ sub check {
 	$found = 0;
 
 	foreach my $loc(@rc) {
-		if(uc($loc) eq $location) {
+		if(uc($loc) eq $expect) {
 			$found = 1;
 			last;
 		}
 	}
 
 	if(!$found) {
-		diag("Failed reverse lookup $location");
+		diag(__LINE__, ": failed reverse lookup $expect");
 		diag(Data::Dumper->new([\@rc])->Dump());
 	}
 	ok($found);
@@ -160,14 +201,14 @@ sub check {
 	$found = 0;
 
 	foreach my $loc(@rc) {
-		if(uc($loc) eq $location) {
+		if(uc($loc) eq $expect) {
 			$found = 1;
 			last;
 		}
 	}
 
 	if(!$found) {
-		diag("Failed reverse lookup $location");
+		diag(__LINE__, ": failed reverse lookup $expect");
 		diag(Data::Dumper->new([\@rc])->Dump());
 	}
 	ok($found);

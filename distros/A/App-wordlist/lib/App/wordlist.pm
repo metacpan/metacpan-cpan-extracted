@@ -1,13 +1,15 @@
 package App::wordlist;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-04'; # DATE
+our $DATE = '2020-05-18'; # DATE
 our $DIST = 'App-wordlist'; # DIST
-our $VERSION = '0.269'; # VERSION
+our $VERSION = '0.270'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+
+use List::Util qw(shuffle);
 
 our %SPEC;
 
@@ -91,6 +93,18 @@ $SPEC{wordlist} = {
             default => 0,
             cmdline_aliases => {n=>{}},
         },
+        random => {
+            summary => 'Pick random words',
+            description => <<'_',
+
+If set to true, then streaming will be turned off. All words will be gathered
+first, then words will be chosen randomly from the gathered list.
+
+_
+            schema  => 'bool*',
+            cmdline_aliases => {r=>{}},
+        },
+
         %arg_wordlists,
         or => {
             summary => 'Match any word in query instead of the default "all"',
@@ -238,6 +252,7 @@ sub wordlist {
     my $arg = $args{arg} // [];
     my $detail = $args{detail};
     my $num = $args{num} // 0;
+    my $random = $args{random};
     my $color = $args{color} // 'auto';
 
     my $use_color = ($color eq 'always' ? 1 : $color eq 'never' ? 0 : undef)
@@ -267,6 +282,7 @@ sub wordlist {
                 push @$wordlists, $rec->{name};
             }
         }
+        $wordlists = [shuffle @$wordlists] if $random;
 
         my $n = 0;
 
@@ -311,7 +327,7 @@ sub wordlist {
                 goto REDO;
             }
 
-            goto REDO if $num > 0 && $n >= $num;
+            goto REDO if !$random && $num > 0 && $n >= $num;
             goto REDO if defined($args{len}) &&
                 _length_in_graphemes($word) != $args{len};
             goto REDO if defined($args{min_len}) &&
@@ -346,7 +362,22 @@ sub wordlist {
                     $wl, $word, $use_color ? $match_arg : undef, $ci);
             }
         };
-        [200, "OK", $code_return_word, {stream=>1}];
+        my $res = [200, "OK", $code_return_word, {stream=>1}];
+
+      RANDOMIZE: {
+            last unless $random;
+            require Array::Pick::Scan;
+
+            my @words;
+            if ($num > 0) {
+                @words = Array::Pick::Scan::random_item($res->[2], $num);
+            } else {
+                while (defined(my $word = $res->[2]->())) { push @words, $word }
+                @words = shuffle @words;
+            }
+            $res = [200, "OK", \@words];
+        }
+        $res;
 
     } elsif ($action eq 'list_installed') {
 
@@ -426,7 +457,7 @@ App::wordlist - Grep words from WordList::*
 
 =head1 VERSION
 
-This document describes version 0.269 of App::wordlist (from Perl distribution App-wordlist), released on 2020-05-04.
+This document describes version 0.270 of App::wordlist (from Perl distribution App-wordlist), released on 2020-05-18.
 
 =head1 SYNOPSIS
 
@@ -536,6 +567,13 @@ Return (at most) this number of words (0 = unlimited).
 =item * B<or> => I<bool>
 
 Match any word in query instead of the default "all".
+
+=item * B<random> => I<bool>
+
+Pick random words.
+
+If set to true, then streaming will be turned off. All words will be gathered
+first, then words will be chosen randomly from the gathered list.
 
 =item * B<wordlists> => I<array[str]>
 

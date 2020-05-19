@@ -1,6 +1,7 @@
 use strict;
 use warnings;
-use if !eval { require Cpanel::JSON::XS; 1; }, 'Test::More', skip_all => 'No Cpanel::JSON::XS';
+
+use Test::Needs 'Cpanel::JSON::XS'; # load first, before JSON::MaybeXS
 use Test::More 0.88;
 use JSON::MaybeXS;
 

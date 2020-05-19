@@ -15,14 +15,17 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Acme-CPANModules-CPANModules",
   "LICENSE" => "perl",
   "NAME" => "Acme::CPANModules::CPANModules",
-  "PREREQ_PM" => {},
+  "PREREQ_PM" => {
+    "Acme::CPANModulesUtil::Misc" => 0,
+    "strict" => 0
+  },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -30,10 +33,12 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Acme::CPANModulesUtil::Misc" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Test::More" => 0
+  "Test::More" => 0,
+  "strict" => 0
 );
 
 

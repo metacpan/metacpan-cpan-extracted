@@ -44,18 +44,42 @@ my $dep= ExtUtils::Depends->new('X11::Xlib');
 #   present, then use that to determine which headers to include and which XS
 #   files to merge together.
 
+my @incpath;
+my @libpath;
+unless (check_lib( lib => 'X11' )) {
+    if ($^O eq 'darwin') {
+        unless (-e '/opt/X11/lib') {
+            warn "Could not find /opt/X11/lib\n";
+            warn "On MacOS, you will need to install XQuartz (http://www.xquartz.org).\n";
+            exit;
+        }
+        push @incpath, '/opt/X11/include';
+        push @libpath, '/opt/X11/lib';
+    }
+    elsif (-e '/usr/X11R6/lib') {
+        push @incpath, '/usr/X11R6/include';
+        push @libpath, '/usr/X11R6/lib';
+    }
+}
+
 check_lib_or_exit(
     lib    => 'X11',
-    header => [ 'X11/Xlib.h', 'X11/Xutil.h' ]
+    header => [ 'X11/Xlib.h', 'X11/Xutil.h' ],
+    incpath => \@incpath,
+    libpath => \@libpath,
 );
 
 check_lib_or_exit(
     lib    => 'Xtst',
-    header => [ 'X11/extensions/XTest.h' ]
+    header => [ 'X11/extensions/XTest.h' ],
+    incpath => \@incpath,
+    libpath => \@libpath,
 );
 
 check_lib_or_exit(
-    lib    => 'Xext'
+    lib    => 'Xext',
+    incpath => \@incpath,
+    libpath => \@libpath,
 );
 
 my @libs= qw( X11 Xtst Xext );
@@ -63,7 +87,12 @@ my @have;
 sub add_optional_lib {
     my ($lib, $header)= @_;
     warn "Checking for extension $lib\n";
-    if (check_lib( lib => $lib, header => (ref $header? $header : [ $header ]) )) {
+    if (check_lib(
+        lib => $lib,
+        header => (ref $header? $header : [ $header ]),
+        incpath => \@incpath,
+        libpath => \@libpath,
+    )) {
         warn "  found!\n";
         push @libs, $lib;
         push @have, uc($lib);
@@ -76,7 +105,10 @@ add_optional_lib( Xcomposite => 'X11/extensions/Xcomposite.h' );
 add_optional_lib( Xfixes     => 'X11/extensions/Xfixes.h' );
 add_optional_lib( Xrender    => 'X11/extensions/Xrender.h' );
 
-$dep->set_libs(join(' ', map { "-l$_" } @libs));
+$dep->set_libs(join(' ', (map { "-L$_" } @libpath), (map { "-l$_" } @libs)));
+if (@incpath) {
+    $dep->set_inc(join(' ', map { "-I$_" } @incpath));
+}
 $dep->add_c('PerlXlib.c');
 $dep->add_xs('Xlib.xs');
 $dep->add_pm(map { my $n= $_; $n =~ s/^lib/\$(INST_LIB)/; $_ => $n } <lib/*/*.pm>, <lib/*/*/*.pm>);
@@ -91,6 +123,7 @@ $dep->save_config('build/IFiles.pm');
 my %WriteMakefileArgs = (
     NAME         => 'X11::Xlib',
     VERSION_FROM => 'lib/X11/Xlib.pm',    # finds $VERSION
+    LICENSE      => 'perl_5',
     ($] >= 5.005 ?                        ## Add these new keywords supported since 5.005
           (ABSTRACT_FROM => 'lib/X11/Xlib.pm',    # retrieve abstract from module
             AUTHOR => [

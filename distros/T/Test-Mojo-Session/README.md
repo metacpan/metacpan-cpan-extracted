@@ -27,7 +27,7 @@ Test::Mojo::Session - Testing session in Mojolicious applications
 
     done_testing();
 
-Use [Test::Mojo::Sesssion](https://metacpan.org/pod/Test::Mojo::Sesssion) via [Test::Mojo::WithRoles](https://metacpan.org/pod/Test::Mojo::WithRoles).
+Use [Test::Mojo::Sesssion](https://metacpan.org/pod/Test%3A%3AMojo%3A%3ASesssion) via [Test::Mojo::WithRoles](https://metacpan.org/pod/Test%3A%3AMojo%3A%3AWithRoles).
 
     use Mojolicious::Lite;
     use Test::More;
@@ -53,12 +53,12 @@ Use [Test::Mojo::Sesssion](https://metacpan.org/pod/Test::Mojo::Sesssion) via [T
 
 # DESCRIPTION
 
-[Test::Mojo::Session](https://metacpan.org/pod/Test::Mojo::Session) is an extension for the [Test::Mojo](https://metacpan.org/pod/Test::Mojo), which allows you
+[Test::Mojo::Session](https://metacpan.org/pod/Test%3A%3AMojo%3A%3ASession) is an extension for the [Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo), which allows you
 to conveniently test session in [Mojolicious](https://metacpan.org/pod/Mojolicious) applications.
 
 # METHODS
 
-[Test::Mojo::Sesssion](https://metacpan.org/pod/Test::Mojo::Sesssion) inherits all methods from [Test::Mojo](https://metacpan.org/pod/Test::Mojo) and implements the
+[Test::Mojo::Sesssion](https://metacpan.org/pod/Test%3A%3AMojo%3A%3ASesssion) inherits all methods from [Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo) and implements the
 following new ones.
 
 ## session\_has
@@ -67,7 +67,7 @@ following new ones.
     $t = $t->session_has('/foo', 'session has "foo"');
 
 Check if current session contains a value that can be identified using the given
-JSON Pointer with [Mojo::JSON::Pointer](https://metacpan.org/pod/Mojo::JSON::Pointer).
+JSON Pointer with [Mojo::JSON::Pointer](https://metacpan.org/pod/Mojo%3A%3AJSON%3A%3APointer).
 
 ## session\_hasnt
 
@@ -75,14 +75,14 @@ JSON Pointer with [Mojo::JSON::Pointer](https://metacpan.org/pod/Mojo::JSON::Poi
     $t = $t->session_hasnt('/bar', 'session does not has "bar"');
 
 Check if current session no contains a value that can be identified using the given
-JSON Pointer with [Mojo::JSON::Pointer](https://metacpan.org/pod/Mojo::JSON::Pointer).
+JSON Pointer with [Mojo::JSON::Pointer](https://metacpan.org/pod/Mojo%3A%3AJSON%3A%3APointer).
 
 ## session\_is
 
     $t = $t->session_is('/pointer', 'value');
     $t = $t->session_is('/pointer', 'value', 'right halue');
 
-Check the session using the given JSON Pointer with [Mojo::JSON::Pointer](https://metacpan.org/pod/Mojo::JSON::Pointer).
+Check the session using the given JSON Pointer with [Mojo::JSON::Pointer](https://metacpan.org/pod/Mojo%3A%3AJSON%3A%3APointer).
 
 ## session\_ok
 
@@ -92,7 +92,7 @@ Check for existence of the session in user agent.
 
 # SEE ALSO
 
-[Mojolicious](https://metacpan.org/pod/Mojolicious), [Test::Mojo](https://metacpan.org/pod/Test::Mojo).
+[Mojolicious](https://metacpan.org/pod/Mojolicious), [Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo).
 
 # AUTHOR
 

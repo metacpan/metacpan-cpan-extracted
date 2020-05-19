@@ -6,8 +6,8 @@ use WebService::LiveJournal::List;
 use WebService::LiveJournal::Event;
 our @ISA = qw/ WebService::LiveJournal::List /;
 
-# ABSTRACT: List of LiveJournal events
-our $VERSION = '0.08'; # VERSION
+# ABSTRACT: (Deprecated) List of LiveJournal events
+our $VERSION = '0.09'; # VERSION
 
 
 sub init
@@ -52,11 +52,11 @@ __END__
 
 =head1 NAME
 
-WebService::LiveJournal::EventList - List of LiveJournal events
+WebService::LiveJournal::EventList - (Deprecated) List of LiveJournal events
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -76,6 +76,11 @@ version 0.08
  }
 
 =head1 DESCRIPTION
+
+B<NOTE>: This distribution is deprecated.  It uses the outmoded XML-RPC protocol.
+LiveJournal has also been compromised.  I recommend using DreamWidth instead
+(L<https://www.dreamwidth.org/>) which is in keeping with the original philosophy
+LiveJournal regarding advertising.
 
 This class represents a list of LiveJournal events.  It can be used
 as a array reference.

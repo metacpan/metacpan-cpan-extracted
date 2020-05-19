@@ -10,6 +10,9 @@ use CPAN::Meta;
 
 require Dist::Zilla; # for VERSION
 
+plan skip_all => '$cwd needs to be $zilla->root for these tests (requires Dist::Zilla 6.003)'
+  if not eval { Dist::Zilla->VERSION('6.003') };
+
 my $root = 'corpus/DZ';
 my $dz_version = min( 5, int( Dist::Zilla->VERSION ) );
 

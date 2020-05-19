@@ -28,6 +28,7 @@ t/02-parse_format.t
 t/03-parse_daytime.t
 t/04-parse_durations.t
 t/05-parse_time_zone.t
+t/06-parse_demand_future.t
 t/06-parse_prefer_future.t
 t/07-parse_datetime.t
 t/07-parse_datetime_future.t

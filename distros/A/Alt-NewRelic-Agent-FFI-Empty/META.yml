@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,9 @@ resources:
   bugtracker: https://github.com/plicease/NewRelic-Agent-FFI
   homepage: https://metacpan.org/pod/Alt::NewRelic::Agent::FFI::Empty
   repository: git://github.com/plicease/Alt-NewRelic-Agent-FFI-Empty.git
-version: '0.02'
-x_generated_by_perl: v5.26.2
+version: '0.03'
+x_deprecated: 1
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

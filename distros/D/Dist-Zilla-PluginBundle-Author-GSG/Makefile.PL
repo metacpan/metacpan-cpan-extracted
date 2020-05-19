@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::Git::Contributors" => 0,
     "Dist::Zilla::Plugin::Git::NextVersion" => "2.044",
     "Dist::Zilla::Plugin::Git::Push" => 0,
-    "Dist::Zilla::Plugin::Git::Tag" => 0,
+    "Dist::Zilla::Plugin::Git::Tag" => "2.046",
     "Dist::Zilla::Plugin::GitHub::Meta" => "0.46",
     "Dist::Zilla::Plugin::GitHub::UploadRelease" => 0,
     "Dist::Zilla::Plugin::MetaProvides::Package" => 0,
@@ -67,7 +67,7 @@ my %WriteMakefileArgs = (
     "Test::Strict" => 0,
     "Time::Piece" => 0
   },
-  "VERSION" => "v0.1.2",
+  "VERSION" => "v0.1.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -82,7 +82,7 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::Git::Contributors" => 0,
   "Dist::Zilla::Plugin::Git::NextVersion" => "2.044",
   "Dist::Zilla::Plugin::Git::Push" => 0,
-  "Dist::Zilla::Plugin::Git::Tag" => 0,
+  "Dist::Zilla::Plugin::Git::Tag" => "2.046",
   "Dist::Zilla::Plugin::GitHub::Meta" => "0.46",
   "Dist::Zilla::Plugin::GitHub::UploadRelease" => 0,
   "Dist::Zilla::Plugin::MetaProvides::Package" => 0,

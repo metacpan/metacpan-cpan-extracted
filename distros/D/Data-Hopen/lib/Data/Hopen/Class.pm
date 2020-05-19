@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use Carp qw(croak);
 
-our $VERSION = '0.000017';
+our $VERSION = '0.000018';
 
 # No parent, so Class::Tiny will become the parent
 use Class::Tiny;

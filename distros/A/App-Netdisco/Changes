@@ -1,3 +1,23 @@
+2.045005 - 2020-05-18
+
+  [BUG FIXES]
+
+  * #713 Template processing issue prevents VLAN list displaying
+
+2.045004 - 2020-05-15
+
+  [BUG FIXES]
+
+  * none - workflow testing
+
+2.045003 - 2020-05-15
+
+  [BUG FIXES]
+
+  * #715 fix crash on missing Accept Header
+  * #718 fix Node Search API endpoint
+  * #719 include IO::Socket::INET6 in deps to ensure IPv6 support
+
 2.045002 - 2020-04-19
 
   [ENHANCEMENTS]

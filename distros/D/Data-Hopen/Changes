@@ -1,5 +1,8 @@
 Revision history for Data-Hopen
 
+0.000018    2020-05-14
+    - Fix dependencies (again) (cpantesters++)
+
 0.000017    2020-05-09
     - Fix dependencies
     - No functional changes since 0.000016

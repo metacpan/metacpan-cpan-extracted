@@ -1,9 +1,10 @@
 Changes
 lib/IPC/Run3/Shell.pm
 lib/IPC/Run3/Shell.pod
+lib/IPC/Run3/Shell/CLIWrapper.pm
 Makefile.PL
 MANIFEST
-README
+README.md
 t/00_smoke.t
 t/10_funcs.t
 t/11_oo.t
@@ -18,12 +19,14 @@ t/21_opt_chomp.t
 t/22_opt_irs.t
 t/23_opt_show_cmd.t
 t/24_opt_both.t
+t/25_opt_stdout_filter.t
 t/29_opt_inherit.t
 t/30_run3.t
 t/31_autoload_fatal.t
 t/40_os_nix.t
 t/41_os_darwin.t
 t/42_os_win32.t
+t/50_cliwrapper.t
 t/90_author_critic.t
 t/91_author_pod.t
 t/92_author_cover.t

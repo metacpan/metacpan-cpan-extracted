@@ -11,6 +11,8 @@ use JSON qw(decode_json);
 use Data::Dumper;
 use JSONLD;
 use open ':std', ':encoding(UTF-8)';
+use lib qw(.);
+require "xt/earl.pl";
 
 use Moo;
 use Attean;
@@ -25,6 +27,8 @@ if ($debug) {
 } else {
 	$PATTERN	= qr/./;
 }
+
+my $REPORT_NEGATIVE_TESTS	= 1;
 
 package MyJSONLD {
 	use v5.18;
@@ -155,18 +159,24 @@ sub load_nq {
 sub load_json {
 	my $file	= shift;
 	open(my $fh, '<:utf8', $file);
-	my $j	= JSON->new();
-	return $j->utf8(0)->decode(do { local($/); <$fh> });
+	my $j	= JSON->new()->canonical(1);
+	return $j->decode(do { local($/); <$fh> });
 }
 
-my $path	= File::Spec->catfile( $Bin, 'data', 'json-ld-api-w3c' );
-my $manifest	= File::Spec->catfile($path, 'toRdf-manifest.jsonld');
-my $d		= load_json($manifest);
+my $component	= 'toRdf';
+my $earl		= init_earl();
+my $path		= File::Spec->catfile( $Bin, 'data', 'json-ld-api-w3c' );
+my $manifest	= File::Spec->catfile($path, "${component}-manifest.jsonld");
+my $d			= load_json($manifest);
+my $base_url	= "https://w3c.github.io/json-ld-api/tests/${component}-manifest";
+my $jj			= JSONLD->new(base_iri => IRI->new('file://' . $manifest));
+
 my $tests	= $d->{'sequence'};
 my $base	= IRI->new(value => $d->{'baseIri'} // 'http://example.org/');
 foreach my $t (@$tests) {
 	my $id		= $t->{'@id'};
 	next unless ($id =~ $PATTERN);
+	my $test_iri	= $jj->expand($t, expandContext => [{'@base' => $base_url}, 'context.jsonld'])->[0]{'@id'};
 
 	my $input	= $t->{'input'};
 	my $expect	= $t->{'expect'} // '';
@@ -175,13 +185,21 @@ foreach my $t (@$tests) {
 	my $options	= $t->{'option'} // {};
 	my $_base	= $options->{'base'};
 	my $spec_v	= $options->{'specVersion'} // '';
+	my $mode	= $options->{'processingMode'} // 'json-ld-1.1';
 	my $genRDF	= $options->{'produceGeneralizedRdf'} // 0;
 	my @types	= @{ $t->{'@type'} };
 	my %types	= map { $_ => 1 } @types;
 	my %args;
+
+	warn "INPUT: $input\n" if ($debug);
+
 	my %expandArgs;
 	if (my $expand = $options->{'expandContext'}) {
+		my $base	= IRI->new(value => 'file://' . $manifest);
+		my $iri		= IRI->new(value => $expand, base => $base);
+		$expand		= $iri->abs;
 		$expandArgs{'expandContext'}	= $expand;
+		warn "CONTEXT: $expand\n" if ($debug);
 	}
 	if (my $rdfDir = $options->{'rdfDirection'}) {
 		$args{rdf_direction}	= $rdfDir;
@@ -194,92 +212,127 @@ foreach my $t (@$tests) {
 		$test_base	= IRI->new(value => $input, base => $base)->abs;
 	}
 	my $j		= JSON->new->canonical(1);
-	if ($spec_v eq 'json-ld-1.0') {
-		diag("IGNORING JSON-LD-1.0-only test $id\n");
-	} elsif ($genRDF) {
-		diag("IGNORING test producing Generalized RDF: $id\n");
-	} elsif ($types{'jld:PositiveEvaluationTest'} or $types{'jld:PositiveSyntaxTest'}) {
-		note($id) if $debug;
-		my $evalTest	= $types{'jld:PositiveEvaluationTest'};
-		my $jld			= MyJSONLD->new(base_iri => IRI->new($test_base), %args);
-		my $infile		= File::Spec->catfile($path, $input);
-		my $data		= load_json($infile);
-		my $outfile		= File::Spec->catfile($path, $expect);
+	SKIP: {
+		skip("skipping IGNORING JSON-LD-1.0-only test $id", 1) if ($spec_v eq 'json-ld-1.0');
+		if ($genRDF) {
+			diag("IGNORING test producing Generalized RDF: $id\n");
+		} elsif ($types{'jld:PositiveEvaluationTest'} or $types{'jld:PositiveSyntaxTest'} or $types{'jld:NegativeEvaluationTest'}) {
+			note($id) if $debug;
+			my $positive	= ($types{'jld:PositiveEvaluationTest'} || $types{'jld:PositiveSyntaxTest'});
+			my $evalTest	= $types{'jld:PositiveEvaluationTest'};
+			my $jld			= MyJSONLD->new(base_iri => IRI->new($test_base), processing_mode => $mode, %args);
+			my $infile		= File::Spec->catfile($path, $input);
+			my $data		= load_json($infile);
+			my $outfile		= File::Spec->catfile($path, $expect);
 
-		if ($debug) {
-			warn "Input file: $infile\n";
-			if ($evalTest) {
-				warn "Output file: $outfile\n";
-			}
-			warn "INPUT:\n===============\n" . JSON->new->pretty->encode($data);
-		}
-		my $default_graph	= $jld->default_graph();
-		my $got		= eval {
-			my $qiter	= $jld->to_rdf($data, %expandArgs)->get_quads()->materialize();
-			my $iter	= Attean::CodeIterator->new(generator => sub {
-				my $q	= $qiter->next;
-				return unless ($q);
-				my $g		= $q->graph;
-				my $prefix	= $jld->skolem_prefix();
-				if ($g->equals($default_graph)) {
-					return $q->as_triple;
-				} elsif (substr($g->value, 0, length($prefix)) eq $prefix) {
-					my $gb		= $jld->new_blank(substr($g->value, length($prefix)));
-					my @terms	= $q->values;
-					$terms[3]	= $gb;
-					return $jld->new_quad(@terms);
-				} else {
-					return $q;
+			if ($debug) {
+				warn "Input file: $infile\n";
+				if ($evalTest) {
+					warn "Output file: $outfile\n";
 				}
-			}, item_type => 'Attean::API::TripleOrQuad')->materialize;
-		};
-		if ($@) {
-			fail("Died: $id: $@");
+				warn "INPUT:\n===============\n" . JSON->new->pretty->encode($data);
+			}
+			my $default_graph	= $jld->default_graph();
+			my $got		= eval {
+				my $qiter	= $jld->to_rdf($data, %expandArgs)->get_quads()->materialize();
+				my $iter	= Attean::CodeIterator->new(generator => sub {
+					my $q	= $qiter->next;
+					return unless ($q);
+					my $g		= $q->graph;
+					my $prefix	= $jld->skolem_prefix();
+					if ($g->equals($default_graph)) {
+						return $q->as_triple;
+					} elsif (substr($g->value, 0, length($prefix)) eq $prefix) {
+						my $gb		= $jld->new_blank(substr($g->value, length($prefix)));
+						my @terms	= $q->values;
+						$terms[3]	= $gb;
+						return $jld->new_quad(@terms);
+					} else {
+						return $q;
+					}
+				}, item_type => 'Attean::API::TripleOrQuad')->materialize;
+			};
+			
+			if ($@) {
+				if ($positive) {
+					earl_fail_test( $earl, $test_iri, $@ );
+					fail("Died: $id: $@");
+				} else {
+					if ($REPORT_NEGATIVE_TESTS) {
+						earl_pass_test( $earl, $test_iri );
+						pass("$id: NegativeEvaluationTest");
+					}
+				}
+				next;
+			} else {
+				if ($evalTest) {
+					if ($positive) {
+						eval {
+							my $eqtest		= Attean::BindingEqualityTest->new();
+							my $expected	= load_nq($outfile);
+							local $SIG{ALRM} = sub { die "timeout" };
+							alarm(30);
+							my $ok			= ok($eqtest->equals($got, $expected), "$id: $name");
+							alarm(0);
+							if ($ok) {
+								earl_pass_test( $earl, $test_iri );
+							} else {
+								earl_fail_test( $earl, $test_iri, 'failed to find a graph isomorphism between computed and expected RDF triples' );
+							}
+							if ($debug) {
+								my @data	= (
+									['EXPECTED', $expected],
+									['OUTPUT__', $got],
+								);
+								my @files;
+								my $ser	= Attean->get_serializer('nquads')->new();
+								foreach my $d (@data) {
+									my ($name, $data)	= @$d;
+									$data->reset;
+									warn "=======================\n";
+									my $filename	= "/tmp/json-ld-$$-$name.out";
+									open(my $fh, '>', $filename) or die $!;
+									push(@files, $filename);
+									print {$fh} "# $name\n";
+									$ser->serialize_iter_to_io($fh, $data);
+									close($fh);
+								}
+								unless ($ok) {
+									system('/usr/local/bin/bbdiff', '--wait', '--resume', @files);
+								}
+							}
+
+						};
+						if ($@) {
+							earl_fail_test( $earl, $test_iri, $@ );
+							fail("$id: $@");
+							next;
+						}
+					} else {
+						if ($REPORT_NEGATIVE_TESTS) {
+							earl_fail_test( $earl, $test_iri, "expected failure but found success" );
+							fail("$id: expected failure but found success");
+						}
+					}
+				} else {
+					earl_pass_test( $earl, $test_iri );
+					pass("$id: PositiveSyntaxTest");
+				}
+			}
+		} elsif ($types{'jld:NegativeEvaluationTest'}){
+			diag("IGNORING NegativeEvaluationTest $id\n");
+		} else {
+			diag("Not a recognized evaluation test: " . Dumper(\@types));
 			next;
 		}
-
-		if ($evalTest) {
-			eval {
-				my $eqtest		= Attean::BindingEqualityTest->new();
-				my $expected	= load_nq($outfile);
-				my $ok			= ok($eqtest->equals($got, $expected), "$id: $name");
-				if ($debug) {
-					my @data	= (
-						['EXPECTED', $expected],
-						['OUTPUT__', $got],
-					);
-					my @files;
-					my $ser	= Attean->get_serializer('nquads')->new();
-					foreach my $d (@data) {
-						my ($name, $data)	= @$d;
-						$data->reset;
-						warn "=======================\n";
-						my $filename	= "/tmp/json-ld-$$-$name.out";
-						open(my $fh, '>', $filename) or die $!;
-						push(@files, $filename);
-						print {$fh} "# $name\n";
-						$ser->serialize_iter_to_io($fh, $data);
-						close($fh);
-					}
-					unless ($ok) {
-						system('/usr/local/bin/bbdiff', '--wait', '--resume', @files);
-					}
-				}
-
-			};
-			if ($@) {
-				fail("$id: $@");
-				next;
-			}
-		} else {
-			pass("$id: PositiveSyntaxTest");
-		}
-	} elsif ($types{'jld:NegativeEvaluationTest'}){
-		diag("IGNORING NegativeEvaluationTest $id\n");
-	} else {
-		diag("Not a recognized evaluation test: " . Dumper(\@types));
-		next;
 	}
 }
 
 done_testing();
+
+unless ($debug) {
+	my $output	= earl_output($earl);
+	open(my $fh, '>:utf8', "jsonld-${component}-earl.ttl") or die $!;
+	print {$fh} $output;
+	close($fh);
+}

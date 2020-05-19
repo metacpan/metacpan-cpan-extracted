@@ -30,7 +30,7 @@ BEGIN
 
 sub init
 {
-	return( shift->DB::Object::Tables::init( @_ ) );
+    return( shift->DB::Object::Tables::init( @_ ) );
 }
 
 ##----{ End of generic routines }----##
@@ -51,18 +51,18 @@ sub create
     ## Check possible options
     my $allowed = 
     {
-    'type'				=> qr/^(ISAM|MYISAM|HEAP)$/i,
-    'auto_increment'	=> qr/^(1|0)$/,
+    'type'                => qr/^(ISAM|MYISAM|HEAP)$/i,
+    'auto_increment'    => qr/^(1|0)$/,
     'avg_row_length'    => qr/^\d+$/,
-    'checksum'			=> qr/^(1|0)$/,
-    'comment'			=> qr//,
-    'max_rows'			=> qr/^\d+$/,
-    'min_rows'			=> qr/^\d+$/,
-    'pack_keys'			=> qr/^(1|0)$/,
-    'password'			=> qr//,
-    'delay_key_write'	=> qr/^\d+$/,
-    'row_format'		=> qr/^(default|dynamic|static|compressed)$/i,
-    'raid_type'			=> qr/^(?:1|STRIPED|RAID0|RAID_CHUNKS\s*=\s*\d+|RAID_CHUNKSIZE\s*=\s*\d+)$/,
+    'checksum'            => qr/^(1|0)$/,
+    'comment'            => qr//,
+    'max_rows'            => qr/^\d+$/,
+    'min_rows'            => qr/^\d+$/,
+    'pack_keys'            => qr/^(1|0)$/,
+    'password'            => qr//,
+    'delay_key_write'    => qr/^\d+$/,
+    'row_format'        => qr/^(default|dynamic|static|compressed)$/i,
+    'raid_type'            => qr/^(?:1|STRIPED|RAID0|RAID_CHUNKS\s*=\s*\d+|RAID_CHUNKSIZE\s*=\s*\d+)$/,
     };
     my @options = ();
     my @errors  = ();
@@ -73,7 +73,7 @@ sub create
         $opt = \%lc_opt;
         foreach my $key ( keys( %$opt ) )
         {
-			next if( $opt->{ $key } =~ /^\s*$/ || !exists( $allowed->{ $key } ) );
+            next if( $opt->{ $key } =~ /^\s*$/ || !exists( $allowed->{ $key } ) );
             if( $opt->{ $key } !~ /$allowed->{ $key }/ )
             {
                 push( @errors, $key );
@@ -169,7 +169,7 @@ sub create_info
 
 sub exists
 {
-	return( shift->table_exists( shift( @_ ) ) );
+    return( shift->table_exists( shift( @_ ) ) );
 }
 
 sub lock { return( shift->error( "There is no table locking in SQLite." ) ); }
@@ -232,13 +232,13 @@ sub structure
     my $types   = $self->{types};
     if( !%$fields || !%$struct || !%$default )
     {
-    	$self->message( 3, "No structure, field, default values, null or types set yet for this table '$table' object. Populating." );
-    	## my $query = "SELECT * FROM information_schema.columns WHERE table_name = ?";
-    	my $query = <<EOT;
+        $self->message( 3, "No structure, field, default values, null or types set yet for this table '$table' object. Populating." );
+        ## my $query = "SELECT * FROM information_schema.columns WHERE table_name = ?";
+        my $query = <<EOT;
 PRAGMA table_info(${table})
 EOT
-    	## http://www.postgresql.org/docs/9.3/interactive/infoschema-columns.html
-    	## select * from information_schema.columns where table_name = 'address'
+        ## http://www.postgresql.org/docs/9.3/interactive/infoschema-columns.html
+        ## select * from information_schema.columns where table_name = 'address'
         my $sth = $self->prepare_cached( $query ) ||
         return( $self->error( "Error while preparing query to get table '$table' columns specification: ", $self->errstr() ) );
         $sth->execute ||
@@ -261,7 +261,7 @@ EOT
             $data{key} = CORE::delete( $data{pk} );
             if( exists( $type_convert->{ $data{type} } ) )
             {
-            	$data{type} = $type_convert->{ $data{type} };
+                $data{type} = $type_convert->{ $data{type} };
             }
             $data{default} = '' if( !defined( $data{default} ) );
             ## push( @order, $data{ 'field' } );
@@ -286,7 +286,7 @@ EOT
         $self->{default}   = $default;
         $self->{fields}    = $fields;
         $self->{structure} = $struct;
-        $self->{types}	   = $types;
+        $self->{types}       = $types;
         $self->message( 3, "Fields found: ", sub{ $self->dumper( $fields ) } );
     }
 #    $self->message( sprintf( "struct has %d keys", scalar( keys( %$struct ) ) ) );

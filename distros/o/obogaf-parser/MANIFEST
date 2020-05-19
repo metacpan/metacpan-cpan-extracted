@@ -12,10 +12,13 @@ t/03_get_parents_or_children_list.t
 t/04_gene2biofun.t
 t/05_make_stat.t
 t/06_map_OBOterm_between_release.t
+t/07_obo_filter.t
+t/data/test_go.obo
 t/data/test_goa_chicken.gaf
 t/data/test_goa_chicken.gaf.gz
 t/data/test_goa_chicken_128.gaf
 t/data/test_goa_chicken_128.gaf.gz
 t/data/test_gobasic.obo
+t/data/test_goterms.txt
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -5,7 +5,7 @@ use warnings;
 
 require 5.010;
 
-our $VERSION = '0.10';
+our $VERSION = '0.13';
 
 use Crypt::OpenSSL::X509;
 
@@ -20,17 +20,25 @@ BOOT_XS: {
 }
 
 sub new {
-    push @_, undef if @_ % 3;
+    if ( scalar(@_) == 2 ) {
+        # Backward compatability Crypt::OpenSSL::Verify
+        # only one parameter is the CAfile name
+        push @_, undef;
+    }
     my ( $class, %args ) = @_;
     my $self    = {};
     my $options = \%args;
-    use Data::Dumper;
     if ( exists $options->{CAfile} ) {
         $self = {
+            CAfile         => $options->{CAfile},
+            CApath         => $options->{CApath},
+            noCAfile       => $options->{noCAfile},
+            noStore        => $options->{noStore},
             trust_expired  => $options->{trust_expired},
             trust_no_local => $options->{trust_no_local},
             trust_onelogin => $options->{trust_onelogin},
-            strict_certs   => $options->{strict_certs}
+            strict_certs   => $options->{strict_certs},
+            STORE          => 0
         };
     }
     else {
@@ -39,10 +47,27 @@ sub new {
             for ( keys %args ) {
                 my %arg = ( CAfile => $_ );
                 %args = %arg;
+                $self = {
+                    CAfile         => $_,
+                    strict_certs   => 0, # Maintain original functionality
+                    STORE          => 0
+                }
+
             }
         }
     }
-    return _new( $class, \%args );
+    my $opt = $self;
+    my $store = _new( $class, $opt ) ;
+    if ($store) {
+        $self->{STORE} = $store;
+    }
+    else {
+        $self = 0;
+    }
+    bless $self, $class;
+
+    return $self;
+
 
 }
 
@@ -60,7 +85,7 @@ sub verify_callback {
         }
         elsif ( $cert_error == 18 ) {
             # X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT:
-            $ok = 1;
+            $ok = $ok; # Disabled not in Verify509
         }
         elsif ( $cert_error == 24 ) {
             # X509_V_ERR_INVALID_CA:
@@ -158,12 +183,6 @@ need to verify that the signing certificate is valid.
 =head1 METHODS
 
 =head2 new()
-           (
-               CAfile => $cafile_path
-               CApath => '/etc/ssl/certs',     # Optional
-               noCAfile => 1,                  # Optional
-               noCApath => 0                   # Optional
-           );
 
 Constructor. Returns an OpenSSL Verify instance, set up with the given CA.
 
@@ -173,6 +192,15 @@ Arguments:
  * CApath => $ca_path           - path to a directory containg hashed CA Certificates
  * noCAfile => 0 or 1           - Default CAfile should not be loaded if TRUE
  * noCApath => 0 or 1           - Default CApath should not be loaded if TRUE
+ * strict_certs => 0 or 1       - Do not override any OpenSSL verify errors
+
+   (
+       CAfile => $cafile_path
+       CApath => '/etc/ssl/certs',     # Optional
+       noCAfile => 1,                  # Optional
+       noCApath => 0,                  # Optional
+       strict_certs = 1                # Default (Optional) 
+   );
 
 =head2  new('t/cacert.pem');
 

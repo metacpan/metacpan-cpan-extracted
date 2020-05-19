@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 18;
+use Test::More tests => 21;
 select(($|=1,select(STDERR),$|=1)[1]);
 BEGIN
 {
@@ -32,7 +32,14 @@ SKIP:
 	'driver'	=> 'Pg',
 	#'debug'		=> 3,
 	};
-	$con_params->{login} = ( $ENV{DB_LOGIN} || (getpwuid( $> ))[0] ) if( !$ENV{DB_CON_FILE} );
+	if( $^O eq 'MSWin32' )
+	{
+		$con_params->{login} = ( $ENV{DB_LOGIN} || getlogin ) if( !$ENV{DB_CON_FILE} );
+	}
+	else
+	{
+		$con_params->{login} = ( $ENV{DB_LOGIN} || getlogin || (getpwuid( $> ))[0] ) if( !$ENV{DB_CON_FILE} );
+	}
 	my $dbh1 = DB::Object->connect( $con_params );
 	if( !defined( $dbh1 ) )
 	{
@@ -67,6 +74,7 @@ SKIP:
 		}
 		else
 		{
+			pass( "Switching database" );
 			my $rv = $dbh1->do( "DROP DATABASE $test_db" );
 			ok( $rv, "Dropping leftover test database $test_db" );
 		}
@@ -111,6 +119,7 @@ SKIP:
 		email => 'paul@example.org',
 		active => 0,
 	) || fail( "Error while create query to add data to table customers: " . $cust->error );
+	pass( "Customer insert query object" );
 	$result = $cust_sth_ins->as_string;
 
 	my $expected = <<SQL;
@@ -126,6 +135,7 @@ SQL
 	$cust->having( email => qr/\@example/ );
 	$cust->limit( 10 );
 	my $cust_sth_sel = $cust->select || fail( "An error occurred while creating a query to select data frm table customers: " . $cust->error );
+	pass( "Customer select query object" );
 	$result = $cust_sth_sel->as_string;
 	$expected = <<SQL;
 SELECT id, first_name, last_name, email, created, modified, active, created::ABSTIME::INTEGER AS created_unixtime, modified::ABSTIME::INTEGER AS modified_unixtime, CONCAT(first_name, ' ', last_name) AS name FROM customers WHERE email='john\@example.org' HAVING email ~ '\\\@example' ORDER BY last_name LIMIT 10
@@ -137,6 +147,7 @@ SQL
 	$cust->reset;
 	$cust->where( email => 'john@example.org' );
 	my $cust_sth_upd = $cust->update( active => 0 ) || fail( "An error has occurred while trying to create an update query for table customers: " . $cust->error );
+	pass( "Customer update query object" );
 	$result = $cust_sth_upd->only->as_string;
 	$expected = <<SQL;
 UPDATE ONLY customers SET active='0' WHERE email='john\@example.org'
@@ -165,11 +176,11 @@ END
 	{
 		## diag "Cleaning up. Dropping database $test_db";
 		## diag( "Disconnecting from database $test_db" );
-		$dbh->disconnect();
+		#$dbh->disconnect();
 	}
 };
 
-done_testing();
+# done_testing();
 
 __END__
 

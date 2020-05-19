@@ -1,0 +1,11 @@
+test/gnupghome/pubring.kbx
+--------------------------
+sec   dsa1024/F950DA9C 2000-02-06 [SCA]
+uid         [ unknown] GnuPG test key (for testing purposes only)
+uid         [ unknown] Foo Bar (1)
+ssb   elg768/2E854A6B 2000-02-06 [E]
+
+sec   rsa2048/B6747DDC 2016-10-12 [SC]
+uid         [ unknown] GnuPG::Interface Test key <test@example.org>
+ssb   rsa2048/AE441D0F 2016-10-12 [E]
+

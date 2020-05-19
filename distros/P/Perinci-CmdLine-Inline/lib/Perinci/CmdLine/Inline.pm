@@ -10,9 +10,9 @@
 package Perinci::CmdLine::Inline;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-02'; # DATE
+our $DATE = '2020-05-18'; # DATE
 our $DIST = 'Perinci-CmdLine-Inline'; # DIST
-our $VERSION = '0.550'; # VERSION
+our $VERSION = '0.551'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -1371,7 +1371,7 @@ _
                 push @l, '    $_pci_meta_result_type_is_simple = 1;'."\n" if Data::Sah::Util::Type::is_simple($meta->{result}{schema} // '');
                 push @l, "    require $cd->{sc_mods}{$sc_name};\n" if $cd->{sc_mods}{$sc_name};
                 push @l, '    eval { $_pci_r->{res} = ', $cd->{func_names}{$sc_name}, ($cd->{args_as}{$sc_name} eq 'hashref' ? '(\\%_pci_args)' : '(%_pci_args)'), ' };', "\n";
-                push @l, '    if ($@) { $_pci_r->{res} = [500, "Function died: $@"] }', "\n";
+                push @l, '    if ($@) { die if $ENV{PERINCI_CMDLINE_INLINE_DEBUG_DIE}; $_pci_r->{res} = [500, "Function died: $@"] }', "\n";
                 if ($meta->{result_naked}) {
                     push @l, '    $_pci_r->{res} = [200, "OK (envelope added by Perinci::CmdLine::Inline)", $_pci_r->{res}];', "\n";
                 }
@@ -1630,7 +1630,7 @@ Perinci::CmdLine::Inline - Generate inline Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.550 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2020-05-02.
+This document describes version 0.551 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2020-05-18.
 
 =head1 SYNOPSIS
 
@@ -1680,6 +1680,15 @@ Generated script's subroutine source codes. Keys are subroutines' names and
 values are subroutines' source codes.
 
 =back
+
+=head1 ENVIRONMENT (GENERATED SCRIPTS)
+
+These are environment variables observed by the generated scripts.
+
+=head2 PERINCI_CMDLINE_INLINE_DEBUG_DIE
+
+Bool. If set to true, then will rethrow exception instead of converting it into
+enveloped result. This makes debugging easier.
 
 =head1 FUNCTIONS
 

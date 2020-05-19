@@ -6,6 +6,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   HTTP::Daemon: '0'
   HTTP::Message: '0'
+  Test::Fatal: '0'
   Test::More: '0.88'
   Test::NoWarnings: '0'
 configure_requires:
@@ -32,5 +33,5 @@ requires:
 resources:
   IRC: irc://irc.perl.org/#smoke
   homepage: http://perl5.test-smoke.org/
-  repository: git://github.com/abeltje/Test-Smoke.git
-version: '1.76'
+  repository: https://github.com/abeltje/Test-Smoke
+version: '1.77'

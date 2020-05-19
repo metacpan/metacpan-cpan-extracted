@@ -39,10 +39,10 @@ my $ret;
 eval {
         $ret = $v->verify($cert);
 };
-ok($@ =~ /^verify: unable to get local issuer certificate/);
+ok($@ =~ /(verify: unable to get local)|(verify: unknown certificate)/);
 ok(!$ret);
 
-my $v = Crypt::OpenSSL::Verify->new(
+$v = Crypt::OpenSSL::Verify->new(
     CAfile => 't/cacert.pem',
     CApath => '/etc/ssl/certs',
     noCAfile => 0,
@@ -54,7 +54,7 @@ $ret = undef;
 eval {
         $ret = $v->verify($cert);
 };
-ok($@ =~ /^verify: unable to get local issuer certificate/);
+ok($@ =~ /(verify: unable to get local)|(verify: unknown certificate)/);
 ok(!$ret);
 
 done_testing;

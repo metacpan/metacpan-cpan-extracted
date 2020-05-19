@@ -32,7 +32,7 @@ use AnyEvent::RabbitMQ::LocalQueue;
 
 use namespace::clean;
 
-our $VERSION = '1.19';
+our $VERSION = '1.20';
 
 use constant {
     _ST_CLOSED => 0,
@@ -139,9 +139,14 @@ sub connect {
             undef $conn;
             my $self = $weak_self or return;
 
-            my $fh = shift or return $args{on_failure}->(
-                sprintf('Error connecting to AMQP Server %s:%s: %s', $args{host}, $args{port}, $!)
-            );
+            my $fh = shift;
+
+            unless ($fh) {
+                $self->{_state} = _ST_CLOSED;
+                return $args{on_failure}->(
+                    sprintf('Error connecting to AMQP Server %s:%s: %s', $args{host}, $args{port}, $!)
+                );
+            }
 
             my $close_cb = $args{on_close};
             my $failure_cb = $args{on_failure};
@@ -166,6 +171,7 @@ sub connect {
                         if exists $self->{drain_condvar};
                 },
                 $args{tls} ? (tls => 'connect') : (),
+                $args{tls_ctx} ? ( tls_ctx => $args{tls_ctx} ) : (),
             );
             $self->_read_loop($args{on_close}, $args{on_read_failure});
             $self->_start(%args,);
@@ -681,6 +687,7 @@ AnyEvent::RabbitMQ - An asynchronous and multi channel Perl AMQP client.
       vhost      => '/',
       timeout    => 1,
       tls        => 0, # Or 1 if you'd like SSL
+      tls_ctx    => $anyevent_tls # or a hash of AnyEvent::TLS options.
       tune       => { heartbeat => 30, channel_max => $whatever, frame_max = $whatever },
       on_success => sub {
           my $ar = shift;

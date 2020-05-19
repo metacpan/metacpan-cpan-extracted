@@ -20,7 +20,7 @@ with qw(GnuPG::HashInit);
 
 has as_hex_string => (
     isa => 'Any',
-    is  => 'rw',        
+    is  => 'rw',
 );
 
 sub compare {

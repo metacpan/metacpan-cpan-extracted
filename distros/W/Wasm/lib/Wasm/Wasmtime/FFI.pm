@@ -11,14 +11,16 @@ use Devel::GlobalDestruction ();
 use base qw( Exporter );
 
 # ABSTRACT: Private class for Wasm::Wasmtime
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 our @EXPORT = qw( $ffi $ffi_prefix _generate_vec_class _generate_destroy );
 
 sub _lib
 {
-  find_lib lib => 'wasmtime', alien => 'Alien::wasmtime';
+  my $lib = find_lib lib => 'wasmtime';
+  return $lib if $lib;
+  return find_lib lib => 'wasmtime', alien => 'Alien::wasmtime';
 }
 
 our $ffi_prefix = 'wasm_';
@@ -145,9 +147,7 @@ sub _generate_destroy
   $ffi->attach( [ delete => join('::', $caller, 'DESTROY') ] => [ $type ] => \&_wrapper_destroy);
 }
 
-if($ffi->find_symbol('wasmtime_error_message'))
-{
-  package Wasm::Wasmtime::Error;
+{ package Wasm::Wasmtime::Error;
 
   $ffi_prefix = 'wasmtime_error_';
   $ffi->custom_type(
@@ -260,7 +260,7 @@ Wasm::Wasmtime::FFI - Private class for Wasm::Wasmtime
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

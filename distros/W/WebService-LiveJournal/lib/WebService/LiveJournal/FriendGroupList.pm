@@ -6,8 +6,8 @@ use WebService::LiveJournal::List;
 use WebService::LiveJournal::FriendGroup;
 our @ISA = qw/ WebService::LiveJournal::List /;
 
-# ABSTRACT: List of LiveJournal friend groups
-our $VERSION = '0.08'; # VERSION
+# ABSTRACT: (Deprecated) List of LiveJournal friend groups
+our $VERSION = '0.09'; # VERSION
 
 
 sub init
@@ -48,13 +48,18 @@ __END__
 
 =head1 NAME
 
-WebService::LiveJournal::FriendGroupList - List of LiveJournal friend groups
+WebService::LiveJournal::FriendGroupList - (Deprecated) List of LiveJournal friend groups
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 DESCRIPTION
+
+B<NOTE>: This distribution is deprecated.  It uses the outmoded XML-RPC protocol.
+LiveJournal has also been compromised.  I recommend using DreamWidth instead
+(L<https://www.dreamwidth.org/>) which is in keeping with the original philosophy
+LiveJournal regarding advertising.
 
 List of friend groups returned from L<WebService::LiveJournal>.
 See L<WebService::LiveJournal::FriendGroup> for how to use

@@ -1,4 +1,17 @@
 Changelog for Data-Object-Cli
 
-2.00 2020-05-10T21:11:06
+2.02 2020-05-18T07:22:53
  - No changes found
+
+2.01 2020-05-13T21:02:36
+ - Built release version 2.01
+ - Added release updates
+ - Update release process
+ - Implement better "name" parsing rules (#5)
+ - Updated documentation
+ - Remove no warnings "redefine" from POD
+
+2.00 2020-05-10T20:49:59
+ - Built release version 2.00
+ - Added release updates
+ - Initial commit

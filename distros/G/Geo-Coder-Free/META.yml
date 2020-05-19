@@ -9,10 +9,12 @@ build_requires:
   CHI: '0'
   CHI::Driver::RawMemory: '0'
   Config::Auto: '0'
+  Cwd: '0'
   Data::Throttler: '0'
   File::Basename: '0'
   File::Copy: '0'
   File::Open::NoCache::ReadOnly: '0.02'
+  File::Slurp: '0'
   File::Spec: '0'
   Geo::Location::Point: '0.02'
   IO::AIO: '0'
@@ -29,7 +31,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -66,5 +68,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/Geo-Coder-Free/issues
   repository: git://github.com/nigelhorne/Geo-Coder-Free.git
-version: '0.22'
+version: '0.23'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

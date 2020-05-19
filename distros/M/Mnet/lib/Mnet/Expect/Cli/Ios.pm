@@ -140,7 +140,9 @@ information.
         return undef;
     }
 
-    # change detected prompt to ensure it works in both user and enable prompts
+    # change detected prompt to ensure it works in different ios modes
+    #   need to work in user, enable, config, interface config, etc
+    #   also needs to work if long hostname in prompt gets truncated
     $self->debug("new checking prompt for enable and user mode");
     my $prompt_re = $self->prompt_re;
     $prompt_re =~ s/(>|#)/(>|#)/;
@@ -200,8 +202,13 @@ prompt, otherwise a value of false is returned.
         '(?i)\s*user(name)?:?\s*$' => sub {
             my ($self, $output) = (shift, shift);
             return undef if $self->{replay};
-            return "$self->{enable_user}\r" if defined $self->{enable_user};
-            return "$self->{username}\r" if defined $self->{username};
+            if (defined $self->{enable_user}) {
+                $self->debug("enable sending enable_user");
+                return "$self->{enable_user}\r";
+            } elsif (defined $self->{username}) {
+                $self->debug("enable sending username");
+                return "$self->{username}\r";
+            }
             return undef;
         },
         $self->{password_re} => sub {
@@ -226,7 +233,7 @@ prompt, otherwise a value of false is returned.
                     $self->fatal("enable or enable_in required and not set");
                 }
             }
-            $self->debug("enable sending password");
+            $self->debug("enable sending enable password");
             $self->{_log_filter} = $password;
             return "$password\r";
         },
@@ -235,7 +242,7 @@ prompt, otherwise a value of false is returned.
 
     # return true if we confirmed we are at an enable prompt
     if (defined $output and $output =~ /#/) {
-        $self->debug("enable finished, confirmed enable, returning true");
+        $self->debug("enable finished, returning true");
         return 1;
     }
 

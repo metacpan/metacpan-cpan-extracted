@@ -64,6 +64,7 @@ module_boilerplate_ok('lib/App/VTide/Command/Conf.pm');
 module_boilerplate_ok('lib/App/VTide/Command/Edit.pm');
 module_boilerplate_ok('lib/App/VTide/Command/Grep.pm');
 module_boilerplate_ok('lib/App/VTide/Command/Help.pm');
+module_boilerplate_ok('lib/App/VTide/Command/History.pm');
 module_boilerplate_ok('lib/App/VTide/Command/Init.pm');
 module_boilerplate_ok('lib/App/VTide/Command/Who.pm');
 module_boilerplate_ok('lib/App/VTide/Command/Recent.pm');

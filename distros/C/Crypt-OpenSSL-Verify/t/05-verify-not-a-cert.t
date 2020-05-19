@@ -13,7 +13,7 @@ eval {
 ok($@ =~ /x509 is not of type Crypt::OpenSSL::X509/);
 ok(!$ret);
 
-my $v = Crypt::OpenSSL::Verify->new(
+$v = Crypt::OpenSSL::Verify->new(
     CAfile => 't/cacert.pem',
     CApath => '/etc/ssl/certs',
     noCAfile => 0,

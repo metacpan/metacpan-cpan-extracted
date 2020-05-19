@@ -1,5 +1,10 @@
 Revision history for Perl extension App-week
 
+0.09 2020-05-14T17:37:05Z
+
+    - Update to use -Mtermcolor.
+    - Correct spelling.
+
 0.08 2020-04-06T13:36:08Z
 
     - Handle 'once' warnings on 5.28.0 on some Linux system.

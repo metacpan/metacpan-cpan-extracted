@@ -23,16 +23,16 @@ subtest 'diag' => sub {
 subtest 'export' => sub {
 
   imported_ok 'newrelic_init';
-  
+
   note "also imported: $_" for @NewRelic::Agent::FFI::Procedural::EXPORT;
-  
+
   ok(newrelic_message_handler, "address of newrelic_message_handler: @{[ newrelic_message_handler ]}");
 
 };
 
 subtest embedded => sub {
 
-  skip_all 'test requires license key' unless $license_key;  
+  skip_all 'test requires license key' unless $license_key;
   ok(newrelic_message_handler, "address of newrelic_message_handler: @{[ newrelic_message_handler ]}");
 
 };
@@ -41,7 +41,7 @@ subtest 'newrelic_basic_literal_replacement_obfuscator' => sub {
 
   my $ffi = FFI::Platypus->new;
   my $f = $ffi->function( newrelic_basic_literal_replacement_obfuscator, ['string'] => 'string' );
-  
+
   my $hidden = $f->("SELECT * FROM user WHERE password = 'secret'");
   pass "didn't crash";
   note $hidden;
@@ -51,7 +51,7 @@ subtest 'newrelic_basic_literal_replacement_obfuscator' => sub {
 subtest 'init' => sub {
 
   newrelic_init;
-  
+
   pass "didn't crash";
 
 };
@@ -71,23 +71,23 @@ subtest 'newrelic_segment_datastore_begin' => sub {
     free($ptr) if $ptr;
     $ptr = strdup $sql_out;
   }
-  
+
   my $ffi = FFI::Platypus->new;
   $ffi->type('(string)->opaque' => 'ob');
   my $myobfuscator_closure = $ffi->closure(\&myobfuscator);
   my $myobfuscator_ptr = $ffi->cast(ob => opaque => $myobfuscator_closure);
   note "\$myobfuscator_ptr = $myobfuscator_ptr";
-  
+
   my $seg = newrelic_segment_datastore_begin $tx, NEWRELIC_ROOT_SEGMENT, 'mytable', 'select', "select * from users where password = 'secret'", 'get_user_pw', $myobfuscator_ptr;
   ok $seg, 'newrelic_segment_datastore_begin';
 
   is $sql_in, "select * from users where password = 'secret'", 'myobfuscator called';
-  
+
   sleep rand .5;
-  
+
   my $rc = newrelic_segment_end $tx, $seg;
   is $rc, 0, 'newrelic_segment_end';
-  
+
   newrelic_transaction_end $tx;
   ok 1, 'newrelic_transaction_end';
 };
@@ -103,7 +103,7 @@ subtest 'newrelic_request_shutdown' => sub {
   #note 'here2';
 
   my $rc = newrelic_request_shutdown 'Because I said so';
-  
+
   is $rc, 0;
   note "rc     = $rc";
   #note "status = $status";

@@ -7,7 +7,7 @@ use boolean qw(true false);
 use DateTime;
 use DateTime::Format::Natural;
 use DateTime::TimeZone;
-use Test::More tests => 12;
+use Test::More tests => 17;
 
 eval { DateTime::Format::Natural->new(lang => 'en') };
 ok(!$@, 'lang');
@@ -32,6 +32,13 @@ foreach my $bool (@bools) {
     eval { DateTime::Format::Natural->new(prefer_future => $bool->[0]) };
     ok(!$@, "prefer_future $bool->[1]");
 }
+foreach my $bool (@bools) {
+    eval { DateTime::Format::Natural->new(demand_future => $bool->[0]) };
+    ok(!$@, "demand_future $bool->[1]");
+}
+
+eval { DateTime::Format::Natural->new(prefer_future => true, demand_future => true) };
+ok($@ =~ /mutually exclusive/, 'prefer_future/demand_future');
 
 eval { DateTime::Format::Natural->new(time_zone => 'floating') };
 ok(!$@, 'time_zone string');

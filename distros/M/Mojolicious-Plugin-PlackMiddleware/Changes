@@ -1,5 +1,8 @@
 Revision history for Mojolicious::Plugin::PlackMiddleware
 
+0.37 2020/05/18
+  - Fix error handling (Larry Leszczynski)
+
 0.36 2016/05/23
   - Fixed tests in favor of Mojo::Home recent changes
 

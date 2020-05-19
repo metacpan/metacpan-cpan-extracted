@@ -38,13 +38,13 @@ use JSON;
 use Storable qw(dclone);
 use Exporter qw(import);
 
-our @EXPORT_OK = qw(get post put delete);
+our @EXPORT_OK = qw(get post put delete postFile putFile);
 
 #####
 ## CONSTANTS
 #####
 our $TIMEOUT = 10;
-our $VERSION = "1.2.1";
+our $VERSION = "1.2.2";
 #####
 ## VARIABLES
 #####
@@ -143,7 +143,7 @@ sub new {
 ## METHODS
 #####
 
-sub get (){
+sub get (){		# endpoint
 	my $self = shift;
 	my $endpoint = shift;
 
@@ -170,7 +170,7 @@ sub get (){
 	return dclone ($responsehash);
 }
 
-sub post(){
+sub post(){		# endpoint, json
 	my $self = shift;
 	my $endpoint = shift;
 	my $json = shift;
@@ -194,7 +194,7 @@ sub post(){
 	return dclone ($responsehash);
 }
 
-sub put(){
+sub put(){		# endpoint, json
 	my $self = shift;
 	my $endpoint = shift;
 	my $json = shift;
@@ -218,7 +218,7 @@ sub put(){
 	return dclone ($responsehash);
 }
 
-sub delete () {
+sub delete () {		# endpoint
 	my $self = shift;
 	my $endpoint = shift;
 
@@ -239,6 +239,59 @@ sub delete () {
 	}
 	return dclone ($responsehash);
 }
+
+sub postFile() {		# endpoint, mimetype, data
+	my $self = shift;
+	my $endpoint = shift;
+	my $mimetype = shift;
+	my $data = shift;
+	
+	my $responsehash = ();
+	my $rc = 0;
+
+	$self->{'client'}->addHeader ("Content-Type", $mimetype);
+	$self->{'client'}->POST($endpoint, $data);
+	$rc = $self->{'client'}->responseCode ();
+	$self->{'result'}->{'httpstatus'} = $rc;
+
+	if ($rc-$rc%100 != 200) {
+		$responsehash->{'reqstatus'} = 'CRIT';
+		$responsehash->{'httpstatus'} = $rc;
+	} else {
+		my $responseContent = $self->{'client'}->responseContent();
+		$self->_logD($responseContent);
+		$responsehash = $self->_handleResponse($responseContent);
+	}
+	return dclone ($responsehash);
+	
+}
+
+sub putFile() {		# endpoint, mimetype, data
+	my $self = shift;
+	my $endpoint = shift;
+	my $mimetype = shift;
+	my $data = shift;
+	
+	my $responsehash = ();
+	my $rc = 0;
+
+	$self->{'client'}->addHeader ("Content-Type", $mimetype);
+	$self->{'client'}->PUT($endpoint, $data);
+	$rc = $self->{'client'}->responseCode ();
+	$self->{'result'}->{'httpstatus'} = $rc;
+
+	if ($rc-$rc%100 != 200) {
+		$responsehash->{'reqstatus'} = 'CRIT';
+		$responsehash->{'httpstatus'} = $rc;
+	} else {
+		my $responseContent = $self->{'client'}->responseContent();
+		$self->_logD($responseContent);
+		$responsehash = $self->_handleResponse($responseContent);
+	}
+	return dclone ($responsehash);
+	
+}
+
 
 sub _handleResponse () {
 	my $self = shift;

@@ -1,10 +1,70 @@
-Changes on 2020-05-12 for repository at:
+Changes on 2020-05-13 for repository at:
+  Fetch URL: git@github.com:abeltje/Test-Smoke.git
+  Push  URL: git@github.com:abeltje/Test-Smoke.git
 
 Enjoy!
 
-1.76 2020-05-12T20:54:37+02:00 (531ef1e => Abe Timmerman)
- - (Abe Timmerman, 2 minutes ago) Autocommit for distribution Test::Smoke
+1.77 2020-05-13T20:51:42+02:00 (1ed68da => Abe Timmerman)
+ - (Abe Timmerman, 58 seconds ago) Autocommit for distribution Test::Smoke
+   1.77 (minor)
+
+1.76_01 2020-05-13T15:51:25+02:00 (c5bf6ca => Abe Timmerman)
+ - (Abe Timmerman, 5 hours ago) Autocommit for distribution Test::Smoke
+   1.76_01 (test)
+
+1.76 2020-05-12T20:54:37+02:00 (0801dd6 => Abe Timmerman)
+ - (Abe Timmerman, 24 hours ago) Autocommit for distribution Test::Smoke
    1.76 (minor)
+
+ - (H.Merijn Brand, 1 year, 1 month ago) Add support for -Uxx and -Dxx=y on
+   tssmokeperl.pl
+ -     When a smokescript smokes for two different compilers, it is likely
+   to use
+ -     something like
+ -     :
+ -     /pro/bin/perl tssmokeperl.pl --nofetch --nopatch \
+ -	   -c "$CFGNAME" $continue $* -Dcc=gcc > p59.log 2>&1
+ -     :
+ -     :
+ -     /pro/bin/perl tssmokeperl.pl --nofetch --nopatch \
+ -	   -c "$CFGNAME" $continue $* -Dcc=g++ > p59.log 2>&1
+ -     :
+ -     This change allows tssmokeperl.pl to accept -Dcc=gcc and/or -Ucc
+ -     and make it DWIM. Before this change, these command-line options
+ -     were silently ignored.
+ -     Only existing options can be (un)set
+
+ - (H.Merijn Brand - Tux, 1 year, 1 month ago) Moving -Dxx=... and -Uxx to
+   the correct spot
+
+ - (H.Merijn Brand - Tux, 1 year, 1 month ago) Also allow -A options
+
+ - (Abe Timmerman, 6 hours ago) Add a Serialiser
+ -     This is a simple serialiser, I still have to hunt the rest of the
+   code
+ -     for uses of Data::Dumper type serialisations and see if I can change
+ -     them.
+
+ - (Abe Timmerman, 6 hours ago) Add a '--pass_option' switch to the
+   runsmoke-applet
+ -     This (repeatable) option will let one pass extra options to
+   Configure
+ -     from the 'tsrunsmoke.pl' (and thus 'tssmokeperl.pl') commandline:
+ -     ~/coresmoke/ts/bin/tssmokeperl.pl -c "$CFGNAME" $* \
+ -	    --pass-option '-Dusesuperthreads' \
+ -	    -p '-Uusesuperfiles' > p59.log 2>&1
+ -     This is what Tux put in a commit message for a different solution of
+ -     his own request:
+ -     When a smokescript smokes for two different compilers, it is likely
+   to
+ -     use something like
+ -     /pro/bin/perl tssmokeperl.pl --nofetch --nopatch \
+ -	   -c "$CFGNAME" $continue $* -Dcc=gcc > p59.log 2>&1
+ -     /pro/bin/perl tssmokeperl.pl --nofetch --nopatch \
+ -	   -c "$CFGNAME" $continue $* -Dcc=g++ > p59.log 2>&1
+ -     This change allows tssmokeperl.pl to accept -Dcc=gcc and/or -Ucc
+ -     and make it DWIM. Before this change, these command-line options
+ -     were silently ignored.
 
 1.75 2020-03-01T12:41:23+01:00 (995b2f9 => Abe Timmerman)
  - (Abe Timmerman, 2 months ago) Autocommit for distribution Test::Smoke
@@ -236,8 +296,8 @@ Enjoy!
  - (Christian Walde, 1 year, 1 month ago) skip tests by modifying them in
    place instead of renaming them
 
- - (H.Merijn Brand - Tux, 1 year ago) Using Test::Smoke out of the box on
-   Win32
+ - (H.Merijn Brand - Tux, 1 year, 1 month ago) Using Test::Smoke out of the
+   box on Win32
  -     Thank you Christian for the time and effort
 
  - (H.Merijn Brand - Tux, 1 year ago) Correct minor typo in docs
@@ -450,8 +510,8 @@ Enjoy!
  - (abeltje, 3 years, 2 months ago) Autocommit for distribution Test::Smoke
    1.70_06 (same)
 
- - (H.Merijn Brand - Tux, 4 years ago) Replace Test::Smoke::SysInfo with
-   System::Info
+ - (H.Merijn Brand - Tux, 4 years, 1 month ago) Replace
+   Test::Smoke::SysInfo with System::Info
 
  - (H.Merijn Brand - Tux, 3 years, 2 months ago) Fix cpuinfo test results
    (based on System::Info)

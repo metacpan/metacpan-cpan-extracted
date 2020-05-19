@@ -1,5 +1,5 @@
 package Beam::Runner::Command::make;
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 # ABSTRACT: Build recipes and their dependencies
 
 #pod =head1 SYNOPSIS
@@ -61,7 +61,7 @@ sub run {
     Log::Any::Adapter->set( Stderr => ( log_level => $log_levels[ $opt{verbose} - $opt{quiet} ] ) );
 
     my $make = Beam::Make->new();
-    $make->run( @ARGV );
+    $make->run( @args );
 }
 
 1;
@@ -76,7 +76,7 @@ Beam::Runner::Command::make - Build recipes and their dependencies
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 

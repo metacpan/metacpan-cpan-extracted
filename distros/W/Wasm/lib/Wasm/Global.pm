@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Interface to Web Assembly Memory
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 1;
@@ -21,9 +21,11 @@ Wasm::Global - Interface to Web Assembly Memory
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
+
+Import globals into Perl from WebAssembly
 
  use Wasm
    -api => 0,
@@ -38,12 +40,54 @@ version 0.09
  $global = 99;
  print "$global\n";  # 99
 
+Import globals from Perl into WebAssembly
+
+ package Foo;
+ 
+ use Wasm
+   -api    => 0,
+   -global => [
+     'foo',  # name
+     'i32',  # type
+     'var',  # mutability
+     42,     # initial value
+   ]
+ ;
+ 
+ package Bar;
+ 
+ use Wasm
+   -api      => 0,
+   -wat      => q{
+     (module
+       (global $foo (import "Foo" "foo") (mut i32))
+       (func (export "get_foo") (result i32)
+         (global.get $foo))
+       (func (export "inc_foo")
+         (global.set $foo
+           (i32.add (global.get $foo) (i32.const 1))))
+     )
+   }
+ ;
+ 
+ package main;
+ 
+ print Bar::get_foo(), "\n";   # 42
+ Bar::inc_foo();
+ print Bar::get_foo(), "\n";   # 43
+ $Foo::foo = 0;
+ print Bar::get_foo(), "\n";   # 0
+
 =head1 DESCRIPTION
 
-This class represents a global variable exported from a WebAssembly
-module.  Each global variable exported from WebAssembly is automatically
+This documents the interface to global variables for L<Wasm>.
+Each global variable exported from WebAssembly is automatically
 imported into Perl space as a tied scalar, which allows you to get
-and set the variable easily from Perl.
+and set the variable easily from Perl.  Going the other way
+requires a bit more boilerplate, but is almost as easy.  Using
+the C<-global> option on the L<Wasm> module, you can define global
+variables in Pure Perl modules that can be imported into WebAssembly
+from Perl.
 
 =head1 CAVEATS
 

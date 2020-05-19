@@ -1,5 +1,9 @@
 Revision history for Perl extension LWP::UserAgent::WithCache.
 
+0.13  Sat May 16 14:57:08 PDT 2020
+	- RT:94510 for LWP-UserAgent-WithCache: Test suite started to fail
+    - Thanks Slaven Rezić https://github.com/eserte for reporting and submitting the PR #4
+
 0.12  Fri Oct 14 13:41:29 PDT 2011
 	- Fixed "Expires" header handling logic
 	- implemented 304 Not Modified response handler to return cached response object

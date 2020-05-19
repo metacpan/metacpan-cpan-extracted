@@ -5,12 +5,20 @@ extends 'NewsExtractor::GenericExtractor';
 
 sub journalist {
     my ($self) = @_;
-    my $content_text = $self->content_text;
-    my ($txt) = $content_text =~ m{（記者／?(\p{Letter}+)）\z};
-    unless ($txt) {
-        ($txt) = $content_text =~ m{\n（(中國時報／.+)）\z};
+    my $text = $self->content_text;
+    my @patterns = (
+        qr{（記者／?(\p{Letter}+)）\z},
+        qr{\n（(中國時報／.+)）(?:\n|\z)},
+        qr{（(記者／.+?)）\z},
+        qr{（(特派員.+?)）\z},
+    );
+
+    my $name;
+    for my $pat (@patterns) {
+        ($name) = $text =~ $pat;
+        last if $name;
     }
-    return $txt;
+    return $name;
 }
 
 1;

@@ -28,34 +28,49 @@ my:project
 	:bug-database			<https://github.com/kasei/perl-jsonld/issues> ;
 	doap:download-page		<http://search.cpan.org/dist/JSONLD/> ;
 	doap:download-mirror	<http://kasei.us/code/files/> ;
-	:release				my:v_0-001 , my:v_0-002 , my:v_0-003 ;
+	:release				my:v_0-001 , my:v_0-002 , my:v_0-003 , my:v_0-004 ;
+	.
+
+my:v_0-004
+	a					:Version ;
+	dc:issued			"2020-05-17"^^xsd:date ;
+	:revision			"0.003" ;
+	dcterms:replaces	my:v_0-003 ;
+	dcs:changeset [
+		dcs:item
+			[ a dcs:Update ; rdfs:label "Improve handling of invalid JSONLD input." ] ,
+			[ a dcs:Update ; rdfs:label "Track changes in the JSONLD spec." ] ,
+			[ a dcs:Update ; rdfs:label "Use new IRI->rel method." ] ,
+			[ a dcs:Update ; rdfs:label "Allow specifying a context file on the command line for jsonld-expand." ]
+	]
 	.
 
 my:v_0-003
 	a					:Version ;
-	dc:issued			"2019-03-08"^^xsd:date ;
+	dc:issued			"2020-03-08"^^xsd:date ;
 	:revision			"0.003" ;
 	dcterms:replaces	my:v_0-002 ;
 	dcs:changeset [
 		dcs:item
-			[ a dcs:Update ; rdfs:label "Version number bump to fix PAUSE issues." ]
+			[ a dcs:Update ; rdfs:label "Version number bump to fix PAUSE issues." ] ,
+			[ a dcs:Update ; rdfs:label "Remove use of Debug::ShowStuff for releases." ]
 	]
 	.
 
 my:v_0-002
 	a					:Version ;
-	dc:issued			"2019-03-02"^^xsd:date ;
+	dc:issued			"2020-01-26"^^xsd:date ;
 	:revision			"0.002" ;
 	dcterms:replaces	my:v_0-001 ;
 	dcs:changeset [
 		dcs:item
-			[ a dcs:Update ; rdfs:label "Remove use of Debug::ShowStuff for releases." ]
+			[ a dcs:Update ; rdfs:label "Updated documentation." ]
 	]
 	.
 
 my:v_0-001
 	a					:Version ;
-	dc:issued			"2019-01-25"^^xsd:date ;
+	dc:issued			"2020-01-25"^^xsd:date ;
 	:revision			"0.001" ;
 	dcs:changeset [
 		dcs:item

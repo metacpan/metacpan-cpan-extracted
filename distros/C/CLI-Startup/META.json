@@ -39,6 +39,7 @@
             "YAML::Any" : "0"
          },
          "requires" : {
+            "Carp" : "0",
             "Class::Std" : "0.01",
             "Clone" : "0",
             "Config::Any" : "0",
@@ -62,7 +63,7 @@
    "provides" : {
       "CLI::Startup" : {
          "file" : "lib/CLI/Startup.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       }
    },
    "release_status" : "stable",
@@ -71,6 +72,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.24",
+   "version" : "0.25",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

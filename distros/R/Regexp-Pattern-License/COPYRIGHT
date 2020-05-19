@@ -29,12 +29,12 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: dist.ini
-Copyright: Copyright 2017 Jonas Smedegaard.
-License: GPL-3.0
-
 Files: t/01-basic.t
 Copyright: Copyright 2019 Jonas Smedegaard.
+License: GPL-3.0
+
+Files: dist.ini
+Copyright: Copyright 2017 Jonas Smedegaard.
 License: GPL-3.0
 
 Files: Makefile.PL

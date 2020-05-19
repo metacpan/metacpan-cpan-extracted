@@ -1,5 +1,5 @@
 package Beam::Make::Recipe;
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 # ABSTRACT: The base class for Beam::Make recipes
 
 #pod =head1 SYNOPSIS
@@ -76,6 +76,22 @@ has requires => ( is => 'ro', default => sub { [] } );
 
 has cache => ( is => 'ro', required => 1 );
 
+#pod =method fill_env
+#pod
+#pod Fill in any environment variables in the given array of strings. Environment variables
+#pod are interpreted as a POSIX shell: C<< $name >> or C<< ${name} >>.
+#pod
+#pod =cut
+
+sub fill_env( $self, @ary ) {
+    return map {
+        defined $_ ?
+            s{\$\{([^\}]+\})}{ $ENV{ $1 } // ( "\$$1" ) }egr
+            =~ s{\$([a-zA-Z_][a-zA-Z0-9_]+)}{ $ENV{ $1 } // ( "\$$1" ) }egr
+        : $_
+     } @ary;
+}
+
 1;
 
 __END__
@@ -88,7 +104,7 @@ Beam::Make::Recipe - The base class for Beam::Make recipes
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -129,6 +145,13 @@ An array of recipe names that this recipe depends on.
 
 A L<Beam::Make::Cache> object. This is used to store content hashes and
 modified dates for later use.
+
+=head1 METHODS
+
+=head2 fill_env
+
+Fill in any environment variables in the given array of strings. Environment variables
+are interpreted as a POSIX shell: C<< $name >> or C<< ${name} >>.
 
 =head1 REQUIRED METHODS
 

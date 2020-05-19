@@ -24,7 +24,7 @@ use HTML::Selector::XPath 'selector_to_xpath';
 use HTTP::Cookies::ChromeDevTools;
 use POSIX ':sys_wait_h';
 
-our $VERSION = '0.54';
+our $VERSION = '0.55';
 our @CARP_NOT;
 
 =encoding utf-8
@@ -2311,7 +2311,9 @@ sub httpMessageFromEvents( $self, $frameId, $events, $url ) {
 
     } map {
         # Extract the loaderId and requestId, if we haven't found it yet
-        if( $_->{method} eq 'Network.requestWillBeSent' and $_->{params}->{frameId} eq $frameId ) {
+        my $fi = $frameId || '';
+        my $rfi = $_->{params}->{frameId} || '';
+        if( $_->{method} eq 'Network.requestWillBeSent' and  $rfi eq $fi ) {
             $requestId ||= $_->{params}->{requestId};
             $loaderId ||= $_->{params}->{loaderId};
             $requestId ||= $_->{params}->{requestId};
@@ -3262,6 +3264,33 @@ sub quote_xpath($) {
     $_
 };
 
+# Copied from WWW::Mechanize 1.97
+# Used by find_links to check for matches
+# The logic is such that ALL param criteria that are given must match
+sub _match_any_link_params( $self, $link, $p ) {
+    # No conditions, anything matches
+    return 1 unless keys %$p;
+
+    return if defined $p->{url}           && !($link->url eq $p->{url} );
+    return if defined $p->{url_regex}     && !($link->url =~ $p->{url_regex} );
+    return if defined $p->{url_abs}       && !($link->url_abs eq $p->{url_abs} );
+    return if defined $p->{url_abs_regex} && !($link->url_abs =~ $p->{url_abs_regex} );
+    return if defined $p->{text}          && !(defined($link->text) && $link->text eq $p->{text} );
+    return if defined $p->{text_regex}    && !(defined($link->text) && $link->text =~ $p->{text_regex} );
+    return if defined $p->{name}          && !(defined($link->name) && $link->name eq $p->{name} );
+    return if defined $p->{name_regex}    && !(defined($link->name) && $link->name =~ $p->{name_regex} );
+    return if defined $p->{tag}           && !($link->tag && $link->tag eq $p->{tag} );
+    return if defined $p->{tag_regex}     && !($link->tag && $link->tag =~ $p->{tag_regex} );
+
+    return if defined $p->{id}            && !($link->attrs->{id} && $link->attrs->{id} eq $p->{id} );
+    return if defined $p->{id_regex}      && !($link->attrs->{id} && $link->attrs->{id} =~ $p->{id_regex} );
+    return if defined $p->{class}         && !($link->attrs->{class} && $link->attrs->{class} eq $p->{class} );
+    return if defined $p->{class_regex}   && !($link->attrs->{class} && $link->attrs->{class} =~ $p->{class_regex} );
+
+    # Success: everything that was defined passed.
+    return 1;
+}
+
 sub find_link_dom {
     my ($self,%opts) = @_;
     my %xpath_options;
@@ -3336,12 +3365,12 @@ sub find_link_dom {
     my @res = $self->xpath($q, %xpath_options );
 
     if (keys %opts) {
-        # post-filter the remaining links through WWW::Mechanize
+        # post-filter the remaining links
         # for all the options we don't support with XPath
         my $base = $self->base;
-        require WWW::Mechanize;
+
         @res = grep {
-            WWW::Mechanize::_match_any_link_parms($self->make_link($_,$base),\%opts)
+            $self->_match_any_link_params($self->make_link($_,$base),\%opts);
         } @res;
     };
 
@@ -5283,7 +5312,9 @@ sub getResourceContent_future( $self, $url_or_resource, $frameId=$self->frameId,
     ->then( sub( $result ) {
         if( delete $result->{base64Encoded}) {
             $result->{content} = decode_base64( $result->{content} )
-        }
+        } else {
+            $result->{_utf8} = 1;
+        };
         %$result = (%additional, %$result);
         Future->done( $result )
     })
@@ -5297,6 +5328,8 @@ our %extensions = (
     'text/html'  => '.html',
     'text/plain'  => '.txt',
     'text/stylesheet'  => '.css',
+    'text/javascript'         => '.js',
+    'application/javascript'  => '.js',
 );
 
 sub _saveResourceTree( $self, $tree, $names, $seen, $wanted, $save, $base_dir ) {
@@ -5304,7 +5337,6 @@ sub _saveResourceTree( $self, $tree, $names, $seen, $wanted, $save, $base_dir ) 
         # Also fetch the frame itself?!
         # Or better reuse ->content?!
         # $tree->{frame}
-
         # build the map from URLs to file names
         # This should become a separate method
         # Also something like get_page_resources, that returns the linear
@@ -5315,7 +5347,11 @@ sub _saveResourceTree( $self, $tree, $names, $seen, $wanted, $save, $base_dir ) 
                 #warn "Skipping $res->{url} (already saved)";
                 next;
             };
-            next if $wanted->($res);
+            if( !$wanted->($res) ) {
+                #warn "Don't want $res->{url}";
+                next;
+            };
+            #warn "Do want $res->{url}";
 
             my $target;
             if( exists $names->{ $res->{url}}) {
@@ -5385,7 +5421,7 @@ sub fetchResources_future( $self, %options ) {
     ->then( sub( $tree ) {
         $s->_saveResourceTree($tree, $names, $seen, $wanted, $save, $base_dir);
     })->catch(sub {
-        warn $@;
+        warn @_;
     });
 }
 
@@ -5418,7 +5454,12 @@ sub saveResources_future( $self, %options ) {
     );
     my $s = $self;
     weaken $s;
-    $self->fetchResources_future( save => sub( $resource ) {
+    $self->fetchResources_future(
+              names => \%names,
+              seen => \my %seen,
+              target_dir => $target_dir,
+        maybe wanted => $options{ wanted },
+              save => sub( $resource ) {
         # For mime/html targets without a name, use the title?!
         # Rewrite all HTML, CSS links
 
@@ -5429,12 +5470,18 @@ sub saveResources_future( $self, %options ) {
         $s->log( 'debug', "Saving '$resource->{url}' to '$target'" );
         open my $fh, '>', $target
             or croak "Couldn't save url '$resource->{url}' to $target: $!";
-        binmode $fh;
+        if( $resource->{_utf8}) {
+            binmode $fh, ':encoding(UTF-8)';
+        } else {
+            binmode $fh;
+        };
+
         print $fh $resource->{content};
         CORE::close( $fh );
 
         Future->done( $resource );
-    }, names => \%names, seen => \my %seen, target_dir => $target_dir )->then( sub( @resources ) {
+    },
+     )->then( sub( @resources ) {
         Future->done( \%names );
     })->catch(sub {
         warn $@;
@@ -5442,7 +5489,8 @@ sub saveResources_future( $self, %options ) {
 }
 
 sub filenameFromUrl( $self, $url, $extension ) {
-    my $target = $url;
+    my $target = URI->new( $url )->path;
+
     $target =~ s![\&\?\<\>\{\}\|\:\*]!_!g;
     $target =~ s!.*[/\\]!!;
 

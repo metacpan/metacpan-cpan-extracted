@@ -163,50 +163,54 @@ ok $tx->kept_alive,  'connection was kept alive';
 is $tx->res->code, 200,            'right status';
 is $tx->res->body, 'Hello Elzar!', 'right content';
 
-# Update script (broken)
-$script->spurt(<<'EOF');
+SKIP: {
+  skip "skipping developer only tests" unless $ENV{TEST_ELZAR_HOT_DEPLOY};
+
+  # Update script (broken)
+  $script->spurt(<<'EOF');
 use Mojolicious::Lite;
 
 die if $ENV{ELZAR_PORT};
 
 app->start;
 EOF
-push @spawned, _spawn($script) || BAIL_OUT("couldn't spawn script");
 
-# Wait for hot deployment to fail
-$i = 0;
-while (1) {
-  diag "wait for upgrade to fail, " . ++$i;
-  my $ltxt = eval { $log->slurp };
-  last if $ltxt and $ltxt =~ qr/Zero downtime software upgrade failed/;
-  sleep 1;
-}
+  push @spawned, _spawn($script) || BAIL_OUT("couldn't spawn script");
 
-sleep 2;
+  # Wait for hot deployment to fail
+  $i = 0;
+  while (1) {
+    diag "wait for upgrade to fail, " . ++$i;
+    my $ltxt = eval { $log->slurp };
+    last if $ltxt and $ltxt =~ qr/Zero downtime software upgrade failed/;
+    sleep 1;
+  }
 
-# Connection did not get lost
-$tx = $ua->get("http://127.0.0.1:$port1/hello");
-ok $tx->is_finished, 'transaction is finished';
-ok $tx->keep_alive,  'connection will be kept alive';
-ok $tx->kept_alive,  'connection was kept alive';
-is $tx->res->code, 200,            'right status';
-is $tx->res->body, 'Hello Elzar!', 'right content';
+  sleep 2;
 
-# Connection did not get lost (second port)
-$tx = $ua->get("http://127.0.0.1:$port2/hello");
-ok $tx->is_finished, 'transaction is finished';
-ok $tx->keep_alive,  'connection will be kept alive';
-ok $tx->kept_alive,  'connection was kept alive';
-is $tx->res->code, 200,            'right status';
-is $tx->res->body, 'Hello Elzar!', 'right content';
+  # Connection did not get lost
+  $tx = $ua->get("http://127.0.0.1:$port1/hello");
+  ok $tx->is_finished, 'transaction is finished';
+  ok $tx->keep_alive,  'connection will be kept alive';
+  ok $tx->kept_alive,  'connection was kept alive';
+  is $tx->res->code, 200,            'right status';
+  is $tx->res->body, 'Hello Elzar!', 'right content';
 
-# Request that will be served after graceful shutdown has been initiated
-$tx = $ua->build_tx(GET => "http://127.0.0.1:$port1/graceful");
-$ua->start($tx => sub { });
-Mojo::IOLoop->one_tick until $tx->req->is_finished;
+  # Connection did not get lost (second port)
+  $tx = $ua->get("http://127.0.0.1:$port2/hello");
+  ok $tx->is_finished, 'transaction is finished';
+  ok $tx->keep_alive,  'connection will be kept alive';
+  ok $tx->kept_alive,  'connection was kept alive';
+  is $tx->res->code, 200,            'right status';
+  is $tx->res->body, 'Hello Elzar!', 'right content';
 
-# Update script
-$body = <<EOF;
+  # Request that will be served after graceful shutdown has been initiated
+  $tx = $ua->build_tx(GET => "http://127.0.0.1:$port1/graceful");
+  $ua->start($tx => sub { });
+  Mojo::IOLoop->one_tick until $tx->req->is_finished;
+
+  # Update script
+  $body = <<EOF;
 plugin Config => {
   default => {
     hypnotoad => {
@@ -226,92 +230,93 @@ get '/hello' => sub { shift->render(text => "Hello World \$\$:" . threads->tid()
 app->start;
 EOF
 
-$script->spurt($head . $body);
+  $script->spurt($head . $body);
 
-push @spawned, _spawn($script) || BAIL_OUT("couldn't spawn script");
+  push @spawned, _spawn($script) || BAIL_OUT("couldn't spawn script");
 
-$i = 0;
-while (1) {
-  diag "wait for hot deploy to finish, " . ++$i;
+  $i = 0;
+  while (1) {
+    diag "wait for hot deploy to finish, " . ++$i;
+    sleep 1;
+    my ($new_pid, $new_port) = _pid();
+    last if $new_pid and $new_pid ne $old_pid;
+  }
+
+  sleep 2;
+
+  # Request that will be served by an old worker that is still running
+  Mojo::IOLoop->one_tick until $tx->is_finished;
+  ok !$tx->keep_alive, 'connection will not be kept alive';
+  ok !$tx->kept_alive, 'connection was not kept alive';
+  is $tx->res->code, 200,                  'right status';
+  is $tx->res->body, 'Graceful shutdown!', 'right content';
+
   sleep 1;
-  my ($new_pid, $new_port) = _pid();
-  last if $new_pid and $new_pid ne $old_pid;
-}
 
-sleep 2;
+  # One uncertain request that may or may not be served by the old worker
+  $tx = $ua->get("http://127.0.0.1:$port1/hello");
+  is $tx->res->code, 200, 'right status';
+  $tx = $ua->get("http://127.0.0.1:$port2/hello");
+  is $tx->res->code, 200, 'right status';
 
-# Request that will be served by an old worker that is still running
-Mojo::IOLoop->one_tick until $tx->is_finished;
-ok !$tx->keep_alive, 'connection will not be kept alive';
-ok !$tx->kept_alive, 'connection was not kept alive';
-is $tx->res->code, 200,                  'right status';
-is $tx->res->body, 'Graceful shutdown!', 'right content';
-
-sleep 1;
-
-# One uncertain request that may or may not be served by the old worker
-$tx = $ua->get("http://127.0.0.1:$port1/hello");
-is $tx->res->code, 200, 'right status';
-$tx = $ua->get("http://127.0.0.1:$port2/hello");
-is $tx->res->code, 200, 'right status';
-
-sleep 1;
-
-# Application has been reloaded
-$tx = $ua->get("http://127.0.0.1:$port1/hello");
-ok $tx->is_finished, 'transaction is finished';
-ok !$tx->keep_alive, 'connection will not be kept alive';
-ok !$tx->kept_alive, 'connection was not kept alive';
-is $tx->res->code, 200, 'right status';
-my $first = $tx->res->body;
-like $first, qr/Hello World \d+:\d+!/, 'right content';
-
-# Application has been reloaded (second port)
-$tx = $ua->get("http://127.0.0.1:$port2/hello");
-ok $tx->is_finished, 'transaction is finished';
-ok !$tx->keep_alive, 'connection will not be kept alive';
-ok !$tx->kept_alive, 'connection was not kept alive';
-is $tx->res->code, 200, 'right status';
-is $tx->res->body, $first, 'same content';
-
-sleep 2;
-
-# Same result
-$tx = $ua->get("http://127.0.0.1:$port1/hello");
-ok $tx->is_finished, 'transaction is finished';
-ok !$tx->keep_alive, 'connection will not be kept alive';
-ok !$tx->kept_alive, 'connection was not kept alive';
-is $tx->res->code, 200, 'right status';
-my $second = $tx->res->body;
-isnt $first, $second, 'different content';
-like $second, qr/Hello World \d+:\d+!/, 'right content';
-
-# Same result (second port)
-$tx = $ua->get("http://127.0.0.1:$port2/hello");
-ok $tx->is_finished, 'transaction is finished';
-ok !$tx->keep_alive, 'connection will not be kept alive';
-ok !$tx->kept_alive, 'connection was not kept alive';
-is $tx->res->code, 200, 'right status';
-is $tx->res->body, $second, 'same content';
-
-# Stop
-push @spawned, _spawn($script, '-s') || BAIL_OUT("couldn't spawn script");
-
-$i = 0;
-while (_port($port2)) {
-  diag "wait for server shutdown, " . ++$i;
   sleep 1;
+
+  # Application has been reloaded
+  $tx = $ua->get("http://127.0.0.1:$port1/hello");
+  ok $tx->is_finished, 'transaction is finished';
+  ok !$tx->keep_alive, 'connection will not be kept alive';
+  ok !$tx->kept_alive, 'connection was not kept alive';
+  is $tx->res->code, 200, 'right status';
+  my $first = $tx->res->body;
+  like $first, qr/Hello World \d+:\d+!/, 'right content';
+
+  # Application has been reloaded (second port)
+  $tx = $ua->get("http://127.0.0.1:$port2/hello");
+  ok $tx->is_finished, 'transaction is finished';
+  ok !$tx->keep_alive, 'connection will not be kept alive';
+  ok !$tx->kept_alive, 'connection was not kept alive';
+  is $tx->res->code, 200, 'right status';
+  is $tx->res->body, $first, 'same content';
+
+  sleep 2;
+
+  # Same result
+  $tx = $ua->get("http://127.0.0.1:$port1/hello");
+  ok $tx->is_finished, 'transaction is finished';
+  ok !$tx->keep_alive, 'connection will not be kept alive';
+  ok !$tx->kept_alive, 'connection was not kept alive';
+  is $tx->res->code, 200, 'right status';
+  my $second = $tx->res->body;
+  isnt $first, $second, 'different content';
+  like $second, qr/Hello World \d+:\d+!/, 'right content';
+
+  # Same result (second port)
+  $tx = $ua->get("http://127.0.0.1:$port2/hello");
+  ok $tx->is_finished, 'transaction is finished';
+  ok !$tx->keep_alive, 'connection will not be kept alive';
+  ok !$tx->kept_alive, 'connection was not kept alive';
+  is $tx->res->code, 200, 'right status';
+  is $tx->res->body, $second, 'same content';
+
+  # Stop
+  push @spawned, _spawn($script, '-s') || BAIL_OUT("couldn't spawn script");
+
+  $i = 0;
+  while (_port($port2)) {
+    diag "wait for server shutdown, " . ++$i;
+    sleep 1;
+  }
+
+  sleep 2;
+
+  # Check log
+  $log = $log->slurp;
+  like $log, qr/Worker \d+ started/, 'right message';
+  like $log, qr/Starting zero downtime software upgrade \(10 seconds\)/,
+    'right message';
+  like $log, qr/Upgrade successful, stopping server with port $old_port/,
+    'right message';
 }
-
-sleep 2;
-
-# Check log
-$log = $log->slurp;
-like $log, qr/Worker \d+ started/, 'right message';
-like $log, qr/Starting zero downtime software upgrade \(10 seconds\)/,
-  'right message';
-like $log, qr/Upgrade successful, stopping server with port $old_port/,
-  'right message';
 
 # cleanup
 _kill(@spawned);

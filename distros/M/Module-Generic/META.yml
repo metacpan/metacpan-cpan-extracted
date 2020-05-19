@@ -6,6 +6,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   Test::Pod: '0'
   Test::Simple: '0'
+  utf8: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -22,13 +23,17 @@ no_index:
 requires:
   B: '0'
   Class::Load: '0.25'
+  Clone: '0.43'
   Data::Dumper: '0'
   Data::Printer: '0'
+  Devel::Declare: '<= 0.006019'
   Devel::StackTrace: '0'
   Exporter: '5.73'
+  JSON: '4.02'
   Number::Format: '1.75'
+  POSIX: '1.88'
+  Regexp::Common: '2017060201'
   Scalar::Util: '1.50'
-  Text::Number: '0'
   Tie::Hash: '1.05'
   TryCatch: '1.003002'
   Want: '0.29'
@@ -39,5 +44,5 @@ requires:
   perl: '5.006000'
   strict: '0'
   warnings: '0'
-version: v0.12.1
+version: v0.12.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

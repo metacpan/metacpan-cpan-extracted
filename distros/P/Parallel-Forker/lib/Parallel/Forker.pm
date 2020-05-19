@@ -11,7 +11,7 @@ use Parallel::Forker::Process;
 use strict;
 use vars qw($Debug $VERSION);
 
-$VERSION = '1.254';
+$VERSION = '1.258';
 
 ######################################################################
 #### CONSTRUCTOR
@@ -507,6 +507,12 @@ The subroutine is called with two arguments, a reference to the
 Parallel::Forker::Process that is finishing, and the exit status of the
 child process.  Note the exit status will only be correct if a CHLD signal
 handler is installed.
+
+=item run_pre_start
+
+Subroutine reference to execute before forking the child, in the master
+process.  The subroutine is called with one argument, a reference to the
+Parallel::Forker::Process that is starting.
 
 =item run_after
 

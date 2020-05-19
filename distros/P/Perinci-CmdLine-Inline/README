@@ -2,8 +2,8 @@ NAME
     Perinci::CmdLine::Inline - Generate inline Perinci::CmdLine CLI script
 
 VERSION
-    This document describes version 0.550 of Perinci::CmdLine::Inline (from
-    Perl distribution Perinci-CmdLine-Inline), released on 2020-05-02.
+    This document describes version 0.551 of Perinci::CmdLine::Inline (from
+    Perl distribution Perinci-CmdLine-Inline), released on 2020-05-18.
 
 SYNOPSIS
      % gen-inline-pericmd-script /Perinci/Examples/gen_array -o gen-array
@@ -49,6 +49,13 @@ COMPILATION DATA KEYS
 
         Generated script's subroutine source codes. Keys are subroutines'
         names and values are subroutines' source codes.
+
+ENVIRONMENT (GENERATED SCRIPTS)
+    These are environment variables observed by the generated scripts.
+
+  PERINCI_CMDLINE_INLINE_DEBUG_DIE
+    Bool. If set to true, then will rethrow exception instead of converting
+    it into enveloped result. This makes debugging easier.
 
 FUNCTIONS
   gen_inline_pericmd_script

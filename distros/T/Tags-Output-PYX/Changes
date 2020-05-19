@@ -1,3 +1,10 @@
+0.05 2020-05-16T20:10:35+02:00
+ - Add new open_elements() method to doc.
+ - Add test messages to tests.
+ - Fix testing with both version of Tags::Output (<0.09 and >=0.09)
+   RT#132534.
+ - Rewrite doc to use =head2 for methods.
+
 0.04 2020-05-11T15:37:49+02:00
  - Add REPOSITORY section to doc.
  - Fix Makefile.PL fails with no '.' in @INC.

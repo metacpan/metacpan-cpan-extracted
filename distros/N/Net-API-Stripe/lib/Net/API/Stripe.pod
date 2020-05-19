@@ -82,7 +82,7 @@ Other methods are describe below and the parameters they take are documented in 
 
 =head1 VERSION
 
-    v1.0
+    v1.0.3
 
 =head1 DESCRIPTION
 
@@ -155,7 +155,7 @@ Provided with optional hash parameters, this returns a L<Net::API::Stripe::Addre
 
 =head2 amount
 
-Provided with a number, this returns a L<Net::API::Stripe::Number> object, which extends L<Number::Format>
+Provided with a number, this returns a L<Module::Generic::Number> object, which extends L<Number::Format>
 
 =head2 api_uri
 
@@ -578,7 +578,7 @@ Everywhere Stripe returns a date or datetime, L<Net::API::Stripe> will return a 
 
 =head2 NUMBERS
 
-When a number is returned by Stripe, L<Net::API::Stripe> will return a L<Net::API::Stripe::Number>, so one could call the method representing a number like this:
+When a number is returned by Stripe, L<Net::API::Stripe> will return a L<Module::Generic::Number>, so one could call the method representing a number like this:
 
     printf( "Charge was %s\n", $charge->amount->format_money( 2, '€' ) );
     # Assuming the charge amount is 100, this would produce: €100.00
@@ -2386,6 +2386,182 @@ Possible parameters are:
 
 For more information, see Stripe documentation here: L<https://stripe.com/docs/api/plans/delete>
 
+=head2 PRICES
+
+You can B<create>, B<retrieve>, B<update>, B<list> products
+
+=head3 create
+
+Provided with a L<Net::API::Stripe::Price> object or an hash reference of parameters and this will create a Stripe product and return its L<Net::API::Stripe::Price> object
+
+Possible parameters are:
+
+=over 4
+
+=item I<active> boolean
+
+Whether the price is currently active. Defaults to true.
+
+=item I<billing_scheme> string
+
+=item I<currency> String
+
+Three-letter ISO currency code, in lowercase. Must be a supported currency.
+
+=item I<lookup_key> string
+
+=item I<metadata> Hash
+
+Set of key-value pairs that you can attach to an object. This can be useful for storing additional information about the object in a structured format. Individual keys can be unset by posting an empty value to them. All keys can be unset by posting an empty value to metadata.
+
+=item I<nickname> String
+
+A brief description of the price, hidden from customers.
+
+=item I<product_data>
+
+A hash or L<Net::API::Stripe::Product>
+
+=item I<unit_amount> A number
+
+A positive integer in JPY (or 0 for a free price) representing how much to charge.
+
+This is required only if I<billing-scheme> is set to C<perl-unit>
+
+=item I<recurring>
+
+The recurring components of a price such as interval and usage_type.
+
+Possible properties are :
+
+=over 8
+
+=item I<interval> string
+
+=item I<aggregate_usage> string
+
+=item I<interval_count> number
+
+=item I<trial_period_days> number
+
+=item I<usage_type> string
+
+=back
+
+=item I<tiers> hash
+
+See L<Net::API::Stripe::Price> for details
+
+=item I<tiers_mode> string
+
+=item I<transfer_lookup_key> string
+
+=item I<transform_quantity> number
+
+=item I<unit_amount_decimal> number
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/prices/create#create_price>
+
+=head2 retrieve
+
+Provided with a L<Net::API::Stripe::Price> object or an hash reference of parameters and this will retrieve a Stripe price and return its L<Net::API::Stripe::Price> object
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe price id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/prices/retrieve#retrieve_price>
+
+=head3 update
+
+Provided with a L<Net::API::Stripe::Price> object or an hash reference of parameters and this will update a Stripe price and return its updated L<Net::API::Stripe::Price> object
+
+As per the Stripe documentation, "After prices are created, you can only update their metadata, nickname, and active fields." (see L<Products and Prices|https://stripe.com/docs/billing/prices-guide|>)
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe price id
+
+=item I<active> boolean
+
+Whether the price is currently active. Defaults to true.
+
+=item I<lookup_key> string
+
+=item I<metadata> Hash
+
+Set of key-value pairs that you can attach to an object. This can be useful for storing additional information about the object in a structured format. Individual keys can be unset by posting an empty value to them. All keys can be unset by posting an empty value to metadata.
+
+=item I<nickname> String
+
+A brief description of the price, hidden from customers.
+
+=item I<recurring>
+
+The recurring components of a price such as interval and usage_type.
+
+Possible properties are :
+
+=over 8
+
+=item I<interval> string
+
+=item I<aggregate_usage> string
+
+=item I<interval_count> number
+
+=item I<trial_period_days> number
+
+=item I<usage_type> string
+
+=back
+
+=item I<transfer_lookup_key> string
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/prices/update>
+
+=head3 list
+
+Provided with an hash reference of parameters, this will retrieve a list of Stripe prices and return a L<Net::API::Stripe::List> object
+
+Possible parameters are:
+
+=over 4
+
+=item I<active> Boolean
+
+=item I<created> Date or unix timestamp
+
+=item I<currency> String
+
+=item I<ending_before> A Stripe credit note id
+
+=item I<limit> Integer
+
+=item I<lookup_key> String
+
+=item I<product> L<Net::API::String::Product> id or object
+
+=item I<recurring> Hash with C<inerval> and C<usage_type> properties
+
+=item I<starting_after> A Stripe credit note id
+
+=item I<type> String. One of C<recurring> or C<one_time>
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/prices/list>
+
 =head2 PRODUCTS
 
 You can B<create>, B<retrieve>, B<update>, B<list>, B<delete> products
@@ -3168,6 +3344,8 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 Stripe API documentation:
 
 L<https://stripe.com/docs/api>
+
+List of server-side libraries: L<https://stripe.com/docs/libraries#server-side-libraries>
 
 L<Net::Stripe>, another Stripe API, but which uses Moose
 

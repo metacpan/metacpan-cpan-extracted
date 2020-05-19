@@ -1,3 +1,10 @@
+0.002   2020-03-01  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Use Acme::CPANModulesUtil::Misc.
+
+
 0.001   2019-11-19  Released-By: PERLANCAR
 
         - First release.

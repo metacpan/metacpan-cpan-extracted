@@ -16,14 +16,15 @@ WriteMakefile(
     },
     BUILD_REQUIRES => {
         'Test::More' => '0',
-		'JSONP' => '1.74',
+        'JSONP' => '1.74',
     },
     PREREQ_PM => {
     	'Scalar::Util' => '0',
-		'Carp' => '0',
-		'Combine::Keys' => '0.09',	
-		'Import::Export' => '0.06',
-	},
+	'Carp' => '0',
+	'Combine::Keys' => '0.09',	
+	'Import::Export' => '0.06',
+        'Tie::IxHash' => '1.23',
+    },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Blessed-Merge-*' },
 );

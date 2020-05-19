@@ -1,5 +1,6 @@
 use warnings;
 use strict;
+use lib '.';
 use Test::More;
 use DBIx::Perlish;
 use t::test_utils;

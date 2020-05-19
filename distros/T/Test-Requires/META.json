@@ -4,7 +4,7 @@
       "Tokuhiro Matsuno <tokuhirom @*(#RJKLFHFSDLJF gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.4.2",
+   "generated_by" : "Minilla/v3.1.10",
    "license" : [
       "perl_5"
    ],
@@ -40,7 +40,7 @@
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -56,7 +56,7 @@
    "provides" : {
       "Test::Requires" : {
          "file" : "lib/Test/Requires.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -70,12 +70,14 @@
          "web" : "https://github.com/tokuhirom/Test-Requires"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_contributors" : [
-      "gfx <gfuji@cpan.org>",
-      "Toby Inkster <mail@tobyinkster.co.uk>",
       "Neil Bowers <neil@bowers.com>",
       "Tatsuhiko Miyagawa <miyagawa@bulknews.net>",
-      "Tokuhiro Matsuno <tokuhirom@gmail.com>"
-   ]
+      "Toby Inkster <mail@tobyinkster.co.uk>",
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>",
+      "gfx <gfuji@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_static_install" : 1
 }

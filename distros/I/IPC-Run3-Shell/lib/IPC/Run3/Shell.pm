@@ -7,7 +7,7 @@ use strict;
 # 
 # Documentation can be found in the file Shell.pod (or via the perldoc command).
 # 
-# Copyright (c) 2014 Hauke Daempfling (haukex@zero-g.net).
+# Copyright (c) 2014-2020 Hauke Daempfling (haukex@zero-g.net).
 # 
 # This library is free software; you can redistribute it and/or modify
 # it under the same terms as Perl 5 itself.
@@ -17,7 +17,7 @@ use strict;
 # Try the command "perldoc perlartistic" or see
 # http://perldoc.perl.org/perlartistic.html .
 
-our $VERSION = '0.56';
+our $VERSION = '0.58';
 
 use Carp;
 use warnings::register;
@@ -36,13 +36,20 @@ sub debug {  ## no critic (RequireArgUnpacking)
 
 my $dumper = Data::Dumper->new([])->Terse(1)->Purity(1)
 	->Useqq(1)->Quotekeys(0)->Sortkeys(1)->Indent(0)->Pair('=>');
-sub pp { return $dumper->Values(\@_)->Reset->Dump }  ## no critic (RequireArgUnpacking)
+sub _dcopy { # slightly kludgy hack because Dumper with Purity issues warnings about code references (e.g. stdout_filter option)
+	my $v = shift;
+	return [ map { _dcopy($_) } @$v ] if ref $v eq 'ARRAY';
+	return { map { $_ => _dcopy($$v{$_}) } keys %$v } if ref $v eq 'HASH';
+	return 'CODE' if ref $v eq 'CODE';
+	return $v;
+}
+sub pp { return $dumper->Values(_dcopy(\@_))->Reset->Dump }  ## no critic (RequireArgUnpacking)
 
 use IPC::Run3 ();
 
 my @RUN3_OPTS = qw/ binmode_stdin binmode_stdout binmode_stderr append_stdout append_stderr return_if_system_error /;
 my %KNOWN_OPTS = map { $_=>1 } @RUN3_OPTS,
-	qw/ show_cmd allow_exit irs chomp stdin stdout stderr fail_on_stderr both /;
+	qw/ show_cmd allow_exit irs chomp stdin stdout stderr fail_on_stderr both stdout_filter /;
 
 our $OBJECT_PACKAGE;
 {
@@ -150,6 +157,9 @@ sub make_cmd {  ## no critic (ProhibitExcessComplexity)
 			warnings::warnif(__PACKAGE__.": unknown option \"$_\"")
 				unless $KNOWN_OPTS{$_};
 		}
+		if (defined $opt{stdout_filter}) {
+			croak __PACKAGE__.": option stdout_filter must be a coderef"
+				unless ref $opt{stdout_filter} eq 'CODE'}
 		my $allow_exit = defined $opt{allow_exit} ? $opt{allow_exit} : [0];
 		if ($allow_exit ne 'ANY') {
 			$allow_exit = [$allow_exit] unless ref $allow_exit eq 'ARRAY';
@@ -232,14 +242,17 @@ sub make_cmd {  ## no critic (ProhibitExcessComplexity)
 			{ return $exitcode }
 		elsif ($opt{both}) {
 			chomp($out,$err) if $opt{chomp};
+			if ($opt{stdout_filter}) { for ($out) { $opt{stdout_filter}->() } }
 			return wantarray ? ($out, $err, $exitcode) : $out
 		}
 		elsif (wantarray) {
 			chomp(@$out) if $opt{chomp};
+			if ($opt{stdout_filter}) { for (@$out) { $opt{stdout_filter}->() } }
 			return @$out
 		}
 		else {
 			chomp($out) if $opt{chomp};
+			if ($opt{stdout_filter}) { for ($out) { $opt{stdout_filter}->() } }
 			return $out
 		}
 	}

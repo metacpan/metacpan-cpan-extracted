@@ -1,5 +1,9 @@
 Changelog for Dist-Zilla-PluginBundle-Author-IOANR
 
+1.201400 2020-05-19T03:08:22Z
+ - Migrate to Gitlab.com
+ - Support dists hosted on github.com or gitlab.com
+
 1.173520 2017-12-18T22:33:59Z
  - Add missing dep
 

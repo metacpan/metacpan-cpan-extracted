@@ -44,11 +44,11 @@ Asm::X86 - List of instructions and registers of x86-compatible processors, vali
 
 =head1 VERSION
 
-Version 0.30
+Version 0.31
 
 =cut
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 =head1 DESCRIPTION
 
@@ -376,7 +376,7 @@ our @instr_intel = (
 	'hint_nop59', 'hint_nop6', 'hint_nop60', 'hint_nop61', 'hint_nop62', 'hint_nop63', 'hint_nop7',
 	'hint_nop8', 'hint_nop9', 'hlt', 'hsubpd', 'hsubps', 'ibts', 'icebp', 'idiv', 'imul', 'in',
 	'inc', 'incsspd', 'incsspq', 'incbin', 'insb', 'insd', 'insertps', 'insertq', 'insw', 'int', 'int01', 'int03',
-	'int1', 'int3', 'into', 'invd', 'invept', 'invlpg', 'invlpga', 'invpcid', 'invvpid', 'iret', 'iretd',
+	'int1', 'int3', 'into', 'invd', 'invept', 'invlpg', 'invlpga', 'invlpgb', 'invpcid', 'invvpid', 'iret', 'iretd',
 	'iretq', 'iretw', 'ja', 'jae', 'jb', 'jbe', 'jc', 'jcxz', 'je', 'jecxz', 'jg', 'jge', 'jl',
 	'jle', 'jmp', 'jmpe', 'jna', 'jnae', 'jnb', 'jnbe', 'jnc', 'jne', 'jng', 'jnge', 'jnl',
 	'jnle', 'jno', 'jnp', 'jns', 'jnz', 'jo', 'jp', 'jpe', 'jpo', 'jrcxz', 'js', 'jz',
@@ -435,15 +435,15 @@ our @instr_intel = (
 	'prefetcht1', 'prefetcht2', 'prefetchw', 'prefetchwt1', 'protb', 'protd', 'protq', 'protw', 'psadbw',
 	'pshab', 'pshad', 'pshaq', 'pshaw', 'pshlb', 'pshld', 'pshlq', 'pshlw', 'pshufb', 'pshufd',
 	'pshufhw', 'pshuflw', 'pshufw', 'psignb', 'psignd', 'psignw', 'pslld', 'pslldq', 'psllq',
-	'psllw', 'psrad', 'psraw', 'psrld', 'psrldq', 'psrlq', 'psrlw', 'psubb', 'psubd', 'psubq',
+	'psllw', 'psmash', 'psrad', 'psraw', 'psrld', 'psrldq', 'psrlq', 'psrlw', 'psubb', 'psubd', 'psubq',
 	'psubsb', 'psubsiw', 'psubsw', 'psubusb', 'psubusw', 'psubw', 'pswapd', 'ptest', 'ptwrite', 'punpckhbw',
 	'punpckhdq', 'punpckhqdq', 'punpckhwd', 'punpcklbw', 'punpckldq', 'punpcklqdq', 'punpcklwd',
 	'push', 'pusha', 'pushad', 'pushaw', 'pushd', 'pushf', 'pushfd', 'pushfq', 'pushfw', 'pushq',
-	'pushw', 'pxor', 'rcl',	'rcpps', 'rcpss', 'rcr', 'rdfsbase', 'rdgsbase', 'rdm', 'rdmsr',
+	'pushw', 'pvalidate', 'pxor', 'rcl', 'rcpps', 'rcpss', 'rcr', 'rdfsbase', 'rdgsbase', 'rdm', 'rdmsr',
 	'rdmsrq', 'rdpid', 'rdpkru', 'rdpmc', 'rdpru', 'rdrand', 'rdseed', 'rdsspd', 'rdsspq', 'rdshr',
 	'rdtsc', 'rdtscp', 'rep', 'repe', 'repne', 'repnz',
 	'repz', 'ret', 'retd', 'retf', 'retfd', 'retfq', 'retfw', 'retn', 'retnd', 'retnq', 'retnw', 'retq', 'retw',
-	'rol', 'ror', 'rorx', 'roundpd', 'roundps', 'roundsd', 'roundss', 'rsdc', 'rsldt', 'rsm',
+	'rmpadjust', 'rmpupdate', 'rol', 'ror', 'rorx', 'roundpd', 'roundps', 'roundsd', 'roundss', 'rsdc', 'rsldt', 'rsm',
 	'rsqrtps', 'rsqrtss', 'rstorssp', 'rsts', 'sahf', 'sal', 'salc', 'sar',
 	'sarx', 'saveprevssp', 'sbb', 'scasb', 'scasd', 'scasq',
 	'scasw', 'seta', 'setae', 'setalc', 'setb', 'setbe', 'setc', 'sete', 'setg', 'setge', 'setl',
@@ -455,7 +455,7 @@ our @instr_intel = (
 	'skinit', 'sldt', 'slwpcb', 'smi', 'smint', 'smintold', 'smsw', 'sqrtpd', 'sqrtps', 'sqrtsd',
 	'sqrtss', 'stac', 'stc', 'std', 'stgi', 'sti', 'stmxcsr', 'stosb', 'stosd', 'stosq', 'stosw', 'str', 'sub',
 	'subpd', 'subps', 'subsd', 'subss', 'svdc', 'svldt', 'svts', 'swapgs', 'syscall', 'sysenter',
-	'sysexit', 'sysexitq', 'sysret', 'sysretq', 't1mskc', 'test', 'tpause', 'tzcnt', 'tzmsk',
+	'sysexit', 'sysexitq', 'sysret', 'sysretq', 't1mskc', 'test', 'tlbsync', 'tpause', 'tzcnt', 'tzmsk',
 	'ucomisd', 'ucomiss', 'ud0', 'ud1', 'ud2', 'ud2a', 'ud2b', 'umonitor', 'umov',
 	'umwait', 'unpckhpd', 'unpckhps', 'unpcklpd', 'unpcklps', 'useavx256', 'useavx512',
 	'v4dpwssd', 'v4dpwssds', 'v4fmaddps', 'v4fmaddss', 'v4fnmaddps', 'v4fnmaddss',

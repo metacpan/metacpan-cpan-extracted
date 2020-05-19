@@ -13,7 +13,7 @@ use Test::Requires { 're::engine::RE2' => 0 };
 my $re = re( 'License::beerware', engine => 'RE2', subject => 'name' );
 
 isa_ok( $re, 're::engine::RE2' );
-is( "$re", '(?-ims:$the?[Bb]eer$D?ware(?: License)?)' );
+like( "$re", qr/\Q|(?:[Tt]he )?\bBeerware\b|/ );
 
 regexp_patterns_in_module_ok(
 	'Regexp::Pattern::License',

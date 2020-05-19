@@ -1,3 +1,7 @@
+0.16 2020-05-18
+- more correct Apollo subscriptions protocol
+- implement websocket keepalive
+
 0.15 2020-05-06
 - now MUST supply a schema
 - implement subscriptions with websocket per apollo subscriptions-transport-ws

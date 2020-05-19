@@ -17,6 +17,7 @@ lib/Util/Medley/DateTime.pm
 lib/Util/Medley/Exec.pm
 lib/Util/Medley/File.pm
 lib/Util/Medley/File/Zip.pm
+lib/Util/Medley/Hostname.pm
 lib/Util/Medley/List.pm
 lib/Util/Medley/Logger.pm
 lib/Util/Medley/Module/Overview.pm
@@ -27,6 +28,7 @@ lib/Util/Medley/Roles/Attributes/Crypt.pm
 lib/Util/Medley/Roles/Attributes/DateTime.pm
 lib/Util/Medley/Roles/Attributes/File.pm
 lib/Util/Medley/Roles/Attributes/File/Zip.pm
+lib/Util/Medley/Roles/Attributes/Hostname.pm
 lib/Util/Medley/Roles/Attributes/List.pm
 lib/Util/Medley/Roles/Attributes/Logger.pm
 lib/Util/Medley/Roles/Attributes/Number.pm
@@ -41,6 +43,7 @@ share/cli-driver.yml
 t/10-cache.t
 t/10-crypt.t
 t/10-datetime.t
+t/10-hostname.t
 t/10-list.t
 t/10-module-overview.t
 t/10-package.t

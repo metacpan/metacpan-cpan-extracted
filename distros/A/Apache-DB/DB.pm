@@ -19,7 +19,7 @@ BEGIN {
 {
     no strict;
     @ISA = qw(DynaLoader);
-    $VERSION = '0.16';
+    $VERSION = '0.18';
     __PACKAGE__->bootstrap($VERSION);
 }
 

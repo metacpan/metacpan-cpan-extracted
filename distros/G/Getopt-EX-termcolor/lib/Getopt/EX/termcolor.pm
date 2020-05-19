@@ -6,7 +6,7 @@ Getopt::EX::termcolor - Getopt::EX termcolor module
 
 =head1 VERSION
 
-Version 1.05
+Version 1.06
 
 =head1 SYNOPSIS
 
@@ -127,7 +127,7 @@ use warnings;
 use Carp;
 use Data::Dumper;
 
-our $VERSION = "1.05";
+our $VERSION = "1.06";
 
 use Exporter 'import';
 our @EXPORT      = qw();
@@ -260,9 +260,10 @@ sub bg {
     my $luminance =
 	$ENV{TERM_LUMINANCE} // $param{default} // return;
     my $option = $luminance > $param{threshold} ?
-	$param{light} : $param{dark};
+	$param{light} : $param{dark}
+    or return;
 
-#   $mod->setopt($option => '$<move(0,0)>');
+#   $mod->setopt($option => '$<ignore>');
     $mod->setopt(default => $option);
 }
 

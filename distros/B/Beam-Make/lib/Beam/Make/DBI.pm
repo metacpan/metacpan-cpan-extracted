@@ -1,5 +1,5 @@
 package Beam::Make::DBI;
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 # ABSTRACT: A Beam::Make recipe for executing SQL queries
 
 #pod =head1 SYNOPSIS
@@ -94,7 +94,7 @@ Beam::Make::DBI - A Beam::Make recipe for executing SQL queries
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 

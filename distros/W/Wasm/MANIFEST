@@ -39,6 +39,7 @@ examples/synopsis/func4.pl
 examples/synopsis/functype.pl
 examples/synopsis/global.pl
 examples/synopsis/global2.pl
+examples/synopsis/global3.pl
 examples/synopsis/globaltype.pl
 examples/synopsis/importtype.pl
 examples/synopsis/instance.pl
@@ -85,6 +86,7 @@ lib/Wasm.pm
 lib/Wasm/Func.pm
 lib/Wasm/Global.pm
 lib/Wasm/Memory.pm
+lib/Wasm/Table.pm
 lib/Wasm/Wasmtime.pm
 lib/Wasm/Wasmtime/Config.pm
 lib/Wasm/Wasmtime/Engine.pm

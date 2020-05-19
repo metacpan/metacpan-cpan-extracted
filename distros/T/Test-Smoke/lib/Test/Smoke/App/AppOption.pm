@@ -55,7 +55,7 @@ croak()s when:
 
 =item B<name not set>
 
-=item B<allow is not undef or an ArrayRef>
+=item B<allow is not undef or ref($allow) is Regexp, CODE or ARRAY>
 
 =back
 

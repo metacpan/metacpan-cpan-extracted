@@ -1,10 +1,10 @@
 {
-   "abstract" : "Perl Agent for NewRelic APM",
+   "abstract" : "(Deprecated) Perl Agent for NewRelic APM",
    "author" : [
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -67,13 +67,15 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Ville Skytt\u00e4 (SCOP)"
    ],
-   "x_generated_by_perl" : "v5.31.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
+   "x_deprecated" : 1,
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }
 

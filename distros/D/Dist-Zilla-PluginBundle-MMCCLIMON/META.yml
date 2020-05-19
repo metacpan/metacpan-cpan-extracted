@@ -1,0 +1,442 @@
+---
+abstract: 'BeLike::MMCCLIMON when you build your dists'
+author:
+  - 'Michael McClimon <michael@mcclimon.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-PluginBundle-MMCCLIMON
+requires:
+  Dist::Zilla: '5.014'
+  Dist::Zilla::Plugin::AutoPrereqs: '1.100130'
+  Dist::Zilla::Plugin::CheckExtraTests: '0'
+  Dist::Zilla::Plugin::CheckPrereqsIndexed: '0'
+  Dist::Zilla::Plugin::Git::Contributors: '0'
+  Dist::Zilla::Plugin::GithubMeta: '0.12'
+  Dist::Zilla::Plugin::PodWeaver: '4'
+  Dist::Zilla::Plugin::PromptIfStale: '0'
+  Dist::Zilla::Plugin::TaskWeaver: '0.093330'
+  Dist::Zilla::Plugin::Test::ChangesHasContent: '0'
+  Dist::Zilla::Plugin::Test::ReportPrereqs: '0'
+  Dist::Zilla::PluginBundle::Basic: '0'
+  Dist::Zilla::PluginBundle::Filter: '0'
+  Dist::Zilla::PluginBundle::Git: '0'
+  Dist::Zilla::Role::PluginBundle::Config::Slicer: '0'
+  Dist::Zilla::Role::PluginBundle::Easy: '0'
+  Dist::Zilla::Role::PluginBundle::PluginRemover: '0.103'
+  Moose: '0'
+  Pod::Elemental: '0.092970'
+  Pod::Elemental::PerlMunger: '0.200000'
+  Pod::Elemental::Transformer::List: '0'
+  Pod::Weaver: '4'
+  Pod::Weaver::Config::Assembler: '0'
+  Pod::Weaver::Section::Contributors: '0.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/mmcclimon/Dist-Zilla-PluginBundle-MMCCLIMON/issues
+  homepage: https://github.com/mmcclimon/Dist-Zilla-PluginBundle-MMCCLIMON
+  repository: https://github.com/mmcclimon/Dist-Zilla-PluginBundle-MMCCLIMON.git
+version: '5.013'
+x_Dist_Zilla:
+  perl:
+    version: '5.028002'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::Git::GatherDir
+      config:
+        Dist::Zilla::Plugin::GatherDir:
+          exclude_filename:
+            - LICENSE
+            - Makefile.PL
+            - cpanfile
+          exclude_match: []
+          follow_symlinks: 0
+          include_dotfiles: 0
+          prefix: ''
+          prune_directory: []
+          root: .
+        Dist::Zilla::Plugin::Git::GatherDir:
+          include_untracked: 0
+      name: '@MMCCLIMON/Git::GatherDir'
+      version: '2.046'
+    -
+      class: Dist::Zilla::Plugin::CheckPrereqsIndexed
+      name: '@MMCCLIMON/CheckPrereqsIndexed'
+      version: '0.020'
+    -
+      class: Dist::Zilla::Plugin::CheckExtraTests
+      name: '@MMCCLIMON/CheckExtraTests'
+      version: '0.029'
+    -
+      class: Dist::Zilla::Plugin::PromptIfStale
+      config:
+        Dist::Zilla::Plugin::PromptIfStale:
+          check_all_plugins: 0
+          check_all_prereqs: 0
+          modules:
+            - Dist::Zilla::PluginBundle::MMCCLIMON
+          phase: build
+          run_under_travis: 0
+          skip: []
+      name: '@MMCCLIMON/MMCCLIMON-Outdated'
+      version: '0.057'
+    -
+      class: Dist::Zilla::Plugin::PromptIfStale
+      config:
+        Dist::Zilla::Plugin::PromptIfStale:
+          check_all_plugins: 1
+          check_all_prereqs: 0
+          modules: []
+          phase: release
+          run_under_travis: 0
+          skip: []
+      name: '@MMCCLIMON/CPAN-Outdated'
+      version: '0.057'
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@MMCCLIMON/@Filter/PruneCruft'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@MMCCLIMON/@Filter/ManifestSkip'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@MMCCLIMON/@Filter/MetaYAML'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@MMCCLIMON/@Filter/License'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@MMCCLIMON/@Filter/Readme'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@MMCCLIMON/@Filter/ExecDir'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@MMCCLIMON/@Filter/ShareDir'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@MMCCLIMON/@Filter/Manifest'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@MMCCLIMON/@Filter/TestRelease'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@MMCCLIMON/@Filter/ConfirmRelease'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@MMCCLIMON/@Filter/UploadToCPAN'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 9
+      name: '@MMCCLIMON/MakeMaker'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@MMCCLIMON/AutoPrereqs'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::CPANFile
+      name: '@MMCCLIMON/CPANFile'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::CopyFilesFromBuild
+      name: '@MMCCLIMON/CopyFilesFromBuild'
+      version: '0.170880'
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      config:
+        Dist::Zilla::Plugin::Git::NextVersion:
+          first_version: '0.001'
+          version_by_branch: 1
+          version_regexp: (?^:^([0-9]+\.[0-9]+)$)
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.25.0
+          repo_root: .
+      name: '@MMCCLIMON/Git::NextVersion'
+      version: '2.046'
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@MMCCLIMON/PkgVersion'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@MMCCLIMON/MetaConfig'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@MMCCLIMON/MetaJSON'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@MMCCLIMON/NextRelease'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::Test::ChangesHasContent
+      name: '@MMCCLIMON/Test::ChangesHasContent'
+      version: '0.011'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@MMCCLIMON/PodSyntaxTests'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::Test::ReportPrereqs
+      name: '@MMCCLIMON/Test::ReportPrereqs'
+      version: '0.027'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: '@MMCCLIMON/TestMoreWithSubtests'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          config_plugins:
+            - '@MMCCLIMON'
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+          plugins:
+            -
+              class: Pod::Weaver::Plugin::EnsurePod5
+              name: '@CorePrep/EnsurePod5'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Plugin::H1Nester
+              name: '@CorePrep/H1Nester'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Plugin::SingleEncoding
+              name: '@MMCCLIMON/SingleEncoding'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Name
+              name: '@MMCCLIMON/Name'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Version
+              name: '@MMCCLIMON/Version'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@MMCCLIMON/Prelude'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@MMCCLIMON/Synopsis'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@MMCCLIMON/Description'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@MMCCLIMON/Overview'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@MMCCLIMON/Stability'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: Attributes
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: Methods
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: Functions
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Leftovers
+              name: '@MMCCLIMON/Leftovers'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@MMCCLIMON/postlude'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Authors
+              name: '@MMCCLIMON/Authors'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Contributors
+              name: '@MMCCLIMON/Contributors'
+              version: '0.009'
+            -
+              class: Pod::Weaver::Section::Legal
+              name: '@MMCCLIMON/Legal'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Plugin::Transformer
+              name: '@MMCCLIMON/List'
+              version: '4.015'
+      name: '@MMCCLIMON/PodWeaver'
+      version: '4.008'
+    -
+      class: Dist::Zilla::Plugin::GithubMeta
+      name: '@MMCCLIMON/GithubMeta'
+      version: '0.58'
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      config:
+        Dist::Zilla::Plugin::Git::Check:
+          untracked_files: die
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Changes
+            - dist.ini
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.25.0
+          repo_root: .
+      name: '@MMCCLIMON/@Git/Check'
+      version: '2.046'
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      config:
+        Dist::Zilla::Plugin::Git::Commit:
+          add_files_in: []
+          commit_msg: v%V%n%n%c
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Changes
+            - dist.ini
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.25.0
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@MMCCLIMON/@Git/Commit'
+      version: '2.046'
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      config:
+        Dist::Zilla::Plugin::Git::Tag:
+          branch: ~
+          changelog: Changes
+          signed: 0
+          tag: '5.013'
+          tag_format: '%v'
+          tag_message: v%V
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.25.0
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@MMCCLIMON/@Git/Tag'
+      version: '2.046'
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      config:
+        Dist::Zilla::Plugin::Git::Push:
+          push_to:
+            - 'gitbox :'
+            - 'michael :'
+          remotes_must_exist: 0
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.25.0
+          repo_root: .
+      name: '@MMCCLIMON/@Git/Push'
+      version: '2.046'
+    -
+      class: Dist::Zilla::Plugin::Git::Contributors
+      config:
+        Dist::Zilla::Plugin::Git::Contributors:
+          git_version: 2.25.0
+          include_authors: 0
+          include_releaser: 1
+          order_by: name
+          paths: []
+      name: '@MMCCLIMON/Git::Contributors'
+      version: '0.035'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExtraTestFiles'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':PerlExecFiles'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '6.014'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: '0'
+    version: '6.014'
+x_contributors:
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Ricardo SIGNES <rjbs@cpan.org>'
+x_generated_by_perl: v5.28.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

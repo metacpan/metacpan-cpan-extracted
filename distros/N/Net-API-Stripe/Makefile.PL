@@ -46,7 +46,6 @@ my %WriteMakefileArgs = (
         'Digest::SHA'			=> '6.02',
         'Net::IP'				=> '1.26',
         'Devel::Confess'		=> '0.009004',
-        'Number::Format'		=> '1.75',
         'Net::API::REST'		=> '0.5.3',
     },
     TEST_REQUIRES =>

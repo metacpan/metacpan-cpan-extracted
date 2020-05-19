@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.com/kaz-utashiro/App-week.svg?branch=master)](https://travis-ci.com/kaz-utashiro/App-week) [![MetaCPAN Release](https://badge.fury.io/pl/App-week.svg)](https://metacpan.org/release/App-week)
 # NAME
 
-week - colorful calender command
+week - colorful calendar command
 
 # SYNOPSIS
 
@@ -13,8 +13,8 @@ Options:
     -A n    Display n months after current month.
     -B n    Display n months before current month (default 1).
     -C[n]   Display n months before and after current month (default 4).
-    -y      Display year calender.
-    -Y[n]   Display n years of calender
+    -y      Display year calendar.
+    -Y[n]   Display n years of calendar
     -c n    Display calendar in n column (default 3).
 
 Color options:
@@ -31,7 +31,7 @@ Module options:
 
 # VERSION
 
-Version 0.08
+Version 0.09
 
 # DESCRIPTION
 
@@ -54,19 +54,19 @@ Date can given like:
     $ week 9/23        # 9/23 of current year
     $ week 23          # 23rd of current month
 
-Greater number is handled as year.  Next command display calender of
+Greater number is handled as year.  Next command display calendar of
 year 1752.
 
     $ week 1752
 
-Use option **-y** to show one year calender.  Number of years can be
+Use option **-y** to show one year calendar.  Number of years can be
 specified by **-Y** option, and implicitly set **-y** option.
 
-    $ week -y          # display this year's calender
+    $ week -y          # display this year's calendar
 
-    $ week -Y2c6       # display 2 years calender in 6 column
+    $ week -Y2c6       # display 2 years calendar in 6 column
 
-    $ week -Y 1752     # display 1752 years of calender (takes long)
+    $ week -Y 1752     # display 1752 years of calendar (takes long)
 
 # COLORMAP
 
@@ -75,10 +75,10 @@ Each field is labled by names.
     FRAME       Enclosing frame
     MONTH       Month name
     WEEK        Day of the week
-    DAYS        Calender
+    DAYS        Calendar
     THISMONTH   Target month name
     THISWEEK    Target day of the week
-    THISDAYS    Target calender
+    THISDAYS    Target calendar
     THISDAY     Target date
 
 Color for each field can be specified by **--colormap** (**--cm**)
@@ -93,8 +93,9 @@ option with **LABEL**=_colorspec_ syntax.  Default color is:
     --colormap  THISWEEK=L05/445 \
     --colormap THISMONTH=555/113
 
-Colormap is handled by [Getopt::EX::Colormap](https://metacpan.org/pod/Getopt::EX::Colormap) module; use \`perldoc
-Getopt::EX::Colormap\` for detail.
+Three digit means 216 RGB values from 000 to 555, and Lxx means 24
+gray scales.  Colormap is handled by [Getopt::EX::Colormap](https://metacpan.org/pod/Getopt::EX::Colormap) module;
+use \`perldoc Getopt::EX::Colormap\` for detail.
 
 You can add special effect afterward.  For example, put next line in
 your `~/.weekrc` to blink today.  `$<move>` indicates to move

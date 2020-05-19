@@ -27,7 +27,7 @@ BEGIN
     our( $VERSION, $VERBOSE, $DEBUG );
     $VERSION    = '0.3';
     $VERBOSE    = 0;
-    $DEBUG		= 0;
+    $DEBUG        = 0;
     use Devel::Confess;
 };
 
@@ -132,12 +132,12 @@ sub ignore
 
 sub only
 {
-	return( shift->error( "SELECT | DELETE | UPDATE ONLY is not supported by SQLite." ) );
+    return( shift->error( "SELECT | DELETE | UPDATE ONLY is not supported by SQLite." ) );
 }
 
 sub priority
 {
-	return( shift->error( "Priority is not supported in SQLite." ) );
+    return( shift->error( "Priority is not supported in SQLite." ) );
 }
 
 ## rollback is called using the dbh handler and is located in DB::Object::Postgres
@@ -150,18 +150,18 @@ sub priority
 
 sub unprepared_statements
 {
-	my $self = shift( @_ );
-	if( $self->{dbh}->{sth} )
-	{
-		return( $self->{dbh}->{sth}->{sqlite_unprepared_statements} );
-	}
-	return( undef() );
+    my $self = shift( @_ );
+    if( $self->{dbh}->{sth} )
+    {
+        return( $self->{dbh}->{sth}->{sqlite_unprepared_statements} );
+    }
+    return( undef() );
 }
 
 ## Does nothing in SQLite. This is a Mysql feature
 sub wait
 {
-	return( shift( @_ ) );
+    return( shift( @_ ) );
 }
 
 DESTROY

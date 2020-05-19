@@ -1,3 +1,5 @@
+BEGIN { unshift @INC, '.' }
+
 use inc::Module::Install;
 
 name 'AnyEvent-RabbitMQ';
@@ -23,6 +25,12 @@ build_requires 'version';
 resources(
     repository => 'git://github.com/bobtfish/AnyEvent-RabbitMQ.git',
 );
+
+contributors 'Tom Doran <bobtfish@cpan.org>';
+contributors 'Nicolas R <atoomic@cpan.org>';
+contributors 'Dave Lambley <dlambley@cpan.org>';
+contributors 'Ruslan Zakirov <ruz@bestpractical.com>';
+contributors 'Masahito Ikuta <cooldaemon@gmail.com>';
 
 WriteAll;
 

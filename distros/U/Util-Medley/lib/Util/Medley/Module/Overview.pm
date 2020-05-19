@@ -1,5 +1,5 @@
 package Util::Medley::Module::Overview;
-$Util::Medley::Module::Overview::VERSION = '0.030';
+$Util::Medley::Module::Overview::VERSION = '0.037';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -17,7 +17,7 @@ Util::Medley::Module::Overview
 
 =head1 VERSION
 
-version 0.030
+version 0.037
 
 =cut
 
@@ -139,7 +139,6 @@ has _inheritedMethodsAndAttributes => (
 has _moduleOverview => (
 	is      => 'ro',
 	isa     => 'HashRef',
-	lazy    => 1,
 	builder => '_buildModuleOverview',
 );
 
@@ -210,20 +209,67 @@ method getConstants {
 	return @{ $self->_getMyConstants };
 }
 
+=head2 getAllPublicAttributes
+
+Combines and sorts the results from getPublicAttributes() and  
+getInheritedPublicAttributes().
+
+=cut
+
+method getAllPublicAttributes {
+
+	my @all = $self->getPublicAttributes;
+	push @all, $self->getInheritedPublicAttributes;
+
+	#
+	# build a map
+	#
+	my %map;
+	foreach my $aref (@all) {
+		$map{ $aref->[0] } = [@$aref];
+	}
+
+	#
+	# get a sorted list of map keys
+	#
+	my @keys = $self->List->nsort( keys %map );
+
+	#
+	# prepare sorted list of arrayrefs
+	#
+	my @sorted;
+	foreach my $key (@keys) {
+		push @sorted, $map{$key};
+	}
+
+	return @sorted;    # Array[ArrayRef]
+}
+
 =head2 getPublicAttributes
 
-Returns a list of public attributes.
+Returns a list of public attributes.  Each item in the list is an ArrayRef
+of [ name, src ].
 
 =cut
 
 method getPublicAttributes {
 
-	my @public;
-	foreach my $attr ( @{ $self->_getMyAttributes } ) {
+	my $modname = $self->moduleName;
+	my $meta    = $modname->meta();
 
-		if ( $attr !~ /^_/ ) {
-			push @public, $attr;
+	my @public;
+	foreach my $name ( @{ $self->_getMyAttributes } ) {
+
+		next if $name =~ /^_/;
+
+		my $from = 'this';
+		my $attr = $meta->get_attribute($name);
+		if ( $attr->has_role_attribute ) {
+			$from = $attr->{definition_context}->{package};
 		}
+
+		my $aref = [ $name, $from ];    # convert to aref and add empty source
+		push @public, $aref;
 	}
 
 	return @public;
@@ -231,7 +277,8 @@ method getPublicAttributes {
 
 =head2 getInheritedPublicAttributes
 
-Returns a list of inherited public attributes.
+Returns a list of inherited public attributes.  Each item in the list is an 
+ArrayRef of [ name, src ]. 
 
 =cut
 
@@ -251,7 +298,8 @@ method getInheritedPublicAttributes {
 
 =head2 getPrivateAttributes
 
-Returns a list of private attributes.
+Returns a list of private attributes.  Each item in the list is an ArrayRef
+of [ name, src ].
 
 =cut
 
@@ -270,7 +318,8 @@ method getPrivateAttributes {
 
 =head2 getInheritedPrivateAttributes
 
-Returns a list of inherited private attributes.
+Returns a list of inherited private attributes.  Each item in the list 
+is an ArrayRef of [ name, src ].
 
 =cut
 
@@ -288,24 +337,77 @@ method getInheritedPrivateAttributes {
 	return @private;
 }
 
+=head2 getAllPublicMethods
+
+Combines and sorts the results from getPublicMethods() and  
+getInheritedPublicMethods().
+
+=cut
+
+method getAllPublicMethods {
+
+	my @all = $self->getPublicMethods;
+	push @all, $self->getInheritedPublicMethods;
+
+	#
+	# build a map
+	#
+	my %map;
+	foreach my $aref (@all) {
+		$map{ $aref->[0] } = $aref;
+	}
+
+	#
+	# get a sorted list of map keys
+	#
+	my @keys = $self->List->nsort( keys %map );
+
+	#
+	# prepare sorted list of arrayrefs
+	#
+	my @sorted;
+	foreach my $key (@keys) {
+		push @sorted, $map{$key};
+	}
+
+	return @sorted;    # Array[ArrayRef]
+}
+
 =head2 getPublicMethods
 
-Returns a list of public methods.
+Returns a list of public methods.  Each item in the list is an ArrayRef
+of [ name, src ].
 
 =cut
 
 method getPublicMethods {
 
+	my $meta;
 	my @public;
-	foreach my $method ( @{ $self->_getMyMethods } ) {
+
+	foreach my $name ( @{ $self->_getMyMethods } ) {
 
 		# moose objects seems to end up with a public method called meta()
 		# here we skip it if we encounter it.
-		if ( $self->_scrubParens($method) ne 'meta' ) {
+		my $scrubbed = $self->_scrubParens($name);
+		if ( $scrubbed ne 'meta' ) {
 
-			if ( $method !~ /^_/ ) {
-				push @public, $method;
+			next if $scrubbed =~ /^_/;
+
+			my $from = 'this';
+
+			if ( $self->isMooseModule ) {
+				$meta = $self->moduleName->meta if !$meta;
+
+				my $method = $meta->get_method($scrubbed);
+
+				my $srcPkg = $method->original_package_name;
+				if ( $srcPkg ne $self->moduleName ) {
+					$from = $method->original_package_name;
+				}
 			}
+
+			push @public, [ $scrubbed, $from ];
 		}
 	}
 
@@ -314,7 +416,8 @@ method getPublicMethods {
 
 =head2 getInheritedPublicMethods
 
-Returns a list of inherited public methods.
+Returns a list of inherited public methods.  Each item in the list is an 
+ArrayRef of [ name, src ].
 
 =cut
 
@@ -322,10 +425,12 @@ method getInheritedPublicMethods {
 
 	my @public;
 	foreach my $aref ( @{ $self->_getInheritedMethods } ) {
+
 		my ( $method, $from ) = @$aref;
-		if ( $method !~ /^_/ ) {
-			push @public, [@$aref];
-		}
+		next if $from eq 'Moose::Object';
+		next if $method =~ /^_/;
+
+		push @public, [@$aref];
 	}
 
 	return @public;
@@ -333,7 +438,8 @@ method getInheritedPublicMethods {
 
 =head2 getPrivateMethods
 
-Returns a list of private methods.
+Returns a list of private methods.  Each item in the list is an ArrayRef
+of [ name, src ].
 
 =cut
 
@@ -351,7 +457,8 @@ method getPrivateMethods {
 
 =head2 getInheritedPrivateMethods
 
-Returns a list of inherited private methods.
+Returns a list of inherited private methods.  Each item in the list is an 
+ArrayRef of [ name, src ].
 
 =cut
 
@@ -370,25 +477,25 @@ method getInheritedPrivateMethods {
 
 method isMooseModule (Str $module?) {
 
-    $module = $self->moduleName if !$module;
-    load($module);
-    
-    my $c = $self->_classTypeCache;
-    if ( !defined $c->{$module} ) {
+	$module = $self->moduleName if !$module;
+	load($module);
 
-        if ( $module->isa('Moose::Object') ) {
-            $c->{$module} = 'moose';
-        }
-        else {
-            $c->{$module} = 'notmoose';
-        }
-    }
-            
-    if ( $c->{$module} eq 'moose' ) {
-        return 1;
-    }
+	my $c = $self->_classTypeCache;
+	if ( !defined $c->{$module} ) {
 
-    return 0;
+		if ( $module->isa('Moose::Object') ) {
+			$c->{$module} = 'moose';
+		}
+		else {
+			$c->{$module} = 'notmoose';
+		}
+	}
+
+	if ( $c->{$module} eq 'moose' ) {
+		return 1;
+	}
+
+	return 0;
 }
 
 ##############################################################
@@ -644,10 +751,10 @@ method _getModuleExports (Str $moduleName) {
 	my @exports;
 
 	if ( $moduleName->isa('Exporter') ) {
-        
-        # TODO: this could be improved by testing for exactly
-        # what is imported.  For now, just assumes subs in
-        # EXPORT_OK were imported.
+
+		# TODO: this could be improved by testing for exactly
+		# what is imported.  For now, just assumes subs in
+		# EXPORT_OK were imported.
 		no strict 'refs';
 		push @exports, @{ sprintf '%s::EXPORT',    $moduleName };
 		push @exports, @{ sprintf '%s::EXPORT_OK', $moduleName };
@@ -662,9 +769,10 @@ method _isImportedSub (Str $subName) {
 	$subName = $self->_scrubParens($subName);
 
 	foreach my $use ( $self->getImportedModules ) {
-		
+
 		my @exports = $self->_getModuleExports($use);
 		my %map     = $self->List->listToMap(@exports);
+
 		if ( $map{$subName} ) {
 			return $use;
 		}

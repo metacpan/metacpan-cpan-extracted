@@ -8,7 +8,7 @@ medley - a cli utility for Util::Medley
 
 =head1 VERSION
 
-version 0.030
+version 0.037
 
 =cut
 
@@ -21,7 +21,7 @@ use File::Basename;
 use CLI::Driver;
 use Util::Medley;
 use File::ShareDir 'dist_file';
-
+use diagnostics;
 use Getopt::Long;
 Getopt::Long::Configure('no_ignore_case');
 Getopt::Long::Configure('pass_through');

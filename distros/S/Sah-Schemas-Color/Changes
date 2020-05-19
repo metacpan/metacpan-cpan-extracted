@@ -1,3 +1,8 @@
+0.006   2020-03-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Add examples (tests).
+
+
 0.005   2019-11-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Add test and explicit depndency to Data::Sah::Coerce >0.034 to

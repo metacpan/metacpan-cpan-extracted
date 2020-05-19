@@ -3,7 +3,7 @@ package WWW::Mechanize::Link;
 use strict;
 use warnings;
 
-our $VERSION = '1.96';
+our $VERSION = '1.97';
 
 #ABSTRACT: Link object for WWW::Mechanize
 
@@ -65,7 +65,7 @@ WWW::Mechanize::Link - Link object for WWW::Mechanize
 
 =head1 VERSION
 
-version 1.96
+version 1.97
 
 =head1 SYNOPSIS
 
@@ -135,7 +135,7 @@ Andy Lester <andy at petdance.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2004-2016 by Andy Lester.
+This software is copyright (c) 2004 by Andy Lester.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

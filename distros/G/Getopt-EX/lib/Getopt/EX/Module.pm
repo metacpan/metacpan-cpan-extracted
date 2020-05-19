@@ -513,11 +513,10 @@ will be evaluated as this:
 
     greple --le &line=10,20-30,40
 
-There are three special arguments to manipulate option behavior and
-the rest of arguments.  Argument C<< $<move> >> moves all following
-arguments there, C<< $<remove> >> just removes them, and C<< $<copy>
->> copies them.  These does not work when included in a part of
-string.
+There are special arguments to manipulate option behavior and the rest
+of arguments.  Argument C<< $<move> >> moves all following arguments
+there, C<< $<remove> >> just removes them, and C<< $<copy> >> copies
+them.  These does not work when included as a part of string.
 
 They take optional one or two parameters, those are passed to Perl
 C<splice> function as I<offset> and I<length>.  C<< $<move(0,1)> >> is
@@ -528,10 +527,13 @@ example exchange following two arguments.
 
     option --exch $<move(1,1)>
 
-Because C<< $<move(0,0)> >> does nothing, you can use it to ignore
-option.
+You can use recently introduced C<< $<ignore> >> to ignore the
+argument.  Because C<< $<move(0,0)> >> does nothing, it effectively
+equivalent and existing module sometimes use it.
 
+    option --deprecated $<ignore>
     option --deprecated $<move(0,0)>
+
 
 =item B<expand> I<name> I<string>
 

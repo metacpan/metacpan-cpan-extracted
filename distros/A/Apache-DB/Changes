@@ -1,4 +1,42 @@
-=item 0.15 - Februar 03, 2019
+=item 0.18 - May 17, 2020
+
+change in perl 5.31
+iperlsys.h
+
+#ifndef Sighandler_t
+-#  if defined(HAS_SIGACTION) && defined(SA_SIGINFO)
++#  ifdef PERL_USE_3ARG_SIGHANDLER
+typedef Signal_t (*Sighandler_t) (int, siginfo_t*, void*);
+#  else
+typedef Signal_t (*Sighandler_t) (int);
+#  endif
+#endif
+
+perl.h
+
++#if defined(HAS_SIGACTION) && defined(SA_SIGINFO)
++    /* having sigaction(2) means that the OS supports both 1-arg and 3-arg
++     * signal handlers. But the perl core itself only fully supports 1-arg
++     * handlers, so don't enable for now.
++     * NB: POSIX::sigaction() supports both.
++     *
++     * # define PERL_USE_3ARG_SIGHANDLER
++     */
++#endif
+
+-#if ((PERL_REVISION == 5) && (PERL_VERSION >= 10)) && defined(HAS_SIGACTION) && defined(SA_SIGINFO)
++#if ((PERL_REVISION == 5) && (PERL_VERSION >= 10) && (PERL_VERSION <= 30)) && defined(HAS_SIGACTION) && defined(SA_SIGINFO)
+
+(https://rt.cpan.org/Ticket/Display.html?id=132641)
+
+This is probably due to this change in 5.31.6 (quoting perl5136delta.pod):
+
+    *   The OS-level signal handlers and type (Sighandler_t) used by the
+        perl core were declared as having three parameters, but the OS was
+        always told to call them with one argument. This has been fixed by
+        declaring them to have one parameter. See the merge commit
+        "v5.31.5-346-g116e19abbf" for full details.
+
 
 DB.XS Fixed ( not longer working for Perl >= v5.21.5 )
 broken in commit [perl #122445] use magic on $DB::single etc to avoid overload issues)

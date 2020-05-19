@@ -88,11 +88,12 @@ sub compare {
     hex_data
     expiration_date
     expiration_date_string
+    local_id
   );
   foreach $field (@can_be_undef) {
-    return 0 unless (defined $self->$field) == (defined $other->$field);
-    if (defined $self->$field) {
-      return 0 unless $self->$field eq $other->$field;
+    return 0 unless ((defined $self->$field && ( $self->$field ne '') ) == (defined $other->$field && ( $other->$field ne '')));
+    if (defined $self->$field && ( $self->$field ne '')  ) {
+      return 0 unless ($self->$field eq $other->$field);
     }
   }
   my @objs = qw(
@@ -207,7 +208,8 @@ instantiated, and should always be undef.
 =item pubkey_data
 
 A list of Math::BigInt objects that correspond to the public key
-material for the given key (this member is empty on secret keys).
+material for the given key. This member is empty on secret keys in
+GnuPG 1.4. It is populated on secret keys In GnuPG >= 2.2.0.
 
 For DSA keys, the values are: prime (p), group order (q), group generator (g), y
 

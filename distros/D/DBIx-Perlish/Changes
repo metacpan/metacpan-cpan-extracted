@@ -1,4 +1,7 @@
 Revision history for DBIx-Perlish
+1.06 14 May 2020
+	Fix broken field addressing in hash/arrayrefs
+
 1.05 4 May 2020
 	Fixes for perl versions 5.20 and below
 
@@ -6,7 +9,7 @@ Revision history for DBIx-Perlish
 	Add --beautify, --inline and --struct for perlish-deparse to help with running
 		copy-pasted code that may contain unknown variables.
 	Minor opcode fixes
-	
+
 1.03 1 May 2019
 	Add CAST support
 	Upgrade to the latest Keyword::Pluggable

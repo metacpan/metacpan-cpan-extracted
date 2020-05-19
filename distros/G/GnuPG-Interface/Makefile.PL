@@ -1,3 +1,4 @@
+BEGIN{push @INC, '.';}
 use strict;
 use warnings;
 use inc::Module::Install;
@@ -12,7 +13,7 @@ die "Can't determine gpg version"
 die "gpg (GnuPG) 1.4 or later is required" unless $1 >= 1.4;
 
 
-author 'Frank J. Tobin';
+author 'BPS';
 abstract 'supply object methods for interacting with GnuPG';
 name 'GnuPG-Interface';
 version_from 'lib/GnuPG/Interface.pm';

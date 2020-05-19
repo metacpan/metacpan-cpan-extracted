@@ -15,7 +15,7 @@ use YAML::Syck;
 
 extends 'App::VTide::Command::Run';
 
-our $VERSION = version->new('0.1.10');
+our $VERSION = version->new('0.1.11');
 our $NAME    = 'recent';
 our $OPTIONS = [
     'max|m=i',
@@ -57,7 +57,7 @@ App::VTide::Command::Recent - List recent App::VTide sessions
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Recent version 0.1.10
+This documentation refers to App::VTide::Command::Recent version 0.1.11
 
 =head1 SYNOPSIS
 

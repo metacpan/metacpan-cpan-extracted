@@ -1,14 +1,11 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Event/Data.pm
-## Version 0.1
-## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <jack@deguest.jp>
+## Version v0.100.0
+## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/11/02
-## Modified 2019/11/02
-## All rights reserved
+## Modified 2020/05/15
 ## 
-## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 ## Object of the resources relevant to the event, e.g. balance, or invoice
 ## This must be processed by callbacks to set the right object
@@ -17,7 +14,7 @@ BEGIN
 {
     use strict;
     use parent qw( Net::API::Stripe::Generic );
-    our( $VERSION ) = '0.1';
+    our( $VERSION ) = 'v0.100.0';
 };
 
 sub object 
@@ -56,7 +53,7 @@ Net::API::Stripe::Event::Data - A Stripe Event Data Object
 
 =head1 VERSION
 
-    0.1
+    v0.100.0
 
 =head1 DESCRIPTION
 

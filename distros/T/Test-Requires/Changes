@@ -1,5 +1,9 @@
 Revision history for Perl module Test::Requires
 
+0.11 2020-05-14T00:34:23Z
+
+    - Re-packaging
+
 0.10 2015-07-21T12:37:03Z
 
     - Support 5.6 again.

@@ -2,7 +2,7 @@ package Mnet::Log;
 
 =head1 NAME
 
-Mnet::Log - Logging compatible with Log4perl api
+Mnet::Log - Logging, compatible with Log4perl
 
 =head1 SYNOPSIS
 
@@ -47,8 +47,8 @@ Mnet::Log supports generating the following types of log entries
 
     dbg   stdout   detailed info, visible when debug option is set
     inf   stdout   normal informational entries intended for users
-    log   stdout   reserved for script start and finish log entries
-    WRN   stderr   logged warning entries, execution will continue
+    ---   stdout   reserved for Mnet notices, ignored by --test
+    WRN   stderr   logged warning entries, execution continues
     ERR   stderr   perl die and warn outputs with stack trace
     DIE   stderr   logged fatal errors, execution aborts
 
@@ -87,8 +87,6 @@ use Time::HiRes;
 
 # export function names
 our @EXPORT_OK = qw( DEBUG INFO WARN FATAL );
-
-
 
 # begin block runs before init blocks of other modules
 BEGIN {
@@ -329,7 +327,7 @@ sub output {
 # $prefix: set to keyword dbg, inf, WRN, ERR, or "---" to bypass Mnet::Tee
 # $severity: 7=debug, 6=info, 5=notice (no Mnet::Test), 4=warn, 3=error, 2=fatal
 # $caller: original caller of method or function making log entry
-# $text: zero or more lines of log text, formatted with timestamps, etc
+# $text: zero or more lines of log text, timestamp/caller/etc will be added
 # $true: boolean true is always returned, can use like: output() and ...
 
     # read args for object and/or text, level, and caller
@@ -350,7 +348,9 @@ sub output {
         my $script_name = $0;
         $script_name =~ s/^.*\///;
         my $started = "$script_name started";
-        $started .= ", pid $$, ".localtime if not $INC{"Mnet/Log/Test.pm"};
+        if (not $INC{"Mnet/Log/Test.pm"}) {
+            $started .= ", pid $$, ".localtime($Mnet::Log::start_time);
+        }
         $Mnet::Log::debug_error = undef if not $INC{"Mnet/Opts/Cli.pm"};
         NOTICE($started);
         output(undef, "dbg", 7, "Mnet::Version", Mnet::Version::info());
@@ -375,8 +375,10 @@ sub output {
     # note identifier for Mnet::Log entries
     my $log_id  = $self->{log_id} // "-";
 
-    # loop through lines of text, prepare to output a log entry for each line
+    # loop through lines of text and output log entries
     foreach my $line (split(/\n/, $text)) {
+
+        # prepare output log entry for each line of text
         $line = "${timestamp}$prefix $log_id $caller $line";
 
         # accumulate all output log entries to --debug-error buffer
@@ -474,6 +476,7 @@ sub notice {
 
 # $self->notice($text)
 # purpose: output log text to stdout, bypassing Mnet::Test log capture
+# $text: zero or more lines of log text, timestamp/caller/etc will be added
 
     # call output function
     my ($self, $text) = (shift, shift);
@@ -566,6 +569,7 @@ sub NOTICE {
 
 # NOTICE($text)
 # purpose: output log text to stdout, bypassing Mnet::Test log capture
+# $text: zero or more lines of log text, timestamp/caller/etc will be added
 
     # call output function
     my $text = shift;
@@ -628,11 +632,11 @@ END {
     }
 
     # prepare summary/finished info for last log entry
-    my $finished = "with no errors";
-    $finished = "with exit error status" if $?;
-    $finished = "with errors" if defined $Mnet::Log::error;
+    my $finished = "no errors";
+    $finished = "exit error status" if $?;
+    $finished = "errors" if defined $Mnet::Log::error;
     my $elapsed = Time::HiRes::time - $Mnet::Log::start_time;
-    $elapsed = sprintf("%.3f seconds elapsed", $elapsed);
+    $elapsed = sprintf("%.3f secs elapsed", $elapsed);
     $finished .= ", pid $$, $elapsed" if not $INC{"Mnet/Log/Test.pm"};
 
     # output notice of errors
@@ -652,7 +656,7 @@ END {
 
     # output last finished log notice
     #   only if first line was output, meaning logging was enabled/used
-    NOTICE("finished $finished") if $Mnet::Log::first;
+    NOTICE("finished, $finished") if $Mnet::Log::first;
 
     # output --debug-error file, if there were errors and that opt was set
     if (defined $Mnet::Log::error and defined $debug_error_file) {
@@ -691,14 +695,15 @@ END {
 =head1 TESTING
 
 When used with the L<Mnet::Test> --record option all stdout and stderr log
-entry output from this module is captured with the exception of dbg and log
-entries.
+entry output from this module is captured with the exception of dbg entries.
 
 Refer to the L<Mnet::Test> module for more information.
 
 =head1 SEE ALSO
 
 L<Mnet>
+
+L<Mnet::Log::Conditional>
 
 L<Mnet::Log::Test>
 
@@ -709,8 +714,6 @@ L<Mnet::Opts::Set::Debug>
 L<Mnet::Opts::Set::Quiet>
 
 L<Mnet::Opts::Set::Silent>
-
-L<Mnet::Tee>
 
 L<Mnet::Test>
 

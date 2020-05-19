@@ -19,11 +19,12 @@
 #       perl Makefile.PL && make distcheck, skip Mnet-*.tar.gz and README.md
 #       make test, commit any fixes made so far, then we're ready for release
 #       vim Changes, update w/date and new <RELEASE> number, 5.09, 5.10, etc
-#       vim lib/Mnet.pm, update $VERSION variable to the new <REELEASE> number
+#       note: for cpan development, <RELEASE> =~ /^\d+\.\d+(_\d+|-TRIAL\d*)$/
+#       vim lib/Mnet.pm, update $VERSION variable to the new <RELEASE> number
 #       git rm Mnet-*.tar.gz, to remove old distribution when new is committed
 #       make realclean && perl Makefile.PL && make dist && make realclean
 #       perform any additional testing before upload to cpan, no going back
-#       upload new Mnet-<RELEASE>.tar.gz to cpan using capn PAUSE account
+#       upload new Mnet-<RELEASE>.tar.gz to cpan using cpan PAUSE account
 #       firefox https://pause.perl.org/pause/authenquery?ACTION=add_uri
 #       wait for email confirmation that file upload to cpan is complete
 #       git add Changes Mnet-*.tar.gz && git commit -m 'latest release'

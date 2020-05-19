@@ -116,7 +116,9 @@ function init() {
     shipped = JSON.parse($('#shipped').html());
     console.log("session %o, shipped %o", session, shipped);
 
-    $('#header a#logo').css('background', 'url('+shipped.logourl+')');
+    if (shipped.logourl) {
+        $('#header a#logo').css('background', 'url('+shipped.logourl+')');
+    }
 
     $('.button').each(function(i){
         var $this = $(this);

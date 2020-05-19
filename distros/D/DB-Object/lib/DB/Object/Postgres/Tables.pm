@@ -30,7 +30,7 @@ BEGIN
 
 sub init
 {
-	return( shift->DB::Object::Tables::init( @_ ) );
+    return( shift->DB::Object::Tables::init( @_ ) );
 }
 
 ##----{ End of generic routines }----##
@@ -67,14 +67,14 @@ sub create
         $opt = \%lc_opt;
         foreach my $key ( keys( %$opt ) )
         {
-			next if( $opt->{ $key } =~ /^\s*$/ || !exists( $allowed->{ $key } ) || $key eq "inherits" );
+            next if( $opt->{ $key } =~ /^\s*$/ || !exists( $allowed->{ $key } ) || $key eq "inherits" );
             if( $opt->{ $key } !~ /$allowed->{ $key }/ )
             {
                 push( @errors, $key );
             }
             else
             {
-				push( @options, $key );
+                push( @options, $key );
             }
         }
         $opt->{ 'comment' } = "'" . quotemeta( $opt->{ 'comment' } ) . "'" if( exists( $opt->{ 'comment' } ) );
@@ -170,12 +170,12 @@ sub drop
     $query   .= " $table";
     if( $opts->{ 'cascade' } )
     {
-    	$query .= " CASCADE";
+        $query .= " CASCADE";
     }
     ## Default Postgres behavior
     elsif( $opts->{restrict} )
     {
-    	$query .= " RESTRICT";
+        $query .= " RESTRICT";
     }
     my $sth = $self->database_object->prepare( $query ) ||
     return( $self->error( "Error while preparing query to drop table '$table':\n$query", $self->database_object->errstr() ) );
@@ -189,7 +189,7 @@ sub drop
 
 sub exists
 {
-	return( shift->table_exists( shift( @_ ) ) );
+    return( shift->table_exists( shift( @_ ) ) );
 }
 
 ## Inherited from DB::Object::Tables
@@ -198,13 +198,13 @@ sub exists
 sub lock
 {
     my $self   = shift( @_ );
-	my $table  = $self->{table};
+    my $table  = $self->{table};
     my $opt    = shift( @_ ) || 'SHARE';
     my $nowait = shift( @_ ) || undef();
-	if( $opt !~ /^(ACCESS SHARE|ROW SHARE|ROW EXCLUSIVE|SHARE UPDATE EXCLUSIVE|SHARE|SHARE ROW EXCLUSIVE|EXCLUSIVE|ACCESS EXCLUSIVE)$/i )
-	{
-		return( $self->error( "Bad table '$table' locking option '$opt'." ) );
-	}
+    if( $opt !~ /^(ACCESS SHARE|ROW SHARE|ROW EXCLUSIVE|SHARE UPDATE EXCLUSIVE|SHARE|SHARE ROW EXCLUSIVE|EXCLUSIVE|ACCESS EXCLUSIVE)$/i )
+    {
+        return( $self->error( "Bad table '$table' locking option '$opt'." ) );
+    }
     my $query = sprintf( 'LOCK TABLE %s IN %s MODE', $table, $opt );
     $query   .= " NOWAIT" if( $nowait );
     my $sth   = $self->database_object->prepare( $query ) ||
@@ -226,31 +226,14 @@ sub lock
 ## Inherited from DB::Object::Tables
 ## sub primary
 
-sub qualified_name_v1
-{
-    my $self = shift( @_ );
-    my $name = $self->name;
-    my $schema = $self->schema;
-    return( $name ) if( !$name || $name eq 'public' );
-    my $path = $self->database_object->search_path || return( $name );
-    if( scalar( grep( /^$schema$/, @$path ) ) )
-    {
-    	return( $name );
-    }
-    else
-    {
-    	return( "$schema.$name" );
-    }
-}
-
 sub qualified_name
 {
     my $self = shift( @_ );
-	my @val = ();
-	CORE::push( @val, $self->database_object->database ) if( $self->{prefixed} > 2 );
-	CORE::push( @val, $self->schema ) if( $self->{prefixed} > 1 && $self->schema );
-	CORE::push( @val, $self->name );
-	return( CORE::join( '.', @val ) );
+    my @val = ();
+    CORE::push( @val, $self->database_object->database ) if( $self->{prefixed} > 2 );
+    CORE::push( @val, $self->schema ) if( $self->{prefixed} > 1 && $self->schema );
+    CORE::push( @val, $self->name );
+    return( CORE::join( '.', @val ) );
 }
 
 sub rename
@@ -295,9 +278,9 @@ sub structure
     my $types   = $self->{types};
     if( !%$fields || !%$struct || !%$default )
     {
-    	$self->message( 3, "No structure, field, default values, null or types set yet for this table '$table' object. Populating." );
-    	## my $query = "SELECT * FROM information_schema.columns WHERE table_name = ?";
-#     	my $query = <<EOT;
+        $self->message( 3, "No structure, field, default values, null or types set yet for this table '$table' object. Populating." );
+        ## my $query = "SELECT * FROM information_schema.columns WHERE table_name = ?";
+#         my $query = <<EOT;
 # SELECT 
 #      pg_tables.schemaname as "schema_name"
 #     ,pg_tables.tablename as "table_name"
@@ -327,10 +310,10 @@ sub structure
 #     AND tablename = ?
 # ORDER BY field_num ASC
 # EOT
-		my $query;
-		if( $self->database_object->version <= 10 )
-		{
-			$query = <<EOT;
+        my $query;
+        if( $self->database_object->version <= 10 )
+        {
+            $query = <<EOT;
 SELECT 
      n.nspname AS "schema_name"
     ,c.relname AS "table_name"
@@ -348,10 +331,10 @@ LEFT JOIN pg_catalog.pg_attribute a ON a.attrelid = c.oid
 WHERE c.relname = ? AND a.attnum > 0 AND NOT a.attisdropped
 ORDER BY a.attnum
 EOT
-		}
-		else
-		{
-			$query = <<EOT;
+        }
+        else
+        {
+            $query = <<EOT;
 SELECT 
      n.nspname AS "schema_name"
     ,c.relname AS "table_name"
@@ -366,9 +349,9 @@ LEFT JOIN pg_catalog.pg_attribute a ON a.attrelid = c.oid
 WHERE c.relname = ? AND a.attnum > 0 AND NOT a.attisdropped
 ORDER BY a.attnum
 EOT
-		}
-    	## http://www.postgresql.org/docs/9.3/interactive/infoschema-columns.html
-    	## select * from information_schema.columns where table_name = 'address'
+        }
+        ## http://www.postgresql.org/docs/9.3/interactive/infoschema-columns.html
+        ## select * from information_schema.columns where table_name = 'address'
         my $sth = $self->database_object->prepare_cached( $query ) ||
         return( $self->error( "Error while preparing query to get table '$table' columns specification: ", $self->database_object->errstr() ) );
         $sth->execute( $table ) ||
@@ -379,18 +362,18 @@ EOT
         my $type_convert =
         {
         'character varying' => 'varchar',
-        'character'			=> 'char',
+        'character'            => 'char',
         };
         ## Mysql: field, type, null, key, default, extra
         ## Postgres: tablename, field, field_num, type, len, comment, is_nullable, key, foreign_key, default 
         while( $ref = $sth->fetchrow_hashref() )
         {
-        	$self->{ 'type' } = $ref->{ 'table_type' } if( !$self->{ 'type' } );
-        	$self->{ 'schema' } = $ref->{ 'schema_name' } if( !$self->{ 'schema' } );
+            $self->{ 'type' } = $ref->{ 'table_type' } if( !$self->{ 'type' } );
+            $self->{ 'schema' } = $ref->{ 'schema_name' } if( !$self->{ 'schema' } );
             my %data = map{ lc( $_ ) => $ref->{ $_ } } keys( %$ref );
             if( exists( $type_convert->{ $data{ 'type' } } ) )
             {
-            	$data{ 'type' } = $type_convert->{ $data{ 'type' } };
+                $data{ 'type' } = $type_convert->{ $data{ 'type' } };
             }
             $data{ 'default' } = '' if( !defined( $data{ 'default' } ) );
             ## push( @order, $data{ 'field' } );
@@ -399,7 +382,7 @@ EOT
             $default->{ $data{ 'field' } } = '';
             if( CORE::length( $data{default} ) )
             {
-				$default->{ $data{ 'field' } } = $data{ 'default' } if( $data{ 'default' } ne '' && !$data{ 'is_nullable' } );
+                $default->{ $data{ 'field' } } = $data{ 'default' } if( $data{ 'default' } ne '' && !$data{ 'is_nullable' } );
             }
             $null->{ $data{ 'field' } } = $data{ 'is_nullable' } ? 1 : 0;
             my @define = ( $data{ 'type' } );
@@ -418,7 +401,7 @@ EOT
         $self->{ 'default' }   = $default;
         $self->{ 'fields' }    = $fields;
         $self->{ 'structure' } = $struct;
-        $self->{ 'types' }	   = $types;
+        $self->{ 'types' }       = $types;
         ## $self->message( 3, "Fields found: ", sub{ $self->dumper( $fields ) } );
     }
     ## $self->messagef( 3, "struct ($struct) has %d keys:\n%s", scalar( keys( %$struct ) ), $self->printer( $struct ) );

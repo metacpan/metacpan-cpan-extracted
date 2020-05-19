@@ -31,7 +31,7 @@ subtest 'setup' => sub {
     $nr->embed_collector;
     ok 1, 'embed_collector';
   }
-  
+
   is $nr->init, 0, 'init';
 };
 
@@ -48,13 +48,13 @@ subtest "transaction (web)" => sub {
   my $tx = $nr->begin_transaction;
   ok $tx, "begin_transaction";
   note "tx = $tx";
-  
+
   is $nr->set_transaction_request_url($tx, 'http://127.0.0.1/foo/bar/baz'), 0, 'set_transaction_request_url';
   is $nr->set_transaction_type_web($tx), 0, 'set_transaction_type_web';
   is $nr->set_transaction_name($tx, "/foo/$$"), 0, 'set_transaction_name';
   is $nr->add_transaction_attribute($tx, user_id => 'blarpho'), 0, 'add_transaction_attribute';
   is $nr->set_transaction_max_trace_segments($tx, 1000), 0, 'set_transaction_max_trace_segments';
-  
+
   subtest 'generic segment' => sub {
 
     my $seg = $nr->begin_generic_segment($tx, undef, 'genero-segment');
@@ -99,14 +99,14 @@ subtest 'transaction with error' => sub {
   my $tx = $nr->begin_transaction;
   ok $tx, "begin_transaction";
   note "tx = $tx";
-  
+
   is $nr->set_transaction_request_url($tx, 'http://127.0.0.1/foo/bar/baz'), 0, 'set_transaction_request_url';
   is $nr->set_transaction_type_web($tx), 0, 'set_transaction_type_web';
   is $nr->set_transaction_name($tx, "/bar/$$"), 0, 'set_transaction_name';
   is $nr->add_transaction_attribute($tx, user_id => 'blarpho'), 0, 'add_transaction_attribute';
 
   is $nr->notice_transaction_error($tx, 'normal', 'ieeieieie something went wrong!', 'one:two:three', ':'), 0, 'notice_transaction_error';
-  
+
   is $nr->end_transaction($tx), $end_transaction_code, 'end_transaction';
 };
 
@@ -115,7 +115,7 @@ subtest "transaction (other)" => sub {
   my $tx = $nr->begin_transaction;
   ok $tx, "begin_transaction";
   note "tx = $tx";
-  
+
   is $nr->set_transaction_type_other($tx), 0, 'set_transaction_type_other';
   is $nr->set_transaction_name($tx, "thingie and stuff"), 0, 'set_transaction_name';
   is $nr->add_transaction_attribute($tx, user_id => 'blarpho'), 0, 'add_transaction_attribute';

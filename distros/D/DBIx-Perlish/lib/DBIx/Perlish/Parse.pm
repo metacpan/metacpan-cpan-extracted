@@ -369,8 +369,6 @@ sub parse_multideref
  				$ref = $$ref if ref($ref) =~ /REF|SCALAR/;
  				$key = $$key if ref($key) =~ /REF|SCALAR/;
 
-				bailout $S, "Can't use value (\"$ref\") as an $reftype ref"
-					unless $reftype eq ref($ref);
 				if ( $reftype eq 'ARRAY') {
 					$ref = $ref->[$key];
 				} else {

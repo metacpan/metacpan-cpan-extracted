@@ -1,10 +1,10 @@
 NAME
 
-    NewRelic::Agent::FFI - Perl Agent for NewRelic APM
+    NewRelic::Agent::FFI - (Deprecated) Perl Agent for NewRelic APM
 
 VERSION
 
-    version 0.09
+    version 0.10
 
 SYNOPSIS
 
@@ -22,6 +22,10 @@ SYNOPSIS
      my $err_id = $agent->end_transaction($txn_id);
 
 DESCRIPTION
+
+    NOTE: This module is deprecated. It is based on the NewRelic Agent SDK,
+    which was only ever released as beta software. Please use NewFangle
+    instead.
 
     This module provides bindings for the NewRelic
     <https://docs.newrelic.com/docs/agents/agent-sdk/getting-started/new-relic-agent-sdk>

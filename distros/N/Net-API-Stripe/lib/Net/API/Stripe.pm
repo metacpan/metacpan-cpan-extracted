@@ -1,15 +1,12 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe.pm
-## Version 1.0
+## Version v1.0.3
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <jack@deguest.jp>
+## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2018/07/19
-## Modified 2020/04/24
-## All rights reserved
+## Modified 2020/05/16
 ## 
-## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::Stripe;
 BEGIN
@@ -47,7 +44,7 @@ BEGIN
 	use Devel::Confess;
 	use constant API_BASE => 'https://api.stripe.com/v1';
 	use constant STRIPE_WEBHOOK_SOURCE_IP => [qw( 54.187.174.169 54.187.205.235 54.187.216.72 54.241.31.99 54.241.31.102 54.241.34.107 )];
-	our $VERSION = '1.0';
+	our $VERSION = 'v1.0.3';
 };
 
 {
@@ -3200,6 +3197,144 @@ sub post_multipart
 	}
 	$self->message( 3, "Post request is: ", $req->as_string );
 	return( $self->_make_request( $req ) );
+}
+
+sub prices
+{
+	my $self = shift( @_ );
+	my $action = shift( @_ );
+	my $allowed = [qw( create retrieve update list )];
+	my $meth = $self->_get_method( 'price', $action, $allowed ) || return;
+	return( $self->$meth( @_ ) );
+}
+
+sub price_create
+{
+	my $self = shift( @_ );
+	return( $self->error( "No parameters were provided to create a price" ) ) if( !scalar( @_ ) );
+	my $args = $self->_get_args_from_object( 'Net::API::Stripe::Price', @_ );
+	my $obj = $args->{_object};
+	if( $self->_is_object( $args->{product} ) && $args->{product}->isa( 'Net::API::Stripe::Product' ) )
+	{
+		my $prod_hash = $args->{product}->as_hash({ json => 1 });
+		$args->{product} = $prod_hash;
+	}
+	#$self->message( 3, "Data to be submitted to create a plan is: ", sub{ $self->dumper( $args ) });
+	#exit;
+	my $okParams = 
+	{
+	expandable			=> { allowed => $EXPANDABLES->{price} },
+	id					=> {},
+	active				=> {},
+	billing_scheme      => {},
+	currency            => { required => 1 },
+	lookup_key          => {},
+	metadata			=> { type => 'hash' },
+	nickname			=> {},
+	product				=> { required => 1 },
+	product_data        => { fields => [qw( id name active metadata statement_descriptor unit_label )] },
+	recurring           => { fields => [qw( interval aggregate_usage interval_count trial_period_days usage_type )] },
+	transfer_lookup_key => {},
+	transform_quantity  => { fields => [qw( divide_by round )] },
+	tiers               => { fields => [qw( up_to flat_amount flat_amount_decimal unit_amount unit_amount_decimal )] },
+	tiers_mode			=> { re => qr/^(graduated|volume)$/ },
+	unit_amount         => { required => 1 },
+	unit_amount_decimal => {},
+	};
+	my $err = $self->_check_parameters( $okParams, $args );
+	return( $self->error( join( ' ', @$err ) ) ) if( scalar( @$err ) );
+	my $hash = $self->post( 'prices', $args ) || return;
+	return( $self->_response_to_object( 'Net::API::Stripe::Price', $hash ) );
+}
+
+sub price_list
+{
+	my $self = shift( @_ );
+	my $args = $self->_get_args( @_ );
+	if( $self->_is_object( $args->{product} ) && $args->{product}->isa( 'Net::API::Stripe::Product' ) )
+	{
+		my $prod_hash = $args->{product}->as_hash({ json => 1 });
+		$args->{product} = $prod_hash->{id} ? $prod_hash->{id} : undef();
+	}
+	my $okParams = 
+	{
+	expandable			=> { allowed => $EXPANDABLES->{price}, data_prefix_is_ok => 1 },
+	# boolean
+	active			    => {},
+	created 			=> { re => qr/^\d+$/ },
+	'created.gt'		=> { re => qr/^\d+$/ },
+	'created.gte'		=> { re => qr/^\d+$/ },
+	'created.lt'		=> { re => qr/^\d+$/ },
+	'created.lte'		=> { re => qr/^\d+$/ },
+	currency            => {},
+	## "A cursor for use in pagination. ending_before is an object ID that defines your place in the list."
+	ending_before		=> {},
+	limit				=> { re => qr/^\d+$/ },
+	lookup_keys         => {},
+	product			    => { re => qr/^\w+$/ },
+	recurring           => { fields => [qw( interval usage_type )] },
+	starting_after	    => {},
+	type                => {},
+	};
+	foreach my $bool ( qw( active ) )
+	{
+		next if( !CORE::length( $args->{ $bool } ) );
+		$args->{ $bool } = ( $args->{ $bool } eq 'true' || ( $args->{ $bool } ne 'false' && $args->{ $bool } ) ) ? 'true' : 'false';
+	}
+	my $err = $self->_check_parameters( $okParams, $args );
+	return( $self->error( join( ' ', @$err ) ) ) if( scalar( @$err ) );
+	if( $args->{expand} )
+	{
+		$self->_adjust_list_expandables( $args ) || return;
+	}
+	my $hash = $self->get( 'prices', $args ) || return;
+	return( $self->_response_to_object( 'Net::API::Stripe::List', $hash ) );
+}
+
+sub price_retrieve
+{
+	my $self = shift( @_ );
+	return( $self->error( "No parameters were provided to retrieve price information." ) ) if( !scalar( @_ ) );
+	my $args = $self->_get_args_from_object( 'Net::API::Stripe::Price', @_ );
+	my $okParams = 
+	{
+	expandable	=> { allowed => $EXPANDABLES->{price} },
+	id 			=> { re => qr/^\w+$/, required => 1 }
+	};
+	my $err = $self->_check_parameters( $okParams, $args );
+	return( $self->error( join( ' ', @$err ) ) ) if( scalar( @$err ) );
+	my $id = CORE::delete( $args->{id} ) || return( $self->error( "No price id was provided to retrieve its information." ) );
+	my $hash = $self->get( "prices/${id}", $args ) || return;
+	return( $self->_response_to_object( 'Net::API::Stripe::Price', $hash ) );
+}
+
+## https://stripe.com/docs/api/customers/update?lang=curl
+sub price_update
+{
+	my $self = shift( @_ );
+	return( $self->error( "No parameters were provided to update a price object" ) ) if( !scalar( @_ ) );
+	my $args = $self->_get_args_from_object( 'Net::API::Stripe::Price', @_ );
+	if( $self->_is_object( $args->{product} ) && $args->{product}->isa( 'Net::API::Stripe::Product' ) )
+	{
+		$args->{product} = $args->{product}->id;
+	}
+	my $okParams = 
+	{
+	expandable			=> { allowed => $EXPANDABLES->{price} },
+	id					=> { required => 1 },
+	active				=> { re => qr/^(?:true|False)$/ },
+	lookup_key          => {},
+	metadata			=> { type => 'hash' },
+	nickname			=> {},
+	recurring           => { fields => [qw( interval aggregate_usage interval_count trial_period_days usage_type )] },
+	transfer_lookup_key => {},
+	};
+	## We found some errors
+	my $err = $self->_check_parameters( $okParams, $args );
+	return( $self->error( join( ' ', @$err ) ) ) if( scalar( @$err ) );
+	my $id = CORE::delete( $args->{id} ) || return( $self->error( "No price id was provided to update price's details" ) );
+	my $hash = $self->post( "prices/${id}", $args ) || return;
+	return( $self->_response_to_object( 'Net::API::Stripe::Price', $hash ) );
 }
 
 sub product { return( shift->_response_to_object( 'Net::API::Stripe::Product', @_ ) ); }

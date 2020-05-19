@@ -66,7 +66,7 @@ sub test_perl {
     # skip if global mnet_test_perl var is set and test doesn't match
     #   makes it easy to troubleshoot one test in a .t script full of tests
     if ($main::mnet_test_perl and $name !~ /\Q$main::mnet_test_perl\E/) {
-        SKIP: { skip("$name (main::mnet_test_perl dosn't match)", 1); };
+        SKIP: { skip("$name (main::mnet_test_perl)", 1); };
         return 1;
     }
 
@@ -81,7 +81,7 @@ sub test_perl {
     # append filter to test command, if one was specified
     #   remove leading and trailing blank lines before shell piping
     if ($specs->{filter}) {
-        $specs->{filter} =~ s/(^\n+|\n+$)//g;
+        $specs->{filter} =~ s/(^\s+|\s+$)//g;
         $command .= "| $specs->{filter}";
     }
 
@@ -99,18 +99,22 @@ sub test_perl {
     my $result = Test::More::is( "\n$output", "\n$specs->{expect}", $name);
 
     # re-run test with debug args if test failed and debug key was set
-    if (not $result and defined $specs->{debug}) {
-        my $output = "\npre/perl/post $specs->{debug} for failed '$name'\n";
-        $output .= "   called from $caller[1] line $caller[2]\n\n";
-        my $command = _test_perl_command($specs, "debug");
-        $output .= "COMMAND STARTING\n$command\nCOMMAND FINISHED\n";
-        $output .= "UNFILTERED OUTPUT STARTING";
-        $output .= `( export MNET_TEST_PERL_DEBUG=1; $command ) 2>&1`;
-        $output .= "UNFILTERED OUTPUT FINISHED\n";
-        $output .= "FILTER STARTING\n$specs->{filter}\nFILTER FINISHED\n"
-            if $specs->{filter};
-        syswrite STDERR, "## $_\n" foreach split(/\n/, $output);
-        syswrite STDERR, "##\n";
+    if (not $result) {
+        if ($specs->{debug} or $specs->{filter}) {
+            my $output = "\npre/perl/post debug for failed '$name'\n";
+            $output .= "   called from $caller[1] line $caller[2]\n\n";
+            my $command = _test_perl_command($specs, "debug");
+            $output .= "COMMAND STARTING\n$command\nCOMMAND FINISHED\n";
+            $output .= "UNFILTERED OUTPUT STARTING";
+            $output .= `( export MNET_TEST_PERL_DEBUG=1; $command ) 2>&1`;
+            $output .= "UNFILTERED OUTPUT FINISHED\n";
+            $output .= "FILTER STARTING\n$specs->{filter}\nFILTER FINISHED\n"
+                if $specs->{filter};
+            syswrite STDERR, "## $_\n" foreach split(/\n/, $output);
+            syswrite STDERR, "##\n";
+        } else {
+            syswrite STDERR, "##    called from $caller[1] line $caller[2]\n\n";
+        }
     }
 
     # finished test_perl function, return result
@@ -135,7 +139,7 @@ sub _test_perl_command {
 
     # append pre shell code, if specified
     if ($specs->{pre}) {
-        $specs->{pre} =~ s/\n+$//;
+        $specs->{pre} =~ s/(^\s+|\s+$)//g;
         $command .= "echo 'PRE STARTING';" if $debug;
         $command .= "$specs->{pre};";
         $command .= "echo 'PRE FINISHED'; echo;" if $debug;
@@ -146,12 +150,12 @@ sub _test_perl_command {
     ( my $perl = $specs->{perl} ) =~ s/'/'"'"'/g;
     $command .= "echo '$perl' | $^X - ";
     $command .= $specs->{args} if defined $specs->{args};
-    $command .= " " . $specs->{debug} if defined $debug;
+    $command .= " " . $specs->{debug} if $debug and defined $specs->{debug};
     $command .= ";";
 
     # append post shell code, if specified
     if ($specs->{post}) {
-        $specs->{post} =~ s/\n+$//;
+        $specs->{post} =~ s/(^\s+|\s+$)//g;
         $command .= "echo; echo 'POST STARTING';" if $debug;
         $command .= "$specs->{post};";
         $command .= "echo 'POST FINISHED';" if $debug;

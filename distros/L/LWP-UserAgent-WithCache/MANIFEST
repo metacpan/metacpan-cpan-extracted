@@ -7,3 +7,4 @@ t/01_new.t
 t/10_request.t
 lib/LWP/UserAgent/WithCache.pm
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

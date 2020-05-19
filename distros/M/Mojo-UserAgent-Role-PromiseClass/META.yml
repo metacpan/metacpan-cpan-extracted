@@ -16,10 +16,10 @@ name: Mojo-UserAgent-Role-PromiseClass
 provides:
   Mojo::Base::Role::PromiseClass:
     file: lib/Mojo/Base/Role/PromiseClass.pm
-    version: '0.008'
+    version: '0.009'
   Mojo::UserAgent::Role::PromiseClass:
     file: lib/Mojo/UserAgent/Role/PromiseClass.pm
-    version: '0.008'
+    version: '0.009'
 requires:
   Class::Method::Modifiers: '0'
   Mojolicious: '8.23'
@@ -28,6 +28,6 @@ requires:
 resources:
   bugtracker: https://github.com/wrog/ua-pclass/issues
   repository: git://github.com/wrog/ua-pclass.git
-version: '0.008'
+version: '0.009'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

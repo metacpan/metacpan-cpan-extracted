@@ -34,6 +34,7 @@ my %params = (
         },
     },
     test => {TESTS => 't/*.t t/*/*.t'},
+    macro => { TARFLAGS   => "--format=ustar -c -v -f"},
 );
 
 my $eumm = $ExtUtils::MakeMaker::VERSION;

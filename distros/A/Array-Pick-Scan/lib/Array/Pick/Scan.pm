@@ -1,7 +1,9 @@
 package Array::Pick::Scan;
 
-our $DATE = '2019-09-15'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-18'; # DATE
+our $DIST = 'Array-Pick-Scan'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,34 +13,57 @@ use Exporter qw(import);
 our @EXPORT_OK = qw(random_item);
 
 sub random_item {
-    my ($ary, $num_items) = @_;
+    my ($src, $num_items) = @_;
+    my $ref = ref $src;
 
     $num_items //= 1;
 
-    my $ary_size = @$ary;
+    if ($ref eq 'ARRAY') {
+        my $ary = $src;
+        my $ary_size = @$ary;
 
-    my @items;
-    if ($num_items == 1) {
-        return $ary->[rand() * $ary_size];
-    } else {
-        for my $i (0..$ary_size-1) {
+        if ($num_items == 1) {
+            return $ary->[rand() * $ary_size];
+        } else {
+            my @items;
+            for my $i (0..$ary_size-1) {
+                if (@items < $num_items) {
+                    # we haven't reached $num_items, insert item to array in a
+                    # random position
+                    splice @items, rand(@items+1), 0, $ary->[$i];
+                } else {
+                    # we have reached $num_items, just replace an item randomly,
+                    # using algorithm from Learning Perl, slightly modified
+                    rand($i+1) < @items and
+                        splice @items, rand(@items), 1, $ary->[$i];
+                }
+            }
+            return @items;
+        }
+    } elsif ($ref eq 'CODE') {
+        my $iter = $src;
+        my @items;
+        my $i = -1;
+        while (defined(my $item = $iter->())) {
+            $i++;
             if (@items < $num_items) {
-                # we haven't reached $num_items, put item to result in a random
-                # position
-                splice @items, rand(@items+1), 0, $ary->[$i];
+                # we haven't reached $num_items, insert item to array in a
+                # random position
+                splice @items, rand(@items+1), 0, $item;
             } else {
-                # we have reached $nnum_items, just replace an item randomly,
+                # we have reached $num_items, just replace an item randomly,
                 # using algorithm from Learning Perl, slightly modified
-                rand($i+1) < @items and
-                    splice @items, rand(@items), 1, $ary->[$i];
+                rand($i+1) < @items and splice @items, rand(@items), 1, $item;
             }
         }
         return @items;
+    } else {
+        die "Please specify arrayref or coderef iterator as source of items";
     }
 }
 
 1;
-# ABSTRACT: Pick random items from an array, without duplicates
+# ABSTRACT: Pick random items from an array (or iterator), without duplicates
 
 __END__
 
@@ -48,28 +73,35 @@ __END__
 
 =head1 NAME
 
-Array::Pick::Scan - Pick random items from an array, without duplicates
+Array::Pick::Scan - Pick random items from an array (or iterator), without duplicates
 
 =head1 VERSION
 
-This document describes version 0.001 of Array::Pick::Scan (from Perl distribution Array-Pick-Scan), released on 2019-09-15.
+This document describes version 0.002 of Array::Pick::Scan (from Perl distribution Array-Pick-Scan), released on 2020-05-18.
 
 =head1 SYNOPSIS
 
  use Array::Pick::Scan qw(random_item);
+
  my $item  = random_item(\@ary);
  my @items = random_line(\@ary, 3);
 
+or:
+
+ my $item  = random_item(\&iterator);
+ my @items = random_line(\&iterator, 3);
+
 =head1 DESCRIPTION
 
-This module can return random items from an array, without duplicates. It uses
-the same algorithm as L<File::Random::Pick>, which in turn uses a slightly
-modified version of algorithm described in L<perlfaq> (L<perldoc -q "random
-line">)), but uses items from an array instead of lines from a file(handle).
+This module can return random items from an array (or iterator), without
+duplicates. It uses the same algorithm as L<File::Random::Pick>, which in turn
+uses a slightly modified version of algorithm described in L<perlfaq> (L<perldoc
+-q "random line">)), but uses items from an array/iterator instead of lines from
+a file(handle).
 
-This module is just a proof of concept and is NOT recommended for general use;
-as its performance is inferior to L<List::Util>'s C<shuffle> or
-L<List::MoreUtils>'s C<samples>.
+Performance-wise, this module is inferior to L<List::Util>'s C<shuffle> or
+L<List::MoreUtils>'s C<samples>, but can be useful in cases where you have an
+iterator and do not want to put all the iterator's items into memory first.
 
 =head1 FUNCTIONS
 
@@ -77,7 +109,8 @@ L<List::MoreUtils>'s C<samples>.
 
 Usage:
 
- my @items = random_item(\@ary [ , $num_samples ]);
+ my @items = random_item(\@ary      [ , $num_samples ]);
+ my @items = random_item(\&iterator [ , $num_samples ]);
 
 Number of samples defaults to 1.
 
@@ -111,7 +144,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

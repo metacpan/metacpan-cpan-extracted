@@ -1,7 +1,9 @@
 package Perinci::Access::Schemeless;
 
-our $DATE = '2020-03-04'; # DATE
-our $VERSION = '0.892'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-18'; # DATE
+our $DIST = 'Perinci-Access-Perl'; # DIST
+our $VERSION = '0.893'; # VERSION
 
 use 5.010001;
 use strict;
@@ -260,13 +262,17 @@ sub _load_module {
         }
         eval { require $module_p };
         if ($@) {
+            die if $ENV{PERINCI_ACCESS_SCHEMELESS_DEBUG};
             $res = [500, "Can't load module $pkg (probably compile error): $@"];
             last;
         }
         # load is successful
         if ($self->{after_load}) {
             eval { $self->{after_load}($self, module=>$pkg) };
-            log_error("after_load for package $pkg dies: $@") if $@;
+            if ($@) {
+                die if $ENV{PERINCI_ACCESS_SCHEMELESS_DEBUG};
+                log_error("after_load for package $pkg dies: $@");
+            }
         }
     }
     $loadcache{$module_p} = $res;
@@ -357,6 +363,7 @@ sub get_meta {
     if ($type eq 'function' && $self->{normalize_metadata}) {
         eval { $meta = normalize_function_metadata($meta) };
         if ($@) {
+            die if $ENV{PERINCI_ACCESS_SCHEMELESS_DEBUG};
             return [500, "Can't normalize function metadata: $@"];
         }
 
@@ -718,9 +725,9 @@ sub action_call {
     } else {
         $args{-confirm} = 1 if $req->{confirm};
         eval { $res = $req->{-code}->(%args) };
-        my $eval_err = $@;
-        if ($eval_err) {
-            $res = err(500, "Function died: $eval_err");
+        if ($@) {
+            die if $ENV{PERINCI_ACCESS_SCHEMELESS_DEBUG};
+            $res = err(500, "Function died: $@");
         }
     }
 
@@ -840,8 +847,11 @@ sub _pre_tx_action {
             $self->{_tx_manager} = $self->{custom_tx_manager}->($self);
             die $self->{_tx_manager} unless blessed($self->{_tx_manager});
         };
-        return err(500, "Can't initialize custom tx manager: ".
-                       "$self->{_tx_manager}: $@") if $@;
+        if ($@) {
+            die if $ENV{PERINCI_ACCESS_SCHEMELESS_DEBUG};
+            return err(500, "Can't initialize custom tx manager: ".
+                           "$self->{_tx_manager}: $@");
+        }
     } elsif (!blessed($self->{_tx_manager})) {
         my $tm_cl = $self->{custom_tx_manager} // "Perinci::Tx::Manager";
         my $tm_cl_p = $tm_cl; $tm_cl_p =~ s!::!/!g; $tm_cl_p .= ".pm";
@@ -850,7 +860,10 @@ sub _pre_tx_action {
             $self->{_tx_manager} = $tm_cl->new(pa => $self);
             die $self->{_tx_manager} unless blessed($self->{_tx_manager});
         };
-        return err(500, "Can't initialize tx manager ($tm_cl): $@") if $@;
+        if ($@) {
+            die if $ENV{PERINCI_ACCESS_SCHEMELESS_DEBUG};
+            return err(500, "Can't initialize tx manager ($tm_cl): $@");
+        }
         # we just want to force newer version, we currently can't specify this
         # in Makefile.PL because peritm's tests use us. this might be rectified
         # in the future.
@@ -1037,7 +1050,7 @@ Perinci::Access::Schemeless - Base class for Perinci::Access::Perl
 
 =head1 VERSION
 
-This document describes version 0.892 of Perinci::Access::Schemeless (from Perl distribution Perinci-Access-Perl), released on 2020-03-04.
+This document describes version 0.893 of Perinci::Access::Schemeless (from Perl distribution Perinci-Access-Perl), released on 2020-05-18.
 
 =head1 DESCRIPTION
 
@@ -1249,6 +1262,15 @@ Process Riap request and return enveloped result. $server_url will be used as
 the Riap request key 'uri', as there is no server in this case.
 
 =head2 $pa->parse_url($server_url) => HASH
+
+=head1 ENVIRONMENT
+
+=head2 PERINCI_ACCESS_SCHEMELESS_DEBUG_DIE
+
+Bool. If set to true, will not return exception (e.g. function dies when
+executed) as status in result envelope; but instead will rethrow the error. This
+will make checking the error (e.g. with L<Devel::Confess> using C<-d:Confess>
+perl flag) slightly easier.
 
 =head1 HOMEPAGE
 

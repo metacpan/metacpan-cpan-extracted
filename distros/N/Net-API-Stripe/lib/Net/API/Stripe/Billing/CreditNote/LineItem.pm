@@ -1,21 +1,18 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/CreditNote/LineItem.pm
-## Version 0.1
+## Version v0.100.0
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <jack@deguest.jp>
+## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2020/01/25
-## Modified 2020/01/25
-## All rights reserved
+## Modified 2020/05/15
 ## 
-## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::Stripe::Billing::CreditNote::LineItem;
 BEGIN
 {
     use strict;
     use parent qw( Net::API::Stripe::Generic );
-    our( $VERSION ) = '0.1';
+    our( $VERSION ) = 'v0.100.0';
 };
 
 sub id { shift->_set_get_scalar( 'id', @_ ); }
@@ -66,7 +63,7 @@ Net::API::Stripe::Billing::CreditNote::LineItem - Stripe API Credit note Line It
 
 =head1 VERSION
 
-    0.1
+    v0.100.0
 
 =head1 DESCRIPTION
 

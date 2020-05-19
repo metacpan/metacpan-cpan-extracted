@@ -1071,7 +1071,7 @@ The relevant portions of the F<httpd.conf> file look like:
 This simply causes Apache to call the mason_handler.cgi script every
 time a URL ending in ".html" under the component root is requested.
 
-To exclude certian directories from being under Mason control, you can
+To exclude certain directories from being under Mason control, you can
 use something like the following:
 
     <LocationMatch "^/(dir1|dir2|dir3)/">

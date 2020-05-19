@@ -7,8 +7,8 @@ use FFI::Platypus::DL;
 use List::Util qw( first );
 use base qw( Alien::Base );
 
-# ABSTRACT: Download and install the NewRelic agent
-our $VERSION = '0.06'; # VERSION
+# ABSTRACT: (Deprecated) Download and install the NewRelic agent
+our $VERSION = '0.08'; # VERSION
 
 
 {
@@ -20,7 +20,7 @@ our $VERSION = '0.06'; # VERSION
 sub dynamic_libs
 {
   my($class) = @_;
-  
+
   if($class->install_type('system'))
   {
     return @{ $class->runtime_prop->{my_lib} };
@@ -42,11 +42,11 @@ __END__
 
 =head1 NAME
 
-Alien::nragent - Download and install the NewRelic agent
+Alien::nragent - (Deprecated) Download and install the NewRelic agent
 
 =head1 VERSION
 
-version 0.06
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -58,6 +58,9 @@ version 0.06
  ...
 
 =head1 DESCRIPTION
+
+B<NOTE>: This L<Alien> is deprecated.  It is based on the NewRelic Agent SDK, which was only
+ever released as beta software.  Please use L<Alien::libnewrelic> and L<NewFangle> instead.
 
 This Alien dist installs and makes available the NewRelic agent library.
 

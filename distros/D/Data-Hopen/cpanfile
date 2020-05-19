@@ -44,7 +44,7 @@ on test => sub {
     requires 'Carp';
     requires 'Exporter';
     requires 'Import::Into';
-    requires 'List::AutoNumbered', '0.000006';
+    requires 'List::AutoNumbered', '0.000009';
     requires 'Quote::Code', '1.0102';
     requires 'Scalar::Util';
     requires 'Sub::Identify', '0.14';

@@ -1,5 +1,11 @@
 Revision history for Net-IPAM-Block
 
+1.15    Mon, 18 May 2020 21:25:55 +0200
+        * bump requirements
+
+1.14    Sat, 16 May 2020 14:01:07 +0200
+        * allow ipv4/maskv4 as input: 192.168.0.0/255.255.0.0
+
 1.13    Mon, 11 May 2020 08:50:10 +0200
         * speed up a bit, swap param security for speed
 

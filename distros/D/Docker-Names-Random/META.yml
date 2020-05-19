@@ -11,10 +11,10 @@ build_requires:
   Test2::V0: '0'
   Test::More: '0'
   lib: '0'
-  perl: '5.008'
+  perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.008'
+  perl: '5.010'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
 keywords:
@@ -37,13 +37,14 @@ no_index:
 provides:
   Docker::Names::Random:
     file: lib/Docker/Names/Random.pm
-    version: v0.0.1
+    version: v0.0.2
 requires:
   English: '0'
   Exporter: '0'
   Hash::Util: '0'
   YAML::PP: '0'
-  perl: '5.008'
+  feature: '0'
+  perl: '5.010'
   strict: '0'
   utf8: '0'
   warnings: '0'
@@ -51,7 +52,7 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Docker-Names-Random
   homepage: https://metacpan.org/release/Docker::Names::Random
   repository: https://github.com/mikkoi/docker-names-random.git
-version: 0.0.1
+version: 0.0.2
 x_Dist_Zilla:
   perl:
     version: '5.028001'
@@ -235,7 +236,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: 0.0.1
+          tag: 0.0.2
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:

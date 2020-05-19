@@ -1,6 +1,12 @@
 NAME
     CAD::AutoCAD::Version - Class which work with AutoCAD versions.
 
+DESCRIPTION
+    This class describes AutoCAD versions and it's identifiers.
+
+    List of identifiers is in Wikipedia article
+    <https://en.wikipedia.org/wiki/AutoCAD_version_history>.
+
 SYNOPSIS
      use CAD::AutoCAD::Version;
 
@@ -14,19 +20,22 @@ METHODS
 
     Constructor.
 
+    Returns instance of object.
+
   "list_of_acad_identifiers"
      my @acad_identifiers = $obj->list_of_acad_identifiers;
 
-    List AutoCAD identifiers used as DWG file magic string or $ACADVER in
-    DXF file.
+    List AutoCAD release identifiers. This identifiers are used e.g. as
+    magic string in DWG file or as $ACADVER in DXF files.
 
     Returns array of identifiers.
 
   "list_of_acad_identifiers_real"
      my @acad_identifiers_real = $obj->list_of_acad_identifiers_real;
 
-    List AutoCAD identifiers used as DWG file magic string or $ACADVER in
-    DXF file. Ordered by date of AutoCAD releases.
+    List AutoCAD release identifiers. This identifiers are used e.g. as
+    magic string in DWG file or as $ACADVER in DXF files. Ordered by date of
+    AutoCAD releases.
 
     Returns array of identifiers.
 
@@ -54,26 +63,42 @@ EXAMPLE1
      # Output:
      # [
      #     [0]  "AC1.2",
-     #     [1]  "AC1.40",
-     #     [2]  "AC1.50",
-     #     [3]  "AC1001",
-     #     [4]  "AC1002",
-     #     [5]  "AC1003",
-     #     [6]  "AC1004",
-     #     [7]  "AC1006",
-     #     [8]  "AC1009",
-     #     [9]  "AC1012",
-     #     [10] "AC1014",
-     #     [11] "AC1015",
-     #     [12] "AC1018",
-     #     [13] "AC1021",
-     #     [14] "AC1024",
-     #     [15] "AC1027",
-     #     [16] "AC1032",
-     #     [17] "AC2.10",
-     #     [18] "AC2.21",
-     #     [19] "AC2.22",
-     #     [20] "MC0.0"
+     #     [1]  "AC1.3",
+     #     [2]  "AC1.40",
+     #     [3]  "AC1.50",
+     #     [4]  "AC1001",
+     #     [5]  "AC1002",
+     #     [6]  "AC1003",
+     #     [7]  "AC1004",
+     #     [8]  "AC1006",
+     #     [9]  "AC1009",
+     #     [10] "AC1012",
+     #     [11] "AC1013",
+     #     [12] "AC1014",
+     #     [13] "AC1015",
+     #     [14] "AC1016",
+     #     [15] "AC1017",
+     #     [16] "AC1018",
+     #     [17] "AC1019",
+     #     [18] "AC1020",
+     #     [19] "AC1021",
+     #     [20] "AC1022",
+     #     [21] "AC1023",
+     #     [22] "AC1024",
+     #     [23] "AC1025",
+     #     [24] "AC1026",
+     #     [25] "AC1027",
+     #     [26] "AC1028",
+     #     [27] "AC1029",
+     #     [28] "AC1030",
+     #     [29] "AC1031",
+     #     [30] "AC1032",
+     #     [31] "AC1033",
+     #     [32] "AC1034",
+     #     [33] "AC2.10",
+     #     [34] "AC2.21",
+     #     [35] "AC2.22",
+     #     [36] "MC0.0"
      # ]
 
 EXAMPLE2
@@ -96,25 +121,41 @@ EXAMPLE2
      # [
      #     [0]  "MC0.0"
      #     [1]  "AC1.2",
-     #     [2]  "AC1.40",
-     #     [3]  "AC1.50",
-     #     [4]  "AC2.10",
-     #     [5]  "AC2.21",
-     #     [6]  "AC2.22",
-     #     [7]  "AC1001",
-     #     [8]  "AC1002",
-     #     [9]  "AC1003",
-     #     [10] "AC1004",
-     #     [11] "AC1006",
-     #     [12] "AC1009",
-     #     [13] "AC1012",
-     #     [14] "AC1014",
-     #     [15] "AC1015",
-     #     [16] "AC1018",
-     #     [17] "AC1021",
-     #     [18] "AC1024",
-     #     [19] "AC1027",
-     #     [20] "AC1032",
+     #     [2]  "AC1.3",
+     #     [3]  "AC1.40",
+     #     [4]  "AC1.50",
+     #     [5]  "AC2.10",
+     #     [6]  "AC2.21",
+     #     [7]  "AC2.22",
+     #     [8]  "AC1001",
+     #     [9]  "AC1002",
+     #     [10] "AC1003",
+     #     [11] "AC1004",
+     #     [12] "AC1006",
+     #     [13] "AC1009",
+     #     [14] "AC1012",
+     #     [15] "AC1013",
+     #     [16] "AC1014",
+     #     [17] "AC1015",
+     #     [18] "AC1016",
+     #     [19] "AC1017",
+     #     [20] "AC1018",
+     #     [21] "AC1019",
+     #     [22] "AC1020",
+     #     [23] "AC1021",
+     #     [24] "AC1022",
+     #     [25] "AC1023",
+     #     [26] "AC1024",
+     #     [27] "AC1025",
+     #     [28] "AC1026",
+     #     [29] "AC1027",
+     #     [30] "AC1028",
+     #     [31] "AC1029",
+     #     [32] "AC1030",
+     #     [33] "AC1031",
+     #     [34] "AC1032",
+     #     [35] "AC1033",
+     #     [36] "AC1034",
      # ]
 
 DEPENDENCIES
@@ -141,5 +182,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

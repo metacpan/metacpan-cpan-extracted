@@ -735,11 +735,11 @@ void PerlXlib_XEvent_pack(XEvent *s, HV *fields, Bool consume) {
       break;
     case ClientMessage:
       fp= hv_fetch(fields, "b", 1, 0);
-      if (fp && *fp) { { if (!SvPOK(*fp) || SvCUR(*fp) != sizeof(char)*20)  croak("Expected scalar of length %d but got %d", sizeof(char)*20, SvCUR(*fp)); memcpy(s->xclient.data.b, SvPVX(*fp), sizeof(char)*20);}; if (consume) hv_delete(fields, "b", 1, G_DISCARD); }
+      if (fp && *fp) { { if (!SvPOK(*fp) || SvCUR(*fp) != sizeof(char)*20)  croak("Expected scalar of length %ld but got %ld", (long)(sizeof(char)*20), (long) SvCUR(*fp)); memcpy(s->xclient.data.b, SvPVX(*fp), sizeof(char)*20);}; if (consume) hv_delete(fields, "b", 1, G_DISCARD); }
       fp= hv_fetch(fields, "l", 1, 0);
-      if (fp && *fp) { { if (!SvPOK(*fp) || SvCUR(*fp) != sizeof(long)*5)  croak("Expected scalar of length %d but got %d", sizeof(long)*5, SvCUR(*fp)); memcpy(s->xclient.data.l, SvPVX(*fp), sizeof(long)*5);}; if (consume) hv_delete(fields, "l", 1, G_DISCARD); }
+      if (fp && *fp) { { if (!SvPOK(*fp) || SvCUR(*fp) != sizeof(long)*5)  croak("Expected scalar of length %ld but got %ld", (long)(sizeof(long)*5), (long) SvCUR(*fp)); memcpy(s->xclient.data.l, SvPVX(*fp), sizeof(long)*5);}; if (consume) hv_delete(fields, "l", 1, G_DISCARD); }
       fp= hv_fetch(fields, "s", 1, 0);
-      if (fp && *fp) { { if (!SvPOK(*fp) || SvCUR(*fp) != sizeof(short)*10)  croak("Expected scalar of length %d but got %d", sizeof(short)*10, SvCUR(*fp)); memcpy(s->xclient.data.s, SvPVX(*fp), sizeof(short)*10);}; if (consume) hv_delete(fields, "s", 1, G_DISCARD); }
+      if (fp && *fp) { { if (!SvPOK(*fp) || SvCUR(*fp) != sizeof(short)*10)  croak("Expected scalar of length %ld but got %ld", (long)(sizeof(short)*10), (long) SvCUR(*fp)); memcpy(s->xclient.data.s, SvPVX(*fp), sizeof(short)*10);}; if (consume) hv_delete(fields, "s", 1, G_DISCARD); }
       fp= hv_fetch(fields, "format", 6, 0);
       if (fp && *fp) { s->xclient.format= SvIV(*fp);; if (consume) hv_delete(fields, "format", 6, G_DISCARD); }
       fp= hv_fetch(fields, "message_type", 12, 0);
@@ -946,7 +946,7 @@ void PerlXlib_XEvent_pack(XEvent *s, HV *fields, Bool consume) {
       break;
     case KeymapNotify:
       fp= hv_fetch(fields, "key_vector", 10, 0);
-      if (fp && *fp) { { if (!SvPOK(*fp) || SvCUR(*fp) != sizeof(char)*32)  croak("Expected scalar of length %d but got %d", sizeof(char)*32, SvCUR(*fp)); memcpy(s->xkeymap.key_vector, SvPVX(*fp), sizeof(char)*32);}; if (consume) hv_delete(fields, "key_vector", 10, G_DISCARD); }
+      if (fp && *fp) { { if (!SvPOK(*fp) || SvCUR(*fp) != sizeof(char)*32)  croak("Expected scalar of length %ld but got %ld", (long)(sizeof(char)*32), (long) SvCUR(*fp)); memcpy(s->xkeymap.key_vector, SvPVX(*fp), sizeof(char)*32);}; if (consume) hv_delete(fields, "key_vector", 10, G_DISCARD); }
       fp= hv_fetch(fields, "window", 6, 0);
       if (fp && *fp) { s->xkeymap.window= PerlXlib_sv_to_xid(*fp);; if (consume) hv_delete(fields, "window", 6, G_DISCARD); }
       break;

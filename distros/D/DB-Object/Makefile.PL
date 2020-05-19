@@ -12,11 +12,14 @@ my %WriteMakefileArgs = (
     ABSTRACT            => 'A SQL Database object abstraction class',
     INSTALLDIRS         => ($] < 5.011 ? 'perl' : 'site'),
     PREREQ_PM           => {
-        'Test::More'		=> 0,
+        'Test::More'		=> '1.302162',
+        'Test::Pod'			=> '1.52',
         'strict'			=> 0,
         'parent'			=> 0,
         'version'			=> 0,
         'common::sense'		=> '3.74',
+        ## We don't directly need Devel::Declare, but TryCatch requires it, and newer version breaks TryCatch
+        'Devel::Declare'    => '<= 0.006019',
         'Module::Generic'	=> '0.11.6',
         'IO::File'			=> 0,
         'Fcntl'				=> 0,

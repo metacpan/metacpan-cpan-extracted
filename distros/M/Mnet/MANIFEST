@@ -1,4 +1,5 @@
 Changes
+CONTRIBUTING
 LICENSE
 MANIFEST
 README
@@ -31,6 +32,7 @@ t/Expect.t
 t/Expect_Cli.t
 t/Expect_Cli_Ios.t
 t/Expect_Cli_command.t
+t/Expect_Cli_command_prompts.t
 t/Expect_Cli_record.t
 t/Log.t
 t/Log_Conditional.t
@@ -46,8 +48,8 @@ t/Opts_Cli_define.t
 t/Opts_Cli_precedence.t
 t/Report_Table.t
 t/Report_Table_batch.t
-t/Report_Table_end.t
 t/Report_Table_errors.t
+t/Report_Table_row_on_error.t
 t/Stanza.t
 t/Tee.t
 t/Test.t

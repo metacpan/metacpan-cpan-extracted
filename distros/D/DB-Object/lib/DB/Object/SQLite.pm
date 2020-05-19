@@ -21,10 +21,10 @@ BEGIN
     ## use DBD::SQLite;
     eval
     {
-		require DBD::SQLite;
+        require DBD::SQLite;
     };
     die( $@ ) if( $@ );
-	use parent qw( DB::Object );
+    use parent qw( DB::Object );
     require DB::Object::SQLite::Statement;
     require DB::Object::SQLite::Tables;
     use File::Spec;
@@ -33,8 +33,8 @@ BEGIN
     use DateTime;
     use DateTime::TimeZone;
     use DateTime::Format::Strptime;
-	use Number::Format;
-	use TryCatch;
+    use Number::Format;
+    use TryCatch;
     our( $VERSION, $DB_ERRSTR, $ERROR, $DEBUG, $CONNECT_VIA, $CACHE_QUERIES, $CACHE_SIZE );
     our( $CACHE_TABLE, $USE_BIND, $USE_CACHE, $MOD_PERL, @DBH );
     $VERSION     = '0.4';
@@ -62,42 +62,42 @@ BEGIN
     
     our $PRIVATE_FUNCTIONS =
     {
-		'ceiling'			=>[1, \&_ceiling],
-		'concat'			=>[-1, \&_concat],
-		'curdate'			=>[0, \&_curdate],
-		'curtime'			=>[0, \&_curtime],
-		'dayname'			=>[1, \&_dayname],
-		'dayofmonth'		=>[1, \&_dayofmonth],
-		'dayofweek'			=>[1, \&_dayofweek],
-		'dayofyear'			=>[1, \&_dayofyear],
-		'distance_miles'	=>[4, \&_distance_miles],
-		# 'from_days'			=>[-1, \&_from_days],
-		'from_unixtime'		=>[1, \&_from_unixtime],
-		'hour'				=>[1, \&_hour],
-		'lcase'				=>[1, \&_lcase],
-		'left'				=>[2, \&_left],
-		'locate'			=>[2, \&_locate],
-		'log10'				=>[1, \&_log10],
-		'minute'			=>[1, \&_minute],
-		'month'				=>[1, \&_month],
-		'monthname'			=>[1, \&_monthname],
-		'number_format'		=>[4, \&_number_format],
-		'power'				=>[2, \&_power],
-		'quarter'			=>[1, \&_quarter],
-		'rand'				=>[0, \&_rand],
-		'regexp'			=>[2, \&_regexp],
-		'replace'			=>[3, \&_replace],
-		'right'				=>[2, \&_right],
-		'second'			=>[1, \&_second],
-		'space'				=>[1, \&_space],
-		'sprintf'			=>[-1, \&_sprintf],
-		'to_days'			=>[1, \&_to_days],
-		# 'truncate'			=>[-1, \&_truncate],
-		'ucase'				=>[1, \&_ucase],
-		'unix_timestamp'	=>[1, \&_unix_timestamp],
-		'week'				=>[1, \&_week],
-		'weekday'			=>[1, \&_weekday],
-		'year'				=>[1, \&_year],
+        'ceiling'            =>[1, \&_ceiling],
+        'concat'            =>[-1, \&_concat],
+        'curdate'            =>[0, \&_curdate],
+        'curtime'            =>[0, \&_curtime],
+        'dayname'            =>[1, \&_dayname],
+        'dayofmonth'        =>[1, \&_dayofmonth],
+        'dayofweek'            =>[1, \&_dayofweek],
+        'dayofyear'            =>[1, \&_dayofyear],
+        'distance_miles'    =>[4, \&_distance_miles],
+        # 'from_days'            =>[-1, \&_from_days],
+        'from_unixtime'        =>[1, \&_from_unixtime],
+        'hour'                =>[1, \&_hour],
+        'lcase'                =>[1, \&_lcase],
+        'left'                =>[2, \&_left],
+        'locate'            =>[2, \&_locate],
+        'log10'                =>[1, \&_log10],
+        'minute'            =>[1, \&_minute],
+        'month'                =>[1, \&_month],
+        'monthname'            =>[1, \&_monthname],
+        'number_format'        =>[4, \&_number_format],
+        'power'                =>[2, \&_power],
+        'quarter'            =>[1, \&_quarter],
+        'rand'                =>[0, \&_rand],
+        'regexp'            =>[2, \&_regexp],
+        'replace'            =>[3, \&_replace],
+        'right'                =>[2, \&_right],
+        'second'            =>[1, \&_second],
+        'space'                =>[1, \&_space],
+        'sprintf'            =>[-1, \&_sprintf],
+        'to_days'            =>[1, \&_to_days],
+        # 'truncate'            =>[-1, \&_truncate],
+        'ucase'                =>[1, \&_ucase],
+        'unix_timestamp'    =>[1, \&_unix_timestamp],
+        'week'                =>[1, \&_week],
+        'weekday'            =>[1, \&_weekday],
+        'year'                =>[1, \&_year],
     };
     ## See compile_options method
     ## This is very useful to know which features can be used
@@ -122,52 +122,52 @@ sub attribute($;$@)
     my %arg   = ( @_ );
     my %attr  = 
     (
-    'InactiveDestroy'		=> 1, 
-    'AutoInactiveDestroy'	=> 1,
-    'RaiseError'			=> 1, 
-    'PrintError'			=> 1, 
-	'ShowErrorStatement'	=> 1,
-    'Warn'					=> 1, 
-    'Executed'				=> 0,
-    'TraceLevel'			=> 1,
-    'Kids'					=> 0,
-    'ActiveKids'			=> 0, 
-    'CachedKids'			=> 0,
-    'ChildHandles'			=> 0,
-    'PrintWarn'				=> 1,
-    'HandleError'			=> 1,
-    'HandleSetErr'			=> 1,
-    'ErrCount'				=> 1,
-    'FetchHashKeyName'		=> 1,
-    'ChopBlanks'			=> 1,
-    'Taint'					=> 1,
-    'TaintIn'				=> 1,
-    'TaintOut'				=> 1,
-    'Profile'				=> 1,
-    'Type'					=> 1,
+    'InactiveDestroy'        => 1, 
+    'AutoInactiveDestroy'    => 1,
+    'RaiseError'            => 1, 
+    'PrintError'            => 1, 
+    'ShowErrorStatement'    => 1,
+    'Warn'                    => 1, 
+    'Executed'                => 0,
+    'TraceLevel'            => 1,
+    'Kids'                    => 0,
+    'ActiveKids'            => 0, 
+    'CachedKids'            => 0,
+    'ChildHandles'            => 0,
+    'PrintWarn'                => 1,
+    'HandleError'            => 1,
+    'HandleSetErr'            => 1,
+    'ErrCount'                => 1,
+    'FetchHashKeyName'        => 1,
+    'ChopBlanks'            => 1,
+    'Taint'                    => 1,
+    'TaintIn'                => 1,
+    'TaintOut'                => 1,
+    'Profile'                => 1,
+    'Type'                    => 1,
     ## Not used
-    ## 'LongReadLen'			=> 1,
-    ## 'LongTruncOk'			=> 1,
-    ## 'CompatMode'			=> 1,
-    'AutoCommit'			=> 1, 
-    'Name'					=> 0, 
-    'RowCacheSize'			=> 0, 
-    'NUM_OF_FIELDS'			=> 0, 
-    'NUM_OF_PARAMS'			=> 0, 
-    'NAME'					=> 0, 
-    'TYPE'					=> 0, 
-    'PRECISION'				=> 0, 
-    'SCALE'					=> 0, 
-    'NULLABLE'				=> 0, 
-    'CursorName'			=> 0, 
-    'Statement'				=> 0, 
-    'RowsInCache'			=> 0, 
+    ## 'LongReadLen'            => 1,
+    ## 'LongTruncOk'            => 1,
+    ## 'CompatMode'            => 1,
+    'AutoCommit'            => 1, 
+    'Name'                    => 0, 
+    'RowCacheSize'            => 0, 
+    'NUM_OF_FIELDS'            => 0, 
+    'NUM_OF_PARAMS'            => 0, 
+    'NAME'                    => 0, 
+    'TYPE'                    => 0, 
+    'PRECISION'                => 0, 
+    'SCALE'                    => 0, 
+    'NULLABLE'                => 0, 
+    'CursorName'            => 0, 
+    'Statement'                => 0, 
+    'RowsInCache'            => 0, 
     ## Current database name
-    'Name'					=> 0,
-    'Username'				=> 0,
-    'Driver'				=> 0,
-    'sqlite_version'		=> 0,
-    'sqlite_unicode'		=> 1,
+    'Name'                    => 0,
+    'Username'                => 0,
+    'Driver'                => 0,
+    'sqlite_version'        => 0,
+    'sqlite_unicode'        => 1,
     ## If you set this to true, "do" method will process multiple statements at one go.
     ## This may be handy, but with performance penalty. See above for details.
     'sqlite_allow_multiple_statements' => 1,
@@ -208,9 +208,9 @@ sub attribute($;$@)
 
 sub begin_work($;$@)
 {
-	my $self = shift( @_ );
-	$self->{transaction} = 1;
-	return( $self->{dbh}->begin_work( @_ ) );
+    my $self = shift( @_ );
+    $self->{transaction} = 1;
+    return( $self->{dbh}->begin_work( @_ ) );
 }
 
 ## This method is common to DB::Object and DB::Object::Statement
@@ -224,41 +224,41 @@ sub can_update_delete_limit { return( shift->has_compile_option( 'ENABLE_UPDATE_
 
 sub commit($;$@)
 {
-	my $self = shift( @_ );
-	$self->{transaction} = 0;
-	return( $self->{dbh}->commit( @_ ) );
+    my $self = shift( @_ );
+    $self->{transaction} = 0;
+    return( $self->{dbh}->commit( @_ ) );
 }
 
 sub compile_options
 {
-	my $self = shift( @_ );
-	return( [ @$COMPILE_OPTIONS ] ) if( scalar( @$COMPILE_OPTIONS ) );
-	my $tmpdir = File::Spec->tmpdir();
+    my $self = shift( @_ );
+    return( [ @$COMPILE_OPTIONS ] ) if( scalar( @$COMPILE_OPTIONS ) );
+    my $tmpdir = File::Spec->tmpdir();
     my $compile_options_cache_file  = File::Spec->catfile( $tmpdir, 'sql_sqlite_compile_options.cfg' );
     my @options = ();
-	if( -e( $compile_options_cache_file ) && !-z( $compile_options_cache_file ) )
-	{
-		my $fh = IO::File->new( "<$compile_options_cache_file" ) || return( $self->error( "Unable to read the sqlite compile options cache file \"$compile_options_cache_file\": $!" ) );
-		my @all = $fh->getlines;
-		## Remove any comments
-		@options = grep( !/^#/, @all );
-		$fh->close;
-		if( scalar( @options ) )
-		{
-			$COMPILE_OPTIONS = \@options;
-			## Return a copy only to be safe
-			return( [ @options ] );
-		}
-	}
-	## If the cache file does not yet exists or there is no options, we do the query
+    if( -e( $compile_options_cache_file ) && !-z( $compile_options_cache_file ) )
+    {
+        my $fh = IO::File->new( "<$compile_options_cache_file" ) || return( $self->error( "Unable to read the sqlite compile options cache file \"$compile_options_cache_file\": $!" ) );
+        my @all = $fh->getlines;
+        ## Remove any comments
+        @options = grep( !/^#/, @all );
+        $fh->close;
+        if( scalar( @options ) )
+        {
+            $COMPILE_OPTIONS = \@options;
+            ## Return a copy only to be safe
+            return( [ @options ] );
+        }
+    }
+    ## If the cache file does not yet exists or there is no options, we do the query
     my $dbh = $self->{dbh} || return( $self->error( "No active database handler available. You can only call this method once a database connection has been made." ) );
-	my $all = $self->do( "PRAGMA compile_options" )->fetchall_arrayref;
-	@options = map( $_->[0], @$all );
-	my $fh = IO::File->new( ">$compile_options_cache_file" ) || return( $self->error( "Unable to write to sqlite compile options cache file \"$compile_options_cache_file\": $!" ) );
-	$fh->autoflush( 1 );
-	$fh->print( join( "\n", @options ), "\n" ) || return( $self->error( "Unable to write to the sqlite compile options cache file \"$compile_options_cache_file\": $!" ) );
-	$fh->close;
-	$COMPILE_OPTIONS = \@options;
+    my $all = $self->do( "PRAGMA compile_options" )->fetchall_arrayref;
+    @options = map( $_->[0], @$all );
+    my $fh = IO::File->new( ">$compile_options_cache_file" ) || return( $self->error( "Unable to write to sqlite compile options cache file \"$compile_options_cache_file\": $!" ) );
+    $fh->autoflush( 1 );
+    $fh->print( join( "\n", @options ), "\n" ) || return( $self->error( "Unable to write to the sqlite compile options cache file \"$compile_options_cache_file\": $!" ) );
+    $fh->close;
+    $COMPILE_OPTIONS = \@options;
     return( \@options );
 }
 
@@ -286,54 +286,54 @@ sub connect
 
 sub database_file
 {
-	return( shift->{database_file} );
+    return( shift->{database_file} );
 }
 
 sub databases
 {
-	my $self = shift( @_ );
-	## return( $self->error( "Not connected to PostgreSQL server yet. Issue $dbh->connect first." ) ) if( !$self->{ 'dbh' } );
-	my $dbh;
-	## If there is no connection yet, then create one using the postgres login.
-	## There should not be a live user and database just to check what databases there are.
-	if( !$self->{dbh} )
-	{
-		try
-		{
-			$dbh = $self->connect( $con ) || return( undef() );
-		}
-		catch( $e )
-		{
-			$self->message( 3, "An error occurred while trying to connect to get the list of available databases: $e" );
-			return;
-		}
-	}
-	else
-	{
-		$self->message( 3, "Already have a connection database handler '$self->{dbh}'" );
-		$dbh = $self;
-	}
-	my $temp = $dbh->do( "PRAGMA database_list" )->fetchall_arrayref( {} );
-	my @dbases = map( $_->{name}, @$temp );
-	return( @dbases );
+    my $self = shift( @_ );
+    ## return( $self->error( "Not connected to PostgreSQL server yet. Issue $dbh->connect first." ) ) if( !$self->{ 'dbh' } );
+    my $dbh;
+    ## If there is no connection yet, then create one using the postgres login.
+    ## There should not be a live user and database just to check what databases there are.
+    if( !$self->{dbh} )
+    {
+        try
+        {
+            $dbh = $self->connect( $con ) || return( undef() );
+        }
+        catch( $e )
+        {
+            $self->message( 3, "An error occurred while trying to connect to get the list of available databases: $e" );
+            return;
+        }
+    }
+    else
+    {
+        $self->message( 3, "Already have a connection database handler '$self->{dbh}'" );
+        $dbh = $self;
+    }
+    my $temp = $dbh->do( "PRAGMA database_list" )->fetchall_arrayref( {} );
+    my @dbases = map( $_->{name}, @$temp );
+    return( @dbases );
 }
 
 sub func
 {
-	my $self      = shift( @_ );
-	my $table     = shift( @_ );
-	## e.g. table_attributes to get the detail information on table columns
-	my $func_name = shift( @_ );
-	## Returns:
-	## NAME        attribute name
-	## TYPE        attribute type
-	## SIZE        attribute size (-1 for variable size)
-	## NULLABLE    flag nullable
-	## DEFAULT     default value
-	## CONSTRAINT  constraint
-	## PRIMARY_KEY flag is_primary_key
-	## REMARKS     attribute description
-	return( $self->{ 'dbh' }->func( $table, $func_name ) );
+    my $self      = shift( @_ );
+    my $table     = shift( @_ );
+    ## e.g. table_attributes to get the detail information on table columns
+    my $func_name = shift( @_ );
+    ## Returns:
+    ## NAME        attribute name
+    ## TYPE        attribute type
+    ## SIZE        attribute size (-1 for variable size)
+    ## NULLABLE    flag nullable
+    ## DEFAULT     default value
+    ## CONSTRAINT  constraint
+    ## PRIMARY_KEY flag is_primary_key
+    ## REMARKS     attribute description
+    return( $self->{ 'dbh' }->func( $table, $func_name ) );
 }
 
 sub having
@@ -346,22 +346,22 @@ sub having
 ## https://www.sqlite.org/compile.html
 sub has_compile_option
 {
-	my $self = shift( @_ );
-	my $opt  = shift( @_ ) || return( $self->error( "No compile option was provided to check" ) );
-	$opt = uc( $opt );
-	my $all  = $self->compile_options;
-	my @found = grep( /^$opt/, @$all );
-	return( $found[0] ) if( scalar( @found ) );
-	return( '' );
+    my $self = shift( @_ );
+    my $opt  = shift( @_ ) || return( $self->error( "No compile option was provided to check" ) );
+    $opt = uc( $opt );
+    my $all  = $self->compile_options;
+    my @found = grep( /^$opt/, @$all );
+    return( $found[0] ) if( scalar( @found ) );
+    return( '' );
 }
 
 sub init
 {
-	my $self = shift( @_ );
-	$self->SUPER::init( @_ );
-	$self->{driver} = 'SQLite';
-	$self->{_func} = {};
-	return( $self );
+    my $self = shift( @_ );
+    $self->SUPER::init( @_ );
+    $self->{driver} = 'SQLite';
+    $self->{_func} = {};
+    return( $self );
 }
 
 sub last_insert_id
@@ -376,18 +376,18 @@ sub lock { return( shift->error( "Table lock is unsupported in SQLite." ) ); }
 
 sub pragma
 {
-	my $self = shfit( @_ );
-	my $key2val =
-	{
-	'foreign_keys'	=> [ qw( ON OFF ) ],
-	'journal_mode'	=> [ qw( DELETE TRUNCATE ) ],
-	'legacy_file_format'	=> [ qw( ON OFF ) ],
-	'reverse_unordered_selects'	=> [ qw( ON OFF ) ],
-	'synchronous'	=> [ qw( ON OFF ) ],
-	## To avoid corruption after BEGIN starts, DBD uses BEGIN IMMEDIATE. Default is TRUE
-	'sqlite_use_immediate_transaction' => [ qw( 1 0 ) ],
-	'cache_size' => qr/^\d+$/
-	};
+    my $self = shfit( @_ );
+    my $key2val =
+    {
+    'foreign_keys'    => [ qw( ON OFF ) ],
+    'journal_mode'    => [ qw( DELETE TRUNCATE ) ],
+    'legacy_file_format'    => [ qw( ON OFF ) ],
+    'reverse_unordered_selects'    => [ qw( ON OFF ) ],
+    'synchronous'    => [ qw( ON OFF ) ],
+    ## To avoid corruption after BEGIN starts, DBD uses BEGIN IMMEDIATE. Default is TRUE
+    'sqlite_use_immediate_transaction' => [ qw( 1 0 ) ],
+    'cache_size' => qr/^\d+$/
+    };
 }
 
 sub query_object { return( shift->_set_get_object( 'query_object', 'DB::Object::SQLite::Query', @_ ) ); }
@@ -424,9 +424,9 @@ sub replace
         push( @avoid, $field ) if( !CORE::exists( $arg{ $field } ) && $null->{ $field } );
     }
     my $db_data = $self->getdefault({
-    	table => $table,
-    	arg => \@arg,
-    	avoid => \@avoid
+        table => $table,
+        arg => \@arg,
+        avoid => \@avoid
     });
     my( $fields, $values ) = $db_data->format_statement();
     $self->_reset_query();
@@ -482,7 +482,7 @@ sub remove_function
 
 sub rollback
 {
-	return( shift->{dbh}->rollback() );
+    return( shift->{dbh}->rollback() );
 }
 
 sub sql_function_register
@@ -490,20 +490,20 @@ sub sql_function_register
     my $self = shift( @_ );
     my $opts = shift( @_ ) || return( $self->error( "No private function hash reference provided." ) );
     my $dbh = $self->{dbh} || return( $self->error( "No active database handler available." ) );
-	my $flag;
-	my $eval = join( '|', @{$opts->{flags}} );
-	$flag = eval( $eval );
-	my $code = $opts->{code};
-	$self->message( 3, "Regisering private function name '$opts->{name}', max number of arguments '$opts->{argc}'." );
-	if( defined( $flag ) )
-	{
-		$dbh->sqlite_create_function( $opts->{name}, $opts->{argc}, sub{ my @arg = @_; unshift( @arg, $self ); $code->( @arg ); }, $flag );
-	}
-	else
-	{
-		$dbh->sqlite_create_function( $opts->{name}, $opts->{argc}, sub{ my @arg = @_; unshift( @arg, $self ); $code->( @arg ); } );
-	}
-	$opts->{_registered_on} = time();
+    my $flag;
+    my $eval = join( '|', @{$opts->{flags}} );
+    $flag = eval( $eval );
+    my $code = $opts->{code};
+    $self->message( 3, "Regisering private function name '$opts->{name}', max number of arguments '$opts->{argc}'." );
+    if( defined( $flag ) )
+    {
+        $dbh->sqlite_create_function( $opts->{name}, $opts->{argc}, sub{ my @arg = @_; unshift( @arg, $self ); $code->( @arg ); }, $flag );
+    }
+    else
+    {
+        $dbh->sqlite_create_function( $opts->{name}, $opts->{argc}, sub{ my @arg = @_; unshift( @arg, $self ); $code->( @arg ); } );
+    }
+    $opts->{_registered_on} = time();
 }
 
 ## http://www.sqlite.org/c3ref/c_status_malloc_count.html
@@ -527,18 +527,18 @@ sub stat
 # sub table_exists
 # {
 #     my $self = shift( @_ );
-# 	my $table = shift( @_ ) || 
+#     my $table = shift( @_ ) || 
 #     return( $self->error( "You must provide a table name to access the table methods." ) );
 #     my $cache_tables = $self->cache_tables;
 #     my $tables_in_cache = $cache_tables->get({
-#     	host => 'localhost',
-#     	driver => $self->driver,
-#     	port => 0,
-#     	database => $self->database,
+#         host => 'localhost',
+#         driver => $self->driver,
+#         port => 0,
+#         database => $self->database,
 #     });
 #     foreach my $ref ( @$tables_in_cache )
 #     {
-#     	return( 1 ) if( $ref->{name} eq $table );
+#         return( 1 ) if( $ref->{name} eq $table );
 #     }
 #     ## We did not find it, so let's try by checking directly the database
 #     my $def = $self->table_info( $table ) || return( undef() );
@@ -549,23 +549,23 @@ sub stat
 sub table_info
 {
     my $self = shift( @_ );
-	my $table = shift( @_ ) || 
+    my $table = shift( @_ ) || 
     return( $self->error( "You must provide a table name to access the table methods." ) );
     my $opts = {};
     $opts = shift( @_ ) if( $self->_is_hash( $_[0] ) );
     my $sql = <<'EOT';
 SELECT 
-	 name
-	,type
+     name
+    ,type
 FROM sqlite_master
 WHERE type IN ('table', 'view') AND name = ?
 EOT
     my $dbh = $self->{dbh} || return( $self->error( "Could not find database handler." ) );
-	my $sth = $dbh->prepare_cached( $sql ) || return( $self->error( "An error occured while preparing query to check if table \"$table\" exists in database \"", $self->database, "\": ", $dbh->errstr ) );
-	$sth->execute( $table ) || return( $self->error( "An error occured while executing query to check if table \"$table\" exists in database \"", $self->database, "\: ", $sth->errstr ) );
-	my $all = $sth->fetchall_arrayref( {} );
-	$sth->finish;
-	return( $all );
+    my $sth = $dbh->prepare_cached( $sql ) || return( $self->error( "An error occured while preparing query to check if table \"$table\" exists in database \"", $self->database, "\": ", $dbh->errstr ) );
+    $sth->execute( $table ) || return( $self->error( "An error occured while executing query to check if table \"$table\" exists in database \"", $self->database, "\: ", $sth->errstr ) );
+    my $all = $sth->fetchall_arrayref( {} );
+    $sth->finish;
+    return( $all );
 }
 
 sub tables
@@ -576,7 +576,7 @@ sub tables
     my @tables = map( $_->{name}, @$all );
 #     return( wantarray() ? () : undef() ) if( !@tables );
 #     return( wantarray() ? @tables : \@tables );
-	return( \@tables );
+    return( \@tables );
 }
 
 sub tables_info
@@ -609,7 +609,7 @@ sub unlock { return( shift->error( "unlock() does not work with SQLite." ) ); }
 
 sub variables
 {
-	return( shift->error( "variables is currently unsupported in Postgres" ) );
+    return( shift->error( "variables is currently unsupported in Postgres" ) );
 }
 
 ## https://www.sqlite.org/versionnumbers.html
@@ -633,18 +633,19 @@ sub _check_connect_param
     my $param = $self->SUPER::_check_connect_param( @_ );
     if( !$param->{database_file} && $param->{database} )
     {
-    	my $uri = CORE::exists( $param->{uri} ) ? $param->{uri} : '';
-    	my $db = $param->{database} ? $param->{database} : ( $uri->path_segments )[-1];
-    	my $path = $uri ? $uri->path : $db;
-		## $db = Cwd::abs_path( $uri ? $uri->path : $db );
-		$db = File::Spec->rel2abs( $path );
-		## If we cannot find the file and it does not end with .sqlite, let's add the extension
-		## So the user can provide the database parameter just like database => 'test' or database => './test'
-		$db = "$db.sqlite" if( !-e( $db ) && $db !~ /\.sqlite$/i );
-		my( $filename, $path, $ext ) = File::Basename::fileparse( $db, qr/\.[^\.]+$/ );
-		$self->message( 3, "Database file path is '$path', file name '$filename' and extension '$ext'." );
-		$param->{database} = $filename;
-		$param->{database_file} = $self->{database_file} = $db;
+        my( $filename, $path, $ext );
+        my $uri = CORE::exists( $param->{uri} ) ? $param->{uri} : '';
+        my $db = $param->{database} ? $param->{database} : ( $uri->path_segments )[-1];
+        $path = $uri ? $uri->path : $db;
+        ## $db = Cwd::abs_path( $uri ? $uri->path : $db );
+        $db = File::Spec->rel2abs( $path );
+        ## If we cannot find the file and it does not end with .sqlite, let's add the extension
+        ## So the user can provide the database parameter just like database => 'test' or database => './test'
+        $db = "$db.sqlite" if( !-e( $db ) && $db !~ /\.sqlite$/i );
+        ( $filename, $path, $ext ) = File::Basename::fileparse( $db, qr/\.[^\.]+$/ );
+        $self->message( 3, "Database file path is '$path', file name '$filename' and extension '$ext'." );
+        $param->{database} = $filename;
+        $param->{database_file} = $self->{database_file} = $db;
     }
     $param->{ 'host' } = 'localhost' if( !length( $param->{ 'host' } ) );
     $param->{ 'port' } = 0 if( !length( $param->{ 'port' } ) );
@@ -654,12 +655,12 @@ sub _check_connect_param
 
 sub _check_default_option
 {
-	my $self = shift( @_ );
-	my $opts = {};
-	$opts = shift( @_ ) if( @_ );
-	return( $self->error( "Provided option is not a hash reference." ) ) if( !$self->_is_hash( $opts ) );
-	$opts->{sqlite_unicode} = 1 if( !CORE::exists( $opts->{sqlite_unicode} ) );
-	return( $opts );
+    my $self = shift( @_ );
+    my $opts = {};
+    $opts = shift( @_ ) if( @_ );
+    return( $self->error( "Provided option is not a hash reference." ) ) if( !$self->_is_hash( $opts ) );
+    $opts->{sqlite_unicode} = 1 if( !CORE::exists( $opts->{sqlite_unicode} ) );
+    return( $opts );
 }
 
 sub _connection_options
@@ -696,26 +697,26 @@ sub _dbi_connect
     my $func = $self->{ '_func' };
     foreach my $k ( sort( keys( %$PRIVATE_FUNCTIONS ) ) )
     {
-    	my $this = $PRIVATE_FUNCTIONS->{ $k };
-    	my $ref =
-    	{
-    	'name' => $k,
-    	'argc' => $this->[0],
-    	'code' => $this->[1],
-    	};
-    	$func->{ $k } = $ref;
+        my $this = $PRIVATE_FUNCTIONS->{ $k };
+        my $ref =
+        {
+        'name' => $k,
+        'argc' => $this->[0],
+        'code' => $this->[1],
+        };
+        $func->{ $k } = $ref;
     }
     $self->messagef( 3, "Declaring %d private functions.", scalar( keys( %$func ) ) );
     foreach my $name ( sort( keys( %$func ) ) )
     {
-    	my $ref = $func->{ $name };
-    	if( $ref->{ '_registered_on' } )
-    	{
-    		$self->message( 3, "Function $ref->{name} already added on ", scalar( localtime( $ref->{ '_registered_on' } ) ) );
-    		next;
-    	}
-    	$self->sql_function_register( $ref );
-    	$ref->{ '_registered_on' } = time();
+        my $ref = $func->{ $name };
+        if( $ref->{ '_registered_on' } )
+        {
+            $self->message( 3, "Function $ref->{name} already added on ", scalar( localtime( $ref->{ '_registered_on' } ) ) );
+            next;
+        }
+        $self->sql_function_register( $ref );
+        $ref->{ '_registered_on' } = time();
     }
     return( $dbh );
 }
@@ -726,9 +727,9 @@ sub _dsn
     my $db = $self->{database_file} || return( $self->error( "No database file was specified." ) );
     # return( $self->error( "Database file \"$db\" does not exist." ) ) if( !-e( $db ) );
     return( $self->error( "Database file \"$db\" is not writable." ) ) if( -e( $db ) && !-w( $db ) );
-	my @params = ( sprintf( 'dbi:%s:', $self->{driver} ) );
-	push( @params, sprintf( 'dbname=%s', $db ) );
-	return( join( ';', @params ) );
+    my @params = ( sprintf( 'dbi:%s:', $self->{driver} ) );
+    push( @params, sprintf( 'dbname=%s', $db ) );
+    return( join( ';', @params ) );
 }
 
 sub _parse_timestamp
@@ -737,66 +738,66 @@ sub _parse_timestamp
     my $str  = shift( @_ );
     ## No value was actually provided
     return( undef() ) if( !length( $str ) );
-	my $tz = DateTime::TimeZone->new( name => 'local' );
-	my $error = 0;
-	my $opt = 
-	{
-	pattern   => '%Y-%m-%d %T',
-	locale    => 'en_GB',
-	time_zone => $tz->name,
-	on_error => sub{ $error++ },
-	};
-	$self->message( 3, "Checking timestamp string '$str' for appropriate pattern" );
-	## 2019-06-19 23:23:57.000000000+0900
-	## From PostgreSQL: 2019-06-20 11:02:36.306917+09
-	## ISO 8601: 2019-06-20T11:08:27
-	if( $str =~ /(\d{4})[-|\/](\d{1,2})[-|\/](\d{1,2})(?:[[:blank:]]+|T)(\d{1,2}:\d{1,2}:\d{1,2})(?:\.\d+)?((?:\+|\-)\d{2,4})?/ )
-	{
-		my( $date, $time, $zone ) = ( "$1-$2-$3", $4, $5 );
-		if( !length( $zone ) )
-		{
-			my $dt = DateTime->now( time_zone => $tz );
-			my $offset = $dt->offset;
-			## e.g. 9 or possibly 9.5
-			my $offset_hour = ( $offset / 3600 );
-			## e.g. 9.5 => 0.5 * 60 = 30
-			my $offset_min  = ( $offset_hour - CORE::int( $offset_hour ) ) * 60;
-			$zone  = sprintf( '%+03d%02d', $offset_hour, $offset_min );
-		}
-		$self->message( 3, "\tMatched pattern #1 with date '$date', time '$time' and time zone '$zone'." );
-		$date =~ tr/\//-/;
-		$zone .= '00' if( length( $zone ) == 3 );
-		$str = "$date $time$zone";
-		$self->message( 3, "\tChanging string to '$str'" );
-		$opt->{pattern} = '%Y-%m-%d %T%z';
-	}
-	## From SQLite: 2019-06-20 02:03:14
-	## From MySQL: 2019-06-20 11:04:01
-	elsif( $str =~ /(\d{4})[-|\/](\d{1,2})[-|\/](\d{1,2})(?:[[:blank:]]+|T)(\d{1,2}:\d{1,2}:\d{1,2})/ )
-	{
-		my( $date, $time ) = ( "$1-$2-$3", $4 );
-		$self->message( 3, "\tMatched pattern #2 with date '$date', time '$time' and without time zone." );
-		my $dt = DateTime->now( time_zone => $tz );
-		my $offset = $dt->offset;
-		## e.g. 9 or possibly 9.5
-		my $offset_hour = ( $offset / 3600 );
-		## e.g. 9.5 => 0.5 * 60 = 30
-		my $offset_min  = ( $offset_hour - CORE::int( $offset_hour ) ) * 60;
-		my $offset_str  = sprintf( '%+03d%02d', $offset_hour, $offset_min );
-		$date =~ tr/\//-/;
-		$str = "$date $time$offset_str";
-		$self->message( 3, "\tAdding time zone '", $tz->name, "' offset of $offset_str with result: '$str'." );
-		$opt->{pattern} = '%Y-%m-%d %T%z';
-	}
-	elsif( $str =~ /^(\d{4})[-|\/](\d{1,2})[-|\/](\d{1,2})$/ )
-	{
-		$str = "$1-$2-$3";
-		$self->message( 3, "\tMatched pattern #3 with date '$date' only." );
-		$opt->{pattern} = '%Y-%m-%d';
-	}
-	my $strp = DateTime::Format::Strptime->new( %$opt );
-	my $dt = $strp->parse_datetime( $str );
-	return( $dt );
+    my $tz = DateTime::TimeZone->new( name => 'local' );
+    my $error = 0;
+    my $opt = 
+    {
+    pattern   => '%Y-%m-%d %T',
+    locale    => 'en_GB',
+    time_zone => $tz->name,
+    on_error => sub{ $error++ },
+    };
+    $self->message( 3, "Checking timestamp string '$str' for appropriate pattern" );
+    ## 2019-06-19 23:23:57.000000000+0900
+    ## From PostgreSQL: 2019-06-20 11:02:36.306917+09
+    ## ISO 8601: 2019-06-20T11:08:27
+    if( $str =~ /(\d{4})[-|\/](\d{1,2})[-|\/](\d{1,2})(?:[[:blank:]]+|T)(\d{1,2}:\d{1,2}:\d{1,2})(?:\.\d+)?((?:\+|\-)\d{2,4})?/ )
+    {
+        my( $date, $time, $zone ) = ( "$1-$2-$3", $4, $5 );
+        if( !length( $zone ) )
+        {
+            my $dt = DateTime->now( time_zone => $tz );
+            my $offset = $dt->offset;
+            ## e.g. 9 or possibly 9.5
+            my $offset_hour = ( $offset / 3600 );
+            ## e.g. 9.5 => 0.5 * 60 = 30
+            my $offset_min  = ( $offset_hour - CORE::int( $offset_hour ) ) * 60;
+            $zone  = sprintf( '%+03d%02d', $offset_hour, $offset_min );
+        }
+        $self->message( 3, "\tMatched pattern #1 with date '$date', time '$time' and time zone '$zone'." );
+        $date =~ tr/\//-/;
+        $zone .= '00' if( length( $zone ) == 3 );
+        $str = "$date $time$zone";
+        $self->message( 3, "\tChanging string to '$str'" );
+        $opt->{pattern} = '%Y-%m-%d %T%z';
+    }
+    ## From SQLite: 2019-06-20 02:03:14
+    ## From MySQL: 2019-06-20 11:04:01
+    elsif( $str =~ /(\d{4})[-|\/](\d{1,2})[-|\/](\d{1,2})(?:[[:blank:]]+|T)(\d{1,2}:\d{1,2}:\d{1,2})/ )
+    {
+        my( $date, $time ) = ( "$1-$2-$3", $4 );
+        $self->message( 3, "\tMatched pattern #2 with date '$date', time '$time' and without time zone." );
+        my $dt = DateTime->now( time_zone => $tz );
+        my $offset = $dt->offset;
+        ## e.g. 9 or possibly 9.5
+        my $offset_hour = ( $offset / 3600 );
+        ## e.g. 9.5 => 0.5 * 60 = 30
+        my $offset_min  = ( $offset_hour - CORE::int( $offset_hour ) ) * 60;
+        my $offset_str  = sprintf( '%+03d%02d', $offset_hour, $offset_min );
+        $date =~ tr/\//-/;
+        $str = "$date $time$offset_str";
+        $self->message( 3, "\tAdding time zone '", $tz->name, "' offset of $offset_str with result: '$str'." );
+        $opt->{pattern} = '%Y-%m-%d %T%z';
+    }
+    elsif( $str =~ /^(\d{4})[-|\/](\d{1,2})[-|\/](\d{1,2})$/ )
+    {
+        $str = "$1-$2-$3";
+        $self->message( 3, "\tMatched pattern #3 with date '$date' only." );
+        $opt->{pattern} = '%Y-%m-%d';
+    }
+    my $strp = DateTime::Format::Strptime->new( %$opt );
+    my $dt = $strp->parse_datetime( $str );
+    return( $dt );
 }
 
 ## Private function
@@ -885,22 +886,22 @@ sub _from_days
     my $self = shift( @_ );
     my @args = @_;
     my $from_days = $args[0];
-	my $tz = DateTime::TimeZone->new( name => 'local' );
-	my $origin = DateTime->new(
-		year       => 0,
-		month      => 1,
-		day        => 1,
-		hour       => 0,
-		minute     => 0,
-		second     => 0,
-		time_zone => $tz->name,
-	);
-	my $epoch = DateTime->from_epoch( epoch => 0, time_zone => $tz->name );
-	## https://stackoverflow.com/questions/821423/how-can-i-calculate-the-number-of-days-between-two-dates-in-perl#7111718
-	my $epoch_days = $epoch->delta_days( $origin )->delta_days();
-	my $days_since_epoch = $from_days - int( $epoch_days );
-	my $dt = DateTime->from_epoch( epoch => ( $days_since_epoch * 86400 ), time_zone => $tz->name );
-	return( $dt );
+    my $tz = DateTime::TimeZone->new( name => 'local' );
+    my $origin = DateTime->new(
+        year       => 0,
+        month      => 1,
+        day        => 1,
+        hour       => 0,
+        minute     => 0,
+        second     => 0,
+        time_zone => $tz->name,
+    );
+    my $epoch = DateTime->from_epoch( epoch => 0, time_zone => $tz->name );
+    ## https://stackoverflow.com/questions/821423/how-can-i-calculate-the-number-of-days-between-two-dates-in-perl#7111718
+    my $epoch_days = $epoch->delta_days( $origin )->delta_days();
+    my $days_since_epoch = $from_days - int( $epoch_days );
+    my $dt = DateTime->from_epoch( epoch => ( $days_since_epoch * 86400 ), time_zone => $tz->name );
+    return( $dt );
 }
 
 sub _from_unixtime
@@ -980,9 +981,9 @@ sub _number_format
     my( $num, $tho, $dec, $prec ) = @args;
     $self->message( 3, "Number to format '$num' with thousand separator '$tho', decimal separator '$dec' and precision '$prec'." );
     my $fmt = Number::Format->new(
-    	-thousands_sep	=> $tho,
-		-decimal_point	=> $dec,
-		-decimal_digits	=> $prec,
+        -thousands_sep    => $tho,
+        -decimal_point    => $dec,
+        -decimal_digits    => $prec,
     );
     ## 1 means with trailing zeros
     return( $fmt->format_number( $num, $prec, 1 ) );
@@ -1084,7 +1085,7 @@ sub _sprintf
     $self->message( 3, "sprintf formatting with parameters: '", join( "', '", @args ), "'" );
     for( my $i = 0; $i < scalar( @args ); $i++ )
     {
-    	$args[$i] =~ s/'/\\'/g;
+        $args[$i] =~ s/'/\\'/g;
     }
     my $eval = "CORE::sprintf( '" . join( "', '", @args ) . "' )";
     $self->message( 3, "\t evaluating with '$eval'." );
@@ -1099,19 +1100,19 @@ sub _to_days
     my $self = shift( @_ );
     my @args = @_;
     my $dt = $self->_parse_timestamp( $args[0] ) || return;
-	my $tz = DateTime::TimeZone->new( name => 'local' );
-	my $origin = DateTime->new(
-		year       => 0,
-		month      => 1,
-		day        => 1,
-		hour       => 0,
-		minute     => 0,
-		second     => 0,
-		time_zone => $tz->name,
-	);
+    my $tz = DateTime::TimeZone->new( name => 'local' );
+    my $origin = DateTime->new(
+        year       => 0,
+        month      => 1,
+        day        => 1,
+        hour       => 0,
+        minute     => 0,
+        second     => 0,
+        time_zone => $tz->name,
+    );
     ## https://stackoverflow.com/questions/821423/how-can-i-calculate-the-number-of-days-between-two-dates-in-perl#7111718
-	my $days = $dt->delta_days( $origin )->delta_days();
-	return( $days );
+    my $days = $dt->delta_days( $origin )->delta_days();
+    return( $days );
 }
 
 # sub _truncate
@@ -1212,63 +1213,76 @@ DB::Object::Postgres - SQL API
 
 =head1 SYNOPSIS
 
-    use DB::Object::Postgres;
+    use DB::Object;
 
-    my $db = DB::Object::Postgres->new();
-    my $dbh = DB::Object::Postgres->connect();
+    my $dbh = DB::Object->connect({
+    driver => 'SQLite',
+    conf_file => 'db-settings.json',
+    database => 'webstore',
+    host => 'localhost',
+    login => 'store-admin',
+    schema => 'auth',
+    debug => 3,
+    }) || bailout( "Unable to connect to sql server on host localhost: ", DB::Object->error );
     
+    # Legacy regular query
     my $sth = $dbh->prepare( "SELECT login,name FROM login WHERE login='jack'" ) ||
     die( $dbh->errstr() );
     $sth->execute() || die( $sth->errstr() );
     my $ref = $sth->fetchrow_hashref();
     $sth->finish();
     
-    ## Get the table 'login' object
-    my $login = $dbh->login();
-    $login->where( "login='jack'" );
-    ## Now, much better less hassle ;-)
-    my $ref = $login->select->fetchrow_hashref();
+    # Get a list of databases;
+    my @databases = $dbh->databases;
+    # Doesn't exist? Create it:
+    my $dbh2 = $dbh->create_db( 'webstore' );
+    # Load some sql into it
+    my $rv = $dbh2->do( $sql ) || die( $dbh->error );
     
-    ## Now let's join
-    my $login = $dbh->login();
-    $login->where( "login='jack'" );
-    ## We get all info regarding user jack and his list
-    my $ref = $login->select->join( 'list' )->fetchrow_hashref();
+    # Check a table exists
+    $dbh->table_exists( 'customers' ) || die( "Cannot find the customers table!\n" );
     
-    ## Same but we give it a higher priority. Having fun obviously...
-    my $ref = $login->select->join( 'list' )->priority( 1 )->fetchrow_hashref();
+    # Get list of tables, as array reference:
+    my $tables = $dbh->tables;
     
-    ## Copy user jack info to user bob
-    $login->where( "login='jack'" );
-    $login->copy( 'login' => 'bob' );
+    my $cust = $dbh->customers || die( "Cannot get customers object." );
+    $cust->where( email => 'john@example.org' );
+    my $str = $cust->delete->as_string;
+    # Becomes: DELETE FROM customers WHERE email='john\@example.org'
     
-    ## Insert some data. Anything we do not provide will fall back to default values
-    $login->insert( 'login' => 'bob' );
-    ## Same but with a low *non waiting* flag
-    $login->insert( 'login' => 'bob' )->wait();
-    ## Same but ignore if already exists or error occur
-    $login->insert( 'login' => 'jack' )->ignore();
-    
+    # Do some insert with transaction
+    $dbh->begin_work;
+    # Making some other inserts and updates here...
+    my $cust_sth_ins = $cust->insert(
+        first_name => 'Paul',
+        last_name => 'Goldman',
+        email => 'paul@example.org',
+        active => 0,
+    ) || do
+    {
+        # Rollback everything since the begin_work
+        $dbh->rollback;
+        die( "Error while create query to add data to table customers: " . $cust->error );
+    };
+    $result = $cust_sth_ins->as_string;
+    # INSERT INTO customers (first_name, last_name, email, active) VALUES('Paul', 'Goldman', 'paul\@example.org', '0')
+    $dbh->commit;
     ## Get the last used insert id
     my $id = $dbh->last_insert_id();
     
-    ## Delete that user
-    ## you'd better specify a where clause or you'll find yourself
-    ## suppressing everything in the table...
-    $login->where( "login='bob'" );
-    $login->delete();
-    ## But you could also write
-    my $rows = $login->delete( "login='bob'" )->rows();
+    $cust->where( email => 'john@example.org' );
+    $cust->order( 'last_name' );
+    $cust->having( email => qr/\@example/ );
+    $cust->limit( 10 );
+    my $cust_sth_sel = $cust->select || die( "An error occurred while creating a query to select data frm table customers: " . $cust->error );
+    # Becomes:
+    # SELECT id, first_name, last_name, email, created, modified, active, created::ABSTIME::INTEGER AS created_unixtime, modified::ABSTIME::INTEGER AS modified_unixtime, CONCAT(first_name, ' ', last_name) AS name FROM customers WHERE email='john\@example.org' HAVING email ~ '\@example' ORDER BY last_name LIMIT 10
     
-    ## Make a query but get the qery string instead of performing it in real
-    $login->where( "login like 'jac%'" );
-    $login->limit( 10 );
-    $login->group( 'last_name' );
-    $login->order( 'last_name' );
-    ## Reverse sorting
-    $login->reverse();
-    print( STDOUT "Here is my SQL statement:\n",
-    $login->select->join( 'list' )->priority( 1 )->as_string() );
+    $cust->reset;
+    $cust->where( email => 'john@example.org' );
+    my $cust_sth_upd = $cust->update( active => 0 )
+    # Would become:
+    # UPDATE ONLY customers SET active='0' WHERE email='john\@example.org'
     
     ## Lets' dump the result of our query
     ## First to STDERR
@@ -1277,16 +1291,6 @@ DB::Object::Postgres - SQL API
     ## Now dump the result to a file
     $login->select->dump( "my_file.txt" );
     
-    ## Get that table 'login' structure
-    my $data = $login->structure();
-    
-    ## Some info on the status of the SQL server
-    my $status_ref = $dbh->stat();
-    ## or (it does not matter)
-    my $status_ref = $login->stat();
-    ## optimize the table, i.e. claim for free space and cleanups
-    $login->optimize();
-
 =head1 DESCRIPTION
 
 L<DB::Object::Postgres> is a SQL API much alike L<DBD::Pg>.
@@ -1720,7 +1724,7 @@ Prepares an INSERT query using the field-value pairs provided.
 
 If a L<DB::Object::Postgres::Statement> object is provided as first argument, it will considered as a SELECT query to be used in the INSERT query, as in: INSERT INTO my table SELECT FROM another_table
 
-Otherwise, B<insert? will build the query based on the fields provided.
+Otherwise, B<insert> will build the query based on the fields provided.
 
 In scalar context, it returns the result of B<execute> and in list context, it returns the statement object.
 

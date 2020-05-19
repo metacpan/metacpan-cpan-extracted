@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.008;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,13 +14,14 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Docker-Names-Random",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.008",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Docker::Names::Random",
   "PREREQ_PM" => {
     "English" => 0,
     "Exporter" => 0,
     "Hash::Util" => 0,
     "YAML::PP" => 0,
+    "feature" => 0,
     "strict" => 0,
     "utf8" => 0,
     "warnings" => 0
@@ -35,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.0.1",
+  "VERSION" => "0.0.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,6 +55,7 @@ my %FallbackPrereqs = (
   "Test2::V0" => 0,
   "Test::More" => 0,
   "YAML::PP" => 0,
+  "feature" => 0,
   "lib" => 0,
   "strict" => 0,
   "utf8" => 0,

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Interface to Web Assembly Memory
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 1;
@@ -21,7 +21,7 @@ Wasm::Func - Interface to Web Assembly Memory
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -61,10 +61,10 @@ Call Perl from Wasm:
 
 =head1 DESCRIPTION
 
-This class represents a function exported from a WebAssembly
-module.  Each function exported from WebAssembly is automatically
+This documents the interface to functions for L<Wasm>.
+Each function exported from WebAssembly is automatically
 imported into Perl space as a Perl subroutine.  Wasm modules
-can import Perl subroutines using the standard import process.
+can import Perl subroutines using their standard import process.
 
 =head1 SEE ALSO
 

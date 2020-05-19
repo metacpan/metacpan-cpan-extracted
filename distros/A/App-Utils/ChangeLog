@@ -1,0 +1,14 @@
+-*- mode: Fundamental; -*-
+App::Utils Perl package
+
+2020-05-13 17:11:41 Version 0.01 Vlado Keselj
+ - Initial release
+ - included command "date-tag"
+
+2020-05-13 19:54:37 Version 0.02
+ - Correcting minor typos
+ - added command "save"
+
+2020-05-13 20:39:27 Version 0.03
+ - added command "remove-empty-dirs"
+

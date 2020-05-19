@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v0.994-5-g16d6c1b
+package Test::JSON::Schema::Acceptance; # git description: v0.995-5-ge072fef
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators like JSON::Schema
 
-our $VERSION = '0.995';
+our $VERSION = '0.996';
 
 no if "$]" >= 5.031009, feature => 'indirect';
 use Test::More ();
@@ -223,12 +223,14 @@ sub _build__test_data {
       my ($path) = @_;
       return if not $path->is_file;
       return if $path !~ /\.json$/;
+      my $data = $self->_json_decoder->decode($path->slurp_raw);
+      return if not @$data; # placeholder files for renamed tests
       my $file = $path->relative($self->test_dir);
       push @test_groups, [
-        scalar(()= split('/', $file)),
+        scalar(split('/', $file)),
         {
           file => $file,
-          json => $self->_json_decoder->decode($path->slurp_raw),
+          json => $data,
         },
       ];
     },
@@ -237,7 +239,7 @@ sub _build__test_data {
 
   return [
     map $_->[1],
-      sort { $a->[0] <=> $b->[0] && $a->[1]{file} cmp $b->[1]{file} }
+      sort { $a->[0] <=> $b->[0] || $a->[1]{file} cmp $b->[1]{file} }
       @test_groups
   ];
 }
@@ -258,7 +260,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 0.995
+version 0.996
 
 =head1 SYNOPSIS
 

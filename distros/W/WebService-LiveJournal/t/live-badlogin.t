@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use File::Glob qw( bsd_glob );
+use File::Path qw( mkpath );
 use WebService::LiveJournal;
 use WebService::LiveJournal::Client;
 
@@ -8,11 +10,12 @@ plan skip_all => 'for live tests set TEST_WEBSERVICE_LIVEJOURNAL' unless defined
 
 my $data_dir = eval q{
   use YAML;
-  use File::HomeDir;
-  File::HomeDir->my_dist_data('WebService-LiveJournal', { create => 1 });
+  my $dir = bsd_glob '~/.local/share/Perl/dist/WebService-LiveJournal';
+  mkpath $dir, 0, 0700;
+  $dir;
 };
 
-plan skip_all => 'test requires File::HomeDir and YAML' unless -d $data_dir;
+plan skip_all => 'test requires YAML' unless -d $data_dir;
 
 note "data_dir = $data_dir";
 

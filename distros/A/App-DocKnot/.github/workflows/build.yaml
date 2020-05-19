@@ -1,0 +1,44 @@
+name: build
+
+on:
+  push:
+    branches-ignore:
+      - "debian/**"
+      - "pristine-tar"
+      - "ubuntu/**"
+      - "upstream/**"
+    tags:
+      - "release/*"
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  perl:
+    env:
+      AUTHOR_TESTING: 1
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        perl-version:
+          - "5.30"
+          - "5.28"
+          - "5.26"
+          - "5.24"
+
+    container:
+      image: perldocker/perl-tester:${{ matrix.perl-version }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: perl -V
+        run: perl -V
+      - name: Install Dependencies
+        run: cpm install -g --show-build-log-on-failure
+      - name: Build.PL
+        run: perl Build.PL
+      - name: make test
+        run: ./Build test

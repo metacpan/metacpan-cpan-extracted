@@ -16,8 +16,11 @@ script:
 
 jobs:
   include:
-    - env: CIP_TAG=5.29
-    - env: CIP_TAG=5.28-fedora29
+    - env: CIP_TAG=5.31
+    - env: CIP_TAG=5.30
+    - env: CIP_TAG=5.30-buster-arm64v8
+      arch: arm64
+    - env: CIP_TAG=5.30-fedora29
     - env: CIP_TAG=5.28 INSTALL_PKGCONF_FROM_GIT=1
     - env: CIP_TAG=5.28
     - env: CIP_TAG=5.26
@@ -29,7 +32,11 @@ jobs:
     - env: CIP_TAG=5.14
     - env: CIP_TAG=5.12
     - env: CIP_TAG=5.10
-    - env: CIP_TAG=5.8.8
+    - env: CIP_TAG=5.8
+
+branches:
+  only:
+    - master
 
 cache:
   directories:

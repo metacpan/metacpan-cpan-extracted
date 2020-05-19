@@ -2,7 +2,7 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
-                                        'perl' => '5.008'
+                                        'perl' => '5.010'
                                       }
                       },
        'develop' => {
@@ -37,7 +37,8 @@ do { my $x = {
                                       'Exporter' => '0',
                                       'Hash::Util' => '0',
                                       'YAML::PP' => '0',
-                                      'perl' => '5.008',
+                                      'feature' => '0',
+                                      'perl' => '5.010',
                                       'strict' => '0',
                                       'utf8' => '0',
                                       'warnings' => '0'
@@ -56,7 +57,7 @@ do { my $x = {
                                    'Test2::V0' => '0',
                                    'Test::More' => '0',
                                    'lib' => '0',
-                                   'perl' => '5.008'
+                                   'perl' => '5.010'
                                  }
                  }
      };

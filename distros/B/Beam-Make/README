@@ -31,15 +31,16 @@ These recipe classes come with "Beam::Make":
 
 *   DBI::CSV - Load data from a CSV into a database table
 
+*   Docker::Image - Build or pull a Docker image
+
+*   Docker::Container - Build a Docker container
+
 Future recipe class ideas are:
 
 *   Template rendering: Files could be generated from a configuration
     file or database and a template.
 
-*   Docker image, container, compose: A Docker container could depend on
-    a Docker image. When the image is updated, the container would get
-    rebuilt and restarted. The Docker image could depend on a directory
-    and get rebuilt if the directory or its Dockerfile changes.
+*   Docker compose: An entire docker-compose network could be rebuilt.
 
 *   System services (init daemon, systemd service, etc...): Services
     could depend on their configuration files (built with a template)

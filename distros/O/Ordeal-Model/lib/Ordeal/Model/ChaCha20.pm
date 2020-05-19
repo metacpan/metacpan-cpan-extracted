@@ -9,7 +9,7 @@ package Ordeal::Model::ChaCha20;
 use 5.020;
 use strict;
 use warnings;
-{ our $VERSION = '0.002'; }
+{ our $VERSION = '0.003'; }
 use Ouch;
 use Mo qw< build default >;
 use experimental qw< signatures postderef >;
@@ -56,30 +56,34 @@ sub freeze ($self) {
    return join '', $release, $state, $buflen, $buffer, $seed;
 }
 
-sub int_rand ($self, $low, $high) {
-   my $N = $high - $low + 1;
+sub _int_rand_parameters ($self, $N) {
    state $cache = {};
-   my ($nbits, $reject_threshold);
-   if (exists $cache->{$N}) {
-      ($nbits, $reject_threshold) = $cache->{$N}->@*;
+   return $cache->{$N}->@* if exists $cache->{$N};
+
+   # basic parameters, find the minimum number of bits to cover $N
+   my $nbits = int(log($N) / log(2));
+   my $M = 2 ** $nbits;
+   while ($M < $N) {
+      $nbits++;
+      $M *= 2;
    }
-   else {
-      $nbits = int(log($N) / log(2));
-      my $M = 2 ** $nbits;
-      while ($M < $N) {
+   my $reject_threshold = $M - $M % $N; # same as $N here
+
+   # if there is still space in the cache, this pair will be used many
+   # times, so we want to reduce the rejection rate
+   if (keys($cache->%*) <= CACHE_SIZE) {
+      while (($nbits * $M / $reject_threshold) > ($nbits + 1)) {
          $nbits++;
          $M *= 2;
+         $reject_threshold = $M - $M % $N;
       }
-      $reject_threshold = $M - $M % $N;
-      if (keys($cache->%*) <= CACHE_SIZE) { # will cache, optimize it
-         while (($nbits * $M / $reject_threshold) > ($nbits + 1)) {
-            $nbits++;
-            $M *= 2;
-            $reject_threshold = $M - $M % $N;
-         }
-         $cache->{$N} = [$nbits, $reject_threshold];
-      }
-   } ## end else [ if ($N <= CACHE_SIZE &&...)]
+   }
+   return ($nbits, $reject_threshold);
+}
+
+sub int_rand ($self, $low, $high) {
+   my $N = $high - $low + 1;
+   my ($nbits, $reject_threshold) = $self->_int_rand_parameters($N);
    my $retval = $reject_threshold;
    while ($retval >= $reject_threshold) {
       my $bitsequence = $self->_bits_rand($nbits);

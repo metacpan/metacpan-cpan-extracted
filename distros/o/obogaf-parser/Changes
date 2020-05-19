@@ -1,3 +1,13 @@
+#### obogaf::parser 1.373
+
+#### NEW FEATURES
+- added the new subroutine obo_filter with test
+- improved subroutine get_parents_or_children_list and gene2biofun
+
+###### CHANGES
+- added case insensitive regex to read obo and gaf file
+- improved tutorial
+
 #### obogaf::parser 1.272
 
 ###### CHANGES

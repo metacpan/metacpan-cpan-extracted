@@ -1,5 +1,5 @@
 package Beam::Make::DBI::CSV;
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 # ABSTRACT: A Beam::Make recipe 
 
 #pod =head1 SYNOPSIS
@@ -136,7 +136,7 @@ Beam::Make::DBI::CSV - A Beam::Make recipe
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 

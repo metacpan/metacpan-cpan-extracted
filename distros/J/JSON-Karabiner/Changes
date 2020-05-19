@@ -1,0 +1,57 @@
+Revision history for JSON-Karabiner
+
+0.017
+  - Expansion of dsl methods for even easier use for non-technical users
+  - Documentation updates to reflect new dsl interface
+
+0.016 - 0.014
+  - major bug fixes
+  - documentation for new DSL
+  - removal of older documentation
+
+0.013
+  - doc improvements
+
+0.012
+  - fix smoke tests (again)
+
+0.011
+  - add experimental DSL feature
+
+0.010     2020-05-15 08:31:05-04:00 America/New_York
+  - fix directory check bug
+  - satisfy smoke testers
+  - remove some minor cruft
+
+0.008     2020-05-14 19:33:01-04:00 America/New_York
+  - documentation corrections and improvements
+
+0.007
+  - add validity checks to ensure 'from' actions exists and is populated
+  - add mechanism for turning off validity checks
+  - create _fake_write_file method for testing
+
+0.006     2020-05-14 15:52:31-04:00 America/New_York
+  - add check on directory where file is to be saved
+  - fixed critical typo that created bad json property
+
+0.005     2020-05-14 12:09:31-04:00 America/New_York
+  - minor documentation improvements
+  - remove crufty files
+
+0.004     2020-05-14 11:15:53-04:00 America/New_York
+  - fix POD error
+  - documentation improvements
+
+0.003     2020-05-14 02:26:29-04:00 America/New_York
+  - alpha release
+  - first draft of documentation added
+  - add missing conditions
+  - fixed bug in from method for adding key code
+  - first release to cpan
+
+0.002     2020-05-13 18:17:14-04:00 America/New_York
+  - early alpha release
+
+0.001     2020-05-13 17:23:41-04:00 America/New_York
+  -init commit

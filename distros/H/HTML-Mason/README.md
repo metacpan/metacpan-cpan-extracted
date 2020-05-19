@@ -4,7 +4,7 @@ HTML::Mason - High-performance, dynamic web site authoring system
 
 # VERSION
 
-version 1.58
+version 1.59
 
 # SYNOPSIS
 
@@ -70,6 +70,15 @@ of Perl code (say, to pull records from a database). They can also
 call other components, cache results for later reuse, and perform all
 the tricks you expect from a regular Perl program.
 
+# MAINTENANCE HELP NEEDED
+
+I (Dave Rolsky) am no longer using HTML::Mason and I would love to find some
+co-maintainers to help. Specifically, I'd like people to review issues and
+PRs, create new PRs, and ultimately take on the task of uploading new releases
+to CPAN. If you're interested the best way to start is to fix one or more of
+the issues in the [issue
+tracker](https://github.com/houseabsolute/HTML-Mason/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc).
+
 # WAIT - HAVE YOU SEEN MASON 2?
 
 Version 1 of Mason (this distribution) -- has been around since 1998, is in
@@ -115,7 +124,7 @@ running mod\_perl.
 
 The <Location> section routes all requests to the Mason handler, which
 is a simple way to try out Mason. A more refined setup is discussed
-in the [Controlling Access via Filename Extension](https://metacpan.org/pod/HTML::Mason::Admin#Controlling-Access-via-Filename-Extension) section of the administrator's manual.
+in the [Controlling Access via Filename Extension](https://metacpan.org/pod/HTML%3A%3AMason%3A%3AAdmin#Controlling-Access-via-Filename-Extension) section of the administrator's manual.
 
 Once you have added the configuration directives, restart the
 server. First, go to a standard URL on your site to make sure you
@@ -135,25 +144,25 @@ reload this page and see a "4", Mason is working!
 # DOCUMENTATION ROADMAP
 
 Once Mason is on its feet, the next step is to write a component or
-two. The [Mason Developer's Manual](https://metacpan.org/pod/HTML::Mason::Devel) is a
+two. The [Mason Developer's Manual](https://metacpan.org/pod/HTML%3A%3AMason%3A%3ADevel) is a
 complete tutorial for writing, using, and debugging components. A
 reference companion to the Developer's Manual is the Request API
-documentation, [HTML::Mason::Request](https://metacpan.org/pod/HTML::Mason::Request).
+documentation, [HTML::Mason::Request](https://metacpan.org/pod/HTML%3A%3AMason%3A%3ARequest).
 
 Whoever is responsible for setting up and tuning Mason should read the
-[Administrator's Manual](https://metacpan.org/pod/HTML::Mason::Admin), though developers
+[Administrator's Manual](https://metacpan.org/pod/HTML%3A%3AMason%3A%3AAdmin), though developers
 will also benefit from reading it as well. This document covers more
 advanced configuration scenarios and performance optimization. The
 reference companion to the Administrator's manual is the
-[Parameters Reference](https://metacpan.org/pod/HTML::Mason::Params), which describes all the
+[Parameters Reference](https://metacpan.org/pod/HTML%3A%3AMason%3A%3AParams), which describes all the
 parameters you can use to configure Mason.
 
 Most of this documentation assumes that you're running Mason on top of
 mod\_perl, since that is the most common configuration.  If you would
 like to run Mason via a CGI script, refer to the
-[HTML::Mason::CGIHandler](https://metacpan.org/pod/HTML::Mason::CGIHandler) documentation.
+[HTML::Mason::CGIHandler](https://metacpan.org/pod/HTML%3A%3AMason%3A%3ACGIHandler) documentation.
 If you are using Mason from a standalone program, refer to
-the [Using Mason from a Standalone Script](https://metacpan.org/pod/HTML::Mason::Admin#Using-Mason-from-a-Standalone-Script) section of the administrator's manual.
+the [Using Mason from a Standalone Script](https://metacpan.org/pod/HTML%3A%3AMason%3A%3AAdmin#Using-Mason-from-a-Standalone-Script) section of the administrator's manual.
 
 There is also a book about Mason, _Embedding Perl in HTML with
 Mason_, by Dave Rolsky and Ken Williams, published by O'Reilly and
@@ -177,7 +186,7 @@ Bugs and feature requests will be tracked at RT:
 
 # SUPPORT
 
-Bugs may be submitted at [http://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Mason](http://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Mason) or via email to [bug-html-mason@rt.cpan.org](mailto:bug-html-mason@rt.cpan.org).
+Bugs may be submitted at [https://github.com/houseabsolute/HTML-Mason/issues](https://github.com/houseabsolute/HTML-Mason/issues).
 
 I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
 
@@ -196,6 +205,7 @@ The source code repository for HTML-Mason can be found at [https://github.com/ho
 - Ævar Arnfjörð Bjarmason <avarab@gmail.com>
 - Alex Balhatchet <kaoru@slackwise.net>
 - Alex Vandiver <alex@chmrr.net>
+- Florian Schlichting <fsfs@debian.org>
 - John Williams <jwilliams@cpan.org>
 - Kent Fredric <kentnl@gentoo.org>
 - Kevin Falcone <falcone@bestpractical.com>
@@ -205,7 +215,7 @@ The source code repository for HTML-Mason can be found at [https://github.com/ho
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 1998 - 2017 by Jonathan Swartz.
+This software is copyright (c) 1998 - 2020 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

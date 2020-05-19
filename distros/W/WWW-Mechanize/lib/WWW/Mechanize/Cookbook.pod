@@ -13,7 +13,7 @@ WWW::Mechanize::Cookbook - Recipes for using WWW::Mechanize
 
 =head1 VERSION
 
-version 1.96
+version 1.97
 
 =head1 INTRODUCTION
 
@@ -95,7 +95,7 @@ Andy Lester <andy at petdance.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2004-2016 by Andy Lester.
+This software is copyright (c) 2004 by Andy Lester.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

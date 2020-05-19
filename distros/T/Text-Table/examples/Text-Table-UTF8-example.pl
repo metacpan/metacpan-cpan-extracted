@@ -2,49 +2,47 @@
 
 use strict;
 use warnings;
-
 use utf8;
 
-use Text::Table;
+use Text::Table ();
 
 binmode STDOUT, ':utf8';
 
 my @cols = qw/First Last Country/;
-my $sep = \'│';
+my $sep  = \'│';
 
 my $major_sep = \'║';
-my $tb = Text::Table->new($sep,  " Number ", $major_sep,
-    (map { +(" $_ ", $sep) } @cols)
-);
+my $tb        = Text::Table->new( $sep, " Number ", $major_sep,
+    ( map { +( " $_ ", $sep ) } @cols ) );
 
 my $num_cols = @cols;
 
-$tb->load([1, "Mark", "Twain", "USA",]);
-$tb->load([2, "Charles", "Dickens", "Britain",]);
-$tb->load([3, "Jules", "Verne", "France",]);
+$tb->load( [ 1, "Mark",    "Twain",   "USA", ] );
+$tb->load( [ 2, "Charles", "Dickens", "Britain", ] );
+$tb->load( [ 3, "Jules",   "Verne",   "France", ] );
 
 my $make_rule = sub {
     my ($args) = @_;
 
-    my $left = $args->{left};
-    my $right = $args->{right};
+    my $left      = $args->{left};
+    my $right     = $args->{right};
     my $main_left = $args->{main_left};
-    my $middle = $args->{middle};
+    my $middle    = $args->{middle};
 
     return $tb->rule(
         sub {
-            my ($index, $len) = @_;
+            my ( $index, $len ) = @_;
 
-            return ('─' x $len);
+            return ( '─' x $len );
         },
         sub {
-            my ($index, $len) = @_;
+            my ( $index, $len ) = @_;
 
-            my $char =
-            (     ($index == 0) ? $left
-                : ($index == 1) ? $main_left
-                : ($index == $num_cols+1) ? $right
-                : $middle
+            my $char = (
+                  ( $index == 0 )             ? $left
+                : ( $index == 1 )             ? $main_left
+                : ( $index == $num_cols + 1 ) ? $right
+                :                               $middle
             );
 
             return $char x $len;
@@ -54,34 +52,33 @@ my $make_rule = sub {
 
 my $start_rule = $make_rule->(
     {
-        left => '┌',
+        left      => '┌',
         main_left => '╥',
-        right => '┐',
-        middle => '┬',
+        right     => '┐',
+        middle    => '┬',
     }
 );
 
 my $mid_rule = $make_rule->(
     {
-        left => '├',
+        left      => '├',
         main_left => '╫',
-        right => '┤',
-        middle => '┼',
+        right     => '┤',
+        middle    => '┼',
     }
 );
 
 my $end_rule = $make_rule->(
     {
-        left => '└',
+        left      => '└',
         main_left => '╨',
-        right => '┘',
-        middle => '┴',
+        right     => '┘',
+        middle    => '┴',
     }
 );
 
-
 print $start_rule, $tb->title,
-    (map { $mid_rule, $_, } $tb->body()), $end_rule;
+    ( map { $mid_rule, $_, } $tb->body() ), $end_rule;
 
 __END__
 

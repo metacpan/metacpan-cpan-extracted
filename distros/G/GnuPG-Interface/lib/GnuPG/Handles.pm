@@ -73,7 +73,7 @@ GnuPG::Handles - GnuPG handles bundle
     = ( IO::Handle->new(), IO::Handle->new(), IO::Handle->new(),
         IO::Handle->new(), IO::Handle->new(), IO::Handle->new(),
       );
- 
+
   my $handles = GnuPG::Handles->new
     ( stdin      => $stdin,
       stdout     => $stdout,

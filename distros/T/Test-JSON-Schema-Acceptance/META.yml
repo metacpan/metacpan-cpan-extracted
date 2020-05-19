@@ -3,8 +3,8 @@ abstract: 'Acceptance testing for JSON-Schema based validators like JSON::Schema
 author:
   - 'Ben Hutton (@relequestual) <relequest@cpan.org>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
   File::Spec: '0'
-  Module::Metadata: '0'
   Test::Deep: '0'
   Test::File::ShareDir: '0'
   Test::More: '0.88'
@@ -36,7 +36,7 @@ no_index:
 provides:
   Test::JSON::Schema::Acceptance:
     file: lib/Test/JSON/Schema/Acceptance.pm
-    version: '0.995'
+    version: '0.996'
 requires:
   File::ShareDir: '0'
   JSON::MaybeXS: '1.004001'
@@ -57,7 +57,7 @@ resources:
   bugtracker: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance/issues
   homepage: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance
   repository: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance.git
-version: '0.995'
+version: '0.996'
 x_Dist_Zilla:
   perl:
     version: '5.031011'
@@ -82,7 +82,7 @@ x_Dist_Zilla:
           quiet: 0
           run:
             - 'git submodule update --remote'
-            - 'echo "run `update-share` to commit submodule updates to share/"'
+            - "echo \"run './update-share' to commit submodule updates to share/\""
           version: '0.048'
       name: Run::BeforeRelease
       version: '0.048'
@@ -502,18 +502,12 @@ x_Dist_Zilla:
       name: '@Author::ETHER/MinimumPerl'
       version: '1.006'
     -
-      class: inc::MakeMaker
+      class: Dist::Zilla::Plugin::MakeMaker
       config:
-        Dist::Zilla::Plugin::MakeMaker:
-          make_path: make
-          version: '6.014'
-        Dist::Zilla::Plugin::MakeMaker::Awesome:
-          version: '0.48'
         Dist::Zilla::Role::TestRunner:
           default_jobs: 9
-          version: '6.014'
-      name: '@Author::ETHER/=inc::MakeMaker'
-      version: ~
+      name: '@Author::ETHER/MakeMaker'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
@@ -748,7 +742,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.995
+          tag: v0.996
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -885,8 +879,12 @@ x_Dist_Zilla:
       version: '2.046'
     -
       class: Dist::Zilla::Plugin::GenerateFile
-      name: GenerateFile
+      name: submodule_status
       version: '6.014'
+    -
+      class: inc::OldShareDirFiles
+      name: =inc::OldShareDirFiles
+      version: ~
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: ShareDir

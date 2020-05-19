@@ -4,73 +4,60 @@ use Mojo::Base 'Test::Mojo';
 use Mojo::Util qw(b64_decode hmac_sha1_sum);
 use Mojo::JSON 'decode_json';
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 sub new {
   my $self = shift->SUPER::new(@_);
   return $self;
 }
 
+# Compatibility hack for Mojolicious < 8.36
+sub test {
+  if (Test::Mojo->can('test')) {
+    return shift->SUPER::test(@_);
+  }
+  return shift->SUPER::_test(@_);
+}
+
 sub session_has {
   my ($self, $p, $desc) = @_;
   $desc //= qq{session has value for JSON Pointer "$p"};
   my $session = $self->_extract_session;
-  return $self->_test('ok', !!Mojo::JSON::Pointer->new($session)->contains($p), $desc);
+  return $self->test('ok', !!Mojo::JSON::Pointer->new($session)->contains($p), $desc);
 }
 
 sub session_hasnt {
   my ($self, $p, $desc) = @_;
   $desc //= qq{session has no value for JSON Pointer "$p"};
   my $session = $self->_extract_session;
-  return $self->_test('ok', !Mojo::JSON::Pointer->new($session)->contains($p), $desc);
+  return $self->test('ok', !Mojo::JSON::Pointer->new($session)->contains($p), $desc);
 }
 
 sub session_is {
   my ($self, $p, $data, $desc) = @_;
   $desc //= qq{session exact match for JSON Pointer "$p"};
   my $session = $self->_extract_session;
-  return $self->_test('is_deeply', Mojo::JSON::Pointer->new($session)->get($p), $data, $desc);
+  return $self->test('is_deeply', Mojo::JSON::Pointer->new($session)->get($p), $data, $desc);
 }
 
 sub session_ok {
   my $self    = shift;
   my $session = $self->_extract_session;
-  return $self->_test('ok', !!$session, 'session ok');
+  return $self->test('ok', !!$session, 'session ok');
 }
 
 sub _extract_session {
   my $self = shift;
 
-  my $app          = $self->app;
-  my $session_name = $app->sessions->cookie_name;
+  my $app      = $self->app;
+  my $sessions = $app->sessions;
+  my $c        = $app->build_controller;
+  my $name     = $sessions->cookie_name;
+  return unless my $cookie = (grep { $_->name eq $name } @{$self->ua->cookie_jar->all})[0];
 
-  my @cookies = $self->ua->cookie_jar->all;
-  @cookies = @{$cookies[0]} if ref $cookies[0] eq 'ARRAY';
-  my ($session_cookie) = grep { $_->name eq $session_name } @cookies;
-  return unless $session_cookie;
-
-  (my $value = $session_cookie->value) =~ s/--([^\-]+)$//;
-  my $sign = $1;
-
-  my $ok;
-  for (@{$app->secrets}) {
-
-    if (
-
-      # Mojolicious < 8.13
-      $sign eq hmac_sha1_sum($value, $_) ||
-
-      # Mojolicious >= 8.13
-      $sign eq hmac_sha1_sum("$session_name=$value", $_)
-    ) {
-      $ok = 1;
-      last;
-    }
-  }
-  return unless $ok;
-
-  my $session = decode_json(b64_decode $value);
-  return $session;
+  $c->req->cookies($cookie);
+  $sessions->load($c);
+  return $c->session;
 }
 
 1;

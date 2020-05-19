@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::AlienBase::Doc 0.30 {
+package Dist::Zilla::Plugin::AlienBase::Doc 0.31 {
 
   use 5.014;
   use Moose;
@@ -205,7 +205,7 @@ Dist::Zilla::Plugin::AlienBase::Doc - Generate boilerplate documentation for Ali
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 SYNOPSIS
 
@@ -302,7 +302,7 @@ In your Makefile.PL:
  WriteMakefile(
    Alien::Base::Wrapper->new('{{ $class }}')->mm_args2(
      # MakeMaker args
-     NAME => 'Kafka::Librd',
+     NAME => 'My::XS',
      ...
    ),
  );

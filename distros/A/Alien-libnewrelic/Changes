@@ -1,0 +1,13 @@
+Revision history for Alien-libnewrelic
+
+0.03      2020-05-15 10:56:31 -0400
+  - Removed libpcre workaround in test that would fail on
+    older versions of FFI::Platypus (gh#4)
+  - Use Alien::libpcre to get the PCRE library on systems
+    that lack it (gh#1, gh#4)
+
+0.02      2020-05-14 15:00:28 -0400
+  - First CPAN release
+
+0.01      2019-06-14 20:03:42 -0400
+  - initial version

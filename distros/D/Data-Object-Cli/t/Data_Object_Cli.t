@@ -14,6 +14,12 @@ Data::Object::Cli
 
 =cut
 
+=tagline
+
+Simple CLIs
+
+=cut
+
 =abstract
 
 Command-line Interface Abstraction for Perl 5
@@ -22,6 +28,7 @@ Command-line Interface Abstraction for Perl 5
 
 =includes
 
+method: auto
 method: exit
 method: fail
 method: handle
@@ -38,8 +45,6 @@ method: spec
   package Command;
 
   use parent 'Data::Object::Cli';
-
-  no warnings 'redefine';
 
   sub main {
     my ($self) = @_;
@@ -71,6 +76,39 @@ vars: ro, opt, VarsObject
 This package provides an abstract base class for defining command-line
 interface classes, which can be run as scripts or passed as objects in a more
 complex system.
+
+=cut
+
+=method auto
+
+The auto method is expected to be overridden by the subclass and should return
+a hashref where the keys represent a subcommand at C<$ARGV[0]> and the value
+represents the subroutine to be dispatched to using the C<handle> method. To
+enable this functionality, the command name be declare a "command" token.
+
+=signature auto
+
+auto(Any %args) : HashRef
+
+=example-1 auto
+
+  package Todo;
+
+  use parent 'Data::Object::Cli';
+
+  our $name = 'todo <{command}>';
+
+  sub auto {
+    {
+      init => '_handle_init'
+    }
+  }
+
+  sub _handle_init {
+    1234567890
+  }
+
+  my $todo = run Todo;
 
 =cut
 
@@ -188,8 +226,6 @@ help() : Str
 
   use parent 'Data::Object::Cli';
 
-  no warnings 'redefine';
-
   sub name {
     'todolist'
   }
@@ -217,8 +253,6 @@ help() : Str
 
   use parent 'Data::Object::Cli';
 
-  no warnings 'redefine';
-
   sub name {
     'todolist'
   }
@@ -230,6 +264,24 @@ help() : Str
   my $todolist = run Todolist;
 
   # $todolist->help
+
+=example-6 help
+
+  package Todolist::Command::Show;
+
+  use parent 'Data::Object::Cli';
+
+  sub name {
+    'todolist show [<{priority}>]'
+  }
+
+  sub info {
+    'show your todo list tasks by priority levels'
+  }
+
+  my $command = run Todolist::Command::Show;
+
+  # $command->help
 
 =cut
 
@@ -250,8 +302,6 @@ main(Any %args) : Any
 
   use parent 'Data::Object::Cli';
 
-  no warnings 'redefine';
-
   sub main {
     my ($self, %args) = @_;
 
@@ -267,8 +317,6 @@ main(Any %args) : Any
   package Todolist;
 
   use parent 'Data::Object::Cli';
-
-  no warnings 'redefine';
 
   sub main {
     my ($self, %args) = @_;
@@ -351,10 +399,10 @@ L<Data::Object::Opts> object through the C<opts> attribute. Each flag
 definition can optionally declare C<args>, C<flag>, and C<type> values as
 follows. The C<args> property denotes that multiple flags are permitted and its
 value can be any valid L<Getopt::Long> I<repeat> specifier. The C<type>
-property denotes the type of data allowed and defaults to type I<string>.
-Allowed values are C<string>, C<number>, or C<float>. The C<flag> property
-denotes the flag aliases and should be a pipe-delimited string, e.g.
-C<userid|id|u>, if multiple aliases are used.
+property denotes the type of data allowed and defaults to type I<flag>.
+Allowed values are C<string>, C<integer>, C<number>, C<float>, or C<flag>. The
+C<flag> property denotes the flag aliases and should be a pipe-delimited
+string, e.g. C<userid|id|u>, if multiple aliases are used.
 
 =signature spec
 
@@ -400,6 +448,26 @@ spec() : HashRef[HashRef]
       attach => {
         flag => 'a',
         args => '@' # allow multiple options
+      },
+      #
+      # represented in Getopt::Long as
+      # publish|p
+      #
+      # publish is accessible as $self->opts->publish
+      #
+      publish => {
+        flag => 'p',
+        type => 'flag'
+      },
+      #
+      # represented in Getopt::Long as
+      # unpublish|u
+      #
+      # unpublish is accessible as $self->opts->unpublish
+      #
+      unpublish => {
+        flag => 'u'
+        # defaults to type: flag
       }
     }
   }
@@ -427,9 +495,21 @@ $subs->synopsis(fun($tryable) {
 
   my $returned = $result->main;
 
-  like $returned, qr/Usage:/;
+  like $returned, qr/usage:/;
 
   $result
+});
+
+$subs->example(-1, 'auto', 'method', fun($tryable) {
+  local @ARGV;
+
+  $ARGV[0] = 'init';
+
+  ok my $result = $tryable->result;
+  ok my $returned = $result->main;
+  is $returned, 1234567890;
+
+  $result->auto
 });
 
 $subs->example(-1, 'exit', 'method', fun($tryable) {
@@ -455,7 +535,7 @@ $subs->example(-1, 'fail', 'method', fun($tryable) {
 
 $subs->example(-1, 'handle', 'method', fun($tryable) {
   ok my $result = $tryable->result;
-  like $result, qr/Usage:/;
+  like $result, qr/usage:/;
 
   $result
 });
@@ -498,6 +578,18 @@ $subs->example(-5, 'help', 'method', fun($tryable) {
   is $result->info, 'manage your todo list';
 
   $result->help
+});
+
+$subs->example(-6, 'help', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is $result->name, 'todolist show [<{priority}>]';
+  is $result->info, 'show your todo list tasks by priority levels';
+
+  my $help = $result->help;
+  like $help, qr/todolist show \[\<priority\>\]/;
+  is $result->args->named->{priority}, 1;
+
+  $help
 });
 
 $subs->example(-1, 'main', 'method', fun($tryable) {
@@ -552,6 +644,13 @@ $subs->example(-1, 'spec', 'method', fun($tryable) {
     attach => {
       flag => 'a',
       args => '@'
+    },
+    publish => {
+      flag => 'p',
+      type => 'flag'
+    },
+    unpublish => {
+      flag => 'u'
     }
   };
 
@@ -561,7 +660,9 @@ $subs->example(-1, 'spec', 'method', fun($tryable) {
   my $opts = $result->opts;
   ok exists $opts->named->{attach};
   ok exists $opts->named->{content};
+  ok exists $opts->named->{publish};
   ok exists $opts->named->{title};
+  ok exists $opts->named->{unpublish};
 
   $spec;
 });

@@ -3,7 +3,7 @@ package Mnet;
 # version number used by Makefile.PL
 #   these should be set to "dev", expect when creating a new release
 #   refer to developer build notes in Makefile.PL for more info
-our $VERSION = "5.19";
+our $VERSION = "5.20";
 
 =head1 NAME
 
@@ -14,14 +14,15 @@ Mnet - Testable network automation and reporting
     # sample script to report Loopback0 ip on cisco devices
     #
     #   demonstrates typical use of all major Mnet modules
-    #   refer to various Mnet modules' perldoc for complete api info
+    #   refer to various Mnet modules' perldoc for more info
     #
-    #   use --help to list all options, or --help <option>
-    #   use --device <address> to connect to device with logging
-    #   use --batch <file.batch> to process multiple --device lines
-    #   add --report csv:<file.csv> to create an output csv report
-    #   add --record <file.test> to create replayable test file
-    #   use --test --replay <file.test> to show script changes
+    #   --help to list all options, or --help <option>
+    #   --device <address> to connect to device with logging
+    #   --username and --password should be set if necessary
+    #   --batch <file.batch> to process multiple --device lines
+    #   --report csv:<file.csv> to create an output csv report
+    #   --record <file.test> to create replayable test file
+    #   --test --replay <file.test> for regression test output
 
     # load modules
     use warnings;
@@ -35,21 +36,21 @@ Mnet - Testable network automation and reporting
     use Mnet::Test;
 
     # define --device, --username, --password, and --report cli options
-    #   record, default, redact, and help option attributes are shown
-    #   use the Mnet environment variable to securely set --password
+    #   record, redact, default, and help option attributes are shown
     Mnet::Opts::Cli::define({ getopt => "device=s", record => 1 });
-    Mnet::Opts::Cli::define({ getopt => "username=s", default => $ENV{USER} });
+    Mnet::Opts::Cli::define({ getopt => "username=s" });
     Mnet::Opts::Cli::define({ getopt => "password=s", redact  => 1 });
-    Mnet::Opts::Cli::define({ getopt => "report=s",
+    Mnet::Opts::Cli::define({ getopt => "report=s", default => undef,
         help_tip    => "specify report output, like 'csv:<file>'",
-        help_text   => "refer to Mnet::Report::Table for more info",
+        help_text   => "perldoc Mnet::Report::Table for more info",
     });
 
-    # parse command line and Mnet environment variable options
-    my $cli = Mnet::Opts::Cli->new;
+    # create object to access command line options and Mnet env variable
+    #   export Mnet="--password '<secret>'" env var to secure password
+    my $cli = Mnet::Opts::Cli->new("Mnet");
 
     # define output --report table, will include first of any errors
-    #   use --report cli opt to output data as csv, json, sql, etc
+    #   use --report cli opt to output data as csv, json, or sql, etc
     my $report = Mnet::Report::Table->new({
         columns => [
             device  => "string",
@@ -59,22 +60,22 @@ Mnet - Testable network automation and reporting
         output  => $cli->report,
     });
 
-    # read command line options, fork children if in --batch mode
+    # recreate cli option object, forking children if in --batch mode
     #   process one device or ten thousand devices with the same script
-    #   exit --batch parent process when finished forking children
+    #   exit --batch parent process here when finished forking children
     $cli = Mnet::Batch::fork($cli);
     exit if not $cli;
 
-    # ensure that errors are reported if script aborts before finishing
+    # ensure device error is reported if script dies before finishing
     $report->row_on_error({ device => $cli->device });
 
-    # use log function and set up log object for device
+    # use log function, set up log object for current --device
     FATAL("missing --device") if not $cli->device;
     my $log = Mnet::Log->new({ log_id => $cli->device });
     $log->info("processing device");
 
-    # create an expect ssh session to --device
-    #   log login authentication prompts as info, instead of default debug
+    # create an expect ssh session to current --device
+    #   log ssh login/auth prompts as info, instead of default debug
     #   password_in set to prompt for password if --password opt not set
     #   ssh host/key checks can be skipped, refer to Mnet::Expect::Cli
     my $ssh = Mnet::Expect::Cli::Ios->new({
@@ -85,14 +86,15 @@ Mnet - Testable network automation and reporting
         password_in => 1,
     });
 
-    # retrieve config from ssh command, warn otherwise
+    # retrieve ios config using ssh command, warn otherwise
     my $config = $ssh->command("show running-config");
     WARN("unable to read config") if not $config;
 
-    # parse interface loopack0 stanza from config
-    my $loop = Mnet::Stanza::parse($config, qr/^interface loopback0$/i);
+    # parse interface loopack0 stanza from device config
+    #   returns int loop0 line and lines indented under int loop0
+    my $loop = Mnet::Stanza::parse($config, qr/^interface Loopback0$/);
 
-    # parse primary ip address from loopback0 config stanza
+    # parse primary ip address from loopback config stanza
     my $ip = undef;
     $ip = $1 if $loop and $loop =~ /^ ip address (\S+) \S+$/m;
 
@@ -114,12 +116,12 @@ The main features are:
 =item *
 
 Record and replay connected command line sessions, speeding development
-and allowing for regression testing of complex automation scripts.
+and allow for regression testing of complex automation scripts.
 
 =item *
 
-Reliable automation of cisco IOS and other command line sessions, including
-reliable authentication and command prompt handling.
+Reliable automation of cisco ios and other command line sessions, including
+authentication and command prompt handling.
 
 =item *
 
@@ -138,7 +140,7 @@ device list files.
 
 =item *
 
-Report data from scripts can be output as plain .csv files, json, or sql.
+Report data from scripts can be output as csv, json, or sql.
 
 =back
 
@@ -156,7 +158,7 @@ The latest release can be installed from CPAN
 
     cpan install Mnet
 
-Or downloaded and installed from L<https://github.com/menzascripting/Mnet>
+Or download and install from L<https://github.com/menzascripting/Mnet>
 
     tar -xzf Mnet-X.y.tar.gz
     cd Mnet-X.y
@@ -171,11 +173,12 @@ to L<ExtUtils::MakeMaker> for more information
 =head1 AUTHOR
 
 The L<Mnet> perl distribution has been created and is maintained by Mike Menza.
-Mike can be reached via email at <mmenza@cpan.org>.
+Feedback and bug reports are welcome, feel free to contact Mike via email
+at <mmenza@cpan.org> with any comments or questions.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2006, 2013-2019 Michael J. Menza Jr.
+Copyright 2006, 2013-2020 Michael J. Menza Jr.
 
 L<Mnet> is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -201,13 +204,9 @@ L<Mnet::Log>
 
 L<Mnet::Opts::Cli>
 
-L<Mnet::Opts::Set>
-
 L<Mnet::Report::Table>
 
 L<Mnet::Stanza>
-
-L<Mnet::Tee>
 
 L<Mnet::Test>
 

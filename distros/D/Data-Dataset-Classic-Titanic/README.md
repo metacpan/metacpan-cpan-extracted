@@ -1,2 +1,2 @@
 # Data::Dataset::Classic::Titanic
-Provide access to the classic titanic survivor dataset
+Provide access to the classic Titanic survivor dataset

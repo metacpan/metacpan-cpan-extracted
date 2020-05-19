@@ -59,27 +59,42 @@ sub ansi256_number {
 	    $grey = $n - 1;
 	}
     }
-    elsif ($code =~ m{^(?| \# ([0-9a-f])([0-9a-f])([0-9a-f])
-			 | \#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2}) )$}xi) {
-	my($rx, $gx, $bx) = map { hex } $1, $2, $3;
-	do { $_ *= 0x11 for $rx, $gx, $bx } if length $1 == 1;
-	if ($rx != 255 and $rx == $gx and $rx == $bx) {
-	    ##
-	    ## Divide area into 25 segments, and map to BLACK and 24 GREYS
-	    ##
-	    $grey = int ( $rx * 25 / 255 ) - 1;
-	    if ($grey < 0) {
-		$r = $g = $b = 0;
-		$grey = undef;
-	    }
-	} else {
-	    ($r, $g, $b) = map { map_256_to_6 $_ } $rx, $gx, $bx;
-	}
-    }
     else {
 	die "Color spec error: $code";
     }
     defined $grey ? ($grey + 232) : ($r*36 + $g*6 + $b + 16);
+}
+
+sub rgb24_number {
+    my($rx, $gx, $bx) = @_;
+    my($r, $g, $b, $grey);
+    if ($rx != 255 and $rx == $gx and $rx == $bx) {
+	##
+	## Divide area into 25 segments, and map to BLACK and 24 GREYS
+	##
+	$grey = int ( $rx * 25 / 255 ) - 1;
+	if ($grey < 0) {
+	    $r = $g = $b = 0;
+	    $grey = undef;
+	}
+    } else {
+	($r, $g, $b) = map { map_256_to_6 $_ } $rx, $gx, $bx;
+    }
+    defined $grey ? ($grey + 232) : ($r*36 + $g*6 + $b + 16);
+}
+
+sub rgbhex {
+    my $rgb = shift =~ s/^#//r;
+    my $len = length $rgb;
+    die "$rgb: Invalid RGB value" if $len == 0 || $len % 3;
+    $len /= 3;
+    my $max = (2 ** ($len * 4)) - 1;
+    my @rgb24 = map { hex($_) * 255 / $max } $rgb =~ /[0-9a-z]{$len}/gi or die;
+    if ($RGB24) {
+	return (2, @rgb24);
+    } else {
+	return (5, rgb24_number @rgb24);
+    }
 }
 
 my %numbers = (
@@ -106,28 +121,6 @@ my %numbers = (
     W => 37, w => 97,	# W : White
     );
 
-sub rgb24 {
-    my $rgb = shift;
-    if ($RGB24) {
-	return (2,
-		map { hex }
-		$rgb =~ /^\#?([\da-f]{2})([\da-f]{2})([\da-f]{2})/i);
-    } else {
-	return (5, ansi256_number $rgb);
-    }
-}
-
-sub rgb12 {
-    my $rgb = shift;
-    if ($RGB24) {
-	return (2,
-		map { 0x11 * hex }
-		$rgb =~ /^#([\da-f])([\da-f])([\da-f])/i);
-    } else {
-	return (5, ansi256_number $rgb);
-    }
-}
-
 sub ansi_numbers {
     local $_ = shift // '';
     my @numbers;
@@ -137,13 +130,13 @@ sub ansi_numbers {
 	     (?:
 	       (?<toggle> /)				# /
 	     | (?<reset> \^)				# ^
-	     | (?<h24>  \#?[0-9a-f]{6} )		# 24bit hex
-	     | (?<h12>  \# [0-9a-f]{3} )		# 12bit hex
+	     | (?<hex>    [0-9a-f]{6}			# 24bit hex
+	              | \#[0-9a-f]{3,} )		# generic hex
 	     | (?<rgb>  \(\d+,\d+,\d+\) )		# 24bit decimal
 	     | (?<c256>   [0-5][0-5][0-5]		# 216 (6x6x6) colors
 		      | L(?:[01][0-9]|[2][0-5]) )	# 24 grey levels + B/W
 	     | (?<c16>  [KRGYBMCW] )			# 16 colors
-	     | (?<efct> ~?[;XNZDPIUFQSVJ] )		# effects
+	     | (?<efct> ~?[;NZDPIUFQSVX] )		# effects
 	     | (?<csi>  { (?<csi_name>[A-Z]+)		# other CSI
 			  (?<P> \( )?			# optional (
 			  (?<csi_param>[\d,;]*)		# 0;1;2
@@ -160,17 +153,14 @@ sub ansi_numbers {
 	elsif ($+{reset}) {
 	    $toggle->reset;
 	}
-	elsif ($+{h24}) {
-	    push @numbers, 38 + $toggle->value, rgb24($+{h24});
-	}
-	elsif ($+{h12}) {
-	    push @numbers, 38 + $toggle->value, rgb12($+{h12});
+	elsif ($+{hex}) {
+	    push @numbers, 38 + $toggle->value, rgbhex($+{hex});
 	}
 	elsif (my $rgb = $+{rgb}) {
 	    my @rgb = $rgb =~ /(\d+)/g;
 	    die "Unexpected value: $rgb\n" if grep { $_ > 255 } @rgb;
 	    my $hex = sprintf "%02X%02X%02X", @rgb;
-	    push @numbers, 38 + $toggle->value, rgb24($hex);
+	    push @numbers, 38 + $toggle->value, rgbhex($hex);
 	}
 	elsif ($+{c256}) {
 	    push @numbers, 38 + $toggle->value, 5, ansi256_number $+{c256};
@@ -200,7 +190,7 @@ sub ansi_numbers {
 		new     Graphics::ColorNames;
 	    };
 	    if (my $rgb = $colornames->hex($+{name})) {
-		push @numbers, 38 + $toggle->value, rgb24($rgb);
+		push @numbers, 38 + $toggle->value, rgbhex($rgb);
 	    } else {
 		die "Unknown color name: $+{name}\n";
 	    }

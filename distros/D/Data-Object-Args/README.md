@@ -1,6 +1,6 @@
 # NAME
 
-Data::Object::Args
+Data::Object::Args - Args Class
 
 # ABSTRACT
 
@@ -160,6 +160,41 @@ The stashed method returns the stashed data associated with the object.
         # given: synopsis
 
         $args->stashed
+
+## unnamed
+
+    unnamed() : ArrayRef
+
+The unnamed method returns an arrayref of values which have not been named
+using the `named` attribute.
+
+- unnamed example #1
+
+        package main;
+
+        use Data::Object::Args;
+
+        local @ARGV = qw(--help execute --format markdown);
+
+        my $args = Data::Object::Args->new(
+          named => { flag => 0, command => 1 }
+        );
+
+        $args->unnamed # ['--format', 'markdown']
+
+- unnamed example #2
+
+        package main;
+
+        use Data::Object::Args;
+
+        local @ARGV = qw(execute phase-1 --format markdown);
+
+        my $args = Data::Object::Args->new(
+          named => { command => 1 }
+        );
+
+        $args->unnamed # ['execute', '--format', 'markdown']
 
 # AUTHOR
 

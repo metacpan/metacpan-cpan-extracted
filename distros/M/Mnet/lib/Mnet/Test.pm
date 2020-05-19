@@ -6,41 +6,37 @@ Mnet::Test - Record, replay, and test script inputs and outputs
 
 =head1 SYNOPSIS
 
-    use Mnet::Test;
+    # sample test script
+    #
+    #   first create an Mnet::Test file with --record <file>
+    #   next replay the test with --test --replay <file>
+    #   add a print statement to cause test replay to fail
+
+    # required for this sample
+    #   refer to TESTING perldoc in other Mnet modules
+    use Mnet::Expect::Cli;
     use Mnet::Opts::Cli;
+    use Mnet::Test;
+
+    # other cli options could be defined and recorded in tests
     my $cli = Mnet::Opts::Cli->new;
+
+    # the Mnet::Expect::Cli modules can record session command outputs
+    my $expect = Mnet::Expect::Cli({ spawn => "ssh 1.2.3.4" });
+    my $output = $expect->command("whoami");
+
+    # stdout and stderr are captures for tests
+    print "$output\n";
 
 =head1 DESCRIPTION
 
 Mnet::Test can be used to allow script inputs and output to be recorded to a
-file, which can be replayed later to test that the outputs are still the same.
+file, which can be replayed later to show any changes.
 
-Other L<Mnet> modules are designed to detect and make use of Mnet::Test, if
-it is being used by the current script. For example, the L<Mnet::Log> start,
-finish, and debug entries are not saved with stdout, and L<Mnet::Opts::Cli>
-allows for command line options and arguments to be recorded and replayed
-with Mnet::Test files.
-
-Refer to the perldoc TESTING sections in other L<Mnet> modules for explanations
-of how each module supports the Mnet::Test test, record, and replay options.
-
-This module uses the L<Mnet::Tee> module to capture all stdout and stderr
-outputs from an executing script and can record, replay, and test for changes
-in those outputs.
-
-When --test is used the exit status of the script will reflect whether output
-matched what is in the specified --replay file.
-
-Scripts that use these modules may not need to do anything else to benefit from
-Mnet::Test support. At its most basic a script using this module can create a
-test data file with the --record option which will contain all the stdout and
-stderr output from the script. The --replay and --test options can be used to
-execute the script again and alert the user to any change in output.
-
-Also note that the Mnet::Test::time function can be used to return repeatable
-sequences of outputs from the perl time command during --test execution. This
-helps to avoid changing timestamps causing test failures. The L<Mnet::Log>
-module automatically normalizes timestamps when running tests.
+Other L<Mnet> modules are designed to detect and make use of Mnet::Test, if it
+is being used by a script. Refer to the perldoc TESTING sections of the other
+modules for explanations of how each module supports Mnet::Test usage. Also
+refer to the --test, --record, and --replay options for more information.
 
 Scripts or modules that need to save additional data to --record test data
 files can call the Mnet::Test::data function to get a referenced hash key that
@@ -49,13 +45,19 @@ will save this data to a file at the end of script execution, and the --replay
 option can be used to load that data back from the file into the
 Mnet::Test::data hash.
 
+Also note that the Mnet::Test::time function can be used to return repeatable
+sequences of outputs from the perl time command during --test execution. This
+helps to avoid changing timestamps causing test failures. The L<Mnet::Log>
+module automatically normalizes timestamps when running tests.
+
 Scripts that do not use L<Mnet::Opts::Cli> to parse command line options can
 pass the replay file as an argument to the Mnet::Test::data function and call
 the Mnet::Test::done function at the end of script execution.
 
-Note that the Mnet environment variable is not parsed if the --test option
-is set on the command line, since the value of this envrionment variable may
-change over time, between users, systems, etc.
+Note that the optional environment variable that can be specified when creating
+a new  L<Mnet::Opts::Cli> object is not parsed if the --test option is set on
+the command line, since the value of this envrionment variable may change over
+time, between users, systems, etc.
 
 =head1 FUNCTIONS
 
@@ -479,11 +481,13 @@ END {
 
 L<Mnet>
 
+L<Mnet::Expect::Cli>
+
 L<Mnet::Log>
 
 L<Mnet::Opts::Cli>
 
-L<Mnet::Tee>
+L<Mnet::Report::Table>
 
 L<Text::Diff>
 

@@ -3,3 +3,6 @@ Revision history for Blessed-Merge
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.11    18/05/2020
+        Merge Classes by detecting if multiple classes are being merged and generating an anonymous class.
+

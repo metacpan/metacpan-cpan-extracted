@@ -1,3 +1,58 @@
+  * introduce setting regime
+    * parse option --licensecheck-regime
+    * parse environment variable LICENSECHECK_REGIME
+    * parse environment variable LICENSECHECK_DEFAULTS
+
+  * Maybe implement all this as a git module?
+    
+  * implement environment variable LICENSECHECK_DEFAULTS
+
+      and setting=value pairs in env vars LICENSECHECK LICENSECHECK_DIFF
+  * implement licensefind
+    * parse options and arguments like GNU find (or busybox find?)
+    * fail on any option supported by find but unsupported here
+    * parse new options --licensecheck-*
+      and setting=value pairs in env vars LICENSECHECK LICENSECHECK_FIND
+    * by default output filenames (i.e. all with any license by default)
+  * implement licensegrep
+    * parse options and arguments like grep (or busybox/git grep?)
+    * fail on any option supported by diff but unsupported here
+    * parse new options --licensecheck-*
+      and setting=value pairs in env vars LICENSECHECK LICENSECHECK_GREP
+    * parse settings from env variables LICENSECHECK LICENSECHECK_GREP
+      (treated as fallback for --licensecheck-* options without prefix)
+    * by default output verbatim text, with filename prefixed if multiple
+  * implement licensediff
+    * parse options and arguments like diff (or git diff?)
+    * fail on any option supported by diff but unsupported here
+    * parse new options --licensecheck-*
+      and setting=value pairs in env vars LICENSECHECK LICENSECHECK_DIFF
+    * by default output unified diff
+    * if file B omitted, compute from file A
+      (with minimal changes by default, or optionally optimized)
+  * implement licensesort
+    * parse options and arguments like sort
+    * fail on any option supported by sort but unsupported here
+    * parse new options --licensecheck-*
+      and setting=value pairs in env vars LICENSECHECK LICENSECHECK_DIFF
+      + file1-format - debian spdx (default: guess from passed file1)
+      + paths-debian - with format=debian try debian/copyright:copyright)
+      + merge-copyright-years
+      + merge-copyright-holders
+      + merge-license-expressions
+      + merge-license-parts
+      + sort-copyright-years
+      + sort-copyright-holders
+      + sort-copyright-sections
+      + sort-license-expressions
+      + sort-license-parts
+      + sort-license-sections
+    * if file B omitted, compute from file A + licensegrep
+    * if file A omitted, try default file for used format, or fail
+      (i.e. with format=debian try debian/copyright:copyright)
+
+  * support omitting copyright holders when permited by license
+
   * Implement decoding options:
     * --decode-html
       regular expression for paths to parse as html.
@@ -80,6 +135,7 @@
     + fpc
     + lazarus
     + boost
+    + picolibc <https://keithp.com/cgit/picolibc.git/>
 
   * Maybe use libdata-binary-perl
   * Maybe use Text::Locus to track (and emit in verbose/debug mode) where patterns are detected?

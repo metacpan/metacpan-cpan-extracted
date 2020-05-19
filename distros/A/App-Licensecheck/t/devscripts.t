@@ -23,7 +23,7 @@ subtest 'copyright declared on 2 lines' => sub {
 subtest 'copyright declared on 3 lines' => sub {
 	run_ok $CMD, qw(-m --copyright t/devscripts/texinfo.tex);
 	like stdout,
-		qr{GPL \(v3 or later\)	1985.*2012 Free Software Foundation, Inc.},
+		qr{GNU General Public License v3.0 or later	1985.*2012 Free Software Foundation, Inc.},
 		'Testing stdout';
 	is stderr, '', 'No stderr';
 };
@@ -47,22 +47,24 @@ subtest 'Duplicated copyright' => sub {
 };
 subtest 'Duplicated copyright' => sub {
 	run_ok $CMD, qw(t/devscripts/dual.c);
-	like stdout, qr{Public domain GPL \(v3\)$}, 'Testing stdout';
+	like stdout, qr{Public domain GNU General Public License, Version 3$},
+		'Testing stdout';
 	is stderr, '', 'No stderr';
 };
 subtest 'machine-readable output; short-form option' => sub {
 	run_ok $CMD, qw(-m t/devscripts/beerware.cpp);
 	like stdout, qr{Beerware(?: License)?}, 'Testing stdout';
-	is stderr, '', 'No stderr';
+	is stderr,   '',                        'No stderr';
 };
 subtest 'machine-readable output; long-form option' => sub {
 	run_ok $CMD, qw(--machine t/devscripts/gpl-2);
-	like stdout, qr{GPL \(v2\)$}, 'Testing stdout';
-	is stderr, '', 'No stderr';
+	like stdout, qr{GNU General Public License, Version 2$}, 'Testing stdout';
+	is stderr,   '',                                         'No stderr';
 };
 subtest 'machine-readable output w/ copyright' => sub {
 	run_ok $CMD, qw(-m --copyright t/devscripts/gpl-2);
-	like stdout, qr{GPL \(v2\)\t2012 Devscripts developers\n$},
+	like stdout,
+		qr{GNU General Public License, Version 2\t2012 Devscripts developers\n$},
 		'Testing stdout';
 	is stderr, '', 'No stderr';
 };
@@ -74,13 +76,14 @@ subtest 'Fortran comments' => sub {
 };
 subtest 'comments; C++ inline style' => sub {
 	run_ok $CMD, qw(t/devscripts/comments-detection.h);
-	like stdout, qr{GPL \(v3 or later\)$}, 'Testing stdout';
+	like stdout, qr{GNU General Public License v3.0 or later$},
+		'Testing stdout';
 	is stderr, '', 'No stderr';
 };
 subtest 'comments; hash style' => sub {
 	run_ok $CMD, qw(t/devscripts/comments-detection.txt);
 	like stdout,
-		qr{\*No copyright\* (?:GNU Lesser General Public License|LGPL) \(v2\.1 or later\)},
+		qr{\*No copyright\* (?:GNU Lesser General Public License|LGPL) v2\.1 or later},
 		'Testing stdout';
 	is stderr, '', 'No stderr';
 };

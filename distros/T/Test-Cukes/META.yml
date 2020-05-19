@@ -3,28 +3,49 @@ abstract: 'A BBD test tool inspired by Cucumber'
 author:
   - 'Kang-min Liu <gugod@gugod.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
-  Test::More: 0
+  ExtUtils::MakeMaker: '6.59'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
-distribution_type: module
-generated_by: 'Module::Install version 1.00'
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Test-Cukes
 no_index:
   directory:
-    - inc
     - t
     - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Cukes:
+    file: lib/Test/Cukes.pm
+    version: '0.11'
+  Test::Cukes::Feature:
+    file: lib/Test/Cukes/Feature.pm
+  Test::Cukes::Scenario:
+    file: lib/Test/Cukes/Scenario.pm
 requires:
-  Any::Moose: 0.07
-  Carp::Assert: 0.20
-  Test::Builder::Module: 0.80
-  Try::Tiny: 0.07
-  perl: 5.8.0
+  Carp::Assert: '0.20'
+  Moose: '0'
+  Test::Builder::Module: '0.80'
+  Try::Tiny: '0.07'
+  perl: '5.008'
 resources:
-  license: http://opensource.org/licenses/mit-license.php
-version: 0.10
+  bugtracker: https://github.com/gugod/Test-Cukes/issues
+  homepage: https://github.com/gugod/Test-Cukes
+  repository: git://github.com/gugod/Test-Cukes.git
+version: '0.11'
+x_contributors:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Yann Kerherve <yann@cyberion.net>'
+  - 'prat0088 <prat0088@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

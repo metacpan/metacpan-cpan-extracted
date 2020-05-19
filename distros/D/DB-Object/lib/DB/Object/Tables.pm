@@ -39,7 +39,7 @@ sub init
     $table ||= CORE::delete( $arg{table} );
     foreach my $k ( keys( %arg ) )
     {
-    	$self->{ $k } = $arg{ $k };
+        $self->{ $k } = $arg{ $k };
     }
     $self->{ 'table' }       = $table if( $table );
     $self->{ 'structure' } ||= {};
@@ -50,12 +50,12 @@ sub init
     $self->{ 'alias' }       = {};
     $self->{ 'avoid' }       = [];
     ## The table type. It could be table or view
-    $self->{ 'type' }		 = '';
+    $self->{ 'type' }         = '';
     ## The schema name, if any
-    $self->{ 'schema' }		 = '';
-    $self->{ 'bind' }		 = '';
-    $self->{ 'cache' }		 = '';
-    $self->{ 'enhance' }	 = '';
+    $self->{ 'schema' }         = '';
+    $self->{ 'bind' }         = '';
+    $self->{ 'cache' }         = '';
+    $self->{ 'enhance' }     = '';
     ## Load table default, fields, structure informations
     ## my $db = $self->database();
     my $ref = $self->structure();
@@ -70,7 +70,7 @@ sub alter
     ## Expecting a reference to an array
     my $spec  = '';
     $spec     = shift( @_ ) if( @_ == 1 && ref( $_[ 0 ] ) );
-    $spec     = [ @_ ] if( @_ && !$ref );
+    $spec     = [ @_ ] if( @_ && !$spec );
     my $table = $self->{ 'table' } ||
     return( $self->error( "No table was provided." ) );
     return( $self->error( "No proper ALTER specification was provided." ) ) if( !$spec || !ref( $spec ) || !@$spec );
@@ -87,51 +87,51 @@ sub alter
 
 sub constant
 {
-	my $self = shift( @_ );
-	my( $pack, $file, $line ) = caller;
-	## $self->message( 3, "Called from package '$pack' in file '$file' at line '$line'." );
-	my $base_class = $self->database_object->base_class;
-	## This does not work for calls made internally
-	return( $self ) if( $pack =~ /^${base_class}\b/ );
-	my $sth = $self->database_object->constant_queries_cache_get({
-		pack => $pack,
-		file => $file,
-		line => $line,
-	});
-	## $self->message( 3, "Statement handler returned is: '$sth'." );
-	## $sth returned may be void if no cache was found or if the caller's file mod time has changed
-	my $q;
-	if( $sth )
-	{
-		$q = $sth->query_object;
-		$self->query_object( $q );
-	}
-	else
-	{
-		$q = $self->_reset_query;
-	}
-	$q->constant({
-		sth => $sth,
-		pack => $pack,
-		file => $file,
-		line => $line,
-	});
-	return( $self );
+    my $self = shift( @_ );
+    my( $pack, $file, $line ) = caller;
+    ## $self->message( 3, "Called from package '$pack' in file '$file' at line '$line'." );
+    my $base_class = $self->database_object->base_class;
+    ## This does not work for calls made internally
+    return( $self ) if( $pack =~ /^${base_class}\b/ );
+    my $sth = $self->database_object->constant_queries_cache_get({
+        pack => $pack,
+        file => $file,
+        line => $line,
+    });
+    ## $self->message( 3, "Statement handler returned is: '$sth'." );
+    ## $sth returned may be void if no cache was found or if the caller's file mod time has changed
+    my $q;
+    if( $sth )
+    {
+        $q = $sth->query_object;
+        $self->query_object( $q );
+    }
+    else
+    {
+        $q = $self->_reset_query;
+    }
+    $q->constant({
+        sth => $sth,
+        pack => $pack,
+        file => $file,
+        line => $line,
+    });
+    return( $self );
 }
 
 ## sub create must be superseded by sub classes
 sub create
 {
-	my $self = shift( @_ );
-	my $class = ref( $self );
-	return( $self->error( "create() is not implemented by $class." ) );
+    my $self = shift( @_ );
+    my $class = ref( $self );
+    return( $self->error( "create() is not implemented by $class." ) );
 }
 
 sub create_info
 {
-	my $self = shift( @_ );
-	my $class = ref( $self );
-	return( $self->error( "create_info() is not implemented by $class." ) );
+    my $self = shift( @_ );
+    my $class = ref( $self );
+    return( $self->error( "create_info() is not implemented by $class." ) );
 }
 
 sub database { return( shift->database_object->database ); }
@@ -167,9 +167,9 @@ sub drop
 
 sub exists
 {
-	my $self = shift( @_ );
-	my $class = ref( $self );
-	return( $self->error( "exists() is not implemented by $class." ) );
+    my $self = shift( @_ );
+    my $class = ref( $self );
+    return( $self->error( "exists() is not implemented by $class." ) );
 }
 
 sub fields
@@ -187,36 +187,36 @@ sub fields_object
     my $o = $self->{fields_object};
     return( $o ) if( $o && $self->_is_object( $o ) );
     my $db_name = $self->database_object->database;
-	$db_name =~ tr/-/_/;
-	$db_name =~ s/\_{2,}/_/g;
-	$db_name = join( '', map( ucfirst( lc( $_ ) ), split( /\_/, $db_name ) ) );
+    $db_name =~ tr/-/_/;
+    $db_name =~ s/\_{2,}/_/g;
+    $db_name = join( '', map( ucfirst( lc( $_ ) ), split( /\_/, $db_name ) ) );
     my $name = $self->name;
-	my $new_class = $name;
-	$new_class =~ tr/-/_/;
-	$new_class =~ s/\_{2,}/_/g;
-	$new_class = join( '', map( ucfirst( lc( $_ ) ), split( /\_/, $new_class ) ) );
-	$class = ref( $self ) . "\::${db_name}\::${new_class}";
+    my $new_class = $name;
+    $new_class =~ tr/-/_/;
+    $new_class =~ s/\_{2,}/_/g;
+    $new_class = join( '', map( ucfirst( lc( $_ ) ), split( /\_/, $new_class ) ) );
+    $class = ref( $self ) . "\::${db_name}\::${new_class}";
     unless( $self->_is_class_loaded( $class ) )
     {
-		my $perl = <<EOT;
+        my $perl = <<EOT;
 package $class;
 BEGIN
 {
-	use strict;
-	use parent qw( DB::Object::Fields );
+    use strict;
+    use parent qw( DB::Object::Fields );
 };
 
 1;
 
 EOT
-		# print( STDERR __PACKAGE__, "::_set_get_hash_as_object(): Evaluating\n$perl\n" );
-		my $rc = eval( $perl );
-		# print( STDERR __PACKAGE__, "::_set_get_hash_as_object(): Returned $rc\n" );
-		die( "Unable to dynamically create module $class: $@" ) if( $@ );
+        # print( STDERR __PACKAGE__, "::_set_get_hash_as_object(): Evaluating\n$perl\n" );
+        my $rc = eval( $perl );
+        # print( STDERR __PACKAGE__, "::_set_get_hash_as_object(): Returned $rc\n" );
+        die( "Unable to dynamically create module $class: $@" ) if( $@ );
     }
     $o = $class->new({
-		table_object => $self,
-		debug => $self->debug,
+        table_object => $self,
+        debug => $self->debug,
     });
     $o->prefixed( $self->{prefixed} );
     $self->{fields_object} = $o;
@@ -227,9 +227,9 @@ sub fo { return( shift->fields_object( @_ ) ); }
 
 sub lock
 {
-	my $self = shift( @_ );
-	my $class = ref( $self );
-	return( $self->error( "lock() is not implemented by $class." ) );
+    my $self = shift( @_ );
+    my $class = ref( $self );
+    return( $self->error( "lock() is not implemented by $class." ) );
 }
 
 sub name
@@ -249,20 +249,20 @@ sub null
 
 sub optimize
 {
-	my $self = shift( @_ );
-	my $class = ref( $self );
-	return( $self->error( "optimize() is not implemented by $class." ) );
+    my $self = shift( @_ );
+    my $class = ref( $self );
+    return( $self->error( "optimize() is not implemented by $class." ) );
 }
 
 sub prefix
 {
-	my $self = shift( @_ );
-	my @val = ();
-	CORE::push( @val, $self->database_object->database ) if( $self->{prefixed} > 2 );
-	CORE::push( @val, $self->schema ) if( $self->{prefixed} > 1 && $self->schema );
-	CORE::push( @val, $self->name ) if( $self->{prefixed} > 0 );
-	return( '' ) if( !scalar( @val ) );
-	return( CORE::join( '.', @val ) );
+    my $self = shift( @_ );
+    my @val = ();
+    CORE::push( @val, $self->database_object->database ) if( $self->{prefixed} > 2 );
+    CORE::push( @val, $self->schema ) if( $self->{prefixed} > 1 && $self->schema );
+    CORE::push( @val, $self->name ) if( $self->{prefixed} > 0 );
+    return( '' ) if( !scalar( @val ) );
+    return( CORE::join( '.', @val ) );
 }
 
 sub prefix_database { return( shift->{prefixed} > 2 ); }
@@ -274,18 +274,18 @@ sub prefix_table { return( shift->{prefixed} > 0 ); }
 ## This the prefix intended for field in query
 sub prefixed
 {
-	my $self = shift( @_ );
-	if( @_ )
-	{
-		$self->{prefixed} = ( $_[0] =~ /^\d+$/ ? $_[0] : ( $_[0] ? 1 : 0 ) );
-	}
-	else
-	{
-		$self->{prefixed} = 1;
-	}
-	my $fo = $self->{fields_object};
-	$fo->prefixed( $self->{prefixed} ) if( $fo );
-	return( $self );
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        $self->{prefixed} = ( $_[0] =~ /^\d+$/ ? $_[0] : ( $_[0] ? 1 : 0 ) );
+    }
+    else
+    {
+        $self->{prefixed} = 1;
+    }
+    my $fo = $self->{fields_object};
+    $fo->prefixed( $self->{prefixed} ) if( $fo );
+    return( $self );
 }
 
 sub primary
@@ -306,25 +306,25 @@ sub query_reset { return( shift->_set_get_scalar( 'query_reset', @_ ) ); }
 
 sub rename
 {
-	my $self = shift( @_ );
-	my $class = ref( $self );
-	return( $self->error( "rename() is not implemented by $class." ) );
+    my $self = shift( @_ );
+    my $class = ref( $self );
+    return( $self->error( "rename() is not implemented by $class." ) );
 }
 
 sub repair
 {
-	my $self = shift( @_ );
-	my $class = ref( $self );
-	return( $self->error( "repair() is not implemented by $class." ) );
+    my $self = shift( @_ );
+    my $class = ref( $self );
+    return( $self->error( "repair() is not implemented by $class." ) );
 }
 
 sub schema { return( shift->_set_get_scalar( 'schema', @_ ) ); }
 
 sub stat
 {
-	my $self = shift( @_ );
-	my $class = ref( $self );
-	return( $self->error( "stat() is not implemented by $class." ) );
+    my $self = shift( @_ );
+    my $class = ref( $self );
+    return( $self->error( "stat() is not implemented by $class." ) );
 }
 
 sub table { return( shift->{table} ); }
@@ -333,7 +333,7 @@ sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
 
 sub types
 {
-	my $self = shift( @_ );
+    my $self = shift( @_ );
     $self->structure();
     my $types = $self->{types};
     return( wantarray() ? () : undef() ) if( !%$types );
@@ -343,16 +343,16 @@ sub types
 ## sub structure must be superseded by sub classes
 sub structure
 {
-	my $self = shift( @_ );
-	my $class = ref( $self );
-	return( $self->error( "structure() is not implemented by $class." ) );
+    my $self = shift( @_ );
+    my $class = ref( $self );
+    return( $self->error( "structure() is not implemented by $class." ) );
 }
 
 sub unlock
 {
-	my $self = shift( @_ );
-	my $class = ref( $self );
-	return( $self->error( "unlock() is not implemented by $class." ) );
+    my $self = shift( @_ );
+    my $class = ref( $self );
+    return( $self->error( "unlock() is not implemented by $class." ) );
 }
 
 DESTROY
@@ -395,6 +395,8 @@ It may also take an hash like arguments, that also are method of the same name.
 =item I<debug>
 
 Toggles debug mode on/off
+
+=back
 
 =back
 

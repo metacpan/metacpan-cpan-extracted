@@ -12,7 +12,7 @@ use Tags::Utils qw(encode_newline);
 Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $SPACE => q{ };
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Attributes.
 sub _put_attribute {
@@ -106,9 +106,12 @@ __END__
  my $obj = Tags::Output::PYX->new(%parameters);
  $obj->finalize;
  my $ret = $obj->flush($reset_flag);
- my @tags = $obj->open_tags;
+ my @elements = $obj->open_elements;
  $obj->put(@data);
  $obj->reset;
+
+ # Deprecated methods.
+ my @elements = $obj->open_tags;
 
 =head1 PYX LINE CHARS
 
@@ -120,11 +123,13 @@ __END__
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%parameters)>
+ my $obj = Tags::Output::PYX->new(%parameters);
 
- Constructor.
+Constructor.
+
+Returns instance of object.
 
 =over 8
 
@@ -160,34 +165,57 @@ __END__
 
 =back
 
-=item C<finalize()>
+=head2 C<finalize>
 
- Finalize Tags output.
- Automaticly puts end of all opened tags.
- Returns undef.
+ $obj->finalize;
 
-=item C<flush($reset_flag)>
+Finalize Tags output.
+Automaticly puts end of all opened tags.
 
- Flush tags in object.
- If defined 'output_handler' flush to its.
- Or returns code.
- If enabled $reset_flag, then resets internal variables via reset method.
+Returns undef.
 
-=item C<open_tags()>
+=head2 C<flush>
 
- Returns array of opened tags.
+ my $ret = $obj->flush($reset_flag);
 
-=item C<put(@data)>
+Flush tags in object.
+If defined 'output_handler' flush to its.
+Or returns code.
+If enabled $reset_flag, then resets internal variables via reset method.
 
- Put tags code in tags format.
- Returns undef.
+=head2 C<open_elements>
 
-=item C<reset()>
+ my @elements = $obj->open_elements;
 
- Resets internal variables.
- Returns undef.
+Get list of open elements.
 
-=back
+Returns array of strings.
+
+=head2 C<put>
+
+ $obj->put(@data);
+
+Put tags code in tags format.
+
+Returns undef.
+
+=head2 C<reset>
+
+ $obj->reset;
+
+Resets internal variables.
+
+Returns undef.
+
+=head1 DEPRECATED METHODS
+
+=head2 C<open_tags>
+
+ my @elements = $obj->open_tags;
+
+Get list of open elements.
+
+Returns array of strings.
 
 =head1 ERRORS
 
@@ -282,6 +310,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

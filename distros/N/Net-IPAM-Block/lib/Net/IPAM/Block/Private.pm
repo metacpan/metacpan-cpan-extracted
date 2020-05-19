@@ -19,29 +19,65 @@ Don't pollute the B<< namespace >> of Net::IPAM::Block
 
 =cut
 
-# 1.2.3.4/24  => {base: 1.2.3.0, last: 1.2.3.255, mask: 255.255.255.0}
-# fe80::1/124 => {base: fe80::,  last: fe80::f,   mask: ffff:ffff:ffff:ffff:ffff:ffff:ffff:fff0}
-sub _fromCIDR {
+# only masks without a gap, representable as CIDR, are allowed
+my %valid_masks = map { pack( 'N', ( 0xffff_ffff >> $_ ) << $_ ) => $_ } 0 .. 32;
+
+# 11111111_11111111_11111111_11111111
+# 11111111_11111111_11111111_11111110
+# 11111111_11111111_11111111_11111100
+# 11111111_11111111_11111111_11111000
+# 11111111_11111111_11111111_11110000
+# 11111111_11111111_11111111_11100000
+# 11111111_11111111_11111111_11000000
+# ...
+# 11111100_00000000_00000000_00000000
+# 11111000_00000000_00000000_00000000
+# 11110000_00000000_00000000_00000000
+# 11100000_00000000_00000000_00000000
+# 11000000_00000000_00000000_00000000
+# 10000000_00000000_00000000_00000000
+# 00000000_00000000_00000000_00000000
+
+# 1.2.3.4/255.0.0.0  => {base: 1.0.0.0, last: 1.255.255.255, mask: 255.0.0.0}
+# 1.2.3.4/24         => {base: 1.2.3.0, last: 1.2.3.255,     mask: 255.255.255.0}
+# fe80::1/124 =>        {base: fe80::,  last: fe80::f,       mask: ffff:ffff:ffff:ffff:ffff:ffff:ffff:fff0}
+
+sub _fromMask {
   my ( $self, $addr, $idx ) = @_;
 
-  # split CIDR in prefix and ones: 10.0.0.0/8 => 10.0.0.0, 8
+  # split input in prefix and suffix:
+  #   10.0.0.0/255.0.0.0 => 10.0.0.0, 255.0.0.0
+  #   10.0.0.0/8         => 10.0.0.0, 8
+  #   fe80::1/124        => fe80::1,  124
+  #
   my $prefix_str = substr( $addr, 0, $idx );
-  my $ones       = substr( $addr, $idx + 1 );
+  my $suffix_str = substr( $addr, $idx + 1 );
 
   my $prefix = Net::IPAM::IP->new($prefix_str) // return;
-  my $bits   = 32;
-  $bits = 128 if $prefix->version == 6;
 
-  return unless $ones =~ m/^\d+$/;    # pos integer
-  return if $ones > $bits;
+  my ( $mask, $mask_n );
+  if ( index( $suffix_str, '.' ) >= 0 ) {
+    $mask   = Net::IPAM::IP->new($suffix_str) // return;
+    $mask_n = $mask->bytes;
+    return unless exists $valid_masks{$mask_n};
+  }
+  else {
+    my $bits = 32;
+    $bits = 128 if $prefix->version == 6;
 
-  my $mask_n = _make_mask_n( $ones, $bits );
+    return unless $suffix_str =~ m/^\d+$/;    # pos integer
+    return if $suffix_str > $bits;
+
+    $mask_n = _make_mask_n( $suffix_str, $bits );
+    $mask   = Net::IPAM::IP->new_from_bytes($mask_n);
+  }
+
   my $base_n = _make_base_n( $prefix->bytes, $mask_n );
   my $last_n = _make_last_n( $prefix->bytes, $mask_n );
 
   $self->{base} = Net::IPAM::IP->new_from_bytes($base_n);
   $self->{last} = Net::IPAM::IP->new_from_bytes($last_n);
-  $self->{mask} = Net::IPAM::IP->new_from_bytes($mask_n);
+  $self->{mask} = $mask;
 
   return $self;
 }

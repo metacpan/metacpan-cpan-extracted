@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+# Copyright 2002-2007 Vlado Keselj http://www.cs.dal.ca/~vlado
+#
+# Remove recursively empty directories
+
+$| = 1;
+&remove_empty_dirs(@ARGV);
+
+sub remove_empty_dirs {
+    my $count = 0;
+    while ($#_ > -1) {
+	   my $dir = shift;
+	   # symbolic link
+	   if (-l $dir) { next }
+
+	   next if not -e $dir;
+
+	   # file
+	   if (not -d $dir) { next }
+	   
+	   local ($_, *DIR);
+	   opendir(DIR, $dir) || die "can't opendir $dir: $!";
+	   map { /^\.\.?$/ ? '' : ($count += &remove_empty_dirs("$dir/$_")) } readdir(DIR);
+	   closedir(DIR);
+
+	   # is it empty?
+	   my $count1 = 0;
+	   opendir(DIR, $dir) || die "can't opendir $dir: $!";
+	   map { /^\.\.?$/ ? '' : ($count1 += 1) } readdir(DIR);
+	   closedir(DIR);
+	   if ($count1 == 0) {
+	       print "Removing $dir (empty dir)\n";
+	       rmdir $dir or die "Error removing $dir: $!";
+	       $count += 1;
+	   }
+       }
+    return $count;
+}

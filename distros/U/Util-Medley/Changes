@@ -1,9 +1,92 @@
 ==================================================
-Changes from 2019-04-25 00:00:00 +0000 to present.
+Changes from 2019-05-19 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.030 at 2020-04-24 23:14:20 +0000
+version 0.037 at 2020-05-18 21:17:00 +0000
+------------------------------------------
+
+  Change: 5ab112f3bed40a70267a683ef8b806b5c67c08a0
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-05-18 16:16:51 +0000
+
+    ignore - fixed pod in lib/Util/Medley/Module/Overview.pm 
+
+  Change: 6af4c10956eb0a40b8b4dbbe43831bf495fafa8e
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-05-18 16:11:38 +0000
+
+    ignore - fixed t/10-module-overview.t 
+
+  Change: 37dcc8ee46d2cb2a1dc8017d805a8a893db62360
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-05-18 16:09:05 +0000
+
+    improvements to lib/Util/Medley/Module/Overview.pm 
+
+------------------------------------------
+version 0.036 at 2020-05-15 22:35:47 +0000
+------------------------------------------
+
+  Change: 57f080316da7f7210a2bcf0e4785f77f77822b62
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-05-15 17:35:47 +0000
+
+    undo of scrubParens snafu in lib/Util/Medley/Module/Overview.pm 
+
+------------------------------------------
+version 0.035 at 2020-05-15 22:30:00 +0000
+------------------------------------------
+
+  Change: c23e8f931e44d36502468dcd0734e57b76a88b2e
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-05-15 17:30:00 +0000
+
+    added view-clean option to module-overview action 
+
+------------------------------------------
+version 0.034 at 2020-05-14 13:36:32 +0000
+------------------------------------------
+
+  Change: f61c7e7d9fb7bef9d72a546f83acf62f33ffb32a
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-05-14 08:36:32 +0000
+
+    fixed issue with parseHostname() returning undef instead of empty string
+    when passed an empty string 
+
+------------------------------------------
+version 0.033 at 2020-05-13 21:52:08 +0000
+------------------------------------------
+
+  Change: 1e3f5e734d961aadae1dc16969219c25b633eb4c
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-05-13 16:52:08 +0000
+
+    added Hostname module to lib/Util/Medley.pm 
+
+------------------------------------------
+version 0.032 at 2020-05-13 21:48:40 +0000
+------------------------------------------
+
+  Change: 1197ab6c07d8c05372e99033ad713efc397486e8
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-05-13 16:48:40 +0000
+
+    added stripDomain() to Hostname module 
+
+------------------------------------------
+version 0.031 at 2020-05-13 21:35:32 +0000
+------------------------------------------
+
+  Change: 4aadd68b5e4c4c24f14e8e1aa7306d7ffeb31ac8
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-05-13 16:35:03 +0000
+
+    added Hostname module 
+
+------------------------------------------
+version 0.030 at 2020-04-24 23:14:11 +0000
 ------------------------------------------
 
   Change: 776c338aa3b1be99a0f3ca62305a27cb393eed6f

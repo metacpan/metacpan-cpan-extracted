@@ -22,10 +22,9 @@ unshift @INC, $app_lib;
     local %INC = %INC;
     my $rcloader = new Getopt::EX::Loader
 	BASECLASS => "App::example";
-    my @argv = qw(-Mexample_test --drink-me arg1);
+    my @argv = qw(-Mexample_test --drink-me --shift-here howdy --deprecated --ignore-me --remove-next remove-me --double-next double-me --exch 2nd 1st);
     $rcloader->deal_with(\@argv);
-    is($argv[0], "--default", "deal_with");
-    is($argv[1], "poison", "deal_with");
+    is_deeply(\@argv, [ qw(--default poison --shift-howdy double-me double-me 1st 2nd) ], "deal_with");
 }
 
 ##

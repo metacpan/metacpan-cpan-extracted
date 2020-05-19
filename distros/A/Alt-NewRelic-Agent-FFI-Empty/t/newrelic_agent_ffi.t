@@ -2,6 +2,9 @@ use 5.010;
 use Test2::V0 -no_srand => 1;
 use NewRelic::Agent::FFI;
 
+delete $ENV{NEWRELIC_APP_NAME};
+delete $ENV{NEWRELIC_LICENSE_KEY};
+
 subtest 'basic' => sub {
   my $nr = NewRelic::Agent::FFI->new;
   is $nr->get_license_key => '',

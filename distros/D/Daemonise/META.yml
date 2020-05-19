@@ -1,10 +1,58 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Daemonise
-version:      1.0
-version_from: lib/Daemonise.pm
-installdirs:  site
+---
+abstract: 'Daemonise - a general daemoniser for anything...'
+author:
+  - 'Lenz Gschwendtner <norbu09@cpan.org>'
+build_requires:
+  Test::Deep: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Daemonise
 requires:
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30
+  Basket::Calc: '0'
+  Cache::KyotoTycoon: '0'
+  Carp: '0'
+  Config::Any: '0'
+  Data::Dumper: '0'
+  Data::MessagePack: '0'
+  Data::Printer: '0'
+  DateTime: '0'
+  Digest::MD5: '0'
+  File::Basename: '0'
+  FindBin: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  MIME::Base64: '0'
+  Modern::Perl: '0'
+  Mouse: '0'
+  Mouse::Role: '0'
+  Net::AMQP::RabbitMQ: '2.300000'
+  Net::Graphite: '0'
+  POSIX: '0'
+  Parallel::ForkManager: '0'
+  Redis: '0'
+  Riemann::Client: '0'
+  Scalar::Util: '0'
+  Storable: '0'
+  Store::CouchDB: '0'
+  Sys::Syslog: '0'
+  Tie::Syslog: '0'
+  Try::Tiny: '0'
+  WebService::PagerDuty: '0'
+  experimental: '0'
+  lib: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/ideegeo/Daemonise/issues
+  homepage: https://github.com/ideegeo/Daemonise/wiki
+  repository: git://github.com/ideegeo/Daemonise.git
+version: '2.13'
+x_generated_by_perl: v5.30.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

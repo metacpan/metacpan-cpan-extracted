@@ -1,5 +1,10 @@
 Revision history for Getopt-EX extension Getopt-EX-termcolor
 
+1.06 2020-05-14T07:04:58Z
+
+    - Allow empty option setting for light/dark.
+    - Make XTerm timeout longer.
+
 1.05 2020-04-28T00:45:35Z
 
     - Accept anything start with xterm as XTerm.

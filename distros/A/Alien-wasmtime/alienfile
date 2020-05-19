@@ -6,7 +6,7 @@ configure {
   requires 'Path::Tiny';
 };
 
-my $version = $ENV{ALIEN_WASMTIME_VERSION} || 'v0.15.0';
+my $version = $ENV{ALIEN_WASMTIME_VERSION} || 'v0.16.0';
 my $arch = 'x86_64';	
 
 if($^O eq 'linux')

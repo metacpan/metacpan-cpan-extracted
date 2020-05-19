@@ -60,6 +60,7 @@
             "Crypt::PRNG" : "0.064",
             "DateTime" : "0",
             "Devel::Confess" : "0",
+            "Devel::Declare" : "<= 0.006019",
             "Encode" : "3.01",
             "HTTP::AcceptLanguage" : "0.02",
             "IO::File" : "0",
@@ -71,7 +72,7 @@
             "Test::Mock::Apache2" : "0.05",
             "Test::MockObject" : "1.20180705",
             "Test::More" : "0",
-            "TryCatch" : "0",
+            "TryCatch" : "1.003002",
             "URI" : "0",
             "URI::Escape" : "3.31",
             "URI::Query" : "0.16",
@@ -85,6 +86,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.5.4",
+   "version" : "v0.5.5",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

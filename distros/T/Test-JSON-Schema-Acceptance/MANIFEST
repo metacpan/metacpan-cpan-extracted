@@ -10,7 +10,7 @@ Makefile.PL
 README
 dist.ini
 examples/run_all_tests
-inc/MakeMaker.pm
+inc/OldShareDirFiles.pm
 lib/Test/JSON/Schema/Acceptance.pm
 share/LICENSE
 share/README.md
@@ -40,10 +40,12 @@ share/tests/draft2019-09/exclusiveMinimum.json
 share/tests/draft2019-09/format.json
 share/tests/draft2019-09/if-then-else.json
 share/tests/draft2019-09/items.json
+share/tests/draft2019-09/maxContains.json
 share/tests/draft2019-09/maxItems.json
 share/tests/draft2019-09/maxLength.json
 share/tests/draft2019-09/maxProperties.json
 share/tests/draft2019-09/maximum.json
+share/tests/draft2019-09/minContains.json
 share/tests/draft2019-09/minItems.json
 share/tests/draft2019-09/minLength.json
 share/tests/draft2019-09/minProperties.json
@@ -53,6 +55,7 @@ share/tests/draft2019-09/not.json
 share/tests/draft2019-09/oneOf.json
 share/tests/draft2019-09/optional/bignum.json
 share/tests/draft2019-09/optional/content.json
+share/tests/draft2019-09/optional/ecmascript-regex.json
 share/tests/draft2019-09/optional/format/date-time.json
 share/tests/draft2019-09/optional/format/date.json
 share/tests/draft2019-09/optional/format/duration.json
@@ -216,6 +219,7 @@ share/tests/draft7/not.json
 share/tests/draft7/oneOf.json
 share/tests/draft7/optional/bignum.json
 share/tests/draft7/optional/content.json
+share/tests/draft7/optional/ecmascript-regex.json
 share/tests/draft7/optional/format/date-time.json
 share/tests/draft7/optional/format/date.json
 share/tests/draft7/optional/format/ecmascript-regex.json
@@ -260,6 +264,11 @@ t/11-additional-resources.t
 t/12-include-optional.t
 t/lib/SchemaParser.pm
 t/tests/bad/invalid-schema.json
+t/tests/include_optional/extra/foo.json
+t/tests/include_optional/foo.json
+t/tests/include_optional/optional/alpha.json
+t/tests/include_optional/optional/beta.json
+t/tests/include_optional/zulu.json
 t/tests/simple-booleans/bar.json
 t/tests/simple-booleans/foo.json
 t/tests/subset/bar.json

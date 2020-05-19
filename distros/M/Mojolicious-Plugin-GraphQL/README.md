@@ -129,6 +129,11 @@ text/html` will return the GraphiQL user interface. Defaults to false.
     # Mojolicious::Lite
     plugin GraphQL => {schema => $schema, graphiql => 1};
 
+## keepalive
+
+Defaults to 0, which means do not send. Otherwise will send a keep-alive
+packet over websocket every specified number of seconds.
+
 # METHODS
 
 [Mojolicious::Plugin::GraphQL](https://metacpan.org/pod/Mojolicious::Plugin::GraphQL) inherits all methods from

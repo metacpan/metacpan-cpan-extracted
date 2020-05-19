@@ -1,0 +1,122 @@
+NAME
+
+    Date::Holidays::TW - Determine whether it is Taiwan Holidays or not.
+
+SYNOPSIS
+
+    This module can be used by itself:
+
+        use Date::Holidays::TW qw(is_tw_holiday);
+        if ( is_tw_holiday(2020, 6, 25) ) {
+            ...
+        }
+
+    Or via Date::Holidays
+
+        my $dh = Date::Holidays->new( countrycode => 'TW' );
+        if ($dh->is_holiday( 2020, 6, 25 )) {
+            ...
+        }
+
+DESCRIPTION
+
+    This module provides functions to look into Taiwan holiday calendars
+    for known holidays. It could be used by itself, or under via
+    Date::Holidays module.
+
+    Caveat: Due to the rule of weekend-compensation and the fact that the
+    majority of holidays are defined by Chinese calendar (Lunar), it
+    requires some non-trivial amount of computation to correctly determine
+    whether the given date is an holiday or not -- which is not implemented
+    at this version.
+
+    The current implementation includes all known holidays of year 2019 and
+    2020 as a lookup table and should therefore correctly determine
+    holidays in those 2 years. It should also determine most of the future
+    updates correct by some basic compuation, except for the ones generated
+    by the weekend-compensation rule.
+
+    Conventionally the holiday calendar for the next year is announcend at
+    the end of June and we could start to mix the new information into the
+    lookup table in this module.
+
+    Generally speaking, queries for far future should be avoided.
+
+EXPORTABLE FUNCTIONS
+
+ is_tw_holiday
+
+    Usage:
+
+        my $holiday_name = is_tw_holiday( $year, $month, $day );
+
+    This subroutine returns the name of the holiday for the given day if it
+    is a holiday. Otherwise it returns undef.
+
+ tw_holidays
+
+    Usage:
+
+        my $holidays = tw_holidays( $year );
+
+    This retrieve all Taiwan holidays of given year as a HashRef. With keys
+    being Month + Day as 4-digit string and values being the name of the
+    corresponding holiday.
+
+METHODS
+
+ is_holiday
+
+    Usage:
+
+        $o = Date::Holidays::TW->new();
+        $res = $o->is_holiday( $year, $month, $day );
+
+    This does the same thing as function is_tw_holiday.
+
+ holidays
+
+    Usage:
+
+        $o = Date::Holidays::TW->new();
+        $res = $o->holidays( $year );
+
+    This does the same thing as function tw_holidays.
+
+SEE ALSO
+
+    Date::Holidays, https://www.dgpa.gov.tw/informationlist?uid=30
+
+AUTHOR
+
+    Kang-min Liu <gugod@gugod.org>
+
+    Wei-Hon Chen
+
+LICENSE
+
+    The MIT License
+
+DISCLAIMER OF WARRANTY
+
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT
+    WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER
+    PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND,
+    EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

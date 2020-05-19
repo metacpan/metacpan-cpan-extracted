@@ -12,7 +12,7 @@ use Scalar::Util qw(weaken);
 use strict;
 use vars qw($Debug $VERSION $HashId);
 
-$VERSION = '1.254';
+$VERSION = '1.258';
 
 $Debug = $Parallel::Forker::Debug;
 $HashId = 0;
@@ -29,6 +29,7 @@ sub _new {
 	_ref_count => 0,        # number of people depending on us
 	pid => undef,		# Pid # running as, undef=not running
 	run_after => [],	# Process objects that are prereqs
+	run_pre_start => sub {},
 	run_on_start => sub {confess "%Error: No run_on_start defined\n";},
 	run_on_finish => sub {my ($procref,$status) = @_;},	# Routine taking child and exit status
 	@_
@@ -226,6 +227,7 @@ sub run {
     print "  FrkProc $self->{name} $self->{_state} -> running\n" if $Debug;
     $self->{_state} = 'running';
     $self->{start_time} = time();
+    $self->{run_pre_start}->($self);
     if (my $pid = fork()) {
 	$self->{pid} = $pid;
 	$self->{pid_last_run} = $pid;

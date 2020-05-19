@@ -1,0 +1,11 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+cpanfile
+lib/Date/Holidays/TW.pm
+metamerge.json
+t/simple.t

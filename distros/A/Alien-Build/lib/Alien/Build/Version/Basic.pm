@@ -14,7 +14,7 @@ use overload
 our @EXPORT_OK = qw( version );
 
 # ABSTRACT: Very basic version object for Alien::Build
-our $VERSION = '2.22'; # VERSION
+our $VERSION = '2.23'; # VERSION
 
 
 sub new
@@ -71,7 +71,7 @@ Alien::Build::Version::Basic - Very basic version object for Alien::Build
 
 =head1 VERSION
 
-version 2.22
+version 2.23
 
 =head1 SYNOPSIS
 

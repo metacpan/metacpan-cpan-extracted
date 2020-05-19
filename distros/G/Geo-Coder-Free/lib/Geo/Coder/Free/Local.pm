@@ -19,11 +19,11 @@ inspecting GeoTagged photographs.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 use constant	LIBPOSTAL_UNKNOWN => 0;
 use constant	LIBPOSTAL_INSTALLED => 1;
 use constant	LIBPOSTAL_NOT_INSTALLED => -1;
@@ -291,39 +291,49 @@ sub geocode {
 	}
 
 	if(($libpostal_is_installed == LIBPOSTAL_INSTALLED) && (my %addr = Geo::libpostal::parse_address($location))) {
-		# ::diag(Data::Dumper->new([\%addr])->Dump());
+		if($addr{'house_number'} && !$addr{'number'}) {
+			$addr{'number'} = delete $addr{'house_number'};
+		}
+		if($addr{'house'} && !$addr{'name'}) {
+			$addr{'name'} = delete $addr{'house'};
+		}
 		$addr{'location'} = $location;
-		if($addr{'country'} && $addr{'state'} && ($addr{'country'} =~ /^(Canada|United States|USA|US)$/i)) {
-			if(my $street = $addr{'road'}) {
-				$street = uc($street);
-				if($street =~ /(.+)\s+STREET$/) {
-					$street = "$1 ST";
-				} elsif($street =~ /(.+)\s+ROAD$/) {
-					$street = "$1 RD";
-				} elsif($street =~ /(.+)\s+AVENUE$/) {
-					$street = "$1 AVE";
-				} elsif($street =~ /(.+)\s+AVENUE\s+(.+)/) {
-					$street = "$1 AVE $2";
-				} elsif($street =~ /(.+)\s+COURT$/) {
-					$street = "$1 CT";
-				} elsif($street =~ /(.+)\s+CIRCLE$/) {
-					$street = "$1 CIR";
-				} elsif($street =~ /(.+)\s+DRIVE$/) {
-					$street = "$1 DR";
-				} elsif($street =~ /(.+)\s+PARKWAY$/) {
-					$street = "$1 PKWY";
-				} elsif($street =~ /(.+)\s+GARDENS$/) {
-					$street = "$1 GRDNS";
-				} elsif($street =~ /(.+)\s+LANE$/) {
-					$street = "$1 LN";
-				} elsif($street =~ /(.+)\s+PLACE$/) {
-					$street = "$1 PL";
-				} elsif($street =~ /(.+)\s+CREEK$/) {
-					$street = "$1 CRK";
-				}
-				$street =~ s/^0+//;	# Turn 04th St into 4th St
-				$addr{'road'} = $street;
+		if(my $street = $addr{'road'}) {
+			$street = uc($street);
+			if($street =~ /(.+)\s+STREET$/) {
+				$street = "$1 ST";
+			} elsif($street =~ /(.+)\s+ROAD$/) {
+				$street = "$1 RD";
+			} elsif($street =~ /(.+)\s+AVENUE$/) {
+				$street = "$1 AVE";
+			} elsif($street =~ /(.+)\s+AVENUE\s+(.+)/) {
+				$street = "$1 AVE $2";
+			} elsif($street =~ /(.+)\s+COURT$/) {
+				$street = "$1 CT";
+			} elsif($street =~ /(.+)\s+CIRCLE$/) {
+				$street = "$1 CIR";
+			} elsif($street =~ /(.+)\s+DRIVE$/) {
+				$street = "$1 DR";
+			} elsif($street =~ /(.+)\s+PARKWAY$/) {
+				$street = "$1 PKWY";
+			} elsif($street =~ /(.+)\s+GARDENS$/) {
+				$street = "$1 GRDNS";
+			} elsif($street =~ /(.+)\s+LANE$/) {
+				$street = "$1 LN";
+			} elsif($street =~ /(.+)\s+PLACE$/) {
+				$street = "$1 PL";
+			} elsif($street =~ /(.+)\s+CREEK$/) {
+				$street = "$1 CRK";
 			}
+			$street =~ s/^0+//;	# Turn 04th St into 4th St
+			$addr{'road'} = $street;
+		}
+		if(defined($addr{'state'}) && !defined($addr{'country'}) && ($addr{'state'} eq 'england')) {
+			delete $addr{'state'};
+			$addr{'country'} = 'GB';
+		}
+		# ::diag(__LINE__, ': ', Data::Dumper->new([\%addr])->Dump());
+		if($addr{'country'} && ($addr{'state'} || $addr{'state_district'})) {
 			if($addr{'country'} =~ /Canada/i) {
 				$addr{'country'} = 'Canada';
 				if(length($addr{'state'}) > 2) {
@@ -331,7 +341,7 @@ sub geocode {
 						$addr{'state'} = $twoletterstate;
 					}
 				}
-			} else {
+			} elsif($addr{'country'} =~ /^(United States|USA|US)$/i) {
 				$addr{'country'} = 'US';
 				if(length($addr{'state'}) > 2) {
 					if(my $twoletterstate = Locale::US->new()->{state2code}{uc($addr{'state'})}) {
@@ -354,6 +364,28 @@ sub geocode {
 				}
 			}
 		}
+	} elsif($location =~ /^(.+?),\s*([\s\w]+),\s*([\s\w]+),\s*([\w\s]+)$/) {
+		my %addr;
+		$addr{'road'} = $1;
+		$addr{'city'} = $2;
+		$addr{'state'} = $3;
+		$addr{'country'} = $4;
+		$addr{'state'} =~ s/\s$//g;
+		$addr{'country'} =~ s/\s$//g;
+		if($addr{'road'} =~ /([\w\s]+),*\s+(.+)/) {
+			$addr{'name'} = $1;
+			$addr{'road'} = $2;
+		}
+		if($addr{'road'} =~ /^(\d+)\s+(.+)/) {
+			$addr{'number'} = $1;
+			$addr{'road'} = $2;
+			# ::diag(__LINE__, ': ', Data::Dumper->new([\%addr])->Dump());
+			if(my $rc = $self->_search(\%addr, ('name', 'number', 'road', 'city', 'state', 'country'))) {
+				return $rc;
+			}
+		} elsif(my $rc = $self->_search(\%addr, ('name', 'road', 'city', 'state', 'country'))) {
+			return $rc;
+		}
 	}
 
 	$location = uc($location);
@@ -368,6 +400,13 @@ sub geocode {
 				# ::diag(__LINE__, ": $location");
 				return $rc;
 			}
+			if($location =~ /(.+), (England|UK)$/i) {
+				$param{'location'} = "$1, GB";
+				if(my $rc = $self->geocode(\%param)) {
+					# ::diag(__LINE__, ": $location");
+					return $rc;
+				}
+			}
 		}
 	}
 	return;
@@ -381,7 +420,7 @@ sub _search {
 	my $location;
 
 	# FIXME: linear search is slow
-	# ::diag(Data::Dumper->new([\@columns, $data])->Dump());
+	# ::diag(__LINE__, ': ', Data::Dumper->new([\@columns, $data])->Dump());
 	# print Data::Dumper->new([\@columns, $data])->Dump();
 	foreach my $row(@{$self->{'data'}}) {
 		my $match = 1;
@@ -451,16 +490,30 @@ sub reverse_geocode {
 		Carp::croak('Usage: reverse_geocode(latlng => $location)');
 	}
 
+	# ::diag('x' x 40);
 	my @rc;
 	foreach my $row(@{$self->{'data'}}) {
 		if(defined($row->{'latitude'}) && defined($row->{'longitude'})) {
+			# ::diag(__LINE__, ': ', $row->{'latitude'}, ', ', $latitude);
 			if(_equal($row->{'latitude'}, $latitude, 4) &&
 			   _equal($row->{'longitude'}, $longitude, 4)) {
-				my $point = Geo::Location::Point->new($row);
+				# ::diag('match');
+				my $location = uc(Geo::Location::Point->new($row)->as_string());
 				if(wantarray) {
-					push @rc, $point->as_string();
+					push @rc, $location;
+					while(my($left, $right) = each %alternatives) {
+						# ::diag("$location/$left");
+						if($location =~ $right) {
+							# ::diag($right, '=>', $left);
+							my $l = $location;
+							$l =~ s/$right/$left/;
+							# ::diag(__LINE__, ": $location");
+							push @rc, $l;
+							# Don't add last here
+						}
+					}
 				} else {
-					return $point->as_string();
+					return $location;
 				}
 			}
 		}
@@ -499,7 +552,7 @@ it under the same terms as Perl itself.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2019 Nigel Horne.
+Copyright 2020 Nigel Horne.
 
 The program code is released under the following licence: GPL2 for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)
@@ -564,5 +617,6 @@ __DATA__
 "TOWPATH TRAVEL PLAZA",,,"BROADVIEW HEIGHTS","CUYAHOGA","OH","US",41.291654,-81.675815
 "NEW STANTON SERVICE PLAZA",,,"HEMPFIELD",,"PA","US",40.206267,-79.565682
 "SOUTH SOMERSET SERVICE PLAZA",,,"SOMERSET","SOMERSET","PA","US",39.999154,-79.046526
+"",14900,"CONFERENCE CENTER DR","CHANTILLY","FAIRFAX","VA","US",38.873934,-77.461939
 "THE PURE PASTY COMPANY",128C,"MAPLE AVE W","VIENNA","FAIRFAX","VA","US",44.40662476,-68.59610059
 "THE CAPITAL GRILLE RESTAURANT",1861,,"MCLEAN","FAIRFAX","VA","US",38.915635,-77.22573

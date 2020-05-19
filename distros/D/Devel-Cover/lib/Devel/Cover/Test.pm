@@ -10,7 +10,7 @@ package Devel::Cover::Test;
 use strict;
 use warnings;
 
-our $VERSION = '1.33'; # VERSION
+our $VERSION = '1.35'; # VERSION
 
 use Carp;
 
@@ -19,7 +19,7 @@ use Test::More;
 
 use Devel::Cover::Inc;
 
-my $LATEST_RELEASED_PERL = 28;
+my $LATEST_RELEASED_PERL = 30;
 my %TEST2VERSIONOVERRIDE = (
     bigint => \&_default_version_override,
 );
@@ -415,7 +415,7 @@ Devel::Cover::Test - Internal module for testing
 
 =head1 VERSION
 
-version 1.33
+version 1.35
 
 =head1 METHODS
 

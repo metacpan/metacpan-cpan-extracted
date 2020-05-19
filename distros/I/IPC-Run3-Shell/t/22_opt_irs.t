@@ -40,4 +40,3 @@ is_deeply \@e1, ["barB","quzB","baz\n"], 'irs 6';
 
 # irs + chomp
 is_deeply [$s->perl({irs=>'C',chomp=>1},'-e','print "fooCbarCquz\n"')], ["foo","bar","quz\n"], 'irs 7';
-

@@ -4,13 +4,13 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Alt-NewRelic-Agent-FFI-Empty",
    "no_index" : {
@@ -28,6 +28,8 @@
       },
       "develop" : {
          "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
             "Test::CPAN::Changes" : "0",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
@@ -66,9 +68,11 @@
          "web" : "https://github.com/plicease/Alt-NewRelic-Agent-FFI-Empty"
       }
    },
-   "version" : "0.02",
-   "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09",
+   "version" : "0.03",
+   "x_deprecated" : 1,
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "JSON::XS version 4.02",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }
 

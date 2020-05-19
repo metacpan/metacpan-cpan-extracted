@@ -45,8 +45,6 @@
          [Bug tracker] \break
     \link[https://git.eyrie.org/?p=devel/docknot.git]
          [Git repository] \break
-    \link[https://travis-ci.org/rra/docknot]
-         [Travis-CI] \break
     \link[https://metacpan.org/release/App-DocKnot]
          [MetaCPAN]
 ]
@@ -154,8 +152,6 @@ development source].
         [GitHub]
     \doc[https://rt.cpan.org/Dist/Display.html?Name=App-DocKnot]
         [Bug tracker]
-    \doc[https://travis-ci.org/rra/docknot]
-        [Travis-CI]
 
 ]
 

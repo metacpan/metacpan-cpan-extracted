@@ -1,10 +1,10 @@
 {
-   "abstract" : "colorful calender command",
+   "abstract" : "colorful calendar command",
    "author" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.9",
+   "generated_by" : "Minilla/v3.1.10",
    "license" : [
       "perl_5"
    ],
@@ -42,7 +42,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Getopt::EX" : "v1.14.0",
+            "Getopt::EX" : "v1.18.0",
+            "Getopt::EX::termcolor" : "1.06",
             "Text::ANSI::Fold" : "1.03",
             "Text::VisualWidth::PP" : "0.05",
             "perl" : "5.014"
@@ -57,7 +58,7 @@
    "provides" : {
       "App::week" : {
          "file" : "lib/App/week.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "App::week::colors" : {
          "file" : "lib/App/week/colors.pm"
@@ -80,7 +81,8 @@
          "web" : "https://github.com/kaz-utashiro/App-week"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_authority" : "cpan:UTASHIRO",
+   "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 0
 }

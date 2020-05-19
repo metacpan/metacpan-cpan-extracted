@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Advanced interpolation engine for Alien builds
-our $VERSION = '2.22'; # VERSION
+our $VERSION = '2.23'; # VERSION
 
 
 sub new
@@ -249,7 +249,7 @@ Alien::Build::Interpolate - Advanced interpolation engine for Alien builds
 
 =head1 VERSION
 
-version 2.22
+version 2.23
 
 =head1 CONSTRUCTOR
 

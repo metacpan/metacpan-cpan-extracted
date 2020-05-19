@@ -1,5 +1,9 @@
 Revision history for JSON-MaybeXS
 
+1.004002 - 2020-05-17
+ - fix test that fails when JSON::XS is installed, but below version 3.0
+   (RT#132578)
+
 1.004001 - 2020-05-01
  - document when is_bool became available
  - now favouring Cpanel::JSON::XS over JSON::XS in more situations (the former

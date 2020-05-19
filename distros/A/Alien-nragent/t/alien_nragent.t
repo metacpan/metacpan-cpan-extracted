@@ -4,6 +4,8 @@ use FFI::Platypus;
 use Test::Alien;
 use Capture::Tiny qw( capture_merged );
 
+skip_all 'skipping for release' if $ENV{PERL_ALIEN_NRAGENT_SKIP_TEST};
+
 alien_ok 'Alien::nragent';
 
 my $pass = 0;

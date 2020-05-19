@@ -15,7 +15,7 @@ with 'Data::Object::Role::Buildable';
 with 'Data::Object::Role::Proxyable';
 with 'Data::Object::Role::Stashable';
 
-our $VERSION = '2.00'; # VERSION
+our $VERSION = '2.01'; # VERSION
 
 # ATTRIBUTES
 
@@ -98,13 +98,28 @@ method stashed() {
   return $data;
 }
 
+method unnamed() {
+  my $list = [];
+
+  my $argv = $self->stash('argv');
+  my $data = +{reverse %{$self->named}};
+
+  for my $index (sort keys %$argv) {
+    unless (exists $data->{$index}) {
+      push @$list, $argv->{$index};
+    }
+  }
+
+  return $list;
+}
+
 1;
 
 =encoding utf8
 
 =head1 NAME
 
-Data::Object::Args
+Data::Object::Args - Args Class
 
 =cut
 
@@ -332,6 +347,51 @@ The stashed method returns the stashed data associated with the object.
   # given: synopsis
 
   $args->stashed
+
+=back
+
+=cut
+
+=head2 unnamed
+
+  unnamed() : ArrayRef
+
+The unnamed method returns an arrayref of values which have not been named
+using the C<named> attribute.
+
+=over 4
+
+=item unnamed example #1
+
+  package main;
+
+  use Data::Object::Args;
+
+  local @ARGV = qw(--help execute --format markdown);
+
+  my $args = Data::Object::Args->new(
+    named => { flag => 0, command => 1 }
+  );
+
+  $args->unnamed # ['--format', 'markdown']
+
+=back
+
+=over 4
+
+=item unnamed example #2
+
+  package main;
+
+  use Data::Object::Args;
+
+  local @ARGV = qw(execute phase-1 --format markdown);
+
+  my $args = Data::Object::Args->new(
+    named => { command => 1 }
+  );
+
+  $args->unnamed # ['execute', '--format', 'markdown']
 
 =back
 

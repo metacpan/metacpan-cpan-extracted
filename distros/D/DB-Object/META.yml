@@ -24,6 +24,7 @@ requires:
   DateTime::Format::Strptime: '1.76'
   DateTime::TimeZone: '2.36'
   Devel::Confess: '0.009004'
+  Devel::Declare: '<= 0.006019'
   Fcntl: '0'
   File::Basename: '2.85'
   File::Spec: '3.78'
@@ -35,7 +36,8 @@ requires:
   Number::Format: '1.75'
   POSIX: '1.88'
   Scalar::Util: '1.54'
-  Test::More: '0'
+  Test::More: '1.302162'
+  Test::Pod: '1.52'
   TryCatch: '1.003002'
   URI: '1.76'
   Want: '0.29'
@@ -44,5 +46,5 @@ requires:
   perl: '5.006000'
   strict: '0'
   version: '0'
-version: v0.9.2
+version: v0.9.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

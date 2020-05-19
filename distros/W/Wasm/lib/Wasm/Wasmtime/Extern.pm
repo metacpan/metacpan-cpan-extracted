@@ -10,7 +10,7 @@ require Wasm::Wasmtime::Table;
 require Wasm::Wasmtime::Memory;
 
 # ABSTRACT: Wasmtime extern class
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 $ffi_prefix = 'wasm_extern_';
@@ -67,7 +67,7 @@ Wasm::Wasmtime::Extern - Wasmtime extern class
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

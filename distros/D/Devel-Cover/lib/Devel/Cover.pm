@@ -12,7 +12,7 @@ use warnings;
 
 our $VERSION;
 BEGIN {
-our $VERSION = '1.33'; # VERSION
+our $VERSION = '1.35'; # VERSION
 }
 
 use DynaLoader ();
@@ -94,63 +94,22 @@ my $Const_right = qr/^(?:const|s?refgen|gelem|die|undef|bless|anon(?:list|hash)|
                        scalar|return|last|next|redo|goto)$/x;
                                          # constant ops
 
-use vars '$File',                        # Last filename we saw.  (localised)
-         '$Line',                        # Last line number we saw.  (localised)
-         '$Collect',                     # Whether or not we are collecting
+our $File;                               # Last filename we saw.  (localised)
+our $Line;                               # Last line number we saw.  (localised)
+our $Collect;                            # Whether or not we are collecting
                                          # coverage data.  We make two passes
                                          # over conditions.  (localised)
-         '%Files',                       # Whether we are interested in files
+our %Files;                              # Whether we are interested in files
                                          # Used in runops function
-         '$Replace_ops',                 # Whether we are replacing ops
-         '$Silent',                      # Output nothing. Can be used anywhere
-         '$Self_cover';                  # Coverage of Devel::Cover
+our $Replace_ops;                        # Whether we are replacing ops
+our $Silent;                             # Output nothing. Can be used anywhere
+our $Self_cover;                         # Coverage of Devel::Cover
 
 BEGIN {
     ($File, $Line, $Collect) = ("", 0, 1);
     $Silent = ($ENV{HARNESS_PERL_SWITCHES} || "") =~ /Devel::Cover/ ||
               ($ENV{PERL5OPT}              || "") =~ /Devel::Cover/;
     *OUT = $ENV{DEVEL_COVER_DEBUG} ? *STDERR : *STDOUT;
-
-    if ($] < 5.010000 && !$ENV{DEVEL_COVER_UNSUPPORTED}) {
-        my $v = $] < 5.008001 ? "1.22" : "1.23";
-        print <<EOM;
-
-================================================================================
-
-                                   IMPORTANT
-                                   ---------
-
-Devel::Cover $VERSION is not supported on perl $].  The last version of
-Devel::Cover which was supported was version $v.  This version may not work.
-I have not tested it.  If it does work it will not be fully functional.
-
-If you decide to use it anyway, you are on your own.  If it works at all, there
-will be some constructs for which coverage will not be collected, and you may
-well encounter bugs which have been fixed in subsequent versions of perl.
-EOM
-
-        print <<EOM if $^O eq "MSWin32";
-
-And things are even worse under Windows.  You may well find random bugs of
-various severities.
-EOM
-        print <<EOM;
-
-If you are actually using this version of Devel::Cover with perl $], please let
-me know.  I don't want to know if you are just testing Devel::Cover, only if you
-are seriously using this version to do code coverage analysis of real code.  If
-I get no reports of such usage then I will remove support and delete the
-workarounds for versions of perl below 5.10.0.
-
-In order to use this version of Devel::Cover with perl $] you must set the
-environment variable \$DEVEL_COVER_UNSUPPORTED
-
-================================================================================
-
-EOM
-
-        die "Exiting";
-    }
 
     if ($^X =~ /(apache2|httpd)$/) {
         # mod_perl < 2.0.8
@@ -370,7 +329,7 @@ sub import {
 
     if ($blib) {
         eval "use blib";
-        for (@INC) { $_ = $1 if /(.*)/ }  # Die tainting
+        for (@INC) { $_ = $1 if ref $_ ne 'CODE' && /(.*)/ }  # Die tainting
         push @Ignore, "^t/", '\\.t$', '^test\\.pl$';
     }
 
@@ -383,11 +342,11 @@ sub import {
 
     if (defined $Dir) {
         $Dir = $1 if $Dir =~ /(.*)/;  # Die tainting
-        chdir $Dir or die __PACKAGE__ . ": Can't chdir $Dir: $!\n";
     } else {
         $Dir = $1 if Cwd::getcwd() =~ /(.*)/;
     }
 
+    $DB = File::Spec->catdir($Dir, $DB);
     unless (mkdir $DB) {
         die "Can't mkdir $DB: $!" unless -d $DB;
     }
@@ -573,10 +532,10 @@ sub get_location {
 }
 
 my $find_filename = qr/
-  (?:^\(eval\s \d+\)\[(.+):\d+\])      |
-  (?:^\(eval\sin\s\w+\)\s(.+))         |
-  (?:\(defined\sat\s(.+)\sline\s\d+\)) |
-  (?:\[from\s(.+)\sline\s\d+\])
+    (?:^\(eval\s \d+\)\[(.+):\d+\])      |
+    (?:^\(eval\sin\s\w+\)\s(.+))         |
+    (?:\(defined\sat\s(.+)\sline\s\d+\)) |
+    (?:\[from\s(.+)\sline\s\d+\])
 /x;
 
 sub use_file {
@@ -652,7 +611,7 @@ sub B::GV::find_cv {
         $Cvs{$_} ||= $_
           for grep ref eq "B::CV" && check_file($_), $cv->PADLIST->ARRAY->ARRAY;
     }
-};
+}
 
 sub sub_info {
     my ($cv) = @_;
@@ -664,12 +623,26 @@ sub sub_info {
         # print STDERR "--[$name]--\n";
         $name =~ s/(__ANON__)\[.+:\d+\]/$1/ if defined $name;
     }
+    # my $op = sub { my ($t, $o) = @_; print "$t\n"; $o->debug };
     my $root = $cv->ROOT;
+    # $op->(root => $root);
     if ($root->can("first")) {
         my $lineseq = $root->first;
+        # $op->(lineseq => $lineseq);
         if ($lineseq->can("first")) {
             # normal case
             $start = $lineseq->first;
+            # $op->(start => $start);
+            # signatures
+            if ($start->name eq "null" && $start->can("first")) {
+                my $lineseq2 = $start->first;
+                # $op->(lineseq2 => $lineseq2);
+                if ($lineseq2->name eq "lineseq" && $lineseq2->can("first")) {
+                    my $cop = $lineseq2->first;
+                    # $op->(cop => $cop);
+                    $start = $cop if $cop->name eq "nextstate";
+                }
+            }
         } elsif ($lineseq->name eq "nextstate") {
             # completely empty sub - sub empty { }
             $start = $lineseq;
@@ -717,8 +690,7 @@ sub check_files {
     # subs in some modules don't seem to be around when we get to looking at
     # them.  I'm not sure why this is, and it seems to me that this hack could
     # affect the order of destruction, but I've not seen any problems.  Yet.
-    # object_2svref doesn't exist before 5.8.1.
-    @Subs = map $_->object_2svref, @Cvs if $] >= 5.008001;
+    @Subs = map $_->object_2svref, @Cvs;
 }
 
 my %Seen;
@@ -1317,7 +1289,7 @@ Devel::Cover - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.33
+version 1.35
 
 =head1 SYNOPSIS
 
@@ -1406,20 +1378,10 @@ reported.
 
 =item * Perl 5.10.0 or greater.
 
-Perl versions 5.6.1, 5.6.2 and 5.8.x may work to an extent but are unsupported.
-Perl 5.8.7 has problems and may crash.
-
-If you want to use an unsupported version you will need to set the environment
-variable $DEVEL_COVER_UNSUPPORTED.  Unsupported versions are also untested.  I
-will consider patches for unsupported versions only if they do not compromise
-the code.  This is a vague, nebulous concept that I will decide on if and when
-necessary.
-
-If you are using an unsupported version, please let me know.  I don't want to
-know if you are just testing Devel::Cover, only if you are seriously using it to
-do code coverage analysis of real code.  If I get no reports of such usage then
-I will remove support and delete the workarounds for versions of perl below
-5.10.0.  I may do that anyway.
+The latest version of Devel::Cover on which Perl 5.8 was supported was 1.23.
+Perl versions 5.6.1 and 5.6.2 were not supported after version 1.22.  Perl
+versions 5.6.0 and earlier were never supported.  Using Devel::Cover with Perl
+5.8.7 was always problematic and frequently lead to crashes.
 
 Different versions of perl may give slightly different results due to changes
 in the op tree.
@@ -1437,6 +1399,14 @@ that the appropriate tools are installed.
 Both are in the core in Perl 5.8.0 and above.
 
 =back
+
+=head2 REQUIRED MODULES
+
+=over
+
+=item * L<B::Debug>
+
+This was core before Perl 5.30.0.
 
 =head2 OPTIONAL MODULES
 

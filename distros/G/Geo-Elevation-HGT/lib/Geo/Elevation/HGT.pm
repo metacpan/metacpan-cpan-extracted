@@ -3,9 +3,10 @@ package Geo::Elevation::HGT;
 use 5.010;
 use strict;
 use warnings;
+use POSIX ();
 use Carp;
 # set the version for version checking
-our $VERSION     = '0.03';
+our $VERSION     = '0.04';
 # file-private lexicals
 my $grid_size; # .hgt grid size = 3601x3601 for 1-minute DEMs or 1201x1201 for 3-minute DEMs
 my @DEMnames;
@@ -215,7 +216,7 @@ Geo::Elevation::HGT - Elevation service with terrain data provided by L<Mapzen a
 
 =head1 Version
 
-Version 0.03
+Version 0.04
 
 =head1 Synopsis
 

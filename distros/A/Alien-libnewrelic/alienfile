@@ -1,0 +1,38 @@
+use alienfile;
+
+unless($^O eq 'linux')
+{
+  print "This Alien is only supported on Linux";
+  exit;
+}
+
+probe sub { 'share' };
+
+share {
+  requires 'Alien::libpcre';
+
+  plugin Download => (
+    url => 'https://github.com/newrelic/c-sdk/releases',
+    filter => qr/\.tar\.gz$/,
+    version => qr/v([0-9\.]+)/,
+  );
+  plugin Extract => 'tar.gz';
+
+  build [
+    'make libnewrelic.a libnewrelic.so',
+    'mkdir -p %{.install.prefix}/lib %{.install.prefix}/include %{.install.prefix}/dynamic',
+    'cp -a libnewrelic.a %{.install.prefix}/lib',
+    'cp -a libnewrelic.so %{.install.prefix}/dynamic',
+    'cp -a include/libnewrelic.h %{.install.prefix}/include',
+  ];
+
+  gather sub {
+    my $build = shift;
+    my $prefix = $build->runtime_prop->{prefix};
+    $build->runtime_prop->{cflags}        = "-I$prefix/include ";
+    $build->runtime_prop->{cflags_static} = "-I$prefix/include ";
+    $build->runtime_prop->{libs}          = "-L$prefix/lib -lnewrelic ";
+    $build->runtime_prop->{libs_static}   = "-L$prefix/lib -lnewrelic ";
+  };
+}
+

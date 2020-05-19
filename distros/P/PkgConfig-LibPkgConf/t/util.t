@@ -12,7 +12,8 @@ subtest 'argv_split' => sub {
 subtest 'compare_version' => sub {
 
   is compare_version('1.2.3', '1.2.3'), 0;
-  isnt compare_version('1.2.3', '1.2.4'), 0;
+  is compare_version('1.2.3', '1.2.4'), -1;
+  is compare_version('1.2.4', '1.2.3'), 1;
 
 };
 

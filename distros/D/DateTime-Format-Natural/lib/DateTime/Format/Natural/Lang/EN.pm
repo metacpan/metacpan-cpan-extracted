@@ -13,7 +13,7 @@ use constant skip  => true;
 
 use DateTime::Format::Natural::Helpers qw(%flag);
 
-our $VERSION = '1.66';
+our $VERSION = '1.67';
 
 our (%init,
      %timespan,
@@ -357,7 +357,10 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          ],
          [ {} ],
          [ '_daytime_variant' ],
-         { truncate_to => [q(hour)] },
+         {
+           advance_future => true,
+           truncate_to    => [q(hour)],
+         },
        ],
        [
          { 0 => qr/^(afternoon)$/i },
@@ -370,7 +373,10 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          ],
          [ {} ],
          [ '_daytime_variant' ],
-         { truncate_to => [q(hour)] },
+         {
+           advance_future => true,
+           truncate_to    => [q(hour)],
+         },
        ],
        [
          { 0 => qr/^(evening)$/i },
@@ -383,7 +389,10 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          ],
          [ {} ],
          [ '_daytime_variant' ],
-         { truncate_to => [q(hour)] },
+         {
+           advance_future => true,
+           truncate_to    => [q(hour)],
+         },
        ]
     ],
     daytime_noon_midnight => [
@@ -399,7 +408,10 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          ],
          [ {} ],
          [ '_daytime' ],
-         { truncate_to => [q(hour)] },
+         {
+           advance_future => true,
+           truncate_to    => [q(hour)],
+         },
        ],
        [
          { 0 => qr/^(midnight)$/i },
@@ -412,7 +424,10 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          ],
          [ {} ],
          [ '_daytime' ],
-         { truncate_to => [q(hour)] },
+         {
+           advance_future => true,
+           truncate_to    => [q(hour)],
+         },
        ],
     ],
     daytime_noon_midnight_at => [
@@ -825,8 +840,8 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          [ {}, {} ],
          [ '_weekday', '_daytime_variant' ],
          {
-           prefer_future => true,
-           truncate_to   => [undef, q(hour)],
+           advance_future => true,
+           truncate_to    => [undef, q(hour)],
          },
        ],
        [
@@ -844,8 +859,8 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          [ {}, {} ],
          [ '_weekday', '_daytime_variant' ],
          {
-           prefer_future => true,
-           truncate_to   => [undef, q(hour)],
+           advance_future => true,
+           truncate_to    => [undef, q(hour)],
          },
        ],
        [
@@ -863,8 +878,8 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          [ {}, {} ],
          [ '_weekday', '_daytime_variant' ],
          {
-           prefer_future => true,
-           truncate_to   => [undef, q(hour)],
+           advance_future => true,
+           truncate_to    => [undef, q(hour)],
          },
        ],
     ],
@@ -1278,8 +1293,8 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          [ { unit => 'month' } ],
          [ '_unit_date' ],
          {
-           prefer_future => true,
-           truncate_to   => [q(month)],
+           advance_future => true,
+           truncate_to    => [q(month)],
          },
        ],
     ],
@@ -1298,8 +1313,8 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          [ {} ],
          [ '_month_day' ],
          {
-           prefer_future => true,
-           truncate_to   => [q(day)],
+           advance_future => true,
+           truncate_to    => [q(day)],
          },
        ],
        [
@@ -1315,8 +1330,8 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          [ {} ],
          [ '_month_day' ],
          {
-           prefer_future => true,
-           truncate_to   => [q(day)],
+           advance_future => true,
+           truncate_to    => [q(day)],
          },
        ]
     ],
@@ -1750,8 +1765,8 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          [ {} ],
          [ '_weekday' ],
          {
-           prefer_future => true,
-           truncate_to   => [q(day)],
+           advance_future => true,
+           truncate_to    => [q(day)],
          },
        ],
     ],
@@ -2102,8 +2117,8 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          [ {} ],
          [ '_at' ],
          {
-           prefer_future => true,
-           truncate_to   => [q(hour_minute)],
+           advance_future => true,
+           truncate_to    => [q(hour_minute)],
          },
        ],
        [
@@ -2118,8 +2133,8 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          [ {} ],
          [ '_at' ],
          {
-           prefer_future => true,
-           truncate_to   => [q(hour_minute)],
+           advance_future => true,
+           truncate_to    => [q(hour_minute)],
          },
        ],
     ],
@@ -2138,8 +2153,8 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          [ {}, {} ],
          [ '_weekday', '_time' ],
          {
-           prefer_future => true,
-           truncate_to   => [undef, q(hour_minute)],
+           advance_future => true,
+           truncate_to    => [undef, q(hour_minute)],
          },
        ],
        [
@@ -2157,8 +2172,8 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          [ {}, {} ],
          [ '_weekday', '_at' ],
          {
-           prefer_future => true,
-           truncate_to   => [undef, q(hour_minute)],
+           advance_future => true,
+           truncate_to    => [undef, q(hour_minute)],
          },
        ],
        [
@@ -2176,8 +2191,8 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          [ {}, {} ],
          [ '_weekday', '_at' ],
          {
-           prefer_future => true,
-           truncate_to   => [undef, q(hour_minute)],
+           advance_future => true,
+           truncate_to    => [undef, q(hour_minute)],
          },
        ],
        [
@@ -2193,8 +2208,8 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          [ {}, {} ],
          [ '_time', '_weekday' ],
          {
-           prefer_future => true,
-           truncate_to   => [undef, q(hour_minute)],
+           advance_future => true,
+           truncate_to    => [undef, q(hour_minute)],
          },
        ],
        [
@@ -2212,8 +2227,8 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          [ {}, {} ],
          [ '_at', '_weekday' ],
          {
-           prefer_future => true,
-           truncate_to   => [undef, q(hour_minute)],
+           advance_future => true,
+           truncate_to    => [undef, q(hour_minute)],
          },
        ],
        [
@@ -2231,8 +2246,8 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          [ {}, {} ],
          [ '_at', '_weekday' ],
          {
-           prefer_future => true,
-           truncate_to   => [undef, q(hour_minute)],
+           advance_future => true,
+           truncate_to    => [undef, q(hour_minute)],
          },
        ],
     ],
@@ -2246,8 +2261,8 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          [ {} ],
          [ '_time' ],
          {
-           prefer_future => true,
-           truncate_to   => [q(hour_minute)],
+           advance_future => true,
+           truncate_to    => [q(hour_minute)],
          },
        ],
     ],
@@ -4047,8 +4062,8 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          [ {}, {} ],
          [ '_time', '_weekday' ],
          {
-           prefer_future => true,
-           truncate_to   => [undef, q(hour_minute)],
+           advance_future => true,
+           truncate_to    => [undef, q(hour_minute)],
          },
        ],
        [
@@ -4066,8 +4081,8 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          [ {}, {} ],
          [ '_at', '_weekday' ],
          {
-           prefer_future => true,
-           truncate_to   => [undef, q(hour_minute)],
+           advance_future => true,
+           truncate_to    => [undef, q(hour_minute)],
          },
        ],
        [
@@ -4085,8 +4100,8 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          [ {}, {} ],
          [ '_at', '_weekday' ],
          {
-           prefer_future => true,
-           truncate_to   => [undef, q(hour_minute)],
+           advance_future => true,
+           truncate_to    => [undef, q(hour_minute)],
          },
        ],
     ],

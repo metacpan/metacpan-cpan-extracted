@@ -1,6 +1,6 @@
 {
     "name": "DocKnot",
-    "version": "3.03",
+    "version": "3.04",
     "synopsis": "package documentation generator",
     "maintainer": "Russ Allbery <rra@cpan.org>",
     "copyrights": [
@@ -24,7 +24,9 @@
         "url": "https://git.eyrie.org/git/devel/docknot.git",
         "browse": "https://git.eyrie.org/?p=devel/docknot.git",
         "github": "rra/docknot",
-        "travis": "rra/docknot",
+        "status": {
+            "workflow": "build",
+        },
     },
     "distribution": {
         "section": "devel",

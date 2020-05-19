@@ -1,21 +1,26 @@
-0.004   2018-01-09 (PERLANCAR)
+0.005   2020-05-18  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to App::wordlist 0.268+ (streaming result).
+
+
+0.004   2018-01-09  Released-By: PERLANCAR
 
 	- Update to App::genpw 0.002.
 
 
-0.003   2018-01-08 (PERLANCAR)
+0.003   2018-01-08  Released-By: PERLANCAR
 
         - Rename utility from genpass-wordlist to genpw-wordlist. Now based on
           App::genpw.
 
 
-0.002   2018-01-02 (PERLANCAR)
+0.002   2018-01-02  Released-By: PERLANCAR
 
         - Add option: patterns.
 
         - [doc] Add warning about limited space, with suggestions.
 
 
-0.001   2017-11-12 (PERLANCAR)
+0.001   2017-11-12  Released-By: PERLANCAR
 
         - First release.

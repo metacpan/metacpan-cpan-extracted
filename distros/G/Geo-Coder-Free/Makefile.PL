@@ -47,15 +47,43 @@ my %urls = (
 
 foreach my $url(keys %urls) {
 	next if(-r $urls{$url});
-	print "Downloading $url\n";
-	my $ff = File::Fetch->new(uri => $url);
-	if(my $path = $ff->fetch($url)) {
-		print "Moving $path to $urls{$url}\n";
-		rename $path, $urls{$url} or die "$urls{$url}: $!";
-	} elsif(my $err = $ff->error(1)) {
-		die $err;
+	if(eval { require HTTP::Cache::Transparent; }) {
+		HTTP::Cache::Transparent->import();
+		my $cachedir;
+		if(my $e = $ENV{'CACHEDIR'}) {
+			$cachedir = File::Spec->catfile($e, 'http-cache-transparent');
+		} else {
+			$cachedir = File::Spec->catfile(File::Spec->tmpdir(), 'cache', 'http-cache-transparent');
+		}
+
+		HTTP::Cache::Transparent::init({
+			BasePath => $cachedir,
+			# Verbose => $opts{'v'} ? 1 : 0,
+			NoUpdate => 60 * 60 * 24,
+			MaxAge => 30 * 24
+		}) || die "$0: $cachedir: $!";
+	}
+
+	my $download = 0;
+	my $file = $urls{$url};
+	if(-r $file) {
+		if((-M $file) > 1) {
+			$download = 1;
+		}
 	} else {
-		die "There was a problem downloading $url";
+		$download = 1;
+	}
+	if($download) {
+		print "Downloading $url\n";
+		my $ff = File::Fetch->new(uri => $url);
+		if(my $path = $ff->fetch($url)) {
+			print "Moving $path to $file\n";
+			rename $path, $file or die "$file: $!";
+		} elsif(my $err = $ff->error(1)) {
+			die $err;
+		} else {
+			die "There was a problem downloading $url";
+		}
 	}
 }
 
@@ -65,11 +93,15 @@ if(!(-r 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt')) {
 }
 
 # London's areas are not complete within Maxmind.  Here are a few to get started
+# To add more, look in lib/Geo/Coder/Free/MaxMind/databases/cities.csv and look for
+#	the country/town and use the region code in there
 if(open(my $admin2, '>>', 'lib/Geo/Coder/Free/MaxMind/databases/admin2.db')) {
 	print $admin2 "GB.ENG.E7\tWoolwich\tWoolwich\t2648110\n",
 		"GB.ENG.O5\tLondon\tLondon\t2648110\n",
 		"GB.ENG.I8\tLondon\tLondon\t2648110\n",
-		"GB.ENG.P5\tLondon\tLondon\t2648110\n";
+		"GB.ENG.P5\tLondon\tLondon\t2648110\n",
+		"GB.ENG.G5\tTooting\tTooting\t2648110\n",	# Not in the database, but Balham is close
+		"GB.ENG.A5\tBedfordshire\tBedfordshire\t2648110\n";
 }
 
 my $test_requires = {
@@ -102,10 +134,12 @@ WriteMakefile(
 		'App::csv2sqlite' => 0,
 		'CHI' => 0,
 		'CHI::Driver::RawMemory' => 0,
+		'Cwd' => 0,
 		'Config::Auto' => 0,
 		'File::Basename' => 0,
 		'File::Copy' => 0,
 		'File::Open::NoCache::ReadOnly' => 0.02,
+		'File::Slurp' => 0,
 		'File::Spec' => 0,
 		'autodie' => 0,
 		'Geo::Location::Point' => 0.02,

@@ -48,8 +48,6 @@ has $_ => (
 sub compare {
   my ($self, $other, $deep) = @_;
 
-  # not comparing local_id because it is meaningless in modern
-  # versions of GnuPG.
   my @comparison_fields = qw (
      owner_trust
   );

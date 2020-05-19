@@ -1,6 +1,6 @@
 # NAME
 
-Data::Object::Cli
+Data::Object::Cli - Simple CLIs
 
 # ABSTRACT
 
@@ -11,8 +11,6 @@ Command-line Interface Abstraction for Perl 5
     package Command;
 
     use parent 'Data::Object::Cli';
-
-    no warnings 'redefine';
 
     sub main {
       my ($self) = @_;
@@ -65,6 +63,35 @@ This attribute is read-only, accepts `(VarsObject)` values, and is optional.
 # METHODS
 
 This package implements the following methods:
+
+## auto
+
+    auto(Any %args) : HashRef
+
+The auto method is expected to be overridden by the subclass and should return
+a hashref where the keys represent a subcommand at `$ARGV[0]` and the value
+represents the subroutine to be dispatched to using the `handle` method. To
+enable this functionality, the command name be declare a "command" token.
+
+- auto example #1
+
+        package Todo;
+
+        use parent 'Data::Object::Cli';
+
+        our $name = 'todo <{command}>';
+
+        sub auto {
+          {
+            init => '_handle_init'
+          }
+        }
+
+        sub _handle_init {
+          1234567890
+        }
+
+        my $todo = run Todo;
 
 ## exit
 
@@ -166,8 +193,6 @@ The help method returns the help text documented in POD if available.
 
         use parent 'Data::Object::Cli';
 
-        no warnings 'redefine';
-
         sub name {
           'todolist'
         }
@@ -195,8 +220,6 @@ The help method returns the help text documented in POD if available.
 
         use parent 'Data::Object::Cli';
 
-        no warnings 'redefine';
-
         sub name {
           'todolist'
         }
@@ -208,6 +231,24 @@ The help method returns the help text documented in POD if available.
         my $todolist = run Todolist;
 
         # $todolist->help
+
+- help example #6
+
+        package Todolist::Command::Show;
+
+        use parent 'Data::Object::Cli';
+
+        sub name {
+          'todolist show [<{priority}>]'
+        }
+
+        sub info {
+          'show your todo list tasks by priority levels'
+        }
+
+        my $command = run Todolist::Command::Show;
+
+        # $command->help
 
 ## main
 
@@ -224,8 +265,6 @@ by `run` will receive the `args`, `data`, `opts`, and `vars` objects.
 
         use parent 'Data::Object::Cli';
 
-        no warnings 'redefine';
-
         sub main {
           my ($self, %args) = @_;
 
@@ -241,8 +280,6 @@ by `run` will receive the `args`, `data`, `opts`, and `vars` objects.
         package Todolist;
 
         use parent 'Data::Object::Cli';
-
-        no warnings 'redefine';
 
         sub main {
           my ($self, %args) = @_;
@@ -317,10 +354,10 @@ The spec method returns a hashref of flag definitions used to configure
 definition can optionally declare `args`, `flag`, and `type` values as
 follows. The `args` property denotes that multiple flags are permitted and its
 value can be any valid [Getopt::Long](https://metacpan.org/pod/Getopt::Long) _repeat_ specifier. The `type`
-property denotes the type of data allowed and defaults to type _string_.
-Allowed values are `string`, `number`, or `float`. The `flag` property
-denotes the flag aliases and should be a pipe-delimited string, e.g.
-`userid|id|u`, if multiple aliases are used.
+property denotes the type of data allowed and defaults to type _flag_.
+Allowed values are `string`, `integer`, `number`, `float`, or `flag`. The
+`flag` property denotes the flag aliases and should be a pipe-delimited
+string, e.g. `userid|id|u`, if multiple aliases are used.
 
 - spec example #1
 
@@ -362,6 +399,26 @@ denotes the flag aliases and should be a pipe-delimited string, e.g.
             attach => {
               flag => 'a',
               args => '@' # allow multiple options
+            },
+            #
+            # represented in Getopt::Long as
+            # publish|p
+            #
+            # publish is accessible as $self->opts->publish
+            #
+            publish => {
+              flag => 'p',
+              type => 'flag'
+            },
+            #
+            # represented in Getopt::Long as
+            # unpublish|u
+            #
+            # unpublish is accessible as $self->opts->unpublish
+            #
+            unpublish => {
+              flag => 'u'
+              # defaults to type: flag
             }
           }
         }

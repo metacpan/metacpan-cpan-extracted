@@ -2,8 +2,9 @@
 
 set -ex
 
-cd /tmp
-git clone https://git.dereferenced.org/pkgconf/pkgconf.git
+mkdir ~/tmp
+cd ~/tmp
+git clone https://github.com/pkgconf/pkgconf.git
 cd pkgconf
 ./autogen.sh
 ./configure --with-pic --disable-shared

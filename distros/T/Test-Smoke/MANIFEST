@@ -70,6 +70,7 @@ lib/Test/Smoke/Util.pm
 lib/Test/Smoke/Util/Execute.pm
 lib/Test/Smoke/Util/FindHelpers.pm
 lib/Test/Smoke/Util/LoadAJSON.pm
+lib/Test/Smoke/Util/Serialise.pm
 lib/Test/Smoke/Util/Win32ErrorMode.pm
 lib/Test/Smoke/maint_dfconfig
 lib/Test/Smoke/perl58x.cfg
@@ -84,6 +85,7 @@ t/10-fallback.t
 t/11-no_fallback.t
 t/15-factory-json.t
 t/20-logger.t
+t/25-util-serialise.t
 t/TestLib.pm
 t/app/000-appobjects.t
 t/app/010-appoptions.t

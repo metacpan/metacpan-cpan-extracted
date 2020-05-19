@@ -1,0 +1,69 @@
+{
+   "abstract" : "Hash to Object: turns hashrefs into objects with accessors for keys",
+   "author" : [
+      "Hauke D <haukex@zero-g.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Util-H2O",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "5.58",
+            "Hash::Util" : "0.06",
+            "Symbol" : "0",
+            "perl" : "5.006000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Scalar::Util" : "0",
+            "Test::More" : "1.302096"
+         }
+      }
+   },
+   "provides" : {
+      "Util::H2O" : {
+         "file" : "lib/Util/H2O.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/haukex/Util-H2O/issues"
+      },
+      "homepage" : "https://github.com/haukex/Util-H2O",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/haukex/Util-H2O.git",
+         "web" : "https://github.com/haukex/Util-H2O"
+      }
+   },
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

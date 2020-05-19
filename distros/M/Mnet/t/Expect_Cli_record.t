@@ -2,84 +2,107 @@
 # purpose: tests Mnet::Expect::Cli record and replay functionality
 
 # required modules
-#   Expect required in Mnet::Expect modules, best to find our here if missing
 use warnings;
 use strict;
 use File::Temp;
+use Mnet::T;
 use Test::More tests => 4;
 
 # create temp record/replay/test file
 my ($fh, $file) = File::Temp::tempfile( UNLINK => 1 );
 
-# use current perl for tests
-my $perl = $^X;
-
-# init perl code used for command record and replay tests
-#   for debug uncomment the use Mnet::Opts::Set::Debug line below
-my $perl_record_replay = '
+# init perl code for these tests
+my $perl = <<'perl-eof';
     use warnings;
     use strict;
-    use Mnet::Test;
     use Mnet::Expect::Cli;
-    # use Mnet::Log; use Mnet::Opts::Set::Debug;
+    use Mnet::Log qw( DEBUG INFO );
+    use Mnet::Log::Test;
     use Mnet::Opts::Cli;
     use Mnet::Test;
-    my $opts = Mnet::Opts::Cli->new();
-    $opts->{spawn} = $ENV{CLI} if $ENV{CLI};
-    my $expect = Mnet::Expect::Cli->new($opts);
-';
+    my $opts = Mnet::Opts::Cli->new;
+    if ($ENV{EXPECT}) {
+        DEBUG("spawn script: $_") foreach (split/\n/, `cat $ENV{EXPECT} 2>&1`);
+    }
+    my $expect = Mnet::Expect::Cli->new({ spawn => $ENV{EXPECT} });
+perl-eof
+
+my $filter = <<'filter-eof';
+    grep -v "Mnet::Log - started" | \
+    grep -v "Mnet::Opts::Cli new parsed opt cli" | \
+    grep -v "Mnet::Log finished"
+filter-eof
 
 # command method record
-Test::More::is(`export CLI=\$(mktemp); echo '
-    echo -n prompt%; read INPUT
-    echo -n prompt%; read INPUT
-    echo output
-    echo -n prompt%; read INPUT
-' >\$CLI; chmod 700 \$CLI; echo; $perl -e '
-    $perl_record_replay
-    print \$expect->command("test") // "<undef>";
-' -- --record $file 2>&1; echo; rm \$CLI`, '
-output
-', 'command method --record');
+Mnet::T::test_perl({
+    name    => 'command method record',
+    pre     => <<'    pre-eof',
+        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
+            echo -n prompt%; read INPUT
+            echo -n prompt%; read INPUT
+            echo output
+            echo -n prompt%; read INPUT
+        ' >$EXPECT
+    pre-eof
+    perl    => $perl . '
+        print $expect->command("test") . "\n";
+    ',
+    args    => "--record $file",
+    filter  => $filter,
+    expect  => "output",
+    debug   => '--debug',
+});
 
 # command method replay
-Test::More::is(`echo; $perl -e '
-    $perl_record_replay
-    print \$expect->command("test") // "<undef>";
-' -- --replay $file 2>&1; echo`, '
-output
-', 'command method --replay');
+Mnet::T::test_perl({
+    name    => 'command method replay',
+    perl    => $perl . '
+        print $expect->command("test") . "\n";
+    ',
+    args    => "--replay $file",
+    filter  => $filter,
+    expect  => "output",
+    debug   => '--debug',
+});
 
 # command method record with cache clear
-Test::More::is(`export CLI=\$(mktemp); echo '
-    echo -n prompt%; read INPUT
-    echo -n prompt%; read INPUT
-    echo output one
-    echo -n prompt%; read INPUT
-    echo output two
-    echo -n prompt%; read INPUT
-' >\$CLI; chmod 700 \$CLI; echo; $perl -e '
-    $perl_record_replay
-    print \$expect->command("test") // "<undef>";
-    print "\\n";
-    \$expect->command_cache_clear;
-    print \$expect->command("test") // "<undef>";
-' -- --record $file 2>&1; echo; rm \$CLI`, '
-output one
-output two
-', 'command method --record with cache clear');
+Mnet::T::test_perl({
+    name    => 'command method record with cache clear',
+    pre     => <<'    pre-eof',
+        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
+            echo -n prompt%; read INPUT
+            echo -n prompt%; read INPUT
+            echo output one
+            echo -n prompt%; read INPUT
+            echo output two
+            echo -n prompt%; read INPUT
+        ' >$EXPECT
+    pre-eof
+    perl    => $perl . '
+        print $expect->command("test") . "\n";
+        $expect->command_cache_clear;
+        print $expect->command("test") . "\n";
+    ',
+    args    => "--record $file",
+    filter  => $filter,
+    expect  => "output one\noutput two",
+    debug   => '--debug',
+});
 
 # command method replay with cache clear
-Test::More::is(`echo; $perl -e '
-    $perl_record_replay
-    print \$expect->command("test") // "<undef>";
-    print "\\n";
-    \$expect->command_cache_clear;
-    print \$expect->command("test") // "<undef>";
-' -- --replay $file 2>&1; echo`, '
-output one
-output two
-', 'command method --replay with cache clear');
+Mnet::T::test_perl({
+    name    => 'command method replay with cache clear',
+    perl    => $perl . '
+        print $expect->command("test") . "\n";
+        $expect->command_cache_clear;
+        print $expect->command("test") . "\n";
+    ',
+    args    => "--replay $file",
+    filter  => $filter,
+    expect  => "output one\noutput two",
+    debug   => '--debug',
+});
 
 # finished
 exit;
+

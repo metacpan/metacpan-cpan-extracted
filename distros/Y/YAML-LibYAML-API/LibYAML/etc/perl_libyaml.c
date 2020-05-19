@@ -300,7 +300,6 @@ perl_to_libyaml_event(yaml_emitter_t *emitter, HV *perl_event)
             style = SvIV(*val);
         }
 
-    //    fprintf(stderr, "event %d %s style=%d, tag=%s\n", i, type, style, tag_name);
         if (strEQ(type, "stream_start_event")) {
             ok = yaml_stream_start_event_initialize(&event, 0);
         }
@@ -314,11 +313,11 @@ perl_to_libyaml_event(yaml_emitter_t *emitter, HV *perl_event)
                 perl_version_directive = (HV *)SvRV(*val);
 
                 val = hv_fetch(perl_version_directive, "major", 5, TRUE);
-                if (val && SvOK(*val) && SvIOK( *val )) {
+                if (val && SvOK(*val) && (SvIOK( *val ) || SvPOK( *val )) ) {
                     major = SvIV(*val);
                 }
                 val = hv_fetch(perl_version_directive, "minor", 5, TRUE);
-                if (val && SvOK(*val) && SvIOK( *val )) {
+                if (val && SvOK(*val) && (SvIOK( *val ) || SvPOK( *val )) ) {
                     minor = SvIV(*val);
                 }
                 if (major && minor) {

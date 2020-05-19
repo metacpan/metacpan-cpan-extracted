@@ -5,7 +5,7 @@ package Ordeal::Model::Backend::YAML;
 use 5.020;
 use strict;    # redundant, but still useful to document
 use warnings;
-{ our $VERSION = '0.002'; }
+{ our $VERSION = '0.003'; }
 use Mo qw< default builder >;
 use Ouch;
 use Path::Tiny;

@@ -1,0 +1,28 @@
+Revision history for Log-Dispatch-Perl
+
+0.05      2020-05-17 22:51:31Z
+        - release back to cpan, with updated distribution tooling
+
+0.04    2012-04-06
+	Brought up to the latest code esthetics.  Stopped doing unneccessary
+	BEGIN block magic.  Verifies it runs on 5.14.2, threaded and unthreaded.
+	Added LICENSE parameter to allow MetaCPAN to show license info.
+
+0.03    2004-02-01
+	Changed internal workings to use %Carp::Internal to indicate module
+	names that shouldn't be listed in a traceback.  As per suggestion of
+	Perl Monk tilly.  This however only works for Perl 5.8.0 and higher.
+	Change the removal optimization slightly for other versions of Perl.
+
+	29 January 2004
+	Minor first 4 line regex removal optimization.
+
+	Minor nits in the documentation.
+
+0.02    2004-01-29
+	Fixed problem with extra lines in "cluck" and "confess" types of
+	handling.  All intermediate levels in Log::Dispatch::xxx modules
+	are now removed.
+
+0.01    2004-01-28
+	First version of Log::Dispatch::Perl.

@@ -14,7 +14,7 @@ BEGIN {
 
 CITIES: {
 	Geo::Coder::Free::DB::init(directory => 'lib/Geo/Coder/Free/MaxMind/databases');
-	my $admin2 = new_ok('Geo::Coder::Free::DB::MaxMind::admin2' => [logger => new_ok('MyLogger')]);
+	my $admin2 = new_ok('Geo::Coder::Free::DB::MaxMind::admin2' => [logger => new_ok('MyLogger'), no_entry => 1]);
 
 	my $kent = $admin2->fetchrow_hashref({ concatenated_codes => 'GB.ENG.G5' });
 	ok($kent->{asciiname} eq 'Kent');

@@ -1,5 +1,9 @@
 Revision history for Perl extension Getopt-EX
 
+v1.18.0 2020-05-14T04:58:38Z
+
+    - Introduce $<ignore> argument.
+
 v1.17.0 2020-04-30T03:33:43Z
 
     - In Colormap.pm, use 'X' as 'crossed out' effect rather than NOP.

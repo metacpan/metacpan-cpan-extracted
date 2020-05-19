@@ -32,12 +32,12 @@ my %WriteMakefileArgs = (
     "Data::Object::Role::Buildable" => "0.03",
     "Data::Object::Space" => "2.05",
     "JSON::Validator" => "3.25",
-    "Test::Auto" => "0.10",
+    "Test::Auto" => "0.12",
     "routines" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,7 +50,7 @@ my %FallbackPrereqs = (
   "Data::Object::Role::Buildable" => "0.03",
   "Data::Object::Space" => "2.05",
   "JSON::Validator" => "3.25",
-  "Test::Auto" => "0.10",
+  "Test::Auto" => "0.12",
   "routines" => 0,
   "strict" => 0,
   "warnings" => 0

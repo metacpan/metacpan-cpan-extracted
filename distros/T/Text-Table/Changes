@@ -1,5 +1,10 @@
 Revision history for Perl extension Text::Table.
 
+1.134   2020-05-15
+    - Add new examples
+    - Convert dist.ini and weaver.ini to @SHLOMIF bundles.
+    - Other cleanups.
+
 1.133   2017-08-04
     - Correct the URLs to the GitHub repositories.
         - https://rt.cpan.org/Ticket/Display.html?id=122708

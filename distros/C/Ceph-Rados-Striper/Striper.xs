@@ -71,6 +71,40 @@ _write(striper, soid, data, len, off)
   OUTPUT:
     RETVAL
 
+uint64_t
+_write_from_fh(striper, soid, fh, psize)
+    rados_striper_t  striper
+    const char *     soid
+    SV *             fh
+    int              psize
+  PREINIT:
+    char *           buf;
+    size_t           len;
+    int              err;
+    uint64_t         off;
+  INIT:
+    PerlIO *  io     = IoIFP(sv_2io(fh));
+    int       retlen = 0;
+    int       chk_sz = 1024 * 1024;
+    Newx(buf, chk_sz, char);
+  CODE:
+    //printf("preparing to write from FH to %s\n", soid);
+    for (off=0; off<psize; off+=chk_sz) {
+        len = psize < off + chk_sz ? psize % chk_sz : chk_sz;
+        err = PerlIO_read(io, buf, len);
+        if (err < 0)
+            croak("cannot read from filehandle: %s", strerror(-err));
+        //printf("writing %i bytes from FH to %s\n", len, soid);
+        err = rados_striper_read(striper, soid, buf, len, off);
+        if (err < 0)
+            croak("cannot write striped object '%s': %s", soid, strerror(-err));
+        retlen += len;
+    }
+    //printf("wrote %i bytes from FH to %s\n", retlen, soid);
+    RETVAL = retlen;
+  OUTPUT:
+    RETVAL
+
 int
 _append(striper, soid, data, len)
     rados_striper_t  striper
@@ -122,6 +156,46 @@ _read(striper, soid, len, off = 0)
     RETVAL = newSVpv(buf, retlen);
   OUTPUT:
     RETVAL
+
+int
+_read_to_fh(striper, soid, fh)
+    rados_striper_t  striper
+    const char *     soid
+    SV *             fh
+  PREINIT:
+    char *           buf;
+    size_t           len;
+    size_t           psize;
+    time_t           pmtime;
+    int              err;
+    uint64_t         off;
+  INIT:
+    PerlIO *  io     = IoOFP(sv_2io(fh));
+    int       chk_sz = 1024 * 1024;
+    Newx(buf, chk_sz, char);
+  CODE:
+    // stat and determine read length
+    err = rados_striper_stat(striper, soid, &psize, &pmtime);
+    if (err < 0)
+        croak("cannot stat object '%s': %s", soid, strerror(-err));
+    //printf("preparing to write from %s to FH, %i bytes\n", soid, psize);
+    for (off=0; off<psize; off+=chk_sz) {
+        len = psize < off + chk_sz ? psize % chk_sz : chk_sz;
+        //printf("Reading %i bytes, offset %i, of %i total from striper\n", len, off, psize);
+        err = rados_striper_read(striper, soid, buf, len, off);
+        if (err < 0)
+            croak("cannot read object '%s': %s", soid, strerror(-err));
+        //printf("Writing %i bytes to FH\n", len);
+        err = PerlIO_write(io, buf, len);
+        if (err < 0)
+            croak("cannot write to filehandle: %s", strerror(-err));
+    }
+    if (err < 0)
+        croak("cannot read object '%s': %s", soid, strerror(-err));
+    RETVAL = err;
+  OUTPUT:
+    RETVAL
+
 
 int
 remove(striper, soid)

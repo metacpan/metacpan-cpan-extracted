@@ -1,5 +1,18 @@
                        User-Visible DocKnot Changes
 
+DocKnot 3.04 (2020-05-16)
+
+    Change the vcs.travis metadata key to vcs.status.travis.  This will
+    require changes to all templates and package metadata.json files that
+    use this key.
+
+    Add support for generating a build status badge from a GitHub Actions
+    workflow.  To do this, set vcs.status.workflow to the name of the
+    workflow that should be referenced for the badge.
+
+    Also specify DocKnot's dependencies with a cpanfile.  This makes it
+    easier to install its dependencies with some tools, such as cpm.
+
 DocKnot 3.03 (2020-01-19)
 
     For CPAN packages pushed to GitHub, add a Shields.io license badge to

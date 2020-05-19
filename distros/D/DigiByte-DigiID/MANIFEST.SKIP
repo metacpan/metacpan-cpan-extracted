@@ -1,0 +1,14 @@
+.*.tar.gz
+\.git.*
+local/
+.+\.swp
+\*\~
+\.prove/
+perltidy.LOG
+perltidy.ERR
+.DS_Store
+.perl-version
+dist.ini
+cpanfile.*
+Dockerfile
+docker-compose.yml

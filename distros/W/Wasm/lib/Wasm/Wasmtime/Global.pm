@@ -11,7 +11,7 @@ use constant is_global => 1;
 use constant kind => 'global';
 
 # ABSTRACT: Wasmtime global class
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 $ffi_prefix = 'wasm_global_';
@@ -98,7 +98,7 @@ Wasm::Wasmtime::Global - Wasmtime global class
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,6 @@
 use warnings;
 use strict;
+use lib '.';
 use DBIx::Perlish qw/:all/;
 use Test::More;
 use t::test_utils;
@@ -31,6 +32,8 @@ my ($LOCAL_ARRAYREF, $LOCAL_HASHREF) = ( \@LOCAL_ARRAY, \%LOCAL_HASH);
 my ($GLOBAL_ARRAYREF, $GLOBAL_HASHREF) = ( \@GLOBAL_ARRAY, \%GLOBAL_HASH);
 my ( $LOCAL_INDEX, $LOCAL_KEY ) = (0, 'a1');
 my ( $GLOBAL_INDEX, $GLOBAL_KEY ) = (0, 'a1');
+my $BLESSED_HASH  = bless { field => 'foo' }, __PACKAGE__;
+my $BLESSED_ARRAY = bless ['foo'], __PACKAGE__;
 test_select_sql {
 	table: my $t1 = $vart;
 	my $t2 : table2;
@@ -246,6 +249,20 @@ test_select_sql {
 } "global arrayref with global variable as a key",
 "select * from table1 t01 where t01.id = ?",
 [42];
+
+test_select_sql {
+	my $t : table = $BLESSED_HASH->{field};
+	$t->id == $BLESSED_HASH->{field};
+} "blessed hashref with field",
+"select * from foo t01 where t01.id = ?",
+[q(foo)];
+
+test_select_sql {
+	my $t : table = $BLESSED_ARRAY->[0];
+	$t->id == $BLESSED_ARRAY->[0];
+} "blessed arrayref with field",
+"select * from foo t01 where t01.id = ?",
+[q(foo)];
 
 test_select_sql {
 	my $t : table1;

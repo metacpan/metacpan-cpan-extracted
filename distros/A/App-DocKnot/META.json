@@ -4,7 +4,7 @@
       "Russ Allbery <rra@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4229",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "mit"
    ],
@@ -43,23 +43,23 @@
    "provides" : {
       "App::DocKnot" : {
          "file" : "lib/App/DocKnot.pm",
-         "version" : "3.03"
+         "version" : "3.04"
       },
       "App::DocKnot::Command" : {
          "file" : "lib/App/DocKnot/Command.pm",
-         "version" : "3.03"
+         "version" : "3.04"
       },
       "App::DocKnot::Config" : {
          "file" : "lib/App/DocKnot/Config.pm",
-         "version" : "3.03"
+         "version" : "3.04"
       },
       "App::DocKnot::Dist" : {
          "file" : "lib/App/DocKnot/Dist.pm",
-         "version" : "3.03"
+         "version" : "3.04"
       },
       "App::DocKnot::Generate" : {
          "file" : "lib/App/DocKnot/Generate.pm",
-         "version" : "3.03"
+         "version" : "3.04"
       }
    },
    "release_status" : "stable",
@@ -78,6 +78,6 @@
          "web" : "https://github.com/rra/docknot"
       }
    },
-   "version" : "3.03",
+   "version" : "3.04",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

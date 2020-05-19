@@ -5,8 +5,8 @@ use warnings;
 use v5.10;
 use base qw( WebService::LiveJournal::Client );
 
-# ABSTRACT: Interface to the LiveJournal API
-our $VERSION = '0.08'; # VERSION
+# ABSTRACT: (Deprecated) Interface to the LiveJournal API
+our $VERSION = '0.09'; # VERSION
 
 sub _set_error
 {
@@ -25,11 +25,11 @@ __END__
 
 =head1 NAME
 
-WebService::LiveJournal - Interface to the LiveJournal API
+WebService::LiveJournal - (Deprecated) Interface to the LiveJournal API
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -51,6 +51,11 @@ See L<WebService::LiveJournal::Friend> for making queries about friends.
 See L<WebService::LiveJournal::FriendGroup> for getting your friend groups.
 
 =head1 DESCRIPTION
+
+B<NOTE>: This distribution is deprecated.  It uses the outmoded XML-RPC protocol.
+LiveJournal has also been compromised.  I recommend using DreamWidth instead
+(L<https://www.dreamwidth.org/>) which is in keeping with the original philosophy
+LiveJournal regarding advertising.
 
 This is a client class for communicating with LiveJournal using its API.  It is different
 from the other LJ modules on CPAN in that it originally used the XML-RPC API.  It now

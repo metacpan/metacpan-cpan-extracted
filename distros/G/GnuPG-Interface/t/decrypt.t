@@ -58,3 +58,34 @@ TEST
 {
     return compare( $texts{plain}->fn(), $texts{temp}->fn() ) == 0;
 };
+
+
+# test without default_passphrase (that is, by using the agent, if ENV flag set)
+TEST
+{
+    return 1 unless ($gnupg->cmp_version($gnupg->version, '2.2') >= 0);
+
+    reset_handles();
+
+    $handles->stdin( $texts{alt_encrypted}->fh() );
+    $handles->options( 'stdin' )->{direct} = 1;
+
+    $handles->stdout( $texts{temp}->fh() );
+    $handles->options( 'stdout' )->{direct} = 1;
+
+    $handles->clear_passphrase();
+    $gnupg->clear_passphrase();
+
+    my $pid = $gnupg->decrypt( handles => $handles );
+
+    waitpid $pid, 0;
+
+    return $CHILD_ERROR == 0;
+};
+
+
+TEST
+{
+    return 1 unless ($gnupg->cmp_version($gnupg->version, '2.2') >= 0);
+    return compare( $texts{alt_plain}->fn(), $texts{temp}->fn() ) == 0;
+};

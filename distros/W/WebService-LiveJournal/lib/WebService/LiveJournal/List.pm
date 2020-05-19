@@ -4,8 +4,8 @@ use strict;
 use warnings;
 use overload '""' => sub { $_[0]->as_string }, '@{}' => sub { $_[0]->{list} };
 
-# ABSTRACT: List base class for WebService::LiveJournal
-our $VERSION = '0.08'; # VERSION
+# ABSTRACT: (Deprecated) List base class for WebService::LiveJournal
+our $VERSION = '0.09'; # VERSION
 
 
 sub new
@@ -52,13 +52,18 @@ __END__
 
 =head1 NAME
 
-WebService::LiveJournal::List - List base class for WebService::LiveJournal
+WebService::LiveJournal::List - (Deprecated) List base class for WebService::LiveJournal
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 DESCRIPTION
+
+B<NOTE>: This distribution is deprecated.  It uses the outmoded XML-RPC protocol.
+LiveJournal has also been compromised.  I recommend using DreamWidth instead
+(L<https://www.dreamwidth.org/>) which is in keeping with the original philosophy
+LiveJournal regarding advertising.
 
 This class is used as the base class for a number of
 list classes included with the L<WebService::LiveJournal>

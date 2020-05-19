@@ -1,0 +1,25 @@
+---
+abstract: File extensions and media types, grouped by application and type
+author:
+  - Skye Shaw <skye.shaw AT gmail.com>
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: ExtUtils::MakeMaker version 8.3508, CPAN::Meta::Converter version 2.150010
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-Groups
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  bugtracker: https://github.com/sshaw/file_groups/issues
+  homepage: https://github.com/sshaw/file_groups
+  repository: https://github.com/sshaw/file_groups.git
+version: '0.1001'
+x_serialization_backend: YAML::XS version 0.75

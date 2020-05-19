@@ -1,7 +1,7 @@
 package Perinci::Access::Perl;
 
-our $DATE = '2020-03-04'; # DATE
-our $VERSION = '0.892'; # VERSION
+our $DATE = '2020-05-18'; # DATE
+our $VERSION = '0.893'; # VERSION
 
 use 5.010001;
 use strict;
@@ -53,7 +53,7 @@ Perinci::Access::Perl - Access Perl module, functions, variables through Riap
 
 =head1 VERSION
 
-This document describes version 0.892 of Perinci::Access::Perl (from Perl distribution Perinci-Access-Perl), released on 2020-03-04.
+This document describes version 0.893 of Perinci::Access::Perl (from Perl distribution Perinci-Access-Perl), released on 2020-05-18.
 
 =head1 SYNOPSIS
 

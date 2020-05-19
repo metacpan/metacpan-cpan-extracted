@@ -7,6 +7,8 @@ my $tempdir = tempdir( CLEANUP => 1 );
 
 my $ua = LWP::UserAgent::WithCache->new({ cache_root => $tempdir });
 
+my $uri = 'http://metacpan.org/favicon.ico';
+
 my $res;
 {
 $res  = HTTP::Response->parse(<<'EOF');
@@ -30,9 +32,8 @@ Client-Response-Num: 1
 /* end StyleCatcher imports */
 EOF
 
-my $uri = 'http://www.example.com/styles.css';
 $ua->set_cache($uri, $res);
-my $cached_res = $ua->get('http://www.example.com/styles.css');
+my $cached_res = $ua->get($uri);
 
 is ($cached_res->code, 200);
 }
@@ -57,9 +58,8 @@ Expires: Thr, 16 Jan 2038 03:14:06 GMT
 /* end StyleCatcher imports */
 EOF
 
-my $uri = 'http://www.example.com/styles.css';
 $ua->set_cache($uri, $res);
-my $cached_res = $ua->get('http://www.example.com/styles.css');
+my $cached_res = $ua->get($uri);
 
 is ($cached_res->code, 200);
 }
@@ -91,14 +91,13 @@ Last-Modified: Thr, 01 Jan 1970 00:00:00 GMT
 
 EOF
 
-my $uri = 'http://www.example.com/styles.css';
 $ua->set_cache($uri, $res);
 
 ## override request method to get not_modified_res
 no warnings 'redefine';
 local *LWP::UserAgent::request = sub {return $not_modified_res};
 
-my $cached_res = $ua->get('http://www.example.com/styles.css');
+my $cached_res = $ua->get($uri);
 
 is ($cached_res->code, 200);
 is ($cached_res->content, $res->content);

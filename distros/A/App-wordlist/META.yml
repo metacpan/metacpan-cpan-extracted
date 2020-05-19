@@ -20,13 +20,14 @@ recommends:
   App::lcpan::Call: '0.11'
   MetaCPAN::Client: '0'
 requires:
+  Array::Pick::Scan: '0.002'
   Complete::Util: '0.608'
   Encode: '0'
   List::Util: '1.45'
   Module::List: '0'
   Perinci::Sub::Property::cmdline: '0'
   Scalar::Util::Numeric: '0'
-  WordList: v0.5.2
+  WordList: v0.6.0
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -34,7 +35,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-wordlist
   homepage: https://metacpan.org/release/App-wordlist
   repository: git://github.com/perlancar/perl-App-wordlist.git
-version: '0.269'
+version: '0.270'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

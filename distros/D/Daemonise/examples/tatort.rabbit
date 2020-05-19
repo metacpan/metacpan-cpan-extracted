@@ -1,0 +1,489 @@
+#!/usr/bin/env perl
+
+use Modern::Perl;
+use experimental 'smartmatch';
+use Daemonise;
+use Getopt::Long;
+
+# PODNAME: tatort.rabbit
+
+my $pid;
+my $debug;
+my $conf = '/etc/daemonise/bunny.conf';
+my $foreground;
+
+our $AUTOLOAD;
+
+GetOptions(
+    "debug|d"      => \$debug,
+    "config|c=s"   => \$conf,
+    "pidfile|p=s"  => \$pid,
+    "foreground|f" => \$foreground,
+) or die;
+
+my $d = Daemonise->new();
+$d->debug(1)       if $debug;
+$d->debug(1)       if ($d->hostname =~ m/devel/);
+$d->foreground(1)  if $foreground;
+$d->pid_file($pid) if $pid;
+$d->config_file($conf);
+$d->configure;
+$d->load_plugin('CouchDB');
+$d->load_plugin('JobQueue');
+$d->load_plugin('HipChat');
+$d->load_plugin('Riemann');
+$d->is_worker(1);
+$d->dont_log_worker;
+$d->couch_db($d->config->{events}->{db});
+
+$d->hooks({
+        event_add => sub {
+            my ($msg) = @_;
+            my $event = event_add($msg);
+            return $msg unless $event;
+            event_exec($event);
+            return $msg;
+        },
+        event_exec => sub { event_exec($_[0]->{data}->{options}) },
+        events_trigger => \&events_trigger,
+    });
+
+$d->start;
+
+sub events_trigger {
+    my ($msg) = @_;
+
+    my @events = _pending_events($msg);
+    foreach my $event (@events) {
+        my $frame = {
+            data => {
+                command => "event_exec",
+                options => $event,
+            },
+        };
+        $d->queue($d->name, $frame);
+    }
+
+    return;
+}
+
+sub event_add {
+    my ($msg) = @_;
+
+    my $event = $msg->{data}->{options};
+
+    # check for mandatory fields
+    my @missing;
+    for ('backend', 'object', 'action', 'status') {
+        push(@missing, $_) unless defined $event->{$_};
+    }
+
+    if (@missing) {
+        $msg->{error} = 'missing mandatory fields: ' . join(',', @missing);
+        return;
+    }
+
+    # set event timestamp if there was none given by importer
+    $event->{timestamp} ||= time;
+    $event->{type} = 'event';
+
+    my ($id, $rev) = $d->couchdb->put_doc({ doc => $event });
+    if ($d->couchdb->error) {
+        $msg->{error} = $d->couchdb->error;
+        return;
+    }
+    else {
+        $msg->{response}->{event_id} = $id;
+    }
+
+    # respond to caller manually, as the rest can be done asynchronously
+    $d->queue($d->reply_queue, $msg);
+    $d->dont_reply;
+
+    # needed so we don't have to get the document again before updating it
+    $event->{_id}  = $id;
+    $event->{_rev} = $rev;
+
+    # graph new event
+    if ($d->can('graph')) {
+        my $service = _event_name($event, '.');
+        $d->graph("event.$service", 'new', 1);
+    }
+
+    return $event;
+}
+
+sub event_exec {
+    my ($event) = @_;
+
+    # we never need/want to reply to asynchrounous event exec calls
+    $d->dont_reply;
+
+    unless (exists $event->{_id}) {
+        $d->log(  "event ID missing, don't call event_exec() directly"
+                . " use event_add() for new events instead");
+        return;
+    }
+
+    if (exists $event->{when} && $event->{when} >= time) {
+        $d->log(  "event_id="
+                . $event->{_id}
+                . " event time not reached yet: "
+                . $event->{when})
+            if $d->debug;
+        return;
+    }
+
+    my $name = _event_name($event);
+    my $service = _event_name($event, '.');
+
+    $d->log('working on event_id=' . $event->{_id} . ' ' . $name);
+
+    my $mute = $d->couchdb->get_doc({ id => 'mute' });
+    if ($mute and (grep /^$name$/, @{ $mute->{event_list} })) {
+        $d->log("event_id=" . $event->{_id} . " event type '$name' is muted")
+            if $d->debug;
+        return;
+    }
+
+    my $def = $d->couchdb->get_view({
+        view => 'events/case_files',
+        opts => { key => $name },
+    });
+    unless ($def) {
+        $event->{error} = "event_name=$name could not find case file";
+        $d->notify("ERROR: " . $event->{error} . ' event_id: ' . $event->{_id})
+            if $d->can('notify');
+        $d->couchdb->put_doc({ doc => $event });
+        return;
+    }
+    $def = $def->{$name};
+
+    # handle defined action_types in separate subs
+    my $method = $def->{action_type};
+    $d->log("event_id=" . $event->{_id} . " event_name=$name running $method");
+    my $processed = do { no strict 'refs'; $method->($event, $def) };
+
+    # if failed, fallback if defined, otherwise fail
+    if (!$processed && $def->{fallback_action_type}) {
+        $method = $def->{fallback_action_type};
+        $d->log(  "event_id="
+                . $event->{_id}
+                . " event_name=$name running fallback $method");
+        $processed = do { no strict 'refs'; $method->($event, $def) };
+    }
+
+    # notify about error and graph failed event
+    if (exists $event->{error}) {
+        $d->notify("event_id="
+                . $event->{_id}
+                . " event_name=$name ERROR: "
+                . $event->{error})
+            if $d->can('notify');
+
+        $d->graph("event.$service", 'failed', 1) if $d->can('graph');
+    }
+
+    # don't mark as processed if processing failed
+    return unless $processed;
+
+    # mark event as processed
+    $event->{processed} = time;
+    $d->couchdb->put_doc({ doc => $event });
+
+    # graph event as processed successfully if there was no error
+    if (not exists $event->{error} and $d->can('graph')) {
+        $d->graph("event.$service", 'done', 1);
+    }
+
+    return;
+}
+
+sub restart_workflow {
+    my ($event, $def, $stop) = @_;
+
+    my $name = _event_name($event);
+
+    my $job;
+    if (    exists $def->{action}
+        and exists $def->{action}->{view}
+        and exists $def->{action}->{key})
+    {
+        $job = $d->find_job($def->{action}->{view},
+            $event->{ $def->{action}->{key} });
+    }
+    else {
+        $job = $d->get_job($event->{job_id});
+    }
+
+    unless ($job) {
+        $event->{error} =
+              "could not find job using view '"
+            . ($def->{action}->{view} || 'none')
+            . "' with "
+            . ($def->{action}->{key} || 'job_id') . "="
+            . $event->{ $def->{action}->{key} || 'job_id' };
+        return;
+    }
+
+    my $msg = $job->{message};
+
+    # try to lock job ID before working on it
+    return unless $d->lock_job($msg);
+
+    # store job in attribute
+    $d->job($job);
+
+    # set to processed if job is already 'done' unless 'reopen'
+    # is set in definition
+    if ($job->{status} eq 'done' and !exists $def->{reopen}) {
+        $d->log("job done, reopen unset, marking as processed");
+        return 1;
+    }
+
+    # check if this is the event the job was waiting for to prevent multiple
+    # events messing with the same job if the job_id was in the event
+    # return true to stop it from looping
+    if (exists $event->{job_id} and exists $msg->{meta}->{event_id}) {
+        unless ($msg->{meta}->{event_id} eq $event->{_id}) {
+            $event->{error} = "job was not waiting for this event. hands off!";
+            return 1;
+        }
+    }
+
+    # remove old error message and check specific conditions
+    delete $msg->{error} if exists $msg->{error};
+    $msg = _check_conditions($msg, $def->{conditions})
+        if exists $def->{conditions};
+
+    if (exists $msg->{error}) {
+        $event->{error} = "check_condition() failed: " . $msg->{error};
+        return;
+    }
+
+    # include event data into job
+    $msg->{response}->{event} = {
+        parsed => $event->{parsed},
+        raw    => $event->{raw},
+    };
+
+    # delete wait_for key and update job before sending off
+    delete $msg->{meta}->{wait_for} if exists $msg->{meta}->{wait_for};
+    pop @{ $msg->{meta}->{log} }
+        if ((exists $def->{mode}) and ($def->{mode} eq 'restart'));
+
+    # mark event ID processed in jobqueue
+    $msg->{meta}->{event_id} = 'processed';
+
+    # in case of stop_workflow we also use the parsed event response as
+    # error message before stopping it
+    if ($stop) {
+        $msg->{error} = $d->dump($event->{parsed}, 1);
+        $d->job_done($msg);
+        $d->unlock_job($msg);
+    }
+    else {
+        $d->update_job($msg, delete $msg->{status});
+        $d->queue('workflow', $msg);
+    }
+
+    return 1;
+}
+
+sub stop_workflow {
+    return restart_workflow(@_[ 0, 1 ], 'stop');
+}
+
+sub start_workflow {
+    my ($event, $def) = @_;
+
+    my $data;
+
+    given ($def->{workflow}) {
+        when ('workflow_name') {
+            $data = { some => 'structure' };
+        }
+        default {
+            $event->{error} =
+                  "no data->options defined for "
+                . $def->{workflow}
+                . " workflow";
+            return;
+        }
+    }
+
+    $d->start_job($def->{workflow}, $data) if ref $data;
+
+    return 1;
+}
+
+sub notification {
+    my ($event, $def) = @_;
+
+    my $name = join('_',
+        $event->{backend}, $event->{object},
+        $event->{action},  $event->{status});
+
+    given ($def->{transport}) {
+        when ('hipchat') {
+            $d->notify(join(' ', $event->{_id}, $name, $event->{message}),
+                $def->{room}, $def->{severity})
+                if $d->can('notify');
+
+            return 1;
+        }
+        default {
+            if ($def->{transport}) {
+                $event->{error} = 'notification transport not supported: '
+                    . $def->{transport};
+            }
+            else {
+                $event->{error} = 'notification transport not defined!';
+            }
+
+            return;
+        }
+    }
+
+    return 1;
+}
+
+sub backend_call {
+    my ($event, $def) = @_;
+
+    # always return true for backend_calls, we never ever want those to loop!
+
+    unless (exists $event->{queue} and $event->{queue}) {
+        $event->{error} = 'missing queue name';
+        return 1;
+    }
+
+    unless (exists $event->{command} and $event->{command}) {
+        $event->{error} = 'missing command';
+        return 1;
+    }
+
+    unless (exists $event->{data} and ref $event->{data} eq 'HASH') {
+        $event->{error} = 'data missing or not a hashref';
+        return 1;
+    }
+
+    my $msg = {
+        data => {
+            command => $event->{command},
+            data    => $event->{data},
+        },
+    };
+
+    $d->queue($event->{queue}, $msg);
+
+    return 1;
+}
+
+sub AUTOLOAD {
+    my ($event, $def) = @_;
+
+    my $name = $AUTOLOAD =~ m/([^:]+)$/x;
+    $event->{error} = "unknown action_type: $name";
+
+    return;
+}
+
+#### internal methods ####
+
+sub _pending_events {
+    my ($msg) = @_;
+
+    my @events = $d->couchdb->get_view_array({
+            view => 'events/pending_now',
+            opts => {
+                startkey     => 0,
+                endkey       => $msg->{data}->{options}->{when} || time,
+                include_docs => 'true',
+            },
+        });
+
+    if (@events) {
+        $d->log("found " . scalar(@events) . " imminent pending events");
+    }
+    else {
+        $d->log("no pending events found") if $d->debug;
+        return;
+    }
+
+    return @events;
+}
+
+sub _check_conditions {
+    my ($msg, $cond) = @_;
+
+    # check log path
+    my @path = @{ $msg->{meta}->{log} } if $msg->{meta}->{log};
+    unless (@path) {
+        $msg->{error} = "missing log path";
+        return $msg;
+    }
+
+    # check last log entry
+    my $last_entry = pop(@path);
+    if ((exists $cond->{log}) and ($last_entry ne $cond->{log})) {
+        $msg->{error} =
+            "last log entry mismatch: '$last_entry' != '" . $cond->{log} . "'";
+        return $msg;
+    }
+
+    # check workflow
+    if (    (exists $cond->{workflow})
+        and ($msg->{meta}->{workflow} !~ m/^$cond->{workflow}/i))
+    {
+        $msg->{error} =
+              "workflow mismatch: '"
+            . $msg->{meta}->{workflow}
+            . "' != '"
+            . $cond->{workflow} . "'";
+        return $msg;
+    }
+
+    # check status
+    if (exists $cond->{status}) {
+        my $var = $msg;
+        @{ $cond->{status} } = split(/->/, delete $cond->{status});
+        $cond->{status_val} = pop @{ $cond->{status} };
+        foreach my $s (@{ $cond->{status} }) {
+            $var = $var->{$s} if (ref($var) eq 'HASH');
+        }
+        $var = 666 unless $var;
+        unless ($var =~ m/^$cond->{status_val}/i) {
+            $msg->{error} = "status value mismatch: '$var' != '"
+                . $cond->{status_val} . "'";
+            return $msg;
+        }
+    }
+
+    # check not_present key
+    if (exists $cond->{not_present}) {
+        my $var = $msg;
+        @{ $cond->{not_present} } =
+            split(/->/, delete $cond->{not_present});
+        $cond->{not_present_val} = pop @{ $cond->{not_present} };
+        foreach my $s (@{ $cond->{not_present} }) {
+            $var = $var->{$s} if (ref($var) eq 'HASH');
+        }
+        $var = 666 unless $var;
+        if ($var eq $cond->{not_present_val}) {
+            $msg->{error} = "key '$var' present which shouldn't be";
+            return $msg;
+        }
+    }
+
+    return $msg;
+}
+
+sub _event_name {
+    my ($event, $separator) = @_;
+
+    return join(
+        $separator || '_',
+        $event->{backend}, $event->{object},
+        $event->{action},  $event->{status});
+}

@@ -1,5 +1,7 @@
 use v5.28;
 use warnings;
+use FindBin;
+use lib $FindBin::Bin. "/../lib";
 
 use JSON;
 use File::Slurp qw(read_file);

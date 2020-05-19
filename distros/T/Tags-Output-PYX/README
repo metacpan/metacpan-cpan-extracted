@@ -7,9 +7,12 @@ SYNOPSYS
      my $obj = Tags::Output::PYX->new(%parameters);
      $obj->finalize;
      my $ret = $obj->flush($reset_flag);
-     my @tags = $obj->open_tags;
+     my @elements = $obj->open_elements;
      $obj->put(@data);
      $obj->reset;
+
+     # Deprecated methods.
+     my @elements = $obj->open_tags;
 
 PYX LINE CHARS
      ?  - Instruction.
@@ -19,60 +22,85 @@ PYX LINE CHARS
      -  - Normal data.
 
 METHODS
-    "new(%parameters)"
-             Constructor.
+  "new"
+     my $obj = Tags::Output::PYX->new(%parameters);
 
-            *       "auto_flush"
+    Constructor.
 
-                     Auto flush flag.
-                     Default value is 0.
+    Returns instance of object.
 
-            *       "output_callback"
+    *       "auto_flush"
 
-                     Output callback.
-                     Default value is undef.
+             Auto flush flag.
+             Default value is 0.
 
-            *       "output_handler"
+    *       "output_callback"
 
-                     Set output handler.
-                     Default value is undef.
+             Output callback.
+             Default value is undef.
 
-            *       "output_sep"
+    *       "output_handler"
 
-                     Output separator.
-                     Default value is newline.
+             Set output handler.
+             Default value is undef.
 
-            *       "skip_bad_data"
+    *       "output_sep"
 
-                     Skip bad tags.
-                     Default value is 0.
+             Output separator.
+             Default value is newline.
 
-            *       "strict_instruction"
+    *       "skip_bad_data"
 
-                     Strict instruction.
-                     Default value is 1.
+             Skip bad tags.
+             Default value is 0.
 
-    "finalize()"
-             Finalize Tags output.
-             Automaticly puts end of all opened tags.
-             Returns undef.
+    *       "strict_instruction"
 
-    "flush($reset_flag)"
-             Flush tags in object.
-             If defined 'output_handler' flush to its.
-             Or returns code.
-             If enabled $reset_flag, then resets internal variables via reset method.
+             Strict instruction.
+             Default value is 1.
 
-    "open_tags()"
-             Returns array of opened tags.
+  "finalize"
+     $obj->finalize;
 
-    "put(@data)"
-             Put tags code in tags format.
-             Returns undef.
+    Finalize Tags output. Automaticly puts end of all opened tags.
 
-    "reset()"
-             Resets internal variables.
-             Returns undef.
+    Returns undef.
+
+  "flush"
+     my $ret = $obj->flush($reset_flag);
+
+    Flush tags in object. If defined 'output_handler' flush to its. Or
+    returns code. If enabled $reset_flag, then resets internal variables via
+    reset method.
+
+  "open_elements"
+     my @elements = $obj->open_elements;
+
+    Get list of open elements.
+
+    Returns array of strings.
+
+  "put"
+     $obj->put(@data);
+
+    Put tags code in tags format.
+
+    Returns undef.
+
+  "reset"
+     $obj->reset;
+
+    Resets internal variables.
+
+    Returns undef.
+
+DEPRECATED METHODS
+  "open_tags"
+     my @elements = $obj->open_tags;
+
+    Get list of open elements.
+
+    Returns array of strings.
 
 ERRORS
      new():
@@ -149,5 +177,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

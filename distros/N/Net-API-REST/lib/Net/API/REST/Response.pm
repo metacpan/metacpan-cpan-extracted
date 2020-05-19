@@ -1,56 +1,53 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST/Response.pm
-## Version 0.4.9
-## Copyright(c) 2019- DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <jack@deguest.jp>
+## Version v0.4.10
+## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/09/01
-## Modified 2019/12/15
-## All rights reserved
+## Modified 2020/05/16
 ## 
-## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::REST::Response;
 BEGIN
 {
-	use strict;
-	use common::sense;
-	use parent qw( Module::Generic );
-	use Devel::Confess;
-	use Apache2::Request;
-	use Apache2::Const;
-	use Apache2::Response ();
-	use Apache2::RequestIO ();
-	use Apache2::RequestRec ();
-	use Apache2::SubRequest ();
-	use Apache2::Const -compile => qw( :common :http );
-	use APR::Request::Cookie;
-	use Net::API::REST::Cookies;
-	use Cookie::Baker ();
-	use Scalar::Util;
-	use Net::API::REST::Status;
-	use TryCatch;
-	our $VERSION = '0.4.9';
+    use strict;
+    use common::sense;
+    use parent qw( Module::Generic );
+    use Devel::Confess;
+    use Apache2::Request;
+    use Apache2::Const;
+    use Apache2::Response ();
+    use Apache2::RequestIO ();
+    use Apache2::RequestRec ();
+    use Apache2::SubRequest ();
+    use Apache2::Const -compile => qw( :common :http );
+    use APR::Request::Cookie;
+    use Net::API::REST::Cookies;
+    use Cookie::Baker ();
+    use Scalar::Util;
+    use Net::API::REST::Status;
+    use TryCatch;
+    our $VERSION = 'v0.4.10';
 };
 
 sub init
 {
-	my $self = shift( @_ );
-	my $r;
-	$r = shift( @_ ) if( @_ % 2 );
-	## Which is an Apache2::Request, but inherits everything from Apache2::RequestRec and APR::Request::Apache2
-	$self->{request} = '';
-	$self->{checkonly} = 0;
-	$self->SUPER::init( @_ );
-	$r ||= $self->{request};
-	unless( $self->{checkonly} )
-	{
-		return( $self->error( "No Net::API::REST::Request was provided." ) ) if( !$r );
-		return( $self->error( "Net::API::REST::Request provided ($r) is not an object!" ) ) if( !Scalar::Util::blessed( $r ) );
-		return( $self->error( "I was expecting an Net::API::REST::Request, but instead I got \"$r\"." ) ) if( !$r->isa( 'Net::API::REST::Request' ) );
-	}
-	return( $self );
+    my $self = shift( @_ );
+    my $r;
+    $r = shift( @_ ) if( @_ % 2 );
+    ## Which is an Apache2::Request, but inherits everything from Apache2::RequestRec and APR::Request::Apache2
+    $self->{request} = '';
+    $self->{checkonly} = 0;
+    $self->SUPER::init( @_ );
+    $r ||= $self->{request};
+    unless( $self->{checkonly} )
+    {
+        return( $self->error( "No Net::API::REST::Request was provided." ) ) if( !$r );
+        return( $self->error( "Net::API::REST::Request provided ($r) is not an object!" ) ) if( !Scalar::Util::blessed( $r ) );
+        return( $self->error( "I was expecting an Net::API::REST::Request, but instead I got \"$r\"." ) ) if( !$r->isa( 'Net::API::REST::Request' ) );
+    }
+    return( $self );
 }
 
 sub bytes_sent { return( shift->_try( '_request', 'bytes_sent' ) ); }
@@ -65,18 +62,18 @@ sub code { return( shift->_try( '_request', 'status', @_ ) ); }
 # sub content_encoding { return( shift->_request->content_encoding( @_ ) ); }
 sub content_encoding
 {
-	my $self = shift( @_ );
-	my( $pack, $file, $line ) = caller;
-	my $sub = ( caller( 1 ) )[3];
-	$self->message( 3, "Got called from package $pack in file $file at line $line in sub $ub with args: '", join( "', '", @_ ), "'." );
-	try
-	{
-		return( $self->_request->content_encoding( @_ ) );
-	}
-	catch( $e )
-	{
-		return( $self->error( "An error occurred while trying to access Apache Request method \"content_encoding\": $e" ) );
-	}
+    my $self = shift( @_ );
+    my( $pack, $file, $line ) = caller;
+    my $sub = ( caller( 1 ) )[3];
+    $self->message( 3, "Got called from package $pack in file $file at line $line in sub $sub with args: '", join( "', '", @_ ), "'." );
+    try
+    {
+        return( $self->_request->content_encoding( @_ ) );
+    }
+    catch( $e )
+    {
+        return( $self->error( "An error occurred while trying to access Apache Request method \"content_encoding\": $e" ) );
+    }
 }
 
 ## https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Language
@@ -94,131 +91,131 @@ sub content_type { return( shift->_try( '_request', 'content_type', @_ ) ); }
 
 sub cookie_new_ok_but_hang_on
 {
-	my $self = shift( @_ );
-	my $opts = {};
-	$opts = shift( @_ ) if( ref( $_[0] ) eq 'HASH' );
-	return( $self->error( "Cookie name was not provided." ) ) if( !$opts->{name} );
-	## No value is ok to remove a cookie, but it needs to be an empty string, not undef
-	return( $self->error( "No value was provided for cookie \"$opts->{name}\"." ) ) if( !length( $opts->{value} ) && !defined( $opts->{value} ) );
-	my @valid_params = qw( comment commentURL domain expires httponly name path port secure value version );
-	my $hash = {};
-	foreach my $k ( @valid_params )
-	{
-		$hash->{ $k } = $opts->{ $k } if( length( $opts->{ $k } ) );
-	}
-	$hash->{value} = '' if( !CORE::exists( $hash->{value} ) );
-	$hash->{domain} ||= $self->request->server_hostname;
-	$hash->{expires} =~ s/d/D/ if( $hash->{expires} );
-	return( $self->error( "Cookie property \"expires\" should be either a unix timestamp, or a variable expiration such as +3h for in 3 hours or +2M for in 2 month. Was provided with '$hash->{expires}'" ) ) if( $hash->{expires} !~ /^(?:\d{10,}|[\+\-]?(\d+)([YMDhms]))$/ );
-	## expires:
-	## Get or set the future expire time for the cookie.  When assigning, the new value ($set) should match /^\+?(\d+)([YMDhms]?)$/ $2 qualifies the number in
-	## $1 as representing "Y"ears, "M"onths, "D"ays, "h"ours, "m"inutes, or "s"econds (if the qualifier is omitted, the number is interpreted as representing
-	## seconds).  As a special case, $set = "now" is equivalent to $set = "0".
-	## Stupidly, APR::Request::Cookie only accept positive relative timestamp, ie +7D is ok, but not -7D :(
-	## So we have to convert it ourself into a timestamp
-	my $interval =
-	{
-		's' => 1,
-		'm' => 60,
-		'h' => 3600,
-		'D' => 86400,
-		'M' => 86400 * 30,
-		'Y' => 86400 * 365,
-	};
-	## If this is a negative relative timestamp, we convert it and compute the epoch
-	if( substr( $hash->{expires}, 0, 1 ) eq '-' )
-	{
-		if( $hash->{expires} =~ /^[\+\-]?(\d+)([YMDhms])/ )
-		{
-			my $offset = ( $interval->{$2} || 1 ) * int( $1 );
-			$hash->{expires} = time() - $offset;
+    my $self = shift( @_ );
+    my $opts = {};
+    $opts = shift( @_ ) if( ref( $_[0] ) eq 'HASH' );
+    return( $self->error( "Cookie name was not provided." ) ) if( !$opts->{name} );
+    ## No value is ok to remove a cookie, but it needs to be an empty string, not undef
+    return( $self->error( "No value was provided for cookie \"$opts->{name}\"." ) ) if( !length( $opts->{value} ) && !defined( $opts->{value} ) );
+    my @valid_params = qw( comment commentURL domain expires httponly name path port secure value version );
+    my $hash = {};
+    foreach my $k ( @valid_params )
+    {
+        $hash->{ $k } = $opts->{ $k } if( length( $opts->{ $k } ) );
+    }
+    $hash->{value} = '' if( !CORE::exists( $hash->{value} ) );
+    $hash->{domain} ||= $self->request->server_hostname;
+    $hash->{expires} =~ s/d/D/ if( $hash->{expires} );
+    return( $self->error( "Cookie property \"expires\" should be either a unix timestamp, or a variable expiration such as +3h for in 3 hours or +2M for in 2 month. Was provided with '$hash->{expires}'" ) ) if( $hash->{expires} !~ /^(?:\d{10,}|[\+\-]?(\d+)([YMDhms]))$/ );
+    ## expires:
+    ## Get or set the future expire time for the cookie.  When assigning, the new value ($set) should match /^\+?(\d+)([YMDhms]?)$/ $2 qualifies the number in
+    ## $1 as representing "Y"ears, "M"onths, "D"ays, "h"ours, "m"inutes, or "s"econds (if the qualifier is omitted, the number is interpreted as representing
+    ## seconds).  As a special case, $set = "now" is equivalent to $set = "0".
+    ## Stupidly, APR::Request::Cookie only accept positive relative timestamp, ie +7D is ok, but not -7D :(
+    ## So we have to convert it ourself into a timestamp
+    my $interval =
+    {
+        's' => 1,
+        'm' => 60,
+        'h' => 3600,
+        'D' => 86400,
+        'M' => 86400 * 30,
+        'Y' => 86400 * 365,
+    };
+    ## If this is a negative relative timestamp, we convert it and compute the epoch
+    if( substr( $hash->{expires}, 0, 1 ) eq '-' )
+    {
+        if( $hash->{expires} =~ /^[\+\-]?(\d+)([YMDhms])/ )
+        {
+            my $offset = ( $interval->{$2} || 1 ) * int( $1 );
+            $hash->{expires} = time() - $offset;
         }
-	}
-	
-	try
-	{
-		$self->message( 3, "Using Apache request pool '" . $self->_request->pool . "'." );
-		my $c = APR::Request::Cookie->new( $self->_request->pool, %$hash );
-		$self->message( 3, "Success, returning an APR::Request::Cookie '$c' (", ref( $c ), ") object with properties: ", sub{ $self->dumper( $hash ) } );
-		return( $self->error( "Unable to create an APR::Request::Cookie object: $@ (" . APR::Request::Error . ")" ) ) if( !ref( $c ) && $@ );
-		return( $c );
-	}
-	catch( $e )
-	{
-		$self->message( 3, "Failed creating an APR::Request::Cookie object, returning an error." );
-		return( $self->error( "An error occurred while trying to call APR::Request::Cookie method \"new\": $e" ) );
-	}
+    }
+    
+    try
+    {
+        $self->message( 3, "Using Apache request pool '" . $self->_request->pool . "'." );
+        my $c = APR::Request::Cookie->new( $self->_request->pool, %$hash );
+        $self->message( 3, "Success, returning an APR::Request::Cookie '$c' (", ref( $c ), ") object with properties: ", sub{ $self->dumper( $hash ) } );
+        return( $self->error( "Unable to create an APR::Request::Cookie object: $@ (" . APR::Request::Error . ")" ) ) if( !ref( $c ) && $@ );
+        return( $c );
+    }
+    catch( $e )
+    {
+        $self->message( 3, "Failed creating an APR::Request::Cookie object, returning an error." );
+        return( $self->error( "An error occurred while trying to call APR::Request::Cookie method \"new\": $e" ) );
+    }
 }
 
 sub cookie_new
 {
-	my $self = shift( @_ );
-	my $opts = {};
-	$opts = shift( @_ ) if( ref( $_[0] ) eq 'HASH' );
-	return( $self->error( "Cookie name was not provided." ) ) if( !$opts->{name} );
-	## No value is ok to remove a cookie, but it needs to be an empty string, not undef
-	# return( $self->error( "No value was provided for cookie \"$opts->{name}\"." ) ) if( !length( $opts->{value} ) && !defined( $opts->{value} ) );
-	my $c = $self->request->cookies->make( $opts ) || return( $self->pass_error( $self->request->cookies->error ) );
-	$self->message( 3, "Success, returning an (", ref( $c ), ") cookie object '$c' with properties: ", sub{ $self->dumper( $opts ) } );
-	return( $c );
+    my $self = shift( @_ );
+    my $opts = {};
+    $opts = shift( @_ ) if( ref( $_[0] ) eq 'HASH' );
+    return( $self->error( "Cookie name was not provided." ) ) if( !$opts->{name} );
+    ## No value is ok to remove a cookie, but it needs to be an empty string, not undef
+    # return( $self->error( "No value was provided for cookie \"$opts->{name}\"." ) ) if( !length( $opts->{value} ) && !defined( $opts->{value} ) );
+    my $c = $self->request->cookies->make( $opts ) || return( $self->pass_error( $self->request->cookies->error ) );
+    $self->message( 3, "Success, returning an (", ref( $c ), ") cookie object '$c' with properties: ", sub{ $self->dumper( $opts ) } );
+    return( $c );
 }
 
 sub cookie_new_old
 {
-	my $self = shift( @_ );
-	my $opts = {};
-	$opts = shift( @_ ) if( ref( $_[0] ) eq 'HASH' );
-	return( $self->error( "Cookie name was not provided." ) ) if( !$opts->{name} );
-	## No value is ok to remove a cookie, but it needs to be an empty string, not undef
-	return( $self->error( "No value was provided for cookie \"$opts->{name}\"." ) ) if( !length( $opts->{value} ) && !defined( $opts->{value} ) );
-	my @valid_params = qw( comment commentURL domain expires httponly name path port secure value version );
-	my $hash = {};
-	foreach my $k ( @valid_params )
-	{
-		$hash->{ $k } = $opts->{ $k } if( length( $opts->{ $k } ) );
-	}
-	$hash->{value} = '' if( !CORE::exists( $hash->{value} ) );
-	$hash->{domain} ||= $self->request->server_hostname;
-	$hash->{expires} =~ s/d/D/ if( $hash->{expires} );
-	return( $self->error( "Cookie property \"expires\" should be either a unix timestamp, or a variable expiration such as +3h for in 3 hours or +2M for in 2 month. Was provided with '$hash->{expires}'" ) ) if( $hash->{expires} !~ /^(?:\d{10,}|[\+\-]?(\d+)([YMDhms]))$/ );
-	## expires:
-	## Get or set the future expire time for the cookie.  When assigning, the new value ($set) should match /^\+?(\d+)([YMDhms]?)$/ $2 qualifies the number in
-	## $1 as representing "Y"ears, "M"onths, "D"ays, "h"ours, "m"inutes, or "s"econds (if the qualifier is omitted, the number is interpreted as representing
-	## seconds).  As a special case, $set = "now" is equivalent to $set = "0".
-	## Stupidly, APR::Request::Cookie only accept positive relative timestamp, ie +7D is ok, but not -7D :(
-	## So we have to convert it ourself into a timestamp
-	my $interval =
-	{
-		's' => 1,
-		'm' => 60,
-		'h' => 3600,
-		'D' => 86400,
-		'M' => 86400 * 30,
-		'Y' => 86400 * 365,
-	};
-	## If this is a negative relative timestamp, we convert it and compute the epoch
-	if( substr( $hash->{expires}, 0, 1 ) eq '-' )
-	{
-		if( $hash->{expires} =~ /^[\+\-]?(\d+)([YMDhms])/ )
-		{
-			my $offset = ( $interval->{$2} || 1 ) * int( $1 );
-			$hash->{expires} = time() - $offset;
+    my $self = shift( @_ );
+    my $opts = {};
+    $opts = shift( @_ ) if( ref( $_[0] ) eq 'HASH' );
+    return( $self->error( "Cookie name was not provided." ) ) if( !$opts->{name} );
+    ## No value is ok to remove a cookie, but it needs to be an empty string, not undef
+    return( $self->error( "No value was provided for cookie \"$opts->{name}\"." ) ) if( !length( $opts->{value} ) && !defined( $opts->{value} ) );
+    my @valid_params = qw( comment commentURL domain expires httponly name path port secure value version );
+    my $hash = {};
+    foreach my $k ( @valid_params )
+    {
+        $hash->{ $k } = $opts->{ $k } if( length( $opts->{ $k } ) );
+    }
+    $hash->{value} = '' if( !CORE::exists( $hash->{value} ) );
+    $hash->{domain} ||= $self->request->server_hostname;
+    $hash->{expires} =~ s/d/D/ if( $hash->{expires} );
+    return( $self->error( "Cookie property \"expires\" should be either a unix timestamp, or a variable expiration such as +3h for in 3 hours or +2M for in 2 month. Was provided with '$hash->{expires}'" ) ) if( $hash->{expires} !~ /^(?:\d{10,}|[\+\-]?(\d+)([YMDhms]))$/ );
+    ## expires:
+    ## Get or set the future expire time for the cookie.  When assigning, the new value ($set) should match /^\+?(\d+)([YMDhms]?)$/ $2 qualifies the number in
+    ## $1 as representing "Y"ears, "M"onths, "D"ays, "h"ours, "m"inutes, or "s"econds (if the qualifier is omitted, the number is interpreted as representing
+    ## seconds).  As a special case, $set = "now" is equivalent to $set = "0".
+    ## Stupidly, APR::Request::Cookie only accept positive relative timestamp, ie +7D is ok, but not -7D :(
+    ## So we have to convert it ourself into a timestamp
+    my $interval =
+    {
+        's' => 1,
+        'm' => 60,
+        'h' => 3600,
+        'D' => 86400,
+        'M' => 86400 * 30,
+        'Y' => 86400 * 365,
+    };
+    ## If this is a negative relative timestamp, we convert it and compute the epoch
+    if( substr( $hash->{expires}, 0, 1 ) eq '-' )
+    {
+        if( $hash->{expires} =~ /^[\+\-]?(\d+)([YMDhms])/ )
+        {
+            my $offset = ( $interval->{$2} || 1 ) * int( $1 );
+            $hash->{expires} = time() - $offset;
         }
-	}
-	
-	try
-	{
-		$self->message( 3, "Using Apache request pool '" . $self->_request->pool . "'." );
-		my $c = APR::Request::Cookie->new( $self->_request->pool, %$hash );
-		$self->message( 3, "Success, returning an APR::Request::Cookie '$c' (", ref( $c ), ") object with properties: ", sub{ $self->dumper( $hash ) } );
-		return( $self->error( "Unable to create an APR::Request::Cookie object: $@ (" . APR::Request::Error . ")" ) ) if( !$c && $@ );
-		return( $c );
-	}
-	catch( $e )
-	{
-		$self->message( 3, "Failed creating an APR::Request::Cookie object, returning an error." );
-		return( $self->error( "An error occurred while trying to call APR::Request::Cookie method \"new\": $e" ) );
-	}
+    }
+    
+    try
+    {
+        $self->message( 3, "Using Apache request pool '" . $self->_request->pool . "'." );
+        my $c = APR::Request::Cookie->new( $self->_request->pool, %$hash );
+        $self->message( 3, "Success, returning an APR::Request::Cookie '$c' (", ref( $c ), ") object with properties: ", sub{ $self->dumper( $hash ) } );
+        return( $self->error( "Unable to create an APR::Request::Cookie object: $@ (" . APR::Request::Error . ")" ) ) if( !$c && $@ );
+        return( $c );
+    }
+    catch( $e )
+    {
+        $self->message( 3, "Failed creating an APR::Request::Cookie object, returning an error." );
+        return( $self->error( "An error occurred while trying to call APR::Request::Cookie method \"new\": $e" ) );
+    }
 }
 
 ## Add or replace a cookie, but because the headers function of Apache2 is based on APR::Table
@@ -226,57 +223,57 @@ sub cookie_new_old
 ## we have to crawl each already set cookie, parse them, compare them en replace them or add them
 sub cookie_replace
 {
-	my $self = shift( @_ );
-	my $cookie = shift( @_ ) || return( $self->error( "No cookie to add to outgoing headers was provided." ) );
-	## Expecting an APR::Request::Cookie object
-	return( $self->error( "Cookie provided (", ref( $cookie ), ") is not an object." ) ) if( !Scalar::Util::blessed( $cookie ) );
-	return( $self->error( "Cookie object provided (", ref( $cookie ), ") does not seem to have an \"as_string\" method." ) ) if( !$cookie->can( 'as_string' ) );
-	## We use err_headers_out() which makes it also possible to set cookies upon error (regular headers_out method cannot)
-	my( @cookie_headers ) = $self->err_headers->get( 'Set-Cookie' );
-	if( !scalar( @cookie_headers ) )
-	{
-		$self->err_headers->set( 'Set-Cookie' => $cookie->as_string );
-	}
-	else
-	{
-		## Check each cookie header set to see if ours is one of them
-		my $found = 0;
-		for( my $i = 0; $i < scalar( @cookie_headers ); $i++ )
-		{
-			my $ref = Cookie::Baker::crush_cookie( $cookie_headers[ $i ] );
-			if( CORE::exists( $ref->{ $cookie->name } ) )
-			{
-				$cookie_headers[ $i ] = $cookie->as_string;
-				$found = 1;
-			}
-		}
-		if( !$found )
-		{
-			$self->err_headers->add( 'Set-Cookie' => $cookie->as_string );
-		}
-		else
-		{
-			## Remove all Set-Cookie headers
-			$self->err_headers->unset( 'Set-Cookie' );
-			## Now, re-add our updated set
-			foreach my $cookie_str ( @cookie_headers )
-			{
-				$self->err_headers->add( 'Set-Cookie' => $cookie_str );
-			}
-		}
-	}
-	return( $cookie );
+    my $self = shift( @_ );
+    my $cookie = shift( @_ ) || return( $self->error( "No cookie to add to outgoing headers was provided." ) );
+    ## Expecting an APR::Request::Cookie object
+    return( $self->error( "Cookie provided (", ref( $cookie ), ") is not an object." ) ) if( !Scalar::Util::blessed( $cookie ) );
+    return( $self->error( "Cookie object provided (", ref( $cookie ), ") does not seem to have an \"as_string\" method." ) ) if( !$cookie->can( 'as_string' ) );
+    ## We use err_headers_out() which makes it also possible to set cookies upon error (regular headers_out method cannot)
+    my( @cookie_headers ) = $self->err_headers->get( 'Set-Cookie' );
+    if( !scalar( @cookie_headers ) )
+    {
+        $self->err_headers->set( 'Set-Cookie' => $cookie->as_string );
+    }
+    else
+    {
+        ## Check each cookie header set to see if ours is one of them
+        my $found = 0;
+        for( my $i = 0; $i < scalar( @cookie_headers ); $i++ )
+        {
+            my $ref = Cookie::Baker::crush_cookie( $cookie_headers[ $i ] );
+            if( CORE::exists( $ref->{ $cookie->name } ) )
+            {
+                $cookie_headers[ $i ] = $cookie->as_string;
+                $found = 1;
+            }
+        }
+        if( !$found )
+        {
+            $self->err_headers->add( 'Set-Cookie' => $cookie->as_string );
+        }
+        else
+        {
+            ## Remove all Set-Cookie headers
+            $self->err_headers->unset( 'Set-Cookie' );
+            ## Now, re-add our updated set
+            foreach my $cookie_str ( @cookie_headers )
+            {
+                $self->err_headers->add( 'Set-Cookie' => $cookie_str );
+            }
+        }
+    }
+    return( $cookie );
 }
 
 sub cookie_set
 {
-	my $self = shift( @_ );
-	my $cookie = shift( @_ ) || return( $self->error( "No cookie to add to outgoing headers was provided." ) );
-	## Expecting an APR::Request::Cookie object
-	return( $self->error( "Cookie provided (", ref( $cookie ), ") is not an object." ) ) if( !Scalar::Util::blessed( $cookie ) );
-	return( $self->error( "Cookie object provided (", ref( $cookie ), ") does not seem to have an \"as_string\" method." ) ) if( !$cookie->can( 'as_string' ) );
-	$self->err_headers->set( 'Set-Cookie' => $cookie->as_string );
-	return( $cookie );
+    my $self = shift( @_ );
+    my $cookie = shift( @_ ) || return( $self->error( "No cookie to add to outgoing headers was provided." ) );
+    ## Expecting an APR::Request::Cookie object
+    return( $self->error( "Cookie provided (", ref( $cookie ), ") is not an object." ) ) if( !Scalar::Util::blessed( $cookie ) );
+    return( $self->error( "Cookie object provided (", ref( $cookie ), ") does not seem to have an \"as_string\" method." ) ) if( !$cookie->can( 'as_string' ) );
+    $self->err_headers->set( 'Set-Cookie' => $cookie->as_string );
+    return( $cookie );
 }
 
 ## e.g. custom_response( $status, $string );
@@ -285,69 +282,69 @@ sub cookie_set
 #  use Apache2::Response ();
 #  use Apache2::Const -compile => qw(FORBIDDEN OK);
 #  sub access {
-# 	 my $r = shift;
+#    my $r = shift;
 # 
-# 	 if (MyApache2::MyShop::tired_squirrels()) {
-# 		 $r->custom_response(Apache2::Const::FORBIDDEN,
-# 			 "It's siesta time, please try later");
-# 		 return Apache2::Const::FORBIDDEN;
-# 	 }
+#    if (MyApache2::MyShop::tired_squirrels()) {
+#        $r->custom_response(Apache2::Const::FORBIDDEN,
+#            "It's siesta time, please try later");
+#        return Apache2::Const::FORBIDDEN;
+#    }
 # 
-# 	 return Apache2::Const::OK;
+#    return Apache2::Const::OK;
 #  }
 sub custom_response { return( shift->_try( '_request', 'custom_response', @_ ) ); }
 
 sub env
 {
-	my $self = shift( @_ );
-	my $r = $self->request;
-	if( @_ )
-	{
-		if( scalar( @_ ) == 1 )
-		{
-			my $v = shift( @_ );
-			if( ref( $v ) eq 'HASH' )
-			{
-				foreach my $k ( sort( keys( %$v ) ) )
-				{
-					$r->subprocess_env( $k => $v->{ $k } );
-				}
-			}
-			else
-			{
-				return( $r->subprocess_env( $v ) );
-			}
-		}
-		else
-		{
-			my $hash = { @_ };
-			foreach my $k ( sort( keys( %$hash ) ) )
-			{
-				$r->subprocess_env( $k => $hash->{ $k } );
-			}
-		}
-	}
-	else
-	{
-		$r->subprocess_env;
-	}
+    my $self = shift( @_ );
+    my $r = $self->request;
+    if( @_ )
+    {
+        if( scalar( @_ ) == 1 )
+        {
+            my $v = shift( @_ );
+            if( ref( $v ) eq 'HASH' )
+            {
+                foreach my $k ( sort( keys( %$v ) ) )
+                {
+                    $r->subprocess_env( $k => $v->{ $k } );
+                }
+            }
+            else
+            {
+                return( $r->subprocess_env( $v ) );
+            }
+        }
+        else
+        {
+            my $hash = { @_ };
+            foreach my $k ( sort( keys( %$hash ) ) )
+            {
+                $r->subprocess_env( $k => $hash->{ $k } );
+            }
+        }
+    }
+    else
+    {
+        $r->subprocess_env;
+    }
 }
 
 sub err_headers
 {
-	my $self = shift( @_ );
-	my $out = $self->_request->err_headers_out;
-	if( @_ )
-	{
-		for( my $i = 0; $i < scalar( @_ ); $i += 2 )
-		{
-			$out->set( $_[ $i ] => $_[ $i + 1 ] );
-		}
-	}
-	else
-	{
-		return( $out );
-	}
+    my $self = shift( @_ );
+    my $out = $self->_request->err_headers_out;
+    if( @_ )
+    {
+        for( my $i = 0; $i < scalar( @_ ); $i += 2 )
+        {
+            $out->set( $_[ $i ] => $_[ $i + 1 ] );
+        }
+    }
+    else
+    {
+        return( $out );
+    }
 }
 
 sub err_headers_out { return( shift->_request->err_headers_out( @_ ) ); }
@@ -360,11 +357,11 @@ sub flush { return( shift->_try( '_request', 'rflush' ) ); }
 
 # sub get_http_message
 # {
-# 	my $self = shift( @_ );
-# 	my $code = shift( @_ ) || return;
-# 	my $formal_msg = $self->get_status_line( $code );
-# 	$formal_msg =~ s/^(\d{3})[[:blank:]]+//;
-# 	return( $formal_msg );
+#   my $self = shift( @_ );
+#   my $code = shift( @_ ) || return;
+#   my $formal_msg = $self->get_status_line( $code );
+#   $formal_msg =~ s/^(\d{3})[[:blank:]]+//;
+#   return( $formal_msg );
 # }
 sub get_http_message { return( Net::API::REST::Status->status_message( $_[1], $_[2] ) ); }
 
@@ -373,31 +370,31 @@ sub get_status_line { return( shift->_try( '_request', 'status_line', @_ ) ); }
 # sub headers { return( shift->_request->headers_out ); }
 sub headers
 {
-	my $self = shift( @_ );
-	# my $out = $self->_request->headers_out;
-	my $out = $self->_request->err_headers_out;
-	if( scalar( @_ ) && !( @_ % 2 ) )
-	{
-		for( my $i = 0; $i < scalar( @_ ); $i += 2 )
-		{
-			if( !defined( $_[ $i + 1 ] ) )
-			{
-				$out->unset( $_[ $i ] );
-			}
-			else
-			{
-				$out->set( $_[ $i ] => $_[ $i + 1 ] );
-			}
-		}
-	}
-	elsif( scalar( @_ ) )
-	{
-		return( $out->get( shift( @_ ) ) );
-	}
-	else
-	{
-		return( $out );
-	}
+    my $self = shift( @_ );
+    # my $out = $self->_request->headers_out;
+    my $out = $self->_request->err_headers_out;
+    if( scalar( @_ ) && !( @_ % 2 ) )
+    {
+        for( my $i = 0; $i < scalar( @_ ); $i += 2 )
+        {
+            if( !defined( $_[ $i + 1 ] ) )
+            {
+                $out->unset( $_[ $i ] );
+            }
+            else
+            {
+                $out->set( $_[ $i ] => $_[ $i + 1 ] );
+            }
+        }
+    }
+    elsif( scalar( @_ ) )
+    {
+        return( $out->get( shift( @_ ) ) );
+    }
+    else
+    {
+        return( $out );
+    }
 }
 
 sub headers_out { return( shift->_request->headers_out( @_ ) ); }
@@ -405,37 +402,37 @@ sub headers_out { return( shift->_request->headers_out( @_ ) ); }
 ## https://perl.apache.org/docs/2.0/api/Apache2/SubRequest.html#toc_C_internal_redirect_
 sub internal_redirect
 {
-	my $self = shift( @_ );
-	my $uri = shift( @_ );
-	$uri = $uri->path if( Scalar::Util::blessed( $uri ) && $uri->isa( 'URI' ) );
-	try
-	{
-		$self->_request->internal_redirect( $uri );
-	}
-	catch( $e )
-	{
-		$self->error( "An error occurred while trying to call Apache Request method \"internal_redirect\": $e" );
-		return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-	}
-	return( Apache2::Const::HTTP_OK );
+    my $self = shift( @_ );
+    my $uri = shift( @_ );
+    $uri = $uri->path if( Scalar::Util::blessed( $uri ) && $uri->isa( 'URI' ) );
+    try
+    {
+        $self->_request->internal_redirect( $uri );
+    }
+    catch( $e )
+    {
+        $self->error( "An error occurred while trying to call Apache Request method \"internal_redirect\": $e" );
+        return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
+    }
+    return( Apache2::Const::HTTP_OK );
 }
 
 ## https://perl.apache.org/docs/2.0/api/Apache2/SubRequest.html#toc_C_internal_redirect_handler_
 sub internal_redirect_handler
 {
-	my $self = shift( @_ );
-	my $uri = shift( @_ );
-	$uri = $uri->path if( Scalar::Util::blessed( $uri ) && $uri->isa( 'URI' ) );
-	try
-	{
-		$self->_request->internal_redirect_handler( $uri );
-	}
-	catch( $e )
-	{
-		$self->error( "An error occurred while trying to call Apache Request method \"internal_redirect_handler\": $e" );
-		return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-	}
-	return( Apache2::Const::HTTP_OK );
+    my $self = shift( @_ );
+    my $uri = shift( @_ );
+    $uri = $uri->path if( Scalar::Util::blessed( $uri ) && $uri->isa( 'URI' ) );
+    try
+    {
+        $self->_request->internal_redirect_handler( $uri );
+    }
+    catch( $e )
+    {
+        $self->error( "An error occurred while trying to call Apache Request method \"internal_redirect_handler\": $e" );
+        return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
+    }
+    return( Apache2::Const::HTTP_OK );
 }
 
 sub is_info         { return( Net::API::REST::Status->is_info( $_[1] ) ); }
@@ -455,20 +452,20 @@ sub last_modified_date { return( shift->headers( 'Last-Modified-Date', @_ ) ); }
 ## https://perl.apache.org/docs/2.0/api/Apache2/SubRequest.html#toc_C_run_
 sub lookup_uri
 {
-	my $self = shift( @_ );
-	my $uri = shift( @_ );
-	$uri = $uri->path if( Scalar::Util::blessed( $uri ) && $uri->isa( 'URI' ) );
-	try
-	{
-		my $subr = $self->_request->lookup_uri( $uri, @_ );
-		## Returns Apache2::Const::OK, Apache2::Const::DECLINED, etc.
-		return( $subr->run );
-	}
-	catch( $e )
-	{
-		$self->error( "An error occurred while trying to call Apache Request method \"internal_redirect_handler\": $e" );
-		return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-	}
+    my $self = shift( @_ );
+    my $uri = shift( @_ );
+    $uri = $uri->path if( Scalar::Util::blessed( $uri ) && $uri->isa( 'URI' ) );
+    try
+    {
+        my $subr = $self->_request->lookup_uri( $uri, @_ );
+        ## Returns Apache2::Const::OK, Apache2::Const::DECLINED, etc.
+        return( $subr->run );
+    }
+    catch( $e )
+    {
+        $self->error( "An error occurred while trying to call Apache Request method \"internal_redirect_handler\": $e" );
+        return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
+    }
 }
 
 ## make_etag( $force_weak )
@@ -488,13 +485,13 @@ sub printf { return( shift->_try( '_request', 'printf', @_ ) ); }
 
 sub redirect
 {
-	my $self = shift( @_ );
-	## I have to die if nothing was provided, because our return value is the http code. We can't just return undef()
-	my $uri = shift( @_ ) || die( "No uri provided to redirect\n" );
-	## Stringify
-	$self->headers->set( 'Location' => "$uri" );
-	$self->code( Apache2::Const::HTTP_MOVED_TEMPORARILY );
-	return( Apache2::Const::HTTP_MOVED_TEMPORARILY );
+    my $self = shift( @_ );
+    ## I have to die if nothing was provided, because our return value is the http code. We can't just return undef()
+    my $uri = shift( @_ ) || die( "No uri provided to redirect\n" );
+    ## Stringify
+    $self->headers->set( 'Location' => "$uri" );
+    $self->code( Apache2::Const::HTTP_MOVED_TEMPORARILY );
+    return( Apache2::Const::HTTP_MOVED_TEMPORARILY );
 }
 
 sub request { return( shift->_set_get_object( 'request', 'Net::API::REST::Request', @_ ) ); }
@@ -534,20 +531,20 @@ sub _request { return( shift->request->request ); }
 
 sub _try
 {
-	my $self = shift( @_ );
-	my $pack = shift( @_ ) || return( $self->error( "No Apache package name was provided to call method" ) );
-	my $meth = shift( @_ ) || return( $self->error( "No method name was provided to try!" ) );
-	my $r = Apache2::RequestUtil->request;
-	$r->log_error( "Net::API::REST::Response::_try to call method \"$meth\" in package \"$pack\"." );
-	try
-	{
-		return( $self->$pack->$meth ) if( !scalar( @_ ) );
-		return( $self->$pack->$meth( @_ ) );
-	}
-	catch( $e )
-	{
-		return( $self->error( "An error occurred while trying to call Apache ", ucfirst( $pack ), " method \"$meth\": $e" ) );
-	}
+    my $self = shift( @_ );
+    my $pack = shift( @_ ) || return( $self->error( "No Apache package name was provided to call method" ) );
+    my $meth = shift( @_ ) || return( $self->error( "No method name was provided to try!" ) );
+    my $r = Apache2::RequestUtil->request;
+    $r->log_error( "Net::API::REST::Response::_try to call method \"$meth\" in package \"$pack\"." );
+    try
+    {
+        return( $self->$pack->$meth ) if( !scalar( @_ ) );
+        return( $self->$pack->$meth( @_ ) );
+    }
+    catch( $e )
+    {
+        return( $self->error( "An error occurred while trying to call Apache ", ucfirst( $pack ), " method \"$meth\": $e" ) );
+    }
 }
 
 1;
@@ -562,15 +559,15 @@ Net::API::REST::Response - Apache2 Outgoing Response Access and Manipulation
 
 =head1 SYNOPSIS
 
-	use Net::API::REST::Response;
-	## $r is the Apache2::RequestRec object
-	my $req = Net::API::REST::Request->new( request => $r, debug => 1 );
-	## or, to test it outside of a modperl environment:
-	my $req = Net::API::REST::Request->new( request => $r, debug => 1, checkonly => 1 );
+    use Net::API::REST::Response;
+    ## $r is the Apache2::RequestRec object
+    my $req = Net::API::REST::Request->new( request => $r, debug => 1 );
+    ## or, to test it outside of a modperl environment:
+    my $req = Net::API::REST::Request->new( request => $r, debug => 1, checkonly => 1 );
 
 =head1 VERSION
 
-    v0.4.9
+    v0.4.10
 
 =head1 DESCRIPTION
 
@@ -622,10 +619,10 @@ Get/set content encoding (the C<Content-Encoding> HTTP header).  Content encodin
 
 For example, here is how to send a gzip'ed response:
 
-	 require Compress::Zlib;
-	 $res->content_type( "text/plain" );
-	 $res->content_encoding( "gzip" );
-	 $res->print( Compress::Zlib::memGzip( "some text to be gzipped" ) );
+     require Compress::Zlib;
+     $res->content_type( "text/plain" );
+     $res->content_encoding( "gzip" );
+     $res->print( Compress::Zlib::memGzip( "some text to be gzipped" ) );
 
 =head2 content_language()
 
@@ -649,7 +646,7 @@ Get/set the HTTP response Content-type header value.
 
 For example, set the "Content-type" header to text/plain.
 
-	 $res->content_type('text/plain');
+     $res->content_type('text/plain');
 
 If you set this header via the C<headers_out> table directly, it will be ignored by Apache. So do not do that.
 
@@ -695,7 +692,7 @@ However, it does not check if another C<Set-Cookie> header exists for this cooki
 
 Install a custom response handler for a given status.
 
-	$res->custom_response( $status, $string );
+    $res->custom_response( $status, $string );
 
 The first argument is the status for which the custom response should be used (e.g. C<Apache2::Const::AUTH_REQUIRED>)
 
@@ -703,34 +700,34 @@ The second argument is the custom response to use. This can be a static string, 
 
 B<custom_response>() does not alter the response code, but is used to replace the standard response body. For example, here is how to change the response body for the access handler failure:
 
-	 package MyApache2::MyShop;
-	 use Apache2::Response ();
-	 use Apache2::Const -compile => qw(FORBIDDEN OK);
-	 sub access {
-		 my $r = shift;
+     package MyApache2::MyShop;
+     use Apache2::Response ();
+     use Apache2::Const -compile => qw(FORBIDDEN OK);
+     sub access {
+         my $r = shift;
 
-		 if (MyApache2::MyShop::tired_squirrels()) {
-			 $r->custom_response(Apache2::Const::FORBIDDEN,
-				 "It's siesta time, please try later");
-			 return Apache2::Const::FORBIDDEN;
-		 }
+         if (MyApache2::MyShop::tired_squirrels()) {
+             $r->custom_response(Apache2::Const::FORBIDDEN,
+                 "It's siesta time, please try later");
+             return Apache2::Const::FORBIDDEN;
+         }
 
-		 return Apache2::Const::OK;
-	 }
-	 ...
+         return Apache2::Const::OK;
+     }
+     ...
 
-	 # httpd.conf
-	 PerlModule MyApache2::MyShop
-	 <Location /TestAPI__custom_response>
-		 AuthName dummy
-		 AuthType none
-		 PerlAccessHandler   MyApache2::MyShop::access
-		 PerlResponseHandler MyApache2::MyShop::response
-	 </Location>
+     # httpd.conf
+     PerlModule MyApache2::MyShop
+     <Location /TestAPI__custom_response>
+         AuthName dummy
+         AuthType none
+         PerlAccessHandler   MyApache2::MyShop::access
+         PerlResponseHandler MyApache2::MyShop::response
+     </Location>
 
 When squirrels can't run any more, the handler will return 403, with the custom message:
 
-	 It's siesta time, please try later
+     It's siesta time, please try later
 
 =head2 env( name, [ name => value ] )
 
@@ -748,13 +745,13 @@ The difference between "headers_out" and "err_headers_out", is that the latter a
 
 For example, if a handler wants to return a 404 response, but nevertheless to set a cookie, it has to be:
 
-	 $res->err_headers_out->add('Set-Cookie' => $cookie);
-	 return( Apache2::Const::NOT_FOUND );
+     $res->err_headers_out->add('Set-Cookie' => $cookie);
+     return( Apache2::Const::NOT_FOUND );
 
 If the handler does:
 
-	 $res->headers_out->add('Set-Cookie' => $cookie);
-	 return( Apache2::Const::NOT_FOUND );
+     $res->headers_out->add('Set-Cookie' => $cookie);
+     return( Apache2::Const::NOT_FOUND );
 
 the "Set-Cookie" header won't be sent.
 
@@ -768,7 +765,7 @@ Sets the C<Etag> http header.
 
 Flush any buffered data to the client.
 
-	$res->flush();
+    $res->flush();
 
 Unless STDOUT stream's $| is false, data sent via C<$req->print()> is buffered. This method flushes that data to the client.
 
@@ -786,7 +783,7 @@ If an invalid or unknown status code is passed, C<500 Internal Server Error> wil
 
 For example:
 
-	print( $res->get_status_line( 400 ) );
+    print( $res->get_status_line( 400 ) );
 
 will print: C<400 Bad Request>
 
@@ -814,7 +811,7 @@ Given a C<URI> object or a uri path string, this redirect the current request to
 
 If a C<URI> object is given, its B<path> method will be used to get the path string.
 
-	$res->internal_redirect( $new_uri );
+    $res->internal_redirect( $new_uri );
 
 In case that you want some other request to be served as the top-level request instead of what the client requested directly, call this method from a handler, and then immediately return L<Apache2::Const::OK>. The client will be unaware the a different request was served to her behind the scenes.
 
@@ -856,8 +853,8 @@ Get or set the http datetime for the http header C<Last-Modified-Date>
 
 Create a sub request from the given URI. This sub request can be inspected to find information about the requested URI.
 
-	 $ret = $res->lookup_uri( $new_uri );
-	 $ret = $res->lookup_uri( $new_uri, $next_filter );
+     $ret = $res->lookup_uri( $new_uri );
+     $ret = $res->lookup_uri( $new_uri, $next_filter );
 
 See L<Apache2::SubRequest> for more information.
 
@@ -865,13 +862,13 @@ See L<Apache2::SubRequest> for more information.
 
 Construct an entity tag from the resource information. If it's a real file, build in some of the file characteristics.
 
-	$etag = $res->make_etag( $force_weak );
+    $etag = $res->make_etag( $force_weak );
 
 =head2 meets_conditions()
 
 Implements condition C<GET> rules for HTTP/1.1 specification. This function inspects the client headers and determines if the response fulfills the specified requirements.
 
-	$status = $res->meets_conditions();
+    $status = $res->meets_conditions();
 
 It returns L<Apache2::Const::OK> if the response fulfils the condition GET rules. Otherwise some other status code (which should be returned to Apache).
 
@@ -879,12 +876,12 @@ It returns L<Apache2::Const::OK> if the response fulfils the condition GET rules
 
 Add/remove cache control headers:
 
-	 $prev_no_cache = $res->no_cache( $boolean );
+     $prev_no_cache = $res->no_cache( $boolean );
 
 A true value sets the "no_cache" request record member to a true value and inserts:
 
-	 Pragma: no-cache
-	 Cache-control: no-cache
+     Pragma: no-cache
+     Cache-control: no-cache
 
 into the response headers, indicating that the data being returned is volatile and the client should not cache it.
 
@@ -896,7 +893,7 @@ This method should be invoked before any response data has been sent out.
 
 Send data to the client.
 
-	$cnt = $res->print( @msg );
+    $cnt = $res->print( @msg );
 
 It returns how many bytes were sent (or buffered). If zero bytes were sent, B<print> will return 0E0, or C<zero but true>, which will still evaluate to 0 in a numerical context.
 
@@ -906,7 +903,7 @@ The data is flushed only if STDOUT stream's $| is true. Otherwise it's buffered 
 
 Format and send data to the client (same as "printf").
 
-	$cnt = $res->printf( $format, @args );
+    $cnt = $res->printf( $format, @args );
 
 It returns how many bytes were sent (or buffered).
 
@@ -918,7 +915,7 @@ Given an URI, this will prepare the http headers and return the proper code for 
 
 It should be used like this in your code:
 
-	return( $res->redirect( "https://example.com/somewhere/" ) );
+    return( $res->redirect( "https://example.com/somewhere/" ) );
 
 =head2 request()
 
@@ -936,7 +933,7 @@ It does not return any value.
 
 Parse the header.
 
-	$res->send_cgi_header( $buffer );
+    $res->send_cgi_header( $buffer );
 
 This method is really for back-compatibility with mod_perl 1.0. It's very inefficient to send headers this way, because of the parsing overhead.
 
@@ -950,9 +947,9 @@ See L<Apache2::Response> for more information.
 
 Send a file or a part of it
 
-	 $rc = $req->sendfile( $filename );
-	 $rc = $req->sendfile( $filename, $offset );
-	 $rc = $req->sendfile( $filename, $offset, $len );
+     $rc = $req->sendfile( $filename );
+     $rc = $req->sendfile( $filename, $offset );
+     $rc = $req->sendfile( $filename, $offset, $len );
 
 It returns a L<APR::Const> constant.
 
@@ -972,7 +969,7 @@ It does not return any value.
 
 Sets the C<Last-Modified> response header field to the value of the mtime field in the request structure -- rationalized to keep it from being in the future.
 
-	$res->set_last_modified( $mtime );
+    $res->set_last_modified( $mtime );
 
 If the $mtime argument is passed, $r->update_mtime will be first run with that argument.
 
@@ -980,7 +977,7 @@ If the $mtime argument is passed, $r->update_mtime will be first run with that a
 
 Set the keepalive status for this request.
 
-	$ret = $res->set_keepalive();
+    $ret = $res->set_keepalive();
 
 It returns true if keepalive can be set, false otherwise.
 
@@ -1009,15 +1006,15 @@ See also C<$r->status_line>, which. if set, overrides C<$r->status>.
 
 Set the C<$res->mtime> field to the specified value if it's later than what's already there.
 
-	$res->update_mtime( $mtime );
+    $res->update_mtime( $mtime );
 
 =head2 write()
 
 Send partial string to the client
 
-	 $cnt = $req->write( $buffer );
-	 $cnt = $req->write( $buffer, $len );
-	 $cnt = $req->write( $buffer, $len, $offset );
+     $cnt = $req->write( $buffer );
+     $cnt = $req->write( $buffer, $len );
+     $cnt = $req->write( $buffer, $len, $offset );
 
 See L<Apache2::RequestIO> for more information.
 

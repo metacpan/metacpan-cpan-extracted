@@ -1,19 +1,34 @@
 package obogaf::parser;
-
 require 5.006;
-our $VERSION= '1.272'; 
+our $VERSION= '1.373'; 
 $VERSION= eval $VERSION;
+
+require Exporter;
+our @ISA= qw(Exporter);
+our %EXPORT_TAGS=(
+    all => [qw(
+        &build_edges
+        &build_subonto
+        &make_stat
+        &get_parents_or_children_list
+        &obo_filter
+        &gene2biofun
+        &map_OBOterm_between_release
+    )],
+);
+our @EXPORT_OK= (@{$EXPORT_TAGS{'all'}});
 
 use strict;
 use warnings;
 use Graph;
+use List::MoreUtils qw(uniq);
 use IO::File;
 use PerlIO::gzip;
 
 sub build_edges{
     my ($obofile)= @_;
     my ($namespace, $idname, $isname, $pofname, $source, $destination, $pof, $res);
-    if($obofile=~/.obo$/){ open FH, "<", "$obofile" or die "cannot open $obofile. $!.\n"; } else { die "cannot open $obofile. The extension must be obo.\n"; }
+    if($obofile=~/.obo$/i){ open FH, "<", "$obofile" or die "cannot open $obofile. $!.\n"; }
     while(<FH>){
         chomp;
         next if $_=~/^\s*$/;
@@ -108,47 +123,84 @@ sub make_stat{
 
 sub get_parents_or_children_list{
     my ($edgesfile, $parentIndex, $childIndex, $chdORpar)= @_;
-    my (%nodelist); 
+    my (%nodelist, %outlist); 
     if($chdORpar ne "parents" && $chdORpar ne "children"){ die "$chdORpar can be 'parents' or 'children'.\n";} 
     open FH, "<", $edgesfile or die "cannot open $edgesfile. $!.\n";
     while(<FH>){
         chomp;
         my @vals= split(/\t/,$_);
         if($chdORpar eq "parents"){
-            $nodelist{$vals[$childIndex]} .= $vals[$parentIndex]."|";
+            push (@{$nodelist{$vals[$childIndex]}}, $vals[$parentIndex]);
         }else{
-            $nodelist{$vals[$parentIndex]} .= $vals[$childIndex]."|";
+            push (@{$nodelist{$vals[$parentIndex]}}, $vals[$childIndex]);
         }
     }
     close FH;
-    foreach my $term (keys %nodelist){ chop $nodelist{$term}; }
-    return \%nodelist;
+    foreach my $term (keys %nodelist){
+        $outlist{$term} = join('|', sort{($a=~/(\d+)/)[0] <=> ($b=~/(\d+)/)[0]} uniq @{$nodelist{$term}});
+    }
+    return \%outlist;
+}
+
+sub obo_filter{
+    my ($obofile, $termsfile)= @_;
+    my (@oboterms, $header, $counter, $res, $obo);
+    ## obo terms of interest
+    open FH, "<", "$termsfile" or die "cannot open $termsfile. $!.\n";
+    while(<FH>){ 
+        chomp; 
+        next if $_=~/^\s*$/;
+        push(@oboterms, $_); 
+    }
+    close FH;
+    my @unique= do { my %seen; grep { !$seen{$_}++ } @oboterms};
+    @oboterms=@unique;
+    ## store obofile header
+    if($obofile=~/.obo$/i){ open FH, "<", "$obofile" or die "cannot open $obofile. $!.\n"; }
+    while(<FH>){
+        next unless 1 .. /\[Term\]/;
+        next if /^\[Term\]/;
+        $header .= $_;    
+    }
+    ## extract from obo file the terms of interest
+    foreach my $oboterm (@oboterms){
+        $counter++;
+        open FH, $obofile;
+        while(<FH>){
+            if(/^id:\s+($oboterm)/ .. (/^$/ || eof FH)){ ## check for end of file
+                $res .= $_;
+            }
+        }
+        close FH;
+        print($counter, "\t", $oboterm, "\tdone\n");
+    }
+    unless(defined $res){ die "none obo terms listed in $termsfile file was found in $obofile file. $!.\n" }
+    ## print obofile filtered
+    $obo = $header.$res."\n";
+    $obo=~ s/\b(id:\s+(\D+\d+))/\[Term\]\n$1/g; ## note: word boundary (\b) is necessary to match only "id:"" and not "alt_id:" in the string $obo
+    return \$obo;
 }
 
 sub gene2biofun{
     my ($annfile, $geneIndex, $classIndex)= @_;
-    my (%gene2biofun, @genes, @biofun, $stat)= ();
+    my (%gene2biofun, %biofun, @genes, @biofun, $stat)= ();
     my ($sample, $oboterm)= (0)x2;
-    if ($annfile =~ /.gz$/){ 
-        open FH, "<:gzip", $annfile or die "cannot open $annfile. $!.\n";
-    }else{ 
-        open FH, "<", "$annfile" or die "cannot open $annfile. $!.\n";
-    }
+    if($annfile=~/.gz$/i){ open FH, "<:gzip", $annfile or die "cannot open $annfile. $!.\n"; } else { open FH, "<", "$annfile" or die "cannot open $annfile. $!.\n"; }
     while(<FH>){
         next if $_=~/^[!,#]|^\s*$/;
         chomp;  
         my @vals=split(/\t/,$_);
         push(@genes, $vals[$geneIndex]);
         push(@biofun, $vals[$classIndex]);
-        $gene2biofun{$vals[$geneIndex]} .= $vals[$classIndex]."|";
+        push(@{$biofun{$vals[$geneIndex]}}, $vals[$classIndex]);
     }
     close FH;
-    foreach my $gene (keys %gene2biofun){ chop $gene2biofun{$gene}; }
-    my %seen=();
-    my @uniqgenes= grep{!$seen{$_}++} @genes;
+    foreach my $gene (keys %biofun){
+        $gene2biofun{$gene} = join('|', sort{($a=~/(\d+)/)[0] <=> ($b=~/(\d+)/)[0]} uniq @{$biofun{$gene}});
+    }
+    my @uniqgenes= uniq @genes;
+    my @uniqpbiofun= uniq @biofun;
     $sample= scalar(@uniqgenes); 
-    undef %seen;
-    my @uniqpbiofun= grep{!$seen{$_}++} @biofun;
     $oboterm= scalar(@uniqpbiofun);
     $stat .= "genes: $sample\nontology terms: $oboterm\n";
     return (\%gene2biofun, \$stat);
@@ -159,7 +211,7 @@ sub map_OBOterm_between_release{
     my (%altid, %oldclass, %old2new, $header, $id, $fln, $pair, $stat, $pstat); 
     my ($alt, $classes, $seen, $unseen)= (0)x4;
     ## step 0: pairing altid_2_id (key: alt_id) 
-    if($obofile=~/.obo$/){ open FH, "<", "$obofile" or die "cannot open $obofile. $!.\n"; } else { die "cannot open $obofile. The extension must be obo.\n"; }
+    if($obofile=~/.obo$/i){ open FH, "<", "$obofile" or die "cannot open $obofile. $!.\n"; }
     while (<FH>){
         chomp;
         next if $_=~/^\s*$/;
@@ -169,11 +221,7 @@ sub map_OBOterm_between_release{
     close FH;
     $alt= keys(%altid);
     # step 1: storing old ontology terms in a hash
-    if ($annfile =~ /.gz$/){ 
-        open FH, "<:gzip", $annfile or die "cannot open $annfile. $!.\n";  
-    }else{ 
-        open FH, "<", "$annfile" or die "cannot open $annfile. $!.\n";
-    }
+    if($annfile=~/.gz$/i){ open FH, "<:gzip", $annfile or die "cannot open $annfile. $!.\n"; } else { open FH, "<", "$annfile" or die "cannot open $annfile. $!.\n"; }
     while(<FH>){
         chomp; 
         if($_=~/^[!,#]|^\s*$/){ $header .= "$_\n"; }
@@ -199,11 +247,7 @@ sub map_OBOterm_between_release{
         }
     }
     ## step 3: substitute ALT-ID with the updated ID, then the annotation file is returned.
-    if ($annfile =~ /.gz$/){ 
-        open FH, "<:gzip", $annfile or die "cannot open $annfile. $!.\n";  
-    }else{ 
-        open FH, "<", "$annfile" or die "cannot open $annfile. $!.\n";
-    }
+    if($annfile=~/.gz$/i){ open FH, "<:gzip", $annfile or die "cannot open $annfile. $!.\n"; } else { open FH, "<", "$annfile" or die "cannot open $annfile. $!.\n"; }
     while(<FH>){
         chomp;
         next if $_=~/^[!,#]|^\s*$/;
@@ -221,7 +265,7 @@ sub map_OBOterm_between_release{
     if(defined $header){$fln = $header.$fln;}
     ## print mapping stat
     $stat .= "Tot. ontology terms:\t$classes\nTot. altID:\t$alt\nTot. altID seen:\t$seen\nTot. altID unseen:\t$unseen\n";
-    unless(not defined $pair){ 
+    unless(not defined $pair){
         $pstat .= "#alt-id <tab> id\n$pair\n$stat"; 
         return (\$fln, \$pstat);
     }
@@ -244,7 +288,7 @@ obogaf::parser - a perl5 module to handle obo and gaf file
 
 use obogaf::parser;
 
-my ($graph, $subonto, $stat, $res, $parORchdlist);
+my ($graph, $subonto, $res, $stat, $parORchdlist, $newobo);
  
 $graph= build_edges(obofile);
 
@@ -253,6 +297,8 @@ $subonto= build_subonto(edgesfile, namespace);
 $stat= make_stat(edgesfile, parentIndex, childIndex);
 
 $parORchdlist= get_parents_or_children_list(edgesfile, parentIndex, childIndex, parORchd);
+
+$newobo= obo_filter(obofile, termsfile);
 
 ($res, $stat)= gene2biofun(annfile, geneIndex, classIndex);
 
@@ -314,6 +360,16 @@ B<childIndex>: index referring to the column containing the I<child> vertices (d
 B<parORchd>: must be C<parents> or C<children>. If C<$parORchd=parents> a pipe separated list containing the parents of each node of the graph is returned; if C<$parORchd=children> a pipe separated list containing the children of each node is returned.
 
 B<output>: an anonymous hash storing for each node of the graph the list of its children or parents according to the B<parORchd> parameter.
+
+=item obo_filter - prune obo file 
+    
+    $newobo= obo_filter(obofile, termsfile);
+
+B<obofile>: any obo file listed in L<OBO foundry|http://www.obofoundry.org/>. The file extension must be ".obo".
+
+B<termsfile>: file containing the set of obo terms (new line separated) for which obo file must be shortened
+
+B<output>: an anonymous scalar storing the terms listed in the file B<termsfile> according to the obo structure
 
 =item gene2biofun - make annotations adjacency list.
 

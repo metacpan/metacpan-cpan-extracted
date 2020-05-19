@@ -27,11 +27,11 @@ licensecheck - simple license checker for source files
 
 =head1 VERSION
 
-Version v3.0.46
+Version v3.0.47
 
 =cut
 
-our $VERSION = version->declare('v3.0.46');
+our $VERSION = version->declare('v3.0.47');
 
 my $progname = path($0)->basename;
 

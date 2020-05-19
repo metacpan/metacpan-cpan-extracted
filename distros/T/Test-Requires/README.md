@@ -43,7 +43,7 @@ Test::Requires can also be used to require a minimum version of Perl:
 
 # AUTHOR
 
-Tokuhiro Matsuno <tokuhirom @\*(#RJKLFHFSDLJF gmail.com>
+Tokuhiro Matsuno &lt;tokuhirom @\*(#RJKLFHFSDLJF gmail.com>
 
 # THANKS TO
 

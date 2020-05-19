@@ -1,1 +1,11 @@
 Changelog for Data-Object-Args
+
+2.01 2020-05-14T00:03:08
+ - Added release updates
+ - Add "unnamed" method (#3)
+
+2.00 2020-03-20T02:11:16
+ - Built release version 2.00
+ - Added release updates
+ - Initial implementation
+ - Initial commit

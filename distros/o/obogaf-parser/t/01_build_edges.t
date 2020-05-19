@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use Test::Files;
-use obogaf::parser;
+use obogaf::parser qw(build_edges);
 
 ## input files
 my $obofile = "t/data/test_gobasic.obo";
@@ -11,15 +11,15 @@ my $fakeobo = "t/data/test_GObasic.obo";
 my $fakeext = "t/data/test_gobasic.OBO";
 
 ## test read or die
-lives_ok( sub { my $file = obogaf::parser::build_edges($obofile) }, 'file opened' );
-dies_ok ( sub { my $file = obogaf::parser::build_edges($fakeobo) }, 'die: wrong file name');
-dies_ok ( sub { my $file = obogaf::parser::build_edges($fakeext) }, 'die: no obo extension');
+lives_ok( sub { my $file = build_edges($obofile) }, 'file opened' );
+dies_ok ( sub { my $file = build_edges($fakeobo) }, 'die: wrong file name');
+dies_ok ( sub { my $file = build_edges($fakeext) }, 'die: no obo extension');
 
 ## my out file
 my $fh;
 
 ## test standard go.obo file
-my $gores   = obogaf::parser::build_edges($obofile);
+my $gores   = build_edges($obofile);
 my $goedges = "t/data/test_gobasic_edges.txt"; 
 open $fh, ">", $goedges; 
 print $fh "${$gores}";
@@ -38,7 +38,7 @@ close FH;
 close $fh;
 
 ## test obo file without namespace
-my $gores_hack   = obogaf::parser::build_edges($gobo_hack);
+my $gores_hack   = build_edges($gobo_hack);
 my $goedges_hack = "t/data/test_gobasic_edges_no_namespace.txt"; 
 open $fh, ">", $goedges_hack; 
 print $fh "${$gores_hack}";

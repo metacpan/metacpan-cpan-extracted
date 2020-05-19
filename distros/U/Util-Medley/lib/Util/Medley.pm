@@ -1,5 +1,5 @@
 package Util::Medley;
-$Util::Medley::VERSION = '0.030';
+$Util::Medley::VERSION = '0.037';
 use Modern::Perl;
 use Moose;
 
@@ -8,6 +8,7 @@ with 'Util::Medley::Roles::Attributes::Crypt';
 with 'Util::Medley::Roles::Attributes::DateTime';
 with 'Util::Medley::Roles::Attributes::File';
 with 'Util::Medley::Roles::Attributes::File::Zip';
+with 'Util::Medley::Roles::Attributes::Hostname';
 with 'Util::Medley::Roles::Attributes::List';
 with 'Util::Medley::Roles::Attributes::Logger';
 with 'Util::Medley::Roles::Attributes::Spawn';
@@ -20,7 +21,7 @@ Util::Medley - A collection of commonly used utilities.
 
 =head1 VERSION
 
-version 0.030
+version 0.037
 
 =head1 SYNOPSIS
 

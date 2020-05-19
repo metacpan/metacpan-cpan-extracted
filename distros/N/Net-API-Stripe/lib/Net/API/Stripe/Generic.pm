@@ -1,14 +1,11 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Generic.pm
-## Version 0.1
-## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <jack@deguest.jp>
+## Version v0.100.2
+## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/11/02
-## Modified 2019/11/02
-## All rights reserved
+## Modified 2020/05/16
 ## 
-## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::Stripe::Generic;
 BEGIN
@@ -16,11 +13,10 @@ BEGIN
 	use strict;
 	use parent qw( Module::Generic );
 	use Net::API::Stripe;
-	use Net::API::Stripe::Number;
 	use TryCatch;
     use Devel::Confess;
     use Want;
-    our( $VERSION ) = '0.1';
+    our( $VERSION ) = 'v0.100.2';
 };
 
 sub init
@@ -228,7 +224,7 @@ sub _set_get_number
     my $field = shift( @_ );
     if( @_ )
     {
-    	$self->{ $field } = Net::API::Stripe::Number->new( shift( @_ ) );
+    	$self->{ $field } = Module::Generic::Number->new( shift( @_ ) );
     }
     return( $self->{ $field } );
 }
@@ -351,7 +347,7 @@ Net::API::Stripe::Generic - A Stripe Generic Module
 
 =head1 VERSION
 
-    0.1
+    v0.100.2
 
 =head1 DESCRIPTION
 
@@ -428,7 +424,7 @@ instead of:
 
 =item B<_set_get_number>( field, number )
 
-Provided with a field (aka property) and a number, this will create a new L<Net::API::Stripe::Number> object for the associated field I<field>
+Provided with a field (aka property) and a number, this will create a new L<Module::Generic::Number> object for the associated field I<field>
 
 =item B<_set_get_object_array>( field, class, array reference )
 
@@ -458,7 +454,7 @@ Calls B<will> from the module L<Module::Generic>
 
 =head1 HISTORY
 
-=head2 v0.1
+=head2 v0.100.0
 
 Initial version
 
@@ -468,7 +464,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<Net::API::Stripe>, L<Module::Generic>, L<Number::Format>, L<JSON>, L<URI>
+L<Net::API::Stripe>, L<Module::Generic>, L<Module::Generic::Number>, L<JSON>, L<URI>
 
 =head1 COPYRIGHT & LICENSE
 

@@ -1,153 +1,150 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## DB/Object/Cache/Tables.pm
-## Version 0.1
-## Copyright(c) 2019 Jacques Deguest
-## Author: Jacques Deguest <jack@deguest.jp>
+## Database Object Interface - ~/lib/DB/Object/Cache/Tables.pm
+## Version v0.100.1
+## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2017/07/19
-## Modified 2019/08/25
-## All rights reserved.
+## Modified 2020/05/16
 ## 
-## This program is free software; you can redistribute it and/or modify it 
-## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package DB::Object::Cache::Tables;
 BEGIN
 {
-	use strict;
-	use parent qw( Module::Generic );
-	use JSON;
-	use File::Spec;
-	use Fcntl qw( :flock );
-	use Devel::Confess;
-	our $VERSION = '0.1';
+    use strict;
+    use parent qw( Module::Generic );
+    use JSON;
+    use File::Spec;
+    use Fcntl qw( :flock );
+    use Devel::Confess;
+    our $VERSION = 'v0.100.1';
 };
 
 sub init
 {
-	my $self = shift( @_ );
-	$self->{ 'cache' } = {};
-	$self->{ 'cache_dir' } = File::Spec->tmpdir();
-	$self->{ 'cache_file' } = "$self->{cache_dir}/sql_tables.json";
-	$self->{ 'timeout' } = 86400;
-	$self->SUPER::init( @_ );
-	$self->{ 'updated' } = '';
-	$self->cache_dir( $self->{cache_dir} ) if( $self->{cache_dir} );
-	$self->cache_file( $self->{cache_file} ) if( $self->{cache_file} );
-	return( $self );
+    my $self = shift( @_ );
+    $self->{cache} = {};
+    $self->{cache_dir} = File::Spec->tmpdir();
+    $self->{cache_file} = "$self->{cache_dir}/sql_tables.json";
+    $self->{timeout} = 86400;
+    $self->SUPER::init( @_ );
+    $self->{updated} = '';
+    $self->cache_dir( $self->{cache_dir} ) if( $self->{cache_dir} );
+    $self->cache_file( $self->{cache_file} ) if( $self->{cache_file} );
+    return( $self );
 }
 
 sub cache { return( shift->_set_get_hash( 'cache', @_ ) ); }
 
 sub cache_dir
 {
-	my $self = shift( @_ );
-	if( @_ )
-	{
-		my $v = shift( @_ );
-		$self->{cache_dir} = $v;
-		$self->cache_file( "$v/sql_tables.json" );
-	}
-	return( $self->{cache_dir} );
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $v = shift( @_ );
+        $self->{cache_dir} = $v;
+        $self->cache_file( "$v/sql_tables.json" );
+    }
+    return( $self->{cache_dir} );
 }
 
 sub cache_file
 {
-	my $self = shift( @_ );
-	if( @_ )
-	{
-		my $f = shift( @_ ) || return( $self->error( "No tables cache file path was provided." ) );
-		## No change
-		return( $f ) if( $f eq $self->{cache_file} );
-		if( -e( $f ) )
-		{
-			my $mtime = ( stat( $f ) )[9];
-			$self->updated( $mtime );
-			my $hash = $self->read( $f ) || return( undef() );
-			$self->cache( $hash );
-		}
-		$self->{cache_file} = $f;
-	}
-	return( $self->{cache_file} );
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $f = shift( @_ ) || return( $self->error( "No tables cache file path was provided." ) );
+        ## No change
+        return( $f ) if( $f eq $self->{cache_file} );
+        if( -e( $f ) )
+        {
+            my $mtime = ( stat( $f ) )[9];
+            $self->updated( $mtime );
+            my $hash = $self->read( $f ) || return( undef() );
+            $self->cache( $hash );
+        }
+        $self->{cache_file} = $f;
+    }
+    return( $self->{cache_file} );
 }
 
 sub get
 {
-	my $self = shift( @_ );
-	my $opts = {};
-	$opts = shift( @_ ) if( @_ && $self->_is_hash( $_[0] ) );
-	foreach my $k ( qw( host port driver ) )
-	{
-		return( $self->error( "Parameter \"$k\" is missing." ) ) if( !length( $opts->{ $k } ) );
-	}
-	my $cache = $self->cache;
-	my $timeout = $self->timeout;
-	my $part  = {};
-	return( [] ) if( !exists( $cache->{ $opts->{host} }->{ $opts->{driver} }->{ $opts->{port} }->{ $opts->{database} }->{tables} ) );
-	my $part = $cache->{ $opts->{host} }->{ $opts->{driver} }->{ $opts->{port} }->{ $opts->{database} };
-	my $ts = $part->{timestamp};
-	return( $part->{tables} ) if( $opts->{ignore_ttl} || ( $ts && ( time() - $ts < $timeout ) ) );
-	return( [] );
+    my $self = shift( @_ );
+    my $opts = {};
+    $opts = shift( @_ ) if( @_ && $self->_is_hash( $_[0] ) );
+    foreach my $k ( qw( host port driver ) )
+    {
+        return( $self->error( "Parameter \"$k\" is missing." ) ) if( !length( $opts->{ $k } ) );
+    }
+    my $cache = $self->cache;
+    my $timeout = $self->timeout;
+    my $part  = {};
+    return( [] ) if( !exists( $cache->{ $opts->{host} }->{ $opts->{driver} }->{ $opts->{port} }->{ $opts->{database} }->{tables} ) );
+    $part = $cache->{ $opts->{host} }->{ $opts->{driver} }->{ $opts->{port} }->{ $opts->{database} };
+    my $ts = $part->{timestamp};
+    return( $part->{tables} ) if( $opts->{ignore_ttl} || ( $ts && ( time() - $ts < $timeout ) ) );
+    return( [] );
 }
 
 sub read
 {
-	my $self = shift( @_ );
-	my $tables_cache_file = shift( @_ ) || $self->cache_file || return( {} );
-	my $hash = {};
-	my $j = JSON->new->relaxed;
-	if( -e( $tables_cache_file ) &&
-		!-z( $tables_cache_file ) )
-	{
-		if( my $fh = IO::File->new( "<$tables_cache_file" ) )
-		{
-			$fh->binmode( ':utf8' );
-			$fh->autoflush( 1 );
-			my $data = join( '', $fh->getlines );
-			$fh->close;
-			eval
-			{
-				$cache = $j->decode( $data );
-			};
-			if( $@ )
-			{
-				warn( "An error occured while decoding json data from the table cache file: $@\n" );
-			}
-		}
-		else
-		{
-			warn( "Warning only: cannot read the tables cache file \"$tables_cache_file\".\n" );
-		}
-	}
-	return( $hash );
+    my $self = shift( @_ );
+    my $tables_cache_file = shift( @_ ) || $self->cache_file || return( {} );
+    my $hash = {};
+    my $j = JSON->new->relaxed;
+    if( -e( $tables_cache_file ) &&
+        !-z( $tables_cache_file ) )
+    {
+        if( my $fh = IO::File->new( "<$tables_cache_file" ) )
+        {
+            $fh->binmode( ':utf8' );
+            $fh->autoflush( 1 );
+            my $data = join( '', $fh->getlines );
+            $fh->close;
+            eval
+            {
+                $cache = $j->decode( $data );
+            };
+            if( $@ )
+            {
+                warn( "An error occured while decoding json data from the table cache file: $@\n" );
+            }
+        }
+        else
+        {
+            warn( "Warning only: cannot read the tables cache file \"$tables_cache_file\".\n" );
+        }
+    }
+    return( $hash );
 }
 
 sub set
 {
-	my $self = shift( @_ );
-	my $hash = shift( @_ ) || return( $self->error( "No hash reference was provided to add to tables cache." ) );
-	return( $self->error( "Hash reference provided for tables cache ($hash) is not a hash reference." ) ) if( !$self->_is_hash( $hash ) );
-	foreach my $k ( qw( host port driver tables ) )
-	{
-		return( $self->error( "Tables cache provided is missing the \"$k\" key." ) ) if( !length( $hash->{ $k } ) );
-	}
-	return( $self->error( "\"tables\" property in cache data is not an array reference." ) ) if( !$self->_is_array( $hash->{tables} ) );
-	## Possibly reload the cache if the modification date changed
-	my $cache = $self->cache;
-	my $f = $self->cache_file;
-	my $last_update = $self->updated;
-	if( -s( $f ) && $last_update && ( stat( $f ) )[9] != $last_update )
-	{
-		$cache = $self->read( $f ) || return( undef() );
-	}
-	$cache->{ $hash->{host} }->{ $hash->{driver} }->{ $hash->{port} }->{ $hash->{database} } = {} if( ref( $cache->{ $hash->{host} }->{ $hash->{driver} }->{ $hash->{port} }->{ $hash->{database} } ) ne 'HASH' );
-	$cache->{ $hash->{host} }->{ $hash->{driver} }->{ $hash->{port} }->{ $hash->{database} }->{tables} = $hash->{tables};
-	$cache->{ $hash->{host} }->{ $hash->{driver} }->{ $hash->{port} }->{ $hash->{database} }->{timestamp} = time();
-	if( !defined( $self->write( $cache ) ) )
-	{
-		return( undef() );
-	}
-	return( $self );
+    my $self = shift( @_ );
+    my $hash = shift( @_ ) || return( $self->error( "No hash reference was provided to add to tables cache." ) );
+    return( $self->error( "Hash reference provided for tables cache ($hash) is not a hash reference." ) ) if( !$self->_is_hash( $hash ) );
+    foreach my $k ( qw( host port driver tables ) )
+    {
+        return( $self->error( "Tables cache provided is missing the \"$k\" key." ) ) if( !length( $hash->{ $k } ) );
+    }
+    return( $self->error( "\"tables\" property in cache data is not an array reference." ) ) if( !$self->_is_array( $hash->{tables} ) );
+    ## Possibly reload the cache if the modification date changed
+    my $cache = $self->cache;
+    my $f = $self->cache_file;
+    my $last_update = $self->updated;
+    if( -s( $f ) && $last_update && ( stat( $f ) )[9] != $last_update )
+    {
+        $cache = $self->read( $f ) || return( undef() );
+    }
+    $cache->{ $hash->{host} }->{ $hash->{driver} }->{ $hash->{port} }->{ $hash->{database} } = {} if( ref( $cache->{ $hash->{host} }->{ $hash->{driver} }->{ $hash->{port} }->{ $hash->{database} } ) ne 'HASH' );
+    $cache->{ $hash->{host} }->{ $hash->{driver} }->{ $hash->{port} }->{ $hash->{database} }->{tables} = $hash->{tables};
+    $cache->{ $hash->{host} }->{ $hash->{driver} }->{ $hash->{port} }->{ $hash->{database} }->{timestamp} = time();
+    if( !defined( $self->write( $cache ) ) )
+    {
+        return( undef() );
+    }
+    return( $self );
 }
 
 sub timeout { return( shift->_set_get_number( 'timeout', @_ ) ); }
@@ -156,34 +153,202 @@ sub updated { return( shift->_set_get_number( 'updated', @_ ) ); }
 
 sub write
 {
-	my $self = shift( @_ );
-	my $hash = shift( @_ ) || return( $self->error( "No table cache data was provided to write to cache file \"$tables_cache_file\"." ) );
-	my $tables_cache_file = shift( @_ ) || $self->cache_file || return( $self->error( "No cache file was set to write data to it." ) );
-	return( $self->error( "Tables cache data provided is not an hash reference." ) ) if( ref( $hash ) ne 'HASH' );
-	my $j = JSON->new->allow_nonref;
-	if( my $fh = IO::File->new( ">$tables_cache_file" ) )
-	{
-		$fh->binmode( ':utf8' );
-		$fh->autoflush( 1 );
-		eval
-		{
-			flock( $fh, LOCK_EX );
-		};
-		$fh->print( $j->encode( $hash ) ) || return( $self->error( "Unable to write data to tables cache file \"$tables_cache_file\": $!" ) );
-		eval
-		{
-			flock( $fh, LOCK_UN );
-		};
-		$fh->close;
-		$self->updated( ( stat( $tables_cache_file ) )[9] );
-		return( -s( $tables_cache_file ) );
-	}
-	else
-	{
-		return( $self->error( "Unable to write to file $tables_cache_file: $!" ) );
-	}
+    my $self = shift( @_ );
+    my $hash = shift( @_ ) || return( $self->error( "No table cache data was provided to write to cache file \"", $self->cache_file, "\"." ) );
+    my $tables_cache_file = shift( @_ ) || $self->cache_file || return( $self->error( "No cache file was set to write data to it." ) );
+    return( $self->error( "Tables cache data provided is not an hash reference." ) ) if( ref( $hash ) ne 'HASH' );
+    my $j = JSON->new->allow_nonref;
+    if( my $fh = IO::File->new( ">$tables_cache_file" ) )
+    {
+        $fh->binmode( ':utf8' );
+        $fh->autoflush( 1 );
+        eval
+        {
+            flock( $fh, LOCK_EX );
+        };
+        $fh->print( $j->encode( $hash ) ) || return( $self->error( "Unable to write data to tables cache file \"$tables_cache_file\": $!" ) );
+        eval
+        {
+            flock( $fh, LOCK_UN );
+        };
+        $fh->close;
+        $self->updated( ( stat( $tables_cache_file ) )[9] );
+        return( -s( $tables_cache_file ) );
+    }
+    else
+    {
+        return( $self->error( "Unable to write to file $tables_cache_file: $!" ) );
+    }
 }
 
 1;
 
 __END__
+
+=encoding utf-8
+
+=head1 NAME
+
+DB::Object::Cache::Tables - Table Cache
+
+=head1 SYNOPSIS
+
+    my $cache = DB::Object::Cache::Tables->new({
+        timeout => 86400,
+        # This is automatically set
+        # cache_file => '/some/dir/sql_tables.json',
+    });
+    $dbh->cache_tables( $cache_tables );
+    $tables = $dbh->tables_info;
+    my $cache = 
+    {
+    host => $host,
+    driver => $driver,
+    port => $port,
+    database => $database,
+    tables => $tables,
+    };
+    if( !defined( $cache->set( $cache ) ) )
+    {
+        warn( "Unable to write to tables cache: ", $cache->error, "\n" );
+    }
+	
+	# Returning an array reference of tables hash reference definition
+	$all = $cache_tables->get({
+		host => $self->host,
+		driver => $self->driver,
+		port => $self->port,
+		database => $db,
+	}) || do
+    
+=head1 VERSION
+
+This is version v0.100.1
+
+=head1 DESCRIPTION
+
+This is a simple given to maintain a cache of database tables in a session. When a connection object is created, it will issue a query to get the list of all tables and views in the database and pass it to L<DB::Object::Cache::Tables>, and save its object. It is then used later several times such as when instantiating table objects.
+
+=head1 METHODS
+
+=head2 init
+
+Possible parameters:
+
+=over 4
+
+=item I<cache_dir>
+
+An absolute path to a directory that will contain the json cache file. Beware that if you run your script from the eb, this directory must be writable by the http server user.
+
+=item I<cache_file>
+
+Alternatively to I<cache_dir>, you can provide an absolute path to the json cache file.
+
+=item I<timeout>
+
+An amount of time in second until the cache file becomes obsolete.
+
+=back
+
+=head2 cache
+
+Returns the hash reference structure of the cache
+
+=head2 cache_dir
+
+Set or get the cache dir.
+
+When set, this will also set the cache file calling L</"cache_file">
+
+=head2 cache_file
+
+Set or get the cache file.
+
+When set, this will store the cache file modification time to check later if it has become obsolete and load its json data into the L</"cache">
+
+=head2 get
+
+Given an hash reference of parameters, this will return an array reference of table hash reference.
+
+Parameters are:
+
+=over 4
+
+=item I<host>
+
+=item I<driver>
+
+=item I<port>
+
+=item I<database>
+
+=back
+
+=head2 read
+
+Given a full path to a json cache file, this will read the file and return its data as a hash reference.
+
+If an error occurs while reading the json cache file, it will issue a warning using B<warn> and return an empty hash reference.
+
+=head2 set
+
+Provided with an hash reference of parameters, this will add it to the cache data and write it to the file.
+
+Parameters are:
+
+=over 4
+
+=item I<host>
+
+=item I<driver>
+
+=item I<port>
+
+=item I<database>
+
+=item I<tables>
+
+An array reference of hash reference containing table definition as returned by L<DB::Object::table_info>
+
+=back
+
+=head2 timeout
+
+Set/get the cache file timeout.
+
+If the current unix timestamp minus the cache file timestamp is higher than the timeout, the cache file has expired.
+
+=head2 updated
+
+Set/get the cache file last modified unix timestamp
+
+=head2 write
+
+Provided with a cache data, which is a hash reference and optionally the full path to the cache file, and B<write> will write the hash data as a json to the cache file.
+
+If no cache file is provided as a second argument, it will use the default one set up when the object was instantiated.
+
+It returns the size of the cache file or return undef and set the B<error>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2000-2019 DEGUEST Pte. Ltd.
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 SEE ALSO
+
+L<DB::Object>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut
+

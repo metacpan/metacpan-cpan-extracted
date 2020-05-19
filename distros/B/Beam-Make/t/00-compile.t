@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Beam/Make.pm',
@@ -14,6 +14,9 @@ my @module_files = (
     'Beam/Make/DBI.pm',
     'Beam/Make/DBI/CSV.pm',
     'Beam/Make/DBI/Schema.pm',
+    'Beam/Make/Docker/Container.pm',
+    'Beam/Make/Docker/Image.pm',
+    'Beam/Make/Docker/Image/Hub.pm',
     'Beam/Make/File.pm',
     'Beam/Make/Recipe.pm',
     'Beam/Runner/Command/make.pm'

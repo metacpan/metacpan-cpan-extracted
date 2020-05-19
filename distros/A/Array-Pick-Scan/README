@@ -1,31 +1,40 @@
 NAME
-    Array::Pick::Scan - Pick random items from an array, without duplicates
+    Array::Pick::Scan - Pick random items from an array (or iterator),
+    without duplicates
 
 VERSION
-    This document describes version 0.001 of Array::Pick::Scan (from Perl
-    distribution Array-Pick-Scan), released on 2019-09-15.
+    This document describes version 0.002 of Array::Pick::Scan (from Perl
+    distribution Array-Pick-Scan), released on 2020-05-18.
 
 SYNOPSIS
      use Array::Pick::Scan qw(random_item);
+
      my $item  = random_item(\@ary);
      my @items = random_line(\@ary, 3);
 
-DESCRIPTION
-    This module can return random items from an array, without duplicates.
-    It uses the same algorithm as File::Random::Pick, which in turn uses a
-    slightly modified version of algorithm described in perlfaq ("perldoc -q
-    "random line"")), but uses items from an array instead of lines from a
-    file(handle).
+    or:
 
-    This module is just a proof of concept and is NOT recommended for
-    general use; as its performance is inferior to List::Util's "shuffle" or
-    List::MoreUtils's "samples".
+     my $item  = random_item(\&iterator);
+     my @items = random_line(\&iterator, 3);
+
+DESCRIPTION
+    This module can return random items from an array (or iterator), without
+    duplicates. It uses the same algorithm as File::Random::Pick, which in
+    turn uses a slightly modified version of algorithm described in perlfaq
+    ("perldoc -q "random line"")), but uses items from an array/iterator
+    instead of lines from a file(handle).
+
+    Performance-wise, this module is inferior to List::Util's "shuffle" or
+    List::MoreUtils's "samples", but can be useful in cases where you have
+    an iterator and do not want to put all the iterator's items into memory
+    first.
 
 FUNCTIONS
   random_item
     Usage:
 
-     my @items = random_item(\@ary [ , $num_samples ]);
+     my @items = random_item(\@ary      [ , $num_samples ]);
+     my @items = random_item(\&iterator [ , $num_samples ]);
 
     Number of samples defaults to 1.
 
@@ -55,7 +64,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2020 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

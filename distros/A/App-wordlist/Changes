@@ -1,16 +1,24 @@
+0.270   2020-05-18  Released-By: PERLANCAR; Urgency: medium
+
+	- Re-add --random (-r) option; note that specifying this option
+	  will disable streaming output.
+
+
 0.269   2020-05-04  Released-By: PERLANCAR; Urgency: medium
 
 	- Enable logging in CLI.
 
 
-0.268   2020-05-02  Released-By: PERLANCAR; Urgency: medium
+0.268   2020-05-02  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
 
-	- CLI now streams output; output starts immediately.
+	- [incompatible change] CLI now streams output; output starts
+          immediately. This break code that calls App::wordlist::wordlist() and
+          expects an array payload.
 
         - Do not stop when a WordList::* module cannot be loaded; print error
           message but continue.
 
-	- [removed] Remove option --random (-r) to ease transition to
+	- [removed] Remove option --random (-r) because it is incompatible with
 	  streaming output.
 
 	- wordlist -l --detail now also shows module path.

@@ -16,7 +16,7 @@ use namespace::autoclean;
 extends 'App::Sqitch::Command';
 with 'App::Sqitch::Role::RevertDeployCommand';
 
-our $VERSION = 'v1.0.0'; # VERSION
+our $VERSION = 'v1.1.0'; # VERSION
 
 has client => (
     is       => 'ro',
@@ -186,7 +186,7 @@ The Sqitch command-line client.
 
 =head1 License
 
-Copyright (c) 2012-2018 iovation Inc.
+Copyright (c) 2012-2020 iovation Inc.
 
 Copyright (c) 2012-2013 Ronan Dunklau
 

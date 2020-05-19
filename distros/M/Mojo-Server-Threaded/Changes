@@ -1,4 +1,8 @@
 Revision history for Mojo-Server-Threaded
+0.18    2020-05-18
+        - skipping hot deploy tests for user installs
+0.17    2020-04-27
+        - fixed issue in Elzar, where failed hot deploys were detected too late
 0.16    2018-11-27
         - fixed logging in tests
         - align with Mojolicious 8.07

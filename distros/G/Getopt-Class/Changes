@@ -18,3 +18,7 @@ Revision history for Perl module Getopt::Class
     printf( "Name provided is: %s\n", $opts->{name} );
     - Corrected and improved aliases using Tie::Hash, because the perl feature https://metacpan.org/pod/perlref#Assigning-to-References refaliasing is still experimental and using Tie::Hash is more straightforward
     - Added the access of the option values as object method, each with their type being an object (string, boolean, date/datetime, number, hash or array reference)
+0.102.1 2020-05-05
+    - Corrected design bug for option key aliases not working properly.
+0.102.2 2020-05-13
+    - Bug fixes and design improvements

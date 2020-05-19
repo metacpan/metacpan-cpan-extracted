@@ -30,7 +30,7 @@ BEGIN
 
 sub init
 {
-	return( shift->DB::Object::Tables::init( @_ ) );
+    return( shift->DB::Object::Tables::init( @_ ) );
 }
 
 # sub init
@@ -42,12 +42,12 @@ sub init
 #     my %arg   = ( @_ );
 #     map{ $self->{ $_ } = $arg{ $_ } } keys( %arg );
 #     $self->{ 'table' }        = $table if( $table );
-#     $self->{ 'structure' }	||= {};
-#     $self->{ 'fields' }		||= {};
-#     $self->{ 'default' }	||= {};
-#     $self->{ 'null' }		||= {};
-#     $self->{ 'alias' }		= {};
-#     $self->{ 'avoid' }		= [];
+#     $self->{ 'structure' }    ||= {};
+#     $self->{ 'fields' }        ||= {};
+#     $self->{ 'default' }    ||= {};
+#     $self->{ 'null' }        ||= {};
+#     $self->{ 'alias' }        = {};
+#     $self->{ 'avoid' }        = [];
 #     ## Load table default, fields, structure informations
 #     my $db = $self->database();
 #     $self->structure();
@@ -93,18 +93,18 @@ sub create
     ## Check possible options
     my $allowed = 
     {
-    'type'				=> qr/^(ISAM|MYISAM|HEAP)$/i,
-    'auto_increment'	=> qr/^(1|0)$/,
+    'type'                => qr/^(ISAM|MYISAM|HEAP)$/i,
+    'auto_increment'    => qr/^(1|0)$/,
     'avg_row_length'    => qr/^\d+$/,
-    'checksum'			=> qr/^(1|0)$/,
-    'comment'			=> qr//,
-    'max_rows'			=> qr/^\d+$/,
-    'min_rows'			=> qr/^\d+$/,
-    'pack_keys'			=> qr/^(1|0)$/,
-    'password'			=> qr//,
-    'delay_key_write'	=> qr/^\d+$/,
-    'row_format'		=> qr/^(default|dynamic|static|compressed)$/i,
-    'raid_type'			=> qr/^(?:1|STRIPED|RAID0|RAID_CHUNKS\s*=\s*\d+|RAID_CHUNKSIZE\s*=\s*\d+)$/,
+    'checksum'            => qr/^(1|0)$/,
+    'comment'            => qr//,
+    'max_rows'            => qr/^\d+$/,
+    'min_rows'            => qr/^\d+$/,
+    'pack_keys'            => qr/^(1|0)$/,
+    'password'            => qr//,
+    'delay_key_write'    => qr/^\d+$/,
+    'row_format'        => qr/^(default|dynamic|static|compressed)$/i,
+    'raid_type'            => qr/^(?:1|STRIPED|RAID0|RAID_CHUNKS\s*=\s*\d+|RAID_CHUNKSIZE\s*=\s*\d+)$/,
     };
     my @options = ();
     my @errors  = ();
@@ -115,7 +115,7 @@ sub create
         $opt = \%lc_opt;
         foreach my $key ( keys( %$opt ) )
         {
-			next if( $opt->{ $key } =~ /^\s*$/ || !exists( $allowed->{ $key } ) );
+            next if( $opt->{ $key } =~ /^\s*$/ || !exists( $allowed->{ $key } ) );
             if( $opt->{ $key } !~ /$allowed->{ $key }/ )
             {
                 push( @errors, $key );
@@ -225,7 +225,7 @@ sub drop
 
 sub exists
 {
-	return( shift->table_exists( shift( @_ ) ) );
+    return( shift->table_exists( shift( @_ ) ) );
 }
 
 sub lock
@@ -483,7 +483,7 @@ sub structure
         $self->{ 'default' }   = $default;
         $self->{ 'fields' }    = $fields;
         $self->{ 'structure' } = $struct;
-        $self->{ 'types' }	   = $types;
+        $self->{ 'types' }       = $types;
     }
     return( wantarray() ? () : undef() ) if( !%$struct );
     return( wantarray() ? %$struct : \%$struct );

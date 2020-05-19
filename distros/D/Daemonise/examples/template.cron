@@ -1,0 +1,25 @@
+#!/usr/bin/env perl
+
+use Modern::Perl;
+use Daemonise;
+use Getopt::Long;
+
+my $debug;
+my $conf = '/etc/daemonise/bunny.conf';
+
+GetOptions(
+    "debug|d"    => \$debug,
+    "config|c=s" => \$conf,
+) or die;
+
+my $d = Daemonise->new(is_cron => 1);
+$d->debug(1) if $debug;
+$d->debug(1) if ($d->hostname =~ m/devel/);
+$d->config_file($conf);
+
+# SEE template.rabbit for list of all possible plugins
+$d->load_plugin('JobQueue');
+
+$d->configure;
+
+# SEE template.rabbit for documentation of possible methods

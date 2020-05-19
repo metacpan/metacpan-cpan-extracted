@@ -54,7 +54,8 @@ CONSTRUCTOR
                datetime      => DateTime->new(...),
                lang          => 'en',
                format        => 'mm/dd/yy',
-               prefer_future => '[0|1]',
+               prefer_future => [0|1],
+               demand_future => [0|1],
                time_zone     => 'floating',
                daytime       => { morning   => 06,
                                   afternoon => 13,
@@ -78,6 +79,11 @@ CONSTRUCTOR
     *   "prefer_future"
 
         Prefers future time and dates. Accepts a boolean, defaults to false.
+
+    *   "demand_future"
+
+        Demands future time and dates. Similar to "prefer_future", but
+        stronger. Accepts a boolean, defaults to false.
 
     *   "time_zone"
 

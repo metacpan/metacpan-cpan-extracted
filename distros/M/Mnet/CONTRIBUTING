@@ -1,0 +1,42 @@
+CONTRIBUTING
+
+Thank you for considering contributing to this distribution. This file contains
+instructions that will help you work with the source code.
+
+Clone a copy of Mnet source code from github with the following commands, which
+will create a git clone of the repository in your local $HOME/Mnet directory:
+
+    git clone https://github.com/menzascripting/Mnet $HOME/Mnet
+    cd $HOME/Mnet
+
+Tests for the Mnet lib code are contained in the t directory, these commands
+will run all of the tests:
+
+    perl Makefile.PL
+    make test realclean
+
+Individual tests can be run after adding the cloned Mnet lib directory to your
+perl library environment variable, as follows:
+
+    export PERL5LIB=$HOME/Mnet/lib
+    perl t/Log.t
+
+Patches containing local changes can be emailed to to other developers, and
+can be created with the following command:
+
+    git diff > patch.diff
+
+Any patches received can be applied locally with the following command:
+
+    git apply patch.diff
+
+It is expected that new code will be consistant with existing code, including
+documentation and tests. Github forks and pull requests can be used for more
+involved changes.
+
+The Mnet perl distribution has been created and is maintained by Mike Menza.
+Feedback and bug reports are welcome, feel free to contact Mike via email
+at mmenza@cpan.org with any comments or questions.
+
+Makefile.PL contains notes on how new releases are craated.
+

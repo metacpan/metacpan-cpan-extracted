@@ -10,7 +10,7 @@ package Devel::Cover::Collection;
 use 5.26.0;
 use warnings;
 
-our $VERSION = '1.33'; # VERSION
+our $VERSION = '1.35'; # VERSION
 
 use Devel::Cover::DB;
 use Devel::Cover::DB::IO::JSON;
@@ -703,7 +703,7 @@ package Devel::Cover::Collection::Template::Provider;
 use strict;
 use warnings;
 
-our $VERSION = '1.33'; # VERSION
+our $VERSION = '1.35'; # VERSION
 
 use base "Template::Provider";
 
@@ -884,7 +884,7 @@ Devel::Cover::Collection - Code coverage for a collection of modules
 
 =head1 VERSION
 
-version 1.33
+version 1.35
 
 =head1 SYNOPSIS
 

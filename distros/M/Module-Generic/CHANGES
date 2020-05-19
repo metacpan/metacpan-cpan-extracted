@@ -23,3 +23,12 @@
 0.12.0 2020-05-01
 	- Added colour_closest, colour_format, colour_parse and message_colour
 	- Added missing pod documentation
+0.12.1 2020-05-03
+	- Corrected issue when @_ contains an undef value in __instantiate_object
+0.12.2 2020-05-05
+	- Added Module::Generic::Number, its test units and pod documentations
+	- _set_get_number now sets and gets a Module::Generic::Number instead of Text::Number
+	- Added Module::Generic::Hash providing an object oriented approach to hash while stil enabling direct access as usual
+	- Added missing test units
+0.12.3 2020-05-16
+	- Corrected minor issues at line at lines 5428 and 5430 where a typo existed

@@ -21,7 +21,7 @@
       },
       "develop" : {
          "requires" : {
-            "Perinci::CmdLine::Inline" : "0.550",
+            "Perinci::CmdLine::Inline" : "0.551",
             "Pod::Coverage::TrustPod" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
@@ -38,13 +38,14 @@
             "MetaCPAN::Client" : "0"
          },
          "requires" : {
+            "Array::Pick::Scan" : "0.002",
             "Complete::Util" : "0.608",
             "Encode" : "0",
             "List::Util" : "1.45",
             "Module::List" : "0",
             "Perinci::Sub::Property::cmdline" : "0",
             "Scalar::Util::Numeric" : "0",
-            "WordList" : "v0.5.2",
+            "WordList" : "v0.6.0",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -71,7 +72,7 @@
          "web" : "https://github.com/perlancar/perl-App-wordlist"
       }
    },
-   "version" : "0.269",
+   "version" : "0.270",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

@@ -1,3 +1,6 @@
+0.009     May 14 2020
+	* improved test coverage and podfixes
+
 0.008     Feb 04 2020
 	* promise_roles now allows empty list (closes issue #1)
 

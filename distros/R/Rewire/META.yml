@@ -8,7 +8,7 @@ build_requires:
   Data::Object::Role::Buildable: '0.03'
   Data::Object::Space: '2.05'
   JSON::Validator: '3.25'
-  Test::Auto: '0.10'
+  Test::Auto: '0.12'
   perl: '5.014'
   routines: '0'
   strict: '0'
@@ -36,7 +36,7 @@ resources:
   bugtracker: https://github.com/iamalnewkirk/rewire/issues
   homepage: https://metacpan.org/pod/Rewire
   repository: git://github.com/iamalnewkirk/rewire.git
-version: '0.03'
+version: '0.04'
 x_authority: cpan:AWNCORP
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

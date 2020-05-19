@@ -35,6 +35,15 @@ no warnings 'qw';
         "Hashy options";
 }
 
+# Do it again, grouping multiple hash elements together
+{
+    local @ARGV = qw/ --x=a=1,b=2,c=3=2+1,"d=a,b" /;
+    my $options = startup({ 'x=s%' => 'hashy x option' });
+    is_deeply $options->{x},
+        { a => 1, b => 2, c => '3=2+1', d => 'a,b' },
+        "Hashy options combined using commas";
+}
+
 # Test incremental options
 {
     local @ARGV = ('--x')x10;

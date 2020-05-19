@@ -1,10 +1,10 @@
 NAME
 
-    WebService::LiveJournal - Interface to the LiveJournal API
+    WebService::LiveJournal - (Deprecated) Interface to the LiveJournal API
 
 VERSION
 
-    version 0.08
+    version 0.09
 
 SYNOPSIS
 
@@ -28,6 +28,11 @@ SYNOPSIS
     groups.
 
 DESCRIPTION
+
+    NOTE: This distribution is deprecated. It uses the outmoded XML-RPC
+    protocol. LiveJournal has also been compromised. I recommend using
+    DreamWidth instead (https://www.dreamwidth.org/) which is in keeping
+    with the original philosophy LiveJournal regarding advertising.
 
     This is a client class for communicating with LiveJournal using its
     API. It is different from the other LJ modules on CPAN in that it

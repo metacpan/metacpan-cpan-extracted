@@ -110,7 +110,7 @@ NewRelic::Agent::FFI::Procedural - Procedural interface for NewRelic APM
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -131,6 +131,9 @@ version 0.02
  my $rc = newrelic_transaction_end $tx;
 
 =head1 DESCRIPTION
+
+B<NOTE>: This module is deprecated.  It is based on the NewRelic Agent SDK, which was only
+ever released as beta software.  Please use L<NewFangle> instead.
 
 This module provides bindings for the L<NewRelic|https://docs.newrelic.com/docs/agents/agent-sdk/getting-started/new-relic-agent-sdk> Agent SDK.
 

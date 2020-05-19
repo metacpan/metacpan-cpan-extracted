@@ -1,5 +1,8 @@
 Revision history for Geo-Elevation-HGT
 
+0.04    16 May 2020
+        Version 0.04 - add missing 'use POSIX ();'
+
 0.03    08 May 2020
         Version 0.03 - correct documentation
 

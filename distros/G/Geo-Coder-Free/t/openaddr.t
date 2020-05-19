@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 54;
+use Test::Most tests => 52;
 use Test::Number::Delta;
 use Test::Carp;
 use Test::Deep;
@@ -16,7 +16,9 @@ BEGIN {
 OPENADDR: {
 	SKIP: {
 		if($ENV{'OPENADDR_HOME'}) {
-			Geo::Coder::Free::DB::init(logger => new_ok('MyLogger'));
+			if($ENV{'TEST_VERBOSE'}) {
+				Geo::Coder::Free::DB::init(logger => new_ok('MyLogger'));
+			}
 
 			my $geo_coder = new_ok('Geo::Coder::Free' => [ openaddr => $ENV{'OPENADDR_HOME'} ]);
 
@@ -35,10 +37,10 @@ OPENADDR: {
 				ok(defined($location));
 				if($ENV{'WHOSONFIRST_HOME'}) {
 					cmp_deeply($location,
-						methods('lat' => num(39.77, 1e-2), 'long' => num(-86.15, 1e-2)));
+						methods('lat' => num(39.72, 1e-2), 'long' => num(-86.28, 1e-2)));
 				} else {
 					cmp_deeply($location,
-						methods('lat' => num(39.77, 1e-2), 'long' => num(-86.16, 1e-2)));
+						methods('lat' => num(39.77, 1e-2), 'long' => num(-86.15, 1e-2)));
 				}
 
 				# $location = $geo_coder->geocode(location => '9235 Main St, Richibucto, New Brunswick, Canada');
@@ -53,12 +55,6 @@ OPENADDR: {
 						ok(defined($location));
 					};
 				}
-
-				$location = $geo_coder->geocode('1363 Kelly Road, Coal City, Owen, Indiana, USA');
-				# ok(defined($location));
-				# diag(Data::Dumper->new([$location])->Dump());
-				cmp_deeply($location,
-					methods('lat' => num(39.27, 1e-2), 'long' => num(-87.03, 1e-2)));
 
 				$location = $geo_coder->geocode(location => '6502 SW. 102nd Avenue, Bushnell, Florida, USA');
 				cmp_deeply($location,
@@ -82,9 +78,6 @@ OPENADDR: {
 				$location = $ogeocoder->geocode('Boswell, Somerset, Pennsylvania, USA');
 				ok(defined($location));
 
-				$location = $ogeocoder->geocode('106 Wells Street, Fort Wayne, Allen, Indiana, USA');
-				cmp_deeply($location,
-					methods('lat' => num(41.09, 1e-2), 'long' => num(-85.14, 1e-2)));
 
 				$location = $geo_coder->geocode({location => 'Harrison Mills, British Columbia, Canada'});
 				ok(defined($location));
@@ -98,13 +91,8 @@ OPENADDR: {
 
 				$location = $geo_coder->geocode(location => 'Edmonton, Alberta, Canada');
 				ok(defined($location));
-				if($ENV{'WHOSONFIRST_HOME'}) {
-					cmp_deeply($location,
-						methods('lat' => num(53.57, 1e-2), 'long' => num(-113.51, 1e-2)));
-				} else {
-					cmp_deeply($location,
-						methods('lat' => num(53.55, 1e-2), 'long' => num(-113.47, 1e-2)));
-				}
+				cmp_deeply($location,
+					methods('lat' => num(53.57, 1e-2), 'long' => num(-113.51, 1e-2)));
 
 				$location = $geo_coder->geocode('London, England');
 				TODO: {
@@ -192,7 +180,7 @@ OPENADDR: {
 
 				$location = $geo_coder->geocode('716 Yates Street, Victoria, British Columbia, Canada');
 				cmp_deeply($location,
-					methods('lat' => num(48.43, 1e-2), 'long' => num(-123.36, 1e-2)));
+					methods('lat' => num(48.43, 1e-2), 'long' => num(-123.37, 1e-2)));
 
 				$location = $geo_coder->geocode(location => 'Caboolture, Queensland, Australia');
 				ok(defined($location));
@@ -216,7 +204,7 @@ OPENADDR: {
 				ok(ref($location) eq 'Geo::Location::Point');
 			} else {
 				diag('Author tests not required for installation');
-				skip('Author tests not required for installation', 51);
+				skip('Author tests not required for installation', 50);
 			}
 
 			# my $address = $geo_coder->reverse_geocode(latlng => '51.50,-0.13');
@@ -234,9 +222,16 @@ OPENADDR: {
 			does_carp(sub {
 				$geo_coder = new_ok('Geo::Coder::Free' => [ openaddr => 'not/there' ]);
 			});
+
+			eval 'use Test::Memory::Cycle';
+			if($@) {
+				skip('Test::Memory::Cycle required to check for cicular memory references', 1);
+			} else {
+				memory_cycle_ok($geo_coder);
+			}
 		} else {
 			diag('Set OPENADDR_HOME to enable openaddresses.io testing');
-			skip('Set OPENADDR_HOME to enable openaddresses.io testing', 53);
+			skip('Set OPENADDR_HOME to enable openaddresses.io testing', 51);
 		}
 	}
 }

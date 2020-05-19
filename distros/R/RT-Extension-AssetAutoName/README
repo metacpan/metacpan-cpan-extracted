@@ -1,0 +1,64 @@
+NAME
+    RT-Extension-AssetAutoName - Auto generate a name for an asset
+
+DESCRIPTION
+    This extension allows you to define templates to use for asset
+    categories that will be used if no name is set on an asset. You can use
+    this to generate the name based on CustomFields (or other values).
+
+    This was developed for tracking components of servers where the name
+    should be based on the make, model and serial number of a component. Yet
+    these should be stored individually as Custom Fields to ease searching
+    and reporting.
+
+RT VERSION
+    Works with RT 4.4.x, not tested with 4.6.x yet.
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        Add this line:
+
+            Plugin('RT::Extension::AssetAutoName');
+
+        Add templates for the categories you'd like to have use this
+        extension:
+
+            Set( %AssetAutoName, 2 => 'Card: __CF.28__ (__Status__)' );
+
+        28 is the CustomField to use, you can also specify the name here.
+
+        If the CustomField is a multi-value, then only the first value is
+        used.
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+USAGE
+    If the asset name is not set, the empty string or just an x, we'll
+    dynamically generate a name based on a template.
+
+    It is useful to allow 'x' in the case that data is being bulk updated,
+    it has been reported that with some tools setting a short string is
+    easier than deleting the text.
+
+AUTHOR
+    Andrew Ruthven, Catalyst Cloud Ltd <puck@catalystcloud.nz<gt>
+
+    All bugs should be reported via email to
+        bug-RT-Extension-AssetAutoName@rt.cpan.org
+    or via the web at
+        http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-AssetAutoName
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2018-2020 by Catalyst Cloud Ltd
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

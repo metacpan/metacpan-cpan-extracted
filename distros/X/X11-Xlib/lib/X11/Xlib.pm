@@ -8,7 +8,7 @@ use base qw(Exporter DynaLoader);
 use Carp;
 use Try::Tiny;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 sub dl_load_flags { 1 } # Make PerlXLib.c functions available to other XS modules
 
@@ -879,11 +879,11 @@ for that struct, indicating which fields have been initialized.
 
 =head3 XResizeWindow
 
-  XMoveWindow($display, $window, $width, $height)
+  XResizeWindow($display, $window, $width, $height)
 
 =head3 XMoveResizeWindow
 
-  XModeResizeWindow($display, $window, $x, $y, $width, $height)
+  XMoveResizeWindow($display, $window, $x, $y, $width, $height)
 
 =head3 XSetWindowBorderWidth
 

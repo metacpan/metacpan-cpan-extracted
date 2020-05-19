@@ -14,7 +14,7 @@ TEST
 {
     reset_handles();
 
-    $gnupg->options->push_recipients( '0x2E854A6B' );
+    $gnupg->options->push_recipients( '0x7466B7E98C4CCB64C2CE738BADB99D9C2E854A6B' );
     my $pid = $gnupg->sign_and_encrypt( handles => $handles );
 
     print $stdin @{ $texts{plain}->data() };

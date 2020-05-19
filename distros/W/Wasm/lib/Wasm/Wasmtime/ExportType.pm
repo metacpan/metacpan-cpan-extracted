@@ -7,7 +7,7 @@ use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::ExternType;
 
 # ABSTRACT: Wasmtime export type class
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 $ffi_prefix = 'wasm_exporttype_';
@@ -79,7 +79,7 @@ Wasm::Wasmtime::ExportType - Wasmtime export type class
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

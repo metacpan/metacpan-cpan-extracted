@@ -10,6 +10,8 @@ build_requires:
   Test::More: 0
   Test::NoWarnings: 0
   Test::Output: 1.02
+  Test::Warn: 0
+  version: 0.77
 configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
@@ -37,4 +39,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Tags-Output-PYX
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-Output-PYX
-version: '0.04'
+version: '0.05'

@@ -4,13 +4,13 @@
       "Sugama Keita <sugama@jamadam.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojolicious-Plugin-PlackMiddleware",
    "no_index" : {
@@ -44,5 +44,6 @@
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "0.36"
+   "version" : "0.37",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

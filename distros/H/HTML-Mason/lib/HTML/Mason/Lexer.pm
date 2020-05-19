@@ -3,7 +3,7 @@
 # under the same terms as Perl itself.
 
 package HTML::Mason::Lexer;
-$HTML::Mason::Lexer::VERSION = '1.58';
+$HTML::Mason::Lexer::VERSION = '1.59';
 use strict;
 use warnings;
 

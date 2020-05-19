@@ -4,8 +4,9 @@ use strict;
 use warnings;
 use overload '""' => sub { $_[0]->as_string };
 
-# ABSTRACT: base class for WebService::LiveJournal classes
-our $VERSION = '0.08'; # VERSION
+# ABSTRACT: (Deprecated) base class for WebService::LiveJournal classes
+our $VERSION = '0.09'; # VERSION
+
 
 sub client
 {
@@ -26,11 +27,18 @@ __END__
 
 =head1 NAME
 
-WebService::LiveJournal::Thingie - base class for WebService::LiveJournal classes
+WebService::LiveJournal::Thingie - (Deprecated) base class for WebService::LiveJournal classes
 
 =head1 VERSION
 
-version 0.08
+version 0.09
+
+=head1 DESCRIPTION
+
+B<NOTE>: This distribution is deprecated.  It uses the outmoded XML-RPC protocol.
+LiveJournal has also been compromised.  I recommend using DreamWidth instead
+(L<https://www.dreamwidth.org/>) which is in keeping with the original philosophy
+LiveJournal regarding advertising.
 
 =head1 SEE ALSO
 

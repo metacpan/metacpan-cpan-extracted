@@ -1,6 +1,6 @@
 # NAME
 
-Rewire
+Rewire - Dependency Injection
 
 # ABSTRACT
 
@@ -321,7 +321,9 @@ The config method returns the configuration based on the `services` and
     process(Str $name, Any $argument, Maybe[Str] $argument_as) : Any
 
 The process method processes and returns an object or value based on the
-service named but where the arguments are provided ad-hoc.
+service named but where the arguments are provided ad-hoc. **Note:** This method
+is meant to be used to construct services ad-hoc and as such bypasses caching
+and lifecycle effects.
 
 - process example #1
 
@@ -359,13 +361,35 @@ service named but where the arguments are provided ad-hoc.
     resolve(Str $name) : Any
 
 The resolve method resolves and returns an object or value based on the service
-named.
+named. **Note:** This method is recommended to be used to construct services as
+defined by the configuration and as such doesn't not allow passing additional
+arguments.
 
 - resolve example #1
 
         # given: synopsis
 
         $rewire->resolve('tempfile');
+
+- resolve example #2
+
+        use Rewire;
+
+        my $services = {
+          mojo_log => {
+            package => 'Mojo/Log',
+            argument => {
+              level => 'fatal',
+              path => '/var/log/rewire.log'
+            },
+          }
+        };
+
+        my $rewire = Rewire->new(
+          services => $services,
+        );
+
+        $rewire->resolve('mojo_log');
 
 ## validate
 

@@ -1,6 +1,6 @@
 # -*- perl -*-
 
-use Test::Pod tests => 158;
+use Test::Pod tests => 157;
 
 pod_file_ok( './lib/Net/API/Stripe/Address.pm' );
 pod_file_ok( './lib/Net/API/Stripe/AddressKana.pm' );
@@ -114,7 +114,6 @@ pod_file_ok( './lib/Net/API/Stripe/Issuing/MerchantData.pm' );
 pod_file_ok( './lib/Net/API/Stripe/Issuing/Transaction.pm' );
 pod_file_ok( './lib/Net/API/Stripe/List.pm' );
 pod_file_ok( './lib/Net/API/Stripe/Mandate.pm' );
-pod_file_ok( './lib/Net/API/Stripe/Number.pm' );
 pod_file_ok( './lib/Net/API/Stripe/Order/DeliveryEstimate.pm' );
 pod_file_ok( './lib/Net/API/Stripe/Order/Item.pm' );
 pod_file_ok( './lib/Net/API/Stripe/Order/Return.pm' );

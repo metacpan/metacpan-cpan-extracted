@@ -1,5 +1,5 @@
 package HTML::Mason::CGIHandler;
-$HTML::Mason::CGIHandler::VERSION = '1.58';
+$HTML::Mason::CGIHandler::VERSION = '1.59';
 use strict;
 use warnings;
 
@@ -143,7 +143,7 @@ sub request_args {
 ###########################################################
 package HTML::Mason::Request::CGI;
 # Subclass for HTML::Mason::Request object $m
-$HTML::Mason::Request::CGI::VERSION = '1.58';
+$HTML::Mason::Request::CGI::VERSION = '1.59';
 use HTML::Mason::Exceptions;
 use HTML::Mason::Request;
 use base qw(HTML::Mason::Request);

@@ -5,8 +5,8 @@ use warnings;
 use WebService::LiveJournal::Thingie;
 our @ISA = qw/ WebService::LiveJournal::Thingie /;
 
-# ABSTRACT: A LiveJournal tag
-our $VERSION = '0.08'; # VERSION
+# ABSTRACT: (Deprecated) A LiveJournal tag
+our $VERSION = '0.09'; # VERSION
 
 
 sub new
@@ -43,11 +43,11 @@ __END__
 
 =head1 NAME
 
-WebService::LiveJournal::Tag - A LiveJournal tag
+WebService::LiveJournal::Tag - (Deprecated) A LiveJournal tag
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -59,6 +59,11 @@ version 0.08
  say $_->name for @tags;
 
 =head1 DESCRIPTION
+
+B<NOTE>: This distribution is deprecated.  It uses the outmoded XML-RPC protocol.
+LiveJournal has also been compromised.  I recommend using DreamWidth instead
+(L<https://www.dreamwidth.org/>) which is in keeping with the original philosophy
+LiveJournal regarding advertising.
 
 Instances of this class represent LiveJournal tags.  They can
 be fetched from the LiveJournal server using the C<get_user_tags>

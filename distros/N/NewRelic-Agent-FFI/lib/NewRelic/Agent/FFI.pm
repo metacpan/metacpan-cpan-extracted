@@ -5,8 +5,8 @@ use warnings;
 use 5.010;
 use NewRelic::Agent::FFI::Procedural ();
 
-# ABSTRACT: Perl Agent for NewRelic APM
-our $VERSION = '0.09'; # VERSION
+# ABSTRACT: (Deprecated) Perl Agent for NewRelic APM
+our $VERSION = '0.10'; # VERSION
 
 
 sub new
@@ -185,11 +185,11 @@ __END__
 
 =head1 NAME
 
-NewRelic::Agent::FFI - Perl Agent for NewRelic APM
+NewRelic::Agent::FFI - (Deprecated) Perl Agent for NewRelic APM
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -207,6 +207,9 @@ version 0.09
  my $err_id = $agent->end_transaction($txn_id);
 
 =head1 DESCRIPTION
+
+B<NOTE>: This module is deprecated.  It is based on the NewRelic Agent SDK, which was only
+ever released as beta software.  Please use L<NewFangle> instead.
 
 This module provides bindings for the L<NewRelic|https://docs.newrelic.com/docs/agents/agent-sdk/getting-started/new-relic-agent-sdk> Agent SDK.
 

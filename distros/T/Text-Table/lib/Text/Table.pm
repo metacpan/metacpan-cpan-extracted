@@ -1,6 +1,6 @@
 # Text::Table - Organize Data in Tables
 package Text::Table;
-
+$Text::Table::VERSION = '1.134';
 use strict;
 use warnings;
 
@@ -9,8 +9,6 @@ use 5.008;
 use List::Util qw(sum max);
 
 use Text::Aligner qw(align);
-
-our $VERSION = '1.133';
 
 use overload (
     # Don't stringify when only doing boolean tests, since stringification can
@@ -886,7 +884,7 @@ use Carp;
 
 =pod
 
-=encoding UTF-8
+=encoding utf-8
 
 =head1 NAME
 
@@ -894,7 +892,7 @@ Text::Table - Organize Data in Tables
 
 =head1 VERSION
 
-version 1.133
+version 1.134
 
 =head1 SYNOPSIS
 
@@ -1023,6 +1021,10 @@ get the popular representation of line-crossings like so:
 
 On table creation, some parameters are checked and warnings issued
 if you allow warnings.  You can also turn warnings into fatal errors.
+
+=head1 VERSION
+
+version 1.134
 
 =head1 SPECIFICATIONS
 
@@ -1483,37 +1485,112 @@ LICENSE file included with this module.
 
 L<Text::Aligner>, L<perl(1)> .
 
-=head1 AUTHOR
+=head1 EXAMPLES
 
-Shlomi Fish <shlomif@cpan.org>
+=head2 center align and Unicode output
 
-=head1 COPYRIGHT AND LICENSE
+    #!/usr/bin/perl
 
-This software is Copyright (c) 2002 by Anno Siegel and others.
+    use strict;
+    use warnings;
+    use utf8;
 
-This is free software, licensed under:
+    use Text::Table ();
 
-  The ISC License
+    binmode STDOUT, ':encoding(utf8)';
 
-=head1 BUGS
+    my @cols = qw/First Last/;
+    push @cols,
+        +{
+        title => "Country",
+        align => "center",
+        };
+    my $sep = \'│';
 
-Please report any bugs or feature requests on the bugtracker website
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Table> or by email to
-L<bug-text-table@rt.cpan.org|mailto:bug-text-table@rt.cpan.org>.
+    my $major_sep = \'║';
+    my $tb        = Text::Table->new( $sep, " Number ", $major_sep,
+        ( map { +( ( ref($_) ? $_ : " $_ " ), $sep ) } @cols ) );
 
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+    my $num_cols = @cols;
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+    $tb->load( [ 1, "Mark",    "Twain",   "USA", ] );
+    $tb->load( [ 2, "Charles", "Dickens", "Great Britain", ] );
+    $tb->load( [ 3, "Jules",   "Verne",   "France", ] );
+
+    my $make_rule = sub {
+        my ($args) = @_;
+
+        my $left      = $args->{left};
+        my $right     = $args->{right};
+        my $main_left = $args->{main_left};
+        my $middle    = $args->{middle};
+
+        return $tb->rule(
+            sub {
+                my ( $index, $len ) = @_;
+
+                return ( '─' x $len );
+            },
+            sub {
+                my ( $index, $len ) = @_;
+
+                my $char = (
+                      ( $index == 0 )             ? $left
+                    : ( $index == 1 )             ? $main_left
+                    : ( $index == $num_cols + 1 ) ? $right
+                    :                               $middle
+                );
+
+                return $char x $len;
+            },
+        );
+    };
+
+    my $start_rule = $make_rule->(
+        {
+            left      => '┌',
+            main_left => '╥',
+            right     => '┐',
+            middle    => '┬',
+        }
+    );
+
+    my $mid_rule = $make_rule->(
+        {
+            left      => '├',
+            main_left => '╫',
+            right     => '┤',
+            middle    => '┼',
+        }
+    );
+
+    my $end_rule = $make_rule->(
+        {
+            left      => '└',
+            main_left => '╨',
+            right     => '┘',
+            middle    => '┴',
+        }
+    );
+
+    print $start_rule, $tb->title,
+        ( map { $mid_rule, $_, } $tb->body() ), $end_rule;
+
+This emits the following output:
+
+    ┌────────╥───────┬───────┬─────────────┐
+    │ Number ║ First │ Last  │Country      │
+    ├────────╫───────┼───────┼─────────────┤
+    │1       ║Mark   │Twain  │     USA     │
+    ├────────╫───────┼───────┼─────────────┤
+    │2       ║Charles│Dickens│Great Britain│
+    ├────────╫───────┼───────┼─────────────┤
+    │3       ║Jules  │Verne  │   France    │
+    └────────╨───────┴───────┴─────────────┘
+
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Text::Table
 
 =head2 Websites
 
@@ -1528,15 +1605,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/Text-Table>
-
-=item *
-
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Text-Table>
+L<https://metacpan.org/release/Text-Table>
 
 =item *
 
@@ -1545,30 +1614,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Text-Table>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Text-Table>
-
-=item *
-
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/Text-Table>
 
 =item *
 
@@ -1582,7 +1627,7 @@ L<http://cpants.cpanauthors.org/dist/Text-Table>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/T/Text-Table>
 
@@ -1618,12 +1663,130 @@ from your repository :)
 
 L<https://github.com/shlomif/Text-Table>
 
-  git clone ssh://git@github.com:shlomif/Text-Table.git
+  git clone git://github.com/shlomif/Text-Table.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/Text-Table/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2002 by Anno Siegel and others.
+
+This is free software, licensed under:
+
+  The ISC License
+
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Websites
+
+The following websites have more information about this module, and may be of help to you. As always,
+in addition to those websites please use your favorite search engine to discover more resources.
+
+=over 4
+
+=item *
+
+MetaCPAN
+
+A modern, open-source CPAN search engine, useful to view POD in HTML format.
+
+L<https://metacpan.org/release/Text-Table>
+
+=item *
+
+RT: CPAN's Bug Tracker
+
+The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
+
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table>
+
+=item *
+
+CPANTS
+
+The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
+
+L<http://cpants.cpanauthors.org/dist/Text-Table>
+
+=item *
+
+CPAN Testers
+
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
+
+L<http://www.cpantesters.org/distro/T/Text-Table>
+
+=item *
+
+CPAN Testers Matrix
+
+The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
+
+L<http://matrix.cpantesters.org/?dist=Text-Table>
+
+=item *
+
+CPAN Testers Dependencies
+
+The CPAN Testers Dependencies is a website that shows a chart of the test results of all dependencies for a distribution.
+
+L<http://deps.cpantesters.org/?module=Text::Table>
+
+=back
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests by email to C<bug-text-table at rt.cpan.org>, or through
+the web interface at L<https://rt.cpan.org/Public/Bug/Report.html?Queue=Text-Table>. You will be automatically notified of any
+progress on the request by the system.
+
+=head2 Source Code
+
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
+
+L<https://github.com/shlomif/Text-Table>
+
+  git clone git://github.com/shlomif/Text-Table.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/Text-Table/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2002 by Anno Siegel and others.
+
+This is free software, licensed under:
+
+  The ISC License
 
 =cut
 
 __END__
-########################################### main pod documentation begin ##
 
 
 1;

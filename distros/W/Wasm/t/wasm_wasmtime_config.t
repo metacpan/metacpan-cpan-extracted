@@ -29,6 +29,13 @@ $config->wasm_multi_value(0);
 $config->wasm_multi_value(1);
 pass 'wasm_multi_value';
 
+$config->interruptable(0);
+$config->interruptable(1);
+pass 'interruptable';
+
+$config->max_wasm_stack(1024);
+pass 'max_wasm_stack';
+
 foreach my $strategy (qw( auto cranelift lightbeam ))
 {
   if(my $e = dies { $config->strategy($strategy) })

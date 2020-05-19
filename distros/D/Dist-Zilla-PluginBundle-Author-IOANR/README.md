@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::Author::IOANR - Build dists the way IOANR likes
 
 # VERSION
 
-version 1.173520
+version 1.201400
 
 # OPTIONS
 
@@ -27,7 +27,7 @@ disable = Another::Plugin
 
 ## `assert_os`
 
-Use [Devel::AssertOS](https://metacpan.org/pod/Devel::AssertOS) to control which platforms this dist will build on.
+Use [Devel::AssertOS](https://metacpan.org/pod/Devel%3A%3AAssertOS) to control which platforms this dist will build on.
 Can be specified multiple times.
 
 ```
@@ -36,8 +36,8 @@ assert_os = Linux
 
 ## `custom_builder`
 
-If `custom_builder` is set, [Module::Build](https://metacpan.org/pod/Module::Build) will be used instead of
-[Module::Build::Tiny](https://metacpan.org/pod/Module::Build::Tiny) with a custom build class set to `My::Builder`
+If `custom_builder` is set, [Module::Build](https://metacpan.org/pod/Module%3A%3ABuild) will be used instead of
+[Module::Build::Tiny](https://metacpan.org/pod/Module%3A%3ABuild%3A%3ATiny) with a custom build class set to `My::Builder`
 
 ## `semantic_version`
 
@@ -67,17 +67,17 @@ in addition to those websites please use your favorite search engine to discover
 
 ## Bugs / Feature Requests
 
-Please report any bugs or feature requests through the web interface at [https://github.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR/issues](https://github.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR/issues).
+Please report any bugs or feature requests through the web interface at [https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR/issues](https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR/issues).
 You will be automatically notified of any progress on the request by the system.
 
 ## Source Code
 
 The source code is available for from the following locations:
 
-[https://github.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR](https://github.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR)
+[https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR](https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR)
 
 ```
-git clone git://github.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR.git
+git clone https://gitlab.com:ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR.git
 ```
 
 # AUTHOR
@@ -86,7 +86,7 @@ Ioan Rogers <ioanr@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Ioan Rogers.
+This software is Copyright (c) 2020 by Ioan Rogers.
 
 This is free software, licensed under:
 

@@ -130,8 +130,9 @@
                 % for my $grp (keys %{$tinfo->{has_many}}) {
                     % my $ginfo    = $tinfo->{has_many}{$grp};
                     % my $ctable   = $ginfo->{ctable};
+                    % my $cpkey    = $ginfo->{cpkey};
                     % my $total    = $row->$grp->count;
-                    % my @children = $row->$grp({}, {rows=>10});
+                    % my @children = $row->$grp({}, {order_by=>{-asc=>$cpkey}, rows=>10});
                     % my $to       = scalar(@children);
                     % my %cdata    = ('data-ctable'     => $ctable,
                     %                 'data-collection' => $grp,

@@ -1,131 +1,128 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST/Request.pm
-## Version 0.8.3
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <jack@deguest.jp>
+## Version v0.8.4
+## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/09/01
-## Modified 2020/01/13
-## All rights reserved
+## Modified 2020/05/16
 ## 
-## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::REST::Request;
 BEGIN
 {
-	use strict;
-	use common::sense;
-	use parent qw( Module::Generic );
-	use Encode ();
-	use Devel::Confess;
-	use Apache2::Request;
-	use Scalar::Util;
-	use Apache2::Const;
-	use Apache2::Connection ();
-	use Apache2::RequestRec ();
-	use Apache2::RequestUtil ();
-	use Apache2::ServerUtil ();
-	use Apache2::RequestIO ();
-	use Apache2::Log;
-	use APR::Pool ();
-	use APR::Socket ();
-	use APR::Request::Cookie;
-	use APR::Request::Apache2;
-	use Net::API::REST::Cookies;
-	use URI;
-	use URI::Query;
-	use URI::Escape;
-	use HTTP::AcceptLanguage;
-	use Net::API::REST::DateTime;
-	use DateTime;
-	# use DateTime::Format::Strptime;
-	use JSON;
-	use TryCatch;
-	use version;
-	our $VERSION = '0.8.3';
-	our @DoW = qw( Sun Mon Tue Wed Thu Fri Sat );
-	our @MoY = qw( Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
-	our $MoY = {};
-	@$MoY{ @MoY } = ( 1..12 );
-	our $GMT_ZONE = { 'GMT' => 1, 'UTC' => 1, 'UT' => 1, 'Z' => 1 };
-	our( $SERVER_VERSION );
+    use strict;
+    use common::sense;
+    use parent qw( Module::Generic );
+    use Encode ();
+    use Devel::Confess;
+    use Apache2::Request;
+    use Scalar::Util;
+    use Apache2::Const;
+    use Apache2::Connection ();
+    use Apache2::RequestRec ();
+    use Apache2::RequestUtil ();
+    use Apache2::ServerUtil ();
+    use Apache2::RequestIO ();
+    use Apache2::Log;
+    use APR::Pool ();
+    use APR::Socket ();
+    use APR::Request::Cookie;
+    use APR::Request::Apache2;
+    use Net::API::REST::Cookies;
+    use URI;
+    use URI::Query;
+    use URI::Escape;
+    use HTTP::AcceptLanguage;
+    use Net::API::REST::DateTime;
+    use DateTime;
+    # use DateTime::Format::Strptime;
+    use JSON;
+    use TryCatch;
+    use version;
+    our $VERSION = 'v0.8.4';
+    our @DoW = qw( Sun Mon Tue Wed Thu Fri Sat );
+    our @MoY = qw( Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
+    our $MoY = {};
+    @$MoY{ @MoY } = ( 1..12 );
+    our $GMT_ZONE = { 'GMT' => 1, 'UTC' => 1, 'UT' => 1, 'Z' => 1 };
+    our( $SERVER_VERSION );
 };
 
 sub init
 {
-	my $self = shift( @_ );
-	my $r;
-	$r = shift( @_ ) if( @_ % 2 );
-	$self->{request} = $r;
-	$self->{checkonly} = 0;
-	$self->SUPER::init( @_ );
-	$self->{variables} = {};
-	$r ||= $self->{request};
-	$self->{charset} = '';
-	$self->{client_api_version} = '';
-	$self->{auth} = '';
-	$self->{_server_version} = '';
-	## Which is an Apache2::Request, but inherits everything from Apache2::RequestRec and APR::Request::Apache2
-	unless( $self->{checkonly} )
-	{
-		return( $self->error( "No Apache2::RequestRec was provided." ) ) if( !$r );
-		return( $self->error( "Apache2::RequestRec provided ($r) is not an object!" ) ) if( !Scalar::Util::blessed( $r ) );
-		return( $self->error( "I was expecting an Apache2::RequestRec, but instead I got \"$r\"." ) ) if( !$r->isa( 'Apache2::RequestRec' ) );
-		$self->{request} = $r;
-		my $headers = $self->headers;
-		## rfc 6750 https://tools.ietf.org/html/rfc6750
-		my $auth = $headers->{Authorization};
-		$self->auth( $auth ) if( length( $auth ) );
-		my $ctype_raw = $self->content_type;
-		$self->message( 3, "Content-type of data received is '$ctype_raw'." );
-		my $accept_raw = $self->accept;
-		## Content-Type: application/json; encoding=utf-8
-		my $ctype_def = $self->_split_str( $ctype_raw );
-		## Accept: application/json; version=1.0; encoding=utf-8
-		my $accept_def = $self->_split_str( $accept_raw );
-		my $ctype = lc( $ctype_def->{value} );
-		$self->type( $ctype );
-		my $enc   = CORE::exists( $ctype_def->{param}->{charset} ) 
-			? lc( $ctype_def->{param}->{charset} ) 
-			: undef();
-		$self->message( 3, "Found content type of '$ctype' and charset of '$enc'. \$ctype_def is: ", sub{ $self->dumper( $ctype_def ) } );
-		my $accept = $accept_def->{value};
-		my $client_api_version = CORE::exists( $accept_def->{param}->{version} ) 
-			? $accept_def->{param}->{version}
-			: undef();
-		$self->charset( $enc ) if( length( $enc ) );
-		$self->client_api_version( $client_api_version ) if( length( $client_api_version ) );
-	
-		my $json = $self->json;
-		$self->messagef( 3, "Loading http payload data into buffer \$payload for length %d.", $self->length );
-# 		my $payload = '';
-# 		if( $self->length > 0 )
-# 		{
-# 			$r->read( $payload, $self->length );
-# 		}
-# 		elsif( lc( $ctype ) eq 'application/json' )
-# 		{
-# 			1 while( $r->read( $payload, 1096, CORE::length( $payload ) ) );
-# 		}
-		my $payload = $self->data;
-		$self->messagef( 3, "Content-type is '$ctype' and length is %d", CORE::length( $payload ) );
-		if( $ctype eq 'application/json' && CORE::length( $payload ) )
-		{
-			my $json_data = '';
-			try
-			{
-				$json_data = $json->decode( $payload );
-			}
-			catch( $e )
-			{
-				$self->message( 3, "Error while trying to decode json paylod '$payload': $e" );
-				return( $self->error({ code => Apache2::Const::HTTP_BAD_REQUEST, message => "Json data provided is malformed." }) );
-			}
-			$self->payload( $json_data );
-		}
-	}
-	return( $self );
+    my $self = shift( @_ );
+    my $r;
+    $r = shift( @_ ) if( @_ % 2 );
+    $self->{request} = $r;
+    $self->{checkonly} = 0;
+    $self->SUPER::init( @_ );
+    $self->{variables} = {};
+    $r ||= $self->{request};
+    $self->{charset} = '';
+    $self->{client_api_version} = '';
+    $self->{auth} = '';
+    $self->{_server_version} = '';
+    ## Which is an Apache2::Request, but inherits everything from Apache2::RequestRec and APR::Request::Apache2
+    unless( $self->{checkonly} )
+    {
+        return( $self->error( "No Apache2::RequestRec was provided." ) ) if( !$r );
+        return( $self->error( "Apache2::RequestRec provided ($r) is not an object!" ) ) if( !Scalar::Util::blessed( $r ) );
+        return( $self->error( "I was expecting an Apache2::RequestRec, but instead I got \"$r\"." ) ) if( !$r->isa( 'Apache2::RequestRec' ) );
+        $self->{request} = $r;
+        my $headers = $self->headers;
+        ## rfc 6750 https://tools.ietf.org/html/rfc6750
+        my $auth = $headers->{Authorization};
+        $self->auth( $auth ) if( length( $auth ) );
+        my $ctype_raw = $self->content_type;
+        $self->message( 3, "Content-type of data received is '$ctype_raw'." );
+        my $accept_raw = $self->accept;
+        ## Content-Type: application/json; encoding=utf-8
+        my $ctype_def = $self->_split_str( $ctype_raw );
+        ## Accept: application/json; version=1.0; encoding=utf-8
+        my $accept_def = $self->_split_str( $accept_raw );
+        my $ctype = lc( $ctype_def->{value} );
+        $self->type( $ctype );
+        my $enc   = CORE::exists( $ctype_def->{param}->{charset} ) 
+            ? lc( $ctype_def->{param}->{charset} ) 
+            : undef();
+        $self->message( 3, "Found content type of '$ctype' and charset of '$enc'. \$ctype_def is: ", sub{ $self->dumper( $ctype_def ) } );
+        my $accept = $accept_def->{value};
+        my $client_api_version = CORE::exists( $accept_def->{param}->{version} ) 
+            ? $accept_def->{param}->{version}
+            : undef();
+        $self->charset( $enc ) if( length( $enc ) );
+        $self->client_api_version( $client_api_version ) if( length( $client_api_version ) );
+    
+        my $json = $self->json;
+        $self->messagef( 3, "Loading http payload data into buffer \$payload for length %d.", $self->length );
+#       my $payload = '';
+#       if( $self->length > 0 )
+#       {
+#           $r->read( $payload, $self->length );
+#       }
+#       elsif( lc( $ctype ) eq 'application/json' )
+#       {
+#           1 while( $r->read( $payload, 1096, CORE::length( $payload ) ) );
+#       }
+        my $payload = $self->data;
+        $self->messagef( 3, "Content-type is '$ctype' and length is %d", CORE::length( $payload ) );
+        if( $ctype eq 'application/json' && CORE::length( $payload ) )
+        {
+            my $json_data = '';
+            try
+            {
+                $json_data = $json->decode( $payload );
+            }
+            catch( $e )
+            {
+                $self->message( 3, "Error while trying to decode json paylod '$payload': $e" );
+                return( $self->error({ code => Apache2::Const::HTTP_BAD_REQUEST, message => "Json data provided is malformed." }) );
+            }
+            $self->payload( $json_data );
+        }
+    }
+    return( $self );
 }
 
 ## Tells whether the connection has been aborted or not
@@ -156,13 +153,13 @@ sub auth_type { return( shift->_try( 'request', 'auth_type', @_ ) ); }
 ## See Apache2::RequestRec
 sub auto_header 
 {
-	my $self = shift( @_ );
-	if( @_ )
-	{
-		my $v = shift( @_ );
-		return( $self->request->assbackwards( $v ? 0 : 1 ) );
-	}
-	return( $self->request->assbackwards );
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $v = shift( @_ );
+        return( $self->request->assbackwards( $v ? 0 : 1 ) );
+    }
+    return( $self->request->assbackwards );
 }
 
 ## See Apache2::Request
@@ -176,17 +173,17 @@ sub child_terminate { return( shift->_try( 'request', 'child_terminate' ) ); }
 
 sub client_api_version
 {
-	my $self = shift( @_ );
-	if( @_ )
-	{
-		my $v = shift( @_ );
-		unless( ref( $v ) eq 'version' )
-		{
-			$v = version->parse( $v );
-		}
-		$self->{client_api_version} = $v;
-	}
-	return( $self->{client_api_version} );
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $v = shift( @_ );
+        unless( ref( $v ) eq 'version' )
+        {
+            $v = version->parse( $v );
+        }
+        $self->{client_api_version} = $v;
+    }
+    return( $self->{client_api_version} );
 }
 
 ## Close the client connection
@@ -194,20 +191,20 @@ sub client_api_version
 ## So this is a successful work around
 sub close
 {
-	my $self = shift( @_ );
-	## Using APR::Socket to get the fileno
-	my $fd = $self->socket->fileno;
-	my $sock = IO::File->new;
-	if( $sock->fdopen( $fd, 'w' ) )
-	{
-		$self->message( 3, "Closing the Apache client connection." );
-		return( $sock->close );
-	}
-	else
-	{
-		$self->message( 3, "Could not get a writable file handle on the socket file descriptor '$fd'." );
-		return( 0 );
-	}
+    my $self = shift( @_ );
+    ## Using APR::Socket to get the fileno
+    my $fd = $self->socket->fileno;
+    my $sock = IO::File->new;
+    if( $sock->fdopen( $fd, 'w' ) )
+    {
+        $self->message( 3, "Closing the Apache client connection." );
+        return( $sock->close );
+    }
+    else
+    {
+        $self->message( 3, "Could not get a writable file handle on the socket file descriptor '$fd'." );
+        return( 0 );
+    }
 }
 
 sub code { return( shift->_try( 'request', 'status', @_ ) ); }
@@ -228,11 +225,11 @@ sub content_length { return( shift->headers( 'Content-Length' ) ); }
 # sub content_type { return( shift->_try( 'request', 'content_type' ) ); }
 sub content_type
 {
-	my $self = shift( @_ );
-	my $ct = $self->headers( 'Content-Type' );
-	return( $ct ) if( !scalar( @_ ) );
-	$self->error( "Warning only: caller is trying to use ", ref( $self ), " to set the content-type. Use Net::API::REST::Response for that instead." );
-	return( $self->request->content_type( @_ ) );
+    my $self = shift( @_ );
+    my $ct = $self->headers( 'Content-Type' );
+    return( $ct ) if( !scalar( @_ ) );
+    $self->error( "Warning only: caller is trying to use ", ref( $self ), " to set the content-type. Use Net::API::REST::Response for that instead." );
+    return( $self->request->content_type( @_ ) );
 }
 
 ## To get individual cookie sent. See APR::Request::Cookie
@@ -240,23 +237,23 @@ sub content_type
 # sub cookie { return( shift->cookies->get( @_ ) ); }
 sub cookie
 {
-	my $self = shift( @_ );
-	my $name = shift( @_ );
-	$self->message( 3, "Got here to get cookie name '$name'." );
-	## An erro has occurred if this is undef
-	my $jar = $self->cookies || return( undef() );
-	$self->message( 3, "Found cookies jar object '$jar'. Getting cookie '$name'" );
-	my $v;
-	try
-	{
-		$v = $jar->get( $name );
-		$v = URI::Escape::uri_unescape( $v ) if( CORE::length( $v ) );
-	}
-	catch( $e )
-	{
-		$self->message( 3, "An error occurred while trying to get the cookie for '$name': $e" );
-	}
-	return( $v );
+    my $self = shift( @_ );
+    my $name = shift( @_ );
+    $self->message( 3, "Got here to get cookie name '$name'." );
+    ## An erro has occurred if this is undef
+    my $jar = $self->cookies || return( undef() );
+    $self->message( 3, "Found cookies jar object '$jar'. Getting cookie '$name'" );
+    my $v;
+    try
+    {
+        $v = $jar->get( $name );
+        $v = URI::Escape::uri_unescape( $v ) if( CORE::length( $v ) );
+    }
+    catch( $e )
+    {
+        $self->message( 3, "An error occurred while trying to get the cookie for '$name': $e" );
+    }
+    return( $v );
 }
 
 ## To get all cookies; then we can fetch then with $jar->get( 'this_cookie' ) for example
@@ -282,84 +279,84 @@ sub cookie
 
 sub cookies_v1
 {
-	my $self = shift( @_ );
-	try
-	{
-		$self->message( 3, "Getting Apache pool object." );
-		my $pool = $self->request->pool;
-		$self->message( 3, "Apache pool object is: '$pool'" );
-		$self->message( 3, "Getting an APR Table object instance." );
-		# my $o = APR::Request::Apache2->handle( $self->request->pool );
-		my $o = APR::Request::Apache2->handle( $self->request );
-		if( $o->jar_status =~ /^(?:Missing input data|Success)$/ )
-		{
-			$self->message( 3, "Object is '$o'. Returning the jar. Object has method 'jar'? ", ( $o->can( 'jar' ) ? 'yes' : 'no' ) );
-			return( $o->jar );
-		}
-		else
-		{
-			$self->message( 3, "Malformed cookie found: ", $o->jar_status, "\nOriginal request is: ", $self->as_string );
-		}
-	}
-	catch( $e )
-	{
-		return( $self->error( "An error occurred while trying to get the jar object of the APR::Request::Apache2: $e" ) );
-	}
+    my $self = shift( @_ );
+    try
+    {
+        $self->message( 3, "Getting Apache pool object." );
+        my $pool = $self->request->pool;
+        $self->message( 3, "Apache pool object is: '$pool'" );
+        $self->message( 3, "Getting an APR Table object instance." );
+        # my $o = APR::Request::Apache2->handle( $self->request->pool );
+        my $o = APR::Request::Apache2->handle( $self->request );
+        if( $o->jar_status =~ /^(?:Missing input data|Success)$/ )
+        {
+            $self->message( 3, "Object is '$o'. Returning the jar. Object has method 'jar'? ", ( $o->can( 'jar' ) ? 'yes' : 'no' ) );
+            return( $o->jar );
+        }
+        else
+        {
+            $self->message( 3, "Malformed cookie found: ", $o->jar_status, "\nOriginal request is: ", $self->as_string );
+        }
+    }
+    catch( $e )
+    {
+        return( $self->error( "An error occurred while trying to get the jar object of the APR::Request::Apache2: $e" ) );
+    }
 }
 
 sub cookies
 {
-	my $self = shift( @_ );
-	return( $self->{_jar} ) if( $self->{_jar} );
-	my $jar = Net::API::REST::Cookies->new( request => $self, debug => $self->debug ) ||
-	return( $self->error( "An error occurred while trying to get the cookie jar." ) );
-	$jar->fetch;
-	$self->{_jar} = $jar;
-	return( $jar );
+    my $self = shift( @_ );
+    return( $self->{_jar} ) if( $self->{_jar} );
+    my $jar = Net::API::REST::Cookies->new( request => $self, debug => $self->debug ) ||
+    return( $self->error( "An error occurred while trying to get the cookie jar." ) );
+    $jar->fetch;
+    $self->{_jar} = $jar;
+    return( $jar );
 }
 
 sub data
 {
-	my $self = shift( @_ );
-	return( $self->{data} ) if( $self->{_data_processed} );
-	my $r = $self->request;
-	my $ctype = $self->type;
-	my $payload = '';
-	if( $self->length > 0 )
-	{
-		$self->messagef( 3, "Reading %d bytes of data", $self->length );
-		$r->read( $payload, $self->length );
-	}
-	elsif( lc( $ctype ) eq 'application/json' )
-	{
-		$self->message( 3, "No data length is provided, but type is json so we read until the end." );
-		1 while( $r->read( $payload, 1096, CORE::length( $payload ) ) );
-	}
-	$self->messagef( 3, "Found %d bytes of data read from http client.", CORE::length( $payload ) );
-	try
-	{
-		## This is set during the init() phase
-		my $charset = $self->charset;
-		$self->message( 3, "Found charset '$charset'." );
-		if( $charset )
-		{
-			$self->message( 3, "Decoding charset encoding with '$charset'." );
-			$payload = Encode::decode( $charset, $payload, Encode::FB_CROAK );
-		}
-		else
-		{
-			$self->message( 3, "Decoding charset with default encoding 'utf8'." );
-			$payload = Encode::decode_utf8( $payload, Encode::FB_CROAK );
-		}
-	}
-	catch( $e )
-	{
-		$self->message( 3, "Character decoding failed with error: $e" );
-		return( $self->error( "Error while decoding payload received from http client: $e" ) );
-	}
-	$self->{data} = $payload;
-	$self->{_data_processed}++;
-	return( $payload );
+    my $self = shift( @_ );
+    return( $self->{data} ) if( $self->{_data_processed} );
+    my $r = $self->request;
+    my $ctype = $self->type;
+    my $payload = '';
+    if( $self->length > 0 )
+    {
+        $self->messagef( 3, "Reading %d bytes of data", $self->length );
+        $r->read( $payload, $self->length );
+    }
+    elsif( lc( $ctype ) eq 'application/json' )
+    {
+        $self->message( 3, "No data length is provided, but type is json so we read until the end." );
+        1 while( $r->read( $payload, 1096, CORE::length( $payload ) ) );
+    }
+    $self->messagef( 3, "Found %d bytes of data read from http client.", CORE::length( $payload ) );
+    try
+    {
+        ## This is set during the init() phase
+        my $charset = $self->charset;
+        $self->message( 3, "Found charset '$charset'." );
+        if( $charset )
+        {
+            $self->message( 3, "Decoding charset encoding with '$charset'." );
+            $payload = Encode::decode( $charset, $payload, Encode::FB_CROAK );
+        }
+        else
+        {
+            $self->message( 3, "Decoding charset with default encoding 'utf8'." );
+            $payload = Encode::decode_utf8( $payload, Encode::FB_CROAK );
+        }
+    }
+    catch( $e )
+    {
+        $self->message( 3, "Character decoding failed with error: $e" );
+        return( $self->error( "Error while decoding payload received from http client: $e" ) );
+    }
+    $self->{data} = $payload;
+    $self->{_data_processed}++;
+    return( $payload );
 }
 
 sub datetime { return( Net::API::REST::DateTime->new( debug => shift->debug ) ); }
@@ -368,38 +365,38 @@ sub document_root { return( shift->_try( 'request', 'document_root', @_ ) ); }
 
 sub env
 {
-	my $self = shift( @_ );
-	my $r = $self->request;
-	if( @_ )
-	{
-		if( scalar( @_ ) == 1 )
-		{
-			my $v = shift( @_ );
-			if( ref( $v ) eq 'HASH' )
-			{
-				foreach my $k ( sort( keys( %$v ) ) )
-				{
-					$r->subprocess_env( $k => $v->{ $k } );
-				}
-			}
-			else
-			{
-				return( $r->subprocess_env( $v ) );
-			}
-		}
-		else
-		{
-			my $hash = { @_ };
-			foreach my $k ( sort( keys( %$hash ) ) )
-			{
-				$r->subprocess_env( $k => $hash->{ $k } );
-			}
-		}
-	}
-	else
-	{
-		$r->subprocess_env;
-	}
+    my $self = shift( @_ );
+    my $r = $self->request;
+    if( @_ )
+    {
+        if( scalar( @_ ) == 1 )
+        {
+            my $v = shift( @_ );
+            if( ref( $v ) eq 'HASH' )
+            {
+                foreach my $k ( sort( keys( %$v ) ) )
+                {
+                    $r->subprocess_env( $k => $v->{ $k } );
+                }
+            }
+            else
+            {
+                return( $r->subprocess_env( $v ) );
+            }
+        }
+        else
+        {
+            my $hash = { @_ };
+            foreach my $k ( sort( keys( %$hash ) ) )
+            {
+                $r->subprocess_env( $k => $hash->{ $k } );
+            }
+        }
+    }
+    else
+    {
+        $r->subprocess_env;
+    }
 }
 
 sub err_headers_out { return( shift->request->err_headers_out ); }
@@ -421,62 +418,62 @@ sub global_request { return( Apache2::RequestUtil->request ); }
 ## sub headers { return( shift->request->headers_in ); }
 sub headers
 {
-	my $self = shift( @_ );
-	my $in = $self->request->headers_in;
-	if( @_ )
-	{
-		my $v = shift( @_ );
-		return( $in->{ $v } );
-	}
-	else
-	{
-		return( $in );
-	}
+    my $self = shift( @_ );
+    my $in = $self->request->headers_in;
+    if( @_ )
+    {
+        my $v = shift( @_ );
+        return( $in->{ $v } );
+    }
+    else
+    {
+        return( $in );
+    }
 }
 
 sub headers_as_hashref
 {
-	my $self = shift( @_ );
-	my $ref = {};
-	my $h = $self->headers;
-	while( my( $k, $v ) = each( %$h ) )
-	{
-		if( CORE::exists( $ref->{ $k } ) )
-		{
-			if( ref( $ref->{ $k } ) eq 'ARRAY' )
-			{
-				CORE::push( @{$ref->{ $k }}, $v );
-			}
-			else
-			{
-				my $old = $ref->{ $k };
-				$ref->{ $k } = [];
-				CORE::push( @{$ref->{ $k }}, $old, $v );
-			}
-		}
-		else
-		{
-			$ref->{ $k } = $v;
-		}
-	}
-	return( $ref );
+    my $self = shift( @_ );
+    my $ref = {};
+    my $h = $self->headers;
+    while( my( $k, $v ) = each( %$h ) )
+    {
+        if( CORE::exists( $ref->{ $k } ) )
+        {
+            if( ref( $ref->{ $k } ) eq 'ARRAY' )
+            {
+                CORE::push( @{$ref->{ $k }}, $v );
+            }
+            else
+            {
+                my $old = $ref->{ $k };
+                $ref->{ $k } = [];
+                CORE::push( @{$ref->{ $k }}, $old, $v );
+            }
+        }
+        else
+        {
+            $ref->{ $k } = $v;
+        }
+    }
+    return( $ref );
 }
 
 sub headers_as_json
 {
-	my $self = shift( @_ );
-	my $ref = $self->headers_as_hashref;
-	my $json;
-	try
-	{
-		## Non-utf8 encoded, because this resulting data may be sent over http or stored in a database which would typically encode data on the fly, and double encoding will damage data
-		$json = $self->json->encode( $ref );
-	}
-	catch( $e )
-	{
-		return( $self->error( "An error occured while encoding the headers hash reference into json: $e" ) );
-	}
-	return( $json );
+    my $self = shift( @_ );
+    my $ref = $self->headers_as_hashref;
+    my $json;
+    try
+    {
+        ## Non-utf8 encoded, because this resulting data may be sent over http or stored in a database which would typically encode data on the fly, and double encoding will damage data
+        $json = $self->json->encode( $ref );
+    }
+    catch( $e )
+    {
+        return( $self->error( "An error occured while encoding the headers hash reference into json: $e" ) );
+    }
+    return( $json );
 }
 
 sub headers_in { return( shift->request->headers_in ); }
@@ -491,9 +488,9 @@ sub id { return( shift->_try( 'connection', 'id' ) ); }
 
 sub if_modified_since
 {
-	my $self = shift( @_ );
-	my $v = $self->headers( 'If-Modified-Since' ) || return;
-	return( $self->datetime->str2datetime( $v ) );
+    my $self = shift( @_ );
+    my $v = $self->headers( 'If-Modified-Since' ) || return;
+    return( $self->datetime->str2datetime( $v ) );
 }
 
 sub if_none_match { return( shift->headers( 'If-None-Match', @_ ) ); }
@@ -508,12 +505,12 @@ sub is_perl_option_enabled { return( shift->_try( 'request', 'is_perl_option_ena
 
 sub json
 {
-	my $self = shift( @_ );
-	if( !$self->{json} )
-	{
-		$self->{json} = JSON->new->relaxed;
-	}
-	return( $self->{json} );
+    my $self = shift( @_ );
+    if( !$self->{json} )
+    {
+        $self->{json} = JSON->new->relaxed;
+    }
+    return( $self->{json} );
 }
 
 sub keepalive { return( shift->_try( 'connection', 'keepalive' ) ); }
@@ -522,11 +519,11 @@ sub keepalives { return( shift->_try( 'connection', 'keepalives' ) ); }
 
 sub languages
 {
-	my $self = shift( @_ );
-	my $lang = $self->accept_language || return( [] );
-	my $al = HTTP::AcceptLanguage->new( $lang );
-	my( @langs ) = $al->languages;
-	return( \@langs );
+    my $self = shift( @_ );
+    my $lang = $self->accept_language || return( [] );
+    my $al = HTTP::AcceptLanguage->new( $lang );
+    my( @langs ) = $al->languages;
+    return( \@langs );
 }
 
 sub length { return( shift->_try( 'request', 'bytes_sent' ) ); }
@@ -553,79 +550,79 @@ sub no_cache { return( shift->_try( 'request', 'no_cache', @_ ) ); }
 ## I returns an APR::Table object which can be used like a hash ie foreach my $k ( sort( keys( %{$table} ) ) )
 sub notes
 {
-	my $self = shift( @_ );
-	if( @_ )
-	{
-		my $hash = shift( @_ );
-		return( $self->error( "Value provided is not a hash reference." ) ) if( ref( $hash ) ne 'HASH' );
-		#my $pool = $self->pool->new;
-		#my $table = APR::Table::make( $pool, 1 );
-		#foreach my $k ( sort( keys( %$hash ) ) )
-		#{
-		#	$table->set( $k => $hash->{ $k } );
-		#}
-		my $r = $self->request;
-		#$r->notes( $table );
-		$r->pnotes( $hash );
-	}
-	return( $self->request->notes );
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $hash = shift( @_ );
+        return( $self->error( "Value provided is not a hash reference." ) ) if( ref( $hash ) ne 'HASH' );
+        #my $pool = $self->pool->new;
+        #my $table = APR::Table::make( $pool, 1 );
+        #foreach my $k ( sort( keys( %$hash ) ) )
+        #{
+        #   $table->set( $k => $hash->{ $k } );
+        #}
+        my $r = $self->request;
+        #$r->notes( $table );
+        $r->pnotes( $hash );
+    }
+    return( $self->request->notes );
 }
 
 sub output_filters { return( shift->_try( 'request', 'output_filters' ) ); }
 
 sub params
 {
-	my $self = shift( @_ );
-	my $r = Apache2::Request->new( $self->request );
-	return( $self->query ) if( $self->method eq 'GET' );
-	## https://perl.apache.org/docs/1.0/guide/snippets.html#Reusing_Data_from_POST_request
-	## my %params = $r->method eq 'POST' ? $r->content : $r->args;
-	## Data are in pure utf8; not perl's internal, so it is up to us to decode them
-	my( @params ) = $r->param;
-	# $self->message( 3, "Found the following keys in post data: '", join( "', '", @params ), "'," );
-	my $form = {};
-	#my $io = IO::File->new( ">/tmp/form_data.txt" );
-	#my $io2 = IO::File->new( ">/tmp/form_data_after_our_decoding.txt" );
-	#my $raw = IO::File->new( ">/tmp/raw_form_data.txt" );
-	#$io->binmode( ':utf8' );
-	#$io2->binmode( ':utf8' );
-	foreach my $k ( @params )
-	{
-		my( @values ) = $r->param( $k );
-		# $self->message( 3, "Adding value '", $values[0], "' for key '$k'." );
-		#$raw->print( "$k => " );
-		#$io->print( "$k => " );
-		my $name = Encode::is_utf8( $k ) ? $k : Encode::decode_utf8( $k );
-		#$io2->print( "$name => " );
-		$form->{ $name } = scalar( @values ) > 1 ? \@values : $values[0];
-		if( ref( $form->{ $name } ) )
-		{
-			#$raw->print( "[\n" );
-			#$io->print( "[\n" );
-			#$io2->print( "[\n" );
-			for( my $i = 0; $i < scalar( @{$form->{ $name }} ); $i++ )
-			{
-				#$raw->print( "\t[$i]: ", $form->{ $name }->[ $i ], "\n" );
-				#$io->print( "\t[$i]: ", $form->{ $name }->[ $i ], "\n" );
-				$form->{ $name }->[ $i ] = Encode::is_utf8( $form->{ $name }->[ $i ] ) ? $form->{ $name }->[ $i ] : Encode::decode_utf8( $form->{ $name }->[ $i ] );
-				#$io2->print( "\t[$i]: ", $form->{ $name }->[ $i ], "\n" );
-			}
-			#$raw->print( "];\n" );
-			#$io->print( "];\n" );
-			#$io2->print( "];\n" );
-		}
-		else
-		{
-			#$raw->print( $form->{ $name }, "\n" );
-			#$io->print( $form->{ $name }, "\n" );
-			$form->{ $name } = Encode::is_utf8( $form->{ $name } ) ? $form->{ $name } : Encode::decode_utf8( $form->{ $name } );
-			#$io2->print( $form->{ $name }, "\n" );
-		}
-	}
-	#$raw->close;
-	#$io->close;
-	#$io2->close;
-	return( $form );
+    my $self = shift( @_ );
+    my $r = Apache2::Request->new( $self->request );
+    return( $self->query ) if( $self->method eq 'GET' );
+    ## https://perl.apache.org/docs/1.0/guide/snippets.html#Reusing_Data_from_POST_request
+    ## my %params = $r->method eq 'POST' ? $r->content : $r->args;
+    ## Data are in pure utf8; not perl's internal, so it is up to us to decode them
+    my( @params ) = $r->param;
+    # $self->message( 3, "Found the following keys in post data: '", join( "', '", @params ), "'," );
+    my $form = {};
+    #my $io = IO::File->new( ">/tmp/form_data.txt" );
+    #my $io2 = IO::File->new( ">/tmp/form_data_after_our_decoding.txt" );
+    #my $raw = IO::File->new( ">/tmp/raw_form_data.txt" );
+    #$io->binmode( ':utf8' );
+    #$io2->binmode( ':utf8' );
+    foreach my $k ( @params )
+    {
+        my( @values ) = $r->param( $k );
+        # $self->message( 3, "Adding value '", $values[0], "' for key '$k'." );
+        #$raw->print( "$k => " );
+        #$io->print( "$k => " );
+        my $name = Encode::is_utf8( $k ) ? $k : Encode::decode_utf8( $k );
+        #$io2->print( "$name => " );
+        $form->{ $name } = scalar( @values ) > 1 ? \@values : $values[0];
+        if( ref( $form->{ $name } ) )
+        {
+            #$raw->print( "[\n" );
+            #$io->print( "[\n" );
+            #$io2->print( "[\n" );
+            for( my $i = 0; $i < scalar( @{$form->{ $name }} ); $i++ )
+            {
+                #$raw->print( "\t[$i]: ", $form->{ $name }->[ $i ], "\n" );
+                #$io->print( "\t[$i]: ", $form->{ $name }->[ $i ], "\n" );
+                $form->{ $name }->[ $i ] = Encode::is_utf8( $form->{ $name }->[ $i ] ) ? $form->{ $name }->[ $i ] : Encode::decode_utf8( $form->{ $name }->[ $i ] );
+                #$io2->print( "\t[$i]: ", $form->{ $name }->[ $i ], "\n" );
+            }
+            #$raw->print( "];\n" );
+            #$io->print( "];\n" );
+            #$io2->print( "];\n" );
+        }
+        else
+        {
+            #$raw->print( $form->{ $name }, "\n" );
+            #$io->print( $form->{ $name }, "\n" );
+            $form->{ $name } = Encode::is_utf8( $form->{ $name } ) ? $form->{ $name } : Encode::decode_utf8( $form->{ $name } );
+            #$io2->print( $form->{ $name }, "\n" );
+        }
+    }
+    #$raw->close;
+    #$io->close;
+    #$io2->close;
+    return( $form );
 }
 
 sub path_info { return( shift->_try( 'request', 'path_info', @_ ) ); }
@@ -640,37 +637,37 @@ sub pool { return( shift->_try( 'connection', 'pool' ) ); }
 
 sub preferred_language
 {
-	my $self = shift( @_ );
-	my $ok_langs = [];
-	if( @_ )
-	{
-		return( $self->error( "I was expecting a list of supported languages as array reference, but instead I received this '", join( "', '", @_ ), "'." ) ) if( ref( $_[0] ) ne 'ARRAY' );
-		## Make a copy
-		$ok_langs = [ @{$_[0]} ];
-		## Make sure the languages provided are in web format (e.g. en-GB), not unix format (e.g. en_GB)
-		for( my $i = 0; $i < scalar( @$ok_langs ); $i++ )
-		{
-			$ok_langs->[ $i ] =~ tr/_/-/;
-		}
-	}
-	else
-	{
-		return( $self->error( "No supported languages list was provided as array reference." ) );
-	}
-	# $self->messagef( 3, "Our support languages are '%s'.", join( "', '", @$ok_langs ) );
-	## No supported languages was provided
-	return( '' ) if( !scalar( @$ok_langs ) );
-	# $self->message( 3, "Client accept language is: '", $self->accept_language, "'." );
-	## The user has not set his/her preferred languages
-	my $accept_langs = $self->accept_language || return( '' );
-	# $self->message( 3, "http accept language is '$accept_langs', initiating a HTTP::AcceptLanguage object." );
-	my $al = HTTP::AcceptLanguage->new( $accept_langs );
-	## Get the most suitable one
-	my $ok = $al->match( @$ok_langs );
-	# $self->messagef( 3, "Best match found based on our support languages '%s' is '$ok'", join( "', '", @$ok_langs ) );
-	return( $ok ) if( CORE::length( $ok ) );
-	## No match, we return empty. undef is for error only
-	return( '' );
+    my $self = shift( @_ );
+    my $ok_langs = [];
+    if( @_ )
+    {
+        return( $self->error( "I was expecting a list of supported languages as array reference, but instead I received this '", join( "', '", @_ ), "'." ) ) if( ref( $_[0] ) ne 'ARRAY' );
+        ## Make a copy
+        $ok_langs = [ @{$_[0]} ];
+        ## Make sure the languages provided are in web format (e.g. en-GB), not unix format (e.g. en_GB)
+        for( my $i = 0; $i < scalar( @$ok_langs ); $i++ )
+        {
+            $ok_langs->[ $i ] =~ tr/_/-/;
+        }
+    }
+    else
+    {
+        return( $self->error( "No supported languages list was provided as array reference." ) );
+    }
+    # $self->messagef( 3, "Our support languages are '%s'.", join( "', '", @$ok_langs ) );
+    ## No supported languages was provided
+    return( '' ) if( !scalar( @$ok_langs ) );
+    # $self->message( 3, "Client accept language is: '", $self->accept_language, "'." );
+    ## The user has not set his/her preferred languages
+    my $accept_langs = $self->accept_language || return( '' );
+    # $self->message( 3, "http accept language is '$accept_langs', initiating a HTTP::AcceptLanguage object." );
+    my $al = HTTP::AcceptLanguage->new( $accept_langs );
+    ## Get the most suitable one
+    my $ok = $al->match( @$ok_langs );
+    # $self->messagef( 3, "Best match found based on our support languages '%s' is '$ok'", join( "', '", @$ok_langs ) );
+    return( $ok ) if( CORE::length( $ok ) );
+    ## No match, we return empty. undef is for error only
+    return( '' );
 }
 
 sub prev { return( shift->_try( 'request', 'prev' ) ); }
@@ -687,11 +684,11 @@ sub push_handlers { return( shift->_try( 'request', 'push_handlers', @_ ) ); }
 
 sub query
 {
-	my $self = shift( @_ );
-	my $qs = $self->query_string;
-	my $qq = URI::Query->new( $qs );
-	my %hash = $qq->hash;
-	return( \%hash );
+    my $self = shift( @_ );
+    my $qs = $self->query_string;
+    my $qq = URI::Query->new( $qs );
+    my %hash = $qq->hash;
+    return( \%hash );
 }
 
 ## Set/get a query string
@@ -705,31 +702,31 @@ sub referer { return( shift->headers->{Referer} ); }
 ## sub remote_addr { return( shift->connection->remote_ip ); }
 sub remote_addr
 {
-	my $self = shift( @_ );
-	my $vers = $self->server_version;
-	my $serv = $self->request;
-	## http://httpd.apache.org/docs/2.4/developer/new_api_2_4.html
-	## We have to prepend the version with 'v', because it will faill when there is a dotted decimal with 3 numbers, 
-	## e.g. 2.4.16 > 2.2 will return false !!
-	## but v2.4.16 > v2.2 returns true :(
-	## Already contacted the author about this edge case (2019-09-22)
-	if( version->parse( "v$vers" ) > version->parse( 'v2.2' ) )
-	{
-		my $addr;
-		try
-		{
-			$addr = $serv->useragent_addr;
-		}
-		catch( $e )
-		{
-			warn( "Unable to get the remote addr with the method useragent_addr: $e\n" );
-			return( undef() );
-		}
-	}
-	else
-	{
-		return( $self->connection->remote_addr );
-	}
+    my $self = shift( @_ );
+    my $vers = $self->server_version;
+    my $serv = $self->request;
+    ## http://httpd.apache.org/docs/2.4/developer/new_api_2_4.html
+    ## We have to prepend the version with 'v', because it will faill when there is a dotted decimal with 3 numbers, 
+    ## e.g. 2.4.16 > 2.2 will return false !!
+    ## but v2.4.16 > v2.2 returns true :(
+    ## Already contacted the author about this edge case (2019-09-22)
+    if( version->parse( "v$vers" ) > version->parse( 'v2.2' ) )
+    {
+        my $addr;
+        try
+        {
+            $addr = $serv->useragent_addr;
+        }
+        catch( $e )
+        {
+            warn( "Unable to get the remote addr with the method useragent_addr: $e\n" );
+            return( undef() );
+        }
+    }
+    else
+    {
+        return( $self->connection->remote_addr );
+    }
 }
 
 sub remote_host { return( shift->_try( 'connection', 'remote_host' ) ); }
@@ -737,92 +734,92 @@ sub remote_host { return( shift->_try( 'connection', 'remote_host' ) ); }
 ## sub remote_ip { return( shift->connection->remote_ip ); }
 sub remote_ip
 {
-	my $self = shift( @_ );
-	my $vers = $self->server_version;
-	$self->message( 3, "Checking if server version '$vers' is higher than 2.2" );
-	my $serv = $self->request;
-	$self->message( 3, "Is the REMOTE_ADDR environment variable available? (", $self->env( 'REMOTE_ADDR' ), ")" );
-	## http://httpd.apache.org/docs/2.4/developer/new_api_2_4.html
-	## We have to prepend the version with 'v', because it will faill when there is a dotted decimal with 3 numbers, 
-	## e.g. 2.4.16 > 2.2 will return false !!
-	## but v2.4.16 > v2.2 returns true :(
-	## Already contacted the author about this edge case (2019-09-22)
-	if( version->parse( "v$vers" ) > version->parse( 'v2.2' ) )
-	{
-		my $ip;
-		try
-		{
-			$ip = $serv->useragent_ip;
-		}
-		catch( $e )
-		{
-			warn( "Unable to get the remote ip with the method useragent_ip: $e\n" );
-		}
-		$ip = $self->env( 'REMOTE_ADDR' ) if( !CORE::length( $ip ) );
-		return( $ip ) if( CORE::length( $ip ) );
-		return( undef() );
-	}
-	else
-	{
-		return( $self->connection->remote_ip );
-	}
+    my $self = shift( @_ );
+    my $vers = $self->server_version;
+    $self->message( 3, "Checking if server version '$vers' is higher than 2.2" );
+    my $serv = $self->request;
+    $self->message( 3, "Is the REMOTE_ADDR environment variable available? (", $self->env( 'REMOTE_ADDR' ), ")" );
+    ## http://httpd.apache.org/docs/2.4/developer/new_api_2_4.html
+    ## We have to prepend the version with 'v', because it will faill when there is a dotted decimal with 3 numbers, 
+    ## e.g. 2.4.16 > 2.2 will return false !!
+    ## but v2.4.16 > v2.2 returns true :(
+    ## Already contacted the author about this edge case (2019-09-22)
+    if( version->parse( "v$vers" ) > version->parse( 'v2.2' ) )
+    {
+        my $ip;
+        try
+        {
+            $ip = $serv->useragent_ip;
+        }
+        catch( $e )
+        {
+            warn( "Unable to get the remote ip with the method useragent_ip: $e\n" );
+        }
+        $ip = $self->env( 'REMOTE_ADDR' ) if( !CORE::length( $ip ) );
+        return( $ip ) if( CORE::length( $ip ) );
+        return( undef() );
+    }
+    else
+    {
+        return( $self->connection->remote_ip );
+    }
 }
 
 sub reply
 {
-	my $self = shift( @_ );
-	my $code = shift( @_ );
-	my $ref  = shift( @_ );
-	my $r    = $self->request;
-	my( $call_pack, $call_file, $call_line ) = caller;
-	my $call_sub = ( caller(1) )[3];
-	$self->message( 2, "Got Apache request object $r from package $call_pack in file $call_file at line $call_line from sub $call_sub" );
-	if( $code !~ /^[0-9]+$/ )
-	{
-		#$r->custom_response( Apache2::Const::SERVER_ERROR, "Was expecting an organisation id" );
-		$r->status( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-		$r->rflush;
-		# $r->send_http_header;
-		$->print( $self->json->encode({ 'error' => 'An unexpected server error occured', 'code' => 500 }) );
-		$self->error( "http code to be used '$code' is invalid. It should be only integers." );
-		return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-	}
-	if( ref( $ref ) ne 'HASH' )
-	{
-		$r->status( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-		$r->rflush;
-		# $r->send_http_header;
-		$->print( $self->json->encode({ 'error' => 'An unexpected server error occured', 'code' => 500 }) );
-		$self->error( "Data provided to send is not an hash ref." );
-		return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-	}
-	my $msg = CORE::exists( $ref->{ 'success' } ) 
-		? $ref->{ 'success' } 
-		: CORE::exists( $ref->{ 'error' } ) 
-			? $ref->{ 'error' } 
-			: undef();
-	$self->message( 2, "Returning http status with code $code" );
-	$r->status( $code );
-	if( defined( $msg ) )
-	{
-		$r->custom_response( $code, $msg );
-	}
-	else
-	{
-		$r->status( $code );
-	}
-	$r->rflush;
-	$ref->{code} = $code if( !CORE::exists( $ref->{code} ) );
-	try
-	{
-		$->print( $self->json->encode( $ref ) );
-		return( $code );
-	}
-	catch( $e )
-	{
-		$self->error( "An error occurred while calling Apache Request method \"print\": $e" );
-		return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-	}
+    my $self = shift( @_ );
+    my $code = shift( @_ );
+    my $ref  = shift( @_ );
+    my $r    = $self->request;
+    my( $call_pack, $call_file, $call_line ) = caller;
+    my $call_sub = ( caller(1) )[3];
+    $self->message( 2, "Got Apache request object $r from package $call_pack in file $call_file at line $call_line from sub $call_sub" );
+    if( $code !~ /^[0-9]+$/ )
+    {
+        #$r->custom_response( Apache2::Const::SERVER_ERROR, "Was expecting an organisation id" );
+        $r->status( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
+        $r->rflush;
+        # $r->send_http_header;
+        $r->print( $self->json->encode({ 'error' => 'An unexpected server error occured', 'code' => 500 }) );
+        $self->error( "http code to be used '$code' is invalid. It should be only integers." );
+        return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
+    }
+    if( ref( $ref ) ne 'HASH' )
+    {
+        $r->status( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
+        $r->rflush;
+        # $r->send_http_header;
+        $r->print( $self->json->encode({ 'error' => 'An unexpected server error occured', 'code' => 500 }) );
+        $self->error( "Data provided to send is not an hash ref." );
+        return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
+    }
+    my $msg = CORE::exists( $ref->{ 'success' } ) 
+        ? $ref->{ 'success' } 
+        : CORE::exists( $ref->{ 'error' } ) 
+            ? $ref->{ 'error' } 
+            : undef();
+    $self->message( 2, "Returning http status with code $code" );
+    $r->status( $code );
+    if( defined( $msg ) )
+    {
+        $r->custom_response( $code, $msg );
+    }
+    else
+    {
+        $r->status( $code );
+    }
+    $r->rflush;
+    $ref->{code} = $code if( !CORE::exists( $ref->{code} ) );
+    try
+    {
+        $r->print( $self->json->encode( $ref ) );
+        return( $code );
+    }
+    catch( $e )
+    {
+        $self->error( "An error occurred while calling Apache Request method \"print\": $e" );
+        return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
+    }
 }
 
 sub request { return( shift->_set_get_object( 'request', 'Apache2::Request', @_ ) ); }
@@ -830,13 +827,13 @@ sub request { return( shift->_set_get_object( 'request', 'Apache2::Request', @_ 
 # sub request_time { return( shift->request->request_time ); }
 sub request_time
 {
-	my $self = shift( @_ );
-	my $t = $self->request->request_time;
-	my $dt = DateTime->from_epoch( epoch => $t, time_zone => 'local' );
-	## A Net::API::REST::DateTime object
-	my $fmt = $self->datetime;
-	$dt->set_formatter( $fmt );
-	return( $dt );
+    my $self = shift( @_ );
+    my $t = $self->request->request_time;
+    my $dt = DateTime->from_epoch( epoch => $t, time_zone => 'local' );
+    ## A Net::API::REST::DateTime object
+    my $fmt = $self->datetime;
+    $dt->set_formatter( $fmt );
+    return( $dt );
 }
 
 ## Return Apache2::ServerUtil object
@@ -854,64 +851,64 @@ sub server_port { return( shift->_try( 'request', 'get_server_port' ) ); }
 ## sub server_version { return( version->parse( Apache2::ServerUtil::get_server_version ) ); }
 sub server_version 
 {
-	my $self = shift( @_ );
-	## Cached
-	$self->{_server_version} = $SERVER_VERSION if( !CORE::length( $self->{_server_version} ) && CORE::length( $SERVER_VERSION ) );
-	return( $self->{_server_version} ) if( CORE::length( $self->{_server_version} ) );
-	## $self->request->log_error( "Apache version is: " . Apache2::ServerUtil::get_server_description );
-	## e.g.: Apache version is: Apache/2.4.16 (Unix) PHP/5.5.38 mod_apreq2-20090110/2.8.0 mod_perl/2.0.10 Perl/v5.30.0
-	## but could also be just 'Apache' depending on server configuration....
-	my $desc = Apache2::ServerUtil::get_server_description;
-	$self->message( 3, "Apache description is: '$desc'" );
-	my $version;
-	if( $desc =~ /\bApache\/([\d\.]+)/ )
-	{
-		$version = $1;
-	}
-	## XXX to test our alternative approach
-	$self->message( 3, "Found Apache version '$version' from its description" );
-	$version = undef();
-	if( !defined( $version ) )
-	{
-		my $path = $self->env( 'PATH' );
-		$self->message( 3, "PATH is: '$path'." );
-		## Typical: /bin:/usr/bin:/usr/local/bin
-		if( $path !~ /\/usr\/sbin/ )
-		{
-			my @path = CORE::split( /:/, $path );
-			CORE::push( @path, '/usr/sbin', '/usr/local/sbin' );
-			$path = join( ':', @path );
-			$self->env( 'PATH' => $path );
-			$self->message( 3, "PATH is now: ", $self->env( 'PATH' ) );
-		}
-		$self->message( 3, "Trying to find out the Apache version from its binary." );
-		my $apache_bin;
-		foreach my $bin ( qw( apache2 httpd ) )
-		{
-			$apache_bin = $self->_find_bin( $bin );
-			last if( defined( $apache_bin ) );
-		}
-		$self->message( 3, "Found binary at $apache_bin" );
-		if( defined( $apache_bin ) )
-		{
-			## e.g.:
-			## Server version: Apache/2.4.16 (Unix)
-			## Server built:   Jul 22 2015 21:03:09
-			my $ver_str = qx( $apache_bin -v );
-			$self->message( 3, "Version string is '$ver_str'" );
-			if( ( split( /\r?\n/, $ver_str ) )[0] =~ /\bApache\/([\d\.]+)/ )
-			{
-				$version = $1;
-			}
-		}
-	}
-	$self->message( 3, "Returning version '$version'." );
-	if( $version )
-	{
-		$self->{_server_version} = $SERVER_VERSION = version->parse( $version );
-		return( $self->{_server_version} );
-	}
-	return( '' );
+    my $self = shift( @_ );
+    ## Cached
+    $self->{_server_version} = $SERVER_VERSION if( !CORE::length( $self->{_server_version} ) && CORE::length( $SERVER_VERSION ) );
+    return( $self->{_server_version} ) if( CORE::length( $self->{_server_version} ) );
+    ## $self->request->log_error( "Apache version is: " . Apache2::ServerUtil::get_server_description );
+    ## e.g.: Apache version is: Apache/2.4.16 (Unix) PHP/5.5.38 mod_apreq2-20090110/2.8.0 mod_perl/2.0.10 Perl/v5.30.0
+    ## but could also be just 'Apache' depending on server configuration....
+    my $desc = Apache2::ServerUtil::get_server_description;
+    $self->message( 3, "Apache description is: '$desc'" );
+    my $version;
+    if( $desc =~ /\bApache\/([\d\.]+)/ )
+    {
+        $version = $1;
+    }
+    ## XXX to test our alternative approach
+    $self->message( 3, "Found Apache version '$version' from its description" );
+    $version = undef();
+    if( !defined( $version ) )
+    {
+        my $path = $self->env( 'PATH' );
+        $self->message( 3, "PATH is: '$path'." );
+        ## Typical: /bin:/usr/bin:/usr/local/bin
+        if( $path !~ /\/usr\/sbin/ )
+        {
+            my @path = CORE::split( /:/, $path );
+            CORE::push( @path, '/usr/sbin', '/usr/local/sbin' );
+            $path = join( ':', @path );
+            $self->env( 'PATH' => $path );
+            $self->message( 3, "PATH is now: ", $self->env( 'PATH' ) );
+        }
+        $self->message( 3, "Trying to find out the Apache version from its binary." );
+        my $apache_bin;
+        foreach my $bin ( qw( apache2 httpd ) )
+        {
+            $apache_bin = $self->_find_bin( $bin );
+            last if( defined( $apache_bin ) );
+        }
+        $self->message( 3, "Found binary at $apache_bin" );
+        if( defined( $apache_bin ) )
+        {
+            ## e.g.:
+            ## Server version: Apache/2.4.16 (Unix)
+            ## Server built:   Jul 22 2015 21:03:09
+            my $ver_str = qx( $apache_bin -v );
+            $self->message( 3, "Version string is '$ver_str'" );
+            if( ( split( /\r?\n/, $ver_str ) )[0] =~ /\bApache\/([\d\.]+)/ )
+            {
+                $version = $1;
+            }
+        }
+    }
+    $self->message( 3, "Returning version '$version'." );
+    if( $version )
+    {
+        $self->{_server_version} = $SERVER_VERSION = version->parse( $version );
+        return( $self->{_server_version} );
+    }
+    return( '' );
 }
 
 ## e.g. set_basic_credentials( $user, $password );
@@ -939,36 +936,36 @@ sub subprocess_env { return( shift->_try( 'request', 'subprocess_env' ) ); }
 
 sub type
 {
-	my $self = shift( @_ );
-	if( @_ )
-	{
-		## Something like text/html, text/plain or application/json, etc...
-		$self->{type} = shift( @_ );
-	}
-	elsif( !CORE::length( $self->{type} ) )
-	{
-		my $ctype_raw = $self->content_type;
-		$self->message( 3, "Content-type of data received is '$ctype_raw'." );
-		## Content-Type: application/json; encoding=utf-8
-		my $ctype_def = $self->_split_str( $ctype_raw );
-		## Accept: application/json; version=1.0; encoding=utf-8
-		my $ctype = lc( $ctype_def->{value} );
-		$self->{type} = $ctype if( $ctype );
-		my $enc   = CORE::exists( $ctype_def->{param}->{charset} ) 
-			? lc( $ctype_def->{param}->{charset} ) 
-			: undef();
-		$self->charset( $enc ) if( CORE::length( $enc ) );
-	}
-	return( $self->{type} );
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        ## Something like text/html, text/plain or application/json, etc...
+        $self->{type} = shift( @_ );
+    }
+    elsif( !CORE::length( $self->{type} ) )
+    {
+        my $ctype_raw = $self->content_type;
+        $self->message( 3, "Content-type of data received is '$ctype_raw'." );
+        ## Content-Type: application/json; encoding=utf-8
+        my $ctype_def = $self->_split_str( $ctype_raw );
+        ## Accept: application/json; version=1.0; encoding=utf-8
+        my $ctype = lc( $ctype_def->{value} );
+        $self->{type} = $ctype if( $ctype );
+        my $enc   = CORE::exists( $ctype_def->{param}->{charset} ) 
+            ? lc( $ctype_def->{param}->{charset} ) 
+            : undef();
+        $self->charset( $enc ) if( CORE::length( $enc ) );
+    }
+    return( $self->{type} );
 }
 
 sub unparsed_uri
 {
-	my $self = shift( @_ );
-	my $uri = $self->uri;
-	my $unparseed_path = $self->request->unparsed_uri;
-	my $unparsed_uri = URI->new( $uri->scheme . '://' . $uri->host_port . $unparseed_path );
-	return( $unparsed_uri );
+    my $self = shift( @_ );
+    my $uri = $self->uri;
+    my $unparseed_path = $self->request->unparsed_uri;
+    my $unparsed_uri = URI->new( $uri->scheme . '://' . $uri->host_port . $unparseed_path );
+    return( $unparsed_uri );
 }
 
 #sub uri { return( URI->new( shift->request->uri( @_ ) ) ); }
@@ -976,13 +973,13 @@ sub unparsed_uri
 ## https://perl.apache.org/docs/2.0/api/APR/URI.html
 sub uri
 {
-	my $self = shift( @_ );
-	my $r = $self->request;
-	my $host = $r->get_server_name;
-	my $port = $r->get_server_port;
-	my $proto = ( $port == 443 ) ? 'https' : 'http';
-	my $path = $r->unparsed_uri;
-	return( URI->new( "${proto}://${host}:${port}${path}" ) );
+    my $self = shift( @_ );
+    my $r = $self->request;
+    my $host = $r->get_server_name;
+    my $port = $r->get_server_port;
+    my $proto = ( $port == 443 ) ? 'https' : 'http';
+    my $path = $r->unparsed_uri;
+    return( URI->new( "${proto}://${host}:${port}${path}" ) );
 }
 
 sub user { return( shift->_try( 'request', 'user' ) ); }
@@ -993,20 +990,20 @@ sub variables { return( shift->_set_get_hash( 'variables', @_ ) ); }
 
 sub _find_bin
 {
-	my $self = shift( @_ );
-	my $bin  = shift( @_ ) || return( '' );
-	my $path = $self->env( 'PATH' );
-	my @path = split( /\:/, $path );
-	my $full_path;
-	foreach my $dir ( @path )
-	{
-		if( -e( "$dir/$bin" ) && -f( "$dir/$bin" ) )
-		{
-			$full_path = "$dir/$bin";
-			last;
-		}
-	}
-	return( $full_path );
+    my $self = shift( @_ );
+    my $bin  = shift( @_ ) || return( '' );
+    my $path = $self->env( 'PATH' );
+    my @path = split( /\:/, $path );
+    my $full_path;
+    foreach my $dir ( @path )
+    {
+        if( -e( "$dir/$bin" ) && -f( "$dir/$bin" ) )
+        {
+            $full_path = "$dir/$bin";
+            last;
+        }
+    }
+    return( $full_path );
 }
 
 ## Taken from http://www.perlmonks.org/bare/?node_id=319761
@@ -1015,56 +1012,56 @@ sub _find_bin
 ## But this would be split: something\\;here resulting in something\ and here after unescaping
 sub _split_str
 {
-	my $self = shift( @_ );
-	my $s    = shift( @_ );
-	return( {} ) if( !length( $s ) );
-	my $sep  = @_ ? shift( @_ ) : ';';
-	my @parts = ();
-	my $i = 0;
-	foreach( split( /(\\.)|$sep/, $s ) ) 
-	{
-		defined( $_ ) ? do{ $parts[$i] .= $_ } : do{ $i++ };
-	}
-	# $self->message( 3, "Field parts are: ", sub{ $self->dumper( \@parts ) } );
-	my $header_val = shift( @parts );
-	my $param = {};
-	foreach my $frag ( @parts )
-	{
-		$frag =~ s/^[[:blank:]]+|[[:blank:]]+$//g;
-		my( $attribute, $value ) = split( /[[:blank:]]*\=[[:blank:]]*/, $frag, 2 );
-		# $self->message( 3, "\tAttribute is '$attribute' and value '$value'. Fragment processed was '$frag'" );
-		$value =~ s/^\"|\"$//g;
-		## Check character string and length. Should not be more than 255 characters
-		## http://tools.ietf.org/html/rfc1341
-		## http://www.iana.org/assignments/media-types/media-types.xhtml
-		## Won't complain if this does not meet our requirement, but will discard it silently
-		if( $attribute =~ /^[a-zA-Z][a-zA-Z0-9\_\-]+$/ && length( $attribute ) <= 255 )
-		{
-			if( $value =~ /^[a-zA-Z][a-zA-Z0-9\_\-]+$/ && length( $value ) <= 255 )
-			{
-				$param->{ lc( $attribute ) } = $value;
-			}
-		}
-	}
-	return( { 'value' => $header_val, 'param' => $param } );
+    my $self = shift( @_ );
+    my $s    = shift( @_ );
+    return( {} ) if( !CORE::length( $s ) );
+    my $sep  = @_ ? shift( @_ ) : ';';
+    my @parts = ();
+    my $i = 0;
+    foreach( split( /(\\.)|$sep/, $s ) ) 
+    {
+        defined( $_ ) ? do{ $parts[$i] .= $_ } : do{ $i++ };
+    }
+    # $self->message( 3, "Field parts are: ", sub{ $self->dumper( \@parts ) } );
+    my $header_val = shift( @parts );
+    my $param = {};
+    foreach my $frag ( @parts )
+    {
+        $frag =~ s/^[[:blank:]]+|[[:blank:]]+$//g;
+        my( $attribute, $value ) = split( /[[:blank:]]*\=[[:blank:]]*/, $frag, 2 );
+        # $self->message( 3, "\tAttribute is '$attribute' and value '$value'. Fragment processed was '$frag'" );
+        $value =~ s/^\"|\"$//g;
+        ## Check character string and length. Should not be more than 255 characters
+        ## http://tools.ietf.org/html/rfc1341
+        ## http://www.iana.org/assignments/media-types/media-types.xhtml
+        ## Won't complain if this does not meet our requirement, but will discard it silently
+        if( $attribute =~ /^[a-zA-Z][a-zA-Z0-9\_\-]+$/ && CORE::length( $attribute ) <= 255 )
+        {
+            if( $value =~ /^[a-zA-Z][a-zA-Z0-9\_\-]+$/ && CORE::length( $value ) <= 255 )
+            {
+                $param->{ lc( $attribute ) } = $value;
+            }
+        }
+    }
+    return( { 'value' => $header_val, 'param' => $param } );
 }
 
 sub _try
 {
-	my $self = shift( @_ );
-	my $pack = shift( @_ ) || return( $self->error( "No Apache package name was provided to call method" ) );
-	my $meth = shift( @_ ) || return( $self->error( "No method name was provided to try!" ) );
-	my $r = Apache2::RequestUtil->request;
-	$r->log_error( "Net::API::REST::Request::_try to call method \"$meth\" in package \"$pack\"." );
-	try
-	{
-		return( $self->$pack->$meth ) if( !scalar( @_ ) );
-		return( $self->$pack->$meth( @_ ) );
-	}
-	catch( $e )
-	{
-		return( $self->error( "An error occurred while trying to call Apache ", ucfirst( $pack ), " method \"$meth\": $e" ) );
-	}
+    my $self = shift( @_ );
+    my $pack = shift( @_ ) || return( $self->error( "No Apache package name was provided to call method" ) );
+    my $meth = shift( @_ ) || return( $self->error( "No method name was provided to try!" ) );
+    my $r = Apache2::RequestUtil->request;
+    $r->log_error( "Net::API::REST::Request::_try to call method \"$meth\" in package \"$pack\"." );
+    try
+    {
+        return( $self->$pack->$meth ) if( !scalar( @_ ) );
+        return( $self->$pack->$meth( @_ ) );
+    }
+    catch( $e )
+    {
+        return( $self->error( "An error occurred while trying to call Apache ", ucfirst( $pack ), " method \"$meth\": $e" ) );
+    }
 }
 
 1;
@@ -1079,15 +1076,15 @@ Net::API::REST::Request - Apache2 Incoming Request Access and Manipulation
 
 =head1 SYNOPSIS
 
-	use Net::API::REST::Request;
-	## $r is the Apache2::RequestRec object
-	my $req = Net::API::REST::Request->new( request => $r, debug => 1 );
-	## or, to test it outside of a modperl environment:
-	my $req = Net::API::REST::Request->new( request => $r, debug => 1, checkonly => 1 );
+    use Net::API::REST::Request;
+    ## $r is the Apache2::RequestRec object
+    my $req = Net::API::REST::Request->new( request => $r, debug => 1 );
+    ## or, to test it outside of a modperl environment:
+    my $req = Net::API::REST::Request->new( request => $r, debug => 1, checkonly => 1 );
 
 =head1 VERSION
 
-    v0.8.3
+    v0.8.4
 
 =head1 DESCRIPTION
 
@@ -1165,7 +1162,7 @@ Given a boolean value, this enables the auto header or not. In the back, this ca
 
 If this is disabled, you need to make sure to manually update the counter, such as:
 
-	$req->connection->keepalives( $req->connection->keepalives + 1 );
+    $req->connection->keepalives( $req->connection->keepalives + 1 );
 
 See L<Apache2::RequestRec> for more information on this.
 
@@ -1173,11 +1170,11 @@ See L<Apache2::RequestRec> for more information on this.
 
 Returns an APR::Request::Param::Table object containing the POST data parameters of the Apache2::Request object.
 
-	my $body = $req->body;
+    my $body = $req->body;
 
 An optional name parameter can be passed to return the POST data parameter associated with the given name:
 
-	my $foo_body = $req->body("foo");
+    my $foo_body = $req->body("foo");
 
 This is similar to the C<param> method with slight difference. Check L<Apache2::Request> for more information.
 
@@ -1205,7 +1202,7 @@ Returns the client api version requested, if provided. This is set during the ob
 
 An example header to require api version 1.0 would be:
 
-	Accept: application/json; version=1.0; encoding=utf-8
+    Accept: application/json; version=1.0; encoding=utf-8
 
 =head2 close()
 
@@ -1223,8 +1220,8 @@ From the L<Apache2::RequestRec> documentation:
 
 Usually you will set this value indirectly by returning the status code as the handler's function result.  However, there are rare instances when you want to trick Apache into thinking that the module returned an "Apache2::Const::OK" status code, but actually send the browser a non-OK status. This may come handy when implementing an HTTP proxy handler.  The proxy handler needs to send to the client, whatever status code the proxied server has returned, while returning "Apache2::Const::OK" to Apache. e.g.:
 
-	$req->status( $some_code );
-	return( Apache2::Const::OK );
+    $req->status( $some_code );
+    return( Apache2::Const::OK );
 
 =head2 connection()
 
@@ -1292,13 +1289,13 @@ The difference between "headers_out" and "err_headers_out", is that the latter a
 
 For example, if a handler wants to return a 404 response, but nevertheless to set a cookie, it has to be:
 
-	$r->err_headers_out->add( 'Set-Cookie' => $cookie );
-	return( Apache2::Const::NOT_FOUND );
+    $r->err_headers_out->add( 'Set-Cookie' => $cookie );
+    return( Apache2::Const::NOT_FOUND );
 
 If the handler does:
 
-	$r->headers_out->add( 'Set-Cookie' => $cookie );
-	return( Apache2::Const::NOT_FOUND );
+    $r->headers_out->add( 'Set-Cookie' => $cookie );
+    return( Apache2::Const::NOT_FOUND );
 
 the C<Set-Cookie> header won't be sent.
 
@@ -1320,11 +1317,11 @@ See L<Apache2::RequestRec> for more information.
 
 Returns a reference to a list of handlers enabled for a given phase.
 
-	$handlers_list = $r->get_handlers( $hook_name );
+    $handlers_list = $r->get_handlers( $hook_name );
 
 Example, a list of handlers configured to run at the response phase:
 
-	my @handlers = @{ $r->get_handlers('PerlResponseHandler') || [] };
+    my @handlers = @{ $r->get_handlers('PerlResponseHandler') || [] };
 
 =head2 get_status_line()
 
@@ -1332,11 +1329,11 @@ Return the "Status-Line" for a given status code (excluding the HTTP-Version fie
 
 For example:
 
-	print( $req->get_status_line( 400 ) );
+    print( $req->get_status_line( 400 ) );
 
 will print:
 
-	400 Bad Request
+    400 Bad Request
 
 =head2 global_request()
 
@@ -1362,7 +1359,7 @@ Returns the list of headers as a json data
 
 Returns the list of the headers as hash or the individual value of a header:
 
-	my $cookie = $r->headers_in->{Cookie} || '';
+    my $cookie = $r->headers_in->{Cookie} || '';
 
 =head2 headers_out( name, [ value ] )
 
@@ -1404,53 +1401,53 @@ Returns the value of the http header C<If-None-Match>
 
 Get/set the first filter in a linked list of request level input filters. It returns a L<Apache2::Filter> object.
 
-	$input_filters      = $r->input_filters();
-	$prev_input_filters = $r->input_filters( $new_input_filters );
+    $input_filters      = $r->input_filters();
+    $prev_input_filters = $r->input_filters( $new_input_filters );
 
 According to the L<Apache2::RequestRec> documentation:
 
 For example instead of using C<$r->read()> to read the POST data, one could use an explicit walk through incoming bucket brigades to get that data. The following function C<read_post()> does just that (in fact that's what C<$r->read()> does behind the scenes):
 
-	 use APR::Brigade ();
-	 use APR::Bucket ();
-	 use Apache2::Filter ();
+     use APR::Brigade ();
+     use APR::Bucket ();
+     use Apache2::Filter ();
 
-	 use Apache2::Const -compile => qw(MODE_READBYTES);
-	 use APR::Const    -compile => qw(SUCCESS BLOCK_READ);
+     use Apache2::Const -compile => qw(MODE_READBYTES);
+     use APR::Const    -compile => qw(SUCCESS BLOCK_READ);
 
-	 use constant IOBUFSIZE => 8192;
+     use constant IOBUFSIZE => 8192;
 
-	 sub read_post {
-		 my $r = shift;
+     sub read_post {
+         my $r = shift;
 
-		 my $bb = APR::Brigade->new($r->pool,
-									$r->connection->bucket_alloc);
+         my $bb = APR::Brigade->new($r->pool,
+                                    $r->connection->bucket_alloc);
 
-		 my $data = '';
-		 my $seen_eos = 0;
-		 do {
-			 $r->input_filters->get_brigade($bb, Apache2::Const::MODE_READBYTES,
-											APR::Const::BLOCK_READ, IOBUFSIZE);
+         my $data = '';
+         my $seen_eos = 0;
+         do {
+             $r->input_filters->get_brigade($bb, Apache2::Const::MODE_READBYTES,
+                                            APR::Const::BLOCK_READ, IOBUFSIZE);
 
-			 for (my $b = $bb->first; $b; $b = $bb->next($b)) {
-				 if ($b->is_eos) {
-					 $seen_eos++;
-					 last;
-				 }
+             for (my $b = $bb->first; $b; $b = $bb->next($b)) {
+                 if ($b->is_eos) {
+                     $seen_eos++;
+                     last;
+                 }
 
-				 if ($b->read(my $buf)) {
-					 $data .= $buf;
-				 }
+                 if ($b->read(my $buf)) {
+                     $data .= $buf;
+                 }
 
-				 $b->remove; # optimization to reuse memory
-			 }
+                 $b->remove; # optimization to reuse memory
+             }
 
-		 } while (!$seen_eos);
+         } while (!$seen_eos);
 
-		 $bb->destroy;
+         $bb->destroy;
 
-		 return $data;
-	 }
+         return $data;
+     }
 
 As you can see C<$r->input_filters> gives us a pointer to the last of the top of the incoming filters stack.
 
@@ -1465,7 +1462,7 @@ Check whether a directory level "PerlOptions" flag is enabled or not. This retur
 
 For example to check whether the "SetupEnv" option is enabled for the current request (which can be disabled with "PerlOptions -SetupEnv") and populate the environment variables table if disabled:
 
-	 $r->subprocess_env unless $r->is_perl_option_enabled('SetupEnv');
+     $r->subprocess_env unless $r->is_perl_option_enabled('SetupEnv');
 
 See also: PerlOptions and the equivalent function for server level PerlOptions flags.
 
@@ -1479,21 +1476,21 @@ Returns a C<JSON> object with the C<relaxed> attribute enabled so that it allows
 
 This method answers the question: Should the the connection be kept alive for another HTTP request after the current request is completed?
 
-	 use Apache2::Const -compile => qw(:conn_keepalive);
-	 ...
-	 my $c = $r->connection;
-	 if ($c->keepalive == Apache2::Const::CONN_KEEPALIVE) {
-		 # do something
-	 }
-	 elsif ($c->keepalive == Apache2::Const::CONN_CLOSE) {
-		 # do something else
-	 }
-	 elsif ($c->keepalive == Apache2::Const::CONN_UNKNOWN) {
-		 # do yet something else
-	 }
-	 else {
-		 # die "unknown state";
-	 }
+     use Apache2::Const -compile => qw(:conn_keepalive);
+     ...
+     my $c = $r->connection;
+     if ($c->keepalive == Apache2::Const::CONN_KEEPALIVE) {
+         # do something
+     }
+     elsif ($c->keepalive == Apache2::Const::CONN_CLOSE) {
+         # do something else
+     }
+     elsif ($c->keepalive == Apache2::Const::CONN_UNKNOWN) {
+         # do yet something else
+     }
+     else {
+         # die "unknown state";
+     }
 
 Notice that new states could be added later by Apache, so your code should make no assumptions and do things only if the desired state matches.
 
@@ -1567,8 +1564,8 @@ Returns a L<Apache2::RequestRec> blessed reference to the next (internal) reques
 
 Add/remove cache control headers. A true value sets the "no_cache" request record member to a true value and inserts:
 
-	 Pragma: no-cache
-	 Cache-control: no-cache
+     Pragma: no-cache
+     Cache-control: no-cache
 
 into the response headers, indicating that the data being returned is volatile and the client should not cache it.
 
@@ -1596,22 +1593,22 @@ According to the L<Apache::RequestRec> documentation:
 
 For example instead of using C<$r->print()> to send the response body, one could send the data directly to the first output filter. The following function C<send_response_body()> does just that:
 
-	 use APR::Brigade ();
-	 use APR::Bucket ();
-	 use Apache2::Filter ();
+     use APR::Brigade ();
+     use APR::Bucket ();
+     use Apache2::Filter ();
 
-	 sub send_response_body 
-	 {
-		 my( $r, $data ) = @_;
+     sub send_response_body 
+     {
+         my( $r, $data ) = @_;
 
-		 my $bb = APR::Brigade->new( $r->pool,
-									 $r->connection->bucket_alloc );
+         my $bb = APR::Brigade->new( $r->pool,
+                                     $r->connection->bucket_alloc );
 
-		 my $b = APR::Bucket->new( $bb->bucket_alloc, $data );
-		 $bb->insert_tail( $b );
-		 $r->output_filters->fflush( $bb );
-		 $bb->destroy;
-	 }
+         my $b = APR::Bucket->new( $bb->bucket_alloc, $data );
+         $bb->insert_tail( $b );
+         $r->output_filters->fflush( $bb );
+         $bb->destroy;
+     }
 
 In fact that's what C<$r->read()> does behind the scenes. But it also knows to parse HTTP headers passed together with the data and it also implements buffering, which the above function does not.
        
@@ -1647,18 +1644,18 @@ For an in-depth discussion, refer to the Apache Server Configuration Customizati
 
 Share Perl variables between Perl HTTP handlers.
 
-	 # to share variables by value and not reference, $val should be a lexical.
-	 $old_val  = $r->pnotes( $key => $val );
-	 $val      = $r->pnotes( $key );
-	 $hash_ref = $r->pnotes();
+     # to share variables by value and not reference, $val should be a lexical.
+     $old_val  = $r->pnotes( $key => $val );
+     $val      = $r->pnotes( $key );
+     $hash_ref = $r->pnotes();
 
 Note: sharing variables really means it. The variable is not copied.  Only its reference count is incremented. If it is changed after being put in pnotes that change also affects the stored value. The following example illustrates the effect:
 
-	 my $v=1;                     my $v=1;
-	 $r->pnotes( 'v'=>$v );       $r->pnotes->{v}=$v;
-	 $v++;                        $v++;
-	 my $x=$r->pnotes('v');       my $x=$r->pnotes->{v};
-	 
+     my $v=1;                     my $v=1;
+     $r->pnotes( 'v'=>$v );       $r->pnotes->{v}=$v;
+     $v++;                        $v++;
+     my $x=$r->pnotes('v');       my $x=$r->pnotes->{v};
+     
 =head2 pool()
 
 Returns the pool associated with the request as a L<APR::Pool> object.
@@ -1689,21 +1686,21 @@ According to the L<Apache2::RequestRec> documentation:
 
 For example to turn a normal request into a proxy request to be handled on the same server in the "PerlTransHandler" phase run:
 
-	 my $real_url = $r->unparsed_uri;
-	 $r->proxyreq(Apache2::Const::PROXYREQ_PROXY);
-	 $r->uri($real_url);
-	 $r->filename("proxy:$real_url");
-	 $r->handler('proxy-server');
+     my $real_url = $r->unparsed_uri;
+     $r->proxyreq(Apache2::Const::PROXYREQ_PROXY);
+     $r->uri($real_url);
+     $r->filename("proxy:$real_url");
+     $r->handler('proxy-server');
 
 Also remember that if you want to turn a proxy request into a non-proxy request, it's not enough to call:
 
-	 $r->proxyreq(Apache2::Const::PROXYREQ_NONE);
+     $r->proxyreq(Apache2::Const::PROXYREQ_NONE);
 
 You need to adjust "$r->uri" and "$r->filename" as well if you run that code in "PerlPostReadRequestHandler" phase, since if you don't -- "mod_proxy"'s own post_read_request handler will override your settings (as it will run after the mod_perl handler).
 
 And you may also want to add
 
-	 $r->set_handlers(PerlResponseHandler => []);
+     $r->set_handlers(PerlResponseHandler => []);
 
 so that any response handlers which match apache directives will not run in addition to the mod_proxy content handler.
 
@@ -1711,8 +1708,8 @@ so that any response handlers which match apache directives will not run in addi
 
 Add one or more handlers to a list of handlers to be called for a given phase.
 
-	 $ok = $r->push_handlers($hook_name => \&handler);
-	 $ok = $r->push_handlers($hook_name => ['Foo::Bar::handler', \&handler2]);
+     $ok = $r->push_handlers($hook_name => \&handler);
+     $ok = $r->push_handlers($hook_name => ['Foo::Bar::handler', \&handler2]);
 
 It returns a true value on success, otherwise a false value
 
@@ -1720,15 +1717,15 @@ Examples:
 
 A single handler:
 
-	 $r->push_handlers(PerlResponseHandler => \&handler);
+     $r->push_handlers(PerlResponseHandler => \&handler);
 
 Multiple handlers:
 
-	 $r->push_handlers(PerlFixupHandler => ['Foo::Bar::handler', \&handler2]);
+     $r->push_handlers(PerlFixupHandler => ['Foo::Bar::handler', \&handler2]);
 
 Anonymous functions:
 
-	 $r->push_handlers(PerlLogHandler => sub { return Apache2::Const::OK });
+     $r->push_handlers(PerlLogHandler => sub { return Apache2::Const::OK });
 
 See L<Apache::RequestUtil> for more information.
 
@@ -1746,8 +1743,8 @@ This get/set the request QUERY string.
 
 Read data from the client and returns the number of characters actually read.
 
-	 $cnt = $r->read($buffer, $len);
-	 $cnt = $r->read($buffer, $len, $offset);
+     $cnt = $r->read($buffer, $len);
+     $cnt = $r->read($buffer, $len, $offset);
 
 This method shares a lot of similarities with the Perl core C<read()> function. The main difference in the error handling, which is done via L<APR::Error> exceptions
 
@@ -1821,7 +1818,7 @@ See L<Apache2::RequestUtil> for more information.
 
 Populate the incoming request headers table ("headers_in") with authentication headers for Basic Authorization as if the client has submitted those in first place:
 
-	$r->set_basic_credentials( $username, $password );
+    $r->set_basic_credentials( $username, $password );
 
 See L<Apache2::RequestUtil> for more information.
 
@@ -1831,10 +1828,10 @@ Set a list of handlers to be called for a given phase. Any previously set handle
 
 See L<Apache2::RequestUtil> for more information.
 
-	 $ok = $r->set_handlers($hook_name => \&handler);
-	 $ok = $r->set_handlers($hook_name => ['Foo::Bar::handler', \&handler2]);
-	 $ok = $r->set_handlers($hook_name => []);
-	 $ok = $r->set_handlers($hook_name => undef);
+     $ok = $r->set_handlers($hook_name => \&handler);
+     $ok = $r->set_handlers($hook_name => ['Foo::Bar::handler', \&handler2]);
+     $ok = $r->set_handlers($hook_name => []);
+     $ok = $r->set_handlers($hook_name => undef);
 
 =head2 slurp_filename()
 
@@ -1873,15 +1870,15 @@ According to the L<Apache2::RequestRec> documentation:
 
 When discussing C<$r->status> we have mentioned that sometimes a handler runs to a successful completion, but may need to return a different code, which is the case with the proxy server. Assuming that the proxy handler forwards to the client whatever response the proxied server has sent, it'll usually use C<status_line()>, like so:
 
-	 $r->status_line( $response->code() . ' ' . $response->message() );
-	 return( Apache2::Const::OK );
+     $r->status_line( $response->code() . ' ' . $response->message() );
+     return( Apache2::Const::OK );
 
 In this example $response could be for example an "HTTP::Response" object, if "LWP::UserAgent" was used to implement the proxy.
 
 This method is also handy when you extend the HTTP protocol and add new response codes. For example you could invent a new error code and tell Apache to use that in the response like so:
 
-	 $r->status_line( "499 We have been FooBared" );
-	 return( Apache2::Const::OK );
+     $r->status_line( "499 We have been FooBared" );
+     return( Apache2::Const::OK );
 
 Here 499 is the new response code, and We have been FooBared is the custom response message.
 
@@ -1897,33 +1894,33 @@ When called in a non-VOID context with no arguments, it returns an "APR::Table o
 
 When the $key argument (string) is passed, it returns the corresponding value (if such exists, or "undef". The following two lines are equivalent:
 
-	 $val = $r->subprocess_env($key);
-	 $val = $r->subprocess_env->get($key);
+     $val = $r->subprocess_env($key);
+     $val = $r->subprocess_env->get($key);
 
 When the $key and the $val arguments (strings) are passed, the value is set. The following two lines are equivalent:
 
-	 $r->subprocess_env($key => $val);
-	 $r->subprocess_env->set($key => $val);
+     $r->subprocess_env($key => $val);
+     $r->subprocess_env->set($key => $val);
 
 The "subprocess_env" "table" is used by "Apache2::SubProcess", to pass environment variables to externally spawned processes. It's also used by various Apache modules, and you should use this table to pass the environment variables. For example if in "PerlHeaderParserHandler" you do:
 
-	  $r->subprocess_env(MyLanguage => "de");
+      $r->subprocess_env(MyLanguage => "de");
 
 you can then deploy "mod_include" and write in .shtml document:
 
-	  <!--#if expr="$MyLanguage = en" -->
-	  English
-	  <!--#elif expr="$MyLanguage = de" -->
-	  Deutsch
-	  <!--#else -->
-	  Sorry
-	  <!--#endif -->
+      <!--#if expr="$MyLanguage = en" -->
+      English
+      <!--#elif expr="$MyLanguage = de" -->
+      Deutsch
+      <!--#else -->
+      Sorry
+      <!--#endif -->
 
 =head2 the_request()
 
 Get or set the first HTTP request header as a string. For example:
 
-	GET /foo/bar/my_path_info?args=3 HTTP/1.0
+    GET /foo/bar/my_path_info?args=3 HTTP/1.0
 
 =head2 type()
 
@@ -1935,15 +1932,15 @@ The URI without any parsing performed.
 
 If for example the request was:
 
-	 GET /foo/bar/my_path_info?args=3 HTTP/1.0
+     GET /foo/bar/my_path_info?args=3 HTTP/1.0
 
 "$r->uri" returns:
 
-	 /foo/bar/my_path_info
+     /foo/bar/my_path_info
 
 whereas "$r->unparsed_uri" returns:
 
-	 /foo/bar/my_path_info?args=3
+     /foo/bar/my_path_info?args=3
 
 =head2 uri()
 
@@ -1959,9 +1956,9 @@ Get the user name, if an authentication process was successful. Or set it.
 
 For example, let's print the username passed by the client:
 
-	 my( $res, $sent_pw ) = $req->get_basic_auth_pw;
-	 return( $res ) if( $res != Apache2::Const::OK );
-	 print( "User: ", $r->user );
+     my( $res, $sent_pw ) = $req->get_basic_auth_pw;
+     return( $res ) if( $res != Apache2::Const::OK );
+     print( "User: ", $r->user );
 
 =head2 user_agent()
 
@@ -1971,7 +1968,7 @@ Returns the user agent, ie the browser signature as provided in the request head
 
 When parsing the endpoint sought by the client request, there may be some variable such as:
 
-	/org/jp/llc/12/directors/23/profile
+    /org/jp/llc/12/directors/23/profile
 
 In this case, llc has an id value of 12 and the director an id value of 23. They will be recorded as variables as instructed by the route map set by the package using L<Net::API::REST>
 

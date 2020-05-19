@@ -1,4 +1,4 @@
-package Mojo::Base::Role::PromiseClass 0.008;
+package Mojo::Base::Role::PromiseClass 0.009;
 
 # ABSTRACT: Add promise_class attribute to Mojo class
 
@@ -31,7 +31,7 @@ Mojo::Base::Role::PromiseClass - Add promise_class attribute to Mojo class
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -69,7 +69,7 @@ This role only provides methods to access and manipulate the promise_class; it d
 
 =head1 ATTRIBUTES
 
-L<Mojo::UserAgent::Role::PromiseClass> implements the following attributes.
+L<Mojo::Base::Role::PromiseClass> implements the following attributes.
 
 =head2 promise_class
 
@@ -80,7 +80,7 @@ Get or set the C<$object>'s preferred promise class.
 
 =head1 METHODS
 
-L<Mojo::UserAgent::Role::PromiseClass> supplies the following methods:
+L<Mojo::Base::Role::PromiseClass> supplies the following methods:
 
 =head2 promise_roles
 

@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use Scalar::Util ();
 
-BEGIN { use_ok( 'Getopt::Class' ); }
+BEGIN { use_ok( 'Getopt::Class' ) || BAIL_OUT( "Unable to load Getopt::Class" ); }
 
 our( $dict, $DEBUG, $VERBOSE, $VERSION, $HELP, $MAN );
 

@@ -2,8 +2,8 @@ NAME
     App::wordlist - Grep words from WordList::*
 
 VERSION
-    This document describes version 0.269 of App::wordlist (from Perl
-    distribution App-wordlist), released on 2020-05-04.
+    This document describes version 0.270 of App::wordlist (from Perl
+    distribution App-wordlist), released on 2020-05-18.
 
 SYNOPSIS
     See the included script wordlist.
@@ -104,6 +104,14 @@ FUNCTIONS
     *   or => *bool*
 
         Match any word in query instead of the default "all".
+
+    *   random => *bool*
+
+        Pick random words.
+
+        If set to true, then streaming will be turned off. All words will be
+        gathered first, then words will be chosen randomly from the gathered
+        list.
 
     *   wordlists => *array[str]*
 

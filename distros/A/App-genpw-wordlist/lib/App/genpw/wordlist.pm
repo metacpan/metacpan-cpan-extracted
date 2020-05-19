@@ -1,7 +1,7 @@
 package App::genpw::wordlist;
 
-our $DATE = '2018-01-09'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2020-05-18'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -63,7 +63,8 @@ sub genpw {
     );
     return $res unless $res->[0] == 200;
 
-    my @words = shuffle @{ $res->[2] };
+    my @words; while (defined(my $word = $res->[2]->())) { push @words, $word }
+    @words = shuffle @words;
     App::genpw::genpw(
         %args,
         patterns => $patterns,
@@ -86,7 +87,7 @@ App::genpw::wordlist - Generate password with words from WordList::*
 
 =head1 VERSION
 
-This document describes version 0.004 of App::genpw::wordlist (from Perl distribution App-genpw-wordlist), released on 2018-01-09.
+This document describes version 0.005 of App::genpw::wordlist (from Perl distribution App-genpw-wordlist), released on 2020-05-18.
 
 =head1 SYNOPSIS
 
@@ -99,7 +100,7 @@ See the included script L<genpw-wordlist>.
 
 Usage:
 
- genpw(%args) -> [status, msg, result, meta]
+ genpw(%args) -> [status, msg, payload, meta]
 
 Generate password with words from WordList::*.
 
@@ -143,15 +144,20 @@ be used as-is. Available conversions:
 
  %l   Random Latin letter (A-Z, a-z)
  %d   Random digit (0-9)
+ %h   Random hexdigit (0-9a-f)
  %a   Random letter/digit (Alphanum) (A-Z, a-z, 0-9; combination of %l and %d)
  %s   Random ASCII symbol, e.g. "-" (dash), "_" (underscore), etc.
  %x   Random letter/digit/ASCII symbol (combination of %a and %s)
+ %m   Base64 character (A-Z, a-z, 0-9, +, /)
+ %b   Base58 character (A-Z, a-z, 0-9 minus IOl0)
+ %B   Base56 character (A-Z, a-z, 0-9 minus IOol01)
  %%   A literal percent sign
  %w   Random word
 
 =item * B<wordlists> => I<array[str]>
 
 Select one or more wordlist modules.
+
 
 =back
 
@@ -160,7 +166,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -192,7 +198,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

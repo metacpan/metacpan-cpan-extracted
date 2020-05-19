@@ -1,6 +1,14 @@
   LICENSE ISSUES
   ==============
 
+  Crypt-OpenSSL-Verify is licensed under the Perl_5 license in as much as
+  the code was taken from the former Crypt-OpenSSL-VerifyX509 and was original
+  code or code written from Perl documentation examples.  However, the _new,
+  verify and other functions takes code from the OpenSSL source.  That code is
+  covered under the following licenses.  I hope that is not a problem for you.
+  If is, that kind of sucks, but theres not much to be done about it now.
+
+
   The OpenSSL toolkit stays under a double license, i.e. both the conditions of
   the OpenSSL License and the original SSLeay license apply to the toolkit.
   See below for the actual license texts.

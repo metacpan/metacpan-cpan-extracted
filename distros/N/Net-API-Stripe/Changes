@@ -20,3 +20,8 @@ Revision history for Perl module Net::API::Stripe
 1.0 2020-04-25
     Updated the formatting of the documentation	
 	Added the Net::API::Stripe::Number::Format in replacement of the dependence on Number::Format due to obscure bug under modperl and that Number::Format croaks
+1.0.1 2020-05-14
+	Replaced Net::API::Stripe::Number and Net::API::Stripe::Number::Format by Module::Generic::Number
+	Added the new Net::API::Stripe::Price added to the Stripe api.
+1.0.3 2020-05-16
+	Minor changes to documentation

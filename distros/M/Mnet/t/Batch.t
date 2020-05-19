@@ -33,7 +33,6 @@ Mnet::T::test_perl({
         line = arg1
         line = arg2 arg3
     ',
-    debug   => '',
 });
 
 # batch with mnet cli
@@ -67,7 +66,6 @@ Mnet::T::test_perl({
         opt1 = 1, opt2 = 1
         opt1 = 2, opt2 = 3
     ',
-    debug   => '',
 });
 
 # batch with mnet cli and extras
@@ -103,7 +101,6 @@ Mnet::T::test_perl({
         opt = 2
         extras = parent
     ',
-    debug   => '',
 });
 
 # finished

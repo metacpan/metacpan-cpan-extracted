@@ -7,7 +7,7 @@ use Alien::Build::Util qw( _has_ssl );
 use Carp ();
 
 # ABSTRACT: Download negotiation plugin
-our $VERSION = '2.22'; # VERSION
+our $VERSION = '2.23'; # VERSION
 
 
 has '+url' => undef;
@@ -194,7 +194,7 @@ Alien::Build::Plugin::Download::Negotiate - Download negotiation plugin
 
 =head1 VERSION
 
-version 2.22
+version 2.23
 
 =head1 SYNOPSIS
 

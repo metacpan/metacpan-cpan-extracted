@@ -1,0 +1,6 @@
+^blib
+^pm_to_blib
+^\.git
+README.*
+MANIFEST.bak
+template.erb

@@ -15,9 +15,10 @@ use Getopt::Alt;
 use App::VTide::Config;
 use App::VTide::Hooks;
 use Path::Tiny;
+use File::Touch;
 use YAML::Syck qw/ LoadFile DumpFile /;
 
-our $VERSION = version->new('0.1.10');
+our $VERSION = version->new('0.1.11');
 
 has config => (
     is      => 'rw',
@@ -150,6 +151,10 @@ sub _sub_commands {
 
     mkdir $sub_file->parent if ! -d $sub_file->parent;
 
+    if ( -f $sub_file && path($0)->stat->mtime ne $sub_file->stat->mtime ) {
+        unlink $sub_file;
+    }
+
     return LoadFile("$sub_file") if -f $sub_file;
 
     return $self->_generate_sub_command();
@@ -170,6 +175,7 @@ sub _generate_sub_command {
     }
 
     DumpFile($sub_file, $sub_commands);
+    File::Touch->new(reference => $0)->touch($sub_file);
 
     return $sub_commands;
 }
@@ -184,7 +190,7 @@ App::VTide - A vim/tmux based IDE for the terminal
 
 =head1 VERSION
 
-This documentation refers to App::VTide version 0.1.10
+This documentation refers to App::VTide version 0.1.11
 
 =head1 SYNOPSIS
 

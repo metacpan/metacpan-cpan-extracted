@@ -79,11 +79,11 @@ Given a string, this return a new L<Module::Generic::Scalar> object with the fir
 
 =head2 length
 
-This returns the length of the string.
+This returns the length of the string, as a L<Module::Generic::Number> object.
 
 =head2 ord
 
-This returns the value of L<perlfunc/"ord"> on the string.
+This returns the value of L<perlfunc/"ord"> on the string, as a L<Module::Generic::Number> object.
 
 =head2 quotemeta
 
@@ -111,7 +111,7 @@ This acts the exact same way as for L</"new">, except it acts on the current obj
 
 =head2 split
 
-Provided with a string or an expression and this returns the result.
+Provided with a string or an expression and this returns the list in list context or, in scalar context, an array reference as an L<Module::Generic::Array> object.
 
 =head2 sprintf
 
@@ -130,6 +130,10 @@ Given a string, this return a new L<Module::Generic::Scalar> object with the str
 =head2 ucfirst
 
 Given a string, this return a new L<Module::Generic::Scalar> object with the first character of the string in upper case.
+
+=head1 SEE ALSO
+
+L<Module::Generic::Number>, L<Module::Generic::Array>, L<Module::Generic::Boolean>, L<Module::Generic::Hash>, L<Module::Generic::Dynamic>
 
 =head1 AUTHOR
 

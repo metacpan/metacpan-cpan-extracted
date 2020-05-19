@@ -11,7 +11,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Metadata: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 keywords:
   - parser
   - obo
@@ -30,12 +30,14 @@ no_index:
 provides:
   obogaf::parser:
     file: lib/obogaf/parser.pm
-    version: '1.272'
+    version: '1.373'
 requires:
   Graph: '0'
+  IO::File: '0'
+  List::MoreUtils: '0'
   PerlIO::gzip: '0'
   perl: '5.006'
 resources:
   repository: git://github.com/marconotaro/obogaf-parser.git
-version: '1.272'
+version: '1.373'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

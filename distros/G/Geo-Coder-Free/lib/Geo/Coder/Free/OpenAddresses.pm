@@ -23,12 +23,14 @@ use Storable;
 
 #  Some locations aren't found because of inconsistencies in the way things are stored - these are some values I know
 # FIXME: Should be in a configuration file
-my %known_locations = (
+our %known_locations = (
 	'Newport Pagnell, Buckinghamshire, England' => {
 		'latitude' => 52.08675,
 		'longitude' => -0.72270
 	},
 );
+
+our %unknown_locations;
 
 use constant	LIBPOSTAL_UNKNOWN => 0;
 use constant	LIBPOSTAL_INSTALLED => 1;
@@ -885,6 +887,10 @@ sub _get {
 	$location =~ s/,\s*//g;
 	# ::diag("_get: $location");
 	my $digest = substr Digest::MD5::md5_base64(uc($location)), 0, 16;
+
+	if(defined($unknown_locations{$digest})) {
+		return;
+	}
 	# my @call_details = caller(0);
 	# print "line ", $call_details[2], "\n";
 	# print "$location: $digest\n";
@@ -926,6 +932,8 @@ sub _get {
 
 		return $rc;
 	}
+	$unknown_locations{$digest} = 1;
+	return;
 }
 
 =head2	reverse_geocode

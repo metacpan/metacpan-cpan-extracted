@@ -4,7 +4,7 @@ use strict;
 use warnings FATAL => 'all';
 use base qw(Exporter);
 
-our $VERSION = '1.004001';
+our $VERSION = '1.004002';
 $VERSION =~ tr/_//d;
 
 sub _choose_json_module {
@@ -121,7 +121,8 @@ JSON::MaybeXS - Use L<Cpanel::JSON::XS> with a fallback to L<JSON::XS> and L<JSO
 =head1 DESCRIPTION
 
 This module first checks to see if either L<Cpanel::JSON::XS> or
-L<JSON::XS> is already loaded, in which case it uses that module. Otherwise
+L<JSON::XS> (at at least version 3.0)
+is already loaded, in which case it uses that module. Otherwise
 it tries to load L<Cpanel::JSON::XS>, then L<JSON::XS>, then L<JSON::PP>
 in order, and either uses the first module it finds or throws an error.
 

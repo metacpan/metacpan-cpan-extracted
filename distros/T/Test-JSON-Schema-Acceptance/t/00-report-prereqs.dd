@@ -61,8 +61,8 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'Module::Metadata' => '0',
                                    'Test::Deep' => '0',
                                    'Test::File::ShareDir' => '0',
                                    'Test::More' => '0.88',
@@ -108,6 +108,7 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::InstallGuide' => '1.200005',
                                            'Dist::Zilla::Plugin::Keywords' => '0.004',
                                            'Dist::Zilla::Plugin::License' => '5.038',
+                                           'Dist::Zilla::Plugin::MakeMaker' => '0',
                                            'Dist::Zilla::Plugin::Manifest' => '0',
                                            'Dist::Zilla::Plugin::MetaConfig' => '0',
                                            'Dist::Zilla::Plugin::MetaJSON' => '0',

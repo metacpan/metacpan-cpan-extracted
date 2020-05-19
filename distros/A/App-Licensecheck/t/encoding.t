@@ -17,11 +17,11 @@ path($CMD)->chmod('a+x') if ( $CMD eq 'bin/licensecheck' );
 
 my $data1 = encode(
 	'iso-8859-1',
-	"t/encoding/copr-utf8.h\tGPL (v2 or later)\t2004-2015 Oliva 'f00' Oberto / 2001-2010 Paul 'bar' Stevénsön\n"
+	"t/encoding/copr-utf8.h\tGNU General Public License v2.0 or later\t2004-2015 Oliva 'f00' Oberto / 2001-2010 Paul 'bar' Stevénsön\n"
 );
 my $data2 = encode(
 	'iso-8859-1',
-	"t/encoding/copr-iso8859.h\tGPL (v2) (with incorrect FSF address)\t2011 Heinrich Müller <henmull\@src.gnome.org>\n"
+	"t/encoding/copr-iso8859.h\tGNU General Public License, Version 2 (with incorrect FSF address)\t2011 Heinrich Müller <henmull\@src.gnome.org>\n"
 );
 my $data3 = encode(
 	'euc_jp',

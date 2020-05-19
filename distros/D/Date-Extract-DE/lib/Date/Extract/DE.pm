@@ -2,7 +2,7 @@ package Date::Extract::DE;
 
 use Moose;
 
-use version; our $VERSION = qv('0.0.3');
+use version; our $VERSION = qv('0.0.4');
 
 use Date::Range;
 use Date::Simple ( 'date', 'today' );
@@ -301,7 +301,7 @@ Date::Extract::DE -  Extract dates from german text
 
 =head1 VERSION
 
-0.0.3
+0.0.4
 
 =begin readme
 

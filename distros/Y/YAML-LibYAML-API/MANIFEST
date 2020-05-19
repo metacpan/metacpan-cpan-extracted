@@ -28,4 +28,5 @@ lib/YAML/LibYAML/API.pm
 t/00.compile.t
 t/10.basic.t
 t/11.anchors.t
+t/12.version.t
 t/data/simple.yaml

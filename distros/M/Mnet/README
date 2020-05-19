@@ -5,14 +5,15 @@ SYNOPSIS
         # sample script to report Loopback0 ip on cisco devices
         #
         #   demonstrates typical use of all major Mnet modules
-        #   refer to various Mnet modules' perldoc for complete api info
+        #   refer to various Mnet modules' perldoc for more info
         #
-        #   use --help to list all options, or --help <option>
-        #   use --device <address> to connect to device with logging
-        #   use --batch <file.batch> to process multiple --device lines
-        #   add --report csv:<file.csv> to create an output csv report
-        #   add --record <file.test> to create replayable test file
-        #   use --test --replay <file.test> to show script changes
+        #   --help to list all options, or --help <option>
+        #   --device <address> to connect to device with logging
+        #   --username and --password should be set if necessary
+        #   --batch <file.batch> to process multiple --device lines
+        #   --report csv:<file.csv> to create an output csv report
+        #   --record <file.test> to create replayable test file
+        #   --test --replay <file.test> for regression test output
 
         # load modules
         use warnings;
@@ -26,21 +27,21 @@ SYNOPSIS
         use Mnet::Test;
 
         # define --device, --username, --password, and --report cli options
-        #   record, default, redact, and help option attributes are shown
-        #   use the Mnet environment variable to securely set --password
+        #   record, redact, default, and help option attributes are shown
         Mnet::Opts::Cli::define({ getopt => "device=s", record => 1 });
-        Mnet::Opts::Cli::define({ getopt => "username=s", default => $ENV{USER} });
+        Mnet::Opts::Cli::define({ getopt => "username=s" });
         Mnet::Opts::Cli::define({ getopt => "password=s", redact  => 1 });
-        Mnet::Opts::Cli::define({ getopt => "report=s",
+        Mnet::Opts::Cli::define({ getopt => "report=s", default => undef,
             help_tip    => "specify report output, like 'csv:<file>'",
-            help_text   => "refer to Mnet::Report::Table for more info",
+            help_text   => "perldoc Mnet::Report::Table for more info",
         });
 
-        # parse command line and Mnet environment variable options
-        my $cli = Mnet::Opts::Cli->new;
+        # create object to access command line options and Mnet env variable
+        #   export Mnet="--password '<secret>'" env var to secure password
+        my $cli = Mnet::Opts::Cli->new("Mnet");
 
         # define output --report table, will include first of any errors
-        #   use --report cli opt to output data as csv, json, sql, etc
+        #   use --report cli opt to output data as csv, json, or sql, etc
         my $report = Mnet::Report::Table->new({
             columns => [
                 device  => "string",
@@ -50,22 +51,22 @@ SYNOPSIS
             output  => $cli->report,
         });
 
-        # read command line options, fork children if in --batch mode
+        # recreate cli option object, forking children if in --batch mode
         #   process one device or ten thousand devices with the same script
-        #   exit --batch parent process when finished forking children
+        #   exit --batch parent process here when finished forking children
         $cli = Mnet::Batch::fork($cli);
         exit if not $cli;
 
-        # ensure that errors are reported if script aborts before finishing
+        # ensure device error is reported if script dies before finishing
         $report->row_on_error({ device => $cli->device });
 
-        # use log function and set up log object for device
+        # use log function, set up log object for current --device
         FATAL("missing --device") if not $cli->device;
         my $log = Mnet::Log->new({ log_id => $cli->device });
         $log->info("processing device");
 
-        # create an expect ssh session to --device
-        #   log login authentication prompts as info, instead of default debug
+        # create an expect ssh session to current --device
+        #   log ssh login/auth prompts as info, instead of default debug
         #   password_in set to prompt for password if --password opt not set
         #   ssh host/key checks can be skipped, refer to Mnet::Expect::Cli
         my $ssh = Mnet::Expect::Cli::Ios->new({
@@ -76,14 +77,15 @@ SYNOPSIS
             password_in => 1,
         });
 
-        # retrieve config from ssh command, warn otherwise
+        # retrieve ios config using ssh command, warn otherwise
         my $config = $ssh->command("show running-config");
         WARN("unable to read config") if not $config;
 
-        # parse interface loopack0 stanza from config
-        my $loop = Mnet::Stanza::parse($config, qr/^interface loopback0$/i);
+        # parse interface loopack0 stanza from device config
+        #   returns int loop0 line and lines indented under int loop0
+        my $loop = Mnet::Stanza::parse($config, qr/^interface Loopback0$/);
 
-        # parse primary ip address from loopback0 config stanza
+        # parse primary ip address from loopback config stanza
         my $ip = undef;
         $ip = $1 if $loop and $loop =~ /^ ip address (\S+) \S+$/m;
 
@@ -100,11 +102,11 @@ DESCRIPTION
     The main features are:
 
     *   Record and replay connected command line sessions, speeding
-        development and allowing for regression testing of complex automation
+        development and allow for regression testing of complex automation
         scripts.
 
-    *   Reliable automation of cisco IOS and other command line sessions,
-        including reliable authentication and command prompt handling.
+    *   Reliable automation of cisco ios and other command line sessions,
+        including authentication and command prompt handling.
 
     *   Automation scripts can run in batch mode to concurrently process a
         list of devices, using a simple command line argument and a device
@@ -116,8 +118,7 @@ DESCRIPTION
     *   Flexible config settings via command line, environment variable,
         and/or batch device list files.
 
-    *   Report data from scripts can be output as plain .csv files, json, or
-        sql.
+    *   Report data from scripts can be output as csv, json, or sql.
 
     Most of the Mnet sub-modules can be used independently of each other,
     unless otherwise noted.
@@ -132,7 +133,7 @@ INSTALLATION
 
         cpan install Mnet
 
-    Or downloaded and installed from <https://github.com/menzascripting/Mnet>
+    Or download and install from <https://github.com/menzascripting/Mnet>
 
         tar -xzf Mnet-X.y.tar.gz
         cd Mnet-X.y
@@ -146,10 +147,11 @@ INSTALLATION
 
 AUTHOR
     The Mnet perl distribution has been created and is maintained by Mike
-    Menza. Mike can be reached via email at <mmenza@cpan.org>.
+    Menza. Feedback and bug reports are welcome, feel free to contact Mike via
+    email at <mmenza@cpan.org> with any comments or questions.
 
 COPYRIGHT AND LICENSE
-    Copyright 2006, 2013-2019 Michael J. Menza Jr.
+    Copyright 2006, 2013-2020 Michael J. Menza Jr.
 
     Mnet is free software: you can redistribute it and/or modify it under the
     terms of the GNU General Public License as published by the Free Software
@@ -175,13 +177,9 @@ SEE ALSO
 
     Mnet::Opts::Cli
 
-    Mnet::Opts::Set
-
     Mnet::Report::Table
 
     Mnet::Stanza
-
-    Mnet::Tee
 
     Mnet::Test
 

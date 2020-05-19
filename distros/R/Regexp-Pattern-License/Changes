@@ -7,15 +7,134 @@ Home page:    <https://metacpan.org/release/Regexp-Pattern-License>
 Bug tracker:  <https://bugs.debian.org/libregexp-pattern-license-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.3.1	2020-05-17
+
+ [ Bug Fixes ]
+ - annotate apostrophe
+ - avoid annotating decimal point as full stop
+ - consistently annotate slash as [/]
+ - disambiguate license patterns for objects agpl_2 agpl-3 gpl-2 gpl-3
+ - fix annotate apostrophe as such (not as quote)
+ - fix object wtfpl_2 license pattern
+ - fix trove caption for object mpl_2
+ - subject pattern name: fix make leading space of publisher optional
+ - synthesized trove label trait: include trailing space
+ - update license object cecill: add alternate IRI (not bogus URI)
+ - update object gpl_2: fix detect license preamble (to avoid misdetection
+   as LGPL-2)
+ - update object mit_advertising: fix double-escaped boundary marker in
+   patch (although seemingly didn't matter)
+
+ [ Documentation ]
+ - document tag license:contains:tag:*: extend to cover optional reference
+   to different license
+ - document tag license:includes:license:*
+ - fix include type:usage:*:* in list of possible single-license tags, and
+   order by inheritance complexity (not alphabetically)
+
+ [ Other ]
+ - Added: add license object qpl_1
+ - Added: add license objects aal abstyles adsl afmparse amdplpa antlr_pd
+ - Added: add license objects aml ampas ecl ecl_1 ecl_2 eupl eupl_1
+   eupl_1_1 eupl_1_2 lppl lppl_1 lppl_1_1 lppl_1_2 lppl_1_3a lppl_1_3c npl
+   npl_1 npl_1_1 oclc oclc_1 oclc_2 ogtsl osl osl_1 osl_1_1 osl_2 osl_2_1
+   osl_3 rpl rpl_1 rpl_1_1 rpl_1_3 rpl_1_5 rscpl ruby spl spl_1 sugarcrm
+   sugarcrm_1_1_3 unlicense watcom watcom_1
+ - Added: add license objects apl apl_1 apsl apsl_1 apsl_1_1 apsl_1_2
+   apsl_2
+ - Added: add license objects bahyph barr bittorrent bittorrent_1
+   bittorrent_1_1 borceux
+ - Added: add license objects bzip2 bzip2_1_0_5 bzip2_1_0_6
+ - Added: add license objects caldera catosl catosl_1_1
+ - Added: add license objects cnri_jython cnri_python
+   cnri_python_gpl_compat cpal cpal_1
+ - Added: add license objects cpol cpol_1_02 cryptix
+ - Added: add license objects cua_opl cua_opl_1
+ - Added: add license objects gfdl_1_1 gfdl_1_2 gfdl_1_3
+ - Added: add license objects gfdl_1_1_only gfdl_1_1_or_later gfdl_1_2_only
+   gfdl_1_2_or_later gfdl_1_3_only gfdl_1_3_or_later
+ - Added: add license patterns lgpl_2 lgpl-2_1 lgpl-3
+ - Added: add trait object version_only
+ - Added: add trait object version_suffix
+ - Added: add usage objects agpl_1_only agpl_1_or_later agpl_3_only
+   agpl_3_or_later
+ - Added: add usage objects gpl_1_only gpl_1_or_later gpl_2_only
+   gpl_2_or_later gpl_3_only gpl_3_or_later
+ - Added: add usage objects lgpl_2_only lgpl_2_or_later lgpl_2_1_only
+   lgpl_2_1_or_later lgpl_3_only lgpl_3_or_later
+ - annnotate less-than and greater-than as [<] [>] (not $LT $GT)
+ - annotate apostrophe as ['] (not $QA)
+ - annotate bullet as [*] (not $B)
+ - annotate colon with optional quotes as [:"] (not $CQ)
+ - annotate copyright sign as [c] (not $C)
+ - annotate dash or number as [-#] (not $ND)
+ - annotate dash or space as [- ] (not $SD)
+ - annotate dashes as [-] [ - ] (not $D $DD)
+ - annotate end-of-sentence and end-of-paragraph vertical space as [ ] [  ]
+   (not $E $EE)
+ - annotate exempli gratia and id est abbreviations as [eg] [ie]
+ - annotate full stop as [.] (not $F)
+ - annotate http(s) protocol as [http://] (not $HT)
+ - annotate optional slash or space as [/] (not $SL)
+ - annotate quote as ["] (not $Q)
+ - annotate quote or bullet as ["*] (not  $QB)
+ - annotate semicolon as [;] (not $SC)
+ - annotate start-of-sentence bullet or count as [*)] (not $BB)
+ - drop alternate british caption: covered by synthesized subject pattern
+ - extend gnu patterns to cover FSF online and postal addresses
+ - generalize use of semicolon as internal variable SC
+ - license objects: drop most custom subject pattern grant, superceded by
+   synthesized pattern
+ - license objects: drop most custom subject pattern name, superceded by
+   synthesized pattern
+ - optimize slightly: sort keys after grep (not before)
+ - relax internal variable gpl to cover lowercase 'license'
+ - singleversion objects: add field licenseversion, with decimal 0 if ever
+   used
+ - synthesize subject pattern name: compose affixes separately
+ - synthesize subject pattern name: cover british spelling licence
+ - synthesize subject pattern name: cover dash variations
+ - synthesize subject pattern name: cover embedded shortname
+ - synthesize subject pattern name: cover leading version
+ - synthesize subject pattern name: cover usage objects
+ - synthesize subject pattern name: optimize version matching
+ - synthesize subject pattern name: optimize: resolve publisher only once
+   per object
+ - synthesize subject pattern name: simplify: optimize: bundle names
+   together
+ - tighten match for quote character
+ - trait object version_prefix: cover word revision
+ - update combo object perl: add tags
+   license:includes:license:artistic_1_perl
+   license:includes:license:gpl_1_or_newer
+ - update combo object perl: improve coverage
+ - update group objects bsd mit: add name and caption for a BSD-style / an
+   MIT-style; cover a/an when synthesizing subject pattern
+ - update group objects bsd-2-clause bsd-3-clause bsd-4-clause: add
+   informal alternate names
+ - update license object bittorent_1_1: add tag
+   license:contains:grant:bittorrent_1
+ - update license object bsd_2_clause: tighten license pattern to exclude
+   Cryptix license
+ - update license object cpl_1: add iri and alternative caption
+ - update license object openssl: add tag license:contains:license:cryptix
+ - update license objects cddl_1 cddl_1_1: add alternative names and
+   captions
+ - update object bsd_3_clause: add a few more alternate captions
+ - update object licensed_under: cover trailing 'either'
+ - update object licensed_under: simplify pattern slightly
+ - update trait object licensed_under: cover 'available under'
+ - update trait object licensed_under: cover 'distribute it under'
+
 v3.3.0	2020-03-13
 
  [ Bug Fixes ]
+ - avoid synthesizing pattern grant from ambiguous name BSD for objects
+   bsd_2_clause bsd_3_clause
  - fix tag object llgpl as license:contains:license:lgpl_2_1 (not bogus
    license:contains:license:llgpl_2_1)
- - fix: avoid synthesizing pattern grant from ambiguous name BSD for
-   objects bsd_2_clause bsd_3_clause
- - fix: synthesize patterns in deterministic order
- - fix: tighten object zpl_2 pattern license to disambiguate from bsd
+ - synthesize patterns in deterministic order
+ - tighten object zpl_2 pattern license to disambiguate from bsd
 
  [ Other ]
  - add license patterns gpl-1 gpl-2 gpl-3

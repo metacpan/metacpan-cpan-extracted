@@ -8,7 +8,7 @@ sub MY::postamble
 return <<'POST'
 pure_all :: README.md
 
-README.md : lib/$(subst ::,/,$(NAME)).pm
+README.md : lib/DBIx/Perlish.pm
 	pod2markdown < $< > $@.tmp && $(MV) $@.tmp $@
 POST
 }

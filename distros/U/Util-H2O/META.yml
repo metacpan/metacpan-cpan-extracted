@@ -1,0 +1,37 @@
+---
+abstract: 'Hash to Object: turns hashrefs into objects with accessors for keys'
+author:
+  - 'Hauke D <haukex@zero-g.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Scalar::Util: '0'
+  Test::More: '1.302096'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Util-H2O
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Util::H2O:
+    file: lib/Util/H2O.pm
+    version: '0.06'
+requires:
+  Carp: '0'
+  Exporter: '5.58'
+  Hash::Util: '0.06'
+  Symbol: '0'
+  perl: '5.006000'
+resources:
+  bugtracker: https://github.com/haukex/Util-H2O/issues
+  homepage: https://github.com/haukex/Util-H2O
+  repository: https://github.com/haukex/Util-H2O.git
+version: '0.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

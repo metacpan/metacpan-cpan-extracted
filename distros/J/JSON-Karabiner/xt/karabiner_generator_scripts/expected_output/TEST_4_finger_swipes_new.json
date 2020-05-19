@@ -1,0 +1,129 @@
+{
+   "rules" : [
+      {
+         "description" : "Double tap left-shift to swipe right",
+         "manipulators" : [
+            {
+               "conditions" : [
+                  {
+                     "name" : "left_shift pressed",
+                     "type" : "variable_if",
+                     "value" : 1
+                  }
+               ],
+               "from" : {
+                  "key_code" : "left_shift"
+               },
+               "to" : [
+                  {
+                     "key_code" : "left_arrow",
+                     "modifiers" : [
+                        "shift",
+                        "control"
+                     ]
+                  }
+               ],
+               "type" : "basic"
+            },
+            {
+               "from" : {
+                  "key_code" : "left_shift"
+               },
+               "to" : [
+                  {
+                     "set_variable" : {
+                        "name" : "left_shift pressed",
+                        "value" : 1
+                     }
+                  },
+                  {
+                     "key_code" : "left_shift"
+                  }
+               ],
+               "to_delayed_action" : {
+                  "to_if_canceled" : [
+                     {
+                        "set_variable" : {
+                           "name" : "left_shift pressed",
+                           "value" : 0
+                        }
+                     }
+                  ],
+                  "to_if_invoked" : [
+                     {
+                        "set_variable" : {
+                           "name" : "left_shift pressed",
+                           "value" : 0
+                        }
+                     }
+                  ]
+               },
+               "type" : "basic"
+            }
+         ]
+      },
+      {
+         "description" : "Double tap right-shift to swipe left",
+         "manipulators" : [
+            {
+               "conditions" : [
+                  {
+                     "name" : "right_shift pressed",
+                     "type" : "variable_if",
+                     "value" : 1
+                  }
+               ],
+               "from" : {
+                  "key_code" : "right_shift"
+               },
+               "to" : [
+                  {
+                     "key_code" : "right_arrow",
+                     "modifiers" : [
+                        "shift",
+                        "control"
+                     ]
+                  }
+               ],
+               "type" : "basic"
+            },
+            {
+               "from" : {
+                  "key_code" : "right_shift"
+               },
+               "to" : [
+                  {
+                     "set_variable" : {
+                        "name" : "right_shift pressed",
+                        "value" : 1
+                     }
+                  },
+                  {
+                     "key_code" : "right_shift"
+                  }
+               ],
+               "to_delayed_action" : {
+                  "to_if_canceled" : [
+                     {
+                        "set_variable" : {
+                           "name" : "right_shift pressed",
+                           "value" : 0
+                        }
+                     }
+                  ],
+                  "to_if_invoked" : [
+                     {
+                        "set_variable" : {
+                           "name" : "right_shift pressed",
+                           "value" : 0
+                        }
+                     }
+                  ]
+               },
+               "type" : "basic"
+            }
+         ]
+      }
+   ],
+   "title" : "4 finger swipes"
+}

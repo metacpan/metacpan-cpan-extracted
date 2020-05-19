@@ -20,5 +20,6 @@ t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/coerce-rgb24_from_colorname_X_or_code.pm
+t/release-sah-schema.t
 t/schema-color-rgb24.t
 weaver.ini

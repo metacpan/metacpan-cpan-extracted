@@ -91,6 +91,9 @@ Test::Smoke::App::RunSmoke::run_smoke...
         '--sync_type' => 'copy',
         '--cdir'      => $cdir,
         '--verbose'   => 1,
+        # also test the new --pass_option switch
+        '-p'          => '-Dusesuperthreads',
+        '-p'          => '-Uusesuperfiles',
     );
     my $app = Test::Smoke::App::RunSmoke->new(
         Test::Smoke::App::Options->runsmoke_config()
@@ -111,7 +114,11 @@ Test::Smoke::App::RunSmoke::run_smoke...
     local *Test::Smoke::Smoker::ttylog = sub { };
     local *Test::Smoke::Smoker::tty    = sub { };
     local *Test::Smoke::Smoker::log    = sub { };
-    local *Test::Smoke::Smoker::smoke = sub { };
+    local *Test::Smoke::Smoker::smoke = sub {
+        my $self = shift;
+        my ($bldcfg) = @_;
+        ok($bldcfg->has_arg(qw( -Dusesuperthreads -Uusesuperfiles )), "Found extra arguments");
+    };
 
     # Replace this version of Test::Harness with a beta-version RT-118879
     my $thp = catfile(catdir($ddir, 'cpan', 'Test-Harness', 'lib', 'Test'), 'Harness.pm');

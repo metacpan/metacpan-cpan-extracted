@@ -23,13 +23,13 @@ my %LICENSES = (
 	'CC0-1.0'      => 'CC0-1.0',
 
 #	Custom                                  => 'UNKNOWN',
-	'EUPL-1.1'             => 'UNKNOWN',
-	'EUPL-1.2'             => 'UNKNOWN',
+	'EUPL-1.1'             => 'EUPL-1.1',
+	'EUPL-1.2'             => 'EUPL-1.2',
 	'BSD-2-Clause-FreeBSD' => 'BSD-2-clause',
 	'GFDL-1.2-or-later'    => 'GFDL-1.2+',
 	'GFDL-1.3-or-later'    => 'GFDL-1.3+',
 	'GPL-1.0-only'         => 'GPL-1',
-	'GPL-2.0-only'         => 'GPL-2 and/or LGPL',
+	'GPL-2.0-only'         => 'GPL-2',
 	'GPL-3.0-only'         => 'GPL-3',
 
 #	'LGPL-2.0'                              => 'LGPL-2',
@@ -42,12 +42,13 @@ my %LICENSES = (
 
 #	None                                    => 'UNKNOWN',
 	OpenSSL => 'Apache-1.0 and/or BSD-4-clause and/or OpenSSL',
-	'Artistic-1.0-Perl OR GPL-1.0-or-later' => 'Artistic or GPL-1+',
-	PostgreSQL                              => 'PostgreSQL',
-	'QPL-1.0'                               => 'QPL-1.0',
-	SSLeay                                  => 'BSD-2-clause and/or SSLeay',
-	SISSL                                   => 'UNKNOWN',
-	Zlib                                    => 'Zlib',
+	'Artistic-1.0-Perl OR GPL-1.0-or-later' =>
+		'Artistic or GPL-1+ and/or GPL-1',
+	PostgreSQL => 'PostgreSQL',
+	'QPL-1.0'  => 'QPL-1.0',
+	SSLeay     => 'SSLeay',
+	SISSL      => 'UNKNOWN',
+	Zlib       => 'Zlib',
 );
 
 my $workdir = Path::Tiny->tempdir( CLEANUP => ( not $ENV{PRESERVE} ) );

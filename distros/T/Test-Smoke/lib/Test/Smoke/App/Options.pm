@@ -195,6 +195,7 @@ sub runsmoke_config { # runsmoke.pl
             w32args(),
             w32cc(),
             w32make(),
+            pass_option(),
         ],
     );
 }
@@ -898,7 +899,7 @@ sub w32args {
 sub w32cc {
     return $opt->new(
         name => 'w32cc',
-        opt => '=s',
+        option => '=s',
         helptext => "The compiler on MSWin32.",
     );
 }
@@ -906,9 +907,26 @@ sub w32cc {
 sub w32make {
     return $opt->new(
         name => 'w32make',
-        opt => '=s',
+        option => '=s',
         default => 'dmake',
         helptext => "The make program on MSWin32.",
+    );
+}
+
+sub pass_option {
+    return $opt->new(
+        name => 'pass_option',
+        option => 'pass-option|p=s@',
+        default => [],
+        allow => sub {
+            my ($list) = @_;
+            return unless ref($list) eq 'ARRAY';
+            for my $to_pass (@$list) {
+                return unless $to_pass =~ m{^ - [DUA] .+ $}x;
+            }
+            return 1;
+        },
+        helptext => 'Pass these options to Configure.',
     );
 }
 

@@ -58,6 +58,7 @@ EXPECTED
 
 subtest "dump_images test", sub {
     dump_tests('dump_images', 't/image-parse.html', <<'EXPECTED');
+/Images/bg-gradient.png
 wango.jpg
 bongo.gif
 linked.gif
@@ -66,6 +67,9 @@ hacktober.jpg
 hacktober.jpg
 http://example.org/abs.tif
 
+images/logo.png
+inner.jpg
+outer.jpg
 EXPECTED
 };
 
@@ -109,7 +113,7 @@ EXPECTED
 
 subtest "dump_text test", sub {
     dump_tests('dump_text', 't/image-parse.html', <<'EXPECTED');
-Testing image extractionblargle And now, the dreaded wango  CNN   BBC Blongo!
+Testing image extractionblargle And now, the dreaded wango  CNN   BBC Blongo!Logo
 EXPECTED
 };
 

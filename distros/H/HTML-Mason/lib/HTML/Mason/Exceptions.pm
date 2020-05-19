@@ -1,5 +1,5 @@
 package HTML::Mason::Exceptions;
-$HTML::Mason::Exceptions::VERSION = '1.58';
+$HTML::Mason::Exceptions::VERSION = '1.59';
 use strict;
 use warnings;
 
@@ -126,7 +126,7 @@ sub rethrow_exception
 }
 
 package HTML::Mason::Exception;
-$HTML::Mason::Exception::VERSION = '1.58';
+$HTML::Mason::Exception::VERSION = '1.59';
 use HTML::Mason::MethodMaker
     ( read_write => [ qw ( format ) ] );
 
@@ -418,7 +418,7 @@ EOF
 }
 
 package HTML::Mason::Exception::Compilation;
-$HTML::Mason::Exception::Compilation::VERSION = '1.58';
+$HTML::Mason::Exception::Compilation::VERSION = '1.59';
 sub full_message
 {
     my $self = shift;
@@ -427,7 +427,7 @@ sub full_message
 }
 
 package HTML::Mason::Exception::Syntax;
-$HTML::Mason::Exception::Syntax::VERSION = '1.58';
+$HTML::Mason::Exception::Syntax::VERSION = '1.59';
 sub full_message
 {
     my $self = shift;

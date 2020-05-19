@@ -1,15 +1,12 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST/DateTime.pm
-## Version 0.1
-## Copyright(c) 2019- DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <jack@deguest.jp>
+## Version v0.100.1
+## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/12/15
-## Modified 2019/12/15
-## All rights reserved
+## Modified 2020/05/16
 ## 
-## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::REST::DateTime;
 BEGIN
@@ -24,7 +21,7 @@ BEGIN
 	our $MoY = {};
 	@$MoY{ @MoY } = ( 1..12 );
 	our $GMT_ZONE = { 'GMT' => 1, 'UTC' => 1, 'UT' => 1, 'Z' => 1 };
-	our $VERSION = '0.1';
+	our $VERSION = 'v0.100.1';
 };
 
 sub format_datetime
@@ -377,7 +374,7 @@ Net::API::REST::DateTime - HTTP DateTime Manipulation and Formatting
 
 =head1 VERSION
 
-    v0.1
+    v0.100.1
 
 =head1 DESCRIPTION
 

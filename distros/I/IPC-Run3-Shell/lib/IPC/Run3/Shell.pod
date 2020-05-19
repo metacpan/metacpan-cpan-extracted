@@ -58,6 +58,8 @@ The above is adapted from Larry Wall's 1994 L<email about Shell|Shell/AUTHOR>.
  my ($out,$err,$exitcode) = echo "Foo", {both=>1}; # return both STDOUT/ERR
  my $out_and_err = echo "FooBar", {both=>1};       # STDOUT+STDERR merged
  echo "Foo", "Bar", {fail_on_stderr=>1};           # fail on any STDERR
+ my $outfilt = echo "Hello", { stdout_filter => sub { s/[eo]/X/g } };
+   # provide a callback that modifies $_ to filter stdout return value
  my $bla = echo {show_cmd=>1}, "blah", "blah";     # show cmd (debugging)
    # IPC::Run3 options binmode_* and append_* are also supported
  
@@ -90,6 +92,7 @@ The above is adapted from Larry Wall's 1994 L<email about Shell|Shell/AUTHOR>.
  is $err, "";
  is $exitcode, 0;
  is $out_and_err, "FooBar\n";
+ is $outfilt, "HXllX\n";
  is $bla, "blah blah\n";
  is $o, "Hello,"; is $e, "World!\n";
  is "$o $e", "Hello, World!\n";
@@ -137,7 +140,7 @@ B<Read on for more information and examples!>
 
 =head2 Version
 
-This document describes version 0.56 of IPC::Run3::Shell.
+This document describes version 0.58 of IPC::Run3::Shell.
 
 =head1 Security
 
@@ -402,6 +405,37 @@ Setting this boolean option causes the return value(s) of the function to be
 L<chomped|perlfunc/chomp>.
 This option has no effect if you're using the option L</stdout>.
 
+=head2 C<stdout_filter>
+
+Setting this option to a coderef causes this coderef to be called to
+filter the command's C<STDOUT>. In list context, the filter is
+applied I<per line>, while in scalar context, the filter is applied
+over the entire output. The coderef should modify C<$_> to modify the
+output string(s); its return value is ignored.
+
+For example, say you've got a command that outputs JSON, you can turn
+the output from that command into a Perl data structure like this
+(this is just a demonstration using C<echo> that passes its input
+through):
+
+ use JSON::PP qw/encode_json decode_json/;
+ use IPC::Run3::Shell [ foo => { fail_on_stderr => 1,
+     stdout_filter => sub { $_=decode_json($_) } }, qw/ echo / ];
+ 
+ my $foo = foo( encode_json( { test=>'123' } ) );
+ print $foo->{test}, "\n"; # prints "123"
+
+=for test
+ is $foo->{test}, '123';
+ is_deeply $foo, { test=>'123' };
+
+=for test cut
+
+This option has no effect if you're using the option L</stdout>.
+It is applied I<after> the C<chomp> operation, if that option is set.
+
+The C<stdout_filter> option was added in v0.58.
+
 =head2 C<both>
 
 Setting this boolean option has a different effect depending on whether the
@@ -448,6 +482,7 @@ The C<both> option was added in v0.52.
  my $rv = find { allow_exit=>[0,1] }, '/etc', '-name', 'passwd',
      '-print0', { stdout=>\my @files, stderr=>\my $err, irs=>"\0" };
  print "find exited with $rv\n";
+ s/\0\z// for @files;  # the "chomp" option doesn't work with "stdout"
  print "Found files: ".join(', ',@files)."\n";
  print "## Warnings ##\n$err##\n" if $err=~/\S/;
 
@@ -743,6 +778,9 @@ and dolmen for a documentation suggestion.
 
 =head1 See Also
 
+L<IPC::Run3::Shell::CLIWrapper> - makes it easier to build wrappers
+for command-line interfaces. This module was added in v0.58.
+
 Larry Wall and others wrote the original L<Shell|Shell> in 1994,
 with various contributions throughout the years.
 L<Shell|Shell> is Copyright (c) 2005 by the Perl 5 Porters.
@@ -768,7 +806,7 @@ to this module
 
 =head1 Author, Copyright, and License
 
-Copyright (c) 2014 Hauke Daempfling (haukex@zero-g.net).
+Copyright (c) 2014-2020 Hauke Daempfling (haukex@zero-g.net).
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl 5 itself.

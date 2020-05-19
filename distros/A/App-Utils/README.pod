@@ -1,0 +1,41 @@
+=head1 NAME
+
+App::Utils - a set of utilities useful in Linux CLI
+
+=head1 DESCRIPTION
+
+date-tag - print a simple date-tag in form YYYY-MM-DD-hhmmss
+
+A simple command that prints one line of with the current date-time tags in
+the form C<YYYY-MM-DD-hhmmss>.
+
+save - save a snapshot of given files in saved.d directory
+
+=head1 SYNOPSIS
+
+ $ date-tag
+ 2020-05-13-154542
+
+=head1 AUTHOR
+
+Vlado Keselj
+
+=head1 LICENSE
+
+Artistic License L<perlartistic>
+
+=head1 INSTALLATION
+
+Using C<cpan>:
+
+ $ cpan App::Utils
+
+Manual install:
+
+ $ perl Makefile.PL
+ $ make
+ $ make install
+
+
+=cut
+

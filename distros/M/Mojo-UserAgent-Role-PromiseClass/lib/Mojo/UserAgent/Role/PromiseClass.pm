@@ -1,4 +1,4 @@
-package Mojo::UserAgent::Role::PromiseClass 0.008;
+package Mojo::UserAgent::Role::PromiseClass 0.009;
 
 # ABSTRACT: Choose the promise class used by Mojo::UserAgent
 
@@ -25,7 +25,7 @@ Mojo::UserAgent::Role::PromiseClass - Choose the promise class used by Mojo::Use
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

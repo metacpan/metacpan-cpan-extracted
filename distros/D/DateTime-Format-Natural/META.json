@@ -42,7 +42,7 @@
             "Exporter" : "0",
             "Getopt::Long" : "0",
             "List::MoreUtils" : "0",
-            "Params::Validate" : "0",
+            "Params::Validate" : "1.15",
             "Scalar::Util" : "0",
             "Storable" : "0",
             "Term::ReadLine" : "0",
@@ -53,7 +53,7 @@
    "provides" : {
       "DateTime::Format::Natural" : {
          "file" : "lib/DateTime/Format/Natural.pm",
-         "version" : "1.08"
+         "version" : "1.09"
       },
       "DateTime::Format::Natural::Calc" : {
          "file" : "lib/DateTime/Format/Natural/Calc.pm",
@@ -93,7 +93,7 @@
       },
       "DateTime::Format::Natural::Lang::EN" : {
          "file" : "lib/DateTime/Format/Natural/Lang/EN.pm",
-         "version" : "1.66"
+         "version" : "1.67"
       },
       "DateTime::Format::Natural::Rewrite" : {
          "file" : "lib/DateTime/Format/Natural/Rewrite.pm",
@@ -121,6 +121,6 @@
          "url" : "https://github.com/stsc/DateTime-Format-Natural"
       }
    },
-   "version" : "1.08",
+   "version" : "1.09",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

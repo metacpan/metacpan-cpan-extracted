@@ -1,21 +1,18 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Mandate.pm
-## Version 0.1
-## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <jack@deguest.jp>
+## Version v0.100.0
+## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/12/25
-## Modified 2019/12/25
-## All rights reserved
+## Modified 2020/05/15
 ## 
-## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::Stripe::Mandate;
 BEGIN
 {
 	use strict;
 	use parent qw( Net::API::Stripe::Generic );
-	our( $VERSION ) = '0.1';
+	our( $VERSION ) = 'v0.100.0';
 };
 
 sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
@@ -99,7 +96,7 @@ See documentation in L<Net::API::Stripe> for example to make api calls to Stripe
 
 =head1 VERSION
 
-    0.1
+    v0.100.0
 
 =head1 DESCRIPTION
 

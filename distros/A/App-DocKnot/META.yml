@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,19 +17,19 @@ name: App-DocKnot
 provides:
   App::DocKnot:
     file: lib/App/DocKnot.pm
-    version: '3.03'
+    version: '3.04'
   App::DocKnot::Command:
     file: lib/App/DocKnot/Command.pm
-    version: '3.03'
+    version: '3.04'
   App::DocKnot::Config:
     file: lib/App/DocKnot/Config.pm
-    version: '3.03'
+    version: '3.04'
   App::DocKnot::Dist:
     file: lib/App/DocKnot/Dist.pm
-    version: '3.03'
+    version: '3.04'
   App::DocKnot::Generate:
     file: lib/App/DocKnot/Generate.pm
-    version: '3.03'
+    version: '3.04'
 requires:
   File::BaseDir: '0'
   File::ShareDir: '1.00'
@@ -46,5 +46,5 @@ resources:
   homepage: https://www.eyrie.org/~eagle/software/docknot
   license: http://www.opensource.org/licenses/mit-license.php
   repository: https://github.com/rra/docknot.git
-version: '3.03'
+version: '3.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

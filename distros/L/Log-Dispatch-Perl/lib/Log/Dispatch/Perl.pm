@@ -1,7 +1,9 @@
-package Log::Dispatch::Perl;
+package Log::Dispatch::Perl; # git description: v0.04-5-g9e5eec5
+# ABSTRACT: Use core Perl functions for logging
+
 use base 'Log::Dispatch::Output';
 
-$VERSION= '0.04';
+our $VERSION = '0.05';
 
 # be as strict and verbose as possible
 use strict;
@@ -180,9 +182,17 @@ sub log_message {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Log::Dispatch::Perl - Use core Perl functions for logging
+
+=head1 VERSION
+
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -204,10 +214,6 @@ Log::Dispatch::Perl - Use core Perl functions for logging
  ) );
 
  $dispatcher->warning( "This is a warning" );
-
-=head1 VERSION
-
-This documentation describes version 0.04.
 
 =head1 DESCRIPTION
 
@@ -256,20 +262,28 @@ execution.
 Indicates a "warn" action should be executed.  See L<perlfunc/"warn">.  Does
 B<not> halt execution.
 
-=head1 REQUIRED MODULES
+=head1 SUPPORT
 
- Log::Dispatch (1.16)
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Log-Dispatch-Perl>
+(or L<bug-Log-Dispatch-Perl@rt.cpan.org|mailto:bug-Log-Dispatch-Perl@rt.cpan.org>).
+
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.freenode.org>.
 
 =head1 AUTHOR
 
-Elizabeth Mattijsen, <liz@dijkmat.nl>.
+Elizabeth Mattijsen (liz@dijkmat.nl)
 
-Please report bugs to <perlbugs@dijkmat.nl>.
+=head1 CONTRIBUTOR
 
-=head1 COPYRIGHT
+=for stopwords Karen Etheridge
 
-Copyright (c) 2004, 2012 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
-reserved.  This program is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
+Karen Etheridge <ether@cpan.org>
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2020 by Elizabeth Mattijsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

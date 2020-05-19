@@ -5,7 +5,7 @@ package Ordeal::Model::Parser;
 use 5.020;
 use strict;    # redundant, but still useful to document
 use warnings;
-{ our $VERSION = '0.002'; }
+{ our $VERSION = '0.003'; }
 use Ouch;
 
 use constant SHOW_CHARS => 20;

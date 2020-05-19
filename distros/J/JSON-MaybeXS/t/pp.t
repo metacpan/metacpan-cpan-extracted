@@ -7,7 +7,7 @@ use lib map {
     sub { return unless $_[1] eq $m; die "Can't locate $m in \@INC (hidden).\n" };
 } qw{Cpanel/JSON/XS.pm JSON/XS.pm};
 
-use if !eval { require JSON::PP; 1; }, 'Test::More', skip_all => 'No JSON::PP';
+use Test::Needs 'JSON::PP';
 use Test::More 0.88;
 use JSON::MaybeXS;
 

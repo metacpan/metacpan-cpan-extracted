@@ -15,7 +15,7 @@ extends 'App::Sqitch::Command';
 with 'App::Sqitch::Role::ContextCommand';
 with 'App::Sqitch::Role::ConnectingCommand';
 
-our $VERSION = 'v1.0.0'; # VERSION
+our $VERSION = 'v1.1.0'; # VERSION
 
 has target => (
     is  => 'ro',
@@ -25,6 +25,12 @@ has target => (
 has to_change => (
     is  => 'ro',
     isa => Str,
+);
+
+has modified => (
+    is      => 'ro',
+    isa     => Bool,
+    default => 0,
 );
 
 has no_prompt => (
@@ -56,6 +62,7 @@ sub options {
         to-change|to|change=s
         set|s=s%
         log-only
+        modified|m
         y
     );
 }
@@ -67,6 +74,7 @@ sub configure {
         to_change
         log_only
         target
+        modified
     );
 
     if ( my $vars = $opt->{set} ) {
@@ -113,14 +121,16 @@ sub execute {
     )) if @{ $targets };
 
     # Warn on too many changes.
-    my $change = $self->to_change // shift @{ $changes };
+    my $engine = $target->engine;
+    my $change = $self->modified
+        ? $engine->planned_deployed_common_ancestor_id
+        : $self->to_change // shift @{ $changes };
     $self->warn(__x(
         'Too many changes specified; reverting to "{change}"',
         change => $change,
     )) if @{ $changes };
 
     # Now get to work.
-    my $engine = $target->engine;
     $engine->no_prompt( $self->no_prompt );
     $engine->prompt_accept( $self->prompt_accept );
     $engine->log_only( $self->log_only );
@@ -211,7 +221,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 License
 
-Copyright (c) 2012-2018 iovation Inc.
+Copyright (c) 2012-2020 iovation Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

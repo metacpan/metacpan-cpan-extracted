@@ -44,8 +44,10 @@ module-overview:
       optional:
         h: hideModules          
       flags:
+        merged: merged
         show-inherited-private-attributes: showInheritedPrivateAttributes
         show-inherited-private-methods: showInheritedPrivateMethods
+        view-clean: viewClean
              
 commify:
   class:

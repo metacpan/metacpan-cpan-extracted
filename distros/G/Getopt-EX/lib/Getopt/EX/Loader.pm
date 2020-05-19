@@ -142,7 +142,7 @@ sub modopt {
     my @modules;
     while (@$argv) {
 	if (my($modpart) = ($argv->[0] =~ /^$start_re(.+)/)) {
-	    debug_argv($argv) if $debug;
+	    debug_argv($argv);
 	    if (my $mod = $obj->parseopt($modpart, $argv)) {
 		push @modules, $mod;
 	    } else {
@@ -261,21 +261,25 @@ sub expand {
 
 	    shift @follow;
 
-	    debug_argv({color=>'Y'}, $argv, undef, \@s, \@follow) if $debug;
+	    debug_argv({color=>'R'}, $argv, undef, \@s, \@follow);
 
 	    ##
-	    ## $<shift>, $<move>, $<remove>, $<copy>
+	    ## $<shift>, $<move>, $<remove>, $<copy>, $<ignore>
 	    ##
+	    my $modified;
 	    @s = map sub {
-		s/\$<shift>/@follow ? shift @follow : ''/ge;
-		my($cmd) = m{^\$ < (.+) >$}x or return $_;
-		($cmd =~ m{^(?<cmd> move | remove | copy )
-			   (?: \(      (?<off> -?\d+ ) ?
-				  (?: ,(?<len> -?\d+ ))? \) )? $ }x)
-		    or return $_;
-		my $p = ($+{cmd} ne 'copy')
-		    ? \@follow
-		    : do { my @new = @follow; \@new };
+		$modified += s/\$<shift>/@follow ? shift @follow : ''/ge;
+		m{\A \$ <				# $<
+		  (?<cmd> move|remove|copy|ignore )	# command
+		  (?: \(      (?<off> -?\d+ ) ?		# (off
+			 (?: ,(?<len> -?\d+ ))? \) )?	#     ,len)
+		  > \z					# >
+		}x or return $_;
+		$modified++;
+		return () if $+{cmd} eq 'ignore';
+		my $p = ($+{cmd} eq 'copy')
+		    ? do { my @new = @follow; \@new }
+		    : \@follow;
 		my @arg = @$p == 0 ? ()
 		    : defined $+{len} ? splice @$p, $+{off}//0, $+{len}
 		    : splice @$p, $+{off}//0;
@@ -283,12 +287,12 @@ sub expand {
 	    }->(), @s;
 
 	    @s = $bucket->expand_args(@s);
+	    debug_argv({color=>'B'}, $argv, undef, \@s, \@follow) if $modified;
 
-	    debug_argv($argv, undef, \@s, \@follow) if $debug;
 	    my(@module, @default);
 	    if (@module = $obj->modopt(\@s)) {
 		@default = grep { @$_ } map { [ $_->default ] } @module;
-		debug_argv({color=>'B'}, $argv, \@default, \@s, \@follow) if $debug;
+		debug_argv({color=>'Y'}, $argv, \@default, \@s, \@follow);
 	    }
 	    push @$argv, @default, @s, @follow;
 
@@ -298,17 +302,20 @@ sub expand {
 }
 
 sub debug_argv {
+    $debug or return;
     my $opt = ref $_[0] eq 'HASH' ? shift : {};
     my($before, $default, $working, $follow) = @_;
     my $color = $opt->{color} // 'R';
+    use List::Util qw(pairmap);
     printf STDERR
 	"\@ARGV = %s\n",
-	array_to_str(@{$before//[]},
-		     $default ? colorize("${color}DI", array_to_str(@$default)) : (),
-		     $working ? colorize("${color}D",  array_to_str(@$working)) : (),
-		     @{$follow//[]});
-
+	array_to_str(pairmap { $a ? colorize($b, array_to_str(@$a)) : () }
+		     $before, "L10",
+		     $default, "$color;DI",
+		     $working, "$color;D",
+		     $follow, "M");
 }
+
 sub array_to_str {
     join ' ', map {
 	if (ref eq 'ARRAY') {

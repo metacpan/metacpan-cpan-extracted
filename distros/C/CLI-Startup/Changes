@@ -1,5 +1,7 @@
 Revision history for CLI-Startup
 
+0.25    2020-05-18
+        Fixed broken support for hash-valued CLI options separated by commas.
 0.24    2019-10-25
         Added diagnostics to test that is mysteriously failing on cpantesters.
 0.23    2019-10-23

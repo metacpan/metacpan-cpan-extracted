@@ -1,5 +1,22 @@
 Changelog for Beam-Make
 
+0.003     2020-05-17 16:17:21-05:00 America/Chicago
+
+    [Added]
+
+    - Added recipe class for detecting changes in a Docker Hub registry,
+      Beam::Make::Docker::Image::Hub.
+
+0.002     2020-05-14 19:00:28-05:00 America/Chicago
+
+    [Added]
+
+    - Added basic Docker image and container recipe classes
+
+    [Fixed]
+
+    - Fixed output to show status of designated targets
+
 0.001     2020-05-12 22:43:13-05:00 America/Chicago
 
     [Added]

@@ -18,7 +18,7 @@ use FindBin ();
 use lib $FindBin::Bin;
 use IPC_Run3_Shell_Testlib;
 
-use Test::More tests => 26;
+use Test::More tests => 28;
 
 use IPC::Run3::Shell;
 use warnings FATAL=>'IPC::Run3::Shell';
@@ -59,3 +59,16 @@ my @cse;
 is $s->perl({chomp=>1},'-e','print "quz"; print STDERR "foo\nbar\n"',{stderr=>\@cse}), 'quz', 'chomp+stderr 1A';
 is_deeply \@cse, ["foo\n","bar\n"], 'chomp+stderr 1B';
 
+# chomp+both
+subtest 'chomp+both 1' => sub { plan tests=>3;
+	my ($o,$e,$c) = $s->perl({both=>1},'-e','print "foo\nbar\n"; print STDERR "quz\nbaz\n"');
+	is $o, "foo\nbar\n", 'stdout';
+	is $e, "quz\nbaz\n", 'stderr';
+	is $c, 0, 'exit code';
+};
+subtest 'chomp+both 2' => sub { plan tests=>3;
+	my ($o,$e,$c) = $s->perl({both=>1, chomp=>1},'-e','print "foo\nbar\n"; print STDERR "quz\nbaz\n"');
+	is $o, "foo\nbar", 'stdout';
+	is $e, "quz\nbaz", 'stderr';
+	is $c, 0, 'exit code';
+};

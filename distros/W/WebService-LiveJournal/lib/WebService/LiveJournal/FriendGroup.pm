@@ -5,8 +5,8 @@ use warnings;
 use WebService::LiveJournal::Thingie;
 our @ISA = qw/ WebService::LiveJournal::Thingie /;
 
-# ABSTRACT: LiveJournal friend group class
-our $VERSION = '0.08'; # VERSION
+# ABSTRACT: (Deprecated) LiveJournal friend group class
+our $VERSION = '0.09'; # VERSION
 
 
 sub new
@@ -55,11 +55,11 @@ __END__
 
 =head1 NAME
 
-WebService::LiveJournal::FriendGroup - LiveJournal friend group class
+WebService::LiveJournal::FriendGroup - (Deprecated) LiveJournal friend group class
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -91,6 +91,11 @@ specified by C<$itemid>:
  $event->update;
 
 =head1 DESCRIPTION
+
+B<NOTE>: This distribution is deprecated.  It uses the outmoded XML-RPC protocol.
+LiveJournal has also been compromised.  I recommend using DreamWidth instead
+(L<https://www.dreamwidth.org/>) which is in keeping with the original philosophy
+LiveJournal regarding advertising.
 
 This class represents a friend group on the LiveJournal server.
 Friend groups can be used to restrict the readability of events.

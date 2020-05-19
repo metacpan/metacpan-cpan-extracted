@@ -7,14 +7,14 @@
 # The latest version of this software should be available from my homepage:
 # http://www.pjcj.net
 
-require 5.6.1;
+require 5.10.0;
 
 use strict;
 use warnings;
 
 our $VERSION;
 BEGIN {
-our $VERSION = '1.33'; # VERSION
+our $VERSION = '1.35'; # VERSION
 }
 
 use Devel::Cover::DB;
@@ -452,7 +452,7 @@ cover - report coverage statistics
 
 =head1 VERSION
 
-version 1.33
+version 1.35
 
 =head1 SYNOPSIS
 

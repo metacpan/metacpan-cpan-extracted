@@ -1,14 +1,11 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/Subscription.pm
-## Version 0.1
+## Version v0.300.0
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <jack@deguest.jp>
+## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/11/02
-## Modified 2020/03/29
-## All rights reserved
+## Modified 2020/05/15
 ## 
-## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 ## https://stripe.com/docs/api/subscriptions
 package Net::API::Stripe::Billing::Subscription;
@@ -16,7 +13,7 @@ BEGIN
 {
     use strict;
     use parent qw( Net::API::Stripe::Generic );
-    our( $VERSION ) = '0.3';
+    our( $VERSION ) = 'v0.300.0';
 };
 
 sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
@@ -161,7 +158,7 @@ Net::API::Stripe::Billing::Subscription - A Stripe Subscription Object
 
 =head1 VERSION
 
-    0.3
+    v0.300.0
 
 =head1 DESCRIPTION
 

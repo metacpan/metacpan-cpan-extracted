@@ -42,7 +42,7 @@ void
 ApacheSIGINT(...)
 
     CODE:
-#if ((PERL_REVISION == 5) && (PERL_VERSION >= 10)) && defined(HAS_SIGACTION) && defined(SA_SIGINFO)
+#if ((PERL_REVISION == 5) && (PERL_VERSION >= 10) && (PERL_VERSION <= 30)) && defined(HAS_SIGACTION) && defined(SA_SIGINFO)
     if (ApacheSIGINT) (*ApacheSIGINT)(SIGINT, NULL, NULL); 
 #else 
     if (ApacheSIGINT) (*ApacheSIGINT)(SIGINT);

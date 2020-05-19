@@ -3,11 +3,14 @@
 # Geo::Coder::Free is licensed under GPL2.0 for personal use only
 # njh@bandsman.co.uk
 
-# use File::HomeDir;
-# use lib File::HomeDir->my_home() . '/lib/perl5';
+# Based on VWF - https://github.com/nigelhorne/vwf
 
 # Can be tested at the command line, e.g.:
-# rootdir=$(pwd)/.. ./page.fcgi page=index
+#	rootdir=$(pwd)/.. ./page.fcgi page=index
+# To mimic a French mobile site:
+#	rootdir=$(pwd)/.. ./page.fcgi mobile=1 page=index lang=fr
+# To turn off linting of HTML on a search-engine landing page
+#	rootdir=$(pwd)/.. ./page.fcgi --search-engine page=index lint_content=0
 
 # TODO: use the memory_cache in the config file for the database searches
 
@@ -25,13 +28,13 @@ use File::Basename;
 # use CGI::Alert 'you@example.com';
 use FCGI;
 use FCGI::Buffer;
-use File::HomeDir;
 use Log::Any::Adapter;
 use Error qw(:try);
 use File::Spec;
 use Log::WarnDie 0.09;
 use CGI::ACL;
 use HTTP::Date;
+use Taint::Runtime qw($TAINT taint_env);
 use autodie qw(:all);
 
 # use lib '/usr/lib';	# This needs to point to the Geo::Coder::Free directory lives,
@@ -41,6 +44,11 @@ use lib '../lib';
 
 use Geo::Coder::Free;
 use Geo::Coder::Free::Config;
+
+$TAINT = 1;
+taint_env();
+
+Log::WarnDie->filter(\&filter);
 
 my $info = CGI::Info->new();
 my $tmpdir = $info->tmpdir();
@@ -111,6 +119,9 @@ $SIG{TERM} = \&sig_handler;
 $SIG{PIPE} = 'IGNORE';
 
 my $request = FCGI::Request();
+
+# It would be really good to send 429 to search engines when there are more than, say, 5 requests being handled.
+# But I don't think that's possible with the FCGI module
 
 while($handling_request = ($request->Accept() >= 0)) {
 	unless($ENV{'REMOTE_ADDR'}) {
@@ -230,13 +241,10 @@ sub doit
 	my $args = {
 		info => $info,
 		optimise_content => 1,
-		lint_content => 0,
+		lint_content => $info->param('lint_content') // $args{'debug'},
 		logger => $logger,
 		lingua => $lingua
 	};
-	if(!$ENV{'REMOTE_ADDR'}) {
-		$args->{'lint_content'} = 1;
-	}
 	if(!$info->is_search_engine() && $config->rootdir() && ((!defined($info->param('action'))) || ($info->param('action') ne 'send'))) {
 		$args->{'save_to'} = {
 			directory => File::Spec->catfile($config->rootdir(), 'save_to'),
@@ -245,9 +253,7 @@ sub doit
 		};
 	}
 
-	my $fb = FCGI::Buffer->new();
-
-	$fb->init($args);
+	my $fb = FCGI::Buffer->new()->init($args);
 
 	my $cachedir = $args{'cachedir'} || $config->{disc_cache}->{root_dir} || "$tmpdir/cache";
 	if($fb->can_cache()) {
@@ -364,4 +370,13 @@ sub choose
 		print "/cgi-bin/page.fcgi?page=index\n",
 			"/cgi-bin/page.fcgi?page=query\n";
 	}
+}
+
+# False positives we don't need in the logs
+sub filter {
+	return 0 if($_[0] =~ /Can't locate Net\/OAuth\/V1_0A\/ProtectedResourceRequest.pm in /);
+	return 0 if($_[0] =~ /Can't locate auto\/NetAddr\/IP\/InetBase\/AF_INET6.al in /);
+	return 0 if($_[0] =~ /S_IFFIFO is not a valid Fcntl macro at /);
+
+	return 1;
 }

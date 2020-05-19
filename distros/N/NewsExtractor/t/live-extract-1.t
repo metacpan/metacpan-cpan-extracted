@@ -1,8 +1,7 @@
+use Test2::V0;
 use v5.18;
-use warnings;
 
 use File::Slurp 'read_file', 'write_file';
-use Test2::V0;
 use NewsExtractor;
 
 skip_all 'Live tests: set env TEST_LIVE=1 to actually run tests.' unless $ENV{TEST_LIVE};

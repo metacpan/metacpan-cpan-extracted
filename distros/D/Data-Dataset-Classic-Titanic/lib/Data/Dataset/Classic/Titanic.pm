@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Provide the classic Titanic survivor dataset
 
-our $VERSION = '0.0101';
+our $VERSION = '0.0102';
 
 use strict;
 use warnings;
@@ -26,8 +26,7 @@ sub as_list {
 
     my @data;
 
-    my $csv = Text::CSV_XS->new({ binary => 1 })
-        or die "Can't read CSV: ", Text::CSV_XS->error_diag;
+    my $csv = Text::CSV_XS->new({ binary => 1 });
 
     open my $fh, '<', $file
         or die "Can't read $file: $!";
@@ -52,8 +51,7 @@ sub as_hash {
     my %data;
     my @headers;
 
-    my $csv = Text::CSV_XS->new({ binary => 1 })
-        or die "Can't read CSV: ", Text::CSV->error_diag;
+    my $csv = Text::CSV_XS->new({ binary => 1 });
 
     open my $fh, '<', $file
         or die "Can't read $file: $!";
@@ -87,8 +85,7 @@ sub headers {
 
     my @data;
 
-    my $csv = Text::CSV_XS->new({ binary => 1 })
-        or die "Can't read CSV: ", Text::CSV_XS->error_diag;
+    my $csv = Text::CSV_XS->new({ binary => 1 });
 
     open my $fh, '<', $file
         or die "Can't read $file: $!";
@@ -117,7 +114,7 @@ Data::Dataset::Classic::Titanic - Provide the classic Titanic survivor dataset
 
 =head1 VERSION
 
-version 0.0101
+version 0.0102
 
 =head1 SYNOPSIS
 

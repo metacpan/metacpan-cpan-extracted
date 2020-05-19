@@ -4,60 +4,99 @@
 # required modules
 use warnings;
 use strict;
+use Mnet::T;
 use Test::More tests => 4;
 
-# use current perl for tests
-my $perl = $^X;
+# debug default disabled
+Mnet::T::test_perl({
+    name    => 'debug default disabled',
+    perl    => <<'    perl-eof',
+        use warnings;
+        use strict;
+        use Mnet::Log qw( DEBUG );
+        use Mnet::Log::Test;
+        use Mnet::Opts::Cli;
+        my $cli = Mnet::Opts::Cli->new;
+        Mnet::Log->new->debug('debug method');
+        DEBUG('debug function');
+    perl-eof
+    expect  => <<'    expect-eof',
+        --- - Mnet::Log - started
+        --- - Mnet::Log finished, no errors
+    expect-eof
+    debug   => '--debug --noquiet',
+});
 
-# check that debug is disabled by default
-Test::More::is(`$perl -e '
-    use warnings;
-    use strict;
-    use Mnet::Log qw( DEBUG );
-    use Mnet::Log::Test;
-    Mnet::Log->new->debug("debug method");
-    DEBUG("debug function");
-' -- 2>&1`, '--- - Mnet::Log -e started
---- - Mnet::Log finished with no errors
-', 'debug default disabled');
+# debug object option
+Mnet::T::test_perl({
+    name    => 'debug object option',
+    perl    => <<'    perl-eof',
+        use warnings;
+        use strict;
+        use Mnet::Log qw( DEBUG );
+        use Mnet::Log::Test;
+        use Mnet::Opts::Cli;
+        my $cli = Mnet::Opts::Cli->new;
+        Mnet::Log->new({ debug => 1 })->debug('debug method');
+        DEBUG('debug function');
+    perl-eof
+    expect  => <<'    expect-eof',
+        --- - Mnet::Log - started
+        dbg - main debug method
+        --- - Mnet::Log finished, no errors
+    expect-eof
+    debug   => '--debug --noquiet',
+});
 
-# check Mnet::Log->new debug object option
-Test::More::is(`$perl -e '
-    use warnings;
-    use strict;
-    use Mnet::Log qw( DEBUG );
-    use Mnet::Log::Test;
-    Mnet::Log->new({ debug => 1 })->debug("debug method");
-    DEBUG("debug function");
-' -- 2>&1 | grep '^dbg - main'`, 'dbg - main debug method
-', 'debug object option');
+# debug pragma option
+Mnet::T::test_perl({
+    name    => 'debug pragma option',
+    perl    => <<'    perl-eof',
+        use warnings;
+        use strict;
+        use Mnet::Log qw( DEBUG );
+        use Mnet::Log::Test;
+        use Mnet::Opts::Cli;
+        use Mnet::Opts::Set::Debug;
+        my $cli = Mnet::Opts::Cli->new;
+        Mnet::Log->new->debug('debug method');
+        DEBUG('debug function');
+    perl-eof
+    filter  => 'grep -v "Mnet::Version" | grep -v "dbg - Mnet::Opts::Cli"',
+    expect  => <<'    expect-eof',
+        --- - Mnet::Log - started
+        inf - Mnet::Opts::Cli new parsed opt use debug = 1
+        dbg - main debug method
+        dbg - main debug function
+        --- - Mnet::Log finished, no errors
+    expect-eof
+    debug   => '--debug --noquiet',
+});
 
-# check Mnet::Opts::Set::Debug pragma option
-Test::More::is(`$perl -e '
-    use warnings;
-    use strict;
-    use Mnet::Log qw( DEBUG );
-    use Mnet::Log::Test;
-    use Mnet::Opts::Set::Debug;
-    Mnet::Log->new->debug("debug method");
-    DEBUG("debug function");
-' -- 2>&1 | grep '^dbg - main'`, 'dbg - main debug method
-dbg - main debug function
-', 'debug pragma option');
-
-# check --debug cli option
-Test::More::is(`$perl -e '
-    use warnings;
-    use strict;
-    use Mnet::Log qw( DEBUG );
-    use Mnet::Log::Test;
-    use Mnet::Opts::Cli;
-    Mnet::Opts::Cli->new;
-    Mnet::Log->new->debug("debug method");
-    DEBUG("debug function");
-' -- --debug 2>&1 | grep '^dbg - main'`, 'dbg - main debug method
-dbg - main debug function
-', 'debug cli option');
+# debug cli option
+Mnet::T::test_perl({
+    name    => 'debug cli option',
+    perl    => <<'    perl-eof',
+        use warnings;
+        use strict;
+        use Mnet::Log qw( DEBUG );
+        use Mnet::Log::Test;
+        use Mnet::Opts::Cli;
+        my $cli = Mnet::Opts::Cli->new;
+        Mnet::Log->new->debug('debug method');
+        DEBUG('debug function');
+    perl-eof
+    args    => '--debug',
+    filter  => 'grep -v "Mnet::Version" | grep -v "dbg - Mnet::Opts::Cli"',
+    expect  => <<'    expect-eof',
+        --- - Mnet::Log - started
+        inf - Mnet::Opts::Cli new parsed opt cli debug = 1
+        dbg - main debug method
+        dbg - main debug function
+        --- - Mnet::Log finished, no errors
+    expect-eof
+    debug   => '--noquiet',
+});
 
 # finished
 exit;

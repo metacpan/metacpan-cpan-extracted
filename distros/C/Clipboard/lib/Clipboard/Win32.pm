@@ -1,5 +1,5 @@
 package Clipboard::Win32;
-$Clipboard::Win32::VERSION = '0.24';
+$Clipboard::Win32::VERSION = '0.26';
 use strict;
 use warnings;
 
@@ -25,7 +25,7 @@ __END__
 
 =head1 VERSION
 
-version 0.24
+version 0.26
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
@@ -100,9 +100,9 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/clipboard>
+L<https://github.com/shlomif/Clipboard>
 
-  git clone https://github.com/shlomif/Clipboard
+  git clone git://github.com/shlomif/Clipboard.git
 
 =head1 AUTHOR
 
@@ -111,7 +111,7 @@ Shlomi Fish <shlomif@cpan.org>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/clipboard/issues>
+L<https://github.com/shlomif/Clipboard/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

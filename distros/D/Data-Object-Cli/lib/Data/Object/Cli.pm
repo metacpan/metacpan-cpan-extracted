@@ -5,6 +5,8 @@ use 5.014;
 use strict;
 use warnings;
 
+use feature 'say';
+
 use registry 'Data::Object::Types';
 use routines;
 
@@ -16,7 +18,7 @@ use Data::Object::Data;
 use Data::Object::Opts;
 use Data::Object::Vars;
 
-our $VERSION = '2.00'; # VERSION
+our $VERSION = '2.02'; # VERSION
 
 # ATTRIBUTES
 
@@ -62,18 +64,43 @@ fun new_vars($self) {
 
 # METHODS
 
+sub auto {
+  {}
+}
+
 sub main {
-  shift
+  my ($self) = shift;
+
+  my $result;
+
+  my $auto = $self->handle('auto');
+  my $command = $self->args->command;
+  my $goto = $auto->{$command} if $auto && $command;
+
+  if ($goto) {
+    $result = $self->handle($goto);
+  }
+  else {
+    say $self->help;
+  }
+
+  return $result;
 }
 
 method _args_spec() {
   my $args_spec = {named => {}};
 
   my $name = $self->name;
-  my @args = ($name =~ /\{(\w+)\}/g);
+  my @args = split /\s+/, $name;
+
+  shift @args;
+
+  return $args_spec if !@args;
 
   for (my $i=0; $i < @args; $i++) {
-    $args_spec->{named}{$args[$i]} = "$i";
+    if (my ($token) = $args[$i] =~ /\{(\w+)\}/) {
+      $args_spec->{named}{$token} = "$i";
+    }
   }
 
   return $args_spec;
@@ -122,11 +149,16 @@ method _opts_spec() {
 
     my $args = $data->{args};
     my $flag = $data->{flag} || $name;
-    my $type = $data->{type} || 'string';
+    my $type = $data->{type} || 'flag';
 
-    my $code = { float => 'f', number => 'n', string => 's' };
+    my $code = {
+      float   => 'f',
+      integer => 'i',
+      number  => 'o',
+      string  => 's',
+    };
 
-    $code = $code->{$type} || 's';
+    $code = $code->{$type};
 
     my @flags = grep !$seen{$_}++, reverse sort $name, split /\|/, $flag;
 
@@ -134,7 +166,7 @@ method _opts_spec() {
 
     $flag = join '|', @flags;
 
-    push @{$opts_spec->{spec}}, sprintf '%s=%s%s', $flag, $code, $args || '';
+    push @{$opts_spec->{spec}}, sprintf '%s%s%s', $flag, ($code ? "=$code" : ''), $args || '';
   }
 
   return $opts_spec;
@@ -143,6 +175,8 @@ method _opts_spec() {
 method exit($code, $handler, @args) {
 
   $self->handle($handler, @args) if $handler;
+
+  $code ||= 0;
 
   exit $code;
 }
@@ -165,10 +199,16 @@ method handle($method, %args) {
 }
 
 method help() {
-  my $name = $self->name;
-  my @more = map +("$_", ""), grep {defined} $self->info, $self->_help_opts;
 
-  return join "\n", "Usage: $name", "", @more;
+  my @help;
+
+  my $name = $self->name =~ s/\{(\w+)\}/$1/gr;
+
+  push @help, "usage: $name", "";
+  push @help, $self->info, "" if $self->info;
+  push @help, $self->_help_opts, "" if $self->_help_opts;
+
+  return join "\n", @help;
 }
 
 method info() {
@@ -207,7 +247,7 @@ method spec() {
 
 =head1 NAME
 
-Data::Object::Cli
+Data::Object::Cli - Simple CLIs
 
 =cut
 
@@ -222,8 +262,6 @@ Command-line Interface Abstraction for Perl 5
   package Command;
 
   use parent 'Data::Object::Cli';
-
-  no warnings 'redefine';
 
   sub main {
     my ($self) = @_;
@@ -292,6 +330,41 @@ This attribute is read-only, accepts C<(VarsObject)> values, and is optional.
 =head1 METHODS
 
 This package implements the following methods:
+
+=cut
+
+=head2 auto
+
+  auto(Any %args) : HashRef
+
+The auto method is expected to be overridden by the subclass and should return
+a hashref where the keys represent a subcommand at C<$ARGV[0]> and the value
+represents the subroutine to be dispatched to using the C<handle> method. To
+enable this functionality, the command name be declare a "command" token.
+
+=over 4
+
+=item auto example #1
+
+  package Todo;
+
+  use parent 'Data::Object::Cli';
+
+  our $name = 'todo <{command}>';
+
+  sub auto {
+    {
+      init => '_handle_init'
+    }
+  }
+
+  sub _handle_init {
+    1234567890
+  }
+
+  my $todo = run Todo;
+
+=back
 
 =cut
 
@@ -427,8 +500,6 @@ The help method returns the help text documented in POD if available.
 
   use parent 'Data::Object::Cli';
 
-  no warnings 'redefine';
-
   sub name {
     'todolist'
   }
@@ -464,8 +535,6 @@ The help method returns the help text documented in POD if available.
 
   use parent 'Data::Object::Cli';
 
-  no warnings 'redefine';
-
   sub name {
     'todolist'
   }
@@ -477,6 +546,28 @@ The help method returns the help text documented in POD if available.
   my $todolist = run Todolist;
 
   # $todolist->help
+
+=back
+
+=over 4
+
+=item help example #6
+
+  package Todolist::Command::Show;
+
+  use parent 'Data::Object::Cli';
+
+  sub name {
+    'todolist show [<{priority}>]'
+  }
+
+  sub info {
+    'show your todo list tasks by priority levels'
+  }
+
+  my $command = run Todolist::Command::Show;
+
+  # $command->help
 
 =back
 
@@ -499,8 +590,6 @@ by C<run> will receive the C<args>, C<data>, C<opts>, and C<vars> objects.
 
   use parent 'Data::Object::Cli';
 
-  no warnings 'redefine';
-
   sub main {
     my ($self, %args) = @_;
 
@@ -520,8 +609,6 @@ by C<run> will receive the C<args>, C<data>, C<opts>, and C<vars> objects.
   package Todolist;
 
   use parent 'Data::Object::Cli';
-
-  no warnings 'redefine';
 
   sub main {
     my ($self, %args) = @_;
@@ -612,10 +699,10 @@ L<Data::Object::Opts> object through the C<opts> attribute. Each flag
 definition can optionally declare C<args>, C<flag>, and C<type> values as
 follows. The C<args> property denotes that multiple flags are permitted and its
 value can be any valid L<Getopt::Long> I<repeat> specifier. The C<type>
-property denotes the type of data allowed and defaults to type I<string>.
-Allowed values are C<string>, C<number>, or C<float>. The C<flag> property
-denotes the flag aliases and should be a pipe-delimited string, e.g.
-C<userid|id|u>, if multiple aliases are used.
+property denotes the type of data allowed and defaults to type I<flag>.
+Allowed values are C<string>, C<integer>, C<number>, C<float>, or C<flag>. The
+C<flag> property denotes the flag aliases and should be a pipe-delimited
+string, e.g. C<userid|id|u>, if multiple aliases are used.
 
 =over 4
 
@@ -659,6 +746,26 @@ C<userid|id|u>, if multiple aliases are used.
       attach => {
         flag => 'a',
         args => '@' # allow multiple options
+      },
+      #
+      # represented in Getopt::Long as
+      # publish|p
+      #
+      # publish is accessible as $self->opts->publish
+      #
+      publish => {
+        flag => 'p',
+        type => 'flag'
+      },
+      #
+      # represented in Getopt::Long as
+      # unpublish|u
+      #
+      # unpublish is accessible as $self->opts->unpublish
+      #
+      unpublish => {
+        flag => 'u'
+        # defaults to type: flag
       }
     }
   }

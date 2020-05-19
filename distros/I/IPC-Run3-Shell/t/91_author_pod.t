@@ -23,6 +23,7 @@ our @PODFILES;
 BEGIN {
 	@PODFILES = (
 		catfile($FindBin::Bin,qw/ .. lib IPC Run3 Shell.pod /),
+		catfile($FindBin::Bin,qw/ .. lib IPC Run3 Shell CLIWrapper.pm /),
 	);
 }
 

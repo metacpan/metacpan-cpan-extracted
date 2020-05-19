@@ -5,20 +5,20 @@
 use warnings;
 use strict;
 use File::Temp;
-use Test::More tests => 6;
+use Mnet::T;
+use Test::More tests => 5;
 
 # create multiple temp test/record/replay files
 my ($fh1, $file1) = File::Temp::tempfile( UNLINK => 1 );
 my ($fh2, $file2) = File::Temp::tempfile( UNLINK => 1 );
 
-# use current perl for tests
-my $perl = $^X;
-
-# init script used to test with mnet batch module
-my $script = '
+# init perl used for tests
+my $perl = '
     use warnings;
     use strict;
     use Mnet::Batch;
+    use Mnet::Log;
+    use Mnet::Log::Test;
     use Mnet::Opts::Cli;
     use Mnet::Test;
     Mnet::Opts::Cli::define({ getopt => "sample=i", record => 1 });
@@ -28,49 +28,77 @@ my $script = '
     syswrite STDOUT, "sample = $cli->{sample}\n";
 ';
 
-# record file 1 for batch test
-Test::More::is(`$perl -e '
-    $script
-' -- --record $file1 --sample 1 2>&1`, 'sample = 1
-', 'record file 1');
+# record file 1
+Mnet::T::test_perl({
+    name    => 'record file 1',
+    perl    => $perl,
+    args    => "--record $file1 --sample 1",
+    filter  => 'grep -v ^--- | grep -v ^inf',
+    expect  => 'sample = 1',
+    debug   => '--debug --noquiet',
+});
 
-# record file 2 for batch test
-Test::More::is(`echo; $perl -e '
-    $script
-' -- --record $file2 --sample 2 2>&1`, '
-sample = 2
-', 'record file 2');
+# record file 2
+Mnet::T::test_perl({
+    name    => 'record file 2',
+    perl    => $perl,
+    args    => "--record $file2 --sample 2",
+    filter  => 'grep -v ^--- | grep -v ^inf',
+    expect  => 'sample = 2',
+    debug   => '--debug --noquiet',
+});
 
-# replay both tests passing in batch mode
-Test::More::is(`echo; ( echo --replay $file1; echo --replay $file2 ) | $perl -e '
-    $script
-' -- --batch /dev/stdin --test 2>&1`, '
-', 'batch replay passed');
+# batch test replay failures
+Mnet::T::test_perl({
+    name    => 'batch test replay',
+    pre     => '
+        export BATCH=$(mktemp); echo "
+            --replay '.$file1.'
+            --replay '.$file2.'
+        " >$BATCH
+    ',
+    perl    => $perl,
+    args    => '--batch $BATCH --test',
+    filter  => 'grep -v ^---',
+    expect  => '',
+    debug   => '--debug --noquiet',
+});
 
-# replay both tests failing in batch mode due to parent arg
-Test::More::is(`echo; ( echo --replay $file1; echo --replay $file2 ) | $perl -e '
-    $script
-' -- --batch /dev/stdin --test --sample 4 2>&1 | sed "s/ pid .*/ pid .../"`,
-'
-WRN - Mnet::Batch fork reaped child pid ...
-WRN - Mnet::Batch fork reaped child pid ...
-', 'batch execution with new parent option');
+# batch test replay child option failure
+Mnet::T::test_perl({
+    name    => 'batch test replay child option failure',
+    pre     => '
+        export BATCH=$(mktemp); echo "
+            --replay '.$file1.' --sample 3
+        " >$BATCH
+    ',
+    perl    => $perl,
+    args    => '--batch $BATCH --test',
+    filter  => 'grep -v ^--- | sed "s/ pid .*/ pid .../"',
+    expect  => <<'    expect-eof',
+        WRN - Mnet::Batch fork reaped child pid ...
+    expect-eof
+    debug   => '--debug --noquiet',
+});
 
-# replay first failing in batch mode due to parent arg
-#   we want to be sure that second child does not get error
-Test::More::is(`echo; ( echo --replay $file1; echo --replay $file2 ) | $perl -e '
-    $script
-' -- --batch /dev/stdin --test --sample 1 2>&1 | sed "s/ pid .*/ pid .../"`,
-'
-WRN - Mnet::Batch fork reaped child pid ...
-', 'batch execution with first child failing');
-
-# replay child test failing in batch mode due to child arg
-Test::More::is(`echo; ( echo --replay $file1 --sample 3 ) | $perl -e '
-    $script
-' -- --batch /dev/stdin --test 2>&1 | sed "s/ pid .*/ pid .../"`, '
-WRN - Mnet::Batch fork reaped child pid ...
-', 'batch replay child failed');
+# batch test replay parent option failure
+Mnet::T::test_perl({
+    name    => 'batch test replay parent option failure',
+    pre     => '
+        export BATCH=$(mktemp); echo "
+            --replay '.$file1.'
+            --replay '.$file2.'
+        " >$BATCH
+    ',
+    perl    => $perl,
+    args    => '--batch $BATCH --test --sample 1',
+    filter  => 'grep -v ^--- | sed "s/ pid .*/ pid .../"',
+    expect  => <<'    expect-eof',
+        inf - Mnet::Opts::Cli new parsed opt cli sample = 1
+        WRN - Mnet::Batch fork reaped child pid ...
+    expect-eof
+    debug   => '--debug --noquiet',
+});
 
 # finished
 exit;

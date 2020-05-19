@@ -1,4 +1,4 @@
-package Pod::Weaver::PluginBundle::Author::IOANR 1.173520;
+package Pod::Weaver::PluginBundle::Author::IOANR 1.201400;
 
 # ABSTRACT: Weave the POD for a IOANR dist
 
@@ -94,7 +94,7 @@ Pod::Weaver::PluginBundle::Author::IOANR - Weave the POD for a IOANR dist
 
 =head1 VERSION
 
-version 1.173520
+version 1.201400
 
 =head1 SEE ALSO
 
@@ -107,7 +107,7 @@ Ioan Rogers <ioanr@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Ioan Rogers.
+This software is Copyright (c) 2020 by Ioan Rogers.
 
 This is free software, licensed under:
 

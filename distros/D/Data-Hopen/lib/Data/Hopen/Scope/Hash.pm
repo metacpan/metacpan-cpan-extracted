@@ -3,7 +3,7 @@ package Data::Hopen::Scope::Hash;
 use strict;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000017';
+our $VERSION = '0.000018';
 
 use Data::Hopen::Scope qw(:default :internal);
 use parent 'Data::Hopen::Scope';

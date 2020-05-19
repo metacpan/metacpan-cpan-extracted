@@ -1,6 +1,11 @@
 Revision history for Perl extension IPC::Run3::Shell.
 
-0.56	Tue, Oct  3 2017
+0.58	Sun, May 17 2020
+	- Added IPC::Run3::Shell::CLIWrapper
+	- Added option stdout_filter to IPC::Run3::Shell
+	- Minor fixups
+
+0.56	Tue, Oct  3 2017	commit 34c1e071128dc041321259a4901496c45f0ebcef
 	- Added :AUTOLOAD and :FATAL export tags
 	- Improved tests, fixed an incorrect test failure on older Perls
 	- Fixed two minor issues on older Perls

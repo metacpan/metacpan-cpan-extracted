@@ -27,7 +27,7 @@ TEST
 
     $gnupg->options->clear_recipients();
     $gnupg->options->clear_meta_recipients_keys();
-    $gnupg->options->push_recipients( '0x2E854A6B' );
+    $gnupg->options->push_recipients( '0x7466B7E98C4CCB64C2CE738BADB99D9C2E854A6B' );
 
     my $pid = $gnupg->encrypt( handles => $handles );
 
@@ -43,7 +43,7 @@ TEST
 {
     reset_handles();
 
-    my @keys = $gnupg->get_public_keys( '0xF950DA9C' );
+    my @keys = $gnupg->get_public_keys( '0x93AFC4B1B0288A104996B44253AE596EF950DA9C' );
     $gnupg->options->clear_recipients();
     $gnupg->options->clear_meta_recipients_keys();
     $gnupg->options->push_meta_recipients_keys( @keys );
@@ -64,7 +64,7 @@ TEST
 
     $gnupg->options->clear_recipients();
     $gnupg->options->clear_meta_recipients_keys();
-    $gnupg->options->push_recipients( '0x2E854A6B' );
+    $gnupg->options->push_recipients( '0x7466B7E98C4CCB64C2CE738BADB99D9C2E854A6B' );
 
     $handles->stdin( $texts{plain}->fh() );
     $handles->options( 'stdin' )->{direct} = 1;

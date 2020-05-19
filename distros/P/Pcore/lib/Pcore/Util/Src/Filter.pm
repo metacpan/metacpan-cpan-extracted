@@ -63,7 +63,7 @@ sub _get_node ($self) {
 
     if ( !$conn ) {
         if ( !P->net->check_port( '127.0.0.1', 55556, 0.1 ) ) {
-            $proc //= P->sys->run_proc( [ 'softvisio-cli', '--vim' ] );
+            $proc //= P->sys->run_proc( [ 'softvisio-cli', 'vim' ] );
 
             return res [ $SRC_FATAL, $proc->{reason} ] if !$proc->is_active && !$proc;
         }

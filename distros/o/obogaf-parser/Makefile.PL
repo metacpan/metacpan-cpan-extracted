@@ -11,7 +11,9 @@ WriteMakefile(
     MIN_PERL_VERSION => '5.006',
     PREREQ_PM        => {
         'Graph'             => 0,
-        'PerlIO::gzip'      => 0
+        'IO::File'          => 0,
+        'PerlIO::gzip'      => 0,
+        'List::MoreUtils'   => 0
     },
     TEST_REQUIRES  => {
         'Test::More'            => 0, 
@@ -43,7 +45,9 @@ WriteMakefile(
                     t/data/test_gobasic_parents_list.txt
                     t/data/test_gobasic_children_list.txt
                     t/data/test_gobasicBP_parents_list.txt
-                    t/data/test_gobasicBP_children_list.txt"
+                    t/data/test_gobasicBP_children_list.txt
+                    t/data/test_gofiltered.obo
+                    t/data/test_fake_goterms.txt"
     },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( 
         META_MERGE => {

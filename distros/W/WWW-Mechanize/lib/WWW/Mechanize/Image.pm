@@ -3,20 +3,20 @@ package WWW::Mechanize::Image;
 use strict;
 use warnings;
 
-our $VERSION = '1.96';
+our $VERSION = '1.97';
 
 #ABSTRACT: Image object for WWW::Mechanize
 
 
 sub new {
     my $class = shift;
-    my $parms = shift || {};
+    my $params = shift || {};
 
     my $self = bless {}, $class;
 
-    for my $parm ( qw( url base tag height width alt name attrs ) ) {
+    for my $param ( qw( url base tag height width alt name attrs ) ) {
         # Check for what we passed in, not whether it's defined
-        $self->{$parm} = $parms->{$parm} if exists $parms->{$parm};
+        $self->{$param} = $params->{$param} if exists $params->{$param};
     }
 
     # url and tag are always required
@@ -69,7 +69,7 @@ WWW::Mechanize::Image - Image object for WWW::Mechanize
 
 =head1 VERSION
 
-version 1.96
+version 1.97
 
 =head1 SYNOPSIS
 
@@ -146,7 +146,7 @@ Andy Lester <andy at petdance.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2004-2016 by Andy Lester.
+This software is copyright (c) 2004 by Andy Lester.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

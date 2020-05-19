@@ -1,3 +1,8 @@
+v2.22, 18.05.2020
+	- no code changes
+	- updated GPLv1 text due to address change
+	- added GPLv2 text
+
 v2.21, 23.09.2016
 	- no code changes to ECB.pm
 	- ecb.pl -l now prints module versions

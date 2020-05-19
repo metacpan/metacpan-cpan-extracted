@@ -3,18 +3,22 @@ NAME
     various Sah schemas
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.003 of
     Perinci::Examples::Bin::Any::SahSchemas (from Perl distribution
-    Perinci-Examples-Bin-Any-SahSchemas), released on 2018-01-15.
+    Perinci-Examples-Bin-Any-SahSchemas), released on 2020-03-14.
 
 DESCRIPTION
     This distribution contains the following scripts:
+
+    *   peri-eg-schema-bandwidth
 
     *   peri-eg-schema-date
 
     *   peri-eg-schema-dirname
 
     *   peri-eg-schema-filename
+
+    *   peri-eg-schema-filesize
 
     *   peri-eg-schema-pathname
 
@@ -45,7 +49,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

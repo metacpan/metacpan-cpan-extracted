@@ -5,6 +5,7 @@ use English qw( -no_match_vars );
 use warnings;
 use strict;
 
+use Carp;
 use Symbol;
 use Pod::Text;
 use Text::CSV;
@@ -23,7 +24,7 @@ use Getopt::Long qw{
 use Exporter 'import';
 our @EXPORT_OK = qw/startup/;
 
-our $VERSION = '0.24';    # Don't forget to update the manpage version, too!
+our $VERSION = '0.25';    # Don't forget to update the manpage version, too!
 
 use Readonly;
 Readonly my $V_FOR_VERBOSE => 'ALIAS OF VERBOSE';
@@ -744,6 +745,40 @@ sub _process_command_line
 
             $options{$option} = \@values;
         }
+        elsif ( ref $options{$option} eq 'HASH' )
+        {
+            my $hash = $options{$option};
+            for my $key ( keys %{$hash} )
+            {
+                # Extract each value and tech for embedded name/value
+                # pairs. We only go one level deep.
+                my $value = $hash->{$key};
+                $csv->parse($value)
+                    or $self->die_usage(
+                    "Can't parse --$option option \"$value\": "
+                        . $csv->error_diag );
+
+                # If there's only one field, nothing to do
+                next if ( $csv->fields == 1 );
+
+                # Pick off the first value
+                my @values = $csv->fields;
+                $hash->{$key} = shift @values;
+
+                # Now parse the rest
+                for my $value (@values)
+                {
+                    my ( $k, $v ) = $value =~ m/^ ([^=]+) = (.*) $/xmsg;
+
+                    # Check for collision
+                    carp "Redefined option value: $k"
+                        if defined $hash->{$k};
+
+                    # Set the value
+                    $hash->{$k} = $v;
+                }
+            }
+        }
     }
 
     # Process the rcfile option immediately, to override any settings
@@ -1248,7 +1283,7 @@ CLI::Startup - Simple initialization for command-line scripts
 
 =head1 VERSION
 
-Version 0.24
+Version 0.25
 
 =head1 SYNOPSIS
 

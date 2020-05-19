@@ -1,0 +1,494 @@
+=encoding utf8
+
+=head1 NAME
+
+Module::Generic::Number - Number Manipulation Object Class
+
+=head1 SYNOPSIS
+
+    my $n = Module::Generic::Number->new( 10 );
+    # or
+    my $n = Module::Generic::Number->new( 10, 
+    {
+        thousand => ',',
+        decimal => '.',
+        precision => 2,
+        # Currency symbol
+        symbol => '€',
+        # Display currency symbol before or after the number
+        precede => 1,
+    });
+    # or, to get all the defaults based on language code
+    my $n = Module::Generic::Number->new( 10, 
+    {
+        lang => 'fr_FR',
+    });
+    # this would set the decimal separator to ',', the thousand separator to ' ', and precede to 0 (false).
+    print( "Number is: $n\n" );
+    # prints: 10
+
+    $n ** 2 # 100
+    # and all other operators work
+
+    my $n_neg = Module::Generic::Number->new( -10 );
+    $n_neg->abs # 10
+    $n->atan # 1.47112767430373
+    $n->atan2(2) # 1.37340076694502
+    $n->cbrt # 2.15443469003188
+    $n->cbrt->ceil # 3
+    $n->clone # Cloning the number object
+    $n->cos # -0.839071529076452
+    $n->currency # €
+    $n->decimal # .
+    $n->exp # 22026.4657948067
+    $n->cbrt->floor # 2
+    $n *= 100;
+    $n->format # 1,000.00
+    $n->format( 0 ) # 1,000
+    $n->format_binary # 1111101000
+    my $n2 = $n->clone;
+    $n2 += 24
+    $n2->format_bytes # 1K
+    $n2->format_hex # 0x400
+    $n2->format_money # € 1,024.00
+    $n2->format_money( '$' ) # $1,024.00
+    $n2->format_negative # -1,024.00
+    $n2->format_picture( '(x)' ) # (1,024.00)
+    $n2->formatter( $new_Number_Format_object );
+    $n->from_binary( "1111101000" ) # 1000
+    $n->from_hex( "0x400" ) # 1000
+    my $n3 = $n->clone( 3.14159265358979323846 )->int # 3
+    # Uses POSIX::signbit
+    $n3->is_negative # 0
+    $n3->is_positive # 1
+    $n->log # 6.90775527898214
+    $n->log2 # 9.96578428466209
+    $n->log10 # 3
+    $n->max( 2000 ) # 2000
+    $n->min( 2000 ) # 1000
+    $n->mod( 3 ) # 1
+    my $fmt = $n->new_formatter({
+        thousand => '.',
+        decimal => ',',
+        symbol => '€',
+        precision => 2,
+        precede => 0,
+    });
+    my $perm = Module::Generic::Number->new( '0700' );
+    $perm->oct # 448
+    printf( "%o\n", 448 ) # 700
+    $n->clone( 2 )->pow( 3 ) # 8
+    # Change position of the currency sign
+    $n->precede( 1 ) # Set it to precede the number
+    # Change precision
+    $n->precision( 0 )
+    # Based on 1000
+    $n->rand # For example, returns 77.775465338589
+    $n->rand->int # For example, would return a random integer 77
+    $n->clone( 3.14159265358979323846 )->round( 4 ) # 3.1416
+    $n->sin # 0.826879540532003
+    $n2->sqrt # 32
+    $n->symbol # €
+    $n->tan # 1.47032415570272
+    $n->thousand # ,
+    $n->unformat( "€ 1,024.00" ) # 1024
+
+
+=head1 DESCRIPTION
+
+The purpos of this class/package is to provide a lightweight object-oriented approach to number manipulation.
+
+This uses perl core functions and POSIX functions only. This module's methods act as a wrapper to them.
+
+The object is overloaded, so it returns the embedded number when used as a string.
+
+    print( "I have $n friends\n" );
+
+Would produce: I have 1000 friends
+
+Because the object is overloaded, you can use the variable with any perl operators, such as:
+
+    $n /= 2 # 5
+    $n + 3 # 8
+    $n **= 2 # $n is now 64
+    # etc...
+
+L<Module::Generic::Number> also handles infinity and numbers that are not numbers, a.k.a. C<NaN>. Ot uses 2 special classes: L<Module::Generic::Infinity> and L<Module::Generic::Nan>
+
+While C<NaN> is very straightforward, C<Inf> or C<-Inf> is a bit trickier, because although it is not a number, it is still possible to perform some operations. For example :
+
+    # Here the use of abs is meaningless, and just to test chaining
+    $inf->abs->max(10)->floor
+
+Would yield C<Inf> object (L<Module::Generic::Infinity>), but
+
+    $inf->abs->max(10)->mod(3)
+
+Would yield a C<NaN> object (L<Module::Generic::Nan>) and of course
+
+    $inf->abs->min(10)
+
+Would yield C<10> as a L<Module::Generic::Number> object, so the results possibly becomes an object of a different class based on the result.
+
+Operators also works on the infinity object:
+
+    my $inf = Module::Generic::Infinity->ne( -Inf );
+    $inf *= -1 # Yields a new infinity object with value Inf
+
+Those are just basic arithmetics wrapped in object to enable object oriented interface and chaining. It does not do anything special and rely on perl and L<POSIX> for computation, depending on the function.
+
+=head1 METHODS
+
+=head2 new
+
+Provided with a number, some optional parameters and this returns a new object.
+
+Possible optional parameters are:
+
+=over 4
+
+=item I<decimal>
+
+Specifies the decimal separator. This can also be changed or retrieved with the method L</"decimal">
+
+=item I<lang>
+
+If provided with a language tag as specified in L<rfc5646|https://tools.ietf.org/html/rfc5646>, and this will the number format properties based on the locale dictionary. It uses L<POSIX/"setlocale"> to achieve that, but without disturbing your own locale settings.
+
+WIth the number format properties retrieved, it will populate the other parameters here, if not provided already. For example :
+
+    my $n = Module::Generic::Number->new( 1000, { lang => 'fr_FR' });
+    $n->format # 1.000,00 €
+
+Would set the thousand separator to C<.>, the decimal separator to C<,>, the currency symbol to C<€> and precede to false.
+
+    my $n = Module::Generic::Number->new( 1000, {
+        lang => 'fr_FR',
+        precede => 1,
+    });
+
+Uses the standard default format properties, except for precede which we set to true
+
+    $n->format # € 1.000,00
+
+=item I<precede>
+
+If set to true, this will set the currency symbol before the number and when set to false, it will set it after the number
+
+ This can also be changed or retrieved with the method L</"precede">
+
+=item I<precision>
+
+Sets the decimal precision of the number.  This can also be changed or retrieved with the method L</"precision">
+
+=item I<symbol>
+
+Sets the currency symbol to be used upon formatting of the number as money with the method L</"format_money">
+
+ This can also be changed or retrieved with the method L</"symbol">
+
+=item I<thousand>
+
+Sets the thousand separator to be used uppon formatting.
+
+ This can also be changed or retrieved with the method L</"thousand">
+
+=back
+
+=head2 abs
+
+Return the absolute value of the number object. Same as L<perlfunc/"abs">
+
+=head2 atan
+
+Returns the arcus tangent for the number object. See L<POSIX/"atan">
+
+    # Assuming $n is an object for 1000
+    # atan2( Y, X ). Y = 1000 here
+    $n->atan2( 20 ) # produces 1.55079899282175
+
+=head2 atan2
+
+Returns the arctangent of Y/X in the range -PI to PI. See L<perlfunc/"atan2">
+
+=head2 as_string
+
+Returns the object string as a string.
+
+    my $n = Module::Generic::Number->new( 1000 );
+    print( "I have $n books\n" );
+    # I have 1000 books
+    # But better like ths:
+    printf( "I have %s bools\n", $n->format( 0 ) );
+    # I have 1,000 books
+
+=head2 cbrt
+
+Returns the cube root. See L<POSIX/"cbrt">
+
+=head2 ceil
+
+Returns the smallest integer value greater than or equal to the number object. See L<POSIX/"ceil">
+
+    # Assuming $n is an object for 3.14159265358979323846
+    $n->ceil # 4
+
+=head2 chr
+
+Returns the character matching our number object. See L<perlfunc/"chr">
+
+    # Assuming $n is 74
+    $n->chr # J
+
+=head2 clone
+
+Returns a clone of the current object, keeping its original formatting properties
+
+It can take an optional number that will be used
+
+    my $n = Moduke::Generic::Number->new( 1000 );
+    # $n is no 1000 with thousand separator set to "","", etc
+    my $n2 = $n->clone( 2020 );
+    # Same properties as $n, but now the number is 2020 instead of 1000 and this is a new object
+
+=head2 cos
+
+Returns the cosine of the number object. See L<perlfunc/"cos">
+
+=head2 currency
+
+Sets or gets the currency symbol to be used for formatting the number object with L</"format_money">
+
+=head2 decimal
+
+Sets or gets the decimal separator to be used for formatting the number object
+
+=head2 exp
+
+Returns the natural logarithm base to the power of the number object. See L<perlfunc/"exp">
+
+    # Assuming the number object is 2
+    $n->exp # 7.38905609893065
+
+=head2 floor
+
+Returns the largest integer value less than or equal to the number object. See L<POSIX/"floor">
+
+    # Assuming $n is an object for 3.14159265358979323846
+    $n->ceil # 3
+
+=head2 format
+
+Provided with an optional precision and this format the number in a human readable way using thousand and decimal separators and floating number precision
+
+    $n->format # 1,000.00
+
+=head2 format_binary
+
+    # Assuming the number object is 1000
+    $n->format_binary # 1111101000
+
+=head2 format_bytes
+
+    # Assuming the number object is 1,234,567
+    $n->format_bytes # 1.18M
+
+=head2 format_hex
+
+    # Assuming the number object is 1000
+    $n->format_hex # 0x3E8
+
+=head2 format_money
+
+Provided with an optional precision, this format the number object, using the inital format parameters specified during object instantiation.
+
+    # Assuming the number object is 1000
+    $n->format_money # € 1,000.00
+
+=head2 format_negative
+
+Provided with a format which must includes the character C<x> and this format the number object, assuming it is negative.
+
+For example, suitable for accounting:
+
+    $n->format_negative( '(x)' ); # (1,000)
+
+=head2 format_picture
+
+Format the string based on the patter provided
+
+    $n->format_picture( '##,###.##' ); # 1,000.00
+
+=head2 formatter
+
+Sets or gets the L<Number::Format> object used for formatting.
+
+=head2 from_binary
+
+Returns a number object based on a binary number.
+
+    my $n2 = $n->from_binary( "1111101000" ); # 1000
+
+=head2 from_hex
+
+Returns a number object based on an hex number.
+
+    my $n2 = $n->from_hex( "0x400" ); # 1024
+
+=head2 int
+
+Returns the integer portion of the number object. See L<perlfunc/"int"> for more details.
+
+    # Assuming $n is an object for 3.14159265358979323846
+    $n->int # 3
+
+=head2 is_finite
+
+Rturns true if the number is finite, i.e. not infinity. See L<POSIX/"isfinite">
+
+=head2 is_float
+
+Returns true if the number is a floating decimal number. It uses L<POSIX/"modf"> to find out.
+
+=head2 is_infinite
+
+Rturns true if the number is infinite. See L<POSIX/"isinf">
+
+=head2 is_int
+
+Returns true if the number is an integer. It uses L<POSIX/"modf"> to find out.
+
+=head2 is_nan
+
+Returns true if the number is not a number, i.e. NaN. See L<POSIX/"isnan">
+
+=head2 is_negative
+
+Returns true if the number object is negative, false otherwise. See L<POSIX/"signbit">
+
+=head2 is_normal
+
+Returns true if the argument is normal (that is, not a subnormal/denormal, and not an infinity, or a not-a-number). See L<POSIX/"isnormal">
+
+=head2 is_positive
+
+Returns true if the number object is positive, false otherwise. See L<POSIX/"signbit">
+
+=head2 length
+
+Returns the number of digits this number object contains. The value returned is a L<Module::Generic::Number> object
+
+=head2 log
+
+Returns the natural logarithm of the number object. See L<perlfunc/"log"> for more details.
+
+    $n->log # 6.90775527898214
+
+=head2 log2
+
+Logarithm base two of the number object. See L<POSIX/"log2"> for more details.
+
+    $n->log2 # 9.96578428466209
+
+=head2 log10
+
+Returns the 10-base logarithm of the number object. See L<POSIX/"log10"> for more details.
+
+    $n->log10 # 3
+
+=head2 max
+
+Returns the highest number of either the number object, or the additional number provided as arguement. If the latter is undef, the number object is returned. See L<POSIX/"fmax">
+
+    $n->max( 2000 ) # 2000
+
+Returns the lowest number of either the number object, or the additional number provided as arguement. If the latter is undef, the number object is returned. See L<POSIX/"fmin">
+
+    $n->min( 2000 ) # 2000
+
+=head2 mod
+
+Returns the remainder for the number bject divided by another number provided as additional argument. See L<POSIX/"fmod"> for more details.
+
+    # Assuming 1000
+    $n->mod(3) # 1
+
+=head2 new_formatter
+
+Given an optional hash of parameters similar to the oens provided to L</"new"> and this return a new L<Number::Format> object or undef with an L<Module::Generic/"error"> set upon error
+
+=head2 oct
+
+Provided an octal value, this returns the corresponding number as an object. See L<perlfunc/"oct"> for more details.
+
+=head2 pow
+
+Returns the number object to the power of the number provided as arguments. See L<POSIX/"pow"> for more details.
+
+    # Assuming $n is an object representing 2
+    $n->pow( 3 ) # 8
+
+=head2 precede
+
+Sets or gets the I<precede> property of this object. This is used by L<Number::Format> to determine if the currency symbol should be set before or after the number
+
+=head2 precision
+
+Sets or gets the floating precision of the number.
+
+    # Assuming $n is an object for 3.14159265358979323846
+    $n->precision( 4 );
+    $n->format # 3.1416
+
+=head2 rand
+
+Returns a random fractional number greater than or equal to 0 and less than the value of the number object.
+See L<perlfunc/"rand"> for more information.
+
+=head2 round
+
+Provided with an optional precision, this will round the number object. Internally it uses L<perldoc/"sprintf"> to achieve that.
+
+=head2 sin
+
+Returns the sine of the number object. See L<perlfunc/"sine"> for more details.
+
+=head2 sqrt
+
+Return the positive square root of the number object. See L<perlfunc/"sqrt"> for more details.
+
+=head2 symbol
+
+Set or gets the currency symbol to be used in L</"format_money">
+
+=head2 tan
+
+Returns the tangent of the number object. See L<POSIX/"tan"> for more details.
+
+=head2 thousand
+
+Set or gets the thousand separator used in formatting the number.
+
+=head2 unformat
+
+Provided with a string containing a number, and this returns a number as a L<Module::Generic::Number> object.
+
+=head1 SEE ALSO
+
+L<Module::Generic::Scalar>, L<Module::Generic::Array>, L<Module::Generic::Boolean>, L<Module::Generic::Hash>, L<Module::Generic::Dynamic>
+
+L<Math::BigInt>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2000-2020 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut
+

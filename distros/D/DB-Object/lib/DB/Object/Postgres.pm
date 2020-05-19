@@ -17,14 +17,14 @@ BEGIN
 {
     require 5.6.0;
     use strict;
-	use parent qw( DB::Object );
-	use version;
+    use parent qw( DB::Object );
+    use version;
     use DBI;
     ## use DBD::Pg qw( :pg_types );
     eval
     {
-		require DBD::Pg;
-		DBD::Pg->import( ':pg_types' );
+        require DBD::Pg;
+        DBD::Pg->import( ':pg_types' );
     };
     die( $@ ) if( $@ );
     use TryCatch;
@@ -88,82 +88,82 @@ sub attribute($;$@)
     my %arg   = ( @_ );
     my %attr  = 
     (
-    'InactiveDestroy'		=> 1, 
-    'AutoInactiveDestroy'	=> 1,
-    'RaiseError'			=> 1, 
-    'PrintError'			=> 1, 
-	'ShowErrorStatement'	=> 1,
-    'Warn'					=> 1, 
-    'Executed'				=> 0,
-    'TraceLevel'			=> 1,
-    'Kids'					=> 0,
-    'ActiveKids'			=> 0, 
-    'CachedKids'			=> 0,
-    'ChildHandles'			=> 0,
-    'PrintWarn'				=> 1,
-    'HandleError'			=> 1,
-    'HandleSetErr'			=> 1,
-    'ErrCount'				=> 1,
-    'FetchHashKeyName'		=> 1,
-    'ChopBlanks'			=> 1,
-    'Taint'					=> 1,
-    'TaintIn'				=> 1,
-    'TaintOut'				=> 1,
-    'Profile'				=> 1,
-    'Type'					=> 1,
+    'InactiveDestroy'        => 1, 
+    'AutoInactiveDestroy'    => 1,
+    'RaiseError'            => 1, 
+    'PrintError'            => 1, 
+    'ShowErrorStatement'    => 1,
+    'Warn'                    => 1, 
+    'Executed'                => 0,
+    'TraceLevel'            => 1,
+    'Kids'                    => 0,
+    'ActiveKids'            => 0, 
+    'CachedKids'            => 0,
+    'ChildHandles'            => 0,
+    'PrintWarn'                => 1,
+    'HandleError'            => 1,
+    'HandleSetErr'            => 1,
+    'ErrCount'                => 1,
+    'FetchHashKeyName'        => 1,
+    'ChopBlanks'            => 1,
+    'Taint'                    => 1,
+    'TaintIn'                => 1,
+    'TaintOut'                => 1,
+    'Profile'                => 1,
+    'Type'                    => 1,
     ## Not used
-    ## 'LongReadLen'			=> 1,
-    ## 'LongTruncOk'			=> 1,
-    ## 'CompatMode'			=> 1,
-    'AutoCommit'			=> 1, 
-    'Name'					=> 0, 
-    'RowCacheSize'			=> 0, 
-    'NUM_OF_FIELDS'			=> 0, 
-    'NUM_OF_PARAMS'			=> 0, 
-    'NAME'					=> 0, 
-    'TYPE'					=> 0, 
-    'PRECISION'				=> 0, 
-    'SCALE'					=> 0, 
-    'NULLABLE'				=> 0, 
-    'CursorName'			=> 0, 
-    'Statement'				=> 0, 
-    'RowsInCache'			=> 0, 
+    ## 'LongReadLen'            => 1,
+    ## 'LongTruncOk'            => 1,
+    ## 'CompatMode'            => 1,
+    'AutoCommit'            => 1, 
+    'Name'                    => 0, 
+    'RowCacheSize'            => 0, 
+    'NUM_OF_FIELDS'            => 0, 
+    'NUM_OF_PARAMS'            => 0, 
+    'NAME'                    => 0, 
+    'TYPE'                    => 0, 
+    'PRECISION'                => 0, 
+    'SCALE'                    => 0, 
+    'NULLABLE'                => 0, 
+    'CursorName'            => 0, 
+    'Statement'                => 0, 
+    'RowsInCache'            => 0, 
     ## Indicates if DBD::Pg should attempt to use server-side prepared statements. On by default
-    'pg_server_prepare'		=> 1,
+    'pg_server_prepare'        => 1,
     ## If true, boolean values will be returned as the characters 't' and 'f' instead of '1' and '0'.
-    'pg_bool_tf'			=> 1,
+    'pg_bool_tf'            => 1,
     ## Specifies if the current database connection should be in read-only mode or not.
-    'ReadOnly'				=> 1,
-    'pg_switch_prepared'	=> 1,
+    'ReadOnly'                => 1,
+    'pg_switch_prepared'    => 1,
     ## When true, question marks inside of statements are not treated as placeholders, e.g. geometric operators
-    'pg_placeholder_dollaronly'	=> 1,
+    'pg_placeholder_dollaronly'    => 1,
     ## When true, colons inside of statements are not treated as placeholders
-    'pg_placeholder_nocolons'	=> 1,
-    'pg_enable_utf8'		=> 1,
+    'pg_placeholder_nocolons'    => 1,
+    'pg_enable_utf8'        => 1,
     ## Valid entries are 0, 1 and 2
-    'pg_errorlevel'			=> 1,
-    'pg_lib_version'		=> 0,
-    'pg_server_version'		=> 0,
+    'pg_errorlevel'            => 1,
+    'pg_lib_version'        => 0,
+    'pg_server_version'        => 0,
     ## Current database name
-    'Name'					=> 0,
-    'Username'				=> 0,
-    'pg_db'					=> 0,
-    'pg_user'				=> 0,
-    'pg_host'				=> 0,
-    'pg_port'				=> 0,
-    'pg_socket'				=> 0,
-    'pg_pass'				=> 0,
-    'pg_options'			=> 0,
-    'pg_default_port'		=> 0,
-    'pg_pid'				=> 0,
-    'pg_prepare_now'		=> 1,
-    'pg_expand_array'		=> 1,
-    'pg_async_status'		=> 0,
-    'pg_standard_conforming_strings'	=> 0,
-    'pg_INV_READ'			=> 0,
-    'pg_INV_WRITE'			=> 0,
-    'Driver'				=> 0,
-    'pg_protocol'			=> 0,
+    'Name'                    => 0,
+    'Username'                => 0,
+    'pg_db'                    => 0,
+    'pg_user'                => 0,
+    'pg_host'                => 0,
+    'pg_port'                => 0,
+    'pg_socket'                => 0,
+    'pg_pass'                => 0,
+    'pg_options'            => 0,
+    'pg_default_port'        => 0,
+    'pg_pid'                => 0,
+    'pg_prepare_now'        => 1,
+    'pg_expand_array'        => 1,
+    'pg_async_status'        => 0,
+    'pg_standard_conforming_strings'    => 0,
+    'pg_INV_READ'            => 0,
+    'pg_INV_WRITE'            => 0,
+    'Driver'                => 0,
+    'pg_protocol'            => 0,
     );
     ## Only those attribute exist
     ## Using an a non existing attribute produce an exception, so we better avoid
@@ -192,9 +192,9 @@ sub attribute($;$@)
 
 sub begin_work($;$@)
 {
-	my $self = shift( @_ );
-	$self->{transaction} = 1;
-	return( $self->{dbh}->begin_work( @_ ) );
+    my $self = shift( @_ );
+    $self->{transaction} = 1;
+    return( $self->{dbh}->begin_work( @_ ) );
 }
 
 ## This method is common to DB::Object and DB::Object::Statement
@@ -206,9 +206,9 @@ sub begin_work($;$@)
 
 sub commit($;$@)
 {
-	my $self = shift( @_ );
-	$self->{transaction} = 0;
-	return( $self->{dbh}->commit( @_ ) );
+    my $self = shift( @_ );
+    $self->{transaction} = 0;
+    return( $self->{dbh}->commit( @_ ) );
 }
 
 ## Inherited by DB::Object, however, DB::Object::connect() will call our subroutine 
@@ -226,63 +226,63 @@ sub connect
 
 sub create_db
 {
-	my $self = shift( @_ );
-	my $name = shift( @_ ) || return( $self->error( "No database name to create was provided." ) );
-	my $opts = {};
-	$opts = shift( @_ ) if( $self->_is_hash( $_[0] ) );
-	my $params = [];
-	## https://www.postgresql.org/docs/9.5/sql-createdatabase.html
-	push( @$params, sprintf( 'OWNER=%s', $opts->{owner} ) ) if( $opts->{owner} );
-	push( @$params, sprintf( 'TEMPLATE=%s', $opts->{template} ) ) if( $opts->{template} );
-	push( @$params, sprintf( 'ENCODING=%s', $opts->{encoding} ) ) if( $opts->{encoding} );
-	push( @$params, sprintf( 'LC_COLLATE=%s', $opts->{lc_collate} ) ) if( $opts->{lc_collate} );
-	push( @$params, sprintf( 'LC_CTYPE=%s', $opts->{lc_ctype} ) ) if( $opts->{lc_ctype} );
-	push( @$params, sprintf( 'TABLESPACE=%s', $opts->{tablespace} ) ) if( $opts->{tablespace} );
-	push( @$params, sprintf( 'ALLOW_CONNECTIONS=%s', $opts->{allowcon} ? 'true' : 'false' ) ) if( length( $opts->{allowcon} ) );
-	push( @$params, sprintf( 'CONNECTION LIMIT=%s', $opts->{connlimit} ) ) if( length( $opts->{connlimit} ) );
-	push( @$params, sprintf( 'IS_TEMPLATE=%s', $opts->{istemplate} ? 'true' : 'false' ) ) if( length( $opts->{istemplate} ) );
-	my $sql = "CREATE DATABASE $name";
-	if( scalar( @$params ) )
-	{
-		$sql .= ' WITH ' . join( ' ', @$params );
-	}
+    my $self = shift( @_ );
+    my $name = shift( @_ ) || return( $self->error( "No database name to create was provided." ) );
+    my $opts = {};
+    $opts = shift( @_ ) if( $self->_is_hash( $_[0] ) );
+    my $params = [];
+    ## https://www.postgresql.org/docs/9.5/sql-createdatabase.html
+    push( @$params, sprintf( 'OWNER=%s', $opts->{owner} ) ) if( $opts->{owner} );
+    push( @$params, sprintf( 'TEMPLATE=%s', $opts->{template} ) ) if( $opts->{template} );
+    push( @$params, sprintf( 'ENCODING=%s', $opts->{encoding} ) ) if( $opts->{encoding} );
+    push( @$params, sprintf( 'LC_COLLATE=%s', $opts->{lc_collate} ) ) if( $opts->{lc_collate} );
+    push( @$params, sprintf( 'LC_CTYPE=%s', $opts->{lc_ctype} ) ) if( $opts->{lc_ctype} );
+    push( @$params, sprintf( 'TABLESPACE=%s', $opts->{tablespace} ) ) if( $opts->{tablespace} );
+    push( @$params, sprintf( 'ALLOW_CONNECTIONS=%s', $opts->{allowcon} ? 'true' : 'false' ) ) if( length( $opts->{allowcon} ) );
+    push( @$params, sprintf( 'CONNECTION LIMIT=%s', $opts->{connlimit} ) ) if( length( $opts->{connlimit} ) );
+    push( @$params, sprintf( 'IS_TEMPLATE=%s', $opts->{istemplate} ? 'true' : 'false' ) ) if( length( $opts->{istemplate} ) );
+    my $sql = "CREATE DATABASE $name";
+    if( scalar( @$params ) )
+    {
+        $sql .= ' WITH ' . join( ' ', @$params );
+    }
     my $dbh = $self->{dbh} || return( $self->error( "Could not find database handler." ) );
     my( $sth, $rc );
     try
     {
-		$sth = $dbh->prepare( $sql ) || return( $self->error( "An error occured while prepareing sql query to create database: ", $dbh->errstr ) );
-		$rc = $sth->execute || return( $self->error( "An error occured while executing sql query to create database: ", $sth->errstr ) );
-		$sth->finish;
-	}
-	catch( $e )
-	{
-		$sth->finish;
-		return( $self->error( "An unexpected error occurred while trying to execute the sql query to create database: ", $sth->error, "\n$sql" ) );
-	}
-	my $ref = {};
-	my @keys = qw( host port login passwd schema opt debug );
-	@$ref{ @keys } = @$self{ @keys };
-	$ref->{database} = $name;
-	my $dbh = $self->connect( $ref ) || return( $self->error( "I could create the database \"$name\" but oddly enough, I could not connect to it with user \"$ref->{login}\" on host \"$ref->{host}\" with port \"$ref->{port}\"." ) );
-	return( $dbh );
+        $sth = $dbh->prepare( $sql ) || return( $self->error( "An error occured while prepareing sql query to create database: ", $dbh->errstr ) );
+        $rc = $sth->execute || return( $self->error( "An error occured while executing sql query to create database: ", $sth->errstr ) );
+        $sth->finish;
+    }
+    catch( $e )
+    {
+        $sth->finish;
+        return( $self->error( "An unexpected error occurred while trying to execute the sql query to create database: ", $sth->error, "\n$sql" ) );
+    }
+    my $ref = {};
+    my @keys = qw( host port login passwd schema opt debug );
+    @$ref{ @keys } = @$self{ @keys };
+    $ref->{database} = $name;
+    $dbh = $self->connect( $ref ) || return( $self->error( "I could create the database \"$name\" but oddly enough, I could not connect to it with user \"$ref->{login}\" on host \"$ref->{host}\" with port \"$ref->{port}\"." ) );
+    return( $dbh );
 }
 
 sub create_table
 {
-	my $self = shift( @_ );
-	my $name = shift( @_ ) || return( $self->error( "No table name to create was provided." ) );
-	my $opts = {};
-	$opts = shift( @_ ) if( $self->_is_hash( $_[0] ) );
-	return( $self->error( "Table \"$name\" already exists in the database." ) ) if( $self->table_exists( $name ) );
-	my $schema = $self->schema;
-	my $sql = $opts->{sql} || return( $self->error( "No sql query was provided to create table \"$name\"." ) );
-	## The schema is missing
-	if( $schema )
-	{
-		$sql =~ s/\b(CREATE[[:blank:]]+(?:.*?)\bTABLE(?:[[:blank:]]+IF[[:blank:]]+NOT[[:blank:]]+EXISTS)?)[[:blank:]]+$name\b/$1 ${schema}.${name}/si;
-	}
-	my $rv = $self->do( $sql ) || return( $self->error( "An error occured while executing sql query to create table \"$name\": ", $self->errstr, "\nOriginal query was: $sql" ) );
-	return( $rv );
+    my $self = shift( @_ );
+    my $name = shift( @_ ) || return( $self->error( "No table name to create was provided." ) );
+    my $opts = {};
+    $opts = shift( @_ ) if( $self->_is_hash( $_[0] ) );
+    return( $self->error( "Table \"$name\" already exists in the database." ) ) if( $self->table_exists( $name ) );
+    my $schema = $self->schema;
+    my $sql = $opts->{sql} || return( $self->error( "No sql query was provided to create table \"$name\"." ) );
+    ## The schema is missing
+    if( $schema )
+    {
+        $sql =~ s/\b(CREATE[[:blank:]]+(?:.*?)\bTABLE(?:[[:blank:]]+IF[[:blank:]]+NOT[[:blank:]]+EXISTS)?)[[:blank:]]+$name\b/$1 ${schema}.${name}/si;
+    }
+    my $rv = $self->do( $sql ) || return( $self->error( "An error occured while executing sql query to create table \"$name\": ", $self->errstr, "\nOriginal query was: $sql" ) );
+    return( $rv );
 }
 
 ## sub create_table($;%)
@@ -296,30 +296,30 @@ sub create_table
 
 sub databases
 {
-	my $self = shift( @_ );
-	## return( $self->error( "Not connected to PostgreSQL server yet. Issue $dbh->connect first." ) ) if( !$self->{ 'dbh' } );
-	my $dbh;
-	## If there is no connection yet, then create one using the postgres login.
-	## There should not be a live user and database just to check what databases there are.
-	if( !$self->{dbh} )
-	{
-		try
-		{
-			$dbh = $self->connect || return( undef() );
-		}
-		catch( $e )
-		{
-			$self->message( 3, "An error occurred while trying to connect to get the list of available databases: $e" );
-			return;
-		}
-	}
-	else
-	{
-		$dbh = $self;
-	}
-	my $temp = $dbh->do( "SELECT datname FROM pg_database" )->fetchall_arrayref;
-	my @dbases = map( $_->[0], @$temp );
-	return( @dbases );
+    my $self = shift( @_ );
+    ## return( $self->error( "Not connected to PostgreSQL server yet. Issue $dbh->connect first." ) ) if( !$self->{ 'dbh' } );
+    my $dbh;
+    ## If there is no connection yet, then create one using the postgres login.
+    ## There should not be a live user and database just to check what databases there are.
+    if( !$self->{dbh} )
+    {
+        try
+        {
+            $dbh = $self->connect || return( undef() );
+        }
+        catch( $e )
+        {
+            $self->message( 3, "An error occurred while trying to connect to get the list of available databases: $e" );
+            return;
+        }
+    }
+    else
+    {
+        $dbh = $self;
+    }
+    my $temp = $dbh->do( "SELECT datname FROM pg_database" )->fetchall_arrayref;
+    my @dbases = map( $_->[0], @$temp );
+    return( @dbases );
 }
 
 ## delete() is inherited from DB::Object
@@ -364,20 +364,20 @@ sub databases
 
 sub func
 {
-	my $self      = shift( @_ );
-	my $table     = shift( @_ );
-	## e.g. table_attributes to get the detail information on table columns
-	my $func_name = shift( @_ );
-	## Returns:
-	## NAME        attribute name
-	## TYPE        attribute type
-	## SIZE        attribute size (-1 for variable size)
-	## NULLABLE    flag nullable
-	## DEFAULT     default value
-	## CONSTRAINT  constraint
-	## PRIMARY_KEY flag is_primary_key
-	## REMARKS     attribute description
-	return( $self->{ 'dbh' }->func( $table, $func_name ) );
+    my $self      = shift( @_ );
+    my $table     = shift( @_ );
+    ## e.g. table_attributes to get the detail information on table columns
+    my $func_name = shift( @_ );
+    ## Returns:
+    ## NAME        attribute name
+    ## TYPE        attribute type
+    ## SIZE        attribute size (-1 for variable size)
+    ## NULLABLE    flag nullable
+    ## DEFAULT     default value
+    ## CONSTRAINT  constraint
+    ## PRIMARY_KEY flag is_primary_key
+    ## REMARKS     attribute description
+    return( $self->{ 'dbh' }->func( $table, $func_name ) );
 }
 
 ## See DB::Object
@@ -398,8 +398,8 @@ sub having
 
 sub large_object
 {
-	## Parameter is a bitmask mode
-	return( DB::Object::Postgres::Lo->new( $self->{ 'dbh' } ) );
+    ## Parameter is a bitmask mode
+    return( DB::Object::Postgres::Lo->new( $self->{ 'dbh' } ) );
 }
 
 ## Must be superseded, or better yet, the one in DB::Object should probably be changed to ours
@@ -442,38 +442,38 @@ sub lock
 
 sub make_schema
 {
-	my $self = shift( @_ );
-	my $db   = shift( @_ ) || $self->{ 'database' };
-	my $dbh;
-	if( $self->{ 'dbh' } )
-	{
-		$dbh = $self;
-	}
-	else
-	{
-		$dbh = $self->connect( { 'login' => 'postgres', 'database' => $db } ) || return( $self->error( "Cannot connect to Postgres database $db: " . $self->error ) );
-	}
-	my $tables = $dbh->tables;
-	return( $self->error( "There is no table in database $db." ) ) if( !@$tables );
-	my @schema_tables = ();
-	my $max_field_size = <<SQL;
+    my $self = shift( @_ );
+    my $db   = shift( @_ ) || $self->{ 'database' };
+    my $dbh;
+    if( $self->{ 'dbh' } )
+    {
+        $dbh = $self;
+    }
+    else
+    {
+        $dbh = $self->connect( { 'login' => 'postgres', 'database' => $db } ) || return( $self->error( "Cannot connect to Postgres database $db: " . $self->error ) );
+    }
+    my $tables = $dbh->tables;
+    return( $self->error( "There is no table in database $db." ) ) if( !@$tables );
+    my @schema_tables = ();
+    my $max_field_size = <<SQL;
 SELECT MAX(LENGTH(a.attname)) AS "max_length"
 FROM pg_class c, pg_attribute a, pg_authid o
 WHERE c.relkind IN ('r', 'v', 'm', 'f') AND a.attrelid=c.oid AND c.relowner=o.oid AND o.rolname != 'postgres'
 SQL
-	my $inherited_fields = <<SQL;
+    my $inherited_fields = <<SQL;
 SELECT c.relname AS table, a.attname AS field 
 FROM pg_class c
 JOIN pg_inherits i ON c.oid = i.inhrelid
 JOIN pg_attribute a ON i.inhparent = a.attrelid
 WHERE attnum > 0
 SQL
-	my $table_info = <<SQL;
+    my $table_info = <<SQL;
 SELECT c.oid, c.relchecks, c.relkind, c.relhasindex, c.relhasrules, c.relhastriggers, c.relhasoids, '', c.reltablespace, CASE WHEN c.reloftype = 0 THEN '' ELSE c.reloftype::pg_catalog.regtype::pg_catalog.text END, c.relpersistence                                                                                      FROM pg_catalog.pg_class c
 LEFT JOIN pg_catalog.pg_class tc ON (c.reltoastrelid = tc.oid)
 WHERE c.relname ~ '^(%s)\$'
 SQL
-	my $field_info = <<SQL;
+    my $field_info = <<SQL;
 SELECT a.attname,
   pg_catalog.format_type(a.atttypid, a.atttypmod),
   (SELECT substring(pg_catalog.pg_get_expr(d.adbin, d.adrelid) for 128)
@@ -488,7 +488,7 @@ FROM pg_catalog.pg_attribute a
 WHERE a.attrelid = ? AND a.attnum > 0 AND NOT a.attisdropped
 ORDER BY a.attnum
 SQL
-	my $get_constraints = <<SQL;
+    my $get_constraints = <<SQL;
 SELECT c2.relname, i.indisprimary, i.indisunique, i.indisclustered, i.indisvalid, pg_catalog.pg_get_indexdef(i.indexrelid, 0, true),
   pg_catalog.pg_get_constraintdef(con.oid, true), contype, condeferrable, condeferred, c2.reltablespace
 FROM pg_catalog.pg_class c, pg_catalog.pg_class c2, pg_catalog.pg_index i
@@ -496,153 +496,153 @@ FROM pg_catalog.pg_class c, pg_catalog.pg_class c2, pg_catalog.pg_index i
 WHERE c.oid = ? AND c.oid = i.indrelid AND i.indexrelid = c2.oid
 ORDER BY i.indisprimary DESC, i.indisunique DESC, c2.relname
 SQL
-	my $get_check_constraint = <<SQL;
+    my $get_check_constraint = <<SQL;
 SELECT r.conname, pg_catalog.pg_get_constraintdef(r.oid, true)
 FROM pg_catalog.pg_constraint r
 WHERE r.conrelid = ? AND r.contype = 'c'
 ORDER BY 1
 SQL
-	my $get_fkey_constraint = <<SQL;
+    my $get_fkey_constraint = <<SQL;
 SELECT conname,
   pg_catalog.pg_get_constraintdef(r.oid, true) as condef
 FROM pg_catalog.pg_constraint r
 WHERE r.conrelid = ? AND r.contype = 'f' ORDER BY 1
 SQL
-	my $inheritance = "SELECT c.oid::pg_catalog.regclass FROM pg_catalog.pg_class c, pg_catalog.pg_inherits i WHERE c.oid=i.inhparent AND i.inhrelid = ? ORDER BY inhseqno";
-	my $get_tbl_comment = "SELECT description FROM pg_description WHERE (SELECT relname FROM pg_class WHERE oid=objoid) = ? and objsubid = 0";
-	my $get_field_comment = "SELECT d.description, a.attname FROM pg_description d, pg_attribute a WHERE (SELECT relname FROM pg_class WHERE oid=d.objoid) = ? AND a.attnum=d.objsubid AND a.attrelid=d.objoid AND d.objsubid > 0";
-	
-	## Get the max size of the fields to properly format the schema
-	my $sth = $dbh->{dbh}->prepare_cached( $max_field_size ) || return( $self->error( $dbh->{dbh}->errstr ) );
-	$sth->execute() || return( $self->error( $sth->errstr ) );
-	my $fsize = $sth->fetchrow;
-	$sth->finish;
-	
-	## Get the list of all inherited fields per table, so we can exclude them in the schema we produce.
-	$sth = $dbh->{dbh}->prepare_cached( $inherited_fields ) || return( $self->error( $dbh->{dbh}->errstr ) );
-	$sth->execute() || return( $self->error( $sth->errstr ) );
-	my $all = $sth->fetchall_arrayref( {} );
-	my $inherited = {};
-	foreach my $h ( @$all )
-	{
-		$inherited->{ $h->{ 'table' } } = [] if( !exists( $inherited->{ $h->{ 'table' } } ) );
-		push( @{$inherited->{ $h->{ 'table' } }}, $h->{ 'field' } );
-	}
-	$sth->finish;
-	
-	foreach my $t ( @$tables )
-	{
-		my @table_def = ( "CREATE TABLE $t (" );
-		## Get table overall information
-		$dbh->bind( 0 );
-		$sth = $dbh->{dbh}->prepare_cached( sprintf( $table_info, $t ) ) || return( $self->error( $dbh->{dbh}->errstr ) );
-		$sth->execute() || return( $self->error( $sth->errstr ) );
-		my $tbl_info = $sth->fetchrow_hashref();
-		$sth->finish;
-		$dbh->bind( 1 );
-		
-		## Get field info.
-		$sth = $dbh->{Dbh}->prepare_cached( $field_info ) || return( $self->error( $dbh->{dbh}->errstr ) );
-		$sth->execute( $tbl_info->{ 'oid' } ) || return( $self->error( $sth->errstr ) );
-		my $rows = $sth->fetchall_arrayref( {} );
-		foreach my $r ( @$rows )
-		{
-			next if( exists( $inherited->{ $t } ) && grep( /^$r->{ 'attname' }$/, @{$inherited->{ $t }} ) );
-			my @col_def = ( sprintf( "\t%-${fsize}s %s", $r->{ 'attname' }, uc( $r->{ 'format_type' } ) ) );
-			push( @col_def, 'NOT NULL' ) if( $r->{ 'attnotnull' } );
-			if( $r->{ 'format_type' } =~ /^(integer|int|boolean|decimal)$/i )
-			{
-				push( @col_def, sprintf( 'DEFAULT %s', $r->{ 'substring' } ) ) if( $r->{ 'substring' } );
-			}
-			else
-			{
-				push( @col_def, sprintf( "DEFAULT '%s'", $r->{ 'substring' } ) ) if( $r->{ 'substring' } );
-			}
-			push( @table_def, join( " ", @col_def ) );
-		}
-		$sth->finish;
-		my @constraints = ();
-		my @index = ();
-		## Get primary key and unique index constraints
-		$sth = $dbh->{dbh}->prepare_cached( $get_constraints ) || return( $self->error( $dbh->{dbh}->errstr ) );
-		$sth->execute( $tbl_info->{ 'oid' } ) || return( $self->error( $sth->errstr ) );
-		$rows = $sth->fetchall_arrayref( {} );
-		foreach my $r ( @$rows )
-		{
-			if( $r->{ 'indisprimary' } || $r->{ 'indisunique' } )
-			{
-			    push( @constraints, sprintf( "\tCONSTRAINT %s %s", @$r{ qw( relname pg_get_constraintdef ) } ) );
-			}
-			else
-			{
-				push( @index, sprintf( 'CREATE INDEX %s;', $r->{ 'pg_get_indexdef' } ) );
-			}
-		}
-		$sth->finish;
-		## Get CHECK constraints
-		$sth = $dbh->{dbh}->prepare_cached( $get_check_constraint ) || return( $self->error( $dbh->{dbh}->errstr ) );
-		$sth->execute( $tbl_info->{ 'oid' } ) || return( $self->error( $sth->errstr ) );
-		$rows = $sth->fetchall_arrayref( {} );
-		foreach my $r ( @$rows )
-		{
-			push( @constraints, sprintf( "\tCONSTRAINT %s %s", @$r{ qw( conname pg_get_constraintdef ) } ) );
-		}
-		$sth->finish;
-		## Get foreign key constraints
-		$sth = $dbh->{dbh}->prepare_cached( $get_fkey_constraint )  || return( $self->error( $dbh->{dbh}->errstr ) );
-		$sth->execute( $tbl_info->{ 'oid' } ) || return( $self->error( $sth->errstr ) );
-		$rows = $sth->fetchall_arrayref( {} );
-		foreach my $r ( @$rows )
-		{
-			push( @constraints, sprintf( "\tCONSTRAINT %s %s", @$r{ qw( conname condef ) } ) );
-		}
-		$sth->finish;
-		push( @table_def, @constraints );
-		
-		## Get table inheritance
-		$sth = $dbh->{dbh}->prepare_cached( $inheritance )  || return( $self->error( $dbh->{dbh}->errstr ) );
-		$sth->execute( $tbl_info->{ 'oid' } ) || return( $self->error( $sth->errstr ) );
-		$rows = $sth->fetchall_arrayref( {} );
-		my @inherit = map{ $_->{ 'oid' } } @$rows;
-		$sth->finish;
-		
-		## Add a comma at the end of each line now we know how many there are.
-		for( my $i = 0; $i < $#table_def; $i++ )
-		{
-			$table_def[ $i ] .= ",";
-		}
-		
-		if( @inherit )
-		{
-		    push( @table_def, sprintf( ') INHERITS (%s);', join( ", ", @inherit ) ) );
-		}
-		else
-		{
-			push( @table_def, ');' );
-		}
-		
-		## Put here the table indexes
-		push( @table_def, @index );
-		
-		## Get comments on the table itself, if any
-		$sth = $dbh->{dbh}->prepare_cached( $get_tbl_comment ) || return( $self->error( $sth->{dbh}->errstr ) );
-		$sth->execute( $t ) || return( $self->error( $sth->errstr ) );
-		my $ref = $sth->fetchrow_hashref();
-		$sth->finish;
-		push( @table_def, sprintf( "COMMENT ON TABLE %s IS '%s';", $t, $ref->{ 'description' } ) ) if( $ref->{ 'description' } );
-		
-		## Get comments for each field
-		$sth = $dbh->{dbh}->prepare_cached( $get_field_comment ) || return( $self->error( $sth->{dbh}->errstr ) );
-		$sth->execute( $t ) || return( $self->error( $sth->errstr ) );
-		$rows = $sth->fetchall_arrayref( {} );
-		$sth->finish;
-		foreach my $r ( @$rows )
-		{
-			push( @table_def, sprintf( "COMMENT ON COLUMN %s.%s IS '%s';", $t, @$r{ qw( attname description ) } ) );
-		}
-		push( @schema_tables, join( "\n", @table_def ) );		
-	}
-	return( wantarray() ? @schema_tables : join( "\n\n", @schema_tables ) );
+    my $inheritance = "SELECT c.oid::pg_catalog.regclass FROM pg_catalog.pg_class c, pg_catalog.pg_inherits i WHERE c.oid=i.inhparent AND i.inhrelid = ? ORDER BY inhseqno";
+    my $get_tbl_comment = "SELECT description FROM pg_description WHERE (SELECT relname FROM pg_class WHERE oid=objoid) = ? and objsubid = 0";
+    my $get_field_comment = "SELECT d.description, a.attname FROM pg_description d, pg_attribute a WHERE (SELECT relname FROM pg_class WHERE oid=d.objoid) = ? AND a.attnum=d.objsubid AND a.attrelid=d.objoid AND d.objsubid > 0";
+    
+    ## Get the max size of the fields to properly format the schema
+    my $sth = $dbh->{dbh}->prepare_cached( $max_field_size ) || return( $self->error( $dbh->{dbh}->errstr ) );
+    $sth->execute() || return( $self->error( $sth->errstr ) );
+    my $fsize = $sth->fetchrow;
+    $sth->finish;
+    
+    ## Get the list of all inherited fields per table, so we can exclude them in the schema we produce.
+    $sth = $dbh->{dbh}->prepare_cached( $inherited_fields ) || return( $self->error( $dbh->{dbh}->errstr ) );
+    $sth->execute() || return( $self->error( $sth->errstr ) );
+    my $all = $sth->fetchall_arrayref( {} );
+    my $inherited = {};
+    foreach my $h ( @$all )
+    {
+        $inherited->{ $h->{ 'table' } } = [] if( !exists( $inherited->{ $h->{ 'table' } } ) );
+        push( @{$inherited->{ $h->{ 'table' } }}, $h->{ 'field' } );
+    }
+    $sth->finish;
+    
+    foreach my $t ( @$tables )
+    {
+        my @table_def = ( "CREATE TABLE $t (" );
+        ## Get table overall information
+        $dbh->bind( 0 );
+        $sth = $dbh->{dbh}->prepare_cached( sprintf( $table_info, $t ) ) || return( $self->error( $dbh->{dbh}->errstr ) );
+        $sth->execute() || return( $self->error( $sth->errstr ) );
+        my $tbl_info = $sth->fetchrow_hashref();
+        $sth->finish;
+        $dbh->bind( 1 );
+        
+        ## Get field info.
+        $sth = $dbh->{Dbh}->prepare_cached( $field_info ) || return( $self->error( $dbh->{dbh}->errstr ) );
+        $sth->execute( $tbl_info->{ 'oid' } ) || return( $self->error( $sth->errstr ) );
+        my $rows = $sth->fetchall_arrayref( {} );
+        foreach my $r ( @$rows )
+        {
+            next if( exists( $inherited->{ $t } ) && grep( /^$r->{ 'attname' }$/, @{$inherited->{ $t }} ) );
+            my @col_def = ( sprintf( "\t%-${fsize}s %s", $r->{ 'attname' }, uc( $r->{ 'format_type' } ) ) );
+            push( @col_def, 'NOT NULL' ) if( $r->{ 'attnotnull' } );
+            if( $r->{ 'format_type' } =~ /^(integer|int|boolean|decimal)$/i )
+            {
+                push( @col_def, sprintf( 'DEFAULT %s', $r->{ 'substring' } ) ) if( $r->{ 'substring' } );
+            }
+            else
+            {
+                push( @col_def, sprintf( "DEFAULT '%s'", $r->{ 'substring' } ) ) if( $r->{ 'substring' } );
+            }
+            push( @table_def, join( " ", @col_def ) );
+        }
+        $sth->finish;
+        my @constraints = ();
+        my @index = ();
+        ## Get primary key and unique index constraints
+        $sth = $dbh->{dbh}->prepare_cached( $get_constraints ) || return( $self->error( $dbh->{dbh}->errstr ) );
+        $sth->execute( $tbl_info->{ 'oid' } ) || return( $self->error( $sth->errstr ) );
+        $rows = $sth->fetchall_arrayref( {} );
+        foreach my $r ( @$rows )
+        {
+            if( $r->{ 'indisprimary' } || $r->{ 'indisunique' } )
+            {
+                push( @constraints, sprintf( "\tCONSTRAINT %s %s", @$r{ qw( relname pg_get_constraintdef ) } ) );
+            }
+            else
+            {
+                push( @index, sprintf( 'CREATE INDEX %s;', $r->{ 'pg_get_indexdef' } ) );
+            }
+        }
+        $sth->finish;
+        ## Get CHECK constraints
+        $sth = $dbh->{dbh}->prepare_cached( $get_check_constraint ) || return( $self->error( $dbh->{dbh}->errstr ) );
+        $sth->execute( $tbl_info->{ 'oid' } ) || return( $self->error( $sth->errstr ) );
+        $rows = $sth->fetchall_arrayref( {} );
+        foreach my $r ( @$rows )
+        {
+            push( @constraints, sprintf( "\tCONSTRAINT %s %s", @$r{ qw( conname pg_get_constraintdef ) } ) );
+        }
+        $sth->finish;
+        ## Get foreign key constraints
+        $sth = $dbh->{dbh}->prepare_cached( $get_fkey_constraint )  || return( $self->error( $dbh->{dbh}->errstr ) );
+        $sth->execute( $tbl_info->{ 'oid' } ) || return( $self->error( $sth->errstr ) );
+        $rows = $sth->fetchall_arrayref( {} );
+        foreach my $r ( @$rows )
+        {
+            push( @constraints, sprintf( "\tCONSTRAINT %s %s", @$r{ qw( conname condef ) } ) );
+        }
+        $sth->finish;
+        push( @table_def, @constraints );
+        
+        ## Get table inheritance
+        $sth = $dbh->{dbh}->prepare_cached( $inheritance )  || return( $self->error( $dbh->{dbh}->errstr ) );
+        $sth->execute( $tbl_info->{ 'oid' } ) || return( $self->error( $sth->errstr ) );
+        $rows = $sth->fetchall_arrayref( {} );
+        my @inherit = map{ $_->{ 'oid' } } @$rows;
+        $sth->finish;
+        
+        ## Add a comma at the end of each line now we know how many there are.
+        for( my $i = 0; $i < $#table_def; $i++ )
+        {
+            $table_def[ $i ] .= ",";
+        }
+        
+        if( @inherit )
+        {
+            push( @table_def, sprintf( ') INHERITS (%s);', join( ", ", @inherit ) ) );
+        }
+        else
+        {
+            push( @table_def, ');' );
+        }
+        
+        ## Put here the table indexes
+        push( @table_def, @index );
+        
+        ## Get comments on the table itself, if any
+        $sth = $dbh->{dbh}->prepare_cached( $get_tbl_comment ) || return( $self->error( $sth->{dbh}->errstr ) );
+        $sth->execute( $t ) || return( $self->error( $sth->errstr ) );
+        my $ref = $sth->fetchrow_hashref();
+        $sth->finish;
+        push( @table_def, sprintf( "COMMENT ON TABLE %s IS '%s';", $t, $ref->{ 'description' } ) ) if( $ref->{ 'description' } );
+        
+        ## Get comments for each field
+        $sth = $dbh->{dbh}->prepare_cached( $get_field_comment ) || return( $self->error( $sth->{dbh}->errstr ) );
+        $sth->execute( $t ) || return( $self->error( $sth->errstr ) );
+        $rows = $sth->fetchall_arrayref( {} );
+        $sth->finish;
+        foreach my $r ( @$rows )
+        {
+            push( @table_def, sprintf( "COMMENT ON COLUMN %s.%s IS '%s';", $t, @$r{ qw( attname description ) } ) );
+        }
+        push( @schema_tables, join( "\n", @table_def ) );        
+    }
+    return( wantarray() ? @schema_tables : join( "\n\n", @schema_tables ) );
 }
 
 ## sub no_bind
@@ -661,19 +661,19 @@ sub on_conflict
     return( $q->on_conflict( @_ ) ) if( !defined( wantarray() ) );
     if( wantarray() )
     {
-		my( @val ) = $q->on_conflict( @_ ) || return( $self->pass_error( $q->error ) );
-		return( @val );
+        my( @val ) = $q->on_conflict( @_ ) || return( $self->pass_error( $q->error ) );
+        return( @val );
     }
     else
     {
-    	my $val = $q->on_conflict( @_ ) || return( $self->pass_error( $q->error ) );
-    	return( $val );
+        my $val = $q->on_conflict( @_ ) || return( $self->pass_error( $q->error ) );
+        return( $val );
     }
 }
 
 sub pg_ping(@)
 {
-	return( shift->{ 'dbh' }->pg_ping );
+    return( shift->{ 'dbh' }->pg_ping );
 }
 
 ## See DB::Object
@@ -693,12 +693,12 @@ sub query_object { return( shift->_set_get_object( 'query_object', 'DB::Object::
 
 sub release
 {
-	return( shift->{ 'dbh' }->pg_release( @_ ) );
+    return( shift->{ 'dbh' }->pg_release( @_ ) );
 }
 
 sub replace
 {
-	return( shift->error( "Replace queries are not supported in PostgreSQL" ) );
+    return( shift->error( "Replace queries are not supported in PostgreSQL" ) );
 }
 
 ## sub reset
@@ -717,53 +717,53 @@ sub returning
 
 sub rollback
 {
-	return( shift->{dbh}->rollback() );
+    return( shift->{dbh}->rollback() );
 }
 
 sub rollback_to(@)
 {
-	return( shift->{dbh}->pg_rollback_to( @_ ) );
+    return( shift->{dbh}->pg_rollback_to( @_ ) );
 }
 
 sub savepoint(@)
 {
-	return( shift->{dbh}->pg_savepoint( @_ ) );
+    return( shift->{dbh}->pg_savepoint( @_ ) );
 }
 
 sub schema { return( shift->_set_get_scalar( 'schema', @_ ) ); }
 
 sub search_path
 {
-	my $self = shift( @_ );
-	if( @_ )
-	{
-		my $val = @_ == 1 
-			? $self->_is_array( $_[0] ) 
-				? shift( @_ ) 
-				: [ @_ ] 
-			: [ @_ ];
-		my $arg = sprintf( '"%s"', join( '", "', @$val ) );
-		my $dbh = $self->{dbh} || return( $self->error( "Could not find database handler." ) );
-		my $sth = $dbh->prepare_cached( "SET search_path = $arg" ) || return( $self->error( "Unable to prepare sql query to set search path: ", $dbh->errstr() ) );
-		my $rc = $sth->execute() || return( $self->error( "Unable to execute sql query to set search path: ", $self->errstr() ) );
-		$sth->finish;
-		return( $rc );
-	}
-	else
-	{
-		my $dbh = $self->{dbh} || return( $self->error( "Could not find database handler." ) );
-		my $sth = $dbh->prepare_cached( "SHOW search_path" ) || return( $self->error( "Unable to prepare sql query to get search path: ", $dbh->errstr() ) );
-		my $rc = $sth->execute() || return( $self->error( "Unable to execute sql query to set search path: ", $self->errstr() ) );
-		my $val = $sth->fetchrow;
-		$sth->finish;
-		my $arr = [ split( /\,[[:blank:]]*/, $val ) ];
-		## Removing surrounding quotes
-		for( my $i = 0; $i < scalar( @$arr ); $i++ )
-		{
-			$arr->[$i] =~ s/^\"|\"$//g;
-		}
-		return( $arr );
-	}
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $val = @_ == 1 
+            ? $self->_is_array( $_[0] ) 
+                ? shift( @_ ) 
+                : [ @_ ] 
+            : [ @_ ];
+        my $arg = sprintf( '"%s"', join( '", "', @$val ) );
+        my $dbh = $self->{dbh} || return( $self->error( "Could not find database handler." ) );
+        my $sth = $dbh->prepare_cached( "SET search_path = $arg" ) || return( $self->error( "Unable to prepare sql query to set search path: ", $dbh->errstr() ) );
+        my $rc = $sth->execute() || return( $self->error( "Unable to execute sql query to set search path: ", $self->errstr() ) );
+        $sth->finish;
+        return( $rc );
+    }
+    else
+    {
+        my $dbh = $self->{dbh} || return( $self->error( "Could not find database handler." ) );
+        my $sth = $dbh->prepare_cached( "SHOW search_path" ) || return( $self->error( "Unable to prepare sql query to get search path: ", $dbh->errstr() ) );
+        my $rc = $sth->execute() || return( $self->error( "Unable to execute sql query to set search path: ", $self->errstr() ) );
+        my $val = $sth->fetchrow;
+        $sth->finish;
+        my $arr = [ split( /\,[[:blank:]]*/, $val ) ];
+        ## Removing surrounding quotes
+        for( my $i = 0; $i < scalar( @$arr ); $i++ )
+        {
+            $arr->[$i] =~ s/^\"|\"$//g;
+        }
+        return( $arr );
+    }
 }
 
 ## See DB::Object; _query_component is superseded and this makes the select customised to Posgres needs
@@ -778,7 +778,7 @@ sub search_path
 ## Was previously getfd()
 sub socket
 {
-	return( shift->{ 'dbh' }->{ 'pg_socket' } );
+    return( shift->{ 'dbh' }->{ 'pg_socket' } );
 }
 
 ## See DB::Object
@@ -794,28 +794,28 @@ sub socket
 sub table_exists
 {
     my $self = shift( @_ );
-	my $table = shift( @_ ) || 
+    my $table = shift( @_ ) || 
     return( $self->error( "You must provide a table name to access the table methods." ) );
     my $opts = {};
     $opts = shift( @_ ) if( $self->_is_hash( $_[0] ) );
     my $schema = $self->schema || $opts->{schema} || '';
     my $cache_tables = $self->cache_tables;
     my $tables_in_cache = $cache_tables->get({
-    	host => $self->host,
-    	driver => $self->driver,
-    	port => $self->port,
-    	database => $self->database,
+        host => $self->host,
+        driver => $self->driver,
+        port => $self->port,
+        database => $self->database,
     });
     foreach my $this ( @$tables_in_cache )
     {
-    	if( $this->{name} eq $table && 
-    		(
-    			( $schema && $this->{schema} eq $schema ) ||
-				( !$schema || $opts->{anywhere} ) 
-    		) )
-    	{
-			return( 1 );
-    	}
+        if( $this->{name} eq $table && 
+            (
+                ( $schema && $this->{schema} eq $schema ) ||
+                ( !$schema || $opts->{anywhere} ) 
+            ) )
+        {
+            return( 1 );
+        }
     }
     ## We did not find it, so let's try by checking directly the database
     my $def = $self->table_info( $table ) || return( undef() );
@@ -826,7 +826,7 @@ sub table_exists
 sub table_info
 {
     my $self = shift( @_ );
-	my $table = shift( @_ ) || 
+    my $table = shift( @_ ) || 
     return( $self->error( "You must provide a table name to access the table methods." ) );
     $self->message( 3, "Getting table/view information for '$table'." );
     my $opts = {};
@@ -843,17 +843,17 @@ LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
 WHERE n.nspname = ANY(regexp_split_to_array((SELECT REPLACE(setting,'"$user"', (SELECT CURRENT_USER)) FROM pg_catalog.pg_settings WHERE name = 'search_path'), '\,\s*')) AND c.relname = ?
 EOT
     my $dbh = $self->{dbh} || return( $self->error( "Could not find database handler." ) );
-	my $sth = $dbh->prepare_cached( $sql ) || return( $self->error( "An error occured while preparing query to check if table \"$table\" exists in our database: ", $dbh->errstr ) );
-	$sth->execute( $table ) || return( $self->error( "An error occured while executing query to check if table \"$table\" exists in our database: ", $sth->errstr ) );
-	my $all = $sth->fetchall_arrayref( {} );
-	$sth->finish;
-	return( [] ) if( !scalar( @$all ) );
-	return( $all ) if( !$schema || $opts->{anywhere} );
-	foreach my $ref ( @$all )
-	{
-		return( $ref ) if( $ref->{schema} eq $schema );
-	}
-	return( [] );
+    my $sth = $dbh->prepare_cached( $sql ) || return( $self->error( "An error occured while preparing query to check if table \"$table\" exists in our database: ", $dbh->errstr ) );
+    $sth->execute( $table ) || return( $self->error( "An error occured while executing query to check if table \"$table\" exists in our database: ", $sth->errstr ) );
+    my $all = $sth->fetchall_arrayref( {} );
+    $sth->finish;
+    return( [] ) if( !scalar( @$all ) );
+    return( $all ) if( !$schema || $opts->{anywhere} );
+    foreach my $ref ( @$all )
+    {
+        return( $ref ) if( $ref->{schema} eq $schema );
+    }
+    return( [] );
 }
 
 ## See DB::Object
@@ -881,7 +881,7 @@ sub tables_info
 # ORDER BY c.oid
 # SQL
 # AND n.nspname OPERATOR(pg_catalog.~) '^((auth|public))$'
-	my $query = <<'EOT';
+    my $query = <<'EOT';
 SELECT
      n.nspname as "schema"
     ,c.relname as "name"
@@ -908,30 +908,30 @@ EOT
 
 sub trace($;@)
 {
-	my $self = shift( @_ );
-	## Value is a numeric level; see parse_trace_flag.
-	return( $self->error( "Trace can only be used on active connection. Use connect first." ) ) if( !$self->{ 'dbh' } );
-	if( @_ )
-	{
-		## my( $opt, $filename ) = @_;
-		$self->{ 'dbh' }->trace( @_ );
-	}
-	return( $self->{ 'dbh' }->trace );
+    my $self = shift( @_ );
+    ## Value is a numeric level; see parse_trace_flag.
+    return( $self->error( "Trace can only be used on active connection. Use connect first." ) ) if( !$self->{ 'dbh' } );
+    if( @_ )
+    {
+        ## my( $opt, $filename ) = @_;
+        $self->{ 'dbh' }->trace( @_ );
+    }
+    return( $self->{ 'dbh' }->trace );
 }
 
 sub trace_msg(@)
 {
-	my $self = shift( @_ );
-	return( $self->error( "Trace can only be used on active connection. Use connect first." ) ) if( !$self->{ 'dbh' } );
-	## $dbh->trace_msg( $message_text, $min_level );
-	return( $self->{ 'dbh' }->trace_msg( @_ ) );
+    my $self = shift( @_ );
+    return( $self->error( "Trace can only be used on active connection. Use connect first." ) ) if( !$self->{ 'dbh' } );
+    ## $dbh->trace_msg( $message_text, $min_level );
+    return( $self->{ 'dbh' }->trace_msg( @_ ) );
 }
 
 ## sub unix_timestamp
 
 sub unlock
 {
-	shift->error( "unlock() does not work with Postgres." );
+    shift->error( "unlock() does not work with Postgres." );
 }
 
 ## See DB::Object
@@ -948,7 +948,7 @@ sub unlock
 
 sub variables
 {
-	return( shift->error( "variables is currently unsupported in Postgres" ) );
+    return( shift->error( "variables is currently unsupported in Postgres" ) );
 }
 
 ## See DB::Object
@@ -991,14 +991,14 @@ sub _check_connect_param
 ## Called from connect once all check was done to see if there are default to set
 sub _check_default_option
 {
-	my $self = shift( @_ );
-	my $opts = {};
-	$opts = shift( @_ ) if( @_ );
-	return( $self->error( "Provided option is not a hash reference." ) ) if( !$self->_is_hash( $opts ) );
-	$opts->{client_encoding} = 'utf8' if( !CORE::exists( $opts->{client_encoding} ) );
-	## Enabled but with auto-guess
-	$opts->{pg_enable_utf8} = -1 if( !CORE::exists( $opts->{pg_enable_utf8} ) && $opts->{client_encoding} eq 'utf8' );
-	return( $opts );
+    my $self = shift( @_ );
+    my $opts = {};
+    $opts = shift( @_ ) if( @_ );
+    return( $self->error( "Provided option is not a hash reference." ) ) if( !$self->_is_hash( $opts ) );
+    $opts->{client_encoding} = 'utf8' if( !CORE::exists( $opts->{client_encoding} ) );
+    ## Enabled but with auto-guess
+    $opts->{pg_enable_utf8} = -1 if( !CORE::exists( $opts->{pg_enable_utf8} ) && $opts->{client_encoding} eq 'utf8' );
+    return( $opts );
 }
 
 ## Called by _check_connect_param
@@ -1028,155 +1028,155 @@ sub _connection_parameters
 
 sub _convert_datetime2object
 {
-	my $self = shift( @_ );
-	my $opts = {};
-	$opts = shift( @_ ) if( @_ && $self->_is_hash( $_[0] ) );
-	my $sth = $opts->{statement} || return( $self->error( "No statement handler was provided to convert data from json to perl." ) );
-	## my $data = $opts->{data} || return( $self->error( "No data was provided to convert from json to perl." ) );
-	return( $opts->{data} ) if( !CORE::length( $opts->{data} ) );
-	my $data = $opts->{data};
-	my $names = $sth->FETCH('NAME');
-	my $types = $sth->FETCH('pg_type');
-	## $self->messagef( 3, "Found %d fields returned.", scalar( @$names ) );
-	## $self->message( 3, "PG_JSON is: '", PG_JSON, "' and PG_JSONB is: '", PG_JSONB, "'." );
-	my $pg_types = $sth->{pg_type};
-	## $self->message( 3, "pg_type has following information: ", sub{ $self->printer( $pg_types ) } );
-	my $mode = ref( $data );
-	local $convert = sub
-	{
-		my $str = shift( @_ ) || return;
-		if( $str =~ /^(?<year>\d{4})-(?<month>\d{1,2})-(?<day>\d{1,2})(?:[[:blank:]]+(?<hour>\d{1,2})\:(?<minute>\d{1,2})\:(?<second>\d{1,2}))?/ )
-		{
-			my $hash =
-			{
-			year => $+{year},
-			month => $+{month},
-			day => $+{day},
-			};
-			for( qw( hour minute second ) )
-			{
-				$hash->{ $_ } = $+{ $_ } if( defined( $+{ $_ } ) );
-			}
-			$hash->{time_zone} => 'local';
+    my $self = shift( @_ );
+    my $opts = {};
+    $opts = shift( @_ ) if( @_ && $self->_is_hash( $_[0] ) );
+    my $sth = $opts->{statement} || return( $self->error( "No statement handler was provided to convert data from json to perl." ) );
+    ## my $data = $opts->{data} || return( $self->error( "No data was provided to convert from json to perl." ) );
+    return( $opts->{data} ) if( !CORE::length( $opts->{data} ) );
+    my $data = $opts->{data};
+    my $names = $sth->FETCH('NAME');
+    my $types = $sth->FETCH('pg_type');
+    ## $self->messagef( 3, "Found %d fields returned.", scalar( @$names ) );
+    ## $self->message( 3, "PG_JSON is: '", PG_JSON, "' and PG_JSONB is: '", PG_JSONB, "'." );
+    my $pg_types = $sth->{pg_type};
+    ## $self->message( 3, "pg_type has following information: ", sub{ $self->printer( $pg_types ) } );
+    my $mode = ref( $data );
+    local $convert = sub
+    {
+        my $str = shift( @_ ) || return;
+        if( $str =~ /^(?<year>\d{4})-(?<month>\d{1,2})-(?<day>\d{1,2})(?:[[:blank:]]+(?<hour>\d{1,2})\:(?<minute>\d{1,2})\:(?<second>\d{1,2}))?/ )
+        {
+            my $hash =
+            {
+            year => $+{year},
+            month => $+{month},
+            day => $+{day},
+            };
+            for( qw( hour minute second ) )
+            {
+                $hash->{ $_ } = $+{ $_ } if( defined( $+{ $_ } ) );
+            }
+            $hash->{time_zone} = 'local';
 
-			try
-			{
-				my $dt = DateTime->new( %$hash );
-				my $fmt = DateTime::Format::Strptime->new(
-					pattern => '%Y-%m-%d %H:%M:%S',
-					locale => 'en_GB',
-					time_zone => 'local',
-				);
-				$dt->set_formatter( $fmt );
-				return( $dt );
-			}
-			catch( $e )
-			{
-				$self->error( "Error converting the date or timestamp \"", $str, "\" to a datetime object: $e" );
-			}
-		}
-		else
-		{
-			return( $str );
-		}
-	};
-	for( my $i = 0; $i < scalar( @$names ); $i++ )
-	{
-		## $self->messagef( 3, "Checking field '%s' with type '%s'.", $names->[$i], $types->[$i] );
-		if( $types->[$i] eq PG_DATE || $types->[$i] eq PG_TIMESTAMP || $types->[$i] eq 'date' || $types->[$i] eq 'timestamp' )
-		{
-			$self->messagef( 3, "Found a date(time) field '%s' of type '%s'.", $names->[$i], $types->[$i] );
-			if( $mode eq 'ARRAY' )
-			{
-				for( my $j = 0; $j < scalar( @$data ); $j++ )
-				{
-					next if( !$data->[ $j ]->{ $names->[ $i ] } );
-					$data->[ $j ]->{ $names->[ $i ] } = $convert->( $data->[ $j ]->{ $names->[ $i ] } );
-				}
-			}
-			elsif( $mode eq 'HASH' )
-			{
-				next if( !$data->{ $names->[ $i ] } );
-				$data->{ $names->[ $i ] } = $convert->( $data->{ $names->[ $i ] } );
-			}
-		}
-	}
-	return( $data );
+            try
+            {
+                my $dt = DateTime->new( %$hash );
+                my $fmt = DateTime::Format::Strptime->new(
+                    pattern => '%Y-%m-%d %H:%M:%S',
+                    locale => 'en_GB',
+                    time_zone => 'local',
+                );
+                $dt->set_formatter( $fmt );
+                return( $dt );
+            }
+            catch( $e )
+            {
+                $self->error( "Error converting the date or timestamp \"", $str, "\" to a datetime object: $e" );
+            }
+        }
+        else
+        {
+            return( $str );
+        }
+    };
+    for( my $i = 0; $i < scalar( @$names ); $i++ )
+    {
+        ## $self->messagef( 3, "Checking field '%s' with type '%s'.", $names->[$i], $types->[$i] );
+        if( $types->[$i] eq PG_DATE || $types->[$i] eq PG_TIMESTAMP || $types->[$i] eq 'date' || $types->[$i] eq 'timestamp' )
+        {
+            $self->messagef( 3, "Found a date(time) field '%s' of type '%s'.", $names->[$i], $types->[$i] );
+            if( $mode eq 'ARRAY' )
+            {
+                for( my $j = 0; $j < scalar( @$data ); $j++ )
+                {
+                    next if( !$data->[ $j ]->{ $names->[ $i ] } );
+                    $data->[ $j ]->{ $names->[ $i ] } = $convert->( $data->[ $j ]->{ $names->[ $i ] } );
+                }
+            }
+            elsif( $mode eq 'HASH' )
+            {
+                next if( !$data->{ $names->[ $i ] } );
+                $data->{ $names->[ $i ] } = $convert->( $data->{ $names->[ $i ] } );
+            }
+        }
+    }
+    return( $data );
 }
 
 sub _convert_json2hash
 {
-	my $self = shift( @_ );
-	my $opts = {};
-	$opts = shift( @_ ) if( @_ && $self->_is_hash( $_[0] ) );
-# 	$self->debug( 3 );
-# 	my( $pack, $file, $line ) = caller( 1 );
-# 	my $sub = ( caller( 2 ) )[3];
-# 	$self->message( 3, "Called from package '$pack' in file '$file' at line '$line' within sub '$sub'." );
-	## $data can be either hash pr array
-	my $sth = $opts->{statement} || return( $self->error( "No statement handler was provided to convert data from json to perl." ) );
-	## my $data = $opts->{data} || return( $self->error( "No data was provided to convert from json to perl." ) );
-	return( $opts->{data} ) if( !CORE::length( $opts->{data} ) );
-	my $data = $opts->{data};
-	my $names = $sth->FETCH('NAME');
-	my $types = $sth->FETCH('pg_type');
-	## $self->messagef( 3, "Found %d fields returned.", scalar( @$names ) );
-	## $self->message( 3, "PG_JSON is: '", PG_JSON, "' and PG_JSONB is: '", PG_JSONB, "'." );
-	my $pg_types = $sth->{pg_type};
-	## $self->message( 3, "pg_type has following information: ", sub{ $self->printer( $pg_types ) } );
-	my $mode = ref( $data );
-	# $self->messagef( 3, "%d data received.", scalar( @$data ) ) if( $mode eq 'ARRAY' );
-	$self->messagef( 3, "%d data received.", scalar( @$data ) ) if( $self->_is_array( $data ) );
-	for( my $i = 0; $i < scalar( @$names ); $i++ )
-	{
-		## $self->messagef( 3, "Checking field '%s' with type '%s'.", $names->[$i], $types->[$i] );
-		if( $types->[$i] eq PG_JSON || $types->[$i] eq PG_JSONB || $types->[$i] eq 'json' || $types->[$i] eq 'jsonb' )
-		{
-			$self->messagef( 3, "Found a json field '%s' of type '%s'.", $names->[$i], $types->[$i] );
-			# if( $mode eq 'ARRAY' )
-			if( $self->_is_array( $data ) )
-			{
-				$self->message( 3, "Value is: '", $data->[0], "'." );
-				for( my $j = 0; $j < scalar( @$data ); $j++ )
-				{
-					next if( !$data->[ $j ]->{ $names->[ $i ] } );
-					my $ref = $self->_decode_json( $data->[ $j ]->{ $names->[ $i ] } );
-					$data->[ $j ]->{ $names->[ $i ] } = $ref if( $ref );
-				}
-			}
-			# elsif( $mode eq 'HASH' )
-			elsif( $self->_is_hash( $data ) )
-			{
-				## $self->message( 3, "Value is: '", $data->{ $names->[ $i ] }, "'." );
-				my $ref = $self->_decode_json( $data->{ $names->[ $i ] } );
-				## $self->message( 3, "Converted value is: ", sub{ $self->dumper( $ref ) } );
-				$data->{ $names->[ $i ] } = $ref if( $ref );
-			}
-		}
-	}
-	return( $data );
+    my $self = shift( @_ );
+    my $opts = {};
+    $opts = shift( @_ ) if( @_ && $self->_is_hash( $_[0] ) );
+#     $self->debug( 3 );
+#     my( $pack, $file, $line ) = caller( 1 );
+#     my $sub = ( caller( 2 ) )[3];
+#     $self->message( 3, "Called from package '$pack' in file '$file' at line '$line' within sub '$sub'." );
+    ## $data can be either hash pr array
+    my $sth = $opts->{statement} || return( $self->error( "No statement handler was provided to convert data from json to perl." ) );
+    ## my $data = $opts->{data} || return( $self->error( "No data was provided to convert from json to perl." ) );
+    return( $opts->{data} ) if( !CORE::length( $opts->{data} ) );
+    my $data = $opts->{data};
+    my $names = $sth->FETCH('NAME');
+    my $types = $sth->FETCH('pg_type');
+    ## $self->messagef( 3, "Found %d fields returned.", scalar( @$names ) );
+    ## $self->message( 3, "PG_JSON is: '", PG_JSON, "' and PG_JSONB is: '", PG_JSONB, "'." );
+    my $pg_types = $sth->{pg_type};
+    ## $self->message( 3, "pg_type has following information: ", sub{ $self->printer( $pg_types ) } );
+    my $mode = ref( $data );
+    # $self->messagef( 3, "%d data received.", scalar( @$data ) ) if( $mode eq 'ARRAY' );
+    $self->messagef( 3, "%d data received.", scalar( @$data ) ) if( $self->_is_array( $data ) );
+    for( my $i = 0; $i < scalar( @$names ); $i++ )
+    {
+        ## $self->messagef( 3, "Checking field '%s' with type '%s'.", $names->[$i], $types->[$i] );
+        if( $types->[$i] eq PG_JSON || $types->[$i] eq PG_JSONB || $types->[$i] eq 'json' || $types->[$i] eq 'jsonb' )
+        {
+            $self->messagef( 3, "Found a json field '%s' of type '%s'.", $names->[$i], $types->[$i] );
+            # if( $mode eq 'ARRAY' )
+            if( $self->_is_array( $data ) )
+            {
+                $self->message( 3, "Value is: '", $data->[0], "'." );
+                for( my $j = 0; $j < scalar( @$data ); $j++ )
+                {
+                    next if( !$data->[ $j ]->{ $names->[ $i ] } );
+                    my $ref = $self->_decode_json( $data->[ $j ]->{ $names->[ $i ] } );
+                    $data->[ $j ]->{ $names->[ $i ] } = $ref if( $ref );
+                }
+            }
+            # elsif( $mode eq 'HASH' )
+            elsif( $self->_is_hash( $data ) )
+            {
+                ## $self->message( 3, "Value is: '", $data->{ $names->[ $i ] }, "'." );
+                my $ref = $self->_decode_json( $data->{ $names->[ $i ] } );
+                ## $self->message( 3, "Converted value is: ", sub{ $self->dumper( $ref ) } );
+                $data->{ $names->[ $i ] } = $ref if( $ref );
+            }
+        }
+    }
+    return( $data );
 }
 
 sub _dsn
 {
     my $self = shift( @_ );
-	my @params = ();
-	$self->message( 3, "\$self contains: ", sub{ $self->dumper( $self ) } );
-	## See pg_service.conf
-	if( $self->{service} )
-	{
-		@params = ( sprintf( 'dbi:%s:%s', @$self{ qw( driver service ) } ) );
-	}
-	else
-	{
-		## It ends with ':'
-		@params = ( sprintf( 'dbi:%s:', $self->{driver} ) );
-	}
-	push( @params, sprintf( 'dbname=%s', $self->{database} ) ) if( $self->{database} );
-	push( @params, sprintf( 'host=%s', $self->{host} ) ) if( $self->{host} );
-	push( @params, sprintf( 'port=%d', $self->{port} ) ) if( $self->{port} );
-	# push( @params, "options=$options" ) if( length( $options ) );
-	return( join( ';', @params ) );
+    my @params = ();
+    $self->message( 3, "\$self contains: ", sub{ $self->dumper( $self ) } );
+    ## See pg_service.conf
+    if( $self->{service} )
+    {
+        @params = ( sprintf( 'dbi:%s:%s', @$self{ qw( driver service ) } ) );
+    }
+    else
+    {
+        ## It ends with ':'
+        @params = ( sprintf( 'dbi:%s:', $self->{driver} ) );
+    }
+    push( @params, sprintf( 'dbname=%s', $self->{database} ) ) if( $self->{database} );
+    push( @params, sprintf( 'host=%s', $self->{host} ) ) if( $self->{host} );
+    push( @params, sprintf( 'port=%d', $self->{port} ) ) if( $self->{port} );
+    # push( @params, "options=$options" ) if( length( $options ) );
+    return( join( ';', @params ) );
 }
 
 ## See DB::Object
@@ -1263,50 +1263,68 @@ DB::Object::Postgres - SQL API
 
     use DB::Object::Postgres;
 
-    my $db = DB::Object::Postgres->new();
-    my $dbh = DB::Object::Postgres->connect();
+    my $dbh = DB::Object::Postgres->connect({
+    driver => 'Pg',
+    conf_file => 'db-settings.json',
+    database => 'webstore',
+    host => 'localhost',
+    login => 'store-admin',
+    schema => 'auth',
+    debug => 3,
+    }) || bailout( "Unable to connect to sql server on host localhost: ", DB::Object->error );
     
+    # Legacy regular query
     my $sth = $dbh->prepare( "SELECT login,name FROM login WHERE login='jack'" ) ||
     die( $dbh->errstr() );
     $sth->execute() || die( $sth->errstr() );
     my $ref = $sth->fetchrow_hashref();
     $sth->finish();
     
-    ## Get the table 'login' object
-    my $login = $dbh->login();
-    $login->where( "login='jack'" );
-    ## Now, much better less hassle ;-)
-    my $ref = $login->select->fetchrow_hashref();
+    # Get a list of databases;
+    my @databases = $dbh->databases;
+    # Doesn't exist? Create it:
+    my $dbh2 = $dbh->create_db( 'webstore' );
+    # Load some sql into it
+    my $rv = $dbh2->do( $sql ) || die( $dbh->error );
     
-    ## Now let's join
-    my $login = $dbh->login();
-    $login->where( "login='jack'" );
-    ## We get all info regarding user jack and his list
-    my $ref = $login->select->join( 'list' )->fetchrow_hashref();
+    # Check a table exists
+    $dbh->table_exists( 'customers' ) || die( "Cannot find the customers table!\n" );
     
-    ## Same but we give it a higher priority. Having fun obviously...
-    my $ref = $login->select->join( 'list' )->priority( 1 )->fetchrow_hashref();
+    # Get list of tables, as array reference:
+    my $tables = $dbh->tables;
     
-    ## Copy user jack info to user bob
-    $login->where( "login='jack'" );
-    $login->copy( 'login' => 'bob' );
+    my $cust = $dbh->customers || die( "Cannot get customers object." );
+    $cust->where( email => 'john@example.org' );
+    my $str = $cust->delete->as_string;
+    # Becomes: DELETE FROM customers WHERE email='john\@example.org'
     
-    ## Insert some data. Anything we do not provide will fall back to default values
-    $login->insert( 'login' => 'bob' );
-    ## Same but with a low *non waiting* flag
-    $login->insert( 'login' => 'bob' )->wait();
-    ## Same but ignore if already exists or error occur
-    $login->insert( 'login' => 'jack' )->ignore();
+    # Do some insert with transaction
+    $dbh->begin_work;
+    # Making some other inserts and updates here...
+    my $cust_sth_ins = $cust->insert(
+        first_name => 'Paul',
+        last_name => 'Goldman',
+        email => 'paul@example.org',
+        active => 0,
+    ) || do
+    {
+        # Rollback everything since the begin_work
+        $dbh->rollback;
+        die( "Error while create query to add data to table customers: " . $cust->error );
+    };
+    $result = $cust_sth_ins->as_string;
+    # INSERT INTO customers (first_name, last_name, email, active) VALUES('Paul', 'Goldman', 'paul\@example.org', '0')
+    $dbh->commit;
     
     ## and more elaborate:
     ## Ref: https://www.postgresql.org/docs/10/sql-insert.html#SQL-ON-CONFLICT
     $login->on_conflict({
-    	## mandatory, can be a constraint name or a field name or array of fields
-    	target => 'on constraint idx_prefs_unique',
-		action => 'update',
-		## where => '',
-		## which fields to update. It can also be more specific by providing a hash ref like fields => { val => 'plop' }
-		fields => [qw( val )],
+        ## mandatory, can be a constraint name or a field name or array of fields
+        target => 'on constraint idx_prefs_unique',
+        action => 'update',
+        ## where => '',
+        ## which fields to update. It can also be more specific by providing a hash ref like fields => { val => 'plop' }
+        fields => [qw( val )],
     });
     ## would become:
     insert into login (..) values(...) on conflict on constraint idx_prefs_unique do update set val = EXCLUDED.val;
@@ -1314,23 +1332,19 @@ DB::Object::Postgres - SQL API
     ## Get the last used insert id
     my $id = $dbh->last_insert_id();
     
-    ## Delete that user
-    ## you'd better specify a where clause or you'll find yourself
-    ## suppressing everything in the table...
-    $login->where( "login='bob'" );
-    $login->delete();
-    ## But you could also write
-    my $rows = $login->delete( "login='bob'" )->rows();
+    $cust->where( email => 'john@example.org' );
+    $cust->order( 'last_name' );
+    $cust->having( email => qr/\@example/ );
+    $cust->limit( 10 );
+    my $cust_sth_sel = $cust->select || die( "An error occurred while creating a query to select data frm table customers: " . $cust->error );
+    # Becomes:
+    # SELECT id, first_name, last_name, email, created, modified, active, created::ABSTIME::INTEGER AS created_unixtime, modified::ABSTIME::INTEGER AS modified_unixtime, CONCAT(first_name, ' ', last_name) AS name FROM customers WHERE email='john\@example.org' HAVING email ~ '\@example' ORDER BY last_name LIMIT 10
     
-    ## Make a query but get the qery string instead of performing it in real
-    $login->where( "login like 'jac%'" );
-    $login->limit( 10 );
-    $login->group( 'last_name' );
-    $login->order( 'last_name' );
-    ## Reverse sorting
-    $login->reverse();
-    print( STDOUT "Here is my SQL statement:\n",
-    $login->select->join( 'list' )->priority( 1 )->as_string() );
+    $cust->reset;
+    $cust->where( email => 'john@example.org' );
+    my $cust_sth_upd = $cust->update( active => 0 )
+    # Would become:
+    # UPDATE ONLY customers SET active='0' WHERE email='john\@example.org'
     
     ## Lets' dump the result of our query
     ## First to STDERR
@@ -1339,16 +1353,6 @@ DB::Object::Postgres - SQL API
     ## Now dump the result to a file
     $login->select->dump( "my_file.txt" );
     
-    ## Get that table 'login' structure
-    my $data = $login->structure();
-    
-    ## Some info on the status of the SQL server
-    my $status_ref = $dbh->stat();
-    ## or (it does not matter)
-    my $status_ref = $login->stat();
-    ## optimize the table, i.e. claim for free space and cleanups
-    $login->optimize();
-
 =head1 DESCRIPTION
 
 L<DB::Object::Postgres> is a SQL API much alike L<DBD::Pg>.
@@ -1781,7 +1785,7 @@ Prepares an INSERT query using the field-value pairs provided.
 
 If a L<DB::Object::Postgres::Statement> object is provided as first argument, it will considered as a SELECT query to be used in the INSERT query, as in: INSERT INTO my table SELECT FROM another_table
 
-Otherwise, B<insert? will build the query based on the fields provided.
+Otherwise, B<insert> will build the query based on the fields provided.
 
 In scalar context, it returns the result of B<execute> and in list context, it returns the statement object.
 

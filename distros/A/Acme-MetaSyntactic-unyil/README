@@ -1,0 +1,49 @@
+NAME
+    Acme::MetaSyntactic::unyil - The Unyil theme
+
+VERSION
+    This document describes version 0.001 of Acme::MetaSyntactic::unyil
+    (from Perl distribution Acme-MetaSyntactic-unyil), released on
+    2020-03-01.
+
+SYNOPSIS
+     % perl -MAcme::MetaSyntactic=unyil -le 'print metaname'
+     ucrit
+
+     % metasyn unyil | shuf | head -n2
+     kinoy
+     ogah
+
+DESCRIPTION
+    Si Unyil is a 1980's Indonesian children TV series.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-MetaSyntactic-unyil>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-MetaSyntactic-unyil>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-MetaSyntactic-un
+    yil>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    <https://en.wikipedia.org/wiki/Si_Unyil>
+
+    Acme::MetaSyntactic
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -4,23 +4,28 @@
 # required modules
 use warnings;
 use strict;
+use Mnet::T;
 use Test::More tests => 1;
 
-# use current perl for tests
-my $perl = $^X;
-
-# check Mnet::Opts for pragma, hash, method, input, and non-existant opts
-Test::More::is(`$perl -e 'use warnings; use strict;
-    use Mnet::Opts;
-    use Mnet::Opts::Set::Debug;
-    print Mnet::Opts->new->{debug} . "\n";
-    print Mnet::Opts->new->debug . "\n";
-    print Mnet::Opts->new({test => "value"})->test . "\n";
-    warn if defined Mnet::Opts->new->non_existant;
-' -- 2>&1`, '1
-1
-value
-', 'pragma, hash, method, input, and non-existant opts');
+# pragma, hash, method, input, and non-existant opts
+Mnet::T::test_perl({
+    name    => 'pragma, hash, method, input, and non-existant opts',
+    perl    => <<'    perl-eof',
+        use warnings;
+        use strict;
+        use Mnet::Opts;
+        use Mnet::Opts::Set::Debug;
+        print Mnet::Opts->new->{debug} . "\n";
+        print Mnet::Opts->new->debug . "\n";
+        print Mnet::Opts->new({test => "value"})->test . "\n";
+        warn if defined Mnet::Opts->new->non_existant;
+    perl-eof
+    expect  => <<'    expect-eof',
+        1
+        1
+        value
+    expect-eof
+});
 
 # finished
 exit;

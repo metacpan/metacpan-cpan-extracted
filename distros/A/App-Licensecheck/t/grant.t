@@ -5,7 +5,7 @@ use Test2::V0;
 use lib 't/lib';
 use Test2::Licensecheck;
 
-plan 48;
+plan 54;
 
 # AFL
 license_is(
@@ -22,7 +22,7 @@ license_is(
 	],
 	'AGPL-3+'
 );
-license_is( 't/grant/AGPL/setup.py', [ 'AGPL-3', 'AGPL-3+' ] );
+license_is( 't/grant/AGPL/setup.py', 'AGPL-3+' );
 
 # Apache
 license_is( 't/grant/Apache_and_more/PIE.htc', 'Apache-2.0 or GPL-2' );
@@ -33,7 +33,15 @@ license_is(
 license_is( 't/grant/Apache_and_more/select2.js', 'Apache-2.0 or GPL-2' );
 license_is(
 	't/grant/Apache_and_more/test_run.py',
-	'Apache-2.0 or BSD-3-clause'
+	[   'UNKNOWN',
+		'Apache-2.0 and/or BSD-3-clause'    # progress, even if not perfect
+	]
+);
+license_is(
+	't/grant/Apache_and_more/test_run.py',
+	[   'UNKNOWN',
+		'Apache-2.0 or BSD-3-clause'
+	]
 );
 
 # CC-BY-SA
@@ -53,7 +61,13 @@ license_is(
 # EPL
 license_is(
 	't/grant/EPL_and_more/Base64Coder.java',
-	[   'GPL-3+ or LGPL-2.1+',
+	[   'UNKNOWN',
+		'GPL-3+ or LGPL-2.1+'    # progress, even if not perfect
+	]
+);
+license_is(
+	't/grant/EPL_and_more/Base64Coder.java',
+	[   'UNKNOWN',
 		'AGPL-3+ or Apache-2.0+ or EPL-1.0+ or GPL-3+ or LGPL-2.1+'
 	]
 );
@@ -78,13 +92,18 @@ license_is(
 );
 license_is(
 	't/grant/LGPL_and_more/da.aff',
-	[ 'GPL-2.0 or LGPL-2.1', 'GPL-2 or LGPL-2.1 or MPL-1.1' ]
+	[   'UNKNOWN', 'GPL-2.0 or LGPL-2.1'    # progress, even if not perfect
+	]
+);
+license_is(
+	't/grant/LGPL_and_more/da.aff',
+	[ 'UNKNOWN', 'GPL-2 or LGPL-2.1 or MPL-1.1' ]
 );
 
 # MPL
 license_is(
 	't/grant/MPL_and_more/symbolstore.py',
-	[   'GPL-2+ or LGPL-2.1+ and/or MPL-1.1',
+	[   'GPL-2+ and/or GPL-2+ or LGPL-2.1+ and/or MPL-1.1',
 		'GPL-2+ or LGPL-2.1+ or MPL-1.1'
 	]
 );

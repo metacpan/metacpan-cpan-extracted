@@ -422,7 +422,7 @@ An invalid input log_expect level results in an error.
 
 Mnet::Expect does not include iteself include support for L<Mnet::Test>
 functionality. This is a low level module that spawns expect sessions but does
-not know how to talk to devices. Any desired test fucntionality would need to
+not know how to talk to devices. Any desired test functionality would need to
 be provided by the calling script.
 
 =head1 SEE ALSO

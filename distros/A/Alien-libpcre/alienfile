@@ -1,0 +1,13 @@
+use alienfile;
+plugin 'PkgConfig' => 'libpcre';
+share {
+  plugin Download => (
+    url => 'https://ftp.pcre.org/pub/pcre/',
+    filter => qr/pcre-.*\.tar\.gz$/,
+    version => qr/([0-9\.]+)/,
+  );
+  plugin Extract => 'tar.gz';
+  plugin 'Build::Autoconf';
+};
+
+

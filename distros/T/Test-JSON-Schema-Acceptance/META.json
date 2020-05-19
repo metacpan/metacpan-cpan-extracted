@@ -85,8 +85,8 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
+            "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
-            "Module::Metadata" : "0",
             "Test::Deep" : "0",
             "Test::File::ShareDir" : "0",
             "Test::More" : "0.88",
@@ -132,6 +132,7 @@
             "Dist::Zilla::Plugin::InstallGuide" : "1.200005",
             "Dist::Zilla::Plugin::Keywords" : "0.004",
             "Dist::Zilla::Plugin::License" : "5.038",
+            "Dist::Zilla::Plugin::MakeMaker" : "0",
             "Dist::Zilla::Plugin::Manifest" : "0",
             "Dist::Zilla::Plugin::MetaConfig" : "0",
             "Dist::Zilla::Plugin::MetaJSON" : "0",
@@ -182,7 +183,7 @@
    "provides" : {
       "Test::JSON::Schema::Acceptance" : {
          "file" : "lib/Test/JSON/Schema/Acceptance.pm",
-         "version" : "0.995"
+         "version" : "0.996"
       }
    },
    "release_status" : "stable",
@@ -197,7 +198,7 @@
          "web" : "https://github.com/karenetheridge/Test-JSON-Schema-Acceptance"
       }
    },
-   "version" : "0.995",
+   "version" : "0.996",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.031011"
@@ -227,7 +228,7 @@
                   "quiet" : 0,
                   "run" : [
                      "git submodule update --remote",
-                     "echo \"run `update-share` to commit submodule updates to share/\""
+                     "echo \"run './update-share' to commit submodule updates to share/\""
                   ],
                   "version" : "0.048"
                }
@@ -774,22 +775,14 @@
             "version" : "1.006"
          },
          {
-            "class" : "inc::MakeMaker",
+            "class" : "Dist::Zilla::Plugin::MakeMaker",
             "config" : {
-               "Dist::Zilla::Plugin::MakeMaker" : {
-                  "make_path" : "make",
-                  "version" : "6.014"
-               },
-               "Dist::Zilla::Plugin::MakeMaker::Awesome" : {
-                  "version" : "0.48"
-               },
                "Dist::Zilla::Role::TestRunner" : {
-                  "default_jobs" : 9,
-                  "version" : "6.014"
+                  "default_jobs" : 9
                }
             },
-            "name" : "@Author::ETHER/=inc::MakeMaker",
-            "version" : null
+            "name" : "@Author::ETHER/MakeMaker",
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
@@ -1103,7 +1096,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.995",
+                  "tag" : "v0.996",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1290,8 +1283,13 @@
          },
          {
             "class" : "Dist::Zilla::Plugin::GenerateFile",
-            "name" : "GenerateFile",
+            "name" : "submodule_status",
             "version" : "6.014"
+         },
+         {
+            "class" : "inc::OldShareDirFiles",
+            "name" : "=inc::OldShareDirFiles",
+            "version" : null
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",

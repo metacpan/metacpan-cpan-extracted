@@ -36,7 +36,6 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::CopyFilesFromBuild' => '0',
                                       'Dist::Zilla::Plugin::Git' => '0',
                                       'Dist::Zilla::Plugin::Git::Contributors' => '0',
-                                      'Dist::Zilla::Plugin::GitHub' => '0',
                                       'Dist::Zilla::Plugin::MetaData::BuiltWith' => '0',
                                       'Dist::Zilla::Plugin::ModuleBuildTiny' => '0',
                                       'Dist::Zilla::Plugin::MojibakeTests' => '0',
@@ -57,6 +56,7 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::Test::UnusedVars' => '0',
                                       'Dist::Zilla::Plugin::Test::Version' => '0',
                                       'Dist::Zilla::Role::PluginBundle::Easy' => '0',
+                                      'Git::Wrapper' => '0',
                                       'List::Util' => '1.33',
                                       'Moose' => '0',
                                       'Perl::Tidy' => '0',
@@ -65,6 +65,10 @@ do { my $x = {
                                       'Pod::Weaver::Config::Assembler' => '0',
                                       'Pod::Weaver::Plugin::StopWords' => '0',
                                       'Pod::Weaver::Section::Support' => '0',
+                                      'Test::EOL' => '0',
+                                      'Test::Kwalitee' => '0',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Signature' => '0',
                                       'perl' => 'v5.24.0'
                                     }
                     },

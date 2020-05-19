@@ -1,0 +1,178 @@
+#!/usr/bin/env perl
+
+use Modern::Perl;
+use experimental 'smartmatch';
+use Daemonise;
+use Getopt::Long;
+
+my $pid;
+my $debug;
+my $conf = '/etc/daemonise/bunny.conf';
+my $foreground;
+
+GetOptions(
+    "debug|d"      => \$debug,
+    "config|c=s"   => \$conf,
+    "pidfile|p=s"  => \$pid,
+    "foreground|f" => \$foreground,
+) or die;
+
+my $d = Daemonise->new();
+$d->debug(1)       if $debug;
+$d->debug(1)       if ($d->hostname =~ m/devel/);
+$d->foreground(1)  if $foreground;
+$d->pid_file($pid) if $pid;
+$d->config_file($conf);
+$d->configure;
+
+$d->load_plugin('RabbitMQ');
+$d->load_plugin('CouchDB');
+$d->load_plugin('JobQueue');
+$d->load_plugin('Graphite');    # or $d->load_plugin('Riemann');
+$d->load_plugin('Event');
+$d->load_plugin('HipChat');
+$d->load_plugin('PagerDuty');
+$d->load_plugin('Paralleliser');
+$d->load_plugin('KyotoTycoon');    # or $d->load_plugin('Redis');
+
+# do not bind to any rabbitMQ queue
+$d->is_worker(0);
+
+# do not bind to additional admin queues
+$d->admin_queue(0);
+
+# hooks come only with JobQueue plugin
+$d->hooks(
+    action  => \&action,
+    default => \&action,
+);
+
+$d->start;
+
+# alternatively start() takes a custom code reference if using hooks is not
+# possible. using hooks is the preferred way though.
+# $d->start(\&action);
+
+sub action {
+    my ($msg) = @_;
+
+    # do stuff here
+    my $data = $msg->{data}->{options};
+
+    ## JobQueue plugin calls ##
+    #
+    # fetch job from jobqueue couchdb and put it in $d->job
+    my $job_id = '585675aab87f878c9e98779e9e9c9ccadff';
+    my $job    = $d->get_job($job_id);
+
+    # creates a new job in jobqueue couchdb, no message sending
+    $job = $d->create_job($msg);
+
+    # starts new job by sending a new job message to workflow worker
+    # options = data->options part of a message only
+    $d->start_job('workflow_name', $data);
+
+    # searches for job in couchdb using view 'find/by_something' and key provided
+    my $something = 'some_key';
+    $job = $d->find_job('by_something', $something);
+
+    # if you REALLY have to persist something in jobqueue right now, rather don't
+    $d->update_job($msg);
+
+    # stops workflow here if it is a job
+    $d->stop_here;
+
+    # lock / unlock job ID
+    $d->lock_job($msg);   # returns true on success or when message is not a job
+    $d->unlock_job($msg);
+
+    # disable worker logging in msg->meta arrayref
+    $d->dont_log_worker;
+
+    ## RabbitMQ plugin calls ##
+    #
+    # does NOT reply to caller, no matter what, usually not what you want
+    $d->dont_reply;
+
+    # send message to queue_name (rabbitMQ publish)
+    $d->queue('queue_name', $msg);
+
+    # send message and wait for response (rabbitMQ RPC)
+    my $response = $d->queue('queue_name', $msg);
+
+    # worker that wants a reply from us, not necessarily from an RPC call
+    $d->reply_queue;
+
+    ## Event plugin calls ##
+    #
+    # create pre defined event, for new types edit Daemonise plugin
+    #
+    # key  = job_id for most types, see Daemonise plugin for details
+    # when = either integer interpreted as hours or timestamp,
+    #        triggers immediately when undef
+    # options = has to be hashref if used. for externally imported events the 2
+    #           hash keys "raw" and "parsed" should be added and will be included
+    #           in the job when found
+    my $key     = '585675aab87f878c9e98779e9e9c9ccadff';
+    my $when    = 24 || 1366673836;
+    my $options = {
+        parsed => [ 'some', 'parsed', 'response' ],
+        raw    => 'some%20raw%20response',
+    };
+    my $event_id = $d->create_event('pre_defined_type', $key, $when, $options);
+
+    ## HipChat plugin calls ##
+    #
+    # hipchat notify, room defaults to 'development' when undef
+    # severity can be debug, info, warning, critical, error, defaults to 'info'
+    my $room     = 'office';
+    my $severity = 'warning';
+    $d->notify($msg, $room, $severity) if $d->can('notify');
+
+    ## KyotoTycoon / Redis plugin calls ##
+    #
+    # set, get and delete data using the cache
+    # data can be any of SCALAR, HASH, ARRAY
+    # expire is optional and in seconds
+    $d->cache_default_expire(1800);    # defaults to 600 (5 min)
+    my $expire = 300;
+    my $hash   = $d->cache_get($key);
+    if ($d->cache_set($key, $data, $expire)) {
+        print 'success';
+    }
+    $d->cache_del($key);
+
+    # lock/unlock worker using $d->name as key by default and the PID as default value
+    $d->lock(undef || "some key", undef || "some value");
+    $d->unlock(undef || "some key", undef || "some value");
+
+    ## Graphite/Riemann plugin calls ##
+    #
+    # graph something
+    # service, state and metric are mandatory and have to be strings
+    # service has to be a dot namespaced string
+    my $service     = 'site.speed.total';
+    my $state       = 'slow';
+    my $metric      = 0.4;
+    my $description = 'slow site right now';
+    my $tags        = [ "custom", "tags" ]; # only with Riemann plugin
+    $d->graph($service, $state, $metric, $description, $tags)
+        if $d->can('graph');
+
+    ## PagerDuty plugin calls ##
+    #
+    # trigger pagerduty event
+    # incident and description are mandatory and have to be strings
+    # details is a hashref with any keys and values
+    my $incident = 'site.slow';
+    my $details = { speed => '100s', error => 'shit hit the fan' };
+    $d->alert($incident, $description, $details);
+
+    ## Paralleliser plugin calls ##
+    #
+    # parallelise simple tasks that don't require locking or writing to shared variables
+    $d->worker(2);    # defaults to 5
+    $d->parallelise(sub { print $_[0] }, qw(execute each word parallel));
+
+    return $msg;
+}

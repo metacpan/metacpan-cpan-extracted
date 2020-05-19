@@ -1,15 +1,12 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST/Cookies.pm
-## Version 0.2.4
-## Copyright(c) 2019- DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <jack@deguest.jp>
+## Version v0.2.5
+## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/10/08
-## Modified 2019/12/15
-## All rights reserved
+## Modified 2020/05/16
 ## 
-## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::REST::Cookies;
 BEGIN
@@ -22,7 +19,7 @@ BEGIN
 	use TryCatch;
 	use Cookie::Baker ();
 	use Scalar::Util;
-	our $VERSION = '0.2.4';
+	our $VERSION = 'v0.2.5';
 };
 
 sub init
@@ -422,7 +419,7 @@ Net::API::REST::Cookies - Cookie Jar and cookie management
 
 =head1 VERSION
 
-    v0.2.4
+    v0.2.5
 
 =head1 DESCRIPTION
 

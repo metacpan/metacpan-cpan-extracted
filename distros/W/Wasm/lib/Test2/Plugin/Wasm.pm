@@ -8,7 +8,7 @@ use Data::Dumper ();
 use FFI::C::Util qw( c_to_perl );
 
 # ABSTRACT: Test2 plugin for Wasm extensions
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 sub get_virtual_memory_limit
@@ -70,16 +70,9 @@ sub import
           my $self = shift->$orig(@_);
           my $ctx = context();
           $ctx->note("virtual memory address limit detected, try to set limits to zero");
-          eval {
-            $self->static_memory_maximum_size(0);
-            $self->static_memory_guard_size(0);
-            $self->dynamic_memory_guard_size(0);
-          };
-          if(my $error = $@)
-          {
-            $ctx->note("failed setting virtual memory address limit:");
-            $ctx->note("$error");
-          }
+          $self->static_memory_maximum_size(0);
+          $self->static_memory_guard_size(0);
+          $self->dynamic_memory_guard_size(0);
           $ctx->release;
           $self;
         },
@@ -103,7 +96,7 @@ Test2::Plugin::Wasm - Test2 plugin for Wasm extensions
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

@@ -31,7 +31,14 @@ SKIP:
 	'driver'	=> 'mysql',
 	#'debug'		=> 3,
 	};
-	$con_params->{login} = ( $ENV{DB_LOGIN} || (getpwuid( $> ))[0] ) if( !$ENV{DB_CON_FILE} );
+	if( $^O eq 'MSWin32' )
+	{
+		$con_params->{login} = ( $ENV{DB_LOGIN} || getlogin ) if( !$ENV{DB_CON_FILE} );
+	}
+	else
+	{
+		$con_params->{login} = ( $ENV{DB_LOGIN} || getlogin || (getpwuid( $> ))[0] ) if( !$ENV{DB_CON_FILE} );
+	}
 	my $dbh1 = DB::Object->connect( $con_params );
 	if( !defined( $dbh1 ) )
 	{
@@ -184,7 +191,7 @@ END
 	if( $dbh )
 	{
 		# diag( "Disconnecting from database $test_db" );
-		$dbh->disconnect();
+		# $dbh->disconnect();
 	}
 };
 

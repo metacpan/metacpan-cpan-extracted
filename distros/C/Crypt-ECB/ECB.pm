@@ -17,7 +17,7 @@ require Exporter;
 
 @ISA       = qw(Exporter);
 @EXPORT_OK = qw(encrypt decrypt encrypt_hex decrypt_hex);
-$VERSION   = '2.21';
+$VERSION   = '2.22';
 
 
 ########################################

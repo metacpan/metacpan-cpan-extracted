@@ -38,7 +38,7 @@ share {
   my $version = '0.17.0.0-beta';
   my $sha256 = '0e627e2ac1fbbc6214bafc28a4df9c56fdf1149c70705164585d0220e228702d';
   plugin Download => (
-    url => "http://download.newrelic.com/agent_sdk/nr_agent_sdk-v$version.x86_64.tar.gz",
+    url => "https://download.newrelic.com/agent_sdk/nr_agent_sdk-v$version.x86_64.tar.gz",
   );
   plugin Extract => 'tar.gz';
 

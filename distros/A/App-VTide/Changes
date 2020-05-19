@@ -1,5 +1,20 @@
 Revision history for App-VTide
 
+0.1.11   2020-05-19
+        Updating for release of version 0.1.11
+        Updated date (Ivan Wills)
+        Adding missing files for testing (Ivan Wills)
+        Added missing dependency (Ivan Wills)
+        Moving run text to after the clear screen and printing only on the first run (Ivan Wills)
+        Fixing case when watching files and trying to quit (Ivan Wills)
+        Making sub-command config dynamic (Ivan Wills)
+        Cleaning up history (Ivan Wills)
+        New history command (Ivan Wills)
+        Added more logic to help helper functions from having issues (Ivan Wills)
+        Adding option to clear screen before re-running command (Ivan Wills)
+        Fixing up travis build versions (Ivan Wills)
+        Adding option to clear terminals before running (Ivan Wills)
+
 0.1.10   2019-04-30
         Updating for release of version 0.1.10
         Adding missing recommends section (Ivan Wills)

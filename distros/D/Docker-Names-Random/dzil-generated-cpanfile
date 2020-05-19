@@ -5,7 +5,8 @@ requires "English" => "0";
 requires "Exporter" => "0";
 requires "Hash::Util" => "0";
 requires "YAML::PP" => "0";
-requires "perl" => "5.008";
+requires "feature" => "0";
+requires "perl" => "5.010";
 requires "strict" => "0";
 requires "utf8" => "0";
 requires "warnings" => "0";
@@ -19,7 +20,7 @@ on 'test' => sub {
   requires "Test2::V0" => "0";
   requires "Test::More" => "0";
   requires "lib" => "0";
-  requires "perl" => "5.008";
+  requires "perl" => "5.010";
 };
 
 on 'test' => sub {
@@ -28,7 +29,7 @@ on 'test' => sub {
 
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "0";
-  requires "perl" => "5.008";
+  requires "perl" => "5.010";
 };
 
 on 'develop' => sub {

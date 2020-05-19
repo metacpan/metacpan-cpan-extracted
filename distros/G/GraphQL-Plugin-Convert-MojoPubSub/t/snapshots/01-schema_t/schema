@@ -1,0 +1,25 @@
+'type Message {
+  channel: String!
+  dateTime: DateTime!
+  message: String!
+  username: String!
+}
+
+input MessageInput {
+  channel: String!
+  message: String!
+  username: String!
+}
+
+type Mutation {
+  publish(input: [MessageInput!]!): DateTime!
+}
+
+type Query {
+  status: Boolean!
+}
+
+type Subscription {
+  subscribe(channels: [String!]): Message!
+}
+'

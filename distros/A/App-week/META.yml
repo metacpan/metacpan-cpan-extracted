@@ -1,5 +1,5 @@
 ---
-abstract: 'colorful calender command'
+abstract: 'colorful calendar command'
 author:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
 build_requires:
@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   App::week:
     file: lib/App/week.pm
-    version: '0.08'
+    version: '0.09'
   App::week::colors:
     file: lib/App/week/colors.pm
   App::week::default:
@@ -34,7 +34,8 @@ provides:
   App::week::teams:
     file: lib/App/week/teams.pm
 requires:
-  Getopt::EX: v1.14.0
+  Getopt::EX: v1.18.0
+  Getopt::EX::termcolor: '1.06'
   Text::ANSI::Fold: '1.03'
   Text::VisualWidth::PP: '0.05'
   perl: '5.014'
@@ -42,6 +43,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/App-week/issues
   homepage: https://github.com/kaz-utashiro/App-week
   repository: git://github.com/kaz-utashiro/App-week.git
-version: '0.08'
+version: '0.09'
 x_authority: cpan:UTASHIRO
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
 x_static_install: 0

@@ -2,9 +2,9 @@ NAME
     Acme::CPANModules::CPANModules - Modules related to Acme::CPANModules
 
 VERSION
-    This document describes version 0.001 of Acme::CPANModules::CPANModules
+    This document describes version 0.002 of Acme::CPANModules::CPANModules
     (from Perl distribution Acme-CPANModules-CPANModules), released on
-    2019-11-19.
+    2020-03-01.
 
 DESCRIPTION
     Modules related to Acme::CPANModules.
@@ -83,6 +83,21 @@ INCLUDED MODULES
 
     *   Pod::From::Acme::CPANModules
 
+FAQ
+  What are ways to use this module?
+    Aside from reading it, you can install all the listed modules using
+    cpanmodules:
+
+        % cpanmodules ls-entries CPANModules | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=CPANModules -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    This module also helps lcpan produce a more meaningful result for "lcpan
+    related-mods" when it comes to finding related modules for the modules
+    listed in this Acme::CPANModules module.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Acme-CPANModules-CPANModules>.
@@ -108,7 +123,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

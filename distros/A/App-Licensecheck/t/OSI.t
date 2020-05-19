@@ -21,7 +21,7 @@ my %Debian2OSI = (
 	'BSL'               => 'BSL-1.0',
 	'Expat'             => 'MIT',
 	'GPL-2'             => 'GPL-2.0',
-	'LGPL-2+'           => 'LGPL-2.0',
+	'LGPL-2'            => 'LGPL-2.0',
 	'LGPL-2.1+'         => 'LGPL-2.1',
 	'Python-2'          => 'Python-2.0',
 );

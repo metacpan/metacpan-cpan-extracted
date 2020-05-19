@@ -3,7 +3,7 @@ package Data::Hopen::G::CollectOp;
 use strict;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000017';
+our $VERSION = '0.000018';
 
 use parent 'Data::Hopen::G::Op';
 use Class::Tiny {

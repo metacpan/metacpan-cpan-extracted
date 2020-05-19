@@ -1,6 +1,6 @@
 package Net::IPAM::IP;
 
-our $VERSION = '1.21';
+our $VERSION = '1.22';
 
 use 5.10.0;
 use strict;
@@ -59,12 +59,12 @@ Returns undef on illegal input.
 =cut
 
 sub new {
-  Carp::croak('missing argument') unless defined $_[1];
-  my $self = bless( {}, $_[0] );
+  my $self  = bless( {}, $_[0] );
+  my $input = $_[1] // Carp::croak 'missing argument';
 
   # IPv4
-  if ( index( $_[1], ':' ) < 0 ) {
-    my $n = Socket::inet_pton( Socket::AF_INET, $_[1] );
+  if ( index( $input, ':' ) < 0 ) {
+    my $n = Socket::inet_pton( Socket::AF_INET, $input );
     return unless defined $n;
 
     $self->{version} = 4;
@@ -73,8 +73,8 @@ sub new {
   }
 
   # IPv4-mapped-IPv6
-  if ( index( $_[1], '.' ) >= 0 ) {
-    my $ip4m6 = $_[1];
+  if ( index( $input, '.' ) >= 0 ) {
+    my $ip4m6 = $input;
 
     # remove leading ::ffff: or return undef
     return unless $ip4m6 =~ s/^::ffff://i;
@@ -88,7 +88,7 @@ sub new {
   }
 
   # IPv6 address
-  my $n = Socket::inet_pton( Socket::AF_INET6, $_[1] );
+  my $n = Socket::inet_pton( Socket::AF_INET6, $input );
   return unless defined $n;
 
   $self->{version} = 6;
@@ -334,8 +334,8 @@ Expand IP address into canonical form, useful for C<< grep >>, aligned output an
 sub expand {
   return $_[0]->{expand} if exists $_[0]->{expand};
 
-# unpack to version and network byte order (from Socket::inet_pton), substr() ist faster than unpack
-# my ( $v, $n ) = unpack( 'C a*', $_[0]->{binary} );
+  # unpack to version and network byte order (from Socket::inet_pton), substr() ist faster than unpack
+  # my ( $v, $n ) = unpack( 'C a*', $_[0]->{binary} );
 
   my ( $v, $n ) = ( ord( substr( $_[0]->{binary}, 0, 1 ) ), substr( $_[0]->{binary}, 1, ) );
 
@@ -494,6 +494,8 @@ BEGIN {
 
     # wrong invalid
     || !defined Socket::inet_pton( Socket::AF_INET6, 'caFe::' )
+    || !defined Socket::inet_pton( Socket::AF_INET6, '::' )
+    || !defined Socket::inet_pton( Socket::AF_INET,  '0.0.0.0' )
     )
   {
     no warnings 'redefine';

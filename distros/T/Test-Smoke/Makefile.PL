@@ -121,6 +121,7 @@ else {
 my %TEST_REQUIRES = (
     'Test::More'       => 0.88,
     'Test::NoWarnings' => 0,
+    'Test::Fatal'      => 0,
     'HTTP::Daemon'     => 0,
     'HTTP::Message'    => 0,
 );
@@ -175,7 +176,7 @@ $mmver > 6.46 and $wm{META_ADD} = {
         homepage   => "http://perl5.test-smoke.org/",
         repository => {
             type   => "git",
-            url    => "git://github.com/abeltje/Test-Smoke.git",
+            url    => "git\@github.com:abeltje/Test-Smoke.git",
             web    => "https://github.com/abeltje/Test-Smoke",
         },
         x_IRC      => "irc://irc.perl.org/#smoke",

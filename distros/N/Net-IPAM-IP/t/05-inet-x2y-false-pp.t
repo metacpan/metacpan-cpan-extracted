@@ -16,7 +16,7 @@ BEGIN {
 BEGIN { use_ok('Net::IPAM::IP') || print "Bail out!\n"; }
 
 # valid
-foreach my $txt (qw/:: fE80::0:1 1.2.3.4 1:2:3:4:5:6:7:8 ::ffff:127.0.0.1 ::ff:0 caFe:: fe80::ffff/)
+foreach my $txt (qw/:: 0.0.0.0 fE80::0:1 1.2.3.4 1:2:3:4:5:6:7:8 ::ffff:127.0.0.1 ::ff:0 caFe:: fe80::ffff/)
 {
   ok( Net::IPAM::IP->new($txt), "_inet_pton_pp: is valid ($txt)" );
 }

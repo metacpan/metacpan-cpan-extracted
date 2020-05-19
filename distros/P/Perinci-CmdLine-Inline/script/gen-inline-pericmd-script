@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.496
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-02'; # DATE
+our $DATE = '2020-05-18'; # DATE
 our $DIST = 'Perinci-CmdLine-Inline'; # DIST
-our $VERSION = '0.550'; # VERSION
+our $VERSION = '0.551'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,49 +38,13 @@ gen-inline-pericmd-script - Generate inline Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.550 of gen-inline-pericmd-script (from Perl distribution Perinci-CmdLine-Inline), released on 2020-05-02.
+This document describes version 0.551 of gen-inline-pericmd-script (from Perl distribution Perinci-CmdLine-Inline), released on 2020-05-18.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % gen-inline-pericmd-script [-I=s+] [--actions-json=s] [--actions=s]
-     [--allow-prereq-json=s] [--allow-prereq=s+]
-     [--code-add-extra-log-outputs=s] [--code-after-enable-logging=s]
-     [--code-after-end=s] [--code-after-shebang=s]
-     [--code-before-enable-logging=s]
-     [--code-before-parse-cmdline-options=s] [--common-opts-json=s]
-     [--common-opts=s] [--completion-json=s] [--completion=s]
-     [--config-dir=s+] [--config-dirs-json=s] [--config-filename-json=s]
-     [--config-filename=s] [--config-path=path | -c]
-     [--config-profile=profile | -P] [--debug] [--default-format-json=s]
-     [--default-format=s] [--default-subcommand=s] [--description-json=s]
-     [--description=s] [--env-name=s] [--exit-json=s] [--exit=s]
-     [--extra-urls-for-version-json=s] [--extra-urls-for-version=s]
-     [--format=name] [--formats-json=s] [--formats=s]
-     [--get-subcommand-from-arg-json=s] [--get-subcommand-from-arg=s]
-     [--include-json=s] [--include=s+] [--json] [--log] [--log-level=level]
-     [--meta-is-normalized] [--meta-json=s] [--meta=s] [--(no)naked-res]
-     [--no-config | -C] [--no-env] [--no-log] [--no-meta-is-normalized]
-     [--no-overwrite] [--no-pack-deps] [--no-pass-cmdline-object]
-     [--no-pod] [--no-read-config] [--no-read-env]
-     [--no-script-version-from-main-version] [--no-skip-format]
-     [--no-stripper] [--no-use-cleanser] [--no-use-utf8]
-     [--no-validate-args] [--nolog] [--nometa-is-normalized]
-     [--nooverwrite] [--nopack-deps] [--nopass-cmdline-object] [--nopod]
-     [--noread-config] [--noread-env]
-     [--noscript-version-from-main-version] [--noskip-format]
-     [--nostripper] [--nouse-cleanser] [--nouse-utf8] [--novalidate-args]
-     [-o=s] [--output-file=s] [--overwrite] [--pack-deps]
-     [--page-result[=program]] [--pass-cmdline-object] [--pod] [--quiet]
-     [--read-config] [--read-env] [--riap-client-args-json=s]
-     [--riap-client-args=s] [--riap-client-json=s] [--riap-client=s]
-     [--riap-version-json=s] [--riap-version=s] [--script-name=s]
-     [--script-summary=s] [--script-version-from-main-version]
-     [--script-version=s] [--shebang=s] [--skip-format] [--stripper]
-     [--sub-name=s] [--subcommands-json=s] [--subcommands=s]
-     [--tags-json=s] [--tags=s] [--trace] [--use-cleanser] [--use-utf8]
-     [--validate-args] [--verbose] [--with-debug] [--without-debug] [url]
+ % gen-inline-pericmd-script [-I=s+] [--actions-json=s] [--actions=s] [--allow-prereq-json=s] [--allow-prereq=s+] [--code-add-extra-log-outputs=s] [--code-after-enable-logging=s] [--code-after-end=s] [--code-after-shebang=s] [--code-before-enable-logging=s] [--code-before-parse-cmdline-options=s] [--common-opts-json=s] [--common-opts=s] [--completion-json=s] [--completion=s] [--config-dir=s+] [--config-dirs-json=s] [--config-filename-json=s] [--config-filename=s] [--config-path=path | -c] [--config-profile=profile | -P] [--debug] [--default-format-json=s] [--default-format=s] [--default-subcommand=s] [--description-json=s] [--description=s] [--env-name=s] [--exit-json=s] [--exit=s] [--extra-urls-for-version-json=s] [--extra-urls-for-version=s] [--format=name] [--formats-json=s] [--formats=s] [--get-subcommand-from-arg-json=s] [--get-subcommand-from-arg=s] [--include-json=s] [--include=s+] [--json] [--log] [--log-level=level] [--meta-is-normalized] [--meta-json=s] [--meta=s] [--(no)naked-res] [--no-config | -C] [--no-env] [--no-log] [--no-meta-is-normalized] [--no-overwrite] [--no-pack-deps] [--no-pass-cmdline-object] [--no-pod] [--no-read-config] [--no-read-env] [--no-script-version-from-main-version] [--no-skip-format] [--no-stripper] [--no-use-cleanser] [--no-use-utf8] [--no-validate-args] [--nolog] [--nometa-is-normalized] [--nooverwrite] [--nopack-deps] [--nopass-cmdline-object] [--nopod] [--noread-config] [--noread-env] [--noscript-version-from-main-version] [--noskip-format] [--nostripper] [--nouse-cleanser] [--nouse-utf8] [--novalidate-args] [-o=s] [--output-file=s] [--overwrite] [--pack-deps] [--page-result[=program]] [--pass-cmdline-object] [--pod] [--quiet] [--read-config] [--read-env] [--riap-client-args-json=s] [--riap-client-args=s] [--riap-client-json=s] [--riap-client=s] [--riap-version-json=s] [--riap-version=s] [--script-name=s] [--script-summary=s] [--script-version-from-main-version] [--script-version=s] [--shebang=s] [--skip-format] [--stripper] [--sub-name=s] [--subcommands-json=s] [--subcommands=s] [--tags-json=s] [--tags=s] [--trace] [--use-cleanser] [--use-utf8] [--validate-args] [--verbose] [--with-debug] [--without-debug] [url]
 
 =head1 DESCRIPTION
 

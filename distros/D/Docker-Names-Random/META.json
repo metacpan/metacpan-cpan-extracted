@@ -32,7 +32,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.008"
+            "perl" : "5.010"
          }
       },
       "develop" : {
@@ -67,7 +67,8 @@
             "Exporter" : "0",
             "Hash::Util" : "0",
             "YAML::PP" : "0",
-            "perl" : "5.008",
+            "feature" : "0",
+            "perl" : "5.010",
             "strict" : "0",
             "utf8" : "0",
             "warnings" : "0"
@@ -86,14 +87,14 @@
             "Test2::V0" : "0",
             "Test::More" : "0",
             "lib" : "0",
-            "perl" : "5.008"
+            "perl" : "5.010"
          }
       }
    },
    "provides" : {
       "Docker::Names::Random" : {
          "file" : "lib/Docker/Names/Random.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.0.2"
       }
    },
    "release_status" : "stable",
@@ -108,7 +109,7 @@
          "web" : "https://github.com/mikkoi/docker-names-random.git"
       }
    },
-   "version" : "0.0.1",
+   "version" : "0.0.2",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028001"
@@ -346,7 +347,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.0.1",
+                  "tag" : "0.0.2",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },

@@ -2,161 +2,255 @@
 # purpose: tests Mnet::Expect::Cli::Ios functionality
 
 # required modules
-#   Expect required in Mnet::Expect modules, best to find our here if missing
 use warnings;
 use strict;
 use File::Temp;
+use Mnet::T;
 use Test::More tests => 8;
 
-# use current perl for tests
-my $perl = $^X;
-
-
-
-#
-# check enable method
-#
-
-# init perl code used for enable and method tests
-#   for debug uncomment the use Mnet::Opts::Set::Debug line below
-my $perl_command_setup = '
+# init perl code for these tests
+my $perl = <<'perl-eof';
     use warnings;
     use strict;
     use Mnet::Expect::Cli::Ios;
-    # use Mnet::Log; use Mnet::Opts::Set::Debug;
-    my $expect = Mnet::Expect::Cli::Ios->new({
-        enable_user => "test",
-        spawn       => $ENV{CLI},
-        timeout     => 2,
-    });
-';
-
-# check enable when already in enable
-Test::More::is(`export CLI=\$(mktemp); echo '
-    echo -n \"prompt# \"; read INPUT
-    echo -n \"prompt# \"; read INPUT
-    echo -n \"prompt# \"; read INPUT
-' >\$CLI; chmod 700 \$CLI; $perl -e '
-    $perl_command_setup
-    print \$expect->enable("test") // "<undef>";
-' 2>&1; rm \$CLI`, '1', 'enable when already in enable');
-
-# check enable with no prompts
-Test::More::is(`export CLI=\$(mktemp); echo '
-    echo -n \"prompt> \"; read INPUT
-    echo -n \"prompt> \"; read INPUT
-    echo -n \"prompt# \"; read INPUT
-' >\$CLI; chmod 700 \$CLI; $perl -e '
-    $perl_command_setup
-    print \$expect->enable("test") // "<undef>";
-' 2>&1; rm \$CLI`, '1', 'enable with no prompts');
-
-# check enable with password prompt
-Test::More::is(`export CLI=\$(mktemp); echo '
-    echo -n \"prompt> \"; read INPUT
-    echo -n \"prompt> \"; read INPUT
-    echo -n \"password: \"; read INPUT
-    echo -n \"prompt# \"; read INPUT
-' >\$CLI; chmod 700 \$CLI; $perl -e '
-    $perl_command_setup
-    print \$expect->enable("test") // "<undef>";
-' 2>&1; rm \$CLI`, '1', 'enable with password prompt');
-
-# check enable with username and password prompts
-Test::More::is(`export CLI=\$(mktemp); echo '
-    echo -n \"prompt> \"; read INPUT
-    echo -n \"prompt> \"; read INPUT
-    echo -n \"username: \"; read INPUT
-    echo -n \"password: \"; read INPUT
-    echo -n \"prompt# \"; read INPUT
-' >\$CLI; chmod 700 \$CLI; $perl -e '
-    $perl_command_setup
-    print \$expect->enable("test") // "<undef>";
-' 2>&1; rm \$CLI`, '1', 'enable with username and password prompts');
-
-# check enable failed
-Test::More::is(`export CLI=\$(mktemp); echo '
-    echo -n \"prompt> \"; read INPUT
-    echo -n \"prompt> \"; read INPUT
-    echo -n \"password: \"; read INPUT
-    echo -n \"password: \"; read INPUT
-    echo -n \"password: \"; read INPUT
-    echo -n \"% Bad enable passwords, too many failures!\"
-    echo -n \"prompt> \"; read INPUT
-' >\$CLI; chmod 700 \$CLI; $perl -e '
-    $perl_command_setup
-    print \$expect->enable("test") // "<undef>";
-' 2>&1; rm \$CLI`, '0', 'enable failed');
-
-
-
-#
-# check record and replay of enable method
-#
-
-# create temp record/replay/test file
-my ($fh, $file) = File::Temp::tempfile( UNLINK => 1 );
-
-# init perl code used for command record and replay tests
-#   for debug uncomment the use Mnet::Opts::Set::Debug line below
-my $perl_record_replay = '
-    use warnings;
-    use strict;
-    use Mnet::Test;
-    use Mnet::Expect::Cli::Ios;
-    # use Mnet::Log; use Mnet::Opts::Set::Debug;
-    use Mnet::Opts::Cli;
-    use Mnet::Test;
-    my $opts = Mnet::Opts::Cli->new();
-    $opts->{spawn} = $ENV{CLI} if $ENV{CLI};
-    my $expect = Mnet::Expect::Cli::Ios->new($opts);
-';
-
-# enable method --record
-Test::More::is(`export CLI=\$(mktemp); echo '
-    echo -n \"prompt> \"; read INPUT
-    echo -n \"prompt> \"; read INPUT
-    echo -n \"prompt# \"; read INPUT
-' >\$CLI; chmod 700 \$CLI; $perl -e '
-    $perl_record_replay
-    print \$expect->enable("test") // "<undef>";
-' -- --record $file 2>&1; rm \$CLI`, '1', 'enable method --record');
-
-# enable method --replay
-Test::More::is(`$perl -e '
-    $perl_record_replay
-    print \$expect->enable("test") // "<undef>";
-' -- --replay $file 2>&1`, '1', 'enable method --replay');
-
-
-
-#
-# check close method and changing prompt
-#
-
-# check close method and changing prompt
-Test::More::is(`export CLI=\$(mktemp); echo '
-    echo -n \"prompt# \"; read INPUT
-    echo -n \"prompt# \"; read INPUT
-    echo -n \"prompt> \"; read INPUT
-' >\$CLI; chmod 700 \$CLI; echo; $perl -e '
-    use warnings;
-    use strict;
-    use Mnet::Expect::Cli::Ios;
-    use Mnet::Log;
+    use Mnet::Log qw( DEBUG INFO );
     use Mnet::Log::Test;
-    use Mnet::Opts::Set::Debug;
-    my \$expect = Mnet::Expect::Cli::Ios->new({
-        spawn       => \$ENV{CLI},
-        timeout     => 2,
-    });
-    \$expect->close;
-' 2>&1 | grep '_command_expect matched'; rm \$CLI`, '
-dbg - Mnet::Expect::Cli _command_expect matched prompt_re
-dbg - Mnet::Expect::Cli _command_expect matched prompts null for timeout
-', 'close and changing prompt');
+    use Mnet::Opts::Cli;
+    use Mnet::Opts::Set::Quiet;
+    use Mnet::Test;
+    Mnet::Opts::Cli::define({ getopt => "config" });
+    Mnet::Opts::Cli::define({ getopt => "enable:s" });
+    Mnet::Opts::Cli::define({ getopt => "enable-user:s" });
+    my $opts = Mnet::Opts::Cli->new;
+    $opts->{spawn} = $ENV{EXPECT};
+    $opts->{timeout} = 2;
+    DEBUG("spawn script: $_") foreach (split/\n/, `cat $ENV{EXPECT} 2>&1`);
+    my $expect = Mnet::Expect::Cli::Ios->new($opts) or die "expect undef";
+    if ($opts->{record} or $opts->{replay}) {
+        my $output = $expect->command("test");
+        INFO("output = $_") foreach split(/\n/, $output);
+    } elsif ($opts->{config}) {
+        $expect->command("configure terminal");
+        $expect->command("interface Loopback0");
+        $expect->command("exit");
+        $expect->command("exit");
+    }
+    $expect->close;
+perl-eof
 
+# enable when already in enable
+Mnet::T::test_perl({
+    name    => 'enable when already in enable',
+    pre     => <<'    pre-eof',
+        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
+            echo -n "prompt# ";   read INPUT
+            echo -n "prompt# ";   read INPUT
+            echo -n "prompt# ";   read INPUT
+        ' >$EXPECT
+    pre-eof
+    perl    => $perl,
+    args    => '--noquiet --debug --enable',
+    filter  => 'grep -e "Ios enable" -e "Log fin"',
+    expect  => <<'    expect-eof',
+        dbg - Mnet::Expect::Cli::Ios enable starting
+        dbg - Mnet::Expect::Cli::Ios enable finished, returning true
+        --- - Mnet::Log finished, no errors
+    expect-eof
+    debug   => '--debug',
+});
 
+# enable with no prompts
+Mnet::T::test_perl({
+    name    => 'enable with no prompts',
+    pre     => <<'    pre-eof',
+        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
+            echo -n "prompt> ";   read INPUT
+            echo -n "prompt> ";   read INPUT
+            echo -n "prompt# ";   read INPUT
+        ' >$EXPECT
+    pre-eof
+    perl    => $perl,
+    args    => '--noquiet --debug --enable',
+    filter  => 'grep -e "Ios enable" -e "Log fin"',
+    expect  => <<'    expect-eof',
+        dbg - Mnet::Expect::Cli::Ios enable starting
+        dbg - Mnet::Expect::Cli::Ios enable finished, returning true
+        --- - Mnet::Log finished, no errors
+    expect-eof
+    debug   => '--debug',
+});
+
+# enable with password prompt
+Mnet::T::test_perl({
+    name    => 'enable with password prompt',
+    pre     => <<'    pre-eof',
+        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
+            echo -n "prompt> ";   read INPUT
+            echo -n "prompt> ";   read INPUT
+            echo -n "password: "; read INPUT
+            echo -n "prompt# ";   read INPUT
+        ' >$EXPECT
+    pre-eof
+    perl    => $perl,
+    args    => '--noquiet --debug --enable pass',
+    filter  => 'grep -e "Ios enable" -e "Log fin"',
+    expect  => <<'    expect-eof',
+        dbg - Mnet::Expect::Cli::Ios enable starting
+        dbg - Mnet::Expect::Cli::Ios enable sending enable password
+        dbg - Mnet::Expect::Cli::Ios enable finished, returning true
+        --- - Mnet::Log finished, no errors
+    expect-eof
+    debug   => '--debug',
+});
+
+# enable with username and password prompts
+Mnet::T::test_perl({
+    name    => 'enable with username and password prompts',
+    pre     => <<'    pre-eof',
+        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
+            echo -n "prompt> ";   read INPUT
+            echo -n "prompt> ";   read INPUT
+            echo -n "username: "; read INPUT
+            echo -n "password: "; read INPUT
+            echo -n "prompt# ";   read INPUT
+        ' >$EXPECT
+    pre-eof
+    perl    => $perl,
+    args    => '--noquiet --debug --enable pass --enable-user test',
+    filter  => 'grep -e "Ios enable" -e "Log fin"',
+    expect  => <<'    expect-eof',
+        dbg - Mnet::Expect::Cli::Ios enable starting
+        dbg - Mnet::Expect::Cli::Ios enable sending enable_user
+        dbg - Mnet::Expect::Cli::Ios enable sending enable password
+        dbg - Mnet::Expect::Cli::Ios enable finished, returning true
+        --- - Mnet::Log finished, no errors
+    expect-eof
+    debug   => '--debug',
+});
+
+# enable failed
+Mnet::T::test_perl({
+    name    => 'enable failed',
+    pre     => <<'    pre-eof',
+        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
+            echo -n "prompt> ";   read INPUT
+            echo -n "prompt> ";   read INPUT
+            echo -n "password: "; read INPUT
+            echo -n "password: "; read INPUT
+            echo -n "password: "; read INPUT
+            echo -n "% Bad enable passwords, too many failures!"
+            echo -n "prompt> ";   read INPUT
+        ' >$EXPECT
+    pre-eof
+    perl    => $perl,
+    args    => '--noquiet --debug --enable',
+    filter  => 'grep -e "Ios enable" -e "Log fin"',
+    expect  => <<'    expect-eof',
+        dbg - Mnet::Expect::Cli::Ios enable starting
+        dbg - Mnet::Expect::Cli::Ios enable sending enable password
+        dbg - Mnet::Expect::Cli::Ios enable sending enable password
+        dbg - Mnet::Expect::Cli::Ios enable sending enable password
+        dbg - Mnet::Expect::Cli::Ios enable finished, returning false
+        --- - Mnet::Log finished, no errors
+    expect-eof
+    debug   => '--debug',
+});
+
+# config interface mode prompt
+#? add test for user/enable/config/int modes to check prompts
+#   also ensure that truncated prompts work
+#       will ios prompt handling need to be modified?
+#   maybe create a sub for bulk testing prompts from here?
+#       or would/should this go into Expect::Cli?
+#INIT { our $mnet_test_perl = 'config interface mode prompt' }
+#Mnet::T::test_perl({
+#    name    => 'config interface mode prompt',
+#    pre     => <<'    pre-eof',
+#        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
+#            echo -n "very-long-hostname> ";         read INPUT
+#            echo -n "very-long-hostname> ";         read INPUT
+#            echo -n "very-long-hostname# ";         read INPUT
+#            echo -n "very-long-host(config)# ";     read INPUT
+#            echo -n "very-long-ho(config-if)# ";    read INPUT
+#            echo -n "very-long-host(config)# ";     read INPUT
+#            echo -n "very-long-hostname# ";         read INPUT
+#        ' >$EXPECT
+#    pre-eof
+#    perl    => $perl,
+#    args    => '--noquiet --debug --enable --config',
+#    filter  => 'grep -e "Ios enable" -e "Log fin"',
+#    expect  => <<'    expect-eof',
+#        --- - Mnet::Log finished, no errors
+#    expect-eof
+#    debug   => '--debug',
+#});
+
+# close with changing prompt
+Mnet::T::test_perl({
+    name    => 'close with changing prompt',
+    pre     => <<'    pre-eof',
+        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
+            echo -n "prompt# "; read INPUT
+            echo -n "prompt# "; read INPUT
+            echo -n "prompt> "; read INPUT
+        ' >$EXPECT
+    pre-eof
+    perl    => $perl,
+    args    => '--debug --noquiet',
+    post    => 'rm $EXPECT',
+    filter  => 'grep -e "Ios close" -e "_command_expect matched" -e "Log fin"',
+    expect  => <<'    expect-eof',
+        dbg - Mnet::Expect::Cli::Ios close starting
+        dbg - Mnet::Expect::Cli _command_expect matched prompt_re
+        dbg - Mnet::Expect::Cli _command_expect matched prompts null for timeout
+        dbg - Mnet::Expect::Cli::Ios close finished
+        --- - Mnet::Log finished, no errors
+    expect-eof
+});
+
+# create temp directory for record and replay tests, below
+#   portable temp dir, as per  http://cpanwiki.grango.org/wiki/CPANAuthorNotes
+my ($temp_dir) = File::Temp::newdir(
+    "tmp.XXXX", CLEANUP => 1, EXLOCK => 0, TMPDIR => 1
+);
+
+# enable mode --record
+Mnet::T::test_perl({
+    name    => 'enable method --record',
+    pre     => <<'    pre-eof',
+        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
+            echo -n "prompt> "; read INPUT
+            echo -n "prompt> "; read INPUT
+            echo -n "prompt# "; read INPUT
+            echo "output";
+            echo -n "prompt# "; read INPUT
+        ' >$EXPECT
+    pre-eof
+    perl    => $perl,
+    args    => "--noquiet --record $temp_dir/file.test --enable",
+    post    => 'rm $EXPECT',
+    filter  => 'grep -e ^inf -e "Mnet::Log finished"',
+    expect  => <<'    expect-eof',
+        inf - main output = output
+        --- - Mnet::Log finished, no errors
+    expect-eof
+    debug   => '--debug',
+});
+
+# enable mode --replay
+Mnet::T::test_perl({
+    name    => 'enable method --replay',
+    pre     => 'export EXPECT="dummy_spawn_not_needed"',
+    perl    => $perl,
+    args    => "--noquiet --replay $temp_dir/file.test --enable",
+    filter  => 'grep -e ^inf -e "Mnet::Log finished"',
+    expect  => <<'    expect-eof',
+        inf - main output = output
+        --- - Mnet::Log finished, no errors
+    expect-eof
+    debug   => '--debug',
+});
 
 # finished
 exit;
+

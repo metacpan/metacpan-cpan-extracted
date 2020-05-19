@@ -1,5 +1,8 @@
 Revision history for Data-Dataset-Classic-Titanic
 
+0.0102 2020-05-16 16:07:52
+    - Remove unneeded "or die" code.
+
 0.0101 2020-04-29 22:47:19
     - Fix typos.
     - Make as_file() return the distribution share file if the dist_dir one does not exist.

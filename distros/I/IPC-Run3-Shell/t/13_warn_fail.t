@@ -104,6 +104,9 @@ like exception { $s->perl('-e','kill 9, $$'); 1 }, $SIG9_ERROR_RE, "fail 4";
 			is $s->perl({stdout=>\my $x},'-e','print "foo"; exit 123'), 123, "warning test 3A"; is $?, 123<<8, "warning test 3B";
 			is $x, "foo", "warning test 3C";
 			is $s->perl('-e','kill 9, $$'), '', "warning test 4A"; is $?, $SIG9_RETURNCODE, "warning test 4B";
+			# since we can't suppress the following on some Windows (XP?), we'll
+			# fake it to make sure that our tests are written to always ignore it
+			warn q{Can't spawn "cmd.exe": No such file or directory};  ## no critic (RequireCarping)
 		};
 	# on some Windows systems, there is an extra warning like the following
 	# (seen on some CPAN Testers results for v0.51)
@@ -144,12 +147,13 @@ like exception { $s->perl('-e','kill 9, $$'); 1 }, $SIG9_ERROR_RE, "fail 4";
 			is $s->perl({stdout=>\my $x},'-e','print "foo"; exit 123'), 123, "no warn 3A"; is $?, 123<<8, "no warn 3B";
 			is $x, "foo", "no warn 3C";
 			is $s->perl('-e','kill 9, $$'), '', "no warn 4A"; is $?, $SIG9_RETURNCODE, "no warn 4B";
-			
+			# see comments in above tests about the following warn
+			warn q{Can't spawn "cmd.exe": No such file or directory};  ## no critic (RequireCarping)
 			like $s->perl('-e','print ">>@ARGV<<"','--','x',[1,2],'y'), qr/^>>x ARRAY\(0x[0-9a-fA-F]+\) y<<$/, "no warn 7";
 			is $s->perl({_BAD_OPT=>1},'-e','print "foo"'), "foo", "unknown opt 3";
 		};
 	# regexen copied and adapted from above
-	is grep({/\QCan't spawn "cmd.exe"\E|exit (status|value)\b|\QCommand "ignore_this_error_it_is_intentional" failed\E|$SIG9_ERROR_RE/} @w4), 0, "no warnings";
+	is grep({/exit (status|value)\b|\QCommand "ignore_this_error_it_is_intentional" failed\E|$SIG9_ERROR_RE/} @w4), 0, "no known warnings";
 	# the uninitialized category should still be fatal too
 	like exception { $s->perl('-e','print ">>@ARGV<<"','--','x',undef,0,undef,'y') },
 		qr/^Use of uninitialized value in argument list\b/, "uninizialized still fatal here";

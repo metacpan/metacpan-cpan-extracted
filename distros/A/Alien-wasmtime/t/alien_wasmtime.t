@@ -62,22 +62,6 @@ ffi_ok
     my $engine = $ffi->function( wasm_engine_new => [] => 'opaque' )->call;
     ok $engine;
     note "engine = $engine";
-
-    my $store = $ffi->function( wasm_store_new => ['opaque'] => 'opaque' )->call($engine);
-    ok $store;
-    note "store = $store";
-
-    my $memorytype = $ffi->function( wasm_memorytype_new => ['uint32[2]'] => 'opaque' )->call([1,2]);
-    ok $memorytype;
-    note "memorytype = $memorytype";
-
-    my $memory = $ffi->function( wasm_memory_new => ['opaque','opaque'] => 'opaque' )->call($store, $memorytype);
-    ok $memory;
-    note "memory = $memory";
-
-    $ffi->function( wasm_memory_delete => ['opaque'] => 'void' )->call($memory);
-    $ffi->function( wasm_memorytype_delete => ['opaque'] => 'void' )->call($memorytype);
-    $ffi->function( wasm_store_delete => ['opaque'] => 'void' )->call($store);
     $ffi->function( wasm_engine_delete => ['opaque'] => 'void' )->call($engine);
     ok 1;
   }

@@ -9,23 +9,25 @@ use lib qw{inc}; use Module::Build::Parse::Yapp;
 my %module_build_args = (
   "build_requires" => {
     "Module::Build" => "0.28",
-    "Module::Build::Parse::Yapp" => 0
+    "Module::Build::Parse::Yapp" => "v0.1.2"
   },
   "configure_requires" => {
     "Module::Build" => "0.28",
-    "Module::Build::Parse::Yapp" => 0
+    "Module::Build::Parse::Yapp" => "v0.1.2"
   },
   "dist_abstract" => "OpenSMILES format reader",
   "dist_author" => [
     "Andrius Merkys <merkys\@cpan.org>"
   ],
   "dist_name" => "Chemistry-OpenSMILES",
-  "dist_version" => "0.1.0",
+  "dist_version" => "0.1.3",
   "license" => "bsd",
   "module_name" => "Chemistry::OpenSMILES",
   "recursive_test_files" => 1,
   "requires" => {
-    "Parse::Yapp" => 0
+    "Graph::Undirected" => 0,
+    "Parse::Yapp" => 0,
+    "perl" => "5.0100"
   },
   "test_requires" => {
     "List::Util" => 0,
@@ -37,7 +39,7 @@ my %module_build_args = (
 my %fallback_build_requires = (
   "List::Util" => 0,
   "Module::Build" => "0.28",
-  "Module::Build::Parse::Yapp" => 0,
+  "Module::Build::Parse::Yapp" => "v0.1.2",
   "Test::More" => 0
 );
 

@@ -18,13 +18,13 @@ BEGIN
     require 5.6.0;
     use strict;
     use IO::File;
-	use parent qw( DB::Object );
+    use parent qw( DB::Object );
     require DB::Object::Mysql::Statement;
     require DB::Object::Mysql::Tables;
     ## use DBD::mysql;
     eval
     {
-		require DBD::mysql;
+        require DBD::mysql;
     };
     die( $@ ) if( $@ );
     use Net::IP;
@@ -125,20 +125,20 @@ sub attribute($;$@)
 
 sub begin_work($;$@)
 {
-	my $self = shift( @_ );
-	$self->{transaction} = 1;
-	$self->{AutoCommit_previous} = $self->{dbh}->{AutoCommit};
-	$self->{dbh}->{AutoCommit} = 0;
-	return( $self );
+    my $self = shift( @_ );
+    $self->{transaction} = 1;
+    $self->{AutoCommit_previous} = $self->{dbh}->{AutoCommit};
+    $self->{dbh}->{AutoCommit} = 0;
+    return( $self );
 }
 
 sub commit($;$@)
 {
-	my $self = shift( @_ );
-	$self->{transaction} = 0;
-	$self->{dbh}->commit( @_ );
-	$self->{dbh}->{AutoCommit} = $self->{AutoCommit_previous} if( length( $self->{AutoCommit_previous} ) );
-	return( $self );
+    my $self = shift( @_ );
+    $self->{transaction} = 0;
+    $self->{dbh}->commit( @_ );
+    $self->{dbh}->{AutoCommit} = $self->{AutoCommit_previous} if( length( $self->{AutoCommit_previous} ) );
+    return( $self );
 }
 
 sub connect
@@ -153,79 +153,79 @@ sub connect
 
 sub create_db
 {
-	my $self = shift( @_ );
-	my $name = shift( @_ ) || return( $self->error( "No database name to create was provided." ) );
-	my $opts = {};
-	$opts = shift( @_ ) if( $self->_is_hash( $_[0] ) );
-	my $params = [];
-	## https://dev.mysql.com/doc/refman/5.6/en/create-database.html
-	push( @$params, sprintf( 'CHARACTER SET = %s', $opts->{charset} ) ) if( $opts->{charset} );
-	push( @$params, sprintf( 'COLLATE = %s', $opts->{collate} ) ) if( $opts->{collate} );
-	my $sql = "CREATE DATABASE " . ( $opts->{if_not_exists} ? 'IF NOT EXISTS ' : '' ) . $name;
-	if( scalar( @$params ) )
-	{
-		$sql .= ' ' . join( ' ', @$params );
-	}
+    my $self = shift( @_ );
+    my $name = shift( @_ ) || return( $self->error( "No database name to create was provided." ) );
+    my $opts = {};
+    $opts = shift( @_ ) if( $self->_is_hash( $_[0] ) );
+    my $params = [];
+    ## https://dev.mysql.com/doc/refman/5.6/en/create-database.html
+    push( @$params, sprintf( 'CHARACTER SET = %s', $opts->{charset} ) ) if( $opts->{charset} );
+    push( @$params, sprintf( 'COLLATE = %s', $opts->{collate} ) ) if( $opts->{collate} );
+    my $sql = "CREATE DATABASE " . ( $opts->{if_not_exists} ? 'IF NOT EXISTS ' : '' ) . $name;
+    if( scalar( @$params ) )
+    {
+        $sql .= ' ' . join( ' ', @$params );
+    }
     my $dbh = $self->{dbh} || return( $self->error( "Could not find database handler." ) );
     my( $sth, $rc );
     try
     {
-		$sth = $dbh->prepare( $sql ) || return( $self->error( "An error occured while prepareing sql query to create database: ", $dbh->errstr ) );
-		$rc = $sth->execute || return( $self->error( "An error occured while executing sql query to create database: ", $sth->errstr ) );
-		$sth->finish;
-	}
-	catch( $e )
-	{
-		$sth->finish;
-		return( $self->error( "An unexpected error occurred while trying to execute the sql query to create database: ", $sth->error, "\n$sql" ) );
-	}
-	my $ref = {};
-	my @keys = qw( host port login passwd opt debug );
-	@$ref{ @keys } = @$self{ @keys };
-	$ref->{database} = $name;
-	my $dbh = $self->connect( $ref ) || return( $self->error( "I could create the database \"$name\" but oddly enough, I could not connect to it with user \"$ref->{login}\" on host \"$ref->{host}\" with port \"$ref->{port}\"." ) );
-	return( $dbh );
+        $sth = $dbh->prepare( $sql ) || return( $self->error( "An error occured while prepareing sql query to create database: ", $dbh->errstr ) );
+        $rc = $sth->execute || return( $self->error( "An error occured while executing sql query to create database: ", $sth->errstr ) );
+        $sth->finish;
+    }
+    catch( $e )
+    {
+        $sth->finish;
+        return( $self->error( "An unexpected error occurred while trying to execute the sql query to create database: ", $sth->error, "\n$sql" ) );
+    }
+    my $ref = {};
+    my @keys = qw( host port login passwd opt debug );
+    @$ref{ @keys } = @$self{ @keys };
+    $ref->{database} = $name;
+    $dbh = $self->connect( $ref ) || return( $self->error( "I could create the database \"$name\" but oddly enough, I could not connect to it with user \"$ref->{login}\" on host \"$ref->{host}\" with port \"$ref->{port}\"." ) );
+    return( $dbh );
 }
 
 sub databases
 {
-	my $self = shift( @_ );
-	## return( $self->error( "Not connected to PostgreSQL server yet. Issue $dbh->connect first." ) ) if( !$self->{ 'dbh' } );
-	my $dbh;
-	## If there is no connection yet, then create one using the postgres login.
-	## There should not be a live user and database just to check what databases there are.
-	if( !$self->{dbh} )
-	{
-		my $con = 
-		{
-		'database' => 'mysql',
-		};
-		$con->{mysql_read_default_file} = '/etc/my.cnf' if( -f( '/etc/my.cnf' ) );
-		if( CORE::exists( $ENV{ 'DB_MYSQL_CON' } ) )
-		{
-			@$con{ qw( host login passwd ) } = split( /;/, $ENV{ 'DB_MYSQL_CON' } );
-		}
-		else
-		{
-			@$con{ qw( host login passwd ) } = ( $SQL_SERVER, $DB_LOGIN, $DB_PASSWD );
-		}
-		try
-		{
-			$dbh = $self->connect( $con ) || return( undef() );
-		}
-		catch( $e )
-		{
-			$self->message( 3, "An error occurred while trying to connect to get the list of available databases: $e" );
-			return;
-		}
-	}
-	else
-	{
-		$dbh = $self;
-	}
-	my $temp = $dbh->do( "SHOW DATABASES" )->fetchall_arrayref;
-	my @dbases = map( $_->[0], @$temp );
-	return( @dbases );
+    my $self = shift( @_ );
+    ## return( $self->error( "Not connected to PostgreSQL server yet. Issue $dbh->connect first." ) ) if( !$self->{ 'dbh' } );
+    my $dbh;
+    ## If there is no connection yet, then create one using the postgres login.
+    ## There should not be a live user and database just to check what databases there are.
+    if( !$self->{dbh} )
+    {
+        my $con = 
+        {
+        'database' => 'mysql',
+        };
+        $con->{mysql_read_default_file} = '/etc/my.cnf' if( -f( '/etc/my.cnf' ) );
+        if( CORE::exists( $ENV{ 'DB_MYSQL_CON' } ) )
+        {
+            @$con{ qw( host login passwd ) } = split( /;/, $ENV{ 'DB_MYSQL_CON' } );
+        }
+        else
+        {
+            @$con{ qw( host login passwd ) } = ( $SQL_SERVER, $DB_LOGIN, $DB_PASSWD );
+        }
+        try
+        {
+            $dbh = $self->connect( $con ) || return( undef() );
+        }
+        catch( $e )
+        {
+            $self->message( 3, "An error occurred while trying to connect to get the list of available databases: $e" );
+            return;
+        }
+    }
+    else
+    {
+        $dbh = $self;
+    }
+    my $temp = $dbh->do( "SHOW DATABASES" )->fetchall_arrayref;
+    my @dbases = map( $_->[0], @$temp );
+    return( @dbases );
 }
 
 ## Specific to Mysql (Postgres also uses it)
@@ -267,10 +267,10 @@ sub query_object { return( shift->_set_get_object( 'query_object', 'DB::Object::
 
 sub rollback
 {
-	my $self = shift( @_ );
-	$self->{transaction} = 0;
-	$self->{dbh}->{AutoCommit} = $self->{AutoCommit_previous} if( length( $self->{AutoCommit_previous} ) );
-	return( $self->{dbh}->rollback() );
+    my $self = shift( @_ );
+    $self->{transaction} = 0;
+    $self->{dbh}->{AutoCommit} = $self->{AutoCommit_previous} if( length( $self->{AutoCommit_previous} ) );
+    return( $self->{dbh}->rollback() );
 }
 
 sub stat
@@ -302,7 +302,7 @@ sub stat
 sub table_info
 {
     my $self = shift( @_ );
-	my $table = shift( @_ ) || 
+    my $table = shift( @_ ) || 
     return( $self->error( "You must provide a table name to access the table methods." ) );
     $self->message( 3, "Getting table/view information for '$table'." );
     my $opts = {};
@@ -311,29 +311,29 @@ sub table_info
     ## my $sth = $self->{dbh}->table_info( undef(), undef(), $table );
     my $sql = "SELECT * FROM information_schema.tables WHERE table_name=?";
     my $dbh = $self->{dbh} || return( $self->error( "Could not find database handler." ) );
-	my $sth = $dbh->prepare_cached( $sql ) || return( $self->error( "An error occured while preparing query to check if table \"$table\" exists in our database: ", $dbh->errstr ) );
-	$sth->execute( $table ) || return( $self->error( "An error occured while executing query to check if table \"$table\" exists in our database: ", $sth->errstr ) );
-	my $all = $sth->fetchall_arrayref( {} );
-	$sth->finish;
-	return( [] ) if( !scalar( @$all ) );
-	return( $all ) if( !$schema || $opts->{anywhere} );
+    my $sth = $dbh->prepare_cached( $sql ) || return( $self->error( "An error occured while preparing query to check if table \"$table\" exists in our database: ", $dbh->errstr ) );
+    $sth->execute( $table ) || return( $self->error( "An error occured while executing query to check if table \"$table\" exists in our database: ", $sth->errstr ) );
+    my $all = $sth->fetchall_arrayref( {} );
+    $sth->finish;
+    return( [] ) if( !scalar( @$all ) );
+    return( $all ) if( !$schema || $opts->{anywhere} );
     foreach my $ref ( @$all )
     {
-    	if( $ref->{table_schema} eq $db )
-    	{
-    		my $hash =
-    		{
-    		schema		=> $ref->{table_schema},
-    		name		=> $ref->{table_name},
-    		type		=> $ref->{table_type},
-    		};
-    		## example: BASE TABLE
-    		if( $ref->{table_type} =~ /^(?:(?:\S+)[[:blank:]]+)?(.*?)$/ )
-    		{
-    			$hash->{type} = $2;
-    		}
-    		return( $hash );
-    	}
+        if( $ref->{table_schema} eq $db )
+        {
+            my $hash =
+            {
+            schema        => $ref->{table_schema},
+            name        => $ref->{table_name},
+            type        => $ref->{table_type},
+            };
+            ## example: BASE TABLE
+            if( $ref->{table_type} =~ /^(?:(?:\S+)[[:blank:]]+)?(.*?)$/ )
+            {
+                $hash->{type} = $2;
+            }
+            return( $hash );
+        }
     }
     return( [] );
 }
@@ -348,7 +348,7 @@ sub tables
     my $ref  = $sth->fetchall_arrayref();
     $sth->finish;
     my @tables = map{ $_->[ 0 ] } @$ref;
-	return( \@tables );
+    return( \@tables );
 }
 
 sub tables_info
@@ -445,30 +445,30 @@ sub _connection_parameters
 sub _dsn
 {
     my $self = shift( @_ );
-	## "DBI:mysql:database=$sql_db;host=$sql_host;port=$sql_port;mysql_read_default_file=/etc/my.cnf"
-	my @params = ( sprintf( 'dbi:%s:database=%s', @$self{ qw( driver database ) } ) );
-	if( $self->{host} )
-	{
-		my $ip = Net::IP->new( $self->{host} );
-		if( $ip )
-		{
-			if( $ip->version == 6 )
-			{
-				push( @params, sprintf( 'host=[%s]', $ip->ip ) );
-			}
-			else
-			{
-				push( @params, sprintf( 'host=%s', $ip->ip ) );
-			}
-		}
-		else
-		{
-			push( @params, sprintf( 'host=%s', $self->{host} ) );
-		}
-	}
-	# my @params = sprintf( "dbi:%s:database=%s;host=%s", @$self{ qw( driver database server ) } );
-	push( @params, sprintf( 'port=%d', $self->{port} ) ) if( $self->{port} );
-	push( @params, sprintf( 'mysql_read_default_file=%s', $self->{mysql_read_default_file} ) ) if( $self->{mysql_read_default_file} );
+    ## "DBI:mysql:database=$sql_db;host=$sql_host;port=$sql_port;mysql_read_default_file=/etc/my.cnf"
+    my @params = ( sprintf( 'dbi:%s:database=%s', @$self{ qw( driver database ) } ) );
+    if( $self->{host} )
+    {
+        my $ip = Net::IP->new( $self->{host} );
+        if( $ip )
+        {
+            if( $ip->version == 6 )
+            {
+                push( @params, sprintf( 'host=[%s]', $ip->ip ) );
+            }
+            else
+            {
+                push( @params, sprintf( 'host=%s', $ip->ip ) );
+            }
+        }
+        else
+        {
+            push( @params, sprintf( 'host=%s', $self->{host} ) );
+        }
+    }
+    # my @params = sprintf( "dbi:%s:database=%s;host=%s", @$self{ qw( driver database server ) } );
+    push( @params, sprintf( 'port=%d', $self->{port} ) ) if( $self->{port} );
+    push( @params, sprintf( 'mysql_read_default_file=%s', $self->{mysql_read_default_file} ) ) if( $self->{mysql_read_default_file} );
     return( join( ';', @params ) );
 }
 
@@ -515,71 +515,84 @@ END
 1;
 
 __END__
+
 =encoding utf8
 
 =head1 NAME
 
-DB::Object - SQL API
+DB::Object::Mysql - Mysql Database Object
 
 =head1 SYNOPSIS
 
     use DB::Object;
 
-    my $db = DB::Object->new();
-    my $dbh = DB::Object->connect();
-    
+    my $dbh = DB::Object->connect({
+    driver => 'mysql',
+    conf_file => 'db-settings.json',
+    database => 'webstore',
+    host => 'localhost',
+    login => 'store-admin',
+    debug => 3,
+    }) || bailout( "Unable to connect to Mysql server on host localhost: ", DB::Object->error );
+
+    # Legacy regular query
     my $sth = $dbh->prepare( "SELECT login,name FROM login WHERE login='jack'" ) ||
     die( $dbh->errstr() );
     $sth->execute() || die( $sth->errstr() );
     my $ref = $sth->fetchrow_hashref();
     $sth->finish();
     
-    ## Get the table 'login' object
-    my $login = $dbh->login();
-    $login->where( "login='jack'" );
-    ## Now, much better less hassle ;-)
-    my $ref = $login->select->fetchrow_hashref();
+    # Get a list of databases;
+    my @databases = $dbh->databases;
+    # Doesn't exist? Create it:
+    my $dbh2 = $dbh->create_db( 'webstore' );
+    # Load some sql into it
+    my $rv = $dbh2->do( $sql ) || die( $dbh->error );
     
-    ## Now let's join
-    my $login = $dbh->login();
-    $login->where( "login='jack'" );
-    ## We get all info regarding user jack and his list
-    my $ref = $login->select->join( 'list' )->fetchrow_hashref();
+    # Check a table exists
+    $dbh->table_exists( 'customers' ) || die( "Cannot find the customers table!\n" );
     
-    ## Same but we give it a higher priority. Having fun obviously...
-    my $ref = $login->select->join( 'list' )->priority( 1 )->fetchrow_hashref();
+    # Get list of tables, as array reference:
+    my $tables = $dbh->tables;
     
-    ## Copy user jack info to user bob
-    $login->where( "login='jack'" );
-    $login->copy( 'login' => 'bob' );
+    my $cust = $dbh->customers || die( "Cannot get customers object." );
+    $cust->where( email => 'john@example.org' );
+    my $str = $cust->delete->as_string;
+    # Becomes: DELETE FROM customers WHERE email='john\@example.org'
     
-    ## Insert some data. Anything we do not provide will fall back to default values
-    $login->insert( 'login' => 'bob' );
-    ## Same but with a low *non waiting* flag
-    $login->insert( 'login' => 'bob' )->wait();
-    ## Same but ignore if already exists or error occur
-    $login->insert( 'login' => 'jack' )->ignore();
-    
+    # Do some insert with transaction
+    $dbh->begin_work;
+    # Making some other inserts and updates here...
+    my $cust_sth_ins = $cust->insert(
+        first_name => 'Paul',
+        last_name => 'Goldman',
+        email => 'paul@example.org',
+        active => 0,
+    ) || do
+    {
+        # Rollback everything since the begin_work
+        $dbh->rollback;
+        die( "Error while create query to add data to table customers: " . $cust->error );
+    };
+    $result = $cust_sth_ins->as_string;
+    # INSERT INTO customers (first_name, last_name, email, active) VALUES('Paul', 'Goldman', 'paul\@example.org', '0')
+    $dbh->commit;
     ## Get the last used insert id
     my $id = $dbh->last_insert_id();
     
-    ## Delete that user
-    ## you'd better specify a where clause or you'll find yourself
-    ## suppressing everything in the table...
-    $login->where( "login='bob'" );
-    $login->delete();
-    ## But you could also write
-    my $rows = $login->delete( "login='bob'" )->rows();
+    $cust->where( email => 'john@example.org' );
+    $cust->order( 'last_name' );
+    $cust->having( email => qr/\@example/ );
+    $cust->limit( 10 );
+    my $cust_sth_sel = $cust->select || die( "An error occurred while creating a query to select data frm table customers: " . $cust->error );
+    # Becomes:
+    # SELECT id, first_name, last_name, email, created, modified, active, created::ABSTIME::INTEGER AS created_unixtime, modified::ABSTIME::INTEGER AS modified_unixtime, CONCAT(first_name, ' ', last_name) AS name FROM customers WHERE email='john\@example.org' HAVING email ~ '\@example' ORDER BY last_name LIMIT 10
     
-    ## Make a query but get the qery string instead of performing it in real
-    $login->where( "login like 'jac%'" );
-    $login->limit( 10 );
-    $login->group( 'last_name' );
-    $login->order( 'last_name' );
-    ## Reverse sorting
-    $login->reverse();
-    print( STDOUT "Here is my SQL statement:\n",
-    $login->select->join( 'list' )->priority( 1 )->as_string() );
+    $cust->reset;
+    $cust->where( email => 'john@example.org' );
+    my $cust_sth_upd = $cust->update( active => 0 )
+    # Would become:
+    # UPDATE ONLY customers SET active='0' WHERE email='john\@example.org'
     
     ## Lets' dump the result of our query
     ## First to STDERR
@@ -588,16 +601,6 @@ DB::Object - SQL API
     ## Now dump the result to a file
     $login->select->dump( "my_file.txt" );
     
-    ## Get that table 'login' structure
-    my $data = $login->structure();
-    
-    ## Some info on the status of the SQL server
-    my $status_ref = $dbh->stat();
-    ## or (it does not matter)
-    my $status_ref = $login->stat();
-    ## optimize the table, i.e. claim for free space and cleanups
-    $login->optimize();
-
 =head1 DESCRIPTION
 
 L<DB::Object> is a SQL API much alike C<DBI>.
@@ -1031,7 +1034,7 @@ Prepares an INSERT query using the field-value pairs provided.
 
 If a L<DB::Object::Statement> object is provided as first argument, it will considered as a SELECT query to be used in the INSERT query, as in: INSERT INTO my table SELECT FROM another_table
 
-Otherwise, B<insert? will build the query based on the fields provided.
+Otherwise, B<insert> will build the query based on the fields provided.
 
 In scalar context, it returns the result of B<execute> and in list context, it returns the statement object.
 

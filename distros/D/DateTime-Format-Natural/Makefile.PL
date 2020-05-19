@@ -17,7 +17,7 @@ WriteMakefile
                    'Getopt::Long' => 0,
                    'List::MoreUtils' => 0,
                    'Module::Util' => 0,
-                   'Params::Validate' => 0,
+                   'Params::Validate' => '1.15',
                    'Scalar::Util' => 0,
                    'Storable' => 0,
                    'Term::ReadLine' => 0,

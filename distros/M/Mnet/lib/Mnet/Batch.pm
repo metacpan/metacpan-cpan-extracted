@@ -24,7 +24,7 @@ Mnet::Batch - Concurrently process a list of command line options
     $cli = Mnet::Batch::fork($cli);
     exit if not $cli;
 
-    # code below runs for batch workers and non-batch executions
+    # code below runs for batch child workers and non-batch executions
     print "sample = $cli->{sample}\n";
 
 =head1 DESCRIPTION

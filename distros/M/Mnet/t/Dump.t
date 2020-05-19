@@ -31,7 +31,6 @@ Mnet::T::test_perl({
         [1,2]
         {"1" => 2}
     expect-eof
-    debug => '',
 });
 
 # finished

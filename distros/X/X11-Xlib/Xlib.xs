@@ -2005,7 +2005,7 @@ _b(event, value=NULL)
   PPCODE:
     switch (event->type) {
     case ClientMessage:
-      if (value) { { if (!SvPOK(value) || SvCUR(value) != sizeof(char)*20)  croak("Expected scalar of length %d but got %d", sizeof(char)*20, SvCUR(value)); memcpy(event->xclient.data.b, SvPVX(value), sizeof(char)*20);} } else { PUSHs(sv_2mortal(newSVpvn((void*)event->xclient.data.b, sizeof(char)*20))); } break;
+      if (value) { { if (!SvPOK(value) || SvCUR(value) != sizeof(char)*20)  croak("Expected scalar of length %ld but got %ld", (long)(sizeof(char)*20), (long) SvCUR(value)); memcpy(event->xclient.data.b, SvPVX(value), sizeof(char)*20);} } else { PUSHs(sv_2mortal(newSVpvn((void*)event->xclient.data.b, sizeof(char)*20))); } break;
     default: croak("Can't access XEvent.b for type=%d", event->type);
     }
 
@@ -2321,7 +2321,7 @@ _key_vector(event, value=NULL)
   PPCODE:
     switch (event->type) {
     case KeymapNotify:
-      if (value) { { if (!SvPOK(value) || SvCUR(value) != sizeof(char)*32)  croak("Expected scalar of length %d but got %d", sizeof(char)*32, SvCUR(value)); memcpy(event->xkeymap.key_vector, SvPVX(value), sizeof(char)*32);} } else { PUSHs(sv_2mortal(newSVpvn((void*)event->xkeymap.key_vector, sizeof(char)*32))); } break;
+      if (value) { { if (!SvPOK(value) || SvCUR(value) != sizeof(char)*32)  croak("Expected scalar of length %ld but got %ld", (long)(sizeof(char)*32), (long) SvCUR(value)); memcpy(event->xkeymap.key_vector, SvPVX(value), sizeof(char)*32);} } else { PUSHs(sv_2mortal(newSVpvn((void*)event->xkeymap.key_vector, sizeof(char)*32))); } break;
     default: croak("Can't access XEvent.key_vector for type=%d", event->type);
     }
 
@@ -2348,7 +2348,7 @@ _l(event, value=NULL)
   PPCODE:
     switch (event->type) {
     case ClientMessage:
-      if (value) { { if (!SvPOK(value) || SvCUR(value) != sizeof(long)*5)  croak("Expected scalar of length %d but got %d", sizeof(long)*5, SvCUR(value)); memcpy(event->xclient.data.l, SvPVX(value), sizeof(long)*5);} } else { PUSHs(sv_2mortal(newSVpvn((void*)event->xclient.data.l, sizeof(long)*5))); } break;
+      if (value) { { if (!SvPOK(value) || SvCUR(value) != sizeof(long)*5)  croak("Expected scalar of length %ld but got %ld", (long)(sizeof(long)*5), (long) SvCUR(value)); memcpy(event->xclient.data.l, SvPVX(value), sizeof(long)*5);} } else { PUSHs(sv_2mortal(newSVpvn((void*)event->xclient.data.l, sizeof(long)*5))); } break;
     default: croak("Can't access XEvent.l for type=%d", event->type);
     }
 
@@ -2628,7 +2628,7 @@ _s(event, value=NULL)
   PPCODE:
     switch (event->type) {
     case ClientMessage:
-      if (value) { { if (!SvPOK(value) || SvCUR(value) != sizeof(short)*10)  croak("Expected scalar of length %d but got %d", sizeof(short)*10, SvCUR(value)); memcpy(event->xclient.data.s, SvPVX(value), sizeof(short)*10);} } else { PUSHs(sv_2mortal(newSVpvn((void*)event->xclient.data.s, sizeof(short)*10))); } break;
+      if (value) { { if (!SvPOK(value) || SvCUR(value) != sizeof(short)*10)  croak("Expected scalar of length %ld but got %ld", (long)(sizeof(short)*10), (long) SvCUR(value)); memcpy(event->xclient.data.s, SvPVX(value), sizeof(short)*10);} } else { PUSHs(sv_2mortal(newSVpvn((void*)event->xclient.data.s, sizeof(short)*10))); } break;
     default: croak("Can't access XEvent.s for type=%d", event->type);
     }
 

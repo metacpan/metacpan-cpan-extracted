@@ -1,22 +1,19 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Product/PackageDimension.pm
-## Version 0.1
-## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <jack@deguest.jp>
+## Version v0.100.1
+## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/11/02
-## Modified 2019/11/02
-## All rights reserved
+## Modified 2020/05/16
 ## 
-## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::Stripe::Product::PackageDimension;
 BEGIN
 {
     use strict;
     use parent qw( Net::API::Stripe::Generic );
-    use Net::API::Stripe::Number;
-    our( $VERSION ) = '0.1';
+    use Module::Generic;
+    our( $VERSION ) = 'v0.100.1';
 };
 
 sub init
@@ -80,7 +77,7 @@ sub _set_get_convert_size
     	my $val = $self->{ $field };
     	return( $val ) if( !$self->{use_metric} );
     	my $new = $self->_convert_measure({ from => 'inch', value => "$val" });
-    	return( Net::API::Stripe::Number->new( $new ) );
+    	return( Module::Generic::Number->new( $new ) );
     }
 }
 
@@ -103,7 +100,7 @@ sub _set_get_convert_weight
     	my $val = $self->{ $field };
     	return( $val ) if( !$self->{use_metric} );
     	my $new = $self->_convert_measure({ from => 'gram', value => "$val" });
-    	return( Net::API::Stripe::Number->new( $new ) );
+    	return( Module::Generic::Number->new( $new ) );
     }
 }
 
@@ -135,7 +132,7 @@ Net::API::Stripe::Product::PackageDimension - A Stripe Product Package Dimension
 
 =head1 VERSION
 
-    0.1
+    v0.100.1
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package Clipboard::Xclip;
-$Clipboard::Xclip::VERSION = '0.24';
+$Clipboard::Xclip::VERSION = '0.26';
 use strict;
 use warnings;
 
@@ -25,7 +25,8 @@ sub copy_to_selection {
     my ($selection, $input) = @_;
     my $cmd = '|xclip -i -selection '. $selection;
     my $r = open my $exe, $cmd or die "Couldn't run `$cmd`: $!\n";
-    print $exe $input;
+    binmode $exe, ':encoding(UTF-8)';
+    print {$exe} $input;
     close $exe or die "Error closing `$cmd`: $!";
 
     return;
@@ -87,7 +88,7 @@ __END__
 
 =head1 VERSION
 
-version 0.24
+version 0.26
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
@@ -162,9 +163,9 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/clipboard>
+L<https://github.com/shlomif/Clipboard>
 
-  git clone https://github.com/shlomif/Clipboard
+  git clone git://github.com/shlomif/Clipboard.git
 
 =head1 AUTHOR
 
@@ -173,7 +174,7 @@ Shlomi Fish <shlomif@cpan.org>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/clipboard/issues>
+L<https://github.com/shlomif/Clipboard/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

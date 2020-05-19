@@ -8,5 +8,8 @@ Revision history for Perl module DB::Object
 0.8 2020-03-31 Improved _where_having in DB::Object::Query
 0.9 2020-04-01 Modified DB::Object::Query to properly handle cases where the value is NULL. Example: WHERE field => undef() or field => 'null' would become field IS NULL.
 	Corrected a bug in the test unit of SQLIte for from_days
-
-
+0.9.2 2020-04-14 Corrected documentation on DB::Object
+0.9.4 2020-05-16
+    - Modified DB::Object::where to enable chaining, which was missing
+      $tbl->where( active => 1 )->merge( $dbh->AND( $other_where_clause ) );
+    - Corrected a minor warning in DB::Object::Cache::Table

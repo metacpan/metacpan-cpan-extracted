@@ -27,6 +27,7 @@ t/001_load.t
 t/002_postgres.t
 t/003_sqlite.t
 t/004_mysql.t
+t/005_pod.t
 t/mysql.sql
 t/pgsql.sql
 t/sqlite.sql

@@ -11,7 +11,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.06'
+generated_by: 'Module::Install version 1.19'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,11 +28,17 @@ requires:
   Devel::GlobalDestruction: 0
   File::ShareDir: 0
   List::MoreUtils: 0
-  Net::AMQP: 0.06
-  Readonly: 1.03
+  Net::AMQP: '0.06'
+  Readonly: '1.03'
   namespace::clean: 0
   perl: 5.10.0
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/bobtfish/AnyEvent-RabbitMQ.git
-version: 1.19
+version: '1.20'
+x_contributors:
+  - 'Tom Doran <bobtfish@cpan.org>'
+  - 'Nicolas R <atoomic@cpan.org>'
+  - 'Dave Lambley <dlambley@cpan.org>'
+  - 'Ruslan Zakirov <ruz@bestpractical.com>'
+  - 'Masahito Ikuta <cooldaemon@gmail.com>'

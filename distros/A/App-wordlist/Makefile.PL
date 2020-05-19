@@ -21,13 +21,14 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::wordlist",
   "PREREQ_PM" => {
+    "Array::Pick::Scan" => "0.002",
     "Complete::Util" => "0.608",
     "Encode" => 0,
     "List::Util" => "1.45",
     "Module::List" => 0,
     "Perinci::Sub::Property::cmdline" => 0,
     "Scalar::Util::Numeric" => 0,
-    "WordList" => "0.5.2",
+    "WordList" => "0.6.0",
     "strict" => 0,
     "warnings" => 0
   },
@@ -37,7 +38,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.269",
+  "VERSION" => "0.270",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,6 +46,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Array::Pick::Scan" => "0.002",
   "Complete::Util" => "0.608",
   "Encode" => 0,
   "File::Spec" => 0,
@@ -55,7 +57,7 @@ my %FallbackPrereqs = (
   "Perinci::Sub::Property::cmdline" => 0,
   "Scalar::Util::Numeric" => 0,
   "Test::More" => 0,
-  "WordList" => "0.5.2",
+  "WordList" => "0.6.0",
   "strict" => 0,
   "warnings" => 0
 );

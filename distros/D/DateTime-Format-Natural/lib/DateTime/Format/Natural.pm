@@ -21,7 +21,7 @@ use Params::Validate ':all';
 use Scalar::Util qw(blessed);
 use Storable qw(dclone);
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 validation_options(
     on_fail => sub
@@ -53,6 +53,7 @@ sub _init
     my %presets = (
         lang          => 'en',
         format        => 'd/m/y',
+        demand_future =>  false,
         prefer_future =>  false,
         time_zone     => 'floating',
     );
@@ -78,6 +79,18 @@ sub _init_check
     my $self = shift;
 
     validate(@_, {
+        demand_future => {
+            # SCALARREF due to boolean.pm's implementation
+            type => BOOLEAN | SCALARREF,
+            optional => true,
+            callbacks => {
+                'mutually exclusive' => sub
+                {
+                    return true unless exists $_[1]->{prefer_future};
+                    die "prefer_future provided\n";
+                },
+            },
+        },
         lang => {
             type => SCALAR,
             optional => true,
@@ -92,6 +105,13 @@ sub _init_check
             # SCALARREF due to boolean.pm's implementation
             type => BOOLEAN | SCALARREF,
             optional => true,
+            callbacks => {
+                'mutually exclusive' => sub
+                {
+                    return true unless exists $_[1]->{demand_future};
+                    die "demand_future provided\n";
+                },
+            },
         },
         time_zone => {
             type => SCALAR | OBJECT,
@@ -161,7 +181,7 @@ sub parse_datetime
         my $dt = $self->_parse_formatted_md($date_string);
         return $dt if blessed($dt);
 
-        if ($self->{Prefer_future}) {
+        if ($self->{Prefer_future} || $self->{Demand_future}) {
             $self->_advance_future('md');
         }
     }
@@ -523,8 +543,8 @@ sub _post_process
 
     delete $opts{truncate_to};
 
-    if ($self->{Prefer_future} &&
-        (exists $opts{prefer_future} && $opts{prefer_future})
+    if (($self->{Prefer_future} || $self->{Demand_future})
+        && (exists $opts{advance_future} && $opts{advance_future})
     ) {
         $self->_advance_future;
     }
@@ -552,15 +572,19 @@ sub _advance_future
       ? dclone($self->{Datetime})
       : DateTime->now(time_zone => $self->{Time_zone});
 
+    my $day_of_week = sub { $_[0]->_Day_of_Week(map $_[0]->{datetime}->$_, qw(year month day)) };
+
     if ((all { /^(?:second|minute|hour)$/ } keys %modified)
         && (exists $self->{modified}{hour} && $self->{modified}{hour} == 1)
-        && $self->{datetime}->hour < $now->hour
+        && (($self->{Prefer_future} && $self->{datetime} <  $now)
+         || ($self->{Demand_future} && $self->{datetime} <= $now))
     ) {
         $self->{postprocess}{day} = 1;
     }
     elsif ($token_contains->('weekdays_all')
         && (exists $self->{modified}{day} && $self->{modified}{day} == 1)
-        && ($self->_Day_of_Week(map $self->{datetime}->$_, qw(year month day)) < $now->wday)
+        && (($self->{Prefer_future} && $day_of_week->($self) <  $now->wday)
+         || ($self->{Demand_future} && $day_of_week->($self) <= $now->wday))
     ) {
         $self->{postprocess}{day} = 7;
     }
@@ -571,7 +595,8 @@ sub _advance_future
               ? $self->{modified}{day} == 1
                 ? true : false
               : true)
-        && ($self->{datetime}->day_of_year < $now->day_of_year)
+        && (($self->{Prefer_future} && $self->{datetime}->day_of_year <  $now->day_of_year)
+         || ($self->{Demand_future} && $self->{datetime}->day_of_year <= $now->day_of_year))
     ) {
         $self->{postprocess}{year} = 1;
     }
@@ -703,7 +728,8 @@ not necessarily required.
            datetime      => DateTime->new(...),
            lang          => 'en',
            format        => 'mm/dd/yy',
-           prefer_future => '[0|1]',
+           prefer_future => [0|1],
+           demand_future => [0|1],
            time_zone     => 'floating',
            daytime       => { morning   => 06,
                               afternoon => 13,
@@ -729,6 +755,11 @@ Specifies the format of numeric dates, defaults to 'C<d/m/y>'.
 =item * C<prefer_future>
 
 Prefers future time and dates. Accepts a boolean, defaults to false.
+
+=item * C<demand_future>
+
+Demands future time and dates. Similar to C<prefer_future>, but stronger.
+Accepts a boolean, defaults to false.
 
 =item * C<time_zone>
 

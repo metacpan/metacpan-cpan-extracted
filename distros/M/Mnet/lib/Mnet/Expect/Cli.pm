@@ -71,8 +71,8 @@ in the L<Mnet::Expect> module new method:
     paging_re       default handles common prompts, refer to paging_re
     password        set to password for spawned command, if needed
     password_in     stderr prompt for stdin entry of password if not set
-    password_re     undef to skip password/passcode prompt detection
-    prompt_re       undef to skip cli prompt detect, refer to prompt_re
+    password_re     undef to skip password/code/phrase prompt detection
+    prompt_re       undef to disable prompt detect, refer to prompt_re
     timeout         seconds for Expect restart_timeout_upon_receive
     username        set to username for spawned command, if needed
     username_re     undef to skip login/user/username promt detection
@@ -137,7 +137,7 @@ Refer to the L<Mnet::Expect> module for more information.
         password    => undef,
         _password_  => undef,
         password_in => undef,
-        password_re => '(?i)pass(word|code):?\s*(\r|\n)?$',
+        password_re => '(?i)pass(code|phrase|word):?\s*(\r|\n)?$',
         prompt_re   => '(^|\r|\n)\S.*(\$|\%|#|:|>) ?(\r|\n|$)',
         record      => undef,
         replay      => undef,
@@ -569,7 +569,7 @@ sub _command_expect {
     # remove echod command from start of output, fix eol chars, remove last eol
     #   normalize eol chars to be unix newlines only if eol_unix opt is set
     if (defined $output) {
-        $output =~ s/^\Q$command\E\s*\r?\n?//;
+        $output =~ s/^\s*\Q$command\E\s*\r?\n?//;
         if ($self->{eol_unix}) {
             $output =~ s/\r\n/\n/g;
             $output =~ s/\r/\n/g;
@@ -732,8 +732,8 @@ By default prompts that end with $ % # : > are recognized, and the first prompt
 detected after login is used as prompt_re for the rest of the expect session.
 
 Note that prompt_re should start with a regex caret symbol and end with a regex
-dollar sign, to ensure it is accurately detected. Also the /Q and /E escape
-sequences do not appear to work in an expect regex.
+dollar sign, to ensure it works correctly. Also the /Q and /E escape sequences
+do not appear to work in an expect regex.
 
 =cut
 

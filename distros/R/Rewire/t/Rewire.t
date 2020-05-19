@@ -13,6 +13,12 @@ Rewire
 
 =cut
 
+=tagline
+
+Dependency Injection
+
+=cut
+
 =abstract
 
 Dependency Injection Container for Perl 5
@@ -362,7 +368,9 @@ config() : HashRef
 =method process
 
 The process method processes and returns an object or value based on the
-service named but where the arguments are provided ad-hoc.
+service named but where the arguments are provided ad-hoc. B<Note:> This method
+is meant to be used to construct services ad-hoc and as such bypasses caching
+and lifecycle effects.
 
 =signature process
 
@@ -404,7 +412,9 @@ process(Str $name, Any $argument, Maybe[Str] $argument_as) : Any
 =method resolve
 
 The resolve method resolves and returns an object or value based on the service
-named.
+named. B<Note:> This method is recommended to be used to construct services as
+defined by the configuration and as such doesn't not allow passing additional
+arguments.
 
 =signature resolve
 
@@ -415,6 +425,26 @@ resolve(Str $name) : Any
   # given: synopsis
 
   $rewire->resolve('tempfile');
+
+=example-2 resolve
+
+  use Rewire;
+
+  my $services = {
+    mojo_log => {
+      package => 'Mojo/Log',
+      argument => {
+        level => 'fatal',
+        path => '/var/log/rewire.log'
+      },
+    }
+  };
+
+  my $rewire = Rewire->new(
+    services => $services,
+  );
+
+  $rewire->resolve('mojo_log');
 
 =cut
 
@@ -592,6 +622,15 @@ $subs->example(-1, 'resolve', 'method', fun($tryable) {
   ok my $result = $tryable->result;
   ok $result->isa('Mojo::File');
   ok $$result->isa('File::Temp');
+
+  $result
+});
+
+$subs->example(-2, 'resolve', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->isa('Mojo::Log');
+  is $result->path, '/var/log/rewire.log';
+  is $result->level, 'fatal';
 
   $result
 });

@@ -12,6 +12,7 @@ use Getopt::Long qw/:config pass_through/;
 use Test::Smoke::App::AppOption;
 use Test::Smoke::App::AppOptionCollection;
 use Test::Smoke::LogMixin;
+use Test::Smoke::Util::Serialise qw/serialise/;
 
 =head1 NAME
 
@@ -352,6 +353,7 @@ sub _get_options {
 
     %{$self->{_cli_options}} = %{$self->opt_collection->options_for_cli};
     @{$self->{_ARGV}} = @ARGV;
+    Getopt::Long::Configure('no_ignore_case');
     GetOptions(
         $self->cli_options,
         @{ $self->opt_collection->options_list },
@@ -402,10 +404,17 @@ sub _post_process_options {
         for my $opt (sort keys %options) {
             printf "  %-20s| %s\n",
                 $opt,
-                $self->option($opt) || '?';
+                $self->_show_option_value($opt) || '?';
         }
         exit(0);
     }
+}
+
+sub _show_option_value {
+    my $self =  shift;
+    my ($option_name) = @_;
+
+    return serialise( $self->option($option_name) );
 }
 
 sub _obtain_config_file {

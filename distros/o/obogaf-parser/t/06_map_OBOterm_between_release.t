@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Test::Files;
 use Test::Exception;
-use obogaf::parser;
+use obogaf::parser qw(map_OBOterm_between_release);
 
 # input files and variables
 my $obofile = "t/data/test_gobasic.obo";
@@ -20,17 +20,17 @@ my $classindex= 4;
 my ($res, $stat, $fh);
 
 ## test read or die
-lives_ok( sub { my $file = obogaf::parser::map_OBOterm_between_release($obofile, $gafold, $classindex) }, 'obo file opened' );
-lives_ok( sub { my $file = obogaf::parser::map_OBOterm_between_release($obofile, $zipgaf, $classindex) }, 'gaf file opened' );
+lives_ok( sub { my $file = map_OBOterm_between_release($obofile, $gafold, $classindex) }, 'obo and gaf file opened' );
+lives_ok( sub { my $file = map_OBOterm_between_release($obofile, $zipgaf, $classindex) }, 'obo and zipped gaf file opened' );
 
-dies_ok ( sub { my $file = obogaf::parser::map_OBOterm_between_release($fakeobo, $zipgaf, $classindex) }, 'die: wrong file name');
-dies_ok ( sub { my $file = obogaf::parser::map_OBOterm_between_release($fakeext, $zipgaf, $classindex) }, 'die: wrong file name');
+dies_ok ( sub { my $file = map_OBOterm_between_release($fakeobo, $zipgaf, $classindex) }, 'die: wrong file name');
+dies_ok ( sub { my $file = map_OBOterm_between_release($fakeext, $zipgaf, $classindex) }, 'die: wrong file name');
 
-dies_ok ( sub { my $file = obogaf::parser::map_OBOterm_between_release($obofile, $fakezip, $classindex) }, 'die: wrong file name');
-dies_ok ( sub { my $file = obogaf::parser::map_OBOterm_between_release($obofile, $fakegaf, $classindex) }, 'die: wrong file name');
+dies_ok ( sub { my $file = map_OBOterm_between_release($obofile, $fakezip, $classindex) }, 'die: wrong file name');
+dies_ok ( sub { my $file = map_OBOterm_between_release($obofile, $fakegaf, $classindex) }, 'die: wrong file name');
 
 ## test mapping without header
-($res, $stat)= obogaf::parser::map_OBOterm_between_release($obofile, $gafold, $classindex);
+($res, $stat)= map_OBOterm_between_release($obofile, $gafold, $classindex);
 my $mapfile= "t/data/test_chicken_goa_mapped.txt"; 
 open $fh, ">", $mapfile; 
 print $fh "${$res}";
@@ -53,7 +53,7 @@ close FH;
 close $fh;
 
 ## test gaf file with header
-($res, $stat)= obogaf::parser::map_OBOterm_between_release($obofile, $gafheader, $classindex);
+($res, $stat)= map_OBOterm_between_release($obofile, $gafheader, $classindex);
 my $mapfile_header= "t/data/test_chicken_goa_mapped_header.txt"; 
 open $fh, ">", $mapfile_header; 
 print $fh "${$res}";
@@ -75,7 +75,7 @@ while(<FH>){
 close FH;
 close $fh;
 
-($res, $stat)= obogaf::parser::map_OBOterm_between_release($obofile, $gafunpair, $classindex);
+($res, $stat)= map_OBOterm_between_release($obofile, $gafunpair, $classindex);
 my $mapfile_unpair= "t/data/test_chicken_goa_mapped_unpair.txt"; 
 open $fh, ">", $mapfile_header; 
 print $fh "${$res}";

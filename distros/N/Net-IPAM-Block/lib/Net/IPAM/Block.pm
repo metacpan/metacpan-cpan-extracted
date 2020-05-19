@@ -1,6 +1,6 @@
 package Net::IPAM::Block;
 
-our $VERSION = '1.13';
+our $VERSION = '1.15';
 
 use 5.10.0;
 use strict;
@@ -29,14 +29,16 @@ our $MaxCIDRSplit = 1 << 20;
   use Net::IPAM::Block;
 
   # parse and normalize
-  my $cidr  = Net::IPAM::Block->new('10.0.0.0/24')       // die 'wrong format,';
-  my $range = Net::IPAM::Block->new('fe80::2-fe80::e')   // die 'wrong format,';
-  my $host  = Net::IPAM::Block->new('2001:db8::1')       // die 'wrong format,';
+  $cidr  = Net::IPAM::Block->new('10.0.0.0/255.0.0.0') // die 'wrong format,';
+  $cidr  = Net::IPAM::Block->new('10.0.0.0/8')         // die 'wrong format,';
+  $range = Net::IPAM::Block->new('fe80::2-fe80::e')    // die 'wrong format,';
+  $host  = Net::IPAM::Block->new('2001:db8::1')        // die 'wrong format,';
 
 =head1 DESCRIPTION
 
 A block is an IP-network or IP-range, e.g.
 
+ 192.168.0.1/255.255.255.0   # network, with IP mask
  192.168.0.1/24              # network, with CIDR mask
  ::1/128                     # network, with CIDR mask
  10.0.0.3-10.0.17.134        # range
@@ -62,6 +64,7 @@ Example for valid input strings:
 
  2001:db8:dead::/38
  10.0.0.0/8
+ 10.0.0.0/255.0.0.0
 
  2001:db8::1-2001:db8::ff00:35
  192.168.2.3-192.168.7.255
@@ -95,9 +98,9 @@ sub new {
 
   return Net::IPAM::Block::Private::_fromIP( $self, $input ) if ref $input;
 
-  # handle CIDR: 2001:db8::/32
+  # handle mask: 2001:db8::/32, 10.0.0.0/8, 10.0.0.0/255.0.0.0
   my $idx = index( $input, '/' );
-  return Net::IPAM::Block::Private::_fromCIDR( $self, $input, $idx )
+  return Net::IPAM::Block::Private::_fromMask( $self, $input, $idx )
     if $idx >= 0;
 
   # handle range: 192.168.1.17-192.168.1.35

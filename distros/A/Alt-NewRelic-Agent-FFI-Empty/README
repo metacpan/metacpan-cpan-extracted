@@ -5,13 +5,17 @@ NAME
 
 VERSION
 
-    version 0.02
+    version 0.03
 
 SYNOPSIS
 
      env PERL_ALT_INSTALL=OVERWRITE cpanm Alt::NewRelic::Agent::FFI::Empty
 
 DESCRIPTION
+
+    NOTE: This module is deprecated. It is based on the NewRelic Agent SDK,
+    which was only ever released as beta software. Please use NewFangle
+    instead.
 
     This distribution provides an interface for NewRelic::Agent::FFI and
     NewRelic::Agent::FFI::Procedural that doesn't do anything. It might be

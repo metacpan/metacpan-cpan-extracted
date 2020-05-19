@@ -1,32 +1,46 @@
 package Blessed::Merge;
 
 use 5.006;
+
+our $VERSION = '0.11';
 use strict;
 use warnings;
-
-our $VERSION = '0.10';
-
 use Scalar::Util qw/reftype/;
 use Carp qw/croak/;
 use Combine::Keys qw/combine_keys/;
+use Tie::IxHash;
 
 sub new {
 	my ($pkg, $args) = (shift, reftype $_[0] || "" eq 'HASH' ? $_[0] : {@_});
 	my $self = bless $args, $pkg;
 	$self->{$_} = $self->{$_} // 1 foreach (qw/same blessed/);
 	$self->{$_} = $self->{$_} // 0 foreach(qw/unique_array unique_hash/);
+	$self->{itterator} = 1;
 	return $self;
 }
 
 sub merge {
 	my ($self, $base_bless, $new) = (shift, ref $_[0], shift);
+	tie my %isa, 'Tie::IxHash';
+	$isa{$base_bless} = $new;
 	map {
 		if ( $self->{same} ) {
 			croak 'Attempting to merge two different *packages*' unless $base_bless eq ref $_;
+		} else {
+			my $r = ref $_;
+			$isa{$r} = $_ unless $r =~ m/HASH|ARRAY|SCALAR/;
 		}
-		$new = $self->_merge({%$new}, $_);
+		$new = $self->_merge($new, $_);
 	} @_;
-	return $self->{blessed} ? bless $new, $base_bless : $new;
+	for my $f (keys %isa) {
+		my $check = $isa{$f} or next;
+		$_ eq $f and next or $check->isa($_) and delete $isa{$_} for keys %isa;	
+	}
+	return $self->{blessed} ? scalar keys %isa == 1 ? bless $new, $base_bless : do { 
+		my $class = sprintf "Blessed::Merge::__ANON__::%s", $self->{itterator}++;
+		eval sprintf('package %s; our @ISA = qw/%s/; 1;', $class, join ' ', keys %isa);
+		return bless $new, $class;
+	} : $new;
 }
 
 sub _merge {
@@ -90,7 +104,7 @@ Blessed::Merge - Merge Blessed Refs.
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

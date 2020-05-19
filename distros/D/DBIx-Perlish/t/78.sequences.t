@@ -1,6 +1,7 @@
 # $Id$
 use warnings;
 use strict;
+use lib '.';
 use Test::More;
 use DBIx::Perlish qw/:all/;
 use t::test_utils;

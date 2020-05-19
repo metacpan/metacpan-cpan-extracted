@@ -1,7 +1,11 @@
-test/secring.gpg
-----------------
+test/gnupghome/secring.gpg
+--------------------------
 sec   1024D/F950DA9C 2000-02-06
 uid                  GnuPG test key (for testing purposes only)
 uid                  Foo Bar (1)
 ssb    768g/2E854A6B 2000-02-06
+
+sec   2048R/B6747DDC 2016-10-12
+uid                  GnuPG::Interface Test key <test@example.org>
+ssb   2048R/AE441D0F 2016-10-12
 

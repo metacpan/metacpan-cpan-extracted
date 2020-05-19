@@ -5,7 +5,7 @@ use warnings;
 use Wasm::Wasmtime::FFI;
 
 # ABSTRACT: Global configuration for Wasm::Wasmtime::Engine
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 $ffi_prefix = 'wasm_config_';
@@ -17,9 +17,16 @@ $ffi->attach( new => [] => 'wasm_config_t' );
 _generate_destroy();
 
 
-foreach my $prop (qw( debug_info wasm_threads wasm_reference_types
-                      wasm_simd wasm_bulk_memory wasm_multi_value
-                      cranelift_debug_verifier ))
+foreach my $prop (qw(
+  cranelift_debug_verifier
+  debug_info
+  interruptable
+  wasm_bulk_memory
+  wasm_reference_types
+  wasm_multi_value
+  wasm_simd
+  wasm_threads
+))
 {
   $ffi->attach( [ "wasmtime_config_${prop}_set" => $prop ] => [ 'wasm_config_t', 'bool' ] => sub {
     my($xsub, $self, $value) = @_;
@@ -28,23 +35,38 @@ foreach my $prop (qw( debug_info wasm_threads wasm_reference_types
   });
 }
 
-
-foreach my $prop (qw( static_memory_maximum_size static_memory_guard_size dynamic_memory_guard_size ))
+foreach my $prop (qw(
+  max_wasm_stack
+))
 {
-  my $f = eval { $ffi->function( "wasmtime_config_${prop}_set" => [ 'wasm_config_t', 'uint64' ] => 'void' => sub {
+  $ffi->attach( [ "wasmtime_config_${prop}_set" => $prop ] => [ 'wasm_config_t', 'size_t' ] => sub {
     my($xsub, $self, $value) = @_;
     $xsub->($self, $value);
     $self;
-  }) };
-  if($f)
+  });
+}
+
+
+outer:
+foreach my $prop (qw( static_memory_maximum_size static_memory_guard_size dynamic_memory_guard_size ))
+{
+  foreach my $suffix ('_set', '')
   {
-    $f->attach($prop);
+    # not sure why, but this didn't make it into 0.16.0 :/
+    # https://github.com/bytecodealliance/wasmtime/pull/1662
+    my $f = eval { $ffi->function( "wasmtime_config_${prop}${suffix}" => [ 'wasm_config_t', 'uint64' ] => 'void' => sub {
+      my($xsub, $self, $value) = @_;
+      $xsub->($self, $value);
+      $self;
+    }) };
+    if($f)
+    {
+      $f->attach($prop);
+      next outer;
+    }
   }
-  else
-  {
-    no strict 'refs';
-    *$prop = sub { Carp::croak("property $prop is not available") };
-  }
+
+  Carp::croak("unable to find either wasmtime_config_${prop} or wasmtime_config_${prop}_set");
 }
 
 
@@ -54,42 +76,21 @@ my %strategy = (
   lightbeam => 2,
 );
 
-if(Wasm::Wasmtime::Error->can('new'))
-{
-  $ffi->attach( [ 'wasmtime_config_strategy_set' => 'strategy' ] => [ 'wasm_config_t', 'uint8' ] => 'wasmtime_error_t' => sub {
-    my($xsub, $self, $value) = @_;
-    if(defined $strategy{$value})
+$ffi->attach( [ 'wasmtime_config_strategy_set' => 'strategy' ] => [ 'wasm_config_t', 'uint8' ] => 'wasmtime_error_t' => sub {
+  my($xsub, $self, $value) = @_;
+  if(defined $strategy{$value})
+  {
+    if(my $error = $xsub->($self, $strategy{$value}))
     {
-      if(my $error = $xsub->($self, $strategy{$value}))
-      {
-        Carp::croak($error->message);
-      }
+      Carp::croak($error->message);
     }
-    else
-    {
-      Carp::croak("unknown strategy: $value");
-    }
-    $self;
-  });
-}
-else
-{
-  $ffi->attach( [ 'wasmtime_config_strategy_set' => 'strategy' ] => [ 'wasm_config_t', 'uint8' ] => 'bool' => sub {
-    my($xsub, $self, $value) = @_;
-    if(defined $strategy{$value})
-    {
-      unless(my $ret = $xsub->($self, $strategy{$value}))
-      {
-        Carp::croak("error setting strategy $value");
-      }
-    }
-    else
-    {
-      Carp::croak("unknown strategy: $value");
-    }
-    $self;
-  });
-}
+  }
+  else
+  {
+    Carp::croak("unknown strategy: $value");
+  }
+  $self;
+});
 
 
 my %cranelift_opt_level = (
@@ -115,68 +116,38 @@ $ffi->attach( ['wasmtime_config_cranelift_opt_level_set' => 'cranelift_opt_level
 my %profiler = (
   none    => 0,
   jitdump => 1,
+  vtune   => 2,
 );
 
-if(Wasm::Wasmtime::Error->can('new'))
-{
-  $ffi->attach( ['wasmtime_config_profiler_set' => 'profiler' ] => ['wasm_config_t', 'uint8'] => 'wasmtime_error_t' => sub {
-    my($xsub, $self, $value) = @_;
-    if(defined $profiler{$value})
-    {
-      if(my $error = $xsub->($self, $profiler{$value}))
-      {
-        Carp::croak($error->message);
-      }
-    }
-    else
-    {
-      Carp::croak("unknown profiler: $value");
-    }
-    $self;
-  });
-
-
-  $ffi->attach( [ 'wasmtime_config_cache_config_load' => 'cache_config_load' ] => [ 'wasm_config_t', 'string' ] => sub {
-    my($xsub, $self, $value) = @_;
-    Carp::croak("undef passed in as cache config") unless defined $value;
-    $xsub->($self, $value);
-    $self;
-  });
-
-  $ffi->attach( [ 'wasmtime_config_cache_config_load' => 'cache_config_default' ] => [ 'wasm_config_t', 'string' ] => sub {
-    my($xsub, $self) = @_;
-    $xsub->($self, undef);
-    $self;
-  });
-
-}
-else
-{
-  $ffi->attach( ['wasmtime_config_profiler_set' => 'profiler' ] => ['wasm_config_t', 'uint8'] => 'bool' => sub {
-    my($xsub, $self, $value) = @_;
-    if(defined $profiler{$value})
-    {
-      unless(my $ret = $xsub->($self, $profiler{$value}))
-      {
-        Carp::croak("error setting profiler $value");
-      }
-    }
-    else
-    {
-      Carp::croak("unknown profiler: $value");
-    }
-    $self;
-  });
-
-  *cache_config_load    = sub { Carp::croak("property cache_config_load is not available")    };
-
-  *cache_config_default = sub
+$ffi->attach( ['wasmtime_config_profiler_set' => 'profiler' ] => ['wasm_config_t', 'uint8'] => 'wasmtime_error_t' => sub {
+  my($xsub, $self, $value) = @_;
+  if(defined $profiler{$value})
   {
-    # silenty ignore
-    my($self) = @_;
-    $self;
-  };
-}
+    if(my $error = $xsub->($self, $profiler{$value}))
+    {
+      Carp::croak($error->message);
+    }
+  }
+  else
+  {
+    Carp::croak("unknown profiler: $value");
+  }
+  $self;
+});
+
+
+$ffi->attach( [ 'wasmtime_config_cache_config_load' => 'cache_config_load' ] => [ 'wasm_config_t', 'string' ] => sub {
+  my($xsub, $self, $value) = @_;
+  Carp::croak("undef passed in as cache config") unless defined $value;
+  $xsub->($self, $value);
+  $self;
+});
+
+$ffi->attach( [ 'wasmtime_config_cache_config_load' => 'cache_config_default' ] => [ 'wasm_config_t', 'string' ] => sub {
+  my($xsub, $self) = @_;
+  $xsub->($self, undef);
+  $self;
+});
 
 1;
 
@@ -192,7 +163,7 @@ Wasm::Wasmtime::Config - Global configuration for Wasm::Wasmtime::Engine
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -226,6 +197,18 @@ Create a new instance of the config class.
 
 Configures whether DWARF debug information is emitted for the generated
 code. This can improve profiling and the debugging experience.
+
+=head2 interruptable
+
+ $config->interruptable($bool);
+
+Configures whether functions and loops will be interruptable.
+
+=head2 max_wasm_stack
+
+ $config->max_wasm_stack($size);
+
+Configures the maximum amount of native stack space available to executing WebAssembly code
 
 =head2 wasm_threads
 
@@ -338,6 +321,8 @@ Acceptable values for C<$profiler> are:
 =item C<none>
 
 =item C<jitdump>
+
+=item C<vtune>
 
 =back
 

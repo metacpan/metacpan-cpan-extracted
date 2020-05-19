@@ -13,6 +13,12 @@ Data::Object::Args
 
 =cut
 
+=tagline
+
+Args Class
+
+=cut
+
 =abstract
 
 Args Class for Perl 5
@@ -26,6 +32,7 @@ method: get
 method: name
 method: set
 method: stashed
+method: unnamed
 
 =cut
 
@@ -196,6 +203,43 @@ stashed() : HashRef
 
   $args->stashed
 
+=method unnamed
+
+The unnamed method returns an arrayref of values which have not been named
+using the C<named> attribute.
+
+=signature unnamed
+
+unnamed() : ArrayRef
+
+=example-1 unnamed
+
+  package main;
+
+  use Data::Object::Args;
+
+  local @ARGV = qw(--help execute --format markdown);
+
+  my $args = Data::Object::Args->new(
+    named => { flag => 0, command => 1 }
+  );
+
+  $args->unnamed # ['--format', 'markdown']
+
+=example-2 unnamed
+
+  package main;
+
+  use Data::Object::Args;
+
+  local @ARGV = qw(execute phase-1 --format markdown);
+
+  my $args = Data::Object::Args->new(
+    named => { command => 1 }
+  );
+
+  $args->unnamed # ['execute', '--format', 'markdown']
+
 =cut
 
 package main;
@@ -281,6 +325,20 @@ $subs->example(-3, 'set', 'method', fun($tryable) {
 
 $subs->example(-1, 'stashed', 'method', fun($tryable) {
   ok my $result = $tryable->result;
+
+  $result
+});
+
+$subs->example(-1, 'unnamed', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is_deeply $result, ['--format', 'markdown'];
+
+  $result
+});
+
+$subs->example(-2, 'unnamed', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is_deeply $result, ['execute', '--format', 'markdown'];
 
   $result
 });

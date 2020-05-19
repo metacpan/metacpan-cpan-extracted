@@ -1,5 +1,8 @@
 Revision history for Alt-NewRelic-Agent-FFI-Empty
 
+0.03      2020-05-14 18:41:19 -0400
+  - Mark distribution as deprecated.
+
 0.02      2019-03-12 22:21:35 -0400
   - First CPAN release
 

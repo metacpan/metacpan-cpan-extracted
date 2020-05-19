@@ -2,6 +2,14 @@ Revision history for Perl extension Parallel::Forker
 
 The contributors that suggested a given feature are shown in [].
 
+* Parallel::Forker 1.258 2020-05-16
+
+****    Fix 10_forker.t skip count, rt132640. [Slaven Rezic]
+
+* Parallel::Forker 1.256 2020-05-15
+
+****    Add run_pre_start option.
+
 * Parallel::Forker 1.254 2020-03-07
 
 ****    Speed up non-author tests.

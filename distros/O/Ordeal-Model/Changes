@@ -1,3 +1,6 @@
+0.003  2020-05-16 21:26:21 CEST
+   - refactor ::ChaCha20::int_rand
+
 0.002  2018-09-13 08:38:41 CEST
    - first release
 

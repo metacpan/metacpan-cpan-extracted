@@ -1,6 +1,19 @@
 Changelog for Dist-Zilla-PluginBundle-Author-GSG
 
-v0.1.2 2020-05-05T17:41:40
+v0.1.3 2020-05-12T15:10:02
+ - Update README (Andrew Hewus Fresh)
+ - Sanitize version numbers from the environment (Andrew Hewus Fresh)
+ - Require a new enough NextVersion Plugin (Andrew Hewus Fresh)
+ - Revert "Fix double-v formatting in git tags because of Git::Tag's
+   defaults" (Andrew Hewus Fresh)
+ - Sync up the INI SYNOPSIS with the ChangelogFromGit::CPAN::Changes swap
+   (Brendan Byrd)
+ - Fix double-v formatting in git tags because of Git::Tag's defaults
+   (Brendan Byrd)
+ - Support 0.90 versioning formats within the changelog (Brendan Byrd)
+ - Support the most common git remote format (Andrew Hewus Fresh)
+
+v0.1.2 2020-05-05T17:41:20
  - Update README (Andrew Hewus Fresh)
  - Don't recommend github.password (Andrew Hewus Fresh)
  - Need new Dist::Zilla::PluginBundle::Test::Compile (Andrew Hewus Fresh)
@@ -236,8 +249,8 @@ v0.0.1 2019-03-27T01:48:40
  - Support main_module from dist.ini in Makefile (Andrew Fresh)
  - Use perl instead of sed to parse dist.ini (Andrew Fresh)
  - Simple explanation in CONTRIBUTING about how (Andrew Fresh)
- - More documentation improvmenets (Andrew Fresh)
  - Update README.md (Andrew Fresh)
+ - More documentation improvmenets (Andrew Fresh)
  - Rearrange Plugins to make documentation clearer (Andrew Fresh)
  - Initial stab at the beginnings of CONTRIBUTING doc (Andrew Fresh)
  - Add a clean and realclean targets (Andrew Fresh)

@@ -61,7 +61,7 @@
          "web" : "https://github.com/ology/Data-Dataset-Classic-Titanic"
       }
    },
-   "version" : "0.0101",
+   "version" : "0.0102",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

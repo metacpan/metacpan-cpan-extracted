@@ -5,15 +5,24 @@ Created:      2019-10-28
 Home page:    <http://search.cpan.org/dist/JSONLD/>
 Bug tracker:  <https://github.com/kasei/perl-jsonld/issues>
 
-0.003  2019-03-08
+0.003  2020-05-17
 
- - (Update) Version number bump to fix PAUSE issues.
+ - (Update) Allow specifying a context file on the command line for
+   jsonld-expand.
+ - (Update) Improve handling of invalid JSONLD input.
+ - (Update) Track changes in the JSONLD spec.
+ - (Update) Use new IRI->rel method.
 
-0.002  2019-03-02
+0.003  2020-03-08
 
  - (Update) Remove use of Debug::ShowStuff for releases.
+ - (Update) Version number bump to fix PAUSE issues.
 
-0.001  2019-01-25
+0.002  2020-01-26
+
+ - (Update) Updated documentation.
+
+0.001  2020-01-25
 
  - (Addition) First release.
 

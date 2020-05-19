@@ -1,10 +1,10 @@
 NAME
 
-    Alien::nragent - Download and install the NewRelic agent
+    Alien::nragent - (Deprecated) Download and install the NewRelic agent
 
 VERSION
 
-    version 0.06
+    version 0.08
 
 SYNOPSIS
 
@@ -16,6 +16,10 @@ SYNOPSIS
      ...
 
 DESCRIPTION
+
+    NOTE: This Alien is deprecated. It is based on the NewRelic Agent SDK,
+    which was only ever released as beta software. Please use
+    Alien::libnewrelic and NewFangle instead.
 
     This Alien dist installs and makes available the NewRelic agent
     library.

@@ -3,6 +3,7 @@
 %{
 
 use warnings;
+use 5.0100;
 
 use Graph::Undirected;
 
@@ -102,8 +103,18 @@ sub _Error
 {
     my( $self ) = @_;
     close $self->{USER}{FILEIN} if $self->{USER}{FILEIN};
-    my $msg = "$0: syntax error at line $self->{USER}{LINENO}, " .
-              "position $self->{USER}{CHARNO}";
+
+    if( ${$self->{TOKEN}} eq '' &&
+        grep { defined $_ && !ref $_ && $_ eq '(' }
+        map { $_->[1] } @{$self->{STACK}} ) {
+        die "$0: syntax error: missing closing parenthesis.\n";
+    }
+
+    if( ${$self->{TOKEN}} eq ')' ) {
+        die "$0: syntax error: unbalanced parentheses.\n";
+    }
+
+    my $msg = "$0: syntax error at position $self->{USER}{CHARNO}";
     if( $self->YYData->{INPUT} ) {
         $self->YYData->{INPUT} =~ s/\n$//;
         die "$msg: '" . $self->YYData->{INPUT} . "'.\n";
@@ -121,13 +132,11 @@ sub _Lexer
     if( !$self->YYData->{INPUT} && $self->{USER}{FILEIN} ) {
         my $filein = $self->{USER}{FILEIN};
         $self->YYData->{INPUT} = <$filein>;
-        $self->{USER}{LINENO} = -1 unless exists $self->{USER}{LINENO};
-        $self->{USER}{LINENO}++;
         $self->{USER}{CHARNO} = 0;
     }
 
     $self->YYData->{INPUT} =~ s/^(\s+)//;
-    $self->{USER}{CHARNO} += length( $1 ) if defined $1;
+    $self->{USER}{CHARNO} += length $1 if defined $1;
 
     # Bracket atoms
     if( $self->YYData->{INPUT} =~ s/^\[ (?<isotope>[0-9]+)?
@@ -142,6 +151,12 @@ sub _Lexer
                                         (?<charge>--|\+\+|[-+][0-9]{0,2})?
                                         (:(?<class>[0-9]+))? \]//x ) {
         my $atom = { %+ };
+        $self->{USER}{CHARNO} += length $&;
+
+        if( $atom->{hcount} ) {
+            $atom->{hcount} =~ s/^H//;
+            $atom->{hcount} = $atom->{hcount} ? int $atom->{hcount} : 1;
+        }
 
         # Atom class is an arbitrary number, 0 by default
         $atom->{class} = exists $atom->{class} ? int $atom->{class} : 0;
@@ -152,12 +167,14 @@ sub _Lexer
     # Bracketless atoms
     if( $self->YYData->{INPUT} =~ s/^(Br|Cl|[BCINOPSFbcnops])// ) {
         my $atom = { symbol => $1 };
+        $self->{USER}{CHARNO} += length $&;
         return ( 'atom', $atom );
     }
 
     # Ring bonds
     if( $self->YYData->{INPUT} =~ s/^%([0-9]{2})// ||
         $self->YYData->{INPUT} =~ s/^([0-9])// ) {
+        $self->{USER}{CHARNO} += length $&;
         return ( 'ringbond', int $1 );
     }
 
@@ -177,12 +194,31 @@ sub parse
     $self->YYData->{INPUT}   = $string;
     $self->{USER}{GRAPHS}    = [];
     $self->{USER}{RINGBONDS} = {};
-    $self->{USER}{LINENO} = 0;
     $self->{USER}{CHARNO} = 0;
     $self->YYParse( yylex => \&_Lexer,
                     yyerror => \&_Error,
                     yydebug => $options->{debug} );
-    return grep { defined } @{$self->{USER}{GRAPHS}};
+
+    if( scalar keys %{$self->{USER}{RINGBONDS}} ) {
+        die "$0: unclosed ring bond(s) detected: " .
+            join( ', ', sort { $a <=> $b } keys %{$self->{USER}{RINGBONDS}} ) .
+            ".\n";
+    }
+
+    my @graphs = grep { defined } @{$self->{USER}{GRAPHS}};
+    if( !$options->{raw} ) {
+        for my $graph (@graphs) {
+            for my $atom ($graph->vertices) {
+                next unless exists $atom->{hcount};
+                for (1..$atom->{hcount}) {
+                    $graph->add_edge( $atom, { symbol => 'H' } );
+                }
+                delete $atom->{hcount};
+            }
+        }
+    }
+
+    return @graphs;
 }
 
 sub _add_ring_bond
@@ -240,7 +276,7 @@ sub _sprint_atom
     return '[' . (exists $atom->{isotope}   ? $atom->{isotope}   : '') .
                  $atom->{symbol} .
                  (exists $atom->{chirality} ? $atom->{chirality} : '') .
-                 (exists $atom->{hcount}    ? $atom->{hcount}    : '') .
+                 (exists $atom->{hcount}    ? 'H' . $atom->{hcount} : '') .
                  (exists $atom->{charge}    ? $atom->{charge}    : '') .
                  (exists $atom->{class} && $atom->{class}
                     ? ':' . $atom->{class} : '') .

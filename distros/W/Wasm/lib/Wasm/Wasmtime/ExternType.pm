@@ -10,7 +10,7 @@ require Wasm::Wasmtime::TableType;
 require Wasm::Wasmtime::MemoryType;
 
 # ABSTRACT: Wasmtime extern type class
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 sub kind { die "internal error" };
@@ -63,7 +63,7 @@ Wasm::Wasmtime::ExternType - Wasmtime extern type class
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,22 @@
+0.1.3 2020-05-19
+
+    - Detecting and reporting unbalanced parentheses.
+    - Detecting and reporting unclosed ring bonds.
+    - Fixing position pointers in error messages, removing line numbers.
+    - Adding versioned dependency on Module::Build::Parse::Yapp v0.1.2.
+    - Declaring minimum Perl version.
+    - Fixing the POD.
+
+0.1.2 2020-05-17
+
+    - Turning hydrogen counts into real vertices. If 'raw' option is
+      present, hydrogen counts are left as integers instead.
+
+0.1.1 2020-05-14
+
+    - Adding missing dependency on Graph::Undirected.
+    - Adding POD.
+
 0.1.0 2020-05-13
 
     - Initial release.

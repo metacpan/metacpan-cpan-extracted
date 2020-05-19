@@ -20,11 +20,14 @@ Mnet::Opts::Cli - Define and parse command line options
         ",
     });
 
+    # optional environment variable can also be parsed for options
+    my $env = "Mnet";
+
     # call in list context for cli opts object and any extra args
-    my ($cli, @extras) = Mnet::Opts::Cli->new();
+    my ($cli, @extras) = Mnet::Opts::Cli->new($env);
 
     # call in scalar context to disallow extra args
-    $cli = Mnet::Opts::Cli->new();
+    $cli = Mnet::Opts::Cli->new($env);
 
     # access parsed cli options using method calls
     my $value = $cli->sample;
@@ -34,14 +37,15 @@ Mnet::Opts::Cli - Define and parse command line options
 Mnet::Opts::Cli can be used by scripts to define and parse command line
 options, as shown in the example above.
 
-The Mnet environment variable can be used to set options. This can be to
-secure passwords so they don't appear in system process table, as below:
+An optional environment variable can be used to set options, as shown in the
+example above.  This can be to secure passwords so they don't appear in system
+process table, as below:
 
     export Mnet="--password secret"
     script.pl
 
-Note that the Mnet environment variable is not parsed if the --test option is
-set on the command line. Refer to L<Mnet::Test> for more information.
+Note that the specified environment variable is not parsed if the --test option
+is set on the command line. Refer to L<Mnet::Test> for more information.
 
 =head1 METHODS
 
@@ -138,8 +142,8 @@ The following keys in the specs input hash reference argument are supported:
     help_hide   set to hide option in --help list of available options
     help_tip    short tip text for --help list of available options
     help_text   longer help text to show in --help for specific options
-    record      set so option gets saved in Mnet::Test record/replay files
-    redact      set to prevent option value in showing in Mnet::Log output
+    record      set so option is saved in Mnet::Test record/replay files
+    redact      set to prevent option value showing in Mnet::Log output
 
 Refer to L<Getopt::Long> for more information.
 
@@ -217,12 +221,15 @@ sub new {
 
 =head2 new
 
-    $opts = Mnet::Opts::Cli->new()
-    or ($cli, @extras) = Mnet::Opts::Cli->new()
+    $opts = Mnet::Opts::Cli->new($env_var)
+    or ($cli, @extras) = Mnet::Opts::Cli->new($env_var)
 
 The new class method may be used to retrieve an options object containing
 defined options parsed from the command line and an array contining any extra
 command line arguments.
+
+The env_var argument is optional, and can be set to the name of an environment
+variable where additional command line options can be securely set.
 
 If called in list context this method will return an opts object containing
 values for defined options parsed from the command line followed by a list of
@@ -242,20 +249,22 @@ Options are applied in the following order:
     child Mnet::Batch command lines
     command line
     replayed command line
-    Mnet environment variable
+    optional environment variable
     Mnet::Opts::Set use pragmas
     Mnet::Opts::Cli::define default key
 
 Note that errors are not issued for unknown options that may be set for other
-scripts in the Mnet environment variable. Also note that the Mnet environment
-variable is not parsed if the --test option is set on the command line.
+scripts in the optional env_var environment variable. Also note that this
+environment variable is not parsed if the --test option is set on the command
+line.
 
 The perl ARGV array is not modified by this module.
 
 =cut
 
-    # read input class
+    # read input class and optional envrionement variable name
     my $class = shift // croak("missing class arg");
+    my $env_var = shift;
 
     # read batch child opts from Mnet::Opts::Cli::batch() only
     #   refer to Mnet::Opts::Cli::batch() for more information
@@ -379,16 +388,16 @@ The perl ARGV array is not modified by this module.
         }
     }
 
-    # parse options from Mnet env var if --test/record/replay opts are not set
+    # parse options from env_var if --test/record/replay opts are not set
     #   ignore warnings for env options that might not be defined at the moment
     my $env_opts = {};
-    if (defined $ENV{Mnet}
+    if (defined $env_var and defined $ENV{$env_var}
         and not defined $cli_opts->{replay}
         and not defined $cli_opts->{record}) {
         eval {
             local $SIG{__WARN__} = "IGNORE";
             Getopt::Long::GetOptionsFromString(
-                $ENV{Mnet}, $env_opts, @definitions
+                $ENV{$env_var}, $env_opts, @definitions
             );
         }
     }
@@ -459,6 +468,7 @@ The perl ARGV array is not modified by this module.
     #   log_entries keys are opt names, set to source keyword followed by dump
     #   default opts identified with 'def' log entry prefix are logged to debug
     #   notice entries used for opts that would interfere with Mnet::Test diffs
+    #       so that opts without record set are not saved in --record file logs
     foreach my $opt (sort keys %$log_entries) {
         my $log_entry = $log_entries->{$opt};
         $log_entry =~ s/(\S+)/opt $1 ${opt} =/;
@@ -582,7 +592,7 @@ sub _new_help {
         $output .= "$other_options\n" if $other_options;
 
         # output Mnet options
-        $output .= "Mnet options:\n\n";
+        $output .= "Other options:\n\n";
         foreach my $opt (sort keys %{$Mnet::Opts::Cli::defined}) {
             my $defined_opt = $Mnet::Opts::Cli::defined->{$opt};
             next if $help ne "help" and $defined_opt->{help_hide};
@@ -658,10 +668,11 @@ sub batch_fork {
     # finished Mnet::Opts::Cli::batch, return child_opts and child_extras
     #   what is returned depends on context Mnet::Batch::fork() was called
     if (wantarray) {
-        my ($child_opts, @child_extras) = Mnet::Opts::Cli->new($batch_argv);
+        my ($child_opts, @child_extras)
+            = Mnet::Opts::Cli->new(undef, $batch_argv);
         return ($child_opts, @child_extras);
     } else {
-        my $child_opts = Mnet::Opts::Cli->new($batch_argv);
+        my $child_opts = Mnet::Opts::Cli->new(undef, $batch_argv);
         return $child_opts;
     }
 }
@@ -695,8 +706,6 @@ L<Getopt::Long>
 L<Mnet>
 
 L<Mnet::Opts>
-
-L<Mnet::Opts::Set>
 
 L<Mnet::Test>
 

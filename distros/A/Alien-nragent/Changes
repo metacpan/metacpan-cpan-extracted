@@ -1,5 +1,11 @@
 Revision history for Alien-nragent
 
+0.08      2020-05-14 18:07:40 -0400
+  - Mark distribution as deprecated.
+
+0.07      2020-05-14 18:05:57 -0400
+  - Switch to https instead of http
+
 0.06      2019-07-01 19:45:44 -0400
   - Update to download tarball for most recent version
     (0.17.0.0-beta)
