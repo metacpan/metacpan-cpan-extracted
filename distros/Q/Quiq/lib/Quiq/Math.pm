@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.180';
+our $VERSION = '1.181';
 
 use 5.010;
 use Quiq::Formatter;
@@ -294,7 +294,7 @@ Breite und Länge des geografischen Mittelpunkts
 =head4 Description
 
 Berechne den geografischen Mittelpunkt der Geo-Koordination (plus
-optionaler Gewichtung) und liefere diesen zurck.
+optionaler Gewichtung) und liefere diesen zurück.
 
 Beschreibung des Alogrithmus siehe
 L<http://www.geomidpoint.com/example.html>
@@ -705,7 +705,7 @@ sub spikeValue {
 
 =head1 VERSION
 
-1.180
+1.181
 
 =head1 AUTHOR
 

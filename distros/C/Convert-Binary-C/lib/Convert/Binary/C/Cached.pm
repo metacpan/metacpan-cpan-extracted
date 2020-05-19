@@ -8,7 +8,7 @@
 #
 ################################################################################
 #
-# Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -23,7 +23,7 @@ use vars qw( @ISA $VERSION );
 
 @ISA = qw(Convert::Binary::C);
 
-$VERSION = '0.78';
+$VERSION = '0.79';
 
 sub new
 {
@@ -227,7 +227,7 @@ sub __parse
 sub __can_use_cache
 {
   my $self = shift;
-  my $fh = new IO::File;
+  my $fh = IO::File->new;
 
   unless (-e $self->{cache} and -s _) {
     $ENV{CBCC_DEBUG} and print STDERR "CBCC: cache file '$self->{cache}' doesn't exist or is empty\n";
@@ -304,7 +304,7 @@ sub __can_use_cache
 sub __save_cache
 {
   my $self = shift;
-  my $fh = new IO::File;
+  my $fh = IO::File->new;
 
   $fh->open(">$self->{cache}") or croak "Cannot open '$self->{cache}': $!";
 
@@ -438,7 +438,7 @@ algorithm cannot detect that an update is required.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 

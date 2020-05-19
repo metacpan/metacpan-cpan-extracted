@@ -20,7 +20,7 @@ sub test_unitTest : Test(1) {
 
     my @arr;
     my $dh = Quiq::DirHandle->new('/tmp');
-    while (my $entry = $dh->next) {
+    while (defined(my $entry = $dh->next)) {
         push @arr,$entry;
     }
     $dh->close;

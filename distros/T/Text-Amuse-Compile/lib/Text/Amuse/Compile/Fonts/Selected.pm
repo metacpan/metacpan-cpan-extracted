@@ -230,7 +230,7 @@ sub _fontspec_args {
                   );
     my $def = $self->definitions->{$slot} or die "bad usage, can't find $slot";
     my $script = $scripts{$language} || 'Latin';
-    my @list = ("Script=$script");
+    my @list = ("Script=$script", "Ligatures=TeX");
     my @shapes = sort values %{ $self->_shape_mapping };
     foreach my $att (qw/Scale Path/, @shapes) {
         if (my $v = $def->{attr}->{$att}) {

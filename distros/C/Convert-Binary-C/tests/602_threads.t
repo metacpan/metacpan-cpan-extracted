@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -17,7 +17,7 @@ BEGIN {
   plan tests => NUM_THREADS
 }
 
-my $CCCFG = require 'tests/include/config.pl';
+my $CCCFG = require './tests/include/config.pl';
 
 #===================================================================
 # load appropriate threads module and start a couple of threads
@@ -35,11 +35,11 @@ my @t;
 if ($have_threads) {
   if ($Config{use5005threads}) {
     require Thread;
-    @t = map { new Thread \&task, $_ } 1 .. NUM_THREADS;
+    @t = map { Thread->new( \&task, $_ ) } 1 .. NUM_THREADS;
   }
   elsif ($Config{useithreads} && $] >= 5.008) {
     require threads;
-    @t = map { new threads \&task, $_ } 1 .. NUM_THREADS;
+    @t = map { threads->new( \&task, $_ ) } 1 .. NUM_THREADS;
   }
 }
 else {
@@ -56,16 +56,18 @@ sub task
   my $p;
 
   eval {
-    $p = new Convert::Binary::C %$CCCFG,
-                                EnumSize       => 0,
-                                ShortSize      => 2,
-                                IntSize        => 4,
-                                LongSize       => 4,
-                                LongLongSize   => 8,
-                                PointerSize    => 4,
-                                FloatSize      => 4,
-                                DoubleSize     => 8,
-                                LongDoubleSize => 12;
+    $p = Convert::Binary::C->new(
+      %$CCCFG,
+      EnumSize       => 0,
+      ShortSize      => 2,
+      IntSize        => 4,
+      LongSize       => 4,
+      LongLongSize   => 8,
+      PointerSize    => 4,
+      FloatSize      => 4,
+      DoubleSize     => 8,
+      LongDoubleSize => 12
+    );
     if ($arg % 2) {
       print "# parse_file ($arg) called\n";
       $p->parse_file('tests/include/include.c');

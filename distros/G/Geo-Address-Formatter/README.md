@@ -1,15 +1,31 @@
+
+# Geo::Address::Formatter
+
+A Perl module to take structured address data and format it
+according to the various global/country rules.
+
+The module runs against a set of templates and test cases from the
+[address-formatting](https://github.com/opencagedata/address-formatting) project.
+
+## Build status
+
 [![Build Status](https://travis-ci.org/OpenCageData/perl-Geo-Address-Formatter.svg?branch=master)](https://travis-ci.org/OpenCageData/perl-Geo-Address-Formatter)
 [![Kritika Analysis Status](https://kritika.io/users/freyfogle/repos/4975169572151338/heads/master/status.svg)](https://kritika.io/users/freyfogle/repos/4975169572151338/heads/master/)
 [![CPAN](https://img.shields.io/cpan/v/Geo-Address-Formatter.svg?style=flat-square)](https://metacpan.org/pod/Geo::Address::Formatter)
 [![Coverage Status](https://coveralls.io/repos/github/OpenCageData/perl-Geo-Address-Formatter/badge.svg?branch=master)](https://coveralls.io/github/OpenCageData/perl-Geo-Address-Formatter?branch=master)
 
-# perl-Geo-Address-Formatter
+## Usage
 
-Perl CPAN module to take structured address data and format it
-according to the various global/country rules.
+For docs please see [the Geo::Address::Formatter page on search.metacpan.org](https://metacpan.org/pod/Geo::Address::Formatter)
+or `perldoc Geo::Address::Formatter`.
 
-It is meant to run against a set of configuration and test cases in
-<https://github.com/opencagedata/address-formatting>
+## Installation
+
+To install into your Perl environment you can use the following command:
+
+    $ cpan Geo::Address::Formatter
+
+or (recommended) use `cpanm`
 
 The address-formatting repository is added as a [git submodule](http://git-scm.com/book/en/Git-Tools-Submodules). It is
 versioned, that means it won't automatically update when you run `git
@@ -25,8 +41,7 @@ To fetch the latest templates available use
 See also: <http://git-scm.com/book/en/Git-Tools-Submodules>
 
 To submit new countries/territories please see the details in the
-[address-formatting repository](https://github.com/opencagedata/address-formatting),
-this module just processes the templates
+[address-formatting repository](https://github.com/opencagedata/address-formatting), this module just processes the templates
 
 ### DEVELOPMENT
 
@@ -45,15 +60,17 @@ this module just processes the templates
 
 ### COPYRIGHT AND LICENCE
 
-Copyright 2014-2019 OpenCage GmbH <cpan@opencagedata.com>
+Copyright OpenCage GmbH
+<cpan@opencagedata.com>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10 or,
 at your option, any later version of Perl 5 you may have available.
 
-### YOU MAY ALSO ENJOY
+### Who is OpenCage GmbH?
 
-This module is in use on the [OpenCage
-Geocoder](https://opencagedata.com), converting lat,longs
-into nicely formatted strings.
-Please give us a try if you have any geocoding needs.
+<a href="https://opencagedata.com"><img src="opencage_logo_300_150.png"></a>
+
+We run the [OpenCage Geocoder](https://opencagedata.com). Learn more [about us](https://opencagedata.com/about). 
+
+We also run [Geomob](https://thegeomob.com), a series of regular meetups for location based service creators, where we do our best to highlight geoinnovation. If you like geo stuff, you will probably enjoy [the Geomob podcast](https://thegeomob.com/podcast/).

@@ -6,9 +6,11 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.180';
+our $VERSION = '1.181';
 
 use GD ();
+use Quiq::Gd::Font;
+use Quiq::Gd::Image;
 use Scalar::Util ();
 use Quiq::Color;
 use Quiq::Option;
@@ -228,7 +230,84 @@ sub new {
 
 # -----------------------------------------------------------------------------
 
-=head2 Einfache Operationen
+=head2 Klassenmethoden
+
+=head3 textImage() - Erzeuge Bild mit Text
+
+=head4 Synopsis
+
+  $img = $class->textImage($text,@opt);
+
+=head4 Arguments
+
+=over 4
+
+=item $text
+
+Text, der in das Bild geschrieben wird.
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -background => $color (Default: 'white')
+
+Hintergrundfarbe.
+
+=item -color => $color (Default: 'white')
+
+Textfarbe.
+
+=item -font => $font (Default: 'gdGiantFont')
+
+Font, in dem der Text gesetzt wird.
+
+=back
+
+=head4 Returns
+
+Bildobjekt
+
+=head4 Description
+
+Erzeuge ein Bild, das den Text $text enthält.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub textImage {
+    my ($self,$text) = splice @_,0,2;
+
+    # Optionen
+
+    my $background = '#ffffff';
+    my $color = '#000000';
+    my $font = 'gdGiantFont';
+
+    $self->parameters(\@_,
+        background => \$background,
+        color => \$color,
+        font => 'gdGiantFont',
+    );
+
+    # Bild erzeugen
+
+    my $fnt = Quiq::Gd::Font->new($font);
+    my $width = $fnt->stringWidth($text)+1;
+    my $height = $fnt->stringHeight($text);
+    my $img = Quiq::Gd::Image->new($width,$height);
+    $img->background($background);
+    $img->string($fnt,1,0,$text,$img->color($color));
+
+    return $img;
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Objektmethoden
 
 =head3 color() - Alloziere Farbe
 
@@ -669,7 +748,7 @@ sub rainbowColors {
 
 =head1 VERSION
 
-1.180
+1.181
 
 =head1 AUTHOR
 

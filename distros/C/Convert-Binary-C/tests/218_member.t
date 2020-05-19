@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -15,7 +15,7 @@ BEGIN {
   plan tests => 1907;
 }
 
-my $CCCFG = require 'tests/include/config.pl';
+my $CCCFG = require './tests/include/config.pl';
 
 %basic = ( char => 1, short => 1, int => 1,
            long => 1, signed => 1, unsigned => 1,

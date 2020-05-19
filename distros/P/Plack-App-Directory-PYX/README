@@ -4,13 +4,13 @@ NAME
 SYNOPSIS
      use Plack::App::Directory::PYX;
 
-     my $obj = Plack::App::File->new(%parameters);
+     my $obj = Plack::App::Directory::PYX->new(%parameters);
      my $psgi_ar = $obj->serve_path($env, $path_to_file_or_dir);
      my $app = $obj->to_app;
 
 METHODS
   "new"
-     my $obj = Plack::App::File->new(%parameters);
+     my $obj = Plack::App::Directory::PYX->new(%parameters);
 
     Constructor.
 
@@ -146,5 +146,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

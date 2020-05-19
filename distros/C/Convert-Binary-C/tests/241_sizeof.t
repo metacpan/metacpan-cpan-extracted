@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -9,7 +9,7 @@
 use Test::More tests => 71;
 use Convert::Binary::C @ARGV;
 
-my $c = new Convert::Binary::C IntSize => 4, CharSize => 1, Alignment => 1;
+my $c = Convert::Binary::C->new( IntSize => 4, CharSize => 1, Alignment => 1 );
 
 eval {
 $c->parse(<<'ENDC');

@@ -1,0 +1,110 @@
+
+
+
+\clearpage
+
+
+\index[imena]{Legit test\$}\{\^{}legittest\^{}\}
+
+
+\clearpage
+
+
+Ivo \index[imena]{Andrić, Ivo}Andrić\dots{}
+
+
+\clearpage
+
+
+\index[imena]{Krleža, Miroslav}Krleža
+
+
+\clearpage
+
+
+\index[imena]{Krleža, Miroslav}Miroslav Krleža
+
+
+\clearpage
+
+
+\index[imena]{another \& test}\textbackslash{}test
+
+
+\clearpage
+
+
+\index[imena]{another \& test}\textbackslash{}test
+
+
+\clearpage
+
+
+\index[imena]{Legit test\$}\{"legittest"\}
+
+
+\clearpage
+
+
+\index[imena]{Prova}Prova~prova \index[imena]{Prova}Prova~prova \index[mjesta]{Ci}Ci \index[mjesta]{Dubrovnik}Dubrovnik \index[imena]{Legit test\$}\{"legittest"\}
+
+
+\clearpage
+
+
+\index[imena]{\% test me \%\&\_ without characters with curly because it breaks the test}\emph{em}  \index[imena]{Prova}Prova~prova \index[imena]{\% test me \%\&\_ without characters with curly because it breaks the test}\emph{em}
+
+
+\clearpage
+
+
+\textbackslash{}testx \textbackslash{}testx
+
+
+\clearpage
+
+
+\index[imena]{\% test me \%\&\_ without characters with curly because it breaks the test}\emph{em}
+
+
+\clearpage
+
+
+\clearpage
+
+
+\index[mjesta]{Ci}Ci \index[mjesta]{Džamija}Džamija
+\index[mjesta]{Dubrovnik}Dubrovnik
+
+
+\clearpage
+
+
+\index[mjesta]{Ča}Ča \index[mjesta]{Ci}Ci \index[mjesta]{Ći}Ći \index[mjesta]{Dubrovnik}Dubrovnik
+\index[mjesta]{Džamija}Džamija
+
+
+\clearpage
+
+
+\index[mjesta]{Ći}Ći
+
+
+\clearpage
+
+
+\index[mjesta]{Dubrovnik}Dubrovnik
+
+
+\clearpage
+
+
+\index[mjesta]{Džamija}Džamija
+
+
+\clearpage
+
+
+\index[mjesta]{Žu}Žu
+
+

@@ -7,15 +7,16 @@ package Comics::Plugin::Optipess;
 
 use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "1.00";
+our $VERSION = "1.01";
 
 our $name    = "Optipess";
-our $url     = "http://www.optipess.com";
+our $url     = "https://www.optipess.com";
 
 our $pattern =
-  qr{ <div \s+ .*? class="comicpane">
+  qr{ <div \s+ .*? id="comic"> \s*
       <img \s+
-       src="(?<url>http://www.optipess.com/comics/
+       src="(?<url>https?://www.optipess.com/wp-content/uploads/
+	    \d+ / \d+ /
             (?<image>.+?\.\w+))" \s+
        (?:title|alt)="(?<title>.*?)"
     }sx;

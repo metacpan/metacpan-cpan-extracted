@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -20,12 +20,12 @@ require_ok('Convert::Binary::C::Cached');
 #===================================================================
 # check if we build the right object (4 tests)
 #===================================================================
-eval { $p = new Convert::Binary::C };
+eval { $p = Convert::Binary::C->new };
 is($@, '', "create Convert::Binary::C object");
 is(ref $p, 'Convert::Binary::C',
    "blessed Convert::Binary::C reference");
 
-eval { $p = new Convert::Binary::C::Cached };
+eval { $p = Convert::Binary::C::Cached->new };
 is($@, '', "create Convert::Binary::C::Cached object");
 is(ref $p, 'Convert::Binary::C::Cached',
    "blessed Convert::Binary::C::Cached reference");
@@ -34,12 +34,14 @@ is(ref $p, 'Convert::Binary::C::Cached',
 # check initialization during construction (4 tests)
 #===================================================================
 eval {
-  $p = new Convert::Binary::C PointerSize => 4,
-                              EnumSize    => 4,
-                              IntSize     => 4,
-                              Alignment   => 2,
-                              ByteOrder   => 'BigEndian',
-                              EnumType    => 'Both';
+  $p = Convert::Binary::C->new(
+    PointerSize => 4,
+    EnumSize    => 4,
+    IntSize     => 4,
+    Alignment   => 2,
+    ByteOrder   => 'BigEndian',
+    EnumType    => 'Both'
+  );
 };
 is($@, '', "create Convert::Binary::C object with arguments");
 is(ref $p, 'Convert::Binary::C',
@@ -48,13 +50,15 @@ is(ref $p, 'Convert::Binary::C',
 @warn = ();
 eval {
   local $SIG{__WARN__} = sub { push @warn, $_[0] };
-  $p = new Convert::Binary::C::Cached Cache       => 'tests/cache.cbc',
-                                      PointerSize => 4,
-                                      EnumSize    => 4,
-                                      IntSize     => 4,
-                                      Alignment   => 2,
-                                      ByteOrder   => 'BigEndian',
-                                      EnumType    => 'Both';
+  $p = Convert::Binary::C::Cached->new(
+    Cache       => 'tests/cache.cbc',
+    PointerSize => 4,
+    EnumSize    => 4,
+    IntSize     => 4,
+    Alignment   => 2,
+    ByteOrder   => 'BigEndian',
+    EnumType    => 'Both'
+  );
 };
 is($@, '', "create Convert::Binary::C::Cached object with arguments");
 is(ref $p, 'Convert::Binary::C::Cached',
@@ -76,12 +80,12 @@ else { pass('warnings') }
 # check unknown options in constructor (2 tests)
 #===================================================================
 eval {
-  $p = new Convert::Binary::C FOO => 123, ByteOrder => 'BigEndian', BAR => ['abc'];
+  $p = Convert::Binary::C->new( FOO => 123, ByteOrder => 'BigEndian', BAR => ['abc'] );
 };
 like($@, qr/Invalid option 'FOO' at \Q$0/);
 
 eval {
-  $p = new Convert::Binary::C::Cached FOO => 123, ByteOrder => 'BigEndian', BAR => ['abc'];
+  $p = Convert::Binary::C::Cached->new( FOO => 123, ByteOrder => 'BigEndian', BAR => ['abc'] );
 };
 like($@, qr/Invalid option 'FOO' at \Q$0/);
 
@@ -89,12 +93,12 @@ like($@, qr/Invalid option 'FOO' at \Q$0/);
 # check invalid construction (2 tests)
 #===================================================================
 eval {
-  $p = new Convert::Binary::C FOO;
+  $p = Convert::Binary::C->new( FOO );
 };
 like($@, qr/Number of configuration arguments to new must be even at \Q$0/);
 
 eval {
-  $p = new Convert::Binary::C::Cached FOO;
+  $p = Convert::Binary::C::Cached->new( FOO );
 };
 like($@, qr/Number of configuration arguments to new must be even at \Q$0/);
 
@@ -102,12 +106,12 @@ like($@, qr/Number of configuration arguments to new must be even at \Q$0/);
 # check invalid construction (2 tests)
 #===================================================================
 eval {
-  $p = new Convert::Binary::C ByteOrder => 'FOO';
+  $p = Convert::Binary::C->new( ByteOrder => 'FOO' );
 };
 like($@, qr/ByteOrder must be.*not 'FOO' at \Q$0/);
 
 eval {
-  $p = new Convert::Binary::C::Cached ByteOrder => 'FOO';
+  $p = Convert::Binary::C::Cached->new( ByteOrder => 'FOO' );
 };
 like($@, qr/ByteOrder must be.*not 'FOO' at \Q$0/);
 
@@ -124,7 +128,7 @@ ok(not defined $p);
 # check calling feature as method (2 tests)
 #===================================================================
 eval {
-  $p = new Convert::Binary::C;
+  $p = Convert::Binary::C->new;
   $p = $p->feature('debug');
 };
 is($@, '');

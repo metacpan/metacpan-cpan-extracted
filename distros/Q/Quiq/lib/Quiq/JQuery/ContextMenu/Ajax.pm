@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.180';
+our $VERSION = '1.181';
 
 use Quiq::Assert;
 use Quiq::Json;
@@ -67,7 +67,11 @@ liefert
                   options = {
                       items: items,
                       callback: function(key,options) {
-                          document.location = items[key].url;
+                          var item = items[key];
+                          if (item.target)
+                              window.open(item.url,item.target);
+                          else
+                              document.location = item.url;
                       },
                   };
               },
@@ -87,6 +91,7 @@ den Aufbau
       <key>: {
           name: '<name>',
           url: '<url>',
+          target: '<target>',
       }
       ...
   ]
@@ -244,7 +249,11 @@ sub js {
                         options = {
                             items: items,
                             callback: function(key,options) {
-                                document.location = items[key].url;
+                                var item = items[key];
+                                if (item.target)
+                                    window.open(item.url,item.target);
+                                else
+                                    document.location = item.url;
                             },
                         };
                     },
@@ -263,7 +272,7 @@ sub js {
 
 =head1 VERSION
 
-1.180
+1.181
 
 =head1 AUTHOR
 

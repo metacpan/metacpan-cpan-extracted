@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.180';
+our $VERSION = '1.181';
 
 use Quiq::Option;
 use DBI ();
@@ -161,6 +161,10 @@ sub new {
             $errstr =~ s| at.*?$||;  # " at FILE.c line N" entf.
             $errstr =~ s|\(\d+\)$||; # "(1)" entf.
             $msg = sprintf('SQLITE-%05d: %s',$err,$errstr);
+            if ($err == 14) {
+                my ($file) = $dsn =~ /=(.*)/;
+                $msg .= " ($file)";
+            }
         }
         elsif ($dbms eq 'mssql') {
             $msg = sprintf('MSSQL-%05d: %s',$err,$errstr);
@@ -535,7 +539,7 @@ sub sql {
 
 =head1 VERSION
 
-1.180
+1.181
 
 =head1 AUTHOR
 

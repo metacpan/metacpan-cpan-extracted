@@ -316,7 +316,7 @@ sub execute_tests {
 
     my @dir_files;
     @dir_files = _globdir $Files_In_Dir if defined $Files_In_Dir;
-    my $run_start_time = new Benchmark;
+    my $run_start_time = Benchmark->new;
 
     my $width = _leader_width(@tests);
     foreach my $tfile (@tests) {
@@ -483,7 +483,7 @@ sub execute_tests {
             }
         }
     } # foreach test
-    $tot{bench} = timediff(new Benchmark, $run_start_time);
+    $tot{bench} = timediff(Benchmark->new, $run_start_time);
 
     $Strap->_restore_PERL5LIB;
 

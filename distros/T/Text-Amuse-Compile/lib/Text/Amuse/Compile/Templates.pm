@@ -746,6 +746,13 @@ sub latex {
 [% END %]
 [% END %]
 
+[% IF tex_indexes %]
+\usepackage[noautomatic]{imakeidx}
+[% FOREACH idx IN tex_indexes %]
+\makeindex[name=[% idx.name %],title={[% idx.title %]}]
+[% END %]
+[% END %]
+
 [% tex_setup_langs %]
 
 [% IF safe_options.nocoverpage %]
@@ -1053,6 +1060,11 @@ pdfkeywords={[% tex_metadata.keywords %]}%
 [% END %]
 
 [% latex_body %]
+
+[% FOREACH idx IN tex_indexes %]
+\printindex[[% idx.name %]]
+[% END %]
+
 
 [% UNLESS safe_options.nofinalpage %]
 % begin final page

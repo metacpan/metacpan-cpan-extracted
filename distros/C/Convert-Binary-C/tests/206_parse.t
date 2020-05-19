@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -13,12 +13,12 @@ $^W = 1;
 
 BEGIN { plan tests => 116 }
 
-my $CCCFG = require 'tests/include/config.pl';
+my $CCCFG = require './tests/include/config.pl';
 
 #===================================================================
 # create object (1 tests)
 #===================================================================
-eval { $p = new Convert::Binary::C };
+eval { $p = Convert::Binary::C->new };
 ok($@,'',"failed to create Convert::Binary::C object");
 
 #===================================================================
@@ -48,16 +48,18 @@ ok(ref $p, 'Convert::Binary::C',
 # create object (1 tests)
 #===================================================================
 eval {
-  $p = new Convert::Binary::C %$CCCFG,
-                              EnumSize       => 0,
-                              ShortSize      => 2,
-                              IntSize        => 4,
-                              LongSize       => 4,
-                              LongLongSize   => 8,
-                              PointerSize    => 4,
-                              FloatSize      => 4,
-                              DoubleSize     => 8,
-                              LongDoubleSize => 12;
+  $p = Convert::Binary::C->new(
+    %$CCCFG,
+    EnumSize       => 0,
+    ShortSize      => 2,
+    IntSize        => 4,
+    LongSize       => 4,
+    LongLongSize   => 8,
+    PointerSize    => 4,
+    FloatSize      => 4,
+    DoubleSize     => 8,
+    LongDoubleSize => 12
+  );
 };
 ok($@,'',"failed to create Convert::Binary::C object");
 
@@ -140,7 +142,7 @@ ok($s1,329,"incorrect number of typedef identifiers");
 # check if all sizes are correct (1 big test)
 #===================================================================
 
-do 'tests/include/sizeof.pl';
+do './tests/include/sizeof.pl';
 $max_size = 0;
 @fail = ();
 @success = ();
@@ -388,7 +390,7 @@ my @tests = (
 );
 
 for my $t ( @tests ) {
-  my $c = new Convert::Binary::C;
+  my $c = Convert::Binary::C->new;
   my $pre  = 'struct { ' x $t->{level};
   my $post = ' x; }'     x $t->{level};
   eval { $c->parse("typedef $pre int $post deep;") };
@@ -401,7 +403,7 @@ for my $t ( @tests ) {
 # check parse error recovery (9 tests)
 #===================================================================
 
-$c = new Convert::Binary::C IntSize => 4, EnumSize => 4;
+$c = Convert::Binary::C->new( IntSize => 4, EnumSize => 4 );
 
 eval {
   $c->parse(<<ENDC);

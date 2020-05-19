@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -13,11 +13,11 @@ $^W = 1;
 
 BEGIN { plan tests => 98 }
 
-my $CCCFG = require 'tests/include/config.pl';
+my $CCCFG = require './tests/include/config.pl';
 
 eval {
-  $orig  = new Convert::Binary::C %$CCCFG;
-  @clone = map { new Convert::Binary::C %$CCCFG } 1 .. 2;
+  $orig  = Convert::Binary::C->new( %$CCCFG );
+  @clone = map { Convert::Binary::C->new( %$CCCFG ) } 1 .. 2;
 };
 ok($@,'',"failed to create Convert::Binary::C objects");
 

@@ -26,6 +26,7 @@ address-formatting/conf/abbreviations/it.yaml
 address-formatting/conf/abbreviations/nl.yaml
 address-formatting/conf/abbreviations/pt.yaml
 address-formatting/conf/abbreviations/ro.yaml
+address-formatting/conf/abbreviations/ru.yaml
 address-formatting/conf/abbreviations/se.yaml
 address-formatting/conf/abbreviations/sk.yaml
 address-formatting/conf/abbreviations/tr.yaml
@@ -36,6 +37,7 @@ address-formatting/conf/country2lang.yaml
 address-formatting/conf/country_codes.yaml
 address-formatting/conf/county_codes.yaml
 address-formatting/conf/state_codes.yaml
+address-formatting/opencage_logo_300_150.png
 address-formatting/testcases/countries/ad.yaml
 address-formatting/testcases/countries/ae.yaml
 address-formatting/testcases/countries/af.yaml
@@ -288,7 +290,9 @@ address-formatting/testcases/countries/zw.yaml
 address-formatting/testcases/other/null.yaml
 dist.ini
 lib/Geo/Address/Formatter.pm
+opencage_logo_300_150.png
 t/blackbox/countries.t
+t/blackbox/state_code.t
 t/unit/abbreviate.t
 t/unit/countries.t
 t/unit/critic.t

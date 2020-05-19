@@ -11,7 +11,7 @@ use parent qw(Comics::Fetcher::Cascade);
 our $VERSION = "1.01";
 
 our $name    = "Extralife";
-our $url     = "http://www.frogpants.com/";
+our $url     = "https://www.frogpants.com/";
 our $patterns = [
 	    qr{ <a \s+ href="(?<url>.*?)" \s* >Comics \s+ &amp; \s+ art</a>
             }xi,

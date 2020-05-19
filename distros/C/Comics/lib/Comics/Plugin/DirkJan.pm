@@ -7,19 +7,15 @@ package Comics::Plugin::DirkJan;
 
 use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "0.01";
+our $VERSION = "1.00";
 
-sub register {
-    shift->SUPER::register
-      ( { name    => "DirkJan",
-	  url     => "http://dirkjan.nl/",
-	  pat	  =>
+our $name    = "DirkJan";
+our $url     = "https://dirkjan.nl/";
+our $pattern =
 	    qr{ <meta \s+ property="og:image" \s*
-		 content="(?<url>http://dirkjan.nl/wp-content/uploads/
+		 content="(?<url>https://dirkjan.nl/wp-content/uploads/
 		            \d+/\d+/(?<image>.*?\.\w+))" \s* />
-	      }x,
-	} );
-}
+	      }x;
 
 # Important: Return the package name!
 __PACKAGE__;

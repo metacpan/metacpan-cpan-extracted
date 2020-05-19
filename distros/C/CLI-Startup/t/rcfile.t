@@ -312,7 +312,7 @@ mkdir "$dir/tmp" or plan skip_all => "Can't create temp directory";
     my $file = "$dir/tmp/auto";
 
     local @ARGV = (
-        "--rcfile=$file", qw/ --write-rcfile --foo --bar=baz /
+        "--rcfile=$file", qw/ --write-rcfile --rcfile-format=perl --foo --bar=baz /
     );
     my $app = CLI::Startup->new({
         options => {

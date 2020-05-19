@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -20,11 +20,13 @@ unless ($reason) {
   $reason = 'cannot use dualvar()' if $@;
 }
 
-my $c = new Convert::Binary::C ByteOrder   => 'BigEndian',
-                               EnumType    => 'String',
-                               EnumSize    => 4,
-                               IntSize     => 4,
-                               PointerSize => 4;
+my $c = Convert::Binary::C->new(
+  ByteOrder   => 'BigEndian',
+  EnumType    => 'String',
+  EnumSize    => 4,
+  IntSize     => 4,
+  PointerSize => 4
+);
 
 $c->parse(<<'ENDC');
 

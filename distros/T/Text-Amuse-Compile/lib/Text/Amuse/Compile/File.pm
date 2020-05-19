@@ -29,7 +29,8 @@ use Text::Amuse::Functions qw/muse_fast_scan_header
 use Text::Amuse::Compile::Templates;
 use Text::Amuse::Compile::TemplateOptions;
 use Text::Amuse::Compile::MuseHeader;
-use Types::Standard qw/Str Bool Object Maybe CodeRef HashRef InstanceOf/;
+use Text::Amuse::Compile::Indexer;
+use Types::Standard qw/Str Bool Object Maybe CodeRef HashRef InstanceOf ArrayRef/;
 use Moo;
 
 =encoding utf8
@@ -127,6 +128,14 @@ Boolean (default to true) which triggers the epub font embedding.
 
 Boolean (default to false). Activates the conditional article output.
 
+=item document_indexes
+
+The raw, unparsed indexes found in the muse comments
+
+=item indexes
+
+If present, the parsed indexes are stored here
+
 =back
 
 =cut
@@ -161,6 +170,7 @@ has file_header => (is => 'lazy', isa => Object);
 has coverpage_only_if_toc => (is => 'ro', isa => Bool, default => sub { 0 });
 has fonts => (is => 'ro', required => 1, isa => InstanceOf['Text::Amuse::Compile::Fonts::Selected']);
 has epub_embed_fonts => (is => 'ro', isa => Bool, default => sub { 1 });
+has indexes => (is => 'rwp', isa => Maybe[ArrayRef]);
 
 sub _build_file_header {
     my $self = shift;
@@ -680,11 +690,31 @@ sub _compile_pdf {
         die "Source must be a tex source file\n";
     }
     $self->log_info("Compiling $source to $output\n") if DEBUG;
+    my $max = 3;
+    my @run_xindy;
     # maybe a check on the toc if more runs are needed?
     # 1. create the toc
     # 2. insert the toc
     # 3. adjust the toc. Should be ok, right?
-    foreach my $i (1..3) {
+    foreach my $idx (@{ $self->indexes || [] }) {
+        push @run_xindy, [
+                          texindy => '--quiet',
+                          -L => $idx->{language},
+                          -I => 'xelatex',
+                          -C => 'utf8',
+                          $idx->{name} . '.idx',
+                         ];
+    }
+    if (@run_xindy) {
+        $max++;
+    }
+    foreach my $i (1..$max) {
+        if ($i > 2 and @run_xindy) {
+            foreach my $exec (@run_xindy) {
+                $self->log_info("Executing " . join(" ", @$exec) . "\n");
+                system(@$exec) == 0 or $self->log_error("Errors running " . join(" ", @$exec) ."\n");
+            }
+        }
         my $pipe = IO::Pipe->new;
         # parent swallows the output
         my $latexname = $self->luatex ? 'LuaLaTeX' : 'XeLaTeX';
@@ -1270,6 +1300,7 @@ sub _prepare_tex_tokens {
         $parsed{fontsize} = $fonts->size;
 
     my $latex_body = $self->_interpolate_magic_comments($template_options->format_id, $doc);
+
     my $enable_secondary_footnotes = $latex_body =~ m/\\footnoteB\{/;
 
     # check if the template body support this conditional, which is new. If not,
@@ -1287,6 +1318,54 @@ sub _prepare_tex_tokens {
                                             bidi => $doc->is_bidi,
                                             is_slide => $is_slide,
                                            );
+
+    my @indexes;
+    if (my @raw_indexes = $self->document_indexes) {
+        my $indexer = Text::Amuse::Compile::Indexer->new(latex_body => $latex_body,
+                                                         language_code => $doc->language_code,
+                                                         index_specs => \@raw_indexes);
+        $latex_body = $indexer->indexed_tex_body;
+        my %xindy_langs = (
+                           bg => 'bulgarian',
+                           cs => 'czech',
+                           da => 'danish',
+                           de => 'german-din', # ae is sorted like ae. alternative -duden
+                           el => 'greek',
+                           en => 'english',
+                           es => 'spanish-modern',
+                           et => 'estonian',
+                           fi => 'finnish',
+                           fr => 'french',
+                           hr => 'croatian',
+                           hu => 'hungarian',
+                           is => 'icelandic',
+                           it => 'italian',
+                           lv => 'latvian',
+                           lt => 'lithuanian',
+                           mk => 'macedonian',
+                           # nl => 'dutch', # unclear why missing
+                           no => 'norwegian',
+                           sr => 'croatian', # serbian is cyrillic
+                           ro => 'romanian',
+                           ru => 'russian',
+                           sk => 'slovak-small', # exists also slovak-large
+                           sl => 'slovenian',
+                           pl => 'polish',
+                           pt => 'portuguese',
+                           sq => 'albanian',
+                           sv => 'swedish',
+                           tr => 'turkish',
+                           uk => 'ukrainian',
+                           vi => 'vietnamese',
+                          );
+        @indexes = map { +{
+                           name => $_->index_name,
+                           title => $_->index_label,
+                           language => $xindy_langs{$doc->language_code} || 'general',
+                          } }
+          @{ $indexer->specifications };
+    }
+    $self->_set_indexes(@indexes ? \@indexes : undef);
     # no cover page if header or compiler says so, or
     # if coverpage_only_if_toc is set and doc doesn't have a toc.
     if ($self->nocoverpage or
@@ -1311,6 +1390,7 @@ sub _prepare_tex_tokens {
             latex_body => $latex_body,
             enable_secondary_footnotes => $enable_secondary_footnotes,
             tex_metadata => $self->file_header->tex_metadata,
+            tex_indexes => \@indexes,
            };
 }
 
@@ -1425,5 +1505,16 @@ sub _format_epub_fragment {
     my ($self, $index) = @_;
     return sprintf('piece%06d.xhtml', $index || 0);
 }
+
+sub document_indexes {
+    my ($self) = @_;
+    my @docs = ($self->virtual ? ($self->document->docs) : ( $self->document ));
+    my @comments = grep { /\AINDEX +([a-z]+): (.+)/ }
+      map { $_->string }
+      grep { $_->type eq 'comment' }
+      map { $_->document->elements } @docs;
+    return @comments;
+}
+
 
 1;

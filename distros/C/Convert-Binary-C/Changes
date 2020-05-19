@@ -1,4 +1,19 @@
 -------------------------
+Version 0.79 (2020-05-19)
+-------------------------
+
+* fix cpan #121039: Fails tests when no "." in @INC; thanks to
+  Kent Fredric for the report & pull request and sorry for the
+  long time this bug/pr sat in the queue
+
+* merge github PR #5: Remove use of indirect object notation in
+  tests; thanks to Julien Fiegehenn for the PR and sorry for the
+  long time this sat in the queue
+
+* fix some tests that generated spurious output and didn't
+  actually test anything useful
+
+-------------------------
 Version 0.78 (2016-02-14)
 -------------------------
 

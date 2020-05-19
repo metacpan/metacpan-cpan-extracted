@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.180';
+our $VERSION = '1.181';
 
 use Term::ANSIColor ();
 
@@ -71,6 +71,16 @@ Debian-Repository enthalten.
 
   $ PROGRAM | less -R
 
+=head1 SEE ALSO
+
+=over 2
+
+=item *
+
+Term::ANSIColor
+
+=back
+
 =head1 METHODS
 
 =head2 Konstruktor
@@ -101,8 +111,9 @@ AnsiColor-Objekt
 =head4 Description
 
 Instantiiere ein Objekt der Klasse und liefere dieses zurück. Durch
-den Parameter $bool wird entschieden, ob die Methode L<str|"str() - Formatiere String mit Colorcodes">()
-ihren Rückgabewert mit oder ohne ANSI Colorcodes liefert.
+den Parameter $bool wird entschieden, ob die Methode
+L<str|"str() - Formatiere String mit Colorcodes">() ihren Rückgabewert mit
+oder ohne ANSI Colorcodes liefert.
 
 =cut
 
@@ -174,7 +185,8 @@ Formatiere Zeichenkette $str mit ANSI Colorcodes gemäß
 Spezifikation $attr und liefere das Resultat zurück. Die
 Colorcodes werden der Zeichenkette vorangestellt und mit dem
 Colorcode 'reset' beendet. Ist die Erzeugung von Colorcodes
-abgeschaltet, wird die Zeichenkette unverändert geliefert.
+abgeschaltet (siehe Konstruktor), wird die Zeichenkette unverändert
+geliefert.
 
 =cut
 
@@ -209,7 +221,7 @@ Siehe L<str|"str() - Formatiere String mit Colorcodes">()
 
 =head4 Description
 
-Wie L<str|"str() - Formatiere String mit Colorcodes">(), nur dass das Resultat mit einem Newline terminiert wird.
+Wie L<str|"str() - Formatiere String mit Colorcodes">(), nur dass der Rückgabewert mit einem Newline beendet wird.
 
 =cut
 
@@ -223,7 +235,7 @@ sub strLn {
 
 =head1 VERSION
 
-1.180
+1.181
 
 =head1 AUTHOR
 

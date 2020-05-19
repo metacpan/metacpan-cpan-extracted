@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -13,7 +13,7 @@ $^W = 1;
 
 BEGIN { plan tests => 18 }
 
-my $c = eval { new Convert::Binary::C };
+my $c = eval { Convert::Binary::C->new };
 ok($@,'',"failed to create Convert::Binary::C object");
 
 $c->PointerSize(4)->IntSize(2)->CharSize(1);

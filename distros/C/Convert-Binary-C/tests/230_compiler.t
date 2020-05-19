@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -37,9 +37,9 @@ for my $cur (sort keys %cc) {
   $bin =~ s/\s+//gms;
   $bin = pack "H*", $bin;
 
-  do $cc{$cur}{cfg};
+  do "./$cc{$cur}{cfg}";
 
-  my $c = new Convert::Binary::C %config;
+  my $c = Convert::Binary::C->new( %config );
   $c->parse_file('tests/compiler/test.h');
   my $pck = $c->pack('test', $dat);
 

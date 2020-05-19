@@ -9,7 +9,7 @@
 *
 ********************************************************************************
 *
-* Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+* Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 * This program is free software; you can redistribute it and/or modify
 * it under the same terms as Perl itself.
 *
@@ -39,10 +39,6 @@
 
 /* ADDITIONAL BISON CONFIGURATION */
 
-#define YYPARSE_PARAM pState
-#define YYLEX_PARAM   pState
-#define YYERROR_VERBOSE
-
 /*
  * Bison version >= 1.31 is needed for YYFPRINTF
  */
@@ -50,7 +46,7 @@
 #define YYFPRINTF BisonDebugFunc
 #endif
 
-#define pragma_error( msg )     \
+#define pragma_error( state, msg )     \
         CT_DEBUG( PRAGMA, ("pragma_error(): %s", msg) )
 
 #define pragma_parse            CTlib_pragma_parse
@@ -209,7 +205,11 @@ static        void         packelem_delete(PackElement *pPack);
 
 %token PUSH_TOK POP_TOK
 
-%pure_parser
+%parse-param { PragmaState *pState }
+%lex-param { PragmaState *pState }
+
+%pure-parser
+%error-verbose
 
 %start pragma
 %%

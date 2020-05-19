@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -12,11 +12,13 @@ use strict;
 
 $^W = 1;
 
-my $c = new Convert::Binary::C CharSize  => 1
-                             , ShortSize => 2
-                             , IntSize   => 4
-                             , Alignment => 1
-                             , ByteOrder => 'BigEndian';
+my $c = Convert::Binary::C->new(
+  CharSize  => 1,
+  ShortSize => 2,
+  IntSize   => 4,
+  Alignment => 1,
+  ByteOrder => 'BigEndian'
+);
 
 $c->parse(<<'ENDC');
 

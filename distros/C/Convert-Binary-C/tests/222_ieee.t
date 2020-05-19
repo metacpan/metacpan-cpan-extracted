@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -19,7 +19,7 @@ $reason = Convert::Binary::C::feature('ieeefp') ? '' : 'no IEEE floating point';
 
 $SIG{__WARN__} = sub { push @warn, $_[0] };
 
-my $c = eval { new Convert::Binary::C };
+my $c = eval { Convert::Binary::C->new };
 skip($reason,$@,'');
 
 # check with reference data

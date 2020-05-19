@@ -1,0 +1,22 @@
+#title Test Index 2
+#lang hr
+
+<comment>
+INDEX mjesta: Kazalo mjesta
+Ci
+Ča
+</comment>
+
+<comment>
+INDEX imena: \crash{Žćđ}
+*em*: Try
+Prova~~prova: Prova
+</comment>
+
+            * * * * *
+
+*em*  Prova~~prova  *em*
+
+            * * * * *
+
+*em*

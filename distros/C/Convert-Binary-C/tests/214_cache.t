@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -66,8 +66,8 @@ if( $Data_Dumper or $IO_File ) {
 *main::copy = sub {
   my($from, $to) = @_;
   -e $to and unlink $to || die $!;
-  my $fh = new IO::File;
-  my $th = new IO::File;
+  my $fh = IO::File->new;
+  my $th = IO::File->new;
   local $/;
   $fh->open("<$from")
     and binmode $fh
@@ -90,14 +90,18 @@ $cache = 'tests/cache.cbc';
 -e $cache and unlink $cache || die $!;
 
 eval {
-  $c = new Convert::Binary::C::Cached Cache   => [$cache],
-                                      Include => ['tests/cache'];
+  $c = Convert::Binary::C::Cached->new(
+    Cache   => [$cache],
+    Include => ['tests/cache']
+  );
 };
 ok( $@, qr/Cache must be a string value, not a reference at \Q$0/ );
 
 eval {
-  $c = new Convert::Binary::C::Cached Cache   => $cache,
-                                      Include => ['tests/cache'];
+  $c = Convert::Binary::C::Cached->new(
+    Cache   => $cache,
+    Include => ['tests/cache']
+  );
 };
 ok($@,'',"failed to create Convert::Binary::C::Cached object");
 
@@ -117,8 +121,10 @@ ok( $@, qr/Cannot parse more than once for cached objects at \Q$0/ );
 # check what happens if the cache file cannot be created
 
 eval {
-  $c = new Convert::Binary::C::Cached Cache   => 'abc/def/ghi/jkl/mno.pqr',
-                                      Include => ['tests/cache'];
+  $c = Convert::Binary::C::Cached->new(
+    Cache   => 'abc/def/ghi/jkl/mno.pqr',
+    Include => ['tests/cache']
+  );
 };
 ok($@,'',"failed to create Convert::Binary::C::Cached object");
 
@@ -145,12 +151,12 @@ copy( qw( tests/cache/sub/dir.1 tests/cache/sub/dir.h ) );
   KeywordMap => {'__inline__' => 'inline', '__restrict__' => undef },
 );
 
-eval { $r = new Convert::Binary::C @config };
+eval { $r = Convert::Binary::C->new( @config ) };
 ok($@,'',"failed to create reference Convert::Binary::C object");
 
 push @config, Cache => $cache;
 
-eval { $c = new Convert::Binary::C::Cached @config };
+eval { $c = Convert::Binary::C::Cached->new( @config ) };
 ok($@,'',"failed to create Convert::Binary::C::Cached object");
 
 eval {
@@ -171,7 +177,7 @@ ok( -e $cache );
 
 # this new object should now use the cache file
 
-eval { $c = new Convert::Binary::C::Cached @config };
+eval { $c = Convert::Binary::C::Cached->new( @config ) };
 ok($@,'',"failed to create Convert::Binary::C::Cached object");
 
 eval {
@@ -194,7 +200,7 @@ for( qw( tests/cache/sub/dir tests/cache/header tests/cache/cache ) ) {
   copy( "$_.2", "$_.h" );
   /dir/ and sleep 2;
 
-  eval { $c = new Convert::Binary::C::Cached @config };
+  eval { $c = Convert::Binary::C::Cached->new( @config ) };
   ok($@,'',"failed to create Convert::Binary::C::Cached object");
 
   eval {
@@ -208,7 +214,7 @@ for( qw( tests/cache/sub/dir tests/cache/header tests/cache/cache ) ) {
 
   ok( compare( $r, $c ) );
 
-  eval { $c = new Convert::Binary::C::Cached @config };
+  eval { $c = Convert::Binary::C::Cached->new( @config ) };
   ok($@,'',"failed to create Convert::Binary::C::Cached object");
 
   eval {
@@ -226,7 +232,7 @@ for( qw( tests/cache/sub/dir tests/cache/header tests/cache/cache ) ) {
 
 # changing the way we're parsing should trigger re-parsing
 
-eval { $c = new Convert::Binary::C::Cached @config };
+eval { $c = Convert::Binary::C::Cached->new( @config ) };
 ok($@,'',"failed to create Convert::Binary::C::Cached object");
 
 eval {
@@ -244,7 +250,7 @@ ok( $c->__uses_cache, 0, "object is using cache file" );
 
 ok( compare( $r, $c ) );
 
-eval { $c = new Convert::Binary::C::Cached @config };
+eval { $c = Convert::Binary::C::Cached->new( @config ) };
 ok($@,'',"failed to create Convert::Binary::C::Cached object");
 
 eval {
@@ -263,7 +269,7 @@ ok( compare( $r, $c ) );
 
 # changing the embedded code should trigger re-parsing
 
-eval { $c = new Convert::Binary::C::Cached @config };
+eval { $c = Convert::Binary::C::Cached->new( @config ) };
 ok($@,'',"failed to create Convert::Binary::C::Cached object");
 
 eval {
@@ -283,7 +289,7 @@ ok( $c->__uses_cache, 0, "object is using cache file" );
 
 ok( compare( $r, $c ) );
 
-eval { $c = new Convert::Binary::C::Cached @config };
+eval { $c = Convert::Binary::C::Cached->new( @config ) };
 ok($@,'',"failed to create Convert::Binary::C::Cached object");
 
 eval {
@@ -305,7 +311,7 @@ ok( compare( $r, $c ) );
 
 push @config, Define => ['BAR'];
 
-eval { $c = new Convert::Binary::C::Cached @config };
+eval { $c = Convert::Binary::C::Cached->new( @config ) };
 ok($@,'',"failed to create Convert::Binary::C::Cached object");
 
 eval {
@@ -325,7 +331,7 @@ ok( $c->__uses_cache, 0, "object is using cache file" );
 
 ok( compare( $r, $c ) );
 
-eval { $c = new Convert::Binary::C::Cached @config };
+eval { $c = Convert::Binary::C::Cached->new( @config ) };
 ok($@,'',"failed to create Convert::Binary::C::Cached object");
 
 eval {
@@ -351,7 +357,7 @@ cleanup();
 # check cache file corruption
 
 $code = 'typedef int foo;';
-eval { $c = new Convert::Binary::C::Cached Cache => $cache };
+eval { $c = Convert::Binary::C::Cached->new( Cache => $cache ) };
 ok($@,'',"failed to create Convert::Binary::C::Cached object");
 
 eval { $c->parse( $code ) };
@@ -381,7 +387,7 @@ for( $pos = 0; $pos < $size; $pos++ ) {
   {
     local $SIG{__WARN__} = sub { push @warn, $_[0] };
 
-    eval { $c = new Convert::Binary::C::Cached Cache => $cache };
+    eval { $c = Convert::Binary::C::Cached->new( Cache => $cache ) };
     if( $@ ne '' ) {
       $@ =~ s/^/# /gm;
       print "# failed to create Convert::Binary::C::Cached object\n$@";

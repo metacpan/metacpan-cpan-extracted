@@ -1,47 +1,19 @@
 {
-   "generated_by" : "Author",
-   "version" : "1.41",
-   "resources" : {
-      "repository" : {
-         "web" : "https://github.com/Tux/Text-CSV_XS",
-         "url" : "https://github.com/Tux/Text-CSV_XS",
-         "type" : "git"
-         },
-      "homepage" : "https://metacpan.org/pod/Text::CSV_XS",
-      "x_IRC" : "irc://irc.perl.org/#csv",
-      "license" : [
-         "http://dev.perl.org/licenses/"
-         ]
-      },
    "name" : "Text-CSV_XS",
-   "abstract" : "Comma-Separated Values manipulation routines",
-   "provides" : {
-      "Text::CSV_XS" : {
-         "file" : "CSV_XS.pm",
-         "version" : "1.41"
-         }
-      },
-   "author" : [
-      "H.Merijn Brand <h.m.brand@xs4all.nl>"
-      ],
-   "license" : [
-      "perl_5"
-      ],
-   "dynamic_config" : 1,
-   "release_status" : "stable",
-   "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
-      },
    "prereqs" : {
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-            }
-         },
       "build" : {
          "requires" : {
             "Config" : "0"
+            }
+         },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006001",
+            "XSLoader" : "0",
+            "IO::Handle" : "0"
+            },
+         "recommends" : {
+            "Encode" : "3.05"
             }
          },
       "test" : {
@@ -50,15 +22,43 @@
             "Tie::Scalar" : "0"
             }
          },
-      "runtime" : {
-         "recommends" : {
-            "Encode" : "3.02"
-            },
+      "configure" : {
          "requires" : {
-            "IO::Handle" : "0",
-            "XSLoader" : "0",
-            "perl" : "5.006001"
+            "ExtUtils::MakeMaker" : "0"
             }
+         }
+      },
+   "version" : "1.42",
+   "author" : [
+      "H.Merijn Brand <h.m.brand@xs4all.nl>"
+      ],
+   "release_status" : "stable",
+   "abstract" : "Comma-Separated Values manipulation routines",
+   "generated_by" : "Author",
+   "dynamic_config" : 1,
+   "license" : [
+      "perl_5"
+      ],
+   "resources" : {
+      "homepage" : "https://metacpan.org/pod/Text::CSV_XS",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/Tux/Text-CSV_XS",
+         "url" : "https://github.com/Tux/Text-CSV_XS"
+         },
+      "x_IRC" : "irc://irc.perl.org/#csv",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+         ]
+      },
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+      },
+   "provides" : {
+      "Text::CSV_XS" : {
+         "file" : "CSV_XS.pm",
+         "version" : "1.42"
          }
       }
    }

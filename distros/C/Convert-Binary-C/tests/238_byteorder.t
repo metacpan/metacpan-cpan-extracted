@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -9,8 +9,11 @@
 use Test::More tests => 32;
 use Convert::Binary::C @ARGV;
 
-my $c = new Convert::Binary::C ByteOrder => 'LittleEndian',
-                               IntSize => 4, EnumSize => 4;
+my $c = Convert::Binary::C->new(
+  ByteOrder => 'LittleEndian',
+  IntSize   => 4,
+  EnumSize  => 4
+);
 
 eval {
   $c->parse(<<ENDC);

@@ -1,3 +1,39 @@
+1.181 2020-05-19
+================
+
+[Quiq::AnsiColor]
+* Doku bearbeitet
+
+[Quiq::Cascm]
+* deleteVersion() - auf Rückgabewert boolean umgestellt
+* edit() - Checkout an den Anfang gestellt
+* listPackages() - Suchargument hinzugefügt
+* putFiles() - Prüfung auf Datei-Identität optional gemacht
+* reduceVersion() - Methode hinzugefügt
+* showPackage() - creation_time, username, versionstatus hinzugefügt
+
+[Quiq::Database::Api::Dbi::Connection]
+* new() - SQLite: Fehlermeldung Verbindungsaufbau verbessert
+
+[Quiq::Database::ResultSet]
+* asExel() - Laden von Quiq::Excel::Writer auf require umgestellt
+* reverse() - Methode hinzugefügt
+
+[Quiq::Gd::Image]
+* textImage() - Methode hinzugefügt
+
+[Quiq::JQuery::ContextMenu::Ajax]
+* js() - Attribut 'target' hinzugefügt
+
+[Quiq::Mechanize]
+* Klasse hinzugefügt
+
+[Quiq::Sql]
+* insertMulti() - um Behandlung von Nullwerten erweitert
+
+[Quiq::Udl]
+* dsn() - SQLite: Tilde-Expansion bei Pfadangabe hinzugefügt
+
 1.180 2020-04-25
 ================
 

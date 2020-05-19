@@ -9,7 +9,7 @@
 *
 ********************************************************************************
 *
-* Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+* Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 * This program is free software; you can redistribute it and/or modify
 * it under the same terms as Perl itself.
 *
@@ -101,8 +101,6 @@ colleagues include: Bruce Blodgett, and Mark Langley.
 /* ADDITIONAL BISON CONFIGURATION */
 
 #define YYMAXDEPTH        10000
-#define YYPARSE_PARAM    pState
-#define YYLEX_PARAM      pState
 
 /*
  * Bison version >= 1.31 is needed for YYFPRINTF
@@ -111,7 +109,7 @@ colleagues include: Bruce Blodgett, and Mark Langley.
 #define YYFPRINTF BisonDebugFunc
 #endif
 
-#define c_error(msg)    parser_error(PSTATE, msg)
+#define c_error         parser_error
 
 #define c_parse         CTlib_c_parse
 
@@ -604,6 +602,9 @@ static        void  parser_error(ParserState *pState, const char *msg);
                      bit_field_size_opt
 
 /*************************************************************************/
+
+%parse-param { ParserState *pState }
+%lex-param { ParserState *pState }
 
 %expect 1
 %pure-parser
@@ -1352,7 +1353,7 @@ member_declarator
 	          sprintf(msg, "%s width for bit-field '%s'",
 	                  $2.iv < 0 ? "negative" : "zero", $1->identifier);
 	          decl_delete($1);
-	          yyerror(msg);
+	          yyerror(pState, msg);
 	          Free(msg);
 	          YYERROR;
 	        }
@@ -1370,7 +1371,7 @@ member_declarator
 	    {
 	      if ($1.iv < 0)
 	      {
-	        yyerror("negative width for bit-field");
+	        yyerror(pState, "negative width for bit-field");
 	        YYERROR;
 	      }
 

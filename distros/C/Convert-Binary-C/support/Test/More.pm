@@ -965,7 +965,7 @@ the easiest way to illustrate:
 
         skip "HTML::Lint not installed", 2 if $@;
 
-        my $lint = new HTML::Lint;
+        my $lint = HTML::Lint->new;
         isa_ok( $lint, "HTML::Lint" );
 
         $lint->parse( $html );

@@ -17,15 +17,16 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.012",
   "NAME" => "Geo::Address::Formatter",
   "PREREQ_PM" => {
-    "Clone" => "0.43",
+    "Clone" => "0.45",
     "Data::Dumper" => 0,
     "File::Basename" => 0,
     "File::Find::Rule" => 0,
     "List::Util" => 0,
+    "Ref::Util" => "0.204",
     "Scalar::Util" => 0,
     "Text::Hogan" => "2.03",
     "Try::Catch" => 0,
-    "YAML::LibYAML" => "0.81"
+    "YAML::LibYAML" => "0.82"
   },
   "TEST_REQUIRES" => {
     "File::Slurper" => 0,
@@ -35,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::Warn" => 0,
     "Text::Trim" => "1.02"
   },
-  "VERSION" => "1.81",
+  "VERSION" => "1.82",
   "test" => {
     "TESTS" => "t/blackbox/*.t t/unit/*.t"
   }
@@ -43,13 +44,14 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Clone" => "0.43",
+  "Clone" => "0.45",
   "Data::Dumper" => 0,
   "File::Basename" => 0,
   "File::Find::Rule" => 0,
   "File::Slurper" => 0,
   "File::Spec" => 0,
   "List::Util" => 0,
+  "Ref::Util" => "0.204",
   "Scalar::Util" => 0,
   "Test::Exception" => 0,
   "Test::More" => "0.88",
@@ -57,7 +59,7 @@ my %FallbackPrereqs = (
   "Text::Hogan" => "2.03",
   "Text::Trim" => "1.02",
   "Try::Catch" => 0,
-  "YAML::LibYAML" => "0.81"
+  "YAML::LibYAML" => "0.82"
 );
 
 

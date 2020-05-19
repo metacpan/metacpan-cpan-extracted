@@ -1,5 +1,12 @@
 Revision history for Perl module Geo::Address::Formatter.
 
+1.82   2020-05-19
+       - support for determining correct state_code or county_code
+         in multiple languages
+       - require Ref::Util, update various other requirements
+       - more tests
+       - newest address-formatting templates
+
 1.81   2019-02-03
        - require YAML::LibYAML >= 0.81
        - newest address-formatting templates

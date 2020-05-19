@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -49,7 +49,7 @@ chkwarn();
 @w= ( qr/^Convert::Binary::C parser is DISABLED/ );
 $ixhash or push @w, qr/^Couldn't load a module for member ordering/;
 
-$c = eval { new Convert::Binary::C };
+$c = eval { Convert::Binary::C->new };
 ok( $@, '', "could not create Convert::Binary::C object" );
 chkwarn( @w );
 ok( $c->OrderMembers, 1 );
@@ -59,7 +59,7 @@ chkwarn();
 ok( $c->OrderMembers, 0 );
 chkwarn();
 
-$c = eval { new Convert::Binary::C OrderMembers => 0 };
+$c = eval { Convert::Binary::C->new( OrderMembers => 0 ) };
 ok( $@, '', "could not create Convert::Binary::C object" );
 chkwarn( $w[0] );
 ok( $c->OrderMembers, 0 );

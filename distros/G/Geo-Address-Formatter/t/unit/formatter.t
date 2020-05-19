@@ -191,7 +191,7 @@ my $GAF = $CLASS->new( conf_path => $path );
         'city_district' => "Sarrià - Sant Gervasi",
         'country' => 'Spain',
         'country_code' => 'es',
-        'county' => 'Barcelona',
+        'county' => 'Barcelonès',
         'house_number' => '68',
         'postcode' => '08017',
         'road' => 'Carrer de Calatrava',

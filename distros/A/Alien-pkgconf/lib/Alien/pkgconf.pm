@@ -6,7 +6,7 @@ use JSON::PP ();
 use File::Spec;
 use File::ShareDir ();
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 =head1 NAME
 
@@ -91,7 +91,7 @@ sub libs
 
  my($dll) = Alien::pkgconf->dynamic_libs;
 
-The C<.so>, C<.dll> or <.dynlib> shared or dynamic library
+The C<.so>, C<.dll> or C<.dynlib> shared or dynamic library
 which can be used via FFI.
 
 =cut
@@ -190,6 +190,10 @@ L<https://github.com/pkgconf/pkgconf/graphs/contributors>
 =head1 AUTHOR
 
 Graham Ollis
+
+Contributors:
+
+Thibault Duponchelle (tib)
 
 =head1 COPYRIGHT AND LICENSE
 

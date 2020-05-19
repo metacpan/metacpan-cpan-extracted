@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -16,7 +16,7 @@ BEGIN { plan tests => 45 }
 my $reason = do {
   my @w;
   local $SIG{__WARN__} = sub { push @w, @_ };
-  my $c = new Convert::Binary::C OrderMembers => 1;
+  my $c = Convert::Binary::C->new( OrderMembers => 1 );
   (grep /Couldn't load a module for member ordering/, @w)
   ? "member ordering requires indexed hashes" : "";
 };
@@ -26,8 +26,8 @@ my $order = $reason ? 0 : 1;
 my @keys = grep !/do|if/, 'aa' .. 'zz';
 my $members = join "\n", map "unsigned char $_;", @keys;
 
-my $u = new Convert::Binary::C OrderMembers => 0;
-my $o = new Convert::Binary::C OrderMembers => $order;
+my $u = Convert::Binary::C->new( OrderMembers => 0 );
+my $o = Convert::Binary::C->new( OrderMembers => $order );
 
 for my $c ( $u, $o ) {
   $c->parse( <<ENDC );

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 ################################################################################
 #
-# Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 # 
@@ -354,9 +354,11 @@ sub configure
           file      => [qw( bin/elf.PL )],
         },
         resources => {
-          license     => 'http://dev.perl.org/licenses/',
+          license     => [ 'http://dev.perl.org/licenses/' ],
           homepage    => 'http://search.cpan.org/~mhx/Convert-Binary-C/',
-          bugtracker  => 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=Convert-Binary-C',
+          bugtracker  => {
+            web => 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=Convert-Binary-C',
+          },
           MailingList => 'convert-binary-c@yahoogroups.com',
           repository  => {
             type => 'git',

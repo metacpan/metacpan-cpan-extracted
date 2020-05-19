@@ -64715,3 +64715,16 @@ N/NE/NERDVANA/X11-Xlib-0.19.tar.gz
 T/TI/TINITA/YAML-LibYAML-API-0.009.tar.gz
 Z/ZN/ZNMSTR/Zonemaster-Backend-5.0.1.tar.gz
 Z/ZN/ZNMSTR/Zonemaster-Engine-v3.1.1.tar.gz
+P/PL/PLICEASE/Alien-pkgconf-0.17.tar.gz
+B/BU/BUDNEY/CLI-Startup-0.26.tar.gz
+J/JV/JV/Comics-1.16.tar.gz
+M/MH/MHX/Convert-Binary-C-0.79.tar.gz
+A/AT/ATOOMIC/TimeDate-2.33.tar.gz
+P/PJ/PJCJ/Devel-Cover-1.36.tar.gz
+E/ED/EDF/Geo-Address-Formatter-1.82.tar.gz
+S/SK/SKIM/Plack-App-Directory-PYX-0.04.tar.gz
+E/EG/EGOR/Plack-Handler-Feersum-SS-0.02.tar.gz
+F/FS/FSEITZ/Quiq-1.181.tar.gz
+M/ME/MELMOTHX/Text-Amuse-Compile-1.40.tar.gz
+H/HM/HMBRAND/Text-CSV_XS-1.42.tgz
+J/JV/JV/Text-Layout-0.018.3.tar.gz

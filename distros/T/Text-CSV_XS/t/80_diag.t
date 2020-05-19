@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
- use Test::More tests => 333;
+ use Test::More tests => 334;
 #use Test::More "no_plan";
 
 my %err;
@@ -219,6 +219,7 @@ open  STDERR, ">&EH"          or die "STDERR: $!\n";
 open  EH,     "<", $diag_file or die "STDERR: $!\n";
 is (scalar <EH>, "CACHE:\n",	"Title");
 while (<EH>) {
+    m/^\s+(?:tmp|bptr)\b/ and next;
     like ($_, qr{^  \w+\s+[0-9a-f]+:(?:".*"|\s*[0-9]+)$}, "Content");
     }
 close EH;

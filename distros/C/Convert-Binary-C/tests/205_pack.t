@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -14,8 +14,7 @@ $^W = 1;
 BEGIN { plan tests => 275 }
 
 eval {
-  $p = new Convert::Binary::C ByteOrder     => 'BigEndian'
-                            , UnsignedChars => 0
+  $p = Convert::Binary::C->new( ByteOrder => 'BigEndian', UnsignedChars => 0 );
 };
 ok($@,'',"failed to create Convert::Binary::C object");
 
@@ -431,7 +430,7 @@ ok($packed =~ /^$val.*$/);
 {
   my @res;
 
-  my $c = new Convert::Binary::C;
+  my $c = Convert::Binary::C->new;
   $c->parse(<<ENDC);
 typedef unsigned char u;
 typedef struct {

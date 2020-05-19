@@ -1,5 +1,8 @@
 Revision history for Alien-pkgconf
 
+0.17 2020-05-19 03:48:15 -0600
+  - Add detection logic for Alpine Linux (tib++ gh#5)
+
 0.16 2020-02-21 08:50:25 -0500
   - Move to Perl5-Alien org
   - Fix repo metadata for repository

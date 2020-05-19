@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.180';
+our $VERSION = '1.181';
 
 =encoding utf8
 
@@ -572,6 +572,10 @@ L<Quiq::Math> - Mathematische Funktionen
 
 =item *
 
+L<Quiq::Mechanize> - Überlagerung von WWW::Mechanize
+
+=item *
+
 L<Quiq::MediaWiki::Client> - Clientseitiger Zugriff auf ein MediaWiki
 
 =item *
@@ -850,7 +854,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.180
+1.181
 
 =head1 AUTHOR
 

@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.180';
+our $VERSION = '1.181';
 
 use Quiq::Option;
 use Quiq::Path;
@@ -428,7 +428,7 @@ sub type {
 
 =head1 VERSION
 
-1.180
+1.181
 
 =head1 AUTHOR
 

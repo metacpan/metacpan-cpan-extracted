@@ -10,6 +10,8 @@ lib/Text/Amuse/Compile/Fonts/Family.pm
 lib/Text/Amuse/Compile/Fonts/File.pm
 lib/Text/Amuse/Compile/Fonts/Import.pm
 lib/Text/Amuse/Compile/Fonts/Selected.pm
+lib/Text/Amuse/Compile/Indexer.pm
+lib/Text/Amuse/Compile/Indexer/Specification.pm
 lib/Text/Amuse/Compile/Merged.pm
 lib/Text/Amuse/Compile/MuseHeader.pm
 lib/Text/Amuse/Compile/TemplateOptions.pm
@@ -55,6 +57,7 @@ t/header.t
 t/headings.t
 t/html-title.t
 t/html.t
+t/indexes.t
 t/langs.t
 t/leaks.t
 t/log-encoding.log
@@ -118,6 +121,10 @@ t/testfile/epub-meta.muse
 t/testfile/for-epub.muse
 t/testfile/for-multipar-footnotes.muse
 t/testfile/html-title.muse
+t/testfile/index-me-1.expected
+t/testfile/index-me-1.muse
+t/testfile/index-me-2.muse
+t/testfile/index-me.muse
 t/testfile/invalid.muse
 t/testfile/options-2.muse
 t/testfile/slides.muse

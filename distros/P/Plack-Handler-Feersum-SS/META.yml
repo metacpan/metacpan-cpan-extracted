@@ -1,0 +1,33 @@
+---
+abstract: 'Server::Starter adapter for Feersum Plack handler'
+author:
+  - 'Yegor Korablev <egor@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Handler-Feersum-SS
+requires:
+  Carp: '0'
+  Fcntl: '0'
+  Feersum: '0'
+  Plack::Handler::Feersum: '0'
+  Server::Starter: '0'
+  Symbol: '0'
+  base: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/vividsnow/Plack-Handler-Feersum-SS/issues
+  repository: git://github.com/vividsnow/Plack-Handler-Feersum-SS.git
+version: '0.02'
+x_generated_by_perl: v5.30.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

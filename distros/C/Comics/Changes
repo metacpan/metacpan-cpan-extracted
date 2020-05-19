@@ -1,6 +1,13 @@
 Revision history for Comics
 
-1.xx
+1.16	2020-05-19
+
+	Add GrrlPower, DayByDay, GunnerKrigg, TimeTrabble.
+	Fix url for GeekAndPoke, GrrlPower, TheOtherEnd, PoorlyDrawnLines.
+	Fix patterns for GirlsWithSlingshots, Optipess, DirkJan,
+	DoYouKnowFlo, FrogPants, LeastICouldDo.
+
+1.15	2019-08-04
 
 	Fix patterns for Nozzman, GeekAndPoke, AMultiverse, JHall,
 	Frogpants, LittleGamers, Glasbergen.

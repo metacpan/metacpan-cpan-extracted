@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -14,8 +14,13 @@ $^W = 1;
 
 my $BIN = $] < 5.006 ? '%x' : '%08b';
 
-my $c = eval { new Convert::Binary::C Bitfields => { Engine => 'Simple', BlockSize => 4 },
-                                      EnumType  => 'String' };
+my $c = eval {
+  Convert::Binary::C->new(
+    Bitfields => { Engine => 'Simple', BlockSize => 4 },
+    EnumType  => 'String'
+  );
+};
+
 is($@, '', "failed to create Convert::Binary::C object");
 
 eval { $c->parse(<<ENDC) };

@@ -8,7 +8,7 @@
 #
 ################################################################################
 #
-# Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -23,7 +23,7 @@ use vars qw( @ISA $VERSION $AUTOLOAD );
 
 @ISA = qw(DynaLoader);
 
-$VERSION = '0.78';
+$VERSION = '0.79';
 
 bootstrap Convert::Binary::C $VERSION;
 
@@ -103,7 +103,7 @@ Convert::Binary::C - Binary Data Conversion using C Types
   #---------------------
   # Create a new object
   #---------------------
-  my $c = new Convert::Binary::C ByteOrder => 'BigEndian';
+  my $c = Convert::Binary::C->new(ByteOrder => 'BigEndian');
   
   #---------------------------------------------------
   # Add include paths and global preprocessor defines
@@ -349,8 +349,8 @@ and alignment, you can use
 
 or you can change the construction code to
 
-  $c = new Convert::Binary::C ByteOrder => 'LittleEndian',
-                              Alignment => 2;
+  $c = Convert::Binary::C->new(ByteOrder => 'LittleEndian',
+                               Alignment => 2);
 
 Either way, the object will now know that it should use
 little endian (Intel) byte order and 2-byte struct member
@@ -606,7 +606,7 @@ Basic types, or atomic types, are C<int> or C<char>, for example.
 It's possible to use these basic types without having parsed any
 code. You can simply do
 
-  $c = new Convert::Binary::C;
+  $c = Convert::Binary::C->new;
   $size = $c->sizeof('unsigned long');
   $data = $c->pack('short int', 42);
 
@@ -1450,7 +1450,7 @@ the perl internals using hooks.
 
   use Config;
   
-  $c = new Convert::Binary::C %CC, OrderMembers => 1;
+  $c = Convert::Binary::C->new(%CC, OrderMembers => 1);
   $c->Include(["$Config{archlib}/CORE", @{$c->Include}]);
   $c->parse(<<ENDC);
   #include "EXTERN.h"
@@ -1604,7 +1604,7 @@ wins.
 The constructor is used to create a new Convert::Binary::C object.
 You can simply use
 
-  $c = new Convert::Binary::C;
+  $c = Convert::Binary::C->new;
 
 without additional arguments to create an object, or you can
 optionally pass any arguments to the constructor that are
@@ -1649,8 +1649,8 @@ used with the L<Data::Dumper|Data::Dumper> module, for example:
   use Convert::Binary::C;
   use Data::Dumper;
   
-  $c = new Convert::Binary::C Define  => ['DEBUGGING', 'FOO=123'],
-                              Include => ['/usr/include'];
+  $c = Convert::Binary::C->new(Define  => ['DEBUGGING', 'FOO=123'],
+                               Include => ['/usr/include']);
   
   print Dumper($c->configure);
 
@@ -1719,7 +1719,7 @@ But if you pass a list of strings instead of an array reference
 (which cannot be done when using L<C<configure>|/"configure">),
 the new list items are B<appended> to the current list, so
 
-  $c = new Convert::Binary::C Include => ['/include'];
+  $c = Convert::Binary::C->new(Include => ['/include']);
   $c->Include('/usr/include', '/usr/local/include');
   print Dumper($c->Include);
   
@@ -2616,7 +2616,7 @@ The L<C<clean>|/"clean"> method returns a reference to its object.
 
 Makes the object return an exact independent copy of itself.
 
-  $c = new Convert::Binary::C Include => ['/usr/include'];
+  $c = Convert::Binary::C->new(Include => ['/usr/include']);
   $c->parse_file('definitions.c');
   $clone = $c->clone;
 
@@ -2626,9 +2626,9 @@ the order of the parsed data, which would make methods such
 as L<C<compound>|/"compound"> return the definitions in a different
 order.) to:
 
-  $c = new Convert::Binary::C Include => ['/usr/include'];
+  $c = Convert::Binary::C->new(Include => ['/usr/include']);
   $c->parse_file('definitions.c');
-  $clone = new Convert::Binary::C %{$c->configure};
+  $clone = Convert::Binary::C->new(%{$c->configure});
   $clone->parse($c->sourcify);
 
 Using L<C<clone>|/"clone"> is just a lot faster.
@@ -3945,7 +3945,7 @@ represent all parsed C data structures.
 
   use Convert::Binary::C;
   
-  $c = new Convert::Binary::C;
+  $c = Convert::Binary::C->new;
   $c->parse(<<'END');
   
   #define ADD(a, b) ((a) + (b))
@@ -5463,7 +5463,7 @@ want to rate the module at L<http://cpanratings.perl.org/>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 

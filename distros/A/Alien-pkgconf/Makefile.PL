@@ -51,7 +51,9 @@ my %args = (
         url  => "http://github.com/Perl5-Alien/Alien-pkgconf.git",
         web  => "http://github.com/Perl5-Alien/Alien-pkgconf",
       },
-      bugtracker => "http://github.com/Perl5-Alien/Alien-pkgconf/issues",
+      bugtracker => {
+        web  => 'https://github.com/PerlPkgConfig/perl-PkgConfig/issues',
+      },
       x_MailingList => "https://groups.google.com/forum/#!forum/perl5-alien",
       x_IRC => "irc://irc.perl.org/#native",
     },

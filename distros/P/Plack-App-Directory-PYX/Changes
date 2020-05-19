@@ -1,3 +1,6 @@
+0.04 2020-05-19T17:19:16+02:00
+ - Fix bad module name in doc.
+
 0.03 2020-05-01T15:28:05+02:00
  - Fix (hack) difference between XS and PP versions in Cookie::Baker and
    WWW::Form::UrlEncoded::XS (RT#132460).

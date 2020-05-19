@@ -12,7 +12,7 @@ use warnings;
 
 our $VERSION;
 BEGIN {
-our $VERSION = '1.35'; # VERSION
+our $VERSION = '1.36'; # VERSION
 }
 
 use Devel::Cover::DB;
@@ -50,11 +50,11 @@ sub class {
     my ($pc, $err, $criterion) = @_;
     return "" if $criterion eq "time";
     no warnings "uninitialized";
-    !$err ? "c3"
-          : $pc < $threshold->{c0} ? "c0"
-          : $pc < $threshold->{c1} ? "c1"
-          : $pc < $threshold->{c2} ? "c2"
-          : "c3"
+      !$err                  ? "c3"
+    : $pc < $threshold->{c0} ? "c0"
+    : $pc < $threshold->{c1} ? "c1"
+    : $pc < $threshold->{c2} ? "c2"
+    :                          "c3"
 }
 
 sub get_summary {
@@ -75,8 +75,8 @@ sub get_summary {
     $vals{details}  = "$vals{covered} / $vals{total}";
 
     my $cr = $criterion eq "pod" ? "subroutine" : $criterion;
-    return \%vals
-      if $cr !~ /^branch|condition|subroutine$/ || !exists $R{filenames}{$file};
+    return \%vals if $cr !~ /^branch|condition|subroutine$/ ||
+                     !exists $R{filenames}{$file};
     $vals{link} = "$R{filenames}{$file}--$cr.html";
 
     \%vals
@@ -96,12 +96,12 @@ sub print_summary {
 
 sub _highlight_ppi {
     my @all_lines = @_;
-    my $code = join "", @all_lines;
-    my $document = PPI::Document->new(\$code);
+    my $code      = join "", @all_lines;
+    my $document  = PPI::Document->new(\$code);
     my $highlight = PPI::HTML->new(line_numbers => 1);
-    my $pretty =  $highlight->html($document);
+    my $pretty    = $highlight->html($document);
 
-    my $split = '<span class="line_number">';
+    my $split     = '<span class                ="line_number">';
 
     no warnings "uninitialized";
 
@@ -128,19 +128,21 @@ sub _highlight_ppi {
     } @all_lines;
 
     shift @all_lines if $all_lines[0] eq "";
-    return @all_lines;
+
+    @all_lines
 }
 
 sub _highlight_perltidy {
     my @all_lines = @_;
-    my @coloured = ();
+    my @coloured;
 
+    my ($stderr, $errorfile);
     Perl::Tidy::perltidy(
         source      => \@all_lines,
         destination => \@coloured,
-        argv        => '-html -pre -nopod2html',
-        stderr      => '-',
-        errorfile   => '-',
+        argv        => "-html -pre -nopod2html",
+        stderr      => \$stderr,
+        errorfile   => \$errorfile,
     );
 
     # remove the PRE
@@ -148,12 +150,12 @@ sub _highlight_perltidy {
     pop @coloured;
     @coloured = grep { !/<a name=/ } @coloured;
 
-    return @coloured
+    @coloured
 }
 
 *_highlight = $Have_PPI      ? \&_highlight_ppi
             : $Have_perltidy ? \&_highlight_perltidy
-            : sub {};
+            :                  sub {};
 
 sub print_file {
     my @lines;
@@ -226,13 +228,14 @@ sub print_file {
     # first line has a ref to the first uncovered line unless
     # the first line already is uncovered in which case it links
     # to the *next* uncovered line
-    {  my @unc = grep { $_->{criteria}[0]{class} eq "c0" &&
-                         $_->{criteria}[0]{text}  eq  "0" } @lines;
-       while (@unc) {
-           my $u = pop @unc;
-           my $link = "#" . $u->{number};
-           (@unc ? $unc[-1] : $lines[0])->{criteria}[0]{link} ||= $link;
-       }
+    {
+        my @unc = grep { $_->{criteria}[0]{class} eq "c0" &&
+            $_->{criteria}[0]{text}  eq  "0" } @lines;
+        while (@unc) {
+            my $u = pop @unc;
+            my $link = "#" . $u->{number};
+            (@unc ? $unc[-1] : $lines[0])->{criteria}[0]{link} ||= $link;
+        }
     }
 
     my $vars = {
@@ -450,7 +453,7 @@ package Devel::Cover::Report::Html_basic::Template::Provider;
 use strict;
 use warnings;
 
-our $VERSION = '1.35'; # VERSION
+our $VERSION = '1.36'; # VERSION
 
 use base "Template::Provider";
 
@@ -809,7 +812,7 @@ Devel::Cover::Report::Html_basic - HTML backend for Devel::Cover
 
 =head1 VERSION
 
-version 1.35
+version 1.36
 
 =head1 SYNOPSIS
 

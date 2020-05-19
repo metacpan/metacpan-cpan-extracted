@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -18,14 +18,16 @@ BEGIN { plan tests => 207 }
 #===================================================================
 
 eval {
-  $p = new Convert::Binary::C PointerSize => 4,
-                              EnumSize    => 4,
-                              IntSize     => 4,
-                              LongSize    => 4,
-                              Alignment   => 2,
-                              ByteOrder   => 'BigEndian',
-                              EnumType    => 'String';
-  $q = new Convert::Binary::C;
+  $p = Convert::Binary::C->new(
+    PointerSize => 4,
+    EnumSize    => 4,
+    IntSize     => 4,
+    LongSize    => 4,
+    Alignment   => 2,
+    ByteOrder   => 'BigEndian',
+    EnumType    => 'String'
+  );
+  $q = Convert::Binary::C->new;
 };
 ok($@,'');
 
@@ -255,7 +257,7 @@ reccmp( $refres, $result );
 # test pack/unpack/sizeof/typeof for basic types
 #------------------------------------------------
 
-$p = new Convert::Binary::C;
+$p = Convert::Binary::C->new;
 
 @tests = (
   ['char',        $p->CharSize      ],

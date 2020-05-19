@@ -12,7 +12,7 @@ use warnings;
 
 our $VERSION;
 BEGIN {
-our $VERSION = '1.35'; # VERSION
+our $VERSION = '1.36'; # VERSION
 }
 
 use DynaLoader ();
@@ -346,7 +346,7 @@ sub import {
         $Dir = $1 if Cwd::getcwd() =~ /(.*)/;
     }
 
-    $DB = File::Spec->catdir($Dir, $DB);
+    $DB = File::Spec->rel2abs($DB, $Dir);
     unless (mkdir $DB) {
         die "Can't mkdir $DB: $!" unless -d $DB;
     }
@@ -1289,7 +1289,7 @@ Devel::Cover - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.35
+version 1.36
 
 =head1 SYNOPSIS
 
@@ -1407,6 +1407,8 @@ Both are in the core in Perl 5.8.0 and above.
 =item * L<B::Debug>
 
 This was core before Perl 5.30.0.
+
+=back
 
 =head2 OPTIONAL MODULES
 

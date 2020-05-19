@@ -5,14 +5,13 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.180';
+our $VERSION = '1.181';
 
 use Quiq::Object;
 use Time::HiRes ();
 use Quiq::Option;
 use Quiq::FileHandle;
 use Quiq::Properties;
-use Quiq::Excel::Writer;
 use Quiq::AnsiColor;
 use Quiq::Array;
 use Quiq::Duration;
@@ -696,6 +695,9 @@ Schreibe die Tabelle im Excel-Format auf Datei $file.
 sub asExcel {
     my ($self,$file) = @_;
 
+    # Dieses Modul laden wir nur, wenn wir diese Methode nutzen
+    require Quiq::Excel::Writer;
+
     # Erzeuge Excel Workbook
     my $wkb = Quiq::Excel::Writer->new($file);
 
@@ -1031,9 +1033,43 @@ sub diffReport {
 
 # -----------------------------------------------------------------------------
 
+=head3 reverse() - Kehre Reihenfolge der Datensätze um
+
+=head4 Synopsis
+
+  $tab = $tab->reverse;
+
+=head4 Returns
+
+Tabellen-Objekt (für Method-Chaining)
+
+=head4 Description
+
+Kehre die Reihenfolge der Datensätze innerhalb des Tabellenobjekts
+um und liefere eine Referenz auf das Tabellenobjekt zurück.
+
+Diese Methode ist nützlich, wenn die ersten N Datensätze einer
+geordneten Selektion in umgekehrter Reihenfolge ausgegeben werden
+sollen.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub reverse {
+    my $self = shift;
+
+    my $rowsA = $self->rows;
+    @$rowsA = reverse @$rowsA;
+
+    return $self;
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.180
+1.181
 
 =head1 AUTHOR
 

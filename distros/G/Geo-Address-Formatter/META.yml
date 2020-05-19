@@ -21,21 +21,22 @@ name: Geo-Address-Formatter
 provides:
   Geo::Address::Formatter:
     file: lib/Geo/Address/Formatter.pm
-    version: '1.81'
+    version: '1.82'
 requires:
-  Clone: '0.43'
+  Clone: '0.45'
   Data::Dumper: '0'
   File::Basename: '0'
   File::Find::Rule: '0'
   List::Util: '0'
+  Ref::Util: '0.204'
   Scalar::Util: '0'
   Text::Hogan: '2.03'
   Try::Catch: '0'
-  YAML::LibYAML: '0.81'
+  YAML::LibYAML: '0.82'
   perl: '5.012'
 resources:
   bugtracker: https://github.com/OpenCageData/perl-Geo-Address-Formatter/issues
   repository: git://github.com/OpenCageData/perl-Geo-Address-Formatter
-version: '1.81'
+version: '1.82'
 x_generated_by_perl: v5.26.3
 x_serialization_backend: 'YAML::Tiny version 1.73'

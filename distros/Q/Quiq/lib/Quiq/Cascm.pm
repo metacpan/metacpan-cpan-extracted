@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.180';
+our $VERSION = '1.181';
 
 use Quiq::Database::Row::Array;
 use Quiq::AnsiColor;
@@ -486,6 +486,9 @@ sub edit {
 
     my $tmpDir = '~/tmp/cascm/';
 
+    # Checke Datei aus
+    $output .= $self->checkout($transportPackage || $package,$repoFile);
+
     # Lokale Kopie der Datei erstellen
 
     my $localFile;
@@ -502,9 +505,6 @@ sub edit {
 
     my $backupFile = "$localFile.bak";
     $p->copy($localFile,$backupFile);
-
-    # Checke Datei aus
-    $output .= $self->checkout($transportPackage || $package,$repoFile);
 
     my $fileChanged = 0;
     my $editCmd = "emacs -nw $localFile";
@@ -656,6 +656,16 @@ Liste von Dateien I<außerhalb> des Workspace.
 
 =back
 
+=head4 Options
+
+=over 4
+
+=item -force => $bool (Default: 0)
+
+Prüfe nicht, ob hinzugefügte Datei und Repository-Datei identisch sind.
+
+=back
+
 =head4 Returns
 
 Konkatenierte Ausgabe der der checkout- und checkin-Kommandos (String)
@@ -677,7 +687,18 @@ braucht sich um die Unterscheidung nicht zu kümmern.
 # -----------------------------------------------------------------------------
 
 sub putFiles {
-    my ($self,$package,$repoDir,@files) = @_;
+    my $self = shift;
+
+    # Optionen und Argumente
+
+    my $force = 0;
+
+    my $argA = $self->parameters(3,undef,\@_,
+        -force => \$force,
+    );
+    my ($package,$repoDir,@files) = @$argA;
+
+    # Operation ausführen
 
     my $workspace = $self->workspace;
     my $p = Quiq::Path->new;
@@ -714,7 +735,7 @@ sub putFiles {
             # und die Workspace-Datei sich unterscheiden. Wenn nein, ist
             # nichts zu tun.
 
-            if (!$p->compare($srcFile,"$workspace/$repoFile")) {
+            if (!$force && !$p->compare($srcFile,"$workspace/$repoFile")) {
                 # Bei fehlender Differenz tun wir nichts
                 next;
             }
@@ -1191,8 +1212,8 @@ sub diff {
 
 =head4 Synopsis
 
-  $output = $scm->deleteVersion($repoFile);
-  $output = $scm->deleteVersion($repoFile,$version);
+  $bool = $scm->deleteVersion($repoFile);
+  $bool = $scm->deleteVersion($repoFile,$version);
 
 =head4 Arguments
 
@@ -1210,7 +1231,7 @@ Version der Datei, die gelöscht werden soll.
 
 =head4 Returns
 
-Ausgabe des Kommandos (String)
+Wahrheitswert: 1, wenn Löschung ausgeführt wurde, andernfalls 0.
 
 =head4 Description
 
@@ -1241,8 +1262,6 @@ Die Versionen bis 110 der Datei C<lib/MetaData.pm> löschen:
 sub deleteVersion {
     my ($self,$repoFile,$version) = @_;
 
-    my $output;
-
     if (!defined $version) {
         $version = $self->versionNumber($repoFile);
     }
@@ -1267,10 +1286,10 @@ sub deleteVersion {
     my $answ = Quiq::Terminal->askUser(
         $count == 1? 'Delete this version?': 'Delete these versions?',
         -values => 'y/n',
-        -default => 'n',
+        -default => 'y',
     );
     if ($answ ne 'y') {
-        return undef; # Abbruch
+        return 0; # Abbruch
     }
 
     # Transportpaket erzeugen, falls nötig
@@ -1281,7 +1300,7 @@ sub deleteVersion {
         if ($row->[3] ne $self->states->[0]) {
             my $name = Quiq::Converter->intToWord(time);
             $transportPackage = "S6800_0_Seitz_Lift_$name";
-            $output .= $self->createPackage($transportPackage);
+            $self->createPackage($transportPackage);
             last;
         }
     }
@@ -1300,7 +1319,6 @@ sub deleteVersion {
                 if ($out) {
                     # Ab der 2. Bewegung fragen wir zurück
                     $transportPackageCount++;
-                    $output .= $out;
                 }
 
                 # Version in Transportpackage bewegen
@@ -1336,16 +1354,16 @@ sub deleteVersion {
             # Löschen ist nur auf unterster Stufe möglích
             -st => $self->states->[0],
         );
-        $output .= $self->runCmd('hdv',$c);
+        $self->runCmd('hdv',$c);
     }
 
     # Transportpaket löschen
 
     if ($transportPackage) {
-        $output .= $self->deletePackages($transportPackage);
+        $self->deletePackages($transportPackage);
     }
 
-    return $output;
+    return 1;
 }
 
 # -----------------------------------------------------------------------------
@@ -1403,6 +1421,87 @@ sub passVersion {
 
     my ($repoDir) = $p->split($repoFile);
     return $self->putFiles($package,$repoDir,$file);
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 reduceVersion() - Mache die neueste Version zu früherer Version
+
+=head4 Synopsis
+
+  $output = $scm->reduceVersion($repoFile,$version);
+
+=head4 Arguments
+
+=over 4
+
+=item $repoFile
+
+Der Pfad der Repository-Datei.
+
+=item $version
+
+Versionsnummer, auf die die neuste Version zurückgeführt werden soll.
+
+=back
+
+=head4 Returns
+
+Boolean. 1, wenn Operation ausgeführt wurde, sonst 0. 0 wird geliefert,
+wenn der Nutzer die Rückfrage nach der Löschung der Dateien mit
+"nein" beantwortet.
+
+=head4 Description
+
+Sichere den Quelltext der neusten Version, lösche alle Versionen bis
+und einschließlich Version $version und checke den gesicherten Quelltext
+ein. Der Ergebnis ist, dass die neuste Version zu Version $version wird.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub reduceVersion {
+    my ($self,$repoFile,$version) = @_;
+
+    my $p = Quiq::Path->new;
+
+    # Höchste Versionsnummer der Datei ermitteln
+
+    my $repoVersion = $self->versionNumber($repoFile);
+    if ($version >= $repoVersion) {
+        # Es ist nichts zu tun
+        return 0;
+    }
+
+    # Package der neusten Version ermitteln. In diesem Package
+    # wird auch die neuerzeugte frühere Version abgelegt.
+
+    my $package = $self->package($repoFile,$repoVersion);
+
+    # Datei der neusten Version sichern
+
+    my $tmpDir = '~/tmp/cascm';
+    my $file = $self->getVersion($repoFile,$repoVersion,$tmpDir,
+        -sloppy => 1,
+        -versionSuffix => 0,
+    );
+
+    # Alle Versionen bis $version löschen
+
+    my $bool = $self->deleteVersion($repoFile,$version);
+    if ($bool) {
+        # Repository-Verzeichnis der Datei
+        my ($repoDir) = $p->split($repoFile);
+
+        # Gesicherte Datei zum Repository hinzufügen
+        $self->putFiles(-force=>1,$package,$repoDir,$file);
+    }
+
+    # Gesicherte Datei löschen
+    $p->delete($file);
+
+    return 1;
 }
 
 # -----------------------------------------------------------------------------
@@ -2019,7 +2118,7 @@ sub renamePackage {
 
 # -----------------------------------------------------------------------------
 
-=head3 showPackage() - Inhalt eines Package
+=head3 showPackage() - Inhalt von Packages
 
 =head4 Synopsis
 
@@ -2032,8 +2131,8 @@ Datensätze oder Ergebnismengen-Objekt
 
 =head4 Description
 
-Ermittele die in Package $package enthaltenen Items und ihrer Versions
-und liefere diese Ergebnismenge zurück.
+Ermittele die in den Packages @packages enthaltenen Items und
+ihrer Versions und liefere diese Ergebnismenge zurück.
 
 =head4 Example
 
@@ -2042,6 +2141,9 @@ und liefere diese Ergebnismenge zurück.
   1 item_path
   2 version
   3 package_name
+  4 creation_time
+  5 username
+  6 versionstatus
 
 =cut
 
@@ -2072,10 +2174,15 @@ sub showPackage {
             , ver.mappedversion AS version
             -- , ver.versiondataobjid
             , pkg.packagename
+            , ver.creationtime
+            , usr.username
+            , ver.versionstatus
         FROM
             haritems itm
             JOIN harversions ver
                 ON ver.itemobjid = itm.itemobjid
+            JOIN harallusers usr
+                ON usr.usrobjid = ver.creatorid
             JOIN harpackage pkg
                 ON pkg.packageobjid = ver.packageobjid
             JOIN harenvironment env
@@ -2144,6 +2251,10 @@ Ausgabe des Kommandos (String)
 
 Übertrage die Dateien @files von Paket $fromPackage in Paket $toPackage.
 Sind keine Dateien angegeben, übertrage alle Dateien aus $fromPackage.
+
+Per Default werden I<alle> Versionen einer Datei übertragen. Soll eine
+bestimmte Version übertragen werden, wird der Suffix :VERSION an
+den Dateinamen angehängt.
 
 =cut
 
@@ -2494,6 +2605,17 @@ sub packageState {
 =head4 Synopsis
 
   $tab = $scm->listPackages(@opt);
+  $tab = $scm->listPackages($likePattern,@opt);
+
+=head4 Arguments
+
+=over 4
+
+=item $likePattern
+
+Schränke die Liste auf Packages ein, deren Name $likePattern matchen.
+
+=back
 
 =head4 Options
 
@@ -2526,14 +2648,16 @@ Liefere die Liste aller Packages.
 
 sub listPackages {
     my $self = shift;
+    # @_: $likePattern,@opt
 
     # Optionen
 
     my $order = 'time';
 
-    $self->parameters(\@_,
+    my $argA = $self->parameters(0,1,\@_,
         -order => \$order,
     );
+    my $likePattern = shift(@$argA) // '';
 
     # Operation ausführen
 
@@ -2555,6 +2679,7 @@ sub listPackages {
                 ON usr.usrobjid = pkg.creatorid
         WHERE
             env.environmentname = '$projectContext'
+            AND pkg.packagename LIKE '%$likePattern%'
         ORDER BY
             $order
     ");
@@ -2929,7 +3054,7 @@ sub runSql {
 
 =head1 VERSION
 
-1.180
+1.181
 
 =head1 AUTHOR
 

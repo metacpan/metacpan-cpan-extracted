@@ -1,0 +1,32 @@
+=encoding utf8
+
+=head1 NAME
+
+Plack::Handler::Feersum::SS
+
+=head1 SYNOPSIS
+
+unix socket:
+
+   start_server --signal-on-hup QUIT --path /tmp/app.sock -- \
+       plackup -s Feersum::SS --pre-fork N app.psgi
+
+tcp socket:
+
+   start_server --signal-on-hup QUIT --port 5000 -- \
+       plackup -s Feersum::SS --pre-fork N app.psgi
+
+=head1 DESCRIPTION
+
+Support running Feersum plack handler via Server::Starter
+
+=head1 AUTHOR
+
+Yegor Korablev <egor@cpan.org>
+
+=head1 SEE ALSO
+
+L<Feersum>, L<Server::Starter>, L<Plack>, L<EV>
+
+
+=cut

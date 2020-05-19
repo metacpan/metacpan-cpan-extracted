@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -48,7 +48,7 @@ sub check_config
 
       my $reference = $config->{out} || $config->{in};
 
-      eval { $p = new Convert::Binary::C };
+      eval { $p = Convert::Binary::C->new };
       skip($reason, $@, '', "failed to create Convert::Binary::C object");
 
       print "# \$p->configure( $option => $config->{in} )\n";
@@ -159,7 +159,7 @@ sub check_option_strlist
   for my $config ( @tests ) {
     @warn = ();
 
-    eval { $p = new Convert::Binary::C };
+    eval { $p = Convert::Binary::C->new };
     ok($@, '', "failed to create Convert::Binary::C object");
 
     print "# \$p->configure( $option => $config->{in} )\n";
@@ -223,7 +223,7 @@ sub check_option_strlist_args {
   my $option = shift;
   my @warn;
   eval {
-    $p = new Convert::Binary::C;
+    $p = Convert::Binary::C->new;
     $p->$option( [qw(foo bar)] );
     $p->$option( 'include' );
     $p->$option( qw(a b c) );
@@ -433,19 +433,19 @@ check_option_strlist_args( $_ ) for qw( Include
 #===================================================================
 
 eval {
-  $p = new Convert::Binary::C;
+  $p = Convert::Binary::C->new;
   $p->configure( DisabledKeywords => ['void', 'foo', 'const'] );
 };
 ok( $@, qr/Cannot disable unknown keyword 'foo'.*$thisfile/ );
 
 eval {
-  $p = new Convert::Binary::C;
+  $p = Convert::Binary::C->new;
   $p->DisabledKeywords( 'void', 'foo', 'const' );
 };
 ok( $@, qr/DisabledKeywords cannot take more than one argument.*$thisfile/ );
 
 eval {
-  $p = new Convert::Binary::C;
+  $p = Convert::Binary::C->new;
   $p->DisabledKeywords( ['auto', 'enum'] );
   $p->DisabledKeywords( ['void', 'while', 'register'] );
 };
@@ -458,43 +458,43 @@ ok( "@$kw", "auto enum", 'DisabledKeywords did not preserve configuration' );
 #===================================================================
 
 eval {
-  $p = new Convert::Binary::C;
+  $p = Convert::Binary::C->new;
   $p->configure( KeywordMap => 5 );
 };
 ok( $@, qr/KeywordMap wants a hash reference.*$thisfile/ );
 
 eval {
-  $p = new Convert::Binary::C;
+  $p = Convert::Binary::C->new;
   $p->configure( KeywordMap => [ __xxx__ => 'foo' ] );
 };
 ok( $@, qr/KeywordMap wants a hash reference.*$thisfile/ );
 
 eval {
-  $p = new Convert::Binary::C;
+  $p = Convert::Binary::C->new;
   $p->KeywordMap( { '' => 'int' } );
 };
 ok( $@, qr/Cannot use empty string as a keyword.*$thisfile/ );
 
 eval {
-  $p = new Convert::Binary::C;
+  $p = Convert::Binary::C->new;
   $p->KeywordMap( { '1_d' => 'int' } );
 };
 ok( $@, qr/Cannot use '1_d' as a keyword.*$thisfile/ );
 
 eval {
-  $p = new Convert::Binary::C;
+  $p = Convert::Binary::C->new;
   $p->KeywordMap( { '_d' => [] } );
 };
 ok( $@, qr/Cannot use a reference as a keyword.*$thisfile/ );
 
 eval {
-  $p = new Convert::Binary::C;
+  $p = Convert::Binary::C->new;
   $p->KeywordMap( { '_d' => 'foo' } );
 };
 ok( $@, qr/Cannot use 'foo' as a keyword.*$thisfile/ );
 
 eval {
-  $p = new Convert::Binary::C;
+  $p = Convert::Binary::C->new;
   $p->KeywordMap( {'__const' => 'const', '__restrict' => undef} );
   $p->KeywordMap( {'__volatile' => 'volatile', '__foo' => 'foo'} );
 };
@@ -512,7 +512,7 @@ ok( "@{[sort keys %$kw]}", "__const __restrict", 'KeywordMap did not preserve co
 foreach $config ( @tests )
 {
   eval {
-    $p = new Convert::Binary::C;
+    $p = Convert::Binary::C->new;
     $p->configure( @{$config->{value}} );
   };
   ok( ($@ eq '' ? SUCCEED : FAIL), $config->{result},
@@ -524,7 +524,7 @@ foreach $config ( @tests )
 # check invalid option
 #===================================================================
 eval {
-  $p = new Convert::Binary::C;
+  $p = Convert::Binary::C->new;
   $p->configure(
     Something => 'xxx',
     ByteOrder => 'BigEndian',
@@ -537,7 +537,7 @@ ok( $@, qr/Invalid option 'Something'.*$thisfile/ );
 # check invalid method
 #===================================================================
 eval {
-  $p = new Convert::Binary::C;
+  $p = Convert::Binary::C->new;
   $p->some_method( 1, 2, 3 );
 };
 ok( $@, qr/Invalid method some_method called.*$thisfile/ );
@@ -578,7 +578,7 @@ ok( $@, qr/Invalid method some_method called.*$thisfile/ );
 );
 
 eval {
-  $p = new Convert::Binary::C %config;
+  $p = Convert::Binary::C->new( %config );
   $cfg = $p->configure;
 };
 ok( $@, '', "failed to retrieve configuration" );
@@ -625,7 +625,7 @@ ok( compare_config( \%config, $cfg ) );
 eval {
   local $SIG{__WARN__} = sub { push @warn, shift };
 
-  $p = new Convert::Binary::C %config;
+  $p = Convert::Binary::C->new( %config );
 
   $p->UnsignedChars( 1 )->configure( ShortSize => 4, EnumType => 'Both', EnumSize => 0 )
     ->Include( ['/usr/local/include'] )->DoubleSize( 8 )

@@ -51,6 +51,9 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PerlPkgConfig/perl-PkgConfig/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "http://github.com/Perl5-Alien/Alien-pkgconf.git",
@@ -59,6 +62,6 @@
       "x_IRC" : "irc://irc.perl.org/#native",
       "x_MailingList" : "https://groups.google.com/forum/#!forum/perl5-alien"
    },
-   "version" : "0.16",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.17",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

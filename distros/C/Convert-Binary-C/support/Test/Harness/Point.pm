@@ -17,7 +17,7 @@ One Test::Harness::Point object represents a single test point.
 
 =head2 new()
 
-    my $point = new Test::Harness::Point;
+    my $point = Test::Harness::Point->new;
 
 Create a test point object.
 

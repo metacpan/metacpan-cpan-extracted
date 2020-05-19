@@ -3,7 +3,7 @@ use IO::File;
 while (<DATA>) {
   /\S/ or next;
   my $file = sprintf "t/%03d.t", ++$i;
-  my $f = new IO::File ">$file" or die "$file: $!\n";
+  my $f = IO::File->new(">$file") or die "$file: $!\n";
   print $f <<END
 require 't/test_memalloc.pl';
 $_

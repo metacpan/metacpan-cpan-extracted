@@ -132,7 +132,7 @@ sub test {
 }
 
 sub slurp {
-  my $file = new IO::File $_[0] or die "$_[0]: $!\n";
+  my $file = IO::File->new($_[0]) or die "$_[0]: $!\n";
   <$file>;
 }
 

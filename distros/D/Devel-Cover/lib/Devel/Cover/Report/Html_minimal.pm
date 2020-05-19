@@ -10,7 +10,7 @@ use Devel::Cover::Truth_Table;
 
 our $VERSION;
 BEGIN {
-our $VERSION = '1.35'; # VERSION
+our $VERSION = '1.36'; # VERSION
 }
 
 use Devel::Cover::Inc;
@@ -757,7 +757,7 @@ Devel::Cover::Report::Html_minimal - HTML backend for Devel::Cover
 
 =head1 VERSION
 
-version 1.35
+version 1.36
 
 =head1 SYNOPSIS
 

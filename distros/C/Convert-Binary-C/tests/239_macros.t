@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Copyright (c) 2002-2015 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -12,7 +12,7 @@ use Convert::Binary::C @ARGV;
 my @stdname = qw( __STDC_HOSTED__ __STDC_VERSION__ );
 my @stddef  = qw( __STDC_HOSTED__=1 __STDC_VERSION__=199901L );
 
-my $c = new Convert::Binary::C;
+my $c = Convert::Binary::C->new;
 
 eval {
   $c->parse('');

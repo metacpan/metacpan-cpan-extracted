@@ -27,7 +27,7 @@ METHODS
   dynamic_libs
      my($dll) = Alien::pkgconf->dynamic_libs;
 
-    The ".so", ".dll" or <.dynlib> shared or dynamic library which can be
+    The ".so", ".dll" or ".dynlib" shared or dynamic library which can be
     used via FFI.
 
   version
@@ -68,6 +68,10 @@ ACKNOWLEDGMENTS
 
 AUTHOR
     Graham Ollis
+
+    Contributors:
+
+    Thibault Duponchelle (tib)
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2016 Graham Ollis.

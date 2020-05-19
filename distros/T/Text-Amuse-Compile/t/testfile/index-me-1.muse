@@ -1,0 +1,110 @@
+#title Test Index 1
+#lang hr
+
+<comment>
+INDEX testć: Kazalo imena
+\testx: {&test}
+</comment>
+
+<comment>
+INDEX imena: \crash{Žćđ}
+Krleža: Krleža, Miroslav
+Miroslav Krleža: Krleža, Miroslav
+Andrić: Andrić, Ivo
+*em*: % test me %&_ without characters with curly because it breaks the test
+{^legittest^}: Legit test$
+{"legittest"}: Legit test$
+\test: another & test
+Prova~~prova: Prova
+</comment>
+
+<comment>
+INDEX mjesta: Kazalo mjesta
+Ci
+Ča
+Ći
+Dubrovnik
+Džamija
+Žu
+
+</comment>
+
+
+STARTHERE
+
+
+
+            * * * * *
+
+{^legittest^}
+
+            * * * * *
+
+Ivo Andrić...
+
+            * * * * *
+
+Krleža
+
+            * * * * *
+
+Miroslav Krleža
+
+            * * * * *
+
+\test
+
+            * * * * *
+
+\test
+
+            * * * * *
+
+{"legittest"}
+
+            * * * * *
+
+Prova~~prova Prova~~prova Ci Dubrovnik {"legittest"}
+
+
+            * * * * *
+
+*em*  Prova~~prova *em*
+
+            * * * * *
+
+\testx \testx
+
+            * * * * *
+
+*em*
+
+            * * * * *
+
+            * * * * *
+
+Ci Džamija
+Dubrovnik
+
+            * * * * *
+
+Ča Ci Ći Dubrovnik
+Džamija
+
+            * * * * *
+
+Ći
+
+            * * * * *
+
+Dubrovnik
+
+            * * * * *
+
+Džamija
+
+            * * * * *
+
+Žu
+
+ENDHERE            

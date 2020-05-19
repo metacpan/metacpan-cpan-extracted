@@ -10,7 +10,7 @@ use Carp;
 
 
 
-our $VERSION = "0.018.2";
+our $VERSION = "0.018.3";
 
 use Text::Layout::FontDescriptor;
 
