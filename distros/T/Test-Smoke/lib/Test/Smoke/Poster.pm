@@ -8,7 +8,6 @@ our $VERSION = '0.001';
 use Cwd qw/:DEFAULT abs_path/;
 use File::Spec::Functions qw/:DEFAULT rel2abs/;
 use Test::Smoke::Poster::Curl;
-use Test::Smoke::Poster::HTTP_Lite;
 use Test::Smoke::Poster::HTTP_Tiny;
 use Test::Smoke::Poster::LWP_UserAgent;
 
@@ -47,11 +46,6 @@ my %CONFIG = (
         required => [],
         class    => 'Test::Smoke::Poster::LWP_UserAgent',
     },
-    'HTTP::Lite' => {
-        allowed => [],
-        required => [],
-        class => 'Test::Smoke::Poster::HTTP_Lite',
-    },
     'HTTP::Tiny' => {
         allowed => [],
         required => [],
@@ -65,7 +59,6 @@ my %CONFIG = (
 
     valid_type => {
         'LWP::UserAgent' => 1,
-        'HTTP::Lite'     => 1,
         'HTTP::Tiny'     => 1,
     },
 

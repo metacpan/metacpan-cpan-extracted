@@ -28,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Color
   homepage: https://metacpan.org/release/Sah-Schemas-Color
   repository: git://github.com/perlancar/perl-Sah-Schemas-Color.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -44,7 +44,7 @@ x_Dist_Zilla:
           Module::Metadata: '1.000036'
           version: '0.006'
       name: Sah::Schemas
-      version: '0.016'
+      version: '0.017'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:

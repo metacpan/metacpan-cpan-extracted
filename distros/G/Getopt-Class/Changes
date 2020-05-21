@@ -22,3 +22,5 @@ Revision history for Perl module Getopt::Class
     - Corrected design bug for option key aliases not working properly.
 0.102.2 2020-05-13
     - Bug fixes and design improvements
+0.102.3 2020-05-21
+	- Change from TryCatch to Nice::Try because TryCatch got broken with release of Devel::Declare version 0.006020

@@ -1,6 +1,6 @@
 # perl-Net-SAML2
 
-Perl Net::SAML2 module - version 0.20.03 and above
+Perl Net::SAML2 module - version 0.20 and above
 
 # NAME
  
@@ -8,7 +8,7 @@ Net::SAML2
  
 # VERSION
  
-version 0.20.03
+version 0.20
  
 # SYNOPSIS
 

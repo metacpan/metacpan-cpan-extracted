@@ -58,7 +58,7 @@ sub _process
     return if ($tag eq '~comment' or $tag eq '~pi' or $tag eq '~declaration');
 
 
-    # replace attributes with their respective translations 
+    # replace attributes with their respective translations
     $tree->{"$Prefix:attributes"} && do {
         my $attributes = $tree->{"$Prefix:attributes"};
         $attributes =~ s/\s*;\s*$//;
@@ -89,7 +89,7 @@ sub _process
             my $default_value = $tree->{$attribute_name};
 
             # the value to replace the attribute with should be either the
-            # translation, or the default value if maketext() failed. 
+            # translation, or the default value if maketext() failed.
             my $value = eval { $Petal::TranslationService->maketext ($translate_id) } || $default_value;
 
             # if maketext() failed, let's know why.
@@ -126,7 +126,7 @@ sub _process
         my $default_value = _canonicalize ( _extract_content_string ($tree) );
 
         # the value to replace the content with should be either the
-        # translation, or the default value if maketext() failed. 
+        # translation, or the default value if maketext() failed.
         my $value = eval { $Petal::TranslationService->maketext ($translate_id) } || $default_value;
 
         # now, $value is supposed to have the translated string, which looks like
@@ -187,7 +187,7 @@ sub _extract_named_nodes
         ref $node || next;
         push @nodes, $node;
     }
-    
+
     my %nodes = ();
     my $count = 0;
     foreach my $node (@nodes)
@@ -196,7 +196,7 @@ sub _extract_named_nodes
         my $name = $node->{"$Prefix:name"} || $count;
         $nodes{$name} = $node;
     }
-    
+
     return %nodes;
 }
 
@@ -213,12 +213,12 @@ sub _extract_content_string
             push @res, $node;
             next;
         };
-        
+
         $count++;
         my $name = $node->{"$Prefix:name"} || $count;
         push @res, '${' . $name . '}';
     }
-    
+
     return join '', @res;
 }
 
@@ -231,7 +231,7 @@ __END__
 
 =head1 NAME
 
-Petal::I18N - Attempt at implementing ZPT I18N for Petal 
+Petal::I18N - Attempt at implementing ZPT I18N for Petal
 
 
 =head1 SYNOPSIS
@@ -243,7 +243,7 @@ in your Perl code:
 
   my $translation_service = new Petal::TranslationService::Gettext (
       locale_dir  => '/path/to/my/app/locale',
-      target_lang => gimme_target_lang(), 
+      target_lang => gimme_target_lang(),
   );
 
   my $template = new Petal (

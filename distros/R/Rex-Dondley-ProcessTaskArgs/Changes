@@ -1,5 +1,9 @@
 Revision history for Rex-Dondley-ProcessTaskArgs
 
+0.010     2020-05-19 16:35:07-04:00 America/New_York
+- fixed spurious warning
+- add an extra test
+
 0.008     2020-05-04 20:34:12-04:00 America/New_York
 - added strict/warnings pragmas
 

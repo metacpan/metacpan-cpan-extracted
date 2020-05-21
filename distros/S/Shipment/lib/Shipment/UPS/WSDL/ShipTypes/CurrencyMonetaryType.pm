@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::CurrencyMonetaryType;
-$Shipment::UPS::WSDL::ShipTypes::CurrencyMonetaryType::VERSION = '3.02';
+$Shipment::UPS::WSDL::ShipTypes::CurrencyMonetaryType::VERSION = '3.04';
 use strict;
 use warnings;
 
@@ -61,7 +61,7 @@ Shipment::UPS::WSDL::ShipTypes::CurrencyMonetaryType
 
 =head1 VERSION
 
-version 3.02
+version 3.04
 
 =head1 DESCRIPTION
 

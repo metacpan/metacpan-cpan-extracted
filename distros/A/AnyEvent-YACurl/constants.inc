@@ -91,6 +91,7 @@
         hv_stores(the_hv, "CURLE_OUT_OF_MEMORY", newSViv(CURLE_OUT_OF_MEMORY));
         hv_stores(the_hv, "CURLE_PARTIAL_FILE", newSViv(CURLE_PARTIAL_FILE));
         hv_stores(the_hv, "CURLE_PEER_FAILED_VERIFICATION", newSViv(CURLE_PEER_FAILED_VERIFICATION));
+        hv_stores(the_hv, "CURLE_QUIC_CONNECT_ERROR", newSViv(CURLE_QUIC_CONNECT_ERROR));
         hv_stores(the_hv, "CURLE_QUOTE_ERROR", newSViv(CURLE_QUOTE_ERROR));
         hv_stores(the_hv, "CURLE_RANGE_ERROR", newSViv(CURLE_RANGE_ERROR));
         hv_stores(the_hv, "CURLE_READ_ERROR", newSViv(CURLE_READ_ERROR));
@@ -318,6 +319,7 @@
         hv_stores(the_hv, "CURLMSG_NONE", newSViv(CURLMSG_NONE));
         hv_stores(the_hv, "CURLM_ADDED_ALREADY", newSViv(CURLM_ADDED_ALREADY));
         hv_stores(the_hv, "CURLM_BAD_EASY_HANDLE", newSViv(CURLM_BAD_EASY_HANDLE));
+        hv_stores(the_hv, "CURLM_BAD_FUNCTION_ARGUMENT", newSViv(CURLM_BAD_FUNCTION_ARGUMENT));
         hv_stores(the_hv, "CURLM_BAD_HANDLE", newSViv(CURLM_BAD_HANDLE));
         hv_stores(the_hv, "CURLM_BAD_SOCKET", newSViv(CURLM_BAD_SOCKET));
         hv_stores(the_hv, "CURLM_CALL_MULTI_PERFORM", newSViv(CURLM_CALL_MULTI_PERFORM));
@@ -449,6 +451,7 @@
         hv_stores(the_hv, "CURLOPT_MAIL_AUTH", newSViv(CURLOPT_MAIL_AUTH));
         hv_stores(the_hv, "CURLOPT_MAIL_FROM", newSViv(CURLOPT_MAIL_FROM));
         hv_stores(the_hv, "CURLOPT_MAIL_RCPT", newSViv(CURLOPT_MAIL_RCPT));
+        hv_stores(the_hv, "CURLOPT_MAIL_RCPT_ALLLOWFAILS", newSViv(CURLOPT_MAIL_RCPT_ALLLOWFAILS));
         hv_stores(the_hv, "CURLOPT_MAXAGE_CONN", newSViv(CURLOPT_MAXAGE_CONN));
         hv_stores(the_hv, "CURLOPT_MAXCONNECTS", newSViv(CURLOPT_MAXCONNECTS));
         hv_stores(the_hv, "CURLOPT_MAXFILESIZE", newSViv(CURLOPT_MAXFILESIZE));
@@ -640,6 +643,7 @@
         hv_stores(the_hv, "CURLPROTO_IMAPS", newSViv(CURLPROTO_IMAPS));
         hv_stores(the_hv, "CURLPROTO_LDAP", newSViv(CURLPROTO_LDAP));
         hv_stores(the_hv, "CURLPROTO_LDAPS", newSViv(CURLPROTO_LDAPS));
+        hv_stores(the_hv, "CURLPROTO_MQTT", newSViv(CURLPROTO_MQTT));
         hv_stores(the_hv, "CURLPROTO_POP3", newSViv(CURLPROTO_POP3));
         hv_stores(the_hv, "CURLPROTO_POP3S", newSViv(CURLPROTO_POP3S));
         hv_stores(the_hv, "CURLPROTO_RTMP", newSViv(CURLPROTO_RTMP));
@@ -707,6 +711,7 @@
         hv_stores(the_hv, "CURLSSLOPT_ALLOW_BEAST", newSViv(CURLSSLOPT_ALLOW_BEAST));
         hv_stores(the_hv, "CURLSSLOPT_NO_PARTIALCHAIN", newSViv(CURLSSLOPT_NO_PARTIALCHAIN));
         hv_stores(the_hv, "CURLSSLOPT_NO_REVOKE", newSViv(CURLSSLOPT_NO_REVOKE));
+        hv_stores(the_hv, "CURLSSLOPT_REVOKE_BEST_EFFORT", newSViv(CURLSSLOPT_REVOKE_BEST_EFFORT));
         hv_stores(the_hv, "CURLSSLSET_NO_BACKENDS", newSViv(CURLSSLSET_NO_BACKENDS));
         hv_stores(the_hv, "CURLSSLSET_OK", newSViv(CURLSSLSET_OK));
         hv_stores(the_hv, "CURLSSLSET_TOO_LATE", newSViv(CURLSSLSET_TOO_LATE));
@@ -760,6 +765,7 @@
         hv_stores(the_hv, "CURLVERSION_FOURTH", newSViv(CURLVERSION_FOURTH));
         hv_stores(the_hv, "CURLVERSION_NOW", newSViv(CURLVERSION_NOW));
         hv_stores(the_hv, "CURLVERSION_SECOND", newSViv(CURLVERSION_SECOND));
+        hv_stores(the_hv, "CURLVERSION_SEVENTH", newSViv(CURLVERSION_SEVENTH));
         hv_stores(the_hv, "CURLVERSION_SIXTH", newSViv(CURLVERSION_SIXTH));
         hv_stores(the_hv, "CURLVERSION_THIRD", newSViv(CURLVERSION_THIRD));
         hv_stores(the_hv, "CURL_CHUNK_BGN_FUNC_FAIL", newSViv(CURL_CHUNK_BGN_FUNC_FAIL));
@@ -888,7 +894,6 @@
         hv_stores(the_hv, "CURL_VERSION_CONV", newSViv(CURL_VERSION_CONV));
         hv_stores(the_hv, "CURL_VERSION_CURLDEBUG", newSViv(CURL_VERSION_CURLDEBUG));
         hv_stores(the_hv, "CURL_VERSION_DEBUG", newSViv(CURL_VERSION_DEBUG));
-        hv_stores(the_hv, "CURL_VERSION_ESNI", newSViv(CURL_VERSION_ESNI));
         hv_stores(the_hv, "CURL_VERSION_GSSAPI", newSViv(CURL_VERSION_GSSAPI));
         hv_stores(the_hv, "CURL_VERSION_GSSNEGOTIATE", newSViv(CURL_VERSION_GSSNEGOTIATE));
         hv_stores(the_hv, "CURL_VERSION_HTTP2", newSViv(CURL_VERSION_HTTP2));

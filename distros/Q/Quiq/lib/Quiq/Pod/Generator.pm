@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.181';
+our $VERSION = '1.182';
 
 use Quiq::Unindent;
 
@@ -602,7 +602,7 @@ sub fmt {
 
 =head1 VERSION
 
-1.181
+1.182
 
 =head1 AUTHOR
 

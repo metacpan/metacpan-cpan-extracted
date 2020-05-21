@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.181';
+our $VERSION = '1.182';
 
 =encoding utf8
 
@@ -60,7 +60,7 @@ L<Quiq::AxisTick> - Tick einer Plot-Achse
 
 =item *
 
-L<Quiq::Cache> - Cache Daten in Datei
+L<Quiq::Cache> - Cache Datenstruktur in Datei
 
 =item *
 
@@ -854,7 +854,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.181
+1.182
 
 =head1 AUTHOR
 

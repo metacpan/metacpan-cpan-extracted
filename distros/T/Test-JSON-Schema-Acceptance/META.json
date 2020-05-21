@@ -183,7 +183,7 @@
    "provides" : {
       "Test::JSON::Schema::Acceptance" : {
          "file" : "lib/Test/JSON/Schema/Acceptance.pm",
-         "version" : "0.996"
+         "version" : "0.997"
       }
    },
    "release_status" : "stable",
@@ -198,7 +198,7 @@
          "web" : "https://github.com/karenetheridge/Test-JSON-Schema-Acceptance"
       }
    },
-   "version" : "0.996",
+   "version" : "0.997",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.031011"
@@ -767,7 +767,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::AuthorDeps",
             "name" : "@Author::ETHER/Prereqs::AuthorDeps",
-            "version" : "0.006"
+            "version" : "0.007"
          },
          {
             "class" : "Dist::Zilla::Plugin::MinimumPerl",
@@ -1096,7 +1096,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.996",
+                  "tag" : "v0.997",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

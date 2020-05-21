@@ -6,10 +6,10 @@ use warnings;
 
 use AnyEvent;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 require XSLoader;
-XSLoader::load('AnyEvent::YACurl', '0.14');
+XSLoader::load('AnyEvent::YACurl', '0.15');
 
 require constant;
 my %constants= %{_get_known_constants()};
@@ -72,7 +72,7 @@ _ae_set_helpers(
 
 =head1 NAME
 
-AnyEvent::YACurl - Yet Another cURL binding for AnyEvent
+AnyEvent::YACurl - Yet Another curl binding for AnyEvent
 
 =head1 SYNOPSIS
 
@@ -88,7 +88,10 @@ AnyEvent::YACurl - Yet Another cURL binding for AnyEvent
         CURLOPT_WRITEFUNCTION => sub {
             my ($chunk) = @_;
             $return_data .= $chunk;
-        }
+        },
+        CURLOPT_HTTPHEADER => [
+            "My-Super-Awesome-Header: forty-two",
+        ],
     });
 
     my ($response, $error) = $condvar->recv;
@@ -97,28 +100,30 @@ AnyEvent::YACurl - Yet Another cURL binding for AnyEvent
 
 =head1 DESCRIPTION
 
-This module provides bindings to cURL, integrated into AnyEvent.
+This module provides bindings to curl, integrated into AnyEvent.
 
-=head2 AnyEvent::YACurl methods
+=head1 METHODS
+
+=head2 AnyEvent::YACurl
 
 =over
 
 =item C<new>
 
-Returns a new C<AnyEvent::YACurl> object. This is essentially a binding over cURL's
+Returns a new C<AnyEvent::YACurl> object. This is essentially a binding over curl's
 L<"multi" interface|https://curl.haxx.se/libcurl/c/libcurl-multi.html>.
 
 Its first and only argument is a required hashref containing options to control behavior, such as
 C<CURLMOPT_MAX_TOTAL_CONNECTIONS>. Refer to the actual
-L<cURL documentation|https://curl.haxx.se/libcurl/c/curl_multi_setopt.html> to find out about
+L<curl documentation|https://curl.haxx.se/libcurl/c/curl_multi_setopt.html> to find out about
 other options to pass.
 
 =item C<request>
 
 Performs a request using the client instantiated via C<new>. Takes a callback and a hashref of
-cURL options (C<CURLOPT_*>). At a minimum C<CURLOPT_URL> must be provided, but it's recommended
+curl options (C<CURLOPT_*>). At a minimum C<CURLOPT_URL> must be provided, but it's recommended
 to pass a few more arguments than that. Refer to the actual
-L<cURL documentation|https://curl.haxx.se/libcurl/c/curl_easy_setopt.html> to find out about
+L<curl documentation|https://curl.haxx.se/libcurl/c/curl_easy_setopt.html> to find out about
 other options to pass.
 
 C<request> does not return anything, but will invoke the coderef passed via C<callback> once the
@@ -149,15 +154,98 @@ callback will contain a human readable description of what went wrong.
 
 =back
 
-=head2 AnyEvent::YACurl::Response methods
+=head2 AnyEvent::YACurl::Response
 
 =over
 
 =item C<getinfo>
 
-Queries the cURL API for information about the response. Refer to the
-L<cURL documentation|https://curl.haxx.se/libcurl/c/curl_easy_getinfo.html> for possible
+Queries the curl API for information about the response. Refer to the
+L<curl documentation|https://curl.haxx.se/libcurl/c/curl_easy_getinfo.html> for possible
 C<CURLINFO_*> options.
+
+=back
+
+=head1 CURL OPTIONS
+
+curl "multi" options may be passed to C<< AnyEvent::YACurl->new({ ... }) >>, and a list of all
+options can be found in the
+L<curl multi documentation|https://curl.haxx.se/libcurl/c/curl_multi_setopt.html>. Most, but not
+all, options can be passed.
+
+curl "easy" (request) options may be passed to C<< $client->request({ ... }) >>, and a list of all
+options can be found in the
+L<curl easy documentation|https://curl.haxx.se/libcurl/c/curl_easy_setopt.html>. Most, but not all,
+options can be passed.
+
+Some translation between Perl and curl value types has to be done. Many curl options take a number
+or string, and these will be converted from simple Perl scalars. When a curl option takes a
+C<curl_slist> structure, a Perl array reference will be converted appropriately, like in the
+C<CURLOPT_HTTPHEADER> example listed earlier.
+
+Special care has to be taken with curl options that take a function, such as
+C<CURLOPT_WRITEFUNCTION>. Their Perl signatures are documented below.
+
+=over
+
+=item CURLOPT_WRITEFUNCTION
+
+(See L<curl documentation|https://curl.haxx.se/libcurl/c/CURLOPT_WRITEFUNCTION.html>)
+
+Set callback for writing received data. This will be called with one argument, C<data>, containing
+the received data.
+
+    CURLOPT_WRITEFUNCTION => sub {
+        my $data= shift;
+        print STDERR $data;
+    },
+
+=item CURLOPT_HEADERFUNCTION
+
+(See L<curl documentation|https://curl.haxx.se/libcurl/c/CURLOPT_HEADERFUNCTION.html>)
+
+Callback that receives header data. This will be called with one argument, C<data>, containing
+the received data.
+
+=item CURLOPT_READFUNCTION
+
+(See L<curl documentation|https://curl.haxx.se/libcurl/c/CURLOPT_READFUNCTION.html>)
+
+Read callback for data uploads. This will be called with one argument, C<length>, indicating
+the maximum size of data to be read. The callback should either return a scalar with the data, an
+empty string to indicate the end of the transfer, or C<undef> to abort the transfer.
+
+    CURLOPT_READFUNCTION => sub {
+        my $length= shift;
+        return substr($my_data, 0, $length, '');
+    },
+
+=item CURLOPT_DEBUGFUNCTION
+
+(See L<curl documentation|https://curl.haxx.se/libcurl/c/CURLOPT_DEBUGFUNCTION.html>)
+
+Debug callback. Called with two arguments, C<type> and C<data>.
+
+    CURLOPT_DEBUGFUNCTION => sub {
+        my ($type, $data)= @_;
+	if ($type == CURLINFO_TEXT) {
+            print STDERR "curl: $data\n";
+	}
+    },
+
+=item CURLOPT_TRAILERFUNCTION
+
+(See L<curl documentation|https://curl.haxx.se/libcurl/c/CURLOPT_TRAILERFUNCTION.html>)
+
+Set callback for sending trailing headers. Called without any arguments, expected output is a
+reference to an array of scalars representing headers to be sent out. C<undef> may be returned to
+abort the request.
+
+    CURLOPT_TRAILERFUNCTION => sub {
+        return [
+            "My-super-awesome-trailer: trailer-stuff",
+	];
+    }
 
 =back
 
@@ -167,7 +255,7 @@ Tom van der Woerdt <tvdw@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Tom van der Woerdt.
+This software is copyright (c) 2020 by Tom van der Woerdt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

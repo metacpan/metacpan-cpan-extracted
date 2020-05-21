@@ -1,11 +1,9 @@
 package JSON::Dumper::Compact;
 
 use JSON::MaybeXS;
-use Mu;
-use strictures 2;
-use namespace::clean;
+use Mu::Tiny;
 
-our $VERSION = '0.004001';
+our $VERSION = '0.005000';
 $VERSION =~ tr/_//d;
 
 extends 'Data::Dumper::Compact';
@@ -17,7 +15,9 @@ lazy json_obj => sub {
       ->filter_json_single_key_object(__bless__ => sub {
           bless($_[0][1], $_[0][0]);
         });
-}, handles => { _json_decode => 'decode' };
+};
+
+sub _json_decode { shift->json_obj->decode(@_) }
 
 sub _build_dumper { my $j = shift->json_obj; sub { $j->encode($_[0]) } }
 

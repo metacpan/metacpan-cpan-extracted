@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::UpdateAction;
-$Shipment::Temando::WSDL::Types::UpdateAction::VERSION = '3.02';
+$Shipment::Temando::WSDL::Types::UpdateAction::VERSION = '3.04';
 use strict;
 use warnings;
 
@@ -28,7 +28,7 @@ Shipment::Temando::WSDL::Types::UpdateAction
 
 =head1 VERSION
 
-version 3.02
+version 3.04
 
 =head1 DESCRIPTION
 

@@ -1,15 +1,12 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/SQLite.pm
-## Version 0.4
+## Version v0.400.1
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <jack@deguest.jp>
+## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2017/07/19
-## Modified 2019/08/25
-## All rights reserved
+## Modified 2020/05/21
 ## 
-## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 ## This is the subclassable module for driver specific ones.
 package DB::Object::SQLite;
@@ -34,10 +31,10 @@ BEGIN
     use DateTime::TimeZone;
     use DateTime::Format::Strptime;
     use Number::Format;
-    use TryCatch;
+    use Nice::Try;
     our( $VERSION, $DB_ERRSTR, $ERROR, $DEBUG, $CONNECT_VIA, $CACHE_QUERIES, $CACHE_SIZE );
     our( $CACHE_TABLE, $USE_BIND, $USE_CACHE, $MOD_PERL, @DBH );
-    $VERSION     = '0.4';
+    $VERSION     = 'v0.400.1';
     use Devel::Confess;
 };
 

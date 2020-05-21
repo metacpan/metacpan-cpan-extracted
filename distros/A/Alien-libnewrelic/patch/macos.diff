@@ -1,0 +1,46 @@
+diff --git a/Makefile b/Makefile
+index dcf1a74..9e6fb49 100644
+--- a/Makefile
++++ b/Makefile
+@@ -8,7 +8,7 @@
+ # - all:       Builds libnewrelic.a and newrelic-daemon
+ # - clean:     Removes all build products
+ # - daemon:    Builds newrelic-daemon
+-# - dynamic:   Builds libnewrelic.so
++# - dynamic:   Builds libnewrelic.dylib
+ # - static:    Builds libnewrelic.a
+ # - run_tests: Runs the unit tests
+ # - tests:     Builds, but does not run, the unit tests
+@@ -103,7 +103,7 @@ daemon-clean:
+ 	rm -f newrelic-daemon
+ 
+ .PHONY: dynamic
+-dynamic: libnewrelic.so
++dynamic: libnewrelic.dylib
+ 
+ .PHONY: valgrind
+ valgrind: vendor libnewrelic.a
+@@ -113,8 +113,8 @@ valgrind: vendor libnewrelic.a
+ # We build the shared library at the top level, since it's easiest to just take
+ # the static library and have gcc wrap it in the appropriate shared library
+ # goop.
+-libnewrelic.so: libnewrelic.a
+-	$(CC) -shared -pthread -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive $(PCRE_LIBS) -ldl
++libnewrelic.dylib: libnewrelic.a
++	$(CC) -shared -pthread -o $@ -Wl,-all_load $^ $(PCRE_LIBS) -ldl
+ 
+ .PHONY: src-static
+ src-static:
+@@ -131,10 +131,10 @@ tests-clean:
+ 
+ .PHONY: clean
+ clean: axiom-clean daemon-clean src-clean tests-clean
+-	rm -f *.o libnewrelic.a libnewrelic.so
++	rm -f *.o libnewrelic.a libnewrelic.dylib
+ 
+ .PHONY: integration
+-integration: libnewrelic.so daemon
++integration: libnewrelic.dylib daemon
+ 	./vendor/newrelic/bin/integration_runner --cgi=sh tests/integration
+ 
+ # Implicit rule for top level test programs.

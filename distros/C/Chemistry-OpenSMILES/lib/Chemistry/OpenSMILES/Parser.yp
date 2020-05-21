@@ -22,21 +22,38 @@ chain: atom
             my $g = Graph::Undirected->new;
             $g->add_vertex( $_[1] );
             push @{$_[0]->{USER}{GRAPHS}}, $g;
+
+            $_[1]->{graph} = $g;
+            $_[1]->{index} = @{$_[0]->{USER}{GRAPHS}}-1;
+
             return { first => $_[1],
-                     last  => $_[1],
-                     graph => $g,
-                     index => @{$_[0]->{USER}{GRAPHS}}-1 };
+                     last  => $_[1] };
         }
      | chain atom
         {
-            $_[1]->{graph}->add_edge( $_[1]->{last}, $_[2] );
+            $_[2]->{graph} = $_[1]->{last}{graph};
+            $_[2]->{index} = $_[1]->{last}{index};
+
+            $_[2]->{graph}->add_edge( $_[1]->{last}, $_[2] );
             $_[1]->{last} = $_[2];
+
             return $_[1];
         }
      | chain bond atom
         {
-            $_[1]->{graph}->set_edge_attribute( $_[1]->{last}, $_[3], 'bond', $_[2] );
+            $_[3]->{graph} = $_[1]->{last}{graph};
+            $_[3]->{index} = $_[1]->{last}{index};
+
+            if( $_[2] ne '-' ) {
+                $_[3]->{graph}->set_edge_attribute( $_[1]->{last},
+                                                    $_[3],
+                                                    'bond',
+                                                    $_[2] );
+            } else {
+                $_[3]->{graph}->add_edge( $_[1]->{last}, $_[3] );
+            }
             $_[1]->{last} = $_[3];
+
             return $_[1];
         }
      | chain '.' atom
@@ -44,35 +61,40 @@ chain: atom
             my $g = Graph::Undirected->new;
             $g->add_vertex( $_[3] );
             push @{$_[0]->{USER}{GRAPHS}}, $g;
+
+            $_[3]->{graph} = $g;
+            $_[3]->{index} = @{$_[0]->{USER}{GRAPHS}}-1;
+
             return { first => $_[3],
-                     last  => $_[3],
-                     graph => $g,
-                     index => @{$_[0]->{USER}{GRAPHS}}-1 };
+                     last  => $_[3] };
         }
      | chain '(' chain ')'
         {
-            if( $_[1]->{index} != $_[3]->{index} ) {
-                _merge_graphs( $_[1]->{graph}, $_[3]->{graph} );
-
-                $_[0]->{USER}{GRAPHS}[$_[3]->{index}] = undef;
-                $_[3]->{graph} = $_[1]->{graph};
-                $_[3]->{index} = $_[1]->{index};
+            if( $_[1]->{last}{index} != $_[3]->{first}{index} ) {
+                $_[0]->_merge_graphs( $_[1]->{last}{index},
+                                      $_[3]->{first}{index} );
             }
 
-            $_[1]->{graph}->add_edge( $_[1]->{last}, $_[3]->{first} );
+            $_[1]->{last}{graph}->add_edge( $_[1]->{last}, $_[3]->{first} );
             return $_[1];
         }
      | chain '(' bond chain ')'
         {
-            if( $_[1]->{index} != $_[4]->{index} ) {
-                _merge_graphs( $_[1]->{graph}, $_[4]->{graph} );
-
-                $_[0]->{USER}{GRAPHS}[$_[4]->{index}] = undef;
-                $_[4]->{graph} = $_[1]->{graph};
-                $_[4]->{index} = $_[1]->{index};
+            if( $_[1]->{last}{index} != $_[4]->{first}{index} ) {
+                $_[0]->_merge_graphs( $_[1]->{last}{index},
+                                      $_[4]->{first}{index} );
             }
 
-            $_[1]->{graph}->set_edge_attribute( $_[1]->{last}, $_[4]->{first}, 'bond', $_[3] );
+            if( $_[3] ne '-' ) {
+                $_[1]->{last}{graph}->set_edge_attribute( $_[1]->{last},
+                                                          $_[4]->{first},
+                                                          'bond',
+                                                          $_[3] );
+            } else {
+                $_[1]->{last}{graph}->add_edge( $_[1]->{last},
+                                                $_[4]->{first} );
+            }
+
             return $_[1];
         }
      | chain '(' '.' chain ')'
@@ -83,12 +105,12 @@ chain: atom
 
      | chain ringbond
         {
-            $_[0]->_add_ring_bond( $_[1], $_[2] );
+            $_[0]->_add_ring_bond( $_[1]->{last}, $_[2] );
             return $_[1];
         }
      | chain bond ringbond
         {
-            $_[0]->_add_ring_bond( $_[1], $_[3], $_[2] );
+            $_[0]->_add_ring_bond( $_[1]->{last}, $_[3], $_[2] );
             return $_[1];
         }
      ;
@@ -206,9 +228,11 @@ sub parse
     }
 
     my @graphs = grep { defined } @{$self->{USER}{GRAPHS}};
-    if( !$options->{raw} ) {
-        for my $graph (@graphs) {
-            for my $atom ($graph->vertices) {
+    for my $graph (@graphs) {
+        for my $atom ($graph->vertices) {
+            delete $atom->{graph};
+            delete $atom->{index};
+            if( !$options->{raw} ) {
                 next unless exists $atom->{hcount};
                 for (1..$atom->{hcount}) {
                     $graph->add_edge( $atom, { symbol => 'H' } );
@@ -223,51 +247,57 @@ sub parse
 
 sub _add_ring_bond
 {
-    my( $self, $chain, $ring_bond, $bond ) = @_;
+    my( $self, $atom, $ring_bond, $bond ) = @_;
     if( $self->{USER}{RINGBONDS}{$ring_bond} ) {
-        # If graphs are not the same, they have to be merged:
-        if( $self->{USER}{RINGBONDS}{$ring_bond}{chain}{index} !=
-            $chain->{index} ) {
-            _merge_graphs( $self->{USER}{RINGBONDS}{$ring_bond}{chain}{graph},
-                           $chain->{graph} );
-            $self->{USER}{GRAPHS}[$chain->{index}] = undef;
-
-            $chain->{graph} = $self->{USER}{RINGBONDS}{$ring_bond}{chain}{graph};
-            $chain->{index} = $self->{USER}{RINGBONDS}{$ring_bond}{chain}{index};
-        }
+        $self->_merge_graphs( $self->{USER}{RINGBONDS}{$ring_bond}{atom}{index},
+                              $atom->{index} );
 
         if( $bond && $self->{USER}{RINGBONDS}{$ring_bond}{bond} &&
             $bond ne $self->{USER}{RINGBONDS}{$ring_bond}{bond} ) {
-            die "ring bond types for ring bond '$ring_bond' do not match";
+            die "$0: ring bond types for ring bond $ring_bond do not match.\n";
         }
         ( $bond ) = grep { defined }
                          ( $bond, $self->{USER}{RINGBONDS}{$ring_bond}{bond} );
-        if( $bond ) {
-            $chain->{graph}->set_edge_attribute( $self->{USER}{RINGBONDS}{$ring_bond}{atom},
-                                                 $chain->{last},
-                                                 'bond',
-                                                 $bond );
+        if( $bond && $bond ne '-' ) {
+            $atom->{graph}->set_edge_attribute( $self->{USER}{RINGBONDS}{$ring_bond}{atom},
+                                                $atom,
+                                                'bond',
+                                                $bond );
         } else {
-            $chain->{graph}->add_edge( $self->{USER}{RINGBONDS}{$ring_bond}{atom},
-                                       $chain->{last} );
+            $atom->{graph}->add_edge( $self->{USER}{RINGBONDS}{$ring_bond}{atom},
+                                      $atom );
         }
         delete $self->{USER}{RINGBONDS}{$ring_bond};
     } else {
         $self->{USER}{RINGBONDS}{$ring_bond} =
-            { atom  => $chain->{last},
-              chain => $chain,
-              $bond ? ( bond => $bond ) : () };
+            { atom => $atom, $bond ? ( bond => $bond ) : () };
     }
 }
 
 sub _merge_graphs
 {
-    my( $g1, $g2 ) = @_;
-    return if $g1 eq $g2;
+    my( $self, $index1, $index2 ) = @_;
+    return if $index1 == $index2;
 
+    my $g1 = $self->{USER}{GRAPHS}[$index1];
+    my $g2 = $self->{USER}{GRAPHS}[$index2];
+
+    for ($g2->vertices) {
+        $_->{graph} = $g1;
+        $_->{index} = $index1;
+    }
     $g1->add_vertices( $g2->vertices );
-    $g1->add_edges( $g2->edges );
-    # FIXME: do we have to add properties?
+
+    for ($g2->edges) {
+        my  $attributes = $g2->get_edge_attributes( @$_ );
+        if( $attributes ) {
+            $g1->set_edge_attributes( @$_, $attributes );
+        } else {
+            $g1->add_edge( @$_ );
+        }
+    }
+
+    $self->{USER}{GRAPHS}[$index2] = undef;
 }
 
 sub _sprint_atom

@@ -20,10 +20,10 @@ my (undef, $temp_file) = tempfile();
 barf($temp_file, decode_base64($data));
 
 # Check file.
-my $dwg_flag = detect_dwg_file($temp_file);
+my $dwg_magic = detect_dwg_file($temp_file);
 
 # Print out.
-if ($dwg_flag) {
+if ($dwg_magic) {
         print "File '$temp_file' is DWG file.\n";
 } else {
         print "File '$temp_file' isn't DWG file.\n";

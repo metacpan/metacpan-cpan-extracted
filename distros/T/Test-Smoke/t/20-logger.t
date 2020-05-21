@@ -6,6 +6,7 @@ BEGIN {
 }
 
 use Test::More;
+use Test::Fatal 'lives_ok';
 use Test::NoWarnings ();
 
 use POSIX 'strftime';
@@ -115,6 +116,36 @@ do_log_debug()
 ${prefix}do_log_warn()
     EOL
     is($logfile, $log, "logfile (v=0)");
+}
+
+{
+    note("no sprintf() without arguments");
+
+    local $Test::Smoke::LogMixin::USE_TIMESTAMP = 0;
+    my $logger = Test::Smoke::Logger->new(v => 1);
+
+    open my $lh, '>', \my $logfile;
+    my $stdout = select($lh); $|++;
+
+    lives_ok(
+        sub {
+            use warnings FATAL => 'all';
+            $logger->log_info("100% error free");
+        },
+        "No problems with '%' in bare log-message"
+    );
+    lives_ok(
+        sub {
+            use warnings FATAL => 'all';
+            $logger->log_info("100%% error free %u", 42);
+        },
+        "No problems with '%%' in log-message with arguments"
+    );
+
+    is($logfile, <<'    EOL', "compare logfile");
+100% error free
+100% error free 42
+    EOL
 }
 
 Test::NoWarnings::had_no_warnings();

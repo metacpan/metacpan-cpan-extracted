@@ -249,6 +249,7 @@ static const struct LongShort aliases[]= {
   {"Eq", "cert-status",              ARG_BOOL},
   {"Er", "false-start",              ARG_BOOL},
   {"Es", "ssl-no-revoke",            ARG_BOOL},
+  {"ES", "ssl-revoke-best-effort",   ARG_BOOL},
   {"Et", "tcp-fastopen",             ARG_BOOL},
   {"Eu", "proxy-tlsuser",            ARG_STRING},
   {"Ev", "proxy-tlspassword",        ARG_STRING},
@@ -273,6 +274,7 @@ static const struct LongShort aliases[]= {
   {"f",  "fail",                     ARG_BOOL},
   {"fa", "fail-early",               ARG_BOOL},
   {"fb", "styled-output",            ARG_BOOL},
+  {"fc", "mail-rcpt-allowfails",     ARG_BOOL},
   {"F",  "form",                     ARG_STRING},
   {"Fs", "form-string",              ARG_STRING},
   {"g",  "globoff",                  ARG_BOOL},
@@ -421,7 +423,7 @@ void parse_cert_parameter(const char *cert_parameter,
       /* escaped colons and Windows drive letter colons were handled
        * above; if we're still here, this is a separating colon */
       param_place++;
-      if(strlen(param_place) > 0) {
+      if(*param_place) {
         *passphrase = strdup(param_place);
       }
       goto done;
@@ -1277,7 +1279,10 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
     case 'b':
       switch(subletter) {
       case 'a': /* --alt-svc */
-        GetStr(&config->altsvc, nextarg);
+        if(curlinfo->features & CURL_VERSION_ALTSVC)
+          GetStr(&config->altsvc, nextarg);
+        else
+          return PARAM_LIBCURL_DOESNT_SUPPORT;
         break;
       default:  /* --cookie string coming up: */
         if(nextarg[0] == '@') {
@@ -1602,6 +1607,11 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
           config->ssl_no_revoke = TRUE;
         break;
 
+      case 'S': /* --ssl-revoke-best-effort */
+        if(curlinfo->features & CURL_VERSION_SSL)
+          config->ssl_revoke_best_effort = TRUE;
+        break;
+
       case 't': /* --tcp-fastopen */
         config->tcp_fastopen = TRUE;
         break;
@@ -1721,6 +1731,9 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         break;
       case 'b': /* --styled-output */
         global->styled_output = toggle;
+        break;
+      case 'c': /* --mail-rcpt-allowfails */
+        config->mail_rcpt_allowfails = toggle;
         break;
       default: /* --fail (hard on errors)  */
         config->failonerror = toggle;
@@ -2245,6 +2258,7 @@ ParameterError parse_args(struct GlobalConfig *global, int argc,
         char *nextarg = (i < (argc - 1)) ? argv[i + 1] : NULL;
 
         result = getparameter(flag, nextarg, &passarg, global, config);
+        config = global->last;
         if(result == PARAM_NEXT_OPERATION) {
           /* Reset result as PARAM_NEXT_OPERATION is only used here and not
              returned from this function */

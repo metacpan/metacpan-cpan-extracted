@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Open::This;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
@@ -183,6 +183,12 @@ sub _maybe_extract_line_number {
         return $1;
     }
 
+    # mvn test output
+    # lib/Open/This.pm:[17,3]
+    if ( $$text =~ s{ (\w) : \[ (\d+) , (\d+) \] }{$1}x ) {
+        return $2, $3;
+    }
+
     # ripgrep (rg --vimgrep)
     # ./lib/Open/This.pm:17:3
     if ( $$text =~ s{(\w):(\d+):(\d+).*}{$1} ) {
@@ -331,7 +337,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 =head1 VERSION
 
-version 0.000022
+version 0.000023
 
 =head1 DESCRIPTION
 

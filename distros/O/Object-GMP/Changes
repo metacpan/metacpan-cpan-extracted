@@ -6,3 +6,9 @@
 
 2020-05-17 - 0.003
     + change the year in Changes file
+
+2020-05-18 - 0.004
+    + adding git repo link to readme
+
+2020-05-19 - 0.005
+    + fix test from PAUSE

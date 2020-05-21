@@ -5,7 +5,7 @@
       *                            | (__| |_| |  _ <| |___
       *                             \___|\___/|_| \_\_____|
       *
-      * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+      * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
       *
       * This software is licensed as described in the file COPYING, which
       * you should have received as part of this distribution. The terms
@@ -602,6 +602,8 @@
      d                 c                   94
      d  CURLE_HTTP3...
      d                 c                   95
+     d  CURLE_QUIC_CONNECT_ERROR...
+     d                 c                   96
       *
       /if not defined(CURL_NO_OLDIES)
      d  CURLE_URL_MALFORMAT_USER...
@@ -768,6 +770,8 @@
      d                 c                   X'0002'
      d CURLSSLOPT_NO_PARTIALCHAIN...
      d                 c                   X'0004'
+     d CURLSSLOPT_REVOKE_BEST_EFFORT...
+     d                 c                   X'0008'
       *
      d CURL_HET_DEFAULT...
      d                 c                   200
@@ -1816,7 +1820,9 @@
      d                 c                   8
      d  CURLM_WAKEUP_FAILURE...
      d                 c                   9
-     d  CURLM_LAST     c                   10
+     d  CURLM_BAD_FUNCTION_ARGUMENT...
+     d                 c                   10
+     d  CURLM_LAST     c                   11
       *
      d CURLMSG         s             10i 0 based(######ptr######)               Enum
      d  CURLMSG_NONE   c                   0

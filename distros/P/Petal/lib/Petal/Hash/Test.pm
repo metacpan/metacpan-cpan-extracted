@@ -51,7 +51,7 @@ uppercases a Petal expression.
       my $class    = shift;
       my $hash     = shift;
       my $argument = shift;
-    
+
       return uc ($hash->get ($argument));
   }
 
@@ -67,7 +67,7 @@ sub process
     my $class    = shift;
     my $hash     = shift;
     my $argument = shift;
-    
+
     return uc ($hash->get ($argument));
 }
 

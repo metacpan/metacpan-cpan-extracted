@@ -1,3 +1,7 @@
+0.05 2020-05-21T00:39:14+02:00
+ - Add test for bad attribute parsing.
+ - Fix bug with one character length attribute.
+
 0.04 2020-04-28T15:01:29+02:00
  - Add test for element with space in attribute.
  - Rewrite METHODS to =head2 in doc.

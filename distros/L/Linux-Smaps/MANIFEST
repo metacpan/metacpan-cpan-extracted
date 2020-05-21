@@ -1,19 +1,32 @@
 Changes
-Makefile.PL
-MANIFEST
-README
-t/double-vdso
-t/single-vdso
-t/smaps
-t/smaps64
-t/smaps-VmFlags
-t/01.t
-t/02.t
-t/03.t
-t/04.t
-t/06-VmFlags.t
 lib/Linux/Smaps.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
 mk_README.sh
 perl-Linux-Smaps.spec
-META.yml                                 Module meta-data (added by MakeMaker)
+README
+t/00-basics.t
+t/64bit-smaps.t
+t/deleted.t
+t/double-import.t
+t/double-vdso-check.t
+t/duplicate-mem.t
+t/duplicate-special.t
+t/emptyfile.t
+t/permission-denied.t
+t/special-then-mem.t
+t/testcases/deleted
+t/testcases/double-vdso
+t/testcases/duplicate-mem
+t/testcases/duplicate-special
+t/testcases/empty
+t/testcases/single-vdso
+t/testcases/smaps32
+t/testcases/smaps32.txt
+t/testcases/smaps64
+t/testcases/smaps64.txt
+t/testcases/special-then-mem
+t/vmflags.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

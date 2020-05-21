@@ -3,11 +3,9 @@ package Data::Dumper::Compact;
 use List::Util qw(sum);
 use Scalar::Util qw(blessed reftype);
 use Data::Dumper ();
-use Mu;
-use strictures 2;
-use namespace::clean;
+use Mu; #::Tiny;
 
-our $VERSION = '0.004001';
+our $VERSION = '0.005000';
 $VERSION =~ tr/_//d;
 
 sub import {
@@ -20,17 +18,17 @@ sub import {
   *{"${targ}::${ddc}"} = $cb;
 }
 
-ro max_width => default => 78;
+lazy max_width => sub { 78 };
 
-lazy width => sub { shift->max_width }, init_arg => undef;
+lazy width => sub { shift->max_width };
 
 lazy indent_width => sub { length($_[0]->indent_by) };
 
 sub _next_width { $_[0]->width - $_[0]->indent_width }
 
-ro indent_by => default => '  ';
+lazy indent_by => sub { '  ' };
 
-ro transforms => default => sub { [] };
+lazy transforms => sub { [] };
 
 sub add_transform { push(@{$_[0]->transforms}, $_[1]); $_[0] }
 
@@ -206,7 +204,7 @@ sub _format_list {
   my @plain = grep !/\s/, map $_->[1], grep $_->[0] eq 'string', @$payload;
   if (@plain == @$payload) {
     my $try = 'qw('.join(' ', @plain).')';
-    return $try if $self->{oneline} or length($try) <= $self->{width};
+    return $try if $self->{oneline} or length($try) <= $self->width;
   }
   return $self->_format_arraylike('(', ')', $payload);
 }
@@ -241,7 +239,7 @@ sub _format_arraylike {
   };
   if (!grep /\n/, @oneline) {
     my $try = join(' ', $l, @oneline, $r);
-    return $try if $self->{oneline} or length $try <= $self->{width};
+    return $try if $self->{oneline} or length $try <= $self->width;
   }
   local $self->{width} = $self->_next_width;
   if (@$payload == 1) {
@@ -264,7 +262,7 @@ sub _format_arraylike {
   my @bits;
   $oneline[-1] .= ','; # going into multiline mode, *now* we add the comma
   foreach my $idx (0..$#$payload) {
-    my $spare = $self->{width} - sum((scalar @bits)+1, map length($_), @bits);
+    my $spare = $self->width - sum((scalar @bits)+1, map length($_), @bits);
     my $f = $oneline[$idx];
     if ($f !~ /\n/) {
       # single line entry, add to the bits for the current line if it'll fit
@@ -332,7 +330,7 @@ sub _format_hash {
     ), '}');
   };
   return $oneline if $self->{oneline};
-  return $oneline if $oneline !~ /\n/ and length($oneline) <= $self->{width};
+  return $oneline if $oneline !~ /\n/ and length($oneline) <= $self->width;
   my $width = local $self->{width} = $self->_next_width;
   my @f = map {
     my $s = $k{$_}.' '.$self->_format(my $p = $hash->{$_});

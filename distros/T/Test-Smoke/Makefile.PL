@@ -1,6 +1,6 @@
 #! /usr/bin/perl -w
 use strict;
-use 5.008003;
+use v5.10;
 use ExtUtils::MakeMaker;
 use Config;
 
@@ -96,7 +96,7 @@ else {
     $extra_deps{'JSON::XS'} = 0;
 }
 my %posters;
-my @ua_clients = qw/HTTP::Tiny LWP::UserAgent HTTP::Lite/;
+my @ua_clients = qw/HTTP::Tiny LWP::UserAgent/;
 for my $poster (@ua_clients) {
     eval "require $poster;";
     if ($@) { $posters{$poster} = 0 }
@@ -124,6 +124,7 @@ my %TEST_REQUIRES = (
     'Test::Fatal'      => 0,
     'HTTP::Daemon'     => 0,
     'HTTP::Message'    => 0,
+    'URI'              => 0,
 );
 
 my $test_requires = (
@@ -182,6 +183,7 @@ $mmver > 6.46 and $wm{META_ADD} = {
         x_IRC      => "irc://irc.perl.org/#smoke",
     },
 };
+$mmver >= 6.48 and $wm{MIN_PERL_VERSION} = '5.010';
 
 WriteMakefile(
     %wm,

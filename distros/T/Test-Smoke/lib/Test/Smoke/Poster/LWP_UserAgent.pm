@@ -57,13 +57,20 @@ sub _post_data {
     $self->log_info("Posting to %s via %s.", $self->smokedb_url, $self->poster);
     $self->log_debug("Report data: %s", my $json = $self->get_json);
 
-    my $response = eval {
-        $self->ua->post(
+    my $response = $self->ua->post(
+        $self->smokedb_url,
+        { json => $json }
+    );
+    if ( !$response->is_success ) {
+        $self->log_warn("POST failed: %s", $response->status_line);
+        die sprintf(
+            "POST to '%s' failed: %s\n",
             $self->smokedb_url,
-            { json => $json }
+            $response->status_line
         );
-    };
-    $self->log_warn("Error posting: $@") if $@;
+    }
+
+    $self->log_debug("[CoreSmokeDB] %s", $response->content);
 
     return $response->content;
 }

@@ -1,4 +1,4 @@
-package NewFangle::Segment 0.01 {
+package NewFangle::Segment 0.02 {
 
   use strict;
   use warnings;
@@ -46,7 +46,7 @@ NewFangle::Segment - NewRelic application class
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

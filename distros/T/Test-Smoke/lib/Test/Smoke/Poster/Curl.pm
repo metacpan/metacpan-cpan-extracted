@@ -60,6 +60,16 @@ sub _post_data {
         '-d' => $form_data,
         $self->smokedb_url,
     );
+
+    if ($self->curl->exitcode) {
+        $self->log_warn("[POST] curl exitcode: %d", $self->curl->exitcode);
+        die sprintf(
+            "POST to '%s' curl failed: %d\n",
+            $self->smokedb_url,
+            $self->curl->exitcode
+        );
+    }
+
     $self->log_debug("[CoreSmokeDB] %s", $response);
 
     return $response;

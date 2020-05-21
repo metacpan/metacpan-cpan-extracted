@@ -61,13 +61,19 @@ sub _post_data {
     );
 
     if (!$response->{success}) {
-        $self->log_info(
+        $self->log_warn(
             "POST failed: %s %s",
             $response->{status},
             $response->{reason}
         );
-        return;
+        die sprintf(
+            "POST to '%s' failed: %s %s\n",
+            $self->smokedb_url,
+            $response->{status}, $response->{reason}
+        );
     }
+
+    $self->log_debug("[CoreSmokeDB] %s", $response->{content});
 
     return $response->{content};
 }

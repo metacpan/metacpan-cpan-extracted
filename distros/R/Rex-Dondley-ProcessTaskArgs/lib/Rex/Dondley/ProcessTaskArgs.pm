@@ -1,5 +1,5 @@
 package Rex::Dondley::ProcessTaskArgs ;
-$Rex::Dondley::ProcessTaskArgs::VERSION = '0.009';
+$Rex::Dondley::ProcessTaskArgs::VERSION = '0.010';
 use strict;
 use warnings;
 
@@ -28,6 +28,7 @@ sub process_task_args {
   my %passed_params = %{$passed_in->[0]};
   my @unkeyed_args  = @{$passed_in->[1]};
   my @defaults      = ref $_[-1] ? @{$_[-1]} : ();
+  pop @_ if @defaults;
   my @valid_args    = @_;
   my @key_list      = grep { $_ && $_ ne '1' && (ref $_) ne 'ARRAY' } @_;
 
@@ -116,7 +117,7 @@ Rex::Dondley::ProcessTaskArgs - easier Rex task argument handling
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

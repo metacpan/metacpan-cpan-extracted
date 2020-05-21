@@ -31,6 +31,10 @@ task 'six' => sub {
   my $params = process_task_args(\@_, 'one', 'two', 'three');
 };
 
+task 'seven' => sub {
+  my $params = process_task_args(\@_, source => 1, target => 0, tarball => 0, [ '', 'something', 1]);
+};
+
 is ref run_task('one'), 'HASH', 'returns a hash';
 is_deeply run_task('one', params => {one => 'two'}), {one => 'two', three => undef}, 'returns hash with values and undefs missing non-required arg';
 is_deeply run_task('one', params => { one => 'two' }), {one => 'two', three => undef}, 'returns hash with values and undefs missing non-required arg';
@@ -47,6 +51,11 @@ is_deeply run_task('five'), {one => 'boo', two => 'bah', three => ''}, 'processe
 is_deeply run_task('five', params => { one => 'baba' }), {one => 'baba', two => 'bah', three => ''}, 'default values can be overridden';
 is_deeply run_task('five', params => { two => 'baba' }), {one => 'boo', two => 'baba', three => ''}, 'default values can be overridden';
 is_deeply run_task('five', params => { two => 'baba', three => 'next' } ), {one => 'boo', two => 'baba', three => 'next'}, 'default values can be overridden';
-is_deeply run_task('six', params => { 'one' => 3 } ), {one => 3, two => undef, three => undef}, 'recognized valueless keys as not required';
+is_deeply run_task('six', params => { 'one' => 3 } ),
+                                    {  one => 3, two => undef, three => undef}, 'recognized valueless keys as not required';
+
+is_deeply run_task('seven', params => { source => 'blah', tarball => 0 } ),
+                                      { source => 'blah', target => 'something', tarball => 0 }, 'default overrides empty value';
+
 
 done_testing();

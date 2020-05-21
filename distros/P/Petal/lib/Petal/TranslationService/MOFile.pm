@@ -13,7 +13,7 @@ sub new
         return bless {}, $class;
     };
 
-    -e $file or do { 
+    -e $file or do {
         warn "$file does not seem to exist";
         return bless {}, $class;
     };

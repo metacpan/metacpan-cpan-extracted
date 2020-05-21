@@ -33,8 +33,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Mu" : "0",
-            "namespace::clean" : "0"
+            "Mu::Tiny" : "0"
          }
       },
       "test" : {
@@ -58,7 +57,7 @@
          "web" : "https://github.com/shadow-dot-cat/Data-Dumper-Compact"
       }
    },
-   "version" : "0.004001",
+   "version" : "0.005000",
    "x_authority" : "cpan:MSTROUT",
    "x_breaks" : {},
    "x_serialization_backend" : "JSON::PP version 2.27300"

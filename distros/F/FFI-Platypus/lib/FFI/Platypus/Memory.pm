@@ -6,10 +6,10 @@ use FFI::Platypus;
 use base qw( Exporter );
 
 # ABSTRACT: Memory functions for FFI
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.28'; # VERSION
 
 
-our @EXPORT = qw( malloc free calloc realloc memcpy memset strdup strndup );
+our @EXPORT = qw( malloc free calloc realloc memcpy memset strdup strndup strcpy );
 
 my $ffi = FFI::Platypus->new( api => 1 );
 $ffi->lib(undef);
@@ -22,6 +22,7 @@ $ffi->attach(calloc  => ['size_t', 'size_t']           => 'opaque' => '$$');
 $ffi->attach(realloc => ['opaque', 'size_t']           => 'opaque' => '$$');
 $ffi->attach(memcpy  => ['opaque', 'opaque', 'size_t'] => 'opaque' => '$$$');
 $ffi->attach(memset  => ['opaque', 'int', 'size_t']    => 'opaque' => '$$$');
+$ffi->attach(strcpy  => ['opaque', 'string']           => 'opaque' => '$$');
 
 my $_strdup_impl = 'not-loaded';
 sub _strdup_impl { $_strdup_impl }
@@ -65,7 +66,7 @@ FFI::Platypus::Memory - Memory functions for FFI
 
 =head1 VERSION
 
-version 1.26
+version 1.28
 
 =head1 SYNOPSIS
 
@@ -137,6 +138,12 @@ If you pass C<undef> in as I<$old_pointer>, then it behaves exactly like
 C<malloc>:
 
  my $pointer = realloc undef, 64; # same as malloc 64
+
+=head2 strcpy
+
+ strcpy $opaque, $string;
+
+Copies the string to the memory location pointed to by C<$opaque>.
 
 =head2 strdup
 

@@ -8,6 +8,12 @@ perl -pe '/^=head1 DESCRIPTION/ and print <STDIN>' lib/Linux/Smaps.pm >README.po
  make test
  make install
 
+=head1 DISTRIBUTION
+
+ perl Makefile.PL
+ make manifest
+ make dist
+
 EOF
 
 perldoc -tU README.pod >README

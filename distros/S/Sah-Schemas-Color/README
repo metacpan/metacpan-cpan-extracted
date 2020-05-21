@@ -2,7 +2,7 @@ NAME
     Sah::Schemas::Color - Sah schemas related to color codes/names
 
 VERSION
-    This document describes version 0.006 of Sah::Schemas::Color (from Perl
+    This document describes version 0.007 of Sah::Schemas::Color (from Perl
     distribution Sah-Schemas-Color), released on 2020-03-02.
 
 HOMEPAGE

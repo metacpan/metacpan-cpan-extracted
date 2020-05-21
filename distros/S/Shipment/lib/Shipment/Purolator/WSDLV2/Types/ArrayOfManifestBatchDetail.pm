@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::ArrayOfManifestBatchDetail;
-$Shipment::Purolator::WSDLV2::Types::ArrayOfManifestBatchDetail::VERSION = '3.02';
+$Shipment::Purolator::WSDLV2::Types::ArrayOfManifestBatchDetail::VERSION = '3.04';
 use strict;
 use warnings;
 
@@ -56,7 +56,7 @@ Shipment::Purolator::WSDLV2::Types::ArrayOfManifestBatchDetail
 
 =head1 VERSION
 
-version 3.02
+version 3.04
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package Shipment::FedEx;
-$Shipment::FedEx::VERSION = '3.02';
+$Shipment::FedEx::VERSION = '3.04';
 use strict;
 use warnings;
 
@@ -948,7 +948,8 @@ sub track {
                         Type  => 'TRACKING_NUMBER_OR_DOORTAG',
                         Value => $self->tracking_id,
                     }
-                }
+                },
+                ProcessingOptions => 'INCLUDE_DETAILED_SCANS',
             },
         );
         $Shipment::SOAP::WSDL::Debug = 0;
@@ -970,31 +971,43 @@ sub track {
         }
         else {
 
-            $self->activities(
-                [   Shipment::Activity->new(
-                        description => $response->get_CompletedTrackDetails()
-                          ->get_TrackDetails()->get_StatusDetail()
-                          ->get_Description()->get_value(),
+            foreach my $event (
+                @{  $response->get_CompletedTrackDetails()->get_TrackDetails()
+                      ->get_Events()
+                }
+              )
+            {
+                $self->add_activity(
+                    Shipment::Activity->new(
+                        description =>
+                          $event->get_EventDescription()->get_value(),
                         date => DateTime::Format::ISO8601->parse_datetime(
-                            $response->get_CompletedTrackDetails()
-                              ->get_TrackDetails()->get_StatusDetail()
-                              ->get_CreationTime()->get_value()
+                            $event->get_Timestamp()->get_value()
                         ),
                         location => Shipment::Address->new(
-                            city => $response->get_CompletedTrackDetails()
-                              ->get_TrackDetails()->get_StatusDetail()
-                              ->get_Location()->get_City()->get_value(),
-                            state => $response->get_CompletedTrackDetails()
-                              ->get_TrackDetails()->get_StatusDetail()
-                              ->get_Location()->get_StateOrProvinceCode()
-                              ->get_value(),
-                            country => $response->get_CompletedTrackDetails()
-                              ->get_TrackDetails()->get_StatusDetail()
-                              ->get_Location()->get_CountryCode()->get_value(),
+                            city => (
+                                  $event->get_Address()->get_City()
+                                ? $event->get_Address()->get_City()
+                                  ->get_value()
+                                : ''
+                            ),
+                            state => (
+                                $event->get_Address()
+                                  ->get_StateOrProvinceCode()
+                                ? $event->get_Address()
+                                  ->get_StateOrProvinceCode()->get_value()
+                                : ''
+                            ),
+                            country => (
+                                  $event->get_Address()->get_CountryCode()
+                                ? $event->get_Address()->get_CountryCode()
+                                  ->get_value()
+                                : ''
+                            ),
                         ),
                     )
-                ]
-            );
+                );
+            }
             $self->ship_date(
                 DateTime::Format::ISO8601->parse_datetime(
                     $response->get_CompletedTrackDetails()->get_TrackDetails()
@@ -1102,7 +1115,7 @@ Shipment::FedEx
 
 =head1 VERSION
 
-version 3.02
+version 3.04
 
 =head1 SYNOPSIS
 

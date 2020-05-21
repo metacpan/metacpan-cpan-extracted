@@ -9,7 +9,7 @@ use base qw{ PPIx::Regexp::Tokenizer };
 
 use Carp;
 
-our $VERSION = '0.071';
+our $VERSION = '0.072';
 
 confess 'PPIx::Regexp::StringTokenizer has been retracted';	## no critic (RequireEndWithOne)
 

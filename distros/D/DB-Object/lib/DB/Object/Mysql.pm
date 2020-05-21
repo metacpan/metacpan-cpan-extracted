@@ -1,15 +1,12 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Mysql.pm
-## Version 0.3.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <jack@deguest.jp>
+## Version v0.3.2
+## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2017/07/19
-## Modified 2020/03/28
-## All rights reserved
+## Modified 2020/05/21
 ## 
-## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 ## This is the subclassable module for driver specific ones.
 package DB::Object::Mysql;
@@ -28,11 +25,11 @@ BEGIN
     };
     die( $@ ) if( $@ );
     use Net::IP;
-    use TryCatch;
+    use Nice::Try;
     ## DBI->trace( 5 );
     our( $VERSION, $DB_ERRSTR, $ERROR, $DEBUG, $CONNECT_VIA, $CACHE_QUERIES, $CACHE_SIZE );
     our( $CACHE_TABLE, $USE_BIND, $USE_CACHE, $MOD_PERL, @DBH );
-    $VERSION     = '0.3.1';
+    $VERSION     = 'v0.3.2';
     use Devel::Confess;
 };
 

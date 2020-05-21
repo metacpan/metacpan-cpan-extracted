@@ -3,12 +3,12 @@ package Moonshine::Template;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Moonshine::Element;
 use Ref::Util qw/:all/;
 use Hash::Merge qw/merge/;
-
+use Hash::Util qw/unlock_hashref/;
 our @ISA;
 BEGIN { @ISA = ('UNIVERSAL::Object') }
 
@@ -20,6 +20,8 @@ BEGIN {
 
 sub BUILD {
     my ( $self, $build_args ) = @_;
+
+    unlock_hashref($self);
 
     my $config = $self->_merge_configs( $build_args->{config} // {} );
 
@@ -41,7 +43,7 @@ sub BUILD {
 
     $self->{base_element} = $base_element;
 
-    return;
+    return $self;
 }
 
 sub add_base_element {
@@ -194,6 +196,7 @@ sub _make_shine {
 }
 
 sub _return_base_element {
+    unlock_hashref($_[1]);
     return $_[1]->{base_element} ? $_[1]->{base_element} : $_[1];
 }
 
@@ -207,7 +210,7 @@ Moonshine::Template - Template some more html.
 
 =head1 VERSION
 
-Version 0.04 
+Version 0.05 
 
 =head1 SYNOPSIS
 

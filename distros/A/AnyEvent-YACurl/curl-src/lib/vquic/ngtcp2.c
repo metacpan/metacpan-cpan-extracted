@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -26,7 +26,9 @@
 #include <ngtcp2/ngtcp2.h>
 #include <ngtcp2/ngtcp2_crypto.h>
 #include <nghttp3/nghttp3.h>
+#ifdef USE_OPENSSL
 #include <openssl/err.h>
+#endif
 #include "urldata.h"
 #include "sendf.h"
 #include "strdup.h"
@@ -69,10 +71,18 @@ struct h3out {
 #define QUIC_MAX_STREAMS (256*1024)
 #define QUIC_MAX_DATA (1*1024*1024)
 #define QUIC_IDLE_TIMEOUT 60000 /* milliseconds */
+
+#ifdef USE_OPENSSL
 #define QUIC_CIPHERS                                                          \
   "TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_"               \
   "POLY1305_SHA256:TLS_AES_128_CCM_SHA256"
 #define QUIC_GROUPS "P-256:X25519:P-384:P-521"
+#elif defined(USE_GNUTLS)
+#define QUIC_PRIORITY \
+  "NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+AES-256-GCM:" \
+  "+CHACHA20-POLY1305:+AES-128-CCM:-GROUP-ALL:+GROUP-SECP256R1:" \
+  "+GROUP-X25519:+GROUP-SECP384R1:+GROUP-SECP521R1"
+#endif
 
 static CURLcode ng_process_ingress(struct connectdata *conn,
                                    curl_socket_t sockfd,
@@ -101,6 +111,7 @@ static void quic_printf(void *user_data, const char *fmt, ...)
 }
 #endif
 
+#ifdef USE_OPENSSL
 static ngtcp2_crypto_level
 quic_from_ossl_level(OSSL_ENCRYPTION_LEVEL ossl_level)
 {
@@ -117,14 +128,32 @@ quic_from_ossl_level(OSSL_ENCRYPTION_LEVEL ossl_level)
     assert(0);
   }
 }
+#elif defined(USE_GNUTLS)
+static ngtcp2_crypto_level
+quic_from_gtls_level(gnutls_record_encryption_level_t gtls_level)
+{
+  switch(gtls_level) {
+  case GNUTLS_ENCRYPTION_LEVEL_INITIAL:
+    return NGTCP2_CRYPTO_LEVEL_INITIAL;
+  case GNUTLS_ENCRYPTION_LEVEL_EARLY:
+    return NGTCP2_CRYPTO_LEVEL_EARLY;
+  case GNUTLS_ENCRYPTION_LEVEL_HANDSHAKE:
+    return NGTCP2_CRYPTO_LEVEL_HANDSHAKE;
+  case GNUTLS_ENCRYPTION_LEVEL_APPLICATION:
+    return NGTCP2_CRYPTO_LEVEL_APP;
+  default:
+    assert(0);
+  }
+}
+#endif
 
 static int setup_initial_crypto_context(struct quicsocket *qs)
 {
   const ngtcp2_cid *dcid = ngtcp2_conn_get_dcid(qs->qconn);
 
   if(ngtcp2_crypto_derive_and_install_initial_key(
-         qs->qconn, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, dcid,
-         NGTCP2_CRYPTO_SIDE_CLIENT) != 0)
+         qs->qconn, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+         dcid) != 0)
     return -1;
 
   return 0;
@@ -146,10 +175,11 @@ static void quic_settings(ngtcp2_settings *s,
   s->transport_params.initial_max_data = QUIC_MAX_DATA;
   s->transport_params.initial_max_streams_bidi = 1;
   s->transport_params.initial_max_streams_uni = 3;
-  s->transport_params.idle_timeout = QUIC_IDLE_TIMEOUT;
+  s->transport_params.max_idle_timeout = QUIC_IDLE_TIMEOUT;
 }
 
 static FILE *keylog_file; /* not thread-safe */
+#ifdef USE_OPENSSL
 static void keylog_callback(const SSL *ssl, const char *line)
 {
   (void)ssl;
@@ -157,37 +187,52 @@ static void keylog_callback(const SSL *ssl, const char *line)
   fputc('\n', keylog_file);
   fflush(keylog_file);
 }
+#elif defined(USE_GNUTLS)
+static int keylog_callback(gnutls_session_t session, const char *label,
+                    const gnutls_datum_t *secret)
+{
+  gnutls_datum_t crandom;
+  gnutls_datum_t srandom;
+  gnutls_datum_t crandom_hex = { NULL, 0 };
+  gnutls_datum_t secret_hex = { NULL, 0 };
+  int rc = 0;
+
+  gnutls_session_get_random(session, &crandom, &srandom);
+  if(crandom.size != 32) {
+    return -1;
+  }
+
+  rc = gnutls_hex_encode2(&crandom, &crandom_hex);
+  if(rc < 0) {
+    fprintf(stderr, "gnutls_hex_encode2 failed: %s\n",
+            gnutls_strerror(rc));
+    goto out;
+  }
+
+  rc = gnutls_hex_encode2(secret, &secret_hex);
+  if(rc < 0) {
+    fprintf(stderr, "gnutls_hex_encode2 failed: %s\n",
+            gnutls_strerror(rc));
+    goto out;
+  }
+
+  fprintf(keylog_file, "%s %s %s\n", label, crandom_hex.data, secret_hex.data);
+  fflush(keylog_file);
+
+ out:
+  gnutls_free(crandom_hex.data);
+  gnutls_free(secret_hex.data);
+  return rc;
+}
+#endif
 
 static int init_ngh3_conn(struct quicsocket *qs);
 
-static int quic_set_encryption_secrets(SSL *ssl,
-                                       OSSL_ENCRYPTION_LEVEL ossl_level,
-                                       const uint8_t *rx_secret,
-                                       const uint8_t *tx_secret,
-                                       size_t secretlen)
+static int write_client_handshake(struct quicsocket *qs,
+                                  ngtcp2_crypto_level level,
+                                  const uint8_t *data, size_t len)
 {
-  struct quicsocket *qs = (struct quicsocket *)SSL_get_app_data(ssl);
-  int level = quic_from_ossl_level(ossl_level);
-
-  if(ngtcp2_crypto_derive_and_install_key(
-         qs->qconn, ssl, NULL, NULL, NULL, NULL, NULL, NULL, level, rx_secret,
-         tx_secret, secretlen, NGTCP2_CRYPTO_SIDE_CLIENT) != 0)
-    return 0;
-
-  if(level == NGTCP2_CRYPTO_LEVEL_APP) {
-    if(init_ngh3_conn(qs) != CURLE_OK)
-      return 0;
-  }
-
-  return 1;
-}
-
-static int quic_add_handshake_data(SSL *ssl, OSSL_ENCRYPTION_LEVEL ossl_level,
-                                   const uint8_t *data, size_t len)
-{
-  struct quicsocket *qs = (struct quicsocket *)SSL_get_app_data(ssl);
   struct quic_handshake *crypto_data;
-  ngtcp2_crypto_level level = quic_from_ossl_level(ossl_level);
   int rv;
 
   crypto_data = &qs->crypto_data[level];
@@ -214,6 +259,42 @@ static int quic_add_handshake_data(SSL *ssl, OSSL_ENCRYPTION_LEVEL ossl_level,
   assert(0 == rv);
 
   return 1;
+}
+
+#ifdef USE_OPENSSL
+static int quic_set_encryption_secrets(SSL *ssl,
+                                       OSSL_ENCRYPTION_LEVEL ossl_level,
+                                       const uint8_t *rx_secret,
+                                       const uint8_t *tx_secret,
+                                       size_t secretlen)
+{
+  struct quicsocket *qs = (struct quicsocket *)SSL_get_app_data(ssl);
+  int level = quic_from_ossl_level(ossl_level);
+
+  if(level != NGTCP2_CRYPTO_LEVEL_EARLY &&
+     ngtcp2_crypto_derive_and_install_rx_key(
+         qs->qconn, ssl, NULL, NULL, NULL, level, rx_secret, secretlen) != 0)
+    return 0;
+
+  if(ngtcp2_crypto_derive_and_install_tx_key(
+         qs->qconn, ssl, NULL, NULL, NULL, level, tx_secret, secretlen) != 0)
+    return 0;
+
+  if(level == NGTCP2_CRYPTO_LEVEL_APP) {
+    if(init_ngh3_conn(qs) != CURLE_OK)
+      return 0;
+  }
+
+  return 1;
+}
+
+static int quic_add_handshake_data(SSL *ssl, OSSL_ENCRYPTION_LEVEL ossl_level,
+                                   const uint8_t *data, size_t len)
+{
+  struct quicsocket *qs = (struct quicsocket *)SSL_get_app_data(ssl);
+  ngtcp2_crypto_level level = quic_from_ossl_level(ossl_level);
+
+  return write_client_handshake(qs, level, data, len);
 }
 
 static int quic_flush_flight(SSL *ssl)
@@ -303,6 +384,193 @@ static int quic_init_ssl(struct quicsocket *qs)
   SSL_set_tlsext_host_name(qs->ssl, hostname);
   return 0;
 }
+#elif defined(USE_GNUTLS)
+static int secret_func(gnutls_session_t ssl,
+                       gnutls_record_encryption_level_t gtls_level,
+                       const void *rx_secret,
+                       const void *tx_secret, size_t secretlen)
+{
+  struct quicsocket *qs = gnutls_session_get_ptr(ssl);
+  int level = quic_from_gtls_level(gtls_level);
+
+  if(level != NGTCP2_CRYPTO_LEVEL_EARLY &&
+     ngtcp2_crypto_derive_and_install_rx_key(
+         qs->qconn, ssl, NULL, NULL, NULL, level, rx_secret, secretlen) != 0)
+    return 0;
+
+  if(ngtcp2_crypto_derive_and_install_tx_key(
+         qs->qconn, ssl, NULL, NULL, NULL, level, tx_secret, secretlen) != 0)
+    return 0;
+
+  if(level == NGTCP2_CRYPTO_LEVEL_APP) {
+    if(init_ngh3_conn(qs) != CURLE_OK)
+      return -1;
+  }
+
+  return 0;
+}
+
+static int read_func(gnutls_session_t ssl,
+                     gnutls_record_encryption_level_t gtls_level,
+                     gnutls_handshake_description_t htype, const void *data,
+                     size_t len)
+{
+  struct quicsocket *qs = gnutls_session_get_ptr(ssl);
+  ngtcp2_crypto_level level = quic_from_gtls_level(gtls_level);
+  int rv;
+
+  if(htype == GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC)
+    return 0;
+
+  rv = write_client_handshake(qs, level, data, len);
+  if(rv == 0)
+    return -1;
+
+  return 0;
+}
+
+static int alert_read_func(gnutls_session_t ssl,
+                           gnutls_record_encryption_level_t gtls_level,
+                           gnutls_alert_level_t alert_level,
+                           gnutls_alert_description_t alert_desc)
+{
+  struct quicsocket *qs = gnutls_session_get_ptr(ssl);
+  (void)gtls_level;
+  (void)alert_level;
+
+  qs->tls_alert = alert_desc;
+  return 1;
+}
+
+static int tp_recv_func(gnutls_session_t ssl, const uint8_t *data,
+                        size_t data_size)
+{
+  struct quicsocket *qs = gnutls_session_get_ptr(ssl);
+  ngtcp2_transport_params params;
+
+  if(ngtcp2_decode_transport_params(
+         &params, NGTCP2_TRANSPORT_PARAMS_TYPE_ENCRYPTED_EXTENSIONS,
+         data, data_size) != 0)
+    return -1;
+
+  if(ngtcp2_conn_set_remote_transport_params(qs->qconn, &params) != 0)
+    return -1;
+
+  return 0;
+}
+
+static int tp_send_func(gnutls_session_t ssl, gnutls_buffer_t extdata)
+{
+  struct quicsocket *qs = gnutls_session_get_ptr(ssl);
+  uint8_t paramsbuf[64];
+  ngtcp2_transport_params params;
+  ssize_t nwrite;
+  int rc;
+
+  ngtcp2_conn_get_local_transport_params(qs->qconn, &params);
+  nwrite = ngtcp2_encode_transport_params(
+    paramsbuf, sizeof(paramsbuf), NGTCP2_TRANSPORT_PARAMS_TYPE_CLIENT_HELLO,
+    &params);
+  if(nwrite < 0) {
+    fprintf(stderr, "ngtcp2_encode_transport_params: %s\n",
+          ngtcp2_strerror((int)nwrite));
+    return -1;
+  }
+
+  rc = gnutls_buffer_append_data(extdata, paramsbuf, nwrite);
+  if(rc < 0)
+    return rc;
+
+  return (int)nwrite;
+}
+
+static int quic_init_ssl(struct quicsocket *qs)
+{
+  gnutls_datum_t alpn = {NULL, 0};
+  /* this will need some attention when HTTPS proxy over QUIC get fixed */
+  const char * const hostname = qs->conn->host.name;
+  const char *keylog_filename;
+  int rc;
+
+  if(qs->ssl)
+    gnutls_deinit(qs->ssl);
+
+  gnutls_init(&qs->ssl, GNUTLS_CLIENT);
+  gnutls_session_set_ptr(qs->ssl, qs);
+
+  rc = gnutls_priority_set_direct(qs->ssl, QUIC_PRIORITY, NULL);
+  if(rc < 0) {
+    fprintf(stderr, "gnutls_priority_set_direct failed: %s\n",
+            gnutls_strerror(rc));
+    return 1;
+  }
+
+  gnutls_handshake_set_secret_function(qs->ssl, secret_func);
+  gnutls_handshake_set_read_function(qs->ssl, read_func);
+  gnutls_alert_set_read_function(qs->ssl, alert_read_func);
+
+  rc = gnutls_session_ext_register(qs->ssl, "QUIC Transport Parameters",
+                                   0xffa5, GNUTLS_EXT_TLS,
+                                   tp_recv_func, tp_send_func,
+                                   NULL, NULL, NULL,
+                                   GNUTLS_EXT_FLAG_TLS |
+                                   GNUTLS_EXT_FLAG_CLIENT_HELLO |
+                                   GNUTLS_EXT_FLAG_EE);
+  if(rc < 0) {
+    fprintf(stderr, "gnutls_session_ext_register failed: %s\n",
+            gnutls_strerror(rc));
+    return 1;
+  }
+
+  keylog_filename = getenv("SSLKEYLOGFILE");
+  if(keylog_filename) {
+    keylog_file = fopen(keylog_filename, "wb");
+    if(keylog_file) {
+      gnutls_session_set_keylog_function(qs->ssl, keylog_callback);
+    }
+  }
+
+  if(qs->cred)
+    gnutls_certificate_free_credentials(qs->cred);
+
+  rc = gnutls_certificate_allocate_credentials(&qs->cred);
+  if(rc < 0) {
+    fprintf(stderr, "gnutls_certificate_allocate_credentials failed: %s\n",
+            gnutls_strerror(rc));
+    return 1;
+  }
+
+  rc = gnutls_certificate_set_x509_system_trust(qs->cred);
+  if(rc < 0) {
+    fprintf(stderr, "gnutls_certificate_set_x509_system_trust failed: %s\n",
+            gnutls_strerror(rc));
+    return 1;
+  }
+
+  rc = gnutls_credentials_set(qs->ssl, GNUTLS_CRD_CERTIFICATE, qs->cred);
+  if(rc < 0) {
+    fprintf(stderr, "gnutls_credentials_set failed: %s\n",
+            gnutls_strerror(rc));
+    return 1;
+  }
+
+  switch(qs->version) {
+#ifdef NGTCP2_PROTO_VER
+  case NGTCP2_PROTO_VER:
+    /* strip the first byte from NGTCP2_ALPN_H3 */
+    alpn.data = (unsigned char *)NGTCP2_ALPN_H3 + 1;
+    alpn.size = sizeof(NGTCP2_ALPN_H3) - 2;
+    break;
+#endif
+  }
+  if(alpn.data)
+    gnutls_alpn_set_protocols(qs->ssl, &alpn, 1, 0);
+
+  /* set SNI */
+  gnutls_server_name_set(qs->ssl, GNUTLS_NAME_DNS, hostname, strlen(hostname));
+  return 0;
+}
+#endif
 
 static int cb_initial(ngtcp2_conn *quic, void *user_data)
 {
@@ -535,6 +803,8 @@ static ngtcp2_conn_callbacks ng_callbacks = {
   NULL, /* extend_max_remote_streams_bidi */
   NULL, /* extend_max_remote_streams_uni */
   cb_extend_max_stream_data,
+  NULL, /* dcid_status */
+  NULL  /* handshake_confirmed */
 };
 
 /*
@@ -554,9 +824,11 @@ CURLcode Curl_quic_connect(struct connectdata *conn,
   struct quicsocket *qs = &conn->hequic[sockindex];
   char ipbuf[40];
   long port;
+#ifdef USE_OPENSSL
   uint8_t paramsbuf[64];
   ngtcp2_transport_params params;
   ssize_t nwrite;
+#endif
 
   qs->conn = conn;
 
@@ -572,12 +844,14 @@ CURLcode Curl_quic_connect(struct connectdata *conn,
         sockfd, ipbuf, port);
 
   qs->version = NGTCP2_PROTO_VER;
+#ifdef USE_OPENSSL
   qs->sslctx = quic_ssl_ctx(data);
   if(!qs->sslctx)
-    return CURLE_FAILED_INIT; /* TODO: better return code */
+    return CURLE_QUIC_CONNECT_ERROR;
+#endif
 
   if(quic_init_ssl(qs))
-    return CURLE_FAILED_INIT; /* TODO: better return code */
+    return CURLE_QUIC_CONNECT_ERROR;
 
   qs->dcid.datalen = NGTCP2_MAX_CIDLEN;
   result = Curl_rand(data, qs->dcid.data, NGTCP2_MAX_CIDLEN);
@@ -595,7 +869,7 @@ CURLcode Curl_quic_connect(struct connectdata *conn,
   rv = getsockname(sockfd, (struct sockaddr *)&qs->local_addr,
                    &qs->local_addrlen);
   if(rv == -1)
-    return CURLE_FAILED_INIT;
+    return CURLE_QUIC_CONNECT_ERROR;
 
   ngtcp2_addr_init(&path.local, (uint8_t *)&qs->local_addr, qs->local_addrlen,
                    NULL);
@@ -609,8 +883,9 @@ CURLcode Curl_quic_connect(struct connectdata *conn,
   rc = ngtcp2_conn_client_new(&qs->qconn, &qs->dcid, &qs->scid, &path, QUICVER,
                               &ng_callbacks, &qs->settings, NULL, qs);
   if(rc)
-    return CURLE_FAILED_INIT; /* TODO: create a QUIC error code */
+    return CURLE_QUIC_CONNECT_ERROR;
 
+#ifdef USE_OPENSSL
   ngtcp2_conn_get_local_transport_params(qs->qconn, &params);
   nwrite = ngtcp2_encode_transport_params(
     paramsbuf, sizeof(paramsbuf), NGTCP2_TRANSPORT_PARAMS_TYPE_CLIENT_HELLO,
@@ -618,15 +893,16 @@ CURLcode Curl_quic_connect(struct connectdata *conn,
   if(nwrite < 0) {
     failf(data, "ngtcp2_encode_transport_params: %s\n",
           ngtcp2_strerror((int)nwrite));
-    return CURLE_FAILED_INIT;
+    return CURLE_QUIC_CONNECT_ERROR;
   }
 
   if(!SSL_set_quic_transport_params(qs->ssl, paramsbuf, nwrite))
-    return CURLE_FAILED_INIT;
+    return CURLE_QUIC_CONNECT_ERROR;
+#endif
 
   rc = setup_initial_crypto_context(qs);
   if(rc)
-    return CURLE_FAILED_INIT; /* TODO: better return code */
+    return CURLE_QUIC_CONNECT_ERROR;
 
   return CURLE_OK;
 }
@@ -639,7 +915,7 @@ int Curl_quic_ver(char *p, size_t len)
 {
   ngtcp2_info *ng2 = ngtcp2_version(0);
   nghttp3_info *ht3 = nghttp3_version(0);
-  return msnprintf(p, len, " ngtcp2/%s nghttp3/%s",
+  return msnprintf(p, len, "ngtcp2/%s nghttp3/%s",
                    ng2->version_str, ht3->version_str);
 }
 
@@ -674,12 +950,22 @@ static CURLcode ng_disconnect(struct connectdata *conn,
   struct quicsocket *qs = &conn->hequic[0];
   (void)dead_connection;
   if(qs->ssl)
+#ifdef USE_OPENSSL
     SSL_free(qs->ssl);
+#elif defined(USE_GNUTLS)
+    gnutls_deinit(qs->ssl);
+#endif
+#ifdef USE_GNUTLS
+  if(qs->cred)
+    gnutls_certificate_free_credentials(qs->cred);
+#endif
   for(i = 0; i < 3; i++)
     free(qs->crypto_data[i].buf);
   nghttp3_conn_del(qs->h3conn);
   ngtcp2_conn_del(qs->qconn);
+#ifdef USE_OPENSSL
   SSL_CTX_free(qs->sslctx);
+#endif
   return CURLE_OK;
 }
 
@@ -998,7 +1284,7 @@ static int init_ngh3_conn(struct quicsocket *qs)
 
   if(ngtcp2_conn_get_max_local_streams_uni(qs->qconn) < 3) {
     failf(qs->conn->data, "too few available QUIC streams");
-    return CURLE_FAILED_INIT;
+    return CURLE_QUIC_CONNECT_ERROR;
   }
 
   nghttp3_conn_settings_default(&qs->h3settings);
@@ -1015,32 +1301,32 @@ static int init_ngh3_conn(struct quicsocket *qs)
 
   rc = ngtcp2_conn_open_uni_stream(qs->qconn, &ctrl_stream_id, NULL);
   if(rc) {
-    result = CURLE_FAILED_INIT;
+    result = CURLE_QUIC_CONNECT_ERROR;
     goto fail;
   }
 
   rc = nghttp3_conn_bind_control_stream(qs->h3conn, ctrl_stream_id);
   if(rc) {
-    result = CURLE_FAILED_INIT;
+    result = CURLE_QUIC_CONNECT_ERROR;
     goto fail;
   }
 
   rc = ngtcp2_conn_open_uni_stream(qs->qconn, &qpack_enc_stream_id, NULL);
   if(rc) {
-    result = CURLE_FAILED_INIT;
+    result = CURLE_QUIC_CONNECT_ERROR;
     goto fail;
   }
 
   rc = ngtcp2_conn_open_uni_stream(qs->qconn, &qpack_dec_stream_id, NULL);
   if(rc) {
-    result = CURLE_FAILED_INIT;
+    result = CURLE_QUIC_CONNECT_ERROR;
     goto fail;
   }
 
   rc = nghttp3_conn_bind_qpack_streams(qs->h3conn, qpack_enc_stream_id,
                                        qpack_dec_stream_id);
   if(rc) {
-    result = CURLE_FAILED_INIT;
+    result = CURLE_QUIC_CONNECT_ERROR;
     goto fail;
   }
 
@@ -1599,9 +1885,11 @@ static CURLcode ng_flush_egress(struct connectdata *conn, int sockfd,
   case AF_INET:
     pktlen = NGTCP2_MAX_PKTLEN_IPV4;
     break;
+#ifdef ENABLE_IPV6
   case AF_INET6:
     pktlen = NGTCP2_MAX_PKTLEN_IPV6;
     break;
+#endif
   default:
     assert(0);
   }

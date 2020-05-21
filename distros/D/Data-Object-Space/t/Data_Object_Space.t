@@ -13,6 +13,12 @@ Data::Object::Space
 
 =cut
 
+=tagline
+
+Namespace Class
+
+=cut
+
 =abstract
 
 Namespace Class for Perl 5
@@ -24,6 +30,7 @@ Namespace Class for Perl 5
 method: append
 method: array
 method: arrays
+method: authority
 method: base
 method: bless
 method: build
@@ -31,6 +38,7 @@ method: call
 method: child
 method: children
 method: cop
+method: data
 method: destroy
 method: eval
 method: functions
@@ -39,6 +47,8 @@ method: hashes
 method: id
 method: included
 method: inherits
+method: init
+method: inject
 method: load
 method: loaded
 method: locate
@@ -49,6 +59,7 @@ method: parse
 method: parts
 method: prepend
 method: rebase
+method: require
 method: root
 method: routine
 method: routines
@@ -56,6 +67,7 @@ method: scalar
 method: scalars
 method: sibling
 method: siblings
+method: use
 method: used
 method: variables
 method: version
@@ -166,6 +178,47 @@ arrays() : ArrayRef
   $space->arrays
 
   # ['handler', 'initial']
+
+=cut
+
+=method authority
+
+The authority method returns the C<AUTHORITY> declared on the target package,
+if any.
+
+=signature authority
+
+authority() : Maybe[Str]
+
+=example-1 authority
+
+  package Foo::Boo;
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('foo/boo');
+
+  $space->authority
+
+  # undef
+
+=example-2 authority
+
+  package Foo::Boo;
+
+  our $AUTHORITY = 'cpan:AWNCORP';
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('foo/boo');
+
+  $space->authority
+
+  # 'cpan:AWNCORP'
 
 =cut
 
@@ -303,6 +356,32 @@ call(Any @args) : Any
 
   # started
 
+=example-2 call
+
+  # given: synopsis
+
+  package Zoo;
+
+  sub import;
+
+  sub AUTOLOAD {
+    bless {};
+  }
+
+  sub DESTROY {
+    ; # noop
+  }
+
+  package main;
+
+  use Data::Object::Space;
+
+  $space = Data::Object::Space->new('zoo');
+
+  $space->call('start')
+
+  # bless({}, 'Zoo')
+
 =cut
 
 =method child
@@ -384,6 +463,27 @@ cop(Any @args) : CodeRef
   $space->cop('handler', $space->bless)
 
   # sub { Foo::Bar::handler(..., @_) }
+
+=cut
+
+=method data
+
+The data method attempts to read and return any content stored in the C<DATA>
+section of the package namespace.
+
+=signature data
+
+data() : Str
+
+=example-1 data
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('foo');
+
+  $space->data; # ''
 
 =cut
 
@@ -594,6 +694,53 @@ inherits() : ArrayRef
   $space->inherits
 
   # ['Foo']
+
+=cut
+
+=method init
+
+The init method ensures that the package namespace is loaded and, whether
+created in-memory or on-disk, is flagged as being loaded and loadable.
+
+=signature init
+
+init() : Str
+
+=example-1 init
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('kit');
+
+  $space->init
+
+  # Kit
+
+=cut
+
+=method inject
+
+The inject method monkey-patches the package namespace, installing a named
+subroutine into the package which can then be called normally, returning the
+fully-qualified subroutine name.
+
+=signature inject
+
+inject(Str $name, Maybe[CodeRef] $coderef) : Any
+
+=example-1 inject
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('kit');
+
+  $space->inject('build', sub { 'finished' });
+
+  # *Kit::build
 
 =cut
 
@@ -898,6 +1045,25 @@ rebase(Str @args) : Object
 
 =cut
 
+=method require
+
+The require method executes a C<require> statement within the package namespace
+specified.
+
+=signature require
+
+require(Str $target) : Any
+
+=example-1 require
+
+  # given: synopsis
+
+  $space->require('Moo');
+
+  # 1
+
+=cut
+
 =method root
 
 The root method returns the root package namespace segments (parts). Sometimes
@@ -1082,6 +1248,53 @@ siblings() : ArrayRef[Object]
 
 =cut
 
+=method use
+
+The use method executes a C<use> statement within the package namespace
+specified.
+
+=signature use
+
+use(Str | Tuple[Str, Str] $target, Any @params) : Object
+
+=example-1 use
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('foo/goo');
+
+  $space->use('Moo');
+
+  # $self
+
+=example-2 use
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('foo/hoo');
+
+  $space->use('Moo', 'has');
+
+  # $self
+
+=example-3 use
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('foo/ioo');
+
+  $space->use(['Moo', 9.99], 'has');
+
+  # $self
+
+=cut
+
 =method used
 
 The used method searches C<%INC> for the package namespace and if found returns
@@ -1251,6 +1464,20 @@ $subs->example(-1, 'arrays', 'method', fun($tryable) {
   $result
 });
 
+$subs->example(-1, 'authority', 'method', fun($tryable) {
+  ok !(my $result = $tryable->result);
+  is $result, undef;
+
+  $result
+});
+
+$subs->example(-2, 'authority', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is $result, 'cpan:AWNCORP';
+
+  $result
+});
+
 $subs->example(-1, 'base', 'method', fun($tryable) {
   ok my $result = $tryable->result;
   is $result, 'Bar';
@@ -1295,6 +1522,13 @@ $subs->example(-1, 'call', 'method', fun($tryable) {
   $result
 });
 
+$subs->example(-2, 'call', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->isa('Zoo');
+
+  $result
+});
+
 $subs->example(-1, 'child', 'method', fun($tryable) {
   ok my $result = $tryable->result;
   is $$result, 'Foo/Bar/Baz';
@@ -1320,6 +1554,13 @@ $subs->example(-1, 'cop', 'method', fun($tryable) {
   is $returned->[2], 2;
   is $returned->[3], 3;
   is $returned->[4], 4;
+
+  $result
+});
+
+$subs->example(-1, 'data', 'method', fun($tryable) {
+  ok !(my $result = $tryable->result);
+  is $result, '';
 
   $result
 });
@@ -1387,6 +1628,23 @@ $subs->example(-1, 'inherits', 'method', fun($tryable) {
 $subs->example(-2, 'inherits', 'method', fun($tryable) {
   ok my $result = $tryable->result;
   is_deeply $result, ['Foo'];
+
+  $result
+});
+
+$subs->example(-1, 'init', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is $result, 'Kit';
+
+  $result
+});
+
+$subs->example(-1, 'inject', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is $result, '*Kit::build';
+
+  my $package = 'Kit';
+  is $package->build, 'finished';
 
   $result
 });
@@ -1522,6 +1780,13 @@ $subs->example(-1, 'rebase', 'method', fun($tryable) {
   $result
 });
 
+$subs->example(-1, 'require', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
 $subs->example(-1, 'root', 'method', fun($tryable) {
   ok my $result = $tryable->result;
   is $result, 'Foo';
@@ -1568,6 +1833,48 @@ $subs->example(-1, 'siblings', 'method', fun($tryable) {
   ok my $result = $tryable->result;
   ok @$result > 1;
   ok $_->isa('Data::Object::Space') for @$result;
+
+  $result
+});
+
+$subs->example(-1, 'use', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is $result->package, 'Foo::Goo';
+  ok $result->package->can('after');
+  ok $result->package->can('before');
+  ok $result->package->can('extends');
+  ok $result->package->can('has');
+  ok $result->package->can('with');
+
+  $result
+});
+
+$subs->example(-2, 'use', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is $result->package, 'Foo::Hoo';
+  ok $result->package->can('after');
+  ok $result->package->can('before');
+  ok $result->package->can('extends');
+  ok $result->package->can('has');
+  ok $result->package->can('with');
+
+  $result
+});
+
+$subs->example(-3, 'use', 'method', fun($tryable) {
+  my $failed = 0;
+  $tryable->default(fun($error) {
+    $failed++;
+    Data::Object::Space->new('foo/ioo');
+  });
+  ok my $result = $tryable->result;
+  is $result->package, 'Foo::Ioo';
+  ok $failed;
+  ok !$result->package->can('after');
+  ok !$result->package->can('before');
+  ok !$result->package->can('extends');
+  ok !$result->package->can('has');
+  ok !$result->package->can('with');
 
   $result
 });

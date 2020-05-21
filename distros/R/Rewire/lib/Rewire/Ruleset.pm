@@ -153,6 +153,9 @@ package Rewire::Ruleset;
         constructor => {
           type => "string",
         },
+        extends => {
+          type => "string",
+        },
         function => {
           type => "string",
         },

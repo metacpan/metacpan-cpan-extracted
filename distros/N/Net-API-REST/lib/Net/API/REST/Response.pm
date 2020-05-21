@@ -27,7 +27,7 @@ BEGIN
     use Cookie::Baker ();
     use Scalar::Util;
     use Net::API::REST::Status;
-    use TryCatch;
+    use Nice::Try;
     our $VERSION = 'v0.4.10';
 };
 

@@ -12,6 +12,7 @@ check the changelog of the current development status, as one or more of these
 problems may have been fixed or changed somewhat since this was written!
 
  1. HTTP
+ 1.2 Multiple methods in a single WWW-Authenticate: header
  1.3 STARTTRANSFER time is wrong for HTTP POSTs
  1.4 multipart formposts file name encoding
  1.5 Expect-100 meets 417
@@ -24,19 +25,19 @@ problems may have been fixed or changed somewhat since this was written!
  2. TLS
  2.1 CURLINFO_SSL_VERIFYRESULT has limited support
  2.2 DER in keychain
- 2.3 GnuTLS backend skips really long certificate fields
  2.4 DarwinSSL won't import PKCS#12 client certificates without a password
  2.5 Client cert handling with Issuer DN differs between backends
  2.6 CURL_GLOBAL_SSL
  2.7 Client cert (MTLS) issues with Schannel
  2.8 Schannel disable CURLOPT_SSL_VERIFYPEER and verify hostname
  2.9 TLS session cache doesn't work with TFO
+ 2.10 Store TLS context per transfer instead of per connection
 
  3. Email protocols
  3.1 IMAP SEARCH ALL truncated response
  3.2 No disconnect command
- 3.3 SMTP to multiple recipients
- 3.4 POP3 expects "CRLF.CRLF" eob for some single-line responses
+ 3.3 POP3 expects "CRLF.CRLF" eob for some single-line responses
+ 3.4 AUTH PLAIN for SMTP is not working on all servers
 
  4. Command line
  4.1 -J and -O with %-encoded file names
@@ -46,7 +47,6 @@ problems may have been fixed or changed somewhat since this was written!
  4.5 Improve --data-urlencode space encoding
 
  5. Build and portability issues
- 5.1 USE_UNIX_SOCKETS on Windows
  5.2 curl-config --libs contains private details
  5.3 curl compiled on OSX 10.13 failed to run on OSX 10.10
  5.4 Cannot compile against a static build of OpenLDAP
@@ -56,6 +56,7 @@ problems may have been fixed or changed somewhat since this was written!
  5.8 configure finding libs in wrong directory
  5.9 Utilize Requires.private directives in libcurl.pc
  5.10 IDN tests failing on Windows / MSYS2
+ 5.11 configure --with-gssapi with Heimdal is ignored on macOS
 
  6. Authentication
  6.1 NTLM authentication and unicode
@@ -76,7 +77,7 @@ problems may have been fixed or changed somewhat since this was written!
  7.7 FTP and empty path parts in the URL
  7.8 Premature transfer end but healthy control channel
  7.9 Passive transfer tries only one IP address
- 7.10 Stick to same family over SOCKS proxy
+ 7.10 FTPS needs session reuse
 
  8. TELNET
  8.1 TELNET and time limitations don't work
@@ -86,8 +87,6 @@ problems may have been fixed or changed somewhat since this was written!
  9.1 SFTP doesn't do CURLOPT_POSTQUOTE correct
 
  10. SOCKS
- 10.1 SOCKS proxy connections are done blocking
- 10.2 SOCKS don't support timeouts
  10.3 FTPS over SOCKS
  10.4 active FTP over a SOCKS
 
@@ -99,6 +98,9 @@ problems may have been fixed or changed somewhat since this was written!
  11.5 Connection information when using TCP Fast Open
  11.6 slow connect to localhost on Windows
  11.7 signal-based resolver timeouts
+ 11.8 DoH leaks memory after followlocation
+ 11.9 DoH doesn't inherit all transfer options
+ 11.10 Blocking socket operations in non-blocking API
 
  12. LDAP and OpenLDAP
  12.1 OpenLDAP hangs after returning results
@@ -114,6 +116,13 @@ problems may have been fixed or changed somewhat since this was written!
 ==============================================================================
 
 1. HTTP
+
+1.2 Multiple methods in a single WWW-Authenticate: header
+
+ The HTTP responses headers WWW-Authenticate: can provide information about
+ multiple authentication methods as multiple headers or as several methods
+ within a single header. The latter way, several methods in the same physical
+ line, is not supported by libcurl's parser. (For no good reason.)
 
 1.3 STARTTRANSFER time is wrong for HTTP POSTs
 
@@ -143,7 +152,7 @@ problems may have been fixed or changed somewhat since this was written!
 1.6 Unnecessary close when 401 received waiting for 100
 
  libcurl closes the connection if an HTTP 401 reply is received while it is
- waiting for the the 100-continue response.
+ waiting for the 100-continue response.
  https://curl.haxx.se/mail/lib-2008-08/0462.html
 
 1.7 Deflate error after all content was received
@@ -198,12 +207,6 @@ problems may have been fixed or changed somewhat since this was written!
 
  Curl doesn't recognize certificates in DER format in keychain, but it works
  with PEM.  https://curl.haxx.se/bug/view.cgi?id=1065
-
-2.3 GnuTLS backend skips really long certificate fields
-
- libcurl calls gnutls_x509_crt_get_dn() with a fixed buffer size and if the
- field is too long in the cert, it'll just return an error and the field will
- be displayed blank.
 
 2.4 DarwinSSL won't import PKCS#12 client certificates without a password
 
@@ -261,6 +264,16 @@ problems may have been fixed or changed somewhat since this was written!
 
  See https://github.com/curl/curl/issues/4301
 
+2.10 Store TLS context per transfer instead of per connection
+
+ The GnuTLS `backend->cred` and the OpenSSL `backend->ctx` data and their
+ proxy versions (and possibly other TLS backends), could be better moved to be
+ stored in the Curl_easy handle instead of in per connection so that a single
+ transfer that makes multiple connections can reuse the context and reduce
+ memory consumption.
+
+ https://github.com/curl/curl/issues/5102
+
 3. Email protocols
 
 3.1 IMAP SEARCH ALL truncated response
@@ -275,20 +288,18 @@ problems may have been fixed or changed somewhat since this was written!
  The disconnect commands (LOGOUT and QUIT) may not be sent by IMAP, POP3 and
  SMTP if a failure occurs during the authentication phase of a connection.
 
-3.3 SMTP to multiple recipients
-
- When sending data to multiple recipients, curl will abort and return failure
- if one of the recipients indicate failure (on the "RCPT TO"
- command). Ordinary mail programs would proceed and still send to the ones
- that can receive data. This is subject for change in the future.
- https://curl.haxx.se/bug/view.cgi?id=1116
-
-3.4 POP3 expects "CRLF.CRLF" eob for some single-line responses
+3.3 POP3 expects "CRLF.CRLF" eob for some single-line responses
 
  You have to tell libcurl not to expect a body, when dealing with one line
  response commands. Please see the POP3 examples and test cases which show
  this for the NOOP and DELE commands. https://curl.haxx.se/bug/?i=740
 
+3.4 AUTH PLAIN for SMTP is not working on all servers
+
+ Specifying "--login-options AUTH=PLAIN" on the command line doesn't seem to
+ work correctly.
+
+ See https://github.com/curl/curl/issues/4080
 
 4. Command line
 
@@ -342,13 +353,6 @@ problems may have been fixed or changed somewhat since this was written!
  See https://github.com/curl/curl/issues/3229
 
 5. Build and portability issues
-
-5.1 USE_UNIX_SOCKETS on Windows
-
- Due to incorrect CMake checks for the presence of the feature, it will never
- be enabled for windows in a cmake build.
-
- See https://github.com/curl/curl/issues/4040
 
 5.2 curl-config --libs contains private details
 
@@ -432,6 +436,12 @@ problems may have been fixed or changed somewhat since this was written!
  compatibility.
 
  https://github.com/curl/curl/issues/3747
+
+5.11 configure --with-gssapi with Heimdal is ignored on macOS
+
+ ... unless you also pass --with-gssapi-libs
+
+ https://github.com/curl/curl/issues/3841
 
 6. Authentication
 
@@ -578,15 +588,13 @@ problems may have been fixed or changed somewhat since this was written!
 
  See https://github.com/curl/curl/issues/1508
 
-7.10 Stick to same family over SOCKS proxy
+7.10 FTPS needs session reuse
 
- When asked to do FTP over a SOCKS proxy, it might connect to the proxy (and
- then subsequently to the remote server) using for example IPv4. When doing
- the second connection, curl should make sure that the second connection is
- using the same IP protocol version as the first connection did and not try
- others, since the remote server will only accept the same.
+ When the control connection is reused for a subsequent transfer, some FTPS
+ servers complain about "missing session reuse" for the data channel for the
+ second transfer.
 
- See https://curl.haxx.se/mail/archive-2018-07/0000.html
+ https://github.com/curl/curl/issues/4654
 
 8. TELNET
 
@@ -614,21 +622,6 @@ problems may have been fixed or changed somewhat since this was written!
 
 
 10. SOCKS
-
-10.1 SOCKS proxy connections are done blocking
-
- Both SOCKS5 and SOCKS4 proxy connections are done blocking, which is very bad
- when used with the multi interface.
-
-10.2 SOCKS don't support timeouts
-
- The SOCKS4 connection codes don't properly acknowledge (connect) timeouts.
- According to bug #1556528, even the SOCKS5 connect code does not do it right:
- https://curl.haxx.se/bug/view.cgi?id=604
-
- When connecting to a SOCK proxy, the (connect) timeout is not properly
- acknowledged after the actual TCP connect (during the SOCKS "negotiate"
- phase).
 
 10.3 FTPS over SOCKS
 
@@ -709,6 +702,17 @@ problems may have been fixed or changed somewhat since this was written!
  Also, alarm() provides timeout resolution only to the nearest second. alarm
  ought to be replaced by setitimer on systems that support it.
 
+11.8 DoH leaks memory after followlocation
+
+ https://github.com/curl/curl/issues/4592
+
+11.9 DoH doesn't inherit all transfer options
+
+ https://github.com/curl/curl/issues/4578
+
+11.10 Blocking socket operations in non-blocking API
+
+ The list of blocking socket operations is in TODO section "More non-blocking".
 
 12. LDAP and OpenLDAP
 

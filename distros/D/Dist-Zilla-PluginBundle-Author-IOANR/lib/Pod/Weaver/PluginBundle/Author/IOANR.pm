@@ -1,4 +1,4 @@
-package Pod::Weaver::PluginBundle::Author::IOANR 1.201400;
+package Pod::Weaver::PluginBundle::Author::IOANR 1.201410;
 
 # ABSTRACT: Weave the POD for a IOANR dist
 
@@ -94,7 +94,7 @@ Pod::Weaver::PluginBundle::Author::IOANR - Weave the POD for a IOANR dist
 
 =head1 VERSION
 
-version 1.201400
+version 1.201410
 
 =head1 SEE ALSO
 

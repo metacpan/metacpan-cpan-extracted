@@ -534,21 +534,20 @@ sub make_test {
         push @layers, ( 'locale' ) x @locales;
     }
 
+    delete $ENV{PERL_UNICODE};
     foreach my $perlio ( @layers ) {
         my $had_LC_ALL = exists $ENV{LC_ALL};
-        local( $ENV{PERLIO}, $ENV{LC_ALL}, $ENV{PERL_UNICODE} ) =
-             ( "", defined $ENV{LC_ALL} ? $ENV{LC_ALL} : "", "" );
+        local( $ENV{PERLIO}, $ENV{LC_ALL} ) =
+             ( "", defined $ENV{LC_ALL} ? $ENV{LC_ALL} : "" );
         my $perlio_logmsg = $perlio;
         if ( $perlio ne 'locale' ) {
             $ENV{PERLIO} = $perlio;
             $self->{is_win32} and $ENV{PERLIO} .= " :crlf";
             $ENV{LC_ALL} = 'C' if $self->{force_c_locale};
             $ENV{LC_ALL} or delete $ENV{LC_ALL};
-            delete $ENV{PERL_UNICODE};
             # make default 'make test' runs possible
             delete $ENV{PERLIO} if $self->{defaultenv};
         } else {
-            $ENV{PERL_UNICODE} = ""; # See -C in perlrun
             $ENV{LC_ALL} = $self->{locale};
             $perlio_logmsg .= ":" . pop @locales;
         }

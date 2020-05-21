@@ -1,6 +1,6 @@
 
 package Shipment::UPS::WSDL::TrackElements::UPSSecurity;
-$Shipment::UPS::WSDL::TrackElements::UPSSecurity::VERSION = '3.02';
+$Shipment::UPS::WSDL::TrackElements::UPSSecurity::VERSION = '3.04';
 use strict;
 use warnings;
 
@@ -65,7 +65,7 @@ use warnings;
 
     package Shipment::UPS::WSDL::TrackElements::UPSSecurity::_ServiceAccessToken;
     $Shipment::UPS::WSDL::TrackElements::UPSSecurity::_ServiceAccessToken::VERSION
-      = '3.02';
+      = '3.04';
     use strict;
     use warnings;
     {
@@ -110,7 +110,7 @@ use warnings;
 
     package Shipment::UPS::WSDL::TrackElements::UPSSecurity::_UsernameToken;
     $Shipment::UPS::WSDL::TrackElements::UPSSecurity::_UsernameToken::VERSION
-      = '3.02';
+      = '3.04';
     use strict;
     use warnings;
     {
@@ -175,7 +175,7 @@ Shipment::UPS::WSDL::TrackElements::UPSSecurity
 
 =head1 VERSION
 
-version 3.02
+version 3.04
 
 =head1 DESCRIPTION
 

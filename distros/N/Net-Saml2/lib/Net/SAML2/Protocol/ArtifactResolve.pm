@@ -7,8 +7,9 @@ with 'Net::SAML2::Role::ProtocolMessage';
 
 
 
+has 'issuer'      => (isa => Str, is => 'ro', required => 1);
+has 'destination' => (isa => Str, is => 'ro', required => 1);
 has 'artifact'    => (isa => Str, is => 'ro', required => 1);
-
 
 
 sub as_xml {
@@ -52,7 +53,7 @@ Net::SAML2::Protocol::ArtifactResolve
 
 =head1 VERSION
 
-version 0.20
+version 0.25
 
 =head1 SYNOPSIS
 
@@ -106,6 +107,7 @@ This software is copyright (c) 2020 by Chris Andrews and Others; in detail:
   Copyright 2010-2011  Chris Andrews
             2012       Peter Marschall
             2017       Alessandro Ranellucci
+            2020       Timothy Legge
 
 
 This is free software; you can redistribute it and/or modify it under

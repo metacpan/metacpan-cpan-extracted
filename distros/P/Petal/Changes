@@ -1,5 +1,8 @@
 Revision history for Petal.
 
+2.26 Wed May 20 15:00:00 2020
+    - fix for cache race condition (mreitinger)
+
 2.25 Wed Feb 13 21:00:00 2019
     - Add error_on_include_error option (mreitinger)
     - add error details to all open() calls to make debugging easier (mreitinger)

@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.181';
+our $VERSION = '1.182';
 
 use Quiq::Digest;
 use Quiq::Path;
@@ -17,7 +17,7 @@ use Quiq::Storable;
 
 =head1 NAME
 
-Quiq::Cache - Cache Daten in Datei
+Quiq::Cache - Cache Datenstruktur in Datei
 
 =head1 BASE CLASS
 
@@ -27,19 +27,26 @@ L<Quiq::Hash>
 
   use Quiq::Cache;
   
+  sub ... {
+      ...
   
-  my $c = Quiq::Cache->new($cacheDir,$duration,\@key)
-      -inactive => $condition,
-  );
-  if (my $ref = $c->read) {
-      return $ref; # liefere Datenstruktur aus Cache
+      # Instantiiere Cache
+  
+      my $c = Quiq::Cache->new($cacheDir,$duration,\@key)
+          -inactive => $condition,
+      );
+      if (my $ref = $c->read) {
+          return $ref; # liefere Datenstruktur aus Cache
+      }
+  
+      # Baue Datenstruktur auf
+  
+      ...
+  
+      $c->write($ref); # schreibe Datenstuktur auf Cache
+  
+      return $ref; # liefere Datenstruktur
   }
-  
-  # ... baue Datenstruktur auf ...
-  
-  $c->write($ref); # schreibe Datenstuktur auf Cache
-  
-  return $ref;
 
 =head1 DESCRIPTION
 
@@ -249,7 +256,7 @@ sub write {
 
 =head1 VERSION
 
-1.181
+1.182
 
 =head1 AUTHOR
 

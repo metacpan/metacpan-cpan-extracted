@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object.pm
-## Version v0.9.4
+## Version v0.9.5
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2017/07/19
-## Modified 2020/05/16
+## Modified 2020/05/21
 ## 
 ##----------------------------------------------------------------------------
 ## This is the subclassable module for driver specific ones.
@@ -29,7 +29,7 @@ BEGIN
     our( $VERSION, $DB_ERRSTR, $ERROR, $DEBUG, $CONNECT_VIA, $CACHE_QUERIES, $CACHE_SIZE );
     our( $CACHE_TABLE, $USE_BIND, $USE_CACHE, $MOD_PERL, @DBH, $CACHE_DIR );
     our( $CONSTANT_QUERIES_CACHE );
-    $VERSION     = 'v0.9.4';
+    $VERSION     = 'v0.9.5';
     use Devel::Confess;
 };
 
@@ -2486,7 +2486,7 @@ DB::Object - SQL API
     
 =head1 VERSION
 
-    v0.9.4
+    v0.9.5
 
 =head1 DESCRIPTION
 

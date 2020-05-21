@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v0.995-5-ge072fef
+package Test::JSON::Schema::Acceptance; # git description: v0.996-3-g3d97dc3
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators like JSON::Schema
 
-our $VERSION = '0.996';
+our $VERSION = '0.997';
 
 no if "$]" >= 5.031009, feature => 'indirect';
 use Test::More ();
@@ -260,7 +260,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 0.996
+version 0.997
 
 =head1 SYNOPSIS
 

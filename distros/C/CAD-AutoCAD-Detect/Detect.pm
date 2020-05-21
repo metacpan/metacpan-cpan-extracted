@@ -12,7 +12,7 @@ use Readonly;
 # Constants.
 Readonly::Array our @EXPORT => qw(detect_dwg_file);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Detect DWG file.
 sub detect_dwg_file {
@@ -30,9 +30,9 @@ sub detect_dwg_file {
 	if ($read == 6 && (any { $_ eq $magic }
 		CAD::AutoCAD::Version->list_of_acad_identifiers)) {
 
-		return 1;
+		return $magic;
 	} else {
-		return 0;
+		return;
 	}
 }
 
@@ -52,7 +52,7 @@ CAD::AutoCAD::Detect - Detect AutoCAD files through magic string.
 
  use CAD::AutoCAD::Detect qw(detect_dwg_file);
 
- my $dwg_flag = detect_dwg_file($file);
+ my $dwg_magic = detect_dwg_file($file);
 
 =head1 DESCRIPTION
 
@@ -64,11 +64,11 @@ List of supported files: dwg
 
 =head2 C<detect_dwg_file>
 
- my $dwg_flag = detect_dwg_file($file);
+ my $dwg_magic = detect_dwg_file($file);
 
 Detect DWG file.
 
-Returns 1/0.
+Returns magic string or undef.
 
 =head1 ERRORS
 
@@ -98,10 +98,10 @@ Returns 1/0.
  barf($temp_file, decode_base64($data));
 
  # Check file.
- my $dwg_flag = detect_dwg_file($temp_file);
+ my $dwg_magic = detect_dwg_file($temp_file);
 
  # Print out.
- if ($dwg_flag) {
+ if ($dwg_magic) {
          print "File '$temp_file' is DWG file.\n";
  } else {
          print "File '$temp_file' isn't DWG file.\n";
@@ -125,10 +125,10 @@ Returns 1/0.
  my $file = $ARGV[0];
 
  # Check DWG file.
- my $dwg_flag = detect_dwg_file($file);
+ my $dwg_magic = detect_dwg_file($file);
 
  # Print out.
- if ($dwg_flag) {
+ if ($dwg_magic) {
          print "File '$file' is DWG file.\n";
  } else {
          print "File '$file' isn't DWG file.\n";
@@ -163,6 +163,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

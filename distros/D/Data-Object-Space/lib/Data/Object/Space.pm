@@ -8,7 +8,7 @@ use routines;
 
 use parent 'Data::Object::Name';
 
-our $VERSION = '2.05'; # VERSION
+our $VERSION = '2.07'; # VERSION
 
 # METHODS
 
@@ -44,6 +44,11 @@ method arrays() {
   return $arrays;
 }
 
+method authority() {
+
+  return $self->scalar('AUTHORITY');
+}
+
 method base() {
 
   return $self->parse->[-1];
@@ -67,7 +72,7 @@ method call($func, @args) {
   unless ($func) {
     require Carp;
 
-    my $text = qq[Attempt to call undefined object method in package "$class"];
+    my $text = qq[Attempt to call undefined class method in package "$class"];
 
     Carp::confess $text;
   }
@@ -75,9 +80,13 @@ method call($func, @args) {
   my $next = $class->can($func);
 
   unless ($next) {
+    $next = sub { $class->$func(@args) } if $class->can('AUTOLOAD');
+  }
+
+  unless ($next) {
     require Carp;
 
-    my $text = qq[Unable to locate object method "$func" via package "$class"];
+    my $text = qq[Unable to locate class method "$func" via package "$class"];
 
     Carp::confess $text;
   }
@@ -152,6 +161,27 @@ method cop($func, @args) {
   return sub { $next->(@args ? (@args, @_) : @_) };
 }
 
+method data() {
+  no strict 'refs';
+
+  my $class = $self->package;
+
+  local $.;
+
+  my $handle = \*{"${class}::DATA"};
+
+  return '' if !fileno $handle;
+
+  seek $handle, 0, 0;
+
+  my $data = join '', <$handle>;
+
+  $data =~ s/^.*\n__DATA__\r?\n/\n/s;
+  $data =~ s/\n__END__\r?\n.*$/\n/s;
+
+  return $data;
+}
+
 method destroy() {
   require Symbol;
 
@@ -218,6 +248,31 @@ method id() {
   return $self->label;
 }
 
+method init() {
+  my $class = $self->package;
+
+  if ($self->routine('import')) {
+
+    return $class;
+  }
+
+  $class = $self->locate ? $self->load : $self->package;
+
+  if ($self->routine('import')) {
+
+    return $class;
+  }
+  else {
+
+    my $import = sub { $class };
+
+    $self->inject('import', $import);
+    $self->load;
+
+    return $class;
+  }
+}
+
 method inherits() {
 
   return $self->array('ISA');
@@ -226,6 +281,23 @@ method inherits() {
 method included() {
 
   return $INC{$self->format('path', '%s.pm')};
+}
+
+method inject($name, $coderef) {
+  my $class = $self->package;
+
+  local $@;
+  no strict 'refs';
+  no warnings 'redefine';
+
+  if (state $subutil = eval "require Sub::Util") {
+    return *{"${class}::${name}"} = Sub::Util::set_subname(
+      "${class}::${name}", $coderef || sub{$class}
+    );
+  }
+  else {
+    return *{"${class}::${name}"} = $coderef || sub{$class};
+  }
 }
 
 method load() {
@@ -351,6 +423,12 @@ method rebase(@args) {
   return $class->new($self->base)->prepend($path);
 }
 
+method require($target) {
+  $target = "'$target'" if -f $target;
+
+  return $self->eval("require $target");
+}
+
 method root() {
 
   return $self->parse->[0];
@@ -432,6 +510,31 @@ method siblings() {
   ];
 }
 
+method use($target, @params) {
+  my $version;
+
+  my $class = $self->package;
+
+  ($target, $version) = @$target if ref $target eq 'ARRAY';
+
+  $self->require($target);
+
+  require Scalar::Util;
+
+  my @statement = (
+    'no strict "subs";',
+    (
+      Scalar::Util::looks_like_number($version)
+        ? "${target}->VERSION($version);" : ()
+    ),
+    'sub{ my ($target, @params) = @_; $target->import(@params)}'
+  );
+
+  $self->eval(join("\n", @statement))->($target, $class, @params);
+
+  return $self;
+}
+
 method used() {
   my $class = $self->package;
   my $path = $self->path;
@@ -462,7 +565,7 @@ method version() {
 
 =head1 NAME
 
-Data::Object::Space
+Data::Object::Space - Namespace Class
 
 =cut
 
@@ -594,6 +697,53 @@ names.
   $space->arrays
 
   # ['handler', 'initial']
+
+=back
+
+=cut
+
+=head2 authority
+
+  authority() : Maybe[Str]
+
+The authority method returns the C<AUTHORITY> declared on the target package,
+if any.
+
+=over 4
+
+=item authority example #1
+
+  package Foo::Boo;
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('foo/boo');
+
+  $space->authority
+
+  # undef
+
+=back
+
+=over 4
+
+=item authority example #2
+
+  package Foo::Boo;
+
+  our $AUTHORITY = 'cpan:AWNCORP';
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('foo/boo');
+
+  $space->authority
+
+  # 'cpan:AWNCORP'
 
 =back
 
@@ -749,6 +899,36 @@ and if successful returns the resulting value.
 
 =back
 
+=over 4
+
+=item call example #2
+
+  # given: synopsis
+
+  package Zoo;
+
+  sub import;
+
+  sub AUTOLOAD {
+    bless {};
+  }
+
+  sub DESTROY {
+    ; # noop
+  }
+
+  package main;
+
+  use Data::Object::Space;
+
+  $space = Data::Object::Space->new('zoo');
+
+  $space->call('start')
+
+  # bless({}, 'Zoo')
+
+=back
+
 =cut
 
 =head2 child
@@ -834,6 +1014,29 @@ and if successful returns a closure.
   $space->cop('handler', $space->bless)
 
   # sub { Foo::Bar::handler(..., @_) }
+
+=back
+
+=cut
+
+=head2 data
+
+  data() : Str
+
+The data method attempts to read and return any content stored in the C<DATA>
+section of the package namespace.
+
+=over 4
+
+=item data example #1
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('foo');
+
+  $space->data; # ''
 
 =back
 
@@ -1064,6 +1267,57 @@ derived from.
   $space->inherits
 
   # ['Foo']
+
+=back
+
+=cut
+
+=head2 init
+
+  init() : Str
+
+The init method ensures that the package namespace is loaded and, whether
+created in-memory or on-disk, is flagged as being loaded and loadable.
+
+=over 4
+
+=item init example #1
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('kit');
+
+  $space->init
+
+  # Kit
+
+=back
+
+=cut
+
+=head2 inject
+
+  inject(Str $name, Maybe[CodeRef] $coderef) : Any
+
+The inject method monkey-patches the package namespace, installing a named
+subroutine into the package which can then be called normally, returning the
+fully-qualified subroutine name.
+
+=over 4
+
+=item inject example #1
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('kit');
+
+  $space->inject('build', sub { 'finished' });
+
+  # *Kit::build
 
 =back
 
@@ -1426,6 +1680,27 @@ specified to the base of the current object's namespace.
 
 =cut
 
+=head2 require
+
+  require(Str $target) : Any
+
+The require method executes a C<require> statement within the package namespace
+specified.
+
+=over 4
+
+=item require example #1
+
+  # given: synopsis
+
+  $space->require('Moo');
+
+  # 1
+
+=back
+
+=cut
+
 =head2 root
 
   root() : Str
@@ -1619,6 +1894,63 @@ deep).
   #   'Encode/Config'
   #   ...
   # ]
+
+=back
+
+=cut
+
+=head2 use
+
+  use(Str | Tuple[Str, Str] $target, Any @params) : Object
+
+The use method executes a C<use> statement within the package namespace
+specified.
+
+=over 4
+
+=item use example #1
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('foo/goo');
+
+  $space->use('Moo');
+
+  # $self
+
+=back
+
+=over 4
+
+=item use example #2
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('foo/hoo');
+
+  $space->use('Moo', 'has');
+
+  # $self
+
+=back
+
+=over 4
+
+=item use example #3
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('foo/ioo');
+
+  $space->use(['Moo', 9.99], 'has');
+
+  # $self
 
 =back
 

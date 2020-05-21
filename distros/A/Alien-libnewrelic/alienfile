@@ -1,8 +1,8 @@
 use alienfile;
 
-unless($^O eq 'linux')
+unless($^O =~ /^(linux|darwin)$/)
 {
-  print "This Alien is only supported on Linux";
+  print "This Alien only works on Linux (supported by NewRelic) and macOS (not supported by NewRelic)";
   exit;
 }
 
@@ -11,18 +11,26 @@ probe sub { 'share' };
 share {
   requires 'Alien::libpcre';
 
-  plugin Download => (
-    url => 'https://github.com/newrelic/c-sdk/releases',
-    filter => qr/\.tar\.gz$/,
-    version => qr/v([0-9\.]+)/,
+  my $version = '1.3.0';
+
+  start_url "https://github.com/newrelic/c-sdk/archive/v1.3.0.tar.gz";
+  plugin Download => ();
+  plugin Extract  => 'tar.gz';
+
+  my @patch = (
+    '%{patch} -p1 < %{.install.patch}/notice-error-with-stacktrace.diff',
   );
-  plugin Extract => 'tar.gz';
+  push @patch, '%{patch} -p1 < %{.install.patch}/macos.diff' if $^O eq 'darwin';
+
+  my $so = $^O eq 'linux' ? 'so' : 'dylib';
+
+  patch \@patch;
 
   build [
-    'make libnewrelic.a libnewrelic.so',
+    "make libnewrelic.a libnewrelic.$so",
     'mkdir -p %{.install.prefix}/lib %{.install.prefix}/include %{.install.prefix}/dynamic',
     'cp -a libnewrelic.a %{.install.prefix}/lib',
-    'cp -a libnewrelic.so %{.install.prefix}/dynamic',
+    "cp -a libnewrelic.$so %{.install.prefix}/dynamic",
     'cp -a include/libnewrelic.h %{.install.prefix}/include',
   ];
 
@@ -33,6 +41,7 @@ share {
     $build->runtime_prop->{cflags_static} = "-I$prefix/include ";
     $build->runtime_prop->{libs}          = "-L$prefix/lib -lnewrelic ";
     $build->runtime_prop->{libs_static}   = "-L$prefix/lib -lnewrelic ";
+    $build->runtime_prop->{version}       = $version;
   };
 }
 

@@ -1,6 +1,6 @@
 
 package Shipment::Purolator::WSDLV2::Elements::ContentDetail;
-$Shipment::Purolator::WSDLV2::Elements::ContentDetail::VERSION = '3.02';
+$Shipment::Purolator::WSDLV2::Elements::ContentDetail::VERSION = '3.04';
 use strict;
 use warnings;
 
@@ -34,7 +34,7 @@ Shipment::Purolator::WSDLV2::Elements::ContentDetail
 
 =head1 VERSION
 
-version 3.02
+version 3.04
 
 =head1 DESCRIPTION
 

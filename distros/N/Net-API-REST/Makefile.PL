@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     	'Devel::Declare'        => '<= 0.006019',
 		'JSON'					=> 0,
 		'Regexp::Common'		=> 0,
-		'TryCatch'				=> '1.003002',
+		'Nice::Try'				=> 'v0.1.2',
 		'Devel::Confess'		=> 0,
 		'Scalar::Util'			=> 0,
 		'DateTime'				=> 0,

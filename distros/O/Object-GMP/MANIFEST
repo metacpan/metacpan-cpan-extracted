@@ -6,7 +6,7 @@ MANIFEST.SKIP
 META.yml
 Makefile.PL
 README
-README.md
+README.mkdn
 lib/Object/GMP.pm
 t/01-use.t
 t/02-with.t

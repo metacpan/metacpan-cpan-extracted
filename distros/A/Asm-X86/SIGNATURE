@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 b8c3ef2636e89645f08b2564c67ef805a710cf0fef1b03802e21387a08848488 CONTRIBUTING
+SHA256 75f8e5ddb88961e0f39f344a214f5352c80de878e2e625dd35df2726c6d0ff3d Changes
+SHA256 ac7797b27d8c499c09dca17c9d9149dab71a5957e21916294e8c1225e303b233 MANIFEST
+SHA256 f9fa128a9a69ad48c6ea647a28f8fb3440e53d504de2f19e5398dc9863379abd META.json
+SHA256 2468bd2e48ef0de821daa0fbd5bc4f648eadbed5972e23a1c5dd2ad3a1501d31 META.yml
+SHA256 440db69d0966dab4162bd38674f957b023cb949b9ae94a664711eae872dd9ee0 Makefile.PL
+SHA256 4e750b3a4628f55175a1e0df396920d9b2e39623ea654dd4823b7d9271ed9683 README
+SHA256 86368e3a3b2b599fff839d51677b18be84f8d6daf5be213b05ba9f187f498e9c lib/Asm/X86.pm
+SHA256 1a93c9cff22abd380a28f009e55ed67b4b2de93bbc29cd49b0ee482286bbe38f t/00-load.t
+SHA256 7def26ec5179ecdf1d85e9577dc0be8f33af2853a7043808dc5c33f39665c168 t/boilerplate.t
+SHA256 4bd4f0f77fc3a6672ff6540bb1f9aec720546c421a1e800799e889c850825dd6 t/pod-coverage.t
+SHA256 505f0d5c68824b3d02df44fa02031c9a379939327af4ef3565166d713cd24f70 t/pod.t
+SHA256 bed31b405f76f6cab9b10fcb758bcba83f1c45e23a70be17805b4781c6244dac t/zz_addr_att.t
+SHA256 f365e3fdecd449cec5c4c26b847978ca0d6879c08b76781fe37ab6dec8441a64 t/zz_addr_intel.t
+SHA256 9ab2e7cdc3420e4b8d4e4500cd25c9ed00f2ecaa887f4e33d544f53d2e25be1f t/zz_addr_mixed.t
+SHA256 e9116506d50058b46128d583008b66e99a66d391cd4261d157624348bf3208fa t/zz_conv.t
+SHA256 3c435a33887e1e81c2cbe74b18374ab85fdafea107eaed1833c0458bf50be834 t/zz_duplicates.t
+SHA256 c3576da2ddfd94ff45e33c481e9b9e7f46cb28e52c4f034665719cc06cd7ffe9 t/zz_instr_att.t
+SHA256 f81a050503e4736674d401212d8eaeca957578bee24a459e79d48fa5997414b9 t/zz_instr_intel.t
+SHA256 467aea7a1c8ddf6461ed6116bc3e0c766f2508d53fd6d3e617286f16d8e58fd7 t/zz_instr_mixed.t
+SHA256 d5a7be19e911904b7d24aae74c0494b46faac7281f5c98e7ba174a2e9bbfb760 t/zz_regs_att.t
+SHA256 c42a556020132fef90c7cd5fcc3f9993b6d4f4ce9db110a77701cd5d6e97fcbe t/zz_regs_intel.t
+SHA256 0f0133136c1e370cfc70a4b7f529fa41a7e03692a933de583eeb74166c240130 t/zz_regs_mixed.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQTpHmmfECbQ73Re7Ds1OtNoHFbaHgUCXsT80QAKCRA1OtNoHFba
+Hs1/AKCSYlOIIowi4wjEivWgoy9zyFtqzwCggILadhk0WMmO9/KUt4/13FhCnGM=
+=9m0C
+-----END PGP SIGNATURE-----

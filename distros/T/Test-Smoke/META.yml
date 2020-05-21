@@ -9,6 +9,7 @@ build_requires:
   Test::Fatal: '0'
   Test::More: '0.88'
   Test::NoWarnings: '0'
+  URI: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -30,8 +31,9 @@ requires:
   JSON::XS: '0'
   POSIX: '0'
   System::Info: '0.05'
+  perl: '5.010'
 resources:
   IRC: irc://irc.perl.org/#smoke
   homepage: http://perl5.test-smoke.org/
   repository: https://github.com/abeltje/Test-Smoke
-version: '1.77'
+version: '1.78'

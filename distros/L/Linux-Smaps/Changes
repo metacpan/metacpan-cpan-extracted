@@ -1,5 +1,11 @@
 Revision history for Perl extension Linux::Smaps.
 
+0.14  Fri Mar 13 14:29:22 PDT 2020
+      - handle non-memory-related keys (like ProtectionKey: and THPeligible:)
+        generically so that Linux::Smaps works on newer kernels.
+      - revamp testsuite to increase test coverage and stop parsing multiple
+        smaps dumps in a single test so that we can update them more easily.
+
 0.13  Sun  1 Dec 20:34:43 CET 2013
       - some kernels allow the user to open /proc/*/smaps for reading even
         if the process is not allowed to read the content. In the latter case

@@ -46,7 +46,7 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => "6.52"
   },
   "CONFIGURE_REQUIRES" => {
-    "Alien::Build"        => "0.32",
+    "Alien::Build"        => "1.19",
     "Alien::Build::MM"    => "0.32",
     "ExtUtils::MakeMaker" => "6.52"
   },
@@ -65,7 +65,7 @@ my %WriteMakefileArgs = (
     "Test::Alien"       => 0,
     "Test::Alien::Diag" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test"    => {
     "TESTS" => "t/*.t"
   }

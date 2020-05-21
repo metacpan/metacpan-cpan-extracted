@@ -114,7 +114,7 @@ Net::SAML2::Protocol::AuthnRequest
 
 =head1 VERSION
 
-version 0.20
+version 0.25
 
 =head1 SYNOPSIS
 

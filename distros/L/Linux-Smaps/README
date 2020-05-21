@@ -14,6 +14,11 @@ INSTALLATION
      make test
      make install
 
+DISTRIBUTION
+     perl Makefile.PL
+     make manifest
+     make dist
+
 DESCRIPTION
     The /proc/PID/smaps files in modern linuxes provides very detailed
     information about a processes memory consumption. It particularly
@@ -152,6 +157,7 @@ DESCRIPTION
    $self->heap
    $self->vdso
    $self->vsyscall
+   $self->vvar
     these are shortcuts to the corresponding "Linux::Smaps::VMA" objects.
 
    $self->all

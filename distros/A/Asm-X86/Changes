@@ -1,5 +1,20 @@
 Revision history for Asm-X86
 
+2020-05-20	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.32
+	  Fix some build/distribution errors in the previous version (README,
+	  missing META.*). Added a digital signature.
+	* Makefile.PL: added detecting the "tar" utility type. In case of
+	  detecting BSD tar (default on some systems), use GNU tar mode.
+	  Added a parameter to sign the package.
+	* CONTRIBUTING: added for metacpan.
+
+2020-05-13	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.31
+	* X86.pm: Updated the instruction list from FASM version 1.73.24.
+
 2019-12-23	Bogdan Drozdowski <bogdandr@op.pl>
 
 	* Version 0.30

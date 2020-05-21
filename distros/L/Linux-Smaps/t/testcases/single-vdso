@@ -1,0 +1,24 @@
+08048000-08076000 r-xp 00000000 08:06 939194     /bin/grep
+Size:                184 kB
+Rss:                  64 kB
+Shared_Clean:          0 kB
+Shared_Dirty:          0 kB
+Private_Clean:        64 kB
+Private_Dirty:         0 kB
+Referenced:           64 kB
+08076000-08078000 rw-p 0002d000 08:06 939194     /bin/grep
+Size:                  8 kB
+Rss:                   8 kB
+Shared_Clean:          0 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:         8 kB
+Referenced:            8 kB
+ffffe000-fffff000 r-xp 00000000 00:00 0          [vdso]
+Size:                  4 kB
+Rss:                   0 kB
+Shared_Clean:          0 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:         0 kB
+Referenced:            0 kB

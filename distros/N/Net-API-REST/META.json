@@ -67,12 +67,12 @@
             "JSON" : "0",
             "MIME::Base64" : "3.15",
             "Module::Generic" : "v0.11.6",
+            "Nice::Try" : "v0.1.2",
             "Regexp::Common" : "0",
             "Scalar::Util" : "0",
             "Test::Mock::Apache2" : "0.05",
             "Test::MockObject" : "1.20180705",
             "Test::More" : "0",
-            "TryCatch" : "1.003002",
             "URI" : "0",
             "URI::Escape" : "3.31",
             "URI::Query" : "0.16",
@@ -86,6 +86,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.5.5",
+   "version" : "v0.5.6",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

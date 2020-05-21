@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::RateTypes::PayerAddressType;
-$Shipment::UPS::WSDL::RateTypes::PayerAddressType::VERSION = '3.02';
+$Shipment::UPS::WSDL::RateTypes::PayerAddressType::VERSION = '3.04';
 use strict;
 use warnings;
 
@@ -61,7 +61,7 @@ Shipment::UPS::WSDL::RateTypes::PayerAddressType
 
 =head1 VERSION
 
-version 3.02
+version 3.04
 
 =head1 DESCRIPTION
 

@@ -71,7 +71,7 @@ sub _instanciate_mo_file_tranlation_service_if_file_exists
 
     my $locale_dir = $self->{locale_dir};
     $locale_dir    =~ s/\/$//;
-   
+
     my $mo_file_relative_path = "/$target_lang/LC_MESSAGES/$domain.mo";
     my $mo_file_absolute_path = $locale_dir . $mo_file_relative_path;
 

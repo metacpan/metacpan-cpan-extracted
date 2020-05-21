@@ -1,5 +1,12 @@
 Revision history for Alien-libnewrelic
 
+0.04      2020-05-19 15:19:03 -0600
+  - Pin to libnewrelic 1.3.0 for patches (gh#5)
+  - Add patch to add newrelic_notice_error_with_stacktrace
+    (based on https://github.com/newrelic/c-sdk/pull/18) (gh#5)
+  - Patch on macOS to allow build (Caveant: macOS is not
+    supported by NewRelic) (gh#5)
+
 0.03      2020-05-15 10:56:31 -0400
   - Removed libpcre workaround in test that would fail on
     older versions of FFI::Platypus (gh#4)

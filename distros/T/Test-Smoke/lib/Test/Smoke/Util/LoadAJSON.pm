@@ -46,7 +46,7 @@ sub import {
 
 =head2 my $class = Test::Smoke::Util::LoadAJSON->find_base_class()
 
-On success returns one of: B<JSON::XS>, B<JSON::PP>
+On success returns one of: B<JSON::PP>, B<JSON::XS>
 
 Returns undef on failure.
 
@@ -55,7 +55,7 @@ Returns undef on failure.
 sub find_base_class {
     my @backends = $ENV{PERL_JSON_BACKEND}
         ? ($ENV{PERL_JSON_BACKEND})
-        : qw/JSON::XS JSON::PP/;
+        : qw/JSON::PP JSON::XS/;
     for my $try_class (@backends) {
         eval "use $try_class";
         next if $@;

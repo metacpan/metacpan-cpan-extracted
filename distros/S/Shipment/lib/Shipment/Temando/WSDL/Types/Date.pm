@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::Date;
-$Shipment::Temando::WSDL::Types::Date::VERSION = '3.02';
+$Shipment::Temando::WSDL::Types::Date::VERSION = '3.04';
 use strict;
 use warnings;
 
@@ -28,7 +28,7 @@ Shipment::Temando::WSDL::Types::Date
 
 =head1 VERSION
 
-version 3.02
+version 3.04
 
 =head1 DESCRIPTION
 

@@ -60,7 +60,7 @@
          "web" : "https://github.com/perlancar/perl-Sah-Schemas-Color"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -80,7 +80,7 @@
                }
             },
             "name" : "Sah::Schemas",
-            "version" : "0.016"
+            "version" : "0.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",

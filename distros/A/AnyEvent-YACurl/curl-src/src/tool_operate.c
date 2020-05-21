@@ -31,6 +31,8 @@
 
 #ifdef HAVE_SYS_SELECT_H
 #  include <sys/select.h>
+#elif defined(HAVE_UNISTD_H)
+#  include <unistd.h>
 #endif
 
 #ifdef __VMS
@@ -380,7 +382,7 @@ static CURLcode post_per_transfer(struct GlobalConfig *global,
     /* do not create (or even overwrite) the file in case we get no
        data because of unmet condition */
     curl_easy_getinfo(curl, CURLINFO_CONDITION_UNMET, &cond_unmet);
-    if(!cond_unmet && !tool_create_output_file(outs))
+    if(!cond_unmet && !tool_create_output_file(outs, config))
       result = CURLE_WRITE_ERROR;
   }
 
@@ -866,13 +868,13 @@ static CURLcode single_transfer(struct GlobalConfig *global,
         /* default headers output stream is stdout */
         heads = &per->heads;
         heads->stream = stdout;
-        heads->config = config;
 
         /* Single header file for all URLs */
         if(config->headerfile) {
           /* open file for output: */
           if(strcmp(config->headerfile, "-")) {
-            FILE *newfile = fopen(config->headerfile, "wb");
+            FILE *newfile;
+            newfile = fopen(config->headerfile, per->prev == NULL?"wb":"ab");
             if(!newfile) {
               warnf(config->global, "Failed to open %s\n", config->headerfile);
               result = CURLE_WRITE_ERROR;
@@ -891,34 +893,17 @@ static CURLcode single_transfer(struct GlobalConfig *global,
           }
         }
 
-        /* --etag-save */
-        etag_save = &per->etag_save;
-        etag_save->stream = stdout;
-        etag_save->config = config;
-        if(config->etag_save_file) {
-          /* open file for output: */
-          if(strcmp(config->etag_save_file, "-")) {
-            FILE *newfile = fopen(config->etag_save_file, "wb");
-            if(!newfile) {
-              warnf(
-                config->global,
-                "Failed to open %s\n", config->etag_save_file);
+        hdrcbdata = &per->hdrcbdata;
 
-              result = CURLE_WRITE_ERROR;
-              break;
-            }
-            else {
-              etag_save->filename = config->etag_save_file;
-              etag_save->s_isreg = TRUE;
-              etag_save->fopened = TRUE;
-              etag_save->stream = newfile;
-            }
-          }
-          else {
-            /* always use binary mode for protocol header output */
-            set_binmode(etag_save->stream);
-          }
-        }
+        outs = &per->outs;
+        input = &per->input;
+
+        per->outfile = NULL;
+        per->infdopen = FALSE;
+        per->infd = STDIN_FILENO;
+
+        /* default output stream is stdout */
+        outs->stream = stdout;
 
         /* --etag-compare */
         if(config->etag_compare_file) {
@@ -927,7 +912,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
 
           /* open file for reading: */
           FILE *file = fopen(config->etag_compare_file, FOPEN_READTEXT);
-          if(!file) {
+          if(!file && !config->etag_save_file) {
             errorf(config->global,
                    "Failed to open %s\n", config->etag_compare_file);
             result = CURLE_READ_ERROR;
@@ -961,18 +946,34 @@ static CURLcode single_transfer(struct GlobalConfig *global,
           }
         }
 
-        hdrcbdata = &per->hdrcbdata;
+        /* --etag-save */
+        etag_save = &per->etag_save;
+        etag_save->stream = stdout;
 
-        outs = &per->outs;
-        input = &per->input;
+        if(config->etag_save_file) {
+          /* open file for output: */
+          if(strcmp(config->etag_save_file, "-")) {
+            FILE *newfile = fopen(config->etag_save_file, "wb");
+            if(!newfile) {
+              warnf(
+                config->global,
+                "Failed to open %s\n", config->etag_save_file);
 
-        per->outfile = NULL;
-        per->infdopen = FALSE;
-        per->infd = STDIN_FILENO;
-
-        /* default output stream is stdout */
-        outs->stream = stdout;
-        outs->config = config;
+              result = CURLE_WRITE_ERROR;
+              break;
+            }
+            else {
+              etag_save->filename = config->etag_save_file;
+              etag_save->s_isreg = TRUE;
+              etag_save->fopened = TRUE;
+              etag_save->stream = newfile;
+            }
+          }
+          else {
+            /* always use binary mode for protocol header output */
+            set_binmode(etag_save->stream);
+          }
+        }
 
         if(metalink) {
           /* For Metalink download, use name in Metalink file as
@@ -1836,6 +1837,10 @@ static CURLcode single_transfer(struct GlobalConfig *global,
         if(config->mail_rcpt)
           my_setopt_slist(curl, CURLOPT_MAIL_RCPT, config->mail_rcpt);
 
+        /* curl 7.69.x */
+        my_setopt(curl, CURLOPT_MAIL_RCPT_ALLLOWFAILS,
+          config->mail_rcpt_allowfails ? 1L : 0L);
+
         /* curl 7.20.x */
         if(config->ftp_pret)
           my_setopt(curl, CURLOPT_FTP_USE_PRET, 1L);
@@ -1895,9 +1900,11 @@ static CURLcode single_transfer(struct GlobalConfig *global,
           my_setopt_str(curl, CURLOPT_GSSAPI_DELEGATION,
                         config->gssapi_delegation);
 
-        /* new in 7.25.0 and 7.44.0 */
+        /* new in 7.25.0, 7.44.0 and 7.70.0 */
         {
           long mask = (config->ssl_allow_beast ? CURLSSLOPT_ALLOW_BEAST : 0) |
+                      (config->ssl_revoke_best_effort ?
+                       CURLSSLOPT_REVOKE_BEST_EFFORT : 0) |
                       (config->ssl_no_revoke ? CURLSSLOPT_NO_REVOKE : 0);
           if(mask)
             my_setopt_bitmask(curl, CURLOPT_SSL_OPTIONS, mask);
@@ -1963,11 +1970,8 @@ static CURLcode single_transfer(struct GlobalConfig *global,
         if(config->disallow_username_in_url)
           my_setopt(curl, CURLOPT_DISALLOW_USERNAME_IN_URL, 1L);
 
-#ifdef USE_ALTSVC
-        /* only if explicitly enabled in configure */
         if(config->altsvc)
           my_setopt_str(curl, CURLOPT_ALTSVC, config->altsvc);
-#endif
 
 #ifdef USE_METALINK
         if(!metalink && config->use_metalink) {
@@ -2055,7 +2059,7 @@ static CURLcode add_parallel_transfers(struct GlobalConfig *global,
   *addedp = FALSE;
   *morep = FALSE;
   result = create_transfer(global, share, addedp);
-  if(result || !*addedp)
+  if(result)
     return result;
   for(per = transfers; per && (all_added < global->parallel_max);
       per = per->next) {

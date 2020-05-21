@@ -6,8 +6,6 @@ our $VERSION = '0.016';
 
 use base 'Test::Smoke::Mailer::Base';
 
-use fallback 'inc';
-
 =head1 Test::Smoke::Mailer::Mail_Sendmail
 
 This handles sending the message using the B<Mail::Sendmail> module.

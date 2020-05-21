@@ -63,6 +63,7 @@ Types::Standard
 =integrates
 
 Data::Object::Role::Buildable
+Data::Object::Role::Proxyable
 
 =cut
 
@@ -79,6 +80,166 @@ services: ro, opt, HashRef
 
 This package provides methods for using dependency injection, and building
 objects and values.
+
+=cut
+
+=scenario $envvar
+
+This package supports inlining environment variables as arguments to services.
+The C<$envvar> directive is used to specify the name of an environment
+variable, and can also be used in metadata for reusability.
+
+=example $envvar
+
+  use Rewire;
+
+  my $services = {
+    file => {
+      package => 'Mojo/File',
+      argument => { '$envvar' => 'home' }
+    }
+  };
+
+  my $rewire = Rewire->new(
+    services => $services
+  );
+
+=cut
+
+=scenario $function
+
+This package supports inlining the result of a service resolution and function
+call as arguments to services. The C<#> delimited C<$function> directive is
+used to specify the name of an existing service on the right-hand side, and an
+arbitrary function to be call on the result on the left-hand side.
+
+=example $function
+
+  use Rewire;
+
+  my $services = {
+    temp => {
+      package => 'File/Temp'
+    },
+    file => {
+      package => 'Mojo/File',
+      argument => { '$function' => 'temp#tempfile' }
+    }
+  };
+
+  my $rewire = Rewire->new(
+    services => $services
+  );
+
+=cut
+
+=scenario $metadata
+
+This package supports inlining configuration data as arguments to services.
+The C<$metadata> directive is used to specify the name of a stashed
+configuration value or data structure.
+
+=example $metadata
+
+  use Rewire;
+
+  my $metadata = {
+    home => '/home/ubuntu'
+  };
+
+  my $services = {
+    file => {
+      package => 'Mojo/File',
+      argument => { '$metadata' => 'home' }
+    }
+  };
+
+  my $rewire = Rewire->new(
+    metadata => $metadata,
+    services => $services
+  );
+
+=cut
+
+=scenario $method
+
+This package supports inlining the result of a service resolution and method
+call as arguments to services. The C<#> delimited C<$method> directive is used
+to specify the name of an existing service on the right-hand side, and an
+arbitrary method to be call on the result on the left-hand side.
+
+=example $method
+
+  use Rewire;
+
+  my $services = {
+    temp => {
+      package => 'File/Temp'
+    },
+    file => {
+      package => 'Mojo/File',
+      argument => { '$method' => 'temp#filename' }
+    }
+  };
+
+  my $rewire = Rewire->new(
+    services => $services
+  );
+
+=cut
+
+=scenario $routine
+
+This package supports inlining the result of a service resolution and routine
+call as arguments to services. The C<#> delimited C<$routine> directive is
+used to specify the name of an existing service on the right-hand side, and an
+arbitrary routine to be call on the result on the left-hand side.
+
+=example $routine
+
+  use Rewire;
+
+  my $services = {
+    temp => {
+      package => 'File/Temp'
+    },
+    file => {
+      package => 'Mojo/File',
+      argument => { '$routine' => 'temp#tempfile' }
+    }
+  };
+
+  my $rewire = Rewire->new(
+    services => $services
+  );
+
+=cut
+
+=scenario $service
+
+This package supports inlining resolved services as arguments to other
+services. The C<$service> directive is used to specify the name of a service
+to be resolved and passed as an argument.
+
+=example $service
+
+  use Rewire;
+
+  my $services = {
+    io => {
+      package => 'IO/Handle'
+    },
+    log => {
+      package => 'Mojo/Log',
+      argument => {
+        handle => { '$service' => 'io' }
+      }
+    },
+  };
+
+  my $rewire = Rewire->new(
+    services => $services
+  );
 
 =cut
 
@@ -105,6 +266,66 @@ building objects and values.
   my $rewire = Rewire->new(
     services => $services,
     metadata => $metadata
+  );
+
+=cut
+
+=scenario extends
+
+This package supports extending services in the definition of other services,
+effectively using the extended service as the invocant in the creation of the
+requested service.
+
+=example extends
+
+  use Rewire;
+
+  my $services = {
+    io => {
+      package => 'IO/Handle'
+    },
+    log => {
+      package => 'Mojo/Log',
+      argument => {
+        handle => { '$service' => 'io' }
+      }
+    },
+    development_log => {
+      package => 'Mojo/Log',
+      extends => 'log',
+      builder => [
+        {
+          method => 'path',
+          argument => '/tmp/development.log',
+          return => 'none'
+        },
+        {
+          method => 'level',
+          argument => 'debug',
+          return => 'none'
+        }
+      ]
+    },
+    production_log => {
+      package => 'Mojo/Log',
+      extends => 'log',
+      builder => [
+        {
+          method => 'path',
+          argument => '/tmp/production.log',
+          return => 'none'
+        },
+        {
+          method => 'level',
+          argument => 'warn',
+          return => 'none'
+        }
+      ]
+    },
+  };
+
+  my $rewire = Rewire->new(
+    services => $services
   );
 
 =cut
@@ -348,6 +569,39 @@ construction of multiple services.
 
 =cut
 
+=scenario proxyable
+
+This package supports the resolution of services using a single method call.
+This is enabled by intercepting method calls and proxying them to the
+L</process> method.
+
+=example proxyable
+
+  use Rewire;
+
+  my $services = {
+    home => {
+      package => 'Mojo/Path',
+      argument => '/home',
+    },
+    temp => {
+      package => 'Mojo/Path',
+      argument => '/tmp',
+    }
+  };
+
+  my $rewire = Rewire->new(
+    services => $services
+  );
+
+  # resolve services via method calls
+  [
+    $rewire->home, # i.e. $rewire->process('home')
+    $rewire->temp  # i.e. $rewire->process('temp')
+  ]
+
+=cut
+
 =method config
 
 The config method returns the configuration based on the C<services> and
@@ -407,6 +661,36 @@ process(Str $name, Any $argument, Maybe[Str] $argument_as) : Any
     path => { '$metadata' => 'logfile' }
   });
 
+=example-3 process
+
+  use Rewire;
+
+  my $metadata = {
+    logfile => '/var/log/rewire.log',
+  };
+
+  my $services = {
+    mojo_log => {
+      package => 'Mojo/Log',
+      builder => [
+        {
+          method => 'new',
+          return => 'self'
+        }
+      ]
+    }
+  };
+
+  my $rewire = Rewire->new(
+    services => $services,
+    metadata => $metadata
+  );
+
+  $rewire->process('mojo_log', {
+    level => 'fatal',
+    path => { '$metadata' => 'logfile' }
+  });
+
 =cut
 
 =method resolve
@@ -446,6 +730,46 @@ resolve(Str $name) : Any
 
   $rewire->resolve('mojo_log');
 
+=example-3 resolve
+
+  package Dynamic;
+
+  sub import;
+
+  sub AUTOLOAD {
+    bless {};
+  }
+
+  sub DESTROY {
+    ; # noop
+  }
+
+  package main;
+
+  use Rewire;
+
+  my $services = {
+    dynamic => {
+      package => 'Dynamic',
+      builder => [
+        {
+          method => 'new',
+          return => 'self'
+        },
+        {
+          method => 'missing_method',
+          return => 'result'
+        }
+      ],
+    }
+  };
+
+  my $rewire = Rewire->new(
+    services => $services,
+  );
+
+  $rewire->resolve('dynamic');
+
 =cut
 
 =method validate
@@ -479,12 +803,95 @@ $subs->synopsis(fun($tryable) {
   $result
 });
 
+$subs->scenario('$envvar', fun($tryable) {
+  local $ENV{HOME} = '/home/ubuntu';
+
+  ok my $result = $tryable->result;
+  ok $result->validate;
+  ok my $value = $result->resolve('file');
+  ok $value->isa('Mojo::File');
+  is $$value, '/home/ubuntu';
+
+  $result
+});
+
+$subs->scenario('$function', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->validate;
+  ok my $value = $result->resolve('file');
+  ok $value->isa('Mojo::File');
+  ok $$value;
+
+  $result
+});
+
+$subs->scenario('$metadata', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->validate;
+  ok my $value = $result->resolve('file');
+  ok $value->isa('Mojo::File');
+  is $$value, '/home/ubuntu';
+
+  $result
+});
+
+$subs->scenario('$method', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->validate;
+  ok my $value = $result->resolve('file');
+  ok $value->isa('Mojo::File');
+  ok $$value;
+
+  $result
+});
+
+$subs->scenario('$routine', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->validate;
+  ok my $value = $result->resolve('file');
+  ok $value->isa('Mojo::File');
+  ok $$value;
+
+  $result
+});
+
+$subs->scenario('$service', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->validate;
+  ok my $value = $result->resolve('log');
+  ok $value->isa('Mojo::Log');
+  ok $value->handle->isa('IO::Handle');
+
+  $result
+});
+
 $subs->scenario('config', fun($tryable) {
   ok my $result = $tryable->result;
   ok $result->validate;
   ok my $value = $result->resolve('tempfile');
   ok $value->isa('Mojo::File');
   is $$value, '/home/ubuntu';
+
+  $result
+});
+
+$subs->scenario('extends', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->validate;
+
+  my $value;
+
+  ok $value = $result->resolve('development_log');
+  ok $value->isa('Mojo::Log');
+  ok $value->handle->isa('IO::Handle');
+  is $value->level, 'debug';
+  is $value->path, '/tmp/development.log';
+
+  ok $value = $result->resolve('production_log');
+  ok $value->isa('Mojo::Log');
+  ok $value->handle->isa('IO::Handle');
+  is $value->level, 'warn';
+  is $value->path, '/tmp/production.log';
 
   $result
 });
@@ -583,6 +990,17 @@ $subs->scenario('metadata', fun($tryable) {
   $result
 });
 
+$subs->scenario('proxyable', fun($tryable) {
+  ok my $result = $tryable->result;
+  my ($home, $temp) = @$result;
+  ok $home->isa('Mojo::Path');
+  is $home->{path}, '/home';
+  ok $temp->isa('Mojo::Path');
+  is $temp->{path}, '/tmp';
+
+  $result
+});
+
 $subs->example(-1, 'config', 'method', fun($tryable) {
   ok my $result = $tryable->result;
   is_deeply $result, {
@@ -618,6 +1036,15 @@ $subs->example(-2, 'process', 'method', fun($tryable) {
   $result
 });
 
+$subs->example(-3, 'process', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->isa('Mojo::Log');
+  is $result->path, '/var/log/rewire.log';
+  is $result->level, 'fatal';
+
+  $result
+});
+
 $subs->example(-1, 'resolve', 'method', fun($tryable) {
   ok my $result = $tryable->result;
   ok $result->isa('Mojo::File');
@@ -631,6 +1058,13 @@ $subs->example(-2, 'resolve', 'method', fun($tryable) {
   ok $result->isa('Mojo::Log');
   is $result->path, '/var/log/rewire.log';
   is $result->level, 'fatal';
+
+  $result
+});
+
+$subs->example(-3, 'resolve', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->isa('Dynamic');
 
   $result
 });

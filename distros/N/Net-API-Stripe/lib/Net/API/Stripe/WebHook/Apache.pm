@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/WebHook/Apache.pm
-## Version v0.1.0
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Version v0.1.1
+## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/11/02
-## Modified 2020/05/15
+## Modified 2020/05/21
 ## 
 ##----------------------------------------------------------------------------
 package Net::API::Stripe::WebHook::Apache;
@@ -13,7 +13,7 @@ BEGIN
 	use strict;
 	use parent qw( Net::API::REST );
 	use Net::API::Stripe::Event;
-	use TryCatch;
+	use Nice::Try;
 	use Devel::Confess;
 	## use Apache2::Const -compile => qw( :common :http DECLINED );
 	eval
@@ -23,6 +23,7 @@ BEGIN
 	};
 	die( $@ ) if( $@ );
     use constant MAX_PAYLOAD_SIZE => 524288;
+    our $VERSION = 'v0.1.1';
 };
 
 sub handler
@@ -206,7 +207,7 @@ Net::API::Stripe::WebHook::Apache - An Apache handler for Stripe Web Hook
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 

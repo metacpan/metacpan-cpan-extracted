@@ -1,15 +1,12 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Telegram API - ~/lib/Net/API/Telegram.pm
-## Version 0.6
+## Version v0.600.1
 ## Copyright(c) 2020 Jacques Deguest
-## Author: Jacques Deguest <jack@deguest.jp>
+## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/05/29
-## Modified 2020/03/28
-## All rights reserved
+## Modified 2020/05/21
 ## 
-## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::Telegram;
 BEGIN
@@ -25,7 +22,7 @@ BEGIN
 	use Data::UUID;
 	use JSON;
 	use Encode ();
-	use TryCatch;
+	use Nice::Try;
 	use File::Map;
 	use Class::Struct qw( struct );
 	use Devel::StackTrace;
@@ -44,7 +41,7 @@ BEGIN
 	## We load Net::API::Telegram::Update because we test the existence of its methods for the setup of handlers
 	use Net::API::Telegram::Update;
 	use Devel::Confess;
-    our( $VERSION ) = '0.6';
+    our( $VERSION ) = 'v0.600.1';
 	use constant TELEGRAM_BASE_API_URI => 'https://api.telegram.org/bot';
 	use constant TELEGRAM_DL_FILE_URI => 'https://api.telegram.org/file/bot';
 	## We do not use the port 80 or 880 by default, because they are commonly used for other things
@@ -3011,7 +3008,7 @@ Net::API::Telegram - Telegram Bot Interface
 		# ssl_key => $ssl_key,
 		external_ssl  => 1,
  		external_path => 'tg',
- 		external_host => 'www.higotonofukuin.org',
+ 		external_host => 'www.example.com',
  		external_port => 443,
  		logging => 1,
  		log_file => $log_file,
@@ -3027,13 +3024,13 @@ Net::API::Telegram - Telegram Bot Interface
 
 =head1 VERSION
 
-This is version 0.6
+This is version v0.600.1
 
 =head1 DESCRIPTION
 
 L<Net::API::Telegram> is a powerful and yet simple interface to Telegram Bot api.
 
-L<Net::API::Telegram> inherits from C<Module::Generic> and all its module excepted for C<Net::API::Telegram::Generic> and C<Net::API::Telegram::Number> are aut generated base don Telegram api online documentation.
+L<Net::API::Telegram> inherits from L<Module::Generic> and all its module excepted for L<Net::API::Telegram::Generic> and L<Net::API::Telegram::Number> are aut generated base don Telegram api online documentation.
 
 =head1 CORE METHODS
 

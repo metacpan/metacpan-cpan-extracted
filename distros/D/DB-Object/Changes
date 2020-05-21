@@ -13,3 +13,5 @@ Revision history for Perl module DB::Object
     - Modified DB::Object::where to enable chaining, which was missing
       $tbl->where( active => 1 )->merge( $dbh->AND( $other_where_clause ) );
     - Corrected a minor warning in DB::Object::Cache::Table
+0.9.5
+	- Change from TryCatch to Nice::Try because TryCatch got broken with release of Devel::Declare version 0.006020

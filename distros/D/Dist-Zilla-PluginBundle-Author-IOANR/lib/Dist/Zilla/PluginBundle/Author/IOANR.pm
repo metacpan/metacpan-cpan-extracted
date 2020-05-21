@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::IOANR 1.201400;
+package Dist::Zilla::PluginBundle::Author::IOANR 1.201410;
 
 # ABSTRACT: Build dists the way IOANR likes
 
@@ -238,8 +238,8 @@ sub configure {
     # these have to come after the builder
     # push @add, 'RunExtraTests';
 
-    if ($self->assert_os) {
-        push @add, [AssertOS => $self->config_slice({assert_os => 'os'})];
+    if ($self->assert_os->@*) {
+        push @add, [AssertOS => { os => $self->assert_os, bundle => 0 }];
     }
 
     $self->add_plugins(@add);
@@ -265,7 +265,7 @@ Dist::Zilla::PluginBundle::Author::IOANR - Build dists the way IOANR likes
 
 =head1 VERSION
 
-version 1.201400
+version 1.201410
 
 =head1 OPTIONS
 

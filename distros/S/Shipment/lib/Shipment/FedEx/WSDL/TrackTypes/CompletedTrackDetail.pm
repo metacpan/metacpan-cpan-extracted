@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::CompletedTrackDetail;
-$Shipment::FedEx::WSDL::TrackTypes::CompletedTrackDetail::VERSION = '3.02';
+$Shipment::FedEx::WSDL::TrackTypes::CompletedTrackDetail::VERSION = '3.04';
 use strict;
 use warnings;
 
@@ -89,7 +89,7 @@ Shipment::FedEx::WSDL::TrackTypes::CompletedTrackDetail
 
 =head1 VERSION
 
-version 3.02
+version 3.04
 
 =head1 DESCRIPTION
 

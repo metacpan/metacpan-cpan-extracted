@@ -6,5 +6,7 @@ Revision history for Perl module Net::API::REST
     - Making minor corrections
     - Changing version numbering
     - Requiring Devel::Declare maximum version 0.006019 because more recent version breaks TryCatch
+0.5.6 2020-05-21
+	- Change from TryCatch to Nice::Try because TryCatch got broken with release of Devel::Declare version 0.006020
 
 

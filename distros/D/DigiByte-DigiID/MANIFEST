@@ -6,7 +6,10 @@ MANIFEST.SKIP
 META.yml
 Makefile.PL
 README
+README.md
 README.mkdn
+dist/clean
+dist/release
 lib/DigiByte/DigiID.pm
 t/001-use.t
 t/002-demo.t

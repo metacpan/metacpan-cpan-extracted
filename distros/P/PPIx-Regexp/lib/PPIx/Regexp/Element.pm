@@ -36,8 +36,7 @@ use warnings;
 use 5.006;
 
 use Carp;
-use List::Util qw{ max min };
-use List::MoreUtils qw{ firstidx };
+use List::Util qw{ first max min };
 use PPIx::Regexp::Util qw{ __instance };
 use Scalar::Util qw{ refaddr weaken };
 
@@ -55,7 +54,7 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.071';
+our $VERSION = '0.072';
 
 =head2 accepts_perl
 
@@ -1041,10 +1040,8 @@ sub __my_inx {
     my ( $self ) = @_;
     my $parent = $self->_parent() or return;
     my $addr = refaddr( $self );
-    my $inx = firstidx { refaddr $_ == $addr } $parent->elements();
-    $inx < 0
-	and return;
-    return $inx;
+    my @elem = $parent->elements();
+    return first { refaddr( $elem[$_] ) == $addr } 0 .. $#elem;
 }
 
 
@@ -1062,8 +1059,10 @@ sub __my_inx {
 	my $addr = refaddr( $self );
 	foreach my $method ( qw{ children start type finish } ) {
 	    $parent->can( $method ) or next;
-	    my $inx = firstidx { refaddr $_ == $addr } $parent->$method();
-	    $inx < 0 and next;
+	    my @elem = $parent->$method();
+	    defined( my $inx = first { refaddr( $elem[$_] ) == $addr }
+		0 .. $#elem )
+		or next;
 	    return ( $method_map{$method} || $method, $inx );
 	}
 	return;

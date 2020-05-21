@@ -1638,3 +1638,4 @@ t/temando.t
 t/ups.t
 t/ups_canada.t
 t/ups_surepost.t
+t/ups_tracking.t

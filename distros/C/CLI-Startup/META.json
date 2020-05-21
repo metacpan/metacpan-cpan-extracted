@@ -63,7 +63,7 @@
    "provides" : {
       "CLI::Startup" : {
          "file" : "lib/CLI/Startup.pm",
-         "version" : "0.26"
+         "version" : "0.27"
       }
    },
    "release_status" : "stable",
@@ -72,6 +72,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.26",
+   "version" : "0.27",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

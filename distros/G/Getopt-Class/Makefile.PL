@@ -19,10 +19,10 @@ my %WriteMakefileArgs = (
         'DateTime::Format::Strptime' => '1.76',
         'Devel::Confess'=> '0.009004',
         'Getopt::Long'  => '0.44',
-        'Module::Generic' => 'v0.12.1',
+        'Module::Generic' => 'v0.12.5',
         'Scalar::Util'  => '1.54',
     	'Tie::Hash'     => '1.05',
-        'TryCatch'      => '1.003002',
+		'Nice::Try'		=> 'v0.1.2',
     },
     TEST_REQUIRES       =>
     {

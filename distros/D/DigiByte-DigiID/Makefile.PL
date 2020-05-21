@@ -19,13 +19,16 @@ my %WriteMakefileArgs = (
     "Crypt::OpenPGP::Digest" => 0,
     "Crypt::OpenSSL::Random" => 0,
     "Crypto::ECC" => 0,
+    "Data::UUID" => 0,
     "Digest::SHA" => 0,
     "JSON::XS" => 0,
     "MIME::Base64" => 0,
+    "Math::BigInt" => "1.999818",
+    "Math::BigInt::GMP" => "1.6007",
     "String::Pad" => 0,
     "URI::Escape" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,9 +39,12 @@ my %FallbackPrereqs = (
   "Crypt::OpenPGP::Digest" => 0,
   "Crypt::OpenSSL::Random" => 0,
   "Crypto::ECC" => 0,
+  "Data::UUID" => 0,
   "Digest::SHA" => 0,
   "JSON::XS" => 0,
   "MIME::Base64" => 0,
+  "Math::BigInt" => "1.999818",
+  "Math::BigInt::GMP" => "1.6007",
   "String::Pad" => 0,
   "URI::Escape" => 0
 );

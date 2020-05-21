@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use Carp;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use base 'Test::Smoke::ObjectBase';
 use Test::Smoke::LogMixin;
@@ -143,8 +143,15 @@ HTTP or Test::Smoke::Gateway-application errors.
 
 sub post {
     my $self = shift;
-    my $response_body = eval {decode_json($self->_post_data())};
-    confess("[$response_body]: " . $@) if $@;
+
+    my $response = eval { $self->_post_data() };
+    confess("[POST]: >$response< " . $@) if $@;
+
+    my $response_body = eval {
+        Test::Smoke::Util::LoadAJSON->new->utf8->allow_nonref->decode($response);
+    };
+    confess("[decode_json] >$response< " . $@) if $@;
+
     $self->_process_post_result($response_body);
 }
 

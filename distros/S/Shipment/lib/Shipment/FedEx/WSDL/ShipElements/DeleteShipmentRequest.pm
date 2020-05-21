@@ -1,6 +1,6 @@
 
 package Shipment::FedEx::WSDL::ShipElements::DeleteShipmentRequest;
-$Shipment::FedEx::WSDL::ShipElements::DeleteShipmentRequest::VERSION = '3.02';
+$Shipment::FedEx::WSDL::ShipElements::DeleteShipmentRequest::VERSION = '3.04';
 use strict;
 use warnings;
 
@@ -34,7 +34,7 @@ Shipment::FedEx::WSDL::ShipElements::DeleteShipmentRequest
 
 =head1 VERSION
 
-version 3.02
+version 3.04
 
 =head1 DESCRIPTION
 

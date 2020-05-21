@@ -1,3 +1,24 @@
+#***************************************************************************
+#                                  _   _ ____  _
+#  Project                     ___| | | |  _ \| |
+#                             / __| | | | |_) | |
+#                            | (__| |_| |  _ <| |___
+#                             \___|\___/|_| \_\_____|
+#
+# Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+#
+# This software is licensed as described in the file COPYING, which
+# you should have received as part of this distribution. The terms
+# are also available at https://curl.haxx.se/docs/copyright.html.
+#
+# You may opt to use, copy, modify, merge, publish, distribute and/or sell
+# copies of the Software, and permit persons to whom the Software is
+# furnished to do so, under the terms of the COPYING file.
+#
+# This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+# KIND, either express or implied.
+#
+###########################################################################
 # files used only in some libcurl test programs
 TESTUTIL = testutil.c testutil.h
 
@@ -22,7 +43,8 @@ noinst_PROGRAMS = chkhostname libauthretry libntlmconnect                \
  lib571 lib572 lib573 lib574 lib575 lib576        lib578 lib579 lib582   \
  lib583 lib585 lib586 lib587 lib589 lib590 lib591 lib597 lib598 lib599   \
  lib643 lib644 lib645 lib650 lib651 lib652 lib653 lib654 lib655 lib658   \
- lib659 lib661 \
+ lib659 lib661 lib666 lib667 lib668 \
+ lib670 lib671 lib672 lib673 \
  lib1156 \
  lib1500 lib1501 lib1502 lib1503 lib1504 lib1505 lib1506 lib1507 lib1508 \
  lib1509 lib1510 lib1511 lib1512 lib1513 lib1514 lib1515         lib1517 \
@@ -33,7 +55,7 @@ noinst_PROGRAMS = chkhostname libauthretry libntlmconnect                \
  lib1550 lib1551 lib1552 lib1553 lib1554 lib1555 lib1556 lib1557 \
  lib1558 lib1559 lib1560 lib1564 lib1565 \
  lib1591 lib1592 lib1593 lib1594 lib1596 \
- lib1900 lib1905 lib1906 lib1907 \
+ lib1900 lib1905 lib1906 lib1907 lib1908 \
  lib2033
 
 chkdecimalpoint_SOURCES = chkdecimalpoint.c ../../lib/mprintf.c \
@@ -348,6 +370,33 @@ lib659_CPPFLAGS = $(AM_CPPFLAGS)
 lib661_SOURCES = lib661.c $(SUPPORTFILES)
 lib661_CPPFLAGS = $(AM_CPPFLAGS)
 
+lib666_SOURCES = lib666.c $(SUPPORTFILES)
+lib666_CPPFLAGS = $(AM_CPPFLAGS)
+
+lib667_SOURCES = lib667.c $(SUPPORTFILES) $(TESTUTIL) $(WARNLESS)
+lib667_LDADD = $(TESTUTIL_LIBS)
+lib667_CPPFLAGS = $(AM_CPPFLAGS)
+
+lib668_SOURCES = lib668.c $(SUPPORTFILES) $(TESTUTIL) $(WARNLESS)
+lib668_LDADD = $(TESTUTIL_LIBS)
+lib668_CPPFLAGS = $(AM_CPPFLAGS)
+
+lib670_SOURCES = lib670.c $(SUPPORTFILES) $(TESTUTIL) $(WARNLESS)
+lib670_LDADD = $(TESTUTIL_LIBS)
+lib670_CPPFLAGS = $(AM_CPPFLAGS) -DLIB670
+
+lib671_SOURCES = lib670.c $(SUPPORTFILES) $(TESTUTIL) $(WARNLESS)
+lib671_LDADD = $(TESTUTIL_LIBS)
+lib671_CPPFLAGS = $(AM_CPPFLAGS) -DLIB671
+
+lib672_SOURCES = lib670.c $(SUPPORTFILES) $(TESTUTIL) $(WARNLESS)
+lib672_LDADD = $(TESTUTIL_LIBS)
+lib672_CPPFLAGS = $(AM_CPPFLAGS) -DLIB672
+
+lib673_SOURCES = lib670.c $(SUPPORTFILES) $(TESTUTIL) $(WARNLESS)
+lib673_LDADD = $(TESTUTIL_LIBS)
+lib673_CPPFLAGS = $(AM_CPPFLAGS) -DLIB673
+
 lib1500_SOURCES = lib1500.c $(SUPPORTFILES) $(TESTUTIL)
 lib1500_LDADD = $(TESTUTIL_LIBS)
 lib1500_CPPFLAGS = $(AM_CPPFLAGS)
@@ -577,6 +626,10 @@ lib1906_CPPFLAGS = $(AM_CPPFLAGS)
 lib1907_SOURCES = lib1907.c $(SUPPORTFILES) $(TESTUTIL) $(WARNLESS)
 lib1907_LDADD = $(TESTUTIL_LIBS)
 lib1907_CPPFLAGS = $(AM_CPPFLAGS)
+
+lib1908_SOURCES = lib1908.c $(SUPPORTFILES) $(TESTUTIL) $(WARNLESS)
+lib1908_LDADD = $(TESTUTIL_LIBS)
+lib1908_CPPFLAGS = $(AM_CPPFLAGS)
 
 lib2033_SOURCES = libntlmconnect.c $(SUPPORTFILES) $(TESTUTIL) $(WARNLESS)
 lib2033_LDADD = $(TESTUTIL_LIBS)

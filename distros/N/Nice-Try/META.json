@@ -1,0 +1,54 @@
+{
+   "abstract" : "A real Try Catch Block Implementation Using Perl Filter",
+   "author" : [
+      "Jacques Deguest (jack@deguest.jp)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Nice-Try",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.73",
+            "Filter::Util::Call" : "1.59",
+            "PPI" : "1.270",
+            "Scalar::Util" : "1.50",
+            "perl" : "5.006000",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.302162",
+            "Test::Pod" : "1.52"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.1.2",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

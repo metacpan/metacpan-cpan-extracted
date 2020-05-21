@@ -24,12 +24,12 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Data::Object::Name" => "2.01",
-    "Test::Auto" => "0.07",
+    "Test::Auto" => "0.12",
     "routines" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "2.05",
+  "VERSION" => "2.07",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Data::Object::Name" => "2.01",
-  "Test::Auto" => "0.07",
+  "Test::Auto" => "0.12",
   "routines" => 0,
   "strict" => 0,
   "warnings" => 0

@@ -1,5 +1,9 @@
 Changelog for Dist-Zilla-PluginBundle-Author-IOANR
 
+1.201410 2020-05-20T05:29:24Z
+ - Don't bundle Devel::CheckOS in build tarballs
+ - Fix always using Devel::AssertOS in Build.PL 
+
 1.201400 2020-05-19T03:08:22Z
  - Migrate to Gitlab.com
  - Support dists hosted on github.com or gitlab.com

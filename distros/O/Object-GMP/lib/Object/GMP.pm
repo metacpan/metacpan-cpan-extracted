@@ -1,5 +1,5 @@
 package Object::GMP;
-$Object::GMP::VERSION = '0.003';
+$Object::GMP::VERSION = '0.005';
 =head1 NAME
 
 Object::GMP - Moo Role for any object has GMP field
@@ -30,6 +30,12 @@ The above exmaple to declare the field 'prime' is a GMP value.
 
 So when you create an object, a and b will be normal value
 and prime will be a GMP value.
+
+=head1 LINKS
+
+B<Git Repo>: L<https://github.com/mvu8912/perl5-object-gmp.git>
+
+B<CPAN Module>: L<https://metacpan.org/pod/Object::GMP>
 
 =cut
 

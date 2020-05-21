@@ -3,7 +3,7 @@ package Data::Sah::Coerce::perl::To_str::From_str::rgb24_from_colorname_X_or_cod
 # AUTHOR
 our $DATE = '2020-03-02'; # DATE
 our $DIST = 'Sah-Schemas-Color'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -57,7 +57,7 @@ Data::Sah::Coerce::perl::To_str::From_str::rgb24_from_colorname_X_or_code - Coer
 
 =head1 VERSION
 
-This document describes version 0.006 of Data::Sah::Coerce::perl::To_str::From_str::rgb24_from_colorname_X_or_code (from Perl distribution Sah-Schemas-Color), released on 2020-03-02.
+This document describes version 0.007 of Data::Sah::Coerce::perl::To_str::From_str::rgb24_from_colorname_X_or_code (from Perl distribution Sah-Schemas-Color), released on 2020-03-02.
 
 =head1 SYNOPSIS
 

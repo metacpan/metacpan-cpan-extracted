@@ -13,18 +13,18 @@ my $data_dir = File::Object->new->up->dir('data')->set;
 
 # Test.
 my $ret = detect_dwg_file($data_dir->file('ex1.dwg')->s);
-is($ret, 1, 'MC0.0 DWG file.');
+is($ret, 'MC0.0', 'MC0.0 DWG file.');
 
 # Test.
 $ret = detect_dwg_file($data_dir->file('ex2.dwg')->s);
-is($ret, 1, 'AC1.2 DWG file.');
+is($ret, 'AC1.2', 'AC1.2 DWG file.');
 
 # Test.
 $ret = detect_dwg_file($data_dir->file('ex3.dwg')->s);
-is($ret, 1, 'AC1003 DWG file.');
+is($ret, 'AC1003', 'AC1003 DWG file.');
 
 $ret = detect_dwg_file($data_dir->file('fake.dwg')->s);
-is($ret, 0, 'Fake DWG file.');
+is($ret, undef, 'Fake DWG file.');
 
 # Test.
 eval {

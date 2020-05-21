@@ -15,7 +15,7 @@ use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 use Scalar::Util qw{ looks_like_number refaddr };
 use Test::More 0.88;
 
-our $VERSION = '0.071';
+our $VERSION = '0.072';
 
 use constant ARRAY_REF	=> ref [];
 
@@ -233,7 +233,7 @@ sub finis {
 
 {
 
-    my %array = map { $_ => 1} qw{
+    my %array = map { $_ => 1 } qw{
 	children delimiters finish schildren start tokens type
     };
 

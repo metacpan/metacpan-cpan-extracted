@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.181';
+our $VERSION = '1.182';
 
 use Quiq::Path;
 use Quiq::String;
@@ -635,7 +635,7 @@ sub style {
 
 =head1 VERSION
 
-1.181
+1.182
 
 =head1 AUTHOR
 

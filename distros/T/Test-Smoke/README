@@ -1,6 +1,6 @@
 =head1 NAME
 
-README - Perl Core Test Smoke Suite (1.62)
+README - Perl Core Test Smoke Suite
 
 =head1 SYNOPSIS
 
@@ -153,14 +153,14 @@ run time of Test::Smoke.
 
 =item B<Reports>
 
-    <daily-build-reports@perl.org> 
+    <daily-build-reports@perl.org>
         [subscribe: <daily-build-reports-subscribe@perl.org>]
     http://www.nntp.perl.org/group/perl.daily-build.reports
     news:nntp.perl.org/perl.daily-build.reports
 
 =item B<Smokers>
 
-    <daily-build@perl.org> 
+    <daily-build@perl.org>
         [subscribe: <daily-build-subscribe@perl.org>]
     http://www.nntp.perl.org/group/perl.daily-build
     news:nntp.perl.org/perl.daily-build

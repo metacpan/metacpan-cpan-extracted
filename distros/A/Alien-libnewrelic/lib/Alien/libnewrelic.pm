@@ -6,7 +6,7 @@ use 5.020;
 use base qw( Alien::Base );
 
 # ABSTRACT: Alien to download and install libnewrelic
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 
@@ -27,7 +27,7 @@ Alien::libnewrelic - Alien to download and install libnewrelic
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -39,7 +39,7 @@ In your Makefile.PL:
  WriteMakefile(
    Alien::Base::Wrapper->new('Alien::libnewrelic')->mm_args2(
      # MakeMaker args
-     NAME => 'Kafka::Librd',
+     NAME => 'My::XS',
      ...
    ),
  );
@@ -83,7 +83,7 @@ for the use of other modules.
 
 =over 4
 
-=item L<NewRelic>
+=item L<NewFangle>
 
 Perl level bindings for this SDK.
 

@@ -13,6 +13,7 @@ lib/DB/Object/Postgres/Query.pm
 lib/DB/Object/Postgres/Statement.pm
 lib/DB/Object/Postgres/Tables.pm
 lib/DB/Object/Query.pm
+lib/DB/Object/Query/Clause.pod
 lib/DB/Object/SQLite.pm
 lib/DB/Object/SQLite/Query.pm
 lib/DB/Object/SQLite/Statement.pm

@@ -1,0 +1,72 @@
+NAME
+    Mu::Tiny - NAE KING! NAE QUIN! NAE CAPTAIN! WE WILLNAE BE FOOLED AGAIN!
+
+SYNOPSIS
+      BEGIN {
+        package Feegle;
+  
+        use Mu::Tiny;
+  
+        ro 'name';
+        lazy plan => sub { 'PLN' };
+      }
+  
+      my $rob = Feegle->new(name => 'Rob Anybody'); # name is required
+  
+      say $rob->plan; # outputs 'PLN'
+
+DESCRIPTION
+    This is the aaaabsoluuuute baaaaare minimumimumimum subset o' Mu, for
+    those o' ye who value yer independence over yer sanity. It doesnae
+    trouble wi' anythin' but the read-onlies, for tis a terrible thing to
+    make a feegle try t' write.
+
+METHODS
+  new
+      my $new = Feegle->new(%attrs|\%attrs);
+
+    The new method be inherited from "Mu::Tiny::Object" like a shiny thing
+    or the duties o' a Kelda.
+
+    Ye may hand it a hash, or if ye already made yer own hash o' things, a
+    reference to the one so pre-prepared.
+
+    An ye forget any o' the attrs declared as "ro", then "new" will go waily
+    waily waily and "croak" with a list of all that ye missed.
+
+EXPORTS
+  ro
+      ro 'attr';
+
+    An "ro" attr be required and read only, and knows nothin' but its own
+    name.
+
+  lazy
+      lazy 'attr' => sub { <build default value> };
+
+    A <lazy> attr be read only but not required, an' if ye make us, we'll
+    take a guess at what ye wanted, but only when we must.
+
+    If'n ye be slightly less lazy than us, then subclass and override yan
+    "_build_attr" method t' change tha guess.
+
+WHUT
+    Dinnae fash yersel', Hamish, you prob'ly wanted Mu anyway.
+
+APOLOGIES
+    ... to Terry Pratchett, Mithaldu, and probably everybody else as well.
+
+AUTHOR
+     mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>
+
+CONTRIBUTORS
+    None yet - maybe this software is perfect! (ahahahahahahahahaha)
+
+COPYRIGHT
+    Copyright (c) 2020 the Mu::Tiny "AUTHOR" and "CONTRIBUTORS" as listed
+    above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

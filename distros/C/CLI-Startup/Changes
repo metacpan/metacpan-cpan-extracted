@@ -1,5 +1,7 @@
 Revision history for CLI-Startup
 
+0.27    2020-05-20
+        Fixed more broken tests caused by missing optional modules.
 0.26    2020-05-19
         Fixed test that breaks if Config::INI::Writer isn't installed.
 0.25    2020-05-18

@@ -11,26 +11,26 @@ foreach my $include_dir (@INC)
     my $dir = "$include_dir/Petal/Hash";
     if (-e $dir and -d $dir)
     {
-	opendir DD, $dir or do {
-	    warn "Cannot open directory $dir. Reason: $!";
-	    next;
-	};
-	
-	my @modules = map { s/\.pm$//; $_ }
-	              grep /\.pm$/,
-		      grep !/^\./,
-		      readdir (DD);
-	
-	closedir DD;
-	
-	foreach my $module (@modules)
-	{
-		$module =~ /^(\w+)$/;
-		$module = $1;
-		eval "use Petal::Hash::$module";
-	    $@ and warn "Cannot import module $module. Reason: $@";
-	    $MODIFIERS->{lc ($module) . ':'} = "Petal::Hash::$module";
-	}
+        opendir DD, $dir or do {
+            warn "Cannot open directory $dir. Reason: $!";
+            next;
+        };
+
+        my @modules = map { s/\.pm$//; $_ }
+                      grep /\.pm$/,
+                      grep !/^\./,
+                      readdir (DD);
+
+        closedir DD;
+
+        foreach my $module (@modules)
+        {
+                $module =~ /^(\w+)$/;
+                $module = $1;
+                eval "use Petal::Hash::$module";
+            $@ and warn "Cannot import module $module. Reason: $@";
+            $MODIFIERS->{lc ($module) . ':'} = "Petal::Hash::$module";
+        }
     }
 }
 
@@ -55,10 +55,10 @@ $MODIFIERS->{'true:'} = sub {
     my $hash = shift;
     my $variable = $hash->fetch (@_);
     return unless (defined $variable);
-    
+
     (scalar @{$variable}) ? return 1 : return
         if (ref $variable eq 'ARRAY' or (ref $variable and $variable =~ /=ARRAY\(/));
-    
+
     ($variable) ? return 1 : return;
 };
 
@@ -91,8 +91,8 @@ sub new
     my $thing = shift;
     my $self  = (ref $thing) ?
         bless { %{$thing} }, ref $thing :
-	bless { @_ }, $thing;
-    
+        bless { @_ }, $thing;
+
     $self->{__petal_hash_cache__}  = {};
     return $self;
 }
@@ -107,7 +107,7 @@ sub get
     delete $self->{__petal_hash_cache__}->{$key} if ($fresh);
     exists $self->{__petal_hash_cache__}->{$key} and return $self->{__petal_hash_cache__}->{$key};
 
-    my $res = undef;   
+    my $res = undef;
     if ($Petal::HTML_ERRORS)
     {
         $res = eval { $self->__FETCH ($key) };
@@ -148,7 +148,7 @@ sub delete_cached
     my $regex = shift;
     for (keys %{$self->{__petal_hash_cache__}})
     {
-	/$regex/ and delete $self->{__petal_hash_cache__}->{$_};
+        /$regex/ and delete $self->{__petal_hash_cache__}->{$_};
     }
 }
 
@@ -160,13 +160,13 @@ sub __FETCH
     my $no_encode = $key =~ s/^\s*structure\s+//;
     if (defined $no_encode and $no_encode)
     {
-	return $self->fetch ($key);
+        return $self->fetch ($key);
     }
     else
     {
         # can anyone explain why keys beginning with 'text' are not allowed???
-	$key =~ s/^\s*text\s*//;
-	return $self->fetch ($key);
+        $key =~ s/^\s*text\s*//;
+        return $self->fetch ($key);
     }
 }
 
@@ -178,13 +178,13 @@ sub fetch
 {
     my $self = shift;
     my $key  = shift;
-    
+
     my $mod  = $self->_fetch_mod ($key);
     $key =~ s/^\Q$mod\E//;
     $key =~ s/^\s+//;
-    
+
     my $module = $MODIFIERS->{$mod} || confess "$mod is not a known modifier";
-    (defined $module and ref $module and ref $module eq 'CODE') and return $module->($self, $key); 
+    (defined $module and ref $module and ref $module eq 'CODE') and return $module->($self, $key);
     $module->process ($self, $key);
 }
 

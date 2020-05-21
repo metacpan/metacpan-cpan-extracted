@@ -1,91 +1,15 @@
-package NewFangle 0.01 {
+package NewFangle 0.02 {
 
   use strict;
   use warnings;
   use 5.020;
   use NewFangle::FFI;
-  use FFI::C 0.08;
+  use NewFangle::Config;
+  use NewFangle::App;
+  use NewFangle::CustomEvent;
   use base qw( Exporter );
 
 # ABSTRACT: Unofficial Perl NewRelic SDK
-
-
-  FFI::C->ffi($ffi);
-
-  package NewFangle::NewrelicLoglevel 0.01 {
-    FFI::C->enum([
-      'error',
-      'warning',
-      'info',
-      'debug',
-    ], { prefix => 'NEWRELIC_LOG_' });
-  }
-
-  package NewFangle::NewrelicTransactionTracerThreshold 0.01 {
-    FFI::C->enum([
-      'is_apdex_failing',
-      'is_over_duration',
-    ], { prefix => 'NEWRELIC_THRESHOLD_' });
-  }
-
-  package NewFangle::NewrelicTtRecordsql 0.01 {
-    FFI::C->enum([
-      'off',
-      'raw',
-      'obfuscated',
-    ], { prefix => 'NEWRELIC_SQL_' });
-  }
-
-  package NewFangle::DatastoreReporting 0.01 {
-    FFI::C->struct([
-      enabled      => 'bool',
-      record_sql   => 'newrelic_tt_recordsql_t',
-      threshold_us => 'newrelic_time_us_t',
-    ]);
-  };
-
-  package NewFangle::NewrelicTransactionTracerConfig 0.01 {
-    FFI::C->struct([
-      enabled                  => 'bool',
-      threshold                => 'newrelic_transaction_tracer_threshold_t',
-      duration_us              => 'newrelic_time_us_t',
-      stack_trace_threshold_us => 'newrelic_time_us_t',
-      datastore_reporting      => 'datastore_reporting_t',
-    ]);
-  }
-
-  package NewFangle::NewrelicDatastoreSegmentConfig 0.01 {
-    FFI::C->struct([
-      instance_reporting      => 'bool',
-      database_name_reporting => 'bool',
-    ]);
-  }
-
-  package NewFangle::NewrelicDistributedTracingConfig 0.01 {
-    FFI::C->struct([
-      enabled => 'bool',
-    ]);
-  }
-
-  package NewFangle::NewrelicSpanEventConfig 0.01 {
-    FFI::C->struct([
-      enabled => 'bool',
-    ]);
-  }
-
-  package NewFangle::NewrelicAppConfig 0.01 {
-    FFI::C->struct([
-      app_name            => 'string(255)',
-      license_key         => 'string(255)',
-      redirect_collector  => 'string(100)',
-      log_filename        => 'string(512)',
-      log_level           => 'newrelic_loglevel_t',
-      transaction_tracer  => 'newrelic_transaction_tracer_config_t',
-      datastore_tracer    => 'newrelic_datastore_segment_config_t',
-      distributed_tracing => 'newrelic_distributed_tracing_config_t',
-      span_events         => 'newrelic_span_event_config_t',
-    ], { trim_string => 1 });
-  }
 
 
   $ffi->mangler(sub { $_[0] });
@@ -95,10 +19,6 @@ package NewFangle 0.01 {
   $ffi->mangler(sub { "newrelic_$_[0]" });
 
   our @EXPORT_OK = grep /^newrelic_/, keys %NewFangle::;
-
-  require NewFangle::Config;
-  require NewFangle::App;
-  require NewFangle::CustomEvent;
 
 };
 
@@ -116,7 +36,7 @@ NewFangle - Unofficial Perl NewRelic SDK
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

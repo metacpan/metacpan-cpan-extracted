@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST.pm
-## Version v0.5.5
+## Version v0.5.6
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/09/01
-## Modified 2020/05/16
+## Modified 2020/05/21
 ## 
 ##----------------------------------------------------------------------------
 package Net::API::REST;
@@ -29,7 +29,7 @@ BEGIN
     use APR::UUID ();
     use JSON::PP ();
     use Regexp::Common;
-    use TryCatch;
+    use Nice::Try;
     use Devel::Confess;
     use Scalar::Util ();
     ## use Crypt::JWT;
@@ -47,7 +47,7 @@ BEGIN
     use Net::API::REST::Response;
     use Net::API::REST::Status;
     our( $VERSION, $DEBUG, $VERBOSE, $API_VERSION );
-    $VERSION = 'v0.5.5';
+    $VERSION = 'v0.5.6';
 };
 
 {
@@ -1783,7 +1783,7 @@ Net::API::REST - Framework for RESTful APIs
 
 =head1 VERSION
 
-    v0.5.5
+    v0.5.6
 
 =head1 DESCRIPTION
 

@@ -47,12 +47,12 @@
             "JSON" : "4.02",
             "Module::Generic" : "v0.11.6",
             "Net::IP" : "1.26",
+            "Nice::Try" : "v0.1.2",
             "Number::Format" : "1.75",
             "POSIX" : "1.88",
             "Scalar::Util" : "1.54",
             "Test::More" : "1.302162",
             "Test::Pod" : "1.52",
-            "TryCatch" : "1.003002",
             "URI" : "1.76",
             "Want" : "0.29",
             "common::sense" : "3.74",
@@ -64,6 +64,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.9.4",
+   "version" : "v0.9.5",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

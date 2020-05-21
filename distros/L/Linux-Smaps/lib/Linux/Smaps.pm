@@ -6,6 +6,8 @@ use warnings FATAL=>'all';
 no warnings qw(uninitialized portable);
 use Errno qw/EACCES/;
 
+our $VERSION = '0.14';
+
 my $min_vma_off;
 
 BEGIN {
@@ -49,6 +51,13 @@ BEGIN {
     our @special;
   }
 
+  sub _default_special {
+    my $l = $_[0];
+    $l =~ s/\s+$//;
+    my @l=split /\s+/, $l, 2;
+    my $res = pop @l;
+  }
+
   sub new {bless [@_[1..$#_]]=>(ref $_[0] ? ref $_[0] : $_[0])}
 
   sub _parse {
@@ -86,8 +95,6 @@ BEGIN {
     *{__PACKAGE__.'::M_'.$attributes[$n]}=sub () {$n};
   }
 }
-
-our $VERSION = '0.13';
 
 sub new {
   my $class=shift;
@@ -176,12 +183,12 @@ sub update {
     } elsif( $l=~/^(\w+):\s*(\d+) kB$/ ) {
       $m=lc $1;
 
-      if( exists $Linux::Smaps::VMA::attributes{$m} ) {
-	$I->[M_lasterror]="Linux::Smaps::VMA::$m method is already defined";
-	return;
-      }
       if( exists $Linux::Smaps::attributes{$m} ) {
 	$I->[M_lasterror]="Linux::Smaps::$m method is already defined";
+	return;
+      }
+      if( exists $Linux::Smaps::VMA::attributes{$m} ) {
+	$I->[M_lasterror]="Linux::Smaps::VMA::$m method is already defined";
 	return;
       }
 
@@ -222,7 +229,8 @@ sub update {
 	$cnt1=length($m);
 	$fmt1="x".($cnt1+1)."A*";
       }
-    } elsif( $l=~/^(\w+):.+$/ and $tmp=$Linux::Smaps::VMA::special{$m=lc $1} ) {
+    } elsif( $l=~/^(\w+):.+$/ ) {
+      my $tmp = $Linux::Smaps::VMA::special{$m=lc $1} || \&Linux::Smaps::VMA::_default_special;
       if( exists $Linux::Smaps::VMA::attributes{$m} ) {
 	$I->[M_lasterror]="Linux::Smaps::VMA::$m method is already defined";
 	return;
@@ -267,7 +275,7 @@ sub update {
 }
 
 BEGIN {
-  foreach my $n (qw{heap stack vdso vsyscall}) {
+  foreach my $n (qw{heap stack vdso vvar vsyscall}) {
     no strict 'refs';
     my $name=$n;
     my $s="[$n]";
@@ -343,7 +351,7 @@ sub names {
     $_->_parse if !defined($_->[V_file_name]) and defined($_->[V__line]);
     $_->[V_file_name];
   } @{$I->[M__elem]}};
-  delete @h{'',qw/[heap] [stack] [vdso] [vsyscall]/};
+  delete @h{'',qw/[heap] [stack] [vdso] [vvar] [vsyscall]/};
   return keys %h;
 }
 
@@ -615,6 +623,8 @@ the way but all my kernels still lack it.
 =head3 $self-E<gt>vdso
 
 =head3 $self-E<gt>vsyscall
+
+=head3 $self-E<gt>vvar
 
 these are shortcuts to the corresponding C<Linux::Smaps::VMA> objects.
 

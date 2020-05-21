@@ -102,7 +102,6 @@ sub sync {
         if ( my $gitexit = $gitbin->exitcode ) {
             croak("Cannot make smoke clone: $self->{gitbin} exit $gitexit");
         }
-        $cloneout =~ s/%/%%/g;
         $self->log_debug("[git clone $self->{gitdir}]: $cloneout");
     }
 
@@ -152,7 +151,7 @@ sub get_git_branch {
     if (open my $fh, '<', $self->{gitbranchfile}) {
         $self->log_debug("Reading branch to smoke from: '$self->{gitbranchfile}'");
 
-        my $branch = <$fh>;
+        chomp( my $branch = <$fh> );
         close $fh;
         return $branch;
     }

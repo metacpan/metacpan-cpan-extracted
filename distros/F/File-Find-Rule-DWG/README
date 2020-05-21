@@ -45,14 +45,14 @@ DEPENDENCIES
     CAD::AutoCAD::Detect, File::Find::Rule.
 
 SEE ALSO
-    File::Find::Rule
-        Alternative interface to File::Find.
+    CAD::AutoCAD::Detect
+        Detect AutoCAD files through magic string.
 
     CAD::AutoCAD::Version
         Class which work with AutoCAD versions.
 
-    CAD::AutoCAD::Detect
-        Detect AutoCAD files through magic string.
+    File::Find::Rule
+        Alternative interface to File::Find.
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/File-Find-Rule-DWG>
@@ -68,5 +68,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

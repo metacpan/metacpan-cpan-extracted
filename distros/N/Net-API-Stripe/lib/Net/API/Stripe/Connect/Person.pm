@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Person.pm
-## Version v0.200.0
+## Version v0.200.1
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/11/02
-## Modified 2020/05/15
+## Modified 2020/05/21
 ## 
 ##----------------------------------------------------------------------------
 package Net::API::Stripe::Connect::Person;
@@ -14,8 +14,8 @@ BEGIN
 	use parent qw( Net::API::Stripe::Generic );
 	use DateTime;
 	use DateTime::Format::Strptime;
-	use TryCatch;
-	our( $VERSION ) = 'v0.200.0';
+	use Nice::Try;
+	our( $VERSION ) = 'v0.200.1';
 };
 
 sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
@@ -146,7 +146,7 @@ See documentation in L<Net::API::Stripe> for example to make api calls to Stripe
 
 =head1 VERSION
 
-    v0.200.0
+    v0.200.1
 
 =head1 DESCRIPTION
 

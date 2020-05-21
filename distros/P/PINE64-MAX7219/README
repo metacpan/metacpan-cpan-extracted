@@ -1,0 +1,129 @@
+=pod
+=head1 NAME
+PINE64::MAX7219 driver for 8-digit 7-seg MAX7219 displays
+
+=head1 SYNOPSIS
+
+	use PINE64::MAX7219;
+
+	my $max = PINE64::MAX7219->new(0,1,2);
+
+	$max->turn_on(1);
+	$max->set_scanlimit(1);
+	$max->set_intensity('max');
+
+	#display test (all on / all off))
+	$max->disp_teston();
+	sleep(2);
+	$max->disp_testoff();
+
+	#clockwise circles
+	$max->clockwise_circles(10);
+
+	#counter clockwise circles
+	$max->countercw_circles(10);
+
+	#print a sentence, 0.5sec / word
+	$max->print_sentence("perl rules on pine64", 500000);
+
+	#endless KnightRider effect!
+	for(;;){
+		$max->bullets_lrmid(1);
+		$max->bullets_rlmid(1);
+	}#end for
+
+=head1 DESCRIPTION
+
+This module is a driver for 8-digit seven-segment MAX7219 displays. It
+is implemented as bit-banged SPI.  Using the object's methods, you can
+set the intensity of the display, print words, and cascade multiple 
+displays. It also comes with several built-in effects.  
+
+Only three GPIO pins are required: SPI clk, SPI data, and SPI chip 
+select.  This modules uses the PINE64::GPIO numbering scheme. 
+
+=head1 METHODS
+
+=head2 new($clock,$data,$chip_select)
+
+Takes the GPIO pin numbers that will be used to inplement the bit-bang
+SPI interface to the MAX7219 as arguments.  Returns an object to
+control an 8-digit display.  
+
+=head2 shift_in($leds, $digit, $n_cascaded, $delay, $latch_flag)
+This method is only used internally.  It takes an array of a single
+seven-segment's LEDs, the digit position, the number of cascaded
+MAX7219 displays, a delay in usec (between SPI clock pulses), and a
+latch flag.  Each individual letter of a word is shifted in one at
+a time.  Once all the letters are shifted in, the latch_flag is set
+high, and displays the word.  
+
+=head2 load()
+This method is only used internally. It manipulates the chip select
+line, aka latch pin.  When called, it will render what has been
+shifted into the display. 
+
+=head2 print_sentence($sentence, $delay, $clear_flag)
+Perhaps the most useful method.  Takes a string, however long, and
+displays each word for $delay micro seconds.  $sentence could be the 
+text of an entire book.  $clear_flag is not required.  
+
+=head2 print_interleaved($string1, $string2)
+This method is for use with two 8-digit displays cascaded.  $string1
+will be displayed in the first display, $string2 in the cascaded
+display. 
+
+=head2 turn_on($num_cascaded)
+Turns on the MAX7219 chip by writing to the turn on register.  Takes
+the number of cascaded displays as an argument. Enter 1 if only 
+using one display. 
+
+=head2 set_scanlimit($num_cascaded)
+Writes to the scan-limit register.  Sets it up to use all 8-digits
+of the display.  Takes number of cascaded displays an arg. 
+
+=head2 set_intensity($intensity); 
+Adjusts the brightness of the display.  Takes a string as an arg.
+Valid vlaues are: min, dim, mid, bright, max.  
+
+=head2 all_off($num_cascaded)  
+Turns off all digits.  Takes number of cascaded displays as an arg. 
+
+=head2 disp_teston()
+Turns on all segments on all digits.  
+
+=head2 disp_testoff()
+Turns off all segments on all digits. 
+
+=head2 clockwise_circles($number_iterations)
+Clockwise circles effect. 
+
+=head2 countercq_circles($number_iterations)
+Counter clockwise circles effects
+
+=head2 bullets_lrtop($number_iterations)
+Knight-rider like bullets effect.  Top row of horizontal LEDs of each
+digit move from right to left. 
+
+=head2 bullets_rltop($number_iterations)
+Knight-rider like bullets effect.  Top row of horizontal LEDs of each
+digit move from left to right. 
+
+=head2 bullets_lrmid($number_iterations) 
+Knight-rider like bullets effect.  Mid row of horizontal LEDs of each
+digit move from left to right. 
+
+=head2 bullets_rlmid($number_iterations) 
+Knight-rider like bullets effect.  Mid row of horizontal LEDs of each
+digit move from right to left. 
+
+=head2 bullets_lrbot($number_iterations) 
+Knight-rider like bullets effect.  Bottom row of horizontal LEDs of 
+each digit move from left to right. 
+
+=head2 bullets_rlbot($number_iterations) 
+Knight-rider like bullets effect.  Bottom row of horizontal LEDs of 
+each digit move from right to left. 
+
+=cut
+

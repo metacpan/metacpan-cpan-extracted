@@ -16,7 +16,6 @@ Test::Smoke::Util::FindHelpers - Functions to help find Helpers (modules/bins)
 
 use Config;
 use Test::Smoke::Util 'whereis';
-use fallback 'inc';
 
 =head1 EXPORT_OK/EXPORT_TAGS
 
@@ -77,14 +76,14 @@ sub get_avail_patchers {
 =head2 get_avail_posters
 
 Return a list of available modules/programs that can be used to HTTP/POST a message.
-(HTTP::Tiny, LWP::UserAgent, HTTP::Lite, curl)
+(HTTP::Tiny, LWP::UserAgent, curl)
 
 =cut
 
 sub get_avail_posters {
     my @posters;
 
-    my @modules = qw/HTTP::Tiny LWP::UserAgent HTTP::Lite/;
+    my @modules = qw/HTTP::Tiny LWP::UserAgent/;
     for my $module (@modules) {
         push @posters, $module if has_module($module);
     }

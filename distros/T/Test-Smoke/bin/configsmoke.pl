@@ -16,8 +16,6 @@ use lib catdir( $FindBin::Bin, 'lib' );
 use lib catdir( $FindBin::Bin, updir(), 'lib' );
 use lib catdir( $FindBin::Bin, updir(), 'lib', 'inc' );
 
-use fallback catdir($FindBin::Bin, updir(), 'lib', 'inc'), catdir($FindBin::Bin, updir(), 'lib', 'inc');
-
 use System::Info;
 use Test::Smoke::Util qw(do_pod2usage whereis);
 use Test::Smoke::Util::FindHelpers ':all';

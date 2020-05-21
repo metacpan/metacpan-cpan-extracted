@@ -10,12 +10,20 @@ my %modules;
 my $post_diag;
 
 $modules{$_} = $_ for qw(
+  Cpanel::JSON::XS
   ExtUtils::MakeMaker
   FFI::C
   FFI::C::Util
   FFI::CheckLib
   FFI::Platypus
+  FFI::Platypus::Memory
   FFI::Platypus::Type::PtrObject
+  JSON::MaybeXS
+  JSON::PP
+  JSON::XS
+  Ref::Util
+  Test2::Tools::AsyncSubtest
+  Test2::Tools::JSON::Pointer
   Test2::V0
   YAML
 );

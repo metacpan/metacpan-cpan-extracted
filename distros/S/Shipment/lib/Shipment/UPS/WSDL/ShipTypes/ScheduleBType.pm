@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::ScheduleBType;
-$Shipment::UPS::WSDL::ShipTypes::ScheduleBType::VERSION = '3.02';
+$Shipment::UPS::WSDL::ShipTypes::ScheduleBType::VERSION = '3.04';
 use strict;
 use warnings;
 
@@ -67,7 +67,7 @@ Shipment::UPS::WSDL::ShipTypes::ScheduleBType
 
 =head1 VERSION
 
-version 3.02
+version 3.04
 
 =head1 DESCRIPTION
 

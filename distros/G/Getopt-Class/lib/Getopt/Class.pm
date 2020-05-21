@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Getopt::Long with Class - ~/lib/Getopt/Class.pm
-## Version v0.102.2
+## Version v0.102.4
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2020/04/25
-## Modified 2020/05/12
+## Modified 2020/05/21
 ## 
 ##----------------------------------------------------------------------------
 package Getopt::Class;
@@ -14,12 +14,12 @@ BEGIN
     use warnings;
     use parent qw( Module::Generic );
     use Getopt::Long;
-    use TryCatch;
+    use Nice::Try;
     use DateTime;
     use DateTime::Format::Strptime;
     use Scalar::Util;
 	use Devel::Confess;
-    our $VERSION = 'v0.102.2';
+    our $VERSION = 'v0.102.4';
 };
 
 sub init
@@ -397,58 +397,14 @@ sub exec
     }
     $self->message( 3, "Enabling aliasing." );
     $tie->enable( 1 );
-    ## Maybe I should remove this block of code since it is not really necessary
-    ## init() takes care of declaring necessary aliases to Getopt::Long
-#     foreach my $k ( sort( keys( %$opts ) ) )
-#     {
-#         next if( index( $k, '-' ) == -1 );
-#         my $k2 = $k;
-#         $k2 =~ tr/-/_/;
-#         $opts->{ $k2 } = $opts->{ $k };
-#     }
-    
-    ## Enable our aliases value auto-propagation
-#     $tie->enable( 1 );
-    ## This only process data and does not check their validity beyond what Getopt::Long has already done
     
     $self->messagef( 3, "%d option keys found in dictionary.", scalar( keys( %$dict ) ) );
     foreach my $k ( sort( keys( %$dict ) ) )
     {
-#         my $k2_dash = $k;
-#         $k2_dash =~ tr/_/-/;
-#         my $k2_under = $k;
-#         $k2_under =~ tr/-/_/;
-#         next if( !length( $opts->{ $k2_dash } ) && !length( $opts->{ $k2_under } ) );
-#         my $def = ( $dict->{ $k2_under } || $dict->{ $k2_dash } );
-        
         my $def = $dict->{ $k };
         $self->message( 3, "Checking if key \"$k\" exists in \$opts (", length( $opts->{ $k } ), ") or that default is set ($def->{default})." );
         next if( !length( $opts->{ $k } ) && !$def->{default} );
         return( $self->error( "Dictionary is malformed with entry $k value not being an hash reference." ) ) if( ref( $def ) ne 'HASH' );
-        ## If there are aliases, make sure the value submitted is also available with the aliases
-#         if( $def->{alias} )
-#         {
-#             ## Hopefully, this should trigger the tie::STORE method
-#             ## $opts->{ $k } = $opts->{ $k };
-#             ## _message( 3, "Processing optiona $k with value \"$opts->{$k}\" with aliases: '", join( "', '", @{$def->{alias}} ), "'." );
-#             $tie->enable( 0 );
-#             foreach my $f ( @{$def->{alias}} )
-#             {
-#                 my $f2_dash = $f;
-#                 my $f2_under = $f;
-#                 $f2_dash =~ tr/_/-/;
-#                 $f2_under =~ tr/-/_/;
-#                 $opts->{ $f2_dash } = $opts->{ $k } unless( length( $opts->{ $f2_dash } ) );
-#                 $opts->{ $f2_under } = $opts->{ $k } unless( length( $opts->{ $f2_under } ) );
-#             }
-#             $tie->enable( 1 );
-#         }
-        
-        ## Not needed anymore, because FETCH in Getopt::Class::Alias will return automatically the dereferenced value of the scalar
-#         if( ref( $def->{default} ) eq 'SCALAR' )
-#         {
-#             $opts->{ $k2_dash } = $opts->{ $k2_under } = $opts->{ $k } = ${$opts->{ $k }};
-#         }
         
         if( ( $def->{type} eq 'date' || $def->{type} eq 'datetime' ) && length( $opts->{ $k } ) )
         {
@@ -459,8 +415,6 @@ sub exec
                 {
                     my $dt = DateTime->from_epoch( epoch => $opts->{ $k } );
                     $opts->{ $k } = $dt;
-#                     $opts->{ $k2_dash } = $dt;
-#                     $opts->{ $k2_under } = $dt;
                 }
                 catch( $e )
                 {
@@ -480,10 +434,7 @@ sub exec
                         second => 0,
                         time_zone => 'local',
                     );
-#                     $opts->{ $k2_dash } = $dt;
-#                     $opts->{ $k2_under } = $dt;
                     $opts->{ $k } = $dt;
-                    ## my $ts = $dt->epoch;
                 }
                 catch( $e )
                 {
@@ -503,10 +454,7 @@ sub exec
                         second => int( $+{second} ),
                         time_zone => 'local',
                     );
-#                     $opts->{ $k2_dash } = $dt;
-#                     $opts->{ $k2_under } = $dt;
                     $opts->{ $k } = $dt;
-                    ## my $ts = $dt->epoch;
                 }
                 catch( $e )
                 {
@@ -516,8 +464,6 @@ sub exec
             elsif( $opts->{ $k } eq 'now' || $opts->{ $k } eq 'today' )
             {
                 my $dt = DateTime->now( time_zone => 'local' );
-#                 $opts->{ $k2_dash } = $dt;
-#                 $opts->{ $k2_under } = $dt;
                 $opts->{ $k } = $dt;
             }
             else
@@ -530,37 +476,30 @@ sub exec
                 locale => 'en_GB',
                 time_zone => 'local',
             );
-#             $opts->{ $k2_dash }->set_formatter( $fmt );
-#             $opts->{ $k2_under }->set_formatter( $fmt );
             $opts->{ $k }->set_formatter( $fmt );
         }
         elsif( $def->{type} eq 'array' )
         {
-#             $opts->{ $k2_dash } = $opts->{ $k2_under } = Module::Generic::Array->new( $opts->{ $k } );
             $opts->{ $k } = Module::Generic::Array->new( $opts->{ $k } );
         }
         elsif( $def->{type} eq 'hash' ||
                $def->{type} eq 'string-hash' )
         {
-#             $opts->{ $k2_dash } = $opts->{ $k2_under } = $self->_set_get_hash_as_object( $k2_under, $opts->{ $k } );
             $self->message( 3, "Setting hash as object for property '$k' and with data: ", sub{ $self->dumper( $opts->{ $k } ) } );
             $opts->{ $k } = $self->_set_get_hash_as_object( $k, $opts->{ $k } );
         }
         elsif( $def->{type} eq 'boolean' )
         {
-#             $opts->{ $k2_dash } = $opts->{ $k2_under } = ( $opts->{ $k } ? $self->true : $self->false );
             $self->message( 3, "Processing boolean value for \"$k\" and current value '", $opts->{ $k }, "'." );
             $opts->{ $k } = ( $opts->{ $k } ? $self->true : $self->false );
             $self->message( 3, "Setting boolean value for \"$k\" with value '", $opts->{ $k }, "'" );
         }
         elsif( $def->{type} eq 'string' )
         {
-#             $opts->{ $k2_dash } = $opts->{ $k2_under } = Module::Generic::Scalar->new( $opts->{ $k } );
             $opts->{ $k } = Module::Generic::Scalar->new( $opts->{ $k } );
         }
         elsif( $def->{type} eq 'integer' || $def->{decimal} )
         {
-#             $opts->{ $k2_dash } = $opts->{ $k2_under } = $self->_set_get_number( $k, $opts->{ $k } );
             ## Even though this is a number, this was set as a scalar reference, so we need to dereference it
             if( $self->_is_scalar( $opts->{ $k } ) )
             {
@@ -571,38 +510,8 @@ sub exec
                 $opts->{ $k } = $self->_set_get_number( $k, $opts->{ $k } );
             }
         }
-        
-#         $tie->enable( 0 );
-#         my $k2_dash = $k;
-#         $k2_dash =~ tr/_/-/;
-#         my $k2_under = $k;
-#         $k2_under =~ tr/-/_/;
-#         $opts->{ $k2_dash } = $opts->{ $k } if( $k2_dash ne $k );
-#         $opts->{ $k2_under } = $opts->{ $k } if( $k2_under ne $k );
-#         $self->message_colour( 3, "Set field \"<green>${k2_dash}</>\" to \"<red>$opts->{$k}</>\"." );
-#         $self->message_colour( 3, "Set field \"<green>${k2_under}</>\" to \"<red>$opts->{$k}</>\"." );
-#         if( $def->{alias} )
-#         {
-#             ## Hopefully, this should trigger the tie::STORE method
-#             ## $opts->{ $k } = $opts->{ $k };
-#             ## _message( 3, "Processing optiona $k with value \"$opts->{$k}\" with aliases: '", join( "', '", @{$def->{alias}} ), "'." );
-#             foreach my $f ( @{$def->{alias}} )
-#             {
-#                 my $f2_dash = $f;
-#                 my $f2_under = $f;
-#                 $f2_dash =~ tr/_/-/;
-#                 $f2_under =~ tr/-/_/;
-#                 $opts->{ $f2_dash } = $opts->{ $k } unless( length( $opts->{ $f2_dash } ) );
-#                 $opts->{ $f2_under } = $opts->{ $k } unless( length( $opts->{ $f2_under } ) );
-#             }
-#         }
-#         $tie->enable( 1 );
-    }
+   }
     
-#    $tie->enable( 0 );
-    # $self->message( 3, "Options data are now: ", sub{ $self->dumper( $tie ) } );
-    # exit;
-#    $tie->enable( 1 );
     $self->message( 3, "Options data are now: ", sub{ $self->dumper( $opts ) } );
     ## return( $opts );
     ## e return a Getopt::Class::Values object, so we can call the option values hash key as method:
@@ -690,7 +599,6 @@ sub init
     ## Can only set properties that exist
     $self->{_init_strict} = 1;
     $self->SUPER::init( @_ ) || return( $self->pass_error( $self->error ) );
-    # $self->{_data_repo} = 'data';
     return( $self->error( "No dictionary as provided." ) ) if( !$self->{dict} );
     return( $self->error( "No dictionary as provided." ) ) if( !$self->{aliases} );
     return( $self->error( "Dictionary provided is not an hash reference." ) ) if( !$self->_is_hash( $self->{dict} ) );
@@ -718,14 +626,13 @@ sub init
 AUTOLOAD
 {
     my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
-    # my( $class, $method ) = our $AUTOLOAD =~ /^(.*?)::([^\:]+)$/;
     no overloading;
     my $self = shift( @_ );
     my $class = ref( $self ) || $self;
     ## Options dictionary
     my $dict = $self->{dict};
     ## Values provided on command line
-    ## my $data = $self->{data};
+    my $data = $self->{data};
     ## printf( STDERR "AUTOLOAD: \$data has %d items and property '$method' has value '%s'\n", scalar( keys( %$self ) ), $self->{ $method } );
     ## return if( !CORE::exists( $data->{ $method } ) );
     return if( !CORE::exists( $self->{ $method } ) );
@@ -777,7 +684,6 @@ BEGIN
 {
     use strict;
     use warnings;
-    # use parent -norequire, qw( Tie::Hash );
     use Scalar::Util;
     use Devel::Confess;
     use constant VALUES_CLASS => 'Getopt::Class::Value';
@@ -1149,7 +1055,7 @@ Getopt::Class - Extended dictionary version of Getopt::Long
 
 =head1 VERSION
 
-    v0.102.2
+    v0.102.4
 
 =head1 DESCRIPTION
 

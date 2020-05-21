@@ -1,6 +1,17 @@
 Changelog for Rewire
 
-0.04 2020-05-14T17:40:13
+0.05 2020-05-20T02:02:56
+ - Add release updates
+ - Update documentation
+ - Add proxyable services (#26)
+ - Add support for packages with autoloading (#25)
+ - Add support for ad-hoc results as arguments (#24)
+ - Add support for extending services (#23)
+ - Add support for passing args to final build step (#22)
+ - Add support for using envvars in arguments (#21)
+
+0.04 2020-05-14T17:40:14
+ - Built release version 0.04
  - Add release updates
  - More documentation for "process" and "resolve" methods (#12)
 

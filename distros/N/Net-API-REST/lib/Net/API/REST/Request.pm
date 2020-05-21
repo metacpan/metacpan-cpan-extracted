@@ -38,7 +38,7 @@ BEGIN
     use DateTime;
     # use DateTime::Format::Strptime;
     use JSON;
-    use TryCatch;
+    use Nice::Try;
     use version;
     our $VERSION = 'v0.8.4';
     our @DoW = qw( Sun Mon Tue Wed Thu Fri Sat );

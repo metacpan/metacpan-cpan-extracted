@@ -1,20 +1,93 @@
-Changes on 2020-05-13 for repository at:
+Changes on 2020-05-20 for repository at:
   Fetch URL: git@github.com:abeltje/Test-Smoke.git
   Push  URL: git@github.com:abeltje/Test-Smoke.git
 
 Enjoy!
 
-1.77 2020-05-13T20:51:42+02:00 (1ed68da => Abe Timmerman)
- - (Abe Timmerman, 58 seconds ago) Autocommit for distribution Test::Smoke
-   1.77 (minor)
+1.78 2020-05-20T16:50:59+02:00 (d4bd262 => Abe Timmerman)
+ - (Abe Timmerman, 65 seconds ago) Autocommit for distribution Test::Smoke
+   1.78 (minor)
+
+1.77_04 2020-05-20T12:28:49+02:00 (9c4724d => Abe Timmerman)
+ - (Abe Timmerman, 4 hours ago) Autocommit for distribution Test::Smoke
+   1.77_04 (test)
+
+ - (Abe Timmerman, 6 minutes ago) More cleanup of HTTP::Lite: 28f09320
+   wasn't enough
+ -     We really dropped support for HTTP::Lite
+
+1.77_03 2020-05-19T23:11:59+02:00 (40678ef => Abe Timmerman)
+ - (Abe Timmerman, 18 hours ago) Autocommit for distribution Test::Smoke
+   1.77_03 (test)
+
+ - (Abe Timmerman, 4 hours ago)  More poster-post problems (HTTP::Tiny)
+ -	IPv6 is not supported in HTTP::Tiny < 0.042. Alas 5.24.[1-4]
+   shipped
+ -	with a DEV-version of the module. We must now use
+   `version->parse()` to
+ -	compare `$HTTP::Tiny::VERSION`
+
+1.77_02 2020-05-19T15:20:21+02:00 (e978fd4 => Abe Timmerman)
+ - (Abe Timmerman, 26 hours ago) Autocommit for distribution Test::Smoke
+   1.77_02 (test)
+
+ - (Abe Timmerman, 25 hours ago) State MIN_PERL_VERSION in Makefile.PL
+ -     6 years overdue... sorry Neil
+
+ - (Abe Timmerman, 25 hours ago) RT#132507: Remove the version number
+
+ - (Abe Timmerman, 18 hours ago) More poster-post problems (curl)
+ -     Older curls do need some help to understand the 'http://[::1]:54321'
+ -     syntax, so quote the argument and use the '--globoff' switch
+
+ - (Abe Timmerman, 18 hours ago) Merge branch
+   'cleanup/remove_support_HTTP_Lite'
+
+1.77_01 2020-05-19T11:52:30+02:00 (d959cb4 => Abe Timmerman)
+ - (Abe Timmerman, 29 hours ago) Test::Smoke::LogMixin: no sprintf without
+   arguments
+ -     The log_* routines use the sprintf() way of creating log-lines. When
+ -     there are no arguments, there is no need to use sprintf() and risk
+ -     warnings about missing arguments or invalid conversion for bare %
+   signs.
+ -     (I ran into this with the output of `git clone`)
+
+ - (Abe Timmerman, 28 hours ago) Test::Smoke::Syncer::Git: fix problem with
+   the branchfile
+ -     The first line was read but not chomp()ed, so if one had
+   (mistakenly)
+ -     put multiple lines in the file, the command line for the `git
+   checkout`
+ -     would have been wrong and that branch would not have been checked
+   out.
+ -     I hope that this also resolves part of RT#128950
+
+ - (Abe Timmerman, 26 hours ago) Prefer JSON::PP over JSON::XS
+
+ - (Abe Timmerman, 26 hours ago) Provide better flow and diagnostics for
+   the Posters
+ -     Untangle the actual POST and json-decode in the `post`-method.
+ -     Also make the clients die from the `_post_data`-method if the
+   request
+ -     didn't return a 2xx.
+
+ - (Abe Timmerman, 26 hours ago) Provide better diagnostics on failure with
+   TEST_VERBOSE
+ -     This provides invalid TAP, but compile-errors are worse!
+
+1.77 2020-05-18T18:55:53+02:00 (046d80a => Abe Timmerman)
+ - (Abe Timmerman, 2 days ago) Remove support for HTTP::Lite
+ -     We ran into a bug for HTTP::Lite that was reported 6 years ago, that
+ -     will not be fixed anymore. No need to keep support for this module
+ -     around now that HTTP::Tiny is in core (>= 5.14).
 
 1.76_01 2020-05-13T15:51:25+02:00 (c5bf6ca => Abe Timmerman)
- - (Abe Timmerman, 5 hours ago) Autocommit for distribution Test::Smoke
+ - (Abe Timmerman, 7 days ago) Autocommit for distribution Test::Smoke
    1.76_01 (test)
 
 1.76 2020-05-12T20:54:37+02:00 (0801dd6 => Abe Timmerman)
- - (Abe Timmerman, 24 hours ago) Autocommit for distribution Test::Smoke
-   1.76 (minor)
+ - (Abe Timmerman, 8 days ago) Autocommit for distribution Test::Smoke 1.76
+   (minor)
 
  - (H.Merijn Brand, 1 year, 1 month ago) Add support for -Uxx and -Dxx=y on
    tssmokeperl.pl
@@ -39,13 +112,13 @@ Enjoy!
 
  - (H.Merijn Brand - Tux, 1 year, 1 month ago) Also allow -A options
 
- - (Abe Timmerman, 6 hours ago) Add a Serialiser
+ - (Abe Timmerman, 7 days ago) Add a Serialiser
  -     This is a simple serialiser, I still have to hunt the rest of the
    code
  -     for uses of Data::Dumper type serialisations and see if I can change
  -     them.
 
- - (Abe Timmerman, 6 hours ago) Add a '--pass_option' switch to the
+ - (Abe Timmerman, 7 days ago) Add a '--pass_option' switch to the
    runsmoke-applet
  -     This (repeatable) option will let one pass extra options to
    Configure
@@ -67,10 +140,10 @@ Enjoy!
  -     were silently ignored.
 
 1.75 2020-03-01T12:41:23+01:00 (995b2f9 => Abe Timmerman)
- - (Abe Timmerman, 2 months ago) Autocommit for distribution Test::Smoke
+ - (Abe Timmerman, 3 months ago) Autocommit for distribution Test::Smoke
    1.75 (same)
 
- - (H.Merijn Brand - Tux, 6 months ago) Ignore all date/time information in
+ - (H.Merijn Brand - Tux, 7 months ago) Ignore all date/time information in
    dot_patch
  -     As we are only interested in the branch (first field), the sha and
    the
@@ -83,7 +156,7 @@ Enjoy!
  - (Abe Timmerman, 3 months ago) Autocommit for distribution Test::Smoke
    1.74 (minor)
 
- - (Abe Timmerman, 2 months ago) FIX: add dependency introduced by
+ - (Abe Timmerman, 3 months ago) FIX: add dependency introduced by
    be0b7a9438bdc9b25176dc8676641aff3bfc6413
  -     We forgot to add Capture::Tiny to the dependencies in Makefile.PL
 
@@ -108,7 +181,7 @@ Enjoy!
    'jkeenan-rtc-131711-perl5-repository'
 
 1.72_07 2019-08-07T13:10:16+03:00 (2b62635 => Abe Timmerman)
- - (Abe Timmerman, 9 months ago) Autocommit for distribution Test::Smoke
+ - (Abe Timmerman, 10 months ago) Autocommit for distribution Test::Smoke
    1.72_07 (test)
 
 1.72_05 2018-04-22T13:15:31+02:00 (91ae91a => abeltje)
@@ -246,36 +319,36 @@ Enjoy!
  - (Abe Timmerman, 1 year, 6 months ago) Autocommit for distribution
    Test::Smoke 1.72_06 (same)
 
- - (Christian Walde, 1 year, 8 months ago) prevent git syncer from failing
+ - (Christian Walde, 1 year, 9 months ago) prevent git syncer from failing
    on trying to log clone progress with %s
 
- - (Christian Walde, 1 year, 8 months ago) throw an error if no makefile is
+ - (Christian Walde, 1 year, 9 months ago) throw an error if no makefile is
    known for the specified win32 make
 
- - (Christian Walde, 1 year, 8 months ago) ensure newlines of the munged
+ - (Christian Walde, 1 year, 9 months ago) ensure newlines of the munged
    win32 makefile don't get mangled
 
- - (Christian Walde, 1 year, 8 months ago) allow using gmake on win32
+ - (Christian Walde, 1 year, 9 months ago) allow using gmake on win32
 
- - (Christian Walde, 1 year, 8 months ago) recognize win32 gnumakefile
+ - (Christian Walde, 1 year, 9 months ago) recognize win32 gnumakefile
    assignments in makefile preparation
 
- - (Christian Walde, 1 year, 8 months ago) don't munge makefile lines that
+ - (Christian Walde, 1 year, 9 months ago) don't munge makefile lines that
    remain uncommented in win32 makefile prep
 
- - (Christian Walde, 1 year, 8 months ago) split Smoker::_make into os subs
+ - (Christian Walde, 1 year, 9 months ago) split Smoker::_make into os subs
    and silence stderr with nul on win32
 
- - (Christian Walde, 1 year, 8 months ago) switch _run from qx to
+ - (Christian Walde, 1 year, 9 months ago) switch _run from qx to
    Capture::Tiny
 
- - (Christian Walde, 1 year, 8 months ago) on windows, dump make stdout
+ - (Christian Walde, 1 year, 9 months ago) on windows, dump make stdout
    under gcc as well
 
- - (Christian Walde, 1 year, 8 months ago) add binmode so change_manifest
+ - (Christian Walde, 1 year, 9 months ago) add binmode so change_manifest
    doesn't mangle the makefile too badly
 
- - (Christian Walde, 1 year, 8 months ago) [HACK] convert set_skip_tests to
+ - (Christian Walde, 1 year, 9 months ago) [HACK] convert set_skip_tests to
    replace skipped tests with print ok 1
  -     this works around a shitton of manifest- and manifest-test-related
    issues,
@@ -283,7 +356,7 @@ Enjoy!
    skipped
  -     tests somewhere else.
 
- - (Christian Walde, 1 year, 8 months ago) add w32args to general options
+ - (Christian Walde, 1 year, 9 months ago) add w32args to general options
    list for runsmoke
  -     not sure if this is useful, was an attempt to get cchome into the
    makefile,
@@ -300,29 +373,29 @@ Enjoy!
    box on Win32
  -     Thank you Christian for the time and effort
 
- - (H.Merijn Brand - Tux, 1 year ago) Correct minor typo in docs
+ - (H.Merijn Brand - Tux, 1 year, 1 month ago) Correct minor typo in docs
 
  - (Abe Timmerman, 1 year ago) Autocommit for distribution Test::Smoke
    1.72_07 (test)
 
- - (James E Keenan, 10 months ago) Correct spelling error in 3 places in
+ - (James E Keenan, 11 months ago) Correct spelling error in 3 places in
    documentation
  -     For: https://rt.cpan.org/Ticket/Display.html?id=129993
 
- - (Abe Timmerman, 9 months ago) Merge branch
+ - (Abe Timmerman, 10 months ago) Merge branch
    'typo-test-smoke-app-base-20180817' of
    https://github.com/jkeenan/Test-Smoke into
    jkeenan-typo-test-smoke-app-base-20180817
 
- - (Abe Timmerman, 9 months ago) Merge branch
+ - (Abe Timmerman, 10 months ago) Merge branch
    'jkeenan-typo-test-smoke-app-base-20180817'
 
- - (Abe Timmerman, 9 months ago) Merge branch
+ - (Abe Timmerman, 10 months ago) Merge branch
    'rtc-129993-test-smoke-reporter-typos' of
    https://github.com/jkeenan/Test-Smoke into
    jkeenan-rtc-129993-test-smoke-reporter-typos
 
- - (Abe Timmerman, 9 months ago) Merge branch
+ - (Abe Timmerman, 10 months ago) Merge branch
    'jkeenan-rtc-129993-test-smoke-reporter-typos'
 
 1.72_04 2018-04-22T13:09:44+02:00 (9868726 => abeltje)
@@ -372,21 +445,21 @@ Enjoy!
  - (abeltje, 3 years ago) Autocommit for distribution Test::Smoke 1.71_01
    (test)
 
- - (Nigel Horne, 2 years, 5 months ago) Better error message to help
+ - (Nigel Horne, 2 years, 6 months ago) Better error message to help
    diagnose what's wrong
 
- - (James E Keenan, 2 years, 2 months ago) Correct spelling error.
+ - (James E Keenan, 2 years, 3 months ago) Correct spelling error.
 
- - (abeltje, 2 years, 2 months ago) Merge branch 'more-typo-20170514' of
+ - (abeltje, 2 years, 3 months ago) Merge branch 'more-typo-20170514' of
    git://github.com/jkeenan/Test-Smoke into jkeenan-more-typo-20170514
 
- - (abeltje, 2 years, 2 months ago) Merge branch
+ - (abeltje, 2 years, 3 months ago) Merge branch
    'jkeenan-more-typo-20170514' into bugfix/github_pullrequests
 
- - (abeltje, 2 years, 2 months ago) Merge branch 'nigelhorne-master' into
+ - (abeltje, 2 years, 3 months ago) Merge branch 'nigelhorne-master' into
    bugfix/github_pullrequests
 
- - (abeltje, 2 years, 2 months ago) Merge branch 'jkeenan-typo-20180303'
+ - (abeltje, 2 years, 3 months ago) Merge branch 'jkeenan-typo-20180303'
    into bugfix/github_pullrequests
 
 1.71 2017-05-14T13:18:36+02:00 (7f2b993 => abeltje)
@@ -430,12 +503,12 @@ Enjoy!
 
  - (James E Keenan, 3 years ago) Correct typo in Test::Smoke::Syncer::Git.
 
- - (Nigel Horne, 2 years, 5 months ago) Better error message to help
+ - (Nigel Horne, 2 years, 6 months ago) Better error message to help
    diagnose what's wrong
 
- - (James E Keenan, 2 years, 2 months ago) Correct spelling error.
+ - (James E Keenan, 2 years, 3 months ago) Correct spelling error.
 
- - (abeltje, 2 years, 2 months ago) Autocommit for distribution Test::Smoke
+ - (abeltje, 2 years, 3 months ago) Autocommit for distribution Test::Smoke
    1.72 (minor)
 
  - (abeltje, 2 years, 1 month ago) Fix another victim of 'No-dot-in-at-inc'
@@ -522,7 +595,7 @@ Enjoy!
  - (abeltje, 3 years, 2 months ago) Merge branch 'System-Info'
 
 1.70_05 2017-01-30T22:45:55+01:00 (0c3df38 => abeltje)
- - (abeltje, 3 years, 3 months ago) Autocommit for distribution Test::Smoke
+ - (abeltje, 3 years, 4 months ago) Autocommit for distribution Test::Smoke
    1.70_05
 
  - (James E Keenan, 3 years, 3 months ago) Correct one typo.
@@ -537,7 +610,7 @@ Enjoy!
    get_patch()
  -     Even when we read the version from git_version.h
 
- - (James E Keenan, 3 years, 2 months ago) Correct one typo.
+ - (James E Keenan, 3 years, 3 months ago) Correct one typo.
 
  - (H.Merijn Brand, 3 years, 2 months ago) Merge pull request #29 from
    jkeenan/faq-spelling-20170303
@@ -558,18 +631,18 @@ Enjoy!
  - (abeltje, 3 years, 2 months ago) Use annotated tags
 
 1.70_04 2017-01-30T22:08:49+01:00 (e956e35 => abeltje)
- - (abeltje, 3 years, 3 months ago) Autocommit for distribution Test::Smoke
+ - (abeltje, 3 years, 4 months ago) Autocommit for distribution Test::Smoke
    1.70_04
 
- - (abeltje, 3 years, 3 months ago) Merge branch
+ - (abeltje, 3 years, 4 months ago) Merge branch
    'dcollins/normalize_testname' of https://github.com/dcollinsn/Test-Smoke
    into dcollinsn-dcollins/normalize_testname
 
 1.70_03 2017-01-30T22:06:31+01:00 (a655fa3 => abeltje)
- - (abeltje, 3 years, 3 months ago) Autocommit for distribution Test::Smoke
+ - (abeltje, 3 years, 4 months ago) Autocommit for distribution Test::Smoke
    1.70_03
 
- - (abeltje, 3 years, 3 months ago) Merge branch 'master' of
+ - (abeltje, 3 years, 4 months ago) Merge branch 'master' of
    ssh://github.com/abeltje/Test-Smoke
 
 1.70_02 2016-05-22T13:07:39+02:00 (47f479f => abeltje)
@@ -611,13 +684,13 @@ Enjoy!
  -     with ext/ or lib/, in which case it prepends only '../'. This patch
  -     adds cpan/ and dist/ to the list of special cases.
 
- - (James E Keenan, 3 years, 3 months ago) Correct spelling errors.
+ - (James E Keenan, 3 years, 4 months ago) Correct spelling errors.
 
- - (H.Merijn Brand, 3 years, 3 months ago) Merge pull request #25 from
+ - (H.Merijn Brand, 3 years, 4 months ago) Merge pull request #25 from
    jkeenan/correct-spelling
  -     Correct spelling errors.
 
- - (abeltje, 3 years, 3 months ago) Rsync from a git-repository should run
+ - (abeltje, 3 years, 4 months ago) Rsync from a git-repository should run
    Porting/make_dot_patch.pl
  -     Pullrequest 18: https://github.com/abeltje/Test-Smoke/pull/18
  -     , implemented in a more general way (imo)
@@ -648,11 +721,11 @@ Enjoy!
  -	 VERSION_ID	     => 20160913,
  -     Welcome to openSUSE Tumbleweed 20160913 - Kernel \\r (\\l).
 
- - (James E Keenan, 3 years, 3 months ago) Correct spelling errors.
+ - (James E Keenan, 3 years, 4 months ago) Correct spelling errors.
 
 1.70_01 2016-05-04T00:19:12+02:00 (eca7717 => abeltje)
- - (abeltje, 4 years ago) Autocommit for distribution Test::Smoke 1.70_01
-   (test)
+ - (abeltje, 4 years, 1 month ago) Autocommit for distribution Test::Smoke
+   1.70_01 (test)
 
  - (H.Merijn Brand - Tux, 4 years ago) Skip testing git that does not
    support "git init folder"
@@ -685,7 +758,7 @@ Enjoy!
 
  - (H.Merijn Brand - Tux, 4 years, 1 month ago) Spelling error
 
- - (abeltje, 4 years ago) Resolve a backward incompatibilty
+ - (abeltje, 4 years, 1 month ago) Resolve a backward incompatibilty
  -     In pre 1.70 Test::Smoke 'sync_type' was the way to specify what sync
  -     method to use. In 1.70 this became 'syncer', now switched back to
  -     'sync_type'.
@@ -761,28 +834,25 @@ Enjoy!
    ssh://github.com/abeltje/Test-Smoke into Belin2015_Aftermath
 
 1.61_11 2015-05-31T12:26:56+02:00 (505f078 => abeltje)
- - (abeltje, 4 years, 11 months ago) Autocommit for distribution
-   Test::Smoke 1.61_11
+ - (abeltje, 5 years ago) Autocommit for distribution Test::Smoke 1.61_11
 
- - (abeltje, 4 years, 11 months ago) BUGFIX: my Windows doesn't support
-   strftime("%T")
+ - (abeltje, 5 years ago) BUGFIX: my Windows doesn't support strftime("%T")
  -     On strawberry it seems POSIX::strftime() has some issues:
  -     %z acts like %Z and %T doesn't work
 
- - (abeltje, 4 years, 11 months ago) ThinkoFIX: Set the correct dependency
+ - (abeltje, 5 years ago) ThinkoFIX: Set the correct dependency
  -     For the "browser"-dependency we picked the wrong (and/or)
 
- - (abeltje, 4 years, 11 months ago) MergeFIX: restore MANIFEST
+ - (abeltje, 5 years ago) MergeFIX: restore MANIFEST
 
- - (abeltje, 4 years, 11 months ago) BUGFIX: fix
+ - (abeltje, 5 years ago) BUGFIX: fix
    a199fafaadf08a1c94c1a1a27f1732269afc0b33
 
 1.61_10 2015-05-31T11:44:01+02:00 (0446a2e => abeltje)
- - (abeltje, 4 years, 11 months ago) Autocommit for distribution
-   Test::Smoke 1.61_10
+ - (abeltje, 5 years ago) Autocommit for distribution Test::Smoke 1.61_10
 
- - (abeltje, 4 years, 11 months ago) TestFIX: another path in a test that
-   failed on MSWin32
+ - (abeltje, 5 years ago) TestFIX: another path in a test that failed on
+   MSWin32
 
 1.61_09 2015-05-24T12:16:03+02:00 (2936dc8 => abeltje)
  - (abeltje, 5 years ago) Autocommit for distribution Test::Smoke 1.61_09
@@ -795,7 +865,7 @@ Enjoy!
 
  - (abeltje, 5 years ago) FIX: MANIFEST (new files)
 
- - (abeltje, 4 years, 11 months ago) Fix skip_tests
+ - (abeltje, 5 years ago) Fix skip_tests
  -     The 'skip_tests' argument needs to be passed to
    Test::Smoke::App::RunSmoke
 
@@ -930,34 +1000,30 @@ Enjoy!
 
  - (abeltje, 5 years ago) FIX: MANIFEST (new files)
 
- - (abeltje, 4 years, 11 months ago) Fix skip_tests
+ - (abeltje, 5 years ago) Fix skip_tests
  -     The 'skip_tests' argument needs to be passed to
    Test::Smoke::App::RunSmoke
 
- - (abeltje, 4 years, 11 months ago) Autocommit for distribution
-   Test::Smoke 1.61_10
+ - (abeltje, 5 years ago) Autocommit for distribution Test::Smoke 1.61_10
 
- - (abeltje, 4 years, 11 months ago) TestFIX: another path in a test that
-   failed on MSWin32
+ - (abeltje, 5 years ago) TestFIX: another path in a test that failed on
+   MSWin32
 
- - (abeltje, 4 years, 11 months ago) Autocommit for distribution
-   Test::Smoke 1.61_11
+ - (abeltje, 5 years ago) Autocommit for distribution Test::Smoke 1.61_11
 
- - (abeltje, 4 years, 11 months ago) BUGFIX: my Windows doesn't support
-   strftime("%T")
+ - (abeltje, 5 years ago) BUGFIX: my Windows doesn't support strftime("%T")
  -     On strawberry it seems POSIX::strftime() has some issues:
  -     %z acts like %Z and %T doesn't work
 
- - (abeltje, 4 years, 11 months ago) ThinkoFIX: Set the correct dependency
+ - (abeltje, 5 years ago) ThinkoFIX: Set the correct dependency
  -     For the "browser"-dependency we picked the wrong (and/or)
 
- - (abeltje, 4 years, 11 months ago) MergeFIX: restore MANIFEST
+ - (abeltje, 5 years ago) MergeFIX: restore MANIFEST
 
- - (abeltje, 4 years, 11 months ago) BUGFIX: fix
+ - (abeltje, 5 years ago) BUGFIX: fix
    a199fafaadf08a1c94c1a1a27f1732269afc0b33
 
- - (abeltje, 4 years, 11 months ago) Autocommit for distribution
-   Test::Smoke 1.61_12
+ - (abeltje, 5 years ago) Autocommit for distribution Test::Smoke 1.61_12
 
  - (H.Merijn Brand - Tux, 4 years, 8 months ago) Add Redhat Enterprise
    Workstation 6.6 sysinfo
@@ -1015,16 +1081,16 @@ Enjoy!
 
  - (H.Merijn Brand - Tux, 6 years ago) Add OpenSUSE 13.2 (Harlequin)
 
- - (Paul Cochrane, 5 years ago) Correcting FAQ as per RT#94329
+ - (Paul Cochrane, 6 years ago) Correcting FAQ as per RT#94329
  -     This change merely adds the extra "a" needed to make the
    introductory
  -     sentence after the "What is Text::Smoke?" heading grammatically
    correct.
  -     This change would also thus close RT#94329.
 
- - (Paul Cochrane, 5 years ago) Correcting typo in sendrpt error message
+ - (Paul Cochrane, 6 years ago) Correcting typo in sendrpt error message
 
- - (Paul Cochrane, 5 years ago) Capitalising JSON in error message for
+ - (Paul Cochrane, 6 years ago) Capitalising JSON in error message for
    consistency
 
  - (H.Merijn Brand - Tux, 5 years ago) Add test and small subst for RHEL
@@ -1058,9 +1124,9 @@ Enjoy!
  -     And yes, I found an old openSUSE 11.4 server that was still used in
  -     production. :/
 
- - (Paul Cochrane, 5 years ago) Correcting typo in sendrpt error message
+ - (Paul Cochrane, 6 years ago) Correcting typo in sendrpt error message
 
- - (Paul Cochrane, 5 years ago) Capitalising JSON in error message for
+ - (Paul Cochrane, 6 years ago) Capitalising JSON in error message for
    consistency
 
  - (Abe Timmerman, 5 years ago) Fixes for the new tsapps architecture
@@ -1104,7 +1170,7 @@ Enjoy!
  -     Processor description: Feroceon 88FR131 rev 1 (v5l) (2000 MHz)
  -     OS and version	    : linux - 2.6.32.12 [DSM 4.3-3810]
 
- - (H.Merijn Brand - Tux, 6 years ago) OpenSUSE 13.1 released
+ - (H.Merijn Brand - Tux, 7 years ago) OpenSUSE 13.1 released
  -     I dug up some old /etc/issue strings from the backup.
  -     I like lists like this to be complete :)
 
@@ -1930,7 +1996,7 @@ Enjoy!
  -     git-svn-id: https://source.test-smoke.org/svn/Test-Smoke@1245
    f9e6db9c-56bf-0310-a82a-abbfb51efdf0
 
- - (bram, 10 years ago) Fixes:
+ - (bram, 11 years ago) Fixes:
  -     - String after 'Finished Smoking' can also contain [a-zA-Z] (git id)
  -     - Fix write_to_file (created the file 1 instead of the actual name)
  -     - Fix error reporting in set_skip_tests: if a file was succesfully
@@ -1940,7 +2006,7 @@ Enjoy!
  -     git-svn-id: https://source.test-smoke.org/svn/Test-Smoke@1254
    f9e6db9c-56bf-0310-a82a-abbfb51efdf0
 
- - (bram, 10 years ago) Add tests for earlier commit.
+ - (bram, 11 years ago) Add tests for earlier commit.
  -     In the reporter test 3 different patchlevels:
  -     - all numeric (perforce patch number)
  -     - hex numbers: starting with a number (git commit id)
@@ -1948,13 +2014,13 @@ Enjoy!
  -     git-svn-id: https://source.test-smoke.org/svn/Test-Smoke@1255
    f9e6db9c-56bf-0310-a82a-abbfb51efdf0
 
- - (bram, 10 years ago) [FIX]
+ - (bram, 11 years ago) [FIX]
  -	   Tests that are skipped in dist/ and cpan/ have to be removed
    from MANIFEST
  -     git-svn-id: https://source.test-smoke.org/svn/Test-Smoke@1256
    f9e6db9c-56bf-0310-a82a-abbfb51efdf0
 
- - (bram, 10 years ago) Forgot test for previous fix
+ - (bram, 11 years ago) Forgot test for previous fix
  -     git-svn-id: https://source.test-smoke.org/svn/Test-Smoke@1257
    f9e6db9c-56bf-0310-a82a-abbfb51efdf0
 
@@ -3305,23 +3371,23 @@ Enjoy!
    f9e6db9c-56bf-0310-a82a-abbfb51efdf0
 
 1.19_60 2004-11-20T12:59:32+00:00 (1fc72cc => abeltje)
- - (abeltje, 15 years ago) * [CHANGE]
+ - (abeltje, 16 years ago) * [CHANGE]
  -	 BIG reorganisation of the source-tree. Needed to make the distro
    work on OpenVMS.
  -     git-svn-id: https://source.test-smoke.org/svn/Test-Smoke@799
    f9e6db9c-56bf-0310-a82a-abbfb51efdf0
 
- - (abeltje, 15 years ago) * [CHANGE]
+ - (abeltje, 16 years ago) * [CHANGE]
  -	 This shouldn't have moved :-(
  -     git-svn-id: https://source.test-smoke.org/svn/Test-Smoke@800
    f9e6db9c-56bf-0310-a82a-abbfb51efdf0
 
- - (abeltje, 15 years ago) * [PRIVATE]
+ - (abeltje, 16 years ago) * [PRIVATE]
  -	 Part of the distribution reorganisation
  -     git-svn-id: https://source.test-smoke.org/svn/Test-Smoke@801
    f9e6db9c-56bf-0310-a82a-abbfb51efdf0
 
- - (abeltje, 15 years ago) * [PRIVATE]
+ - (abeltje, 16 years ago) * [PRIVATE]
  -	 Fix a thinko:
  -	   Changes needs to be committed before "make dist"
  -	   SIGNATURES and META.yml can only be committed after "make dist"
@@ -3438,11 +3504,11 @@ Enjoy!
    f9e6db9c-56bf-0310-a82a-abbfb51efdf0
 
 1.19_53 2004-11-19T22:01:39+00:00 (497c271 => abeltje)
- - (abeltje, 15 years ago) * prepare for the 1.19_53 snapshot!
+ - (abeltje, 16 years ago) * prepare for the 1.19_53 snapshot!
  -     git-svn-id: https://source.test-smoke.org/svn/Test-Smoke@796
    f9e6db9c-56bf-0310-a82a-abbfb51efdf0
 
- - (abeltje, 15 years ago) * [AUTOCOMMIT]
+ - (abeltje, 16 years ago) * [AUTOCOMMIT]
  -	 Regenerate 'Changes', 'SIGNATURES', 'META.yml'
  -     git-svn-id: https://source.test-smoke.org/svn/Test-Smoke@797
    f9e6db9c-56bf-0310-a82a-abbfb51efdf0
@@ -3458,23 +3524,23 @@ Enjoy!
  -     git-svn-id: https://source.test-smoke.org/svn/Test-Smoke@790
    f9e6db9c-56bf-0310-a82a-abbfb51efdf0
 
- - (abeltje, 15 years ago) * [CHANGE] (By Craig Berry!)
+ - (abeltje, 16 years ago) * [CHANGE] (By Craig Berry!)
  -	 -Dusevmsdebug builds "ndbgperl.exe" on OpenVMS, so check for that
  -     git-svn-id: https://source.test-smoke.org/svn/Test-Smoke@792
    f9e6db9c-56bf-0310-a82a-abbfb51efdf0
 
- - (abeltje, 15 years ago) * [CHANGE] (By Jarkko Hietaniemi!)
+ - (abeltje, 16 years ago) * [CHANGE] (By Jarkko Hietaniemi!)
  -	 This should sort out the Solaris/OSF harware information
  -     git-svn-id: https://source.test-smoke.org/svn/Test-Smoke@793
    f9e6db9c-56bf-0310-a82a-abbfb51efdf0
 
- - (abeltje, 15 years ago) * [CHANGE]
+ - (abeltje, 16 years ago) * [CHANGE]
  -	 more of a fix, I shouldn't use one Makefile.PL for both creating
    distributions and user deployment
  -     git-svn-id: https://source.test-smoke.org/svn/Test-Smoke@794
    f9e6db9c-56bf-0310-a82a-abbfb51efdf0
 
- - (abeltje, 15 years ago) * [FIX]
+ - (abeltje, 16 years ago) * [FIX]
  -	 take out the debug-print statements
  -     git-svn-id: https://source.test-smoke.org/svn/Test-Smoke@795
    f9e6db9c-56bf-0310-a82a-abbfb51efdf0

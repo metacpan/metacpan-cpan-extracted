@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::FreightSpecialServicePayment;
-$Shipment::FedEx::WSDL::ShipTypes::FreightSpecialServicePayment::VERSION = '3.02';
+$Shipment::FedEx::WSDL::ShipTypes::FreightSpecialServicePayment::VERSION = '3.04';
 use strict;
 use warnings;
 
@@ -63,7 +63,7 @@ Shipment::FedEx::WSDL::ShipTypes::FreightSpecialServicePayment
 
 =head1 VERSION
 
-version 3.02
+version 3.04
 
 =head1 DESCRIPTION
 

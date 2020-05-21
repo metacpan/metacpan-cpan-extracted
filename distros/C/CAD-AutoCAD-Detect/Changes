@@ -1,2 +1,5 @@
+0.02 2020-05-21T01:07:03+02:00
+ - Rewrite api of detect_dwg_file() to return magic string.
+
 0.01 2020-04-06T11:43:29+02:00
  - First version.

@@ -71,7 +71,6 @@ sub requires {
     return {
         'Carp'			=> 0,
         'Exporter'		=> 0,
-        'List::MoreUtils'	=> 0,
         'List::Util'		=> 0,
 	'PPI::Document'		=> 1.117,	# for new( readonly => 1 )
         'Scalar::Util'		=> 0,

@@ -20,8 +20,8 @@ sub find_filepath
     my $filename = shift;
     for (@_)
     {
-	s/\/$//;
-	return $_ if (-e "$_/$filename");
+        s/\/$//;
+        return $_ if (-e "$_/$filename");
     }
 }
 
@@ -39,18 +39,18 @@ sub find_filename
 {
     my $lang  = shift;
     my @paths = @_;
-    
+
     while (defined $lang)
     {
-	foreach my $path (@paths)
-	{
-	    my $filename = exists_filename ($lang, $path);
-	    defined $filename and return $filename;
-	}
-	
-	$lang = parent_language ($lang);
+        foreach my $path (@paths)
+        {
+            my $filename = exists_filename ($lang, $path);
+            defined $filename and return $filename;
+        }
+
+        $lang = parent_language ($lang);
     }
-    
+
     return;
 }
 
@@ -66,10 +66,10 @@ sub parent_language
 {
     my $lang = shift;
     $lang =~ /-/ and do {
-	($lang) = $lang =~ /^(.*)\-/;
-	return $lang;
+        ($lang) = $lang =~ /^(.*)\-/;
+        return $lang;
     };
-    
+
     $lang eq $Petal::LANGUAGE and return;
     return $Petal::LANGUAGE;
 }
@@ -88,7 +88,7 @@ sub exists_filename
 {
     my $language = shift;
     my $path = shift;
-    
+
     return (map { s{\Q$path\E/?}{}; $_ } <$path/$language.*>)[0];
 }
 

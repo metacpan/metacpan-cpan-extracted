@@ -1,15 +1,12 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Telegram API - ~/lib/Net/API/Telegram/Generic.pm
-## Version 0.1
+## Version v0.100.1
 ## Copyright(c) 2019 Jacques Deguest
-## Author: Jacques Deguest <jack@deguest.jp>
+## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/06/02
-## Modified 2019/06/02
-## All rights reserved
+## Modified 2020/05/21
 ## 
-## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::Telegram::Generic;
 BEGIN
@@ -25,9 +22,9 @@ BEGIN
     use File::Spec;
     ## For the JSON::true and JSON::false
     use JSON;
-    use TryCatch;
+    use Nice::Try;
 	use Net::API::Telegram::Number;
-	our( $VERSION ) = '0.1';
+	our( $VERSION ) = 'v0.100.1';
 };
 
 sub init

@@ -32,3 +32,7 @@
 	- Added missing test units
 0.12.3 2020-05-16
 	- Corrected minor issues at line at lines 5428 and 5430 where a typo existed
+0.12.4 2020-05-16
+	- Specified more clearly version 0.006019 for Devel::Declare, because upper version break TryCatch
+0.12.5
+	- Switched from broken TryCatch to Nice::Try

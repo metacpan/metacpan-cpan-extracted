@@ -213,7 +213,7 @@ sub test_charHeight_ttf : Test(1) {
 
     my $fnt = $self->get('ttFont');
     # Verschiedene Ergebnisse möglich, je nach Font oder libgd-Version
-    $self->in($fnt->charHeight,[27,28]);
+    $self->in($fnt->charHeight,[24,27,28]);
 }
 
 sub test_charHeight_gd : Test(5) {
@@ -242,7 +242,7 @@ sub test_digitWidth_ttf : Test(1) {
 
     my $fnt = $self->get('ttFont');
     # Verschiedene Ergebnisse möglich, je nach Font oder libgd-Version
-    $self->in($fnt->digitWidth,[14,16,18]);
+    $self->in($fnt->digitWidth,[14,15,16,18]);
 }
 
 sub test_digitWidth_gd : Test(5) {

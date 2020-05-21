@@ -51,7 +51,6 @@ lib/Test/Smoke/Policy.pm
 lib/Test/Smoke/Poster.pm
 lib/Test/Smoke/Poster/Base.pm
 lib/Test/Smoke/Poster/Curl.pm
-lib/Test/Smoke/Poster/HTTP_Lite.pm
 lib/Test/Smoke/Poster/HTTP_Tiny.pm
 lib/Test/Smoke/Poster/LWP_UserAgent.pm
 lib/Test/Smoke/Reporter.pm
@@ -79,10 +78,6 @@ lib/Test/Smoke/perlmaint.cfg
 lib/Test/Smoke/smoke58x_dfconfig
 lib/Test/Smoke/vmsperl.cfg
 lib/Test/Smoke/w32current.cfg
-lib/fallback.pm
-lib/inc/Mail/Sendmail.pm
-t/10-fallback.t
-t/11-no_fallback.t
 t/15-factory-json.t
 t/20-logger.t
 t/25-util-serialise.t

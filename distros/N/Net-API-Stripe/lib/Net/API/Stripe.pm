@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe.pm
-## Version v1.0.3
+## Version v1.0.4
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2018/07/19
-## Modified 2020/05/16
+## Modified 2020/05/21
 ## 
 ##----------------------------------------------------------------------------
 package Net::API::Stripe;
@@ -37,14 +37,14 @@ BEGIN
 	use Cwd ();
 	use DateTime;
 	use DateTime::Format::Strptime;
-	use TryCatch;
+	use Nice::Try;
 	use Want;
 	use Digest::SHA ();
 	use Net::IP;
 	use Devel::Confess;
 	use constant API_BASE => 'https://api.stripe.com/v1';
 	use constant STRIPE_WEBHOOK_SOURCE_IP => [qw( 54.187.174.169 54.187.205.235 54.187.216.72 54.241.31.99 54.241.31.102 54.241.34.107 )];
-	our $VERSION = 'v1.0.3';
+	our $VERSION = 'v1.0.4';
 };
 
 {
@@ -2616,7 +2616,7 @@ sub invoice_update
 	description				=> {},
 	due_date				=> {},
 	footer					=> {},
-	metadata 				=> { type eq 'hash' },
+	metadata 				=> { type => 'hash' },
 	statement_descriptor	=> {},
 	tax_percent				=> { re => qr/^\d+(?:\.\d+)?$/ },
 	};
@@ -3386,7 +3386,7 @@ sub product_create
 	deactivate_on		=> { type => 'array' },
 	description			=> {},
 	images				=> sub{ return( ref( $_[0] ) eq 'ARRAY' && scalar( @{$_[0]} ) <= 8 ? undef() : "An array reference of up to 8 images was expected." ) },
-	metadata 			=> { type eq 'hash' },
+	metadata 			=> { type => 'hash' },
 	package_dimensions	=> {},
 	shippable			=> {},
 	statement_descriptor => {},
@@ -4405,7 +4405,7 @@ sub _as_hash
 	}
 	else
 	{
-		return( $self->error( "Unknown data type $hash to be converted into hash for api call." ) );
+		return( $self->error( "Unknown data type $this to be converted into hash for api call." ) );
 	}
 	return( $ref );
 }
@@ -4478,6 +4478,7 @@ sub _check_parameters
 		my $dict = $okParams->{ $k };
 		if( ref( $dict ) eq 'HASH' )
 		{
+		    my $pkg;
 			if( $dict->{fields} && ref( $dict->{fields} ) eq 'ARRAY' )
 			{
 				my $this = $dict->{fields};
@@ -4552,7 +4553,7 @@ sub _check_parameters
 				push( @$err, "Parameter \"$k\" is required, but missing" );
 			}
 			## _is_object is inherited from Module::Object
-			elsif( my $pkg = $self->_is_object( $args->{ $k } ) && $dict->{package} && $dict->{package} ne $pkg )
+			elsif( ( $pkg = $self->_is_object( $args->{ $k } ) ) && $dict->{package} && $dict->{package} ne $pkg )
 			{
 				push( @$err, "Parameter \"$k\" value is a package \"$pkg\", but I was expecting \"$dict->{package}\"" );
 			}
@@ -5026,7 +5027,7 @@ sub _get_method
 	}
 	elsif( $action eq 'add' )
 	{
-		$acton = 'create';
+		$action = 'create';
 	}
 	if( !scalar( grep( /^$action$/, @$allowed ) ) )
 	{
@@ -5100,7 +5101,7 @@ sub _make_request
         	$self->messagef( 3, "Request failed with error %s", $resp->message );
             if( $resp->header( 'Content_Type' ) =~ m{text/html} ) 
             {
-                return( $sef->_make_error({
+                return( $self->_make_error({
                     code    => $resp->code,
                     type    => $resp->message,
                     message => $resp->message
@@ -5175,7 +5176,7 @@ sub _response_to_object
 	my $class = shift( @_ );
 	return( $self->error( "No hash was provided" ) ) if( !scalar( @_ ) );
 	my $hash  = $self->_get_args( @_ );
-	my $callbacks = $CALLBACKS->{ $class };
+	## my $callbacks = $CALLBACKS->{ $class };
 	## $self->message( "Found callbacks for $class: ", sub{ Dumper( $CALLBACKS ) } );
 	## $self->messagef( "%d callbacks found for class $class", scalar( keys( %$callbacks ) ) );
 	# $self->message( 3, "Called for class $class with hash $hash" );

@@ -162,3 +162,25 @@ Revision history for Perl extension Net::SAML2.
       6fb076c Create README.md
       963d871 (tag: 0.20.03-TRIAL) Add dist.ini
       f4232c2 Update changes for 0.20.03 TRIAL
+
+0.25    TBD
+
+      What happened to version v0.21 to v0.24?
+
+      The version of the embeded XML::Sig was higher that that of Net::SAML2
+      which causes some issues in packaging so this release simply skipped the
+      versions 0.21 to 0.24.  Not much else to say
+
+      Minor changes for the most part but a requested release based on the 
+      removal of XML::Cannonical.  In fact that could be the only functionality
+      change present.
+
+      80db64d Add provides section of META
+      8b39923 Add github action to test build
+      38b05fd Make t/author/podcoverage.t a developer only test
+      7473f54 XML::Canonical was removed as an option due to its age
+      50d4314 t/09-authn-request.t: update tests for signed requests
+      bf07c83 Generate META.json via dist.ini
+      cac4ad7 Add missing pod info for Protocol/ArtifactResolve.pm
+      b260946 Update README.md
+

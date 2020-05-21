@@ -6,7 +6,7 @@ use Carp ();
 use FFI::Platypus;
 
 # ABSTRACT: Declarative interface to FFI::Platypus
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.28'; # VERSION
 
 
 our $ffi    = {};
@@ -174,7 +174,7 @@ FFI::Platypus::Declare - Declarative interface to FFI::Platypus
 
 =head1 VERSION
 
-version 1.26
+version 1.28
 
 =head1 SYNOPSIS
 

@@ -19,9 +19,10 @@ my %WriteMakefileArgs = (
     "JSON::XS" => 0,
     "Math::BigInt" => 0,
     "Math::BigInt::GMP" => 0,
+    "Moo::Role" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,6 +33,7 @@ my %FallbackPrereqs = (
   "JSON::XS" => 0,
   "Math::BigInt" => 0,
   "Math::BigInt::GMP" => 0,
+  "Moo::Role" => 0,
   "Test::More" => 0
 );
 

@@ -62,7 +62,7 @@ sub is_ok
     my $lang  = shift || '';
     my $key = $class->compute_key ($file, $lang);
     return unless (defined $FILE_TO_SUBS->{$key});
-    
+
     my $cached_mtime = $class->cached_mtime ($file, $lang);
     my $current_mtime = $class->current_mtime ($file);
     return $cached_mtime >= $current_mtime;
@@ -106,7 +106,7 @@ sub compute_key
     my $class = shift;
     my $file = shift;
     my $lang = shift || '';
-    
+
     my $key = $file . ";$lang" . ";INPUT=" . $Petal::INPUT . ";OUTPUT=" . $Petal::OUTPUT;
     return $key;
 }

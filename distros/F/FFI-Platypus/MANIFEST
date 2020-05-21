@@ -11,6 +11,7 @@ META.yml
 Makefile.PL
 README
 SUPPORT
+_mm/config.pl
 author.yml
 corpus/ffi_build/project-cxx/foo1.cxx
 corpus/ffi_build/project-cxx/foo2.cpp

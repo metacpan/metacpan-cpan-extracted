@@ -3,23 +3,22 @@ abstract: "Mozilla's CA cert bundle in PEM format"
 author:
   - 'Gisle Aas <gisle@activestate.com>'
 build_requires:
-  Test: '0'
+  Test: 0
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: 0
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
+  version: 1.4
 name: Mozilla-CA
 no_index:
   directory:
     - t
     - inc
 requires:
-  perl: '5.006'
+  perl: 5.006
 resources:
   repository: http://github.com/gisle/mozilla-ca
-version: '20180117'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: 20200520

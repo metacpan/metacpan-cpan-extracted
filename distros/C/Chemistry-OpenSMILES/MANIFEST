@@ -13,3 +13,4 @@ t/01_atoms.t
 t/02_chains.t
 t/03_hcount.t
 t/04_errors.t
+t/05_orders.t

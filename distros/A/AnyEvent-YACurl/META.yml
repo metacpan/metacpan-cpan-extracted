@@ -1,5 +1,5 @@
 ---
-abstract: 'Yet Another cURL binding for AnyEvent'
+abstract: 'Yet Another curl binding for AnyEvent'
 author:
   - 'Tom van der Woerdt <tvdw@cpan.org>'
 build_requires:
@@ -19,5 +19,5 @@ requires:
   AnyEvent: '7.0'
 resources:
   repository: https://github.com/TvdW/perl-AnyEvent-YACurl.git
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

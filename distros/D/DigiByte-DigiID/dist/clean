@@ -1,0 +1,10 @@
+#!/bin/sh
+
+cd DigiByte-DigiID-*
+
+cp -v Makefile.PL META.yml ..
+cp -v README.mkdn ../README.md
+
+cd ..
+docker-compose exec release carton exec dzil clean
+docker-compose down

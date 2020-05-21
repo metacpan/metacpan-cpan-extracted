@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Generic.pm
-## Version v0.100.2
+## Version v0.100.3
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/11/02
-## Modified 2020/05/16
+## Modified 2020/05/21
 ## 
 ##----------------------------------------------------------------------------
 package Net::API::Stripe::Generic;
@@ -13,10 +13,10 @@ BEGIN
 	use strict;
 	use parent qw( Module::Generic );
 	use Net::API::Stripe;
-	use TryCatch;
+	use Nice::Try;
     use Devel::Confess;
     use Want;
-    our( $VERSION ) = 'v0.100.2';
+    our( $VERSION ) = 'v0.100.3';
 };
 
 sub init
@@ -347,7 +347,7 @@ Net::API::Stripe::Generic - A Stripe Generic Module
 
 =head1 VERSION
 
-    v0.100.2
+    v0.100.3
 
 =head1 DESCRIPTION
 

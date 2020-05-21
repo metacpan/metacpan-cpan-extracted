@@ -36,7 +36,7 @@ no_index:
 provides:
   Test::JSON::Schema::Acceptance:
     file: lib/Test/JSON/Schema/Acceptance.pm
-    version: '0.996'
+    version: '0.997'
 requires:
   File::ShareDir: '0'
   JSON::MaybeXS: '1.004001'
@@ -57,7 +57,7 @@ resources:
   bugtracker: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance/issues
   homepage: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance
   repository: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance.git
-version: '0.996'
+version: '0.997'
 x_Dist_Zilla:
   perl:
     version: '5.031011'
@@ -496,7 +496,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Prereqs::AuthorDeps
       name: '@Author::ETHER/Prereqs::AuthorDeps'
-      version: '0.006'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::MinimumPerl
       name: '@Author::ETHER/MinimumPerl'
@@ -742,7 +742,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.996
+          tag: v0.997
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:

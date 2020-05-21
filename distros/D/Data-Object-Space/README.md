@@ -1,6 +1,6 @@
 # NAME
 
-Data::Object::Space
+Data::Object::Space - Namespace Class
 
 # ABSTRACT
 
@@ -100,6 +100,43 @@ names.
         $space->arrays
 
         # ['handler', 'initial']
+
+## authority
+
+    authority() : Maybe[Str]
+
+The authority method returns the `AUTHORITY` declared on the target package,
+if any.
+
+- authority example #1
+
+        package Foo::Boo;
+
+        package main;
+
+        use Data::Object::Space;
+
+        my $space = Data::Object::Space->new('foo/boo');
+
+        $space->authority
+
+        # undef
+
+- authority example #2
+
+        package Foo::Boo;
+
+        our $AUTHORITY = 'cpan:AWNCORP';
+
+        package main;
+
+        use Data::Object::Space;
+
+        my $space = Data::Object::Space->new('foo/boo');
+
+        $space->authority
+
+        # 'cpan:AWNCORP'
 
 ## base
 
@@ -221,6 +258,32 @@ and if successful returns the resulting value.
 
         # started
 
+- call example #2
+
+        # given: synopsis
+
+        package Zoo;
+
+        sub import;
+
+        sub AUTOLOAD {
+          bless {};
+        }
+
+        sub DESTROY {
+          ; # noop
+        }
+
+        package main;
+
+        use Data::Object::Space;
+
+        $space = Data::Object::Space->new('zoo');
+
+        $space->call('start')
+
+        # bless({}, 'Zoo')
+
 ## child
 
     child(Str $arg1) : Object
@@ -290,6 +353,23 @@ and if successful returns a closure.
         $space->cop('handler', $space->bless)
 
         # sub { Foo::Bar::handler(..., @_) }
+
+## data
+
+    data() : Str
+
+The data method attempts to read and return any content stored in the `DATA`
+section of the package namespace.
+
+- data example #1
+
+        package main;
+
+        use Data::Object::Space;
+
+        my $space = Data::Object::Space->new('foo');
+
+        $space->data; # ''
 
 ## destroy
 
@@ -468,6 +548,45 @@ derived from.
         $space->inherits
 
         # ['Foo']
+
+## init
+
+    init() : Str
+
+The init method ensures that the package namespace is loaded and, whether
+created in-memory or on-disk, is flagged as being loaded and loadable.
+
+- init example #1
+
+        package main;
+
+        use Data::Object::Space;
+
+        my $space = Data::Object::Space->new('kit');
+
+        $space->init
+
+        # Kit
+
+## inject
+
+    inject(Str $name, Maybe[CodeRef] $coderef) : Any
+
+The inject method monkey-patches the package namespace, installing a named
+subroutine into the package which can then be called normally, returning the
+fully-qualified subroutine name.
+
+- inject example #1
+
+        package main;
+
+        use Data::Object::Space;
+
+        my $space = Data::Object::Space->new('kit');
+
+        $space->inject('build', sub { 'finished' });
+
+        # *Kit::build
 
 ## load
 
@@ -730,6 +849,21 @@ specified to the base of the current object's namespace.
 
         # Zoo/Bar
 
+## require
+
+    require(Str $target) : Any
+
+The require method executes a `require` statement within the package namespace
+specified.
+
+- require example #1
+
+        # given: synopsis
+
+        $space->require('Moo');
+
+        # 1
+
 ## root
 
     root() : Str
@@ -885,6 +1019,49 @@ deep).
         #   'Encode/Config'
         #   ...
         # ]
+
+## use
+
+    use(Str | Tuple[Str, Str] $target, Any @params) : Object
+
+The use method executes a `use` statement within the package namespace
+specified.
+
+- use example #1
+
+        package main;
+
+        use Data::Object::Space;
+
+        my $space = Data::Object::Space->new('foo/goo');
+
+        $space->use('Moo');
+
+        # $self
+
+- use example #2
+
+        package main;
+
+        use Data::Object::Space;
+
+        my $space = Data::Object::Space->new('foo/hoo');
+
+        $space->use('Moo', 'has');
+
+        # $self
+
+- use example #3
+
+        package main;
+
+        use Data::Object::Space;
+
+        my $space = Data::Object::Space->new('foo/ioo');
+
+        $space->use(['Moo', 9.99], 'has');
+
+        # $self
 
 ## used
 

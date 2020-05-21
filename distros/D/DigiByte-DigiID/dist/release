@@ -1,0 +1,14 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+system qq{
+    rm -fv Makefile.PL META.yml
+    docker-compose up -d release;
+    docker-compose exec release carton exec dzil clean
+};
+
+print "RUN: dzil release\n";
+
+exec qw(docker-compose exec release carton exec bash);

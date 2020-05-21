@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.181';
+our $VERSION = '1.182';
 
 use Quiq::Css;
 use Quiq::JavaScript;
@@ -54,17 +54,21 @@ L<Quiq::Hash>
 
 =head1 DESCRIPTION
 
-Ein Objekt der Klasse repräsentiert eine eigenständige Komponente einer
-HTML-Seite bestehend aus HTML-, CSS- und JavaScript-Code. Der Zweck
-besteht darin, diese einzelnen Bestandteile zu einer Einheit
-zusammenzufassen. Die Bestandteile können über Methoden der Klasse
-abgefragt werden, um sie systematisch in die unterschiedlichen Abschnitte
-einer HTML-Seite (<head>, <body>, <style>, <script>, $(function() {...}))
-einsetzen zu können. Die Resourcen mehrerer Komponenten können
-zu einer Liste ohne Dubletten konsolidiert werden, dies ist allerdings
-Aufgabe des Nutzers. Ein Objekt der Klasse speichert die einzelnen
-Bestandteile nur, sie manipuliert sie nicht (außer, dass im Skalarkontext
-Teile konkateniert werden).
+Ein Objekt der Klasse repräsentiert eine eigenständige Komponente
+einer HTML-Seite bestehend aus HTML-, CSS- und JavaScript-Code
+(normaler Code und jQuery ready-Handler). Der Zweck besteht darin,
+diese Bestandteile zu einer logischen Einheit zusammenzufassen. Die
+Bestandteile können über Methoden der Klasse abgefragt werden, um
+sie systematisch in die unterschiedlichen Abschnitte einer
+HTML-Seite (<head>, <body>, <style>, <script>, $(function()
+{...})) einsetzen zu können. Die Resourcen mehrerer Komponenten
+(Attribut resources) können zu einer Liste ohne Dubletten konsolidiert
+werden. Dies ist allerdings Aufgabe des Nutzers bzw. der Klasse
+Quiq::Html::Component::Bundle. Ein Objekt der Klasse
+speichert die einzelnen Bestandteile nur, die Methoden
+manipulieren sie nicht. Einzig die Methode L<fragment|"fragment() - Generiere HTML">() führt
+eine Verarbeitung durch, indem sie zusammenfassenden HTML-Code über
+allen Komponenten generiert.
 
 =head1 METHODS
 
@@ -397,7 +401,7 @@ sub putValue {
 
 =head1 VERSION
 
-1.181
+1.182
 
 =head1 AUTHOR
 

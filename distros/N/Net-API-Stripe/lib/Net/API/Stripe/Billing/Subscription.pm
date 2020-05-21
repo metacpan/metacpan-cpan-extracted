@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/Subscription.pm
-## Version v0.300.0
+## Version v0.300.1
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/11/02
-## Modified 2020/05/15
+## Modified 2020/05/16
 ## 
 ##----------------------------------------------------------------------------
 ## https://stripe.com/docs/api/subscriptions
@@ -13,7 +13,7 @@ BEGIN
 {
     use strict;
     use parent qw( Net::API::Stripe::Generic );
-    our( $VERSION ) = 'v0.300.0';
+    our( $VERSION ) = 'v0.300.1';
 };
 
 sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
@@ -59,6 +59,9 @@ sub default_tax_rates { return( shift->_set_get_object_array( 'default_tax_rates
 sub discount { return( shift->_set_get_object( 'discount', 'Net::API::Stripe::Billing::Discount', @_ ) ); }
 
 sub ended_at { return( shift->_set_get_datetime( 'ended_at', @_ ) ); }
+
+## To cancel subscriptions
+sub invoice_now { return( shift->_set_get_boolean( 'invoice_now', @_ ) ); }
 
 sub invoice_customer_balance_settings { return( shift->_set_get_hash_as_object( 'invoice_customer_balance_settings', 'Net::API::Stripe::Billing::Invoice::BalanceSettings', @_ ) ); }
 
@@ -158,7 +161,7 @@ Net::API::Stripe::Billing::Subscription - A Stripe Subscription Object
 
 =head1 VERSION
 
-    v0.300.0
+    v0.300.1
 
 =head1 DESCRIPTION
 
@@ -292,6 +295,12 @@ This is a L<Net::API::Stripe::Billing::Discount> object.
 =item B<ended_at> timestamp
 
 If the subscription has ended, the date the subscription ended.
+
+=item B<invoice_now> boolean
+
+Will generate a final invoice that invoices for any un-invoiced metered usage and new/pending proration invoice items.
+
+This is used to cancel a subscription. See here: L<https://stripe.com/docs/api/subscriptions/cancel>
 
 =item B<invoice_customer_balance_settings>()
 

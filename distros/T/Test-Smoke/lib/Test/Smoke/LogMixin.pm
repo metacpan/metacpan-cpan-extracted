@@ -1,9 +1,10 @@
 package Test::Smoke::LogMixin;
 use warnings;
 use strict;
+use Data::Dumper;
 BEGIN { $|++ }
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Exporter 'import';
 our @EXPORT = qw/verbosity log_warn log_info log_debug/;
@@ -11,6 +12,42 @@ our @EXPORT = qw/verbosity log_warn log_info log_debug/;
 our $USE_TIMESTAMP = 1;
 
 require POSIX;
+
+=head1 NAME
+
+Test::Smoke::LogMixin - "Role" that adds logging methods to "traditional" objects.
+
+=head1 SYNOPSIS
+
+    package MyPackage;
+    use warnings;
+    use strict;
+    use Test::Smoke::LogMixin;
+
+    sub new {
+        my $class = shift;
+        my %selfish = @_;
+        $selfish{_verbose} ||= 0;
+        return bless \%selfish, $class;
+    }
+    1;
+
+    package main;
+    use MyPackage;
+    my $o = MyPackage->new(_verbose => 2);
+    $o->log_debug("This will end up in the log");
+
+=head1 DESCRIPTION
+
+This package with these mixin-methods acts like a role to extend your traditional (created with
+C<bless()>) object with 4 new methods. It has some extra
+L<Test::Smoke::App::Base> logic to determine the log-level (by looking at C<<
+$app->option('verbose') >>).  For other object types it tries to fiend if there
+are methods by the name C<verbose> or C<v>, or maybe the keys C<_verbose> or
+C<_v> (See also L<Test::Smoke::ObjectBase>).
+
+The three log methods use the C<sprintf()> way of composing strings whenever
+more than 1 argument is passed!
 
 =head2 $app->verbosity
 
@@ -34,7 +71,6 @@ sub verbosity {
     for my $vfield (qw/verbose v/) {
         return $self->$vfield if $self->can($vfield) or exists $self->{"_$vfield"};
     }
-    use Data::Dumper;
     my $struct = Data::Dumper->new([$self])->Terse(1)->Sortkeys(1)->Indent(1)->Dump;
     die "Could not find a verbosity option: $struct\n";
 }
@@ -156,7 +192,8 @@ sub _log_message {
         : "";
 
     # use the $stamp for every line.
-    my @message = split(/\n/, sprintf("$fmt", @_));
+    # sprintf iff @_;
+    my @message = split(/\n/, @_ ? sprintf("$fmt", @_) : ($fmt));
     return join("\n", map "$stamp$_", @message) . "\n";
 }
 
@@ -209,3 +246,23 @@ sub new {
 }
 
 1;
+
+=head1 COPYRIGHT
+
+(c) 2020, All rights reserved.
+
+  * Abe Timmerman <abeltje@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+See:
+
+  * <http://www.perl.com/perl/misc/Artistic.html>,
+  * <http://www.gnu.org/copyleft/gpl.html>
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut

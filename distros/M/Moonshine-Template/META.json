@@ -4,13 +4,13 @@
       "Robert Acock <thisusedtobeanemail@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Moonshine-Template",
    "no_index" : {
@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "Hash::Merge" : "0.200",
+            "Hash::Util" : "0",
             "Moonshine::Element" : "0.11",
             "Ref::Util" : "0.101",
             "UNIVERSAL::Object" : "0.04",
@@ -43,7 +44,7 @@
    "provides" : {
       "Moonshine::Template" : {
          "file" : "lib/Moonshine/Template.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -54,6 +55,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Moonshine-Template"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

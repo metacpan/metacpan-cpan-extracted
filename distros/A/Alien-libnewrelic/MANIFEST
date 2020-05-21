@@ -12,6 +12,8 @@ author.yml
 dist.ini
 lib/Alien/libnewrelic.pm
 maint/cip-before-install
+patch/macos.diff
+patch/notice-error-with-stacktrace.diff
 perlcriticrc
 t/00_diag.t
 t/01_use.t

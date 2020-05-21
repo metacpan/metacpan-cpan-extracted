@@ -18,8 +18,7 @@ my %META = (
     },
     runtime => {
       requires => {
-        Mu => 0,
-        'namespace::clean' => 0,
+        'Mu::Tiny' => 0,
       },
     },
     develop   => {

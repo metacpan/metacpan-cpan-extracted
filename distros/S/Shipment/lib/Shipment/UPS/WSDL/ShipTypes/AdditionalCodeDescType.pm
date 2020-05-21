@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::AdditionalCodeDescType;
-$Shipment::UPS::WSDL::ShipTypes::AdditionalCodeDescType::VERSION = '3.02';
+$Shipment::UPS::WSDL::ShipTypes::AdditionalCodeDescType::VERSION = '3.04';
 use strict;
 use warnings;
 
@@ -61,7 +61,7 @@ Shipment::UPS::WSDL::ShipTypes::AdditionalCodeDescType
 
 =head1 VERSION
 
-version 3.02
+version 3.04
 
 =head1 DESCRIPTION
 

@@ -1,3 +1,10 @@
+0.007   2020-03-02  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Forgot to add #AUTHORITY, #DIST, et al to main module.
+
+
 0.006   2020-03-02  Released-By: PERLANCAR; Urgency: medium
 
 	- Add examples (tests).

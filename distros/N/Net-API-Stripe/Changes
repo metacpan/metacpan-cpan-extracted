@@ -25,3 +25,6 @@ Revision history for Perl module Net::API::Stripe
 	Added the new Net::API::Stripe::Price added to the Stripe api.
 1.0.3 2020-05-16
 	Minor changes to documentation
+1.0.4 2020-05-17
+	Added invoice_now method to Net::API::Stripe::Billing::Subscription used in cancelling subscriptions
+	Change from TryCatch to Nice::Try because TryCatch got broken with release of Devel::Declare version 0.006020

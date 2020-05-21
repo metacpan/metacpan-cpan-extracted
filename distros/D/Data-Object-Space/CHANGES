@@ -1,7 +1,33 @@
 Changelog for Data-Object-Space
 
-2.05 2020-05-07T03:19:05
- - No changes found
+2.07 2020-05-20T18:52:30
+ - Add release updates
+ - Fix typo in .gitattributes
+ - Add support for using "use" in a package space (#57)
+ - Support reading from "DATA" token (#55)
+ - Add support for using "require" in a package space (#56)
+ - Address pre-perl-5.18.2 Sub/Util issue (#54)
+
+2.06 2020-05-20T00:27:09
+ - Built release version 2.06
+ - Add release updates
+ - Housekeeping
+ - Add support for packages with autoloading
+ - Add support for crude package monkey-patching
+ - Updated documentation
+ - Add "authority" method
+
+2.05 2020-05-07T03:10:10
+ - Built release version 2.05
+ - Added release updates
+ - Fix "locate" example-1 test
+ - Updated documentation
+ - Fix license mismatch
+ - Hide shell scripts from GH stats (another way)
+ - Hide shell scripts from GH stats
+ - Built release version 2.04
+ - Fix release process
+ - Re-enable automated CPAN release
 
 2.03 2020-05-06T02:30:19
  - Built release version 2.03

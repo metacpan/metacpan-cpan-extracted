@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::ShipmentDryIceDetail;
-$Shipment::FedEx::WSDL::RateTypes::ShipmentDryIceDetail::VERSION = '3.02';
+$Shipment::FedEx::WSDL::RateTypes::ShipmentDryIceDetail::VERSION = '3.04';
 use strict;
 use warnings;
 
@@ -62,7 +62,7 @@ Shipment::FedEx::WSDL::RateTypes::ShipmentDryIceDetail
 
 =head1 VERSION
 
-version 3.02
+version 3.04
 
 =head1 DESCRIPTION
 

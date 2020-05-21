@@ -35,6 +35,8 @@ INTEGRATES
 
     Data::Object::Role::Buildable
 
+    Data::Object::Role::Proxyable
+
 LIBRARIES
 
     This package uses type constraints from:
@@ -44,6 +46,145 @@ LIBRARIES
 SCENARIOS
 
     This package supports the following scenarios:
+
+ $envvar
+
+      use Rewire;
+    
+      my $services = {
+        file => {
+          package => 'Mojo/File',
+          argument => { '$envvar' => 'home' }
+        }
+      };
+    
+      my $rewire = Rewire->new(
+        services => $services
+      );
+
+    This package supports inlining environment variables as arguments to
+    services. The $envvar directive is used to specify the name of an
+    environment variable, and can also be used in metadata for reusability.
+
+ $function
+
+      use Rewire;
+    
+      my $services = {
+        temp => {
+          package => 'File/Temp'
+        },
+        file => {
+          package => 'Mojo/File',
+          argument => { '$function' => 'temp#tempfile' }
+        }
+      };
+    
+      my $rewire = Rewire->new(
+        services => $services
+      );
+
+    This package supports inlining the result of a service resolution and
+    function call as arguments to services. The # delimited $function
+    directive is used to specify the name of an existing service on the
+    right-hand side, and an arbitrary function to be call on the result on
+    the left-hand side.
+
+ $metadata
+
+      use Rewire;
+    
+      my $metadata = {
+        home => '/home/ubuntu'
+      };
+    
+      my $services = {
+        file => {
+          package => 'Mojo/File',
+          argument => { '$metadata' => 'home' }
+        }
+      };
+    
+      my $rewire = Rewire->new(
+        metadata => $metadata,
+        services => $services
+      );
+
+    This package supports inlining configuration data as arguments to
+    services. The $metadata directive is used to specify the name of a
+    stashed configuration value or data structure.
+
+ $method
+
+      use Rewire;
+    
+      my $services = {
+        temp => {
+          package => 'File/Temp'
+        },
+        file => {
+          package => 'Mojo/File',
+          argument => { '$method' => 'temp#filename' }
+        }
+      };
+    
+      my $rewire = Rewire->new(
+        services => $services
+      );
+
+    This package supports inlining the result of a service resolution and
+    method call as arguments to services. The # delimited $method directive
+    is used to specify the name of an existing service on the right-hand
+    side, and an arbitrary method to be call on the result on the left-hand
+    side.
+
+ $routine
+
+      use Rewire;
+    
+      my $services = {
+        temp => {
+          package => 'File/Temp'
+        },
+        file => {
+          package => 'Mojo/File',
+          argument => { '$routine' => 'temp#tempfile' }
+        }
+      };
+    
+      my $rewire = Rewire->new(
+        services => $services
+      );
+
+    This package supports inlining the result of a service resolution and
+    routine call as arguments to services. The # delimited $routine
+    directive is used to specify the name of an existing service on the
+    right-hand side, and an arbitrary routine to be call on the result on
+    the left-hand side.
+
+ $service
+
+      use Rewire;
+    
+      my $services = {
+        io => {
+          package => 'IO/Handle'
+        },
+        log => {
+          package => 'Mojo/Log',
+          argument => {
+            handle => { '$service' => 'io' }
+          }
+        },
+      };
+    
+      my $rewire = Rewire->new(
+        services => $services
+      );
+
+    This package supports inlining resolved services as arguments to other
+    services. The $service directive is used to specify the name of a
+    service to be resolved and passed as an argument.
 
  arguments
 
@@ -141,6 +282,62 @@ SCENARIOS
     traditional new routine. A constructor is always called with the
     package name as the invocant.
 
+ extends
+
+      use Rewire;
+    
+      my $services = {
+        io => {
+          package => 'IO/Handle'
+        },
+        log => {
+          package => 'Mojo/Log',
+          argument => {
+            handle => { '$service' => 'io' }
+          }
+        },
+        development_log => {
+          package => 'Mojo/Log',
+          extends => 'log',
+          builder => [
+            {
+              method => 'path',
+              argument => '/tmp/development.log',
+              return => 'none'
+            },
+            {
+              method => 'level',
+              argument => 'debug',
+              return => 'none'
+            }
+          ]
+        },
+        production_log => {
+          package => 'Mojo/Log',
+          extends => 'log',
+          builder => [
+            {
+              method => 'path',
+              argument => '/tmp/production.log',
+              return => 'none'
+            },
+            {
+              method => 'level',
+              argument => 'warn',
+              return => 'none'
+            }
+          ]
+        },
+      };
+    
+      my $rewire = Rewire->new(
+        services => $services
+      );
+
+    This package supports extending services in the definition of other
+    services, effectively using the extended service as the invocant in the
+    creation of the requested service.
+
  function
 
       use Rewire;
@@ -230,6 +427,35 @@ SCENARIOS
 
     This package supports specifying construction as a method call, which
     when called provides the package or object instance as the invocant.
+
+ proxyable
+
+      use Rewire;
+    
+      my $services = {
+        home => {
+          package => 'Mojo/Path',
+          argument => '/home',
+        },
+        temp => {
+          package => 'Mojo/Path',
+          argument => '/tmp',
+        }
+      };
+    
+      my $rewire = Rewire->new(
+        services => $services
+      );
+    
+      # resolve services via method calls
+      [
+        $rewire->home, # i.e. $rewire->process('home')
+        $rewire->temp  # i.e. $rewire->process('temp')
+      ]
+
+    This package supports the resolution of services using a single method
+    call. This is enabled by intercepting method calls and proxying them to
+    the "process" method.
 
  routine
 
@@ -358,6 +584,36 @@ METHODS
           path => { '$metadata' => 'logfile' }
         });
 
+    process example #3
+
+        use Rewire;
+      
+        my $metadata = {
+          logfile => '/var/log/rewire.log',
+        };
+      
+        my $services = {
+          mojo_log => {
+            package => 'Mojo/Log',
+            builder => [
+              {
+                method => 'new',
+                return => 'self'
+              }
+            ]
+          }
+        };
+      
+        my $rewire = Rewire->new(
+          services => $services,
+          metadata => $metadata
+        );
+      
+        $rewire->process('mojo_log', {
+          level => 'fatal',
+          path => { '$metadata' => 'logfile' }
+        });
+
  resolve
 
       resolve(Str $name) : Any
@@ -392,6 +648,46 @@ METHODS
         );
       
         $rewire->resolve('mojo_log');
+
+    resolve example #3
+
+        package Dynamic;
+      
+        sub import;
+      
+        sub AUTOLOAD {
+          bless {};
+        }
+      
+        sub DESTROY {
+          ; # noop
+        }
+      
+        package main;
+      
+        use Rewire;
+      
+        my $services = {
+          dynamic => {
+            package => 'Dynamic',
+            builder => [
+              {
+                method => 'new',
+                return => 'self'
+              },
+              {
+                method => 'missing_method',
+                return => 'result'
+              }
+            ],
+          }
+        };
+      
+        my $rewire = Rewire->new(
+          services => $services,
+        );
+      
+        $rewire->resolve('dynamic');
 
  validate
 

@@ -26,22 +26,22 @@ sub process
         $argument = eval { $Petal::TranslationService->maketext ($argument) } || $argument;
         $@ and warn $@;
     };
-    
+
     my $tokens = $self->_tokenize (\$argument);
     my @res = map {
-	($_ =~ /$TOKEN_RE/gsm) ?
-	    do {
-		s/^\$//;
-		s/^\{//;
-		s/\}$//;
-		$hash->fetch ($_);
-	    } :
-	    do {
-		s/\\(.)/$1/gsm;
-		$_;
-	    };
+        ($_ =~ /$TOKEN_RE/gsm) ?
+            do {
+                s/^\$//;
+                s/^\{//;
+                s/\}$//;
+                $hash->fetch ($_);
+            } :
+            do {
+                s/\\(.)/$1/gsm;
+                $_;
+            };
     } @{$tokens};
-    
+
     return join '', map { defined $_ ? $_ : () } @res;
 }
 
@@ -54,7 +54,7 @@ sub _tokenize
 {
     my $self = shift;
     my $data_ref = shift;
-    
+
     my @tokens = $$data_ref =~ /($TOKEN_RE)/gs;
     my @split  = split /$TOKEN_RE/s, $$data_ref;
     my $tokens = [];

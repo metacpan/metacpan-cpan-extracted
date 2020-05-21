@@ -1,5 +1,5 @@
 package DigiByte::DigiID;
-$DigiByte::DigiID::VERSION = '0.003';
+$DigiByte::DigiID::VERSION = '0.004';
 use strict;
 use warnings;
 use base 'Exporter';
@@ -12,7 +12,7 @@ our @EXPORT_OK = qw(
 
 use Crypto::ECC;
 use Crypt::OpenPGP::Digest;    ## RIPEMD160
-use Crypt::OpenSSL::Random;
+use Data::UUID;
 use Digest::SHA qw(sha256);
 use Math::BigInt lib => 'GMP';
 use MIME::Base64 qw(decode_base64);
@@ -34,8 +34,7 @@ my %SECP256K1    = (
 sub get_qrcode {
     my ( $server_domain, %options ) = @_;
 
-    my $nonce = $options{nonce} // unpack( "H*",
-        pack( "B*", Crypt::OpenSSL::Random::random_pseudo_bytes(16) ) );
+    my $nonce = $options{nonce} // Data::UUID->new->create_hex;
 
     my $path = $options{path} // '/callback';
 
@@ -397,5 +396,11 @@ https://digibyteforums.io/ (Has a custom interface on top)
 =head1 Credit
 
 Direct Translation from PHP to Perl5 - https://github.com/DigiByte-Core/digiid-php/blob/master/DigiID.php
+
+=head1 LINKS
+
+B<Git Repo>: L<https://github.com/mvu8912/perl5-digibyte-digiid.git>
+
+B<CPAN Module>: L<https://metacpan.org/pod/DigiByte::DigiID>
 
 =cut

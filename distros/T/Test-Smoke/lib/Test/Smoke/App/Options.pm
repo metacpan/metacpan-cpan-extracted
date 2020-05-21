@@ -107,7 +107,6 @@ sub poster_config { # posting to CoreSmokeDB
             'LWP::UserAgent' => [
                 ua_timeout(),
             ],
-            'HTTP::Lite' => [],
             'HTTP::Tiny' => [],
             'curl' => [
                 curlbin(),
@@ -655,7 +654,7 @@ sub poster {
     return $opt->new(
         name     => 'poster',
         option   => '=s',
-        allow    => [qw/LWP::UserAgent HTTP::Lite HTTP::Tiny curl/],
+        allow    => [qw/LWP::UserAgent HTTP::Tiny curl/],
         default  => 'LWP::UserAgent',
         helptext => "The type of HTTP post system to use.",
     );

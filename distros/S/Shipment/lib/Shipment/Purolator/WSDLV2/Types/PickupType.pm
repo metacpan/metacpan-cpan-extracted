@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::PickupType;
-$Shipment::Purolator::WSDLV2::Types::PickupType::VERSION = '3.02';
+$Shipment::Purolator::WSDLV2::Types::PickupType::VERSION = '3.04';
 use strict;
 use warnings;
 
@@ -24,7 +24,7 @@ Shipment::Purolator::WSDLV2::Types::PickupType
 
 =head1 VERSION
 
-version 3.02
+version 3.04
 
 =head1 DESCRIPTION
 

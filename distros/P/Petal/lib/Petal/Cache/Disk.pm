@@ -9,6 +9,7 @@ package Petal::Cache::Disk;
 use strict;
 use warnings;
 use File::Spec;
+use File::Temp qw/tempfile/;
 use Digest::MD5 qw /md5_hex/;
 use Carp;
 
@@ -58,19 +59,20 @@ sub set
     my $lang  = shift || '';
     my $key   = $class->compute_key ($file, $lang);
     my $tmp   = $class->tmp;
-    {
-	if ($] > 5.007)
-	{
-	    open FP, ">:utf8", "$tmp/$key" or ( Carp::cluck "Cannot write-open $tmp/$key ($!)" and return );
-	}
-	else
-	{
-	    open FP, ">$tmp/$key" or ( Carp::cluck "Cannot write-open $tmp/$key ($!)" and return );
-	}
-	
-	print FP $code;
-	close FP;
-    }
+    my $final_file_path = "$tmp/$key";
+
+    #we write the cached templated to a temp file first and move it to the final
+    #destination afterwards. this prevents a rare race condition if a
+    #request attempts to use a cached template that is not yet fully written
+    #by turning it into a atomic operation
+
+    my ($fh, $temp_file_path) = tempfile( $PREFIX . "_XXXXXX", dir => $tmp);
+    binmode( $fh, ":utf8" );
+    print $fh $code;
+    close($fh);
+
+    rename($temp_file_path, $final_file_path)
+        or ( Carp::cluck "Cannot write-open $final_file_path ($!)" and return );
 }
 
 
@@ -82,12 +84,12 @@ sub is_ok
     my $class = shift;
     my $file  = shift;
     my $lang  = shift || '';
-    
+
     my $key = $class->compute_key ($file, $lang);
-    my $tmp = $class->tmp;    
+    my $tmp = $class->tmp;
     my $tmp_file = "$tmp/$key";
     return unless (-e $tmp_file);
-    
+
     my $cached_mtime = $class->cached_mtime ($file, $lang);
     my $current_mtime = $class->current_mtime ($file);
     return $cached_mtime >= $current_mtime;
@@ -104,7 +106,7 @@ sub compute_key
     my $class = shift;
     my $file = shift;
     my $lang = shift || '';
-    
+
     my $key = md5_hex ($file . ";$lang" . ";INPUT=" . $Petal::INPUT . ";OUTPUT=" . $Petal::OUTPUT);
     $key = $PREFIX . "_" . $Petal::VERSION . "_" . $key if (defined $PREFIX);
     return $key;
@@ -122,7 +124,7 @@ sub cached_mtime
     my $lang = shift || '';
     my $key = $class->compute_key ($file, $lang);
     my $tmp = $class->tmp;
-    
+
     my $tmp_file = "$tmp/$key";
     my $mtime = (stat($tmp_file))[9];
     return $mtime;
@@ -151,24 +153,17 @@ sub cached
     my $key = shift;
     my $tmp = $class->tmp;
     my $cached_filepath = $tmp . '/' . $key;
-    
+
     (-e $cached_filepath) or return;
 
     my $res = undef;
-    {
-	if ($] > 5.007)
-	{
-	    open FP, "<:utf8", "$tmp/$key" or ( Carp::cluck "Cannot read-open $tmp/$key ($!)" and return );
-	}
-	else
-	{
-	    open FP, "<$tmp/$key" or ( Carp::cluck "Cannot read-open $tmp/$key ($!)" and return );
-	}
-	
-	$res = join '', <FP>;
-	close FP;
-    }
-    
+
+    open FP, "<:utf8", "$tmp/$key"
+        or ( Carp::cluck "Cannot read-open $tmp/$key ($!)" and return );
+
+    $res = join '', <FP>;
+    close FP;
+
     return $res;
 }
 
@@ -180,7 +175,7 @@ sub tmp
 {
     my $class = shift;
     $TMP_DIR ||= File::Spec->tmpdir;
-    
+
     (-e $TMP_DIR) or confess "\$TMP_DIR '$TMP_DIR' does not exist";
     (-d $TMP_DIR) or confess "\$TMP_DIR '$TMP_DIR' is not a directory";
     $TMP_DIR =~ s/\/+$//;

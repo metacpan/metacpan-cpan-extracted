@@ -1,11 +1,10 @@
 #! perl -w
 use strict;
+use version;
 $|++;
 
 # fork() and JSON::XS don't go well together on Windows
 BEGIN { $ENV{PERL_JSON_BACKEND} = 'JSON::PP' if $^O eq 'MSWin32'; }
-
-use fallback 'inc';
 
 use Test::More;
 use Test::NoWarnings ();
@@ -21,6 +20,7 @@ use Test::Smoke::Util::FindHelpers 'has_module';
 if (!has_module('HTTP::Daemon')) {
     plan skip_all => "Need 'HTTP::Daemon' for this test!";
 }
+require URI;
 require HTTP::Daemon;
 require HTTP::Status; HTTP::Status->import('RC_OK', 'RC_NOT_IMPLEMENTED');
 require HTTP::Response;
@@ -34,8 +34,24 @@ my $timeout = 60;
 my $jsnfile = 'testsuite.jsn';
 {
     $daemon = HTTP::Daemon->new() || die "Could not initialize a Daemon";
-    # IPv6 doesn't work, so force IPv4 localhost
-    ($url = $daemon->url) =~ s{(http://)([^:]+)}{${1}127.0.0.1};
+    $url = URI->new($daemon->url);
+    note(
+        "HTTP::Daemon ($HTTP::Daemon::VERSION): ",
+        $daemon->sockhost eq '::' ? "IPv6" : "IPv4",
+        " (" , $url->host, ")"
+    );
+
+    # Some sockets are exclusive v4 or v6
+    # IPv6 doesn't work, so force IPv4 localhost HTTP::Daemon < 6.05
+    if ($HTTP::Daemon::VERSION <= 6.07) {
+        # Check $daemon->sockhost for either '0.0.0.0' (ipv4) or '::' (ipv6)
+        if ($daemon->sockhost eq '::') {
+            $url->host('[::1]');
+        }
+        else {
+            $url->host('127.0.0.1');
+        }
+    }
 
     $pid = fork();
     if ($pid) { # Continue
@@ -98,7 +114,8 @@ SKIP: {
     ok(write_json($poster->json_filename, $sysinfo), "write_json");
     my $response = eval { $poster->post() };
     $response = $@ if $@;
-    is($response, 42, "Got id");
+    is($response, 42, "Got id (LWP::Useragent: ${url}report)")
+        or diag(explain({poster => $poster, response => $response}));
 
     unlink $poster->json_filename;
 }
@@ -111,8 +128,8 @@ SKIP: {
         'curl',
         ddir        => 't',
         jsnfile     => 'testsuite.jsn',
-        smokedb_url => "${url}report",
-        curlbin     => $curlbin,
+        smokedb_url => qq{"${url}report"},
+        curlbin     => "$curlbin --globoff", # older curls and v6-addresses
         v           => $debug ? 2 : 0,
     );
     isa_ok($poster, 'Test::Smoke::Poster::Curl');
@@ -120,13 +137,17 @@ SKIP: {
     ok(write_json($poster->json_filename, $sysinfo), "write_json");
     my $response = eval { $poster->post() };
     $response = $@ if $@;
-    is($response, 42, "Got id");
+    is($response, 42, "Got id (curl: ${url}report)")
+        or diag(explain({poster => $poster, response => $response}));
 
     unlink $poster->json_filename;
 }
 
 SKIP: {
     skip("Could not load HTTP::Tiny", 3) if ! has_module('HTTP::Tiny');
+    skip("HTTP::Tiny too old $HTTP::Tiny::VERSION (IPv6 support >= 0.042)", 3)
+        if    $daemon->sockhost eq '::'
+          and version->parse($HTTP::Tiny::VERSION) < version->parse("0.042");
 
     my $poster = Test::Smoke::Poster->new(
         'HTTP::Tiny',
@@ -140,27 +161,8 @@ SKIP: {
     ok(write_json($poster->json_filename, $sysinfo), "write_json");
     my $response = eval { $poster->post() };
     $response = $@ if $@;
-    is($response, 42, "Got id");
-
-    unlink $poster->json_filename;
-}
-
-SKIP: {
-    skip("Could not load HTTP::Lite", 3) if ! has_module('HTTP::Lite');
-
-    my $poster = Test::Smoke::Poster->new(
-        'HTTP::Lite',
-        ddir        => 't',
-        jsnfile     => 'testsuite.jsn',
-        smokedb_url => "${url}report",
-        v           => $debug ? 2 : 0,
-    );
-    isa_ok($poster, 'Test::Smoke::Poster::HTTP_Lite');
-
-    ok(write_json($poster->json_filename, $sysinfo), "write_json");
-    my $response = eval { $poster->post() };
-    $response = $@ if $@;
-    is($response, 42, "Got id");
+    is($response, 42, "Got id (HTTP::Tiny: ${url}report")
+        or diag(explain({poster => $poster, response => $response}));
 
     unlink $poster->json_filename;
 }

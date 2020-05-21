@@ -2,6 +2,7 @@
 Changes
 LICENSE
 MANIFEST
+META.json
 META.yml
 Makefile.PL
 README
@@ -53,6 +54,7 @@ testapp/config.yml
 testapp/environments/development.yml
 testapp/environments/production.yml
 testapp/lib/Saml2Test.pm
+testapp/logs/development.log
 testapp/public/404.html
 testapp/public/500.html
 testapp/public/css/error.css

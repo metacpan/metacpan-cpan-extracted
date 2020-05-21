@@ -145,8 +145,9 @@ mkdir "$dir/tmp" or plan skip_all => "Can't create temp directory";
         close OUT;
 
         $app1 = CLI::Startup->new({
-            rcfile  => $rcfile,
-            options => $optspec,
+            rcfile          => $rcfile,
+            'rcfile-format' => 'perl',
+            options         => $optspec,
         });
         $app1->init;
 
@@ -186,8 +187,9 @@ mkdir "$dir/tmp" or plan skip_all => "Can't create temp directory";
         ok $trap->leaveby eq "return", "Wrote INI config successfully";
 
         my $app2 = CLI::Startup->new({
-            rcfile  => $rcfile,
-            options => $optspec,
+            rcfile          => $rcfile,
+            'rcfile-format' => 'ini',
+            options         => $optspec,
         });
         $app2->init;
 
@@ -212,8 +214,9 @@ mkdir "$dir/tmp" or plan skip_all => "Can't create temp directory";
         close OUT;
 
         my $app3 = CLI::Startup->new({
-            rcfile  => $rcfile,
-            options => { a => 1 },
+            rcfile          => $rcfile,
+            'rcfile-format' => 'ini',
+            options         => { a => 1 },
         });
         $app3->init;
 
@@ -239,8 +242,9 @@ mkdir "$dir/tmp" or plan skip_all => "Can't create temp directory";
         ok $trap->leaveby eq "return", "Wrote YAML config successfully";
 
         my $app2 = CLI::Startup->new({
-            rcfile  => $rcfile,
-            options => $optspec,
+            rcfile          => $rcfile,
+            'rcfile-format' => 'yaml',
+            options         => $optspec,
         });
         $app2->init;
 
@@ -266,8 +270,9 @@ mkdir "$dir/tmp" or plan skip_all => "Can't create temp directory";
         ok $trap->leaveby eq "return", "Wrote JSON config successfully";
 
         my $app2 = CLI::Startup->new({
-            rcfile  => $rcfile,
-            options => $optspec,
+            rcfile          => $rcfile,
+            'rcfile-format' => 'json',
+            options         => $optspec,
         });
         $app2->init;
 
@@ -293,8 +298,9 @@ mkdir "$dir/tmp" or plan skip_all => "Can't create temp directory";
         ok $trap->leaveby eq "return", "Wrote XML config successfully";
 
         my $app2 = CLI::Startup->new({
-            rcfile  => $rcfile,
-            options => $optspec,
+            rcfile          => $rcfile,
+            'rcfile-format' => 'xml',
+            options         => $optspec,
         });
         $app2->init;
 
@@ -401,8 +407,9 @@ EOF
     close OUT;
 
     my $app = CLI::Startup->new({
-        rcfile  => $rcfile,
-        options => {
+        rcfile          => $rcfile,
+        'rcfile-format' => 'yaml',
+        options         => {
             'foo=s'  => 1,
             'bar=s'  => 1,
             'baz=i@' => 1,

@@ -54,12 +54,10 @@ fun preload(HashRef $servConf, Maybe[CodeRef] $context) {
 }
 
 # builds and returns object or value based on spec
-fun builder(HashRef $service, Any $argument) {
-  my $construct;
-
-  # build namespace object
+fun builder(HashRef $service, Any $argument, Maybe[Object] $construct) {
   my $space = Data::Object::Space->new($service->{package});
 
+  # load declared package
   $space->load;
 
   # determine how to pass arguments (if any)
@@ -69,13 +67,22 @@ fun builder(HashRef $service, Any $argument) {
   if (my $builder = $service->{builder}) {
     my $original;
 
-    for my $buildspec (@$builder) {
+    # inject at last build step unless arguments exist
+    my @injectables = @arguments;
+
+    for (my $i=0; $i < @$builder; $i++) {
+      my $buildspec = $builder->[$i];
       my $argument = $buildspec->{argument};
       my $argument_as = $buildspec->{argument_as};
       my $return = $buildspec->{return};
 
       my $result = $construct || $space->package;
       my @arguments = arguments($argument, $argument_as);
+
+      if ($i == $#$builder) {
+        # on last build step if no build step arguments
+        @arguments = @injectables if not exists $buildspec->{argument};
+      }
 
       if (my $function = $buildspec->{function}) {
         $result = $space->call($function, @arguments);
@@ -126,6 +133,7 @@ fun reifier(Str $servName, HashRef $servConf, Maybe[CodeRef] $context) {
 
   my $value;
   my $service;
+  my $extended;
 
   my $servSpec = $servConf->{services};
 
@@ -136,8 +144,15 @@ fun reifier(Str $servName, HashRef $servConf, Maybe[CodeRef] $context) {
 
   $service = $servSpec->{$servName} or return;
 
+  # extend existing service (if requested)
+  if (my $extends = $service->{extends}) {
+    $extended = reifier($extends, $servConf, $context);
+  }
+
   # build object or value
-  $value = builder($service, resolver($service->{argument}, $servConf, $context));
+  my $arguments = resolver($service->{argument}, $servConf, $context);
+
+  $value = builder($service, $arguments, $extended);
 
   # determine cachability
   my $lifecycle = $service->{lifecycle};
@@ -162,6 +177,68 @@ fun resolver(Any $argsData, HashRef $servConf, Maybe[CodeRef] $context) {
   if (ref $argsData eq 'HASH' && (keys %$argsData) == 1) {
     if ($servMeta && $argsData->{'$metadata'}) {
       $argsData = $servMeta->{$argsData->{'$metadata'}};
+    }
+  }
+
+  # $envvar
+  if (ref $argsData eq 'HASH' && (keys %$argsData) == 1) {
+    if (my $envvar = $argsData->{'$envvar'}) {
+      if (exists $ENV{$envvar}) {
+        $argsData = $ENV{$envvar};
+      }
+      elsif (exists $ENV{uc($envvar)}) {
+        $argsData = $ENV{uc($envvar)};
+      }
+      else {
+        $argsData = undef;
+      }
+    }
+  }
+
+  # $function
+  if (ref $argsData eq 'HASH' && (keys %$argsData) == 1) {
+    if ($servSpec && $argsData->{'$function'}) {
+      my ($name, $next) = split /#/, $argsData->{'$function'};
+      if ($name && $next) {
+        if (my $resolved = reifier($name, $servConf, $context)) {
+          if (Scalar::Util::blessed($resolved)
+            || (!ref($resolved) && ($resolved =~ /^[a-z-A-Z]/))) {
+            my $space = Data::Object::Space->new(ref $resolved || $resolved);
+            $argsData = $space->call($next) if $next && $next =~ /^[a-zA-Z]/;
+          }
+        }
+      }
+    }
+  }
+
+  # $method
+  if (ref $argsData eq 'HASH' && (keys %$argsData) == 1) {
+    if ($servSpec && $argsData->{'$method'}) {
+      my ($name, $next) = split /#/, $argsData->{'$method'};
+      if ($name && $next) {
+        if (my $resolved = reifier($name, $servConf, $context)) {
+          if (Scalar::Util::blessed($resolved)
+            || (!ref($resolved) && ($resolved =~ /^[a-z-A-Z]/))) {
+            $argsData = $resolved->$next if $next && $next =~ /^[a-zA-Z]/;
+          }
+        }
+      }
+    }
+  }
+
+  # $routine
+  if (ref $argsData eq 'HASH' && (keys %$argsData) == 1) {
+    if ($servSpec && $argsData->{'$routine'}) {
+      my ($name, $next) = split /#/, $argsData->{'$routine'};
+      if ($name && $next) {
+        if (my $resolved = reifier($name, $servConf, $context)) {
+          if (Scalar::Util::blessed($resolved)
+            || (!ref($resolved) && ($resolved =~ /^[a-z-A-Z]/))) {
+            my $space = Data::Object::Space->new(ref $resolved || $resolved);
+            $argsData = $space->call($next) if $next && $next =~ /^[a-zA-Z]/;
+          }
+        }
+      }
     }
   }
 

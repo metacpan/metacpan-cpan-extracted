@@ -19,25 +19,23 @@ WriteMakefile(
     	'Clone'         => '0.43',
     	'Data::Dumper'	=> 0,
     	'Data::Printer'	=> 0,
-    	## Need to specify the maximum version for Devel::Declare or else TryCatch would not work anymore due to a breaking change in Devel::Declare version 0.006020
-    	'Devel::Declare'=> '<= 0.006019',
     	'Devel::StackTrace' => 0,
     	'Class::Load'	=> '0.25',
     	'Exporter'		=> '5.73',
     	'JSON'          => '4.02',
     	'Number::Format' => '1.75',
+    	'Nice::Try'     => 'v0.1.2',
     	'POSIX'         => '1.88',
     	'Regexp::Common'=> '2017060201',
     	'Scalar::Util'	=> '1.50',
     	'Tie::Hash'     => '1.05',
-    	'TryCatch'		=> '1.003002',
     	'Want'			=> '0.29',
     },
     TEST_REQUIRES =>
     {
-		'Test::Simple' => 0,
-		'Test::Pod'	=> 0,
-		'utf8' => 0,
+        'Test::More'    => '1.302162',
+        'Test::Pod'     => '1.52',
+		'utf8'          => 0,
     },
     LICENSE				=> 'perl_5',
     MIN_PERL_VERSION	=> 5.6.0,
@@ -49,8 +47,8 @@ WriteMakefile(
         resources => {
         #    homepage    => undef,
             repository  => {
-                url         => 'git@github.com:jackdeguest/Module-Generic.git',
-                web         => 'https://github.com/jackdeguest/Module-Generic',
+                url         => 'git@git.deguest.jp:jack/Module-Generic.git',
+                web         => 'https://git.deguest.jp/jack/Module-Generic',
                 type        => 'git',
             },
         #    bugtracker => {

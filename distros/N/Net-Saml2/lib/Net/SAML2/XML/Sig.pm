@@ -7,7 +7,7 @@ use warnings;
 use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS $DEBUG);
 
 $DEBUG = 0;
-$VERSION = '0.24';
+$VERSION = '0.25';
 
 use base qw(Class::Accessor);
 Net::SAML2::XML::Sig->mk_accessors(qw(canonicalizer key));
@@ -647,14 +647,7 @@ sub _canonicalize_xml {
     $comments = 0 unless $comments;
     $prefixlist = '' unless $prefixlist;
 
-    if ( $self->{canonicalizer} eq 'XML::Canonical' ) {
-        require XML::Canonical;
-
-        # TODO - pass prefixlist in here if X::C supports it
-        my $xmlcanon = XML::Canonical->new( comments => $comments );
-        return $xmlcanon->canonicalize_string( $xml );
-    }
-    elsif ( $self->{ canonicalizer } eq 'XML::CanonicalizeXML' ) {
+    if ( $self->{ canonicalizer } eq 'XML::CanonicalizeXML' ) {
         require XML::CanonicalizeXML;
         my $xpath = '<XPath>(//. | //@* | //namespace::*)</XPath>';
 
@@ -682,7 +675,7 @@ Net::SAML2::XML::Sig
 
 =head1 VERSION
 
-version 0.20
+version 0.25
 
 =head1 SYNOPSIS
 
@@ -904,11 +897,11 @@ should match the private key used for the signature.
 
 The XML canonicalization library to use. Options currently are:
 
+XML::Canonical was removed as an option due to its age
+
 =over
 
 =item XML::CanonicalizerXML (default)
-
-=item XML::Canonicalizer
 
 =back
 

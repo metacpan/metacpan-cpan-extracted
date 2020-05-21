@@ -42,7 +42,6 @@ my %WriteMakefileArgs = (
     "MooseX::Types::URI" => 0,
     "URI" => 0,
     "URI::QueryParam" => 0,
-    "XML::Canonical" => 0,
     "XML::CanonicalizeXML" => 0,
     "XML::Generator" => 0,
     "XML::Tidy" => 0,
@@ -61,7 +60,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => "1.14",
     "Test::Pod::Coverage" => "1.04"
   },
-  "VERSION" => "0.20",
+  "VERSION" => "0.25",
   "test" => {
     "TESTS" => "t/*.t t/author/*.t"
   }
@@ -99,7 +98,6 @@ my %FallbackPrereqs = (
   "Test::Pod::Coverage" => "1.04",
   "URI" => 0,
   "URI::QueryParam" => 0,
-  "XML::Canonical" => 0,
   "XML::CanonicalizeXML" => 0,
   "XML::Generator" => 0,
   "XML::Tidy" => 0,

@@ -5,7 +5,7 @@ no if "$]" >= 5.031009, feature => 'indirect';
 
 use Test::Tester 0.108;
 use Test::More 0.88;
-use Test::Warnings 'warnings';
+use Test::Warnings qw(warnings had_no_warnings :no_end_test);
 use Test::Deep;
 use Test::JSON::Schema::Acceptance;
 use lib 't/lib';
@@ -55,4 +55,5 @@ foreach my $test (
   );
 }
 
+had_no_warnings if $ENV{AUTHOR_TESTING};
 done_testing;

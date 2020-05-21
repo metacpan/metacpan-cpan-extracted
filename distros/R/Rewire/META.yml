@@ -6,7 +6,8 @@ build_requires:
   Data::Object::Class: '2.02'
   Data::Object::ClassHas: '2.01'
   Data::Object::Role::Buildable: '0.03'
-  Data::Object::Space: '2.05'
+  Data::Object::Role::Proxyable: '2.03'
+  Data::Object::Space: '2.06'
   JSON::Validator: '3.25'
   Test::Auto: '0.12'
   perl: '5.014'
@@ -26,7 +27,8 @@ requires:
   Data::Object::Class: '2.02'
   Data::Object::ClassHas: '2.01'
   Data::Object::Role::Buildable: '0.03'
-  Data::Object::Space: '2.05'
+  Data::Object::Role::Proxyable: '2.03'
+  Data::Object::Space: '2.06'
   JSON::Validator: '3.25'
   perl: '5.014'
   routines: '0'
@@ -36,7 +38,7 @@ resources:
   bugtracker: https://github.com/iamalnewkirk/rewire/issues
   homepage: https://metacpan.org/pod/Rewire
   repository: git://github.com/iamalnewkirk/rewire.git
-version: '0.04'
+version: '0.05'
 x_authority: cpan:AWNCORP
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -46,6 +46,8 @@ my %cases = (
     'C1.C1'                   => [ 1,  2,  1 ],
     'C1.C12.C2'               => [ 1,  3,  2 ],
     'c1c2c3c4cc1.Br2.Cl3.Cl4' => [ 1,  9,  9 ],
+
+    'C(C(C1))C1' => [ 4, 4 ],
 );
 
 plan tests => 3 * scalar keys %cases;

@@ -24,13 +24,13 @@ requires:
   DateTime::Format::Strptime: '1.76'
   Devel::Confess: '0.009004'
   Getopt::Long: '0.44'
-  Module::Generic: v0.12.1
+  Module::Generic: v0.12.5
+  Nice::Try: v0.1.2
   Scalar::Util: '1.54'
   Tie::Hash: '1.05'
-  TryCatch: '1.003002'
   parent: '0.237'
   perl: '5.006000'
   strict: '1.11'
   warnings: '1.44'
-version: v0.102.2
+version: v0.102.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

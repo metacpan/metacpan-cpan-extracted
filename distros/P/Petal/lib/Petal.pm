@@ -105,7 +105,7 @@ our $CURRENT_INCLUDES = 0;
 
 
 # this is for CPAN
-our $VERSION = '2.25';
+our $VERSION = '2.26';
 
 
 # The CodeGenerator class backend to use.
@@ -178,9 +178,9 @@ sub load_code_generator
 {
     if (not $CodeGeneratorLoaded)
     {
-	eval "require $CodeGenerator";
-	confess "Failed to load $CodeGenerator, $@" if $@;
-	$CodeGeneratorLoaded = 1;
+        eval "require $CodeGenerator";
+        confess "Failed to load $CodeGenerator, $@" if $@;
+        $CodeGeneratorLoaded = 1;
     }
 }
 
@@ -193,7 +193,7 @@ sub new
     unshift (@_, 'file') if (@_ == 1);
     my $self = bless { @_ }, $class;
     $self->_initialize();
-    
+
     return $self;
 }
 
@@ -207,14 +207,14 @@ sub _initialize
     my $file  = $self->{file};
     if ($file =~ /#/)
     {
-	my ($file, $macro) = split /#/, $file, 2;
-	$self->{file}  = $file;
-	$self->_initialize_lang();
-	$self->{file} .= "#$macro";
+        my ($file, $macro) = split /#/, $file, 2;
+        $self->{file}  = $file;
+        $self->_initialize_lang();
+        $self->{file} .= "#$macro";
     }
     else
     {
-	$self->_initialize_lang();
+        $self->_initialize_lang();
     }
 }
 
@@ -225,7 +225,7 @@ sub _initialize_lang
     my $lang = $self->language() || return;
     my @dirs = $self->base_dir();
     @dirs    = map { File::Spec->canonpath ("$_/$self->{file}") } @dirs;
-    
+
     $self->{file}  =~ s/\/$//;
     my $filename   = Petal::Functions::find_filename ($lang, @dirs);
     $self->{file} .= "/$filename" if ($filename);
@@ -264,18 +264,18 @@ sub _base_dir
     my $self = shift;
     if (exists $self->{base_dir})
     {
-	my $base_dir = $self->{base_dir};
-	if (ref $base_dir) { return @{$base_dir} }
-	else
-	{
-	    die '\$self->{base_dir} is not defined' unless (defined $base_dir);
-	    return $base_dir;
-	}
+        my $base_dir = $self->{base_dir};
+        if (ref $base_dir) { return @{$base_dir} }
+        else
+        {
+            die '\$self->{base_dir} is not defined' unless (defined $base_dir);
+            return $base_dir;
+        }
     }
     else
     {
-	if (defined $BASE_DIR) { return ( $BASE_DIR, @BASE_DIR ) }
-	else                   { return @BASE_DIR                }
+        if (defined $BASE_DIR) { return ( $BASE_DIR, @BASE_DIR ) }
+        else                   { return @BASE_DIR                }
     }
 }
 
@@ -288,38 +288,38 @@ sub _include_compute_path
 {
     my $self  = shift;
     my $file  = shift;
-    
+
     # this is for metal self-includes
     if ($file =~ /^#/)
     {
-	$file = $self->{file} . $file;
+        $file = $self->{file} . $file;
     }
-    
+
     return $file unless ($file =~ /^\./);
-    
+
     my $path = $self->{file};
     ($path)  = $path =~ /(.*)\/.*/;
     $path  ||= '.';
     $path .= '/';
     $path .= $file;
-    
+
     my @path = split /\//, $path;
     my @new_path = ();
     while (scalar @path)
     {
-	my $next = shift (@path);
-	next if $next eq '.';
-	
-	if ($next eq '..')
-	{
-	    die "Cannot go above base directory: $file" if (scalar @new_path == 0);
-	    pop (@new_path);
-	    next;
-	}
-	
-	push @new_path, $next;
+        my $next = shift (@path);
+        next if $next eq '.';
+
+        if ($next eq '..')
+        {
+            die "Cannot go above base directory: $file" if (scalar @new_path == 0);
+            pop (@new_path);
+            next;
+        }
+
+        push @new_path, $next;
     }
-    
+
     return join '/', @new_path;
 }
 
@@ -333,7 +333,7 @@ sub _include_compute_path
 #   my $data_out = $template->process (
 #     user   => $user,
 #     page   => $page,
-#     basket => $shopping_basket,    
+#     basket => $shopping_basket,
 #   );
 #
 # print "Content-Type: text/html\n\n";
@@ -342,7 +342,7 @@ sub process
 {
     my $self = shift;
     $self->_process_absolutize_pathes();
-    
+
     # ok, from there on we need to override any global variable with stuff
     # that might have been specified when constructing the object
     local $TAINT                    = defined $self->{taint}                    ? $self->{taint}                  : $TAINT;
@@ -366,24 +366,24 @@ sub process
     my $current_includes = $CURRENT_INCLUDES;
     return "ERROR: MAX_INCLUDES : $CURRENT_INCLUDES" if ($CURRENT_INCLUDES > $MAX_INCLUDES);
     local $CURRENT_INCLUDES = $current_includes + 1;
-    
+
     my $res = undef;
     eval {
-	my $hash = undef;
-	if (ref $_[0] eq 'Petal::Hash') { $hash = shift }
-	elsif (ref $_[0] eq 'HASH')     { $hash = new Petal::Hash (%{shift()}) }
-	else                            { $hash = new Petal::Hash (@_)         }
-	
-	my $coderef = $self->_code_memory_cached;
-	die "\$coderef is undefined\n\n" unless $coderef;
-	die "\$hash is undefined\n\n" unless $hash;
-	$res = $coderef->($hash);
+        my $hash = undef;
+        if (ref $_[0] eq 'Petal::Hash') { $hash = shift }
+        elsif (ref $_[0] eq 'HASH')     { $hash = new Petal::Hash (%{shift()}) }
+        else                            { $hash = new Petal::Hash (@_)         }
+
+        my $coderef = $self->_code_memory_cached;
+        die "\$coderef is undefined\n\n" unless $coderef;
+        die "\$hash is undefined\n\n" unless $hash;
+        $res = $coderef->($hash);
     };
-    
+
     if ( $CACHE_ONLY == 1 ){ return 1; }
-   
+
     if (defined $@ and $@) { $res = $self->_handle_error ($@) }
-    elsif (defined $TranslationService && $CURRENT_INCLUDES == 1) { $res = Petal::I18N->process ($res) } 
+    elsif (defined $TranslationService && $CURRENT_INCLUDES == 1) { $res = Petal::I18N->process ($res) }
 
     return $res;
 }
@@ -396,32 +396,32 @@ sub process
 sub _process_absolutize_pathes
 {
     my $self = shift;
-    
+
     if (defined $BASE_DIR)
     {
-	$BASE_DIR = File::Spec->rel2abs ($BASE_DIR) unless (
-	    File::Spec->file_name_is_absolute ($BASE_DIR)
-	     );
+        $BASE_DIR = File::Spec->rel2abs ($BASE_DIR) unless (
+            File::Spec->file_name_is_absolute ($BASE_DIR)
+             );
     }
-    
+
     @BASE_DIR = ( map { File::Spec->file_name_is_absolute ($_) ? $_ : File::Spec->rel2abs ($_) }
-		  map { defined $_ ? $_ : () } @BASE_DIR );
-    
+                  map { defined $_ ? $_ : () } @BASE_DIR );
+
     if (defined $self->{base_dir})
     {
-	if (ref $self->{base_dir})
-	{
-	    $self->{base_dir} = [
-		map { File::Spec->file_name_is_absolute ($_) ? $_ : File::Spec->rel2abs ($_) }
-		map { defined $_ ? $_ : () } @{$self->{base_dir}}
-	       ] if (defined $self->{base_dir});
-	}
-	else
-	{
-	    $self->{base_dir} = File::Spec->rel2abs ($self->{base_dir}) unless (
-		File::Spec->file_name_is_absolute ($self->{base_dir})
-		 );
-	}
+        if (ref $self->{base_dir})
+        {
+            $self->{base_dir} = [
+                map { File::Spec->file_name_is_absolute ($_) ? $_ : File::Spec->rel2abs ($_) }
+                map { defined $_ ? $_ : () } @{$self->{base_dir}}
+               ] if (defined $self->{base_dir});
+        }
+        else
+        {
+            $self->{base_dir} = File::Spec->rel2abs ($self->{base_dir}) unless (
+                File::Spec->file_name_is_absolute ($self->{base_dir})
+                 );
+        }
     }
 }
 
@@ -438,55 +438,55 @@ sub _handle_error
         $res    .= "\n\n";
         $res    .= "Petal object dump:\n";
         $res    .= "==================\n";
-	$res    .= Dumper ($self);
+        $res    .= Dumper ($self);
         $res    .= "\n\n";
-	$res    .= "Stack trace:\n";
-	$res    .= "============\n";
-	$res    .= Carp::longmess();
-	$res    .= "\n\n";
+        $res    .= "Stack trace:\n";
+        $res    .= "============\n";
+        $res    .= Carp::longmess();
+        $res    .= "\n\n";
         $res    .= "Template perl code dump:\n";
         $res    .= "========================\n";
 
         my $dump = eval { $self->_code_with_line_numbers() };
         $res    .= ($dump) ? $dump : "(no dump available)";
-        
+
         $res .= '</pre>';
         return $res;
     };
-    
+
     $Petal::DEBUG_DUMP and do {
-	my $tmpdir  = File::Spec->tmpdir();
-	my $tmpfile = $$ . '.' . time() . '.' . ( join '', map { chr (ord ('a') + int (rand (26))) } 1..10 );
-	my $debug   = "$tmpdir/petal_debug.$tmpfile";
-	
-	open ERROR, ">$debug" || die "Cannot write-open \">$debug\" ($!)";
-	
-	print ERROR "Error: $error\n";
-	ref $error and do {
-	    print ERROR "=============\n";
-	};
-	print ERROR "\n";
-	
-	print ERROR "Petal object dump:\n";
-	print ERROR "==================\n";
-	print ERROR Dumper ($self);
-	print ERROR "\n\n";
-	
-	print ERROR "Stack trace:\n";
-	print ERROR "============\n";
-	print ERROR Carp::longmess();
-	print ERROR "\n\n";
-	
-	print ERROR "Template perl code dump:\n";
-	print ERROR "========================\n";
-	my $dump = eval { $self->_code_with_line_numbers() };
-	($dump) ? print ERROR $dump : print ERROR "(no dump available)";
-	
-	die "[PETAL ERROR] $error. Debug info written in $debug";
+        my $tmpdir  = File::Spec->tmpdir();
+        my $tmpfile = $$ . '.' . time() . '.' . ( join '', map { chr (ord ('a') + int (rand (26))) } 1..10 );
+        my $debug   = "$tmpdir/petal_debug.$tmpfile";
+
+        open ERROR, ">$debug" || die "Cannot write-open \">$debug\" ($!)";
+
+        print ERROR "Error: $error\n";
+        ref $error and do {
+            print ERROR "=============\n";
+        };
+        print ERROR "\n";
+
+        print ERROR "Petal object dump:\n";
+        print ERROR "==================\n";
+        print ERROR Dumper ($self);
+        print ERROR "\n\n";
+
+        print ERROR "Stack trace:\n";
+        print ERROR "============\n";
+        print ERROR Carp::longmess();
+        print ERROR "\n\n";
+
+        print ERROR "Template perl code dump:\n";
+        print ERROR "========================\n";
+        my $dump = eval { $self->_code_with_line_numbers() };
+        ($dump) ? print ERROR $dump : print ERROR "(no dump available)";
+
+        die "[PETAL ERROR] $error. Debug info written in $debug";
     };
-    
+
     ! $Petal::DEBUG_DUMP and do {
-	die "[PETAL ERROR] $error. No debug info written.";
+        die "[PETAL ERROR] $error. No debug info written.";
     };
 }
 
@@ -507,16 +507,16 @@ sub _code_with_line_numbers
     # add line numbers
     my $count = 0;
     @lines = map {
-	my $cur_line = $_;
-	$count++;
-	
-	# space padding so the line numbers nicely line up with each other
-	my $line_num = sprintf ("%" . length(scalar(@lines)) . "d", $count);
-	
-	# put line number and line back together
-	"${line_num}. ${cur_line}";
+        my $cur_line = $_;
+        $count++;
+
+        # space padding so the line numbers nicely line up with each other
+        my $line_num = sprintf ("%" . length(scalar(@lines)) . "d", $count);
+
+        # put line number and line back together
+        "${line_num}. ${cur_line}";
     } @lines;
-    
+
     return join("\n", @lines);
 }
 
@@ -562,17 +562,17 @@ sub _file_path
     my $file = $self->_file;
     $file =~ s/#.*$//;
     my @dirs = $self->base_dir;
-    
+
     foreach my $dir (@dirs)
     {
-	# my $base_dir  = File::Spec->canonpath ($dir);
-	# $base_dir     = File::Spec->rel2abs ($base_dir) unless ($base_dir =~ /^\//);
-	my $base_dir  = $dir;
-	$base_dir     =~ s/\/$//;
-	my $file_path = File::Spec->canonpath ($base_dir . '/' . $file);
-	return $file_path if (-e $file_path and -r $file_path);
+        # my $base_dir  = File::Spec->canonpath ($dir);
+        # $base_dir     = File::Spec->rel2abs ($base_dir) unless ($base_dir =~ /^\//);
+        my $base_dir  = $dir;
+        $base_dir     =~ s/\/$//;
+        my $file_path = File::Spec->canonpath ($base_dir . '/' . $file);
+        return $file_path if (-e $file_path and -r $file_path);
     }
-    
+
     Carp::confess ("Cannot find $file in @dirs. (typo? permission problem?)");
 }
 
@@ -586,28 +586,28 @@ sub _file_data_ref
     my $self      = shift;
     my $file_path = $self->_file_path;
     $file_path =~ s/#.*$//;
-    
+
     if ($] > 5.007)
     {
-	my $encoding = Encode::resolve_alias ($DECODE_CHARSET) || 'utf8';
-	open FP, "<:encoding($encoding)", "$file_path" or die "Cannot read-open $file_path ($!)";
+        my $encoding = Encode::resolve_alias ($DECODE_CHARSET) || 'utf8';
+        open FP, "<:encoding($encoding)", "$file_path" or die "Cannot read-open $file_path ($!)";
     }
     else
     {
-	open FP, "<$file_path" || die "Cannot read-open $file_path ($!)";
+        open FP, "<$file_path" || die "Cannot read-open $file_path ($!)";
     }
-    
+
     my $res = join '', <FP>;
     close FP;
-    
+
     # kill template comments
     $res =~ s/\<!--\?.*?\-->//gsm;
-    
+
     my $decode = ($OUTPUT =~ /HTML$/i or $INPUT =~ /HTML$/i) ?
         new MKDoc::XML::Decode ('numeric', 'xhtml') :
-	new MKDoc::XML::Decode ('numeric');
-    
-    $res = $decode->process ($res);    
+        new MKDoc::XML::Decode ('numeric');
+
+    $res = $decode->process ($res);
     return \$res;
 }
 
@@ -621,17 +621,17 @@ sub _code_disk_cached
     my $code = (defined $DISK_CACHE and $DISK_CACHE) ? Petal::Cache::Disk->get ($self->_file_path_with_macro, $self->language) : undef;
     unless (defined $code)
     {
-	my $macro = $self->_macro() || $MT_NAME_CUR;
-	
-	local ($MT_NAME_CUR);
-	$MT_NAME_CUR = $macro;
-	
-	my $data_ref = $self->_canonicalize;
-	load_code_generator();
-	$code = $CodeGenerator->process ($data_ref, $self);
-	Petal::Cache::Disk->set ($self->_file_path_with_macro, $code, $self->language) if (defined $DISK_CACHE and $DISK_CACHE);
+        my $macro = $self->_macro() || $MT_NAME_CUR;
+
+        local ($MT_NAME_CUR);
+        $MT_NAME_CUR = $macro;
+
+        my $data_ref = $self->_canonicalize;
+        load_code_generator();
+        $code = $CodeGenerator->process ($data_ref, $self);
+        Petal::Cache::Disk->set ($self->_file_path_with_macro, $code, $self->language) if (defined $DISK_CACHE and $DISK_CACHE);
     }
-    
+
     return $code;
 }
 
@@ -645,16 +645,16 @@ sub _code_memory_cached
     my $code = (defined $MEMORY_CACHE and $MEMORY_CACHE) ? Petal::Cache::Memory->get ($self->_file_path_with_macro, $self->language) : undef;
     unless (defined $code)
     {
-	my $code_perl = $self->_code_disk_cached;
-	my $VAR1 = undef;
-	
-	eval "$code_perl";
-	confess ($@ . "\n" . $self->_code_with_line_numbers) if $@;
-	$code = $VAR1;
-	
-	Petal::Cache::Memory->set ($self->_file_path_with_macro, $code, $self->language) if (defined $MEMORY_CACHE and $MEMORY_CACHE);	
+        my $code_perl = $self->_code_disk_cached;
+        my $VAR1 = undef;
+
+        eval "$code_perl";
+        confess ($@ . "\n" . $self->_code_with_line_numbers) if $@;
+        $code = $VAR1;
+
+        Petal::Cache::Memory->set ($self->_file_path_with_macro, $code, $self->language) if (defined $MEMORY_CACHE and $MEMORY_CACHE);
     }
-    
+
     return $code;
 }
 
@@ -679,7 +679,7 @@ sub _canonicalize
     my $self = shift;
     my $parser_type        = $INPUTS->{$INPUT}   || confess "unknown \$Petal::INPUT = $INPUT";
     my $canonicalizer_type = $OUTPUTS->{$OUTPUT} || confess "unknown \$Petal::OUTPUT = $OUTPUT";
-    
+
     my $data_ref = $self->_file_data_ref;
     my $parser = $parser_type->new;
     return $canonicalizer_type->process ($parser, $data_ref);
@@ -921,7 +921,7 @@ files.  Recognised values are:
 
   'HTML'  - Petal will output XHTML, self-closing certain tags
   'XHTML' - Alias for 'HTML'
-  'XML'   - Petal will output generic XML 
+  'XML'   - Petal will output generic XML
 
 
 =head2 language => I<language code>
@@ -1005,7 +1005,7 @@ This option will work only if you use Perl 5.8 or greater.
 If specified, Petal will assume that the template to be processed (and its
 sub-templates) are in the character set I<charset>.
 
-I<charset> can be any character set that can be used with the module L<Encode>. 
+I<charset> can be any character set that can be used with the module L<Encode>.
 
 
 =head1 TAL SYNTAX
@@ -1095,7 +1095,7 @@ A table with rows of alternating colours set via CSS:
       tal:omit-tag=""
       tal:repeat="audience self/audiences"
     >
-      <tr 
+      <tr
         class="odd"
         tal:condition="repeat/odd"
       >
@@ -1103,11 +1103,11 @@ A table with rows of alternating colours set via CSS:
           This a odd row, it comes before the even row.
         </td>
       </tr>
-      <tr 
+      <tr
         class="even"
         tal:condition="repeat/even"
       >
-        <td> 
+        <td>
           This a even row.
         </td>
       </tr>
@@ -1272,7 +1272,7 @@ You can do things like:
      tal:content="child/data"
      tal:on-error="string:Ouch!">Some Dummy Content</p>
 
-Given the fact that XML attributes are not ordered, withing the same tag
+Given the fact that XML attributes are not ordered, within the same tag
 statements will be executed in the following order:
 
     define
@@ -1401,10 +1401,10 @@ be recursive by nature:
 
       <li metal:define-macro="recurse">
         <a href="#"
-           petal:attributes="href child/Full_Path" 
+           petal:attributes="href child/Full_Path"
            petal:content="child/Title"
         >Child Document Title</a>
-        <ul 
+        <ul
           petal:define="children child/Children"
           petal:condition="children"
           petal:repeat="child children"
@@ -1431,7 +1431,7 @@ In the following examples, we'll assume that the template is used as follows:
   print $template->process ( $hashref );
 
 Then we will show how the Petal Expression Syntax maps to the Perl way of
-accessing these values.  
+accessing these values.
 
 
 =head2 accessing scalar values
@@ -1500,7 +1500,7 @@ Perl expressions
 
   1. $hashref->{'some_object'}->some_method();
   2. $hashref->{'some_object'}->some_method ('foo', 'bar');
-  3. $hashref->{'some_object'}->some_method ($hashref->{'some_variable'})  
+  3. $hashref->{'some_object'}->some_method ($hashref->{'some_variable'})
 
 Petal expressions
 
@@ -1520,7 +1520,7 @@ Example
     <span tal:replace="value2">2</span> equals
     <span tal:replace="math_object/multiply value1 value2">4</span>
   </p>
-    
+
 
 =head2 composing
 
@@ -1584,7 +1584,7 @@ and returns the value.
 Alternatively, you could write:
 
   string:Welcome ${user/real_name}, it is ${date}!
-  
+
 The advantage of using curly brackets is that it lets you interpolate
 expressions which invoke methods with parameters, i.e.
 
@@ -1631,7 +1631,7 @@ reimplemented as a module:
     package Petal::Hash::UpperCase;
     use strict;
     use warnings;
-  
+
     sub process {
       my $class = shift;
       my $hash  = shift;
@@ -1670,7 +1670,7 @@ Note that this is a language I<keyword>, not a modifier. It does not use a
 trailing colon.
 
 
-=head3 Petal::Hash caching and fresh keyword 
+=head3 Petal::Hash caching and fresh keyword
 
 Petal caches the expressions which it resolves, i.e. if you write the
 expression:
@@ -1683,7 +1683,7 @@ for loops because a new Petal::Hash object is used for each iteration in order
 to support proper scoping.
 
 However, in some rare cases you might not want to have that behavior, in which
-case you need to prefix your expression with the C<fresh> keyword, i.e. 
+case you need to prefix your expression with the C<fresh> keyword, i.e.
 
   fresh string:$foo/bar, ${baz/buz/blah}
 
@@ -1795,9 +1795,9 @@ None.
 
 Copyright 2003 - MKDoc Ltd.
 
-Authors: Jean-Michel Hiver, 
+Authors: Jean-Michel Hiver,
          Fergal Daly <fergal@esatclear.ie>,
-	 and others.
+         and others.
 
 This module free software and is distributed under the same license as Perl
 itself. Use it at your own risk.

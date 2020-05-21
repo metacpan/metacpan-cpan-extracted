@@ -3,7 +3,7 @@ BEGIN {
   my %missing = map {
     eval qq{ require $_ };
     $@ ? ($_=>1) : ()
-  } qw( Carp Exporter base lib strict warnings );
+  } qw( Carp Exporter Time::HiRes base lib strict warnings );
   if(%missing)
   {
     print "Your Perl is missing core modules: @{[ sort keys %missing ]}\n";
@@ -59,33 +59,43 @@ my %WriteMakefileArgs = (
     "lib/NewFangle/Transaction.pm" => "\$(INST_LIB)/NewFangle/Transaction.pm"
   },
   "PREREQ_PM" => {
-    "FFI::C"        => "0.08",
-    "FFI::C::Util"  => 0,
-    "FFI::CheckLib" => "0.27",
-    "FFI::Platypus" => "1.26"
+    "FFI::C"                => "0.08",
+    "FFI::C::Util"          => 0,
+    "FFI::CheckLib"         => "0.27",
+    "FFI::Platypus"         => "1.26",
+    "FFI::Platypus::Memory" => 0,
+    "JSON::MaybeXS"         => 0,
+    "Ref::Util"             => 0
   },
   "TEST_REQUIRES" => {
-    "Test2::V0" => "0.000060",
-    "YAML"      => 0
+    "Test2::Tools::AsyncSubtest"  => 0,
+    "Test2::Tools::JSON::Pointer" => 0,
+    "Test2::V0"                   => "0.000060",
+    "YAML"                        => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test"    => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
-  "FFI::C"        => "0.08",
-  "FFI::C::Util"  => 0,
-  "FFI::CheckLib" => "0.27",
-  "FFI::Platypus" => "1.26",
-  "Test2::V0"     => "0.000060",
-  "YAML"          => 0
+  "FFI::C"                      => "0.08",
+  "FFI::C::Util"                => 0,
+  "FFI::CheckLib"               => "0.27",
+  "FFI::Platypus"               => "1.26",
+  "FFI::Platypus::Memory"       => 0,
+  "JSON::MaybeXS"               => 0,
+  "Ref::Util"                   => 0,
+  "Test2::Tools::AsyncSubtest"  => 0,
+  "Test2::Tools::JSON::Pointer" => 0,
+  "Test2::V0"                   => "0.000060",
+  "YAML"                        => 0
 );
 
 # inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.037
 if ( do { use FFI::CheckLib 0.27; !find_lib lib => 'newrelic' } ) {
-  requires( 'Alien::libnewrelic', '0.01' );
+  requires( 'Alien::libnewrelic', '0.04' );
 }
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

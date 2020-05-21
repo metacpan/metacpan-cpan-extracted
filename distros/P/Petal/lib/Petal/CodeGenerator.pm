@@ -13,11 +13,11 @@ use base qw /MKDoc::XML::Decode/;
 sub process
 {
     (@_ == 2) or warn "MKDoc::XML::Encode::process() should be called with two arguments";
-    
+
     my $self = shift;
     my $data = join '', @_;
     $data    =~ s/&(#?[0-9A-Za-z]+)\\;/$self->entity_to_char ($1)/eg;
-    
+
     return $data;
 }
 
@@ -146,9 +146,9 @@ sub process
 {
     my $class = shift;
     my $data_ref = shift;
-    
+
     local $petal_object = shift || die "$class::" . "process: \$petal_object was not defined";
-    
+
     local $tokens = $class->_tokenize ($data_ref);
     local $variables = {};
     local @code = ();
@@ -157,52 +157,52 @@ sub process
     local %token_hash = ();
     local $token = undef;
     local $my_array = {};
-    
+
     $class->code_header();
 
     foreach $token (@{$tokens})
     {
         if ($token =~ /$PI_RE/s)
         {
-	    ($token_name) = $token =~ /$PI_RE/s;
-	    my @atts1 = $token =~ /(\S+)\=\"(.*?)\"/gos;
-	    my @atts2 = $token =~ /(\S+)\=\'(.*?)\'/gos;
-	    %token_hash = (@atts1, @atts2); 
-	    foreach my $key (%token_hash)
-	    {
-		$token_hash{$key} = $class->_decode_backslash_semicolon ($token_hash{$key})
-		    if (defined $token_hash{$key});
-	    }
-	    
+            ($token_name) = $token =~ /$PI_RE/s;
+            my @atts1 = $token =~ /(\S+)\=\"(.*?)\"/gos;
+            my @atts2 = $token =~ /(\S+)\=\'(.*?)\'/gos;
+            %token_hash = (@atts1, @atts2);
+            foreach my $key (%token_hash)
+            {
+                $token_hash{$key} = $class->_decode_backslash_semicolon ($token_hash{$key})
+                    if (defined $token_hash{$key});
+            }
+
           CASE:
             for ($token_name)
-	    {
+            {
                 /^attr$/      and do { $class->_attr;    last CASE };
                 /^include$/   and do { $class->_include; last CASE };
-		/^var$/       and do { $class->_var;     last CASE };
-		/^if$/        and do { $class->_if;      last CASE };
-		/^condition$/ and do { $class->_if;      last CASE };
+                /^var$/       and do { $class->_var;     last CASE };
+                /^if$/        and do { $class->_if;      last CASE };
+                /^condition$/ and do { $class->_if;      last CASE };
                 /^else$/      and do { $class->_else;    last CASE };
-		/^repeat$/    and do { $class->_for;     last CASE };
-		/^loop$/      and do { $class->_for;     last CASE };
-		/^foreach$/   and do { $class->_for;     last CASE };
-		/^for$/       and do { $class->_for;     last CASE };
-		/^eval$/      and do { $class->_eval;    last CASE };
-		/^endeval$/   and do { $class->_endeval; last CASE };
-		/^defslot$/   and do { $class->_defslot; last CASE };
-		
-		/^end$/ and do
+                /^repeat$/    and do { $class->_for;     last CASE };
+                /^loop$/      and do { $class->_for;     last CASE };
+                /^foreach$/   and do { $class->_for;     last CASE };
+                /^for$/       and do { $class->_for;     last CASE };
+                /^eval$/      and do { $class->_eval;    last CASE };
+                /^endeval$/   and do { $class->_endeval; last CASE };
+                /^defslot$/   and do { $class->_defslot; last CASE };
+
+                /^end$/ and do
                 {
                     my $idt = $class->indent();
-		    delete $my_array->{$idt};
+                    delete $my_array->{$idt};
                     $class->indent_decrement();
                     $class->add_code("};");
                     last CASE;
                 };
-	    }
-	}
-	else
-	{
+            }
+        }
+        else
+        {
             my $string = quotemeta ($token);
 #            $string =~ s/\@/\\\@/gsm;
 #            $string =~ s/\$/\\\$/gsm;
@@ -212,7 +212,7 @@ sub process
             $class->add_code($class->_add_res( '"' . $string . '";'));
         }
     }
-    
+
     $class->code_footer();
     return join "\n", @code;
 }
@@ -241,10 +241,10 @@ sub _include
 
     (defined $lang and $lang) ?
         $class->add_code ("my \$res = eval { Petal->new (file => '$path', lang => '$lang')->process (\$new_hash) };") :
-	$class->add_code ("my \$res = eval { Petal->new ('$path')->process (\$new_hash) };");
+        $class->add_code ("my \$res = eval { Petal->new ('$path')->process (\$new_hash) };");
 
     $class->add_code ("if (\$@) { confess(\$@); }") if $Petal::ERROR_ON_INCLUDE_ERROR;
-    
+
     $class->add_code ("\$res = \"<!--\\n\$\@\\n-->\" if (defined \$\@ and \$\@);");
     $class->add_code ("\$res;");
     $class->indent_decrement();
@@ -263,15 +263,15 @@ sub _defslot
     my $class = shift;
     my $variable = $token_hash{name} or
         confess "Cannot parse $token : 'name' attribute is not defined";
-    
+
     (defined $variable and $variable) or
         confess "Cannot parse $token : 'name' attribute is not defined";
-   
+
     # set the variable in the $variables hash
     my $tmp = $variable;
     $tmp =~ s/\..*//;
     $variables->{$tmp} = 1;
-    
+
     $variable =~ s/\'/\\\'/g;
 
     $class->add_code ("do {");
@@ -288,7 +288,7 @@ sub _defslot
     my $lang  = $petal_object->language();
     (defined $lang and $lang) ?
         $class->add_code ("\$tmp = eval { Petal->new (file => \$path, lang => '$lang')->process (\$new_hash) };") :
-	$class->add_code ("\$tmp = eval { Petal->new (\$path)->process (\$new_hash) };");
+        $class->add_code ("\$tmp = eval { Petal->new (\$path)->process (\$new_hash) };");
 
     $class->add_code ("if (\$@) { confess(\$@); }") if $Petal::ERROR_ON_INCLUDE_ERROR;
 
@@ -304,7 +304,7 @@ sub _defslot
     $class->add_code ( "} else {" );
     $class->indent_increment();
 }
-    
+
 
 # $class->_var;
 # -------------
@@ -314,15 +314,15 @@ sub _var
     my $class = shift;
     my $variable = $token_hash{name} or
         confess "Cannot parse $token : 'name' attribute is not defined";
-    
+
     (defined $variable and $variable) or
         confess "Cannot parse $token : 'name' attribute is not defined";
-    
+
     # set the variable in the $variables hash
     my $tmp = $variable;
     $tmp =~ s/\..*//;
     $variables->{$tmp} = 1;
-    
+
     $variable =~ s/\'/\\\'/g;
     $class->add_code ( $class->_add_res (('do {')) );
     $class->indent_increment();
@@ -341,15 +341,15 @@ sub _if
     my $class = shift;
     my $variable = $token_hash{name} or
         confess "Cannot parse $token : 'name' attribute is not defined";
-    
+
     (defined $variable and $variable) or
         confess "Cannot parse $token : 'name' attribute is not defined";
-		    
+
     # set the variable in the $variables hash
     my $tmp = $variable;
     $tmp =~ s/\..*//;
     $variables->{$tmp} = 1;
-    
+
     $variable =~ s/\'/\\\'/g;
     $class->add_code("if (".$class->comp_expr($variable).") {");
     $class->indent_increment();
@@ -362,7 +362,7 @@ sub _if
 sub _eval
 {
     my $class = shift;
-    $class->add_code($class->_add_res("eval {"));    
+    $class->add_code($class->_add_res("eval {"));
     $class->indent_increment();
     $class->add_code("my " . $class->_init_res() .";");
     $class->add_code("local %SIG;");
@@ -374,15 +374,15 @@ sub _eval
 # -----------------
 # process a <?endeval errormsg="..."?> statement
 sub _endeval
-{   
+{
     my $class = shift;
     my $variable = $token_hash{'errormsg'} or
        confess "Cannot parse $token : 'errormsg' attribute is not defined";
-    
+
     $class->add_code("return " . $class->_get_res() . ";");
     $class->indent_decrement();
     $class->add_code("} || '';");
-    
+
     $class->add_code("if (defined \$\@ and \$\@) {");
     $class->indent_increment();
 
@@ -405,18 +405,18 @@ sub _attr
     my $class = shift;
     my $attribute = $token_hash{name} or
         confess "Cannot parse $token : 'name' attribute is not defined";
-    
+
     my $variable = $token_hash{value} or
         confess "Cannot parse $token : 'value' attribute is not defined";
-    
+
     (defined $variable and $variable) or
         confess "Cannot parse $token : 'value' attribute is not defined";
-    
+
     # set the variable in the $variables hash
     my $tmp = $variable;
     $tmp =~ s/\..*//;
     $variables->{$tmp} = 1;
-    
+
     $variable =~ s/\'/\\\'/g;
     $class->add_code('{');
     $class->indent_increment();
@@ -453,50 +453,50 @@ sub _for
     my $class = shift;
     my $variable = $token_hash{name} or
     confess "Cannot parse $token : 'name' attribute is not defined";
-    
+
     (defined $variable and $variable) or
     confess "Cannot parse $token : 'name' attribute is not defined";
-    
+
     $variable =~ s/^\s+//;
     my $as;
     ($as, $variable) = split /\s+/, $variable, 2;
-    
+
     (defined $as and defined $variable) or
         confess "Cannot parse $token : loop name not specified";
-    
+
     # set the variable in the $variables hash
     my $tmp = $variable;
     $tmp =~ s/\..*//;
     $variables->{$tmp} = 1;
-    
-    my $idt = $class->indent(); 
+
+    my $idt = $class->indent();
     $variable =~ s/\'/\\\'/g;
     unless (defined $my_array->{$idt})
     {
-	$class->add_code("my \$array = ".$class->comp_expr($variable).";");
-	$class->add_code(
+        $class->add_code("my \$array = ".$class->comp_expr($variable).";");
+        $class->add_code(
             qq{die 'tried to repeat but $variable gave no array reference'}
             . qq{ unless defined \$array and ref \$array eq 'ARRAY';}
         );
-	$class->add_code("my \@array = \@\$array;");
-	$my_array->{$idt} = 1;
+        $class->add_code("my \@array = \@\$array;");
+        $my_array->{$idt} = 1;
     }
     else
     {
-	#$class->add_code("\@array = \@{".$class->comp_expr($variable)."};");
-	$class->add_code("\$array = ".$class->comp_expr($variable).";");
-	$class->add_code(
+        #$class->add_code("\@array = \@{".$class->comp_expr($variable)."};");
+        $class->add_code("\$array = ".$class->comp_expr($variable).";");
+        $class->add_code(
             qq{die 'tried to repeat but $variable gave no array reference'}
             . qq{ unless defined \$array and ref \$array eq 'ARRAY';}
         );
-	$class->add_code("\@array = \@\$array;");
+        $class->add_code("\@array = \@\$array;");
     }
 
-        
+
     $class->add_code ("for (my \$i=0; \$i < \@array; \$i++) {");
     $class->indent_increment();
     $class->add_code ("my \$hash   = \$hash->new();");
-    
+
     # compute various might-be-useful variables
     $class->add_code ("my \$number = \$i + 1;");
     $class->add_code ("my \$odd    = \$number % 2;");
@@ -504,7 +504,7 @@ sub _for
     $class->add_code ("my \$start  = (\$i == 0);");
     $class->add_code ("my \$end    = (\$i == \$#array);");
     $class->add_code ("my \$inner  = (\$i and \$i < \@array);");
-    
+
     # backwards compatibility
     $class->add_code ("\$hash->{__count__}    = \$number;");
     $class->add_code ("\$hash->{__is_first__} = \$start;");
@@ -512,7 +512,7 @@ sub _for
     $class->add_code ("\$hash->{__is_inner__} = \$inner;");
     $class->add_code ("\$hash->{__even__}     = \$even;");
     $class->add_code ("\$hash->{__odd__}      = \$odd;");
-    
+
     # new repeat style object
     $class->add_code ("\$hash->{repeat} = {");
     $class->indent_increment();
@@ -525,7 +525,7 @@ sub _for
     $class->add_code ("inner  => \$inner,");
     $class->add_code ("};");
     $class->indent_decrement();
-    
+
     $class->add_code ("\$hash->{'$as'} = \$array[\$i];");
 }
 
@@ -538,10 +538,10 @@ sub _tokenize
 {
     my $self = shift;
     my $data_ref = shift;
-    
+
     my @tags  = $$data_ref =~ /(<\?.*?\?>)/gs;
     my @split = split /(?:<\?.*?\?>)/s, $$data_ref;
-    
+
     my $tokens = [];
     while (@split)
     {
@@ -557,7 +557,7 @@ sub _decode_backslash_semicolon
 {
     my $class = shift;
     my $data  = shift;
-    
+
     my $decode = new Petal::CodeGenerator::Decode ('xml');
     return $decode->process ($data);
 }
