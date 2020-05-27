@@ -1,9 +1,9 @@
 package App::lcpan;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-07'; # DATE
+our $DATE = '2020-05-26'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.057'; # VERSION
+our $VERSION = '1.058'; # VERSION
 
 use 5.010001;
 use strict;
@@ -242,51 +242,60 @@ our %finclude_unindexed_args = (
 );
 
 our %fctime_args = (
-    added_before => {
-        summary => 'Include only records that are added before a certain date',
+    added_since => {
+        summary => 'Include only records that are added since a certain date',
         schema => ['date*', 'x.perl.coerce_rules' => ['From_str::natural']],
         tags => ['category:filtering'],
     },
-    added_after => {
-        summary => 'Include only records that are added after a certain date',
-        schema => ['date*', 'x.perl.coerce_rules' => ['From_str::natural']],
-        tags => ['category:filtering'],
-    },
-    added_in_last_update => {
-        summary => 'Include only records that are added during the last index update',
+    added_since_last_index_update => {
+        summary => 'Include only records that are added since the last index update',
         schema => 'true*',
         tags => ['category:filtering'],
     },
-    added_in_last_n_updates => {
-        summary => 'Include only records that are added during the last N index updates',
+    added_since_last_n_index_updates => {
+        summary => 'Include only records that are added since the last N index updates',
         schema => 'posint*',
         tags => ['category:filtering'],
     },
-    # XXX choose one: added_before/after or added_in_last_update or added_in_last_n_updates
 );
 
 our %fmtime_args = (
-    updated_before => {
-        summary => 'Include only records that are updated before a certain date',
+    updated_since => {
+        summary => 'Include only records that are updated since certain date',
         schema => ['date*', 'x.perl.coerce_rules' => ['From_str::natural']],
         tags => ['category:filtering'],
     },
-    updated_after => {
-        summary => 'Include only records that are updated after a certain date',
-        schema => ['date*', 'x.perl.coerce_rules' => ['From_str::natural']],
-        tags => ['category:filtering'],
-    },
-    updated_in_last_update => {
-        summary => 'Include only records that are updated during the last index update',
+    updated_since_last_index_update => {
+        summary => 'Include only records that are updated since the last index update',
         schema => 'true*',
         tags => ['category:filtering'],
     },
-    updated_in_last_n_updates => {
-        summary => 'Include only records that are updated during the last N index updates',
+    updated_since_last_n_index_updates => {
+        summary => 'Include only records that are updated since the last N index updates',
         schema => 'posint*',
         tags => ['category:filtering'],
     },
-    # XXX choose one: updated_before/after or updated_in_last_update or updated_in_last_n_updates
+);
+
+our %fctime_or_mtime_args = (
+    added_or_updated_since => {
+        summary => 'Include only records that are added/updated since a certain date',
+        schema => ['date*', 'x.perl.coerce_rules' => ['From_str::natural']],
+        cmdline_aliases => {since=>{}},
+        tags => ['category:filtering'],
+    },
+    added_or_updated_since_last_index_update => {
+        summary => 'Include only records that are added/updated since the last index update',
+        schema => 'true*',
+        cmdline_aliases => {since_last_index_update=>{}},
+        tags => ['category:filtering'],
+    },
+    added_or_updated_since_last_n_index_updates => {
+        summary => 'Include only records that are added/updated since the last N index updates',
+        schema => 'posint*',
+        cmdline_aliases => {since_last_n_index_updates=>{}},
+        tags => ['category:filtering'],
+    },
 );
 
 our %perl_version_args = (
@@ -537,43 +546,45 @@ sub _set_args_default {
     }
 }
 
-# set {added,updated}_after time when {added,update}_in_last_updated
-sub _set_added_updated_times {
+# set {added_,updated_,added_or_udpated_}since from
+# {added_,updated_,added_or_updated_}since_last_{index_update,n_index_updates},
+# set, since SQL query will usually use the former
+sub _set_since {
     my ($args, $dbh) = @_;
 
-    if ($args->{added_in_last_update} || $args->{updated_in_last_update}) {
+    my $num_sinces = 0;
+    if (defined $args->{added_since}) { $num_sinces++ }
+    if (defined $args->{updated_since}) { $num_sinces++ }
+    if (defined $args->{added_or_updated_since}) { $num_sinces++ }
+    if (defined $args->{added_since_last_index_update} || defined $args->{updated_since_last_index_update} || defined $args->{added_or_updated_since_last_index_update}) {
         my ($time) = $dbh->selectrow_array("SELECT date FROM log WHERE category='update_index' AND summary LIKE 'Begin%' ORDER BY date DESC");
-        if (delete $args->{added_in_last_update}) {
-            $args->{added_after} //= $time // 0;
-        }
-        if (delete $args->{updated_in_last_update}) {
-            $args->{updated_after} //= $time // 0;
-        }
+        die "Index has not been updated at all, cannot use {added_,updated_,added_or_updated_}since_last_index_update option" unless $time;
+        if (delete $args->{added_since_last_index_update})            { $args->{added_since}            //= $time; $num_sinces++ }
+        if (delete $args->{updated_since_last_index_update})          { $args->{updated_since}          //= $time; $num_sinces++ }
+        if (delete $args->{added_or_updated_since_last_index_update}) { $args->{added_or_updated_since} //= $time; $num_sinces++ }
     }
-
-    {
-        last unless defined $args->{added_in_last_n_updates};
-        my $n = int($args->{added_in_last_n_updates});
-        last unless $n >= 1;
+    if (defined $args->{added_since_n_last_index_updates} || defined $args->{updated_since_last_n_index_updates} || defined $args->{added_or_updated_since_last_n_index_updates}) {
+        my $n = int($args->{added_since_last_n_index_updates} // $args->{updated_since_last_n_index_updates} // $args->{added_or_updated_since_last_n_index_updates});
+        $n = 1 if $n < 1;
         my $sth = $dbh->prepare("SELECT date FROM log WHERE category='update_index' AND summary LIKE 'Begin%' ORDER BY date DESC");
         $sth->execute;
         my $i = 0;
         my $time;
         1 while ++$i <= $n && (($time) = $sth->fetchrow_array);
-        $args->{added_after} //= $time // 0;
+        die "Index has not been updated that many times, please set a lower number for {,added_,updated_}since_last_n_index_updates option" if $i < $n;
+        if (delete $args->{added_since_last_n_index_updates})            { $args->{added_since}            //= $time; $num_sinces++ }
+        if (delete $args->{updated_since_last_n_index_updates})          { $args->{updated_since}          //= $time; $num_sinces++ }
+        if (delete $args->{added_or_updated_since_last_n_index_updates}) { $args->{added_or_updated_since} //= $time; $num_sinces++ }
     }
 
-    {
-        last unless defined $args->{updated_in_last_n_updates};
-        my $n = int($args->{updated_in_last_n_updates});
-        last unless $n >= 1;
-        my $sth = $dbh->prepare("SELECT date FROM log WHERE category='update_index' AND summary LIKE 'Begin%' ORDER BY date DESC");
-        $sth->execute;
-        my $i = 0;
-        my $time;
-        1 while ++$i <= $n && (($time) = $sth->fetchrow_array);
-        $args->{updated_after} //= $time // 0;
-    }
+    die "Multiple {added_,updated_,added_or_updated_}since options set, please set only one to avoid confusion" if $num_sinces > 1;
+}
+
+sub _add_since_where_clause {
+    my ($args, $where, $table) = @_;
+    if (defined $args->{added_since}  )          { push @$where, "$table.rec_ctime >= ". (0+$args->{added_since}) }
+    if (defined $args->{updated_since})          { push @$where, "$table.rec_mtime >= ". (0+$args->{updated_since}) }
+    if (defined $args->{added_or_updated_since}) { push @$where, "($table.rec_ctime >= ". (0+$args->{added_or_updated_since}). " OR $table.rec_mtime >= ". (0+$args->{added_or_updated_since}). ")" }
 }
 
 sub _fmt_time {
@@ -3279,8 +3290,7 @@ $SPEC{authors} = {
                 },
             },
         },
-        %fctime_args,
-        %fmtime_args,
+        %fctime_or_mtime_args,
     },
     result => {
         description => <<'_',
@@ -3353,11 +3363,8 @@ sub authors {
         }
     }
 
-    _set_added_updated_times(\%args, $dbh);
-    if (defined $args{added_before}  ) { push @where, "author.rec_ctime < ". (0+$args{added_before}) }
-    if (defined $args{added_after}   ) { push @where, "author.rec_ctime > ". (0+$args{added_after}) }
-    if (defined $args{updated_before}) { push @where, "author.rec_mtime < ". (0+$args{updated_before}) }
-    if (defined $args{updated_after} ) { push @where, "author.rec_mtime > ". (0+$args{updated_after}) }
+    _set_since(\%args, $dbh);
+    _add_since_where_clause(\%args, \@where, 'author');
 
     my $sql = "SELECT
   cpanid id,
@@ -3429,6 +3436,7 @@ $SPEC{modules} = {
         %perl_version_args,
         %fctime_args,
         %fmtime_args,
+        %fctime_or_mtime_args,
         namespaces => {
             'x.name.is_plural' => 1,
             summary => 'Select modules belonging to certain namespace(s)',
@@ -3527,11 +3535,8 @@ sub modules {
         push @where, "NOT file.is_latest_dist";
     }
 
-    _set_added_updated_times(\%args, $dbh);
-    if (defined $args{added_before}  ) { push @where, "module.rec_ctime < ". (0+$args{added_before}) }
-    if (defined $args{added_after}   ) { push @where, "module.rec_ctime > ". (0+$args{added_after}) }
-    if (defined $args{updated_before}) { push @where, "module.rec_mtime < ". (0+$args{updated_before}) }
-    if (defined $args{updated_after} ) { push @where, "module.rec_mtime > ". (0+$args{updated_after}) }
+    _set_since(\%args, $dbh);
+    _add_since_where_clause(\%args, \@where, 'module');
 
     my @order;
     for (@$sort) { /\A(-?)(\w+)/ and push @order, $2 . ($1 ? " DESC" : "") }
@@ -3616,6 +3621,7 @@ $SPEC{dists} = {
         %flatest_args,
         %fctime_args,
         %fmtime_args,
+        %fctime_or_mtime_args,
         has_makefilepl => {
             schema => 'bool',
             tags => ['category:filtering'],
@@ -3788,11 +3794,8 @@ sub dists {
         push @bind, $args{rel_mtime_newer_than};
     }
 
-    _set_added_updated_times(\%args, $dbh);
-    if (defined $args{added_before}  ) { push @where, "f.rec_ctime < ". (0+$args{added_before}) }
-    if (defined $args{added_after}   ) { push @where, "f.rec_ctime > ". (0+$args{added_after}) }
-    if (defined $args{updated_before}) { push @where, "f.rec_mtime < ". (0+$args{updated_before}) }
-    if (defined $args{updated_after} ) { push @where, "f.rec_mtime > ". (0+$args{updated_after}) }
+    _set_since(\%args, $dbh);
+    _add_since_where_clause(\%args, \@where, 'f');
 
     my @order;
     for (@$sort) { /\A(-?)(\w+)/ and push @order, $2 . ($1 ? " DESC" : "") }
@@ -3868,6 +3871,7 @@ $SPEC{'releases'} = {
         %flatest_args,
         %fctime_args,
         %fmtime_args,
+        %fctime_or_mtime_args,
         %full_path_args,
         %no_path_args,
         %sort_args_for_rels,
@@ -3942,11 +3946,8 @@ sub releases {
         push @where, "NOT(d.is_latest)";
     }
 
-    _set_added_updated_times(\%args, $dbh);
-    if (defined $args{added_before}  ) { push @where, "f1.rec_ctime < ". (0+$args{added_before}) }
-    if (defined $args{added_after}   ) { push @where, "f1.rec_ctime > ". (0+$args{added_after}) }
-    if (defined $args{updated_before}) { push @where, "f1.rec_mtime < ". (0+$args{updated_before}) }
-    if (defined $args{updated_after} ) { push @where, "f1.rec_mtime > ". (0+$args{updated_after}) }
+    _set_since(\%args, $dbh);
+    _add_since_where_clause(\%args, \@where, 'f1');
 
     my @order;
     for (@$sort) { /\A(-?)(\w+)/ and push @order, $2 . ($1 ? " DESC" : "") }
@@ -4026,10 +4027,7 @@ sub _get_prereqs {
         }
     }
 
-    if (defined $filters->{added_before}  ) { push @where, "dp.rec_ctime < ". (0+$filters->{added_before}) }
-    if (defined $filters->{added_after}   ) { push @where, "dp.rec_ctime > ". (0+$filters->{added_after}) }
-    if (defined $filters->{updated_before}) { push @where, "dp.rec_mtime < ". (0+$filters->{updated_before}) }
-    if (defined $filters->{updated_after} ) { push @where, "dp.rec_mtime > ". (0+$filters->{updated_after}) }
+    _add_since_where_clause($filters, \@where, 'dp');
 
     # fetch the dependency information
     my $sth = $dbh->prepare("SELECT
@@ -4170,10 +4168,7 @@ sub _get_revdeps {
         }
     }
 
-    if (defined $filters->{added_before}  ) { push @where, "dp.rec_ctime < ". (0+$filters->{added_before}) }
-    if (defined $filters->{added_after}   ) { push @where, "dp.rec_ctime > ". (0+$filters->{added_after}) }
-    if (defined $filters->{updated_before}) { push @where, "dp.rec_mtime < ". (0+$filters->{updated_before}) }
-    if (defined $filters->{updated_after} ) { push @where, "dp.rec_mtime > ". (0+$filters->{updated_after}) }
+    _add_since_where_clause($filters, \@where, 'dp');
 
     # get all dists that depend on that module
     my $sth = $dbh->prepare("SELECT
@@ -4358,6 +4353,7 @@ _
     %finclude_unindexed_args,
     %fctime_args,
     %fmtime_args,
+    %fctime_or_mtime_args,
 );
 
 our $deps_args_rels = {
@@ -4433,7 +4429,7 @@ sub deps {
     my $include_indexed = $args{include_indexed} // 1;
     my $include_unindexed = $args{include_unindexed} // 1;
 
-    _set_added_updated_times(\%args, $dbh);
+    _set_since(\%args, $dbh);
     my $filters = {
         include_core => $include_core,
         include_noncore => $include_noncore,
@@ -4441,10 +4437,9 @@ sub deps {
         include_unindexed => $include_unindexed,
         authors => $args{authors},
         authors_arent => $args{authors_arent},
-        added_before => $args{added_before},
-        added_after  => $args{added_after},
-        updated_before => $args{updated_before},
-        updated_after  => $args{updated_after},
+        added_since => $args{added_since},
+        updated_since => $args{updated_since},
+        added_or_updated_since => $args{added_or_updated_since},
     };
 
     my $res = _get_prereqs($file_ids, $dbh, {}, {},
@@ -4521,6 +4516,7 @@ _
     },
     %fctime_args,
     %fmtime_args,
+    %fctime_or_mtime_args,
 );
 
 our $rdeps_args_rels = {
@@ -4546,14 +4542,13 @@ sub rdeps {
     my $authors =  $args{authors} ? [map {uc} @{$args{authors}}] : undef;
     my $authors_arent = $args{authors_arent} ? [map {uc} @{$args{authors_arent}}] : undef;
 
-    _set_added_updated_times(\%args, $dbh);
+    _set_since(\%args, $dbh);
     my $filters = {
         authors => $authors,
         authors_arent => $authors_arent,
-        added_before => $args{added_before},
-        added_after  => $args{added_after},
-        updated_before => $args{updated_before},
-        updated_after  => $args{updated_after},
+        added_since => $args{added_since},
+        updated_since => $args{updated_since},
+        added_or_updated_since => $args{added_or_updated_since},
     };
 
     my $res = _get_revdeps($mods, $dbh, {}, {}, 1, $level, $filters, $args{flatten}, $args{dont_uniquify}, $args{phase}, $args{rel});
@@ -4618,6 +4613,7 @@ $SPEC{namespaces} = {
         },
         %fctime_args,
         %fmtime_args,
+        %fctime_or_mtime_args,
     },
 };
 sub namespaces {
@@ -4665,11 +4661,8 @@ sub namespaces {
         push @bind, $args{level}-1;
     }
 
-    _set_added_updated_times(\%args, $dbh);
-    if (defined $args{added_before}  ) { push @where, "namespace.rec_ctime < ". (0+$args{added_before}) }
-    if (defined $args{added_after}   ) { push @where, "namespace.rec_ctime > ". (0+$args{added_after}) }
-    if (defined $args{updated_before}) { push @where, "namespace.rec_mtime < ". (0+$args{updated_before}) }
-    if (defined $args{updated_after} ) { push @where, "namespace.rec_mtime > ". (0+$args{updated_after}) }
+    _set_since(\%args, $dbh);
+    _add_since_where_clause(\%args, \@where, "namespace");
 
     my $order = 'name';
     if ($args{sort} eq 'num_modules') {
@@ -4711,7 +4704,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.057 of App::lcpan (from Perl distribution App-lcpan), released on 2020-05-07.
+This document describes version 1.058 of App::lcpan (from Perl distribution App-lcpan), released on 2020-05-26.
 
 =head1 SYNOPSIS
 
@@ -4748,21 +4741,17 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<added_after> => I<date>
+=item * B<added_or_updated_since> => I<date>
 
-Include only records that are added after a certain date.
+Include only records that are addedE<sol>updated since a certain date.
 
-=item * B<added_before> => I<date>
+=item * B<added_or_updated_since_last_index_update> => I<true>
 
-Include only records that are added before a certain date.
+Include only records that are addedE<sol>updated since the last index update.
 
-=item * B<added_in_last_n_updates> => I<posint>
+=item * B<added_or_updated_since_last_n_index_updates> => I<posint>
 
-Include only records that are added during the last N index updates.
-
-=item * B<added_in_last_update> => I<true>
-
-Include only records that are added during the last index update.
+Include only records that are addedE<sol>updated since the last N index updates.
 
 =item * B<cpan> => I<dirname>
 
@@ -4790,22 +4779,6 @@ When there are more than one query, perform OR instead of AND logic.
 Search query.
 
 =item * B<query_type> => I<str> (default: "any")
-
-=item * B<updated_after> => I<date>
-
-Include only records that are updated after a certain date.
-
-=item * B<updated_before> => I<date>
-
-Include only records that are updated before a certain date.
-
-=item * B<updated_in_last_n_updates> => I<posint>
-
-Include only records that are updated during the last N index updates.
-
-=item * B<updated_in_last_update> => I<true>
-
-Include only records that are updated during the last index update.
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 
@@ -4882,21 +4855,29 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<added_after> => I<date>
+=item * B<added_or_updated_since> => I<date>
 
-Include only records that are added after a certain date.
+Include only records that are addedE<sol>updated since a certain date.
 
-=item * B<added_before> => I<date>
+=item * B<added_or_updated_since_last_index_update> => I<true>
 
-Include only records that are added before a certain date.
+Include only records that are addedE<sol>updated since the last index update.
 
-=item * B<added_in_last_n_updates> => I<posint>
+=item * B<added_or_updated_since_last_n_index_updates> => I<posint>
 
-Include only records that are added during the last N index updates.
+Include only records that are addedE<sol>updated since the last N index updates.
 
-=item * B<added_in_last_update> => I<true>
+=item * B<added_since> => I<date>
 
-Include only records that are added during the last index update.
+Include only records that are added since a certain date.
+
+=item * B<added_since_last_index_update> => I<true>
+
+Include only records that are added since the last index update.
+
+=item * B<added_since_last_n_index_updates> => I<posint>
+
+Include only records that are added since the last N index updates.
 
 =item * B<cpan> => I<dirname>
 
@@ -4975,7 +4956,7 @@ using the C<index_name>.
 
 Recurse for a number of levels (-1 means unlimited).
 
-=item * B<perl_version> => I<str> (default: "v5.30.0")
+=item * B<perl_version> => I<str> (default: "v5.30.2")
 
 Set base Perl version for determining core modules.
 
@@ -4983,21 +4964,17 @@ Set base Perl version for determining core modules.
 
 =item * B<rel> => I<str> (default: "requires")
 
-=item * B<updated_after> => I<date>
+=item * B<updated_since> => I<date>
 
-Include only records that are updated after a certain date.
+Include only records that are updated since certain date.
 
-=item * B<updated_before> => I<date>
+=item * B<updated_since_last_index_update> => I<true>
 
-Include only records that are updated before a certain date.
+Include only records that are updated since the last index update.
 
-=item * B<updated_in_last_n_updates> => I<posint>
+=item * B<updated_since_last_n_index_updates> => I<posint>
 
-Include only records that are updated during the last N index updates.
-
-=item * B<updated_in_last_update> => I<true>
-
-Include only records that are updated during the last index update.
+Include only records that are updated since the last N index updates.
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 
@@ -5058,21 +5035,29 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<added_after> => I<date>
+=item * B<added_or_updated_since> => I<date>
 
-Include only records that are added after a certain date.
+Include only records that are addedE<sol>updated since a certain date.
 
-=item * B<added_before> => I<date>
+=item * B<added_or_updated_since_last_index_update> => I<true>
 
-Include only records that are added before a certain date.
+Include only records that are addedE<sol>updated since the last index update.
 
-=item * B<added_in_last_n_updates> => I<posint>
+=item * B<added_or_updated_since_last_n_index_updates> => I<posint>
 
-Include only records that are added during the last N index updates.
+Include only records that are addedE<sol>updated since the last N index updates.
 
-=item * B<added_in_last_update> => I<true>
+=item * B<added_since> => I<date>
 
-Include only records that are added during the last index update.
+Include only records that are added since a certain date.
+
+=item * B<added_since_last_index_update> => I<true>
+
+Include only records that are added since the last index update.
+
+=item * B<added_since_last_n_index_updates> => I<posint>
+
+Include only records that are added since the last N index updates.
 
 =item * B<author> => I<str>
 
@@ -5123,21 +5108,17 @@ Search query.
 
 Sort the result.
 
-=item * B<updated_after> => I<date>
+=item * B<updated_since> => I<date>
 
-Include only records that are updated after a certain date.
+Include only records that are updated since certain date.
 
-=item * B<updated_before> => I<date>
+=item * B<updated_since_last_index_update> => I<true>
 
-Include only records that are updated before a certain date.
+Include only records that are updated since the last index update.
 
-=item * B<updated_in_last_n_updates> => I<posint>
+=item * B<updated_since_last_n_index_updates> => I<posint>
 
-Include only records that are updated during the last N index updates.
-
-=item * B<updated_in_last_update> => I<true>
-
-Include only records that are updated during the last index update.
+Include only records that are updated since the last N index updates.
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 
@@ -5232,21 +5213,29 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<added_after> => I<date>
+=item * B<added_or_updated_since> => I<date>
 
-Include only records that are added after a certain date.
+Include only records that are addedE<sol>updated since a certain date.
 
-=item * B<added_before> => I<date>
+=item * B<added_or_updated_since_last_index_update> => I<true>
 
-Include only records that are added before a certain date.
+Include only records that are addedE<sol>updated since the last index update.
 
-=item * B<added_in_last_n_updates> => I<posint>
+=item * B<added_or_updated_since_last_n_index_updates> => I<posint>
 
-Include only records that are added during the last N index updates.
+Include only records that are addedE<sol>updated since the last N index updates.
 
-=item * B<added_in_last_update> => I<true>
+=item * B<added_since> => I<date>
 
-Include only records that are added during the last index update.
+Include only records that are added since a certain date.
+
+=item * B<added_since_last_index_update> => I<true>
+
+Include only records that are added since the last index update.
+
+=item * B<added_since_last_n_index_updates> => I<posint>
+
+Include only records that are added since the last N index updates.
 
 =item * B<author> => I<str>
 
@@ -5291,7 +5280,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.30.0")
+=item * B<perl_version> => I<str> (default: "v5.30.2")
 
 Set base Perl version for determining core modules.
 
@@ -5305,21 +5294,17 @@ Search query.
 
 Sort the result.
 
-=item * B<updated_after> => I<date>
+=item * B<updated_since> => I<date>
 
-Include only records that are updated after a certain date.
+Include only records that are updated since certain date.
 
-=item * B<updated_before> => I<date>
+=item * B<updated_since_last_index_update> => I<true>
 
-Include only records that are updated before a certain date.
+Include only records that are updated since the last index update.
 
-=item * B<updated_in_last_n_updates> => I<posint>
+=item * B<updated_since_last_n_index_updates> => I<posint>
 
-Include only records that are updated during the last N index updates.
-
-=item * B<updated_in_last_update> => I<true>
-
-Include only records that are updated during the last index update.
+Include only records that are updated since the last N index updates.
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 
@@ -5362,21 +5347,29 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<added_after> => I<date>
+=item * B<added_or_updated_since> => I<date>
 
-Include only records that are added after a certain date.
+Include only records that are addedE<sol>updated since a certain date.
 
-=item * B<added_before> => I<date>
+=item * B<added_or_updated_since_last_index_update> => I<true>
 
-Include only records that are added before a certain date.
+Include only records that are addedE<sol>updated since the last index update.
 
-=item * B<added_in_last_n_updates> => I<posint>
+=item * B<added_or_updated_since_last_n_index_updates> => I<posint>
 
-Include only records that are added during the last N index updates.
+Include only records that are addedE<sol>updated since the last N index updates.
 
-=item * B<added_in_last_update> => I<true>
+=item * B<added_since> => I<date>
 
-Include only records that are added during the last index update.
+Include only records that are added since a certain date.
+
+=item * B<added_since_last_index_update> => I<true>
+
+Include only records that are added since the last index update.
+
+=item * B<added_since_last_n_index_updates> => I<posint>
+
+Include only records that are added since the last N index updates.
 
 =item * B<cpan> => I<dirname>
 
@@ -5413,21 +5406,17 @@ Search query.
 
 =item * B<to_level> => I<int>
 
-=item * B<updated_after> => I<date>
+=item * B<updated_since> => I<date>
 
-Include only records that are updated after a certain date.
+Include only records that are updated since certain date.
 
-=item * B<updated_before> => I<date>
+=item * B<updated_since_last_index_update> => I<true>
 
-Include only records that are updated before a certain date.
+Include only records that are updated since the last index update.
 
-=item * B<updated_in_last_n_updates> => I<posint>
+=item * B<updated_since_last_n_index_updates> => I<posint>
 
-Include only records that are updated during the last N index updates.
-
-=item * B<updated_in_last_update> => I<true>
-
-Include only records that are updated during the last index update.
+Include only records that are updated since the last N index updates.
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 
@@ -5466,21 +5455,29 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<added_after> => I<date>
+=item * B<added_or_updated_since> => I<date>
 
-Include only records that are added after a certain date.
+Include only records that are addedE<sol>updated since a certain date.
 
-=item * B<added_before> => I<date>
+=item * B<added_or_updated_since_last_index_update> => I<true>
 
-Include only records that are added before a certain date.
+Include only records that are addedE<sol>updated since the last index update.
 
-=item * B<added_in_last_n_updates> => I<posint>
+=item * B<added_or_updated_since_last_n_index_updates> => I<posint>
 
-Include only records that are added during the last N index updates.
+Include only records that are addedE<sol>updated since the last N index updates.
 
-=item * B<added_in_last_update> => I<true>
+=item * B<added_since> => I<date>
 
-Include only records that are added during the last index update.
+Include only records that are added since a certain date.
+
+=item * B<added_since_last_index_update> => I<true>
+
+Include only records that are added since the last index update.
+
+=item * B<added_since_last_n_index_updates> => I<posint>
+
+Include only records that are added since the last N index updates.
 
 =item * B<author> => I<str>
 
@@ -5525,7 +5522,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.30.0")
+=item * B<perl_version> => I<str> (default: "v5.30.2")
 
 Set base Perl version for determining core modules.
 
@@ -5539,21 +5536,17 @@ Search query.
 
 Sort the result.
 
-=item * B<updated_after> => I<date>
+=item * B<updated_since> => I<date>
 
-Include only records that are updated after a certain date.
+Include only records that are updated since certain date.
 
-=item * B<updated_before> => I<date>
+=item * B<updated_since_last_index_update> => I<true>
 
-Include only records that are updated before a certain date.
+Include only records that are updated since the last index update.
 
-=item * B<updated_in_last_n_updates> => I<posint>
+=item * B<updated_since_last_n_index_updates> => I<posint>
 
-Include only records that are updated during the last N index updates.
-
-=item * B<updated_in_last_update> => I<true>
-
-Include only records that are updated during the last index update.
+Include only records that are updated since the last N index updates.
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 
@@ -5596,21 +5589,29 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<added_after> => I<date>
+=item * B<added_or_updated_since> => I<date>
 
-Include only records that are added after a certain date.
+Include only records that are addedE<sol>updated since a certain date.
 
-=item * B<added_before> => I<date>
+=item * B<added_or_updated_since_last_index_update> => I<true>
 
-Include only records that are added before a certain date.
+Include only records that are addedE<sol>updated since the last index update.
 
-=item * B<added_in_last_n_updates> => I<posint>
+=item * B<added_or_updated_since_last_n_index_updates> => I<posint>
 
-Include only records that are added during the last N index updates.
+Include only records that are addedE<sol>updated since the last N index updates.
 
-=item * B<added_in_last_update> => I<true>
+=item * B<added_since> => I<date>
 
-Include only records that are added during the last index update.
+Include only records that are added since a certain date.
+
+=item * B<added_since_last_index_update> => I<true>
+
+Include only records that are added since the last index update.
+
+=item * B<added_since_last_n_index_updates> => I<posint>
+
+Include only records that are added since the last N index updates.
 
 =item * B<authors> => I<array[str]>
 
@@ -5661,21 +5662,17 @@ Recurse for a number of levels (-1 means unlimited).
 
 =item * B<rel> => I<str> (default: "ALL")
 
-=item * B<updated_after> => I<date>
+=item * B<updated_since> => I<date>
 
-Include only records that are updated after a certain date.
+Include only records that are updated since certain date.
 
-=item * B<updated_before> => I<date>
+=item * B<updated_since_last_index_update> => I<true>
 
-Include only records that are updated before a certain date.
+Include only records that are updated since the last index update.
 
-=item * B<updated_in_last_n_updates> => I<posint>
+=item * B<updated_since_last_n_index_updates> => I<posint>
 
-Include only records that are updated during the last N index updates.
-
-=item * B<updated_in_last_update> => I<true>
-
-Include only records that are updated during the last index update.
+Include only records that are updated since the last N index updates.
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 
@@ -5721,21 +5718,29 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<added_after> => I<date>
+=item * B<added_or_updated_since> => I<date>
 
-Include only records that are added after a certain date.
+Include only records that are addedE<sol>updated since a certain date.
 
-=item * B<added_before> => I<date>
+=item * B<added_or_updated_since_last_index_update> => I<true>
 
-Include only records that are added before a certain date.
+Include only records that are addedE<sol>updated since the last index update.
 
-=item * B<added_in_last_n_updates> => I<posint>
+=item * B<added_or_updated_since_last_n_index_updates> => I<posint>
 
-Include only records that are added during the last N index updates.
+Include only records that are addedE<sol>updated since the last N index updates.
 
-=item * B<added_in_last_update> => I<true>
+=item * B<added_since> => I<date>
 
-Include only records that are added during the last index update.
+Include only records that are added since a certain date.
+
+=item * B<added_since_last_index_update> => I<true>
+
+Include only records that are added since the last index update.
+
+=item * B<added_since_last_n_index_updates> => I<posint>
+
+Include only records that are added since the last N index updates.
 
 =item * B<author> => I<str>
 
@@ -5784,21 +5789,17 @@ Search query.
 
 =item * B<sort> => I<array[str]> (default: ["name"])
 
-=item * B<updated_after> => I<date>
+=item * B<updated_since> => I<date>
 
-Include only records that are updated after a certain date.
+Include only records that are updated since certain date.
 
-=item * B<updated_before> => I<date>
+=item * B<updated_since_last_index_update> => I<true>
 
-Include only records that are updated before a certain date.
+Include only records that are updated since the last index update.
 
-=item * B<updated_in_last_n_updates> => I<posint>
+=item * B<updated_since_last_n_index_updates> => I<posint>
 
-Include only records that are updated during the last N index updates.
-
-=item * B<updated_in_last_update> => I<true>
-
-Include only records that are updated during the last index update.
+Include only records that are updated since the last N index updates.
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 

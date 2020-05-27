@@ -1,5 +1,68 @@
 Revision history for MIDI-Ngram
 
+0.1501 2020-05-26 15:12:36
+    - Drop unused bounds attribute.
+    - Clean-up test code.
+
+0.1500 2020-05-26 11:53:51
+    - Process simultaneous events!
+
+0.1401 2020-05-25 15:53:24
+    - Replace AWOL playback text output parens.
+    - Update documentation.
+
+0.1400 2020-05-25 11:05:26
+    - Make the duration and note convert routines proper methods.
+    - Enhance eg/ngram-play.
+
+0.1300 2020-05-25 09:53:34
+    - Compute the duration transition network.
+
+0.1201 2020-05-25 09:17:14
+    - Add a crucial Prereqs section to the dist.ini.
+
+0.1200 2020-05-24 17:06:30
+    - Improve eg/ngram-play.
+    - Process and play phrase durations.
+
+0.1106 2020-05-23 21:02:39
+    - Improve documentation.
+
+0.1105 2020-05-23 20:30:26
+    - Improve documentation.
+    - Improve tests.
+
+0.1104 2020-05-23 18:14:27
+    - Improve documentation.
+
+0.1103 2020-05-23 00:18:30
+    - Fix-up eg/ngram-play a bit.
+    - Improve documentation.
+
+0.1101 2020-05-22 11:33:19
+    - Fix ngram_size group logic for net computation.
+    - Enhance eg/ngram-play to show ISO note names instead of MIDI numbers.
+
+0.1100 2020-05-22 10:29:59
+    - Add transition network processing.
+    - Enhance eg/ngram-play to create a graphviz diagram.
+
+0.1003 2020-05-22 02:43:24
+    - Fix eg/ngram-play.
+    - Improve documentation.
+
+0.1002 2020-05-22 02:10:47
+    - Improve tests.
+    - Improve documentation.
+
+0.1001 2020-05-22 01:35:34
+    - Improve documentation.
+
+0.1000 2020-05-22 01:29:41
+    - Improve documentation.
+    - Clean-up code.
+    - Use the MIDI::Util module instead of manually building a score, etc.
+
 0.0901 2018-02-20 21:25:52
     - CRUCIAL FIX: Accumulate ngram phrase counts instead of overwriting.
 

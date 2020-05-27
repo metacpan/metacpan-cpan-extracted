@@ -1,4 +1,4 @@
-# -*- perl -*-
+#!/usr/bin/perl
 
 # t/04.colour.t - terminal coloured message
 

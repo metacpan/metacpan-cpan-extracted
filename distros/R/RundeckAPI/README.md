@@ -20,6 +20,7 @@ instance via REST API
     my $hashRef = $api->get("/api/27/system/info");
     my $json = '{some: value}';
     $hashRef = $api->put(/api/27/endpoint_for_put, $json);
+
 # METHODS
   "new"         Returns an object authenticated and connected to a Rundeck
                 Instance
@@ -33,6 +34,11 @@ instance via REST API
   "put"         Sends a PUT query. Similar to post
 
   "delete"      Sends a DELETE query. Similar to get
+
+  "postFile"    POST a file. Requet three arguments : endpoint, mime-type
+                and the appropriate data. Returns a hash reference.
+
+  "putFile"     Similar to postFile
 
 Returns a hash reference containing the data sent by Rundeck.
 See documentation for Rundeck's [API](https://docs.rundeck.com/docs/api/rundeck-api.html) and returned data

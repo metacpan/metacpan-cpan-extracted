@@ -5,7 +5,7 @@ use Test2::V0;
 use App::Licensecheck;
 use Path::Tiny;
 
-plan 87;
+plan 88;
 
 my $app = App::Licensecheck->new;
 $app->lines(0);

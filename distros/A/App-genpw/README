@@ -2,8 +2,8 @@ NAME
     App::genpw - Generate random password, with patterns and wordlists
 
 VERSION
-    This document describes version 0.009 of App::genpw (from Perl
-    distribution App-genpw), released on 2018-07-01.
+    This document describes version 0.011 of App::genpw (from Perl
+    distribution App-genpw), released on 2020-05-22.
 
 SYNOPSIS
     See the included script genpw.
@@ -12,7 +12,7 @@ FUNCTIONS
   genpw
     Usage:
 
-     genpw(%args) -> [status, msg, result, meta]
+     genpw(%args) -> [status, msg, payload, meta]
 
     Generate random password, with patterns and wordlists.
 
@@ -85,6 +85,8 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   action => *str* (default: "gen")
+
     *   case => *str* (default: "default")
 
         Force casing.
@@ -138,7 +140,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -158,20 +160,11 @@ BUGS
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
 
-SEE ALSO
-    genpw-base56.
-
-    genpw-base64.
-
-    genpw-id.
-
-    genpw-wordlist.
-
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

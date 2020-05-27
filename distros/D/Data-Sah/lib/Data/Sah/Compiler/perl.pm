@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::perl;
 
-our $DATE = '2020-02-12'; # DATE
-our $VERSION = '0.907'; # VERSION
+our $DATE = '2020-05-21'; # DATE
+our $VERSION = '0.908'; # VERSION
 
 use 5.010;
 use strict;
@@ -109,10 +109,12 @@ our %known_modules = (
     'DateTime::Format::Natural'   => {pp=>1, core=>0},
     'experimental'              => {pp=>1, core=>0}, # only core in 5.020+, so we note it as 0
     'List::Util'                => {pp=>0, core=>1},
+    'PERLANCAR::Module::List'   => {pp=>1, core=>0},
     'Scalar::Util::Numeric'     => {pp=>0, core=>0},
     'Scalar::Util::Numeric::PP' => {pp=>1, core=>0},
     'Scalar::Util'              => {pp=>0, core=>1},
     'Storable'                  => {pp=>0, core=>1},
+    'String::Wildcard::Bash'    => {pp=>1, core=>0},
     'Time::Duration::Parse::AsHash' => {pp=>1, core=>0},
     'Time::Local'               => {pp=>1, core=>1},
     'Time::Moment'              => {pp=>0, core=>0},
@@ -483,7 +485,7 @@ Data::Sah::Compiler::perl - Compile Sah schema to Perl code
 
 =head1 VERSION
 
-This document describes version 0.907 of Data::Sah::Compiler::perl (from Perl distribution Data-Sah), released on 2020-02-12.
+This document describes version 0.908 of Data::Sah::Compiler::perl (from Perl distribution Data-Sah), released on 2020-05-21.
 
 =head1 SYNOPSIS
 

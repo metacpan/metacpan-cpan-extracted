@@ -1,0 +1,17 @@
+0.003   2020-05-22  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename modules from
+	  WordList::EN::PersonName::PopularBabyName{s,}::US::SSA::* for
+	  consistency.
+
+
+0.002   2020-05-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename modules from
+	  WordList{,::EN}::PersonName::PopularBabyNames::US::SSA::*, for
+	  consistency.
+
+
+0.001   2019-05-01  Released-By: PERLANCAR
+
+        - First release.

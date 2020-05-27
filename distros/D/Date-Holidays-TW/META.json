@@ -35,13 +35,13 @@
    "provides" : {
       "Date::Holidays::TW" : {
          "file" : "lib/Date/Holidays/TW.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.1"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/gugod/Date-Holidays-TW/issues"
+         "web" : "https://github.com/perltaiwan/Date-Holidays-TW/issues"
       },
       "repository" : {
          "type" : "git",
@@ -49,7 +49,7 @@
          "web" : "https://github.com/perltaiwan/Date-Holidays-TW"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.1.1",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_spdx_expression" : "MIT",
    "x_static_install" : "1"

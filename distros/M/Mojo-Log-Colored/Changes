@@ -1,5 +1,10 @@
 Revision history for Perl extension Mojo-Log-Colored
 
+0.03 2020-05-22T12:32:37Z
+
+    - Do not color line endings (Tina Müller)
+    - POD updates (Mohammad S Anwar)
+
 0.02 2017-07-09T11:56:49Z
 
     - require at least Mojolicious 5.00 because the logger changed its internals at that point

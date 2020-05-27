@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::TotalWeight;
-$Shipment::Purolator::WSDLV2::Types::TotalWeight::VERSION = '3.04';
+$Shipment::Purolator::WSDLV2::Types::TotalWeight::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -61,7 +61,7 @@ Shipment::Purolator::WSDLV2::Types::TotalWeight
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 

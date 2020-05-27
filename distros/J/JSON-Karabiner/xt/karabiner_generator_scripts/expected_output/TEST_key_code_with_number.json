@@ -1,0 +1,21 @@
+{
+   "rules" : [
+      {
+         "description" : "some rule name",
+         "manipulators" : [
+            {
+               "from" : {
+                  "key_code" : "a"
+               },
+               "to" : [
+                  {
+                     "key_code" : "9"
+                  }
+               ],
+               "type" : "basic"
+            }
+         ]
+      }
+   ],
+   "title" : "some title"
+}

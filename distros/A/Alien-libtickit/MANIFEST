@@ -2,7 +2,7 @@ Build.PL
 Changes
 inc/Alien/make/Module/Build.pm
 lib/Alien/libtickit.pm
-libtickit-0.3.4.tar.gz
+libtickit-0.4.0.tar.gz
 LICENSE
 MANIFEST			This list of files
 META.json

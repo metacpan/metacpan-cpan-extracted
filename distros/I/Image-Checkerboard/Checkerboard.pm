@@ -9,7 +9,7 @@ use Imager;
 use Imager::Fill;
 use List::MoreUtils qw(none);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -138,17 +138,20 @@ Image::Checkerboard - Image generator for checkboards.
 =head1 SYNOPSIS
 
  use Image::Checkerboard;
+
  my $image = Image::Checkerboard->new(%parameters);
  my $suffix = $image->create($path);
  my $type = $image->type($type);
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%parameters)>
+ my $image = Image::Checkerboard->new(%parameters);
 
- Constructor
+Constructor.
+
+Returns instance of object.
 
 =over 8
 
@@ -194,17 +197,21 @@ Image::Checkerboard - Image generator for checkboards.
 
 =back
 
-=item C<create($path)>
+=head2 C<create>
 
- Create image.
- Returns scalar value of supported file type.
+ my $suffix = $image->create($path);
 
-=item C<type([$type])>
+Create image.
 
- Set/Get image type.
- Returns actual type of image.
+Returns scalar value of supported file type.
 
-=back
+=head2 C<type>
+
+ my $type = $image->type($type);
+
+Set/Get image type.
+
+Returns actual type of image.
 
 =head1 ERRORS
 
@@ -259,7 +266,8 @@ Image::Checkerboard - Image generator for checkboards.
 L<Class::Utils>,
 L<Error::Pure>,
 L<Imager>,
-L<Imager::Fill>.
+L<Imager::Fill>,
+L<List::MoreUtils>.
 
 =head1 SEE ALSO
 
@@ -287,11 +295,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2012-2020 Michal Josef Špaček
- BSD 2-Clause License
+© 2012-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

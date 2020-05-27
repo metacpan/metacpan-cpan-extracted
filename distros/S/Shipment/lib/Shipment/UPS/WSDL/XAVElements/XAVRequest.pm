@@ -1,6 +1,6 @@
 
 package Shipment::UPS::WSDL::XAVElements::XAVRequest;
-$Shipment::UPS::WSDL::XAVElements::XAVRequest::VERSION = '3.04';
+$Shipment::UPS::WSDL::XAVElements::XAVRequest::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -89,7 +89,7 @@ Shipment::UPS::WSDL::XAVElements::XAVRequest
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 

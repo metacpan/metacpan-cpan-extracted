@@ -3,7 +3,7 @@ package Test::FTP::Server;
 use strict;
 use warnings;
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 use Carp;
 
@@ -230,6 +230,12 @@ Test::FTP::Server is for test use only. "root" and "sandbox" is not using chroot
 =head1 AUTHOR
 
 Taku Amano E<lt>taku@toi-planning.netE<gt>
+
+=head1 CONTRIBUTORS
+
+Kazuhiro Osawa
+
+Roy Storey
 
 =head1 SEE ALSO
 

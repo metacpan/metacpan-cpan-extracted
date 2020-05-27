@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::ArrayOfService;
-$Shipment::Purolator::WSDL::Types::ArrayOfService::VERSION = '3.04';
+$Shipment::Purolator::WSDL::Types::ArrayOfService::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -54,7 +54,7 @@ Shipment::Purolator::WSDL::Types::ArrayOfService
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 

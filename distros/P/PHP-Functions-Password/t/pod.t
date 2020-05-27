@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-# $Id: pod.t,v 1.1 2017/06/13 00:51:28 cmanley Exp $
 use strict;
 use File::Find;
 use FindBin ();

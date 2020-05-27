@@ -8,7 +8,7 @@ package Tickit::Term;
 use strict;
 use warnings;
 
-our $VERSION = '0.70';
+our $VERSION = '0.71';
 
 use Carp;
 
@@ -113,17 +113,9 @@ sub new
    my $class = shift;
    my %params = @_;
 
-   my $self = $class->_new( $ENV{TERM} ) or croak "Cannot construct Tickit::Term - $!";
-
-   $self->set_input_handle ( $params{input_handle}  ) if $params{input_handle};
-   $self->set_output_handle( $params{output_handle} ) if $params{output_handle};
-
-   my $writer = $params{writer};
-   $self->set_output_func( sub { $writer->write( @_ ) } ) if $writer;
-
-   $self->set_utf8( $params{UTF8} ) if defined $params{UTF8};
-
-   return $self;
+   return $class->_new(
+      $ENV{TERM}, @params{qw( input_handle output_handle writer UTF8 )}
+   ) || croak "Cannot construct Tickit::Term - $!";
 }
 
 =head2 open_stdio
@@ -260,6 +252,10 @@ more of the following constants:
 =item TICKIT_BIND_FIRST
 
 Inserts this event handler first in the chain, before any existing ones.
+
+=item TICKIT_BIND_ONESHOT
+
+Remove the event handler after it has been invoked the first time.
 
 =back
 

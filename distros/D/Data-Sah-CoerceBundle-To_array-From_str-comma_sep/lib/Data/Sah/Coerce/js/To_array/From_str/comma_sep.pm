@@ -1,9 +1,9 @@
 package Data::Sah::Coerce::js::To_array::From_str::comma_sep;
 
-# AUTHOR
-our $DATE = '2019-11-28'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-21'; # DATE
 our $DIST = 'Data-Sah-CoerceBundle-To_array-From_str-comma_sep'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,13 +14,22 @@ sub meta {
         v => 4,
         summary => 'Coerce array from a comma-separated items in a string',
         prio => 60, # a bit lower than normal
+        args => {
+            separator => {
+                schema => ['str*', min_len=>1],
+                default => ',',
+            },
+        },
     };
 }
 
 sub coerce {
-    my %args = @_;
+    require String::JS;
 
-    my $dt = $args{data_term};
+    my %cargs = @_;
+
+    my $dt = $cargs{data_term};
+    my $gen_args = $cargs{args};
 
     my $res = {};
 
@@ -29,7 +38,8 @@ sub coerce {
         "typeof($dt)=='string'",
     );
 
-    $res->{expr_coerce} = "$dt.split(/\\s*,\\s*/)";
+    my $sep = $gen_args->{separator} // ',';
+    $res->{expr_coerce} = "$dt.split(RegExp('\\\\s*' + String(" . String::JS::encode_js_string($sep) . ").replace(/(\\W)/g, '\\\\\$1') + '\\\\s*'))";
 
     $res;
 }
@@ -49,7 +59,7 @@ Data::Sah::Coerce::js::To_array::From_str::comma_sep - Coerce array from a comma
 
 =head1 VERSION
 
-This document describes version 0.011 of Data::Sah::Coerce::js::To_array::From_str::comma_sep (from Perl distribution Data-Sah-CoerceBundle-To_array-From_str-comma_sep), released on 2019-11-28.
+This document describes version 0.012 of Data::Sah::Coerce::js::To_array::From_str::comma_sep (from Perl distribution Data-Sah-CoerceBundle-To_array-From_str-comma_sep), released on 2020-05-21.
 
 =head1 SYNOPSIS
 
@@ -81,7 +91,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

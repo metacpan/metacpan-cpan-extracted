@@ -1,7 +1,9 @@
 package App::WordListUtils;
 
-our $DATE = '2016-06-09'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-22'; # DATE
+our $DIST = 'App-WordListUtils'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 
@@ -20,7 +22,7 @@ App::WordListUtils - Collection of CLI utilities related to WordList
 
 =head1 VERSION
 
-This document describes version 0.001 of App::WordListUtils (from Perl distribution App-WordListUtils), released on 2016-06-09.
+This document describes version 0.002 of App::WordListUtils (from Perl distribution App-WordListUtils), released on 2020-05-22.
 
 =head1 SYNOPSIS
 
@@ -53,13 +55,15 @@ feature.
 
 L<WordList>
 
+L<wordlist> which is distributed separately (with L<App::wordlist>)
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

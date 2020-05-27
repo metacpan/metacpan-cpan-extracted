@@ -1,5 +1,5 @@
 package Shipment::Base;
-$Shipment::Base::VERSION = '3.04';
+$Shipment::Base::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -153,9 +153,10 @@ has 'goods_value' => (
 
 
 has 'pickup_date' => (
-    is     => 'rw',
-    isa    => DateAndTime,
-    coerce => \&coerce_datetime,
+    is      => 'rw',
+    isa     => DateAndTime,
+    coerce  => \&coerce_datetime,
+    default => sub { DateTime->now },
 );
 
 
@@ -387,7 +388,7 @@ Shipment::Base
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 SYNOPSIS
 

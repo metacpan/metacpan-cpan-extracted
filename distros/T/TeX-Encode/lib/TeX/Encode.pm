@@ -13,7 +13,7 @@ use TeX::Encode::BibTeX;
 
 our @ISA = qw(Encode::Encoding);
 
-our $VERSION = '2.008'; # VERSION
+our $VERSION = '2.009'; # VERSION
 
 __PACKAGE__->Define(qw(LaTeX latex));
 
@@ -77,7 +77,7 @@ sub encode
 		}
 
 		# basic unreserved characters
-		/\G([\sa-zA-Z0-9\.,:;'"\(\)=\/]+)/gc and ($tex .= $1, next);
+		/\G([\sa-zA-Z0-9\.,:;'"\(\)=\-\/\[\]\*\+!]+)/gc and ($tex .= $1, next);
 
 		# unsupported code point (may set $bad_cp)
 		/\G(.)/gc and ($tex .= &$check(ord($1)), next);

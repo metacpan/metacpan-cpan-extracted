@@ -85,7 +85,7 @@ A callback for formatting log messages. Cannot be passed to `new` at constructio
 
 # ACKNOWLEDGEMENTS
 
-This plugin was inspired by lanti asking about a way to easier find specific errors
+This plugin was inspired by lanti asking about a way to find specific errors more easily
 in the Mojo log during unit test runs on [Stack Overflow](https://stackoverflow.com/q/44965998/1331451).
 
 # LICENSE

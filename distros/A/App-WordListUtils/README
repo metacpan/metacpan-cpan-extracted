@@ -1,11 +1,42 @@
-SYNOPSIS
+NAME
+    App::WordListUtils - Collection of CLI utilities related to WordList
 
+VERSION
+    This document describes version 0.002 of App::WordListUtils (from Perl
+    distribution App-WordListUtils), released on 2020-05-22.
+
+SYNOPSIS
     This distribution provides the following command-line utilities related
     to WordList:
 
-    #INSERT_EXECS_LIST
+    *   list-wordlist-modules
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-WordListUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-WordListUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-WordListUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     WordList
+
+    wordlist which is distributed separately (with App::wordlist)
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

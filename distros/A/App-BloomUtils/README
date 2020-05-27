@@ -2,13 +2,19 @@ NAME
     App::BloomUtils - Utilities related to bloom filters
 
 VERSION
-    This document describes version 0.002 of App::BloomUtils (from Perl
-    distribution App-BloomUtils), released on 2018-03-23.
+    This document describes version 0.004 of App::BloomUtils (from Perl
+    distribution App-BloomUtils), released on 2020-05-24.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
 
     *   bloom-filter-calculator
+
+    *   bloomcalc
+
+    *   bloomchk
+
+    *   bloomgen
 
     *   check-with-bloom-filter
 
@@ -18,42 +24,61 @@ FUNCTIONS
   bloom_filter_calculator
     Usage:
 
-     bloom_filter_calculator(%args) -> [status, msg, result, meta]
+     bloom_filter_calculator(%args) -> [status, msg, payload, meta]
 
     Help calculate num_bits (m) and num_hashes (k).
 
-    Bloom filter is setup using two parameters: "num_bits" ("m") which is
-    the size of the bloom filter (in bits) and "num_hashes" ("k") which is
-    the number of hash functions to use which will determine the write and
-    lookup speed.
-
-    Some rules of thumb:
+    You supply lines of text from STDIN and it will output the bloom filter
+    bits on STDOUT. You can also customize "num_bits" ("m") and "num_hashes"
+    ("k"), or, more easily, "num_items" and "fp_rate". Some rules of thumb
+    to remember:
 
     *   One byte per item in the input set gives about a 2% false positive
         rate. So if you expect two have 1024 elements, create a 1KB bloom
         filter with about 2% false positive rate. For other false positive
         rates:
 
-        1% - 9.6 bits per item 0.1% - 14.4 bits per item 0.01% - 19.2 bits
-        per item
+        10% - 4.8 bits per item 1% - 9.6 bits per item 0.1% - 14.4 bits per
+        item 0.01% - 19.2 bits per item
 
     *   Optimal number of hash functions is 0.7 times number of bits per
-        item.
+        item. Note that the number of hashes dominate performance. If you
+        want higher performance, pick a smaller number of hashes. But for
+        most cases, use the the optimal number of hash functions.
 
     *   What is an acceptable false positive rate? This depends on your
-        needs.
+        needs. 1% (1 in 100) or 0.1% (1 in 1,000) is a good start. If you
+        want to make sure that user's chosen password is not in a known
+        wordlist, a higher false positive rates will annoy your user more by
+        rejecting her password more often, while lower false positive rates
+        will require a higher memory usage.
 
     Ref: https://corte.si/posts/code/bloom-filter-rules-of-thumb/index.html
+
+    FAQ
+
+    *   Why does two different false positive rates (e.g. 1% and 0.1%) give
+        the same bloom filter size?
+
+        The parameter "m" is rounded upwards to the nearest power of 2 (e.g.
+        1024*8 bits becomes 1024*8 bits but 1025*8 becomes 2048*8 bits), so
+        sometimes two false positive rates with different "m" get rounded to
+        the same value of "m". Use the "bloom_filter_calculator" routine to
+        see the "actual_m" and "actual_p" (actual false-positive rate).
 
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
 
-    *   false_positive_rate => *num* (default: 0.02)
+    *   false_positive_rate => *float* (default: 0.02)
 
-    *   num_hashes => *num*
+    *   num_bits => *posint*
 
-    *   num_hashes_to_bits_per_item_ratio => *num* (default: 0.7)
+        Number of bits to set for the bloom filter.
+
+    *   num_hashes => *posint*
+
+    *   num_hashes_to_bits_per_item_ratio => *num*
 
         0.7 (the default) is optimal.
 
@@ -66,7 +91,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -75,7 +100,7 @@ FUNCTIONS
   check_with_bloom_filter
     Usage:
 
-     check_with_bloom_filter(%args) -> [status, msg, result, meta]
+     check_with_bloom_filter(%args) -> [status, msg, payload, meta]
 
     Check with bloom filter.
 
@@ -97,7 +122,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -106,50 +131,80 @@ FUNCTIONS
   gen_bloom_filter
     Usage:
 
-     gen_bloom_filter(%args) -> [status, msg, result, meta]
+     gen_bloom_filter(%args) -> [status, msg, payload, meta]
 
     Generate bloom filter.
 
+    Examples:
+
+    *   Create a bloom filter for 100k items and 0.1% maximum false-positive
+        rate (actual bloom size and false-positive rate will be shown on
+        stderr):
+
+         gen_bloom_filter( false_positive_rate => "0.1%", num_items => 100000);
+
     You supply lines of text from STDIN and it will output the bloom filter
     bits on STDOUT. You can also customize "num_bits" ("m") and "num_hashes"
-    ("k"). Some rules of thumb to remember:
+    ("k"), or, more easily, "num_items" and "fp_rate". Some rules of thumb
+    to remember:
 
     *   One byte per item in the input set gives about a 2% false positive
         rate. So if you expect two have 1024 elements, create a 1KB bloom
         filter with about 2% false positive rate. For other false positive
         rates:
 
-        1% - 9.6 bits per item 0.1% - 14.4 bits per item 0.01% - 19.2 bits
-        per item
+        10% - 4.8 bits per item 1% - 9.6 bits per item 0.1% - 14.4 bits per
+        item 0.01% - 19.2 bits per item
 
     *   Optimal number of hash functions is 0.7 times number of bits per
-        item.
+        item. Note that the number of hashes dominate performance. If you
+        want higher performance, pick a smaller number of hashes. But for
+        most cases, use the the optimal number of hash functions.
 
     *   What is an acceptable false positive rate? This depends on your
-        needs.
+        needs. 1% (1 in 100) or 0.1% (1 in 1,000) is a good start. If you
+        want to make sure that user's chosen password is not in a known
+        wordlist, a higher false positive rates will annoy your user more by
+        rejecting her password more often, while lower false positive rates
+        will require a higher memory usage.
 
     Ref: https://corte.si/posts/code/bloom-filter-rules-of-thumb/index.html
+
+    FAQ
+
+    *   Why does two different false positive rates (e.g. 1% and 0.1%) give
+        the same bloom filter size?
+
+        The parameter "m" is rounded upwards to the nearest power of 2 (e.g.
+        1024*8 bits becomes 1024*8 bits but 1025*8 becomes 2048*8 bits), so
+        sometimes two false positive rates with different "m" get rounded to
+        the same value of "m". Use the "bloom_filter_calculator" routine to
+        see the "actual_m" and "actual_p" (actual false-positive rate).
 
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
 
-    *   num_bits => *num* (default: 80000)
+    *   false_positive_rate => *float*
 
-        The default is 80000 (generates a ~10KB bloom filter). If you supply
-        10,000 items (meaning 1 byte per 1 item) then the false positive
+    *   num_bits => *posint*
+
+        The default is 16384*8 bits (generates a ~16KB bloom filter). If you
+        supply 16k items (meaning 1 byte per 1 item) then the false positive
         rate will be ~2%. If you supply fewer items the false positive rate
-        is smaller and if you supply more than 10,000 items the false
-        positive rate will be higher.
+        is smaller and if you supply more than 16k items the false positive
+        rate will be higher.
 
-    *   num_hashes => *num* (default: 5.7)
+    *   num_hashes => *posint*
+
+    *   num_items => *posint*
 
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -170,14 +225,11 @@ BUGS
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
 
-SEE ALSO
-    bloom-filter-calculator.
-
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

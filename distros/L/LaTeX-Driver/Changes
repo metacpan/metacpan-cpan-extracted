@@ -1,5 +1,9 @@
 Revision history for the LaTeX::Driver module                -*- indented-text -*-
 
+1.0.0   2020-05-21
+   - Improve error reported when invoked external program is missing
+   - Fix RT #127951: failing tests on some installations
+
 0.300.2 2016-04-21
     - Added ps support via pdflatex
 

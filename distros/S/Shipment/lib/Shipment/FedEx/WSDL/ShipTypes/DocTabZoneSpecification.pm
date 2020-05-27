@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::DocTabZoneSpecification;
-$Shipment::FedEx::WSDL::ShipTypes::DocTabZoneSpecification::VERSION = '3.04';
+$Shipment::FedEx::WSDL::ShipTypes::DocTabZoneSpecification::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -78,7 +78,7 @@ Shipment::FedEx::WSDL::ShipTypes::DocTabZoneSpecification
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 

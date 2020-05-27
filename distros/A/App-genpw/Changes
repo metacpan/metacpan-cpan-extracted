@@ -1,4 +1,16 @@
-0.009   2018-07-01 (PERLANCAR)
+0.011   2020-05-22  Released-By: PERLANCAR; Urgency: medium
+
+	- Accept WordList::* object in _wl as an alternative to accepting words
+	  in _words; accepting wordlist object allows more efficient
+	  random-picking.
+
+
+0.010   2020-05-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option --list-patterns (--action=list-patterns).
+
+
+0.009   2018-07-01  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -7,7 +19,7 @@
 	- Tweak example.
 
 
-0.008   2018-06-29 (PERLANCAR)
+0.008   2018-06-29  Released-By: PERLANCAR
 
 	- [ux] By default generate base56 passwords between 12-20
 	  characters to be more typing-friendly.
@@ -17,14 +29,14 @@
 	- [doc] Fix example.
 
 
-0.007   2018-05-01 (PERLANCAR)
+0.007   2018-05-01  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Tweak Abstract.
 
 
-0.006   2018-05-01 (PERLANCAR)
+0.006   2018-05-01  Released-By: PERLANCAR
 
 	- Get words from STDIN if pattern contains '%w'.
 
@@ -34,7 +46,7 @@
 	- [doc] Add examples.
 
 
-0.005   2018-02-20 (PERLANCAR)
+0.005   2018-02-20  Released-By: PERLANCAR
 
 	- Add conversion pattern: %m (base64 character: A-Za-z0-9 + /).
 
@@ -42,22 +54,22 @@
           to get --config-profile.
 
 
-0.004   2018-02-20 (PERLANCAR)
+0.004   2018-02-20  Released-By: PERLANCAR
 
 	- Add conversion pattern: %h (hexdigit 0-9a-f).
 
 
-0.003   2018-01-16 (PERLANCAR)
+0.003   2018-01-16  Released-By: PERLANCAR
 
 	- Add conversion pattern: %b (base58 character) and %B (base56
 	  character).
 
 
-0.002   2018-01-09 (PERLANCAR)
+0.002   2018-01-09  Released-By: PERLANCAR
 
 	- Tweak Rinci metadata: allow num as first arg.
 
 
-0.001   2018-01-08 (PERLANCAR)
+0.001   2018-01-08  Released-By: PERLANCAR
 
         - First release.

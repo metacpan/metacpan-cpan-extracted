@@ -3,7 +3,7 @@ package Sah::Schemas::Color;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-03-02'; # DATE
 our $DIST = 'Sah-Schemas-Color'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas related to color codes/names
@@ -20,7 +20,7 @@ Sah::Schemas::Color - Sah schemas related to color codes/names
 
 =head1 VERSION
 
-This document describes version 0.007 of Sah::Schemas::Color (from Perl distribution Sah-Schemas-Color), released on 2020-03-02.
+This document describes version 0.009 of Sah::Schemas::Color (from Perl distribution Sah-Schemas-Color), released on 2020-03-02.
 
 =head1 HOMEPAGE
 

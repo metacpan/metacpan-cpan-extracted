@@ -1,14 +1,17 @@
 package App::genpw;
 
-our $DATE = '2018-07-01'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-22'; # DATE
+our $DIST = 'App-genpw'; # DIST
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
+# TODO: random shuffling/picking of words from wordlist is not cryptographically
+# secure yet
 use Random::Any 'rand', -warn => 1;
-use List::Util qw(shuffle);
 
 our %SPEC;
 
@@ -21,6 +24,16 @@ my $letterdigitsymbols = [@$letterdigits, @$symbols];                           
 my $base64characters   = ["A".."Z","a".."z","0".."9","+","/"];                                      # %m
 my $base58characters   = [split //, q(ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz123456789)]; # %b
 my $base56characters   = [split //, q(ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789)];   # %B
+
+our %arg_action = (
+    action => {
+        schema => ['str*', in=>[qw/gen list-patterns/]],
+        default => 'gen',
+        cmdline_aliases => {
+            list_patterns => {summary=>'Shortcut for --action=list-patterns', is_flag=>1, code=>sub { $_[0]{action} = 'list-patterns' }},
+        },
+    },
+);
 
 our %arg_patterns = (
     patterns => {
@@ -54,7 +67,7 @@ _
 );
 
 sub _fill_conversion {
-    my ($matches, $words) = @_;
+    my ($matches, $words, $wl) = @_;
 
     my $n = $matches->{N};
     my $m = $matches->{M};
@@ -82,25 +95,23 @@ sub _fill_conversion {
     } elsif ($matches->{CONV} eq 'B') {
         return join("", map {$base56characters->[rand(@$base56characters)]} 1..$len);
     } elsif ($matches->{CONV} eq 'w') {
-        die "Ran out of words while trying to fill out conversion '$matches->{all}'" unless @$words;
-        my $i = 0;
-        my $word;
-        while ($i < @$words) {
-            if (defined $n && defined $m) {
-                if (length($words->[$i]) >= $n && length($words->[$i]) <= $m) {
-                    $word = splice @$words, $i, 1;
-                    last;
-                }
-            } elsif (defined $n) {
-                if (length($words->[$i]) == $n) {
-                    $word = splice @$words, $i, 1;
-                    last;
-                }
+       my $word;
+        my $iter = 0;
+        while (1) {
+            if ($words) {
+                @$words or die "Ran out of wordse (please use a longer wordlist or set a lower -n";
+                $word = shift @$words;
+            } elsif ($wl) {
+                ($word) = $wl->pick(1, "allow duplicates");
             } else {
-                $word = splice @$words, $i, 1;
-                last;
+                die "No supply of words for conversion '$matches->{all}'";
             }
-            $i++;
+
+            # repeat picking if word does not fulfill requirement (e.g. length)
+            next if defined $n && length $word < $n;
+            next if defined $m && length $word > $m;
+            do { undef $word; last } if $iter++ > 1000;
+            last;
         }
         die "Couldn't find suitable random words for conversion '$matches->{all}'"
             unless defined $word;
@@ -126,9 +137,9 @@ sub _set_case {
 our $re = qr/(?<all>%(?:(?<N>\d+)(?:\$(?<M>\d+))?)?(?<CONV>[abBdhlmswx%]))/;
 
 sub _fill_pattern {
-    my ($pattern, $words) = @_;
+    my ($pattern, $words, $wl) = @_;
 
-    $pattern =~ s/$re/_fill_conversion({%+}, $words)/eg;
+    $pattern =~ s/$re/_fill_conversion({%+}, $words, $wl)/eg;
 
     $pattern;
 }
@@ -210,6 +221,7 @@ then:
 
 _
     args => {
+        %arg_action,
         num => {
             schema => ['int*', min=>1],
             default => 1,
@@ -262,28 +274,34 @@ _
 sub genpw {
     my %args = @_;
 
+    my $action = $args{action} // 'gen';
     my $num = $args{num} // 1;
     my $min_len = $args{min_len} // $args{len} // 12;
     my $max_len = $args{max_len} // $args{len} // 20;
     my $patterns = $args{patterns} // ["%$min_len\$${max_len}B"];
     my $case = $args{case} // 'default';
 
+    if ($action eq 'list-patterns') {
+        return [200, "OK", $patterns];
+    }
+
   GET_WORDS_FROM_STDIN:
     {
-        last if defined $args{_words};
+        last if defined $args{_words} || defined $args{_wl};
         my $has_w;
         for (@$patterns) {
             if (_pattern_has_w_conversion($_)) { $has_w++; last }
         }
         last unless $has_w;
-        $args{_words} = [shuffle <STDIN>];
+        require List::Util;
+        $args{_words} = [List::Util::shuffle(<STDIN>)];
         chomp for @{ $args{_words} };
     }
 
     my @passwords;
     for my $i (1..$num) {
             my $password =
-                _fill_pattern($patterns->[rand @$patterns], $args{_words});
+                _fill_pattern($patterns->[rand @$patterns], $args{_words}, $args{_wl});
             $password = _set_case($password, $case);
         push @passwords, $password;
     }
@@ -306,7 +324,7 @@ App::genpw - Generate random password, with patterns and wordlists
 
 =head1 VERSION
 
-This document describes version 0.009 of App::genpw (from Perl distribution App-genpw), released on 2018-07-01.
+This document describes version 0.011 of App::genpw (from Perl distribution App-genpw), released on 2020-05-22.
 
 =head1 SYNOPSIS
 
@@ -319,7 +337,7 @@ See the included script L<genpw>.
 
 Usage:
 
- genpw(%args) -> [status, msg, result, meta]
+ genpw(%args) -> [status, msg, payload, meta]
 
 Generate random password, with patterns and wordlists.
 
@@ -398,6 +416,8 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<action> => I<str> (default: "gen")
+
 =item * B<case> => I<str> (default: "default")
 
 Force casing.
@@ -442,6 +462,7 @@ be used as-is. Available conversions:
  %%   A literal percent sign
  %w   Random word
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -449,7 +470,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -471,24 +492,13 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
-=head1 SEE ALSO
-
-
-L<genpw-base56>.
-
-L<genpw-base64>.
-
-L<genpw-id>.
-
-L<genpw-wordlist>.
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,6 +1,6 @@
 package rjbs;
 # ABSTRACT: all the junk that rjbs likes in his one-offs
-$rjbs::VERSION = '20150423.001';
+$rjbs::VERSION = '20200521.000';
 use 5.20.0;
 use feature ();
 use experimental ();
@@ -29,7 +29,7 @@ rjbs - all the junk that rjbs likes in his one-offs
 
 =head1 VERSION
 
-version 20150423.001
+version 20200521.000
 
 =head1 OVERVIEW
 
@@ -49,7 +49,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Ricardo Signes.
+This software is copyright (c) 2020 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

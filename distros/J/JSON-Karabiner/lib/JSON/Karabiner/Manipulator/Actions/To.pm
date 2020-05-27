@@ -1,5 +1,5 @@
 package JSON::Karabiner::Manipulator::Actions::To ;
-$JSON::Karabiner::Manipulator::Actions::To::VERSION = '0.017';
+$JSON::Karabiner::Manipulator::Actions::To::VERSION = '0.018';
 use strict;
 use warnings;
 use JSON;
@@ -44,7 +44,7 @@ sub add_key_code {
     my %hash;
     my $letter_code;
     my $ms;
-    if ($key_code =~ /-([A-Z])|(\d+)$/) {
+    if ($key_code =~ /-([A-Z])|-(\d+)$/) {
       $letter_code = $1;
       $ms = $2;
       $key_code =~ s/-(.*?)$//;
@@ -150,7 +150,7 @@ sub add_modifiers {
   $lkc->{modifiers} = $existing;
 }
 
-# ABSTRACT: To action
+# ABSTRACT: To action object
 
 1;
 
@@ -160,17 +160,17 @@ __END__
 
 =head1 NAME
 
-JSON::Karabiner::Manipulator::Actions::To - To action
+JSON::Karabiner::Manipulator::Actions::To - To action object
 
 =head1 SYNOPSIS
 
-  add_action('to');
+  add_action 'to';
 
   # Use methods to add data to the C<to> action:
   add_key_code 'h', 'i', 'x';
   add_modifiers 'control', 'left_shift';
 
-  # Other C<to> actions may be added as well:
+  # Other "to" actions may be added as well:
 
   add_action 'to_if_alone';
 
@@ -197,40 +197,40 @@ typically created via the manipulator object's C<add_action()> method.
 
 Add a C<key_code> property to a C<to> action:
 
-  add_key_code('h', 'i', 'x');
+  add_key_code 'h', 'i', 'x';
 
 Special properties for key codes (C<lazy>, C<repeat>, C<halt> and C<hold_down_millisecond>
 can be attached with the following special notation:
 
-  add_key_code('h-L')   # adds a "lazy" property to key code
-  add_key_code('h-R')   # adds a "repeat" property to key code
-  add_key_code('h-H')   # adds a "halt" property to key code
-  add_key_code('h-200') # adds a "hold_down_milliseconds" property to the key
-                             # code with the value set to the number specified after the dash
+  add_key_code 'h-L'   # adds a "lazy" property to key code
+  add_key_code 'h-R'   # adds a "repeat" property to key code
+  add_key_code 'h-H'   # adds a "halt" property to key code
+  add_key_code 'h-200' # adds a "hold_down_milliseconds" property to the key
+                        # code with the value set to the number specified after the dash
 
 =head3 add_consumer_key_code($value)
 
 Add a C<consumer_key_code> property to a C<from> action:
 
-  add_consumer_key_code('MUSIC_NEXT');
+  add_consumer_key_code 'MUSIC_NEXT';
 
 =head3 add_pointing_button($value)
 
 Add a C<pointing_button> property to a C<from> action:
 
-  add_pointing_button('button2');
+  add_pointing_button 'button2';
 
 =head3 add_shell_command($command)
 
 Add a C<shell_command> property to a C<to> action:
 
-  add_shell_command('ls');
+  add_shell_command 'ls';
 
 =head3 add_select_input_source($option, $value)
 
 Add a C<select_input_source> property to a C<to> action:
 
-  select_input_source('language', 'language regex');
+  select_input_source 'language', 'language regex';
 
 Multiple option/value pairs may be set by calling this method multiple times.
 
@@ -240,7 +240,7 @@ https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-
 
 Add a C<select_input_source> property to a C<to> action:
 
-  add_select_input_source('language', 'language regex');
+  add_select_input_source 'language', 'language regex';
 
 Multiple option/value pairs may be set by calling this method multiple times.
 
@@ -248,13 +248,13 @@ Multiple option/value pairs may be set by calling this method multiple times.
 
 Add a C<set_value> property to a C<to> action:
 
-  add_set_variable('some_variable', '0');
+  add_set_variable 'some_variable', '1';
 
 =head3 add_mouse_key($name, $value)
 
 Add a C<mouse_key> property to a C<to> action:
 
-  add_mouse_key('speed_multiplier', '1.0');
+  add_mouse_key 'speed_multiplier', '1.0';
 
 Multiple name/value pairs may be set by calling this method multiple times.
 
@@ -264,15 +264,15 @@ https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-
 
 Add a C<modifiers> property to a keys in a C<to> action:
 
-  add_modifiers('left_shift', 'left_command');
+  add_modifiers 'left_shift', 'left_command';
 
-The modifiers can only be applied to the last key/buttons added to the object. In other words,
-if you need to apply to modifier to more than one key, add the keys that require modifiers
-individually and then add your modifiers.
+The modifiers can only be applied to the last key/buttons added to the object.
+In other words, if you need to apply to modifier to more than one key, add the
+keys that require modifiers individually and then add the modifiers.
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 AUTHOR
 

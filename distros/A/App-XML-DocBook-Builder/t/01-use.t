@@ -7,7 +7,7 @@ use Test::More tests => 26;
 use Test::Trap
     qw( trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn );
 
-use App::XML::DocBook::Docmake;
+use App::XML::DocBook::Docmake ();
 
 package MyTest::DocmakeAppDebug;
 

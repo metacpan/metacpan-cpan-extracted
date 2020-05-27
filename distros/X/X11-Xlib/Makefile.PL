@@ -150,7 +150,10 @@ my %WriteMakefileArgs = (
             repository => 'https://github.com/nanardon/X11-Xlib.git',
         }
     },
-    
+    # script to update all version numbers to match X11/Xlib.pm
+    # Runs during "make dist"
+    PREOP => 'perl util/update_versions.pl',
+
     $dep->get_makefile_vars,
 );
 

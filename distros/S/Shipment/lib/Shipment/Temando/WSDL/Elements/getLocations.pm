@@ -1,6 +1,6 @@
 
 package Shipment::Temando::WSDL::Elements::getLocations;
-$Shipment::Temando::WSDL::Elements::getLocations::VERSION = '3.04';
+$Shipment::Temando::WSDL::Elements::getLocations::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -85,7 +85,7 @@ Shipment::Temando::WSDL::Elements::getLocations
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 

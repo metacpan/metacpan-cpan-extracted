@@ -11,8 +11,9 @@ my %common_reqs = (
     "PkgConfig" => 0.19026,
     "Alien::Build::Plugin::Cleanse::BuildDir" => 0,
     'Sort::Versions' => 0,
-    'Alien::sqlite' => 0,
-    #'Alien::curl' => "0.07",
+    'Alien::sqlite' => '1.06',
+    "Path::Tiny" => 0,
+    "File::Which" => 0,
     ($^O =~ /mswin/i) ? ("Alien::MSYS" => 0) : (),
 );
 
@@ -48,17 +49,36 @@ my %WriteMakefileArgs = (
                 web => 'https://github.com/shawnlaffan/perl-alien-proj/issues/',
             },
         },
+        prereqs => {
+            build => {
+              suggests => {
+                  'Alien::curl' => 0,
+                  'Alien::libtiff' => 0,
+              },
+            },
+            runtime => {
+              suggests => {
+                  'Alien::curl' => 0,
+                  'Alien::libtiff' => 0,
+              },
+            },
+        },
     },
     "DISTNAME" => "Alien-proj",
     "LICENSE"  => "perl",
 );
 
 use Alien::Build::MM;
-my $abmm = Alien::Build::MM->new ();
+my $abmm = Alien::Build::MM->new (
+    clean_install => 1,
+);
 %WriteMakefileArgs = $abmm->mm_args(%WriteMakefileArgs);
 
 WriteMakefile(%WriteMakefileArgs);
 
+sub MY::install {
+  $abmm->mm_install(@_);
+}
 sub MY::postamble {
   $abmm->mm_postamble;
 }

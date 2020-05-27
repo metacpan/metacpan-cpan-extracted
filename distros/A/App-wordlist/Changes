@@ -1,3 +1,36 @@
+0.274   2020-05-24  Released-By: PERLANCAR; Urgency: medium
+
+	- Support loading parameterized wordlist with syntax -w
+	  Mod=param1,param2,...
+
+	- [bugfix] Call first_word() first, then next_word(); don't go
+	  straight to next_word().
+
+	- [doc] Remove old FAQ item (--random has been re-added).
+
+
+0.273   2020-05-22  Released-By: PERLANCAR; Urgency: medium
+
+	- No longer apply WordListMod::RandomSeekPick; let the wordlist modules
+	  themselves decide whether they want the behavior.
+
+
+0.272   2020-05-22  Released-By: PERLANCAR; Urgency: medium
+
+	- [optimize] When random-picking from a single wordlist, use the
+	  wordlist's pick() directly; and if the wordlist is huge, use
+	  WordListMod::RandomSeekPick.
+
+	- Add option -s (--action=stat).
+
+
+0.271   2020-05-21  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Allow specifying wildcard in -w, e.g. -w EN::* or -w EN::**.
+
+	- Add a couple of logging statements.
+
+
 0.270   2020-05-18  Released-By: PERLANCAR; Urgency: medium
 
 	- Re-add --random (-r) option; note that specifying this option
@@ -19,7 +52,8 @@
           message but continue.
 
 	- [removed] Remove option --random (-r) because it is incompatible with
-	  streaming output.
+	  streaming output. UPDATE 2020-05-18: this option has been re-added in
+	  0.270.
 
 	- wordlist -l --detail now also shows module path.
 

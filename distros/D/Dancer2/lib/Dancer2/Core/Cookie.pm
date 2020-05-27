@@ -1,6 +1,6 @@
 package Dancer2::Core::Cookie;
 # ABSTRACT: A cookie representing class
-$Dancer2::Core::Cookie::VERSION = '0.300003';
+$Dancer2::Core::Cookie::VERSION = '0.300004';
 use Moo;
 use URI::Escape;
 use Dancer2::Core::Types;
@@ -134,7 +134,7 @@ has http_only => (
 
 has same_site => (
     is       => 'rw',
-    isa      => Enum[qw[Strict Lax]],
+    isa      => Enum[qw[Strict Lax None]],
     required => 0,
 );
 
@@ -152,7 +152,7 @@ Dancer2::Core::Cookie - A cookie representing class
 
 =head1 VERSION
 
-version 0.300003
+version 0.300004
 
 =head1 SYNOPSIS
 

@@ -3091,7 +3091,7 @@ _unpack(s, fields)
     XVisualInfo *s
     HV *fields
     PPCODE:
-        PerlXlib_XVisualInfo_unpack(s, fields);
+        PerlXlib_XVisualInfo_unpack_obj(s, fields, ST(0));
 
 void
 bits_per_rgb(self, value=NULL)
@@ -3276,7 +3276,7 @@ _unpack(s, fields)
     XWindowChanges *s
     HV *fields
     PPCODE:
-        PerlXlib_XWindowChanges_unpack(s, fields);
+        PerlXlib_XWindowChanges_unpack_obj(s, fields, ST(0));
 
 void
 border_width(self, value=NULL)
@@ -3414,7 +3414,7 @@ _unpack(s, fields)
     XWindowAttributes *s
     HV *fields
     PPCODE:
-        PerlXlib_XWindowAttributes_unpack(s, fields);
+        PerlXlib_XWindowAttributes_unpack_obj(s, fields, ST(0));
 
 void
 all_event_masks(self, value=NULL)
@@ -3781,7 +3781,7 @@ _unpack(s, fields)
     XSetWindowAttributes *s
     HV *fields
     PPCODE:
-        PerlXlib_XSetWindowAttributes_unpack(s, fields);
+        PerlXlib_XSetWindowAttributes_unpack_obj(s, fields, ST(0));
 
 void
 background_pixel(self, value=NULL)
@@ -4031,7 +4031,7 @@ _unpack(s, fields)
     XSizeHints *s
     HV *fields
     PPCODE:
-        PerlXlib_XSizeHints_unpack(s, fields);
+        PerlXlib_XSizeHints_unpack_obj(s, fields, ST(0));
 
 void
 base_height(self, value=NULL)
@@ -4323,7 +4323,7 @@ _unpack(s, fields)
     XRectangle *s
     HV *fields
     PPCODE:
-        PerlXlib_XRectangle_unpack(s, fields);
+        PerlXlib_XRectangle_unpack_obj(s, fields, ST(0));
 
 void
 height(self, value=NULL)
@@ -4419,7 +4419,7 @@ _unpack(s, fields)
     XRenderPictFormat *s
     HV *fields
     PPCODE:
-        PerlXlib_XRenderPictFormat_unpack(s, fields);
+        PerlXlib_XRenderPictFormat_unpack_obj(s, fields, ST(0));
 
 void
 colormap(self, value=NULL)

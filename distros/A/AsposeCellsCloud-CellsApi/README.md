@@ -18,7 +18,7 @@ This Cloud SDK enhances your Perl cloud-based apps to [process & manipulate Micr
 - Cloud SDK to Read & Process Excel Worksheets.
 - Leverage the Power of Pivot Tables & Ranges.
 
-## Enhancements in Version 20.4
+## Enhancements in Version 20.05
 
 - Support to export area or page of sheet to JPEG.
 - Support to add background for workbook.

@@ -1,0 +1,53 @@
+NAME
+    WordListRole::RandomSeekPick - Provide a pick() implementation that
+    random-seeks DATA
+
+VERSION
+    This document describes version 0.004 of WordListRole::RandomSeekPick
+    (from Perl distribution WordListRole-RandomSeekPick), released on
+    2020-05-23.
+
+DESCRIPTION
+    The default WordList's "pick()" performs a scan on the whole word list
+    once while collecting random items. This role provides an alternative
+    implementation that random-seeks on DATA, discard the line fragment,
+    then get the next line. This algorithm does not provide uniformly random
+    picking, but for many cases it should be random enough. It is faster if
+    you have a huge word list and just want to pick one or a few items.
+
+    Note: since this role's "pick()" operates on the DATA filehandle
+    directly instead of using "each_word()", it cannot be used on dynamic
+    wordlists.
+
+PROVIDED METHODS
+  pick
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WordListRole-RandomSeekPick>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WordListRole-RandomSeekPick>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=WordListRole-RandomSe
+    ekPick>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    File::RandomLine provides a similar algorithm.
+
+    WordList
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

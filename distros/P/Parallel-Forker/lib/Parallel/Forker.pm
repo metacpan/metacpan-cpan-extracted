@@ -11,7 +11,7 @@ use Parallel::Forker::Process;
 use strict;
 use vars qw($Debug $VERSION);
 
-$VERSION = '1.258';
+$VERSION = '1.260';
 
 ######################################################################
 #### CONSTRUCTOR
@@ -27,6 +27,7 @@ sub new {
 	_run_after_eqn => undef,# Equation to eval to determine if ready to launch
 	_parent_pid => $$,	# PID of initial process creating the forker
 	max_proc => undef,	# Number processes to launch, <1=any, +=that number
+	poll_interval => 100*1000,  # Poll interval in usec
 	use_sig_child => undef,	# Default to not using SIGCHLD handler
 	@_
     };
@@ -45,6 +46,12 @@ sub max_proc {
     my $self = shift;
     $self->{max_proc} = shift if $#_>=0;
     return $self->{max_proc};
+}
+
+sub poll_interval {
+    my $self = shift;
+    $self->{poll_interval} = shift if $#_>=0;
+    return $self->{poll_interval};
 }
 
 sub use_sig_child {
@@ -106,7 +113,7 @@ sub wait_all {
     while ($self->is_any_left) {
 	#print "NRUNNING ", scalar ( (keys %{$self->{_running}}) ), "\n";
 	$self->poll;
-	usleep 100*1000;
+	usleep $self->{poll_interval};
     };
 }
 
@@ -399,6 +406,12 @@ call in "if ($self->in_parent)."
 =item $self->kill_tree_all(<signal>)
 
 Send a signal to all running children and their subchildren.
+
+=item $self->poll_interval(<usec>)
+
+Set the time in microseconds between polls when using wait_all.  Default is
+100000 usec (10 microseconds), smaller numbers may improve performance when
+jobs complete quickly.
 
 =item $self->max_proc(<number>)
 

@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::update;
 
-our $DATE = '2020-05-07'; # DATE
-our $VERSION = '1.057'; # VERSION
+our $DATE = '2020-05-26'; # DATE
+our $VERSION = '1.058'; # VERSION
 
 use 5.010;
 use strict;
@@ -29,7 +29,7 @@ App::lcpan::Cmd::update - Create/update local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.057 of App::lcpan::Cmd::update (from Perl distribution App-lcpan), released on 2020-05-07.
+This document describes version 1.058 of App::lcpan::Cmd::update (from Perl distribution App-lcpan), released on 2020-05-26.
 
 =head1 FUNCTIONS
 

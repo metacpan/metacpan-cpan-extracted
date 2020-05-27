@@ -193,3 +193,7 @@ in a lot of places.
 
 2.26 2017-04-10 rurban
    - . in @INC test fixes for perl5.26 (RT #121020)
+
+2.27 2020-05-26 15:56:27 rurban
+   - fix various null derefs (RT #132711, reported by Petr Pisar)
+   - 5.6 does not work for some time, disallow

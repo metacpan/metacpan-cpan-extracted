@@ -1,0 +1,28 @@
+---
+abstract: 'Query currency exchange rates from SCSB (Shanghai Commercial and Savings Bank)'
+author:
+  - 'Kang-min Liu <gugod@gugod.org>'
+build_requires:
+  Test2::Harness: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.027, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Finance-Currency-Convert-SCSB
+provides:
+  Finance::Currency::Convert::SCSB:
+    file: lib/Finance/Currency/Convert/SCSB.pm
+    version: v0.1.0
+requires:
+  Mojolicious: '0'
+resources:
+  bugtracker: https://github.com/perltaiwan/Finance-Currency-Convert-SCSB/issues
+  repository: https://github.com/perltaiwan/Finance-Currency-Convert-SCSB.git
+version: v0.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_spdx_expression: MIT
+x_static_install: '1'

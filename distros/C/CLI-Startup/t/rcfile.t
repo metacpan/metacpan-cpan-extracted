@@ -88,7 +88,7 @@ mkdir "$dir/tmp" or plan skip_all => "Can't create temp directory";
 
     local @ARGV = ('--rcfile=/baz');
     $app->init();
-    ok $app->get_rcfile eq '/baz', "Command line override rcfile";
+    ok $app->get_rcfile eq '/baz', "Command line overrides rcfile";
 }
 
 # Write and read various different types of RC file
@@ -146,7 +146,6 @@ mkdir "$dir/tmp" or plan skip_all => "Can't create temp directory";
 
         $app1 = CLI::Startup->new({
             rcfile          => $rcfile,
-            'rcfile-format' => 'perl',
             options         => $optspec,
         });
         $app1->init;
@@ -188,7 +187,6 @@ mkdir "$dir/tmp" or plan skip_all => "Can't create temp directory";
 
         my $app2 = CLI::Startup->new({
             rcfile          => $rcfile,
-            'rcfile-format' => 'ini',
             options         => $optspec,
         });
         $app2->init;
@@ -215,7 +213,6 @@ mkdir "$dir/tmp" or plan skip_all => "Can't create temp directory";
 
         my $app3 = CLI::Startup->new({
             rcfile          => $rcfile,
-            'rcfile-format' => 'ini',
             options         => { a => 1 },
         });
         $app3->init;
@@ -243,7 +240,6 @@ mkdir "$dir/tmp" or plan skip_all => "Can't create temp directory";
 
         my $app2 = CLI::Startup->new({
             rcfile          => $rcfile,
-            'rcfile-format' => 'yaml',
             options         => $optspec,
         });
         $app2->init;
@@ -264,14 +260,13 @@ mkdir "$dir/tmp" or plan skip_all => "Can't create temp directory";
         eval "use Config::Any::JSON";
         skip("Config::Any::JSON is not installed", $tests) if $@;
         skip("JSON config files not supported", $tests)
-            unless Config::Any::YAML->is_supported;
+            unless Config::Any::JSON->is_supported;
 
         trap { $app1->_write_rcfile_json($rcfile) };
         ok $trap->leaveby eq "return", "Wrote JSON config successfully";
 
         my $app2 = CLI::Startup->new({
             rcfile          => $rcfile,
-            'rcfile-format' => 'json',
             options         => $optspec,
         });
         $app2->init;
@@ -292,14 +287,13 @@ mkdir "$dir/tmp" or plan skip_all => "Can't create temp directory";
         eval "use Config::Any::XML";
         skip("Config::Any::XML is not installed", $tests) if $@;
         skip("XML config files not supported", $tests)
-            unless Config::Any::YAML->is_supported;
+            unless Config::Any::XML->is_supported;
 
         trap { $app1->_write_rcfile_xml($rcfile) };
         ok $trap->leaveby eq "return", "Wrote XML config successfully";
 
         my $app2 = CLI::Startup->new({
             rcfile          => $rcfile,
-            'rcfile-format' => 'xml',
             options         => $optspec,
         });
         $app2->init;
@@ -408,7 +402,6 @@ EOF
 
     my $app = CLI::Startup->new({
         rcfile          => $rcfile,
-        'rcfile-format' => 'yaml',
         options         => {
             'foo=s'  => 1,
             'bar=s'  => 1,

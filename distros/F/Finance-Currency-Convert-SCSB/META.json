@@ -1,0 +1,59 @@
+{
+   "abstract" : "Query currency exchange rates from SCSB (Shanghai Commercial and Savings Bank)",
+   "author" : [
+      "Kang-min Liu <gugod@gugod.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.027",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Finance-Currency-Convert-SCSB",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.027"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Harness" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Finance::Currency::Convert::SCSB" : {
+         "file" : "lib/Finance/Currency/Convert/SCSB.pm",
+         "version" : "v0.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/perltaiwan/Finance-Currency-Convert-SCSB/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/perltaiwan/Finance-Currency-Convert-SCSB.git",
+         "web" : "https://github.com/perltaiwan/Finance-Currency-Convert-SCSB"
+      }
+   },
+   "version" : "v0.1.0",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_spdx_expression" : "MIT",
+   "x_static_install" : "1"
+}

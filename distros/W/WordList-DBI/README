@@ -1,0 +1,48 @@
+NAME
+    WordList::DBI - Wordlist that get its list from a DBI query
+
+VERSION
+    This document describes version 0.001 of WordList::DBI (from Perl
+    distribution WordList-DBI), released on 2020-05-24.
+
+SYNOPSIS
+     use WordList::DBI;
+
+     my $wl = WordList::DBI->new(
+         dbh => $dbh,
+         query => 'SELECT word FROM table ORDER BY word',
+         # query_pick => 'SELECT word FROM table ORDER BY RAND()', # optional
+     );
+     $wl->each_word(sub { ... });
+
+DESCRIPTION
+    This is a dynamic, parameterized wordlist to get list of words from a
+    DBI query.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WordList-DBI>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WordList-DBI>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=WordList-DBI>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    WordList
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

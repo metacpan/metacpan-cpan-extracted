@@ -1,23 +1,96 @@
-# Mojo-JWT-Google
-Easily create a JWT for Google authorization.
+NAME
+    Mojo::JWT::Google - Service Account tokens
 
-[![Build Status](https://travis-ci.org/rpcme/Mojo-JWT-Google.svg?branch=master)](https://travis-ci.org/rpcme/Mojo-JWT-Google)
-[![Coverage Status](https://coveralls.io/repos/rpcme/Mojo-JWT-Google/badge.svg)](https://coveralls.io/r/rpcme/Mojo-JWT-Google)
-[![CPAN version](https://badge.fury.io/pl/Mojo-JWT-Google.svg)](http://badge.fury.io/pl/Mojo-JWT-Google)
+VERSION
+    0.10
 
-Changes in Version 0.03
------------------------
-Fixed unit tests - needed to include ext files in MANIFEST
+SYNOPSIS
+      my $gjwt = Mojo::JWT::Google->new(secret => 's3cr3t',
+                                        scopes => [ '/my/scope/a', '/my/scope/b' ],
+                                        client_email => 'riche@cpan.org')->encode;
 
-Changes in Version 0.02
------------------------
-Attempt to fix failed tests on cpantesters that could not be replicated
-Fix a couple documentation typos
-Change claims construction and remove Time::HiRes dependency based on new
-  Mojo::JWT set_iat method.
-Remove Mojolicious dependency as parent has it.
-Remove strictures dependency since Mojo::Base controls how strict you are.
+DESCRIPTION
+    Like Mojo::JWT, you can instantiate this class by using the same syntax,
+    except that this class constructs the claims for you.
 
-Changes in Version 0.01
------------------------
-Initial implementation.
+     my $jwt = Mojo::JWT::Google->new(secret => 's3cr3t')->encode;
+
+    And add any attribute defined in this class. The JWT is fairly useless
+    unless you define your scopes.
+
+     my $gjwt = Mojo::JWT::Google->new(secret => 's3cr3t',
+                                       scopes => [ '/my/scope/a', '/my/scope/b' ],
+                                       client_email => 'riche@cpan.org')->encode;
+
+    You can also get your information automatically from the .json you
+    received from Google. Your secret key is in that file, so it's best to
+    keep it safe somewhere. This will ease some busy work in configuring the
+    object -- with virtually the only things to do is determine the scopes
+    and the user_as if you need to impersonate.
+
+      my $gjwt = Mojo::JWT::Google
+        ->new( from_json => '/my/secret.json',
+               scopes    => [ '/my/scope/a', '/my/scope/b' ])->encode;
+
+ATTRIBUTES
+    Mojo::JWT::Google inherits all attributes from Mojo::JWT and defines the
+    following new ones.
+
+  claims
+    Overrides the parent class and constructs a hashref representing
+    Google's required attribution.
+
+  client_email
+    Get or set the Client ID email address.
+
+  expires_in
+    Defines the threshold for when the token expires. Defaults to 3600.
+
+  issue_at
+    Defines the time of issuance in epoch seconds. If not defined, the
+    claims issue at date defaults to the time when it is being encoded.
+
+  scopes
+    Get or set the Google scopes. If impersonating, these scopes must be set
+    up by your Google Business Administrator.
+
+  target
+    Get or set the target. At the time of writing, there is only one valid
+    target: https://www.googleapis.com/oauth2/v4/token. This is the default
+    value; if you have no need to customize this, then just fetch the
+    default.
+
+  user_as
+    Set the Google user to impersonate. Your Google Business Administrator
+    must have already set up your Client ID as a trusted app in order to use
+    this successfully.
+
+METHODS
+    Inherits all methods from Mojo::JWT and defines the following new ones.
+
+  from_json
+    Loads the JSON file from Google with the client ID information in it and
+    sets the respective attributes.
+
+    Returns 0 on failure: file not found or value not defined
+
+     $gjwt->from_json('/my/google/app/project/sa/json/file');
+
+SEE ALSO
+    Mojo::JWT
+
+SOURCE REPOSITORY
+    <http://github.com/rabbiveesh/Mojo-JWT-Google>
+
+AUTHOR
+    Richard Elberger, <riche@cpan.org>
+
+CONTRIBUTORS
+    Scott Wiersdorf, <scott@perlcode.org> Avishai Goldman, <veesh@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2015 by Richard Elberger
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

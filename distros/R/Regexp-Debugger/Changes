@@ -255,3 +255,13 @@ Revision history for Regexp-Debugger
 
     - Added detection of (&subpat) and (<name> ... ) errors
       (Thanks, Hugo!)
+
+
+0.002005  Sat May 23 03:27:31 2020
+
+    - Improved inference of /x flag (or absence thereof)
+      for some (but not all) cases where an unescaped # is found
+      (thanks Deven!)
+
+    - Added proper dynamic tracking of /x flag status within regex,
+      so that (?x:...) and (?-x:...) blocks are handled correctly.

@@ -18,11 +18,10 @@ my $builder = Module::Build->new(
     },
     requires => {
         'perl'             => '5.10.0',
-        'namespace::clean' => '0',
         'List::MoreUtils'  => '0.420_001',
         'Scalar::Util'     => '1.39',
-        'Net::IPAM::IP'    => '1.16',
-        'Net::IPAM::Block' => '1.10',
+        'Net::IPAM::IP'    => '1.22',
+        'Net::IPAM::Block' => '1.15',
     },
     add_to_cleanup => ['Net-IPAM-Tree-*'],
 );

@@ -1,3 +1,14 @@
+0.049   2020-05-24  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Coerce num/float from percent string by default, e.g. 1% ->
+	  0.01 (currently for perl only).
+
+
+0.048   2020-05-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Also support arguments in coerce rule, like in Data::Sah::Filter.
+
+
 0.047   2020-02-12  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Rename return_type values for clarity: status+val ->

@@ -1,0 +1,4 @@
+0.10
+
+Cleaned up some code, explicitly depend on Mojolicious (not sure
+why, but should help CPANTS)

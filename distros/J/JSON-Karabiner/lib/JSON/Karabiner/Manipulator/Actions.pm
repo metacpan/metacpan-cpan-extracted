@@ -1,5 +1,5 @@
 package JSON::Karabiner::Manipulator::Actions ;
-$JSON::Karabiner::Manipulator::Actions::VERSION = '0.017';
+$JSON::Karabiner::Manipulator::Actions::VERSION = '0.018';
 use strict;
 use warnings;
 use JSON;
@@ -78,7 +78,7 @@ for reference purposes only.
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 AUTHOR
 

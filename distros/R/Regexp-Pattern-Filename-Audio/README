@@ -1,0 +1,72 @@
+NAME
+    Regexp::Pattern::Filename::Audio - Audio filename
+
+VERSION
+    This document describes version 0.001 of
+    Regexp::Pattern::Filename::Audio (from Perl distribution
+    Regexp-Pattern-Filename-Audio), released on 2020-04-01.
+
+SYNOPSIS
+     use Regexp::Pattern; # exports re()
+     my $re = re("Filename::Audio::filename_audio");
+
+DESCRIPTION
+    This is a Regexp::Pattern wrapper for Filename::Audio.
+
+PATTERNS
+    *   filename_audio
+
+        Audio filename.
+
+        Examples:
+
+        No extension.
+
+         "foo" =~ re("Filename::Audio::filename_audio");  # doesn't match
+
+        Not an extension.
+
+         "mp3" =~ re("Filename::Audio::filename_audio");  # doesn't match
+
+         "foo.mp3" =~ re("Filename::Audio::filename_audio");  # matches
+
+        Case insensitive.
+
+         "foo bar.WAV" =~ re("Filename::Audio::filename_audio");  # matches
+
+        Regex is anchored.
+
+         "foo.mp3 is the file" =~ re("Filename::Audio::filename_audio");  # doesn't match
+
+         "foo.mp4" =~ re("Filename::Audio::filename_audio");  # doesn't match
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Regexp-Pattern-Filename-Audio>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Regexp-Pattern-Filename-Audio>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern-Filena
+    me-Audio>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Regexp::Pattern
+
+    Filename::Audio
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

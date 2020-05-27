@@ -1,0 +1,246 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/BloomUtils/gen_bloom_filter
+# and generated automatically using Perinci::CmdLine::Gen version 0.496
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-24'; # DATE
+our $DIST = 'App-BloomUtils'; # DIST
+our $VERSION = '0.004'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/BloomUtils/gen_bloom_filter",
+    program_name => "bloomgen",
+    log => 1,
+    log_level => "info",
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Shorter alias for gen-bloom-filter
+# PODNAME: bloomgen
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+bloomgen - Shorter alias for gen-bloom-filter
+
+=head1 VERSION
+
+This document describes version 0.004 of bloomgen (from Perl distribution App-BloomUtils), released on 2020-05-24.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % bloomgen [--debug] [--false-positive-rate=s] [--fp-rate=s] [-k=s]
+     [--log-level=level] [-m=s] [-n=s] [--num-bits=s] [--num-hashes=s]
+     [--num-items=s] [-p=s] [--page-result[=program]] [--quiet] [--trace]
+     [--verbose]
+
+Examples:
+
+Create a bloom filter for 100k items and 0.1% maximum false-positive rate (actual bloom size and false-positive rate will be shown on stderr):
+
+ % bloomgen --num-items 100000 --fp-rate 0.1%
+
+=head1 DESCRIPTION
+
+You supply lines of text from STDIN and it will output the bloom filter bits on
+STDOUT. You can also customize C<num_bits> (C<m>) and C<num_hashes> (C<k>), or, more
+easily, C<num_items> and C<fp_rate>. Some rules of thumb to remember:
+
+=over
+
+=item * One byte per item in the input set gives about a 2% false positive rate. So if
+you expect two have 1024 elements, create a 1KB bloom filter with about 2%
+false positive rate. For other false positive rates:
+
+10%    -  4.8 bits per item
+ 1%    -  9.6 bits per item
+ 0.1%  - 14.4 bits per item
+ 0.01% - 19.2 bits per item
+
+=item * Optimal number of hash functions is 0.7 times number of bits per item. Note
+that the number of hashes dominate performance. If you want higher
+performance, pick a smaller number of hashes. But for most cases, use the the
+optimal number of hash functions.
+
+=item * What is an acceptable false positive rate? This depends on your needs. 1% (1
+in 100) or 0.1% (1 in 1,000) is a good start. If you want to make sure that
+user's chosen password is not in a known wordlist, a higher false positive
+rates will annoy your user more by rejecting her password more often, while
+lower false positive rates will require a higher memory usage.
+
+=back
+
+Ref: https://corte.si/posts/code/bloom-filter-rules-of-thumb/index.html
+
+B<FAQ>
+
+=over
+
+=item * Why does two different false positive rates (e.g. 1% and 0.1%) give the same bloom filter size?
+
+The parameter C<m> is rounded upwards to the nearest power of 2 (e.g. 1024*8
+bits becomes 1024*8 bits but 1025*8 becomes 2048*8 bits), so sometimes two
+false positive rates with different C<m> get rounded to the same value of C<m>.
+Use the C<bloom_filter_calculator> routine to see the C<actual_m> and C<actual_p>
+(actual false-positive rate).
+
+=back
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--false-positive-rate>=I<s>, B<-p>, B<--fp-rate>
+
+=item B<--num-bits>=I<s>, B<-m>
+
+The default is 16384*8 bits (generates a ~16KB bloom filter). If you supply 16k
+items (meaning 1 byte per 1 item) then the false positive rate will be ~2%. If
+you supply fewer items the false positive rate is smaller and if you supply more
+than 16k items the false positive rate will be higher.
+
+
+=item B<--num-hashes>=I<s>, B<-k>
+
+=item B<--num-items>=I<s>, B<-n>
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C bloomgen bloomgen
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete bloomgen 'p/*/`bloomgen`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-BloomUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-BloomUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-BloomUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<bloom-filter-calculator>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

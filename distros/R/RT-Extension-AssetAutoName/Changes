@@ -1,5 +1,9 @@
 Revision history for RT-Extension-AssetAutoName
 
+0.03 2020-04-21
+ - Use the hack of inserting a newline in the "package" statement to hide
+   the namespace of RT::Assets from PAUSE.
+
 0.02 2020-04-12
  - Allow the name field to be x. Thank you to Marcelo for the suggestion.
 

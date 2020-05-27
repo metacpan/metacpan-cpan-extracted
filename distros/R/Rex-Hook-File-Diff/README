@@ -1,0 +1,76 @@
+NAME
+
+    Rex::Hook::File::Diff - show diff of changes for files managed by Rex
+
+VERSION
+
+    version v0.1.0
+
+SYNOPSIS
+
+        use Rex::Hook::File::Diff;
+
+DESCRIPTION
+
+    This module allows Rex to show a diff of changes for the files managed
+    via its built-in file manipulation commands
+    <https://metacpan.org/pod/Rex::Commands::File> which rely on the file
+    <https://metacpan.org/pod/Rex::Commands::File#file> command as a
+    backend:
+
+    file <https://metacpan.org/pod/Rex::Commands::File#file>
+
+    delete_lines_matching
+    <https://metacpan.org/pod/Rex::Commands::File#delete_lines_matching>
+
+    delete_lines_according_to
+    <https://metacpan.org/pod/Rex::Commands::File#delete_lines_according_to>
+
+    append_if_no_such_line
+    <https://metacpan.org/pod/Rex::Commands::File#append_if_no_such_line>
+
+    append_or_amend_line
+    <https://metacpan.org/pod/Rex::Commands::File#append_or_amend_line>
+
+    sed <https://metacpan.org/pod/Rex::Commands::File#sed>
+
+DIAGNOSTICS
+
+    This module does not do any error checking (yet).
+
+CONFIGURATION AND ENVIRONMENT
+
+    This module does not require any configuration, nor does it use any
+    environment variables.
+
+DEPENDENCIES
+
+    See the included cpanfile.
+
+INCOMPATIBILITIES
+
+    There are no known incompatibilities with other modules.
+
+BUGS AND LIMITATIONS
+
+    There are no known bugs. Make sure they are reported.
+
+    Currently the module supports local file operations only.
+
+    Upload hook support is not implemented (yet), so diff is not shown upon
+    file uploads when using the source option with the file
+    <https://metacpan.org/pod/Rex::Commands::File#file> command (or the
+    upload <https://metacpan.org/pod/Rex::Commands::Upload#upload> command
+    directly).
+
+AUTHOR
+
+    Ferenc Erki <erkiferenc@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2020 by Ferenc Erki.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

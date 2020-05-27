@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::ValidateShipmentResponseContainer;
-$Shipment::Purolator::WSDLV2::Types::ValidateShipmentResponseContainer::VERSION = '3.04';
+$Shipment::Purolator::WSDLV2::Types::ValidateShipmentResponseContainer::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -66,7 +66,7 @@ Shipment::Purolator::WSDLV2::Types::ValidateShipmentResponseContainer
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 

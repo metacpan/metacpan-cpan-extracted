@@ -3,68 +3,69 @@
    "author" : [
       "Grant Street Group <developers@grantstreet.com>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "DBIx-Connector-Retry",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.64"
+            "ExtUtils::MakeMaker" : "7.1101"
          }
       },
       "develop" : {
          "requires" : {
-            "Module::Metadata" : "1.00",
-            "Perl::PrereqScanner" : "1.023",
-            "Pod::Markdown::Github" : "0",
-            "Pod::Readme" : "v1.1.2",
-            "Test2::Suite" : "0",
-            "Test::CPAN::Changes" : "0",
-            "Test::Pod" : "1.51",
-            "Test::Pod::Coverage" : "1.10",
+            "Dist::Zilla::PluginBundle::Author::GSG" : "0",
+            "Test2::Require::AuthorTesting" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
             "Test::Strict" : "0",
-            "Test::Version" : "2.00",
-            "perl" : "v5.10.1"
+            "Test::Version" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "DBIx::Connector" : "0.56",
-            "Moo" : "2.00",
+            "DBIx::Connector" : "0",
+            "Moo" : "0",
             "Scalar::Util" : "0",
-            "Types::Common::Numeric" : "1.00",
-            "Types::Standard" : "1.00",
+            "Types::Common::Numeric" : "0",
+            "Types::Standard" : "0",
             "namespace::clean" : "0",
-            "perl" : "5.010001"
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
-            "DBD::SQLite" : "1.29",
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Path::Class" : "0",
             "Test2::Bundle::More" : "0",
             "Test2::Tools::Compare" : "0",
             "Test2::Tools::Exception" : "0",
-            "Test2::Tools::Explain" : "0"
+            "Test2::Tools::Explain" : "0",
+            "Test::More" : "0",
+            "lib" : "0"
          }
+      }
+   },
+   "provides" : {
+      "DBIx::Connector::Retry" : {
+         "file" : "lib/DBIx/Connector/Retry.pm",
+         "version" : "v0.900.1"
       }
    },
    "release_status" : "stable",
@@ -72,13 +73,15 @@
       "bugtracker" : {
          "web" : "https://github.com/GrantStreetGroup/DBIx-Connector-Retry/issues"
       },
-      "homepage" : "https://github.com/GrantStreetGroup/DBIx-Connector-Retry",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/GrantStreetGroup/DBIx-Connector-Retry.git",
+         "url" : "git://github.com/GrantStreetGroup/DBIx-Connector-Retry.git",
          "web" : "https://github.com/GrantStreetGroup/DBIx-Connector-Retry"
       }
    },
-   "version" : "0.90",
-   "x_authority" : "cpan:GSG"
+   "version" : "v0.900.1",
+   "x_generated_by_perl" : "v5.18.2",
+   "x_serialization_backend" : "JSON::XS version 3.01",
+   "x_static_install" : 1
 }
+

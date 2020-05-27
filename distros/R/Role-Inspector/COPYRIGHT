@@ -3,11 +3,7 @@ Upstream-Name: Role-Inspector
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Role-Inspector
 
-Files: Changes
- META.json
- META.yml
- dist.ini
- doap.ttl
+Files: dist.ini
  t/lib/Local/CustomRole.pm
  t/lib/Local/MooClass.pm
  t/lib/Local/MooClass2.pm
@@ -44,11 +40,15 @@ Files: README
 Copyright: This software is copyright (c) 2014 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: CONTRIBUTING
- INSTALL
- LICENSE
-Copyright: Unknown
-License: Unknown
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
+ t/lib/Local/MooseRole4.pm
+ t/lib/Local/MouseRole3.pm
+ t/lib/Local/RoleTiny3.pm
+Copyright: Copyright 2020 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
  CREDITS
@@ -56,19 +56,24 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
+Files: INSTALL
+ LICENSE
+Copyright: Unknown
+License: Unknown
+
 Files: Makefile.PL
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2020 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2020 by the copyright holder(s).
  
  This is free software, licensed under:
  

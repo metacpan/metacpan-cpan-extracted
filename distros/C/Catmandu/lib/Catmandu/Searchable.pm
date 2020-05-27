@@ -2,7 +2,7 @@ package Catmandu::Searchable;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2011';
+our $VERSION = '1.2012';
 
 use Catmandu::Util qw(is_natural is_positive);
 use Moo::Role;
@@ -28,7 +28,7 @@ sub normalize_sort {$_[1]}
 my $AROUND_SEARCH = sub {
     my ($orig, $self, %args) = @_;
     $args{limit} = $self->default_limit unless is_natural($args{limit});
-    $args{start} = 0 unless is_natural($args{start});
+    $args{start} = 0                    unless is_natural($args{start});
     $args{start} += 0;
     $args{limit} += 0;
     if ($args{limit} > $self->maximum_limit) {

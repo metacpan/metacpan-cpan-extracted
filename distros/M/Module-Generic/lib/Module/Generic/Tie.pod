@@ -14,6 +14,10 @@ Module::Generic::Tie - Object Access Control Class
     # but this below will succeed
     $o->debug( 1 );
 
+=head1 VERSION
+
+    v0.1.0
+
 =head1 DESCRIPTION
 
 Given an object, and a set of parameters, this will restrict direct access to the object values, ensuring the object properties can only be modified from within the class/package if necessary.

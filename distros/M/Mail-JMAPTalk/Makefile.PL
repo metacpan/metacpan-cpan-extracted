@@ -6,7 +6,7 @@ WriteMakefile(
     VERSION_FROM      => 'lib/Mail/JMAPTalk.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
     PREREQ_PM         => {
         'Convert::Base64' => 0,
-        'JSON::XS'        => 0,
+        'JSON'            => 0,
         'File::LibMagic' => 0,
         'HTTP::Tiny'     => 0,
     }, # e.g., Module::Name => 1.1

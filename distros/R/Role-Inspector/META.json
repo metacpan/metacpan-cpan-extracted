@@ -4,7 +4,7 @@
       "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [],
    "license" : [
       "perl_5"
@@ -45,6 +45,7 @@
       },
       "test" : {
          "recommends" : {
+            "Class::Method::Modifiers" : "0",
             "Moo::Role" : "1.000000",
             "Moose::Role" : "2.0600",
             "Mouse::Role" : "1.00",
@@ -60,7 +61,7 @@
    "provides" : {
       "Role::Inspector" : {
          "file" : "lib/Role/Inspector.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -79,5 +80,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Role-Inspector/project"
    },
-   "version" : "0.005"
+   "version" : "0.006",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
 }

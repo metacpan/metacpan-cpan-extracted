@@ -36,13 +36,13 @@ no_index:
 provides:
   TeX::Encode:
     file: lib/TeX/Encode.pm
-    version: '2.008'
+    version: '2.009'
   TeX::Encode::BibTeX:
     file: lib/TeX/Encode/BibTeX.pm
-    version: '2.008'
+    version: '2.009'
   TeX::Encode::charmap:
     file: lib/TeX/Encode/charmap.pm
-    version: '2.008'
+    version: '2.009'
 requires:
   Carp: '0'
   Encode::Encoding: '0.1'
@@ -53,7 +53,7 @@ resources:
   bugtracker: https://github.com/athreef/TeX-Encode/issues
   homepage: https://github.com/athreef/TeX-Encode
   repository: https://github.com/athreef/TeX-Encode.git
-version: '2.008'
+version: '2.009'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -256,7 +256,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v2.008
+          tag: v2.009
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

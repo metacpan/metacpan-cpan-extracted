@@ -111,8 +111,8 @@ license_is(
 # misc
 license_is(
 	't/grant/misc/rpplexer.h',
-	[   'GPL-3 and/or LGPL-2.1 or LGPL-3',
-		'GPL-3 or LGPL-2.1 with Qt exception or LGPL-3 with Qt exception or Qt'
+	[   '(GPL-3 and/or LGPL-2.1 or LGPL-3) with Qt-LGPL-1.1 exception',
+		'GPL-3 or LGPL-2.1 with Qt exception or LGPL-3 with Qt-LGPL-1.1 exception or Qt'
 	]
 );
 

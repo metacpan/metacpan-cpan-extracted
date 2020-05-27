@@ -2,7 +2,7 @@ NAME
     LaTeX::Driver - Latex driver
 
 VERSION
-    This document describes version 0.200.4 of "LaTeX::Driver".
+    1.0.0
 
 SYNOPSIS
         use LaTeX::Driver;

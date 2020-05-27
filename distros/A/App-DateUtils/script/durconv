@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/DateUtils/durconv
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
+# and generated automatically using Perinci::CmdLine::Gen version 0.495
 
-our $DATE = '2020-01-31'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-30'; # DATE
 our $DIST = 'App-DateUtils'; # DIST
-our $VERSION = '0.125'; # VERSION
+our $VERSION = '0.126'; # VERSION
 
 use 5.010001;
 use strict;
@@ -22,7 +23,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
 
 $cmdline->run;
 
-# ABSTRACT: Convert duration to another format
+# ABSTRACT: Convert duration from one format to another
 # PODNAME: durconv
 
 __END__
@@ -33,11 +34,11 @@ __END__
 
 =head1 NAME
 
-durconv - Convert duration to another format
+durconv - Convert duration from one format to another
 
 =head1 VERSION
 
-This document describes version 0.125 of durconv (from Perl distribution App-DateUtils), released on 2020-01-31.
+This document describes version 0.126 of durconv (from Perl distribution App-DateUtils), released on 2020-03-30.
 
 =head1 SYNOPSIS
 

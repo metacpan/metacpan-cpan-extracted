@@ -2,7 +2,7 @@ package Catmandu::Util;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2011';
+our $VERSION = '1.2012';
 
 use Exporter qw(import);
 use Sub::Quote    ();
@@ -494,7 +494,7 @@ sub is_ref {
 sub is_able {
     my $obj = shift;
     is_invocant($obj) || return 0;
-    $obj->can($_) || return 0 for @_;
+    $obj->can($_)     || return 0 for @_;
     1;
 }
 
@@ -514,7 +514,7 @@ sub check_maybe_able {
 sub is_instance {
     my $obj = shift;
     Scalar::Util::blessed($obj) || return 0;
-    $obj->isa($_) || return 0 for @_;
+    $obj->isa($_)               || return 0 for @_;
     1;
 }
 

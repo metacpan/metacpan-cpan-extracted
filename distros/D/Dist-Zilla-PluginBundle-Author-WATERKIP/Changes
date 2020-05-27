@@ -1,6 +1,21 @@
 Revision history for Dist::Zilla::PluginBundle::Author::WATERKIP
 
+TODO:
+* Get dual license to work with dzil
+
+2.5       2020-05-23 06:06:17Z
+
+    * Add [Encoding] to configure
+    * Update documenation
+    * Fix glitches in Changes file
+
 2.4       2020-04-29 18:43:07Z
+
+    * Update tests
+    * Disable some testing plugins
+
+    Maintainer only
+    * Use different docker infra
 
 2.3       2019-11-01 23:34:25Z
 
@@ -33,7 +48,9 @@ Revision history for Dist::Zilla::PluginBundle::Author::WATERKIP
 1.9       2018-06-11 11:59:57Z
 
     * Add MintingProfile
-    * Maintainer only: add some basic tests
+
+    Maintainer only:
+    * add some basic tests
 
 1.8       2018-06-03 10:13:19Z
 
@@ -52,6 +69,8 @@ Revision history for Dist::Zilla::PluginBundle::Author::WATERKIP
 
     * Allow uploading to Stratopan (requires patch to stratopan plugin
       module).
+
+    Maintainer only:
     * Add Gitlab CI yaml
 
 1.4       2017-09-03 11:40:28Z

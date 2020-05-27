@@ -1,5 +1,29 @@
 Revision history for Alien::proj
 
+1.11 2020-05-25
+    - Mark utility test as todo if projinfo is not installed,
+      warn when user tries to run a utility in such cases.
+
+1.10 2020-05-24 21:00 AEST
+    - Fix curl argument to configure under system installs
+
+1.09 2020-05-24 19:00 AEST
+    - Add method to access dependent bin_dirs.
+    - Add Path::Tiny as a dependency.
+
+1.08 2020-05-24
+    - More diagnostics in tests
+    - Set minimum Alien::sqlite version to 1.06 to
+      ensure the sqlite3 binary is available. 
+
+1.07 2020-05-23
+    - Set minimum Proj version to 6.1 (GH#1)
+    - Enable libtiff and curl integration if they are provided
+      by their respective Aliens (GH#3, GH#4).
+    - List Alien::libtiff and Alien::curl as suggested deps (GH#5).
+    - Wrap pure perl pkg-config on windows so it is called
+      using the user's perl.
+
 1.06 2020-05-02
     - Re-enable proj 7, but disable libtiff and curl integration
 

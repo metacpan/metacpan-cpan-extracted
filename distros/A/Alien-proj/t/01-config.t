@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Alien::proj;
 
-diag( 'NAME=' . Alien::proj->config('name') );
+diag( 'NAME=' . Alien::proj->config('name') // '(no name confg param)');
 diag( 'VERSION=' . Alien::proj->config('version') );
 
 my $alien = Alien::proj->new;

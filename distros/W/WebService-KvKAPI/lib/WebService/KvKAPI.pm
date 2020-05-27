@@ -6,7 +6,7 @@ use Moo;
 # This code has an EUPL license. Please see the LICENSE file in this repo for
 # more information.
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 use Carp;
 use OpenAPI::Client 0.17;
@@ -112,13 +112,31 @@ sub api_call {
     return $tx->res->json;
 }
 
+sub mangle_params {
+    my ($self, $params) = @_;
+
+    if (exists $params->{kvkNumber}) {
+        $params->{kvkNumber} = sprintf('%08d', $params->{kvkNumber});
+    }
+
+    if (exists $params->{branchNumber}) {
+        $params->{branchNumber} = sprintf('%012d', $params->{branchNumber});
+    }
+}
+
 sub _search {
     my ($self, $params) = @_;
+
+    $self->mangle_params($params);
+
     return $self->api_call('Companies_GetCompaniesBasicV2', $params);
 }
 
 sub _profile {
     my ($self, $params) = @_;
+
+    $self->mangle_params($params);
+
     return $self->api_call('Companies_GetCompaniesExtendedV2', $params);
 }
 
@@ -146,7 +164,7 @@ WebService::KvKAPI - Query the Dutch Chamber of Commerence (KvK) API
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 AUTHOR
 
@@ -1129,14 +1147,20 @@ Optional API host to allow overriding the default host C<api.kvk.nl>.
 
 =head1 METHODS
 
+=head2 has_api_host
+
+Check if you have an API host set or if you use the default. Publicly available
+for those who need it.
+
 =head2 api_call
 
-Directly do an API call towards the KvK API. Returns the JSON datastructure as an C<HashRef>.
+Directly do an API call towards the KvK API. Returns the JSON datastructure as
+an C<HashRef>.
 
 =head2 profile
 
-Retreive detailed information of one company. Dies when the company
-cannot be found. Make sure to call C<search> first in case you don't
+Retreive detailed information of one company. Dies when the company cannot be
+found. Make sure to call L<WebService::KvKAPI/search> first in case you don't
 want to die.
 
 =head2 search
@@ -1161,12 +1185,19 @@ searches
 
 =head2 search_max
 
-Search the KVK, retreives a maximum of X results up the the nearest 10, eg 15 as a max returns 20 items.
+Search the KVK, retreives a maximum of X results up the the nearest 10, eg 15
+as a max returns 20 items.
 
     my $results = $self->search_max(15, kvkNumber => 12345678, ...);
     foreach (@$results) {
         ...;
     }
+
+=head2 mangle_params
+
+Helper function to always have the correct syntax for the kvkNumber and
+branchNumber. Publicly available for if you want to do calls yourself via
+L<WebService::KvKAPI/api_call>
 
 =head1 SEE ALSO
 

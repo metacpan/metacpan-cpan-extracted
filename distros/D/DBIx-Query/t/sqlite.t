@@ -102,7 +102,7 @@ sub test_where {
     my ($dq) = @_;
 
     is_deeply(
-        $dq->get('movie')->where( 'final' => 'Aug 7, 2011' )->run->all({}),
+        scalar( $dq->get('movie')->where( 'final' => 'Aug 7, 2011' )->run->all({}) ),
         [{
             'open'  => 'Aug 5, 2011',
             'final' => 'Aug 7, 2011',
@@ -255,6 +255,23 @@ sub test_row_set_methods {
             'east' => 'Forks Over Knives'
         },
         '$dq->sql(...)->run()->next(2)->data()',
+    );
+
+    is_deeply(
+        $row_set->next(6)->data,
+        {
+            'open'  => 'Aug 26, 2011',
+            'final' => 'Aug 28, 2011',
+            'west'  => 'Gladiator',
+            'east'  => 'The Trip',
+        },
+        '$dq->sql(...)->run()->next(6)->data()',
+    );
+
+    is(
+        $row_set->next,
+        undef,
+        'next at end of data returns undef',
     );
 
     is_deeply(

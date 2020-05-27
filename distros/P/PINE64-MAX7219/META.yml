@@ -22,5 +22,5 @@ requires:
   PINE64::GPIO: '0.91'
   Time::HiRes: '1.9760'
   perl: '5.006'
-version: '0.91'
+version: '0.9101'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::ProcessTagReply;
-$Shipment::FedEx::WSDL::ShipTypes::ProcessTagReply::VERSION = '3.04';
+$Shipment::FedEx::WSDL::ShipTypes::ProcessTagReply::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -80,7 +80,7 @@ Shipment::FedEx::WSDL::ShipTypes::ProcessTagReply
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 

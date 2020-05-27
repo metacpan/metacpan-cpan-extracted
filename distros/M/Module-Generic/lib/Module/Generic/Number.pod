@@ -93,6 +93,9 @@ Module::Generic::Number - Number Manipulation Object Class
     $n->thousand # ,
     $n->unformat( "€ 1,024.00" ) # 1024
 
+=head1 VERSION
+
+    v0.3.1
 
 =head1 DESCRIPTION
 
@@ -151,6 +154,10 @@ Possible optional parameters are:
 
 Specifies the decimal separator. This can also be changed or retrieved with the method L</"decimal">
 
+=item I<grouping>
+
+The sizes of the groups of digits, except for currency values. unpack( "C*", $grouping ) will give the number in question. This is typically 3.
+
 =item I<lang>
 
 If provided with a language tag as specified in L<rfc5646|https://tools.ietf.org/html/rfc5646>, and this will the number format properties based on the locale dictionary. It uses L<POSIX/"setlocale"> to achieve that, but without disturbing your own locale settings.
@@ -171,15 +178,49 @@ Uses the standard default format properties, except for precede which we set to 
 
     $n->format # € 1.000,00
 
+When no I<lang> is provided, it uses the default language set in the system to retrieve the number formatting properties.
+
+Any of those properties can be overriden by specifying its value when creating an object.
+
+=item I<position_neg>
+
+Boolea value to define whether the negative sign (typically "-") should be positioned at the begining (true) or at the end (false) of the negative numbers.
+
+=item I<position_pos>
+
+Boolea value to define whether the positive sign (typically and empty string) should be positioned at the begining (true) or at the end (false) of the positive numbers.
+
 =item I<precede>
 
 If set to true, this will set the currency symbol before the number and when set to false, it will set it after the number
 
- This can also be changed or retrieved with the method L</"precede">
+This can also be changed or retrieved with the method L</"precede">
+
+=item I<precede_neg>
+
+If set to true, this will set the currency symbol before the negative number and when set to false, it will set it after the negative number
+
+This can also be changed or retrieved with the method L</"precede_neg">
 
 =item I<precision>
 
 Sets the decimal precision of the number.  This can also be changed or retrieved with the method L</"precision">
+
+=item I<sign_neg>
+
+The character used to denote negative currency values, usually a minus sign.
+
+=item I<sign_pos>
+
+The separator between groups of digits before the decimal point, except for currency values.
+
+=item I<space>
+
+Boolean value to define whether there should be a space between the currency sign and the number value.
+
+=item I<space_neg>
+
+Boolean value to define whether there should be a space between the currency sign and the number value for negative numbers.
 
 =item I<symbol>
 
@@ -335,6 +376,10 @@ Returns a number object based on an hex number.
 
     my $n2 = $n->from_hex( "0x400" ); # 1024
 
+=head2 grouping
+
+The sizes of the groups of digits, except for currency values. unpack( "C*", $grouping ) will reveal the number in question.
+
 =head2 int
 
 Returns the integer portion of the number object. See L<perlfunc/"int"> for more details.
@@ -374,9 +419,17 @@ Returns true if the argument is normal (that is, not a subnormal/denormal, and n
 
 Returns true if the number object is positive, false otherwise. See L<POSIX/"signbit">
 
+=head2 lang
+
+Returns the current language used for the number formatting properties.
+
 =head2 length
 
 Returns the number of digits this number object contains. The value returned is a L<Module::Generic::Number> object
+
+=head2 locale
+
+Same as L</"lang">
 
 =head2 log
 
@@ -421,6 +474,14 @@ Given an optional hash of parameters similar to the oens provided to L</"new"> a
 
 Provided an octal value, this returns the corresponding number as an object. See L<perlfunc/"oct"> for more details.
 
+=head2 position_neg
+
+Set to true or false if the negative sign (typically "-") should be positioned at the begining (true) or at the end (false) of the number.
+
+=head2 position_pos
+
+Set to true or false if the positive sign (typically "", i.e. empty, but could be set to "+") should be positioned at the begining (true) or at the end (false) of the number.
+
 =head2 pow
 
 Returns the number object to the power of the number provided as arguments. See L<POSIX/"pow"> for more details.
@@ -431,6 +492,10 @@ Returns the number object to the power of the number provided as arguments. See 
 =head2 precede
 
 Sets or gets the I<precede> property of this object. This is used by L<Number::Format> to determine if the currency symbol should be set before or after the number
+
+=head2 precede_neg
+
+Sets or gets the I<precede_neg> property of this object. This is used by L<Number::Format> to determine if the currency symbol should be set before or after the number when it is a negative number.
 
 =head2 precision
 
@@ -449,9 +514,25 @@ See L<perlfunc/"rand"> for more information.
 
 Provided with an optional precision, this will round the number object. Internally it uses L<perldoc/"sprintf"> to achieve that.
 
+=head2 sign_neg
+
+Sets or gets the I<sign_neg> property of this object. The character used to denote negative currency values, usually a minus sign.
+
+=head2 sign_pos
+
+Sets or gets the I<sign_pos> property of this object. The character used to denote nonnegative currency values, usually the empty string.
+
 =head2 sin
 
 Returns the sine of the number object. See L<perlfunc/"sine"> for more details.
+
+=head2 space
+
+Sets or gets the I<space> property of this object. 1 if a space is inserted between the currency symbol and the currency value for non-negative values, 0 otherwise.
+
+=head2 space_neg
+
+Sets or gets the I<space_neg> property of this object. 1 if a space is inserted between the currency symbol and the currency value for negative values, 0 otherwise.
 
 =head2 sqrt
 

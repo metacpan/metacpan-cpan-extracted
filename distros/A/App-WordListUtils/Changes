@@ -1,5 +1,8 @@
-Revision history for App-WordListModules
+0.002   2020-05-22  Released-By: PERLANCAR; Urgency: medium
 
-0.001   2016-06-09 (PERLANCAR)
+	- [script list-wordlist-modules] Return more details.
+
+
+0.001   2016-06-09  Released-By: PERLANCAR
 
         - First release.

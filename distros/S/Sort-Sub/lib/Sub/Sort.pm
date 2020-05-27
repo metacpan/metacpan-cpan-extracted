@@ -18,7 +18,7 @@ Sub::Sort - Dummy module to catch Sort::Sub typo
 
 =head1 VERSION
 
-This document describes version 0.118 of Sub::Sort (from Perl distribution Sort-Sub), released on 2020-02-28.
+This document describes version 0.120 of Sub::Sort (from Perl distribution Sort-Sub), released on 2020-05-25.
 
 =head1 HOMEPAGE
 

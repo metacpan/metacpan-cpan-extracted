@@ -179,7 +179,7 @@ char* error_info;
 
   errstr = error_num * -1 < 0 || error_num * -1 > 9 ? "Unknown" : (char *) bzerrorstrings[ error_num * -1 ];
 
-  if ( obj!=NULL ) {
+  if ( obj != NULL ) {
     obj->bzip_errno = error_num;
     obj->io_error = error_num == BZ_IO_ERROR ? errno : 0;
   }
@@ -216,7 +216,7 @@ Bool bzfile_error( bzFile *obj ) {
 #else
 Bool bzfile_error( obj ) bzFile *obj; {
 #endif
-  return obj!=NULL ? ( obj->bzip_errno ? True : False ) : global_bzip_errno ? True : False;
+  return obj != NULL ? ( obj->bzip_errno ? True : False ) : global_bzip_errno ? True : False;
 }
 
 #ifdef CAN_PROTOTYPE
@@ -224,7 +224,7 @@ int bzfile_geterrno( bzFile *obj ) {
 #else
 int bzfile_geterrno( obj ) bzFile *obj; {
 #endif
-  return obj==NULL ? global_bzip_errno : obj->bzip_errno;
+  return obj == NULL ? global_bzip_errno : obj->bzip_errno;
 }
 
 #ifdef CAN_PROTOTYPE
@@ -232,7 +232,7 @@ const char *bzfile_geterrstr( bzFile *obj ) {
 #else
 const char *bzfile_geterrstr( obj ) bzFile *obj; {
 #endif
-  int error_num = obj==NULL ? global_bzip_errno : obj->bzip_errno;
+  int error_num = obj == NULL ? global_bzip_errno : obj->bzip_errno;
   char *errstr = error_num * -1 < 0 || error_num * -1 > 9 ? "Unknown" : (char *) bzerrorstrings[ error_num * -1 ];
   return errstr;
 }
@@ -242,7 +242,7 @@ Bool bzfile_eof( bzFile *obj ) {
 #else
 Bool bzfile_eof( obj ) bzFile *obj; {
 #endif
-  return obj==NULL ? False :
+  return obj == NULL ? False :
     obj->bzip_errno == BZ_UNEXPECTED_EOF ? True :
     obj->bzip_errno == BZ_OK && obj->pending_io_error && obj->io_error == BZ_IO_EOF ? True :
     obj->bzip_errno != BZ_IO_ERROR ? False :
@@ -254,7 +254,7 @@ long bzfile_total_in( bzFile *obj ) {
 #else
 long bzfile_total_in( obj ) bzFile *obj; {
 #endif
-  return obj->total_in;
+  return obj == NULL ? 0 : obj->total_in;
 }
 
 #ifdef CAN_PROTOTYPE
@@ -262,7 +262,7 @@ long bzfile_total_out( bzFile *obj ) {
 #else
 long bzfile_total_out( obj ) bzFile *obj; {
 #endif
-  return obj->total_out;
+  return obj == NULL ? 0 : obj->total_out;
 }
 
 #ifdef CAN_PROTOTYPE
@@ -270,8 +270,10 @@ long bzfile_clear_totals( bzFile *obj ) {
 #else
 long bzfile_clear_totals( obj ) bzFile *obj; {
 #endif
-  obj->total_in = 0;
-  obj->total_out = 0;
+  if (obj) {
+    obj->total_in = 0;
+    obj->total_out = 0;
+  }
   return 0;
 }
 
@@ -284,7 +286,8 @@ int bzfile_clearerr( obj ) bzFile *obj; {
   int clear_flag = 1;
 
   if ( error_num == BZ_IO_ERROR ) {
-    PerlIO_clearerr( obj->handle );
+    if (obj)
+      PerlIO_clearerr( obj->handle );
   }
   else if ( error_num == BZ_SEQUENCE_ERROR ) {
     /* program error */
@@ -310,7 +313,7 @@ int bzfile_clearerr( obj ) bzFile *obj; {
     clear_flag = 0;		/* we don't like the version of bzlib */
   }
   else if ( error_num == BZ_OK ) {
-    if ( obj->pending_io_error ) {
+    if ( obj && obj->pending_io_error ) {
       if ( obj->io_error == BZ_IO_EOF ) {
 	PerlIO_clearerr( obj->handle );
 	clear_flag = 0;
@@ -335,7 +338,7 @@ int bzfile_clearerr( obj ) bzFile *obj; {
   }
 
   if ( clear_flag ) {
-    if ( obj != NULL ) {
+    if ( obj ) {
       obj->bzip_errno = 0;
       obj->io_error = 0;
       obj->pending_io_error = False;
@@ -368,6 +371,11 @@ bzFile* bzfile_new( verbosity, small, blockSize100k, workFactor )
   }
 
   Newz(idthing, obj, 1, bzFile);
+  if (!obj) {
+    BZ_SETERR(NULL, BZ_IO_ERROR, NULL);
+    die( "Out of memory");
+    return NULL;
+  }
 
   BZ_SETERR(obj, BZ_OK, NULL);
 
@@ -411,7 +419,7 @@ void bzfile_free( bzFile* obj ) {
 #else
 void bzfile_free( obj ) bzFile* obj; {
 #endif
-  if ( obj!=NULL ) Safefree((void*) obj);
+  if ( obj != NULL ) Safefree((void*) obj);
 }
 
 /* query and/or set param setting of bzFile */
@@ -1668,8 +1676,8 @@ MY_new(...)
   {
     int i;
 
-    perlobj=NULL;
-    obj=NULL;
+    perlobj = NULL;
+    obj = NULL;
     if ( items == 0 ) {
       class = "Compress::Bzip2";
     }
@@ -1711,7 +1719,9 @@ DESTROY(obj)
 
   CODE:
   {
-    if (obj->verbosity>=1)
+    if (!obj)
+      XSRETURN_UNDEF;
+    if (obj->verbosity >= 1)
       PerlIO_printf(PerlIO_stderr(), "debug: DESTROY on %p\n", obj);
     bzfile_close( obj, 0 );
     bzfile_free( obj );
@@ -2135,7 +2145,7 @@ MY_bzclearerr(obj)
 
   CODE:
   {
-    if ( bzfile_clearerr( obj ) )
+    if ( obj && bzfile_clearerr( obj ) )
       RETVAL = 1;
     else
       RETVAL = 0;

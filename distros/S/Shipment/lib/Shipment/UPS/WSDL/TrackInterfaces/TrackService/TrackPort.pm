@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::TrackInterfaces::TrackService::TrackPort;
-$Shipment::UPS::WSDL::TrackInterfaces::TrackService::TrackPort::VERSION = '3.04';
+$Shipment::UPS::WSDL::TrackInterfaces::TrackService::TrackPort::VERSION = '3.05';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -92,7 +92,7 @@ Shipment::UPS::WSDL::TrackInterfaces::TrackService::TrackPort
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 SYNOPSIS
 

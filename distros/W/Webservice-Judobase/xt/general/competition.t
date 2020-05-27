@@ -26,6 +26,7 @@ subtest europeans_2017 => sub {
         date_from     => '2017-04-20',
         date_to       => '2017-04-23',
         id            => 1455,
+        is_teams      => 0,
         label         => 'Warsaw 2017',
         module        => 'competition',
         rank_group    => 'cont_champ',

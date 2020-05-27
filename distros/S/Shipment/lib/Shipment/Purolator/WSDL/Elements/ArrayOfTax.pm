@@ -1,6 +1,6 @@
 
 package Shipment::Purolator::WSDL::Elements::ArrayOfTax;
-$Shipment::Purolator::WSDL::Elements::ArrayOfTax::VERSION = '3.04';
+$Shipment::Purolator::WSDL::Elements::ArrayOfTax::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -34,7 +34,7 @@ Shipment::Purolator::WSDL::Elements::ArrayOfTax
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 

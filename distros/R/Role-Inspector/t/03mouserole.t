@@ -74,4 +74,16 @@ ok(
 	'!does_role($x, $y) where $x is a role that consumes $y',
 );
 
+is_deeply(
+	get_role_info('Local::MouseRole3'),
+	+{
+		name     => 'Local::MouseRole3',
+		type     => 'Mouse::Role',
+		api      => [sort qw( meta meth3 mod req req_list1 req_list2 req_list3 req_array_ref1 req_array_ref2 )],
+		requires => [sort qw( mod req req_list1 req_list2 req_list3 req_array_ref1 req_array_ref2 )],
+		provides => [sort qw( meta meth3 )],
+	},
+	'can inspect Mouse role which uses method modifiers',
+) or diag explain(get_role_info('Local::MouseRole3'));
+
 done_testing;

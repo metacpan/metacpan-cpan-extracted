@@ -1,3 +1,10 @@
+0.126   2020-03-30  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- dateconv, durconv: Tweak Abstract.
+
+
 0.125   2020-01-31  Released-By: PERLANCAR; Urgency: medium
 
 	- Add utility: strftimeq.

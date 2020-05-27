@@ -1,3 +1,25 @@
+0.012   2020-05-24  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: get-firefox-profile-dir.
+
+
+0.011   2020-05-24  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention App::FirefoxMultiAccountContainersUtils.
+
+
+0.010   2020-04-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: firefox-is-running.
+
+
+0.009   2020-04-18  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: list-firefox-profiles.
+
+
 0.008   2020-04-11  Released-By: PERLANCAR; Urgency: medium
 
         - [build] Rebuild to update Sah coerce rule modules

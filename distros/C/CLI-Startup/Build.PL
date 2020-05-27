@@ -66,6 +66,8 @@ my $builder = $class->new(
 
     build_requires => {
         'Cwd'             => 0,
+        'File::Compare'   => 0,
+        'Test::Exit'      => 0,
         'Test::More'      => 0,
         'Test::Trap'      => 0,
         'Test::Exception' => 0,

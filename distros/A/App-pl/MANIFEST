@@ -1,4 +1,5 @@
 MANIFEST
+INSTALL
 README
 Makefile.PL
 App/pl.pm

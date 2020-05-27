@@ -1,9 +1,9 @@
 package App::lcpan::Cmd::authors_by_dist_count;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-07'; # DATE
+our $DATE = '2020-05-26'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.057'; # VERSION
+our $VERSION = '1.058'; # VERSION
 
 use 5.010001;
 use strict;
@@ -62,7 +62,7 @@ App::lcpan::Cmd::authors_by_dist_count - List authors ranked by number of dists
 
 =head1 VERSION
 
-This document describes version 1.057 of App::lcpan::Cmd::authors_by_dist_count (from Perl distribution App-lcpan), released on 2020-05-07.
+This document describes version 1.058 of App::lcpan::Cmd::authors_by_dist_count (from Perl distribution App-lcpan), released on 2020-05-26.
 
 =head1 FUNCTIONS
 

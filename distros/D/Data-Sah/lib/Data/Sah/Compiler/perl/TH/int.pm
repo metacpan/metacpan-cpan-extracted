@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::perl::TH::int;
 
-our $DATE = '2020-02-12'; # DATE
-our $VERSION = '0.907'; # VERSION
+our $DATE = '2020-05-21'; # DATE
+our $VERSION = '0.908'; # VERSION
 
 use 5.010;
 use strict;
@@ -61,7 +61,7 @@ Data::Sah::Compiler::perl::TH::int - perl's type handler for type "int"
 
 =head1 VERSION
 
-This document describes version 0.907 of Data::Sah::Compiler::perl::TH::int (from Perl distribution Data-Sah), released on 2020-02-12.
+This document describes version 0.908 of Data::Sah::Compiler::perl::TH::int (from Perl distribution Data-Sah), released on 2020-05-21.
 
 =for Pod::Coverage ^(clause_.+|superclause_.+)$
 

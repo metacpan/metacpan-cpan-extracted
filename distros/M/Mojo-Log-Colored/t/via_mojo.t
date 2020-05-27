@@ -35,8 +35,8 @@ for my $level ( sort keys %defaults ) {
     like $stderr, qr{
         \Q$defaults{$level}\E   # color of this level, escaped
         $level
-        \n
         \e\[0m                  # end of coloring
+        \n
     }x, "log contains colors for $level";
 }
 done_testing;

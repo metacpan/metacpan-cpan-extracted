@@ -1,7 +1,9 @@
 package DBIx::OnlineDDL;
 
 our $AUTHORITY = 'cpan:GSG';
-our $VERSION   = '0.92';
+# ABSTRACT: Run DDL on online databases safely
+use version;
+our $VERSION = 'v0.920.1'; # VERSION
 
 use v5.10;
 use Moo;
@@ -23,152 +25,144 @@ use namespace::clean -except => [qw< new meta >];
 
 my $DEFAULT_MAX_ATTEMPTS = 20;
 
-=encoding utf8
-
-=head1 NAME
-
-DBIx::OnlineDDL - Run DDL on online databases safely
-
-=head1 VERSION
-
-version 0.92
-
-=head1 SYNOPSIS
-
-    use DBIx::OnlineDDL;
-    use DBIx::BatchChunker;
-
-    DBIx::OnlineDDL->construct_and_execute(
-        rsrc          => $dbic_schema->source('Account'),
-        ### OR ###
-        dbi_connector => $dbix_connector_retry_object,
-        table_name    => 'accounts',
-
-        coderef_hooks => {
-            # This is the phase where the DDL is actually run
-            before_triggers => \&drop_foobar,
-
-            # Run other operations right before the swap
-            before_swap => \&delete_deprecated_accounts,
-        },
-
-        process_name => 'Dropping foobar from accounts',
-
-        copy_opts => {
-            chunk_size => 5000,
-            debug => 1,
-        },
-    );
-
-    sub drop_foobar {
-        my $oddl  = shift;
-        my $name  = $oddl->new_table_name;
-        my $qname = $oddl->dbh->quote_identifier($name);
-
-        # Drop the 'foobar' column, since it is no longer used
-        $oddl->dbh_runner_do("ALTER TABLE $qname DROP COLUMN foobar");
-    }
-
-    sub delete_deprecated_accounts {
-        my $oddl = shift;
-        my $name = $oddl->new_table_name;
-        my $dbh  = $oddl->dbh;  # only use for quoting!
-
-        my $qname = $dbh->quote_identifier($name);
-
-        DBIx::BatchChunker->construct_and_execute(
-            chunk_size  => 5000,
-
-            debug => 1,
-
-            process_name     => 'Deleting deprecated accounts',
-            process_past_max => 1,
-
-            dbic_storage => $oddl->rsrc->storage,
-            min_stmt => "SELECT MIN(account_id) FROM $qname",
-            max_stmt => "SELECT MAX(account_id) FROM $qname",
-            stmt     => join("\n",
-                "DELETE FROM $qname",
-                "WHERE",
-                "    account_type = ".$dbh->quote('deprecated')." AND",
-                "    account_id BETWEEN ? AND ?",
-            ),
-        );
-    }
-
-=head1 DESCRIPTION
-
-This is a database utility class for running DDL operations (like C<ALTER TABLE>) safely
-on large tables.  It has a similar scope as L<DBIx::BatchChunker>, but is designed for
-DDL, rather than DML.  It also has a similar function to other utilities like
-L<pt-online-schema-change|https://www.percona.com/doc/percona-toolkit/LATEST/pt-online-schema-change.html> or
-L<gh-ost|https://github.com/github/gh-ost>, but actually works properly with foreign
-keys, and is written as a Perl module to hook directly into a DBI handle.
-
-Like most online schema change tools, this works by creating a new shell table that looks
-just like the old table, running the DDL changes (through the L</before_triggers> hook),
-copying data to the new table, and swapping the tables.  Triggers are created to keep the
-data in sync.  See L</STEP METHODS> for more information.
-
-The full operation is protected with an L<undo stack|/reversible> via L<Eval::Reversible>.
-If any step in the process fails, the undo stack is run to return the DB back to normal.
-
-This module uses as many of the DBI info methods as possible, along with ANSI SQL in most
-places, to be compatible with multiple RDBMS.  So far, it will work with MySQL or SQLite,
-but can be expanded to include more systems with a relatively small amount of code
-changes.  (See L<DBIx::OnlineDDL::Helper::Base> for details.)
-
-B<DISCLAIMER:> You should not rely on this class to magically fix any and all locking
-problems the DB might experience just because it's being used.  Thorough testing and
-best practices are still required.
-
-=head2 When you shouldn't use this module
-
-=head3 Online DDL is already available in the RDBMS
-
-If you're running MySQL 5.6+ without clustering, just use C<LOCK=NONE> for every DDL
-statement.  It is seriously simple and guarantees that the table changes you make are not
-going to lock the table, or it will fail right away to tell you it's an incompatible
-change.
-
-If you're running something like Galera clusters, this typically wouldn't be an option,
-as it would lock up the clusters while the C<ALTER TABLE> statement is running, despite
-the C<LOCK=NONE> statement.  (Galera clusters were the prime motivation for writing this
-module.)
-
-Other RDBMSs may have support for online DDL as well.  Check the documentation first.  If
-they don't, patches for this tool are welcome!
-
-=head3 The operation is small
-
-Does your DDL only take 2 seconds?  Just do it!  Don't bother with trying to swap tables
-around, wasting time with full table copies, etc.  It's not worth the time spent or risk.
-
-=head3 When you actually want to run DML, not DDL
-
-L<DBIx::BatchChunker> is more appropriate for running DML operations (like C<INSERT>,
-C<UPDATE>, C<DELETE>).  If you need to do both, you can use the L</before_triggers> hook
-for DDL, and the L</before_swap> hook for DML.  Or just run DBIx::BatchChunker after the
-OnlineDDL process is complete.
-
-=head3 Other online schema change tools fit your needs
-
-Don't have foreign key constraints and C<gh-ost> is already working for you?  Great!
-Keep using it.
-
-=head1 ATTRIBUTES
-
-=head2 DBIC Attributes
-
-=head3 rsrc
-
-A L<DBIx::Class::ResultSource>.  This will be the source used for all operations, DDL or
-otherwise.  Optional, but recommended for DBIC users.
-
-The DBIC storage handler's C<connect_info> will be tweaked to ensure sane defaults and
-proper post-connection details.
-
-=cut
+#pod =encoding utf8
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod     use DBIx::OnlineDDL;
+#pod     use DBIx::BatchChunker;
+#pod
+#pod     DBIx::OnlineDDL->construct_and_execute(
+#pod         rsrc          => $dbic_schema->source('Account'),
+#pod         ### OR ###
+#pod         dbi_connector => $dbix_connector_retry_object,
+#pod         table_name    => 'accounts',
+#pod
+#pod         coderef_hooks => {
+#pod             # This is the phase where the DDL is actually run
+#pod             before_triggers => \&drop_foobar,
+#pod
+#pod             # Run other operations right before the swap
+#pod             before_swap => \&delete_deprecated_accounts,
+#pod         },
+#pod
+#pod         process_name => 'Dropping foobar from accounts',
+#pod
+#pod         copy_opts => {
+#pod             chunk_size => 5000,
+#pod             debug => 1,
+#pod         },
+#pod     );
+#pod
+#pod     sub drop_foobar {
+#pod         my $oddl  = shift;
+#pod         my $name  = $oddl->new_table_name;
+#pod         my $qname = $oddl->dbh->quote_identifier($name);
+#pod
+#pod         # Drop the 'foobar' column, since it is no longer used
+#pod         $oddl->dbh_runner_do("ALTER TABLE $qname DROP COLUMN foobar");
+#pod     }
+#pod
+#pod     sub delete_deprecated_accounts {
+#pod         my $oddl = shift;
+#pod         my $name = $oddl->new_table_name;
+#pod         my $dbh  = $oddl->dbh;  # only use for quoting!
+#pod
+#pod         my $qname = $dbh->quote_identifier($name);
+#pod
+#pod         DBIx::BatchChunker->construct_and_execute(
+#pod             chunk_size  => 5000,
+#pod
+#pod             debug => 1,
+#pod
+#pod             process_name     => 'Deleting deprecated accounts',
+#pod             process_past_max => 1,
+#pod
+#pod             dbic_storage => $oddl->rsrc->storage,
+#pod             min_stmt => "SELECT MIN(account_id) FROM $qname",
+#pod             max_stmt => "SELECT MAX(account_id) FROM $qname",
+#pod             stmt     => join("\n",
+#pod                 "DELETE FROM $qname",
+#pod                 "WHERE",
+#pod                 "    account_type = ".$dbh->quote('deprecated')." AND",
+#pod                 "    account_id BETWEEN ? AND ?",
+#pod             ),
+#pod         );
+#pod     }
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This is a database utility class for running DDL operations (like C<ALTER TABLE>) safely
+#pod on large tables.  It has a similar scope as L<DBIx::BatchChunker>, but is designed for
+#pod DDL, rather than DML.  It also has a similar function to other utilities like
+#pod L<pt-online-schema-change|https://www.percona.com/doc/percona-toolkit/LATEST/pt-online-schema-change.html> or
+#pod L<gh-ost|https://github.com/github/gh-ost>, but actually works properly with foreign
+#pod keys, and is written as a Perl module to hook directly into a DBI handle.
+#pod
+#pod Like most online schema change tools, this works by creating a new shell table that looks
+#pod just like the old table, running the DDL changes (through the L</before_triggers> hook),
+#pod copying data to the new table, and swapping the tables.  Triggers are created to keep the
+#pod data in sync.  See L</STEP METHODS> for more information.
+#pod
+#pod The full operation is protected with an L<undo stack|/reversible> via L<Eval::Reversible>.
+#pod If any step in the process fails, the undo stack is run to return the DB back to normal.
+#pod
+#pod This module uses as many of the DBI info methods as possible, along with ANSI SQL in most
+#pod places, to be compatible with multiple RDBMS.  So far, it will work with MySQL or SQLite,
+#pod but can be expanded to include more systems with a relatively small amount of code
+#pod changes.  (See L<DBIx::OnlineDDL::Helper::Base> for details.)
+#pod
+#pod B<DISCLAIMER:> You should not rely on this class to magically fix any and all locking
+#pod problems the DB might experience just because it's being used.  Thorough testing and
+#pod best practices are still required.
+#pod
+#pod =head2 When you shouldn't use this module
+#pod
+#pod =head3 Online DDL is already available in the RDBMS
+#pod
+#pod If you're running MySQL 5.6+ without clustering, just use C<LOCK=NONE> for every DDL
+#pod statement.  It is seriously simple and guarantees that the table changes you make are not
+#pod going to lock the table, or it will fail right away to tell you it's an incompatible
+#pod change.
+#pod
+#pod If you're running something like Galera clusters, this typically wouldn't be an option,
+#pod as it would lock up the clusters while the C<ALTER TABLE> statement is running, despite
+#pod the C<LOCK=NONE> statement.  (Galera clusters were the prime motivation for writing this
+#pod module.)
+#pod
+#pod Other RDBMSs may have support for online DDL as well.  Check the documentation first.  If
+#pod they don't, patches for this tool are welcome!
+#pod
+#pod =head3 The operation is small
+#pod
+#pod Does your DDL only take 2 seconds?  Just do it!  Don't bother with trying to swap tables
+#pod around, wasting time with full table copies, etc.  It's not worth the time spent or risk.
+#pod
+#pod =head3 When you actually want to run DML, not DDL
+#pod
+#pod L<DBIx::BatchChunker> is more appropriate for running DML operations (like C<INSERT>,
+#pod C<UPDATE>, C<DELETE>).  If you need to do both, you can use the L</before_triggers> hook
+#pod for DDL, and the L</before_swap> hook for DML.  Or just run DBIx::BatchChunker after the
+#pod OnlineDDL process is complete.
+#pod
+#pod =head3 Other online schema change tools fit your needs
+#pod
+#pod Don't have foreign key constraints and C<gh-ost> is already working for you?  Great!
+#pod Keep using it.
+#pod
+#pod =head1 ATTRIBUTES
+#pod
+#pod =head2 DBIC Attributes
+#pod
+#pod =head3 rsrc
+#pod
+#pod A L<DBIx::Class::ResultSource>.  This will be the source used for all operations, DDL or
+#pod otherwise.  Optional, but recommended for DBIC users.
+#pod
+#pod The DBIC storage handler's C<connect_info> will be tweaked to ensure sane defaults and
+#pod proper post-connection details.
+#pod
+#pod =cut
 
 has rsrc => (
     is       => 'ro',
@@ -176,13 +170,13 @@ has rsrc => (
     required => 0,
 );
 
-=head3 dbic_retry_opts
-
-A hashref of DBIC retry options.  These options control how retry protection works within
-DBIC.  Right now, this is just limited to C<max_attempts>, which controls the number of
-times to retry.  The default C<max_attempts> is 20.
-
-=cut
+#pod =head3 dbic_retry_opts
+#pod
+#pod A hashref of DBIC retry options.  These options control how retry protection works within
+#pod DBIC.  Right now, this is just limited to C<max_attempts>, which controls the number of
+#pod times to retry.  The default C<max_attempts> is 20.
+#pod
+#pod =cut
 
 has dbic_retry_opts => (
     is       => 'ro',
@@ -191,22 +185,22 @@ has dbic_retry_opts => (
     default  => sub { {} },
 );
 
-=head2 DBI Attributes
-
-=head3 dbi_connector
-
-A L<DBIx::Connector::Retry> object.  Instead of L<DBI> statement handles, this is the
-recommended non-DBIC way for OnlineDDL (and BatchChunker) to interface with the DBI, as
-it handles retries on failures.  The connection mode used is whatever default is set
-within the object.
-
-Required, except for DBIC users, who should be setting L</rsrc> above.  It is also
-assumed that the correct database is already active.
-
-The object will be tweaked to ensure sane defaults, proper post-connection details, a
-custom C<retry_handler>, and set a default C<max_attempts> of 20, if not already set.
-
-=cut
+#pod =head2 DBI Attributes
+#pod
+#pod =head3 dbi_connector
+#pod
+#pod A L<DBIx::Connector::Retry> object.  Instead of L<DBI> statement handles, this is the
+#pod recommended non-DBIC way for OnlineDDL (and BatchChunker) to interface with the DBI, as
+#pod it handles retries on failures.  The connection mode used is whatever default is set
+#pod within the object.
+#pod
+#pod Required, except for DBIC users, who should be setting L</rsrc> above.  It is also
+#pod assumed that the correct database is already active.
+#pod
+#pod The object will be tweaked to ensure sane defaults, proper post-connection details, a
+#pod custom C<retry_handler>, and set a default C<max_attempts> of 20, if not already set.
+#pod
+#pod =cut
 
 has dbi_connector => (
     is       => 'ro',
@@ -214,12 +208,12 @@ has dbi_connector => (
     required => 0,
 );
 
-=head3 table_name
-
-The table name to be copied and eventually replaced.  Required unless L</rsrc> is
-specified.
-
-=cut
+#pod =head3 table_name
+#pod
+#pod The table name to be copied and eventually replaced.  Required unless L</rsrc> is
+#pod specified.
+#pod
+#pod =cut
 
 has table_name => (
     is       => 'ro',
@@ -232,16 +226,16 @@ has table_name => (
     },
 );
 
-=head3 new_table_name
-
-The new table name to be created, copied to, and eventually used as the final table.
-Optional.
-
-If not defined, a name will be created automatically.  This might be the better route,
-since the default builder will search for an unused name in the DB right before OnlineDDL
-needs it.
-
-=cut
+#pod =head3 new_table_name
+#pod
+#pod The new table name to be created, copied to, and eventually used as the final table.
+#pod Optional.
+#pod
+#pod If not defined, a name will be created automatically.  This might be the better route,
+#pod since the default builder will search for an unused name in the DB right before OnlineDDL
+#pod needs it.
+#pod
+#pod =cut
 
 has new_table_name => (
     is       => 'ro',
@@ -274,18 +268,18 @@ sub _build_new_table_name {
     );
 }
 
-=head2 Progress Bar Attributes
-
-=head3 progress_bar
-
-The progress bar used for most of the process.  A different one is used for the actual
-table copy with L<DBIx::BatchChunker>, since that step takes longer.
-
-Optional.  If the progress bar isn't specified, a default one will be created.  If the
-terminal isn't interactive, the default L<Term::ProgressBar> will be set to C<silent> to
-naturally skip the output.
-
-=cut
+#pod =head2 Progress Bar Attributes
+#pod
+#pod =head3 progress_bar
+#pod
+#pod The progress bar used for most of the process.  A different one is used for the actual
+#pod table copy with L<DBIx::BatchChunker>, since that step takes longer.
+#pod
+#pod Optional.  If the progress bar isn't specified, a default one will be created.  If the
+#pod terminal isn't interactive, the default L<Term::ProgressBar> will be set to C<silent> to
+#pod naturally skip the output.
+#pod
+#pod =cut
 
 has progress_bar => (
     is       => 'rw',
@@ -308,15 +302,15 @@ sub _progress_bar_setup {
     $vars->{progress_bar} = $progress;
 }
 
-=head3 progress_name
-
-A string used to assist in creating a progress bar.  Ignored if L</progress_bar> is
-already specified.
-
-This is the preferred way of customizing the progress bar without having to create one
-from scratch.
-
-=cut
+#pod =head3 progress_name
+#pod
+#pod A string used to assist in creating a progress bar.  Ignored if L</progress_bar> is
+#pod already specified.
+#pod
+#pod This is the preferred way of customizing the progress bar without having to create one
+#pod from scratch.
+#pod
+#pod =cut
 
 has progress_name => (
     is       => 'rw',
@@ -329,41 +323,41 @@ has progress_name => (
     },
 );
 
-=head2 Other Attributes
-
-=head3 coderef_hooks
-
-A hashref of coderefs.  Each of these are used in different steps in the process.  All
-of these are optional, but it is B<highly recommended> that C<before_triggers> is
-specified.  Otherwise, you're not actually running any DDL and the table copy is
-essentially a no-op.
-
-All of these triggers pass the C<DBIx::OnlineDDL> object as the only argument.  The
-L</new_table_name> can be acquired from that and used in SQL statements.  The L</dbh_runner>
-and L</dbh_runner_do> methods should be used to protect against disconnections or locks.
-
-There is room to add more hooks here, but only if there's a good reason to do so.
-(Running the wrong kind of SQL at the wrong time could be dangerous.)  Create a GitHub
-issue if you can think of one.
-
-=head4 before_triggers
-
-This is called before the table triggers are applied.  Your DDL should take place here,
-for a few reasons:
-
-    1. The table is empty, so DDL should take no time at all now.
-
-    2. After this hook, the table is reanalyzed to make sure it has an accurate picture
-    of the new columns.  This is critical for the creation of the triggers.
-
-=head4 before_swap
-
-This is called after the new table has been analyzed, but before the big table swap.  This
-hook might be used if a large DML operation needs to be done while the new table is still
-available.  If you use this hook, it's highly recommended that you use something like
-L<DBIx::BatchChunker> to make sure the changes are made in a safe and batched manner.
-
-=cut
+#pod =head2 Other Attributes
+#pod
+#pod =head3 coderef_hooks
+#pod
+#pod A hashref of coderefs.  Each of these are used in different steps in the process.  All
+#pod of these are optional, but it is B<highly recommended> that C<before_triggers> is
+#pod specified.  Otherwise, you're not actually running any DDL and the table copy is
+#pod essentially a no-op.
+#pod
+#pod All of these triggers pass the C<DBIx::OnlineDDL> object as the only argument.  The
+#pod L</new_table_name> can be acquired from that and used in SQL statements.  The L</dbh_runner>
+#pod and L</dbh_runner_do> methods should be used to protect against disconnections or locks.
+#pod
+#pod There is room to add more hooks here, but only if there's a good reason to do so.
+#pod (Running the wrong kind of SQL at the wrong time could be dangerous.)  Create a GitHub
+#pod issue if you can think of one.
+#pod
+#pod =head4 before_triggers
+#pod
+#pod This is called before the table triggers are applied.  Your DDL should take place here,
+#pod for a few reasons:
+#pod
+#pod     1. The table is empty, so DDL should take no time at all now.
+#pod
+#pod     2. After this hook, the table is reanalyzed to make sure it has an accurate picture
+#pod     of the new columns.  This is critical for the creation of the triggers.
+#pod
+#pod =head4 before_swap
+#pod
+#pod This is called after the new table has been analyzed, but before the big table swap.  This
+#pod hook might be used if a large DML operation needs to be done while the new table is still
+#pod available.  If you use this hook, it's highly recommended that you use something like
+#pod L<DBIx::BatchChunker> to make sure the changes are made in a safe and batched manner.
+#pod
+#pod =cut
 
 has coderef_hooks => (
     is       => 'ro',
@@ -375,45 +369,45 @@ has coderef_hooks => (
     default  => sub { +{} },
 );
 
-=head3 copy_opts
-
-A hashref of different options to pass to L<DBIx::BatchChunker>, which is used in the
-L</copy_rows> step.  Some of these are defined automatically.  It's recommended that you
-specify at least these options:
-
-    chunk_size  => 5000,     # or whatever is a reasonable size for that table
-    id_name     => 'pk_id',  # especially if there isn't an obvious integer PK
-
-Specifying L<DBIx::BatchChunker/coderef> is not recommended, since Active DBI Processing
-mode will be used.
-
-These options will be included into the hashref, unless specifically overridden by key
-name:
-
-    id_name      => $first_pk_column,  # will warn if the PK is multi-column
-    target_time  => 1,
-    sleep        => 0.5,
-
-    # If using DBIC
-    dbic_storage => $rsrc->storage,
-    rsc          => $id_rsc,
-    dbic_retry_opts => {
-        max_attempts  => 20,
-        # best not to change this, unless you know what you're doing
-        retry_handler => $onlineddl_retry_handler,
-    },
-
-    # If using DBI
-    dbi_connector => $oddl->dbi_connector,
-    min_stmt      => $min_sql,
-    max_stmt      => $max_sql,
-
-    # For both
-    count_stmt    => $count_sql,
-    stmt          => $insert_select_sql,
-    progress_name => $copying_msg,
-
-=cut
+#pod =head3 copy_opts
+#pod
+#pod A hashref of different options to pass to L<DBIx::BatchChunker>, which is used in the
+#pod L</copy_rows> step.  Some of these are defined automatically.  It's recommended that you
+#pod specify at least these options:
+#pod
+#pod     chunk_size  => 5000,     # or whatever is a reasonable size for that table
+#pod     id_name     => 'pk_id',  # especially if there isn't an obvious integer PK
+#pod
+#pod Specifying L<DBIx::BatchChunker/coderef> is not recommended, since Active DBI Processing
+#pod mode will be used.
+#pod
+#pod These options will be included into the hashref, unless specifically overridden by key
+#pod name:
+#pod
+#pod     id_name      => $first_pk_column,  # will warn if the PK is multi-column
+#pod     target_time  => 1,
+#pod     sleep        => 0.5,
+#pod
+#pod     # If using DBIC
+#pod     dbic_storage => $rsrc->storage,
+#pod     rsc          => $id_rsc,
+#pod     dbic_retry_opts => {
+#pod         max_attempts  => 20,
+#pod         # best not to change this, unless you know what you're doing
+#pod         retry_handler => $onlineddl_retry_handler,
+#pod     },
+#pod
+#pod     # If using DBI
+#pod     dbi_connector => $oddl->dbi_connector,
+#pod     min_stmt      => $min_sql,
+#pod     max_stmt      => $max_sql,
+#pod
+#pod     # For both
+#pod     count_stmt    => $count_sql,
+#pod     stmt          => $insert_select_sql,
+#pod     progress_name => $copying_msg,
+#pod
+#pod =cut
 
 has copy_opts => (
     is       => 'ro',
@@ -490,45 +484,45 @@ sub _fill_copy_opts {
     return $copy_opts;
 }
 
-=head3 db_timeouts
-
-A hashref of timeouts used for various DB operations, and usually set at the beginning of
-each connection.  Some of these settings may be RDBMS-specific.
-
-=head4 lock_file
-
-Amount of time (in seconds) to wait when attempting to acquire filesystem locks (on
-filesystems which support locking).  Float or fractional values are allowed.  This
-currently only applies to SQLite.
-
-Default value is 1 second.  The downside is that the SQLite default is actually 0, so
-other (non-OnlineDDL) connections should have a setting that is more than that to prevent
-lock contention.
-
-=head4 lock_db
-
-Amount of time (in whole seconds) to wait when attempting to acquire table and/or database
-level locks before falling back to retry.
-
-Default value is 60 seconds.
-
-=head4 lock_row
-
-Amount of time (in whole seconds) to wait when attempting to acquire row-level locks,
-which apply to much lower-level operations than L</lock_db>.  At this scope, the lesser
-of either of these two settings will take precedence.
-
-Default value is 2 seconds.  Lower values are preferred for row lock wait timeouts, so
-that OnlineDDL is more likely to be the victim of lock contention.  OnlineDDL can simply
-retry the connection at that point.
-
-=head4 session
-
-Amount of time (in whole seconds) for inactive session timeouts on the database side.
-
-Default value is 28,800 seconds (8 hours), which is MySQL's default.
-
-=cut
+#pod =head3 db_timeouts
+#pod
+#pod A hashref of timeouts used for various DB operations, and usually set at the beginning of
+#pod each connection.  Some of these settings may be RDBMS-specific.
+#pod
+#pod =head4 lock_file
+#pod
+#pod Amount of time (in seconds) to wait when attempting to acquire filesystem locks (on
+#pod filesystems which support locking).  Float or fractional values are allowed.  This
+#pod currently only applies to SQLite.
+#pod
+#pod Default value is 1 second.  The downside is that the SQLite default is actually 0, so
+#pod other (non-OnlineDDL) connections should have a setting that is more than that to prevent
+#pod lock contention.
+#pod
+#pod =head4 lock_db
+#pod
+#pod Amount of time (in whole seconds) to wait when attempting to acquire table and/or database
+#pod level locks before falling back to retry.
+#pod
+#pod Default value is 60 seconds.
+#pod
+#pod =head4 lock_row
+#pod
+#pod Amount of time (in whole seconds) to wait when attempting to acquire row-level locks,
+#pod which apply to much lower-level operations than L</lock_db>.  At this scope, the lesser
+#pod of either of these two settings will take precedence.
+#pod
+#pod Default value is 2 seconds.  Lower values are preferred for row lock wait timeouts, so
+#pod that OnlineDDL is more likely to be the victim of lock contention.  OnlineDDL can simply
+#pod retry the connection at that point.
+#pod
+#pod =head4 session
+#pod
+#pod Amount of time (in whole seconds) for inactive session timeouts on the database side.
+#pod
+#pod Default value is 28,800 seconds (8 hours), which is MySQL's default.
+#pod
+#pod =cut
 
 has db_timeouts => (
     is       => 'ro',
@@ -541,12 +535,12 @@ has db_timeouts => (
     required => 0,
 );
 
-=head3 reversible
-
-A L<Eval::Reversible> object, used for rollbacks.  A default will be created, if not
-specified.
-
-=cut
+#pod =head3 reversible
+#pod
+#pod A L<Eval::Reversible> object, used for rollbacks.  A default will be created, if not
+#pod specified.
+#pod
+#pod =cut
 
 has reversible => (
     is       => 'rw',
@@ -739,31 +733,31 @@ sub BUILD {
     $dbh->do($_) for @stmts;
 }
 
-=head1 CONSTRUCTORS
-
-See L</ATTRIBUTES> for information on what can be passed into these constructors.
-
-=head2 new
-
-    my $online_ddl = DBIx::OnlineDDL->new(...);
-
-A standard object constructor. If you use this constructor, you will need to manually
-call L</execute> to execute the DB changes.
-
-You'll probably just want to use L</construct_and_execute>.
-
-=head2 construct_and_execute
-
-    my $online_ddl = DBIx::OnlineDDL->construct_and_execute(...);
-
-Constructs a DBIx::OnlineDDL object and automatically calls each method step, including
-hooks.  Anything passed to this method will be passed through to the constructor.
-
-Returns the constructed object, post-execution.  This is typically only useful if you want
-to inspect the attributes after the process has finished.  Otherwise, it's safe to just
-ignore the return and throw away the object immediately.
-
-=cut
+#pod =head1 CONSTRUCTORS
+#pod
+#pod See L</ATTRIBUTES> for information on what can be passed into these constructors.
+#pod
+#pod =head2 new
+#pod
+#pod     my $online_ddl = DBIx::OnlineDDL->new(...);
+#pod
+#pod A standard object constructor. If you use this constructor, you will need to manually
+#pod call L</execute> to execute the DB changes.
+#pod
+#pod You'll probably just want to use L</construct_and_execute>.
+#pod
+#pod =head2 construct_and_execute
+#pod
+#pod     my $online_ddl = DBIx::OnlineDDL->construct_and_execute(...);
+#pod
+#pod Constructs a DBIx::OnlineDDL object and automatically calls each method step, including
+#pod hooks.  Anything passed to this method will be passed through to the constructor.
+#pod
+#pod Returns the constructed object, post-execution.  This is typically only useful if you want
+#pod to inspect the attributes after the process has finished.  Otherwise, it's safe to just
+#pod ignore the return and throw away the object immediately.
+#pod
+#pod =cut
 
 sub construct_and_execute {
     my $class      = shift;
@@ -774,16 +768,16 @@ sub construct_and_execute {
     return $online_ddl;
 }
 
-=head1 METHODS
-
-=head2 Step Runners
-
-=head3 execute
-
-Runs all of the steps as documented in L</STEP METHODS>.  This also includes undo
-protection, in case of exceptions.
-
-=cut
+#pod =head1 METHODS
+#pod
+#pod =head2 Step Runners
+#pod
+#pod =head3 execute
+#pod
+#pod Runs all of the steps as documented in L</STEP METHODS>.  This also includes undo
+#pod protection, in case of exceptions.
+#pod
+#pod =cut
 
 sub execute {
     my $self       = shift;
@@ -803,15 +797,15 @@ sub execute {
     });
 }
 
-=head3 fire_hook
-
-    $online_ddl->fire_hook('before_triggers');
-
-Fires one of the coderef hooks, if it exists.  This also updates the progress bar.
-
-See L</coderef_hooks> for more details.
-
-=cut
+#pod =head3 fire_hook
+#pod
+#pod     $online_ddl->fire_hook('before_triggers');
+#pod
+#pod Fires one of the coderef hooks, if it exists.  This also updates the progress bar.
+#pod
+#pod See L</coderef_hooks> for more details.
+#pod
+#pod =cut
 
 sub fire_hook {
     my ($self, $hook_name) = @_;
@@ -831,17 +825,17 @@ sub fire_hook {
     $progress->update;
 }
 
-=head2 DBI Helpers
-
-=head3 dbh
-
-    $online_ddl->dbh;
-
-Acquires a database handle, either from L</rsrc> or L</dbi_connector>.  Not recommended
-for active work, as it doesn't offer retry protection.  Instead, use L</dbh_runner> or
-L</dbh_runner_do>.
-
-=cut
+#pod =head2 DBI Helpers
+#pod
+#pod =head3 dbh
+#pod
+#pod     $online_ddl->dbh;
+#pod
+#pod Acquires a database handle, either from L</rsrc> or L</dbi_connector>.  Not recommended
+#pod for active work, as it doesn't offer retry protection.  Instead, use L</dbh_runner> or
+#pod L</dbh_runner_do>.
+#pod
+#pod =cut
 
 sub dbh {
     my $self = shift;
@@ -852,21 +846,21 @@ sub dbh {
     return $dbh;
 }
 
-=head3 dbh_runner
-
-    my @items = $online_ddl->dbh_runner(run => sub {
-        my $dbh = $_;  # or $_[0]
-        $dbh->selectall_array(...);
-    });
-
-Runs the C<$coderef>, locally setting C<$_> to and passing in the database handle.  This
-is essentially a shortcut interface into either L<dbi_connector> or DBIC's L<BlockRunner|DBIx::Class::Storage::BlockRunner>.
-
-The first argument can either be C<run> or C<txn>, which controls whether to wrap the
-code in a DB transaction or not.  The return is passed directly back, and return context
-is honored.
-
-=cut
+#pod =head3 dbh_runner
+#pod
+#pod     my @items = $online_ddl->dbh_runner(run => sub {
+#pod         my $dbh = $_;  # or $_[0]
+#pod         $dbh->selectall_array(...);
+#pod     });
+#pod
+#pod Runs the C<$coderef>, locally setting C<$_> to and passing in the database handle.  This
+#pod is essentially a shortcut interface into either L<dbi_connector> or DBIC's L<BlockRunner|DBIx::Class::Storage::BlockRunner>.
+#pod
+#pod The first argument can either be C<run> or C<txn>, which controls whether to wrap the
+#pod code in a DB transaction or not.  The return is passed directly back, and return context
+#pod is honored.
+#pod
+#pod =cut
 
 sub _retry_handler {
     my ($self, $runner) = @_;
@@ -978,24 +972,24 @@ sub dbh_runner {
     return $wantarray ? @res : $res[0];
 }
 
-=head3 dbh_runner_do
-
-    $online_ddl->dbh_runner_do(
-        "ALTER TABLE $table_name ADD COLUMN foobar",
-        ["ALTER TABLE ? DROP COLUMN ?", undef, $table_name, 'baz'],
-    );
-
-Runs a list of commands, encapsulating each of them in a L</dbh_runner> coderef with calls
-to L<DBI/do>.  This is handy when you want to run a list of DDL commands, which you don't
-care about the output of, but don't want to bundle them into a single non-idempotant
-repeatable coderef.  Or if you want to save typing on a single do-able SQL command.
-
-The items can either be a SQL string or an arrayref of options to pass to L<DBI/do>.
-
-The statement is assumed to be non-transactional.  If you want to run a DB transaction,
-you should use L</dbh_runner> instead.
-
-=cut
+#pod =head3 dbh_runner_do
+#pod
+#pod     $online_ddl->dbh_runner_do(
+#pod         "ALTER TABLE $table_name ADD COLUMN foobar",
+#pod         ["ALTER TABLE ? DROP COLUMN ?", undef, $table_name, 'baz'],
+#pod     );
+#pod
+#pod Runs a list of commands, encapsulating each of them in a L</dbh_runner> coderef with calls
+#pod to L<DBI/do>.  This is handy when you want to run a list of DDL commands, which you don't
+#pod care about the output of, but don't want to bundle them into a single non-idempotant
+#pod repeatable coderef.  Or if you want to save typing on a single do-able SQL command.
+#pod
+#pod The items can either be a SQL string or an arrayref of options to pass to L<DBI/do>.
+#pod
+#pod The statement is assumed to be non-transactional.  If you want to run a DB transaction,
+#pod you should use L</dbh_runner> instead.
+#pod
+#pod =cut
 
 sub dbh_runner_do {
     my ($self, @commands) = @_;
@@ -1010,18 +1004,18 @@ sub dbh_runner_do {
     }
 }
 
-=head1 STEP METHODS
-
-You can call these methods individually, but using L</construct_and_execute> instead is
-highly recommended.  If you do run these yourself, the exception will need to be caught
-and the L</reversible> undo stack should be run to get the DB back to normal.
-
-=head2 create_new_table
-
-Creates the new table, making sure to preserve as much of the original table properties
-as possible.
-
-=cut
+#pod =head1 STEP METHODS
+#pod
+#pod You can call these methods individually, but using L</construct_and_execute> instead is
+#pod highly recommended.  If you do run these yourself, the exception will need to be caught
+#pod and the L</reversible> undo stack should be run to get the DB back to normal.
+#pod
+#pod =head2 create_new_table
+#pod
+#pod Creates the new table, making sure to preserve as much of the original table properties
+#pod as possible.
+#pod
+#pod =cut
 
 sub create_new_table {
     my $self = shift;
@@ -1071,12 +1065,12 @@ sub create_new_table {
     $progress->update;
 }
 
-=head2 create_triggers
-
-Creates triggers on the original table to make sure any new changes are captured into the
-new table.
-
-=cut
+#pod =head2 create_triggers
+#pod
+#pod Creates triggers on the original table to make sure any new changes are captured into the
+#pod new table.
+#pod
+#pod =cut
 
 sub create_triggers {
     my $self = shift;
@@ -1263,12 +1257,12 @@ sub create_triggers {
     $progress->update;
 }
 
-=head2 copy_rows
-
-Fires up a L<DBIx::BatchChunker> process to copy all of the rows from the old table to
-the new.
-
-=cut
+#pod =head2 copy_rows
+#pod
+#pod Fires up a L<DBIx::BatchChunker> process to copy all of the rows from the old table to
+#pod the new.
+#pod
+#pod =cut
 
 sub copy_rows {
     my $self = shift;
@@ -1290,11 +1284,11 @@ sub copy_rows {
     $progress->update;
 }
 
-=head2 swap_tables
-
-With the new table completely modified and set up, this swaps the old/new tables.
-
-=cut
+#pod =head2 swap_tables
+#pod
+#pod With the new table completely modified and set up, this swaps the old/new tables.
+#pod
+#pod =cut
 
 sub swap_tables {
     my $self = shift;
@@ -1354,12 +1348,12 @@ sub swap_tables {
     $progress->update;
 }
 
-=head2 drop_old_table
-
-Drops the old table.  This will also remove old foreign keys on child tables.  (Those FKs
-are re-applied to the new table in the next step.)
-
-=cut
+#pod =head2 drop_old_table
+#pod
+#pod Drops the old table.  This will also remove old foreign keys on child tables.  (Those FKs
+#pod are re-applied to the new table in the next step.)
+#pod
+#pod =cut
 
 sub drop_old_table {
     my $self = shift;
@@ -1402,11 +1396,11 @@ sub drop_old_table {
     $progress->update;
 }
 
-=head2 cleanup_foreign_keys
-
-Clean up foreign keys on both the new and child tables.
-
-=cut
+#pod =head2 cleanup_foreign_keys
+#pod
+#pod Clean up foreign keys on both the new and child tables.
+#pod
+#pod =cut
 
 sub cleanup_foreign_keys {
     my $self = shift;
@@ -1622,6 +1616,485 @@ sub _fk_to_sql {
     );
 }
 
+#pod =head1 SEE ALSO
+#pod
+#pod =over
+#pod
+#pod =item *
+#pod
+#pod L<Percona's pt-online-schema-change|https://www.percona.com/doc/percona-toolkit/LATEST/pt-online-schema-change.html>
+#pod
+#pod =item *
+#pod
+#pod L<GitHub's gh-ost|https://github.com/github/gh-ost>
+#pod
+#pod =item *
+#pod
+#pod L<Facebook's OSC|https://www.facebook.com/notes/mysql-at-facebook/online-schema-change-for-mysql/430801045932/>
+#pod
+#pod =item *
+#pod
+#pod L<MySQL's Online DDL|https://dev.mysql.com/doc/refman/5.6/en/innodb-online-ddl.html>
+#pod
+#pod =back
+#pod
+#pod =head1 WHY YET ANOTHER OSC?
+#pod
+#pod The biggest reason is that none of the above fully support foreign key constraints.
+#pod Percona's C<pt-osc> comes close, but also includes this paragraph:
+#pod
+#pod     Due to a limitation in MySQL, foreign keys will not have the same names after the ALTER
+#pod     that they did prior to it. The tool has to rename the foreign key when it redefines it,
+#pod     which adds a leading underscore to the name. In some cases, MySQL also automatically
+#pod     renames indexes required for the foreign key.
+#pod
+#pod So, tables swapped with C<pt-osc> are not exactly what they used to be before the swap.
+#pod It also had a number of other quirks that just didn't work out for us, related to FKs and
+#pod the amount of switches required to make it (semi-)work.
+#pod
+#pod Additionally, by making DBIx::OnlineDDL its own Perl module, it's a lot easier to run
+#pod Perl-based schema changes along side L<DBIx::BatchChunker> without having to switch
+#pod between Perl and CLI.  If other people want to subclass this module for their own
+#pod environment-specific quirks, they have the power to do so, too.
+#pod
+#pod =cut
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIx::OnlineDDL - Run DDL on online databases safely
+
+=head1 VERSION
+
+version v0.920.1
+
+=head1 SYNOPSIS
+
+    use DBIx::OnlineDDL;
+    use DBIx::BatchChunker;
+
+    DBIx::OnlineDDL->construct_and_execute(
+        rsrc          => $dbic_schema->source('Account'),
+        ### OR ###
+        dbi_connector => $dbix_connector_retry_object,
+        table_name    => 'accounts',
+
+        coderef_hooks => {
+            # This is the phase where the DDL is actually run
+            before_triggers => \&drop_foobar,
+
+            # Run other operations right before the swap
+            before_swap => \&delete_deprecated_accounts,
+        },
+
+        process_name => 'Dropping foobar from accounts',
+
+        copy_opts => {
+            chunk_size => 5000,
+            debug => 1,
+        },
+    );
+
+    sub drop_foobar {
+        my $oddl  = shift;
+        my $name  = $oddl->new_table_name;
+        my $qname = $oddl->dbh->quote_identifier($name);
+
+        # Drop the 'foobar' column, since it is no longer used
+        $oddl->dbh_runner_do("ALTER TABLE $qname DROP COLUMN foobar");
+    }
+
+    sub delete_deprecated_accounts {
+        my $oddl = shift;
+        my $name = $oddl->new_table_name;
+        my $dbh  = $oddl->dbh;  # only use for quoting!
+
+        my $qname = $dbh->quote_identifier($name);
+
+        DBIx::BatchChunker->construct_and_execute(
+            chunk_size  => 5000,
+
+            debug => 1,
+
+            process_name     => 'Deleting deprecated accounts',
+            process_past_max => 1,
+
+            dbic_storage => $oddl->rsrc->storage,
+            min_stmt => "SELECT MIN(account_id) FROM $qname",
+            max_stmt => "SELECT MAX(account_id) FROM $qname",
+            stmt     => join("\n",
+                "DELETE FROM $qname",
+                "WHERE",
+                "    account_type = ".$dbh->quote('deprecated')." AND",
+                "    account_id BETWEEN ? AND ?",
+            ),
+        );
+    }
+
+=head1 DESCRIPTION
+
+This is a database utility class for running DDL operations (like C<ALTER TABLE>) safely
+on large tables.  It has a similar scope as L<DBIx::BatchChunker>, but is designed for
+DDL, rather than DML.  It also has a similar function to other utilities like
+L<pt-online-schema-change|https://www.percona.com/doc/percona-toolkit/LATEST/pt-online-schema-change.html> or
+L<gh-ost|https://github.com/github/gh-ost>, but actually works properly with foreign
+keys, and is written as a Perl module to hook directly into a DBI handle.
+
+Like most online schema change tools, this works by creating a new shell table that looks
+just like the old table, running the DDL changes (through the L</before_triggers> hook),
+copying data to the new table, and swapping the tables.  Triggers are created to keep the
+data in sync.  See L</STEP METHODS> for more information.
+
+The full operation is protected with an L<undo stack|/reversible> via L<Eval::Reversible>.
+If any step in the process fails, the undo stack is run to return the DB back to normal.
+
+This module uses as many of the DBI info methods as possible, along with ANSI SQL in most
+places, to be compatible with multiple RDBMS.  So far, it will work with MySQL or SQLite,
+but can be expanded to include more systems with a relatively small amount of code
+changes.  (See L<DBIx::OnlineDDL::Helper::Base> for details.)
+
+B<DISCLAIMER:> You should not rely on this class to magically fix any and all locking
+problems the DB might experience just because it's being used.  Thorough testing and
+best practices are still required.
+
+=head2 When you shouldn't use this module
+
+=head3 Online DDL is already available in the RDBMS
+
+If you're running MySQL 5.6+ without clustering, just use C<LOCK=NONE> for every DDL
+statement.  It is seriously simple and guarantees that the table changes you make are not
+going to lock the table, or it will fail right away to tell you it's an incompatible
+change.
+
+If you're running something like Galera clusters, this typically wouldn't be an option,
+as it would lock up the clusters while the C<ALTER TABLE> statement is running, despite
+the C<LOCK=NONE> statement.  (Galera clusters were the prime motivation for writing this
+module.)
+
+Other RDBMSs may have support for online DDL as well.  Check the documentation first.  If
+they don't, patches for this tool are welcome!
+
+=head3 The operation is small
+
+Does your DDL only take 2 seconds?  Just do it!  Don't bother with trying to swap tables
+around, wasting time with full table copies, etc.  It's not worth the time spent or risk.
+
+=head3 When you actually want to run DML, not DDL
+
+L<DBIx::BatchChunker> is more appropriate for running DML operations (like C<INSERT>,
+C<UPDATE>, C<DELETE>).  If you need to do both, you can use the L</before_triggers> hook
+for DDL, and the L</before_swap> hook for DML.  Or just run DBIx::BatchChunker after the
+OnlineDDL process is complete.
+
+=head3 Other online schema change tools fit your needs
+
+Don't have foreign key constraints and C<gh-ost> is already working for you?  Great!
+Keep using it.
+
+=head1 ATTRIBUTES
+
+=head2 DBIC Attributes
+
+=head3 rsrc
+
+A L<DBIx::Class::ResultSource>.  This will be the source used for all operations, DDL or
+otherwise.  Optional, but recommended for DBIC users.
+
+The DBIC storage handler's C<connect_info> will be tweaked to ensure sane defaults and
+proper post-connection details.
+
+=head3 dbic_retry_opts
+
+A hashref of DBIC retry options.  These options control how retry protection works within
+DBIC.  Right now, this is just limited to C<max_attempts>, which controls the number of
+times to retry.  The default C<max_attempts> is 20.
+
+=head2 DBI Attributes
+
+=head3 dbi_connector
+
+A L<DBIx::Connector::Retry> object.  Instead of L<DBI> statement handles, this is the
+recommended non-DBIC way for OnlineDDL (and BatchChunker) to interface with the DBI, as
+it handles retries on failures.  The connection mode used is whatever default is set
+within the object.
+
+Required, except for DBIC users, who should be setting L</rsrc> above.  It is also
+assumed that the correct database is already active.
+
+The object will be tweaked to ensure sane defaults, proper post-connection details, a
+custom C<retry_handler>, and set a default C<max_attempts> of 20, if not already set.
+
+=head3 table_name
+
+The table name to be copied and eventually replaced.  Required unless L</rsrc> is
+specified.
+
+=head3 new_table_name
+
+The new table name to be created, copied to, and eventually used as the final table.
+Optional.
+
+If not defined, a name will be created automatically.  This might be the better route,
+since the default builder will search for an unused name in the DB right before OnlineDDL
+needs it.
+
+=head2 Progress Bar Attributes
+
+=head3 progress_bar
+
+The progress bar used for most of the process.  A different one is used for the actual
+table copy with L<DBIx::BatchChunker>, since that step takes longer.
+
+Optional.  If the progress bar isn't specified, a default one will be created.  If the
+terminal isn't interactive, the default L<Term::ProgressBar> will be set to C<silent> to
+naturally skip the output.
+
+=head3 progress_name
+
+A string used to assist in creating a progress bar.  Ignored if L</progress_bar> is
+already specified.
+
+This is the preferred way of customizing the progress bar without having to create one
+from scratch.
+
+=head2 Other Attributes
+
+=head3 coderef_hooks
+
+A hashref of coderefs.  Each of these are used in different steps in the process.  All
+of these are optional, but it is B<highly recommended> that C<before_triggers> is
+specified.  Otherwise, you're not actually running any DDL and the table copy is
+essentially a no-op.
+
+All of these triggers pass the C<DBIx::OnlineDDL> object as the only argument.  The
+L</new_table_name> can be acquired from that and used in SQL statements.  The L</dbh_runner>
+and L</dbh_runner_do> methods should be used to protect against disconnections or locks.
+
+There is room to add more hooks here, but only if there's a good reason to do so.
+(Running the wrong kind of SQL at the wrong time could be dangerous.)  Create a GitHub
+issue if you can think of one.
+
+=head4 before_triggers
+
+This is called before the table triggers are applied.  Your DDL should take place here,
+for a few reasons:
+
+    1. The table is empty, so DDL should take no time at all now.
+
+    2. After this hook, the table is reanalyzed to make sure it has an accurate picture
+    of the new columns.  This is critical for the creation of the triggers.
+
+=head4 before_swap
+
+This is called after the new table has been analyzed, but before the big table swap.  This
+hook might be used if a large DML operation needs to be done while the new table is still
+available.  If you use this hook, it's highly recommended that you use something like
+L<DBIx::BatchChunker> to make sure the changes are made in a safe and batched manner.
+
+=head3 copy_opts
+
+A hashref of different options to pass to L<DBIx::BatchChunker>, which is used in the
+L</copy_rows> step.  Some of these are defined automatically.  It's recommended that you
+specify at least these options:
+
+    chunk_size  => 5000,     # or whatever is a reasonable size for that table
+    id_name     => 'pk_id',  # especially if there isn't an obvious integer PK
+
+Specifying L<DBIx::BatchChunker/coderef> is not recommended, since Active DBI Processing
+mode will be used.
+
+These options will be included into the hashref, unless specifically overridden by key
+name:
+
+    id_name      => $first_pk_column,  # will warn if the PK is multi-column
+    target_time  => 1,
+    sleep        => 0.5,
+
+    # If using DBIC
+    dbic_storage => $rsrc->storage,
+    rsc          => $id_rsc,
+    dbic_retry_opts => {
+        max_attempts  => 20,
+        # best not to change this, unless you know what you're doing
+        retry_handler => $onlineddl_retry_handler,
+    },
+
+    # If using DBI
+    dbi_connector => $oddl->dbi_connector,
+    min_stmt      => $min_sql,
+    max_stmt      => $max_sql,
+
+    # For both
+    count_stmt    => $count_sql,
+    stmt          => $insert_select_sql,
+    progress_name => $copying_msg,
+
+=head3 db_timeouts
+
+A hashref of timeouts used for various DB operations, and usually set at the beginning of
+each connection.  Some of these settings may be RDBMS-specific.
+
+=head4 lock_file
+
+Amount of time (in seconds) to wait when attempting to acquire filesystem locks (on
+filesystems which support locking).  Float or fractional values are allowed.  This
+currently only applies to SQLite.
+
+Default value is 1 second.  The downside is that the SQLite default is actually 0, so
+other (non-OnlineDDL) connections should have a setting that is more than that to prevent
+lock contention.
+
+=head4 lock_db
+
+Amount of time (in whole seconds) to wait when attempting to acquire table and/or database
+level locks before falling back to retry.
+
+Default value is 60 seconds.
+
+=head4 lock_row
+
+Amount of time (in whole seconds) to wait when attempting to acquire row-level locks,
+which apply to much lower-level operations than L</lock_db>.  At this scope, the lesser
+of either of these two settings will take precedence.
+
+Default value is 2 seconds.  Lower values are preferred for row lock wait timeouts, so
+that OnlineDDL is more likely to be the victim of lock contention.  OnlineDDL can simply
+retry the connection at that point.
+
+=head4 session
+
+Amount of time (in whole seconds) for inactive session timeouts on the database side.
+
+Default value is 28,800 seconds (8 hours), which is MySQL's default.
+
+=head3 reversible
+
+A L<Eval::Reversible> object, used for rollbacks.  A default will be created, if not
+specified.
+
+=head1 CONSTRUCTORS
+
+See L</ATTRIBUTES> for information on what can be passed into these constructors.
+
+=head2 new
+
+    my $online_ddl = DBIx::OnlineDDL->new(...);
+
+A standard object constructor. If you use this constructor, you will need to manually
+call L</execute> to execute the DB changes.
+
+You'll probably just want to use L</construct_and_execute>.
+
+=head2 construct_and_execute
+
+    my $online_ddl = DBIx::OnlineDDL->construct_and_execute(...);
+
+Constructs a DBIx::OnlineDDL object and automatically calls each method step, including
+hooks.  Anything passed to this method will be passed through to the constructor.
+
+Returns the constructed object, post-execution.  This is typically only useful if you want
+to inspect the attributes after the process has finished.  Otherwise, it's safe to just
+ignore the return and throw away the object immediately.
+
+=head1 METHODS
+
+=head2 Step Runners
+
+=head3 execute
+
+Runs all of the steps as documented in L</STEP METHODS>.  This also includes undo
+protection, in case of exceptions.
+
+=head3 fire_hook
+
+    $online_ddl->fire_hook('before_triggers');
+
+Fires one of the coderef hooks, if it exists.  This also updates the progress bar.
+
+See L</coderef_hooks> for more details.
+
+=head2 DBI Helpers
+
+=head3 dbh
+
+    $online_ddl->dbh;
+
+Acquires a database handle, either from L</rsrc> or L</dbi_connector>.  Not recommended
+for active work, as it doesn't offer retry protection.  Instead, use L</dbh_runner> or
+L</dbh_runner_do>.
+
+=head3 dbh_runner
+
+    my @items = $online_ddl->dbh_runner(run => sub {
+        my $dbh = $_;  # or $_[0]
+        $dbh->selectall_array(...);
+    });
+
+Runs the C<$coderef>, locally setting C<$_> to and passing in the database handle.  This
+is essentially a shortcut interface into either L<dbi_connector> or DBIC's L<BlockRunner|DBIx::Class::Storage::BlockRunner>.
+
+The first argument can either be C<run> or C<txn>, which controls whether to wrap the
+code in a DB transaction or not.  The return is passed directly back, and return context
+is honored.
+
+=head3 dbh_runner_do
+
+    $online_ddl->dbh_runner_do(
+        "ALTER TABLE $table_name ADD COLUMN foobar",
+        ["ALTER TABLE ? DROP COLUMN ?", undef, $table_name, 'baz'],
+    );
+
+Runs a list of commands, encapsulating each of them in a L</dbh_runner> coderef with calls
+to L<DBI/do>.  This is handy when you want to run a list of DDL commands, which you don't
+care about the output of, but don't want to bundle them into a single non-idempotant
+repeatable coderef.  Or if you want to save typing on a single do-able SQL command.
+
+The items can either be a SQL string or an arrayref of options to pass to L<DBI/do>.
+
+The statement is assumed to be non-transactional.  If you want to run a DB transaction,
+you should use L</dbh_runner> instead.
+
+=head1 STEP METHODS
+
+You can call these methods individually, but using L</construct_and_execute> instead is
+highly recommended.  If you do run these yourself, the exception will need to be caught
+and the L</reversible> undo stack should be run to get the DB back to normal.
+
+=head2 create_new_table
+
+Creates the new table, making sure to preserve as much of the original table properties
+as possible.
+
+=head2 create_triggers
+
+Creates triggers on the original table to make sure any new changes are captured into the
+new table.
+
+=head2 copy_rows
+
+Fires up a L<DBIx::BatchChunker> process to copy all of the rows from the old table to
+the new.
+
+=head2 swap_tables
+
+With the new table completely modified and set up, this swaps the old/new tables.
+
+=head2 drop_old_table
+
+Drops the old table.  This will also remove old foreign keys on child tables.  (Those FKs
+are re-applied to the new table in the next step.)
+
+=head2 cleanup_foreign_keys
+
+Clean up foreign keys on both the new and child tables.
+
 =head1 SEE ALSO
 
 =over
@@ -1667,16 +2140,12 @@ environment-specific quirks, they have the power to do so, too.
 
 Grant Street Group <developers@grantstreet.com>
 
-=head1 LICENSE AND COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2019 Grant Street Group
+This software is Copyright (c) 2018 - 2020 by Grant Street Group.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
+This is free software, licensed under:
 
-L<http://www.perlfoundation.org/artistic_license_2_0>
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut
-
-1;

@@ -1,5 +1,12 @@
 Revision history for JSON-Karabiner
 
+0.018     2020-05-22 11:43:54-04:00 America/New_York
+  - Bug fix for #2
+  - Throw bones to smoke test gods
+
+0.018
+  - Minor documentation tweaks and updates
+
 0.017
   - Expansion of dsl methods for even easier use for non-technical users
   - Documentation updates to reflect new dsl interface

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.92
+    version 1.98
 
 SYNOPSIS
 
@@ -49,6 +49,16 @@ PLUGIN SYSTEM
 
     See Devel::PatchPerl::Plugin for details of Devel::PatchPerl's plugin
     system.
+
+PATCHLEVEL
+
+    Devel::PatchPerl will normally update the patchlevel.h file in the perl
+    source tree to indicate that it has applied local patches. This
+    behaviour is negated if it is detected that it is operating in a git
+    repository. To override this and update patchlevel.h when in a Git
+    repository, set the env var PERL5_PATCHPERL_PATCHLEVEL to a true value.
+
+    Alternatively, call patchperl with the --patchlevel option.
 
 CAVEAT
 

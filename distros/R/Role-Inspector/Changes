@@ -6,6 +6,13 @@ Home page:    <https://metacpan.org/release/Role-Inspector>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Role-Inspector>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.006	2020-05-13
+
+ - If a method is both required and provided by a role, ignore that it is
+   required because effectively it isn't.
+ - Method modifiers in roles now count as required methods, unless the
+   method is also provided by the role.
+
 0.005	2014-09-27
 
  [ Documentation ]

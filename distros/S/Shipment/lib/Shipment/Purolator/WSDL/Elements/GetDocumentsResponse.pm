@@ -1,6 +1,6 @@
 
 package Shipment::Purolator::WSDL::Elements::GetDocumentsResponse;
-$Shipment::Purolator::WSDL::Elements::GetDocumentsResponse::VERSION = '3.04';
+$Shipment::Purolator::WSDL::Elements::GetDocumentsResponse::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -34,7 +34,7 @@ Shipment::Purolator::WSDL::Elements::GetDocumentsResponse
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 

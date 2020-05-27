@@ -1,3 +1,10 @@
+## [2.9.1](https://github.com/hexonet/perl-sdk/compare/v2.9.0...v2.9.1) (2020-05-25)
+
+
+### Bug Fixes
+
+* **apiclient:** fix empty ConvertIDN command ([22dd8ed](https://github.com/hexonet/perl-sdk/commit/22dd8ede0f2d1d9573e3fa0336320fc72405b39c))
+
 # [2.9.0](https://github.com/hexonet/perl-sdk/compare/v2.8.1...v2.9.0) (2020-05-12)
 
 

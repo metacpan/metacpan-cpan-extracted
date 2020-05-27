@@ -1,3 +1,13 @@
+0.908   2020-05-21  Released-By: PERLANCAR; Urgency: low
+
+	- Note a couple of modules's pp/core status.
+
+        - [doc] Mention Data::Sah::Tiny & Params::Sah.
+
+	- [doc] Update information about Sah::Schema::* namespace, mention
+	  Sah::Schemas::* namespace.
+
+
 0.907   2020-02-12  Released-By: PERLANCAR; Urgency: medium
 
 	- Rename return_type values for clarity: bool -> bool_valid, bool+val ->

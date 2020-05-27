@@ -1,13 +1,14 @@
 package Sort::Sub;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-28'; # DATE
+our $DATE = '2020-05-25'; # DATE
 our $DIST = 'Sort-Sub'; # DIST
-our $VERSION = '0.118'; # VERSION
+our $VERSION = '0.120'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
+use Log::ger;
 
 our $re_spec = qr/\A(\$)?(\w+)(?:<(\w*)>)?\z/;
 
@@ -17,8 +18,54 @@ our %argsopt_sortsub = (
         schema => ['sortsub::spec*'],
     },
     sort_args => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'sort_arg',
         summary => 'Arguments to pass to the Sort::Sub::* routine',
-        schema => ['hash*', of=>'str*'],
+        schema => ['array*', of=>'str*'],
+        element_completion => sub {
+            my %cargs = @_;
+
+            # do we have the routine already? if yes, extract the metadata
+            my $rname = $cargs{args}{sort_sub};
+            return [] unless defined $rname;
+
+            my $mod = "Sort::Sub::$rname";
+            (my $mod_pm = "$mod.pm") =~ s!::!/!g;
+            eval { require $mod_pm };
+            return {message=>"Cannot load $mod: $@"} if $@;
+            my $meta;
+            eval { $meta = $mod->meta };
+            return [] unless $meta;
+
+            require Complete::Sequence;
+            return Complete::Sequence::complete_sequence(
+                word => $cargs{word},
+                sequence => [
+                    sub {
+                        [$meta->{args} ? keys(%{ $meta->{args} }) : ()];
+                    },
+                    '=',
+                    sub {
+                        my $stash = shift;
+                        my $argname = $stash->{completed_item_words}[0];
+                        return [] unless defined $argname;
+
+                        my $argspec = $meta->{args}{$argname};
+                        return [] unless $argspec->{schema};
+
+                        require Complete::Sah;
+                        require Complete::Util;
+                        Complete::Util::arrayify_answer(
+                            Complete::Sah::complete_from_schema(
+                                word => $stash->{cur_word},
+                                schema => $argspec->{schema},
+                            )
+                          );
+
+                    },
+                ],
+            );
+        },
     },
 );
 
@@ -84,7 +131,7 @@ Sort::Sub - Collection of sort subroutines
 
 =head1 VERSION
 
-This document describes version 0.118 of Sort::Sub (from Perl distribution Sort-Sub), released on 2020-02-28.
+This document describes version 0.120 of Sort::Sub (from Perl distribution Sort-Sub), released on 2020-05-25.
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,92 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use ExtUtils::MakeMaker;
+
+WriteMakefile(
+    'NAME'         => 'Data::AnyXfer',
+    'VERSION_FROM' => 'lib/Data/AnyXfer.pm',
+    'PREREQ_PM'    => {
+
+        'Clone'                        => 0,
+        'DBIx::Class::ResultSet'       => 0,
+        'Moo'                        => 0,
+        'Moo::Util::TypeConstraints' => 0,
+        'MooX::Types::Path::Class'   => 0,
+        'Moose'                      => 0,
+        'MooseX::Types'              => 0,
+        'namespace::autoclean'         => 0,
+        'Test::Compile'                => 0,
+        'Test::Most'                   => 0,
+        'Hash::Util'                   => 0,
+        'Sys::Hostname'                => 0,
+        'DBIx::Class'                  => 0,
+
+        'Cpanel::JSON::XS'          => 0,
+        'Encode'                    => 0,
+        'Exporter'                  => 0,
+        'Test::Most'                => 0,
+        'Test::Warnings'            => 0,
+        'utf8'                      => 0,
+        'Carp'                      => 0,
+        'Class::MOP::Method'        => 0,
+        'Const::Exporter'           => 0,
+        'Const::Fast'               => 0,
+        'curry'                     => 0,
+        'Getopt::Long::Descriptive' => 0,
+        'Hash::Util'                => 0,
+        'JSON::XS'                  => 0,
+        'List::MoreUtils'           => 0,
+        'Log::Dispatch'             => 0,
+        'Hash::Merge'               => 0,
+        'Log::Dispatch::FileRotate'   => 0,
+        'Log::Dispatch::Screen'       => 0,
+        'Moo'                         => 0,
+        'Moo::Role'                   => 1,
+        'Path::Class'                 => 0,
+        'Scalar::Util'                => 0,
+        'Search::Elasticsearch'       => 0,
+        'Search::Elasticsearch::Bulk' => 0,
+        'Sys::Hostname'             => 0,
+        'Term::ANSIColor'           => 0,
+        'Try::Tiny'                 => 0,
+        'Archive::Tar'              => 0,
+        'Archive::Tar::Streamed'    => 0,
+        'IO::Compress::Lzma'        => 0,
+        'IO::Uncompress::UnLzma'    => 0,
+        'IPC::Run3'                 => 0,
+        'Perl::Critic'              => 0,
+        'File::Find::Rule'          => 0,
+
+        'Carp'                  => 0,
+        'Carp::Assert'          => 0.14,
+        'Class::Accessor::Fast' => 0,
+        'Data::Dumper::Concise' => 0,
+        'Data::Printer'         => 0,
+        'Devel::StackTrace'     => 0,
+        'File::Copy::Reliable'  => 0,
+        'File::Slurp'           => 0,
+        'IPC::Run'              => 0,
+        'Path::Class'           => 0,
+        'Sys::Hostname'         => 0,
+        'Test::Kit'             => 2.02,
+        'Test::Moose'           => 0,
+        'Test::Most'            => 0,
+        'Timer::Simple'         => 0,
+        'Perl::Critic::Utils'   => 0,
+
+        'MooX::ClassCompositor' => 0,
+
+        'Test::CheckManifest' => 0,
+        'Test::Exception'     => 0,
+        'Test::LeakTrace'     => 0,
+        'Test::Moo'         => 0,
+        'Test::Most'          => 0,
+    },
+
+    EXE_FILES => [
+      'bin/data_anyxfer_es_play_datafile.pl',
+    ],
+);

@@ -1,11 +1,17 @@
 package App::XML::DocBook::Builder;
-$App::XML::DocBook::Builder::VERSION = '0.0801';
-use warnings;
+$App::XML::DocBook::Builder::VERSION = '0.0900';
+use 5.014;
 use strict;
+use warnings;
 
-use 5.008;
+sub new
+{
+    my $class = shift;
 
-use parent 'Class::Accessor';
+    return bless {}, $class;
+}
+
+1;
 
 
 my $inst_dir = "$ENV{HOME}/apps/docbook-builder";
@@ -54,15 +60,19 @@ App::XML::DocBook::Builder - Build DocBook/XML files.
 
 =head1 VERSION
 
-version 0.0801
+version 0.0900
 
 =head1 SYNOPSIS
 
-    use App::XML::DocBook::Builder;
+    use App::XML::DocBook::Builder ();
 
     my $foo = App::XML::DocBook::Builder->new();
 
 =head1 FUNCTIONS
+
+=head2 new
+
+A constructor.
 
 =head2 initialize_makefiles($args)
 
@@ -141,27 +151,11 @@ L<https://metacpan.org/release/App-XML-DocBook-Builder>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/App-XML-DocBook-Builder>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-XML-DocBook-Builder>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/App-XML-DocBook-Builder>
 
 =item *
 

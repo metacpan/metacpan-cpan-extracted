@@ -15,7 +15,7 @@ package API::GitForge::GitLab;
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-$API::GitForge::GitLab::VERSION = '0.004';
+$API::GitForge::GitLab::VERSION = '0.005';
 
 use 5.028;
 use strict;
@@ -74,12 +74,11 @@ sub _assert_fork_has_parent {
 }
 
 sub _clean_config_repo {
-    my ($self, $upstream) = @_;
-    my (undef, $repo)     = _extract_project_id($upstream);
-    my $user = $self->{_api}->current_user->{username};
+    my ($self, $target) = @_;
+    my ($ns,   $repo)   = _extract_project_id($target);
 
     $self->{_api}->edit_project(
-        "$user/$repo",
+        "$ns/$repo",
         {
             issues_access_level         => "disabled",
             merge_requests_access_level => "disabled",
@@ -151,7 +150,7 @@ API::GitForge::GitLab - common git forge operations using the GitLab API
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 

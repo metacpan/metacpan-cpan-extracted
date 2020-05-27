@@ -2,8 +2,8 @@ NAME
     Sort::Sub - Collection of sort subroutines
 
 VERSION
-    This document describes version 0.118 of Sort::Sub (from Perl
-    distribution Sort-Sub), released on 2020-02-28.
+    This document describes version 0.120 of Sort::Sub (from Perl
+    distribution Sort-Sub), released on 2020-05-25.
 
 SYNOPSIS
      use Sort::Sub qw($naturally);

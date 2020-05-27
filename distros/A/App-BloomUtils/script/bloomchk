@@ -1,0 +1,192 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/BloomUtils/check_with_bloom_filter
+# and generated automatically using Perinci::CmdLine::Gen version 0.496
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-24'; # DATE
+our $DIST = 'App-BloomUtils'; # DIST
+our $VERSION = '0.004'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/BloomUtils/check_with_bloom_filter",
+    program_name => "bloomchk",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Shorter alias for check-with-bloom-filter
+# PODNAME: bloomchk
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+bloomchk - Shorter alias for check-with-bloom-filter
+
+=head1 VERSION
+
+This document describes version 0.004 of bloomchk (from Perl distribution App-BloomUtils), released on 2020-05-24.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % bloomchk [--debug] [--log-level=level] [--page-result[=program]]
+     [--quiet] [--trace] [--verbose] <items> ...
+
+=head1 DESCRIPTION
+
+You supply the bloom filter in STDIN, items to check as arguments, and this
+utility will print lines containing 0 or 1 depending on whether items in the
+arguments are tested to be, respectively, not in the set (0) or probably in the
+set (1).
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--items-json>=I<s>
+
+Items to check (JSON-encoded).
+
+See C<--items>.
+
+=item B<--items>=I<s@>*
+
+Items to check.
+
+Can be specified multiple times.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C bloomchk bloomchk
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete bloomchk 'p/*/`bloomchk`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-BloomUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-BloomUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-BloomUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

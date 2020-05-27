@@ -4,8 +4,7 @@ use warnings;
 use X11::Xlib ();
 use Carp ();
 
-# All modules in dist share a version
-BEGIN { our $VERSION= $X11::Xlib::VERSION; }
+our $VERSION = '0.20';
 
 =head1 NAME
 
@@ -23,8 +22,15 @@ All attribute accessors are defined in XS.
 
 =head2 display
 
-This is a 'magic' attribute that can be attached to all structs (except for
-XEvent where it is a real attribute).  Many times a struct will have 
+A reference to an L<X11::Xlib> instance, automatically set by various functions
+that populate structs.  Many times a struct will have pointers that are related
+to a particular display, so it is desirable to pair the struct with its display
+pointer in order to be able to inflate those other pointers into objects and be
+able to call methods on them.
+
+This attribute is implemented "inside-out", so it can't be seen in a dump of the
+perl data, and requires help from DESTROY to clean up.  (handled by this class's
+destructor)
 
 =head1 METHODS
 
@@ -132,12 +138,19 @@ sub bytes { ${$_[0]} }
 
 require X11::Xlib::XEvent;
 @X11::Xlib::XVisualInfo::ISA= ( __PACKAGE__ );
+$X11::Xlib::XVisualInfo::VERSION= $VERSION;
 @X11::Xlib::XWindowChanges::ISA= ( __PACKAGE__ );
+$X11::Xlib::XWindowChanges::VERSION= $VERSION;
 @X11::Xlib::XWindowAttributes::ISA= ( __PACKAGE__ );
+$X11::Xlib::XWindowAttributes::VERSION= $VERSION;
 @X11::Xlib::XSetWindowAttributes::ISA= ( __PACKAGE__ );
+$X11::Xlib::XSetWindowAttributes::VERSION= $VERSION;
 @X11::Xlib::XSizeHints::ISA= ( __PACKAGE__ );
+$X11::Xlib::XSizeHints::VERSION= $VERSION;
 @X11::Xlib::XRectangle::ISA= ( __PACKAGE__ );
+$X11::Xlib::XRectangle::VERSION= $VERSION;
 @X11::Xlib::XRenderPictFormat::ISA= ( __PACKAGE__ );
+$X11::Xlib::XRenderPictFormat::VERSION= $VERSION;
 
 1;
 
@@ -153,7 +166,7 @@ Michael Conrad, E<lt>mike@nrdvana.netE<gt>
 
 Copyright (C) 2009-2010 by Olivier Thauvin
 
-Copyright (C) 2017 by Michael Conrad
+Copyright (C) 2017-2020 by Michael Conrad
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

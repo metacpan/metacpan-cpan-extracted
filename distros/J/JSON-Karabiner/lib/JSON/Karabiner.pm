@@ -1,5 +1,5 @@
 package JSON::Karabiner ;
-$JSON::Karabiner::VERSION = '0.017';
+$JSON::Karabiner::VERSION = '0.018';
 use strict;
 use warnings;
 use JSON;
@@ -158,8 +158,8 @@ JSON::Karabiner - easy JSON code generation for Karabiner-Elements
 =head1 SYNOPSIS
 
 Below is an executable perl script that generates a json file that can be read
-by by L<Karabiner-Elements|https://karabiner-elements.pqrs.org>. You can copy
-and paste this code to your local machine,modify it if you wish, and execute it.
+by L<Karabiner-Elements|https://karabiner-elements.pqrs.org>. You can copy
+and paste this code to your local machine, modify it if you wish, and execute it.
 Note that you must first install the C<JSON::Karabiner> package
 (see the L</"INSTALLATION"> section below).
 
@@ -206,8 +206,10 @@ Then execute this script with:
 from the same directory where this script is saved.
 
 After this script is run, a json file called my_awesome_karabiner_mod.json
-should now be sitting in the assets/complex_modifications directory. Open
-the Karabiner-Elements app on your Mac to install the new rule.
+should now be sitting in the assets/complex_modifications directory as long as
+you have Karbiner-Elements installed to the default directory (see the
+C<set_save_dir> method if you don't). Now open the Karabiner-Elements app on
+your Mac to install the new rule.
 
 Ready to give is try? Follow the L</"INSTALLATION"> instructions to get started.
 
@@ -220,11 +222,11 @@ programming at all, don't worry. There are examples provided that you can follow
 so no programming knowledge is necessary. The 10 or 20 minutes you spend
 learning how to install and use this module will pay off in spades.
 
-A Karabiner JSON complex modification file stores the rules for modifying the keyboard
-in a data structure called the "manipulators." Therefore, most of methods you
-write will add data to the manipulator data structure. C<JSON::Karabiner> can then
-write the JSON to a file and then you can load the rules you've written using
-the Kabrabiner-Elements program.
+A Karabiner JSON complex modification file stores the rules for modifying the
+keyboard in a data structure called "manipulators." Therefore, most of methods
+you write will add data to the manipulator data structure. C<JSON::Karabiner>
+can then write the JSON to a file and then you can load the rules you generate
+with your script with the Kabrabiner-Elements program.
 
 Below are descriptions of the methods used on manipulators.
 
@@ -263,7 +265,7 @@ for more information.
 As of version 0.011, JSON::Karabiner moved to a DSL (domain specific language)
 interface to make writing scripts even easier. Please see the L</SYNOPSIS>
 for an example of how to use the DSL. Note that the older object-oriented interface,
-though currently deprecated and undocumented, is still fully funcitonal (or
+though currently deprecated and undocumented, is still fully functional (or
 should be, in theory).
 
 =head2 How to Use the DSL Interface
@@ -552,20 +554,20 @@ This description is not visible inside Karabiner-Elements apps.
 
 =head2 write_file([$title], [$filename])
 
-This method writes all the manipulators objects out to the .json file.
+This method writes all the manipulator objects out to a .json file.
 
 Example usage:
 
   write_file 'My Hotkeys', 'my_file.json';
 
   # or, even better:
-  write_file; # title and file name must have been already set with the "set_title"
-              # and "set_filename" methods to run this method without arguments
+  write_file; # title must have been already set with the "set_title"
+              # method to run this method without arguments
 
 This method will overwrite pre-existing files with the same name without
 warning, so be sure the file name is unique if you don't want this to happen.
 
-The title method is not required if it has already been set with the
+The title argument is not required if it has already been set with the
 C<set_title> method, otherwise it is required. The C<$filename> argument is
 always optional and will default to the what was set with C<set_filename> or, if
 that method wasn't used, than the filename will inherit the prefix from the
@@ -625,7 +627,7 @@ modules|https://www.cpan.org/modules/INSTALL.html> for more information.
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 Development Status
 

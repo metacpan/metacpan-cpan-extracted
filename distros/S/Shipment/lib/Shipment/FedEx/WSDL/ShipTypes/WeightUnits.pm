@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::WeightUnits;
-$Shipment::FedEx::WSDL::ShipTypes::WeightUnits::VERSION = '3.04';
+$Shipment::FedEx::WSDL::ShipTypes::WeightUnits::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -24,7 +24,7 @@ Shipment::FedEx::WSDL::ShipTypes::WeightUnits
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 

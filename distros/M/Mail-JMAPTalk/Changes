@@ -1,5 +1,18 @@
 Revision history for Perl extension Mail::JMAPTalk.
 
+0.15  Tue May 26 11:01:00 AEST 2019
+    - Actually encode the filename when creating a URI
+
+0.14  Mon May 25 18:34:12 AEST 2019
+    - User-Agent should be Mail:: rather than Net::
+    - new() takes lowercase using, not "Using".
+    - add Call() helper method
+    - change dependency from JSON::XS to just JSON
+    - request createdIds from the server (no API hooked up yet)
+    - allow up to 2048 levels of JSON nesting
+    - no longer die on Download() error
+    - much better documentation
+
 0.13  Wed Apr 17 14:00:42 CEST 2019
     - Added DefaultUsing subroutine to get/set 'using' argument
 

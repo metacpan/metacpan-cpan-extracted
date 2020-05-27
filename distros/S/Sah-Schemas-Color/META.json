@@ -38,13 +38,10 @@
       },
       "test" : {
          "requires" : {
-            "Data::Sah" : "0.907",
-            "Data::Sah::Coerce" : "0.038",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0.98",
-            "Test::Needs" : "0"
+            "Test::More" : "0"
          }
       }
    },
@@ -60,7 +57,7 @@
          "web" : "https://github.com/perlancar/perl-Sah-Schemas-Color"
       }
    },
-   "version" : "0.007",
+   "version" : "0.009",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -411,7 +408,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Sah::Schemas",
                         "name" : "-Sah::Schemas",
-                        "version" : "0.05"
+                        "version" : "0.060"
                      }
                   ]
                }

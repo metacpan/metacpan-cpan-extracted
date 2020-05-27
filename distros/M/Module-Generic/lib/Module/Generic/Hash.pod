@@ -103,6 +103,9 @@ Module::Generic::Hash - Hash Manipulation Object Class
         ref( $_[0] ) ? () : $_[0];
     }, { sort => 1 });
 
+=head1 VERSION
+
+    v0.1.0
 
 =head1 DESCRIPTION
 

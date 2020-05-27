@@ -1,3 +1,27 @@
+0.009   2020-05-22  Released-By: PERLANCAR; Urgency: medium
+
+        - Bump prereq App::genpw version.
+
+	- Edit Changes.
+
+
+0.008   2020-05-22  Released-By: PERLANCAR; Urgency: medium
+
+	- When there's only a single wordlist, pass the WordList::* object in
+          _wl so App::genpw can random-pick() more efficiently.
+
+
+0.007   2020-05-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to App::genpw 0.010 (has --list-patterns & --action
+	  options).
+
+
+0.006   2020-05-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to App::wordlist 0.270 (option 'random' re-added).
+
+
 0.005   2020-05-18  Released-By: PERLANCAR; Urgency: medium
 
 	- Update to App::wordlist 0.268+ (streaming result).

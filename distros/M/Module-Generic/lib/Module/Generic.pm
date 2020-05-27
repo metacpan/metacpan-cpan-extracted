@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.12.5
+## Version v0.12.12
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <@sitael.local>
 ## Created 2019/08/24
-## Modified 2020/05/20
+## Modified 2020/05/25
 ## 
 ##----------------------------------------------------------------------------
 package Module::Generic;
@@ -31,6 +31,7 @@ BEGIN
     ## To get some context on what the caller expect. This is used in our error() method to allow chaining without breaking
     use Want;
     use Class::Load ();
+    use Encode ();
     our( @ISA, @EXPORT_OK, @EXPORT, %EXPORT_TAGS, $AUTOLOAD );
     our( $VERSION, $ERROR, $SILENT_AUTOLOAD, $VERBOSE, $DEBUG, $MOD_PERL );
     our( $PARAM_CHECKER_LOAD_ERROR, $PARAM_CHECKER_LOADED, $CALLER_LEVEL );
@@ -40,7 +41,7 @@ BEGIN
     @EXPORT      = qw( );
     @EXPORT_OK   = qw( subclasses );
     %EXPORT_TAGS = ();
-    $VERSION     = 'v0.12.5';
+    $VERSION     = 'v0.12.12';
     $VERBOSE     = 0;
     $DEBUG       = 0;
     $SILENT_AUTOLOAD      = 1;
@@ -1087,7 +1088,8 @@ sub error
         {
             ## die( sprintf( "Within package %s in file %s at line %d: %s\n", $o->package, $o->file, $o->line, $o->message ) );
             # $r->log_error( "Module::Generic::error(): called calling die" ) if( $r );
-            die( $o );
+            my $enc_str = eval{ Encode::encode( 'UTF-8', "$o", Encode::FB_CROAK ) };
+            die( $@ ? $o : $enc_str );
         }
         elsif( !exists( $this->{quiet} ) || !$this->{quiet} )
         {
@@ -1098,7 +1100,8 @@ sub error
             }
             else
             {
-                warn( $o ) if( $should_display_warning );
+                my $enc_str = eval{ Encode::encode( 'UTF-8', "$o", Encode::FB_CROAK ) };
+                warn( $@ ? $o : $enc_str ) if( $should_display_warning );
             }
         }
         ## https://metacpan.org/pod/Perl::Critic::Policy::Subroutines::ProhibitExplicitReturnUndef
@@ -2910,8 +2913,7 @@ sub _set_get_scalar_as_object
         }
         else
         {
-            $o = Module::Generic::Scalar->new( $val );
-            $data->{ $field } = $o;
+            $data->{ $field } = Module::Generic::Scalar->new( $val );
         }
         # $self->message( 3, "Object now is: '", ref( $data->{ $field } ), "'." );
     }
@@ -2919,10 +2921,21 @@ sub _set_get_scalar_as_object
     if( !$self->_is_object( $data->{ $field } ) )
     {
         # $self->message( 3, "No object is set yet, initiating one." );
-        my $o = Module::Generic::Scalar->new( $data->{ $field } );
-        $data->{ $field } = $o;
+        $data->{ $field } = Module::Generic::Scalar->new( $data->{ $field } );
     }
-    return( $data->{ $field } );
+    my $v = $data->{ $field };
+    if( !$v->defined )
+    {
+        if( Want::want( 'OBJECT' ) )
+        {
+            return( Module::Generic::Null->new );
+        }
+        else
+        {
+            return;
+        }
+    }
+    return( $v );
 }
 
 sub _set_get_scalar_or_object
@@ -3262,7 +3275,7 @@ BEGIN
                   '!='     => sub { !_obj_eq(@_) },
                   fallback => 1,
                  );
-    our( $VERSION ) = '0.1';
+    our( $VERSION ) = '0.1.0';
 };
 
 sub init
@@ -3467,7 +3480,7 @@ BEGIN
                   fallback => 1,
                  );
     use Want;
-    our( $VERSION ) = '0.2';
+    our( $VERSION ) = '0.2.0';
 };
 
 sub new
@@ -3527,7 +3540,7 @@ BEGIN
     use warnings::register;
     use Scalar::Util ();
     # use Class::ISA;
-    our( $VERSION ) = '0.1';
+    our( $VERSION ) = '0.1.0';
 };
 
 sub new
@@ -3539,6 +3552,7 @@ sub new
     ## A Module::Generic object standard parameter
     $self->{_data_repo} = '_data';
     my $hash = {};
+    @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
     if( scalar( @_ ) == 1 && Scalar::Util::reftype( $_[0] ) eq 'HASH' )
     {
         $hash = shift( @_ );
@@ -3692,7 +3706,7 @@ BEGIN
       "--"     => sub { $_[0] = ${$_[0]} - 1 },
       fallback => 1;
     # *Module::Generic::Boolean:: = *JSON::PP::Boolean::;
-    our( $VERSION ) = '0.1';
+    our( $VERSION ) = '0.1.0';
 };
 
 sub new { return( $_[1] ? $true : $false ); }
@@ -3732,7 +3746,7 @@ BEGIN
                   '%{}' => 'as_hash',
                   fallback => 1,
                  );
-    our( $VERSION ) = '0.1';
+    our( $VERSION ) = '0.1.0';
 };
 
 sub new
@@ -4102,15 +4116,26 @@ package Module::Generic::Scalar;
 BEGIN
 {
     use common::sense;
-    use Scalar::Util ();
-    use Want;
     use warnings;
     use warnings::register;
+    ## So that the user can say $obj->isa( 'Module::Generic::Scalar' ) and it would return true
+    ## use parent -norequire, qw( Module::Generic::Scalar );
+    use Scalar::Util ();
+    use Want;
     use overload (
         '""'    => 'as_string',
         '.='    => sub
         {
             my( $self, $other, $swap ) = @_;
+            no warnings 'uninitialized';
+            if( !CORE::defined( $$self ) )
+            {
+                return( $other );
+            }
+            elsif( !CORE::defined( $other ) )
+            {
+                return( $$self );
+            }
             ## print( STDERR ref( $self ), "::concatenate: Got here with other = '$other', and swap = '$swap'\n" );
             ## print( STDERR "Module::Generic::Scalar::overload->.=: Received arguments '", join( "', '", @_ ), "'\n" );
             my $expr;
@@ -4128,6 +4153,7 @@ BEGIN
         'x'     => sub
         {
             my( $self, $other, $swap ) = @_;
+            no warnings 'uninitialized';
             ## print( STDERR "Module::Generic::Scalar::overload->x: Received arguments '", join( "', '", @_ ), "'\n" );
             my $expr = $swap ? "\"$other" x \"$$self\"" : "\"$$self\" x \"$other\"";
             my $res  = eval( $expr );
@@ -4138,20 +4164,28 @@ BEGIN
             }
             return( $self->new( $res ) );
         },
+        'eq'    => sub
+        {
+            my( $self, $other, $swap ) = @_;
+            no warnings 'uninitialized';
+            if( Scalar::Util::blessed( $other ) && ref( $other ) eq ref( $self ) )
+            {
+                return( $$self eq $$other );
+            }
+            else
+            {
+                return( $$self eq "$other" );
+            }
+        },
         fallback => 1,
     );
-#     overload::constant 'qr' => sub
-#     {
-#         no overloading;
-#         my( $re ) = @_;
-#         print( STDERR "overload->qr: Received arguments '", join( "', '", @_ ), "'\n" );
-#     };
-    our( $VERSION ) = '0.1';
+    our( $VERSION ) = 'v0.2.2';
 };
 
+## sub new { return( shift->_new( @_ ) ); }
 sub new
 {
-    my $this = CORE::shift( @_ );
+    my $this = shift( @_ );
     my $init = '';
     if( ref( $_[0] ) eq 'SCALAR' || UNIVERSAL::isa( $_[0], 'SCALAR' ) )
     {
@@ -4166,16 +4200,28 @@ sub new
         warn( "I do not know what to do with \"", $_[0], "\"\n" ) if( $this->_warnings_is_enabled );
         return;
     }
+    elsif( @_ )
+    {
+        $init = $_[0];
+    }
     else
     {
-        $init = shift( @_ );
+        $init = undef();
     }
+    ## print( STDERR __PACKAGE__, "::new: got here for value '$init' (defined? ", CORE::defined( $init ) ? 'yes' : 'no', ")\n" );
+    # CORE::tie( $self, 'Module::Generic::Scalar::Tie', $init );
     return( bless( \$init => ( ref( $this ) || $this ) ) );
 }
 
 sub as_boolean { return( Module::Generic::Boolean->new( ${$_[0]} ? 1 : 0 ) ); }
 
-sub as_string { return( ${$_[0]} ); }
+# sub as_string { return( ${$_[0]} ); }
+sub as_string
+{
+    my( $self ) = @_;
+    my $copy = $$self;
+    return( $copy );
+}
 
 ## Credits: John Gruber, Aristotle Pagaltzis
 ## https://gist.github.com/gruber/9f9e8650d68b13ce4d78
@@ -4243,7 +4289,7 @@ sub capitalise
 		(?!	- )					# Negative lookahead for another '-'
 	}{$1\u$2}xig;
 
-    return( $self->new( $copy ) );
+    return( $self->_new( $copy ) );
 }
 
 sub chomp { return( CORE::chomp( ${$_[0]} ) ); }
@@ -4255,15 +4301,15 @@ sub clone
     my $self = shift( @_ );
     if( @_ )
     {
-        return( $self->new( @_ ) );
+        return( $self->_new( @_ ) );
     }
     else
     {
-        return( $self->new( ${$self} ) );
+        return( $self->_new( ${$self} ) );
     }
 }
 
-sub crypt { return( __PACKAGE__->new( CORE::crypt( ${$_[0]}, $_[1] ) ) ); }
+sub crypt { return( __PACKAGE__->_new( CORE::crypt( ${$_[0]}, $_[1] ) ) ); }
 
 sub defined { return( CORE::defined( ${$_[0]} ) ); }
 
@@ -4291,13 +4337,25 @@ sub is_numeric { return( Scalar::Util::looks_like_number( ${$_[0]} ) ); }
 
 sub is_upper { return( ${$_[0]} =~ /^[[:upper:]]+$/ ); }
 
-sub lc { return( __PACKAGE__->new( CORE::lc( ${$_[0]} ) ) ); }
+sub lc { return( __PACKAGE__->_new( CORE::lc( ${$_[0]} ) ) ); }
 
-sub lcfirst { return( __PACKAGE__->new( CORE::lcfirst( ${$_[0]} ) ) ); }
+sub lcfirst { return( __PACKAGE__->_new( CORE::lcfirst( ${$_[0]} ) ) ); }
 
-sub left { return( $_[0]->new( CORE::substr( ${$_[0]}, 0, CORE::int( $_[1] ) ) ) ); }
+sub left { return( $_[0]->_new( CORE::substr( ${$_[0]}, 0, CORE::int( $_[1] ) ) ) ); }
 
 sub length { return( $_[0]->_number( CORE::length( ${$_[0]} ) ) ); }
+
+sub like
+{
+    my $self = shift( @_ );
+    my $str = shift( @_ );
+    $str = CORE::defined( $str ) 
+        ? ref( $str ) eq 'Regexp'
+            ? $str
+            : qr/(?:\Q$str\E)+/
+        : qr/[[:blank:]\r\n]*/;
+    return( $$self =~ /$str/ );
+}
 
 sub ltrim
 {
@@ -4350,9 +4408,9 @@ sub pad
     return( $self );
 }
 
-sub quotemeta { return( __PACKAGE__->new( CORE::quotemeta( ${$_[0]} ) ) ); }
+sub quotemeta { return( __PACKAGE__->_new( CORE::quotemeta( ${$_[0]} ) ) ); }
 
-sub right { return( $_[0]->new( CORE::substr( ${$_[0]}, ( CORE::int( $_[1] ) * -1 ) ) ) ); }
+sub right { return( $_[0]->_new( CORE::substr( ${$_[0]}, ( CORE::int( $_[1] ) * -1 ) ) ) ); }
 
 sub replace
 {
@@ -4367,7 +4425,7 @@ sub replace
 
 sub reset { ${$_[0]} = ''; return( $_[0] ); }
 
-sub reverse { return( __PACKAGE__->new( scalar( CORE::reverse( ${$_[0]} ) ) ) ); }
+sub reverse { return( __PACKAGE__->_new( scalar( CORE::reverse( ${$_[0]} ) ) ) ); }
 
 sub rindex
 {
@@ -4441,15 +4499,15 @@ sub split
     return;
 }
 
-sub sprintf { return( __PACKAGE__->new( CORE::sprintf( ${$_[0]}, @_[1..$#_] ) ) ); }
+sub sprintf { return( __PACKAGE__->_new( CORE::sprintf( ${$_[0]}, @_[1..$#_] ) ) ); }
 
 sub substr
 {
     my $self = CORE::shift( @_ );
     my( $offset, $length, $replacement ) = @_;
-    return( __PACKAGE__->new( CORE::substr( ${$self}, $offset, $length, $replacement ) ) ) if( CORE::defined( $length ) && CORE::defined( $replacement ) );
-    return( __PACKAGE__->new( CORE::substr( ${$self}, $offset, $length ) ) ) if( CORE::defined( $length ) );
-    return( __PACKAGE__->new( CORE::substr( ${$self}, $offset ) ) );
+    return( __PACKAGE__->_new( CORE::substr( ${$self}, $offset, $length, $replacement ) ) ) if( CORE::defined( $length ) && CORE::defined( $replacement ) );
+    return( __PACKAGE__->_new( CORE::substr( ${$self}, $offset, $length ) ) ) if( CORE::defined( $length ) );
+    return( __PACKAGE__->_new( CORE::substr( ${$self}, $offset ) ) );
 }
 
 sub trim
@@ -4461,9 +4519,9 @@ sub trim
     return( $self );
 }
 
-sub uc { return( __PACKAGE__->new( CORE::uc( ${$_[0]} ) ) ); }
+sub uc { return( __PACKAGE__->_new( CORE::uc( ${$_[0]} ) ) ); }
 
-sub ucfirst { return( __PACKAGE__->new( CORE::ucfirst( ${$_[0]} ) ) ); }
+sub ucfirst { return( __PACKAGE__->_new( CORE::ucfirst( ${$_[0]} ) ) ); }
 
 sub undef
 {
@@ -4490,6 +4548,8 @@ sub _number
     return( Module::Generic::Number->new( $num ) );
 }
 
+sub _new { return( shift->Module::Generic::Scalar::new( @_ ) ); }
+
 sub _warnings_is_enabled { return( warnings::enabled( ref( $_[0] ) || $_[0] ) ); }
 
 package Module::Generic::Number;
@@ -4502,7 +4562,7 @@ BEGIN
     use Nice::Try;
     use Regexp::Common qw( number );
     use POSIX ();
-    our( $VERSION ) = '0.2';
+    our( $VERSION ) = 'v0.3.1';
 };
 
 use overload (
@@ -4578,6 +4638,369 @@ use overload (
     'fallback' => 1,
 );
 
+our $SUPPORTED_LOCALES =
+{
+aa_DJ   => [qw( aa_DJ.UTF-8 aa_DJ.ISO-8859-1 aa_DJ.ISO8859-1 )],
+aa_ER   => [qw( aa_ER.UTF-8 )],
+aa_ET   => [qw( aa_ET.UTF-8 )],
+af_ZA   => [qw( af_ZA.UTF-8 af_ZA.ISO-8859-1 af_ZA.ISO8859-1 )],
+ak_GH   => [qw( ak_GH.UTF-8 )],
+am_ET   => [qw( am_ET.UTF-8 )],
+an_ES   => [qw( an_ES.UTF-8 an_ES.ISO-8859-15 an_ES.ISO8859-15 )],
+anp_IN  => [qw( anp_IN.UTF-8 )],
+ar_AE   => [qw( ar_AE.UTF-8 ar_AE.ISO-8859-6 ar_AE.ISO8859-6 )],
+ar_BH   => [qw( ar_BH.UTF-8 ar_BH.ISO-8859-6 ar_BH.ISO8859-6 )],
+ar_DZ   => [qw( ar_DZ.UTF-8 ar_DZ.ISO-8859-6 ar_DZ.ISO8859-6 )],
+ar_EG   => [qw( ar_EG.UTF-8 ar_EG.ISO-8859-6 ar_EG.ISO8859-6 )],
+ar_IN   => [qw( ar_IN.UTF-8 )],
+ar_IQ   => [qw( ar_IQ.UTF-8 ar_IQ.ISO-8859-6 ar_IQ.ISO8859-6 )],
+ar_JO   => [qw( ar_JO.UTF-8 ar_JO.ISO-8859-6 ar_JO.ISO8859-6 )],
+ar_KW   => [qw( ar_KW.UTF-8 ar_KW.ISO-8859-6 ar_KW.ISO8859-6 )],
+ar_LB   => [qw( ar_LB.UTF-8 ar_LB.ISO-8859-6 ar_LB.ISO8859-6 )],
+ar_LY   => [qw( ar_LY.UTF-8 ar_LY.ISO-8859-6 ar_LY.ISO8859-6 )],
+ar_MA   => [qw( ar_MA.UTF-8 ar_MA.ISO-8859-6 ar_MA.ISO8859-6 )],
+ar_OM   => [qw( ar_OM.UTF-8 ar_OM.ISO-8859-6 ar_OM.ISO8859-6 )],
+ar_QA   => [qw( ar_QA.UTF-8 ar_QA.ISO-8859-6 ar_QA.ISO8859-6 )],
+ar_SA   => [qw( ar_SA.UTF-8 ar_SA.ISO-8859-6 ar_SA.ISO8859-6 )],
+ar_SD   => [qw( ar_SD.UTF-8 ar_SD.ISO-8859-6 ar_SD.ISO8859-6 )],
+ar_SS   => [qw( ar_SS.UTF-8 )],
+ar_SY   => [qw( ar_SY.UTF-8 ar_SY.ISO-8859-6 ar_SY.ISO8859-6 )],
+ar_TN   => [qw( ar_TN.UTF-8 ar_TN.ISO-8859-6 ar_TN.ISO8859-6 )],
+ar_YE   => [qw( ar_YE.UTF-8 ar_YE.ISO-8859-6 ar_YE.ISO8859-6 )],
+as_IN   => [qw( as_IN.UTF-8 )],
+ast_ES  => [qw( ast_ES.UTF-8 ast_ES.ISO-8859-15 ast_ES.ISO8859-15 )],
+ayc_PE  => [qw( ayc_PE.UTF-8 )],
+az_AZ   => [qw( az_AZ.UTF-8 )],
+be_BY   => [qw( be_BY.UTF-8 be_BY.CP1251 )],
+bem_ZM  => [qw( bem_ZM.UTF-8 )],
+ber_DZ  => [qw( ber_DZ.UTF-8 )],
+ber_MA  => [qw( ber_MA.UTF-8 )],
+bg_BG   => [qw( bg_BG.UTF-8 bg_BG.CP1251 )],
+bhb_IN  => [qw( bhb_IN.UTF-8 )],
+bho_IN  => [qw( bho_IN.UTF-8 )],
+bn_BD   => [qw( bn_BD.UTF-8 )],
+bn_IN   => [qw( bn_IN.UTF-8 )],
+bo_CN   => [qw( bo_CN.UTF-8 )],
+bo_IN   => [qw( bo_IN.UTF-8 )],
+br_FR   => [qw( br_FR.UTF-8 br_FR.ISO-8859-1 br_FR.ISO8859-1 br_FR.ISO-8859-15 br_FR.ISO8859-15 )],
+brx_IN  => [qw( brx_IN.UTF-8 )],
+bs_BA   => [qw( bs_BA.UTF-8 bs_BA.ISO-8859-2 bs_BA.ISO8859-2 )],
+byn_ER  => [qw( byn_ER.UTF-8 )],
+ca_AD   => [qw( ca_AD.UTF-8 ca_AD.ISO-8859-15 ca_AD.ISO8859-15 )],
+ca_ES   => [qw( ca_ES.UTF-8 ca_ES.ISO-8859-1 ca_ES.ISO8859-1 ca_ES.ISO-8859-15 ca_ES.ISO8859-15 )],
+ca_FR   => [qw( ca_FR.UTF-8 ca_FR.ISO-8859-15 ca_FR.ISO8859-15 )],
+ca_IT   => [qw( ca_IT.UTF-8 ca_IT.ISO-8859-15 ca_IT.ISO8859-15 )],
+ce_RU   => [qw( ce_RU.UTF-8 )],
+ckb_IQ  => [qw( ckb_IQ.UTF-8 )],
+cmn_TW  => [qw( cmn_TW.UTF-8 )],
+crh_UA  => [qw( crh_UA.UTF-8 )],
+cs_CZ   => [qw( cs_CZ.UTF-8 cs_CZ.ISO-8859-2 cs_CZ.ISO8859-2 )],
+csb_PL  => [qw( csb_PL.UTF-8 )],
+cv_RU   => [qw( cv_RU.UTF-8 )],
+cy_GB   => [qw( cy_GB.UTF-8 cy_GB.ISO-8859-14 cy_GB.ISO8859-14 )],
+da_DK   => [qw( da_DK.UTF-8 da_DK.ISO-8859-1 da_DK.ISO8859-1 )],
+de_AT   => [qw( de_AT.UTF-8 de_AT.ISO-8859-1 de_AT.ISO8859-1 de_AT.ISO-8859-15 de_AT.ISO8859-15 )],
+de_BE   => [qw( de_BE.UTF-8 de_BE.ISO-8859-1 de_BE.ISO8859-1 de_BE.ISO-8859-15 de_BE.ISO8859-15 )],
+de_CH   => [qw( de_CH.UTF-8 de_CH.ISO-8859-1 de_CH.ISO8859-1 )],
+de_DE   => [qw( de_DE.UTF-8 de_DE.ISO-8859-1 de_DE.ISO8859-1 de_DE.ISO-8859-15 de_DE.ISO8859-15 )],
+de_LI   => [qw( de_LI.UTF-8 )],
+de_LU   => [qw( de_LU.UTF-8 de_LU.ISO-8859-1 de_LU.ISO8859-1 de_LU.ISO-8859-15 de_LU.ISO8859-15 )],
+doi_IN  => [qw( doi_IN.UTF-8 )],
+dv_MV   => [qw( dv_MV.UTF-8 )],
+dz_BT   => [qw( dz_BT.UTF-8 )],
+el_CY   => [qw( el_CY.UTF-8 el_CY.ISO-8859-7 el_CY.ISO8859-7 )],
+el_GR   => [qw( el_GR.UTF-8 el_GR.ISO-8859-7 el_GR.ISO8859-7 )],
+en_AG   => [qw( en_AG.UTF-8 )],
+en_AU   => [qw( en_AU.UTF-8 en_AU.ISO-8859-1 en_AU.ISO8859-1 )],
+en_BW   => [qw( en_BW.UTF-8 en_BW.ISO-8859-1 en_BW.ISO8859-1 )],
+en_CA   => [qw( en_CA.UTF-8 en_CA.ISO-8859-1 en_CA.ISO8859-1 )],
+en_DK   => [qw( en_DK.UTF-8 en_DK.ISO-8859-15 en_DK.ISO8859-15 )],
+en_GB   => [qw( en_GB.UTF-8 en_GB.ISO-8859-1 en_GB.ISO8859-1 en_GB.ISO-8859-15 en_GB.ISO8859-15 )],
+en_HK   => [qw( en_HK.UTF-8 en_HK.ISO-8859-1 en_HK.ISO8859-1 )],
+en_IE   => [qw( en_IE.UTF-8 en_IE.ISO-8859-1 en_IE.ISO8859-1 en_IE.ISO-8859-15 en_IE.ISO8859-15 )],
+en_IN   => [qw( en_IN.UTF-8 )],
+en_NG   => [qw( en_NG.UTF-8 )],
+en_NZ   => [qw( en_NZ.UTF-8 en_NZ.ISO-8859-1 en_NZ.ISO8859-1 )],
+en_PH   => [qw( en_PH.UTF-8 en_PH.ISO-8859-1 en_PH.ISO8859-1 )],
+en_SG   => [qw( en_SG.UTF-8 en_SG.ISO-8859-1 en_SG.ISO8859-1 )],
+en_US   => [qw( en_US.UTF-8 en_US.ISO-8859-1 en_US.ISO8859-1 en_US.ISO-8859-15 en_US.ISO8859-15 )],
+en_ZA   => [qw( en_ZA.UTF-8 en_ZA.ISO-8859-1 en_ZA.ISO8859-1 )],
+en_ZM   => [qw( en_ZM.UTF-8 )],
+en_ZW   => [qw( en_ZW.UTF-8 en_ZW.ISO-8859-1 en_ZW.ISO8859-1 )],
+eo      => [qw( eo.UTF-8 eo.ISO-8859-3 eo.ISO8859-3 )],
+eo_US   => [qw( eo_US.UTF-8 )],
+es_AR   => [qw( es_AR.UTF-8 es_AR.ISO-8859-1 es_AR.ISO8859-1 )],
+es_BO   => [qw( es_BO.UTF-8 es_BO.ISO-8859-1 es_BO.ISO8859-1 )],
+es_CL   => [qw( es_CL.UTF-8 es_CL.ISO-8859-1 es_CL.ISO8859-1 )],
+es_CO   => [qw( es_CO.UTF-8 es_CO.ISO-8859-1 es_CO.ISO8859-1 )],
+es_CR   => [qw( es_CR.UTF-8 es_CR.ISO-8859-1 es_CR.ISO8859-1 )],
+es_CU   => [qw( es_CU.UTF-8 )],
+es_DO   => [qw( es_DO.UTF-8 es_DO.ISO-8859-1 es_DO.ISO8859-1 )],
+es_EC   => [qw( es_EC.UTF-8 es_EC.ISO-8859-1 es_EC.ISO8859-1 )],
+es_ES   => [qw( es_ES.UTF-8 es_ES.ISO-8859-1 es_ES.ISO8859-1 es_ES.ISO-8859-15 es_ES.ISO8859-15 )],
+es_GT   => [qw( es_GT.UTF-8 es_GT.ISO-8859-1 es_GT.ISO8859-1 )],
+es_HN   => [qw( es_HN.UTF-8 es_HN.ISO-8859-1 es_HN.ISO8859-1 )],
+es_MX   => [qw( es_MX.UTF-8 es_MX.ISO-8859-1 es_MX.ISO8859-1 )],
+es_NI   => [qw( es_NI.UTF-8 es_NI.ISO-8859-1 es_NI.ISO8859-1 )],
+es_PA   => [qw( es_PA.UTF-8 es_PA.ISO-8859-1 es_PA.ISO8859-1 )],
+es_PE   => [qw( es_PE.UTF-8 es_PE.ISO-8859-1 es_PE.ISO8859-1 )],
+es_PR   => [qw( es_PR.UTF-8 es_PR.ISO-8859-1 es_PR.ISO8859-1 )],
+es_PY   => [qw( es_PY.UTF-8 es_PY.ISO-8859-1 es_PY.ISO8859-1 )],
+es_SV   => [qw( es_SV.UTF-8 es_SV.ISO-8859-1 es_SV.ISO8859-1 )],
+es_US   => [qw( es_US.UTF-8 es_US.ISO-8859-1 es_US.ISO8859-1 )],
+es_UY   => [qw( es_UY.UTF-8 es_UY.ISO-8859-1 es_UY.ISO8859-1 )],
+es_VE   => [qw( es_VE.UTF-8 es_VE.ISO-8859-1 es_VE.ISO8859-1 )],
+et_EE   => [qw( et_EE.UTF-8 et_EE.ISO-8859-1 et_EE.ISO8859-1 et_EE.ISO-8859-15 et_EE.ISO8859-15 )],
+eu_ES   => [qw( eu_ES.UTF-8 eu_ES.ISO-8859-1 eu_ES.ISO8859-1 eu_ES.ISO-8859-15 eu_ES.ISO8859-15 )],
+eu_FR   => [qw( eu_FR.UTF-8 eu_FR.ISO-8859-1 eu_FR.ISO8859-1 eu_FR.ISO-8859-15 eu_FR.ISO8859-15 )],
+fa_IR   => [qw( fa_IR.UTF-8 )],
+ff_SN   => [qw( ff_SN.UTF-8 )],
+fi_FI   => [qw( fi_FI.UTF-8 fi_FI.ISO-8859-1 fi_FI.ISO8859-1 fi_FI.ISO-8859-15 fi_FI.ISO8859-15 )],
+fil_PH  => [qw( fil_PH.UTF-8 )],
+fo_FO   => [qw( fo_FO.UTF-8 fo_FO.ISO-8859-1 fo_FO.ISO8859-1 )],
+fr_BE   => [qw( fr_BE.UTF-8 fr_BE.ISO-8859-1 fr_BE.ISO8859-1 fr_BE.ISO-8859-15 fr_BE.ISO8859-15 )],
+fr_CA   => [qw( fr_CA.UTF-8 fr_CA.ISO-8859-1 fr_CA.ISO8859-1 )],
+fr_CH   => [qw( fr_CH.UTF-8 fr_CH.ISO-8859-1 fr_CH.ISO8859-1 )],
+fr_FR   => [qw( fr_FR.UTF-8 fr_FR.ISO-8859-1 fr_FR.ISO8859-1 fr_FR.ISO-8859-15 fr_FR.ISO8859-15 )],
+fr_LU   => [qw( fr_LU.UTF-8 fr_LU.ISO-8859-1 fr_LU.ISO8859-1 fr_LU.ISO-8859-15 fr_LU.ISO8859-15 )],
+fur_IT  => [qw( fur_IT.UTF-8 )],
+fy_DE   => [qw( fy_DE.UTF-8 )],
+fy_NL   => [qw( fy_NL.UTF-8 )],
+ga_IE   => [qw( ga_IE.UTF-8 ga_IE.ISO-8859-1 ga_IE.ISO8859-1 ga_IE.ISO-8859-15 ga_IE.ISO8859-15 )],
+gd_GB   => [qw( gd_GB.UTF-8 gd_GB.ISO-8859-15 gd_GB.ISO8859-15 )],
+gez_ER  => [qw( gez_ER.UTF-8 )],
+gez_ET  => [qw( gez_ET.UTF-8 )],
+gl_ES   => [qw( gl_ES.UTF-8 gl_ES.ISO-8859-1 gl_ES.ISO8859-1 gl_ES.ISO-8859-15 gl_ES.ISO8859-15 )],
+gu_IN   => [qw( gu_IN.UTF-8 )],
+gv_GB   => [qw( gv_GB.UTF-8 gv_GB.ISO-8859-1 gv_GB.ISO8859-1 )],
+ha_NG   => [qw( ha_NG.UTF-8 )],
+hak_TW  => [qw( hak_TW.UTF-8 )],
+he_IL   => [qw( he_IL.UTF-8 he_IL.ISO-8859-8 he_IL.ISO8859-8 )],
+hi_IN   => [qw( hi_IN.UTF-8 )],
+hne_IN  => [qw( hne_IN.UTF-8 )],
+hr_HR   => [qw( hr_HR.UTF-8 hr_HR.ISO-8859-2 hr_HR.ISO8859-2 )],
+hsb_DE  => [qw( hsb_DE.UTF-8 hsb_DE.ISO-8859-2 hsb_DE.ISO8859-2 )],
+ht_HT   => [qw( ht_HT.UTF-8 )],
+hu_HU   => [qw( hu_HU.UTF-8 hu_HU.ISO-8859-2 hu_HU.ISO8859-2 )],
+hy_AM   => [qw( hy_AM.UTF-8 hy_AM.ARMSCII-8 hy_AM.ARMSCII8 )],
+ia_FR   => [qw( ia_FR.UTF-8 )],
+id_ID   => [qw( id_ID.UTF-8 id_ID.ISO-8859-1 id_ID.ISO8859-1 )],
+ig_NG   => [qw( ig_NG.UTF-8 )],
+ik_CA   => [qw( ik_CA.UTF-8 )],
+is_IS   => [qw( is_IS.UTF-8 is_IS.ISO-8859-1 is_IS.ISO8859-1 )],
+it_CH   => [qw( it_CH.UTF-8 it_CH.ISO-8859-1 it_CH.ISO8859-1 )],
+it_IT   => [qw( it_IT.UTF-8 it_IT.ISO-8859-1 it_IT.ISO8859-1 it_IT.ISO-8859-15 it_IT.ISO8859-15 )],
+iu_CA   => [qw( iu_CA.UTF-8 )],
+iw_IL   => [qw( iw_IL.UTF-8 iw_IL.ISO-8859-8 iw_IL.ISO8859-8 )],
+ja_JP   => [qw( ja_JP.UTF-8 ja_JP.EUC-JP ja_JP.EUCJP )],
+ka_GE   => [qw( ka_GE.UTF-8 ka_GE.GEORGIAN-PS ka_GE.GEORGIANPS )],
+kk_KZ   => [qw( kk_KZ.UTF-8 kk_KZ.PT154 kk_KZ.RK1048 )],
+kl_GL   => [qw( kl_GL.UTF-8 kl_GL.ISO-8859-1 kl_GL.ISO8859-1 )],
+km_KH   => [qw( km_KH.UTF-8 )],
+kn_IN   => [qw( kn_IN.UTF-8 )],
+ko_KR   => [qw( ko_KR.UTF-8 ko_KR.EUC-KR ko_KR.EUCKR )],
+kok_IN  => [qw( kok_IN.UTF-8 )],
+ks_IN   => [qw( ks_IN.UTF-8 )],
+ku_TR   => [qw( ku_TR.UTF-8 ku_TR.ISO-8859-9 ku_TR.ISO8859-9 )],
+kw_GB   => [qw( kw_GB.UTF-8 kw_GB.ISO-8859-1 kw_GB.ISO8859-1 )],
+ky_KG   => [qw( ky_KG.UTF-8 )],
+lb_LU   => [qw( lb_LU.UTF-8 )],
+lg_UG   => [qw( lg_UG.UTF-8 lg_UG.ISO-8859-10 lg_UG.ISO8859-10 )],
+li_BE   => [qw( li_BE.UTF-8 )],
+li_NL   => [qw( li_NL.UTF-8 )],
+lij_IT  => [qw( lij_IT.UTF-8 )],
+ln_CD   => [qw( ln_CD.UTF-8 )],
+lo_LA   => [qw( lo_LA.UTF-8 )],
+lt_LT   => [qw( lt_LT.UTF-8 lt_LT.ISO-8859-13 lt_LT.ISO8859-13 )],
+lv_LV   => [qw( lv_LV.UTF-8 lv_LV.ISO-8859-13 lv_LV.ISO8859-13 )],
+lzh_TW  => [qw( lzh_TW.UTF-8 )],
+mag_IN  => [qw( mag_IN.UTF-8 )],
+mai_IN  => [qw( mai_IN.UTF-8 )],
+mg_MG   => [qw( mg_MG.UTF-8 mg_MG.ISO-8859-15 mg_MG.ISO8859-15 )],
+mhr_RU  => [qw( mhr_RU.UTF-8 )],
+mi_NZ   => [qw( mi_NZ.UTF-8 mi_NZ.ISO-8859-13 mi_NZ.ISO8859-13 )],
+mk_MK   => [qw( mk_MK.UTF-8 mk_MK.ISO-8859-5 mk_MK.ISO8859-5 )],
+ml_IN   => [qw( ml_IN.UTF-8 )],
+mn_MN   => [qw( mn_MN.UTF-8 )],
+mni_IN  => [qw( mni_IN.UTF-8 )],
+mr_IN   => [qw( mr_IN.UTF-8 )],
+ms_MY   => [qw( ms_MY.UTF-8 ms_MY.ISO-8859-1 ms_MY.ISO8859-1 )],
+mt_MT   => [qw( mt_MT.UTF-8 mt_MT.ISO-8859-3 mt_MT.ISO8859-3 )],
+my_MM   => [qw( my_MM.UTF-8 )],
+nan_TW  => [qw( nan_TW.UTF-8 )],
+nb_NO   => [qw( nb_NO.UTF-8 nb_NO.ISO-8859-1 nb_NO.ISO8859-1 )],
+nds_DE  => [qw( nds_DE.UTF-8 )],
+nds_NL  => [qw( nds_NL.UTF-8 )],
+ne_NP   => [qw( ne_NP.UTF-8 )],
+nhn_MX  => [qw( nhn_MX.UTF-8 )],
+niu_NU  => [qw( niu_NU.UTF-8 )],
+niu_NZ  => [qw( niu_NZ.UTF-8 )],
+nl_AW   => [qw( nl_AW.UTF-8 )],
+nl_BE   => [qw( nl_BE.UTF-8 nl_BE.ISO-8859-1 nl_BE.ISO8859-1 nl_BE.ISO-8859-15 nl_BE.ISO8859-15 )],
+nl_NL   => [qw( nl_NL.UTF-8 nl_NL.ISO-8859-1 nl_NL.ISO8859-1 nl_NL.ISO-8859-15 nl_NL.ISO8859-15 )],
+nn_NO   => [qw( nn_NO.UTF-8 nn_NO.ISO-8859-1 nn_NO.ISO8859-1 )],
+nr_ZA   => [qw( nr_ZA.UTF-8 )],
+nso_ZA  => [qw( nso_ZA.UTF-8 )],
+oc_FR   => [qw( oc_FR.UTF-8 oc_FR.ISO-8859-1 oc_FR.ISO8859-1 )],
+om_ET   => [qw( om_ET.UTF-8 )],
+om_KE   => [qw( om_KE.UTF-8 om_KE.ISO-8859-1 om_KE.ISO8859-1 )],
+or_IN   => [qw( or_IN.UTF-8 )],
+os_RU   => [qw( os_RU.UTF-8 )],
+pa_IN   => [qw( pa_IN.UTF-8 )],
+pa_PK   => [qw( pa_PK.UTF-8 )],
+pap_AN  => [qw( pap_AN.UTF-8 )],
+pap_AW  => [qw( pap_AW.UTF-8 )],
+pap_CW  => [qw( pap_CW.UTF-8 )],
+pl_PL   => [qw( pl_PL.UTF-8 pl_PL.ISO-8859-2 pl_PL.ISO8859-2 )],
+ps_AF   => [qw( ps_AF.UTF-8 )],
+pt_BR   => [qw( pt_BR.UTF-8 pt_BR.ISO-8859-1 pt_BR.ISO8859-1 )],
+pt_PT   => [qw( pt_PT.UTF-8 pt_PT.ISO-8859-1 pt_PT.ISO8859-1 pt_PT.ISO-8859-15 pt_PT.ISO8859-15 )],
+quz_PE  => [qw( quz_PE.UTF-8 )],
+raj_IN  => [qw( raj_IN.UTF-8 )],
+ro_RO   => [qw( ro_RO.UTF-8 ro_RO.ISO-8859-2 ro_RO.ISO8859-2 )],
+ru_RU   => [qw( ru_RU.UTF-8 ru_RU.KOI8-R ru_RU.KOI8R ru_RU.ISO-8859-5 ru_RU.ISO8859-5 ru_RU.CP1251 )],
+ru_UA   => [qw( ru_UA.UTF-8 ru_UA.KOI8-U ru_UA.KOI8U )],
+rw_RW   => [qw( rw_RW.UTF-8 )],
+sa_IN   => [qw( sa_IN.UTF-8 )],
+sat_IN  => [qw( sat_IN.UTF-8 )],
+sc_IT   => [qw( sc_IT.UTF-8 )],
+sd_IN   => [qw( sd_IN.UTF-8 )],
+sd_PK   => [qw( sd_PK.UTF-8 )],
+se_NO   => [qw( se_NO.UTF-8 )],
+shs_CA  => [qw( shs_CA.UTF-8 )],
+si_LK   => [qw( si_LK.UTF-8 )],
+sid_ET  => [qw( sid_ET.UTF-8 )],
+sk_SK   => [qw( sk_SK.UTF-8 sk_SK.ISO-8859-2 sk_SK.ISO8859-2 )],
+sl_SI   => [qw( sl_SI.UTF-8 sl_SI.ISO-8859-2 sl_SI.ISO8859-2 )],
+so_DJ   => [qw( so_DJ.UTF-8 so_DJ.ISO-8859-1 so_DJ.ISO8859-1 )],
+so_ET   => [qw( so_ET.UTF-8 )],
+so_KE   => [qw( so_KE.UTF-8 so_KE.ISO-8859-1 so_KE.ISO8859-1 )],
+so_SO   => [qw( so_SO.UTF-8 so_SO.ISO-8859-1 so_SO.ISO8859-1 )],
+sq_AL   => [qw( sq_AL.UTF-8 sq_AL.ISO-8859-1 sq_AL.ISO8859-1 )],
+sq_MK   => [qw( sq_MK.UTF-8 )],
+sr_ME   => [qw( sr_ME.UTF-8 )],
+sr_RS   => [qw( sr_RS.UTF-8 )],
+ss_ZA   => [qw( ss_ZA.UTF-8 )],
+st_ZA   => [qw( st_ZA.UTF-8 st_ZA.ISO-8859-1 st_ZA.ISO8859-1 )],
+sv_FI   => [qw( sv_FI.UTF-8 sv_FI.ISO-8859-1 sv_FI.ISO8859-1 sv_FI.ISO-8859-15 sv_FI.ISO8859-15 )],
+sv_SE   => [qw( sv_SE.UTF-8 sv_SE.ISO-8859-1 sv_SE.ISO8859-1 sv_SE.ISO-8859-15 sv_SE.ISO8859-15 )],
+sw_KE   => [qw( sw_KE.UTF-8 )],
+sw_TZ   => [qw( sw_TZ.UTF-8 )],
+szl_PL  => [qw( szl_PL.UTF-8 )],
+ta_IN   => [qw( ta_IN.UTF-8 )],
+ta_LK   => [qw( ta_LK.UTF-8 )],
+tcy_IN  => [qw( tcy_IN.UTF-8 )],
+te_IN   => [qw( te_IN.UTF-8 )],
+tg_TJ   => [qw( tg_TJ.UTF-8 tg_TJ.KOI8-T tg_TJ.KOI8T )],
+th_TH   => [qw( th_TH.UTF-8 th_TH.TIS-620 th_TH.TIS620 )],
+the_NP  => [qw( the_NP.UTF-8 )],
+ti_ER   => [qw( ti_ER.UTF-8 )],
+ti_ET   => [qw( ti_ET.UTF-8 )],
+tig_ER  => [qw( tig_ER.UTF-8 )],
+tk_TM   => [qw( tk_TM.UTF-8 )],
+tl_PH   => [qw( tl_PH.UTF-8 tl_PH.ISO-8859-1 tl_PH.ISO8859-1 )],
+tn_ZA   => [qw( tn_ZA.UTF-8 )],
+tr_CY   => [qw( tr_CY.UTF-8 tr_CY.ISO-8859-9 tr_CY.ISO8859-9 )],
+tr_TR   => [qw( tr_TR.UTF-8 tr_TR.ISO-8859-9 tr_TR.ISO8859-9 )],
+ts_ZA   => [qw( ts_ZA.UTF-8 )],
+tt_RU   => [qw( tt_RU.UTF-8 )],
+ug_CN   => [qw( ug_CN.UTF-8 )],
+uk_UA   => [qw( uk_UA.UTF-8 uk_UA.KOI8-U uk_UA.KOI8U )],
+unm_US  => [qw( unm_US.UTF-8 )],
+ur_IN   => [qw( ur_IN.UTF-8 )],
+ur_PK   => [qw( ur_PK.UTF-8 )],
+uz_UZ   => [qw( uz_UZ.UTF-8 uz_UZ.ISO-8859-1 uz_UZ.ISO8859-1 )],
+ve_ZA   => [qw( ve_ZA.UTF-8 )],
+vi_VN   => [qw( vi_VN.UTF-8 )],
+wa_BE   => [qw( wa_BE.UTF-8 wa_BE.ISO-8859-1 wa_BE.ISO8859-1 wa_BE.ISO-8859-15 wa_BE.ISO8859-15 )],
+wae_CH  => [qw( wae_CH.UTF-8 )],
+wal_ET  => [qw( wal_ET.UTF-8 )],
+wo_SN   => [qw( wo_SN.UTF-8 )],
+xh_ZA   => [qw( xh_ZA.UTF-8 xh_ZA.ISO-8859-1 xh_ZA.ISO8859-1 )],
+yi_US   => [qw( yi_US.UTF-8 yi_US.CP1255 )],
+yo_NG   => [qw( yo_NG.UTF-8 )],
+yue_HK  => [qw( yue_HK.UTF-8 )],
+zh_CN   => [qw( zh_CN.UTF-8 zh_CN.GB18030 zh_CN.GBK zh_CN.GB2312 )],
+zh_HK   => [qw( zh_HK.UTF-8 zh_HK.BIG5-HKSCS zh_HK.BIG5HKSCS )],
+zh_SG   => [qw( zh_SG.UTF-8 zh_SG.GBK zh_SG.GB2312 )],
+zh_TW   => [qw( zh_TW.UTF-8 zh_TW.EUC-TW zh_TW.EUCTW zh_TW.BIG5 )],
+zu_ZA   => [qw( zu_ZA.UTF-8 zu_ZA.ISO-8859-1 zu_ZA.ISO8859-1 )],
+};
+
+our $DEFAULT =
+{
+## The local currency symbol.
+currency_symbol     => '€',
+## The decimal point character, except for currency values, cannot be an empty string
+decimal_point       => '.',
+## The number of digits after the decimal point in the local style for currency values.
+frac_digits         => 2,
+## The sizes of the groups of digits, except for currency values. unpack( "C*", $grouping ) will give the number
+grouping            => (CORE::chr(3) x 2),
+## The standardized international currency symbol.
+int_curr_symbol     => '€',
+## The number of digits after the decimal point in an international-style currency value.
+int_frac_digits     => 2,
+## Same as n_cs_precedes, but for internationally formatted monetary quantities.
+int_n_cs_precedes   => '',
+## Same as n_sep_by_space, but for internationally formatted monetary quantities.
+int_n_sep_by_space  => '',
+## Same as n_sign_posn, but for internationally formatted monetary quantities.
+int_n_sign_posn     => 1,
+## Same as p_cs_precedes, but for internationally formatted monetary quantities.
+int_p_cs_precedes   => 1,
+## Same as p_sep_by_space, but for internationally formatted monetary quantities.
+int_p_sep_by_space  => 0,
+## Same as p_sign_posn, but for internationally formatted monetary quantities.
+int_p_sign_posn     => 1,
+## The decimal point character for currency values.
+mon_decimal_point   => '.',
+## Like grouping but for currency values.
+mon_grouping        => (CORE::chr(3) x 2),
+## The separator for digit groups in currency values.
+mon_thousands_sep   => ',',
+## Like p_cs_precedes but for negative values.
+n_cs_precedes       => 1,
+## Like p_sep_by_space but for negative values.
+n_sep_by_space      => 0,
+## Like p_sign_posn but for negative currency values.
+n_sign_posn         => 1,
+## The character used to denote negative currency values, usually a minus sign.
+negative_sign       => '-',
+## 1 if the currency symbol precedes the currency value for nonnegative values, 0 if it follows.
+p_cs_precedes       => 1,
+## 1 if a space is inserted between the currency symbol and the currency value for nonnegative values, 0 otherwise.
+p_sep_by_space      => 0,
+## The location of the positive_sign with respect to a nonnegative quantity and the currency_symbol, coded as follows:
+## 0    Parentheses around the entire string.
+## 1    Before the string.
+## 2    After the string.
+## 3    Just before currency_symbol.
+## 4    Just after currency_symbol.
+p_sign_posn         => 1,
+## The character used to denote nonnegative currency values, usually the empty string.
+positive_sign       => '',
+## The separator between groups of digits before the decimal point, except for currency values
+thousands_sep       => ',',
+};
+
+my $map =
+{
+decimal             => [qw( decimal_point mon_decimal_point )],
+grouping            => [qw( grouping mon_grouping )],
+position_neg        => [qw( n_sign_posn int_n_sign_posn )],
+position_pos        => [qw( n_sign_posn int_p_sign_posn )],
+precede             => [qw( p_cs_precedes int_p_cs_precedes )],
+precede_neg         => [qw( n_cs_precedes int_n_cs_precedes )],
+precision           => [qw( frac_digits int_frac_digits )],
+sign_neg            => [qw( negative_sign )],
+sign_pos            => [qw( positive_sign )],
+space_pos           => [qw( p_sep_by_space int_p_sep_by_space )],
+space_neg           => [qw( n_sep_by_space int_n_sep_by_space )],
+symbol              => [qw( currency_symbol int_curr_symbol )],
+thousand            => [qw( thousands_sep mon_thousands_sep )],
+};
+
 sub init
 {
     my $self = shift( @_ );
@@ -4586,62 +5009,69 @@ sub init
     return( Module::Generic::Infinity->new( $num ) ) if( POSIX::isinf( $num ) );
     return( Module::Generic::Nan->new( $num ) ) if( POSIX::isnan( $num ) );
     use utf8;
-    $self->{thousand}   = ',';
-    $self->{decimal}    = '.';
-    $self->{symbol}     = '€';
-    $self->{precision}  = 2;
-    $self->{precede}    = 1;
-    $self->{lang}       = '';
-    my $args = {};
-    $args = ref( $_[0] ) ? $_[0] : !( @_ % 2 ) ? { @_ } : {};
+    my @k = keys( %$map );
+    @$self{ @k } = ( '' x scalar( @k ) );
+    $self->{lang} = '';
+    $self->{default} = $DEFAULT;
+    $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ );
+    my $default = $self->default;
+    # $self->message( 3, "Getting current locale" );
+    my $curr_locale = POSIX::setlocale( &POSIX::LC_ALL );
+    ## $self->message( 3, "Current locale is '$curr_locale'" );
     if( $self->{lang} )
     {
-        $self->message( 3, "Language requested '$self->{lang}'." );
+        # $self->message( 3, "Language requested '$self->{lang}'." );
         try
         {
-            my $curr_locale = POSIX::setlocale( &POSIX::LC_ALL );
-            ## $self->message( 3, "Current locale is: '$curr_locale'" );
-            if( my $loc = POSIX::setlocale( &POSIX::LC_ALL, $self->{lang} ) )
+            # $self->message( 3, "Current locale found is '$curr_locale'" );
+            local $try_locale = sub
             {
+                my $loc;
+                # $self->message( 3, "Checking language '$_[0]'" );
+                ## The user provided only a language code such as fr_FR. We try it, and also other known combination like fr_FR.UTF-8 and fr_FR.ISO-8859-1, fr_FR.ISO8859-1
+                ## Try several possibilities
+                ## RT https://rt.cpan.org/Public/Bug/Display.html?id=132664
+                if( index( $_[0], '.' ) == -1 )
+                {
+                    # $self->message( 3, "Language '$_[0]' is a bareword, check if it works as is." );
+                    $loc = POSIX::setlocale( &POSIX::LC_ALL, $_[0] );
+                    # $self->message( 3, "Succeeded to set up locale for language '$_[0]'" ) if( $loc );
+                    $_[0] =~ s/^(?<locale>[a-z]{2,3})_(?<country>[a-z]{2})$/$+{locale}_\U$+{country}\E/;
+                    if( !$loc && CORE::exists( $SUPPORTED_LOCALES->{ $_[0] } ) )
+                    {
+                        # $self->message( 3, "Language '$_[0]' is supported, let's check for right variation" );
+                        foreach my $supported ( @{$SUPPORTED_LOCALES->{ $_[0] }} )
+                        {
+                            if( ( $loc = POSIX::setlocale( &POSIX::LC_ALL, $supported ) ) )
+                            {
+                                $_[0] = $supported;
+                                # $self->message( "-> Language variation '$supported' found." );
+                                last;
+                            }
+                        }
+                    }
+                }
+                ## We got something like fr_FR.ISO-8859
+                ## The user is specific, so we try as is
+                else
+                {
+                    # $self->message( 3, "Language '$_[0]' is specific enough, let's try it." );
+                    $loc = POSIX::setlocale( &POSIX::LC_ALL, $_[0] );
+                }
+                return( $loc );
+            };
+            
+            ## $self->message( 3, "Current locale is: '$curr_locale'" );
+            if( my $loc = $try_locale->( $self->{lang} ) )
+            {
+                # $self->message( 3, "Succeeded in setting locale for language '$self->{lang}'" );
                 ## $self->message( 3, "Succeeded in setting locale to '$self->{lang}'." );
                 my $lconv = POSIX::localeconv();
                 ## Set back the LC_ALL to what it was, because we do not want to disturb the user environment
                 POSIX::setlocale( &POSIX::LC_ALL, $curr_locale );
                 ## $self->messagef( 3, "POSIX::localeconv() returned %d items", scalar( keys( %$lconv ) ) );
-                if( !CORE::length( $args->{decimal} ) && 
-                    ( CORE::length( $lconv->{decimal_point} ) || CORE::length( $lconv->{mon_decimal_point} ) ) )
-                {
-                    $self->{decimal} = CORE::length( $lconv->{decimal_point} ) 
-                        ? $lconv->{decimal_point}
-                        : $lconv->{mon_decimal_point};
-                }
-                if( !CORE::length( $args->{thousand} ) && 
-                    ( CORE::length( $lconv->{thousands_sep} ) || CORE::length( $lconv->{mon_thousands_sep} ) ) )
-                {
-                    $self->{thousand} = CORE::length( $lconv->{thousands_sep} )
-                        ? $lconv->{thousands_sep}
-                        : $lconv->{mon_thousands_sep};
-                }
-                if( !CORE::length( $args->{symbol} ) &&
-                    CORE::length( $lconv->{currency_symbol} ) )
-                {
-                    $self->{symbol} = $lconv->{currency_symbol};
-                }
-                if( !CORE::length( $args->{precision} ) && 
-                    ( CORE::length( $lconv->{frac_digits} ) || CORE::length( $lconv->{int_frac_digits} ) ) )
-                {
-                    $self->{precision} = CORE::length( $lconv->{frac_digits} )
-                        ? $lconv->{frac_digits}
-                        : $lconv->{int_frac_digits};
-                }
-                if( !CORE::length( $args->{precede} ) &&
-                    ( CORE::length( $lconv->{p_cs_precedes} ) || CORE::length( $lconv->{int_p_cs_precedes} ) ) )
-                {
-                    $self->{precede} = CORE::length( $lconv->{p_cs_precedes} )
-                        ? $lconv->{p_cs_precedes}
-                        : $lconv->{int_p_cs_precedes};
-                }
+                $default = $lconv if( $lconv && scalar( keys( %$lconv ) ) );
             }
             else
             {
@@ -4653,26 +5083,138 @@ sub init
             return( $self->error( "An error occurred while getting the locale information for \"$self->{lang}\": $e" ) );
         }
     }
-    $Number::Format::DEFAULT_LOCALE->{int_curr_symbol} = 'EUR';
+    elsif( $curr_locale && ( my $lconv = POSIX::localeconv() ) )
+    {
+        $default = $lconv if( scalar( keys( %$lconv ) ) );
+        ## To simulate running on Windows
+#         my $fail = [qw(
+# frac_digits
+# int_frac_digits
+# n_cs_precedes
+# n_sep_by_space
+# n_sign_posn
+# p_cs_precedes
+# p_sep_by_space
+# p_sign_posn
+#         )];
+#         @$lconv{ @$fail } = ( -1 ) x scalar( @$fail );
+        ## $self->message( 3, "No language provided, but current locale '$curr_locale' found" );
+        $self->{lang} = $curr_locale;
+    }
+
+    ## This serves 2 purposes:
+    ## 1) to silence warnings issued from Number::Format when it uses an empty string when evaluating a number, e.g. '' == 1
+    ## 2) to ensure that blank numerical values are not interpreted to anything else than equivalent of empty
+    ##    For example, an empty frac_digits will default to 2 in Number::Format even if the user does not want any. Of course, said user could also have set it to 0
+    ## So here we use this hash reference of numeric properties to ensure the option parameters are set to a numeric value (0) when they are empty.
+    my $numerics = 
+    {
+    grouping => 0,
+    frac_digits => 0,
+    int_frac_digits => 0,
+    int_n_cs_precedes => 0,
+    int_p_cs_precedes => 0,
+    int_n_sep_by_space => 0,
+    int_p_sep_by_space => 0,
+    int_n_sign_posn => 1,
+    int_p_sign_posn => 1,
+    mon_grouping => 0,
+    n_cs_precedes => 0,
+    n_sep_by_space => 0,
+    n_sign_posn => 1,
+    p_cs_precedes => 0,
+    p_sep_by_space => 0,
+    ## Position of positive sign. 1 = before (0 = parentheses)
+    p_sign_posn => 1,
+    };
+    
+    foreach my $prop ( keys( %$map ) )
+    {
+        my $ref = $map->{ $prop };
+        ## Already set by user
+        next if( CORE::length( $self->{ $prop } ) );
+        foreach my $lconv_prop ( @$ref )
+        {
+            if( CORE::defined( $default->{ $lconv_prop } ) )
+            {
+                ## Number::Format bug RT #71044 when running on Windows
+                ## https://rt.cpan.org/Ticket/Display.html?id=71044
+                ## This is a workaround when values are lower than 0 (i.e. -1)
+                if( CORE::exists( $numerics->{ $lconv_prop } ) && 
+                    CORE::length( $default->{ $lconv_prop } ) && 
+                    $default->{ $lconv_prop } < 0 )
+                {
+                    $default->{ $lconv_prop } = $numerics->{ $lconv_prop };
+                }
+                $self->$prop( $default->{ $lconv_prop } );
+                last;
+            }
+        }
+    }
+    
+    # $Number::Format::DEFAULT_LOCALE->{int_curr_symbol} = 'EUR';
     try
     {
-        $self->{_fmt} = Number::Format->new(
-            thousands_sep => $self->{thousand},
-            decimal_point => $self->{decimal},
-            int_curr_symbol => $self->{currency},
-            decimal_digits => $self->{precision},
-            p_cs_precedes => $self->{precede},
-            n_cs_precedes => $self->{precede},
-        );
+        ## Those are unsupported by Number::Format
+        my $skip =
+        {
+        int_n_cs_precedes => 1,
+        int_p_cs_precedes => 1,
+        int_n_sep_by_space => 1,
+        int_p_sep_by_space => 1,
+        int_n_sign_posn => 1,
+        int_p_sign_posn => 1,
+        };
+        my $opts = {};
+        foreach my $prop ( CORE::keys( %$map ) )
+        {
+            ## $self->message( 3, "Checking property \"$prop\" value \"", overload::StrVal( $self->{ $prop } ), "\" (", $self->$prop->defined ? 'defined' : 'undefined', ")." );
+            my $prop_val;
+            if( $self->$prop->defined )
+            {
+                $prop_val = $self->$prop;
+            }
+            ## To prevent Number::Format from defaulting to property values not in sync with ours
+            ## Because it seems the POSIX::setlocale only affect one module
+            else
+            {
+                $prop_val = '';
+            }
+            ## $self->message( 3, "Using property \"$prop\" value \"$prop_val\" (", CORE::defined( $prop_val ) ? 'defined' : 'undefined', ") [ref=", ref( $prop_val ), "]." );
+            ## Need to set all the localeconv properties for Number::Format, because it uses mon_thousand_sep intsead of just thousand_sep
+            foreach my $lconv_prop ( @{$map->{ $prop }} )
+            {
+                CORE::next if( CORE::exists( $skip->{ $lconv_prop } ) );
+                ## Cannot be undefined, but can be empty string
+                $opts->{ $lconv_prop } = "$prop_val";
+                if( !CORE::length( $opts->{ $lconv_prop } ) && CORE::exists( $numerics->{ $lconv_prop } ) )
+                {
+                    $opts->{ $lconv_prop } = $numerics->{ $lconv_prop };
+                }
+            }
+        }
+        ## $self->message( 3, "Using following options for Number::Format: ", sub{ $self->dumper( $opts ) } );
+        no warnings qw( uninitialized );
+        $self->{_fmt} = Number::Format->new( %$opts );
+        use warnings;
     }
     catch( $e )
     {
-        return( $self->error( "Unable to crete a Number::Format object: $e" ) );
+        ## $self->message( 3, "Error trapped in creating a Number::Format object: '$e'" );
+        return( $self->error( "Unable to create a Number::Format object: $e" ) );
     }
     $self->{_original} = $num;
     try
     {
-        $self->{_number} = $self->{_fmt}->unformat_number( $num );
+        if( $num !~ /^$RE{num}{real}$/ )
+        {
+            $self->{_number} = $self->{_fmt}->unformat_number( $num );
+        }
+        else
+        {
+            $self->{_number} = $num;
+        }
+        ## $self->message( 3, "Unformatted number is: '$self->{_number}'" );
         return( $self->error( "Invalid number: $num" ) ) if( !defined( $self->{_number} ) );
     }
     catch( $e )
@@ -4706,7 +5248,8 @@ sub clone
     my $num  = @_ ? shift( @_ ) : $self->{_number};
     return( Module::Generic::Infinity->new( $num ) ) if( POSIX::isinf( $num ) );
     return( Module::Generic::Nan->new( $num ) ) if( POSIX::isnan( $num ) );
-    my @keys = qw( thousand decimal symbol precision );
+    my @keys = keys( %$map );
+    push( @keys, qw( lang debug ) );
     my $hash = {};
     @$hash{ @keys } = @$self{ @keys };
     return( $self->new( $num, $hash ) );
@@ -4749,6 +5292,8 @@ sub cos { return( shift->_func( 'cos' ) ); }
 sub currency { return( shift->_set_get_prop( 'symbol', @_ ) ); }
 
 sub decimal { return( shift->_set_get_prop( 'decimal', @_ ) ); }
+
+sub default { return( shift->_set_get_hash_as_mix_object( 'default', @_ ) ); }
 
 sub exp { return( shift->_func( 'exp' ) ); }
 
@@ -4818,7 +5363,7 @@ sub format_money
         ## Even though the Number::Format instantiated is set with a currency symbol, 
         ## Number::Format will not respect it, and revert to USD if nothing was provided as argument
         ## This highlights that Number::Format is designed to be used more for exporting function rather than object methods
-        $self->message( 3, "Passing Number = '$num', precision = '$precision', currency symbol = '$currency_symbol'." );
+        ## $self->message( 3, "Passing Number = '$num', precision = '$precision', currency symbol = '$currency_symbol'." );
         ## return( $fmt->format_price( $num, $precision, $currency_symbol ) );
         my $res = $fmt->format_price( "$num", "$precision", "$currency_symbol" );
         return if( !defined( $res ) );
@@ -4841,10 +5386,10 @@ sub format_negative
     try
     {
         my $new = $self->format;
-        $self->message( 3, "Formatted number '$self->{_number}' now is '$new'" );
+        ## $self->message( 3, "Formatted number '$self->{_number}' now is '$new'" );
         ## return( $fmt->format_negative( $new, @_ ) );
         my $res = $fmt->format_negative( "$new", @_ );
-        $self->message( 3, "Result is '$res'" );
+        ## $self->message( 3, "Result is '$res'" );
         return if( !defined( $res ) );
         return( Module::Generic::Scalar->new( $res ) );
     }
@@ -4913,6 +5458,8 @@ sub from_hex
     }
 }
 
+sub grouping { return( shift->_set_get_prop( 'grouping', @_ ) ); }
+
 sub int { return( shift->_func( 'int' ) ); }
 
 *is_decimal = \&is_float;
@@ -4938,7 +5485,11 @@ sub is_normal { return( shift->_func( 'isnormal', { posix => 1}) ); }
 
 sub is_positive { return( shift->_func( 'signbit', { posix => 1 }) == 0 ); }
 
+sub lang { return( shift->_set_get_scalar_as_object( 'lang', @_ ) ); }
+
 sub length { return( $_[0]->clone( CORE::length( $_[0]->{_number} ) ) ); }
+
+sub locale { return( shift->_set_get_scalar_as_object( 'lang', @_ ) ); }
 
 sub log { return( shift->_func( 'log' ) ); }
 
@@ -4974,19 +5525,21 @@ sub new_formatter
     }
     else
     {
-        my @keys = qw( thousand decimal currency precision precede );
-        @$hash{ @keys } = @$self{ @keys };
+        my @keys = keys( %$map );
+        # @$hash{ @keys } = @$self{ @keys };
+        for( @keys )
+        {
+            $hash->{ $_ } = $self->$_();
+        }
     }
     try
     {
-        return( Number::Format->new(
-            thousands_sep => $hash->{thousand},
-            decimal_point => $hash->{decimal},
-            int_curr_symbol => $hash->{currency},
-            decimal_digits => $hash->{precision},
-            p_cs_precedes => $hash->{precede},
-            n_cs_precedes => $hash->{precede},
-        ) );
+        my $opts = {};
+        foreach my $prop ( keys( %$map ) )
+        {
+            $opts->{ $map->{ $prop }->[0] } = $hash->{ $prop } if( CORE::defined( $hash->{ $prop } ) );
+        }
+        return( Number::Format->new( %$opts ) );
     }
     catch( $e )
     {
@@ -4996,9 +5549,17 @@ sub new_formatter
 
 sub oct { return( shift->_func( 'oct' ) ); }
 
+sub position_neg { return( shift->_set_get_prop( 'position_neg', @_ ) ); }
+
+sub position_pos { return( shift->_set_get_prop( 'position_pos', @_ ) ); }
+
 sub pow { return( shift->_func( 'pow', @_, { posix => 1 } ) ); }
 
 sub precede { return( shift->_set_get_prop( 'precede', @_ ) ); }
+
+sub precede_neg { return( shift->_set_get_prop( 'precede_neg', @_ ) ); }
+
+sub precede_pos { return( shift->_set_get_prop( 'precede', @_ ) ); }
 
 sub precision { return( shift->_set_get_prop( 'precision', @_ ) ); }
 
@@ -5031,7 +5592,17 @@ sub round2
     }
 }
 
+sub sign_neg { return( shift->_set_get_prop( 'sign_neg', @_ ) ); }
+
+sub sign_pos { return( shift->_set_get_prop( 'sign_pos', @_ ) ); }
+
 sub sin { return( shift->_func( 'sin' ) ); }
+
+*space = \&space_pos;
+
+sub space_neg { return( shift->_set_get_prop( 'space_neg', @_ ) ); }
+
+sub space_pos { return( shift->_set_get_prop( 'space_pos', @_ ) ); }
 
 sub sqrt { return( shift->_func( 'sqrt' ) ); }
 
@@ -5072,6 +5643,7 @@ sub _func
     my $expr = defined( $val ) ? "${namespace}::${func}( \$self->{_number}, $val )" : "${namespace}::${func}( \$self->{_number} )";
     ## $self->message( 3, "Evaluating '$expr'" );
     my $res = eval( $expr );
+    ## $self->message( 3, "Result for number '$self->{_number}' is '$res'" );
     $self->message( 3, "Error: $@" ) if( $@ );
     return( $self->pass_error( $@ ) ) if( $@ );
     return if( !defined( $res ) );
@@ -5087,6 +5659,7 @@ sub _set_get_prop
     if( @_ )
     {
         my $val = shift( @_ );
+        ## $self->message( 3, "Setting value \"$val\" (", defined( $val ) ? 'defined' : 'undefined', ") for property \"$prop\"." );
         if( $val ne $self->{ $prop } )
         {
             # $self->{ $prop } = $val;
@@ -5142,7 +5715,7 @@ BEGIN
                  );
     use Want;
     use POSIX ();
-    our( $VERSION ) = '0.1';
+    our( $VERSION ) = '0.1.0';
 };
 
 sub new
@@ -5227,7 +5800,7 @@ BEGIN
     use strict;
     use warnings;
     use parent -norequire, qw( Module::Generic::NumberSpecial );
-    our( $VERSION ) = '0.1';
+    our( $VERSION ) = '0.1.0';
 };
 
 sub is_infinite { return( 1 ); }
@@ -5238,7 +5811,7 @@ BEGIN
     use strict;
     use warnings;
     use parent -norequire, qw( Module::Generic::NumberSpecial );
-    our( $VERSION ) = '0.1';
+    our( $VERSION ) = '0.1.0';
 };
 
 sub is_nan { return( 1 ); }
@@ -5575,6 +6148,7 @@ BEGIN
     use warnings::register;
     use parent -norequire, qw( Module::Generic );
     use Scalar::Util ();
+    our( $VERSION ) = '0.1.0';
 };
 
 sub TIEHASH
@@ -5741,8 +6315,12 @@ sub _exclude
 }
 
 package Module::Generic::Tie;
-use Tie::Hash;
-our( @ISA ) = qw( Tie::Hash );
+BEGIN
+{
+    use Tie::Hash;
+    our( @ISA ) = qw( Tie::Hash );
+    our( $VERSION ) = '0.1.0';
+};
 
 sub TIEHASH
 {
@@ -5918,7 +6496,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.12.5
+    v0.12.12
 
 =head1 DESCRIPTION
 
@@ -6877,4 +7455,3 @@ You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.
 
 =cut
-

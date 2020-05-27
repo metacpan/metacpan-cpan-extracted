@@ -34,6 +34,10 @@ t/20_plugin_no_check.t
 t/21_plugin_does_not_exist.t
 t/22_config_as_string.t
 t/23_invalid_refs.t
+t/24_plugin_list.t
+t/25_regexes.t
+t/26_not_regexes.t
+t/Data/Validate/WithYAML/Plugin/TestExists.pm
 t/Data/Validate/WithYAML/Plugin/TestNoCheck.pm
 t/Data/Validate/WithYAML/Plugin/TestPlugin.pm
 t/author-pod-coverage.t

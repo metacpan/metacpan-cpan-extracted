@@ -2,7 +2,7 @@
     "x_static_install": true,
     "resources": {
         "bugtracker": {
-            "web": "https://github.com/gugod/Date-Holidays-TW/issues"
+            "web": "https://github.com/perltaiwan/Date-Holidays-TW/issues"
         },
         "repository": {
             "web": "https://github.com/perltaiwan/Date-Holidays-TW",

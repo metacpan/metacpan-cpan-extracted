@@ -1,21 +1,24 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/BloomUtils/check_with_bloom_filter
-# and generated automatically using Perinci::CmdLine::Gen version 0.485
+# and generated automatically using Perinci::CmdLine::Gen version 0.496
 
-our $DATE = '2018-03-23'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-24'; # DATE
 our $DIST = 'App-BloomUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Perinci::CmdLine::Any;
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BloomUtils/check_with_bloom_filter",
     program_name => "check-with-bloom-filter",
+    log => 1,
     read_config => 0,
     read_env => 0,
 );
@@ -37,13 +40,14 @@ check-with-bloom-filter - Check with bloom filter
 
 =head1 VERSION
 
-This document describes version 0.002 of check-with-bloom-filter (from Perl distribution App-BloomUtils), released on 2018-03-23.
+This document describes version 0.004 of check-with-bloom-filter (from Perl distribution App-BloomUtils), released on 2020-05-24.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % check-with-bloom-filter [options] <items> ...
+ % check-with-bloom-filter [--debug] [--log-level=level]
+     [--page-result[=program]] [--quiet] [--trace] [--verbose] <items> ...
 
 =head1 DESCRIPTION
 
@@ -74,42 +78,39 @@ Can be specified multiple times.
 
 =back
 
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
 =head2 Output options
 
 =over
 
-=item B<--format>=I<s>
+=item B<--page-result>
 
-Choose output format, e.g. json, text.
-
-Default value:
-
- undef
-
-=item B<--json>
-
-Set output format to json.
-
-=item B<--naked-res>
-
-When outputing as JSON, strip result envelope.
-
-Default value:
-
- 0
-
-By default, when outputing as JSON, the full enveloped result is returned, e.g.:
-
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
-
-The reason is so you can get the status (1st element), status message (2nd
-element) as well as result metadata/extra result (4th element) instead of just
-the result (3rd element). However, sometimes you want just the result, e.g. when
-you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
-
-    [1,2,3]
-
+Filter output through a pager.
 
 =back
 
@@ -183,7 +184,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

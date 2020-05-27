@@ -4,59 +4,61 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "introspection for roles",
-  "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
-  "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.140640",
-  "keywords"       => [],
-  "license"        => ["perl_5"],
-  "meta-spec"      => {
-                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                        version => 2,
-                      },
-  "name"           => "Role-Inspector",
-  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        develop   => { recommends => { "Dist::Inkt" => 0.001 } },
-                        runtime   => {
-                                       requires => {
-                                         "Exporter::Shiny" => 0,
-                                         "Module::Runtime" => 0,
-                                         "perl" => 5.006,
-                                         "Scalar::Util" => 0,
+  "abstract"         => "introspection for roles",
+  "author"           => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
+  "dynamic_config"   => 0,
+  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "keywords"         => [],
+  "license"          => ["perl_5"],
+  "meta-spec"        => {
+                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                          version => 2,
+                        },
+  "name"             => "Role-Inspector",
+  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"          => {
+                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                          develop   => { recommends => { "Dist::Inkt" => 0.001 } },
+                          runtime   => {
+                                         requires => {
+                                           "Exporter::Shiny" => 0,
+                                           "Module::Runtime" => 0,
+                                           "perl" => 5.006,
+                                           "Scalar::Util" => 0,
+                                         },
                                        },
-                                     },
-                        test      => {
-                                       recommends => {
-                                                       "Moo::Role"   => "1.000000",
-                                                       "Moose::Role" => "2.0600",
-                                                       "mop::role"   => 0,
-                                                       "Mouse::Role" => "1.00",
-                                                       "Role::Basic" => 0,
-                                                       "Role::Tiny"  => "1.000000",
-                                                     },
-                                       requires   => { "Test::Modern" => 0.006 },
-                                     },
-                      },
-  "provides"       => {
-                        "Role::Inspector" => { file => "lib/Role/Inspector.pm", version => 0.005 },
-                      },
-  "release_status" => "stable",
-  "resources"      => {
-                        bugtracker   => {
-                                          web => "http://rt.cpan.org/Dist/Display.html?Queue=Role-Inspector",
-                                        },
-                        homepage     => "https://metacpan.org/release/Role-Inspector",
-                        license      => ["http://dev.perl.org/licenses/"],
-                        repository   => {
-                                          type => "git",
-                                          url  => "git://github.com/tobyink/p5-role-inspector.git",
-                                          web  => "https://github.com/tobyink/p5-role-inspector",
-                                        },
-                        x_identifier => "http://purl.org/NET/cpan-uri/dist/Role-Inspector/project",
-                      },
-  "version"        => 0.005,
+                          test      => {
+                                         recommends => {
+                                                         "Class::Method::Modifiers" => 0,
+                                                         "Moo::Role"                => "1.000000",
+                                                         "Moose::Role"              => "2.0600",
+                                                         "mop::role"                => 0,
+                                                         "Mouse::Role"              => "1.00",
+                                                         "Role::Basic"              => 0,
+                                                         "Role::Tiny"               => "1.000000",
+                                                       },
+                                         requires   => { "Test::Modern" => 0.006 },
+                                       },
+                        },
+  "provides"         => {
+                          "Role::Inspector" => { file => "lib/Role/Inspector.pm", version => 0.006 },
+                        },
+  "release_status"   => "stable",
+  "resources"        => {
+                          bugtracker   => {
+                                            web => "http://rt.cpan.org/Dist/Display.html?Queue=Role-Inspector",
+                                          },
+                          homepage     => "https://metacpan.org/release/Role-Inspector",
+                          license      => ["http://dev.perl.org/licenses/"],
+                          repository   => {
+                                            type => "git",
+                                            url  => "git://github.com/tobyink/p5-role-inspector.git",
+                                            web  => "https://github.com/tobyink/p5-role-inspector",
+                                          },
+                          x_identifier => "http://purl.org/NET/cpan-uri/dist/Role-Inspector/project",
+                        },
+  "version"          => 0.006,
+  "x_static_install" => 1,
 };
 
 my %dynamic_config;

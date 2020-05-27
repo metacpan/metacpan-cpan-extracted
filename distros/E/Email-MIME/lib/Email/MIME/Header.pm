@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Email::MIME::Header;
 # ABSTRACT: the header of a MIME message
-$Email::MIME::Header::VERSION = '1.946';
+$Email::MIME::Header::VERSION = '1.949';
 use parent 'Email::Simple::Header';
 
 use Carp ();
@@ -14,7 +14,7 @@ our @CARP_NOT;
 
 our %header_to_class_map;
 
-{
+BEGIN {
   my @address_list_headers = qw(from sender reply-to to cc bcc);
   push @address_list_headers, map { "resent-$_" } @address_list_headers;
   push @address_list_headers, map { "downgraded-$_" } @address_list_headers; # RFC 5504
@@ -75,7 +75,7 @@ sub header_str_set {
     Email::MIME::Encode::maybe_mime_encode_header($name, $_, 'UTF-8')
   } @vals;
 
-  $self->header_set($name => @values);
+  $self->header_raw_set($name => @values);
 }
 
 sub header_str_pairs {
@@ -143,7 +143,7 @@ Email::MIME::Header - the header of a MIME message
 
 =head1 VERSION
 
-version 1.946
+version 1.949
 
 =head1 DESCRIPTION
 

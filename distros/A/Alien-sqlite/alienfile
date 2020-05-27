@@ -1,6 +1,8 @@
 use 5.010;
 use alienfile;
 use Sort::Versions;
+use Path::Tiny qw /path/;
+
 
 my $on_windows = $^O =~ /mswin/i;
 my $on_automated_rig
@@ -8,7 +10,8 @@ my $on_automated_rig
   || $ENV{PERL_CPAN_REPORTER_CONFIG}
   || $ENV{AUTOMATED_TESTING}
   || $ENV{TRAVIS}
-  || $ENV{APPVEYOR};
+  || $ENV{APPVEYOR}
+  || $ENV{CI};
 
 
 use Cwd;
@@ -26,6 +29,22 @@ plugin 'PkgConfig' => (
     pkg_name => 'sqlite3',
     minimum_version => $min_target_version,
 );
+
+plugin 'Probe::CommandLine' => (
+  command  => 'sqlite3',
+  #args    => [ '--version' ],
+  #match   => qr/\d+\.\d+\.\d+ \d{4}-\d{2}-\d{2}/,
+  #version => qr/gzip ([0-9\.]+)/,
+  secondary => 1,  #  secondary to pkgconf probe
+);
+
+#  need to check if we have sqlite headers
+#  as dependent aliens like proj need them
+#probe sub {
+#  my($build) = @_;  # $build is the Alien::Build instance.
+#  system 'pkg-config --exists libfoo';
+#  $? == 0 ? 'system' : 'share';
+#};
 
 
 share {
@@ -89,15 +108,7 @@ share {
     plugin 'Cleanse::BuildDir';
   }
   
-  #  remove any git utils from the path
-  #say join ' ', @PATH;
-  my $have_git_in_path = grep {$_ =~ m|Git[/\\]usr[/\\]bin|} @PATH;
-  if ($on_windows && $have_git_in_path) {
-    warn 'Found Git/usr/bin in path and removed it for compilation';
-    #say $ENV{PATH};
-    @PATH = grep {not $_ =~ m|Git[/\\]usr[/\\]bin$|} @PATH;
-    #say $ENV{PATH};
-  }
+  meta->around_hook( build => \&remove_gitfw_from_path );
 
   build [
     "%{configure} $with_local $with_cpp11 $build_static",
@@ -108,6 +119,34 @@ share {
   ];
 
 };
+
+#  git for windows clashes with MSYS
+#  if its /usr/bin dir is in the path
+sub remove_gitfw_from_path {
+  my ($orig, $build, @args) = @_;
+
+  return $orig->($build, @args)
+    if !$on_windows;
+
+  local $ENV{PATH} = $ENV{PATH};
+
+  my $msys_path = eval {
+    path('Alien::MSYS'->msys_path())
+  };
+  return if !defined $msys_path;
+  my $count = @PATH;
+
+  @PATH
+    = grep {path($_)->stringify =~ m|/usr/bin$| && path($_) ne $msys_path ? () : $_}
+      @PATH;
+
+  my $removed = $count - @PATH;
+  if ($removed) {
+    $build->log ("$removed additional .../usr/bin dirs were removed from the path for compilation");
+  }
+
+  $orig->($build, @args);
+}
 
 sub pause {
     return;  #  re-enable in case of debug

@@ -1,3 +1,10 @@
+0.032   2020-05-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Coerce rules
+	  Data::Sah::Coerce::perl::To_array::From_str_or_array::expand_perl
+	  _mod{name,prefix}_wildcard: accept argument 'ns_prefix'.
+
+
 0.031   2020-05-08  Released-By: PERLANCAR; Urgency: medium
 
         - [build] Rebuild with newest Pod::Weaver::Plugin::Sah::Schemas that

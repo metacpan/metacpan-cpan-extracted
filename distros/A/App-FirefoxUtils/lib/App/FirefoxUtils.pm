@@ -1,9 +1,9 @@
 package App::FirefoxUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-11'; # DATE
+our $DATE = '2020-05-24'; # DATE
 our $DIST = 'App-FirefoxUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -70,6 +70,26 @@ sub firefox_is_paused {
     App::BrowserUtils::_do_browser('is_paused', 'firefox', @_);
 }
 
+$SPEC{firefox_is_running} = {
+    v => 1.1,
+    summary => "Check whether Firefox is running",
+    description => <<'_',
+
+Firefox is defined as running if there are some Firefox processes that are *not*
+in 'stop' state. In other words, if Firefox has been started but is currently
+paused, we do not say that it's running. If you want to check if Firefox process
+exists, you can use `ps_firefox`.
+
+_
+    args => {
+        %App::BrowserUtils::args_common,
+        %App::BrowserUtils::argopt_quiet,
+    },
+};
+sub firefox_is_running {
+    App::BrowserUtils::_do_browser('is_running', 'firefox', @_);
+}
+
 $SPEC{terminate_firefox} = {
     v => 1.1,
     summary => "Terminate  (kill -KILL) Firefox",
@@ -96,7 +116,7 @@ App::FirefoxUtils - Utilities related to Firefox
 
 =head1 VERSION
 
-This document describes version 0.008 of App::FirefoxUtils (from Perl distribution App-FirefoxUtils), released on 2020-04-11.
+This document describes version 0.012 of App::FirefoxUtils (from Perl distribution App-FirefoxUtils), released on 2020-05-24.
 
 =head1 SYNOPSIS
 
@@ -108,7 +128,13 @@ This distribution includes several utilities related to Firefox:
 
 =item * L<firefox-is-paused>
 
+=item * L<firefox-is-running>
+
+=item * L<get-firefox-profile-dir>
+
 =item * L<kill-firefox>
+
+=item * L<list-firefox-profiles>
 
 =item * L<pause-firefox>
 
@@ -132,6 +158,47 @@ Usage:
 Check whether Firefox is paused.
 
 Firefox is defined as paused if I<all> of its processes are in 'stop' state.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<quiet> => I<true>
+
+=item * B<users> => I<array[unix::local_uid]>
+
+Kill browser processes that belong to certain user(s) only.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 firefox_is_running
+
+Usage:
+
+ firefox_is_running(%args) -> [status, msg, payload, meta]
+
+Check whether Firefox is running.
+
+Firefox is defined as running if there are some Firefox processes that are I<not>
+in 'stop' state. In other words, if Firefox has been started but is currently
+paused, we do not say that it's running. If you want to check if Firefox process
+exists, you can use C<ps_firefox>.
 
 This function is not exported.
 
@@ -322,7 +389,7 @@ feature.
 =head1 SEE ALSO
 
 Some other CLI utilities related to Firefox: L<dump-firefox-history> (from
-L<App::DumpFirefoxHistory>).
+L<App::DumpFirefoxHistory>), L<App::FirefoxMultiAccountContainersUtils>.
 
 L<App::ChromeUtils>
 

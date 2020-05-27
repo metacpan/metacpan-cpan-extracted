@@ -1,0 +1,5 @@
+name = "Test2-Plugin-GitHub-Actions-AnnotateFailedTest"
+# badges = ["travis-ci.com"]
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+

@@ -8,7 +8,7 @@ package Tickit::RenderBuffer;
 use strict;
 use warnings;
 
-our $VERSION = '0.70';
+our $VERSION = '0.71';
 
 use Carp;
 use Scalar::Util qw( refaddr );

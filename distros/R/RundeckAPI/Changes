@@ -1,3 +1,10 @@
+20200522
+	Correct return value from internal method _handleResponse.
+	Added two levels of verbosity
+
+2020512
+	Refactored code
+
 2020501
 	Revamped code in order to avoid overwrite of shadow hashes. Alway
 	use a temporay hash, and return a dclone() of it.

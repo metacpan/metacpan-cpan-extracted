@@ -7,7 +7,7 @@ use 5.010001;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "List available Firefox profiles",
+  "ABSTRACT" => "Given a Firefox profile name, return its directory",
   "AUTHOR" => "perlancar <perlancar\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Firefox::Util::Profile",
   "PREREQ_PM" => {
     "Config::IOD::INI::Reader" => 0,
+    "Exporter" => "5.57",
     "Log::ger" => "0.037",
     "Sort::Sub" => "0.118",
     "strict" => 0,
@@ -29,7 +30,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,6 +39,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Config::IOD::INI::Reader" => 0,
+  "Exporter" => "5.57",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

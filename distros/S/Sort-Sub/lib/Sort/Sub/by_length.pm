@@ -1,9 +1,9 @@
 package Sort::Sub::by_length;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-28'; # DATE
+our $DATE = '2020-05-25'; # DATE
 our $DIST = 'Sort-Sub'; # DIST
-our $VERSION = '0.118'; # VERSION
+our $VERSION = '0.120'; # VERSION
 
 use 5.010;
 use strict;
@@ -45,7 +45,7 @@ Sort::Sub::by_length - Sort by length of string
 
 =head1 VERSION
 
-This document describes version 0.118 of Sort::Sub::by_length (from Perl distribution Sort-Sub), released on 2020-02-28.
+This document describes version 0.120 of Sort::Sub::by_length (from Perl distribution Sort-Sub), released on 2020-05-25.
 
 =head1 SYNOPSIS
 

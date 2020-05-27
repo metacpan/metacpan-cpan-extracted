@@ -1,6 +1,6 @@
 
 package Shipment::FedEx::WSDL::ShipElements::ValidateShipmentRequest;
-$Shipment::FedEx::WSDL::ShipElements::ValidateShipmentRequest::VERSION = '3.04';
+$Shipment::FedEx::WSDL::ShipElements::ValidateShipmentRequest::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -34,7 +34,7 @@ Shipment::FedEx::WSDL::ShipElements::ValidateShipmentRequest
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 

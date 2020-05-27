@@ -1,10 +1,41 @@
-0.002   2018-03-23 (PERLANCAR)
+0.004   2020-05-24  Released-By: PERLANCAR; Urgency: medium
+
+	- [cil gen-bloom-filter] Show information on actual m/k/p/size.
+
+	- [cli bloom-filter-calculator] Return actual m, k, p.
+
+	- [ux] Add shorter aliases for the CLIs: bloomcalc, bloomchk,
+	  bloomgen.
+
+	- Use the same description for gen-bloom-filter and
+	  bloom-filter-calculator.
+
+	- Tweak Rinci schema.
+
+
+0.003   2020-05-24  Released-By: PERLANCAR; Urgency: medium
+
+	[cli gen-bloom-filter]
+
+        - Allow specifying --num-items (-n) and --fp-rate (-p) as alternative to
+	  specifying -m and -k.
+
+        - [doc] Add more docs.
+
+        [cli bloom-filter-calculator]
+
+	- [bugfix] Argument num_hashes_to_bits_per_item_ratio was not observed.
+
+        - Show num_hashes_to_bits_per_item_ratio in result.
+
+
+0.002   2018-03-23  Released-By: PERLANCAR
 
 	- [ux] bloom-filter-calculator: Add some keypairs to result.
 
 	- Typo.
 
 
-0.001   2018-03-22 (PERLANCAR)
+0.001   2018-03-22  Released-By: PERLANCAR
 
         - First release.

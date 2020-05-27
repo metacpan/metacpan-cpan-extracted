@@ -1,4 +1,4 @@
-use Test::More skip_all => "Work in progress";
+use Test::More;
 use utf8;
 
 use Encode;
@@ -9,6 +9,7 @@ BEGIN {
 my %samples = (
     'nop'       => 'nop',
     '!'       => '!',
+    '-'         => '-',
 );
 
 while (my ($unicode, $expected) = each %samples) {

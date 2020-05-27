@@ -1,9 +1,9 @@
 package Data::Sah::Coerce::perl::To_array::From_str_or_array::expand_perl_modname_wildcard;
 
-# AUTHOR
-our $DATE = '2020-05-08'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-21'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.031'; # VERSION
+our $VERSION = '0.032'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,16 +14,28 @@ sub meta {
         v => 4,
         summary => 'Expand wildcard of Perl module names',
         prio => 50,
+        args => {
+            ns_prefix => {
+                schema => 'str*',
+            },
+        },
     };
 }
 
 sub coerce {
-    my %args = @_;
+    require Data::Dmp;
 
-    my $dt = $args{data_term};
+    my %cargs = @_;
+
+    my $dt = $cargs{data_term};
+    my $gen_args = $cargs{args};
+
+    my $ns_prefix = $gen_args->{ns_prefix};
+    if (defined $ns_prefix) {
+        $ns_prefix .= "::" unless $ns_prefix =~ /::\z/;
+    }
 
     my $res = {};
-
     $res->{expr_match} = "ref($dt) eq '' || ref($dt) eq 'ARRAY'";
     $res->{modules}{"PERLANCAR::Module::List"} //= "0.004002";
     $res->{modules}{"String::Wildcard::Bash"} //= "0.040";
@@ -36,8 +48,9 @@ sub coerce {
         "  \$tmp->[\$i] =~ s!/!::!g; ",
         "  my \$el = \$tmp->[\$i++]; ",
         "  next unless String::Wildcard::Bash::contains_wildcard(\$el); ",
-        "  my \$mods = PERLANCAR::Module::List::list_modules(\$el, {wildcard=>1, list_modules=>1}); ",
+        "  my \$mods = PERLANCAR::Module::List::list_modules(" . (defined($ns_prefix) ? Data::Dmp::dmp($ns_prefix) . " . " : "") . "\$el, {wildcard=>1, list_modules=>1}); ",
         "  my \@mods = sort keys \%\$mods; ",
+        (defined($ns_prefix) ? "  for (\@mods) { substr(\$_, 0, ".length($ns_prefix).") = '' } " : ""),
         "  if (\@mods) { splice \@\$tmp, \$i-1, 1, \@mods; \$i += \@mods - 1 } ",
         "} ", # while
         "\$tmp ",
@@ -62,7 +75,7 @@ Data::Sah::Coerce::perl::To_array::From_str_or_array::expand_perl_modname_wildca
 
 =head1 VERSION
 
-This document describes version 0.031 of Data::Sah::Coerce::perl::To_array::From_str_or_array::expand_perl_modname_wildcard (from Perl distribution Sah-Schemas-Perl), released on 2020-05-08.
+This document describes version 0.032 of Data::Sah::Coerce::perl::To_array::From_str_or_array::expand_perl_modname_wildcard (from Perl distribution Sah-Schemas-Perl), released on 2020-05-21.
 
 =head1 DESCRIPTION
 

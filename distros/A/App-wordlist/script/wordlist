@@ -5,18 +5,18 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.496
 
 ### end code_after_shebang
-# PERICMD_INLINE_SCRIPT: {"code_after_shebang":"...","config_dirs":null,"config_filename":"wordlist.conf","env_name":"WORDLIST_OPT","include":["App::wordlist"],"log":"1","pack_deps":1,"pod":0,"read_config":1,"read_env":1,"script_name":"wordlist","script_summary":null,"script_version":"0.270","shebang":"perl","skip_format":0,"subcommands":null,"url":"/App/wordlist/wordlist","use_cleanser":1,"use_utf8":1,"validate_args":1}
+# PERICMD_INLINE_SCRIPT: {"code_after_shebang":"...","config_dirs":null,"config_filename":"wordlist.conf","env_name":"WORDLIST_OPT","include":["App::wordlist"],"log":"1","pack_deps":1,"pod":0,"read_config":1,"read_env":1,"script_name":"wordlist","script_summary":null,"script_version":"0.274","shebang":"perl","skip_format":0,"subcommands":null,"url":"/App/wordlist/wordlist","use_cleanser":1,"use_utf8":1,"validate_args":1}
 
-my $_pci_metas = {""=>{args=>{action=>{cmdline_aliases=>{L=>{code=>sub{"DUMMY"},is_flag=>1,summary=>"List WordList::* modules on CPAN"},l=>{code=>sub{"DUMMY"},is_flag=>1,summary=>"List installed WordList::* modules"}},default=>"grep",schema=>["str",{in=>["list_cpan","list_installed","grep"],req=>1},{}]},arg=>{greedy=>1,pos=>0,schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}]},color=>{default=>"auto",schema=>["str",{in=>["never","always","auto"],req=>1},{}],summary=>"When to highlight search string/matching pattern with color"},detail=>{description=>"\nWhen listing installed modules (`-l`), this means also returning a wordlist's\nlanguage.\n\nWhen returning grep result, this means also returning wordlist name.\n\n",schema=>["bool",{},{}],summary=>"Display more information when listing modules/result"},ignore_case=>{default=>1,schema=>["bool",{},{}]},langs=>{description=>"\nBy convention, language code is the first subnamespace of a wordlist module,\ne.g. WordList::EN::* for English, WordList::FR::* for French, and so on.\nWordlist modules which do not follow this convention (e.g. WordList::Password::*\nor WordList::PersonName::*) are not included.\n\n",element_completion=>sub{"DUMMY"},schema=>["array",{of=>["str",{match=>"\\A\\w\\w\\z",req=>1},{}],req=>1},{}],summary=>"Only include wordlists of certain language(s)","x.name.is_plural"=>1},lcpan=>{schema=>["bool",{},{}],summary=>"Use local CPAN mirror first when available (for -L)"},len=>{schema=>["int",{req=>1},{}]},max_len=>{schema=>["int",{req=>1},{}]},min_len=>{schema=>["int",{req=>1},{}]},num=>{cmdline_aliases=>{n=>{}},default=>0,schema=>["int",{max=>9999,min=>0,req=>1},{}],summary=>"Return (at most) this number of words (0 = unlimited)"},or=>{schema=>["bool",{},{}],summary=>"Match any word in query instead of the default \"all\""},random=>{cmdline_aliases=>{r=>{}},description=>"\nIf set to true, then streaming will be turned off. All words will be gathered\nfirst, then words will be chosen randomly from the gathered list.\n\n",schema=>["bool",{req=>1},{}],summary=>"Pick random words"},wordlists=>{cmdline_aliases=>{w=>{}},element_completion=>sub{"DUMMY"},schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],summary=>"Select one or more wordlist modules","x.name.is_plural"=>1}},"cmdline.default_format"=>"text-simple",examples=>[{argv=>[],summary=>"By default print all words from all wordlists",test=>0,"x.doc.show_result"=>0},{argv=>["foo","bar"],summary=>"Print all words matching /foo/ and /bar/",test=>0,"x.doc.show_result"=>0},{argv=>["--or","foo","bar"],summary=>"Print all words matching /foo/ or /bar/",test=>0,"x.doc.show_result"=>0},{argv=>["--detail","foo"],summary=>"Print wordlist name for each matching words",test=>0,"x.doc.show_result"=>0},{argv=>["-w","ID::KBBI","foo"],summary=>"Select a specific wordlist (multiple -w allowed)",test=>0,"x.doc.show_result"=>0},{argv=>["--lang","FR","foo"],summary=>"Select French wordlists (multiple --lang allowed)",test=>0,"x.doc.show_result"=>0},{argv=>["/fof[aeiou]/"],summary=>"Filter by regex",test=>0,"x.doc.show_result"=>0},{argv=>["-l"],summary=>"List installed wordlist modules",test=>0,"x.doc.show_result"=>0},{argv=>["-L"],summary=>"List wordlist modules available on CPAN",test=>0,"x.doc.show_result"=>0}],result=>{},summary=>"Grep words from WordList::*",v=>1.1}};
+my $_pci_metas = {""=>{args=>{action=>{cmdline_aliases=>{L=>{code=>sub{"DUMMY"},is_flag=>1,summary=>"List WordList::* modules on CPAN"},l=>{code=>sub{"DUMMY"},is_flag=>1,summary=>"List installed WordList::* modules"},s=>{code=>sub{"DUMMY"},is_flag=>1,summary=>"Show statistics contained in the wordlist modules"}},default=>"grep",schema=>["str",{in=>["list_cpan","list_installed","grep","stat"],req=>1},{}]},arg=>{greedy=>1,pos=>0,schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}]},color=>{default=>"auto",schema=>["str",{in=>["never","always","auto"],req=>1},{}],summary=>"When to highlight search string/matching pattern with color"},detail=>{description=>"\nWhen listing installed modules (`-l`), this means also returning a wordlist's\nlanguage.\n\nWhen returning grep result, this means also returning wordlist name.\n\n",schema=>["bool",{},{}],summary=>"Display more information when listing modules/result"},ignore_case=>{default=>1,schema=>["bool",{},{}]},langs=>{description=>"\nBy convention, language code is the first subnamespace of a wordlist module,\ne.g. WordList::EN::* for English, WordList::FR::* for French, and so on.\nWordlist modules which do not follow this convention (e.g. WordList::Password::*\nor WordList::PersonName::*) are not included.\n\n",element_completion=>sub{"DUMMY"},schema=>["array",{of=>["str",{match=>"\\A\\w\\w\\z",req=>1},{}],req=>1},{}],summary=>"Only include wordlists of certain language(s)","x.name.is_plural"=>1},lcpan=>{schema=>["bool",{},{}],summary=>"Use local CPAN mirror first when available (for -L)"},len=>{schema=>["int",{req=>1},{}]},max_len=>{schema=>["int",{req=>1},{}]},min_len=>{schema=>["int",{req=>1},{}]},num=>{cmdline_aliases=>{n=>{}},default=>0,schema=>["int",{max=>9999,min=>0,req=>1},{}],summary=>"Return (at most) this number of words (0 = unlimited)"},or=>{schema=>["bool",{},{}],summary=>"Match any word in query instead of the default \"all\""},random=>{cmdline_aliases=>{r=>{}},description=>"\nIf set to true, then streaming will be turned off. All words will be gathered\nfirst, then words will be chosen randomly from the gathered list.\n\n",schema=>["bool",{req=>1},{}],summary=>"Pick random words"},wordlists=>{cmdline_aliases=>{w=>{}},element_completion=>sub{"DUMMY"},schema=>["array",{of=>["str",{req=>1},{}],req=>1,"x.perl.coerce_rules"=>[["From_str_or_array::expand_perl_modname_wildcard",{ns_prefix=>"WordList"}]]},{}],summary=>"Select one or more wordlist modules","x.name.is_plural"=>1}},"cmdline.default_format"=>"text-simple",examples=>[{argv=>[],summary=>"By default print all words from all wordlists",test=>0,"x.doc.show_result"=>0},{argv=>["foo","bar"],summary=>"Print all words matching /foo/ and /bar/",test=>0,"x.doc.show_result"=>0},{argv=>["--or","foo","bar"],summary=>"Print all words matching /foo/ or /bar/",test=>0,"x.doc.show_result"=>0},{argv=>["--detail","foo"],summary=>"Print wordlist name for each matching words",test=>0,"x.doc.show_result"=>0},{argv=>["-w","ID::KBBI","foo"],summary=>"Select a specific wordlist (multiple -w allowed)",test=>0,"x.doc.show_result"=>0},{argv=>["-w","ID::**","foo"],summary=>"Select all ID::* wordlists (wildcard will be expanded)",test=>0,"x.doc.show_result"=>0},{argv=>["--lang","FR","foo"],summary=>"Select French wordlists (multiple --lang allowed)",test=>0,"x.doc.show_result"=>0},{argv=>["/fof[aeiou]/"],summary=>"Filter by regex",test=>0,"x.doc.show_result"=>0},{argv=>["-l"],summary=>"List installed wordlist modules",test=>0,"x.doc.show_result"=>0},{argv=>["-L"],summary=>"List wordlist modules available on CPAN",test=>0,"x.doc.show_result"=>0}],result=>{},summary=>"Grep words from WordList::*",v=>1.1}};
 
-# This script is generated by Perinci::CmdLine::Inline version 0.551 on Mon May 18 19:40:21 2020.
+# This script is generated by Perinci::CmdLine::Inline version 0.550 on Sun May 24 09:16:50 2020.
 
 # Rinci metadata taken from these modules: App::wordlist (no version)
 
 # You probably should not manually edit this file.
 
-our $DATE = '2020-05-18'; # DATE
-our $VERSION = '0.270'; # VERSION
+our $DATE = '2020-05-24'; # DATE
+our $VERSION = '0.274'; # VERSION
 # PODNAME: wordlist
 # ABSTRACT: Grep words from WordList::*
 
@@ -148,7 +148,7 @@ my $go_spec1 = {
     'config-profile=s' => sub { $_pci_r->{config_profile} = $_[1]; },
     'debug' => sub { require Log::ger::Util; Log::ger::Util::set_level("debug"); $_pci_r->{log_level} = "debug"; },
     'format=s' => sub { $_pci_r->{format} = $_[1]; },
-    'help|h|?' => sub { print "wordlist - Grep words from WordList::*\n\nUsage:\n  wordlist --help (or -h, -?)\n  wordlist --version (or -v)\n  wordlist [-L] [--action=s] [--color=s] [--config-path=path+]\n    [--config-profile=profile] [--debug] [--detail] [--format=name]\n    [--ignore-case] [--json] [-l] [--lang=s+] [--lcpan] [--len=s]\n    [--log-level=s] [--max-len=s] [--min-len=s] [-n=s] [--naked-res]\n    [--no-config] [--no-detail] [--no-env] [--no-ignore-case] [--no-lcpan]\n    [--no-naked-res | --nonaked-res] [--no-or] [--no-random] [--nodetail]\n    [--noignore-case] [--nolcpan] [--noor] [--norandom] [--num=s] [--or]\n    [--page-result[=program]] [--quiet] [-r] [--random] [--trace] [--verbose]\n    [-w=s+] [--wordlist=s+] [arg] ...\n\nExamples:\n  By default print all words from all wordlists:\n  % wordlist\n\n  Print all words matching /foo/ and /bar/:\n  % wordlist foo bar\n\n  Print all words matching /foo/ or /bar/:\n  % wordlist --or foo bar\n\n  Print wordlist name for each matching words:\n  % wordlist --detail foo\n\n  Select a specific wordlist (multiple -w allowed):\n  % wordlist -w ID::KBBI foo\n\n  Select French wordlists (multiple --lang allowed):\n  % wordlist --lang FR foo\n\n  Filter by regex:\n  % wordlist '/fof[aeiou]/'\n\n  List installed wordlist modules:\n  % wordlist -l\n\n  List wordlist modules available on CPAN:\n  % wordlist -L\n\nMain options:\n  --action=s          [\"grep\"]\n  --arg=s\@            (=arg[0-])\n  --color=s          When to highlight search string/matching pattern with color [\"auto\"]\n  --detail           Display more information when listing modules/result\n  --lang=s\@          Only include wordlists of certain language(s)\n  --lcpan            Use local CPAN mirror first when available (for -L)\n  --len=s            \n  --max-len=s        \n  --min-len=s        \n  --no-ignore-case   \n  --num=s, -n        Return (at most) this number of words (0 = unlimited) [0]\n  --or               Match any word in query instead of the default \"all\"\n  --random, -r       Pick random words\n  --wordlist=s\@, -w  Select one or more wordlist modules\n  -L                 List WordList::* modules on CPAN\n  -l                 List installed WordList::* modules\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s     Choose output format, e.g. json, text\n  --json         Set output format to json\n  --page-result  Filter output through a pager\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --quiet                        Set logging level to error\n  --trace                        Set logging level to trace\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n"; exit 0; },
+    'help|h|?' => sub { print "wordlist - Grep words from WordList::*\n\nUsage:\n  wordlist --help (or -h, -?)\n  wordlist --version (or -v)\n  wordlist [-L] [--action=s] [--color=s] [--config-path=path+]\n    [--config-profile=profile] [--debug] [--detail] [--format=name]\n    [--ignore-case] [--json] [-l] [--lang=s+] [--lcpan] [--len=s]\n    [--log-level=s] [--max-len=s] [--min-len=s] [-n=s] [--naked-res]\n    [--no-config] [--no-detail] [--no-env] [--no-ignore-case] [--no-lcpan]\n    [--no-naked-res | --nonaked-res] [--no-or] [--no-random] [--nodetail]\n    [--noignore-case] [--nolcpan] [--noor] [--norandom] [--num=s] [--or]\n    [--page-result[=program]] [--quiet] [-r] [--random] [-s] [--trace]\n    [--verbose] [-w=s+] [--wordlist=s+] [arg] ...\n\nExamples:\n  By default print all words from all wordlists:\n  % wordlist\n\n  Print all words matching /foo/ and /bar/:\n  % wordlist foo bar\n\n  Print all words matching /foo/ or /bar/:\n  % wordlist --or foo bar\n\n  Print wordlist name for each matching words:\n  % wordlist --detail foo\n\n  Select a specific wordlist (multiple -w allowed):\n  % wordlist -w ID::KBBI foo\n\n  Select all ID::* wordlists (wildcard will be expanded):\n  % wordlist -w 'ID::**' foo\n\n  Select French wordlists (multiple --lang allowed):\n  % wordlist --lang FR foo\n\n  Filter by regex:\n  % wordlist '/fof[aeiou]/'\n\n  List installed wordlist modules:\n  % wordlist -l\n\n  List wordlist modules available on CPAN:\n  % wordlist -L\n\nMain options:\n  --action=s          [\"grep\"]\n  --arg=s\@            (=arg[0-])\n  --color=s          When to highlight search string/matching pattern with color [\"auto\"]\n  --detail           Display more information when listing modules/result\n  --lang=s\@          Only include wordlists of certain language(s)\n  --lcpan            Use local CPAN mirror first when available (for -L)\n  --len=s            \n  --max-len=s        \n  --min-len=s        \n  --no-ignore-case   \n  --num=s, -n        Return (at most) this number of words (0 = unlimited) [0]\n  --or               Match any word in query instead of the default \"all\"\n  --random, -r       Pick random words\n  --wordlist=s\@, -w  Select one or more wordlist modules\n  -l                 List installed WordList::* modules\n  -L                 List WordList::* modules on CPAN\n  -s                 Show statistics contained in the wordlist modules\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s     Choose output format, e.g. json, text\n  --json         Set output format to json\n  --page-result  Filter output through a pager\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --quiet                        Set logging level to error\n  --trace                        Set logging level to trace\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n"; exit 0; },
     'json' => sub { $_pci_r->{format} = (-t STDOUT) ? "json-pretty" : "json"; },
     'log-level=s' => sub { if ($_[1] eq "trace") { require Log::ger::Util; Log::ger::Util::set_level("trace"); Log::ger::Output::Composite::set_level("trace") } if ($_[1] eq "debug") { require Log::ger::Util; Log::ger::Util::set_level("debug"); Log::ger::Output::Composite::set_level("debug") } if ($_[1] eq "info" ) { require Log::ger::Util; Log::ger::Util::set_level("info" ); Log::ger::Output::Composite::set_level("info")  } if ($_[1] eq "error") { require Log::ger::Util; Log::ger::Util::set_level("warn" ); Log::ger::Output::Composite::set_level("warn")  } if ($_[1] eq "fatal") { require Log::ger::Util; Log::ger::Util::set_level("debug"); Log::ger::Output::Composite::set_level("debug") } if ($_[1] eq "none")  { require Log::ger::Util; Log::ger::Util::set_level("off"  ); Log::ger::Output::Composite::set_level("off")   } if ($_[1] eq "off")   { require Log::ger::Util; Log::ger::Util::set_level("off"  ); Log::ger::Output::Composite::set_level("off")   } $_pci_r->{log_level} = $_[1]; },
     'naked-res' => sub { $_pci_r->{naked_res} = 1; },
@@ -159,7 +159,7 @@ my $go_spec1 = {
     'quiet' => sub { require Log::ger::Util; Log::ger::Util::set_level("error"); $_pci_r->{log_level} = "error"; },
     'trace' => sub { require Log::ger::Util; Log::ger::Util::set_level("trace"); $_pci_r->{log_level} = "trace"; },
     'verbose' => sub { require Log::ger::Util; Log::ger::Util::set_level("info" ); $_pci_r->{log_level} = "info" ; },
-    'version|v' => sub { no warnings 'once'; require App::wordlist; print "wordlist version ", "0.270", ($App::wordlist::DATE ? " ($App::wordlist::DATE)" : ''), "\n"; print "  Generated by Perinci::CmdLine::Inline version 0.551 (2020-05-18)\n"; exit 0 },
+    'version|v' => sub { no warnings 'once'; require App::wordlist; print "wordlist version ", "0.274", ($App::wordlist::DATE ? " ($App::wordlist::DATE)" : ''), "\n"; print "  Generated by Perinci::CmdLine::Inline version 0.550 (2020-05-02)\n"; exit 0 },
 };
 my $go_spec2 = {
     'L' => sub {         my $code = sub{package App::wordlist;use warnings;use strict;no feature;use feature ':5.10';my $args = shift();$$args{'action'} = 'list_cpan'}; $code->(\%_pci_args);
@@ -232,6 +232,8 @@ my $go_spec2 = {
     'r' => sub {         $_pci_args{'random'} = $_[1];
  },
     'random' => sub {         $_pci_args{'random'} = $_[1];
+ },
+    's' => sub {         my $code = sub{package App::wordlist;use warnings;use strict;no feature;use feature ':5.10';my $args = shift();$$args{'action'} = 'stat'}; $code->(\%_pci_args);
  },
     'trace' => sub {  },
     'verbose' => sub {  },
@@ -307,7 +309,7 @@ if ($sc_name eq "") {
     $_pci_meta_result_type = "";
     require App::wordlist;
     eval { $_pci_r->{res} = App::wordlist::wordlist(%_pci_args) };
-    if ($@) { die if $ENV{PERINCI_CMDLINE_INLINE_DEBUG_DIE}; $_pci_r->{res} = [500, "Function died: $@"] }
+    if ($@) { $_pci_r->{res} = [500, "Function died: $@"] }
 }
 }
 
@@ -358,13 +360,21 @@ wordlist - Grep words from WordList::*
 
 =head1 VERSION
 
-This document describes version 0.270 of main (from Perl distribution App-wordlist), released on 2020-05-18.
+This document describes version 0.274 of main (from Perl distribution App-wordlist), released on 2020-05-24.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % wordlist [-L] [--action=s] [--color=s] [--config-path=path+] [--config-profile=profile] [--debug] [--detail] [--format=name] [--ignore-case] [--json] [-l] [--lang=s+] [--langs-json=s] [--lcpan] [--len=s] [--log-level=level] [--max-len=s] [--min-len=s] [-n=s] [--(no)naked-res] [--no-config] [--no-detail] [--no-env] [--no-ignore-case] [--no-lcpan] [--no-or] [--no-random] [--nodetail] [--noignore-case] [--nolcpan] [--noor] [--norandom] [--num=s] [--or] [--page-result[=program]] [--quiet] [-r] [--random] [--trace] [--verbose] [-w=s+] [--wordlist=s+] [--wordlists-json=s] [arg] ...
+ % wordlist [-L] [--action=s] [--color=s] [--config-path=path+]
+     [--config-profile=profile] [--debug] [--detail] [--format=name]
+     [--ignore-case] [--json] [-l] [--lang=s+] [--langs-json=s] [--lcpan]
+     [--len=s] [--log-level=level] [--max-len=s] [--min-len=s] [-n=s]
+     [--(no)naked-res] [--no-config] [--no-detail] [--no-env]
+     [--no-ignore-case] [--no-lcpan] [--no-or] [--no-random] [--nodetail]
+     [--noignore-case] [--nolcpan] [--noor] [--norandom] [--num=s] [--or]
+     [--page-result[=program]] [--quiet] [-r] [--random] [-s] [--trace]
+     [--verbose] [-w=s+] [--wordlist=s+] [--wordlists-json=s] [arg] ...
 
 Examples:
 
@@ -387,6 +397,10 @@ Print wordlist name for each matching words:
 Select a specific wordlist (multiple -w allowed):
 
  % wordlist -w ID::KBBI foo
+
+Select all ID::* wordlists (wildcard will be expanded):
+
+ % wordlist -w 'ID::**' foo
 
 Select French wordlists (multiple --lang allowed):
 
@@ -420,7 +434,7 @@ Default value:
 
 Valid values:
 
- ["list_cpan","list_installed","grep"]
+ ["list_cpan","list_installed","grep","stat"]
 
 =item B<--arg-json>=I<s>
 
@@ -523,6 +537,12 @@ See C<--action>.
 =item B<-l>
 
 List installed WordList::* modules.
+
+See C<--action>.
+
+=item B<-s>
+
+Show statistics contained in the wordlist modules.
 
 See C<--action>.
 
@@ -756,23 +776,23 @@ the same terms as the Perl 5 programming language system itself.
 
 __DATA__
 Data::Section::Seekable v1
-App/wordlist.pm,24,14725,0;0
-Clone/PP.pm,14769,6331,1;475
-Complete/Bash.pm,21125,39632,2;668
-Config/IOD/Base.pm,60784,23603,3;1907
-Config/IOD/Reader.pm,84416,17366,4;2717
-Data/Check/Structure.pm,101814,8606,5;3276
-Data/Sah/Normalize.pm,110450,9038,6;3612
-Getopt/Long/EvenLess.pm,119520,11364,7;3886
-Local/_pci_check_args.pm,130917,13397,8;4268
-Local/_pci_clean_json.pm,144347,4414,9;4519
-Log/ger.pm,148780,11278,10;4581
-Perinci/CmdLine/Util/Config.pm,160097,15677,11;4926
-Perinci/Result/Format/Lite.pm,175812,22687,12;5424
-Perinci/Sub/Normalize.pm,198532,7303,13;6022
-Sah/Schema/rinci/function_meta.pm,205877,5179,14;6257
-Scalar/Util/Numeric/PP.pm,211090,3106,15;6444
-Text/Table/Tiny.pm,214223,8117,16;6585
+App/wordlist.pm,24,16072,0;0
+Clone/PP.pm,16116,6331,1;504
+Complete/Bash.pm,22472,39632,2;697
+Config/IOD/Base.pm,62131,23603,3;1936
+Config/IOD/Reader.pm,85763,17366,4;2746
+Data/Check/Structure.pm,103161,8606,5;3305
+Data/Sah/Normalize.pm,111797,9038,6;3641
+Getopt/Long/EvenLess.pm,120867,11364,7;3915
+Local/_pci_check_args.pm,132264,14235,8;4297
+Local/_pci_clean_json.pm,146532,4414,9;4555
+Log/ger.pm,150965,11278,10;4617
+Perinci/CmdLine/Util/Config.pm,162282,15677,11;4962
+Perinci/Result/Format/Lite.pm,177997,22687,12;5460
+Perinci/Sub/Normalize.pm,200717,7303,13;6058
+Sah/Schema/rinci/function_meta.pm,208062,5179,14;6293
+Scalar/Util/Numeric/PP.pm,213275,3106,15;6480
+Text/Table/Tiny.pm,216408,8117,16;6621
 
 ### App/wordlist.pm ###
 #package App::wordlist;
@@ -785,6 +805,7 @@ Text/Table/Tiny.pm,214223,8117,16;6585
 #use 5.010001;
 #use strict;
 #use warnings;
+#use Log::ger;
 #
 #use List::Util qw(shuffle);
 #
@@ -793,7 +814,10 @@ Text/Table/Tiny.pm,214223,8117,16;6585
 #our %arg_wordlists = (
 #    wordlists => {
 #        'x.name.is_plural' => 1,
-#        schema => ['array*' => of => 'str*'],
+#        schema => ['array*' => {
+#            of => 'str*', # for the moment we need to use 'str' instead of 'perl::modname' due to Perinci::Sub::GetArgs::Argv limitation
+#            'x.perl.coerce_rules'=>[ ['From_str_or_array::expand_perl_modname_wildcard'=>{ns_prefix=>"WordList"}] ],
+#        }],
 #        summary => 'Select one or more wordlist modules',
 #        cmdline_aliases => {w=>{}},
 #        element_completion => sub {
@@ -890,7 +914,7 @@ Text/Table/Tiny.pm,214223,8117,16;6585
 #        action => {
 #            schema  => ['str*', in=>[
 #                'list_cpan', 'list_installed',
-#                'grep',
+#                'grep', 'stat',
 #            ]],
 #            default => 'grep',
 #            cmdline_aliases => {
@@ -903,6 +927,11 @@ Text/Table/Tiny.pm,214223,8117,16;6585
 #                    summary=>'List WordList::* modules on CPAN',
 #                    is_flag => 1,
 #                    code => sub { my $args=shift; $args->{action} = 'list_cpan' },
+#                },
+#                s => {
+#                    summary=>'Show statistics contained in the wordlist modules',
+#                    is_flag => 1,
+#                    code => sub { my $args=shift; $args->{action} = 'stat' },
 #                },
 #            },
 #        },
@@ -984,12 +1013,13 @@ Text/Table/Tiny.pm,214223,8117,16;6585
 #            test => 0,
 #            'x.doc.show_result' => 0,
 #        },
-#        #{
-#        #    argv => [qw/-t Phrase foo/],
-#        #    summary => 'Select phrase wordlists (multiple -t allowed)',
-#        #    test => 0,
-#        #    'x.doc.show_result' => 0,
-#        #},
+#        {
+#            argv => [qw/-w ID::** foo/],
+#            summary => 'Select all ID::* wordlists (wildcard will be expanded)',
+#            test => 0,
+#            'x.doc.show_result' => 0,
+#        },
+#
 #        {
 #            argv => [qw/--lang FR foo/],
 #            summary => 'Select French wordlists (multiple --lang allowed)',
@@ -1019,6 +1049,7 @@ Text/Table/Tiny.pm,214223,8117,16;6585
 #};
 #sub wordlist {
 #    require Encode;
+#    require WordListUtil::CLI;
 #
 #    my %args = @_;
 #
@@ -1035,7 +1066,7 @@ Text/Table/Tiny.pm,214223,8117,16;6585
 #    my $use_color = ($color eq 'always' ? 1 : $color eq 'never' ? 0 : undef)
 #        // $ENV{COLOR} // (-t STDOUT);
 #
-#    if ($action eq 'grep') {
+#    if ($action eq 'grep' || $action eq 'stat') {
 #        # convert /.../ in arg to regex
 #        for (@$arg) {
 #            $_ = Encode::decode('UTF-8', $_);
@@ -1059,7 +1090,32 @@ Text/Table/Tiny.pm,214223,8117,16;6585
 #                push @$wordlists, $rec->{name};
 #            }
 #        }
+#
 #        $wordlists = [shuffle @$wordlists] if $random;
+#        log_trace "Wordlist(s) to use: %s", $wordlists;
+#
+#        if ($action eq 'stat') {
+#            no strict 'refs';
+#            return [200] unless @$wordlists;
+#            my %all_stats;
+#            for my $wl (@$wordlists) {
+#                my $mod = "WordList::$wl"; $mod =~ s/=.*//;
+#                (my $modpm = "$mod.pm") =~ s!::!/!g;
+#                require $modpm;
+#                if (@$wordlists == 1) {
+#                    return [200, "OK", \%{"$mod\::STATS"}];
+#                } else {
+#                    $all_stats{$wl} = \%{"$mod\::STATS"};
+#                }
+#            }
+#            return [200, "OK", \%all_stats];
+#        }
+#
+#        # optimize random picking when there's only one wordlist to pick from
+#        if ($random && @$wordlists == 1 && $num > 0 && $num <= 100) {
+#            my $wl_obj = WordListUtil::CLI::instantiate_wordlist($wordlists->[0]);
+#            return [200, "OK", [$wl_obj->pick($num)]];
+#        }
 #
 #        my $n = 0;
 #
@@ -1081,23 +1137,22 @@ Text/Table/Tiny.pm,214223,8117,16;6585
 #        };
 #
 #        my $i_wordlist = 0;
+#        my $nth_word;
 #        my $wl_obj;
 #        my $code_return_word = sub {
 #          REDO:
 #            return if $i_wordlist >= @$wordlists;
 #            my $wl = $wordlists->[$i_wordlist];
 #            unless ($wl_obj) {
-#                my $mod = "WordList::$wl";
-#                (my $modpm = "$mod.pm") =~ s!::!/!g;
-#                eval { require $modpm; $wl_obj = $mod->new };
-#                if ($@) {
-#                    warn;
+#                log_trace "Instantiating wordlist $wl ...";
+#                $wl_obj = WordListUtil::CLI::instantiate_wordlist($wl, 'ignore');
+#                unless ($wl_obj) {
 #                    $i_wordlist++;
 #                    goto REDO;
 #                }
-#                $wl_obj->reset_iterator;
+#                $nth_word = 0;
 #            }
-#            my $word = $wl_obj->next_word;
+#            my $word = $nth_word++ ? $wl_obj->next_word : $wl_obj->first_word;
 #            unless (defined $word) {
 #                undef $wl_obj;
 #                $i_wordlist++;
@@ -1154,6 +1209,8 @@ Text/Table/Tiny.pm,214223,8117,16;6585
 #            }
 #            $res = [200, "OK", \@words];
 #        }
+#
+#      RETURN_RES:
 #        $res;
 #
 #    } elsif ($action eq 'list_installed') {
@@ -1234,14 +1291,6 @@ Text/Table/Tiny.pm,214223,8117,16;6585
 #=head2 COLOR => bool
 #
 #Set color on/off when --color=auto (the default).
-#
-#
-#=head1 FAQ
-#
-#=head2 How to make wordlist return words in random order?
-#
-#The C<--random> (C<-r>) option was removed in v0.268. To return random words,
-#you can pipe the output of C<wordlist> to C<shuf> or other similar utility.
 #
 #
 #=head1 SEE ALSO
@@ -5066,6 +5115,8 @@ Text/Table/Tiny.pm,214223,8117,16;6585
 #        no warnings ('void');
 #        require List::Util;
 #        require Scalar::Util::Numeric::PP;
+#        require String::Wildcard::Bash;
+#        require PERLANCAR::Module::List;
 #        my $_sahv_dpath;
 #        my $_sahv_err;
 #        $args->{"action"} //= "grep";
@@ -5082,7 +5133,7 @@ Text/Table/Tiny.pm,214223,8117,16;6585
 #            &&
 #            
 #            (# clause: in
-#            ((grep { $_ eq $args->{"action"} } @{ ["list_cpan","list_installed","grep"] }) ? 1 : (($_sahv_err //= "Must be one of [\"list_cpan\",\"list_installed\",\"grep\"]"),0)))
+#            ((grep { $_ eq $args->{"action"} } @{ ["list_cpan","list_installed","grep","stat"] }) ? 1 : (($_sahv_err //= "Must be one of [\"list_cpan\",\"list_installed\",\"grep\",\"stat\"]"),0)))
 #             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
 #        } # if date arg exists
 #        if (exists $args->{"arg"}) {
@@ -5264,6 +5315,11 @@ Text/Table/Tiny.pm,214223,8117,16;6585
 #            $_sahv_dpath = [];
 #            # req #0
 #            ((defined($args->{"wordlists"})) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Required but not specified"),0))
+#            
+#            &&
+#            
+#            # coerce rule(s): From_str_or_array::expand_perl_modname_wildcard
+#            (($args->{"wordlists"} = (ref($args->{"wordlists"}) eq '' || ref($args->{"wordlists"}) eq 'ARRAY') ? (do { my $tmp = $args->{"wordlists"}; $tmp = [$tmp] unless ref $tmp eq 'ARRAY'; my $i = 0; while ($i < @$tmp) {   $tmp->[$i] =~ s!/!::!g;   my $el = $tmp->[$i++];   next unless String::Wildcard::Bash::contains_wildcard($el);   my $mods = PERLANCAR::Module::List::list_modules("WordList::" . $el, {wildcard=>1, list_modules=>1});   my @mods = sort keys %$mods;   for (@mods) { substr($_, 0, 10) = '' }   if (@mods) { splice @$tmp, $i-1, 1, @mods; $i += @mods - 1 } } $tmp }) : $args->{"wordlists"}), 1)
 #            
 #            &&
 #            

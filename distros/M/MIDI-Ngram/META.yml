@@ -1,5 +1,5 @@
 ---
-abstract: 'Find the top repeated note phrases of a MIDI file'
+abstract: 'Find the top repeated note phrases of MIDI files'
 author:
   - 'Gene Boggs <gene@cpan.org>'
 build_requires:
@@ -15,7 +15,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.012'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,24 +23,22 @@ meta-spec:
 name: MIDI-Ngram
 requires:
   Carp: '0'
-  Lingua::EN::Ngram: '0'
-  List::Util: '0'
+  Lingua::EN::Ngram: '0.03'
+  List::Util: '1.44'
   List::Util::WeightedChoice: '0'
-  MIDI::Simple: '0'
-  Moo: '0'
-  Music::Gestalt: '0'
+  MIDI::Util: '0'
+  Moo: '2'
   Music::Note: '0'
-  Music::Tempo: '0'
   namespace::clean: '0'
   perl: '5.012'
   strictures: '2'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MIDI-Ngram
-  repository: https://github.com/ology/MIDI-Ngram
-version: '0.0901'
+  homepage: https://github.com/ology/MIDI-Ngram
+  repository: https://github.com/ology/MIDI-Ngram.git
+version: '0.1501'
 x_Dist_Zilla:
   perl:
-    version: '5.027007'
+    version: '5.030002'
   plugins:
     -
       class: Dist::Zilla::Plugin::VersionFromModule
@@ -53,7 +51,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: AutoPrereqs
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
       name: CheckChangesHasContent
@@ -61,7 +59,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: NextRelease
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::Authority
       name: Authority
@@ -69,7 +67,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: PkgVersion
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -147,11 +145,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: PodCoverageTests
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: PodSyntaxTests
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::Test::EOL
       config:
@@ -189,15 +187,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: MetaConfig
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: MetaJSON
-      version: '6.010'
+      version: '6.014'
     -
-      class: Dist::Zilla::Plugin::MetaResources
-      name: MetaResources
-      version: '6.010'
+      class: Dist::Zilla::Plugin::GithubMeta
+      name: GithubMeta
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::Test::PodSpelling
       config:
@@ -207,6 +205,7 @@ x_Dist_Zilla:
             - lib
           spell_cmd: 'aspell list'
           stopwords:
+            - dura
             - durations
             - ngram
             - ngrams
@@ -217,74 +216,79 @@ x_Dist_Zilla:
       name: Test::PodSpelling
       version: '2.007005'
     -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: '6.014'
+    -
       class: Dist::Zilla::Plugin::GatherDir
       config:
         Dist::Zilla::Plugin::GatherDir:
-          exclude_filename:
-            - LICENSE
-          exclude_match: []
+          exclude_filename: []
+          exclude_match:
+            - \.png
+            - ngram-play\.mid
           follow_symlinks: 0
           include_dotfiles: 0
           prefix: ''
           prune_directory: []
           root: .
       name: GatherDir
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: PruneCruft
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: ManifestSkip
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: MetaYAML
-      version: '6.010'
-    -
-      class: Dist::Zilla::Plugin::License
-      name: License
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::Readme
       name: Readme
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: ExtraTests
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: ExecDir
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: ShareDir
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: MakeMaker
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: Manifest
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: TestRelease
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: ConfirmRelease
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: UploadToCPAN
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromBuild
       name: CopyFilesFromBuild
@@ -292,47 +296,49 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.010'
+      version: '6.014'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.010'
+    version: '6.014'
 x_authority: cpan:GENE
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.30.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

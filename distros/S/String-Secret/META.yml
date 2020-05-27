@@ -1,0 +1,43 @@
+---
+abstract: 'secret string wrapper to mask secret from logger'
+author:
+  - 'karupanerura <karupa@cpan.org>'
+build_requires:
+  Scalar::Util: '0'
+  Test::More: '0.98'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: String-Secret
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  String::Secret:
+    file: lib/String/Secret.pm
+    version: '0.01'
+  String::Secret::Serializable:
+    file: lib/String/Secret/Serializable.pm
+requires:
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/karupanerura/String-Secret/issues
+  homepage: https://github.com/karupanerura/String-Secret
+  repository: git://github.com/karupanerura/String-Secret.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

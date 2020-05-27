@@ -11,5 +11,13 @@ BEGIN {
 use strict;
 use warnings;
 
-use Test::Perl::Critic (-profile => "perlcritic.rc") x!! -e "perlcritic.rc";
-all_critic_ok();
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.005
+
+use Test::Perl::Critic (-profile => "") x!! -e "";
+
+my $filenames = ['lib/App/BloomUtils.pm','script/bloom-filter-calculator','script/bloomcalc','script/bloomchk','script/bloomgen','script/check-with-bloom-filter','script/gen-bloom-filter'];
+unless ($filenames && @$filenames) {
+    $filenames = -d "blib" ? ["blib"] : ["lib"];
+}
+
+all_critic_ok(@$filenames);

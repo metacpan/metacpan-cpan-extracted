@@ -2,8 +2,8 @@ NAME
     App::FirefoxUtils - Utilities related to Firefox
 
 VERSION
-    This document describes version 0.008 of App::FirefoxUtils (from Perl
-    distribution App-FirefoxUtils), released on 2020-04-11.
+    This document describes version 0.012 of App::FirefoxUtils (from Perl
+    distribution App-FirefoxUtils), released on 2020-05-24.
 
 SYNOPSIS
 DESCRIPTION
@@ -11,7 +11,13 @@ DESCRIPTION
 
     *   firefox-is-paused
 
+    *   firefox-is-running
+
+    *   get-firefox-profile-dir
+
     *   kill-firefox
+
+    *   list-firefox-profiles
 
     *   pause-firefox
 
@@ -31,6 +37,39 @@ FUNCTIONS
 
     Firefox is defined as paused if *all* of its processes are in 'stop'
     state.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   quiet => *true*
+
+    *   users => *array[unix::local_uid]*
+
+        Kill browser processes that belong to certain user(s) only.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  firefox_is_running
+    Usage:
+
+     firefox_is_running(%args) -> [status, msg, payload, meta]
+
+    Check whether Firefox is running.
+
+    Firefox is defined as running if there are some Firefox processes that
+    are *not* in 'stop' state. In other words, if Firefox has been started
+    but is currently paused, we do not say that it's running. If you want to
+    check if Firefox process exists, you can use "ps_firefox".
 
     This function is not exported.
 
@@ -183,7 +222,7 @@ BUGS
 
 SEE ALSO
     Some other CLI utilities related to Firefox: dump-firefox-history (from
-    App::DumpFirefoxHistory).
+    App::DumpFirefoxHistory), App::FirefoxMultiAccountContainersUtils.
 
     App::ChromeUtils
 

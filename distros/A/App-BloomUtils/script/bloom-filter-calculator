@@ -1,21 +1,24 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/BloomUtils/bloom_filter_calculator
-# and generated automatically using Perinci::CmdLine::Gen version 0.485
+# and generated automatically using Perinci::CmdLine::Gen version 0.496
 
-our $DATE = '2018-03-23'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-24'; # DATE
 our $DIST = 'App-BloomUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Perinci::CmdLine::Any;
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BloomUtils/bloom_filter_calculator",
     program_name => "bloom-filter-calculator",
+    log => 1,
     read_config => 0,
     read_env => 0,
 );
@@ -37,21 +40,23 @@ bloom-filter-calculator - Help calculate num_bits (m) and num_hashes (k)
 
 =head1 VERSION
 
-This document describes version 0.002 of bloom-filter-calculator (from Perl distribution App-BloomUtils), released on 2018-03-23.
+This document describes version 0.004 of bloom-filter-calculator (from Perl distribution App-BloomUtils), released on 2020-05-24.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % bloom-filter-calculator [options] <num_items>
+ % bloom-filter-calculator [--debug] [--false-positive-rate=s]
+     [--format=name] [--fp-rate=s] [--json] [-k=s] [--log-level=level]
+     [-m=s] [--(no)naked-res] [--num-bits=s]
+     [--num-hashes-to-bits-per-item-ratio=s] [--num-hashes=s] [-p=s]
+     [--page-result[=program]] [--quiet] [--trace] [--verbose] <num_items>
 
 =head1 DESCRIPTION
 
-Bloom filter is setup using two parameters: C<num_bits> (C<m>) which is the size
-of the bloom filter (in bits) and C<num_hashes> (C<k>) which is the number of hash
-functions to use which will determine the write and lookup speed.
-
-Some rules of thumb:
+You supply lines of text from STDIN and it will output the bloom filter bits on
+STDOUT. You can also customize C<num_bits> (C<m>) and C<num_hashes> (C<k>), or, more
+easily, C<num_items> and C<fp_rate>. Some rules of thumb to remember:
 
 =over
 
@@ -59,17 +64,39 @@ Some rules of thumb:
 you expect two have 1024 elements, create a 1KB bloom filter with about 2%
 false positive rate. For other false positive rates:
 
-1%    -  9.6 bits per item
-0.1%  - 14.4 bits per item
-0.01% - 19.2 bits per item
+10%    -  4.8 bits per item
+ 1%    -  9.6 bits per item
+ 0.1%  - 14.4 bits per item
+ 0.01% - 19.2 bits per item
 
-=item * Optimal number of hash functions is 0.7 times number of bits per item.
+=item * Optimal number of hash functions is 0.7 times number of bits per item. Note
+that the number of hashes dominate performance. If you want higher
+performance, pick a smaller number of hashes. But for most cases, use the the
+optimal number of hash functions.
 
-=item * What is an acceptable false positive rate? This depends on your needs.
+=item * What is an acceptable false positive rate? This depends on your needs. 1% (1
+in 100) or 0.1% (1 in 1,000) is a good start. If you want to make sure that
+user's chosen password is not in a known wordlist, a higher false positive
+rates will annoy your user more by rejecting her password more often, while
+lower false positive rates will require a higher memory usage.
 
 =back
 
 Ref: https://corte.si/posts/code/bloom-filter-rules-of-thumb/index.html
+
+B<FAQ>
+
+=over
+
+=item * Why does two different false positive rates (e.g. 1% and 0.1%) give the same bloom filter size?
+
+The parameter C<m> is rounded upwards to the nearest power of 2 (e.g. 1024*8
+bits becomes 1024*8 bits but 1025*8 becomes 2048*8 bits), so sometimes two
+false positive rates with different C<m> get rounded to the same value of C<m>.
+Use the C<bloom_filter_calculator> routine to see the C<actual_m> and C<actual_p>
+(actual false-positive rate).
+
+=back
 
 =head1 OPTIONS
 
@@ -85,19 +112,45 @@ Default value:
 
  0.02
 
+=item B<--num-bits>=I<s>, B<-m>
+
+Number of bits to set for the bloom filter.
+
 =item B<--num-hashes-to-bits-per-item-ratio>=I<s>
 
 0.7 (the default) is optimal.
-
-Default value:
-
- 0.7
 
 =item B<--num-hashes>=I<s>, B<-k>
 
 =item B<--num-items>=I<s>*, B<-n>
 
 Expected number of items to add to bloom filter.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
 
 =back
 
@@ -137,6 +190,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
 
 =back
 
@@ -210,7 +267,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

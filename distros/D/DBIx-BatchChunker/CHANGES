@@ -1,38 +1,68 @@
-DBIx-BatchChunker
-=================
+Changelog for DBIx-BatchChunker
 
-Created:         2018-01-20
-Home page:       <https://metacpan.org/release/DBIx-BatchChunker>
-Bug tracker:     <https://github.com/GrantStreetGroup/DBIx-BatchChunker/issues>
-Maintainer:      Grant Street Group <developers@grantstreet.com>
+v0.940.1 2020-05-14T19:56:46
+ - No changes found
 
-0.94        2019-08-06
+0.94 2019-08-06T22:24:54
+ - Fix attribute typo in SYNOPSIS (Brendan Byrd)
+ - Update version date in CHANGES (Brendan Byrd)
+ - SM-1858: Use MooX::StrictConstructor to prevent attribute misspellings
+   (Brendan Byrd)
+ - SM-1828: Prep for new version 0.94 (Brendan Byrd)
+ - SM-1828: Change boolean $rs calls to "defined $rs" (Brendan Byrd)
 
-    - Change boolean $rs calls to "defined $rs"
-    - Use MooX::StrictConstructor to prevent attribute misspellings
+v0.940.0 2019-08-06T22:24:54
+ - No changes found
 
-0.93        2018-12-27
+0.93 2019-01-09T20:08:59
+ - SM-1647: Prep for new version 0.93 (Brendan Byrd)
+ - SM-1647: Lower target_time default to 5 seconds (Brendan Byrd)
+ - PEX-1647: Prevent a DIV/0 issue, which appeared in a few CPAN tester
+   tests (Brendan Byrd)
+ - SM-1647: Fix a few Makefile.PL requirements (Brendan Byrd)
+ - SM-1647: MANIFEST.SKIP corrections (Brendan Byrd)
 
-    - Change target_time default from 15 to 5 seconds
-    - Make sure this CHANGES file doesn't get skipped in the MANIFEST
-    - Add some test/develop requirements
-    - Fix a DIV/0 error that cropped up in CPAN Matrix tests
+0.92 2018-08-13T20:19:56
+ - Remove MANIFEST from index (Brendan Byrd)
+ - Add Class::Load to test deps list (Brendan Byrd)
+ - Spelling fix: idempotant -> idempotent (Brendan Byrd)
+ - Add dbic_storage attribute (Brendan Byrd)
+ - Prep for new version 0.92 (Brendan Byrd)
+ - Add gitc config (Brendan Byrd)
+ - Add dbic_retry_opts for retry protection + unit tests (Brendan Byrd)
+ - Split up the unit tests to separate files and add new ones (Brendan
+   Byrd)
+ - Allow for legacy sth/*_sth options (Brendan Byrd)
+ - Create _process_block with the new DBI retry logic (Brendan Byrd)
+ - Switch to using dbi_connector and stmt/*_stmt attributes, instead of
+   real $sth (Brendan Byrd)
+ - Add new version of CDTest from DBIx::OnlineDDL (Brendan Byrd)
+ - Allow DIY Processing to still use features like chunk resizing (Brendan
+   Byrd)
+ - Minor rewording in sleep POD (Brendan Byrd)
+ - Change target_time default from 0 to 15 seconds (Brendan Byrd)
+ - Use scalars for numeric defaults, instead of 'sub { 0 }' (Brendan Byrd)
+ - Add improvements to Makefile.PL and create a xt test suite (Brendan
+   Byrd)
+ - Add .gitignore / MANIFEST.SKIP files (Brendan Byrd)
 
-0.92        2018-06-20
+0.91 2018-03-05T14:45:01
+ - Prep for new version 0.91 (Brendan Byrd)
+ - Loosen one of the runtime targeting unit tests (Brendan Byrd)
+ - Remove post-5.8 features and bring minimum Perl version to 5.8.1
+   (Brendan Byrd)
 
-    - Add support for DBIx::Connector::Retry for DBI retry protection.  This deprecated
-      the sth/*_sth attributes, in favor of stmt/*_stmt attributes.
-    - Add dbic_retry_opts for retry protection on the DBIC side
-    - Add dbic_storage to allow DBI retry protection for DBIC users who want to run raw
-      SQL
-    - Change target_time default from 0 to 15 seconds
-    - Allow DIY Processing to still use features like chunk resizing
-
-0.91        2018-02-16
-
-    - Some unit test fixes based on CPAN Matrix tests
-    - Fix Perl 5.8 failures and bring minimum Perl version to 5.8.1
-
-0.90        2018-01-20
-
-    - Initial release
+0.90 2018-01-23T16:12:40
+ - Add various files needed for CPAN distro (Brendan Byrd)
+ - Fix process_past_max to be smarter, by actively checking the DB for new
+   rows (Brendan Byrd)
+ - Switch to using vanilla Term::ProgressBar (Brendan Byrd)
+ - Add runtime targeting via target_time attribute (Brendan Byrd)
+ - Apply variable $CHUNK_SIZE throughout all of the tests (Brendan Byrd)
+ - Convert min/max_multiplier in favor of min/max_id (Brendan Byrd)
+ - Migrated old test to t/dbh-dbic.t, now utilizing CDTest (Brendan Byrd)
+ - Created CDTest and its schema files (Brendan Byrd)
+ - Extra POD and POD corrections (Brendan Byrd)
+ - Move progress debug messages to _print_debug_status method (Brendan
+   Byrd)
+ - Initial conversion to DBIx::BatchChunker (Brendan Byrd)

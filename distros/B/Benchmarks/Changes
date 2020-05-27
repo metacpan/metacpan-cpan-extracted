@@ -1,5 +1,9 @@
 Revision history for Perl extension Benchmarks
 
+0.11    Sat May 23 10:07:35 JST 2020
+        - Nothing happen when it'd be returned undef
+        - Fix build
+
 0.10    Wed Jun 24 08:13:21 JST 2015
         - add +x to penchmarks
 

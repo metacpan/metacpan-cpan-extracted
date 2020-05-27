@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## A real Try Catch Block Implementation Using Perl Filter - ~/lib/Nice/Try.pm
-## Version v0.1.2
+## Version v0.1.4
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2020/05/17
-## Modified 2020/05/20
+## Modified 2020/05/25
 ## 
 ##----------------------------------------------------------------------------
 package Nice::Try;
@@ -16,8 +16,9 @@ BEGIN
     use PPI;
     use Filter::Util::Call;
     use Scalar::Util;
+    use List::Util ();
     # use Devel::Confess;
-    our $VERSION = 'v0.1.2';
+    our $VERSION = 'v0.1.4';
     our $ERROR;
     our( $CATCH, $DIED, $EXCEPTION, $FINALLY, $HAS_CATCH, @RETVAL, $SENTINEL, $TRY, $WANTARRAY );
 }
@@ -50,7 +51,7 @@ sub filter
     {
         filter_del();
         $status = 1;
-        $self->_message( 3, "Skiping filtering." );
+        ## $self->_message( 3, "Skiping filtering." );
         return( $status );
     }
     while( $status = filter_read() )
@@ -68,7 +69,7 @@ sub filter
     return( $line ) if( !$line );
     unless( $status < 0 )
     {
-        ## $self->_message( 5, "Processing at line $line code:\n$code" );
+        ## ## $self->_message( 5, "Processing at line $line code:\n$code" );
         my $doc = PPI::Document->new( \$code, readonly => 1 ) || die( "Unable to parse:\n$code\n" );
         if( $doc = $self->_parse( $doc ) )
         {
@@ -79,7 +80,7 @@ sub filter
         ## Rollback
         else
         {
-            # $self->_message( 5, "Nothing found, restoring code to '$code'" );
+            # ## $self->_message( 5, "Nothing found, restoring code to '$code'" );
             $_ = $code;
 #             $status = -1;
 #             filter_del();
@@ -97,7 +98,7 @@ sub filter
             $line++;
         }
     }
-    # $self->_message( 3, "Returning status '$line' with \$_ set to '$_'." );
+    # ## $self->_message( 3, "Returning status '$line' with \$_ set to '$_'." );
     if( $self->{debug_file} )
     {
         if( my $fh = IO::File->new( ">$self->{debug_file}" ) )
@@ -116,8 +117,8 @@ sub _browse
     my $self = shift( @_ );
     my $elem = shift( @_ );
     my $level = shift( @_ ) || 0;
-    $self->_message( 4, "Checking code '$elem'." );
-    $self->_messagef( 4, "PPI element of class %s has children property '%s'.", $elem->class, $elem->{children} );
+    ## $self->_message( 4, "Checking code '$elem'." );
+    ## $self->_messagef( 4, "PPI element of class %s has children property '%s'.", $elem->class, $elem->{children} );
     return if( !$elem->children );
     foreach my $e ( $elem->elements )
     {
@@ -190,7 +191,7 @@ sub _parse
         return( $this->class eq 'PPI::Statement' && substr( $this->content, 0, 3 ) eq 'try' );
     });
     return( $self->_error( "Failed to find any try-catch clause: $@" ) ) if( !defined( $ref ) );
-    $self->_messagef( 3, "Found %d match(es)", scalar( @$ref ) );
+    ## $self->_messagef( 3, "Found %d match(es)", scalar( @$ref ) );
     return if( !scalar( @$ref ) );
     foreach my $this ( @$ref )
     {
@@ -208,7 +209,7 @@ sub _parse
         ## There is a weird bug in PPI that I have searched but could not find
         ## If I don't attempt to stringify, I may end up with a PPI::Statement object that has no children as an array reference
         my $ct = "$this";
-        $self->_message( 3, "Checking sibling elements for '$ct'" );
+        ## $self->_message( 3, "Checking sibling elements for '$ct'" );
         my( @block_children ) = $this->children;
         next if( !scalar( @block_children ) );
         my $prev_sib = $block_children[0];
@@ -221,10 +222,10 @@ sub _parse
         my $nl_counter = 0;
         while( $sib = $prev_sib->next_sibling )
         {
-            $self->_messagef( 3, "Try sibling at line %d with class '%s': '%s'", $sib->line_number, $sib->class, $sib->content );
+            ## $self->_messagef( 3, "Try sibling at line %d with class '%s': '%s'", $sib->line_number, $sib->class, $sib->content );
             if( !scalar( @$try_block_ref ) )
             {
-                $self->_message( 3, "\tWorking on the initial try block." );
+                ## $self->_message( 3, "\tWorking on the initial try block." );
                 if( $sib->class eq 'PPI::Structure::Block' &&
                     substr( "$sib", 0, 1 ) eq "\{" &&
                     substr( "$sib", -1, 1 ) eq "\}" )
@@ -241,7 +242,7 @@ sub _parse
                 }
                 elsif( $sib->class eq 'PPI::Token::Whitespace' && $sib->content =~ /\v+/ )
                 {
-                    $self->_messagef( 4, "\tTry -> Found open new line at line %d", $sib->line_number );
+                    ## $self->_messagef( 4, "\tTry -> Found open new line at line %d", $sib->line_number );
                     $temp->{open_curly_nl}++;
                     push( @$buff, $sib );
                 }
@@ -265,7 +266,7 @@ sub _parse
             }
             elsif( $inside_catch )
             {
-                $self->_message( 3, "\tWorking on a catch block." );
+                ## $self->_message( 3, "\tWorking on a catch block." );
                 ## This is the catch list as in catch( $e ) or catch( Exception $e )
                 if( $sib->class eq 'PPI::Structure::List' )
                 {
@@ -291,7 +292,7 @@ sub _parse
                 }
                 elsif( $sib->class eq 'PPI::Token::Whitespace' && $sib->content =~ /\v+/ )
                 {
-                    $self->_messagef( 4, "\tCatch -> Found open new line at line %d", $sib->line_number );
+                    ## $self->_messagef( 4, "\tCatch -> Found open new line at line %d", $sib->line_number );
                     $temp->{open_curly_nl}++;
                     push( @$nodes_to_replace, $sib );
                 }
@@ -312,7 +313,7 @@ sub _parse
             }
             elsif( $inside_finally )
             {
-                $self->_message( 3, "\tWorking on a finally block." );
+                ## $self->_message( 3, "\tWorking on a finally block." );
                 ## We could ignore it, but it is best to let the developer know in case he/she counts on it somehow
                 if( $sib->class eq 'PPI::Structure::List' )
                 {
@@ -341,7 +342,7 @@ sub _parse
                 }
                 elsif( $sib->class eq 'PPI::Token::Whitespace' && $sib->content =~ /\v+/ )
                 {
-                    $self->_messagef( 4, "\tFinally -> Found open new line at line %d", $sib->line_number );
+                    ## $self->_messagef( 4, "\tFinally -> Found open new line at line %d", $sib->line_number );
                     $temp->{open_curly_nl}++;
                     push( @$nodes_to_replace, $sib );
                 }
@@ -359,7 +360,7 @@ sub _parse
             ## This could also be new lines following the last catch block
             elsif( $sib->class eq 'PPI::Token::Whitespace' && $sib->content =~ /\v+/ )
             {
-                $self->_messagef( 4, "Between -> Found closing new line at line %d", $sib->line_number );
+                ## $self->_messagef( 4, "Between -> Found closing new line at line %d", $sib->line_number );
                 $nl_counter++;
                 push( @$buff, $sib );
             }
@@ -377,7 +378,8 @@ sub _parse
         if( scalar( @$fin_block_ref ) )
         {
             my $fin_def = $fin_block_ref->[0];
-            my $finally_block = $fin_def->{block}->content;
+            ## my $finally_block = $fin_def->{block}->content;
+            my $finally_block = $self->_serialize( $fin_def->{block} );
             $finally_block =~ s/^\{[[:blank:]]*|[[:blank:]]*\}$//gs;
             $fin_block = <<EOT;
 CORE::local \$Nice::Try::FINALLY = Nice\::Try\::ScopeGuard->_new(sub __FINALLY_OPEN_NL__{ __BLOCK_PLACEHOLDER__ __FINALLY__CLOSE_NL__}, \@_);
@@ -405,25 +407,26 @@ EOT
         ## Found any try block at all?
         if( scalar( @$try_block_ref ) )
         {
-            $self->_message( 3, "Original code to remove is:\n", join( '', @$nodes_to_replace ) );
-            $self->_message( 3, "Try definition: ", $try_block_ref->[0]->{block}->content );
-            $self->_messagef( 3, "%d catch clauses found", scalar( @$catch_def ) );
+            ## $self->_message( 3, "Original code to remove is:\n", join( '', @$nodes_to_replace ) );
+            ## $self->_message( 3, "Try definition: ", $try_block_ref->[0]->{block}->content );
+            ## $self->_messagef( 3, "%d catch clauses found", scalar( @$catch_def ) );
             foreach my $c ( @$catch_def )
             {
-                $self->_message( 3, "Catch variable assignment: ", $c->{var} );
-                $self->_message( 3, "Catch block: ", $c->{block} );
+                ## $self->_message( 3, "Catch variable assignment: ", $c->{var} );
+                ## $self->_message( 3, "Catch block: ", $c->{block} );
             }
             my $try_def = $try_block_ref->[0];
-            $self->_messagef( 3, "Try new lines before block: %d, after block %d", $try_def->{open_curly_nl}, $try_def->{close_curly_nl} );
+            ## $self->_messagef( 3, "Try new lines before block: %d, after block %d", $try_def->{open_curly_nl}, $try_def->{close_curly_nl} );
             
             ## Checking for embedded try-catch
-            $self->_message( 4, "Checking for embedded try-catch in ", $try_def->{block} );
+            ## $self->_message( 4, "Checking for embedded try-catch in ", $try_def->{block} );
             if( my $emb = $self->_parse( $try_def->{block} ) )
             {
                 $try_def->{block} = $emb;
             }
                         
-            my $try_block = $try_def->{block}->content;
+            ## my $try_block = $try_def->{block}->content;
+            my $try_block = $self->_serialize( $try_def->{block} );
             $try_block =~ s/^\{[[:blank:]]*|[[:blank:]]*\}$//gs;
             
             my $try_sub = <<EOT;
@@ -491,7 +494,7 @@ EOT
         }
         else
         {
-            $self->_message( 3, "** No try block found!!" );
+            ## $self->_message( 3, "** No try block found!!" );
             next;
         }
         
@@ -505,14 +508,14 @@ EOT
         push( @$catch_repl, $if_start );
         if( scalar( @$catch_def ) )
         {
-            $self->_messagef( 3, "Found %d catch blocks", scalar( @$catch_def ) );
+            ## $self->_messagef( 3, "Found %d catch blocks", scalar( @$catch_def ) );
             my $total_catch = scalar( @$catch_def );
             ## To count how many times we have else's – obviously we should not have more than 1
             my $else = 0;
             for( my $i = 0; $i < $total_catch; $i++ )
             {
                 my $cdef = $catch_def->[$i];
-                $self->_messagef( 3, "Catch No ${i} new lines before block: %d, after block %d", $cdef->{open_curly_nl}, $cdef->{close_curly_nl} );
+                ## $self->_messagef( 3, "Catch No ${i} new lines before block: %d, after block %d", $cdef->{open_curly_nl}, $cdef->{close_curly_nl} );
                 ## Checking for embedded try-catch
                 if( my $emb = $self->_parse( $cdef->{block} ) )
                 {
@@ -521,8 +524,9 @@ EOT
                 
                 if( $cdef->{var} )
                 {
-                    $self->_messagef( 3, "Catch assignment is: '%s'", $cdef->{var}->content );
-                    my $str = $cdef->{var}->content;
+                    ## $self->_messagef( 3, "Catch assignment is: '%s'", $cdef->{var}->content );
+                    ## my $str = $cdef->{var}->content;
+                    my $str = $self->_serialize( $cdef->{var} );
                     $str =~ s/^\([[:blank:]]*|[[:blank:]]*\)$//g;
                     if( $str =~ /^(\S+)[[:blank:]]+(\$\S+)$/ )
                     {
@@ -537,15 +541,15 @@ EOT
                 }
                 else
                 {
-                    $self->_message( 3, "No Catch assignment found" );
+                    ## $self->_message( 3, "No Catch assignment found" );
                 }
                 if( $cdef->{block} )
                 {
-                    $self->_messagef( 3, "Catch block is:\n%s", $cdef->{block}->content );
+                    ## $self->_messagef( 3, "Catch block is:\n%s", $cdef->{block}->content );
                 }
                 else
                 {
-                    $self->_message( 3, "No catch block found!" );
+                    ## $self->_message( 3, "No catch block found!" );
                     next;
                 }
                 my $cond;
@@ -565,8 +569,9 @@ EOT
                 {
                     $cond = 'elsif';
                 }
-                $self->_message( 3, "\$i = $i, \$total_catch = $total_catch and cond = '$cond'" );
-                my $block = $cdef->{block}->content;
+                ## $self->_message( 3, "\$i = $i, \$total_catch = $total_catch and cond = '$cond'" );
+                ## my $block = $cdef->{block}->content;
+                my $block = $self->_serialize( $cdef->{block} );
                 $block =~ s/^\{[[:blank:]]*|[[:blank:]]*\}$//gs;
                 my $catch_section = '';
                 my $catch_code = <<EOT;
@@ -607,10 +612,11 @@ EOT
                     ## No class, just variable assignment like $e or something
                     else
                     {
-                        $self->_message( 3, "Called here for fallback for element No $i" );
+                        ## $self->_message( 3, "Called here for fallback for element No $i" );
                         if( ++$else > 1 )
                         {
-                            CORE::warn( "Cannot have more than one falllback catch clause for block: ", $cdef->{block}->content, "\n" ) if( warnings::enabled );
+                            ## CORE::warn( "Cannot have more than one falllback catch clause for block: ", $cdef->{block}->content, "\n" ) if( warnings::enabled );
+                            CORE::warn( "Cannot have more than one falllback catch clause for block: ", $self->_serialize( $cdef->{block} ), "\n" ) if( warnings::enabled );
                             ## Skip, not die. Not fatal, just ignored
                             next;
                         }
@@ -715,28 +721,161 @@ EOT
         my $try_catch_code = join( '', @$repl );
         my $token = PPI::Token->new( "; \{ $try_catch_code \}" ) || die( "Unable to create token" );
         $token->set_class( 'Structure' );
-        $self->_messagef( 3, "Token is '$token' and of class '%s'", $token->class );
+        ## $self->_messagef( 3, "Token is '$token' and of class '%s'", $token->class );
         my $struct = PPI::Structure->new( $token ) || die( "Unable to create PPI::Structure element" );
-        $self->_message( 3, "Resulting try-catch block is:\n'$token'" );
+        ## $self->_message( 3, "Resulting try-catch block is:\n'$token'" );
         my $orig_try_catch_block = join( '', @$nodes_to_replace );
-        $self->_message( 3, "Original try-catch block is:\n'$orig_try_catch_block'" );
-        $self->_messagef( 3, "Element before our try-catch block is of class %s with value '%s'", $element_before_try->class, $element_before_try->content );
+        ## $self->_message( 3, "Original try-catch block is:\n'$orig_try_catch_block'" );
+        ## $self->_messagef( 3, "Element before our try-catch block is of class %s with value '%s'", $element_before_try->class, $element_before_try->content );
         my $rc = $element_before_try->insert_after( $token ) || 
           return( $self->_error( "Failed to add replacement code" ) );
-        ## $self->_message( 3, "Return code is defined? ", defined( $rc ) ? "yes" : "no" );
+        ## ## $self->_message( 3, "Return code is defined? ", defined( $rc ) ? "yes" : "no" );
         
         for( my $k = 0; $k < scalar( @$nodes_to_replace ); $k++ )
         {
             my $e = $nodes_to_replace->[$k];
-            $self->_messagef( 4, "[$k] Removing node: $e" );
+            ## $self->_messagef( 4, "[$k] Removing node: $e" );
             $e->delete;
         }
     }
     ## End foreach catch found
     
-    $self->_message( 3, "\n\nResulting code is\n", $elem->content );
+    ## $self->_message( 3, "\n\nResulting code is\n", $elem->content );
     return( $elem );
 }
+
+## Taken from PPI::Document
+sub _serialize 
+{
+    my $self   = shift( @_ );
+	my $ppi    = shift( @_ ) || return( '' );
+	my @tokens = $ppi->tokens;
+
+	# The here-doc content buffer
+	my $heredoc = '';
+
+	# Start the main loop
+	my $output = '';
+	foreach my $i ( 0 .. $#tokens ) {
+		my $Token = $tokens[$i];
+
+		# Handle normal tokens
+		unless ( $Token->isa('PPI::Token::HereDoc') ) {
+			my $content = $Token->content;
+
+			# Handle the trivial cases
+			unless ( $heredoc ne '' and $content =~ /\n/ ) {
+				$output .= $content;
+				next;
+			}
+
+			# We have pending here-doc content that needs to be
+			# inserted just after the first newline in the content.
+			if ( $content eq "\n" ) {
+				# Shortcut the most common case for speed
+				$output .= $content . $heredoc;
+			} else {
+				# Slower and more general version
+				$content =~ s/\n/\n$heredoc/;
+				$output .= $content;
+			}
+
+			$heredoc = '';
+			next;
+		}
+
+		# This token is a HereDoc.
+		# First, add the token content as normal, which in this
+		# case will definitely not contain a newline.
+		$output .= $Token->content;
+
+		# Now add all of the here-doc content to the heredoc buffer.
+		foreach my $line ( $Token->heredoc ) {
+			$heredoc .= $line;
+		}
+
+		if ( $Token->{_damaged} ) {
+			# Special Case:
+			# There are a couple of warning/bug situations
+			# that can occur when a HereDoc content was read in
+			# from the end of a file that we silently allow.
+			#
+			# When writing back out to the file we have to
+			# auto-repair these problems if we aren't going back
+			# on to the end of the file.
+
+			# When calculating $last_line, ignore the final token if
+			# and only if it has a single newline at the end.
+			my $last_index = $#tokens;
+			if ( $tokens[$last_index]->{content} =~ /^[^\n]*\n$/ ) {
+				$last_index--;
+			}
+
+			# This is a two part test.
+			# First, are we on the last line of the
+			# content part of the file
+			my $last_line = List::Util::none {
+				$tokens[$_] and $tokens[$_]->{content} =~ /\n/
+				} (($i + 1) .. $last_index);
+			if ( ! defined $last_line ) {
+				# Handles the null list case
+				$last_line = 1;
+			}
+
+			# Secondly, are their any more here-docs after us,
+			# (with content or a terminator)
+			my $any_after = List::Util::any {
+				$tokens[$_]->isa('PPI::Token::HereDoc')
+				and (
+					scalar(@{$tokens[$_]->{_heredoc}})
+					or
+					defined $tokens[$_]->{_terminator_line}
+					)
+				} (($i + 1) .. $#tokens);
+			if ( ! defined $any_after ) {
+				# Handles the null list case
+				$any_after = '';
+			}
+
+			# We don't need to repair the last here-doc on the
+			# last line. But we do need to repair anything else.
+			unless ( $last_line and ! $any_after ) {
+				# Add a terminating string if it didn't have one
+				unless ( defined $Token->{_terminator_line} ) {
+					$Token->{_terminator_line} = $Token->{_terminator};
+				}
+
+				# Add a trailing newline to the terminating
+				# string if it didn't have one.
+				unless ( $Token->{_terminator_line} =~ /\n$/ ) {
+					$Token->{_terminator_line} .= "\n";
+				}
+			}
+		}
+
+		# Now add the termination line to the heredoc buffer
+		if ( defined $Token->{_terminator_line} ) {
+			$heredoc .= $Token->{_terminator_line};
+		}
+	}
+
+	# End of tokens
+
+	if ( $heredoc ne '' ) {
+		# If the file doesn't end in a newline, we need to add one
+		# so that the here-doc content starts on the next line.
+		unless ( $output =~ /\n$/ ) {
+			$output .= "\n";
+		}
+
+		# Now we add the remaining here-doc content
+		# to the end of the file.
+		$output .= $heredoc;
+	}
+
+	$output;
+}
+
 
 {
   package # hide from PAUSE
@@ -831,7 +970,7 @@ When run, this would produce, as one would expect:
 
 =head1 VERSION
 
-    v0.1.2
+    v0.1.4
 
 =head1 DESCRIPTION
 
@@ -1012,7 +1151,7 @@ In group 3, L<TryCatch> was working wonderfully, but was relying on L<Devel::Dec
 
 In group 4, there is L<Syntax::Keyword::Try>, which is a great alternative if you do not care about exception variable assignment or exception class filter. You can only use C<$@>
 
-So, L<Nice::Try> is quite unique and fill the missing features, but because it is purely in perl and not an XS module, it is slower than XS module like L<Syntax::Keyword::Try>, although I am not sure the difference would be noticeable.
+So, L<Nice::Try> is quite unique and fill the missing features, but because it is purely in perl and not an XS module, it is slower than XS module like L<Syntax::Keyword::Try>. I am not sure the difference would be noticeable for regular size script, but the parsing with L<PPI> would definitely take more time on larger piece of code like 10,000 lines or more. If you know of a perl parser that uses XS, please let me know.
 
 =head1 FINALLY
 
@@ -1038,7 +1177,11 @@ However, because this is designed for clean-up, it is called in void context, so
 
 =head1 DEBUGGING
 
-If you want to see the updated code produced, either call your script using L<Filter::ExtractSource> like this:
+And to have L<Nice::Try> save the filtered code to a file, pass it the C<debug_file> parameter like this:
+
+    use Nice::Try debug_file => './updated_script.pl';
+
+You can also call your script using L<Filter::ExtractSource> like this:
 
     perl -MFilter::ExtractSource script.pl > updated_script.pl
 
@@ -1052,11 +1195,7 @@ to avoid L<Nice::Try> from filtering your script
 
 If you want L<Nice::Try> to produce human readable code, pass it the C<debug_code> parameter like this:
 
-    use Nice::Try debug_code => 1, debug 3;
-
-And to have L<Nice::Try> produce copious amount of debugging information, pass it the C<debug> parameter like this:
-
-    use Nice::Try debug => 3;
+    use Nice::Try debug_code => 1;
 
 =head1 CREDITS
 

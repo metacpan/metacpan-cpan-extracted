@@ -1,9 +1,9 @@
 package Sah::Schema::perl::modname_or_prefix;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-08'; # DATE
+our $DATE = '2020-05-21'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.031'; # VERSION
+our $VERSION = '0.032'; # VERSION
 
 our $schema = [str => {
     summary => 'Perl module name (e.g. Foo::Bar) or prefix (e.g. Foo::Bar::)',
@@ -53,7 +53,7 @@ Sah::Schema::perl::modname_or_prefix - Perl module name (e.g. Foo::Bar) or prefi
 
 =head1 VERSION
 
-This document describes version 0.031 of Sah::Schema::perl::modname_or_prefix (from Perl distribution Sah-Schemas-Perl), released on 2020-05-08.
+This document describes version 0.032 of Sah::Schema::perl::modname_or_prefix (from Perl distribution Sah-Schemas-Perl), released on 2020-05-21.
 
 =head1 SYNOPSIS
 

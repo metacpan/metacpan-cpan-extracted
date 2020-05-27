@@ -1,21 +1,19 @@
 package Mojo::JWT::Google;
 use utf8;
 use Mojo::Base qw(Mojo::JWT);
-use vars qw($VERSION);
-use Mojo::Collection 'c';
-use Mojo::File ();
+use Mojo::File qw(path);
 use Mojo::JSON qw(decode_json);
+use Carp;
 
-BEGIN {
-  $Mojo::JWT::Google::VERSION = '0.06';
-}
+our $VERSION = '0.10';
 
 has client_email => undef;
 has expires_in   => 3600;
 has issue_at     => undef;
-has scopes       => sub { c->new };
-has target       => q(https://www.googleapis.com/oauth2/v3/token);
+has scopes       => sub { [] };
+has target       => q(https://www.googleapis.com/oauth2/v4/token);
 has user_as      => undef;
+has audience     => undef;
 
 sub new {
   my ($class, %options) = @_;
@@ -25,7 +23,7 @@ sub new {
   my $result = $self->from_json($self->{from_json});
 
   if ( $result == 0 ) {
-    say 'Your JSON file import failed.';
+    croak 'Your JSON file import failed.';
     return undef;
   }
   return $self;
@@ -41,16 +39,24 @@ sub claims {
     $self->{claims} = $value;
     return $self;
   }
-  return $self->_construct_claims;
+  my $claims = $self->_construct_claims;
+  unless (exists $claims->{exp}) {
+    $claims->{exp} = $self->now + $self->expires_in ;
+  }
+  return $claims;
 }
 
 sub _construct_claims {
   my $self = shift;
   my $result = {};
   $result->{iss}   = $self->client_email;
-  $result->{scope} = $self->scopes->join(' ')->to_string;
   $result->{aud}   = $self->target;
   $result->{sub}   = $self->user_as if defined $self->user_as;
+  my @scopes = @{ $self->scopes };
+
+  croak "Can't use both scopes and audience in the same token" if @scopes && $self->audience;
+  $result->{scope} = join ' ', @scopes if @scopes;
+  $result->{target_audience} = $self->audience if defined $self->audience;
 
   if ( not defined $self->issue_at ) {
     $self->set_iat(1);
@@ -67,7 +73,7 @@ sub from_json {
   my ($self, $value) = @_;
   return 0 if not defined $value;
   return 0 if not -f $value;
-  my $json = decode_json( Mojo::File->new($value)->slurp );
+  my $json = decode_json( path($value)->slurp );
   return 0 if not defined $json->{private_key};
   return 0 if $json->{type} ne 'service_account';
   $self->algorithm('RS256');
@@ -85,13 +91,13 @@ Mojo::JWT::Google - Service Account tokens
 
 =head1 VERSION
 
-0.05
+0.10
 
 =head1 SYNOPSIS
 
-my $gjwt = Mojo::JWT::Google->new(secret => 's3cr3t',
-                                  scopes => [ '/my/scope/a', '/my/scope/b' ],
-                                  client_email => 'riche@cpan.org')->encode;
+  my $gjwt = Mojo::JWT::Google->new(secret => 's3cr3t',
+                                    scopes => [ '/my/scope/a', '/my/scope/b' ],
+                                    client_email => 'riche@cpan.org')->encode;
 
 =head1 DESCRIPTION
 
@@ -113,9 +119,9 @@ somewhere.  This will ease some busy work in configuring the object -- with
 virtually the only things to do is determine the scopes and the user_as if you
 need to impersonate.
 
- my $gjwt = Mojo::JWT::Google
-   ->new( from_json => '/my/secret.json',
-          scopes    => [ '/my/scope/a', '/my/scope/b' ])->encode;
+  my $gjwt = Mojo::JWT::Google
+    ->new( from_json => '/my/secret.json',
+           scopes    => [ '/my/scope/a', '/my/scope/b' ])->encode;
 
 =cut
 
@@ -151,7 +157,7 @@ your Google Business Administrator.
 =head2 target
 
 Get or set the target.  At the time of writing, there is only one valid target:
-https://www.googleapis.com/oauth2/v3/token.  This is the default value; if you
+https://www.googleapis.com/oauth2/v4/token.  This is the default value; if you
 have no need to customize this, then just fetch the default.
 
 
@@ -183,7 +189,7 @@ L<Mojo::JWT>
 
 =head1 SOURCE REPOSITORY
 
-L<http://github.com/rpcme/Mojo-JWT-Google>
+L<http://github.com/rabbiveesh/Mojo-JWT-Google>
 
 =head1 AUTHOR
 
@@ -192,6 +198,7 @@ Richard Elberger, <riche@cpan.org>
 =head1 CONTRIBUTORS
 
 Scott Wiersdorf, <scott@perlcode.org>
+Avishai Goldman, <veesh@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

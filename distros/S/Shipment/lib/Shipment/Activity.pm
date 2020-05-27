@@ -1,5 +1,5 @@
 package Shipment::Activity;
-$Shipment::Activity::VERSION = '3.04';
+$Shipment::Activity::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -46,7 +46,7 @@ Shipment::Activity
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 SYNOPSIS
 

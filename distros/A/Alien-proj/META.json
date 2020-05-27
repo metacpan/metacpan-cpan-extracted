@@ -4,7 +4,7 @@
       "Shawn Laffan <shawnlaffan@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -23,26 +23,42 @@
       "build" : {
          "requires" : {
             "Alien::Build" : "1.41",
-            "Alien::Build::MM" : "1.41",
+            "Alien::Build::MM" : "1.74",
             "Alien::Build::Plugin::Cleanse::BuildDir" : "0",
-            "Alien::MSYS" : "0",
-            "Alien::sqlite" : "0",
+            "Alien::MSYS" : "0.07",
+            "Alien::libtiff" : "0",
+            "Alien::sqlite" : "1.06",
+            "Archive::Tar" : "0",
+            "Env::ShellWords" : "0.01",
             "ExtUtils::MakeMaker" : "6.52",
             "File::Find::Rule" : "0",
+            "File::Which" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Zlib" : "0",
+            "Mojo::DOM58" : "1.00",
+            "Path::Tiny" : "0",
             "PkgConfig" : "0.19026",
-            "Sort::Versions" : "0"
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "suggests" : {
+            "Alien::curl" : "0",
+            "Alien::libtiff" : "0"
          }
       },
       "configure" : {
          "requires" : {
             "Alien::Build" : "1.41",
-            "Alien::Build::MM" : "1.41",
+            "Alien::Build::MM" : "1.74",
             "Alien::Build::Plugin::Build::SearchDep" : "0.53",
             "Alien::Build::Plugin::Cleanse::BuildDir" : "0",
             "Alien::MSYS" : "0",
-            "Alien::sqlite" : "0",
+            "Alien::sqlite" : "1.06",
             "ExtUtils::MakeMaker" : "6.52",
             "File::Find::Rule" : "0",
+            "File::Which" : "0",
+            "Path::Tiny" : "0",
             "PkgConfig" : "0",
             "Sort::Versions" : "0"
          }
@@ -50,8 +66,12 @@
       "runtime" : {
          "requires" : {
             "Alien::Base" : "1.41",
-            "Alien::Build" : "0.25",
+            "Alien::Build" : "1.74",
             "FFI::CheckLib" : "0.23"
+         },
+         "suggests" : {
+            "Alien::curl" : "0",
+            "Alien::libtiff" : "0"
          }
       },
       "test" : {
@@ -71,18 +91,19 @@
          "url" : "https://github.com/shawnlaffan/perl-alien-proj"
       }
    },
-   "version" : "1.06",
+   "version" : "1.11",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 1.74",
+      "generated_by" : "Alien::Build::MM version 2.23",
       "requires" : {
          "share" : {
             "Alien::MSYS" : "0.07",
+            "Alien::libtiff" : "0",
             "Alien::sqlite" : "0",
             "Archive::Tar" : "0",
             "Env::ShellWords" : "0.01",
-            "HTML::LinkExtor" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Zlib" : "0",
+            "Mojo::DOM58" : "1.00",
             "Sort::Versions" : "0",
             "URI" : "0",
             "URI::Escape" : "0"
@@ -90,5 +111,5 @@
          "system" : {}
       }
    },
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

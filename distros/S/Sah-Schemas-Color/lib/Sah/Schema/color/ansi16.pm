@@ -3,7 +3,7 @@ package Sah::Schema::color::ansi16;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-03-02'; # DATE
 our $DIST = 'Sah-Schemas-Color'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $schema = [str => {
     summary => 'ANSI-16 color, either a number from 0-15 or color names like "black", "bold red", etc',
@@ -33,7 +33,21 @@ Sah::Schema::color::ansi16 - ANSI-16 color, either a number from 0-15 or color n
 
 =head1 VERSION
 
-This document describes version 0.007 of Sah::Schema::color::ansi16 (from Perl distribution Sah-Schemas-Color), released on 2020-03-02.
+This document describes version 0.009 of Sah::Schema::color::ansi16 (from Perl distribution Sah-Schemas-Color), released on 2020-03-02.
+
+=head1 SYNOPSIS
+
+Sample data:
+
+ 0  # valid
+
+ 15  # valid
+
+ 16  # INVALID
+
+ "black"  # valid, becomes "black"
+
+ "foo"  # INVALID
 
 =head1 HOMEPAGE
 

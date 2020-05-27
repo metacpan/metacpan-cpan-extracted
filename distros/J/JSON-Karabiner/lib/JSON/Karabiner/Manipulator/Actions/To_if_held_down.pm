@@ -1,5 +1,5 @@
 package JSON::Karabiner::Manipulator::Actions::To_if_held_down ;
-$JSON::Karabiner::Manipulator::Actions::To_if_held_down::VERSION = '0.017';
+$JSON::Karabiner::Manipulator::Actions::To_if_held_down::VERSION = '0.018';
 use strict;
 use warnings;
 use JSON;
@@ -14,7 +14,7 @@ sub new {
   return $obj;
 }
 
-# ABSTRACT: to_if_alone action
+# ABSTRACT: to_if_held_down action
 
 1;
 
@@ -24,11 +24,11 @@ __END__
 
 =head1 NAME
 
-JSON::Karabiner::Manipulator::Actions::To_if_held_down - to_if_alone action
+JSON::Karabiner::Manipulator::Actions::To_if_held_down - to_if_held_down action
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 AUTHOR
 

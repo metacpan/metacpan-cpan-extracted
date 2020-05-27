@@ -1,5 +1,8 @@
 Revision history for Net-IPAM-Tree
 
+1.10    Fri, 22 May 2020 00:23:43 +0200
+        - remove dependency for namespace::clean
+
 1.09    Mon, 20 Apr 2020 15:49:07 +0200
         - use carp as default error_cb
 

@@ -1,4 +1,7 @@
 UNRELEASED
+1.52 (15-Nov-2018):
+ - Less problematic build CPAN RT#132165
+
 1.51 (15-Nov-2018):
  - Fix old bugs from CPAN RT
  - perltidy

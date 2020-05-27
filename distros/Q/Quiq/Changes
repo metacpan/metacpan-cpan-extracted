@@ -1,3 +1,9 @@
+1.183 2020-05-22
+================
+
+[Quiq::Gd::Font]
+* Unittest für FreeBSD verbessert
+
 1.182 2020-05-20
 ================
 
@@ -6,9 +12,6 @@
 
 [Quiq::Database::ResultSet]
 * Doku bearbeitet
-
-[Quiq::Gd::Font]
-* Unittest für FreeBSD verbessert
 
 [Quiq::Html::Component]
 * Doku bearbeitet

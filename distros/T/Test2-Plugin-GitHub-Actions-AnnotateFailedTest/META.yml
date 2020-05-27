@@ -1,0 +1,46 @@
+---
+abstract: 'Annotate failed tests with GitHub Actions workflow command'
+author:
+  - 'utgwkk <utagawakiki@gmail.com>'
+build_requires:
+  Module::Spy: '0'
+  Test2::V0: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test2-Plugin-GitHub-Actions-AnnotateFailedTest
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test2::Plugin::GitHub::Actions::AnnotateFailedTest:
+    file: lib/Test2/Plugin/GitHub/Actions/AnnotateFailedTest.pm
+    version: '0.01'
+requires:
+  Encode: '0'
+  Test2: '1.302133'
+  Test2::API: '0'
+  URI::Escape: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/utgwkk/Test2-Plugin-GitHub-Actions-AnnotateFailedTest/issues
+  homepage: https://github.com/utgwkk/Test2-Plugin-GitHub-Actions-AnnotateFailedTest
+  repository: git://github.com/utgwkk/Test2-Plugin-GitHub-Actions-AnnotateFailedTest.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

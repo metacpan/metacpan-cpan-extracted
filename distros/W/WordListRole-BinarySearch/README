@@ -1,0 +1,51 @@
+NAME
+    WordListRole::BinarySearch - Provide word_exists() that uses binary
+    search
+
+VERSION
+    This document describes version 0.004 of WordListRole::BinarySearch
+    (from Perl distribution WordListRole-BinarySearch), released on
+    2020-05-23.
+
+SYNOPSIS
+     use Role::Tiny;
+     use WordList::EN::Enable;
+     my $wl = WordList::EN::Enable->new;
+     Role::Tiny->apply_roles_to_object($wl, "WordListRole::BinarySearch");
+
+DESCRIPTION
+    This role provides an alternative "word_exists()" method that performs
+    binary searching instead of the default linear. The list must be sorted
+    numerically ($SORT is "num" or "numeric") or alphabetically ($SORT is
+    empty).
+
+PROVIDED METHODS
+  word_exists
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WordListRole-BinarySearch>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WordListRole-BinarySearch>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=WordListRole-BinarySe
+    arch>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    File::SortedSeek
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

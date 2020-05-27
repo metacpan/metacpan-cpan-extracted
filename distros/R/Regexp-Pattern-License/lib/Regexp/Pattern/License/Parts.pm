@@ -10,11 +10,11 @@ Regexp::Pattern::License::Parts - Regular expressions for licensing sub-parts
 
 =head1 VERSION
 
-Version v3.3.1
+Version v3.4.0
 
 =cut
 
-our $VERSION = version->declare("v3.3.1");
+our $VERSION = version->declare("v3.4.0");
 
 =head STATUS
 
@@ -232,20 +232,6 @@ our %RE = (
 		{ pat => '(?:[http://]creativecommons.org[/]publicdomain[/])' },
 
 	# FSF
-	fsf_addr_franklin => {
-		pat =>
-			"51 Franklin [Ss]t(?:reet|\\.)?, (?:Fifth|5th) [Ff]loor(?:[;]? |[ - ])"
-			. 'Boston,? MA 02110[-]1301,? USA'
-	},
-	fsf_addr_mass => {
-		pat =>
-			"675 [Mm]ass(?:achusett?ss?|\\.)? [Aa]ve(?:nue|\.)?(?:(?:[;]? |[ - ])"
-			. '[Cc]ambridge,? (?:MA|ma) 02139,? (?:USA|usa))?'
-	},
-	fsf_addr_temple => {
-		pat => '5[39] Temple Place,? S(?:ui)?te 330(?:[;]? |[ - ])'
-			. 'Boston,? MA 02111[-]1307,? USA'
-	},
 	fsf_url => { pat => '(?:[http://](?:www\.)?fsf\.org[/]?)' },
 
 	# texts

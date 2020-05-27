@@ -1,9 +1,9 @@
 package Sah::Schema::perl::modnames;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-08'; # DATE
+our $DATE = '2020-05-21'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.031'; # VERSION
+our $VERSION = '0.032'; # VERSION
 
 our $schema = [array => {
     summary => 'Array of Perl module names, e.g. ["Foo::Bar", "Baz"]',
@@ -21,7 +21,7 @@ and it will be expanded to e.g.:
     ["Module::Patch", "Module::Path", "Module::Pluggable"]
 
 The wildcard syntax supports jokers (`?`, `*`, `**`), brackets (`[abc]`), and
-braces (`{one,two}`).
+braces (`{one,two}`). See <pm:Module::List::Wildcard> for more details.
 
 _
     of => ["perl::modname", {req=>1}, {}],
@@ -50,7 +50,7 @@ Sah::Schema::perl::modnames - Array of Perl module names, e.g. ["Foo::Bar", "Baz
 
 =head1 VERSION
 
-This document describes version 0.031 of Sah::Schema::perl::modnames (from Perl distribution Sah-Schemas-Perl), released on 2020-05-08.
+This document describes version 0.032 of Sah::Schema::perl::modnames (from Perl distribution Sah-Schemas-Perl), released on 2020-05-21.
 
 =head1 SYNOPSIS
 
@@ -127,7 +127,7 @@ and it will be expanded to e.g.:
  ["Module::Patch", "Module::Path", "Module::Pluggable"]
 
 The wildcard syntax supports jokers (C<?>, C<*>, C<**>), brackets (C<[abc]>), and
-braces (C<{one,two}>).
+braces (C<{one,two}>). See L<Module::List::Wildcard> for more details.
 
 =head1 HOMEPAGE
 

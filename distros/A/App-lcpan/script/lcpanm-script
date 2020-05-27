@@ -3,8 +3,8 @@
 # NO_PERINCI_CMDLINE_SCRIPT
 # FRAGMENT id=shcompgen-hint command=_cpanm-script
 
-our $DATE = '2020-05-07'; # DATE
-our $VERSION = '1.057'; # VERSION
+our $DATE = '2020-05-26'; # DATE
+our $VERSION = '1.058'; # VERSION
 
 use strict;
 use warnings;
@@ -80,7 +80,7 @@ lcpanm-script - cpanm wrapper (set mirror to local CPAN by default, convert scri
 
 =head1 VERSION
 
-This document describes version 1.057 of lcpanm-script (from Perl distribution App-lcpan), released on 2020-05-07.
+This document describes version 1.058 of lcpanm-script (from Perl distribution App-lcpan), released on 2020-05-26.
 
 =head1 SYNOPSIS
 

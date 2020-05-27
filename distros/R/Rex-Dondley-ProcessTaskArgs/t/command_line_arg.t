@@ -23,7 +23,7 @@ is_deeply get_params( [ qw /--one=five/ ],
                       [ 'one' ]
                     ),
           { one => 'five' },
-          'blah';
+          'test 2';
 
 lives_ok {
   get_params( [ qw /--one=five/ ],
@@ -53,26 +53,27 @@ is_deeply get_params( [ qw /boo bah/ ],
                       [ qw /one 1 two 0/ ]
                     ),
           { one => 'boo', two => 'bah' },
-          'blah';
+          'test 7';
 
 is_deeply get_params( [ qw /bah --one=boo/ ],
                       [ qw /one 1 two 0/ ]
                     ),
           { one => 'boo', two => 'bah' },
-          'blah';
+          'test 8';
 
 is_deeply get_params( [ qw /bah boo/ ],
                       [ qw /one 0 two 0 three 0 four 0 five 0 six 0/ ]
                     ),
           { one => 'bah', two => 'boo', three => undef, four => undef, five => undef, six => undef },
-          'test3';
+          'test 9';
 
 done_testing();
 
 sub get_params {
   my $args = shift;
   my $keys = shift;
-  return process_task_args(get_args('test1', @$args), @$keys);
+  my $return = process_task_args(get_args('test1', @$args), @$keys);
+  return $return;
 }
 
 sub get_args {

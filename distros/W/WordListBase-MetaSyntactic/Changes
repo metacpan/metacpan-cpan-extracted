@@ -1,3 +1,9 @@
+0.005   2020-05-22  Released-By: PERLANCAR; Urgency: medium
+
+	- [incompatible change] Change object storage from array to the
+	  more flexible hash.
+
+
 0.004   2020-05-02  Released-By: PERLANCAR; Urgency: medium
 
 	- Add reset_indicator(), first_word(), and next_word() like

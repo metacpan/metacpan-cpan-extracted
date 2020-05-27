@@ -1,5 +1,5 @@
 package JSON::Karabiner::Manipulator::Actions::To_delayed_if_canceled ;
-$JSON::Karabiner::Manipulator::Actions::To_delayed_if_canceled::VERSION = '0.017';
+$JSON::Karabiner::Manipulator::Actions::To_delayed_if_canceled::VERSION = '0.018';
 use strict;
 use warnings;
 use JSON;
@@ -46,7 +46,7 @@ JSON::Karabiner::Manipulator::Actions::To_delayed_if_canceled - to_delayed_if_ca
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 AUTHOR
 

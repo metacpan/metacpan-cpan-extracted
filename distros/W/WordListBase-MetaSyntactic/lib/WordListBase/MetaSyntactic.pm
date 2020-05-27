@@ -1,9 +1,9 @@
 package WordListBase::MetaSyntactic;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-02'; # DATE
+our $DATE = '2020-05-22'; # DATE
 our $DIST = 'WordListBase-MetaSyntactic'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use strict 'subs', 'vars';
 
@@ -12,17 +12,21 @@ sub new {
     die "Must be subclassed by WordList::MetaSyntactic::*, not '$package'"
         unless $package =~ /\AWordList::MetaSyntactic::(\w+)\z/;
     require Acme::MetaSyntactic;
-    bless [
-        Acme::MetaSyntactic->new($1), # Acme::MetaSyntactic object
-        0,                            # iterator index
-        undef,                        # the whole array of words, for when iterating
-    ], $package;
+    bless {
+        # Acme::MetaSyntactic object
+        _am => Acme::MetaSyntactic->new($1),
+
+        _iterator_idx => 0,
+
+         # the whole array of words, for when iterating
+        _all_words => undef,
+    }, $package;
 }
 
 sub each_word {
     my ($self, $code) = @_;
 
-    for my $word (sort $self->[0]->name(0)) {
+    for my $word (sort $self->{_am}->name(0)) {
         $code->($word);
     }
 }
@@ -31,13 +35,13 @@ sub pick {
     my ($self, $n) = @_;
 
     $n ||= 1;
-    $self->[0]->name($n);
+    $self->{_am}->name($n);
 }
 
 sub word_exists {
     my ($self, $word) = @_;
 
-    for my $w ($self->[0]->name(0)) {
+    for my $w ($self->{_am}->name(0)) {
         return 1 if $word eq $w;
     }
     0;
@@ -47,22 +51,23 @@ sub all_words {
     my ($self) = @_;
 
     # A:M doesn't provide a method to get a sorted list, so we sort it ourselves
-    sort $self->[0]->name(0);
+    sort $self->{_am}->name(0);
 }
 
 sub reset_iterator {
     my $self = shift;
-    $self->[1] = 0;
+    $self->{_iterator_idx} = 0;
 }
 
 sub next_word {
     my $self = shift;
-    unless (defined $self->[2]) {
-        $self->[2] = [$self->all_words];
+    unless (defined $self->{_all_words}) {
+        $self->{_all_words} = [$self->all_words];
     }
-    my $word = $self->[2][ $self->[1] ];
-    $self->[1]++;
-    $self->[1] = 0 if $self->[1] > @{ $self->[2] };
+    my $word = $self->{_all_words}[ $self->{_iterator_idx} ];
+    $self->{_iterator_idx}++;
+    $self->{_iterator_idx} = 0
+        if $self->{_iterator_idx} > @{ $self->{_all_words} };
     $word;
 }
 
@@ -87,7 +92,7 @@ WordListBase::MetaSyntactic - Base class for WordList::MetaSyntactic::*
 
 =head1 VERSION
 
-This document describes version 0.004 of WordListBase::MetaSyntactic (from Perl distribution WordListBase-MetaSyntactic), released on 2020-05-02.
+This document describes version 0.005 of WordListBase::MetaSyntactic (from Perl distribution WordListBase-MetaSyntactic), released on 2020-05-22.
 
 =head1 SYNOPSIS
 

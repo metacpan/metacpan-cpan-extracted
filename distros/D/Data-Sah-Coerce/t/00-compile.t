@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 41 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 42 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Coerce.pm',
@@ -46,6 +46,7 @@ my @module_files = (
     'Data/Sah/Coerce/perl/To_duration/From_str/iso8601.pm',
     'Data/Sah/Coerce/perl/To_float/From_str/percent.pm',
     'Data/Sah/Coerce/perl/To_int/From_str/percent.pm',
+    'Data/Sah/Coerce/perl/To_num/From_str/percent.pm',
     'Data/Sah/Coerce/perl/To_timeofday/From_obj/date_timeofday.pm',
     'Data/Sah/Coerce/perl/To_timeofday/From_str/hms.pm',
     'Data/Sah/CoerceCommon.pm',

@@ -1,5 +1,5 @@
 package Shipment::FedEx;
-$Shipment::FedEx::VERSION = '3.04';
+$Shipment::FedEx::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -41,6 +41,13 @@ has 'proxy_domain' => (
           )
     ],
     default => 'wsbeta.fedex.com:443',
+);
+
+
+has 'shipment_special_service_types' => (
+    is      => 'rw',
+    isa     => ArrayRef [Str],
+    default => sub { [] },
 );
 
 
@@ -538,6 +545,12 @@ sub ship {
       $signature_type_map{$self->signature_type} || $self->signature_type;
 
     my $shipment_options;
+
+    my @shipment_special_service_types;
+
+    push @shipment_special_service_types,
+      @{$self->shipment_special_service_types};
+
     my @email_notifications;
     if ($self->to_address->email) {
         push @email_notifications,
@@ -547,10 +560,13 @@ sub ship {
             Format                         => 'TEXT',
             Localization                   => {LanguageCode => 'EN',},
           };
-        $shipment_options->{SpecialServiceTypes} = 'EMAIL_NOTIFICATION';
+        push @shipment_special_service_types, 'EMAIL_NOTIFICATION';
         $shipment_options->{EMailNotificationDetail}->{Recipients} =
           \@email_notifications;
     }
+
+    $shipment_options->{SpecialServiceTypes} =
+      \@shipment_special_service_types;
 
     my @references;
     push @references,
@@ -617,7 +633,7 @@ sub ship {
                         Minor        => 0,
                     },
                     RequestedShipment => {
-                        ShipTimestamp => DateTime->now->datetime,
+                        ShipTimestamp => $self->pickup_date->datetime,
                         ServiceType   => $service_id,
                         DropoffType   => $pickup_type_map{$self->pickup_type}
                           || $self->pickup_type,
@@ -1115,7 +1131,7 @@ Shipment::FedEx
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 SYNOPSIS
 
@@ -1178,6 +1194,10 @@ Credentials required to access FedEx Web Services
 This determines whether you will use the FedEx Web Services Testing Environment or the production (live) environment
   * wsbeta.fedex.com:443 (testing)
   * ws.fedex.com:443 (live)
+
+=head2 shipment_special_service_types
+
+special services offered by FedEx, for example SATURDAY_DELIVERY
 
 =head2 residential_address
 

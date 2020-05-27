@@ -13,7 +13,7 @@ Dancer2::Manual - A gentle introduction to Dancer2
 
 =head1 VERSION
 
-version 0.300003
+version 0.300004
 
 =head1 DESCRIPTION
 

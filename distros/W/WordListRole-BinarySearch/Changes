@@ -1,0 +1,8 @@
+0.004   2020-05-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to WordList 0.7.0+.
+
+
+0.003   2020-05-22  Released-By: PERLANCAR; Urgency: medium
+
+        - First release. Converted from WordListMod::BinarySearch.

@@ -1,6 +1,6 @@
 package Dancer2::Core::Role::SessionFactory;
 # ABSTRACT: Role for session factories
-$Dancer2::Core::Role::SessionFactory::VERSION = '0.300003';
+$Dancer2::Core::Role::SessionFactory::VERSION = '0.300004';
 use Moo::Role;
 with 'Dancer2::Core::Role::Engine';
 
@@ -83,6 +83,13 @@ has is_http_only => (
     is      => 'rw',
     isa     => Bool,
     default => sub {1},
+);
+
+has cookie_same_site => (
+    is        => 'ro',
+    isa       => Str,
+    predicate => 1,
+    coerce    => sub { ucfirst $_[0] },
 );
 
 sub create {
@@ -255,6 +262,9 @@ sub cookie {
         http_only => $self->is_http_only,
     );
 
+    $cookie{same_site} = $self->cookie_same_site
+      if $self->has_cookie_same_site;
+
     $cookie{domain} = $self->cookie_domain
       if $self->has_cookie_domain;
 
@@ -291,7 +301,7 @@ Dancer2::Core::Role::SessionFactory - Role for session factories
 
 =head1 VERSION
 
-version 0.300003
+version 0.300004
 
 =head1 DESCRIPTION
 

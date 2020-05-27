@@ -2,8 +2,8 @@ NAME
     App::lcpan - Manage your local CPAN mirror
 
 VERSION
-    This document describes version 1.057 of App::lcpan (from Perl
-    distribution App-lcpan), released on 2020-05-07.
+    This document describes version 1.058 of App::lcpan (from Perl
+    distribution App-lcpan), released on 2020-05-26.
 
 SYNOPSIS
     See lcpan script.
@@ -30,21 +30,19 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   added_after => *date*
+    *   added_or_updated_since => *date*
 
-        Include only records that are added after a certain date.
+        Include only records that are added/updated since a certain date.
 
-    *   added_before => *date*
+    *   added_or_updated_since_last_index_update => *true*
 
-        Include only records that are added before a certain date.
+        Include only records that are added/updated since the last index
+        update.
 
-    *   added_in_last_n_updates => *posint*
+    *   added_or_updated_since_last_n_index_updates => *posint*
 
-        Include only records that are added during the last N index updates.
-
-    *   added_in_last_update => *true*
-
-        Include only records that are added during the last index update.
+        Include only records that are added/updated since the last N index
+        updates.
 
     *   cpan => *dirname*
 
@@ -72,23 +70,6 @@ FUNCTIONS
         Search query.
 
     *   query_type => *str* (default: "any")
-
-    *   updated_after => *date*
-
-        Include only records that are updated after a certain date.
-
-    *   updated_before => *date*
-
-        Include only records that are updated before a certain date.
-
-    *   updated_in_last_n_updates => *posint*
-
-        Include only records that are updated during the last N index
-        updates.
-
-    *   updated_in_last_update => *true*
-
-        Include only records that are updated during the last index update.
 
     *   use_bootstrap => *bool* (default: 1)
 
@@ -153,21 +134,31 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   added_after => *date*
+    *   added_or_updated_since => *date*
 
-        Include only records that are added after a certain date.
+        Include only records that are added/updated since a certain date.
 
-    *   added_before => *date*
+    *   added_or_updated_since_last_index_update => *true*
 
-        Include only records that are added before a certain date.
+        Include only records that are added/updated since the last index
+        update.
 
-    *   added_in_last_n_updates => *posint*
+    *   added_or_updated_since_last_n_index_updates => *posint*
 
-        Include only records that are added during the last N index updates.
+        Include only records that are added/updated since the last N index
+        updates.
 
-    *   added_in_last_update => *true*
+    *   added_since => *date*
 
-        Include only records that are added during the last index update.
+        Include only records that are added since a certain date.
+
+    *   added_since_last_index_update => *true*
+
+        Include only records that are added since the last index update.
+
+    *   added_since_last_n_index_updates => *posint*
+
+        Include only records that are added since the last N index updates.
 
     *   cpan => *dirname*
 
@@ -251,7 +242,7 @@ FUNCTIONS
 
         Recurse for a number of levels (-1 means unlimited).
 
-    *   perl_version => *str* (default: "v5.30.0")
+    *   perl_version => *str* (default: "v5.30.2")
 
         Set base Perl version for determining core modules.
 
@@ -259,22 +250,18 @@ FUNCTIONS
 
     *   rel => *str* (default: "requires")
 
-    *   updated_after => *date*
+    *   updated_since => *date*
 
-        Include only records that are updated after a certain date.
+        Include only records that are updated since certain date.
 
-    *   updated_before => *date*
+    *   updated_since_last_index_update => *true*
 
-        Include only records that are updated before a certain date.
+        Include only records that are updated since the last index update.
 
-    *   updated_in_last_n_updates => *posint*
+    *   updated_since_last_n_index_updates => *posint*
 
-        Include only records that are updated during the last N index
+        Include only records that are updated since the last N index
         updates.
-
-    *   updated_in_last_update => *true*
-
-        Include only records that are updated during the last index update.
 
     *   use_bootstrap => *bool* (default: 1)
 
@@ -323,21 +310,31 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   added_after => *date*
+    *   added_or_updated_since => *date*
 
-        Include only records that are added after a certain date.
+        Include only records that are added/updated since a certain date.
 
-    *   added_before => *date*
+    *   added_or_updated_since_last_index_update => *true*
 
-        Include only records that are added before a certain date.
+        Include only records that are added/updated since the last index
+        update.
 
-    *   added_in_last_n_updates => *posint*
+    *   added_or_updated_since_last_n_index_updates => *posint*
 
-        Include only records that are added during the last N index updates.
+        Include only records that are added/updated since the last N index
+        updates.
 
-    *   added_in_last_update => *true*
+    *   added_since => *date*
 
-        Include only records that are added during the last index update.
+        Include only records that are added since a certain date.
+
+    *   added_since_last_index_update => *true*
+
+        Include only records that are added since the last index update.
+
+    *   added_since_last_n_index_updates => *posint*
+
+        Include only records that are added since the last N index updates.
 
     *   author => *str*
 
@@ -388,22 +385,18 @@ FUNCTIONS
 
         Sort the result.
 
-    *   updated_after => *date*
+    *   updated_since => *date*
 
-        Include only records that are updated after a certain date.
+        Include only records that are updated since certain date.
 
-    *   updated_before => *date*
+    *   updated_since_last_index_update => *true*
 
-        Include only records that are updated before a certain date.
+        Include only records that are updated since the last index update.
 
-    *   updated_in_last_n_updates => *posint*
+    *   updated_since_last_n_index_updates => *posint*
 
-        Include only records that are updated during the last N index
+        Include only records that are updated since the last N index
         updates.
-
-    *   updated_in_last_update => *true*
-
-        Include only records that are updated during the last index update.
 
     *   use_bootstrap => *bool* (default: 1)
 
@@ -481,21 +474,31 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   added_after => *date*
+    *   added_or_updated_since => *date*
 
-        Include only records that are added after a certain date.
+        Include only records that are added/updated since a certain date.
 
-    *   added_before => *date*
+    *   added_or_updated_since_last_index_update => *true*
 
-        Include only records that are added before a certain date.
+        Include only records that are added/updated since the last index
+        update.
 
-    *   added_in_last_n_updates => *posint*
+    *   added_or_updated_since_last_n_index_updates => *posint*
 
-        Include only records that are added during the last N index updates.
+        Include only records that are added/updated since the last N index
+        updates.
 
-    *   added_in_last_update => *true*
+    *   added_since => *date*
 
-        Include only records that are added during the last index update.
+        Include only records that are added since a certain date.
+
+    *   added_since_last_index_update => *true*
+
+        Include only records that are added since the last index update.
+
+    *   added_since_last_n_index_updates => *posint*
+
+        Include only records that are added since the last N index updates.
 
     *   author => *str*
 
@@ -540,7 +543,7 @@ FUNCTIONS
 
         When there are more than one query, perform OR instead of AND logic.
 
-    *   perl_version => *str* (default: "v5.30.0")
+    *   perl_version => *str* (default: "v5.30.2")
 
         Set base Perl version for determining core modules.
 
@@ -554,22 +557,18 @@ FUNCTIONS
 
         Sort the result.
 
-    *   updated_after => *date*
+    *   updated_since => *date*
 
-        Include only records that are updated after a certain date.
+        Include only records that are updated since certain date.
 
-    *   updated_before => *date*
+    *   updated_since_last_index_update => *true*
 
-        Include only records that are updated before a certain date.
+        Include only records that are updated since the last index update.
 
-    *   updated_in_last_n_updates => *posint*
+    *   updated_since_last_n_index_updates => *posint*
 
-        Include only records that are updated during the last N index
+        Include only records that are updated since the last N index
         updates.
-
-    *   updated_in_last_update => *true*
-
-        Include only records that are updated during the last index update.
 
     *   use_bootstrap => *bool* (default: 1)
 
@@ -603,21 +602,31 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   added_after => *date*
+    *   added_or_updated_since => *date*
 
-        Include only records that are added after a certain date.
+        Include only records that are added/updated since a certain date.
 
-    *   added_before => *date*
+    *   added_or_updated_since_last_index_update => *true*
 
-        Include only records that are added before a certain date.
+        Include only records that are added/updated since the last index
+        update.
 
-    *   added_in_last_n_updates => *posint*
+    *   added_or_updated_since_last_n_index_updates => *posint*
 
-        Include only records that are added during the last N index updates.
+        Include only records that are added/updated since the last N index
+        updates.
 
-    *   added_in_last_update => *true*
+    *   added_since => *date*
 
-        Include only records that are added during the last index update.
+        Include only records that are added since a certain date.
+
+    *   added_since_last_index_update => *true*
+
+        Include only records that are added since the last index update.
+
+    *   added_since_last_n_index_updates => *posint*
+
+        Include only records that are added since the last N index updates.
 
     *   cpan => *dirname*
 
@@ -654,22 +663,18 @@ FUNCTIONS
 
     *   to_level => *int*
 
-    *   updated_after => *date*
+    *   updated_since => *date*
 
-        Include only records that are updated after a certain date.
+        Include only records that are updated since certain date.
 
-    *   updated_before => *date*
+    *   updated_since_last_index_update => *true*
 
-        Include only records that are updated before a certain date.
+        Include only records that are updated since the last index update.
 
-    *   updated_in_last_n_updates => *posint*
+    *   updated_since_last_n_index_updates => *posint*
 
-        Include only records that are updated during the last N index
+        Include only records that are updated since the last N index
         updates.
-
-    *   updated_in_last_update => *true*
-
-        Include only records that are updated during the last index update.
 
     *   use_bootstrap => *bool* (default: 1)
 
@@ -700,21 +705,31 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   added_after => *date*
+    *   added_or_updated_since => *date*
 
-        Include only records that are added after a certain date.
+        Include only records that are added/updated since a certain date.
 
-    *   added_before => *date*
+    *   added_or_updated_since_last_index_update => *true*
 
-        Include only records that are added before a certain date.
+        Include only records that are added/updated since the last index
+        update.
 
-    *   added_in_last_n_updates => *posint*
+    *   added_or_updated_since_last_n_index_updates => *posint*
 
-        Include only records that are added during the last N index updates.
+        Include only records that are added/updated since the last N index
+        updates.
 
-    *   added_in_last_update => *true*
+    *   added_since => *date*
 
-        Include only records that are added during the last index update.
+        Include only records that are added since a certain date.
+
+    *   added_since_last_index_update => *true*
+
+        Include only records that are added since the last index update.
+
+    *   added_since_last_n_index_updates => *posint*
+
+        Include only records that are added since the last N index updates.
 
     *   author => *str*
 
@@ -759,7 +774,7 @@ FUNCTIONS
 
         When there are more than one query, perform OR instead of AND logic.
 
-    *   perl_version => *str* (default: "v5.30.0")
+    *   perl_version => *str* (default: "v5.30.2")
 
         Set base Perl version for determining core modules.
 
@@ -773,22 +788,18 @@ FUNCTIONS
 
         Sort the result.
 
-    *   updated_after => *date*
+    *   updated_since => *date*
 
-        Include only records that are updated after a certain date.
+        Include only records that are updated since certain date.
 
-    *   updated_before => *date*
+    *   updated_since_last_index_update => *true*
 
-        Include only records that are updated before a certain date.
+        Include only records that are updated since the last index update.
 
-    *   updated_in_last_n_updates => *posint*
+    *   updated_since_last_n_index_updates => *posint*
 
-        Include only records that are updated during the last N index
+        Include only records that are updated since the last N index
         updates.
-
-    *   updated_in_last_update => *true*
-
-        Include only records that are updated during the last index update.
 
     *   use_bootstrap => *bool* (default: 1)
 
@@ -822,21 +833,31 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   added_after => *date*
+    *   added_or_updated_since => *date*
 
-        Include only records that are added after a certain date.
+        Include only records that are added/updated since a certain date.
 
-    *   added_before => *date*
+    *   added_or_updated_since_last_index_update => *true*
 
-        Include only records that are added before a certain date.
+        Include only records that are added/updated since the last index
+        update.
 
-    *   added_in_last_n_updates => *posint*
+    *   added_or_updated_since_last_n_index_updates => *posint*
 
-        Include only records that are added during the last N index updates.
+        Include only records that are added/updated since the last N index
+        updates.
 
-    *   added_in_last_update => *true*
+    *   added_since => *date*
 
-        Include only records that are added during the last index update.
+        Include only records that are added since a certain date.
+
+    *   added_since_last_index_update => *true*
+
+        Include only records that are added since the last index update.
+
+    *   added_since_last_n_index_updates => *posint*
+
+        Include only records that are added since the last N index updates.
 
     *   authors => *array[str]*
 
@@ -887,22 +908,18 @@ FUNCTIONS
 
     *   rel => *str* (default: "ALL")
 
-    *   updated_after => *date*
+    *   updated_since => *date*
 
-        Include only records that are updated after a certain date.
+        Include only records that are updated since certain date.
 
-    *   updated_before => *date*
+    *   updated_since_last_index_update => *true*
 
-        Include only records that are updated before a certain date.
+        Include only records that are updated since the last index update.
 
-    *   updated_in_last_n_updates => *posint*
+    *   updated_since_last_n_index_updates => *posint*
 
-        Include only records that are updated during the last N index
+        Include only records that are updated since the last N index
         updates.
-
-    *   updated_in_last_update => *true*
-
-        Include only records that are updated during the last index update.
 
     *   use_bootstrap => *bool* (default: 1)
 
@@ -941,21 +958,31 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   added_after => *date*
+    *   added_or_updated_since => *date*
 
-        Include only records that are added after a certain date.
+        Include only records that are added/updated since a certain date.
 
-    *   added_before => *date*
+    *   added_or_updated_since_last_index_update => *true*
 
-        Include only records that are added before a certain date.
+        Include only records that are added/updated since the last index
+        update.
 
-    *   added_in_last_n_updates => *posint*
+    *   added_or_updated_since_last_n_index_updates => *posint*
 
-        Include only records that are added during the last N index updates.
+        Include only records that are added/updated since the last N index
+        updates.
 
-    *   added_in_last_update => *true*
+    *   added_since => *date*
 
-        Include only records that are added during the last index update.
+        Include only records that are added since a certain date.
+
+    *   added_since_last_index_update => *true*
+
+        Include only records that are added since the last index update.
+
+    *   added_since_last_n_index_updates => *posint*
+
+        Include only records that are added since the last N index updates.
 
     *   author => *str*
 
@@ -1004,22 +1031,18 @@ FUNCTIONS
 
     *   sort => *array[str]* (default: ["name"])
 
-    *   updated_after => *date*
+    *   updated_since => *date*
 
-        Include only records that are updated after a certain date.
+        Include only records that are updated since certain date.
 
-    *   updated_before => *date*
+    *   updated_since_last_index_update => *true*
 
-        Include only records that are updated before a certain date.
+        Include only records that are updated since the last index update.
 
-    *   updated_in_last_n_updates => *posint*
+    *   updated_since_last_n_index_updates => *posint*
 
-        Include only records that are updated during the last N index
+        Include only records that are updated since the last N index
         updates.
-
-    *   updated_in_last_update => *true*
-
-        Include only records that are updated during the last index update.
 
     *   use_bootstrap => *bool* (default: 1)
 

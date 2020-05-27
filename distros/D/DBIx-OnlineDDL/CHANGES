@@ -1,22 +1,69 @@
-DBIx-OnlineDDL
-==============
+Changelog for DBIx-OnlineDDL
 
-Created:         2018-09-27
-Home page:       <https://metacpan.org/release/DBIx-OnlineDDL>
-Bug tracker:     <https://github.com/GrantStreetGroup/DBIx-OnlineDDL/issues>
-Maintainer:      Grant Street Group <developers@grantstreet.com>
+v0.920.1 2020-05-14T19:11:02
+ - Clean up cpanfile (Andrew Hewus Fresh)
+ - Clean up POD for new PodWeaver settings (Andrew Hewus Fresh)
+ - Move xt tests where they belong (Andrew Hewus Fresh)
+ - Convert to Dist::Zilla::PluginBundle::Author::GSG (Andrew Hewus Fresh)
 
-0.92        2019-08-06
+0.92 2019-08-08T15:14:41
+ - Fix year in CHANGES (Brendan Byrd)
+ - Version changes to 0.92 (Brendan Byrd)
+ - Fix copyright years (Brendan Byrd)
+ - Update version date in CHANGES (Brendan Byrd)
+ - SM-1858 Fix typos in pod. (Tom Christiansen)
+ - SM-1858: Use MooX::StrictConstructor to prevent attribute misspellings
+   (Brendan Byrd)
 
-    - Use MooX::StrictConstructor to prevent attribute misspellings
+v0.920.0 2019-08-08T15:14:41
+ - No changes found
 
-0.91        2018-01-02
+0.91 2019-01-29T20:08:03
+ - POD version fixes to 0.91 (Brendan Byrd)
+ - SM-1647a: Quiet the "multi-column primary key" warning for all_tables.t
+   (Brendan Byrd)
+ - SM-1647a: Fix FK renaming inconsistency in SQLite >= 3.26.0 (Brendan
+   Byrd)
+ - SM-1647a: Bump List::Utils version to 1.44 (Brendan Byrd)
+ - SM-1647 Add clarifying comments (Nathaniel Blake)
+ - SM-1647: Prep for new version 0.91 (Brendan Byrd)
+ - SM-1647: Bulletproof the statistics_info call (Brendan Byrd)
+ - SM-1647: More bulletproofing against DB errors (Brendan Byrd)
+ - SM-1647: Add 'WSREP has not yet prepared node' as a retryable error
+   (Brendan Byrd)
+ - SM-1647: Add more sleep time to retries in the retry handler (Brendan
+   Byrd)
+ - SM-1647: Add default target_time and sleep for copy_opts (Brendan Byrd)
+ - SM-1647: Remove .perl-version (Brendan Byrd)
 
-    - Include default target_time / sleep for copy_opts
-    - Increase sleep time for retries (incremental)
-    - Include 'WSREP has not yet prepared node for application use' as a retryable error
-    - Bulletproof against various DB errors and DBD failures
-
-0.90        2018-09-27
-
-    - Initial release
+0.90 2018-09-27T15:37:59
+ - CHANGES date adjustment (Brendan Byrd)
+ - SM-1394: Makefile.PL cleanup (Brendan Byrd)
+ - SM-1394: Use dbh_runner_do in basic example script (Brendan Byrd)
+ - SM-1394: Apply on_connect_call changes to the right attributes (Brendan
+   Byrd)
+ - SM-1394: Create Test::OnlineDDL module (Brendan Byrd)
+ - SM-1394: Account for self-referenced FKs by ignoring them in child FK
+   renaming operations (Brendan Byrd)
+ - SM-1394: Fix MySQL FK renames to actually look for more than one FK on a
+   table (Brendan Byrd)
+ - SM-1394: Add tests for other tables (Brendan Byrd)
+ - SM-1394: Add cd.prev_cdid column in CDTest as a self-reference FK
+   (Brendan Byrd)
+ - SM-1394: README and xt changes (Brendan Byrd)
+ - SM-1394: Migrate RDBMS-specific code to their own Helper modules
+   (Brendan Byrd)
+ - SM-1394: Convert package globals to db_timeouts attribute (Brendan Byrd)
+ - SM-1394: Privatize $DEFAULT_MAX_ATTEMPTS (Brendan Byrd)
+ - SM-1394 Abstract magic numbers, standardize conventions, doc updates
+   (Paul "ptom" Tomlinson)
+ - Prep for CPAN release (Brendan Byrd)
+ - Rename undo_stack attribute to reversible (Brendan Byrd)
+ - Add dbh_runner_do (Brendan Byrd)
+ - Remove prework step and migrate post-connection details into
+   storage/connector (Brendan Byrd)
+ - Fix unit tests to work with retry protection changes (Brendan Byrd)
+ - Add retry protection to DBIx::OnlineDDL (Brendan Byrd)
+ - Skeleton framework (Brendan Byrd)
+ - Add examples/basic.pl (Brendan Byrd)
+ - Initial version of DBIx::OnlineDDL (Brendan Byrd)

@@ -1,19 +1,22 @@
-Revision history for WordList-EN-Enable
+0.040   2020-05-22  Released-By: PERLANCAR; Urgency: medium
 
-0.03    2016-01-13 (PERLANCAR)
+	- Use random-seek pick().
+
+
+0.03    2016-01-13  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to add statistics.
 
 
-0.02    2016-01-12 (PERLANCAR)
+0.02    2016-01-12  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild: add Synopsis.
 
 
-0.01    2016-01-08 (PERLANCAR)
+0.01    2016-01-08  Released-By: PERLANCAR
 
         - First release.

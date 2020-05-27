@@ -1,0 +1,175 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Role::Declare - declarative parameter and return type checking
+
+
+=head1 SYNOPSIS
+
+In the interface Role:
+
+    package My::Class::interface;
+
+    use Role::Declare;
+    use Types::Standard qw/:all/;
+
+    class_method create_object ( Str $name, Int $age ) : Returns( InstanceOf['My::Class'] ) {
+        die "Age cannot be negative: $age" if $age < 0;
+    };
+
+In the interface implementation:
+
+    package My::Class;
+    use Role::Declare::StrictWith;
+
+    with_strict 'My::Class::interface';
+
+    sub create_object { ...  }
+
+or:
+
+    package My::Class;
+    use Role::Tiny::With;
+
+    with 'My::Class::interface';
+
+    sub create_object { ...  }
+
+=head1 DESCRIPTION
+
+Perl doesn't provide a way to describe an interface,
+much less validate its implementation. This module aims to fill that gap
+by providing an easy way to build a validation layer with subroutine
+attributes and L<Function::Parameters> syntax.
+
+=head2 How it works
+
+Any package which uses L<Role::Declare> becomes a role and receives a few
+keywords and attributes that generate method modifiers. This means any
+class which composes it will need to implement the listed methods (this
+will be enforced on composition). Method implementations will be affected
+by L<Class::MethodModifiers> modifiers, which provide argument and return
+value type checking, as well as arbitrary assertions defined in the interface.
+
+Having that validation layer on at all times introduces a performance penalty.
+It makes sense to keep it on during development and testing to catch bugs
+and remove it in production. L<Role::Declare::StrictWith> provides a specialized
+version of L<Role::Tiny>'s C<with> function, which works only in test environments
+as defined by L<Devel::StrictMode>.
+
+=head1 EXPORTS
+
+The following are exported into the callers namespace:
+
+=head2 method
+
+    method $method ( $Type $foo, $Type $bar ) { ... }
+
+A method declaration following the syntax of L<Function::Parameters>
+- a list of parameters that can have type constraints,
+like those from L<Type::Tiny>. C<$self> will be automatically provided.
+
+The body can contain any checks that need to be done on the arguments
+B<before> the method is executed, it will not overwrite the method itself.
+
+=head2 class_method
+
+    class_method $method ( $Type $foo, $Type $bar ) { ... }
+
+Like L<method>, but instead of C<$self> generates a C<$class> variable,
+which must be of the type C<ClassName>, from L<Types::Standard>.
+
+=head2 instance_method
+
+    instance_method $method ( $Type $foo, $Type $bar ) { ... }
+
+Like L<method>, but requries C<$self> to be an C<Object> from L<Types::Standard>.
+
+=head2 :Return
+
+This attribute can be used along with L<method>, L<instance_method> or L<class_method>
+to add return value validation in scalar context (see L<:ReturnList> for list context).
+It takes a single L<Type::Tiny> constraint as an argument.
+
+    class_method $method ( $Type $foo, $Type $bar ) : Return( $Type ) { ... }
+
+=head2 :ReturnMaybe
+
+Same as L<:Return> but allows C<undef>.
+
+=head2 :ReturnList
+
+Similar to L<:Returns> but gets triggered by list context returns.
+It's arguments are the same as for L<ArrayRef> constraint from L<Type::Tiny>.
+
+    class_method $method ( $Type $foo, $Type $bar ) : ReturnList( $Type ) { ... }
+
+=head2 :ReturnMaybeList
+
+Same as L<:ReturnList> but will always allow an empty list.
+
+=head2 :ReturnSelf
+
+Require the method to return its invocant.
+
+=head2 :ReturnMaybeSelf
+
+Same as L<:ReturnSelf> but allow C<undef>.
+
+=head2 :ReturnObject
+
+Shorthand for C<:Returns(Object)>.
+
+=head2 :ReturnMaybeObject
+
+Same as L<:ReturnObject> but allows C<undef>.
+
+=head2 :ReturnInstanceOf
+
+Require the method to return an instance of the specified class.
+C<:ReturnsInstanceOf($class)> is equivalent to C<:Returns(InstanceOf[$class])>.
+
+=head2 :ReturnMaybeInstanceOf
+
+Same as L<:ReturnInstanceOf> but allows C<undef>.
+
+=head1 DIAGNOSTICS
+
+=head2 A [list|scalar] hook for $method already exists
+
+For each method at most two return validations can be set up - one for list
+and one for scalar context. This means, you can specify both C<:Returns(...)>
+and C<:ReturnsList(...)> for a method but you can't use
+C<:ReturnsMaybeList> and C<:ReturnsList> at the same time.
+
+=head2 Only a single constraint is supported
+
+A C<:Return> attribute should have a single argument - a L<Types::Standard>
+constraint. If you want to test a method for multiple different types,
+see L<Type::Tiny::Union>.
+
+=head2 List constraint not defined
+
+A C<:ReturnList> or C<:ReturnMaybeList> was used without arguments,
+see C<ArrayRef> in L<Types::Standard> for supported arguments.
+
+=head1 AUTHOR
+
+Szymon Nieznański <snieznanski@perceptyx.com>
+
+=head1 LICENSE
+
+'Role::Declare' is Copyright (C) 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This package is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
+
+=cut

@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::mods_by_mention_count;
 
-our $DATE = '2020-05-07'; # DATE
-our $VERSION = '1.057'; # VERSION
+our $DATE = '2020-05-26'; # DATE
+our $VERSION = '1.058'; # VERSION
 
 use 5.010;
 use strict;
@@ -43,6 +43,10 @@ _
             schema => ['str*', in=>['content', 'dist', 'author']],
             default => 'content',
         },
+        n => {
+            summary => 'Return at most this number of results',
+            schema => 'posint*',
+        },
     },
 };
 sub handle_cmd {
@@ -77,7 +81,7 @@ LEFT JOIN file targetfile ON module.file_id=targetfile.id
 WHERE ".join(" AND ", @where)."
 GROUP BY module.name
 ORDER BY mention_count DESC
-";
+".($args{n} ? "LIMIT ".(0+$args{n}) : "");
 
     my @res;
     my $sth = $dbh->prepare($sql);
@@ -105,7 +109,7 @@ App::lcpan::Cmd::mods_by_mention_count - List modules ranked by number of mentio
 
 =head1 VERSION
 
-This document describes version 1.057 of App::lcpan::Cmd::mods_by_mention_count (from Perl distribution App-lcpan), released on 2020-05-07.
+This document describes version 1.058 of App::lcpan::Cmd::mods_by_mention_count (from Perl distribution App-lcpan), released on 2020-05-26.
 
 =head1 FUNCTIONS
 
@@ -158,6 +162,10 @@ If C<index_name> is a filename without any path, e.g. C<index.db> then index wil
 be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
 C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
 using the C<index_name>.
+
+=item * B<n> => I<posint>
+
+Return at most this number of results.
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 

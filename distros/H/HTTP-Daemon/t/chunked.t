@@ -7,7 +7,7 @@ use Test::More;
 
 # use Time::HiRes qw(sleep);
 our $CRLF;
-use Socket qw($CRLF);
+use Socket qw($CRLF AF_INET AF_INET6);
 
 our $LOGGING = 0;
 
@@ -101,23 +101,19 @@ my $can_fork
 my $tests = @TESTS;
 my $tport = 8334;
 
-my @addresses = (
-    {server => '::',      client => '::1'},
-    {server => '0.0.0.0', client => '127.0.0.1'}
+my %addresses = (
+    AF_INET6() => {server => '::',      client => '::1'},
+    AF_INET()  => {server => '0.0.0.0', client => '127.0.0.1'}
 );
 my $family;
-for my $id (0 .. $#addresses) {
-    my $tsock = IO::Socket::IP->new(
-        LocalAddr => $addresses[$id]->{server},
-        LocalPort => $tport,
-        Listen    => 1,
-        ReuseAddr => 1
-    );
-    if ($tsock) {
-        close $tsock;
-        $family = $id;
-        last;
-    }
+my $tsock = IO::Socket::IP->new(
+    LocalPort => $tport,
+    Listen    => 1,
+    ReuseAddr => 1
+);
+if ($tsock) {
+    $family = $tsock->sockdomain;
+    close $tsock;
 }
 
 if (!$can_fork) {
@@ -153,7 +149,7 @@ if ($pid = fork) {
         }
         use IO::Socket::IP;
         my $sock = IO::Socket::IP->new(
-            PeerAddr => $addresses[$family]->{client},
+            PeerAddr => $addresses{$family}->{client},
             PeerPort => $tport,
         ) or die;
         if (0) {
@@ -176,7 +172,7 @@ if ($pid = fork) {
 else {
     die "cannot fork: $!" unless defined $pid;
     my $d = HTTP::Daemon->new(
-        LocalAddr => $addresses[$family]->{server},
+        LocalAddr => $addresses{$family}->{server},
         LocalPort => $tport,
         ReuseAddr => 1,
     ) or die;

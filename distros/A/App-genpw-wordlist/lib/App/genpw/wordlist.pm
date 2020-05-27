@@ -1,10 +1,12 @@
 package App::genpw::wordlist;
 
-our $DATE = '2020-05-18'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-22'; # DATE
+our $DIST = 'App-genpw-wordlist'; # DIST
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
-use strict;
+use strict 'subs', 'vars';
 use warnings;
 
 use App::genpw ();
@@ -58,17 +60,36 @@ sub genpw {
     my $wordlists = delete($args{wordlists}) // ['EN::Enable'];
     my $patterns = delete($args{patterns}) // $default_patterns;
 
-    my $res = App::wordlist::wordlist(
-        (wordlists => $wordlists) x !!defined($wordlists),
-    );
-    return $res unless $res->[0] == 200;
+    my ($words, $wl);
+    unless ($args{action} && $args{action} eq 'list-patterns') {
+        # optimize: when there is only one wordlist, pass wordlist object to
+        # App::wordlist so it can use pick() which can be more efficient than
+        # getting all the words first
+        if (@$wordlists == 1) {
+            my $mod = "WordList::$wordlists->[0]";
+            (my $modpm = "$mod.pm") =~ s!::!/!g;
+            require $modpm;
+            if (!${"$mod\::DYNAMIC"}) {
+                $wl = $mod->new;
+                goto GENPW;
+            }
+        }
 
-    my @words; while (defined(my $word = $res->[2]->())) { push @words, $word }
-    @words = shuffle @words;
+        my $res = App::wordlist::wordlist(
+            (wordlists => $wordlists) x !!defined($wordlists),
+            random => 1,
+        );
+
+        return $res unless $res->[0] == 200;
+        $words = $res->[2];
+    }
+
+  GENPW:
     App::genpw::genpw(
         %args,
         patterns => $patterns,
-        _words => \@words,
+        ($words ? (_words => $words) : ()),
+        ($wl    ? (_wl    => $wl   ) : ()),
     );
 }
 
@@ -87,7 +108,7 @@ App::genpw::wordlist - Generate password with words from WordList::*
 
 =head1 VERSION
 
-This document describes version 0.005 of App::genpw::wordlist (from Perl distribution App-genpw-wordlist), released on 2020-05-18.
+This document describes version 0.009 of App::genpw::wordlist (from Perl distribution App-genpw-wordlist), released on 2020-05-22.
 
 =head1 SYNOPSIS
 
@@ -121,6 +142,8 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<action> => I<str> (default: "gen")
 
 =item * B<case> => I<str> (default: "default")
 
@@ -178,7 +201,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-genpw-
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-App-Genpass-WordList>.
+Source repository is at L<https://github.com/perlancar/perl-App-genpw-wordlist>.
 
 =head1 BUGS
 

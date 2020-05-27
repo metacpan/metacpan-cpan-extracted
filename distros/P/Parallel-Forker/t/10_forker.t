@@ -79,6 +79,7 @@ sub test_poll {
     sub slow_sleep { sleep 7 }
     sub finish_func { push @done, $_[0]{name} }
 
+    $fork->poll_interval(10*1000);
     $fork->max_proc(3);
     $fork->schedule(
 		    name => 'p1',

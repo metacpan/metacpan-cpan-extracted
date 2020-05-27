@@ -1,6 +1,11 @@
 Changelog for HealthCheck-Diagnostic-SMTP
 
-v0.0.3 2020-05-12T16:07:02
+v0.0.4 2020-05-14T18:22:20
+ - Update README (Andrew Hewus Fresh)
+ - Force stringifiation of exception (Andrew Hewus Fresh)
+ - Don't localize $@ on perl versions that is broken (Andrew Hewus Fresh)
+
+v0.0.3 2020-05-12T15:19:16
  - No changes found
 
 v0.0.2 2020-05-12T15:19:16

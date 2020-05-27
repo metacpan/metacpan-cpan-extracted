@@ -1,6 +1,8 @@
 use 5.010;
 use alienfile;
 use Sort::Versions;
+use Path::Tiny qw /path/;
+use File::Which qw /which/;
 
 my $on_windows = $^O =~ /mswin/i;
 my $on_automated_rig
@@ -8,43 +10,39 @@ my $on_automated_rig
   || $ENV{PERL_CPAN_REPORTER_CONFIG}
   || $ENV{AUTOMATED_TESTING}
   || $ENV{TRAVIS}
-  || $ENV{APPVEYOR};
-  #|| $ENV{CI};
+  || $ENV{APPVEYOR}
+  || $ENV{CI};
 
 
 use Cwd;
 my $base_dir = getcwd();
 
-use Env qw( @PATH );
+use Env qw( @PATH @PKG_CONFIG_PATH );
 
 use Alien::sqlite;
 unshift @PATH, Alien::sqlite->bin_dir;
 my @dep_aliens = ('Alien::sqlite');
-my $have_alien_curl = eval 'require Alien::curl';
-if ($have_alien_curl) {
-  unshift @PATH, 'Alien::curl'->bin_dir;
-  push @dep_aliens, 'Alien::curl';
+my %have;
+my $lib = 'Alien::curl';
+$have{$lib} = eval "require $lib";
+if ($have{$lib}) {
+    unshift @PATH, $lib->dist_dir . '/dynamic';
 }
-#  does not exist at the time of writing
-my $have_alien_tiff = eval 'require Alien::libtiff';
-if ($have_alien_tiff) {
-  unshift @PATH, 'Alien::tiff'->bin_dir;
-  push @dep_aliens, 'Alien::tiff';
+$lib = 'Alien::libtiff';
+$have{$lib} = eval "require $lib";
+if ($have{$lib}) {
+    #say 'Adding libtiff dependency';
+    unshift @PATH, $lib->bin_dir;
+    push @dep_aliens, $lib;
+    if ($on_windows) { # && $lib->install_type eq 'system') {
+      #  dirty hack for strawberry perl
+      my $p = path ($^X)->parent->parent->parent . '/c/lib/pkgconfig';
+      if (-e $p) {
+        push @PKG_CONFIG_PATH, $p;
+      }
+    }
 }
-#do {
-#  #  limit scope
-#  #use Env qw / @PKG_CONFIG_PATH /;
-#  if (Alien::sqlite->install_type eq 'share') {
-#    #unshift @PKG_CONFIG_PATH,
-#    $ENV{PKG_CONFIG_PATH} .= 
-#      ':' . Alien::sqlite->dist_dir . '/lib/pkgconfig';
-#    $ENV{PKG_CONFIG_PATH} =~ s/^://;
-#  }
-#};
-#  we should just add path to $ENV{PKG_CONFIG_PATH}
-#  but are hitting sep char issues
-$ENV{SQLITE3_CFLAGS} = Alien::sqlite->cflags;
-$ENV{SQLITE3_LIBS} = Alien::sqlite->libs;
+
 say "Alien::sqlite has sqlite version " . Alien::sqlite->version;
 
 plugin 'Build::SearchDep' => (
@@ -53,15 +51,25 @@ plugin 'Build::SearchDep' => (
   public_l => 1,
 );
 
-my $min_target_version = '4.9.0';
+my $min_target_version = '6.1';
 
 plugin 'PkgConfig' => (
     pkg_name => 'proj',
     minimum_version => $min_target_version,
 );
+#plugin 'Probe::CommandLine' => (
+#  command  => 'projinfo',
+#  secondary => 1,  #  secondary to pkgconf probe
+#);
 
 
 share {
+
+  #  see if this helps with cirrus bsd builds
+  $ENV{SQLITE3_CFLAGS} = Alien::sqlite->cflags;
+  $ENV{SQLITE3_LIBS} = Alien::sqlite->libs;
+  say "sqlite cflags: " . Alien::sqlite->cflags;
+  say "sqlite libs: " . Alien::sqlite->libs; 
 
   my $with_local = '';
   my $with_cpp11 = '';
@@ -87,16 +95,13 @@ share {
   $build_static = '' if $ENV{FORCE_DYNAMIC};
   
   
-  if ($^O =~ /bsd/) {
+  if ($^O =~ /bsd|dragonfly/) {
     plugin 'Build::Make' => 'gmake';
-    if (-d '/usr/local') {
-        $with_local = ' --with-local=/usr/local ';
+    if (!-e '/usr/local/include/sqlite3.h' && Alien::sqlite->install_type eq 'system') {
+      warn '/usr/local/include/sqlite3.h does not exist, '
+         . 'you might need to install the sqlite package for your system, '
+         . 'or install a share version of Alien::sqlite';
     }
-  }
-  elsif ($^O =~ /dragonfly/) {
-    #  might need to be combined with bsd check above
-    #  but not sure if /usr/local is needed yet
-    plugin 'Build::Make' => 'gmake';
   }
 
   my $make_cmd = '%{make}';
@@ -127,20 +132,50 @@ share {
   
   my $config_args = $ENV{ALIEN_PROJ_CONFIG_ARGS} // '';
   $config_args =~ s/[^-\s\w,=]//g;  #  overkill?
-  my $with_tiff = '';
-  if (!$have_alien_tiff && $proj_version ge 7) {
-    $with_tiff = '--disable-tiff';
-  }
-  my $with_curl = '--without-curl';  #  until Alien::libcurl provides dynamic curl-config
-  if (!$have_alien_curl && $proj_version ge 7) {
-    $with_curl = '--without-curl';  #  until Alien::libcurl provides dynamic curl-config
+  my $with_tiff = '';  #  only needed for proj 7+
+  my $with_curl = '';  #  only needed for proj 7+
+  if ($proj_version ge 7) {
+    if (!$have{'Alien::libtiff'}) {
+      $with_tiff = '--disable-tiff';  
+    }
+    else {
+      $with_tiff = '--enable-tiff';
+    }
+    if (!$have{'Alien::curl'}) {
+      $with_curl = '--without-curl';
+    }
+    else {
+      my $dynamic_config = path ('Alien::curl'->dist_dir . '/dynamic/curl-config');
+      if (-e $dynamic_config) {
+        say 'Adding curl support';
+        $with_curl = "--with-curl=$dynamic_config";
+      }
+      elsif ('Alien::curl'->install_type eq 'system') {
+        if ('Alien::curl'->cflags =~ /STATIC_LIB/) {
+          $with_curl = '--without-curl';
+          say 'Disabling curl support.  You have Alien::curl, but it lacks a dynamic curl-config.';
+        }
+        else {
+          say 'Adding curl support';
+          $with_curl = "--with-curl";
+        }
+      }
+      else {
+        say 'Disabling curl support.  You have Alien::curl, but it lacks a dynamic curl-config.';
+        #  until we depend on an Alien::libcurl that provides a dynamic curl-config
+        $with_curl = '--without-curl';  
+      }
+    }
   }
   $config_args = "$with_local $with_cpp11 $with_tiff $with_curl $build_static $config_args";
+
+  meta->around_hook( build => \&_pkgconf_wrapper );
+  meta->around_hook( build => \&remove_gitfw_from_path );
   
   build [
-    \&update_pkg_conf_path,
+    #\&pause,
+    #\&update_pkg_conf_path,
     "%{configure} $config_args",
-    \&pause,
     $make_cmd,
     $make_inst_cmd,
     #@make_clean,
@@ -154,13 +189,102 @@ share {
 #];
 #
 
+
+#  git for windows clashes with MSYS
+#  if its /usr/bin dir is in the path
+sub remove_gitfw_from_path {
+  my ($orig, $build, @args) = @_;
+
+  return $orig->($build, @args)
+    if !$on_windows;
+
+  local $ENV{PATH} = $ENV{PATH};
+
+  my $msys_path = eval {
+    path('Alien::MSYS'->msys_path())
+  };
+  return if !defined $msys_path;
+  my $count = @PATH;
+
+  @PATH
+    = grep {path($_)->stringify =~ m|/usr/bin$| && path($_) ne $msys_path ? () : $_}
+      @PATH;
+
+  my $removed = $count - @PATH;
+  if ($removed) {
+    $build->log ("$removed additional .../usr/bin dirs were removed from the path for compilation");
+  }
+
+  $orig->($build, @args);
+}
+
+
+sub _pkgconf_wrapper {
+  my ($orig, $build, @args) = @_;
+
+  return $orig->($build, @args)
+    if !$on_windows;
+
+  my $pk = File::Which::which ($ENV{PKG_CONFIG})
+        || File::Which::which ('ppkg-config')
+        || File::Which::which ('pkg-config');
+
+  if (!defined $pk) {
+    $build->log ("Could not locate ppkg-config or pkg-config in your path:\n");
+    return $orig->($build, @args);
+  }
+
+  $pk =~ s/\.bat$//i;
+  if (!(-e $pk && -e "$pk.bat")) {
+    $build->log ("$pk unlikely to be pure perl");
+    return $orig->($build, @args);
+  }
+
+  my $perl = $^X;
+  $perl =~ s/\.exe$//i;
+  foreach my $path ($perl, $pk) {
+    $path =~ s{\\}{/}g;
+    $path =~ s{^([a-z]):/}{/$1/}i;
+    $path =~ s{\s}{\\ }g;
+  }
+  my $args = '$' . join ' $', (1..9);
+    
+  my $wrapper = <<"EOWRAPPER"
+#/bin/sh
+
+$perl $pk $args
+EOWRAPPER
+  ;
+  $build->log ("Pure perl pkg-config detected on windows.\n");
+  $build->log ("Wrapping $pk in shell script to cope with MSYS perl and paths.\n");
+  my $fname = Path::Tiny->new(File::Temp::tempdir( CLEANUP => 1 ))->child('pkg-config');
+  open my $fh, '>', $fname
+    or die "Unable to open pkg-config wrapper $fname, $!";
+  print {$fh} $wrapper;
+  close ($fh);
+  $build->log ("Setting \$ENV{PKG_CONFIG} to point to $fname\n");
+  
+  local $ENV{PKG_CONFIG} = $fname;
+  
+  return $orig->($build, @args);
+}
+
+
 sub update_pkg_conf_path {
+  return;
     return if !$on_windows;
+    #  should be a before or around hook
     use Env qw /@PKG_CONFIG_PATH/;
     say 'Modifying drive paths in PKG_CONFIG_PATH';
     say $ENV{PKG_CONFIG_PATH};
     #  msys-ificate drive paths
     @PKG_CONFIG_PATH = map {s{^([a-z]):}{/$1}ri} @PKG_CONFIG_PATH;
+    #  make sure we get the dynamic libcurl
+    #  (although the proj configure script does not currently use it)
+    @PKG_CONFIG_PATH
+      = map {s{Alien-curl[/\\]lib[/\\]pkgconfig}{Alien-curl/dynamic/pkgconfig}ri}
+        @PKG_CONFIG_PATH;
+    $ENV{PKG_CONFIG_PATH} = join ':', @PKG_CONFIG_PATH;
     say $ENV{PKG_CONFIG_PATH};
     return;
 }

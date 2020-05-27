@@ -1,5 +1,5 @@
-=pod
 =head1 NAME
+
 PINE64::MAX7219 driver for 8-digit 7-seg MAX7219 displays
 
 =head1 SYNOPSIS
@@ -51,6 +51,7 @@ SPI interface to the MAX7219 as arguments.  Returns an object to
 control an 8-digit display.  
 
 =head2 shift_in($leds, $digit, $n_cascaded, $delay, $latch_flag)
+
 This method is only used internally.  It takes an array of a single
 seven-segment's LEDs, the digit position, the number of cascaded
 MAX7219 displays, a delay in usec (between SPI clock pulses), and a
@@ -59,71 +60,85 @@ a time.  Once all the letters are shifted in, the latch_flag is set
 high, and displays the word.  
 
 =head2 load()
+
 This method is only used internally. It manipulates the chip select
 line, aka latch pin.  When called, it will render what has been
 shifted into the display. 
 
 =head2 print_sentence($sentence, $delay, $clear_flag)
+
 Perhaps the most useful method.  Takes a string, however long, and
 displays each word for $delay micro seconds.  $sentence could be the 
 text of an entire book.  $clear_flag is not required.  
 
 =head2 print_interleaved($string1, $string2)
+
 This method is for use with two 8-digit displays cascaded.  $string1
 will be displayed in the first display, $string2 in the cascaded
 display. 
 
 =head2 turn_on($num_cascaded)
+
 Turns on the MAX7219 chip by writing to the turn on register.  Takes
 the number of cascaded displays as an argument. Enter 1 if only 
 using one display. 
 
 =head2 set_scanlimit($num_cascaded)
+
 Writes to the scan-limit register.  Sets it up to use all 8-digits
 of the display.  Takes number of cascaded displays an arg. 
 
 =head2 set_intensity($intensity); 
+
 Adjusts the brightness of the display.  Takes a string as an arg.
 Valid vlaues are: min, dim, mid, bright, max.  
 
 =head2 all_off($num_cascaded)  
+
 Turns off all digits.  Takes number of cascaded displays as an arg. 
 
 =head2 disp_teston()
+
 Turns on all segments on all digits.  
 
 =head2 disp_testoff()
+
 Turns off all segments on all digits. 
 
 =head2 clockwise_circles($number_iterations)
+
 Clockwise circles effect. 
 
 =head2 countercq_circles($number_iterations)
+
 Counter clockwise circles effects
 
 =head2 bullets_lrtop($number_iterations)
+
 Knight-rider like bullets effect.  Top row of horizontal LEDs of each
 digit move from right to left. 
 
 =head2 bullets_rltop($number_iterations)
+
 Knight-rider like bullets effect.  Top row of horizontal LEDs of each
 digit move from left to right. 
 
 =head2 bullets_lrmid($number_iterations) 
+
 Knight-rider like bullets effect.  Mid row of horizontal LEDs of each
 digit move from left to right. 
 
 =head2 bullets_rlmid($number_iterations) 
+
 Knight-rider like bullets effect.  Mid row of horizontal LEDs of each
 digit move from right to left. 
 
 =head2 bullets_lrbot($number_iterations) 
+
 Knight-rider like bullets effect.  Bottom row of horizontal LEDs of 
 each digit move from left to right. 
 
 =head2 bullets_rlbot($number_iterations) 
+
 Knight-rider like bullets effect.  Bottom row of horizontal LEDs of 
 each digit move from right to left. 
-
-=cut
-

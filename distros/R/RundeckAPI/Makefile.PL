@@ -14,7 +14,7 @@ WriteMakefile (
 		'LWP::UserAgent'		=> 5.833,
 		'HTTP::Cookies'			=> 5.833,
 		'REST::Client'			=> 272,
-		'Scalar::List::Utils'	=> 1.27,
+		'Scalar::Util'			=> 1.27,
 		'JSON'					=> 2.15
 	},
 	TEST_REQUIRES => {

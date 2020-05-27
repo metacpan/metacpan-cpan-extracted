@@ -1,9 +1,9 @@
 package Sah::Schema::perl::modprefixes;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-08'; # DATE
+our $DATE = '2020-05-21'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.031'; # VERSION
+our $VERSION = '0.032'; # VERSION
 
 our $schema = [array => {
     summary => 'Perl module prefixes, e.g. ["", "Foo::", "Foo::Bar::"]',
@@ -51,7 +51,7 @@ Sah::Schema::perl::modprefixes - Perl module prefixes, e.g. ["", "Foo::", "Foo::
 
 =head1 VERSION
 
-This document describes version 0.031 of Sah::Schema::perl::modprefixes (from Perl distribution Sah-Schemas-Perl), released on 2020-05-08.
+This document describes version 0.032 of Sah::Schema::perl::modprefixes (from Perl distribution Sah-Schemas-Perl), released on 2020-05-21.
 
 =head1 SYNOPSIS
 

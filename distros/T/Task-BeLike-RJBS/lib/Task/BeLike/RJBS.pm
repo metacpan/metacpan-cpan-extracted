@@ -2,7 +2,7 @@ use 5.14.0;
 use warnings;
 package Task::BeLike::RJBS;
 # ABSTRACT: be more like RJBS -- use the modules he likes!
-$Task::BeLike::RJBS::VERSION = '20150423.001';
+$Task::BeLike::RJBS::VERSION = '20200521.000';
 
 1;
 
@@ -18,7 +18,7 @@ Task::BeLike::RJBS - be more like RJBS -- use the modules he likes!
 
 =head1 VERSION
 
-version 20150423.001
+version 20200521.000
 
 =head1 TASK CONTENTS
 
@@ -208,8 +208,6 @@ These are just here to make sure other things work properly.
 
 =head3 L<Mozilla::CA>
 
-=head3 L<Crypt::SSLeay>
-
 =head3 L<LWP::Protocol::https>
 
 =head3 L<IO::Socket::SSL>
@@ -222,7 +220,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Ricardo Signes.
+This software is copyright (c) 2020 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

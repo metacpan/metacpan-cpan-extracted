@@ -15,6 +15,7 @@ do { my $x = {
                                       'Carp' => '0',
                                       'Encode' => '2.87',
                                       'Exporter' => '5.57',
+                                      'Text::Unidecode' => '0',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

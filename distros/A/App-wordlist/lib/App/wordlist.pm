@@ -1,13 +1,14 @@
 package App::wordlist;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-18'; # DATE
+our $DATE = '2020-05-24'; # DATE
 our $DIST = 'App-wordlist'; # DIST
-our $VERSION = '0.270'; # VERSION
+our $VERSION = '0.274'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use List::Util qw(shuffle);
 
@@ -16,7 +17,10 @@ our %SPEC;
 our %arg_wordlists = (
     wordlists => {
         'x.name.is_plural' => 1,
-        schema => ['array*' => of => 'str*'],
+        schema => ['array*' => {
+            of => 'str*', # for the moment we need to use 'str' instead of 'perl::modname' due to Perinci::Sub::GetArgs::Argv limitation
+            'x.perl.coerce_rules'=>[ ['From_str_or_array::expand_perl_modname_wildcard'=>{ns_prefix=>"WordList"}] ],
+        }],
         summary => 'Select one or more wordlist modules',
         cmdline_aliases => {w=>{}},
         element_completion => sub {
@@ -113,7 +117,7 @@ _
         action => {
             schema  => ['str*', in=>[
                 'list_cpan', 'list_installed',
-                'grep',
+                'grep', 'stat',
             ]],
             default => 'grep',
             cmdline_aliases => {
@@ -126,6 +130,11 @@ _
                     summary=>'List WordList::* modules on CPAN',
                     is_flag => 1,
                     code => sub { my $args=shift; $args->{action} = 'list_cpan' },
+                },
+                s => {
+                    summary=>'Show statistics contained in the wordlist modules',
+                    is_flag => 1,
+                    code => sub { my $args=shift; $args->{action} = 'stat' },
                 },
             },
         },
@@ -207,12 +216,13 @@ _
             test => 0,
             'x.doc.show_result' => 0,
         },
-        #{
-        #    argv => [qw/-t Phrase foo/],
-        #    summary => 'Select phrase wordlists (multiple -t allowed)',
-        #    test => 0,
-        #    'x.doc.show_result' => 0,
-        #},
+        {
+            argv => [qw/-w ID::** foo/],
+            summary => 'Select all ID::* wordlists (wildcard will be expanded)',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+
         {
             argv => [qw/--lang FR foo/],
             summary => 'Select French wordlists (multiple --lang allowed)',
@@ -242,6 +252,7 @@ _
 };
 sub wordlist {
     require Encode;
+    require WordListUtil::CLI;
 
     my %args = @_;
 
@@ -258,7 +269,7 @@ sub wordlist {
     my $use_color = ($color eq 'always' ? 1 : $color eq 'never' ? 0 : undef)
         // $ENV{COLOR} // (-t STDOUT);
 
-    if ($action eq 'grep') {
+    if ($action eq 'grep' || $action eq 'stat') {
         # convert /.../ in arg to regex
         for (@$arg) {
             $_ = Encode::decode('UTF-8', $_);
@@ -282,7 +293,32 @@ sub wordlist {
                 push @$wordlists, $rec->{name};
             }
         }
+
         $wordlists = [shuffle @$wordlists] if $random;
+        log_trace "Wordlist(s) to use: %s", $wordlists;
+
+        if ($action eq 'stat') {
+            no strict 'refs';
+            return [200] unless @$wordlists;
+            my %all_stats;
+            for my $wl (@$wordlists) {
+                my $mod = "WordList::$wl"; $mod =~ s/=.*//;
+                (my $modpm = "$mod.pm") =~ s!::!/!g;
+                require $modpm;
+                if (@$wordlists == 1) {
+                    return [200, "OK", \%{"$mod\::STATS"}];
+                } else {
+                    $all_stats{$wl} = \%{"$mod\::STATS"};
+                }
+            }
+            return [200, "OK", \%all_stats];
+        }
+
+        # optimize random picking when there's only one wordlist to pick from
+        if ($random && @$wordlists == 1 && $num > 0 && $num <= 100) {
+            my $wl_obj = WordListUtil::CLI::instantiate_wordlist($wordlists->[0]);
+            return [200, "OK", [$wl_obj->pick($num)]];
+        }
 
         my $n = 0;
 
@@ -304,23 +340,22 @@ sub wordlist {
         };
 
         my $i_wordlist = 0;
+        my $nth_word;
         my $wl_obj;
         my $code_return_word = sub {
           REDO:
             return if $i_wordlist >= @$wordlists;
             my $wl = $wordlists->[$i_wordlist];
             unless ($wl_obj) {
-                my $mod = "WordList::$wl";
-                (my $modpm = "$mod.pm") =~ s!::!/!g;
-                eval { require $modpm; $wl_obj = $mod->new };
-                if ($@) {
-                    warn;
+                log_trace "Instantiating wordlist $wl ...";
+                $wl_obj = WordListUtil::CLI::instantiate_wordlist($wl, 'ignore');
+                unless ($wl_obj) {
                     $i_wordlist++;
                     goto REDO;
                 }
-                $wl_obj->reset_iterator;
+                $nth_word = 0;
             }
-            my $word = $wl_obj->next_word;
+            my $word = $nth_word++ ? $wl_obj->next_word : $wl_obj->first_word;
             unless (defined $word) {
                 undef $wl_obj;
                 $i_wordlist++;
@@ -377,6 +412,8 @@ sub wordlist {
             }
             $res = [200, "OK", \@words];
         }
+
+      RETURN_RES:
         $res;
 
     } elsif ($action eq 'list_installed') {
@@ -457,7 +494,7 @@ App::wordlist - Grep words from WordList::*
 
 =head1 VERSION
 
-This document describes version 0.270 of App::wordlist (from Perl distribution App-wordlist), released on 2020-05-18.
+This document describes version 0.274 of App::wordlist (from Perl distribution App-wordlist), released on 2020-05-24.
 
 =head1 SYNOPSIS
 
@@ -497,6 +534,10 @@ Examples:
 =item * Select a specific wordlist (multiple -w allowed):
 
  wordlist( arg => ["foo"], wordlists => ["ID::KBBI"]);
+
+=item * Select all ID::* wordlists (wildcard will be expanded):
+
+ wordlist( arg => ["foo"], wordlists => ["ID::**"]);
 
 =item * Select French wordlists (multiple --lang allowed):
 
@@ -592,13 +633,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
-=head1 FAQ
-
-=head2 How to make wordlist return words in random order?
-
-The C<--random> (C<-r>) option was removed in v0.268. To return random words,
-you can pipe the output of C<wordlist> to C<shuf> or other similar utility.
 
 =head1 ENVIRONMENT
 

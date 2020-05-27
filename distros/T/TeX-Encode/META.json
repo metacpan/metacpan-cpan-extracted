@@ -75,15 +75,15 @@
    "provides" : {
       "TeX::Encode" : {
          "file" : "lib/TeX/Encode.pm",
-         "version" : "2.008"
+         "version" : "2.009"
       },
       "TeX::Encode::BibTeX" : {
          "file" : "lib/TeX/Encode/BibTeX.pm",
-         "version" : "2.008"
+         "version" : "2.009"
       },
       "TeX::Encode::charmap" : {
          "file" : "lib/TeX/Encode/charmap.pm",
-         "version" : "2.008"
+         "version" : "2.009"
       }
    },
    "release_status" : "stable",
@@ -98,7 +98,7 @@
          "web" : "https://github.com/athreef/TeX-Encode"
       }
    },
-   "version" : "2.008",
+   "version" : "2.009",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -362,7 +362,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v2.008",
+                  "tag" : "v2.009",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },

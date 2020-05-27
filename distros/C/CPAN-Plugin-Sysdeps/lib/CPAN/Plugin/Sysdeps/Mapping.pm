@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.63';
+our $VERSION = '0.64';
 
 # shortcuts
 #  os and distros
@@ -526,6 +526,13 @@ sub mapping {
 	linuxdistroversion => '28',
 	package => 'librados-devel'], # XXX but compilation errors
       ],
+     ],
+
+     [cpanmod => 'Ceph::Rados::Striper',
+      [like_debian,
+       [before_ubuntu_xenial,
+	[package => []]],
+       [package => 'libradosstriper-dev']],
      ],
 
      [cpanmod => 'Chipcard::PCSC',
@@ -1418,6 +1425,21 @@ sub mapping {
      [cpanmod => ['Graphics::GnuplotIF', 'Gnuplot::Simple', 'Chart::Gnuplot'],
       [package => 'gnuplot']],
 
+     [cpanmod => 'Graph::Nauty',
+      [os_freebsd,
+       [package => []]], # there is a nauty package, but this seems to be something different
+      [like_debian,
+       [before_ubuntu_trusty,
+	[package => []]],
+       [package => 'libnauty2-dev']],
+      [like_fedora,
+       [linuxdistro => 'centos',
+	[package => []]],
+       [package => 'libnauty-devel']],
+      [os_darwin,
+       [package => 'nauty']]
+     ],
+
      [cpanmod => 'Graphics::Plotter',
       [os_freebsd,
        [package => 'plotutils']],
@@ -1870,6 +1892,8 @@ sub mapping {
 	[package => 'openjdk-11-jdk']],
       ],
       [like_fedora,
+       [linuxdistro => 'centos', linuxdistroversion => {'<', 7},
+	[package => 'java-1.8.0-openjdk-devel | java-1.7.0-openjdk-devel | java-1.6.0-openjdk-devel']],
        [package => 'java-11-openjdk-devel | java-9-openjdk-devel | java-1.8.0-openjdk-devel | java-1.7.0-openjdk-devel | java-1.6.0-openjdk-devel']],
      ],
 
@@ -2155,6 +2179,8 @@ sub mapping {
       [os_freebsd,
        [package => 'gettext']],
       # XXX what about debian?
+      [os_darwin,
+       [package => 'gettext']],
      ],
 
      [cpanmod => 'Lucene',
@@ -3139,6 +3165,10 @@ sub mapping {
      ],
 
      [cpanmod => 'Text::Hspell',
+      [os_freebsd,
+       [osvers => {'>=', 10},
+	[package => 'iw-hspell']],
+       [package => []]], # not available for fbsd9
       [like_debian,
        [before_ubuntu_trusty, # not available for wheezy
 	[package => []]],

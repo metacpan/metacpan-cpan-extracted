@@ -1,9 +1,9 @@
 package App::lcpan::Cmd::author_deps;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-07'; # DATE
+our $DATE = '2020-05-26'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.057'; # VERSION
+our $VERSION = '1.058'; # VERSION
 
 use 5.010;
 use strict;
@@ -96,7 +96,7 @@ App::lcpan::Cmd::author_deps - List dependencies for all of the dists of an auth
 
 =head1 VERSION
 
-This document describes version 1.057 of App::lcpan::Cmd::author_deps (from Perl distribution App-lcpan), released on 2020-05-07.
+This document describes version 1.058 of App::lcpan::Cmd::author_deps (from Perl distribution App-lcpan), released on 2020-05-26.
 
 =head1 FUNCTIONS
 
@@ -135,21 +135,29 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<added_after> => I<date>
+=item * B<added_or_updated_since> => I<date>
 
-Include only records that are added after a certain date.
+Include only records that are addedE<sol>updated since a certain date.
 
-=item * B<added_before> => I<date>
+=item * B<added_or_updated_since_last_index_update> => I<true>
 
-Include only records that are added before a certain date.
+Include only records that are addedE<sol>updated since the last index update.
 
-=item * B<added_in_last_n_updates> => I<posint>
+=item * B<added_or_updated_since_last_n_index_updates> => I<posint>
 
-Include only records that are added during the last N index updates.
+Include only records that are addedE<sol>updated since the last N index updates.
 
-=item * B<added_in_last_update> => I<true>
+=item * B<added_since> => I<date>
 
-Include only records that are added during the last index update.
+Include only records that are added since a certain date.
+
+=item * B<added_since_last_index_update> => I<true>
+
+Include only records that are added since the last index update.
+
+=item * B<added_since_last_n_index_updates> => I<posint>
+
+Include only records that are added since the last N index updates.
 
 =item * B<author>* => I<str>
 
@@ -234,7 +242,7 @@ Only list depended modules published by specified author(s).
 
 Do not list depended modules published by specified author(s).
 
-=item * B<perl_version> => I<str> (default: "v5.30.0")
+=item * B<perl_version> => I<str> (default: "v5.30.2")
 
 Set base Perl version for determining core modules.
 
@@ -242,21 +250,17 @@ Set base Perl version for determining core modules.
 
 =item * B<rel> => I<str> (default: "requires")
 
-=item * B<updated_after> => I<date>
+=item * B<updated_since> => I<date>
 
-Include only records that are updated after a certain date.
+Include only records that are updated since certain date.
 
-=item * B<updated_before> => I<date>
+=item * B<updated_since_last_index_update> => I<true>
 
-Include only records that are updated before a certain date.
+Include only records that are updated since the last index update.
 
-=item * B<updated_in_last_n_updates> => I<posint>
+=item * B<updated_since_last_n_index_updates> => I<posint>
 
-Include only records that are updated during the last N index updates.
-
-=item * B<updated_in_last_update> => I<true>
-
-Include only records that are updated during the last index update.
+Include only records that are updated since the last N index updates.
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 

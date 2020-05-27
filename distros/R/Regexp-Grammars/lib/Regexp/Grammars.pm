@@ -12,7 +12,7 @@ use vars ();
 use Scalar::Util qw< blessed reftype >;
 use Data::Dumper qw< Dumper  >;
 
-our $VERSION = '1.055';
+our $VERSION = '1.057';
 
 my $anon_scalar_ref = \do{my $var};
 my $MAGIC_VARS = q{my ($CAPTURE, $CONTEXT, $DEBUG, $INDEX, $MATCH, %ARG, %MATCH);};
@@ -36,7 +36,6 @@ sub import {
     overload::constant(
         qr => sub {
             my ($raw, $cooked, $type) = @_;
-
             # In active scope and really a regex...
             if (_module_is_active() && $type =~ /qq?/) {
                 return bless \$cooked, 'Regexp::Grammars::Precursor';
@@ -240,7 +239,7 @@ sub _debug_context {
         = substr(_show_metas(substr(($_//q{}).q{},pos()//0,$field_width)),0,$field_width);
 
     # Build the context string, handling special cases...
-    our $last_context_str;
+    our $last_context_str //= q{};
     if ($fill_chars) {
         # If caller supplied a 1- or 2-char fill sequence, use that instead...
         my $last_fill_char = length($fill_chars) > 1
@@ -550,12 +549,10 @@ sub _build_debugging_statements {
     $subrule = "q{$subrule}";
 
     return (
-      qq{ Regexp::Grammars::_debug_trying(\@Regexp::Grammars::RESULT_STACK+$extra_pre_indent, \$Regexp::Grammars::RESULT_STACK[-2+$extra_pre_indent], $subrule)
-            if \$Regexp::Grammars::DEBUG_LEVEL{\$Regexp::Grammars::DEBUG};
-        },
-      qq{ Regexp::Grammars::_debug_matched(\@Regexp::Grammars::RESULT_STACK+1, \$Regexp::Grammars::RESULT_STACK[-1], $subrule, \$^N)
-            if \$Regexp::Grammars::DEBUG_LEVEL{\$Regexp::Grammars::DEBUG};
-        },
+      qq{Regexp::Grammars::_debug_trying(\@Regexp::Grammars::RESULT_STACK+$extra_pre_indent, \$Regexp::Grammars::RESULT_STACK[-2+$extra_pre_indent], $subrule)
+            if \$Regexp::Grammars::DEBUG_LEVEL{\$Regexp::Grammars::DEBUG};},
+      qq{Regexp::Grammars::_debug_matched(\@Regexp::Grammars::RESULT_STACK+1, \$Regexp::Grammars::RESULT_STACK[-1], $subrule, \$^N)
+            if \$Regexp::Grammars::DEBUG_LEVEL{\$Regexp::Grammars::DEBUG};},
     );
 }
 
@@ -568,26 +565,20 @@ sub _build_raw_debugging_statements {
 
     if ($subpattern eq '|') {
         return (
-        q{},
-        qq{
-            (?{;Regexp::Grammars::_debug_trying(\@Regexp::Grammars::RESULT_STACK+$extra_pre_indent,
-              \$Regexp::Grammars::RESULT_STACK[-2+$extra_pre_indent], 'next alternative')
-                if \$Regexp::Grammars::DEBUG_LEVEL{\$Regexp::Grammars::DEBUG};})
-            },
+            q{},
+            qq{(?{;Regexp::Grammars::_debug_trying(\@Regexp::Grammars::RESULT_STACK+$extra_pre_indent,
+                \$Regexp::Grammars::RESULT_STACK[-2+$extra_pre_indent], 'next alternative')
+                    if \$Regexp::Grammars::DEBUG_LEVEL{\$Regexp::Grammars::DEBUG};})},
         );
     }
     else {
         return (
-        qq{
-            (?{;Regexp::Grammars::_debug_trying(\@Regexp::Grammars::RESULT_STACK+$extra_pre_indent,
-              \$Regexp::Grammars::RESULT_STACK[-2+$extra_pre_indent], q{subpattern /$subpattern/}, \$^N)
-                if \$Regexp::Grammars::DEBUG_LEVEL{\$Regexp::Grammars::DEBUG};})
-            },
-        qq{
-            (?{;Regexp::Grammars::_debug_matched(\@Regexp::Grammars::RESULT_STACK+1,
-              \$Regexp::Grammars::RESULT_STACK[-1], q{subpattern /$subpattern/}, \$^N)
-                if \$Regexp::Grammars::DEBUG_LEVEL{\$Regexp::Grammars::DEBUG};})
-            },
+            qq{(?{;Regexp::Grammars::_debug_trying(\@Regexp::Grammars::RESULT_STACK+$extra_pre_indent,
+                \$Regexp::Grammars::RESULT_STACK[-2+$extra_pre_indent], q{subpattern /$subpattern/}, \$^N)
+                    if \$Regexp::Grammars::DEBUG_LEVEL{\$Regexp::Grammars::DEBUG};})},
+            qq{(?{;Regexp::Grammars::_debug_matched(\@Regexp::Grammars::RESULT_STACK+1,
+                \$Regexp::Grammars::RESULT_STACK[-1], q{subpattern /$subpattern/}, \$^N)
+                    if \$Regexp::Grammars::DEBUG_LEVEL{\$Regexp::Grammars::DEBUG};})},
         );
     }
 }
@@ -1186,9 +1177,7 @@ sub _translate_subpattern {
     my $timeout_test = $timeout ? q{(??{;Regexp::Grammars::_test_timeout()})} : q{};
 
     # Translate to standard regex code...
-    return qq{$timeout_test(?{;local \@Regexp::Grammars::RESULT_STACK
-                    = \@Regexp::Grammars::RESULT_STACK;$debug_pre})
-                (?:($subpattern)(?{;$post_action$debug_post}))$postmodifier};
+    return qq{$timeout_test(?{;local \@Regexp::Grammars::RESULT_STACK = \@Regexp::Grammars::RESULT_STACK;$debug_pre})(?:($subpattern)(?{;$post_action$debug_post}))$postmodifier};
 }
 
 
@@ -1250,8 +1239,7 @@ sub _translate_hashmatch {
 
     # Translate to standard regex code...
     return qq{$timeout_test(?:(?{;local \@Regexp::Grammars::RESULT_STACK
-                    = \@Regexp::Grammars::RESULT_STACK;$debug_pre})
-                (?:($keypat)(??{exists $hash_lookup ? q{} : q{(?!)}})(?{;$post_action$debug_post})))$postmodifier};
+                    = \@Regexp::Grammars::RESULT_STACK;$debug_pre})(?:($keypat)(??{exists $hash_lookup ? q{} : q{(?!)}})(?{;$post_action$debug_post})))$postmodifier};
 }
 
 
@@ -2710,7 +2698,7 @@ Regexp::Grammars - Add grammatical parsing features to Perl 5.10 regexes
 
 =head1 VERSION
 
-This document describes Regexp::Grammars version 1.055
+This document describes Regexp::Grammars version 1.057
 
 
 =head1 SYNOPSIS

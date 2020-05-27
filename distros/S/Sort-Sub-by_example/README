@@ -1,0 +1,70 @@
+NAME
+    Sort::Sub::by_example - Sort by example
+
+VERSION
+    This document describes version 0.001 of Sort::Sub::by_example (from
+    Perl distribution Sort-Sub-by_example), released on 2020-05-24.
+
+SYNOPSIS
+    Generate sorter (accessed as variable) via Sort::Sub import:
+
+     use Sort::Sub '$by_example'; # use '$by_example<i>' for case-insensitive sorting, '$by_example<r>' for reverse sorting
+     my @sorted = sort $by_example ('item', ...);
+
+    Generate sorter (accessed as subroutine):
+
+     use Sort::Sub 'by_example<ir>';
+     my @sorted = sort {by_example} ('item', ...);
+
+    Generate directly without Sort::Sub:
+
+     use Sort::Sub::by_example;
+     my $sorter = Sort::Sub::by_example::gen_sorter(
+         ci => 1,      # default 0, set 1 to sort case-insensitively
+         reverse => 1, # default 0, set 1 to sort in reverse order
+     );
+     my @sorted = sort $sorter ('item', ...);
+
+    Use in shell/CLI with sortsub (from App::sortsub):
+
+     % some-cmd | sortsub by_example
+     % some-cmd | sortsub by_example --ignore-case -r
+
+DESCRIPTION
+SORT ARGUMENTS
+    "*" marks required arguments.
+
+  example*
+    any.
+
+    Either an arrayref or comma-separated string.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Sort-Sub-by_example>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Sort-Sub-by_example>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Sort-Sub-by_example>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Sort::ByExample
+
+    Sort::Sub
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

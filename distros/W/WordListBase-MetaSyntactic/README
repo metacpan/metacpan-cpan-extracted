@@ -2,9 +2,9 @@ NAME
     WordListBase::MetaSyntactic - Base class for WordList::MetaSyntactic::*
 
 VERSION
-    This document describes version 0.004 of WordListBase::MetaSyntactic
+    This document describes version 0.005 of WordListBase::MetaSyntactic
     (from Perl distribution WordListBase-MetaSyntactic), released on
-    2020-05-02.
+    2020-05-22.
 
 SYNOPSIS
     Use one of the "WordList::MetaSyntactic::*" modules.

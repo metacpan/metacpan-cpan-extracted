@@ -1,9 +1,9 @@
 package Dist::Zilla::Plugin::WordList;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-04'; # DATE
+our $DATE = '2020-05-23'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-WordList'; # DIST
-our $VERSION = '0.057'; # VERSION
+our $VERSION = '0.058'; # VERSION
 
 use 5.014;
 use strict;
@@ -46,6 +46,11 @@ sub munge_files {
         {
             require $package_pm;
             no strict 'refs';
+            my $stats = \%{"$package\::STATS"};
+            last if keys %$stats; # module creates its own stats, skip
+            my $no_stats = ${"$package\::NO_STATS"};
+            last if $no_stats; # module does not want stats, skip
+
             my $param_spec = \%{"$package\::PARAMS"};
             last CREATE_STATS if keys %$param_spec;
 
@@ -121,7 +126,7 @@ Dist::Zilla::Plugin::WordList - Plugin to use when building WordList::* distribu
 
 =head1 VERSION
 
-This document describes version 0.057 of Dist::Zilla::Plugin::WordList (from Perl distribution Dist-Zilla-Plugin-WordList), released on 2020-05-04.
+This document describes version 0.058 of Dist::Zilla::Plugin::WordList (from Perl distribution Dist-Zilla-Plugin-WordList), released on 2020-05-23.
 
 =head1 SYNOPSIS
 

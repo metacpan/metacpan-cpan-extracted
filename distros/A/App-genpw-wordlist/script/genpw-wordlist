@@ -5,18 +5,18 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.496
 
 ### end code_after_shebang
-# PERICMD_INLINE_SCRIPT: {"code_after_shebang":"...","config_dirs":null,"config_filename":"genpw-wordlist.conf","env_name":"GENPW_WORDLIST_OPT","include":null,"log":null,"pack_deps":1,"pod":0,"read_config":1,"read_env":1,"script_name":"genpw-wordlist","script_summary":null,"script_version":"0.005","shebang":"perl","skip_format":0,"subcommands":null,"url":"/App/genpw/wordlist/genpw","use_cleanser":1,"use_utf8":1,"validate_args":1}
+# PERICMD_INLINE_SCRIPT: {"code_after_shebang":"...","config_dirs":null,"config_filename":"genpw-wordlist.conf","env_name":"GENPW_WORDLIST_OPT","include":null,"log":null,"pack_deps":1,"pod":0,"read_config":1,"read_env":1,"script_name":"genpw-wordlist","script_summary":null,"script_version":"0.009","shebang":"perl","skip_format":0,"subcommands":null,"url":"/App/genpw/wordlist/genpw","use_cleanser":1,"use_utf8":1,"validate_args":1}
 
-my $_pci_metas = {""=>{args=>{case=>{cmdline_aliases=>{L=>{code=>sub{"DUMMY"},is_flag=>1,summary=>"Shortcut for --case=lower"},U=>{code=>sub{"DUMMY"},is_flag=>1,summary=>"Shortcut for --case=upper"}},default=>"default",description=>"\n`default` means to not change case. `random` changes casing some letters\nrandomly to lower-/uppercase. `lower` forces lower case. `upper` forces\nUPPER CASE. `title` forces Title case.\n\n",schema=>["str",{in=>["default","random","lower","upper","title"],req=>1},{}],summary=>"Force casing"},num=>{cmdline_aliases=>{n=>{}},default=>1,pos=>0,schema=>["int",{min=>1,req=>1},{}]},patterns=>{cmdline_aliases=>{p=>{}},description=>"\nA pattern is string that is similar to a printf pattern. %P (where P is certain\nletter signifying a format) will be replaced with some other string. %Nw (where\nN is a number) will be replaced by a word of length N, %N\$MP (where N and M is a\nnumber) will be replaced by a word of length between N and M. Anything else will\nbe used as-is. Available conversions:\n\n    %l   Random Latin letter (A-Z, a-z)\n    %d   Random digit (0-9)\n    %h   Random hexdigit (0-9a-f)\n    %a   Random letter/digit (Alphanum) (A-Z, a-z, 0-9; combination of %l and %d)\n    %s   Random ASCII symbol, e.g. \"-\" (dash), \"_\" (underscore), etc.\n    %x   Random letter/digit/ASCII symbol (combination of %a and %s)\n    %m   Base64 character (A-Z, a-z, 0-9, +, /)\n    %b   Base58 character (A-Z, a-z, 0-9 minus IOl0)\n    %B   Base56 character (A-Z, a-z, 0-9 minus IOol01)\n    %%   A literal percent sign\n    %w   Random word\n\n",schema=>["array",{min_len=>1,of=>["str",{req=>1},{}],req=>1},{}],summary=>"Pattern(s) to use","x.name.is_plural"=>1,"x.name.singular"=>"pattern"},wordlists=>{cmdline_aliases=>{w=>{}},element_completion=>sub{"DUMMY"},schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],summary=>"Select one or more wordlist modules","x.name.is_plural"=>1}},description=>"\nUsing password from dictionary words (in this case, from WordList::*) can be\nuseful for humans when remembering the password. Note that using a string of\nrandom characters is generally better because of the larger space (combination).\nUsing a password of two random words from a 5000-word wordlist has a space of\nonly ~25 million while an 8-character of random uppercase letters/lowercase\nletters/numbers has a space of 62^8 = ~218 trillion. To increase the space\nyou'll need to use more words (e.g. 3 to 5 instead of just 2). This is important\nif you are using the password for something that can be bruteforced quickly e.g.\nfor protecting on-disk ZIP/GnuPG file and the attacker has access to your file.\nIt is then recommended to use a high number of rounds for hashing to slow down\npassword cracking (e.g. `--s2k-count 65011712` in GnuPG).\n\n",examples=>[],result=>{},summary=>"Generate password with words from WordList::*",v=>1.1}};
+my $_pci_metas = {""=>{args=>{action=>{cmdline_aliases=>{list_patterns=>{code=>sub{"DUMMY"},is_flag=>1,summary=>"Shortcut for --action=list-patterns"}},default=>"gen",schema=>["str",{in=>["gen","list-patterns"],req=>1},{}]},case=>{cmdline_aliases=>{L=>{code=>sub{"DUMMY"},is_flag=>1,summary=>"Shortcut for --case=lower"},U=>{code=>sub{"DUMMY"},is_flag=>1,summary=>"Shortcut for --case=upper"}},default=>"default",description=>"\n`default` means to not change case. `random` changes casing some letters\nrandomly to lower-/uppercase. `lower` forces lower case. `upper` forces\nUPPER CASE. `title` forces Title case.\n\n",schema=>["str",{in=>["default","random","lower","upper","title"],req=>1},{}],summary=>"Force casing"},num=>{cmdline_aliases=>{n=>{}},default=>1,pos=>0,schema=>["int",{min=>1,req=>1},{}]},patterns=>{cmdline_aliases=>{p=>{}},description=>"\nA pattern is string that is similar to a printf pattern. %P (where P is certain\nletter signifying a format) will be replaced with some other string. %Nw (where\nN is a number) will be replaced by a word of length N, %N\$MP (where N and M is a\nnumber) will be replaced by a word of length between N and M. Anything else will\nbe used as-is. Available conversions:\n\n    %l   Random Latin letter (A-Z, a-z)\n    %d   Random digit (0-9)\n    %h   Random hexdigit (0-9a-f)\n    %a   Random letter/digit (Alphanum) (A-Z, a-z, 0-9; combination of %l and %d)\n    %s   Random ASCII symbol, e.g. \"-\" (dash), \"_\" (underscore), etc.\n    %x   Random letter/digit/ASCII symbol (combination of %a and %s)\n    %m   Base64 character (A-Z, a-z, 0-9, +, /)\n    %b   Base58 character (A-Z, a-z, 0-9 minus IOl0)\n    %B   Base56 character (A-Z, a-z, 0-9 minus IOol01)\n    %%   A literal percent sign\n    %w   Random word\n\n",schema=>["array",{min_len=>1,of=>["str",{req=>1},{}],req=>1},{}],summary=>"Pattern(s) to use","x.name.is_plural"=>1,"x.name.singular"=>"pattern"},wordlists=>{cmdline_aliases=>{w=>{}},element_completion=>sub{"DUMMY"},schema=>["array",{of=>["str",{req=>1},{}],req=>1,"x.perl.coerce_rules"=>[["From_str_or_array::expand_perl_modname_wildcard",{ns_prefix=>"WordList"}]]},{}],summary=>"Select one or more wordlist modules","x.name.is_plural"=>1}},description=>"\nUsing password from dictionary words (in this case, from WordList::*) can be\nuseful for humans when remembering the password. Note that using a string of\nrandom characters is generally better because of the larger space (combination).\nUsing a password of two random words from a 5000-word wordlist has a space of\nonly ~25 million while an 8-character of random uppercase letters/lowercase\nletters/numbers has a space of 62^8 = ~218 trillion. To increase the space\nyou'll need to use more words (e.g. 3 to 5 instead of just 2). This is important\nif you are using the password for something that can be bruteforced quickly e.g.\nfor protecting on-disk ZIP/GnuPG file and the attacker has access to your file.\nIt is then recommended to use a high number of rounds for hashing to slow down\npassword cracking (e.g. `--s2k-count 65011712` in GnuPG).\n\n",examples=>[],result=>{},summary=>"Generate password with words from WordList::*",v=>1.1}};
 
-# This script is generated by Perinci::CmdLine::Inline version 0.549 on Mon May 18 16:24:52 2020.
+# This script is generated by Perinci::CmdLine::Inline version 0.550 on Fri May 22 12:54:20 2020.
 
 # Rinci metadata taken from these modules: App::genpw::wordlist (no version)
 
 # You probably should not manually edit this file.
 
-our $DATE = '2020-05-18'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2020-05-22'; # DATE
+our $VERSION = '0.009'; # VERSION
 # PODNAME: genpw-wordlist
 # ABSTRACT: Generate password with words from WordList::*
 
@@ -134,19 +134,21 @@ my $go_spec1 = {
     'config-path=s@' => sub { $_pci_r->{config_paths} //= []; push @{ $_pci_r->{config_paths} }, $_[1]; },
     'config-profile=s' => sub { $_pci_r->{config_profile} = $_[1]; },
     'format=s' => sub { $_pci_r->{format} = $_[1]; },
-    'help|h|?' => sub { print "genpw-wordlist - Generate password with words from WordList::*\n\nUsage:\n  genpw-wordlist --help (or -h, -?)\n  genpw-wordlist --version (or -v)\n  genpw-wordlist [-L] [-U] [--case=s] [--config-path=path+]\n    [--config-profile=profile] [--format=name] [--json] [--naked-res]\n    [--no-config] [--no-env] [--no-naked-res | --nonaked-res] [-p=s+]\n    [--page-result[=program]] [--pattern=s+] [-w=s+] [--wordlist=s+] [num]\n\nUsing password from dictionary words (in this case, from WordList::*) can be\nuseful for humans when remembering the password. Note that using a string of\nrandom characters is generally better because of the larger space (combination).\nUsing a password of two random words from a 5000-word wordlist has a space of\nonly ~25 million while an 8-character of random uppercase letters/lowercase\nletters/numbers has a space of 62^8 = ~218 trillion. To increase the space\nyou'll need to use more words (e.g. 3 to 5 instead of just 2). This is important\nif you are using the password for something that can be bruteforced quickly e.g.\nfor protecting on-disk ZIP/GnuPG file and the attacker has access to your file.\nIt is then recommended to use a high number of rounds for hashing to slow down\npassword cracking (e.g. `--s2k-count 65011712` in GnuPG).\n\nMain options:\n  --case=s           Force casing [\"default\"]\n  --num=s, -n         (=arg[0]) [1]\n  --pattern=s\@, -p   Pattern(s) to use\n  --wordlist=s\@, -w  Select one or more wordlist modules\n  -L                 Shortcut for --case=lower\n  -U                 Shortcut for --case=upper\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s     Choose output format, e.g. json, text\n  --json         Set output format to json\n  --page-result  Filter output through a pager\n\nOther options:\n  --help, -h, -?                 Display help message and exit\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --version, -v                  Display program's version and exit\n"; exit 0; },
+    'help|h|?' => sub { print "genpw-wordlist - Generate password with words from WordList::*\n\nUsage:\n  genpw-wordlist --help (or -h, -?)\n  genpw-wordlist --version (or -v)\n  genpw-wordlist [-L] [-U] [--action=s] [--case=s] [--config-path=path+]\n    [--config-profile=profile] [--format=name] [--json] [--list-patterns]\n    [--naked-res] [--no-config] [--no-env] [--no-naked-res | --nonaked-res]\n    [-p=s+] [--page-result[=program]] [--pattern=s+] [-w=s+] [--wordlist=s+]\n    [num]\n\nUsing password from dictionary words (in this case, from WordList::*) can be\nuseful for humans when remembering the password. Note that using a string of\nrandom characters is generally better because of the larger space (combination).\nUsing a password of two random words from a 5000-word wordlist has a space of\nonly ~25 million while an 8-character of random uppercase letters/lowercase\nletters/numbers has a space of 62^8 = ~218 trillion. To increase the space\nyou'll need to use more words (e.g. 3 to 5 instead of just 2). This is important\nif you are using the password for something that can be bruteforced quickly e.g.\nfor protecting on-disk ZIP/GnuPG file and the attacker has access to your file.\nIt is then recommended to use a high number of rounds for hashing to slow down\npassword cracking (e.g. `--s2k-count 65011712` in GnuPG).\n\nMain options:\n  --action=s          [\"gen\"]\n  --case=s           Force casing [\"default\"]\n  --list-patterns    Shortcut for --action=list-patterns\n  --num=s, -n         (=arg[0]) [1]\n  --pattern=s\@, -p   Pattern(s) to use\n  --wordlist=s\@, -w  Select one or more wordlist modules\n  -L                 Shortcut for --case=lower\n  -U                 Shortcut for --case=upper\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s     Choose output format, e.g. json, text\n  --json         Set output format to json\n  --page-result  Filter output through a pager\n\nOther options:\n  --help, -h, -?                 Display help message and exit\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --version, -v                  Display program's version and exit\n"; exit 0; },
     'json' => sub { $_pci_r->{format} = (-t STDOUT) ? "json-pretty" : "json"; },
     'naked-res' => sub { $_pci_r->{naked_res} = 1; },
     'no-config' => sub { $_pci_r->{read_config} = 0; },
     'no-env' => sub { $_pci_r->{read_env} = 0; },
     'no-naked-res|nonaked-res' => sub { $_pci_r->{naked_res} = 0; },
     'page-result:s' => sub { $_pci_r->{page_result} = 1; },
-    'version|v' => sub { no warnings 'once'; require App::genpw::wordlist; print "genpw-wordlist version ", "0.005", ($App::genpw::wordlist::DATE ? " ($App::genpw::wordlist::DATE)" : ''), "\n"; print "  Generated by Perinci::CmdLine::Inline version 0.549 (2020-05-18)\n"; exit 0 },
+    'version|v' => sub { no warnings 'once'; require App::genpw::wordlist; print "genpw-wordlist version ", "0.009", ($App::genpw::wordlist::DATE ? " ($App::genpw::wordlist::DATE)" : ''), "\n"; print "  Generated by Perinci::CmdLine::Inline version 0.550 (2020-05-02)\n"; exit 0 },
 };
 my $go_spec2 = {
     'L' => sub {         my $code = sub{package App::genpw;use warnings;use strict;no feature;use feature ':5.10';$_[0]{'case'} = 'lower'}; $code->(\%_pci_args);
  },
     'U' => sub {         my $code = sub{package App::genpw;use warnings;use strict;no feature;use feature ':5.10';$_[0]{'case'} = 'upper'}; $code->(\%_pci_args);
+ },
+    'action=s' => sub {         $_pci_args{'action'} = $_[1];
  },
     'case=s' => sub {         $_pci_args{'case'} = $_[1];
  },
@@ -155,6 +157,8 @@ my $go_spec2 = {
     'format=s' => sub {  },
     'help|h|?' => sub {  },
     'json' => sub {  },
+    'list-patterns' => sub {         my $code = sub{package App::genpw;use warnings;use strict;no feature;use feature ':5.10';$_[0]{'action'} = 'list-patterns'}; $code->(\%_pci_args);
+ },
     'n=s' => sub {         $_pci_args{'num'} = $_[1];
  },
     'naked-res' => sub {  },
@@ -240,7 +244,7 @@ if ($sc_name eq "") {
     $_pci_meta_result_type = "";
     require App::genpw::wordlist;
     eval { $_pci_r->{res} = App::genpw::wordlist::genpw(%_pci_args) };
-    if ($@) { die if $ENV{PERINCI_CMDLINE_INLINE_DEBUG_DIE}; $_pci_r->{res} = [500, "Function died: $@"] }
+    if ($@) { $_pci_r->{res} = [500, "Function died: $@"] }
 }
 }
 
@@ -265,7 +269,7 @@ else { require Local::_pci_clean_json; require Perinci::Result::Format::Lite; $i
 my $use_utf8 = $_pci_r->{res}[3]{"x.hint.result_binary"} ? 0 : 1;
 if ($use_utf8) { binmode STDOUT, ":encoding(utf8)" }
 if ($is_stream) {
-    my $code = $_pci_r->{res}[2]; if (ref($code) ne "CODE") { die "Result is a stream but no coderef provided" } if ($_pci_meta_result_type_is_simple) { while(defined(my $l=$code->())) { print $fh $l; print $fh "\n" unless $_pci_meta_result_type eq "buf"; } } else { while (defined(my $rec=$code->())) { print $fh _pci_json()->encode($rec),"\n" } }
+    my $code = $_pci_r->{res}[2]; if (ref($code) ne "CODE") { die "Result is a stream but no coderef provided" } if ($_pci_meta_result_type_is_simple) { while(defined(my $l=$code->())) { print $fh $l; print $fh "\n" unless $_pci_meta_result_type eq "buf"; } } else { while (defined(my $rec=$code->())) { if (!defined($rec) || ref $rec) { print $fh _pci_json()->encode($rec),"\n" } else { print $fh $rec,"\n" } } }
 } else {
     print $fh $fres;
 }
@@ -290,13 +294,17 @@ genpw-wordlist - Generate password with words from WordList::*
 
 =head1 VERSION
 
-This document describes version 0.005 of main (from Perl distribution App-genpw-wordlist), released on 2020-05-18.
+This document describes version 0.009 of main (from Perl distribution App-genpw-wordlist), released on 2020-05-22.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % genpw-wordlist [-L] [-U] [--case=s] [--config-path=path+] [--config-profile=profile] [--format=name] [--json] [--(no)naked-res] [--no-config] [--no-env] [-p=s+] [--page-result[=program]] [--pattern=s+] [--patterns-json=s] [-w=s+] [--wordlist=s+] [--wordlists-json=s] [num]
+ % genpw-wordlist [-L] [-U] [--action=s] [--case=s] [--config-path=path+]
+     [--config-profile=profile] [--format=name] [--json] [--list-patterns]
+     [--(no)naked-res] [--no-config] [--no-env] [-p=s+]
+     [--page-result[=program]] [--pattern=s+] [--patterns-json=s] [-w=s+]
+     [--wordlist=s+] [--wordlists-json=s] [num]
 
 =head1 DESCRIPTION
 
@@ -320,6 +328,16 @@ C<*> marks required options.
 
 =over
 
+=item B<--action>=I<s>
+
+Default value:
+
+ "gen"
+
+Valid values:
+
+ ["gen","list-patterns"]
+
 =item B<--case>=I<s>
 
 Force casing.
@@ -336,6 +354,12 @@ Valid values:
 randomly to lower-/uppercase. `lower` forces lower case. `upper` forces
 UPPER CASE. `title` forces Title case.
 
+
+=item B<--list-patterns>
+
+Shortcut for --action=list-patterns.
+
+See C<--action>.
 
 =item B<--num>=I<s>, B<-n>
 
@@ -539,6 +563,7 @@ Finally, you can filter a section by environment variable using the filter C<env
 
 List of available configuration parameters:
 
+ action (see --action)
  case (see --case)
  format (see --format)
  naked_res (see --naked-res)
@@ -566,7 +591,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-genpw-
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-App-Genpass-WordList>.
+Source repository is at L<https://github.com/perlancar/perl-App-genpw-wordlist>.
 
 =head1 BUGS
 
@@ -598,15 +623,15 @@ Config/IOD/Reader.pm,69667,17366,3;2242
 Data/Check/Structure.pm,87065,8606,4;2801
 Data/Sah/Normalize.pm,95701,9038,5;3137
 Getopt/Long/EvenLess.pm,104771,11364,6;3411
-Local/_pci_check_args.pm,116168,6274,7;3793
-Local/_pci_clean_json.pm,122475,4414,8;3910
-Log/ger.pm,126908,11278,9;3972
-Perinci/CmdLine/Util/Config.pm,138225,15677,10;4317
-Perinci/Result/Format/Lite.pm,153940,22687,11;4815
-Perinci/Sub/Normalize.pm,176660,7303,12;5413
-Sah/Schema/rinci/function_meta.pm,184005,5179,13;5648
-Scalar/Util/Numeric/PP.pm,189218,3106,14;5835
-Text/Table/Tiny.pm,192351,8117,15;5976
+Local/_pci_check_args.pm,116168,7968,7;3793
+Local/_pci_clean_json.pm,124169,4414,8;3935
+Log/ger.pm,128602,11278,9;3997
+Perinci/CmdLine/Util/Config.pm,139919,15677,10;4342
+Perinci/Result/Format/Lite.pm,155634,22687,11;4840
+Perinci/Sub/Normalize.pm,178354,7303,12;5438
+Sah/Schema/rinci/function_meta.pm,185699,5179,13;5673
+Scalar/Util/Numeric/PP.pm,190912,3106,14;5860
+Text/Table/Tiny.pm,194045,8117,15;6001
 
 ### Clone/PP.pm ###
 #package Clone::PP;
@@ -4424,8 +4449,27 @@ Text/Table/Tiny.pm,192351,8117,15;5976
 #        no warnings ('void');
 #        require Scalar::Util::Numeric::PP;
 #        require List::Util;
+#        require PERLANCAR::Module::List;
+#        require String::Wildcard::Bash;
 #        my $_sahv_dpath;
 #        my $_sahv_err;
+#        $args->{"action"} //= "gen";
+#        if (exists $args->{"action"}) {
+#            $_sahv_dpath = [];
+#            # req #0
+#            ((defined($args->{"action"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+#            
+#            &&
+#            
+#            # check type 'str'
+#            ((!ref($args->{"action"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
+#            
+#            &&
+#            
+#            (# clause: in
+#            ((grep { $_ eq $args->{"action"} } @{ ["gen","list-patterns"] }) ? 1 : (($_sahv_err //= "Must be one of [\"gen\",\"list-patterns\"]"),0)))
+#             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+#        } # if date arg exists
 #        $args->{"case"} //= "default";
 #        if (exists $args->{"case"}) {
 #            $_sahv_dpath = [];
@@ -4497,6 +4541,11 @@ Text/Table/Tiny.pm,192351,8117,15;5976
 #            
 #            &&
 #            
+#            # coerce rule(s): From_str_or_array::expand_perl_modname_wildcard
+#            (($args->{"wordlists"} = (ref($args->{"wordlists"}) eq '' || ref($args->{"wordlists"}) eq 'ARRAY') ? (do { my $tmp = $args->{"wordlists"}; $tmp = [$tmp] unless ref $tmp eq 'ARRAY'; my $i = 0; while ($i < @$tmp) {   $tmp->[$i] =~ s!/!::!g;   my $el = $tmp->[$i++];   next unless String::Wildcard::Bash::contains_wildcard($el);   my $mods = PERLANCAR::Module::List::list_modules("WordList::" . $el, {wildcard=>1, list_modules=>1});   my @mods = sort keys %$mods;   for (@mods) { substr($_, 0, 10) = '' }   if (@mods) { splice @$tmp, $i-1, 1, @mods; $i += @mods - 1 } } $tmp }) : $args->{"wordlists"}), 1)
+#            
+#            &&
+#            
 #            # check type 'array'
 #            ((ref($args->{"wordlists"}) eq 'ARRAY') ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type array"),0))
 #            
@@ -4517,6 +4566,7 @@ Text/Table/Tiny.pm,192351,8117,15;5976
 #        } # if date arg exists
 #
 #        # check required args
+#        return [400, "Missing required value for argument: action"] if exists($args->{"action"}) && !defined($args->{"action"});
 #        return [400, "Missing required value for argument: case"] if exists($args->{"case"}) && !defined($args->{"case"});
 #        return [400, "Missing required value for argument: num"] if exists($args->{"num"}) && !defined($args->{"num"});
 #        return [400, "Missing required value for argument: patterns"] if exists($args->{"patterns"}) && !defined($args->{"patterns"});

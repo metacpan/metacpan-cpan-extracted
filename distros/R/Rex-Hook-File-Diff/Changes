@@ -1,0 +1,16 @@
+Revision history for Rex-Hook-File-Diff
+
+v0.1.0 2020-05-26T17:42:17Z
+ - No code changes since v0.0.0.3 trial release
+
+v0.0.0.3 2020-05-19T20:23:50Z (TRIAL RELEASE)
+ [ENHANCEMENTS]
+ - Add missing test names
+ - Add tests for expected set of testing files
+
+v0.0.0.2 2020-05-17T05:45:18Z (TRIAL RELEASE)
+ [BUG FIXES]
+ - Fix minimum Perl version required
+
+v0.0.0.1 2020-05-16T16:26:26Z (TRIAL RELEASE)
+ - Initial release

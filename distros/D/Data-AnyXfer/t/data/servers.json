@@ -1,0 +1,38 @@
+{
+    "servers": [
+      {
+        "name": "prodserver",
+        "env": "production",
+        "installed_version": "6.4.0",
+        "silos": [
+          "public_data",
+          "private_data"
+        ],
+        "standalone_nodes": [
+          "http://test-es-1.example.com:9200",
+          "http://test-es-2.example.com:9200",
+          "http://test-es-3.example.com:9200"
+        ],
+        "cluster_nodes": [
+          "http://test-es-1.example.com:9201",
+          "http://test-es-2.example.com:9201",
+          "http://test-es-3.example.com:9201"
+        ]
+      },
+      {
+        "name": "testserver",
+        "env": "testing",
+        "installed_version": "6.4.0",
+        "silos": [
+          "public_data",
+          "private_data"
+        ],
+        "standalone_nodes": [
+          "http://localhost:9200"
+        ],
+        "cluster_nodes": [
+          "http://localhost:9201"
+        ]
+      }
+    ]
+}

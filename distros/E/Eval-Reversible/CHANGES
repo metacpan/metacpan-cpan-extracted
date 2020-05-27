@@ -1,0 +1,23 @@
+Changelog for Eval-Reversible
+
+v0.900.1 2020-05-14T20:28:32
+ - Update README (Brendan Byrd)
+ - Clean up cpanfile (Andrew Hewus Fresh)
+ - Clean up POD for new PodWeaver settings (Andrew Hewus Fresh)
+ - Move xt tests to correct location (Andrew Hewus Fresh)
+ - Convert to Dist::Zilla::PluginBundle::Author::GSG (Andrew Hewus Fresh)
+
+0.90 2018-05-04T19:14:38
+ - Correct the wording in failure_warning's POD (Brendan Byrd)
+ - Fix the POD footer, including LICENSE AND COPYRIGHT (Brendan Byrd)
+ - Prep for version 0.90 (Brendan Byrd)
+ - Use a more Moo-friendly way of adding Exporter::import (Brendan Byrd)
+ - Add exportable function interface: reversibly & to_undo (Brendan Byrd)
+ - Add a set of tests (Brendan Byrd)
+ - Remove MooX::HandlesVia usage on Bool, since it doesn't set anything
+   (Brendan Byrd)
+ - Initial version of Eval::Reversible (Brendan Byrd)
+ - Skeleton framework (Brendan Byrd)
+
+v0.900.0 2018-05-04T19:14:38
+ - No changes found

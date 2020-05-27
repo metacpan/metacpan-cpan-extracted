@@ -1,5 +1,5 @@
 package Shipment::SOAP::WSDL;
-$Shipment::SOAP::WSDL::VERSION = '3.04';
+$Shipment::SOAP::WSDL::VERSION = '3.05';
 
 BEGIN {
     my %fatpacked;
@@ -9738,7 +9738,7 @@ Shipment::SOAP::WSDL
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 AUTHOR
 

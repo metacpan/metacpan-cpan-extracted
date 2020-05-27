@@ -445,12 +445,12 @@ static int term_userevent_fn(TickitTerm *tt, TickitEventFlags flags, void *_info
   return ret;
 }
 
-static void term_output_fn(TickitTerm *tt, const char *bytes, size_t len, void *user)
+static void term_outputwriter_fn(TickitTerm *tt, const char *bytes, size_t len, void *user)
 {
-  CV *func = user;
+  SV *writer = user;
 
   if(!len) {
-    SvREFCNT_dec(func);
+    SvREFCNT_dec(writer);
     return;
   }
 
@@ -459,11 +459,12 @@ static void term_output_fn(TickitTerm *tt, const char *bytes, size_t len, void *
   SAVETMPS;
 
   PUSHMARK(SP);
-  EXTEND(SP, 1);
+  EXTEND(SP, 2);
+  PUSHs(writer);
   mPUSHp(bytes, len);
   PUTBACK;
 
-  call_sv((SV*)(func), G_VOID);
+  call_method("write", G_VOID);
 
   FREETMPS;
   LEAVE;
@@ -659,7 +660,7 @@ typedef struct {
   CV *cb_destroy;
   CV *cb_run;
   CV *cb_stop;
-  CV *cb_io_read;
+  CV *cb_io;
   CV *cb_cancel_io;
   CV *cb_timer;
   CV *cb_cancel_timer;
@@ -698,6 +699,27 @@ static XS(invoke_watch)
 static SV *S_newSVcallback_tickit_invoke(pTHX_ TickitWatch *watch)
 {
   CV *cv = newXS(NULL, invoke_watch, __FILE__);
+  CvXSUBANY(cv).any_ptr = watch;
+  return newRV_noinc((SV *)cv);
+}
+
+static XS(invoke_iowatch);
+static XS(invoke_iowatch)
+{
+  dXSARGS;
+  TickitWatch *watch = XSANY.any_ptr;
+
+  TickitIOCondition cond = POPi;
+
+  tickit_evloop_invoke_iowatch(watch, TICKIT_EV_FIRE, cond);
+
+  XSRETURN(0);
+}
+
+#define newSVcallback_tickit_invokeio(watch)  S_newSVcallback_tickit_invokeio(aTHX_ watch)
+static SV *S_newSVcallback_tickit_invokeio(pTHX_ TickitWatch *watch)
+{
+  CV *cv = newXS(NULL, invoke_iowatch, __FILE__);
   CvXSUBANY(cv).any_ptr = watch;
   return newRV_noinc((SV *)cv);
 }
@@ -742,7 +764,7 @@ static void evloop_destroy(void *data)
   SvREFCNT_dec(evdata->cb_destroy);
   SvREFCNT_dec(evdata->cb_run);
   SvREFCNT_dec(evdata->cb_stop);
-  SvREFCNT_dec(evdata->cb_io_read);
+  SvREFCNT_dec(evdata->cb_io);
   SvREFCNT_dec(evdata->cb_cancel_io);
   SvREFCNT_dec(evdata->cb_timer);
   SvREFCNT_dec(evdata->cb_cancel_timer);
@@ -782,7 +804,7 @@ static void evloop_stop(void *data)
   FREETMPS;
 }
 
-static bool evloop_io_read(void *data, int fd, TickitBindFlags flags, TickitWatch *watch)
+static bool evloop_io(void *data, int fd, TickitIOCondition cond, TickitBindFlags flags, TickitWatch *watch)
 {
   EventLoopData *evdata = data;
   dTHXa(evdata->myperl);
@@ -792,14 +814,15 @@ static bool evloop_io_read(void *data, int fd, TickitBindFlags flags, TickitWatc
   dSP;
   SAVETMPS;
 
-  EXTEND(SP, 2);
+  EXTEND(SP, 3);
   PUSHMARK(SP);
 
   PUSHs(fh);
-  mPUSHs(newSVcallback_tickit_invoke(watch));
+  mPUSHi(cond);
+  mPUSHs(newSVcallback_tickit_invokeio(watch));
   PUTBACK;
 
-  call_sv((SV *)evdata->cb_io_read, G_VOID);
+  call_sv((SV *)evdata->cb_io, G_VOID);
 
   FREETMPS;
 
@@ -953,12 +976,42 @@ static int invoke_callback(Tickit *t, TickitEventFlags flags, void *info, void *
     SvREFCNT_dec((SV*)code);
 }
 
+static int invoke_iocallback(Tickit *t, TickitEventFlags flags, void *_info, void *user)
+{
+  dSP;
+  CV *code = user;
+
+  if(flags & TICKIT_EV_FIRE) {
+    SV *info_sv = newSV(0);
+    TickitIOWatchInfo *info;
+    Newx(info, 1, TickitIOWatchInfo);
+    *info = *(TickitIOWatchInfo *)(_info);
+    sv_setref_pv(info_sv, "Tickit::Event::IOWatch", info);
+
+    ENTER;
+    SAVETMPS;
+
+    EXTEND(SP, 1);
+    PUSHMARK(SP);
+    mPUSHs(info_sv);
+    PUTBACK;
+
+    call_sv((SV*)code, G_VOID);
+
+    FREETMPS;
+    LEAVE;
+  }
+
+  if(flags & TICKIT_EV_UNBIND)
+    SvREFCNT_dec((SV*)code);
+}
+
 static TickitEventHooks evhooks = {
   .init         = evloop_init,
   .destroy      = evloop_destroy,
   .run          = evloop_run,
   .stop         = evloop_stop,
-  .io_read      = evloop_io_read,
+  .io           = evloop_io,
   .cancel_io    = evloop_cancel_io,
   .timer        = evloop_timer,
   .cancel_timer = evloop_cancel_timer,
@@ -987,6 +1040,13 @@ static void setup_constants(void)
   DO_CONSTANT(TICKIT_RUN_NOSETUP)
 
   DO_CONSTANT(TICKIT_BIND_FIRST)
+  DO_CONSTANT(TICKIT_BIND_ONESHOT)
+
+  DO_CONSTANT(TICKIT_IO_IN)
+  DO_CONSTANT(TICKIT_IO_OUT)
+  DO_CONSTANT(TICKIT_IO_HUP)
+  DO_CONSTANT(TICKIT_IO_ERR)
+  DO_CONSTANT(TICKIT_IO_INVAL)
 
   stash = gv_stashpvn("Tickit::Term", 12, TRUE);
   export = get_av("Tickit::Term::EXPORT_OK", TRUE);
@@ -1146,6 +1206,34 @@ type(self,newapi=&PL_sv_undef)
     }
   OUTPUT:
     RETVAL
+
+MODULE = Tickit             PACKAGE = Tickit::Event::IOWatch
+
+void
+DESTROY(self)
+  SV *self
+  INIT:
+    TickitIOWatchInfo *info = INT2PTR(TickitIOWatchInfo *, SvIV((SV*)SvRV(self)));
+  CODE:
+    Safefree(info);
+
+SV *
+fd(self)
+  SV *self
+  ALIAS:
+    fd   = 0
+    cond = 1
+  INIT:
+    TickitIOWatchInfo *info = INT2PTR(TickitIOWatchInfo *, SvIV((SV*)SvRV(self)));
+  CODE:
+    switch(ix) {
+      case 0: RETVAL = newSVuv(info->fd); break;
+      case 1: RETVAL = newSVuv(info->cond); break;
+      default: croak("Unreachable");
+    }
+  OUTPUT:
+    RETVAL
+
 
 MODULE = Tickit             PACKAGE = Tickit::Event::Key
 
@@ -2212,15 +2300,37 @@ columns(self)
 MODULE = Tickit             PACKAGE = Tickit::Term
 
 SV *
-_new(package,termtype)
+_new(package,termtype,input_handle,output_handle,writer,utf8)
   char *package;
   char *termtype;
+  SV   *input_handle
+  SV   *output_handle
+  SV   *writer
+  SV   *utf8
   INIT:
+    struct TickitTermBuilder builder = { 0 };
     TickitTerm   *tt;
   CODE:
-    tt = tickit_term_new_for_termtype(termtype);
+    builder.termtype = termtype;
+    builder.open = TICKIT_OPEN_FDS;
+    builder.input_fd = -1;
+    builder.output_fd = -1;
+
+    if(SvOK(input_handle))
+      builder.input_fd = PerlIO_fileno(IoIFP(sv_2io(input_handle)));
+    if(SvOK(output_handle))
+      builder.output_fd = PerlIO_fileno(IoOFP(sv_2io(output_handle)));
+    if(SvOK(writer)) {
+      builder.output_func      = term_outputwriter_fn;
+      builder.output_func_user = SvREFCNT_inc(writer);
+    }
+
+    tt = tickit_term_build(&builder);
     if(!tt)
       XSRETURN_UNDEF;
+
+    if(SvOK(utf8))
+      tickit_term_set_utf8(tt, SvTRUE(utf8));
 
     RETVAL = newSVterm_noinc(tt, package);
   OUTPUT:
@@ -2265,13 +2375,6 @@ get_input_fd(self)
   OUTPUT:
     RETVAL
 
-void
-set_input_handle(self,handle)
-  Tickit::Term  self
-  SV           *handle
-  CODE:
-    tickit_term_set_input_fd(self, PerlIO_fileno(IoIFP(sv_2io(handle))));
-
 int
 get_output_fd(self)
   Tickit::Term  self
@@ -2279,20 +2382,6 @@ get_output_fd(self)
     RETVAL = tickit_term_get_output_fd(self);
   OUTPUT:
     RETVAL
-
-void
-set_output_handle(self,handle)
-  Tickit::Term  self
-  SV           *handle
-  CODE:
-    tickit_term_set_output_fd(self, PerlIO_fileno(IoIFP(sv_2io(handle))));
-
-void
-set_output_func(self,func)
-  Tickit::Term  self
-  CV           *func
-  CODE:
-    tickit_term_set_output_func(self, term_output_fn, SvREFCNT_inc(func));
 
 void
 await_started(self,timeout)
@@ -2325,13 +2414,6 @@ set_output_buffer(self,len)
   size_t        len
   CODE:
     tickit_term_set_output_buffer(self, len);
-
-void
-set_utf8(self,utf8)
-  Tickit::Term  self
-  int           utf8;
-  CODE:
-    tickit_term_set_utf8(self, utf8);
 
 void
 get_size(self)
@@ -3469,12 +3551,15 @@ new(package,term)
   char               *package
   Tickit::Term_MAYBE  term
   INIT:
+    struct TickitBuilder builder = { 0 };
     Tickit *t;
   CODE:
     if(term)
-      t = tickit_new_for_term(tickit_term_ref(term));
+      builder.tt = tickit_term_ref(term);
     else
-      t = tickit_new_stdio();
+      builder.term_builder.open = TICKIT_OPEN_STDIO;
+
+    t = tickit_build(&builder);
     if(!t)
       XSRETURN_UNDEF;
     RETVAL = newSV(0);
@@ -3483,14 +3568,14 @@ new(package,term)
     RETVAL
 
 SV *
-_new_with_evloop(package, term, init, destroy, run, stop, io_read, cancel_io, timer, cancel_timer, idle, cancel_idle)
+_new_with_evloop(package, term, init, destroy, run, stop, io, cancel_io, timer, cancel_timer, idle, cancel_idle)
   char *package
   SV   *term
   CV   *init
   CV   *destroy
   CV   *run
   CV   *stop
-  CV   *io_read
+  CV   *io
   CV   *cancel_io
   CV   *timer
   CV   *cancel_timer
@@ -3498,6 +3583,7 @@ _new_with_evloop(package, term, init, destroy, run, stop, io_read, cancel_io, ti
   CV   *cancel_idle
   INIT:
     TickitTerm *tt = NULL;
+    struct TickitBuilder builder = { 0 };
     Tickit *t;
     EventLoopData *evdata;
   CODE:
@@ -3513,7 +3599,9 @@ _new_with_evloop(package, term, init, destroy, run, stop, io_read, cancel_io, ti
       Perl_croak(aTHX_ "term is not of type Tickit::Term");
 
     if(tt)
-      tickit_term_ref(tt);
+      builder.tt = tickit_term_ref(tt);
+    else
+      builder.term_builder.open = TICKIT_OPEN_STDIO;
 
     Newx(evdata, 1, EventLoopData);
 #ifdef tTHX
@@ -3523,14 +3611,18 @@ _new_with_evloop(package, term, init, destroy, run, stop, io_read, cancel_io, ti
     evdata->cb_destroy      = (CV *)SvREFCNT_inc((SV *)destroy);
     evdata->cb_run          = (CV *)SvREFCNT_inc((SV *)run);
     evdata->cb_stop         = (CV *)SvREFCNT_inc((SV *)stop);
-    evdata->cb_io_read      = (CV *)SvREFCNT_inc((SV *)io_read);
+    evdata->cb_io           = (CV *)SvREFCNT_inc((SV *)io);
     evdata->cb_cancel_io    = (CV *)SvREFCNT_inc((SV *)cancel_io);
     evdata->cb_timer        = (CV *)SvREFCNT_inc((SV *)timer);
     evdata->cb_cancel_timer = (CV *)SvREFCNT_inc((SV *)cancel_timer);
     evdata->cb_idle         = (CV *)SvREFCNT_inc((SV *)idle);
     evdata->cb_cancel_idle  = (CV *)SvREFCNT_inc((SV *)cancel_idle);
 
-    t = tickit_new_with_evloop(tt, &evhooks, evdata);
+    /* Uses the not-technically-documented evhooks / evinitdata TickitBuilder fields */
+    builder.evhooks = &evhooks;
+    builder.evinitdata = evdata;
+
+    t = tickit_build(&builder);
     if(!t)
       XSRETURN_UNDEF;
 
@@ -3597,6 +3689,17 @@ setctl(self, ctl, value)
       case TICKIT_TYPE_NONE:
         break;
     }
+  OUTPUT:
+    RETVAL
+
+UV
+watch_io(self, fd, cond, code)
+  Tickit::_Tickit  self
+  UV               fd
+  UV               cond
+  CV              *code
+  CODE:
+    RETVAL = PTR2UV(tickit_watch_io(self, fd, cond, TICKIT_BIND_UNBIND, invoke_iocallback, SvREFCNT_inc(code)));
   OUTPUT:
     RETVAL
 

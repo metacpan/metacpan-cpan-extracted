@@ -2,6 +2,10 @@ NAME
 
     Eval::Reversible - Evals with undo stacks
 
+VERSION
+
+    version v0.900.1
+
 SYNOPSIS
 
         use Eval::Reversible;
@@ -187,13 +191,11 @@ AUTHOR
 
     Grant Street Group <developers@grantstreet.com>
 
-LICENSE AND COPYRIGHT
+COPYRIGHT AND LICENSE
 
-    Copyright 2018 Grant Street Group
+    This software is Copyright (c) 2018 - 2020 by Grant Street Group.
 
-    This program is free software; you can redistribute it and/or modify it
-    under the terms of the the Artistic License (2.0). You may obtain a
-    copy of the full license at:
+    This is free software, licensed under:
 
-    http://www.perlfoundation.org/artistic_license_2_0
+      The Artistic License 2.0 (GPL Compatible)
 

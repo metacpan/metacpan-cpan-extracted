@@ -1,5 +1,5 @@
 package JSON::Karabiner::Manipulator::Conditions::Variable_if ;
-$JSON::Karabiner::Manipulator::Conditions::Variable_if::VERSION = '0.017';
+$JSON::Karabiner::Manipulator::Conditions::Variable_if::VERSION = '0.018';
 use strict;
 use warnings;
 use JSON;
@@ -69,7 +69,7 @@ JSON::Karabiner::Manipulator::Conditions::Variable_if - definition for Frontmost
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 AUTHOR
 

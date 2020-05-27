@@ -29,6 +29,6 @@ foreach my $MODULE ( @MODULES ) {
 }
 
 # Note: constant_hash requires 5.8 but works okay with 5.6.2 here
-all_minimum_version_ok("5.008"); 
+all_minimum_version_ok("5.008001"); 
 
 1;

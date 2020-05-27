@@ -1,0 +1,21 @@
+0.004   2020-05-23  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Keep working when class/object has been mixed with roles
+	  and reblessed to another package.
+
+
+0.003   2020-05-23  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Remove typo.
+
+
+0.002   2020-05-22  Released-By: PERLANCAR; Urgency: medium
+
+	- Support allow_duplicates option.
+
+
+0.001   2020-05-22  Released-By: PERLANCAR
+
+        - First release.

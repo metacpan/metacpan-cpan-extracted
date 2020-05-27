@@ -5,7 +5,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 use DBI 1.40;
 use parent 'DBI';
@@ -463,13 +463,13 @@ sub connect_uncached {
         my $self  = shift;
         my @input = @_;
 
-        my @value;
+        my $value;
         DBIx::Query::_Common::_try( $self, sub {
-            @value = $self->{'sth'}->fetchall_arrayref(@input);
+            $value = $self->{'sth'}->fetchall_arrayref(@input);
             $self->{'sth'}->finish;
         } );
 
-        return @value;
+        return $value;
     }
 
     sub each {
@@ -721,7 +721,7 @@ DBIx::Query - Simplified abstracted chained DBI subclass
 
 =head1 VERSION
 
-version 1.09
+version 1.10
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/DBIx-Query.svg)](https://travis-ci.org/gryphonshafer/DBIx-Query)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/DBIx-Query/badge.png)](https://coveralls.io/r/gryphonshafer/DBIx-Query)

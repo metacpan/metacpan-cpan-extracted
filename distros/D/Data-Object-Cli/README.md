@@ -427,6 +427,51 @@ string, e.g. `userid|id|u`, if multiple aliases are used.
 
         # $todotask->spec
 
+## subs
+
+    subs(Any %args) : HashRef
+
+The subs method works in tandem with the ["auto"](#auto) method and is expected to be
+overridden by the subclass and should return a hashref where the keys represent
+a subcommand at `$ARGV[0]` and the value represents the description of the
+corresponding action (i.e. _command_).
+
+- subs example #1
+
+        package Todo::Admin;
+
+        use parent 'Data::Object::Cli';
+
+        our $name = 'todo <action>';
+
+        sub auto {
+          {
+            add_user => '_handle_add_user',
+            del_user => '_handle_del_user'
+          }
+        }
+
+        sub subs {
+          {
+            add_user => 'Add a new user to the system',
+            del_user => 'Remove a user to the system'
+          }
+        }
+
+        my $admin = run Todo::Admin;
+
+        __DATA__
+
+        Usage: {name}
+
+        Commands:
+
+        {commands}
+
+        Options:
+
+        {options}
+
 # AUTHOR
 
 Al Newkirk, `awncorp@cpan.org`

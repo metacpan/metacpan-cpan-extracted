@@ -31,11 +31,12 @@ pm_to_blib
 
 appveyor.yml
 .travis.yml
-
+.cirrus.yml
 
 ^_alien
 
 gp_changer.pl
+gh_links
 
 tarballs.zip
 

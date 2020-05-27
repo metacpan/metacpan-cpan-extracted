@@ -1,7 +1,7 @@
 package Sah::SchemaR::perl::distname;
 
-our $DATE = '2020-05-08'; # DATE
-our $VERSION = '0.031'; # VERSION
+our $DATE = '2020-05-21'; # DATE
+our $VERSION = '0.032'; # VERSION
 
 our $rschema = ["str",[{description=>"\nFor convenience (particularly in CLI with tab completion), you can input one of:\n\n    Foo::Bar\n    Foo/Bar\n    Foo/Bar.pm\n    Foo.Bar\n\nand it will be coerced into Foo-Bar form.\n\n",match=>"\\A[A-Za-z_][A-Za-z_0-9]*(-[A-Za-z_0-9]+)*\\z",summary=>"Perl distribution name, e.g. Foo-Bar","x.completion"=>"perl_distname","x.perl.coerce_rules"=>["From_str::normalize_perl_distname"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::distname - Perl distribution name, e.g. Foo-Bar
 
 =head1 VERSION
 
-This document describes version 0.031 of Sah::SchemaR::perl::distname (from Perl distribution Sah-Schemas-Perl), released on 2020-05-08.
+This document describes version 0.032 of Sah::SchemaR::perl::distname (from Perl distribution Sah-Schemas-Perl), released on 2020-05-21.
 
 =head1 DESCRIPTION
 

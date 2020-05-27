@@ -1,3 +1,31 @@
+1.058   2020-05-26  Released-By: PERLANCAR; Urgency: medium
+
+	- [incompatible change] Add/replace/rename/remove ctime/mtime
+	  options: remove --{added,updated}-before, replace
+	  --{added,updated}-after with --{added,updated}-since, rename
+	  --{added,updated}-in-last-update to
+	  --{added,updated}-since-last-index-update, rename
+	  --{added,updated}-in-last-n-updates to
+	  --{added,updated}-since-last-n-index-updates, add
+	  --added-or-updated-since* options.
+
+        - Add some subcommands: most-depended-mods, most-mentioned-mods,
+          most-mentioned-scripts, whatsnew, heaviest-dists.
+
+        - Add option -n to mods-by-mention-count, mods-by-rdep-count,
+	  scripts-by-mention-count, dists-by-dep-count.
+
+	[subcommand scripts-by-mention-count]
+
+        - Return author.
+
+	- Add subcommand: heaviest-dists.
+
+        [subcommand dists-by-dep-count]
+
+	- [bugfix]Fix query, dependency count was incorrect (all 1).
+
+
 1.057   2020-05-07  Released-By: PERLANCAR; Urgency: high
 
 	- [bugfix] Fix several misplaced parameters in SQL update query which

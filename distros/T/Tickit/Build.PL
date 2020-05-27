@@ -7,7 +7,7 @@ my $build = Module::Build::Using::PkgConfig->new(
    module_name => 'Tickit',
    requires => {
       'Exporter' => '5.57',
-      'perl' => '5.010', # //
+      'perl' => '5.014', # PL_phase
       'Struct::Dumb' => '0.04',
    },
    configure_requires => {
@@ -26,9 +26,9 @@ my $build = Module::Build::Using::PkgConfig->new(
 );
 
 $build->use_pkgconfig( "tickit",
-   atleast_version => "0.3.4",
+   atleast_version => "0.4.0",
    alien         => "Alien::libtickit",
-   alien_version => "0.08",
+   alien_version => "0.09",
 );
 
 $build->create_build_script;

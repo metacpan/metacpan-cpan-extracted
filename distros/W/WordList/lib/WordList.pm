@@ -1,11 +1,14 @@
 package WordList;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-04'; # DATE
+our $DATE = '2020-05-24'; # DATE
 our $DIST = 'WordList'; # DIST
-our $VERSION = '0.6.0'; # VERSION
+our $VERSION = '0.7.5'; # VERSION
 
 use strict 'subs', 'vars';
+
+use WordListBase ();
+our @ISA = qw(WordListBase);
 
 # IFUNBUILT
 # use Role::Tiny::With;
@@ -14,36 +17,28 @@ use strict 'subs', 'vars';
 
 sub new {
     my $class = shift;
+    my $self = $class->SUPER::new(@_);
+
     my $fh = \*{"$class\::DATA"};
     binmode $fh, "encoding(utf8)";
+    my $fh_orig_pos = tell $fh;
     unless (defined ${"$class\::DATA_POS"}) {
-        ${"$class\::DATA_POS"} = tell $fh;
+        ${"$class\::DATA_POS"} = $fh_orig_pos;
     }
 
-    # check for known and required parameters
-    my %params = @_;
-    my $param_spec = \%{"$class\::PARAMS"};
-    for my $param_name (keys %params) {
-        die "Unknown parameter '$param_name'" unless $param_spec->{$param_name};
-    }
-    for my $param_name (keys %$param_spec) {
-        die "Missing required parameter '$param_name'"
-            if $param_spec->{$param_name}{req} && !exists($params{$param_name});
-    }
-
-    bless [undef, undef, \%params], $class;
+    $self->{fh} = $fh;
+    $self->{fh_orig_pos} = $fh_orig_pos;
+    $self->{fh_seekable} = 1;
+    $self;
 }
 
 sub each_word {
     my ($self, $code) = @_;
 
-    my $class = ref($self);
-
-    my $fh = \*{"$class\::DATA"};
-
-    seek $fh, ${"$class\::DATA_POS"}, 0;
-    while (defined(my $word = <$fh>)) {
-        chomp $word;
+    my $i = 0;
+    while (1) {
+        my $word = $i++ ? $self->next_word : $self->first_word;
+        last unless defined $word;
         my $res = $code->($word);
         last if defined $res && $res == -2;
     }
@@ -52,8 +47,7 @@ sub each_word {
 sub next_word {
     my $self = shift;
 
-    my $class = ref($self);
-    my $fh = \*{"$class\::DATA"};
+    my $fh = $self->{fh};
     my $word = <$fh>;
     chomp $word if defined $word;
     $word;
@@ -62,9 +56,10 @@ sub next_word {
 sub reset_iterator {
     my $self = shift;
 
-    my $class = ref($self);
-    my $fh = \*{"$class\::DATA"};
-    seek $fh, ${"$class\::DATA_POS"}, 0;
+    die "Cannot reset iterator, filehandle not seekable"
+        unless $self->{fh_seekable};
+    my $fh = $self->{fh};
+    seek $fh, $self->{fh_orig_pos}, 0;
 }
 
 sub first_word {
@@ -75,7 +70,7 @@ sub first_word {
 }
 
 sub pick {
-    my ($self, $n) = @_;
+    my ($self, $n, $allow_duplicates) = @_; # but this implementaiton never produces duplicates
 
     $n = 1 if !defined $n;
     die "Please specify a positive number of words to pick" if $n < 1;
@@ -153,7 +148,7 @@ WordList - Word lists
 
 =head1 VERSION
 
-This document describes version 0.6.0 of WordList (from Perl distribution WordList), released on 2020-05-04.
+This document describes version 0.7.5 of WordList (from Perl distribution WordList), released on 2020-05-24.
 
 =head1 SYNOPSIS
 
@@ -165,11 +160,12 @@ C<WordList::*> modules are modules that contain, well, list of words. This
 module, C<WordList>, serves as a base class and establishes convention for such
 modules.
 
-C<WordList> is an alternative interface for L<Games::Word::Wordlist> and
+C<WordList> is an alternative for L<Games::Word::Wordlist> and
 C<Games::Word::Wordlist::*>. Its main difference is: C<WordList::*> wordlists
 are read-only/immutable and the modules are designed to have low startup
 overhead. This makes them more suitable for use in CLI scripts which often only
-want to pick a word from one or several lists.
+want to pick a word from one or several lists. See L</"DIFFERENCES WITH
+GAMES::WORD::WORDLIST"> for more details.
 
 Unless you are defining a dynamic wordlist (see below), words (or phrases) must
 be put in C<__DATA__> section, one per line. Putting the wordlist in the
@@ -207,8 +203,8 @@ metadata specified in L<Rinci::function>.
 
 =head1 DIFFERENCES WITH GAMES::WORD::WORDLIST
 
-Since this is a new and non-backward compatible interface from
-Games::Word::Wordlist, I also make some other changes:
+Since this is a non-compatible interface from Games::Word::Wordlist, I also make
+some other changes:
 
 =over
 
@@ -216,11 +212,19 @@ Games::Word::Wordlist, I also make some other changes:
 
 Because obviously word lists are not only useful for games.
 
+=item * Namespace is more language-neutral and not English-centric
+
+English wordlists are put under C<WordList::EN::*>. Other languages have their
+own subnamespaces, e.g. C<WordList::FR::*> or C<WordList::ID::*>. Aside from
+language subnamespaces, there are also other subnamespaces:
+C<WordList::Phrase::$LANG::*>, C<WordList::Password::*>, C<WordList::Domain::*>,
+C<WordList::HTTP::*>, etc.
+
 =item * Interface is simpler
 
 This is partly due to the list being read-only. The methods provided are just:
 
-- C<pick> (pick one or several random entries)
+- C<pick> (pick one or several random entries, without duplicates or with)
 
 - C<word_exists> (check whether a word is in the list)
 
@@ -230,9 +234,27 @@ This is partly due to the list being read-only. The methods provided are just:
 
 A couple of other functions might be added, with careful consideration.
 
-=item * Namespace is more language-neutral and not English-centric
+=item * More extensions
+
+Some roles, subclasses, or alternate implementations are provided. For example,
+since most wordlist are alphabetically sorted, a binary search can be performed
+in C<word_exists()>. There is a role, L<WordListRole::BinarySearch>, that does
+that and can be mixed in. An even faster version of C<word_exists()> using bloom
+filter is offered by L<WordListRole::Bloom>. A faster version of pick() that
+does random seeking is offered by L<WordListRole::RandomSeekPick>.
 
 =back
+
+=head1 SUBCLASSING OR CREATING ROLES
+
+If you want to get the word list from another filehandle source, e.g. a gzipped
+file, you just need to override C<reset_iterator()>. Your C<reset_iterator()>
+needs to set the 'fh' attribute to the filehandle. The default C<first_word()>
+calls C<reset_iterator()> and reads a line from the filehandle. The default
+C<next_word()> just reads another line from the filehandle. C<each_word()> is
+implemented in terms of C<first_word()> and C<next_word()>, and
+C<word_exists()>, C<pick()>, and C<all_words()> are implemented in terms of
+C<each_word()>.
 
 =head1 METHODS
 
@@ -240,7 +262,7 @@ A couple of other functions might be added, with careful consideration.
 
 Usage:
 
- $wl = WordList::Module->new => obj
+ $wl = WordList::Module->new([ %params ]);
 
 Constructor.
 
@@ -273,10 +295,16 @@ L</next_word>.
 
 Usage:
 
- $wl->pick($n = 1) => list
+ @words = $wl->pick([ $num=1 [ , $allow_duplicates=0 ] ])
 
-Pick C<$n> (default: 1) random word(s) from the list. If there are less then
-C<$n> words in the list, only that many will be returned.
+Examples:
+
+ ($word) = $wl->pick;
+ @words  = $wl->pick(3);
+
+Pick C<$n> (default: 1) random word(s) from the list, without duplicates (unless
+C<$allow_duplicates> is set to true). If there are less then C<$n> words in the
+list and duplicates are not allowed, only that many will be returned.
 
 The algorithm used is from perlfaq ("perldoc -q "random line""), which scans the
 whole list once (a.k.a. each_word() once). The algorithm is for returning a
@@ -304,6 +332,21 @@ Return all the words in a list, in order. Note that if wordlist is very large
 you might want to use L</"each_word"> instead to avoid slurping all words into
 memory.
 
+=head1 FAQ
+
+=head2 Why does pick() return "1"?
+
+You probably write this:
+
+ $word = $wl->pick;
+
+instead of this:
+
+ ($word) = $wl->pick;
+
+C<pick()> returns a list and in scalar context it returns the number of elements
+in the list which is 1. This is a common context trap in Perl.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/WordList>.
@@ -323,8 +366,6 @@ feature.
 =head1 SEE ALSO
 
 C<WordListRole::*> modules.
-
-C<WordListMod::*> modules.
 
 C<WordList::*> modules.
 

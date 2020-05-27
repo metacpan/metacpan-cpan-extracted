@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.182';
+our $VERSION = '1.183';
 
 use Quiq::Database::Row::Array;
 use Quiq::AnsiColor;
@@ -3054,7 +3054,7 @@ sub runSql {
 
 =head1 VERSION
 
-1.182
+1.183
 
 =head1 AUTHOR
 

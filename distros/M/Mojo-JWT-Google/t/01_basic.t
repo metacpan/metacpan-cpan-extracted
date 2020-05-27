@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
+use Test2::V0;
 use Mojo::JWT::Google;
 use Mojo::Collection 'c';
 use File::Basename 'dirname';
@@ -9,22 +9,22 @@ use Cwd 'abs_path';
 #my $grant_type = "urn:ietf:params:oauth:grant-type:jwt-bearer";
 
 my $client_email = 'mysa@developer.gserviceaccount.com';
-my $target = 'https://www.googleapis.com/oauth2/v3/token';
+my $target = 'https://www.googleapis.com/oauth2/v4/token';
 
 
-isa_ok my $jwt = Mojo::JWT::Google->new, 'Mojo::JWT::Google';
+isa_ok my $jwt = Mojo::JWT::Google->new, ['Mojo::JWT::Google'], 'empty object creation';
 
 # accessors
 is $jwt->client_email, undef, 'not init';
 is $jwt->client_email($client_email), $jwt, 'service_account set';
 is $jwt->client_email, $client_email, 'service_account get';
 
-is_deeply $jwt->scopes, [], 'no scopes';
+is $jwt->scopes, [], 'no scopes';
 is push( @{ $jwt->scopes }, '/a/scope'), 1, 'scopes add one scope';
 is push( @{ $jwt->scopes }, '/b/scope'), 2, 'scopes add another';
-is_deeply $jwt->scopes, ['/a/scope','/b/scope'], 'scopes get all';
+is $jwt->scopes, ['/a/scope','/b/scope'], 'scopes get all';
 
-is $jwt->target, 'https://www.googleapis.com/oauth2/v3/token', 'target get';
+is $jwt->target, 'https://www.googleapis.com/oauth2/v4/token', 'target get';
 is $jwt->target('https://a/new/target'), $jwt, 'target set';
 is $jwt->target, 'https://a/new/target', 'target get';
 
@@ -37,24 +37,26 @@ is $jwt->issue_at('1429812717'), $jwt, 'issue_at set';
 is $jwt->issue_at, '1429812717', 'issue_at get';
 
 # basic claim work
-$jwt = Mojo::JWT::Google->new( client_email => $client_email,
-                               issue_at => '1429812717',
-                               scopes => c('/a/scope', '/b/scope'));
+for my $scopes ( c('/a/scope', '/b/scope'), [qw+ /a/scope /b/scope +] ){
+  ok $jwt = Mojo::JWT::Google->new( client_email => $client_email,
+                                 issue_at => '1429812717',
+                                 scopes => $scopes), 'created a token for ' . ref($scopes) . ' as scopes';
 
-is_deeply $jwt->claims, { iss   => $client_email,
-                          scope => '/a/scope /b/scope',
-                          aud   => 'https://www.googleapis.com/oauth2/v3/token',
-                          exp   => '1429816317',
-                          iat   => '1429812717',
-                        }, 'claims based on accessor settings';
+  is $jwt->claims, { iss   => $client_email,
+                            scope => '/a/scope /b/scope',
+                            aud   => 'https://www.googleapis.com/oauth2/v4/token',
+                            exp   => '1429816317',
+                            iat   => '1429812717',
+                          }, 'claims based on accessor settings';
+}
 
 is $jwt->user_as, undef, 'impersonate user undef by default';
 is $jwt->user_as('riche@cpan.org'), $jwt, 'set user';
 is $jwt->user_as, 'riche@cpan.org', 'get user';
 
-is_deeply $jwt->claims, { iss   => $client_email,
+is $jwt->claims, { iss   => $client_email,
                           scope => '/a/scope /b/scope',
-                          aud   => 'https://www.googleapis.com/oauth2/v3/token',
+                          aud   => 'https://www.googleapis.com/oauth2/v4/token',
                           exp   => '1429816317',
                           iat   => '1429812717',
                           sub   => 'riche@cpan.org',
@@ -68,7 +70,7 @@ $jwt = Mojo::JWT::Google->new( client_email => $client_email,
 
 
 # we must set this
-is_deeply $jwt->scopes(c->new('/a/scope')), $jwt, 'scopes add one scope';
+is $jwt->scopes(c->new('/a/scope')), $jwt, 'scopes add one scope';
 
 my $claims = $jwt->claims;
 
@@ -79,7 +81,9 @@ $jwt = Mojo::JWT::Google->new( scopes => c('/scope/a/', '/scope/b/'));
 my $testdir = dirname ( abs_path( __FILE__ ) );
 
 
-is my $er = Mojo::JWT::Google->new( from_json => "$testdir/load0.json" ), undef;
+like dies {
+  Mojo::JWT::Google->new( from_json => "$testdir/load0.json" ),
+}, qr/Your JSON file import failed.*/, 'dies on file load failure';
 
 
 $jwt = Mojo::JWT::Google->new( from_json => "$testdir/load1.json" );

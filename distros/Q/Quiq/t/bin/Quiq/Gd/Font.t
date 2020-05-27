@@ -270,8 +270,8 @@ sub test_digitHeight_ttf : Test(1) {
     my $self = shift;
 
     my $fnt = $self->get('ttFont');
-    # auf vostro 20, auf kopc02 21
-    $self->ok($fnt->digitHeight >= 20);
+    # auf vostro 20, auf kopc02 21, FreeBSD 19
+    $self->cmpOk($fnt->digitHeight, '>=', 19);
 }
 
 sub test_digitHeight_gd : Test(5) {

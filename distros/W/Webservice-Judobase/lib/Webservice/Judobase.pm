@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: This module wraps the www.judobase.org website API.
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use Moo;
 require HTTP::Request;

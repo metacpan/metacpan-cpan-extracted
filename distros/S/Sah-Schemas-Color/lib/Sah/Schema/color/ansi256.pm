@@ -3,7 +3,7 @@ package Sah::Schema::color::ansi256;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-03-02'; # DATE
 our $DIST = 'Sah-Schemas-Color'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $schema = [int => {
     summary => 'ANSI-256 color, an integer number from 0-255',
@@ -33,7 +33,21 @@ Sah::Schema::color::ansi256 - ANSI-256 color, an integer number from 0-255
 
 =head1 VERSION
 
-This document describes version 0.007 of Sah::Schema::color::ansi256 (from Perl distribution Sah-Schemas-Color), released on 2020-03-02.
+This document describes version 0.009 of Sah::Schema::color::ansi256 (from Perl distribution Sah-Schemas-Color), released on 2020-03-02.
+
+=head1 SYNOPSIS
+
+Sample data:
+
+ 0  # valid
+
+ 255  # valid
+
+ 256  # INVALID
+
+ "black"  # INVALID
+
+ "foo"  # INVALID
 
 =head1 HOMEPAGE
 

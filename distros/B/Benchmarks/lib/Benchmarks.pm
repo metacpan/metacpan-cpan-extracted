@@ -2,7 +2,7 @@ package Benchmarks;
 use strict;
 use warnings;
 use Benchmark qw/ :hireswallclock /;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 sub import {
     my ($class, $code, $count, $style, $title) = @_;
@@ -13,6 +13,9 @@ sub import {
     return unless ref $code eq 'CODE';
 
     my ($ret, $runtime_count, $runtime_style, $runtime_title)  = $code->();
+
+    return if !defined $ret;
+
     $count = defined($runtime_count) ? $runtime_count
            : defined($count)         ? $count
            : -1;

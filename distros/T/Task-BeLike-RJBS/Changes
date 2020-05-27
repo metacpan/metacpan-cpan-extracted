@@ -1,5 +1,8 @@
 Revision history for Task-BeLike-RJBS
 
+20200521.000 2020-05-21 09:16:14-04:00 America/New_York
+              drop Crypt::SSLeay -- that'd be nice if it pans out!
+
 20150423.001 2015-04-23 13:20:43-04:00 America/New_York
               allow rjbs.pm to work on 5.20, with fewer features; this is going
               to be a hard minimum

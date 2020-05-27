@@ -9,9 +9,6 @@ use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Mapping Perl releases on CPAN to the location of the tarballs",
   "AUTHOR" => "Chris Williams <chris\@bingosnet.co.uk>",
-  "BUILD_REQUIRES" => {
-    "Test::More" => "0.47"
-  },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -26,7 +23,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "0.47"
   },
-  "VERSION" => "5.20200428",
+  "VERSION" => "5.20200524",
   "test" => {
     "TESTS" => "t/*.t"
   }

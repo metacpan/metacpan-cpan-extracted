@@ -24,10 +24,6 @@ my $builder = Module::Build->new(
       resources => {
         repository  => 'http://github.com/bayashi/Benchmarks',
         bugtracker  => 'http://github.com/bayashi/Benchmarks/issues',
-        x_IRC       => {
-            url => 'irc://chat.freenode.org/#bayadev',
-            web => 'http://webchat.freenode.net/?channels=%23bayadev',
-        },
       }
     },
     recursive_test_files => 1,

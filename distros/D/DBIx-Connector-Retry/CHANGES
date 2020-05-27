@@ -1,0 +1,22 @@
+Changelog for DBIx-Connector-Retry
+
+v0.900.1 2020-05-14T20:27:15
+ - Update README (Brendan Byrd)
+ - Clean up cpanfile (Andrew Hewus Fresh)
+ - Clean up POD for new PodWeaver settings (Andrew Hewus Fresh)
+ - Move xt tests to correct location (Andrew Hewus Fresh)
+ - Convert to Dist::Zilla::PluginBundle::Author::GSG (Andrew Hewus Fresh)
+
+v0.900.0 2018-07-05T22:52:17
+ - No changes found
+
+0.90 2018-07-05T22:52:17
+ - Typo fixups (Brendan Byrd)
+ - Add READMEs (Brendan Byrd)
+ - Tweak date in CHANGES (Brendan Byrd)
+ - SM-1393 Add DBD::SQLite to deps (Eric Wiegandt)
+ - Skeleton framework (Brendan Byrd)
+ - Add deps to Makefile.PL (Brendan Byrd)
+ - Add some bare attributes for extra constructor options (Brendan Byrd)
+ - Add a set of tests (Brendan Byrd)
+ - Initial version of DBIx::Connector::Retry (Brendan Byrd)

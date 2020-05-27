@@ -1,9 +1,9 @@
 package Data::Sah::Coerce::perl::To_array::From_str::comma_sep;
 
-# AUTHOR
-our $DATE = '2019-11-28'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-21'; # DATE
 our $DIST = 'Data-Sah-CoerceBundle-To_array-From_str-comma_sep'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,19 +14,28 @@ sub meta {
         v => 4,
         summary => 'Coerce array from a comma-separated items in a string',
         prio => 60, # a bit lower than normal
+        args => {
+            separator => {
+                schema => ['str*', min_len=>1],
+                default => ',',
+            },
+            # TODO: separators
+        },
     };
 }
 
 sub coerce {
-    my %args = @_;
+    my %cargs = @_;
 
-    my $dt = $args{data_term};
+    my $dt = $cargs{data_term};
+    my $gen_args = $cargs{args};
 
     my $res = {};
 
     $res->{expr_match} = "!ref($dt)";
 
-    $res->{expr_coerce} = "[split /\\s*,\\s*/, $dt]";
+    my $sep = $gen_args->{separator} // ',';
+    $res->{expr_coerce} = "[split /\\s*\Q$sep\E\\s*/, $dt]";
 
     $res;
 }
@@ -46,7 +55,7 @@ Data::Sah::Coerce::perl::To_array::From_str::comma_sep - Coerce array from a com
 
 =head1 VERSION
 
-This document describes version 0.011 of Data::Sah::Coerce::perl::To_array::From_str::comma_sep (from Perl distribution Data-Sah-CoerceBundle-To_array-From_str-comma_sep), released on 2019-11-28.
+This document describes version 0.012 of Data::Sah::Coerce::perl::To_array::From_str::comma_sep (from Perl distribution Data-Sah-CoerceBundle-To_array-From_str-comma_sep), released on 2020-05-21.
 
 =head1 SYNOPSIS
 
@@ -78,7 +87,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

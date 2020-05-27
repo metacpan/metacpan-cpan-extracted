@@ -1,14 +1,19 @@
 Revision history for Changes
 
+0.71    2020-05-25
+        [CHANGES]
+         * Use libtickit 0.4.0
+         * Requires perl 5.14+ because of PL_phase
+
 0.70    2020-01-27 13:00:17
         [CHANGES]
          * Construct a new Tickit::Term proxy object during callbacks rather
            than relying on weakrefs to still be alive
-         * Give Tickit::Term proxy objects numify and strnigify overloading so
+         * Give Tickit::Term proxy objects numify and stringify overloading so
            that proxies to the same underlying object compare equal
          * Added toplevel methods Tickit->watch_later and ->watch_timer_*
          * Added Tickit::Test::mk_tickit
-         * Implement timers and watch cancellation in Tickit;:Test instance
+         * Implement timers and watch cancellation in Tickit::Test instance
          * Provide accessors for library version query
          * Requires libtickit 0.3.4
 

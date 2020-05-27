@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::Carrier;
-$Shipment::Temando::WSDL::Types::Carrier::VERSION = '3.04';
+$Shipment::Temando::WSDL::Types::Carrier::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -156,7 +156,7 @@ Shipment::Temando::WSDL::Types::Carrier
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 

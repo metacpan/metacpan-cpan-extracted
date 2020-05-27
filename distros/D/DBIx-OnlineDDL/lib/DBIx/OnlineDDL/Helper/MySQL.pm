@@ -1,7 +1,9 @@
 package DBIx::OnlineDDL::Helper::MySQL;
 
 our $AUTHORITY = 'cpan:GSG';
-our $VERSION   = '0.92';
+# ABSTRACT: Private OnlineDDL helper for MySQL-specific code
+use version;
+our $VERSION = 'v0.920.1'; # VERSION
 
 use v5.10;
 use Moo;
@@ -15,26 +17,18 @@ use Sub::Util qw( set_subname );
 
 use namespace::clean;  # don't export the above
 
-=encoding utf8
-
-=head1 NAME
-
-DBIx::OnlineDDL::Helper::MySQL - Private OnlineDDL helper for MySQL-specific code
-
-=head1 VERSION
-
-version 0.92
-
-=head1 DESCRIPTION
-
-This is a private helper module for any MySQL-specific code.  B<As a private module, any
-methods or attributes here are subject to change.>
-
-You should really be reading documentation for L<DBIx::OnlineDDL>.  Or, if you want to
-create a helper module for a different RDBMS, read the docs for
-L<DBIx::OnlineDDL::Helper::Base>.
-
-=cut
+#pod =encoding utf8
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This is a private helper module for any MySQL-specific code.  B<As a private module, any
+#pod methods or attributes here are subject to change.>
+#pod
+#pod You should really be reading documentation for L<DBIx::OnlineDDL>.  Or, if you want to
+#pod create a helper module for a different RDBMS, read the docs for
+#pod L<DBIx::OnlineDDL::Helper::Base>.
+#pod
+#pod =cut
 
 sub dbms_uses_global_fk_namespace { 1 }
 sub child_fks_need_adjusting      { 1 }
@@ -220,20 +214,41 @@ around 'rename_fks_back_to_original_stmts' => sub {
 
 # Keep Base->add_fks_back_to_child_tables_stmts (no DROPs on those)
 
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIx::OnlineDDL::Helper::MySQL - Private OnlineDDL helper for MySQL-specific code
+
+=head1 VERSION
+
+version v0.920.1
+
+=head1 DESCRIPTION
+
+This is a private helper module for any MySQL-specific code.  B<As a private module, any
+methods or attributes here are subject to change.>
+
+You should really be reading documentation for L<DBIx::OnlineDDL>.  Or, if you want to
+create a helper module for a different RDBMS, read the docs for
+L<DBIx::OnlineDDL::Helper::Base>.
+
 =head1 AUTHOR
 
 Grant Street Group <developers@grantstreet.com>
 
-=head1 LICENSE AND COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2019 Grant Street Group
+This software is Copyright (c) 2018 - 2020 by Grant Street Group.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
+This is free software, licensed under:
 
-L<http://www.perlfoundation.org/artistic_license_2_0>
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut
-
-1;

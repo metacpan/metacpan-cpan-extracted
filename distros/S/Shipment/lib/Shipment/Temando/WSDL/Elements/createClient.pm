@@ -1,6 +1,6 @@
 
 package Shipment::Temando::WSDL::Elements::createClient;
-$Shipment::Temando::WSDL::Elements::createClient::VERSION = '3.04';
+$Shipment::Temando::WSDL::Elements::createClient::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -86,7 +86,7 @@ Shipment::Temando::WSDL::Elements::createClient
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 

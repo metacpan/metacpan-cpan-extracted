@@ -1,3 +1,12 @@
+1.829   2020-05-26  Released-By: PERLANCAR; Urgency: medium
+
+	- [experimental] Inspect result's content_type and set default
+	  viewer and processing for text/x-org content.
+
+	- Add common option: --view-result:s, similar to what we previously
+	  did with --page-result:s.
+
+
 1.828   2020-04-27  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Add 'value_label' keys to common options, to be utilized in usage

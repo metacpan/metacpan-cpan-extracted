@@ -24,8 +24,8 @@ WriteMakefile(
     	'Exporter'		=> '5.73',
     	'JSON'          => '4.02',
     	'Number::Format' => '1.75',
-    	'Nice::Try'     => 'v0.1.2',
-    	'POSIX'         => '1.88',
+    	'Nice::Try'     => 'v0.1.3',
+    	'POSIX'         => '1.53_01',
     	'Regexp::Common'=> '2017060201',
     	'Scalar::Util'	=> '1.50',
     	'Tie::Hash'     => '1.05',
@@ -33,12 +33,13 @@ WriteMakefile(
     },
     TEST_REQUIRES =>
     {
+		'File::Which'   => '1.23',
         'Test::More'    => '1.302162',
         'Test::Pod'     => '1.52',
 		'utf8'          => 0,
     },
     LICENSE				=> 'perl_5',
-    MIN_PERL_VERSION	=> 5.6.0,
+    MIN_PERL_VERSION	=> 'v5.26.1',
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Module-Generic-*' },
     ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? () : ( META_MERGE => {

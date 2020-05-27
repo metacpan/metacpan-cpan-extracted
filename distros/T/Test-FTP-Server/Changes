@@ -1,5 +1,9 @@
 Revision history for Perl extension Test::FTP::Server
 
+0.013   Fri May 22 11:00:17 JST 2020
+        - Fixed tests.
+        @kiwiroy++
+
 0.012   Mon Aug  9 19:00:17 JST 2010
         - Fixed a error message.
         - Fixed a bug that occurs when test_root contains symbolic link.

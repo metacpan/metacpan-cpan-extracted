@@ -1,5 +1,11 @@
 Revision history for Rex-Dondley-ProcessTaskArgs
 
+0.012     2020-05-25 15:13:27-04:00 America/New_York
+- Update docs to reflect new wantarray feature
+
+0.011     2020-05-25 14:55:30-04:00 America/New_York
+- return an ordered array of values in array context
+
 0.010     2020-05-19 16:35:07-04:00 America/New_York
 - fixed spurious warning
 - add an extra test

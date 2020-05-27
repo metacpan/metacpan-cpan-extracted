@@ -83,8 +83,8 @@ my $c = Text::Amuse::Compile->new(
         $tex_indexed = $1;
     }
 
-    eq_or_diff([ split(/\n/, $tex_indexed) ],
-               [ split(/\n/, path(qw/t testfile index-me-1.expected/)->slurp_utf8) ]);
+    eq_or_diff([ split(/\r?\n/, $tex_indexed) ],
+               [ split(/\r?\n/, path(qw/t testfile index-me-1.expected/)->slurp_utf8) ]);
 
     # now we create a same file, but without the magic comment, so
     # indexes are not triggered

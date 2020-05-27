@@ -1,3 +1,20 @@
+0.004   2020-05-24  Released-By: PERLANCAR; Urgency: medium
+
+	- Add routine: get_firefox_profile_dir().
+
+
+0.003   2020-04-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Make function exportable.
+
+
+0.002   2020-04-19  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention {Chrome,Opera,Vivaldi}::Util::Profile.
+
+
 0.001   2020-04-18  Released-By: PERLANCAR
 
         - First release.

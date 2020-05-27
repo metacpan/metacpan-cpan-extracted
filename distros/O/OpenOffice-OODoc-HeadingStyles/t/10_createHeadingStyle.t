@@ -50,6 +50,11 @@ subtest "Custom Heading" => sub {
 
     my $mocked_styles = _mock_obj__styles( { styles => {} } );
 
+
+
+    my @warnings;
+    $SIG{__WARN__} = sub { push(@warnings, @_) };
+
     $mocked_styles->createHeadingStyle(
         9.99 => { # yup, decimal number here
             paragraph => {
@@ -72,6 +77,13 @@ subtest "Custom Heading" => sub {
                 'Heading_20_9' => ignore(),
         },
         "Created style '9', using whole number only"
+    );
+
+    is(@warnings, 1, ".. and emits warnings as expected");
+    like(
+        $warnings[0],
+        qr/^Changed level '9.99' to '9' at/,
+        ".. with the correct message"
     );
 
     cmp_deeply(
@@ -163,7 +175,7 @@ sub _mock_obj__styles {
             my $name = shift;
             my %args = @_;
             return if exists $self->{styles}{$name};
-            $self->{styles}{$name} = \%args; 
+            $self->{styles}{$name} = \%args;
         }
     );
     $mock_obj->mock(

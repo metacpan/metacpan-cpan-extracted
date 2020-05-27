@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 90 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 95 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/lcpan.pm',
@@ -49,6 +49,7 @@ my @module_files = (
     'App/lcpan/Cmd/extract_mod.pm',
     'App/lcpan/Cmd/extract_rel.pm',
     'App/lcpan/Cmd/extract_script.pm',
+    'App/lcpan/Cmd/heaviest_dists.pm',
     'App/lcpan/Cmd/inject.pm',
     'App/lcpan/Cmd/log.pm',
     'App/lcpan/Cmd/mentions.pm',
@@ -68,6 +69,9 @@ my @module_files = (
     'App/lcpan/Cmd/mods_from_same_dist.pm',
     'App/lcpan/Cmd/module.pm',
     'App/lcpan/Cmd/modules.pm',
+    'App/lcpan/Cmd/most_depended_mods.pm',
+    'App/lcpan/Cmd/most_mentioned_mods.pm',
+    'App/lcpan/Cmd/most_mentioned_scripts.pm',
     'App/lcpan/Cmd/namespaces.pm',
     'App/lcpan/Cmd/rdeps.pm',
     'App/lcpan/Cmd/rdeps_scripts.pm',
@@ -91,6 +95,7 @@ my @module_files = (
     'App/lcpan/Cmd/subnames_by_count.pm',
     'App/lcpan/Cmd/subs.pm',
     'App/lcpan/Cmd/update.pm',
+    'App/lcpan/Cmd/whatsnew.pm',
     'App/lcpan/Cmd/x_mentions_for_mod.pm',
     'App/lcpan/PodParser.pm',
     'End/PrintBytesIn.pm',

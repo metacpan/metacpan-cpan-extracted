@@ -1,12 +1,15 @@
 package WordList::ID::KBBI;
 
-our $DATE = '2017-12-25'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $DATE = '2020-05-22'; # DATE
+our $VERSION = '0.050'; # VERSION
 
 use WordList;
 our @ISA = qw(WordList);
 
-our %STATS = ("shortest_word_len",2,"num_words_contains_whitespace",0,"num_words_contains_nonword_chars",0,"longest_word_len",23,"avg_word_len",7.75904862579281,"num_words",47300,"num_words_contains_unicode",0); # STATS
+use Role::Tiny::With;
+with 'WordListRole::RandomSeekPick';
+
+our %STATS = ("longest_word_len",23,"num_words_contain_nonword_chars",0,"num_words_contains_nonword_chars",0,"shortest_word_len",2,"num_words_contain_unicode",0,"num_words_contains_unicode",0,"num_words_contain_whitespace",0,"num_words_contains_whitespace",0,"avg_word_len",7.75904862579281,"num_words",47300); # STATS
 
 1;
 # ABSTRACT: Indonesian words from Kamus Besar Bahasa Indonesia
@@ -21,7 +24,7 @@ WordList::ID::KBBI - Indonesian words from Kamus Besar Bahasa Indonesia
 
 =head1 VERSION
 
-This document describes version 0.04 of WordList::ID::KBBI (from Perl distribution WordList-ID-KBBI), released on 2017-12-25.
+This document describes version 0.050 of WordList::ID::KBBI (from Perl distribution WordList-ID-KBBI), released on 2020-05-22.
 
 =head1 SYNOPSIS
 
@@ -39,8 +42,17 @@ This document describes version 0.04 of WordList::ID::KBBI (from Perl distributi
  # Call a callback for each word
  $wl->each_word(sub { my $word = shift; ... });
 
+ # Iterate
+ my $first_word = $wl->first_word;
+ while (defined(my $word = $wl->next_word)) { ... }
+
  # Get all the words
  my @all_words = $wl->all_words;
+
+=head1 DESCRIPTION
+
+This wordlist uses random-seek picking, which gives higher probability for
+longer words. See L<File::RandomLine> for more details.
 
 =head1 STATISTICS
 
@@ -50,6 +62,9 @@ This document describes version 0.04 of WordList::ID::KBBI (from Perl distributi
  | avg_word_len                     | 7.75904862579281 |
  | longest_word_len                 | 23               |
  | num_words                        | 47300            |
+ | num_words_contain_nonword_chars  | 0                |
+ | num_words_contain_unicode        | 0                |
+ | num_words_contain_whitespace     | 0                |
  | num_words_contains_nonword_chars | 0                |
  | num_words_contains_unicode       | 0                |
  | num_words_contains_whitespace    | 0                |
@@ -80,7 +95,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

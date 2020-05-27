@@ -21,7 +21,7 @@ name: Data-Validate-WithYAML
 provides:
   Data::Validate::WithYAML:
     file: lib/Data/Validate/WithYAML.pm
-    version: '0.18'
+    version: '0.20'
 requires:
   Carp: '0'
   Scalar::Util: '1.5'
@@ -30,7 +30,7 @@ resources:
   bugtracker: http://github.com/reneeb/Data-Validate-WithYAML/issues
   homepage: http://github.com/reneeb/Data-Validate-WithYAML
   repository: http://github.com/reneeb/Data-Validate-WithYAML.git
-version: '0.18'
+version: '0.20'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'reneeb <github@renee-baecker.de>'

@@ -1,0 +1,30 @@
+MyEngine 
+
+A Service Engine performs two basic functions:
+
+Select itmes to process
+Work on the items selected
+
+What is selected is definded in Modules::Selector
+The work performed is defined in Modules::Worker
+
+To make a service engine:
+    - duplicate this example
+    - rename the directory
+    - modify config.pl
+    - customize Modules::Selector and Modules::Worker
+    - start the new engine: ./start-emgine.pl
+
+To connect to the admin console, telnet to the ip and port defined in config.pl
+
+To connect to the REST API, browse to http://yourIP:yourPort/Health/api_overview, 
+or other endooints you define in your config file.
+
+INSTALLATION AS A SERVICE (CENTOS)
+
+# cd ./install/centos/
+# sudo ./install-service.pl
+
+TO DO
+
+Implement SSL and API Keys

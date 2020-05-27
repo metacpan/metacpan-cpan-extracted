@@ -1,6 +1,52 @@
 ==================================================
-Changes from 2015-04-29 00:00:00 +0000 to present.
+Changes from 2015-05-27 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 1.98 at 2020-05-25 18:17:30 +0000
+-----------------------------------------
+
+  Change: 25ccc65e1b2bd688983ced340c23561888456921
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-05-25 19:17:30 +0000
+
+    Added command line switches to patchperl
+
+    --version prints version of Devel::PatchPerl and exits
+
+    --patchlevel will update patchlevel.h even in a git repository
+
+    One may also set the PERL5_PATCHPERL_PATCHLEVEL env var to have the
+    same effect as --patchlevel 
+
+-----------------------------------------
+version 1.96 at 2020-05-25 11:21:50 +0000
+-----------------------------------------
+
+  Change: 15cdb6b32538d3cefc779735413f0fe8522aa27b
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-05-25 12:21:50 +0000
+
+    Resolve reported issue with 1.94 release
+
+    https://github.com/bingos/devel-patchperl/issues/42
+
+    Will successfully patch all the way back to v5.6.0 
+
+-----------------------------------------
+version 1.94 at 2020-05-24 12:52:39 +0000
+-----------------------------------------
+
+  Change: 14c825fc079cb8f0d626b6b9769d048db9771bc0
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-05-24 13:52:39 +0000
+
+    Added Configure patch for GCC10
+
+    https://github.com/perl/perl5/commit/9f4e6307232229875331a55e44e1245b
+    0b91e219
+
+    Fedora 32 now ships with GCC 10 as the system compiler 
 
 -----------------------------------------
 version 1.92 at 2020-04-27 10:25:28 +0000
@@ -538,5 +584,5 @@ version 1.36 at 2015-07-03 11:48:26 +0000
     Added Errno GCC5 patches as far back as v5.6.0 
 
 =================================================
-Plus 67 releases after 2015-04-29 00:00:00 +0000.
+Plus 67 releases after 2015-05-27 00:00:00 +0000.
 =================================================

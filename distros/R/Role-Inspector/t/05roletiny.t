@@ -49,5 +49,17 @@ is_deeply(
 	'can inspect Role::Tiny roles that consume other roles',
 ) or diag explain(get_role_info('Local::RoleTiny2'));
 
+is_deeply(
+	get_role_info('Local::RoleTiny3'),
+	+{
+		name     => 'Local::RoleTiny3',
+		type     => 'Role::Tiny',
+		api      => [sort qw( meth3 mod req req_list1 req_list2 req_list3 req_array_ref1 req_array_ref2 )],
+		requires => [sort qw( mod req req_list1 req_list2 req_list3 req_array_ref1 req_array_ref2 )],
+		provides => [sort qw( meth3 )],
+	},
+	'can inspect Role::Tiny which uses method modifiers',
+) or diag explain(get_role_info('Local::RoleTiny3'));
+
 done_testing;
 

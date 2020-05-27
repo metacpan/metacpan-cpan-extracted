@@ -1,22 +1,27 @@
-0.04    2017-12-25 (PERLANCAR)
+0.050   2020-05-22  Released-By: PERLANCAR; Urgency: medium
+
+	- Use random-seek pick() for faster picking.
+
+
+0.04    2017-12-25  Released-By: PERLANCAR
 
 	- [Bugfix] Sort & remove 69 duplicate entries.
 
 
-0.03    2016-01-13 (PERLANCAR)
+0.03    2016-01-13  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to add statistics.
 
 
-0.02    2016-01-12 (PERLANCAR)
+0.02    2016-01-12  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild: add Synopsis.
 
 
-0.01    2016-01-07 (PERLANCAR)
+0.01    2016-01-07  Released-By: PERLANCAR
 
         - First release.

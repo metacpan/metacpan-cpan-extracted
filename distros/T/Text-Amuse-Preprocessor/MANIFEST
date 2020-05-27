@@ -67,6 +67,7 @@ t/testfiles/infile.muse
 t/testfiles/it.muse
 t/testfiles/mk.muse
 t/testfiles/nl.muse
+t/testfiles/pl.muse
 t/testfiles/pt.muse
 t/testfiles/ru.muse
 t/testfiles/sq.muse

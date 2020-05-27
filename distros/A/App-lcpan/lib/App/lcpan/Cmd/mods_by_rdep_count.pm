@@ -1,7 +1,9 @@
 package App::lcpan::Cmd::mods_by_rdep_count;
 
-our $DATE = '2020-05-07'; # DATE
-our $VERSION = '1.057'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-26'; # DATE
+our $DIST = 'App-lcpan'; # DIST
+our $VERSION = '1.058'; # VERSION
 
 use 5.010;
 use strict;
@@ -21,6 +23,10 @@ $SPEC{'handle_cmd'} = {
         %App::lcpan::fauthor_args,
         clone_list(%App::lcpan::deps_phase_args),
         clone_list(%App::lcpan::deps_rel_args),
+        n => {
+            summary => 'Return at most this number of results',
+            schema => 'posint*',
+        },
     },
 };
 delete $SPEC{'handle_cmd'}{args}{phase}{default};
@@ -48,7 +54,7 @@ sub handle_cmd {
     @where = (1) if !@where;
 
     my $sql = "SELECT
-  m.name name,
+  m.name module,
   m.cpanid author,
   COUNT(*) AS rdep_count
 FROM module m
@@ -56,7 +62,7 @@ JOIN dep dp ON dp.module_id=m.id
 WHERE ".join(" AND ", @where)."
 GROUP BY m.name
 ORDER BY rdep_count DESC
-";
+".($args{n} ? " LIMIT ".(0+$args{n}) : "");
 
     my @res;
     my $sth = $dbh->prepare($sql);
@@ -84,7 +90,7 @@ App::lcpan::Cmd::mods_by_rdep_count - List modules ranked by number of reverse d
 
 =head1 VERSION
 
-This document describes version 1.057 of App::lcpan::Cmd::mods_by_rdep_count (from Perl distribution App-lcpan), released on 2020-05-07.
+This document describes version 1.058 of App::lcpan::Cmd::mods_by_rdep_count (from Perl distribution App-lcpan), released on 2020-05-26.
 
 =head1 FUNCTIONS
 
@@ -121,6 +127,10 @@ If C<index_name> is a filename without any path, e.g. C<index.db> then index wil
 be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
 C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
 using the C<index_name>.
+
+=item * B<n> => I<posint>
+
+Return at most this number of results.
 
 =item * B<phase> => I<str>
 

@@ -19,11 +19,13 @@ subtest info_valid_params => sub {
     is $info,
       {
         age               => E,
+        archived          => 0,
         belt              => undef,
         best_result       => undef,
         birth_date        => E,
         categories        => [''],
         club              => undef,
+        dob_year          => 1960,
         coach             => '',
         country_short     => 'SLO',
         country           => 'Slovenia',

@@ -10,7 +10,7 @@ use URI::Escape;
 use JSON;
 use Encode qw( encode_utf8 );
 use Scalar::Util 'looks_like_number';
-use version 0.77; our $VERSION = version->declare('2.0.0');
+use version 0.77; our $VERSION = version->declare('2.0.3');
 
 sub new {
     my ($class, $hostname, $port, $path, $version, $insecure) = @_;
@@ -112,6 +112,12 @@ sub _encode_param {
             [ qw/ arguments command env vars timeout / ],
             [ qw/ templates zone / ],
         ],
+        Downtime => [
+            [ qw/ author comment duration end_time entry_time fixed
+                host_name service_name start_time vars triggers /
+            ],
+            [ qw/ templates zone / ],
+        ],
         Host => [
             [ qw/ address6 address check_command display_name event_command
                 action_url notes notes_url vars icon_image icon_image_alt
@@ -126,6 +132,12 @@ sub _encode_param {
         HostGroup => [
             [ qw/ action_url display_name notes notes_url vars / ],
             [ qw/ groups templates zone / ],
+        ],
+        ScheduledDowntime => [
+            [ qw/ author comment duration fixed host_name ranges
+                service_name /
+            ],
+            [ qw/ templates zone / ],
         ],
         Service => [
             [ qw/ vars action_url check_command check_interval display_name
@@ -164,7 +176,8 @@ sub _encode_param {
         my ( $self, $full, $api_only ) = @_;
         my $result = decode_json( encode_utf8( $self->{res}->content ) );
         my $type   = $result->{results}[0]{type};
-
+        # Do nothing if there is nothing to export
+        return unless $type;
         # We only support certain object types
         return unless exists $type2keys{$type};
 

@@ -1,5 +1,5 @@
 package JSON::Karabiner::Manipulator::Actions::To_if_alone ;
-$JSON::Karabiner::Manipulator::Actions::To_if_alone::VERSION = '0.017';
+$JSON::Karabiner::Manipulator::Actions::To_if_alone::VERSION = '0.018';
 use strict;
 use warnings;
 use JSON;
@@ -46,7 +46,7 @@ See L<the official Karabiner documentation|https://karabiner-elements.pqrs.org/d
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 AUTHOR
 

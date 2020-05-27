@@ -21,6 +21,10 @@ Module::Generic::Dynamic - Dynamic Object Class
     my $product_name = $object->name
     # etc
 
+=head1 VERSION
+
+    v0.1.0
+
 =head1 DESCRIPTION
 
 The purpose of this class/package is to provide a framework to create dynamically created class/package.

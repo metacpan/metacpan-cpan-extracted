@@ -16,6 +16,7 @@ my @files = (
     't/misc/httpd_term.pl',
     't/robot/ua-get.t',
     't/robot/ua.t',
+    't/url.t',
     'xt/author/00-compile.t',
     'xt/author/changes_has_content.t',
     'xt/author/eol.t',

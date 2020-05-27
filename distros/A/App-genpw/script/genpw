@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/genpw/genpw
-# and generated automatically using Perinci::CmdLine::Gen version 0.485
+# and generated automatically using Perinci::CmdLine::Gen version 0.496
 
-our $DATE = '2018-07-01'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-22'; # DATE
 our $DIST = 'App-genpw'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -36,13 +37,17 @@ genpw - Generate random password, with patterns and wordlists
 
 =head1 VERSION
 
-This document describes version 0.009 of genpw (from Perl distribution App-genpw), released on 2018-07-01.
+This document describes version 0.011 of genpw (from Perl distribution App-genpw), released on 2020-05-22.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % genpw [options] [num]
+ % genpw [-L] [-U] [--action=s] [--case=s] [--config-path=path | -c]
+     [--config-profile=profile | -P] [--format=name] [--json] [-l=s]
+     [--len=s] [--list-patterns] [--max-len=s] [--min-len=s]
+     [--(no)naked-res] [--no-config | -C] [--no-env] [-p=s+]
+     [--page-result[=program]] [--pattern=s+] [--patterns-json=s] [num]
 
 =head1 DESCRIPTION
 
@@ -123,6 +128,16 @@ C<*> marks required options.
 
 =over
 
+=item B<--action>=I<s>
+
+Default value:
+
+ "gen"
+
+Valid values:
+
+ ["gen","list-patterns"]
+
 =item B<--case>=I<s>
 
 Force casing.
@@ -143,6 +158,12 @@ UPPER CASE. `title` forces Title case.
 =item B<--len>=I<s>, B<-l>
 
 If no pattern is supplied, will generate random alphanum characters with this exact length.
+
+=item B<--list-patterns>
+
+Shortcut for --action=list-patterns.
+
+See C<--action>.
 
 =item B<--max-len>=I<s>
 
@@ -207,17 +228,15 @@ See C<--case>.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
@@ -269,6 +288,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
 
 =back
 
@@ -338,6 +361,7 @@ Finally, you can filter a section by environment variable using the filter C<env
 
 List of available configuration parameters:
 
+ action (see --action)
  case (see --case)
  format (see --format)
  len (see --len)
@@ -393,7 +417,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

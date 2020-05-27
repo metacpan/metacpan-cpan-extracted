@@ -4,13 +4,13 @@
       "Dai Okabayashi <bayashi@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Benchmarks",
    "prereqs" : {
@@ -34,7 +34,7 @@
    "provides" : {
       "Benchmarks" : {
          "file" : "lib/Benchmarks.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -47,11 +47,8 @@
       ],
       "repository" : {
          "url" : "http://github.com/bayashi/Benchmarks"
-      },
-      "x_IRC" : {
-         "url" : "irc://chat.freenode.org/#bayadev",
-         "web" : "http://webchat.freenode.net/?channels=%23bayadev"
       }
    },
-   "version" : "0.10"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

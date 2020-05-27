@@ -8,7 +8,7 @@ package Tickit::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.70';
+our $VERSION = '0.71';
 
 use Carp;
 

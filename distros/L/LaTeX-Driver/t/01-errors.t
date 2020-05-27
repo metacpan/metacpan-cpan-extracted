@@ -21,7 +21,7 @@ BEGIN {
 use Test::LaTeX::Driver;
 use LaTeX::Driver;
 
-plan tests => 4;
+plan tests => 5;
 
 
 # For some of our tests we need a directory that does not exist, we
@@ -34,14 +34,22 @@ die "hey, someone created our non-existent directory" if -d $nonexistent_dir;
 diag("testing constructor error handling");
 
 dies_ok { LaTeX::Driver->new( DEBUG       => $debug,
-			      DEBUGPREFIX => $debugprefix ) } 'no source specified';
+                              DEBUGPREFIX => $debugprefix ) } 'no source specified';
 like($@, qr{no source specified}, 'constructor fails without a source');
 
 dies_ok { LaTeX::Driver->new( source      => $docpath,
-			      format      => 'tiff',
-			      DEBUG       => $debug,
-			      DEBUGPREFIX => $debugprefix ) } 'unsupported output type';
+                              format      => 'tiff',
+                              DEBUG       => $debug,
+                              DEBUGPREFIX => $debugprefix ) } 'unsupported output type';
 like($@, qr{invalid output format}, "'tiff' is not a supported output type");
+
+
+diag("execution error handling");
+
+$LaTeX::Driver::program_path{'xelatex'} = 'abcdefghijklmnopqrstuvwxyz0123456789';
+my $drv = LaTeX::Driver->new( source => 't/testdata/01-errors/01-errors' );
+dies_ok { $drv->run_latex; } 'Failure to start abcdefghijklm';
+
 
 exit(0);
 

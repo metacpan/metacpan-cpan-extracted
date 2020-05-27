@@ -1,5 +1,5 @@
 {
-   "abstract" : "List available Firefox profiles",
+   "abstract" : "Given a Firefox profile name, return its directory",
    "author" : [
       "perlancar <perlancar@cpan.org>"
    ],
@@ -34,6 +34,7 @@
       "runtime" : {
          "requires" : {
             "Config::IOD::INI::Reader" : "0",
+            "Exporter" : "5.57",
             "Log::ger" : "0.037",
             "Sort::Sub" : "0.118",
             "perl" : "5.010001",
@@ -62,7 +63,7 @@
          "web" : "https://github.com/perlancar/perl-Firefox-Util-Profile"
       }
    },
-   "version" : "0.001",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

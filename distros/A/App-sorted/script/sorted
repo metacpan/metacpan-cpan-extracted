@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/sorted/sorted
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
+# and generated automatically using Perinci::CmdLine::Gen version 0.496
 
-our $DATE = '2019-12-15'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-25'; # DATE
 our $DIST = 'App-sorted'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,13 +38,13 @@ sorted - Check if lines of a file are sorted
 
 =head1 VERSION
 
-This document describes version 0.001 of sorted (from Perl distribution App-sorted), released on 2019-12-15.
+This document describes version 0.002 of sorted (from Perl distribution App-sorted), released on 2020-05-25.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % sorted [options] [file]
+ % sorted [-A=s+] [-S=s] [--format=name] [--json] [--(no)naked-res] [--no-quiet] [--noquiet] [--page-result[=program]] [-q] [--quiet] [--sort-arg=s+] [--sort-args-json=s] [--sort-sub=s] [file]
 
 =head1 DESCRIPTION
 
@@ -97,17 +98,17 @@ Default value:
 
 =item B<--quiet>, B<-q>
 
-=item B<--sort-args-json>=I<s>, B<-A>
-
-Arguments to pass to the Sort::Sub::* routine (JSON-encoded).
-
-See C<--sort-args>.
-
-=item B<--sort-args>=I<s>%
+=item B<--sort-arg>=I<s@>, B<-A>
 
 Arguments to pass to the Sort::Sub::* routine.
 
-Each value is a name-value pair, use I<key=value> syntax. Can be specified multiple times.
+Can be specified multiple times.
+
+=item B<--sort-args-json>=I<s>
+
+Arguments to pass to the Sort::Sub::* routine (JSON-encoded).
+
+See C<--sort-arg>.
 
 =item B<--sort-sub>=I<s>, B<-S>
 
@@ -151,6 +152,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
 
 =back
 
@@ -230,7 +235,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

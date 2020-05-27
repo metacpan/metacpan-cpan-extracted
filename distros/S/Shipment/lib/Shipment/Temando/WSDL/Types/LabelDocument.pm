@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::LabelDocument;
-$Shipment::Temando::WSDL::Types::LabelDocument::VERSION = '3.04';
+$Shipment::Temando::WSDL::Types::LabelDocument::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -28,7 +28,7 @@ Shipment::Temando::WSDL::Types::LabelDocument
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 

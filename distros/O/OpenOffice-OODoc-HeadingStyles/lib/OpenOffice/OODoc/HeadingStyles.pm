@@ -3,31 +3,15 @@ package OpenOffice::OODoc::HeadingStyles;
 use strict;
 use warnings;
 
-=head1 NAME
+# ABSTRACT: utilities for manipulating OpenOffice::OODoc objects
 
-OpenOffice::OODoc::HeadingStyles - utilities for manipulating OpenOffice::OODoc objects
-
-=head1 VERSION
-
-Version 0.03
-
-=cut
-
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use OpenOffice::OODoc;
 
 use List::Util 'max';
 use Scalar::Util 'looks_like_number';
 
-=head1 DESCRIPTION
-
-This module helps to create Heading Styles in L<OpenOfice::OODoc> documents.
-Instead of blindly creating new styles at will, one can call
-C<establishHeadingStyle> that will honour any exisiting style, but will create
-a new one if needed.
-
-=cut
 
 # patch the original OpenOffice::OODoc module and add these subroutines
 #
@@ -72,38 +56,6 @@ our $HEADING_DEFINITIONS = {
     },
 };
 
-=head1 METHODS
-
-=head2 establishHeadingStyle
-
-returns an OpenOffice::OODoc Heading Style Element for a given level
-
-    my $level = 2;
-    my $style_definition = {
-        paragraph   => { top    => '0.1390in', bottom => '0.0835in' },
-        text        => { size   =>     '115%', weight =>     'bold' },
-    };
-    my $heading_style = $oodoc_style
-        ->establishHeadingStyle( $level, $style_definition );
-
-If the style was not already present in the 'Styles' part of the document, it
-will be created and added into the document.
-
-The style-definition is an optional argument. If not provided, it will use what
-is found in C<HEADING_DEFINITIONS> package HashRef. That is pre-populated with
-the defaults from Libre Office.
-
-See below.
-
-A newly created heading style inherrits from the C<Heading> style and will apply
-font settings like Libre Office does: relative C<font-size>, C<font-weight> and
-C<font-style> and more.
-
-CAVEAT: C<$level> will be treated turned into integer values. This means that if
-it does not start with a number will be treated as "Heading 0" styles and
-decimals will be truncated. See C<int>
-
-=cut
 
 sub establishHeadingStyle {
     my $oodoc_styles     = shift; # $self
@@ -122,12 +74,6 @@ sub establishHeadingStyle {
 }
 
 
-=head2 createHeadingStyle
-
-Creates a new Heading Style in the 'styles' part for a given level. It accepts
-an optional style-definition HashRef like the above.
-
-=cut
 
 sub createHeadingStyle {
     my $oodoc_styles     = shift; # $self
@@ -195,6 +141,61 @@ sub _propertiesFromStyleArea {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+OpenOffice::OODoc::HeadingStyles - utilities for manipulating OpenOffice::OODoc objects
+
+=head1 VERSION
+
+version 0.04
+
+=head1 DESCRIPTION
+
+This module helps to create Heading Styles in L<OpenOffice::OODoc> documents.
+Instead of blindly creating new styles at will, one can call
+C<establishHeadingStyle> that will honour any exisiting style, but will create
+a new one if needed.
+
+=head1 METHODS
+
+=head2 establishHeadingStyle
+
+returns an OpenOffice::OODoc Heading Style Element for a given level
+
+    my $level = 2;
+    my $style_definition = {
+        paragraph   => { top    => '0.1390in', bottom => '0.0835in' },
+        text        => { size   =>     '115%', weight =>     'bold' },
+    };
+    my $heading_style = $oodoc_style
+        ->establishHeadingStyle( $level, $style_definition );
+
+If the style was not already present in the 'Styles' part of the document, it
+will be created and added into the document.
+
+The style-definition is an optional argument. If not provided, it will use what
+is found in C<HEADING_DEFINITIONS> package HashRef. That is pre-populated with
+the defaults from Libre Office.
+
+See below.
+
+A newly created heading style inherrits from the C<Heading> style and will apply
+font settings like Libre Office does: relative C<font-size>, C<font-weight> and
+C<font-style> and more.
+
+CAVEAT: C<$level> will be treated turned into integer values. This means that if
+it does not start with a number will be treated as "Heading 0" styles and
+decimals will be truncated. See C<int>
+
+=head2 createHeadingStyle
+
+Creates a new Heading Style in the 'styles' part for a given level. It accepts
+an optional style-definition HashRef like the above.
+
 =head1 MORE...
 
 =head2 Heading Style Definitions
@@ -261,16 +262,16 @@ Libre Office, there are 10 diferent styles.
 You can set this HashRef so C<createHeadingStyle> has defaults to pick from if
 not provided when calling that method.
 
-=head1 COPYRIGHT
+=head1 AUTHOR
 
-Copyright (c) 2018, Th. J. van Hoesel - Mintlab B.V.
+Theo van Hoessel
 
-=head1 LICENCE
+=head1 COPYRIGHT AND LICENSE
 
-This software is distributed, subject to the EUPL. You may not use this file
-except in compliance with the License. You may obtain a copy of the License at
-<http://joinup.ec.europa.eu/software/page/eupl>
+This software is Copyright (c) 2020 by Mintlab B.V.
 
-Software distributed under the License is distributed on an "AS IS"vbasis,
-WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for the
-specific language governing rights and limitations under the License.
+This is free software, licensed under:
+
+  The European Union Public License (EUPL) v1.1
+
+=cut

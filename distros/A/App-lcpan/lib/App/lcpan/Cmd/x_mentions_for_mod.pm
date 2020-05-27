@@ -1,9 +1,9 @@
 package App::lcpan::Cmd::x_mentions_for_mod;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-07'; # DATE
+our $DATE = '2020-05-26'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.057'; # VERSION
+our $VERSION = '1.058'; # VERSION
 
 use 5.010;
 use strict;
@@ -49,7 +49,7 @@ App::lcpan::Cmd::x_mentions_for_mod - List distributions which has an x_mentions
 
 =head1 VERSION
 
-This document describes version 1.057 of App::lcpan::Cmd::x_mentions_for_mod (from Perl distribution App-lcpan), released on 2020-05-07.
+This document describes version 1.058 of App::lcpan::Cmd::x_mentions_for_mod (from Perl distribution App-lcpan), released on 2020-05-26.
 
 =head1 FUNCTIONS
 

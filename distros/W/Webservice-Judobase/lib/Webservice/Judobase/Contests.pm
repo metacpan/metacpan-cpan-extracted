@@ -3,7 +3,7 @@ package Webservice::Judobase::Contests;
 use strict;
 use warnings;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use Moo;
 use HTTP::Request;

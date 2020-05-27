@@ -2,7 +2,7 @@ package Date::Extract::DE;
 
 use Moose;
 
-use version; our $VERSION = qv('0.0.4');
+use version; our $VERSION = qv('0.0.5');
 
 use Date::Range;
 use Date::Simple ( 'date', 'today' );
@@ -169,15 +169,24 @@ sub _process_date {
                     $date->{year2}, $date->{month2}, $date->{day2}
                 )
             );
-            push @dates, $range->dates();
+            push @dates,
+                map { { date => $_, context => $date->{date} } }
+                $range->dates;
         }
         elsif ( $date->{conjugator} eq 'enum' ) {
             push @dates,
-                Date::Simple::ymd(
-                $date->{year1}, $date->{month1}, $date->{day1}
+                {
+                date => Date::Simple::ymd(
+                    $date->{year1}, $date->{month1}, $date->{day1}
                 ),
-                Date::Simple::ymd( $date->{year2}, $date->{month2},
-                $date->{day2} );
+                context => $date->{date}
+                },
+                {
+                date => Date::Simple::ymd(
+                    $date->{year2}, $date->{month2}, $date->{day2}
+                ),
+                context => $date->{date}
+                };
         }
     }
     else {
@@ -188,18 +197,26 @@ sub _process_date {
                 month => $date->{month1},
                 day   => $date->{day1}
             );
-            push @dates, $self->_guess_full_date($dti);
+            push @dates,
+                {
+                date    => $self->_guess_full_date($dti),
+                context => $date->{date}
+                };
         }
         else {
             push @dates,
-                Date::Simple::ymd( $date->{year1}, $date->{month1},
-                $date->{day1} );
+                {
+                date => Date::Simple::ymd(
+                    $date->{year1}, $date->{month1}, $date->{day1}
+                ),
+                context => $date->{date}
+                };
         }
     }
     return @dates;
 }
 
-sub extract {
+sub extract_with_context {
     my ( $self, $text ) = @_;
     my @found_dates;
 
@@ -284,9 +301,17 @@ sub extract {
     }
     my @adjusted_dates;
     foreach (@found_dates) {
+        $_->{date} =~ s/(?:^\s+)|(?:\s+$)//g;
         push @adjusted_dates, $self->_process_date($_);
     }
     return \@adjusted_dates;
+}
+
+sub extract {
+    my ( $self, $text ) = @_;
+
+    my $extract_info = $self->extract_with_context($text);
+    return [ map { $_->{date} } @$extract_info ];
 }
 
 __PACKAGE__->meta->make_immutable();
@@ -301,7 +326,7 @@ Date::Extract::DE -  Extract dates from german text
 
 =head1 VERSION
 
-0.0.4
+0.0.5
 
 =begin readme
 
@@ -326,6 +351,8 @@ To install this module, run the following commands:
     use Date::Extract::DE;
     my $parser = Date::Extract::DE->new( reference_date => $reference_date );
     my $dates = $parser->extract($text);
+    my $infos = $parser->extract_with_context($text);
+    printf("%s => %s\n", $_->{context}, $_->{date}) foreach @$infos;
 
 =head1 DESCRIPTION
 
@@ -344,7 +371,15 @@ back when an incomplete date is guessed (otherwise the closest date is used)
 
 =item extract($text)
 
-Tries to extract dates from the text and returns an arrayref of L<Date::Simple> instances
+Tries to extract dates from the text and returns an arrayref of L<Date::Simple>
+instances
+
+=item extract_with_context($text)
+
+Tries to extract dates from the text and returns an arrayref of HashRef
+instances. Each HashRef contains a key 'date' which maps to a L<Date::Simple>
+instance, and a key 'context' mapping to the date string found in the original
+text
 
 =back
 

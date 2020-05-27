@@ -9,6 +9,7 @@ README.md
 t/00-load.t
 t/01-config.t
 t/02-use.t
+t/03-run.t
 t/src/test.c
 xt/.perlcritic-history
 xt/01-has_versions.t

@@ -2,8 +2,8 @@ NAME
     App::genpw::wordlist - Generate password with words from WordList::*
 
 VERSION
-    This document describes version 0.005 of App::genpw::wordlist (from Perl
-    distribution App-genpw-wordlist), released on 2020-05-18.
+    This document describes version 0.009 of App::genpw::wordlist (from Perl
+    distribution App-genpw-wordlist), released on 2020-05-22.
 
 SYNOPSIS
     See the included script genpw-wordlist.
@@ -33,6 +33,8 @@ FUNCTIONS
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
+
+    *   action => *str* (default: "gen")
 
     *   case => *str* (default: "default")
 
@@ -88,7 +90,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/perlancar/perl-App-Genpass-WordList>.
+    <https://github.com/perlancar/perl-App-genpw-wordlist>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website

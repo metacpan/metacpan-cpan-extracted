@@ -24,15 +24,13 @@ no_index:
     - Mojo::Util::_Guard
 requires:
   IO::Socket::IP: '0.37'
-  JSON::PP: '2.27103'
-  List::Util: '1.41'
-  Time::Local: '1.2'
-  perl: '5.010001'
+  Sub::Util: '1.41'
+  perl: '5.016'
 resources:
   IRC: irc://irc.freenode.net/#mojo
   bugtracker: https://github.com/mojolicious/mojo/issues
   homepage: https://mojolicious.org
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/mojolicious/mojo.git
-version: '8.42'
+version: '8.50'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

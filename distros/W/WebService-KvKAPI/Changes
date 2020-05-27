@@ -1,5 +1,11 @@
 Revision history for Webservice-KvKAPI
 
+0.008     2020-05-22 20:33:10Z
+
+    * Automaticly fix kvk and branch number syntax. Easier when using
+      the CLI client of this module.
+    * (Maintainer) Fix author tests
+
 0.007     2020-03-31 15:29:15Z
 
     * Allow users to override the API hostname

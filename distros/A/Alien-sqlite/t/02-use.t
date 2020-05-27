@@ -45,7 +45,7 @@ __DATA__
 #include "perl.h"
 #include "XSUB.h"
 #include "stdio.h"
-#include <spatialite.h>
+#include <sqlite.h>
 
 int main()
 {

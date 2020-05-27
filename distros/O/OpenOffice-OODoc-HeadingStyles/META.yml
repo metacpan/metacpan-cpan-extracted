@@ -1,19 +1,41 @@
 ---
 abstract: 'utilities for manipulating OpenOffice::OODoc objects'
 author:
-  - 'Theo van Hoesel <theo@mintlab.nl>'
-build_requires: {}
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
-license: unknown
+  - 'Theo van Hoessel'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::MockObject: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: OpenOffice-OODoc-HeadingStyles
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  OpenOffice::OODoc::HeadingStyles:
+    file: lib/OpenOffice/OODoc/HeadingStyles.pm
+    version: '0.04'
+requires:
+  List::Util: '0'
+  OpenOffice::OODoc: '0'
+  Scalar::Util: '0'
+  constant: '0'
+  perl: '5.010'
 resources:
-  repository: https://gitlab.com/mintlab/perl-openoffice-oodoc-headingstyles.git
-version: 0.03
+  repository: git://gitlab.com/mintlab/perl-openoffice-oodoc-headingstyles.git
+version: '0.04'
+x_contributors:
+  - 'Wesley Schwengle <wesley@opndev.io>'
+  - 'Theo van Hoesel <theo@mintlab.nl>'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: EUPL-1.1

@@ -17,11 +17,12 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Data::Sah::CoerceBundle::To_array::From_str::comma_sep",
   "PREREQ_PM" => {
+    "String::JS" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Data::Sah::Coerce" => "0.038",
+    "Data::Sah::Coerce" => "0.048",
     "Data::Sah::CoerceJS" => "0.011",
     "File::Spec" => 0,
     "IO::Handle" => 0,
@@ -29,7 +30,7 @@ my %WriteMakefileArgs = (
     "Nodejs::Util" => "0.007",
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,12 +38,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Sah::Coerce" => "0.038",
+  "Data::Sah::Coerce" => "0.048",
   "Data::Sah::CoerceJS" => "0.011",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Nodejs::Util" => "0.007",
+  "String::JS" => 0,
   "Test::More" => "0.98",
   "strict" => 0,
   "warnings" => 0

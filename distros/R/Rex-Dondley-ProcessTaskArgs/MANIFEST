@@ -13,4 +13,5 @@ t/00-use_ok.t
 t/command_line_arg.t
 t/direct_calls_with_array.t
 t/direct_calls_with_hash.t
+t/wantarray.t
 weaver.ini

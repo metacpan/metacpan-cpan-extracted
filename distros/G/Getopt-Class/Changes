@@ -1,26 +1,39 @@
 Revision history for Perl module Getopt::Class
 
-0.1 2020-04-27
-    - Initial version 0.1
-0.1.1 2020-04-27
-    - Corrected 2 typos overlooked and updated slightly the documentation
-0.101.0 2020-04-27
-    - Change of versioning, cpan forcing me to set version to higher than 0.100.0
-0.101.1 2020-05-01
-    - Corrected a type in method class
+0.102.5 2020-05-26T14:23:07
+    - Corrected a mishandling of boolean object
+
+0.102.4 2020-05-21
+    - Using the latest version of Module::Generic
+
+0.102.3 2020-05-21
+    - Change from TryCatch to Nice::Try because TryCatch got broken with release of Devel::Declare version 0.006020
+
+0.102.2 2020-05-13
+    - Bug fixes and design improvements
+
+0.102.1 2020-05-05
+    - Corrected design bug for option key aliases not working properly.
+
 0.102.0 2020-05-02
     - Improvement in management of aliases so that when an alias value is modified, it also modifies the values for other aliases
     - Created an inline class so that the resulting options can be called as method, e.g.
-    my $cl = Getlong::Class->new({ dictionary => $dict });
-    my $opts = $ct->exec;
-    printf( "Name provided is: %s\n", $opts->name );
-    # or
-    printf( "Name provided is: %s\n", $opts->{name} );
+    - my $cl = Getlong::Class->new({ dictionary => $dict });
+    - my $opts = $ct->exec;
+    - printf( "Name provided is: %s\n", $opts->name );
+    - or
+    - printf( "Name provided is: %s\n", $opts->{name} );
     - Corrected and improved aliases using Tie::Hash, because the perl feature https://metacpan.org/pod/perlref#Assigning-to-References refaliasing is still experimental and using Tie::Hash is more straightforward
     - Added the access of the option values as object method, each with their type being an object (string, boolean, date/datetime, number, hash or array reference)
-0.102.1 2020-05-05
-    - Corrected design bug for option key aliases not working properly.
-0.102.2 2020-05-13
-    - Bug fixes and design improvements
-0.102.3 2020-05-21
-	- Change from TryCatch to Nice::Try because TryCatch got broken with release of Devel::Declare version 0.006020
+
+0.101.1 2020-05-01
+    - Corrected a type in method class
+
+0.101.0 2020-04-27
+    - Change of versioning, cpan forcing me to set version to higher than 0.100.0
+
+0.1 2020-04-27
+    - Initial version 0.1
+
+0.1.1 2020-04-27
+    - Corrected 2 typos overlooked and updated slightly the documentation

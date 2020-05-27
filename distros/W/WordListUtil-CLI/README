@@ -1,0 +1,54 @@
+NAME
+    WordListUtil::CLI - Some utility routines related to WordList::* and the
+    CLI
+
+VERSION
+    This document describes version 0.001 of WordListUtil::CLI (from Perl
+    distribution WordListUtil-CLI), released on 2020-05-22.
+
+DESCRIPTION
+FUNCTIONS
+  instantiate_wordlist
+    Usage:
+
+     my $wl = instantiate_wordlist($name [ , $ignore ]);
+
+    Examples:
+
+     $wl1 = instantiate_wordlist("EN::Enable"); # dies on failure
+     $wl2 = instantiate_wordlist("EN::Enable", 1); # return undef on failure
+     $wl3 = instantiate_wordlist("MetaSyntactic::Any=theme,dangdut");
+
+    Load WordList::* module and instantiate the class. In the above example,
+    $wl1 will be an instance of WordList::EN::Enable class.
+
+    Like Perl's "-M" option, you can also pass parameters to a parameterized
+    wordlist using the "=val1,val2,..." syntax (see $wl3 example above).
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WordListUtil-CLI>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WordListUtil-CLI>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=WordListUtil-CLI>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    WordList
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,9 +1,9 @@
 package Data::Sah::Coerce::perl::To_bool::From_str::common_words;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-12'; # DATE
+our $DATE = '2020-05-24'; # DATE
 our $DIST = 'Data-Sah-Coerce'; # DIST
-our $VERSION = '0.047'; # VERSION
+our $VERSION = '0.049'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,13 +14,21 @@ sub meta {
         v => 4,
         summary => 'Convert common true/false words (e.g. "yes","true","on","1" to "1", and "no","false","off","0" to "")',
         prio => 50,
+        args => {
+            # mostly for testing of args
+            ci => {
+                schema => 'bool*',
+                default => 1,
+            },
+        },
     };
 }
 
 sub coerce {
-    my %args = @_;
+    my %cargs = @_;
 
-    my $dt = $args{data_term};
+    my $dt = $cargs{data_term};
+    my $gen_args = $cargs{args} // {};
 
     my $res = {};
 
@@ -29,7 +37,8 @@ sub coerce {
         "1",
     );
 
-    $res->{expr_coerce} = "$dt =~ /\\A(yes|true|on)\\z/i ? 1 : $dt =~ /\\A(no|false|off|0)\\z/i ? '' : $dt";
+    my $modifier = ($gen_args->{ci} // 1) ? "i" : "";
+    $res->{expr_coerce} = "$dt =~ /\\A(yes|true|on)\\z/$modifier ? 1 : $dt =~ /\\A(no|false|off|0)\\z/$modifier ? '' : $dt";
 
     $res;
 }
@@ -49,7 +58,7 @@ Data::Sah::Coerce::perl::To_bool::From_str::common_words - Convert common true/f
 
 =head1 VERSION
 
-This document describes version 0.047 of Data::Sah::Coerce::perl::To_bool::From_str::common_words (from Perl distribution Data-Sah-Coerce), released on 2020-02-12.
+This document describes version 0.049 of Data::Sah::Coerce::perl::To_bool::From_str::common_words (from Perl distribution Data-Sah-Coerce), released on 2020-05-24.
 
 =head1 SYNOPSIS
 

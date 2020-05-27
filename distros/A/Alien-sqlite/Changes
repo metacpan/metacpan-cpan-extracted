@@ -1,7 +1,12 @@
 Revision history for Alien::sqlite
 
+1.06 2020-05-24
+    - Add probe for sqlite3 binary.
+    - Share installs on Windows: Remove any /usr/bin from path
+      if it is not the one used by Alien::MSYS.
+
 1.05 2020-05-02
-    - Share installs: Remove .../Git/usr/bin from the path before
+    - Share installs on Windows: Remove .../Git/usr/bin from the path before
       running configure (GH#3)
 
 1.04 2020-04-14

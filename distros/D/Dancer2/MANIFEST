@@ -281,6 +281,7 @@ t/mime.t
 t/multi_apps.t
 t/multi_apps_forward.t
 t/multiapp_template_hooks.t
+t/multipart_content.t
 t/named_apps.t
 t/no_default_middleware.t
 t/plugin2/basic-2.t

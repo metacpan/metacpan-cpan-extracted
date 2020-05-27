@@ -1,9 +1,9 @@
 package Data::Sah::Coerce::perl::To_str::From_str::convert_perl_pod_to_path;
 
 # AUTHOR
-our $DATE = '2020-05-08'; # DATE
+our $DATE = '2020-05-21'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.031'; # VERSION
+our $VERSION = '0.032'; # VERSION
 
 use 5.010001;
 use strict;
@@ -57,7 +57,7 @@ Data::Sah::Coerce::perl::To_str::From_str::convert_perl_pod_to_path
 
 =head1 VERSION
 
-This document describes version 0.031 of Data::Sah::Coerce::perl::To_str::From_str::convert_perl_pod_to_path (from Perl distribution Sah-Schemas-Perl), released on 2020-05-08.
+This document describes version 0.032 of Data::Sah::Coerce::perl::To_str::From_str::convert_perl_pod_to_path (from Perl distribution Sah-Schemas-Perl), released on 2020-05-21.
 
 =head1 DESCRIPTION
 

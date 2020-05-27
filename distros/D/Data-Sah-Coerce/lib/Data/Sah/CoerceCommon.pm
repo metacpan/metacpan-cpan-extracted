@@ -1,9 +1,9 @@
 package Data::Sah::CoerceCommon;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-12'; # DATE
+our $DATE = '2020-05-24'; # DATE
 our $DIST = 'Data-Sah-Coerce'; # DIST
-our $VERSION = '0.047'; # VERSION
+our $VERSION = '0.049'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -13,18 +13,22 @@ our $SUPPORT_OLD_PREFIX = $ENV{PERL_DATA_SAH_COERCE_SUPPORT_OLD_PREFIX} // 1;
 our %Default_Rules = (
     perl => {
         bool       => [qw//],
-        date       => [qw/From_float::epoch From_obj::datetime From_obj::time_moment From_str::iso8601/],
         datenotime => [qw/From_float::epoch From_obj::datetime From_obj::time_moment From_str::iso8601/],
+        date       => [qw/From_float::epoch From_obj::datetime From_obj::time_moment From_str::iso8601/],
         datetime   => [qw/From_float::epoch From_obj::datetime From_obj::time_moment From_str::iso8601/],
         duration   => [qw/From_float::seconds From_obj::datetime_duration From_str::human From_str::iso8601/],
+        float      => [qw/From_str::percent/],
+        num        => [qw/From_str::percent/],
         timeofday  => [qw/From_obj::date_timeofday From_str::hms/],
     },
     js => {
         bool       => [qw/From_float::zero_one From_str::common_words/],
+        datenotime => [qw/From_float::epoch From_obj::date From_str::date_parse/],
         date       => [qw/From_float::epoch From_obj::date From_str::date_parse/],
         datetime   => [qw/From_float::epoch From_obj::date From_str::date_parse/],
-        datenotime => [qw/From_float::epoch From_obj::date From_str::date_parse/],
         duration   => [qw/From_float::seconds From_str::iso8601/],
+        #float      => [qw/From_str::percent/],
+        #num        => [qw/From_str::percent/],
         timeofday  => [qw/From_str::hms/],
     },
 );
@@ -149,26 +153,29 @@ sub get_coerce_rules {
     my $old_prefix = "Data::Sah::Coerce::$compiler\::$typen\::"; # deprecated, <0.034, will be removed in the future
     my $prefix = "Data::Sah::Coerce::$compiler\::To_$typen\::";
 
-    my @rule_names = @{ $Default_Rules{$compiler}{$typen} || [] };
+    my @rules0 = @{ $Default_Rules{$compiler}{$typen} || [] };
     for my $item (@{ $args{coerce_rules} // [] }) {
-        my $is_exclude = $item =~ s/\A!//;
-        if ($SUPPORT_OLD_PREFIX && $item =~ /\A\w+\z/) {
+        my $rule_name = ref $item eq 'ARRAY' ? $item->[0] : $item;
+        my $is_exclude = $rule_name =~ s/\A!//;
+        if ($SUPPORT_OLD_PREFIX && $rule_name =~ /\A\w+\z/) {
             # old name
-        } elsif ($item =~ /\AFrom_[A-Za-z0-9_]+::[A-Za-z0-9_]+\z/) {
+        } elsif ($rule_name =~ /\AFrom_[A-Za-z0-9_]+::[A-Za-z0-9_]+\z/) {
             # new name
         } else {
             die "Invalid syntax for coercion rule item '$item', please ".
                 "only use From_<type>::<description>";
         }
         if ($is_exclude) {
-            @rule_names = grep { $_ ne $item } @rule_names;
+            @rules0 = grep { $_ ne $rule_name } @rules0;
         } else {
-            push @rule_names, $item unless grep { $_ eq $item } @rule_names;
+            push @rules0, $item unless grep { $_ eq $rule_name } @rules0;
         }
     }
 
     my @rules;
-    for my $rule_name (@rule_names) {
+    for my $item (@rules0) {
+        my $rule_name = ref $item eq 'ARRAY' ? $item->[0] : $item;
+        my $rule_gen_args = ref $item eq 'ARRAY' ? $item->[1] : undef;
         my $is_old_name = $SUPPORT_OLD_PREFIX && $rule_name =~ /\A\w+\z/;
         my $mod = ($is_old_name ? $old_prefix : $prefix) . $rule_name;
         (my $mod_pm = "$mod.pm") =~ s!::!/!g;
@@ -184,6 +191,7 @@ sub get_coerce_rules {
         my $rule = &{"$mod\::coerce"}(
             data_term => $dt,
             coerce_to => $args{coerce_to},
+            (args => $rule_gen_args) x !!$rule_gen_args,
         );
         $rule->{name} = $rule_name;
         $rule->{meta} = $rule_meta;
@@ -239,7 +247,7 @@ Data::Sah::CoerceCommon - Common stuffs for Data::Sah::Coerce and Data::Sah::Coe
 
 =head1 VERSION
 
-This document describes version 0.047 of Data::Sah::CoerceCommon (from Perl distribution Data-Sah-Coerce), released on 2020-02-12.
+This document describes version 0.049 of Data::Sah::CoerceCommon (from Perl distribution Data-Sah-Coerce), released on 2020-05-24.
 
 =head1 FUNCTIONS
 

@@ -18,7 +18,7 @@ my %META = (
     },
     runtime => {
       requires => {
-        'Mu::Tiny' => 0,
+        'Mu::Tiny' => '0.000002',
       },
     },
     develop   => {

@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($SGML::PYX::VERSION, 0.05, 'Version.');
+is($SGML::PYX::VERSION, 0.06, 'Version.');

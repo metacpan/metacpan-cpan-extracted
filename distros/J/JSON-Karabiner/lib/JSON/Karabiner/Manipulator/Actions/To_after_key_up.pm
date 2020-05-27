@@ -1,5 +1,5 @@
 package JSON::Karabiner::Manipulator::Actions::To_after_key_up ;
-$JSON::Karabiner::Manipulator::Actions::To_after_key_up::VERSION = '0.017';
+$JSON::Karabiner::Manipulator::Actions::To_after_key_up::VERSION = '0.018';
 use strict;
 use warnings;
 use JSON;
@@ -14,7 +14,7 @@ sub new {
   return $obj;
 }
 
-# ABSTRACT: to_if_alone action
+# ABSTRACT: to_after_key_up action
 
 1;
 
@@ -24,7 +24,7 @@ __END__
 
 =head1 NAME
 
-JSON::Karabiner::Manipulator::Actions::To_after_key_up - to_if_alone action
+JSON::Karabiner::Manipulator::Actions::To_after_key_up - to_after_key_up action
 
 =head1 DESCRIPTION
 
@@ -32,7 +32,7 @@ INTENTIONALLY LEFT BLANK
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 AUTHOR
 

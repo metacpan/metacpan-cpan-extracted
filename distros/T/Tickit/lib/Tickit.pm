@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 BEGIN {
-   our $VERSION = '0.70';
+   our $VERSION = '0.71';
 }
 
 use Carp;
@@ -68,13 +68,6 @@ and position events above the 224th column and arbitrary modified key input
 via F<libtermkey> (all of these will require a supporting terminal as well).
 It also supports having multiple instances and non-blocking or asynchronous
 control.
-
-At the current version, this is a Perl distribution which contains and XS and
-C implementation of the lower levels (L<Tickit::Term> and L<Tickit::Pen>), and
-implements the higher levels (L<Tickit::Window> and L<Tickit::Widget>) in pure
-perl. The XS parts are supported by F<libtickit>, either from the installed
-library, or using a bundled copy compiled at build time. It is intended that
-eventually the Window layer will be rewritten in XS and C instead.
 
 =cut
 
@@ -186,6 +179,53 @@ sub _make_tickit
 {
    my $self = shift;
    return Tickit::_Tickit->new( @_ );
+}
+
+=head2 watch_io
+
+   $id = $tickit->watch_io( $fh, $cond, $code )
+
+I<Since version 0.71.>
+
+Runs the given CODE reference at some point in the future, when IO operations
+are possible on the given filehandle. C<$cond> should be a bitmask of at least
+one of the C<IO_IN>, C<IO_OUT> or C<IO_HUP> constants describing which kinds
+of IO operation the callback is interested in.
+
+Returns an opaque integer value that may be passed to L</watch_cancel>. This
+value is safe to ignore if not required.
+
+When invoked, the callback will receive an event parameter which will be an
+instances of a type with a field called C<cond>. This will contain the kinds
+of IO operation that are currently possible.
+
+   $code->( $info )
+
+   $current_cond = $info->cond;
+
+For example, to watch for both input and hangup conditions and respond to each
+individually:
+
+   $tickit->watch_io( $fh, Tickit::IO_IN|Tickit::IO_HUP,
+      sub {
+         my ( $info ) = @_;
+         if( $info->cond & Tickit::IO_IN ) {
+            ...
+         }
+         if( $info->cond & Tickit::IO_HUP ) {
+            ...
+         }
+      }
+   );
+
+=cut
+
+sub watch_io
+{
+   my $self = shift;
+   my ( $fh, $cond, $code ) = @_;
+
+   return $self->_tickit->watch_io( $fh->fileno, $cond, $code );
 }
 
 =head2 watch_later

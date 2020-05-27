@@ -1,5 +1,5 @@
 package JSON::Karabiner::Manipulator::Conditions::Frontmost_application_unless ;
-$JSON::Karabiner::Manipulator::Conditions::Frontmost_application_unless::VERSION = '0.017';
+$JSON::Karabiner::Manipulator::Conditions::Frontmost_application_unless::VERSION = '0.018';
 use strict;
 use warnings;
 use JSON;
@@ -31,7 +31,7 @@ JSON::Karabiner::Manipulator::Conditions::Frontmost_application_unless - definit
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 AUTHOR
 

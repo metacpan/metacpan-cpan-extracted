@@ -1,4 +1,4 @@
-# -*- perl -*-
+#!/usr/bin/perl
 
 # t/05.scalar.t - check scalar manipulation object
 
@@ -20,7 +20,9 @@ my $h = \%$a;
 isa_ok( $h, 'Module::Generic::Hash' );
 is( CORE::exists( $a->{disapprove} ), 1, 'array to hash' );
 is( "$a", 'I disapprove of what you say, but I will defend to the death your right to say it', 'array as string' );
+no warnings 'Module::Generic::Array';
 is( $a->delete( 'not-integer' ), $a, 'delete with non-integer offset' );
+use warnings 'Module::Generic::Array';
 my $a2 = $a->clone;
 is( $a2->delete( 2 )->as_string, 'of', 'delete with offset' );
 is( "$a2", 'I disapprove what you say, but I will defend to the death your right to say it', 'array after delete' );
@@ -29,7 +31,7 @@ is( "$a2", 'I disapprove but I will defend to the death your right to say it', '
 $a2->delete( 3, $a2->length );
 is( "$a2", 'I disapprove but', 'delete till the end' );
 # $i starts from 0
-diag( "$a" );
+# diag( "$a" );
 $a->each(sub{
     my( $i, $v ) = @_;
     return( 1 ) unless( $i == 9 );
@@ -111,8 +113,15 @@ is( $a->sort(sub
 # splice with no argument will behave as pop
 is( $a2->clone->splice->length, 0, 'splice with no argument remove everything' );
 is( $a2->unshift( 'This' )->as_string, 'This has been set', 'unshift' );
-diag( "Array is: $a2" );
+# diag( "Array is: $a2" );
 is( $a2->splice( 1, 1, qw( should have ) )->as_string, 'This should have been set', 'splice with replacement' );
 is( $a2->clone->undef->length, 0, 'undef' );
 is( $a2->values->as_string, 'This should have been set', 'values' );
 
+my $array1 = [qw( John Paul )];
+my $array2 = Module::Generic::Array->new;
+my $array3 = Module::Generic::Array->new;
+@$array2 = @$array1;
+isa_ok( $array2, 'Module::Generic::Array', 'Array keeps class' );
+is( $array2->join( ' ' ), 'John Paul', 'Assigned array' );
+$array3 = $array2;

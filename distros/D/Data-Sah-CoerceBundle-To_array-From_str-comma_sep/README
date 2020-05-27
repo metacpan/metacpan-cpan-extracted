@@ -3,10 +3,10 @@ NAME
     from a comma-separated items in a string
 
 VERSION
-    This document describes version 0.011 of
+    This document describes version 0.012 of
     Data::Sah::CoerceBundle::To_array::From_str::comma_sep (from Perl
     distribution Data-Sah-CoerceBundle-To_array-From_str-comma_sep),
-    released on 2019-11-28.
+    released on 2020-05-21.
 
 DESCRIPTION
     This distribution contains the following Sah coerce rule modules:
@@ -49,7 +49,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2018, 2016 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

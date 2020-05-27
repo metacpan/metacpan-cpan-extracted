@@ -1,6 +1,6 @@
 
 package Shipment::Temando::WSDL::Elements::confirmManifestResponse;
-$Shipment::Temando::WSDL::Elements::confirmManifestResponse::VERSION = '3.04';
+$Shipment::Temando::WSDL::Elements::confirmManifestResponse::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -92,7 +92,7 @@ use warnings;
 
     package Shipment::Temando::WSDL::Elements::confirmManifestResponse::_requests;
     $Shipment::Temando::WSDL::Elements::confirmManifestResponse::_requests::VERSION
-      = '3.04';
+      = '3.05';
     use strict;
     use warnings;
     {
@@ -148,7 +148,7 @@ Shipment::Temando::WSDL::Elements::confirmManifestResponse
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 

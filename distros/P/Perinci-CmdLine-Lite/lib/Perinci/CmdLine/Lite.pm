@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Lite;
 
-our $DATE = '2020-04-27'; # DATE
-our $VERSION = '1.828'; # VERSION
+our $DATE = '2020-05-26'; # DATE
+our $VERSION = '1.829'; # VERSION
 
 use 5.010001;
 # use strict; # already enabled by Mo
@@ -70,6 +70,7 @@ sub BUILD {
             $copts->{json}        = { $_copy->('json'), };
             $copts->{naked_res}   = { $_copy->('naked_res'), };
             $copts->{page_result} = { $_copy->('page_result'), };
+            $copts->{view_result} = { $_copy->('view_result'), };
         }
         if ($self->subcommands) {
             $copts->{subcommands} = { $_copy->('subcommands'), };
@@ -629,7 +630,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.828 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2020-04-27.
+This document describes version 1.829 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2020-05-26.
 
 =head1 SYNOPSIS
 

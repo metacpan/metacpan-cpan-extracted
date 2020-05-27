@@ -4,7 +4,7 @@ Shipment - Interface to Popular Shipping Services
 
 # VERSION
 
-version 3.04
+version 3.05
 
 # SYNOPSIS
 

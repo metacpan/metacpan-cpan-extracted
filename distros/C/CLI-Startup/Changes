@@ -1,5 +1,7 @@
 Revision history for CLI-Startup
 
+0.28    2020-05-21
+        Additional test fixes. TNX Nigel Horne.
 0.27    2020-05-20
         Fixed more broken tests caused by missing optional modules.
 0.26    2020-05-19

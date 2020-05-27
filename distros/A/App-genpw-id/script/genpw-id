@@ -1,21 +1,22 @@
 #!perl
 
-### code_after_shebang
-# Note: This script is a CLI  for Riap function /App/genpw/id/genpw
-# and generated automatically using Perinci::CmdLine::Gen version 0.483
+### begin code_after_shebang
+# Note: This script is a CLI for Riap function /App/genpw/id/genpw
+# and generated automatically using Perinci::CmdLine::Gen version 0.496
 
-# PERICMD_INLINE_SCRIPT: {"code_after_shebang":"...","config_dirs":null,"config_filename":"genpw-id.conf","env_name":"GENPW_ID_OPT","include":null,"log":null,"pack_deps":1,"pod":0,"read_config":1,"read_env":1,"script_name":"genpw-id","script_summary":null,"script_version":"0.005","shebang":"perl","skip_format":0,"subcommands":null,"url":"/App/genpw/id/genpw","use_cleanser":1,"validate_args":1}
+### end code_after_shebang
+# PERICMD_INLINE_SCRIPT: {"code_after_shebang":"...","config_dirs":null,"config_filename":"genpw-id.conf","env_name":"GENPW_ID_OPT","include":null,"log":null,"pack_deps":1,"pod":0,"read_config":1,"read_env":1,"script_name":"genpw-id","script_summary":null,"script_version":"0.006","shebang":"perl","skip_format":0,"subcommands":null,"url":"/App/genpw/id/genpw","use_cleanser":1,"validate_args":1}
 
-my $_pci_metas = {""=>{args=>{case=>{default=>"default",description=>"\n`default` means to not change case. `random` changes casing some letters\nrandomly to lower-/uppercase. `lower` forces lower case. `upper` forces\nUPPER CASE. `title` forces Title case.\n\n",schema=>["str",{in=>["default","random","lower","upper","title"],req=>1},{}],summary=>"Force casing"},num=>{cmdline_aliases=>{n=>{}},default=>1,pos=>0,schema=>["int",{min=>1,req=>1},{}]},patterns=>{cmdline_aliases=>{p=>{}},description=>"\nA pattern is string that is similar to a printf pattern. %P (where P is certain\nletter signifying a format) will be replaced with some other string. %Nw (where\nN is a number) will be replaced by a word of length N, %N\$MP (where N and M is a\nnumber) will be replaced by a word of length between N and M. Anything else will\nbe used as-is. Available conversions:\n\n    %l   Random Latin letter (A-Z, a-z)\n    %d   Random digit (0-9)\n    %a   Random letter/digit (Alphanum) (A-Z, a-z, 0-9; combination of %l and %d)\n    %s   Random ASCII symbol, e.g. \"-\" (dash), \"_\" (underscore), etc.\n    %x   Random letter/digit/ASCII symbol (combination of %a and %s)\n    %%   A literal percent sign\n    %w   Random word\n\n",schema=>["array",{min_len=>1,of=>["str",{req=>1},{}],req=>1},{}],summary=>"Pattern(s) to use","x.name.is_plural"=>1,"x.name.singular"=>"pattern"},wordlists=>{cmdline_aliases=>{w=>{}},element_completion=>sub{"DUMMY"},schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],summary=>"Select one or more wordlist modules","x.name.is_plural"=>1}},description=>"\nUsing password from dictionary words (in this case, from WordList::*) can be\nuseful for humans when remembering the password. Note that using a string of\nrandom characters is generally better because of the larger space (combination).\nUsing a password of two random words from a 5000-word wordlist has a space of\nonly ~25 million while an 8-character of random uppercase letters/lowercase\nletters/numbers has a space of 62^8 = ~218 trillion. To increase the space\nyou'll need to use more words (e.g. 3 to 5 instead of just 2). This is important\nif you are using the password for something that can be bruteforced quickly e.g.\nfor protecting on-disk ZIP/GnuPG file and the attacker has access to your file.\nIt is then recommended to use a high number of rounds for hashing to slow down\npassword cracking (e.g. `--s2k-count 65011712` in GnuPG).\n\n",examples=>[],result=>{},summary=>"Generate password from combination of Indonesian words",v=>1.1}};
+my $_pci_metas = {""=>{args=>{action=>{cmdline_aliases=>{list_patterns=>{code=>sub{"DUMMY"},is_flag=>1,summary=>"Shortcut for --action=list-patterns"}},default=>"gen",schema=>["str",{in=>["gen","list-patterns"],req=>1},{}]},case=>{cmdline_aliases=>{L=>{code=>sub{"DUMMY"},is_flag=>1,summary=>"Shortcut for --case=lower"},U=>{code=>sub{"DUMMY"},is_flag=>1,summary=>"Shortcut for --case=upper"}},default=>"default",description=>"\n`default` means to not change case. `random` changes casing some letters\nrandomly to lower-/uppercase. `lower` forces lower case. `upper` forces\nUPPER CASE. `title` forces Title case.\n\n",schema=>["str",{in=>["default","random","lower","upper","title"],req=>1},{}],summary=>"Force casing"},num=>{cmdline_aliases=>{n=>{}},default=>1,pos=>0,schema=>["int",{min=>1,req=>1},{}]},patterns=>{cmdline_aliases=>{p=>{}},description=>"\nA pattern is string that is similar to a printf pattern. %P (where P is certain\nletter signifying a format) will be replaced with some other string. %Nw (where\nN is a number) will be replaced by a word of length N, %N\$MP (where N and M is a\nnumber) will be replaced by a word of length between N and M. Anything else will\nbe used as-is. Available conversions:\n\n    %l   Random Latin letter (A-Z, a-z)\n    %d   Random digit (0-9)\n    %h   Random hexdigit (0-9a-f)\n    %a   Random letter/digit (Alphanum) (A-Z, a-z, 0-9; combination of %l and %d)\n    %s   Random ASCII symbol, e.g. \"-\" (dash), \"_\" (underscore), etc.\n    %x   Random letter/digit/ASCII symbol (combination of %a and %s)\n    %m   Base64 character (A-Z, a-z, 0-9, +, /)\n    %b   Base58 character (A-Z, a-z, 0-9 minus IOl0)\n    %B   Base56 character (A-Z, a-z, 0-9 minus IOol01)\n    %%   A literal percent sign\n    %w   Random word\n\n",schema=>["array",{min_len=>1,of=>["str",{req=>1},{}],req=>1},{}],summary=>"Pattern(s) to use","x.name.is_plural"=>1,"x.name.singular"=>"pattern"},wordlists=>{cmdline_aliases=>{w=>{}},element_completion=>sub{"DUMMY"},schema=>["array",{of=>["str",{req=>1},{}],req=>1,"x.perl.coerce_rules"=>[["From_str_or_array::expand_perl_modname_wildcard",{ns_prefix=>"WordList"}]]},{}],summary=>"Select one or more wordlist modules","x.name.is_plural"=>1}},description=>"\nUsing password from dictionary words (in this case, from WordList::*) can be\nuseful for humans when remembering the password. Note that using a string of\nrandom characters is generally better because of the larger space (combination).\nUsing a password of two random words from a 5000-word wordlist has a space of\nonly ~25 million while an 8-character of random uppercase letters/lowercase\nletters/numbers has a space of 62^8 = ~218 trillion. To increase the space\nyou'll need to use more words (e.g. 3 to 5 instead of just 2). This is important\nif you are using the password for something that can be bruteforced quickly e.g.\nfor protecting on-disk ZIP/GnuPG file and the attacker has access to your file.\nIt is then recommended to use a high number of rounds for hashing to slow down\npassword cracking (e.g. `--s2k-count 65011712` in GnuPG).\n\n",examples=>[],result=>{},summary=>"Generate password from combination of Indonesian words",v=>1.1}};
 
-# This script is generated by Perinci::CmdLine::Inline version 0.541 on Tue Jan  9 22:40:52 2018.
+# This script is generated by Perinci::CmdLine::Inline version 0.550 on Thu May 21 17:33:04 2020.
 
 # Rinci metadata taken from these modules: App::genpw::id (no version)
 
 # You probably should not manually edit this file.
 
-our $DATE = '2018-01-09'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2020-05-21'; # DATE
+our $VERSION = '0.006'; # VERSION
 # PODNAME: genpw-id
 # ABSTRACT: Generate password from combination of Indonesian words
 
@@ -94,7 +95,7 @@ use 5.010001;
 use strict;
 #use warnings;
 
-# modules
+# load modules
 
 
 ### declare global variables
@@ -122,6 +123,8 @@ sub _pci_json {
     $json;
 }
 
+### begin code_before_parse_cmdline_options
+### end code_before_parse_cmdline_options
 ### get arguments (from config file, env, command-line args
 
 {
@@ -131,15 +134,22 @@ my $go_spec1 = {
     'config-path=s@' => sub { $_pci_r->{config_paths} //= []; push @{ $_pci_r->{config_paths} }, $_[1]; },
     'config-profile=s' => sub { $_pci_r->{config_profile} = $_[1]; },
     'format=s' => sub { $_pci_r->{format} = $_[1]; },
-    'help|h|?' => sub { print "genpw-id - Generate password from combination of Indonesian words\n\nUsage:\n  genpw-id --help (or -h, -?)\n  genpw-id --version (or -v)\n  genpw-id [options] [num]\n\nUsing password from dictionary words (in this case, from WordList::*) can be\nuseful for humans when remembering the password. Note that using a string of\nrandom characters is generally better because of the larger space (combination).\nUsing a password of two random words from a 5000-word wordlist has a space of\nonly ~25 million while an 8-character of random uppercase letters/lowercase\nletters/numbers has a space of 62^8 = ~218 trillion. To increase the space\nyou'll need to use more words (e.g. 3 to 5 instead of just 2). This is important\nif you are using the password for something that can be bruteforced quickly e.g.\nfor protecting on-disk ZIP/GnuPG file and the attacker has access to your file.\nIt is then recommended to use a high number of rounds for hashing to slow down\npassword cracking (e.g. `--s2k-count 65011712` in GnuPG).\n\nMain options:\n  --case=s           Force casing [\"default\"]\n  --num=s, -n         (=arg[0]) [1]\n  --pattern=s\@, -p   Pattern(s) to use\n  --wordlist=s\@, -w  Select one or more wordlist modules\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --help, -h, -?                 Display help message and exit\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --version, -v                  Display program's version and exit\n"; exit 0; },
+    'help|h|?' => sub { print "genpw-id - Generate password from combination of Indonesian words\n\nUsage:\n  genpw-id --help (or -h, -?)\n  genpw-id --version (or -v)\n  genpw-id [-L] [-U] [--action=s] [--case=s] [--config-path=path+]\n    [--config-profile=profile] [--format=name] [--json] [--list-patterns]\n    [--naked-res] [--no-config] [--no-env] [--no-naked-res | --nonaked-res]\n    [-p=s+] [--page-result[=program]] [--pattern=s+] [-w=s+] [--wordlist=s+]\n    [num]\n\nUsing password from dictionary words (in this case, from WordList::*) can be\nuseful for humans when remembering the password. Note that using a string of\nrandom characters is generally better because of the larger space (combination).\nUsing a password of two random words from a 5000-word wordlist has a space of\nonly ~25 million while an 8-character of random uppercase letters/lowercase\nletters/numbers has a space of 62^8 = ~218 trillion. To increase the space\nyou'll need to use more words (e.g. 3 to 5 instead of just 2). This is important\nif you are using the password for something that can be bruteforced quickly e.g.\nfor protecting on-disk ZIP/GnuPG file and the attacker has access to your file.\nIt is then recommended to use a high number of rounds for hashing to slow down\npassword cracking (e.g. `--s2k-count 65011712` in GnuPG).\n\nMain options:\n  --action=s          [\"gen\"]\n  --case=s           Force casing [\"default\"]\n  --list-patterns    Shortcut for --action=list-patterns\n  --num=s, -n         (=arg[0]) [1]\n  --pattern=s\@, -p   Pattern(s) to use\n  --wordlist=s\@, -w  Select one or more wordlist modules\n  -L                 Shortcut for --case=lower\n  -U                 Shortcut for --case=upper\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s     Choose output format, e.g. json, text\n  --json         Set output format to json\n  --page-result  Filter output through a pager\n\nOther options:\n  --help, -h, -?                 Display help message and exit\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --version, -v                  Display program's version and exit\n"; exit 0; },
     'json' => sub { $_pci_r->{format} = (-t STDOUT) ? "json-pretty" : "json"; },
     'naked-res' => sub { $_pci_r->{naked_res} = 1; },
     'no-config' => sub { $_pci_r->{read_config} = 0; },
     'no-env' => sub { $_pci_r->{read_env} = 0; },
     'no-naked-res|nonaked-res' => sub { $_pci_r->{naked_res} = 0; },
-    'version|v' => sub { no warnings 'once'; require App::genpw::id; print "genpw-id version ", "0.005", ($App::genpw::id::DATE ? " ($App::genpw::id::DATE)" : ''), "\n"; print "  Generated by Perinci::CmdLine::Inline version 0.541 (2017-08-16)\n"; exit 0 },
+    'page-result:s' => sub { $_pci_r->{page_result} = 1; },
+    'version|v' => sub { no warnings 'once'; require App::genpw::id; print "genpw-id version ", "0.006", ($App::genpw::id::DATE ? " ($App::genpw::id::DATE)" : ''), "\n"; print "  Generated by Perinci::CmdLine::Inline version 0.550 (2020-05-02)\n"; exit 0 },
 };
 my $go_spec2 = {
+    'L' => sub {         my $code = sub{package App::genpw;use warnings;use strict;no feature;use feature ':5.10';$_[0]{'case'} = 'lower'}; $code->(\%_pci_args);
+ },
+    'U' => sub {         my $code = sub{package App::genpw;use warnings;use strict;no feature;use feature ':5.10';$_[0]{'case'} = 'upper'}; $code->(\%_pci_args);
+ },
+    'action=s' => sub {         $_pci_args{'action'} = $_[1];
+ },
     'case=s' => sub {         $_pci_args{'case'} = $_[1];
  },
     'config-path=s@' => sub {  },
@@ -147,6 +157,8 @@ my $go_spec2 = {
     'format=s' => sub {  },
     'help|h|?' => sub {  },
     'json' => sub {  },
+    'list-patterns' => sub {         my $code = sub{package App::genpw;use warnings;use strict;no feature;use feature ':5.10';$_[0]{'action'} = 'list-patterns'}; $code->(\%_pci_args);
+ },
     'n=s' => sub {         $_pci_args{'num'} = $_[1];
  },
     'naked-res' => sub {  },
@@ -157,6 +169,7 @@ my $go_spec2 = {
  },
     'p=s@' => sub {         if ($mentioned_args{'patterns'}++) { push @{ $_pci_args{'patterns'} }, $_[1] } else { $_pci_args{'patterns'} = [$_[1]] }
  },
+    'page-result:s' => sub {  },
     'pattern=s@' => sub {         if ($mentioned_args{'patterns'}++) { push @{ $_pci_args{'patterns'} }, $_[1] } else { $_pci_args{'patterns'} = [$_[1]] }
  },
     'patterns-json=s' => sub {         $_pci_args{'patterns'} = _pci_json()->decode($_[1]);
@@ -238,6 +251,13 @@ if ($sc_name eq "") {
 ### format & display result
 
 {
+my $fh;
+if ($_pci_r->{page_result} // $ENV{PAGE_RESULT} // $_pci_r->{res}[3]{"cmdline.page_result"}) {
+my $pager = $_pci_r->{pager} // $_pci_r->{res}[3]{"cmdline.pager"} // $ENV{PAGER} // "less -FRSX";
+open $fh, "| $pager";
+} else {
+$fh = \*STDOUT;
+}
 my $fres;
 my $save_res; if (exists $_pci_r->{res}[3]{"cmdline.result"}) { $save_res = $_pci_r->{res}[2]; $_pci_r->{res}[2] = $_pci_r->{res}[3]{"cmdline.result"} }
 my $is_success = $_pci_r->{res}[0] =~ /\A2/ || $_pci_r->{res}[0] == 304;
@@ -249,9 +269,9 @@ else { require Local::_pci_clean_json; require Perinci::Result::Format::Lite; $i
 my $use_utf8 = $_pci_r->{res}[3]{"x.hint.result_binary"} ? 0 : 0;
 if ($use_utf8) { binmode STDOUT, ":encoding(utf8)" }
 if ($is_stream) {
-    my $code = $_pci_r->{res}[2]; if (ref($code) ne "CODE") { die "Result is a stream but no coderef provided" } if ($_pci_meta_result_type_is_simple) { while(defined(my $l=$code->())) { print $l; print "\n" unless $_pci_meta_result_type eq "buf"; } } else { while (defined(my $rec=$code->())) { print _pci_json()->encode($rec),"\n" } }
+    my $code = $_pci_r->{res}[2]; if (ref($code) ne "CODE") { die "Result is a stream but no coderef provided" } if ($_pci_meta_result_type_is_simple) { while(defined(my $l=$code->())) { print $fh $l; print $fh "\n" unless $_pci_meta_result_type eq "buf"; } } else { while (defined(my $rec=$code->())) { if (!defined($rec) || ref $rec) { print $fh _pci_json()->encode($rec),"\n" } else { print $fh $rec,"\n" } } }
 } else {
-    print $fres;
+    print $fh $fres;
 }
 if (defined $save_res) { $_pci_r->{res}[2] = $save_res }
 }
@@ -274,13 +294,17 @@ genpw-id - Generate password from combination of Indonesian words
 
 =head1 VERSION
 
-This document describes version 0.005 of main (from Perl distribution App-genpw-id), released on 2018-01-09.
+This document describes version 0.006 of main (from Perl distribution App-genpw-id), released on 2020-05-21.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % genpw-id [options] [num]
+ % genpw-id [-L] [-U] [--action=s] [--case=s] [--config-path=path+]
+     [--config-profile=profile] [--format=name] [--json] [--list-patterns]
+     [--(no)naked-res] [--no-config] [--no-env] [-p=s+]
+     [--page-result[=program]] [--pattern=s+] [--patterns-json=s] [-w=s+]
+     [--wordlist=s+] [--wordlists-json=s] [num]
 
 =head1 DESCRIPTION
 
@@ -304,6 +328,16 @@ C<*> marks required options.
 
 =over
 
+=item B<--action>=I<s>
+
+Default value:
+
+ "gen"
+
+Valid values:
+
+ ["gen","list-patterns"]
+
 =item B<--case>=I<s>
 
 Force casing.
@@ -320,6 +354,12 @@ Valid values:
 randomly to lower-/uppercase. `lower` forces lower case. `upper` forces
 UPPER CASE. `title` forces Title case.
 
+
+=item B<--list-patterns>
+
+Shortcut for --action=list-patterns.
+
+See C<--action>.
 
 =item B<--num>=I<s>, B<-n>
 
@@ -339,9 +379,13 @@ be used as-is. Available conversions:
 
     %l   Random Latin letter (A-Z, a-z)
     %d   Random digit (0-9)
+    %h   Random hexdigit (0-9a-f)
     %a   Random letter/digit (Alphanum) (A-Z, a-z, 0-9; combination of %l and %d)
     %s   Random ASCII symbol, e.g. "-" (dash), "_" (underscore), etc.
     %x   Random letter/digit/ASCII symbol (combination of %a and %s)
+    %m   Base64 character (A-Z, a-z, 0-9, +, /)
+    %b   Base58 character (A-Z, a-z, 0-9 minus IOl0)
+    %B   Base56 character (A-Z, a-z, 0-9 minus IOol01)
     %%   A literal percent sign
     %w   Random word
 
@@ -366,13 +410,25 @@ Select one or more wordlist modules (JSON-encoded).
 
 See C<--wordlist>.
 
+=item B<-L>
+
+Shortcut for --case=lower.
+
+See C<--case>.
+
+=item B<-U>
+
+Shortcut for --case=upper.
+
+See C<--case>.
+
 =back
 
 =head2 Configuration options
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<s>
 
 Set path to configuration file.
 
@@ -434,6 +490,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
 
 =back
 
@@ -503,6 +563,7 @@ Finally, you can filter a section by environment variable using the filter C<env
 
 List of available configuration parameters:
 
+ action (see --action)
  case (see --case)
  format (see --format)
  naked_res (see --naked-res)
@@ -530,7 +591,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-genpw-
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-App-Genpass-ID>.
+Source repository is at L<https://github.com/perlancar/perl-App-genpw-id>.
 
 =head1 BUGS
 
@@ -546,7 +607,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -555,20 +616,22 @@ the same terms as the Perl 5 programming language system itself.
 
 __DATA__
 Data::Section::Seekable v1
-Clone/PP.pm,20,1884,0;0
-Complete/Bash.pm,1929,17459,1;71
-Config/IOD/Base.pm,19415,13463,2;596
-Config/IOD/Reader.pm,32907,6377,3;1100
-Data/Check/Structure.pm,39316,3504,4;1307
-Data/Sah/Normalize.pm,42850,6073,5;1469
-Getopt/Long/EvenLess.pm,48955,6010,6;1650
-Local/_pci_check_args.pm,54998,1158,7;1858
-Local/_pci_clean_json.pm,56189,3724,8;1880
-Perinci/CmdLine/Util/Config.pm,59952,7499,9;1933
-Perinci/Result/Format/Lite.pm,67489,18339,10;2195
-Perinci/Sub/Normalize.pm,85861,4885,11;2674
-Sah/Schema/rinci/function_meta.pm,90788,3632,12;2826
-Text/Table/Tiny.pm,94447,2733,13;2964
+Clone/PP.pm,20,6331,0;0
+Complete/Bash.pm,6376,39632,1;193
+Config/IOD/Base.pm,46035,23603,2;1432
+Config/IOD/Reader.pm,69667,17366,3;2242
+Data/Check/Structure.pm,87065,8606,4;2801
+Data/Sah/Normalize.pm,95701,9038,5;3137
+Getopt/Long/EvenLess.pm,104771,11364,6;3411
+Local/_pci_check_args.pm,116168,7968,7;3793
+Local/_pci_clean_json.pm,124169,4414,8;3935
+Log/ger.pm,128602,11278,9;3997
+Perinci/CmdLine/Util/Config.pm,139919,15677,10;4342
+Perinci/Result/Format/Lite.pm,155634,22687,11;4840
+Perinci/Sub/Normalize.pm,178354,7303,12;5438
+Sah/Schema/rinci/function_meta.pm,185699,5179,13;5673
+Scalar/Util/Numeric/PP.pm,190912,3106,14;5860
+Text/Table/Tiny.pm,194045,8117,15;6001
 
 ### Clone/PP.pm ###
 #package Clone::PP;
@@ -582,36 +645,49 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #$VERSION = 1.07;
 #
 #@EXPORT_OK = qw( clone );
-#sub import { goto &Exporter::import } 
+#sub import { goto &Exporter::import } # lazy Exporter
 #
+## These methods can be temporarily overridden to work with a given class.
 #use vars qw( $CloneSelfMethod $CloneInitMethod );
 #$CloneSelfMethod ||= 'clone_self';
 #$CloneInitMethod ||= 'clone_init';
 #
+## Used to detect looped networks and avoid infinite recursion. 
 #use vars qw( %CloneCache );
 #
+## Generic cloning function
 #sub clone {
 #  my $source = shift;
 #
 #  return undef if not defined($source);
 #  
+#  # Optional depth limit: after a given number of levels, do shallow copy.
 #  my $depth = shift;
 #  return $source if ( defined $depth and $depth -- < 1 );
 #  
+#  # Maintain a shared cache during recursive calls, then clear it at the end.
 #  local %CloneCache = ( undef => undef ) unless ( exists $CloneCache{undef} );
 #  
 #  return $CloneCache{ $source } if ( defined $CloneCache{ $source } );
 #  
+#  # Non-reference values are copied shallowly
 #  my $ref_type = ref $source or return $source;
 #  
+#  # Extract both the structure type and the class name of referent
 #  my $class_name;
 #  if ( "$source" =~ /^\Q$ref_type\E\=([A-Z]+)\(0x[0-9a-f]+\)$/ ) {
 #    $class_name = $ref_type;
 #    $ref_type = $1;
+#    # Some objects would prefer to clone themselves; check for clone_self().
 #    return $CloneCache{ $source } = $source->$CloneSelfMethod() 
 #				  if $source->can($CloneSelfMethod);
 #  }
 #  
+#  # To make a copy:
+#  # - Prepare a reference to the same type of structure;
+#  # - Store it in the cache, to avoid looping if it refers to itself;
+#  # - Tie in to the same class as the original, if it was tied;
+#  # - Assign a value to the reference by cloning each item in the original;
 #  
 #  my $copy;
 #  if ($ref_type eq 'HASH') {
@@ -627,9 +703,12 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #    if ( my $tied = tied( $$source ) ) { tie $$copy, ref $tied }
 #    $$copy = clone($$source, $depth);
 #  } else {
+#    # Shallow copy anything else; this handles a reference to code, glob, regex
 #    $CloneCache{ $source } = $copy = $source;
 #  }
 #  
+#  # - Bless it into the same class as the original, if it was blessed;
+#  # - If it has a post-cloning initialization method, call it.
 #  if ( $class_name ) {
 #    bless $copy, $class_name;
 #    $copy->$CloneInitMethod() if $copy->can($CloneInitMethod);
@@ -642,15 +721,124 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #
 #__END__
 #
+#=head1 NAME
+#
+#Clone::PP - Recursively copy Perl datatypes
+#
+#=head1 SYNOPSIS
+#
+#  use Clone::PP qw(clone);
+#  
+#  $item = { 'foo' => 'bar', 'move' => [ 'zig', 'zag' ]  };
+#  $copy = clone( $item );
+#
+#  $item = [ 'alpha', 'beta', { 'gamma' => 'vlissides' } ];
+#  $copy = clone( $item );
+#
+#  $item = Foo->new();
+#  $copy = clone( $item );
+#
+#Or as an object method:
+#
+#  require Clone::PP;
+#  push @Foo::ISA, 'Clone::PP';
+#  
+#  $item = Foo->new();
+#  $copy = $item->clone();
+#
+#=head1 DESCRIPTION
+#
+#This module provides a general-purpose clone function to make deep
+#copies of Perl data structures. It calls itself recursively to copy
+#nested hash, array, scalar and reference types, including tied
+#variables and objects.
+#
+#The clone() function takes a scalar argument to copy. To duplicate
+#arrays or hashes, pass them in by reference:
+#
+#  my $copy = clone(\@array);    my @copy = @{ clone(\@array) };
+#  my $copy = clone(\%hash);     my %copy = %{ clone(\%hash) };
+#
+#The clone() function also accepts an optional second parameter that
+#can be used to limit the depth of the copy. If you pass a limit of
+#0, clone will return the same value you supplied; for a limit of
+#1, a shallow copy is constructed; for a limit of 2, two layers of
+#copying are done, and so on.
+#
+#  my $shallow_copy = clone( $item, 1 );
+#
+#To allow objects to intervene in the way they are copied, the
+#clone() function checks for a couple of optional methods. If an
+#object provides a method named C<clone_self>, it is called and the
+#result returned without further processing. Alternately, if an
+#object provides a method named C<clone_init>, it is called on the
+#copied object before it is returned.
+#
+#=head1 BUGS
+#
+#Some data types, such as globs, regexes, and code refs, are always copied shallowly.
+#
+#References to hash elements are not properly duplicated. (This is why two tests in t/dclone.t that are marked "todo".) For example, the following test should succeed but does not:
+#
+#  my $hash = { foo => 1 }; 
+#  $hash->{bar} = \{ $hash->{foo} }; 
+#  my $copy = clone( \%hash ); 
+#  $hash->{foo} = 2; 
+#  $copy->{foo} = 2; 
+#  ok( $hash->{bar} == $copy->{bar} );
+#
+#To report bugs via the CPAN web tracking system, go to 
+#C<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Clone-PP> or send mail 
+#to C<Dist=Clone-PP#rt.cpan.org>, replacing C<#> with C<@>.
+#
+#=head1 SEE ALSO
+#
+#L<Clone> - a baseclass which provides a C<clone()> method.
+#
+#L<MooseX::Clone> - find-grained cloning for Moose objects.
+#
+#The C<dclone()> function in L<Storable>.
+#
+#L<Data::Clone> -
+#polymorphic data cloning (see its documentation for what that means).
+#
+#L<Clone::Any> - use whichever of the cloning methods is available.
+#
+#=head1 REPOSITORY
+#
+#L<https://github.com/neilbowers/Clone-PP>
+#
+#=head1 AUTHOR AND CREDITS
+#
+#Developed by Matthew Simon Cavalletto at Evolution Softworks. 
+#More free Perl software is available at C<www.evoscript.org>.
+#
+#
+#=head1 COPYRIGHT AND LICENSE
+#
+#Copyright 2003 Matthew Simon Cavalletto. You may contact the author
+#directly at C<evo@cpan.org> or C<simonm@cavalletto.org>.
+#
+#Code initially derived from Ref.pm. Portions Copyright 1994 David Muir Sharnoff.
+#
+#Interface based by Clone by Ray Finch with contributions from chocolateboy.
+#Portions Copyright 2001 Ray Finch. Portions Copyright 2001 chocolateboy. 
+#
+#You may use, modify, and distribute this software under the same terms as Perl.
+#
+#=cut
 ### Complete/Bash.pm ###
 #package Complete::Bash;
 #
-#our $DATE = '2016-12-28'; 
-#our $VERSION = '0.31'; 
+#our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+#our $DATE = '2020-04-16'; # DATE
+#our $DIST = 'Complete-Bash'; # DIST
+#our $VERSION = '0.335'; # VERSION
 #
 #use 5.010001;
 #use strict;
 #use warnings;
+#use Log::ger;
 #
 #require Exporter;
 #our @ISA = qw(Exporter);
@@ -678,7 +866,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #        $user = $ent[0];
 #    }
 #    return $ent[7] . $slash if @ent;
-#    "~$user$slash"; 
+#    "~$user$slash"; # return as-is when failed
 #}
 #
 #sub _add_unquoted {
@@ -686,6 +874,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #
 #    my ($word, $is_cur_word, $after_ws) = @_;
 #
+#    #say "D:add_unquoted word=$word is_cur_word=$is_cur_word after_ws=$after_ws";
 #
 #    $word =~ s!^(~)(\w*)(/|\z) |  # 1) tilde  2) username  3) optional slash
 #               \\(.)           |  # 4) escaped char
@@ -908,12 +1097,14 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #    die "$0: COMP_LINE not set, make sure this script is run under ".
 #        "bash completion (e.g. through complete -C)\n" unless defined $line;
 #
+#    log_trace "[compbash] parse_cmdline(): input: line=<$line> point=<$point>"
+#        if $ENV{COMPLETE_BASH_TRACE};
 #
 #    my @words;
 #    my $cword;
 #    my $pos = 0;
 #    my $pos_min_ws = 0;
-#    my $after_ws = 1; 
+#    my $after_ws = 1; # XXX what does this variable mean?
 #    my $chunk;
 #    my $add_blank;
 #    my $is_cur_word;
@@ -982,6 +1173,9 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #    $cword //= @words;
 #    $words[$cword] //= '';
 #
+#    log_trace "[compbash] parse_cmdline(): result: words=%s, cword=%s", \@words, $cword
+#        if $ENV{COMPLETE_BASH_TRACE};
+#
 #    [\@words, $cword];
 #}
 #
@@ -997,16 +1191,16 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #
 #So if command-line is:
 #
-#    command -MData::Dump bob@example.org
+#    command --module=Data::Dump bob@example.org
 #
 #then they will be parsed as:
 #
-#    ["command", "-MData", "::", "Dump", "bob", '@', "example.org"]
+#    ["command", "--module", "=", "Data", "::", "Dump", "bob", '@', "example.org"]
 #
 #Normally in Perl applications, we want `:`, `@` to be part of word. So this
 #routine will convert the above into:
 #
-#    ["command", "-MData::Dump", 'bob@example.org']
+#    ["command", "--module=Data::Dump", 'bob@example.org']
 #
 #_
 #};
@@ -1032,7 +1226,36 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #            push @$new_words, $w;
 #        }
 #    }
+#    log_trace "[compbash] join_wordbreak_words(): result: words=%s, cword=%d", $new_words, $cword
+#        if $ENV{COMPLETE_BASH_TRACE};
 #    [$new_words, $cword];
+#}
+#
+#sub _terminal_width {
+#    # XXX need to cache?
+#    if (eval { require Term::Size; 1 }) {
+#        my ($cols, undef) = Term::Size::chars(*STDOUT{IO});
+#        $cols // 80;
+#    } else {
+#        $ENV{COLUMNS} // 80;
+#    }
+#}
+#
+## given terminal width & number of columns, calculate column width
+#sub _column_width {
+#    my ($terminal_width, $num_columns) = @_;
+#    if (defined $num_columns && $num_columns > 0) {
+#        int( ($terminal_width - ($num_columns-1)*2) / $num_columns ) - 1;
+#    } else {
+#        undef;
+#    }
+#}
+#
+## given terminal width & column width, calculate number of columns
+#sub _num_columns {
+#    my ($terminal_width, $column_width) = @_;
+#    my $n = int( ($terminal_width+2) / ($column_width+2) );
+#    $n >= 1 ? $n : 1;
 #}
 #
 #$SPEC{format_completion} = {
@@ -1046,43 +1269,6 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #
 #This function accepts completion answer structure as described in the `Complete`
 #POD. Aside from `words`, this function also recognizes these keys:
-#
-#* `as` (str): Either `string` (the default) or `array` (to return array of lines
-#  instead of the lines joined together). Returning array is useful if you are
-#  doing completion inside `Term::ReadLine`, for example, where the library
-#  expects an array.
-#
-#* `esc_mode` (str): Escaping mode for entries. Either `default` (most
-#  nonalphanumeric characters will be escaped), `shellvar` (like `default`, but
-#  dollar sign `$` will not be escaped, convenient when completing environment
-#  variables for example), `filename` (currently equals to `default`), `option`
-#  (currently equals to `default`), or `none` (no escaping will be done).
-#
-#* `path_sep` (str): If set, will enable "path mode", useful for
-#  completing/drilling-down path. Below is the description of "path mode".
-#
-#  In shell, when completing filename (e.g. `foo`) and there is only a single
-#  possible completion (e.g. `foo` or `foo.txt`), the shell will display the
-#  completion in the buffer and automatically add a space so the user can move to
-#  the next argument. This is also true when completing other values like
-#  variables or program names.
-#
-#  However, when completing directory (e.g. `/et` or `Downloads`) and there is
-#  solely a single completion possible and it is a directory (e.g. `/etc` or
-#  `Downloads`), the shell automatically adds the path separator character
-#  instead (`/etc/` or `Downloads/`). The user can press Tab again to complete
-#  for files/directories inside that directory, and so on. This is obviously more
-#  convenient compared to when shell adds a space instead.
-#
-#  The `path_sep` option, when set, will employ a trick to mimic this behaviour.
-#  The trick is, if you have a completion array of `['foo/']`, it will be changed
-#  to `['foo/', 'foo/ ']` (the second element is the first element with added
-#  space at the end) to prevent bash from adding a space automatically.
-#
-#  Path mode is not restricted to completing filesystem paths. Anything path-like
-#  can use it. For example when you are completing Java or Perl module name (e.g.
-#  `com.company.product.whatever` or `File::Spec::Unix`) you can use this mode
-#  (with `path_sep` appropriately set to, e.g. `.` or `::`).
 #
 #_
 #    args_as => 'array',
@@ -1099,8 +1285,64 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #            pos=>0,
 #        },
 #        opts => {
+#            summary => 'Specify options',
 #            schema=>'hash*',
 #            pos=>1,
+#            description => <<'_',
+#
+#Known options:
+#
+#* as
+#
+#  Either `string` (the default) or `array` (to return array of lines instead of
+#  the lines joined together). Returning array is useful if you are doing
+#  completion inside `Term::ReadLine`, for example, where the library expects an
+#  array.
+#
+#* esc_mode
+#
+#  Escaping mode for entries. Either `default` (most nonalphanumeric characters
+#  will be escaped), `shellvar` (like `default`, but dollar sign `$` will also be
+#  escaped, convenient when completing environment variables for example),
+#  `filename` (currently equals to `default`), `option` (currently equals to
+#  `default`), or `none` (no escaping will be done).
+#
+#* word
+#
+#  A workaround. String. For now, see source code for more details.
+#
+#* show_summaries
+#
+#  Whether to show item's summaries. Boolean, default is from
+#  COMPLETE_BASH_SHOW_SUMMARIES environment variable or 1.
+#
+#  An answer item contain summary, which is a short description about the item,
+#  e.g.:
+#
+#      [{word=>"-a"    , summary=>"Show hidden files"},
+#       {word=>"-l"    , summary=>"Show details"},
+#       {word=>"--sort", summary=>"Specify sort order"}],
+#
+#  When summaries are not shown, user will just be seeing something like:
+#
+#      -a
+#      -l
+#      --sort
+#
+#  But when summaries are shown, user will see:
+#
+#      -a         -- Show hidden files
+#      -l         -- Show details
+#      --sort     -- Specify sort order
+#
+#  which is quite helpful.
+#
+#* workaround_with_wordbreaks
+#
+#  Boolean. Default is true. See source code for more details.
+#
+#_
+#
 #        },
 #    },
 #    result => {
@@ -1115,27 +1357,89 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #    $opts //= {};
 #
 #    $hcomp = {words=>$hcomp} unless ref($hcomp) eq 'HASH';
-#    my $comp     = $hcomp->{words};
-#    my $as       = $hcomp->{as} // 'string';
-#    my $esc_mode = $hcomp->{esc_mode} // $hcomp->{escmode} // 'default';
+#    my $words    = $hcomp->{words};
+#    my $as       = $opts->{as} // 'string';
+#    # 'escmode' key is deprecated (Complete 0.11-) and will be removed later
+#    my $esc_mode = $opts->{esc_mode} // $ENV{COMPLETE_BASH_DEFAULT_ESC_MODE} //
+#        'default';
 #    my $path_sep = $hcomp->{path_sep};
 #
-#    if (defined($path_sep) && @$comp == 1) {
-#        my $re = qr/\Q$path_sep\E\z/;
-#        my $word;
-#        if (ref($comp->[0]) eq 'HASH') {
-#            $comp = [$comp->[0], {word=>"$comp->[0] "}] if
-#                $comp->[0]{word} =~ $re;
-#        } else {
-#            $comp = [$comp->[0], "$comp->[0] "]
-#                if $comp->[0] =~ $re;
+#    # we keep the original words (before formatted with summaries) when we want
+#    # to use fzf instead of passing to bash directly
+#    my @words;
+#    my @summaries;
+#    my @res;
+#    my $has_summary;
+#
+#    my $code_return_message = sub {
+#        # display a message instead of list of words. we send " " (ASCII space)
+#        # which bash does not display, so we can display a line of message while
+#        # the user does not get the message as the completion. I've also tried
+#        # \000 to \037 instead of space (\040) but nothing works better.
+#        my $msg = shift;
+#        if ($msg =~ /\A /) {
+#            $msg =~ s/\A +//;
+#            $msg = " (empty message)" unless length $msg;
+#        }
+#        return (sprintf("%-"._terminal_width()."s", $msg), " ");
+#    };
+#
+#  FORMAT_MESSAGE:
+#    # display a message instead of list of words. we send " " (ASCII space)
+#    # which bash does not display, so we can display a line of message while the
+#    # user does not get the message as the completion. I've also tried \000 to
+#    # \037 instead of space (\040) but nothing works better.
+#    if (defined $hcomp->{message}) {
+#        @res = $code_return_message->($hcomp->{message});
+#        goto RETURN_RES;
+#    }
+#
+#  WORKAROUND_PREVENT_BASH_FROM_INSERTING_SPACE:
+#    {
+#        last unless @$words == 1;
+#        if (defined $path_sep) {
+#            my $re = qr/\Q$path_sep\E\z/;
+#            my $word;
+#            if (ref $words->[0] eq 'HASH') {
+#                $words = [$words->[0], {word=>"$words->[0]{word} "}] if
+#                    $words->[0]{word} =~ $re;
+#            } else {
+#                $words = [$words->[0], "$words->[0] "]
+#                    if $words->[0] =~ $re;
+#            }
+#            last;
+#        }
+#
+#        if ($hcomp->{is_partial} ||
+#                ref $words->[0] eq 'HASH' && $words->[0]{is_partial}) {
+#            if (ref $words->[0] eq 'HASH') {
+#                $words = [$words->[0], {word=>"$words->[0]{word} "}];
+#            } else {
+#                $words = [$words->[0], "$words->[0] "];
+#            }
+#            last;
 #        }
 #    }
 #
-#    if (defined($opts->{word})) {
+#  WORKAROUND_WITH_WORDBREAKS:
+#    # this is a workaround. since bash breaks words using characters in
+#    # $COMP_WORDBREAKS, which by default is "'@><=;|&(: this presents a problem
+#    # we often encounter: if we want to provide with a list of strings
+#    # containing say ':', most often Perl modules/packages, if user types e.g.
+#    # "Text::AN" and we provide completion ["Text::ANSI"] then bash will change
+#    # the word at cursor to become "Text::Text::ANSI" since it sees the current
+#    # word as "AN" and not "Text::AN". the workaround is to chop /^Text::/ from
+#    # completion answers. btw, we actually chop /^text::/i to handle
+#    # case-insensitive matching, although this does not have the ability to
+#    # replace the current word (e.g. if we type 'text::an' then bash can only
+#    # replace the current word 'an' with 'ANSI).
+#    {
+#        last unless $opts->{workaround_with_wordbreaks} // 1;
+#        last unless defined $opts->{word};
+#
 #        if ($opts->{word} =~ s/(.+[\@><=;|&\(:])//) {
 #            my $prefix = $1;
-#            for (@$comp) {
+#            for (@$words) {
 #                if (ref($_) eq 'HASH') {
 #                    $_->{word} =~ s/\A\Q$prefix\E//i;
 #                } else {
@@ -1145,18 +1449,124 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #        }
 #    }
 #
-#    my @res;
-#    for my $entry (@$comp) {
-#        my $word = ref($entry) eq 'HASH' ? $entry->{word} : $entry;
+#  ESCAPE_WORDS:
+#    for my $entry (@$words) {
+#        my $word    = ref($entry) eq 'HASH' ? $entry->{word}    : $entry;
+#        my $summary = (ref($entry) eq 'HASH' ? $entry->{summary} : undef) // '';
 #        if ($esc_mode eq 'shellvar') {
-#            $word =~ s!([^A-Za-z0-9,+._/\$~-])!\\$1!g;
-#        } elsif ($esc_mode eq 'none') {
-#        } else {
+#            # escape $ also
 #            $word =~ s!([^A-Za-z0-9,+._/:~-])!\\$1!g;
+#        } elsif ($esc_mode eq 'none') {
+#            # no escaping
+#        } else {
+#            # default
+#            $word =~ s!([^A-Za-z0-9,+._/:\$~-])!\\$1!g;
 #        }
-#        push @res, $word;
+#        push @words, $word;
+#        push @summaries, $summary;
+#        $has_summary = 1 if length $summary;
 #    }
 #
+#    my $summary_align = $ENV{COMPLETE_BASH_SUMMARY_ALIGN} // 'left';
+#    my $max_columns = $ENV{COMPLETE_BASH_MAX_COLUMNS} // 0;
+#    my $terminal_width = _terminal_width();
+#    my $column_width = _column_width($terminal_width, $max_columns);
+#
+#    #warn "terminal_width=$terminal_width, column_width=".($column_width // 'undef')."\n";
+#
+#  FORMAT_SUMMARIES: {
+#        @res = @words;
+#        last if @words <= 1;
+#        last unless $has_summary;
+#        last unless $opts->{show_summaries} //
+#            $ENV{COMPLETE_BASH_SHOW_SUMMARIES} // 1;
+#        my $max_entry_width   = 8;
+#        my $max_summ_width = 0;
+#        for (0..$#words) {
+#            $max_entry_width = length $words[$_]
+#                if $max_entry_width < length $words[$_];
+#            $max_summ_width = length $summaries[$_]
+#                if $max_summ_width < length $summaries[$_];
+#        }
+#        #warn "max_entry_width=$max_entry_width, max_summ_width=$max_summ_width\n";
+#        if ($summary_align eq 'right') {
+#            # if we are aligning summary to the right, we want to fill column
+#            # width width
+#            if ($max_columns <= 0) {
+#                $max_columns = _num_columns(
+#                    $terminal_width, ($max_entry_width + 2 + $max_summ_width));
+#            }
+#            $column_width = _column_width($terminal_width, $max_columns);
+#            my $new_max_summ_width = $column_width - 2 - $max_entry_width;
+#            $max_summ_width = $new_max_summ_width
+#                if $max_summ_width < $new_max_summ_width;
+#            #warn "max_columns=$max_columns, column_width=$column_width, max_summ_width=$max_summ_width\n";
+#        }
+#
+#        for (0..$#words) {
+#            my $summary = $summaries[$_];
+#            if (length $summary) {
+#                $res[$_] = sprintf(
+#                    "%-${max_entry_width}s |%".
+#                        ($summary_align eq 'right' ? $max_summ_width : '')."s",
+#                    $words[$_], $summary);
+#            }
+#        }
+#    } # FORMAT_SUMMARIES
+#
+#  MAX_COLUMNS: {
+#        last unless $max_columns > 0;
+#        my $max_entry_width = 0;
+#        for (@res) {
+#            $max_entry_width = length if $max_entry_width < length;
+#        }
+#        last if $max_entry_width >= $column_width;
+#        for (@res) {
+#            $_ .= " " x ($column_width - length) if $column_width > length;
+#        }
+#    }
+#
+#  PASS_TO_FZF: {
+#        last unless $ENV{COMPLETE_BASH_FZF};
+#        my $items = $ENV{COMPLETE_BASH_FZF_ITEMS} // 100;
+#        last unless @words >= $items;
+#
+#        require File::Which;
+#        unless (File::Which::which("fzf")) {
+#            #@res = $code_return_message->("Cannot find fzf to filter ".
+#            #                                  scalar(@words)." items");
+#            goto RETURN_RES;
+#        }
+#
+#        require IPC::Open2;
+#        local *CHLD_OUT;
+#        local *CHLD_IN;
+#        my $pid = IPC::Open2::open2(
+#            \*CHLD_OUT, \*CHLD_IN, "fzf", "-m", "-d:", "--with-nth=2..")
+#            or do {
+#                @res = $code_return_message->("Cannot open fzf to filter ".
+#                                                  scalar(@words)." items");
+#                goto RETURN_RES;
+#            };
+#
+#        print CHLD_IN map { "$_:$res[$_]\n" } 0..$#res;
+#        close CHLD_IN;
+#
+#        my @res_words;
+#        while (<CHLD_OUT>) {
+#            my ($index) = /\A([0-9]+)\:/ or next;
+#            push @res_words, $words[$index];
+#        }
+#        if (@res_words) {
+#            @res = join(" ", @res_words);
+#        } else {
+#            @res = ();
+#        }
+#        waitpid($pid, 0);
+#    }
+#
+#  RETURN_RES:
+#    #use Data::Dump; warn Data::Dump::dump(\@res);
 #    if ($as eq 'array') {
 #        return \@res;
 #    } else {
@@ -1165,21 +1575,511 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #}
 #
 #1;
+## ABSTRACT: Completion routines for bash shell
 #
 #__END__
 #
+#=pod
+#
+#=encoding UTF-8
+#
+#=head1 NAME
+#
+#Complete::Bash - Completion routines for bash shell
+#
+#=head1 VERSION
+#
+#This document describes version 0.335 of Complete::Bash (from Perl distribution Complete-Bash), released on 2020-04-16.
+#
+#=head1 DESCRIPTION
+#
+#This module provides routines related to tab completion in bash shell.
+#
+#=head2 About programmable completion in bash
+#
+#Bash allows completion to come from various sources. The simplest is from a list
+#of words (C<-W>):
+#
+# % complete -W "one two three four" somecmd
+# % somecmd t<Tab>
+# two  three
+#
+#Another source is from a bash function (C<-F>). The function will receive input
+#in two variables: C<COMP_WORDS> (array, command-line chopped into words) and
+#C<COMP_CWORD> (integer, index to the array of words indicating the cursor
+#position). It must set an array variable C<COMPREPLY> that contains the list of
+#possible completion:
+#
+# % _foo()
+# {
+#   local cur
+#   COMPREPLY=()
+#   cur=${COMP_WORDS[COMP_CWORD]}
+#   COMPREPLY=($( compgen -W '--help --verbose --version' -- $cur ) )
+# }
+# % complete -F _foo foo
+# % foo <Tab>
+# --help  --verbose  --version
+#
+#And yet another source is an external command (C<-C>) including, from a Perl
+#script. The command receives two environment variables: C<COMP_LINE> (string,
+#raw command-line) and C<COMP_POINT> (integer, cursor location). Program must
+#split C<COMP_LINE> into words, find the word to be completed, complete that, and
+#return the list of words one per-line to STDOUT. An example:
+#
+# % cat foo-complete
+# #!/usr/bin/perl
+# use Complete::Bash qw(parse_cmdline format_completion);
+# use Complete::Util qw(complete_array_elem);
+# my ($words, $cword) = @{ parse_cmdline() };
+# my $res = complete_array_elem(array=>[qw/--help --verbose --version/], word=>$words->[$cword]);
+# print format_completion($res);
+#
+# % complete -C foo-complete foo
+# % foo --v<Tab>
+# --verbose --version
+#
+#=head2 About the routines in this module
+#
+#First of all, C<parse_cmdline()> is the function to parse raw command-line (such
+#as what you get from bash in C<COMP_LINE> environment variable) into words. This
+#makes it easy for the other functions to generate completion answer. See the
+#documentation for that function for more details.
+#
+#C<format_completion()> is what you use to format completion answer structure for
+#bash.
+#
+#=head1 FUNCTIONS
+#
+#
+#=head2 format_completion
+#
+#Usage:
+#
+# format_completion($completion, $opts) -> str|array
+#
+#Format completion for output (for shell).
+#
+#Bash accepts completion reply in the form of one entry per line to STDOUT. Some
+#characters will need to be escaped. This function helps you do the formatting,
+#with some options.
+#
+#This function accepts completion answer structure as described in the C<Complete>
+#POD. Aside from C<words>, this function also recognizes these keys:
+#
+#This function is not exported by default, but exportable.
+#
+#Arguments ('*' denotes required arguments):
+#
+#=over 4
+#
+#=item * B<$completion>* => I<hash|array>
+#
+#Completion answer structure.
+#
+#Either an array or hash. See function description for more details.
+#
+#=item * B<$opts> => I<hash>
+#
+#Specify options.
+#
+#Known options:
+#
+#=over
+#
+#=item * as
+#
+#Either C<string> (the default) or C<array> (to return array of lines instead of
+#the lines joined together). Returning array is useful if you are doing
+#completion inside C<Term::ReadLine>, for example, where the library expects an
+#array.
+#
+#=item * esc_mode
+#
+#Escaping mode for entries. Either C<default> (most nonalphanumeric characters
+#will be escaped), C<shellvar> (like C<default>, but dollar sign C<$> will also be
+#escaped, convenient when completing environment variables for example),
+#C<filename> (currently equals to C<default>), C<option> (currently equals to
+#C<default>), or C<none> (no escaping will be done).
+#
+#=item * word
+#
+#A workaround. String. For now, see source code for more details.
+#
+#=item * show_summaries
+#
+#Whether to show item's summaries. Boolean, default is from
+#COMPLETE_BASH_SHOW_SUMMARIES environment variable or 1.
+#
+#An answer item contain summary, which is a short description about the item,
+#e.g.:
+#
+#  [{word=>"-a"    , summary=>"Show hidden files"},
+#   {word=>"-l"    , summary=>"Show details"},
+#   {word=>"--sort", summary=>"Specify sort order"}],
+#
+#When summaries are not shown, user will just be seeing something like:
+#
+#  -a
+#  -l
+#  --sort
+#
+#But when summaries are shown, user will see:
+#
+#  -a         -- Show hidden files
+#  -l         -- Show details
+#  --sort     -- Specify sort order
+#
+#which is quite helpful.
+#
+#=item * workaround_with_wordbreaks
+#
+#Boolean. Default is true. See source code for more details.
+#
+#=back
+#
+#
+#=back
+#
+#Return value: Formatted string (or array, if `as` is set to `array`) (str|array)
+#
+#
+#
+#=head2 join_wordbreak_words
+#
+#Usage:
+#
+# join_wordbreak_words() -> [status, msg, payload, meta]
+#
+#Post-process parse_cmdline() result by joining some words.
+#
+#C<parse_cmdline()>, like bash, splits some characters that are considered as
+#word-breaking characters:
+#
+# "'@><=;|&(:
+#
+#So if command-line is:
+#
+# command --module=Data::Dump bob@example.org
+#
+#then they will be parsed as:
+#
+# ["command", "--module", "=", "Data", "::", "Dump", "bob", '@', "example.org"]
+#
+#Normally in Perl applications, we want C<:>, C<@> to be part of word. So this
+#routine will convert the above into:
+#
+# ["command", "--module=Data::Dump", 'bob@example.org']
+#
+#This function is not exported by default, but exportable.
+#
+#No arguments.
+#
+#Returns an enveloped result (an array).
+#
+#First element (status) is an integer containing HTTP status code
+#(200 means OK, 4xx caller error, 5xx function error). Second element
+#(msg) is a string containing error message, or 'OK' if status is
+#200. Third element (payload) is optional, the actual result. Fourth
+#element (meta) is called result metadata and is optional, a hash
+#that contains extra information.
+#
+#Return value:  (any)
+#
+#
+#
+#=head2 parse_cmdline
+#
+#Usage:
+#
+# parse_cmdline($cmdline, $point, $opts) -> array
+#
+#Parse shell command-line for processing by completion routines.
+#
+#This function basically converts C<COMP_LINE> (str) and C<COMP_POINT> (int) into
+#something like (but not exactly the same as) C<COMP_WORDS> (array) and
+#C<COMP_CWORD> (int) that bash supplies to shell functions.
+#
+#The differences with bash are (these differences are mostly for parsing
+#convenience for programs that use this routine; this comparison is made against
+#bash versions 4.2-4.3):
+#
+#1) quotes and backslashes are stripped (bash's C<COMP_WORDS> contains all the
+#   quotes and backslashes);
+#
+#2) quoted phrase that contains spaces, or phrase that contains escaped spaces is
+#   parsed as a single word. For example:
+#
+# command "First argument" Second\ argument
+#
+#   bash would split it as (represented as Perl):
+#
+# ["command", "\"First", "argument\"", "Second\\", "argument"]
+#
+#   which is not very convenient. We parse it into:
+#
+# ["command", "First argument", "Second argument"]
+#
+#3) variables are substituted with their values from environment variables except
+#   for the current word (C<COMP_WORDS[COMP_CWORD]>) (bash does not perform
+#   variable substitution for C<COMP_WORDS>). However, note that special shell
+#   variables that are not environment variables like C<$0>, C<$_>, C<$IFS> will not
+#   be replaced correctly because bash does not export those variables for us.
+#
+#4) tildes (C<~>) are expanded with user's home directory except for the current
+#   word (bash does not perform tilde expansion for C<COMP_WORDS>);
+#
+#Caveats:
+#
+#=over
+#
+#=item * Like bash, we group non-whitespace word-breaking characters into its own word.
+#By default C<COMP_WORDBREAKS> is:
+#
+#"'@><=;|&(:
+#
+#So if raw command-line is:
+#
+#command --foo=bar http://example.com:80 mail@example.org Foo::Bar
+#
+#then the parse result will be:
+#
+#["command", "--foo", "=", "bar", "http", ":", "//example.com", ":", "80", "Foo", "::", "Bar"]
+#
+#which is annoying sometimes. But we follow bash here so we can more easily
+#accept input from a joined C<COMP_WORDS> if we write completion bash functions,
+#e.g. (in the example, C<foo> is a Perl script):
+#
+#I<foo ()
+#{
+#    local words=(${COMP>CWORDS[@]})
+#    # add things to words, etc
+#    local point=... # calculate the new point
+#    COMPREPLY=( C<COMP_LINE="foo ${words[@]}" COMP_POINT=$point foo> )
+#}
+#
+#To avoid these word-breaking characters to be split/grouped, we can escape
+#them with backslash or quote them, e.g.:
+#
+#command "http://example.com:80" Foo\:\:Bar
+#
+#which bash will parse as:
+#
+#["command", "\"http://example.com:80\"", "Foo\:\:Bar"]
+#
+#and we parse as:
+#
+#["command", "http://example.com:80", "Foo::Bar"]
+#
+#=item * Due to the way bash parses the command line (see above), the two below are
+#equivalent:
+#
+#% cmd --foo=bar
+#% cmd --foo = bar
+#
+#=back
+#
+#Because they both expand to C<['--foo', '=', 'bar']>. But obviously
+#L<Getopt::Long> does not regard the two as equivalent.
+#
+#This function is not exported by default, but exportable.
+#
+#Arguments ('*' denotes required arguments):
+#
+#=over 4
+#
+#=item * B<$cmdline> => I<str>
+#
+#Command-line, defaults to COMP_LINE environment.
+#
+#=item * B<$opts> => I<hash>
+#
+#Options.
+#
+#Optional. Known options:
+#
+#=over
+#
+#=item * C<truncate_current_word> (bool). If set to 1, will truncate current word to the
+#position of cursor, for example (C<^> marks the position of cursor):
+#C<--vers^oo> to C<--vers> instead of C<--versoo>. This is more convenient when
+#doing tab completion.
+#
+#=back
+#
+#=item * B<$point> => I<int>
+#
+#PointE<sol>position to complete in command-line, defaults to COMP_POINT.
+#
+#
+#=back
+#
+#Return value:  (array)
+#
+#
+#Return a 2-element array: C<[$words, $cword]>. C<$words> is array of str,
+#equivalent to C<COMP_WORDS> provided by bash to shell functions. C<$cword> is an
+#integer, roughly equivalent to C<COMP_CWORD> provided by bash to shell functions.
+#The word to be completed is at C<< $words-E<gt>[$cword] >>.
+#
+#Note that COMP_LINE includes the command name. If you want the command-line
+#arguments only (like in C<@ARGV>), you need to strip the first element from
+#C<$words> and reduce C<$cword> by 1.
+#
+#
+#
+#=head2 point
+#
+#Usage:
+#
+# point($cmdline, $marker) -> any
+#
+#Return line with point marked by a marker.
+#
+#This is a utility function useful for testing/debugging. C<parse_cmdline()>
+#expects a command-line and a cursor position (C<$line>, C<$point>). This routine
+#expects C<$line> with a marker character (by default it's the caret, C<^>) and
+#return (C<$line>, C<$point>) to feed to C<parse_cmdline()>.
+#
+#Example:
+#
+# point("^foo") # => ("foo", 0)
+# point("fo^o") # => ("foo", 2)
+#
+#This function is not exported by default, but exportable.
+#
+#Arguments ('*' denotes required arguments):
+#
+#=over 4
+#
+#=item * B<$cmdline> => I<str>
+#
+#Command-line which contains a marker character.
+#
+#=item * B<$marker> => I<str> (default: "^")
+#
+#Marker character.
+#
+#
+#=back
+#
+#Return value:  (any)
+#
+#=head1 ENVIRONMENT
+#
+#=head2 COMPLETE_BASH_DEFAULT_ESC_MODE
+#
+#Str. To provide default for the C<esc_mode> option in L</format_completion>.
+#
+#=head2 COMPLETE_BASH_FZF
+#
+#Bool. Whether to pass large completion answer to fzf instead of directly passing
+#it to bash and letting bash page it with a simpler more-like internal pager. By
+#default, large is defined as having at least 100 items (same bash's
+#C<completion-query-items> setting). This can be configured via
+#L</COMPLETE_BASH_FZF_ITEMS>.
+#
+#=head2 COMPLETE_BASH_FZF_ITEMS
+#
+#Uint. Default 100. The minimum number of items to trigger passing completion
+#answer to fzf. See also: L</COMPLETE_BASH_FZF>.
+#
+#=head2 COMPLETE_BASH_MAX_COLUMNS
+#
+#Uint.
+#
+#Bash will show completion entries in one or several columns, depending on the
+#terminal width and the length of the entries (much like a standard non-long
+#`ls`). If you prefer completion entries to be shown in a single column no matter
+#how wide your terminal is, or how short the entries are, you can set the value
+#of this variable to 1. If you prefer a maximum of two columns, set to 2, and so
+#on. L</format_completion> will pad the entries with sufficient spaces to limit
+#the number of columns.
+#
+#=head2 COMPLETE_BASH_SHOW_SUMMARIES
+#
+#Bool. Will set the default for C<show_summaries> option in
+#L</format_completion>.
+#
+#=head2 COMPLETE_BASH_SUMMARY_ALIGN
+#
+#String. Either C<left> (the default) or C<right>.
+#
+#The C<left> align looks something like this:
+#
+# --bar      Summary about the bar option
+# --baz      Summary about the baz option
+# --foo      Summary about the foo option
+# --schapen  Summary about the schapen option
+#
+#The C<right> align will make the completion answer look like what you see in the
+#B<fish> shell:
+#
+# --bar                        Summary about the bar option
+# --baz                        Summary about the baz option
+# --foo                        Summary about the foo option
+# --schapen                Summary about the schapen option
+#
+#=head2 COMPLETE_BASH_TRACE
+#
+#Bool. If set to true, will produce more log statements to L<Log::ger>.
+#
+#=head1 HOMEPAGE
+#
+#Please visit the project's homepage at L<https://metacpan.org/release/Complete-Bash>.
+#
+#=head1 SOURCE
+#
+#Source repository is at L<https://github.com/perlancar/perl-Complete-Bash>.
+#
+#=head1 BUGS
+#
+#Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Bash>
+#
+#When submitting a bug or request, please include a test-file or a
+#patch to an existing test-file that illustrates the bug or desired
+#feature.
+#
+#=head1 SEE ALSO
+#
+#L<Complete>, the convention that this module follows.
+#
+#Some higher-level modules that use this module (so you don't have to use this
+#module directly): L<Getopt::Long::Complete> (via L<Complete::Getopt::Long>),
+#L<Getopt::Long::Subcommand>, L<Perinci::CmdLine> (via
+#L<Perinci::Sub::Complete>).
+#
+#Other modules related to bash shell tab completion: L<Bash::Completion>,
+#L<Getopt::Complete>, L<Term::Bash::Completion::Generator>.
+#
+#Programmable Completion section in Bash manual:
+#L<https://www.gnu.org/software/bash/manual/html_node/Programmable-Completion.html>
+#
+#=head1 AUTHOR
+#
+#perlancar <perlancar@cpan.org>
+#
+#=head1 COPYRIGHT AND LICENSE
+#
+#This software is copyright (c) 2020, 2019, 2018, 2016, 2015, 2014 by perlancar@cpan.org.
+#
+#This is free software; you can redistribute it and/or modify it under
+#the same terms as the Perl 5 programming language system itself.
+#
+#=cut
 ### Config/IOD/Base.pm ###
 #package Config::IOD::Base;
 #
-#our $DATE = '2017-08-05'; 
-#our $VERSION = '0.33'; 
+#our $DATE = '2019-01-17'; # DATE
+#our $VERSION = '0.342'; # VERSION
 #
 #use 5.010001;
 #use strict;
 #use warnings;
+##use Carp; # avoided to shave a bit of startup time
 #
 #use constant +{
-#    COL_V_ENCODING => 0, 
+#    COL_V_ENCODING => 0, # either "!j"... or '"', '[', '{', '~'
 #    COL_V_WS1 => 1,
 #    COL_V_VALUE => 2,
 #    COL_V_WS2 => 3,
@@ -1192,6 +2092,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #    $attrs{default_section} //= 'GLOBAL';
 #    $attrs{allow_bang_only} //= 1;
 #    $attrs{allow_duplicate_key} //= 1;
+#    $attrs{enable_directive} //= 1;
 #    $attrs{enable_encoding} //= 1;
 #    $attrs{enable_quoting}  //= 1;
 #    $attrs{enable_bracket}  //= 1;
@@ -1200,9 +2101,15 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #    $attrs{enable_expr}     //= 0;
 #    $attrs{expr_vars}       //= {};
 #    $attrs{ignore_unknown_directive} //= 0;
+#    # allow_encodings
+#    # disallow_encodings
+#    # allow_directives
+#    # disallow_directives
 #    bless \%attrs, $class;
 #}
 #
+## borrowed from Parse::CommandLine. differences: returns arrayref. return undef
+## on error (instead of dying).
 #sub _parse_command_line {
 #    my ($self, $str) = @_;
 #
@@ -1272,6 +2179,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #    \@argv;
 #}
 #
+## return ($err, $res, $decoded_val)
 #sub _parse_raw_value {
 #    my ($self, $val, $needs_res) = @_;
 #
@@ -1281,14 +2189,15 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #        my ($enc, $ws1) = ($1, $2);
 #
 #        my $res; $res = [
-#            "!$enc", 
-#            $ws1, 
-#            $1, 
-#            $2, 
-#            $3, 
-#            $4, 
+#            "!$enc", # COL_V_ENCODING
+#            $ws1, # COL_V_WS1
+#            $1, # COL_V_VALUE
+#            $2, # COL_V_WS2
+#            $3, # COL_V_COMMENT_CHAR
+#            $4, # COL_V_COMMENT
 #        ] if $needs_res;
 #
+#        # canonicalize shorthands
 #        $enc = "json" if $enc eq 'j';
 #        $enc = "hex"  if $enc eq 'h';
 #        $enc = "expr" if $enc eq 'e';
@@ -1306,6 +2215,9 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #
 #        if ($enc eq 'json') {
 #
+#            # XXX imperfect regex for simplicity, comment should not contain
+#            # "]", '"', or '}' or it will be gobbled up as value by greedy regex
+#            # quantifier
 #            $val =~ /\A
 #                     (".*"|\[.*\]|\{.*\}|\S+)
 #                     (\s*)
@@ -1351,6 +2263,8 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #
 #            return ("expr is not allowed (enable_expr=0)")
 #                unless $self->{enable_expr};
+#            # XXX imperfect regex, expression can't contain # and ; because it
+#            # will be assumed as comment
 #            $val =~ m!\A
 #                      ((?:[^#;])+?)
 #                      (\s*)
@@ -1378,12 +2292,12 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #                 (?: ([;#])(.*) )?
 #                 \z/x or return ("Invalid syntax in quoted string value");
 #        my $res; $res = [
-#            '"', 
-#            '', 
-#            $1, 
-#            $2, 
-#            $3, 
-#            $4, 
+#            '"', # COL_V_ENCODING
+#            '', # COL_V_WS1
+#            $1, # VOL_V_VALUE
+#            $2, # COL_V_WS2
+#            $3, # COL_V_COMMENT_CHAR
+#            $4, # COL_V_COMMENT
 #        ] if $needs_res;
 #        my $decode_res = $self->_decode_json(qq("$1"));
 #        return ($decode_res->[1]) unless $decode_res->[0] == 200;
@@ -1391,6 +2305,8 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #
 #    } elsif ($val =~ /\A\[/ && $self->{enable_bracket}) {
 #
+#        # XXX imperfect regex for simplicity, comment should not contain "]" or
+#        # it will be gobbled up as value by greedy regex quantifier
 #        $val =~ /\A
 #                 \[(.*)\]
 #                 (?:
@@ -1399,12 +2315,12 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #                 )?
 #                 \z/x or return ("Invalid syntax in bracketed array value");
 #        my $res; $res = [
-#            '[', 
-#            '', 
-#            $1, 
-#            $2, 
-#            $3, 
-#            $4, 
+#            '[', # COL_V_ENCODING
+#            '', # COL_V_WS1
+#            $1, # VOL_V_VALUE
+#            $2, # COL_V_WS2
+#            $3, # COL_V_COMMENT_CHAR
+#            $4, # COL_V_COMMENT
 #        ] if $needs_res;
 #        my $decode_res = $self->_decode_json("[$1]");
 #        return ($decode_res->[1]) unless $decode_res->[0] == 200;
@@ -1412,6 +2328,8 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #
 #    } elsif ($val =~ /\A\{/ && $self->{enable_brace}) {
 #
+#        # XXX imperfect regex for simplicity, comment should not contain "}" or
+#        # it will be gobbled up as value by greedy regex quantifier
 #        $val =~ /\A
 #                 \{(.*)\}
 #                 (?:
@@ -1420,12 +2338,12 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #                 )?
 #                 \z/x or return ("Invalid syntax in braced hash value");
 #        my $res; $res = [
-#            '{', 
-#            '', 
-#            $1, 
-#            $2, 
-#            $3, 
-#            $4, 
+#            '{', # COL_V_ENCODING
+#            '', # COL_V_WS1
+#            $1, # VOL_V_VALUE
+#            $2, # COL_V_WS2
+#            $3, # COL_V_COMMENT_CHAR
+#            $4, # COL_V_COMMENT
 #        ] if $needs_res;
 #        my $decode_res = $self->_decode_json("{$1}");
 #        return ($decode_res->[1]) unless $decode_res->[0] == 200;
@@ -1439,12 +2357,12 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #                 (?: ([;#])(.*) )?
 #                 \z/x or return ("Invalid syntax in path value");
 #        my $res; $res = [
-#            '~', 
-#            '', 
-#            $1, 
-#            $2, 
-#            $3, 
-#            $4, 
+#            '~', # COL_V_ENCODING
+#            '', # COL_V_WS1
+#            $1, # VOL_V_VALUE
+#            $2, # COL_V_WS2
+#            $3, # COL_V_COMMENT_CHAR
+#            $4, # COL_V_COMMENT
 #        ] if $needs_res;
 #
 #        my $decode_res = $self->_decode_path_or_paths($val, 'path');
@@ -1457,18 +2375,19 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #                 (.*?)
 #                 (\s*)
 #                 (?: ([#;])(.*) )?
-#                 \z/x or return ("Invalid syntax in value"); 
+#                 \z/x or return ("Invalid syntax in value"); # shouldn't happen, regex should match any string
 #        my $res; $res = [
-#            '', 
-#            '', 
-#            $1, 
-#            $2, 
-#            $3, 
-#            $4, 
+#            '', # COL_V_ENCODING
+#            '', # COL_V_WS1
+#            $1, # VOL_V_VALUE
+#            $2, # COL_V_WS2
+#            $3, # COL_V_COMMENT_CHAR
+#            $4, # COL_V_COMMENT
 #        ] if $needs_res;
 #        return (undef, $res, $1);
 #
 #    }
+#    # should not be reached
 #}
 #
 #sub _get_my_user_name {
@@ -1482,8 +2401,11 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #    }
 #}
 #
+## borrowed from PERLANCAR::File::HomeDir 0.04
 #sub _get_my_home_dir {
 #    if ($^O eq 'MSWin32') {
+#        # File::HomeDir always uses exists($ENV{x}) first, does it want to avoid
+#        # accidentally creating env vars?
 #        return $ENV{HOME} if $ENV{HOME};
 #        return $ENV{USERPROFILE} if $ENV{USERPROFILE};
 #        return join($ENV{HOMEDRIVE}, "\\", $ENV{HOMEPATH})
@@ -1498,12 +2420,17 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #    die "Can't get home directory";
 #}
 #
-#sub _get_users_home_dir {
+## borrowed from PERLANCAR::File::HomeDir 0.05, with some modifications
+#sub _get_user_home_dir {
 #    my ($name) = @_;
 #
 #    if ($^O eq 'MSWin32') {
+#        # not yet implemented
 #        return undef;
 #    } else {
+#        # IF and only if we have getpwuid support, and the name of the user is
+#        # our own, shortcut to my_home. This is needed to handle HOME
+#        # environment settings.
 #        if ($name eq getpwuid($<)) {
 #            return _get_my_home_dir();
 #        }
@@ -1542,7 +2469,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #
 #    if ($val =~ m!\A~([^/]+)?(?:/|\z)!) {
 #        my $home_dir = length($1) ?
-#            _get_users_home_dir($1) : _get_my_home_dir();
+#            _get_user_home_dir($1) : _get_my_home_dir();
 #        unless ($home_dir) {
 #            if (length $1) {
 #                return [500, "Can't get home directory for user '$1' in path"];
@@ -1603,6 +2530,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #
 #    my ($self, $path) = @_;
 #
+#    # included file's path is based on the main (topmost) file
 #    if (@{ $self->{_include_stack} }) {
 #        require File::Spec;
 #        my ($vol, $dir, $file) =
@@ -1630,6 +2558,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #
 #    $self->{_include_stack} = [];
 #
+#    # set expr variables
 #    {
 #        last unless $self->{enable_expr};
 #        no strict 'refs';
@@ -1670,14 +2599,290 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #}
 #
 #1;
+## ABSTRACT: Base class for Config::IOD and Config::IOD::Reader
 #
 #__END__
 #
+#=pod
+#
+#=encoding UTF-8
+#
+#=head1 NAME
+#
+#Config::IOD::Base - Base class for Config::IOD and Config::IOD::Reader
+#
+#=head1 VERSION
+#
+#This document describes version 0.342 of Config::IOD::Base (from Perl distribution Config-IOD-Reader), released on 2019-01-17.
+#
+#=head1 EXPRESSION
+#
+#=for BEGIN_BLOCK: expression
+#
+#Expression allows you to do things like:
+#
+# [section1]
+# foo=1
+# bar="monkey"
+#
+# [section2]
+# baz =!e 1+1
+# qux =!e "grease" . val("section1.bar")
+# quux=!e val("qux") . " " . val('baz')
+#
+#And the result will be:
+#
+# {
+#     section1 => {foo=>1, bar=>"monkey"},
+#     section2 => {baz=>2, qux=>"greasemonkey", quux=>"greasemonkey 2"},
+# }
+#
+#For safety, you'll need to set C<enable_expr> attribute to 1 first to enable
+#this feature.
+#
+#The syntax of the expression (the C<expr> encoding) is not officially specified
+#yet in the L<IOD> specification. It will probably be Expr (see
+#L<Language::Expr::Manual::Syntax>). At the moment, this module implements a very
+#limited subset that is compatible (lowest common denominator) with Perl syntax
+#and uses C<eval()> to evaluate the expression. However, only the limited subset
+#is allowed (checked by Perl 5.10 regular expression).
+#
+#The supported terms:
+#
+# number
+# string (double-quoted and single-quoted)
+# undef literal
+# simple variable ($abc, no namespace, no array/hash sigil, no special variables)
+# function call (only the 'val' function is supported)
+# grouping (parenthesis)
+#
+#The supported operators are:
+#
+# + - .
+# * / % x
+# **
+# unary -, unary +, !, ~
+#
+#The C<val()> function refers to the configuration key. If the argument contains
+#".", it will be assumed as C<SECTIONNAME.KEYNAME>, otherwise it will access the
+#current section's key. Since parsing is done in a single pass, you can only
+#refer to the already mentioned key.
+#
+#Code will be compiled using Perl's C<eval()> in the
+#C<Config::IOD::Expr::_Compiled> namespace, with C<no strict>, C<no warnings>.
+#
+#=for END_BLOCK: expression
+#
+#=head1 ATTRIBUTES
+#
+#=for BEGIN_BLOCK: attributes
+#
+#=head2 default_section => str (default: C<GLOBAL>)
+#
+#If a key line is specified before any section line, this is the section that the
+#key will be put in.
+#
+#=head2 enable_directive => bool (default: 1)
+#
+#If set to false, then directives will not be parsed. Lines such as below will be
+#considered a regular comment:
+#
+# ;!include foo.ini
+#
+#and lines such as below will be considered a syntax error (B<regardless> of the
+#C<allow_bang_only> setting):
+#
+# !include foo.ini
+#
+#B<NOTE: Turning this setting off violates IOD specification.>
+#
+#=head2 enable_encoding => bool (default: 1)
+#
+#If set to false, then encoding notation will be ignored and key value will be
+#parsed as verbatim. Example:
+#
+# name = !json null
+#
+#With C<enable_encoding> turned off, value will not be undef but will be string
+#with the value of (as Perl literal) C<"!json null">.
+#
+#B<NOTE: Turning this setting off violates IOD specification.>
+#
+#=head2 enable_quoting => bool (default: 1)
+#
+#If set to false, then quotes on key value will be ignored and key value will be
+#parsed as verbatim. Example:
+#
+# name = "line 1\nline2"
+#
+#With C<enable_quoting> turned off, value will not be a two-line string, but will
+#be a one line string with the value of (as Perl literal) C<"line 1\\nline2">.
+#
+#B<NOTE: Turning this setting off violates IOD specification.>
+#
+#=head2 enable_bracket => bool (default: 1)
+#
+#If set to false, then JSON literal array will be parsed as verbatim. Example:
+#
+# name = [1,2,3]
+#
+#With C<enable_bracket> turned off, value will not be a three-element array, but
+#will be a string with the value of (as Perl literal) C<"[1,2,3]">.
+#
+#B<NOTE: Turning this setting off violates IOD specification.>
+#
+#=head2 enable_brace => bool (default: 1)
+#
+#If set to false, then JSON literal object (hash) will be parsed as verbatim.
+#Example:
+#
+# name = {"a":1,"b":2}
+#
+#With C<enable_brace> turned off, value will not be a hash with two pairs, but
+#will be a string with the value of (as Perl literal) C<'{"a":1,"b":2}'>.
+#
+#B<NOTE: Turning this setting off violates IOD specification.>
+#
+#=head2 enable_tilde => bool (default: 1)
+#
+#If set to true (the default), then value that starts with C<~> (tilde) will be
+#assumed to use !path encoding, unless an explicit encoding has been otherwise
+#specified.
+#
+#Example:
+#
+# log_dir = ~/logs  ; ~ will be resolved to current user's home directory
+#
+#With C<enable_tilde> turned off, value will still be literally C<~/logs>.
+#
+#B<NOTE: Turning this setting off violates IOD specification.>
+#
+#=head2 allow_encodings => array
+#
+#If defined, set list of allowed encodings. Note that if C<disallow_encodings> is
+#also set, an encoding must also not be in that list.
+#
+#Also note that, for safety reason, if you want to enable C<expr> encoding,
+#you'll also need to set C<enable_expr> to 1.
+#
+#=head2 disallow_encodings => array
+#
+#If defined, set list of disallowed encodings. Note that if C<allow_encodings> is
+#also set, an encoding must also be in that list.
+#
+#Also note that, for safety reason, if you want to enable C<expr> encoding,
+#you'll also need to set C<enable_expr> to 1.
+#
+#=head2 enable_expr => bool (default: 0)
+#
+#Whether to enable C<expr> encoding. By default this is turned on, for safety.
+#Please see L</"EXPRESSION"> for more details.
+#
+#=head2 allow_directives => array
+#
+#If defined, only directives listed here are allowed. Note that if
+#C<disallow_directives> is also set, a directive must also not be in that list.
+#
+#=head2 disallow_directives => array
+#
+#If defined, directives listed here are not allowed. Note that if
+#C<allow_directives> is also set, a directive must also be in that list.
+#
+#=head2 allow_bang_only => bool (default: 1)
+#
+#Since the mistake of specifying a directive like this:
+#
+# !foo
+#
+#instead of the correct:
+#
+# ;!foo
+#
+#is very common, the spec allows it. This reader, however, can be configured to
+#be more strict.
+#
+#=head2 allow_duplicate_key => bool (default: 1)
+#
+#If set to 0, you can forbid duplicate key, e.g.:
+#
+# [section]
+# a=1
+# a=2
+#
+#or:
+#
+# [section]
+# a=1
+# b=2
+# c=3
+# a=10
+#
+#In traditional INI file, to specify an array you specify multiple keys. But when
+#there is only a single key, it is unclear if the value is a single-element array
+#or a scalar. You can use this setting to avoid this array/scalar ambiguity in
+#config file and force user to use JSON encoding or bracket to specify array:
+#
+# [section]
+# a=[1,2]
+#
+#B<NOTE: Turning this setting off violates IOD specification.>
+#
+#=head2 ignore_unknown_directive => bool (default: 0)
+#
+#If set to true, will not die if an unknown directive is encountered. It will
+#simply be ignored as a regular comment.
+#
+#B<NOTE: Turning this setting on violates IOD specification.>
+#
+#=for END_BLOCK: attributes
+#
+#=head1 METHODS
+#
+#=for BEGIN_BLOCK: methods
+#
+#=head2 new(%attrs) => obj
+#
+#=head2 $reader->read_file($filename)
+#
+#Read IOD configuration from a file. Die on errors.
+#
+#=head2 $reader->read_string($str)
+#
+#Read IOD configuration from a string. Die on errors.
+#
+#=head1 HOMEPAGE
+#
+#Please visit the project's homepage at L<https://metacpan.org/release/Config-IOD-Reader>.
+#
+#=head1 SOURCE
+#
+#Source repository is at L<https://github.com/perlancar/perl-Config-IOD-Reader>.
+#
+#=head1 BUGS
+#
+#Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Config-IOD-Reader>
+#
+#When submitting a bug or request, please include a test-file or a
+#patch to an existing test-file that illustrates the bug or desired
+#feature.
+#
+#=head1 AUTHOR
+#
+#perlancar <perlancar@cpan.org>
+#
+#=head1 COPYRIGHT AND LICENSE
+#
+#This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+#
+#This is free software; you can redistribute it and/or modify it under
+#the same terms as the Perl 5 programming language system itself.
+#
+#=cut
 ### Config/IOD/Reader.pm ###
 #package Config::IOD::Reader;
 #
-#our $DATE = '2017-08-05'; 
-#our $VERSION = '0.33'; 
+#our $DATE = '2019-01-17'; # DATE
+#our $VERSION = '0.342'; # VERSION
 #
 #use 5.010001;
 #use strict;
@@ -1691,7 +2896,11 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #    my $res = $self->{_res};
 #    for my $msect (@{ $self->{_merge} }) {
 #        if ($msect eq $section) {
+#            # ignore merging self
 #            next;
+#            #local $self->{_linum} = $self->{_linum}-1;
+#            #$self->_err("Can't merge section '$msect' to '$section': ".
+#            #                "Same section");
 #        }
 #        if (!exists($res->{$msect})) {
 #            local $self->{_linum} = $self->{_linum}-1;
@@ -1725,7 +2934,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #        qr/^;?\s*!\s*(\w+)\s*/ :
 #        qr/^;\s*!\s*(\w+)\s*/;
 #
-#    my $_raw_val; 
+#    my $_raw_val; # only to provide to callback
 #
 #    my @lines = split /^/, $str;
 #    local $self->{_linum} = 0;
@@ -1733,11 +2942,13 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #    for my $line (@lines) {
 #        $self->{_linum}++;
 #
+#        # blank line
 #        if ($line !~ /\S/) {
 #            next LINE;
 #        }
 #
-#        if ($line =~ s/$directive_re//) {
+#        # directive line
+#        if ($self->{enable_directive} && $line =~ s/$directive_re//) {
 #            my $directive = $1;
 #            if ($self->{allow_directives}) {
 #                $self->_err("Directive '$directive' is not in ".
@@ -1779,13 +2990,14 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #                    $self->_err("Can't include '$path': $res->[1]");
 #                }
 #                $path = $res->[2];
-#                $self->_read_string($self->_read_file($path, $cb));
+#                $self->_read_string($self->_read_file($path, $cb), $cb);
 #                $self->_pop_include_stack;
 #            } elsif ($directive eq 'merge') {
 #                $self->{_merge} = @$args ? $args : undef;
 #            } elsif ($directive eq 'noop') {
 #            } else {
 #                if ($self->{ignore_unknown_directive}) {
+#                    # assume a regular comment
 #                    next LINE;
 #                } else {
 #                    $self->_err("Unknown directive '$directive'");
@@ -1794,6 +3006,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #            next LINE;
 #        }
 #
+#        # comment line
 #        if ($line =~ /^\s*[;#]/) {
 #
 #            if ($cb) {
@@ -1806,12 +3019,14 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #            next LINE;
 #        }
 #
+#        # section line
 #        if ($line =~ /^\s*\[\s*(.+?)\s*\](?: \s*[;#].*)?/) {
 #            my $prev_section = $self->{_cur_section};
 #            $self->{_cur_section} = $cur_section = $1;
 #            $res->{$cur_section} //= {};
 #            $self->{_num_seen_section_lines}++;
 #
+#            # previous section exists? do merging for previous section
 #            if ($self->{_merge} && $self->{_num_seen_section_lines} > 1) {
 #                $self->_merge($prev_section);
 #            }
@@ -1827,10 +3042,14 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #            next LINE;
 #        }
 #
+#        # key line
 #        if ($line =~ /^\s*([^=]+?)\s*=\s*(.*)/) {
 #            my $key = $1;
 #            my $val = $2;
 #
+#            # the common case is that value are not decoded or
+#            # quoted/bracketed/braced, so we avoid calling _parse_raw_value here
+#            # to avoid overhead
 #            if ($val =~ /\A["!\\[\{~]/) {
 #                $_raw_val = $val if $cb;
 #                my ($err, $parse_res, $decoded_val) = $self->_parse_raw_value($val);
@@ -1838,7 +3057,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #                $val = $decoded_val;
 #            } else {
 #                $_raw_val = $val if $cb;
-#                $val =~ s/\s*[#;].*//; 
+#                $val =~ s/\s*[#;].*//; # strip comment
 #            }
 #
 #            if (exists $res->{$cur_section}{$key}) {
@@ -1878,16 +3097,355 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #}
 #
 #1;
+## ABSTRACT: Read IOD/INI configuration files
 #
 #__END__
 #
+#=pod
+#
+#=encoding UTF-8
+#
+#=head1 NAME
+#
+#Config::IOD::Reader - Read IOD/INI configuration files
+#
+#=head1 VERSION
+#
+#This document describes version 0.342 of Config::IOD::Reader (from Perl distribution Config-IOD-Reader), released on 2019-01-17.
+#
+#=head1 SYNOPSIS
+#
+# use Config::IOD::Reader;
+# my $reader = Config::IOD::Reader->new(
+#     # list of known attributes, with their default values
+#     # default_section     => 'GLOBAL',
+#     # enable_directive    => 1,
+#     # enable_encoding     => 1,
+#     # enable_quoting      => 1,
+#     # enable_backet       => 1,
+#     # enable_brace        => 1,
+#     # allow_encodings     => undef, # or ['base64','json',...]
+#     # disallow_encodings  => undef, # or ['base64','json',...]
+#     # allow_directives    => undef, # or ['include','merge',...]
+#     # disallow_directives => undef, # or ['include','merge',...]
+#     # allow_bang_only     => 1,
+#     # enable_expr         => 0,
+#     # allow_duplicate_key => 1,
+#     # ignore_unknown_directive => 0,
+# );
+# my $config_hash = $reader->read_file('config.iod');
+#
+#=head1 DESCRIPTION
+#
+#This module reads L<IOD> configuration files (IOD is an INI-like format with
+#more precise specification, some extra features, and 99% compatible with typical
+#INI format). It is a minimalist alternative to the more fully-featured
+#L<Config::IOD>. It cannot write IOD files and is optimized for low startup
+#overhead.
+#
+#=head1 EXPRESSION
+#
+#Expression allows you to do things like:
+#
+# [section1]
+# foo=1
+# bar="monkey"
+#
+# [section2]
+# baz =!e 1+1
+# qux =!e "grease" . val("section1.bar")
+# quux=!e val("qux") . " " . val('baz')
+#
+#And the result will be:
+#
+# {
+#     section1 => {foo=>1, bar=>"monkey"},
+#     section2 => {baz=>2, qux=>"greasemonkey", quux=>"greasemonkey 2"},
+# }
+#
+#For safety, you'll need to set C<enable_expr> attribute to 1 first to enable
+#this feature.
+#
+#The syntax of the expression (the C<expr> encoding) is not officially specified
+#yet in the L<IOD> specification. It will probably be Expr (see
+#L<Language::Expr::Manual::Syntax>). At the moment, this module implements a very
+#limited subset that is compatible (lowest common denominator) with Perl syntax
+#and uses C<eval()> to evaluate the expression. However, only the limited subset
+#is allowed (checked by Perl 5.10 regular expression).
+#
+#The supported terms:
+#
+# number
+# string (double-quoted and single-quoted)
+# undef literal
+# simple variable ($abc, no namespace, no array/hash sigil, no special variables)
+# function call (only the 'val' function is supported)
+# grouping (parenthesis)
+#
+#The supported operators are:
+#
+# + - .
+# * / % x
+# **
+# unary -, unary +, !, ~
+#
+#The C<val()> function refers to the configuration key. If the argument contains
+#".", it will be assumed as C<SECTIONNAME.KEYNAME>, otherwise it will access the
+#current section's key. Since parsing is done in a single pass, you can only
+#refer to the already mentioned key.
+#
+#Code will be compiled using Perl's C<eval()> in the
+#C<Config::IOD::Expr::_Compiled> namespace, with C<no strict>, C<no warnings>.
+#
+#=head1 ATTRIBUTES
+#
+#=head2 default_section => str (default: C<GLOBAL>)
+#
+#If a key line is specified before any section line, this is the section that the
+#key will be put in.
+#
+#=head2 enable_directive => bool (default: 1)
+#
+#If set to false, then directives will not be parsed. Lines such as below will be
+#considered a regular comment:
+#
+# ;!include foo.ini
+#
+#and lines such as below will be considered a syntax error (B<regardless> of the
+#C<allow_bang_only> setting):
+#
+# !include foo.ini
+#
+#B<NOTE: Turning this setting off violates IOD specification.>
+#
+#=head2 enable_encoding => bool (default: 1)
+#
+#If set to false, then encoding notation will be ignored and key value will be
+#parsed as verbatim. Example:
+#
+# name = !json null
+#
+#With C<enable_encoding> turned off, value will not be undef but will be string
+#with the value of (as Perl literal) C<"!json null">.
+#
+#B<NOTE: Turning this setting off violates IOD specification.>
+#
+#=head2 enable_quoting => bool (default: 1)
+#
+#If set to false, then quotes on key value will be ignored and key value will be
+#parsed as verbatim. Example:
+#
+# name = "line 1\nline2"
+#
+#With C<enable_quoting> turned off, value will not be a two-line string, but will
+#be a one line string with the value of (as Perl literal) C<"line 1\\nline2">.
+#
+#B<NOTE: Turning this setting off violates IOD specification.>
+#
+#=head2 enable_bracket => bool (default: 1)
+#
+#If set to false, then JSON literal array will be parsed as verbatim. Example:
+#
+# name = [1,2,3]
+#
+#With C<enable_bracket> turned off, value will not be a three-element array, but
+#will be a string with the value of (as Perl literal) C<"[1,2,3]">.
+#
+#B<NOTE: Turning this setting off violates IOD specification.>
+#
+#=head2 enable_brace => bool (default: 1)
+#
+#If set to false, then JSON literal object (hash) will be parsed as verbatim.
+#Example:
+#
+# name = {"a":1,"b":2}
+#
+#With C<enable_brace> turned off, value will not be a hash with two pairs, but
+#will be a string with the value of (as Perl literal) C<'{"a":1,"b":2}'>.
+#
+#B<NOTE: Turning this setting off violates IOD specification.>
+#
+#=head2 enable_tilde => bool (default: 1)
+#
+#If set to true (the default), then value that starts with C<~> (tilde) will be
+#assumed to use !path encoding, unless an explicit encoding has been otherwise
+#specified.
+#
+#Example:
+#
+# log_dir = ~/logs  ; ~ will be resolved to current user's home directory
+#
+#With C<enable_tilde> turned off, value will still be literally C<~/logs>.
+#
+#B<NOTE: Turning this setting off violates IOD specification.>
+#
+#=head2 allow_encodings => array
+#
+#If defined, set list of allowed encodings. Note that if C<disallow_encodings> is
+#also set, an encoding must also not be in that list.
+#
+#Also note that, for safety reason, if you want to enable C<expr> encoding,
+#you'll also need to set C<enable_expr> to 1.
+#
+#=head2 disallow_encodings => array
+#
+#If defined, set list of disallowed encodings. Note that if C<allow_encodings> is
+#also set, an encoding must also be in that list.
+#
+#Also note that, for safety reason, if you want to enable C<expr> encoding,
+#you'll also need to set C<enable_expr> to 1.
+#
+#=head2 enable_expr => bool (default: 0)
+#
+#Whether to enable C<expr> encoding. By default this is turned on, for safety.
+#Please see L</"EXPRESSION"> for more details.
+#
+#=head2 allow_directives => array
+#
+#If defined, only directives listed here are allowed. Note that if
+#C<disallow_directives> is also set, a directive must also not be in that list.
+#
+#=head2 disallow_directives => array
+#
+#If defined, directives listed here are not allowed. Note that if
+#C<allow_directives> is also set, a directive must also be in that list.
+#
+#=head2 allow_bang_only => bool (default: 1)
+#
+#Since the mistake of specifying a directive like this:
+#
+# !foo
+#
+#instead of the correct:
+#
+# ;!foo
+#
+#is very common, the spec allows it. This reader, however, can be configured to
+#be more strict.
+#
+#=head2 allow_duplicate_key => bool (default: 1)
+#
+#If set to 0, you can forbid duplicate key, e.g.:
+#
+# [section]
+# a=1
+# a=2
+#
+#or:
+#
+# [section]
+# a=1
+# b=2
+# c=3
+# a=10
+#
+#In traditional INI file, to specify an array you specify multiple keys. But when
+#there is only a single key, it is unclear if the value is a single-element array
+#or a scalar. You can use this setting to avoid this array/scalar ambiguity in
+#config file and force user to use JSON encoding or bracket to specify array:
+#
+# [section]
+# a=[1,2]
+#
+#B<NOTE: Turning this setting off violates IOD specification.>
+#
+#=head2 ignore_unknown_directive => bool (default: 0)
+#
+#If set to true, will not die if an unknown directive is encountered. It will
+#simply be ignored as a regular comment.
+#
+#B<NOTE: Turning this setting on violates IOD specification.>
+#
+#=head1 METHODS
+#
+#=head2 new(%attrs) => obj
+#
+#=head2 $reader->read_file($filename[ , $callback ]) => hash
+#
+#Read IOD configuration from a file. Die on errors.
+#
+#See C<read_string> for more information on C<$callback> argument.
+#
+#=head2 $reader->read_string($str[ , $callback ]) => hash
+#
+#Read IOD configuration from a string. Die on errors.
+#
+#C<$callback> is an optional coderef argument that will be called during various
+#stages. It can be useful if you want more information (especially ordering). It
+#will be called with hash argument C<%args>
+#
+#=over
+#
+#=item * Found a directive line
+#
+#Arguments passed: C<event> (str, has the value of 'directive'), C<linum> (int,
+#line number, starts from 1), C<line> (str, raw line), C<directive> (str,
+#directive name), C<cur_section> (str, current section name), C<args> (array,
+#directive arguments).
+#
+#=item * Found a comment line
+#
+#Arguments passed: C<event> (str, 'comment'), C<linum>, C<line>, C<cur_section>.
+#
+#=item * Found a section line
+#
+#Arguments passed: C<event> (str, 'section'), C<linum>, C<line>, C<cur_section>,
+#C<section> (str, section name).
+#
+#=item * Found a key line
+#
+#Arguments passed: C<event> (str, 'section'), C<linum>, C<line>, C<cur_section>,
+#C<key> (str, key name), C<val> (any, value name, already decoded if encoded),
+#C<raw_val> (str, raw value).
+#
+#=back
+#
+#TODO: callback when there is merging.
+#
+#=head1 HOMEPAGE
+#
+#Please visit the project's homepage at L<https://metacpan.org/release/Config-IOD-Reader>.
+#
+#=head1 SOURCE
+#
+#Source repository is at L<https://github.com/perlancar/perl-Config-IOD-Reader>.
+#
+#=head1 BUGS
+#
+#Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Config-IOD-Reader>
+#
+#When submitting a bug or request, please include a test-file or a
+#patch to an existing test-file that illustrates the bug or desired
+#feature.
+#
+#=head1 SEE ALSO
+#
+#L<IOD> - specification
+#
+#L<Config::IOD> - round-trip parser for reading as well as writing IOD documents
+#
+#L<IOD::Examples> - sample documents
+#
+#=head1 AUTHOR
+#
+#perlancar <perlancar@cpan.org>
+#
+#=head1 COPYRIGHT AND LICENSE
+#
+#This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+#
+#This is free software; you can redistribute it and/or modify it under
+#the same terms as the Perl 5 programming language system itself.
+#
+#=cut
 ### Data/Check/Structure.pm ###
 #package Data::Check::Structure;
 #
-#our $DATE = '2017-07-18'; 
-#our $VERSION = '0.04'; 
+#our $DATE = '2017-07-18'; # DATE
+#our $VERSION = '0.04'; # VERSION
 #
 #use strict;
+##use warnings;
 #
 #use Exporter 'import';
 #our @EXPORT_OK = qw(
@@ -2041,9 +3599,182 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #}
 #
 #1;
+## ABSTRACT: Check structure of data
 #
 #__END__
 #
+#=pod
+#
+#=encoding UTF-8
+#
+#=head1 NAME
+#
+#Data::Check::Structure - Check structure of data
+#
+#=head1 VERSION
+#
+#This document describes version 0.04 of Data::Check::Structure (from Perl distribution Data-Check-Structure), released on 2017-07-18.
+#
+#=head1 SYNOPSIS
+#
+#=head1 DESCRIPTION
+#
+#This small module provides several simple routines to check the structure of
+#data, e.g. whether data is an array of arrays ("aoa"), array of scalars ("aos"),
+#and so on.
+#
+#=head1 FUNCTIONS
+#
+#None exported by default, but they are exportable.
+#
+#=head2 is_aos($data[, \%opts]) => bool
+#
+#Check that data is an array of scalars. Examples:
+#
+# is_aos([]);                     # true
+# is_aos(['a', 'b']);             # true
+# is_aos(['a', []]);              # false
+# is_aos([1,2,3, []], {max=>3});  # true
+#
+#Known options: C<max> (maximum number of items to check, undef means check all
+#items).
+#
+#=head2 is_aoa($data[, \%opts]) => bool
+#
+#Check that data is an array of arrays. Examples:
+#
+# is_aoa([]);                          # true
+# is_aoa([[1], [2]]);                  # true
+# is_aoa([[1], 'a']);                  # false
+# is_aoa([[1],[],[], 'a'], {max=>3});  # true
+#
+#Known options: C<max> (maximum number of items to check, undef means check all
+#items).
+#
+#=head2 is_aoaos($data[, \%opts]) => bool
+#
+#Check that data is an array of arrays of scalars. Examples:
+#
+# is_aoaos([]);                           # true
+# is_aoaos([[1], [2]]);                   # true
+# is_aoaos([[1], [{}]]);                  # false
+# is_aoaos([[1],[],[], [{}]], {max=>3});  # true
+#
+#Known options: C<max> (maximum number of items to check, undef means check all
+#items).
+#
+#=head2 is_aoh($data[, \%opts]) => bool
+#
+#Check that data is an array of hashes. Examples:
+#
+# is_aoh([]);                             # true
+# is_aoh([{}, {a=>1}]);                   # true
+# is_aoh([{}, 'a']);                      # false
+# is_aoh([{},{},{a=>1}, 'a'], {max=>3});  # true
+#
+#Known options: C<max> (maximum number of items to check, undef means check all
+#items).
+#
+#=head2 is_aohos($data[, \%opts]) => bool
+#
+#Check that data is an array of hashes of scalars. Examples:
+#
+# is_aohos([]);                                 # true
+# is_aohos([{a=>1}, {}]);                       # true
+# is_aohos([{a=>1}, {b=>[]}]);                  # false
+# is_aohos([{a=>1},{},{}, {b=>[]}], {max=>3});  # true
+#
+#Known options: C<max> (maximum number of items to check, undef means check all
+#items).
+#
+#=head2 is_hos($data[, \%opts]) => bool
+#
+#Check that data is a hash of scalars. Examples:
+#
+# is_hos({});                                   # true
+# is_hos({a=>1, b=>2});                         # true
+# is_hos({a=>1, b=>[]});                        # false
+# is_hos({a=>1, b=>2, c=>3, d=>[]}, {max=>3});  # true (or false, depending on random hash key ordering)
+#
+#Known options: C<max> (maximum number of items to check, undef means check all
+#items).
+#
+#=head2 is_hoa($data[, \%opts]) => bool
+#
+#Check that data is a hash of arrays. Examples:
+#
+# is_hoa({}) );       # true
+# is_hoa({a=>[]}) );  # true
+# is_hoa({a=>1}) );   # false
+#
+#Known options: C<max> (maximum number of items to check, undef means check all
+#items).
+#
+#=head2 is_hoaos($data[, \%opts]) => bool
+#
+#Check that data is a hash of arrays of scalars. Examples:
+#
+# is_hoaos({}) );         # true
+# is_hoaos({a=>[]}) );    # true
+# is_hoaos({a=>[1]}) );   # true
+# is_hoaos({a=>1}) );     # false
+# is_hoaos({a=>[{}]}) );  # false
+#
+#Known options: C<max> (maximum number of items to check, undef means check all
+#items).
+#
+#=head2 is_hoh($data[, \%opts]) => bool
+#
+#Check that data is a hash of hashes. Examples:
+#
+# is_hoh({}) );       # true
+# is_hoh({a=>{}}) );  # true
+# is_hoh({a=>1}) );   # false
+#
+#Known options: C<max> (maximum number of items to check, undef means check all
+#items).
+#
+#=head2 is_hohos($data[, \%opts]) => bool
+#
+#Check that data is a hash of hashes of scalrs. Examples:
+#
+# is_hohos({}) );            # true
+# is_hohos({a=>{}}) );       # true
+# is_hohos({a=>{b=>1}}) );   # true
+# is_hohos({a=>1}) );        # false
+# is_hohos({a=>{b=>[]}}) );  # false
+#
+#Known options: C<max> (maximum number of items to check, undef means check all
+#items).
+#
+#=head1 HOMEPAGE
+#
+#Please visit the project's homepage at L<https://metacpan.org/release/Data-Check-Structure>.
+#
+#=head1 SOURCE
+#
+#Source repository is at L<https://github.com/perlancar/perl-Data-Check-Structure>.
+#
+#=head1 BUGS
+#
+#Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Check-Structure>
+#
+#When submitting a bug or request, please include a test-file or a
+#patch to an existing test-file that illustrates the bug or desired
+#feature.
+#
+#=head1 AUTHOR
+#
+#perlancar <perlancar@cpan.org>
+#
+#=head1 COPYRIGHT AND LICENSE
+#
+#This software is copyright (c) 2017, 2014 by perlancar@cpan.org.
+#
+#This is free software; you can redistribute it and/or modify it under
+#the same terms as the Perl 5 programming language system itself.
+#
+#=cut
 ### Data/Sah/Normalize.pm ###
 #package Data::Sah::Normalize;
 #
@@ -2051,8 +3782,8 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #use strict;
 #use warnings;
 #
-#our $DATE = '2015-09-06'; 
-#our $VERSION = '0.04'; 
+#our $DATE = '2018-09-10'; # DATE
+#our $VERSION = '0.050'; # VERSION
 #
 #require Exporter;
 #our @ISA       = qw(Exporter);
@@ -2086,9 +3817,12 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #
 #        my $v = $clset0->{$c};
 #
+#        # ignore expression
 #        my $expr;
 #        if ($c =~ s/=\z//) {
 #            $expr++;
+#            # XXX currently can't disregard merge prefix when checking
+#            # conflict
 #            die "Conflict between '$c=' and '$c'" if exists $clset0->{$c};
 #            $clset->{"$c.is_expr"} = 1;
 #            }
@@ -2096,7 +3830,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #        my $sc = "";
 #        my $cn;
 #        {
-#            my $errp = "Invalid clause name syntax '$c0'"; 
+#            my $errp = "Invalid clause name syntax '$c0'"; # error prefix
 #            if (!$expr && $c =~ s/\A!(?=.)//) {
 #                die "$errp, syntax should be !CLAUSE"
 #                    unless $c =~ $clause_name_re;
@@ -2122,6 +3856,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #            }
 #        }
 #
+#        # XXX can't disregard merge prefix when checking conflict
 #        if ($sc eq '!') {
 #            die "Conflict between clause shortcuts '!$c' and '$c'"
 #                if exists $clset0->{$c};
@@ -2158,6 +3893,17 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #    }
 #    $clset->{req} = 1 if $opts->{has_req};
 #
+#    # XXX option to recursively normalize clset, any's of, all's of, ...
+#    #if ($clset->{clset}) {
+#    #    local $opts->{has_req};
+#    #    if ($clset->{'clset.op'} && $clset->{'clset.op'} =~ /and|or/) {
+#    #        # multiple clause sets
+#    #        $clset->{clset} = map { $self->normalize_clset($_, $opts) }
+#    #            @{ $clset->{clset} };
+#    #    } else {
+#    #        $clset->{clset} = $self->normalize_clset($_, $opts);
+#    #    }
+#    #}
 #
 #    $clset;
 #}
@@ -2198,6 +3944,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #                die "For array form, there should not be more than 3 elements"
 #                    if @$s > 3;
 #            } else {
+#                # flattened clause set [t, c=>1, c2=>2, ...]
 #                die "For array in the form of [t, c1=>1, ...], there must be ".
 #                    "3 elements (or 5, 7, ...)"
 #                        unless @$s % 2;
@@ -2207,6 +3954,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #            $clset0 = {};
 #        }
 #
+#        # check clauses and parse shortcuts (!c, c&, c|, c=)
 #        my $clset = normalize_clset($clset0, {has_req=>$has_req});
 #        if (defined $extras) {
 #            die "For array form with 3 elements, extras must be hash"
@@ -2223,15 +3971,95 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #}
 #
 #1;
+## ABSTRACT: Normalize Sah schema
 #
 #__END__
 #
+#=pod
+#
+#=encoding UTF-8
+#
+#=head1 NAME
+#
+#Data::Sah::Normalize - Normalize Sah schema
+#
+#=head1 VERSION
+#
+#This document describes version 0.050 of Data::Sah::Normalize (from Perl distribution Data-Sah-Normalize), released on 2018-09-10.
+#
+#=head1 SYNOPSIS
+#
+# use Data::Sah::Normalize qw(normalize_clset normalize_schema);
+#
+# my $nclset = normalize_clset({'!a'=>1}); # -> {a=>1, 'a.op'=>'not'}
+# my $nsch   = normalize_schema("int");    # -> ["int", {}, {}]
+#
+#=head1 DESCRIPTION
+#
+#This often-needed functionality is split from the main L<Data::Sah> to keep it
+#in a small and minimal-dependencies package.
+#
+#=head1 FUNCTIONS
+#
+#=head2 normalize_clset($clset) => HASH
+#
+#Normalize a clause set (hash). Return a shallow copy of the original hash. Die
+#on failure.
+#
+#TODO: option to recursively normalize clause which contains sah clauses (e.g.
+#C<of>).
+#
+#=head2 normalize_schema($sch) => ARRAY
+#
+#Normalize a Sah schema (scalar or array). Return an array. Produce a 2-level
+#copy of schema, so it's safe to add/delete/modify the normalized schema's clause
+#set and extras (but clause set's and extras' values are still references to the
+#original). Die on failure.
+#
+#TODO: recursively normalize clause which contains sah clauses (e.g. C<of>).
+#
+#=head1 HOMEPAGE
+#
+#Please visit the project's homepage at L<https://metacpan.org/release/Data-Sah-Normalize>.
+#
+#=head1 SOURCE
+#
+#Source repository is at L<https://github.com/perlancar/perl-Data-Sah-Normalize>.
+#
+#=head1 BUGS
+#
+#Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-Normalize>
+#
+#When submitting a bug or request, please include a test-file or a
+#patch to an existing test-file that illustrates the bug or desired
+#feature.
+#
+#=head1 SEE ALSO
+#
+#L<Sah>, L<Data::Sah>
+#
+#=head1 AUTHOR
+#
+#perlancar <perlancar@cpan.org>
+#
+#=head1 COPYRIGHT AND LICENSE
+#
+#This software is copyright (c) 2018, 2015, 2014 by perlancar@cpan.org.
+#
+#This is free software; you can redistribute it and/or modify it under
+#the same terms as the Perl 5 programming language system itself.
+#
+#=cut
 ### Getopt/Long/EvenLess.pm ###
 #package Getopt::Long::EvenLess;
 #
-#our $DATE = '2017-08-09'; 
-#our $VERSION = '0.111'; 
+#our $DATE = '2019-02-02'; # DATE
+#our $VERSION = '0.112'; # VERSION
 #
+## IFUNBUILT
+## # use strict 'subs', 'vars';
+## # use warnings;
+## END IFUNBUILT
 #
 #our @EXPORT   = qw(GetOptions);
 #our @EXPORT_OK = qw(GetOptionsFromArray);
@@ -2259,6 +4087,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #            } elsif ($_ eq 'no_auto_abbrev') {
 #                $config->{auto_abbrev} = 0;
 #            } elsif ($_ =~ /\A(no_ignore_case|no_getopt_compat|gnu_compat|bundling|permute)\z/) {
+#                # ignore, already behaves that way
 #            } else {
 #                die "Unknown configuration '$_'";
 #            }
@@ -2303,9 +4132,11 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #            for my $o (@opts) {
 #                next if $short_mode && length($o) > 1;
 #                if ($o eq $wanted) {
+#                    # perfect match, we immediately go with this one
 #                    @candidates = ($opts[0]);
 #                    last OPT_SPEC;
 #                } elsif ($config->{auto_abbrev} && index($o, $wanted) == 0) {
+#                    # prefix match, collect candidates first
 #                    push @candidates, $opts[0];
 #                    next OPT_SPEC;
 #                }
@@ -2316,14 +4147,14 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #                warn "Unknown option: $wanted\n";
 #                $success = 0;
 #            }
-#            return undef; 
+#            return undef; # means unknown
 #        } elsif (@candidates > 1) {
 #            unless ($config->{pass_through}) {
 #                warn "Option $wanted is ambiguous (" .
 #                    join(", ", @candidates) . ")\n";
 #                $success = 0;
 #            }
-#            return ''; 
+#            return ''; # means ambiguous
 #        }
 #        return $candidates[0];
 #    };
@@ -2332,9 +4163,9 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #        my $name = shift;
 #
 #        my $spec_key = $spec_by_opt_name{$name};
-#        my $handler  = $spec{$spec_key};
+#        my $destination = $spec{$spec_key};
 #
-#        $handler->({name=>$name}, @_ ? $_[0] : 1);
+#        $destination->({name=>$name}, @_ ? $_[0] : 1);
 #    };
 #
 #    my $i = -1;
@@ -2351,19 +4182,23 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #            my ($used_name, $val_in_opt) = ($1, $2);
 #            my $opt = $code_find_opt->($used_name);
 #            if (!defined($opt)) {
+#                # unknown option
 #                push @remaining, $argv->[$i];
 #                next ELEM;
 #            } elsif (!length($opt)) {
 #                push @remaining, $argv->[$i];
-#                next ELEM; 
+#                next ELEM; # ambiguous
 #            }
 #
 #            my $spec = $spec_by_opt_name{$opt};
+#            # check whether option requires an argument
 #            if ($spec =~ /=[fios][@%]?\z/) {
 #                if (defined $val_in_opt) {
+#                    # argument is taken after =
 #                    $code_set_val->($opt, $val_in_opt);
 #                } else {
 #                    if ($i+1 >= @$argv) {
+#                        # we are the last element
 #                        warn "Option $used_name requires an argument\n";
 #                        $success = 0;
 #                        last ELEM;
@@ -2385,27 +4220,33 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #                my $short_opt = $1;
 #                my $opt = $code_find_opt->($short_opt, 'short');
 #                if (!defined $opt) {
+#                    # unknown short option
 #                    push @remaining, "-" unless $remaining_pushed++;
 #                    $remaining[-1] .= $short_opt;
 #                    next SHORT_OPT;
 #                } elsif (!length $opt) {
+#                    # ambiguous short option
 #                    push @remaining, "-" unless $remaining_pushed++;
 #                    $remaining[-1] .= $short_opt;
 #                }
 #
 #                my $spec = $spec_by_opt_name{$opt};
+#                # check whether option requires an argument
 #                if ($spec =~ /=[fios][@%]?\z/) {
 #                    if (length $str) {
+#                        # argument is taken from $str
 #                        $code_set_val->($opt, $str);
 #                        next ELEM;
 #                    } else {
 #                        if ($i+1 >= @$argv) {
+#                            # we are the last element
 #                            unless ($config->{pass_through}) {
 #                                warn "Option $used_name requires an argument\n";
 #                                $success = 0;
 #                            }
 #                            last ELEM;
 #                        }
+#                        # take the next element as argument
 #                        $i++;
 #                        $code_set_val->($opt, $argv->[$i]);
 #                    }
@@ -2414,7 +4255,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #                }
 #            }
 #
-#        } else { 
+#        } else { # argument
 #
 #            push @remaining, $argv->[$i];
 #            next;
@@ -2423,7 +4264,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #    }
 #
 #  RETURN:
-#    splice @$argv, 0, ~~@$argv, @remaining; 
+#    splice @$argv, 0, ~~@$argv, @remaining; # replace with remaining elements
 #    return $success;
 #}
 #
@@ -2432,9 +4273,166 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #}
 #
 #1;
+## ABSTRACT: Like Getopt::Long::Less, but with even less features
 #
 #__END__
 #
+#=pod
+#
+#=encoding UTF-8
+#
+#=head1 NAME
+#
+#Getopt::Long::EvenLess - Like Getopt::Long::Less, but with even less features
+#
+#=head1 VERSION
+#
+#This document describes version 0.112 of Getopt::Long::EvenLess (from Perl distribution Getopt-Long-EvenLess), released on 2019-02-02.
+#
+#=head1 DESCRIPTION
+#
+#This module (GLEL for short) is a reimplementation of L<Getopt::Long> (GL for
+#short), but with much less features. It's an even more stripped down version of
+#L<Getopt::Long::Less> (GLL for short) and is perhaps less convenient to use for
+#day-to-day scripting work.
+#
+#The main goal is minimum amount of code and small startup overhead. This module
+#is an experiment of how little code I can use to support the stuffs I usually do
+#with GL.
+#
+#Compared to GL and GLL, it:
+#
+#=over
+#
+#=item * has minimum Configure() support
+#
+#Only these configurations are known: pass_through, no_pass_through (default).
+#
+#GLEL is equivalent to GL in this mode: bundling, no_ignore_case,
+#no_getopt_compat, gnu_compat, permute.
+#
+#No support for configuring via import options e.g.:
+#
+# use Getopt::Long qw(:config pass_through);
+#
+#=item * does not support increment (C<foo+>)
+#
+#=item * no type checking (C<foo=i>, C<foo=f>, C<foo=s> all accept any string)
+#
+#=item * does not support optional value (C<foo:s>), only no value (C<foo>) or required value (C<foo=s>)
+#
+#=item * does not support desttypes (C<foo=s@>)
+#
+#=item * does not support destination other than coderef (so no C<< "foo=s" => \$scalar >>, C<< "foo=s" => \@ary >>, no C<< "foo=s" => \%hash >>, only C<< "foo=s" => sub { ... } >>)
+#
+#Also, in coderef destination, code will get a simple hash instead of a
+#"callback" object as its first argument.
+#
+#=item * does not support hashref as first argument
+#
+#=item * does not support bool/negation (no C<foo!>, so you have to declare both C<foo> and C<no-foo> manually)
+#
+#=back
+#
+#The result?
+#
+#B<Amount of code>. GLEL 0.07 is about 175 lines of code, while GL is about 1500.
+#Sure, if you I<really> want to be minimalistic, you can use this single line of
+#code to get options:
+#
+# @ARGV = grep { /^--([^=]+)(=(.*))?/ ? ($opts{$1} = $2 ? $3 : 1, 0) : 1 } @ARGV;
+#
+#and you're already able to extract C<--flag> or C<--opt=val> from C<@ARGV> but
+#you also lose a lot of stuffs like autoabbreviation, C<--opt val> syntax support
+#syntax (which is more common, but requires you specify an option spec), custom
+#destination, etc.
+#
+#=head1 FUNCTIONS
+#
+#=head2 Configure(@configs | \%config) => hash
+#
+#Set configuration. Known configurations:
+#
+#=over
+#
+#=item * pass_through
+#
+#Ignore errors (unknown/ambiguous option) and still make GetOptions return true.
+#
+#=item * no_pass_through (default)
+#
+#=item * no_auto_abbrev
+#
+#=item * auto_abbrev (default)
+#
+#=item * no_ignore_case
+#
+#=item * no_getopt_compat
+#
+#=item * gnu_compat
+#
+#=item * bundling
+#
+#=item * permute
+#
+#=back
+#
+#Return old configuration data. To restore old configuration data you can pass it
+#back to C<Configure()>, e.g.:
+#
+# my $orig_conf = Getopt::Long::EvenLess::Configure("pass_through");
+# # ...
+# Getopt::Long::EvenLess::Configure($orig_conf);
+#
+#=head2 GetOptions(%spec) => bool
+#
+#Shortcut for:
+#
+# GetOptionsFromArray(\@ARGV, %spec)
+#
+#=head2 GetOptionsFromArray(\@ary, %spec) => bool
+#
+#Get (and strip) options from C<@ary>. Return true on success or false on failure
+#(unknown option, etc).
+#
+#=head1 HOMEPAGE
+#
+#Please visit the project's homepage at L<https://metacpan.org/release/Getopt-Long-EvenLess>.
+#
+#=head1 SOURCE
+#
+#Source repository is at L<https://github.com/perlancar/perl-Getopt-Long-EvenLess>.
+#
+#=head1 BUGS
+#
+#Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Getopt-Long-EvenLess>
+#
+#When submitting a bug or request, please include a test-file or a
+#patch to an existing test-file that illustrates the bug or desired
+#feature.
+#
+#=head1 SEE ALSO
+#
+#L<Getopt::Long>
+#
+#L<Getopt::Long::Less>
+#
+#If you want I<more> features intead of less, try L<Getopt::Long::More>.
+#
+#Benchmarks in L<Bencher::Scenario::GetoptModules>
+#
+#=head1 AUTHOR
+#
+#perlancar <perlancar@cpan.org>
+#
+#=head1 COPYRIGHT AND LICENSE
+#
+#This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+#
+#This is free software; you can redistribute it and/or modify it under
+#the same terms as the Perl 5 programming language system itself.
+#
+#=cut
 ### Local/_pci_check_args.pm ###
 #sub _pci_check_args {
 #    my ($args) = @_;
@@ -2445,10 +4443,130 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #            if (@ARGV > 0) { if (exists $args->{"num"}) { return [400, "You specified --num but also argument #0"]; } else { $args->{"num"} = delete($ARGV[0]); } }
 #        }
 #        my @check_argv = @ARGV;
+#        # fill from cmdline_src
 #
+#        # fill defaults from "default" property and check against schema
+#        no warnings ('void');
+#        require Scalar::Util::Numeric::PP;
+#        require List::Util;
+#        require String::Wildcard::Bash;
+#        require PERLANCAR::Module::List;
+#        my $_sahv_dpath;
+#        my $_sahv_err;
+#        $args->{"action"} //= "gen";
+#        if (exists $args->{"action"}) {
+#            $_sahv_dpath = [];
+#            # req #0
+#            ((defined($args->{"action"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+#            
+#            &&
+#            
+#            # check type 'str'
+#            ((!ref($args->{"action"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
+#            
+#            &&
+#            
+#            (# clause: in
+#            ((grep { $_ eq $args->{"action"} } @{ ["gen","list-patterns"] }) ? 1 : (($_sahv_err //= "Must be one of [\"gen\",\"list-patterns\"]"),0)))
+#             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+#        } # if date arg exists
 #        $args->{"case"} //= "default";
+#        if (exists $args->{"case"}) {
+#            $_sahv_dpath = [];
+#            # req #0
+#            ((defined($args->{"case"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+#            
+#            &&
+#            
+#            # check type 'str'
+#            ((!ref($args->{"case"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
+#            
+#            &&
+#            
+#            (# clause: in
+#            ((grep { $_ eq $args->{"case"} } @{ ["default","random","lower","upper","title"] }) ? 1 : (($_sahv_err //= "Must be one of [\"default\",\"random\",\"lower\",\"upper\",\"title\"]"),0)))
+#             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+#        } # if date arg exists
 #        $args->{"num"} //= 1;
+#        if (exists $args->{"num"}) {
+#            $_sahv_dpath = [];
+#            # req #0
+#            ((defined($args->{"num"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+#            
+#            &&
+#            
+#            # check type 'int'
+#            ((Scalar::Util::Numeric::PP::isint($args->{"num"})) ? 1 : (($_sahv_err //= "Not of type integer"),0))
+#            
+#            &&
+#            
+#            (# clause: min
+#            (($args->{"num"} >= 1) ? 1 : (($_sahv_err //= "Must be at least 1"),0)))
+#             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+#        } # if date arg exists
+#        if (exists $args->{"patterns"}) {
+#            $_sahv_dpath = [];
+#            # req #0
+#            ((defined($args->{"patterns"})) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Required but not specified"),0))
+#            
+#            &&
+#            
+#            # check type 'array'
+#            ((ref($args->{"patterns"}) eq 'ARRAY') ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type array"),0))
+#            
+#            &&
+#            
+#            (# clause: min_len
+#            ((@{$args->{"patterns"}} >= 1) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Length must be at least 1"),0)))
+#            
+#            &&
+#            
+#            ([push(@{$_sahv_dpath}, undef), scalar(# clause: of
+#            ((!defined(List::Util::first(sub {!(
+#                        ($_sahv_dpath->[-1] = $_),
+#                        # req #0
+#                        ((defined($args->{"patterns"}->[$_])) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Required but not specified"),0))
+#                        
+#                        &&
+#                        
+#                        # check type 'str'
+#                        ((!ref($args->{"patterns"}->[$_])) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type text"),0))
+#                        )}, 0..@{$args->{"patterns"}}-1))) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type text"),0))), pop(@{$_sahv_dpath})]->[1])
+#             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+#        } # if date arg exists
+#        if (exists $args->{"wordlists"}) {
+#            $_sahv_dpath = [];
+#            # req #0
+#            ((defined($args->{"wordlists"})) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Required but not specified"),0))
+#            
+#            &&
+#            
+#            # coerce rule(s): From_str_or_array::expand_perl_modname_wildcard
+#            (($args->{"wordlists"} = (ref($args->{"wordlists"}) eq '' || ref($args->{"wordlists"}) eq 'ARRAY') ? (do { my $tmp = $args->{"wordlists"}; $tmp = [$tmp] unless ref $tmp eq 'ARRAY'; my $i = 0; while ($i < @$tmp) {   $tmp->[$i] =~ s!/!::!g;   my $el = $tmp->[$i++];   next unless String::Wildcard::Bash::contains_wildcard($el);   my $mods = PERLANCAR::Module::List::list_modules("WordList::" . $el, {wildcard=>1, list_modules=>1});   my @mods = sort keys %$mods;   for (@mods) { substr($_, 0, 10) = '' }   if (@mods) { splice @$tmp, $i-1, 1, @mods; $i += @mods - 1 } } $tmp }) : $args->{"wordlists"}), 1)
+#            
+#            &&
+#            
+#            # check type 'array'
+#            ((ref($args->{"wordlists"}) eq 'ARRAY') ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type array"),0))
+#            
+#            &&
+#            
+#            ([push(@{$_sahv_dpath}, undef), scalar(# clause: of
+#            ((!defined(List::Util::first(sub {!(
+#                        ($_sahv_dpath->[-1] = $_),
+#                        # req #0
+#                        ((defined($args->{"wordlists"}->[$_])) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Required but not specified"),0))
+#                        
+#                        &&
+#                        
+#                        # check type 'str'
+#                        ((!ref($args->{"wordlists"}->[$_])) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type text"),0))
+#                        )}, 0..@{$args->{"wordlists"}}-1))) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type text"),0))), pop(@{$_sahv_dpath})]->[1])
+#             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+#        } # if date arg exists
 #
+#        # check required args
+#        return [400, "Missing required value for argument: action"] if exists($args->{"action"}) && !defined($args->{"action"});
 #        return [400, "Missing required value for argument: case"] if exists($args->{"case"}) && !defined($args->{"case"});
 #        return [400, "Missing required value for argument: num"] if exists($args->{"num"}) && !defined($args->{"num"});
 #        return [400, "Missing required value for argument: patterns"] if exists($args->{"patterns"}) && !defined($args->{"patterns"});
@@ -2459,7 +4577,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #}
 #1;
 ### Local/_pci_clean_json.pm ###
-#sub _pci_clean_json { require Scalar::Util; require Clone::PP;  use feature 'state'; state $cleanser = sub {
+#sub _pci_clean_json { require Clone::PP; require Scalar::Util;  use feature 'state'; state $cleanser = sub {
 #my $data = shift;
 #state %refs;
 #state $ctr_circ;
@@ -2467,7 +4585,10 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #state $process_hash;
 #if (!$process_array) { $process_array = sub { my $a = shift; for my $e (@$a) { my $ref=ref($e);
 #    if ($ref && $refs{ $e }++) { if (++$ctr_circ <= 1) { $e = Clone::PP::clone($e); redo } else { $e = 'CIRCULAR'; $ref = '' } }
+#    elsif ($ref eq 'Cpanel::JSON::XS::Boolean') { $e = $e ? 1:0; $ref = '' }
 #    elsif ($ref eq 'DateTime') { $e = $e->epoch; $ref = ref($e) }
+#    elsif ($ref eq 'JSON::PP::Boolean') { $e = $e ? 1:0; $ref = '' }
+#    elsif ($ref eq 'JSON::XS::Boolean') { $e = $e ? 1:0; $ref = '' }
 #    elsif ($ref eq 'Math::BigInt') { $e = $e->bstr; $ref = ref($e) }
 #    elsif ($ref eq 'Regexp') { $e = "$e"; $ref = "" }
 #    elsif ($ref eq 'SCALAR') { $e = ${ $e }; $ref = ref($e) }
@@ -2481,7 +4602,10 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #} } }
 #if (!$process_hash) { $process_hash = sub { my $h = shift; for my $k (keys %$h) { my $ref=ref($h->{$k});
 #    if ($ref && $refs{ $h->{$k} }++) { if (++$ctr_circ <= 1) { $h->{$k} = Clone::PP::clone($h->{$k}); redo } else { $h->{$k} = 'CIRCULAR'; $ref = '' } }
+#    elsif ($ref eq 'Cpanel::JSON::XS::Boolean') { $h->{$k} = $h->{$k} ? 1:0; $ref = '' }
 #    elsif ($ref eq 'DateTime') { $h->{$k} = $h->{$k}->epoch; $ref = ref($h->{$k}) }
+#    elsif ($ref eq 'JSON::PP::Boolean') { $h->{$k} = $h->{$k} ? 1:0; $ref = '' }
+#    elsif ($ref eq 'JSON::XS::Boolean') { $h->{$k} = $h->{$k} ? 1:0; $ref = '' }
 #    elsif ($ref eq 'Math::BigInt') { $h->{$k} = $h->{$k}->bstr; $ref = ref($h->{$k}) }
 #    elsif ($ref eq 'Regexp') { $h->{$k} = "$h->{$k}"; $ref = "" }
 #    elsif ($ref eq 'SCALAR') { $h->{$k} = ${ $h->{$k} }; $ref = ref($h->{$k}) }
@@ -2496,7 +4620,10 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #%refs = (); $ctr_circ=0;
 #for ($data) { my $ref=ref($_);
 #    if ($ref && $refs{ $_ }++) { if (++$ctr_circ <= 1) { $_ = Clone::PP::clone($_); redo } else { $_ = 'CIRCULAR'; $ref = '' } }
+#    elsif ($ref eq 'Cpanel::JSON::XS::Boolean') { $_ = $_ ? 1:0; $ref = '' }
 #    elsif ($ref eq 'DateTime') { $_ = $_->epoch; $ref = ref($_) }
+#    elsif ($ref eq 'JSON::PP::Boolean') { $_ = $_ ? 1:0; $ref = '' }
+#    elsif ($ref eq 'JSON::XS::Boolean') { $_ = $_ ? 1:0; $ref = '' }
 #    elsif ($ref eq 'Math::BigInt') { $_ = $_->bstr; $ref = ref($_) }
 #    elsif ($ref eq 'Regexp') { $_ = "$_"; $ref = "" }
 #    elsif ($ref eq 'SCALAR') { $_ = ${ $_ }; $ref = ref($_) }
@@ -2512,20 +4639,377 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #}
 #;; $cleanser->(shift) }
 #1;
+### Log/ger.pm ###
+#package Log::ger;
+#
+#our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+#our $DATE = '2020-03-11'; # DATE
+#our $DIST = 'Log-ger'; # DIST
+#our $VERSION = '0.037'; # VERSION
+#
+##IFUNBUILT
+## use strict 'subs', 'vars';
+## use warnings;
+##END IFUNBUILT
+#
+#our $re_addr = qr/\(0x([0-9a-f]+)/o;
+#
+#our %Levels = (
+#    fatal   => 10,
+#    error   => 20,
+#    warn    => 30,
+#    info    => 40,
+#    debug   => 50,
+#    trace   => 60,
+#);
+#
+#our %Level_Aliases = (
+#    off     => 0,
+#    warning => 30,
+#);
+#
+#our $Current_Level = 30;
+#
+#our $Caller_Depth_Offset = 0;
+#
+## a flag that can be used by null output to skip using formatter
+#our $_outputter_is_null;
+#
+#our $_dumper;
+#
+#our %Global_Hooks;
+#
+## in Log/ger/Heavy.pm
+## our %Default_Hooks = (
+#
+#our %Package_Targets; # key = package name, value = \%per_target_conf
+#our %Per_Package_Hooks; # key = package name, value = { phase => hooks, ... }
+#
+#our %Hash_Targets; # key = hash address, value = [$hashref, \%per_target_conf]
+#our %Per_Hash_Hooks; # key = hash address, value = { phase => hooks, ... }
+#
+#our %Object_Targets; # key = object address, value = [$obj, \%per_target_conf]
+#our %Per_Object_Hooks; # key = object address, value = { phase => hooks, ... }
+#
+#my $sub0 = sub {0};
+#my $sub1 = sub {1};
+#my $default_null_routines;
+#
+#sub install_routines {
+#    my ($target, $target_arg, $routines, $name_routines) = @_;
+#
+#    if ($name_routines && !defined &subname) {
+#        if (eval { require Sub::Name; 1 }) {
+#            *subname = \&Sub::Name::subname;
+#        } else {
+#            *subname = sub {};
+#        }
+#    }
+#
+#    if ($target eq 'package') {
+##IFUNBUILT
+##         no warnings 'redefine';
+##END IFUNBUILT
+#        for my $r (@$routines) {
+#            my ($code, $name, $lnum, $type) = @$r;
+#            next unless $type =~ /_sub\z/;
+#            #print "D:installing $name to package $target_arg\n";
+#            *{"$target_arg\::$name"} = $code;
+#            subname("$target_arg\::$name", $code) if $name_routines;
+#        }
+#    } elsif ($target eq 'object') {
+##IFUNBUILT
+##         no warnings 'redefine';
+##END IFUNBUILT
+#        my $pkg = ref $target_arg;
+#        for my $r (@$routines) {
+#            my ($code, $name, $lnum, $type) = @$r;
+#            next unless $type =~ /_method\z/;
+#            *{"$pkg\::$name"} = $code;
+#            subname("$pkg\::$name", $code) if $name_routines;
+#        }
+#    } elsif ($target eq 'hash') {
+#        for my $r (@$routines) {
+#            my ($code, $name, $lnum, $type) = @$r;
+#            next unless $type =~ /_sub\z/;
+#            $target_arg->{$name} = $code;
+#        }
+#    }
+#}
+#
+#sub add_target {
+#    my ($target_type, $target_name, $per_target_conf, $replace) = @_;
+#    $replace = 1 unless defined $replace;
+#
+#    if ($target_type eq 'package') {
+#        unless ($replace) { return if $Package_Targets{$target_name} }
+#        $Package_Targets{$target_name} = $per_target_conf;
+#    } elsif ($target_type eq 'object') {
+#        my ($addr) = "$target_name" =~ $re_addr;
+#        unless ($replace) { return if $Object_Targets{$addr} }
+#        $Object_Targets{$addr} = [$target_name, $per_target_conf];
+#    } elsif ($target_type eq 'hash') {
+#        my ($addr) = "$target_name" =~ $re_addr;
+#        unless ($replace) { return if $Hash_Targets{$addr} }
+#        $Hash_Targets{$addr} = [$target_name, $per_target_conf];
+#    }
+#}
+#
+#sub _set_default_null_routines {
+#    $default_null_routines ||= [
+#        (map {(
+#            [$sub0, "log_$_", $Levels{$_}, 'logger_sub'],
+#            [$Levels{$_} > $Current_Level ? $sub0 : $sub1, "log_is_$_", $Levels{$_}, 'level_checker_sub'],
+#            [$sub0, $_, $Levels{$_}, 'logger_method'],
+#            [$Levels{$_} > $Current_Level ? $sub0 : $sub1, "is_$_", $Levels{$_}, 'level_checker_method'],
+#        )} keys %Levels),
+#    ];
+#}
+#
+#sub get_logger {
+#    my ($package, %per_target_conf) = @_;
+#
+#    my $caller = caller(0);
+#    $per_target_conf{category} = $caller
+#        if !defined($per_target_conf{category});
+#    my $obj = []; $obj =~ $re_addr;
+#    my $pkg = "Log::ger::Obj$1"; bless $obj, $pkg;
+#    add_target(object => $obj, \%per_target_conf);
+#    if (keys %Global_Hooks) {
+#        require Log::ger::Heavy;
+#        init_target(object => $obj, \%per_target_conf);
+#    } else {
+#        # if we haven't added any hooks etc, skip init_target() process and use
+#        # this preconstructed routines as shortcut, to save startup overhead
+#        _set_default_null_routines();
+#        install_routines(object => $obj, $default_null_routines, 0);
+#    }
+#    $obj; # XXX add DESTROY to remove from list of targets
+#}
+#
+#sub _import_to {
+#    my ($package, $target_pkg, %per_target_conf) = @_;
+#
+#    $per_target_conf{category} = $target_pkg
+#        if !defined($per_target_conf{category});
+#    add_target(package => $target_pkg, \%per_target_conf);
+#    if (keys %Global_Hooks) {
+#        require Log::ger::Heavy;
+#        init_target(package => $target_pkg, \%per_target_conf);
+#    } else {
+#        # if we haven't added any hooks etc, skip init_target() process and use
+#        # this preconstructed routines as shortcut, to save startup overhead
+#        _set_default_null_routines();
+#        install_routines(package => $target_pkg, $default_null_routines, 0);
+#    }
+#}
+#
+#sub import {
+#    my ($package, %per_target_conf) = @_;
+#
+#    my $caller = caller(0);
+#    $package->_import_to($caller, %per_target_conf);
+#}
+#
+#1;
+## ABSTRACT: A lightweight, flexible logging framework
+#
+#__END__
+#
+#=pod
+#
+#=encoding UTF-8
+#
+#=head1 NAME
+#
+#Log::ger - A lightweight, flexible logging framework
+#
+#=head1 VERSION
+#
+#version 0.037
+#
+#=head1 SYNOPSIS
+#
+#=head2 Producing logs
+#
+#In your module (producer):
+#
+# package Foo;
+# use Log::ger; # will install some logger routines e.g. log_warn, log_error
+#
+# sub foo {
+#     ...
+#     # produce some logs. no need to configure output or level.
+#     log_error "an error occured: %03d - %s", $errcode, $errmsg;
+#     ...
+#     log_debug "http response: %s", $http; # automatic dumping of data
+# }
+# 1;
+#
+#=head2 Consuming logs
+#
+#=head3 Choosing an output
+#
+#In your application (consumer/listener):
+#
+# use Foo;
+# use Log::ger::Output 'Screen'; # configure output
+# # level is by default 'warn'
+# foo(); # the error message is shown, but debug message is not.
+#
+#=head3 Choosing multiple outputs
+#
+#Instead of screen, you can output to multiple outputs (including multiple
+#files):
+#
+# use Log::ger::Output 'Composite' => (
+#     outputs => {
+#         Screen => {},
+#         File   => [
+#             {conf=>{path=>'/path/to/app.log'}},
+#             ...
+#         ],
+#         ...
+#     },
+# );
+#
+#See L<Log::ger::Manual::Tutorial::481_Output_Composite> for more examples.
+#
+#=head3 Choosing level
+#
+#One way to set level:
+#
+# use Log::ger::Util;
+# Log::ger::Util::set_level('debug'); # be more verbose
+# foo(); # the error message as well as debug message are now shown
+#
+#There are better ways, e.g. letting users configure log level via configuration
+#file or command-line option. See L<Log::ger::Manual::Tutorial::300_Level> for
+#more details.
+#
+#=head1 DESCRIPTION
+#
+#Log::ger is yet another logging framework with the following features:
+#
+#=over
+#
+#=item * Separation of producers and consumers/listeners
+#
+#Like L<Log::Any>, this offers a very easy way for modules to produce some logs
+#without having to configure anything. Configuring output, level, etc can be done
+#in the application as log consumers/listeners. To read more about this, see the
+#documentation of L<Log::Any> or L<Log::ger::Manual> (but nevertheless see
+#L<Log::ger::Manual> on why you might prefer Log::ger to Log::Any).
+#
+#=item * Lightweight and fast
+#
+#B<Slim distribution.> No non-core dependencies, extra functionalities are
+#provided in separate distributions to be pulled as needed.
+#
+#B<Low startup overhead.> Only ~0.5-1ms. For comparison, L<strict> ~0.2-0.5ms,
+#L<warnings> ~2ms, L<Log::Any> (v0.15) ~2-3ms, Log::Any (v1.049) ~8-10ms,
+#L<Log::Log4perl> ~35ms. This is measured on a 2014-2015 PC and before doing any
+#output configuration. I strive to make C<use Log::ger;> statement to be roughly
+#as light as C<use strict;> or C<use warnings;> so the impact of adding the
+#statement is really minimal and you can just add logging without much thought to
+#most of your modules. This is important to me because I want logging to be
+#pervasive.
+#
+#To test for yourself, try e.g. with L<bencher-code>:
+#
+# % bencher-code 'use Log::ger' 'use Log::Any' --startup
+#
+#B<Fast>. Low null-/stealth-logging overhead, about 1.5x faster than Log::Any, 3x
+#faster than Log4perl, 5x faster than L<Log::Fast>, ~40x faster than
+#L<Log::Contextual>, and ~100x faster than L<Log::Dispatch>.
+#
+#For more benchmarks, see L<Bencher::Scenarios::LogGer>.
+#
+#B<Conditional compilation.> There is a plugin to optimize away unneeded logging
+#statements, like assertion/conditional compilation, so they have zero runtime
+#performance cost. See L<Log::ger::Plugin::OptAway>.
+#
+#Being lightweight means the module can be used more universally, from CLI to
+#long-running daemons to inside routines with tight loops.
+#
+#=item * Flexible
+#
+#B<Customizable levels and routine/method names.> Can be used in a procedural or
+#OO style. Log::ger can mimic the interface of L<Log::Any>, L<Log::Contextual>,
+#L<Log::Log4perl>, or some other popular logging frameworks, to ease migration or
+#adjust with your personal style.
+#
+#B<Per-package settings.> Each importer package can use its own format/layout,
+#output. For example, a module that is migrated from Log::Any uses Log::Any-style
+#logging, while another uses native Log::ger style, and yet some other uses block
+#formatting like Log::Contextual. This eases code migration and teamwork. Each
+#module author can preserve her own logging style, if wanted, and all the modules
+#still use the same framework.
+#
+#B<Dynamic.> Outputs and levels can be changed anytime during run-time and logger
+#routines will be updated automatically. This is useful in situation like a
+#long-running server application: you can turn on tracing logs temporarily to
+#debug problems, then turn them off again, without restarting your server.
+#
+#B<Interoperability.> There are modules to interop with Log::Any, either consume
+#Log::Any logs (see L<Log::Any::Adapter::LogGer>) or produce logs to be consumed
+#by Log::Any (see L<Log::ger::Output::LogAny>).
+#
+#B<Many output modules and plugins.> See C<Log::ger::Output::*>,
+#C<Log::ger::Format::*>, C<Log::ger::Layout::*>, C<Log::ger::Plugin::*>. Writing
+#an output module in Log::ger is easier than writing a Log::Any::Adapter::*.
+#
+#=back
+#
+#For more documentation, start with L<Log::ger::Manual>.
+#
+#=for Pod::Coverage ^(.+)$
+#
+#=head1 SEE ALSO
+#
+#Some other popular logging frameworks: L<Log::Any>, L<Log::Contextual>,
+#L<Log::Log4perl>, L<Log::Dispatch>, L<Log::Dispatchouli>.
+#
+#If you still prefer debugging using the good old C<print()>, there's
+#L<Debug::Print>.
+#
+#=head1 AUTHOR
+#
+#perlancar <perlancar@cpan.org>
+#
+#=head1 COPYRIGHT AND LICENSE
+#
+#This software is copyright (c) 2020, 2019, 2018, 2017 by perlancar@cpan.org.
+#
+#This is free software; you can redistribute it and/or modify it under
+#the same terms as the Perl 5 programming language system itself.
+#
+#=cut
 ### Perinci/CmdLine/Util/Config.pm ###
 #package Perinci::CmdLine::Util::Config;
 #
-#our $DATE = '2017-01-13'; 
-#our $VERSION = '1.71'; 
+#our $DATE = '2019-05-29'; # DATE
+#our $VERSION = '1.722'; # VERSION
 #
 #use 5.010001;
 #use strict;
 #use warnings;
+#use Log::ger;
+#
+#use Exporter qw(import);
+#our @EXPORT_OK = (
+#    'get_default_config_dirs',
+#    'read_config',
+#    'get_args_from_config',
+#);
 #
 #our %SPEC;
 #
+## from PERLANCAR::File::HomeDir 0.03, with minor modification
 #sub _get_my_home_dir {
 #    if ($^O eq 'MSWin32') {
+#        # File::HomeDir always uses exists($ENV{x}) first, does it want to avoid
+#        # accidentally creating env vars?
 #        return $ENV{HOME} if $ENV{HOME};
 #        return $ENV{USERPROFILE} if $ENV{USERPROFILE};
 #        return join($ENV{HOMEDRIVE}, "\\", $ENV{HOMEPATH})
@@ -2545,6 +5029,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #};
 #sub get_default_config_dirs {
 #    my @dirs;
+#    #local $PERLANCAR::File::HomeDir::DIE_ON_FAILURE = 1;
 #    my $home = _get_my_home_dir();
 #    if ($^O eq 'MSWin32') {
 #        push @dirs, $home;
@@ -2561,6 +5046,9 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #        config_filename => {},
 #        config_dirs     => {},
 #        program_name    => {},
+#        # TODO: hook_file
+#        hook_section    => {},
+#        # TODO: hook_param?
 #    },
 #};
 #sub read_config {
@@ -2604,27 +5092,46 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #    my %res;
 #    my @read;
 #    my %section_read_order;
+#  FILE:
 #    for my $i (0..$#{$paths}) {
 #        my $path           = $paths->[$i];
 #        my $filename = $path; $filename =~ s!.*[/\\]!!;
 #        my $wanted_section = $section_config_filename_map{$filename};
+#        log_trace "[pericmd] Reading config file '%s' ...", $path;
 #        my $j = 0;
 #        $section_read_order{GLOBAL} = [$i, $j++];
+#        my @file_sections = ("GLOBAL");
 #        my $hoh = $reader->read_file(
 #            $path,
 #            sub {
 #                my %args = @_;
 #                return unless $args{event} eq 'section';
 #                my $section = $args{section};
+#                push @file_sections, $section
+#                    unless grep {$section eq $_} @file_sections;
 #                $section_read_order{$section} = [$i, $j++];
 #            },
 #        );
 #        push @read, $path;
-#        for my $section (keys %$hoh) {
+#      SECTION:
+#        for my $section (@file_sections) {
 #            my $hash = $hoh->{$section};
 #
-#            my $s = $section; $s =~ s/\s*\S*=.*\z//; 
+#            my $s = $section; $s =~ s/\s*\S*=.*\z//; # strip key=value pairs
 #            $s = 'GLOBAL' if $s eq '';
+#
+#            if ($args{hook_section}) {
+#                my $res = $args{hook_section}->($section, $hash);
+#                if ($res->[0] == 204) {
+#                    log_trace "[pericmd] Skipped config section '$section' ".
+#                        "in file '$path': hook_section returns 204";
+#                    next SECTION;
+#                } elsif ($res->[0] >= 400 && $res->[0] <= 599) {
+#                    return [$res->[0], "Error when reading config file '$path'".
+#                                ": $res->[1]"];
+#                }
+#            }
+#
 #            next unless !defined($wanted_section) || $s eq $wanted_section;
 #
 #            for (keys %$hash) {
@@ -2671,6 +5178,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #
 #    my $csro = $r->{_config_section_read_order} // {};
 #    my @sections = sort {
+#        # sort according to the order the section is seen in the file
 #        my $csro_a = $csro->{$a} // [0,0];
 #        my $csro_b = $csro->{$b} // [0,0];
 #        $csro_a->[0] <=> $csro_b->[0] ||
@@ -2678,7 +5186,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #            $a cmp $b
 #        } keys %$conf;
 #
-#    my %seen_profiles; 
+#    my %seen_profiles; # for debugging message
 #    for my $section0 (@sections) {
 #        my %keyvals;
 #        my $sect_name;
@@ -2694,54 +5202,100 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #        my $sect_scn     = $keyvals{subcommand} // '';
 #        my $sect_profile = $keyvals{profile};
 #
+#        # if there is a subcommand name, use section with no subcommand=... or
+#        # the matching subcommand
 #        if (length $scn) {
 #            if (length($sect_scn) && $sect_scn ne $scn) {
+#                log_trace(
+#                    "[pericmd] Skipped config section '%s' (%s)",
+#                    $section0, "subcommand does not match '$scn'",
+#                );
 #                next;
 #            }
 #        } else {
 #            if (length $sect_scn) {
+#                log_trace(
+#                    "[pericmd] Skipped config section '%s' (%s)",
+#                    $section0, "only for a certain subcommand",
+#                );
 #                next;
 #            }
 #        }
 #
+#        # if user chooses a profile, only use section with no profile=... or the
+#        # matching profile
 #        if (defined $profile) {
 #            if (defined($sect_profile) && $sect_profile ne $profile) {
+#                log_trace(
+#                    "[pericmd] Skipped config section '%s' (%s)",
+#                    $section0, "profile does not match '$profile'",
+#                );
 #                next;
 #            }
 #            $found = 1 if defined($sect_profile) && $sect_profile eq $profile;
 #        } else {
 #            if (defined($sect_profile)) {
+#                log_trace(
+#                    "[pericmd] Skipped config section '%s' (%s)",
+#                    $section0, "only for a certain profile",
+#                );
 #                next;
 #            }
 #        }
 #
+#        # only use section marked with program=... if the program name matches
 #        if (defined($progn) && defined($keyvals{program})) {
 #            if ($progn ne $keyvals{program}) {
+#                log_trace(
+#                    "[pericmd] Skipped config section '%s' (%s)",
+#                    $section0, "program does not match '$progn'",
+#                );
 #                next;
 #            }
 #        }
 #
+#        # if user specifies env=... then apply filtering by ENV variable
 #        if (defined(my $env = $keyvals{env})) {
 #            my ($var, $val);
 #            if (($var, $val) = $env =~ /\A(\w+)=(.*)\z/) {
 #                if (($ENV{$var} // '') ne $val) {
+#                    log_trace(
+#                        "[pericmd] Skipped config section '%s' (%s)",
+#                        $section0, "env $var has non-matching value '".
+#                            ($ENV{$var} // '')."'",
+#                    );
 #                    next;
 #                }
 #            } elsif (($var, $val) = $env =~ /\A(\w+)!=(.*)\z/) {
 #                if (($ENV{$var} // '') eq $val) {
+#                    log_trace(
+#                        "[pericmd] Skipped config section '%s' (%s)",
+#                        $section0, "env $var has that value",
+#                    );
 #                    next;
 #                }
 #            } elsif (($var, $val) = $env =~ /\A(\w+)\*=(.*)\z/) {
 #                if (index(($ENV{$var} // ''), $val) < 0) {
+#                    log_trace(
+#                        "[pericmd] Skipped config section '%s' (%s)",
+#                        $section0, "env $var has value '".
+#                            ($ENV{$var} // '')."' which does not contain the ".
+#                                "requested string"
+#                    );
 #                    next;
 #                }
 #            } else {
 #                if (!$ENV{$env}) {
+#                    log_trace(
+#                        "[pericmd] Skipped config section '%s' (%s)",
+#                        $section0, "env $env is not set/true",
+#                    );
 #                    next;
 #                }
 #            }
 #        }
 #
+#        log_trace("[pericmd] Reading config section '%s'", $section0);
 #
 #        my $as = $meta->{args} // {};
 #        for my $k (keys %{ $conf->{$section0} }) {
@@ -2751,14 +5305,24 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #                if ($sch) {
 #                    require Data::Sah::Normalize;
 #                    $sch = Data::Sah::Normalize::normalize_schema($sch);
+#                    # since IOD might return a scalar or an array (depending on
+#                    # whether there is a single param=val or multiple param=
+#                    # lines), we need to arrayify the value if the argument is
+#                    # expected to be an array.
 #                    if (ref($v) ne 'ARRAY' && $sch->[0] eq 'array') {
 #                        $v = [$v];
 #                    }
 #                }
 #                $copts->{$k}{handler}->(undef, $v, $r);
 #            } else {
+#                # when common option clashes with function argument name, user
+#                # can use NAME.arg to refer to function argument.
 #                $k =~ s/\.arg\z//;
 #
+#                # since IOD might return a scalar or an array (depending on
+#                # whether there is a single param=val or multiple param= lines),
+#                # we need to arrayify the value if the argument is expected to
+#                # be an array.
 #                if (ref($v) ne 'ARRAY' && $as->{$k} && $as->{$k}{schema} &&
 #                        $as->{$k}{schema}[0] eq 'array') {
 #                    $v = [$v];
@@ -2767,27 +5331,177 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #            }
 #        }
 #    }
+#    log_trace("[pericmd] Seen config profiles: %s",
+#              [sort keys %seen_profiles]);
 #
 #    [200, "OK", $args, {'func.found'=>$found}];
 #}
 #
 #1;
+## ABSTRACT: Utility routines related to config files
 #
 #__END__
 #
+#=pod
+#
+#=encoding UTF-8
+#
+#=head1 NAME
+#
+#Perinci::CmdLine::Util::Config - Utility routines related to config files
+#
+#=head1 VERSION
+#
+#This document describes version 1.722 of Perinci::CmdLine::Util::Config (from Perl distribution Perinci-CmdLine-Util-Config), released on 2019-05-29.
+#
+#=head1 FUNCTIONS
+#
+#
+#=head2 get_args_from_config
+#
+#Usage:
+#
+# get_args_from_config(%args) -> [status, msg, payload, meta]
+#
+#This function is not exported by default, but exportable.
+#
+#Arguments ('*' denotes required arguments):
+#
+#=over 4
+#
+#=item * B<args> => I<any>
+#
+#=item * B<common_opts> => I<any>
+#
+#=item * B<config> => I<any>
+#
+#=item * B<config_profile> => I<any>
+#
+#=item * B<meta> => I<any>
+#
+#=item * B<meta_is_normalized> => I<any>
+#
+#=item * B<r> => I<any>
+#
+#=item * B<subcommand_name> => I<any>
+#
+#=back
+#
+#Returns an enveloped result (an array).
+#
+#First element (status) is an integer containing HTTP status code
+#(200 means OK, 4xx caller error, 5xx function error). Second element
+#(msg) is a string containing error message, or 'OK' if status is
+#200. Third element (payload) is optional, the actual result. Fourth
+#element (meta) is called result metadata and is optional, a hash
+#that contains extra information.
+#
+#Return value:  (any)
+#
+#
+#=head2 get_default_config_dirs
+#
+#Usage:
+#
+# get_default_config_dirs() -> [status, msg, payload, meta]
+#
+#This function is not exported by default, but exportable.
+#
+#No arguments.
+#
+#Returns an enveloped result (an array).
+#
+#First element (status) is an integer containing HTTP status code
+#(200 means OK, 4xx caller error, 5xx function error). Second element
+#(msg) is a string containing error message, or 'OK' if status is
+#200. Third element (payload) is optional, the actual result. Fourth
+#element (meta) is called result metadata and is optional, a hash
+#that contains extra information.
+#
+#Return value:  (any)
+#
+#
+#=head2 read_config
+#
+#Usage:
+#
+# read_config(%args) -> [status, msg, payload, meta]
+#
+#This function is not exported by default, but exportable.
+#
+#Arguments ('*' denotes required arguments):
+#
+#=over 4
+#
+#=item * B<config_dirs> => I<any>
+#
+#=item * B<config_filename> => I<any>
+#
+#=item * B<config_paths> => I<any>
+#
+#=item * B<hook_section> => I<any>
+#
+#=item * B<program_name> => I<any>
+#
+#=back
+#
+#Returns an enveloped result (an array).
+#
+#First element (status) is an integer containing HTTP status code
+#(200 means OK, 4xx caller error, 5xx function error). Second element
+#(msg) is a string containing error message, or 'OK' if status is
+#200. Third element (payload) is optional, the actual result. Fourth
+#element (meta) is called result metadata and is optional, a hash
+#that contains extra information.
+#
+#Return value:  (any)
+#
+#=head1 HOMEPAGE
+#
+#Please visit the project's homepage at L<https://metacpan.org/release/Perinci-CmdLine-Util-Config>.
+#
+#=head1 SOURCE
+#
+#Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine-Util-Config>.
+#
+#=head1 BUGS
+#
+#Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Util-Config>
+#
+#When submitting a bug or request, please include a test-file or a
+#patch to an existing test-file that illustrates the bug or desired
+#feature.
+#
+#=head1 AUTHOR
+#
+#perlancar <perlancar@cpan.org>
+#
+#=head1 COPYRIGHT AND LICENSE
+#
+#This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
+#
+#This is free software; you can redistribute it and/or modify it under
+#the same terms as the Perl 5 programming language system itself.
+#
+#=cut
 ### Perinci/Result/Format/Lite.pm ###
 #package Perinci::Result::Format::Lite;
 #
-#our $DATE = '2017-12-09'; 
-#our $VERSION = '0.270'; 
+#our $DATE = '2018-07-04'; # DATE
+#our $VERSION = '0.274'; # VERSION
 #
 #use 5.010001;
+##IFUNBUILT
+## use strict;
+## use warnings;
+##END IFUNBUILT
 #
 #use List::Util qw(first max);
 #
 #use Exporter qw(import);
 #our @EXPORT_OK = qw(format);
 #
+## copy-pasted from List::MoreUtils::PP
 #sub firstidx (&@) {
 #    my $f = shift;
 #    foreach my $i ( 0 .. $#_ )
@@ -2829,6 +5543,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #
 #    $resmeta //= {};
 #
+#    # column names
 #    my @columns;
 #    if ($header_row) {
 #        @columns = @{$data->[0]};
@@ -2836,9 +5551,11 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #        @columns = map {"col$_"} 0..@{$data->[0]}-1;
 #    }
 #
-#    my $column_orders; 
+#    my $column_orders; # e.g. [col2, col1, col3, ...]
 #  SET_COLUMN_ORDERS: {
 #
+#        # find column orders from 'table_column_orders' in result metadata (or
+#        # from env)
 #        my $tcos;
 #        if ($ENV{FORMAT_PRETTY_TABLE_COLUMN_ORDERS}) {
 #            $tcos = _json->encode($ENV{FORMAT_PRETTY_TABLE_COLUMN_ORDERS});
@@ -2850,6 +5567,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #            }
 #        }
 #        if ($tcos) {
+#            # find an entry in tcos that @columns contains all the columns of
 #          COLS:
 #            for my $cols (@$tcos) {
 #                for my $col (@$cols) {
@@ -2860,21 +5578,28 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #            }
 #        }
 #
+#        if ($resmeta->{'table.field_orders'}) {
+#            $column_orders = $resmeta->{'table.field_orders'};
+#            last SET_COLUMN_ORDERS;
+#        }
+#
+#        # find column orders from table spec
 #        $column_orders = $resmeta->{'table.fields'};
 #    }
 #
+#    # reorder each row according to requested column order
 #    if ($column_orders) {
-#        my @map0 = sort {
-#            my $idx_a = firstidx(sub {$_ eq $a->[1]},
-#                                 @$column_orders) // 9999;
-#            my $idx_b = firstidx(sub {$_ eq $b->[1]},
-#                                 @$column_orders) // 9999;
-#            $idx_a <=> $idx_b || $a->[1] cmp $b->[1];
-#        } map {[$_, $columns[$_]]} 0..$#columns;
+#        require Sort::BySpec;
+#        my $cmp = Sort::BySpec::cmp_by_spec(spec => $column_orders);
+#        # 0->2, 1->0, ... (map column position from unordered to ordered)
+#        my @map0 = sort { $cmp->($a->[1], $b->[1]) }
+#            map {[$_, $columns[$_]]} 0..$#columns;
+#        #use DD; dd \@map0;
 #        my @map;
 #        for (0..$#map0) {
 #            $map[$_] = $map0[$_][0];
 #        }
+#        #use DD; dd \@map;
 #        my $newdata = [];
 #        for my $row (@$data) {
 #            my @newrow;
@@ -2887,7 +5612,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #        @columns = @newcolumns;
 #    }
 #
-#    my @field_idxs; 
+#    my @field_idxs; # map column to index in table.fields
 #    {
 #        my $tff = $resmeta->{'table.fields'} or last;
 #        for my $i (0..$#columns) {
@@ -2895,32 +5620,42 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #        }
 #    }
 #
+#    # determine field labels
 #    {
 #        last unless $header_row && @$data;
 #        my $tff = $resmeta->{'table.fields'} or last;
-#        my $tfu = $resmeta->{'table.field_units'} or last;
+#        my $tfl = $resmeta->{'table.field_labels'};
+#        my $tfu = $resmeta->{'table.field_units'};
 #        for my $i (0..$#columns) {
 #            my $field_idx = $field_idxs[$i];
 #            next unless $field_idx >= 0;
-#            next unless defined $tfu->[$field_idx];
-#            $data->[0][$i] .= " ($tfu->[$field_idx])";
+#            if ($tfl && defined $tfl->[$field_idx]) {
+#                $data->[0][$i] = $tfl->[$field_idx];
+#            } elsif ($tfu && defined $tfu->[$field_idx]) {
+#                # add field units as label suffix to header (" (UNIT)")
+#                $data->[0][$i] .= " ($tfu->[$field_idx])";
+#            }
 #        }
 #    }
 #
+#  FORMAT_CELLS:
 #    {
-#        my $tff   = $resmeta->{'table.fields'} or last;
-#        my $tffmt = $resmeta->{'table.field_formats'} or last;
+#        my $tffmt         = $resmeta->{'table.field_formats'};
+#        my $tffmt_code    = $resmeta->{'table.field_format_code'};
+#        my $tffmt_default = $resmeta->{'table.default_field_format'};
+#        last unless $tffmt || $tffmt_code || $tffmt_default;
 #
-#        my (@fmt_names, @fmt_opts); 
+#        my (@fmt_names, @fmt_opts); # key: column index
 #        for my $i (0..$#columns) {
 #            my $field_idx = $field_idxs[$i];
-#            next unless $field_idx >= 0;
-#            next unless defined $tffmt->[$field_idx];
-#            if (ref($tffmt->[$field_idx]) eq 'ARRAY') {
-#                $fmt_names[$i] = $tffmt->[$field_idx][0];
-#                $fmt_opts [$i] = $tffmt->[$field_idx][1] // {};
+#            my $fmt = $tffmt_code ? $tffmt_code->($columns[$i]) : undef;
+#            $fmt //= $tffmt->[$field_idx] if $field_idx >= 0;
+#            $fmt //= $tffmt_default;
+#            if (ref $fmt eq 'ARRAY') {
+#                $fmt_names[$i] = $fmt->[0];
+#                $fmt_opts [$i] = $fmt->[1] // {};
 #            } else {
-#                $fmt_names[$i] = $tffmt->[$field_idx];
+#                $fmt_names[$i] = $fmt;
 #                $fmt_opts [$i] = {};
 #            }
 #        }
@@ -2932,18 +5667,18 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #            my $row = $data->[$i];
 #            for my $j (0..$#columns) {
 #                next unless defined $row->[$j];
-#                my $field_idx = $field_idxs[$j];
-#                next unless $field_idx >= 0;
 #                my $fmt_name = $fmt_names[$j];
+#                #say "D:j=$j fmt_name=$fmt_name";
 #                next unless $fmt_name;
 #                my $fmt_opts = $fmt_opts [$j];
 #                if ($fmt_name eq 'iso8601_datetime' || $fmt_name eq 'iso8601_date') {
-#                    if ($row->[$j] =~ /\A[0-9]+\z/) {
+#                    if ($row->[$j] =~ /\A[0-9]+(\.[0-9]*)?\z/) {
+#                        my $frac = $1 ? "0$1"+0 : 0;
 #                        my @t = gmtime($row->[$j]);
 #                        if ($fmt_name eq 'iso8601_datetime') {
 #                            $row->[$j] = sprintf(
-#                                "%04d-%02d-%02dT%02d:%02d:%02dZ",
-#                                $t[5]+1900, $t[4]+1, $t[3], $t[2], $t[1], $t[0]);
+#                                "%04d-%02d-%02dT%02d:%02d:".($frac ? "%06.3f" : "%02d")."Z",
+#                                $t[5]+1900, $t[4]+1, $t[3], $t[2], $t[1], $t[0]+$frac);
 #                        } else {
 #                            $row->[$j] = sprintf(
 #                                "%04d-%02d-%02d",
@@ -2967,6 +5702,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #                            thousands_sep  => $fmt_opts->{thousands_sep} // ',',
 #                            decimal_point  => $fmt_opts->{decimal_point} // '.',
 #                            decimal_digits => $fmt_opts->{precision} // 0,
+#                            # XXX decimal_fill
 #                        });
 #                }
 #            }
@@ -2974,20 +5710,28 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #    }
 #
 #    if ($format eq 'text-pretty') {
+#      ALIGN_COLUMNS:
 #        {
+#            # XXX we just want to turn off 'uninitialized' and 'negative repeat
+#            # count does nothing' from the operator x
 #            no warnings;
 #
-#            my $tfa = $resmeta->{'table.field_aligns'} or last;
+#            my $tfa         = $resmeta->{'table.field_aligns'};
+#            my $tfa_code    = $resmeta->{'table.field_align_code'};
+#            my $tfa_default = $resmeta->{'table.default_field_align'};
+#            last unless $tfa || $tfa_code || $tfa_default;
 #            last unless @$data;
 #
 #            for my $colidx (0..$#columns) {
 #                my $field_idx = $field_idxs[$colidx];
-#                next unless $field_idx >= 0;
-#                my $align = $tfa->[$field_idx];
+#                my $align = $tfa_code ? $tfa_code->($columns[$colidx]) : undef;
+#                $align //= $tfa->[$field_idx] if $field_idx >= 0;
+#                $align //= $tfa_default;
 #                next unless $align;
 #
+#                # determine max widths
 #                my $maxw;
-#                my ($maxw_bd, $maxw_d, $maxw_ad); 
+#                my ($maxw_bd, $maxw_d, $maxw_ad); # before digit, digit, after d
 #                if ($align eq 'number') {
 #                    my (@w_bd, @w_d, @w_ad);
 #                    for my $i (0..$#{$data}) {
@@ -3000,14 +5744,17 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #                                push @w_bd, 0;
 #                                push @w_ad, 0;
 #                            } elsif ($cell =~ /\A([+-]?\d+)(\.?)(\d*)\z/) {
+#                                # decimal notation number
 #                                push @w_bd, length($1);
 #                                push @w_d , length($2);
 #                                push @w_ad, length($3);
 #                            } elsif ($cell =~ /\A([+-]?\d+\.?\d*)([eE])([+-]?\d+)\z/) {
+#                                # scientific notation number
 #                                push @w_bd, length($1);
 #                                push @w_d , length($2);
 #                                push @w_ad, length($3);
 #                            } else {
+#                                # not a number
 #                                push @w_bd, length($cell);
 #                                push @w_bd, 0;
 #                                push @w_ad, 0;
@@ -3033,6 +5780,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #                    @$_ > $colidx ? length($_->[$colidx]) : 0
 #                } @$data);
 #
+#                # do the alignment
 #                for my $i (0..$#{$data}) {
 #                    my $row = $data->[$i];
 #                    for my $i (0..$#{$data}) {
@@ -3068,14 +5816,15 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #                            my $n = int(($maxw-$w)/2);
 #                            $cell = (' ' x $n) . $cell . (' ' x ($maxw-$w-$n));
 #                        } else {
+#                            # assumed left
 #                            $cell .= (' ' x ($maxw - length($cell)));
 #
 #                        }
 #                        $row->[$colidx] = $cell;
 #                    }
 #                }
-#            } 
-#        } 
+#            } # for $colidx
+#        } # END align columns
 #
 #        my $fres;
 #        if (my $backend = $ENV{FORMAT_PRETTY_TABLE_BACKEND}) {
@@ -3185,6 +5934,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #                unshift @$data, ["key", "value"];
 #                return __gen_table($data, 1, $res->[3], $format);
 #            } elsif (Data::Check::Structure::is_aohos($data, {max=>$max})) {
+#                # collect all mentioned fields
 #                my @fieldnames;
 #                if ($res->[3] && $res->[3]{'table.fields'} &&
 #                        $res->[3]{'table.hide_unknown_fields'}) {
@@ -3218,6 +5968,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #        } elsif (eval { require Data::Dump; 1 }) {
 #            return Data::Dump::dump($res);
 #        } else {
+#            no warnings 'once';
 #            require Data::Dumper;
 #            local $Data::Dumper::Terse = 1;
 #            local $Data::Dumper::Indent = 1;
@@ -3252,14 +6003,91 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #}
 #
 #1;
+## ABSTRACT: Format enveloped result
 #
 #__END__
 #
+#=pod
+#
+#=encoding UTF-8
+#
+#=head1 NAME
+#
+#Perinci::Result::Format::Lite - Format enveloped result
+#
+#=head1 VERSION
+#
+#This document describes version 0.274 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2018-07-04.
+#
+#=head1 SYNOPSIS
+#
+#=head1 DESCRIPTION
+#
+#=for Pod::Coverage ^(firstidx)$
+#
+#=head1 FUNCTIONS
+#
+#=head2 format($res, $format[ , $is_naked=0, $cleanse=1 ]) => str
+#
+#=head1 ENVIRONMENT
+#
+#=head2 FORMAT_PRETTY_TABLE_BACKEND => str
+#
+#If this is set, will render text table using L<Text::Table::Any> (with
+#C<backend> set to the value of this environment variable) instead of the default
+#L<Text::Table::Tiny>. This is useful if you want to output text table in a
+#different format, for example to generate Org tables (make sure
+#L<Text::Table::Org> backend is already installed):
+#
+# % FORMAT_PRETTY_TABLE_BACKEND=Text::Table::Org lcpan rdeps Getopt::Lucid
+#
+#=head2 FORMAT_PRETTY_TABLE_COLUMN_ORDERS => array (json)
+#
+#Set the default of C<table_column_orders> in C<format_options> in result
+#metadata, similar to what's implemented in L<Perinci::Result::Format> and
+#L<Data::Format::Pretty::Console>.
+#
+#=head2 COLOR => bool
+#
+#=head1 HOMEPAGE
+#
+#Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Result-Format-Lite>.
+#
+#=head1 SOURCE
+#
+#Source repository is at L<https://github.com/perlancar/perl-Perinci-Result-Format-Lite>.
+#
+#=head1 BUGS
+#
+#Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Result-Format-Lite>
+#
+#When submitting a bug or request, please include a test-file or a
+#patch to an existing test-file that illustrates the bug or desired
+#feature.
+#
+#=head1 SEE ALSO
+#
+#L<Perinci::Result::Format>, a more heavyweight version of this module.
+#
+#L<Perinci::CmdLine::Lite> uses this module to format enveloped result.
+#
+#=head1 AUTHOR
+#
+#perlancar <perlancar@cpan.org>
+#
+#=head1 COPYRIGHT AND LICENSE
+#
+#This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+#
+#This is free software; you can redistribute it and/or modify it under
+#the same terms as the Perl 5 programming language system itself.
+#
+#=cut
 ### Perinci/Sub/Normalize.pm ###
 #package Perinci::Sub::Normalize;
 #
-#our $DATE = '2016-12-11'; 
-#our $VERSION = '0.19'; 
+#our $DATE = '2018-09-10'; # DATE
+#our $VERSION = '0.200'; # VERSION
 #
 #use 5.010001;
 #use strict;
@@ -3299,6 +6127,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #
 #        my $nk = "$prop" . (defined($attr) ? ".$attr" : "");
 #
+#        # strip property/attr started with _
 #        if ($prop =~ /\A_/ || defined($attr) && $attr =~ /\A_|\._/) {
 #            unless ($opt_rip) {
 #                $nmeta->{$nk} = $meta->{$k};
@@ -3308,10 +6137,12 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #
 #        my $prop_proplist = $proplist->{$prop};
 #
+#        # try to load module that declare new props first
 #        if (!$opt_aup && !$prop_proplist) {
 #            $modprefix //= $prefix;
 #            my $mod = "Perinci/Sub/Property$modprefix/$prop.pm";
 #            eval { require $mod };
+#            # hide technical error message from require()
 #            if ($@) {
 #                die "Unknown property '$prefix/$prop' (and couldn't ".
 #                    "load property module '$mod'): $@" if $@;
@@ -3374,7 +6205,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #                );
 #            }
 #        } else {
-#            if ($k eq 'schema' && $opt_nss) { 
+#            if ($k eq 'schema' && $opt_nss) { # XXX currently hardcoded
 #                require Data::Sah::Normalize;
 #                $nmeta->{$nk} = Data::Sah::Normalize::normalize_schema(
 #                    $meta->{$k});
@@ -3405,14 +6236,94 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #}
 #
 #1;
+## ABSTRACT: Normalize Rinci function metadata
 #
 #__END__
 #
+#=pod
+#
+#=encoding UTF-8
+#
+#=head1 NAME
+#
+#Perinci::Sub::Normalize - Normalize Rinci function metadata
+#
+#=head1 VERSION
+#
+#This document describes version 0.200 of Perinci::Sub::Normalize (from Perl distribution Perinci-Sub-Normalize), released on 2018-09-10.
+#
+#=head1 SYNOPSIS
+#
+# use Perinci::Sub::Normalize qw(normalize_function_metadata);
+#
+# my $nmeta = normalize_function_metadata($meta);
+#
+#=head1 FUNCTIONS
+#
+#=head2 normalize_function_metadata($meta[ , \%opts ]) => HASH
+#
+#Normalize and check L<Rinci> function metadata C<$meta>. Return normalized
+#metadata, which is a shallow copy of C<$meta>. Die on error.
+#
+#Available options:
+#
+#=over
+#
+#=item * allow_unknown_properties => BOOL (default: 0)
+#
+#If set to true, will die if there are unknown properties.
+#
+#=item * normalize_sah_schemas => BOOL (default: 1)
+#
+#By default, L<Sah> schemas e.g. in C<result/schema> or C<args/*/schema> property
+#is normalized using L<Data::Sah>'s C<normalize_schema>. Set this to 0 if you
+#don't want this.
+#
+#=item * remove_internal_properties => BOOL (default: 0)
+#
+#If set to 1, all properties and attributes starting with underscore (C<_>) with
+#will be stripped. According to L<DefHash> specification, they are ignored and
+#usually contain notes/comments/extra information.
+#
+#=back
+#
+#=head1 HOMEPAGE
+#
+#Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Sub-Normalize>.
+#
+#=head1 SOURCE
+#
+#Source repository is at L<https://github.com/perlancar/perl-Perinci-Sub-Normalize>.
+#
+#=head1 BUGS
+#
+#Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-Normalize>
+#
+#When submitting a bug or request, please include a test-file or a
+#patch to an existing test-file that illustrates the bug or desired
+#feature.
+#
+#=head1 SEE ALSO
+#
+#L<Rinci::function>
+#
+#=head1 AUTHOR
+#
+#perlancar <perlancar@cpan.org>
+#
+#=head1 COPYRIGHT AND LICENSE
+#
+#This software is copyright (c) 2018, 2016, 2015, 2014 by perlancar@cpan.org.
+#
+#This is free software; you can redistribute it and/or modify it under
+#the same terms as the Perl 5 programming language system itself.
+#
+#=cut
 ### Sah/Schema/rinci/function_meta.pm ###
 #package Sah::Schema::rinci::function_meta;
 #
-#our $DATE = '2016-12-26'; 
-#our $VERSION = '1.1.82.2'; 
+#our $DATE = '2019-05-24'; # DATE
+#our $VERSION = '1.1.90.0'; # VERSION
 #
 #use 5.010001;
 #use strict;
@@ -3424,10 +6335,12 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #our $schema = [hash => {
 #    summary => 'Rinci function metadata',
 #
+#    # tmp
 #    _ver => 1.1,
 #    _prop => {
 #        %Sah::Schema::rinci::meta::_dh_props,
 #
+#        # from common rinci metadata
 #        entity_v => {},
 #        entity_date => {},
 #        links => {},
@@ -3439,6 +6352,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #            _value_prop => {
 #                %Sah::Schema::rinci::meta::_dh_props,
 #
+#                # common rinci metadata
 #                links => {},
 #
 #                schema => {},
@@ -3446,7 +6360,8 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #                default => {},
 #                req => {},
 #                pos => {},
-#                greedy => {},
+#                slurpy => {},
+#                greedy => {}, # old alias for slurpy, will be removed in Rinci 1.2
 #                partial => {},
 #                stream => {},
 #                is_password => {},
@@ -3475,6 +6390,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #                        none => {},
 #                    },
 #                },
+#                examples => {},
 #            },
 #        },
 #        args_as => {},
@@ -3486,6 +6402,7 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #                schema => {},
 #                statuses => {
 #                    _value_prop => {
+#                        # from defhash
 #                        summary => {},
 #                        description => {},
 #                        schema => {},
@@ -3540,24 +6457,211 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #$schema->[1]{_prop}{args}{_value_prop}{meta} = $schema->[1];
 #$schema->[1]{_prop}{args}{_value_prop}{element_meta} = $schema->[1];
 #
+## just so the dzil plugin won't complain about schema not being normalized.
+## because this is a circular structure and normalizing creates a shallow copy.
 #
 #$schema = Data::Sah::Normalize::normalize_schema($schema);
 #
 #1;
+## ABSTRACT: Rinci function metadata
 #
 #__END__
 #
+#=pod
+#
+#=encoding UTF-8
+#
+#=head1 NAME
+#
+#Sah::Schema::rinci::function_meta - Rinci function metadata
+#
+#=head1 VERSION
+#
+#This document describes version 1.1.90.0 of Sah::Schema::rinci::function_meta (from Perl distribution Sah-Schemas-Rinci), released on 2019-05-24.
+#
+#=head1 HOMEPAGE
+#
+#Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schemas-Rinci>.
+#
+#=head1 SOURCE
+#
+#Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Rinci>.
+#
+#=head1 BUGS
+#
+#Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Rinci>
+#
+#When submitting a bug or request, please include a test-file or a
+#patch to an existing test-file that illustrates the bug or desired
+#feature.
+#
+#=head1 AUTHOR
+#
+#perlancar <perlancar@cpan.org>
+#
+#=head1 COPYRIGHT AND LICENSE
+#
+#This software is copyright (c) 2019, 2018, 2016 by perlancar@cpan.org.
+#
+#This is free software; you can redistribute it and/or modify it under
+#the same terms as the Perl 5 programming language system itself.
+#
+#=cut
+### Scalar/Util/Numeric/PP.pm ###
+#package Scalar::Util::Numeric::PP;
+#
+#our $DATE = '2016-01-22'; # DATE
+#our $VERSION = '0.04'; # VERSION
+#
+#use 5.010001;
+#use strict;
+#use warnings;
+#
+#require Exporter;
+#our @ISA       = qw(Exporter);
+#our @EXPORT_OK = qw(
+#                       isint
+#                       isnum
+#                       isnan
+#                       isinf
+#                       isneg
+#                       isfloat
+#               );
+#
+#sub isint {
+#    local $_ = shift;
+#    return 0 unless defined;
+#    return 1 if /\A\s*[+-]?(?:0|[1-9][0-9]*)\s*\z/s;
+#    0;
+#}
+#
+#sub isnan($) {
+#    local $_ = shift;
+#    return 0 unless defined;
+#    return 1 if /\A\s*[+-]?nan\s*\z/is;
+#    0;
+#}
+#
+#sub isinf($) {
+#    local $_ = shift;
+#    return 0 unless defined;
+#    return 1 if /\A\s*[+-]?inf(?:inity)?\s*\z/is;
+#    0;
+#}
+#
+#sub isneg($) {
+#    local $_ = shift;
+#    return 0 unless defined;
+#    return 1 if /\A\s*-/;
+#    0;
+#}
+#
+#sub isnum($) {
+#    local $_ = shift;
+#    return 0 unless defined;
+#    return 1 if isint($_);
+#    return 1 if isfloat($_);
+#    0;
+#}
+#
+#sub isfloat($) {
+#    local $_ = shift;
+#    return 0 unless defined;
+#    return 1 if /\A\s*[+-]?
+#                 (?: (?:0|[1-9][0-9]*)(\.[0-9]+)? | (\.[0-9]+) )
+#                 ([eE][+-]?[0-9]+)?\s*\z/sx && $1 || $2 || $3;
+#    return 1 if isnan($_) || isinf($_);
+#    0;
+#}
+#
+#1;
+## ABSTRACT: Pure-perl drop-in replacement/approximation of Scalar::Util::Numeric
+#
+#__END__
+#
+#=pod
+#
+#=encoding UTF-8
+#
+#=head1 NAME
+#
+#Scalar::Util::Numeric::PP - Pure-perl drop-in replacement/approximation of Scalar::Util::Numeric
+#
+#=head1 VERSION
+#
+#This document describes version 0.04 of Scalar::Util::Numeric::PP (from Perl distribution Scalar-Util-Numeric-PP), released on 2016-01-22.
+#
+#=head1 SYNOPSIS
+#
+#=head1 DESCRIPTION
+#
+#This module is written mainly for the convenience of L<Data::Sah>, as a drop-in
+#pure-perl replacement for the XS module L<Scalar::Util::Numeric>, in the case
+#when Data::Sah needs to generate code that uses PP modules instead of XS ones.
+#
+#Not all functions from Scalar::Util::Numeric have been provided.
+#
+#=head1 FUNCTIONS
+#
+#=head2 isint
+#
+#=head2 isfloat
+#
+#=head2 isnum
+#
+#=head2 isneg
+#
+#=head2 isinf
+#
+#=head2 isnan
+#
+#=head1 HOMEPAGE
+#
+#Please visit the project's homepage at L<https://metacpan.org/release/Scalar-Util-Numeric-PP>.
+#
+#=head1 SOURCE
+#
+#Source repository is at L<https://github.com/perlancar/perl-Scalar-Util-Numeric-PP>.
+#
+#=head1 BUGS
+#
+#Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Scalar-Util-Numeric-PP>
+#
+#When submitting a bug or request, please include a test-file or a
+#patch to an existing test-file that illustrates the bug or desired
+#feature.
+#
+#=head1 SEE ALSO
+#
+#L<Data::Sah>
+#
+#L<Scalar::Util::Numeric>
+#
+#=head1 AUTHOR
+#
+#perlancar <perlancar@cpan.org>
+#
+#=head1 COPYRIGHT AND LICENSE
+#
+#This software is copyright (c) 2016 by perlancar@cpan.org.
+#
+#This is free software; you can redistribute it and/or modify it under
+#the same terms as the Perl 5 programming language system itself.
+#
+#=cut
 ### Text/Table/Tiny.pm ###
 #use 5.006;
 #use strict;
 #use warnings;
 #package Text::Table::Tiny;
-#$Text::Table::Tiny::VERSION = '0.04';
+#$Text::Table::Tiny::VERSION = '0.05';
 #use parent 'Exporter';
 #use List::Util qw();
+#use Carp qw/ croak /;
 #
 #our @EXPORT_OK = qw/ generate_table /;
 #
+## ABSTRACT: makes simple tables from two-dimensional arrays, with limited templating options
 #
 #
 #our $COLUMN_SEPARATOR = '|';
@@ -3569,18 +6673,22 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #sub generate_table {
 #
 #    my %params = @_;
-#    my $rows = $params{rows} or die "Must provide rows!";
+#    my $rows = $params{rows} or croak "generate_table(): you must pass the 'rows' argument!";
 #
+#    # foreach col, get the biggest width
 #    my $widths = _maxwidths($rows);
 #    my $max_index = _max_array_index($rows);
 #
+#    # use that to get the field format and separators
 #    my $format = _get_format($widths);
 #    my $row_sep = _get_row_separator($widths);
 #    my $head_row_sep = _get_header_row_separator($widths);
 #
+#    # here we go...
 #    my @table;
-#    push @table, $row_sep;
+#    push(@table, $row_sep) unless $params{top_and_tail};
 #
+#    # if the first row's a header:
 #    my $data_begins = 0;
 #    if ( $params{header_row} ) {
 #        my $header_row = $rows->[0];
@@ -3592,34 +6700,41 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #        push @table, $params{separate_rows} ? $head_row_sep : $row_sep;
 #    }
 #
+#    # then the data
+#    my $row_number = 0;
+#    my $last_line_number = int(@$rows);
+#    $last_line_number-- if $params{header_row};
 #    foreach my $row ( @{ $rows }[$data_begins..$#$rows] ) {
-#        push @table, sprintf(
-#	    $format, 
-#	    map { defined($row->[$_]) ? $row->[$_] : '' } (0..$max_index)
-#	);
-#        push @table, $row_sep if $params{separate_rows};
+#        $row_number++;
+#        push(@table, sprintf(
+#                             $format, 
+#                             map { defined($row->[$_]) ? $row->[$_] : '' } (0..$max_index)
+#                            ));
+#
+#        push(@table, $row_sep) if $params{separate_rows} && (!$params{top_and_tail} || $row_number < $last_line_number);
+#
 #    }
 #
-#    push @table, $row_sep unless $params{separate_rows};
+#    # this will have already done the bottom if called explicitly
+#    push(@table, $row_sep) unless $params{separate_rows} || $params{top_and_tail};
 #    return join("\n",grep {$_} @table);
 #}
 #
-#sub _get_cols_and_rows ($) {
-#    my $rows = shift;
-#    return ( List::Util::max( map { scalar @$_ } @$rows), scalar @$rows);
-#}
 #
 #sub _maxwidths {
 #    my $rows = shift;
+#    # what's the longest array in this list of arrays?
 #    my $max_index = _max_array_index($rows);
 #    my $widths = [];
 #    for my $i (0..$max_index) {
+#        # go through the $i-th element of each array, find the longest
 #        my $max = List::Util::max(map {defined $$_[$i] ? length($$_[$i]) : 0} @$rows);
 #        push @$widths, $max;
 #    }
 #    return $widths;
 #}
 #
+## return highest top-index from all rows in case they're different lengths
 #sub _max_array_index {
 #    my $rows = shift;
 #    return List::Util::max( map { $#$_ } @$rows );
@@ -3640,10 +6755,200 @@ Text/Table/Tiny.pm,94447,2733,13;2964
 #    return "$HEADER_CORNER_MARKER$HEADER_ROW_SEPARATOR".join("$HEADER_ROW_SEPARATOR$HEADER_CORNER_MARKER$HEADER_ROW_SEPARATOR",map { $HEADER_ROW_SEPARATOR x $_ } @$widths)."$HEADER_ROW_SEPARATOR$HEADER_CORNER_MARKER";
 #}
 #
+## Back-compat: 'table' is an alias for 'generate_table', but isn't exported
 #*table = \&generate_table;
 #
 #1;
 #
 #__END__
 #
+#=pod
 #
+#=head1 NAME
+#
+#Text::Table::Tiny - simple text tables from 2D arrays, with limited templating options
+#
+#=head1 SYNOPSIS
+#
+#    use Text::Table::Tiny 0.04 qw/ generate_table /;
+#
+#    my $rows = [
+#        # header row
+#        ['Name', 'Rank', 'Serial'],
+#        # rows
+#        ['alice', 'pvt', '123456'],
+#        ['bob',   'cpl', '98765321'],
+#        ['carol', 'brig gen', '8745'],
+#    ];
+#    print generate_table(rows => $rows, header_row => 1);
+#
+#
+#=head1 DESCRIPTION
+#
+#This module provides a single function, C<generate_table>, which formats
+#a two-dimensional array of data as a text table.
+#
+#The example shown in the SYNOPSIS generates the following table:
+#
+#    +-------+----------+----------+
+#    | Name  | Rank     | Serial   |
+#    +-------+----------+----------+
+#    | alice | pvt      | 123456   |
+#    | bob   | cpl      | 98765321 |
+#    | carol | brig gen | 8745     |
+#    +-------+----------+----------+
+#
+#B<NOTE>: the interface changed with version 0.04, so if you
+#use the C<generate_table()> function illustrated above,
+#then you need to require at least version 0.04 of this module,
+#as shown in the SYNOPSIS.
+#
+#
+#=head2 generate_table()
+#
+#The C<generate_table> function understands three arguments,
+#which are passed as a hash.
+#
+#=over 4
+#
+#
+#=item *
+#
+#rows
+#
+#Takes an array reference which should contain one or more rows
+#of data, where each row is an array reference.
+#
+#
+#=item *
+#
+#header_row
+#
+#If given a true value, the first row in the data will be interpreted
+#as a header row, and separated from the rest of the table with a ruled line.
+#
+#
+#=item *
+#
+#separate_rows
+#
+#If given a true value, a separator line will be drawn between every row in
+#the table,
+#and a thicker line will be used for the header separator.
+#
+#=item *
+#
+#top_and_tail
+#
+#If given a true value, then the top and bottom border lines will be skipped.
+#This reduces the vertical height of the generated table.
+#
+#=back
+#
+#
+#=head2 EXAMPLES
+#
+#If you just pass the data and no other options:
+#
+# generate_table(rows => $rows);
+#
+#You get minimal ruling:
+#
+#    +-------+----------+----------+
+#    | Name  | Rank     | Serial   |
+#    | alice | pvt      | 123456   |
+#    | bob   | cpl      | 98765321 |
+#    | carol | brig gen | 8745     |
+#    +-------+----------+----------+
+#
+#If you want lines between every row, and also want a separate header:
+#
+# generate_table(rows => $rows, header_row => 1, separate_rows => 1);
+#
+#You get the maximally ornate:
+#
+#    +-------+----------+----------+
+#    | Name  | Rank     | Serial   |
+#    O=======O==========O==========O
+#    | alice | pvt      | 123456   |
+#    +-------+----------+----------+
+#    | bob   | cpl      | 98765321 |
+#    +-------+----------+----------+
+#    | carol | brig gen | 8745     |
+#    +-------+----------+----------+
+#
+#=head1 FORMAT VARIABLES
+#
+#You can set a number of package variables inside the C<Text::Table::Tiny> package
+#to configure the appearance of the table.
+#This interface is likely to be deprecated in the future,
+#and some other mechanism provided.
+#
+#=over 4
+#
+#=item *
+#
+#$Text::Table::Tiny::COLUMN_SEPARATOR = '|';
+#
+#=item *
+#
+#$Text::Table::Tiny::ROW_SEPARATOR = '-';
+#
+#=item *
+#
+#$Text::Table::Tiny::CORNER_MARKER = '+';
+#
+#=item *
+#
+#$Text::Table::Tiny::HEADER_ROW_SEPARATOR = '=';
+#
+#=item *
+#
+#$Text::Table::Tiny::HEADER_CORNER_MARKER = 'O';
+#
+#=back
+#
+#
+#=head1 PREVIOUS INTERFACE
+#
+#Prior to version 0.04 this module provided a function called C<table()>,
+#which wasn't available for export. It took exactly the same arguments:
+#
+# use Text::Table::Tiny;
+# my $rows = [ ... ];
+# print Text::Table::Tiny::table(rows => $rows, separate_rows => 1, header_row => 1);
+#
+#For backwards compatibility this interface is still supported.
+#The C<table()> function isn't available for export though.
+#
+#
+#=head1 SEE ALSO
+#
+#There are many modules for formatting text tables on CPAN.
+#A good number of them are listed in the
+#L<See Also|https://metacpan.org/pod/Text::Table::Manifold#See-Also>
+#section of the documentation for L<Text::Table::Manifold>.
+#
+#
+#=head1 REPOSITORY
+#
+#L<https://github.com/neilb/Text-Table-Tiny>
+#
+#
+#=head1 AUTHOR
+#
+#Creighton Higgins <chiggins@chiggins.com>
+#
+#Now maintained by Neil Bowers <neilb@cpan.org>
+#
+#=head1 COPYRIGHT AND LICENSE
+#
+#This software is copyright (c) 2012 by Creighton Higgins.
+#
+#This is free software; you can redistribute it and/or modify it under
+#the same terms as the Perl 5 programming language system itself.
+#
+#=cut
+#
+### begin code_after_end
+### end code_after_end

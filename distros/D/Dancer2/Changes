@@ -1,3 +1,17 @@
+0.300004  2020-05-26 20:52:34-04:00 America/New_York
+
+    [ BUG FIXES ]
+    * GH #1509: Request instantiation fails throw 400 Bad Response (Russell
+      @veryrusty Jenkins). This resolves GH #1056, 1482, 1496, 1507, 1508,
+      and 1510.
+    
+    [ ENHANCEMENTS ]
+    * GH #1510: Test for proper multi-part form handing (ice-lenor, Sawyer X)
+    * GH #1547: Cookie SameSite support (Russell @veryrusty Jenkins)
+
+    [ DOCUMENTATION ]
+    * None
+
 0.300003  2020-04-09 10:39:55-04:00 America/New_York
 
     [ BUG FIXES ]

@@ -1,13 +1,31 @@
 NAME
-    Firefox::Util::Profile - List available Firefox profiles
+    Firefox::Util::Profile - Given a Firefox profile name, return its
+    directory
 
 VERSION
-    This document describes version 0.001 of Firefox::Util::Profile (from
-    Perl distribution Firefox-Util-Profile), released on 2020-04-18.
+    This document describes version 0.004 of Firefox::Util::Profile (from
+    Perl distribution Firefox-Util-Profile), released on 2020-05-24.
 
 SYNOPSIS
 DESCRIPTION
 FUNCTIONS
+  get_firefox_profile_dir
+    Usage:
+
+     get_firefox_profile_dir($profile) -> any
+
+    Given a Firefox profile name, return its directory.
+
+    Return undef if Firefox profile is unknown.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $profile* => *firefox::profile_name*
+
+    Return value: (any)
+
   list_firefox_profiles
     Usage:
 
@@ -18,7 +36,7 @@ FUNCTIONS
     This utility will read ~/.mozilla/firefox/profiles.ini and extracts the
     list of profiles.
 
-    This function is not exported.
+    This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
 
@@ -52,6 +70,12 @@ BUGS
 
 SEE ALSO
     Other "Firefox::Util::*" modules.
+
+    Chrome::Util::Profile
+
+    Vivaldi::Util::Profile
+
+    Opera::Util::Profile
 
 AUTHOR
     perlancar <perlancar@cpan.org>

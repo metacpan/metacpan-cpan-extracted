@@ -11,7 +11,12 @@ my $build = Module::Build->new(
         Test::Pod::Coverage => 0,
         Module::Build       => 0
     },
-
+    meta_merge => {
+        resources => {
+            homepage   => 'http://github.com/stockholmuniversity/Config-File',
+            repository => 'git://github.com/stockholmuniversity/Config-File.git'
+        },
+    },
     create_makefile_pl => 'passthrough'
 );
 $build->create_build_script;

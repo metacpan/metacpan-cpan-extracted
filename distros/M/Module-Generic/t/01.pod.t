@@ -1,4 +1,4 @@
-# -*- perl -*-
+#!/usr/bin/perl
 
 use Test::Pod tests => 9;
 

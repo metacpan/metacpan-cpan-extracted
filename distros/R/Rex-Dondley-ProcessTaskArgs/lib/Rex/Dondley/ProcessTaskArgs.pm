@@ -1,5 +1,5 @@
 package Rex::Dondley::ProcessTaskArgs ;
-$Rex::Dondley::ProcessTaskArgs::VERSION = '0.010';
+$Rex::Dondley::ProcessTaskArgs::VERSION = '0.012';
 use strict;
 use warnings;
 
@@ -40,13 +40,21 @@ sub process_task_args {
 
   # create a hash of valid and required keys
   # assumes all values are not required if @valid_args do not contain required value
+  my @ordered_keys;
   my %valid_keys = ();
   if ((exists $valid_args[1] && ($valid_args[1] !~ /^0|1$/)) || scalar @valid_args == 1) { # checks to see if list contains required values
     foreach my $arg (@valid_args) {
       $valid_keys{$arg} = 0;
+      @ordered_keys = @valid_args;
     }
   } else {
     %valid_keys = @valid_args;
+    my $count = 0;
+    foreach my $key (@valid_args) {
+      if (!($count++ % 2)) {
+        push @ordered_keys, $key;
+      }
+    }
   }
 
   # check to see if passed parameters are valid
@@ -100,7 +108,13 @@ sub process_task_args {
   my %return_hash = (%defaults, %passed_params);
 
 
-  return \%return_hash;
+
+  if (wantarray) {
+    my @blah = @return_hash{ @ordered_keys };
+    return @blah;
+  } else {
+    return \%return_hash;
+  }
 }
 # methods here
 
@@ -117,7 +131,7 @@ Rex::Dondley::ProcessTaskArgs - easier Rex task argument handling
 
 =head1 VERSION
 
-version 0.010
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -145,6 +159,10 @@ version 0.010
   task 'another_task' => sub {
     my $params = process_task_args( \@_, key1, key2 [ 'default_value_for_key1' ]);
   };
+
+  # Params can also be returned in an array. The returned order is the same as
+  # the order of the list of available keys.
+  my ($one, $two, $three) = process_task_args( \@_, one => 1, two => 2, three => 3 );
 
 =head1 DESCRIPTION
 
@@ -216,25 +234,26 @@ And the following command line command:
 
   rex some_task
 
-C<$params> will look like:
+C<$params> will be:
 
-  $params = { key1 => 'default_value_for_key1', key2 => undef };
+  { key1 => 'default_value_for_key1', key2 => undef };
 
 =head3 Example #2
 
 Given the following code:
 
   task 'another_task' => sub {
-    my $params = process_task_args( \@_, key1, key2 );
+    my ($key1, $key2) = process_task_args( \@_, key1, key2 [ 'default_value_for_key1' ] );
   };
 
 And the following command line command:
 
-  rex some_task some_value
+  rex some_task one two
 
-C<$params> will look like:
+C<$key1> will have a value of `one` and C<$key2> will have a value of `two`.
 
-  $params = { key1 => 'some_value', key2 => undef };
+This examples demonstrates that the function will return an array of values in
+an array context.
 
 =head3 Example #3
 
@@ -246,11 +265,27 @@ Given the following code:
 
 And the following command line command:
 
+  rex some_task some_value
+
+C<$params> will be:
+
+  { key1 => 'some_value', key2 => undef };
+
+=head3 Example #4
+
+Given the following code:
+
+  task 'another_task' => sub {
+    my $params = process_task_args( \@_, key1, key2 );
+  };
+
+And the following command line command:
+
   rex some_task some_value another_value
 
-C<$params> will look like:
+C<$params> will be:
 
-  $params = { key1 => 'some_value', key2 => another_value };
+  { key1 => 'some_value', key2 => another_value };
 
 =head3 Example #4
 
@@ -264,11 +299,11 @@ And the following command line command:
 
   rex some_task some_value --key1=another_value
 
-C<$params> will look like:
+C<$params> will be:
 
-  $params = { key1 => 'another_value', key2 => 'some_value' };
+  { key1 => 'another_value', key2 => 'some_value' };
 
-=head3 Example #5
+=head3 Example #6
 
 Given the following code:
 
@@ -284,7 +319,12 @@ B<ERROR!> because C<key2> is required and it was not supplied.
 
 =head1 FUNCTIONS
 
-=head2 process_task_args($array_ref, $available_key1 [ => 1|0 ], $available_key2 [ => 1|0 ], ..., [ $array_ref ];
+=head2 my $params = process_task_args($array_ref, $available_key1 [ => 1|0 ], $available_key2 [ => 1|0 ], ..., [ $array_ref ];
+=function my @values = process_task_args($array_ref, $available_key1 [ => 1|0 ], $available_key2 [ => 1|0 ], ..., [ $array_ref ];
+
+The function will return values with keys as a hash reference in a scalar
+contect or as array with just the value depending on context. See L</SYNOPSIS>
+and exmaples above for usage instructions.
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

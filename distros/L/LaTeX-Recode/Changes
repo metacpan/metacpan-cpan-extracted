@@ -1,12 +1,14 @@
 Revision history for perl module LaTeX::Recode
 
+0.05 2020-05-23
+
+ [ BUG FIXES ]
+ - fixed unescaped brace on regular expression
+
 0.04 2016-07-13
 
  [ ENHANCEMENTS ]
  - drop requirement for List::AllUtils and use only List::Util;
-
- [ BUG FIXES ]
- - add version to Perl module file;
 
 0.03 2016-07-11
 

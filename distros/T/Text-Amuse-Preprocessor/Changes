@@ -1,5 +1,9 @@
 Revision history for perl module Text-Amuse-Preprocessor
 
+0.62 2020-05-21
+
+ - Add support for Polish
+
 0.61 2019-03-19
 
  - Fix space-eating bug introduced by the new parsing

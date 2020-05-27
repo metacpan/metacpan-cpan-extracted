@@ -1,3 +1,70 @@
+0.7.5   2020-05-24  Released-By: PERLANCAR; Urgency: medium
+
+	- No spec changes.
+
+	- Split new() to WordListBase.
+
+	- [doc] Add more docs.
+
+
+0.7.4   2020-05-24  Released-By: PERLANCAR; Urgency: medium
+
+	- No spec changes.
+
+	- Improve reusability: abstract filehandle and original position in
+	  'fh' and 'fh_orig_pos' object attribute.
+
+
+0.7.3   2020-05-23  Released-By: PERLANCAR; Urgency: medium
+
+	- No spec changes.
+
+	- Implement each_word() in terms of first_word() and next_word() to
+	  reduce code duplication.
+
+
+0.7.2   2020-05-23  Released-By: PERLANCAR; Urgency: medium
+
+	- No spec changes.
+
+	- Add tests.
+
+
+0.7.1   2020-05-23  Released-By: PERLANCAR; Urgency: medium
+
+	- No spec changes.
+
+        - Use value from orig_class attribute to keep working when class/object
+          is mixed with roles into another package.
+
+	- [doc] WordListRole::WordList: Document the required methods.
+
+	- [doc] Add FAQ item about pick() returning '1'.
+
+	- [doc] Remove mention of WordListMod::* modules.
+
+
+0.7.0   2020-05-22  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+
+	- No spec changes.
+
+	- [incompatible] Change storage of object from inflexible array to
+	  flexible hash.
+
+
+0.6.2   2020-05-22  Released-By: PERLANCAR; Urgency: medium
+
+	- No spec changes.
+
+	- pick(): Don't die when allow_duplicates is set to true.
+
+
+0.6.1   2020-05-22  Released-By: PERLANCAR; Urgency: medium
+
+	- Specify that user can now instruct pick() to allow duplicates, by
+          setting the second argument to true.
+
+
 0.6.0   2020-05-04  Released-By: PERLANCAR; Urgency: medium
 
 	- Introduce parameterized wordlist; check for known and required
@@ -6,7 +73,10 @@
 
 0.5.3   2020-05-04  Released-By: PERLANCAR; Urgency: medium
 
-	- Add WordListRole::WordList, WordListRole::FirstNextResetFromEach, WordListRole::EachFromFirstNextReset.
+	- No spec changes.
+
+	- Add WordListRole::WordList, WordListRole::FirstNextResetFromEach,
+          WordListRole::EachFromFirstNextReset.
 
         - Add tests for dynamic wordlist.
 

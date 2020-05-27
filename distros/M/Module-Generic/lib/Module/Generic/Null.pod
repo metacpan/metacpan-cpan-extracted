@@ -19,6 +19,10 @@ Module::Generic::Null - Null Value Chaining Object Class
     # object is returned
     my $name = $object->customer->name;
 
+=head1 VERSION
+
+    v0.2.0
+
 =head1 DESCRIPTION
 
 Normally this call would have triggered a perl error like C<Cannot call method name on an undefined value>, but since L<Module::Generic/"error"> returns a L<Module::Generic::Null> object, the method B<name> here is called without triggering an error, and of course returns an L<Module::Generic::Null> object when being chained, or undef otherwise. Undefined value is the typical response one gets when an error occurred, so you can check like this :

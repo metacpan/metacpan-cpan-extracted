@@ -1,6 +1,6 @@
 
 package Shipment::Temando::WSDL::Elements::getRequestsRequiringBooking;
-$Shipment::Temando::WSDL::Elements::getRequestsRequiringBooking::VERSION = '3.04';
+$Shipment::Temando::WSDL::Elements::getRequestsRequiringBooking::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -55,7 +55,7 @@ Shipment::Temando::WSDL::Elements::getRequestsRequiringBooking
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 

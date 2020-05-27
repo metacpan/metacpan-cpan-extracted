@@ -1,4 +1,4 @@
-# -*- perl -*-
+#!/usr/bin/perl
 
 # t/03.hash.t - check for hash object
 

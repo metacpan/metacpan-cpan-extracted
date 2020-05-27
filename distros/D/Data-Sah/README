@@ -2,8 +2,8 @@ NAME
     Data::Sah - Fast and featureful data structure validation
 
 VERSION
-    This document describes version 0.907 of Data::Sah (from Perl
-    distribution Data-Sah), released on 2020-02-12.
+    This document describes version 0.908 of Data::Sah (from Perl
+    distribution Data-Sah), released on 2020-05-21.
 
 SYNOPSIS
     Non-OO interface:
@@ -165,11 +165,13 @@ MODULE ORGANIZATION
     of other Data::Sah modules, e.g. Data::Sah::Lang::en_US::Type::int or
     "Data::Sah::Lang::en_US::TypeX::str::is_palindrome".
 
-    Sah::Schema:: namespace is reserved for modules that contain bundles of
-    schemas. For example, "Sah::Schema::CPANMeta" contains the schema to
-    validate CPAN META.yml. Sah::Schema::Int contains various schemas for
-    integers such as "pos_int", "int8", "uint32". Sah::Schema::Sah contains
-    the schema for Sah schema itself.
+    Sah::Schema:: namespace is reserved for modules that contain schemas in
+    their $schema package variables. For example, Sah::Schema::posint.
+
+    Sah::Schemas::* are module names for distributions that bundle several
+    "Sah::Schema::*" modules. For example Sah::Schemas::Int contains various
+    schemas for integers such as Sah::Schema::uint, Sah::Schema::int8, and
+    so on.
 
     Sah::SchemaR:: namespace is reserved to store resolved version of
     schema. For example, Sah::Schema::unix::local_username contains the
@@ -505,6 +507,8 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    Data::Sah::Tiny, Params::Sah
+
    Other interpreted validators
     Params::Validate is very fast, although minimal. Data::Rx, Kwalify,
     Data::Verifier, Data::Validator, JSON::Schema, Validation::Class.

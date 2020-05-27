@@ -7,6 +7,35 @@ Home page:    <https://metacpan.org/release/App-Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.1.1	2020-05-21
+
+ [ Test Suite ]
+ - drop tricky and superfluous exception test
+
+v3.1.0	2020-05-21
+
+ [ SECURITY ]
+ - Fix: avoid uninitialized value in local Apache-and-BSD pattern
+   Sandro Mani++
+
+ [ Test Suite ]
+ - check detection of generated file
+ - check detection of incorrect FSF postal address
+ - update author tests
+ - update to reflect changed markup of flaws
+
+ [ Packaging ]
+ - fix test-require (not only runtime-require) strictures
+ - tighten to require more recent Regexp::Pattern::License
+
+ [ Other ]
+ - Added: enclose flaws with square brackets (not parens, now used for
+   details of some flaws) in legacy output
+ - detect exceptions, tracked as objects
+ - streamline and improve detection of generated file
+ - streamline and improve detection of incorrect FSF postal address
+ - track detected flaws as objects
+
 v3.0.47	2020-05-17
 
  [ Bug Fixes ]

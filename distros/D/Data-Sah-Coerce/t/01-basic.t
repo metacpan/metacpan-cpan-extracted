@@ -22,7 +22,22 @@ sub test_no_dupes {
     }
 }
 
-# XXX check no duplicates in $rules
+subtest "rule args" => sub {
+    my $c_pl;
+
+    $c_pl = Data::Sah::Coerce::gen_coercer(
+        type=>"bool", return_type=>"bool_coerced+val",
+        coerce_rules=>[["From_str::common_words", {ci=>1}]]);
+    is_deeply($c_pl->("ON"), [1, 1]);
+    is_deeply($c_pl->("on"), [1, 1]);
+
+    $c_pl = Data::Sah::Coerce::gen_coercer(
+        type=>"bool", return_type=>"bool_coerced+val",
+        coerce_rules=>[["From_str::common_words", {ci=>0}]]);
+    is_deeply($c_pl->("ON"), [1, "ON"]);
+    is_deeply($c_pl->("on"), [1, 1]);
+};
+
 subtest "opt:coerce_rules" => sub {
     subtest "unknown name -> dies" => sub {
         dies_ok {
@@ -164,4 +179,5 @@ subtest "opt:return_type=bool_coerced+str_errmsg+val" => sub {
     };
 };
 
+DONE_TESTING:
 done_testing;

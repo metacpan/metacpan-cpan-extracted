@@ -53,6 +53,7 @@ do { my $x = {
                                    'Module::Metadata' => '0',
                                    'Plack::Test' => '0',
                                    'Test::More' => '0',
+                                   'open' => '0',
                                    'perl' => '5.013002'
                                  }
                  }

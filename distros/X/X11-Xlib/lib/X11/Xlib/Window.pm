@@ -4,7 +4,7 @@ use warnings;
 use parent 'X11::Xlib::XID';
 
 # All modules in dist share a version
-BEGIN { our $VERSION= $X11::Xlib::VERSION; }
+our $VERSION = '0.20';
 
 sub clear_all {
     delete @{$_[0]}{qw( attributes )};
@@ -234,7 +234,7 @@ Michael Conrad, E<lt>mike@nrdvana.netE<gt>
 
 Copyright (C) 2009-2010 by Olivier Thauvin
 
-Copyright (C) 2017 by Michael Conrad
+Copyright (C) 2017-2020 by Michael Conrad
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

@@ -1,0 +1,15 @@
+CHANGES
+LICENSE.md
+MANIFEST
+Makefile.PL
+README.md
+cpanfile
+lib/Role/Declare.pm
+lib/Role/Declare.pod
+lib/Role/Declare/StrictWith.pm
+t/role-declare.t
+t/shorthands.t
+xt/kwalitee.t
+xt/manifest.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

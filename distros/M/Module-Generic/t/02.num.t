@@ -1,16 +1,112 @@
-# -*- perl -*-
+#!/usr/bin/perl
 
 # t/02.num.t - check for number object
 
-use Test::More qw( no_plan );
-use strict;
-use warnings;
-use utf8;
+BEGIN
+{
+    use Test::More qw( no_plan );
+    use strict;
+    use warnings;
+    use utf8;
+    use File::Which;
+    use POSIX ();
+    use open ':std' => ':utf8';
+
+    my %old = %ENV;
+    my @rem = qw( LANG LANGUAGE LC_ADDRESS LC_ALL LC_COLLATE LC_CTYPE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE LC_TIME );
+    for( @rem )
+    {
+        #$ENV{$_} = undef();
+        delete( $ENV{$_} );
+    }
+    # no warnings 'uninitialized';
+    ## POSIX::setlocale( &POSIX::LC_ALL, undef() );
+    ## XXX To be removed before release
+    #use Data::Dumper;
+    #$Data::Dumper::Sortkeys = 1;
+};
+
+# diag( "Environment variables: ", Dumper( \%ENV ) );
 
 BEGIN { use_ok( 'Module::Generic' ) || BAIL_OUT( "Unable to load Module::Generic" ); }
 
-my $n = Module::Generic::Number->new( 10 );
+## RT #132674
+## Stupid me. I should compare the result to the locale variables unless they are explicitely set
+## my $prev_locale = POSIX::setlocale( &POSIX::LC_ALL );
+## my $new_loc = POSIX::setlocale( &POSIX::LC_ALL, 'de_DE' );
+my $lconv = POSIX::localeconv();
+#         my $fail = [qw(
+# frac_digits
+# int_frac_digits
+# n_cs_precedes
+# n_sep_by_space
+# n_sign_posn
+# p_cs_precedes
+# p_sep_by_space
+# p_sign_posn
+#         )];
+#         @$lconv{ @$fail } = ( -1 ) x scalar( @$fail );
+## POSIX::setlocale( &POSIX::LC_ALL, $prev_locale );
+my( $sep_space, $tho_sep, $dec_sep );
+if( scalar( keys( %$lconv ) ) )
+{
+    $sep_space = $lconv->{p_sep_by_space} > 0 ? qr/[[:blank:]\h]+/ : '';
+    $tho_sep = CORE::length( $lconv->{thousands_sep} )
+        ? $lconv->{thousands_sep} 
+        : $lconv->{mon_thousands_sep};
+    $dec_sep = CORE::length( $lconv->{decimal_point} )
+        ? $lconv->{decimal_point}
+        : $lconv->{mon_decimal_point};
+}
+else
+{
+    diag( "No locale could be found for language \"$ENV{LANG}\"" );
+}
+my $n = Module::Generic::Number->new( 10, precision => 2, debug => 0 );
+if( !defined( $n ) )
+{
+    diag( "Error: '$Module::Generic::Number::ERROR'" );
+    BAIL_OUT( Module::Generic::Number->error );
+}
+# diag( "Space between symbol and number is '", $n->space, "'." );
+# my $lconv_debug = '';
+# foreach my $property (qw(
+#         decimal_point
+#         thousands_sep
+#         grouping
+#         int_curr_symbol
+#         currency_symbol
+#         mon_decimal_point
+#         mon_thousands_sep
+#         mon_grouping
+#         positive_sign
+#         negative_sign
+#         int_frac_digits
+#         frac_digits
+#         p_cs_precedes
+#         p_sep_by_space
+#         n_cs_precedes
+#         n_sep_by_space
+#         p_sign_posn
+#         n_sign_posn
+#         int_p_cs_precedes
+#         int_p_sep_by_space
+#         int_n_cs_precedes
+#         int_n_sep_by_space
+#         int_p_sign_posn
+#         int_n_sign_posn
+# ))
+# {
+#     my $dots = ( '.' x ( 20 - length( $property ) ) );
+#     $lconv_debug .= sprintf( qq(%s ${dots}: "%s" (%s) (%d bytes),\n),
+#         $property, $lconv->{$property}, defined( $lconv->{$property} ) ? 'defined' : 'undefined', length( $lconv->{$property} ) );
+# }
+# diag( "Locale formatting properties are:\n$lconv_debug" );
+my $new_loc = $n->lang;
+## diag( "New locale is $new_loc" );
 my $n2 = $n->clone;
+is( $n2->locale, $new_loc, "Locale is kept with cloning" );
+$n2->symbol( '€' );
 
 no warnings;
 my $n_fail = Module::Generic::Number->new( 'USD One' );
@@ -19,12 +115,33 @@ use warnings;
 is( $n_fail, undef, 'Invalid number' );
 
 # Creating object from locale
-my $n_loc = Module::Generic::Number->new( 100, { lang => 'fr_FR', precede => 1 });
-isa_ok( $n_loc, 'Module::Generic::Number', 'Object with locale language string' );
-is( $n_loc->precision, 2, 'French precision => 2' );
-is( $n_loc->thousand, ' ', 'French thousand separator => space' );
-is( $n_loc->decimal, ',', 'French decimal separator => comma' );
-
+SKIP:
+{
+    my( @paths ) = File::Which::which( 'locale' );
+    # diag( sprintf( "%d locale executable found", scalar( @paths ) ) );
+    my @ok_langs;
+    foreach my $p ( @paths )
+    {
+        ( @ok_langs ) = eval
+        {
+            qx( $p -a );
+        };
+        last if( !$@ );
+    }
+    # diag( sprintf( "Found %d languages available on the system.", scalar( @ok_langs ) ) );
+    if( !scalar( @ok_langs ) || !scalar( grep( /^fr_FR/, @ok_langs ) ) )
+    {
+        skip( 'Unsupported language', 4 );
+    }
+    my $n_loc = Module::Generic::Number->new( 100, { lang => 'fr_FR', precede => 1, debug => 0 });
+    isa_ok( $n_loc, 'Module::Generic::Number', 'Object with locale language string' );
+    is( $n_loc->precision, 2, 'French precision => 2' );
+    ## RT #132667
+    ## https://perldoc.perl.org/5.10.1/perlrecharclass.html
+    ## [:blank:] does not catch non-breaking space, but horizontal space \h does
+    like( $n_loc->thousand, qr/[[:blank:]\h]+/, 'French thousand separator => space' );
+    is( $n_loc->decimal, ',', 'French decimal separator => comma' );
+};
 isa_ok( $n, 'Module::Generic::Number', 'Number Class Object' );
 isa_ok( $n2, 'Module::Generic::Number', 'Cloning object' );
 is( "$n", 10, 'Stringification' );
@@ -89,55 +206,77 @@ isa_ok( $n, 'Module::Generic::Number', 'Number regexp check after concatenation'
 is( $n .= 'X', '1281284X', 'String concatenation with non-number' );
 isa_ok( $n, 'Module::Generic::Scalar', 'Regexp check after concatenation and class -> Module::Generic::Scalar' );
 
-is( $n2->decimal, '.', 'Decimal separator' );
-is( $n2->thousand, ',', 'Thousand separator' );
+is( $n2->decimal, $dec_sep, 'Decimal separator' );
+is( $n2->thousand, $tho_sep, 'Thousand separator' );
 is( $n2->precision, 2, 'Precision' );
 is( $n2->currency, '€', 'Currency symbol' );
 isa_ok( $n2->currency, 'Module::Generic::Scalar', 'Returns property as string object' );
+
 my $n3 = $n2->unformat( $n );
 # diag( "Unformatting \"$n\"." );
 isa_ok( $n3, 'Module::Generic::Number', 'Unformat result in new object using unformat()' );
 is( $n3, 1281284, 'Unformat resulting value' );
 is( $n3->precision, 2, 'New object precision' );
-is( $n3->format, '1,281,284.00', 'Formatting number using format()' );
+$dec_sep = '' if( !defined( $dec_sep ) );
+$tho_sep = '' if( !defined( $tho_sep ) );
+# diag( "Thousand separator is: '", $n3->thousand, "'" );
+# diag( "Number::Format object is: ", Dumper( $n3->{_fmt} ) );
+is( $n3->format, "1${tho_sep}281${tho_sep}284${dec_sep}00", 'Formatting number using format()' );
 is( $n3->currency, '€', 'Currency symbol' );
-# $n3->debug( 3 );
 my $n_money = $n3->format_money;
-is( "$n_money", '€1,281,284.00', 'Formatting money using format_money()' );
+if( $n3->precede )
+{
+    like( "$n_money", qr/€${sep_space}1${tho_sep}281${tho_sep}284${dec_sep}00/, 'Formatting money using format_money()' );
+}
+else
+{
+    like( "$n_money", qr/1${tho_sep}281${tho_sep}284${dec_sep}00${sep_space}€/, 'Formatting money using format_money()' );
+}
 isa_ok( $n_money, 'Module::Generic::Scalar', 'Returns string object upon formatting' );
 $n3 *= -1;
 is( $n3, -1281284, 'Negative number' );
-is( $n3->format_negative( '(x)' ), '(1,281,284.00)', 'Formatting negative number => (1,281,284.00)' );
+like( $n3->format_negative( '(x)' ), qr/\(1${tho_sep}281${tho_sep}284${dec_sep}00\)/, "Formatting negative number => (1${tho_sep}281${tho_sep}284${dec_sep}00)" );
 my $n4 = $n3->abs;
 is( $n4, 1281284, 'abs' );
-is( $n4->atan, 1.5707955463278, 'atan' );
-# $n4->debug( 3 );
-is( $n4->atan2(12), 1.57078696118977, 'atan2' );
+# 1.5707955463278
+is( $n4->atan, POSIX::atan( $n4 ), 'atan' );
+# 1.57078696118977
+is( $n4->atan2(12), CORE::atan2( $n4, 12 ), 'atan2' );
 my $n5 = $n4->cbrt;
-is( $n5, 108.612997866582, 'cbrt' );
-is( $n5->ceil, 109, 'ceil' );
-is( $n5->floor, 108, 'floor' );
-is( $n4->cos, -0.413777602170324, 'cos' );
-is( $n4->clone( 3 )->exp, 20.0855369231877, 'exp' );
-is( $n5->int, 108, 'int' );
+# 108.612997866582
+is( $n5, POSIX::cbrt( $n4 ), 'cbrt' );
+# 109
+is( $n5->ceil, POSIX::ceil( $n5 ), 'ceil' );
+# 108
+is( $n5->floor, POSIX::floor( $n5 ), 'floor' );
+# -0.413777602170324
+is( $n4->cos, CORE::cos( $n4 ), 'cos' );
+# 20.0855369231877
+is( $n4->clone( 3 )->exp, POSIX::exp( 3 ), 'exp' );
+# 108
+is( $n5->int, CORE::int( $n5 ), 'int' );
 ok( !$n5->is_negative, 'Not negative' );
 ok( $n3->is_negative, 'Is Negative' );
 ok( $n5->is_positive, 'Is positive' );
 ok( !$n3->is_positive, 'Is not positive' );
-is( $n4->log, 14.0633732581021, 'log' );
-is( $n4->log2, 20.2891588576344, 'log2' );
-is( $n4->log10, 6.10764540293951, 'log10' );
+# 14.0633732581021
+is( $n4->log, CORE::log( $n4 ), 'log' );
+# 20.2891588576344
+is( $n4->log2, POSIX::log2( $n4 ), 'log2' );
+# 6.10764540293951
+is( $n4->log10, POSIX::log10( $n4 ), 'log10' );
 is( $n4->max( 1281285 ), 1281285, 'max' );
 is( $n4->min( 1281285 ), 1281284, 'min' );
 is( $n4->mod( 3 ), 2, 'mod' );
-# diag( "\$n4 = $n4" );
-# $n4->debug( 3 );
 is( $n4->oct, 10, 'oct' );
 is( $n4->clone( 3.14159265358979323846 )->round( 4 ), 3.1416, 'Rounding' );
-is( $n4->sin, -0.910377996187395, 'sin' );
-is( $n4->sqrt, 1131.93816085509, 'sqrt' );
-is( $n4->tan, 2.20016257867108, 'tan' );
-is( $n4->clone( 3.14159265358979323846 )->length, 16, 'Number length' );
+# -0.910377996187395
+is( $n4->sin, CORE::sin( $n4 ), 'sin' );
+is( $n4->sqrt, CORE::sqrt( $n4 ), 'sqrt' );
+# 2.20016257867108
+is( $n4->tan, POSIX::tan( $n4 ), 'tan' );
+my $pie = $n4->clone( 3.14159265358979323846 );
+is( $pie->length, CORE::length( $pie ), 'Number length' );
 ok( $n4->is_finite, 'Is finite number' );
 ok( $n4->clone( 3.14159265358979323846 )->is_float, 'Is float' );
 ok( $n4->is_int, 'Is integer' );
@@ -185,7 +324,7 @@ is( $nan->max( 10 ), 10, 'NaN with max' );
 is( $nan * 10, 'NaN', 'NaN overloaded' );
 
 # diag( "Formatting as bytes '$n4'." );
-is( $n4->format_bytes, '1.22M', 'Formatting as bytes' );
+is( $n4->format_bytes, "1${dec_sep}22M", 'Formatting as bytes' );
 # diag( "Current value is: $n4" );
 is( $n4->format_hex, '0x138D04', 'Formatting as hexadecimal -> 0x138D04' );
 is( $n4->format_binary, '100111000110100000100', 'Formatting as binary' );

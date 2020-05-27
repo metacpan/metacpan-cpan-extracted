@@ -49,7 +49,7 @@
    "provides" : {
       "HealthCheck::Diagnostic::SMTP" : {
          "file" : "lib/HealthCheck/Diagnostic/SMTP.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.0.4"
       }
    },
    "release_status" : "stable",
@@ -63,7 +63,7 @@
          "web" : "https://github.com/GrantStreetGroup/p5-HealthCheck-Diagnostic-SMTP"
       }
    },
-   "version" : "v0.0.3",
+   "version" : "v0.0.4",
    "x_generated_by_perl" : "v5.30.2",
    "x_serialization_backend" : "JSON::XS version 4.02",
    "x_spdx_expression" : "Artistic-2.0",

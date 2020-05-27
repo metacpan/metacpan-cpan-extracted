@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::CodCollectionType;
-$Shipment::FedEx::WSDL::ShipTypes::CodCollectionType::VERSION = '3.04';
+$Shipment::FedEx::WSDL::ShipTypes::CodCollectionType::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -24,7 +24,7 @@ Shipment::FedEx::WSDL::ShipTypes::CodCollectionType
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 

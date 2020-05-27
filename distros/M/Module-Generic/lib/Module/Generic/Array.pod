@@ -11,6 +11,10 @@ Module::Generic::Array - An Array Manipulation Object Class
     # Adding one more
     $ar->push( "Jack" );
 
+=head1 VERSION
+
+    v0.1.0
+
 =head1 DESCRIPTION
 
 The purpose of this class/package is to provide an object-oriented approach at array manipulation

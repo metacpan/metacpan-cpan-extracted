@@ -3,7 +3,7 @@ package Sah::Schema::color::rgb24;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-03-02'; # DATE
 our $DIST = 'Sah-Schemas-Color'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $schema = [str => {
     summary => 'RGB 24-digit color, a hexdigit e.g. ffcc00', # XXX also allow other forms
@@ -34,7 +34,21 @@ Sah::Schema::color::rgb24 - RGB 24-digit color, a hexdigit e.g. ffcc00
 
 =head1 VERSION
 
-This document describes version 0.007 of Sah::Schema::color::rgb24 (from Perl distribution Sah-Schemas-Color), released on 2020-03-02.
+This document describes version 0.009 of Sah::Schema::color::rgb24 (from Perl distribution Sah-Schemas-Color), released on 2020-03-02.
+
+=head1 SYNOPSIS
+
+Sample data:
+
+ "000000"  # valid, becomes "000000"
+
+ "black"  # valid, becomes "000000"
+
+ "FFffcc"  # valid, becomes "ffffcc"
+
+ "#FFffcc"  # valid, becomes "ffffcc"
+
+ "foo"  # INVALID
 
 =head1 DESCRIPTION
 

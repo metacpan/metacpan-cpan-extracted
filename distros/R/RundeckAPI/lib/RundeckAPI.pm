@@ -44,7 +44,7 @@ our @EXPORT_OK = qw(get post put delete postFile putFile);
 ## CONSTANTS
 #####
 our $TIMEOUT = 10;
-our $VERSION = "1.2.2";
+our $VERSION = "1.2.4";
 #####
 ## VARIABLES
 #####
@@ -61,7 +61,8 @@ sub new {
 		'login'		=> $args{'login'},
 		'token'		=> $args{'token'},
 		'password'	=> $args{'password'},
-		'debug'		=> $args{'debug'},
+		'debug'		=> $args{'debug'} || 0,
+		'verbose'	=> $args{'verbose'} || 0,
 		'result'	=> undef,
 	};
 # create and store a cookie jar
@@ -135,6 +136,7 @@ sub new {
 
 # done, bless object and return it
 	bless ($self, $class);
+	$self->_logV1 ("Connected to $self->{'url'}");
 	$self->_logD($self);
 	return $self;
 }
@@ -159,13 +161,12 @@ sub get (){		# endpoint
 		$responsehash->{'httpstatus'} = $rc;
 	} else {
 		my $responseContent = $self->{'client'}->responseContent();
-		$self->_logD($responseContent);
 	# handle special case where test is "ping", response is "pong" in plain text, not a json
 		if ($endpoint =~ /ping/) {
 			$responsehash->{'reqstatus'} = $responseContent =~ /pong/ ? 'OK' : 'CRIT';
 			return dclone ($responsehash);
 		}
-		$responsehash = $self->_handleResponse($responseContent);
+		$responsehash = $self->_handleResponse($rc, $responseContent);
 	}
 	return dclone ($responsehash);
 }
@@ -188,8 +189,7 @@ sub post(){		# endpoint, json
 		$responsehash->{'httpstatus'} = $rc;
 	} else {
 		my $responseContent = $self->{'client'}->responseContent();
-		$self->_logD($responseContent);
-		$responsehash = $self->_handleResponse($responseContent);
+		$responsehash = $self->_handleResponse($rc, $responseContent);
 	}
 	return dclone ($responsehash);
 }
@@ -212,8 +212,7 @@ sub put(){		# endpoint, json
 		$responsehash->{'httpstatus'} = $rc;
 	} else {
 		my $responseContent = $self->{'client'}->responseContent();
-		$self->_logD($responseContent);
-		$responsehash = $self->_handleResponse($responseContent);
+		$responsehash = $self->_handleResponse($rc, $responseContent);
 	}
 	return dclone ($responsehash);
 }
@@ -234,8 +233,7 @@ sub delete () {		# endpoint
 		$responsehash->{'httpstatus'} = $rc;
 	} else {
 		my $responseContent = $self->{'client'}->responseContent();
-		$self->_logD($responseContent);
-		$responsehash = $self->_handleResponse($responseContent);
+		$responsehash = $self->_handleResponse($rc, $responseContent);
 	}
 	return dclone ($responsehash);
 }
@@ -245,7 +243,7 @@ sub postFile() {		# endpoint, mimetype, data
 	my $endpoint = shift;
 	my $mimetype = shift;
 	my $data = shift;
-	
+
 	my $responsehash = ();
 	my $rc = 0;
 
@@ -259,11 +257,10 @@ sub postFile() {		# endpoint, mimetype, data
 		$responsehash->{'httpstatus'} = $rc;
 	} else {
 		my $responseContent = $self->{'client'}->responseContent();
-		$self->_logD($responseContent);
-		$responsehash = $self->_handleResponse($responseContent);
+		$responsehash = $self->_handleResponse($rc, $responseContent);
 	}
 	return dclone ($responsehash);
-	
+
 }
 
 sub putFile() {		# endpoint, mimetype, data
@@ -271,7 +268,7 @@ sub putFile() {		# endpoint, mimetype, data
 	my $endpoint = shift;
 	my $mimetype = shift;
 	my $data = shift;
-	
+
 	my $responsehash = ();
 	my $rc = 0;
 
@@ -285,22 +282,22 @@ sub putFile() {		# endpoint, mimetype, data
 		$responsehash->{'httpstatus'} = $rc;
 	} else {
 		my $responseContent = $self->{'client'}->responseContent();
-		$self->_logD($responseContent);
-		$responsehash = $self->_handleResponse($responseContent);
+		$responsehash = $self->_handleResponse($rc, $responseContent);
 	}
 	return dclone ($responsehash);
-	
+
 }
 
 
 sub _handleResponse () {
 	my $self = shift;
+	my $rc = shift;
 	my $responseContent = shift;
 
 	my $responseJSON = ();
 	my $responsehash = ();
-	my $rc = 0;
 
+	$self->_logV2($responseContent);
 	$responseJSON = decode_json($responseContent) if $responseContent ne '';
 	my $reftype = reftype($responseJSON);
 	if (not defined $reftype) {
@@ -319,6 +316,31 @@ sub _handleResponse () {
 	$responsehash->{'reqstatus'} = 'OK';
 	$responsehash->{'httpstatus'} = $rc;
 	return $responsehash;
+}
+
+sub _logV1() {
+	my $self = shift;
+	my $msg = shift;
+
+	if ($self->{'verbose'} >= 1) {
+		if (defined $msg) {
+			print "$msg\n";
+		} else {
+			print "unknown $!";
+		}
+	}
+}
+sub _logV2() {
+	my $self = shift;
+	my $obj = shift;
+
+	if ($self->{'verbose'} >= 2) {
+		if (defined $obj) {
+			print Dumper ($obj);
+		} else {
+			print "unknown objetc $!";
+		}
+	}
 }
 
 sub _logD() {

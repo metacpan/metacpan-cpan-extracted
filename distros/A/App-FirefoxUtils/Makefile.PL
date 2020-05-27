@@ -15,7 +15,10 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "App-FirefoxUtils",
   "EXE_FILES" => [
     "script/firefox-is-paused",
+    "script/firefox-is-running",
+    "script/get-firefox-profile-dir",
     "script/kill-firefox",
+    "script/list-firefox-profiles",
     "script/pause-firefox",
     "script/ps-firefox",
     "script/terminate-firefox",
@@ -25,15 +28,19 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::FirefoxUtils",
   "PREREQ_PM" => {
-    "App::BrowserUtils" => "0.002",
+    "App::BrowserUtils" => "0.005",
+    "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" => 0,
     "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::int" => 0,
+    "Data::Sah::Compiler::perl::TH::str" => 0,
     "Data::Sah::Filter::perl::Unix::check_uid_exists" => 0,
     "Data::Sah::Filter::perl::Unix::convert_unix_user_to_uid" => 0,
+    "Firefox::Util::Profile" => "0.004",
     "Log::ger" => "0.037",
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Lite" => "1.827",
+    "Sah::Schema::firefox::profile_name" => 0,
     "Sah::Schema::true" => 0,
     "Sah::Schema::unix::local_uid" => 0,
     "strict" => 0,
@@ -45,7 +52,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.008",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,18 +60,22 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "App::BrowserUtils" => "0.002",
+  "App::BrowserUtils" => "0.005",
+  "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" => 0,
   "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::bool" => 0,
   "Data::Sah::Compiler::perl::TH::int" => 0,
+  "Data::Sah::Compiler::perl::TH::str" => 0,
   "Data::Sah::Filter::perl::Unix::check_uid_exists" => 0,
   "Data::Sah::Filter::perl::Unix::convert_unix_user_to_uid" => 0,
   "File::Spec" => 0,
+  "Firefox::Util::Profile" => "0.004",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Log::ger" => "0.037",
   "Perinci::CmdLine::Any" => 0,
   "Perinci::CmdLine::Lite" => "1.827",
+  "Sah::Schema::firefox::profile_name" => 0,
   "Sah::Schema::true" => 0,
   "Sah::Schema::unix::local_uid" => 0,
   "Test::More" => 0,

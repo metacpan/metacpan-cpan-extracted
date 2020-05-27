@@ -2,8 +2,8 @@ NAME
     WordList - Word lists
 
 VERSION
-    This document describes version 0.6.0 of WordList (from Perl
-    distribution WordList), released on 2020-05-04.
+    This document describes version 0.7.5 of WordList (from Perl
+    distribution WordList), released on 2020-05-24.
 
 SYNOPSIS
     Use one of the "WordList::*" modules.
@@ -13,11 +13,12 @@ DESCRIPTION
     This module, "WordList", serves as a base class and establishes
     convention for such modules.
 
-    "WordList" is an alternative interface for Games::Word::Wordlist and
+    "WordList" is an alternative for Games::Word::Wordlist and
     "Games::Word::Wordlist::*". Its main difference is: "WordList::*"
     wordlists are read-only/immutable and the modules are designed to have
     low startup overhead. This makes them more suitable for use in CLI
     scripts which often only want to pick a word from one or several lists.
+    See "DIFFERENCES WITH GAMES::WORD::WORDLIST" for more details.
 
     Unless you are defining a dynamic wordlist (see below), words (or
     phrases) must be put in "__DATA__" section, one per line. Putting the
@@ -56,19 +57,29 @@ DESCRIPTION
     function argument metadata specified in Rinci::function.
 
 DIFFERENCES WITH GAMES::WORD::WORDLIST
-    Since this is a new and non-backward compatible interface from
-    Games::Word::Wordlist, I also make some other changes:
+    Since this is a non-compatible interface from Games::Word::Wordlist, I
+    also make some other changes:
 
     *   Namespace is put outside "Games::"
 
         Because obviously word lists are not only useful for games.
+
+    *   Namespace is more language-neutral and not English-centric
+
+        English wordlists are put under "WordList::EN::*". Other languages
+        have their own subnamespaces, e.g. "WordList::FR::*" or
+        "WordList::ID::*". Aside from language subnamespaces, there are also
+        other subnamespaces: "WordList::Phrase::$LANG::*",
+        "WordList::Password::*", "WordList::Domain::*", "WordList::HTTP::*",
+        etc.
 
     *   Interface is simpler
 
         This is partly due to the list being read-only. The methods provided
         are just:
 
-        - "pick" (pick one or several random entries)
+        - "pick" (pick one or several random entries, without duplicates or
+        with)
 
         - "word_exists" (check whether a word is in the list)
 
@@ -79,13 +90,31 @@ DIFFERENCES WITH GAMES::WORD::WORDLIST
         A couple of other functions might be added, with careful
         consideration.
 
-    *   Namespace is more language-neutral and not English-centric
+    *   More extensions
+
+        Some roles, subclasses, or alternate implementations are provided.
+        For example, since most wordlist are alphabetically sorted, a binary
+        search can be performed in "word_exists()". There is a role,
+        WordListRole::BinarySearch, that does that and can be mixed in. An
+        even faster version of "word_exists()" using bloom filter is offered
+        by WordListRole::Bloom. A faster version of pick() that does random
+        seeking is offered by WordListRole::RandomSeekPick.
+
+SUBCLASSING OR CREATING ROLES
+    If you want to get the word list from another filehandle source, e.g. a
+    gzipped file, you just need to override "reset_iterator()". Your
+    "reset_iterator()" needs to set the 'fh' attribute to the filehandle.
+    The default "first_word()" calls "reset_iterator()" and reads a line
+    from the filehandle. The default "next_word()" just reads another line
+    from the filehandle. "each_word()" is implemented in terms of
+    "first_word()" and "next_word()", and "word_exists()", "pick()", and
+    "all_words()" are implemented in terms of "each_word()".
 
 METHODS
   new
     Usage:
 
-     $wl = WordList::Module->new => obj
+     $wl = WordList::Module->new([ %params ]);
 
     Constructor.
 
@@ -113,10 +142,17 @@ METHODS
   pick
     Usage:
 
-     $wl->pick($n = 1) => list
+     @words = $wl->pick([ $num=1 [ , $allow_duplicates=0 ] ])
 
-    Pick $n (default: 1) random word(s) from the list. If there are less
-    then $n words in the list, only that many will be returned.
+    Examples:
+
+     ($word) = $wl->pick;
+     @words  = $wl->pick(3);
+
+    Pick $n (default: 1) random word(s) from the list, without duplicates
+    (unless $allow_duplicates is set to true). If there are less then $n
+    words in the list and duplicates are not allowed, only that many will be
+    returned.
 
     The algorithm used is from perlfaq ("perldoc -q "random line""), which
     scans the whole list once (a.k.a. each_word() once). The algorithm is
@@ -143,6 +179,19 @@ METHODS
     large you might want to use "each_word" instead to avoid slurping all
     words into memory.
 
+FAQ
+  Why does pick() return "1"?
+    You probably write this:
+
+     $word = $wl->pick;
+
+    instead of this:
+
+     ($word) = $wl->pick;
+
+    "pick()" returns a list and in scalar context it returns the number of
+    elements in the list which is 1. This is a common context trap in Perl.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/WordList>.
@@ -159,8 +208,6 @@ BUGS
 
 SEE ALSO
     "WordListRole::*" modules.
-
-    "WordListMod::*" modules.
 
     "WordList::*" modules.
 

@@ -1,9 +1,9 @@
 package Data::Sah::Compiler::Prog;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-12'; # DATE
+our $DATE = '2020-05-21'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.907'; # VERSION
+our $VERSION = '0.908'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1077,7 +1077,7 @@ Data::Sah::Compiler::Prog - Base class for programming language compilers
 
 =head1 VERSION
 
-This document describes version 0.907 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2020-02-12.
+This document describes version 0.908 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2020-05-21.
 
 =head1 SYNOPSIS
 

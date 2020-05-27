@@ -9,7 +9,7 @@ use YAML::Tiny;
 
 # ABSTRACT: Validation framework that can be configured with YAML files
 
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 our $errstr  = '';
 
 
@@ -195,13 +195,14 @@ sub check{
     my ($self,$field,$value,$definition) = @_;
     
     my %dispatch = (
-        min      => \&_min,
-        max      => \&_max,
-        regex    => \&_regex,
-        length   => \&_length,
-        enum     => \&_enum,
-        sub      => \&_sub,
-        datatype => \&_datatype,
+        min       => \&_min,
+        max       => \&_max,
+        regex     => \&_regex,
+        not_regex => \&_not_regex,
+        length    => \&_length,
+        enum      => \&_enum,
+        sub       => \&_sub,
+        datatype  => \&_datatype,
     );
                 
     my $subhash = $definition || $self->_required->{$field} || $self->_optional->{$field};
@@ -229,16 +230,26 @@ sub check{
             }
         }
         elsif( $key eq 'plugin' ){
-            my ($name)   = $subhash->{$key} =~ m{([A-z0-9_:]+)};
-            my $module   = 'Data::Validate::WithYAML::Plugin::' . $name;
-            eval "use $module";
-            
-            if( not $@ and $module->can('check') ){
-                $bool = $module->check($value, $subhash);
+            my $plugins = ref $subhash->{$key} ? $subhash->{$key} : [$subhash->{$key}];
+
+            my $one_not_ok = 0;
+
+            for my $plugin ( @{ $plugins } ) {
+                my ($name)   = $plugin =~ m{([A-z0-9_:]+)};
+                my $module   = 'Data::Validate::WithYAML::Plugin::' . $name;
+
+                eval "use $module";
+
+                if( not $@ and $module->can('check') ){
+                    my $local_bool = $module->check($value, $subhash);
+                    $one_not_ok = 1 if !$local_bool;
+                }
+                else{
+                    croak "Can't check with $module";
+                }
             }
-            else{
-                croak "Can't check with $module";
-            }
+
+            $bool = $one_not_ok ? 0 : 1;
         }
     }
     
@@ -332,9 +343,29 @@ sub _max{
 }
 
 sub _regex{
-    my ($value,$regex) = @_;
-    my $re = qr/$regex/;
-    return ($value =~ $re);
+    my ($value,$regex_list) = @_;
+
+    my $regexes = ref $regex_list ? $regex_list : [$regex_list];
+
+    for my $regex ( @{ $regexes } ) {
+        my $re = qr/$regex/;
+        return 0 if $value !~ $re;
+    }
+
+    return 1;
+}
+
+sub _not_regex{
+    my ($value,$regex_list) = @_;
+
+    my $regexes = ref $regex_list ? $regex_list : [$regex_list];
+
+    for my $regex ( @{ $regexes } ) {
+        my $re = qr/$regex/;
+        return if $value =~ $re;
+    }
+
+    return 1;
 }
 
 sub _length{
@@ -413,7 +444,7 @@ Data::Validate::WithYAML - Validation framework that can be configured with YAML
 
 =head1 VERSION
 
-version 0.18
+version 0.20
 
 =head1 SYNOPSIS
 

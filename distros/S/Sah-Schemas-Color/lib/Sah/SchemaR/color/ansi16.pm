@@ -1,7 +1,7 @@
 package Sah::SchemaR::color::ansi16;
 
 our $DATE = '2020-03-02'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $rschema = ["str",[{examples=>[{data=>0,valid=>1},{data=>15,valid=>1},{data=>16,valid=>0},{data=>"black",res=>"black",valid=>1},{data=>"foo",valid=>0}],match=>qr(\A(?:0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|
                     (?:(bold|bright) \s )?(black|red|green|yellow|blue|magenta|cyan|white))\z)ix,summary=>"ANSI-16 color, either a number from 0-15 or color names like \"black\", \"bold red\", etc"}],["str"]];
@@ -21,7 +21,7 @@ Sah::SchemaR::color::ansi16 - ANSI-16 color, either a number from 0-15 or color 
 
 =head1 VERSION
 
-This document describes version 0.007 of Sah::SchemaR::color::ansi16 (from Perl distribution Sah-Schemas-Color), released on 2020-03-02.
+This document describes version 0.009 of Sah::SchemaR::color::ansi16 (from Perl distribution Sah-Schemas-Color), released on 2020-03-02.
 
 =head1 DESCRIPTION
 

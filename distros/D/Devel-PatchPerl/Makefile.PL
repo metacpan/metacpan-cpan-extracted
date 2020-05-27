@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Devel::PatchPerl",
   "PREREQ_PM" => {
     "File::pushd" => "1.00",
+    "Getopt::Long" => 0,
     "IO::File" => 0,
     "MIME::Base64" => 0,
     "Module::Pluggable" => 0
@@ -28,7 +29,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "1.92",
+  "VERSION" => "1.98",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,6 +38,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "File::pushd" => "1.00",
+  "Getopt::Long" => 0,
   "IO::File" => 0,
   "MIME::Base64" => 0,
   "Module::Pluggable" => 0,

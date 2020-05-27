@@ -1,6 +1,6 @@
 ---
 name: Config-File
-version: 1.51
+version: 1.52
 author:
   - 'Gunnar Wolf <gwolf@gwolf.org>'
 abstract: Parse a simple configuration file
@@ -14,7 +14,7 @@ build_requires:
 provides:
   Config::File:
     file: lib/Config/File.pm
-    version: 1.51
+    version: 1.52
 generated_by: Module::Build version 0.280801
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html

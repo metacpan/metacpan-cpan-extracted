@@ -1,5 +1,8 @@
 Revision history for Date::Extract::DE
 
+v0.0.5  Mon May  25 15:05:00 2020
+        Add 'extract_with_context'
+
 v0.0.4  Wed May  18 12:20:00 2020
         Version bump
 

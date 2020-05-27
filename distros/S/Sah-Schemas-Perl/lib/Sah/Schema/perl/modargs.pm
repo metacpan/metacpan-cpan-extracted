@@ -1,9 +1,9 @@
 package Sah::Schema::perl::modargs;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-08'; # DATE
+our $DATE = '2020-05-21'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.031'; # VERSION
+our $VERSION = '0.032'; # VERSION
 
 our $schema = ['perl::modname_with_optional_args' => {
     summary => 'Shorter alias for perl::modname_with_optional_args',
@@ -24,7 +24,7 @@ Sah::Schema::perl::modargs - Shorter alias for perl::modname_with_optional_args
 
 =head1 VERSION
 
-This document describes version 0.031 of Sah::Schema::perl::modargs (from Perl distribution Sah-Schemas-Perl), released on 2020-05-08.
+This document describes version 0.032 of Sah::Schema::perl::modargs (from Perl distribution Sah-Schemas-Perl), released on 2020-05-21.
 
 =head1 SYNOPSIS
 

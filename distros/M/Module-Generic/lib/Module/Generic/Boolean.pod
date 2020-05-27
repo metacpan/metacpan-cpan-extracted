@@ -30,6 +30,10 @@ Module::Generic::Boolean - Boolean Representation Class
         active: true
     }
 
+=head1 VERSION
+
+    v0.1.0
+
 =head1 DESCRIPTION
 
 This a class/package to represent boolean value and make sure they are recognised interchangeably as perl boolean, i.e. 1 or 0, or as L<JSON> bool, i.e. C<true> or C<false>

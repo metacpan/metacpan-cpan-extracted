@@ -1,0 +1,120 @@
+NAME
+
+    Finance::Currency::Convert::SCSB - Query currency exchange rates from
+    SCSB (Shanghai Commercial and Savings Bank)
+
+VERSION
+
+    v0.1.0
+
+DESCRIPTION
+
+    This module crawl and parses currency exchange rates listed on this
+    web:
+    https://ibank.scsb.com.tw/netbank.portal?_nfpb=true&_pageLabel=page_other12&_nfls=false
+    . All prices on this page are in TWD (Taiwan Dollar.) For this reason,
+    it can only convert some non-TWD currency to TWD.
+
+FUNCTIONS
+
+    The following functions are exportable, but not exported by default.
+
+    Some annotations with fictional Types are used in the following
+    documentation just for the purpose of explaination. No Type-validation
+    are implemented, nor are they defined. Not in this module.
+
+    "Num" referrer to a number, "Currency" is a short string such as 'TWD',
+    'USD'. The notation `Maybe[T]` means that the variable can contain a
+    value either be of type T, or undef. See: Types::Standard or
+    Moose::Util::TypeConstraints for more description of these notations.
+
+ convert_currency
+
+    Definition:
+
+        ($error :Maybe[Str], $result :Maybe[Num]) =
+            convert_currency(
+                $amount :Num
+                $from :Currency,
+                $to :Currency
+            )
+
+    When it is successful, $error is undef and $result contained the parsed
+    output.
+
+    When error of some kind happens, $error contains the error message and
+    $result is undef.
+
+    Example Usage:
+
+        # Error-checking
+        my ($err, $n) = convert_currency(100, 'USD', 'TWD');
+        die "Error: $err": if $err;
+        say "100 USD is about $n TWD";
+    
+        # Ignore error message. Checks the result directly.
+        my $n = convert_currency(100, 'USD', 'TWD');
+        if ( defined($n) ) {
+            say "100 USD is about $n TWD";
+        } else {
+            say "Failed to convert 100 USD to TWD";
+        }
+
+ get_currencies
+
+    With this function, the entire exchange rate table are parsed and
+    returned in the special strucutre.
+
+    Definition:
+
+        ($error :Maybe[Str], $result :Maybe[ArrayRef[Rate]]) =
+            convert_currency(
+                $amount :Num,
+                $from :Currency,
+                $to :Currency
+            )
+
+    When it is successful, $error is undef and $result contained the parsed
+    output.
+
+    When error of some kind happens, $error contains the error message and
+    $result is undef.
+
+    Usage:
+
+        # Error-checking
+        my ($err, $o) = get_currencies();
+        die "Error: $err": if $err;
+        do_something($o);
+    
+        # Ignore error message. Checks the result directly.
+        my $o = get_currencies();
+        if ($o) {
+            ...
+        } else {
+            ...
+        }
+
+    The "Rate" type is a HashRef with 4 specific key-value pairs that looks
+    like this:
+
+        {
+            zh_currency_name => "美金現金",
+            en_currency_name => "USD CASH",
+            buy_at           => 33.06,
+            sell_at          => 33.56
+        }
+
+    This structure is just a directly translation of the rate exchange
+    table shown on the source web page.
+
+AUTHOR
+
+    Kang-min Liu <gugod@gugod.org>
+
+LICENSE
+
+    This is free software, licensed under:
+
+      The MIT (X11) License
+

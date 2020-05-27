@@ -1,5 +1,5 @@
 ---
-abstract: 'Perl client for the http://jmap.io/ protocol'
+abstract: 'Basic interface to talk to JMAP Servers'
 author:
   - 'Bron Gondwana <brong@>'
 build_requires:
@@ -21,6 +21,6 @@ requires:
   Convert::Base64: '0'
   File::LibMagic: '0'
   HTTP::Tiny: '0'
-  JSON::XS: '0'
-version: '0.13'
+  JSON: '0'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

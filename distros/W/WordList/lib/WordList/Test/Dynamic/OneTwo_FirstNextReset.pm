@@ -1,9 +1,9 @@
 package WordList::Test::Dynamic::OneTwo_FirstNextReset;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-04'; # DATE
+our $DATE = '2020-05-24'; # DATE
 our $DIST = 'WordList'; # DIST
-our $VERSION = '0.6.0'; # VERSION
+our $VERSION = '0.7.5'; # VERSION
 
 use strict;
 
@@ -17,7 +17,7 @@ our $DYNAMIC = 1;
 
 sub reset_iterator {
     my $self = shift;
-    $self->[0] = 0;
+    $self->{_iterator_idx} = 0;
 }
 
 sub first_word {
@@ -28,15 +28,15 @@ sub first_word {
 
 sub next_word {
     my $self = shift;
-    $self->[0] = 0 unless defined $self->[0];
+    $self->{_iterator_idx} = 0 unless defined $self->{_iterator_idx};
 
-    $self->[0]++;
-    if    ($self->[0] == 1) { return "one" }
-    elsif ($self->[0] == 2) { return "two" }
+    $self->{_iterator_idx}++;
+    if    ($self->{_iterator_idx} == 1) { return "one" }
+    elsif ($self->{_iterator_idx} == 2) { return "two" }
     else { return undef }
 }
 
-our %STATS = ("num_words_contain_unicode",0,"longest_word_len",3,"num_words",2,"avg_word_len",3,"num_words_contains_whitespace",0,"num_words_contains_unicode",0,"num_words_contains_nonword_chars",0,"num_words_contain_nonword_chars",0,"num_words_contain_whitespace",0,"shortest_word_len",3); # STATS
+our %STATS = ("num_words_contain_whitespace",0,"num_words_contains_unicode",0,"num_words_contain_nonword_chars",0,"avg_word_len",3,"shortest_word_len",3,"longest_word_len",3,"num_words_contains_whitespace",0,"num_words",2,"num_words_contains_nonword_chars",0,"num_words_contain_unicode",0); # STATS
 
 1;
 # ABSTRACT: Wordlist that returns one, two (via implementing first_word(), next_word(), and reset_iterator())
@@ -53,7 +53,7 @@ WordList::Test::Dynamic::OneTwo_FirstNextReset - Wordlist that returns one, two 
 
 =head1 VERSION
 
-This document describes version 0.6.0 of WordList::Test::Dynamic::OneTwo_FirstNextReset (from Perl distribution WordList), released on 2020-05-04.
+This document describes version 0.7.5 of WordList::Test::Dynamic::OneTwo_FirstNextReset (from Perl distribution WordList), released on 2020-05-24.
 
 =head1 SYNOPSIS
 

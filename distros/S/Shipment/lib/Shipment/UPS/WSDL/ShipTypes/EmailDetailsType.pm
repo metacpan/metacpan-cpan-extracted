@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::EmailDetailsType;
-$Shipment::UPS::WSDL::ShipTypes::EmailDetailsType::VERSION = '3.04';
+$Shipment::UPS::WSDL::ShipTypes::EmailDetailsType::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -87,7 +87,7 @@ Shipment::UPS::WSDL::ShipTypes::EmailDetailsType
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 

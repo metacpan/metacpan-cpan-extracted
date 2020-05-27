@@ -3,6 +3,7 @@ use 5.010; # for //
 use strict;
 use warnings;
 use Moo;
+use PerlX::Maybe;
 use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
@@ -15,7 +16,7 @@ use Chrome::DevToolsProtocol::Transport;
 use Scalar::Util 'weaken', 'isweak';
 use Try::Tiny;
 
-our $VERSION = '0.55';
+our $VERSION = '0.58';
 our @CARP_NOT;
 
 =head1 NAME
@@ -311,6 +312,9 @@ sub connect( $self, %args ) {
 
     my $got_endpoint;
     if( ! $endpoint ) {
+        if( ! $self->port ) {
+            die "Can't connect without knowing the port?! " . $self->port;
+        };
         $got_endpoint = $self->version_info()->then(sub( $info ) {
             $self->log('debug', "Found webSocket URL", $info );
             #$self->tab( $info );
@@ -534,8 +538,8 @@ sub current_sequence( $self ) {
 };
 
 sub build_url( $self, %options ) {
-    $options{ host } ||= $self->{host};
-    $options{ port } ||= $self->{port};
+    $options{ host } ||= $self->host;
+    $options{ port } ||= $self->port;
     my $url = sprintf "http://%s:%s/json", $options{ host }, $options{ port };
     $url .= '/' . $options{domain} if $options{ domain };
     $url
@@ -729,11 +733,11 @@ sub list_tabs( $self, $type = 'page' ) {
 
 =cut
 
-sub new_tab( $self, $url=undef ) {
+sub new_tab( $self, $url=undef, %options ) {
     #my $u = $url ? '?' . $url : '';
     $self->log('trace', "Creating new tab");
     #$self->json_get('new' . $u)
-    $self->createTarget( url => $url );
+    $self->createTarget( url => $url, %options );
 };
 
 =head2 C<< $chrome->activate_tab >>
@@ -776,6 +780,7 @@ Gets the list of available targets
 
 sub getTargets( $self ) {
     $self->send_message('Target.getTargets')->then(sub( $info ) {
+        #use Data::Dumper; warn Dumper $info;
         Future->done( @{$info->{targetInfos}})
     });
 }
@@ -789,9 +794,10 @@ Returns information about the current target
 
 =cut
 
-sub getTargetInfo( $self, $targetId ) {
+sub getTargetInfo( $self, $targetId=undef ) {
     $self->send_message('Target.getTargetInfo',
-        targetId => $targetId )->then(sub( $info ) {
+        maybe targetId => $targetId
+    )->then(sub( $info ) {
             Future->done( $info->{targetInfo})
     });
 }
@@ -807,7 +813,7 @@ sub getTargetInfo( $self, $targetId ) {
     )->get;
     print $targetId;
 
-Creates a new target
+Creates a new target, optionally in a new window
 
 =cut
 
@@ -852,6 +858,38 @@ sub closeTarget( $self, %options ) {
         %options )
 }
 
+=head2 C<< $target->getWindowForTarget >>
+
+    my $info = $chrome->getWindowForTarget( $targetId )->get;
+    print $info->{windowId};
+
+Returns information about the window of the current target
+
+=cut
+
+sub getWindowForTarget( $self, $targetId ) {
+    $self->send_message('Browser.getWindowForTarget',
+        targetId => $targetId
+    );
+}
+
+=head2 C<< $chrome->getBrowserContexts >>
+
+    my @browserContextIds = $chrome->getBrowserContexts->get;
+
+Gets the list of available browser contexts. These are separate sets of user
+cookies etc.
+
+=cut
+
+sub getBrowserContexts( $self ) {
+    $self->send_message('Target.getBrowserContexts')->then(sub( $info ) {
+        #use Data::Dumper; warn Dumper $info;
+        Future->done( @{$info->{browserContextIds}})
+    });
+}
+
+
 package
     Chrome::DevToolsProtocol::EventListener;
 use strict;
@@ -861,7 +899,7 @@ use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.55';
+our $VERSION = '0.58';
 
 has 'protocol' => (
     is => 'ro',

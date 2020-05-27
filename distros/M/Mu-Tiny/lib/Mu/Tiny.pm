@@ -1,6 +1,6 @@
 package Mu::Tiny;
 
-our $VERSION = '0.000001'; # 0.0.1
+our $VERSION = '0.000002'; # v0.0.2
 
 $VERSION = eval $VERSION;
 
@@ -43,8 +43,8 @@ sub import {
     }
     *{"${targ}::${name}"} = sub {
       exists($_[0]->{$name})
-        ? $_[0]->{name}
-        : ($_[0]->{name} = $_[0]->$builder)
+        ? $_[0]->{$name}
+        : ($_[0]->{$name} = $_[0]->$builder)
     };
   };
 }
@@ -138,7 +138,7 @@ An C<ro> attr be required and read only, and knows nothin' but its own name.
 
   lazy 'attr' => sub { <build default value> };
 
-A <lazy> attr be read only but not required, an' if ye make us, we'll take a
+A C<lazy> attr be read only but not required, an' if ye make us, we'll take a
 guess at what ye wanted, but only when we must.
 
 If'n ye be slightly less lazy than us, then subclass and override yan

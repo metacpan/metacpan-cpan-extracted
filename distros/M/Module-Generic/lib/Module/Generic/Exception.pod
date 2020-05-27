@@ -22,6 +22,10 @@ Module::Generic::Exception - Generic Module Exception Class
     # or simply:
     $object->customer_orders || die( "Error: ", $object->error, "\n" );
 
+=head1 VERSION
+
+    v0.1.0
+
 =head1 DESCRIPTION
 
 This is a simple and straightforward exception class you can use or inherit from. The error object can be stringified or compared.

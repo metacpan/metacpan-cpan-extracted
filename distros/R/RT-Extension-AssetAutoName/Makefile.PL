@@ -7,5 +7,13 @@ repository 'https://github.com/catalyst-cloud/rt-extension-assetautoname';
 requires_rt '4.4.0';
 rt_too_new '4.6.0';
 
+# We need to modify the Name function RT::Asset, but don't want
+# PAUSE to update the index for that namespace.
+# Well, I would use this method, but it doesn't with for the
+# inc/Moudule/Install files here... So instead use put
+# "package RT::Assets" on two lines in:
+#   lib/RT/Extension/AssetAutoName.pm
+# no_index 'namespace' => 'RT::Asset';
+
 sign;
 WriteAll;

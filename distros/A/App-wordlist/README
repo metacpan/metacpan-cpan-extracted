@@ -2,8 +2,8 @@ NAME
     App::wordlist - Grep words from WordList::*
 
 VERSION
-    This document describes version 0.270 of App::wordlist (from Perl
-    distribution App-wordlist), released on 2020-05-18.
+    This document describes version 0.274 of App::wordlist (from Perl
+    distribution App-wordlist), released on 2020-05-24.
 
 SYNOPSIS
     See the included script wordlist.
@@ -37,6 +37,10 @@ FUNCTIONS
     *   Select a specific wordlist (multiple -w allowed):
 
          wordlist( arg => ["foo"], wordlists => ["ID::KBBI"]);
+
+    *   Select all ID::* wordlists (wildcard will be expanded):
+
+         wordlist( arg => ["foo"], wordlists => ["ID::**"]);
 
     *   Select French wordlists (multiple --lang allowed):
 
@@ -127,12 +131,6 @@ FUNCTIONS
     information.
 
     Return value: (any)
-
-FAQ
-  How to make wordlist return words in random order?
-    The "--random" ("-r") option was removed in v0.268. To return random
-    words, you can pipe the output of "wordlist" to "shuf" or other similar
-    utility.
 
 ENVIRONMENT
   DEBUG => bool

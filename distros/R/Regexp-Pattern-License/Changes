@@ -7,6 +7,40 @@ Home page:    <https://metacpan.org/release/Regexp-Pattern-License>
 Bug tracker:  <https://bugs.debian.org/libregexp-pattern-license-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.4.0	2020-05-21
+
+ [ Bug Fixes ]
+ - version_later_postfix: cover lack of leading space
+
+ [ Test Suite ]
+ - relax deep inspection of generated regex
+
+ [ Other ]
+ - Added: add trait object generated
+ - Added: add trait objects addr_fsf addr_fsf_franklin
+   addr_fsf_franklin_steet addr_fsf_mass addr_fsf_temple
+ - Added: add trait objects except_autoconf_data except_autoconf_2
+   except_autoconf_2_archive except_autoconf_2_autotroll
+   except_autoconf_2_g10 except_autoconf_3 except_bison_1_24
+   except_bison_2_2 except_faust except_openssl except_openssl-lgpl
+   except_openssl_s3 except_prefix_agpl except_prefix_generic
+   except_prefix_gpl except_prefix_gpl_clisp except_prefix_lgpl
+   except_proguard except_qt_gpl_1 except_qt_gpl_eclipse
+   except_qt_gpl_openssl except_qt_kernel except_qt_lgpl_1_1
+   except_qt_nosource except_sdc except_sollya_4_1 except_warzone
+   except_xerces
+ - apache apache_1_1 apache_2: add caption for 'Apache Public License' and
+   'Apache Software License'
+ - bittorrent_1: fix list alternate SPDX caption (not bogusly as iri)
+ - bsd_3_clause: add names 'EPL' 'EPL-1.0', and 'captions 'new BSD License'
+   'Eclipse Distribution License'
+ - license gpl_2: cover 'is covered by he GNU' (original revision with
+   typo)
+ - licensed_under: cover 'subject to'
+ - reorder patterns: traits before licenses
+ - synthesized grants: cover 'the $license version 2 (the $shortname
+   License)'
+
 v3.3.1	2020-05-17
 
  [ Bug Fixes ]

@@ -23,7 +23,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Country
   homepage: https://metacpan.org/release/Sah-Schemas-Country
   repository: git://github.com/perlancar/perl-Sah-Schemas-Country.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -35,7 +35,7 @@ x_Dist_Zilla:
           Module::Metadata: '1.000036'
           version: '0.006'
       name: Sah::Schemas
-      version: '0.016'
+      version: '0.017'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -150,11 +150,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.003'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
@@ -290,11 +290,11 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.06'
+              version: '0.081'
             -
               class: Pod::Weaver::Plugin::Sah::Schemas
               name: -Sah::Schemas
-              version: '0.04'
+              version: '0.05'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -308,7 +308,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.142'
+      version: '0.144'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'

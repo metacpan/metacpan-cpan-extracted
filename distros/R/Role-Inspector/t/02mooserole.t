@@ -74,5 +74,17 @@ ok(
 	'!does_role($x, $y) where $x is a role that consumes $y',
 );
 
+is_deeply(
+	get_role_info('Local::MooseRole4'),
+	+{
+		name     => 'Local::MooseRole4',
+		type     => 'Moose::Role',
+		api      => [sort qw( meta meth3 mod req req_list1 req_list2 req_list3 req_array_ref1 req_array_ref2 )],
+		requires => [sort qw( req req_list1 req_list2 req_list3 req_array_ref1 req_array_ref2 )],
+		provides => [sort qw( mod meta meth3 )],
+	},
+	'can inspect Moose role which uses method modifiers',
+) or diag explain(get_role_info('Local::MooseRole4'));
+
 done_testing;
 

@@ -1,6 +1,11 @@
 Revision history for Perl extension Util::H2O.
 
-0.06	Sun, May 17 2020
+0.08	Sat, May 23 2020
+	- WARNING: Potentially Incompatible Changes:
+		- methods created with "-meth" are removed from the hash by default
+	- minor doc updates
+
+0.06	Sun, May 17 2020	commit 8ef1cd7fe1c003b02f121927bb1ff297a8e69aad
 	- WARNING: Potentially Incompatible Changes:
 		- added "-lock" option and made it the default (locks hash's keyset)
 

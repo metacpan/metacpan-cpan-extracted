@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: This module wraps the www.judobase.org website API.
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use HTTP::Request;
 use JSON::Tiny 'decode_json';

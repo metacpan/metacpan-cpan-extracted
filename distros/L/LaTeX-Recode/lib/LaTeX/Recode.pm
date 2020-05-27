@@ -1,5 +1,5 @@
 package LaTeX::Recode;
-$LaTeX::Recode::VERSION = '0.04';
+
 use strict;
 use warnings;
 use parent qw(Exporter);
@@ -194,7 +194,7 @@ sub latex_decode {
     # Workaround perl's lack of variable-width negative look-behind -
     # Reverse string (and therefore some of the Re) and use variable width negative look-ahead
     $text = reverse $text;
-    $text =~ s/}(\pM+\pL){(?!\pL+\\)/$1/g;
+    $text =~ s/}(\pM+\pL)\{(?!\pL+\\)/$1/g;
     $text = reverse $text;
 
     return $norm ? Unicode::Normalize::normalize( $norm_form, $text ) : $text;

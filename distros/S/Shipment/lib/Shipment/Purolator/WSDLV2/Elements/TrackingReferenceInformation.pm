@@ -1,6 +1,6 @@
 
 package Shipment::Purolator::WSDLV2::Elements::TrackingReferenceInformation;
-$Shipment::Purolator::WSDLV2::Elements::TrackingReferenceInformation::VERSION = '3.04';
+$Shipment::Purolator::WSDLV2::Elements::TrackingReferenceInformation::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -34,7 +34,7 @@ Shipment::Purolator::WSDLV2::Elements::TrackingReferenceInformation
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 

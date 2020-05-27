@@ -1,6 +1,17 @@
 Revision history for Data::Validate::WithYAML
 =============================================
 
+0.20    2020-05-22 11:16:00
+
+        + added not_regex filter
+        + accept a list of regexes to check a value
+
+
+0.19    2020-05-22 10:59:00
+
+        + accept a list of plugins that should be
+          used to check a value
+
 0.18    2019-03-02 11:14:00
 
         + accept scalar reference as config

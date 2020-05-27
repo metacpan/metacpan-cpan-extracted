@@ -2,7 +2,7 @@ package Date::Holidays::TW;
 use strict;
 use utf8;
 
-our $VERSION = v0.1.0;
+our $VERSION = v0.1.1;
 
 use Exporter 'import';
 our @EXPORT_OK = qw(is_tw_holiday tw_holidays);
@@ -41,8 +41,8 @@ my %CAL = (
         "0405" => "民族掃墓節",
         "0607" => "端午節",
         "0913" => "中秋節",
-        "1010" => "國慶日"
-        "1011" => "國慶日"
+        "1010" => "國慶日",
+        "1011" => "國慶日",
     },
     2020 => {
         "0101" => "中華民國開國紀念日",

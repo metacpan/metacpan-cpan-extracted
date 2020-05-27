@@ -3,7 +3,7 @@ package Tickit::Test::MockTerm;
 use strict;
 use warnings;
 
-our $VERSION = '0.70';
+our $VERSION = '0.71';
 
 use base qw( Tickit::Term );
 

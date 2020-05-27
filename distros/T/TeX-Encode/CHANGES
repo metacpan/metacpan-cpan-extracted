@@ -1,9 +1,44 @@
 ==================================================
-Changes from 2019-03-16 00:00:00 +0000 to present.
+Changes from 2019-05-26 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 2.008 at 2020-03-15 08:18:30 +0000
+version 2.009 at 2020-05-25 03:42:04 +0000
+------------------------------------------
+
+  Change: d449a33ec3edbd5844653d2889fb9ce580cfc5b9
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2020-05-25 05:41:47 +0000
+
+    t: enable regression testing
+
+    With '!' fixed, we can now enable testing that it yields the expected
+    result. Do so and add a test case for the hyphen as well. 
+
+  Change: 2e2461e880b07ce6e5ed6bbbcd0057fcecfb090a
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2020-05-25 05:41:46 +0000
+
+    encode: add exclamation mark as unreserved character
+
+    Exclamation marks have no special meaning in TeX and thus need to be
+    in this regex (or we should start blacklisting instead of
+    whitelisting). 
+
+  Change: 0c49764bf5192b121b2f2db46fecda62160bce40
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2020-05-25 05:41:43 +0000
+
+    encode: sync unreserved characters regex with BibTex'
+
+    We have a separate BibTex encode that was out of sync with the Tex
+    one. We should probably combine them, but for now, just sync the
+    regex.
+
+    The hyphen added fixes #9. 
+
+------------------------------------------
+version 2.008 at 2020-03-14 22:22:00 +0000
 ------------------------------------------
 
   Change: c75c5294b659a65046b78bfbde44a36dc8452018
@@ -49,5 +84,5 @@ version 2.006 at 2019-06-02 07:28:48 +0000
     Add dotless i and fix eth 
 
 =================================================
-Plus 16 releases after 2019-03-16 00:00:00 +0000.
+Plus 16 releases after 2019-05-26 00:00:00 +0000.
 =================================================

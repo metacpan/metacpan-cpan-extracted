@@ -45,7 +45,7 @@ test_tcp(
 	client => sub {
 		my $port = shift;
 
-		my $ftp = Net::FTP->new('localhost', Port => $port);
+		my $ftp = Net::FTP->new('127.0.0.1', Port => $port);
 		ok($ftp);
 		ok($ftp->login($user, $pass));
 		is(

@@ -10,6 +10,10 @@ Module::Generic::Scalar - String Manipulation Object Class
     print( $s->substr( 0, 4 ), "\n" );
     # prints: John
 
+=head1 VERSION
+
+    v0.2.2
+
 =head1 DESCRIPTION
 
 The purpos of this calss/package is to provide an object-oriented approach to string manipulation.
@@ -80,6 +84,13 @@ Given a string, this return a new L<Module::Generic::Scalar> object with the fir
 =head2 length
 
 This returns the length of the string, as a L<Module::Generic::Number> object.
+
+=head2 like
+
+Provided with a string or a regular express and this return the value of the regular expression evaluation against the object string.
+
+    my $s = "I disapprove of what you say, but I will defend to the death your right to say it";
+    print( "Matches? ", $s->like( qr/\bapprove[[:blank:]\h]+what\b/ ) ? 'yes' : 'no', "\n" ); # print yes
 
 =head2 ord
 

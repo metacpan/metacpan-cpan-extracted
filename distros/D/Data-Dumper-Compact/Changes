@@ -1,5 +1,8 @@
 Revision history for Data-Dumper-Compact
 
+0.005001 - 2020-05-25
+  - Fixup to use Mu::Tiny everywhere and require working version of Mu::Tiny
+
 0.005000 - 2020-05-20
   - Switch to Mu::Tiny for a shallower dep tree
 

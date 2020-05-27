@@ -3,14 +3,14 @@ use strict;
 use warnings;
 package Email::MIME;
 # ABSTRACT: easy MIME message handling
-$Email::MIME::VERSION = '1.946';
+$Email::MIME::VERSION = '1.949';
 use Email::Simple 2.212; # nth header value
 use parent qw(Email::Simple);
 
 use Carp ();
 use Email::MessageID;
 use Email::MIME::Creator;
-use Email::MIME::ContentType 1.022; # parse_content_disposition
+use Email::MIME::ContentType 1.023; # build_content_type
 use Email::MIME::Encode;
 use Email::MIME::Encodings 1.314;
 use Email::MIME::Header;
@@ -134,7 +134,7 @@ sub new {
 
   my $self = shift->SUPER::new($text, $arg, @rest);
   $self->encode_check_set($encode_check);
-  $self->{ct} = parse_content_type($self->content_type);
+  $self->{ct} = parse_content_type($self->content_type_raw);
   $self->parts;
   return $self;
 }
@@ -174,7 +174,7 @@ sub new {
 #pod
 #pod C<attributes> is a hash of MIME attributes to assign to the part, and may
 #pod override portions of the header set in the C<header> parameter. The hash keys
-#pod correspond directly to methods or modifying a message from
+#pod correspond directly to methods for modifying a message from
 #pod C<Email::MIME::Modifier>. The allowed keys are: content_type, charset, name,
 #pod format, boundary, encoding, disposition, and filename. They will be mapped to
 #pod C<"$attr\_set"> for message modification.
@@ -255,7 +255,7 @@ sub create {
 
   my $email = $class->new($header, \%pass_on);
 
-  for my $key (keys %attrs) {
+  for my $key (sort keys %attrs) {
     $email->content_type_attribute_set($key => $attrs{$key});
   }
 
@@ -377,9 +377,16 @@ sub body_str {
   return $str;
 }
 
+our $MAX_DEPTH = 10;
+
 sub parts_multipart {
   my $self     = shift;
   my $boundary = $self->{ct}->{attributes}->{boundary};
+
+  our $DEPTH ||= 0;
+
+  Carp::croak("attempted to parse a MIME message more than $MAX_DEPTH deep")
+    if $MAX_DEPTH && $DEPTH > $MAX_DEPTH;
 
   # Take a message, join all its lines together.  Now try to Email::MIME->new
   # it with 1.861 or earlier.  Death!  It tries to recurse endlessly on the
@@ -387,7 +394,8 @@ sub parts_multipart {
   # that means it's a bogus message, but a mangled result (or exception) is
   # better than endless recursion. -- rjbs, 2008-01-07
   return $self->parts_single_part
-    unless $boundary and $self->body_raw =~ /^--\Q$boundary\E\s*$/sm;
+    unless defined $boundary and length $boundary and
+           $self->body_raw =~ /^--\Q$boundary\E\s*$/sm;
 
   $self->{body_raw} = $self->SUPER::body;
 
@@ -410,6 +418,7 @@ sub parts_multipart {
   for my $bit (@bits) {
     $bit =~ s/\A[\n\r]+//smg;
     $bit =~ s/(?<!\x0d)$self->{mycrlf}\Z//sm;
+    local $DEPTH = $DEPTH + 1;
     my $email = (ref $self)->new($bit, { encode_check => $self->encode_check });
     push @parts, $email;
   }
@@ -422,6 +431,7 @@ sub parts_multipart {
 sub force_decode_hook { 0 }
 sub decode_hook       { return $_[1] }
 sub content_type      { scalar shift->header("Content-type"); }
+sub content_type_raw  { scalar shift->header_raw("Content-type"); }
 
 sub debug_structure {
   my ($self, $level) = @_;
@@ -541,7 +551,7 @@ sub boundary_set {
   my ($self, $value) = @_;
   my $ct_header = parse_content_type($self->header('Content-Type'));
 
-  if ($value) {
+  if (defined $value and length $value) {
     $ct_header->{attributes}->{boundary} = $value;
   } else {
     delete $ct_header->{attributes}->{boundary};
@@ -727,20 +737,14 @@ sub disposition_set {
 sub filename_set {
   my ($self, $filename) = @_;
   my $dis_header = $self->header('Content-Disposition');
-  my ($disposition, $attrs);
+  my ($disposition, $attrs) = ('inline', {});
   if ($dis_header) {
     my $struct = parse_content_disposition($dis_header);
     $disposition = $struct->{type};
     $attrs = $struct->{attributes};
   }
   $filename ? $attrs->{filename} = $filename : delete $attrs->{filename};
-  $disposition ||= 'inline';
-
-  my $dis = $disposition;
-  while (my ($attr, $val) = each %{$attrs}) {
-    $dis .= qq[; $attr="$val"];
-  }
-
+  my $dis = build_content_disposition({type => $disposition, attributes => $attrs});
   $self->header_raw_set('Content-Disposition' => $dis);
 }
 
@@ -764,7 +768,8 @@ sub parts_set {
   if (@{$parts} > 1 or $ct_header->{type} eq 'multipart') {
 
     # setup multipart
-    $ct_header->{attributes}->{boundary} ||= Email::MessageID->new->user;
+    $ct_header->{attributes}->{boundary} = Email::MessageID->new->user
+      unless defined $ct_header->{attributes}->{boundary} and length $ct_header->{attributes}->{boundary};
     my $bound = $ct_header->{attributes}->{boundary};
     foreach my $part (@{$parts}) {
       $body .= "$self->{mycrlf}--$bound$self->{mycrlf}";
@@ -787,7 +792,11 @@ sub parts_set {
     my $from_ct = parse_content_type($parts->[0]->header('Content-Type'));
     @{$ct_header}{qw[type subtype]} = @{ $from_ct }{qw[type subtype]};
 
-    $ct_header->{attributes}{charset} = $from_ct->{attributes}{charset};
+    if (exists $from_ct->{attributes}{charset}) {
+      $ct_header->{attributes}{charset} = $from_ct->{attributes}{charset};
+    } else {
+      delete $ct_header->{attributes}{charset};
+    }
 
     $self->encoding_set($parts->[0]->header('Content-Transfer-Encoding'));
     delete $ct_header->{attributes}->{boundary};
@@ -881,11 +890,7 @@ sub walk_parts {
 
 sub _compose_content_type {
   my ($self, $ct_header) = @_;
-  my $ct = join q{/}, @{$ct_header}{qw[type subtype]};
-  for my $attr (sort keys %{ $ct_header->{attributes} }) {
-    next unless defined (my $value = $ct_header->{attributes}{$attr});
-    $ct .= qq[; $attr="$value"];
-  }
+  my $ct = build_content_type({type => $ct_header->{type}, subtype => $ct_header->{subtype}, attributes => $ct_header->{attributes}});
   $self->header_raw_set('Content-Type' => $ct);
   $self->{ct} = $ct_header;
 }
@@ -935,7 +940,7 @@ Email::MIME - easy MIME message handling
 
 =head1 VERSION
 
-version 1.946
+version 1.949
 
 =head1 SYNOPSIS
 
@@ -1067,7 +1072,7 @@ C<header_str>.  Its values will be used verbatim.
 
 C<attributes> is a hash of MIME attributes to assign to the part, and may
 override portions of the header set in the C<header> parameter. The hash keys
-correspond directly to methods or modifying a message from
+correspond directly to methods for modifying a message from
 C<Email::MIME::Modifier>. The allowed keys are: content_type, charset, name,
 format, boundary, encoding, disposition, and filename. They will be mapped to
 C<"$attr\_set"> for message modification.
@@ -1333,6 +1338,12 @@ For example:
     + text/plain
     + text/html
 
+=head1 CONFIGURATION
+
+The variable C<$Email::MIME::MAX_DEPTH> is the maximum depth of parts that will
+be processed.  It defaults to 10, already higher than legitimate mail is ever
+likely to be.  This value may go up over time as the parser is improved.
+
 =head1 TODO
 
 All of the Email::MIME-specific guts should move to a single entry on the
@@ -1368,7 +1379,7 @@ Simon Cozens <simon@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex Vandiver Arthur Axel 'fREW' Schmidt Brian Cassidy Dan Book David Steinbrunner Dotan Dimet Geraint Edwards Jesse Luehrs Kurt Anderson Lance A. Brown Matthew Horsfall (alh) memememomo Michael McClimon Pali Shawn Sorichetti Tomohiro Hosaka
+=for stopwords Alex Vandiver Anirvan Chatterjee Arthur Axel 'fREW' Schmidt Brian Cassidy Damian Lukowski Dan Book David Steinbrunner Dotan Dimet dxdc Eric Wong Geraint Edwards Jesse Luehrs Kurt Anderson Lance A. Brown Matthew Horsfall (alh) memememomo Michael McClimon Pali Ricardo Signes Shawn Sorichetti Tomohiro Hosaka
 
 =over 4
 
@@ -1378,11 +1389,19 @@ Alex Vandiver <alexmv@mit.edu>
 
 =item *
 
+Anirvan Chatterjee <anirvan@users.noreply.github.com>
+
+=item *
+
 Arthur Axel 'fREW' Schmidt <frioux@gmail.com>
 
 =item *
 
 Brian Cassidy <bricas@cpan.org>
+
+=item *
+
+Damian Lukowski <damian.lukowski@credativ.de>
 
 =item *
 
@@ -1395,6 +1414,14 @@ David Steinbrunner <dsteinbrunner@pobox.com>
 =item *
 
 Dotan Dimet <dotan@corky.net>
+
+=item *
+
+dxdc <dan@element26.net>
+
+=item *
+
+Eric Wong <e@80x24.org>
 
 =item *
 
@@ -1427,6 +1454,10 @@ Michael McClimon <michael@mcclimon.org>
 =item *
 
 Pali <pali@cpan.org>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 
@@ -1568,6 +1599,12 @@ __END__
 #pod   + multipart/alternative; boundary="=_NextPart_2"; charset="BIG-5"
 #pod     + text/plain
 #pod     + text/html
+#pod
+#pod =head1 CONFIGURATION
+#pod
+#pod The variable C<$Email::MIME::MAX_DEPTH> is the maximum depth of parts that will
+#pod be processed.  It defaults to 10, already higher than legitimate mail is ever
+#pod likely to be.  This value may go up over time as the parser is improved.
 #pod
 #pod =head1 TODO
 #pod

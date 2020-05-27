@@ -1,16 +1,22 @@
-# $Id: password_verify.t,v 1.2 2017/06/24 13:25:32 cmanley Exp $
 # This file must be saved in UTF-8 encoding!
 use strict;
 use warnings;
 use Test::More;
 use lib qw(../lib);
-use PHP::Functions::Password;
+
 
 my %tests_verify_good = (
-	'hello'		=> '$2a$10$O0fG6ExZRx4mEZxsRHqPKuDy9U2HW9M4UONC1hnsx84tW/bb5URFO',
-	'Test 123'	=> '$2b$10$wOmSB/8mvcXJBAnPTJzO..tFOq4nCxP21vTfWqunrVi5Irsi3Obcy',
-	'€U maffia'	=> '$2y$04$f5VgvyHCr0OiPbvjdZ8zJuPBHD6Tul6nleZSWUVkk/HSOKOC8DmFy',	# UTF-8!
+	'hello'			=> '$2a$10$O0fG6ExZRx4mEZxsRHqPKuDy9U2HW9M4UONC1hnsx84tW/bb5URFO',
+	'Test 123'		=> '$2b$10$wOmSB/8mvcXJBAnPTJzO..tFOq4nCxP21vTfWqunrVi5Irsi3Obcy',
+	'€U maffia'		=> '$2y$04$f5VgvyHCr0OiPbvjdZ8zJuPBHD6Tul6nleZSWUVkk/HSOKOC8DmFy',	# UTF-8!
 );
+if ($INC{'Crypt/Argon2.pm'} || eval { require Crypt::Argon2; }) {
+	$tests_verify_good{'€uro 123'}   = '$argon2id$v=19$m=65536,t=4,p=1$d0pJRy83QmFtbjRoMTRMLg$LUUfxwFcaIeV/V/L6vs2ist/n41kUfuGEKKfoYFbOtY';	# UTF-8!
+	$tests_verify_good{'top secret'} = '$argon2i$v=19$m=65536,t=4,p=1$QVVILkUvbUFaNGQzOEpKTA$PuQa7RB6cJWHFRJXGxXqi0qW51N801ZS9ZE7f+gDnjI';
+}
+else {
+	diag('Skipping some tests because the Crypt::Argon2 module is not installed');
+}
 my %tests_verify_bad = (
 	'wrong password'	=> '$2a$10$O0fG6ExZRx4mEZxsRHqPKuDy9U2HW9M4UONC1hnsx84tW/bb5URFO',
 	'garbage'			=> '0fG6ExZRx4mEZxsRHqPKuDy9U2HW9M4UONC1hnsx84tsdfs',
@@ -27,19 +33,23 @@ if (!($ENV{'HARNESS_ACTIVE'} || ($^O eq 'MSWin32'))) {	# experimental: that's wh
 		my $phpversion = `php -v`;
 		$phpversion =~ s/^PHP (\S+)\s.*/$1/s;
 		if ($phpversion =~ /^(\d{1,3}\.\d{1,6})\b/) {
-			if ($1 < 5.5) {
+			#if ($1 < 5.5) {
+			if ($1 < 7.3) {
 				undef($php);
 			}
 		}
-		print "Found PHP executable $php with version $phpversion: " . ($php ? 'OK' : 'TOO OLD') . "\n";
+		diag("Found PHP executable $php with version $phpversion: " . ($php ? 'OK' : 'TOO OLD') . "\n");
 	}
 	else {
 		undef($php);
 	}
 }
 
-plan tests => scalar(@methods) + ($php ? 3 : 2) * (scalar(keys(%tests_verify_good)) + scalar(keys(%tests_verify_bad)));
+plan tests => 1 + scalar(@methods) + ($php ? 3 : 2) * (scalar(keys(%tests_verify_good)) + scalar(keys(%tests_verify_bad)));
+
 my $class = 'PHP::Functions::Password';
+use_ok($class) || BAIL_OUT("Failed to use $class");
+
 foreach my $method (@methods) {
 	can_ok($class, $method);
 	if ($method =~ /^password/) {

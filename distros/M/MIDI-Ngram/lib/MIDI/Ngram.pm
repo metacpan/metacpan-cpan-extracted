@@ -1,9 +1,9 @@
 package MIDI::Ngram;
 our $AUTHORITY = 'cpan:GENE';
 
-# ABSTRACT: Find the top repeated note phrases of a MIDI file
+# ABSTRACT: Find the top repeated note phrases of MIDI files
 
-our $VERSION = '0.0901';
+our $VERSION = '0.1501';
 
 use Moo;
 use strictures 2;
@@ -11,53 +11,58 @@ use namespace::clean;
 
 use Carp;
 use Lingua::EN::Ngram;
-use List::Util qw( shuffle );
+use List::Util qw( shuffle uniq );
 use List::Util::WeightedChoice qw( choose_weighted );
-use MIDI::Simple;
-use Music::Gestalt;
+use MIDI::Util;
 use Music::Note;
-use Music::Tempo;
 
 
 has in_file => (
     is       => 'ro',
-    isa      => \&_invalid_list,
+    isa      => \&_is_list,
     required => 1,
 );
 
 
 has ngram_size => (
     is      => 'ro',
-    isa     => \&_invalid_integer,
+    isa     => \&_is_integer,
     default => sub { 2 },
 );
 
 
 has max_phrases => (
     is      => 'ro',
-    isa     => \&_invalid_integer,
+    isa     => \&_is_integer0,
     default => sub { 10 },
 );
 
 
 has bpm => (
     is      => 'ro',
-    isa     => \&_invalid_integer,
+    isa     => \&_is_integer,
     default => sub { 100 },
 );
 
 
 has durations => (
     is      => 'ro',
-    isa     => \&_invalid_list,
-    default => sub { [qw( qn tqn )] },
+    isa     => \&_is_list,
+    default => sub { [] },
 );
 
 
 has patches => (
     is      => 'ro',
-    isa     => \&_invalid_list,
+    isa     => \&_is_list,
     default => sub { [ 0 .. 127 ] },
+);
+
+
+has random_patch => (
+    is      => 'ro',
+    isa     => \&_is_boolean,
+    default => sub { 0 },
 );
 
 
@@ -76,55 +81,41 @@ has pause_duration => (
 
 has analyze => (
     is  => 'ro',
-    isa => \&_invalid_list,
+    isa => \&_is_list,
 );
 
 
 has loop => (
     is      => 'ro',
-    isa     => \&_invalid_integer,
+    isa     => \&_is_integer,
     default => sub { 10 },
 );
 
 
 has weight => (
     is      => 'ro',
-    isa     => \&_invalid_boolean,
-    default => sub { 0 },
-);
-
-
-has random_patch => (
-    is      => 'ro',
-    isa     => \&_invalid_boolean,
+    isa     => \&_is_boolean,
     default => sub { 0 },
 );
 
 
 has shuffle_phrases => (
     is      => 'ro',
-    isa     => \&_invalid_boolean,
+    isa     => \&_is_boolean,
     default => sub { 0 },
 );
 
 
 has single_phrases => (
     is      => 'ro',
-    isa     => \&_invalid_boolean,
+    isa     => \&_is_boolean,
     default => sub { 0 },
 );
 
 
 has one_channel => (
     is      => 'ro',
-    isa     => \&_invalid_boolean,
-    default => sub { 0 },
-);
-
-
-has gestalt => (
-    is      => 'ro',
-    isa     => \&_invalid_boolean,
+    isa     => \&_is_boolean,
     default => sub { 0 },
 );
 
@@ -135,6 +126,10 @@ has score => (
     lazy     => 1,
 );
 
+has _opus_ticks => (
+    is => 'rw',
+);
+
 
 has notes => (
     is       => 'ro',
@@ -142,121 +137,221 @@ has notes => (
     default  => sub { {} },
 );
 
+has _event_list => (
+    is       => 'ro',
+    init_arg => undef,
+    lazy     => 1,
+    builder  => 1,
+);
+
+sub _build__event_list {
+    my ($self) = @_;
+
+    my %events;
+
+    for my $file ( @{ $self->in_file } ) {
+        my $opus = MIDI::Opus->new({ from_file => $file });
+
+        # XXX Assume that all files have the same MIDI ppqn
+        $self->_opus_ticks($opus->ticks)
+            unless $self->_opus_ticks;
+
+        for my $t ( $opus->tracks ) {
+            my $score_r = MIDI::Score::events_r_to_score_r( $t->events_r );
+            #MIDI::Score::dump_score($score_r);
+
+            # Collect the note events
+            for my $event (@$score_r) {
+                # ['note', <start>, <duration>, <channel>, <note>, <velocity>]
+                if ($event->[0] eq 'note') {
+                    push @{ $events{ $event->[3] }{ $event->[1] } },
+                        { note => $event->[4], dura => $event->[2] };
+                }
+            }
+        }
+    }
+
+    return \%events;
+}
+
+
+has dura => (
+    is       => 'ro',
+    init_arg => undef,
+    default  => sub { {} },
+);
+
+has _dura_list => (
+    is       => 'ro',
+    init_arg => undef,
+    default  => sub { {} },
+);
+
+
+has dura_net => (
+    is       => 'ro',
+    init_arg => undef,
+    lazy     => 1,
+    builder  => 1,
+);
+
+sub _build_dura_net {
+    my ($self) = @_;
+
+    my %net;
+
+    for my $channel (sort { $a <=> $b } keys %{ $self->_event_list }) {
+        my @group;
+        my $last;
+
+        for my $start (sort { $a <=> $b } keys %{ $self->_event_list->{$channel} }) {
+            my $duras = join ',', map { $_->{dura} } @{ $self->_event_list->{$channel}{$start} };
+
+            if (@group == $self->ngram_size) {
+                my $group = join ' ', @group;
+                $net{$channel}{ $last . '-' . $group }++
+                    if $last;
+                $last = $group;
+                @group = ();
+            }
+            push @group, $self->dura_convert($duras);
+        }
+    }
+
+    return \%net;
+}
+
+
+has note_net => (
+    is       => 'ro',
+    init_arg => undef,
+    lazy     => 1,
+    builder  => 1,
+);
+
+sub _build_note_net {
+    my ($self) = @_;
+
+    my %net;
+
+    for my $channel (sort { $a <=> $b } keys %{ $self->_event_list }) {
+        my @group;
+        my $last;
+
+        for my $start (sort { $a <=> $b } keys %{ $self->_event_list->{$channel} }) {
+            my $notes = join ',', map { $_->{note} } @{ $self->_event_list->{$channel}{$start} };
+
+            if (@group == $self->ngram_size) {
+                my $group = join ' ', @group;
+                $net{$channel}{ $last . '-' . $group }++
+                    if $last;
+                $last = $group;
+                @group = ();
+            }
+
+            push @group, $self->note_convert($notes);
+        }
+    }
+
+    return \%net;
+}
+
 
 sub process {
     my ($self) = @_;
 
-    my $analysis;
+    for my $channel (sort { $a <=> $b } keys %{ $self->_event_list }) {
+        # Skip if this is not a channel to analyze
+        next if $self->analyze && keys @{ $self->analyze }
+            && !grep { $_ == $channel } @{ $self->analyze };
 
-    my $files = ref $self->in_file eq 'ARRAY' ? $self->in_file : [ $self->in_file ];
+        my $dura_text = '';
+        my $note_text = '';
 
-    for my $file ( @$files ) {
-        # Counter for the tracks seen
-        my $i = 0;
+        for my $start (sort { $a <=> $b } keys %{ $self->_event_list->{$channel} }) {
+            # CSV durations and notes
+            my $duras = join ',', map { $_->{dura} } @{ $self->_event_list->{$channel}{$start} };
+            my $notes = join ',', map { $_->{note} } @{ $self->_event_list->{$channel}{$start} };
 
-        my $opus = MIDI::Opus->new({ from_file => $file });
+            # Transliterate MIDI note numbers to alpha-code
+            ( my $str = $duras ) =~ tr/0-9,/a-k/;
+            $dura_text .= "$str ";
+            ( $str = $notes ) =~ tr/0-9,/a-k/;
+            $note_text .= "$str ";
+        }
 
-        $analysis .= "Ngram analysis of $file:\n\tN\tReps\tPhrase\n";
+        # Parse the note text into ngrams
+        my $dura_ngram = Lingua::EN::Ngram->new( text => $dura_text );
+        my $dura_phrase = $dura_ngram->ngram( $self->ngram_size );
+        my $note_ngram = Lingua::EN::Ngram->new( text => $note_text );
+        my $note_phrase = $note_ngram->ngram( $self->ngram_size );
 
-        # Handle each track...
-        for my $t ( $opus->tracks ) {
-            # Collect the note events for each track
-            my @events = grep {
-                $_->[0] eq 'note_on'    # Only consider note_on events
-                && $_->[2] != 9         # Avoid the drum channel
-                && $_->[4] != 0         # Ignore events of velocity 0
-            } $t->events;
+        # Counter for the ngrams seen
+        my $j = 0;
 
-            # XXX Assume that there is one channel per track
-            my $track_channel = $self->one_channel ? 0 : $events[0][2];
+        # Display the ngrams in order of their repetition amount
+        for my $p ( sort { $dura_phrase->{$b} <=> $dura_phrase->{$a} || $a cmp $b } keys %$dura_phrase ) {
+            # Skip single occurance phrases if requested
+            next if !$self->single_phrases && $dura_phrase->{$p} == 1;
 
-            # Skip if there are no events and no channel
-            next unless @events && defined $track_channel;
+            $j++;
 
-            # Skip if this is not a channel to analyze
-            next if $self->analyze && keys @{ $self->analyze }
-                && !grep { $_ == $track_channel } @{ $self->analyze };
+            # End if a max is set and we are past the maximum
+            last if $self->max_phrases > 0 && $j > $self->max_phrases;
 
-            $i++;
-            $analysis .= "Track $i. Channel: $track_channel\n";
+            # Transliterate our letter code back to MIDI note numbers
+            ( my $num = $p ) =~ tr/a-k/0-9,/;
 
-            # Declare the notes to inspect
-            my $text = '';
+            # Convert MIDI numbers to named durations.
+            my $text = $self->dura_convert($num);
 
-            # Accumulate the notes
-            for my $event ( @events ) {
-                # Transliterate MIDI note numbers to alpha-code
-                ( my $str = $event->[3] ) =~ tr/0-9/a-j/;
-                $text .= "$str ";
+            # Save the number of times the phrase is repeated
+            $self->dura->{$channel}{$text} += $dura_phrase->{$p};
+        }
+
+        unless (@{ $self->durations }) {
+            # Build the durations set
+            for my $channel (keys %{ $self->dura }) {
+                for my $duras (keys %{ $self->dura->{$channel} }) {
+                    # A dura string is a space separated, CSV
+                    my @duras = split / /, $duras;
+                    push @{ $self->_dura_list->{$channel} }, map { split /,/, $_ } @duras;
+                }
+                $self->_dura_list->{$channel} = [ uniq @{ $self->_dura_list->{$channel} } ];
             }
+        }
 
-            # Parse the note text into ngrams
-            my $ngram  = Lingua::EN::Ngram->new( text => $text );
-            my $phrase = $ngram->ngram( $self->ngram_size );
+        # Reset counter for the ngrams seen
+        $j = 0;
 
-            # Counter for the ngrams seen
-            my $j = 0;
+        # Display the ngrams in order of their repetition amount
+        for my $p ( sort { $note_phrase->{$b} <=> $note_phrase->{$a} || $a cmp $b } keys %$note_phrase ) {
+            # Skip single occurance phrases if requested
+            next if !$self->single_phrases && $note_phrase->{$p} == 1;
 
-            # Display the ngrams in order of their repetition amount
-            for my $p ( sort { $phrase->{$b} <=> $phrase->{$a} || $a cmp $b } keys %$phrase ) {
-                # Skip single occurance phrases if requested
-                next if !$self->single_phrases && $phrase->{$p} == 1;
+            $j++;
 
-                # Don't allow phrases that are not the right size
-                my @items = grep { $_ } split /\s+/, $p;
-                next unless @items == $self->ngram_size;
+            # End if a max is set and we are past the maximum
+            last if $self->max_phrases > 0 && $j > $self->max_phrases;
 
-                $j++;
+            # Transliterate our letter code back to MIDI note numbers
+            ( my $num = $p ) =~ tr/a-k/0-9,/;
 
-                # End if we are past the maximum
-                last if $self->max_phrases > 0 && $j > $self->max_phrases;
+            # Convert MIDI numbers to named notes.
+            my $text = $self->note_convert($num);
 
-                # Transliterate our letter code back to MIDI note numbers
-                ( my $num = $p ) =~ tr/a-j/0-9/;
-
-                # Convert MIDI numbers to named notes.
-                my $text = _convert($num);
-
-                $analysis .= sprintf "\t%d\t%d\t%s %s\n", $j, $phrase->{$p}, $num, $text;
-
-                # Save the number of times the phrase is repeated
-                $self->notes->{$track_channel}{$num} += $phrase->{$p};
-            }
-
-            $analysis .= $self->_gestalt_analysis( \@events )
-                if $self->gestalt;
+            # Save the number of times the phrase is repeated
+            $self->notes->{$channel}{$text} += $note_phrase->{$p};
         }
     }
-
-    return $analysis;
-}
-
-sub _gestalt_analysis {
-    my ( $self, $events ) = @_;
-
-    my $score_r = MIDI::Score::events_r_to_score_r( $events );
-    $score_r = MIDI::Score::sort_score_r($score_r);
-
-    my $g = Music::Gestalt->new( score => $score_r );
-
-    my $note = Music::Note->new( $g->PitchLowest, 'midinum' );
-    my $low  = $note->format('midi');
-    $note    = Music::Note->new( $g->PitchHighest, 'midinum' );
-    my $high = $note->format('midi');
-    $note    = Music::Note->new( $g->PitchMiddle, 'midinum' );
-    my $mid  = $note->format('midi');
-
-    my $gestalt = "\tRange: $low to $high\n"
-        . "\tSpan: $mid +/- " . $g->PitchRange . "\n";
-
-    return $gestalt;
 }
 
 
 sub populate {
     my ($self) = @_;
 
-    $self->score( _setup_midi( bpm => $self->bpm ) );
+    my $score = MIDI::Util::setup_score( bpm => $self->bpm );
+    $self->score($score);
 
     my @phrases;
     my $playback;
@@ -269,7 +364,7 @@ sub populate {
             my $func = sub {
                 my $patch = $self->random_patch ? $self->_random_patch() : 0;
 
-                _set_chan_patch( $self->score, $channel, $patch );
+                MIDI::Util::set_chan_patch( $self->score, $channel, $patch );
 
                 for my $n ( 1 .. $self->loop ) {
                     my $choice = choose_weighted(
@@ -277,15 +372,15 @@ sub populate {
                         [ values %{ $self->notes->{$channel} } ]
                     );
 
-                    # Convert MIDI numbers to named notes.
-                    my $text = _convert($choice);
-
-                    $playback .= "\t$n\t$channel\t$choice $text\n";
+                    $playback .= "\t$n\t$channel\t$choice\n";
 
                     # Add each chosen note to the score
                     for my $note ( split /\s+/, $choice ) {
-                        my $duration = $self->durations->[ int rand @{ $self->durations } ];
-                        $self->score->n( $duration, $note );
+                        my @note = split /,/, $note;
+                        my $duration = @{ $self->durations }
+                            ? $self->durations->[ int rand @{ $self->durations } ]
+                            : $self->_dura_list->{$channel}[ int rand @{ $self->_dura_list->{$channel} } ];
+                        $self->score->n( $duration, @note );
                     }
 
                     $self->score->r( $self->pause_duration )
@@ -317,10 +412,7 @@ sub populate {
             for my $phrase ( @track_notes ) {
                 $n++;
 
-                # Convert MIDI numbers to named notes.
-                my $text = _convert($phrase);
-
-                $playback .= "\t$n\t$channel\t$phrase $text\n";
+                $playback .= "\t$n\t$channel\t$phrase\n";
 
                 my @phrase = split /\s/, $phrase;
                 push @all, @phrase;
@@ -332,15 +424,18 @@ sub populate {
             my $func = sub {
                 my $patch = $self->random_patch ? $self->_random_patch() : 0;
 
-                _set_chan_patch( $self->score, $channel, $patch);
+                MIDI::Util::set_chan_patch( $self->score, $channel, $patch);
 
                 for my $note ( @all ) {
                     if ( $note eq 'r' ) {
                         $self->score->r( $self->pause_duration );
                     }
                     else {
-                        my $duration = $self->durations->[ int rand @{ $self->durations } ];
-                        $self->score->n( $duration, $note );
+                        my @note = split /,/, $note;
+                        my $duration = @{ $self->durations }
+                            ? $self->durations->[ int rand @{ $self->durations } ]
+                            : $self->_dura_list->{$channel}[ int rand @{ $self->_dura_list->{$channel} } ];
+                        $self->score->n( $duration, @note );
                     }
                 }
             };
@@ -360,72 +455,81 @@ sub write {
     $self->score->write_score( $self->out_file );
 }
 
+
+sub dura_convert {
+    my ($self, $string) = @_;
+
+    my @text;
+
+    my $match = 0;
+
+    for my $n ( split /\s+/, $string ) {
+        my @csv;
+
+        for my $v (split /,/, $n) {
+            my $dura = $v / $self->_opus_ticks;
+
+            for my $d (keys %MIDI::Simple::Length) {
+                if (sprintf('%.4f', $MIDI::Simple::Length{$d}) eq sprintf('%.4f', $dura)) {
+                    $match++;
+                    $dura = $d;
+                    last;
+                }
+            }
+
+            push @csv, $match ? $dura : 'd' . $n;
+            $match = 0;
+        }
+
+        push @text, join ',', @csv;
+    }
+
+    return join ' ', @text;
+}
+
+
+sub note_convert {
+    my ($self, $string) = @_;
+
+    my @text;
+
+    for my $n ( split /\s+/, $string ) {
+        my @csv;
+
+        for my $v (split /,/, $n) {
+            my $note = Music::Note->new( $v, 'midinum' );
+            push @csv, $note->format('midi');
+        }
+
+        push @text, join ',', @csv;
+    }
+
+    return join ' ', @text;
+}
+
 sub _random_patch {
     my ($self) = @_;
     return $self->patches->[ int rand @{ $self->patches } ];
 }
 
-# Convert MIDI numbers to named notes.
-sub _convert {
-    my $string = shift;
-
-    my $text = '( ';
-
-    for my $n ( split /\s+/, $string ) {
-        my $note = Music::Note->new( $n, 'midinum' );
-        $text .= $note->format('midi') . ' ';
-    }
-
-    $text .= ')';
-
-    return $text;
+sub _is_integer0 {
+    croak 'Not greater than or equal to zero'
+        unless defined $_[0] && $_[0] =~ /^\d+$/;
 }
 
-sub _setup_midi {
-    my %args = (
-        volume  => 120,
-        bpm     => 100,
-        channel => 0,
-        patch   => 0,
-        octave  => 5,
-        @_,
-    );
-
-    my $score = MIDI::Simple->new_score();
-
-    $score->set_tempo( bpm_to_ms($args{bpm}) * 1000 );
-
-    $score->Volume($args{volume});
-    $score->Channel($args{channel});
-    $score->Octave($args{octave});
-    $score->patch_change( $args{channel}, $args{patch} );
-
-    return $score;
-}
-
-sub _set_chan_patch {
-    my ( $score, $channel, $patch ) = @_;
-
-    $channel //= 0;
-    $patch   //= 0;
-
-    $score->patch_change( $channel, $patch );
-    $score->noop( 'c' . $channel );
-}
-
-sub _invalid_integer {
+sub _is_integer {
     croak 'Invalid integer'
-        unless $_[0] && $_[0] =~ /^\d+$/ && $_[0] > 0;
+        unless defined $_[0] && $_[0] =~ /^\d+$/ && $_[0] > 0;
 }
 
-sub _invalid_list {
+sub _is_list {
     croak 'Invalid list'
         unless ref $_[0] eq 'ARRAY';
 }
 
-sub _invalid_boolean {
+sub _is_boolean {
     croak 'Invalid Boolean'
-        unless defined $_[0] && ( $_[0] == 1 || $_[0] == 0 );
+        unless defined $_[0] && $_[0] =~ /^\d$/ && ( $_[0] == 1 || $_[0] == 0 );
 }
 
 1;
@@ -438,138 +542,211 @@ __END__
 
 =head1 NAME
 
-MIDI::Ngram - Find the top repeated note phrases of a MIDI file
+MIDI::Ngram - Find the top repeated note phrases of MIDI files
 
 =head1 VERSION
 
-version 0.0901
+version 0.1501
 
 =head1 SYNOPSIS
 
   use MIDI::Ngram;
+
+  # Analyze a tune and build a new MIDI file of repetitions
   my $mng = MIDI::Ngram->new(
     in_file      => [ 'eg/twinkle_twinkle.mid' ],
     ngram_size   => 3,
+    max_phrases  => 0, # Analyze all events
     patches      => [qw( 68 69 70 71 72 73 )],
     random_patch => 1,
-    gestalt      => 1,
   );
-  my $analysis = $mng->process;
+
+  $mng->process;
+
+  # Analyze
+  print Dumper $mng->duras;
+  print Dumper $mng->notes;
+
+  print Dumper $mng->dura_net;
+  print Dumper $mng->note_net;
+
   my $playback = $mng->populate;
+  print $playback;
+
   $mng->write;
+
+  # Convert a MIDI number string to a duration or note name.
+  my $named = $mng->dura_convert('96');
+  $named = $mng->note_convert('60 61,62');
 
 =head1 DESCRIPTION
 
-C<MIDI::Ngram> parses a given list of MIDI files and finds the top repeated note phrases.
+C<MIDI::Ngram> parses a given list of MIDI files, finds the top
+repeated note phrases, builds the analysis, transition network, and
+renders to a MIDI file if desired.
 
 =head1 ATTRIBUTES
 
 =head2 in_file
 
-Required.  An ArrayRef of MIDI files to process.
+Required.  An Array reference of MIDI files to process.
 
 =head2 ngram_size
 
-Ngram phrase size.  Default: 2
+Ngram phrase size.
+
+Default: C<2>
 
 =head2 max_phrases
 
-The maximum number of phrases to play.  Default: 10
+The maximum number of phrases to analyze/play.
+
+Default: C<10>
+
+Setting this to a value of C<0> analyzes all phrases.
 
 =head2 bpm
 
-Beats per minute.  Default: 100
+Beats per minute.
+
+Default: C<100>
 
 =head2 durations
 
-The note durations to choose from (at random).  Default: [qn tqn]
+The optional MIDI note durations to choose from (at random).
+
+Default: C<[]> (i.e. use the computed B<dura> phrases instead)
+
+Using a setting of C<['qn']> allows you to evenly inspect the phrases
+during audio playback.
 
 =head2 patches
 
-The patches to choose from (at random) if given the B<random_patch> option.
-Otherwise 0 (piano) is used.  Default: [0 .. 127]
+The patches to choose from (at random) if given the B<random_patch>
+option.
 
-=head2 out_file
-
-MIDI output file.  Default: midi-ngram.mid
-
-=head2 pause_duration
-
-Insert a rest of the given duration after each phrase.  Default: '' (no resting)
-
-=head2 analyze
-
-ArrayRef of the channels to analyze.  If not given, all channels are analyzed.
-
-=head2 loop
-
-The number of times to choose a weighted phrase.  * Only works with the
-B<weight> option.  Default: 4
-
-=head2 weight
-
-Boolean.  Play phrases by their ngram repetition occurrence.  Default: 0
+Default: C<[0 .. 127]>
 
 =head2 random_patch
 
 Boolean.  Choose a random patch from B<patches> for each channel.
-Default: 0 (piano)
+
+Default: C<0> (meaning "use the piano patch")
+
+=head2 out_file
+
+MIDI output file.
+
+Default: C<midi-ngram.mid>
+
+=head2 pause_duration
+
+Insert a rest of the given duration after each phrase.
+
+Default: C<''> (no resting)
+
+=head2 analyze
+
+Array reference of the channels to analyze.  If not given, all
+channels are analyzed.
+
+Default: C<undef>
+
+=head2 loop
+
+The number of times to choose a weighted phrase.  * This only works
+in conjunction with the B<weight> option.
+
+Default: C<10>
+
+=head2 weight
+
+Boolean.  Play phrases according to the probability of their
+repetition occurrence with the function
+L<List::Util::WeightedChoice/choose_weighted>.
+
+Default: C<0>
 
 =head2 shuffle_phrases
 
-Boolean.  Shuffle the non-weighted phrases before playing them.  Default: 0
+Boolean.  Shuffle the non-weighted phrases before playing them.
+
+Default: C<0>
 
 =head2 single_phrases
 
-Boolean.  Allow single occurrence ngrams.  Default: 0
+Boolean.  Allow single occurrence ngrams.
+
+Default: C<0>
 
 =head2 one_channel
 
-Boolean.  Accumulate phrases into a single list.  Default: 0
+Boolean.  Accumulate phrases onto a single channel.
 
-=head2 gestalt
-
-Boolean.  Include pitch range in the analysis.
+Default: C<0>
 
 =head2 score
 
-The MIDI score object.  Constructed at runtime.  Constructor argument if given
-will be ignored.
+The score object in L<MIDI::Simple/"MAIN-ROUTINES">.  Constructed by
+the B<populate> method.
 
 =head2 notes
 
-The bucket of ngrams.  Constructed at runtime.  Constructor argument if given
-will be ignored.
+The hash-reference bucket of pitch ngrams.  Constructed by the
+B<process> method.
+
+=head2 dura
+
+The hash-reference bucket of duration ngrams.  Constructed by the
+B<process> method.
+
+=head2 dura_net
+
+A hash-reference ngram transition network of the durations.
+Constructed by the B<process> method.
+
+=head2 note_net
+
+A hash-reference ngram transition network of the notes.  Constructed
+by the B<process> method.
 
 =head1 METHODS
 
-=head2 new()
+=head2 new
 
   $mng = MIDI::Ngram->new(%arguments);
 
 Create a new C<MIDI::Ngram> object.
 
-=head2 process()
+=head2 process
 
-  my $analysis = $mng->process;
+  $analysis = $mng->process;
 
 Find all ngram phrases and return the note analysis.
 
-=head2 populate()
+=head2 populate
 
-  my $playback = $mng->populate;
+  $playback = $mng->populate;
 
 Add notes to the MIDI score and return the playback notes.
 
-=head2 write()
+=head2 write
 
   $mng->write;
 
 Write out the MIDI file.
 
-=head1 TO DO
+=head2 dura_convert
 
-Preserve note durations instead of random assignment.
+  $durations = $mng->dura_convert($string);
+
+Convert MIDI numbers to named durations.
+
+=head2 note_convert
+
+  $notes = $mng->note_convert($string);
+
+Convert MIDI numbers to named notes.
 
 =head1 SEE ALSO
 
@@ -583,11 +760,7 @@ L<List::Util::WeightedChoice>
 
 L<Music::Note>
 
-L<MIDI::Simple>
-
-L<Music::Tempo>
-
-L<Music::Gestalt>
+L<MIDI::Util>
 
 =head1 AUTHOR
 
@@ -595,7 +768,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Gene Boggs.
+This software is copyright (c) 2020 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

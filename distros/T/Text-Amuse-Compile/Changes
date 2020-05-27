@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.41 2020-05-21
+
+ - Fix tests on Windows
+
 1.40 2020-05-19
 
  - Add Ligatures=TeX to fontspec (which appears to be missing lately)

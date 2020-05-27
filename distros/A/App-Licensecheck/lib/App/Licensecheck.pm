@@ -13,11 +13,18 @@ use Try::Tiny;
 use Fcntl qw(:seek);
 use Encode;
 use Array::IntSpan;
-use Regexp::Pattern::License 3.1.102;
+use Regexp::Pattern::License 3.4.0;
 use Regexp::Pattern 0.2.12 (
 	're',
 	'License::*' => (
+		engine            => 'RE2',
+		subject           => 'trait',
+		-prefix           => 'EXCEPTION_',
+		-has_tag_matching => '^type:trait:exception(?:\z|:)',
+	),
+	'License::*' => (
 		engine              => 'RE2',
+		capture             => 'named',
 		subject             => 'trait',
 		-prefix             => 'TRAIT_',
 		-has_tag_matching   => '^type:trait(?:\z|:)',
@@ -105,6 +112,20 @@ use MooX::Struct File => [
 		return MooX::Struct::BUILDARGS(@_);
 	}
 	],
+	Exception => [
+	qw( %id! +begin! +end! $file ),
+	BUILDARGS => sub {
+		$log->tracef( 'detected exception: %s: %d-%d', @{ $_[1] } );
+		return MooX::Struct::BUILDARGS(@_);
+	},
+	],
+	Flaw => [
+	qw( %id! +begin! +end! $file ),
+	BUILDARGS => sub {
+		$log->tracef( 'detected flaw: %s: %d-%d', @{ $_[1] } );
+		return MooX::Struct::BUILDARGS(@_);
+	},
+	],
 	Licensing => [
 	-extends  => ['Thing'], qw(@traits),
 	BUILDARGS => sub {
@@ -145,11 +166,11 @@ App::Licensecheck - functions for a simple license checker for source files
 
 =head1 VERSION
 
-Version v3.0.47
+Version v3.1.1
 
 =cut
 
-our $VERSION = version->declare('v3.0.47');
+our $VERSION = version->declare('v3.1.1');
 
 =head1 SYNOPSIS
 
@@ -172,10 +193,11 @@ See the script for casual usage.
 # TODO: make naming scheme configurable
 my %L = licensepatterns(qw(debian spdx));
 
-my @RE_LICENSE = sort map /^LICENSE_(.*)/, keys(%RE);
-my @RE_NAME    = sort map /^NAME_(.*)/,    keys(%RE);
-my @L_family_cc          = sort keys %{ $L{family}{cc} };
-my @L_type_usage         = sort keys %{ $L{type}{usage} };
+my @RE_EXCEPTION = sort map /^EXCEPTION_(.*)/, keys(%RE);
+my @RE_LICENSE   = sort map /^LICENSE_(.*)/,   keys(%RE);
+my @RE_NAME      = sort map /^NAME_(.*)/,      keys(%RE);
+my @L_family_cc  = sort keys %{ $L{family}{cc} };
+my @L_type_usage = sort keys %{ $L{type}{usage} };
 my @L_type_singleversion = sort keys %{ $L{type}{singleversion} };
 my @L_type_versioned     = sort keys %{ $L{type}{versioned} };
 my @L_type_unversioned   = sort keys %{ $L{type}{unversioned} };
@@ -581,9 +603,6 @@ sub licensepatterns
 	}
 
 	#<<<  do not let perltidy touch this (keep long regex on one line)
-	$list{re_grant_license}{local}{address_agpl_gpl_lgpl}{1} = qr/(?:675 Mass Ave|59 Temple Place|51 Franklin Steet|02139|02111-1307)/i;
-	$list{re_grant_license}{local}{exception_agpl_gpl_lgpl}{1} = qr/permission (?:is (also granted|given))? to link (the code of )?this program with (any edition of )?(Qt|the Qt library)/i;
-	$list{re_grant_license}{local}{generated}{2} = qr/(All changes made in this file will be lost|DO NOT ((?:HAND )?EDIT|delete this file|modify)|edit the original|Generated (automatically|by|from|data|with)|generated.*file|auto[- ]generated)/i;
 	$list{re_grant_license}{local}{multi}{1} = qr/$RE{LOCAL_TRAIT_licensed_under}$list{re_trait}{any_of}(?:[^.]|\.\S)*$list{re_name}{lgpl}$RE{LOCAL_TRAIT_KEEP_version}?/i;
 	$list{re_grant_license}{local}{multi}{2} = qr/$RE{LOCAL_TRAIT_licensed_under}$list{re_trait}{any_of}(?:[^.]|\.\S)*$list{re_name}{gpl}$RE{LOCAL_TRAIT_KEEP_version}?/i;
 	$list{re_grant_license}{local}{lgpl}{4} = qr/$RE{LOCAL_TRAIT_licensed_under}$RE{LOCAL_TRAIT_KEEP_version}? of $list{re_name}{lgpl}/i;
@@ -652,9 +671,7 @@ sub parse_license
 
 	my $file = File [ $path, $licensetext ];
 
-	my $gplver    = "";
-	my $extrainfo = "";
-	my $license   = "";
+	my $license = "";
 	my @spdx_gplver;
 
 	my @agpl = qw(agpl agpl_1 agpl_2 agpl_3);
@@ -665,14 +682,10 @@ sub parse_license
 	my %match;
 	my ( %grant, %license );
 
-  # @clues and @expressions contains DEP-5 or SPDX identifiers
-  # it would be more efficient to store license info only in this
-  # array and then convert it to legacy formulation, but there are
-  # corner case (like extrainfo) that would not fit. So the old storage scheme
-  # is kept with the new (SPDX/DEP-5) scheme to keep backward compat.
-	my ( @clues, @expressions );
+   # @clues, @expressions, and @exceptions contains DEP-5 or SPDX identifiers,
+   # and @flaws contains non-SPDX notes.
+	my ( @clues, @expressions, @exceptions, @flaws );
 
-	my $spdx_extra;
 	my $patterns2id = sub {
 		my ( $id, $ver ) = @_;
 		return $id
@@ -729,6 +742,22 @@ sub parse_license
 		while ( $licensetext =~ /$RE{"LICENSE_$id"}/g ) {
 			$pos_license{ $-[0] }{$id}
 				= Trait [ "license($id)", $-[0], $+[0], $file ];
+		}
+	}
+
+	foreach my $trait (
+		qw(except_prefix_generic except_prefix_agpl except_prefix_gpl_clisp except_prefix_lgpl except_prefix_gpl)
+		)
+	{
+		next unless ( $licensetext =~ /$RE{"TRAIT_$trait"}/ );
+		while ( $licensetext =~ /$RE{"TRAIT_$trait"}/g ) {
+			next
+				if (
+				defined(
+					$coverage->get_range( $-[0], $+[0] )->get_element(0)
+				)
+				);
+			push @clues, Trait [ $trait, $-[0], $+[0], $file ];
 		}
 	}
 	foreach my $pos ( sort { $a <=> $b } keys %pos_license ) {
@@ -886,24 +915,29 @@ sub parse_license
 		$self->log->tracef('scan for GNU oddities');
 
 		# address in AGPL/GPL/LGPL
-		given ($licensetext) {
-			when ( $L{re_grant_license}{local}{address_agpl_gpl_lgpl}{1} ) {
-				my $flaw
-					= Trait [ 'flaw(agpl_gpl_lgpl#1)', $-[0], $+[0], $file ];
-				$extrainfo = " (with incorrect FSF address)$extrainfo";
+		while ( $licensetext =~ /$RE{TRAIT_addr_fsf}/g ) {
+			foreach (
+				qw(addr_fsf_franklin_steet addr_fsf_mass addr_fsf_temple))
+			{
+				if ( defined $+{$_} ) {
+					push @flaws, Flaw [
+						$Regexp::Pattern::License::RE{$_}, $-[0], $+[0],
+						$file,
+					];
+				}
 			}
 		}
+	}
 
-		# exception for AGPL/GPL/LGPL
-		given ($licensetext) {
-			when ( $L{re_grant_license}{local}{exception_agpl_gpl_lgpl}{1} ) {
-				my $exception = Trait [
-					'exception(agpl_gpl_lgpl#1)', $-[0], $+[0],
-					$file
-				];
-				$extrainfo  = " (with Qt exception)$extrainfo";
-				$spdx_extra = 'with Qt exception';
-			}
+	# exceptions
+	# TODO: conditionally limit to AGPL/GPL/LGPL
+	foreach (@RE_EXCEPTION) {
+		if ( $licensetext =~ $RE{"EXCEPTION_$_"} ) {
+			my $exception = Exception [
+				$Regexp::Pattern::License::RE{$_}, $-[0], $+[0],
+				$file,
+			];
+			push @exceptions, $exception;
 		}
 	}
 
@@ -912,10 +946,11 @@ sub parse_license
 	given ($licensetext) {
 
 		# generated file
-		break if ( $license{bsl_1} );
-		when ( $L{re_grant_license}{local}{generated}{2} ) {
-			my $meta = Trait [ 'GENERATED FILE', $-[0], $+[0], $file ];
-			$license = $meta->name;
+		when ( $RE{TRAIT_generated} ) {
+			push @flaws, Flaw [
+				$Regexp::Pattern::License::RE{generated}, $-[0], $+[0],
+				$file
+			];
 		}
 	}
 
@@ -1025,7 +1060,10 @@ sub parse_license
 			}
 			when ( $L{re_grant_license}{local}{apache}{2} ) {
 				my $grant = Trait [ 'grant(apache#2)', $-[0], $+[0], $file ];
-				$gen_license->( 'apache', $1, $2, "bsd_${3}_clause" );
+				$gen_license->(
+					'apache', $1, $2,
+					$3 ? "bsd_${3}_clause" : ''
+				);
 				$match{ $patterns2id->( 'apache', $1 ) }{custom} = 1;
 			}
 			when ( $L{re_grant_license}{local}{apache}{4} ) {
@@ -1226,8 +1264,33 @@ sub parse_license
 	}
 
 	$license =~ s/$L{re_grant_license}{local}{trailing_space}//;
-	$license .= $extrainfo;    # TODO: tie to each license grant
 	my $expr = join( ' and/or ', sort map { $_->name } @expressions );
+	$expr ||= 'UNKNOWN';
+	if (@exceptions) {
+		$expr = "($expr)"
+			if ( @expressions > 1 );
+		$expr .= ' with ' . join(
+			'_AND_',
+			sort map {
+					   $_->{id}{'name.alt.org.debian'}
+					|| $_->{id}{'name.alt.org.spdx'}
+					|| $_->{id}{name}
+			} @exceptions
+		) . ' exception';
+	}
+	if (@flaws) {
+		$license .= ' [' . join(
+			', ',
+			sort map {
+					   $_->{id}{'caption.alt.org.debian'}
+					|| $_->{id}{'caption.alt.org.spdx'}
+					|| $_->{id}{caption}
+					|| $_->{id}{'name.alt.org.debian'}
+					|| $_->{id}{'name.alt.org.spdx'}
+					|| $_->{id}{name}
+			} @flaws
+		) . ']';
+	}
 	$self->log->infof(
 		'resolved license expression: %s [%s]', $expr,
 		$file

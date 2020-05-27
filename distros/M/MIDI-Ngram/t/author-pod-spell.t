@@ -22,6 +22,7 @@ Boggs
 Gene
 MIDI
 Ngram
+dura
 durations
 gene
 lib

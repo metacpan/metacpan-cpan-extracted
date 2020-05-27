@@ -1,6 +1,6 @@
 package Dancer2::Core::Route;
 # ABSTRACT: Dancer2's route handler
-$Dancer2::Core::Route::VERSION = '0.300003';
+$Dancer2::Core::Route::VERSION = '0.300004';
 use Moo;
 use Dancer2::Core::Types;
 use Module::Runtime 'use_module';
@@ -320,7 +320,7 @@ Dancer2::Core::Route - Dancer2's route handler
 
 =head1 VERSION
 
-version 0.300003
+version 0.300004
 
 =head1 ATTRIBUTES
 

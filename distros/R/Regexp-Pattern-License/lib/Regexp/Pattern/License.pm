@@ -13,11 +13,11 @@ Regexp::Pattern::License - Regular expressions for legal licenses
 
 =head1 VERSION
 
-Version v3.3.1
+Version v3.4.0
 
 =cut
 
-our $VERSION = version->declare("v3.3.1");
+our $VERSION = version->declare("v3.4.0");
 
 =head1 DESCRIPTION
 
@@ -49,34 +49,41 @@ L<Regexp::Pattern> is a convention for organizing reusable regex patterns.
 # [ - ]         dash with space around
 # [<]           less-than
 # [>]           greater-than
+# [#.]          digits and maybe one infix dot
+# [#-,]         digits, infix maybe one dash, suffix maybe comma maybe space
 # [c]           copyright mark
 # [eg]          exempli gratia, abbreviated
 # [http://]     http or https protocol
 # [ie]          id est, abbreviated
+# [word]        word, maybe space around
 
 my @_re = (
 	[ qr/\Q[*)]/,  '(?:\W{0,5}\S{0,2}\W{0,3})' ],
-	[ qr/\Q[:"]/,  '(?::\W{0,2})' ],                #"
+	[ qr/\Q[:"]/,  '(?::\W{0,2})' ],                    #"
 	[ qr/\Q[-]/,   '[-–]' ],
 	[ qr/\Q[-#]/,  '[-–\d]' ],
 	[ qr/\Q[- ]/,  '[-– ]' ],
 	[ qr/\Q[ - ]/, '(?: [-–—]{1,2} )' ],
+	[ qr/\Q[#.]/,  '(?:\d+(?:\.\d+)?)' ],
+	[ qr/\Q[#-,]/, '(?:\d+(?: ?[-–] ?\d+)?,? ?)' ],
 	[ qr/\Q[ ]/,   '(?:\s{1,3})' ],
 	[ qr/\Q[  ]/,  '(?:\s{1,3})' ],
 	[ qr/\Q["]/, "(?:[\"«»˝̏“”„]|['<>`´‘’‹›‚]{0,2})" ],
 	[ qr/\Q[']/, "(?:['`´‘’]?)" ],
-	[ qr/\Q["*]/, '(?:\W{0,2})' ],                  #"
+	[ qr/\Q["*]/, '(?:\W{0,2})' ],                      #"
 	[ qr/\Q[;]/,  '[;:,]' ],
 	[ qr/\Q[\/]/, '(?:[ /]?)' ],
 
 	[ qr/\[à\]/, '(?:[àa]?)' ],
 	[ qr/\[é\]/, '(?:[ée]?)' ],
 	[ qr/\[è\]/, '(?:[èe]?)' ],
+	[ qr/\[ł\]/, '(?:[łl]?)' ],
 
 	[ qr/\Q[c]/,       '(?:©|\([Cc]\))' ],
-	[ qr/\Q[eg]/,      'ex?\.? ?gr?\.?' ],
+	[ qr/\Q[eg]/,      '(?:ex?\.? ?gr?\.?)' ],
 	[ qr!\Q[http://]!, '(?:(?:https?:?)?(?://)?)' ],
-	[ qr/\Q[ie]/,      'i\.? ?e\.?' ],
+	[ qr/\Q[ie]/,      '(?:i\.? ?e\.?)' ],
+	[ qr/\Q[word]/,    '(?: ?\S+ ?)' ],
 );
 
 my %P;
@@ -139,19 +146,14 @@ my $cc_intro_cc0
 my $cc_by_exercising_you_accept_this
 	= '(?:By exercising the Licensed Rights \(?defined below\)?, You accept and agree to be bound by the terms and conditions of this '
 	. '|BY EXERCISING ANY RIGHTS TO THE WORK PROVIDED HERE, YOU ACCEPT AND AGREE TO BE BOUND BY THE TERMS OF THIS )';
+my $clisp_they_only_ref_clisp
+	= "They only reference external symbols in CLISP[']s public packages "
+	. 'that define API also provided by many other Common Lisp implementations '
+	. '\(namely the packages '
+	. 'COMMON[-]LISP, COMMON[-]LISP[-]USER, KEYWORD, CLOS, GRAY, EXT\) ';
 my $gnu = '(?:GNU )';
 my $gpl = '(?:General Public [Ll]icen[cs]e|GENERAL PUBLIC LICEN[CS]E)';
 my $fsf = "(?:$the?Free Software Foundation)";
-my $by_fsf
-	= '(?: ?(?:as )?published by '
-	. $fsf
-	. '(?: \('
-	. $P{fsf_url}
-	. '\))?(?:,? Inc\.?)?'
-	. '(?:,? ?(?:'
-	. $P{fsf_addr_franklin} . '|'
-	. $P{fsf_addr_temple} . '|'
-	. $P{fsf_addr_mass} . '))?)';
 my $niv
 	= 'with no Invariant Sections(?:, with no Front[-]Cover Texts, and with no Back[-]Cover Texts)?';
 my $fsf_ul
@@ -173,6 +175,1435 @@ my $_any     = '[a-z0-9_.()]';
 our %RE;
 
 =head1 PATTERNS
+
+=head2 Licensing traits
+
+Patterns each covering a single trait occuring in licenses.
+
+Each of these patterns has the tag B< type:trait >.
+
+=over
+
+=item * addr_fsf
+
+=item * addr_fsf_franklin
+
+=item * addr_fsf_franklin_steet
+
+=item * addr_fsf_mass
+
+=item * addr_fsf_temple
+
+=cut
+
+$RE{addr_fsf} = {
+	caption => 'FSF postal address',
+	tags    => [
+		'type:trait:address:gnu',
+	],
+};
+
+$RE{addr_fsf_franklin} = {
+	caption => 'FSF postal address (Franklin Street)',
+	tags    => [
+		'type:trait:address:gnu',
+	],
+
+	'pat.alt.subject.trait' =>
+		'(?P<_addr_fsf_franklin>51 Franklin [Ss]t(?:reet|(?P<_addr_fsf_franklin_steet>eet)|\.)?, '
+		. '(?:Fifth|5th) [Ff]loor(?:[;]? |[ - ])'
+		. 'Boston,? MA 02110[-]1301,? USA[.]?)',
+};
+
+$RE{addr_fsf_franklin_steet} = {
+	caption => 'mis-spelled FSF postal address (Franklin Steet)',
+	tags    => [
+		'type:trait:address:gnu',
+		'type:trait:flaw:gnu',
+	],
+
+	'pat.alt.subject.trait' =>
+		'(?P<_addr_fsf_franklin_steet>51 Franklin [Ss]teet, '
+		. '(?:Fifth|5th) [Ff]loor(?:[;]? |[ - ])'
+		. 'Boston,? MA 02110[-]1301,? USA[.]?)',
+};
+
+$RE{addr_fsf_mass} = {
+	caption => 'obsolete FSF postal address (Mass Ave)',
+	tags    => [
+		'type:trait:address:gnu',
+		'type:trait:flaw:gnu',
+	],
+
+	'pat.alt.subject.trait' =>
+		'(?P<_addr_fsf_mass>675 [Mm]ass(?:achusett?ss?|\.)? [Aa]ve(?:nue|\.)?(?:(?:[;]? |[ - ])'
+		. '[Cc]ambridge,? (?:MA|ma) 02139,? (?:USA|usa))?[.]?)',
+};
+
+$RE{addr_fsf_temple} = {
+	caption => 'obsolete FSF postal address (Temple Place)',
+	tags    => [
+		'type:trait:address:gnu',
+		'type:trait:flaw:gnu',
+	],
+
+	'pat.alt.subject.trait' =>
+		'(?P<_addr_fsf_temple>5[39] Temple Place,? S(?:ui)?te 330(?:[;]? |[ - ])'
+		. 'Boston,? MA 02111[-]1307,? USA[.]?)',
+};
+
+$RE{addr_fsf}{'pat.alt.subject.trait'}
+	= '(?P<_addr_fsf>'
+	. $RE{addr_fsf_franklin}{'pat.alt.subject.trait'} . '|'
+	. $RE{addr_fsf_temple}{'pat.alt.subject.trait'} . '|'
+	. $RE{addr_fsf_mass}{'pat.alt.subject.trait'} . ')';
+
+=item * any_of
+
+=cut
+
+$RE{any_of} = {
+	caption => 'license grant "any of the following" phrase',
+	tags    => [
+		'type:trait',
+	],
+
+	'pat.alt.subject.trait' =>
+		'(?P<_any_of>(?:any|one or more) of the following(?: licen[cs]es(?: at your choice)?)?)[.:]? ?',
+};
+
+=item * by
+
+=item * by_apache
+
+=item * by_fsf
+
+=item * by_james_clark
+
+=item * by_psf
+
+=item * by_sam_hocevar
+
+=cut
+
+$RE{by} = {
+	caption => 'license grant " as published by ..." phrase',
+	tags    => [
+		'type:trait:publisher',
+	],
+
+	'pat.alt.subject.trait' => '(?P<_by> ?(?:as )?published by(?: \S+){1,6})',
+};
+
+$RE{by_apache} = {
+	caption =>
+		'license grant "as published by the Apache Software Foundation" phrase',
+	tags => [
+		'type:trait:publisher:apache',
+	],
+
+	'pat.alt.subject.trait' =>
+		'(?P<_by_apache> ?(?:as )?published by the Apache Software Foundation)',
+};
+
+$RE{by_fsf} = {
+	caption =>
+		'license grant "as published by the Free Software Foundation" phrase',
+	tags => [
+		'type:trait:publisher:gnu',
+	],
+
+	'pat.alt.subject.trait' => '(?P<_by_fsf> ?(?:as )?published by '
+		. $fsf
+		. '(?: \('
+		. $P{fsf_url}
+		. '\))?(?:,? Inc\.?)?'
+		. '(?:,? ?'
+		. $RE{addr_fsf}{'pat.alt.subject.trait'} . ')?)',
+};
+
+$RE{by_james_clark} = {
+	caption => 'license grant "as published by James Clark" phrase',
+	tags    => [
+		'type:trait:publisher:mit_new',
+	],
+
+	'pat.alt.subject.trait' =>
+		'(?P<_by_hames_clark> ?(?:as )?published by James Clark)',
+};
+
+$RE{by_psf} = {
+	caption =>
+		'license grant "as published by the Python Software Foundation" phrase',
+	tags => [
+		'type:trait:publisher:python',
+	],
+
+	'pat.alt.subject.trait' =>
+		'(?P<_by_psf> ?(?:as )?published by the Python Software Foundation)',
+};
+
+$RE{by_sam_hocevar} = {
+	caption => 'license grant "as published by Sam Hocevar" phrase',
+	tags    => [
+		'type:trait:publisher:wtfpl',
+	],
+
+	'pat.alt.subject.trait' =>
+		'(?P<_by_sam_hocevar> ?(?:as )?published by Sam Hocevar)',
+};
+
+=item * clause_retention
+
+=cut
+
+$RE{clause_retention} = {
+	caption => 'retention clause',
+	tags    => [
+		'type:trait',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' => $P{retain_notice_cond_discl},
+};
+
+=item * clause_reproduction
+
+=cut
+
+$RE{clause_reproduction} = {
+	caption => 'reproduction clause',
+	tags    => [
+		'type:trait',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' => $P{repro_copr_cond_discl},
+};
+
+=item * clause_advertising
+
+=item * clause_advertising_always
+
+=cut
+
+$RE{clause_advertising} = {
+	caption => 'advertising clause',
+	tags    => [
+		'type:trait',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' => $P{ad_mat_ack_this},
+};
+
+$RE{clause_advertising_always} = {
+	caption => 'advertising clause (always)',
+	tags    => [
+		'type:trait',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' => $P{redist_ack_this},
+};
+
+=item * clause_non_endorsement
+
+=cut
+
+$RE{clause_non_endorsement} = {
+	caption => 'non-endorsement clause',
+	tags    => [
+		'type:trait',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' => $P{nopromo_neither},
+};
+
+=item * except_389
+
+=cut
+
+$RE{except_389} = {
+	name                  => '389-exception',
+	'name.alt.org.debian' => '389',
+	caption               => '389 Directory Server Exception',
+	tags                  => [
+		'family:gnu:gpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' =>
+		'Red Hat, Inc\. gives You the additional right '
+		. 'to link the code of this Program '
+		. 'with code not covered under the GNU General Public License '
+		. '\(["]Non-GPL Code["]\) '
+		. 'and to distribute linked combinations including the two, '
+		. 'subject to the limitations in this paragraph[.] '
+		. 'Non[-]GPL Code permitted under this exception '
+		. 'must only link to the code of this Program '
+		. 'through those well defined interfaces identified '
+		. 'in the file named EXCEPTION found in the source code files '
+		. '\(the ["]Approved Interfaces["]\)[.]',
+};
+
+=item * except_autoconf_data
+
+=item * except_autoconf_2
+
+=item * except_autoconf_2_archive
+
+=item * except_autoconf_2_autotroll
+
+=item * except_autoconf_2_g10
+
+=item * except_autoconf_3
+
+=cut
+
+$RE{except_autoconf_data} = {
+	name    => 'Autoconf-data',
+	caption => 'Autoconf data exception',
+	tags    => [
+		'family:gnu:gpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' =>
+		'if you distribute this file as part of a program '
+		. 'that contains a configuration script generated by Autoconf, '
+		. 'you may include it under the same distribution terms '
+		. 'that you use for the rest of that program',
+};
+
+$RE{except_autoconf_2} = {
+	name                  => 'Autoconf-exception-2.0',
+	'name.alt.org.debian' => 'Autoconf-2.0',
+	caption               => 'Autoconf exception 2.0',
+	tags                  => [
+		'family:gnu:gpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.sentence.part.1' =>
+		'the Free Software Foundation gives unlimited permission '
+		. 'to copy, distribute and modify configure scripts ',
+	'pat.alt.subject.trait.part.2' =>
+		'This special exception to the GPL applies '
+		. 'to versions of Autoconf',
+};
+
+$RE{except_autoconf_2_archive} = {
+	name                  => 'Autoconf-exception-2.0~Archive',
+	'name.alt.org.debian' => 'Autoconf-2.0~Archive',
+	caption               => 'Autoconf exception 2.0 (Autoconf Archive)',
+	tags                  => [
+		'family:gnu:gpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.sentence.part.1' =>
+		"the respective Autoconf Macro[']s copyright owner "
+		. 'gives unlimited permission ',
+	'pat.alt.subject.trait.part.2' =>
+		'This special exception to the GPL applies '
+		. 'to versions of the Autoconf',
+};
+
+$RE{except_autoconf_2_autotroll} = {
+	name                  => 'Autoconf-exception-2.0~AutoTroll',
+	'name.alt.org.debian' => 'Autoconf-2.0~AutoTroll',
+	caption               => 'Autoconf exception 2.0 (AutoTroll)',
+	tags                  => [
+		'family:gnu:gpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.sentence.part.1' =>
+		'the copyright holders of AutoTroll '
+		. 'give you unlimited permission ',
+	'pat.alt.subject.trait.part.2' =>
+		'This special exception to the GPL applies '
+		. 'to versions of AutoTroll',
+};
+
+$RE{except_autoconf_2_g10} = {
+	name                  => 'Autoconf-exception-2.0~g10',
+	'name.alt.org.debian' => 'Autoconf-2.0~g10',
+	caption               => 'Autoconf exception 2.0 (g10 Code)',
+	tags                  => [
+		'family:gnu:gpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.part.1' =>
+		'g10 Code GmbH gives unlimited permission',
+	'pat.alt.subject.trait.part.2' =>
+		'Certain portions of the mk\S+\.awk source text are designed',
+	'pat.alt.subject.trait.part.3' =>
+		'If your modification has such potential, you must delete',
+};
+
+$RE{except_autoconf_3} = {
+	name                  => 'Autoconf-exception-3.0',
+	'name.alt.org.debian' => 'Autoconf-3.0',
+	caption               => 'Autoconf exception 3.0',
+	tags                  => [
+		'family:gnu:gpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.sentence.part.1' =>
+		"The purpose of this Exception is to allow distribution of Autoconf[']s",
+};
+
+=item * except_bison_1_24
+
+=item * except_bison_2_2
+
+=cut
+
+$RE{except_bison_1_24} = {
+	name    => 'Bison-1.24',
+	caption => 'Bison exception 1.24',
+	tags    => [
+		'family:gnu:gpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' =>
+		'when this file is copied by Bison into a Bison output file',
+	'pat.alt.subject.trait.scope.multisection.part.1' =>
+		'when this file is copied by Bison into a Bison output file, '
+		. 'you may use that output file without restriction[.][ ]',
+	'pat.alt.subject.trait.scope.multisection.part.2' =>
+		'This special exception was added by the Free Software Foundation'
+		. 'in version 1\.24 of Bison[.]'
+};
+
+$RE{except_bison_2_2} = {
+	name                  => 'Bison-exception-2.2',
+	'name.alt.org.debian' => 'Bison-2.2',
+	caption               => 'Bison exception 2.2',
+	tags                  => [
+		'family:gnu:gpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' =>
+		'you may create a larger work that contains '
+		. 'part or all of the Bison parser skeleton',
+	'pat.alt.subject.trait.scope.multisection.part.1' =>
+		'you may create a larger work that contains '
+		. 'part or all of the Bison parser skeleton'
+		. 'and distribute that work under terms of your choice, '
+		. "so long as that work isn[']t itself a parser generator"
+		. 'using the skeleton or a modified version thereof '
+		. 'as a parser skeleton[.]'
+		. 'Alternatively, if you modify or redistribute the parser skeleton itself, '
+		. 'yoy may \(at your option\) remove this special exception, '
+		. 'which will cause the skeleton and the resulting Bison output files '
+		. 'to be licensed under the GNU General Public License '
+		. 'without this special exception[.][  ]',
+	'pat.alt.subject.trait.scope.multisection.part.2' =>
+		'This special exception was added by the Free Software Foundation'
+		. 'in version 2\.2 of Bison[.]'
+};
+
+=item * except_classpath_2
+
+=cut
+
+$RE{except_classpath_2} = {
+	name                  => 'Classpath-exception-2.0',
+	'name.alt.org.debian' => 'Classpath-2.0',
+	caption               => 'Classpath exception 2.0',
+	tags                  => [
+		'family:gnu:gpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' =>
+		'link this library with independent modules',
+	'pat.alt.subject.trait.scope.multisection.part.intro' =>
+		'Linking this library statically or dynamically with other modules '
+		. 'is making a combined work based on this library[.][ ]'
+		. 'Thus, the terms and conditions of the GNU General Public License '
+		. 'cover the whole combination[.][  ]',
+	'pat.alt.subject.trait.scope.multisection.part.1' =>
+		'the copyright holders of this library give you permission '
+		. 'to link this library with independent modules to produce an executable, '
+		. 'regardless of the license terms of these independent modules, '
+		. 'and to copy and distribute the resulting executable '
+		. 'under terms of your choice, '
+		. 'provided that you also meet, '
+		. 'for each linked independent module, '
+		. 'the terms and conditions of the license of that module[.][ ]?',
+	'pat.alt.subject.trait.scope.multisection.part.2' =>
+		'An independent module is a module '
+		. 'which is not derived from or based on this library[.] '
+		. 'If you modify this library, '
+		. 'you may extend this exception to your version of the library, '
+		. 'but you are not obligated to do so[.] '
+		. 'If you do not wish to do so, '
+		. 'delete this exception statement from your version[.]',
+};
+
+=item * except_epl
+
+=cut
+
+$RE{except_epl} = {
+	name    => 'EPL-library',
+	caption => 'EPL-library exception',
+	tags    => [
+		'family:gnu:gpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' =>
+		'you have the permission to link the code of this program '
+		. 'with any library released under the EPL license '
+		. 'and distribute linked combinations including the two[.]',
+	'pat.alt.subject.trait.scope.paragraph.part.all' =>
+		'you have the permission to link the code of this program '
+		. 'with any library released under the EPL license '
+		. 'and distribute linked combinations including the two[.][ ]'
+		. 'If you modify this file, '
+		. 'you may extend this exception to your version of the file, '
+		. 'but you are not obligated to do so[.][ ]'
+		. 'If you do not wish to do so, '
+		. 'delete this exception statement from your version[.]',
+};
+
+=item * except_epl_mpl
+
+=cut
+
+$RE{except_epl_mpl} = {
+	name    => 'EPL-MPL-library',
+	caption => 'EPL-MPL-library exception',
+	tags    => [
+		'family:gnu:gpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' =>
+		'you have the permission to link the code of this program '
+		. 'with any library released under the EPL license '
+		. 'and distribute linked combinations including the two[;] '
+		. 'the MPL \(Mozilla Public License\), '
+		. 'which EPL \(Erlang Public License\) is based on, '
+		. 'is included in this exception.',
+};
+
+=item * except_faust
+
+=cut
+
+$RE{except_faust} = {
+	name    => 'FAUST',
+	caption => 'FAUST exception',
+	tags    => [
+		'family:gnu:gpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' =>
+		'you may create a larger work that contains '
+		. 'this FAUST architecture section',
+	'pat.alt.subject.trait.scope.multisection.part.all' =>
+		'you may create a larger work that contains '
+		. 'this FAUST architecture section '
+		. 'and distribute that work under terms of your choice, '
+		. 'so long as this FAUST architecture section is not modified[.]',
+};
+
+=item * except_gstreamer
+
+=cut
+
+$RE{except_gstreamer} = {
+	name    => 'GStreamer',
+	caption => 'GStreamer exception',
+	tags    => [
+		'family:gnu:gpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.multisection.part.all' =>
+		'The [word]{1,3} project hereby grant permission '
+		. 'for non-gpl compatible GStreamer plugins '
+		. 'to be used and distributed together with GStreamer and [word]{1,3}[.] '
+		. 'This permission are above and beyond '
+		. 'the permissions granted by the GPL license [word]{1,3} is covered by[.]',
+};
+
+=item * except_libtool
+
+=cut
+
+$RE{except_libtool} = {
+	name                  => 'libtool-exception',
+	'name.alt.org.debian' => 'libtool',
+	caption               => 'Libtool Exception',
+	tags                  => [
+		'family:gnu:gpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' =>
+		'if you distribute this file as part of a program or library '
+		. 'that is built using GNU Libtool, '
+		. 'you may include this file under the same distribution terms '
+		. 'that you use for the rest of that program[.]',
+};
+
+=item * except_mif
+
+=cut
+
+$RE{except_mif} = {
+	name                  => 'mif-exception',
+	'name.alt.org.debian' => 'mif',
+	caption               => 'Macros and Inline Functions Exception',
+	tags                  => [
+		'family:gnu:gpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.multisection.part.first' =>
+		'you may use this file '
+		. 'as part of a free software library without restriction[.][ ]'
+		. 'Specifically, if other files instantiate templates ',
+	'pat.alt.subject.trait.scope.multisection.part.all' =>
+		'you may use this file '
+		. 'as part of a free software library without restriction[.][ ]'
+		. 'Specifically, if other files instantiate templates '
+		. 'or use macros or inline functions from this file, '
+		. 'or you compile this file and link it with other files '
+		. 'to produce an executable, '
+		. 'this file does not by itself cause the resulting executable '
+		. 'to be covered by the GNU General Public License[.][ ]'
+		. 'This exception does not however invalidate any other reasons '
+		. 'why the executable file might be covered '
+		. 'by the GNU General Public License[.]',
+};
+
+=item * except_openssl
+
+=cut
+
+$RE{except_openssl} = {
+	name                  => 'OpenSSL-exception',
+	'name.alt.org.debian' => 'OpenSSL',
+	caption               => 'OpenSSL exception',
+	tags                  => [
+		'family:gnu',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' =>
+		'SSLeay licenses, (?:the (?:author|copyright holder|licensors|Free Software)|you are granted)',
+	'pat.alt.subject.trait.scope.multisection.part.all' =>
+		'If you modify (?:the|this) program, or any covered work, '
+		. 'by linking or combining it '
+		. "with the OpenSSL project[']s [\"]OpenSSL[\"] library "
+		. '\(or a modified version of that library\), '
+		. 'containing parts covered '
+		. 'by the terms of the OpenSSL or SSLeay licenses, '
+		. '(?:the authors of(?: \S+){0,8} grant you'
+		. '|the (?:copyright holder|licensors|Free Software Foundation) grants? you'
+		. '|you are granted) '
+		. 'additional permission to convey the resulting work[.] '
+		. 'Corresponding Source for a non-source form '
+		. 'of such a combination '
+		. 'shall include the source code for the parts of OpenSSL used '
+		. 'as well as that of the covered work[.]'
+};
+
+=item * except_ocaml-lgpl
+
+=cut
+
+$RE{except_ocaml_lgpl} = {
+	name                  => 'OCaml-LGPL-linking-exception',
+	'name.alt.org.debian' => 'OCaml-LGPL-linking',
+	caption               => 'OCaml LGPL Linking Exception',
+	tags                  => [
+		'family:gnu:lgpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.multisection.part.all' =>
+		'you may link, statically or dynamically, '
+		. 'a ["]work that uses the Library["] '
+		. 'with a publicly distributed version of the Library '
+		. 'to produce an executable file '
+		. 'containing portions of the Library, '
+		. 'and distribute that executable file '
+		. 'under terms of your choice, '
+		. 'without any of the additional requirements '
+		. 'listed in clause 6 of the GNU Library General Public License[.]',
+};
+
+=item * except_openssl-lgpl
+
+=item * except_openssl_s3
+
+=cut
+
+$RE{except_openssl_lgpl} = {
+	name                  => 'OpenSSL~LGPL-exception',
+	'name.alt.org.debian' => 'OpenSSL~LGPL',
+	caption               => 'OpenSSL~LGPL exception',
+	tags                  => [
+		'family:gnu:lgpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.multisection.part.all' =>
+		'the copyright holders give permission '
+		. 'to link the code of portions of this program '
+		. 'with the OpenSSL library '
+		. 'under certain conditions as described '
+		. 'in each individual source file, '
+		. 'and distribute linked combinations including the two[.][  ]'
+		. 'You must obey the GNU Lesser General Public License '
+		. 'in all respects '
+		. 'for all of the code used other than OpenSSL[.]'
+};
+
+$RE{except_openssl_s3} = {
+	name                  => 'OpenSSL~s3-exception',
+	'name.alt.org.debian' => 'OpenSSL~s3',
+	caption               => 'OpenSSL~s3 exception',
+	tags                  => [
+		'family:gnu',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' =>
+		'link the code of this library and its programs with the OpenSSL library',
+	'pat.alt.subject.trait.scope.multisection.part.all' =>
+		'the copyright holders give permission '
+		. 'to link the code of portions of this program '
+		. "with the OpenSSL project[']s [\"]OpenSSL[\"] library "
+		. '\(or with modified versions of it '
+		. 'that use the same license as the ["]OpenSSL["] library '
+		. '[-] see [http://]www.openssl.org/\), '
+		. 'and distribute linked combinations including the two[.]'
+};
+
+=item * except_prefix_agpl
+
+=item * except_prefix_generic
+
+=item * except_prefix_gpl
+
+=item * except_prefix_gpl_clisp
+
+=item * except_prefix_lgpl
+
+=cut
+
+$RE{except_prefix_agpl} = {
+	caption => 'AGPL exception prefix',
+	tags    => [
+		'family:gnu:agpl',
+		'type:trait:grant:prefix',
+	],
+
+	'pat.alt.subject.trait.target.generic' =>
+		'In addition to the permissions in the GNU General Public License, ',
+	'pat.alt.subject.trait.target.agpl_3' => 'Additional permissions? under '
+		. "$the?(?:GNU )?A(?:ffero )?GPL(?: version 3|v3) section 7"
+};
+
+$RE{except_prefix_generic} = {
+	caption => 'generic exception prefix',
+	tags    => [
+		'type:trait:grant:prefix',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' =>
+		'(?:In addition, as a special exception, '
+		. '|As a special exception, )',
+	'pat.alt.subject.trait.scope.paragraph' =>
+		'(?:In addition, as a special exception, '
+		. '|(?:Exception [*)]FIXME[  ])?'
+		. 'As a special exception, '
+		. '|Grant of Additional Permission[.][ ])',
+};
+
+$RE{except_prefix_gpl} = {
+	caption => 'GPL exception prefix',
+	tags    => [
+		'family:gnu:gpl',
+		'type:trait:grant:prefix',
+	],
+
+	'pat.alt.subject.trait.target.generic' =>
+		'In addition to the permissions in the GNU General Public License, ',
+	'pat.alt.subject.trait.target.gpl_3' =>
+		'(?:the file is governed by GPLv3 along with this Exception'
+		. '|Additional permissions? under '
+		. "$the?(?:GNU )?GPL(?: version 3|v3) section 7)"
+};
+
+$RE{except_prefix_gpl_clisp} = {
+	caption => 'CLISP exception prefix',
+	tags    => [
+		'family:gnu:gpl',
+		'type:trait:grant:prefix',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' => 'Note[:"][  ]'
+		. 'This copyright does NOT cover user programs '
+		. 'that run in CLISP and third-party packages not part of CLISP, '
+		. "if [*)]$clisp_they_only_ref_clisp, "
+		. "[ie] if they don[']t rely on CLISP internals "
+		. 'and would as well run in any other Common Lisp implementation[.] '
+		. "Or [*)]$clisp_they_only_ref_clisp "
+		. 'and some external, not CLISP specific, symbols '
+		. 'in third[-]party packages '
+		. 'that are released with source code under a GPL compatible license '
+		. 'and that run in a great number of Common Lisp implementations, '
+		. '[ie] if they rely on CLISP internals only to the extent needed '
+		. 'for gaining some functionality also available '
+		. 'in a great number of Common Lisp implementations[.] '
+		. 'Such user programs are not covered '
+		. 'by the term ["]derived work["] used in the GNU GPL[.] '
+		. 'Neither is their compiled code, '
+		. '[ie] the result of compiling them '
+		. 'by use of the function COMPILE-FILE[.] '
+		. 'We refer to such user programs '
+		. 'as ["]independent work["][.][  ]',
+};
+
+$RE{except_prefix_lgpl} = {
+	caption => 'LGPL exception prefix',
+	tags    => [
+		'family:gnu:lgpl',
+		'type:trait:grant:prefix',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' =>
+		'In addition to the permissions in '
+		. 'the GNU (?:Lesser|Library) General Public License, '
+};
+
+=item * except_proguard
+
+=cut
+
+$RE{except_proguard} = {
+	name    => 'Proguard',
+	caption => 'Proguard exception',
+	tags    => [
+		'family:gnu:gpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' =>
+		'this program with the following stand-alone applications',
+	'pat.alt.subject.trait.scope.multisection.part.1' =>
+		'(?:Eric Lafortune|Guardsquare NV) gives permission '
+		. 'to link the code of this program '
+		. "with the following stand[-]alone applications[:]?"
+};
+
+=item * except_qt_gpl_1
+
+=item * except_qt_gpl_eclipse
+
+=item * except_qt_gpl_openssl
+
+=cut
+
+$RE{except_qt_gpl_1} = {
+	name                  => 'Qt-GPL-exception-1.0',
+	'name.alt.org.debian' => 'Qt-GPL-1.0',
+	caption               => 'Qt GPL exception 1.0',
+	tags                  => [
+		'family:gnu:gpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.sentence.part.1' =>
+		'you may create a larger work which contains '
+		. 'the output of this application '
+		. 'and distribute that work under terms of your choice, '
+		. 'so long as the work is not otherwise derived from or based on this application '
+		. 'and so long as the work does not in itself generate output '
+		. 'that contains the output from this application in its original or modified form',
+	'pat.alt.subject.trait.scope.paragraph.part.2' =>
+		'you have permission to combine this application with Plugins '
+		. 'licensed under the terms of your choice, '
+		. 'to produce an executable, and to copy and distribute the resulting executable '
+		. 'under the terms of your choice[.] '
+		. 'However, the executable must be accompanied by a prominent notice '
+		. 'offering all users of the executable the entire source code to this application, '
+		. 'excluding the source code of the independent modules, '
+		. 'but including any changes you have made to this application, '
+		. 'under the terms of this license[.]',
+};
+
+$RE{except_qt_gpl_eclipse} = {
+	name    => 'Qt-GPL-Eclipse',
+	caption => 'Qt GPL Eclipse exception',
+	tags    => [
+		'family:gnu:gpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' =>
+		'Qt Designer, grants users of the Qt/Eclipse',
+	'pat.alt.subject.trait.scope.paragraph.part.1' =>
+		'Trolltech, as the sole copyright holder for Qt Designer, '
+		. 'grants users of the Qt[/]Eclipse Integration plug-in '
+		. 'the right for the Qt[/]Eclipse Integration to link '
+		. 'to functionality provided by Qt Designer '
+		. 'and its related libraries[.][  ]'
+};
+
+$RE{except_qt_gpl_openssl} = {
+	name    => 'Qt-GPL-OpenSSL',
+	caption => 'Qt GPL OpenSSL exception',
+	tags    => [
+		'family:gnu:gpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' =>
+		'its release of Qt with the OpenSSL',
+	'pat.alt.subject.trait.scope.paragraph.part.1' =>
+		'Nokia gives permission to link the code of its release of Qt '
+		. "with the OpenSSL project[']s [\"]OpenSSL[\"] library "
+		. '\(or modified versions of the ["]OpenSSL["] library '
+		. 'that use the same license as the original version\), '
+		. 'and distribute the linked executables[.][  ]',
+	'pat.alt.subject.trait.scope.paragraph.part.2' =>
+		' You must comply with the GNU General Public License version 2 '
+		. 'in all respects for all of the code used '
+		. 'other than the ["]OpenSSL["] code[.] '
+		. 'If you modify this file, '
+		. 'you may extend this exception to your version of the file, '
+		. 'but you are not obligated to do so[.] '
+		. 'If you do not wish to do so, '
+		. 'delete this exception statement '
+		. 'from your version of this file[.]'
+};
+
+=item * except_qt_kernel
+
+=cut
+
+$RE{except_qt_kernel} = {
+	name    => 'Qt-kernel',
+	caption => 'Qt-kernel exception',
+	tags    => [
+		'family:gnu',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' =>
+		'Permission is also granted to link this program with the Qt library, '
+		. 'treating Qt like a library that normally accompanies the operating system kernel, '
+		. 'whether or not that is in fact the case',
+};
+
+=item * except_qt_lgpl_1_1
+
+=cut
+
+$RE{except_qt_lgpl_1_1} = {
+	name                  => 'Qt-LGPL-exception-1.1',
+	'name.alt.org.debian' => 'Qt-LGPL-1.1',
+	caption               => 'Qt LGPL exception 1.1',
+	tags                  => [
+		'family:gnu:lgpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.type.reference' =>
+		'(?:Digia|Nokia|The Qt Company) gives you certain',
+	'pat.alt.subject.trait.scope.sentence.type.reference' =>
+		'(?:Digia|Nokia|The Qt Company) gives you certain additional rights[.] '
+		. 'These rights are described '
+		. 'in The (?:Digia Qt|Nokia Qt|Qt Company) LGPL Exception version 1\.1, '
+		. 'included in the file \S+ in this package'
+};
+
+=item * except_qt_nosource
+
+=cut
+
+$RE{except_qt_nosource} = {
+	name    => 'Qt-no-source',
+	caption => 'Qt-no-source exception',
+	tags    => [
+		'family:gnu',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' =>
+		'permission is given to link this program with any edition of Qt, '
+		. 'and distribute the resulting executable, '
+		. 'without including the source code for Qt in the source distribution',
+};
+
+=item * except_sdc
+
+=cut
+
+$RE{except_sdc} = {
+	name    => 'SDC',
+	caption => 'SDC exception',
+	tags    => [
+		'family:gnu:lgpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' =>
+		'you may create a larger work that contains '
+		. 'code generated by the Shared Data Compiler',
+	'pat.alt.subject.trait.scope.multisection.part.1' =>
+		'you may create a larger work that contains '
+		. 'code generated by the Shared Data Compiler'
+		. 'and distribute that work under terms of '
+		. 'the GNU Lesser General Public License \(LGPL\)'
+		. 'by the Free Software Foundation; '
+		. 'either version 2\.1 of the License, '
+		. 'or \(at your option\) any later version '
+		. 'or under terms that are fully compatible with these licenses[.][  ]',
+	'pat.alt.subject.trait.scope.multisection.part.2' =>
+		'Alternatively, if you modify or redistribute '
+		. 'the Shared Data Compiler tool itself, '
+		. 'you may \(at your option\) remove this special exception, '
+		. 'which will cause the resulting generted source code files '
+		. 'to be licensed under the GNU General Public License '
+		. '\(either version 2 of the License, '
+		. 'or at your option under any later version\) '
+		. 'without this special exception[.][  ]',
+	'pat.alt.subject.trait.scope.multisection.part.3' =>
+		'This special exception was added by Jaros[ł]aw Staniek[.][ ]'
+		. 'Contact him for more licensing options, '
+		. '[eg] using in non-Open Source projects[.]',
+};
+
+=item * except_sollya_4_1
+
+=cut
+
+$RE{except_sollya_4_1} = {
+	name                  => 'Sollya-exception-4.1',
+	'name.alt.org.debian' => 'Sollya-4.1',
+	caption               => 'Sollya exception 4.1',
+	tags                  => [
+		'family:cecill',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' =>
+		'you may create a larger work that contains '
+		. 'part or all of this software generated using Sollya',
+	'pat.alt.subject.trait.scope.multisection.part.1' =>
+		'you may create a larger work that contains '
+		. 'part or all of this software generated using Sollya'
+		. 'and distribute that work under terms of your choice, '
+		. "so long as that work isn[']t itself a numerical code generator "
+		. 'using the skeleton of this code or a modified version thereof '
+		. 'as a code skeleton[.]'
+		. 'Alternatively, if you modify or redistribute this code itself, '
+		. 'or its skeleton, '
+		. 'you may \(at your option\) remove this special exception, '
+		. 'which will cause this generated code and its skeleton '
+		. 'and the resulting Sollya output files'
+		. 'to be licensed under the CeCILL-C License '
+		. 'without this special exception[.][  ]',
+	'pat.alt.subject.trait.scope.multisection.part.2' =>
+		'This special exception was added by the Sollya copyright holders '
+		. 'in version 4\.1 of Sollya[.]'
+};
+
+=item * except_warzone
+
+=cut
+
+$RE{except_warzone} = {
+	name    => 'Warzone',
+	caption => 'Warzone exception',
+	tags    => [
+		'family:gnu:gpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' =>
+		'the copyright holders of Warzone 2100 '
+		. 'give you permission to combine',
+	'pat.alt.subject.trait.scope.multisection.part.1' =>
+		'the copyright holders of Warzone 2100 '
+		. 'give you permission to combine Warzone 2100 '
+		. 'with code included in the standard release of libraries '
+		. 'that are accessible, redistributable and linkable '
+		. 'free of charge[.] '
+		. 'You may copy and distribute such a system '
+		. 'following the terms of the GNU GPL '
+		. 'for Warzone 2100 '
+		. 'and the licenses of the other code concerned[.][  ]',
+	'pat.alt.subject.trait.scope.multisection.part.2' =>
+		'Note that people who make modified versions of Warzone 2100 '
+		. 'are not obligated to grant this special exception '
+		. 'for their modified versions; '
+		. 'it is their choice whether to do so[.] '
+		. 'The GNU General Public License gives permission '
+		. 'to release a modified version without this exception; '
+		. 'this exception also makes it possible '
+		. 'to release a modified version '
+		. 'which carries forward this exception[.]'
+};
+
+=item * except_xerces
+
+=cut
+
+$RE{except_xerces} = {
+	name                  => 'Xerces-exception',
+	'name.alt.org.debian' => 'Xerces',
+	caption               => 'Xerces exception',
+	tags                  => [
+		'family:gnu:gpl',
+		'type:trait:exception',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' =>
+		'Code Synthesis Tools CC gives permission '
+		. 'to link this program with the Xerces-C\+\+ library ',
+	'pat.alt.subject.trait.scope.multisection.part.1' =>
+		'Code Synthesis Tools CC gives permission '
+		. 'to link this program with the Xerces-C\+\+ library '
+		. '\(or with modified versions of Xerces-C\+\+ '
+		. 'that use the same license as Xerces-C\+\+\), '
+		. 'and distribute linked combinations including the two[.] '
+		. 'You must obey the GNU General Public License version 2 '
+		. 'in all respects '
+		. 'for all of the code used other than Xerces-C\+\+[.] '
+		. 'If you modify this copy of the program, '
+		. 'you may extend this exception '
+		. 'to your version of the program, '
+		. 'but you are not obligated to do so[.] '
+		. 'If you do not wish to do so, '
+		. 'delete this exception statement from your version[.][  ]',
+	'pat.alt.subject.trait.scope.multisection.part.2' =>
+		'Furthermore, Code Synthesis Tools CC makes a special exception '
+		. 'for the Free[/]Libre and Open Source Software \(FLOSS\) '
+		. 'which is described in the accompanying FLOSSE file[.] '
+};
+
+=item * fsf_unlimited
+
+=item * fsf_unlimited_retention
+
+=cut
+
+$RE{fsf_unlimited} = {
+	tags => [
+		'type:trait',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' => $fsf_ul,
+};
+
+$RE{fsf_unlimited_retention} = {
+	tags => [
+		'type:trait',
+	],
+
+	'pat.alt.subject.trait.scope.sentence' => $fsf_ullr,
+};
+
+=item * generated
+
+=cut
+
+$RE{generated} = {
+	name    => 'generated',
+	caption => 'generated file',
+	tags    => [
+		'type:trait:flaw',
+	],
+
+	'_pat.alt.subject.trait.scope.sentence' => [
+		'this is (?:a )?generated (?:file|manifest)',
+		'This file (?:has been|is|was) (?:[*]{1,3})?(?:auto(?:matically |[-]?)|tool[-])?generated(?:[*]{1,3})?',
+		'All changes made in this file will be lost',
+		'generated file(?:[.] |[ - ])do not (?:edit|modify)[!.]',
+		'DO NOT (?:EDIT|MODIFY) THIS FILE',
+		'generated by [word](?: \([word]{0,3}\))?[  ]'
+			. '(?:Please )?DO NOT delete this file[!]',
+
+# weak, but seems to catch no false positives at end of line
+		'Generated by running[:]$',
+
+# too weak: does not mention file explicitly, so may reflect only a subset
+#		'Generated (?:automatically|by|from|data|with)',
+#		'generated (?:by|from|using)(?: the)? [word]{1,2}(?: compiler)?[.][ ]'
+#			. '(please )?Do not (edit|modify)',
+#		'Machine generated[.][ ](please )?Do not (edit|modify)',
+#		'Do not (edit|modify)[.][ ]Generated (?:by|from|using)',
+#		'(?:created with|trained by) [word][.][ ](please )?Do not edit',
+	],
+	'_pat.alt.subject.trait.scope.sentence.target.autotools' => [
+		'Makefile\.in generated by automake [#.]+ from Makefile\.am[.]',
+		'generated automatically by aclocal [#.]+ -\*?- Autoconf',
+		'Generated(?: from [word])? by GNU Autoconf',
+		'(?:Attempt to guess a canonical system name|Configuration validation subroutine script)[.][ ]'
+			. 'Copyright [c] [#-,]+Free Software Foundation',
+		'Calling this script install[-]sh is preferred over install[.]sh, to prevent',
+		'depcomp - compile a program generating dependencies as side-effects[  ]'
+			. 'scriptversion',
+		'Common wrapper for a few potentially missing GNU programs[.][  ]'
+			. 'scriptversion',
+		'DO NOT EDIT[!] GENERATED AUTOMATICALLY[!][ ]'
+			. 'Process this file with automake to produce Makefile\.in',
+		'This file is maintained in Automake, ',
+	],
+};
+
+=item * license_label
+
+=item * license_label_trove
+
+=cut
+
+$RE{license_label} = {
+	caption => 'license grant "License:" phrase',
+	tags    => [
+		'type:trait:grant:prefix',
+	],
+
+	'pat.alt.subject.trait' =>
+		'(?P<_license_label>[Ll]icen[sc]e|[Ii]dentifier)[:"]',
+};
+
+$RE{license_label_trove} = {
+	caption => 'license grant "License:" phrase',
+	tags    => [
+		'type:trait:grant:prefix',
+	],
+
+	'pat.alt.subject.trait' =>
+		'(?P<_license_label_trove>License(?: ::)? OSI Approved(?: ::)? )',
+};
+
+=item * licensed_under
+
+=cut
+
+$RE{licensed_under} = {
+	caption => 'license grant "licensed under" phrase',
+	tags    => [
+		'type:trait:grant:prefix',
+	],
+
+	'pat.alt.subject.trait' => '(?P<_licensed_under>'
+		. '(?:(?:[Ll]icen[sc]ed(?: for use)?|available|[Dd]istribut(?:able|ed)|[Ff]or distribution|permitted|provided|[Pp]ublished|[Rr]eleased) under'
+		. '|[Ll]icen[sc]ed using'
+		. '|(?:in form of source code|may be copied|placed their code|to [Yy]ou) under'
+		. '|(?:[Tt]his|[Mm]y) (?:software|file|work) is under' # vague preposition prepended by object
+		. '|(?:are|is) release under' # vague preposition prepended by verb and vague object/action
+		. '|which I release under'    # vague preposition prepended by actor and vague action
+		. '|distribute(?: it)?(?: and[/]or modify)? it under' # vague preposition prepended by action and vague object
+		. '|(?:according|[Ss]ubject) to|in accordance with'
+		. '|[Ss]ubject to'
+		. '|(?:[Cc]overed|governed) by)'
+		. '(?: (?:either )?(?:the )?(?:conditions|terms(?: and conditions)?|provisions) (?:described in|of))?' # terms optionally appended
+		. '|[Uu]nder (?:either )?(?:the )?(?:terms|(?:terms and )?conditions) (?:described in|of)(?: either)?' # vague preposition + terms
+		. ') ',
+};
+
+=item * or_at_option
+
+=cut
+
+$RE{or_at_option} = {
+	caption => 'license grant "or at your option" phrase',
+	tags    => [
+		'type:trait',
+	],
+
+	'pat.alt.subject.trait' =>
+		'(?P<_or_at_option>(?:and|or)(?: ?\(?at your (?:option|choice)\)?)?)',
+};
+
+=item * usage_rfn
+
+=cut
+
+$RE{usage_rfn} = {
+	caption => 'license usage "with Reserved Font Name" phrase',
+	tags    => [
+		'type:trait:usage:rfn',
+	],
+
+	'pat.alt.subject.trait' => '(?P<_usage_rfn>with Reserved Font Name)',
+};
+
+=item * version
+
+=cut
+
+$RE{version} = {
+	tags => [
+		'type:trait',
+	],
+};
+
+=item * version_later
+
+=item * version_later_paragraph
+
+=item * version_later_postfix
+
+=cut
+
+$RE{version_later} = {
+	caption => 'version "or later"',
+	tags    => [
+		'type:trait',
+	],
+};
+
+$RE{version_later_paragraph} = {
+	caption => 'version "or later" postfix (paragraphs)',
+	tags    => [
+		'type:trait',
+	],
+
+	'pat.alt.subject.trait.scope.paragraph' =>
+		'(?P<_version_later_paragraph>Later versions are permitted)',
+};
+
+$RE{version_later_postfix} = {
+	caption => 'version "or later" (postfix)',
+	tags    => [
+		'type:trait',
+	],
+
+	'pat.alt.subject.trait' => '\(?(?P<_version_later_postfix>'
+		. $RE{or_at_option}{'pat.alt.subject.trait'}
+		. '(?: any)? (?:later|above|newer)(?: version)?'
+		. '|or any later at your option)\)?',
+};
+
+$RE{version_later}{'pat.alt.subject.trait.scope.line.scope.sentence'}
+	= ',? ?(?P<version_later>'
+	. $RE{version_later_postfix}{'pat.alt.subject.trait'} . ')';
+$RE{version_later}{'pat.alt.subject.trait.scope.paragraph'}
+	= '[.][ ](?P<version_later>'
+	. $RE{version_later_paragraph}{'pat.alt.subject.trait.scope.paragraph'}
+	. ')';
+$RE{version_later}{'pat.alt.subject.trait'}
+	= '(?:[.][ ]|,? )(?P<version_later>'
+	. $RE{version_later_paragraph}{'pat.alt.subject.trait.scope.paragraph'}
+	. '|'
+	. $RE{version_later_postfix}{'pat.alt.subject.trait'} . ')';
+
+=item * version_number
+
+=item * version_number_suffix
+
+=cut
+
+$RE{version_number} = {
+	caption => 'version number',
+	tags    => [
+		'type:trait',
+	],
+
+	'pat.alt.subject.trait' => '(?P<version_number>\d(?:\.\d)*\b)',
+};
+
+$RE{version_number_suffix} = {
+	caption => 'version "of the License" suffix',
+	tags    => [
+		'type:trait',
+	],
+
+	'pat.alt.subject.trait' => '(?:(?: of the)? Licen[cs]e)?',
+};
+
+=item * version_only
+
+=cut
+
+$RE{version_only} = {
+	caption => 'version "only"',
+	tags    => [
+		'type:trait',
+	],
+
+	'pat.alt.subject.trait' =>
+		'(?P<_version_only> (?:only|\(no other versions\)))',
+};
+
+=item * version_prefix
+
+=cut
+
+$RE{version_prefix} = {
+	caption => 'version prefix',
+	tags    => [
+		'type:trait',
+	],
+
+	'pat.alt.subject.trait.scope.line.scope.sentence' =>
+		'(?:[-]|[;]?(?: (?:only |either )?)?|[ - ])?\(?(?:[Vv]ersion [Vv]?|VERSION |rev(?:ision)? |[Vv]\.? ?)?',
+	'pat.alt.subject.trait.scope.paragraph' =>
+		':?[ ]\(?(?:Version [Vv]?|VERSION )?',
+	'pat.alt.subject.trait' =>
+		'(?:[-]|[;](?: (?:either )?)?|[ - ]|:?[ ])?\(?(?:[Vv]ersion [Vv]?|VERSION |[Vv]\.? ?)?',
+};
+
+=item * version_numberstring
+
+=cut
+
+$RE{version_numberstring} = {
+	caption => 'version numberstring',
+	tags    => [
+		'type:trait',
+	],
+
+	'pat.alt.subject.trait.scope.line.scope.sentence' =>
+		$RE{version_prefix}{'pat.alt.subject.trait.scope.line.scope.sentence'}
+		. $RE{version_number}{'pat.alt.subject.trait'}
+		. $RE{version_number_suffix}{'pat.alt.subject.trait'},
+	'pat.alt.subject.trait.scope.paragraph' =>
+		$RE{version_prefix}{'pat.alt.subject.trait.scope.paragraph'}
+		. $RE{version_number}{'pat.alt.subject.trait'}
+		. $RE{version_number_suffix}{'pat.alt.subject.trait'},
+	'pat.alt.subject.trait' => $RE{version_prefix}{'pat.alt.subject.trait'}
+		. $RE{version_number}{'pat.alt.subject.trait'}
+		. $RE{version_number_suffix}{'pat.alt.subject.trait'},
+};
+
+$RE{version}{'pat.alt.subject.trait.scope.line.scope.sentence'}
+	= '(?P<_version>'
+	. $RE{version_numberstring}
+	{'pat.alt.subject.trait.scope.line.scope.sentence'} . '(?:'
+	. $RE{version_later}{'pat.alt.subject.trait.scope.line.scope.sentence'}
+	. ')?)\)?(?: of)? ?';
+$RE{version}{'pat.alt.subject.trait.scope.paragraph'}
+	= '(?P<_version>'
+	. $RE{version_numberstring}{'pat.alt.subject.trait.scope.paragraph'}
+	. '(?:'
+	. $RE{version_later}{'pat.alt.subject.trait.scope.paragraph'}
+	. ')?)\)?';
+$RE{version}{'pat.alt.subject.trait'}
+	= '(?P<_version>'
+	. $RE{version_numberstring}{'pat.alt.subject.trait'} . '(?:'
+	. $RE{version_later}{'pat.alt.subject.trait'}
+	. ')?)\)?(?: of)? ?';
+
+=back
 
 =head2 Single licenses
 
@@ -743,6 +2174,7 @@ $RE{apache} = {
 	caption                     => 'Apache License',
 	'caption.alt.org.trove'     => 'Apache Software License',
 	'caption.alt.org.wikipedia' => 'Apache License',
+	'caption.alt.misc.public'   => 'Apache Public License',
 	iri  => 'https://www.apache.org/licenses/LICENSE-2.0',
 	tags => [
 		'type:versioned:decimal',
@@ -781,14 +2213,15 @@ END
 };
 
 $RE{apache_1_1} = {
-	name                   => 'Apache-1.1',
-	'name.alt.org.osi'     => 'Apache-1.1',
-	'name.alt.org.spdx'    => 'Apache-1.1',
-	'name.alt.org.tldr'    => 'apache-license-1.1',
-	caption                => 'Apache License 1.1',
-	'caption.alt.org.osi'  => 'Apache Software License, version 1.1',
-	'caption.alt.org.tldr' => 'Apache License 1.1 (Apache-1.1)',
-	description            => <<'END',
+	name                        => 'Apache-1.1',
+	'name.alt.org.osi'          => 'Apache-1.1',
+	'name.alt.org.spdx'         => 'Apache-1.1',
+	'name.alt.org.tldr'         => 'apache-license-1.1',
+	caption                     => 'Apache License 1.1',
+	'caption.alt.org.osi'       => 'Apache Software License, version 1.1',
+	'caption.alt.org.tldr'      => 'Apache License 1.1 (Apache-1.1)',
+	'caption.alt.misc.software' => 'Apache Software License 1.1',
+	description                 => <<'END',
 Identical to BSD (3 clause), except...
 * add documentation-acknowledgement clause (as 3rd clause similar to BSD-4-clause advertising clause)
 * extend non-endorsement clause to include contact info
@@ -826,6 +2259,8 @@ $RE{apache_2} = {
 	'caption.alt.org.osi'          => 'Apache License, Version 2.0',
 	'caption.alt.org.osi.alt.list' => 'Apache License 2.0 (Apache-2.0)',
 	'caption.alt.org.tldr'         => 'Apache License 2.0 (Apache-2.0)',
+	'caption.alt.misc.public'      => 'Apache Public License 2.0',
+	'caption.alt.misc.software'    => 'Apache Software License 2.0',
 	iri => 'https://www.apache.org/licenses/LICENSE-2.0',
 	'iri.alt.org.wikipedia' =>
 		'https://en.wikipedia.org/wiki/Apache_License#Version_2.0',
@@ -1253,14 +2688,16 @@ $RE{beerware} = {
 $RE{bittorrent} = {
 	name    => 'BitTorrent',
 	caption => 'BitTorrent Open Source License',
-	tags    => ['type:versioned:decimal'],
+	tags    => [
+		'type:versioned:decimal',
+	],
 };
 
 $RE{bittorrent_1} = {
-	name               => 'BitTorrent-1.0',
-	'iri.alt.org.spdx' => 'BitTorrent-1.0',
-	caption            => 'BitTorrent Open Source License v1.0',
-	tags               => [
+	name                => 'BitTorrent-1.0',
+	'name.alt.org.spdx' => 'BitTorrent-1.0',
+	caption             => 'BitTorrent Open Source License v1.0',
+	tags                => [
 		'license:contains:grant',
 		'type:singleversion:bittorrent',
 	],
@@ -1358,6 +2795,8 @@ $RE{bsd_3_clause} = {
 	'name.alt.org.spdx'                 => 'BSD-3-Clause',
 	'name.alt.org.tldr.path.short'      => 'bsd3',
 	'name.alt.misc.clauses'             => '3-clause-BSD',
+	'name.alt.misc.eclipse'             => 'EPL',
+	'name.alt.misc.eclipse_1'           => 'EPL-1.0',
 	'name.alt.misc.modified'            => 'Modified-BSD',
 	caption                             => 'BSD (3 clause)',
 	'caption.alt.org.fedora'            => 'BSD License (no advertising)',
@@ -1367,16 +2806,23 @@ $RE{bsd_3_clause} = {
 	'caption.alt.org.tldr' => 'BSD 3-Clause License (Revised)',
 	'caption.alt.org.wikipedia.bsd' =>
 		'3-clause license ("BSD License 2.0", "Revised BSD License", "New BSD License", or "Modified BSD License")',
-	'caption.alt.misc.new'   => '(new) BSD License',
-	'caption.alt.misc.short' => 'BSD 3 clause',
-	'caption.alt.misc.qemu'  => 'BSD Licence (without advertising clause)',
-	tags                     => [
+	'caption.alt.misc.eclipse'    => 'Eclipse Distribution License',
+	'caption.alt.misc.new'        => 'new BSD License',
+	'caption.alt.misc.new_parens' => '(new) BSD License',
+	'caption.alt.misc.short'      => 'BSD 3 clause',
+	'caption.alt.misc.qemu' => 'BSD Licence (without advertising clause)',
+	tags                    => [
 		'family:bsd',
 		'license:contains:license:bsd_2_clause',
 		'license:is:grant',
 		'type:unversioned',
 	],
 
+	'pat.alt.subject.name.alt.misc.eclipse' => 'Eclipse Distribution License'
+		. '(?:'
+		. $RE{version_prefix}
+		{'pat.alt.subject.trait.scope.line.scope.sentence'}
+		. '1(?:\.0)?)?',
 	'pat.alt.subject.license.scope.multisection' => $P{repro_copr_cond_discl}
 		. '[.]?[  ]'
 		. '(?:[*)]\[?(?:rescinded 22 July 1999'
@@ -3512,7 +4958,9 @@ $RE{gfdl_niv} = {
 	],
 
 	'pat.alt.subject.name' =>
-		"$the?$gnu?Free Documentation Licen[cs]e(?: \\(GFDL\\))?$by_fsf?[;]? $niv",
+		"$the?$gnu?Free Documentation Licen[cs]e(?: \\(GFDL\\))?"
+		. $RE{by_fsf}{'pat.alt.subject.trait'}
+		. "?[;]? $niv",
 };
 
 =item * gpl
@@ -3556,7 +5004,8 @@ $RE{gpl} = {
 	],
 
 	'_pat.alt.subject.name' => [
-		"$the?$gnu?$gpl(?: \\(GPL\\))?$by_fsf?",
+		"$the?$gnu?$gpl(?: \\(GPL\\))?"
+			. $RE{by_fsf}{'pat.alt.subject.trait'} . '?',
 		"$the$gnu?GPL",
 		"${the}GNU [Ll]icense",
 		"${gnu}GPL",
@@ -3639,7 +5088,7 @@ $RE{gpl_2} = {
 	licenseversion => '2.0',
 
 	'pat.alt.subject.license.scope.part.preamble' =>
-		'\(Some other Free Software Foundation software is covered by the GNU (Library|Lesser)',
+		'\(Some other Free Software Foundation software is covered by t?he GNU (Library|Lesser)',
 	'pat.alt.subject.license.scope.multisection.part.tail_sample' =>
 		'[<]?name of author[>]?[  ]'
 		. 'This program is free software[;]? '
@@ -3924,10 +5373,14 @@ $RE{lgpl} = {
 	],
 
 	'_pat.alt.subject.name' => [
-		"$the?$gnu?Library $gpl(?: \\(LGPL\\))?$by_fsf?",
-		"$the?$gnu?Lesser(?: \\(Library\\))? $gpl(?: \\(LGPL\\))?$by_fsf?",
-		"$the?$gnu?LIBRARY GENERAL PUBLIC LICEN[CS]E(?: \\(LGPL\\))?$by_fsf?",
-		"$the?$gnu?LESSER GENERAL PUBLIC LICEN[CS]E(?: \\(LGPL\\))?$by_fsf?",
+		"$the?$gnu?Library $gpl(?: \\(LGPL\\))?"
+			. $RE{by_fsf}{'pat.alt.subject.trait'} . '?',
+		"$the?$gnu?Lesser(?: \\(Library\\))? $gpl(?: \\(LGPL\\))?"
+			. $RE{by_fsf}{'pat.alt.subject.trait'} . '?',
+		"$the?$gnu?LIBRARY GENERAL PUBLIC LICEN[CS]E(?: \\(LGPL\\))?"
+			. $RE{by_fsf}{'pat.alt.subject.trait'} . '?',
+		"$the?$gnu?LESSER GENERAL PUBLIC LICEN[CS]E(?: \\(LGPL\\))?"
+			. $RE{by_fsf}{'pat.alt.subject.trait'} . '?',
 		"$the$gnu?LGPL",
 		"${gnu}LGPL",
 	],
@@ -5859,448 +7312,6 @@ $RE{zpl_2_1} = {
 
 =back
 
-=head2 Licensing traits
-
-Patterns each covering a single trait occuring in licenses.
-
-Each of these patterns has the tag B< type:trait >.
-
-=over
-
-=item * any_of
-
-=cut
-
-$RE{any_of} = {
-	caption => 'license grant "any of the following" phrase',
-	tags    => [
-		'type:trait',
-	],
-
-	'pat.alt.subject.trait' =>
-		'(?P<_any_of>(?:any|one or more) of the following(?: licen[cs]es(?: at your choice)?)?)[.:]? ?',
-};
-
-=item * by
-
-=cut
-
-$RE{by} = {
-	caption => 'license grant " as published by ..." phrase',
-	tags    => [
-		'type:trait:publisher',
-	],
-
-	'pat.alt.subject.trait' => '(?P<_by> ?(?:as )?published by(?: \S+){1,6})',
-};
-
-=item * by_apache
-
-=cut
-
-$RE{by_apache} = {
-	caption =>
-		'license grant "as published by the Apache Software Foundation" phrase',
-	tags => [
-		'type:trait:publisher:apache',
-	],
-
-	'pat.alt.subject.trait' =>
-		'(?P<_by_apache> ?(?:as )?published by the Apache Software Foundation)',
-};
-
-=item * by_fsf
-
-=cut
-
-$RE{by_fsf} = {
-	caption =>
-		'license grant "as published by the Free Software Foundation" phrase',
-	tags => [
-		'type:trait:publisher:gnu',
-	],
-
-	'pat.alt.subject.trait' => "(?P<_by_fsf>$by_fsf)",
-};
-
-=item * by_james_clark
-
-=cut
-
-$RE{by_james_clark} = {
-	caption => 'license grant "as published by James Clark" phrase',
-	tags    => [
-		'type:trait:publisher:mit_new',
-	],
-
-	'pat.alt.subject.trait' =>
-		'(?P<_by_hames_clark> ?(?:as )?published by James Clark)',
-};
-
-=item * by_psf
-
-=cut
-
-$RE{by_psf} = {
-	caption =>
-		'license grant "as published by the Python Software Foundation" phrase',
-	tags => [
-		'type:trait:publisher:python',
-	],
-
-	'pat.alt.subject.trait' =>
-		'(?P<_by_psf> ?(?:as )?published by the Python Software Foundation)',
-};
-
-=item * by_sam_hocevar
-
-=cut
-
-$RE{by_sam_hocevar} = {
-	caption => 'license grant "as published by Sam Hocevar" phrase',
-	tags    => [
-		'type:trait:publisher:wtfpl',
-	],
-
-	'pat.alt.subject.trait' =>
-		'(?P<_by_sam_hocevar> ?(?:as )?published by Sam Hocevar)',
-};
-
-=item * clause_retention
-
-=cut
-
-$RE{'clause_retention'} = {
-	caption => 'retention clause',
-	tags    => [
-		'type:trait',
-	],
-
-	'pat.alt.subject.trait.scope.sentence' => $P{retain_notice_cond_discl},
-};
-
-=item * clause_reproduction
-
-=cut
-
-$RE{'clause_reproduction'} = {
-	caption => 'reproduction clause',
-	tags    => [
-		'type:trait',
-	],
-
-	'pat.alt.subject.trait.scope.sentence' => $P{repro_copr_cond_discl},
-};
-
-=item * clause_advertising
-
-=cut
-
-$RE{'clause_advertising'} = {
-	caption => 'advertising clause',
-	tags    => [
-		'type:trait',
-	],
-
-	'pat.alt.subject.trait.scope.sentence' => $P{ad_mat_ack_this},
-};
-
-=item * clause_advertising_always
-
-=cut
-
-$RE{'clause_advertising_always'} = {
-	caption => 'advertising clause (always)',
-	tags    => [
-		'type:trait',
-	],
-
-	'pat.alt.subject.trait.scope.sentence' => $P{redist_ack_this},
-};
-
-=item * clause_non_endorsement
-
-=cut
-
-$RE{'clause_non_endorsement'} = {
-	caption => 'non-endorsement clause',
-	tags    => [
-		'type:trait',
-	],
-
-	'pat.alt.subject.trait.scope.sentence' => $P{nopromo_neither},
-};
-
-=item * fsf_unlimited
-
-=cut
-
-$RE{'fsf_unlimited'} = {
-	tags => [
-		'type:trait',
-	],
-
-	'pat.alt.subject.trait.scope.sentence' => $fsf_ul,
-};
-
-=item * fsf_unlimited_retention
-
-=cut
-
-$RE{'fsf_unlimited_retention'} = {
-	tags => [
-		'type:trait',
-	],
-
-	'pat.alt.subject.trait.scope.sentence' => $fsf_ullr,
-};
-
-=item * license_label
-
-=cut
-
-$RE{license_label} = {
-	caption => 'license grant "License:" phrase',
-	tags    => [
-		'type:trait:grant:prefix',
-	],
-
-	'pat.alt.subject.trait' =>
-		'(?P<_license_label>[Ll]icen[sc]e|[Ii]dentifier)[:"]',
-};
-
-=item * license_label_trove
-
-=cut
-
-$RE{license_label_trove} = {
-	caption => 'license grant "License:" phrase',
-	tags    => [
-		'type:trait:grant:prefix',
-	],
-
-	'pat.alt.subject.trait' =>
-		'(?P<_license_label_trove>License(?: ::)? OSI Approved(?: ::)? )',
-};
-
-=item * licensed_under
-
-=cut
-
-$RE{licensed_under} = {
-	caption => 'license grant "licensed under" phrase',
-	tags    => [
-		'type:trait:grant:prefix',
-	],
-
-	'pat.alt.subject.trait' => '(?P<_licensed_under>'
-		. '(?:(?:[Ll]icen[sc]ed(?: for use)?|available|[Dd]istribut(?:able|ed)|[Ff]or distribution|permitted|provided|[Pp]ublished|[Rr]eleased) under'
-		. '|[Ll]icen[sc]ed using'
-		. '|(?:in form of source code|may be copied|placed their code|to [Yy]ou) under'
-		. '|(?:[Tt]his|[Mm]y) (?:software|file|work) is under' # vague preposition prepended by object
-		. '|(?:are|is) release under' # vague preposition prepended by verb and vague object/action
-		. '|which I release under'    # vague preposition prepended by actor and vague action
-		. '|distribute(?: it)?(?: and[/]or modify)? it under' # vague preposition prepended by action and vague object
-		. '|(?:according|[Ss]ubject) to|in accordance with'
-		. '|(?:[Cc]overed|governed) by)'
-		. '(?: (?:either )?(?:the )?(?:conditions|terms(?: and conditions)?|provisions) (?:described in|of))?' # terms optionally appended
-		. '|[Uu]nder (?:either )?(?:the )?(?:terms|(?:terms and )?conditions) (?:described in|of)(?: either)?' # vague preposition + terms
-		. ') ',
-};
-
-=item * or_at_option
-
-=cut
-
-$RE{'or_at_option'} = {
-	caption => 'license grant "or at your option" phrase',
-	tags    => [
-		'type:trait',
-	],
-
-	'pat.alt.subject.trait' =>
-		'(?P<_or_at_option>(?:and|or)(?: ?\(?at your (?:option|choice)\)?)?)',
-};
-
-=item * usage_rfn
-
-=cut
-
-$RE{usage_rfn} = {
-	caption => 'license usage "with Reserved Font Name" phrase',
-	tags    => [
-		'type:trait:usage:rfn',
-	],
-
-	'pat.alt.subject.trait' => '(?P<_usage_rfn>with Reserved Font Name)',
-};
-
-=item * version
-
-=cut
-
-$RE{'version'} = {
-	tags => [
-		'type:trait',
-	],
-};
-
-=item * version_later
-
-=cut
-
-$RE{'version_later'} = {
-	caption => 'version "or later"',
-	tags    => [
-		'type:trait',
-	],
-};
-
-=item * version_later_paragraph
-
-=cut
-
-$RE{'version_later_paragraph'} = {
-	caption => 'version "or later" postfix (paragraphs)',
-	tags    => [
-		'type:trait',
-	],
-
-	'pat.alt.subject.trait.scope.paragraph' =>
-		'(?P<_version_later_paragraph>Later versions are permitted)',
-};
-
-=item * version_later_postfix
-
-=cut
-
-$RE{'version_later_postfix'} = {
-	caption => 'version "or later" (postfix)',
-	tags    => [
-		'type:trait',
-	],
-
-	'pat.alt.subject.trait' => '\(?(?P<_version_later_postfix>'
-		. $RE{or_at_option}{'pat.alt.subject.trait'}
-		. '(?: any)? (?:later|above|newer)(?: version)?'
-		. '|or any later at your option)\)?',
-};
-
-$RE{version_later}{'pat.alt.subject.trait.scope.line.scope.sentence'}
-	= ',? (?P<version_later>'
-	. $RE{version_later_postfix}{'pat.alt.subject.trait'} . ')';
-$RE{version_later}{'pat.alt.subject.trait.scope.paragraph'}
-	= '[.][ ](?P<version_later>'
-	. $RE{version_later_paragraph}{'pat.alt.subject.trait.scope.paragraph'}
-	. ')';
-$RE{version_later}{'pat.alt.subject.trait'}
-	= '(?:[.][ ]|,? )(?P<version_later>'
-	. $RE{version_later_paragraph}{'pat.alt.subject.trait.scope.paragraph'}
-	. '|'
-	. $RE{version_later_postfix}{'pat.alt.subject.trait'} . ')';
-
-=item * version_number
-
-=cut
-
-$RE{'version_number'} = {
-	caption => 'version number',
-	tags    => [
-		'type:trait',
-	],
-
-	'pat.alt.subject.trait' => '(?P<version_number>\d(?:\.\d)*\b)',
-};
-
-=item * version_numberstring
-
-=cut
-
-$RE{'version_numberstring'} = {
-	caption => 'version numberstring',
-	tags    => [
-		'type:trait',
-	],
-};
-
-=item * version_number_suffix
-
-=cut
-
-$RE{'version_number_suffix'} = {
-	caption => 'version "of the License" suffix',
-	tags    => [
-		'type:trait',
-	],
-
-	'pat.alt.subject.trait' => '(?:(?: of the)? Licen[cs]e)?',
-};
-
-=item * version_only
-
-=cut
-
-$RE{'version_only'} = {
-	caption => 'version "only"',
-	tags    => [
-		'type:trait',
-	],
-
-	'pat.alt.subject.trait' =>
-		'(?P<_version_only> (?:only|\(no other versions\)))',
-};
-
-=item * version_prefix
-
-=cut
-
-$RE{'version_prefix'} = {
-	caption => 'version prefix',
-	tags    => [
-		'type:trait',
-	],
-
-	'pat.alt.subject.trait.scope.line.scope.sentence' =>
-		'(?:[-]|[;]?(?: (?:only |either )?)?|[ - ])?\(?(?:[Vv]ersion [Vv]?|VERSION |rev(?:ision)? |[Vv]\.? ?)?',
-	'pat.alt.subject.trait.scope.paragraph' =>
-		':?[ ]\(?(?:Version [Vv]?|VERSION )?',
-	'pat.alt.subject.trait' =>
-		'(?:[-]|[;](?: (?:either )?)?|[ - ]|:?[ ])?\(?(?:[Vv]ersion [Vv]?|VERSION |[Vv]\.? ?)?',
-};
-
-$RE{version_numberstring}{'pat.alt.subject.trait.scope.line.scope.sentence'}
-	= $RE{version_prefix}{'pat.alt.subject.trait.scope.line.scope.sentence'}
-	. $RE{version_number}{'pat.alt.subject.trait'}
-	. $RE{version_number_suffix}{'pat.alt.subject.trait'};
-$RE{version_numberstring}{'pat.alt.subject.trait.scope.paragraph'}
-	= $RE{version_prefix}{'pat.alt.subject.trait.scope.paragraph'}
-	. $RE{version_number}{'pat.alt.subject.trait'}
-	. $RE{version_number_suffix}{'pat.alt.subject.trait'};
-$RE{version_numberstring}{'pat.alt.subject.trait'}
-	= $RE{version_prefix}{'pat.alt.subject.trait'}
-	. $RE{version_number}{'pat.alt.subject.trait'}
-	. $RE{version_number_suffix}{'pat.alt.subject.trait'};
-
-$RE{version}{'pat.alt.subject.trait.scope.line.scope.sentence'}
-	= '(?P<_version>'
-	. $RE{version_numberstring}
-	{'pat.alt.subject.trait.scope.line.scope.sentence'} . '(?:'
-	. $RE{version_later}{'pat.alt.subject.trait.scope.line.scope.sentence'}
-	. ')?)\)?(?: of)? ?';
-$RE{version}{'pat.alt.subject.trait.scope.paragraph'}
-	= '(?P<_version>'
-	. $RE{version_numberstring}{'pat.alt.subject.trait.scope.paragraph'}
-	. '(?:'
-	. $RE{version_later}{'pat.alt.subject.trait.scope.paragraph'}
-	. ')?)\)?';
-$RE{version}{'pat.alt.subject.trait'}
-	= '(?P<_version>'
-	. $RE{version_numberstring}{'pat.alt.subject.trait'} . '(?:'
-	. $RE{version_later}{'pat.alt.subject.trait'}
-	. ')?)\)?(?: of)? ?';
-
-=back
-
 =head2 License combinations
 
 Patterns each covering a combination of multiple licenses.
@@ -6315,7 +7326,7 @@ Each of these patterns has the tag B< type:combo >.
 
 =cut
 
-$RE{'perl'} = {
+$RE{perl} = {
 	name                     => 'Perl',
 	'name.alt.org.spdx'      => 'Artistic or GPL-1+',
 	caption                  => 'The Perl 5 License',
@@ -6353,7 +7364,7 @@ Each of these patterns has the tag B< type:group >.
 
 =cut
 
-$RE{'bsd'} = {
+$RE{bsd} = {
 	name                        => 'BSD',
 	'name.alt.org.debian'       => 'BSD~unspecified',
 	'name.alt.org.fedora.web'   => 'BSD',
@@ -6381,7 +7392,7 @@ $RE{'bsd'} = {
 
 =cut
 
-$RE{'gnu'} = {
+$RE{gnu} = {
 	name                  => 'AGPL/GPL/LGPL',
 	'name.alt.org.debian' => 'GNU~unspecified',
 	caption               => 'GNU license',
@@ -6401,7 +7412,7 @@ $RE{'gnu'} = {
 
 =cut
 
-$RE{'mit'} = {
+$RE{mit} = {
 	name                        => 'MIT',
 	'name.alt.org.debian'       => 'MIT~unspecified',
 	'name.alt.org.fedora.web'   => 'MIT',
@@ -6764,7 +7775,8 @@ for my $id (@_OBJECTS) {
 		@shortnames = uniq sort @shortnames;
 
 		my $shortname = '';
-		$shortname = sprintf '(?: \(\"?(%s)\"?\))?',
+		$shortname
+			= sprintf '(?: ?\((?:the )?\"?(%s)(?: [Ll]icen[cs]e)?\"?\))?',
 			join( '|', @shortnames )
 			if (@shortnames);
 		my $shortname_re = qr/$shortname$/;
@@ -6834,6 +7846,7 @@ for my $id (@_OBJECTS) {
 				. $version
 				. $RE{version_number_suffix}{'pat.alt.subject.trait'}
 				. $version_usage
+				. $shortname
 				. $version_stopgap;
 		}
 		push @{ $RE{$id}{'_pat.alt.subject.name.synth.caption'} },

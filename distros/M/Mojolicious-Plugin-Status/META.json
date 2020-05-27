@@ -34,10 +34,10 @@
       "runtime" : {
          "requires" : {
             "BSD::Resource" : "0",
+            "Cpanel::JSON::XS" : "4.09",
             "File::Map" : "0",
             "File::Temp" : "0.2308",
             "Mojolicious" : "8.33",
-            "Sereal" : "0",
             "perl" : "5.010001"
          }
       }
@@ -58,6 +58,6 @@
       },
       "x_IRC" : "irc://irc.freenode.net/#mojo"
    },
-   "version" : "1.08",
+   "version" : "1.10",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

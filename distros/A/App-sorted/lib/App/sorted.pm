@@ -1,9 +1,9 @@
 package App::sorted;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-15'; # DATE
+our $DATE = '2020-05-25'; # DATE
 our $DIST = 'App-sorted'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -93,8 +93,8 @@ sub sorted {
     }
 
     my $sort_sub  = $args{sort_sub}  // 'asciibetically';
-    my $sort_args = $args{sort_args} // {};
-    my $cmp = Sort::Sub::get_sorter($sort_sub, $sort_args);
+    my $sort_args = $args{sort_args} // [];
+    my $cmp = Sort::Sub::get_sorter($sort_sub, { map { split /=/, $_, 2 } @$sort_args });
 
     my $sorted = 1;
     my ($prev_line, $cur_line);
@@ -142,7 +142,7 @@ App::sorted - Check if lines of a file are sorted
 
 =head1 VERSION
 
-This document describes version 0.001 of App::sorted (from Perl distribution App-sorted), released on 2019-12-15.
+This document describes version 0.002 of App::sorted (from Perl distribution App-sorted), released on 2020-05-25.
 
 =head1 SYNOPSIS
 
@@ -203,13 +203,14 @@ Arguments ('*' denotes required arguments):
 
 =item * B<quiet> => I<bool>
 
-=item * B<sort_args> => I<hash>
+=item * B<sort_args> => I<array[str]>
 
 Arguments to pass to the Sort::Sub::* routine.
 
 =item * B<sort_sub> => I<sortsub::spec>
 
 Name of a Sort::Sub::* module (without the prefix).
+
 
 =back
 
@@ -255,7 +256,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

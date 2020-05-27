@@ -20,7 +20,7 @@ L<http://perldoc.perl.org/perlartistic.html>.
 
 =cut
 
-use Test::More tests => 88;
+use Test::More tests => 100;
 use Scalar::Util qw/blessed/;
 
 sub exception (&) { eval { shift->(); 1 } ? undef : ($@ || die) }  ## no critic (ProhibitSubroutinePrototypes, RequireFinalReturn, RequireCarping)
@@ -30,72 +30,106 @@ sub warns (&) { my @w; { local $SIG{__WARN__} = sub { push @w, shift }; shift->(
 
 diag "This is Perl $] at $^X on $^O";
 BEGIN { use_ok 'Util::H2O' }
-is $Util::H2O::VERSION, '0.06';
+is $Util::H2O::VERSION, '0.08';
 
 my $PACKRE = qr/\AUtil::H2O::_[0-9A-Fa-f]+\z/;
 
-my $hash = { foo => "bar", x => "y" };
-my $o1 = h2o $hash, qw/ more keys /;
-is $o1, $hash;
-like blessed($o1), $PACKRE;
-is $o1->foo, 'bar';
-is $o1->x, 'y';
-ok exception { $o1->blah };
-is $o1->x("z"), 'z';
-is $o1->x, 'z';
-is $o1->more, undef;
-is $o1->keys, undef;
-is $o1->more("quz"), 'quz';
-is $o1->more, 'quz';
-is_deeply $hash, { foo=>'bar', x=>'z', more=>'quz' };
-is $o1->keys(undef), undef;
-is_deeply $hash, { foo=>'bar', x=>'z', more=>'quz', keys=>undef };
+{
+	my $hash = { foo => "bar", x => "y" };
+	my $o1 = h2o $hash, qw/ more keys /;
+	is $o1, $hash;
+	like blessed($o1), $PACKRE;
+	is $o1->foo, 'bar';
+	is $o1->x, 'y';
+	ok exception { $o1->blah };
+	is $o1->x("z"), 'z';
+	is $o1->x, 'z';
+	is $o1->more, undef;
+	is $o1->keys, undef;
+	is $o1->more("quz"), 'quz';
+	is $o1->more, 'quz';
+	is_deeply $hash, { foo=>'bar', x=>'z', more=>'quz' };
+	is $o1->keys(undef), undef;
+	is_deeply $hash, { foo=>'bar', x=>'z', more=>'quz', keys=>undef };
+}
+{
+	my $o2 = { hello => { perl => "world!" }, x=>{y=>{z=>"foo"}} };
+	h2o -recurse, $o2;
+	is $o2->hello->perl, "world!";
+	is $o2->x->y->z, "foo";
+	like blessed($o2->x), $PACKRE;
+	like blessed($o2->x->y), $PACKRE;
+	note explain $o2;
+}
 
-my $o2 = { hello => { perl => "world!" }, x=>{y=>{z=>"foo"}} };
-h2o -recurse, $o2;
-is $o2->hello->perl, "world!";
-is $o2->x->y->z, "foo";
-like blessed($o2->x), $PACKRE;
-like blessed($o2->x->y), $PACKRE;
-note explain $o2;
+# -recurse
+{
+	my $o3 = h2o -recurse, { foo => { bar => "quz" } }, 'xyz';
+	is $o3->xyz, undef;
+	is $o3->foo->bar, 'quz';
+	ok exception { $o3->foo->xyz };
+}
+{
+	my $code = sub {};
+	my $o4 = h2o { a=>[], h=>{}, c=>$code };
+	is ref $o4->a, 'ARRAY';
+	is ref $o4->h, 'HASH';
+	is ref $o4->c, 'CODE';
+	is $o4->c, $code;
+}
 
-my $o3 = h2o -recurse, { foo => { bar => "quz" } }, 'xyz';
-is $o3->xyz, undef;
-is $o3->foo->bar, 'quz';
-ok exception { $o3->foo->xyz };
+# -meth
+{
+	my $o5 = h2o -meth, { abc => 123, def => sub { $_[0]->abc(789); 456 } };
+	is $o5->abc, 123;
+	is $o5->def, 456;
+	is $o5->abc, 789;
+}
+{
+	my $o6 = h2o -meth, -recurse, { a => { b=>"c", d=>sub{"e"} }, f=>sub{"g"} };
+	is $o6->a->b, 'c';
+	is ref $o6->a->d, 'CODE';
+	is $o6->f, 'g';
+}
+{
+	my $o = h2o -meth, { x=>111, y=>sub{222} };
+	is $o->x, 111;
+	is $o->y, 222;
+	is_deeply [sort keys %$o], [qw/ x /];
+	is $o->{x}, 111;
+	SKIP: {
+		skip "Won't work on old Perls", 1 if $] lt '5.008009';
+		ok exception { my $x = $o->{y} };
+	}
+}
+{
+	my $o = h2o -meth, { x=>111, y=>sub{222} }, qw/y/;
+	is $o->x, 111;
+	is $o->y, 222;
+	is_deeply [sort keys %$o], [qw/ x /];
+	$o->{y} = 333;
+	is_deeply $o, { x=>111, y=>333 };
+	is $o->y, 222;
+}
 
-my $code = sub {};
-my $o4 = h2o { a=>[], h=>{}, c=>$code };
-is ref $o4->a, 'ARRAY';
-is ref $o4->h, 'HASH';
-is ref $o4->c, 'CODE';
-is $o4->c, $code;
-
-my $o5 = h2o -meth, { abc => 123, def => sub { $_[0]->abc(789); 456 } };
-is $o5->abc, 123;
-is $o5->def, 456;
-is $o5->abc, 789;
-
-my $o6 = h2o -meth, -recurse, { a => { b=>"c", d=>sub{"e"} }, f=>sub{"g"} };
-is $o6->a->b, 'c';
-is ref $o6->a->d, 'CODE';
-is $o6->f, 'g';
-
-my $dest=0;
-my $o7 = h2o -class=>'Foo::Bar', -meth,
-	{ ijk=>'nop', rst => sub { $_[0]->ijk('wxy'); 'efg' },
-		DESTROY=>sub{$dest++} };
-isa_ok $o7, 'Foo::Bar';
-is $o7->ijk, 'nop';
-is $o7->rst, 'efg';
-is $o7->ijk, 'wxy';
-is $dest, 0;
-$o7 = undef;
-is $dest, 1;
-my $o7a = bless {}, 'Foo::Bar';
-is $o7a->ijk, undef;
-is $o7a->rst, 'efg';
-is $o7a->ijk, 'wxy';
+# -class
+{
+	my $dest=0;
+	my $o7 = h2o -class=>'Foo::Bar', -meth,
+		{ ijk=>'nop', rst => sub { $_[0]->ijk('wxy'); 'efg' },
+			DESTROY=>sub{$dest++} };
+	isa_ok $o7, 'Foo::Bar';
+	is $o7->ijk, 'nop';
+	is $o7->rst, 'efg';
+	is $o7->ijk, 'wxy';
+	is $dest, 0;
+	$o7 = undef;
+	is $dest, 1;
+	my $o7a = bless {}, 'Foo::Bar';
+	is $o7a->ijk, undef;
+	is $o7a->rst, 'efg';
+	is $o7a->ijk, 'wxy';
+}
 
 # -clean
 sub checksym {
@@ -144,10 +178,16 @@ sub checksym {
 	isa_ok $n, 'Quz';
 	my $n2 = new_ok 'Quz';
 	is $n2->abc, undef;
-	my $n3 = Quz->new(abc=>444);
+	$n2->{new} = sub{die};  ## no critic (RequireCarping)
+	my $n3 = $n2->new(abc=>444);
 	is $n3->abc, 444;
 	like exception { Quz->new(abc=>4,5) }, qr/\bOdd\b/;
 	like exception { Quz->new(def=>4) }, qr/\bUnknown argument\b/i;
+	SKIP: {
+		skip "Won't work on old Perls", 2 if $] lt '5.008009';
+		ok exception { my $x = $n->{new} };
+		ok exception { my $x = $n->{DESTROY} };
+	}
 }
 
 # -lock
@@ -210,3 +250,5 @@ ok exception { h2o(-new, { new=>5 }) };
 ok exception { h2o(-class) };
 ok exception { h2o(-class=>'') };
 ok exception { h2o(-class=>[]) };
+
+done_testing;

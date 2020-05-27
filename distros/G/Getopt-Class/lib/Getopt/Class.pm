@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Getopt::Long with Class - ~/lib/Getopt/Class.pm
-## Version v0.102.4
+## Version v0.102.5
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2020/04/25
-## Modified 2020/05/21
+## Modified 2020/05/26
 ## 
 ##----------------------------------------------------------------------------
 package Getopt::Class;
@@ -19,7 +19,7 @@ BEGIN
     use DateTime::Format::Strptime;
     use Scalar::Util;
 	use Devel::Confess;
-    our $VERSION = 'v0.102.4';
+    our $VERSION = 'v0.102.5';
 };
 
 sub init
@@ -639,15 +639,15 @@ AUTOLOAD
     my $f = $method;
     ## Dictionary definition for this particular option field
     my $def = $dict->{ $f };
-    if( $def->{type} eq 'string' ||
-        Scalar::Util::reftype( $self->{ $f } ) eq 'SCALAR' )
-    {
-        return( $self->_set_get_scalar_as_object( $f, @_ ) );
-    }
-    elsif( $def->{type} eq 'boolean' )
+    if( $def->{type} eq 'boolean' || ( $self->_is_object( $self->{ $f } ) && $self->{ $f }->isa( 'Module::Generic::Boolean' ) ) )
     {
         $self->message( 3, "Returning boolean value for '$f': '", $data->{ $f }, "'." );
         return( $self->_set_get_boolean( $f, @_ ) );
+    }
+    elsif( $def->{type} eq 'string' ||
+        Scalar::Util::reftype( $self->{ $f } ) eq 'SCALAR' )
+    {
+        return( $self->_set_get_scalar_as_object( $f, @_ ) );
     }
     elsif( $def->{type} eq 'integer' ||
            $def->{type} eq 'decimal' )
@@ -1055,7 +1055,7 @@ Getopt::Class - Extended dictionary version of Getopt::Long
 
 =head1 VERSION
 
-    v0.102.4
+    v0.102.5
 
 =head1 DESCRIPTION
 

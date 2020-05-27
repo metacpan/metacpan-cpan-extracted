@@ -1,3 +1,16 @@
+0.120   2020-05-25  Released-By: PERLANCAR; Urgency: medium
+
+        - Edit Changes.
+
+
+0.119   2020-05-25  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+
+	- [ux] Add tab completion for 'sort_sub' and 'sort_args' arguments.
+
+        - [incompatible change] 'sort_args' argument is now an array, not a
+          hash.
+
+
 0.118   2020-02-28  Released-By: PERLANCAR; Urgency: medium
 
 	- Introduce meta property: compares_record.

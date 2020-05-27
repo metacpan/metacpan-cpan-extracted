@@ -14,7 +14,7 @@ use AsposeCellsCloud::ApiClient;
 
 use base "Class::Data::Inheritable";
 
-my $VERSION = '20.4.6';
+my $VERSION = '20.5.2';
 
 
 

@@ -1,10 +1,8 @@
-# $Id: password_needs_rehash.t,v 1.2 2017/06/24 13:25:32 cmanley Exp $
 # This file must be saved in UTF-8 encoding!
 use strict;
 use warnings;
 use Test::More;
 use lib qw(../lib);
-use PHP::Functions::Password;
 
 my @tests = (
 	{
@@ -74,6 +72,51 @@ my @tests = (
 		'expect_php'=> 1,	# even though PHP say's no.
 		'reason'	=> 'invalid crypt string',
 	},
+
+	{
+		'crypted'	=> '$argon2id$v=19$m=65536,t=4,p=1$ZExWOUovRW1YNldkNFNsZA$2VI1DHxtqj3gQgVC5M3SZnYXZD4rM1mJR9666QVGCkQ',
+		'algo'		=> 3, #$class::PASSWORD_ARGON2ID
+		'options'	=> {
+			'memory_cost'	=> 65536,
+			'time_cost'		=> 4,
+			'threads'		=> 1,
+		},
+		'expect'	=> 0,
+		'reason'	=> 'up to date',
+	},
+	{
+		'crypted'	=> '$argon2id$v=19$m=65536,t=4,p=1$ZExWOUovRW1YNldkNFNsZA$2VI1DHxtqj3gQgVC5M3SZnYXZD4rM1mJR9666QVGCkQ',
+		'algo'		=> 3, #$class::PASSWORD_ARGON2ID
+		'options'	=> {
+			'memory_cost'	=> 65536,
+			'time_cost'		=> 8,
+			'threads'		=> 1,
+		},
+		'expect'	=> 1,
+		'reason'	=> 'time_cost mismatch',
+	},
+	{
+		'crypted'	=> '$argon2id$v=19$m=65536,t=4,p=1$ZExWOUovRW1YNldkNFNsZA$2VI1DHxtqj3gQgVC5M3SZnYXZD4rM1mJR9666QVGCkQ',
+		'algo'		=> 3, #$class::PASSWORD_ARGON2ID
+		'options'	=> {
+			'memory_cost'	=> 123,
+			'time_cost'		=> 4,
+			'threads'		=> 1,
+		},
+		'expect'	=> 1,
+		'reason'	=> 'memory_cost mismatch',
+	},
+	{
+		'crypted'	=> '$argon2id$v=19$m=65536,t=4,p=1$ZExWOUovRW1YNldkNFNsZA$2VI1DHxtqj3gQgVC5M3SZnYXZD4rM1mJR9666QVGCkQ',
+		'algo'		=> 3, #$class::PASSWORD_ARGON2ID
+		'options'	=> {
+			'memory_cost'	=> 65536,
+			'time_cost'		=> 4,
+			'threads'		=> 2,
+		},
+		'expect'	=> 1,
+		'reason'	=> 'threads mismatch',
+	},
 );
 
 my @methods = map { $_, "password_$_"; } qw(
@@ -88,19 +131,23 @@ if (!($ENV{'HARNESS_ACTIVE'} || ($^O eq 'MSWin32'))) {	# experimental: that's wh
 		my $phpversion = `php -v`;
 		$phpversion =~ s/^PHP (\S+)\s.*/$1/s;
 		if ($phpversion =~ /^(\d{1,3}\.\d{1,6})\b/) {
-			if ($1 < 5.5) {
+			#if ($1 < 5.5) {
+			if ($1 < 7.3) {
 				undef($php);
 			}
 		}
-		print "Found PHP executable $php with version $phpversion: " . ($php ? 'OK' : 'TOO OLD') . "\n";
+		diag("Found PHP executable $php with version $phpversion: " . ($php ? 'OK' : 'TOO OLD') . "\n");
 	}
 	else {
 		undef($php);
 	}
 }
 
-plan tests => scalar(@methods) + ($php ? 3 : 2) * scalar(@tests);
+plan tests => 1 + scalar(@methods) + ($php ? 3 : 2) * scalar(@tests);
+
 my $class = 'PHP::Functions::Password';
+use_ok($class) || BAIL_OUT("Failed to use $class");
+
 foreach my $method (@methods) {
 	can_ok($class, $method);
 	if ($method =~ /^password/) {
@@ -126,8 +173,21 @@ foreach my $test (@tests) {
 		if (defined($options->{'salt'})) {
 			$phpcode .= "'salt'=>'" . $options->{'salt'} . "',";
 		}
-		if (defined($options->{'cost'})) {
-			$phpcode .= "'cost'=>" . $options->{'cost'} . ",";
+		if ($algo == 1) {
+			if (defined($options->{'cost'})) {
+				$phpcode .= "'cost'=>" . $options->{'cost'} . ",";
+			}
+		}
+		elsif (($algo == 2) || ($algo == 3)) {
+			if (defined($options->{'memory_cost'})) {
+				$phpcode .= "'memory_cost'=>" . $options->{'memory_cost'} . ",";
+			}
+			if (defined($options->{'time_cost'})) {
+				$phpcode .= "'time_cost'=>" . $options->{'time_cost'} . ",";
+			}
+			if (defined($options->{'threads'})) {
+				$phpcode .= "'threads'=>" . $options->{'threads'} . ",";
+			}
 		}
 		$phpcode .= "))";
 		#print "$phpcode\n";

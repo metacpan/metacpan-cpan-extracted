@@ -1,16 +1,14 @@
 package Net::IPAM::Tree;
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 use 5.10.0;
 use strict;
 use warnings;
 use utf8;
 
-use Carp qw(carp croak);
-use Scalar::Util qw(blessed);
-###
-use namespace::clean;
+use Carp qw();
+use Scalar::Util qw();
 
 use Net::IPAM::Block;
 use Net::IPAM::Tree::Node;
@@ -86,7 +84,7 @@ sub new {
     $self->{error_cb} = $_[1];
   }
   else {
-    $self->{error_cb} = sub { carp("duplicate block during insert: $_[0]") };
+    $self->{error_cb} = sub { Carp::carp("duplicate block during insert: $_[0]") };
   }
 
   return $self;
@@ -162,12 +160,12 @@ This can be used for fast ACL lookups.
 
 sub contains {
   my ( $self, $thing ) = @_;
-  croak("missing or wrong arg,") unless blessed($thing);
+  Carp::croak("missing or wrong arg,") unless Scalar::Util::blessed($thing);
 
   # make a /32 or /128 block if thing is an IP
   $thing = Net::IPAM::Block->new($thing) if $thing->isa('Net::IPAM::IP');
 
-  croak("wrong arg,") unless $thing->isa('Net::IPAM::Block');
+  Carp::croak("wrong arg,") unless $thing->isa('Net::IPAM::Block');
 
   # just look in childs of root node
   return $self->{root}->_contains($thing);
@@ -195,12 +193,12 @@ This can be used for fast routing table lookups.
 
 sub lookup {
   my ( $self, $thing ) = @_;
-  croak("missing or wrong arg,") unless blessed($thing);
+  Carp::croak("missing or wrong arg,") unless Scalar::Util::blessed($thing);
 
   # make a /32 or /128 block if thing is an IP
   $thing = Net::IPAM::Block->new($thing) if $thing->isa('Net::IPAM::IP');
 
-  croak("wrong arg,") unless $thing->isa('Net::IPAM::Block');
+  Carp::croak("wrong arg,") unless $thing->isa('Net::IPAM::Block');
 
   return $self->{root}->_lookup($thing);
 }
@@ -216,8 +214,8 @@ Returns undef if $block is not found.
 =cut
 
 sub remove {
-  croak("missing or wrong arg,") unless blessed( $_[1] );
-  croak("wrong arg,") unless $_[1]->isa('Net::IPAM::Block');
+  Carp::croak("missing or wrong arg,") unless Scalar::Util::blessed( $_[1] );
+  Carp::croak("wrong arg,") unless $_[1]->isa('Net::IPAM::Block');
 
   # remove block, relink childs
   return $_[0]->{root}->_remove( $_[1], 0 );
@@ -234,8 +232,8 @@ Returns undef if $block is not found.
 =cut
 
 sub remove_branch {
-  croak("missing or wrong arg,") unless blessed( $_[1] );
-  croak("wrong arg,") unless $_[1]->isa('Net::IPAM::Block');
+  Carp::croak("missing or wrong arg,") unless Scalar::Util::blessed( $_[1] );
+  Carp::croak("wrong arg,") unless $_[1]->isa('Net::IPAM::Block');
 
   # remove block and child nodes
   return $_[0]->{root}->_remove( $_[1], 1 );
@@ -277,7 +275,7 @@ sub to_string {
   my ( $self, $block_to_str ) = @_;
 
   if ( defined $block_to_str ) {
-    croak("attribute 'cb' is no CODE_REF,") unless ref $block_to_str eq 'CODE';
+    Carp::croak("attribute 'cb' is no CODE_REF,") unless ref $block_to_str eq 'CODE';
   }
   else {
     $block_to_str = sub { return "$_[0]" };
@@ -352,8 +350,8 @@ Example, get some tree statistics:
 
 sub walk {
   my ( $self, $cb ) = @_;
-  croak("missing arg,") unless defined $cb;
-  croak("wrong arg, callback is no CODE_REF,") unless ref $cb eq 'CODE';
+  Carp::croak("missing arg,") unless defined $cb;
+  Carp::croak("wrong arg, callback is no CODE_REF,") unless ref $cb eq 'CODE';
 
   # recursive func, declare ahead
   my $walk_rec;
@@ -396,7 +394,7 @@ sub len {
   my $counter_cb = sub { $n++; return };
 
   my $err = $self->walk($counter_cb);
-  croak($err) if defined $err;
+  Carp::croak($err) if defined $err;
 
   return $n;
 }

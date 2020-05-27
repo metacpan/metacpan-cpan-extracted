@@ -17,7 +17,9 @@
       "build" : {
          "requires" : {
             "Cwd" : "0",
+            "File::Compare" : "0",
             "Test::Exception" : "0",
+            "Test::Exit" : "0",
             "Test::More" : "0",
             "Test::Trap" : "0",
             "base" : "0",
@@ -63,7 +65,7 @@
    "provides" : {
       "CLI::Startup" : {
          "file" : "lib/CLI/Startup.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       }
    },
    "release_status" : "stable",
@@ -72,6 +74,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.27",
+   "version" : "0.28",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

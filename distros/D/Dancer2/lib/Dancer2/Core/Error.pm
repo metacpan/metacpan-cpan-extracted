@@ -1,6 +1,6 @@
 package Dancer2::Core::Error;
 # ABSTRACT: Class representing fatal errors
-$Dancer2::Core::Error::VERSION = '0.300003';
+$Dancer2::Core::Error::VERSION = '0.300004';
 use Moo;
 use Carp;
 use Dancer2::Core::Types;
@@ -140,14 +140,15 @@ END_TEMPLATE
     return $output;
 }
 
+# status and message are 'rw' to permit modification in core.error.before hooks
 has status => (
-    is      => 'ro',
+    is      => 'rw',
     default => sub {500},
     isa     => Num,
 );
 
 has message => (
-    is      => 'ro',
+    is      => 'rw',
     isa     => Str,
     lazy    => 1,
     default => sub { '' },
@@ -482,7 +483,7 @@ Dancer2::Core::Error - Class representing fatal errors
 
 =head1 VERSION
 
-version 0.300003
+version 0.300004
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,9 @@ author:
   - 'Len Budney <len.budney@gmail.com>'
 build_requires:
   Cwd: '0'
+  File::Compare: '0'
   Test::Exception: '0'
+  Test::Exit: '0'
   Test::More: '0'
   Test::Trap: '0'
   base: '0'
@@ -22,7 +24,7 @@ name: CLI-Startup
 provides:
   CLI::Startup:
     file: lib/CLI/Startup.pm
-    version: '0.27'
+    version: '0.28'
 recommends:
   Config::INI::Writer: '0'
   Config::Tiny: '0'
@@ -50,5 +52,5 @@ requires:
   perl: v5.10.0
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.27'
+version: '0.28'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

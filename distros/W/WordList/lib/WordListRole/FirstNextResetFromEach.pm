@@ -1,9 +1,9 @@
 package WordListRole::FirstNextResetFromEach;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-04'; # DATE
+our $DATE = '2020-05-24'; # DATE
 our $DIST = 'WordList'; # DIST
-our $VERSION = '0.6.0'; # VERSION
+our $VERSION = '0.7.5'; # VERSION
 
 use Role::Tiny;
 
@@ -19,21 +19,21 @@ sub first_word {
 sub next_word {
     my $self = shift;
 
-    unless ($self->[1]) {
+    unless ($self->{_all_words}) {
         my @wordlist;
         $self->each_word(sub { push @wordlist, $_[0] });
-        $self->[1] = \@wordlist;
+        $self->{_all_words} = \@wordlist;
     }
-    $self->[0] = 0 unless defined $self->[0];
+    $self->{_iterator_idx} = 0 unless defined $self->{_iterator_idx};
 
-    return undef if $self->[0] > $#{ $self->[1] };
-    $self->[1][ $self->[0]++ ];
+    return undef if $self->{_iterator_idx} > $#{ $self->{_all_words} };
+    $self->{_all_words}[ $self->{_iterator_idx}++ ];
 }
 
 sub reset_iterator {
     my $self = shift;
 
-    $self->[0] = 0;
+    $self->{_iterator_idx} = 0;
 }
 
 1;
@@ -51,7 +51,7 @@ WordListRole::FirstNextResetFromEach - Provide first_word(), next_word(), reset_
 
 =head1 VERSION
 
-This document describes version 0.6.0 of WordListRole::FirstNextResetFromEach (from Perl distribution WordList), released on 2020-05-04.
+This document describes version 0.7.5 of WordListRole::FirstNextResetFromEach (from Perl distribution WordList), released on 2020-05-24.
 
 =head1 DESCRIPTION
 

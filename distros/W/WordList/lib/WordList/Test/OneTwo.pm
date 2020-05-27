@@ -1,12 +1,12 @@
 package WordList::Test::OneTwo;
 
-our $DATE = '2020-05-04'; # DATE
-our $VERSION = '0.6.0'; # VERSION
+our $DATE = '2020-05-24'; # DATE
+our $VERSION = '0.7.5'; # VERSION
 
 use WordList;
 our @ISA = qw(WordList);
 
-our %STATS = ("num_words_contain_unicode",0,"longest_word_len",3,"num_words_contains_whitespace",0,"num_words_contains_unicode",0,"num_words",2,"avg_word_len",3,"num_words_contain_whitespace",0,"num_words_contain_nonword_chars",0,"shortest_word_len",3,"num_words_contains_nonword_chars",0); # STATS
+our %STATS = ("longest_word_len",3,"shortest_word_len",3,"num_words_contains_nonword_chars",0,"num_words_contains_whitespace",0,"num_words",2,"num_words_contain_unicode",0,"num_words_contain_whitespace",0,"num_words_contains_unicode",0,"avg_word_len",3,"num_words_contain_nonword_chars",0); # STATS
 
 1;
 # ABSTRACT: Wordlist that contains "one" and "two"
@@ -21,7 +21,7 @@ WordList::Test::OneTwo - Wordlist that contains "one" and "two"
 
 =head1 VERSION
 
-This document describes version 0.6.0 of WordList::Test::OneTwo (from Perl distribution WordList), released on 2020-05-04.
+This document describes version 0.7.5 of WordList::Test::OneTwo (from Perl distribution WordList), released on 2020-05-24.
 
 =head1 SYNOPSIS
 

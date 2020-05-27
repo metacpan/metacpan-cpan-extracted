@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipInterfaces::VoidService::VoidPort;
-$Shipment::UPS::WSDL::ShipInterfaces::VoidService::VoidPort::VERSION = '3.04';
+$Shipment::UPS::WSDL::ShipInterfaces::VoidService::VoidPort::VERSION = '3.05';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -118,7 +118,7 @@ Shipment::UPS::WSDL::ShipInterfaces::VoidService::VoidPort
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 SYNOPSIS
 

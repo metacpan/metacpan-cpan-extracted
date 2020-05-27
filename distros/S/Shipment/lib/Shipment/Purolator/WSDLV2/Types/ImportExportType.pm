@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::ImportExportType;
-$Shipment::Purolator::WSDLV2::Types::ImportExportType::VERSION = '3.04';
+$Shipment::Purolator::WSDLV2::Types::ImportExportType::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -24,7 +24,7 @@ Shipment::Purolator::WSDLV2::Types::ImportExportType
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 

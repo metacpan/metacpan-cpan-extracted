@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::AssetAutoName;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -95,7 +95,8 @@ package RT::Extension::AssetAutoName;
 use strict;
 
 {
-    package RT::Asset;
+    package # hide from PAUSE
+        RT::Asset;
     no warnings 'redefine';
 
     *Name = sub {

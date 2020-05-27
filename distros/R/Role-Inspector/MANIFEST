@@ -1,4 +1,3 @@
-CONTRIBUTING
 COPYRIGHT
 CREDITS
 Changes
@@ -33,11 +32,14 @@ t/lib/Local/MooseClass2.pm
 t/lib/Local/MooseRole.pm
 t/lib/Local/MooseRole2.pm
 t/lib/Local/MooseRole3.pm
+t/lib/Local/MooseRole4.pm
 t/lib/Local/MopRole.pm
 t/lib/Local/MouseClass.pm
 t/lib/Local/MouseRole.pm
 t/lib/Local/MouseRole2.pm
+t/lib/Local/MouseRole3.pm
 t/lib/Local/RoleBasic.pm
 t/lib/Local/RoleBasic2.pm
 t/lib/Local/RoleTiny.pm
 t/lib/Local/RoleTiny2.pm
+t/lib/Local/RoleTiny3.pm

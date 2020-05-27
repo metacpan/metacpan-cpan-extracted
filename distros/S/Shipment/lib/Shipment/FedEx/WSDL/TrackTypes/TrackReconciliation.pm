@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackReconciliation;
-$Shipment::FedEx::WSDL::TrackTypes::TrackReconciliation::VERSION = '3.04';
+$Shipment::FedEx::WSDL::TrackTypes::TrackReconciliation::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -61,7 +61,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackReconciliation
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 

@@ -1,10 +1,8 @@
-# $Id: password_get_info.t,v 1.2 2017/06/24 13:25:32 cmanley Exp $
 # This file must be saved in UTF-8 encoding!
 use strict;
 use warnings;
 use Test::More;
 use lib qw(../lib);
-use PHP::Functions::Password;
 
 my %tests_info = (
 	'$2a$10$O0fG6ExZRx4mEZxsRHqPKuDy9U2HW9M4UONC1hnsx84tW/bb5URFO' => {
@@ -42,6 +40,19 @@ my %tests_info = (
 		'algoName'	=> 'unknown',
 		'options'	=> {},
 	},
+	'$argon2id$v=19$m=65536,t=4,p=1$cUxuUXdZZWprZmVWT004eUNRejRVdQ$jBK/oG9+9hUdM55ImaE1WR/DsxSMfU4XJKU' => {
+		'algo'		=> 3, #$class::PASSWORD_ARGON2ID,
+		'algoName' => 'argon2id',
+		'options'	=> {
+			'memory_cost'	=> 65536,
+			'time_cost'		=> 4,
+			'threads'		=> 1,
+		},
+		'algoSig'	=> 'argon2id',
+		'salt'		=> 'cUxuUXdZZWprZmVWT004eUNRejRVdQ',
+		'hash'		=> 'jBK/oG9+9hUdM55ImaE1WR/DsxSMfU4XJKU',
+		'version'	=> 19,
+	},
 );
 
 my @methods = map { $_, "password_$_"; } qw(
@@ -56,11 +67,12 @@ if (!($ENV{'HARNESS_ACTIVE'} || ($^O eq 'MSWin32'))) {	# experimental: that's wh
 		my $phpversion = `php -v`;
 		$phpversion =~ s/^PHP (\S+)\s.*/$1/s;
 		if ($phpversion =~ /^(\d{1,3}\.\d{1,6})\b/) {
-			if ($1 < 5.5) {
+			#if ($1 < 5.5) {
+			if ($1 < 7.3) {
 				undef($php);
 			}
 		}
-		print "Found PHP executable $php with version $phpversion: " . ($php ? 'OK' : 'TOO OLD') . "\n";
+		diag("Found PHP executable $php with version $phpversion: " . ($php ? 'OK' : 'TOO OLD') . "\n");
 	}
 	else {
 		undef($php);
@@ -69,13 +81,16 @@ if (!($ENV{'HARNESS_ACTIVE'} || ($^O eq 'MSWin32'))) {	# experimental: that's wh
 		require	JSON::PP;
 	};
 	if ($@) {
-		warn("JSON::PP not avaible. Won't use PHP\n");
+		diag("JSON::PP not avaible. Won't use PHP\n");
 		undef($php);
 	}
 }
 
-plan tests => scalar(@methods) + ($php ? 3 : 2) * scalar(keys(%tests_info));
+plan tests => 1 + scalar(@methods) + ($php ? 3 : 2) * scalar(keys(%tests_info));
+
 my $class = 'PHP::Functions::Password';
+use_ok($class) || BAIL_OUT("Failed to use $class");
+
 foreach my $method (@methods) {
 	can_ok($class, $method);
 	if ($method =~ /^password/) {
@@ -87,9 +102,11 @@ foreach my $crypted (sort keys %tests_info) {
 	my $expect = $tests_info{$crypted};
 
 	my $info = $class->get_info($crypted);
+	#diag(JSON::PP::encode_json($info));
 	is_deeply($info, $expect, "$class->get_info(\"$crypted\")");
 
 	$info = password_get_info($crypted);
+	#diag(JSON::PP::encode_json($info));
 	is_deeply($info, $expect, "password_get_info(\"$crypted\")");
 
 	if ($php) {
@@ -103,7 +120,8 @@ foreach my $crypted (sort keys %tests_info) {
 		delete($expect->{'algoSig'});
 		delete($expect->{'salt'});
 		delete($expect->{'hash'});
-		#print "$json\n";
+		delete($expect->{'version'});
+		#diag("$json\n");
 		is_deeply($info, $expect, "PHP's password_get_info(\"$crypted\")");
 	}
 }

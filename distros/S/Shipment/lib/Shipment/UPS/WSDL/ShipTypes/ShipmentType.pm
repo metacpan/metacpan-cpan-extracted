@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::ShipmentType;
-$Shipment::UPS::WSDL::ShipTypes::ShipmentType::VERSION = '3.04';
+$Shipment::UPS::WSDL::ShipTypes::ShipmentType::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -133,7 +133,7 @@ Class::Std::initialize();
 
 package Shipment::UPS::WSDL::ShipTypes::ShipmentType::_ShipmentServiceOptions;
 $Shipment::UPS::WSDL::ShipTypes::ShipmentType::_ShipmentServiceOptions::VERSION
-  = '3.04';
+  = '3.05';
 use strict;
 use warnings;
 {
@@ -263,7 +263,7 @@ Shipment::UPS::WSDL::ShipTypes::ShipmentType
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 

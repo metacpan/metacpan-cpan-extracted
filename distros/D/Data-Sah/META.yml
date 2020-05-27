@@ -31,10 +31,10 @@ recommends:
   Time::Moment: '0'
   Time::Piece: '0'
 requires:
-  Data::Dmp: '0.21'
+  Data::Dmp: '0.240'
   Data::Dump: '0'
-  Data::Sah::Coerce: '0.038'
-  Data::Sah::CoerceCommon: '0'
+  Data::Sah::Coerce: '0.048'
+  Data::Sah::CoerceCommon: '0.048'
   Data::Sah::Filter: '0.003'
   Data::Sah::FilterCommon: '0.003'
   Data::Sah::Normalize: '0.03'
@@ -48,7 +48,7 @@ requires:
   Language::Expr: '0.29'
   Language::Expr::Interpreter::var_enumer: '0'
   Lingua::EN::Numbers::Ordinate: '1.02'
-  Log::ger: '0.027'
+  Log::ger: '0.037'
   Mo: '0'
   Module::Installed::Tiny: '0.004'
   POSIX: '0'
@@ -70,7 +70,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah
   homepage: https://metacpan.org/release/Data-Sah
   repository: git://github.com/perlancar/perl-Data-Sah.git
-version: '0.907'
+version: '0.908'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -144,17 +144,13 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/@Filter/ConfirmRelease'
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::FileFinder::ByName
-      name: '@Author::PERLANCAR/FileFinder::ByName PERLANCAR'
-      version: '6.012'
-    -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/ExecDir script'
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.599'
+      version: '0.600'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -197,7 +193,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
@@ -333,7 +329,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.07'
+              version: '0.082'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -383,9 +379,11 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::Test::Perl::Critic::Subset:
           finder:
-            - '@Author::PERLANCAR/FileFinder::ByName PERLANCAR'
+            - ':ExecFiles'
+            - ':InstallModules'
+            - ':TestFiles'
       name: '@Author::PERLANCAR/Test::Perl::Critic::Subset'
-      version: 3.001.003
+      version: 3.001.005
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'

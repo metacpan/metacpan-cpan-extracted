@@ -1,9 +1,9 @@
 package Data::Sah;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-12'; # DATE
+our $DATE = '2020-05-21'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.907'; # VERSION
+our $VERSION = '0.908'; # VERSION
 
 use 5.010001;
 use strict;
@@ -126,7 +126,7 @@ Data::Sah - Fast and featureful data structure validation
 
 =head1 VERSION
 
-This document describes version 0.907 of Data::Sah (from Perl distribution Data-Sah), released on 2020-02-12.
+This document describes version 0.908 of Data::Sah (from Perl distribution Data-Sah), released on 2020-05-21.
 
 =head1 SYNOPSIS
 
@@ -296,11 +296,13 @@ translations. They are further organized according to the organization of other
 Data::Sah modules, e.g. L<Data::Sah::Lang::en_US::Type::int> or
 C<Data::Sah::Lang::en_US::TypeX::str::is_palindrome>.
 
-B<Sah::Schema::> namespace is reserved for modules that contain bundles of
-schemas. For example, C<Sah::Schema::CPANMeta> contains the schema to validate
-CPAN META.yml. L<Sah::Schema::Int> contains various schemas for integers such as
-C<pos_int>, C<int8>, C<uint32>. L<Sah::Schema::Sah> contains the schema for Sah
-schema itself.
+B<Sah::Schema::> namespace is reserved for modules that contain schemas in their
+C<$schema> package variables. For example, L<Sah::Schema::posint>.
+
+B<Sah::Schemas::*> are module names for distributions that bundle several
+C<Sah::Schema::*> modules. For example L<Sah::Schemas::Int> contains various
+schemas for integers such as L<Sah::Schema::uint>, L<Sah::Schema::int8>, and so
+on.
 
 B<Sah::SchemaR::> namespace is reserved to store resolved version of schema. For
 example, L<Sah::Schema::unix::local_username> contains the definition for the
@@ -662,6 +664,8 @@ patch to an existing test-file that illustrates the bug or desired
 feature.
 
 =head1 SEE ALSO
+
+L<Data::Sah::Tiny>, L<Params::Sah>
 
 =head3 Other interpreted validators
 

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::CreatePendingShipmentRequest;
-$Shipment::FedEx::WSDL::ShipTypes::CreatePendingShipmentRequest::VERSION = '3.04';
+$Shipment::FedEx::WSDL::ShipTypes::CreatePendingShipmentRequest::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -79,7 +79,7 @@ Shipment::FedEx::WSDL::ShipTypes::CreatePendingShipmentRequest
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 

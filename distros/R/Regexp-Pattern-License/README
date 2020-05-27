@@ -2,7 +2,7 @@ NAME
     Regexp::Pattern::License - Regular expressions for legal licenses
 
 VERSION
-    Version v3.3.1
+    Version v3.4.0
 
 DESCRIPTION
     Regexp::Pattern::License provides a hash of regular expression patterns
@@ -11,6 +11,151 @@ DESCRIPTION
     Regexp::Pattern is a convention for organizing reusable regex patterns.
 
 PATTERNS
+  Licensing traits
+    Patterns each covering a single trait occuring in licenses.
+
+    Each of these patterns has the tag type:trait .
+
+    *   addr_fsf
+
+    *   addr_fsf_franklin
+
+    *   addr_fsf_franklin_steet
+
+    *   addr_fsf_mass
+
+    *   addr_fsf_temple
+
+    *   any_of
+
+    *   by
+
+    *   by_apache
+
+    *   by_fsf
+
+    *   by_james_clark
+
+    *   by_psf
+
+    *   by_sam_hocevar
+
+    *   clause_retention
+
+    *   clause_reproduction
+
+    *   clause_advertising
+
+    *   clause_advertising_always
+
+    *   clause_non_endorsement
+
+    *   except_389
+
+    *   except_autoconf_data
+
+    *   except_autoconf_2
+
+    *   except_autoconf_2_archive
+
+    *   except_autoconf_2_autotroll
+
+    *   except_autoconf_2_g10
+
+    *   except_autoconf_3
+
+    *   except_bison_1_24
+
+    *   except_bison_2_2
+
+    *   except_classpath_2
+
+    *   except_epl
+
+    *   except_epl_mpl
+
+    *   except_faust
+
+    *   except_gstreamer
+
+    *   except_libtool
+
+    *   except_mif
+
+    *   except_openssl
+
+    *   except_ocaml-lgpl
+
+    *   except_openssl-lgpl
+
+    *   except_openssl_s3
+
+    *   except_prefix_agpl
+
+    *   except_prefix_generic
+
+    *   except_prefix_gpl
+
+    *   except_prefix_gpl_clisp
+
+    *   except_prefix_lgpl
+
+    *   except_proguard
+
+    *   except_qt_gpl_1
+
+    *   except_qt_gpl_eclipse
+
+    *   except_qt_gpl_openssl
+
+    *   except_qt_kernel
+
+    *   except_qt_lgpl_1_1
+
+    *   except_qt_nosource
+
+    *   except_sdc
+
+    *   except_sollya_4_1
+
+    *   except_warzone
+
+    *   except_xerces
+
+    *   fsf_unlimited
+
+    *   fsf_unlimited_retention
+
+    *   generated
+
+    *   license_label
+
+    *   license_label_trove
+
+    *   licensed_under
+
+    *   or_at_option
+
+    *   usage_rfn
+
+    *   version
+
+    *   version_later
+
+    *   version_later_paragraph
+
+    *   version_later_postfix
+
+    *   version_number
+
+    *   version_number_suffix
+
+    *   version_only
+
+    *   version_prefix
+
+    *   version_numberstring
+
   Single licenses
     Patterns each covering a single license.
 
@@ -576,67 +721,6 @@ PATTERNS
     *   zpl_2
 
     *   zpl_2_1
-
-  Licensing traits
-    Patterns each covering a single trait occuring in licenses.
-
-    Each of these patterns has the tag type:trait .
-
-    *   any_of
-
-    *   by
-
-    *   by_apache
-
-    *   by_fsf
-
-    *   by_james_clark
-
-    *   by_psf
-
-    *   by_sam_hocevar
-
-    *   clause_retention
-
-    *   clause_reproduction
-
-    *   clause_advertising
-
-    *   clause_advertising_always
-
-    *   clause_non_endorsement
-
-    *   fsf_unlimited
-
-    *   fsf_unlimited_retention
-
-    *   license_label
-
-    *   license_label_trove
-
-    *   licensed_under
-
-    *   or_at_option
-
-    *   usage_rfn
-
-    *   version
-
-    *   version_later
-
-    *   version_later_paragraph
-
-    *   version_later_postfix
-
-    *   version_number
-
-    *   version_numberstring
-
-    *   version_number_suffix
-
-    *   version_only
-
-    *   version_prefix
 
   License combinations
     Patterns each covering a combination of multiple licenses.

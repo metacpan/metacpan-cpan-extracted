@@ -2,8 +2,8 @@ NAME
     App::DateUtils - An assortment of date-/time-related CLI utilities
 
 VERSION
-    This document describes version 0.125 of App::DateUtils (from Perl
-    distribution App-DateUtils), released on 2020-01-31.
+    This document describes version 0.126 of App::DateUtils (from Perl
+    distribution App-DateUtils), released on 2020-03-30.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related
@@ -45,13 +45,13 @@ FUNCTIONS
 
      dateconv(%args) -> any
 
-    Convert date to another format.
+    Convert date from one format to another.
 
     Examples:
 
     *   Convert "today" to epoch:
 
-         dateconv(date => "today"); # -> [200, "OK", 1580428800]
+         dateconv(date => "today"); # -> [200, "OK", 1585526400]
 
     *   Convert epoch to ymd:
 
@@ -75,9 +75,9 @@ FUNCTIONS
            200,
            "OK",
            {
-             epoch => 1580450649,
-             iso8601 => "2020-01-31T06:04:09Z",
-             ymd => "2020-01-31",
+             epoch => 1585530643,
+             iso8601 => "2020-03-30T01:10:43Z",
+             ymd => "2020-03-30",
            },
          ]
 
@@ -157,7 +157,7 @@ FUNCTIONS
 
      durconv(%args) -> any
 
-    Convert duration to another format.
+    Convert duration from one format to another.
 
     Examples:
 
@@ -222,8 +222,8 @@ FUNCTIONS
              module          => "DateTime::Format::Flexible",
              original        => "tomorrow",
              is_parseable    => 1,
-             as_epoch        => 1580515200,
-             as_datetime_obj => "2020-02-01T00:00:00",
+             as_epoch        => 1585612800,
+             as_datetime_obj => "2020-03-31T00:00:00",
            },
            {
              module       => "DateTime::Format::Flexible",
@@ -676,8 +676,8 @@ FUNCTIONS
              is_parseable => 1,
              as_secs => 1209600,
              as_dtdur_obj => "P14D",
-             date1 => "2020-01-31T06:04:09",
-             date2 => "2020-02-14T06:04:09",
+             date2 => "2020-04-13T01:10:43",
+             date1 => "2020-03-30T01:10:43",
            },
          ]
 
@@ -692,9 +692,9 @@ FUNCTIONS
              module => "DateTime::Format::Natural",
              original => "from 23 Jun to 29 Jun",
              is_parseable => 1,
-             as_secs => 13002951,
-             as_dtdur_obj => "P4M28DT17H55M51S",
-             date1 => "2020-01-31T06:04:09",
+             as_secs => 7847357,
+             as_dtdur_obj => "P2M29DT22H49M17S",
+             date1 => "2020-03-30T01:10:43",
              date2 => "2020-06-29T00:00:00",
            },
          ]
@@ -798,11 +798,11 @@ FUNCTIONS
 
     *   Format current time as yyyy-mm-dd:
 
-         strftime(format => "%Y-%m-%d"); # -> [200, "OK", "2020-01-31"]
+         strftime(format => "%Y-%m-%d"); # -> [200, "OK", "2020-03-30"]
 
     *   Format a specific time as yyyy-mm-dd:
 
-         strftime(format => "%Y-%m-%d", date => "tomorrow"); # -> [200, "OK", "2020-02-01"]
+         strftime(format => "%Y-%m-%d", date => "tomorrow"); # -> [200, "OK", "2020-03-31"]
 
     This function is not exported.
 
@@ -830,7 +830,7 @@ FUNCTIONS
 
         Result:
 
-         [200, "OK", "2020-01-31"]
+         [200, "OK", "2020-03-30"]
 
     strftimeq() is like POSIX's strftime(), but allows an extra conversion
     "%(...)q" to insert Perl code, for flexibility in customizing format.
@@ -862,7 +862,7 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    dateparse. Perinci::To::POD=HASH(0x564a231e0ff8).
+    dateparse. Perinci::To::POD=HASH(0x56293caf21a8).
 
     App::datecalc
 

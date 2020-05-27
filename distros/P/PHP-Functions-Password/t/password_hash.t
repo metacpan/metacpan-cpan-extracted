@@ -1,10 +1,8 @@
-# $Id: password_hash.t,v 1.2 2017/06/24 13:25:32 cmanley Exp $
 # This file must be saved in UTF-8 encoding!
 use strict;
 use warnings;
 use Test::More;
 use lib qw(../lib);
-use PHP::Functions::Password;
 
 my @test_passwords = (
 	'hello',
@@ -25,19 +23,26 @@ if (!($ENV{'HARNESS_ACTIVE'} || ($^O eq 'MSWin32'))) {	# experimental: that's wh
 		my $phpversion = `php -v`;
 		$phpversion =~ s/^PHP (\S+)\s.*/$1/s;
 		if ($phpversion =~ /^(\d{1,3}\.\d{1,6})\b/) {
-			if ($1 < 5.5) {
+			#if ($1 < 5.5) {
+			if ($1 < 7.3) {
 				undef($php);
 			}
 		}
-		print "Found PHP executable $php with version $phpversion: " . ($php ? 'OK' : 'TOO OLD') . "\n";
+		diag("Found PHP executable $php with version $phpversion: " . ($php ? 'OK' : 'TOO OLD') . "\n");
 	}
 	else {
 		undef($php);
 	}
 }
 
-plan tests => scalar(@methods) + ($php ? 4 : 3) * scalar(@test_passwords);
 my $class = 'PHP::Functions::Password';
+my $require_ok = eval "require $class";
+$require_ok || BAIL_OUT("Failed to require $class");
+
+plan tests => 1 + scalar(@methods) + ($php ? 4 : 3) * scalar(@test_passwords) * scalar($class->algos());
+
+require_ok($class) || BAIL_OUT("Failed to require $class");
+
 foreach my $method (@methods) {
 	can_ok($class, $method);
 	if ($method =~ /^password/) {
@@ -45,22 +50,46 @@ foreach my $method (@methods) {
 	}
 }
 
-foreach my $password (@test_passwords) {
-	my $crypted = $class->hash($password);
-	ok(length($crypted) eq 60, "$class->hash(\"$password\") returns a crypted string");
+my %sig_to_algo = (
+	'2y'       => $class->PASSWORD_BCRYPT,
+);
 
-	my $result = $class->verify($password, $crypted);
-	ok($result, "Expect success from verify method using password \"$password\" and new crypted string \"$crypted\"");
+if ($INC{'Crypt/Argon2.pm'} || eval { require Crypt::Argon2; }) {
+	$sig_to_algo{'argon2i'}  = $class->PASSWORD_ARGON2I;
+	$sig_to_algo{'argon2id'} = $class->PASSWORD_ARGON2ID;
+}
+else {
+	diag('Skipping some tests because the Crypt::Argon2 module is not installed');
+}
+foreach my $sig (sort keys %sig_to_algo) {
+	my $algo = $sig_to_algo{$sig};
+	foreach my $password (@test_passwords) {
+		my $crypted = $class->hash($password, 'algo' => $algo);
+		ok(length($crypted) >= 60, "$class->hash(\"$password\", 'algo' => $algo) returns a crypted string");
+		#diag("length $sig: " . length($crypted));
+		if (1) {
+			my $result = $class->verify($password, $crypted);
+			ok($result, "Expect success from verify method using password \"$password\" and new crypted string \"$crypted\"");
+			$result = password_verify($password, $crypted);
+			ok($result, "Expect success from password_verify function using password \"$password\" and new crypted string \"$crypted\"");
+		}
+		if ($php) {
+			my $phpcode = "var_export(password_verify('" . $password . "', '" . $crypted . "'));";
+			my $h;
+			open($h, '-|', $php, '-r', $phpcode) || die("Failed to execute $php: $!");
+			my $line = <$h>;
+			close($h);
+			ok($line eq 'true', "Expect true from PHP's password_verify(\"$password\", \"$crypted\")");
+		}
+	}
+}
 
-	$result = password_verify($password, $crypted);
-	ok($result, "Expect success from password_verify function using password \"$password\" and new crypted string \"$crypted\"");
 
-	if ($php) {
-		my $phpcode = "var_export(password_verify('" . $password . "', '" . $crypted . "'));";
-		my $h;
-		open($h, '-|', $php, '-r', $phpcode) || die("Failed to execute $php: $!");
-		my $line = <$h>;
-		close($h);
-		ok($line eq 'true', "Expect true from PHP's password_verify(\"$password\", \"$crypted\")");
+unless ($ENV{'HARNESS_ACTIVE'}) {
+	foreach my $password (@test_passwords) {
+		#print password_hash($password, $class->PASSWORD_ARGON2ID, 'tag_length' => 16) . "\n";
+		#print password_hash($password, $class->PASSWORD_ARGON2ID) . "\n";
+		#print password_hash($password, $class->PASSWORD_BCRYPT) . "\n";
+		last;
 	}
 }

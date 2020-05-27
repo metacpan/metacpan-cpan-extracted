@@ -9,7 +9,7 @@ use List::Util qw(uniq any first);
 use Moose::Util::TypeConstraints qw(enum subtype where);
 use namespace::autoclean;
 
-our $VERSION = '2.4';
+our $VERSION = '2.5';
 
 with
     'Dist::Zilla::Role::PluginBundle::Easy',
@@ -251,6 +251,16 @@ sub configure {
         ],
         ['MetaProvides::Package'],
 
+        [
+            'Encoding' => [
+                encoding => 'bytes',
+                match    => 'ico',
+                match    => 'docx',
+                match    => 'zip',
+                match    => 'ztb', # Mintlab specific, just a zip file
+            ]
+        ],
+
         ['CPANFile'],
 
         [
@@ -346,7 +356,7 @@ Dist::Zilla::PluginBundle::Author::WATERKIP - An plugin bundle for all distribut
 
 =head1 VERSION
 
-version 2.4
+version 2.5
 
 =head1 SYNOPSIS
 
@@ -359,7 +369,103 @@ In your F<dist.ini>:
 This is a L<Dist::Zilla> plugin bundle. It is somewhat equal to the
 following F<dist.ini>:
 
-    TODO: Show what is done
+    [Git::GatherDir]
+    exclude_filename = .dockerignore
+    exclude_filename = .gitlab-ci.yml
+    exclude_filename = Dockerfile
+    exclude_filename = docker-compose.override.yml
+    exclude_filename = docker-compose.yml
+
+    [PromptIfStale 'stale modules, build']
+    phase = build
+    module = ... ; lookup syntax
+
+    [PruneCruft]
+    [ManifestSkip]
+    [MetaYAML]
+    [MetaJSON]
+
+    [License]
+    filename = LICENSE
+
+    [ReadmeFromPod]
+    type = markdown
+    readme = README.md
+
+    [ExecDir]
+    [ShareDir]
+    [MakeMaker]
+    [Manifest]
+    [TestRelease]
+    [PodWeaver]
+
+    [Git::Contributors]
+    order_by = commits
+
+    [ContributesFile]
+    filename = CONTRIBUTORS
+
+    [AutoPrereqs]
+    skip = ^perl$, utf8, warnings, strict, overload
+
+    [Prereqs::AuthorDeps]
+    [MinimumPerl]
+    configure_finder = :NoFiles
+
+    [MetaProvides::Package]
+
+    [Encoding]
+    encoding = bytes
+    match = ico
+    match = docx
+    match = zip
+    match = ztb ; Mintlab specific
+
+    [CPANFile]
+
+    [CopyFilesFromBuild::Filtered]
+    copy = cpanfile, Makefile.pl, CONTRIBUTORS, LICENSE, README.md
+
+    [Git::Check 'initial check']
+    allow_dirty = dist.ini; only if airplane mode is set
+
+    [Git::CheckFor::MergeConflicts]
+    [Git::Remote::Check]
+    branch = master
+    remote_branch = master
+
+    [Git::CheckFor::CorrectBranch]
+    release_branch = master
+
+    [CheckPrereqsIndexed]
+
+    [Repository]
+    [ConfirmRelease]
+
+    [CopyFilesFromRelease]
+    filename = cpanfile, Makefile.pl, CONTRIBUTORS, LICENSE, README.md
+
+    [@TestingMania]
+    disable = Test::Perl::Critic
+    disable = Test::Portability::Files
+    disable = Test::Portability
+
+    [@Git::VersionManager]
+    RewriteVersion::Transitional.global = 1
+    RewriteVersion::Transitional.fallback_version_provider = Git::NextVersion
+    RewriteVersion::Transitional.version_regexp = ^v([\d._]+)(-TRIAL)?$
+
+    commit_files_after_release = Changes LICENSE README.md
+
+    release snapshot.add_files_in = .
+    release snapshot.commit_msg = %N-%v%t%n%n%c
+
+    Git::Tag.tag_message = v%v%t
+
+    BumpVersionAfterRelease::Transitional.global = 1
+
+    NextRelease.time_zone = UTC
+    NextRelease.format = %-8v  %{yyyy-MM-dd HH:mm:ss\'Z\'}d%{ (TRIAL RELEASE)}T'
 
 =head1 METHODS
 

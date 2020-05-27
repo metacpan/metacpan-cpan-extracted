@@ -183,11 +183,14 @@ for my $level (qw( core debug info warning error )) {
 }
 
 {
+    # we don't want a wide character warning going into our STDERR capture
+    use open qw/:std :encoding(UTF-8)/;
+
     $l->log_format('%t');
     my $stderr = capture_stderr { $l->info('foo') };
     like $stderr, qr{
         ^                       # there is no color for the date by default
-        \d+/[a-zA-Z]+/\d{4}     # date
+        \d+/.*?/\d{4}           # date (containing a named month)
         \s                      # whitespace
         \d\d:\d\d:\d\d          # time
         $

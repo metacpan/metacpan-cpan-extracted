@@ -1,59 +1,106 @@
 package App::BloomUtils;
 
-our $DATE = '2018-03-23'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-24'; # DATE
+our $DIST = 'App-BloomUtils'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
+
+use POSIX qw(ceil);
 
 our %SPEC;
 
-$SPEC{gen_bloom_filter} = {
-    v => 1.1,
-    summary => 'Generate bloom filter',
-    description => <<'_',
+my $desc1 = <<'_';
 
 You supply lines of text from STDIN and it will output the bloom filter bits on
-STDOUT. You can also customize `num_bits` (`m`) and `num_hashes` (`k`). Some
-rules of thumb to remember:
+STDOUT. You can also customize `num_bits` (`m`) and `num_hashes` (`k`), or, more
+easily, `num_items` and `fp_rate`. Some rules of thumb to remember:
 
 * One byte per item in the input set gives about a 2% false positive rate. So if
   you expect two have 1024 elements, create a 1KB bloom filter with about 2%
   false positive rate. For other false positive rates:
 
-    1%    -  9.6 bits per item
-    0.1%  - 14.4 bits per item
-    0.01% - 19.2 bits per item
+    10%    -  4.8 bits per item
+     1%    -  9.6 bits per item
+     0.1%  - 14.4 bits per item
+     0.01% - 19.2 bits per item
 
-* Optimal number of hash functions is 0.7 times number of bits per item.
+* Optimal number of hash functions is 0.7 times number of bits per item. Note
+  that the number of hashes dominate performance. If you want higher
+  performance, pick a smaller number of hashes. But for most cases, use the the
+  optimal number of hash functions.
 
-* What is an acceptable false positive rate? This depends on your needs.
+* What is an acceptable false positive rate? This depends on your needs. 1% (1
+  in 100) or 0.1% (1 in 1,000) is a good start. If you want to make sure that
+  user's chosen password is not in a known wordlist, a higher false positive
+  rates will annoy your user more by rejecting her password more often, while
+  lower false positive rates will require a higher memory usage.
 
 Ref: https://corte.si/posts/code/bloom-filter-rules-of-thumb/index.html
 
+**FAQ**
+
+* Why does two different false positive rates (e.g. 1% and 0.1%) give the same bloom filter size?
+
+  The parameter `m` is rounded upwards to the nearest power of 2 (e.g. 1024*8
+  bits becomes 1024*8 bits but 1025*8 becomes 2048*8 bits), so sometimes two
+  false positive rates with different `m` get rounded to the same value of `m`.
+  Use the `bloom_filter_calculator` routine to see the `actual_m` and `actual_p`
+  (actual false-positive rate).
+
 _
+
+$SPEC{gen_bloom_filter} = {
+    v => 1.1,
+    summary => 'Generate bloom filter',
+    description => $desc1,
     args => {
         num_bits => {
             description => <<'_',
 
-The default is 80000 (generates a ~10KB bloom filter). If you supply 10,000 items
-(meaning 1 byte per 1 item) then the false positive rate will be ~2%. If you
-supply fewer items the false positive rate is smaller and if you supply more
-than 10,000 items the false positive rate will be higher.
+The default is 16384*8 bits (generates a ~16KB bloom filter). If you supply 16k
+items (meaning 1 byte per 1 item) then the false positive rate will be ~2%. If
+you supply fewer items the false positive rate is smaller and if you supply more
+than 16k items the false positive rate will be higher.
 
 _
-            schema => 'num*',
-            default => 8*10000,
+            schema => 'posint*',
+            #default => 8*16384,
             cmdline_aliases => {m=>{}},
         },
         num_hashes => {
-            schema => 'num*',
+            schema => 'posint*',
             cmdline_aliases => {k=>{}},
-            default => 5.7,
+            #default => 6,
+        },
+        num_items => {
+            schema => 'posint*',
+            cmdline_aliases => {n=>{}},
+        },
+        false_positive_rate => {
+            schema => ['float*', max=>0.5],
+            cmdline_aliases => {
+                fp_rate => {},
+                p => {},
+            },
         },
     },
     'cmdline.skip_format' => 1,
+    args_rels => {
+    },
+    examples => [
+        {
+            summary => 'Create a bloom filter for 100k items and 0.1% maximum false-positive rate '.
+                '(actual bloom size and false-positive rate will be shown on stderr)',
+            argv => [qw/--num-items 100000 --fp-rate 0.1%/],
+            'x.doc.show_result' => 0,
+            test => 0,
+        },
+    ],
     links => [
         {url=>'prog:bloom-filter-calculator'},
     ],
@@ -63,13 +110,38 @@ sub gen_bloom_filter {
 
     my %args = @_;
 
-    my $m = $args{num_bits};
-    my $k = $args{num_hashes};
+    my $res;
+    if (defined $args{num_items}) {
+        $res = bloom_filter_calculator(
+            num_items => $args{num_items},
+            num_bits => $args{num_bits},
+            num_hashes => $args{num_hashes},
+            false_positive_rate => $args{false_positive_rate},
+            num_hashes_to_bits_per_item_ratio => 0.7,
+        );
+    } else {
+        $res = bloom_filter_calculator(
+            num_bits => $args{num_bits} // 16384*8,
+            num_hashes => $args{num_hashes} // 6,
+
+            num_items => int($args{num_bits} / 8),
+        );
+    }
+    return $res unless $res->[0] == 200;
+    my $m = $res->[2]{actual_m};
+    my $k = $res->[2]{actual_k};
+    log_info "Will be creating bloom filter with num_bits (m)=%d, num_hashes (k)=%d, actual false-positive rate=%.5f%% (when num_items=%d), bloom filter size=%d bytes",
+        $m, $k, $res->[2]{actual_p}*100, $res->[2]{n}, $res->[2]{actual_bloom_size};
 
     my $bf = Algorithm::BloomFilter->new($m, $k);
+    my $i = 0;
     while (defined(my $line = <STDIN>)) {
         chomp $line;
         $bf->add($line);
+        $i++;
+        if (defined $args{num_items} && $i == $args{num_items}+1) {
+            log_warn "You created bloom filter for num_items=%d, but now have added more than that", $args{num_items};
+        }
     }
 
     print $bf->serialize;
@@ -123,29 +195,7 @@ sub check_with_bloom_filter {
 $SPEC{bloom_filter_calculator} = {
     v => 1.1,
     summary => 'Help calculate num_bits (m) and num_hashes (k)',
-    description => <<'_',
-
-Bloom filter is setup using two parameters: `num_bits` (`m`) which is the size
-of the bloom filter (in bits) and `num_hashes` (`k`) which is the number of hash
-functions to use which will determine the write and lookup speed.
-
-Some rules of thumb:
-
-* One byte per item in the input set gives about a 2% false positive rate. So if
-  you expect two have 1024 elements, create a 1KB bloom filter with about 2%
-  false positive rate. For other false positive rates:
-
-    1%    -  9.6 bits per item
-    0.1%  - 14.4 bits per item
-    0.01% - 19.2 bits per item
-
-* Optimal number of hash functions is 0.7 times number of bits per item.
-
-* What is an acceptable false positive rate? This depends on your needs.
-
-Ref: https://corte.si/posts/code/bloom-filter-rules-of-thumb/index.html
-
-_
+    description => $desc1,
     args => {
         num_items => {
             summary => 'Expected number of items to add to bloom filter',
@@ -154,8 +204,13 @@ _
             req => 1,
             cmdline_aliases => {n=>{}},
         },
+        num_bits => {
+            summary => 'Number of bits to set for the bloom filter',
+            schema => 'posint*',
+            cmdline_aliases => {m=>{}},
+        },
         false_positive_rate => {
-            schema => 'num*',
+            schema => ['float*', max=>0.5],
             default => 0.02,
             cmdline_aliases => {
                 fp_rate => {},
@@ -163,42 +218,69 @@ _
             },
         },
         num_hashes => {
-            schema => 'num*',
+            schema => 'posint*',
             cmdline_aliases => {k=>{}},
         },
         num_hashes_to_bits_per_item_ratio => {
             summary => '0.7 (the default) is optimal',
             schema => 'num*',
-            default => 0.7,
         },
     },
     args_rels => {
-        choose_one => [qw/num_hashes/],
+        'choose_one&' => [
+            [qw/num_hashes num_hashes_to_bits_per_item_ratio/],
+        ],
     },
 };
 sub bloom_filter_calculator {
     my %args = @_;
 
-    my $num_items = $args{num_items};
-    my $fp_rate   = $args{false_positive_rate};
+    my $num_hashes_to_bits_per_item_ratio = $args{num_hashes_to_bits_per_item_ratio};
+    $num_hashes_to_bits_per_item_ratio //= 0.7 unless defined($args{num_bits}) && defined($args{num_items});
 
-    my $num_bits = $num_items * log(1/$fp_rate)/ log(2)**2;
-    my $num_hashes = $args{num_hashes} // ($num_bits / $num_items * log(2));
+    my $num_items = $args{num_items};
+    my $fp_rate   = $args{false_positive_rate} // 0.02;
+    my $num_bits = $args{num_bits} // ($num_items * log(1/$fp_rate)/ log(2)**2);
+
+    my $num_bits_per_item = $num_bits / $num_items;
+    my $num_hashes = $args{num_hashes} //
+        (defined $num_hashes_to_bits_per_item_ratio ? $num_hashes_to_bits_per_item_ratio*$num_bits_per_item : undef) //
+        ($num_bits / $num_items * log(2));
+    $num_hashes_to_bits_per_item_ratio //= $num_hashes / $num_bits_per_item;
+
+    my $actual_num_hashes = ceil($num_hashes);
+    my $num_bits_2power = sprintf "%.6f", (log($num_bits) / log(2));
+    my $actual_num_bits = 2**ceil($num_bits_2power);
+    my $actual_fp_rate = (1 - exp(-$actual_num_hashes*$num_items/$actual_num_bits))**$actual_num_hashes;
+    my $actual_bloom_size = ($actual_num_bits/8) + 3;
 
     [200, "OK", {
         num_bits   => $num_bits,
         m          => $num_bits,
+
         num_items  => $num_items,
         n          => $num_items,
+
         num_hashes => $num_hashes,
         k          => $num_hashes,
+
+        num_hashes_to_bits_per_item_ratio => $num_hashes_to_bits_per_item_ratio,
+
         fp_rate    => $fp_rate,
         p          => $fp_rate,
+
         num_bits_per_item => $num_bits / $num_items,
         'm/n'             => $num_bits / $num_items,
+
+        actual_num_bits   => $actual_num_bits,
+        actual_m          => $actual_num_bits,
+        actual_num_hashes => ceil($num_hashes),
+        actual_k          => ceil($num_hashes),
+        actual_fp_rate    => $actual_fp_rate,
+        actual_p          => $actual_fp_rate,
+        actual_bloom_size => $actual_bloom_size,
     }];
 }
-
 
 1;
 # ABSTRACT: Utilities related to bloom filters
@@ -215,7 +297,7 @@ App::BloomUtils - Utilities related to bloom filters
 
 =head1 VERSION
 
-This document describes version 0.002 of App::BloomUtils (from Perl distribution App-BloomUtils), released on 2018-03-23.
+This document describes version 0.004 of App::BloomUtils (from Perl distribution App-BloomUtils), released on 2020-05-24.
 
 =head1 DESCRIPTION
 
@@ -224,6 +306,12 @@ This distributions provides the following command-line utilities:
 =over
 
 =item * L<bloom-filter-calculator>
+
+=item * L<bloomcalc>
+
+=item * L<bloomchk>
+
+=item * L<bloomgen>
 
 =item * L<check-with-bloom-filter>
 
@@ -238,15 +326,13 @@ This distributions provides the following command-line utilities:
 
 Usage:
 
- bloom_filter_calculator(%args) -> [status, msg, result, meta]
+ bloom_filter_calculator(%args) -> [status, msg, payload, meta]
 
 Help calculate num_bits (m) and num_hashes (k).
 
-Bloom filter is setup using two parameters: C<num_bits> (C<m>) which is the size
-of the bloom filter (in bits) and C<num_hashes> (C<k>) which is the number of hash
-functions to use which will determine the write and lookup speed.
-
-Some rules of thumb:
+You supply lines of text from STDIN and it will output the bloom filter bits on
+STDOUT. You can also customize C<num_bits> (C<m>) and C<num_hashes> (C<k>), or, more
+easily, C<num_items> and C<fp_rate>. Some rules of thumb to remember:
 
 =over
 
@@ -254,17 +340,39 @@ Some rules of thumb:
 you expect two have 1024 elements, create a 1KB bloom filter with about 2%
 false positive rate. For other false positive rates:
 
-1%    -  9.6 bits per item
-0.1%  - 14.4 bits per item
-0.01% - 19.2 bits per item
+10%    -  4.8 bits per item
+ 1%    -  9.6 bits per item
+ 0.1%  - 14.4 bits per item
+ 0.01% - 19.2 bits per item
 
-=item * Optimal number of hash functions is 0.7 times number of bits per item.
+=item * Optimal number of hash functions is 0.7 times number of bits per item. Note
+that the number of hashes dominate performance. If you want higher
+performance, pick a smaller number of hashes. But for most cases, use the the
+optimal number of hash functions.
 
-=item * What is an acceptable false positive rate? This depends on your needs.
+=item * What is an acceptable false positive rate? This depends on your needs. 1% (1
+in 100) or 0.1% (1 in 1,000) is a good start. If you want to make sure that
+user's chosen password is not in a known wordlist, a higher false positive
+rates will annoy your user more by rejecting her password more often, while
+lower false positive rates will require a higher memory usage.
 
 =back
 
 Ref: https://corte.si/posts/code/bloom-filter-rules-of-thumb/index.html
+
+B<FAQ>
+
+=over
+
+=item * Why does two different false positive rates (e.g. 1% and 0.1%) give the same bloom filter size?
+
+The parameter C<m> is rounded upwards to the nearest power of 2 (e.g. 1024*8
+bits becomes 1024*8 bits but 1025*8 becomes 2048*8 bits), so sometimes two
+false positive rates with different C<m> get rounded to the same value of C<m>.
+Use the C<bloom_filter_calculator> routine to see the C<actual_m> and C<actual_p>
+(actual false-positive rate).
+
+=back
 
 This function is not exported.
 
@@ -272,17 +380,22 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<false_positive_rate> => I<num> (default: 0.02)
+=item * B<false_positive_rate> => I<float> (default: 0.02)
 
-=item * B<num_hashes> => I<num>
+=item * B<num_bits> => I<posint>
 
-=item * B<num_hashes_to_bits_per_item_ratio> => I<num> (default: 0.7)
+Number of bits to set for the bloom filter.
+
+=item * B<num_hashes> => I<posint>
+
+=item * B<num_hashes_to_bits_per_item_ratio> => I<num>
 
 0.7 (the default) is optimal.
 
 =item * B<num_items>* => I<posint>
 
 Expected number of items to add to bloom filter.
+
 
 =back
 
@@ -291,18 +404,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 check_with_bloom_filter
 
 Usage:
 
- check_with_bloom_filter(%args) -> [status, msg, result, meta]
+ check_with_bloom_filter(%args) -> [status, msg, payload, meta]
 
 Check with bloom filter.
 
@@ -321,6 +435,7 @@ Arguments ('*' denotes required arguments):
 
 Items to check.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -328,24 +443,35 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 gen_bloom_filter
 
 Usage:
 
- gen_bloom_filter(%args) -> [status, msg, result, meta]
+ gen_bloom_filter(%args) -> [status, msg, payload, meta]
 
 Generate bloom filter.
 
+Examples:
+
+=over
+
+=item * Create a bloom filter for 100k items and 0.1% maximum false-positive rate (actual bloom size and false-positive rate will be shown on stderr):
+
+ gen_bloom_filter( false_positive_rate => "0.1%", num_items => 100000);
+
+=back
+
 You supply lines of text from STDIN and it will output the bloom filter bits on
-STDOUT. You can also customize C<num_bits> (C<m>) and C<num_hashes> (C<k>). Some
-rules of thumb to remember:
+STDOUT. You can also customize C<num_bits> (C<m>) and C<num_hashes> (C<k>), or, more
+easily, C<num_items> and C<fp_rate>. Some rules of thumb to remember:
 
 =over
 
@@ -353,17 +479,39 @@ rules of thumb to remember:
 you expect two have 1024 elements, create a 1KB bloom filter with about 2%
 false positive rate. For other false positive rates:
 
-1%    -  9.6 bits per item
-0.1%  - 14.4 bits per item
-0.01% - 19.2 bits per item
+10%    -  4.8 bits per item
+ 1%    -  9.6 bits per item
+ 0.1%  - 14.4 bits per item
+ 0.01% - 19.2 bits per item
 
-=item * Optimal number of hash functions is 0.7 times number of bits per item.
+=item * Optimal number of hash functions is 0.7 times number of bits per item. Note
+that the number of hashes dominate performance. If you want higher
+performance, pick a smaller number of hashes. But for most cases, use the the
+optimal number of hash functions.
 
-=item * What is an acceptable false positive rate? This depends on your needs.
+=item * What is an acceptable false positive rate? This depends on your needs. 1% (1
+in 100) or 0.1% (1 in 1,000) is a good start. If you want to make sure that
+user's chosen password is not in a known wordlist, a higher false positive
+rates will annoy your user more by rejecting her password more often, while
+lower false positive rates will require a higher memory usage.
 
 =back
 
 Ref: https://corte.si/posts/code/bloom-filter-rules-of-thumb/index.html
+
+B<FAQ>
+
+=over
+
+=item * Why does two different false positive rates (e.g. 1% and 0.1%) give the same bloom filter size?
+
+The parameter C<m> is rounded upwards to the nearest power of 2 (e.g. 1024*8
+bits becomes 1024*8 bits but 1025*8 becomes 2048*8 bits), so sometimes two
+false positive rates with different C<m> get rounded to the same value of C<m>.
+Use the C<bloom_filter_calculator> routine to see the C<actual_m> and C<actual_p>
+(actual false-positive rate).
+
+=back
 
 This function is not exported.
 
@@ -371,14 +519,19 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<num_bits> => I<num> (default: 80000)
+=item * B<false_positive_rate> => I<float>
 
-The default is 80000 (generates a ~10KB bloom filter). If you supply 10,000 items
-(meaning 1 byte per 1 item) then the false positive rate will be ~2%. If you
-supply fewer items the false positive rate is smaller and if you supply more
-than 10,000 items the false positive rate will be higher.
+=item * B<num_bits> => I<posint>
 
-=item * B<num_hashes> => I<num> (default: 5.7)
+The default is 16384*8 bits (generates a ~16KB bloom filter). If you supply 16k
+items (meaning 1 byte per 1 item) then the false positive rate will be ~2%. If
+you supply fewer items the false positive rate is smaller and if you supply more
+than 16k items the false positive rate will be higher.
+
+=item * B<num_hashes> => I<posint>
+
+=item * B<num_items> => I<posint>
+
 
 =back
 
@@ -387,7 +540,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -409,18 +562,13 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
-=head1 SEE ALSO
-
-
-L<bloom-filter-calculator>.
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

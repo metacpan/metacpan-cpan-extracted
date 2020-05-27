@@ -2,7 +2,7 @@ package Catmandu::Fix::retain;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2011';
+our $VERSION = '1.2012';
 
 use Moo;
 use Catmandu::Util::Path qw(as_path);
@@ -14,7 +14,7 @@ with 'Catmandu::Fix::Builder';
 has paths => (fix_arg => 'collect', default => sub {[]},);
 
 sub _build_fixer {
-    my ($self) = @_;
+    my ($self)   = @_;
     my $paths    = [map {as_path($_)} @{$self->paths}];
     my $getters  = [map {$_->getter} @$paths];
     my $creators = [map {$_->creator} @$paths];

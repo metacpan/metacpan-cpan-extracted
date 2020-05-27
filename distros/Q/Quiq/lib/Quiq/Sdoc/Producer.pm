@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.182';
+our $VERSION = '1.183';
 
 use Quiq::Unindent;
 
@@ -462,7 +462,7 @@ sub eof {
 
 =head1 VERSION
 
-1.182
+1.183
 
 =head1 AUTHOR
 

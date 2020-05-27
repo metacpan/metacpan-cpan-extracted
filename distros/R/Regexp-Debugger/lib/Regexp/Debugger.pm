@@ -4,7 +4,7 @@ use warnings;
 use strict;
 eval "use feature 'evalbytes'";         # Experimental fix for Perl 5.16
 
-our $VERSION = '0.002004';
+our $VERSION = '0.002005';
 
 # Handle Perl 5.18's new-found caution...
 no if $] >= 5.018, warnings => "experimental::smartmatch";
@@ -336,8 +336,25 @@ my $next_regex_ID = 0;
             my ($obj) = @_;
 
             use Scalar::Util qw< refaddr >;
-            return $regex_cache{ refaddr($obj) }
-                //= Regexp::Debugger::_build_debugging_regex( @{$obj}{'cooked', 'lexical_scope'} );
+            my $obj_id = refaddr($obj);
+            return $regex_cache{$obj_id} if $regex_cache{$obj_id};
+
+            my ($cooked, $lexical_scope) = @{$obj}{'cooked', 'lexical_scope'};
+            my $x_flag = 1;
+            use re 'eval';
+            if (!eval { qr/$cooked/x}) {
+                say 'redo';
+                $x_flag = 0;
+            }
+            if (!eval { qr/$cooked/}) {
+                say 're-redo';
+                $x_flag = 1;
+            }
+
+            return $regex_cache{$obj_id}
+                = Regexp::Debugger::_build_debugging_regex( $cooked, $lexical_scope, $x_flag );
+
+
         },
 
         # Everything else, as usual...
@@ -391,8 +408,11 @@ my %LOOKTYPE = (
 );
 
 sub _build_debugging_regex {
-    my ( $raw_regex, $lexical_scope ) = @_;
+    my ( $raw_regex, $lexical_scope, $x_flag ) = @_;
     $lexical_scope //= 0;
+
+    # Track whether the /x flag is active...
+    our $if_x_flag = $x_flag ? q{} : q{(?!)};
 
     # How does this regexp show whitespace???
     our $show_ws = $config[$lexical_scope]{show_ws};
@@ -718,7 +738,9 @@ sub _build_debugging_regex {
 
     (?(DEFINE)
         # Miscellaneous useful pattern fragments...
-        (?<COMMENT>    [(][?][#] (?! \s* BREAK \s* ) .*? [)] | \# [^\n]* (?= \n | \z )  )
+        (?<COMMENT>    [(][?][#] (?! \s* BREAK \s* ) .*? [)]
+                  |    (??{$if_x_flag}) \# [^\n]* (?= \n | \z )
+        )
         (?<CHARSET>    \[ \^?+ \]?+ (?: \[:\w+:\] | \\. | [^]\\] )*+ \] )
         (?<IDENTIFIER> [^\W\d]\w*                                   )
         (?<CODEBLOCK>  \{  (?: (?&CODEBLOCK) | . )*?   \}           )
@@ -741,7 +763,7 @@ sub _build_debugging_regex {
             | {\d+,?\d*}[?]  (?{ $quantifier_desc = 'the specified number of times (as few as possible)'   })
             | {\d+,?\d*}     (?{ $quantifier_desc = 'the specified number of times (as many as possible)'  })
         )
-        (?<NONMETA>  [\w~`!%&=:;"'<>,/-] )
+        (?<NONMETA>  [\w~`!%&=:;"'<>,/-] | (?! (??{$if_x_flag}) ) \# )
     )
     }{
         # Which event is this???
@@ -764,8 +786,8 @@ sub _build_debugging_regex {
             indent         => $indent,
         );
 
-#        use Data::Dumper 'Dumper';
-#        warn Dumper { std_info => \%std_info, '%+' => \%+ };
+        use Data::Dumper 'Dumper';
+        warn Dumper { std_info => \%std_info, '%+' => \%+ };
 
         # Record the construct for display...
         $clean_regex .=
@@ -1218,10 +1240,26 @@ sub _build_debugging_regex {
                 # Do the non-capturing parens have embedded modifiers???
                 my $addendum = length($construct) > 3 ? ', changing modifiers' : q{};
 
+                # Update for (?x: or (?-x:...
+                my $old_if_x_flag = $if_x_flag;
+                my $neg = index($construct, '-');
+                if ($neg >= 0) {
+                    my $x = index($construct, 'x');
+                    if ($x >= 0) {
+                        if ($x < $neg) {
+                            $if_x_flag = '';
+                        }
+                        else {
+                            $if_x_flag = '(?!)';
+                        }
+                    }
+                }
+
                 # It's an unbalanced opening paren, so remember it on the stack...
                 push @paren_stack, {
-                    is_capture     => 0,
-                    construct_type => '_noncapture_group',
+                    is_capture       => 0,
+                    construct_type   => '_noncapture_group',
+                    reinstate_x_flag => $old_if_x_flag,
                 };
 
                 # Insert an event to report the start of a non-capturing group...
@@ -1392,6 +1430,11 @@ sub _build_debugging_regex {
 
                 if (length($std_info{quantifier})) {
                     $msg .= " (matching $quantifier_desc)";
+                }
+
+                # Reinstate previous /x status (if necessary)...
+                if (exists $paren_data->{reinstate_x_flag}) {
+                    $if_x_flag = $paren_data->{reinstate_x_flag};
                 }
 
                 # Two events, so add an extra ID...
@@ -3377,7 +3420,7 @@ Regexp::Debugger - Visually debug regexes in-place
 
 =head1 VERSION
 
-This document describes Regexp::Debugger version 0.002004
+This document describes Regexp::Debugger version 0.002005
 
 
 =head1 SYNOPSIS
@@ -3855,18 +3898,24 @@ Due to limitations in the Perl C<overload::constant()> mechanism, the
 current implementation cannot always distinguish whether a regex has an
 external /x modifier (and hence, what whitespace and comment characters
 mean). Whitespace is handled correctly in almost all cases, but
-comments are not.
+comments are sometimes not.
 
 When processing a C<# comment to end of line> within a regex, the module
-currently assumes a C</x> is in effect at start of the regex. This will cause
-erroneous behaviour if an unescaped C<#> is used in a non-C</x> regex.
-Note that this limitation is likely to be corrected in a future release.
+currently assumes a C</x> is in effect at start of the regex (unless
+that assumption causes the regex to fail to compile). This will sometimes
+cause erroneous behaviour if an unescaped C<#> is used in a non-C</x> regex.
 
-This limitation does not affect the handling of comments in
-C<(?x:...)> and C<(?-x:...)> blocks within the regex. These are
-always correctly handled, so explicitly using one of these blocks
-is a reliable workaround...as is always using the C</x> modifier
-on every debugged regex.
+Unfortunately, this limitation is unlikely to be fully removed in a
+future release, unless an additional flag-detection mechanism is added
+to C<overload::constant()>.
+
+Note, however, that this limitation does not affect the handling of comments in
+C<(?x:...)> blocks or of literal C<#> in C<(?-x:...)> blocks within a regex.
+These are always correctly handled, which means that explicitly using
+either of these blocks is a reliable workaround. Alternatively, there is
+no problem if you always use the C</x> modifier on every debugged regex
+(for example, via C<use re '/x'>). Nor if you explicitly escape every literal
+C<#> (i.e. write it as C<\#>).
 
 As regards whitespace, the one case where the current implementation
 does not always correctly infer behaviour is where whitespace is used to

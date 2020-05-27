@@ -1,5 +1,5 @@
 package Shipment::Address;
-$Shipment::Address::VERSION = '3.04';
+$Shipment::Address::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -196,7 +196,7 @@ Shipment::Address
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 SYNOPSIS
 

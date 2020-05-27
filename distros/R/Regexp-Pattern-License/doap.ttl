@@ -374,7 +374,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/jonass>;
 	doap:name            "Regexp-Pattern-License";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-0-31>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-0>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-100>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-101>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-102>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-90>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-91>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-92>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-93>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-94>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-95>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-96>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-97>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-98>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-99>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-2-0>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-3-0>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-3-1>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-0-31>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-0>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-100>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-101>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-102>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-90>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-91>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-92>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-93>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-94>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-95>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-96>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-97>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-98>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-99>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-2-0>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-3-0>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-3-1>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-4-0>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://salsa.debian.org/build-common-team/regexp-pattern-license.git>;
@@ -1349,6 +1349,53 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/Regexp-Pattern-License-v3.3.1.tar.gz>;
 	doap:revision        "v3.3.1"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-4-0>
+	a                    doap:Version;
+	dc:identifier        "Regexp-Pattern-License-v3.4.0"^^xsd:string;
+	dc:issued            "2020-05-21"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "licensed_under: cover 'subject to'";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "license gpl_2: cover 'is covered by he GNU' (original revision with typo)";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "apache apache_1_1 apache_2: add caption for 'Apache Public License' and 'Apache Software License'";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "synthesized grants: cover 'the $license version 2 (the $shortname License)'";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "bsd_3_clause: add names 'EPL' 'EPL-1.0', and 'captions 'new BSD License' 'Eclipse Distribution License'";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "reorder patterns: traits before licenses";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "relax deep inspection of generated regex";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "bittorrent_1: fix list alternate SPDX caption (not bogusly as iri)";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "add trait object generated";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "add trait objects addr_fsf addr_fsf_franklin addr_fsf_franklin_steet addr_fsf_mass addr_fsf_temple";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "add trait objects except_autoconf_data except_autoconf_2 except_autoconf_2_archive except_autoconf_2_autotroll except_autoconf_2_g10 except_autoconf_3 except_bison_1_24 except_bison_2_2 except_faust except_openssl except_openssl-lgpl except_openssl_s3 except_prefix_agpl except_prefix_generic except_prefix_gpl except_prefix_gpl_clisp except_prefix_lgpl except_proguard except_qt_gpl_1 except_qt_gpl_eclipse except_qt_gpl_openssl except_qt_kernel except_qt_lgpl_1_1 except_qt_nosource except_sdc except_sollya_4_1 except_warzone except_xerces";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "version_later_postfix: cover lack of leading space";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/Regexp-Pattern-License-v3.4.0.tar.gz>;
+	doap:revision        "v3.4.0"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/jonass>
 	a                    foaf:Person;

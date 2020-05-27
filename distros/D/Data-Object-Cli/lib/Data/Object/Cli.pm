@@ -12,13 +12,16 @@ use routines;
 
 use Data::Object::Class;
 use Data::Object::ClassHas;
+use Data::Object::Space;
 
 use Data::Object::Args;
 use Data::Object::Data;
 use Data::Object::Opts;
 use Data::Object::Vars;
 
-our $VERSION = '2.02'; # VERSION
+our $VERSION = '2.03'; # VERSION
+
+our $DEFAULT_SPACE = 15;
 
 # ATTRIBUTES
 
@@ -74,7 +77,7 @@ sub main {
   my $result;
 
   my $auto = $self->handle('auto');
-  my $command = $self->args->command;
+  my $command = $self->args->command || $ARGV[0];
   my $goto = $auto->{$command} if $auto && $command;
 
   if ($goto) {
@@ -87,7 +90,122 @@ sub main {
   return $result;
 }
 
+sub subs {
+  {}
+}
+
+method exit($code, $handler, @args) {
+
+  $self->handle($handler, @args) if $handler;
+
+  $code ||= 0;
+
+  exit $code;
+}
+
+method fail($handler, @args) {
+
+  return $self->exit(1, $handler, @args);
+}
+
+method handle($method, %args) {
+
+  my %meta;
+
+  $meta{args} = $self->args;
+  $meta{data} = $self->data;
+  $meta{opts} = $self->opts;
+  $meta{vars} = $self->vars;
+
+  return $self->$method(%meta, %args);
+}
+
+method help() {
+
+  my $space = Data::Object::Space->new(ref $self);
+
+  my $name = $self->name =~ s/\{(\w+)\}/$1/gr;
+  my $info = $self->info;
+  my $subs = $self->_help_subs;
+  my $opts = $self->_help_opts;
+
+  my $data;
+
+  if ($data =  $space->data) {
+    if ($name && $data =~ /\{name\}/) {
+      $data =~ s/\{name\}/$name/g;
+    }
+
+    if ($info && $data =~ /\{info\}/) {
+      $data =~ s/\{info\}/$info/g;
+    }
+
+    if ($subs && $data =~ /\{subs\}/) {
+      $data =~ s/\{subs\}/$subs/g;
+    }
+
+    if ($opts && $data =~ /\{opts\}/) {
+      $data =~ s/\{opts\}/$opts/g;
+    }
+
+    if ($subs && $data =~ /\{commands\}/) {
+      $data =~ s/\{commands\}/$subs/g;
+    }
+
+    if ($opts && $data =~ /\{options\}/) {
+      $data =~ s/\{options\}/$opts/g;
+    }
+
+    $data =~ s/^\n//;
+  }
+  else {
+    my @help;
+
+    push @help, "usage: $name", "";
+    push @help, $info, "" if $info;
+    push @help, $subs, "" if $subs;
+    push @help, $opts, "" if $opts;
+
+    $data = join "\n", @help;
+  }
+
+  return $data;
+}
+
+method info() {
+
+  my $class = ref $self;
+
+  do { no strict 'refs'; ${"${class}::info"} };
+}
+
+method name() {
+
+  my $class = ref $self;
+
+  do { no strict 'refs'; ${"${class}::name"} } || $0;
+}
+
+method okay($handler, @args) {
+
+  return $self->exit(0, $handler, @args);
+}
+
+method run($class: @args) {
+
+  my $self = $class->new(@args);
+
+  return $self->handle('main') unless caller(1);
+
+  return $self;
+}
+
+method spec() {
+  {}
+}
+
 method _args_spec() {
+
   my $args_spec = {named => {}};
 
   my $name = $self->name;
@@ -107,8 +225,9 @@ method _args_spec() {
 }
 
 method _help_opts() {
+
   my $spec = $self->spec;
-  my $size = 0;
+  my $size = $DEFAULT_SPACE;
 
   my @opts;
 
@@ -137,7 +256,26 @@ method _help_opts() {
   return join "\n", map {sprintf "  %-*s  %s", $size, @$_} @opts;
 }
 
+method _help_subs() {
+
+  my $spec = $self->subs;
+  my $size = $DEFAULT_SPACE;
+
+  my @opts;
+
+  for my $name (sort keys %$spec) {
+    my $text = $spec->{$name};
+
+    $size = length $name if length $name > $size;
+
+    push @opts, [$name, $text];
+  }
+
+  return join "\n", map {sprintf "  %-*s  %s", $size, @$_} @opts;
+}
+
 method _opts_spec() {
+
   my $opts_spec = {spec => []};
 
   my $spec = $self->spec;
@@ -170,75 +308,6 @@ method _opts_spec() {
   }
 
   return $opts_spec;
-}
-
-method exit($code, $handler, @args) {
-
-  $self->handle($handler, @args) if $handler;
-
-  $code ||= 0;
-
-  exit $code;
-}
-
-method fail($handler, @args) {
-
-  return $self->exit(1, $handler, @args);
-}
-
-method handle($method, %args) {
-
-  my %meta;
-
-  $meta{args} = $self->args;
-  $meta{data} = $self->data;
-  $meta{opts} = $self->opts;
-  $meta{vars} = $self->vars;
-
-  return $self->$method(%meta, %args);
-}
-
-method help() {
-
-  my @help;
-
-  my $name = $self->name =~ s/\{(\w+)\}/$1/gr;
-
-  push @help, "usage: $name", "";
-  push @help, $self->info, "" if $self->info;
-  push @help, $self->_help_opts, "" if $self->_help_opts;
-
-  return join "\n", @help;
-}
-
-method info() {
-  my $class = ref $self;
-
-  do { no strict 'refs'; ${"${class}::info"} };
-}
-
-method name() {
-  my $class = ref $self;
-
-  do { no strict 'refs'; ${"${class}::name"} } || $0;
-}
-
-method okay($handler, @args) {
-
-  return $self->exit(0, $handler, @args);
-}
-
-method run($class: @args) {
-
-  my $self = $class->new(@args);
-
-  return $self->handle('main') unless caller(1);
-
-  return $self;
-}
-
-method spec() {
-  {}
 }
 
 1;
@@ -773,6 +842,57 @@ string, e.g. C<userid|id|u>, if multiple aliases are used.
   my $todotask = run Todolist::Task;
 
   # $todotask->spec
+
+=back
+
+=cut
+
+=head2 subs
+
+  subs(Any %args) : HashRef
+
+The subs method works in tandem with the L</auto> method and is expected to be
+overridden by the subclass and should return a hashref where the keys represent
+a subcommand at C<$ARGV[0]> and the value represents the description of the
+corresponding action (i.e. I<command>).
+
+=over 4
+
+=item subs example #1
+
+  package Todo::Admin;
+
+  use parent 'Data::Object::Cli';
+
+  our $name = 'todo <action>';
+
+  sub auto {
+    {
+      add_user => '_handle_add_user',
+      del_user => '_handle_del_user'
+    }
+  }
+
+  sub subs {
+    {
+      add_user => 'Add a new user to the system',
+      del_user => 'Remove a user to the system'
+    }
+  }
+
+  my $admin = run Todo::Admin;
+
+  __DATA__
+
+  Usage: {name}
+
+  Commands:
+
+  {commands}
+
+  Options:
+
+  {options}
 
 =back
 

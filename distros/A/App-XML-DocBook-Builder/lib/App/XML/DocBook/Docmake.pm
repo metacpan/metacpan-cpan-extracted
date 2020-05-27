@@ -1,33 +1,32 @@
 package App::XML::DocBook::Docmake;
-$App::XML::DocBook::Docmake::VERSION = '0.0801';
+$App::XML::DocBook::Docmake::VERSION = '0.0900';
+use 5.014;
 use strict;
 use warnings;
 
-use 5.008;
-
-use Getopt::Long qw(GetOptionsFromArray);
-use File::Path;
-use Pod::Usage;
-
-use parent 'Class::Accessor';
+use Getopt::Long qw/ GetOptionsFromArray /;
+use File::Path qw/ mkpath /;
+use Pod::Usage qw/ pod2usage /;
 
 
-__PACKAGE__->mk_accessors(
-    qw(
-        _base_path
-        _has_output
-        _input_path
-        _make_like
-        _mode
-        _output_path
-        _stylesheet
-        _trailing_slash
-        _verbose
-        _real_mode
-        _xslt_mode
-        _xslt_stringparams
-        )
-);
+use Class::XSAccessor {
+    accessors => [
+        qw(
+            _base_path
+            _has_output
+            _input_path
+            _make_like
+            _mode
+            _output_path
+            _stylesheet
+            _trailing_slash
+            _verbose
+            _real_mode
+            _xslt_mode
+            _xslt_stringparams
+            )
+    ]
+};
 
 
 my %modes = (
@@ -535,15 +534,22 @@ sub _output_cmd_comp
 }
 
 package App::XML::DocBook::Docmake::CmdComponent;
-$App::XML::DocBook::Docmake::CmdComponent::VERSION = '0.0801';
-use base 'Class::Accessor';
+$App::XML::DocBook::Docmake::CmdComponent::VERSION = '0.0900';
+use Class::XSAccessor {
+    accessors => [
 
-__PACKAGE__->mk_accessors(
-    qw(
-        is_input
-        is_output
-        )
-);
+        qw(
+            is_input
+            is_output
+            )
+    ]
+};
+
+sub new
+{
+    my ( $class, $self ) = @_;
+    return bless $self, $class;
+}
 
 1;
 
@@ -562,11 +568,11 @@ App::XML::DocBook::Docmake - translate DocBook/XML to other formats
 
 =head1 VERSION
 
-version 0.0801
+version 0.0900
 
 =head1 SYNOPSIS
 
-    use App::XML::DocBook::Docmake;
+    use App::XML::DocBook::Docmake ();
 
     my $docmake = App::XML::DocBook::Docmake->new({argv => [@ARGV]});
 
@@ -652,27 +658,11 @@ L<https://metacpan.org/release/App-XML-DocBook-Builder>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/App-XML-DocBook-Builder>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-XML-DocBook-Builder>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/App-XML-DocBook-Builder>
 
 =item *
 

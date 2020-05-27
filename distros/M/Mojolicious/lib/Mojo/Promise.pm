@@ -1,6 +1,7 @@
 package Mojo::Promise;
 use Mojo::Base -base;
 
+use Carp qw(carp);
 use Mojo::IOLoop;
 use Mojo::Util qw(deprecated);
 use Scalar::Util qw(blessed);
@@ -14,7 +15,7 @@ sub AWAIT_FAIL { shift->reject(@_) }
 
 sub AWAIT_GET {
   my $self    = shift;
-  my @results = @{$self->{result} // []};
+  my @results = @{$self->{results} // []};
   die $results[0] unless $self->{status} eq 'resolve';
   return wantarray ? @results : $results[0];
 }
@@ -23,14 +24,24 @@ sub AWAIT_IS_CANCELLED {undef}
 
 sub AWAIT_IS_READY {
   my $self = shift;
-  return !!$self->{result} && !@{$self->{resolve}} && !@{$self->{reject}};
+  $self->{handled} = 1;
+  return !!$self->{results} && !@{$self->{resolve}} && !@{$self->{reject}};
 }
 
 sub AWAIT_NEW_DONE { _await('resolve', @_) }
 sub AWAIT_NEW_FAIL { _await('reject',  @_) }
 
 sub AWAIT_ON_CANCEL { }
-sub AWAIT_ON_READY  { shift->finally(@_) }
+
+sub AWAIT_ON_READY {
+  shift->_finally(0, @_)->catch(sub { });
+}
+
+sub DESTROY {
+  my $self = shift;
+  return if $self->{handled} || ($self->{status} // '') ne 'reject';
+  carp "Unhandled rejected promise: @{$self->{results}}" if $self->{results};
+}
 
 sub all         { _all(2, @_) }
 sub all_settled { _all(0, @_) }
@@ -40,51 +51,36 @@ sub catch { shift->then(undef, shift) }
 
 sub clone { $_[0]->new->ioloop($_[0]->ioloop) }
 
-sub finally {
-  my ($self, $finally) = @_;
-
-  my $new = $self->clone;
-  push @{$self->{resolve}}, sub { _finally($new, $finally, 'resolve', @_) };
-  push @{$self->{reject}},  sub { _finally($new, $finally, 'reject',  @_) };
-
-  $self->_defer if $self->{result};
-
-  return $new;
-}
+sub finally { shift->_finally(1, @_) }
 
 sub map {
-  my ($class, $options) = (shift, ref $_[0] eq 'HASH' ? shift : {});
-  my ($cb,    @items)   = @_;
+  my ($class, $options, $cb, @items)
+    = (shift, ref $_[0] eq 'HASH' ? shift : {}, @_);
 
-  my @start = map { $_->$cb } splice @items, 0,
-    $options->{concurrency} // @items;
-  my $proto = $class->resolve($start[0]);
+  return $class->all(map { $_->$cb } @items)
+    if !$options->{concurrency} || @items <= $options->{concurrency};
 
-  my (@trigger, @wait);
-  for my $item (@items) {
-    my $p = $proto->clone;
-    push @trigger, $p;
-    push @wait,    $p->then(sub { local $_ = $item; $_->$cb });
-  }
+  my @start = map { $_->$cb } splice @items, 0, $options->{concurrency};
 
-  my @all = map {
-    $proto->clone->resolve($_)->then(
-      sub { shift(@trigger)->resolve if @trigger; @_ },
-      sub { @trigger = (); $proto->clone->reject($_[0]) },
-    )
-  } (@start, @wait);
+  my $loop = $start[0]->ioloop;
+  my @wait = map { $class->new->ioloop($loop) } 0 .. $#items;
 
-  return $class->all(@all);
+  my $start_next;
+  $start_next = sub {
+    return unless my $item = shift @items;
+    my $chain = shift @wait;
+    $_->$cb->then(
+      sub { $start_next->() if $start_next; $chain->resolve(@_); () },
+      sub { $chain->reject(@_); () })
+      for $item;
+  };
+
+  $_->then(sub { $start_next->() if $start_next; () }, sub { }) for @start;
+
+  return $class->all(@start, @wait)->finally(sub { undef $start_next });
 }
 
 sub new {
-
-  # DEPRECATED!
-  if (@_ > 2 or ref($_[1]) eq 'HASH') {
-    deprecated 'Mojo::Promise::new with attributes is DEPRECATED';
-    return shift->SUPER::new(@_);
-  }
-
   my $self = shift->SUPER::new;
   shift->(sub { $self->resolve(@_) }, sub { $self->reject(@_) }) if @_;
   return $self;
@@ -99,10 +95,11 @@ sub then {
   my ($self, $resolve, $reject) = @_;
 
   my $new = $self->clone;
-  push @{$self->{resolve}}, sub { _then($new, $resolve, 'resolve', @_) };
-  push @{$self->{reject}},  sub { _then($new, $reject,  'reject',  @_) };
+  $self->{handled} = 1;
+  push @{$self->{resolve}}, sub { _then_cb($new, $resolve, 'resolve', @_) };
+  push @{$self->{reject}},  sub { _then_cb($new, $reject,  'reject',  @_) };
 
-  $self->_defer if $self->{result};
+  $self->_defer if $self->{results};
 
   return $new;
 }
@@ -114,7 +111,7 @@ sub wait {
   my $self = shift;
   return if (my $loop = $self->ioloop)->is_running;
   my $done;
-  $self->finally(sub { $done++; $loop->stop });
+  $self->_finally(0, sub { $done++; $loop->stop })->catch(sub { });
   $loop->start until $done;
 }
 
@@ -128,7 +125,8 @@ sub _all {
 
     # "race"
     if ($type == 1) {
-      $promises[$i]->then(sub { $all->resolve(@_) }, sub { $all->reject(@_) });
+      $promises[$i]
+        ->then(sub { $all->resolve(@_); () }, sub { $all->reject(@_); () });
     }
 
     # "all"
@@ -137,18 +135,20 @@ sub _all {
         sub {
           $results->[$i] = [@_];
           $all->resolve(@$results) if --$remaining <= 0;
+          return ();
         },
-        sub { $all->reject(@_) }
+        sub { $all->reject(@_); () }
       );
     }
 
     # "any"
     elsif ($type == 3) {
       $promises[$i]->then(
-        sub { $all->resolve(@_) },
+        sub { $all->resolve(@_); () },
         sub {
           $results->[$i] = [@_];
           $all->reject(@$results) if --$remaining <= 0;
+          return ();
         }
       );
     }
@@ -159,10 +159,12 @@ sub _all {
         sub {
           $results->[$i] = {status => 'fulfilled', value => [@_]};
           $all->resolve(@$results) if --$remaining <= 0;
+          return ();
         },
         sub {
           $results->[$i] = {status => 'rejected', reason => [@_]};
           $all->resolve(@$results) if --$remaining <= 0;
+          return ();
         }
       );
     }
@@ -181,50 +183,70 @@ sub _await {
 sub _defer {
   my $self = shift;
 
-  return unless my $result = $self->{result};
+  return unless my $results = $self->{results};
   my $cbs = $self->{status} eq 'resolve' ? $self->{resolve} : $self->{reject};
   @{$self}{qw(cycle resolve reject)} = (undef, [], []);
 
-  $self->ioloop->next_tick(sub { $_->(@$result) for @$cbs });
+  $self->ioloop->next_tick(sub { $_->(@$results) for @$cbs });
 }
 
 sub _finally {
-  my ($new, $finally, $method, @result) = @_;
+  my ($self, $handled, $finally) = @_;
+
+  my $new = $self->clone;
+  $self->{handled} = 1 if $handled;
+  push @{$self->{resolve}}, sub { _finally_cb($new, $finally, 'resolve', @_) };
+  push @{$self->{reject}},  sub { _finally_cb($new, $finally, 'reject',  @_) };
+
+  $self->_defer if $self->{results};
+
+  return $new;
+}
+
+sub _finally_cb {
+  my ($new, $finally, $method, @results) = @_;
   return $new->reject($@) unless eval { $finally->(); 1 };
-  return $new->$method(@result);
+  return $new->$method(@results);
 }
 
 sub _settle {
-  my ($self, $status) = (shift, shift);
-  my $thenable = blessed $_[0] && $_[0]->can('then');
-  $self = $thenable ? $_[0]->clone : $self->new unless ref $self;
+  my ($self, $status, @results) = @_;
 
-  $_[0]->then(sub { $self->resolve(@_); () }, sub { $self->reject(@_); () })
-    and return $self
-    if $thenable;
+  my $thenable = blessed $results[0] && $results[0]->can('then');
+  unless (ref $self) {
+    return $results[0]
+      if $thenable && $status eq 'resolve' && $results[0]->isa('Mojo::Promise');
+    $self = $self->new;
+  }
 
-  return $self if $self->{result};
+  if ($thenable && $status eq 'resolve') {
+    $results[0]
+      ->then(sub { $self->resolve(@_); () }, sub { $self->reject(@_); () });
+  }
 
-  @{$self}{qw(result status)} = ([@_], $status);
-  $self->_defer;
+  elsif (!$self->{results}) {
+    @{$self}{qw(results status)} = (\@results, $status);
+    $self->_defer;
+  }
+
   return $self;
 }
 
-sub _then {
-  my ($new, $cb, $method, @result) = @_;
+sub _then_cb {
+  my ($new, $cb, $method, @results) = @_;
 
-  return $new->$method(@result) unless defined $cb;
+  return $new->$method(@results) unless defined $cb;
 
   my @res;
-  return $new->reject($@) unless eval { @res = $cb->(@result); 1 };
+  return $new->reject($@) unless eval { @res = $cb->(@results); 1 };
   return $new->resolve(@res);
 }
 
 sub _timer {
-  my ($self, $method, $after, @result) = @_;
+  my ($self, $method, $after, @results) = @_;
   $self = $self->new unless ref $self;
-  $result[0] = 'Promise timeout' if $method eq 'reject' && !@result;
-  $self->ioloop->timer($after => sub { $self->$method(@result) });
+  $results[0] = 'Promise timeout' if $method eq 'reject' && !@results;
+  $self->ioloop->timer($after => sub { $self->$method(@results) });
   return $self;
 }
 
@@ -358,8 +380,7 @@ the fulfilled promises in the same order as the passed promises.
 
 Returns a new L<Mojo::Promise> object that fulfills when all of the passed
 L<Mojo::Promise> objects have fulfilled or rejected, with hash references that
-describe the outcome of each promise. Note that this method is B<EXPERIMENTAL>
-and might change without warning!
+describe the outcome of each promise.
 
 =head2 any
 
@@ -421,11 +442,11 @@ reason.
   my $new = Mojo::Promise->map(sub {...}, @items);
   my $new = Mojo::Promise->map({concurrency => 3}, sub {...}, @items);
 
-Apply a function that returns a L<Mojo::Promise> to each item in a list of
-items while optionally limiting concurrency. Returns a L<Mojo::Promise> that
-collects the results in the same manner as L</all>. If any item's promise is
-rejected, any remaining items which have not yet been mapped will not be. Note
-that this method is B<EXPERIMENTAL> and might change without warning!
+Apply a function that returns a L<Mojo::Promise> to each item in a list of items
+while optionally limiting concurrency. Returns a L<Mojo::Promise> that collects
+the results in the same manner as L</all>. If any item's promise is rejected,
+any remaining items which have not yet been mapped will not be. Note that this
+method is B<EXPERIMENTAL> and might change without warning!
 
   # Perform 3 requests at a time concurrently
   Mojo::Promise->map({concurrency => 3}, sub { $ua->get_p($_) }, @urls)

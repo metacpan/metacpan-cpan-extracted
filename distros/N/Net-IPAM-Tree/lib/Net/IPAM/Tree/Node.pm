@@ -3,9 +3,7 @@ package Net::IPAM::Tree::Node;
 use 5.10.0;
 use strict;
 use warnings;
-use List::MoreUtils qw(lower_bound);
-###
-use namespace::clean;
+use List::MoreUtils qw();
 
 =head1 NAME
 
@@ -93,7 +91,7 @@ sub _insert_node {
   # childs are sorted find pos in childs on this level
   # find first index where child->{block} >= input->{block}
   # -1 if $node->{childs} is an empty array
-  my $idx = lower_bound { $_->{block}->cmp( $input->{block} ) } @{ $node->{childs} };
+  my $idx = List::MoreUtils::lower_bound { $_->{block}->cmp( $input->{block} ) } @{ $node->{childs} };
 
   # idx not -1 and not at end of slice, check for dup block
   if ( $idx >= 0 && $idx < $nc && $input->{block}->cmp( $node->{childs}[$idx]->{block} ) == 0 ) {
@@ -180,7 +178,7 @@ sub _remove {
 
   # childs are sorted find pos in childs on this level
   # find first index where child->{block} >= that
-  my $idx = lower_bound { $_->{block}->cmp($that) } @{ $node->{childs} };
+  my $idx = List::MoreUtils::lower_bound { $_->{block}->cmp($that) } @{ $node->{childs} };
 
   # found by exact match?
   # search index may be at $nc, take care for index panics
@@ -239,7 +237,7 @@ sub _contains {
 
   # childs are sorted find pos in childs
   # find first index where child->{block} >= block
-  my $idx = lower_bound { $_->{block}->cmp($block) } @{ $node->{childs} };
+  my $idx = List::MoreUtils::lower_bound { $_->{block}->cmp($block) } @{ $node->{childs} };
 
   # search index may be at $nc, take care for index panics
   if ( $idx < $nc ) {
@@ -274,7 +272,7 @@ sub _lookup {
 
   # childs are sorted find pos in childs on this level
   # find first index where child->{block} >= block
-  my $idx = lower_bound { $_->{block}->cmp($block) } @{ $node->{childs} };
+  my $idx = List::MoreUtils::lower_bound { $_->{block}->cmp($block) } @{ $node->{childs} };
 
   # found by exact match?
   if ( $idx < $nc ) {

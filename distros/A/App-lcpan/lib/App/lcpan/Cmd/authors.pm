@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::authors;
 
-our $DATE = '2020-05-07'; # DATE
-our $VERSION = '1.057'; # VERSION
+our $DATE = '2020-05-26'; # DATE
+our $VERSION = '1.058'; # VERSION
 
 use 5.010;
 use strict;
@@ -29,7 +29,7 @@ App::lcpan::Cmd::authors - List authors
 
 =head1 VERSION
 
-This document describes version 1.057 of App::lcpan::Cmd::authors (from Perl distribution App-lcpan), released on 2020-05-07.
+This document describes version 1.058 of App::lcpan::Cmd::authors (from Perl distribution App-lcpan), released on 2020-05-26.
 
 =head1 FUNCTIONS
 
@@ -62,21 +62,17 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<added_after> => I<date>
+=item * B<added_or_updated_since> => I<date>
 
-Include only records that are added after a certain date.
+Include only records that are addedE<sol>updated since a certain date.
 
-=item * B<added_before> => I<date>
+=item * B<added_or_updated_since_last_index_update> => I<true>
 
-Include only records that are added before a certain date.
+Include only records that are addedE<sol>updated since the last index update.
 
-=item * B<added_in_last_n_updates> => I<posint>
+=item * B<added_or_updated_since_last_n_index_updates> => I<posint>
 
-Include only records that are added during the last N index updates.
-
-=item * B<added_in_last_update> => I<true>
-
-Include only records that are added during the last index update.
+Include only records that are addedE<sol>updated since the last N index updates.
 
 =item * B<cpan> => I<dirname>
 
@@ -104,22 +100,6 @@ When there are more than one query, perform OR instead of AND logic.
 Search query.
 
 =item * B<query_type> => I<str> (default: "any")
-
-=item * B<updated_after> => I<date>
-
-Include only records that are updated after a certain date.
-
-=item * B<updated_before> => I<date>
-
-Include only records that are updated before a certain date.
-
-=item * B<updated_in_last_n_updates> => I<posint>
-
-Include only records that are updated during the last N index updates.
-
-=item * B<updated_in_last_update> => I<true>
-
-Include only records that are updated during the last index update.
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 

@@ -1,7 +1,9 @@
 package Perinci::CmdLine::Base;
 
-our $DATE = '2020-04-27'; # DATE
-our $VERSION = '1.828'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-26'; # DATE
+our $DIST = 'Perinci-CmdLine-Lite'; # DIST
+our $VERSION = '1.829'; # VERSION
 
 use 5.010001;
 use strict;
@@ -197,6 +199,18 @@ our %copts = (
             my ($go, $val, $r) = @_;
             $r->{page_result} = 1;
             $r->{pager} = $val if length $val;
+        },
+        tags => ['category:output'],
+    },
+
+    view_result => {
+        getopt  => "view-result:s",
+        summary => "View output using a viewer",
+        value_label => 'program',
+        handler => sub {
+            my ($go, $val, $r) = @_;
+            $r->{view_result} = 1;
+            $r->{viewer} = $val if length $val;
         },
         tags => ['category:output'],
     },
@@ -1374,9 +1388,22 @@ sub select_output_handle {
   SELECT_HANDLE:
     {
         # view result using external program
-        if ($ENV{VIEW_RESULT} // $resmeta->{"cmdline.view_result"}) {
-            my $viewer = $resmeta->{"cmdline.viewer"} // $ENV{VIEWER} //
-                $ENV{BROWSER};
+        if ($r->{view_result} // $ENV{VIEW_RESULT} // $resmeta->{"cmdline.view_result"}) {
+
+            # select default viewer & preprocessing based on content_type and
+            # availability. should probably be moved elsewhere later.
+            my $default_viewer;
+          SET_DEFAULT_VIEWER: {
+                require File::Which;
+
+                my $ct = $resmeta->{content_type} // '';
+                if ($ct eq 'text/x-org') {
+                    $default_viewer = 'emacs' if File::Which::which("emacs");
+                }
+            }
+
+            my $viewer = $r->{viewer} // $resmeta->{"cmdline.viewer"} //
+                $default_viewer // $ENV{VIEWER} // $ENV{BROWSER};
             last if defined $viewer && !$viewer; # ENV{VIEWER} can be set 0/'' to disable viewing result using external program
             die [500, "No VIEWER program set"] unless defined $viewer;
             $r->{viewer} = $viewer;
@@ -1527,8 +1554,19 @@ sub display_result {
             die "Result is a stream but no coderef provided";
         }
     } else {
+        # do preprocessing based on content_type. should probably be moved
+        # elsewhere later.
+      PREPROCESS_RESULT: {
+            last unless defined $r->{viewer};
+
+            my $ct = $resmeta->{content_type} // '';
+            if ($ct eq 'text/x-org') {
+                $fres = "# -*- mode: org -*-\n" . $fres;
+            }
+        }
+
         print $handle $fres;
-        if ($r->{viewer}) {
+        if (defined $r->{viewer}) {
             require ShellQuote::Any::Tiny;
             my $cmd = $r->{viewer} ." ". ShellQuote::Any::Tiny::shell_quote($r->{viewer_temp_path});
             system $cmd;
@@ -1769,7 +1807,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.828 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2020-04-27.
+This document describes version 1.829 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2020-05-26.
 
 =head1 DESCRIPTION
 

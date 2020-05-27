@@ -1,0 +1,27 @@
+---
+abstract: 'ftpd runner for tests'
+author:
+  - 'Taku Amano <taku@toi-planning.net>'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Module::Install version 1.19, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-FTP-Server
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Net::FTPServer: '0'
+  perl: '5.006001'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: ssh://git@github.com/usualoma/p5-test-ftp-server.git
+version: '0.013'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    0.0.4
+    0.0.5
 
 INSTALLATION
 
@@ -20,6 +20,8 @@ SYNOPSIS
         use Date::Extract::DE;
         my $parser = Date::Extract::DE->new( reference_date => $reference_date );
         my $dates = $parser->extract($text);
+        my $infos = $parser->extract_with_context($text);
+        printf("%s => %s\n", $_->{context}, $_->{date}) foreach @$infos;
 
 DESCRIPTION
 
@@ -40,6 +42,13 @@ METHODS
 
       Tries to extract dates from the text and returns an arrayref of
       Date::Simple instances
+
+    extract_with_context($text)
+
+      Tries to extract dates from the text and returns an arrayref of
+      HashRef instances. Each HashRef contains a key 'date' which maps to a
+      Date::Simple instance, and a key 'context' mapping to the date string
+      found in the original text
 
 AUTHORS
 

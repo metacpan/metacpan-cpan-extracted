@@ -15,7 +15,7 @@ Log::Log4perl->easy_init($ERROR);
 # What instances of Chrome will we try?
 my @instances = t::helper::browser_instances();
 
-my $testcount = 7;
+my $testcount = 11;
 
 if (my $err = t::helper::default_unavailable) {
     plan skip_all => "Couldn't connect to Chrome: $@";
@@ -27,9 +27,7 @@ if (my $err = t::helper::default_unavailable) {
 my %args;
 sub new_mech {
     # Just keep these to pass the parameters to new instances
-    if( ! keys %args ) {
-        %args = @_;
-    };
+    %args = @_;
     t::helper::need_minimum_chrome_version( '62.0.0.0', @_ );
     WWW::Mechanize::Chrome->new(
         autodie => 1,
@@ -39,8 +37,6 @@ sub new_mech {
 
 t::helper::run_across_instances(\@instances, \&new_mech, $testcount, sub {
     my( $file, $mech ) = splice @_; # so we move references
-    my $version = $mech->chrome_version;
-
     if( $ENV{WWW_MECHANIZE_CHROME_TRANSPORT}
         and $ENV{WWW_MECHANIZE_CHROME_TRANSPORT} eq 'Chrome::DevToolsProtocol::Transport::Mojo'
     ) {
@@ -48,11 +44,6 @@ t::helper::run_across_instances(\@instances, \&new_mech, $testcount, sub {
             skip "Chrome::DevToolsProtocol::Transport::Mojo doesn't support port reuse", $testcount
         };
         return;
-    } elsif( $version =~ /\b(\d+)\b/ and ($1 == 61 or $1 == 59)) {
-        SKIP: {
-            skip "Chrome v$1 doesn't properly handle listing tabs...", $testcount;
-        };
-        return
     };
 
     my $app = $mech->driver;
@@ -62,14 +53,11 @@ t::helper::run_across_instances(\@instances, \&new_mech, $testcount, sub {
 
     # Add one more, just to be on the safe side, so that Chrome doesn't close
     # immediately again:
-    #$mech->driver->new_tab()->get;
     my $info = $mech->driver->createTarget()->get;
     my $targetId = $mech->driver->targetId; # this one should close once we discard it
 
-    #my @tabs = $app->list_tabs()->get;
     my @tabs = $app->getTargets()->get;
     note "Tabs open in PID $pid: ", 0+@tabs;
-    #use Data::Dumper; note Dumper \@tabs;
 
     note "Releasing mechanize $pid";
     undef $mech; # our own tab should now close automatically
@@ -105,12 +93,12 @@ t::helper::run_across_instances(\@instances, \&new_mech, $testcount, sub {
     $mech = WWW::Mechanize::Chrome->new(
         autodie   => 0,
         autoclose => 0,
-        reuse     => 1,
         new_tab   => 1,
         driver    => $app,
         driver_transport => $transport,
         %args,
     );
+    is $mech->{pid}, undef, "We didn't start a new process when reusing a pre-existing transport";
     $mech->update_html(<<HTML);
     <html><head><title>$magic</title></head><body>Test</body></html>
 HTML
@@ -125,11 +113,11 @@ HTML
         autodie   => 0,
         autoclose => 0,
         tab       => qr/^\Q$magic/,
-        reuse     => 1,
         driver    => $app,
         driver_transport => $transport,
         %args,
     );
+    is $mech->{pid}, undef, "We didn't start a new process when reusing a pre-existing transport";
     $c = $mech->content;
     like $c, qr/\Q$magic/, "We selected the existing tab"
         or do { diag $_->{title} for $mech->driver->getTargets()->get };
@@ -150,6 +138,8 @@ HTML
         driver_transport => $transport,
         %args,
     );
+    is $mech->{pid}, undef, "We didn't start a new process when reusing a pre-existing transport";
+#is $mech->{pid}, undef, "We didn't start a new process when connecting to the current tab";
     $c = $mech->content;
     like $mech->content, qr/\Q$magic/, "We connected to the current tab"
         or do { diag $_->{title} for $mech->driver->getTargets()->get() };
@@ -160,17 +150,17 @@ HTML
     # Now try to connect to "our" now closed tab
     my $lived = eval {
         $mech = WWW::Mechanize::Chrome->new(
-            autodie => 1,
-            tab => qr/\Q$magic/,
-            reuse => 1,
-        driver    => $app,
-        driver_transport => $transport,
+            autodie          => 1,
+            tab              => qr/\Q$magic/,
+            driver           => $app,
+            driver_transport => $transport,
             %args,
         );
         1;
     };
     my $err = $@;
     is $lived, undef, 'We died trying to connect to a non-existing tab';
+    is $mech->{pid}, undef, "We didn't start a new process when searching for a tab";
     if( $] < 5.014 ) {
         SKIP: {
             skip "Perl pre 5.14 destructor eval clears \$\@ sometimes", 1;
@@ -180,10 +170,7 @@ HTML
     };
 
     if( $pid ) {
-        # If we spawned a child process, let's clean it up the hard way
-        local $SIG{CHLD} = 'IGNORE';
-        kill 'SIGKILL', $pid; # clean up, the hard way
+        WWW::Mechanize::Chrome->kill_child('SIGKILL', $pid, undef);
     };
-    %args = ();
     };
 });

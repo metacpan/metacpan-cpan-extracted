@@ -1,5 +1,8 @@
 Revision history for DBIx::Query
 
+1.10      2020-05-26 09:59:56-07:00 America/Los_Angeles
+        - Fix bug in all() to always return arrayref despite context
+
 1.09      2020-03-12 09:51:14-07:00 America/Los_Angeles
         - POD improvements and remove empty ()s in code
 

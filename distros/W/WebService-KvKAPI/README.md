@@ -29,14 +29,20 @@ Optional API host to allow overriding the default host `api.kvk.nl`.
 
 # METHODS
 
+## has\_api\_host
+
+Check if you have an API host set or if you use the default. Publicly available
+for those who need it.
+
 ## api\_call
 
-Directly do an API call towards the KvK API. Returns the JSON datastructure as an `HashRef`.
+Directly do an API call towards the KvK API. Returns the JSON datastructure as
+an `HashRef`.
 
 ## profile
 
-Retreive detailed information of one company. Dies when the company
-cannot be found. Make sure to call `search` first in case you don't
+Retreive detailed information of one company. Dies when the company cannot be
+found. Make sure to call ["search" in WebService::KvKAPI](https://metacpan.org/pod/WebService%3A%3AKvKAPI#search) first in case you don't
 want to die.
 
 ## search
@@ -61,12 +67,19 @@ searches
 
 ## search\_max
 
-Search the KVK, retreives a maximum of X results up the the nearest 10, eg 15 as a max returns 20 items.
+Search the KVK, retreives a maximum of X results up the the nearest 10, eg 15
+as a max returns 20 items.
 
     my $results = $self->search_max(15, kvkNumber => 12345678, ...);
     foreach (@$results) {
         ...;
     }
+
+## mangle\_params
+
+Helper function to always have the correct syntax for the kvkNumber and
+branchNumber. Publicly available for if you want to do calls yourself via
+["api\_call" in WebService::KvKAPI](https://metacpan.org/pod/WebService%3A%3AKvKAPI#api_call)
 
 # SEE ALSO
 

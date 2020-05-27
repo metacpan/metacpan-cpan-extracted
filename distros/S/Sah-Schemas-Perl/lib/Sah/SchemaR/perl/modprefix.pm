@@ -1,7 +1,7 @@
 package Sah::SchemaR::perl::modprefix;
 
-our $DATE = '2020-05-08'; # DATE
-our $VERSION = '0.031'; # VERSION
+our $DATE = '2020-05-21'; # DATE
+our $VERSION = '0.032'; # VERSION
 
 our $rschema = ["str",[{description=>"\nPerl module prefix, e.g. `Foo::Bar::`. An empty prefix ('') is also allowed.\n\nContains coercion rule so you can also input:\n\n    Foo-Bar\n    Foo-Bar-\n    Foo-Bar\n    Foo/Bar\n    Foo/Bar/\n    Foo::Bar\n\nand it will be normalized into `Foo::Bar::`.\n\n",examples=>[{valid=>1,value=>""},{valid=>0,value=>"::"},{valid=>1,value=>"Foo::"},{valid=>1,validated_value=>"Foo::Bar::",value=>"Foo::Bar"},{valid=>1,value=>"Foo::Bar::"},{valid=>0,value=>"::Foo"},{valid=>1,validated_value=>"Foo::",value=>"Foo"},{valid=>1,validated_value=>"Foo::",value=>"Foo/"},{valid=>1,validated_value=>"Foo::",value=>"Foo-"}],match=>"\\A(?:[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*::)?\\z",summary=>"Perl module prefix, e.g. Foo::Bar::","x.completion"=>"perl_modprefix","x.perl.coerce_rules"=>["From_str::normalize_perl_modprefix"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::modprefix - Perl module prefix, e.g. Foo::Bar::
 
 =head1 VERSION
 
-This document describes version 0.031 of Sah::SchemaR::perl::modprefix (from Perl distribution Sah-Schemas-Perl), released on 2020-05-08.
+This document describes version 0.032 of Sah::SchemaR::perl::modprefix (from Perl distribution Sah-Schemas-Perl), released on 2020-05-21.
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,71 @@
+NAME
+    WordListRole::Bloom - Provide word_exists() that uses bloom filter
+
+VERSION
+    This document describes version 0.005 of WordListRole::Bloom (from Perl
+    distribution WordListRole-Bloom), released on 2020-05-23.
+
+SYNOPSIS
+    In your WordList/EN/Foo.pm:
+
+     package WordList::EN::Foo;
+
+     __DATA__
+     word1
+     word2
+     ...
+
+    In your WordListBloom/EN/Foo.pm:
+
+     package WordListBloom::EN::Foo;
+     1;
+     __DATA__
+     (The actual bloom filter, base64-encoded)
+
+    Then:
+
+     use Role::Tiny;
+     use WordList::EN::Foo;
+     my $wl = WordList::EN::Foo->new;
+     Role::Tiny->apply_roles_to_object($wl, 'WordListRole::Bloom');
+
+     $wl->word_exists("foo"); # uses bloom filter to check for existence.
+
+DESCRIPTION
+    EXPERIMENTAL.
+
+    This role provides an alternative "word_exists()" method that checks a
+    bloom filter located in the data section of
+    "WordListBloom::<Your_WordList_Subpackage>". This provides a low
+    startup-overhead way to check an item against a big list (e.g.
+    millions). Note that testing using a bloom filter can result in a false
+    positive (i.e. "word_exists()" returns true but the word is not actually
+    in the list.
+
+PROVIDED METHODS
+  word_exists
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WordListRole-Bloom>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WordListRole-Bloom>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=WordListRole-Bloom>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

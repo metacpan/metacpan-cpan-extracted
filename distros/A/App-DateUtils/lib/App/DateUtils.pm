@@ -1,9 +1,9 @@
 package App::DateUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-31'; # DATE
+our $DATE = '2020-03-30'; # DATE
 our $DIST = 'App-DateUtils'; # DIST
-our $VERSION = '0.125'; # VERSION
+our $VERSION = '0.126'; # VERSION
 
 use 5.010001;
 use strict;
@@ -456,7 +456,7 @@ sub parse_duration_using_td_parse {
 
 $SPEC{dateconv} = {
     v => 1.1,
-    summary => 'Convert date to another format',
+    summary => 'Convert date from one format to another',
     args => {
         date => {
             schema => ['date*', {
@@ -618,7 +618,7 @@ sub strftimeq {
 
 $SPEC{durconv} = {
     v => 1.1,
-    summary => 'Convert duration to another format',
+    summary => 'Convert duration from one format to another',
     args => {
         duration => {
             schema => ['duration*', {
@@ -798,7 +798,7 @@ App::DateUtils - An assortment of date-/time-related CLI utilities
 
 =head1 VERSION
 
-This document describes version 0.125 of App::DateUtils (from Perl distribution App-DateUtils), released on 2020-01-31.
+This document describes version 0.126 of App::DateUtils (from Perl distribution App-DateUtils), released on 2020-03-30.
 
 =head1 SYNOPSIS
 
@@ -848,7 +848,7 @@ Usage:
 
  dateconv(%args) -> any
 
-Convert date to another format.
+Convert date from one format to another.
 
 Examples:
 
@@ -856,7 +856,7 @@ Examples:
 
 =item * Convert "today" to epoch:
 
- dateconv(date => "today"); # -> [200, "OK", 1580428800]
+ dateconv(date => "today"); # -> [200, "OK", 1585526400]
 
 =item * Convert epoch to ymd:
 
@@ -880,9 +880,9 @@ Result:
    200,
    "OK",
    {
-     epoch => 1580450649,
-     iso8601 => "2020-01-31T06:04:09Z",
-     ymd => "2020-01-31",
+     epoch => 1585530643,
+     iso8601 => "2020-03-30T01:10:43Z",
+     ymd => "2020-03-30",
    },
  ]
 
@@ -984,7 +984,7 @@ Usage:
 
  durconv(%args) -> any
 
-Convert duration to another format.
+Convert duration from one format to another.
 
 Examples:
 
@@ -1063,8 +1063,8 @@ Result:
      module          => "DateTime::Format::Flexible",
      original        => "tomorrow",
      is_parseable    => 1,
-     as_epoch        => 1580515200,
-     as_datetime_obj => "2020-02-01T00:00:00",
+     as_epoch        => 1585612800,
+     as_datetime_obj => "2020-03-31T00:00:00",
    },
    {
      module       => "DateTime::Format::Flexible",
@@ -1609,8 +1609,8 @@ Result:
      is_parseable => 1,
      as_secs => 1209600,
      as_dtdur_obj => "P14D",
-     date1 => "2020-01-31T06:04:09",
-     date2 => "2020-02-14T06:04:09",
+     date2 => "2020-04-13T01:10:43",
+     date1 => "2020-03-30T01:10:43",
    },
  ]
 
@@ -1625,9 +1625,9 @@ Result:
      module => "DateTime::Format::Natural",
      original => "from 23 Jun to 29 Jun",
      is_parseable => 1,
-     as_secs => 13002951,
-     as_dtdur_obj => "P4M28DT17H55M51S",
-     date1 => "2020-01-31T06:04:09",
+     as_secs => 7847357,
+     as_dtdur_obj => "P2M29DT22H49M17S",
+     date1 => "2020-03-30T01:10:43",
      date2 => "2020-06-29T00:00:00",
    },
  ]
@@ -1755,11 +1755,11 @@ Examples:
 
 =item * Format current time as yyyy-mm-dd:
 
- strftime(format => "%Y-%m-%d"); # -> [200, "OK", "2020-01-31"]
+ strftime(format => "%Y-%m-%d"); # -> [200, "OK", "2020-03-30"]
 
 =item * Format a specific time as yyyy-mm-dd:
 
- strftime(format => "%Y-%m-%d", date => "tomorrow"); # -> [200, "OK", "2020-02-01"]
+ strftime(format => "%Y-%m-%d", date => "tomorrow"); # -> [200, "OK", "2020-03-31"]
 
 =back
 
@@ -1798,7 +1798,7 @@ Examples:
 
 Result:
 
- [200, "OK", "2020-01-31"]
+ [200, "OK", "2020-03-30"]
 
 =back
 
@@ -1840,7 +1840,7 @@ feature.
 =head1 SEE ALSO
 
 
-L<dateparse>. Perinci::To::POD=HASH(0x564a231e0ff8).
+L<dateparse>. Perinci::To::POD=HASH(0x56293caf21a8).
 
 L<App::datecalc>
 

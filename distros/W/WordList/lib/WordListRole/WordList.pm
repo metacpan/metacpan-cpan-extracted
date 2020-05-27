@@ -1,9 +1,9 @@
 package WordListRole::WordList;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-04'; # DATE
+our $DATE = '2020-05-24'; # DATE
 our $DIST = 'WordList'; # DIST
-our $VERSION = '0.6.0'; # VERSION
+our $VERSION = '0.7.5'; # VERSION
 
 use Role::Tiny;
 
@@ -31,7 +31,33 @@ WordListRole::WordList - The WordList methods
 
 =head1 VERSION
 
-This document describes version 0.6.0 of WordListRole::WordList (from Perl distribution WordList), released on 2020-05-04.
+This document describes version 0.7.5 of WordListRole::WordList (from Perl distribution WordList), released on 2020-05-24.
+
+=head1 REQUIRED METHODS
+
+=head2 new
+
+=head2 each_word
+
+=head2 next_word
+
+=head2 reset_iterator
+
+=head2 pick
+
+Usage:
+
+ @words = $wl->pick([ $num=1 [ , $allow_duplicates=0 ] ]);
+
+Examples:
+
+ ($word) = $wl->pick;    # pick one item, note the list context
+ ($word) = $wl->pick(1); # ditto
+ @words  = $wl->pick(3);
+
+=head2 word_exists
+
+=head2 all_words
 
 =head1 HOMEPAGE
 

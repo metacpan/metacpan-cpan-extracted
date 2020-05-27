@@ -22,5 +22,6 @@ SIGNATURE
 t/Image-Checkerboard/01-use.t
 t/Image-Checkerboard/02-version.t
 t/Image-Checkerboard/03-new.t
+t/Image-Checkerboard/04-type.t
 xt/Image-Checkerboard/01-pod_coverage.t
 xt/Image-Checkerboard/02-pod.t

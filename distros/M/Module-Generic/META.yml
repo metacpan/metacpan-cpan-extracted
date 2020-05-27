@@ -4,6 +4,7 @@ author:
   - 'Jacques Deguest <jack@deguest.jp>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Which: '1.23'
   Test::More: '1.302162'
   Test::Pod: '1.52'
   utf8: '0'
@@ -29,9 +30,9 @@ requires:
   Devel::StackTrace: '0'
   Exporter: '5.73'
   JSON: '4.02'
-  Nice::Try: v0.1.2
+  Nice::Try: v0.1.3
   Number::Format: '1.75'
-  POSIX: '1.88'
+  POSIX: 1.53_01
   Regexp::Common: '2017060201'
   Scalar::Util: '1.50'
   Tie::Hash: '1.05'
@@ -40,8 +41,8 @@ requires:
   overload: '1.22'
   overloading: '0.02'
   parent: '0'
-  perl: '5.006000'
+  perl: '5.026001'
   strict: '0'
   warnings: '0'
-version: v0.12.5
+version: v0.12.12
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

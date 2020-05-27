@@ -5,7 +5,7 @@ use warnings;
 package Role::Inspector;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.005';
+our $VERSION   = '0.006';
 
 use Exporter::Shiny qw( get_role_info learn does_role );
 use Module::Runtime qw( use_package_optimistically );
@@ -65,16 +65,24 @@ sub _canonicalize
 	
 	if ( not $info->{api} )
 	{
-		$info->{api} = [sort(
+		$info->{api} = [
 			@{ $info->{provides} ||= [] },
 			@{ $info->{requires} ||= [] },
-		)];
+		];
 	}
 	
+	# if a method is in both `provides` and `requires`, remove from `requires`
+	my %lookup;
+	undef $lookup{$_} for @{$info->{provides}};
+	@{$info->{requires}} = grep !exists($lookup{$_}), @{$info->{requires}};
+	
 	for my $k (qw/ api provides requires /) {
-		@{ $info->{$k} } =
-			map ref($_) ? $_->{name} : $_,
-			uniq @{ $info->{$k} };
+		@{ $info->{$k} } = sort(
+			uniq(
+				map ref($_) ? $_->{name} : $_,
+				@{ $info->{$k} }
+			)
+		);
 	}
 }
 
@@ -186,12 +194,22 @@ learn {
 	@methods = $type->methods_provided_by($role)
 		if $type ne 'Role::Tiny';
 	
+	my @requires = @{ $Role::Tiny::INFO{$role}{requires} or [] };
+	
+	my $modifiers = $Role::Tiny::INFO{$role}{modifiers} || [];
+	foreach my $modifier (@$modifiers) {
+		my @modified = @$modifier[ 1 .. $#$modifier - 1 ];
+		# handle: before ['foo', 'bar'] => sub { ... }
+		@modified = @{ $modified[0] } if ref $modified[0] eq 'ARRAY';
+		push @requires, @modified;
+	}
+	
 	return {
 		name     => $role,
 		type     => $type,
-		api      => [ sort(@methods) ],  # keep: potentially more accurate
-		provides => [ sort keys %{ $type->_concrete_methods_of($role) } ],
-		requires => [ sort @{ $Role::Tiny::INFO{$role}{requires} or [] } ],
+		api      => [ @methods, @requires ],
+		provides => [ keys %{ $type->_concrete_methods_of($role) } ],
+		requires => \@requires,
 	};
 };
 
@@ -204,12 +222,21 @@ learn {
 	my $meta = Moose::Util::find_meta($role);
 	return unless $meta && $meta->isa('Moose::Meta::Role');
 	
+	my (@provides, @requires);
+	push @provides, $meta->get_method_list;
+	push @provides, __PACKAGE__->_expand_attributes($role, $meta);
+	push @requires, map($_->name, $meta->get_required_method_list);
+	for my $kind (qw/before after around/) {
+		my $accessor = "get_${kind}_method_modifiers_map";
+		push @requires, keys %{ $meta->$accessor };
+	}
+	
 	return {
 		name     => $role,
 		type     => 'Moose::Role',
 		meta     => $meta,
-		provides => [ sort($meta->get_method_list, __PACKAGE__->_expand_attributes($role, $meta)) ],
-		requires => [ sort(map($_->name, $meta->get_required_method_list)) ],
+		provides => \@provides,
+		requires => \@requires,
 	};
 };
 
@@ -222,12 +249,20 @@ learn {
 	my $meta = Mouse::Util::find_meta($role);
 	return unless $meta && $meta->isa('Mouse::Meta::Role');
 	
+	my (@provides, @requires);
+	push @provides, $meta->get_method_list;
+	push @provides, __PACKAGE__->_expand_attributes($role, $meta);
+	push @requires, $meta->get_required_method_list;
+	for my $kind (qw/before after around/) {
+		push @requires, keys %{ $meta->{"${kind}_method_modifiers"} };
+	}
+	
 	return {
 		name     => $role,
 		type     => 'Mouse::Role',
 		meta     => $meta,
-		provides => [ sort($meta->get_method_list, __PACKAGE__->_expand_attributes($role, $meta)) ],
-		requires => [ sort($meta->get_required_method_list) ],
+		provides => \@provides,
+		requires => \@requires,
 	};
 };
 
@@ -241,8 +276,8 @@ learn {
 	return {
 		name     => $role,
 		type     => 'Role::Basic',
-		provides => [ sort(keys(%{ 'Role::Basic'->_get_methods($role) })) ],
-		requires => [ sort('Role::Basic'->get_required_by($role)) ],
+		provides => [ keys %{ 'Role::Basic'->_get_methods($role) } ],
+		requires => [ 'Role::Basic'->get_required_by($role) ],
 	};
 };
 

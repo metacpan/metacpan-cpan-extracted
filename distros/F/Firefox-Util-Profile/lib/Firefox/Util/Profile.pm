@@ -1,14 +1,17 @@
 package Firefox::Util::Profile;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-18'; # DATE
+our $DATE = '2020-05-24'; # DATE
 our $DIST = 'Firefox-Util-Profile'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
+
+use Exporter 'import';
+our @EXPORT_OK = qw(list_firefox_profiles);
 
 our %SPEC;
 
@@ -71,8 +74,43 @@ sub list_firefox_profiles {
     [200, "OK", \@rows];
 }
 
+$SPEC{get_firefox_profile_dir} = {
+    v => 1.1,
+    summary => 'Given a Firefox profile name, return its directory',
+    description => <<'_',
+
+Return undef if Firefox profile is unknown.
+
+_
+    args_as => 'array',
+    args => {
+        profile => {
+            schema => 'firefox::profile_name*',
+            cmdline_aliases => {l=>{}},
+            req => 1,
+            pos => 0,
+        },
+    },
+    result_naked => 1,
+};
+sub get_firefox_profile_dir {
+    my $profile = shift;
+
+    return unless defined $profile;
+    my $res = list_firefox_profiles(detail=>1);
+    unless ($res->[0] == 200) {
+        log_warn "Can't list Firefox profile: $res->[0] - $res->[1]";
+        return;
+    };
+
+    for (@{ $res->[2] }) {
+        return $_->{path} if $_->{name} eq $profile;
+    }
+    return;
+}
+
 1;
-# ABSTRACT: List available Firefox profiles
+# ABSTRACT: Given a Firefox profile name, return its directory
 
 __END__
 
@@ -82,17 +120,42 @@ __END__
 
 =head1 NAME
 
-Firefox::Util::Profile - List available Firefox profiles
+Firefox::Util::Profile - Given a Firefox profile name, return its directory
 
 =head1 VERSION
 
-This document describes version 0.001 of Firefox::Util::Profile (from Perl distribution Firefox-Util-Profile), released on 2020-04-18.
+This document describes version 0.004 of Firefox::Util::Profile (from Perl distribution Firefox-Util-Profile), released on 2020-05-24.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
 =head1 FUNCTIONS
+
+
+=head2 get_firefox_profile_dir
+
+Usage:
+
+ get_firefox_profile_dir($profile) -> any
+
+Given a Firefox profile name, return its directory.
+
+Return undef if Firefox profile is unknown.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<$profile>* => I<firefox::profile_name>
+
+
+=back
+
+Return value:  (any)
+
 
 
 =head2 list_firefox_profiles
@@ -106,7 +169,7 @@ List available Firefox profiles.
 This utility will read ~/.mozilla/firefox/profiles.ini and extracts the list of
 profiles.
 
-This function is not exported.
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -147,6 +210,12 @@ feature.
 =head1 SEE ALSO
 
 Other C<Firefox::Util::*> modules.
+
+L<Chrome::Util::Profile>
+
+L<Vivaldi::Util::Profile>
+
+L<Opera::Util::Profile>
 
 =head1 AUTHOR
 

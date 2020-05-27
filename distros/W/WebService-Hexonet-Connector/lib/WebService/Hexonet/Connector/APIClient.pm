@@ -20,7 +20,7 @@ Readonly my $IDX4                         => 4;                                 
 Readonly our $ISPAPI_CONNECTION_URL       => 'https://api.ispapi.net/api/call.cgi';    # Default Connection Setup URL
 Readonly our $ISPAPI_CONNECTION_URL_PROXY => 'http://127.0.0.1/api/call.cgi';          # High Speed Connection Setup URL
 
-use version 0.9917; our $VERSION = version->declare('v2.9.0');
+use version 0.9917; our $VERSION = version->declare('v2.9.1');
 
 my $rtm = WebService::Hexonet::Connector::ResponseTemplateManager->getInstance();
 
@@ -467,6 +467,9 @@ sub _autoIDNConvert {
             push @toconvert, $val;
             push @idxs,      $key;
         }
+    }
+    if ( scalar @toconvert == 0 ) {
+        return $cmd;
     }
     my $r = $self->request(
         {   COMMAND => 'ConvertIDN',

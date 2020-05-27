@@ -1,5 +1,5 @@
 package JSON::Karabiner::Manipulator::Actions::From ;
-$JSON::Karabiner::Manipulator::Actions::From::VERSION = '0.017';
+$JSON::Karabiner::Manipulator::Actions::From::VERSION = '0.018';
 use strict;
 use warnings;
 use JSON;
@@ -124,7 +124,7 @@ sub add_simultaneous_options {
 
 }
 
-# ABSTRACT: From defintion
+# ABSTRACT: From object definition
 
 1;
 
@@ -134,15 +134,15 @@ __END__
 
 =head1 NAME
 
-JSON::Karabiner::Manipulator::Actions::From - From defintion
+JSON::Karabiner::Manipulator::Actions::From - From object definition
 
 =head1 SYNOPSIS
 
-  add_action('from');
+  add_action 'from';
 
   # Use methods to add data to the action:
-  add_key_code('h');
-  add_optional_modifiers('control', 'left_shift');
+  add_key_code 'h';
+  add_optional_modifiers 'control', 'left_shift';
 
 =head1 DESCRIPTION
 
@@ -155,76 +155,76 @@ official L<Karbiner documentation|https://karabiner-elements.pqrs.org/docs/json/
 
 =head1 METHODS
 
-=head3 new($type)
+=head3 new $type
 
 The constructor method is not called directly. The C<from> action object is more
-typically created via the manipulator object's C<add_action()> method.
+typically created via the manipulator object's C<add_action > method.
 
-=head3 add_key_code($value)
+=head3 add_key_code $value
 
 Add a C<key_code> property to a C<from> action:
 
-  add_key_code('h');
+  add_key_code 'h';
 
 See official L<Karbiner documentation|https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/from/>
 
-=head3 add_any($value)
+=head3 add_any $value
 
 Add an C<any> property to a C<from> action:
 
-  add_any($value);
+  add_any $value;
 
 See official L<Karbiner documentation|https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/from/any/>
 
-=head3 add_consumer_key_code($value)
+=head3 add_consumer_key_code $value
 
 Add an C<consumer_key_code> property to a C<from> action:
 
-  add_consumer_key_code('MUSIC_NEXT');
+  add_consumer_key_code 'MUSIC_NEXT';
 
-=head3 add_pointing_button($value)
+=head3 add_pointing_button $value
 
 Add an C<pointing_button> property to a C<from> action:
 
-  add_pointing_button('button2');
+  add_pointing_button 'button2';
 
-=head3 add_optional_modifiers(@values)
+=head3 add_optional_modifiers @values
 
 Add an C<optional_modifiers> property to keycodes in a C<from> action:
 
-  add_optional_modifiers('control', 'shift', 'command');
+  add_optional_modifiers 'control', 'shift', 'command';
 
 See official L<Karbiner documentation|https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/from/modifiers/>
 
 See official L<Karbiner documentation|>
 
-=head3 add_mandatory_modifiers(@values)
+=head3 add_mandatory_modifiers @values
 
 Add an C<mandatory_modifiers> property to keycodes in a C<from> action:
 
-  add_mandatory_modifiers('shift', 'command');
+  add_mandatory_modifiers 'shift', 'command';
 
 See official L<Karbiner documentation|https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/from/modifiers/>
 
-=head3 add_simulatneous([ $key_code_type = 'key_code' ], @values)
+=head3 add_simulatneous [ $key_code_type = 'key_code' ], @values
 
 Add an C<simultaneous> property to a C<from> action:
 
-  add_simultaneous('a', 'j');
+  add_simultaneous 'a', 'j';
 
 An optional C<key_code_type> can be passed in as the first argument:
 
-  add_simulataneous('pointing_button', 'button1', 'button2')
+  add_simulataneous 'pointing_button', 'button1', 'button2'
 
 If no C<key_code_type> value is detected, a default value of C<key_code> is used.
 
 See official L<Karbiner documentation|https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/from/simultaneous/>
 
-=head3 add_simulatneous_options([ $key_code_type = 'key_code' ], @values)
+=head3 add_simulatneous_options [ $key_code_type = 'key_code' ], @values
 
 Add an C<simultaneous> property to a C<from> action:
 
-  add_simultaneous_options('key_down_order', 'strict');
+  add_simultaneous_options 'key_down_order', 'strict';
 
 Multiple options by set my calling this method multiple times.
 
@@ -232,7 +232,7 @@ See official L<Karbiner documentation|https://karabiner-elements.pqrs.org/docs/j
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 AUTHOR
 

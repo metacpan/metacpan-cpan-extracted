@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::CloseTypes::SmartPostCloseRequest;
-$Shipment::FedEx::WSDL::CloseTypes::SmartPostCloseRequest::VERSION = '3.04';
+$Shipment::FedEx::WSDL::CloseTypes::SmartPostCloseRequest::VERSION = '3.05';
 use strict;
 use warnings;
 
@@ -97,7 +97,7 @@ Shipment::FedEx::WSDL::CloseTypes::SmartPostCloseRequest
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 

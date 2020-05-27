@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/WordList.pm','lib/WordList/Test/Dynamic/OneTwo_Each.pm','lib/WordList/Test/Dynamic/OneTwo_EachParam.pm','lib/WordList/Test/Dynamic/OneTwo_FirstNextReset.pm','lib/WordList/Test/OneTwo.pm','lib/WordListRole/EachFromFirstNextReset.pm','lib/WordListRole/FirstNextResetFromEach.pm','lib/WordListRole/WordList.pm'];
+my $filenames = ['lib/WordList.pm','lib/WordList/Test/Dynamic/OneTwo_Each.pm','lib/WordList/Test/Dynamic/OneTwo_EachParam.pm','lib/WordList/Test/Dynamic/OneTwo_FirstNextReset.pm','lib/WordList/Test/OneTwo.pm','lib/WordListBase.pm','lib/WordListRole/EachFromFirstNextReset.pm','lib/WordListRole/FirstNextResetFromEach.pm','lib/WordListRole/Test.pm','lib/WordListRole/WordList.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

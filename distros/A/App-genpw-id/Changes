@@ -1,24 +1,30 @@
-0.005   2018-01-09 (PERLANCAR)
+0.006   2020-05-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to App::genpw::wordlist 0.007 (new options --action,
+	  --list-patterns).
+
+
+0.005   2018-01-09  Released-By: PERLANCAR
 
 	- Update to App::genpw 0.002 (via App::genpw::wordlist 0.004).
 
 
-0.004   2018-01-08 (PERLANCAR)
+0.004   2018-01-08  Released-By: PERLANCAR
 
         - Rename dist from App-Genpass-ID to App-genpw-id. Now based on
           App::genpw.
 
 
-0.003   2018-01-02 (PERLANCAR)
+0.003   2018-01-02  Released-By: PERLANCAR
 
 	- Use App::Genpass::WordList as base (add option 'patterns').
 
 
-0.002   2017-11-07 (PERLANCAR)
+0.002   2017-11-07  Released-By: PERLANCAR
 
 	- Fix CLI name.
 
 
-0.001   2017-11-07 (PERLANCAR)
+0.001   2017-11-07  Released-By: PERLANCAR
 
         - First release.

@@ -1,0 +1,20 @@
+requires        'Class::Method::Modifiers';
+requires        'Data::Alias';
+requires        'Devel::StrictMode';
+requires        'Function::Parameters';
+requires        'Import::Into';
+requires        'Role::Tiny';
+requires        'Type::Params';
+requires        'Types::Interface', '0.002';
+requires        'Types::Standard';
+requires        'namespace::clean';
+
+
+on 'develop' => sub {
+    requires    "ExtUtils::MakeMaker::CPANfile";
+};
+
+
+on 'test' => sub {
+    requires    "Test::Most";
+};

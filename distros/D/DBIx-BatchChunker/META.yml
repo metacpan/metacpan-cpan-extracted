@@ -4,48 +4,57 @@ author:
   - 'Grant Street Group <developers@grantstreet.com>'
 build_requires:
   Class::Load: '0'
-  DBD::SQLite: '1.29'
-  DBIx::Class: '0'
-  DBIx::Connector::Retry: '0'
+  DBIx::Class::Core: '0'
+  DBIx::Class::Schema: '0'
+  Env: '0'
   ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   Path::Class: '0'
-  Scalar::Util: '0'
-  Test2::Bundle::More: '0.000060'
+  Path::Class::File: '0'
+  Test2::Bundle::More: '0'
   Test2::Tools::Compare: '0'
   Test2::Tools::Exception: '0'
   Test2::Tools::Explain: '0'
+  Test::More: '0'
+  base: '0'
+  lib: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.64'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+  ExtUtils::MakeMaker: '7.1101'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: DBIx-BatchChunker
-no_index:
-  directory:
-    - t
-    - inc
-    - examples
+provides:
+  DBIx::BatchChunker:
+    file: lib/DBIx/BatchChunker.pm
+    version: v0.940.1
 requires:
   CLDR::Number: '0'
-  DBI: '0'
+  DBIx::Connector::Retry: '0'
   Data::Float: '0'
   List::Util: '1.33'
-  Moo: '2.000002'
-  MooX::StrictConstructor: '0.008'
+  Moo: '0'
+  MooX::StrictConstructor: '0'
+  POSIX: '0'
   Scalar::Util: '0'
-  Term::ProgressBar: '2.14'
+  Term::ProgressBar: '0'
+  Time::HiRes: '0'
   Type::Utils: '0'
   Types::Common::Numeric: '0'
-  Types::Standard: '1.00'
+  Types::Standard: '0'
   namespace::clean: '0'
-  perl: '5.008001'
 resources:
   bugtracker: https://github.com/GrantStreetGroup/DBIx-BatchChunker/issues
-  homepage: https://github.com/GrantStreetGroup/DBIx-BatchChunker
-  repository: https://github.com/GrantStreetGroup/DBIx-BatchChunker.git
-version: '0.94'
-x_authority: cpan:GSG
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  repository: git://github.com/GrantStreetGroup/DBIx-BatchChunker.git
+version: v0.940.1
+x_generated_by_perl: v5.18.2
+x_serialization_backend: 'YAML::Tiny version 1.64'
+x_static_install: 1

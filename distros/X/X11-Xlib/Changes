@@ -1,5 +1,13 @@
 Revision history for Perl extension X11::Xlib.
 
+0.20 - 2020-05-25
+    - Fix XS double-free in unpacking ::Screen objects from Screen*
+      (affected XWindowAttributes->unpack)
+    - Improved XS API for unpacking structs to be able to find the
+      Display* ptr, in order to return cached objects more often.
+      (affects whether XWindowAttributes can return a cached ::Visual)
+    - Embed literal version into every module, not just set at runtime.
+
 0.19 - 2020-05-17
     - Detect lib paths needed for MacOS and OpenBSD
     - Fix warnings in XS code

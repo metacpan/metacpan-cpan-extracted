@@ -1,4 +1,4 @@
-# -*- perl -*-
+#!/usr/bin/perl
 
 # t/05.scalar.t - check scalar manipulation object
 
@@ -23,7 +23,6 @@ isa_ok( $s, 'Module::Generic::Scalar', 'Object after concatenation' );
 is( $s, "$str\n", 'Checking updated string object' );
 my $a1 = $s->clone( "Prefix; " );
 $a1 .= $s;
-# diag( "\$a1 is $a1" );
 my $s3 = Module::Generic::Scalar->new( 'A' );
 my $res = $s3 x 12;
 # diag( "$s3 x 12 = $res (" . ref( $res ) . ")" );
@@ -89,7 +88,60 @@ is( Module::Generic::Scalar->new( 'Hello world%%%%' )->rtrim( '%' ), 'Hello worl
 is( $s->clone->set( 'Bonjour' ), 'Bonjour', 'set' );
 isa_ok( $s->split( qr/[[:blank:]]+/ ), 'Module::Generic::Array', 'split -> array' );
 is( Module::Generic::Scalar->new( 'Hello Ms %s.' )->sprintf( 'Jones' ), 'Hello Ms Jones.', 'sprintf' );
+
 is( $s->substr( 2, 13 ), 'disapprove of', 'substr' );
 is( $s->substr( 2, 13, 'really do not approve' ), 'disapprove of', 'substr substituted part' );
 is( $s, 'I really do not approve what you say, but I will defend to the death your right to say it', 'substr -> substitution' );
+
+ok( $s->like( qr/\bapprove[[:blank:]\h]+what\b/ ), 'like' );
+
+my $undef = Module::Generic::Scalar->new( undef() );
+ok( defined( $undef ), 'Undefined variable object -> defined' );
+no warnings 'uninitialized';
+ok( !!defined( "$undef" ), 'Undefined variable object using stringification -> not undefined' );
+ok( !$undef->defined, 'Object value is undefined using method -> undefined' );
+my $var = 'test';
+$var = $s;
+isa_ok( $var, 'Module::Generic::Scalar', 'Regular var assigned becomes object' );
+my $var2 = "Je n'approuve rien";
+$s = $var2;
+ok( !ref( $s ), 'Object lose class after assignment' );
+my $obj = MyObject->new({ name => 'Dave', type => undef() });
+#$obj->name( 'Dave' );
+#$obj->type( undef() );
+# diag( "\$obj->name has value '" . $obj->name . "' (" . overload::StrVal( $obj->name ) . ")" );
+isa_ok( $obj->name, 'Module::Generic::Scalar', 'object field is a Module::Generic::Scalar object' );
+# diag( "\$obj->type is ref " . ref( $obj->type ) );
+# isa_ok( $obj->type, 'Module::Generic::Scalar', 'undef object field is also a Module::Generic::Scalar object' );
+# diag( "\$obj->type value is '" . $obj->type . "' (" . overload::StrVal( $obj->type ) . ") ref(" . ref( $obj->type ) . "). Defined ? " . ( defined( $obj->type ) ? 'yes' : 'no' ) );
+is( $obj->type, undef(), 'Test object type property is undef()' );
+is( $obj->name->uc, 'DAVE', 'Object chain method ok' );
+is( $obj->type->length, undef(), 'Chained, but eventually undef' );
+
+package MyObject;
+BEGIN
+{
+    use strict;
+    use warnings;
+    use parent qw( Module::Generic );
+};
+
+sub new
+{
+    my $this = shift( @_ );
+    my $hash = {};
+    $hash = shift( @_ );
+    return( bless( $hash => ( ref( $this ) || $this ) ) );
+}
+
+sub name { return( shift->_set_get_scalar_as_object( 'name', @_ ) ); }
+
+sub type { return( shift->_set_get_scalar_as_object( 'type', @_ ) ); }
+
+sub AUTOLOAD
+{
+    my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
+    my $self = shift( @_ ) || return;
+    return( $self->{ $method } );
+}
 

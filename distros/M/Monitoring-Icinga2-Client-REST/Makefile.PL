@@ -6,7 +6,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
         NAME => "Monitoring::Icinga2::Client::REST",
         ABSTRACT_FROM => "lib/Monitoring/Icinga2/Client/REST.pod",
-        AUTHOR => ['Johan Carlquist <jocar@su.se>','Mikael Nordin <mikael.nordin@su.se'],
+        AUTHOR => ['Johan Wassberg <jocar@su.se>','Mikael Nordin <mikael.nordin@su.se'],
         VERSION_FROM => "lib/Monitoring/Icinga2/Client/REST.pm",
         PREREQ_PM => {
                 "Carp" => 0,

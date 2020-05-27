@@ -25,3 +25,17 @@ v1.07	2017-06-24
 
 	- Increased MIN_PERL_VERSION in Makefile.PL to 5.10 because builds were failing on 5.8
 	- Replace require_ok() with plain 'use' in test scripts.
+
+v1.08	2020-05-25
+
+	- Add support for new algorithms PASSWORD_ARGON2I (PHP >= 7.2) and PASSWORD_ARGON2ID (PHP >= 7.3) for compatibility with latest PHP versions.
+	- Add password_algos() function that exists since PHP 7.4
+
+v1.09	2020-05-25
+
+	- Mention the new Argon2 algorithms in the documentation.
+	- Make minimal PHP version for unit tests 7.3.
+	- Only try to require Crypt::Argon2 when needed.
+
+v1.10	2020-05-26
+	- Add CONTRIBUTING.md

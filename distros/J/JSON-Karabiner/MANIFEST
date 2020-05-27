@@ -55,9 +55,12 @@ t/validity_checks/has_from.t
 weaver.ini
 xt/karabiner_generator_scripts/TEST_4_finger_swipes_file_name.pl
 xt/karabiner_generator_scripts/TEST_4_finger_swipes_new.pl
+xt/karabiner_generator_scripts/TEST_key_code_with_number.pl
 xt/karabiner_generator_scripts/expected_output/TEST_4_finger_swipes.json
 xt/karabiner_generator_scripts/expected_output/TEST_4_finger_swipes_file_name.json
 xt/karabiner_generator_scripts/expected_output/TEST_4_finger_swipes_new.json
+xt/karabiner_generator_scripts/expected_output/TEST_key_code_with_number.json
+xt/key_code_with_number.t
 xt/multiple_manips.t
 xt/override_dir.t
 xt/utility_funcs.pl

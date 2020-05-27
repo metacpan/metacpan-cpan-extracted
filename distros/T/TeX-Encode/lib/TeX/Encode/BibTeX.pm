@@ -1,6 +1,6 @@
 package TeX::Encode::BibTeX;
 
-our $VERSION = '2.008'; # VERSION
+our $VERSION = '2.009'; # VERSION
 
 use 5.008;
 use strict;
@@ -34,7 +34,7 @@ sub encode
 		/\G($TeX::Encode::charmap::CHAR_MAP_RE)/gc and ($tex .= '{'.$TeX::Encode::charmap::CHAR_MAP{$1}.'}', next);
 
 		# basic unreserved characters
-		/\G([\sa-zA-Z0-9\.,:;'"\(\)=\-\/\[\]\*\+]+)/gc and ($tex .= $1, next);
+		/\G([\sa-zA-Z0-9\.,:;'"\(\)=\-\/\[\]\*\+!]+)/gc and ($tex .= $1, next);
 		/\G([\x00-\x7e])/gc and ($tex .= $1, next);
 
 		/\G(.)/gc and ($tex .= '?', next);

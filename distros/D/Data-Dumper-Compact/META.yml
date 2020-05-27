@@ -18,12 +18,12 @@ no_index:
     - t
     - xt
 requires:
-  Mu::Tiny: '0'
+  Mu::Tiny: '0.000002'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Dumper-Compact
   license: http://dev.perl.org/licenses/
   repository: https://github.com/shadow-dot-cat/Data-Dumper-Compact.git
-version: '0.005000'
+version: '0.005001'
 x_authority: cpan:MSTROUT
 x_breaks: {}
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -10,7 +10,7 @@ use Tag::Reader::Perl;
 use PYX qw(comment end_element char instruction start_element);
 use PYX::Utils qw(decode entity_decode);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -75,7 +75,7 @@ sub parsefile {
 			if ($data =~ s/\/$//ms) {
 				$end = 1;
 			}
-			(my $element, $data) = ($data =~ m/^([^\s]+)\s*(.*?)$/ms);
+			(my $element, $data) = ($data =~ m/^([^\s]+)\s*(.*)$/ms);
 			my @attrs = $self->_parse_attributes($data);
 			$self->{'output'}->(start_element($element, @attrs));
 			if ($end) {
@@ -116,13 +116,13 @@ sub _parse_attributes {
 	while ($data) {
 
 		# <example par="val"> or <example par = "val">
-		if ($data =~ m/^([_\w:][\.\-\w:]*)\s*=\s*"(.*?)"\s*(.*?)$/ms
+		if ($data =~ m/^([_\w:][\.\-\w:]*)\s*=\s*"(.*?)"\s*(.*)$/ms
 
 			# <example par='val'> or <example par = 'val'>
-			|| $data =~ m/^([_\w:][\.\-\w:]*)\s*=\s*'(.*?)'\s*(.*?)$/ms
+			|| $data =~ m/^([_\w:][\.\-\w:]*)\s*=\s*'(.*?)'\s*(.*)$/ms
 
 			# <example par=foo> or <example par = foo >.
-			|| $data =~ m/^([_\w:][\.\-\w:]*)\s*=\s*([^\s]+)\s*(.*?)$/ms) {
+			|| $data =~ m/^([_\w:][\.\-\w:]*)\s*=\s*([^\s]+)\s*(.*)$/ms) {
 
 			push @attrs, $1, $2;
 			$data = $3;
@@ -133,7 +133,7 @@ sub _parse_attributes {
 			$data = '';
 
 		# <example checked>
-		} elsif ($data =~ m/^([_\w:][\.\-\w:]*)\s*(.*?)$/ms) {
+		} elsif ($data =~ m/^([_\w:][\.\-\w:]*)\s*(.*)$/ms) {
 			push @attrs, $1, $1;
 			$data = $2;
 		} else {
@@ -279,6 +279,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

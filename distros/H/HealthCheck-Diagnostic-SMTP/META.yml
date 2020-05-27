@@ -20,7 +20,7 @@ name: HealthCheck-Diagnostic-SMTP
 provides:
   HealthCheck::Diagnostic::SMTP:
     file: lib/HealthCheck/Diagnostic/SMTP.pm
-    version: v0.0.3
+    version: v0.0.4
 requires:
   HealthCheck::Diagnostic: '0'
   Net::SMTP: '0'
@@ -30,7 +30,7 @@ requires:
 resources:
   bugtracker: https://github.com/GrantStreetGroup/p5-HealthCheck-Diagnostic-SMTP/issues
   repository: git://github.com/GrantStreetGroup/p5-HealthCheck-Diagnostic-SMTP.git
-version: v0.0.3
+version: v0.0.4
 x_generated_by_perl: v5.30.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

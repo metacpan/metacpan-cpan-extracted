@@ -27,6 +27,7 @@
             "Data::Object::ClassHas" : "2.01",
             "Data::Object::Data" : "2.02",
             "Data::Object::Opts" : "2.00",
+            "Data::Object::Space" : "2.07",
             "Data::Object::Types" : "0.04",
             "Data::Object::Vars" : "2.01",
             "perl" : "5.014",
@@ -43,6 +44,7 @@
             "Data::Object::ClassHas" : "2.01",
             "Data::Object::Data" : "2.02",
             "Data::Object::Opts" : "2.00",
+            "Data::Object::Space" : "2.07",
             "Data::Object::Types" : "0.04",
             "Data::Object::Vars" : "2.01",
             "Test::Auto" : "0.12",
@@ -66,7 +68,7 @@
          "web" : "https://github.com/iamalnewkirk/data-object-cli"
       }
    },
-   "version" : "2.02",
+   "version" : "2.03",
    "x_authority" : "cpan:AWNCORP",
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",

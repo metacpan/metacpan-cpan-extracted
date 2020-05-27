@@ -58,10 +58,11 @@ t/27window-input.t
 t/28window-float.t
 t/29window-dragndrop.t
 t/80tickit.t
-t/81tickit-input.t
+t/81tickit-io.t
 t/82tickit-timer.t
 t/83tickit-later.t
-t/84tickit-widget.t
+t/84tickit-term-input.t
+t/85tickit-widget.t
 t/89tickit-test.t
 t/90rt101716.t
 t/99pod.t

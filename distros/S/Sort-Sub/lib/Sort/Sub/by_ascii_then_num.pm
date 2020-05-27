@@ -1,9 +1,9 @@
 package Sort::Sub::by_ascii_then_num;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-28'; # DATE
+our $DATE = '2020-05-25'; # DATE
 our $DIST = 'Sort-Sub'; # DIST
-our $VERSION = '0.118'; # VERSION
+our $VERSION = '0.120'; # VERSION
 
 use 5.010;
 use strict;
@@ -66,7 +66,7 @@ Sort::Sub::by_ascii_then_num - Sort non-numbers (sorted asciibetically) before n
 
 =head1 VERSION
 
-This document describes version 0.118 of Sort::Sub::by_ascii_then_num (from Perl distribution Sort-Sub), released on 2020-02-28.
+This document describes version 0.120 of Sort::Sub::by_ascii_then_num (from Perl distribution Sort-Sub), released on 2020-05-25.
 
 =for Pod::Coverage ^(gen_sorter|meta)$
 

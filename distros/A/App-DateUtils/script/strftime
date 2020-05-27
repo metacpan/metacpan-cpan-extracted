@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/DateUtils/strftime
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
+# and generated automatically using Perinci::CmdLine::Gen version 0.495
 
-our $DATE = '2020-01-31'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-30'; # DATE
 our $DIST = 'App-DateUtils'; # DIST
-our $VERSION = '0.125'; # VERSION
+our $VERSION = '0.126'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +38,7 @@ strftime - Format date using strftime()
 
 =head1 VERSION
 
-This document describes version 0.125 of strftime (from Perl distribution App-DateUtils), released on 2020-01-31.
+This document describes version 0.126 of strftime (from Perl distribution App-DateUtils), released on 2020-03-30.
 
 =head1 SYNOPSIS
 
@@ -50,12 +51,12 @@ Examples:
 Format current time as yyyy-mm-dd:
 
  % strftime %Y-%m-%d
- 2020-01-31
+ 2020-03-30
 
 Format a specific time as yyyy-mm-dd:
 
  % strftime %Y-%m-%d tomorrow
- 2020-02-01
+ 2020-03-31
 
 =head1 OPTIONS
 

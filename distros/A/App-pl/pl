@@ -6,7 +6,7 @@ use v5.10;
 
 our( $VERSION, $A, @A );
 BEGIN {
-    $VERSION = '0.51';
+    $VERSION = '0.51.1';
     *A = *ARGV;
     my $execed = shift if @A && $A[0] eq '+';
     return unless @A and $A[0] =~ /^-/s;
@@ -728,20 +728,23 @@ pl - Swiss Army Knife of Perl One-Liners
 Just one small script extends C<perl -E> with many bells & whistles: Various
 one-letter commands & magic variables (with meaningful aliases too) and more
 nifty loop options take Perl programming to the command line.  List::Util is
-fully imported.  Unless you pass a program on the command line, starts a
-simple Perl Shell.
+fully imported.  If you pass no program on the command line, starts a simple
+Perl Shell.
 
 How to C<e(cho)> values, including from C<@A(RGV)>, with single C<$q(uote)> &
 double C<$Q(uote)>.  Same for hard-to-print values:
 
+    pl 'echo "${quote}Perl$quote", "$Quote@ARGV$Quote"' one liner
     pl 'e "${q}Perl$q", "$Q@A$Q"' one liner
+
+    pl 'echo \"Perl", \@ARGV, undef' one liner
     pl 'e \"Perl", \@A, undef' one liner
 
 Print up to 3 matching lines, resetting count (and C<$.>) for each file:
 
     pl -rP3 '/Perl.*one.*liner/' file1 file2 file3
 
-Loop over args, printing each with line ending.  And same, shouting:
+Loop over args, printing each with line ending.  And same, SHOUTING:
 
     pl -opl '' Perl one liner
     pl -opl '$_ = uc' Perl one liner
@@ -753,17 +756,14 @@ Count hits in magic statistics hash C<%n(umber)>:
 Even though the point here is to make things even easier, most Perl one-liners
 from the internet work, just by omitting C<-e> or C<-E>.  Known minor
 differences are: don't C<goto LINE>, but C<next LINE> is fine.  In B<-n>
-C<last> goes straight to the next file instead of being like C<exit>.  And
+C<last> goes straight to the next file instead of behaving like C<exit>.
+Using C<pop>, etc. to implicitly modify C<@A(RGV)> works in B<-b> begin code,
+but not in your main program (which gets compiled to a function.  And
 shenanigans with unbalanced braces won't work.
 
-Windows note: Do yourself a favour and get a real Shell, e.g. from Cygwin or
-MSYS.  Any help for getting this to work in PowerShell is welcome!  If you
-can't avoid command.com or cmd.exe, you will have to first convert all inner
-quotes to C<qq>.  Then convert the outer single quotes to double quotes:
-
-    pl "e qq{${q}Perl$q}, qq{$Q@A$Q}" one liner
-
 =head1 DESCRIPTION
+
+I<Don't believe everything you read on the internet^H^H^H SourceForge! -- Aristotle ;-)>
 
 Pl follows Perl's philosophy for one-liners: the one variable solely used in
 one-liners, C<@F>, is single-lettered.  Because not everyone may like that, Pl
@@ -773,12 +773,15 @@ letter, including Perl's own C<@F> & C<*ARGV>.
 C<-b> doesn't do a C<BEGIN> block.  Rather it is in the same scope as your main
 PERLCODE.  So you can use it to initialise C<my> variables.  Whereas, if you
 define a my variable in a B<-n>, B<-p>, B<-o> or B<-O> loop, it's a new
-variable each time.  This echoes "a c" because -e emulates an B<END> block, as
+variable each time.  This echoes "a c" because -e emulates an C<END> block, as
 a closure of the first C<$inner> variable:
 
     pl -Ob 'my $outer'  -e 'echo $inner, $outer'  'my $inner = $outer = $ARGV' a b c
+    pl -Ob 'my $outer'  -e 'e $inner, $outer'  'my $inner = $outer = $A' a b c
 
 =head1 EXAMPLES
+
+I<To steal ideas from one person is plagiarism.  To steal from many is research. ;-)>
 
 Only some of these are original.  Many have been adapted from the various Perl
 one-liner pages on the internet.  This is no attempt to appropriate ownership,
@@ -786,84 +789,47 @@ just to show how things are even easier and more concise with pl.
 
 All examples use the long names and are repeated for short names, where applicable.
 
-=head2 Looking at Perl
+=head2 Dealing with Files
 
 =over
 
-=item VERSION of a File
+=item Delete matching files, except last one
 
-Print the first line where the substitution was successful:
+If you have many files, which sort chronologically by name, and you want to
+keep only the last one, it can be quite painful to formulate Shell patterns.
+So check on each iteration of the B<-o> loop, if the index C<$ARGIND> (or
+C<$I>) is less than the last, before unlinking (deleting).  If you want to test
+it first, replace C<unlink> with C<echo> or C<e>:
 
-    pl -P1 's/.+\bVERSION\s*=\s*[v$Quote$quote]([0-9.]+).+/$1/' pl
-    pl -P1 's/.+\bVERSION\s*=\s*[v$Q$q]([0-9.]+).+/$1/' pl
+    pl -o 'unlink if $ARGIND < $#ARGV' file*
+    pl -o 'unlink if $I < $#A' file*
 
-For multple files, add the filename, and reset B<-P> count for each file:
+If your resulting list is too long for the Shell, let Perl do it.  Beware that
+the Shell has a clever ordering of files, while Perl does it purely lexically!
+In the B<-b> begin code the result is assigned to C<@A(RGV)>, as though it had
+come from the command line.  This list is then popped (shortened), instead of
+checking each time.  Since the program doesn't contain special characters, you
+don't even need to quote it:
 
-    pl -rP1 's/.+\bVERSION\s*=\s*[v$Quote$quote]([0-9.]+).+/$ARGV: $1/' *.pm
-    pl -rP1 's/.+\bVERSION\s*=\s*[v$Q$q]([0-9.]+).+/$A: $1/' *.pm
+    pl -ob '@ARGV = <file*>; pop' unlink
+    pl -ob '@A = <file*>; pop' unlink
 
-=item Only POD or non-POD
+You can exclude files by any other criterion as well:
 
-You can extract either parts of a Perl file, with these commands.  Note that
-they don't take the empty line before into account.  If you want that, and
-you're sure the files adheres strictly to this convention, use the option
-B<-00P> instead (not exactly as desired, the empty line comes after things,
-but still, before next thing).  If you want only the 1st POD (e.g. NAME &
-SYNOPSIS) use the option B<-P1> or B<-00P1>:
-
-    pl -P '/^=\w/../^=cut/' file
-    pl -P 'not /^=\w/../^=cut/' file
-
-=item Content of a Package
-
-Pl's C<e(cho)> can print any item.  Packages are funny hashes, with two colons
-at the end.  Backslashing the variable passes it as a unit to C<Data::Dumper>,
-which gets loaded on demand in this case.  Otherwise all elements would come
-out just separated by spaces:
-
-    pl 'echo \%List::Util::'
-    pl 'e \%List::Util::'
-
-=item Library Loading
-
-Where does perl load from, and what exactly has it loaded?
-
-    pl 'echo \@INC, \%INC'
-    pl 'e \@INC, \%INC'
-
-Same, for a different Perl version, e.g. if you have F<perl5.20.0> in your
-path:
-
-    pl -V5.20.0 'echo \@INC, \%INC'
-    pl -V5.20.0 'e \@INC, \%INC'
-
-=item Configuration
-
-You get C<%Config::Config> loaded on demand and returned by C<c(onfig)>:
-
-    pl 'echo config'
-    pl 'e c'
-
-It returns a hash reference, from which you can lookup an entry:
-
-    pl 'echo config->{sitelib}'
-    pl 'e c->{sitelib}'
-
-You can also return a sub-hash, of only the keys matching any regexps you
-pass:
-
-    pl 'echo config "random", qr/stream/'
-    pl 'e c "random", qr/stream/'
+    pl -ob '@ARGV = grep !/keep-me/, <file*>' unlink
+    pl -ob '@A = grep !/keep-me/, <file*>' unlink
 
 =back
 
 =head2 File statistics
 
+I<42% of statistics are made up! :-)>
+
 =over
 
 =item Count files per suffix
 
-Find and pl both use the B<0> option to allow funny filenames, including
+Find and pl both use the B<-0> option to allow funny filenames, including
 newlines.  Sum up encountered suffixes in sort-value-numerically-at-end hash
 C<%n(umber)>:
 
@@ -874,8 +840,8 @@ C<%n(umber)>:
 
 =item Count files per directory per suffix
 
-Match to last / & after a dot following something, i.e. not just a dot-file.
-"" is the suffix for suffixless files.  Stores in
+Match to last C</> and after a dot following something, i.e. not just a dot-file.
+C<""> is the suffix for suffixless files.  Stores in
 sort-by-key-and-stringify-at-end C<%s(tring)>.  So count in a nested hash of
 directory & suffix:
 
@@ -939,12 +905,13 @@ sort-value-numerically-at-end hash C<%n(umber)>:
 
 =item Count files per date with rollup
 
-todo
-Rollup means, additionally to the previous case
-The trick here is to count both for the actual year, month and day, as well as
-replacing once only the day, once also the month with "__",and once also the
-year with "____".  This sorts after numbers and gives a sum for all with the
-same leading numbers.
+I<Learn sign language!  It's very handy. :-)>
+
+Rollup means, additionally to the previous case, sum up dates with the same
+prefix.  The trick here is to count both for the actual year, month and day,
+as well as replacing once only the day, once also the month with "__",and once
+also the year with "____".  This sorts after numbers and gives a sum for all
+with the same leading numbers.  Use the sort-by-key-at-end hash C<%s(tring)>:
 
     find -printf '%TY-%Tm-%Td\n' |
         pl -ln '++$string{$_}; ++$string{$_} while s/[0-9]+(?=[-_]*$)/"_" x length $&/e'
@@ -955,8 +922,10 @@ same leading numbers.
 
 =head2 Diff several inputs by a unique key
 
+I<Always remember you're unique, just like everyone else. :-)>
+
 The function C<k(eydiff)> stores the 2nd arg or chomped C<$_> in C<%k(eydiff)>
-keyed by 1st arg or C<$1> and the arg counter C<$ARGIND> or C<$I>.  Its
+keyed by 1st arg or C<$1> and the arg counter C<$ARGIND> (or C<$I>).  Its
 sibling C<K(eydiff)> does the same using 1st arg or 0 as an index into C<@F(IELD)>
 for the 1st part of the key.  At the end only the rows differing between files
 are shown.  If you specify B<--color> and have C<Algorithm::Diff> the exact
@@ -967,8 +936,8 @@ difference gets color-highlighted.
 =item Diff several csv, tsv or passwd files by 1st field
 
 This assumes no comma in key field and no newline in any field.  Else you need
-a csv-parser package.  B<-F> implies B<-a>, which implies B<-n> (even before
-Perl 5.20, which introduced this idea):
+a csv-parser package.  B<-F> implies B<-a>, which implies B<-n> (even using
+older than Perl 5.20, which introduced this idea):
 
     pl -F, Keydiff *.csv
     pl -F, K *.csv
@@ -982,17 +951,19 @@ repeated for each file:
 A variant of csv is tsv, with tab as separator.  Tab is C<\t>, which must be
 escaped from the Shell as C<\\t>:
 
-    pl -anF\\t Keydiff *.tsv
+    pl -F\\t Keydiff *.tsv
+    pl -F\\t K *.tsv
+
     pl -n 'keydiff if s/(.+?)\t//' *.tsv
-    pl -anF\\t K *.tsv
     pl -n 'k if s/(.+?)\t//' *.tsv
 
 The same, with a colon as separator, if you want to compare passwd files from
 several hosts:
 
-    pl -anF: Keydiff /etc/passwd passwd*
+    pl -F: Keydiff /etc/passwd passwd*
+    pl -F: K /etc/passwd passwd*
+
     pl -n 'keydiff if s/(.+?)://' /etc/passwd passwd*
-    pl -anF: K /etc/passwd passwd*
     pl -n 'k if s/(.+?)://' /etc/passwd passwd*
 
 =item Diff several zip archives by member name
@@ -1014,7 +985,7 @@ but still differ by date.  This excludes the date:
 =item Diff several tarballs by member name
 
 This is like the zip example.  But tar gives no checksum, so this is not very
-reliable.  Each time a wider file size was seen columns shift right.  Reformat
+reliable.  Each time a wider file size was seen, columns shift right.  Reformat
 the columns, so this doesn't show up as a difference:
 
     pl -o 'piped { s/^\S+ \K(.+?) +(\d+) (.{16}) (.+)/sprintf "%-20s %10d %s", $1, $2, $3/e; keydiff $4 } "tar", "-tvf", $_' *.tar *.tgz *.txz
@@ -1044,17 +1015,124 @@ numbers may change:
 
 =back
 
+=head2 Looking at Perl
+
+I<A pig looking at an electric socket:  "Oh no, who put you into that wall?" :)>
+
+=over
+
+=item VERSION of a File
+
+Print the first line (B<-P1>) where the substitution was successful.  To avoid
+the hassle of protecting them from (sometimes multiple levels of) Shell
+quoting, there are variables for single C<$q(uote)> & double C<$Q(uote)>:
+
+    pl -P1 's/.+\bVERSION\s*=\s*[v$Quote$quote]([0-9.]+).+/$1/' pl
+    pl -P1 's/.+\bVERSION\s*=\s*[v$Q$q]([0-9.]+).+/$1/' pl
+
+For multple files, add the filename, and reset (B<-r>) the B<-P> count for each
+file:
+
+    pl -rP1 's/.+\bVERSION\s*=\s*[v$Quote$quote]([0-9.]+).+/$ARGV: $1/' *.pm
+    pl -rP1 's/.+\bVERSION\s*=\s*[v$Q$q]([0-9.]+).+/$A: $1/' *.pm
+
+=item Only POD or non-POD
+
+You can extract either parts of a Perl file, with these commands.  Note that
+they don't take the empty line before into account.  If you want that, and
+you're sure the files adheres strictly to this convention, use the option
+B<-00P> instead (not exactly as desired, the empty line comes after things,
+but still, before next thing).  If you want only the 1st POD (e.g. NAME &
+SYNOPSIS) use the option B<-P1> or B<-00P1>:
+
+    pl -P '/^=\w/../^=cut/' file
+
+    pl -P 'not /^=\w/../^=cut/' file
+
+=item Count Perl Code
+
+This makes C<__DATA__> or C<__END__> the last inspected line of (unlike in
+C<perl -n>!) each file.  It strips any comment (not quite reliably, also
+inside a string).  Then it strips leading whitespace and adds the remaining
+length to print-at-end C<$r(esult)>:
+
+    pl -ln 'last if /^__(?:DATA|END)__/; s/(?:^|\s+)#.*//s; s/^\s+//; $result += length' *.pm
+    pl -ln 'last if /^__(?:DATA|END)__/; s/(?:^|\s+)#.*//s; s/^\s+//; $r += length' *.pm
+
+If you want the count per file, instead of C<$r(esult)> use either
+sort-lexically C<$string{$ARGV}> (or C<$s{$A}>) or sort-numerically
+C<$number{$ARGV}> (or C<$n{$A}>).
+
+=item Content of a Package
+
+Pl's C<e(cho)> can print any item.  Packages are funny hashes, with two colons
+at the end.  Backslashing the variable passes it as a unit to C<Data::Dumper>,
+which gets loaded on demand in this case.  Otherwise all elements would come
+out just separated by spaces:
+
+    pl 'echo \%List::Util::'
+    pl 'e \%List::Util::'
+
+=item Library Loading
+
+Where does perl load from, and what exactly has it loaded?
+
+    pl 'echo \@INC, \%INC'
+    pl 'e \@INC, \%INC'
+
+Same, for a different Perl version, e.g. if you have F<perl5.20.0> in your
+path:
+
+    pl -V5.20.0 'echo \@INC, \%INC'
+    pl -V5.20.0 'e \@INC, \%INC'
+
+=item Configuration
+
+You get C<%Config::Config> loaded on demand and returned by C<c(onfig)>:
+
+    pl 'echo config'
+    pl 'e c'
+
+It returns a hash reference, from which you can lookup an entry:
+
+    pl 'echo config->{sitelib}'
+    pl 'e c->{sitelib}'
+
+You can also return a sub-hash, of only the keys matching any regexps you
+pass:
+
+    pl 'echo config "random", qr/stream/'
+    pl 'e c "random", qr/stream/'
+
+=back
+
 =head2 Tables
 
 =over
 
-=item ANSI foreground;background colour table
+=item ISO paper sizes
 
-How to generate a table, hardly a one-liner...  You get numbers to fill into
-C<"\e[FGm">, C<"\e[BGm"> or C<"\e[FG;BGm"> to get a colour and close it with
-C<"\e[m">.  There are twice twice 8 different colors for dim & bright and for
-foreground & background.  Hence the multiplication of escape codes and of
-values to fill them.
+I<ISO replaced 8 standards by one.  Now we have 9 standards. :-(>
+
+Can't put the A into the format, because 10 is wider.  Uses Perl's lovely list
+assignment to swap and alternately halve the numbers.  Because halving happens
+before echoing, start with double size:
+
+    pl '($w, $h) = (1189, 1682); echof "%3s  %4dmm x %4dmm", "A$_", ($w, $h) = ($h / 2, $w) for 0..10'
+    pl '($w, $h) = (1189, 1682); f "%3s  %4dmm x %4dmm", "A$_", ($w, $h) = ($h / 2, $w) for 0..10'
+
+The table could easily be widened to cover B- & C-formats, by extending each
+list of 2, to an appropriate list of 6, e.g. C<($Aw, $Ah, $Bw, ...)>.
+
+=item ANSI foreground;background color table
+
+I<If at first you don't succeed, destroy all evidence that you tried! ;-)>
+
+What a table, hardly a one-liner...  You get numbers to fill into C<"\e[FGm">,
+C<"\e[BGm"> or C<"\e[FG;BGm"> to get a color and close it with C<"\e[m">.
+There are twice twice 8 different colors for dim & bright and for foreground &
+background.  Hence the multiplication of escape codes and of values to fill
+them.
 
 This fills C<@A(RGV)> in C<-b>, as though it had been given on the command
 line.  It maps it to the 16fold number format to print the header.  Then the
@@ -1065,7 +1143,7 @@ sequence, once to be displayed:
     pl -Ob '@ARGV = map +($_, $_+8), 1..8; f "co:  fg;bg"."%5d"x16, @ARGV' \
         'echof "%2d:  \e[%dm%d;   ".("\e[%dm%4d "x16)."\e[m", $A, ($A + ($A > 8 ? 81 : 29))x2, map +(($_)x2, ($_+60)x2), 40..47'
     pl -Ob '@A = map +($_, $_+8), 1..8; f "co:  fg;bg"."%5d"x16, @A' \
-        'ef "%2d:  \e[%dm%d;   ".("\e[%dm%4d "x16)."\e[m", $A, ($A + ($A > 8 ? 81 : 29))x2, map +(($_)x2, ($_+60)x2), 40..47'
+        'f "%2d:  \e[%dm%d;   ".("\e[%dm%4d "x16)."\e[m", $A, ($A + ($A > 8 ? 81 : 29))x2, map +(($_)x2, ($_+60)x2), 40..47'
 
 This does exactly the same, but explicitly loops over lists C<@co & @bg>:
 
@@ -1073,8 +1151,8 @@ This does exactly the same, but explicitly loops over lists C<@co & @bg>:
         echof "co:  fg;bg"."%5d"x16, @co;
         echof "%2d:  \e[%dm%d;   ".("\e[%dm%4d "x16)."\e[m", $_, ($_ + ($_ > 8 ? 81 : 29))x2, @bg for @co'
     pl '@co = map +($_, $_+8), 1..8; @bg = map +(($_)x2, ($_+60)x2), 40..47;
-        ef "co:  fg;bg"."%5d"x16, @co;
-        ef "%2d:  \e[%dm%d;   ".("\e[%dm%4d "x16)."\e[m", $_, ($_ + ($_ > 8 ? 81 : 29))x2, @bg for @co'
+        f "co:  fg;bg"."%5d"x16, @co;
+        f "%2d:  \e[%dm%d;   ".("\e[%dm%4d "x16)."\e[m", $_, ($_ + ($_ > 8 ? 81 : 29))x2, @bg for @co'
 
 =back
 
@@ -1082,7 +1160,22 @@ This does exactly the same, but explicitly loops over lists C<@co & @bg>:
 
 =over
 
-=item Split up numbers with commas, dots or underscores
+=item Math
+
+I<2 + 2 = 5 for extremely large values of 2. :-)>
+
+With the C<big*> modules you can do arbitrary precision math:
+
+    pl -Mbignum 'echo 123456789012345678901234567890 * 123456789012345678901234567890'
+    pl -Mbignum 'e 123456789012345678901234567890 * 123456789012345678901234567890'
+
+    pl -Mbignum 'echo 1.23456789012345678901234567890 * 1.23456789012345678901234567890'
+    pl -Mbignum 'e 1.23456789012345678901234567890 * 1.23456789012345678901234567890'
+
+    pl -Mbigrat 'echo 1/23456789012345678901234567890 * 1/23456789012345678901234567890'
+    pl -Mbigrat 'e 1/23456789012345678901234567890 * 1/23456789012345678901234567890'
+
+=item Separate big numbers with commas, dots or underscores
 
 Loop and print with line-end (B<-opl>) over remaining args in C<$_>.  If
 reading from stdin or files, instead of arguments, use only B<-pl>.  After a
@@ -1096,6 +1189,7 @@ The same for languages with a decimal comma, using either a dot or a space as sp
 
     pl -opl '1 while s/[,.]\d{3}\K(?=\d)/./; 1 while s/\d\K(?=\d{3}(?:$|[.,]))/./' \
         12345678 12345678 1234567890 1234,5678 3,141 3,141592653589
+
     pl -opl '1 while s/[, ]\d{3}\K(?=\d)/ /; 1 while s/\d\K(?=\d{3}(?:$|[ ,]))/ /' \
         12345678 12345678 1234567890 1234,5678 3,141 3,141592653589
 
@@ -1106,10 +1200,13 @@ The same for Perl style output:
 
 =item Generate a random UUID
 
-This gives a hex number with the characteristic pattern of dashes:
+I<Lottery: a tax on people who are bad at math. :-)>
+
+This gives a hex number with the characteristic pattern of dashes.  The hex
+format takes only the integral parts of the random numbers:
 
     pl '$x = "%04x"; echof "$x$x-$x-$x-$x-$x$x$x", map rand 0x10000, 0..7'
-    pl '$x = "%04x"; ef "$x$x-$x-$x-$x-$x$x$x", map rand 0x10000, 0..7'
+    pl '$x = "%04x"; f "$x$x-$x-$x-$x-$x$x$x", map rand 0x10000, 0..7'
 
 To be RFC 4122 conformant, the 4 version & 2 variant bits need to have
 standard values.  Note that Shell strings can span more than one line:
@@ -1117,9 +1214,11 @@ standard values.  Note that Shell strings can span more than one line:
     pl '@u = map rand 0x10000, 0..7; ($u[3] /= 16) |= 0x4000; ($u[4] /= 4) |= 0x8000;
         $x = "%04x"; echof "$x$x-$x-$x-$x-$x$x$x", @u'
     pl '@u = map rand 0x10000, 0..7; ($u[3] /= 16) |= 0x4000; ($u[4] /= 4) |= 0x8000;
-        $x = "%04x"; ef "$x$x-$x-$x-$x-$x$x$x", @u'
+        $x = "%04x"; f "$x$x-$x-$x-$x-$x$x$x", @u'
 
 =item DNS lookup
+
+I<What do you call a sheep with no legs?  A cloud. *,=,>
 
 The C<h(osts)> function deals with the nerdy C<gethost...> etc. and outputs as
 a hosts file.  The file is sorted by address type (localhost, link local,
@@ -1128,20 +1227,44 @@ IP-addresses or hostnames, either as Perl arguments or on the command-line via
 C<@A(RGV)>:
 
     pl 'hosts qw(perl.org 127.0.0.1 perldoc.perl.org cpan.org)'
-    pl 'hosts @ARGV' perl.org 127.0.0.1 perldoc.perl.org cpan.org
     pl 'h qw(perl.org 127.0.0.1 perldoc.perl.org cpan.org)'
+
+    pl 'hosts @ARGV' perl.org 127.0.0.1 perldoc.perl.org cpan.org
     pl 'h @A' perl.org 127.0.0.1 perldoc.perl.org cpan.org
 
 If you don't want it to be sorted, call C<h(osts)> for individual addresses:
 
     pl 'hosts for qw(perl.org 127.0.0.1 perldoc.perl.org cpan.org)'
-    pl -o hosts perl.org 127.0.0.1 perldoc.perl.org cpan.org
     pl 'h for qw(perl.org 127.0.0.1 perldoc.perl.org cpan.org)'
+
+    pl -o hosts perl.org 127.0.0.1 perldoc.perl.org cpan.org
     pl -o h perl.org 127.0.0.1 perldoc.perl.org cpan.org
 
-If your input comes from a file, collect it in a list and perform at end:
+If your input comes from a file, collect it in a list and perform at end (B<-e>):
 
     pl -lne 'hosts @list' 'push @list, $_' file
     pl -lne 'h @list' 'push @list, $_' file
 
 =back
+
+=head1 COMPATIBILITY
+
+Even if it is rarer nowadays, Perl 5.10 is still found out in the wild.  Pl
+tries to accomodate it gracefully, falling back to what works.  Printed
+data-structures will be formatted with a wide margin and C<h(osts)> will find
+the less IPv6 resolutions, the older your Perl.
+
+=head2 Windows Notes
+
+Do yourself a favour and get a real Shell, e.g. from Cygwin or
+MSYS!  If you can't avoid command.com or cmd.exe, you will have to first
+convert all inner quotes to C<qq>.  Then convert the outer single quotes to
+double quotes:
+
+    pl "echo qq{${quote}Perl$quote}, qq{$Quote@A$Quote}" one liner
+    pl "e qq{${q}Perl$q}, qq{$Q@A$Q}" one liner
+
+Any help for getting this to work in PowerShell is welcome!  While the old
+Windows 10 terminal understands Ansi escape sequences, it makes it horribly
+hard to activate them.  So they are off by default, requiring B<--color> to
+override that choice.

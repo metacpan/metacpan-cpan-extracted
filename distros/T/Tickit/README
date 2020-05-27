@@ -36,14 +36,6 @@ DESCRIPTION
     a supporting terminal as well). It also supports having multiple
     instances and non-blocking or asynchronous control.
 
-    At the current version, this is a Perl distribution which contains and
-    XS and C implementation of the lower levels (Tickit::Term and
-    Tickit::Pen), and implements the higher levels (Tickit::Window and
-    Tickit::Widget) in pure perl. The XS parts are supported by libtickit,
-    either from the installed library, or using a bundled copy compiled at
-    build time. It is intended that eventually the Window layer will be
-    rewritten in XS and C instead.
-
 CONSTRUCTOR
 
  new
@@ -80,6 +72,43 @@ CONSTRUCTOR
       are stll available after the program has finished.
 
 METHODS
+
+ watch_io
+
+       $id = $tickit->watch_io( $fh, $cond, $code )
+
+    Since version 0.71.
+
+    Runs the given CODE reference at some point in the future, when IO
+    operations are possible on the given filehandle. $cond should be a
+    bitmask of at least one of the IO_IN, IO_OUT or IO_HUP constants
+    describing which kinds of IO operation the callback is interested in.
+
+    Returns an opaque integer value that may be passed to "watch_cancel".
+    This value is safe to ignore if not required.
+
+    When invoked, the callback will receive an event parameter which will
+    be an instances of a type with a field called cond. This will contain
+    the kinds of IO operation that are currently possible.
+
+       $code->( $info )
+    
+       $current_cond = $info->cond;
+
+    For example, to watch for both input and hangup conditions and respond
+    to each individually:
+
+       $tickit->watch_io( $fh, Tickit::IO_IN|Tickit::IO_HUP,
+          sub {
+             my ( $info ) = @_;
+             if( $info->cond & Tickit::IO_IN ) {
+                ...
+             }
+             if( $info->cond & Tickit::IO_HUP ) {
+                ...
+             }
+          }
+       );
 
  watch_later
 

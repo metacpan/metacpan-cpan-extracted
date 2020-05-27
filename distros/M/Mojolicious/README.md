@@ -5,7 +5,7 @@
   </a>
 </p>
 
- # [![Build Status](https://travis-ci.com/mojolicious/mojo.svg?branch=master)](https://travis-ci.com/mojolicious/mojo) [![Windows build status](https://ci.appveyor.com/api/projects/status/b748ehchfsd4edac?svg=true)](https://ci.appveyor.com/project/kraih73737/mojo)
+ [![](https://github.com/mojolicious/mojo/workflows/linux/badge.svg)](https://github.com/mojolicious/mojo/actions) [![](https://github.com/mojolicious/mojo/workflows/macos/badge.svg)](https://github.com/mojolicious/mojo/actions) [![](https://github.com/mojolicious/mojo/workflows/windows/badge.svg)](https://github.com/mojolicious/mojo/actions)
 
   Mojolicious is a fresh take on Perl web development, based on years of
   experience developing the Catalyst framework, and utilizing the latest
@@ -41,7 +41,7 @@
       highly scalable web services.
     * JSON and HTML/XML parser with CSS selector support.
   * Very clean, portable and object-oriented pure-Perl API with no hidden
-    magic and no requirements besides Perl 5.26.0 (versions as old as 5.10.1
+    magic and no requirements besides Perl 5.26.0 (versions as old as 5.16.0
     can be used too, but may require additional CPAN modules to be installed)
   * Fresh code based upon years of experience developing
     [Catalyst](http://www.catalystframework.org), free and open source.

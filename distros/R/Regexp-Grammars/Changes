@@ -518,3 +518,15 @@ Revision history for Regexp-Grammars
 
     * Fixed bug in parsing (??{...}) constructs
       (thanks Hugo)
+
+
+1.056  Fri May 22 20:46:21 2020
+
+    * Silenced 'undefined' warning from context-string tracking
+      (thanks Hugo)
+
+
+1.057  Fri May 22 22:06:11 2020
+
+    * Fixed a very subtle bug with automatic whitespace matching under <debug: on>
+      (thanks, Malan!)

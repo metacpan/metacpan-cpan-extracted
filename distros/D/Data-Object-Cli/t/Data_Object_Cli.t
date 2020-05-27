@@ -37,6 +37,7 @@ method: main
 method: okay
 method: run
 method: spec
+method: subs
 
 =cut
 
@@ -478,6 +479,55 @@ spec() : HashRef[HashRef]
 
 =cut
 
+=method subs
+
+The subs method works in tandem with the L</auto> method and is expected to be
+overridden by the subclass and should return a hashref where the keys represent
+a subcommand at C<$ARGV[0]> and the value represents the description of the
+corresponding action (i.e. I<command>).
+
+=signature subs
+
+subs(Any %args) : HashRef
+
+=example-1 subs
+
+  package Todo::Admin;
+
+  use parent 'Data::Object::Cli';
+
+  our $name = 'todo <action>';
+
+  sub auto {
+    {
+      add_user => '_handle_add_user',
+      del_user => '_handle_del_user'
+    }
+  }
+
+  sub subs {
+    {
+      add_user => 'Add a new user to the system',
+      del_user => 'Remove a user to the system'
+    }
+  }
+
+  my $admin = run Todo::Admin;
+
+  __DATA__
+
+  Usage: {name}
+
+  Commands:
+
+  {commands}
+
+  Options:
+
+  {options}
+
+=cut
+
 package main;
 
 my $test = testauto(__FILE__);
@@ -665,6 +715,27 @@ $subs->example(-1, 'spec', 'method', fun($tryable) {
   ok exists $opts->named->{unpublish};
 
   $spec;
+});
+
+$subs->example(-1, 'subs', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->isa('Todo::Admin');
+
+  my $subs = $result->subs;
+
+  is_deeply $subs, {
+    add_user => 'Add a new user to the system',
+    del_user => 'Remove a user to the system'
+  };
+
+  my $help = $result->help;
+  my $add_user = $subs->{add_user};
+  my $del_user = $subs->{del_user};
+
+  like $help, qr/$add_user/;
+  like $help, qr/$del_user/;
+
+  $subs;
 });
 
 ok 1 and done_testing;

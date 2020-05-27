@@ -32,4 +32,4 @@ resources:
   bugtracker: https://github.com/zonemaster/zonemaster-cli/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/zonemaster/zonemaster-cli
-version: '2.000003'
+version: '2.000004'

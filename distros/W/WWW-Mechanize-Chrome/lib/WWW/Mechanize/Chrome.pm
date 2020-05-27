@@ -24,7 +24,7 @@ use HTML::Selector::XPath 'selector_to_xpath';
 use HTTP::Cookies::ChromeDevTools;
 use POSIX ':sys_wait_h';
 
-our $VERSION = '0.55';
+our $VERSION = '0.58';
 our @CARP_NOT;
 
 =encoding utf-8
@@ -227,12 +227,12 @@ Examples of other useful parameters include:
     '--load-extension'
     '--no-sandbox'
 
-=item B<profile>
+=item B<separate_session>
 
-  profile => '/path/to/profile/directory'  #  set the profile directory
+  separate_session => 1   # create a new, empty session
 
-By default, your current user profile directory is used. Use this setting
-to change the profile directory for the browsing session.
+This creates an empty, fresh Chrome session without any cookies. Setting this
+will disregard any B<data_directory> setting.
 
 =item B<incognito>
 
@@ -240,11 +240,13 @@ to change the profile directory for the browsing session.
 
 Defaults to false. Set to true to launch the browser in incognito mode.
 
+Most likely, you want to use B<separate_session> instead.
+
 =item B<data_directory>
 
   data_directory => '/path/to/data/directory'  #  set the data directory
 
-By default, the current data directory is used. Use this setting to change the
+By default, an empty data directory is used. Use this setting to change the
 base data directory for the browsing session.
 
   use File::Temp 'tempdir';
@@ -252,6 +254,22 @@ base data directory for the browsing session.
   my $mech = WWW::Mechanize::Chrome->new(
       data_directory => tempdir(CLEANUP => 1 ),
   );
+
+Using the "main" Chrome cookies:
+
+  my $mech = WWW::Mechanize::Chrome->new(
+      data_directory => '/home/corion/.config/chromium',
+  );
+
+=item B<profile>
+
+  profile => '/path/to/profile/directory'  #  set the profile directory
+
+By default, your current user profile directory is used. Use this setting
+to change the profile directory for the browsing session.
+
+You will need to set the B<data_directory> as well, so that Chrome finds the
+profile within the data directory.
 
 =item B<wait_file>
 
@@ -823,6 +841,10 @@ sub new($class, %options) {
         $options{ autodie } = 1
     };
 
+    if (! exists $options{ autoclose }) {
+        $options{ autoclose } = 1
+    };
+
     if( ! exists $options{ frames }) {
         $options{ frames }= 1;
     };
@@ -843,8 +865,14 @@ sub new($class, %options) {
 
     my $host = $options{ host } || '127.0.0.1';
 
-    $options{ reuse } ||= defined $options{ tab };
     $options{ extra_headers } ||= {};
+
+    if( $options{ separate_session }) {
+        $options{ tab } ||= undef;
+    } else {
+        $options{ tab } ||= 0;
+    }
+    $options{ existing_tab } ||= defined $options{ tab };
 
     if( $options{ tab } and $options{ tab } eq 'current' ) {
         $options{ tab } = 0; # use tab at index 0
@@ -854,7 +882,7 @@ sub new($class, %options) {
     my $connection_style =    $options{ connection_style }
                            || $ENV{ WWW_MECHANIZE_CHROME_CONNECTION_STYLE }
                            || $class->connection_style( \%options );
-    if( ! $options{ port } and ! $options{ pid } and ! $options{ reuse }) {
+    if( ! $options{ port } and ! $options{ pid } ) {
         if( $options{ pipe } ) {
         #if( $^O !~ /mswin32/i ) {
             $connection_style = 'pipe';
@@ -873,9 +901,12 @@ sub new($class, %options) {
     $self->{log} ||= $self->_build_log;
 
     my( $to_chrome, $from_chrome );
-    if( $options{ pid } or $options{ reuse }) {
+    if( $options{ pid } ) {
         # Assume some defaults for the already running Chrome executable
         $options{ port } //= 9222;
+
+    } elsif ( $options{ driver } and $options{ driver_transport }) {
+        # We already have a connection to some Chrome running
 
     } else {
         #if ( ! defined $options{ port } and ! $options{ pipe }) {
@@ -970,13 +1001,14 @@ sub new($class, %options) {
 
 sub _setup_driver_future( $self, %options ) {
     $self->target->connect(
-        new_tab => !$options{ reuse },
-        tab     => $options{ tab },
-        #writer_fh => $options{ writer_fh },
-        #reader_fh => $options{ reader_fh },
+        new_tab          => !$options{ existing_tab },
+        tab              => $options{ tab },
+        separate_session => $options{ separate_session },
+        start_url        => $options{ start_url } ? "".$options{ start_url } : undef,
     )->catch( sub(@args) {
         my $err = $args[0];
         if( ref $args[1] eq 'HASH') {
+            use Data::Dumper; warn Dumper $args[1];
             $err .= $args[1]->{Reason};
         };
         Future->fail( $err );
@@ -996,18 +1028,7 @@ sub _connect( $self, %options ) {
     # to it, kill it manually to avoid waiting for it indefinitely
     if ( $err ) {
         if( $self->{ kill_pid } and my $pid = delete $self->{ pid }) {
-            local $SIG{CHLD} = 'IGNORE';
-            kill $self->{cleanup_signal} => $pid;
-            waitpid $pid, 0;
-
-            if( my $path = $self->{wait_file}) {
-                my $timeout = time + 10;
-                while( time < $timeout ) {
-                    last unless(-e $path);
-                    unlink($path) and last;
-                    $self->sleep(0.1);
-                }
-            };
+            $self->kill_child( 'SIGKILL', $pid, $self->{wait_file} );
         };
         croak $err;
     }
@@ -1030,6 +1051,7 @@ sub _connect( $self, %options ) {
 
     my @setup = (
         $self->target->send_message('DOM.enable'),
+        $self->target->send_message('Overlay.enable'),
         $self->target->send_message('Page.enable'),    # capture DOMLoaded
         $self->target->send_message('Network.enable'), # capture network
         $self->target->send_message('Runtime.enable'), # capture console messages
@@ -1711,7 +1733,7 @@ sub close {
     #if( $_[0]->{autoclose} and $_[0]->tab and my $tab_id = $_[0]->tab->{id} ) {
     #    $_[0]->target->close_tab({ id => $tab_id })->get();
     #};
-    if( $_[0]->{autoclose} and $_[0]->tab  ) {
+    if( $_[0]->{autoclose} and $_[0]->target and $_[0]->tab  ) {
         $_[0]->target->close->get();
     };
 
@@ -1732,10 +1754,16 @@ sub close {
     };
     delete $_[0]->{ driver };
 
+    if( $_[0]->{autoclose} and $_[0]->{kill_pid} ) {
+        $_[0]->kill_child( $_[0]->{cleanup_signal}, $pid, $_[0]->{wait_file} );
+    }
+}
+
+sub kill_child( $self, $signal, $pid, $wait_file ) {
     if( $pid and kill 0 => $pid) {
         local $SIG{CHLD} = 'IGNORE';
         undef $!;
-        if( ! kill $_[0]->{cleanup_signal} => $pid ) {
+        if( ! kill $signal => $pid ) {
             # The child already has gone away?!
             warn "Couldn't kill browser child process $pid with $_[0]->{cleanup_signal}: $!";
             # Gobble up any exit status
@@ -1758,22 +1786,34 @@ sub close {
                 };
             } else {
                 # on Linux and Windows, plain waitpid Just Works
-                waitpid $pid, WNOHANG;
+                waitpid $pid, 0;
+                # but still, check again that the child has really gone away:
+                my $timeout = time+2;
+                while( time < $timeout ) {
+                    my $res = kill 0 => $pid;
+                    if( $res ) {
+                        sleep 0.1;
+                    } else {
+                        last;
+                    };
+                };
+
             };
         };
 
-        if( my $path = $_[0]->{wait_file}) {
+        if( my $path = $wait_file) {
             my $timeout = time + 10;
             while( time < $timeout ) {
                 last unless(-e $path);
                 unlink($path) and last;
-                $_[0]->sleep(0.1);
+                $self->sleep(0.1);
             }
         };
     };
 }
 
 sub DESTROY {
+    #warn "Closing mechanize";
     $_[0]->close();
     %{ $_[0] }= (); # clean out all other held references
 }
@@ -4513,8 +4553,8 @@ sub get_set_value($self,%options) {
     my $post  = delete $options{post};
     $post = [$post]
         if (defined $post and ! ref $post);
-    $pre  ||= []; # just to eliminate some checks downwards
-    $post ||= []; # just to eliminate some checks downwards
+    $pre  ||= ['focus']; # just to eliminate some checks downwards
+    $post ||= ['change']; # just to eliminate some checks downwards
     my $name  = delete $options{ name };
     my $index = delete $options{ index };
 
@@ -4549,6 +4589,9 @@ sub get_set_value($self,%options) {
                 select   => 'selected',
             );
             my $method = $method{ lc $tag };
+            if( lc $tag eq 'input' and $obj->get_attribute('type') eq 'radio' ) {
+                $method = 'checked';
+            };
 
             my $id = $obj->{objectId};
 
@@ -4600,6 +4643,11 @@ function(newValue) {
 JS
                         arguments => [{ value => $value }],
                     )->get;
+                }
+            } elsif( 'checked' eq $method ) {
+                if (defined $value) {
+                    $value = [ $value ] unless ref $value;
+                    $obj->set_attribute('checked' => JSON::true);
                 }
             } elsif( 'content' eq $method ) {
                 $self->target->send_message('Runtime.callFunctionOn',
@@ -5001,8 +5049,6 @@ sub do_set_fields($self, %options) {
         if (ref $v) {
             ($v,my $num) = @$v;
             $index = $num;
-            #warn "Index larger than 1 not supported, ignoring"
-            #    unless $num == 1;
         };
 
         $self->get_set_value( node => $form, name => $n, value => $v, index => $index, %options );

@@ -4,7 +4,7 @@ use Term::ANSIColor 'colored';
 
 use if $^O eq "MSWin32", "Win32::Console::ANSI";
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 has 'colors' => sub {
     return {
@@ -27,6 +27,8 @@ sub format {
 
     return $self->_format(
         sub {
+            # Prevent having the end escape sequence at the start of the line
+            local $Term::ANSIColor::EACHLINE = "\n";
             # only add colors if we have a color for this level
             exists $self->colors->{ $_[1] }
                 ? colored( $format->(@_), $self->colors->{ $_[1] } )
@@ -132,7 +134,7 @@ L<Mojo::Log>, L<Term::ANSIColor>
 
 =head1 ACKNOWLEDGEMENTS
 
-This plugin was inspired by lanti asking about a way to easier find specific errors
+This plugin was inspired by lanti asking about a way to find specific errors more easily
 in the Mojo log during unit test runs on L<Stack Overflow|https://stackoverflow.com/q/44965998/1331451>.
 
 =head1 LICENSE

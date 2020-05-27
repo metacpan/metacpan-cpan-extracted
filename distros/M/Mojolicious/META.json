@@ -39,10 +39,8 @@
       "runtime" : {
          "requires" : {
             "IO::Socket::IP" : "0.37",
-            "JSON::PP" : "2.27103",
-            "List::Util" : "1.41",
-            "Time::Local" : "1.2",
-            "perl" : "5.010001"
+            "Sub::Util" : "1.41",
+            "perl" : "5.016"
          }
       }
    },
@@ -62,6 +60,6 @@
       },
       "x_IRC" : "irc://irc.freenode.net/#mojo"
    },
-   "version" : "8.42",
+   "version" : "8.50",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

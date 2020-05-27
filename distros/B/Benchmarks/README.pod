@@ -5,7 +5,7 @@ This is Perl module B<Benchmarks>.
 
 =begin html
 
-<a href="http://travis-ci.org/bayashi/Benchmarks"><img src="https://secure.travis-ci.org/bayashi/Benchmarks.png?_t=1435101171"/></a> <a href="https://coveralls.io/r/bayashi/Benchmarks"><img src="https://coveralls.io/repos/bayashi/Benchmarks/badge.png?_t=1435101171&branch=master"/></a>
+<a href="http://travis-ci.org/bayashi/Benchmarks"><img src="https://secure.travis-ci.org/bayashi/Benchmarks.png?_t=1590195911"/></a> <a href="https://coveralls.io/r/bayashi/Benchmarks"><img src="https://coveralls.io/repos/bayashi/Benchmarks/badge.png?_t=1590195911&branch=master"/></a>
 
 =end html
 

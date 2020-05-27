@@ -1,7 +1,7 @@
 # Copyright (c) 2016-2017 by Pali <pali@cpan.org>
 
 package Email::MIME::Header::AddressList;
-$Email::MIME::Header::AddressList::VERSION = '1.946';
+$Email::MIME::Header::AddressList::VERSION = '1.949';
 use strict;
 use warnings;
 
@@ -335,7 +335,7 @@ Email::MIME::Header::AddressList
 
 =head1 VERSION
 
-version 1.946
+version 1.949
 
 =head1 SYNOPSIS
 

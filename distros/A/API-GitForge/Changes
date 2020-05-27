@@ -1,5 +1,11 @@
 Revision history for API::GitForge
 
+0.005     2020-05-24 08:04:55-07:00 America/Phoenix
+    - API::GitForge::Role::GitForge::clean_repo(): don't continue if
+      fail to push the gitforge branch.
+    - API::GitForge::GitLab::_clean_config_repo(): use target project
+      namespace rather than always using the user's namespace.
+
 0.004     2020-03-13 17:28:05-07:00 America/Phoenix
     - API::GitForge::Role::GitForge::clean_repo(): reinstate
       workaround -- bypass Git::Wrapper when pushing the gitforge

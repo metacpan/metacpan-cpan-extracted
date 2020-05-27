@@ -17,10 +17,18 @@ use File::Spec;
 use lib ("$Bin/../lib", "$Bin/lib");
 use Data::Dumper;
 
-use Test::More tests => 14;
+use Test::More;
 
 use Test::LaTeX::Driver;
 use LaTeX::Driver;
+
+system('makeindex', '--help');
+if ($? == -1) {
+  plan skip_all => q{Can't execute "makeindex"};
+}
+else {
+  plan tests => 14;
+}
 
 tidy_directory($basedir, $docname, $debug);
 

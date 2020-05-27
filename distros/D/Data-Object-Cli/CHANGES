@@ -1,7 +1,14 @@
 Changelog for Data-Object-Cli
 
-2.02 2020-05-18T07:22:53
+2.03 2020-05-26T01:26:01
  - No changes found
+
+2.02 2020-05-18T07:13:33
+ - Built release version 2.02
+ - Added release updates
+ - Add support for automated dispatching (#13)
+ - Add support for "boolean" and "flag" option types (#12)
+ - Add examples to build and release (#11)
 
 2.01 2020-05-13T21:02:36
  - Built release version 2.01

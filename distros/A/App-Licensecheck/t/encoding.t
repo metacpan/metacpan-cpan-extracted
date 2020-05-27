@@ -21,7 +21,7 @@ my $data1 = encode(
 );
 my $data2 = encode(
 	'iso-8859-1',
-	"t/encoding/copr-iso8859.h\tGNU General Public License, Version 2 (with incorrect FSF address)\t2011 Heinrich Müller <henmull\@src.gnome.org>\n"
+	"t/encoding/copr-iso8859.h\tGNU General Public License, Version 2 [obsolete FSF postal address (Temple Place)]\t2011 Heinrich Müller <henmull\@src.gnome.org>\n"
 );
 my $data3 = encode(
 	'euc_jp',
