@@ -89,6 +89,8 @@ use vars qw(
 	$cygwin_fake_Slib
 	$force_cccdl
 	$use_pkgconfig
+	$macos_broken_setup
+	$macos_x11_path
 );
 
 sub printlog($)
@@ -125,6 +127,8 @@ syntax:
 options:
     X11BASE           - path where X11 includes and libraries are installed
     WITH_XFT          - compile with/without Xft (default 1), X only
+    WITH_FRIBIDI      - compile with/without fribidi (default 1)
+    WITH_HARFBUZZ     - compile with/without harfbuzz (default 1), X only
     WITH_ICONV        - compile with/without iconv (default 1), X only
     WITH_GTK2         - compile with/without GTK2 (default 1), X only
     WITH_GTK3         - compile with/without GTK3 (default 0), X only
@@ -161,11 +165,11 @@ setup_exports();
 setup_defines();
 setup_dl_loadflags();
 setup_pkgconfig();
+setup_fribidi() if $cmd_options{WITH_FRIBIDI};
 setup_X11() if $unix;
 setup_xlibs() if $unix;
-setup_macosx() if $cmd_options{WITH_COCOA};
 setup_codecs();
-setup_modules();
+setup_macosx() if $cmd_options{WITH_COCOA} || $macos_x11_path;
 create_codecs_c();
 create_config_h();
 create_config_pm();
@@ -179,6 +183,8 @@ sub setup_argv
 	%cmd_options = (
 		X11BASE       => undef,
 		WITH_XFT      => 1,
+		WITH_HARFBUZZ => 1,
+		WITH_FRIBIDI   => 1,
 		WITH_ICONV    => 1,
 		WITH_GTK2     => 1,
 		WITH_GTK3     => 0,
@@ -377,7 +383,10 @@ sub setup_environment
 		$OPTIMIZE     = '-g' if $cmd_options{DEBUG};
 		$OPENMP       = '-fopenmp';
 		$OPTIMIZE    .= ' -Wall' if gcc;
-		$passthru_options{LDDLFLAGS} .= ' -g' if $cmd_options{DEBUG};
+		if ($cmd_options{DEBUG}) {
+			$passthru_options{LDDLFLAGS} .= ' -g';
+			$passthru_options{LDDLFLAGS} =~ s/(^| )\-s//;
+		}
 	}
 
 	$DEFFILE    = 'Prima.def';
@@ -467,7 +476,11 @@ sub _find_file
 	$pathname = "$dir/$fname";
 	return $pathname if $pathname !~ /\.\./ && -e $pathname;
 	opendir D, $dir or die "Cannot open dir $dir: $!";
-	my @entries = map { "$dir/$_"} grep { /^[^.]/ && -d "$dir/$_"} readdir D;
+	my @entries =
+		map { "$dir/$_"}
+		grep { !/^blib/ }
+		grep { /^[^.]/ && -d "$dir/$_"}
+		readdir D;
 	closedir D;
 	foreach my $entry ( @entries) {
 		$pathname = _find_file( $fname, $entry);
@@ -875,7 +888,7 @@ EOF
 		}
 	}
 	printlog "none found\n";
-	$DEFINES{__INLINE__} = 'static'; # nasty hack, but better than #pragma inline
+	$DEFINES{__INLINE__} = '';
 }
 
 sub setup_compiler
@@ -979,7 +992,7 @@ MSCVER
 		'include/generic',
 	);
 
-	push @LIBS, qw(gdi32 mpr winspool comdlg32 msimg32 ole32 uuid) if $Win32; # add more when appropriate
+	push @LIBS, qw(usp10 gdi32 mpr winspool comdlg32 msimg32 ole32 uuid) if $Win32; # add more when appropriate
 	push @LIBPATH, '/usr/lib/w32api' if $cygwin;
 	if ($^O eq 'solaris') {
 		push @LIBPATH, '/opt/csw/lib';
@@ -1174,7 +1187,10 @@ MIXED
 			$add_path = 1 unless system "pkg-config --exists x11";
 		}
 		restore_output;
-		$ENV{PKG_CONFIG_PATH} = $xquartz_pkgconfig_path if $add_path;
+		if ($add_path) {
+			$ENV{PKG_CONFIG_PATH} = "/usr/local/lib/pkgconfig:$xquartz_pkgconfig_path";
+			$macos_broken_setup = 1;
+		}
 	}
 
 	$use_pkgconfig = 1;
@@ -1187,6 +1203,7 @@ sub pkgconfig
 
 	printlog "Checking for $package using pkg-config...";
 	null_output;
+
 	if ( system "pkg-config --exists $package" ) {
 		restore_output;
 		printlog "no\n";
@@ -1243,6 +1260,7 @@ sub pkgconfig
 sub setup_X11
 {
 	if ($use_pkgconfig) {
+		my $n_libpath = @LIBPATH;
 		unless (pkgconfig('x11')) {
 			warn
 				"Prima needs package with x11 development file for compilation! ".
@@ -1250,6 +1268,13 @@ sub setup_X11
 			exit(0);
 		}
 		pkgconfig('xext');
+		if ( $macos_broken_setup ) {
+			# stuff /opt/X11 or whatever comes with XQuartz at the end of the list
+			# to use libs that come with homebrew instead. If we won't do that,
+			# strange coredumps ensue
+			$macos_x11_path = [ @LIBPATH[$n_libpath .. $#LIBPATH] ]
+				if $n_libpath < @LIBPATH;
+		}
 		return;
 	}
 
@@ -1333,8 +1358,10 @@ sub setup_xft
 	my @pre_xft_incpath = @INCPATH;
 
 	if ( $use_pkgconfig ) {
-		my @packages = map { pkgconfig($_) ? 1 : () } (qw(freetype2 fontconfig xrender xft));
-		if ( @packages != $NEED_XFT ) {
+		my $has_xft = pkgconfig('xft') ? 1 : 0;
+		my @post_xft_libpath = @LIBPATH;
+		my @packages = map { pkgconfig($_) ? 1 : () } (qw(freetype2 fontconfig xrender));
+		if ((@packages + $has_xft) != $NEED_XFT ) {
 			$cmd_options{WITH_XFT} = 0;
 			@LIBS    = @pre_xft_libs;
 			@LIBPATH = @pre_xft_libpath;
@@ -1346,6 +1373,27 @@ sub setup_xft
 				HAVE_X11_EXTENSIONS_XRENDER_H
 				HAVE_X11_XFT_XFT_H
 			);
+			if (
+				$macos_broken_setup &&
+				$macos_x11_path &&
+				$cmd_options{WITH_HARFBUZZ} &&
+				@pre_xft_libpath == @post_xft_libpath
+			) {
+				$cmd_options{WITH_HARFBUZZ} = 0;
+				$END .= <<BROKEN_PATH_SETUP;
+
+** Warning: harfbuzz have been disabled.
+
+This happened because broken setup was detected where both harfbuzz and libXft
+depend on freetype2, but one on /opt/X11 and another in /usr/local.
+This _WILL_ result in coredumps.
+
+To resolve the issue install libXft that uses the recent freetype2, with
+
+    brew install dk/x11/libxft
+
+BROKEN_PATH_SETUP
+			}
 		}
 		return;
 	}
@@ -1463,6 +1511,44 @@ sub setup_iconv
 	}
 }
 
+sub setup_fribidi
+{
+	$cmd_options{WITH_FRIBIDI} = 0;
+	unless ( $use_pkgconfig ) {
+		printlog "Checking for presence of fribidi... no, can only check with pkg-config installed\n";
+		goto WARN;
+	}
+	goto WARN unless pkgconfig('fribidi');
+	$DEFINES{WITH_FRIBIDI} = 1;
+	$cmd_options{WITH_FRIBIDI} = 1;
+	return;
+
+WARN:
+	$END .= <<BIDI;
+
+** Warning: fribidi is needed for bidirectional text.
+
+BIDI
+}
+
+sub setup_harfbuzz
+{
+	$cmd_options{WITH_HARFBUZZ} = 0;
+
+	if ( !$cmd_options{WITH_XFT}) {
+		printlog "harfbuzz deselected as it requires Xft\n";
+		return;
+	}
+
+	unless ( $use_pkgconfig ) {
+		printlog "Checking for presence of harfbuzz... no, can only check with pkg-config installed\n";
+		return;
+	}
+	return unless pkgconfig('harfbuzz');
+	$DEFINES{WITH_HARFBUZZ} = 1;
+	$cmd_options{WITH_HARFBUZZ} = 1;
+}
+
 sub setup_gtk
 {
 	my $use_gtk3 = $cmd_options{WITH_GTK3};
@@ -1546,6 +1632,7 @@ sub setup_xlibs
 	have_header( "X11/extensions/XShm.h", "X11/X.h", "X11/Xlib.h", "X11/Xutil.h");
 
 	setup_xft() if $cmd_options{WITH_XFT};
+	setup_harfbuzz() if $cmd_options{WITH_HARFBUZZ};
 
 	$cmd_options{WITH_ICONV} = 0 unless $cmd_options{WITH_XFT}; # iconv is used for xft only
 	setup_iconv() if $cmd_options{WITH_ICONV};
@@ -1566,6 +1653,8 @@ sub setup_xlibs
 	}
 
 	printlog "Using Xft library\n" if $cmd_options{WITH_XFT};
+	printlog "Using fribidi library\n" if $cmd_options{WITH_FRIBIDI};
+	printlog "Using harfbuzz library\n" if $cmd_options{WITH_HARFBUZZ};
 	printlog "Using iconv library\n" if $cmd_options{WITH_ICONV};
 	printlog "Using gtk2 library\n" if $cmd_options{WITH_GTK2};
 	printlog "Using gtk3 library\n" if $cmd_options{WITH_GTK3};
@@ -1574,6 +1663,13 @@ sub setup_xlibs
 
 sub setup_macosx
 {
+	if ( $macos_x11_path ) {
+		my %remove = map { $_ => 1 } @{ $macos_x11_path // [] };
+		@LIBPATH = grep { !exists $remove{$_} } @LIBPATH;
+		push @LIBPATH, @{ $macos_x11_path // [] };
+	}
+	
+	return unless $cmd_options{WITH_COCOA};
 	printlog "Can compile with Cocoa...";
 	my $old_ldflags = $LDFLAGS;
 
@@ -1837,32 +1933,6 @@ Please follow the instructions in README file.
 NOCODECS
 	}
 	push @ACTIVE_CODECS, @builtin_codecs;
-}
-
-sub setup_modules
-{
-	printlog "Checking for Text::Bidi...";
-	eval "use Text::Bidi;";
-	if ( $@ ) {
-		printlog "no\n";
-		goto BAD_VERSION;
-	}
-	my $v;
-	eval { $v = $Text::Bidi::VERSION };
-	if ( ($v // 0) < 2.1 ) {
-		printlog "yes, but too old\n";
-		goto BAD_VERSION;
-	}
-	printlog "$Text::Bidi::VERSION\n";
-	return;
-BAD_VERSION:
-	$END .= <<BIDI;
-
-** Warning: Text::Bidi v2.10 is needed for working with bidirectional text.
-
-Note that Prima will work fine, except with Hebrew and Arabic text.
-
-BIDI
 }
 
 sub create_codecs_c

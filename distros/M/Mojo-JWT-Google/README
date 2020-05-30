@@ -2,7 +2,7 @@ NAME
     Mojo::JWT::Google - Service Account tokens
 
 VERSION
-    0.10
+    0.11
 
 SYNOPSIS
       my $gjwt = Mojo::JWT::Google->new(secret => 's3cr3t',

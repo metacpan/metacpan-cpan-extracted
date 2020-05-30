@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Dist::Zilla::App::Command::authordeps 6.014;
+package Dist::Zilla::App::Command::authordeps 6.015;
 # ABSTRACT: List your distribution's author dependencies
 
 use Dist::Zilla::App -command;
@@ -64,7 +64,7 @@ Dist::Zilla::App::Command::authordeps - List your distribution's author dependen
 
 =head1 VERSION
 
-version 6.014
+version 6.015
 
 =head1 SYNOPSIS
 

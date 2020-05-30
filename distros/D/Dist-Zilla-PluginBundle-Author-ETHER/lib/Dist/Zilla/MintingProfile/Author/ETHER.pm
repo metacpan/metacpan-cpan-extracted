@@ -4,7 +4,7 @@ package Dist::Zilla::MintingProfile::Author::ETHER;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Mint distributions like ETHER does
 
-our $VERSION = '0.156';
+our $VERSION = '0.157';
 
 no if "$]" >= 5.031009, feature => 'indirect';
 use Moose;
@@ -40,7 +40,7 @@ Dist::Zilla::MintingProfile::Author::ETHER - Mint distributions like ETHER does
 
 =head1 VERSION
 
-version 0.156
+version 0.157
 
 =head1 SYNOPSIS
 

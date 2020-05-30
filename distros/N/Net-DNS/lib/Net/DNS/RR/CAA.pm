@@ -1,9 +1,9 @@
 package Net::DNS::RR::CAA;
 
 #
-# $Id: CAA.pm 1771 2020-02-25 14:23:23Z willem $
+# $Id: CAA.pm 1781 2020-05-13 08:58:25Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1771 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1781 $)[1];
 
 
 use strict;
@@ -73,7 +73,7 @@ sub flags {
 
 sub critical {
 	for ( shift->{flags} ) {
-		$_ = ( shift() ? 0 : 0x0080 ) ^ ( 0x0080 | ( $_ || 0 ) ) if scalar @_;
+		$_ = ( $_[0] ? 0 : 0x0080 ) ^ ( 0x0080 | ( $_ || 0 ) ) if scalar @_;
 		return 0x0080 & ( $_ || 0 );
 	}
 }

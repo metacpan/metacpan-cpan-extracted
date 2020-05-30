@@ -44,5 +44,5 @@ requires:
   perl: '5.026001'
   strict: '0'
   warnings: '0'
-version: v0.12.12
+version: v0.12.14
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

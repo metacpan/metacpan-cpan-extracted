@@ -95,6 +95,14 @@ method generate {
 		no_init_arg => 1,
 		default     => sprintf( "'%s'", $self->table->name ),
 	  );
+	  
+	push @attr,
+      $self->attribute_maker->make_attribute(
+        name        => 'db',
+        is          => 'ro',
+        isa         => $self->db_class_name,
+        required    => 1
+      );
 
 	$self->writer->write_class(
 		file_name  => $self->get_module_path,
@@ -491,6 +499,10 @@ method _get_table2alias_map {
 			schema_name => $t->schema_name,
 			table_name  => $t->name
 		);
+		
+		# Skip this table if it is ourself
+		next if $parent_table_name eq $self->_get_table_name;
+		
 		$map{$parent_table_name} = 't' . $num;
 		$num++;
 	}
@@ -519,6 +531,8 @@ method _get_method_selectx {
 			schema_name => $t->schema_name,
 			table_name  => $t->name
 		);
+		
+		next if( $parent_table_name eq $self->_get_table_name );
 
 		foreach my $c ( $t->get_columns ) {
 			if ( !$arg2table{ $c->name } ) {
@@ -540,6 +554,8 @@ method _get_method_selectx {
 				schema_name => $con->parent_schema_name,
 				table_name  => $con->parent_table_name
 			);
+			
+			next if( $parent_table_name eq $self->_get_table_name );
 
 			push @from, 'left join';
 			push @from,

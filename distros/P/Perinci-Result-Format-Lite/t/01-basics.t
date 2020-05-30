@@ -4,6 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 use Test::More 0.98;
+use Test::Needs;
 
 use Perinci::Result::Format::Lite;
 
@@ -115,6 +116,8 @@ subtest "meta:table.field_formats" => sub {
 };
 
 subtest "meta:table.default_field_format" => sub {
+    test_needs 'Number::Format::BigFloat';
+
     like($fmt->(
         [200,
          "OK",
@@ -133,6 +136,8 @@ subtest "meta:table.default_field_format" => sub {
 };
 
 subtest "meta:table.field_format_code" => sub {
+    test_needs 'Number::Format::BigFloat';
+
     like($fmt->(
         [200,
          "OK",

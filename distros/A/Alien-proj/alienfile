@@ -84,6 +84,12 @@ share {
   my $proj_version = get_proj_version() // 'not yet defined';
   say "Downloaded proj version is $proj_version";
   
+  die "Downloaded proj version $proj_version is too low "
+      . "(should be >= $min_target_version).\n"
+      . "Please update your Alien::Build::Fetch::Cache if using one."
+    if   defined $proj_version
+      && versioncmp ($proj_version, $min_target_version) < 0;
+  
   plugin Extract => (format => 'tar.gz');
 
 

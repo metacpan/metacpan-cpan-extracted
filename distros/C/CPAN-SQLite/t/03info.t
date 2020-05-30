@@ -1,4 +1,4 @@
-# $Id: 03info.t 71 2019-01-15 01:46:34Z stro $
+# $Id: 03info.t 81 2019-01-30 21:53:22Z stro $
 
 use strict;
 use warnings;
@@ -19,7 +19,7 @@ my $CPAN  = catdir $cwd, 't', 'cpan';
 my $t_dir = catdir $cwd, 't';
 
 my $db_name = 'cpandb.sql';
-my $db_dir  = $cwd;
+my $db_dir  = catdir $cwd, 't', 'dot-cpan';
 unlink($db_name) if (-e $db_name);
 
 ok(-d $CPAN);

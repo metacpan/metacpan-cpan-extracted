@@ -1,3 +1,23 @@
+libzvbi-perl (1.1.0) stable; urgency=low
+
+  * Adapted example scripts for use with DVB capture cards: Globally added
+    command line options for device path and PID (replacing hard-coded
+    constants)
+  * examples/capture.pl: Implemented missing handling of option "--pes";
+    removed option "--pull" which had no effect & made "pull" as default
+  * examples/osc.pl: Work-around for setting initial keyboard focus in Tk
+  * examples/proxy-test.pl: converted channel-change ioctl()s from
+    obsolete V4L1 API to V4L2
+  * examples/export.py: Allow export of CC pages
+  * Fixed capture::read() and capture::read_sliced() methods: sliced buffer
+    result was not pruned to actually used length; caused failure in dvb_mux
+  * Improved documentation: extended examples section; added new section
+    "class hierarchy"; added mention of "zvbi-chains" library; reworked
+    capture description to mention type names of raw/sliced buffers
+  * Added links to new Python version of the module
+
+ -- T. Zoerner <tomzo@users.sourceforge.net>  Sat, 30 May 2020 09:00:00 +0200
+
 libzvbi-perl (1.0.0) stable; urgency=low
 
   * Elevated status to "stable release"

@@ -19,8 +19,8 @@ BEGIN
         #$ENV{$_} = undef();
         delete( $ENV{$_} );
     }
-    # no warnings 'uninitialized';
-    ## POSIX::setlocale( &POSIX::LC_ALL, undef() );
+    #no warnings 'uninitialized';
+    #POSIX::setlocale( &POSIX::LC_ALL, undef() );
     ## XXX To be removed before release
     #use Data::Dumper;
     #$Data::Dumper::Sortkeys = 1;
@@ -35,6 +35,7 @@ BEGIN { use_ok( 'Module::Generic' ) || BAIL_OUT( "Unable to load Module::Generic
 ## my $prev_locale = POSIX::setlocale( &POSIX::LC_ALL );
 ## my $new_loc = POSIX::setlocale( &POSIX::LC_ALL, 'de_DE' );
 my $lconv = POSIX::localeconv();
+# $lconv->{mon_thousands_sep} = $lconv->{thousands_sep} = undef();
 #         my $fail = [qw(
 # frac_digits
 # int_frac_digits
@@ -207,6 +208,9 @@ is( $n .= 'X', '1281284X', 'String concatenation with non-number' );
 isa_ok( $n, 'Module::Generic::Scalar', 'Regexp check after concatenation and class -> Module::Generic::Scalar' );
 
 is( $n2->decimal, $dec_sep, 'Decimal separator' );
+# is( $n2->thousand->scalar, $tho_sep, 'Thousand separator' );
+# diag( "\$tho_sep is defined? ", defined( $tho_sep ) ? 'yes' : 'no' );
+# diag( "\$n2->thousand is defined? ", defined( $n2->thousand ) ? 'yes' : 'no' );
 is( $n2->thousand, $tho_sep, 'Thousand separator' );
 is( $n2->precision, 2, 'Precision' );
 is( $n2->currency, '€', 'Currency symbol' );

@@ -1,11 +1,6 @@
 #!/usr/bin/perl -w
 #
-#  Very simple test of the DVB PES multiplexer:
-#  - reading sliced data from an analog capture device
-#  - multiplexer output is written to STDOUT
-#  - output can be decoded with examples/decode.pl --pes --all
-#
-#  Copyright (C) 2007 Tom Zoerner
+#  Copyright (C) 2007,2020 Tom Zoerner
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -22,11 +17,29 @@
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-# $Id: dvb-mux.pl,v 1.2 2020/04/01 07:31:19 tom Exp tom $
+# Description:
+#
+#  Example for the use of class Video::ZVBI::dvb_mux. This script excercises
+#  the DVB multiplexer functions: The script first opens a capture device
+#  (normally this will be an analog device), then continuously captures VBI
+#  data, encodes it in a DVB packet stream and wites the result to STDOUT. The
+#  output stream can be decoded equivalently to that of capture.pl --pes,
+#  which is:
+#
+#    ./dvb-mux.pl --pid NNN | ./decode.pl --pes --all
 
 use strict;
 use blib;
+use Getopt::Long;
 use Video::ZVBI qw(/^VBI_/);
+
+my $opt_device = "/dev/dvb/adapter0/demux0";
+my $opt_pid = 0;  # mandatory for DVB
+my $opt_v4l2 = 0;
+my $opt_use_feed = 0;
+my $opt_use_read = 0;
+my $opt_verbose = 0;
+my $opt_help = 0;
 
 # callback function invoked by Video::ZVBI::dvb_mux::feed()
 sub feed_cb {
@@ -39,35 +52,41 @@ sub feed_cb {
 }
 
 sub main_func {
-   my $opt_device = "/dev/vbi0";
    my $opt_buf_count = 5;
-   my $opt_services = VBI_SLICED_TELETEXT_B_625;
-   #my $opt_services = VBI_SLICED_TELETEXT_A;
+   my $opt_services = VBI_SLICED_TELETEXT_B |
+                      VBI_SLICED_VPS |
+                      VBI_SLICED_CAPTION_625 |
+                      VBI_SLICED_WSS_625;
    my $opt_strict = 0;
-   my $opt_verbose = 0;
-   my $opt_use_feed = 0;
    my $err;
    my $pxc;
    my $cap;
    my $mux;
 
-   $pxc = Video::ZVBI::proxy::create($opt_device, $0, 0, $err, $opt_verbose);
-   if (defined $pxc) {
-      $cap = Video::ZVBI::capture::proxy_new($pxc, 5, 0, $opt_services, $opt_strict, $err);
-      undef $pxc unless defined $cap;
+   if ($opt_v4l2 || (($opt_pid == 0) && ($opt_device !~ /dvb/))) {
+      $pxc = Video::ZVBI::proxy::create($opt_device, $0, 0, $err, $opt_verbose);
+      if (defined $pxc) {
+         $cap = Video::ZVBI::capture::proxy_new($pxc, 5, 0, $opt_services, $opt_strict, $err);
+         undef $pxc unless defined $cap;
+      }
+      if (!defined $cap) {
+         $cap = Video::ZVBI::capture::v4l2_new($opt_device, $opt_buf_count, $opt_services, $opt_strict, $err, $opt_verbose);
+      }
+      if (!defined $cap) {
+         $cap = Video::ZVBI::capture::v4l_new($opt_device, 0, $opt_services, $opt_strict, $err, $opt_verbose);
+      }
+      if (!defined $cap) {
+         $cap = Video::ZVBI::capture::bktr_new($opt_device, 0, $opt_services, $opt_strict, $err, $opt_verbose);
+      }
+      die "Failed to open video device: $err\n" unless $cap;
+   } else {
+      warn "WARNING: DVB devices require --pid parameter\n" if $opt_pid <= 0;
+      $cap = Video::ZVBI::capture::dvb_new2($opt_device, $opt_pid, $err, $opt_verbose);
    }
-   if (!defined $cap) {
-      $cap = Video::ZVBI::capture::v4l2_new($opt_device, $opt_buf_count, $opt_services, $opt_strict, $err, $opt_verbose);
-   }
-   if (!defined $cap) {
-      $cap = Video::ZVBI::capture::v4l_new($opt_device, 0, $opt_services, $opt_strict, $err, $opt_verbose);
-   }
-   if (!defined $cap) {
-      $cap = Video::ZVBI::capture::bktr_new($opt_device, 0, $opt_services, $opt_strict, $err, $opt_verbose);
-   }
-   die "Failed to open video device: $err\n" unless $cap;
 
-   Video::ZVBI::set_log_on_stderr(0xFFFF);
+   if ($opt_verbose) {
+      Video::ZVBI::set_log_on_stderr(0xFFFF);
+   }
 
    # create DVB multiplexer
    if ($opt_use_feed) {
@@ -84,7 +103,11 @@ sub main_func {
       my $res;
 
       # read a sliced VBI frame
-      $res = $cap->pull_sliced($sliced, $n_lines, $timestamp, 1000);
+      if ($opt_use_read) {
+         $res = $cap->read_sliced($sliced, $n_lines, $timestamp, 1000);
+      } else {
+         $res = $cap->pull_sliced($sliced, $n_lines, $timestamp, 1000);
+      }
       die "Capture error: $!\n" if $res < 0;
 
       if ($opt_use_feed == 0) {
@@ -112,8 +135,8 @@ sub main_func {
          }
          syswrite STDOUT, $buf, $buf_size-$buf_left if defined $buf;
          print STDERR "wrote ".($buf_size-$buf_left)."\n";
-      } else {
 
+      } else {
          if (!$mux->feed($sliced, $n_lines, $opt_services, $timestamp*90000.0)) {
             print STDERR "ERROR in feed\n";
          }
@@ -123,5 +146,33 @@ sub main_func {
    exit(-1);
 }
 
-main_func();
+sub usage {
+        print STDERR "\
+Example for DVB multiplexer in Video::ZVBI\
+Copyright (C) 2007,2020 T. Zoerner\
+This program is licensed under GPL 2 or later. NO WARRANTIES.\n\
+Usage: $0 [OPTIONS]\n\
+--device PATH     Specify the capture device\
+--pid NNN         Specify the PES stream PID: Required for DVB\
+--v4l2            Force device to be addressed via analog driver\
+--use-read        Use \"read\" capture method instead of \"pull\"
+--use-feed        Use feed/callback API of class Video::ZVBI::dvb_mux\
+--verbose         Emit debug trace output\
+--help            Print this message and exit\
+";
+  exit(1);
+}
+my %CmdOpts = (
+        "device=s" =>  \$opt_device,
+        "pid=i" =>     \$opt_pid,
+        "v4l2" =>      \$opt_v4l2,
+        "use-read" =>  \$opt_use_read,
+        "use-feed" =>  \$opt_use_feed,
+        "verbose" =>   \$opt_verbose,
+        "help" =>      \$opt_help,
+);
+GetOptions(%CmdOpts) || usage();
+usage() if $opt_help;
+die "Options --v4l2 and --pid are mutually exclusive\n" if $opt_v4l2 && $opt_pid;
 
+main_func();

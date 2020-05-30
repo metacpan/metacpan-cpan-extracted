@@ -119,6 +119,10 @@ sub check {
 	
 	@rows = $team->select;
 	ok(!@rows);
+	
+	# Test selectx for self referencing table
+	@rows = $orm->SelfRefTest->selectx( self_ref_test_code => 'self_ref_test_code1' );
+	ok( @rows == 1 );
 }
 
 sub get_random_owner_id {

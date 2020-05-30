@@ -1,15 +1,15 @@
 package Net::DNS::Parameters;
 
 #
-# $Id: Parameters.pm 1761 2020-01-01 11:58:34Z willem $
+# $Id: Parameters.pm 1779 2020-05-11 09:11:17Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1761 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1779 $)[1];
 
 
 ################################################
 ##
 ##	Domain Name System (DNS) Parameters
-##	(last updated 2019-12-23)
+##	(last updated 2020-05-07)
 ##
 ################################################
 
@@ -129,9 +129,9 @@ my @typebyname = (
 	CAA	   => 257,					# RFC8659
 	AVC	   => 258,					#
 	DOA	   => 259,					# draft-durand-doa-over-dns
-	AMTRELAY   => 260,					# RFC-ietf-mboned-driad-amt-discovery-13
+	AMTRELAY   => 260,					# RFC8777
 	TA	   => 32768,					# http://cameo.library.cmu.edu/ http://www.watson.org/~weiler/INI1999-19.pdf
-	DLV	   => 32769,					# RFC-ietf-dnsop-obsolete-dlv-02 RFC4431
+	DLV	   => 32769,					# RFC8749 RFC4431
 	);
 our %typebyval = reverse( TYPE0 => 0, @typebyname );
 push @typebyname, map /^\d/ ? $_ : lc($_), @typebyname;
@@ -184,22 +184,23 @@ our %rcodebyname = @rcodebyname;
 
 # Registry: DNS EDNS0 Option Codes (OPT)
 my @ednsoptionbyname = (
-	LLQ		=> 1,					# RFC-sekar-dns-llq-06
-	UL		=> 2,					# http://files.dns-sd.org/draft-sekar-dns-ul.txt
-	NSID		=> 3,					# RFC5001
-	DAU		=> 5,					# RFC6975
-	DHU		=> 6,					# RFC6975
-	N3U		=> 7,					# RFC6975
-	'CLIENT-SUBNET' => 8,					# RFC7871
-	EXPIRE		=> 9,					# RFC7314
-	COOKIE		=> 10,					# RFC7873
-	'TCP-KEEPALIVE' => 11,					# RFC7828
-	PADDING		=> 12,					# RFC7830
-	CHAIN		=> 13,					# RFC7901
-	'KEY-TAG'	=> 14,					# RFC8145
-	'CLIENT-TAG'	=> 16,					# draft-bellis-dnsop-edns-tags
-	'SERVER-TAG'	=> 17,					# draft-bellis-dnsop-edns-tags
-	DEVICEID	=> 26946,				# https://docs.umbrella.com/developer/networkdevices-api/identifying-dns-traffic2
+	LLQ		 => 1,					# RFC-sekar-dns-llq-06
+	UL		 => 2,					# http://files.dns-sd.org/draft-sekar-dns-ul.txt
+	NSID		 => 3,					# RFC5001
+	DAU		 => 5,					# RFC6975
+	DHU		 => 6,					# RFC6975
+	N3U		 => 7,					# RFC6975
+	'CLIENT-SUBNET'	 => 8,					# RFC7871
+	EXPIRE		 => 9,					# RFC7314
+	COOKIE		 => 10,					# RFC7873
+	'TCP-KEEPALIVE'	 => 11,					# RFC7828
+	PADDING		 => 12,					# RFC7830
+	CHAIN		 => 13,					# RFC7901
+	'KEY-TAG'	 => 14,					# RFC8145
+	'EXTENDED-ERROR' => 15,					# RFC-ietf-dnsop-extended-error-16
+	'CLIENT-TAG'	 => 16,					# draft-bellis-dnsop-edns-tags
+	'SERVER-TAG'	 => 17,					# draft-bellis-dnsop-edns-tags
+	DEVICEID	 => 26946,				# https://docs.umbrella.com/developer/networkdevices-api/identifying-dns-traffic2
 	);
 our %ednsoptionbyval = reverse @ednsoptionbyname;
 push @ednsoptionbyname, map /^\d/ ? $_ : lc($_), @ednsoptionbyname;

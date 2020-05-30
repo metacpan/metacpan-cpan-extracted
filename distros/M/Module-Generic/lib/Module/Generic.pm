@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.12.12
+## Version v0.12.14
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.local>
+## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/08/24
-## Modified 2020/05/25
+## Modified 2020/05/28
 ## 
 ##----------------------------------------------------------------------------
 package Module::Generic;
@@ -41,7 +41,7 @@ BEGIN
     @EXPORT      = qw( );
     @EXPORT_OK   = qw( subclasses );
     %EXPORT_TAGS = ();
-    $VERSION     = 'v0.12.12';
+    $VERSION     = 'v0.12.14';
     $VERBOSE     = 0;
     $DEBUG       = 0;
     $SILENT_AUTOLOAD      = 1;
@@ -2918,7 +2918,7 @@ sub _set_get_scalar_as_object
         # $self->message( 3, "Object now is: '", ref( $data->{ $field } ), "'." );
     }
     # $self->message( 3, "Checking if object '", ref( $data->{ $field } ), "' is set. Is it an object? ", $self->_is_object( $data->{ $field } ) ? 'yes' : 'no', " and its stringified value is '", $data->{ $field }, "'." );
-    if( !$self->_is_object( $data->{ $field } ) )
+    if( !$self->_is_object( $data->{ $field } ) || ( $self->_is_object( $data->{ $field } ) && ref( $data->{ $field } ) ne ref( $self ) ) )
     {
         # $self->message( 3, "No object is set yet, initiating one." );
         $data->{ $field } = Module::Generic::Scalar->new( $data->{ $field } );
@@ -3711,6 +3711,8 @@ BEGIN
 
 sub new { return( $_[1] ? $true : $false ); }
 
+sub defined { return( 1 ); }
+
 our $true  = do{ bless( \( my $dummy = 1 ) => Module::Generic::Boolean ) };
 our $false = do{ bless( \( my $dummy = 0 ) => Module::Generic::Boolean ) };
 
@@ -4215,13 +4217,8 @@ sub new
 
 sub as_boolean { return( Module::Generic::Boolean->new( ${$_[0]} ? 1 : 0 ) ); }
 
-# sub as_string { return( ${$_[0]} ); }
-sub as_string
-{
-    my( $self ) = @_;
-    my $copy = $$self;
-    return( $copy );
-}
+## sub as_string { CORE::defined( ${$_[0]} ) ? return( ${$_[0]} ) : return; }
+sub as_string { return( ${$_[0]} ); }
 
 ## Credits: John Gruber, Aristotle Pagaltzis
 ## https://gist.github.com/gruber/9f9e8650d68b13ce4d78
@@ -4425,7 +4422,7 @@ sub replace
 
 sub reset { ${$_[0]} = ''; return( $_[0] ); }
 
-sub reverse { return( __PACKAGE__->_new( scalar( CORE::reverse( ${$_[0]} ) ) ) ); }
+sub reverse { return( __PACKAGE__->_new( CORE::scalar( CORE::reverse( ${$_[0]} ) ) ) ); }
 
 sub rindex
 {
@@ -4447,6 +4444,8 @@ sub rtrim
     $$self =~ s/${str}$//g;
     return( $self );
 }
+
+sub scalar { return( shift->as_string ); }
 
 sub set
 {
@@ -4562,7 +4561,7 @@ BEGIN
     use Nice::Try;
     use Regexp::Common qw( number );
     use POSIX ();
-    our( $VERSION ) = 'v0.3.1';
+    our( $VERSION ) = 'v0.3.3';
 };
 
 use overload (
@@ -5149,6 +5148,10 @@ sub init
                 $self->$prop( $default->{ $lconv_prop } );
                 last;
             }
+            else
+            {
+                $self->$prop( $default->{ $lconv_prop } );
+            }
         }
     }
     
@@ -5659,8 +5662,9 @@ sub _set_get_prop
     if( @_ )
     {
         my $val = shift( @_ );
+        $val = $val->scalar if( $self->_is_object( $val ) && $val->isa( 'Module::Generic::Scalar' ) );
         ## $self->message( 3, "Setting value \"$val\" (", defined( $val ) ? 'defined' : 'undefined', ") for property \"$prop\"." );
-        if( $val ne $self->{ $prop } )
+        if( $val ne $self->{ $prop } || !CORE::defined( $val ) )
         {
             # $self->{ $prop } = $val;
             $self->_set_get_scalar_as_object( $prop, $val );
@@ -6496,7 +6500,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.12.12
+    v0.12.14
 
 =head1 DESCRIPTION
 

@@ -44,6 +44,7 @@
             "File::Spec" : "0.86",
             "IO::File" : "1.08",
             "IO::Select" : "1.14",
+            "IO::Socket" : "1.26",
             "IO::Socket::IP" : "0.38",
             "MIME::Base64" : "2.13",
             "PerlIO" : "1.05",
@@ -55,6 +56,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.23",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "1.24",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

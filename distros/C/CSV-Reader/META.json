@@ -1,0 +1,57 @@
+{
+   "abstract" : "Simple CSV reader class that uses Text::CSV internally.",
+   "author" : [
+      "Craig Manley"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CSV-Reader",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.48",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::BOM" : "0",
+            "Test::More" : "0",
+            "Text::CSV" : "0",
+            "Tie::IxHash" : "0",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cmanley/p5-CSV-Reader/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/cmanley/p5-CSV-Reader.git",
+         "web" : "https://github.com/cmanley/p5-CSV-Reader/"
+      }
+   },
+   "version" : 1.09,
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

@@ -13,7 +13,7 @@ my $bin             = $FindBin::Bin;
 my $file            = $bin . '/test.mwb';
 my $namespace       = 'MyApp::DB';
 my $load_namespaces = ['Test', 'Virtual'];
-my $output_path     = $bin . '/Test';
+my $output_path     = $bin . '/Test' . $$;
 
 my $foo = MySQL::Workbench::DBIC->new(
     file                     => $file,

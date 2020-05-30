@@ -1,4 +1,4 @@
-# $Id: 00-install.t 1698 2018-07-24 15:29:05Z willem $ -*-perl-*-
+# $Id: 00-install.t 1779 2020-05-11 09:11:17Z willem $ -*-perl-*-
 
 use strict;
 use Test::More;
@@ -7,17 +7,11 @@ use File::Find;
 use ExtUtils::MakeMaker;
 
 
-my @files;
-my $blib = File::Spec->catfile(qw(blib lib));
-
-find( sub { push( @files, $File::Find::name ) if /\.pm$/ && !/Template/ }, $blib );
-
 my %manifest;
-open MANIFEST, 'MANIFEST' or plan skip_all => "MANIFEST: $!";
+open( MANIFEST, 'MANIFEST' ) or BAIL_OUT("MANIFEST: $!");
 while (<MANIFEST>) {
-	chomp;
-	my ( $volume, $directory, $name ) = File::Spec->splitpath($_);
-	$manifest{lc $name}++ if $name;
+	my ($filename) = split;
+	$manifest{$filename}++;
 }
 close MANIFEST;
 
@@ -25,13 +19,27 @@ plan skip_all => 'No versions from git checkouts' if -e '.git';
 
 plan skip_all => 'Not sure how to parse versions.' unless eval { MM->can('parse_version') };
 
-plan tests => scalar @files;
+plan tests => scalar keys %manifest;
 
-foreach my $file ( sort @files ) {				# reconcile files with MANIFEST
-	my $version = MM->parse_version($file);
-	ok( $version =~ /[\d.]{3}/, "file version: $version\t$file" );
-	my ( $volume, $directory, $name ) = File::Spec->splitpath($file);
-	diag("File not in MANIFEST: $file") unless $manifest{lc $name};
+
+foreach ( sort keys %manifest ) {				# reconcile files with MANIFEST
+	next unless ok( -f $_, "file exists\t$_" );
+	next unless /\.pm$/;
+	next unless /^lib/;
+
+	my $module = File::Spec->catfile( 'blib', $_ );		# library component
+	diag("Missing module: $module") unless -f $module;
+
+	my $version = MM->parse_version($_);			# module version
+	diag("\$VERSION = $version\t$_") unless $version =~ /^\d/;
+}
+
+
+my @files;							# flag MANIFEST omissions
+find( sub { push( @files, $File::Find::name ) if /\.pm$/ }, 'lib' );
+foreach ( sort @files ) {
+	next if /Template.pm$/;
+	diag("Filename not in MANIFEST: $_") unless $manifest{$_};
 }
 
 

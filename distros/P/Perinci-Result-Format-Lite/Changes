@@ -1,50 +1,61 @@
-0.274   2018-07-04 (PERLANCAR)
+0.276   2020-05-30  Released-By: PERLANCAR; Urgency: medium
+
+	- [test] Adjust that now that Number::Format::BigFloat is downgraded to
+	  RuntimeRecommends dep [RT#132738].
+
+
+0.275   2020-05-30  Released-By: PERLANCAR; Urgency: medium
+
+	- Observe field format 'filesize'.
+
+
+0.274   2018-07-04  Released-By: PERLANCAR
 
 	- Allow non-integer float for iso8601_date{,time} format, and show
 	  milliseconds in iso8601_datetime format.
 
 
-0.273   2018-06-27 (PERLANCAR)
+0.273   2018-06-27  Released-By: PERLANCAR
 
 	- Introduce table.field_{format,align}_code,
 	  table.default_field_{format,align}.
 
 
-0.272   2018-06-14 (PERLANCAR)
+0.272   2018-06-14  Released-By: PERLANCAR
 
 	- Introduce table.field_labels.
 
 
-0.271   2018-01-31 (PERLANCAR)
+0.271   2018-01-31  Released-By: PERLANCAR
 
 	- Introduce table.field_orders (which will be fed to Sort::BySpec
 	  which can sort by regexes and custom coderefs).
 
 	- [Bugfix] In table view, make columns that are mentioned in
-	  table.fields result metadata shown before (instead of after)
+	  table.fields result metadata shown before  Released-By: instead of after
 	  those that are not mentioned. This bug is caused by a
 	  misunderstanding of what firstidx() will return in case there is
 	  no match. It is -1, not undef.
 
 
-0.270   2017-12-09 (PERLANCAR)
+0.270   2017-12-09  Released-By: PERLANCAR
 
 	- Replace Number::Format with Number::Format::BigFloat to be able
 	  to handle large numbers/arbitrary number of decimals.
 
 
-0.26    2017-08-09 (PERLANCAR)
+0.26    2017-08-09  Released-By: PERLANCAR
 
 	- Support format 'perl'.
 
 
-0.25    2017-05-31 (PERLANCAR)
+0.25    2017-05-31  Released-By: PERLANCAR
 
 	- Recognize field format 'number' (with options: decimal_point,
 	  thousands_sep, decimal_fill, precision).
 
 
-0.24    2017-05-24 (PERLANCAR)
+0.24    2017-05-24  Released-By: PERLANCAR
 
 	- Allow field format to be of the form [NAME, \%OPTS] instead of
 	  just NAME.
@@ -54,14 +65,14 @@
         - [Bugfix] Fix applying formatting for aoaos.
 
 
-0.23    2017-01-10 (PERLANCAR)
+0.23    2017-01-10  Released-By: PERLANCAR
 
 	- Remove embedding of Data::Check::Structure, Text::Table::Any,
 	  Text::Table::Tiny (I don't feel embedding is elegant or worth the
 	  hassle, we should fatpack/datapack only the scripts).
 
 
-0.22    2016-12-29 (PERLANCAR)
+0.22    2016-12-29  Released-By: PERLANCAR
 
         - [Bugfix] Fix HTML output (</tbody> was too early).
 
@@ -69,32 +80,32 @@
           Text::Table::Tiny.
 
 
-0.21    2016-12-12 (PERLANCAR)
+0.21    2016-12-12  Released-By: PERLANCAR
 
 	- Observe FORMAT_PRETTY_TABLE_BACKEND to allow producing text
 	  tables of various formats using Text::Table::Any.
 
 
-0.20    2016-06-28 (PERLANCAR)
+0.20    2016-06-28  Released-By: PERLANCAR
 
 	- [Bugfix] Missed a whitespace.
 
 	- html: Generate <thead> and <tbody> elements.
 
 
-0.19    2016-06-28 (PERLANCAR)
+0.19    2016-06-28  Released-By: PERLANCAR
 
 	- Support html output format.
 
 
-0.18    2016-06-23 (PERLANCAR)
+0.18    2016-06-23  Released-By: PERLANCAR
 
 	- [Bugfix] Correctly handle when there are columns not specified in
 	  table.field* and when there are columns specified in table.fields
 	  not in data column.
 
 
-0.17    2016-06-17 (PERLANCAR)
+0.17    2016-06-17  Released-By: PERLANCAR
 
 	- Tweak 'number' field alignment (right align again after doing
 	  number alignment).
@@ -102,42 +113,42 @@
 	- [Bugfix] Woops, mixed up between left alignment and right.
 
 
-0.16    2016-06-17 (PERLANCAR) (unreleased)
+0.16    2016-06-17  Released-By: PERLANCAR; Released: no
 
         - Recognize field formats: boolstr, sci2dec.
 
         - Observe result metadata: table.field_aligns.
 
 
-0.15    2016-06-12 (PERLANCAR)
+0.15    2016-06-12  Released-By: PERLANCAR
 
 	- Observe result metadata: table.field_formats.
 
 	- Add tests, bugfix (first field unit was not shown).
 
 
-0.14    2016-04-08 (PERLANCAR)
+0.14    2016-04-08  Released-By: PERLANCAR
 
 	- Handle encoding objects.
 
 
-0.13    2016-03-09 (PERLANCAR)
+0.13    2016-03-09  Released-By: PERLANCAR
 
 	- Replace JSON::XS with Cpanel::JSON::XS.
 
 
-0.12    2016-01-19 (PERLANCAR)
+0.12    2016-01-19  Released-By: PERLANCAR
 
 	- Observe result metadata table.field_units (currently just adds '
 	  (UNIT)' to headers).
 
 
-0.11    2016-01-13 (PERLANCAR)
+0.11    2016-01-13  Released-By: PERLANCAR
 
 	- [Bugfix] Remove extra 'my', derp.
 
 
-0.10    2016-01-13 (PERLANCAR)
+0.10    2016-01-13  Released-By: PERLANCAR
 
 	- text format: Observe table.hide_unknown_fields result metadata.
 
@@ -145,35 +156,35 @@
 	  metadata, if any.
 
 
-0.09    2015-11-24 (PERLANCAR)
+0.09    2015-11-24  Released-By: PERLANCAR
 
 	- csv: Avoid perl undef warning.
 
 
-0.08    2015-11-21 (PERLANCAR)
+0.08    2015-11-21  Released-By: PERLANCAR
 
 	- [Bugfix] csv output: Forgot to escape backslash.
 
 
-0.07    2015-11-21 (PERLANCAR)
+0.07    2015-11-21  Released-By: PERLANCAR
 
 	- Add new format: csv.
 
 
-0.06    2015-09-30 (PERLANCAR)
+0.06    2015-09-30  Released-By: PERLANCAR
 
 	- Switch from JSON::Tiny to JSON::Tiny::Subclassable because the
 	  latter can do pretty encoding.
 
 
-0.05    2015-09-30 (PERLANCAR)
+0.05    2015-09-30  Released-By: PERLANCAR
 
 	- Also try to use JSON::Tiny (embedded by
 	  Perinci::CmdLine::Inline), because JSON::PP is not yet core in
 	  perl < 5.14.
 
 
-0.04    2015-09-29 (PERLANCAR)
+0.04    2015-09-29  Released-By: PERLANCAR
 
         - Make more suitable for use by Perinci::CmdLine::Inline.
 
@@ -189,16 +200,16 @@
           JSON::XS first if it's available.
 
 
-0.03    2015-09-15 (PERLANCAR)
+0.03    2015-09-15  Released-By: PERLANCAR
 
 	- Add $DATE & $VERSION.
 
 
-0.02    2015-09-12 (PERLANCAR)
+0.02    2015-09-12  Released-By: PERLANCAR
 
 	- [Bugfix] Forgot to import List::Util's first().
 
 
-0.01     2015-09-11 (PERLANCAR)
+0.01     2015-09-11  Released-By: PERLANCAR
 
          - First release, extracted from Perinci-CmdLine-Lite.

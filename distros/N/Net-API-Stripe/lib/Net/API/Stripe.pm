@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe.pm
-## Version v1.0.4
+## Version v1.0.8
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2018/07/19
-## Modified 2020/05/21
+## Modified 2020/05/28
 ## 
 ##----------------------------------------------------------------------------
 package Net::API::Stripe;
@@ -44,7 +44,7 @@ BEGIN
 	use Devel::Confess;
 	use constant API_BASE => 'https://api.stripe.com/v1';
 	use constant STRIPE_WEBHOOK_SOURCE_IP => [qw( 54.187.174.169 54.187.205.235 54.187.216.72 54.241.31.99 54.241.31.102 54.241.34.107 )];
-	our $VERSION = 'v1.0.4';
+	our $VERSION = 'v1.0.8';
 };
 
 {
@@ -5216,4 +5216,3 @@ BEGIN
 1;
 
 __END__
-

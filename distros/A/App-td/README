@@ -2,8 +2,8 @@ NAME
     App::td - Manipulate table data
 
 VERSION
-    This document describes version 0.094 of App::td (from Perl distribution
-    App-td), released on 2020-04-05.
+    This document describes version 0.100 of App::td (from Perl distribution
+    App-td), released on 2020-05-29.
 
 FUNCTIONS
   td
@@ -51,6 +51,9 @@ FUNCTIONS
 
      # Convert table data (which might be hash, aos, or aoaos) to aohos form
      % list-files -l --json | td as-aohos
+
+     # Convert table data to CSV
+     % list-files -l --json | td as-csv
 
      # Calculate arithmetic average of numeric columns
      % list-files -l --json | td avg
@@ -118,6 +121,47 @@ FUNCTIONS
      # Show rows from the row 5 onwards
      % osnames -l --json | td tail -n +5
 
+     # Transpose table (make first column of rows as column names in the transposed
+     # table)
+
+     % osnames -l --json | td transpose
+
+     # Transpose table (make columns named 'row1', 'row2', 'row3', ... in the
+     # transposed table)
+
+     % osnames -l --json | td transpose --no-header-column
+
+     # Use Perl code to filter rows. Perl code gets row in $row or $_
+     # (scalar/aos/hos) or $rowhash (always a hos) or $rowarray (always aos). There
+     # are also $rownum (integer, starts at 0) and $td (table data object). Perl
+     # code is eval'ed in the 'main' package with strict/warnings turned off. The
+     # example below selects videos that are larger than 480p.
+
+     % media-info *.mp4 | td grep 'use List::Util qw(min); min($I<< ->{video >>height}, $I<< ->{video >>width}) > 480'
+
+     # Use Perl code to filter columns. Perl code gets column name in $colname or
+     # $_. There's also $colidx (column index, from 1) and $td (table data object).
+     # If table data form is 'hash' or 'aos', it will be transformed into 'aoaos'.
+     # The example below only select even columns that match /col/i. Note that most
+     # of the time, 'td select' is better. But when you have a lot of columns and
+     # want to select them programmatically, you have grep-col.
+
+     % somecd --json | td grep-col '$colidx % 2 == 0 && /col/i'
+
+     # Use Perl code to transform row. Perl code gets row in $row or $_
+     # (scalar/hash/array) and is supposed to return the new row. As in 'grep',
+     # $rowhash, $rowarray, $rownum, $td are also available as helper. The example
+     # below adds a field called 'is_landscape'.
+
+     % media-info *.jpg | td map '$I<< ->{is >>landscape} = $I<< ->{video >>height} < $I<< ->{video >>width} ? 1:0; $_'
+
+     # Use perl code to sort rows. Perl sorter code gets row in $a & $b or $I<[0] &
+     # $>[1] (hash/array). Sorter code, like in Perl's standard sort(), is expected
+     # to return -1/0/1. The example belows sort videos by height, descendingly then
+     # by width, descendingly.
+
+     % media-info *.mp4 | td psort '$b->{video_height} <=> $a->{video_height} || $b->{video_width} <=> $b->{video_width}'
+
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
@@ -135,6 +179,11 @@ FUNCTIONS
     *   exclude_columns => *array[str]*
 
     *   lines => *str*
+
+    *   no_header_column => *true*
+
+        Don't make the first column as column names of the transposed table;
+        instead create column named 'row1', 'row2', ...
 
     *   repeat => *bool*
 

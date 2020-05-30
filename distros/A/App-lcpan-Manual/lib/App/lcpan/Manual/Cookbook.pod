@@ -20,7 +20,7 @@ App::lcpan::Manual::Cookbook - App::lcpan cookbook
 
 =head1 VERSION
 
-version 1.057.000
+version 1.058.000
 
 =head1 DESCRIPTION
 
@@ -56,10 +56,10 @@ currently not indexed (i.e. probably cannot be installed by users):
 =head2 Listing distributions of other CPAN authors that recently depend on one of your modules [author]
 
     # Show dependencies that were added in the last 2 weeks
-    % lcpan author-rdeps YOURCPANID --user-author-isnt YOURCPANID --added-after '2 weeks ago'
+    % lcpan author-rdeps YOURCPANID --user-author-isnt YOURCPANID --added-since '2 weeks ago'
 
     # Show dependencies that were updated in the last 2 weeks
-    % lcpan author-rdeps YOURCPANID --user-author-isnt YOURCPANID --updated-after '2 weeks ago'
+    % lcpan author-rdeps YOURCPANID --user-author-isnt YOURCPANID --updated-since '2 weeks ago'
 
     # Show dependencies that were not present before your last 'lcpan update'
     % lcpan author-rdeps YOURCPANID --user-author-isnt YOURCPANID --added-in-last-update
@@ -98,13 +98,15 @@ L<td> is provided by L<App::td>.
 =head2 Listing recent modules
 
     # Show modules that were added in the last 2 weeks
-    % lcpan mods -l --added-after '2 weeks ago'
+    % lcpan mods -l --added-since '2 weeks ago'
 
     # Show modules that were updated in the last 2 weeks
-    % lcpan mods -l --updated-after '2 weeks ago'
+    % lcpan mods -l --updated-since '2 weeks ago'
 
     # Show modules that were not present before the last 'lcpan update'
-    % lcpan mods -l --added-in-last-update
+    % lcpan mods -l --added-in-last-index-update
+
+There's also C<lcpan whatsnew>.
 
 =head2 Showing related modules
 

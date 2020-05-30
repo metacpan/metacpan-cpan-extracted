@@ -1,5 +1,10 @@
 Revision history for Perl extension CPAN::SQLite.
 
+0.218 May 27, 2020
+  - Make Test::Memory::Cycle test optional
+  - Modified the dot-cpan directory for t/0[234]*
+  - Added a FP protection again one particular crappy cpan tester
+
 0.217 Jan 29, 2019
   - Updated HTTP::Tiny prerequisite to make it working with proxy auth
   - Removed search limits (RT#128387)

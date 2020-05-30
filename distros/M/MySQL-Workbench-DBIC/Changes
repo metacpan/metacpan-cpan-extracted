@@ -1,6 +1,12 @@
 Change history for MySQL::Workbench::DBIC
 =========================================
 
+1.17 2020-05-29 09:25:00
+
+  * fix tests
+  * fix list of prereqs
+  * add 'schema_base_class'
+
 1.16 2019-01-16 09:35:00
 
   * handle flags and unique constraints correctly

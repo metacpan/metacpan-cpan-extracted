@@ -1,3 +1,9 @@
+0.005   2020-05-30  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+
+	- [incompatible] Rename rule 'Str::downcase' to the more familiar
+          'Str::lowcase'.
+
+
 0.004   2020-02-11  Released-By: PERLANCAR; Urgency: medium
 
 	- Add filter: Str::replace_map.

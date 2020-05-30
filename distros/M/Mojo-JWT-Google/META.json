@@ -51,7 +51,7 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
-            "Test2::Suite" : "0",
+            "Test2::V0" : "0",
             "Test::More" : "0"
          }
       }
@@ -59,7 +59,7 @@
    "provides" : {
       "Mojo::JWT::Google" : {
          "file" : "lib/Mojo/JWT/Google.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -74,7 +74,7 @@
          "web" : "https://github.com/rabbiveesh/mojo-jwt-google"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030001"
@@ -244,7 +244,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.10",
+                  "tag" : "0.11",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },

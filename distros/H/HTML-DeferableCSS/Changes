@@ -1,5 +1,10 @@
 Revision history for HTML-DeferableCSS:
 
+v0.4.0    2020-05-29 23:34:41+01:00 Europe/London
+  [Improvements]
+  - Added simple mode option to use a simpler method without the
+    loadCSS shim.
+
 v0.3.2    2020-03-12 13:52:53+00:00 Europe/London
   [Documentation]
   - Added note about Content-Security-Policy (CSP) to KNOWN ISSUES.

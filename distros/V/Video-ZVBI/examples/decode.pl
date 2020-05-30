@@ -1,10 +1,9 @@
 #!/usr/bin/perl -w
 #
-#  zvbi-decode -- decode sliced VBI data using low-level
-#                  libzvbi functions
+#  decode sliced VBI data using low-level libzvbi functions
 #
 #  Copyright (C) 2004, 2006 Michael H. Schimek
-#  Perl Port: Copyright (C) 2007 Tom Zoerner
+#  Perl Port: Copyright (C) 2007, 2020 Tom Zoerner
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -19,10 +18,16 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-#/
 
-# Perl $Id: decode.pl,v 1.1 2007/11/18 18:48:35 tom Exp tom $
-# libzvbi #Id: decode.c,v 1.19 2006/10/06 19:23:15 mschimek Exp #
+# Description:
+#
+#   Example for the use of class Video::ZVBI::vt. Decodes sliced VBI data
+#   on STDIN for different data services. Example for decoding teletext:
+#
+#     ./capture.pl --sliced | ./decode.pl --ttx
+#
+#   Call with option --help for a list of options.
+#   (This is a direct translation of test/decode.c in the libzvbi package.)
 
 use blib;
 use strict;
@@ -33,6 +38,8 @@ use IO::Handle;
 use Encode;
 use Video::ZVBI qw(/^VBI_/);
 
+my $option_help         = 0;
+my $option_verbose      = 0;
 my $source_is_pes       = 0; # ATSC/DVB
 
 my $option_pfc_pgno     = 0;
@@ -877,49 +884,48 @@ sub usage {
 $0 -- low-level VBI decoder\n\
 Copyright (C) 2004, 2006 Michael H. Schimek\
 This program is licensed under GPL 2 or later. NO WARRANTIES.\n\
-Usage: %s [options] < sliced VBI data\n\
--h | --help | --usage  Print this message and exit\
--V | --version         Print the program version and exit\
+Usage: $0 [options] < sliced VBI data\n\
+--help                 Print this message and exit\
+--version              Print the program version and exit\
 Input options:\
--P | --pes             Source is a DVB PES stream [auto-detected]\
+--pes                  Source is a DVB PES stream\
 Decoding options:\n".
 #if 3 == VBI_VERSION_MINOR # XXX port me back
-#"-1 | --8301            Teletext packet 8/30 format 1 (local time)\
-#-2 | --8302            Teletext packet 8/30 format 2 (PDC)\n"
+#"--8301                 Teletext packet 8/30 format 1 (local time)\
+#--8302                 Teletext packet 8/30 format 2 (PDC)\n".
 #endif
-"-c | --cc              Closed Caption\
--i | --idl             Any Teletext IDL packets (M/30, M/31)\
--t | --ttx             Decode any Teletext packet\
--v | --vps             Video Programming System (PDC)\n".
+"--cc                   Closed Caption\
+--idl                  Any Teletext IDL packets (M/30, M/31)\
+--ttx                  Decode any Teletext packet\
+--vps                  Video Programming System (PDC)\n".
 #if 3 == VBI_VERSION_MINOR # XXX port me back
-#"-w | --wss             Wide Screen Signalling\n"
+#"--wss                  Wide Screen Signalling\n"
 #endif
-"-x | --xds             Decode eXtended Data Service (NTSC line 284)\
--a | --all             Everything above, e.g.\
+"--xds                  Decode eXtended Data Service (NTSC line 284)\
+--all                  Everything above, e.g.\
                        -i     decode IDL packets\
                        -a     decode everything\
                        -a -i  everything except IDL\
--c | --idl-ch N\
--d | --idl-addr NNN\
+--idl-ch N\
+--idl-addr NNN\
                        Decode Teletext IDL format A data from channel N,\
                        service packet address NNN [0]\
--r | --vps-other       Decode VPS data unrelated to PDC\
--p | --pfc-pgno NNN\
--s | --pfc-stream NN   Decode Teletext Page Function Clear data\
+--vps-other            Decode VPS data unrelated to PDC\
+--pfc-pgno NNN\
+--pfc-stream NN        Decode Teletext Page Function Clear data\
                          from page NNN (for example 1DF), stream NN [0]\
 Modifying options:\
--e | --hex             With -t dump packets in hex and ASCII,\
+--hex                  With -t dump packets in hex and ASCII,\
                          otherwise only ASCII\
--n | --network         With -1, -2, -v decode CNI and print\
+--network              With --8301, --8302, --vps: decode CNI and print\
                          available information about the network\
--b | --bin             With -t, -p, -v dump data in binary format\
+--bin                  With --ttx, --pfx, --vps: dump data in binary format\
                          instead of ASCII\
--T | --time            Dump capture timestamps\
+--time                 Dump capture timestamps\
+--verbose              Print debug output\
 ";
   exit(0);
 }
-
-#short_options [] = "12abcd:ehil:np:rs:tvwxPTV";
 
 my %CmdOpts = (
         "8301" =>      \$option_decode_8301,  # '1'
@@ -929,8 +935,7 @@ my %CmdOpts = (
         "cc" =>        \$option_decode_caption,  # 'c'
         "idl-addr=i",  \$option_idl_address,  # 'd'
         "hex" =>       \$option_dump_hex,  # 'e'
-        #"help" =>      \$OPT,  # 'h'
-        #"usage" =>     \$OPT,  # 'h'
+        "help" =>      \$option_help,  # 'h'
         "idl" =>       \$option_decode_idl,  # 'i'
         "idl-ch=i" =>  \$option_idl_channel,  # 'l'
         "network" =>   \$option_dump_network,  # 'n'
@@ -943,6 +948,7 @@ my %CmdOpts = (
         "xds" =>       \$option_decode_xds,  # 'x'
         "pes" =>       \$source_is_pes,  # 'P'
         "time" =>      \$option_dump_time,  # 'T'
+        "verbose" =>   \$option_verbose,
 );
 
 sub main_func {
@@ -960,24 +966,28 @@ sub main_func {
                 $option_pfc_pgno = 0x1DF;
         }
 
-        #usage() if $option_help;
-        #print  if $option_help;
+        usage() if $option_help;
 
         if (-t) {
                 die "No VBI data on standard input.\n";
         }
 
+        if ($option_verbose) {
+                Video::ZVBI::set_log_on_stderr(VBI_LOG_ERROR | VBI_LOG_WARNING |
+                                               VBI_LOG_INFO | VBI_LOG_DEBUG);
+        }
+
         if (0 != $option_pfc_pgno) {
                 $pfc = Video::ZVBI::pfc_demux::new ($option_pfc_pgno,
-                                         $option_pfc_stream,
-                                         \&page_function_clear_cb);
+                                                    $option_pfc_stream,
+                                                    \&page_function_clear_cb);
                 die unless defined $pfc;
         }
 
         if (0 != $option_idl_channel) {
                 $idl = Video::ZVBI::idl_demux::new ($option_idl_channel,
-                                            $option_idl_address,
-                                            \&idl_format_a_cb);
+                                                    $option_idl_address,
+                                                    \&idl_format_a_cb);
                 die unless defined $idl;
         }
 
@@ -1013,8 +1023,4 @@ sub main_func {
         undef $xds;
 }
 
-#sub vlog  { print "LOG ".join(",",@_); }
-#Video::ZVBI::set_log_fn(VBI_LOG_DEBUG, \&vlog, "\n");
-
 main_func();
-

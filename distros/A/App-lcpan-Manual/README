@@ -2,7 +2,7 @@ NAME
     App::lcpan::Manual - Manual for App::lcpan
 
 VERSION
-    version 1.057.000
+    version 1.058.000
 
 DESCRIPTION
     This distribution contains the following documentation pages:
@@ -12,6 +12,8 @@ DESCRIPTION
     *   App::lcpan::Manual::FAQ
 
     *   App::lcpan::Manual::Internals
+
+    *   App::lcpan::Manual::Tips
 
     *   App::lcpan::Manual::Tutorial
 

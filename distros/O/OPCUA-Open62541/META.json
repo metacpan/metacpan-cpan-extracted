@@ -54,6 +54,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.014",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/bluhm/p5-opcua-open62541.git",
+         "web" : "https://github.com/bluhm/p5-opcua-open62541/"
+      }
+   },
+   "version" : "0.015",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

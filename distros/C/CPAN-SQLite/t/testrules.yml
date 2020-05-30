@@ -2,7 +2,6 @@
     seq:
         # tests that are not parallel-ready (will run in isolation)
         - seq:
-            - **
             - t/02drop.t
             - t/03info.t
             - t/04search.t

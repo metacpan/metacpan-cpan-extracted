@@ -1,7 +1,7 @@
 package Perinci::Result::Format::Lite;
 
-our $DATE = '2018-07-04'; # DATE
-our $VERSION = '0.274'; # VERSION
+our $DATE = '2020-05-30'; # DATE
+our $VERSION = '0.276'; # VERSION
 
 use 5.010001;
 #IFUNBUILT
@@ -200,6 +200,9 @@ sub __gen_table {
                     }
                 } elsif ($fmt_name eq 'boolstr') {
                     $row->[$j] = $row->[$j] ? "yes" : "no";
+                } elsif ($fmt_name eq 'filesize') {
+                    require Format::Human::Bytes;
+                    $row->[$j] = Format::Human::Bytes::base2($row->[$j], 0);
                 } elsif ($fmt_name eq 'sci2dec') {
                     if ($row->[$j] =~ /\A(?:[+-]?)(?:\d+\.|\d*\.(\d+))[eE]([+-]?\d+)\z/) {
                         my $n = length($1 || "") - $2; $n = 0 if $n < 0;
@@ -530,7 +533,7 @@ Perinci::Result::Format::Lite - Format enveloped result
 
 =head1 VERSION
 
-This document describes version 0.274 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2018-07-04.
+This document describes version 0.276 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2020-05-30.
 
 =head1 SYNOPSIS
 
@@ -590,7 +593,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

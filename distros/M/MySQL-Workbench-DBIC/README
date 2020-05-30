@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.16
+    version 1.17
 
 SYNOPSIS
 
@@ -216,6 +216,8 @@ ATTRIBUTES
  classes
 
  file
+
+ schema_base_class
 
  inherit_from_core
 

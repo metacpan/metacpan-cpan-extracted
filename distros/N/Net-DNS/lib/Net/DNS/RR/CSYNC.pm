@@ -1,9 +1,9 @@
 package Net::DNS::RR::CSYNC;
 
 #
-# $Id: CSYNC.pm 1741 2019-04-16 13:10:38Z willem $
+# $Id: CSYNC.pm 1781 2020-05-13 08:58:25Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1741 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1781 $)[1];
 
 
 use strict;
@@ -78,7 +78,7 @@ sub flags {
 
 sub immediate {
 	for ( shift->{flags} ) {
-		$_ = ( shift() ? 0 : 0x0001 ) ^ ( 0x0001 | ( $_ || 0 ) ) if scalar @_;
+		$_ = ( $_[0] ? 0 : 0x0001 ) ^ ( 0x0001 | ( $_ || 0 ) ) if scalar @_;
 		return 0x0001 & ( $_ || 0 );
 	}
 }
@@ -86,7 +86,7 @@ sub immediate {
 
 sub soaminimum {
 	for ( shift->{flags} ) {
-		$_ = ( shift() ? 0 : 0x0002 ) ^ ( 0x0002 | ( $_ || 0 ) ) if scalar @_;
+		$_ = ( $_[0] ? 0 : 0x0002 ) ^ ( 0x0002 | ( $_ || 0 ) ) if scalar @_;
 		return 0x0002 & ( $_ || 0 );
 	}
 }

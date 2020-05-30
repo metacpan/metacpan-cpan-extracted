@@ -23,7 +23,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Country
   homepage: https://metacpan.org/release/Sah-Schemas-Country
   repository: git://github.com/perlancar/perl-Sah-Schemas-Country.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -294,7 +294,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Sah::Schemas
               name: -Sah::Schemas
-              version: '0.05'
+              version: '0.060'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -

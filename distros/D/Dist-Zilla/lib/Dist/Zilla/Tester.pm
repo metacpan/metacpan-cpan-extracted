@@ -1,4 +1,4 @@
-package Dist::Zilla::Tester 6.014;
+package Dist::Zilla::Tester 6.015;
 # ABSTRACT: a testing-enabling stand-in for Dist::Zilla
 
 use Moose;
@@ -112,7 +112,7 @@ sub minter { 'Dist::Zilla::Tester::_Minter' }
 }
 
 {
-  package Dist::Zilla::Tester::_Builder 6.014;
+  package Dist::Zilla::Tester::_Builder 6.015;
 
   use Moose;
   extends 'Dist::Zilla::Dist::Builder';
@@ -205,6 +205,13 @@ sub minter { 'Dist::Zilla::Tester::_Minter' }
   around build_in => sub {
     my ($orig, $self, $target) = @_;
 
+    # Sometimes, we can't get a local time zone.  When that happens, we're just
+    # going to pretend to be in UTC.  We don't do this during actual runtime
+    # because the user can fix their own environment, but we'll let them do
+    # that after they get the software installed. -- rjbs, 2020-01-26
+    my $ok = eval { DateTime::TimeZone->new(name => 'local'); 1 };
+    local $ENV{TZ} = $ok ? $ENV{TZ} : 'UTC';
+
     # XXX: We *must eliminate* the need for this!  It's only here because right
     # now building a dist with (root <> cwd) doesn't work. -- rjbs, 2010-03-08
     my $wd = File::pushd::pushd($self->root);
@@ -250,7 +257,7 @@ sub minter { 'Dist::Zilla::Tester::_Minter' }
 }
 
 {
-  package Dist::Zilla::Tester::_Minter 6.014;
+  package Dist::Zilla::Tester::_Minter 6.015;
 
   use Moose;
   extends 'Dist::Zilla::Dist::Minter';
@@ -300,6 +307,13 @@ sub minter { 'Dist::Zilla::Tester::_Minter' }
 
   around _new_from_profile => sub {
     my ($orig, $self, $profile_data, $arg, $tester_arg) = @_;
+
+    # Sometimes, we can't get a local time zone.  When that happens, we're just
+    # going to pretend to be in UTC.  We don't do this during actual runtime
+    # because the user can fix their own environment, but we'll let them do
+    # that after they get the software installed. -- rjbs, 2020-01-26
+    my $ok = eval { DateTime::TimeZone->new(name => 'local'); 1 };
+    local $ENV{TZ} = $ok ? $ENV{TZ} : 'UTC';
 
     my $tempdir_root = exists $tester_arg->{tempdir_root}
                      ? $tester_arg->{tempdir_root}
@@ -355,7 +369,7 @@ Dist::Zilla::Tester - a testing-enabling stand-in for Dist::Zilla
 
 =head1 VERSION
 
-version 6.014
+version 6.015
 
 =head1 AUTHOR
 

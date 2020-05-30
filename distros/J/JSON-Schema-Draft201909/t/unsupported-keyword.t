@@ -1,5 +1,7 @@
 use strict;
 use warnings;
+no if "$]" >= 5.031009, feature => 'indirect';
+use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::More;
 use Test::Fatal;
@@ -8,11 +10,17 @@ use JSON::Schema::Draft201909;
 
 my $js = JSON::Schema::Draft201909->new;
 
-foreach my $keyword (qw($id $anchor $recursiveRef $recursiveAnchor $vocabulary)) {
+foreach my $keyword (qw($recursiveRef $recursiveAnchor $vocabulary)) {
   subtest 'keyword: '.$keyword => sub {
     is(
       exception {
-        my $result = $js->evaluate('hello', { $keyword => 'something' });
+        my $result = $js->evaluate(
+          'hello',
+          {
+            '$schema' => 'https://json-schema.org/draft/2019-09/schema',
+            $keyword => 'something',
+          },
+        );
         cmp_deeply(
           $result->TO_JSON,
           {
@@ -20,7 +28,7 @@ foreach my $keyword (qw($id $anchor $recursiveRef $recursiveAnchor $vocabulary))
             errors => [
               {
                 instanceLocation => '',
-                keywordLocation => '',
+                keywordLocation => "/$keyword",
                 error => 'EXCEPTION: unsupported keyword "'.$keyword.'"',
               },
             ],
@@ -29,7 +37,7 @@ foreach my $keyword (qw($id $anchor $recursiveRef $recursiveAnchor $vocabulary))
         );
       },
       undef,
-      'did not get no exception',
+      'got an exception',
     );
   };
 }

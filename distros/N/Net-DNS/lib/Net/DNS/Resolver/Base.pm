@@ -1,9 +1,9 @@
 package Net::DNS::Resolver::Base;
 
 #
-# $Id: Base.pm 1771 2020-02-25 14:23:23Z willem $
+# $Id: Base.pm 1784 2020-05-24 19:27:13Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1771 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1784 $)[1];
 
 
 #
@@ -26,7 +26,7 @@ our $VERSION = (qw$LastChangedRevision: 1771 $)[1];
 # [Revised March 2016, June 2018]
 
 
-use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.32; 1';
+use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.38; 1';
 
 use constant IPv6 => USE_SOCKET_IP;
 
@@ -45,6 +45,7 @@ use strict;
 use warnings;
 use integer;
 use Carp;
+use IO::File;
 use IO::Select;
 use IO::Socket;
 
@@ -188,8 +189,7 @@ sub _read_config_file {			## read resolver config file
 	my $self = shift;
 	my $file = shift;
 
-	my $filehandle;
-	open( $filehandle, '<', $file ) or croak "$file: $!";
+	my $filehandle = new IO::File( $file, '<' ) or croak "$file: $!";
 
 	my @nameserver;
 	my @searchlist;
@@ -719,7 +719,7 @@ sub axfr {				## zone transfer
 			unless ( scalar @rr ) {
 				my $reply;			# refill @rr
 				( $reply, $verify ) = $self->_axfr_next( $select, $verify );
-				@rr = $reply->answer;
+				@rr = $reply->answer if $reply;
 			}
 
 			return $rr;
@@ -1009,25 +1009,25 @@ sub dnssec {
 
 sub force_v6 {
 	my $self = shift;
-	my $value = scalar(@_) ? shift() : $self->{force_v6};
+	my $value = scalar(@_) ? $_[0] : $self->{force_v6};
 	$self->{force_v6} = $value ? do { $self->{force_v4} = 0; 1 } : 0;
 }
 
 sub force_v4 {
 	my $self = shift;
-	my $value = scalar(@_) ? shift() : $self->{force_v4};
+	my $value = scalar(@_) ? $_[0] : $self->{force_v4};
 	$self->{force_v4} = $value ? do { $self->{force_v6} = 0; 1 } : 0;
 }
 
 sub prefer_v6 {
 	my $self = shift;
-	my $value = scalar(@_) ? shift() : $self->{prefer_v6};
+	my $value = scalar(@_) ? $_[0] : $self->{prefer_v6};
 	$self->{prefer_v6} = $value ? do { $self->{prefer_v4} = 0; 1 } : 0;
 }
 
 sub prefer_v4 {
 	my $self = shift;
-	my $value = scalar(@_) ? shift() : $self->{prefer_v4};
+	my $value = scalar(@_) ? $_[0] : $self->{prefer_v4};
 	$self->{prefer_v4} = $value ? do { $self->{prefer_v6} = 0; 1 } : 0;
 }
 

@@ -9,18 +9,17 @@ use utf8;
 use Exporter;
 use Carp qw( croak );
 use Log::Any qw($log);
+use File::Slurp;
 
 use AsposeCellsCloud::ApiClient;
 
 use base "Class::Data::Inheritable";
 
-my $VERSION = '20.5.2';
-
-
 
 __PACKAGE__->mk_classdata('method_documentation' => {});
 
 
+our $VERSION = '20.5.4';
 
 sub new {
     my $class = shift;

@@ -34,6 +34,16 @@ WriteMakefile(
 	'-Wall -Wpointer-arith -Wuninitialized -Wstrict-prototypes '.
 	'-Wmissing-prototypes -Wunused -Wsign-compare -Wshadow '.
 	'-Wno-pointer-sign',
+    META_MERGE => {
+	'meta-spec' => { version => 2 },
+	resources => {
+	    repository => {
+		type => 'git',
+		url  => 'git://github.com/bluhm/p5-opcua-open62541.git',
+		web  => 'https://github.com/bluhm/p5-opcua-open62541/',
+	    },
+	},
+    },
     SIGN		=> 1,
     TEST_REQUIRES	=> {
 	'Test::Deep'		=> 0,

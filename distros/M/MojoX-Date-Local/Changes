@@ -1,0 +1,19 @@
+Revision history for Perl extension MojoX-Date-Local
+
+0.04 2020-05-28T07:12:29Z
+
+    - stop overloading to_string
+    - Allow custom formatted output, defaulting to something like RFC-7231
+
+0.03 2020-05-28T05:02:27Z
+
+    - still learning what cpan uploads are supposed to look like
+
+0.02 2020-05-28T04:14:47Z
+
+    - actually try uploading to CPAN this time?
+
+0.01 2020-05-28T04:10:55Z
+
+    - original version
+

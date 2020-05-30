@@ -1,0 +1,9 @@
+0.002   2020-05-30  Released-By: PERLANCAR; Urgency: medium
+
+	- [removed] Remove scripts that got accidentally copied from
+	  App-FileRenameUtils.
+
+
+0.001   2020-05-30  Released-By: PERLANCAR
+
+        - First release.

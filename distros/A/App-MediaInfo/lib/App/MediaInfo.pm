@@ -1,7 +1,9 @@
 package App::MediaInfo;
 
-our $DATE = '2019-08-15'; # DATE
-our $VERSION = '0.124'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-30'; # DATE
+our $DIST = 'App-MediaInfo'; # DIST
+our $VERSION = '0.126'; # VERSION
 
 use 5.010001;
 use strict;
@@ -20,23 +22,19 @@ $SPEC{':package'} = {
 our %arg0_media_multiple = (
     media => {
         summary => 'Media files/URLs',
-        schema => ['array*' => of => 'str*'],
+        schema => ['array*' => of => 'filename*'], # XXX filename_or_url
         req => 1,
         pos => 0,
         greedy => 1,
-        #'x.schema.entity' => 'filename_or_url',
-        'x.schema.entity' => 'filename', # temp
     },
 );
 
 our %arg0_media_single = (
     media => {
         summary => 'Media file/URL',
-        schema => ['str*'],
+        schema => ['filename*'], # XXX filename_or_url
         req => 1,
         pos => 0,
-        #'x.schema.entity' => 'filename_or_url',
-        'x.schema.entity' => 'filename', # temp
     },
 );
 
@@ -64,9 +62,29 @@ our %argopt_quiet = (
     },
 );
 
+sub _type_from_name {
+    require Filename::Audio;
+    require Filename::Video;
+    require Filename::Image;
+    my $name = shift;
+
+    Filename::Video::check_video_filename(filename => $name) ? "video" :
+    Filename::Audio::check_audio_filename(filename => $name) ? "audio" :
+    Filename::Image::check_image_filename(filename => $name) ? "image" : "unknown";
+}
+
 $SPEC{media_info} = {
     v => 1.1,
     summary => 'Get information about media files/URLs',
+    description => <<'_',
+
+Many fields will depend on the backend used. Some other fields returned:
+
+* `info_backend`: the `Media::Info::*` backend module used, e.g. `Ffmpeg`.
+* `type_from_name`: either `image`, `audio`, `video`, or `unknown`. This
+  is determined from filename (extension).
+
+_
     args => {
         %arg0_media_multiple,
         %argopt_backend,
@@ -79,26 +97,27 @@ sub media_info {
 
     my $media = $args{media};
 
-    if (@$media == 1) {
-        return Media::Info::get_media_info(
-            media => $media->[0],
+    my @res;
+    for (@$media) {
+        my $res = Media::Info::get_media_info(
+            media => $_,
             (backend => $args{backend}) x !!(defined $args{backend}),
         );
-    } else {
-        my @res;
-        for (@$media) {
-            my $res = Media::Info::get_media_info(
-                media => $_,
-                (backend => $args{backend}) x !!(defined $args{backend}),
-            );
-            unless ($res->[0] == 200) {
-                warn "Can't get media info for '$_': $res->[1] ($res->[0])\n";
-                next;
-            }
-            push @res, { media => $_, %{$res->[2]} };
+        unless ($res->[0] == 200) {
+            warn "Can't get media info for '$_': $res->[1] ($res->[0])\n";
+            next;
         }
-        [200, "OK", \@res];
+        push @res, {
+            media => $_,
+            %{$res->[2]},
+            info_backend => $res->[3]{'func.backend'},
+            type_from_name => _type_from_name($_),
+        };
+        if (@$media == 1) {
+            return [200, "OK", $res->[0]];
+        }
     }
+    [200, "OK", \@res];
 }
 
 $SPEC{media_is_portrait} = {
@@ -233,7 +252,7 @@ App::MediaInfo - Utilities related to getting (metadata) information from media 
 
 =head1 VERSION
 
-This document describes version 0.124 of App::MediaInfo (from Perl distribution App-MediaInfo), released on 2019-08-15.
+This document describes version 0.126 of App::MediaInfo (from Perl distribution App-MediaInfo), released on 2020-05-30.
 
 =head1 FUNCTIONS
 
@@ -244,7 +263,18 @@ Usage:
 
  media_info(%args) -> [status, msg, payload, meta]
 
-Get information about media files/URLs.
+Get information about media filesE<sol>URLs.
+
+Many fields will depend on the backend used. Some other fields returned:
+
+=over
+
+=item * C<info_backend>: the C<Media::Info::*> backend module used, e.g. C<Ffmpeg>.
+
+=item * C<type_from_name>: either C<image>, C<audio>, C<video>, or C<unknown>. This
+is determined from filename (extension).
+
+=back
 
 This function is not exported.
 
@@ -256,9 +286,10 @@ Arguments ('*' denotes required arguments):
 
 Choose a specific backend.
 
-=item * B<media>* => I<array[str]>
+=item * B<media>* => I<array[filename]>
 
-Media files/URLs.
+Media filesE<sol>URLs.
+
 
 =back
 
@@ -296,13 +327,14 @@ Arguments ('*' denotes required arguments):
 
 Choose a specific backend.
 
-=item * B<media>* => I<str>
+=item * B<media>* => I<filename>
 
-Media file/URL.
+Media fileE<sol>URL.
 
 =item * B<quiet> => I<true>
 
 Don't output anything on command-line, just return appropriate exit code.
+
 
 =back
 
@@ -340,13 +372,14 @@ Arguments ('*' denotes required arguments):
 
 Choose a specific backend.
 
-=item * B<media>* => I<str>
+=item * B<media>* => I<filename>
 
-Media file/URL.
+Media fileE<sol>URL.
 
 =item * B<quiet> => I<true>
 
 Don't output anything on command-line, just return appropriate exit code.
+
 
 =back
 
@@ -384,9 +417,10 @@ Arguments ('*' denotes required arguments):
 
 Choose a specific backend.
 
-=item * B<media>* => I<str>
+=item * B<media>* => I<filename>
 
-Media file/URL.
+Media fileE<sol>URL.
+
 
 =back
 
@@ -423,7 +457,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

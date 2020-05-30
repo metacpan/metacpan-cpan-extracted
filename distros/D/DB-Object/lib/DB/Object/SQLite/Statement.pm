@@ -1,15 +1,12 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## DB/Object/SQLite/Statement.pm
-## Version 0.3
-## Copyright(c) 2019 Jacques Deguest
-## Author: Jacques Deguest <jack@deguest.jp>
+## Database Object Interface - ~/lib/DB/Object/SQLite/Statement.pm
+## Version v0.300.1
+## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2017/07/19
-## Modified 2019/09/11
-## All rights reserved.
+## Modified 2020/05/22
 ## 
-## This program is free software; you can redistribute it and/or modify it 
-## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 ## This package's purpose is to automatically terminate the statement object and
 ## separate them from the connection object (DB::Object).
@@ -25,7 +22,7 @@ BEGIN
     use DB::Object::Statement;
     use parent qw( DB::Object::SQLite DB::Object::Statement );
     our( $VERSION, $VERBOSE, $DEBUG );
-    $VERSION    = '0.3';
+    $VERSION    = 'v0.300.1';
     $VERBOSE    = 0;
     $DEBUG        = 0;
     use Devel::Confess;
@@ -155,7 +152,7 @@ sub unprepared_statements
     {
         return( $self->{dbh}->{sth}->{sqlite_unprepared_statements} );
     }
-    return( undef() );
+    return;
 }
 
 ## Does nothing in SQLite. This is a Mysql feature

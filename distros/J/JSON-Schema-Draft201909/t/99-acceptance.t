@@ -41,12 +41,18 @@ $accepter->acceptance(
     die 'results inconsistent between short_circuit = false and true'
       if $result xor $result_short;
 
+    # if any errors contain an exception, propage at that upwards as an exception so we can be sure
+    # to count that as a failure.
+    # (This might change if tests are added that are expected to produce exceptions.)
+    if (my ($e) = grep $_->error =~ /^EXCEPTION/, $result->errors) {
+      die $e->error;
+    }
+
     $result;
   },
   @ARGV ? (tests => { file => \@ARGV }) : (),
   $ENV{NO_TODO} ? () : ( todo_tests => [
     { file => [
-        'anchor.json',                # $anchor, $ref, $id
         'defs.json',                  # $ref to (cached?) metaschema
         'refRemote.json',             # $ref, $id, loading external file
         'unevaluatedItems.json',
@@ -76,8 +82,7 @@ $accepter->acceptance(
         ),
       ] },
     { file => 'ref.json', group_description => [
-        'remote ref, containing refs itself',
-        'Recursive references between schemas',
+        'remote ref, containing refs itself',               # cached metaschema
         'ref creates new scope when adjacent to keywords',  # unevaluatedProperties
       ] },
   ] ),
@@ -108,6 +113,7 @@ $accepter->acceptance(
 # 2020-05-13  0.995  Looks like you failed 171 tests of 959.
 # 2020-05-14  0.996  Looks like you failed 171 tests of 992.
 # 2020-05-19  0.997  Looks like you failed 171 tests of 994.
+# 2020-05-22  0.997  Looks like you failed 163 tests of 994.
 
 
 END {

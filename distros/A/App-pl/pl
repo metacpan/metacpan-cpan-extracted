@@ -2,20 +2,19 @@
 
 # Beware: DON'T PERFORM ANY ACTIONS AT TOP LEVEL: this file runs many times under -n!
 
-use v5.10;
+use 5.010;
 
 our( $VERSION, $A, @A );
 BEGIN {
-    $VERSION = '0.51.1';
+    $VERSION = '0.52';
     *A = *ARGV;
-    my $execed = shift if @A && $A[0] eq '+';
+    my $execed = shift if @A && $A[0] eq '+'; # don't recursively call perl again for -p
     return unless @A and $A[0] =~ /^-/s;
-    my $onepl = qr/[oOrhv?]|[pP](?:[1-9][0-9]*)?/; # simple pl opts
+    my $onepl = qr/[oOrhv?]|[pP](?:[1-9][0-9]*)?/; # simple pl opts, reflect these in doc/html
     my $one = qr/[cftTuUwWXan]|$onepl/; # simple opts to pass to perl, which handles them well
     my( $perl, @perl, @pl1, %seen );
     while( @A ) {		# no for, may need to shift
 	$_ = $A[0];
-	$perl = \1, next if $_ eq '+';
 	last unless /^-/s;
 	shift;
 	last if /^--$/s;
@@ -152,14 +151,12 @@ sub B(&@) {
 # Config
 sub c(@) {
     require Config;
-    no warnings;
     if( @_ ) {
-	#{map { pairgrep { $a =~ /$_/ } %Config::Config } @_}; # n/a in 5.10
+	#{map { pairgrep { $a =~ /$_/ } %Config::Config } @_}; # needs 5.20
 	my %config;
-	for my $re ( @_ ) {
-	    for my $key ( grep /$re/, keys %Config::Config ) {
-		$config{$key} = $Config::Config{$key};
-	    }
+	while( my( $k, $v ) = each %Config::Config ) {
+	    $k =~ $_ and $config{$k} = $v, last
+	      for @_;
 	}
 	\%config;
     } else {
@@ -325,111 +322,10 @@ Predefined (magic) variables:
 EOF
 }
 
-BEGIN {
-    *ARGIND = \$I;
-    *benchmark = \&b;
-    *benchmark100 = \&B;
-    *config = \&c;
-    *Date = \&D;
-    *echo = \&e;
-    *Echo = \&E;
-    *echof = \&f;
-    *Echof = \&F;
-    *FIELD = \@F;
-    *hosts = \&h;
-    *keydiff = *k;
-    *Keydiff = *K;
-    *number = *n;
-    *piped = \&p;
-    *quote = \$q;
-    *Quote = \$Q;
-    *result = \$r,
-    *sort_hex = \$H,
-    *sort_txt = \$T,
-    *string = \%s,
-    *String = \%S,
-#    * = \&;
-}
-INIT {
-    ($I, $q, $Q, $H, $pl::p) = (0, "'", '"', 1, 0);
-    unless( @pl::opts || @A ) {
-	*pl::prog = \&pl::shell;
-	return;
-    }
-
-    # Assemble a program that works under perl -n, etc., while adding in pl's options.
-    @pl::bit[1, 3, 9, 11, 20] = # Don't pollute eval with my-var
-      ('sub pl::prog { $pl::last = 1;',
-       'LINE: {',		# dummy loop
-       '} continue {',		# program didn't do last
-       '$pl::last = 0 }',
-       '}');
-    while( @pl::opts ) {	# no for, need to shift
-	$_ = shift @pl::opts;
-	if( /^--color(?:()|=(a)lways|=(n)ever|=auto)$/s ) {
-	    $pl::c = defined( $1 ) || $2 ? 1 : $3 ? 0 : undef;
-	    next;
-	} elsif( /[?h]/ ) {
-	    help undef;
-	    exit;
-	} elsif( /v/ ) {
-	    e "This is pl v$VERSION, with perl $^V
-
-Copyright 1997-2020, Daniel Pfeiffer
-
-Pl may be copied only under the terms of either the Artistic License or the
-GNU General Public License, which may be found in the Perl 5 source kit.";
-	    exit;
-	}
-
-	if( /([bez])/ ) {
-	    my $bit = "\n#line 1 \"-$1 option\"\n" . shift( @pl::opts ) . "\n;";
-	    if( /b/ ) {
-		$pl::bit[0] = $bit;
-	    } elsif( /z/ ) {
-		$pl::bit[6] = "\n;\$pl::Z //= sub{$bit};";
-		$pl::z = '$pl::Z->(); ';
-	    } else {
-		$pl::bit[7] = "\n;\$pl::E //= sub{$bit};";
-	    }
-	}
-	@pl::bit[2, 12] =
-	  (/O/ ? 'for $A (@A) {' : 'for(@A) {',
-	   '} continue { ++$I; last if $pl::last }')
-	    if /o/i;
-	if( /p([1-9][0-9]*)?/i ) {
-	    my $p = $1;
-	    @pl::bit[4, 8] =
-	      ('$pl::P = do {',
-	       '}') if /P/;
-	    $pl::bit[10] = ' ++$pl::p, print or die "-p destination: $!\n"' . (/P/ ? ' if $pl::P;' : ';');
-	    $pl::bit[11] =~ s/0/\$pl::p >= $p/ if $p;
-	}
-	$pl::r = 1 if /r/;
-    }
-    $pl::bit[5] = @A ? "\n#line 1 \"perlcode\"\n" . shift() . ";\n" : ';';
-    $pl::bit[12] //= 		# ! -[oO]
-      ' if( $pl::last || eof ) { ++$I; ' .
-      ($pl::r ? 'close A; $pl::p = 0;' : 'if( $pl::last ) { my $d = $.; close A; $. = $d }') .
-      $pl::z . ' }';
-    undef $_;
-    @pl::c{qw(B I G R E)} = $pl::c // (-t STDOUT && $^O !~ /^MSWin/) ?
-      map "\e[${_}m", 1, 3, 32, 31, '' :
-      ('')x5;
-    #no warnings 'experimental';	# overridden by -W
-    no strict;
-#e join '', map $_ // '', @pl::bit;
-    eval join '', map $_ // '', @pl::bit;
-    if( $@ ) {
-	warn $@;
-	exit 255;
-    }
-}
-&pl::prog; # will be called repeatedly if -n
-
 
 
 # \todo help doc readline test:my
+{
 package pl;
 
 our %c;
@@ -597,24 +493,131 @@ sub shell {
     }
 }
 
-
-END {
-    $pl::E->() if $pl::E;
-    ::e $::r if defined $::r;
-    use sort 'stable';
-    # todo lenint.lenfloat %d/f
-    printf "%8d: %s\n", $::n{$_}, $_
-	for sort { $::n{$a} <=> $::n{$b} } sort_keys %::n;
-    printf "%s:  %s\n", $_, pretty $::s{$_}
-	for sort_keys %::s;
-    ::e $::S{$_}
-	for sort_keys %::S;
-    &keydiff if keys %::k;
+sub selftest {
+    eval join '', <::DATA>;
+    warn $@ if $@;
+}
 }
 
-sub selftest {
-    eval join '', <DATA>;
-    warn $@ if $@;
+
+
+BEGIN {
+    *ARGIND = \$I;
+    *benchmark = \&b;
+    *benchmark100 = \&B;
+    *config = \&c;
+    *Date = \&D;
+    *echo = \&e;
+    *Echo = \&E;
+    *echof = \&f;
+    *Echof = \&F;
+    *FIELD = \@F;
+    *hosts = \&h;
+    *keydiff = *k;
+    *Keydiff = *K;
+    *number = *n;
+    *piped = \&p;
+    *quote = \$q;
+    *Quote = \$Q;
+    *result = \$r,
+    *sort_hex = \$H,
+    *sort_txt = \$T,
+    *string = \%s,
+    *String = \%S,
+#    * = \&;
+
+    ($I, $q, $Q, $H) = (0, "'", '"', 1);
+    unless( @pl::opts || @A ) {
+	*pl::prog = \&pl::shell;
+	return;
+    }
+
+    # Assemble a program that works under perl -n, etc., while adding in pl's options.
+    @pl::bit[2, 4, 10, 12, 21] = # Don't pollute eval with my-var
+      ('sub pl::prog { $pl::last = 1;',
+       'LINE: {',		# dummy loop
+       '} continue {',		# program didn't do last
+       '$pl::last = 0 }',
+       '}');
+    while( @pl::opts ) {	# no for, need to shift
+	$_ = shift @pl::opts;
+	if( /^--color(?:()|=(a)lways|=(n)ever|=auto)$/s ) {
+	    $pl::c = defined( $1 ) || $2 ? 1 : $3 ? 0 : undef;
+	    next;
+	} elsif( /[?h]/ ) {
+	    help undef;
+	    exit;
+	} elsif( /v/ ) {
+	    e "This is pl v$VERSION, with perl $^V
+
+Copyright 1997-2020, Daniel Pfeiffer
+
+Pl may be copied only under the terms of either the Artistic License or the
+GNU General Public License, which may be found in the Perl 5 source kit.";
+	    exit;
+	}
+
+	if( /([bez])/ ) {
+	    my $bit = "\n#line 1 \"-$1 option\"\n" . shift( @pl::opts ) . "\n;";
+	    if( /b/ ) {
+		$pl::bit[0] = $bit;
+	    } else {
+		if( /z/ ) {
+		    $pl::bit[7] = "\n;INIT { \$pl::Z = sub{$bit} }";
+		    $pl::z = '$pl::Z->(); ';
+		} else {
+		    $pl::bit[8] = "\n;END { $bit }";
+		}
+	    }
+	}
+	@pl::bit[3, 13] =
+	  (/O/ ? 'for $A (@A) {' : 'for(@A) {',
+	   '} continue { ++$I; last if $pl::last }')
+	    if /o/i;
+	if( /p([1-9][0-9]*)?/i ) {
+	    my $p = $1;
+	    $pl::bit[1] = '$pl::p = 0;';
+	    @pl::bit[5, 9] =
+	      ('$pl::P = do {',
+	       '}') if /P/;
+	    $pl::bit[11] = ' ++$pl::p, print or die "-p destination: $!\n"' . (/P/ ? ' if $pl::P;' : ';');
+	    $pl::bit[12] =~ s/0/\$pl::p >= $p/ if $p;
+	}
+	$pl::r = 1 if /r/;
+    }
+    $pl::bit[6] = @A ? "\n#line 1 \"perlcode\"\n" . shift() . ";\n" : ';';
+    $pl::bit[13] //= 		# ! -[oO]
+      ' if( $pl::last || eof ) { ++$I; ' .
+      ($pl::r ? 'close A; $pl::p = 0;' : 'if( $pl::last ) { my $d = $.; close A; $. = $d }') .
+      ($pl::z // '') . ' }';
+    undef $_;
+    @pl::c{qw(B I G R E)} = $pl::c // (-t STDOUT && $^O !~ /^MSWin/) ?
+      map "\e[${_}m", 1, 3, 32, 31, '' :
+      ('')x5;
+    #no warnings 'experimental';	# overridden by -W
+    no strict;
+#e join '', map $_ // '', @pl::bit;
+    eval join '', map $_ // '', @pl::bit;
+    if( $@ ) {
+	warn $@;
+	exit 255;
+    }
+}
+&pl::prog; # will be called repeatedly if -n
+
+
+
+END {
+    e $r if defined $r;
+    use sort 'stable';
+    # todo lenint.lenfloat %d/f
+    printf "%8d: %s\n", $n{$_}, $_
+	for sort { $n{$a} <=> $n{$b} } pl::sort_keys %n;
+    printf "%s:  %s\n", $_, pl::pretty $s{$_}
+	for pl::sort_keys %s;
+    e $S{$_}
+	for pl::sort_keys %S;
+    &pl::keydiff if keys %k;
 }
 
 __DATA__
@@ -751,30 +754,28 @@ Loop over args, printing each with line ending.  And same, SHOUTING:
 
 Count hits in magic statistics hash C<%n(umber)>:
 
+    pl -n '++$number{$1} while /(Perl|one|liner)/g' file1 file2 file3
     pl -n '++$n{$1} while /(Perl|one|liner)/g' file1 file2 file3
 
-Even though the point here is to make things even easier, most Perl one-liners
-from the internet work, just by omitting C<-e> or C<-E>.  Known minor
-differences are: don't C<goto LINE>, but C<next LINE> is fine.  In B<-n>
-C<last> goes straight to the next file instead of behaving like C<exit>.
-Using C<pop>, etc. to implicitly modify C<@A(RGV)> works in B<-b> begin code,
-but not in your main program (which gets compiled to a function.  And
-shenanigans with unbalanced braces won't work.
+Though they are sometimes slightly, sometimes quite a bit more complicated,
+most Perl one-liners from the internet work, just by omitting C<-e> or C<-E>.
+See L<minor differences|/"Minor Differences with perl -e"> for exceptions.
 
 =head1 DESCRIPTION
 
-I<Don't believe everything you read on the internet^H^H^H SourceForge! -- Aristotle ;-)>
+I<Don't believe everything you read on SourceForge^H^H^H the internet! -- Aristotle ;-)>
 
 Pl follows Perl's philosophy for one-liners: the one variable solely used in
 one-liners, C<@F>, is single-lettered.  Because not everyone may like that, Pl
 has it both ways.  Everything is aliased both as a word and as a single
 letter, including Perl's own C<@F> & C<*ARGV>.
 
-C<-b> doesn't do a C<BEGIN> block.  Rather it is in the same scope as your main
-PERLCODE.  So you can use it to initialise C<my> variables.  Whereas, if you
-define a my variable in a B<-n>, B<-p>, B<-o> or B<-O> loop, it's a new
-variable each time.  This echoes "a c" because -e emulates an C<END> block, as
-a closure of the first C<$inner> variable:
+B<-b> doesn't do a C<BEGIN> block.  Rather it is in the same scope as your
+main PERLCODE.  So you can use it to initialise C<my> variables.  Whereas, if
+you define a my variable in the main program of a B<-n>, B<-p>, B<-P>, B<-o>
+or B<-O> loop, it's a new variable each time.  This echoes "a c" because B<-e>
+gives an C<END> block, as a closure of the 1st C<$inner> variable.  Perl
+warns "Variable "$inner" will not stay shared":
 
     pl -Ob 'my $outer'  -e 'echo $inner, $outer'  'my $inner = $outer = $ARGV' a b c
     pl -Ob 'my $outer'  -e 'e $inner, $outer'  'my $inner = $outer = $A' a b c
@@ -787,11 +788,96 @@ Only some of these are original.  Many have been adapted from the various Perl
 one-liner pages on the internet.  This is no attempt to appropriate ownership,
 just to show how things are even easier and more concise with pl.
 
-All examples use the long names and are repeated for short names, where applicable.
+All examples, if applicable, use the long names and are repeated for short names.
 
 =head2 Dealing with Files
 
 =over
+
+=item Heads ...
+
+I<People say the back of my head looks really nice -- but I don't see it :-)>
+
+If you want just I<n>, e.g. 10, lines from the head of each file, use the
+optional number argument to B<-p>, along with B<-r> to reset the count.  The
+program can be empty, but must be present, unless you're reading from stdin:
+
+    pl -rp10 '' file*
+
+If you want the head up to a regexp, use the flip-flop operator, starting with
+line number 1.  Use the print-if-true B<-P> loop option, again with B<-r> to
+reset the count:
+
+    pl -rP '1../last/' file*
+
+You can combine the two, if you want at most I<n> lines, e.g. 10:
+
+    pl -rP10 '1../last/' file*
+
+=item ... or Tails?
+
+I<What has a head, a tail, but no legs?  A penny. :-)>
+
+If you want just 1 last line from each file, the end-of-file B<-z> code (no
+need to quote, as it has no special characters) can C<E(cho)> it for you,
+without adding another newline (yes, Perl is case sensitive):
+
+    pl -z Echo '' file*
+    pl -z E '' file*
+
+If you want the tail from a regexp, use the flip-flop operator, starting with
+your regexp and going till end-of-file:
+
+    pl -P '/first/..eof' file*
+
+You can even get head and tail, if last line of head comes before 1st line of
+tail (or actually any number of such disjoint ranges):
+
+    pl -rP '1../last/ or /first/..eof' file*
+
+=item Remove trailing whitespace in each file
+
+This print-loops (B<-p>) over each file, replacing it (B<-i>) with the
+modified output.  Line ends are stripped on reading and added on printing
+(B<-l>), because they are also whitespace (C<\s>).  At each end of line,
+substitute one or more spaces of any kind (incl. DOS newlines) with nothing:
+
+    pl -pli 's/\s+$//' file*
+
+=item Tabify each file
+
+This print-loops (B<-p>) over each file, replacing it (B<-i>) with the
+modified output.  At beginning of line and after each tab, 8 spaces or less
+than 8 followed by a tab are converted to a tab:
+
+    pl -pi '1 while s/(?:^|\t)\K(?: {1,7}\t| {8})/\t/' file*
+
+If you're a fan or half-width tabs, make that:
+
+    pl -pi '1 while s/(?:^|\t)\K(?: {1,3}\t| {4})/\t/' file*
+
+=item Print only 1st occurrence of each line
+
+This counts repetitions of lines in a hash.  Print only when the expression is
+true (B<-P>), i.e. the count was 0:
+
+    pl -P '!$a{$_}++' file*
+
+If you want this per file, you must empty the hash in the end-of-file B<-z>
+code:
+
+    pl -Pz '%a = ()' '!$a{$_}++' file*
+
+=item Move a line further down in each file
+
+Assume we have lines matching "from" followed by lines matching "to".  The
+former shall move after the latter.  This loops over each file, replacing it
+with the modified output.  The flip-flop operator becomes true when matching
+the 1st regexp.  Capture something in there to easily recognize it's the
+first, keep the line in a variable and empty C<$_>.  When C<$1> is again true,
+it must be the last matching line.  Append the keep variable to it.
+
+    pl -pi 'if( /(f)rom/.../(t)o/ ) { if( $1 eq "f" ) { $k = $_; $_ = "" } elsif( $1 ) { $_ .= $k }}' file*
 
 =item Delete matching files, except last one
 
@@ -881,16 +967,16 @@ contains, 1st element is the size and last is the suffix.  Sum it in C<%n(umber)
 which gets sorted numerically at the end:
 
     find -name '*.*' -type f -printf "%s.%f\0" |
-        pl -0lanF\\. '$number{".$FIELD[-1]"} += $FIELD[0]'
+        pl -0lF\\. '$number{".$FIELD[-1]"} += $FIELD[0]'
     find -name '*.*' -type f -printf "%s.%f\0" |
-        pl -0lanF\\. '$n{".$F[-1]"} += $F[0]'
+        pl -0lF\\. '$n{".$F[-1]"} += $F[0]'
 
 This is similar, but also deals with suffixless files:
 
     find -type f -printf "%s.%f\0" |
-        pl -0lanF\\. '$number{@FIELD == 2 ? "none" : ".$FIELD[-1]"} += $FIELD[0]'
+        pl -0lF\\. '$number{@FIELD == 2 ? "none" : ".$FIELD[-1]"} += $FIELD[0]'
     find -type f -printf "%s.%f\0" |
-        pl -0lanF\\. '$n{@F == 2 ? "none" : ".$F[-1]"} += $F[0]'
+        pl -0lF\\. '$n{@F == 2 ? "none" : ".$F[-1]"} += $F[0]'
 
 =item Count files per date
 
@@ -969,9 +1055,9 @@ several hosts:
 =item Diff several zip archives by member name
 
 This uses the same mechanism as the csv example.  Addidionally it reads the
-output of C<unzip -vql> for each archive through the C<pipe> or C<p> block.
-That has a fixed format, except for tiny members, which can report -200%,
-screwing the column by one:
+output of C<unzip -vql> for each archive through the C<p(ipe)> block.  That
+has a fixed format, except for tiny members, which can report -200%, screwing
+the column by one:
 
     pl -o 'piped { keydiff if / Defl:/ && s/^.{56,57}\K  (.+)// } "unzip", "-vql", $_' *.zip
     pl -o 'p { k if / Defl:/ && s/^.{56,57}\K  (.+)// } "unzip", "-vql", $_' *.zip
@@ -996,22 +1082,22 @@ Again without the date:
     pl -o 'piped { s/^\S+ \K(.+?) +(\d+) .{16} (.+)/sprintf "%-20s %10d", $1, $2/e; keydiff $3 } "tar", "-tvf", $_' *.tar *.tgz *.txz
     pl -o 'p { s/^\S+ \K(.+?) +(\d+) .{16} (.+)/sprintf "%-20s %10d", $1, $2/e; k $3 } "tar", "-tvf", $_' *.tar *.tgz *.txz
 
-=item Diff ELF executables or libraries by loaded dependencies
+=item Diff ELF executables by loaded dependencies
 
 You get the idea: you can do this for any command that outputs records with a
 unique key.  This one looks at the required libraries and which file they came
-from.  For a change loop with B<-O> and C<@A(RGV)> to avoid the previous
+from.  For a change, loop with B<-O> and C<@A(RGV)> to avoid the previous
 examples' confusion between outer C<$_> which are the cli args, and the inner
 one, which are the read lines:
 
-    pl -O 'piped { keydiff if s/^\t(.+\.so.*) => (.*) \(\w+\)/$2/ } ldd => $ARGV' exe1 exe2 exe3
-    pl -O 'p { k if s/^\t(.+\.so.*) => (.*) \(\w+\)/$2/ } ldd => $A' exe1 exe2 exe3
+    pl -O 'piped { keydiff if s/^\t(.+\.so.*) => (.*) \(\w+\)/$2/ } ldd => $ARGV' exe1 exe2 lib*.so
+    pl -O 'p { k if s/^\t(.+\.so.*) => (.*) \(\w+\)/$2/ } ldd => $A' exe1 exe2 lib*.so
 
 It's even more useful if you use just the basename as a key, because version
 numbers may change:
 
-    pl -O 'piped { keydiff $2 if s/^\t((.+)\.so.* => .*) \(\w+\)/$1/ } ldd => $ARGV' exe1 exe2 exe3
-    pl -O 'p { k $2 if s/^\t((.+)\.so.* => .*) \(\w+\)/$1/ } ldd => $A' exe1 exe2 exe3
+    pl -O 'piped { keydiff $2 if s/^\t((.+)\.so.* => .*) \(\w+\)/$1/ } ldd => $ARGV' exe1 exe2 lib*.so
+    pl -O 'p { k $2 if s/^\t((.+)\.so.* => .*) \(\w+\)/$1/ } ldd => $A' exe1 exe2 lib*.so
 
 =back
 
@@ -1122,7 +1208,17 @@ before echoing, start with double size:
     pl '($w, $h) = (1189, 1682); f "%3s  %4dmm x %4dmm", "A$_", ($w, $h) = ($h / 2, $w) for 0..10'
 
 The table could easily be widened to cover B- & C-formats, by extending each
-list of 2, to an appropriate list of 6, e.g. C<($Aw, $Ah, $Bw, ...)>.
+list of 2, to an appropriate list of 6, e.g. C<($Aw, $Ah, $Bw, ...)>.  But a
+more algorithmic approach seems better.  This fills C<@A(RGV)> in B<-b>, as
+though it had been given on the command line and prepares a nested list of the
+3 initials specs.  The format is tripled (with cheat spaces at the beginning).
+The main PERLCODE loops over C<@A(RGV)>, thanks to B<-O>, doing the same as
+above, but on anonymous elements of C<@d>:
+
+    pl -Ob '@ARGV = 0..10; @d = (["A", 1189, 1682], ["B", 1414, 2000], ["C", 1297, 1834])' \
+        'echof "  %3s  %4dmm x %4dmm"x3, map +("$$_[0]$A", ($$_[1], $$_[2]) = ($$_[2] / 2, $$_[1])), @d'
+    pl -Ob '@A = 0..10; @d = (["A", 1189, 1682], ["B", 1414, 2000], ["C", 1297, 1834])' \
+        'f "  %3s  %4dmm x %4dmm"x3, map +("$$_[0]$A", ($$_[1], $$_[2]) = ($$_[2] / 2, $$_[1])), @d'
 
 =item ANSI foreground;background color table
 
@@ -1134,9 +1230,9 @@ There are twice twice 8 different colors for dim & bright and for foreground &
 background.  Hence the multiplication of escape codes and of values to fill
 them.
 
-This fills C<@A(RGV)> in C<-b>, as though it had been given on the command
+This fills C<@A(RGV)> in B<-b>, as though it had been given on the command
 line.  It maps it to the 16fold number format to print the header.  Then the
-main PERLCODE loops over it with C<$A(RGV)>, thanks to C<-O>, to print the
+main PERLCODE loops over it with C<$A(RGV)>, thanks to B<-O>, to print the
 body.  All numbers are duplicated with C<(N)x2>, once to go into the escape
 sequence, once to be displayed:
 
@@ -1160,7 +1256,21 @@ This does exactly the same, but explicitly loops over lists C<@co & @bg>:
 
 =over
 
-=item Math
+=item Triangular Number and Factorial
+
+The triangular number is defined as the sum of all numbers from 1 to I<n>, e.g. 1
+to 5:
+
+    pl 'echo sum 1..5'
+    pl 'e sum 1..5'
+
+Factorial is the equivalent for products.  This requires List::Util as of Perl
+5.20 or newer:
+
+    pl 'echo product 1..5'
+    pl 'e product 1..5'
+
+=item Big Math
 
 I<2 + 2 = 5 for extremely large values of 2. :-)>
 
@@ -1175,7 +1285,7 @@ With the C<big*> modules you can do arbitrary precision math:
     pl -Mbigrat 'echo 1/23456789012345678901234567890 * 1/23456789012345678901234567890'
     pl -Mbigrat 'e 1/23456789012345678901234567890 * 1/23456789012345678901234567890'
 
-=item Separate big numbers with commas, dots or underscores
+=item Separate big numbers with commas, ...
 
 Loop and print with line-end (B<-opl>) over remaining args in C<$_>.  If
 reading from stdin or files, instead of arguments, use only B<-pl>.  After a
@@ -1193,7 +1303,7 @@ The same for languages with a decimal comma, using either a dot or a space as sp
     pl -opl '1 while s/[, ]\d{3}\K(?=\d)/ /; 1 while s/\d\K(?=\d{3}(?:$|[ ,]))/ /' \
         12345678 12345678 1234567890 1234,5678 3,141 3,141592653589
 
-The same for Perl style output:
+The same for Perl style output with underscores:
 
     pl -opl '1 while s/[._]\d{3}\K(?=\d)/_/; 1 while s/\d\K(?=\d{3}(?:$|[._]))/_/' \
         12345678 123456789 1234567890 1234.5678 3.141 3.14159265358
@@ -1216,13 +1326,20 @@ standard values.  Note that Shell strings can span more than one line:
     pl '@u = map rand 0x10000, 0..7; ($u[3] /= 16) |= 0x4000; ($u[4] /= 4) |= 0x8000;
         $x = "%04x"; f "$x$x-$x-$x-$x-$x$x$x", @u'
 
+=item Generate a random password
+
+Use C<say>, which doesn't put spaces between its arguments.  Generate twelve
+random characters between 33 & 127, i.e. printable Ascii characters:
+
+    pl 'say map chr(33 + rand 94), 1..12'
+
 =item DNS lookup
 
 I<What do you call a sheep with no legs?  A cloud. *,=,>
 
-The C<h(osts)> function deals with the nerdy C<gethost...> etc. and outputs as
-a hosts file.  The file is sorted by address type (localhost, link local,
-private, public), version (IPv4, IPv6) and address.  You tack on any number of
+The C<h(osts)> function deals with the nerdy details and outputs as a hosts
+file.  The file is sorted by address type (localhost, link local, private,
+public), version (IPv4, IPv6) and address.  You tack on any number of
 IP-addresses or hostnames, either as Perl arguments or on the command-line via
 C<@A(RGV)>:
 
@@ -1250,21 +1367,49 @@ If your input comes from a file, collect it in a list and perform at end (B<-e>)
 =head1 COMPATIBILITY
 
 Even if it is rarer nowadays, Perl 5.10 is still found out in the wild.  Pl
-tries to accomodate it gracefully, falling back to what works.  Printed
-data-structures will be formatted with a wide margin and C<h(osts)> will find
+tries to accomodate it gracefully, falling back to what works.  Dumped
+data-structures will be formatted with a funny margin and C<h(osts)> will find
 the less IPv6 resolutions, the older your Perl.
+
+=head2 Minor Differences with perl -e
+
+Known minor differences are:
+
+=over
+
+=item *
+
+don't C<goto LINE>, but C<next LINE> is fine
+
+=item *
+
+in a B<-n> loop C<last> goes straight to the next file instead of behaving
+like C<exit>
+
+=item *
+
+using C<pop>, etc. to implicitly modify C<@A(RGV)> works in B<-b> begin code,
+but not in your main program (which gets compiled to a function)
+
+=item *
+
+shenanigans with unbalanced braces won't work
+
+=back
 
 =head2 Windows Notes
 
-Do yourself a favour and get a real Shell, e.g. from Cygwin or
-MSYS!  If you can't avoid command.com or cmd.exe, you will have to first
-convert all inner quotes to C<qq>.  Then convert the outer single quotes to
-double quotes:
+I<B<W>ork B<I>s B<N>ever B<D>one B<O>n B<W>indows B<S>ystems ;-)>
 
-    pl "echo qq{${quote}Perl$quote}, qq{$Quote@A$Quote}" one liner
+Do yourself a favour and get a real Shell, e.g. from Cygwin or MSYS!  If you
+can't avoid F<command.com> or F<cmd.exe>, you will have to first convert all
+inner quotes to C<qq>.  Then convert the outer single quotes to double quotes:
+
+    pl "echo qq{${quote}Perl$quote}, qq{$Quote@ARGV$Quote}" one liner
     pl "e qq{${q}Perl$q}, qq{$Q@A$Q}" one liner
 
-Any help for getting this to work in PowerShell is welcome!  While the old
-Windows 10 terminal understands Ansi escape sequences, it makes it horribly
-hard to activate them.  So they are off by default, requiring B<--color> to
-override that choice.
+Any help for getting this to work in PowerShell is welcome!
+
+While the old Windows 10 terminal understands Ansi escape sequences, it makes
+it horribly hard to activate them.  So they are off by default, requiring
+B<--color> to override that choice.

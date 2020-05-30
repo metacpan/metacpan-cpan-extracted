@@ -1,5 +1,7 @@
 use strict;
 use warnings;
+no if "$]" >= 5.031009, feature => 'indirect';
+use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::More;
 use Test::Fatal;
@@ -21,7 +23,7 @@ subtest 'local JSON pointer' => sub {
       my $result = $js->evaluate(true, { '$ref' => '#/$defs/nowhere' });
       like(
         (($result->errors)[0])->error,
-        qr{unable to resolve ref "\#/\$defs/nowhere"},
+        qr{unable to find resource \#/\$defs/nowhere},
         'got error for unresolvable ref',
       );
     },
@@ -30,18 +32,50 @@ subtest 'local JSON pointer' => sub {
   );
 };
 
-local $TODO = 'FIXME! I dont think I like making these errors instead of exceptions';
+subtest 'local anchor' => sub {
+  ok(
+    $js->evaluate(
+      true,
+      {
+        '$defs' => {
+          true => {
+            '$anchor' => 'true',
+          },
+        },
+        '$ref' => '#true',
+      },
+    ),
+    'can follow local $ref to an $anchor to a true schema',
+  );
 
-like(
-  exception { $js->evaluate(true, { '$ref' => '#foo' }) },
-  qr/only same-document JSON pointers are supported in \$ref/,
-  'threw exception on $ref to plain-name fragment',
-);
+  ok(
+    !$js->evaluate(
+      true,
+      {
+        '$defs' => {
+          false => {
+            '$anchor' => 'false',
+            not => true,
+          },
+        },
+        '$ref' => '#false',
+      },
+    ),
+    'can follow local $ref to an $anchor to a false schema',
+  );
 
-like(
-  exception { $js->evaluate(true, { '$ref' => 'http://foo/bar#/$defs/x' }) },
-  qr/only same-document JSON pointers are supported in \$ref/,
-  'threw exception on $ref to absolute URI',
-);
+  is(
+    exception {
+      my $result = $js->evaluate(true, { '$ref' => '#nowhere' });
+      like(
+        (($result->errors)[0])->error,
+        qr{unable to find resource \#nowhere},
+        'got error for unresolvable ref',
+      );
+    },
+    undef,
+    'no exception',
+  );
+};
 
 done_testing;

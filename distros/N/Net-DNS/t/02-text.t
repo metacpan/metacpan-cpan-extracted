@@ -1,4 +1,4 @@
-# $Id: 02-text.t 1762 2020-02-02 21:39:02Z willem $	-*-perl-*-
+# $Id: 02-text.t 1779 2020-05-11 09:11:17Z willem $	-*-perl-*-
 
 use strict;
 use Test::More tests => 37;

@@ -1,5 +1,5 @@
 package Dist::Zilla::Role::PluginBundle::Airplane;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use Moose::Role;
 
 # ABSTRACT: A role for building packages with Dist::Zilla in an airplane
@@ -80,7 +80,7 @@ Dist::Zilla::Role::PluginBundle::Airplane - A role for building packages with Di
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -89,7 +89,8 @@ version 0.001
 
     with 'Dist::Zilla::Role::PluginBundle::Airplane';
 
-    sub build_airplane_mode {
+    # You are required to implement this method
+    sub build_network_plugins {
         return [qw(
             PromptIfStale
             Test::Pod::LinkCheck

@@ -1,0 +1,10 @@
+Revision history for Perl module Net::API::Stripe::WebHook::Apache
+
+0.100.2 2020-05-28T13:48:18+09:00
+    - Corrected missing method and improved pod documentation
+
+0.100.1 2020-05-27T20:20:10+09:00
+    - Decoupled it from Net::API::Stripe since this implement server functions while Net::API::Stripe implement client ones
+
+v0.1.0 2019-10-15T09:54:59+09:00
+    - original version from Net::API::Stripe

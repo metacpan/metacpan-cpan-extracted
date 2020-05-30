@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/BinPackUtils/count_number_of_dvds_required
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
+# and generated automatically using Perinci::CmdLine::Gen version 0.496
 
-our $DATE = '2019-12-11'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-30'; # DATE
 our $DIST = 'App-BinPackUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,13 +41,17 @@ count-number-of-dvds-required - Count the number of DVDs required to contain the
 
 =head1 VERSION
 
-This document describes version 0.006 of count-number-of-dvds-required (from Perl distribution App-BinPackUtils), released on 2019-12-11.
+This document describes version 0.007 of count-number-of-dvds-required (from Perl distribution App-BinPackUtils), released on 2020-05-30.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % count-number-of-dvds-required [options] <files> ...
+ % count-number-of-dvds-required [-D] [--debug] [--dereference-files]
+     [--dvd-size=s] [--format=name] [--json] [--log-level=level] [--move]
+     [--(no)naked-res] [--no-dereference-files] [--no-move]
+     [--nodereference-files] [--nomove] [--page-result[=program]] [--quiet]
+     [-s=s] [--trace] [--verbose] [--view-result[=program]] <files> ...
 
 =head1 DESCRIPTION
 
@@ -153,6 +158,14 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
+
 =back
 
 =head2 Other options
@@ -225,7 +238,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

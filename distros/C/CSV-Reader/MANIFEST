@@ -1,0 +1,15 @@
+Changes
+CONTRIBUTING.md
+lib/CSV/Reader.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/basic.t
+t/broken_line.csv
+t/broken_line.t
+t/pod.t
+t/reader.t
+t/utf8_with_bom.csv
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

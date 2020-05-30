@@ -82,7 +82,7 @@ Other methods are describe below and the parameters they take are documented in 
 
 =head1 VERSION
 
-    v1.0.4
+    v1.0.8
 
 =head1 DESCRIPTION
 
@@ -117,7 +117,7 @@ Toggles debug mode on/off
 
 =item I<expand>
 
-Integer. Sets the depth level of expansion of Stripe objects. If objects are not expanded, Stripe API will return the object id, but when they are expanded, Stripe returns the entire object and its properties. Youc an then chain your code and do something like:
+Integer. Sets the depth level of expansion of Stripe objects. If objects are not expanded, Stripe API will return the object id, but when they are expanded, Stripe returns the entire object and its properties. You can then chain your code and do something like:
 
     print $cust->invoice_settings->default_payment_method->type
 
@@ -528,7 +528,7 @@ L<Net::API::Stripe> never dies, or at least not voluntarily. Instead, when an er
 
     my $prod = $stripe->products( retrieve => $prod_id ) || die( $stripe->error, "\n" );
 
-The B<error> method returns the L<Module::Generic::Exception> set. Please refer to the manual page of L<Module::Generic> for more information, but essentially, the following methods are available with the error objects:
+The B<error> method returns the L<Module::Generic::Exception> set. Please refer to the manual page of L<Module::Generic/"error"> for more information, but essentially, the following methods are available with the error objects:
 
 =head3 as_string
 

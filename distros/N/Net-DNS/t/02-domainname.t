@@ -1,4 +1,4 @@
-# $Id: 02-domainname.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
+# $Id: 02-domainname.t 1779 2020-05-11 09:11:17Z willem $	-*-perl-*-
 
 use strict;
 use Test::More tests => 51;

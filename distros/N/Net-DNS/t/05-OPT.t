@@ -1,4 +1,4 @@
-# $Id: 05-OPT.t 1754 2019-08-19 14:12:28Z willem $	-*-perl-*-
+# $Id: 05-OPT.t 1784 2020-05-24 19:27:13Z willem $	-*-perl-*-
 
 use strict;
 use Test::More;
@@ -33,9 +33,6 @@ my $wire = '0000290500000080000000';
 		%$hash
 		);
 
-	my $string = $rr->string;
-	like( $string, '/EDNS/', 'string method works' );
-
 	foreach (@attr) {
 		is( $rr->$_, $hash->{$_}, "expected result from rr->$_()" );
 	}
@@ -51,6 +48,9 @@ my $wire = '0000290500000080000000';
 	my $hex2    = uc unpack 'H*', $decoded->encode;
 	is( $hex1, $hex2, 'encode/decode transparent' );
 	is( $hex1, $wire, 'encoded RDATA matches example' );
+
+	$rr->option( 10, 'rawbytes' );
+	like( $rr->string, '/EDNS/', 'string method works' );
 }
 
 
@@ -138,11 +138,11 @@ foreach my $method (qw(class ttl)) {
 
 	$edns->option( 7 => pack 'H*', '01' );
 
-	$edns->option( 8 => ( pack 'H*', '000117007b7b7a' ) );
+	$edns->option( 8 => pack 'H*', '000117007b7b7a' );
 
 	$edns->option( 9 => pack 'H*', '00093A80' );
 
-	$edns->option( 10 => pack 'H*', '7261776279746573636f6f6b65646279746573' );
+	$edns->option( 10 => pack 'H*', '010000005EC233441122334455667788' );
 
 	$edns->option( 11 => pack 'H*', '00C8' );
 

@@ -1,5 +1,5 @@
 {
-   "abstract" : "an app that contains some useful command-line utilities",
+   "abstract" : "some useful command-line utilities",
    "author" : [
       "Vlado Keselj https://web.cs.dal.ca/~vlado"
    ],
@@ -45,5 +45,5 @@
          "web" : "https://github.com/vkeselj/App-Utils"
       }
    },
-   "version" : 0.03
+   "version" : 0.042
 }

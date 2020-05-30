@@ -1,9 +1,9 @@
 #!/usr/bin/perl -w
 #
-#  libzvbi test
+#  libzvbi test of export interfaces
 #
 #  Copyright (C) 2000, 2001 Michael H. Schimek
-#  Perl Port: Copyright (C) 2007 Tom Zoerner
+#  Perl Port: Copyright (C) 2007,2020 Tom Zoerner
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -20,8 +20,13 @@
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-# Perl $Id: explist.pl,v 1.1 2007/11/18 18:48:35 tom Exp tom $
-# libzvbi #Id: explist.c,v 1.10 2006/02/10 06:25:38 mschimek Exp #
+# Description:
+#
+#   Example for the use of export option management in class
+#   Video::ZVBI::export. Test of page export options and menu interfaces. The
+#   script lists all available export modules (i.e. formats) and options.
+#
+#   (This is a direct translation of test/explist.c in the libzvbi package.)
 
 use blib;
 use strict;
@@ -452,4 +457,3 @@ sub main_func {
 }
 
 main_func();
-

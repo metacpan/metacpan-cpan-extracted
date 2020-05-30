@@ -1,3 +1,34 @@
+0.100   2020-05-29  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with updated Perinci::CmdLine::POD to wrap usage line.
+
+
+0.097   2020-05-29  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+
+	- Add action: grep-col, transpose.
+
+	- [incompatible change] Rename variables for perl code in 'grep' and
+	  'map', to be more consistent with App::CSVUtils: $ROW -> $row,
+	  $ROW_NUM -> $rownum, $ROW_HOS -> $rowhash, $ROW_AOS -> $rowarray.
+
+        - Add variable for 'grep' and 'map': $td.
+
+        - Rename actions grep -> grep-row (but grep still provided), map ->
+	  map-row (but map still provided).
+
+
+0.096   2020-05-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Add action: as-csv.
+
+
+0.095   2020-05-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Add actions: grep, map, psort.
+
+
 0.094   2020-04-06  Released-By: PERLANCAR; Urgency: medium
 
         - [build] Rebuild with Perinci::CmdLine::Inline 0.548 (support

@@ -1,9 +1,9 @@
 package Net::DNS::Domain;
 
 #
-# $Id: Domain.pm 1726 2018-12-15 12:59:56Z willem $
+# $Id: Domain.pm 1784 2020-05-24 19:27:13Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1726 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1784 $)[1];
 
 
 =head1 NAME
@@ -252,7 +252,7 @@ represented by the appropriate escape sequence.
 =cut
 
 sub string {
-	( my $name = &name ) =~ s/(["'\$();@])/\\$1/;		# escape special char
+	( my $name = &name ) =~ s/(["();@])/\\$1/;		# escape special char
 	return $name =~ /[.]$/ ? $name : $name . '.';		# append trailing dot
 }
 

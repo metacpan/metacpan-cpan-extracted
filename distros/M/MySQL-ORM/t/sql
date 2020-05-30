@@ -132,6 +132,35 @@ LOCK TABLES `team` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `self_ref_test`
+--
+
+DROP TABLE IF EXISTS `self_ref_test`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `self_ref_test` (
+  `self_ref_test_id` int(11) NOT NULL AUTO_INCREMENT,
+  `parent_self_ref_test_id` int(11),
+  `self_ref_test_code` varchar(20) NOT NULL,
+  `self_ref_test_name` varchar(20) NOT NULL,
+  PRIMARY KEY (`self_ref_test_id`),
+  UNIQUE KEY `self_ref_test_ak` (`self_ref_test_code`),
+  KEY `parent_self_ref_test_id` (`parent_self_ref_test_id`),
+  CONSTRAINT `self_ref_fk_1` FOREIGN KEY (`parent_self_ref_test_id`) REFERENCES `self_ref_test` (`self_ref_test_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `self_ref_test`
+--
+
+LOCK TABLES `self_ref_test` WRITE;
+/*!40000 ALTER TABLE `self_ref_test` DISABLE KEYS */;
+INSERT INTO `self_ref_test` VALUES (1,null,'self_ref_test_code1','self_ref_test_name1');
+/*!40000 ALTER TABLE `self_ref_test` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Current Database: `testmysqlorm_fk`
 --
 
@@ -164,6 +193,7 @@ LOCK TABLES `fk_test` WRITE;
 INSERT INTO `fk_test` VALUES (1,'fk_test_code1','fk_test_name1');
 /*!40000 ALTER TABLE `fk_test` ENABLE KEYS */;
 UNLOCK TABLES;
+
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

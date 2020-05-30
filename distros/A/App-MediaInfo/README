@@ -3,8 +3,8 @@ NAME
     from media files
 
 VERSION
-    This document describes version 0.124 of App::MediaInfo (from Perl
-    distribution App-MediaInfo), released on 2019-08-15.
+    This document describes version 0.126 of App::MediaInfo (from Perl
+    distribution App-MediaInfo), released on 2020-05-30.
 
 FUNCTIONS
   media_info
@@ -14,6 +14,14 @@ FUNCTIONS
 
     Get information about media files/URLs.
 
+    Many fields will depend on the backend used. Some other fields returned:
+
+    *   "info_backend": the "Media::Info::*" backend module used, e.g.
+        "Ffmpeg".
+
+    *   "type_from_name": either "image", "audio", "video", or "unknown".
+        This is determined from filename (extension).
+
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
@@ -22,7 +30,7 @@ FUNCTIONS
 
         Choose a specific backend.
 
-    *   media* => *array[str]*
+    *   media* => *array[filename]*
 
         Media files/URLs.
 
@@ -55,7 +63,7 @@ FUNCTIONS
 
         Choose a specific backend.
 
-    *   media* => *str*
+    *   media* => *filename*
 
         Media file/URL.
 
@@ -93,7 +101,7 @@ FUNCTIONS
 
         Choose a specific backend.
 
-    *   media* => *str*
+    *   media* => *filename*
 
         Media file/URL.
 
@@ -131,7 +139,7 @@ FUNCTIONS
 
         Choose a specific backend.
 
-    *   media* => *str*
+    *   media* => *filename*
 
         Media file/URL.
 
@@ -165,7 +173,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

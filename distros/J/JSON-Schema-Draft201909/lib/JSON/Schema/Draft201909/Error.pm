@@ -4,7 +4,7 @@ package JSON::Schema::Draft201909::Error;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains a single error from a JSON Schema evaluation
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 no if "$]" >= 5.031009, feature => 'indirect';
 use Moo;
@@ -15,9 +15,18 @@ use namespace::clean;
 has [qw(
   instance_location
   keyword_location
-  absolute_keyword_location
   error
-)] => ( is => 'ro', isa => Str );
+)] => (
+  is => 'ro',
+  isa => Str,
+  required => 1,
+);
+
+has absolute_keyword_location => (
+  is => 'ro',
+  isa => Str, # always a uri (absolute uri or uri reference)
+  coerce => sub { "$_[0]" },
+);
 
 sub TO_JSON {
   my $self = shift;
@@ -46,7 +55,7 @@ JSON::Schema::Draft201909::Error - Contains a single error from a JSON Schema ev
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

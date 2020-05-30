@@ -50,6 +50,7 @@
             "Regexp::Common" : "0",
             "SQL::Translator" : "0.11018",
             "Test::Most" : "0",
+            "Test::PostgreSQL" : "0",
             "Test::Requires" : "0",
             "Test::Roo" : "0",
             "Try::Tiny" : "0"
@@ -68,12 +69,13 @@
          "web" : "https://github.com/wreis/DBIx-Class-ParseError"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_contributors" : [
+      "Ovid <curtis_ovid_poe@yahoo.com>",
       "Wallace Reis <wallace@reis.me>"
    ],
    "x_generated_by_perl" : "v5.24.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.15",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_static_install" : 1
 }
 

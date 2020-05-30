@@ -58,7 +58,7 @@
    "provides" : {
       "App::week" : {
          "file" : "lib/App/week.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "App::week::colors" : {
          "file" : "lib/App/week/colors.pm"
@@ -81,7 +81,7 @@
          "web" : "https://github.com/kaz-utashiro/App-week"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_authority" : "cpan:UTASHIRO",
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 0

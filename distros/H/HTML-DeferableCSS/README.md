@@ -4,7 +4,7 @@ HTML::DeferableCSS - Simplify management of stylesheets in your HTML
 
 # VERSION
 
-version v0.3.2
+version v0.4.0
 
 # SYNOPSIS
 
@@ -15,6 +15,7 @@ my $css = HTML::DeferableCSS->new(
     css_root      => '/var/www/css',
     url_base_path => '/css',
     inline_max    => 512,
+    simple  => 1,
     aliases => {
       reset => 1,
       jqui  => 'jquery-ui',
@@ -47,8 +48,8 @@ to something like
 <link rel="preload" as="stylesheet" href="....">
 ```
 
-but this is not well supported by all web browsers. So a web page
-needs some [JavaScript](https://github.com/filamentgroup/loadCSS)
+but this is not well supported by all web browsers.  So a web page needs
+to use some [JavaScript](https://github.com/filamentgroup/loadCSS)
 to handle this, as well as a `noscript` block as a fallback.
 
 This module allows you to simplify the management of stylesheets for a
@@ -239,6 +240,16 @@ or even integrate this with your own logging system:
 ```perl
 log => sub { $logger->log(@_) },
 ```
+
+## simple
+
+When true, this enables a simpler method of using deferable CSS,
+without the need for the `loadCSS` script.
+
+It is false by default, for backwards compatability. But it is
+recommended that you set this to true.
+
+See [https://www.filamentgroup.com/lab/load-css-simpler/](https://www.filamentgroup.com/lab/load-css-simpler/).
 
 # METHODS
 

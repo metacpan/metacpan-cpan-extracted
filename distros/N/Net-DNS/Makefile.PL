@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1761 2020-01-01 11:58:34Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1781 2020-05-13 08:58:25Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -41,6 +41,7 @@ my %prerequisite = (
 	'File::Spec'	 => 0.86,
 	'IO::File'	 => 1.08,
 	'IO::Select'	 => 1.14,
+	'IO::Socket'	 => 1.26,
 	'IO::Socket::IP' => 0.38,
 	'MIME::Base64'	 => 2.13,
 	'PerlIO'	 => 1.05,
@@ -70,7 +71,7 @@ my @debris = qw(
 		);
 
 
-use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.32; 1';
+use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.38; 1';
 use constant INET_FALLBACK => !USE_SOCKET_IP && eval 'require IO::Socket::INET';
 
 
@@ -151,15 +152,18 @@ if ($online_tests) {
 	my $class = USE_SOCKET_IP ? 'IO::Socket::IP' : 'IO::Socket::INET';
 
 	my $socket = $class->new(
-		PeerAddr => "www.google.com:80",
-		Timeout	 => 20
+		PeerAddr => 'dns.google.',
+		PeerPort => 53,		## check 53/TCP not blocked ##
+		Timeout	 => 10
 		);
 
 	unless ($socket) {
 		$online_tests = 0;
-		print <<EOT;
+		print <<"EOT";
 
-You appear not to be directly connected to the Internet.
+Unable to establish TCP/IP connection to the global Internet.
+$@
+
 Disabling online tests altogether...
 
 EOT

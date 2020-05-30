@@ -1,4 +1,4 @@
-# $Id: 71-TSIG-create.t 1774 2020-03-18 07:49:22Z willem $	-*-perl-*-
+# $Id: 71-TSIG-create.t 1779 2020-05-11 09:11:17Z willem $	-*-perl-*-
 
 use strict;
 use Test::More;
@@ -18,52 +18,87 @@ foreach my $package ( sort keys %prerequisite ) {
 	exit;
 }
 
-plan tests => 12;
+plan tests => 20;
 
 
-my $tsig = new Net::DNS::RR( type => 'TSIG' );
+my $tsig  = new Net::DNS::RR( type => 'TSIG' );
 my $class = ref($tsig);
 
 
-my $keyrr = new Net::DNS::RR <<'END';
-hmac-md5.example. IN KEY 512 3 157 ARDJZgtuTDzAWeSGYPAu9uJUkX0=
+my $tsigkey = 'HMAC-SHA256.key';
+END { unlink($tsigkey) if defined $tsigkey; }
+
+open( KEY, '>', $tsigkey ) or die "$tsigkey $!";
+print KEY <<'END';
+key "HMAC-SHA256.example." {
+	algorithm hmac-sha256;
+	secret "f+JImRXRzLpKseG+bP+W9Vwb2QAgtFuIlRU80OA3NU8=";
+};
 END
+close KEY;
+
+
+my $keyrr = new Net::DNS::RR <<'END';				# dnssec-keygen key pair
+HMAC-SHA256.example. IN KEY 512 3 163 f+JImRXRzLpKseG+bP+W9Vwb2QAgtFuIlRU80OA3NU8=
+END
+
+my $publickey = 'Khmac-sha256.example.+163+52011.key';
+END { unlink($publickey) if defined $publickey; }
+
+open( KEY, ">", $publickey ) or die "$publickey $!";
+print KEY $keyrr->string;
+close KEY;
+
 
 my $privatekey = $keyrr->privatekeyname;
 END { unlink($privatekey) if defined $privatekey; }
 
-open( KEY, ">$privatekey" ) or die "$privatekey $!";
+open( KEY, ">", $privatekey ) or die "$privatekey $!";
 print KEY <<'END';
 Private-key-format: v1.2
-Algorithm: 157 (HMAC_MD5)
-Key: ARDJZgtuTDzAWeSGYPAu9uJUkX0=
+Algorithm: 163 (HMAC_SHA256)
+Key: f+JImRXRzLpKseG+bP+W9Vwb2QAgtFuIlRU80OA3NU8=
 END
 close KEY;
 
-{
+
+SKIP: {
+	my $tsig = create $class($tsigkey);
+	skip( 'TSIG attribute test', 2 )
+			unless is( ref($tsig), $class, 'create TSIG from BIND tsig key' );
+	is( $tsig->name, $keyrr->name, 'TSIG key name' );
+	my $algorithm = $tsig->algorithm;
+	is( $algorithm, $tsig->algorithm( $keyrr->algorithm ), 'TSIG algorithm' );
+}
+
+
+SKIP: {
 	my $tsig = create $class($privatekey);
-	is( ref($tsig), $class, 'create TSIG from private key' );
+	skip( 'TSIG attribute test', 2 )
+			unless is( ref($tsig), $class, 'create TSIG from BIND dnssec private key' );
+	is( $tsig->name, lc( $keyrr->name ), 'TSIG key name' );
+	my $algorithm = $tsig->algorithm;
+	is( $algorithm, $tsig->algorithm( $keyrr->algorithm ), 'TSIG algorithm' );
 }
 
 
-{
-	my $tsig = create $class($keyrr);
-	is( ref($tsig), $class, 'create TSIG from KEY RR' );
-}
-
-
-my $publickey = 'Khmac-sha1.example.+161+39562.key';
-END { unlink($publickey) if defined $publickey; }
-
-open( KEY, ">$publickey" ) or die "$publickey $!";
-print KEY <<'END';
-HMAC-SHA1.example. IN KEY 512 3 161 xdX9m8UtQNbJUzUgQ4xDtUNZAmU=
-END
-close KEY;
-
-{
+SKIP: {
 	my $tsig = create $class($publickey);
-	is( ref($tsig), $class, 'create TSIG from public key' );
+	skip( 'TSIG attribute test', 2 )
+			unless is( ref($tsig), $class, 'create TSIG from BIND dnssec public key' );
+	is( $tsig->name, $keyrr->name, 'TSIG key name' );
+	my $algorithm = $tsig->algorithm;
+	is( $algorithm, $tsig->algorithm( $keyrr->algorithm ), 'TSIG algorithm' );
+}
+
+
+SKIP: {
+	my $tsig = create $class($keyrr);
+	skip( 'TSIG attribute test', 2 )
+			unless is( ref($tsig), $class, 'create TSIG from KEY RR' );
+	is( $tsig->name, $keyrr->name, 'TSIG key name' );
+	my $algorithm = $tsig->algorithm;
+	is( $algorithm, $tsig->algorithm( $keyrr->algorithm ), 'TSIG algorithm' );
 }
 
 
@@ -108,24 +143,6 @@ close KEY;
 	eval { create $class($packet); };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "no TSIG in packet\t[$exception]" );
-}
-
-
-my $badprivatekey = 'K+161+39562.private';
-END { unlink($badprivatekey) if defined $badprivatekey; }
-
-open( KEY, ">$badprivatekey" ) or die "$badprivatekey $!";
-print KEY <<'END';
-Private-key-format: v1.2
-Algorithm: 161 (HMAC_SHA1)
-Key: xdX9m8UtQNbJUzUgQ4xDtUNZAmU=
-END
-close KEY;
-
-{
-	eval { create $class($badprivatekey); };
-	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "misnamed private key\t[$exception]" );
 }
 
 

@@ -16,6 +16,7 @@ examples/MyEngine/ssl/ca.csr
 examples/MyEngine/ssl/ssl.crt
 examples/MyEngine/ssl/ssl.key
 examples/MyEngine/start-engine.pl
+examples/nagios/service_engine_check.pl
 lib/Service/Engine.pm
 lib/Service/Engine/API.pm
 lib/Service/Engine/API/Server.pm

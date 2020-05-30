@@ -17,12 +17,14 @@ use File::MoreUtil qw(
                          dir_has_dot_files
                          dir_has_non_dot_files
                          dir_has_subdirs
+                         dir_has_non_subdirs
                          dir_has_dot_subdirs
                          dir_has_non_dot_subdirs
 
                          get_dir_entries
                          get_dir_dot_entries
                          get_dir_subdirs
+                         get_dir_non_subdirs
                          get_dir_dot_subdirs
                          get_dir_non_dot_subdirs
                          get_dir_files
@@ -135,12 +137,12 @@ subtest "dir_empty, dir_has_*files, dir_has_*subdirs" => sub {
     ok( dir_has_subdirs("hassubdirs"));
     ok( dir_has_subdirs("hasdotsubdirs"));
 
-    ok(!dir_has_subdirs("empty"));
-    ok(!dir_has_subdirs("doesntexist"));
-    ok(!dir_has_subdirs("hasfiles"));
-    ok(!dir_has_subdirs("hasdotfiles"));
-    ok( dir_has_subdirs("hassubdirs"));
-    ok( dir_has_subdirs("hasdotsubdirs"));
+    ok(!dir_has_non_subdirs("empty"));
+    ok(!dir_has_non_subdirs("doesntexist"));
+    ok( dir_has_non_subdirs("hasfiles"));
+    ok( dir_has_non_subdirs("hasdotfiles"));
+    ok(!dir_has_non_subdirs("hassubdirs"));
+    ok(!dir_has_non_subdirs("hasdotsubdirs"));
 
     ok(!dir_has_dot_subdirs("empty"));
     ok(!dir_has_dot_subdirs("doesntexist"));
@@ -178,11 +180,75 @@ subtest "get_dir_*{entries,files,subdirs}" => sub {
               ["file"]);
     is_deeply([sort( get_dir_subdirs() )],
               [".dotdir", "dir"]);
+    is_deeply([sort( get_dir_non_subdirs() )],
+              [".dotfile", "file"]);
     is_deeply([sort( get_dir_dot_subdirs() )],
               [".dotdir"]);
     is_deeply([sort( get_dir_non_dot_subdirs() )],
               ["dir"]);
 
+};
+
+subtest "dir_empty, dir_has_*files, dir_has_*subdirs, get_* (symlink tests)" => sub {
+    plan skip_all => "symlink() not available"
+        unless eval { symlink "", ""; 1 };
+
+    my $dir = tempdir(CLEANUP=>1);
+    #note "tempdir=$dir";
+    local $CWD = $dir;
+
+    mkdir "dir", 0755;
+    write_text "file", "";
+
+    mkdir "hasbrokensymlink", 0755;
+    { local $CWD = "hasbrokensymlink"; symlink "../not_exists", "symlink" }
+
+    mkdir "hassymlinktofile", 0755;
+    { local $CWD = "hassymlinktofile"; symlink "../file", "symlink" }
+
+    mkdir "hasdotsymlinktofile", 0755;
+    { local $CWD = "hasdotsymlinktofile"; symlink "../file", ".symlink" }
+
+    mkdir "hassymlinktodir", 0755;
+    { local $CWD = "hassymlinktodir"; symlink "../dir2", "symlink" }
+
+    mkdir "hasdotsymlinktodir", 0755;
+    { local $CWD = "hasdotsymlinktodir"; symlink "../dir2", ".symlink" }
+
+    ok(!dir_empty("hasbrokensymlink"));
+    ok(!dir_empty("hassymlinktofile"));
+    ok(!dir_empty("hassymlinktodir"));
+
+    ok(!dir_has_files("hasbrokensymlink"));
+    ok( dir_has_files("hassymlinktofile"));
+    ok( dir_has_files("hasdotsymlinktofile"));
+    ok(!dir_has_files("hassymlinktodir"));
+
+    ok(!dir_has_dot_files("hasbrokensymlink"));
+    ok(!dir_has_dot_files("hassymlinktofile"));
+    ok( dir_has_dot_files("hasdotsymlinktofile"));
+    ok(!dir_has_dot_files("hassymlinktodir"));
+
+    ok(!dir_has_non_dot_files("hasbrokensymlink"));
+    ok( dir_has_non_dot_files("hassymlinktofile"));
+    ok(!dir_has_non_dot_files("hasdotsymlinktofile"));
+    ok(!dir_has_non_dot_files("hassymlinktodir"));
+
+    ok(!dir_has_subdirs("hasbrokensymlink"));
+    ok(!dir_has_subdirs("hassymlinktofile"));
+    ok(!dir_has_subdirs("hassymlinktodir"));
+
+    ok( dir_has_non_subdirs("hasbrokensymlink"));
+    ok( dir_has_non_subdirs("hassymlinktofile"));
+    ok( dir_has_non_subdirs("hassymlinktodir"));
+
+    ok(!dir_has_subdirs("hasbrokensymlink"));
+    ok(!dir_has_subdirs("hassymlinktofile"));
+    ok(!dir_has_subdirs("hassymlinktodir"));
+
+    is_deeply([sort( get_dir_entries("hassymlinktofile") )], ["symlink"]);
+    is_deeply([sort( get_dir_subdirs("hassymlinktodir") )], []);
+    is_deeply([sort( get_dir_non_subdirs("hassymlinktodir") )], ["symlink"]);
 };
 
 DONE_TESTING:

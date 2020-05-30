@@ -1,21 +1,26 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/UniqFiles/uniq_files
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
+# and generated automatically using Perinci::CmdLine::Gen version 0.496
 
-our $DATE = '2019-12-04'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-28'; # DATE
 our $DIST = 'App-UniqFiles'; # DIST
-our $VERSION = '0.130'; # VERSION
+our $VERSION = '0.131'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Perinci::CmdLine::Any;
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/UniqFiles/uniq_files",
     program_name => "uniq-files",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
 );
 
 $cmdline->run;
@@ -35,13 +40,13 @@ uniq-files - Report or omit duplicate file contents
 
 =head1 VERSION
 
-This document describes version 0.130 of uniq-files (from Perl distribution App-UniqFiles), released on 2019-12-04.
+This document describes version 0.131 of uniq-files (from Perl distribution App-UniqFiles), released on 2020-05-28.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % uniq-files [options] <files> ...
+ % uniq-files [-A=s] [-D] [-R] [-a] [--algorithm=s] [-c] [--count] [-d] [--debug] [--digest-args-json=s] [--digest-args=s] [--format=name] [--group-by-digest] [--json] [--log-level=level] [--(no)naked-res] [--no-count] [--no-group-by-digest] [--no-recurse] [--no-report-unique] [--no-show-digest] [--no-show-size] [--nocount] [--nogroup-by-digest] [--norecurse] [--noreport-unique] [--noshow-digest] [--noshow-size] [--page-result[=program]] [--quiet] [--recurse] [--report-duplicate=s] [--report-unique] [--show-digest] [--show-size] [--trace] [-u] [--verbose] [--view-result[=program]] <files> ...
 
 Examples:
 
@@ -53,9 +58,21 @@ List all files which have duplicate contents:
 
  % uniq-files -d *
 
-List number of occurences of contents for each file:
+Move all duplicate files (except one copy) in this directory (and subdirectories) to .dupes/:
+
+ % uniq-files -D -R * | while read f; do mv "$f" .dupes/; done
+
+List number of occurences of contents for duplicate files:
 
  % uniq-files -c *
+
+List number of occurences of contents for all files:
+
+ % uniq-files -a -c *
+
+List all files, along with their number of content occurrences and content digest. Use the BLAKE2b digest algorithm. And group the files according to their digest.:
+
+ % uniq-files -a -c --show-digest -A BLAKE2,blake2b *
 
 =head1 DESCRIPTION
 
@@ -70,12 +87,35 @@ C<*> marks required options.
 
 =over
 
-=item B<--count>
+=item B<--algorithm>=I<s>
+
+What algorithm is used to compute the digest of the content.
+
+The default is to use `md5`. Some algorithms supported include `crc32`, `sha1`,
+`sha256`, as well as `Digest` to use Perl <pm:Digest> which supports a lot of
+other algorithms, e.g. `SHA-1`, `BLAKE2b`.
+
+If set to '', 'none', or 'size', then digest will be set to file size. This
+means uniqueness will be determined solely from file size. This can be quicker
+but will generate a false positive when two files of the same size are deemed as
+duplicate even though their content may be different.
+
+
+=item B<--count>, B<-c>
 
 Whether to return each file content's number of occurence.
 
 1 means the file content is only encountered once (unique), 2 means there is one
 duplicate, and so on.
+
+
+=item B<--digest-args-json>=I<s>, B<-A>
+
+See C<--digest-args>.
+
+=item B<--digest-args>=I<s>
+
+Some Digest algorithms require arguments, you can pass them here.
 
 
 =item B<--files-json>=I<s>
@@ -86,14 +126,16 @@ See C<--files>.
 
 Can be specified multiple times.
 
-=item B<--no-check-content>
+=item B<--group-by-digest>
 
-If set to 0, uniqueness will be determined solely from file size. This can be
-quicker but might generate a false positive when two files of the same size are
-deemed as duplicate even though their content are different.
-
+Sort files by its digest (or size, if not computing digest), separate each different digest.
 
 =item B<--no-report-unique>
+
+=item B<--recurse>, B<-R>
+
+If set to true, will recurse into subdirectories.
+
 
 =item B<--report-duplicate>=I<s>
 
@@ -103,22 +145,55 @@ Default value:
 
  2
 
+Valid values:
+
+ [0,1,2,3]
+
 Can be set to either 0, 1, 2.
 
 If set to 2 (the default), will only return the first of duplicate items. For
-example: file1 contains text 'a', file2 'b', file3 'a'. Only file1 will be
-returned because file2 is unique and file3 contains 'a' (already represented by
-file1).
+example: `file1` contains text 'a', `file2` 'b', `file3` 'a'. Only `file1` will
+be returned because `file2` is unique and `file3` contains 'a' (already
+represented by `file1`).
 
-If set to 1, will return all the the duplicate items. From the above example:
-file1 and file3 will be returned.
+If set to 1, will return all the the duplicate files. From the above example:
+`file1` and `file3` will be returned.
+
+If set to 3, will return all but the first of duplicate items. From the above
+example: `file3` will be returned. This is useful if you want to keep only one
+copy of the duplicate content. You can use the output of this routine to `mv` or
+`rm`.
 
 If set to 0, duplicate items will not be returned.
 
 
+=item B<--show-digest>
+
+Show the digest value (or the size, if not computing digest) for each file.
+
+Note that this routine does not compute digest for files which have unique
+sizes, so they will show up as empty.
+
+
+=item B<--show-size>
+
+Show the size for each file.
+
+=item B<-a>
+
+Alias for --report-unique --report-duplicate=1 (report all files).
+
+See C<--no-report-unique>.
+
 =item B<-d>
 
 Alias for --noreport-unique --report-duplicate=1.
+
+See C<--no-report-unique>.
+
+=item B<-D>
+
+Alias for --noreport-unique --report-duplicate=3.
 
 See C<--no-report-unique>.
 
@@ -130,31 +205,29 @@ See C<--no-report-unique>.
 
 =back
 
-=head2 Configuration options
+=head2 Logging options
 
 =over
 
-=item B<--config-path>=I<s>, B<-c>
+=item B<--debug>
 
-Set path to configuration file.
+Shortcut for --log-level=debug.
 
-=item B<--config-profile>=I<s>, B<-P>
+=item B<--log-level>=I<s>
 
-Set configuration profile to use.
+Set log level.
 
-=item B<--no-config>, B<-C>
+=item B<--quiet>
 
-Do not use any configuration file.
+Shortcut for --log-level=error.
 
-=back
+=item B<--trace>
 
-=head2 Environment options
+Shortcut for --log-level=trace.
 
-=over
+=item B<--verbose>
 
-=item B<--no-env>
-
-Do not read environment for default options.
+Shortcut for --log-level=info.
 
 =back
 
@@ -194,6 +267,14 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
 
 =back
 
@@ -245,46 +326,6 @@ It is also recommended to install L<shcompgen> (see above).
 
 For fish and zsh, install L<shcompgen> as described above.
 
-=head1 CONFIGURATION FILE
-
-This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
-
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/uniq-files.conf>, F<~/uniq-files.conf>, or F</etc/uniq-files.conf>.
-
-All found files will be read and merged.
-
-To disable searching for configuration files, pass C<--no-config>.
-
-You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
-
-You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
-
-Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
-
-List of available configuration parameters:
-
- check_content (see --no-check-content)
- count (see --count)
- files (see --files)
- format (see --format)
- naked_res (see --naked-res)
- report_duplicate (see --report-duplicate)
- report_unique (see --no-report-unique)
-
-=head1 ENVIRONMENT
-
-=head2 UNIQ_FILES_OPT => str
-
-Specify additional command-line options.
-
-=head1 FILES
-
-F<~/.config/uniq-files.conf>
-
-F<~/uniq-files.conf>
-
-F</etc/uniq-files.conf>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-UniqFiles>.
@@ -307,7 +348,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2015, 2014, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2015, 2014, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

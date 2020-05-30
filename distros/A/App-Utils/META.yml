@@ -1,5 +1,5 @@
 ---
-abstract: 'an app that contains some useful command-line utilities'
+abstract: 'some useful command-line utilities'
 author:
   - 'Vlado Keselj https://web.cs.dal.ca/~vlado'
 build_requires:
@@ -22,4 +22,4 @@ requires:
   perl: '5.0008004'
 resources:
   repository: https://github.com/vkeselj/App-Utils.git
-version: 0.03
+version: 0.042

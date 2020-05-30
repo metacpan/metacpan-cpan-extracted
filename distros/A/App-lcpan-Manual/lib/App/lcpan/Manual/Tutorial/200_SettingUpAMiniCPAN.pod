@@ -18,7 +18,7 @@ App::lcpan::Manual::Tutorial::200_SettingUpAMiniCPAN - Setting up a local "mini"
 
 =head1 VERSION
 
-version 1.057.000
+version 1.058.000
 
 =head1 SETTING UP YOUR LOCAL MINICPAN MIRROR
 

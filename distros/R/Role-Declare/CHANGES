@@ -1,3 +1,15 @@
+0.04 2020-05-29
+
+* Introduce an experimental lax mode
+
+0.03 2020-05-27
+
+* Set version requirements for Function::Parameters and Type::Tiny
+
+0.02 2020-05-26
+
+* Fix POD errors
+
 0.01 2020-05-26
 
 * Initial release

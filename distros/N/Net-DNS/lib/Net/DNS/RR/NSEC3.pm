@@ -1,9 +1,9 @@
 package Net::DNS::RR::NSEC3;
 
 #
-# $Id: NSEC3.pm 1749 2019-07-21 09:15:55Z willem $
+# $Id: NSEC3.pm 1781 2020-05-13 08:58:25Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1749 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1781 $)[1];
 
 
 use strict;
@@ -142,7 +142,7 @@ sub flags {
 
 sub optout {
 	for ( shift->{flags} ) {
-		$_ = ( shift() ? 0 : 0x01 ) ^ ( 0x01 | ( $_ || 0 ) ) if scalar @_;
+		$_ = ( $_[0] ? 0 : 0x01 ) ^ ( 0x01 | ( $_ || 0 ) ) if scalar @_;
 		return 0x01 & ( $_ || 0 );
 	}
 }

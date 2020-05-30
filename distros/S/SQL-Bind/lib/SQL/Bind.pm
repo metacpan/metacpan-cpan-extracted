@@ -4,7 +4,7 @@ use warnings;
 use base 'Exporter';
 our @EXPORT_OK = qw(sql);
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 our $PlaceholderPrefix = ':';
 our $PlaceholderRegex  = qr/(?i)([a-z_][a-z0-9_]*)/;
@@ -14,7 +14,13 @@ sub sql {
 
     my @bind;
 
-    $sql =~ s{${PlaceholderPrefix}${PlaceholderRegex}(!|\*)?}{
+    my $exceptions = '';
+
+    if ($PlaceholderPrefix eq ':') {
+        $exceptions = '(?<!:)';
+    }
+
+    $sql =~ s{$exceptions${PlaceholderPrefix}${PlaceholderRegex}(!|\*)?}{
         my $options = $2
           ? {
             {

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Find the top repeated note phrases of MIDI files
 
-our $VERSION = '0.1501';
+our $VERSION = '0.1600';
 
 use Moo;
 use strictures 2;
@@ -360,11 +360,13 @@ sub populate {
         $playback = "Weighted playback:\n\tLoop\tChan\tPhrase\n";
 
         for my $channel ( sort { $a <=> $b } keys %{ $self->notes } ) {
+            my $track_chan = $self->one_channel ? 0 : $channel;
+
             # Create a function that adds notes to the score
             my $func = sub {
                 my $patch = $self->random_patch ? $self->_random_patch() : 0;
 
-                MIDI::Util::set_chan_patch( $self->score, $channel, $patch );
+                MIDI::Util::set_chan_patch( $self->score, $track_chan, $patch );
 
                 for my $n ( 1 .. $self->loop ) {
                     my $choice = choose_weighted(
@@ -372,7 +374,7 @@ sub populate {
                         [ values %{ $self->notes->{$channel} } ]
                     );
 
-                    $playback .= "\t$n\t$channel\t$choice\n";
+                    $playback .= "\t$n\t$track_chan\t$choice\n";
 
                     # Add each chosen note to the score
                     for my $note ( split /\s+/, $choice ) {
@@ -398,6 +400,8 @@ sub populate {
         my $n = 0;
 
         for my $channel ( keys %{ $self->notes } ) {
+            my $track_chan = $self->one_channel ? 0 : $channel;
+
             my $notes = $self->notes->{$channel};
 
             # Shuffle the phrases if requested
@@ -412,7 +416,7 @@ sub populate {
             for my $phrase ( @track_notes ) {
                 $n++;
 
-                $playback .= "\t$n\t$channel\t$phrase\n";
+                $playback .= "\t$n\t$track_chan\t$phrase\n";
 
                 my @phrase = split /\s/, $phrase;
                 push @all, @phrase;
@@ -424,7 +428,7 @@ sub populate {
             my $func = sub {
                 my $patch = $self->random_patch ? $self->_random_patch() : 0;
 
-                MIDI::Util::set_chan_patch( $self->score, $channel, $patch);
+                MIDI::Util::set_chan_patch( $self->score, $track_chan, $patch);
 
                 for my $note ( @all ) {
                     if ( $note eq 'r' ) {
@@ -546,7 +550,7 @@ MIDI::Ngram - Find the top repeated note phrases of MIDI files
 
 =head1 VERSION
 
-version 0.1501
+version 0.1600
 
 =head1 SYNOPSIS
 
@@ -681,7 +685,7 @@ Default: C<0>
 
 =head2 one_channel
 
-Boolean.  Accumulate phrases onto a single channel.
+Boolean.  Accumulate phrases onto a single playback channel.
 
 Default: C<0>
 

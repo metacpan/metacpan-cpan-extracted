@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/BinPackUtils/bin_files
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
+# and generated automatically using Perinci::CmdLine::Gen version 0.496
 
-our $DATE = '2019-12-11'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-30'; # DATE
 our $DIST = 'App-BinPackUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -25,7 +26,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
 
 $cmdline->run;
 
-# ABSTRACT: Put files into bins
+# ABSTRACT: Put files into bins of certain size (or number of items)
 # PODNAME: bin-files
 
 __END__
@@ -36,17 +37,32 @@ __END__
 
 =head1 NAME
 
-bin-files - Put files into bins
+bin-files - Put files into bins of certain size (or number of items)
 
 =head1 VERSION
 
-This document describes version 0.006 of bin-files (from Perl distribution App-BinPackUtils), released on 2019-12-11.
+This document describes version 0.007 of bin-files (from Perl distribution App-BinPackUtils), released on 2020-05-30.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % bin-files [options] <files> ...
+ % bin-files [-D] [--bin-max-items=s] [--bin-prefix=s] [--bin-size=s]
+     [--debug] [--dereference-files] [--format=name] [-i=s] [--json]
+     [--log-level=level] [--move] [-n] [--(no)naked-res]
+     [--no-dereference-files] [--no-move] [--nodereference-files]
+     [--nomove] [--num-bins] [--page-result[=program]] [--quiet] [-s=s]
+     [--trace] [--verbose] [--view-result[=program]] <files> ...
+
+Examples:
+
+Put at most 100MB in each bin, move the files:
+
+ % bin-files --bin-size 100MB --move *.jpg
+
+Put at most 1000 files in each bin, move the files:
+
+ % bin-files --bin-max-items 1000 --move *.jpg
 
 =head1 OPTIONS
 
@@ -56,13 +72,15 @@ C<*> marks required options.
 
 =over
 
+=item B<--bin-max-items>=I<s>, B<-i>
+
 =item B<--bin-prefix>=I<s>
 
 Default value:
 
  "bin"
 
-=item B<--bin-size>=I<s>*, B<-s>
+=item B<--bin-size>=I<s>, B<-s>
 
 =item B<--dereference-files>, B<-D>
 
@@ -149,6 +167,14 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
+
 =back
 
 =head2 Other options
@@ -221,7 +247,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

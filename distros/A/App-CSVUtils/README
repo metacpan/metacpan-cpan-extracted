@@ -2,8 +2,8 @@ NAME
     App::CSVUtils - CLI utilities related to CSV
 
 VERSION
-    This document describes version 0.028 of App::CSVUtils (from Perl
-    distribution App-CSVUtils), released on 2019-12-28.
+    This document describes version 0.029 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2020-05-29.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -54,6 +54,8 @@ DESCRIPTION
 
     *   csv2ltsv
 
+    *   csv2td
+
     *   csv2tsv
 
     *   dump-csv
@@ -61,6 +63,52 @@ DESCRIPTION
     *   tsv2csv
 
 FUNCTIONS
+  csv2td
+    Usage:
+
+     csv2td(%args) -> [status, msg, payload, meta]
+
+    Return an enveloped aoaos table data from CSV data.
+
+    Read more about "table data" in App::td, which comes with a CLI td to
+    munge table data.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filename* => *filename*
+
+        Input CSV file.
+
+        Use "-" to read from stdin.
+
+    *   header => *bool* (default: 1)
+
+        Whether CSV has a header row.
+
+        By default ("--header"), the first row of the CSV will be assumed to
+        contain field names (and the second row contains the first data
+        row). When you declare that CSV does not have header row
+        ("--no-header"), the first row of the CSV is assumed to contain the
+        first data row. Fields will be named "field1", "field2", and so on.
+
+    *   tsv => *bool*
+
+        Inform that input file is in TSV (tab-separated) format instead of
+        CSV.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   csv_add_field
     Usage:
 
@@ -1488,17 +1536,17 @@ SEE ALSO
 
     setop.
 
-    csv-select-row.
-
     csvgrep.
 
     csv-split.
+
+    csv-select-row.
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2017, 2016 by
+    This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

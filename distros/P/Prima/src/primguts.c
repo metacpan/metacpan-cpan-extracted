@@ -55,6 +55,13 @@ List   postDestroys;
 int    recursiveCall = 0;
 PHash  primaObjects = nil;
 SV *   eventHook = nil;
+Bool   use_fribidi =
+#ifdef WITH_FRIBIDI
+		true
+#else
+		false
+#endif
+		;
 
 char *
 duplicate_string( const char *s)
@@ -539,15 +546,16 @@ register_notifications( PVMT vmt)
 static Bool
 common_get_options( int * argc, char *** argv)
 {
-#ifdef HAVE_OPENMP
 	static char * common_argv[] = {
-		"openmp_threads", "sets number of openmp threads"
+#ifdef HAVE_OPENMP
+		"openmp_threads", "sets number of openmp threads",
+#endif
+#ifdef WITH_FRIBIDI
+		"no-fribidi", "do not use fribidi",
+#endif
 	};
 	*argv = common_argv;
 	*argc = sizeof( common_argv) / sizeof( char*);
-#else
-	*argc = 0;
-#endif
 	return true;
 }
 
@@ -565,6 +573,13 @@ common_set_option( char * option, char * value)
 			warn("`--openmp_threads' must be given parameters.");
 		return true;
 	}
+#ifdef WITH_FRIBIDI
+	else if ( strcmp( option, "no-fribidi") == 0) {
+		if ( value) warn("`--no-fribidi' option has no parameters");
+		use_fribidi = false;
+		return true;
+	}
+#endif
 	return false;
 }
 
@@ -648,6 +663,7 @@ XS(Prima_init)
 	}
 
 	if ( prima_init_ok == 2) {
+		prima_init_font_mapper();
 		if ( !window_subsystem_init( error_buf))
 			croak( "%s", error_buf);
 		prima_init_ok++;
@@ -1214,7 +1230,10 @@ XS( prima_cleanup)
 	hash_destroy( primaObjects, false);
 	primaObjects = nil;
 	if ( prima_init_ok > 1) prima_cleanup_image_subsystem();
-	if ( prima_init_ok > 2) window_subsystem_cleanup();
+	if ( prima_init_ok > 2) {
+		window_subsystem_cleanup();
+		prima_cleanup_font_mapper();
+	}
 	hash_destroy( vmtHash, false);
 	vmtHash = nil;
 	list_delete_all( &staticObjects, true);
@@ -1282,6 +1301,8 @@ register_constants( void)
 	register_ggo_constants();
 	register_fv_constants();
 	register_dnd_constants();
+	register_to_constants();
+	register_ts_constants();
 }
 
 XS( Object_alive_FROMPERL);
@@ -1850,14 +1871,10 @@ exception_check_raise(void)
 }
 
 int
-prima_utf8_length( const char * utf8)
+prima_utf8_length( const char * utf8, int maxlen)
 {
-	int ret = 0;
-	while ( *utf8) {
-		utf8 = ( char*) utf8_hop(( U8*) utf8, 1);
-		ret++;
-	}
-	return ret;
+	if ( maxlen < 0 ) maxlen = INT16_MAX;
+	return utf8_length((U8*)utf8, ((U8*)utf8) + maxlen);
 }
 
 Bool
@@ -1872,6 +1889,14 @@ prima_is_utf8_sv( SV * sv)
 	} else {
 		return SvUTF8(sv) ? 1 : 0;
 	}
+}
+
+SV*
+prima_svpv_utf8( const char *text, int is_utf8)
+{
+	SV *sv = newSVpv(text, 0);
+	if ( is_utf8 ) SvUTF8_on(sv);
+	return sv;
 }
 
 #ifdef HAVE_OPENMP
@@ -1943,6 +1968,7 @@ prima_array_tie( SV * array, size_t size_of_entry, char * letter)
 
 	av2 = newAV();
 	hv_magic(av2, (GV*)tie, PERL_MAGIC_tied);
+	SvREFCNT(tie)--;
 	return newRV_noinc((SV*) av2);
 }
 
@@ -2014,13 +2040,18 @@ prima_read_point( SV *rv_av, int * pt, int number, char * error)
 }
 
 void *
-prima_read_array( SV * points, char * procName, Bool integer, int div, int min, int max, int * n_points )
+prima_read_array( SV * points, char * procName, char type, int div, int min, int max, int * n_points, Bool * do_free)
 {
 	AV * av;
 	int i, count, psize;
 	void * p;
 
-	psize = integer ? sizeof(int) : sizeof(double);
+	switch(type) {
+	case 's': psize = sizeof(uint16_t); break;
+	case 'i': psize = sizeof(int);      break;
+	case 'd': psize = sizeof(double);   break;
+	default: croak("Bad type %c", type);
+	}
 	if ( !SvROK( points) || ( SvTYPE( SvRV( points)) != SVt_PVAV)) {
 		warn("Invalid array reference passed to %s", procName);
 		return NULL;
@@ -2050,8 +2081,12 @@ prima_read_array( SV * points, char * procName, Bool integer, int div, int min, 
 
 	{
 		void * ref;
-		char * pack, req = integer ? 'i' : 'd';
-		if ( prima_array_parse( points, &ref, NULL, &pack ) && *pack == req) {
+		char * pack;
+		if ( prima_array_parse( points, &ref, NULL, &pack ) && *pack == type) {
+			if ( do_free ) {
+				*do_free = false;
+				return ref;
+			}
 			if (!( p = malloc( psize * count))) {
 				warn("not enough memory");
 				return false;
@@ -2075,11 +2110,21 @@ prima_read_array( SV * points, char * procName, Bool integer, int div, int min, 
 			warn("Array panic on item %d on %s", i, procName);
 			return NULL;
 		}
-		if ( integer )
+		switch (type) {
+		case 'i':
 			*(((int*)p) + i) = SvIV( *psv);
-		else
+			break;
+		case 'd':
 			*(((double*)p) + i) = SvNV( *psv);
+			break;
+		case 's':
+			*(((uint16_t*)p) + i) = SvIV( *psv);
+			break;
+		}
 	}
+
+	if ( do_free )
+		*do_free = true;
 
 	return p;
 }

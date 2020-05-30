@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object.pm
-## Version v0.9.5
+## Version v0.9.7
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2017/07/19
-## Modified 2020/05/21
+## Modified 2020/05/28
 ## 
 ##----------------------------------------------------------------------------
 ## This is the subclassable module for driver specific ones.
@@ -29,7 +29,7 @@ BEGIN
     our( $VERSION, $DB_ERRSTR, $ERROR, $DEBUG, $CONNECT_VIA, $CACHE_QUERIES, $CACHE_SIZE );
     our( $CACHE_TABLE, $USE_BIND, $USE_CACHE, $MOD_PERL, @DBH, $CACHE_DIR );
     our( $CONSTANT_QUERIES_CACHE );
-    $VERSION     = 'v0.9.5';
+    $VERSION     = 'v0.9.7';
     use Devel::Confess;
 };
 
@@ -355,7 +355,7 @@ sub connect
     $self->{debug} = CORE::exists( $param->{debug} ) ? CORE::delete( $param->{debug} ) : CORE::exists( $param->{Debug} ) ? CORE::delete( $param->{Debug} ) : $DEBUG;
     $self->{cache_dir} =  CORE::exists( $param->{cache_dir} ) ? CORE::delete( $param->{cache_dir} ) : CORE::exists( $that->{cache_dir} ) ?  $that->{cache_dir} : $CACHE_DIR;
     
-    $param = $self->_check_connect_param( $param ) || return( undef() );
+    $param = $self->_check_connect_param( $param ) || return;
     $self->message( 3, "Connection parameters are: ", sub{ $self->dumper( $param ) } );
     my $opt = {};
     if( exists( $param->{opt} ) )
@@ -391,7 +391,7 @@ sub connect
     ## print( DEB "DB::Object::connect( '$driver:$db:$server', '$login', '$passwd', '$opt', 'undef()', '$CONNECT_VIA'\n" );
     ## close( DEB );
     $self->message( 3, "Calling _dbi_connect" );
-    my $dbh = $self->_dbi_connect || return( undef() );
+    my $dbh = $self->_dbi_connect || return;
     $self->{dbh} = $dbh;
     $self->message( 3, "Database handler is: '$dbh'" );
     ## If we are not running under mod_perl, cleanup the database object handle in case it was not shutdown
@@ -940,7 +940,7 @@ sub prepare($;$)
     $self->message( 3, "Is database handler active? ", ( $dbo->ping ? 'Yes' : 'No' ) );
     if( !$dbo->ping )
     {
-        my $dbh = $dbo->_dbi_connect || return( undef() );
+        my $dbh = $dbo->_dbi_connect || return;
         $self->{ 'dbh' } = $dbo->{ 'dbh' } = $dbh;
     }
     my $sth = eval
@@ -989,7 +989,7 @@ sub prepare_cached
     $self->message( 3, "Is database handler active? ", ( $dbo->ping ? 'Yes' : 'No' ) );
     if( !$dbo->ping )
     {
-        my $dbh = $dbo->_dbi_connect || return( undef() );
+        my $dbh = $dbo->_dbi_connect || return;
         $self->{dbh} = $dbo->{dbh} = $dbh;
     }
     my $sth = eval
@@ -1031,7 +1031,7 @@ sub query($$)
     my $result;
     if( $sth && !( $result = $sth->execute() ) )
     {
-        return( undef() );
+        return;
     }
     else
     {
@@ -1278,7 +1278,7 @@ sub table_exists
         return( 1 ) if( $ref->{name} eq $table );
     }
     ## We did not find it, so let's try by checking directly the database
-    my $def = $self->table_info( $table ) || return( undef() );
+    my $def = $self->table_info( $table ) || return;
     return( 0 ) if( !scalar( @$def ) );
     return( 1 );
 }
@@ -1293,7 +1293,7 @@ sub table_push
 {
     my $self = shift( @_ );
     my $table = shift( @_ ) || return( $self->error( "No table provided to add to our cache." ) );
-    my $def = $self->tables_info || return( undef() );
+    my $def = $self->tables_info || return;
     my $hash =
     {
     host => $self->host,
@@ -1339,7 +1339,7 @@ sub tables
     }
     if( $opts->{no_cache} || $opts->{live} || !scalar( @$all ) )
     {
-        $all = $self->tables_info || return( undef() );
+        $all = $self->tables_info || return;
     }
     my @tables = ();
     @tables = map( $_->{name}, @$all ) if( scalar( @$all ) );
@@ -1369,7 +1369,7 @@ sub tables_refresh
 {
     my $self = shift( @_ );
     my $db   = shift( @_ ) || $self->database;
-    my $tables = $self->tables_info || return( undef() );
+    my $tables = $self->tables_info || return;
     my $hash =
     {
     host => $self->host,
@@ -1555,7 +1555,7 @@ sub _cache_this
         $sth = $self->prepare( $query ) || do
         {
             $self->message( 3, "An error occured while preparing the query '$query': ", $self->error );
-            return( undef() );
+            return;
         };
         ## $sth = $self->prepare( $self->{ 'query' } ) ||
         ## return( $self->error( "Error while preparing the query on table '$self->{ 'table' }':\n$self->{ 'query' }\n", $self->errstr() ) );
@@ -2100,7 +2100,7 @@ sub _query_type_old
     {
         return( lc( ( $self->{ 'query' } =~ /^[[:blank:]]*(ALTER|CREATE|DROP|GRANT|LISTEN|NOTIFY|INSERT|UPDATE|DELETE|SELECT|TRUNCATE)\b/i )[0] ) )
     }
-    return( undef() );
+    return;
 }
 
 sub _reset_query
@@ -2297,7 +2297,7 @@ AUTOLOAD
         }
         else
         {
-            return( undef() );
+            return;
         }
     }
 #     if( defined( &$meth ) ) 
@@ -2486,7 +2486,7 @@ DB::Object - SQL API
     
 =head1 VERSION
 
-    v0.9.5
+    v0.9.7
 
 =head1 DESCRIPTION
 

@@ -26,10 +26,10 @@ use XSLoader;
 use Carp;
 
 use vars   qw( $VERSION @ISA @EXPORT_OK );
-$VERSION   = "1.42";
+$VERSION   = "1.43";
 @ISA       = qw( Exporter );
 @EXPORT_OK = qw( csv );
-XSLoader::load "Text::CSV_XS", $VERSION;
+XSLoader::load ("Text::CSV_XS", $VERSION);
 
 sub PV { 0 }
 sub IV { 1 }
@@ -274,8 +274,7 @@ my %_cache_id = ( # Only expose what is accessed from within PM
 # A `character'
 sub _set_attr_C {
     my ($self, $name, $val, $ec) = @_;
-    defined $val or $val = 0;
-    utf8::decode ($val);
+    defined $val and utf8::decode ($val);
     $self->{$name} = $val;
     $ec = _check_sanity ($self) and croak ($self->SetDiag ($ec));
     $self->_cache_set ($_cache_id{$name}, $val);
@@ -1806,6 +1805,9 @@ The chars used to quote fields, by default undefined. Limited to 8 bytes.
 
 When set, overrules L<C<quote_char>|/quote_char>. If its length is one byte
 it acts as an alias to L<C<quote_char>|/quote_char>.
+
+This method does not support C<undef>.  Use L<C<quote_char>|/quote_char> to
+disable quotation.
 
 See also L</CAVEATS>
 

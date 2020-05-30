@@ -2,7 +2,7 @@ package Test2::Tools::AsyncSubtest;
 use strict;
 use warnings;
 
-our $VERSION = '0.000129';
+our $VERSION = '0.000130';
 
 use Test2::IPC;
 use Test2::AsyncSubtest;
@@ -101,7 +101,6 @@ other events are also being generated.
     # any child processes and threads.
     $ast1->finish;
     $ast2->finish;
-    $ast3->finish;
 
     done_testing;
 

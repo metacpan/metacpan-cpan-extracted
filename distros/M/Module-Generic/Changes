@@ -1,5 +1,11 @@
 Revision history for Perl module Module::Generic
 
+0.12.14 2020-05-28T05:46:04
+    - Tweaked Module::Generic::Number::_set_get_prop in my last deprate attempt to correct this tedious bug. Should fix RT #132714
+
+0.12.13 2020-05-27T13:58:32
+    - Corrected (hopefully) an issue whereby some undefined hash keys would not be undefined affecting test unit
+
 0.12.12 2020-05-25T13:55:00+09:00
     - Corrected issues with Number::Format whereby it would revert to some default, so made all of the Number::Format argument explicit, even setting them to '' to avoid Number::Format from using its inadequate default
     - Implemented a workaround to Number::Format on Windows whereby some of the POSIX::localconv values are -1. When there is no value, such as when the locale is C or when it is on Windows (value being -1), then numeric values default to 0

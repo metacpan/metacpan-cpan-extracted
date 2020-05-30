@@ -5,7 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
-  Test2::Suite: '0'
+  Test2::V0: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -27,7 +27,7 @@ no_index:
 provides:
   Mojo::JWT::Google:
     file: lib/Mojo/JWT/Google.pm
-    version: '0.10'
+    version: '0.11'
 requires:
   Mojo::JWT: '0'
   Mojolicious: '8.00'
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://github.com/rabbiveesh/mojo-jwt-google/issues
   homepage: https://github.com/rabbiveesh/mojo-jwt-google
   repository: https://github.com/rabbiveesh/mojo-jwt-google.git
-version: '0.10'
+version: '0.11'
 x_Dist_Zilla:
   perl:
     version: '5.030001'
@@ -166,7 +166,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.10'
+          tag: '0.11'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:

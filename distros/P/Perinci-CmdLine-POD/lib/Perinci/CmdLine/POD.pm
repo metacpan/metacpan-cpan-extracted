@@ -1,9 +1,9 @@
 package Perinci::CmdLine::POD;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-27'; # DATE
+our $DATE = '2020-05-30'; # DATE
 our $DIST = 'Perinci-CmdLine-POD'; # DIST
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 use 5.010001;
 use strict;
@@ -989,7 +989,7 @@ Perinci::CmdLine::POD - Generate POD for Perinci::CmdLine-based CLI script
 
 =head1 VERSION
 
-This document describes version 0.018 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2020-04-27.
+This document describes version 0.019 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2020-05-30.
 
 =head1 SYNOPSIS
 

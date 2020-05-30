@@ -32,6 +32,41 @@ subtest col_idx => sub {
     is_deeply($td->col_idx("value"), undef);
 };
 
+subtest col_content => sub {
+    is_deeply($td->col_content(0), [1,4,2,10]);
+    is_deeply($td->col_content('elem'), [1,4,2,10]);
+    is_deeply($td->col_content(1), undef);
+    is_deeply($td->col_content('foo'), undef);
+};
+
+subtest row => sub {
+    is_deeply($td->row(0), 1);
+    is_deeply($td->row(1), 4);
+    is_deeply($td->row(2), 2);
+    is_deeply($td->row(3), 10);
+    is_deeply($td->row(4), undef);
+};
+
+subtest row_as_aos => sub {
+    is_deeply($td->row_as_aos(0), [1]);
+    is_deeply($td->row_as_aos(1), [4]);
+    is_deeply($td->row_as_aos(2), [2]);
+    is_deeply($td->row_as_aos(3), [10]);
+    is_deeply($td->row_as_aos(4), undef);
+};
+
+subtest row_as_hos => sub {
+    is_deeply($td->row_as_hos(0), {elem=>1});
+    is_deeply($td->row_as_hos(1), {elem=>4});
+    is_deeply($td->row_as_hos(2), {elem=>2});
+    is_deeply($td->row_as_hos(3), {elem=>10});
+    is_deeply($td->row_as_hos(4), undef);
+};
+
+subtest rows => sub {
+    is_deeply($td->rows, [1,4,2,10]);
+};
+
 subtest rows_as_aoaos => sub {
     is_deeply($td->rows_as_aoaos, [[1],[4],[2],[10]]);
 };

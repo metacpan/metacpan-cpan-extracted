@@ -58,6 +58,27 @@ DESCRIPTION
 
     missing table
 
+CUSTOM ERRORS
+
+    You may find your code throwing exceptions that you would like to
+    generate custom errors for. You can specify them in the constructor:
+
+        my $parser = DBIx::Class::ParseError->new(
+            schema => $dbic_schema,
+            custom_errors => {
+                locking_failed => qr/Could not update due to version mismatch/i
+            }
+        );
+
+    The custom_errors key must point to a hash references whose values are
+    regular expressions to match against the error. Due to the
+    unpredictable nature of these errors, the exception will like not have
+    additional information beyond the error message and the error message.
+
+    The parser will attempt to match custom errors before standard errors.
+    Any error will have the string custom_ prepended, so the above error
+    will be reported as custom_locking_failed.
+
 DRIVERS
 
     Initial fully support for errors from the following DBMS:
@@ -70,21 +91,24 @@ DRIVERS
 
       See DBIx::Class::ParseError::Parser::MySQL.
 
+    PostgreSQL
+
+      See DBIx::Class::ParseError::Parser::PostgreSQL.
+
 AUTHOR
 
     wreis - Wallace reis <wreis@cpan.org>
 
+CONTRIBUTORS
+
+    Ovid - Curtis "Ovid" Poe <ovid@cpan.org>
+
 COPYRIGHT
 
-    Copyright (c) the "AUTHOR" and "CONTRIBUTORS" as listed above.
+    Copyright (c) the "AUTHOR".
 
 LICENSE
 
     This library is free software and may be distributed under the same
     terms as perl itself.
-
-SPONSORSHIP
-
-    This module exists due to the wonderful people at IntelliTree Solutions
-    http://www.intellitree.com.
 

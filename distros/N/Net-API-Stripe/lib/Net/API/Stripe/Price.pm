@@ -153,7 +153,7 @@ Describes how to compute the price per period. Either I<per_unit> or I<tiered>. 
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
 
-=iten B<currency> string
+=item B<currency> string
 
 Three-letter L<ISO currency code|https://www.iso.org/iso-4217-currency-codes.html>, in lowercase. Must be a supported L<currency|https://stripe.com/docs/currencies>.
 

@@ -54,13 +54,13 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::Author::ETHER:
     file: lib/Dist/Zilla/MintingProfile/Author/ETHER.pm
-    version: '0.156'
+    version: '0.157'
   Dist::Zilla::PluginBundle::Author::ETHER:
     file: lib/Dist/Zilla/PluginBundle/Author/ETHER.pm
-    version: '0.156'
+    version: '0.157'
   Pod::Weaver::PluginBundle::Author::ETHER:
     file: lib/Pod/Weaver/PluginBundle/Author/ETHER.pm
-    version: '0.156'
+    version: '0.157'
 recommends:
   Dist::Zilla::Plugin::BlockRelease: '0'
   Dist::Zilla::Plugin::GitHub::Update: '0.40'
@@ -199,6 +199,7 @@ requires:
   Test::Spelling: '0.19'
   Text::Tabs: '2013.0426'
   Try::Tiny: '0'
+  URI::Escape: '0'
   if: '0'
   namespace::autoclean: '0'
   perl: '5.010'
@@ -210,7 +211,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Author-ETHER
   homepage: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER
   repository: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER.git
-version: '0.156'
+version: '0.157'
 x_Dist_Zilla:
   perl:
     version: '5.031011'
@@ -345,7 +346,7 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: '@Author::ETHER/stale modules, build'
-      version: '0.056'
+      version: '0.057'
     -
       class: Dist::Zilla::Plugin::FileFinder::ByName
       name: '@Author::ETHER/Examples'
@@ -731,7 +732,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Prereqs::AuthorDeps
       name: '@Author::ETHER/Prereqs::AuthorDeps'
-      version: '0.006'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::MinimumPerl
       name: '@Author::ETHER/MinimumPerl'
@@ -843,7 +844,7 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: '@Author::ETHER/stale modules, release'
-      version: '0.056'
+      version: '0.057'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -992,7 +993,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.156
+          tag: v0.157
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:

@@ -18,7 +18,7 @@ App::lcpan::Manual::Tutorial::700_SettingUpADarkPAN - Setting up a DarkPAN mirro
 
 =head1 VERSION
 
-version 1.057.000
+version 1.058.000
 
 =head1 DESCRIPTION
 

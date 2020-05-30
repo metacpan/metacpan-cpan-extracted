@@ -11,20 +11,26 @@ use Prima::Const;
 
 package Prima::array;
 use base 'Tie::Array';
+use Carp;
 
 sub new
 {
-	my ($class, $letter) = @_;
-	die "bad array type" if $letter !~ /^[id]$/;
+	my ($class, $letter, $buf) = @_;
+	die "bad array type" if $letter !~ /^[idSs]$/;
 	my @tie;
 	my $size = length pack $letter, 0;
-	my $buf = '';
+	if ( defined $buf ) {
+		croak "Bad length ". length($buf). ", must be mod $size" if length($buf) % $size;
+	} else {
+		$buf = '';
+	}
 	tie @tie, $class, $buf, $size, $letter;
 	return \@tie;
 }
 
-sub new_int    { shift->new('i') }
-sub new_double { shift->new('d') }
+sub new_short  { shift->new('S', @_) }
+sub new_int    { shift->new('i', @_) }
+sub new_double { shift->new('d', @_) }
 
 use constant REF  => 0;
 use constant SIZE => 1;
@@ -32,23 +38,52 @@ use constant PACK => 2;
 
 sub is_array { ((ref tied @{$_[0]}) // '') eq 'Prima::array' }
 
+sub substr
+{
+	my ( $self, $offset, $length, $replacement) = @_;
+	my $a1 = tied @$self;
+	my $len = length($a1->[REF]) / $a1->[SIZE];
+	croak "offset beyond array boundaries" if $offset > $len || -$offset > $len;
+	my $newref;
+	if ( defined $replacement ) {
+		croak "bad length" if $length < 0;
+		croak "bad array" unless is_array($replacement);
+		my $a2 = tied @$replacement;
+		croak "replacement of type '$a2->[PACK]' is incompatible with type '$a1->[PACK]'"
+			if $a1->[PACK] ne $a2->[PACK];
+		$newref = CORE::substr( $a1->[REF], $offset * $a1->[SIZE], $length * $a1->[SIZE], $a2->[REF]);
+	} elsif ( defined $length ) {
+		$newref = CORE::substr( $a1->[REF], $offset * $a1->[SIZE], $length * $a1->[SIZE]);
+	} else {
+		$newref = CORE::substr( $a1->[REF], $offset * $a1->[SIZE]);
+	}
+	return ref($a1)->new( $a1->[PACK], $newref );
+}
+
 sub append
 {
-	die "bad array" if grep { !is_array($_) } @_;
+	croak "bad array" if grep { !is_array($_) } @_;
 	my ( $a1, $a2 ) = map { tied @$_ } @_;
-	die "bad array" if $a1->[PACK] ne $a2->[PACK];
+	croak "bad array" if $a1->[PACK] ne $a2->[PACK];
 	$a1->[REF] .= $a2->[REF];
 }
 
+sub clone
+{
+	my $self = tied @{$_[0]};
+	my ( $buf, $size, $pack ) = @$self;
+	return __PACKAGE__->new($pack, $buf);
+}
+
 sub TIEARRAY  { bless \@_, shift }
-sub FETCH     { unpack( $_[0]->[PACK], substr( $_[0]->[REF], $_[1] * $_[0]->[SIZE], $_[0]->[SIZE] )) }
-sub STORE     { substr( $_[0]->[REF], $_[1] * $_[0]->[SIZE], $_[0]->[SIZE], pack( $_[0]->[PACK], $_[2] )) }
+sub FETCH     { unpack( $_[0]->[PACK], CORE::substr( $_[0]->[REF], $_[1] * $_[0]->[SIZE], $_[0]->[SIZE] )) }
+sub STORE     { CORE::substr( $_[0]->[REF], $_[1] * $_[0]->[SIZE], $_[0]->[SIZE], pack( $_[0]->[PACK], $_[2] )) }
 sub FETCHSIZE { length( $_[0]->[REF] ) / $_[0]->[SIZE] }
 sub EXISTS    { $_[1] < FETCHSIZE($_[0]) }
 sub STORESIZE {
 	( $_[1] > FETCHSIZE($_[0]) ) ?
 		(STORE($_[0], $_[1] - 1, 0)) :
-		(substr( $_[0]->[REF], $_[1] * $_[0]->[SIZE] ) = '' )
+		(CORE::substr( $_[0]->[REF], $_[1] * $_[0]->[SIZE] ) = '' )
 }
 sub DELETE    { warn "This array does not implement delete functionality" }
 
@@ -387,7 +422,6 @@ sub image  { shift->bitmap_or_image( 'Prima::Image',        type => im::BW,     
 package Prima::Drawable;
 use vars qw(@ISA);
 @ISA = qw(Prima::Component);
-use Prima::Bidi qw(is_bidi);
 use Prima::Drawable::Basic;
 
 sub profile_default
@@ -464,15 +498,6 @@ sub stretch_image {
 		@_[3,4], $_[5]-> size,
 		defined ($_[6]) ? $_[6] : $_[0]-> rop
 	) if $_[5]
-}
-
-sub text_out_bidi
-{
-	if ( $Prima::Bidi::enabled && is_bidi $_[1] ) {
-		return shift->text_out( Prima::Bidi::visual(shift), @_);
-	} else {
-		return shift->text_out(@_);
-	}
 }
 
 sub has_alpha_layer { 0 }
@@ -1450,6 +1475,7 @@ sub begin_drag
 	if ( $self->alive ) {
 		if ( $ret == dnd::None && $opt{preview} ) {
 			my @npp = $::application->pointerPos;
+			$npp[1] -= $opt{preview}->height;
 			my $paint_flag = 0;
 			my $flyback = Prima::Widget->new(
 				size      => [ $opt{preview}->size ],
@@ -1463,18 +1489,27 @@ sub begin_drag
 					$paint_flag = 1;
 				}
 			);
+			$flyback-> insert( Timer => 
+				onTick => sub {
+					$flyback->destroy if $flyback;
+					undef $flyback;
+				},
+				timeout => 1000,
+			)-> start;
 			$flyback->bring_to_front;
 			my @targ = map { $_ / 2 } $flyback->size;
 			while (abs( $npp[0] - $opp[0]) > $targ[0] || abs($npp[1] - $opp[1]) > $targ[1]) {
 				@npp = map { ( $npp[$_] + $opp[$_] ) / 2 } 0, 1;
 				my $max_wait = 10;
 				$::application->yield while !$paint_flag && $max_wait--;
+				last unless $flyback;
 				$paint_flag = 0;
 				CORE::select(undef, undef, undef, 0.1);
 				$flyback->origin(@npp);
 				$flyback->bring_to_front;
 			}
-			$flyback->destroy;
+			$flyback->destroy if $flyback;
+			undef $flyback;
 		}
 		$self->pointer($pointer); # dnd_start doesn't affect children pointers and doesn't restore them
 		$self->remove_notification($_) for @id;
@@ -1824,7 +1859,7 @@ sub on_paint
 	my ( $x, $y) = ( 3, $size[1] - 1 - $fh);
 	my @ln = $canvas->text_split_lines($self->text);
 	for ( @ln) {
-		$canvas-> text_out_bidi( $_, $x, $y);
+		$canvas-> text_shape_out( $_, $x, $y);
 		$y -= $fh;
 	}
 }
@@ -1863,6 +1898,7 @@ sub profile_default
 		autoClose      => 0,
 		pointerType    => cr::Arrow,
 		pointerVisible => 1,
+		language       => Prima::Application->get_system_info->{guiLanguage},
 		icon           => undef,
 		owner          => undef,
 		scaleChildren  => 0,
@@ -1882,8 +1918,9 @@ sub profile_default
 		printerModule  => $unix ? 'Prima::PS::Printer' : '',
 		helpClass      => 'Prima::HelpViewer',
 		helpModule     => 'Prima::HelpViewer',
+		textDirection  => 0,
 		uiScaling      => 0,
-		wantUnicodeInput => 0,
+		wantUnicodeInput => 1,
 	);
 	@$def{keys %prf} = values %prf;
 	return $def;
@@ -1892,6 +1929,7 @@ sub profile_default
 sub profile_check_in
 {
 	my ( $self, $p, $default) = @_;
+	$p->{textDirection} //= $self->lang_is_rtl($p->{language} // $default->{language});
 	$self-> SUPER::profile_check_in( $p, $default);
 	delete $p-> { printerModule};
 	delete $p-> { owner};
@@ -1968,6 +2006,31 @@ sub get_printer
 sub hintFont      {($#_)?$_[0]-> set_hint_font        ($_[1])  :return Prima::Font-> new($_[0], "get_hint_font", "set_hint_font")}
 sub helpModule    {($#_)?$_[0]-> {HelpModule} = $_[1] : return $_[0]-> {HelpModule}}
 sub helpClass     {($#_)?$_[0]-> {HelpClass}  = $_[1] : return $_[0]-> {HelpClass}}
+
+sub lang_is_rtl
+{
+	my $lang = $_[1] // $_[0]->get_system_info->{guiLanguage};
+	$lang =~ /^(
+		ar| # arabic
+		dv| # divehi
+		fa| # persian (farsi)
+		ha| # hausa
+		he| # hebrew
+		iw| # hebrew (old code)
+		ji| # yiddish (old code)
+		ps| # pashto, pushto
+		ur| # urdu
+		yi  # yiddish
+	)/x ? 1 : 0
+}
+
+sub language
+{
+	return $_[0]->{language} unless $#_;
+	my ( $self, $lang ) = @_;
+	$self->{language} = $lang;
+	$self->textDirection( $_[0]-> lang_is_rtl($lang));
+}
 
 sub help_init
 {

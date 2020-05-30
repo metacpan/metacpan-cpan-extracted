@@ -36,6 +36,7 @@ lib/Net/DNS/RR.pm
 lib/Net/DNS/RR/A.pm
 lib/Net/DNS/RR/AAAA.pm
 lib/Net/DNS/RR/AFSDB.pm
+lib/Net/DNS/RR/AMTRELAY.pm
 lib/Net/DNS/RR/APL.pm
 lib/Net/DNS/RR/CAA.pm
 lib/Net/DNS/RR/CDNSKEY.pm
@@ -121,6 +122,7 @@ t/04-packet-truncate.t
 t/05-A.t
 t/05-AAAA.t
 t/05-AFSDB.t
+t/05-AMTRELAY.t
 t/05-APL.t
 t/05-CAA.t
 t/05-CDNSKEY.t

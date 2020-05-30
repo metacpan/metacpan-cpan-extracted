@@ -45,6 +45,7 @@ my %opts = (
     one     => 0,        # Analyze phrases into one list
     image   => 0,        # Output GraphViz network diagram
     thresh  => 10,       # Threshold to show net edges
+    chan    => 0,        # Network diagram channel to render
     ranp    => 0,        # Random patch instead of all piano
     patches => join(' ', @patches),
 );
@@ -67,6 +68,7 @@ GetOptions( \%opts,
     'one',
     'image',
     'thresh=i',
+    'chan=i',
     'ranp',
     'patches=s',
 ) or die 'Failed GetOptions';
@@ -108,10 +110,10 @@ if ( $opts{out} ) {
     $mng->write;
 }
 else {
-    warn ddc($mng->dura);
-    warn ddc($mng->dura_net);
-    warn ddc($mng->notes);
-    warn ddc($mng->note_net);
+    print 'Durations: ', ddc($mng->dura), "\n",
+        'Duration network: ', ddc($mng->dura_net), "\n",
+        'Notes: ', ddc($mng->notes), "\n",
+        'Note network: ', ddc($mng->note_net);
 }
 
 exit unless $opts{image};
@@ -125,25 +127,13 @@ my $g = GraphViz2->new(
 
 my %edges;
 
-for my $edge ( keys %{ $mng->note_net } ) {
-    next unless $mng->note_net->{$edge} >= $opts{thresh};
+for my $edge ( keys %{ $mng->note_net->{$opts{chan}} } ) {
+    next unless $mng->note_net->{$opts{chan}}{$edge} >= $opts{thresh};
 
     # Split the edge in two
     my ($i, $j) = split '-', $edge;
 
-    # Convert midinum to ISO in the edge
-    my @notes;
-    for my $n (split ' ', $i) {
-        push @notes, $mng->note_convert($n);
-    }
-    $i = join ' ', @notes;
-    @notes = ();
-    for my $n (split ' ', $j) {
-        push @notes, $mng->note_convert($n);
-    }
-    $j = join ' ', @notes;
-
-    $g->add_edge(from => $i, to => $j, label => $mng->note_net->{$edge})
+    $g->add_edge(from => $i, to => $j, label => $mng->note_net->{$opts{chan}}{$edge})
         unless $edges{$edge}++;
 }
 
@@ -158,25 +148,13 @@ $g = GraphViz2->new(
 
 %edges = ();
 
-for my $edge ( keys %{ $mng->dura_net } ) {
-    next unless $mng->dura_net->{$edge} >= $opts{thresh};
+for my $edge ( keys %{ $mng->dura_net->{$opts{chan}} } ) {
+    next unless $mng->dura_net->{$opts{chan}}{$edge} >= $opts{thresh};
 
     # Split the edge in two
     my ($i, $j) = split '-', $edge;
 
-    # Convert midinum to ISO in the edge
-    my @notes;
-    for my $n (split ' ', $i) {
-        push @notes, $mng->dura_convert($n);
-    }
-    $i = join ' ', @notes;
-    @notes = ();
-    for my $n (split ' ', $j) {
-        push @notes, $mng->dura_convert($n);
-    }
-    $j = join ' ', @notes;
-
-    $g->add_edge(from => $i, to => $j, label => $mng->dura_net->{$edge})
+    $g->add_edge(from => $i, to => $j, label => $mng->dura_net->{$opts{chan}}{$edge})
         unless $edges{$edge}++;
 }
 

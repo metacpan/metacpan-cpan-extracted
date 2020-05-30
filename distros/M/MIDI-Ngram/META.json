@@ -43,6 +43,11 @@
             "namespace::clean" : "0",
             "perl" : "5.012",
             "strictures" : "2"
+         },
+         "suggests" : {
+            "Data::Dumper::Compact" : "0",
+            "File::Find::Rule" : "0",
+            "GraphViz2" : "0"
          }
       },
       "test" : {
@@ -67,7 +72,7 @@
          "web" : "https://github.com/ology/MIDI-Ngram"
       }
    },
-   "version" : "0.1501",
+   "version" : "0.1600",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"
@@ -305,6 +310,17 @@
                }
             },
             "name" : "Prereqs",
+            "version" : "6.014"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "suggests"
+               }
+            },
+            "name" : "Suggests",
             "version" : "6.014"
          },
          {

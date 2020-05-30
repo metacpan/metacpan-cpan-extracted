@@ -2,7 +2,7 @@
 #
 #  Small level 2.5 teletext browser
 #
-#  Copyright (C) 2007 Tom Zoerner
+#  Copyright (C) 2007,2020 Tom Zoerner
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -19,10 +19,16 @@
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-# $Id: browse-ttx.pl,v 1.2 2007/12/02 18:30:50 tom Exp tom $
+# Description:
+#
+#   This script is an example for the use of classes Video::ZVBI::page and
+#   Video::ZVBI::export for rendering teletext pages. The script captures
+#   teletext from a given device and renders selected teletext pages in a
+#   simple GUI using TkInter.
 
 use strict;
 use blib;
+use Getopt::Long;
 use IO::Handle;
 use Tk;
 use Video::ZVBI qw(/^VBI_/);
@@ -41,6 +47,12 @@ my $img_xpm;
 my $font = ['courier', -12];
 my $mode_xpm = 1;
 my $redraw;
+
+my $opt_device = "/dev/dvb/adapter0/demux0";
+my $opt_pid = 0;  # mandatory for DVB
+my $opt_v4l2 = 0;
+my $opt_verbose = 0;
+my $opt_help = 0;
 
 #
 # This callback is invoked by the teletext decoder for every ompleted page.
@@ -68,10 +80,12 @@ sub cap_frame {
    my $res;
 
    $res = $cap->pull_sliced($sliced, $n_lines, $timestamp, 50);
-   die "Capture error: $!\n" if $res < 0;
 
    if ($res > 0) {
       $vtdec->decode($sliced, $n_lines, $timestamp);
+   }
+   elsif ($res < 0) {
+      warn "Capture error: $!\n";
    }
 
    if ($redraw) {
@@ -85,26 +99,31 @@ sub cap_frame {
 # device capture context and the teletext decoder
 #
 sub cap_init {
-   my $opt_device = "/dev/vbi0";
-   my $opt_buf_count = 5;
-   my $opt_services = VBI_SLICED_TELETEXT_B;
-   my $opt_strict = 0;
-   my $opt_verbose = 0;
    my $err;
 
-   $pxc = Video::ZVBI::proxy::create($opt_device, $0, 0, $err, $opt_verbose);
-   if (defined $pxc) {
-      $cap = Video::ZVBI::capture::proxy_new($pxc, 5, 0, $opt_services, $opt_strict, $err);
-      undef $pxc unless defined $cap;
+   if ($opt_v4l2 || (($opt_pid == 0) && ($opt_device !~ /dvb/))) {
+      my $opt_buf_count = 5;
+      my $opt_services = VBI_SLICED_TELETEXT_B;
+      my $opt_strict = 0;
+
+      $pxc = Video::ZVBI::proxy::create($opt_device, $0, 0, $err, $opt_verbose);
+      if (defined $pxc) {
+         $cap = Video::ZVBI::capture::proxy_new($pxc, 5, 0, $opt_services, $opt_strict, $err);
+         undef $pxc unless defined $cap;
+      }
+      if (!defined $cap) {
+         $cap = Video::ZVBI::capture::v4l2_new($opt_device, $opt_buf_count, $opt_services, $opt_strict, $err, $opt_verbose);
+      }
+      if (!defined $cap) {
+         $cap = Video::ZVBI::capture::v4l_new($opt_device, 0, $opt_services, $opt_strict, $err, $opt_verbose);
+      }
+      if (!defined $cap) {
+         $cap = Video::ZVBI::capture::bktr_new($opt_device, 0, $opt_services, $opt_strict, $err, $opt_verbose);
+      }
    }
-   if (!defined $cap) {
-      $cap = Video::ZVBI::capture::v4l2_new($opt_device, $opt_buf_count, $opt_services, $opt_strict, $err, $opt_verbose);
-   }
-   if (!defined $cap) {
-      $cap = Video::ZVBI::capture::v4l_new($opt_device, 0, $opt_services, $opt_strict, $err, $opt_verbose);
-   }
-   if (!defined $cap) {
-      $cap = Video::ZVBI::capture::bktr_new($opt_device, 0, $opt_services, $opt_strict, $err, $opt_verbose);
+   else {
+      warn "WARNING: DVB devices require --pid parameter\n" if $opt_pid <= 0;
+      $cap = Video::ZVBI::capture::dvb_new2($opt_device, $opt_pid, $err, $opt_verbose);
    }
    die "Failed to open video device: $err\n" unless $cap;
 
@@ -308,6 +327,31 @@ sub gui_init {
    $redraw = 0;
 }
 
+sub usage {
+        print STDERR "\
+Teletext browser GUI demo\
+Copyright (C) 2007,2020 T. Zoerner\
+This program is licensed under GPL 2 or later. NO WARRANTIES.\n\
+Usage: $0 [OPTIONS]\n\
+--device PATH     Specify the capture device\
+--pid NNN         Specify the PES stream PID: Required for DVB\
+--v4l2            Force device to be addressed via analog driver\
+--verbose         Emit debug trace output\
+--help            Print this message and exit\
+";
+  exit(1);
+}
+my %CmdOpts = (
+        "device=s" =>  \$opt_device,
+        "pid=i" =>     \$opt_pid,
+        "v4l2" =>      \$opt_v4l2,
+        "verbose" =>   \$opt_verbose,
+        "help" =>      \$opt_help,
+);
+GetOptions(%CmdOpts) || usage();
+usage() if $opt_help;
+die "Options --v4l2 and --pid are mutually exclusive\n" if $opt_v4l2 && $opt_pid;
+
 # create & display GUI
 gui_init();
 
@@ -315,5 +359,4 @@ gui_init();
 cap_init();
 
 # everything from here on is event driven
-MainLoop;
-
+MainLoop();

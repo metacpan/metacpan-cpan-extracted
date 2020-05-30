@@ -1,7 +1,9 @@
 package App::td;
 
-our $DATE = '2020-04-05'; # DATE
-our $VERSION = '0.094'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-29'; # DATE
+our $DIST = 'App-td'; # DIST
+our $VERSION = '0.100'; # VERSION
 
 use 5.010001;
 #IFUNBUILT
@@ -17,6 +19,7 @@ our %actions = (
     'actions' => {summary=>'List available actions', req_input=>0},
     'as-aoaos' => {summary=>'Convert table data to aoaos form'},
     'as-aohos' => {summary=>'Convert table data to aohos form'},
+    'as-csv' => {summary=>'Convert table data to CSV'},
     'avg-row' => {summary=>'Append an average row'},
     'avg' => {summary=>'Return average of all numeric columns'},
     'colcount-row' => {summary=>'Append a row containing number of columns'},
@@ -34,8 +37,16 @@ our %actions = (
     'sum-row' => {summary=>'Append a row containing sums'},
     'sum' => {summary=>'Return a row containing sum of all numeric columns'},
     'tail' => {summary=>'Only return the last N rows'},
-    'wc-row' => {summary=>'Alias for rowcount-row'},
-    'wc' => {summary=>'Alias for rowcount'},
+    'transpose' => {summary=>'Transpose table'},
+    'wc-row' => {summary=>'Alias for rowcount-row', tags=>['alias']},
+    'wc' => {summary=>'Alias for rowcount', tags=>['alias']},
+
+    'grep-row' => {summary=>'Use Perl code to filter rows', tags=>['perl']},
+    'grep' => {summary=>'Alias for grep-row', tags=>['perl', 'alias']},
+    'grep-col' => {summary=>'Use Perl code to filter columns', tags=>['perl']},
+    'map-row' => {summary=>'Use Perl code to transform rows', tags=>['perl']},
+    'map' => {summary=>'Alias for map-row', tags=>['perl', 'alias']},
+    'psort' => {summary=>'Use Perl code to transform row', tags=>['perl']},
 );
 
 sub _get_table_spec_from_envres {
@@ -64,6 +75,33 @@ sub _decode_json {
 
     state $json = Cpanel::JSON::XS->new->allow_nonref;
     $json->decode(shift);
+}
+
+sub _get_td_obj {
+    require Data::Check::Structure;
+
+    my $input = shift;
+    my ($input_form, $input_obj);
+    if (ref($input->[2]) eq 'HASH') {
+        $input_form = 'hash';
+        require TableData::Object::hash;
+        $input_obj = TableData::Object::hash->new($input->[2]);
+    } elsif (Data::Check::Structure::is_aos($input->[2])) {
+        $input_form = 'aos';
+        require TableData::Object::aos;
+        $input_obj = TableData::Object::aos->new($input->[2]);
+    } elsif (Data::Check::Structure::is_aoaos($input->[2])) {
+        $input_form = 'aoaos';
+        my $spec = _get_table_spec_from_envres($input);
+        require TableData::Object::aoaos;
+        $input_obj = TableData::Object::aoaos->new($input->[2], $spec);
+    } elsif (Data::Check::Structure::is_aohos($input->[2])) {
+        $input_form = 'aohos';
+        my $spec = _get_table_spec_from_envres($input);
+        require TableData::Object::aohos;
+        $input_obj = TableData::Object::aohos->new($input->[2], $spec);
+    }
+    ($input_form, $input_obj);
 }
 
 $SPEC{td} = {
@@ -108,6 +146,9 @@ Next, you can use these actions:
 
  # Convert table data (which might be hash, aos, or aoaos) to aohos form
  % list-files -l --json | td as-aohos
+
+ # Convert table data to CSV
+ % list-files -l --json | td as-csv
 
  # Calculate arithmetic average of numeric columns
  % list-files -l --json | td avg
@@ -175,6 +216,47 @@ Next, you can use these actions:
  # Show rows from the row 5 onwards
  % osnames -l --json | td tail -n +5
 
+ # Transpose table (make first column of rows as column names in the transposed
+ # table)
+
+ % osnames -l --json | td transpose
+
+ # Transpose table (make columns named 'row1', 'row2', 'row3', ... in the
+ # transposed table)
+
+ % osnames -l --json | td transpose --no-header-column
+
+ # Use Perl code to filter rows. Perl code gets row in $row or $_
+ # (scalar/aos/hos) or $rowhash (always a hos) or $rowarray (always aos). There
+ # are also $rownum (integer, starts at 0) and $td (table data object). Perl
+ # code is eval'ed in the 'main' package with strict/warnings turned off. The
+ # example below selects videos that are larger than 480p.
+
+ % media-info *.mp4 | td grep 'use List::Util qw(min); min($_->{video_height}, $_->{video_width}) > 480'
+
+ # Use Perl code to filter columns. Perl code gets column name in $colname or
+ # $_. There's also $colidx (column index, from 1) and $td (table data object).
+ # If table data form is 'hash' or 'aos', it will be transformed into 'aoaos'.
+ # The example below only select even columns that match /col/i. Note that most
+ # of the time, 'td select' is better. But when you have a lot of columns and
+ # want to select them programmatically, you have grep-col.
+
+ % somecd --json | td grep-col '$colidx % 2 == 0 && /col/i'
+
+ # Use Perl code to transform row. Perl code gets row in $row or $_
+ # (scalar/hash/array) and is supposed to return the new row. As in 'grep',
+ # $rowhash, $rowarray, $rownum, $td are also available as helper. The example
+ # below adds a field called 'is_landscape'.
+
+ % media-info *.jpg | td map '$_->{is_landscape} = $_->{video_height} < $_->{video_width} ? 1:0; $_'
+
+ # Use perl code to sort rows. Perl sorter code gets row in $a & $b or $_[0] &
+ # $_[1] (hash/array). Sorter code, like in Perl's standard sort(), is expected
+ # to return -1/0/1. The example belows sort videos by height, descendingly then
+ # by width, descendingly.
+
+ % media-info *.mp4 | td psort '$b->{video_height} <=> $a->{video_height} || $b->{video_width} <=> $b->{video_width}'
+
 _
     args => {
         action => {
@@ -220,6 +302,13 @@ _
             cmdline_aliases => {e=>{}},
             tags => ['category:select-action'],
         },
+
+        no_header_column => {
+            summary => "Don't make the first column as column names of the transposed table; ".
+                "instead create column named 'row1', 'row2', ...",
+            schema => 'true*',
+            tags => ['category:transpose-action'],
+        },
     },
 };
 sub td {
@@ -231,7 +320,6 @@ sub td {
   GET_INPUT:
     {
         last unless $actions{$action}{req_input} // 1;
-        require Data::Check::Structure;
         eval {
             local $/;
             $input = _decode_json(~~<STDIN>);
@@ -248,27 +336,9 @@ sub td {
         }
 
         # detect table form
-        if (ref($input->[2]) eq 'HASH') {
-            $input_form = 'hash';
-            require TableData::Object::hash;
-            $input_obj = TableData::Object::hash->new($input->[2]);
-        } elsif (Data::Check::Structure::is_aos($input->[2])) {
-            $input_form = 'aos';
-            require TableData::Object::aos;
-            $input_obj = TableData::Object::aos->new($input->[2]);
-        } elsif (Data::Check::Structure::is_aoaos($input->[2])) {
-            $input_form = 'aoaos';
-            my $spec = _get_table_spec_from_envres($input);
-            require TableData::Object::aoaos;
-            $input_obj = TableData::Object::aoaos->new($input->[2], $spec);
-        } elsif (Data::Check::Structure::is_aohos($input->[2])) {
-            $input_form = 'aohos';
-            my $spec = _get_table_spec_from_envres($input);
-            require TableData::Object::aohos;
-            $input_obj = TableData::Object::aohos->new($input->[2], $spec);
-        } else {
-            return [400, "Input is not table data, please feed a hash/aos/aoaos/aohos"];
-        }
+        ($input_form, $input_obj) = _get_td_obj($input);
+        return [400, "Input is not table data, please feed a hash/aos/aoaos/aohos"]
+            unless $input_form;
     } # GET_INPUT
 
     my $output;
@@ -304,6 +374,21 @@ sub td {
             my $cols = $input_obj->cols_by_idx;
             my $rows = $input_obj->rows_as_aoaos;
             $output = [200, "OK", $rows, {'table.fields' => $cols}];
+            last;
+        }
+
+        if ($action eq 'as-csv') {
+            require Text::CSV_XS;
+            my $csv = Text::CSV_XS->new({binary=>1}) or die "Can't instantiate CSV parser";
+            my $cols = $input_obj->cols_by_idx;
+            my $res = "";
+            $csv->combine(@$cols) or die "Can't combine header row to CSV: ".join(", ", @$cols);
+            $res .= $csv->string . "\n";
+            for my $row (@{ $input_obj->rows_as_aoaos }) {
+                $csv->combine(@$row) or die "Can't combine data row to CSV: ".join(", ", @$row);
+                $res .= $csv->string . "\n";
+            }
+            $output = [200, "OK", $res, {'cmdline.skip_format' => 1}];
             last;
         }
 
@@ -502,6 +587,118 @@ sub td {
             last;
         }
 
+        if ($action =~ /\A(grep-row|grep|map-row|map|psort)\z/) {
+            return [400, "Usage: td $action <perl-code>"] unless @$argv == 1;
+            my $code_str;
+            if ($action eq 'psort') {
+                $code_str = join(
+                    "",
+                    "package main; no strict; no warnings; sub {",
+                    ' my ($a, $b) = @_;',
+                    " $argv->[0] }",
+                );
+            } else {
+                $code_str = "package main; no strict; no warnings; sub { $argv->[0] }";
+            }
+            my $code = eval $code_str; die if $@;
+
+            my $input_rows     = $input_obj->rows;
+            my $input_rows_aos = $input_obj->rows_as_aoaos;
+            my $input_rows_hos = $input_obj->rows_as_aohos;
+
+            my $output_rows;
+            if ($action eq 'grep-row' || $action eq 'grep' ||
+                    $action eq 'map-row' || $action eq 'map'
+                ) {
+                for my $row_num (0 .. $#{ $input_rows }) {
+                    my $code_res;
+                    {
+                        no warnings 'once';
+                        local $_              = $input_rows->[$row_num];
+                        local $main::row      = $input_rows->[$row_num];
+                        local $main::rowarray = $input_rows_aos->[$row_num];
+                        local $main::rowhash  = $input_rows_hos->[$row_num];
+                        local $main::rownum   = $row_num;
+                        local $main::td       = $input_obj;
+                        $code_res = $code->($_);
+                    }
+                    if ($action eq 'grep-row' || $action eq 'grep') {
+                        push @$output_rows, $input_rows->[$row_num] if $code_res;
+                    } else { # map-row / map
+                        push @$output_rows, $code_res;
+                    }
+                }
+            } else { # psort
+                $output_rows = [sort { $code->($a, $b) } @$input_rows];
+            }
+
+            $output = [200, "OK", $output_rows, $input->[3]];
+            last;
+        }
+
+        if ($action =~ /\A(grep-col)\z/) {
+            return [400, "Usage: td $action <perl-code>"] unless @$argv == 1;
+            my $code_str = "package main; no strict; no warnings; sub { $argv->[0] }";
+            my $code = eval $code_str; die if $@;
+
+            my $input_cols = $input_obj->cols_by_idx;
+            my $output_cols = [];
+            for my $col_idx (0 .. $#{ $input_cols }) {
+                my $code_res;
+                {
+                    no warnings 'once';
+                    local $_              = $input_cols->[$col_idx];
+                    local $main::colname  = $input_cols->[$col_idx];
+                    local $main::colidx   = $col_idx;
+                    local $main::td       = $input_obj;
+                    $code_res = $code->($_);
+                }
+                push @$output_cols, $code_res ? $input_cols->[$col_idx] : undef;
+            }
+
+            if ($input_form eq 'hash' || $input_form eq 'aos') {
+                $input_obj = _get_td_obj($input_form->rows_as_aoaos);
+                $input_form = 'aoaos';
+            }
+            for my $col_idx (reverse 0..$#{ $output_cols }) {
+                unless (defined $output_cols->[$col_idx]) {
+                    $input_obj->del_col($col_idx);
+                }
+            }
+            $output = [
+                200,
+                "OK",
+                $input_form eq 'aohos' ? $input_obj->rows_as_aohos : $input_obj->rows_as_aoaos,
+                $input_form eq 'aohos' ? $input->[3] : undef
+            ];
+            last;
+        }
+
+        if ($action eq 'transpose') {
+            my $input_rows = $input_obj->rows_as_aoaos;
+            my $input_cols = $input_obj->cols_by_idx;
+
+            my @output_cols;
+            if ($args{no_header_column} || !@$input_rows) {
+                @output_cols = map {"row$_"} 1 .. @$input_rows;
+            } else {
+                @output_cols = map { $input_rows->[$_-1][0] } 1 .. @$input_rows;
+            }
+
+            my @output_rows;
+
+            for my $inputrowidx (0..$#{ $input_rows }) {
+                my $inputrow = $input_rows->[$inputrowidx];
+                for my $inputcolidx (0..$#{ $input_cols }) {
+                    $output_rows[$inputcolidx] //= [];
+                    $output_rows[$inputcolidx][$inputrowidx] = $inputrow->[$inputcolidx];
+                }
+            }
+
+            $output = [200, "OK", \@output_rows, {'table.fields'=>\@output_cols}];
+            last;
+        }
+
         return [400, "Unknown action '$action'"];
     } # PROCESS
 
@@ -533,7 +730,7 @@ App::td - Manipulate table data
 
 =head1 VERSION
 
-This document describes version 0.094 of App::td (from Perl distribution App-td), released on 2020-04-05.
+This document describes version 0.100 of App::td (from Perl distribution App-td), released on 2020-05-29.
 
 =head1 FUNCTIONS
 
@@ -583,6 +780,9 @@ Next, you can use these actions:
 
  # Convert table data (which might be hash, aos, or aoaos) to aohos form
  % list-files -l --json | td as-aohos
+
+ # Convert table data to CSV
+ % list-files -l --json | td as-csv
 
  # Calculate arithmetic average of numeric columns
  % list-files -l --json | td avg
@@ -650,6 +850,47 @@ Next, you can use these actions:
  # Show rows from the row 5 onwards
  % osnames -l --json | td tail -n +5
 
+ # Transpose table (make first column of rows as column names in the transposed
+ # table)
+
+ % osnames -l --json | td transpose
+
+ # Transpose table (make columns named 'row1', 'row2', 'row3', ... in the
+ # transposed table)
+
+ % osnames -l --json | td transpose --no-header-column
+
+ # Use Perl code to filter rows. Perl code gets row in $row or $_
+ # (scalar/aos/hos) or $rowhash (always a hos) or $rowarray (always aos). There
+ # are also $rownum (integer, starts at 0) and $td (table data object). Perl
+ # code is eval'ed in the 'main' package with strict/warnings turned off. The
+ # example below selects videos that are larger than 480p.
+
+ % media-info *.mp4 | td grep 'use List::Util qw(min); min($I<< ->{video >>height}, $I<< ->{video >>width}) > 480'
+
+ # Use Perl code to filter columns. Perl code gets column name in $colname or
+ # $_. There's also $colidx (column index, from 1) and $td (table data object).
+ # If table data form is 'hash' or 'aos', it will be transformed into 'aoaos'.
+ # The example below only select even columns that match /col/i. Note that most
+ # of the time, 'td select' is better. But when you have a lot of columns and
+ # want to select them programmatically, you have grep-col.
+
+ % somecd --json | td grep-col '$colidx % 2 == 0 && /col/i'
+
+ # Use Perl code to transform row. Perl code gets row in $row or $_
+ # (scalar/hash/array) and is supposed to return the new row. As in 'grep',
+ # $rowhash, $rowarray, $rownum, $td are also available as helper. The example
+ # below adds a field called 'is_landscape'.
+
+ % media-info *.jpg | td map '$I<< ->{is >>landscape} = $I<< ->{video >>height} < $I<< ->{video >>width} ? 1:0; $_'
+
+ # Use perl code to sort rows. Perl sorter code gets row in $a & $b or $I<[0] &
+ # $>[1] (hash/array). Sorter code, like in Perl's standard sort(), is expected
+ # to return -1/0/1. The example belows sort videos by height, descendingly then
+ # by width, descendingly.
+
+ % media-info *.mp4 | td psort '$b->{video_height} <=> $a->{video_height} || $b->{video_width} <=> $b->{video_width}'
+
 This function is not exported.
 
 Arguments ('*' denotes required arguments):
@@ -669,6 +910,10 @@ Arguments.
 =item * B<exclude_columns> => I<array[str]>
 
 =item * B<lines> => I<str>
+
+=item * B<no_header_column> => I<true>
+
+Don't make the first column as column names of the transposed table; instead create column named 'row1', 'row2', ...
 
 =item * B<repeat> => I<bool>
 

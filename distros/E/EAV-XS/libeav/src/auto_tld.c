@@ -1,4 +1,4 @@
-/* this file was auto-generated at 2020-04-02 18:27:10 */
+/* this file was auto-generated at 2020-05-28 14:42:52 */
 
 #include <stdio.h> /* NULL */
 #include "include/eav/auto_tld.h"
@@ -413,7 +413,7 @@ const tld_t tld_list[] = {
     { "es", 3, TLD_TYPE_COUNTRY_CODE },
     { "esq", 4, TLD_TYPE_GENERIC },
     { "estate", 7, TLD_TYPE_GENERIC },
-    { "esurance", 9, TLD_TYPE_GENERIC },
+    { "esurance", 9, TLD_TYPE_NOT_ASSIGNED },
     { "et", 3, TLD_TYPE_COUNTRY_CODE },
     { "etisalat", 9, TLD_TYPE_GENERIC },
     { "eu", 3, TLD_TYPE_COUNTRY_CODE },

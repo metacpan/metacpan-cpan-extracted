@@ -4,9 +4,10 @@ use Prima;
 use Prima::PodView;
 use Prima::Buttons;
 use Prima::InputLine;
-use Prima::StdDlg;
 use Prima::IniFile;
 use Prima::Utils;
+use Prima::Dialog::FileDialog;
+use Prima::Dialog::PrintDialog;
 
 package Prima::HelpViewer;
 use vars qw(@helpWindows $windowClass);
@@ -210,10 +211,7 @@ sub profile_default
 				['-frb' => 'Repeat backward' => 'N' => kb::NoKey, sub { $_[0]-> fastfind_repeat(0) }],
 			]],
 			[],
-			['Set~up' => 'setup_dialog'],
-			['Set font ~encoding' => [
-				map { [ "(ENC$_", $_, 'set_encoding' ] } sort @{$::application-> font_encodings()},
-			]],
+			['Set~up' => 'setup_dialog']
 		]], [ '~Go' => [
 				[ '-goback' => '~Back' => 'Alt + LeftArrow' => km::Alt | kb::Left, 'back' ],
 				[ '-goforw' => '~Forward' => 'Alt + RightArrow' => km::Alt | kb::Right, 'forward' ],
@@ -262,18 +260,6 @@ sub init
 		$defaultFixedFont    = $self-> {text}-> {fontPalette}-> [1]-> {name};
 	}
 
-	my $enc = ((Prima::Application-> get_system_info-> {apc} == apc::Win32) ?
-		'Western' :
-		'iso8859-1'
-	); # set a fall-back latin-1 encoding
-
-	$enc = $::application-> font_encodings-> [0] unless
-		grep { $_ eq $enc } @{$::application-> font_encodings};
-	if ( defined $enc) {
-		$self-> {text}-> {fontPalette}-> [$_]-> {encoding} = $enc for 0, 1;
-		$self-> menu-> check( "ENC$enc") if $self-> menu-> has_item( "ENC$enc");
-	}
-
 	my ( $x, $y) = ( 0, $self-> height - $t - 4);
 	for ( qw(Back Forward Up Prev Next)) {
 		my $lc = lc;
@@ -303,7 +289,7 @@ sub init
 		onPaint     => sub {
 			my ( $self, $canvas) = @_;
 			$canvas-> clear;
-			$canvas-> text_out_bidi( $self-> text, 1, 1);
+			$canvas-> text_shape_out( $self-> text, 1, 1);
 		}
 	);
 
@@ -338,15 +324,6 @@ sub init
 		}
 	}
 
-	if ( exists $sec-> {FontEncoding} ) {
-		my $fe = $sec-> {FontEncoding};
-		if ( $self-> menu-> has_item( "ENC$fe")) {
-			my $enc = $self-> {text}-> {fontPalette}-> [0]-> {encoding};
-			$self-> menu-> check( "ENC$fe");
-			$self-> {text}-> {fontPalette}-> [$_]-> {encoding} = $fe for 0,1;
-		}
-	}
-
 	if ( $sec-> {FullText}) {
 		$self-> menu-> fullView-> check;
 		$self-> {text}-> topicView(0);
@@ -374,7 +351,6 @@ sub on_close
 	my $sec = $inifile-> section('View');
 
 	$sec-> {FontSize}     = $self-> {text}-> {defaultFontSize};
-	$sec-> {FontEncoding} = $self-> {text}-> {fontPalette}-> [0]-> {encoding};
 	$sec-> {FullText}     = $self-> {text}-> topicView ? 0 : 1;
 }
 
@@ -607,7 +583,7 @@ sub find_dialog
 	my $fd = $self-> {findData};
 	my @props = qw(findText options scope);
 	if ( $fd) { for( @props) { $prf{$_} = $fd-> {$_}}}
-	$finddlg = Prima::FindDialog-> create( text => 'Find text') unless $finddlg;
+	$finddlg = Prima::Dialog::FindDialog-> create( text => 'Find text') unless $finddlg;
 	$finddlg-> set( %prf);
 	$finddlg-> Find-> items($fd-> {findItems});
 	my $ret = 0;
@@ -821,7 +797,7 @@ sub print
 
 	$self-> fastfind_close;
 
-	$prndlg = Prima::PrintSetupDialog-> create unless $prndlg;
+	$prndlg = Prima::Dialog::PrintDialog-> create unless $prndlg;
 	return unless $prndlg-> execute;
 
 	my $p = $::application-> get_printer;
@@ -887,19 +863,14 @@ sub setup_dialog
 	my $ntext = $self-> text;
 	$self-> text('Enumerating fonts...');
 
-	my $fe = $t-> {fontPalette}-> [0]-> {encoding};
 	my $fonts = $::application-> fonts;
-	$setupdlg-> FixFont-> items( ['Default', sort map {
-		$_-> {name}} grep {
-			my $x;
-			$x = grep { $fe eq $_ } @{$_-> {encodings}} if $_-> {pitch} == fp::Fixed;
-			$x;
-		} @$fonts ]);
-	$setupdlg-> VarFont-> items( [ 'Default', sort map {
-		$_-> {name}} grep {
-			my $x = grep { $fe eq $_ } @{$_-> {encodings}};
-			$x;
-		} @$fonts ]);
+	$setupdlg-> FixFont-> items( ['Default', 
+		sort map { $_-> {name}} 
+		grep { $_-> {pitch} == fp::Fixed }
+		@$fonts ]);
+	$setupdlg-> VarFont-> items( ['Default', 
+		sort map { $_-> {name}}
+		@$fonts ]);
 	$self-> text( $ntext);
 
 	$setupdlg-> VarFont-> text( $sec-> {VariableFont} ? $sec-> {VariableFont} : 'Default');
@@ -932,23 +903,6 @@ sub setup_dialog
 	} else {
 		$t-> repaint;
 	}
-}
-
-sub set_encoding
-{
-	my ( $self, $fe) = @_;
-
-	my $t = $self-> {text};
-	my $m = $self-> menu;
-
-	$fe =~ s/^ENC//;
-	return unless $m-> has_item( "ENC$fe");
-
-	my $enc = $self-> {text}-> {fontPalette}-> [0]-> {encoding};
-	$m-> check( "ENC$fe");
-	$t-> {fontPalette}-> [$_]-> {encoding} = $fe for 0,1;
-	$inifile-> section('View')-> {FontEncoding} = $self-> {text}-> {fontPalette}-> [0]-> {encoding};
-	$t-> format(1);
 }
 
 sub view_source

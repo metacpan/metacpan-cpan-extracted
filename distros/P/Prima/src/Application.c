@@ -117,8 +117,8 @@ Application_done( Handle self)
 	if ( var-> hint ) SvREFCNT_dec( var-> hint);
 	free( var-> helpContext);
 	var-> accelTable = var-> hintWidget = var-> hintTimer = nilHandle;
-	var-> helpContext = nil;
-	var-> hint = var-> text = nil;
+	var-> helpContext = NULL;
+	var-> hint = var-> text = NULL;
 	apc_application_destroy( self);
 	CDrawable-> done( self);
 	application = nilHandle;
@@ -136,7 +136,7 @@ Application_cleanup( Handle self)
 		my-> detach( self, var-> icon, true);
 	var-> icon = nilHandle;
 
-	my-> first_that_component( self, (void*)prima_kill_all_objects, nil);
+	my-> first_that_component( self, (void*)prima_kill_all_objects, NULL);
 
 	CDrawable-> cleanup( self);
 }
@@ -304,17 +304,17 @@ Application_fonts( Handle self, char * name, char * encoding)
 	for ( i = 0; i < count; i++) {
 		SV * sv      = sv_Font2HV( &fmtx[ i]);
 		HV * profile = ( HV*) SvRV( sv);
-		if ( fmtx[i]. utf8_flags & FONT_UTF8_NAME) {
+		if ( fmtx[i].is_utf8.name ) {
 			SV ** entry = hv_fetch(( HV*) SvRV( sv), "name", 4, 0);
 			if ( entry && SvOK( *entry))
 				SvUTF8_on( *entry);
 		}
-		if ( fmtx[i]. utf8_flags & FONT_UTF8_FAMILY) {
+		if ( fmtx[i].is_utf8.family ) {
 			SV ** entry = hv_fetch(( HV*) SvRV( sv), "family", 6, 0);
 			if ( name && SvOK( *entry))
 				SvUTF8_on( *entry);
 		}
-		if ( fmtx[i]. utf8_flags & FONT_UTF8_ENCODING) {
+		if ( fmtx[i].is_utf8.encoding ) {
 			SV ** entry = hv_fetch(( HV*) SvRV( sv), "encoding", 8, 0);
 			if ( name && SvOK( *entry))
 				SvUTF8_on( *entry);
@@ -356,7 +356,7 @@ Application_font_encodings( Handle self, char * encoding)
 	{
 		void *key;
 		STRLEN  keyLen;
-		if (( he = hv_iternext( h)) == nil)
+		if (( he = hv_iternext( h)) == NULL)
 			break;
 		key    = HeKEY( he);
 		keyLen = HeKLEN( he);
@@ -449,13 +449,14 @@ Application_get_system_info( char * dummy)
 	char vendor   [ 1024];
 	char arch     [ 1024];
 	char gui_desc [ 1024];
+	char gui_lang [ 1024];
 	int  os, gui;
 
 	os  = apc_application_get_os_info( system, sizeof( system),
 					release, sizeof( release),
 					vendor, sizeof( vendor),
 					arch, sizeof( arch));
-	gui = apc_application_get_gui_info( gui_desc, sizeof( gui_desc));
+	gui = apc_application_get_gui_info( gui_desc, sizeof( gui_desc), gui_lang, sizeof(gui_lang));
 
 	pset_i( apc,            os);
 	pset_i( gui,            gui);
@@ -464,6 +465,7 @@ Application_get_system_info( char * dummy)
 	pset_c( vendor,         vendor);
 	pset_c( architecture,   arch);
 	pset_c( guiDescription, gui_desc);
+	pset_c( guiLanguage,    gui_lang);
 
 	return newRV_noinc(( SV *) profile);
 }
@@ -597,7 +599,6 @@ Application_set_font( Handle self, Font font)
 	apc_font_pick( self, &font, & var-> font);
 	if ( opt_InPaint) apc_gp_set_font ( self, &var-> font);
 }
-
 
 Bool
 Application_close( Handle self)
@@ -981,6 +982,13 @@ Bool
 Application_modalHorizon( Handle self, Bool set, Bool modalHorizon)
 {
 	return true;
+}
+
+Bool
+Application_textDirection( Handle self, Bool set, Bool textDirection)
+{
+	if ( !set ) return var->textDirection;
+	return var-> textDirection = textDirection;
 }
 
 #define UISCALING_STEP 4

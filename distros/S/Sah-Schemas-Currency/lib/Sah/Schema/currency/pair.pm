@@ -1,7 +1,9 @@
 package Sah::Schema::currency::pair;
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-02'; # DATE
+our $DIST = 'Sah-Schemas-Currency'; # DIST
+our $VERSION = '0.005'; # VERSION
 
 our $schema = [str => {
     summary => 'Fiat currency pair, e.g. USD/IDR',
@@ -19,6 +21,13 @@ _
     match => qr(\A\S+/\S+\z),
     #'x.completion' => 'currency_pair',
     'x.perl.coerce_rules' => ['From_str::to_currency_pair'],
+    examples => [
+        {data=>'', valid=>0},
+        {data=>'idr', valid=>0},
+        {data=>'usd/idr', valid=>1, res=>'USD/IDR'},
+        {data=>'usd idr', valid=>0},
+        {data=>'usd/foo', valid=>0},
+    ],
 }, {}];
 
 1;
@@ -36,7 +45,21 @@ Sah::Schema::currency::pair - Fiat currency pair, e.g. USD/IDR
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::Schema::currency::pair (from Perl distribution Sah-Schemas-Currency), released on 2019-11-29.
+This document describes version 0.005 of Sah::Schema::currency::pair (from Perl distribution Sah-Schemas-Currency), released on 2020-03-02.
+
+=head1 SYNOPSIS
+
+Sample data:
+
+ ""  # INVALID
+
+ "idr"  # INVALID
+
+ "usd/idr"  # valid, becomes "USD/IDR"
+
+ "usd idr"  # INVALID
+
+ "usd/foo"  # INVALID
 
 =head1 DESCRIPTION
 
@@ -70,7 +93,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

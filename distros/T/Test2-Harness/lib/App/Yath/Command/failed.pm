@@ -2,7 +2,7 @@ package App::Yath::Command::failed;
 use strict;
 use warnings;
 
-our $VERSION = '1.000018';
+our $VERSION = '1.000019';
 
 use Test2::Util::Table qw/table/;
 use Test2::Harness::Util::File::JSONL;
@@ -78,6 +78,11 @@ sub run {
     }
 
     return 0 if $settings->display->brief;
+
+    unless (@$rows) {
+        print "\nNo jobs failed!\n";
+        return 0;
+    }
 
     print "\nThe following jobs failed at least once:\n";
     print join "\n" => table(

@@ -1,9 +1,9 @@
 package Storage::MySQL;
 
-use strict;
-use warnings;
 use Moo::Role;
 use Test::mysqld;
+
+with qw(Storage::Common);
 
 has _mysqld => (
     is => 'lazy',

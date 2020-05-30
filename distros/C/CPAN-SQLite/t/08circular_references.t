@@ -1,9 +1,7 @@
-# $Id: 08circular_references.t 73 2019-01-23 22:29:38Z stro $
+# $Id: 08circular_references.t 81 2019-01-30 21:53:22Z stro $
 
 use strict;
 use warnings;
-
-use Test::Memory::Cycle;
 
 use Test::More;
 use Cwd;
@@ -14,6 +12,12 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 use TestSQL qw($mods $auths $dists has_hash_data);
 use CPAN::SQLite::Info;
+
+unless (eval 'use Test::Memory::Cycle; 1;') {
+    diag $@;
+    plan ('skip_all' => 'Test::Memory::Cycle is required for testing memory leaks');
+    exit;
+}
 
 use TestShell;
 

@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use 5.013002;
+use 5.016000;
 use ExtUtils::MakeMaker;
 
 BEGIN {
@@ -79,22 +79,24 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "JSON-Schema-Draft201909",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.013002",
+  "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "JSON::Schema::Draft201909",
   "PL_FILES" => {},
   "PREREQ_PM" => {
     "Carp" => 0,
     "JSON::MaybeXS" => "1.004001",
     "JSON::PP" => 0,
-    "List::Util" => "1.33",
+    "List::Util" => "1.50",
     "Mojo::JSON::Pointer" => 0,
     "Mojo::URL" => 0,
     "Moo" => 0,
     "MooX::HandlesVia" => 0,
     "MooX::TypeTiny" => "0.002002",
+    "Safe::Isa" => 0,
     "Syntax::Keyword::Try" => 0,
     "Types::Standard" => "1.010002",
     "constant" => 0,
+    "feature" => 0,
     "if" => 0,
     "namespace::clean" => 0,
     "overload" => 0,
@@ -103,18 +105,19 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
+    "List::Util" => "1.50",
     "Module::Metadata" => 0,
     "Scalar::Util" => 0,
     "Test::Deep" => 0,
     "Test::Fatal" => 0,
-    "Test::JSON::Schema::Acceptance" => "0.993",
+    "Test::JSON::Schema::Acceptance" => "0.994",
     "Test::More" => "0.88",
     "Test::Warnings" => "0.027",
     "lib" => 0,
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -125,22 +128,24 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "JSON::MaybeXS" => "1.004001",
   "JSON::PP" => 0,
-  "List::Util" => "1.33",
+  "List::Util" => "1.50",
   "Module::Metadata" => 0,
   "Mojo::JSON::Pointer" => 0,
   "Mojo::URL" => 0,
   "Moo" => 0,
   "MooX::HandlesVia" => 0,
   "MooX::TypeTiny" => "0.002002",
+  "Safe::Isa" => 0,
   "Scalar::Util" => 0,
   "Syntax::Keyword::Try" => 0,
   "Test::Deep" => 0,
   "Test::Fatal" => 0,
-  "Test::JSON::Schema::Acceptance" => "0.993",
+  "Test::JSON::Schema::Acceptance" => "0.994",
   "Test::More" => "0.88",
   "Test::Warnings" => "0.027",
   "Types::Standard" => "1.010002",
   "constant" => 0,
+  "feature" => 0,
   "if" => 0,
   "lib" => 0,
   "namespace::clean" => 0,

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Test::DZil 6.014;
+package Test::DZil 6.015;
 # ABSTRACT: tools for testing Dist::Zilla plugins
 
 use Params::Util qw(_HASH0);
@@ -251,7 +251,7 @@ Test::DZil - tools for testing Dist::Zilla plugins
 
 =head1 VERSION
 
-version 6.014
+version 6.015
 
 =head1 DESCRIPTION
 

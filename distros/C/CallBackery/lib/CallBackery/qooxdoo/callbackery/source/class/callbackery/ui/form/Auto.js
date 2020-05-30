@@ -177,7 +177,7 @@ qx.Class.define("callbackery.ui.form.Auto", {
             if (s.widget == 'date') {
                 formCtrl.addBindingOptions(s.key, {
                     converter : function(data) {
-                        if (/^\d+$/.test(String(data))) {
+                        if (/^-?\d+$/.test(String(data))) {
                             var d = new Date();
                             d.setTime(parseInt(data) * 1000);
                             var d2 = new Date(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate(),0,0,0,0);

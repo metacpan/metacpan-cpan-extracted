@@ -1,0 +1,65 @@
+Math-Giac
+
+This implements a interface to giac, a CAS(Computer Algebra System)
+
+    use Math::Giac;
+
+    my $giac;
+    eval( {
+       $giac=$Math::Giac->new;
+    } );
+    if ( $@ ){
+        die("Failed to locate the giac binary");
+    }
+
+    my $results=$giac->run('sin(x)+cos(pi)-3');
+    print $results."\n";
+
+    $results=$giac->run('mathml(sin(x)+cos(pi)-3)');
+    print $results."\n";
+
+    $giac->set_vars({ A=>2 });
+    my $results=$giac->run('sin(A)+cos(pi)-3');
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Math::Giac
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Giac
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Math-Giac
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Math-Giac
+
+    Search CPAN
+        https://metacpan.org/release/Math-Giac
+
+    Repository
+        https://gitea.eesdp.org/vvelox/Math-Giac
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2020 by Zane C. Bowers-HAdley.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

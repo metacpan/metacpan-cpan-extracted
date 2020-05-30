@@ -788,7 +788,7 @@ sub on_keydown
 			}
 		}
 
-		if ( !($mod & ~km::Shift))  {
+		if (!($mod & (km::Ctrl|km::Alt))) {
 			my $i;
 			my ( $c, $hit, $items) = ( lc chr $code, undef, $self-> {items});
 			for ( $i = $self-> {focusedItem} + 1; $i < $self-> {count}; $i++)
@@ -1073,12 +1073,12 @@ sub set_focused_item
 			$topSet = $foc - $rows + 1;
 		}
 	}
-	$self-> topItem( $topSet) if defined $topSet;
 	( $oldFoc, $foc) = ( $foc, $oldFoc) if $foc > $oldFoc;
 	my @a  = $self-> get_active_area;
 	my $ih = $self-> {itemHeight};
 	my $lastItem = $self-> {topItem} + $self-> {rows};
-	$self->redraw_items($oldFoc, $foc);
+	$self-> redraw_items($oldFoc, $foc);
+	$self-> topItem( $topSet) if defined $topSet;
 }
 
 sub set_indent
@@ -1646,10 +1646,10 @@ sub draw_items
 			$self->backColor($bc);
 			my $c = $canvas-> color;
 			$canvas-> color( $selected ? $self-> hiliteColor : $c );
-			$canvas-> text_out_bidi( $node-> [0], $left, $bottom);
+			$canvas-> text_shape_out( $node-> [0], $left, $bottom);
 			$canvas-> color( $c);
 		} else {
-			$canvas-> text_out_bidi( $node-> [0], $left, $bottom);
+			$canvas-> text_shape_out( $node-> [0], $left, $bottom);
 		}
 		$canvas-> rect_focus( $left, $bottom, $right, $top) if $focused;
 	}
@@ -1686,10 +1686,10 @@ sub draw_items
 
 			my $c  = $canvas-> color;
 			$canvas-> color( $selected ? $self-> hiliteColor : $c );
-			$canvas-> text_out_bidi( $node-> [0]-> [0], $left, $bottom);
+			$canvas-> text_shape_out( $node-> [0]-> [0], $left, $bottom);
 			$canvas-> color( $c);
 		} else {
-			$canvas-> text_out_bidi( $node-> [0]-> [0], $left, $bottom);
+			$canvas-> text_shape_out( $node-> [0]-> [0], $left, $bottom);
 		}
 		$canvas-> rect_focus( $left, $bottom, $right, $top) if $focused;
 	}
@@ -1819,7 +1819,7 @@ sub draw_items
 			int($bottom + ( $self-> {itemHeight} - $self-> {iconSizes}-> [1]) / 2),
 			$icon
 		);
-		$canvas-> text_out_bidi(
+		$canvas-> text_shape_out(
 			$node-> [0]-> [0],
 			$left + $dw,
 			int($bottom + ( $self-> {itemHeight} - $self-> {fontHeight}) / 2)

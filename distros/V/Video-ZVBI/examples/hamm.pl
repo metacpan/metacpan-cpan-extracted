@@ -3,7 +3,7 @@
 #  libzvbi test
 #
 #  Copyright (C) 2003, 2005 Michael H. Schimek
-#  Perl Port: Copyright (C) 2007 Tom Zoerner
+#  Perl Port: Copyright (C) 2007, 2020 Tom Zoerner
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -20,10 +20,12 @@
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-# Perl $Id: hamm.pl,v 1.1 2007/11/18 18:48:35 tom Exp tom $
-# ZVBI #Id: hamm.c,v 1.2 2006/03/17 13:37:05 mschimek Exp #
-
-# Automated test of the odd parity and Hamming test/set routines.
+# Description:
+#
+#   Automated test of the odd parity and Hamming encoder and decoder
+#   functions. Note this test runs for a long time.
+#
+#   (This is a direct translation of test/hamm.c in the libzvbi package.)
 
 use blib;
 use strict;
@@ -200,4 +202,3 @@ sub main_func {
 }
 
 main_func();
-

@@ -1,19 +1,29 @@
-Revision history for App-TableDataUtils
+0.050   2020-05-29  Released-By: PERLANCAR; Urgency: medium
 
-0.03    2015-09-13 (PERLANCAR)
+	- Add utility: td2csv.
+
+
+0.04    2020-05-29  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention App::td.
+
+
+0.03    2015-09-13  Released-By: PERLANCAR
 
         - [Incompatible change] Rename script: gen-table-data to gen-rand-table.
 
         - [ux] Set positional arguments for convenience.
 
 
-0.02    2015-09-12 (PERLANCAR)
+0.02    2015-09-12  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dzil] Fix plugin ordering.
 
 
-0.01    2015-09-12 (PERLANCAR)
+0.01    2015-09-12  Released-By: PERLANCAR
 
         - First release.

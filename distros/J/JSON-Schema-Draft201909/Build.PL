@@ -19,7 +19,7 @@ if (!grep { $_ } values %errors)
     use strict;
     use warnings;
 
-    use 5.013002;
+    use v5.16.0;
     # use Module::Build::Tiny 0.034;
     Module::Build::Tiny::Build_PL();
 }
@@ -80,14 +80,14 @@ EOW
       "configure_requires" => {
         "ExtUtils::MakeMaker" => 0,
         "Module::Build::Tiny" => "0.034",
-        "perl" => "5.013002"
+        "perl" => "v5.16.0"
       },
       "dist_abstract" => "Validate data against a schema",
       "dist_author" => [
         "Karen Etheridge <ether\@cpan.org>"
       ],
       "dist_name" => "JSON-Schema-Draft201909",
-      "dist_version" => "0.001",
+      "dist_version" => "0.002",
       "license" => "perl",
       "module_name" => "JSON::Schema::Draft201909",
       "recursive_test_files" => 1,
@@ -95,34 +95,37 @@ EOW
         "Carp" => 0,
         "JSON::MaybeXS" => "1.004001",
         "JSON::PP" => 0,
-        "List::Util" => "1.33",
+        "List::Util" => "1.50",
         "Mojo::JSON::Pointer" => 0,
         "Mojo::URL" => 0,
         "Moo" => 0,
         "MooX::HandlesVia" => 0,
         "MooX::TypeTiny" => "0.002002",
+        "Safe::Isa" => 0,
         "Syntax::Keyword::Try" => 0,
         "Types::Standard" => "1.010002",
         "constant" => 0,
+        "feature" => 0,
         "if" => 0,
         "namespace::clean" => 0,
         "overload" => 0,
-        "perl" => "5.013002",
+        "perl" => "v5.16.0",
         "strict" => 0,
         "warnings" => 0
       },
       "test_requires" => {
         "File::Spec" => 0,
+        "List::Util" => "1.50",
         "Module::Metadata" => 0,
         "Scalar::Util" => 0,
         "Test::Deep" => 0,
         "Test::Fatal" => 0,
-        "Test::JSON::Schema::Acceptance" => "0.993",
+        "Test::JSON::Schema::Acceptance" => "0.994",
         "Test::More" => "0.88",
         "Test::Warnings" => "0.027",
         "lib" => 0,
         "open" => 0,
-        "perl" => "5.013002",
+        "perl" => "v5.16.0",
         "utf8" => 0
       }
     );
@@ -130,16 +133,17 @@ EOW
 
     my %fallback_build_requires = (
       "File::Spec" => 0,
+      "List::Util" => "1.50",
       "Module::Metadata" => 0,
       "Scalar::Util" => 0,
       "Test::Deep" => 0,
       "Test::Fatal" => 0,
-      "Test::JSON::Schema::Acceptance" => "0.993",
+      "Test::JSON::Schema::Acceptance" => "0.994",
       "Test::More" => "0.88",
       "Test::Warnings" => "0.027",
       "lib" => 0,
       "open" => 0,
-      "perl" => "5.013002",
+      "perl" => "v5.16.0",
       "utf8" => 0
     );
 

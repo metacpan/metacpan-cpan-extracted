@@ -1,3 +1,9 @@
+0.010   2020-05-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Add workaround to prevent Perinci::Sub::GetArgs::Argv arrayify
+	  --digest-args value before coercion.
+
+
 0.009   2019-11-29  Released-By: PERLANCAR; Urgency: high
 
         - Merge two releases 0.008 and 0.008.1.

@@ -77,9 +77,9 @@
                                                     'sms' => {    
                                                                 'enabled' => 1,
                                                                 # connection parameters
-                                                                'AccountSid' => 'ACa4f1e805ab76d138bb063b5e2b295af0',
-                                                                'AuthToken'  => '5581b5ea92941e84fe404724e7152da6',
-                                                                'from'       => '+12075187260',
+                                                                'AccountSid' => '',
+                                                                'AuthToken'  => '',
+                                                                'from'       => '',
                                                                 'method'     => 'sendSMS',
                                                              },
                                             },
@@ -88,7 +88,7 @@
                                                     'localhost' => {    
                                                                         'enabled' => 1,
                                                                         'method'  => 'sendEmail',
-                                                                        'from' => 'serviceEngine@haleymarketing.com', # make sure you are allowed to send from this address
+                                                                        'from' => '', # make sure you are allowed to send from this address
                                                                         'smtp_ip' => '127.0.0.1', # defaults to 127.0.0.1
                                                                         'smtp_port' => '25', # defaults to 25    
                                                                    },
@@ -336,9 +336,9 @@
     # contacts
     'contacts'  => {
                         'rbush'  => { # shortname - a-zA-Z0-9
-                                        'name' => 'Richard Bush',
-                                        'email' => 'rbush@haleymarketing.com',
-                                        'mobile_number' => '+17163937536', # for twilio we need +1
+                                        'name' => '',
+                                        'email' => '',
+                                        'mobile_number' => '', # for twilio we need +1
                                     }
                     },
     # groups

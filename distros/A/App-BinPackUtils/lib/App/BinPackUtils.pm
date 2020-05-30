@@ -1,9 +1,9 @@
 package App::BinPackUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-11'; # DATE
+our $DATE = '2020-05-30'; # DATE
 our $DIST = 'App-BinPackUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -19,6 +19,20 @@ my %arg_bin_size = (
         schema => ['filesize*'],
         req => 1,
         cmdline_aliases => {s=>{}},
+    },
+);
+
+my %argopt_bin_size = (
+    bin_size => {
+        schema => ['filesize*'],
+        cmdline_aliases => {s=>{}},
+    },
+);
+
+my %argopt_bin_max_items = (
+    bin_max_items => {
+        schema => ['posint*'],
+        cmdline_aliases => {i=>{}},
     },
 );
 
@@ -72,7 +86,7 @@ my %argopt_move = (
 
 $SPEC{pack_bins} = {
     v => 1.1,
-    summary => 'Pack items into bin',
+    summary => 'Pack items into bin, based on bin size',
     args => {
         %arg_bin_size,
         items => {
@@ -117,9 +131,10 @@ sub pack_bins {
 
 $SPEC{bin_files} = {
     v => 1.1,
-    summary => 'Put files into bins',
+    summary => 'Put files into bins of certain size (or number of items)',
     args => {
-        %arg_bin_size,
+        %argopt_bin_size,
+        %argopt_bin_max_items,
         bin_prefix => {
             schema => 'filename*',
             default => 'bin',
@@ -129,33 +144,58 @@ $SPEC{bin_files} = {
         %argopt_move,
         %argopt_num_bins,
     },
+    args_rels => {
+        req_one => [qw/bin_size bin_max_items/],
+    },
     deps => {
         prog => 'du',
     },
+    examples => [
+        {
+            summary => 'Put at most 100MB in each bin, move the files',
+            src => 'bin-files --bin-size 100MB --move *.jpg',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Put at most 1000 files in each bin, move the files',
+            src => 'bin-files --bin-max-items 1000 --move *.jpg',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+    ],
 };
 sub bin_files {
     require String::ShellQuote;
 
     my %args = @_;
+    my $bin_size = $args{bin_size};
+    my $bin_max_items = $args{bin_max_items};
     my $bin_prefix = $args{bin_prefix} // "bin";
 
     my @items;
     for my $file (@{ $args{files} }) {
         return [404, "File '$file' does not exist"] unless -e $file;
 
-        my $cmd = "du ".($args{dereference_files} ? "-D " : "")."-sb ".
-            String::ShellQuote::shell_quote($file);
-        my $out = `$cmd`;
-        my $size;
-        if ($out =~ /\A(\d+)/) {
-            $size = $1;
+        if (defined $bin_size) {
+            my $cmd = "du ".($args{dereference_files} ? "-D " : "")."--apparent-size -sb ".
+                String::ShellQuote::shell_quote($file);
+            my $out = `$cmd`;
+            my $size;
+            if ($out =~ /\A(\d+)/) {
+                $size = $1;
+            } else {
+                return [500, "Cannot find the size of '$file': $!"];
+            }
+            push @items, [$file, $size];
         } else {
-            return [500, "Cannot find the size of '$file': $!"];
+            push @items, [$file, 1];
         }
-        push @items, [$file, $size];
     }
 
-    my $res = pack_bins(bin_size => $args{bin_size}, items => \@items);
+    my $res = pack_bins(bin_size => $bin_size // $bin_max_items, items => \@items);
     return $res unless $res->[0] == 200;
 
     # reformat as a single 2D table
@@ -264,7 +304,7 @@ App::BinPackUtils - Collection of CLI utilities related to packing items into bi
 
 =head1 VERSION
 
-This document describes version 0.006 of App::BinPackUtils (from Perl distribution App-BinPackUtils), released on 2019-12-11.
+This document describes version 0.007 of App::BinPackUtils (from Perl distribution App-BinPackUtils), released on 2020-05-30.
 
 =head1 DESCRIPTION
 
@@ -294,7 +334,7 @@ Usage:
 
  bin_files(%args) -> [status, msg, payload, meta]
 
-Put files into bins.
+Put files into bins of certain size (or number of items).
 
 This function is not exported.
 
@@ -302,9 +342,11 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<bin_max_items> => I<posint>
+
 =item * B<bin_prefix> => I<filename> (default: "bin")
 
-=item * B<bin_size>* => I<filesize>
+=item * B<bin_size> => I<filesize>
 
 =item * B<dereference_files> => I<bool>
 
@@ -319,6 +361,7 @@ Actually move the files to the bins.
 =item * B<num_bins> => I<true>
 
 Just return the number of bins required.
+
 
 =back
 
@@ -364,6 +407,7 @@ Actually move the files to the bins.
 =item * B<num_dvds> => I<true>
 
 Just return the number of DVDs required.
+
 
 =back
 
@@ -414,6 +458,7 @@ Just like -D option in du, to derefence the filenames only.
 
 Actually move the files to the bins.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -435,7 +480,7 @@ Usage:
 
  pack_bins(%args) -> [status, msg, payload, meta]
 
-Pack items into bin.
+Pack items into bin, based on bin size.
 
 Examples:
 
@@ -444,7 +489,7 @@ Examples:
 =item * Example #1:
 
  pack_bins(
-   items => ["A,10", "B,50", "C,30", "D,70", "E,40", "F,40", "G,25"],
+     items => ["A,10", "B,50", "C,30", "D,70", "E,40", "F,40", "G,25"],
    bin_size => 100
  );
 
@@ -490,6 +535,7 @@ the first one is the label and the second its size).
 
 Just return the number of bins required.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -529,7 +575,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

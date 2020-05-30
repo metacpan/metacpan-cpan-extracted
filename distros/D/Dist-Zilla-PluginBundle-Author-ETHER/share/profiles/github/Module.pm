@@ -19,15 +19,15 @@ use namespace::autoclean;
 
 around dump_config => sub
 {
-    my ($orig, $self) = @_;
-    my $config = $self->$orig;
+  my ($orig, $self) = @_;
+  my $config = $self->$orig;
 
-    $config->{+__PACKAGE__} = {
-        ...,
-        blessed($self) ne __PACKAGE__ ? ( version => $VERSION ) : (),
-    };
+  $config->{+__PACKAGE__} = {
+      ...,
+      blessed($self) ne __PACKAGE__ ? ( version => $VERSION ) : (),
+  };
 
-    return $config;
+  return $config;
 };
 
 
@@ -44,12 +44,12 @@ PLUGIN
 $zilla_plugin ? <<SYNOPSIS
 In your F<dist.ini>:
 
-    [$zilla_plugin]
+  [$zilla_plugin]
 SYNOPSIS
 : <<SYNOPSIS
-    use $name;
+  use $name;
 
-    ...
+  ...
 SYNOPSIS
 }}
 =head1 DESCRIPTION

@@ -5,7 +5,7 @@ use Mojo::File qw(path);
 use Mojo::JSON qw(decode_json);
 use Carp;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 has client_email => undef;
 has expires_in   => 3600;
@@ -91,7 +91,7 @@ Mojo::JWT::Google - Service Account tokens
 
 =head1 VERSION
 
-0.10
+0.11
 
 =head1 SYNOPSIS
 

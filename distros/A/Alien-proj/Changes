@@ -1,5 +1,11 @@
 Revision history for Alien::proj
 
+1.12 2020-05-29
+    - Die in alienfile is downloaded proj version is less
+      than the minimum required.  This could occur if
+      Alien::Build::Fetch::Cache is in use.
+    - Change utility test to use cs2cs instead of projinfo.
+
 1.11 2020-05-25
     - Mark utility test as todo if projinfo is not installed,
       warn when user tries to run a utility in such cases.

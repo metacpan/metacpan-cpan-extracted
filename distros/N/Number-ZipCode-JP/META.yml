@@ -22,4 +22,4 @@ requires:
   UNIVERSAL::require: '0'
 resources:
   X_twitter: https://twitter.com/nipotan
-version: '0.20200430'
+version: '0.20200529'

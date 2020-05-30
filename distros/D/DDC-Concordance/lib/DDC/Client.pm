@@ -78,37 +78,42 @@ BEGIN {
 ##     Proto=>'tcp',
 ##     Type=>SOCK_STREAM,
 ##     Blocking=>1,
-##  + URL specification of \%connectArgs via connect=>{url=>$url} or connect=>$url,
-##     inet://ADDR:PORT?OPT=VAL...
-##     unix://UNIX_PATH?OPT=VAL...
-##     unix:UNIX_PATH?OPT=VAL...
-##     ADDR?OPT=VAL...
-##     :PORT?OPT=VAL...
-##     ADDR:PORT?OPT=VAL...
-##     /UNIX_PATH?OPT=VAL...
+##  + URL specification of \%connectArgs via connect=>{url=>$url} or connect=>$url (see parseAddr() method):
+##     inet://ADDR:PORT?OPT=VAL...	# canonical INET socket URL
+##     unix://UNIX_PATH?OPT=VAL...	# canonical UNIX socket URL
+##     unix:UNIX_PATH?OPT=VAL...	# = unix://UNIX_PATH?OPT=val
+##     ADDR?OPT=VAL...			# = inet://ADDR:5000?OPT=VAL...
+##     :PORT?OPT=VAL...			# = inet://localhost:PORT?OPT=VAL...
+##     ADDR:PORT?OPT=VAL...		# = inet://ADDR:PORT?OPT=VAL...
+##     /UNIX_PATH?OPT=VAL...		# = unix:///UNIX_PATH?POT=VAL...
 sub new {
   my ($that,%args) = @_;
   my @connect_args = grep {exists $args{$_}} map {($_,lc($_),uc($_))} qw(Peer PeerAddr PeerPort Url);
-  my %connect = (
-		 ##-- connection options
-		 Domain=>'INET',
-		 PeerAddr=>'localhost',
-		 PeerPort=>50000,
-		 Proto=>'tcp',
-		 Type=>SOCK_STREAM,
-		 Blocking=>1,
+  my $connect = $that->parseAddr
+    ({
+      ##-- connect: default options
+      Domain=>'INET',
+      PeerAddr=>'localhost',
+      PeerPort=>50000,
+      Proto=>'tcp',
+      Type=>SOCK_STREAM,
+      Blocking=>1,
 
-		 ##-- connect: user args
-		 (defined($args{'connect'}) ? %{$args{'connect'}} : qw()),
+      ##-- connect: user args
+      (ref($args{'connect'})
+       ? %{$args{'connect'}}
+       : ($args{connect}
+	  ? %{$that->parseAddr($args{connect})}
+	  : qw())),
 
-                 ##-- connect: top-level args
-                 (map {($_=>$args{$_})} @connect_args),
-		);
+      ##-- connect: top-level args
+      (map {($_=>$args{$_})} @connect_args),
+     });
   delete @args{'connect',@connect_args};
 
   my $dc =bless {
 		 ##-- connection options
-		 connect=>\%connect,
+		 connect=> $connect,
 		 linger => [1,0],
 		 mode   =>'json',
 		 encoding => 'UTF-8',
@@ -443,13 +448,13 @@ sub run_query {
 ## \%connect = $CLASS_OR_OBJECT->parserAddr({url=>$url}, $PEER_OR_LOCAL='peer', %options)
 ##  + parses connect URLs to option-hashes suitable for use as $dc->{connect}
 ##  + supported URLs formats:
-##     inet://ADDR:PORT?OPT=VAL...
-##     unix://UNIX_PATH?OPT=VAL...
-##     unix:UNIX_PATH?OPT=VAL...
-##     ADDR?OPT=VAL...
-##     :PORT?OPT=VAL...
-##     ADDR:PORT?OPT=VAL...
-##     /UNIX_PATH?OPT=VAL...
+##     inet://ADDR:PORT?OPT=VAL...	# canonical INET socket URL
+##     unix://UNIX_PATH?OPT=VAL...	# canonical UNIX socket URL
+##     unix:UNIX_PATH?OPT=VAL...	# = unix://UNIX_PATH?OPT=val
+##     ADDR?OPT=VAL...			# = inet://ADDR:5000?OPT=VAL...
+##     :PORT?OPT=VAL...			# = inet://localhost:PORT?OPT=VAL...
+##     ADDR:PORT?OPT=VAL...		# = inet://ADDR:PORT?OPT=VAL...
+##     /UNIX_PATH?OPT=VAL...		# = unix:///UNIX_PATH?POT=VAL...
 sub parseAddr {
   my ($that,$connect,$prefix,%opts) = @_;
   my ($override);
@@ -908,7 +913,7 @@ DDC::Client - Client socket object and utilities for DDC::Concordance
  ##---------------------------------------------------------------------
  ## Constructors, etc.
 
- $dc = DDC::Client->new(PeerAddr=>'localhost',PeerPort=>50000);
+ $dc = DDC::Client->new( url=>"inet://localhost:50000" );
 
  ##---------------------------------------------------------------------
  ## Common Requests
@@ -1028,7 +1033,7 @@ DDC clients via the L<threads|threads> module.
  (
   ##-- connection options
   connect  =>\%connectArgs,   ##-- passed to IO::Socket::(INET|UNIX)->new(), depending on $connectArgs{Domain}
-                              ##   + you can also specify connect=>{url=>$url} or connect=>$url
+                              ##   + you can also specify connect=>{url=>$url} or connect=>$url ; see parseAddr() method
   mode     =>$mode,           ##-- query mode; one of qw(json table text html raw); default='json'
   linger   =>\@linger,        ##-- SO_LINGER socket option (default=[1,0]: immediate termination)
  
@@ -1054,7 +1059,7 @@ DDC clients via the L<threads|threads> module.
 
 =item default \%connectArgs:
 
- Domain=>'INET',
+ Domain=>'INET',              ##-- also accepts 'UNIX'
  PeerAddr=>'localhost',
  PeerPort=>50000,
  Proto=>'tcp',
@@ -1088,7 +1093,7 @@ DDC clients via the L<threads|threads> module.
 
 =cut
 
-  
+
 ##----------------------------------------------------------------
 ## DESCRIPTION: DDC::Client::Distributed: Query Requests
 =pod
@@ -1293,13 +1298,13 @@ C<$dc-E<gt>{connect}>.
 
 Honors bare URL-style strings C<$url> of the form:
 
- inet://ADDR:PORT?OPT=VAL...
- unix://UNIX_PATH?OPT=VAL...
- unix:UNIX_PATH?OPT=VAL...
- ADDR?OPT=VAL...
- :PORT?OPT=VAL...
- ADDR:PORT?OPT=VAL...
- /UNIX_PATH?OPT=VAL...
+ inet://ADDR:PORT?OPT=VAL...   # canonical INET socket URL format
+ unix://UNIX_PATH?OPT=VAL...   # canonical UNIX socket URL format
+ unix:UNIX_PATH?OPT=VAL...     # = unix://UNIX_PATH?OPT=val
+ ADDR?OPT=VAL...               # = inet://ADDR:5000?OPT=VAL...
+ :PORT?OPT=VAL...              # = inet://localhost:PORT?OPT=VAL...
+ ADDR:PORT?OPT=VAL...          # = inet://ADDR:PORT?OPT=VAL...
+ /UNIX_PATH?OPT=VAL...         # = unix:///UNIX_PATH?POT=VAL...
 
 =item addrStr
 

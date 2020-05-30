@@ -9,7 +9,7 @@ require DynaLoader;
 use vars qw($VERSION @ISA $__import @preload $pid);
 @ISA = qw(DynaLoader);
 sub dl_load_flags { 0x00 }
-$VERSION = '1.58';
+$VERSION = '1.59';
 $pid = $$;
 bootstrap Prima $VERSION;
 unless ( UNIVERSAL::can('Prima', 'init')) {
@@ -353,6 +353,8 @@ L<Prima::InputLine> - input line widget
 
 L<Prima::KeySelector> - key combination widget and routines
 
+L<Prima::Menus> - menu widgets
+
 L<Prima::Label> - static text widget 
 
 L<Prima::Lists> - user-selectable item list widgets
@@ -381,31 +383,37 @@ L<Prima::Themes> - widget themes manager
 
 =item Standard dialogs
 
-L<Prima::ColorDialog> - color selection facilities
+L<Prima::Dialog::ColorDialog> - color selection facilities
 
-L<Prima::EditDialog> - find and replace dialogs
+L<Prima::Dialog::FindDialog> - find and replace dialogs
 
-L<Prima::FileDialog> - file system related widgets and dialogs 
+L<Prima::Dialog::FileDialog> - file system related widgets and dialogs
 
-L<Prima::FontDialog> - font dialog
+L<Prima::Dialog::FontDialog> - font dialog
 
-L<Prima::ImageDialog> - image file open and save dialogs
+L<Prima::Dialog::ImageDialog> - image file open and save dialogs
+
+L<Prima::Image::TransparencyControl> - transparent color index selection
 
 L<Prima::MsgBox> - message and input dialog boxes
 
-L<Prima::PrintDialog> - standard printer setup dialog
-
-L<Prima::StdDlg> - wrapper module to the toolkit standard dialogs
+L<Prima::Dialog::PrintDialog> - standard printer setup dialog
 
 =item Drawing helpers
 
 L<Prima::Drawable::CurvedText> - fit text to path
 
+L<Prima::Drawable::Glyphs> - bi-directional text input and complex scripts output
+
 L<Prima::Drawable::Gradient> - gradient fills for primitives
+
+L<Prima::Drawable::Markup> - Allow markup in widgets
 
 L<Prima::Drawable::Path> - stroke and fill complex paths
 
 L<Prima::Drawable::Subcanvas> - paint a hierarchy of widgets to any drawable
+
+L<Prima::Drawable::TextBlock> - rich text representation
 
 =item Visual Builder
 
@@ -421,10 +429,6 @@ L<Prima::VB::CfgMaint> - maintains visual builder widget palette configuration
 
 L<Prima::PS::Drawable> - PostScript interface to C<Prima::Drawable>
 
-L<Prima::PS::Encodings> - latin-based encodings
-
-L<Prima::PS::Fonts> - PostScript device fonts metrics
-
 L<Prima::PS::Printer> - PostScript interface to C<Prima::Printer>
 
 =item C interface to the toolkit
@@ -438,8 +442,6 @@ L<prima-gencls>     - C<prima-gencls>, a class compiler tool.
 =item Miscellaneous
 
 L<Prima::faq> - frequently asked questions 
-
-L<Prima::Bidi> - bi-directional text input and output
 
 L<Prima::Const> - predefined toolkit constants 
 
@@ -461,9 +463,17 @@ L<Prima::Utils> - miscellaneous routines
 
 L<Prima::Widgets> - miscellaneous widget classes
 
+=item System-specific modules and documentation
+
 L<Prima::gp-problems> - Graphic subsystem portability issues
 
 L<Prima::X11> - usage guide for X11 environment
+
+L<Prima::sys::gtk::FileDialog> - GTK file system dialogs
+
+L<Prima::sys::win32::FileDialog> - Windows file system dialogs
+
+L<Prima::sys::XQuartz> - MacOSX/XQuartz facilities
 
 =item Class information
 
@@ -480,7 +490,7 @@ viewer C<podview> ( see File/Run/prima-class ).
 Copyright 1997-2003 The Protein Laboratory, University of Copenhagen. All
 rights reserved.
 
-Copyright 2004-2012 Dmitry Karasik. All rights reserved. 
+Copyright 2004-2020 Dmitry Karasik. All rights reserved. 
 
 This program is distributed under the BSD License.
 

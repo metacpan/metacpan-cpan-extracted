@@ -56,7 +56,7 @@ check-domain: $(TARGETS) $(PARTIAL_TRT)
 	# =====================================================
 	# domain tests
 	# =====================================================
-	./t-all-tlds-test.bin 11 52 ../data/tld-domains.txt
+	./t-all-tlds-test.bin 11 53 ../data/tld-domains.txt
 	./t-domain-length.bin 4 3 ../data/domain-length.txt
 	./t-dash-domains.bin ../data/xn-dash-domains.txt
 

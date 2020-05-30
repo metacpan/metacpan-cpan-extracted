@@ -1,4 +1,4 @@
-# $Id: 04-packet-truncate.t 1774 2020-03-18 07:49:22Z willem $ -*-perl-*-
+# $Id: 04-packet-truncate.t 1779 2020-05-11 09:11:17Z willem $ -*-perl-*-
 
 use strict;
 use Test::More tests => 33;

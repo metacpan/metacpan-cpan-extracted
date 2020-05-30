@@ -1,9 +1,9 @@
 package Net::DNS::RR::KEY;
 
 #
-# $Id: KEY.pm 1528 2017-01-18 21:44:58Z willem $
+# $Id: KEY.pm 1779 2020-05-11 09:11:17Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1528 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1779 $)[1];
 
 
 use strict;
@@ -85,6 +85,9 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, L<Net::DNS::RR::DNSKEY>, RFC3755, RFC2535
+L<perl>, L<Net::DNS>, L<Net::DNS::RR>, L<Net::DNS::RR::DNSKEY>,
+RFC4034, RFC3755, RFC3008, RFC2535
+
+L<Algorithm Numbers|http://www.iana.org/assignments/dns-sec-alg-numbers>
 
 =cut

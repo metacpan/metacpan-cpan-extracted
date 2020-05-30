@@ -8,11 +8,11 @@ chdir $_ if length;
 sub pl($@) {
     my $expect = shift;
     my $win = require Win32::ShellQuote if $^O =~ /^MSWin/;
-    open my $fh, '-|', $^X, $win ? '..\pl' : '../pl',
+    open my $fh, '-|', $^X, '-W', $win ? '..\pl' : '../pl',
       $win ? map '"'.join('""', split /"/).'"', @_ : @_;
     local $/;
     my $ret = <$fh>;
-    ok $ret eq $expect, join ' ', 'pl', map /[\s*?[\]{}\$\\'"]|^$/ ? "'$_'" : $_, @_;
+    ok $ret eq $expect, join ' ', 'pl', map /[\s*?()[\]{}\$\\'";|&]|^$/ ? "'$_'" : $_, @_;
     print "got: '$ret', expected: '$expect'\n" if $ret ne $expect;
 }
 
@@ -89,7 +89,7 @@ pl $_, '-p', '', @abc;
 pl $_, '-lp', '', @abc;
 
 my @cdlines = grep /[cd]/, split /^/;
-pl join( '', @cdlines[0, 1] ), '-P2', '/[cde]/', @abc;
+pl join( '', $cdlines[0], "eof\n", $cdlines[1], "eof\n" x 2 ), '-P2z', 'e "eof"', '/[cde]/', @abc;
 pl join( '', @cdlines ), '-rP2', '/[cde]/', @abc;
 
 sub pl10($$) {

@@ -1,10 +1,7 @@
 use strict;
 use warnings;
 use utf8;
-use Prima qw(Label InputLine Buttons Application PodView Edit FontDialog);
-use Prima::Bidi qw(:require :rtl);
-
-$::application-> wantUnicodeInput(1);
+use Prima qw(Label InputLine Buttons Application PodView Edit Dialog::FontDialog);
 
 my $w;
 my $pod;
@@ -13,6 +10,8 @@ my $editor;
 my $pod_text;
 my $font_dialog;
 
+$::application->textDirection(1);
+
 $w = Prima::MainWindow-> create(
 	size => [ 430, 200],
 	designScale => [7, 16],
@@ -20,72 +19,20 @@ $w = Prima::MainWindow-> create(
 	menuItems => [
 		[ "~Options" => [
 			[ "~Toggle direction" => sub {
-				$arabic-> alignment( $arabic-> alignment == ta::Left ? ta::Right : ta::Left );
 				my $td = !$w-> Hebrew-> textDirection;
 				$w-> Hebrew-> textDirection($td);
+				$arabic-> textDirection( $td);
+				$editor-> textDirection( $td);
 				$pod->textDirection($td);
 				$pod->format(1);
 			} ],
 			[ "~Set font" => sub {
-				$font_dialog //= Prima::FontDialog-> create(logFont => $w->font);
+				$font_dialog //= Prima::Dialog::FontDialog-> create(logFont => $w->font);
 				$w->font($font_dialog-> logFont) if $font_dialog-> execute == mb::OK;
 			} ],
 		]],
 	],
 );
-
-sub can_rtl
-{
-	$::application->font(shift);
-	my @r = @{ $::application->get_font_ranges };
-	my $hebrew = ord('א');
-	my $arabic = ord('ر');
-	my $found_hebrew;
-	my $found_arabic;
-	for ( my $i = 0; $i < @r; $i += 2 ) {
-		my ( $l, $r ) = @r[$i, $i+1];
-		$found_hebrew = 1 if $l <= $hebrew && $r >= $hebrew;
-		$found_arabic = 1 if $l <= $arabic && $r >= $arabic;
-	}
-	return $found_hebrew && $found_arabic;
-}
-
-# try to find font with arabic and hebrew letters
-$::application->begin_paint_info;
-unless (can_rtl($w->font)) {
-	my $found;
-	my @f = @{$::application->fonts};
-
-	# fontconfig fonts
-	for my $f ( @f ) {
-		next unless $f->{vector};
-		next unless $f->{name} =~ /^[A-Z]/;
-		next unless can_rtl($f);
-		$found = $f;
-		goto FOUND;
-	}
-
-	# x11/core vector fonts
-	for my $f ( @f ) {
-		next unless $f->{vector};
-		next if $f->{name} =~ /^[A-Z]/;
-		next unless can_rtl($f);
-		$found = $f;
-		goto FOUND;
-	}
-
-	# bitmap fonts
-	for my $f ( @f ) {
-		next if $f->{vector};
-		next unless can_rtl($f);
-		$found = $f;
-		goto FOUND;
-	}
-FOUND:
-	$w->font->name($found->{name}) if $found;
-
-}
-$::application->end_paint_info;
 
 $w->insert( InputLine =>
 	name => 'Hebrew',
@@ -122,6 +69,7 @@ $editor = $panel-> insert( Edit =>
 	name => 'Editor',
 	text     => $arabic_text,
 );
+
 
 $arabic = $panel->insert( Label =>
 	packInfo => { fill => 'both', expand => 1, pad => 10, side => 'left' },

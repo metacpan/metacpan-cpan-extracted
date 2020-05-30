@@ -1,3 +1,15 @@
+0.019   2020-05-30  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.018 & 0.018.1.
+
+
+0.018.1 2020-05-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Wrap generated usage line.
+
+        - UPDATE 2020-05-30: renamed to 0.018.1 due to conflict.
+
+
 0.018   2020-04-27  Released-By: PERLANCAR; Urgency: medium
 
 	- Wrap usage line because it's now potentially long, since

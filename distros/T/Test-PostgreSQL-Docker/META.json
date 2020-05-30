@@ -4,7 +4,7 @@
       "Satoshi Azuma <ytnobody@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.5",
+   "generated_by" : "Minilla/v3.1.10",
    "license" : [
       "perl_5"
    ],
@@ -52,14 +52,15 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.98"
+            "Test::More" : "0.98",
+            "Test::SharedFork" : "0"
          }
       }
    },
    "provides" : {
       "Test::PostgreSQL::Docker" : {
          "file" : "lib/Test/PostgreSQL/Docker.pm",
-         "version" : "0.03001"
+         "version" : "0.03003"
       }
    },
    "release_status" : "stable",
@@ -73,7 +74,7 @@
          "web" : "https://github.com/ytnobody/p5-Test-PostgreSQL-Docker"
       }
    },
-   "version" : "0.03001",
+   "version" : "0.03003",
    "x_authority" : "cpan:YTURTLE",
    "x_contributors" : [
       "makamaka <makamaka.donzoko@gmail.com>"

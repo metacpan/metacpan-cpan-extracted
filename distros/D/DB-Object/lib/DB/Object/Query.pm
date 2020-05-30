@@ -1,15 +1,12 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Query.pm
-## Version 0.4.3
+## Version v0.4.4
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <jack@deguest.jp>
+## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2017/07/19
-## Modified 2020/04/01
-## All rights reserved
+## Modified 2020/05/22
 ## 
-## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package DB::Object::Query;
 BEGIN
@@ -19,7 +16,7 @@ BEGIN
     use Scalar::Util ();
     use Devel::Confess;
     our( $VERSION, $DEBUG, $VERBOSE );
-    $VERSION = '0.4.3';
+    $VERSION = 'v0.4.4';
     $DEBUG = 0;
     $VERBOSE = 0;
 };
@@ -833,7 +830,7 @@ sub insert
             table => $table,
             arg => \@arg,
             avoid => \@avoid,
-        }) || return( undef() );
+        }) || return;
         ( $fields, $values ) = $self->format_statement();
         $self->message( 3, "Fields formatted are: '$fields' and values are '$values'." );
         ## $self->{ 'binded_values' } = $db_data->{ 'binded_values' };
@@ -1562,7 +1559,7 @@ sub _query_type
     {
         return( lc( ( $self->{query} =~ /^[[:blank:]]*(ALTER|CREATE|DROP|GRANT|LISTEN|NOTIFY|INSERT|UPDATE|DELETE|SELECT|TRUNCATE)\b/i )[0] ) )
     }
-    return( undef() );
+    return;
 }
 
 sub _save_bind
@@ -2124,7 +2121,7 @@ DB::Object::Query - Query Object
 
 =head1 VERSION
 
-This is version 0.6
+This is version v0.4.4
 
 =head1 DESCRIPTION
 

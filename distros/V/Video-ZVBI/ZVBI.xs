@@ -1078,7 +1078,6 @@ zvbi_xs_dvb_log_handler( vbi_log_mask           level,
                          void *                 user_data)
 {
         VbiDvb_DemuxObj * ctx = user_data;
-        I32  count;
 
         if ((ctx != NULL) && (ctx->log_cb != NULL)) {
                 dSP ;
@@ -1096,7 +1095,7 @@ zvbi_xs_dvb_log_handler( vbi_log_mask           level,
                 PUTBACK ;
 
                 /* invoke the Perl subroutine */
-                count = call_sv(ctx->log_cb, G_SCALAR) ;
+                call_sv(ctx->log_cb, G_VOID | G_DISCARD) ;
 
                 SPAGAIN ;
 
@@ -1848,6 +1847,10 @@ vbi_capture_read_sliced(capture, data, n_lines, timestamp, timeout_ms)
                 size_t size = (p_par->count[0] + p_par->count[1]) * sizeof(vbi_sliced);
                 p_sliced = zvbi_xs_sv_buffer_prep(data, size);
                 RETVAL = vbi_capture_read_sliced(capture, p_sliced, &n_lines, &timestamp, &tv);
+                if ((RETVAL > 0) && (n_lines < p_par->count[0] + p_par->count[1])) {
+                        /* shrink buffer size to valid lines */
+                        SvCUR_set(data, n_lines * sizeof(vbi_sliced));
+                }
         } else {
                 RETVAL = -1;
         }
@@ -1880,6 +1883,10 @@ vbi_capture_read(capture, raw_data, sliced_data, n_lines, timestamp, timeout_ms)
                 p_raw = zvbi_xs_sv_buffer_prep(raw_data, size_raw);
                 p_sliced = zvbi_xs_sv_buffer_prep(sliced_data, size_sliced);
                 RETVAL = vbi_capture_read(capture, p_raw, p_sliced, &n_lines, &timestamp, &tv);
+                if ((RETVAL > 0) && (n_lines < p_par->count[0] + p_par->count[1])) {
+                        /* shrink buffer size to valid lines */
+                        SvCUR_set(sliced_data, n_lines * sizeof(vbi_sliced));
+                }
         } else {
                 RETVAL = -1;
         }
@@ -1941,8 +1948,8 @@ vbi_capture_pull_sliced(capture, buffer, n_lines, timestamp, timeout_ms)
 int
 vbi_capture_pull(capture, raw_buffer, sliced_buffer, sliced_lines, timestamp, timeout_ms)
         VbiCaptureObj * capture
-        VbiRawBuffer * &raw_buffer
-        VbiSlicedBuffer * &sliced_buffer
+        VbiRawBuffer * &raw_buffer = NO_INIT
+        VbiSlicedBuffer * &sliced_buffer = NO_INIT
         int &sliced_lines = NO_INIT
         double &timestamp = NO_INIT
         int timeout_ms
@@ -1953,12 +1960,13 @@ vbi_capture_pull(capture, raw_buffer, sliced_buffer, sliced_lines, timestamp, ti
         tv.tv_usec = (timeout_ms % 1000) * 1000;
         RETVAL = vbi_capture_pull(capture, &raw_buffer, &sliced_buffer, &tv);
         if (RETVAL > 0) {
-                timestamp = raw_buffer->timestamp;
+                timestamp = sliced_buffer->timestamp;
                 sliced_lines = sliced_buffer->size / sizeof(vbi_sliced);
         } else {
                 timestamp = 0.0;
                 sliced_lines = 0;
         }
+        // note raw_buffer may be NULL for DVB device (raw data not supported)
         OUTPUT:
         raw_buffer
         sliced_buffer
@@ -2170,7 +2178,10 @@ decode(rd, sv_raw, sv_sliced)
         if (raw_buf_size >= raw_size) {
                 p_sliced = zvbi_xs_sv_buffer_prep(sv_sliced, sliced_size);
                 RETVAL = vbi_raw_decode(rd, p_raw, p_sliced);
-                SvCUR_set(sv_sliced, sliced_size);
+                if (RETVAL >= 0) {
+                        /* shrink buffer size to valid lines */
+                        SvCUR_set(sv_sliced, RETVAL * sizeof(vbi_sliced));
+                }
         } else {
                 croak("Input raw buffer is smaller than required for VBI geometry");
         }
@@ -2367,7 +2378,7 @@ vbi_dvb_mux_feed(mx, sv_sliced, sliced_lines, service_mask, pts, sv_raw=NULL, hv
         if ((p_sliced != NULL) && (sliced_lines <= max_lines)) {
                 RETVAL =
                   zvbi_(dvb_mux_feed)(mx->ctx,
-                                      p_sliced + max_lines - sliced_lines, sliced_lines,
+                                      p_sliced, sliced_lines,
                                       service_mask,
                                       p_raw, ((p_raw != NULL) ? &rd : NULL),
                                       pts);
@@ -2657,14 +2668,14 @@ vbi_dvb_demux_set_log_fn(dx, mask, log_fn=NULL, user_data=NULL)
         CHECK_LIBZVBI_SYM(0,2,22, dvb_demux_set_log_fn);
         Save_SvREFCNT_dec(dx->log_cb);
         Save_SvREFCNT_dec(dx->log_user_data);
-        if (log_fn != NULL) {
+        if ((log_fn != NULL) && (mask != 0)) {
                 dx->log_cb = SvREFCNT_inc(log_fn);
                 dx->demux_user_data = SvREFCNT_inc(user_data);
                 zvbi_(dvb_demux_set_log_fn)(dx->ctx, mask, zvbi_xs_dvb_log_handler, dx);
         } else {
                 dx->log_cb = NULL;
                 dx->log_user_data = NULL;
-                zvbi_(dvb_demux_set_log_fn)(dx->ctx, mask, NULL, NULL);
+                zvbi_(dvb_demux_set_log_fn)(dx->ctx, 0, NULL, NULL);
         }
 #else
         CROAK_LIB_VERSION(0,2,22, dvb_demux_set_log_fn);
@@ -3635,6 +3646,7 @@ resolve_link(pg_obj, column, row)
         PREINIT:
         vbi_link ld;
         CODE:
+        memset(&ld, 0, sizeof(ld));
         vbi_resolve_link(pg_obj->p_pg, column, row, &ld);
         RETVAL = newHV();
         sv_2mortal((SV*)RETVAL); /* see man perlxs */
@@ -3648,6 +3660,7 @@ resolve_home(pg_obj)
         PREINIT:
         vbi_link ld;
         CODE:
+        memset(&ld, 0, sizeof(ld));
         vbi_resolve_home(pg_obj->p_pg, &ld);
         RETVAL = newHV();
         sv_2mortal((SV*)RETVAL); /* see man perlxs */
@@ -4160,7 +4173,7 @@ set_log_fn(mask, log_fn=NULL, user_data=NULL)
 #if LIBZVBI_H_VERSION(0,2,22)
         CHECK_LIBZVBI_SYM(0,2,22, set_log_fn);
         zvbi_xs_free_callback_by_obj(MY_CXT.log, NULL);
-        if (log_fn != NULL) {
+        if ((log_fn != NULL) && (mask != 0)) {
                 cb_idx = zvbi_xs_alloc_callback(MY_CXT.log, (SV*)log_fn, user_data, NULL);
                 if (cb_idx < ZVBI_MAX_CB_COUNT) {
                         zvbi_(set_log_fn)(mask, zvbi_xs_log_callback, UINT2PVOID(cb_idx));
@@ -4169,7 +4182,7 @@ set_log_fn(mask, log_fn=NULL, user_data=NULL)
                         croak ("Max. log callback count exceeded");
                 }
         } else {
-                zvbi_(set_log_fn)(mask, NULL, NULL);
+                zvbi_(set_log_fn)(0, NULL, NULL);
         }
 #else
         CROAK_LIB_VERSION(0,2,22, set_log_fn);
@@ -4184,7 +4197,11 @@ set_log_on_stderr(mask)
 #if LIBZVBI_H_VERSION(0,2,22)
         CHECK_LIBZVBI_SYM(0,2,22, log_on_stderr);
         zvbi_xs_free_callback_by_obj(MY_CXT.log, NULL);
-        zvbi_(set_log_fn)(mask, zvbi_(log_on_stderr), NULL);
+        if (mask != 0) {
+                zvbi_(set_log_fn)(mask, zvbi_(log_on_stderr), NULL);
+        } else {
+                zvbi_(set_log_fn)(0, NULL, NULL);
+        }
 #else
         CROAK_LIB_VERSION(0,2,22, log_on_stderr);
 #endif
@@ -4265,7 +4282,7 @@ iconv_caption(sv_src, repl_char=0)
 #if LIBZVBI_H_VERSION(0,2,23)
         CHECK_LIBZVBI_SYM(0,2,23, strndup_iconv_caption);
         p_src = (void *) SvPV(sv_src, src_len);
-        p_buf = zvbi_(strndup_iconv_caption)("UTF-8", p_src, src_len, '?');
+        p_buf = zvbi_(strndup_iconv_caption)("UTF-8", p_src, src_len, repl_char);
         if (p_buf != NULL) {
                 sv = newSV(0);
                 sv_usepvn(sv, p_buf, strlen(p_buf));

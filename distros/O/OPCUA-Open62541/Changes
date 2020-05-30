@@ -1,6 +1,19 @@
 Revision history for Perl extension OPCUA::Open62541.
 
-0.014
+0.015 2020-05-29
+    - Implement client sendAsyncReadRequest() as it is missing
+      in open62541 API.
+    - Implement client/server read/write DataType.  They cannot
+      be generated as DataType needs special conversion to NodeId.
+    - UA_Server_readContainsNoLoop contains typo, provide
+      server readContainsNoLoops wrapper.
+    - Genearalize  script client-server-read-write.pl
+      to generate all client/server read/write functions.
+    - Generate wrapper for all server read and write functions.
+    - Generate client write wrapper functions.
+    - Generate client readDataTypeAttribute() function.
+
+0.014 2020-05-13
     - Server build info is copied to return value and uses regular
       typemap clear.
     - The NULL string and NULL byte string is unpacked from undef.
@@ -20,7 +33,8 @@ Revision history for Perl extension OPCUA::Open62541.
     - Better error message for missing mandatory parameter.
     - The typemap identifies the reqId parameter as optional
       output parameter by its new name outoptReqId.
-    - Implement client sendAsyncBrowseNextRequest().
+    - Implement client sendAsyncBrowseNextRequest() as it is missing
+      in open62541 API.
     - Code scanner cppcheck passes with C code generated from XS.
     - Test server setup_complex_objects() method can handle name
       space, access level, and got various other improvements.

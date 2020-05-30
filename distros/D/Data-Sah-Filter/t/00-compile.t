@@ -10,13 +10,13 @@ plan tests => 15 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Filter.pm',
-    'Data/Sah/Filter/js/Str/downcase.pm',
+    'Data/Sah/Filter/js/Str/lowcase.pm',
     'Data/Sah/Filter/js/Str/ltrim.pm',
     'Data/Sah/Filter/js/Str/rtrim.pm',
     'Data/Sah/Filter/js/Str/trim.pm',
     'Data/Sah/Filter/js/Str/upcase.pm',
     'Data/Sah/Filter/perl/Str/check.pm',
-    'Data/Sah/Filter/perl/Str/downcase.pm',
+    'Data/Sah/Filter/perl/Str/lowcase.pm',
     'Data/Sah/Filter/perl/Str/ltrim.pm',
     'Data/Sah/Filter/perl/Str/replace_map.pm',
     'Data/Sah/Filter/perl/Str/rtrim.pm',

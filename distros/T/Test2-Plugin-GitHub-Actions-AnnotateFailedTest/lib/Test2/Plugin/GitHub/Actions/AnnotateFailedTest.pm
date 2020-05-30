@@ -11,7 +11,7 @@ use Test2::API qw(
 );
 use URI::Escape qw(uri_escape);
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 sub import {
     my ($class) = @_;
@@ -33,11 +33,29 @@ sub listener {
     return unless $event->causes_fail;
 
     my $trace = $event->trace;
+    my $summary = _extract_summary_from_event($event);
     my $file = $trace->file // '<no name>';
     my $line = $trace->line // 0;
-    my $detail = encode_utf8 $event->summary; # avoid Wide character in print warning
+    my $details = _extract_details_from_event($event);
+    my $message = encode_utf8(join "\n", grep { defined } ($summary, $details)); # avoid Wide character in print warning
 
-    _issue_error($file, $line, $detail);
+    _issue_error($file, $line, $message);
+}
+
+sub _extract_summary_from_event {
+    my ($event) = @_;
+
+    my $name_or_summary = $event->isa('Test2::Event::Fail') ? $event->name : $event->summary;
+    # avoid uninitialized warning for regexp matching
+    $name_or_summary //= '';
+    return $name_or_summary =~ /Nameless Assertion/ ? '' : $name_or_summary;
+}
+
+sub _extract_details_from_event {
+    my ($event) = @_;
+
+    return undef unless exists $event->{info};
+    return join "\n", map { $_->{details} } @{$event->{info}};
 }
 
 sub _issue_error {

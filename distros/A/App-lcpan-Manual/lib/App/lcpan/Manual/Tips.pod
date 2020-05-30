@@ -1,0 +1,57 @@
+package App::lcpan::Manual::Tips;
+
+# AUTHORITY
+# DATE
+our $DIST = 'App-lcpan-Manual'; # DIST
+# VERSION
+
+1;
+# ABSTRACT: Tips related to App::lcpan
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+App::lcpan::Manual::Tips - Tips related to App::lcpan
+
+=head1 VERSION
+
+version 1.058.000
+
+=head1 DESCRIPTION
+
+=head2 Filtering result rows
+
+Some subcommands offer filtering rows by some criteria, e.g. C<lcpan mods> allow
+selecting only modules from a certain author (C<--author>) or recentness in the
+index (C<--added-since>, C<--updated-since-last-index-update>, etc). But
+sometimes a subcommand does not offer filtering options or you need to filter
+based on some other criteria. There's a utility L<td> (from L<App::td>) which
+allows you to filter/transform result rows easily.
+
+Some examples:
+
+ # Show recently updated modules that are not released by PERLANCAR
+ % lcpan mods --updated-since-last-index-update -l | td grep '$_->{author} ne "PERLANCAR"' --page
+
+ # Show dependencies of App-lcpan to File::* modules
+ % lcpan deps App-lcpan | td grep '$_->{module} =~ /^File::/' --page
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

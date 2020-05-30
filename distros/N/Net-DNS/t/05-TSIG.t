@@ -1,4 +1,4 @@
-# $Id: 05-TSIG.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
+# $Id: 05-TSIG.t 1779 2020-05-11 09:11:17Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -75,19 +75,18 @@ my $hash = {};
 	$packet->header->rd(1);
 	my $encoded = $buffer = $rr->encode( 0, {}, $packet );
 	my $decoded = decode Net::DNS::RR( \$buffer );
-	my $hex1 = unpack 'H*', $encoded;
-	my $hex2 = unpack 'H*', $decoded->encode;
-	my $hex3 = unpack 'H*', substr( $encoded, length $null );
+	my $hex1    = unpack 'H*', $encoded;
+	my $hex2    = unpack 'H*', $decoded->encode;
+	my $hex3    = unpack 'H*', substr( $encoded, length $null );
 	is( $hex2,	    $hex1,	   'encode/decode transparent' );
 	is( $hex3,	    $wire,	   'encoded RDATA matches example' );
 	is( length($empty), length($null), 'encoded RDATA can be empty' );
 	is( length($rxbin), length($null), 'decoded RDATA can be empty' );
 
-	my @wire = unpack 'C*', $encoded;
-	my $wireformat = pack 'C*', @wire, 0;
+	my $wireformat = pack 'a* x', $encoded;
 	eval { decode Net::DNS::RR( \$wireformat ); };
 	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "misplaced SIG RR\t[$exception]" );
+	ok( $exception, "misplaced $type RR\t[$exception]" );
 }
 
 
@@ -99,7 +98,7 @@ my $hash = {};
 	ok( $rr->time_signed(), 'time_signed() defined' );
 	my $key = eval { $rr->key(); };
 	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "write-only key attribute\t[$exception]" );
+	ok( $exception, "key attribute write-only\t[$exception]" );
 }
 
 

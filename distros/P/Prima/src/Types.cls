@@ -42,7 +42,6 @@ global %Font {
 	int         lastChar          ;
 	int         breakChar         ;
 	int         defaultChar       ;
-	U8          utf8_flags        ;
 }
 
 global @FillPattern U8[8];

@@ -1,0 +1,127 @@
+#!/usr/bin/env perl
+
+# Examples:
+# perl stretch # Use defaults and create stretch.mid
+# perl stretch --note A --type pminor # Use the A pentatonic minor scale
+# perl stretch --max 32 --phrases 8 --out 'foo.mid'
+# perl stretch --max 128 --pool sn:5 --pool ten:8 --pool tsn:10
+#
+# The --pool option is a duration:weight spec where duration is a
+# MIDI::Simple length name. And the relative weight is an
+# arbitrary number.  If no ":weight" is given, an even chance is used.
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Data::Dumper::Compact 'ddc';
+use MIDI::Praxis::Variation qw(augmentation transposition);
+use MIDI::Util;
+use Music::Duration::Partition;
+use Music::Scales;
+
+my %opts = (
+    b_patch  => 35,             # Alternate: 42, etc.
+    t_patch  => 4,              # Treble patch
+    max      => 64,             # Number of treble repetitions
+    octave   => 4,              # Treble octave
+    phrases  => 16,             # Number of notes to accumulate
+    size     => 4,              # Motif duration size in quarter notes
+    bpm      => 120,            # Beats per minute
+    note     => 'C',            # C, C#, Db, D, D#, ...
+    type     => 'pentatonic',   # Alternate: pminor, etc.
+    out      => "$0.mid",       # MIDI output file
+    pool     => [],             # List of duration:weight specs
+);
+GetOptions(
+    \%opts,
+    'b_patch=i',
+    't_patch=i',
+    'max=i',
+    'octave=i',
+    'phrases=i',
+    'size=i',
+    'bpm=i',
+    'note=s',
+    'type=s',
+    'out=s',
+    'pool=s@',
+);
+
+# Pool and weights for motif
+$opts{pool} = [qw/ hn:1 qn:1 en:1 /]
+    unless @{ $opts{pool} };
+my @pool;
+my @weights;
+for my $spec (@{ $opts{pool} }) {
+    my ($duration, $weight) = split /:/, $spec;
+    $weight ||= 1;
+    push @pool, $duration;
+    push @weights, $weight;
+}
+
+# Rhythmic motif
+my $mdp = Music::Duration::Partition->new(size => $opts{size}, pool => \@pool, weights => \@weights);
+my $motif = $mdp->motif;
+print ddc $motif; # Show the generated motif
+
+my $sizes = { %MIDI::Simple::Length }; # Named durations used by the counter
+
+my $score = MIDI::Util::setup_score(bpm => $opts{bpm});
+
+my @notes; # List of accumulated treble notes
+
+my $count = 0; # Duration counter used by the drums
+
+$score->synch(
+    \&treble,
+    \&drums,
+    \&bass,
+);
+
+$score->n('wn', $opts{note});
+
+$score->write_score($opts{out});
+
+sub treble {
+    MIDI::Util::set_chan_patch($score, 0, $opts{t_patch});
+
+    my @scale = get_scale_MIDI($opts{note}, $opts{octave}, $opts{type});
+
+    for my $n (0 .. $opts{max} - 1) {
+        my $note;
+        if (@notes < $opts{phrases}) {
+            $note = $scale[int rand @scale];
+        }
+        else {
+            $note = $notes[int rand @notes];
+        }
+        push @notes, $note; # Accumulate the notes
+
+        my $dura = $motif->[$n % @$motif];
+
+        $score->n($dura, $note);
+
+        $count += $sizes->{$dura};
+    }
+}
+
+sub bass {
+    MIDI::Util::set_chan_patch($score, 1, $opts{b_patch});
+
+    # Lower the notes and stretch the rhythm
+    my @transposed = transposition(-24, @notes);
+    my @stretched  = augmentation(@$motif);
+
+    for my $n (0 .. $opts{max} / 2 - 1) {
+        $score->n($stretched[$n % @stretched], $transposed[$n % @transposed]);
+    }
+}
+
+sub drums {
+    MIDI::Util::set_chan_patch($score, 9, 44);
+
+    for (1 .. $count) {
+        $score->n('qn', 44); # hi-hat
+    }
+}

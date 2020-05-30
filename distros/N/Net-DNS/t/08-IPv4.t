@@ -1,4 +1,4 @@
-# $Id: 08-IPv4.t 1774 2020-03-18 07:49:22Z willem $ -*-perl-*-
+# $Id: 08-IPv4.t 1784 2020-05-24 19:27:13Z willem $ -*-perl-*-
 
 use strict;
 use Test::More;
@@ -47,7 +47,7 @@ eval {
 	exit plan skip_all => 'No IPv4 transport' unless $resolver->nameservers;
 
 	my $reply = $resolver->send(qw(. NS IN)) || die;
-	my $from = $reply->from();
+	my $from  = $reply->from();
 
 	my @ns = grep $_->type eq 'NS', $reply->answer, $reply->authority;
 	exit plan skip_all => "Unexpected response from $from" unless scalar @ns;
@@ -276,7 +276,7 @@ SKIP: {
 
 {
 	my $resolver = Net::DNS::Resolver->new( nameservers => $IP );
-	my $update = new Net::DNS::Update(qw(example.com));
+	my $update   = new Net::DNS::Update(qw(example.com));
 	ok( $resolver->send($update), '$resolver->send($update) UDP' );
 	$resolver->usevc(1);
 	ok( $resolver->send($update), '$resolver->send($update) TCP' );
@@ -326,18 +326,17 @@ SKIP: {
 	my $iterator = $resolver->axfr('net-dns.org');
 	ok( ref($iterator), '$resolver->axfr() returns iterator in scalar context' );
 
-	my $soa = eval { $iterator->() };
+	my $soa = $iterator->();
 	is( ref($soa), 'Net::DNS::RR::SOA', '$iterator->() returns initial SOA RR' );
 
-	my $i;
+	my $iterations;
 	eval {
-		return unless $soa;
-		$soa->serial(undef);				# force SOA mismatch
-		while ( $iterator->() ) { $i++; }
+		$soa->serial(undef) if $soa;			# force SOA mismatch
+		while ( $iterator->() ) { $iterations++; }
 	};
 	my ($exception) = split /\n/, "$@\n";
-	ok( $i, '$iterator->() iterates through remaining RRs' );
-	ok( !eval { $iterator->() }, '$iterator->() returns undef after last RR' );
+	ok( $iterations, '$iterator->() iterates through remaining RRs' );
+	is( $iterator->(), undef, '$iterator->() returns undef after last RR' );
 	ok( $exception, "iterator exception\t[$exception]" );
 }
 
@@ -427,11 +426,10 @@ SKIP: {
 
 {					## exercise error paths in _send_???()
 	my $resolver = Net::DNS::Resolver->new( nameservers => $IP, retry => 1 );
-	my $packet = new Net::DNS::Packet(qw(net-dns.org SOA));
-
+	my $original = new Net::DNS::Packet(qw(net-dns.org SOA));
 	my $mismatch = new Net::DNS::Packet(qw(net-dns.org SOA));
-	ok( !$resolver->_send_tcp( $mismatch, $packet->data ), '_send_tcp()	id mismatch' );
-	ok( !$resolver->_send_udp( $mismatch, $packet->data ), '_send_udp()	id mismatch' );
+	ok( !$resolver->_send_tcp( $original, $mismatch->data ), '_send_tcp()	id mismatch' );
+	ok( !$resolver->_send_udp( $original, $mismatch->data ), '_send_udp()	id mismatch' );
 }
 
 
@@ -441,13 +439,13 @@ SKIP: {
 	ok( !$resolver->bgread(undef), '_bgread()	undefined handle' );
 
 	my $packet = $resolver->_make_query_packet(qw(net-dns.org SOA));
-	my $second = bless {%$packet, id => -1}, ref($packet);
-	my $handle = $resolver->_bgsend_udp( $packet, $second->data );
+	my $broken = bless {%$packet, id => 0xffff ^ $packet->header->id}, ref($packet);
+	my $handle = $resolver->_bgsend_udp( $packet, $broken->data );
 	ok( !$resolver->bgread($handle), '_bgread()	no reply' );
 
 	ok( !$resolver->bgread( ref($handle)->new ), '_bgread()	timeout' );
 
-	my $socket = $resolver->_bgsend_udp( $packet, $second->data );
+	my $socket = $resolver->_bgsend_udp( $packet, $packet->data );
 	delete ${*$socket}{net_dns_bg};
 	while ( $resolver->bgbusy($socket) ) { sleep 1 }
 	ok( !$resolver->bgbusy($socket), 'bgbusy()	SpamAssassin workaround' );

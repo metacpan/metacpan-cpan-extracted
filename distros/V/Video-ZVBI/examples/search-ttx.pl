@@ -2,7 +2,7 @@
 #
 #  libzvbi test of teletext search
 #
-#  Copyright (C) 2007 Tom Zoerner
+#  Copyright (C) 2007, 2020 Tom Zoerner
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -19,11 +19,23 @@
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-# $Id: search-ttx.pl,v 1.3 2020/04/01 07:34:29 tom Exp tom $
+# Description:
+#
+#   Example for the use of class Video::ZVBI::search. The script captures
+#   and caches teletext pages until the RETURN key is pressed, then
+#   prompts for a search string. A search across teletext pages is
+#   started, and the content of matching pages is printed on the terminal.
 
 use strict;
 use blib;
+use Getopt::Long;
 use Video::ZVBI qw(/^VBI_/);
+
+my $opt_device = "/dev/dvb/adapter0/demux0";
+my $opt_pid = 0;  # mandatory for DVB
+my $opt_v4l2 = 0;
+my $opt_verbose = 0;
+my $opt_help = 0;
 
 my $cr;
 
@@ -36,14 +48,19 @@ sub pg_handler {
 }
 
 sub progress {
-   my ($pg,$user_data) = @_;
+   my ($pg,$search_cnt_ref) = @_;
    my ($page,$sub) = $pg->get_page_no();
-   printf "${cr}Search #$user_data->[0] %03X.%04x ", $page, $sub;
+   printf "${cr}Searching page %03X.%04x ", $page, $sub;
+   $$search_cnt_ref++;
+   return 1;
 }
 
 sub search {
    my ($vtdec) = @_;
+   my $search_cnt = 0;
+   my $match_cnt = 0;
    my $pat;
+
    print "\nEnter search pattern: ";
    chomp($pat = <STDIN>);
    if (defined($pat) && ($pat ne "")) {
@@ -56,7 +73,7 @@ sub search {
 
       #my $rand = [int(rand(1000))];
       #print "Search rand user data $rand->[0]\n";
-      $srch = Video::ZVBI::search::new($vtdec, 0x100, $any_sub, $pat, 0, 0, \&progress);
+      $srch = Video::ZVBI::search::new($vtdec, 0x100, $any_sub, $pat, 0, 0, \&progress, \$search_cnt);
       die "failed to initialize search: $!\n" unless $srch;
 
       while (($stat = $srch->next($pg, 1)) == VBI_SEARCH_SUCCESS) {
@@ -73,44 +90,50 @@ sub search {
             }
             $last_page = $page;
             $last_sub = $sub;
+            $match_cnt++;
          }
       }
-      print "\n";
       die "search \"$pat\": result code $stat\n" unless $stat == VBI_SEARCH_NOT_FOUND;
    }
+   print "${cr}Found $match_cnt matches on $search_cnt searched pages for \"$pat\"\n";
 }
 
 sub main_func {
-   my $opt_device = "/dev/vbi0";
-   my $opt_buf_count = 5;
-   my $opt_services = VBI_SLICED_TELETEXT_B;
-   my $opt_strict = 0;
    my $opt_verbose = 0;
    my $err;
-   my $pxc;
    my $cap;
    my $vtdec;
    my $exp;
 
-   $pxc = Video::ZVBI::proxy::create($opt_device, $0, 0, $err, $opt_verbose);
-   if (defined $pxc) {
-      # work-around for bug in proxy_new() prior to libzvbi 0.2.26 which closed STDIN
-      open OLDSTDIN, "<&", \*STDIN;
+   if ($opt_v4l2 || (($opt_pid == 0) && ($opt_device !~ /dvb/))) {
+      my $opt_buf_count = 5;
+      my $opt_services = VBI_SLICED_TELETEXT_B;
+      my $opt_strict = 0;
 
-      $cap = Video::ZVBI::capture::proxy_new($pxc, 5, 0, $opt_services, $opt_strict, $err);
-      undef $pxc unless defined $cap;
+      my $pxc = Video::ZVBI::proxy::create($opt_device, $0, 0, $err, $opt_verbose);
+      if (defined $pxc) {
+         # work-around for bug in proxy_new() prior to libzvbi 0.2.26 which closed STDIN
+         open OLDSTDIN, "<&", \*STDIN;
 
-      open STDIN, "<&OLDSTDIN"; # work-around cntd.
-      close OLDSTDIN;
+         $cap = Video::ZVBI::capture::proxy_new($pxc, 5, 0, $opt_services, $opt_strict, $err);
+         undef $pxc unless defined $cap;
+
+         open STDIN, "<&OLDSTDIN"; # work-around cntd.
+         close OLDSTDIN;
+      }
+      if (!defined $cap) {
+         $cap = Video::ZVBI::capture::v4l2_new($opt_device, $opt_buf_count, $opt_services, $opt_strict, $err, $opt_verbose);
+      }
+      if (!defined $cap) {
+         $cap = Video::ZVBI::capture::v4l_new($opt_device, 0, $opt_services, $opt_strict, $err, $opt_verbose);
+      }
+      if (!defined $cap) {
+         $cap = Video::ZVBI::capture::bktr_new($opt_device, 0, $opt_services, $opt_strict, $err, $opt_verbose);
+      }
    }
-   if (!defined $cap) {
-      $cap = Video::ZVBI::capture::v4l2_new($opt_device, $opt_buf_count, $opt_services, $opt_strict, $err, $opt_verbose);
-   }
-   if (!defined $cap) {
-      $cap = Video::ZVBI::capture::v4l_new($opt_device, 0, $opt_services, $opt_strict, $err, $opt_verbose);
-   }
-   if (!defined $cap) {
-      $cap = Video::ZVBI::capture::bktr_new($opt_device, 0, $opt_services, $opt_strict, $err, $opt_verbose);
+   else {
+      warn "WARNING: DVB devices require --pid parameter\n" if $opt_pid <= 0;
+      $cap = Video::ZVBI::capture::dvb_new2($opt_device, $opt_pid, $err, $opt_verbose);
    }
    die "Failed to open video device: $err\n" unless $cap;
 
@@ -130,16 +153,16 @@ sub main_func {
       my $res;
 
       my $rin = '';
-      vec($rin, fileno(STDIN),1) = 1;
+      vec($rin, fileno(STDIN), 1) = 1;
       if (select($rin, undef, undef, 0) > 0) {
          <STDIN>;
          search($vtdec);
       }
 
       $res = $cap->pull_sliced($sliced, $n_lines, $timestamp, 1000);
-      die "Capture error: $!\n" if $res < 0;
+      warn "Capture error: $!\n" if $res < 0;
 
-      if ($res != 0) {
+      if ($res > 0) {
          $vtdec->decode($sliced, $n_lines, $timestamp);
       }
    }
@@ -147,5 +170,30 @@ sub main_func {
    exit(-1);
 }
 
-main_func();
+sub usage {
+        print STDERR "\
+libzvbi test of teletext search
+Copyright (C) 2007, 2020 Tom Zoerner
+This program is licensed under GPL 2 or later. NO WARRANTIES.\n\
+Usage: $0 [OPTIONS]\n\
+--device PATH     Specify the capture device\
+--pid NNN         Specify the PES stream PID: Required for DVB\
+--v4l2            Force device to be addressed via analog driver\
+--verbose         Emit debug trace output\
+--help            Print this message and exit\
+";
+  exit(1);
+}
 
+my %CmdOpts = (
+        "device=s" =>  \$opt_device,
+        "pid=i" =>     \$opt_pid,
+        "v4l2" =>      \$opt_v4l2,
+        "verbose" =>   \$opt_verbose,
+        "help" =>      \$opt_help,
+);
+GetOptions(%CmdOpts) || usage();
+usage() if $opt_help;
+die "Options --v4l2 and --pid are mutually exclusive\n" if $opt_v4l2 && $opt_pid;
+
+main_func();

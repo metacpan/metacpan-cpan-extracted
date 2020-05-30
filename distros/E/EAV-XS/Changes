@@ -1,5 +1,8 @@
 Revision history for Perl extension EAV::XS.
 
+0.4.7  Thu May 28 12:16:07 UTC 2020
+	- update IANA database
+
 0.4.6  Tue Apr  7 10:02:52 UTC 2020
 	- added null pointer check for get_* functions
 

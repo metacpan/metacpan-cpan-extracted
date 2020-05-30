@@ -27,13 +27,14 @@ my %WriteMakefileArgs = (
     "MySQL::Workbench::Parser" => "1.08"
   },
   "TEST_REQUIRES" => {
+    "Capture::Tiny" => 0,
     "File::Copy" => 0,
     "File::Path" => "2.0",
     "FindBin" => 0,
     "Pod::Coverage::TrustPod" => 0,
     "Test::LongString" => "0.16"
   },
-  "VERSION" => "1.16",
+  "VERSION" => "1.17",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,6 +42,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Capture::Tiny" => 0,
   "Carp" => 0,
   "Data::Dumper" => 0,
   "File::Copy" => 0,

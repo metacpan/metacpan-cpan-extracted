@@ -211,6 +211,7 @@ my %WriteMakefileArgs = (
     "Test::Spelling" => "0.19",
     "Text::Tabs" => "2013.0426",
     "Try::Tiny" => 0,
+    "URI::Escape" => 0,
     "if" => 0,
     "namespace::autoclean" => 0,
     "strict" => 0,
@@ -241,7 +242,7 @@ my %WriteMakefileArgs = (
     "namespace::clean" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.156",
+  "VERSION" => "0.157",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -379,6 +380,7 @@ my %FallbackPrereqs = (
   "Test::Warnings" => "0.009",
   "Text::Tabs" => "2013.0426",
   "Try::Tiny" => 0,
+  "URI::Escape" => 0,
   "if" => 0,
   "lib" => 0,
   "namespace::autoclean" => 0,

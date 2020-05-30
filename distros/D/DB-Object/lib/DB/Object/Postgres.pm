@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres.pm
-## Version v0.4.6
+## Version v0.4.7
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2017/07/19
-## Modified 2020/05/21
+## Modified 2020/05/22
 ## 
 ##----------------------------------------------------------------------------
 ## This is the subclassable module for driver specific ones.
@@ -32,7 +32,7 @@ BEGIN
     require DB::Object::Postgres::Lo;
     our( $VERSION, $DB_ERRSTR, $ERROR, $DEBUG, $CONNECT_VIA, $CACHE_QUERIES, $CACHE_SIZE );
     our( $CACHE_TABLE, $USE_BIND, $USE_CACHE, $MOD_PERL, @DBH );
-    $VERSION     = 'v0.4.6';
+    $VERSION     = 'v0.4.7';
     use Devel::Confess;
 };
 
@@ -213,8 +213,7 @@ sub commit($;$@)
 sub connect
 {
     my $that   = shift( @_ );
-    my $param = $that->_connection_params2hash( @_ ) || return( undef() );
-    ## my $param = $that->_check_connect_param( @_ ) || return( undef() );
+    my $param = $that->_connection_params2hash( @_ ) || return;
     $param->{driver} = 'Pg';
     return( $that->SUPER::connect( $param ) );
 }
@@ -302,7 +301,7 @@ sub databases
     {
         try
         {
-            $dbh = $self->connect || return( undef() );
+            $dbh = $self->connect || return;
         }
         catch( $e )
         {
@@ -815,7 +814,7 @@ sub table_exists
         }
     }
     ## We did not find it, so let's try by checking directly the database
-    my $def = $self->table_info( $table ) || return( undef() );
+    my $def = $self->table_info( $table ) || return;
     return( 1 ) if( scalar( @$def ) );
     return( 0 );
 }

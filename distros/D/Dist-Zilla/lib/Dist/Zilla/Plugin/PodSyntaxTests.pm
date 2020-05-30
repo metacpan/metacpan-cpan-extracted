@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::PodSyntaxTests 6.014;
+package Dist::Zilla::Plugin::PodSyntaxTests 6.015;
 # ABSTRACT: a author test for Pod syntax
 
 use Moose;
@@ -57,7 +57,7 @@ Dist::Zilla::Plugin::PodSyntaxTests - a author test for Pod syntax
 
 =head1 VERSION
 
-version 6.014
+version 6.015
 
 =head1 DESCRIPTION
 

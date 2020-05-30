@@ -31,7 +31,7 @@ Module options:
 
 # VERSION
 
-Version 0.09
+Version 0.10
 
 # DESCRIPTION
 
@@ -125,9 +125,11 @@ load appropriate module automatically in default start up module
 
 - **-Mteams**
 
-        --tigers
-        --giants
-        --lions
+        --team teamname
+
+        --tigers, --tigers-rev
+        --giants, --giants-rev
+        --lions, --lions-rev
 
 Feel free to update these modules and send pull request to github
 site.
@@ -135,6 +137,8 @@ site.
 # SEE ALSO
 
 [https://github.com/kaz-utashiro/App-week](https://github.com/kaz-utashiro/App-week)
+
+[https://github.com/kaz-utashiro/Getopt-EX-termcolor](https://github.com/kaz-utashiro/Getopt-EX-termcolor)
 
 [Getopt::EX::Colormap](https://metacpan.org/pod/Getopt::EX::Colormap)
 

@@ -4,7 +4,7 @@ package JSON::Schema::Draft201909::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 no if "$]" >= 5.031009, feature => 'indirect';
 use Moo;
@@ -18,6 +18,7 @@ use namespace::clean;
 
 use overload
   'bool'  => sub { $_[0]->result },
+  '0+'    => sub { $_[0]->count },
   fallback => 1;
 
 has result => (
@@ -34,6 +35,7 @@ has errors => (
   handles_via => 'Array',
   handles => {
     errors => 'elements',
+    error_count => 'count',
   },
 );
 
@@ -42,6 +44,11 @@ has output_format => (
   isa => Enum[qw(flag basic detailed verbose)],
   default => 'basic',
 );
+
+sub BUILD {
+  my $self = shift;
+  warn 'result is false but there are no errors' if not $self->result and not $self->error_count;
+}
 
 sub format {
   my ($self, $style) = @_;
@@ -59,6 +66,8 @@ sub format {
 
   die 'unsupported output format';
 }
+
+sub count { $_[0]->result ? 0 : $_[0]->error_count }
 
 sub TO_JSON {
   my $self = shift;
@@ -79,7 +88,7 @@ JSON::Schema::Draft201909::Result - Contains the result of a JSON Schema evaluat
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -122,6 +131,8 @@ One of: C<flag>, C<basic>, C<detailed>, C<verbose>. Defaults to C<basic>.
 
 =head1 METHODS
 
+=for Pod::Coverage BUILD
+
 =head2 format
 
 Returns a data structure suitable for serialization; requires one argument specifying the output
@@ -132,6 +143,10 @@ formats at this time are C<flag> and C<basic>.
 =head2 TO_JSON
 
 Calls L</format> with the style configured in L</output_format>.
+
+=head2 count
+
+Returns the number of errors, when the result is false.
 
 =head1 SUPPORT
 

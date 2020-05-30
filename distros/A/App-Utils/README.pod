@@ -9,6 +9,8 @@ date-tag - print a simple date-tag in form YYYY-MM-DD-hhmmss
 A simple command that prints one line of with the current date-time tags in
 the form C<YYYY-MM-DD-hhmmss>.
 
+remove-empty-dirs - remove recursively empty directories
+
 save - save a snapshot of given files in saved.d directory
 
 =head1 SYNOPSIS
@@ -18,7 +20,7 @@ save - save a snapshot of given files in saved.d directory
 
 =head1 AUTHOR
 
-Vlado Keselj
+Vlado Keselj https://web.cs.dal.ca/~vlado 2002-2020
 
 =head1 LICENSE
 
@@ -38,4 +40,3 @@ Manual install:
 
 
 =cut
-

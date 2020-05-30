@@ -1,0 +1,9 @@
+v1.07	2020-05-30
+	- Initial git import (from CVS)
+
+v1.08	2020-05-30
+	- Minor documentation corrections
+
+v1.09	2020-05-30
+	- Process field_aliases option after field_normalizer option and document that behavior.
+	- Add unit test for field_normalizer and field_aliases options used together.

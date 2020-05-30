@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Dist::Zilla::Util 6.014;
+package Dist::Zilla::Util 6.015;
 # ABSTRACT: random snippets of code that Dist::Zilla wants
 
 use Carp ();
@@ -13,10 +13,7 @@ use Encode ();
 
   sub _new  {
     my ($class, @args) = @_;
-    # Load Pod::Simple only when used (and not yet loaded)
-    unless (exists $INC{'Pod/Simple.pm'}) {
-      require Pod::Simple;
-    }
+    require Pod::Simple;
     my $parser = $class->new(@args);
     $parser->code_handler(sub {
       my ($line, $line_number, $parser) = @_;
@@ -174,7 +171,7 @@ Dist::Zilla::Util - random snippets of code that Dist::Zilla wants
 
 =head1 VERSION
 
-version 6.014
+version 6.015
 
 =head1 METHODS
 

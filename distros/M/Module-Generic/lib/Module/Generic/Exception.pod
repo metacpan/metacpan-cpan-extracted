@@ -112,7 +112,7 @@ This returns a string representation of the Exception such as :
 
 =head2 caught
 
-    use TryCatch;
+    use Nice::Try;
     try
     {
         # An error made with Module::Generic::Exception
@@ -127,7 +127,7 @@ This returns a string representation of the Exception such as :
         }
     }
 
-But L<TryCatch> let's you do this:
+But L<Nice::Try> let's you do this:
 
     try
     {

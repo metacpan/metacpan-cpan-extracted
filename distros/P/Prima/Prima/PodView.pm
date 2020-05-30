@@ -110,7 +110,7 @@ sub profile_default
 		],
 		pageName      => '',
 		topicView     => 0,
-		textDirection  => $Prima::Bidi::default_direction_rtl,
+		textDirection  => $::application->textDirection,
 	);
 	@$def{keys %prf} = values %prf;
 	return $def;
@@ -124,7 +124,6 @@ sub init
 	$self-> {links} = [];
 	$self-> {styles} = [];
 	$self-> {pageName} = '';
-	$self-> {textDirection} = $Prima::Bidi::default_direction_rtl;
 	$self-> {manpath}  = '';
 	$self-> {modelRange} = [0,0,0];
 	$self-> {postBlocks} = {};
@@ -139,6 +138,7 @@ sub init
 	my %font = %{$self-> fontPalette-> [0]};
 	$font{pitch} = fp::Fixed;
 	$self-> {fontPalette}-> [1] = \%font;
+	$self-> {fontPaletteSize} = 2;
 
 	$self-> $_($profile{$_}) for qw( styles images pageName topicView);
 
@@ -1305,10 +1305,11 @@ sub format
 	# cache indents
 	my @indents;
 	my $state = $self-> create_state;
-	for ( 0 .. ( scalar @{$self-> fontPalette} - 1)) {
-		$$state[ tb::BLK_FONT_ID] = $_;
+
+	for my $fid ( 0 .. ( scalar @{$self-> fontPalette} - 1)) {
+		$$state[ tb::BLK_FONT_ID] = $fid;
 		$self-> realize_state( $self, $state, tb::REALIZE_FONTS);
-		$indents[$_] = $self-> font-> width;
+		$indents[$fid] = $self-> font-> width;
 	}
 	$$state[ tb::BLK_FONT_ID] = 0;
 
@@ -1342,8 +1343,10 @@ sub format
 
 	while ( 1) {
 		$self-> format_chunks;
-		last unless $self-> {formatData} && $self-> {blocks}-> [-1] &&
-						$self-> {blocks}-> [-1]-> [tb::BLK_Y] < $ph;
+		last unless 
+			$self-> {formatData} && 
+			$self-> {blocks}-> [-1] &&
+			$self-> {blocks}-> [-1]-> [tb::BLK_Y] < $ph;
 	}
 }
 
@@ -1380,6 +1383,8 @@ sub format_chunks
 		push @$g, @$m[ M_START .. $#$m ];
 
 		# format the paragraph
+
+		my $next_text_offs = ( $mid == $#{$self->{model}} ) ? length( ${$self->{text}} ) : $self->{model}->[$mid + 1]->[M_TEXT_OFFSET];
 		my $indent = $$m[M_INDENT] * $$indents[ $$m[M_FONT_ID]];
 		@blocks = $self-> block_wrap( $self, $g, $state, $formatWidth - $indent);
 
@@ -1511,9 +1516,12 @@ sub print
 	my $pageno = 1;
 	my $pagenum  = sub {
 		$canvas->translate( 0, 0 );
+		my %save = %{$canvas->font};
 		$canvas->font->set( name => $self->fontPalette->[0]->{name} || 'Default', size => 6, style => 0, pitch => fp::Default );
 		$canvas->set( color => cl::Black );
 		$canvas->text_out( $pageno, ( $formatWidth - $canvas->get_text_width($pageno) ) / 2, ($vmargin - $canvas->font->height ) / 2 );
+		delete $save{height}; # XXX fix this
+		$canvas->font(\%save);
 		$pageno++;
 	};
 	my $new_page = sub {
@@ -1536,6 +1544,7 @@ sub print
 		@blocks = $self-> block_wrap( $canvas, $g, $state, $formatWidth - $indent);
 
 		# paint
+		$self-> reset_state;
 		for ( @blocks) {
 			my $b = $_;
 			if ( $y < $$b[ tb::BLK_HEIGHT]) {

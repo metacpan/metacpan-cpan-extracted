@@ -34,7 +34,7 @@ Module options:
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =head1 DESCRIPTION
 
@@ -134,9 +134,11 @@ load appropriate module automatically in default start up module
 
 =item B<-Mteams>
 
-    --tigers
-    --giants
-    --lions
+    --team teamname
+
+    --tigers, --tigers-rev
+    --giants, --giants-rev
+    --lions, --lions-rev
 
 =back
 
@@ -146,6 +148,8 @@ site.
 =head1 SEE ALSO
 
 L<https://github.com/kaz-utashiro/App-week>
+
+L<https://github.com/kaz-utashiro/Getopt-EX-termcolor>
 
 L<Getopt::EX::Colormap>
 

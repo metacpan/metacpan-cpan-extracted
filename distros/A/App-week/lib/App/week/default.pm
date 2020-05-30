@@ -3,4 +3,8 @@ package App::week::default;
 __DATA__
 
 autoload -Mcolors --mono --green --lavender --pastel
-autoload -Mteams --tigers --lions --giants
+autoload -Mteams \
+	--team \
+	--giants --giants-rev \
+	--tigers --tigers-rev \
+	--lions --lions-rev --lions2 --lions3 --lions3-rev

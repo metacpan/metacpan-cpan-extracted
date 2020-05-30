@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Prima::Classes;
 use Prima::Lists;
+use Prima::Dialog::FindDialog;
 
 package Prima::VB::Divider;
 use strict;
@@ -205,7 +206,7 @@ sub on_drawitem
 	$canvas-> clear( $left, $bottom, $right, $top);
 	my $text = $me-> {id}-> [$index];
 	my $x = $left + 2;
-	$canvas-> text_out_bidi( $text, $x, ($top + $bottom + 1 - $me-> {fHeight}) / 2);
+	$canvas-> text_shape_out( $text, $x, ($top + $bottom + 1 - $me-> {fHeight}) / 2);
 	$canvas-> backColor( $bc) if $hilite || $prelight;
 	$canvas-> color( $c) if $hilite || !$ena
 }
@@ -423,7 +424,7 @@ sub find_dialog
 	my @props = qw(findText options scope);
 	push( @props, q(replaceText)) unless $findStyle;
 	if ( $fd) { for( @props) { $prf{$_} = $fd-> {$_}}}
-	$findDialog = Prima::FindDialog-> create unless $findDialog;
+	$findDialog = Prima::Dialog::FindDialog-> create unless $findDialog;
 	$findDialog-> set( %prf, findStyle => $findStyle, text => ($findStyle ? 'Find' : 'Replace'));
 	$findDialog-> Find-> items($fd-> {findItems});
 	$findDialog-> Replace-> items($fd-> {replaceItems}) unless $findStyle;

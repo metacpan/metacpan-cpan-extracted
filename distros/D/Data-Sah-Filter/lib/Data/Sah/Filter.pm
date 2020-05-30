@@ -1,9 +1,9 @@
 package Data::Sah::Filter;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-11'; # DATE
+our $DATE = '2020-05-30'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
@@ -123,7 +123,7 @@ Data::Sah::Filter - Filtering for Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.004 of Data::Sah::Filter (from Perl distribution Data-Sah-Filter), released on 2020-02-11.
+This document describes version 0.005 of Data::Sah::Filter (from Perl distribution Data-Sah-Filter), released on 2020-05-30.
 
 =head1 SYNOPSIS
 
@@ -188,8 +188,8 @@ Whether coercion might fail, e.g. because of invalid input. If set to 1,
 C<expr_filter> key that the C<filter()> routine returns must be an expression
 that returns an array (envelope) of C<< (error_msg, data) >> instead of just
 filtered data. Error message should be a string that is set when filtering fails
-and explains why. Otherwise, if filtering succeeds, the string should be set to
-undefined value.
+and explains why. Otherwise, if filtering succeeds, the error message string
+should be set to undefined value.
 
 This is used for filtering rules that act as a data checker.
 

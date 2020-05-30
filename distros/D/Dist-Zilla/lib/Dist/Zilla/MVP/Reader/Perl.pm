@@ -1,4 +1,4 @@
-package Dist::Zilla::MVP::Reader::Perl 6.014;
+package Dist::Zilla::MVP::Reader::Perl 6.015;
 # ABSTRACT: the reader for dist.pl files
 
 use Moose;
@@ -30,7 +30,7 @@ sub read_into_assembler {
 
   while (my ($ident, $arg) = splice @$plugins, 0, 2) {
     unless (ref $arg) {
-      unshift @$plugins, $arg;
+      unshift @$plugins, $arg if defined $arg;
       $arg = [];
     }
 
@@ -43,9 +43,9 @@ sub read_into_assembler {
   }
 
   # should be done ... elsewhere? -- rjbs, 2009-08-24
-  $self->assembler->end_section if $self->assembler->current_section;
+  $asm->end_section if $asm->current_section;
 
-  return $self->assembler->sequence;
+  return $asm->sequence;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -63,7 +63,7 @@ Dist::Zilla::MVP::Reader::Perl - the reader for dist.pl files
 
 =head1 VERSION
 
-version 6.014
+version 6.015
 
 =head1 DESCRIPTION
 

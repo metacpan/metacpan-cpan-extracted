@@ -3,6 +3,7 @@ requires 'Moo';
 
 on test => sub {
     requires 'Test::Most';
+    requires 'Test::PostgreSQL';
     requires 'Test::Roo';
     requires 'Test::Requires';
     requires 'DBD::SQLite';

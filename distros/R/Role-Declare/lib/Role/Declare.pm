@@ -1,7 +1,7 @@
 package Role::Declare;
 use strict;
 use warnings;
-our $VERSION = 0.02;
+our $VERSION = 0.04;
 
 use Attribute::Handlers;
 use Carp qw[ croak ];
@@ -141,9 +141,19 @@ sub _build_validator {
 }
 
 sub import {
-    my ($class) = @_;
+    my ($class, $mode) = @_;
     my $package = scalar caller;
     return if $class ne __PACKAGE__;    # don't let this import spread around
+
+    my $lax;
+    if (defined $mode) {
+        if ($mode eq '-lax') {
+            $lax = 1;
+        }
+        else {
+            croak "Unsupported mode: $mode";
+        }
+    }
 
     # make the caller a role first, so we can install modifiers
     Role::Tiny->import::into($package);
@@ -163,26 +173,28 @@ sub import {
         return;
     };
 
+    my %common_args = (
+        name        => 'required',
+        install_sub => $installer,
+    );
+    $common_args{check_argument_count} = 0 if $lax;
     Function::Parameters->import(
         {
             class_method => {
-                name        => 'required',
-                shift       => [ [ '$class', ClassName ] ],
-                install_sub => $installer,
+                %common_args,
+                shift => [ [ '$class', ClassName ] ],
             },
         },
         {
             instance_method => {
-                name        => 'required',
-                shift       => [ [ '$self', Object ] ],
-                install_sub => $installer,
+                %common_args,
+                shift => [ [ '$self', Object ] ],
             },
         },
         {
             method => {
-                name        => 'required',
-                shift       => [ '$self' ],
-                install_sub => $installer,
+                %common_args,
+                shift => [ '$self' ],
             },
         },
     );

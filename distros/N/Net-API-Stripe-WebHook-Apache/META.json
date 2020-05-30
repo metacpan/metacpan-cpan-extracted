@@ -1,0 +1,57 @@
+{
+   "abstract" : "A Stripe WebHook Implementation using Apache",
+   "author" : [
+      "Jacques Deguest (jack@deguest.jp)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-API-Stripe-WebHook-Apache",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Apache2::Const" : "2.000010",
+            "Devel::Confess" : "0.009004",
+            "Net::API::REST" : "v0.5.3",
+            "Net::API::Stripe" : "v1.0.5",
+            "Nice::Try" : "v0.1.4",
+            "constant" : "0",
+            "parent" : "0",
+            "perl" : "5.006000",
+            "strict" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Mock::Apache2" : "0.05",
+            "Test::More" : "0",
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.100.2",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

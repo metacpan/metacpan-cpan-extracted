@@ -5,7 +5,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::IOLoop;
 use Time::HiRes ();
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 our $LifeTime;
 
@@ -212,7 +212,7 @@ Mojolicious::Plugin::SizeLimit - Terminate workers that grow too large
 
 =head1 VERSION
 
-Version 0.005
+Version 0.006
 
 =head1 SYNOPSIS
 
@@ -233,7 +233,7 @@ to terminate L<hypnotoad> worker processes if they grow too large. The
 decision to end a process can be based on its overall size, by setting
 a minimum limit on shared memory, or a maximum on unshared memory.
 
-Actually, there are two big reasons your L<hypnotoad> workers will grow.
+Actually, there are two main reasons your L<hypnotoad> workers will grow.
 First, your code could have a bug that causes the process to increase in
 size very quickly. Second, you could just be doing operations that
 require a lot of memory for each request. Since you can't rely that
@@ -327,13 +327,15 @@ L<Process::SizeLimit::Core>.
 
 Andreas J. Koenig, who told me to write this Mojolicious plugin.
 
+Stefan Corneliu Petrea for kicking my ass.
+
 =head1 AUTHOR
 
 Bernhard Graf <graf(a)cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015 Bernhard Graf
+Copyright (C) 2015 - 2020 Bernhard Graf
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

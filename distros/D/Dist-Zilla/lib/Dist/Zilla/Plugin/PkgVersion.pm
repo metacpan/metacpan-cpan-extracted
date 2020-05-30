@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::PkgVersion 6.014;
+package Dist::Zilla::Plugin::PkgVersion 6.015;
 # ABSTRACT: add a $VERSION to your packages
 
 use Moose;
@@ -340,7 +340,7 @@ Dist::Zilla::Plugin::PkgVersion - add a $VERSION to your packages
 
 =head1 VERSION
 
-version 6.014
+version 6.015
 
 =head1 SYNOPSIS
 

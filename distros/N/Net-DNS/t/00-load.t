@@ -1,4 +1,4 @@
-# $Id: 00-load.t 1754 2019-08-19 14:12:28Z willem $	-*-perl-*-
+# $Id: 00-load.t 1781 2020-05-13 08:58:25Z willem $	-*-perl-*-
 
 use strict;
 use Test::More;
@@ -7,9 +7,7 @@ use Test::More;
 my @module = qw(
 	Net::DNS
 	Net::DNS::SEC
-	Data::Dumper
 	Digest::BubbleBabble
-	Digest::GOST
 	Digest::HMAC
 	Digest::MD5
 	Digest::SHA
@@ -17,7 +15,6 @@ my @module = qw(
 	File::Spec
 	IO::File
 	IO::Select
-	IO::Socket
 	IO::Socket::INET
 	IO::Socket::IP
 	MIME::Base64
@@ -25,7 +22,6 @@ my @module = qw(
 	Net::LibIDN2
 	PerlIO
 	Scalar::Util
-	Socket
 	Time::Local
 	Win32::API
 	Win32::IPHelper

@@ -78,6 +78,9 @@ sub draw_text
 	$flags     = dt::Default unless defined $flags;
 	$tabIndent = 1 if !defined( $tabIndent) || $tabIndent < 0;
 
+	$x2 //= $x + 1;
+	$y2 //= $y + 1;
+
 	$x2 = int( $x2);
 	$x  = int( $x);
 	$y2 = int( $y2);
@@ -96,19 +99,15 @@ sub draw_text
 		(( $flags & dt::ExpandTabs    ) ? ( tw::ExpandTabs | tw::CalcTabs) : 0)
 	;
 
-	my @lines = @{$canvas-> text_wrap( $string,
-		( $flags & dt::NoWordWrap) ? 1000000 : $w,
-		$twFlags, $tabIndent
+	my @lines = @{$canvas-> text_wrap_shape( $string,
+		( $flags & dt::NoWordWrap) ? undef : $w,
+		options => $twFlags, tabs => $tabIndent
 	)};
 
 	my $tildes;
 	$tildes = pop @lines if $flags & dt::DrawMnemonic;
 
 	return 0 unless scalar @lines;
-
-	if (($flags & dt::BidiText) && $Prima::Bidi::available) {
-		$_ = Prima::Bidi::visual($_) for @lines;
-	}
 
 	my @clipSave;
 	my $fh = $canvas-> font-> height +
@@ -222,6 +221,14 @@ sub new_gradient
 	return Prima::Drawable::Gradient->new(@_);
 }
 
+
+sub new_glyph_obj
+{
+	shift;
+	require Prima::Drawable::Glyphs;
+	return Prima::Drawable::Glyphs->new(@_);
+}
+
 sub stroke_primitive
 {
 	my ( $self, $request ) = (shift, shift);
@@ -298,6 +305,95 @@ sub fill_primitive
 	$self->translate(@offset);
 	$self->region($region2);
 	return $ok;
+}
+
+sub text_shape_out
+{
+	my ( $self, $text, $x, $y, $rtl) = @_;
+	my %flags = (skip_if_simple => 1);
+	$flags{rtl} = $rtl if defined $rtl;
+	if ( my $glyphs = $self->text_shape($text, %flags)) {
+		$text = $glyphs;
+	}
+	return $self->text_out( $text, $x, $y);
+}
+
+sub get_text_shape_width
+{
+	my ( $self, $text, $flags) = @_;
+	my %flags = (skip_if_simple => 1);
+	$flags{rtl} = $flags & to::RTL if defined $flags;
+	if ( my $glyphs = $self->text_shape($text, %flags)) {
+		$text = $glyphs;
+	}
+	return $self->get_text_width( $text, $flags // 0);
+}
+
+sub text_wrap_shape
+{
+	my ( $self, $text, $width, %opt) = @_;
+
+	$width = 1_000_000 unless defined $width;
+
+	my $opt = delete($opt{options}) // tw::Default;
+
+	my $wrapped = $self-> text_wrap( $text, $width, $opt, delete($opt{tabs}) // 8);
+	return $wrapped if $opt & tw::ReturnChunks;
+
+	my $tilde;
+	$tilde = pop @$wrapped if $opt & (tw::CalcMnemonic | tw::CollapseTilde);
+
+	my @shaped;
+	for my $chunk ( @$wrapped ) {
+		my $shaped = $self-> text_shape( $chunk, %opt );
+		unless (defined $shaped) {
+			push @$wrapped, $tilde if $tilde;
+			return $wrapped;
+		}
+		$shaped = $chunk unless $shaped;
+		push @shaped, $shaped;
+	}
+
+	if ( $tilde && defined($tilde->{tildeLine}) && ref(my $glyphs = $shaped[$tilde->{tildeLine}])) {
+		my $pos = $tilde->{tildePos};
+		my $index = -1;
+		my $found = -1;
+		my $indexes;
+		my $ligature;
+
+AGAIN:
+		$indexes = $glyphs-> indexes;
+		for my $c ( @$indexes ) {
+			$index++;
+			$c &= ~to::RTL;
+			$found = $index, last if $c == $pos; # same glyph
+			$found = $index if $c < $pos && $c > $found; # same cluster?
+		}
+
+		# check for ligature: "f~l" situation where "fl" is a single glyph
+		# (also, ligatures won't work without the advances array)
+		if ( $indexes->[$found+1] > $indexes->[$found] + 1 && !$ligature && $glyphs->advances ) {
+			my $text = $wrapped->[$tilde->{tildeLine}];
+			substr( $text, $pos++, 0, "\x{200c}");
+			substr( $text, $pos + 1, 0, "\x{200c}");
+			$glyphs = $self-> text_shape( $text, %opt );
+			$ligature++;
+			$index = $found = -1;
+			goto AGAIN;
+		}
+
+		my ($A,$B,$C) = $glyphs-> abc($self, $found);
+		my ($A0) = $glyphs-> abc($self, 0);
+		my $x = $glyphs->get_sub_width( $self, 0, $found ) - (($A0 < 0) ? $A0 : 0);
+		$tilde->{tildeStart}  = $x;
+		$tilde->{tildeStart} += $A if $A < 0;
+		$tilde->{tildeEnd}    = $x + $B;
+		$tilde->{tildeEnd}   -= $C if $C < 0;
+	}
+
+	push @shaped, $tilde if $tilde;
+
+	return \@shaped;
 }
 
 1;

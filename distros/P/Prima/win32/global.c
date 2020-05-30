@@ -21,14 +21,15 @@ extern "C" {
 
 WinGuts guts;
 DWORD   rc;
-PHash   stylusMan    = nil; // pen & brush manager
-PHash   fontMan      = nil; // font manager
-PHash   patMan       = nil; // pattern resource manager
-PHash   menuMan      = nil; // HMENU manager
-PHash   imageMan     = nil; // HBITMAP manager
-PHash   regnodeMan   = nil; // cache for apc_widget_user_profile
-PHash   myfontMan    = nil; // hash of calls to apc_font_load
-PHash   menuBitmapMan= nil; // HBITMAP manager for SetMenuItemBitmaps 
+PHash   stylusMan      = nil; // pen & brush manager
+PHash   fontMan        = nil; // font manager
+PHash   patMan         = nil; // pattern resource manager
+PHash   menuMan        = nil; // HMENU manager
+PHash   imageMan       = nil; // HBITMAP manager
+PHash   regnodeMan     = nil; // cache for apc_widget_user_profile
+PHash   myfontMan      = nil; // hash of calls to apc_font_load
+PHash   menuBitmapMan  = nil; // HBITMAP manager for SetMenuItemBitmaps 
+PHash   scriptCacheMan = nil; // SCRIPT_CACHE entries per font/script
 HPEN    hPenHollow;
 HBRUSH  hBrushHollow;
 PatResource hPatHollow;
@@ -96,6 +97,18 @@ static HRESULT (__stdcall *SetProcessDpiAwareness)(PROCESS_DPI_AWARENESS)  = NUL
 static HRESULT (__stdcall *GetDpiForMonitor)(HMONITOR,MONITOR_DPI_TYPE,UINT*,UINT*) = NULL;
 static HRESULT (__stdcall *DwmEnableBlurBehindWindow)(HWND hWnd, const DWM_BLURBEHIND *pBlurBehind) = NULL;
 static HRESULT (__stdcall *DwmIsCompositionEnabled)(BOOL *pfEnabled) = NULL;
+static BOOL    (__stdcall *GetUserPreferredUILanguages)(DWORD dwFlags, PULONG pulNumLanguages, PZZWSTR pwszLanguagesBuffer, PULONG pcchLanguagesBuffer) = NULL;
+
+BOOL
+my_GetUserPreferredUILanguages(
+	DWORD dwFlags, PULONG pulNumLanguages,
+	PZZWSTR pwszLanguagesBuffer, PULONG pcchLanguagesBuffer
+) {
+	if ( GetUserPreferredUILanguages == NULL) 
+		return false;
+	return GetUserPreferredUILanguages(dwFlags, pulNumLanguages, pwszLanguagesBuffer, pcchLanguagesBuffer);
+}
+
 
 void
 dpi_change(void)
@@ -249,7 +262,8 @@ window_subsystem_init( char * error_buf)
 	imageMan   = hash_create();
 	regnodeMan = hash_create();
 	myfontMan  = hash_create();
-	menuBitmapMan = hash_create();
+	menuBitmapMan  = hash_create();
+	scriptCacheMan = hash_create();
 	create_font_hash();
 	{
 		LOGBRUSH b = { BS_HOLLOW, 0, 0};
@@ -268,10 +282,14 @@ window_subsystem_init( char * error_buf)
 	/* Win7 DWM */
 #define LOAD_FUNC(m,f) load_function(m, (void**) &f, #f)
 	if ( os.dwMajorVersion >= 5) {
-		HMODULE dwm = LoadLibrary("DWMAPI.DLL");
-		if ( dwm ) {
-			LOAD_FUNC(dwm, DwmEnableBlurBehindWindow);
-			LOAD_FUNC(dwm, DwmIsCompositionEnabled);
+		HMODULE mod = LoadLibrary("DWMAPI.DLL");
+		if ( mod ) {
+			LOAD_FUNC(mod, DwmEnableBlurBehindWindow);
+			LOAD_FUNC(mod, DwmIsCompositionEnabled);
+		}
+		mod = LoadLibrary("KERNEL32.DLL");
+		if ( mod ) {
+			LOAD_FUNC(mod, GetUserPreferredUILanguages);
 		}
 	}
 
@@ -318,6 +336,7 @@ window_subsystem_init( char * error_buf)
 
 		// getting system font presets
 		reset_system_fonts();
+		register_mapper_fonts();
 	}
 
 	memset( &guts. displayBMInfo, 0, sizeof( guts. displayBMInfo));
@@ -458,6 +477,7 @@ window_subsystem_done()
 
 	hash_first_that( menuBitmapMan, menu_bitmap_cleaner, nil, nil, nil);
 	hash_destroy( menuBitmapMan,  false);
+	hash_destroy( scriptCacheMan,  true);
 
 	hash_first_that( myfontMan, myfont_cleaner, nil, nil, nil);
 	hash_destroy( myfontMan,  false);
@@ -635,6 +655,7 @@ LRESULT CALLBACK generic_view_handler( HWND win, UINT  msg, WPARAM mp1, LPARAM m
 		}
 		break;
 	case WM_CLOSE:
+		if ( guts. focSysDialog) return 0;
 		if ( sys className != WC_FRAME)
 			return 0;
 		break;
@@ -753,13 +774,13 @@ AGAIN:
 				switch ( ToUnicodeEx( mp1, scan, keyState, keys, 2, 0, kl)) {
 				case 1: // char
 					if ( lastDeadKey ) {
-		   WCHAR wcBuffer[3];
-		   WCHAR out[3];
-		   wcBuffer[0] = keys[0];
-		   wcBuffer[1] = lastDeadKey;
-		   wcBuffer[2] = '\0';
-		   if ( FoldStringW(MAP_PRECOMPOSED, (LPWSTR) wcBuffer, 3, (LPWSTR) out, 3) )
-		      keys[0] = out[0];
+						WCHAR wcBuffer[3];
+						WCHAR out[3];
+						wcBuffer[0] = keys[0];
+						wcBuffer[1] = lastDeadKey;
+						wcBuffer[2] = '\0';
+						if ( FoldStringW(MAP_PRECOMPOSED, (LPWSTR) wcBuffer, 3, (LPWSTR) out, 3) )
+							keys[0] = out[0];
 					}
 					if ( !deadPollCount && ( GetKeyState( VK_MENU) < 0) && ( GetKeyState( VK_SHIFT) >= 0)) {
 						WCHAR keys2[2];
@@ -792,7 +813,7 @@ AGAIN:
 					if (!up) lastDeadKey = 0;
 					break;
 				default:
-						ev. key. mod |= kmDeadKey;
+					ev. key. mod |= kmDeadKey;
 					if (!up) lastDeadKey = 0;
 				}
 				ev. key. code = keys[ 0];
@@ -802,13 +823,13 @@ AGAIN:
 				switch ( ToAsciiEx( mp1, scan, keyState, (LPWORD) keys, 0, kl)) {
 				case 1: // char
 					if ( lastDeadKey ) {
-		   BYTE cBuffer[3];
-		   BYTE out[3];
-		   cBuffer[0] = keys[0];
-		   cBuffer[1] = lastDeadKey;
-		   cBuffer[2] = '\0';
-		   if ( FoldStringA(MAP_PRECOMPOSED, (LPSTR) cBuffer, 3, (LPSTR) out, 3) )
-		      keys[0] = out[0];
+						BYTE cBuffer[3];
+						BYTE out[3];
+						cBuffer[0] = keys[0];
+						cBuffer[1] = lastDeadKey;
+						cBuffer[2] = '\0';
+						if ( FoldStringA(MAP_PRECOMPOSED, (LPSTR) cBuffer, 3, (LPSTR) out, 3) )
+		   					keys[0] = out[0];
 					}
 					if ( !deadPollCount && ( GetKeyState( VK_MENU) < 0) && ( GetKeyState( VK_SHIFT) >= 0)) {
 						BYTE keys2[4];
@@ -821,11 +842,10 @@ AGAIN:
 						}
 					}
 					break;
-				case 2: { // dead key
-						lastDeadKey = keys[0];
-						keys[ 0] = 0;
-						   ev. key. mod |= kmDeadKey;
-					}
+				case 2: // dead key 
+					lastDeadKey = keys[0];
+					keys[ 0] = 0;
+						ev. key. mod |= kmDeadKey;
 					break;
 				case 0: // virtual key
 					if ( deadPollCount == 0) {
@@ -876,10 +896,10 @@ AGAIN:
 		break;
 	case WM_KILLFOCUS:
 		if (( HWND) mp1 != win) {
-		ev. cmd = cmReleaseFocus;
-		hiStage = true;
-		apt_assign( aptFocused, 0);
-		DestroyCaret();
+			ev. cmd = cmReleaseFocus;
+			hiStage = true;
+			apt_assign( aptFocused, 0);
+			DestroyCaret();
 		}
 		break;
 	case WM_LBUTTONDOWN:
@@ -985,83 +1005,79 @@ AGAIN:
 		ev. pos. where. y = sys lastSize. y - (short)HIWORD( mp2) - 1;
 	MB_MAIN_NOPOS:
 		ev. pos. mod      = 0 |
-		(( mp1 & MK_CONTROL ) ? kmCtrl   : 0) |
-		(( mp1 & MK_SHIFT   ) ? kmShift  : 0) |
-		(( GetKeyState( VK_MENU) < 0) ? kmAlt : 0) |
-		apc_pointer_get_state(self)
+			(( mp1 & MK_CONTROL )         ? kmCtrl   : 0) |
+			(( mp1 & MK_SHIFT   )         ? kmShift  : 0) |
+			(( GetKeyState( VK_MENU) < 0) ? kmAlt    : 0) |
+			apc_pointer_get_state(self)
 		;
 		break;
-	case WM_MEASUREITEM:
-		{
-			MEASUREITEMSTRUCT *mis = (MEASUREITEMSTRUCT*) mp2;
-			if ( mis-> CtlType == ODT_MENU && mis-> itemData != 0) {
-				ev.cmd     = cmMenuItemMeasure;
-				self = (Handle) mis-> itemData;
-				v = (PWidget) self;
-				ev.gen.i   = (Handle) mis-> itemID - MENU_ID_AUTOSTART;
-				ev.gen.P.x = ev.gen.P.y = 0;
-			}
+	case WM_MEASUREITEM: {
+		MEASUREITEMSTRUCT *mis = (MEASUREITEMSTRUCT*) mp2;
+		if ( mis-> CtlType == ODT_MENU && mis-> itemData != 0) {
+			ev.cmd     = cmMenuItemMeasure;
+			self = (Handle) mis-> itemData;
+			v = (PWidget) self;
+			ev.gen.i   = (Handle) mis-> itemID - MENU_ID_AUTOSTART;
+			ev.gen.P.x = ev.gen.P.y = 0;
 		}
 		break;
-	case WM_MENUCHAR:
-		{
-			int key;
-			PMenuWndData mwd;
-			ev. key. key    = ctx_remap_def( mp1, ctx_kb2VK2, false, kbNoKey);
-			ev. key. code   = LOWORD(mp1);
-			ev. key. mod   |=
-				(( GetKeyState( VK_SHIFT)   < 0) ? kmShift : 0) |
-				(( GetKeyState( VK_CONTROL) < 0) ? kmCtrl  : 0) |
-				(( GetKeyState( VK_MENU)    < 0) ? kmAlt   : 0);
-			if (( ev. key. mod & kmCtrl) && ( ev. key. code <= 'z'))
-				ev. key. code += 'A' - 1;
-			key = CAbstractMenu-> translate_key( nilHandle, ev. key. code, ev. key. key, ev. key. mod);
-			if ( v-> self-> process_accel( self, key))
-				return MAKELONG( 0, MNC_CLOSE);
+	}
+	case WM_MENUCHAR: {
+		int key;
+		PMenuWndData mwd;
+		ev. key. key    = ctx_remap_def( mp1, ctx_kb2VK2, false, kbNoKey);
+		ev. key. code   = LOWORD(mp1);
+		ev. key. mod   |=
+			(( GetKeyState( VK_SHIFT)   < 0) ? kmShift : 0) |
+			(( GetKeyState( VK_CONTROL) < 0) ? kmCtrl  : 0) |
+			(( GetKeyState( VK_MENU)    < 0) ? kmAlt   : 0);
+		if (( ev. key. mod & kmCtrl) && ( ev. key. code <= 'z'))
+			ev. key. code += 'A' - 1;
+		key = CAbstractMenu-> translate_key( nilHandle, ev. key. code, ev. key. key, ev. key. mod);
+		if ( v-> self-> process_accel( self, key))
+			return MAKELONG( 0, MNC_CLOSE);
 
-			ev.key.code = tolower(ev.key.code);
-			if (( mwd = (MenuWndData*) hash_fetch(menuMan, &mp2, sizeof(mp2))) != NULL) {
-				int pos = 0;
-				PMenuItemReg m = CAbstractMenu(mwd->menu)-> first_that(mwd->menu, (void*)id_match, &mwd->id, false);
-				while ( m != NULL ) {
-					if ( m-> flags.custom_draw && m-> text != NULL ) {
-						char * t = m-> text;
-						while (*t) {
-							if ( t[0] == '~' && tolower(t[1]) == ev.key.code )
-								return MAKELONG( pos, MNC_EXECUTE);
-							t++;
-						}
+		ev.key.code = tolower(ev.key.code);
+		if (( mwd = (MenuWndData*) hash_fetch(menuMan, &mp2, sizeof(mp2))) != NULL) {
+			int pos = 0;
+			PMenuItemReg m = CAbstractMenu(mwd->menu)-> first_that(mwd->menu, (void*)id_match, &mwd->id, false);
+			while ( m != NULL ) {
+				if ( m-> flags.custom_draw && m-> text != NULL ) {
+					char * t = m-> text;
+					while (*t) {
+						if ( t[0] == '~' && tolower(t[1]) == ev.key.code )
+							return MAKELONG( pos, MNC_EXECUTE);
+						t++;
 					}
-					m = m-> next;
-					pos++;
 				}
+				m = m-> next;
+				pos++;
 			}
 		}
 		break;
-	case WM_SYNCMOVE:
-		{
-			Handle parent = v-> self-> get_parent(( Handle) v);
-			if ( parent) {
-				Point pos  = var self-> get_origin( self);
-				ev. cmd    = cmMove;
-				ev. gen. P = pos;
-				if ( pos. x == var pos. x && pos. y == var pos. y) ev. cmd = 0;
-			}
+	}
+	case WM_SYNCMOVE: {
+		Handle parent = v-> self-> get_parent(( Handle) v);
+		if ( parent) {
+			Point pos  = var self-> get_origin( self);
+			ev. cmd    = cmMove;
+			ev. gen. P = pos;
+			if ( pos. x == var pos. x && pos. y == var pos. y) ev. cmd = 0;
 		}
 		break;
-	case WM_MOVE:
-		{
-			Handle parent = v-> self-> get_parent(( Handle) v);
-			if ( parent) {
-				Point sz = CWidget(parent)-> get_size( parent);
-				ev. cmd = cmMove;
-				ev. gen . P. x = ( short) LOWORD( mp2);
-				ev. gen . P. y = sz. y - ( short) HIWORD( mp2) - sys yOverride;
-				if ( is_apt( aptTransparent))
-					InvalidateRect( win, nil, false);
-			}
+	}
+	case WM_MOVE: {
+		Handle parent = v-> self-> get_parent(( Handle) v);
+		if ( parent) {
+			Point sz = CWidget(parent)-> get_size( parent);
+			ev. cmd = cmMove;
+			ev. gen . P. x = ( short) LOWORD( mp2);
+			ev. gen . P. y = sz. y - ( short) HIWORD( mp2) - sys yOverride;
+			if ( is_apt( aptTransparent))
+				InvalidateRect( win, nil, false);
 		}
 		break;
+	}
 	case WM_NCHITTEST:
 		if ( guts. focSysDialog) return HTERROR;
 		// dlg protect code - protecting from user actions
@@ -1147,33 +1163,31 @@ AGAIN:
 		if ( sys sizeLockLevel == 0 && var stage <= csNormal)
 			var virtualSize = sys lastSize;
 		break;
-	case WM_WINDOWPOSCHANGING:
-		{
-			LPWINDOWPOS l = ( LPWINDOWPOS) mp2;
-			if ( sys className == WC_CUSTOM) {
-				if (( l-> flags & SWP_NOSIZE) == 0) {
-					ev. cmd = cmCalcBounds;
-					ev. gen. R. right = l-> cx;
-					ev. gen. R. top   = l-> cy;
-				}
-			}
-			if (( l-> flags & SWP_NOZORDER) == 0)
-				zorder_sync( self, win, l);
-		}
-		break;
-	case WM_WINDOWPOSCHANGED:
-		{
-			LPWINDOWPOS l = ( LPWINDOWPOS) mp2;
-			if (( l-> flags & SWP_NOZORDER) == 0)
-				PostMessage( win, WM_ZORDERSYNC, 0, 0);
+	case WM_WINDOWPOSCHANGING: {
+		LPWINDOWPOS l = ( LPWINDOWPOS) mp2;
+		if ( sys className == WC_CUSTOM) {
 			if (( l-> flags & SWP_NOSIZE) == 0) {
-				sys yOverride = l-> cy;
-				SendMessage( win, WM_SYNCMOVE, 0, 0);
+				ev. cmd = cmCalcBounds;
+				ev. gen. R. right = l-> cx;
+				ev. gen. R. top   = l-> cy;
 			}
-			if ( l-> flags & SWP_HIDEWINDOW) SendMessage( win, WM_SETVISIBLE, 0, 0);
-			if ( l-> flags & SWP_SHOWWINDOW) SendMessage( win, WM_SETVISIBLE, 1, 0);
 		}
+		if (( l-> flags & SWP_NOZORDER) == 0)
+			zorder_sync( self, win, l);
 		break;
+	}
+	case WM_WINDOWPOSCHANGED: {
+		LPWINDOWPOS l = ( LPWINDOWPOS) mp2;
+		if (( l-> flags & SWP_NOZORDER) == 0)
+			PostMessage( win, WM_ZORDERSYNC, 0, 0);
+		if (( l-> flags & SWP_NOSIZE) == 0) {
+			sys yOverride = l-> cy;
+			SendMessage( win, WM_SYNCMOVE, 0, 0);
+		}
+		if ( l-> flags & SWP_HIDEWINDOW) SendMessage( win, WM_SETVISIBLE, 0, 0);
+		if ( l-> flags & SWP_SHOWWINDOW) SendMessage( win, WM_SETVISIBLE, 1, 0);
+		break;
+	}
 	case WM_ZORDERSYNC:
 		ev. cmd = cmZOrderChanged;
 		break;
@@ -1190,13 +1204,12 @@ AGAIN:
 	if ( v-> stage > csNormal) orgMsg = 0; // protect us from dead body
 
 	switch ( orgMsg) {
-	case WM_DRAWITEM:
-		{
-			DRAWITEMSTRUCT *dis = (DRAWITEMSTRUCT*) mp2;
-			if ( dis-> CtlType == ODT_MENU && dis-> itemData != 0)
-				return (LRESULT) 1;
-		}
+	case WM_DRAWITEM: {
+		DRAWITEMSTRUCT *dis = (DRAWITEMSTRUCT*) mp2;
+		if ( dis-> CtlType == ODT_MENU && dis-> itemData != 0)
+			return (LRESULT) 1;
 		break;
+	}
 	case WM_DESTROY:
 		v-> handle = nilHandle;       // tell apc not to kill this HWND
 		SetWindowLongPtr( win, GWLP_USERDATA, 0);
@@ -1211,37 +1224,35 @@ AGAIN:
 	case WM_SYSKEYUP:
 		// ev. cmd = 1; // forced call DefWindowProc superseded for test reasons
 		break;
-	case WM_MEASUREITEM:
-		{
-			MEASUREITEMSTRUCT *mis = (MEASUREITEMSTRUCT*) mp2;
-			if ( mis-> CtlType == ODT_MENU && mis-> itemData != 0) {
-				mis-> itemWidth  = ev.gen.P.x;
-				mis-> itemHeight = ev.gen.P.y;
-				return (LRESULT) 1;
-			}
+	case WM_MEASUREITEM: {
+		MEASUREITEMSTRUCT *mis = (MEASUREITEMSTRUCT*) mp2;
+		if ( mis-> CtlType == ODT_MENU && mis-> itemData != 0) {
+			mis-> itemWidth  = ev.gen.P.x;
+			mis-> itemHeight = ev.gen.P.y;
+			return (LRESULT) 1;
 		}
 		break;
+	}
 	case WM_MOUSEMOVE:
 		if ( is_apt( aptEnabled)) SetCursor( sys pointer);
 		break;
 	case WM_MOUSEWHEEL:
 		return ( LRESULT)1;
-	case WM_WINDOWPOSCHANGING:
-		{
-			LPWINDOWPOS l = ( LPWINDOWPOS) mp2;
-			if ( sys className == WC_CUSTOM) {
-				if (( l-> flags & SWP_NOSIZE) == 0) {
-					int dy = l-> cy - ev. gen. R. top;
-					l-> cx = ev. gen. R. right;
-					l-> cy = ev. gen. R. top;
-					l-> y += dy;
-				}
-				return false;
+	case WM_WINDOWPOSCHANGING: {
+		LPWINDOWPOS l = ( LPWINDOWPOS) mp2;
+		if ( sys className == WC_CUSTOM) {
+			if (( l-> flags & SWP_NOSIZE) == 0) {
+				int dy = l-> cy - ev. gen. R. top;
+				l-> cx = ev. gen. R. right;
+				l-> cy = ev. gen. R. top;
+				l-> y += dy;
 			}
-			if (( l-> flags & SWP_NOZORDER) == 0)
-				zorder_sync( self, win, l);
+			return false;
 		}
+		if (( l-> flags & SWP_NOZORDER) == 0)
+			zorder_sync( self, win, l);
 		break;
+	}
 	}
 
 	if ( ev. cmd && !hiStage)
@@ -1283,6 +1294,7 @@ LRESULT CALLBACK generic_frame_handler( HWND win, UINT  msg, WPARAM mp1, LPARAM 
 		hiStage = true;
 		break;
 	case WM_CLOSE:
+		if ( guts. focSysDialog) return 0;
 		ev. cmd = cmClose;
 		break;
 	case WM_COMMAND:
@@ -1377,48 +1389,45 @@ LRESULT CALLBACK generic_frame_handler( HWND win, UINT  msg, WPARAM mp1, LPARAM 
 			// else we do not select any widget, but still have a chance to resize frame :)
 		}
 		break;
-	case WM_SIZE:
-		{
-			int state = wsNormal;
-			Bool doWSChange = false;
-			if (( int) mp1 == SIZE_RESTORED) {
-				state = wsNormal;
-				if ( sys s. window. state != state) doWSChange = true;
-			} else if (( int) mp1 == SIZE_MAXIMIZED) {
-				state = wsMaximized;
-				doWSChange = true;
-			} else if (( int) mp1 == SIZE_MINIMIZED) {
-				state = wsMinimized;
-				doWSChange = true;
-			}
-			if ( doWSChange) {
-				ev. gen. i = sys s. window. state = state;
-				ev. cmd = cmWindowState;
-			}
+	case WM_SIZE: {
+		int state = wsNormal;
+		Bool doWSChange = false;
+		if (( int) mp1 == SIZE_RESTORED) {
+			state = wsNormal;
+			if ( sys s. window. state != state) doWSChange = true;
+		} else if (( int) mp1 == SIZE_MAXIMIZED) {
+			state = wsMaximized;
+			doWSChange = true;
+		} else if (( int) mp1 == SIZE_MINIMIZED) {
+			state = wsMinimized;
+			doWSChange = true;
+		}
+		if ( doWSChange) {
+			ev. gen. i = sys s. window. state = state;
+			ev. cmd = cmWindowState;
 		}
 		break;
-	case WM_SYNCMOVE:
-		{
-			Handle parent = v-> self-> get_parent(( Handle) v);
-			if ( parent) {
-				Point pos  = var self-> get_origin( self);
-				ev. cmd    = cmMove;
-				ev. gen. P = pos;
-				if ( pos. x == var pos. x && pos. y == var pos. y) ev. cmd = 0;
-			}
+	}
+	case WM_SYNCMOVE: {
+		Handle parent = v-> self-> get_parent(( Handle) v);
+		if ( parent) {
+			Point pos  = var self-> get_origin( self);
+			ev. cmd    = cmMove;
+			ev. gen. P = pos;
+			if ( pos. x == var pos. x && pos. y == var pos. y) ev. cmd = 0;
 		}
 		break;
-	case WM_MOVE:
-		{
-			Handle parent = v-> self-> get_parent(( Handle) v);
-			if ( parent) {
-				Point sz = CWidget(parent)-> get_size( parent);
-				ev. cmd = cmMove;
-				ev. gen . P. x = ( short) LOWORD( mp2);
-				ev. gen . P. y = sz. y - ( short) HIWORD( mp2) - sys yOverride;
-			}
+	}
+	case WM_MOVE: {
+		Handle parent = v-> self-> get_parent(( Handle) v);
+		if ( parent) {
+			Point sz = CWidget(parent)-> get_size( parent);
+			ev. cmd = cmMove;
+			ev. gen . P. x = ( short) LOWORD( mp2);
+			ev. gen . P. y = sz. y - ( short) HIWORD( mp2) - sys yOverride;
 		}
 		break;
+	}
 // case WM_SYSCHAR:return 1;
 	case WM_TIMER:
 		if ( mp1 == TID_USERMAX) {
@@ -1464,21 +1473,20 @@ LRESULT CALLBACK generic_frame_handler( HWND win, UINT  msg, WPARAM mp1, LPARAM 
 			}
 		}
 		break;
-	case WM_GETMINMAXINFO:
-		{
-			LPMINMAXINFO l = ( LPMINMAXINFO) mp2;
-			Point min = var self-> get_sizeMin( self);
-			Point max = var self-> get_sizeMax( self);
-			Point bor = get_window_borders( sys s. window. borderStyle);
-			int   dy  = 0 +
-				(( sys s. window. borderIcons & biTitleBar) ? GetSystemMetrics( SM_CYCAPTION) : 0) +
-				( PWindow(self)-> menu ? GetSystemMetrics( SM_CYMENU) : 0);
-			l-> ptMinTrackSize. x = min. x + bor.x * 2;
-			l-> ptMinTrackSize. y = min. y + bor.y * 2 + dy;
-			l-> ptMaxTrackSize. x = max. x + bor.x * 2;
-			l-> ptMaxTrackSize. y = max. y + bor.y * 2 + dy;
-		}
+	case WM_GETMINMAXINFO: {
+		LPMINMAXINFO l = ( LPMINMAXINFO) mp2;
+		Point min = var self-> get_sizeMin( self);
+		Point max = var self-> get_sizeMax( self);
+		Point bor = get_window_borders( sys s. window. borderStyle);
+		int   dy  = 0 +
+			(( sys s. window. borderIcons & biTitleBar) ? GetSystemMetrics( SM_CYCAPTION) : 0) +
+			( PWindow(self)-> menu ? GetSystemMetrics( SM_CYMENU) : 0);
+		l-> ptMinTrackSize. x = min. x + bor.x * 2;
+		l-> ptMinTrackSize. y = min. y + bor.y * 2 + dy;
+		l-> ptMaxTrackSize. x = max. x + bor.x * 2;
+		l-> ptMaxTrackSize. y = max. y + bor.y * 2 + dy;
 		break;
+	}
 	case WM_WINDOWPOSCHANGED:
 		if ( !is_apt(aptIgnoreSizeMessages)) {
 			LPWINDOWPOS l = ( LPWINDOWPOS) mp2;
@@ -1580,44 +1588,43 @@ LRESULT CALLBACK layered_frame_handler( HWND win, UINT  msg, WPARAM mp1, LPARAM 
 		update_layered_frame(self);
 		return DefWindowProcW( win, msg, mp1, mp2);
 
-	case WM_WINDOWPOSCHANGED:
-		{
-			LPWINDOWPOS l = ( LPWINDOWPOS) mp2;
-			Bool updated = false;
+	case WM_WINDOWPOSCHANGED: {
+		LPWINDOWPOS l = ( LPWINDOWPOS) mp2;
+		Bool updated = false;
 
-			if (( l-> flags & SWP_NOSIZE) == 0) {
-				RECT r;
+		if (( l-> flags & SWP_NOSIZE) == 0) {
+			RECT r;
+			update_layered_frame(self);
+			updated = true;
+
+			GetClientRect( win, &r);
+			sys yOverride = r. bottom - r. top;
+			SendMessage( win, WM_SYNCMOVE, 0, 0);
+		}
+		if (( l-> flags & SWP_NOMOVE) == 0) {
+			if ( !updated ) {
 				update_layered_frame(self);
 				updated = true;
-
-				GetClientRect( win, &r);
-				sys yOverride = r. bottom - r. top;
-				SendMessage( win, WM_SYNCMOVE, 0, 0);
-			}
-			if (( l-> flags & SWP_NOMOVE) == 0) {
-				if ( !updated ) {
-					update_layered_frame(self);
-					updated = true;
-				}
-			}
-			if (( l-> flags & SWP_NOZORDER) == 0) {
-				PostMessage( win, WM_ZORDERSYNC, 0, 0);
-				if ( !updated ) {
-					update_layered_frame(self);
-					updated = true;
-				}
-			}
-			if ( l-> flags & SWP_HIDEWINDOW) {
-				ShowWindow((HWND) var handle, SW_HIDE);
-				SendMessage( win, WM_SETVISIBLE, 0, 0);
-			}
-			if ( l-> flags & SWP_SHOWWINDOW) {
-				ShowWindow((HWND) var handle, SW_SHOW);
-				SendMessage( win, WM_SETVISIBLE, 1, 0);
 			}
 		}
-
+		if (( l-> flags & SWP_NOZORDER) == 0) {
+			PostMessage( win, WM_ZORDERSYNC, 0, 0);
+			if ( !updated ) {
+				update_layered_frame(self);
+				updated = true;
+			}
+		}
+		if ( l-> flags & SWP_HIDEWINDOW) {
+			ShowWindow((HWND) var handle, SW_HIDE);
+			SendMessage( win, WM_SETVISIBLE, 0, 0);
+		}
+		if ( l-> flags & SWP_SHOWWINDOW) {
+			ShowWindow((HWND) var handle, SW_SHOW);
+			SendMessage( win, WM_SETVISIBLE, 1, 0);
+		}
 		return DefWindowProcW( win, msg, mp1, mp2);
+	}
+
 	}
 
 	return generic_frame_handler( win, msg, mp1, mp2 );
@@ -1635,44 +1642,42 @@ static Bool kill_img_cache( Handle self, int keyLen, void * key, void * killDBM)
 LRESULT CALLBACK generic_app_handler( HWND win, UINT  msg, WPARAM mp1, LPARAM mp2)
 {
 	switch ( msg) {
-		case WM_DISPLAYCHANGE:
-			{
-				HDC dc = dc_alloc();
-				int oldBPP = guts. displayBMInfo. bmiHeader. biBitCount;
-				HBITMAP hbm;
+		case WM_DISPLAYCHANGE: {
+			HDC dc = dc_alloc();
+			int oldBPP = guts. displayBMInfo. bmiHeader. biBitCount;
+			HBITMAP hbm;
 
-				if ( dc) {
-					guts. displayBMInfo. bmiHeader. biBitCount = 0;
-					guts. displayBMInfo. bmiHeader. biSize = sizeof( BITMAPINFO);
-					if ( !( hbm = GetCurrentObject( dc, OBJ_BITMAP))) apiErr;
+			if ( dc) {
+				guts. displayBMInfo. bmiHeader. biBitCount = 0;
+				guts. displayBMInfo. bmiHeader. biSize = sizeof( BITMAPINFO);
+				if ( !( hbm = GetCurrentObject( dc, OBJ_BITMAP))) apiErr;
 
-					if ( !GetDIBits( dc, hbm, 0, 0, NULL, &guts. displayBMInfo, DIB_PAL_COLORS)) {
-						guts. displayBMInfo. bmiHeader. biBitCount = ( int) mp1;
-						guts. displayBMInfo. bmiHeader. biPlanes   = GetDeviceCaps( dc, PLANES);
-					};
-				}
-				dsys( application) lastSize. x = ( short) LOWORD( mp2);
-				dsys( application) lastSize. y = ( short) HIWORD( mp2);
-				if ( dc) {
-					if ( oldBPP != guts. displayBMInfo. bmiHeader. biBitCount)
-						hash_first_that( imageMan, kill_img_cache, (void*)1, nil, nil);
-					dc_free();
-				}
+				if ( !GetDIBits( dc, hbm, 0, 0, NULL, &guts. displayBMInfo, DIB_PAL_COLORS)) {
+					guts. displayBMInfo. bmiHeader. biBitCount = ( int) mp1;
+					guts. displayBMInfo. bmiHeader. biPlanes   = GetDeviceCaps( dc, PLANES);
+				};
+			}
+			dsys( application) lastSize. x = ( short) LOWORD( mp2);
+			dsys( application) lastSize. y = ( short) HIWORD( mp2);
+			if ( dc) {
+				if ( oldBPP != guts. displayBMInfo. bmiHeader. biBitCount)
+					hash_first_that( imageMan, kill_img_cache, (void*)1, nil, nil);
+				dc_free();
 			}
 			break;
+		}
 		case WM_FONTCHANGE:
 			destroy_font_hash();
 			break;
-		case WM_DPICHANGED:
-			{
-				Event ev = {cmFontChanged};
-				dpi_change();
-				reset_system_fonts();
-				destroy_font_hash();
-				font_clean();
-				PComponent(application)-> self-> message( application, &ev);
-			}
+		case WM_DPICHANGED: {
+			Event ev = {cmFontChanged};
+			dpi_change();
+			reset_system_fonts();
+			destroy_font_hash();
+			font_clean();
+			PComponent(application)-> self-> message( application, &ev);
 			break;
+		}
 		case WM_COMPACTING:
 			stylus_clean();
 			font_clean();

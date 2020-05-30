@@ -1,11 +1,11 @@
-# $Id: Search.pm 79 2019-01-30 02:35:31Z stro $
+# $Id: Search.pm 82 2020-05-30 06:14:27Z stro $
 
 package CPAN::SQLite::Search;
 use strict;
 use warnings;
 no warnings qw(redefine);
 
-our $VERSION = '0.217';
+our $VERSION = '0.218';
 
 use English qw/-no_match_vars/;
 
@@ -276,7 +276,7 @@ CPAN::SQLite::Search - perform queries on the database
 
 =head1 VERSION
 
-version 0.217
+version 0.218
 
 =head1 SYNOPSIS
 

@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-MoreUtil
   homepage: https://metacpan.org/release/File-MoreUtil
   repository: git://github.com/perlancar/perl-SHARYANTO-File-Util.git
-version: '0.623'
+version: '0.624'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

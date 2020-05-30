@@ -15,9 +15,9 @@ sub UNITCHECK {				## restore %SIG after compilation
 package Net::DNS::RR::SIG;
 
 #
-# $Id: SIG.pm 1754 2019-08-19 14:12:28Z willem $
+# $Id: SIG.pm 1779 2020-05-11 09:11:17Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1754 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1779 $)[1];
 
 
 use strict;
@@ -806,9 +806,7 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl>, L<Net::DNS>, L<Net::DNS::RR>, L<Net::DNS::SEC>,
-RFC4034, RFC3755, RFC2535, RFC2931, RFC3110, RFC3008,
-L<Net::DNS::SEC::DSA>,
-L<Net::DNS::SEC::RSA>
+RFC4034, RFC3755, RFC3008, RFC2931, RFC2535
 
 L<Algorithm Numbers|http://www.iana.org/assignments/dns-sec-alg-numbers>
 

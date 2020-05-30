@@ -1,5 +1,4 @@
 Changes
-header-settings.json
 lib/Net/API/Stripe.pm
 lib/Net/API/Stripe.pod
 lib/Net/API/Stripe/Address.pm

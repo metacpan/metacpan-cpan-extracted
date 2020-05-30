@@ -1,9 +1,9 @@
 package Data::Sah::Filter::perl::Str::replace_map;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-11'; # DATE
+our $DATE = '2020-05-30'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -58,7 +58,7 @@ Data::Sah::Filter::perl::Str::replace_map - Replace (map) some values with (to) 
 
 =head1 VERSION
 
-This document describes version 0.004 of Data::Sah::Filter::perl::Str::replace_map (from Perl distribution Data-Sah-Filter), released on 2020-02-11.
+This document describes version 0.005 of Data::Sah::Filter::perl::Str::replace_map (from Perl distribution Data-Sah-Filter), released on 2020-05-30.
 
 =head1 SYNOPSIS
 

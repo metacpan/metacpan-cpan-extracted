@@ -3,7 +3,7 @@
 #  libzvbi test
 #
 #  Copyright (C) 2000, 2001 Michael H. Schimek
-#  Perl Port: Copyright (C) 2007 Tom Zoerner
+#  Perl Port: Copyright (C) 2007, 2020 Tom Zoerner
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -20,12 +20,21 @@
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-# Perl $Id: caption.pl,v 1.1 2007/11/18 18:48:35 tom Exp tom $
-# ZVBI #Id: caption.c,v 1.14 2006/05/22 08:57:05 mschimek Exp #
-
 #
-#  Rudimentary render code for Closed Caption (CC) test.
+# Description:
 #
+#   Example for the use of class Video::ZVBI::vt, type VBI_EVENT_CAPTION.
+#   When called without an input stream, the application opens a GUI displaying
+#   a demo messages sequente (character sets etc.) for debugging the decoder.
+#   For displaying live CC streams use the following:
+#
+#      ./capture.pl --sliced | ./caption.pl
+#
+#   The buttons on top of the GUI switch between Closed Caption channels 1-4
+#   and Text channels 1-4.
+#
+#   (This script is a translation of test/caption.c in the libzvbi package,
+#   albeit based on Perl-Tk here.)
 
 use blib;
 use strict;
@@ -310,14 +319,17 @@ sub pes_mainloop {
 
         while (read (STDIN, $buffer, 2048)) {
                 my $bytes_left = length($buffer);
+                my $found = 0;
 
                 while ($bytes_left > 0) {
 
                         $n_lines = $dx->cor ($sliced, 64, $pts, $buffer, $bytes_left);
                         if ($n_lines > 0) {
                                 $vbi->decode ($sliced, $n_lines, $pts / 90000.0);
+                                $found += $n_lines
                         }
                 }
+                warn "No VBI data in PES input stream\n" if $found == 0;
 
                 $tk->after(20, \&pes_mainloop);
                 return;
@@ -330,23 +342,30 @@ sub old_mainloop {
         my $timestamp;
         my $n_lines;
 
-        # one one frame's worth of sliced data from the input stream or file
-        ($n_lines, $timestamp, $sliced) = read_sliced ();
-        if (defined $n_lines) {
-                my $buf = "";
-                my $set;
-                # pack the read data into the normal slicer output format
-                # (i.e. the format delivered by the librarie's internal slicer)
-                foreach $set (@$sliced) {
-                        $buf .= pack "LLa56", @$set;
-                }
-                # pass the full frame's data to the decoder
-                $vbi->decode ($buf, $n_lines, $timestamp);
+        # avoid blocking in read when no data available: keep Tk mainloop alive
+        my $rin = '';
+        vec($rin, fileno($infile), 1) = 1;
+        if (select($rin, undef, undef, 0) > 0) {
+                # one one frame's worth of sliced data from the input stream or file
+                ($n_lines, $timestamp, $sliced) = read_sliced ();
+                if (defined $n_lines) {
+                        my $buf = "";
+                        my $set;
+                        # pack the read data into the normal slicer output format
+                        # (i.e. the format delivered by the librarie's internal slicer)
+                        foreach $set (@$sliced) {
+                                $buf .= pack "LLa56", @$set;
+                        }
+                        # pass the full frame's data to the decoder
+                        $vbi->decode ($buf, $n_lines, $timestamp);
 
-                # FIXME: reading from STDIN, so $tk->fileevent(readable) could be used instead of polling
-                $tk->after(20, \&old_mainloop);
+                        # FIXME: reading from STDIN, so $tk->fileevent(readable) could be used instead of polling
+                        $tk->after(20, \&old_mainloop);
+                } else {
+                        print STDERR "\rEnd of stream\n";
+                }
         } else {
-                print STDERR "\rEnd of stream\n";
+                $tk->after(20, \&old_mainloop);
         }
 }
 
@@ -666,6 +685,7 @@ sub main_func {
 
         if (-t STDIN) {
                 # no file or stream on STDIN -> generate demo data
+                print STDERR "No input provided via STDIN - playing back demo sequence\n";
                 hello_world ();
                 # start play back of the demo data (timer-based, to give control to the main loop below)
                 play_world ();
@@ -675,6 +695,7 @@ sub main_func {
                 $infile = new IO::Handle;
                 $infile->fdopen(fileno(STDIN), "r");
 
+                # FIXME blocks forever if input stalls
                 my $c = ord($infile->getc() || 1);
                 $infile->ungetc($c);
 
@@ -689,9 +710,8 @@ sub main_func {
                 }
         }
 
-        # everything from here on is event driven
-        MainLoop;
+        # everything from here on is driven by Tk event handling
+        MainLoop ();
 }
 
 main_func();
-

@@ -1,0 +1,39 @@
+---
+abstract: 'Mojo::Date, but in my timezone and with custom formats'
+author:
+  - 'Brian Wisti <brianwisti@pobox.com>'
+build_requires:
+  Test::More: '1.302175'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MojoX-Date-Local
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MojoX::Date::Local:
+    file: lib/MojoX/Date/Local.pm
+    version: '0.04'
+requires:
+  Mojolicious: '8.50'
+resources:
+  bugtracker: https://github.com/brianwisti/MojoX-Date-Local/issues
+  homepage: https://github.com/brianwisti/MojoX-Date-Local
+  repository: git://github.com/brianwisti/MojoX-Date-Local.git
+version: '0.04'
+x_authority: cpan:BWISTI
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

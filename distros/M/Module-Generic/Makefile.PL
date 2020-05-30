@@ -52,9 +52,9 @@ WriteMakefile(
                 web         => 'https://git.deguest.jp/jack/Module-Generic',
                 type        => 'git',
             },
-        #    bugtracker => {
-        #        web         => undef,
-        #    },
+            bugtracker => {
+                web         => 'https://rt.cpan.org/NoAuth/Bugs.html?Dist=Module::Generic',
+            },
         },
     })),
 );

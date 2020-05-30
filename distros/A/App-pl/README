@@ -28,8 +28,16 @@ Count hits in magic statistics hash "%n(umber)":
 
     pl -n '++$n{$1} while /(Perl|one|liner)/g' file1 file2 file3
 
-Even though the point here is to make things even easier, most Perl one-liners
-from the internet work, just by omitting "-e" or "-E".  A few differences are:
-don't "goto LINE", but "next LINE" is fine.  In "-n" "last" goes straight to
-the next file instead of being like "exit".  And shenanigans with unbalanced
-braces won't work.
+Though they are sometimes slightly, sometimes quite a bit more complicated,
+most Perl one-liners from the internet work, just by omitting "-e" or "-E".
+Known minor differences are:
+
+* don't "goto LINE", but "next LINE" is fine
+
+* in a "-n" loop "last" goes straight to the next file instead of behaving like
+"exit"
+
+* using "pop", etc. to implicitly modify "@A(RGV)" works in "-b" begin code,
+but not in your main program (which gets compiled to a function)
+
+* shenanigans with unbalanced braces won't work

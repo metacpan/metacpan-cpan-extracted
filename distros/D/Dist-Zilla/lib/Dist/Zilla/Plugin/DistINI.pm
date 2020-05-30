@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::DistINI 6.014;
+package Dist::Zilla::Plugin::DistINI 6.015;
 # ABSTRACT: a plugin to add a dist.ini to newly-minted dists
 
 use Moose;
@@ -116,7 +116,7 @@ Dist::Zilla::Plugin::DistINI - a plugin to add a dist.ini to newly-minted dists
 
 =head1 VERSION
 
-version 6.014
+version 6.015
 
 =head1 DESCRIPTION
 

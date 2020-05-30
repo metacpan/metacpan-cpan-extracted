@@ -1,9 +1,9 @@
 package Data::Sah::Filter::perl::Str::trim;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-11'; # DATE
+our $DATE = '2020-05-30'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -45,7 +45,7 @@ Data::Sah::Filter::perl::Str::trim - Trim whitespaces at the beginning and end o
 
 =head1 VERSION
 
-This document describes version 0.004 of Data::Sah::Filter::perl::Str::trim (from Perl distribution Data-Sah-Filter), released on 2020-02-11.
+This document describes version 0.005 of Data::Sah::Filter::perl::Str::trim (from Perl distribution Data-Sah-Filter), released on 2020-05-30.
 
 =head1 SYNOPSIS
 

@@ -35,7 +35,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-Ngram
   repository: https://github.com/ology/MIDI-Ngram.git
-version: '0.1501'
+version: '0.1600'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -222,6 +222,14 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: suggests
+      name: Suggests
       version: '6.014'
     -
       class: Dist::Zilla::Plugin::GatherDir

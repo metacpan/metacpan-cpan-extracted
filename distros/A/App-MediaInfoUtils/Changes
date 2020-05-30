@@ -1,0 +1,76 @@
+0.128   2020-05-30  Released-By: PERLANCAR; Urgency: medium
+
+	- [cli media-summary-by-type] Show total of ALL, audio+image+video,
+	  and image+video files.
+
+
+0.127   2020-05-30  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename distro App-MediaInfo -> App-MediaInfoUtils to reflect the fact
+	  that this distro now contains several CLI's instead of just
+	  'media-info'.
+
+        - Add utility: media-summary-by-type.
+
+
+0.126   2020-05-30  Released-By: PERLANCAR; Urgency: high
+
+        - Merge 0.125 and 0.125.1.
+
+
+0.125.1 2020-05-30  Released-By: PERLANCAR; Urgency: medium
+
+	- Return 'info_backend' and 'type_from_name' fields.
+
+        - UPDATE: renamed to 0.125.1 due to clash.
+
+
+0.125   2020-04-29  Released-By: PERLANCAR; Urgency: medium; Released: no
+
+	- Tweak Rinci metadata: replace deprecated
+	  x.schema.{,element_}entity with more specific schema.
+
+
+0.124   2019-08-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Use Perinci::Exporter.
+
+
+0.123   2019-06-09  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- Tweak module Summary again.
+
+
+0.122   2019-06-09  Released-By: PERLANCAR
+
+	- Add examples for media-is-{landscape,portrait}.
+
+	- [ux] Revert previous change, now uses --quiet (-q) a la grep to
+	  be silent.
+
+	- Fix module Summary.
+
+
+0.121   2019-06-09  Released-By: PERLANCAR
+
+	- [ux] media-is-{portrait,landscape}: Show human-friendly message
+	  when run interactively.
+
+
+0.120   2019-01-28  Released-By: PERLANCAR
+
+	- Add utilities: media-is-landscape, media-is-portrait,
+	  media-orientation.
+
+
+0.11    2016-04-06  Released-By: PERLANCAR
+
+	- [Bugfix] Fix broken CLI (Riap URL was not updated).
+
+
+0.10    2016-04-06  Released-By: PERLANCAR
+
+	- First release, split from Media-Info to reduce dependencies of
+          Media-Info.

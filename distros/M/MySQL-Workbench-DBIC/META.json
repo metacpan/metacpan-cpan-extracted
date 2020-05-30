@@ -41,6 +41,7 @@
       },
       "test" : {
          "requires" : {
+            "Capture::Tiny" : "0",
             "File::Copy" : "0",
             "File::Path" : "2.0",
             "FindBin" : "0",
@@ -52,11 +53,11 @@
    "provides" : {
       "MySQL::Workbench::DBIC" : {
          "file" : "lib/MySQL/Workbench/DBIC.pm",
-         "version" : "1.16"
+         "version" : "1.17"
       },
       "MySQL::Workbench::DBIC::FakeDBIC" : {
          "file" : "lib/MySQL/Workbench/DBIC/FakeDBIC.pm",
-         "version" : "1.16"
+         "version" : "1.17"
       }
    },
    "release_status" : "stable",
@@ -71,7 +72,7 @@
          "web" : "http://github.com/reneeb/MySQL-Workbench-DBIC"
       }
    },
-   "version" : "1.16",
+   "version" : "1.17",
    "x_contributors" : [
       "Mario Minati <mario.minati@minati.de>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",

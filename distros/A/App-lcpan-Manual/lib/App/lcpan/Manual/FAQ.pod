@@ -20,11 +20,16 @@ App::lcpan::Manual::FAQ - FAQ on App::lcpan
 
 =head1 VERSION
 
-version 1.057.000
+version 1.058.000
 
 =head1 DESCRIPTION
 
-TODO. Some FAQ are already listed in L<lcpan>.
+Some FAQs are already listed in L<lcpan>, they will be moved here. Newer FAQs go
+here.
+
+=head1 FAQ
+
+=head2 General
 
 =head1 SEE ALSO
 

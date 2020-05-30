@@ -886,6 +886,8 @@ MB(Information)
 MB(Question)
 #define mbNoSound       0x1000
 MB(NoSound)
+#define mbChangeAll     0xCA11
+MB(ChangeAll)
 END_TABLE(mb,UV)
 #undef MB
 #undef MB2
@@ -1500,10 +1502,24 @@ list_index_of( PList self, Handle item);
 
 /* utf8 */
 extern int
-prima_utf8_length( const char * utf8);
+prima_utf8_length( const char * utf8, int length);
 
 extern Bool
 prima_is_utf8_sv( SV * sv);
+
+extern SV*
+prima_svpv_utf8( const char *text, int is_utf8);
+
+#if PERL_PATCHLEVEL >= 16
+#define prima_utf8_uvchr(_text, _textlen, _charlen) \
+	utf8_to_uvchr_buf(( U8*)(_text), (U8*)(_text) + (_textlen), _charlen)
+#define prima_utf8_uvchr_end(_text, _end, _charlen) \
+	utf8_to_uvchr_buf(( U8*)(_text), (U8*)(_end), _charlen)
+#else
+#define prima_utf8_uvchr(_text, _textlen, _charlen) \
+	utf8_to_uvchr(( U8*)(_text), _charlen)
+#define prima_utf8_uvchr_end prima_utf8_uvchr
+#endif
 
 extern SV *
 prima_array_new( size_t size);
@@ -1521,6 +1537,9 @@ prima_array_parse( SV * sv, void ** ref, size_t * length, char ** letter);
 
 extern Bool
 prima_read_point( SV *rv_av, int * pt, int number, char * error);
+
+extern void *
+prima_read_array( SV * points, char * procName, char type, int div, int min, int max, int * n_points, Bool * do_free);
 
 /* OS types */
 #define APC(const_name) CONSTANT(apc,const_name)
@@ -1569,47 +1588,45 @@ DT(CDROM)
 #define dtMemory                6
 DT(Memory)
 
-#define dtLeft                     0x0000
+#define dtLeft                     0x00000
 DT(Left)
-#define dtRight                    0x0001
+#define dtRight                    0x00001
 DT(Right)
-#define dtCenter                   0x0002
+#define dtCenter                   0x00002
 DT(Center)
-#define dtTop                      0x0000
+#define dtTop                      0x00000
 DT(Top)
-#define dtBottom                   0x0004
+#define dtBottom                   0x00004
 DT(Bottom)
-#define dtVCenter                  0x0008
+#define dtVCenter                  0x00008
 DT(VCenter)
-#define dtDrawMnemonic             0x0010
+#define dtDrawMnemonic             0x00010
 DT(DrawMnemonic)
-#define dtDrawSingleChar           0x0020
+#define dtDrawSingleChar           0x00020
 DT(DrawSingleChar)
-#define dtDrawPartial              0x0040
+#define dtDrawPartial              0x00040
 DT(DrawPartial)
-#define dtNewLineBreak             0x0080
+#define dtNewLineBreak             0x00080
 DT(NewLineBreak)
-#define dtSpaceBreak               0x0100
+#define dtSpaceBreak               0x00100
 DT(SpaceBreak)
-#define dtWordBreak                0x0200
+#define dtWordBreak                0x00200
 DT(WordBreak)
-#define dtExpandTabs               0x0400
+#define dtExpandTabs               0x00400
 DT(ExpandTabs)
-#define dtUseExternalLeading       0x0800
+#define dtUseExternalLeading       0x00800
 DT(UseExternalLeading)
-#define dtUseClip                  0x1000
+#define dtUseClip                  0x01000
 DT(UseClip)
-#define dtQueryHeight              0x2000
+#define dtQueryHeight              0x02000
 DT(QueryHeight)
-#define dtQueryLinesDrawn          0x0000
+#define dtQueryLinesDrawn          0x00000
 DT(QueryLinesDrawn)
-#define dtNoWordWrap               0x4000
+#define dtNoWordWrap               0x04000
 DT(NoWordWrap)
-#define dtWordWrap                 0x0000
+#define dtWordWrap                 0x00000
 DT(WordWrap)
-#define dtBidiText                 0x8000
-DT(BidiText)
-#define dtDefault                  (dtNewLineBreak|dtWordBreak|dtExpandTabs|dtUseExternalLeading|dtBidiText)
+#define dtDefault                  (dtNewLineBreak|dtWordBreak|dtExpandTabs|dtUseExternalLeading)
 DT(Default)
 
 END_TABLE(dt,UV)
@@ -1900,6 +1917,8 @@ SV(DWM)
 SV(FixedPointerSize)
 #define   svMenuCheckSize   36
 SV(MenuCheckSize)
+#define   svFriBidi         37
+SV(FriBidi)
 END_TABLE(sv,UV)
 #undef SV
 
@@ -1944,7 +1963,7 @@ extern Bool
 apc_application_get_bitmap( Handle self, Handle image, int x, int y, int xLen, int yLen);
 
 extern int
-apc_application_get_gui_info( char * description, int len);
+apc_application_get_gui_info( char * description, int len1, char * language, int len2);
 
 extern Handle
 apc_application_get_widget_from_point( Handle self, Point point);
@@ -2976,10 +2995,6 @@ FW(UltraBold)
 END_TABLE(fw,UV)
 #undef FW
 
-#define FONT_UTF8_NAME           0x001
-#define FONT_UTF8_FAMILY         0x002
-#define FONT_UTF8_ENCODING       0x004
-
 #define IM(const_name) CONSTANT(im,const_name)
 START_TABLE(im,UV)
 #define    imNone                0
@@ -3393,6 +3408,7 @@ typedef struct _TextWrapRec {
 	int    t_start;                     /* ~ starting point */
 	int    t_end;                       /* ~ ending point */
 	int    t_line;                      /* ~ line */
+	int    t_pos;                       /* ~ offset in t_line */
 	char * t_char;                      /* letter next to ~ */
 
 	PFontABC * ascii;                   /* eventual abc caches, to be freed after call. */
@@ -3579,8 +3595,51 @@ apc_gp_stretch_image( Handle self, Handle image,
 	int xDestLen, int yDestLen, int xLen, int yLen,
 	int rop);
 
+#define TO(const_name) CONSTANT(to,const_name)
+START_TABLE(to,UV)
+#define toPlain          0x0000
+TO(Plain)
+#define toAddOverhangs   0x0001
+TO(AddOverhangs)
+#define toGlyphs         0x0002
+TO(Glyphs)
+#define toUTF8           0x0004
+#define toUnicode        0x0004
+TO(Unicode)
+#define toRTL            0x8000
+TO(RTL)
+#define toPitch          8
+END_TABLE(to,UV)
+#undef TO
+
+typedef struct {
+	char     *language;
+	uint32_t *text;
+	int len, flags;
+	Byte     *analysis;
+	uint16_t *v2l;
+
+	unsigned int n_glyphs, n_glyphs_max;
+	uint16_t *glyphs, *indexes, *advances;
+	int16_t *positions;
+	uint16_t *fonts;
+} TextShapeRec, *PTextShapeRec;
+
+typedef Bool TextShapeFunc( Handle self, PTextShapeRec rec);
+typedef TextShapeFunc *PTextShapeFunc;
+
+typedef struct {
+	int len, flags, text_len;
+	uint16_t *glyphs, *indexes, *advances;
+	int16_t  *positions;
+	uint16_t *fonts;
+} GlyphsOutRec, *PGlyphsOutRec;
+
 extern Bool
-apc_gp_text_out( Handle self, const char * text, int x, int y, int len, Bool utf8);
+apc_gp_glyphs_out( Handle self, PGlyphsOutRec t, int x, int y);
+
+extern Bool
+apc_gp_text_out( Handle self, const char * text, int x, int y, int len, int flags);
 
 /* gpi settings */
 extern Color
@@ -3596,13 +3655,22 @@ extern Rect
 apc_gp_get_clip_rect( Handle self);
 
 extern PFontABC
-apc_gp_get_font_abc( Handle self, int firstChar, int lastChar, Bool unicode);
+apc_gp_get_font_abc( Handle self, int firstChar, int lastChar, int flags);
 
 extern PFontABC
-apc_gp_get_font_def( Handle self, int firstChar, int lastChar, Bool unicode);
+apc_gp_get_font_def( Handle self, int firstChar, int lastChar, int flags);
 
 extern unsigned long *
 apc_gp_get_font_ranges( Handle self, int * count);
+
+#define MAPPER_FLAGS_COMBINING_SUPPORTED 0x01
+#define MAPPER_FLAGS_SYNTHETIC_PITCH     0x02
+
+extern unsigned long *
+apc_gp_get_mapper_ranges(PFont font, int * count, unsigned int * flags);
+
+extern char *
+apc_gp_get_font_languages( Handle self);
 
 extern int
 apc_gp_get_fill_mode( Handle self);
@@ -3612,6 +3680,12 @@ apc_gp_get_fill_pattern( Handle self);
 
 extern Point
 apc_gp_get_fill_pattern_offset( Handle self);
+
+extern Point*
+apc_gp_get_glyphs_box( Handle self, PGlyphsOutRec text);
+
+extern int
+apc_gp_get_glyphs_width( Handle self, PGlyphsOutRec text);
 
 extern ApiHandle
 apc_gp_get_handle( Handle self);
@@ -3650,13 +3724,31 @@ extern int
 apc_gp_get_rop2( Handle self);
 
 extern Point*
-apc_gp_get_text_box( Handle self, const char * text, int len, Bool utf8);
+apc_gp_get_text_box( Handle self, const char * text, int len, int flags);
 
 extern Bool
 apc_gp_get_text_opaque( Handle self);
 
+#define TS(const_name) CONSTANT(ts,const_name)
+START_TABLE(ts,UV)
+#define tsNone      0
+TS(None)
+#define tsGlyphs    1
+TS(Glyphs)
+#define tsFull      2
+TS(Full)
+#define tsDefault   tsFull
+TS(Default)
+#define tsBytes     3
+TS(Bytes)
+END_TABLE(ts,UV)
+#undef TS
+
+extern PTextShapeFunc
+apc_gp_get_text_shaper( Handle self, int * type);
+
 extern int
-apc_gp_get_text_width( Handle self, const char * text, int len, Bool addOverhang, Bool utf8);
+apc_gp_get_text_width( Handle self, const char * text, int len, int flags);
 
 extern Bool
 apc_gp_get_text_out_baseline( Handle self);

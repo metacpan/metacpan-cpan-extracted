@@ -1,3 +1,21 @@
+0.126   2020-05-30  Released-By: PERLANCAR; Urgency: high
+
+        - Merge 0.125 and 0.125.1.
+
+
+0.125.1 2020-05-30  Released-By: PERLANCAR; Urgency: medium
+
+	- Return 'info_backend' and 'type_from_name' fields.
+
+        - UPDATE: renamed to 0.125.1 due to clash.
+
+
+0.125   2020-04-29  Released-By: PERLANCAR; Urgency: medium; Released: no
+
+	- Tweak Rinci metadata: replace deprecated
+	  x.schema.{,element_}entity with more specific schema.
+
+
 0.124   2019-08-15  Released-By: PERLANCAR; Urgency: medium
 
 	- Use Perinci::Exporter.

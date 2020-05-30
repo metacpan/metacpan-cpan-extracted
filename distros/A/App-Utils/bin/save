@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+# save - save this version of the file in saved.d directory
+# Vlado Keselj <vlado@dnlp.ca> 2020
+# 2020 Vlado Keselj http://web.cs.dal.ca/~vlado
+if ($#ARGV<0) { die "Usage: $0 files..."; }
+
+use POSIX;
+my $tag = strftime("%Y-%m-%d-%H%M%S", localtime(time));
+my $cnt=1;
+for my $f (@ARGV) {
+  die "Not a regular file: ($f)" unless -f $f;
+  my $d; my $fbase = $f;
+  if ($f =~ /\/([^\/]+)$/) { $d="$`/saved.d"; $fbase=$1; }
+  else { $d = "saved.d"; $fbase=$f; }
+  if (!-d $d) { mkdir $d, 0700 or die "can't mkdir $d: $!" }
+  my $fnew = "$d/$tag-$fbase";
+  if (-e $fnew) {
+    while (-e "$d/$tag-$cnt-$fbase") { die if ++$cnt > 1000 }
+    $fnew = "$d/$tag-$cnt-$fbase"; }
+  $|=1; print "cp $f -> $fnew\n"; system('cp','-a',$f,$fnew);
+}
+
+exit 0;
+__END__ # Documentation
+
+=head1 NAME
+
+save - save a snapshot of given files in C<saved.d> directory
+
+=head1 DESCRIPTION
+
+A command to save a snapshot of given files in C<saved.d> directory, taged
+with time and date of save.
+
+=head1 SYNOPSIS
+
+ $ save file1 file2...
+
+=head1 AUTHOR
+
+Vlado Keselj http://web.cs.dal.ca/~vlado 2020
+
+=head1 LICENSE
+
+Artistic License 1.0 L<perlartistic>
+
+=head1 INSTALLATION
+
+Using C<cpan>:
+
+ $ cpan App::Utils
+
+Manual install:
+
+ $ perl Makefile.PL
+ $ make
+ $ make install
+
+=cut

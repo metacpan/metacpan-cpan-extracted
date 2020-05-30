@@ -3,8 +3,8 @@ NAME
     into bins
 
 VERSION
-    This document describes version 0.006 of App::BinPackUtils (from Perl
-    distribution App-BinPackUtils), released on 2019-12-11.
+    This document describes version 0.007 of App::BinPackUtils (from Perl
+    distribution App-BinPackUtils), released on 2020-05-30.
 
 DESCRIPTION
     This distribution provides the following command-line utilities:
@@ -26,15 +26,17 @@ FUNCTIONS
 
      bin_files(%args) -> [status, msg, payload, meta]
 
-    Put files into bins.
+    Put files into bins of certain size (or number of items).
 
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
 
+    *   bin_max_items => *posint*
+
     *   bin_prefix => *filename* (default: "bin")
 
-    *   bin_size* => *filesize*
+    *   bin_size => *filesize*
 
     *   dereference_files => *bool*
 
@@ -146,14 +148,14 @@ FUNCTIONS
 
      pack_bins(%args) -> [status, msg, payload, meta]
 
-    Pack items into bin.
+    Pack items into bin, based on bin size.
 
     Examples:
 
     *   Example #1:
 
          pack_bins(
-           items => ["A,10", "B,50", "C,30", "D,70", "E,40", "F,40", "G,25"],
+             items => ["A,10", "B,50", "C,30", "D,70", "E,40", "F,40", "G,25"],
            bin_size => 100
          );
 
@@ -228,7 +230,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

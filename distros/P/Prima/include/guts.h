@@ -25,6 +25,7 @@ extern List   postDestroys;
 extern int    recursiveCall;
 extern PHash  primaObjects;
 extern SV *   eventHook;
+extern Bool   use_fribidi;
 
 #define CORE_INIT_TRANSIENT(cls) ((PObject)self)->transient_class = (void*)C##cls
 
@@ -46,7 +47,11 @@ extern Bool prima_font_notify ( Handle self, Handle child, void * font);
 extern Bool prima_find_accel( Handle self, Handle item, int * key);
 extern Bool prima_single_color_notify ( Handle self, Handle child, void * color);
 extern Bool prima_kill_all_objects( Handle self, Handle child, void * dummy);
-extern void *prima_read_array( SV * points, char * procName, Bool integer, int div, int min, int max, int * n_points );
+
+extern void  prima_init_font_mapper(void);
+extern void  prima_cleanup_font_mapper(void);
+extern PFont prima_font_mapper_save_font(const char * name);
+extern PFont prima_font_mapper_get_font(unsigned int fid );
 
 #ifdef __cplusplus
 }

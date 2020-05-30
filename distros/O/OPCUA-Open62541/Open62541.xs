@@ -1315,6 +1315,19 @@ server_run_mgset(pTHX_ SV* sv, MAGIC* mg)
 
 static MGVTBL server_run_mgvtbl = { 0, server_run_mgset, 0, 0, 0, 0, 0, 0 };
 
+/*
+ * There is a typo in open62541 server read readContainsNoLoops,
+ * the final s in the function name is missing.  Translate it to
+ * get standard conforming name in Perl.
+ * This code will break and can be removed when upstream fixes the bug.
+ */
+static UA_StatusCode
+UA_Server_readContainsNoLoops(UA_Server *server, const UA_NodeId nodeId,
+    UA_Boolean *outContainsNoLoops)
+{
+    return UA_Server_readContainsNoLoop(server, nodeId, outContainsNoLoops);
+}
+
 /* Open62541 C callback handling */
 
 static ClientCallbackData
@@ -1439,6 +1452,8 @@ clientAsyncBrowseNextCallback(UA_Client *client, void *userdata,
 	clientCallbackPerl(client, userdata, requestId, sv);
 }
 
+#include "Open62541-client-read-callback.xsh"
+
 static void
 clientAsyncReadDataTypeCallback(UA_Client *client, void *userdata,
     UA_UInt32 requestId, UA_NodeId *nodeId)
@@ -1464,7 +1479,19 @@ clientAsyncReadDataTypeCallback(UA_Client *client, void *userdata,
 	clientCallbackPerl(client, userdata, requestId, sv);
 }
 
-#include "Open62541-client-read-callback.xsh"
+static void
+clientAsyncReadCallback(UA_Client *client, void *userdata,
+    UA_UInt32 requestId, UA_ReadResponse *response)
+{
+	dTHX;
+	SV *sv;
+
+	sv = newSV(0);
+	if (response != NULL)
+		XS_pack_UA_ReadResponse(sv, *response);
+
+	clientCallbackPerl(client, userdata, requestId, sv);
+}
 
 /* 16.4 Logging Plugin API, log and clear callbacks */
 
@@ -2001,24 +2028,66 @@ UA_Server_run_shutdown(server)
 
 # 11.4 Reading and Writing Node Attributes
 
+INCLUDE: Open62541-server-read-write.xsh
+
 UA_StatusCode
-UA_Server_readValue(server, nodeId, outValue)
+UA_Server_readDataType(server, nodeId, outDataType)
 	OPCUA_Open62541_Server		server
 	OPCUA_Open62541_NodeId		nodeId
-	OPCUA_Open62541_Variant		outValue
+	SV *				outDataType
+    PREINIT:
+	UA_NodeId			outNodeId;
+	UV				index;
     CODE:
-	RETVAL = UA_Server_readValue(server->sv_server, *nodeId, outValue);
-	XS_pack_UA_Variant(SvRV(ST(2)), *outValue);
+	RETVAL = UA_Server_readDataType(server->sv_server,
+	    *nodeId, &outNodeId);
+	/*
+	 * Convert NodeId to DataType, see XS_unpack_UA_NodeId() for
+	 * the opposite direction.
+	 */
+	for (index = 0; index < UA_TYPES_COUNT; index++) {
+		if (UA_NodeId_equal(&outNodeId, &UA_TYPES[index].typeId))
+			break;
+	}
+	if (index < UA_TYPES_COUNT)
+		XS_pack_OPCUA_Open62541_DataType(SvRV(outDataType),
+		    &UA_TYPES[index]);
     OUTPUT:
 	RETVAL
 
 UA_StatusCode
-UA_Server_writeValue(server, nodeId, value)
+UA_Server_writeDataType(server, nodeId, newDataType)
 	OPCUA_Open62541_Server		server
 	OPCUA_Open62541_NodeId		nodeId
-	OPCUA_Open62541_Variant		value
+	OPCUA_Open62541_DataType	newDataType
     CODE:
-	RETVAL = UA_Server_writeValue(server->sv_server, *nodeId, *value);
+	RETVAL = UA_Server_writeDataType(server->sv_server,
+	    *nodeId, newDataType->typeId);
+    OUTPUT:
+	RETVAL
+
+UA_StatusCode
+UA_Server_readObjectProperty(server, nodeId, propertyName, outVariant)
+	OPCUA_Open62541_Server		server
+	OPCUA_Open62541_NodeId		nodeId
+	OPCUA_Open62541_QualifiedName	propertyName
+	OPCUA_Open62541_Variant		outVariant
+    CODE:
+	RETVAL = UA_Server_readObjectProperty(server->sv_server, *nodeId,
+	    *propertyName, outVariant);
+	XS_pack_UA_Variant(SvRV(ST(2)), *outVariant);
+    OUTPUT:
+	RETVAL
+
+UA_StatusCode
+UA_Server_writeObjectProperty(server, nodeId, propertyName, newVariant)
+	OPCUA_Open62541_Server		server
+	OPCUA_Open62541_NodeId		nodeId
+	OPCUA_Open62541_QualifiedName	propertyName
+	OPCUA_Open62541_Variant		newVariant
+    CODE:
+	RETVAL = UA_Server_writeObjectProperty(server->sv_server,
+	    *nodeId, *propertyName, *newVariant);
     OUTPUT:
 	RETVAL
 
@@ -2481,6 +2550,10 @@ UA_Client_Service_browse(client, request)
     OUTPUT:
 	RETVAL
 
+# 12.7.1 Highlevel Client Functionality
+
+INCLUDE: Open62541-client-read-write.xsh
+
 UA_StatusCode
 UA_Client_readDataTypeAttribute(client, nodeId, outDataType)
 	OPCUA_Open62541_Client		client
@@ -2490,8 +2563,8 @@ UA_Client_readDataTypeAttribute(client, nodeId, outDataType)
 	UA_NodeId			outNodeId;
 	UV				index;
     CODE:
-	RETVAL = UA_Client_readDataTypeAttribute(client->cl_client, *nodeId,
-	    &outNodeId);
+	RETVAL = UA_Client_readDataTypeAttribute(client->cl_client,
+	    *nodeId, &outNodeId);
 	/*
 	 * Convert NodeId to DataType, see XS_unpack_UA_NodeId() for
 	 * the opposite direction.
@@ -2507,9 +2580,9 @@ UA_Client_readDataTypeAttribute(client, nodeId, outDataType)
 	RETVAL
 
 UA_StatusCode
-UA_Client_readDataTypeAttribute_async(client, nodeId, callback, data, outoptReqId)
+UA_Client_sendAsyncReadRequest(client, request, callback, data, outoptReqId)
 	OPCUA_Open62541_Client		client
-	OPCUA_Open62541_NodeId		nodeId
+	OPCUA_Open62541_ReadRequest	request
 	SV *				callback
 	SV *				data
 	OPCUA_Open62541_UInt32		outoptReqId
@@ -2517,8 +2590,10 @@ UA_Client_readDataTypeAttribute_async(client, nodeId, callback, data, outoptReqI
 	ClientCallbackData		ccd;
     CODE:
 	ccd = newClientCallbackData(callback, ST(0), data);
-	RETVAL = UA_Client_readDataTypeAttribute_async(client->cl_client,
-	    *nodeId, clientAsyncReadDataTypeCallback, ccd, outoptReqId);
+	RETVAL = UA_Client_sendAsyncRequest(client->cl_client, request,
+	    &UA_TYPES[UA_TYPES_READREQUEST],
+	    (UA_ClientAsyncServiceCallback)clientAsyncReadCallback,
+	    &UA_TYPES[UA_TYPES_READRESPONSE], ccd, outoptReqId);
 	if (RETVAL != UA_STATUSCODE_GOOD)
 		deleteClientCallbackData(ccd);
 	if (outoptReqId != NULL)
@@ -2526,7 +2601,16 @@ UA_Client_readDataTypeAttribute_async(client, nodeId, callback, data, outoptReqI
     OUTPUT:
 	RETVAL
 
-INCLUDE: Open62541-client-read.xsh
+UA_StatusCode
+UA_Client_writeDataTypeAttribute(client, nodeId, newDataType)
+	OPCUA_Open62541_Client		client
+	OPCUA_Open62541_NodeId		nodeId
+	OPCUA_Open62541_DataType	newDataType
+    CODE:
+	RETVAL = UA_Client_writeDataTypeAttribute(client->cl_client,
+	    *nodeId, &newDataType->typeId);
+    OUTPUT:
+	RETVAL
 
 #############################################################################
 MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::ClientConfig	PREFIX = UA_ClientConfig_

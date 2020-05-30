@@ -278,9 +278,13 @@ subtest "a -remove'd plugin should not be loaded" => sub {
     }
 };
 
-# I'd like to test the release installation command here, but there's no nice
-# way of doing that without risking leaking my (or someone else's!) PAUSE
-# password in the failure output of like(). Can you imagine my embarrassment!
+cmp_deeply(
+  (first { $_->plugin_name eq '@Author::ETHER/install release' } @{$tzil->plugins}),
+  methods(
+    run => [ 'cpanm http://URMOM:my%20sekrit%20password@pause.perl.org/pub/PAUSE/authors/id/U/UR/URMOM/%a' ],
+  ),
+  'correctly generated the URL for installing the newly-uploaded distribution',
+);
 
 my $contributing = $tzil->slurp_file('build/CONTRIBUTING');
 unlike($contributing, qr/[^\S\n]\n/, 'no trailing whitespace in generated CONTRIBUTING');

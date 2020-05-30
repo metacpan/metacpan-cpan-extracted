@@ -9,6 +9,9 @@ minil.toml
 t/00_compile.t
 t/add_callback_only_once.t
 t/annotate.t
+t/annotate_no_name.t
+t/annotate_with_details.t
+t/multiline_escape.t
 t/no_annotation_when_passed.t
 t/without_github_actions.t
 META.yml

@@ -91,7 +91,7 @@
          "url" : "https://github.com/shawnlaffan/perl-alien-proj"
       }
    },
-   "version" : "1.11",
+   "version" : "1.12",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.23",
       "requires" : {

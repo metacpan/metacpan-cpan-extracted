@@ -45,7 +45,7 @@ And the associated values would be automatically bound to the query upon executi
 
 =head1 VERSION
 
-v0.1
+v0.1.0
 
 =head1 DESCRIPTION
 

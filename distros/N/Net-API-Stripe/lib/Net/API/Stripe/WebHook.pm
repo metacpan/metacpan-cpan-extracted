@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
-## Stripe API - ~/lib/Net/API/Stripe/WebHook.pm
-## Version v0.100.0
+## A Stripe WebHook Implementation - ~/lib/Net/API/Stripe/WebHook.pm
+## Version v0.100.1
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/11/02
-## Modified 2020/05/15
+## Modified 2020/05/27
 ## 
 ##----------------------------------------------------------------------------
 package Net::API::Stripe::WebHook;
@@ -12,7 +12,7 @@ BEGIN
 {
 	use strict;
 	use parent qw( Net::API::Stripe::Generic );
-	our( $VERSION ) = 'v0.100.0';
+	our( $VERSION ) = 'v0.100.1';
 };
 
 ## Creating a web hook
@@ -29,7 +29,7 @@ Net::API::Stripe::WebHook - An interface to manage and handle Stripe WebHooks
 
 =head1 VERSION
 
-    v0.100.0
+    v0.100.1
 
 =head1 DESCRIPTION
 
@@ -60,12 +60,6 @@ See L<Net::API::Stripe::WebHook::Apache> for detail of implementation using Apac
 	  "status": "enabled",
 	  "url": "http://expugno.serveo.net/stripe/invoice"
 	}
-
-=head1 HISTORY
-
-=head2 v0.1
-
-Initial version
 
 =head1 AUTHOR
 

@@ -1,4 +1,4 @@
-# $Id: 05-DNSKEY.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
+# $Id: 05-DNSKEY.t 1784 2020-05-24 19:27:13Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -15,7 +15,7 @@ foreach my $package (@prerequisite) {
 	exit;
 }
 
-plan tests => 32;
+plan tests => 33;
 
 
 my $name = 'DNSKEY.example';
@@ -111,6 +111,17 @@ my $wire = join '', qw( 010003050103D22A6CA77F35B893206FD35E4C506D8378843709B97E
 	is( $class->algorithm('RSASHA256'), 8,		 'class method algorithm("RSASHA256")' );
 	is( $class->algorithm(8),	    'RSASHA256', 'class method algorithm(8)' );
 	is( $class->algorithm(255),	    255,	 'class method algorithm(255)' );
+}
+
+
+{
+	my $rr = new Net::DNS::RR(
+		type	  => $type,
+		algorithm => 1,
+		keybin	  => pack( 'H*', '0000000000123456' ),
+		);
+	my $expect = unpack 'n', pack 'H*', '1234';
+	is( $rr->keytag, $expect, 'Historic keytag, per RFC4034 Appendix B.1' );
 }
 
 

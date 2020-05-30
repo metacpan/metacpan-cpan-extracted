@@ -1,0 +1,18 @@
+0.003   2020-05-30  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename distro from App-RenameUtils to App-FileRenameUtils to be more
+          precise. Add App::FileRemoveUtils for easier discovery.
+
+	- Add script:  move-files-here.
+
+
+0.002   2019-07-23  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention renwd.
+
+
+0.001   2019-01-15  Released-By: PERLANCAR
+
+        - First release.

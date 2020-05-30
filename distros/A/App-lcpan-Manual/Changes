@@ -1,3 +1,10 @@
+1.058.000  2020-05-29  Released-By: PERLANCAR; Urgency: medium
+
+           - Update to App::lcpan 1.058 (some renamed options).
+
+	   - Add page: App::lcpan::Manual::Tips.
+
+
 1.057.000  2020-05-08  Released-By: PERLANCAR; Urgency: medium
 
 	   - Add two tutorial pages: 200_SettingUpAMiniCPAN,

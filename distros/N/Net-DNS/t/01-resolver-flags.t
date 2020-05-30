@@ -1,4 +1,4 @@
-# $Id: 01-resolver-flags.t 1709 2018-09-07 08:03:09Z willem $  -*-perl-*-
+# $Id: 01-resolver-flags.t 1779 2020-05-11 09:11:17Z willem $  -*-perl-*-
 
 use strict;
 use Test::More tests => 23;

@@ -2,8 +2,8 @@ NAME
     Data::Sah::Filter - Filtering for Data::Sah
 
 VERSION
-    This document describes version 0.004 of Data::Sah::Filter (from Perl
-    distribution Data-Sah-Filter), released on 2020-02-11.
+    This document describes version 0.005 of Data::Sah::Filter (from Perl
+    distribution Data-Sah-Filter), released on 2020-05-30.
 
 SYNOPSIS
      use Data::Sah::Filter qw(gen_filter);
@@ -58,7 +58,8 @@ DESCRIPTION
         an expression that returns an array (envelope) of "(error_msg,
         data)" instead of just filtered data. Error message should be a
         string that is set when filtering fails and explains why. Otherwise,
-        if filtering succeeds, the string should be set to undefined value.
+        if filtering succeeds, the error message string should be set to
+        undefined value.
 
         This is used for filtering rules that act as a data checker.
 

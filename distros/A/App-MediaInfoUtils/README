@@ -1,0 +1,206 @@
+NAME
+    App::MediaInfoUtils - Utilities related to getting (metadata)
+    information from media files
+
+VERSION
+    This document describes version 0.128 of App::MediaInfoUtils (from Perl
+    distribution App-MediaInfoUtils), released on 2020-05-30.
+
+FUNCTIONS
+  media_info
+    Usage:
+
+     media_info(%args) -> [status, msg, payload, meta]
+
+    Get information about media files/URLs.
+
+    Many fields will depend on the backend used. Some other fields returned:
+
+    *   "info_backend": the "Media::Info::*" backend module used, e.g.
+        "Ffmpeg".
+
+    *   "type_from_name": either "image", "audio", "video", or "unknown".
+        This is determined from filename (extension).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   backend => *str*
+
+        Choose a specific backend.
+
+    *   media* => *array[filename]*
+
+        Media files/URLs.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  media_is_landscape
+    Usage:
+
+     media_is_landscape(%args) -> [status, msg, payload, meta]
+
+    Return exit code 0 if media is landscape.
+
+    Portrait is defined as having 'rotate' metadata of 90 or 270. Otherwise,
+    media is assumed to be 'landscape'.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   backend => *str*
+
+        Choose a specific backend.
+
+    *   media* => *filename*
+
+        Media file/URL.
+
+    *   quiet => *true*
+
+        Don't output anything on command-line, just return appropriate exit
+        code.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  media_is_portrait
+    Usage:
+
+     media_is_portrait(%args) -> [status, msg, payload, meta]
+
+    Return exit code 0 if media is portrait.
+
+    Portrait is defined as having 'rotate' metadata of 90 or 270 when the
+    width > height. Otherwise, media is assumed to be 'landscape'.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   backend => *str*
+
+        Choose a specific backend.
+
+    *   media* => *filename*
+
+        Media file/URL.
+
+    *   quiet => *true*
+
+        Don't output anything on command-line, just return appropriate exit
+        code.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  media_orientation
+    Usage:
+
+     media_orientation(%args) -> [status, msg, payload, meta]
+
+    Return orientation of media ('portrait' or 'landscape').
+
+    Portrait is defined as having 'rotate' metadata of 90 or 270. Otherwise,
+    media is assumed to be 'landscape'.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   backend => *str*
+
+        Choose a specific backend.
+
+    *   media* => *filename*
+
+        Media file/URL.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  media_summary_by_type
+    Usage:
+
+     media_summary_by_type(%args) -> [status, msg, payload, meta]
+
+    Summarize media by types (from filenames).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   media* => *array[filename]*
+
+        Media files/URLs.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-MediaInfoUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-MediaInfoUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-MediaInfoUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

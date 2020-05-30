@@ -1,0 +1,66 @@
+NAME
+    App::FileRenameUtils - Utilities related to renaming/moving files
+
+VERSION
+    This document describes version 0.003 of App::FileRenameUtils (from Perl
+    distribution App-FileRenameUtils), released on 2020-05-30.
+
+DESCRIPTION
+    This distribution provides the following command-line utilities:
+
+    *   move-files-here
+
+    *   rename-swap
+
+FUNCTIONS
+  add_filename_suffix
+    Usage:
+
+     $new_name = add_filename_suffix($filename, $suffix);
+
+    Examples:
+
+     add_filename_suffix("foo.jpg", " (1)"); # -> "foo (1).jpg"
+     add_filename_suffix("foo", " (1)"); # -> "foo (1)"
+
+  find_unique_filename
+    Usage:
+
+     $new_name = find_unique_filename($filename);
+
+    Continue adding suffix " (1)", " (2)", and so on to $filename (see
+    "add_filename_suffix") until the new name does not exist on the
+    filesystem. If $filename already does not exist, it will be returned
+    as-is.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-FileRenameUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-FileRenameUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-FileRenameUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    rename from File::Rename
+
+    perlmv from App::perlmv
+
+    renwd from App::renwd
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

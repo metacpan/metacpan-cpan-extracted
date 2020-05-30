@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Cache/Tables.pm
-## Version v0.100.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Version v0.100.2
+## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2017/07/19
-## Modified 2020/05/16
+## Modified 2020/05/22
 ## 
 ##----------------------------------------------------------------------------
 package DB::Object::Cache::Tables;
@@ -17,7 +17,7 @@ BEGIN
     use File::Spec;
     use Fcntl qw( :flock );
     use Devel::Confess;
-    our $VERSION = 'v0.100.1';
+    our $VERSION = 'v0.100.2';
 };
 
 sub init
@@ -60,7 +60,7 @@ sub cache_file
         {
             my $mtime = ( stat( $f ) )[9];
             $self->updated( $mtime );
-            my $hash = $self->read( $f ) || return( undef() );
+            my $hash = $self->read( $f ) || return;
             $self->cache( $hash );
         }
         $self->{cache_file} = $f;
@@ -135,14 +135,14 @@ sub set
     my $last_update = $self->updated;
     if( -s( $f ) && $last_update && ( stat( $f ) )[9] != $last_update )
     {
-        $cache = $self->read( $f ) || return( undef() );
+        $cache = $self->read( $f ) || return;
     }
     $cache->{ $hash->{host} }->{ $hash->{driver} }->{ $hash->{port} }->{ $hash->{database} } = {} if( ref( $cache->{ $hash->{host} }->{ $hash->{driver} }->{ $hash->{port} }->{ $hash->{database} } ) ne 'HASH' );
     $cache->{ $hash->{host} }->{ $hash->{driver} }->{ $hash->{port} }->{ $hash->{database} }->{tables} = $hash->{tables};
     $cache->{ $hash->{host} }->{ $hash->{driver} }->{ $hash->{port} }->{ $hash->{database} }->{timestamp} = time();
     if( !defined( $self->write( $cache ) ) )
     {
-        return( undef() );
+        return;
     }
     return( $self );
 }
@@ -223,7 +223,7 @@ DB::Object::Cache::Tables - Table Cache
     
 =head1 VERSION
 
-This is version v0.100.1
+This is version v0.100.2
 
 =head1 DESCRIPTION
 

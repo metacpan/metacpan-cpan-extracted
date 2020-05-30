@@ -1,4 +1,4 @@
-# $Id: 02-domain.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
+# $Id: 02-domain.t 1784 2020-05-24 19:27:13Z willem $	-*-perl-*-
 
 use strict;
 use Test::More tests => 53;
@@ -139,7 +139,7 @@ use constant ESC => '\\';
 
 
 {
-	foreach my $char (qw($ ' " ; @)) {
+	foreach my $char (qw(" ( ) ; @)) {
 		my $name   = $char . 'example.com.';
 		my $domain = new Net::DNS::Domain($name);
 		is( $domain->string, ESC . $name, "escape leading $char in string" );

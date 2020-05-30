@@ -16,7 +16,7 @@ In the interface Role:
     use Role::Declare;
     use Types::Standard qw/:all/;
 
-    class_method create_object ( Str $name, Int $age ) : Returns( InstanceOf['My::Class'] ) {
+    class_method create_object ( Str $name, Int $age ) : Return( InstanceOf['My::Class'] ) {
         die "Age cannot be negative: $age" if $age < 0;
     };
 
@@ -27,7 +27,7 @@ In the interface implementation:
 
     with_strict 'My::Class::interface';
 
-    sub create_object { ...  }
+    sub create_object { ... }
 
 or:
 
@@ -36,7 +36,7 @@ or:
 
     with 'My::Class::interface';
 
-    sub create_object { ...  }
+    sub create_object { ... }
 
 =head1 DESCRIPTION
 
@@ -59,6 +59,23 @@ It makes sense to keep it on during development and testing to catch bugs
 and remove it in production. L<Role::Declare::StrictWith> provides a specialized
 version of L<Role::Tiny>'s C<with> function, which works only in test environments
 as defined by L<Devel::StrictMode>.
+
+=head2 A note about void context
+
+Return type validation will never be triggered in void context.
+Even if a method unconditionally returns a value and a L<:Return> attribute
+is used, void context calls will not be validated.
+
+=head2 Lax mode
+
+L<Role::Declare> can be imported in lax mode:
+
+  use Role::Declare -lax;
+
+this will disable argument count checks, similar to L<Function::Parameters>
+C<:lax> tag. It will affect all exported keywords.
+
+B<WARNING>: This functionality is experimental and subject to abrupt changes.
 
 =head1 EXPORTS
 
@@ -102,7 +119,7 @@ Same as L<:Return> but allows C<undef>.
 
 =head2 :ReturnList
 
-Similar to L<:Returns> but gets triggered by list context returns.
+Similar to L<:Return> but gets triggered by list context returns.
 It's arguments are the same as for L<ArrayRef> constraint from L<Type::Tiny>.
 
     class_method $method ( $Type $foo, $Type $bar ) : ReturnList( $Type ) { ... }
@@ -121,7 +138,7 @@ Same as L<:ReturnSelf> but allow C<undef>.
 
 =head2 :ReturnObject
 
-Shorthand for C<:Returns(Object)>.
+Shorthand for C<:Return(Object)>.
 
 =head2 :ReturnMaybeObject
 
@@ -130,7 +147,7 @@ Same as L<:ReturnObject> but allows C<undef>.
 =head2 :ReturnInstanceOf
 
 Require the method to return an instance of the specified class.
-C<:ReturnsInstanceOf($class)> is equivalent to C<:Returns(InstanceOf[$class])>.
+C<:ReturnInstanceOf($class)> is equivalent to C<:Return(InstanceOf[$class])>.
 
 =head2 :ReturnMaybeInstanceOf
 
@@ -141,9 +158,9 @@ Same as L<:ReturnInstanceOf> but allows C<undef>.
 =head2 A [list|scalar] hook for $method already exists
 
 For each method at most two return validations can be set up - one for list
-and one for scalar context. This means, you can specify both C<:Returns(...)>
-and C<:ReturnsList(...)> for a method but you can't use
-C<:ReturnsMaybeList> and C<:ReturnsList> at the same time.
+and one for scalar context. This means, you can specify both C<:Return(...)>
+and C<:ReturnList(...)> for a method but you can't use
+C<:ReturnMaybeList> and C<:ReturnList> at the same time.
 
 =head2 Only a single constraint is supported
 

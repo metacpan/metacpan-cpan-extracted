@@ -13,7 +13,29 @@ Debian/Ubuntu
 
 For easy setup, run this:
 
-apt-get install libgtk2.0-dev libtext-bidi-perl libgif-dev libjpeg-dev libtiff-dev libxpm-dev libwebp-dev 
+  apt-get install libgtk2.0-dev libgif-dev libjpeg-dev libtiff-dev libxpm-dev \
+      libwebp-dev libfribidi-dev libharfbuzz-dev
+
+OpenSUSE
+--------
+
+  zypper install gtk2-devel giflib-devel libXpm-devel libjpeg-devel libtiff-devel \
+      libXpm-devel libXrandr-devel libXcomposite-devel libXcursor-devel \
+      libfribidi-devel libwebp-devel
+
+Cygwin
+------
+
+- install apt-cyg:
+
+   wget https://raw.githubusercontent.com/transcode-open/apt-cyg/master/apt-cyg -O /usr/bin/apt-cyg
+   chmod +x /usr/bin/apt-cyg
+
+- install prerequisites:
+
+   apt-cyg install libgtk2.0-devel libfribidi-devel libgif-devel libjpeg-devel libtiff-devel \
+       libXpm-devel libwebp-devel
+
 
 Graphic libraries
 -----------------
@@ -49,16 +71,42 @@ WebP libraries are unavailable for strawberry, get them here:
 
  http://prima.eu.org/download/webp-win.zip
 
-Fribidi
--------
+MacOSX
+------
 
-To support bi-directional text input and output you'll need Text::Bidi
-module from CPAN. The module is not a prerequisite; it'll need the
-external fribidi library to build. On windows the library is not installed by
-default, you can grab it here:
+You'll need homebrew, XQuartz, and a set of extra libraries.
 
- - http://prima.eu.org/download/fribidi-win32.zip
- - http://prima.eu.org/download/fribidi-win64.zip
+- install homebrew:
+
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+
+- install XQuartz:
+
+  brew cask install xquartz
+
+- install support libraries:
+
+  brew install fribidi fontconfig freetype giflib gtk+ harfbuzz jpeg libpng libtiff webp
+
+- install custom built xorg libraries, either very minimal
+
+  brew install dk/x11/xorg-macros dk/x11/libxft
+
+or linux-homebrew's (not tested)
+
+  brew tap linuxbrew/xorg
+
+  brew install linuxbrew/xorg/libxft
+
+Bidirectional input and complex scripts
+---------------------------------------
+
+To support bi-directional unicode text input and output you'll need the fribidi
+library.  Additionally for unix builds you'll need harfbuzz library for output
+of complex scripts and font ligature support.
+
+Prima can compile and work fine without these, but the support of these
+features will be rather primitive.
 
 SOURCE DISTRIBUTION INSTALLATION
 ================================
@@ -72,7 +120,7 @@ gmake, or nmake for Win32):
     make install
 
 If 'perl Makefile.PL' fails, the compilation history along with errors can be
-found in makefile.log. 
+found in makefile.log.
 
 If make fails with message
 
@@ -100,7 +148,7 @@ BINARY DISTRIBUTION INSTALLATION
 Available only for MSWin32. Please use installation from source for
 the other platforms.
 
-To install the toolkit from the binary distribution run 
+To install the toolkit from the binary distribution run
 
     perl ms_install.pl
 
@@ -121,10 +169,10 @@ Typical code starts with
     use Prima qw(Application);
 
 and ends with
-   
+
     run Prima;
 
-which is an event loop call. Start from the following code:
+, the event loop. Start from the following code:
 
     use Prima qw(Application Buttons);
 
@@ -136,10 +184,10 @@ which is an event loop call. Start from the following code:
        text     => 'Hello world!',
        onClick  => sub { $::application-> close },
     );
-    
+ 
     run Prima;
 
-Or, alternatively, start the VB program, which is the toolkit visual builder. 
+Or, alternatively, start the VB program, the toolkit visual builder.
 
 MORE INFORMATION
 ================

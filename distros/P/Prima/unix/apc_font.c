@@ -27,6 +27,7 @@ static Bool   do_core_fonts = true;
 static Bool   do_xft_no_antialias = false;
 static Bool   do_xft_priority = true;
 static Bool   do_no_scaled_fonts = false;
+static Bool   do_harfbuzz = true;
 
 static void detail_font_info( PFontInfo f, PFont font, Bool addToCache, Bool bySize);
 
@@ -645,11 +646,12 @@ prima_init_font_subsystem( char * error_buf)
 			strcpy( guts. locale, "iso10646-1");
 	}
 
-#ifdef USE_XFT
 	guts. xft_no_antialias = do_xft_no_antialias;
 	guts. xft_priority     = do_xft_priority;
+#ifdef USE_XFT
 	if ( do_xft) prima_xft_init();
 #endif
+	guts. use_harfbuzz     = do_xft && do_harfbuzz;
 
 	prima_font_pp2font( "fixed", nil);
 	Fdebug("font: init\n");
@@ -684,7 +686,7 @@ prima_init_font_subsystem( char * error_buf)
 		free( do_menu_font);
 		do_menu_font = nil;
 	} else if ( !apc_fetch_resource( "Prima", "", "Font", "menu_font",
-									nilHandle, frFont, &guts. default_menu_font)) {
+		nilHandle, frFont, &guts. default_menu_font)) {
 		memcpy( &guts. default_menu_font, &guts. default_font, sizeof( Font));
 	}
 	Fdebug("menu font: %d.[w=%d,s=%d].%s.%s\n", DEBUG_FONT(guts.default_menu_font));
@@ -695,7 +697,7 @@ prima_init_font_subsystem( char * error_buf)
 		free( do_widget_font);
 		do_widget_font = nil;
 	} else if ( !apc_fetch_resource( "Prima", "", "Font", "widget_font",
-									nilHandle, frFont, &guts. default_widget_font)) {
+		nilHandle, frFont, &guts. default_widget_font)) {
 		memcpy( &guts. default_widget_font, &guts. default_font, sizeof( Font));
 	}
 	Fdebug("widget font: %d.[w=%d,s=%d].%s.%s\n", DEBUG_FONT(guts.default_widget_font));
@@ -706,7 +708,7 @@ prima_init_font_subsystem( char * error_buf)
 		free( do_msg_font);
 		do_msg_font = nil;
 	} else if ( !apc_fetch_resource( "Prima", "", "Font", "message_font",
-									nilHandle, frFont, &guts. default_msg_font)) {
+		nilHandle, frFont, &guts. default_msg_font)) {
 		memcpy( &guts. default_msg_font, &guts. default_font, sizeof( Font));
 	}
 	Fdebug("msg font: %d.[w=%d,s=%d].%s.%s\n", DEBUG_FONT(guts.default_msg_font));
@@ -717,10 +719,13 @@ prima_init_font_subsystem( char * error_buf)
 		free( do_caption_font);
 		do_caption_font = nil;
 	} else if ( !apc_fetch_resource( "Prima", "", "Font", "caption_font",
-												nilHandle, frFont, &guts. default_caption_font)) {
+		nilHandle, frFont, &guts. default_caption_font)) {
 		memcpy( &guts. default_caption_font, &guts. default_font, sizeof( Font));
 	}
 	Fdebug("caption font: %d.[w=%d,s=%d].%s.%s\n", DEBUG_FONT(guts.default_caption_font));
+#ifdef USE_XFT
+	if ( do_xft) prima_xft_init_font_substitution();
+#endif
 
 	return true;
 }
@@ -733,6 +738,7 @@ prima_font_subsystem_set_option( char * option, char * value)
 		do_core_fonts = false;
 		return true;
 	} else
+#ifdef USE_XFT
 	if ( strcmp( option, "no-xft") == 0) {
 		if ( value) warn("`--no-xft' option has no parameters");
 		do_xft = false;
@@ -756,6 +762,14 @@ prima_font_subsystem_set_option( char * option, char * value)
 			warn("Invalid value '%s' to `--font-priority' option. Valid are 'core' and 'xft'", value);
 		return true;
 	} else
+#endif
+#ifdef WITH_HARFBUZZ
+	if ( strcmp( option, "no-harfbuzz") == 0) {
+		if ( value) warn("`--no-harfbuzz' option has no parameters");
+		do_harfbuzz = false;
+		return true;
+	} else
+#endif
 	if ( strcmp( option, "noscaled") == 0) {
 		if ( value) warn("`--noscaled' option has no parameters");
 		do_no_scaled_fonts = true;
@@ -1091,8 +1105,9 @@ prima_try_height( HeightGuessStack * p, int height)
 				ret = -1;
 				break;
 			}
-		p-> xlfd[ p-> sp] = ret;
 	}
+
+	p-> xlfd[ p-> sp] = ret;
 
 	p-> sp++;
 
@@ -1103,6 +1118,7 @@ DONT_ADVISE:
 			diff = p-> target - p-> prima[i];
 			if ( diff < 0) diff += 1000;
 			if ( best_diff > diff) {
+				if ( p-> xlfd[i] < 0 ) continue;
 				best_diff = diff;
 				best_i = i;
 			}
@@ -1281,7 +1297,7 @@ AGAIN:
 		f-> font.  externalLeading =
 						abs( s-> max_bounds. ascent  - s-> ascent) +
 						abs( s-> max_bounds. descent - s-> descent);
-		f-> font.  utf8_flags      = 0;
+		bzero(&f->font.is_utf8, sizeof(f->font.is_utf8));
 
 		/* detailing width */
 		if ( f-> font. width == 0 || !f-> flags. width) {
@@ -1842,7 +1858,7 @@ apc_menu_set_font( Handle self, PFont font)
 		XX-> guillemots = XTextWidth( kf-> fs, ">>", 2);
 	} else {
 #ifdef USE_XFT
-		XX-> guillemots = prima_xft_get_text_width( kf, ">>", 2, true, false, nil, nil);
+		XX-> guillemots = prima_xft_get_text_width( kf, ">>", 2, toAddOverhangs, nil, nil);
 #endif
 	}
 	if ( !XX-> type. popup && X_WINDOW) {
@@ -1861,11 +1877,10 @@ int
 apc_gp_get_glyph_outline( Handle self, int index, int flags, int ** buffer)
 {
 #ifdef USE_XFT
-	if ( !guts. use_xft) return 0;
-	return prima_xft_get_glyph_outline( self, index, flags, buffer);
-#else
-	return 0;
+	if ( guts.use_xft && X(self)-> font-> xft)
+		return prima_xft_get_glyph_outline( self, index, flags, buffer);
 #endif
+	return -1;
 }
 
 
@@ -2019,7 +2034,7 @@ FAILED:
 		XSetForeground( DISP, r-> arena_gc, 0);
 		XFillRectangle( DISP, r-> arena, r-> arena_gc, 0, 0, r-> orgBox. x, r-> orgBox .y);
 		XSetForeground( DISP, r-> arena_gc, 1);
-		if ( wide)
+		if (wide)
 			XDrawString16( DISP, r-> arena, r-> arena_gc,
 				( cs-> lbearing < 0) ? -cs-> lbearing : 0,
 				r-> orgBox. y - f-> fs-> max_bounds. descent,
@@ -2159,3 +2174,16 @@ prima_font_debug_style(int style)
 
 	return buf;
 }
+
+unsigned long *
+apc_gp_get_mapper_ranges(PFont font, int * count, unsigned int * flags)
+{
+#ifdef USE_XFT
+	if ( do_xft )
+		return prima_xft_mapper_query_ranges(font, count, flags);
+#endif
+	*count = 0;
+	*flags = 0;
+	return NULL;
+}
+

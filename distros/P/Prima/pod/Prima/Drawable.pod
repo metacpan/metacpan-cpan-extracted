@@ -836,6 +836,41 @@ See L<"Fonts"> for the detailed descriptions.
 
 Applies to text_out(), get_text_width(), get_text_box(), get_font_abc(), get_font_def().
 
+=item fontMapperPalette INDEX, [\%FONT | COMMAND]
+
+A pseudo-property that manages access to a set of fonts used for substitution
+in polyfont shaping (see L</text_shape>). INDEX is the same font index used in
+C<fonts> array returned from C<text_shape>, if polyfont was used (where 0 is
+the current font).
+
+There are two font lists used in the substituion mechanism, I<passive> and
+I<active>. The passive font list is initiated during the toolkit start and is
+not changed. Each font there is addressed by C<INDEX>. When the actual search
+for a glyph is initiated, these fonts are queried in the loop and are checked
+whether they do contain required glyphs. These queries are cached, so that next
+time lookups run much quicker. That way, an C<active> font list is built, and
+next substitutions use it before trying to look into the passive list. Since
+font order is system based, and is rather random, some fonts may not be a good
+or aesthetic substition. Therefore C<fontMapperPallette> can assist in adding
+or removing particular fonts to the active list, potentially allowing an
+application to store and load a user-driven selection of substitution fonts.
+
+C<fontMapperPallette> is a pseudo-property, such that it is not symmetric as
+real properties are; its call formats are several and not orthogonal to each
+other neither in syntax nor functionality. Therefore these may change in
+future.
+
+As a getter, the property returns the following depending on INDEX: If it is
+-1, returns how many fonts are in the passive list. If 0, which means the current font
+return either the non-index of the current font if the same font is found in
+the palette, and 0 otherwise. If greater than zero, returns the substitution
+FONT record from the passive list.
+
+As a setter, manages the active list, and uses COMMAND integer as a second argument.
+If COMMAND is 0, removes the INDEXth font from the active list, and if 1, marks it
+for immediate scanning and adding to the active list. The font is added in the end
+of the list, after the existing active entries.
+
 =item lineEnd VALUE
 
 Selects a line ending cap for plotting primitives. VALUE
@@ -1133,7 +1168,6 @@ The FLAGS is a combination of the following constants:
                               of the lines drawn
   dt::NoWordWrap            - performs no word wrapping by the width of the boundaries
   dt::WordWrap              - performs word wrapping by the width of the boundaries
-  dt::BidiText              - use bidirectional formatting, if available
   dt::Default               - dt::NewLineBreak|dt::WordBreak|dt::ExpandTabs|
                               dt::UseExternalLeading
 
@@ -1372,7 +1406,170 @@ Context used: rop
 
 =item text_out TEXT, X, Y
 
-Draws TEXT string at (X,Y).
+Draws TEXT string at (X,Y). TEXT is either character string, or a
+C<Prima::Drawable::Glyphs> object returned from C<text_shape>, or C<<
+Prima::Drawable::Glyphs->glyphs >> strings of glyphs.
+
+Returns success flag; if failed, C<$@> contains the error.
+
+Context used: color, backColor, font, rop, textOpaque, textOutBaseline
+
+=item text_shape TEXT, %OPTIONS
+
+Converts TEXT into set of glyphs, returns either a C<Prima::Drawable::Glyphs>
+object, or a C<0> integer when shaping is not necessary, or C<undef> as an
+error.
+
+When compiled with C<libfribidi>, runs unicode bidirectional algorithm on TEXT
+that properly positions embedded directional text (f.ex. a latin quote inside
+an arabic text), see L<http://unicode.org/reports/tr9/tr9-22.html>.  Without
+the library only does minimal RTL alignment.
+
+Glyphs returned are positioned according to RTL directions given in TEXT using
+characters from uncode block "General Punctuation U+2000 .. U+206F".
+Additionally, character ligation may be performed to that one or more
+characters are respresented by one or more glyphs. Such syntatic units,
+I<clusters>, are adopted in Prima where appropriate, instead of character
+units, for selection, navigation etc in f.ex. C<Prima::InputLine> and
+C<Prima::Edit>. Helper routines that translate clusters, glyphs, and characters
+into each other are found in L<Prima::Drawable::Glyphs>.
+
+Options recognized:
+
+=over
+
+=item advances BOOLEAN = false
+
+Shaping process may or may not fill integer array of advances and positions for
+each glyphs, depending on the implementation. The advances are needed to
+represent f.ex.  combining graphemes, when TEXT consisting of two characters,
+C<"A"> and combining grave accent U+300 should be drawn as a single E<Agrave>
+cluster but are represented by a two glyphs C<"A"> and <"`">. The grave glyph
+has its own advance for standalone usage, but in this case it should be
+ignored, and that is achieved by filling advance table where the C<"A"> advance
+is the normal glyph advance, whereas the advance of the C<"`"> is zero.  Also,
+the position table additionaly shifts glyph position by X and Y coordinates,
+when that is needed (f.ex. it might be positioned differently by vertical on
+C<"a"> and C<"A">).
+
+Setting this options to C<true> will force fill advance and positioning tables.
+These tables can be manipulated laters, and are respected by C<text_out> and
+C<get_text_width>.
+
+=item language STRING = undef
+
+When set, shaping process can take in the account the language of the text.
+F.ex. text C<"ae"> will be shaped as a single glyph I<E<aelig>> for the Latin
+language, but not for the English.
+
+=item level INTEGER = ts:XXX
+
+Select the shaping (i.e. text to glyph conversion) level, how the system should treat the input text
+and how deep the shaping should go. One of the following C<ts::XXX> options:
+
+=over
+
+=item ts::Bytes
+
+Treats input text as non-unicode locale-specific codepoints, characters higher
+than 255 are treated as chr(255).  Reordering never happens, kerning and
+ligation never happens, returns glyph indexes in a 1:1 mapping to each
+codepoint.
+
+=item ts::None
+
+Performs quick null shaping without mapping to the font glyphs, but only
+running bidirectional algorithm on the text. On the return, C<glyphs>, as well
+as eventual C<advances> and C<positions>, are filled with zeros, but C<indexes>
+are filled with the proper character offsets, effectively making it a visual to
+logical map since number of glyphs will always be equal to number of characters
+in TEXT, because ligation never happens here (except when text contains unicode
+directional characters such as isolates etc).
+
+By default, advances and positions are not filled, but if C<advances> option is set,
+fills them with zeros.
+
+=item ts::Glyphs
+
+Applies the unicode bidi algoritm and maps the result onto font glyphs.  Ligation
+and kerning doesn't happen here, it's basically same as C<ts::None> but with
+the glyph mapping part. 
+
+By default, advances and positions are not filled, but if C<advances> option is set,
+fills the advances array with character glyph advances and the positions array with zeros.
+
+=item ts::Full
+
+Applies the unicode bidi algorithm, and runs the full shaping on the result.
+Ligation and kerning may occur. Always fills the advances and positions array;
+the C<advances> option is ignored.
+
+If the system or the selected font does not support shaping, tries to ligate
+known arabic shapes using the I<fribidi> library, when compiled with. Also in
+this case does not return the advances and positions by default, but if
+C<advances> option is set, fills the advances array with character glyph
+advances and the positions array with zeros.
+
+=back
+
+=item pitch INTEGER
+
+When polyfont is active and font substitution is desired, filters only fonts
+that match C<pitch>, either C<fp::Variable> or C<fp::Fixed>. By default will be
+set to C<fp::Fixed> if the current for is monospaced, but to C<fp::Default>
+matching all fonts, otherwise.
+
+=item polyfont BOOLEAN = true
+
+If set, scans if the currently selected font supports all unicode points, and
+if not, selects a substituions from a pre-populated list, taking into account
+the font pitch (see C<pitch> above). In cases where the current font has not
+enough glyphs to shape all the requested unicode points, font substitution is
+made, and the result contains an extra array C<fonts> (see
+L<Prima::Drawable/fonts>). When the current font has all needed glyphs, the
+fonts array is not created.
+
+The font list access is available through L</fontMapperPallette>.
+
+Valid only with shaping levels C<ts::Glyphs> and C<ts::Full>.
+
+=item reorder BOOLEAN = true
+
+When set, unicode bidi algorithm is used to reorder codepoints, and
+additionally RTL codepoints are reversed (depending on direction context).
+
+When unset, no such reordering occurs, to emulate as much as possible a
+behavior that each text grapheme is being mapped to a glyph cluster exactly as
+it occurs in the input text, from left to right. Note that bidi reordering
+still may occur internally, since system shapers may reverse placement of RTL
+characters, so that reordering is needed to cancel this. In theory the caller
+shouldn't see the difference as these should cancel each other, but if Prima
+miscalculates the expected way the system shaper does the bidi processing it
+might.
+
+A similar effect can be reached by prepending the text with U+202D
+(LEFT-TO-RIGHT OVERRIDE).
+
+=item rtl BOOLEAN
+
+If set to 1, default text direction is assumed as RTL, and as LTR if set to 0.
+If unset, the text direction is taken from C<Prima::Application::textDirection>.
+
+=item skip_if_simple BOOLEAN = false
+
+When set, checks whether shaping result is identical to the input, in a sense
+that a call to C<text_out(TEXT)> and a call to C<text_shape_out(TEXT)> produce
+identical results.  Majority of english text will fall into that category, and
+when that indeed happens, returns integer value C<0> instead of a glyph object.
+
+=back
+
+See also C<text_shape_out>, C<get_text_shape_width>, C<text_wrap_shape>.
+
+=item text_shape_out TEXT, X, Y[, RTL]
+
+Runs shaping on TEXT character string with the RTL flag or C<< $::application->textDirection >>.
+Draws the resulting glyph string at (X,Y). 
 
 Returns success flag; if failed, C<$@> contains the error.
 
@@ -1485,6 +1682,11 @@ has to render glyphs on bitmaps and scan for black and white pixels.
 Vector fonts are not subject to this, and the call is as effective
 as C<get_font_abc>.
 
+=item get_font_languages
+
+Returns array of ISO 639 strings that can be displayed using glyphs available
+in the currently selected font.
+
 =item get_font_ranges
 
 Returns array of integer pairs denoting unicode indices of glyphs covered by
@@ -1522,10 +1724,23 @@ to all programs in the system. The information is volatile if
 the system palette can change colors, since any other application
 may change the system colors at any moment.
 
+=item get_text_shape_width TEXT, [ FLAGS ]
+
+Runs shaping on TEXT character string with text direction either taken from
+C<FLAGS & to::RTL> value, or from the or C<< $::application->textDirection >>.
+Returns the shaping result width as if it would be drawn using currently
+selected font.
+
+If C<FLAGS & to::AddOverhangs> is set, the first character's absolute A value
+and the last character's absolute C value are added to the string if they are
+negative.
+
 =item get_text_width TEXT, ADD_OVERHANG = 0
 
-Returns TEXT string width if it would be drawn using currently
-selected font.
+Returns TEXT string width if it would be drawn using currently selected font.
+TEXT is either a character string, or a C<Prima::Drawable::Glyphs> object
+returned from C<text_shape>, or C<< Prima::Drawable::Glyphs-> glyphs >> glyph
+string.
 
 If ADD_OVERHANG is 1, the first character's absolute A value and the last
 character's absolute C value are added to the string if they are negative.
@@ -1536,8 +1751,10 @@ Context used: font
 
 =item get_text_box TEXT
 
-Returns TEXT string extensions if it would be drawn using currently
-selected font.
+Returns TEXT string extensions if it would be drawn using currently selected
+font.  TEXT is either a character string, or a C<Prima::Drawable::Glyphs>
+object returned from C<text_shape>, or C<< Prima::Drawable::Glyphs-> glyphs >>
+glyph string.
 
 The result is an anonymous array of 5 points ( 5 integer pairs
 in (X,Y) format). These 5 points are offsets for the following string
@@ -1619,8 +1836,10 @@ for cases when these are insufficient. See description of options in L<spline>.
 
 =item text_wrap TEXT, WIDTH, OPTIONS, TAB_INDENT = 8
 
-Breaks TEXT string in chunks that would fit
-into WIDTH pixels wide box.
+Breaks TEXT string in chunks that would fit into WIDTH pixels wide box. TEXT
+is either character string, or a C<Prima::Drawable::Glyphs> object returned
+from C<text_shape>, or C<< Prima::Drawable::Glyphs->glyphs >> strings of
+glyphs. In the glyph cases, some wrapping options are not applicable.
 
 The break algorithm and its result are governed by OPTIONS integer value
 which is a combination of C<tw::> constants:
@@ -1634,18 +1853,26 @@ special meaning - it gets underlined. If this bit is set, the first tilde charac
 as an escapement is not calculated, and never appeared in the result
 apart from the escaped character.
 
+Not applicable in glyph wrapping.
+
 =item tw::CollapseTilde
 
 In addition to tw::CalcMnemonic, removes '~' character from
 the resulting chunks.
 
+Not applicable in glyph wrapping.
+
 =item tw::CalcTabs
 
 If set, calculates a tab ('\t') character as TAB_INDENT times space characters.
 
+Not applicable in glyph wrapping.
+
 =item tw::ExpandTabs
 
 If set, expands tab ('\t') character as TAB_INDENT times space characters.
+
+Not applicable in glyph wrapping.
 
 =item tw::BreakSingle
 
@@ -1662,9 +1889,13 @@ Forces new chunk after a newline character ('\n') is met.
 If UTF8 text is passed, unicode line break characters C<0x2028> and C<0x2029>
 produce same effect as the newline character.
 
+Not applicable in glyph wrapping.
+
 =item tw::SpaceBreak
 
 Forces new chunk after a space character (' ') or a tab character ('\t') are met.
+
+Not applicable in glyph wrapping.
 
 =item tw::ReturnChunks
 
@@ -1679,11 +1910,15 @@ If unset, the resulting array consists from text chunks.
 
 Equals to 0, is a mnemonic to an unset tw::ReturnChunks.
 
+Not applicable in glyph wrapping.
+
 =item tw::WordBreak
 
 If unset, the TEXT breaks as soon as the chunk width exceeds WIDTH.
 If set, tries to keep words in TEXT so they do not appear in two
 chunks, e.g. breaks TEXT by words, not by characters.
+
+Not applicable in glyph wrapping.
 
 =item tw::ReturnFirstLineLength
 
@@ -1694,11 +1929,11 @@ is needed.
 
 =back
 
-If OPTIONS has tw::CalcMnemonic or tw::CollapseTilde bits set,
-then the last scalar in the array result is a special hash reference.
-The hash contains extra information regarding the 'hot key'
-underline position - it is assumed that '~' - escapement denotes
-an underlined character. The hash contains the following keys:
+If OPTIONS has tw::CalcMnemonic or tw::CollapseTilde bits set, then the last
+scalar in the array result is a special hash reference.  The hash contains
+extra information regarding the 'hot key' underline position - it is assumed
+that '~' - escapement denotes an underlined character. The hash contains the
+following keys:
 
 =over 4
 
@@ -1726,6 +1961,16 @@ The escaped character.
 
 Context used: font
 
+=item text_wrap_shape TEXT, WIDTH, %OPTIONS
+
+Runs C<text_shape> over results from C<text_wrap> call, with C<TEXT>, C<WIDTH>,
+C<$OPTIONS{options}> and C<$OPTIONS{tabs}>. Other C<%OPTIONS> are used in
+C<text_shape> call. Where C<text_wrap> returns text substrings or positions,
+return glyphs objects or their positions instead.
+
+When called with C<tw::CalcMnemonic> options, recalculates the tilde position
+so it adapts to glyph positions returned.
+
 =back
 
 =head1 AUTHOR
@@ -1734,4 +1979,5 @@ Dmitry Karasik, E<lt>dmitry@karasik.eu.orgE<gt>.
 
 =head1 SEE ALSO
 
-L<Prima>, L<Prima::Object>, L<Prima::Image>, L<Prima::Region>, L<Prima::Drawable::Path>
+L<Prima>, L<Prima::Object>, L<Prima::Image>, L<Prima::Region>,
+L<Prima::Drawable::Path>, L<Prima::Drawable::Glyphs>

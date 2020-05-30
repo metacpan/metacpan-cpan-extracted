@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Dist::Zilla::App::Command::build 6.014;
+package Dist::Zilla::App::Command::build 6.015;
 # ABSTRACT: build your dist
 
 use Dist::Zilla::App -command;
@@ -124,7 +124,7 @@ Dist::Zilla::App::Command::build - build your dist
 
 =head1 VERSION
 
-version 6.014
+version 6.015
 
 =head1 SYNOPSIS
 

@@ -8,7 +8,7 @@ use Sub::Retry qw/retry/;
 use Net::EmptyPort qw/empty_port/;
 use IPC::Run ();
 
-our $VERSION = "0.03001";
+our $VERSION = "0.03003";
 our $DEBUG;
 
 sub new {
@@ -24,6 +24,7 @@ sub new {
         dbname  => "test",
         print_docker_error => 1,
         _orig_address => '',
+        _pid => $$,
         %opts,
     }, $class;
     $self->{docker} = $self->_search_docker_path() unless $self->docker;
@@ -95,6 +96,7 @@ sub DESTROY {
     my ( $self ) = @_;
     $self->{dbh}->disconnect() if defined $self->{dbh};
     return if $self->_address ne $self->{_orig_address};
+    return if $$ != $self->{_pid};
     $self->docker_cmd(kill => [$self->container_name]) if $self->docker_is_running;
 }
 

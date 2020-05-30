@@ -14,7 +14,7 @@ sub type_regex {
                         .+value\s+supplied\s+for\s+column\s+
                         \'(\w+)\'
         }ix,
-        missing_table => qr{()no\s+such\s+table}i,
+        missing_table => qr{no\s+such\s+table\:\s*(\w+)}i,
         missing_column => qr{no\s+such\s+column\s+\'(\w+)\'}i,
         not_null => qr{
                        NOT\s+NULL\s+constraint\s+failed\:\s+

@@ -1,5 +1,13 @@
 Revision history for MIDI-Ngram
 
+0.1600 2020-05-27 12:02:38
+    - Improve eg/ngram-play.
+    - Improve dist.ini.
+    - Actually use the one_channel attribute for playback.
+
+0.1502 2020-05-27 08:28:22
+    - Fix the eg/ngram-play network logic.
+
 0.1501 2020-05-26 15:12:36
     - Drop unused bounds attribute.
     - Clean-up test code.

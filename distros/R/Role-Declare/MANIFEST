@@ -7,6 +7,7 @@ cpanfile
 lib/Role/Declare.pm
 lib/Role/Declare.pod
 lib/Role/Declare/StrictWith.pm
+t/lax-mode.t
 t/role-declare.t
 t/shorthands.t
 xt/kwalitee.t

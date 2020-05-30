@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use Test::More tests => 60;
+use Test::More qw( no_plan );
 
 BEGIN
 {
@@ -63,7 +63,7 @@ SKIP:
 	is( $sql->_dayofweek( "$dt" ), $dt->day_of_week, "Checking dayofweek()" );
 	is( $sql->_dayofyear( "$dt" ), $dt->day_of_year, "Checking dayofyear()" );
 	my @coordinates = qw( 35.7132311 139.7174027 35.68117 139.7327573 );
-	is( $sql->_distance_miles( @coordinates ), 2.37703415424117, "Checking distance_miles()" );
+	is( CORE::sprintf( "%.12f", $sql->_distance_miles( @coordinates ) ), 2.377034154241, "Checking distance_miles()" );
 	my $check_t = DateTime->new(
 		year => 1970,
 		month => 3,

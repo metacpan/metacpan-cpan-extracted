@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/SQLite.pm
-## Version v0.400.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Version v0.400.3
+## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2017/07/19
-## Modified 2020/05/21
+## Modified 2020/05/28
 ## 
 ##----------------------------------------------------------------------------
 ## This is the subclassable module for driver specific ones.
@@ -34,7 +34,7 @@ BEGIN
     use Nice::Try;
     our( $VERSION, $DB_ERRSTR, $ERROR, $DEBUG, $CONNECT_VIA, $CACHE_QUERIES, $CACHE_SIZE );
     our( $CACHE_TABLE, $USE_BIND, $USE_CACHE, $MOD_PERL, @DBH );
-    $VERSION     = 'v0.400.1';
+    $VERSION     = 'v0.400.3';
     use Devel::Confess;
 };
 
@@ -264,7 +264,7 @@ sub compile_options
 sub connect
 {
     my $that  = shift( @_ );
-    my $param = $that->_connection_params2hash( @_ ) || return( undef() );
+    my $param = $that->_connection_params2hash( @_ ) || return;
     $param->{driver} = 'SQLite';
     $param->{sqlite_unicode} = 1;
     return( $that->SUPER::connect( $param ) );
@@ -297,7 +297,7 @@ sub databases
     {
         try
         {
-            $dbh = $self->connect( $con ) || return( undef() );
+            $dbh = $self->connect( $con ) || return;
         }
         catch( $e )
         {
@@ -569,7 +569,7 @@ sub tables
 {
     my $self = shift( @_ );
     my $db   = shift( @_ ) || $self->{ 'database' };
-    my $all  = $self->tables_info || return( undef() );
+    my $all  = $self->tables_info || return;
     my @tables = map( $_->{name}, @$all );
 #     return( wantarray() ? () : undef() ) if( !@tables );
 #     return( wantarray() ? @tables : \@tables );
@@ -734,7 +734,7 @@ sub _parse_timestamp
     my $self = shift( @_ );
     my $str  = shift( @_ );
     ## No value was actually provided
-    return( undef() ) if( !length( $str ) );
+    return if( !length( $str ) );
     my $tz = DateTime::TimeZone->new( name => 'local' );
     my $error = 0;
     my $opt = 
@@ -1996,4 +1996,3 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 L<DBI>, L<Apache::DBI>
 
 =cut
-

@@ -2,7 +2,7 @@
 
 Enables airplane mode for your dzil plugin bundle. This means all network
 plugins are removed from loading and aborts a release via the plugin
-[Dist::Zilla::Plugin::BlockRelease](https://metacpan.org/pod/Dist::Zilla::Plugin::BlockRelease).
+[Dist::Zilla::Plugin::BlockRelease](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3ABlockRelease).
 
     # In your dist.ini
     [@Author::EXAMPLE]
@@ -15,7 +15,8 @@ plugins are removed from loading and aborts a release via the plugin
 
     with 'Dist::Zilla::Role::PluginBundle::Airplane';
 
-    sub build_airplane_mode {
+    # You are required to implement this method
+    sub build_network_plugins {
         return [qw(
             PromptIfStale
             Test::Pod::LinkCheck

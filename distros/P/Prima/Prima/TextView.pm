@@ -15,7 +15,6 @@ use Prima::ScrollBar;
 use Prima::Drawable::TextBlock;
 use vars qw(@ISA);
 @ISA = qw(Prima::Widget Prima::MouseScroller Prima::GroupScroller);
-use Prima::Bidi qw(:methods is_bidi);
 
 use constant YMAX => 1000;
 
@@ -44,6 +43,7 @@ sub profile_default
 		hScrollBarProfile=> {},
 		vScrollBarProfile=> {},
 		selectable      => 1,
+		textDirection   => $::application->textDirection,
 		textOutBaseline => 1,
 		textRef         => '',
 		vScroll         => 1,
@@ -74,13 +74,14 @@ sub profile_check_in
 sub init
 {
 	my $self = shift;
-	for ( qw( topLine scrollTransaction hScroll vScroll offset
+	for ( qw( topLine scrollTransaction hScroll vScroll offset textDirection
 		paneWidth paneHeight borderWidth autoVScroll autoHScroll))
 		{ $self-> {$_} = 0; }
 	my %profile = $self-> SUPER::init(@_);
 	$self-> {paneSize} = [0,0];
 	$self-> {colorMap} = [];
 	$self-> {fontPalette} = [];
+	$self-> {fontPaletteSize} = 0;
 	$self-> {blocks} = [];
 	$self-> {resolution} = [];
 	$self-> {defaultFontSize} = $self-> font-> size;
@@ -92,7 +93,7 @@ sub init
 	$self->{$_} = $profile{$_} for qw(scrollBarClass hScrollBarProfile vScrollBarProfile);
 	for ( qw( autoHScroll autoVScroll colorMap fontPalette
 				hScroll vScroll borderWidth paneWidth paneHeight
-				offset topLine textRef))
+				offset topLine textDirection textRef))
 		{ $self-> $_( $profile{ $_}); }
 	return %profile;
 }
@@ -240,6 +241,13 @@ sub resolution
 	@{$self-> {resolution}} = ( $x, $y);
 }
 
+sub textDirection
+{
+	return $_[0]-> {textDirection} unless $#_;
+	my ( $self, $td ) = @_;
+	$self-> {textDirection} = $td;
+}
+
 sub topLine
 {
 	return $_[0]-> {topLine} unless $#_;
@@ -299,6 +307,7 @@ sub fontPalette
 		encoding => '',
 		pitch    => fp::Default,
 	} if scalar @$fm < 1;
+	$self-> {fontPaletteSize} = @$fm;
 	$self-> repaint;
 }
 
@@ -315,18 +324,20 @@ sub create_state
 sub begin_paint_info
 {
 	my $self = shift;
-	delete $self->{currentFont};
+	$self-> reset_state;
 	return $self->SUPER::begin_paint_info;
 }
 
 sub end_paint_info
 {
 	my $self = shift;
-	delete $self->{currentFont};
+	$self-> reset_state;
 	return $self->SUPER::end_paint_info;
 }
 
 sub _hash { my $k = shift; join("\0", map { ($_, $k->{$_}) } sort keys %$k) }
+
+sub reset_state { delete $_[0]->{currentFont} }
 
 sub realize_state
 {
@@ -393,15 +404,15 @@ sub block_wrap
 {
 	my ( $self, $canvas, $b, $state, $width) = @_;
 	return tb::block_wrap( $b,
-		textPtr      => $self->{text},
-		canvas       => $canvas,
-		state        => $state,
-		width        => $width,
-		fontmap      => $self->{fontPalette},
-		baseFontSize => $self->{defaultFontSize},
-		resolution   => $self->{resolution},
-		wordBreak    => 1,
-		bidi         => 1,
+		textPtr       => $self->{text},
+		canvas        => $canvas,
+		state         => $state,
+		width         => $width,
+		fontmap       => $self->{fontPalette},
+		baseFontSize  => $self->{defaultFontSize},
+		resolution    => $self->{resolution},
+		wordBreak     => 1,
+		textDirection => $self->{textDirection}, 
 	);
 }
 
@@ -420,25 +431,21 @@ sub paint_selection
 	my $len = $self->get_block_text_length($index);
 	$sx2 = $len - 1 if $sx2 < 0;
 
-	my @selection_map;
-	unless ($$block[ tb::BLK_FLAGS ] & tb::T_IS_BIDI) {
-		@selection_map = (0) x $len;
-		$selection_map[$_] = 1 for $sx1 .. $sx2;
-	}
 	my @state;
 	my @xy = ($x,$y);
 	local $self->{selectionPaintMode} = 0;
 
 	my $draw_text = sub {
-		my ( $x, $text ) = @_;
+		my ( $glyphs, $x, $start, $end ) = @_;
 		my $f = $canvas->get_font;
-		my $w = $canvas->get_text_width($text);
+		my $w = $canvas->get_text_width($glyphs, 0, $start, $end - $start);
 		$self-> realize_state( $canvas, \@state, tb::REALIZE_COLORS);
+		my $g = $glyphs->glyphs;
 		$canvas->clear(
 			$x, $xy[1] - $f->{descent},
 			$x + $w - 1, $xy[1] + $f->{ascent} + $f->{externalLeading} - 1
-			) if $self->{selectionPaintMode};
-		$canvas-> text_out($text, $x, $xy[1]);
+		) if $self->{selectionPaintMode};
+		$canvas-> text_out($glyphs, $x, $xy[1], $start, $end - $start);
 		return $w;
 	};
 
@@ -449,17 +456,26 @@ sub paint_selection
 		state    => \@state,
 		text     => sub {
 			my ($offset, $length, undef, $text) = @_;
-			my $accumulated = '';
+			my ($vis_start, $vis_end) = (0,0);
 			my $x = $xy[0];
+			my $glyphs  = $self-> text_shape($text);
+			my $indexes = $glyphs->indexes;
+			$length = @{ $glyphs-> glyphs };
+			my $selection_map = $glyphs-> selection_map_glyphs( map { $_ - $offset } ($sx1, $sx2));
 			for ( my $i = 0; $i < $length; $i++) {
-				if ( $selection_map[$offset + $i] != $self->{selectionPaintMode} ) {
-					$x += $draw_text->( $x, $accumulated );
-					$accumulated = '';
-					$self->{selectionPaintMode} = $selection_map[$offset + $i];
+				if ( $selection_map->[$i] != $self->{selectionPaintMode} ) {
+					if ($vis_end > $vis_start) {
+						my $curr_index = $indexes->[$i];
+						$i++, $vis_end++ while $curr_index == $indexes->[$i + 1];
+						$x += $draw_text->( $glyphs, $x, $vis_start, $vis_end );
+					}
+					$vis_start = $vis_end;
+					$self->{selectionPaintMode} = $selection_map->[$i];
 				}
-				$accumulated .= substr($text, $i, 1);
+				$vis_end++;
 			}
-			$draw_text->( $x, $accumulated ) if length $accumulated;
+			$draw_text->( $glyphs, $x, $vis_start, $vis_end )
+				if $vis_end > $vis_start;
 		},
 		code     => sub {
 			my ( $code, $data ) = @_;
@@ -471,19 +487,13 @@ sub paint_selection
 			return if !($f & tb::X_EXTEND) || !$self->{selectionPaintMode} || $x == 0 || $y == 0;
 			$canvas->clear($xy[0], $xy[1] - $$block[ tb::BLK_APERTURE_Y], $xy[0] + $x - 1, $xy[1] + $y - $$block[ tb::BLK_APERTURE_Y] - 1);
 		},
-		bidimap  => sub {
-			my $map = pop;
-			for ( my $i = 0; $i < @$map; $i++) {
-				$selection_map[$i] = ($map->[$i] >= $sx1 && $map->[$i] <= $sx2) ? 1 : 0;
-			}
-		},
 	);
 }
 
 sub on_paint
 {
 	my ( $self, $canvas) = @_;
-	delete $self->{currentFont};
+	$self-> reset_state;
 	my @size = $canvas-> size;
 	unless ( $self-> enabled) {
 		$self-> color( $self-> disabledColor);
@@ -564,7 +574,7 @@ sub block_draw
 		position => \@xy,
 		state    => \@state,
 		text     => sub {
-			$self-> block_walk_abort( $ret = 0 ) unless $canvas-> text_out($_[-1], @xy);
+			$self-> block_walk_abort( $ret = 0 ) unless $canvas-> text_shape_out($_[-1], @xy);
 		},
 		code     => sub {
 			my ( $code, $data ) = @_;
@@ -671,7 +681,6 @@ sub xy2info
 
 	# find text offset
 	my $ofs = 0;
-	my $bidimap;
 	my @pos = ($$b[ tb::BLK_X] - $x,0);
 
 	$self-> block_walk( $b,
@@ -684,16 +693,21 @@ sub xy2info
 				$ofs = $offset;
 				$self-> block_walk_abort;
 			} elsif ( $pos[0] <= 0 && $npx > 0) {
-				$ofs = $offset + $self-> text_wrap( $text, -$pos[0], tw::ReturnFirstLineLength | tw::BreakSingle);
+				my $glyphs = $self-> text_shape( $text );
+				my $goffs  = $self-> text_wrap(
+					$glyphs, -$pos[0],
+					tw::ReturnFirstLineLength | tw::BreakSingle
+				);
+				my $indexes = $glyphs->indexes;
+				$ofs = $offset + (( $goffs >= $#$indexes ) ? 
+						($indexes-> [-1]) : # shouldn't happen
+						($indexes->[$goffs] & ~to::RTL));
 				$self-> block_walk_abort;
 			} else {
 				$ofs = $offset + $length - 1;
 			}
 		},
-		bidimap => sub { $bidimap = pop },
 	);
-
-	$ofs = $bidimap->[$ofs] if $bidimap;
 
 	return $ofs, $bid;
 }
@@ -782,12 +796,6 @@ sub info2text_offset
 
 	my $ptr = $self-> {blocks}-> [$block]-> [tb::BLK_TEXT_OFFSET];
 	my $len = $self->get_block_text_length( $block );
-	if (
-		$offset < $len &&
-		$self->is_bidi( my $str = substr( ${$self-> {text}}, $ptr, $len ) )
-	) {
-		$offset = $self->bidi_map($str)->[$offset];
-	}
 	return $ptr + $offset;
 }
 
@@ -797,10 +805,6 @@ sub text_offset2info
 	my $blk = $self-> text_offset2block( $ofs);
 	return undef unless defined $blk;
 	$ofs -= $self-> {blocks}-> [$blk]-> [ tb::BLK_TEXT_OFFSET];
-
-	if ( $self->is_bidi( my $str = $self-> get_block_text($blk))) {
-		$ofs = $self->bidi_map_find( $self-> bidi_map($str), $ofs );
-	}
 	return $ofs, $blk;
 }
 
@@ -938,8 +942,6 @@ sub on_mouseup
 		return;
 	}
 
-	# my $p = $self-> get_selected_text;
-	# Prima::Bidi::debug_str($p) if defined $p;
 
 	return if $btn != mb::Left;
 

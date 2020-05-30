@@ -1,15 +1,12 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## DB/Object/Mysql/Tables.pm
-## Version 0.3
-## Copyright(c) 2019 Jacques Deguest
-## Author: Jacques Deguest <jack@deguest.jp>
+## Database Object Interface - ~/lib/DB/Object/Mysql/Tables.pm
+## Version v0.300.1
+## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2017/07/19
-## Modified 2019/09/11
-## All rights reserved.
+## Modified 2020/05/22
 ## 
-## This program is free software; you can redistribute it and/or modify it 
-## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 ## This package's purpose is to separate the object of the tables from the main
 ## DB::Object package so that when they get DESTROY'ed, it does not interrupt
@@ -22,7 +19,7 @@ BEGIN
     use strict;
     our( $VERSION, $VERBOSE, $DEBUG );
     use parent qw( DB::Object::Mysql DB::Object::Tables );
-    $VERSION    = '0.3';
+    $VERSION    = 'v0.300.1';
     $VERBOSE    = 0;
     $DEBUG      = 0;
     use Devel::Confess;
@@ -282,7 +279,7 @@ sub lock
             $opt = $arg;
         }
         $opt ||= 'LOW_PRIORITY WRITE';
-        $chk_opt->( $self, $self->{ 'table' }, $opt, $alias ) || return( undef() );
+        $chk_opt->( $self, $self->{ 'table' }, $opt, $alias ) || return;
         my @lck = ( $self->{ 'table' } );
         push( @lck, "AS $alias" ) if( $alias );
         push( @lck, uc( $opt ) );
@@ -308,7 +305,7 @@ sub lock
                 $opt = $value;
             }
             $opt ||= 'LOW_PRIORITY WRITE';
-            $chk_opt->( $self, $tbl, $opt, $alias ) || return( undef() );
+            $chk_opt->( $self, $tbl, $opt, $alias ) || return;
             my @lck = ( $tbl );
             push( @lck, "AS $alias" ) if( $alias );
             push( @lck, uc( $opt ) );

@@ -5,10 +5,10 @@ use vars qw(@ISA);
 use strict;
 use warnings;
 use Prima;
-use Prima::PS::Fonts;
-use Prima::PS::Encodings;
+use Prima::PS::Glyphs;
+use Prima::PS::TempFile;
+use File::Temp;
 use Encode;
-
 
 {
 my %RNT = (
@@ -25,10 +25,6 @@ sub profile_default
 	my $def = $_[ 0]-> SUPER::profile_default;
 	my %prf = (
 		copies           => 1,
-		font             => {
-			%{$def-> {font}},
-			name => $Prima::PS::Fonts::defaultFontName,
-		},
 		grayscale        => 0,
 		pageDevice       => undef,
 		pageSize         => [ 598, 845],
@@ -39,19 +35,9 @@ sub profile_default
 		scale            => [ 1, 1],
 		isEPS            => 0,
 		textOutBaseline  => 0,
-		useDeviceFonts   => 1,
-		useDeviceFontsOnly => 0,
 	);
 	@$def{keys %prf} = values %prf;
 	return $def;
-}
-
-sub profile_check_in
-{
-	my ( $self, $p, $default) = @_;
-	Prima::Component::profile_check_in( $self, $p, $default);
-	$p-> { font} = {} unless exists $p-> { font};
-	$p-> { font} = Prima::Drawable-> font_match( $p-> { font}, $default-> { font}, 0);
 }
 
 sub init
@@ -66,13 +52,10 @@ sub init
 	$self-> {copies}      = 1;
 	$self-> {rotate}      = 1;
 	$self-> {font}        = {};
-	$self-> {useDeviceFonts} = 1;
 	my %profile = $self-> SUPER::init(@_);
 	$self-> $_( $profile{$_}) for qw( grayscale copies pageDevice
-		useDeviceFonts rotate reversed useDeviceFontsOnly isEPS);
+		rotate reversed isEPS);
 	$self-> $_( @{$profile{$_}}) for qw( pageSize pageMargins resolution scale );
-	$self-> {localeEncoding} = [];
-	$self-> set_font($profile{font}); # update to the changed resolution, device fonts etc
 	return %profile;
 }
 
@@ -92,14 +75,39 @@ sub cmd_rgb
 	}
 }
 
+sub defer_emission
+{
+	my ($self, $defer) = @_;
+	if ( $defer ) {
+		return if defined $self->{deferred};
+		if ( length($self-> {ps_data})) {
+			my $d = $self->{ps_data};
+			$self-> {ps_data} = '';
+			return $self-> abort_doc unless $self-> spool($d);
+		}
+
+		$self->abort_doc unless $self->{deferred} = Prima::PS::TempFile->new;
+	} else {
+		return unless defined $self->{deferred};
+		$self-> abort_doc unless delete($self->{deferred})->evacuate( sub { $self-> spool($_[0]) } );
+	}
+}
+
 sub emit
 {
 	my $self = $_[0];
-	return 0 unless $self-> {canDraw};
-	$self-> {psData} .= $_[1] . "\n";
-	if ( length($self-> {psData}) > 10240) {
-		$self-> abort_doc unless $self-> spool( $self-> {psData});
-		$self-> {psData} = '';
+	return 0 unless $self-> {can_draw};
+	if ( defined $self->{deferred} ) {
+		unless ($self->{deferred}->write($_[1] . "\n")) {
+			$self->abort_doc;
+			return 0;
+		}
+	} else {
+		$self-> {ps_data} .= $_[1] . "\n";
+		if ( length($self-> {ps_data}) > 10240) {
+			$self-> abort_doc unless $self-> spool( $self-> {ps_data});
+			$self-> {ps_data} = '';
+		}
 	}
 	return 1;
 }
@@ -108,23 +116,14 @@ sub save_state
 {
 	my $self = $_[0];
 
-	$self-> {saveState} = {};
-	if ($self-> {useDeviceFonts}) {
-		# force-fill font data
-		my $f = $self->get_font;
-		delete $f->{size} if exists $f->{height} and exists $f->{size};
-		$self-> set_font( $f );
-	}
-	$self-> {saveState}-> {$_} = $self-> $_() for qw(
+	$self-> {save_state} = {};
+	$self-> {save_state}-> {$_} = $self-> $_() for qw(
 		color backColor fillPattern lineEnd linePattern lineWidth miterLimit
 		rop rop2 textOpaque textOutBaseline font lineJoin fillMode
 	);
-	delete $self->{saveState}->{font}->{size};
-	$self-> {saveState}-> {$_} = [$self-> $_()] for qw(
+	$self-> {save_state}-> {$_} = [$self-> $_()] for qw(
 		translate clipRect
 	);
-	$self-> {saveState}-> {localeEncoding} =
-		$self-> {useDeviceFonts} ? [ @{$self-> {localeEncoding}}] : [];
 }
 
 sub restore_state
@@ -132,12 +131,11 @@ sub restore_state
 	my $self = $_[0];
 	for ( qw( color backColor fillPattern lineEnd linePattern lineWidth miterLimit
 			rop rop2 textOpaque textOutBaseline font lineJoin fillMode)) {
-		$self-> $_( $self-> {saveState}-> {$_});
+		$self-> $_( $self-> {save_state}-> {$_});
 	}
 	for ( qw( translate clipRect)) {
-		$self-> $_( @{$self-> {saveState}-> {$_}});
+		$self-> $_( @{$self-> {save_state}-> {$_}});
 	}
-	$self-> {localeEncoding} = $self-> {saveState}-> {localeEncoding};
 }
 
 sub pixel2point
@@ -147,8 +145,8 @@ sub pixel2point
 	my @res;
 	for ( $i = 0; $i < scalar @_; $i+=2) {
 		my ( $x, $y) = @_[$i,$i+1];
-		push( @res, int( $x * 7227 / $self-> {resolution}-> [0] + 0.5) / 100 );
-		push( @res, int( $y * 7227 / $self-> {resolution}-> [1] + 0.5) / 100 ) if defined $y;
+		push @res, int( $x * 7227 / $self-> {resolution}-> [0] + 0.5) / 100;
+		push @res, int( $y * 7227 / $self-> {resolution}-> [1] + 0.5) / 100 if defined $y;
 	}
 	return @res;
 }
@@ -160,12 +158,11 @@ sub point2pixel
 	my @res;
 	for ( $i = 0; $i < scalar @_; $i+=2) {
 		my ( $x, $y) = @_[$i,$i+1];
-		push( @res, $x * $self-> {resolution}-> [0] / 72.27);
-		push( @res, $y * $self-> {resolution}-> [1] / 72.27) if defined $y;
+		push @res, $x * $self-> {resolution}-> [0] / 72.27;
+		push @res, $y * $self-> {resolution}-> [1] / 72.27 if defined $y;
 	}
 	return @res;
 }
-
 
 sub change_transform
 {
@@ -329,8 +326,8 @@ sub begin_doc
 {
 	my ( $self, $docName) = @_;
 	return 0 if $self-> get_paint_state;
-	$self-> {psData}  = '';
-	$self-> {canDraw} = 1;
+	$self-> {ps_data}  = '';
+	$self-> {can_draw} = 1;
 
 	$docName = $::application ? $::application-> name : "Prima::PS::Drawable"
 		unless defined $docName;
@@ -340,7 +337,7 @@ sub begin_doc
 		int($self-> {pageSize}-> [1] - $self-> {pageMargins}-> [3] + .5)
 	);
 
-	$self-> {fpHash}  = {};
+	$self-> {fp_hash}  = {};
 	$self-> {pages}   = 1;
 
 	my ($x,$y) = (
@@ -365,8 +362,6 @@ sub begin_doc
 %%EndFeature
 NUMPAGES
 	}
-	$self-> {localeData} = {};
-	$self-> {fontLocaleData} = {};
 
 	my $header = "%!PS-Adobe-2.0";
 	$header .= " EPSF-2.0" if $self->isEPS;
@@ -386,7 +381,7 @@ $extras
 
 /d/def load def/,/load load d/~/exch , d/S/show , d/:/gsave , d/;/grestore ,
 d/N/newpath , d/M/moveto , d/L/rlineto , d/X/closepath , d/C/clip ,
-d/T/translate , d/R/rotate , d/P/showpage , d/Z/scale , d/I/imagemask ,
+d/T/translate , d/R/rotate , d/Y/glyphshow , d/P/showpage , d/Z/scale , d/I/imagemask ,
 d/@/dup , d/G/setgray , d/A/setrgbcolor , d/l/lineto , d/F/fill ,
 d/FF/findfont , d/XF/scalefont , d/SF/setfont ,
 d/O/stroke , d/SD/setdash , d/SL/setlinecap , d/SW/setlinewidth ,
@@ -400,19 +395,19 @@ d/dummy/_dummy
 $setup
 %%EndSetup
 
-%%Page: 1 1
 PSHEADER
+	$self->defer_emission(1);
+	$self->emit("%%Page: 1 1\n");
 
-	$self-> {pagePrefix} = <<PREFIX;
+	$self-> {page_prefix} = <<PREFIX;
 @{$self->{pageMargins}}[0,1] T
 N 0 0 M 0 $y L $x 0 L 0 -$y L X C
 PREFIX
 
-	$self-> {pagePrefix} .= "0 0 M 90 R 0 -$x T\n" if $self-> {reversed};
+	$self-> {page_prefix} .= "0 0 M 90 R 0 -$x T\n" if $self-> {reversed};
 
 	$self-> {changed} = { map { $_ => 0 } qw(
 		fill lineEnd linePattern lineWidth lineJoin miterLimit font)};
-	$self-> {docFontMap} = {};
 
 	$self-> SUPER::begin_paint;
 	$self-> save_state;
@@ -421,7 +416,7 @@ PREFIX
 	$self-> restore_state;
 	$self-> {delay} = 0;
 
-	$self-> emit( $self-> {pagePrefix});
+	$self-> emit( $self-> {page_prefix});
 	$self-> change_transform( 1);
 	$self-> {changed}-> {linePattern} = 0;
 
@@ -431,20 +426,24 @@ PREFIX
 sub abort_doc
 {
 	my $self = $_[0];
-	return unless $self-> {canDraw};
-	$self-> {canDraw} = 0;
+	return unless $self-> {can_draw};
+	$self-> {can_draw} = 0;
 	$self-> SUPER::end_paint;
 	$self-> restore_state;
 	delete $self-> {$_} for
-		qw (saveState localeData psData changed fontLocaleData pagePrefix);
-	$self-> {plate}-> destroy, $self-> {plate} = undef if $self-> {plate};
+		qw (save_state ps_data changed page_prefix);
 }
 
 sub end_doc
 {
 	my $self = $_[0];
-	return 0 unless $self-> {canDraw};
-	$self-> emit(<<PSFOOTER);
+	return 0 unless $self-> {can_draw};
+	$self-> {can_draw} = 0;
+
+	$self->{glyph_keeper}-> evacuate( sub { $self->spool( $_[0] ) } )
+		if $self-> {glyph_keeper};
+	$self-> defer_emission(0);
+	my $ret = $self-> spool($self->{ps_data} . <<PSFOOTER);
 ; P
 
 %%Trailer
@@ -454,18 +453,11 @@ sub end_doc
 %%EOF
 PSFOOTER
 
-	# if ( $self-> {locale}) {
-	# 	my @z = map { '/' . $_ } keys %{$self-> {docFontMap}};
-	# 	my $xcl = "/FontList [@z] d\n";
-	# }
-
-	my $ret = $self-> spool( $self-> {psData});
-	$self-> {canDraw} = 0;
+	$self-> {can_draw} = 0;
 	$self-> SUPER::end_paint;
 	$self-> restore_state;
 	delete $self-> {$_} for
-		qw (saveState localeData changed fontLocaleData psData pagePrefix);
-	$self-> {plate}-> destroy, $self-> {plate} = undef if $self-> {plate};
+		qw (save_state changed ps_data page_prefix glyph_keeper glyph_font);
 	return $ret;
 }
 
@@ -493,16 +485,17 @@ sub end_paint_info
 
 sub new_page
 {
-	return 0 unless $_[0]-> {canDraw};
+	return 0 unless $_[0]-> {can_draw};
 	my $self = $_[0];
 	$self-> {pages}++;
 	$self-> emit("; P\n%%Page: $self->{pages} $self->{pages}\n");
 	{
 		local $self->{delay} = 1;
-		$self-> $_( @{$self-> {saveState}-> {$_}}) for qw( translate clipRect);
+		$self-> $_( @{$self-> {save_state}-> {$_}}) for qw( translate clipRect);
 	}
+	$self-> emit( $self-> {page_prefix});
 	$self-> change_transform(1);
-	$self-> emit( $self-> {pagePrefix});
+	$self-> {changed}->{font} = 1;
 	return 1;
 }
 
@@ -512,10 +505,6 @@ sub spool
 {
 	shift-> notify( 'Spool', @_);
 	return 1;
-	# my $p = $_[1];
-	# open F, ">> ./test.ps";
-	# print F $p;
-	# close F;
 }
 
 # properties
@@ -524,7 +513,7 @@ sub color
 {
 	return $_[0]-> SUPER::color unless $#_;
 	$_[0]-> SUPER::color( $_[1]);
-	return unless $_[0]-> {canDraw};
+	return unless $_[0]-> {can_draw};
 	$_[0]-> {changed}-> {fill} = 1;
 }
 
@@ -532,7 +521,7 @@ sub fillPattern
 {
 	return $_[0]-> SUPER::fillPattern unless $#_;
 	$_[0]-> SUPER::fillPattern( $_[1]);
-	return unless $_[0]-> {canDraw};
+	return unless $_[0]-> {can_draw};
 
 	my $self = $_[0];
 	my @fp  = @{$self-> SUPER::fillPattern};
@@ -542,7 +531,7 @@ sub fillPattern
 	my @scaleto = $self-> pixel2point( 8, 8);
 	if ( !$solidBack && !$solidFore) {
 		$fpid = join( '', map { sprintf("%02x", $_)} @fp);
-		unless ( exists $self-> {fpHash}-> {$fpid}) {
+		unless ( exists $self-> {fp_hash}-> {$fpid}) {
 			$self-> emit( <<PATTERNDEF);
 <<
 \/PatternType 1 \% Tiling pattern
@@ -564,7 +553,7 @@ e
 \/Pat_$fpid ~ d
 
 PATTERNDEF
-			$self-> {fpHash}-> {$fpid} = 1;
+			$self-> {fp_hash}-> {$fpid} = 1;
 		}
 	}
 	$self-> {fpType} = $solidBack ? 'B' : ( $solidFore ? 'F' : $fpid);
@@ -575,7 +564,7 @@ sub fillPatternOffset
 {
 	return $_[0]-> SUPER::fillPatternOffset unless $#_;
 	$_[0]-> SUPER::fillPatternOffset($_[1], $_[2]);
-	return unless $_[0]-> {canDraw};
+	return unless $_[0]-> {can_draw};
 	$_[0]-> {changed}-> {fillPatternOffset} = 1;
 }
 
@@ -583,7 +572,7 @@ sub lineEnd
 {
 	return $_[0]-> SUPER::lineEnd unless $#_;
 	$_[0]-> SUPER::lineEnd($_[1]);
-	return unless $_[0]-> {canDraw};
+	return unless $_[0]-> {can_draw};
 	$_[0]-> {changed}-> {lineEnd} = 1;
 }
 
@@ -591,7 +580,7 @@ sub lineJoin
 {
 	return $_[0]-> SUPER::lineJoin unless $#_;
 	$_[0]-> SUPER::lineJoin($_[1]);
-	return unless $_[0]-> {canDraw};
+	return unless $_[0]-> {can_draw};
 	$_[0]-> {changed}-> {lineJoin} = 1;
 }
 
@@ -605,7 +594,7 @@ sub linePattern
 {
 	return $_[0]-> SUPER::linePattern unless $#_;
 	$_[0]-> SUPER::linePattern($_[1]);
-	return unless $_[0]-> {canDraw};
+	return unless $_[0]-> {can_draw};
 	$_[0]-> {changed}-> {linePattern} = 1;
 }
 
@@ -613,7 +602,7 @@ sub lineWidth
 {
 	return $_[0]-> SUPER::lineWidth unless $#_;
 	$_[0]-> SUPER::lineWidth($_[1]);
-	return unless $_[0]-> {canDraw};
+	return unless $_[0]-> {can_draw};
 	$_[0]-> {changed}-> {lineWidth} = 1;
 }
 
@@ -623,7 +612,7 @@ sub miterLimit
 	my ( $self, $ml ) = @_;
 	$ml = 1.0 if $ml < 0;
 	$self-> SUPER::miterLimit($ml);
-	return unless $self-> {canDraw};
+	return unless $self-> {can_draw};
 	$self-> {changed}-> {miterLimit} = 1;
 }
 
@@ -683,7 +672,6 @@ sub reversed
 	$self-> calc_page;
 }
 
-
 sub rotate
 {
 	return $_[0]-> {rotate} unless $#_;
@@ -691,7 +679,6 @@ sub rotate
 	$self-> {rotate} = $_[1];
 	$self-> change_transform;
 }
-
 
 sub resolution
 {
@@ -715,63 +702,10 @@ sub pageDevice
 	$_[0]-> {pageDevice} = $_[1] unless $_[0]-> get_paint_state;
 }
 
-sub useDeviceFonts
-{
-	return $_[0]-> {useDeviceFonts} unless $#_;
-	if ( $_[1]) {
-		delete $_[0]-> {font}-> {width};
-		$_[0]-> set_font( $_[0]-> get_font);
-	}
-	$_[0]-> {useDeviceFonts} = $_[1] unless $_[0]-> get_paint_state;
-	$_[0]-> {useDeviceFonts} = 1 if $_[0]-> {useDeviceFontsOnly};
-	if ( !$::application && !$_[1] ) {
-		warn "warning: ignored .useDeviceFonts(0) because Prima::Application is not instantiated\n";
-		$_[0]->{useDeviceFonts} = 1;
-	}
-}
-
-sub useDeviceFontsOnly
-{
-	return $_[0]-> {useDeviceFontsOnly} unless $#_;
-	$_[0]-> useDeviceFonts(1)
-		if $_[0]-> {useDeviceFontsOnly} = $_[1] && !$_[0]-> get_paint_state;
-}
-
 sub grayscale
 {
 	return $_[0]-> {grayscale} unless $#_;
 	$_[0]-> {grayscale} = $_[1] unless $_[0]-> get_paint_state;
-}
-
-sub set_locale
-{
-	my ( $self, $loc) = @_;
-	return if !$self-> {useDeviceFonts};
-
-	$self-> {locale} = $loc;
-	my $le  = $self-> {localeEncoding} = Prima::PS::Encodings::load( $loc);
-
-	return unless $self->{canDraw};
-
-	unless ( scalar keys %{$self-> {localeData}}) {
-		return if ! defined($loc);
-		$self-> emit( <<ENCODER);
-\/reencode_font { ~ \/enco ~ d
-@ @ FF @ length dict b { 1 index
-\/FID ne{d}{pop pop}?} forall \/Encoding
-enco d currentdict e definefont } bind d
-ENCODER
-	}
-
-	unless ( exists $self-> {localeData}-> {$loc}) {
-		$self-> {localeData}-> {$loc} = 1;
-		$self-> emit( "/Encoding_$loc [");
-		my $i = 0;
-		for ( $i = 0; $i < 16; $i++) {
-			$self-> emit( join('', map {'/' . $_ } @$le[$i * 16 .. $i * 16 + 15]));
-		}
-		$self-> emit("] d\n");
-	}
 }
 
 sub calc_page
@@ -912,34 +846,118 @@ N 0 0 M 0 0 $rx 0 $end a 0 0 l $F ;
 SECTOR
 }
 
+sub text_out_outline
+{
+	my ( $self, $text ) = @_;
+	my $is_bytes = !Encode::is_utf8($text);
+	my $shaped   = $self->text_shape($text, level => $is_bytes ? ts::Bytes : ts::Glyphs ) or return;
+	$self-> glyph_out_outline($shaped, 0, scalar @{$shaped->glyphs});
+}
+
+sub glyph_out_outline
+{
+	my ( $self, $text, $from, $len ) = @_;
+
+	my $glyphs     = $text-> glyphs;
+	my $indexes    = $text-> indexes;
+	my $advances   = $text-> advances;
+	my $positions  = $text-> positions;
+	my $fonts      = $text-> fonts;
+	my $plaintext  = $text-> [Prima::Drawable::Glyphs::CUSTOM()];
+	my @ix_lengths = defined($plaintext) ? $text-> index_lengths : ();
+	my $adv        = 0;
+	my $canvas     = $self->glyph_canvas;
+	my $resolution = 72.27 / $self->{resolution}->[0];
+	my $keeper     = $self->{glyph_keeper};
+	my $font       = $self->{glyph_font};
+	my $div        = $self->{font_scale};
+	my $restore_font;
+
+	$len += $from;
+	my $emit = '';
+	my $fid  = 0;
+	my $ff = $canvas->font;
+	for ( my $i = $from; $i < $len; $i++) {
+		my $advance;
+		my $glyph     = $glyphs->[$i];
+		my ($x2, $y2) = ($adv, 0);
+		my $nfid = $fonts ? $fonts->[$i] : 0;
+		if ( $nfid != $fid ) {
+			my $newfont;
+			if ( $nfid == 0 ) {
+				$newfont = $self->{font};
+				$restore_font = 0;
+			} else {
+				my $src  = $self-> fontMapperPalette($nfid);
+				my $dst  = \%{$self->{font}};
+				$newfont = Prima::Drawable->font_match( $src, $dst );
+				$restore_font = 1;
+			}
+			$self-> glyph_canvas_set_font( %$newfont );
+			$font = $nfid ? $keeper->get_font($canvas->font) : $self->{glyph_font};
+			$emit .= "/$font FF $self->{font}->{size} XF SF\n";
+			$fid = $nfid;
+		}
+		my $char = defined($plaintext) ?
+			substr( $plaintext, $indexes->[$i] & ~to::RTL, $ix_lengths[$i]) :
+			undef;
+		my $gid = $keeper-> use_char($canvas, $font, $glyph, $char);
+		if ( $advances) {
+			$advance = $advances->[$i];
+			$x2 += $positions->[$i*2];
+			$y2 += $positions->[$i*2 + 1];
+		} else {
+			my $xr = $canvas->get_font_abc($glyph, $glyph, to::Glyphs);
+			$advance = ($$xr[0] + $$xr[1] + $$xr[2]) * $div;
+		}
+		$adv += $advance;
+		if ( defined $gid ) {
+			($x2, $y2) = map { int( $_ * 100 + 0.5) / 100 } $self->pixel2point($x2, $y2);
+			$emit .= "$x2 $y2 M " if $x2 != 0 || $y2 != 0;
+		} else {
+			# not a single vector font found
+			$gid //= $Prima::PS::Unicode->{$char} // 'question';
+		}
+		$emit .= "/$gid Y\n";
+	}
+
+	if ($restore_font) {
+		$emit .= "/$self->{glyph_font} FF $self->{font}->{size} XF SF\n";
+		$self-> glyph_canvas_set_font( %{ $self->{font} });
+	}
+	$self-> emit($emit);
+}
+
 sub text_out
 {
-	my ( $self, $text, $x, $y) = @_;
-	return $text->text_out($self, $x, $y) if ref $text;
-	return 0 unless $self-> {canDraw} and length $text;
+	my ( $self, $text, $x, $y, $from, $len) = @_;
+
+	$from //= 0;
+	my $glyphs;
+	if ( ref($text) eq 'Prima::Drawable::Glyphs') {
+		$glyphs = $text->glyphs;
+		$len    = @$glyphs if !defined($len) || $len < 0 || $len > @$glyphs;
+	} elsif (ref($text)) {
+		$len //= -1;
+		return $text->text_out($self, $x, $y, $from, $len);
+	} else {
+		$len   = length($text) if !defined($len) || $len < 0 || $len > length($text);
+		$text  = substr($text, $from, $len);
+		$from  = 0;
+		$len   = length($text);
+	}
+	return 0 unless $self-> {can_draw} and $len > 0;
+
 	$y += $self-> {font}-> {descent} if !$self-> textOutBaseline;
 	( $x, $y) = $self-> pixel2point( $x, $y);
 
-	my $n = $self-> {typeFontMap}-> {$self-> {font}-> {name}};
-	my $spec = exists ( $self-> {font}-> {encoding}) ?
-		exists ( $Prima::PS::Encodings::fontspecific{ $self-> {font}-> {encoding}}) : 0;
-	if ( $n == 1) {
-		my $fn = $self-> {font}-> {docname};
-		unless ( $spec ||
-			( !defined( $self-> {locale}) && !defined($self-> {fontLocaleData}-> {$fn})) ||
-			( defined( $self-> {locale}) && defined($self-> {fontLocaleData}-> {$fn}) &&
-					($self-> {fontLocaleData}-> {$fn} eq $self-> {locale}))) {
-			$self-> {fontLocaleData}-> {$fn} = $self-> {locale};
-			$self-> emit( "Encoding_$self->{locale} /$fn reencode_font");
-			$self-> {changed}-> {font} = 1;
-		}
-
-		if ( $self-> {changed}-> {font}) {
-			$self-> emit( "/$fn FF $self->{font}->{size} XF SF");
-			$self-> {changed}-> {font} = 0;
-		}
+	if ( $self-> {changed}-> {font}) {
+		my $fn = $self->{glyph_font};
+		$self-> emit( "/$fn FF $self->{font}->{size} XF SF");
+		$self-> {changed}-> {font} = 0;
 	}
-	my $wmul = $self-> {font}-> {width} / $self-> {fontWidthDivisor};
+
+	my $wmul = $self-> {font_x_scale};
 	$self-> emit(": $x $y T");
 	$self-> emit("$wmul 1 Z") if $wmul != 1;
 	$self-> emit("0 0 M");
@@ -947,12 +965,13 @@ sub text_out
 		my $r = $self-> {font}-> {direction};
 		$self-> emit("$r R");
 	}
+
 	my @rb;
 	if ( $self-> textOpaque || $self-> {font}-> {style} & (fs::Underlined|fs::StruckOut)) {
 		my ( $ds, $bs) = ( $self-> {font}-> {direction}, $self-> textOutBaseline);
 		$self-> {font}-> {direction} = 0;
 		$self-> textOutBaseline(1) unless $bs;
-		@rb = $self-> pixel2point( @{$self-> get_text_box( $text)});
+		@rb = $self-> pixel2point( @{$self-> get_text_box( $text, $from, $len)});
 		$self-> {font}-> {direction} = $ds;
 		$self-> textOutBaseline($bs) unless $bs;
 	}
@@ -962,81 +981,15 @@ sub text_out
 	}
 
 	$self-> emit( $self-> cmd_rgb( $self-> color));
-	my ( $rm, $nd) = $self-> get_rmap;
-	my ( $xp, $yp) = ( $x, $y);
-	my $c  = $self-> {font}-> {chardata};
-	my $le = $self-> {localeEncoding};
-	my $adv = 0;
 
-	my ( @t, @umap);
-	my $unicode = Encode::is_utf8( $text);
-	if ( defined($self-> {font}-> {encoding}) && $unicode) {
-		# known encoding?
-		eval { Encode::encode( $self-> {font}-> {encoding}, ''); };
-		unless ( $@) {
-			# convert as much of unicode text as possible into the current encoding
-			while ( 1) {
-				my $conv = Encode::encode(
-					$self-> {font}-> {encoding}, $text,
-					Encode::FB_QUIET
-				);
-				push @t, split( '', $conv);
-				push @umap, (undef) x length $conv;
-				last unless length $text;
-				push @t, substr( $text, 0, 1, '');
-				push @umap, 1;
-			}
-		} else {
-			@t = split '', $text;
-			@umap = map { undef } @t;
-		}
+	if ( $glyphs ) {
+		$self->glyph_out_outline($text, $from, $len);
 	} else {
-		@t = split '', $text;
-		@umap = map { undef } @t;
+		$self->text_out_outline($text);
 	}
-
-	my $i = -1;
-	for my $j ( @t) {
-		$i++;
-		my $advance;
-		my $u = $umap[$i]||0;
-		if (
-			!$umap[$i] &&                           # not unicode
-			$n == 1 &&                              # postscript font
-			( $le-> [ ord $j] ne '.notdef') && (    #
-				$spec ||                        # fontspecific
-				exists ( $c-> {$le-> [ ord $j]} # have predefined font metrics
-			)
-		)) {
-			$j =~ s/([\\()])/\\$1/g;
-			my $adv2 = int( $adv * 100 + 0.5) / 100;
-			$self-> emit( "$adv2 0 M") if $adv2 != 0;
-			$self-> emit("($j) S");
-			my $xr = $rm-> [ ord $j];
-			$advance = $$xr[1] + $$xr[2] + $$xr[3];
-		} else {
-			my ( $pg, $a, $b, $c) = $self-> place_glyph( $j);
-			if ( length $pg) {
-				my $adv2 = $adv + $a * 72.27 / $self-> {resolution}-> [0];
-				$adv2 = int( $adv * 100 + 0.5) / 100;
-				$self-> emit( "$adv2 $self->{plate}->{yd} M : CP T");
-				$self-> emit( $pg);
-				$self-> emit(";");
-				$advance = $a + $b + $c;
-			} elsif ( defined $a ) {
-				$advance = $a + $b + $c;
-			} else {
-				$advance = $$nd[1] + $$nd[2] + $$nd[3];
-			}
-		}
-		$adv += $advance * 72.27 / $self-> {resolution}-> [0];
-	}
-
-	#$text =~ s/([\\()])/\\$1/g;
-	#$self-> emit("($text) S");
 
 	if ( $self-> {font}-> {style} & (fs::Underlined|fs::StruckOut)) {
-		my $lw = $self-> {font}-> {size}/30; # XXX empiric
+		my $lw = int($self-> {font}-> {size} / 40 + .5); # XXX empiric
 		$self-> emit("[] 0 SD 0 SL $lw SW");
 		if ( $self-> {font}-> {style} & fs::Underlined) {
 			$self-> emit("N @rb[0,3] M $rb[4] 0 L O");
@@ -1168,17 +1121,15 @@ PIXEL
 	$self-> {changed}-> {fill} = 1;
 }
 
-
 # methods
 
 sub put_image_indirect
 {
-	return 0 unless $_[0]-> {canDraw};
+	return 0 unless $_[0]-> {can_draw};
 	my ( $self, $image, $x, $y, $xFrom, $yFrom, $xDestLen, $yDestLen, $xLen, $yLen) = @_;
 
 	my $touch;
 	$touch = 1, $image = $image-> image if $image-> isa('Prima::DeviceBitmap');
-
 
 	unless ( $xFrom == 0 && $yFrom == 0 && $xLen == $image-> width && $yLen == $image-> height) {
 		$image = $image-> extract( $xFrom, $yFrom, $xLen, $yLen);
@@ -1193,14 +1144,26 @@ sub put_image_indirect
 		} else {
 			$image-> type( im::RGB);
 		}
+		$touch = 1;
 	} elsif ( $self-> {grayscale} || $image-> type & im::GrayScale) {
 		$image = $image-> dup unless $touch;
 		$image-> type( im::Byte);
+		$touch = 1;
 	}
 
 	$ib = $image-> get_bpp;
-	$image-> type( im::RGB) if $ib != 8 && $ib != 24;
+	if ($ib != 8 && $ib != 24) {
+		$image = $image-> dup unless $touch;
+		$image-> type( im::RGB);
+		$touch = 1;
+	}
 
+	if ( $image-> type == im::RGB ) {
+		# invert BGR -> RGB
+		$image = $image-> dup unless $touch;
+		$image-> set(data => $image->data, type => im::fmtBGR | im::RGB);
+		$touch = 1;
+	}
 
 	my @is = $image-> size;
 	($x, $y, $xDestLen, $yDestLen) = $self-> pixel2point( $x, $y, $xDestLen, $yDestLen);
@@ -1208,7 +1171,6 @@ sub put_image_indirect
 		$is[0] / $xLen * $xDestLen,
 		$is[1] / $yLen * $yDestLen,
 	);
-
 
 	my $g  = $image-> data;
 	my $bt = ( $image-> type & im::BPP) * $is[0] / 8;
@@ -1222,10 +1184,7 @@ sub put_image_indirect
 	$self-> emit(( $image-> type & im::GrayScale) ? "image" : "false 3 colorimage");
 
 	for ( $i = 0; $i < $is[1]; $i++) {
-		my $w  = substr( $g, $ls * $i, $bt);
-		$w =~ s/(.)(.)(.)/$3$2$1/gs if $ib == 24;
-		$w =~ s/(.)/sprintf("%02x",ord($1))/egs;
-		$self-> emit( $w);
+		$self-> emit(unpack('H*', substr( $g, $ls * $i, $bt)));
 	}
 	$self-> emit(';');
 	return 1;
@@ -1243,468 +1202,229 @@ sub fonts
 	$family   = undef if defined $family   && !length $family;
 	$encoding = undef if defined $encoding && !length $encoding;
 
-	my $f1 = $self-> {useDeviceFonts} ? Prima::PS::Fonts::enum_fonts( $family, $encoding) : [];
-	return $f1 if !$::application || $self-> {useDeviceFontsOnly};
-
-	my $f2 = $::application-> fonts( $family, $encoding);
-	if ( !defined($family) && !defined($encoding)) {
-		my %f = map { $_-> {name} => $_ } @$f1;
-		my @add;
-		for ( @$f2) {
-			if ( $f{$_}) {
-				push @{$f{$_}-> {encodings}}, @{$_-> {encodings}};
-			} else {
-				push @add, $_;
+	my $enc = 'iso10646-1'; # unicode only
+	if ( !defined $family ) {
+		my @fonts;
+		my $num = $self->fontMapperPalette(-1);
+		if ( $num > 0 ) {
+			for my $fid ( 1 .. $num ) {
+				my $f = $self->fontMapperPalette($fid) or next;
+				$f->{encodings} = [$enc];
+				$f->{encoding} = $enc;
+				push @fonts, $f;
 			}
 		}
-		push @$f1, @add;
+		return \@fonts;
 	} else {
-		push @$f1, @$f2;
+		return [] if defined($encoding) && $encoding ne '' && $encoding ne $enc;
+
+		my @f = @{$::application->fonts($family) // []};
+		return [] unless @f;
+		$f[0]->{encoding} = $enc;
+		return [$f[0]];
 	}
-	return $f1;
 }
 
-sub font_encodings
+sub glyph_canvas
 {
-	my @r;
-	if ( $_[0]-> {useDeviceFonts}) {
-		@r = Prima::PS::Encodings::unique, keys %Prima::PS::Encodings::fontspecific;
-	}
-	if ( $::application && !$_[0]-> {useDeviceFontsOnly}) {
-		my %h = map { $_ => 1 } @r;
-		for ( @{$::application-> font_encodings}) {
-			next if $h{$_};
-			push @r, $_;
-		}
-	}
-	return \@r;
+	my $self = shift;
+	return $self->{glyph_canvas} //= Prima::DeviceBitmap->create(
+		width           => 1,
+		height          => 1,
+		textOutBaseline => 1,
+	);
 }
 
-sub get_font
+sub glyph_canvas_set_font
 {
-	my $z = {%{$_[0]-> {font}}};
-	delete $z-> {charmap};
-	delete $z-> {docname};
-	return $z;
+	my ($self, %font) = @_;
+
+	my $g = $self-> glyph_canvas;
+	$font{style} &= ~(fs::Underlined|fs::StruckOut);
+	delete @font{qw(height width direction)};
+	$font{size} = 1000;
+	$g-> font(\%font);
 }
 
-# we're asked to substitute a non-PS font, which most probably has its own definiton of box width
-# let's find out what em-width the font has, and if we can adapt for it
-#
-# return the multiplication factor between the requested gui font and the currently selected PS font
-sub _get_gui_font_ratio
-{
-	my ($self, %request) = @_;
-	my $n = $request{name};
-
-	return unless
-		($n ne 'Default') && exists $request{width} && exists $request{height} && $::application &&
-		!exists($Prima::PS::Fonts::enum_families{ $n}) && !exists($Prima::PS::Fonts::files{ $n})
-		;
-
-	my $ratio;
-	my $paint_state = $::application->get_paint_state == ps::Disabled;
-	my $save_font;
-	$paint_state ? $::application->begin_paint_info : ( $save_font = \%{ $::application->get_font } );
-
-	my $scale = ($request{height} < 20) ? 10 : 1; # scale font 10 times for better accuracy
-	my $width = delete($request{width});
-	$request{height} *= $scale;
-	$::application->set_font(\%request);
-
-	if ( $n eq $::application->font->name) {
-		my $gui_scaling = $width / $::application->font->width;
-		my $ps_scaling  = $self->{font}->{referenceWidth} / $self->{font}->{width};
-		$ratio = $ps_scaling * $gui_scaling * $scale;
-	}
-
-	$paint_state ? $::application->end_paint_info   : ( $::application->set_font($save_font) );
-	return $ratio;
-}
+sub get_font {+{%{$_[0]-> {font}}}}
 
 sub set_font
 {
 	my ( $self, $font) = @_;
+
+	my $canvas = $self-> glyph_canvas;
+	my ($curr_font, $new_font) = ('', '');
+	$curr_font = ($self->{font}->{size} // '-1'). '.' . ($self->{glyph_font} // '');
+
 	$font = { %$font };
-	my $n = exists($font-> {name}) ? $font-> {name} : $self-> {font}-> {name};
-	my $gui_font;
-	$n = $self-> {useDeviceFonts} ? $Prima::PS::Fonts::defaultFontName : 'Default'
-		unless defined $n;
+	my $wscale     = $font-> {width};
+	delete $font-> {width};
 
-AGAIN:
-	if ( $self-> {useDeviceFontsOnly} || !$::application ||
-			( $self-> {useDeviceFonts} &&
-			(
-			# enter, if there's a device font
-				exists $Prima::PS::Fonts::enum_families{ $n} ||
-				exists $Prima::PS::Fonts::files{ $n} ||
-				(
-					# or the font encoding is PS::Encodings-specific,
-					# not present in the GUI space
-					exists $font-> {encoding} &&
-					(
-						exists $Prima::PS::Encodings::fontspecific{$font-> {encoding}} ||
-						exists $Prima::PS::Encodings::files{$font-> {encoding}}
-					) && (
-						!grep { $_ eq $font-> {encoding} } @{$::application-> font_encodings}
-					)
-				)
-			) &&
-			# and, the encoding is supported
-			(
-				!exists $font-> {encoding} || !length ($font-> {encoding}) ||
-				(
-					exists $Prima::PS::Encodings::fontspecific{$font-> {encoding}} ||
-					exists $Prima::PS::Encodings::files{$font-> {encoding}}
-				)
-			)
-		)
-	)
-	{
-		$self-> {font} = Prima::PS::Fonts::font_pick( $font, $self-> {font},
-			resolution => $self-> {resolution}-> [1]);
-		$self-> {fontCharHeight} = $self-> {font}-> {charheight};
-		$self-> {docFontMap}-> {$self-> {font}-> {docname}} = 1;
-		$self-> {typeFontMap}-> {$self-> {font}-> {name}} = 1;
-		$self-> {fontWidthDivisor} = $self-> {font}-> {referenceWidth};
-		$self-> set_locale( $self-> {font}-> {encoding});
+	my $div        = 72.27 / $self-> {resolution}-> [1];
+	my $by_height  = defined($font->{height});
+	$font = Prima::Drawable-> font_match( $font, $self-> {font});
+	delete $font->{$by_height ? 'size' : 'height'};
+	$canvas->set_font( $font );
+	$font = $self-> {font} = { %{ $canvas->get_font } };
 
-		my %request = ( %$font, name => $n );
-		$request{height} = $self->{font}->{height} unless defined $request{height};
-		delete $request{size};
-		if ( my $ratio = $self->_get_gui_font_ratio(%request)) {
-			$self->{font}->{width}        *= $ratio;
-			$self->{font}->{maximalWidth} *= $ratio;
-		}
+	# convert Prima size definition to PS size definition
+	#
+	# PS doesn't account for internal leading, and thus there are two possibilities:
+	# 1) enforce Prima model, but that results in $font->size(100) printed
+	# will not exactly be 100 points by mm.
+	#
+	# 2) hack font structure on the fly, so that caller setting $font->size(100) 
+	# will get $font->height slightly less (by internal leading) in pixels.
+	#
+	# Here #2 is implemented
+	if ( $by_height ) {
+		$font->{size} = int($font->{height} * $div + .5);
 	} else {
-		my $wscale = $font-> {width};
-		my $wsize  = $font-> {size};
-		my $wfsize = $self-> {font}-> {size};
-		delete $font-> {width};
-		delete $font-> {size};
-		delete $self-> {font}-> {size};
-		unless ( $gui_font) {
-			$gui_font = Prima::Drawable-> font_match( $font, $self-> {font});
-			if ( $gui_font-> {name} ne $n && $self-> {useDeviceFonts}) {
-				# back up
-				my $pitch = (exists ( $font-> {pitch} ) ?
-					$font-> {pitch} : $self-> {font}-> {pitch}) || fp::Variable;
-				$n = $font-> {name} = ( $pitch == fp::Variable) ?
-					$Prima::PS::Fonts::variablePitchName :
-					$Prima::PS::Fonts::fixedPitchName;
-				$font-> {width} = $wscale if defined $wscale;
-				$font-> {wsize} = $wsize  if defined $wsize;
-				$self-> {font}-> {size} = $wfsize if defined $wfsize;
-				goto AGAIN;
-			}
-		}
-		$self-> {font} = $gui_font;
-		$self-> {font}-> {size} =
-			int(( $self-> {font}-> {height} - $self->{font}->{internalLeading}) * 72.27 / $self-> {resolution}-> [1] + 0.5);
-		$self-> {typeFontMap}-> {$self-> {font}-> {name}} = 2;
-		$self-> {fontWidthDivisor} = $self-> {font}-> {width};
-		$self-> {font}-> {width} = $wscale if $wscale;
-		$self-> {fontCharHeight} = $self-> {font}-> {height};
+		my $new_h        = $font->{size} / $div;
+		my $ratio        = $font->{height} / $new_h;
+		$font->{height}  = int( $new_h + .5);
+		$font->{ascent}  = int( $font->{ascent} / $ratio + .5 );
+		$font->{descent} = $font->{height} - $font->{ascent};
 	}
-	$self-> {changed}-> {font} = 1;
-	$self-> {plate}-> destroy, $self-> {plate} = undef if $self-> {plate};
-}
 
-my %fontmap =
-(Prima::Application-> get_system_info-> {apc} == apc::Win32) ? (
-	'Helvetica' => 'Arial',
-	'Times'     => 'Times New Roman',
-	'Courier'   => 'Courier New',
-) : ();
+	# we emulate wider fonts by PS scaling, but this factor is needed
+	# when reporting horizontal glyph and text extension
+	my $font_width_divisor  = $font->{width};
+	$font-> {width} = $wscale if $wscale;
+	$self-> {font_x_scale}  = $font->{width} / $font_width_divisor;
 
-sub plate
-{
-	my $self = $_[0];
-	return $self-> {plate} if $self-> {plate};
-	return {ABC => []} if $self-> {useDeviceFontsOnly};
-	my ( $dimx, $dimy) = ( $self-> {font}-> {maximalWidth}, $self-> {font}-> {height});
-	my %f = %{$self-> {font}};
-	$f{style} &= ~(fs::Underlined|fs::StruckOut);
-	if ( $self-> {useDeviceFonts} && exists $Prima::PS::Fonts::files{$f{name}}) {
-		$f{name} =~ s/^([^-]+)\-.*$/$1/;
-		$f{pitch} = fp::Default unless $f{pitch} == fp::Fixed;
-		$f{name} = $fontmap{$f{name}} if exists $fontmap{$f{name}};
-	}
-	delete $f{size};
-	delete $f{width};
-	delete $f{direction};
-	$self-> {plate} = Prima::Image-> create(
-		type   => im::BW,
-		width  => $dimx,
-		height => $dimy,
-		font      => \%f,
-		backColor => cl::Black,
-		color     => cl::White,
-		textOutBaseline => 1,
-		preserveType => 1,
-		conversion   => ict::None,
-	);
-	my ( $f, $l) = ( $self-> {plate}-> font-> {firstChar}, $self-> {plate}-> font-> {lastChar});
-	my $x = $self-> {plate}-> {ABC} = $self-> {plate}-> get_font_abc( $f, $l);
-	my $j = (230 - $f) * 3;
-	return $self-> {plate};
-}
-
-sub place_glyph
-{
-	return '' if $_[0]-> {useDeviceFontsOnly};
-	my ( $self, $char) = @_;
-	my $z = $_[0]-> plate;
-	my $x = ord $char;
-	my $d  = $z-> font-> descent;
-	my ( $dimx, $dimy) = $z-> size;
-	my ( $f, $l) = ( $z-> font-> firstChar, $z-> font-> lastChar);
-	my $ls = int(( $dimx + 31) / 32) * 4;
-	my $la = int ($dimx / 8) + (( $dimx & 7) ? 1 : 0);
-	my $ax = ( $dimx & 7) ? (( 0xff << (7-( $dimx & 7))) & 0xff) : 0xff;
-
-	my $xsf = 0;
-	my ( $a, $b, $c);
-
-	if ( Encode::is_utf8( $char)) {
-		( $a, $b, $c) = @{ $z-> get_font_abc( $x, $x, 1)};
+	$self-> glyph_canvas_set_font(%$font);
+	my $f1000 = $self->glyph_canvas->font;
+	if ($f1000->{vector} == fv::Outline) {
+		$self-> {glyph_keeper} //= Prima::PS::Glyphs->new;
+		$self-> {glyph_font} = $self-> {glyph_keeper}->get_font($f1000); # it wants size=1000
 	} else {
-		my $abc = $z-> {ABC};
-		( $a, $b, $c) = (
-			$abc-> [ ( $x - $f) * 3],
-			$abc-> [ ( $x - $f) * 3 + 1],
-			$abc-> [ ( $x - $f) * 3 + 2],
-		);
-	}
-	return '' if $b <= 0;
-	$z-> begin_paint;
-	$z-> clear;
-	$z-> text_out( chr( $x), ($a < 0) ? -$a : 0, $d);
-	$z-> end_paint;
-	my $dd = $z-> data;
-	my ($j, $k);
-	my @emmap = (0) x $dimy;
-	my @bbox = ( $a, 0, $b - $a, $dimy - 1);
-	for ( $j = $dimy - 1; $j >= 0; $j--) {
-		#my @ss  = map { my $x = ord $_; map { ($x & (0x80>>$_))?'X':'.'} 0..7 } split( '', substr( $dd, $ls * $j, $la));
-		my @xdd = map { ord $_ } split( '', substr( $dd, $ls * $j, $la));
-		#print "@ss @xdd\n";
-		$xdd[-1] &= $ax;
-		$emmap[$j] = 1 unless grep { $_ } @xdd;
-	}
-	for ( $j = 0; $j < $dimy; $j++) {
-		last unless $emmap[$j];
-		$bbox[1]++;
-	}
-	for ( $j = $dimy - 1; $j >= 0; $j--) {
-		last unless $emmap[$j];
-		$bbox[3]--;
+		$self-> {glyph_font}  = ($f1000->{pitch} == fp::Fixed) ? 'Courier' : 'Helvetica'
 	}
 
-	if ( $bbox[3] >= 0) {
-		$bbox[1] -= $d;
-		$bbox[3] -= $d;
-		my $zd = $z-> extract(
-			( $a < 0) ? 0 : $a,
-			$bbox[1] + $d,
-			$b,
-			$bbox[3] - $bbox[1] + 1,
-		);
-		# $z-> save("a.gif");
+	# When querying glyph extensions, remember to scale to the
+	# difference between PS and Prima models. 
+	my $y_scale = 1.0 + $f1000->internalLeading / $f1000->height;
+	# Also, note that querying is on the canvas that has size=1000.
+	$self->{font_scale} = $font->{height} / $f1000->height * $y_scale;
 
-		my $bby = $bbox[3] - $bbox[1] + 1;
-		my $zls = int(( $b + 31) / 32) * 4;
-		my $zla = int ($b / 8) + (( $b & 7) ? 1 : 0);
-		$zd = $zd-> data;
-		my $cd = '';
-		for ( $j = $bbox[3] - $bbox[1]; $j >= 0; $j--) {
-			$cd .= substr( $zd, $j * $zls, $zla);
-		}
-
-		my $cdz = '';
-		for ( $j = 0; $j < length $cd; $j++) {
-			$cdz .= sprintf("%02x", ord substr( $cd, $j, 1));
-		}
-
-		$_[0]-> {plate}-> {yd} = $bbox[1] * 72.27 / $_[0]-> {resolution}-> [1];
-		my $scalex = 72.27 * $b   / $_[0]-> {resolution}-> [0];
-		my $scaley = 72.27 * $bby / $_[0]-> {resolution}-> [1];
-		return
-			"$scalex $scaley scale $b $bby true [$b 0 0 -$bby 0 $bby] <$cdz> imagemask",
-			$a, $b, $c;
-	}
-	return '', $a, $b, $c;
-}
-
-sub get_rmap
-{
-	my @rmap;
-	my $self = shift;
-	my $c  = $self-> {font}-> {chardata};
-	my $le = $self-> {localeEncoding};
-	my $nd = $c-> {'.notdef'};
-	my $fs = $self-> {font}-> {height} / $self-> {fontCharHeight};
-	if ( defined $nd) {
-		$nd = [ @$nd ];
-		$$nd[$_] *= $fs for 1..3;
-	} else {
-		$nd = [0,0,0,0];
-	}
-
-	my ( $f, $l) = ( $self-> {font}-> {firstChar}, $self-> {font}-> {lastChar});
-	my $i;
-	my $abc;
-	if ( $self-> {typeFontMap}-> {$self-> {font}-> {name}} == 1) {
-		for ( $i = 0; $i < 255; $i++) {
-			if (defined($le->[$i]) && ( $le-> [$i] ne '.notdef') && $c-> { $le-> [ $i]}) {
-				$rmap[$i] = [ $i, map { $_ * $fs } @{$c-> { $le-> [ $i]}}[1..3]];
-			} elsif ( !$self->{useDeviceFontsOnly} && $i >= $f && $i <= $l) {
-				$abc = $self-> plate-> {ABC} unless $abc;
-				my $j = ( $i - $f) * 3;
-				$rmap[$i] = [ $i, @$abc[ $j .. $j + 2]];
-			}
-		}
-	} else {
-		$abc = $self-> plate-> {ABC};
-		for ( $i = $f; $i <= $l; $i++) {
-			my $j = ( $i - $f) * 3;
-			$rmap[$i] = [ $i, @$abc[ $j .. $j + 2]];
-		}
-	}
-#  @rmap = map { $c-> {$_} } @{$_[0]-> {localeEncoding}};
-
-	return \@rmap, $nd;
+	$new_font = $font->{size} . '.' . $self->{glyph_font};
+	$self-> {changed}->{font} = 1 if $curr_font ne $new_font;
 }
 
 sub get_font_abc
 {
-	my ( $self, $first, $last) = @_;
-	my $lim = 255;
-	$first = 0    if !defined $first || $first < 0;
-	$first = $lim if $first > $lim;
-	$last  = $lim if !defined $last || $last < 0 || $last > $lim;
-	my $i;
-	my @ret;
-	my ( $rmap, $nd) = $self-> get_rmap;
-	my $wmul = $self-> {font}-> {width} / $self-> {fontWidthDivisor};
-	for ( $i = $first; $i <= $last; $i++) {
-		my $cd = $rmap-> [ $i] || $nd;
-		push( @ret, map { $_ * $wmul } @$cd[1..3]);
-	}
-	return \@ret;
+	my ( $self, $first, $last, $flags) = @_;
+	$first = 0     if !defined ($first) || $first < 0;
+	$last = $first if !defined ($last) || $last < $first;
+	my $canvas = $self-> glyph_canvas;
+	my $scale  = $self->{font_scale} * $self->{font_x_scale};
+	return [ map { $_ * $scale } @{ $canvas->get_font_abc($first, $last, $flags) } ];
 }
 
 sub get_font_def
 {
-	my ( $self, $first, $last) = @_;
-	my $lim = 255;
-	$first = 0    if !defined $first || $first < 0;
-	$first = $lim if $first > $lim;
-	$last  = $lim if !defined $last || $last < 0 || $last > $lim;
-	my $i;
-	my @ret;
-	my $fs = $self-> {font}-> {height} / $self-> {fontCharHeight};
-	my $c  = $self-> {font}-> {chardata};
-	my $le = $self-> {localeEncoding};
-	my $nd = $c-> {'.notdef'};
-	if ( defined $nd) {
-		$nd = [ map { $_ * $fs } @$nd[4..6] ];
-	} else {
-		$nd = [0,0,0];
-	}
-
-	my ( $f, $l) = ( $self-> {font}-> {firstChar}, $self-> {font}-> {lastChar});
-	my $def;
-	if ( $self-> {typeFontMap}-> {$self-> {font}-> {name}} == 1) {
-		for ( $i = $first; $i <= $last; $i++) {
-			my @rmap;
-			if (defined($le->[$i]) && ( $le-> [$i] ne '.notdef') && $c-> { $le-> [ $i]}) {
-				push @ret, map { $_ * $fs } @{$c-> { $le-> [ $i]}}[4..6];
-			} elsif ( !$self->{useDeviceFontsOnly} && $i >= $f && $i <= $l) {
-				$def = $self-> plate-> get_font_def($first, $last) unless $def;
-				my $j = ($i - $first) * 3;
-				push @ret, @$def[ $j .. $j + 2];
-			} else {
-				push @ret, @$nd;
-			}
-		}
-		return \@ret;
-	} else {
-		return $self-> plate-> get_font_def( $first, $last );
-	}
-
+	my ( $self, $first, $last, $flags) = @_;
+	$first = 0     if !defined ($first) || $first < 0;
+	$last = $first if !defined ($last) || $last < $first;
+	my $canvas = $self-> glyph_canvas;
+	my $scale  = $self->{font_scale};
+	return [ map { $_ * $scale } @{ $canvas->get_font_def($first, $last, $flags) } ];
 }
 
-sub get_font_ranges
-{
-	my $self = $_[0];
-	return [ $self-> {font}-> {firstChar}, $self-> {font}-> {lastChar}];
-}
+sub get_font_ranges    { shift->glyph_canvas->get_font_ranges    }
+sub get_font_languages { shift->glyph_canvas->get_font_languages }
 
 sub get_text_width
 {
-	my ( $self, $text, $addOverhang) = @_;
-	return $text->get_text_width($self, $addOverhang) if ref $text;
-
-	my $i;
-	my $len = length $text;
+	my ( $self, $text, $flags, $from, $len) = @_;
+	$flags //= 0;
+	$from  //= 0;
+	my $glyphs;
+	if ( ref($text) eq 'Prima::Drawable::Glyphs') {
+		$glyphs = $text->glyphs;
+		$len    = @$glyphs if !defined($len) || $len < 0 || $len > @$glyphs;
+	} elsif (ref($text)) {
+		$len //= -1;
+		return $text->get_text_width($self, $flags, $from, $len);
+	} else {
+		$len = length($text) if !defined($len) || $len < 0 || $len > length($text);
+	}
 	return 0 unless $len;
-	my ( $rmap, $nd) = $self-> get_rmap;
-	my $cd;
-	my $w = 0;
 
-	for ( $i = 0; $i < $len; $i++) {
-		my $cd = $rmap-> [ ord( substr( $text, $i, 1))] || $nd;
-		$w += $cd-> [1] + $cd-> [2] + $cd-> [3];
-	}
+	my $w = $self->glyph_canvas-> get_text_width( $text, $flags, $from, $len);
+	$w *= $self->{font_scale} unless $glyphs && $text->advances;
+	return int( $w * $self-> {font_x_scale} + .5);
+}
 
-	if ( $addOverhang) {
-		$cd = $rmap-> [ ord( substr( $text, 0, 1))] || $nd;
-		$w += ( $cd-> [1] < 0) ? -$cd-> [1] : 0;
-		$cd = $rmap-> [ ord( substr( $text, $len - 1, 1))] || $nd;
-		$w += ( $cd-> [3] < 0) ? -$cd-> [3] : 0;
+sub _rotate
+{
+	my ( $angle, $arr ) = @_;
+	my $s = sin( $angle / 57.29577951);
+	my $c = cos( $angle / 57.29577951);
+	my $i;
+	for ( $i = 0; $i < 10; $i+=2) {
+		my ( $x, $y) = @$arr[$i,$i+1];
+		$$arr[$i]   = $x * $c - $y * $s;
+		$$arr[$i+1] = $x * $s + $y * $c;
 	}
-	return $w * $self-> {font}-> {width} / $self-> {fontWidthDivisor};
 }
 
 sub get_text_box
 {
-	my ( $self, $text) = @_;
-	return $text->get_text_box($self) if ref $text;
-	my ( $rmap, $nd) = $self-> get_rmap;
-	my $len = length $text;
-	return [ (0) x 10 ] unless $len;
-	my $cd;
-	my $wmul = $self-> {font}-> {width} / $self-> {fontWidthDivisor};
-	$cd = $rmap-> [ ord( substr( $text, 0, 1))] || $nd;
-	my $ovxa = $wmul * (( $cd-> [1] < 0) ? -$cd-> [1] : 0);
-	$cd = $rmap-> [ ord( substr( $text, $len - 1, 1))] || $nd;
-	my $ovxb = $wmul * (( $cd-> [3] < 0) ? -$cd-> [3] : 0);
+	my ( $self, $text, $from, $len) = @_;
 
-	my $w = $self-> get_text_width( $text);
-	my @ret = (
-		-$ovxa,      $self-> {font}-> {ascent} - 1,
-		-$ovxa,     -$self-> {font}-> {descent},
-		$w + $ovxb,  $self-> {font}-> {ascent} - 1,
-		$w + $ovxb, -$self-> {font}-> {descent},
-		$w, 0
-	);
-	unless ( $self-> textOutBaseline) {
-		$ret[$_] += $self-> {font}-> {descent} for (1,3,5,7,9);
+	$from //= 0;
+	my $glyphs;
+	if ( ref($text) eq 'Prima::Drawable::Glyphs') {
+		$glyphs = $text->glyphs;
+		$len    = @$glyphs if !defined($len) || $len < 0 || $len > @$glyphs;
+	} elsif (ref($text)) {
+		$len //= -1;
+		return $text->get_text_box($self, $from, $len);
+	} else {
+		$len  = length($text) if !defined($len) || $len < 0 || $len > length($text);
 	}
-	if ( $self-> {font}-> {direction} != 0) {
-		my $s = sin( $self-> {font}-> {direction} / 57.29577951);
-		my $c = cos( $self-> {font}-> {direction} / 57.29577951);
-		my $i;
-		for ( $i = 0; $i < 10; $i+=2) {
-			my ( $x, $y) = @ret[$i,$i+1];
-			$ret[$i]   = $x * $c - $y * $s;
-			$ret[$i+1] = $x * $s + $y * $c;
-		}
+	return [ (0) x 10 ] unless $len;
+
+	my $wmul = $self->{font_x_scale};
+	my $dir  = $self->{font}->{direction};
+	my @ret;
+
+	@ret = @{ $self-> glyph_canvas-> get_text_box( $text, $from, $len) };
+	my $div = $self->{font_scale};
+	if ($glyphs && $text->advances) {
+		$_ *= $div for @ret[1,3,5,7,9];
+	} else {
+		$_ *= $div for @ret;
 	}
+
+	if ( $wmul != 0.0 && $wmul != 1.0 ) {
+		_rotate(-$dir, \@ret) if $dir != 0;
+		$ret[$_] *= $wmul for 0,2,4,6,8;
+		_rotate($dir, \@ret) if $dir != 0;
+	}
+
 	return \@ret;
 }
 
+sub text_shape
+{
+	my ( $self, $text, %opt ) = @_;
+
+	my $canvas = $self-> glyph_canvas;
+	my $shaped = $canvas->text_shape($text, %opt);
+	return $shaped unless $shaped;
+	$shaped->[Prima::Drawable::Glyphs::CUSTOM()] = $text;
+	if ( $shaped-> advances ) {
+		my $scale  = $self->{font_scale};
+		$_ *= $scale for @{ $shaped->advances  };
+		$_ *= $scale for @{ $shaped->positions };
+	}
+	return $shaped;
+}
+
+sub render_glyph {}
 
 1;
 
@@ -1788,22 +1508,6 @@ measured in degrees, counter-clockwise. ::scale is array of
 two numbers, respectively x- and y-scale. 1 is 100%, 2 is 200%
 etc.
 
-=item ::useDeviceFonts
-
-1 by default; optimizes greatly text operations, but takes the risk
-that a character could be drawn incorrectly or not drawn at all -
-this behavior depends on a particular PS interpreter.
-
-=item ::useDeviceFontsOnly
-
-If 1, the system fonts, available from Prima::Application
-interfaces can not be used. It is designed for
-developers and the outside-of-Prima applications that wish to
-use PS generation module without graphics. If 1, C<::useDeviceFonts>
-is set to 1 automatically.
-
-Default value is 0
-
 =back
 
 =head2 Internal methods
@@ -1835,7 +1539,8 @@ Prima::PS::Printer handles spooling logic.
 
 =item fonts
 
-Returns Prima::Application::font plus those that defined into Prima::PS::Fonts module.
+Returns Prima::Application::fonts, however with C<iso10646-1> encoding only.
+That effectively allows only unicode output.
 
 =back
 

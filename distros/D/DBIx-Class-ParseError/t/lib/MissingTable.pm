@@ -37,16 +37,17 @@ test 'no table foo' => sub {
             source_name => 'Foo',
             error_str => $error_str,
         });
-        my $is_sqlite = $self->db_driver eq 'SQLite';
-        cmp_deeply(
-            $error->column_data,
-            {
-                bar_id => $is_sqlite ? undef : 1,
-                is_foo => $is_sqlite ? undef : 1,
-                name => $is_sqlite ? undef : 'Foo',
-            },
-            'check column data'
-        );
+        unless ($self->db_driver eq 'SQLite') {
+            cmp_deeply(
+                $error->column_data,
+                {
+                    bar_id => 1,
+                    is_foo => 1,
+                    name => 'Foo',
+                },
+                'check column data'
+            );
+        }
         $error;
     };
     dies_ok { $exception->rethrow };

@@ -1,5 +1,10 @@
 Revision history for Mojolicious-Plugin-SizeLimit
 
+0.006   2020-05-29
+        - Fix test suite for newer Mojolicious.
+        - Fixes for CI (Travis-CI)
+        - No new features or functional changes.
+
 0.005   2015-10-18
         - Test fix due to incompatible changes in Mojolicious 6.15
           commit fe2d4f5, reported by Slaven Rezic.

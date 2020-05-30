@@ -3,7 +3,7 @@
 #  libzvbi network identification example.
 #
 #  Copyright (C) 2006 Michael H. Schimek
-#  Perl Port: Copyright (C) 2007 Tom Zoerner
+#  Perl Port: Copyright (C) 2007,2020 Tom Zoerner
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -20,11 +20,15 @@
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-# Perl $Id: network.pl,v 1.1 2007/11/18 18:48:35 tom Exp tom $
-# ZVBI #Id: network.c,v 1.2 2006/10/27 04:52:08 mschimek Exp #
-
-# This example shows how to identify a network from data transmitted
-# in XDS packets, Teletext packet 8/30 format 1 and 2, and VPS packets.
+# Description:
+#
+#   Example for the use of class Video::ZVBI::vt, type VBI_EVENT_NETWORK.
+#   This script shows how to identify a network from data transmitted in
+#   XDS packets, Teletext packet 8/30 format 1 and 2, and VPS packets. The
+#   script captures from a device until the currently tuned channel is
+#   identified by means of VPS, PDC et.al.
+#
+#   (This is a direct translation of examples/network.c in libzvbi.)
 
 use blib;
 use strict;
@@ -36,10 +40,14 @@ my $cap;
 my $dec;
 my $quit;
 
-my $option_vps = 0;
-my $option_8301 = 0;
-my $option_8302 = 0;
-my $option_help = 0;
+my $opt_device = "/dev/dvb/adapter0/demux0";
+my $opt_pid = 0;  # mandatory for DVB
+my $opt_v4l2 = 0;
+my $opt_verbose = 0;
+my $opt_help = 0;
+my $opt_vps = 0;
+my $opt_8301 = 0;
+my $opt_8302 = 0;
 my $services;
 
 sub handler {
@@ -88,9 +96,9 @@ sub handler {
 		$ev->{cni_8301},
 		$ev->{cni_8302};
 
-        $quit = 1 if $ev->{cni_vps} != 0 && $option_vps;
-        $quit = 1 if $ev->{cni_8301} != 0 && $option_8301;
-        $quit = 1 if $ev->{cni_8302} != 0 && $option_8302;
+        $quit = 1 if $ev->{cni_vps} != 0 && $opt_vps;
+        $quit = 1 if $ev->{cni_8301} != 0 && $opt_8301;
+        $quit = 1 if $ev->{cni_8302} != 0 && $opt_8302;
 }
 
 sub mainloop {
@@ -140,38 +148,59 @@ sub mainloop {
 }
 
 sub usage {
-        print STDERR "$0 - network identification test\n".
-                     "Options:\n".
-                     "\t--vps\tStop after receiving VPS\n".
-                     "\t--8301\tStop after receiving packet 8/30/1\n".
-                     "\t--8302\tStop after receiving packet 8/30/2\n".
-                     "\t--help\tPrint this usage info\n";
+        print STDERR "Network identification test\n".
+                     "Copyright (C) 2006 Michael H. Schimek\n".
+                     "This program is licensed under GPL 2 or later. NO WARRANTIES.\n".
+                     "Usage: $0 [OPTIONS]\n".
+                     "--device PATH\tSpecify the capture device\n".
+                     "--pid NNN\tSpecify the PES stream PID: Required for DVB\n".
+                     "--v4l2\t\tForce device to be addressed via analog driver\n".
+                     "--vps\t\tStop after receiving VPS\n".
+                     "--8301\t\tStop after receiving packet 8/30/1\n".
+                     "--8302\t\tStop after receiving packet 8/30/2\n".
+                     "--verbose\tEmit debug trace output\n".
+                     "--help\t\tPrint this usage info\n";
         exit(1);
 }
 
 my %CmdOpts = (
-        "vps" =>       \$option_vps,
-        "8301" =>      \$option_8301,
-        "8302" =>      \$option_8302,
+        "device=s" =>  \$opt_device,
+        "pid=i" =>     \$opt_pid,
+        "v4l2" =>      \$opt_v4l2,
+        "verbose" =>   \$opt_verbose,
+        "vps" =>       \$opt_vps,
+        "8301" =>      \$opt_8301,
+        "8302" =>      \$opt_8302,
+        "help" =>      \$opt_help,
 );
 
-sub main_func
-{
+sub main_func {
 	my $errstr;
 	my $success;
 
         GetOptions(%CmdOpts) || usage();
+        usage() if $opt_help;
 
-        if (!$option_vps && !$option_8301 && !$option_8302) {
-                $option_vps = $option_8301 = $option_8302 = 1;
+        if (!$opt_vps && !$opt_8301 && !$opt_8302) {
+                $opt_vps = $opt_8301 = $opt_8302 = 1;
         }
 
 	$services = (VBI_SLICED_TELETEXT_B |
 		     VBI_SLICED_VPS |
 		     VBI_SLICED_CAPTION_525);
 
-        # open VBI device (buffers:=5, strict:=0, verbose:=FALSE
-	$cap = Video::ZVBI::capture::v4l2_new ("/dev/vbi0", 5, $services, 0, $errstr, 0);
+        if ($opt_v4l2 and ($opt_pid != 0)) {
+                print STDERR "Options --v4l2 and --pid are mutually exclusive\n";
+                exit(1)
+        }
+        if (!$opt_v4l2 && ($opt_pid == 0) && ($opt_device !~ /dvb/)) {
+                # open VBI device (buffers:=5, strict:=0, verbose:=FALSE
+                $cap = Video::ZVBI::capture::v4l2_new ($opt_device, 5, $services, 0, $errstr, 0);
+        }
+        else {
+                warn "WARNING: DVB devices require --pid parameter\n" if $opt_pid <= 0;
+                $cap = Video::ZVBI::capture::dvb_new2($opt_device, $opt_pid, $errstr, 0);
+        }
         die "Cannot capture VBI data with V4L2 interface: $errstr\n" unless $cap;
 
 	$dec = Video::ZVBI::vt::decoder_new ();
@@ -186,4 +215,3 @@ sub main_func
 }
 
 main_func();
-

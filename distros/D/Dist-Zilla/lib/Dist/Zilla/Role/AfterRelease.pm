@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::AfterRelease 6.014;
+package Dist::Zilla::Role::AfterRelease 6.015;
 # ABSTRACT: something that runs after release is mostly complete
 
 use Moose::Role;
@@ -30,7 +30,7 @@ Dist::Zilla::Role::AfterRelease - something that runs after release is mostly co
 
 =head1 VERSION
 
-version 6.014
+version 6.015
 
 =head1 DESCRIPTION
 

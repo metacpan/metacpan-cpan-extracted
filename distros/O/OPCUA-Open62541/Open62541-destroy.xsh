@@ -144,6 +144,15 @@ UA_QualifiedName_DESTROY(qualifiedName)
 	DPRINTF("qualifiedName %p", qualifiedName);
 	UA_QualifiedName_delete(qualifiedName);
 
+MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::ReadRequest	PREFIX = UA_ReadRequest_
+
+void
+UA_ReadRequest_DESTROY(readRequest)
+	OPCUA_Open62541_ReadRequest	readRequest
+    CODE:
+	DPRINTF("readRequest %p", readRequest);
+	UA_ReadRequest_delete(readRequest);
+
 MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::ReferenceTypeAttributes	PREFIX = UA_ReferenceTypeAttributes_
 
 void

@@ -1,0 +1,7 @@
+name = "MojoX-Date-Local"
+# badges = ["travis-ci.com"]
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+authority = "cpan:BWISTI"
+license = "perl_5"
+

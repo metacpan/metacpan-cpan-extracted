@@ -1,5 +1,9 @@
 Revision history for Perl extension SQL-Bind
 
+1.03 2020-05-27T12:47:29Z
+
+    - Ignore common cast expressions (e.g. id::text)
+
 1.02 2020-05-13T12:14:28Z
 
     - Changeable placeholder prefix ($PlaceholderPrefix)

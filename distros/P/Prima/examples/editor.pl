@@ -14,11 +14,7 @@ and, in lesser extent, of standard find/replace dialogs.
 use strict;
 use warnings;
 
-use Prima qw(Edit Bidi Application MsgBox StdDlg);
-
-eval "use Encode;";
-my $can_utf8 = $@ ? 0 : 1;
-$::application->wantUnicodeInput($can_utf8);
+use Prima qw(Edit Application MsgBox Dialog::FileDialog Dialog::FindDialog Dialog::FontDialog);
 
 package Indicator;
 use vars qw(@ISA);
@@ -121,7 +117,7 @@ sub profile_default
 	return {
 		%def,
 		fileName => undef,
-		utf8     => $can_utf8,
+		utf8     => 1,
 		menuItems => [
 			[ '~File' => [
 				[ '~New'        => q(new_window)],
@@ -148,20 +144,23 @@ sub profile_default
 				[ '@syx' => '~Syntax hilite' => sub{ $_[0]-> {editor}-> syntaxHilite( $_[2] )}],
 				[ '@*aid' => '~Auto indent' => sub{ $_[0]-> {editor}-> autoIndent( $_[2] )}],
 				[ '@wwp' => '~Word wrap' => sub{ $_[0]-> {editor}-> wordWrap( $_[2] )}],
+				[ '@cwp' => '~Cursor wrap' => sub{ $_[0]-> {editor}-> cursorWrap( $_[2] )}],
+				[ '@tab' => 'Enter ~tabs in text' => sub{ $_[0]-> {editor}-> wantTabs( $_[2] )}],
 				[ '@psb' => '~Presistent blocks' => sub{ $_[0]-> {editor}-> persistentBlock( $_[2] )}],
 				[],
 				[ '@*hsc' => '~Horizontal scrollbar' => sub{ $_[0]-> {editor}-> hScroll( $_[2])}],
 				[ '@*vsc' => '~Vertical scrollbar'   => sub{ $_[0]-> {editor}-> vScroll( $_[2])}],
 				[],
 				(
-					$can_utf8 ?
 					['utf'  => 'UTF-8 mode' => sub {
 						my $utf8_mode = $_[0]-> menu-> utf-> toggle;
 						$_[0]-> {utf8} = $utf8_mode;
 						$::application-> wantUnicodeInput($utf8_mode);
-					}] :
-					()
+					}]
 				),
+				[ '@'.($::application->textDirection ? '*' : '').'rtl' => 
+					'~Right-to-left' => sub{ $_[0]-> {editor}-> textDirection( $_[2] )}],
+				[ '@*ligation' => '~Ligatures' => sub{ $_[0]-> {editor}-> textLigation( $_[2] )}],
 				[ 'Set ~font' => q(setfont)],
 			]]
 		],
@@ -178,7 +177,7 @@ sub init
 	my $cap = '';
 	$self-> menu-> utf-> check if $self-> {utf8} = $profile{utf8};
 	if ( defined $fn) {
-		if ( open FILE, '<'.($profile{utf8} ? 'utf8' : ''), $fn) {
+		if ( open FILE, '<'.($profile{utf8} ? ':encoding(utf-8)' : ''), $fn) {
 			if ( ! defined read( FILE, $cap, -s $fn)) {
 				Prima::MsgBox::message("Cannot read file $fn:$!");
 				$fn = undef;
@@ -271,7 +270,7 @@ sub save_file
 	my $fn = $self-> text;
 	if ( open FILE, '>'.($self-> {utf8} ? 'utf8' : ''), $fn) {
 		my $cap = $self-> {editor}-> text;
-		Encode::_utf8_off($cap) if $can_utf8 and !$self-> {utf8};
+		Encode::_utf8_off($cap) if !$self-> {utf8};
 		my $swr = syswrite(FILE,$cap,length($cap));
 		close FILE;
 		unless (defined $swr && $swr==length($cap)) {
@@ -302,10 +301,10 @@ sub save_as
 	SAVE:while(1) {
 		next SAVE unless open FILE, '>'.($self-> {utf8} ? 'utf8' : ''), $fn;
 		my $cap = $self-> {editor}-> text;
-		Encode::_utf8_off($cap) if $can_utf8 and !$self-> {utf8};
-		my $swr = syswrite(FILE,$cap,length($cap));
+		Encode::_utf8_off($cap) if !$self-> {utf8};
+		my $swr = print FILE $cap;
 		close FILE;
-		unless (defined $swr && $swr==length($cap)) {
+		unless ($swr) {
 			undef $cap;
 			unlink $fn;
 			next SAVE;
@@ -344,7 +343,7 @@ sub find_dialog
 	my @props = qw(findText options scope);
 	push( @props, q(replaceText)) unless $findStyle;
 	if ( $fd) { for( @props) { $prf{$_} = $fd-> {$_}}}
-	$findDialog = Prima::FindDialog-> create unless $findDialog;
+	$findDialog = Prima::Dialog::FindDialog-> create unless $findDialog;
 	$findDialog-> set( %prf, findStyle => $findStyle);
 	$findDialog-> Find-> items($fd-> {findItems});
 	$findDialog-> Replace-> items($fd-> {replaceItems}) unless $findStyle;
@@ -427,7 +426,7 @@ my $fontDialog;
 sub setfont
 {
 	my $self = $_[0];
-	$fontDialog = Prima::FontDialog-> create() unless $fontDialog;
+	$fontDialog = Prima::Dialog::FontDialog-> create() unless $fontDialog;
 	$fontDialog-> logFont( $self-> font);
 	return unless $fontDialog-> execute;
 	$self-> font( $fontDialog-> logFont);

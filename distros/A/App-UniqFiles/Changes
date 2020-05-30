@@ -1,4 +1,32 @@
-0.130   2019-12-04  Released-By: PERLANCAR; Urgency: medium
+0.131   2020-05-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Support multiple digest algorithms (--algorithm, --digest-args (-A)).
+
+	- [removed] Remove --check-content option, replace it with --algorithm none.
+
+        - Support recursing into subdirectories (--recurse, -R).
+
+	- Add option --show-size, --show-digest, --group-by-digest.
+
+	- [doc] Mention App::DuplicateFilesUtils and move-duplicate-files-to.
+
+	- [ux] Simplify CLI: skip reading env & config files.
+
+	- Add option -D (--report-duplicate 3).
+
+	- [ux] Add shortcut alias option -a (for showing all files, equivalent
+	  to --report-unique --report-duplicate=1).
+
+	- [ux] Add -c as shortcut for --count.
+
+	- Make --count (-c) respect the --report-unique (-u) or
+	  --report-duplicate (-d, -D) options; so -c -u will only show the count
+	  of uniq files (which is all 1), -c -a will show count of all files, etc.
+
+
+0.130   2019-12-04  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
 
 	- [doc] Mention find-duplicate-filenames.
 
@@ -33,7 +61,7 @@
 	- Rebuild (Generate TODO.md).
 
 
-0.08     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.08     2014-08-16  Released-By: SHARYANTO; Note: Happy 19th CPAN Day!
 
          - [build] CLI scripts are now generated automatically using
            Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the

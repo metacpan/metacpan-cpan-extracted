@@ -1,7 +1,9 @@
 package Sah::Schemas::Currency;
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-02'; # DATE
+our $DIST = 'Sah-Schemas-Currency'; # DIST
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: Various Sah currency schemas
@@ -18,7 +20,7 @@ Sah::Schemas::Currency - Various Sah currency schemas
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::Schemas::Currency (from Perl distribution Sah-Schemas-Currency), released on 2019-11-29.
+This document describes version 0.005 of Sah::Schemas::Currency (from Perl distribution Sah-Schemas-Currency), released on 2020-03-02.
 
 =head1 HOMEPAGE
 
@@ -50,7 +52,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

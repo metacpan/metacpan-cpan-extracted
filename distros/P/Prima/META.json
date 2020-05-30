@@ -52,6 +52,6 @@
          "url" : "http://github.com/dk/Prima"
       }
    },
-   "version" : "1.58",
+   "version" : "1.59",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

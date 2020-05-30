@@ -1,22 +1,25 @@
 use strict;
 use warnings;
-package JSON::Schema::Draft201909; # git description: 9b1de99
+package JSON::Schema::Draft201909; # git description: v0.001-20-gbe3f104
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 no if "$]" >= 5.031009, feature => 'indirect';
+use feature 'current_sub';
 use JSON::MaybeXS 1.004001 'is_bool';
 use Syntax::Keyword::Try;
 use Carp 'croak';
-use List::Util 1.33 'any';
+use List::Util 1.33 qw(any pairs);
 use Mojo::JSON::Pointer;
 use Mojo::URL;
+use Safe::Isa;
 use Moo;
 use MooX::TypeTiny 0.002002;
-use Types::Standard 1.010002 qw(Bool HasMethods Enum);
+use MooX::HandlesVia;
+use Types::Standard 1.010002 qw(Bool HasMethods Enum InstanceOf HashRef Dict);
 use JSON::Schema::Draft201909::Error;
 use JSON::Schema::Draft201909::Result;
 use namespace::clean;
@@ -33,6 +36,42 @@ has short_circuit => (
   lazy => 1,
   default => sub { $_[0]->output_format eq 'flag' },
 );
+
+has _resource_index => (
+  is => 'bare',
+  isa => HashRef[Dict[
+      # see JSON::MaybeXS::is_bool
+      ref => InstanceOf[qw(JSON::XS::Boolean Cpanel::JSON::XS::Boolean JSON::PP::Boolean)]|HashRef,
+      canonical_uri => InstanceOf['Mojo::URL'],
+    ]],
+  handles_via => 'Hash',
+  handles => {
+    _add_resources => 'set',
+    _get_resource => 'get',
+    _remove_resource => 'delete',
+    _resource_index => 'elements',
+  },
+  lazy => 1,
+  default => sub { {} },
+);
+
+before _add_resources => sub {
+  my $self = shift;
+  foreach my $pair (pairs @_) {
+    my ($key, $value) = @$pair;
+    if (my $existing = $self->_get_resource($key)) {
+      croak 'a schema resource is already indexed with uri "'.$key.'"'
+        # we allow overwriting canonical_uri = '' to allow for ad hoc evaluation of
+        # schemas that lack all identifiers altogether
+        if ($key ne '' and $existing->{canonical_uri} ne '')
+          and $existing->{ref} != $value->{ref}
+            or $existing->{canonical_uri} ne $value->{canonical_uri};
+    }
+
+    croak sprintf('canonical_uri cannot contain a plain-name fragment (%s)', $value->{canonical_uri})
+      if ($value->{canonical_uri}->fragment // '') =~ m{^[^/]};
+  }
+};
 
 has _json_decoder => (
   is => 'ro',
@@ -67,12 +106,14 @@ sub evaluate_json_string {
 sub evaluate {
   my ($self, $data, $schema) = @_;
 
+  $self->_find_all_identifiers($schema);
+
   my $state = {
-    root_schema => Mojo::JSON::Pointer->new($schema),
+    base_uri => Mojo::URL->new,                   # TODO: will be set by a global attribute
     short_circuit => $self->short_circuit,
     data_path => '',
     traversed_schema_path => '',  # the accumulated path up to the last $ref traversal
-    absolute_schema_path => '',   # the absolute path of the last traversed $ref
+    absolute_schema_uri => undef, # the absolute path of the last traversed $ref; always a Mojo::URL
     schema_path => '',            # the rest of the path, since the last traversed $ref
     errors => [],
   };
@@ -82,7 +123,13 @@ sub evaluate {
     $result = $self->_eval($data, $schema, $state);
   }
   catch {
-    E($state, 'EXCEPTION: '.$@) if $@ ne "ABORT\n";
+    if ($@->$_isa('JSON::Schema::Draft201909::Error')) {
+      push @{$state->{errors}}, $@;
+    }
+    else {
+      E($state, 'EXCEPTION: '.$@);
+    }
+
     $result = 0;
   }
 
@@ -96,6 +143,7 @@ sub evaluate {
 sub _eval {
   my ($self, $data, $schema, $state) = @_;
 
+  $state = { %$state };     # changes to $state should only affect subschemas, not parents
   delete $state->{keyword};
 
   my $schema_type = $self->_get_type($schema);
@@ -107,7 +155,7 @@ sub _eval {
 
   foreach my $keyword (
     # CORE KEYWORDS
-    qw($schema $ref $id $anchor $recursiveRef $recursiveAnchor $vocabulary $comment $defs),
+    qw($schema $id $anchor $ref $recursiveRef $recursiveAnchor $vocabulary $comment $defs),
     # VALIDATOR KEYWORDS
     qw(type enum const
       multipleOf maximum exclusiveMaximum minimum exclusiveMinimum
@@ -121,9 +169,10 @@ sub _eval {
   ) {
     next if not exists $schema->{$keyword};
 
+    $state->{keyword} = $keyword;
     my $method = '_eval_keyword_'.($keyword =~ s/^\$//r);
     abort($state, 'unsupported keyword "%s"', $keyword) if not $self->can($method);
-    $result = 0 if not $self->$method($data, $schema, +{ %$state, keyword => $keyword });
+    $result = 0 if not $self->$method($data, $schema, $state);
 
     return 0 if not $result and $state->{short_circuit};
   }
@@ -149,27 +198,70 @@ sub _eval_keyword_schema {
 
   abort($state, 'custom $schema references are not yet supported')
     if $schema->{'$schema'} ne 'https://json-schema.org/draft/2019-09/schema';
+
+  return 1;
+}
+
+sub _eval_keyword_id {
+  my ($self, $data, $schema, $state) = @_;
+
+  abort($state, '%s is not a string', $schema->{'$id'})
+    if not $self->_is_type('string', $schema->{'$id'});
+
+  my $uri = Mojo::URL->new($schema->{'$id'})->base($state->{base_uri})->to_abs;
+  abort($state, '%s cannot have a non-empty fragment', $schema->{'$id'}) if length $uri->fragment;
+
+  $state->{base_uri} = $uri;
+  $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path};
+  $state->{absolute_schema_uri} = $uri->clone;
+  $state->{schema_path} = '';
+
+  return 1;
+}
+
+sub _eval_keyword_anchor {
+  my ($self, $data, $schema, $state) = @_;
+
+  abort($state, '%s is not a string', $schema->{'$anchor'})
+    if not $self->_is_type('string', $schema->{'$anchor'});
+
+  if ($schema->{'$anchor'} !~ /^[A-Za-z][A-Za-z0-9_:.-]+$/) {
+    $self->_remove_resource($state->{base_uri}->clone->fragment($schema->{'$anchor'}));
+    abort($state, '%s does not match required syntax', $schema->{'$anchor'});
+  }
+
+  # we already indexed this uri, so there is nothing more to do.
+  # we explicitly do NOT set $state->{absolute_schema_uri}.
+  return 1;
 }
 
 sub _eval_keyword_ref {
   my ($self, $data, $schema, $state) = @_;
 
-  abort($state, 'only same-document JSON pointers are supported in $ref')
-    if $schema->{'$ref'} !~ m{^#(/|$)};
+  my $uri = Mojo::URL->new($schema->{'$ref'})->base($state->{base_uri})->to_abs;
 
-  my $url = Mojo::URL->new($schema->{'$ref'});
-  my $fragment = $url->fragment;
+  my $fragment = $uri->fragment // '';
+  my ($subschema, $absolute_uri);
+  # TODO: this will get less ugly when we move to actual document objects
+  if (not length($fragment) or $fragment =~ m{^/}) {
+    my $base = $uri->clone->fragment(undef);
+    my $document = Mojo::JSON::Pointer->new(($self->_get_resource($base) // {})->{ref});
+    $subschema = $document->get($fragment);
+    $absolute_uri = $uri;
+  }
+  else {
+    if (my $resource = $self->_get_resource($uri)) {
+      $subschema = $resource->{ref};
+      $absolute_uri = $resource->{canonical_uri}->clone;  # this is *not* the anchor-containing URI
+    }
+  }
 
-  my $subschema = $state->{root_schema}->get($fragment);
-  abort($state, 'unable to resolve ref "%s"', $schema->{'$ref'}) if not defined $subschema;
+  abort($state, 'unable to find resource %s', $uri) if not defined $subschema;
 
-  # for now, the base_uri of the schema is always '' (yes I know this is not an absolute uri)
-  # TODO: we need to track the base_uri of the schema resource that we are referencing.
-  # absolute_schema_path may not look anything like the contents of the $ref keyword.
   return $self->_eval($data, $subschema,
     +{ %$state,
       traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/$ref',
-      absolute_schema_path => $url->to_string,
+      absolute_schema_uri => $absolute_uri,
       schema_path => '',
     });
 }
@@ -538,7 +630,7 @@ sub _eval_keyword_items {
 
   my $last_index = -1;
   my $valid = 1;
-  foreach my $idx (0..$#{$data}) {
+  foreach my $idx (0 .. $#{$data}) {
     last if $idx > $#{$schema->{items}};
 
     $last_index = $idx;
@@ -583,7 +675,7 @@ sub _eval_keyword_contains {
 
   my $num_valid = 0;
   my @errors;
-  foreach my $idx (0.. $#{$data}) {
+  foreach my $idx (0 .. $#{$data}) {
     if ($self->_eval($data->[$idx], $schema->{contains},
         +{ %$state,
           errors => \@errors,
@@ -694,11 +786,17 @@ sub _eval_keyword_additionalProperties {
     next if exists $schema->{patternProperties}
       and any { $property =~ /$_/ } keys %{$schema->{patternProperties}};
 
-    $valid = 0 if not $self->_eval($data->{$property}, $schema->{additionalProperties},
-      +{ %$state,
-        data_path => $state->{data_path}.'/'.$property,
-        schema_path => $state->{schema_path}.'/additionalProperties',
-      });
+    if ($self->_is_type('boolean', $schema->{additionalProperties})) {
+      $valid = E({ %$state, data_path => $state->{data_path}.'/'.$property },
+        'additional property not permitted') if not $schema->{additionalProperties};
+    }
+    else {
+      $valid = 0 if not $self->_eval($data->{$property}, $schema->{additionalProperties},
+        +{ %$state,
+          data_path => $state->{data_path}.'/'.$property,
+          schema_path => $state->{schema_path}.'/additionalProperties',
+        });
+    }
     last if not $valid and $state->{short_circuit};
   }
 
@@ -812,7 +910,7 @@ sub _is_equal {
 
   if ($types[0] eq 'array') {
     return 0 if @$x != @$y;
-    foreach my $idx (0..$#{$x}) {
+    foreach my $idx (0 .. $#{$x}) {
       $state->{path} = $path.'/'.$idx;
       return 0 if not $self->_is_equal($x->[$idx], $y->[$idx], $state);
     }
@@ -822,11 +920,11 @@ sub _is_equal {
   return 0; # should never get here
 }
 
-# checks array elements for uniqueness
-# if second arrayref is provided, it is populated with the indices of unique items
+# checks array elements for uniqueness. short-circuits on first pair of matching elements
+# if second arrayref is provided, it is populated with the indices of identical items
 sub _is_elements_unique {
   my ($self, $array, $equal_indices) = @_;
-  foreach my $idx0 (0..$#{$array}-1) {
+  foreach my $idx0 (0 .. $#{$array}-1) {
     foreach my $idx1 ($idx0+1 .. $#{$array}) {
       if ($self->_is_equal($array->[$idx0], $array->[$idx1])) {
         push @$equal_indices, $idx0, $idx1 if defined $equal_indices;
@@ -835,6 +933,51 @@ sub _is_elements_unique {
     }
   }
   return 1;
+}
+
+sub _traverse_for_identifiers {
+  my ($data, $canonical_uri) = @_;
+  my $uri_fragment = $canonical_uri->fragment // '';
+  my %identifiers;
+  if (ref $data eq 'ARRAY') {
+    return map
+      __SUB__->($data->[$_], $canonical_uri->clone->fragment($uri_fragment.'/'.$_)),
+      0 .. $#{$data};
+  }
+  elsif (ref $data eq 'HASH') {
+    if (exists $data->{'$id'} and _is_type(undef, 'string', $data->{'$id'})) {
+      $canonical_uri = Mojo::URL->new($data->{'$id'})->base($canonical_uri)->to_abs;
+      # this might not be a real $id... wait for it to be encountered at runtime before dying
+      $identifiers{$canonical_uri} = { ref => $data, canonical_uri => $canonical_uri }
+        if not length $canonical_uri->fragment;
+    }
+    if (exists $data->{'$anchor'} and _is_type(undef, 'string', $data->{'$anchor'})) {
+      # we cannot change the canonical uri, or we won't be able to properly identify
+      # paths within this resource
+      my $uri = Mojo::URL->new->base($canonical_uri)->to_abs->fragment($data->{'$anchor'});
+      $identifiers{$uri} = { ref => $data, canonical_uri => $canonical_uri };
+    }
+
+    return
+      %identifiers,
+      map __SUB__->($data->{$_}, $canonical_uri->clone->fragment($uri_fragment.'/'.$_)), keys %$data;
+  }
+
+  return ();
+}
+
+# traverse a schema document, find all identifiers and add them to the resource index.
+# internal only and subject to change!
+sub _find_all_identifiers {
+  my ($self, $schema) = @_;
+
+  my $base_uri = Mojo::URL->new;  # TODO: $self->base_uri->clone
+  my %identifiers = _traverse_for_identifiers($schema, $base_uri);
+
+  $identifiers{''} = { ref => $schema, canonical_uri => $base_uri }
+    if not "$base_uri" and ref $schema eq 'HASH' and not exists $schema->{'$id'};
+
+  $self->_add_resources(%identifiers);
 }
 
 # shorthand for creating error objects
@@ -846,8 +989,10 @@ sub E {
   push @{$state->{errors}}, JSON::Schema::Draft201909::Error->new(
     instance_location => $state->{data_path},
     keyword_location => $state->{traversed_schema_path}.$state->{schema_path}.$suffix,
-    !$state->{absolute_schema_path} ? ()
-      : ( absolute_keyword_location => $state->{absolute_schema_path}.$state->{schema_path}.$suffix ),
+    !$state->{absolute_schema_uri} ? () : ( absolute_keyword_location => do {
+      my $abs = $state->{absolute_schema_uri}->clone;
+      $abs->fragment(($abs->fragment//'').$state->{schema_path}.$suffix);
+    } ),
     error => @args ? sprintf($error_string, @args) : $error_string,
   );
 
@@ -857,8 +1002,9 @@ sub E {
 # creates an error object, but also aborts evaluation immediately
 use namespace::clean 'abort';
 sub abort {
-  E($_[0], 'EXCEPTION: '.$_[1], @_[2..$#_]);
-  die "ABORT\n";
+  my ($state, $error_string, @args) = @_;
+  E($state, 'EXCEPTION: '.$error_string, @args);
+  die pop @{$state->{errors}};
 }
 
 1;
@@ -877,7 +1023,7 @@ JSON::Schema::Draft201909 - Validate data against a schema
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -916,7 +1062,7 @@ Defaults to true when C<output_format> is C<flag>, and false otherwise.
 Evaluates the provided instance data against the known schema document.
 
 The data is in the form of a JSON-encoded string (in accordance with
-L<RFC8259|https://tools.ietf.org/html/rfc8259>. B<The string is expected to be UTF-8 encoded.>
+L<RFC8259|https://tools.ietf.org/html/rfc8259>). B<The string is expected to be UTF-8 encoded.>
 
 The schema is in the form of a Perl data structure, representing a JSON Schema
 that respects the Draft 2019-09 meta-schema at L<https://json-schema.org/draft/2019-09/schema>.
@@ -994,7 +1140,7 @@ loading multiple schema documents, and registration of a schema against a canoni
 
 =item *
 
-collection of annotations (L<https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.7.7>
+collection of annotations (L<https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.7.7>)
 
 =item *
 

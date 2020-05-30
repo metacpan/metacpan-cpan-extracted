@@ -31,7 +31,7 @@ require Exporter;
 require DynaLoader;
 
 our @ISA = ('Exporter', 'DynaLoader');
-our $VERSION = "1.0.0";  # remember to update README and META.yml too
+our $VERSION = "1.1.0";  # remember to update README and META.yml too
 our @EXPORT = qw();
 our @EXPORT_OK = qw();  # filled by XSUB
 
@@ -70,16 +70,167 @@ The ZVBI Perl module covers all exported libzvbi functions.  Most of
 the functions and parameters are exposed nearly identical, or with
 minor adaptions for the Perl idiom.
 
-Note: This manual page does not reproduce the full documentation
-which is available along with libzvbi. Hence it's recommended that
-you use the libzvbi documentation in parallel to this one. It is
-included in the libzvbi-dev package in the C<doc/html> sub-directory
-and online at L<http://zapping.sourceforge.net/doc/libzvbi/index.html>
+Note: This manual page does not reproduce the full documentation provided
+by libzvbi by means of doxygen: While method and parameter descriptions
+are fully included, some data structures may not be not fully documented
+here.  Hence when additional details are needed, it's recommended to look
+at libzvbi documentation, or directly at its source code.
 
 Finally note there's also another, older, module which covers VBI
 data capture: B<Video::Capture::VBI> and based on that another one which
 covers Teletext caching: B<Video::TeletextDB>. Check for yourself which
 one fits your needs better.
+
+=head1 Class hierarchy
+
+The following is an overview how functionality provided by I<libzvbi> is
+structured into classes, and how the classes are connected:
+
+=over 4
+
+=item Class L</Video::ZVBI::capture>
+
+This class allows receiving data through a video device. For
+digital television transmissions (DVB) this mostly involves demultiplexing
+of the data service sub-stream from the overall transmission stream.
+For analog television transmission this involves capturing selected
+lines within the Vertical Blanking Interval (VBI) and "demodulating"
+the digitized wave form to raw data.
+
+=item Blessed references I<VbiRawBufferPtr> and I<VbiSlicedBufferPtr>
+
+The I<pull> variety of capture methods produce blessed references of types
+I<VbiRawBufferPtr> and I<VbiSlicedBufferPtr> for raw VBI samples and
+sliced VBI lines respectively. These are transparent pointers to C
+structures, and thus not directly accesible from Perl (although there is
+function I<Video::ZVBI::get_sliced_line()>, which allows unpacking a
+I<VbiSlicedBufferPtr>). They are meant for efficiently and safely
+transferring data to decoder methods of classes I<rawdec>, I<vt>,
+I<dvb_mux>, and the analog de-multiplexer classes I<idl_demux>,
+I<pfc_demux> and I<xds_demux>.
+
+When data is intended to be processed by Perl directly, use the I<read>
+variety of capture methods, which return captured data in form of plain
+string scalars. Actually the decoder and de-multiplexer classes accept
+these scalars too, but it is not recommended to use this as it is less
+type-safe.
+
+=item Class L</Video::ZVBI::rawdec>
+
+This class can optionally be used for manually processing raw data
+(i.e.  direct output of the analog-to-digital conversion of the video
+signal) optionally returned by the L</Video::ZVBI::capture> class via I<pull_raw()>
+methods et.al. For most use-cases the processing (so-called "slicing")
+done under control of the L</Video::ZVBI::capture> class using I<pull_sliced()> should
+be sufficient, so this class is usually not needed. This class is not
+applicable for DVB.
+
+=item Class L</Video::ZVBI::proxy>
+
+This class allows accessing VBI devices via a proxy daemon. An
+instance of this class would be provided to the L</Video::ZVBI::capture> class
+constructor.  Using the proxy instead of capturing directly from a VBI
+device allows multiple applications to capture concurrently (e.g. for
+decoding multiple data services). Not applicable to DVB, as the proxy
+does not support DVB.  (Also at least the Linux DVB driver allows
+multiple applications reading the same stream concurrently.)
+
+=item Class L</Video::ZVBI::vt>
+
+Class performing high level decoding of all supported services and storing
+the data in an internal cache. The class takes input ("sliced data") from
+the L</Video::ZVBI::capture> class. The class supports callback functions
+for notifications about received data; various interfaces allow extracting
+the data in form of instances of the L</Video::ZVBI::page> class, or
+as an image in PPM or XPM formats.
+
+=item Class L</Video::ZVBI::search>
+
+This class allows searching the cache maintained by L</Video::ZVBI::vt> for
+pages with text matching a pattern. The search returns instances of
+class L</Video::ZVBI::page>.
+
+=item Class L</Video::ZVBI::page>
+
+Instances of this class are produced by the L</Video::ZVBI::vt> query
+functions or L</Video::ZVBI::search>. Each instance represents a teletext
+(sub-)page or Closed Caption page. The class has various interfaces for
+extracting the text and properties of the page content.
+
+=item Class L</Video::ZVBI::export>
+
+This class allows rendering an instance of L</Video::ZVBI::page> in
+specific formats, for example as plain-text or image in various formats
+such as PNG or PPM. The result can be returned within a string, or written
+directly to a file.
+
+=back
+
+In summary: For receiving live data, you'll need at least an instance of
+the L</Video::ZVBI::capture> class. Your application is responsible for
+calling the capture interface at 25 or 30 Hz intervals (ideally using a
+separate thread that blocks on the capture function - but this is not
+supported by the Perl module, or else using async I/O via select/poll, or
+polling using a timer). For standard services such as Teletext, Closed
+Caption, WSS or network identification you'll need to feed the captured
+data into an instance of the L</Video::ZVBI::vt> class, which then drives
+further processing via callback notifications. For other services you
+may use the de-multiplexers listed below, or process the data within your
+application directly. After that it depends on your application which
+interfaces/classes you want to use for further processing of decoded data.
+
+Special-purpose classes for DVB:
+
+=over 4
+
+=item Class L</Video::ZVBI::dvb_demux>
+
+Class performing de-multiplexing of a transport stream received from a
+DVB driver, i.e. separating "VBI" data from a DVB PES stream (EN 301
+472, EN 301 775). Note this class is used internally by the
+L</Video::ZVBI::capture> class for de-multiplexing. You should only use this
+class directly when the data does not originate from a local device.
+
+=item Class L</Video::ZVBI::dvb_mux>
+
+This class converts sliced and optionally raw VBI data to a DVB
+Packetized Elementary Stream or Transport Stream as defined in EN 300
+472 "Digital Video Broadcasting (DVB); Specification for conveying
+ITU-R System B Teletext in DVB bit-streams" and EN 301 775 "Digital
+Video Broadcasting (DVB); Specification for the carriage of Vertical
+Blanking Information (VBI) data in DVB bit-streams".
+
+=back
+
+The following classes are for de-multiplexing data services transmitted
+within teletext packets. For PFC and IDL, libzvbi only supports the
+protocol, but the application has to decode and store payload data. XDS is
+supported by L</Video::ZVBI::vt> (decoding and event notifications). Most
+likely none of these protocols are used anymore, as they were intended for
+use via analog television broadcast:
+
+=over 4
+
+=item Class L</Video::ZVBI::idl_demux>
+
+This class allows decoding data transmissions within a Teletext
+packet stream using I<Independent Data Line> protocol (EN 300 708 section 6),
+i.e. data transmissions based on packet 8/30.
+
+=item Class L</Video::ZVBI::pfc_demux>
+
+Class for separating data transmitted in I<Page Function Clear> teletext
+packets (ETS 300 708 section 4), i.e. using regular packets on a dedicated
+teletext page. Historically this protocol was used for I<Nextview EPG>,
+(i.e. an Electronic Programming Guide for analog television).
+
+=item Class L</Video::ZVBI::xds_demux>
+
+Class for separating I<Extended Data Service> from a Closed Caption stream
+(EIA 608). This service allows to transmit "now & next" EPG data in
+addition to sub-titles.
+
+=back
 
 =head1 Video::ZVBI::capture
 
@@ -103,15 +254,15 @@ returns C<undef> as result and an error message in I<$errorstr>
 Parameters: I<$dev> is the path of the device to open, usually one of
 C</dev/vbi0> or up. I<$buffers> is the number of device buffers for
 raw VBI data if the driver supports streaming. Otherwise one bounce
-buffer is allocated for I<$cap-E<gt>pull()>  I<$services> is a logical OR
+buffer is allocated for I<$cap-E<gt>pull()>.  I<$services> is a logical OR
 of C<VBI_SLICED_*> symbols describing the data services to be decoded.
 On return the services actually decodable will be stored here.
-See I<ZVBI::raw_dec::add_services()> for details.  If you want to capture
+See I<rawdec::add_services()> for details.  If you want to capture
 raw data only, set to C<VBI_SLICED_VBI_525>, C<VBI_SLICED_VBI_625> or
 both.  If this parameter is C<undef>, no services will be installed.
 You can do so later with I<$cap-E<gt>update_services()> (Note in this
 case the I<$reset> parameter to that function will have to be set to 1.)
-I<$strict> is passed internally to L<Video::ZVBI::raw_dec::add_services()>.
+I<$strict> is passed internally to I<rawdec::add_services()>.
 I<$errorstr> is used to return an error description.  I<$trace> can be
 used to enable output of progress messages on I<stderr>.
 
@@ -137,25 +288,30 @@ returned by Perl's B<fileno>.
 
 =item $cap = bktr_new($dev, $scanning, $services, $strict, $errorstr, $trace)
 
-Initializes a video device using the BSD driver.
-Result and parameters are identical to function I<v4l2_new()>
+Initializes a video device using the BSD "bktr" driver.
+Result and parameters are identical to function I<v4l_new()>
 
 =item $cap = dvb_new($dev, $scanning, $services, $strict, $errorstr, $trace)
 
 Initializes a DVB video device.  This function is deprecated as it has many
 bugs (see libzvbi documentation for details). Use I<dvb_new2()> instead.
 
-=item dvb_new2($dev, $pid, $errorstr, $trace)
+=item $cap = dvb_new2($dev, $pid, $errorstr, $trace)
 
 Initializes a DVB video device.  The function returns a blessed reference
 to a capture context.  Upon error the function returns C<undef> as result
 and an error message in I<$errorstr>
 
-Parameters: I<$dev> is the path of the DVB device to open.
-I<$pid> specifies the number (PID) of a stream which contains the data.
-You can pass 0 here and set or change the PID later with I<$cap-E<gt>dvb_filter()>.
-I<$errorstr> is used to return an error descriptions.  I<$trace> can be
-used to enable output of progress messages on I<stderr>.
+Parameters: I<$dev> is the path of the DVB device to open.  I<$pid>
+specifies the number (PID) of a stream which contains the VBI data
+service. You can pass 0 here and set or change the PID later with
+I<$cap-E<gt>dvb_filter()>.  I<$errorstr> is used to return an error
+descriptions.  I<$trace> can be used to enable output of progress messages
+on I<stderr>.
+
+B<Note> the PID value can often be derived from the PID for video in
+C<channels.conf> by adding offsets in range 3 to 30. Alternatively you can
+look up the PID via Internet services such as L<https://www.satindex.de/>.
 
 =item $cap = $proxy->proxy_new($buffers, $scanning, $services, $strict, $errorstr)
 
@@ -177,7 +333,7 @@ Upon error the function returns C<undef> as result and an error message
 in I<$errorstr>
 
 Parameters: I<$proxy> is a reference to a previously created proxy
-client context (L<Video::ZVBI::proxy>.) The remaining
+client context (L</Video::ZVBI::proxy>.) The remaining
 parameters have the same meaning as described above, as they are used
 by the daemon when opening the device.
 I<$buffers> specifies the number of intermediate buffers on server side
@@ -189,7 +345,7 @@ to query the device for the norm, as this parameter is only required
 for old v4l1 drivers which don't support video standard query ioctls.)
 I<$services> is a set of C<VBI_SLICED_*> symbols describing the data
 services to be decoded. On return I<$services> contains actually
-decodable services.  See I<Video::ZVBI::raw_dec::add_services()>
+decodable services.  See I<Video::ZVBI::rawdec::add_services()>
 for details.  If you want to capture raw data only, set to
 C<VBI_SLICED_VBI_525>, C<VBI_SLICED_VBI_625> or both.  If this
 parameter is C<undef>, no services will be installed.  I<$strict> has
@@ -204,7 +360,8 @@ a previously created capture context I<$cap> (the reference is implicitly
 inserted as first parameter when the functions are invoked as listed
 below.) All these functions return a status result code: -1 on error
 (and an error indicator in C<$!>), 0 on timeout (i.e. no data arrived
-within I<$timeout_ms> milliseconds) or 1 on success.
+within I<$timeout_ms> milliseconds) or 1 on success. The functions'
+output parameters are valid only in case of the latter.
 
 There are two different types of capture functions: The functions
 named C<read...> copy captured data into the given Perl scalar. In
@@ -221,14 +378,21 @@ these are usually more efficient.
 
 Read a raw VBI frame from the capture device into scalar I<$raw_buf>.
 The buffer variable is automatically extended to the exact length
-required for the frame's data.  On success, the function returns
-in I<$timestamp> the capture instant in seconds and fractions
-since 1970-01-01 00:00 in double format.
+required for the frame's data.  The function returns 1 upon success,
+0 upon timeout and -1 upon error as described above. On success, the
+the function additionally returns in I<$timestamp> the capture instant
+in seconds and fractions since 1970-01-01 00:00 in double format.
 
 Parameter I<$timeout_ms> gives the limit for waiting for data in
 milliseconds; if no data arrives within the timeout, the function
 returns 0.  Note the function may fail if the device does not support
 reading data in raw format.
+
+Note the returned raw buffer contains all captured VBI lines consecutively
+in a one-dimensional array. Length of a line can be queried from the
+capture context using I<Video::ZVBI::capture.parameters()>, attribute
+I<bytes_per_line>. The number of lines in the buffer is determined by the
+values of I<count_a> plus I<count_b>.
 
 =item $cap->read_sliced($sliced_buf, $n_lines, $timestamp, $timeout_ms)
 
@@ -237,12 +401,16 @@ I<$sliced_buf>.  The buffer is automatically extended to the length
 required for the sliced data.  Parameter I<$timeout_ms> specifies the
 limit for waiting for data (in milliseconds.)
 
-On success, the function returns in I<$timestamp> the capture instant
-in seconds and fractions since 1970-01-01 00:00 in double format and
-in I<$n_lines> the number of sliced lines in the buffer. Note for
-efficiency the buffer is an array of vbi_sliced C structures. Use
-I<get_sliced_line()> to process the contents in Perl, or pass the buffer
-directly to class L<Video::ZVBI::vt> or other decoder objects.
+The function returns 1 upon success, 0 upon timeout and -1 upon error as
+described above.  On success, the function additionally returns in
+I<$timestamp> the capture instant in seconds and fractions since
+1970-01-01 00:00 in double format and in I<$n_lines> the number of sliced
+lines in the buffer.
+
+Note for efficiency the buffer holds an array of packed C structures of
+type I<vbi_sliced>. Use I<get_sliced_line()> for extracting data of
+individual VBI lines for processing by Perl, or pass the buffer directly
+to class L</Video::ZVBI::vt> or other decoder objects.
 
 Note: it's generally more efficient to use I<pull_sliced()>
 instead, as that one may avoid having to copy sliced data into the
@@ -253,7 +421,7 @@ given buffer (e.g. for the VBI proxy)
 This function is a combination of I<read_raw()> and I<read_sliced()>, i.e.
 reads a raw VBI frame from the capture context into I<$raw_buf> and
 decodes it to sliced data which is returned in I<$sliced_buf>. For
-details on parameters see above.
+details on parameters and results see above.
 
 Note: Depending on the driver, captured raw data may have to be copied
 from the capture buffer into the given buffer (e.g. for v4l2 streams which
@@ -264,47 +432,57 @@ to raw data at all.
 =item $cap->pull_raw($ref, $timestamp, $timeout_ms)
 
 Read a raw VBI frame from the capture context, which is returned in
-I<$ref> in form of a blessed reference to an internal buffer.  The data
-remains valid until the next call to this or any other "pull" function.
-The reference can be passed to the raw decoder function.  If you need to
-process the data in Perl, use I<read_raw()> instead.  For all other cases
-I<read_raw()> is more efficient as it may avoid copying the data.
+I<$ref> in form of a blessed reference of type I<VbiRawBufferPtr>, which
+refers to an internal C data structure.  The data remains valid until the
+next call to this or any other "pull" function.  The reference can be
+passed to the decoder function of class L</Video::ZVBI::rawdec>. For
+processing raw data by Perl directly, I<read_raw()> is more efficient as
+it may avoid copying the data.
 
-On success, the function returns in I<$timestamp> the capture instant in
-seconds and fractions since 1970-01-01 00:00 in double format.  Parameter
-I<$timeout_ms> specifies the limit for waiting for data (in milliseconds.)
-Note the function may fail if the device does not support reading data
-in raw format.
+The function returns 1 upon success, 0 upon timeout and -1 upon error as
+described above.  On success, the function additionally returns in
+I<$timestamp> the capture instant in seconds and fractions since
+1970-01-01 00:00 in double format.  Parameter I<$timeout_ms> specifies the
+limit for waiting for data (in milliseconds.) Note the function may fail
+if the device does not support reading data in raw format.
 
 =item $cap->pull_sliced($ref, $n_lines, $timestamp, $timeout_ms)
 
 Read a sliced VBI frame from the capture context, which is returned in
-I<$ref> in form of a blessed reference to an internal buffer. The data
-remains valid until the next call to this or any other "pull" function.
-The reference can be passed to I<get_sliced_line()> to process the data in
-Perl, or it can be passed to a L<Video::ZVBI::vt> decoder object.
+I<$ref> in form of a blessed reference of type I<VbiSlicedBufferPtr>,
+which refers to an internal C data structure. The data remains valid until
+the next call to this or any other "pull" function.  The reference can be
+passed to I<get_sliced_line()> for extracting data of individual VBI lines
+for processing the data in Perl, or it can be passed to a
+L</Video::ZVBI::vt> decoder object.
 
-On success, the function returns in I<$timestamp> the capture instant
-in seconds and fractions since 1970-01-01 00:00 in double format and
-in I<$n_lines> the number of sliced lines in the buffer.  Parameter
-I<$timeout_ms> specifies the limit for waiting for data (in milliseconds.)
+The function returns 1 upon success, 0 upon timeout and -1 upon error as
+described above.  On success, the function additionally returns in
+I<$timestamp> the capture instant in seconds and fractions since
+1970-01-01 00:00 in double format and in I<$n_lines> the number of sliced
+lines in the buffer.  Parameter I<$timeout_ms> specifies the limit for
+waiting for data (in milliseconds.)
 
 =item $cap->pull($raw_ref, $sliced_ref, $sliced_lines, $timestamp, $timeout_ms)
 
 This function is a combination of I<pull_raw()> and I<pull_sliced()>, i.e.
-returns blessed references to an internal raw data buffer in I<$raw_ref>
-and to a sliced data buffer in I<$sliced_ref>. For details on parameters
-see above.
+returns blessed references to an internal raw data buffer of type
+I<VbiRawBufferPtr> in I<$raw_ref> and to a sliced data buffer of type
+I<VbiSlicedBufferPtr> in I<$sliced_ref>. Scalar I<$sliced_lines> indicates
+the number of valid sliced lines in I<$sliced_ref>. For details on
+parameters and results see above.
 
 =back
 
-For reasons of efficiency the data is not immediately converted into
-Perl structures. Functions of the "read" variety return a single
-byte-string in the given scalar which contains all VBI lines.
-Functions of the "pull" variety just return a binary reference
-(i.e. a C pointer) which cannot be used by Perl for other purposes
-than passing it to further processing functions.  To process either
-read or pulled data by Perl code, use the following function:
+For reasons of efficiency, data is not immediately converted into Perl
+structures. Functions of the "read" variety return a byte-string in the
+given scalar which contains data of all VBI lines.  Functions of the
+"pull" variety just return a blessed reference (i.e. a C pointer) of types
+I<VbiRawBufferPtr> and I<VbiSlicedBufferPtr> respectively which cannot be
+used by Perl for other purposes than passing it to further processing
+functions.  To process either read or pulled sliced VBI lines by Perl
+code, use the following function for extracting parameters and data of
+individual VBI lines:
 
 =over 4
 
@@ -314,7 +492,8 @@ The function takes a buffer which was filled by one of the slicer
 or capture & slice functions and a line index. The index must be lower
 than the line count returned by the slicer.  The function returns
 a list of three elements: sliced data from the respective line in
-the buffer, slicer type (C<VBI_SLICED_...>) and physical line number.
+the buffer, sliced service type (C<VBI_SLICED_...>) and physical line
+number in ITU-R line numbering scheme.
 
 The structure of the data returned in the first element depends on
 the kind of data in the VBI line (e.g. for teletext it's 42 bytes,
@@ -323,8 +502,8 @@ after the 42 bytes is undefined.)
 
 =back
 
-The following control functions work as described in the libzvbi
-documentation.
+The following methods can be used for querying or modifying a capture
+context:
 
 =over 4
 
@@ -414,7 +593,7 @@ committed (because capturing has to be suspended to allow resizing the
 VBI image.)  Note this flag is ignored when using the VBI proxy.
 I<$services> contains a set of C<VBI_SLICED_*> symbols describing the
 data services to be decoded. On return the services actually decodable
-will be stored here, i.e. the behaviour is identical to I<v4l2_new()> etc.
+will be stored here, i.e. the behavior is identical to I<v4l2_new()> etc.
 I<$strict> and I<$errorstr> are also same as during capture context
 creation.
 
@@ -463,7 +642,7 @@ of one or more C<VBI_FD_*> constants:
 
 =item VBI_FD_HAS_SELECT
 
-Is set when I<select(2)> can be used on the filehandle returned by
+Is set when I<select(2)> can be used on the file handle returned by
 I<$cap-E<gt>fd()> to wait for new data on the capture device file handle.
 
 =item VBI_FD_HAS_MMAP
@@ -503,6 +682,15 @@ The following functions are used for receiving sliced or raw data from
 VBI proxy daemon.  Using the daemon instead of capturing directly from
 a VBI device allows multiple applications to capture concurrently,
 e.g. to decode multiple data services.
+
+Note the proxy is only useful if all VBI applications use it. For
+applications that do not support the proxy directly, there is a library
+that can overload calls to C library, so that access to the VBI device is
+redirected transparently through the daemon. Details are described in the
+manual I<zvbi-chains(1)>. In principle it's as easy as as prepending
+C<zvbi-chains -dev /dev/vbi0> to the application command line.
+
+See C<examples/proxy-test.pl> for examples how to use these functions.
 
 =over 4
 
@@ -700,16 +888,15 @@ to control the channel.
 =item $proxy->get_channel_desc()
 
 Retrieve info sent by the proxy daemon in a channel change indication.
-The function returns a list with two members: scanning value (625, 525 or 0)
-and a boolean indicator if the change request was granted.
+The function returns a tuple with two elements: scanning value (625
+indicating PAL, or 525 indicating NTSC, or 0 if unknown) and a boolean
+indicator if the change request was granted.
 
 =item $proxy->has_channel_control()
 
 Returns 1 if client is currently allowed to switch channels, else 0.
 
 =back
-
-See B<examples/proxy-test.pl> for examples how to use these functions.
 
 =head1 Video::ZVBI::rawdec
 
@@ -728,7 +915,7 @@ functions of the capture object (e.g. I<pull_sliced>)
 Creates and initializes a new raw decoder context. Parameter I<$ref>
 specifies the physical parameters of the raw VBI image, such as the
 sampling rate, number of VBI lines etc.  The parameter can be either
-a reference to a capture context (L<Video::ZVBI::capture>)
+a reference to a capture context (L</Video::ZVBI::capture>)
 or a reference to a hash. The contents for the hash are as returned
 by method I<$cap-E<gt>parameters()> on capture contexts, i.e. they
 describe the physical parameters of the source.
@@ -750,7 +937,7 @@ VBI scan lines in the calculated sampling parameters.
 If I<$scanning> is set to 525 only NTSC services are accepted; if set to
 625 only PAL/SECAM services are accepted. When scanning is 0, the norm is
 determined from the requested services; an ambiguous set will result in
-undefined behaviour.
+undefined behavior.
 
 The function returns a set of C<VBI_SLICED_*> constants describing the
 data services covered by the calculated sampling parameters returned in
@@ -814,14 +1001,18 @@ Returns C<undef>.
 
 This is the main service offered by the raw decoder: Decodes a raw VBI
 image given in I<$ref>, consisting of several scan lines of raw VBI data,
-into sliced VBI lines in I<$buf>. The output is sorted by line number.
+into sliced VBI lines in I<$buf>, which is a string scalar in the same
+format as returned by method I<read_sliced()> of L</Video::ZVBI::capture>.
+The output is sorted by line number.
 
-The input I<$ref> can either be a scalar filled by one of the "read" kind of
-capture functions (or any scalar filled with a byte string with the correct
-number of samples for the current geometry), or a blessed reference to
-an internal capture buffer as returned by the "pull" kind of capture
-functions. The format of the output buffer is the same as described
-for I<$cap-E<gt>read_sliced()>.  Return value is the number of lines decoded.
+The input parameter I<$ref> can either be a string scalar filled by one of
+the "read" kind of capture functions (or any scalar filled with a byte
+string with the correct number of samples for the current geometry), or a
+blessed reference of type I<VbiRawBufferPtr> as returned by the "pull" kind
+of L</Video::ZVBI::capture> methods.
+
+The function returns the number of lines decoded (i.e. the number of valid
+sliced lines in output parameter I<$buf>).
 
 Note this function attempts to learn which lines carry which data
 service, or none, to speed up decoding.  Hence you must use different
@@ -834,9 +1025,9 @@ raw decoder contexts for different devices.
 These functions convert raw and/or sliced VBI data to a DVB Packetized
 Elementary Stream or Transport Stream as defined in EN 300 472 "Digital
 Video Broadcasting (DVB); Specification for conveying ITU-R System B
-Teletext in DVB bitstreams" and EN 301 775 "Digital Video Broadcasting
+Teletext in DVB bit-streams" and EN 301 775 "Digital Video Broadcasting
 (DVB); Specification for the carriage of Vertical Blanking Information
-(VBI) data in DVB bitstreams".
+(VBI) data in DVB bit-streams".
 
 Note EN 300 468 "Digital Video Broadcasting (DVB); Specification for
 Service Information (SI) in DVB systems" defines another method to
@@ -903,9 +1094,9 @@ I<buffer> will be used as output buffer for converted data. This scalar
 may be undefined; else it should have the length given in I<$buffer_left>.
 I<$buffer_left> the number of bytes available in I<$buffer>,
 and will be decremented by number of bytes stored there.
-I<$sliced> contains the sliced VBI data to be converted. All data
-must belong to the same video frame.  I<$sliced> is either a blessed
-reference to a slicer buffer, or a scalar with a byte string consisting
+I<$sliced> contains the sliced VBI data to be converted. All data must
+belong to the same video frame.  I<$sliced> is either a blessed reference
+of type I<VbiSlicedBufferPtr>, or a scalar with a byte string consisting
 of sliced data (i.e. the same formats are accepted as by I<$vt-E<gt>decode()>.
 I<$sliced_left> must contain the number of sliced VBI lines in the
 input buffer I<$sliced>. It will be decremented by the number of
@@ -915,10 +1106,12 @@ I<$service_mask> Only data services in this set will be
 encoded. Other data services in the sliced input buffer will be
 discarded without further checks. Create a set by ORing
 C<VBI_SLICED_*> constants.
-I<$pts> contains the presentation time stamp which will be encoded
-into the PES packet. Bits 33 ... 63 are discarded.
+I<$pts> contains the presentation time stamp which will be encoded into
+the PES packet. Bits 33 ... 63 are discarded. Resolution is 90 kHz. Thus
+the value can be derived from the I<$timestamp> returned by the methods
+of class L</Video::ZVBI::capture> as C<$timestamp * 90000.0>.
 
-I<$raw> shall contain a raw VBI frame of (I<$sp-E<gt>{count_a}>
+I<$raw>, if present, shall contain a raw VBI frame of (I<$sp-E<gt>{count_a}>
 + I<$sp-E<gt>{count_b}>) lines times I<$sp-E<gt>{bytes_per_line}>.
 The function encodes only those lines which have been selected by sliced
 lines in the I<$sliced> array with id C<VBI_SLICED_VBI_625>
@@ -985,6 +1178,8 @@ On all errors I<$sliced_left> will refer to the offending sliced
 line in the index buffer (i.e. relative to the end of the buffer)
 and the output buffer remains unchanged.
 
+See also C<examples/dvb-mux.pl> for a working example.
+
 =item $mx->feed($sliced, $sliced_lines, $service_mask, $pts [, $raw, $sp])
 
 This function converts raw and/or sliced VBI data to one DVB VBI PES
@@ -993,15 +1188,17 @@ EN 301 775. To deliver output, the callback function passed to
 I<pes_new()> or I<ts_new()> is called once for each PES or TS packet.
 
 Parameters:
-I<$sliced> contains the sliced VBI data to be converted. All data
-must belong to the same video frame.  I<$sliced> is either a blessed
-reference to a slicer buffer, or a scalar with a byte string consisting
-of sliced data (i.e. the same formats are accepted as by I<$vt-E<gt>decode()>.
-I<$sliced_lines> number of valid lines in the I<$sliced> input buffer.
+I<$sliced> contains the sliced VBI data to be converted. All data must
+belong to the same video frame.  I<$sliced> is either a blessed reference
+of type I<VbiSlicedBufferPtr>, or a scalar with a byte string consisting
+of sliced data (i.e. the same formats are accepted as by
+I<$vt-E<gt>decode()>.
+I<$sliced_lines> is number of valid lines in the I<$sliced> input buffer.
 I<$service_mask> Only data services in this set will be
 encoded. Other data services in the sliced buffer will be
 discarded without further checks. Create a set by ORing
-C<VBI_SLICED_*> constants.
+C<VBI_SLICED_*> constants. However: only the services listed above for
+method I<cor()> can be encoded.
 I<$pts> This Presentation Time Stamp will be encoded into the
 PES packet. Bits 33 ... 63 are discarded.
 
@@ -1025,8 +1222,8 @@ C<VBI_PIXFMT_YUV420>. Chrominance samples are ignored.
 * offset + samples_per_line must be <= 132 + 720.
 * synchronous must be set.
 
-The function returns 0 on failures. For a description of failure
-conditions see I<cor()> above.
+The function returns 1 on success, and 0 on failures. For a description of
+failure conditions see I<cor()> above.
 
 =item $mx->get_data_identifier()
 
@@ -1045,11 +1242,11 @@ Returns 0 if I<$data_identifier> is outside the valid range.
 
 =item $size = $mx->get_min_pes_packet_size()
 
-Returns the maximum size of PES packets the multiplexer generates.
+Returns the minimum size of PES packets the multiplexer generates.
 
 =item $size = $mx->get_max_pes_packet_size()
 
-Returns the minimum size of PES packets the multiplexer generates.
+Returns the maximum size of PES packets the multiplexer generates.
 
 =item $ok = $mx->set_pes_packet_size($min_size, $max_size)
 
@@ -1123,7 +1320,12 @@ samples.
 
 =head1 Video::ZVBI::dvb_demux
 
-Separating VBI data from a DVB PES stream (EN 301 472, EN 301 775).
+This class extracts sliced VBI data from a DVB Packetized Elementary
+Stream (PES) or Transport Stream (TS) as defined in EN 300 472 "Digital
+Video Broadcasting (DVB); Specification for conveying ITU-R System B
+Teletext in DVB bitstreams" and EN 301 775 "Digital Video Broadcasting
+(DVB); Specification for the carriage of Vertical Blanking Information
+(VBI) data in DVB bitstreams".
 
 =over 4
 
@@ -1197,7 +1399,10 @@ The callback function is called with the following parameters:
 
 I<$sliced> is a reference to a buffer holding sliced data; the reference
 has the same type as returned by capture functions. I<$n_lines> specifies
-the number of valid lines in the buffer. I<$pts> is the timestamp.
+the number of valid lines in the buffer. I<$pts> is the presentation
+timestamp in 90 kHz resolution. (Thus, when forwarding I<$sliced_buf> to
+methods of class L</Video::ZVBI::vt>, derive the required timestamp
+parameter as C<$pts / 90000>.)
 The last parameter is I<$user_data>, if given during creation.
 The handler should return 1 on success, 0 on failure.
 
@@ -1232,7 +1437,7 @@ i.e. data transmissions based on packet 8/30.
 
 =over 4
 
-=item $idl = Video::ZVBI::idl_demux::new($channel, $address [, $callback, $user_data] )
+=item $idl = Video::ZVBI::idl_demux::new($channel, $address, $callback [,$user_data] )
 
 Creates and returns a new Independent Data Line format A
 (EN 300 708 section 6.5) demultiplexer.
@@ -1249,23 +1454,27 @@ Resets the IDL demux context, useful for example after a channel change.
 
 =item $ok = $idl->feed($buf)
 
-This function takes a stream of Teletext packets, filters out packets
-of the desired data channel and address and calls the handler
+This function (successively) takes a stream of Teletext packets, filters
+out packets of the desired data channel and address and calls the handler
 given context creation when new user data is available.
 
-Parameter I<$buf> is a scalar containing a teletext packet's data
-(at last 42 bytes, i. e. without clock run-in and framing code),
-as returned by the slicer functions.  The function returns 0 if
-the packet contained incorrectable errors.
+Parameter I<$buf> is a string scalar containing a single teletext packet's
+data of at least 42 bytes (i.e. without clock run-in and framing code).
+Specifically, when forwarding slicer output of the I<capture> class,
+provide the I<$data> result of I<$cap-E<gt>get_sliced_line($idx)>. The
+function returns 0 if the packet contained incorrectable errors.
 
 Parameters to the handler are: I<$buffer>, I<$flags>, I<$user_data>.
 
 =item $ok = $idl->feed_frame($sliced_buf, $n_lines)
 
-This function works like I<$idl-E<gt>feed()> but takes a sliced
-buffer (i.e. a full frame's worth of sliced data) and automatically
-filters out all teletext lines.  This can be used to "short-circuit"
-the capture output with the demultiplexer.
+This function works like I<$idl-E<gt>feed()>, but takes a complete sliced
+buffer holding (i.e. a full frame's worth of sliced data) and
+automatically filters out all teletext lines.  This can be used to
+"short-circuit" the capture output with the demultiplexer. I<$sliced_buf>
+is either a blessed reference of type I<VbiSlicedBufferPtr>, or a scalar
+with a byte string consisting of sliced data as produced by
+I<read_sliced()> in class L</Video::ZVBI::capture>.
 
 B<Available:> since libzvbi version 0.2.26
 
@@ -1279,7 +1488,7 @@ teletext page.
 
 =over 4
 
-=item $pfc = Video::ZVBI::pfc_demux::new($pgno, $stream [, $callback, $user_data] )
+=item $pfc = Video::ZVBI::pfc_demux::new($pgno, $stream, $callback [,$user_data] )
 
 Creates and returns a new demultiplexer context.
 
@@ -1296,10 +1505,16 @@ Resets the PFC demux context, useful for example after a channel change.
 
 =item $pfc->feed($buf)
 
-This function takes a raw stream of Teletext packets, filters out the
-requested page and stream and assembles the data transmitted in this
-page in an internal buffer. When a data block is complete it calls
+This function (successively) takes a stream of Teletext packets, filters
+out the requested page and stream and assembles the data transmitted in
+this page in an internal buffer. When a data block is complete it calls
 the handler given during creation.
+
+Parameter I<$buf> is a string scalar containing a single teletext packet's
+data of at least 42 bytes (i.e. without clock run-in and framing code).
+Specifically, when forwarding slicer output of the I<capture> class,
+provide the I<$data> result of I<$cap-E<gt>get_sliced_line($idx)>. The
+function returns 0 if the packet contained incorrectable errors.
 
 The handler is called with the following parameters:
 I<$pgno> is the page number given during creation;
@@ -1310,10 +1525,13 @@ optional I<$user_data> is passed through from the creation.
 
 =item $ok = $pfc->feed_frame($sliced_buf, $n_lines)
 
-This function works like I<$pfc-E<gt>feed()> but takes a sliced
+This function works like I<$pfc-E<gt>feed()> but takes a complete sliced
 buffer (i.e. a full frame's worth of sliced data) and automatically
-filters out all teletext lines.  This can be used to "short-circuit"
-the capture output with the demultiplexer.
+filters out all teletext lines.  This can be used to "short-circuit" the
+capture output with the demultiplexer. I<$sliced_buf> is either a blessed
+reference of type I<VbiSlicedBufferPtr>, or a scalar with a byte string
+consisting of sliced data as produced by I<read_sliced()> in class
+L</Video::ZVBI::capture>.
 
 B<Available:> since libzvbi version 0.2.26
 
@@ -1358,10 +1576,13 @@ optional I<$user_data> is passed through from the creation.
 
 =item $ok = $xds->feed_frame($sliced_buf, $n_lines)
 
-This function works like I<$xds-E<gt>feed()> but takes a sliced
+This function works like I<$xds-E<gt>feed()> but takes a complete sliced
 buffer (i.e. a full frame's worth of sliced data) and automatically
-filters out all teletext lines.  This can be used to "short-circuit"
-the capture output with the demultiplexer.
+filters out all Closed Caption lines.  This can be used to "short-circuit"
+the capture output with the demultiplexer. I<$sliced_buf> is either a
+blessed reference of type I<VbiSlicedBufferPtr>, or a scalar with a byte
+string consisting of sliced data as produced by I<read_sliced()> in class
+L</Video::ZVBI::capture>.
 
 B<Available:> since libzvbi version 0.2.26
 
@@ -1369,10 +1590,11 @@ B<Available:> since libzvbi version 0.2.26
 
 =head1 Video::ZVBI::vt
 
-This section describes high level decoding functions.  Input to the
-decoder functions in this section is sliced data, as returned from
-capture objects (L<Video::ZVBI::capture>) or the raw decoder
-(L<Video::ZVBI::rawdec>)
+This class is used for high level decoding of sliced data received from an
+instance of the L</Video::ZVBI::capture> class or the raw decoder
+(L</Video::ZVBI::rawdec>).  Decoded data is stored in caches for each
+service. The application can be notified via callbacks about various
+events. Various interfaces allow extracting decoded data from the caches.
 
 =over 4
 
@@ -1391,15 +1613,16 @@ Decodes zero or more lines of sliced VBI data from the same video
 frame, updates the decoder state and invokes callback functions
 for registered events.  The function always returns C<undef>.
 
-Input parameters: I<$buf> is either a blessed reference to a slicer
-buffer, or a scalar with a byte string consisting of sliced data.
+Input parameters: I<$buf> is either a blessed reference of type
+I<VbiSlicedBufferPtr>, or a scalar with a byte string consisting of sliced
+data as produced by I<read_sliced()> in class L</Video::ZVBI::capture>.
 I<$n_lines> gives the number of valid lines in the sliced data buffer
 and should be exactly the value returned by the slicer function.
 I<$timestamp> specifies the capture instant of the input data in seconds
 and fractions since 1970-01-01 00:00 in double format. The timestamps
 are expected to advance by 1/30 to 1/25 seconds for each call to this
 function. Different steps will be interpreted as dropped frames, which
-starts a resynchronization cycle, eventually a channel switch may be assumed
+starts a re-synchronization cycle, eventually a channel switch may be assumed
 which resets even more decoder state. So this function must be called even
 if a frame did not contain any useful data (with parameter I<$n_lines> = 0)
 
@@ -1484,7 +1707,7 @@ significant bits will be replaced.
 
 Fetches a Teletext page designated by parameters I<$pgno> and I<$subno>
 from the cache, formats and returns it as a blessed reference to a
-page object of type L<Video::ZVBI::page>.  The reference can
+page object of type L</Video::ZVBI::page>.  The reference can
 then be passed to the various libzvbi methods working on page objects,
 such as the export functions.
 
@@ -1518,7 +1741,7 @@ be forced by use of Perl's I<undef> operator.
 
 Fetches a Closed Caption page designated by I<$pgno> from the cache,
 formats and returns it and  as a blessed reference to a page object
-of type L<Video::ZVBI::page>.
+of type L</Video::ZVBI::page>.
 Returns C<undef> upon errors.
 
 Closed Caption pages are transmitted basically in two modes: at once
@@ -1602,7 +1825,7 @@ is destroyed.
 
 =item $vt->event_handler_unregister($handler [, $user_data])
 
-Unregisters the event handler I<$handler> with parameter I<$user_data>,
+De-registers the event handler I<$handler> with parameter I<$user_data>,
 if such a handler was previously registered.
 
 Apart of removing a handler this function also disables decoding
@@ -1759,7 +1982,7 @@ open_subtitles.
 We have new information about the current or next program.
 (Note this event is preliminary as info from Teletext is not implemented yet.)
 
-The referenced has contains the program description including
+The referenced hash contains the program description including
 many parameters. See libzvbi documentation for details.
 
 =item VBI_EVENT_NETWORK_ID
@@ -1775,11 +1998,11 @@ B<Available:> since libzvbi version 0.2.20
 
 These are functions to render Teletext and Closed Caption pages directly
 into memory, essentially a more direct interface to the functions of some
-important export modules described in L<Video::ZVBI::export>.
+important export modules described in L</Video::ZVBI::export>.
 
 All of the functions in this section work on page objects as returned
-by the page cache's "fetch" functions (see L<Video::ZVBI::vt>)
-or the page search function (see L<Video::ZVBI::search>)
+by the page cache's "fetch" functions (see L</Video::ZVBI::vt>)
+or the page search function (see L</Video::ZVBI::search>)
 
 =over 4
 
@@ -1909,7 +2132,7 @@ is suitable as input to B<Tk::Pixmap> but can also be written into
 a file for passing the image to external applications.)
 
 Optional boolean parameter I<$aspect> when set to 0, disables the
-aspect ration correction (i.e. on teletext pages all lines are
+aspect ratio correction (i.e. on teletext pages all lines are
 doubled by default; closed caption output ration is already correct.)
 Optional parameter I<$img_pix_width> if present, must have the same
 value as used when drawing the image. If this parameter is omitted
@@ -1918,7 +2141,7 @@ suitable for converting images generated by I<draw_vt_page()> or
 I<draw_cc_page()>.)
 
 Note: Since libzvbi 0.2.26, you can also obtain XPM snapshots
-via the L<Video::ZVBI::export> class.
+via the L</Video::ZVBI::export> class.
 
 =item $txt = $pg->print_page($table=0, $rtl=0)
 
@@ -1935,7 +2158,7 @@ sequences of spaces at the start and end of rows are collapsed
 into single spaces and blank lines are suppressed.
 Optional parameter I<$rtl> is currently ignored; defaults to 0.
 
-=item $txt = $pg->print_page_region($table, $rtl, $column, $row, $width, $height)
+=item $txt = $pg->print_page_region($sv_buf, $size, $format, $table, $rtl, $column, $row, $width, $height)
 
 Print and return a sub-section of the referenced Teletext or
 Closed Caption page in text form, with rows separated
@@ -2010,8 +2233,115 @@ The function returns a reference to an array which contains
 the properties of all characters on the given page. Each element
 in the array is a bit-field. The members are (in ascending order,
 width in bits given behind the colon):
-foreground:8, background:8, opacity:4, size:4,
-underline:1, bold:1, italic:1, flash:1, conceal:1, proportional:1, link:1.
+
+=over 8
+
+=item foreground color:8:
+
+Index into the color map returned by I<pg-E<gt>get_page_color_map()>
+
+=item background color:8:
+
+Index into the color map returned by I<pg-E<gt>get_page_color_map()>
+
+=item opacity:4:
+
+Character opacity, as one of constants:
+
+=over 12
+
+=item C<VBI_TRANSPARENT_SPACE>
+
+(replace char with video),
+
+=item C<VBI_TRANSPARENT_FULL>
+
+(replace background with video),
+
+=item C<VBI_SEMI_TRANSPARENT>
+
+(mix video into background), or
+
+=item C<VBI_OPAQUE>
+
+(no transparency).
+
+=back
+
+Both I<foreground> and I<background> colors are valid independent of this flag.
+
+=item size:4:
+
+One of the constants:
+
+=over 12
+
+=item C<VBI_NORMAL_SIZE>,
+
+=item C<VBI_DOUBLE_WIDTH>,
+
+=item C<VBI_DOUBLE_HEIGHT>,
+
+=item C<VBI_DOUBLE_SIZE>,
+
+=item C<VBI_OVER_TOP>
+
+(i.e. this is to the right of C<VBI_DOUBLE_WIDTH> or C<VBI_DOUBLE_SIZE>),
+
+=item C<VBI_OVER_BOTTOM>
+
+(i.e. this is below C<VBI_OVER_TOP>, thus lower right of C<VBI_DOUBLE_SIZE>),
+
+=item C<VBI_DOUBLE_HEIGHT2>
+
+(i.e. this is lower half of a C<VBI_DOUBLE_HEIGHT> character in the row above), or
+
+=item C<VBI_DOUBLE_SIZE2>
+
+(i.e. this is lower (left) half of a C<VBI_DOUBLE_SIZE> character in the row above).
+
+=back
+
+Note characters marked C<VBI_DOUBLE_HEIGHT2>, C<VBI_DOUBLE_SIZE2>,
+C<VBI_OVER_TOP>, C<VBI_OVER_BOTTOM> have the same character unicode and
+attributes as the top/left anchor. Partial characters (like a single
+C<VBI_DOUBLE_HEIGHT2>) will not appear, so characters with these
+attributes can be safely ignored when scanning the page content.
+
+=item underline:1:
+
+Boolean TRUE for underlined, else FALSE.
+
+=item bold:1:
+
+Boolean TRUE for bold, else FALSE.
+
+=item italic:1:
+
+Boolean TRUE for displaying the character slanted right, else FALSE.
+
+=item flash:1:
+
+Boolean TRUE for characters that should flash (i.e. blink), else
+FALSE. Note the GUI is responsible for rendering the page periodically
+with such characters present, or omitted. See I<pg-E<gt>draw_vt_page()>.
+
+=item conceal:1:
+
+Boolean TRUE for characters that should be concealed (i.e. replaced by
+space character), else FALSE.
+See also option *reveal* for I<pg-E<gt>draw_vt_page()>.
+
+=item proportional:1:
+
+Currently always FALSE, i.e. use fixed-width fonts for rendering.
+
+=item link:1:
+
+Boolean TRUE if the character is part of a hyperlink, else FALSE.
+Call I<pg-E<gt>resolve_link()> to get more information.
+
+=back
 
 =item $txt = $pg->get_page_text( [$all_chars] )
 
@@ -2084,7 +2414,7 @@ initialize options by appending to the I<$keyword> parameter like this:
 C<$keyword = "keyword; quality=75.5, comment=\"example text\"";>
 
 Note: A quick overview of all export formats and options can be
-ptained by running the demo script I<examples/explist.pl> in the
+obtained by running the demo script I<examples/explist.pl> in the
 ZVBI package.
 
 =item $href = Video::ZVBI::export::info_enum($index)
@@ -2432,16 +2762,21 @@ set to a reference to the matching page.
 
 Returns the version of the ZVBI library.
 
+=item check_lib_version(major, minor, micro)
+
+Returns 1 if the library version is at least the given version, else 0.
+
 =item set_log_fn($mask [, $log_fn [, $user_data ]] )
 
-Various functions can print warnings, errors and information useful to
-debug the library. With this function you can enable these messages
-and determine a function to print them. (Note: The kind and contents
-of messages logged by particular functions may change in the future.)
+Various functions in the I<libzvbi> library can print warnings, errors and
+information useful for debugging the library. By default, logging is
+disabled. With this function you can enable these messages and determine a
+function to print them. (Note: The kind and contents of messages logged by
+particular functions may change in the future.)
 
 Parameters:
 I<$mask> specifies which kind of information to log.
-It's a bit-wise OR of zero or more of the constants
+It's a bit-wise OR of one or more of the constants
 C<VBI_LOG_ERROR>,
 C<VBI_LOG_WARNING>,
 C<VBI_LOG_NOTICE>,
@@ -2456,11 +2791,12 @@ messages. Omit this parameter to disable logging.
 The log handler is called with the following parameters: I<level>
 is one of the C<VBI_LOG_*> constants; I<$context> which is a text
 string describing the module where the event occurred; I<$message>
-the actual error message; finally, if passed during callback
+the actual error message text; finally, if passed during callback
 definition, a I<$user_data> parameter.
 
-Note only 10 event log functions can be registered in a script
-at the same time.
+Note if you simply want to have the messages printed to I<STDERR>, you can
+use I<set_log_on_stderr()> instead. Also note you can register only one
+log handler; further registrations will override the previous one.
 
 B<Available:> since libzvbi version 0.2.22
 
@@ -2469,11 +2805,10 @@ B<Available:> since libzvbi version 0.2.22
 This function enables error logging just like I<set_log_fn()>,
 but uses the library's internal log function which prints
 all messages to I<stderr>, i.e. on the terminal.
-I<$mask> is a bit-wise OR of zero or more of the C<VBI_LOG_*>
-constants. The mask specifies which kind of information to log.
 
-To disable logging call C<set_log_fn(0)>, i.e. without passing
-a callback function reference.
+Parameter I<$mask> is a bit-wise OR of zero or more of the C<VBI_LOG_*>
+constants. The mask specifies which kind of information to log.
+To disable logging, pass a zero mask value.
 
 B<Available:> since libzvbi version 0.2.22
 
@@ -2498,8 +2833,6 @@ string contains the result after the call.
 
 This function decodes a Parity encoded string in place, i.e. the
 parity bit is removed from all characters in the given string.
-The result is negative when a decoding error is detected, else
-the result is positive or zero.
 
 =item rev8(val)
 
@@ -2569,14 +2902,14 @@ Tests if I<$bcd> forms a valid BCD number. The argument must be
 in range 0x00000000 ... 0x09999999. Return value is 0 if I<$bcd>
 contains hex digits 0xA ... 0xF.
 
-=item vbi_decode_vps_cni(data)
+=item decode_vps_cni(data)
 
 This function receives a sliced VPS line and returns a 16-bit CNI value,
 or undef in case of errors.
 
 B<Available:> since libzvbi version 0.2.22
 
-=item vbi_encode_vps_cni(cni)
+=item encode_vps_cni(cni)
 
 This function receives a 16-bit CNI value and returns a VPS line,
 or undef in case of errors.
@@ -2643,99 +2976,145 @@ B<Available:> since libzvbi version 0.2.23
 
 The C<examples> sub-directory in the B<Video::ZVBI> package
 contains a number of scripts used to test the various interface
-functions. You can also use them as examples for your code:
+functions. You can also use them as examples for your code.
+
+B<Note>: Example command lines for scripts capturing directly from a
+DVB/VBI device shown below do not include options required for configuring
+the device. Generally, you'll need either
+C<--device /dev/dvb/adapter0/demux0 --pid PID> for DVB, or
+C<--device /dev/vbi0> for analog capture devices.
+The VBI PID value can often be derived from the PID for video in
+C<channels.conf> by adding offsets in range 3 to 30. Alternatively you can
+look up the PID via Internet services such as L<https://www.satindex.de/>.
 
 =over 4
 
 =item capture.pl
 
-This is a translation of C<test/capture.c> in the libzvbi package.
-The script captures sliced VBI data from a device.  Output can be
-written to a file or passed via stdout into one of the following
+Example for the use of class L</Video::ZVBI::capture>.
+The script captures VBI data from a device and slices it. The result
+can be dumped for the various data services in form of hex-string plus
+roughly decoded text (where applicable) for inspection of incoming
+data. Altnernatively, output can be written to STDOUT for further
+processing (decoding) by piping the data into one of the following
 example scripts.  Call with option C<--help> for a list of options.
+(This is a translation of C<test/capture.c> in the libzvbi package.)
 
 =item decode.pl
 
-This is a direct translation of C<test/decode.c> in the libzvbi package.
-Decodes sliced VBI data on stdin, e. g.
+Example for the use of class L</Video::ZVBI::vt>.
+Decodes sliced VBI data on STDIN, e.g.
 
-  ./capture --sliced | ./decode --ttx
+  ./capture.pl --sliced | ./decode.pl --ttx
 
 Call with option C<--help> for a list of options.
+(This is a direct translation of C<test/decode.c> in the libzvbi package.)
 
 =item caption.pl
 
-This is a translation of C<test/caption.c> in the libzvbi package,
-albeit based on Perl::Tk here.
-When called without an input stream, the application displays some
-sample messages (character sets etc.) for debugging the decoder.
-When the input stream is the output of C<capture.pl --sliced>
-(see above), the applications displays the live CC stream received
-from a VBI device.  The buttons on top switch between Closed Caption
-channels 1-4 and Text channels 1-4.
+Example for the use of class L</Video::ZVBI::vt>, type
+C<VBI_EVENT_CAPTION>.  When called without an input stream, the
+application opens a GUI displaying a demo messages sequente (character
+sets etc.) for debugging the decoder. For displaying live CC streams
+you can use the following:
+
+  ./capture.pl --sliced | ./caption.pl
+
+The buttons on top of the GUI switch between Closed Caption channels
+1-4 and Text channels 1-4.
+(This is a translation of C<test/caption.c> in the libzvbi package,
+albeit based on TkInter here.)
 
 =item export.pl
 
-This is a direct translation of C<test/export.c> in the libzvbi package.
-The script captures from C</dev/vbi0> until the page specified on the
-command line is found and then exports the page in a requested format.
+Example for the use of export actions in class L</Video::ZVBI::export>.
+The script captures from a device until the page specified on the command
+line is found and then exports the page content in a requested format.
+Alternatively, the script can be used to continuously export a single or
+all received pages. Examples:
+
+  ./export.pl text 100       # teletext page 100 as text
+  ./export.pl text all       # continuously all teletext pages
+  ./export.pl --loop text 1  # continuously closed caption
+  ./export.pl "png;reveal=1" 100 > page_100.png
+
+Use ./explist.pl for listing supported export formats (aka "modules")
+and possible options. Note options are appended to the module name,
+separated by semicolon as shown in the second example.
+(This is a direct translation of C<test/export.c> in the libzvbi package.)
 
 =item explist.pl
 
-This is a direct translation of C<test/explist.c> in the libzvbi package.
+Example for the use of export option management in class L</Video::ZVBI::export>.
 Test of page export options and menu interfaces.  The script lists
 all available export modules (i.e. formats) and options.
+(This is a direct translation of C<test/explist.c> in the libzvbi package.)
 
 =item hamm.pl
 
-This is a direct translation of C<test/hamm.c> in the libzvbi package.
 Automated test of the odd parity and Hamming encoder and decoder functions.
+Note this test runs for a long time.
+(This is a direct translation of C<test/hamm.c> in the libzvbi package.)
 
 =item network.pl
 
-This is a direct translation of C<examples/network.c> in the libzvbi package.
-The script captures from C</dev/vbi0> until the currently tuned channel is
+Example for the use of class L</Video::ZVBI::vt>, type C<VBI_EVENT_NETWORK>.
+This script shows how to identify a network from data transmitted in XDS
+packets, Teletext packet 8/30 format 1 and 2, and VPS packets.  The script
+captures directly from a device until the currently tuned channel is
 identified by means of VPS, PDC et.al.
+(This is a direct translation of C<examples/network.c> in the libzvbi package.)
 
 =item proxy-test.pl
 
-This is a direct translation of C<test/proxy-test.c> in the libzvbi package.
+Example for the use of class L</Video::ZVBI::proxy>.
 The script can capture either from a proxy daemon or a local device and
 dumps captured data on the terminal. Also allows changing services and
 channels during capturing (e.g. by entering "+ttx" or "-ttx" on stdin.)
 Start with option C<-help> for a list of supported command line options.
+(This is a direct translation of C<test/proxy-test.c> in the libzvbi package.)
 
 =item test-vps.pl
 
-This is a direct translation of C<test/test-vps.c> in the libzvbi package.
-It contains tests for encoding and decoding the VPS data service on
-randomly generated data.
+This script contains tests for encoding and decoding the VPS data service
+on randomly generated data.
+(This is a direct translation of C<test/test-vps.c> in the libzvbi package.)
 
 =item search-ttx.pl
 
-The script is used to test search on teletext pages. The script
-captures from C</dev/vbi0> until the RETURN key is pressed, then prompts
-for a search string.  The content of matching pages is printed on
-the terminal and capturing continues until a new search text is
-entered.
+Example for the use of class L</Video::ZVBI::search>.
+The script captures and caches teletext pages until the RETURN key is
+pressed, then prompts for a search string.  A search across teletext pages
+is started, and the content of matching pages is printed on the terminal.
 
 =item browse-ttx.pl
 
-The script captures from C</dev/vbi0> and displays teletext pages in
-a small GUI using Perl::Tk.
+Example for the use of classes L</Video::ZVBI::page> and
+L</Video::ZVBI::export> for rendering teletext pages. The script captures
+teletext from a given device and renders selected teletext pages in a
+simple GUI using TkInter.
 
 =item osc.pl
 
-This script is loosely based on C<test/osc.c> in the libzvbi package.
-The script captures raw VBI data from a device and displays the data as
-an animated gray-scale image. One selected line is plotted and the decoded
-teletext or VPS Data of that line is shown.
+Example for the use of class L</Video::ZVBI::rawdec>.
+The script continuously captures raw VBI data and displays the data as
+an animated gray-scale image. Below this, the analog wave line of one
+selected video line is plotted (i.e. essentially simulating an
+oscilloscope). For the selected line, the resulting data from slicing
+is also shown if decoding is successful.
+(This script is loosely based on C<test/osc.c> in the libzvbi package.)
 
 =item dvb-mux.pl
 
-This script is a small example for use of the DVD multiplexer functions
-(available since libzvbi 0.2.26)  The scripts captures teletext from an
-analog VBI device and generates a PES or TS stream on STDOUT.
+Example for the use of class L</Video::ZVBI::dvb_mux>.
+This script excercises the DVB multiplexer functions: The script first
+opens a capture device (normally this will be an analog device, as the
+goal is forwarding VBI services from analog to digital domain), then
+continuously captures VBI data, encodes it in a DVB packet stream and
+wites the result to STDOUT. The output stream can be decoded
+equivalently to that of capture.pl, which is:
+
+  ./dvb-mux.pl | ./decode.pl --pes --all
 
 =back
 
@@ -2743,7 +3122,8 @@ analog VBI device and generates a PES or TS stream on STDOUT.
 
 The ZVBI Perl interface module was written by T. Zoerner <tomzo@sourceforge.net>
 starting March 2006 for the Teletext EPG grabber accompanying nxtvepg
-L<http://nxtvepg.sourceforge.net/>
+L<http://nxtvepg.sourceforge.net/>. In April 2020 the module was ported to
+Python: L<https://pypi.org/project/Zvbi/>.
 
 The module is based on the libzvbi library, mainly written and maintained
 by Michael H. Schimek (2000-2007) and IE<ntilde>aki GarcE<iacute>a Etxebarria (2000-2001),
@@ -2754,12 +3134,25 @@ See also L<http://zapping.sourceforge.net/>
 
 Copyright (C) 2006-2020 T. Zoerner.
 
-Parts of the descriptions in this man page are copied from the
-"libzvbi" documentation, licensed under the GNU General Public
-License version 2 or later,
+Parts of the descriptions in this man page are copied from the "libzvbi"
+documentation, licensed under the GNU General Public License version 2 or
+later. The respective copyright is by the following:
+
+=over 4
+
+=item *
+
 Copyright (C) 2000-2007 Michael H. Schimek,
+
+=item *
+
 Copyright (C) 2000-2001 IE<ntilde>aki GarcE<iacute>a Etxebarria,
+
+=item *
+
 Copyright (C) 2003-2004 Tom Zoerner.
+
+=back
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -2772,5 +3165,4 @@ B<merchantability> or B<fitness for a particular purpose>.  See the
 I<GNU General Public License> for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.

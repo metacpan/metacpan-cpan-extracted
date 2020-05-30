@@ -1,3 +1,8 @@
+0.112   2020-05-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Add col_content(), row(), row_as_aos(), row_as_aohos().
+
+
 0.111   2019-09-15  Released-By: PERLANCAR; Urgency: medium
 
 	- Add rows().
@@ -76,6 +81,7 @@
 	  requirement.
 
 
-0.01     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.01     2014-08-16  Released-By: SHARYANTO; Note: Happy 19th CPAN Day!
 
         - First version.
+

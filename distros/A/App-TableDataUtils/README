@@ -1,14 +1,180 @@
-DESCRIPTION
+NAME
+    App::TableDataUtils - Routines related to table data
 
+VERSION
+    This document describes version 0.050 of App::TableDataUtils (from Perl
+    distribution App-TableDataUtils), released on 2020-05-29.
+
+DESCRIPTION
     This distribution includes a few utility scripts related to table data.
 
-    #INSERT_EXECS_LIST
+    *   gen-rand-table
 
-    The main CLI, tabledata, is currently split into its own distribution.
+    *   td2csv
+
+FUNCTIONS
+  gen_rand_aoaos
+    Usage:
+
+     gen_rand_aoaos(%args) -> [status, msg, payload, meta]
+
+    Generate array of (array of scalars) with random values.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   num_columns => *int* (default: 3)
+
+        Number of columns.
+
+    *   num_rows => *int* (default: 10)
+
+        Number of rows.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  gen_rand_aohos
+    Usage:
+
+     gen_rand_aohos(%args) -> [status, msg, payload, meta]
+
+    Generate array of (hash of scalars) with random values.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   num_columns => *int* (default: 3)
+
+        Number of columns.
+
+    *   num_rows => *int* (default: 10)
+
+        Number of rows.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  gen_rand_aos
+    Usage:
+
+     gen_rand_aos(%args) -> [status, msg, payload, meta]
+
+    Generate array of scalars with random values.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   num_elems => *int* (default: 10)
+
+        Number of elements.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  gen_rand_hash
+    Usage:
+
+     gen_rand_hash(%args) -> [status, msg, payload, meta]
+
+    Generate hash with random keys/values.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   num_keys => *int* (default: 10)
+
+        Number of keys.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  td2csv
+    Usage:
+
+     td2csv() -> [status, msg, payload, meta]
+
+    Convert table data in STDIN to CSV.
+
+    Actually alias for "td as-csv".
+
+    This function is not exported.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-TableDataUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-TableDataUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-TableDataUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
-    App::tabledata
+    td from App::td
 
     TableDef
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

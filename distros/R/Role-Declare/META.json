@@ -35,12 +35,12 @@
             "Class::Method::Modifiers" : "0",
             "Data::Alias" : "0",
             "Devel::StrictMode" : "0",
-            "Function::Parameters" : "0",
+            "Function::Parameters" : "2.001003",
             "Import::Into" : "0",
             "Role::Tiny" : "0",
             "Type::Params" : "0",
+            "Type::Tiny" : "1.010002",
             "Types::Interface" : "0.002",
-            "Types::Standard" : "0",
             "namespace::clean" : "0",
             "perl" : "5.014"
          }
@@ -52,6 +52,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : 0.02,
+   "version" : 0.04,
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

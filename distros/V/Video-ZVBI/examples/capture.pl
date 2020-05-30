@@ -3,7 +3,7 @@
 #  libzvbi test
 #
 #  Copyright (C) 2000-2006 Michael H. Schimek
-#  Perl Port: Copyright (C) 2007 Tom Zoerner
+#  Perl Port: Copyright (C) 2007, 2020 Tom Zoerner
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -20,8 +20,17 @@
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-# Perl $Id: capture.pl,v 1.1 2007/11/18 18:48:35 tom Exp tom $
-# ZVBI #Id: capture.c,v 1.26 2006/10/08 06:19:48 mschimek Exp #
+# Description:
+#
+#   Example for the use of class Video::ZVBI::Capture. The script captures VBI
+#   data from a device and slices it. The result can be dumped for the various
+#   data services in form of hex-string plus roughly decoded text (where
+#   applicable) for inspection of incoming data. Altnernatively, output can be
+#   written to STDOUT in binary format for further processing (decoding) by
+#   piping the data into one of the following example scripts. Call with option
+#   --help for a list of options.
+#
+#   (This is a translation of test/capture.c in the libzvbi package.)
 
 use blib;
 use strict;
@@ -36,7 +45,7 @@ my $mx;
 my $quit;
 my $outfile;
 
-my $dev_name = "/dev/vbi";
+my $dev_name = "/dev/dvb/adapter0/demux0";
 my $dump = 0;
 my $dump_ttx = 0;
 my $dump_xds = 0;
@@ -47,16 +56,17 @@ my $dump_sliced = 0;
 my $bin_sliced = 0;
 my $bin_pes = 0;
 my $bin_ts = 0;
-my $do_read = 1;
+my $do_read = 0;
 my $do_sim = 0;
 my $ignore_error = 0;
 my $desync = 0;
 my $strict = 0;
-my $pid = -1;
+my $pid = 0;
 my $scanning_ntsc = 0;
 my $scanning_pal = 0;
 my $api_v4l = 0;
 my $api_v4l2 = 0;
+my $opt_help = 0;
 my $verbose = 0;
 
 #extern void
@@ -93,7 +103,7 @@ sub dump_pil
         } elsif ($pil == PIL(31, 15, 31, 63)) {
                 $outfile->print(" PDC: No time\n");
         } else {
-                $outfile->printf(" PDC: %05x, 200X-%02d-%02d %02d:%02d\n",
+                $outfile->printf(" PDC: %05x, YYYY-%02d-%02d %02d:%02d\n",
                         $pil, $mon, $day, $hour, $min);
         }
 }
@@ -274,13 +284,13 @@ my %ServiceWidth = (
         &VBI_SLICED_CAPTION_525 => [2, 7],
 );
 
+my $last_ts = 0.0;
 sub binary_sliced {
         my ($cap, $sliced, $time, $lines) = @_;
-        my $last = 0.0;
         my $i;
 
-        if ($last > 0.0) {
-                $outfile->printf("%f\n%c", $time - $last, $lines);
+        if ($last_ts > 0.0) {
+                $outfile->printf("%f\n%c", $time - $last_ts, $lines);
         } else {
                 $outfile->printf("%f\n%c", 0.04, $lines);
         }
@@ -291,7 +301,7 @@ sub binary_sliced {
                         $outfile->printf("%c%c%c", $ServiceWidth{$id}->[1],
                                          $line & 0xFF, $line >> 8);
                         $outfile->write($data, $ServiceWidth{$id}->[0]);
-                        $last = time;
+                        $last_ts = time;
                 }
         }
 
@@ -299,34 +309,32 @@ sub binary_sliced {
 }
 
 sub binary_ts_pes {
-        my ($user_data, $packet, $packet_size) = @_;
+        my ($packet, $user_data) = @_;
 
-        $outfile->write($packet, $packet_size);
+        my $r = $outfile->syswrite($packet);
         $outfile->flush();
+        #print STDERR "wrote $r of ".length($packet)."\n";
 
-        return 1;
+        # return 1, else multiplexing is aborted
+        1;
 }
 
 sub mainloop {
-        my $sliced;
-        my $lines;
-        my $raw;
-        my $timestamp;
-
         for ($quit = 0; !$quit; ) {
+                my ($raw, $sliced, $lines, $timestamp);
                 my $r;
 
                 if ($do_read) {
-                        $r = $cap->read($raw, $sliced, $lines, $timestamp, 2000);
+                        $r = $cap->read($raw, $sliced, $lines, $timestamp, 4000);
                 } else {
-                        $r = $cap->pull($raw, $sliced, $lines, $timestamp, 2000);
+                        $r = $cap->pull($raw, $sliced, $lines, $timestamp, 4000);
                 }
 
                 if (0) {
                         $| = 1;
                         $outfile->print(".");
                 }
- 
+
                 if ($r == -1) {
                         warn "VBI read error: $!\n";
                         next if $ignore_error;
@@ -348,17 +356,51 @@ sub mainloop {
                         binary_sliced($cap, $sliced, $timestamp, $lines);
                 }
                 if ($bin_pes || $bin_ts) {
+                        my $services = VBI_SLICED_TELETEXT_B |
+                                       VBI_SLICED_VPS |
+                                       VBI_SLICED_CAPTION_625 |
+                                       VBI_SLICED_WSS_625;
                         # XXX shouldn't use system time
-                        my $pts = $timestamp * 90000.0;
-                        _vbi_dvb_mux_feed ($mx, $pts, $sliced, $lines, -1); # service_set: all
+                        if (!$mx->feed($sliced, $lines, $services, $timestamp*90000.0)) {
+                                print STDERR "ERROR in feed\n";
+                        }
                 }
         }
 }
 
-#static const char short_options[] = "123cd:elnpr:stvPT";
+sub usage {
+    print STDERR "\
+ZVBI decoding examples\
+Copyright (C) 2000-2006 Michael H. Schimek\
+This program is licensed under GPL 2 or later. NO WARRANTIES.\n\
+Usage: $0 [OPTIONS]\n\
+Input:
+--device PATH  Path to video capture device
+--pid NNN      Teletext channel PID for DVB
+--v4l          Using analog V4L2 or bktr driver interface
+--v4l2         Using analog V4l1 or bktr driver interface
+--ignore-error Silently ignore device errors and timeout
+Output:
+--dump-ttx     Capture and dump teletext packets
+--dump-xds     Capture and dump CC XDS packets
+--dump-cc      Capture and dump CC packets
+--dump-wss     Capture and dump WSS
+--dump-vps     Capture and dump VPS data
+--dump-sliced  Capture and all VBI services
+--sliced       Write binary output, for piping into decode.pl
+--pes          Write output as PES DVB stream
+--ts           Write output as TS DVB stream
+Modifiers:
+--read         Use \"read\" capture method instead of \"pull\"
+--strict       Use strict mode 0,1,2 for adding VBI services
+--pal          Assume PAL video norm (bktr driver only)
+--ntsc         Assume NTSC video norm (bktr driver only)
+--verbose      Enable trace output in the library
+";
+    exit(1);
+}
 
 my %CmdOpts = (
-        "desync" =>     \$desync,
         "device=s" =>   \$dev_name,
         "ignore-error" => \$ignore_error,
         "pid=i" =>      \$pid,
@@ -369,28 +411,33 @@ my %CmdOpts = (
         "dump-vps" =>   \$dump_vps,
         "dump-sliced" => \$dump_sliced,
         "pes" =>        \$bin_pes,
-        "sliced" =>     \$bin_sliced,
         "ts" =>         \$bin_ts,
+        "sliced" =>     \$bin_sliced,
         "read" =>       \$do_read,
-        "pull" =>       \$do_read,
         "strict=i" =>   \$strict,
-        "sim" =>        \$do_sim,
+        #"sim" =>        \$do_sim,
+        #"desync" =>     \$desync,
         "ntsc" =>       \$scanning_ntsc,
         "pal" =>        \$scanning_pal,
         "v4l" =>        \$api_v4l,
         "v4l2" =>       \$api_v4l2,
-        "v4l2-read" =>  \$api_v4l2, # FIXME
-        "v4l2-mmap" =>  \$api_v4l2, # FIXME
+        #"v4l2-read" =>  \$api_v4l2, # FIXME
+        #"v4l2-mmap" =>  \$api_v4l2, # FIXME
         "verbose+" =>   \$verbose,
+        "help" =>       \$opt_help,
 );
 
 sub main_func {
         my $errstr;
-        my $services;
         my $scanning = 0;
-        my $verbose = 0;
 
-        GetOptions(%CmdOpts) || die "";
+        GetOptions(%CmdOpts) || usage();
+        usage() if $opt_help;
+
+        if (($pid > 0) && ($api_v4l || $api_v4l2)) {
+                print STDERR "Options --v4l et.al. and --pid are mutually exclusive\n";
+                exit(1)
+        }
 
         $scanning = 625 if $scanning_pal;
         $scanning = 525 if $scanning_ntsc;
@@ -403,85 +450,76 @@ sub main_func {
 
         $dump = $dump_wss | $dump_vps | $dump_sliced;
 
-        $services = VBI_SLICED_VBI_525 |
-                    VBI_SLICED_VBI_625 |
-                    VBI_SLICED_TELETEXT_B |
-                    VBI_SLICED_CAPTION_525 |
-                    VBI_SLICED_CAPTION_625 |
-                    VBI_SLICED_VPS |
-                    VBI_SLICED_WSS_625 |
-                    VBI_SLICED_WSS_CPR1204;
+        if ($bin_sliced) {
+                warn "WARNING: combining --sliced with --pes, --ts or --dump will garble output\n" if $bin_pes || $bin_ts || $dump;
+        } elsif ($bin_pes || $bin_ts) {
+                warn "WARNING: combining --pes/ts with --sliced or --dump will garble output\n" if $bin_sliced || $dump;
+        }
+
+        my $services = VBI_SLICED_VBI_525 |
+                       VBI_SLICED_VBI_625 |
+                       VBI_SLICED_TELETEXT_B |
+                       VBI_SLICED_CAPTION_525 |
+                       VBI_SLICED_CAPTION_625 |
+                       VBI_SLICED_VPS |
+                       VBI_SLICED_WSS_625 |
+                       VBI_SLICED_WSS_CPR1204;
 
         if ($do_sim) {
                 #$cap = Video::ZVBI::sim_new ($scanning, $services, 0, !$desync);
-                $par = $cap->parameters();
-                die unless defined $par;
+
+        } elsif (($pid > 0) || (($dev_name =~ /dvb/) && !$api_v4l && !$api_v4l2)) {
+                print STDERR "WARNING: DVB devices require --pid parameter\n" if $pid == 0;
+
+                $cap = Video::ZVBI::capture::dvb_new2 ($dev_name,
+                                                       $pid,
+                                                       $errstr,
+                                                       $verbose != 0);
+                die "Cannot capture vbi data with DVB interface:\n$errstr\n" unless $cap;
         } else {
-                while (1) {
-                        if (-1 != $pid) {
-                                $cap = Video::ZVBI::capture::dvb_new ($dev_name,
-                                                           $scanning,
-                                                           $services,
-                                                           $strict,
-                                                           $errstr,
-                                                           $verbose != 0);
-                                if (defined $cap) {
-                                        $cap->dvb_filter ($pid);
-                                        last;
-                                }
-
-                                die "Cannot capture vbi data with DVB interface:\n$errstr\n";
-                        }
-
-                        if (!$api_v4l) {
-                                $cap = Video::ZVBI::capture::v4l2_new ($dev_name,
-                                                            5, # buffers
-                                                            $services,
-                                                            $strict,
-                                                            $errstr,
-                                                            $verbose != 0);
-                                last if defined $cap;
-
-                                die "Cannot capture vbi data with v4l2 interface:\n$errstr\n";
-
-                        }
-                        
-                        if (!$api_v4l2) {
-                                $cap = Video::ZVBI::capture::v4l_new ($dev_name,
-                                                           $scanning,
-                                                           $services,
-                                                           $strict,
-                                                           $errstr,
-                                                           $verbose != 0);
-                                last if $cap;
-
-                                die "Cannot capture vbi data with v4l interface:\n$errstr\n";
-                        }
-
-                        # BSD interface
-                        if (1) {
-                                $cap = Video::ZVBI::capture::bktr_new ($dev_name,
-                                                            $scanning,
-                                                            $services,
-                                                            $strict,
-                                                            $errstr,
-                                                            $verbose != 0);
-                                last if defined $cap;
-
-                                die "Cannot capture vbi data with bktr interface:\n$errstr\n";
-                        }
-
-                        warn "Nothing to do - exiting.\n";
-                        exit(-1);
-
+                if (!$api_v4l) {
+                        $cap = Video::ZVBI::capture::v4l2_new ($dev_name,
+                                                               5, # buffers
+                                                               $services,
+                                                               $strict,
+                                                               $errstr,
+                                                               $verbose != 0);
+                        warn "Cannot capture vbi data with v4l2 interface:\n$errstr\n" unless $cap;
                 }
 
-                $par = $cap->parameters();
-                die unless defined $par;
+                if (!$cap && !$api_v4l2) {
+                        $cap = Video::ZVBI::capture::v4l_new ($dev_name,
+                                                              $scanning,
+                                                              $services,
+                                                              $strict,
+                                                              $errstr,
+                                                              $verbose != 0);
+                        warn "Cannot capture vbi data with v4l interface:\n$errstr\n" unless $cap;
+                }
+
+                # BSD interface
+                if (!$cap) {
+                        $cap = Video::ZVBI::capture::bktr_new ($dev_name,
+                                                               $scanning,
+                                                               $services,
+                                                               $strict,
+                                                               $errstr,
+                                                               $verbose != 0);
+                        warn "Cannot capture vbi data with bktr interface:\n$errstr\n" unless $cap;
+                }
+
+                if (!$cap) {
+                        warn "No working capture device found - exiting.\n";
+                        exit(-1);
+                }
         }
 
+        $par = $cap->parameters();
+        die unless defined $par;
+
         if ($verbose > 1) {
-                #TODO $cap->set_log_fp (STDERR);
+                Video::ZVBI::set_log_on_stderr (VBI_LOG_ERROR | VBI_LOG_WARNING |
+                                                VBI_LOG_INFO | VBI_LOG_DEBUG);
         }
 
         if (-1 == $pid) {
@@ -489,18 +527,14 @@ sub main_func {
         }
 
         if ($bin_pes) {
-                $mx = _vbi_dvb_mux_pes_new (0x10, # data_identifier
-                                           8 * 184, # packet_size
-                                           0, #TODO VBI_VIDEOSTD_SET_625_50,
-                                           \&binary_ts_pes);
+                $mx = Video::ZVBI::dvb_mux::pes_new (\&binary_ts_pes);
                 die unless defined $mx;
+                $mx->set_pes_packet_size (0, 8* 184)
         } elsif ($bin_ts) {
-                $mx = _vbi_dvb_mux_ts_new (999, # pid
-                                          0x10, # data_identifier
-                                          8 * 184, # packet_size
-                                          0, #TODO VBI_VIDEOSTD_SET_625_50,
-                                          \&binary_ts_pes);
+                my $pid = 999;
+                $mx = Video::ZVBI::dvb_mux::ts_new ($pid, \&binary_ts_pes);
                 die unless defined $mx;
+                $mx->set_pes_packet_size (0, 8* 184)
         }
 
         $outfile = new IO::Handle;
@@ -510,4 +544,3 @@ sub main_func {
 }
 
 main_func();
-

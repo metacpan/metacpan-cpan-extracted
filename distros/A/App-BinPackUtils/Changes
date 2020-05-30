@@ -1,3 +1,12 @@
+0.007   2020-05-30  Released-By: PERLANCAR; Urgency: medium
+
+	- [cli bin-files] Also allow binning based on a bin's maximum
+	  number of items (--bin-max-items, -i) instead of size
+	  (--bin-size, -s).
+
+	- Use --apparent-size du option.
+
+
 0.006   2019-12-11  Released-By: PERLANCAR; Urgency: medium
 
         - [build] Rebuild to update coerce rule modules dependency.

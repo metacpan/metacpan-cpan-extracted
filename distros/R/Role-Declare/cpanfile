@@ -1,12 +1,12 @@
 requires        'Class::Method::Modifiers';
 requires        'Data::Alias';
 requires        'Devel::StrictMode';
-requires        'Function::Parameters';
+requires        'Function::Parameters', '>= 2.001003';
 requires        'Import::Into';
 requires        'Role::Tiny';
 requires        'Type::Params';
 requires        'Types::Interface', '0.002';
-requires        'Types::Standard';
+requires        'Type::Tiny', '1.010002';
 requires        'namespace::clean';
 
 

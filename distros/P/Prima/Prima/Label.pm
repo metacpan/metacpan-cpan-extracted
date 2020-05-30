@@ -5,16 +5,16 @@ use vars qw(@ISA);
 use Carp;
 use Prima::Const;
 use Prima::Classes;
-use Prima::Bidi qw(is_bidi);
 use strict;
 use warnings;
 
 sub profile_default
 {
 	my $font = $_[ 0]-> get_default_font;
+	my $rtl  = $::application-> textDirection;
 	return {
 		%{$_[ 0]-> SUPER::profile_default},
-		alignment      => $Prima::Bidi::default_direction_rtl ? ta::Right : ta::Left,
+		alignment      => $rtl ? ta::Right : ta::Left,
 		autoHeight     => 0,
 		autoWidth      => 1,
 		focusLink      => undef,
@@ -25,12 +25,12 @@ sub profile_default
 		showAccelChar  => 0,
 		showPartial    => 1,
 		tabStop        => 0,
+		textDirection  => $rtl,
 		valignment     => ta::Top,
 		widgetClass    => wc::Label,
 		wordWrap       => 0,
 	}
 }
-
 
 sub profile_check_in
 {
@@ -49,6 +49,8 @@ sub profile_check_in
 		exists $p-> {rect} ||
 		( exists $p-> {top} && exists $p-> {bottom})
 	);
+	$p-> {alignment} = ( $p->{textDirection} // $default->{textDirection} ) ?
+		ta::Right : ta::Left unless exists $p->{alignment};
 	$self-> SUPER::profile_check_in( $p, $default);
 	my $vertical = exists $p-> {vertical} ?
 		$p-> {vertical} :
@@ -59,12 +61,16 @@ sub profile_check_in
 sub init
 {
 	my $self = shift;
+	$self->{lock} = 1;
+	$self->{textLines} = 0;
 	my %profile = $self-> SUPER::init(@_);
 	$self-> {$_} = $profile{$_} for qw(
-		alignment valignment autoHeight autoWidth
+		textDirection alignment valignment autoHeight autoWidth
 		wordWrap focusLink showAccelChar showPartial hotKey
 	);
 	$self-> check_auto_size;
+	delete $self->{lock};
+	$self->reset_lines;
 	return %profile;
 }
 
@@ -249,24 +255,22 @@ sub set_valignment
 sub reset_lines
 {
 	my ($self, $nomaxlines) = @_;
+	return if $self->{lock};
 
 	my @res;
 	my $maxLines = int($self-> height / $self-> font-> height);
 	$maxLines++ if $self-> {showPartial} and (($self-> height % $self-> font-> height) > 0);
 
 	my $opt   = tw::NewLineBreak|tw::ReturnLines|tw::WordBreak|tw::CalcMnemonic|tw::ExpandTabs|tw::CalcTabs;
-	my $width = 1000000;
+	my $width;
 	$opt |= tw::CollapseTilde unless $self-> {showAccelChar};
 	$width = $self-> width if $self-> {wordWrap};
 
 	$self-> begin_paint_info;
 
-	my $lines = $self-> text_wrap( $self-> text, $width, $opt);
+	my $lines = $self-> text_wrap_shape( $self-> text, $width, options => $opt, rtl => $self->textDirection);
 	my $lastRef = pop @{$lines};
 
-	if ( $Prima::Bidi::enabled) {
-		$_ = Prima::Bidi::visual($_) for grep { is_bidi $_ } @$lines;
-	}
 	$self-> {textLines} = scalar @$lines;
 	for( qw( tildeStart tildeEnd tildeLine)) {$self-> {$_} = $lastRef-> {$_}}
 
@@ -367,6 +371,15 @@ sub autoWidth     {($#_)?($_[0]-> set_auto_width(   $_[1]))   :return $_[0]-> {a
 sub autoHeight    {($#_)?($_[0]-> set_auto_height(  $_[1]))   :return $_[0]-> {autoHeight}   }
 sub wordWrap      {($#_)?($_[0]-> set_word_wrap(    $_[1]))   :return $_[0]-> {wordWrap}     }
 sub hotKey        { $#_ ? $_[0]->{hotKey} = $_[1] : $_[0]->{hotKey} }
+
+sub textDirection
+{
+	return $_[0]-> {textDirection} unless $#_;
+	my ( $self, $td ) = @_;
+	$self-> {textDirection} = $td;
+	$self-> text( $self-> text );
+	$self-> alignment( $td ? ta::Right : ta::Left );
+}
 
 1;
 
@@ -473,6 +486,10 @@ last line is shown even if not visible in full. If 0, only full
 lines are drawn.
 
 Default value: 1
+
+=item textDirection BOOLEAN
+
+If set, indicates RTL text direction.
 
 =item wordWrap BOOLEAN
 

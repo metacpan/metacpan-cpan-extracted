@@ -14,7 +14,7 @@ use MySQL::Workbench::Parser;
 
 # ABSTRACT: create DBIC scheme for MySQL workbench .mwb files
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
 
 has output_path              => ( is => 'ro', required => 1, default => sub { '.' } );
 has file                     => ( is => 'ro', required => 1 );
@@ -36,6 +36,7 @@ has has_many_prefix          => ( is => 'ro', required => 1, default => sub { ''
 has has_one_prefix           => ( is => 'ro', required => 1, default => sub { '' } );
 has many_to_many_prefix      => ( is => 'ro', required => 1, default => sub { '' } );
 has utf8                     => ( is => 'ro', required => 1, default => sub { 0 } );
+has schema_base_class        => ( is => 'ro', required => 1, default => sub { 'DBIx::Class::Schema' } );
 
 has version => ( is => 'rwp' );
 has classes => ( is => 'rwp', isa => sub { ref $_[0] && ref $_[0] eq 'ARRAY' }, default => sub { [] } );
@@ -643,7 +644,8 @@ sub _main_template{
     my $namespaces_to_load = '';
     $namespaces_to_load    = "(" . (join '', @namespace_types) . "\n)" if @namespace_types;
 
-    my $use_utf8 = $self->utf8 ? "\nuse utf8;" : '';
+    my $use_utf8   = $self->utf8 ? "\nuse utf8;" : '';
+    my $base_class = $self->schema_base_class ? $self->schema_base_class : 'DBIx::Class::Schema'; 
 
     my $template = qq~package $namespace;
 
@@ -652,7 +654,7 @@ sub _main_template{
 use strict;
 use warnings;$use_utf8
 
-use base qw/DBIx::Class::Schema/;
+use base qw/$base_class/;
 
 our \$VERSION = $version;
 
@@ -684,7 +686,7 @@ MySQL::Workbench::DBIC - create DBIC scheme for MySQL workbench .mwb files
 
 =head1 VERSION
 
-version 1.16
+version 1.17
 
 =head1 SYNOPSIS
 
@@ -885,6 +887,8 @@ Then every generated class has a C<use utf8;> in it.
 =head2 classes
 
 =head2 file
+
+=head2 schema_base_class
 
 =head2 inherit_from_core
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 21;
+use Test::More qw( no_plan );
 select(($|=1,select(STDERR),$|=1)[1]);
 BEGIN
 {

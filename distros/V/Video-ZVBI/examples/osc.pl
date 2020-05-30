@@ -1,10 +1,10 @@
 #!/usr/bin/perl -w
 #
-#  libzvbi test
+#  libzvbi test of raw data capturing and raw decoding
 #
 #  Copyright (C) 2000-2002, 2004 Michael H. Schimek
 #  Copyright (C) 2003 James Mastros
-#  Perl Port: Copyright (C) 2007 Tom Zoerner
+#  Perl Port: Copyright (C) 2007, 2020 Tom Zoerner
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -21,8 +21,16 @@
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-# Perl $Id: osc.pl,v 1.2 2007/12/02 18:31:10 tom Exp tom $
-# libzvbi #Id: osc.c,v 1.29 2006/10/08 06:19:48 mschimek Exp #
+# Description:
+#
+#   Example for the use of class Video::ZVBI::rawdec. The script continuously
+#   captures raw VBI data and displays the data as an animated gray-scale
+#   image. Below this, the analog wave line of one selected video line is
+#   plotted (i.e. essentially simulating an oscilloscope). For the selected
+#   line, the resulting data from slicing is also shown if decoding is
+#   successful.
+#
+#   (This script is loosely based on test/osc.c in the libzvbi package.)
 
 use blib;
 use strict;
@@ -32,15 +40,16 @@ use IO::Handle;
 use Video::ZVBI qw(/^VBI_/);
 
 my $option_dev_name = "/dev/vbi0";
+my $option_pid = 0;
 my $option_ignore_error = 0;
 my $option_ntsc = 0;
 my $option_pal = 0;
 my $option_sim = 0;
 my $option_v4l = 0;
-my $option_v4l2_read = 0;
-my $option_v4l2_mmap = 1;
+my $option_v4l2 = 0;
 my $option_proxy = 0;
 my $option_verbose = 0;
+my $option_help = 0;
 
 my $cap;
 my $par;
@@ -238,15 +247,13 @@ sub draw_dec {
 
 sub draw_plot {
         my $start = $src_w * $draw_row;
-        my $h0 = $src_h + $dst_h - unpack("x$start C1", $raw1) / 256;
 
         my @Poly = ();
         my $h;
-        my $r = $src_h + 10 + $dst_h;
+        my $r = $src_h + 0 + $dst_h;
         my $i = 0;
         foreach $h (unpack("x$start C$src_w", $raw1)) {
                 push @Poly, $i++, ($r - $h *$dst_h/256);
-                $h0 = $h;
         }
         $canvas->coords($canvas_lid, @Poly);
 }
@@ -280,6 +287,7 @@ sub init_window {
 
         $canvas = $tk->Canvas(-borderwidth, 1, -relief, 'sunken', -background, '#000000',
                               -height, $src_h + 10 + $dst_h, -width, 640,
+                              -takefocus, 1,
                               -scrollregion, [0, 0, $src_w, $src_h]);
         $canvas->pack(-side, 'top', -fill, 'x', -expand, 1);
         my $csb = $tk->Scrollbar(-orient, 'horizontal', -takefocus, 0, -width, 10, -borderwidth, 1,
@@ -289,13 +297,12 @@ sub init_window {
         $canvas->pack(-side, 'top', -fill, 'both', -expand, 1);
 
         $canvas->Tk::bind('<Configure>', [\&resize_window, Ev('w'), Ev('h')]);
-        $canvas->Tk::bind('<q>', sub {exit});
+        $canvas->Tk::bind('<q>', sub {exit(0);});
         $canvas->Tk::bind('<Down>', sub {if ($draw_row+1<$src_h){$draw_row += 1;}; draw(); Tk->break});
         $canvas->Tk::bind('<Up>', sub {if ($draw_row>0){$draw_row -= 1;}; draw(); Tk->break});
         $canvas->Tk::bind('<space>', sub {$draw_count = 1;});  # single-stepping
         $canvas->Tk::bind('<Return>', sub {$draw_count = -1;});  # live capture
         $canvas->bindtags([$canvas, 'all']);  # remove widget default bindings
-        $canvas->focus();
 
         my $label = $tk->Entry(-textvariable, \$dec_text, -font, ['courier', -12],
                                -takefocus, 0, -width, 50);
@@ -314,6 +321,10 @@ sub init_window {
 
         $pgm = $tk->Photo();
         $canvas_pgm = $canvas->createImage(0, 0, -image, $pgm, -anchor, 'nw');
+
+        # FIXME: focusNext() is work-around as focus() is ignored by Perl-Tk
+        $canvas->focusNext();
+        $canvas->focus();
 }
 
 sub cap_frame {
@@ -338,22 +349,39 @@ sub cap_frame {
         }
 
         draw($raw2);
-
-        #printf "raw: %f; sliced: %d\n", $timestamp, $slines;
 }
 
-#static const char short_options[] = "123cd:enpsv";
+sub usage {
+    print STDERR "\
+libzvbi test of raw data capturing and raw decoding
+Copyright (C) 2000-2002, 2004 Michael H. Schimek
+Copyright (C) 2003 James Mastros
+This program is licensed under GPL 2 or later. NO WARRANTIES.\n\
+Usage: $0 [OPTIONS]\n\
+--device PATH  Path to video capture device
+--pid NNN      Teletext channel PID for DVB
+--ignore-error Silently ignore device errors and timeout
+--ntsc         Assume NTSC video norm (bktr driver only)
+--pal          Assume PAL video norm (bktr driver only)
+--v4l          Using analog V4L2 or bktr driver interface
+--v4l2         Using analog V4l1 or bktr driver interface
+--proxy        Access given analog device via VBI proxy
+--verbose      Enable trace output in the library
+";
+    exit(1);
+}
 
 my %CmdOpts = (
-        "device=s" =>   \$option_dev_name, # 'd'
-        "ignore-error" => \$option_ignore_error, # 'e'
-        "ntsc" =>       \$option_ntsc, # 'n'
-        "pal" =>        \$option_pal, # 'p'
-        "v4l" =>        \$option_v4l, # '1'
-        "v4l2-read" =>  \$option_v4l2_read, # '2'
-        "v4l2-mmap" =>  \$option_v4l2_mmap, # '3'
-        "proxy" =>      \$option_proxy, # '4'
-        "verbose+" =>   \$option_verbose, # 'v'
+        "device=s" =>   \$option_dev_name,
+        "pid=i" =>      \$option_pid,
+        "ignore-error" => \$option_ignore_error,
+        "ntsc" =>       \$option_ntsc,
+        "pal" =>        \$option_pal,
+        "v4l" =>        \$option_v4l,
+        "v4l2" =>       \$option_v4l2,
+        "proxy" =>      \$option_proxy,
+        "verbose+" =>   \$option_verbose,
+        "help" =>       \$option_help,
 );
 
 sub main_func {
@@ -364,7 +392,13 @@ sub main_func {
         my $c;
         my $index;
 
-        GetOptions(%CmdOpts) || die "Invalid command line options\n";
+        GetOptions(%CmdOpts) || usage();
+        usage() if $option_help;
+
+        if ($option_verbose > 1) {
+                #vbi_capture_set_log_fp ($cap, stderr);
+                set_log_on_stderr(0);
+        }
 
         if ($option_ntsc) {
                 $scanning = 525;
@@ -379,31 +413,7 @@ sub main_func {
 
         my $strict = 0;
 
-        while(1) {
-                if ($option_v4l2_read || $option_v4l2_mmap) {
-                        $cap = Video::ZVBI::capture::v4l2_new ($option_dev_name,
-                                                    5, #/* buffers */ 5,
-                                                    $services,
-                                                    $strict,
-                                                    $errstr,
-                                                    $option_verbose);
-                        last if defined $cap;
-
-                        warn "Cannot capture vbi data with v4l2 interface:\n$errstr\n";
-                }
-
-                if ($option_v4l < 2) {
-                        $cap = Video::ZVBI::capture::v4l_new ($option_dev_name,
-                                                   $scanning,
-                                                   $services,
-                                                   $strict,
-                                                   $errstr,
-                                                   $option_verbose);
-                        last if defined $cap;
-
-                        warn "Cannot capture vbi data with v4l interface:\n$errstr\n";
-                }
-
+        if ($option_v4l2 || $option_v4l || (($option_pid == 0) && ($option_dev_name !~ /dvb/))) {
                 if ($option_proxy) {
                         $pxc = Video::ZVBI::proxy::create($option_dev_name, "capture", 0,
                                                           $errstr, $option_verbose);
@@ -413,44 +423,65 @@ sub main_func {
                                                       VBI_SLICED_VBI_625);
                                 $cap = Video::ZVBI::capture::proxy_new($pxc, 5, 0, $sv,
                                                             $strict, $errstr );
-                                last if defined $cap;
 
                                 warn "Cannot capture vbi data ".
-                                         "through proxy:\n$errstr\n";
+                                         "through proxy:\n$errstr\n" if !$cap;
+                        } else {
+                                warn "Cannot initialize proxy\n$errstr\n";
                         }
-                        warn "Cannot initialize proxy\n$errstr\n";
+                }
+
+                if (!$cap && !$option_v4l) {
+                        $cap = Video::ZVBI::capture::v4l2_new ($option_dev_name,
+                                                               5, #/* buffers */ 5,
+                                                               $services,
+                                                               $strict,
+                                                               $errstr,
+                                                               $option_verbose);
+                        warn "Cannot capture vbi data with v4l2 interface:\n$errstr\n" if !$cap;
+                }
+
+                if (!$cap && $option_v4l2) {
+                        $cap = Video::ZVBI::capture::v4l_new ($option_dev_name,
+                                                              $scanning,
+                                                              $services,
+                                                              $strict,
+                                                              $errstr,
+                                                              $option_verbose);
+                        warn "Cannot capture vbi data with v4l interface:\n$errstr\n" if !$cap;
                 }
 
                 # BSD interface */
-                if (1) {
+                if (!$cap) {
                         $cap = Video::ZVBI::capture::bktr_new ($option_dev_name,
-                                                    $scanning,
-                                                    $services,
-                                                    $strict,
-                                                    $errstr,
-                                                    $option_verbose);
-                        last if defined $cap;
-
+                                                               $scanning,
+                                                               $services,
+                                                               $strict,
+                                                               $errstr,
+                                                               $option_verbose);
                         warn "Cannot capture vbi data ".
-                                 "with bktr interface:\n$errstr\n";
+                                 "with bktr interface:\n$errstr\n" if !$cap;
                 }
+        }
+        else {
+                warn "WARNING: DVB devices require --pid parameter\n" if $option_pid <= 0;
+                warn "WARNING: proxy not supported for DVB\n" if $option_proxy;
+                $cap = Video::ZVBI::capture::dvb_new2($option_dev_name, $option_pid, $errstr, $option_verbose);
+        }
+        die "Failed to open video device: $errstr\n" unless $cap;
 
-                exit -1;
+        $par = $cap->parameters();
+        die unless defined $par;
+        if ($par->{sampling_format} != VBI_PIXFMT_YUV420) {
+                print STDERR "Unexpected sampling format:$par->{sampling_format} (expect:".&VBI_PIXFMT_YUV420.")\n".
+                             "In raw decoder parameters: ".join(",", %$par)."\n".
+                             "Likely the device does not support capturing raw data\n";
+                exit(1);
         }
 
         $rawdec = Video::ZVBI::rawdec::new($cap);
         die unless defined $rawdec;
         $rawdec->add_services($services, $strict) or die;
-
-        $par = $cap->parameters();
-        die unless defined $par;
-
-        if ($option_verbose > 1) {
-                #vbi_capture_set_log_fp ($cap, stderr);
-                set_log_on_stderr(0);
-        }
-
-        die unless $par->{sampling_format} == VBI_PIXFMT_YUV420;
 
         $src_w = $par->{bytes_per_line};
         $src_h = $par->{count_a} + $par->{count_b};

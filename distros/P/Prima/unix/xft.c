@@ -1,4 +1,4 @@
-/*********************************/
+/********************************/
 /*                               */
 /*  Xft - client-side X11 fonts  */
 /*                               */
@@ -52,6 +52,11 @@ TO DO
 
 #ifdef HAVE_ICONV_H
 #include <iconv.h>
+#endif
+
+#ifdef WITH_HARFBUZZ
+#include <harfbuzz/hb.h>
+#include <harfbuzz/hb-ft.h>
 #endif
 
 /* fontconfig version < 2.2.0 */
@@ -109,6 +114,11 @@ static CharSetInfo utf8_charset         = { "iso10646-1",   NULL, 0, 1 };
 #define ALL_CHARSETS (STD_CHARSETS+EXTRA_CHARSETS)
 #define MAX_GLYPH_SIZE (guts.limits.request_length / 256)
 
+#define ROUND_DIRECTION 1000.0
+#define IS_ZERO(a)  ((int)(a*ROUND_DIRECTION)==0)
+#define ROUGHLY(a) (((int)(a*ROUND_DIRECTION))/ROUND_DIRECTION)
+
+
 static PHash encodings    = NULL;
 static PHash mono_fonts   = NULL; /* family->mono font mapping */
 static PHash prop_fonts   = NULL; /* family->proportional font mapping */
@@ -130,6 +140,64 @@ typedef struct _XExtDisplayInfo {
 extern XExtDisplayInfo *
 XRenderFindDisplay (Display *dpy);
 #endif
+
+typedef struct {
+	Font font;
+	XftFont *orig, *xft_font;
+	XftFont *orig_base, *xft_base_font;
+	uint32_t fid;
+	uint16_t *fonts;
+} FontContext;
+
+static void
+font_context_init( FontContext * fc, Font * font, uint16_t * fonts, XftFont * orig, XftFont * base)
+{
+	bzero(fc, sizeof(FontContext));
+	fc->font      = *font;
+	fc->orig      = fc->xft_font = orig;
+	fc->orig_base = fc->xft_base_font = base;
+	fc->fid       = 0;
+	fc->fonts     = fonts;
+}
+
+static void
+font_context_next( FontContext * fc )
+{
+	Font *_src, src, dst;
+	uint16_t nfid;
+
+	if ( !fc-> fonts ) return;
+
+	nfid = *(fc->fonts++);
+	if ( nfid == fc-> fid ) return;
+
+	fc->fid = nfid;
+	if ( nfid == 0 ) {
+		fc->xft_font = fc->orig;
+		fc->xft_base_font = fc->orig_base;
+		return;
+	}
+
+	if ( !( _src = prima_font_mapper_get_font(nfid)))
+		return;
+
+	src = *_src;
+	dst = fc->font;
+	src.size = dst.size;
+	src.undef.size = 0;
+
+	prima_xft_font_pick( nilHandle, &src, &dst, NULL, &fc->xft_font);
+	if ( !fc->orig_base )
+		return;
+	
+	if ( IS_ZERO(fc->font.direction))
+		fc-> xft_base_font = fc->xft_font;
+	else {
+		dst.direction = 0;
+		prima_xft_font_pick( nilHandle, &dst, &dst, NULL, &fc->xft_base_font);
+	}
+}
+
 
 static void
 xft_debug( const char *format, ...)
@@ -284,17 +352,17 @@ prima_xft_done(void)
 
 }
 
-static unsigned short
-utf8_flag_strncpy( char * dst, const char * src, unsigned int maxlen, unsigned short is_utf8_flag)
+static Bool
+utf8_flag_strncpy( char * dst, const char * src, unsigned int maxlen)
 {
-	int is_utf8 = 0;
+	Bool is_utf8 = false;
 	while ( maxlen-- && *src) {
 		if ( *((unsigned char*)src) > 0x7f)
-			is_utf8 = 1;
+			is_utf8 = true;
 		*(dst++) = *(src++);
 	}
 	*dst = 0;
-	return is_utf8 ? is_utf8_flag : 0;
+	return is_utf8;
 }
 
 static void
@@ -303,9 +371,9 @@ fcpattern2fontnames( FcPattern * pattern, Font * font)
 	FcChar8 * s;
 
 	if ( FcPatternGetString( pattern, FC_FAMILY, 0, &s) == FcResultMatch)
-		font-> utf8_flags |= utf8_flag_strncpy( font-> name, (char*)s, 255, FONT_UTF8_NAME);
+		font-> is_utf8.name = utf8_flag_strncpy( font-> name, (char*)s, 255);
 	if ( FcPatternGetString( pattern, FC_FOUNDRY, 0, &s) == FcResultMatch)
-		font-> utf8_flags |= utf8_flag_strncpy( font-> family, (char*)s, 255, FONT_UTF8_FAMILY);
+		font-> is_utf8.family = utf8_flag_strncpy( font-> family, (char*)s, 255);
 
 	/* fake family */
 	if (
@@ -342,6 +410,7 @@ fcpattern2font( FcPattern * pattern, PFont font)
 			font-> style |= fsThin;
 		else if ( i >= FC_WEIGHT_BOLD)
 			font-> style |= fsBold;
+		font-> weight = i * fwUltraBold / FC_WEIGHT_ULTRABOLD;
 	}
 
 	font-> xDeviceRes = guts. resolution. x;
@@ -428,10 +497,6 @@ STOP_2:;
 	font-> internalLeading = 0;
 	font-> externalLeading = 0;
 }
-
-#define ROUND_DIRECTION 1000.0
-#define IS_ZERO(a)  ((int)(a*ROUND_DIRECTION)==0)
-#define ROUGHLY(a) (((int)(a*ROUND_DIRECTION))/ROUND_DIRECTION)
 
 static void
 xft_build_font_key( PFontKey key, PFont f, Bool bySize)
@@ -522,25 +587,50 @@ find_good_font_by_family( Font * f, int fc_spacing )
 			if ( hash_fetch( font_hash, f.family, len))
 				continue;
 
+			if ( spacing == FC_MONO ) {
+				char * p;
+				#define MONO_TAG " Mono"
+				if (( p = strcasestr(f.name, MONO_TAG)) == NULL )
+					continue;
+				p += strlen(MONO_TAG);
+				if ( *p != ' ' && *p != 0 )
+					continue;
+				#undef MONO_TAG
+			}
+
 			hash_store( font_hash, f.family, len, duplicate_string(f.name));
 		}
 		FcFontSetDestroy(s);
 	}
 	/* initialized ok */
+	XFTdebug("trying to find %s pitch replacement for %s/%s", 
+		(fc_spacing == FC_MONO ) ? "fixed" : "variable",
+		f->name, f->family);
 
 	/* try to find same family and same 1st word in font name */
 	{
 		char *c, *w, word1[255], word2[255];
 		PHash font_hash = (fc_spacing == FC_MONO) ? mono_fonts : prop_fonts;
 		c = hash_fetch( font_hash, f->family, strlen(f->family));
-		if ( !c ) return NULL;
-		if ( strcmp( c, f->name) == 0) return NULL; /* same font */
+		if ( !c ) {
+			XFTdebug("no default font for that family");
+			return NULL;
+		}
+		if ( strcmp( c, f->name) == 0) {
+			XFTdebug("same font");
+			return NULL; /* same font */
+		}
 
 		strcpy( word1, c);
 		strcpy( word2, f->name);
 		if (( w = strchr( word1, ' '))) *w = 0;
 		if (( w = strchr( word2, ' '))) *w = 0;
-		if ( strcmp( word1, word2 ) != 0 ) return NULL;
+		if ( strcmp( word1, word2 ) != 0 ) {
+			XFTdebug("default font %s doesn't look similar", c);
+			return NULL;
+		}
+		XFTdebug("replaced with %s", c);
+
 		return c;
 	}
 }
@@ -723,8 +813,8 @@ prima_xft_font_pick( Handle self, Font * source, Font * dest, double * size, Xft
 
 	FcPatternAddInteger( request, FC_SLANT, ( requested_font. style & fsItalic) ? FC_SLANT_ITALIC : FC_SLANT_ROMAN);
 	FcPatternAddInteger( request, FC_WEIGHT,
-				( requested_font. style & fsBold) ? FC_WEIGHT_BOLD :
-				( requested_font. style & fsThin) ? FC_WEIGHT_THIN : FC_WEIGHT_NORMAL);
+		( requested_font. style & fsBold) ? FC_WEIGHT_BOLD :
+		( requested_font. style & fsThin) ? FC_WEIGHT_THIN : FC_WEIGHT_NORMAL);
 	FcPatternAddBool( request, FC_SCALABLE, requested_font. vector > fvBitmap );
 	if ( !IS_ZERO(requested_font. direction) || requested_font. width != 0) {
 		FcMatrix mat;
@@ -773,10 +863,12 @@ prima_xft_font_pick( Handle self, Font * source, Font * dest, double * size, Xft
 				Bool ret;
 				Font s = *source;
 				strcpy(s.name, monospace_font);
+				s.undef.name = 0;
 				XFTdebug("try fixed pitch");
 				try_xft_monospace_emulation_by_name++;
 				ret = prima_xft_font_pick( self, &s, dest, size, xft_result);
 				try_xft_monospace_emulation_by_name--;
+				XFTdebug("fixed pitch done");
 				return ret;
 			} else {
 				Bool ret;
@@ -808,6 +900,7 @@ prima_xft_font_pick( Handle self, Font * source, Font * dest, double * size, Xft
 			if (( proportional_font = find_good_font_by_family(&font_with_family, FC_PROPORTIONAL))) {
 				/* try a good variable font, again */
 				Font s = *source;
+				s.undef.name = 0;
 				strcpy(s.name, proportional_font);
 				XFTdebug("try variable pitch");
 				FcPatternDestroy( match);
@@ -985,8 +1078,11 @@ prima_xft_font_pick( Handle self, Font * source, Font * dest, double * size, Xft
 				XGlyphInfo glyph;
 				if ( !( ft_index = XftCharIndex( DISP, x, c))) continue;
 				XftGlyphExtents( DISP, x, &ft_index, 1, &glyph);
-				sum += glyph. xOff;
-				num++;
+				if ( glyph. xOff > 0 && glyph. xOff < xf->max_advance_width) {
+					sum += glyph. xOff;
+					num++;
+				} else
+					XFTdebug( "!! font %s returns bad XftGlyphExtents", loaded_font.name);
 			}
 			loaded_font. width = ( num > 10) ? ((float) sum / num + 0.5) : loaded_font. maximalWidth;
 		} else
@@ -1124,6 +1220,7 @@ prima_xft_fonts( PFont array, const char *facename, const char * encoding, int *
 				}
 			}
 			/* if no encodings found, assume fontspecific, otherwise always provide iso10646 */
+			fcpattern2font( *ppat, f);
 			strcpy( f-> encoding, (f == tmpl) ? fontspecific : utf8_encoding);
 			f++;
 		} else if ( !facename && !encoding) {
@@ -1180,17 +1277,12 @@ xft_text2ucs4( const unsigned char * text, int len, Bool utf8, uint32_t * map8)
 		STRLEN charlen, bytelen = strlen(( const char *) text);
 		(void)bytelen;
 
-		if ( len < 0) len = prima_utf8_length(( char*) text);
+		if ( len < 0) len = prima_utf8_length(( char*) text, -1);
 		if ( !( r = ret = malloc( len * sizeof( FcChar32)))) return NULL;
 		while ( len--) {
-			*(r++) =
-#if PERL_PATCHLEVEL >= 16
-			utf8_to_uvchr_buf(( U8*) text, ( U8*) + bytelen, &charlen)
-#else
-			utf8_to_uvchr(( U8*) text, &charlen)
-#endif
-			;
+			*(r++) = prima_utf8_uvchr(text, bytelen, &charlen);
 			text += charlen;
+			bytelen -= charlen;
 			if ( charlen == 0 ) break;
 		}
 	} else {
@@ -1203,40 +1295,55 @@ xft_text2ucs4( const unsigned char * text, int len, Bool utf8, uint32_t * map8)
 	return ret;
 }
 
-int
-prima_xft_get_text_width(
-	PCachedFont self, const char * text, int len, Bool addOverhang,
-	Bool utf8, uint32_t * map8, Point * overhangs
-) {
-	int i, ret = 0, bytelen, div;
-	XftFont * font = self-> xft_base;
-
-	if ( overhangs) overhangs-> x = overhangs-> y = 0;
-	if ( utf8 ) bytelen = strlen(text);
-
-	/* x11 has problems with text_out strings that are wider than
-	64K pixel - it wraps the coordinates and produces mess. This hack is
-	although ugly, but is better that X11 default behaviour, and
-	at least can be excused by the fact that all GP spaces have
-	their geometrical limits. */
+/*
+x11 has problems with text_out strings that are wider than
+64K pixel - it wraps the coordinates and produces mess. This hack is
+although ugly, but is better that X11 default behaviour, and
+at least can be excused by the fact that all GP spaces have
+their geometrical limits.
+*/
+static int
+check_width(PCachedFont self, int len)
+{
+	int div;
 	div = 65535L / (self-> font. maximalWidth ? self-> font. maximalWidth : 1);
 	if ( div <= 0) div = 1;
 	if ( len > div) len = div;
+	return len;
+}
+
+#define UPDATE_OVERHANGS(_len,_flags)                                             \
+	if ( i == 0) {                                                            \
+		if (( _flags & toAddOverhangs ) && glyph. x > 0) ret += glyph. x; \
+		if ( overhangs) overhangs-> x = glyph. x;                         \
+	}                                                                         \
+	if ( i == _len - 1) {                                                     \
+		int c = glyph. xOff - glyph. width + glyph. x;                    \
+		if ( (_flags & toAddOverhangs) && c < 0) ret -= c;                \
+		if ( overhangs) overhangs-> y = -c;                               \
+	}
+
+int
+prima_xft_get_text_width(
+	PCachedFont self, const char * text, int len, int flags,
+	uint32_t * map8, Point * overhangs
+) {
+	int i, ret = 0, bytelen = 0;
+	XftFont * font = self-> xft_base;
+
+	if ( overhangs) overhangs-> x = overhangs-> y = 0;
+	if ( flags & toUTF8 ) bytelen = strlen(text);
+	len = check_width(self, len);
 
 	for ( i = 0; i < len; i++) {
 		FcChar32 c;
 		FT_UInt ft_index;
 		XGlyphInfo glyph;
-		if ( utf8) {
+		if ( flags & toUTF8) {
 			STRLEN charlen;
-			c = ( FcChar32)
-#if PERL_PATCHLEVEL >= 16
-			utf8_to_uvchr_buf(( U8*) text, (U8*) text + bytelen, &charlen)
-#else
-			utf8_to_uvchr(( U8*) text, &charlen)
-#endif
-			;
+			c = ( FcChar32) prima_utf8_uvchr(text, bytelen, &charlen);
 			text += charlen;
+			bytelen -= charlen;
 			if ( charlen == 0 ) break;
 		} else if ( ((Byte*)text)[i] > 127) {
 			c = map8[ ((Byte*)text)[i] - 128];
@@ -1245,41 +1352,53 @@ prima_xft_get_text_width(
 		ft_index = XftCharIndex( DISP, font, c);
 		XftGlyphExtents( DISP, font, &ft_index, 1, &glyph);
 		ret += glyph. xOff;
-		if ( addOverhang || overhangs) {
-			if ( i == 0) {
-				if ( addOverhang && glyph. x > 0) ret += glyph. x;
-				if ( overhangs) overhangs-> x = glyph. x;
-			}
-			if ( i == len - 1) {
-				int c = glyph. xOff - glyph. width + glyph. x;
-				if ( addOverhang && c < 0) ret -= c;
-				if ( overhangs) overhangs-> y = -c;
-			}
+		if ( (flags & toAddOverhangs ) || overhangs) {
+			UPDATE_OVERHANGS(len,flags)
 		}
 	}
 	return ret;
 }
 
-Point *
-prima_xft_get_text_box( Handle self, const char * text, int len, Bool utf8)
+int
+prima_xft_get_glyphs_width( PCachedFont self, PGlyphsOutRec t, Point * overhangs)
+{
+	int i, ret = 0;
+	FontContext fc;
+
+	font_context_init(&fc, &self->font, t->fonts, self->xft_base, NULL);
+	if ( overhangs) overhangs-> x = overhangs-> y = 0;
+
+	t->len = check_width(self, t->len);
+	for ( i = 0; i < t->len; i++) {
+		FT_UInt ft_index;
+		XGlyphInfo glyph;
+		ft_index = t->glyphs[i];
+		font_context_next(&fc);
+		XftGlyphExtents( DISP, fc.xft_font, &ft_index, 1, &glyph);
+		ret += glyph. xOff;
+		if ( (t->flags & toAddOverhangs ) || overhangs) {
+			UPDATE_OVERHANGS(t->len,t->flags)
+		}
+	}
+	return ret;
+}
+
+static Point *
+get_box( Handle self, Point * ovx, int advance ) 
 {
 	DEFXX;
-	Point ovx;
-	int width;
 	Point * pt = ( Point *) malloc( sizeof( Point) * 5);
 	if ( !pt) return NULL;
 
-	width = prima_xft_get_text_width( XX-> font, text, len,
-		false, utf8, X(self)-> xft_map8, &ovx);
-	if ( ovx.x < 0 ) ovx.x = 0;
-	if ( ovx.y < 0 ) ovx.y = 0;
+	if ( ovx->x < 0 ) ovx->x = 0;
+	if ( ovx->y < 0 ) ovx->y = 0;
 
 	pt[0].y = pt[2]. y = XX-> font-> font. ascent - 1;
 	pt[1].y = pt[3]. y = - XX-> font-> font. descent;
 	pt[4].y = 0;
-	pt[4].x = width;
-	pt[3].x = pt[2]. x = width + ovx. y;
-	pt[0].x = pt[1]. x = - ovx. x;
+	pt[4].x = advance;
+	pt[3].x = pt[2]. x = advance + ovx->y;
+	pt[0].x = pt[1]. x = - ovx->x;
 
 	if ( !XX-> flags. paint_base_line) {
 		int i;
@@ -1299,6 +1418,25 @@ prima_xft_get_text_box( Handle self, const char * text, int len, Bool utf8)
 	}
 
 	return pt;
+}
+
+Point *
+prima_xft_get_text_box( Handle self, const char * text, int len, int flags)
+{
+	Point ovx;
+	return get_box(self, &ovx, prima_xft_get_text_width(
+		X(self)-> font, text, len, flags,
+		X(self)-> xft_map8, &ovx)
+	);
+}
+
+Point *
+prima_xft_get_glyphs_box( Handle self, PGlyphsOutRec t)
+{
+	Point ovx;
+	return get_box(self, &ovx, prima_xft_get_glyphs_width(
+		X(self)-> font, t, &ovx
+	));
 }
 
 static XftFont *
@@ -1324,12 +1462,14 @@ create_no_aa_font( XftFont * font)
 #define EMULATE_ALPHA_CLEARING 0
 
 static void
-XftDrawGlyph_layered( PDrawableSysData selfxx, _Xconst XftColor *color, int x, int y, _Xconst FT_UInt glyph)
-{
+XftDrawGlyph_layered( PDrawableSysData selfxx, 
+	_Xconst XftColor *color, XftFont * font, 
+	int x, int y, _Xconst FT_UInt glyph
+) {
 	XftColor black;
 	XGlyphInfo extents;
 
-	XftGlyphExtents( DISP, XX-> font-> xft, &glyph, 1, &extents);
+	XftGlyphExtents( DISP, font, &glyph, 1, &extents);
 
 	if (
 		!XX-> xft_shadow_pixmap ||
@@ -1367,8 +1507,8 @@ XftDrawGlyph_layered( PDrawableSysData selfxx, _Xconst XftColor *color, int x, i
 	black.color.blue  =
 	black.pixel       = 0x1;
 	black.color.alpha = 0x0;
-	XftDrawGlyphs( XX-> xft_shadow_drawable, &black, XX->font->xft, extents.x, extents.y, &glyph, 1);
-	XftDrawGlyphs( XX-> xft_drawable, color, XX->font->xft, x, y, &glyph, 1);
+	XftDrawGlyphs( XX-> xft_shadow_drawable, &black, font, extents.x, extents.y, &glyph, 1);
+	XftDrawGlyphs( XX-> xft_drawable, color, font, x, y, &glyph, 1);
 
 	XCopyPlane( DISP, XX-> xft_shadow_pixmap, XX-> gdrawable, XX-> gc, 0, 0, extents.width, extents.height,
 		x - extents.x, y - extents.y, 1);
@@ -1379,17 +1519,22 @@ XftDrawGlyph_layered( PDrawableSysData selfxx, _Xconst XftColor *color, int x, i
 	than requested. We track this and align the reference point when it
 	deviates from the ideal line */
 static void
-my_XftDrawString32( PDrawableSysData selfxx,
+xft_draw_glyphs( PDrawableSysData selfxx,
 		_Xconst XftColor *color, int x, int y,
-		_Xconst FcChar32 *string, int len)
+		_Xconst FcChar32 *string, int len,
+		PGlyphsOutRec t)
 {
-
 	XGCValues old_gcv, gcv;
 	int i, ox, oy, shift;
-	if ( IS_ZERO(XX-> font-> font. direction) && !XX-> flags. layered ) {
-		XftDrawString32( XX-> xft_drawable, color, XX-> font-> xft, x, y, string, len);
-		return;
-	}
+	FontContext fc;
+	uint16_t * advances  = t ? t->advances : NULL;
+	int16_t  * positions = t ? t->positions : NULL;
+	Bool straight = IS_ZERO(XX-> font-> font. direction);
+
+	font_context_init(&fc, &XX->font->font, 
+		t ? t->fonts : NULL, 
+		XX->font->xft, advances ? NULL : XX->font->xft_base);
+
 	ox = x;
 	oy = y;
 	shift = 0;
@@ -1406,19 +1551,46 @@ my_XftDrawString32( PDrawableSysData selfxx,
 		XChangeGC( DISP, XX-> gc, GCFunction|GCBackground|GCForeground|GCPlaneMask, &gcv);
 	}
 
+	if (t) len = t->len;
 	for ( i = 0; i < len; i++) {
-		int cx, cy;
+		int cx, cy, dx = 0, dy = 0;
 		FT_UInt ft_index;
 		XGlyphInfo glyph;
-		ft_index = XftCharIndex( DISP, XX-> font-> xft, string[i]);
-		XftGlyphExtents( DISP, XX-> font-> xft_base, &ft_index, 1, &glyph);
-		shift += glyph. xOff;
-		cx = ox + (int)(shift * XX-> xft_font_cos + 0.5);
-		cy = oy - (int)(shift * XX-> xft_font_sin + 0.5);
+
+		if ( t ) {
+			ft_index = t->glyphs[i];
+			font_context_next(&fc);
+			if ( advances ) {
+				register int x, y;
+				shift += *(advances++);
+				x = *(positions++);
+				y = *(positions++);
+				if ( straight ) {
+					dx = x;
+					dy = y;
+				} else {
+					dx = (int)(x * XX-> xft_font_cos + 0.5) - (int)(y * XX-> xft_font_sin + .5);
+					dy = (int)(x * XX-> xft_font_sin + 0.5) + (int)(y * XX-> xft_font_cos + .5);
+				}
+			} else
+				goto CHECK_EXTENTS;
+		} else {
+			ft_index = XftCharIndex( DISP, fc.xft_font, string[i]);
+		CHECK_EXTENTS:
+			XftGlyphExtents( DISP, fc.xft_base_font, &ft_index, 1, &glyph);
+			shift += glyph. xOff;
+		}
+		if ( straight ) {
+			cx = ox + shift;
+			cy = oy;
+		} else {
+			cx = ox + (int)(shift * XX-> xft_font_cos + 0.5);
+			cy = oy - (int)(shift * XX-> xft_font_sin + 0.5);
+		}
 		if ( XX-> flags. layered && EMULATE_ALPHA_CLEARING)
-			XftDrawGlyph_layered( XX, color, x, y, ft_index);
+			XftDrawGlyph_layered( XX, color, fc.xft_font, x + dx, y - dy, ft_index);
 		else
-			XftDrawGlyphs( XX-> xft_drawable, color, XX->font->xft, x, y, &ft_index, 1);
+			XftDrawGlyphs( XX-> xft_drawable, color, fc.xft_font, x + dx, y - dy, &ft_index, 1);
 		x = cx;
 		y = cy;
 	}
@@ -1427,41 +1599,34 @@ my_XftDrawString32( PDrawableSysData selfxx,
 		XChangeGC( DISP, XX-> gc, GCFunction|GCBackground|GCForeground|GCPlaneMask, &old_gcv);
 }
 
-Bool
-prima_xft_text_out( Handle self, const char * text, int x, int y, int len, Bool utf8)
+static void
+my_XftDrawString32( PDrawableSysData selfxx,
+		_Xconst XftColor *color, int x, int y,
+		_Xconst FcChar32 *string, int len)
 {
-	DEFXX;
-	FcChar32 *ucs4;
-	XftColor xftcolor;
-	XftFont *font = XX-> font-> xft;
-	int rop = XX-> paint_rop, div;
-	Point baseline;
+	if ( IS_ZERO(XX-> font-> font. direction) && !XX-> flags. layered )
+		XftDrawString32( XX-> xft_drawable, color, XX-> font-> xft, x, y, string, len);
+	else
+		xft_draw_glyphs( XX, color, x, y, string, len, NULL);
+}
 
-	if ( len == 0) return true;
-
-	/* x11 has problems with text_out strings that are wider than
-	64K pixel - it wraps the coordinates and produces mess. This hack is
-	although ugly, but is better that X11 default behaviour, and
-	at least can be excused by the fact that all GP spaces have
-	their geometrical limits. */
-	div = 65535L / (PDrawable(self)-> font. maximalWidth ? PDrawable(self)-> font. maximalWidth : 1);
-	if ( div <= 0) div = 1;
-	if ( len > div) len = div;
-
+static int
+filter_unsupported_rops( PDrawableSysData selfxx, int rop, XftColor * xftcolor )
+{
 	/* filter out unsupported rops */
 	switch ( rop) {
 	case ropBlackness:
-		xftcolor.color.red   =
-		xftcolor.color.green =
-		xftcolor.color.blue  =
-		xftcolor.pixel       = 0;
+		xftcolor->color.red   =
+		xftcolor->color.green =
+		xftcolor->color.blue  =
+		xftcolor->pixel       = 0;
 		rop = ropCopyPut;
 		break;
 	case ropWhiteness:
-		xftcolor.color.red   =
-		xftcolor.color.green =
-		xftcolor.color.blue  = 0xffff;
-		xftcolor.pixel       = 0xffffffff;
+		xftcolor->color.red   =
+		xftcolor->color.green =
+		xftcolor->color.blue  = 0xffff;
+		xftcolor->pixel       = 0xffffffff;
 		rop = ropCopyPut;
 		break;
 	case ropXorPut:
@@ -1470,90 +1635,150 @@ prima_xft_text_out( Handle self, const char * text, int x, int y, int len, Bool 
 	case ropNotSrcXor:
 	case ropNotSrcOr:
 	case ropAndPut:
-		xftcolor.color.red   = COLOR_R16(XX->fore.color);
-		xftcolor.color.green = COLOR_G16(XX->fore.color);
-		xftcolor.color.blue  = COLOR_B16(XX->fore.color);
-		xftcolor.pixel       = XX-> fore. primary;
+		xftcolor->color.red   = COLOR_R16(XX->fore.color);
+		xftcolor->color.green = COLOR_G16(XX->fore.color);
+		xftcolor->color.blue  = COLOR_B16(XX->fore.color);
+		xftcolor->pixel       = XX-> fore. primary;
 		break;
 	case ropNotPut:
-		xftcolor.color.red   = COLOR_R16(~XX->fore.color);
-		xftcolor.color.green = COLOR_G16(~XX->fore.color);
-		xftcolor.color.blue  = COLOR_B16(~XX->fore.color);
-		xftcolor.pixel       = ~XX-> fore. primary;
+		xftcolor->color.red   = COLOR_R16(~XX->fore.color);
+		xftcolor->color.green = COLOR_G16(~XX->fore.color);
+		xftcolor->color.blue  = COLOR_B16(~XX->fore.color);
+		xftcolor->pixel       = ~XX-> fore. primary;
 		rop = ropCopyPut;
 		break;
 	default:
-		xftcolor.color.red   = COLOR_R16(XX->fore.color);
-		xftcolor.color.green = COLOR_G16(XX->fore.color);
-		xftcolor.color.blue  = COLOR_B16(XX->fore.color);
-		xftcolor.pixel       = XX-> fore. primary;
+		xftcolor->color.red   = COLOR_R16(XX->fore.color);
+		xftcolor->color.green = COLOR_G16(XX->fore.color);
+		xftcolor->color.blue  = COLOR_B16(XX->fore.color);
+		xftcolor->pixel       = XX-> fore. primary;
 		rop = ropCopyPut;
 	}
 
+	return rop;
+}
+
+/* force-remove antialiasing, xft doesn't have a better API for this */
+static XftFont *
+get_no_aa_font( PDrawableSysData selfxx, XftFont * font)
+{
+	FcBool aa;
+	if (
+		( FcPatternGetBool( font-> pattern, FC_ANTIALIAS, 0, &aa) == FcResultMatch)
+		&& aa
+	) {
+		XftFont * f = create_no_aa_font( font);
+		if ( f)
+			font = XX-> font-> xft_no_aa = f;
+	}
+
+	return font;
+}
+
+static void
+setup_alpha(PDrawableSysData selfxx, XftColor * xftcolor, XftFont ** font)
+{
 	if ( XX-> flags. layered) {
-		xftcolor.color.alpha = 0xffff;
+		xftcolor->color.alpha = 0xffff;
 	} else if ( XX-> type. bitmap) {
-		xftcolor.color.alpha =
-			((xftcolor.color.red/3 + xftcolor.color.green/3 + xftcolor.color.blue/3) > (0xff00 / 2)) ?
-				0xffff : 0;
-		/* force-remove antialiasing, xft doesn't have a better API for this */
-		if ( !guts. xft_no_antialias && !XX-> font-> xft_no_aa) {
-			FcBool aa;
-			if (
-				( FcPatternGetBool( font-> pattern, FC_ANTIALIAS, 0, &aa) == FcResultMatch)
-				&& aa
-				) {
-				XftFont * f = create_no_aa_font( font);
-				if ( f)
-					font = XX-> font-> xft_no_aa = f;
-			}
-		}
+		xftcolor->color.alpha = (
+			(
+				xftcolor->color.red/3 + 
+				xftcolor->color.green/3 + 
+				xftcolor->color.blue/3
+			) > (0xff00 / 2)
+		) ?
+			0xffff :
+			0
+			;
+		if ( !guts. xft_no_antialias && !XX-> font-> xft_no_aa)
+			*font = get_no_aa_font(XX, *font);
 	} else {
-		xftcolor.color.alpha = 0xffff;
+		xftcolor->color.alpha = 0xffff;
 	}
-	/* paint background if opaque */
-	if ( XX-> flags. paint_opaque) {
-		int i;
-		Point * p = prima_xft_get_text_box( self, text, len, utf8);
-		FillPattern fp;
-		memcpy( &fp, apc_gp_get_fill_pattern( self), sizeof( FillPattern));
-		XSetForeground( DISP, XX-> gc, XX-> back. primary);
-		XX-> flags. brush_back = 0;
+}
+
+static void
+paint_text_background( Handle self, Point * p, int x, int y )
+{
+	DEFXX;
+	int i;
+	FillPattern fp;
+	memcpy( &fp, apc_gp_get_fill_pattern( self), sizeof( FillPattern));
+	XSetForeground( DISP, XX-> gc, XX-> back. primary);
+	XX-> flags. brush_back = 0;
+	XX-> flags. brush_fore = 1;
+	XX-> fore. balance = 0;
+	XSetFunction( DISP, XX-> gc, GXcopy);
+	apc_gp_set_fill_pattern( self, fillPatterns[fpSolid]);
+	for ( i = 0; i < 4; i++) {
+		p[i].x += x;
+		p[i].y += y;
+	}
+	i = p[2].x; p[2].x = p[3].x; p[3].x = i;
+	i = p[2].y; p[2].y = p[3].y; p[3].y = i;
+
+	apc_gp_fill_poly( self, 4, p);
+	apc_gp_set_rop( self, XX-> paint_rop);
+	apc_gp_set_color( self, XX-> fore. color);
+	apc_gp_set_fill_pattern( self, fp);
+}
+
+/* emulate over- and understriking */
+static void
+overstrike( Handle self, int x, int y, Point *ovx, int advance)
+{
+	DEFXX;
+	int lw = apc_gp_get_line_width( self);
+	int d  = - PDrawable(self)-> font. descent;
+	int ay, x1, y1, x2, y2;
+	double c = XX-> xft_font_cos, s = XX-> xft_font_sin;
+
+	XSetFillStyle( DISP, XX-> gc, FillSolid);
+	if ( !XX-> flags. brush_fore) {
+		XSetForeground( DISP, XX-> gc, XX-> fore. primary);
 		XX-> flags. brush_fore = 1;
-		XX-> fore. balance = 0;
-		XSetFunction( DISP, XX-> gc, GXcopy);
-		apc_gp_set_fill_pattern( self, fillPatterns[fpSolid]);
-		for ( i = 0; i < 4; i++) {
-			p[i].x += x;
-			p[i].y += y;
-		}
-		i = p[2].x; p[2].x = p[3].x; p[3].x = i;
-		i = p[2].y; p[2].y = p[3].y; p[3].y = i;
-
-		apc_gp_fill_poly( self, 4, p);
-		apc_gp_set_rop( self, XX-> paint_rop);
-		apc_gp_set_color( self, XX-> fore. color);
-		apc_gp_set_fill_pattern( self, fp);
-		free( p);
-	}
-	SHIFT( x, y);
-	RANGE2(x,y);
-
-	/* xft doesn't allow shifting glyph reference point - need to adjust manually */
-	baseline. x = - PDrawable(self)-> font. descent * XX-> xft_font_sin;
-	baseline. y = - PDrawable(self)-> font. descent * ( 1 - XX-> xft_font_cos )
-					+ XX-> font-> font. descent;
-	if ( !XX-> flags. paint_base_line) {
-		x += baseline. x;
-		y += baseline. y;
 	}
 
-	/* allocate xftdraw surface */
+	if ( lw != 1)
+		apc_gp_set_line_width( self, 1);
+
+	if ( ovx->x < 0 ) ovx->x = 0;
+	if ( ovx->y < 0 ) ovx->y = 0;
+	advance += ovx->y;
+
+	if ( PDrawable( self)-> font. style & fsUnderlined) {
+		ay = d;
+		x1 = x - ovx->x * c - ay * s + 0.5;
+		y1 = y - ovx->x * s + ay * c + 0.5;
+		x2 = x + advance * c - ay * s + 0.5;
+		y2 = y + advance * s + ay * c + 0.5;
+		XDrawLine( DISP, XX-> gdrawable, XX-> gc, x1, REVERT( y1), x2, REVERT( y2));
+	}
+
+	if ( PDrawable( self)-> font. style & fsStruckOut) {
+		ay = (XX-> font-> font.ascent - XX-> font-> font.internalLeading)/2;
+		x1 = x - ovx->x * c - ay * s + 0.5;
+		y1 = y - ovx->x * s + ay * c + 0.5;
+		x2 = x + advance * c - ay * s + 0.5;
+		y2 = y + advance * s + ay * c + 0.5;
+		XDrawLine( DISP, XX-> gdrawable, XX-> gc, x1, REVERT( y1), x2, REVERT( y2));
+	}
+
+	if ( lw != 1)
+		apc_gp_set_line_width( self, lw);
+}
+
+static void
+allocate_xftdraw_surface(PDrawableSysData selfxx)
+{
 	if ( !XX-> xft_drawable) {
 		if ( XX-> type. bitmap)
 			XX-> xft_drawable = XftDrawCreateBitmap( DISP, XX-> gdrawable );
 		else
-			XX-> xft_drawable = XftDrawCreate( DISP, XX-> gdrawable, XX->visual->visual, XX->colormap);
+			XX-> xft_drawable = XftDrawCreate( DISP,
+				XX-> gdrawable, XX->visual->visual, XX->colormap
+			);
 		XftDrawSetSubwindowMode( XX-> xft_drawable,
 			XX-> flags.clip_by_children ? ClipByChildren : IncludeInferiors);
 		XCHECKPOINT;
@@ -1562,134 +1787,233 @@ prima_xft_text_out( Handle self, const char * text, int x, int y, int len, Bool 
 		XftDrawSetClip( XX-> xft_drawable, XX-> current_region);
 		XX-> flags. xft_clip = 1;
 	}
+}
 
-	/* convert text string to unicode */
-	if ( !( ucs4 = xft_text2ucs4(( unsigned char*) text, len, utf8, X( self)-> xft_map8)))
+typedef struct {
+	int x, y, dx, dy, width, height;
+	Pixmap canvas;
+	GC gc;
+} TextBlit;
+
+static Bool
+open_text_blit(Handle self, int x, int y, int dx, int rop, TextBlit * tb)
+{
+	DEFXX;
+	XGCValues gcv;
+	int i;
+	Rect rc;
+	Point p[4], offset;
+
+	bzero( &rc, sizeof(rc));
+	tb-> x   = x;
+	tb-> y   = y;
+	tb-> dx  = dx;
+	tb-> dy  = XX-> font-> font. height;
+
+	offset. x = offset. y = 0;
+	p[0].x = p[2].x = 0;
+	p[0].y = p[1].y = 0;
+	p[1].x = p[3].x = tb->dx;
+	p[2].y = p[3].y = tb->dy;
+	rc. left = rc. right = rc. top = rc. bottom = 0;
+	for ( i = 1; i < 4; i++) {
+		int x = p[i].x * XX-> xft_font_cos - p[i].y * XX-> xft_font_sin + 0.5;
+		int y = p[i].x * XX-> xft_font_sin + p[i].y * XX-> xft_font_cos + 0.5;
+		if ( rc. left    > x) rc. left   = x;
+		if ( rc. right   < x) rc. right  = x;
+		if ( rc. bottom  > y) rc. bottom = y;
+		if ( rc. top     < y) rc. top    = y;
+	}
+	tb->width  = rc. right  - rc. left   + 1;
+	tb->height = rc. top    - rc. bottom + 1;
+
+	tb->canvas = XCreatePixmap( DISP, guts. root,
+		tb->width, tb->height,
+		XX-> type. bitmap ? 1 : guts. depth);
+	if ( !tb->canvas)
 		return false;
 
+	tb->dx = -rc. left;
+	tb->dy = -rc. bottom;
+	tb->gc = XCreateGC( DISP, tb->canvas, 0, &gcv);
+	switch ( rop) {
+	case ropAndPut:
+	case ropNotSrcXor:
+	case ropNotSrcOr:
+		XSetForeground( DISP, tb->gc, 0xffffffff);
+		break;
+	default:
+		XSetForeground( DISP, tb->gc, 0x0);
+		break;
+	}
+	XFillRectangle( DISP, tb->canvas, tb->gc, 0, 0, tb->width, tb->height);
+	XftDrawChange( XX-> xft_drawable, tb->canvas);
+	if ( XX-> flags. xft_clip)
+		XftDrawSetClip( XX-> xft_drawable, 0);
+
+	return true;
+}
+
+static void
+close_text_blit(PDrawableSysData selfxx, TextBlit * tb)
+{
+	XftDrawChange( XX-> xft_drawable, XX-> gdrawable);
+	if ( XX-> flags. xft_clip)
+		XftDrawSetClip( XX-> xft_drawable, XX-> current_region);
+	XCHECKPOINT;
+	XCopyArea( DISP,
+		tb->canvas, XX-> gdrawable, XX-> gc,
+		0, 0, tb->width, tb->height,
+		tb->x - tb->dx, REVERT( tb->y - tb->dy + tb->height)
+	);
+	XFreeGC( DISP, tb->gc);
+	XFreePixmap( DISP, tb->canvas);
+}
+
+/*
+	If you're guided here by something like
+
+		X Error: BadLength (poly request too large or internal Xlib length error),
+
+	then you probably need to know that your X server is out of date.
+	The error is caused by a Xrender bug, and you have the following options:
+	- update your X server
+	- set guts.xft_disable_large_fonts to 1, which would explicitly tell Prima not to wait
+	for Xlib to bark on large polygons
+	- set guts.xft_disable_large_fonts to 1 and decrease MAX_GLYPH_SIZE, if the former
+	option is not enough
+*/
+
+Bool
+prima_xft_text_out( Handle self, const char * text, int x, int y, int len, int flags)
+{
+	DEFXX;
+	FcChar32 *ucs4;
+	XftColor xftcolor;
+	XftFont *font = XX-> font-> xft;
+	int rop = XX-> paint_rop;
+	Point baseline;
+
+	if ( len == 0) return true;
+	len = check_width( XX->font, len );
+	rop = filter_unsupported_rops( XX, rop, &xftcolor );
+	setup_alpha( XX, &xftcolor, &font );
+
+	/* paint background if opaque */
+	if ( XX-> flags. paint_opaque) {
+		Point * p = prima_xft_get_text_box( self, text, len, flags);
+		paint_text_background( self, p, x, y );
+		free( p);
+	}
+
+	SHIFT(x,y);
+	RANGE2(x,y);
+	/* xft doesn't allow shifting glyph reference point - need to adjust manually */
+	baseline.x = - PDrawable(self)-> font. descent * XX-> xft_font_sin;
+	baseline.y = - PDrawable(self)-> font. descent * ( 1 - XX-> xft_font_cos )
+					+ XX-> font-> font. descent;
+	if ( !XX-> flags. paint_base_line) {
+		x += baseline.x;
+		y += baseline.y;
+	}
+
+	/* convert text string to unicode */
+	if ( !( ucs4 = xft_text2ucs4(( unsigned char*) text, len, flags & toUTF8, X( self)-> xft_map8)))
+		return false;
+
+	allocate_xftdraw_surface(XX);
 	if ( rop != ropCopyPut) {
-	/* emulate rops by blitting the text */
-		XGCValues gcv;
-		GC gc;
-		int dx  = prima_xft_get_text_width( XX-> font, text, len,
-			true, utf8, X(self)-> xft_map8, NULL);
-		int dy  = XX-> font-> font. height;
-		int i, width, height;
-		Rect rc;
-		Point p[4], offset;
-		Pixmap canvas;
-
-		bzero( &rc, sizeof(rc));
-		offset. x = offset. y = 0;
-		p[0].x = p[2].x = 0;
-		p[0].y = p[1].y = 0;
-		p[1].x = p[3].x = dx;
-		p[2].y = p[3].y = dy;
-		rc. left = rc. right = rc. top = rc. bottom = 0;
-		for ( i = 1; i < 4; i++) {
-			int x = p[i].x * XX-> xft_font_cos - p[i].y * XX-> xft_font_sin + 0.5;
-			int y = p[i].x * XX-> xft_font_sin + p[i].y * XX-> xft_font_cos + 0.5;
-			if ( rc. left    > x) rc. left   = x;
-			if ( rc. right   < x) rc. right  = x;
-			if ( rc. bottom  > y) rc. bottom = y;
-			if ( rc. top     < y) rc. top    = y;
-		}
-		width  = rc. right  - rc. left   + 1;
-		height = rc. top    - rc. bottom + 1;
-
-		canvas = XCreatePixmap( DISP, guts. root, width, height, XX-> type. bitmap ? 1 : guts. depth);
-		if ( !canvas) goto COPY_PUT;
-		dx = -rc. left;
-		dy = -rc. bottom;
-		gc = XCreateGC( DISP, canvas, 0, &gcv);
-		switch ( rop) {
-		case ropAndPut:
-		case ropNotSrcXor:
-		case ropNotSrcOr:
-			XSetForeground( DISP, gc, 0xffffffff);
-			break;
-		default:
-			XSetForeground( DISP, gc, 0x0);
-			break;
-		}
-		XFillRectangle( DISP, canvas, gc, 0, 0, width, height);
-		XftDrawChange( XX-> xft_drawable, canvas);
-		if ( XX-> flags. xft_clip)
-			XftDrawSetClip( XX-> xft_drawable, 0);
-		my_XftDrawString32( XX, &xftcolor, dx + baseline.x, height - dy - baseline. y, ucs4, len);
-		XftDrawChange( XX-> xft_drawable, XX-> gdrawable);
-		if ( XX-> flags. xft_clip)
-			XftDrawSetClip( XX-> xft_drawable, XX-> current_region);
-		XCHECKPOINT;
+		/* emulate rops by blitting the text */
+		int dx;
+		TextBlit tb;
+		dx = prima_xft_get_text_width( XX-> font, text, len,
+			flags | toAddOverhangs, X(self)-> xft_map8, NULL);
+		if (!open_text_blit(self, x, y, dx, rop, &tb))
+			goto COPY_PUT;
+		my_XftDrawString32( XX, &xftcolor,
+			tb.dx + baseline.x, tb.height - tb.dy - baseline.y,
+			ucs4, len);
+		close_text_blit(XX, &tb);
 		x -= baseline.x;
 		y -= baseline.y;
-		XCopyArea( DISP, canvas, XX-> gdrawable, XX-> gc, 0, 0, width, height, x - dx, REVERT( y - dy + height));
-		XFreeGC( DISP, gc);
-		XFreePixmap( DISP, canvas);
 	} else {
 	COPY_PUT:
 		my_XftDrawString32( XX, &xftcolor, x, REVERT( y) + 1, ucs4, len);
 	}
 	free( ucs4);
-	/*
-		If you're guided here by something like
+	XCHECKPOINT; 
 
-			X Error: BadLength (poly request too large or internal Xlib length error),
-
-		then you probably need to know that your X server is out of date.
-		The error is caused by a Xrender bug, and you have the following options:
-		- update your X server
-		- set guts.xft_disable_large_fonts to 1, which would explicitly tell Prima not to wait
-		for Xlib to bark on large polygons
-		- set guts.xft_disable_large_fonts to 1 and decrease MAX_GLYPH_SIZE, if the former
-		option is not enough
-	*/
-	XCHECKPOINT;
-
-
-	/* emulate over- and understriking */
 	if ( PDrawable( self)-> font. style & (fsUnderlined|fsStruckOut)) {
 		Point ovx;
-		int lw = apc_gp_get_line_width( self);
-		int tw = prima_xft_get_text_width( XX-> font, text, len, false, utf8,
-						X(self)-> xft_map8, &ovx) - 1;
-		int d  = - PDrawable(self)-> font. descent;
-		int ay, x1, y1, x2, y2;
-		double c = XX-> xft_font_cos, s = XX-> xft_font_sin;
+		overstrike(self, x, y, &ovx, prima_xft_get_text_width(
+			XX-> font, text, len, flags | toAddOverhangs,
+			X(self)-> xft_map8, &ovx) - 1
+		);
+	}
+	XFLUSH;
 
-		XSetFillStyle( DISP, XX-> gc, FillSolid);
-		if ( !XX-> flags. brush_fore) {
-			XSetForeground( DISP, XX-> gc, XX-> fore. primary);
-			XX-> flags. brush_fore = 1;
-		}
+	return true;
+}
 
-		if ( lw != 1)
-			apc_gp_set_line_width( self, 1);
+Bool
+prima_xft_glyphs_out( Handle self, PGlyphsOutRec t, int x, int y)
+{
+	DEFXX;
+	XftColor xftcolor;
+	XftFont *font = XX-> font-> xft;
+	int rop = XX-> paint_rop;
+	Point baseline;
+		
+	t-> flags |= toAddOverhangs; /* for overstriking etc */
 
-		if ( ovx.x < 0 ) ovx.x = 0;
-		if ( ovx.y < 0 ) ovx.y = 0;
-		if ( PDrawable( self)-> font. style & fsUnderlined) {
-			ay = d;
-			x1 = x - ovx.x * c - ay * s + 0.5;
-			y1 = y - ovx.x * s + ay * c + 0.5;
-			tw += ovx.y;
-			x2 = x + tw * c - ay * s + 0.5;
-			y2 = y + tw * s + ay * c + 0.5;
-			XDrawLine( DISP, XX-> gdrawable, XX-> gc, x1, REVERT( y1), x2, REVERT( y2));
-		}
+	if ( t->len == 0) return true;
+	t->len = check_width( XX->font, t->len );
+	rop = filter_unsupported_rops( XX, rop, &xftcolor );
+	setup_alpha( XX, &xftcolor, &font );
 
-		if ( PDrawable( self)-> font. style & fsStruckOut) {
-			ay = (XX-> font-> font.ascent - XX-> font-> font.internalLeading)/2;
-			x1 = x - ovx.x * c - ay * s + 0.5;
-			y1 = y - ovx.x * s + ay * c + 0.5;
-			tw += ovx.y;
-			x2 = x + tw * c - ay * s + 0.5;
-			y2 = y + tw * s + ay * c + 0.5;
-			XDrawLine( DISP, XX-> gdrawable, XX-> gc, x1, REVERT( y1), x2, REVERT( y2));
-		}
+	/* paint background if opaque */
+	if ( XX-> flags. paint_opaque) {
+		Point * p = prima_xft_get_glyphs_box( self, t);
+		paint_text_background( self, p, x, y );
+		free( p);
+	}
 
-		if ( lw != 1)
-			apc_gp_set_line_width( self, lw);
+	SHIFT(x,y);
+	RANGE2(x,y);
+	/* xft doesn't allow shifting glyph reference point - need to adjust manually */
+	baseline.x = - PDrawable(self)-> font. descent * XX-> xft_font_sin;
+	baseline.y = - PDrawable(self)-> font. descent * ( 1 - XX-> xft_font_cos )
+					+ XX-> font-> font. descent;
+	if ( !XX-> flags. paint_base_line) {
+		x += baseline.x;
+		y += baseline.y;
+	}
+
+	allocate_xftdraw_surface(XX);
+	if ( rop != ropCopyPut) {
+		/* emulate rops by blitting the text */
+		int dx;
+		TextBlit tb;
+		dx = prima_xft_get_glyphs_width( XX-> font, t, NULL);
+		if (!open_text_blit(self, x, y, dx, rop, &tb))
+			goto COPY_PUT;
+		xft_draw_glyphs(XX, &xftcolor,
+			tb.dx + baseline.x, tb.height - tb.dy - baseline.y,
+			NULL, 0, t);
+		close_text_blit(XX, &tb);
+		x -= baseline.x;
+		y -= baseline.y;
+	} else {
+	COPY_PUT:
+		xft_draw_glyphs(XX, &xftcolor, x, REVERT(y) + 1, NULL, 0, t);
+	}
+	XCHECKPOINT; 
+
+	if ( PDrawable( self)-> font. style & (fsUnderlined|fsStruckOut)) {
+		Point ovx;
+		t-> flags |= toAddOverhangs;
+		overstrike(self, x, y, &ovx, prima_xft_get_glyphs_width(
+			XX-> font, t, &ovx) - 1);
 	}
 	XFLUSH;
 
@@ -1712,13 +2036,12 @@ xft_add_item( unsigned long ** list, int * count, int * size, FcChar32 chr,
 	return true;
 }
 
-unsigned long *
-prima_xft_get_font_ranges( Handle self, int * count)
+static unsigned long *
+get_font_ranges( FcCharSet *c, int * count)
 {
 	FcChar32 ucs4, last = 0, haslast = 0;
 	FcChar32 map[FC_CHARSET_MAP_SIZE];
 	FcChar32 next;
-	FcCharSet *c = X(self)-> font-> xft-> charset;
 	int size = 16;
 	unsigned long * ret;
 
@@ -1742,20 +2065,20 @@ prima_xft_get_font_ranges( Handle self, int * count)
 		int i, j;
 		for (i = 0; i < FC_CHARSET_MAP_SIZE; i++)
 			if (map[i]) {
-					for (j = 0; j < 32; j++)
-						if (map[i] & (1 << j)) {
-							FcChar32 u = ucs4 + i * 32 + j;
-							if ( haslast) {
-								if ( last != u - 1) {
-									ADD( last,true);
-									ADD( u,false);
-								}
-							} else {
+				for (j = 0; j < 32; j++)
+					if (map[i] & (1 << j)) {
+						FcChar32 u = ucs4 + i * 32 + j;
+						if ( haslast) {
+							if ( last != u - 1) {
+								ADD( last,true);
 								ADD( u,false);
-								haslast = 1;
 							}
-							last = u;
+						} else {
+							ADD( u,false);
+							haslast = 1;
 						}
+						last = u;
+					}
 			}
 	}
 	if ( haslast) ADD( last,true);
@@ -1763,8 +2086,65 @@ prima_xft_get_font_ranges( Handle self, int * count)
 	return ret;
 }
 
+unsigned long *
+prima_xft_get_font_ranges( Handle self, int * count)
+{
+	return get_font_ranges(X(self)-> font-> xft-> charset, count);
+}
+
+char *
+prima_xft_get_font_languages( Handle self)
+{
+#if FC_VERSION >= 21100
+	FcPattern *pat;
+	FcLangSet *ls;
+	FcStrSet  *ss;
+	FcStrList *l;
+	FcChar8  *s;
+	char *ret, *p;
+	int size;
+
+	if ( !(pat = X(self)-> font-> xft-> pattern))
+		return NULL;
+	FcPatternGetLangSet(pat, FC_LANG, 0, &ls);
+	if ( !ls )
+		return NULL;
+	if ( !(ss = FcLangSetGetLangs(ls)))
+		return NULL;
+	if ( !(l = FcStrListCreate (ss)))
+		return NULL;
+
+	size = 1024; /* longest line from 'fc-list -v' is 779 */
+	if ( !(p = ret = malloc(size)))
+		goto FAIL;
+
+	FcStrListFirst(l);
+	while ((s = FcStrListNext(l)) != NULL) {
+		int len = strlen((char*)s);
+		if ( p - ret + len + 1 + 1 > size ) {
+			char * p2;
+			size *= 2;
+			if ( !( p2 = realloc(ret, size)))
+				goto FAIL;
+			p   = p2 + (p - ret);
+			ret = p2;
+		}
+		strcpy( p, (char*) s );
+		p += len + 1;
+	}
+	*p = 0;
+	FcStrListDone(l);
+	return ret;
+
+FAIL:
+	FcStrListDone(l);
+	free(ret);
+#endif
+	return NULL;
+}
+
 PFontABC
-prima_xft_get_font_abc( Handle self, int firstChar, int lastChar, Bool unicode)
+prima_xft_get_font_abc( Handle self, int firstChar, int lastChar, int flags)
 {
 	PFontABC abc;
 	int i, len = lastChar - firstChar + 1;
@@ -1774,13 +2154,16 @@ prima_xft_get_font_abc( Handle self, int firstChar, int lastChar, Bool unicode)
 		return NULL;
 
 	for ( i = 0; i < len; i++) {
-		FcChar32 c = i + firstChar;
 		FT_UInt ft_index;
 		XGlyphInfo glyph;
-		if ( !unicode && c > 128) {
-			c = X(self)-> xft_map8[ c - 128];
+		if ( flags & toGlyphs ) {
+			ft_index = i + firstChar;
+		} else {
+			FcChar32 c = i + firstChar;
+			if ( !(flags & toUnicode) && c > 128)
+				c = X(self)-> xft_map8[ c - 128];
+			ft_index = XftCharIndex( DISP, font, c);
 		}
-		ft_index = XftCharIndex( DISP, font, c);
 		XftGlyphExtents( DISP, font, &ft_index, 1, &glyph);
 		abc[i]. a = -glyph. x;
 		abc[i]. b = glyph. width;
@@ -1791,7 +2174,7 @@ prima_xft_get_font_abc( Handle self, int firstChar, int lastChar, Bool unicode)
 }
 
 PFontABC
-prima_xft_get_font_def( Handle self, int firstChar, int lastChar, Bool unicode)
+prima_xft_get_font_def( Handle self, int firstChar, int lastChar, int flags)
 {
 	PFontABC abc;
 	int i, len = lastChar - firstChar + 1;
@@ -1801,13 +2184,16 @@ prima_xft_get_font_def( Handle self, int firstChar, int lastChar, Bool unicode)
 		return NULL;
 
 	for ( i = 0; i < len; i++) {
-		FcChar32 c = i + firstChar;
 		FT_UInt ft_index;
 		XGlyphInfo glyph;
-		if ( !unicode && c > 128) {
-			c = X(self)-> xft_map8[ c - 128];
+		if ( flags & toGlyphs ) {
+			ft_index = i + firstChar;
+		} else {
+			FcChar32 c = i + firstChar;
+			if ( !(flags & toUnicode) && c > 128)
+				c = X(self)-> xft_map8[ c - 128];
+			ft_index = XftCharIndex( DISP, font, c);
 		}
-		ft_index = XftCharIndex( DISP, font, c);
 		XftGlyphExtents( DISP, font, &ft_index, 1, &glyph);
 		abc[i]. a = X(self)-> font-> font. descent - glyph. height + glyph. y; /* XXX yOff ? */
 		abc[i]. b = glyph. height;
@@ -2013,9 +2399,9 @@ prima_xft_get_glyph_outline( Handle self, int index, int flags, int ** buffer)
 	OutlineStorage storage = { 0, 0, -1, NULL };
 
 	if ( !( face = XftLockFace( XX->font->xft)))
-		return 0;
+		return -1;
 
-	c = ((flags & ggoUnicode) || index <= 128) ? index : XX-> xft_map8[index - 128];
+	c = ((flags & (ggoUnicode|ggoGlyphIndex)) || index <= 128) ? index : XX-> xft_map8[index - 128];
 	ft_index = (flags & ggoGlyphIndex) ? c : XftCharIndex( DISP, XX->font->xft, c);
 	if (
 		(FT_Load_Glyph (face, ft_index, ft_flags) == 0) &&
@@ -2027,6 +2413,273 @@ prima_xft_get_glyph_outline( Handle self, int index, int flags, int ** buffer)
 
 	*buffer = storage.buffer;
 	return storage.count;
+}
+
+unsigned long *
+prima_xft_mapper_query_ranges(PFont font, int * count, unsigned int * flags)
+{
+	char name[256];
+	XftFont * xft = NULL;
+	unsigned long * ranges;
+	strncpy(name, font->name, 256);
+	prima_xft_font_pick( nilHandle, font, font, NULL, &xft);
+	*flags = 0 | MAPPER_FLAGS_SYNTHETIC_PITCH;
+	if ( !xft || strcmp( font->name, name ) != 0 ) {
+		*count = 0;
+		return NULL;
+	}
+	ranges = get_font_ranges( xft->charset, count);
+#ifdef WITH_HARFBUZZ
+{
+	FT_Face face;
+	hb_buffer_t *buf;
+	hb_font_t *font;
+	hb_glyph_position_t *glyph_pos;
+	unsigned int l = 0;
+	uint32_t x_tilde[2] = {'x', 0x330};
+
+	if ( !( face = XftLockFace( xft)))
+		return ranges;
+
+	buf = hb_buffer_create();
+	hb_buffer_add_utf32(buf, x_tilde, 2, 0, -1);
+	hb_buffer_guess_segment_properties (buf);
+	font = hb_ft_font_create(face, NULL);
+	hb_shape(font, buf, NULL, 0);
+	glyph_pos  = hb_buffer_get_glyph_positions(buf, &l);
+
+	if ( l == 2 && glyph_pos[1].x_advance == 0 ) {
+		*flags |= MAPPER_FLAGS_COMBINING_SUPPORTED;
+	}
+
+	hb_buffer_destroy(buf);
+	hb_font_destroy(font);
+	XftUnlockFace(xft);
+
+}
+#endif
+	return ranges;
+}
+
+Bool
+prima_xft_text_shaper( Handle self, PTextShapeRec r, uint32_t * map8)
+{
+        int i;
+	uint16_t *glyphs;
+	uint32_t *text;
+	XftFont *font = X(self)->font->xft_base;
+
+        for ( 
+		i = 0, glyphs = r->glyphs, text = r->text;
+		i < r->len; 
+		i++
+	) {
+		uint32_t c = *(text++);
+		if ( map8 && c > 128 ) c = map8[c];
+               	*(glyphs++) = XftCharIndex(DISP, font, c);
+	}
+	r-> n_glyphs = r->len;
+
+	if ( r-> advances ) {
+		uint16_t *advances;
+		for (
+			i = 0, glyphs = r->glyphs, advances = r->advances;
+			i < r-> len;
+			i++, glyphs++, advances++
+		) {
+			XGlyphInfo glyph;
+			FT_UInt ft_index = *glyphs;
+			XftGlyphExtents( DISP, font, &ft_index, 1, &glyph);
+			*advances = glyph.xOff;
+		}
+		bzero(r->positions, r->len * 2 * sizeof(int16_t));
+	}
+
+        return true;
+}
+
+Bool
+prima_xft_text_shaper_bytes( Handle self, PTextShapeRec r)
+{
+	return prima_xft_text_shaper( self, r, X(self)-> xft_map8);
+}
+
+Bool
+prima_xft_text_shaper_ident( Handle self, PTextShapeRec r)
+{
+	return prima_xft_text_shaper( self, r, NULL);
+}
+
+#ifdef WITH_HARFBUZZ
+Bool
+prima_xft_text_shaper_harfbuzz( Handle self, PTextShapeRec r)
+{
+	DEFXX;
+	Bool ret = true;
+	int i, j;
+	FT_Face face;
+	hb_buffer_t *buf;
+	hb_font_t *font;
+	hb_glyph_info_t *glyph_info;
+	hb_glyph_position_t *glyph_pos;
+
+	if ( !( face = XftLockFace( XX->font->xft))) /*XXX*/
+		return -1;
+
+	buf = hb_buffer_create();
+	hb_buffer_add_utf32(buf, r->text, r->len, 0, -1);
+
+#if HB_VERSION_ATLEAST(1,0,3)
+	hb_buffer_set_cluster_level(buf, HB_BUFFER_CLUSTER_LEVEL_MONOTONE_CHARACTERS);
+#endif
+	hb_buffer_set_direction(buf, (r->flags & toRTL) ? HB_DIRECTION_RTL : HB_DIRECTION_LTR);
+/*
+	hb_buffer_set_script(buf, HB_SCRIPT_LATIN);
+	hb_buffer_set_script (buf, hb_script_from_string ("Arab", -1));
+*/
+	if ( r-> language != NULL )
+		hb_buffer_set_language(buf, hb_language_from_string(r->language, -1));
+	hb_buffer_guess_segment_properties (buf);
+
+
+	font = hb_ft_font_create(face, NULL);
+
+	hb_shape(font, buf, NULL, 0);
+
+	glyph_info = hb_buffer_get_glyph_infos(buf, &r->n_glyphs);
+	glyph_pos  = hb_buffer_get_glyph_positions(buf, &r->n_glyphs);
+
+	for (i = j = 0; i < r->n_glyphs; i++) {
+		uint32_t c = glyph_info[i].cluster;
+		if ( c > r-> len ) {
+			/* something bad happened? */
+			warn("harfbuzz shaping asssertion failed: got cluster=%d for strlen=%d", c, r->len);
+			guts. use_harfbuzz = false;
+			ret = false;
+			break;
+		}
+                r->indexes[i] = c;
+                r->glyphs[i]   = glyph_info[i].codepoint;
+		if ( glyph_pos ) {
+			r->advances[i]    = floor(glyph_pos[i].x_advance / 64.0 + .5);
+			r->positions[j++] = floor(glyph_pos[i].x_offset  / 64.0 + .5);
+			r->positions[j++] = floor(glyph_pos[i].y_offset  / 64.0 + .5);
+		}
+	}
+ 
+	hb_buffer_destroy(buf);
+	hb_font_destroy(font);
+	XftUnlockFace(XX->font->xft);
+
+	return ret;
+}
+#endif
+
+static Bool
+kill_lists( void * f, int keyLen, void * key, void * dummy)
+{
+	plist_destroy((PList) f);
+	return false;
+}
+
+void
+prima_xft_init_font_substitution(void)
+{
+	int i;
+	FcFontSet * s;
+	FcPattern   *pat, **ppat;
+	FcObjectSet *os;
+	PHash core_fonts = hash_create();
+	PFontInfo info;
+
+	for ( i = 0, info = guts. font_info; i < guts. n_fonts; i++, info++) {
+		PList list;
+		int len = strlen(info->font.name);
+		list = (PList) hash_fetch( core_fonts, info-> font.name, len);
+		if ( !list ) {
+			list = plist_create(32, 32);
+			hash_store( core_fonts, info-> font.name, len, (void*) list);
+		}
+		list_add( list, (Handle) i);
+	}
+
+	if ( guts.default_font_ok) {
+		pat = FcPatternCreate();
+		FcPatternAddBool( pat, FC_SCALABLE, 1);
+		FcPatternAddString( pat, FC_FAMILY, (FcChar8*) guts.default_font.name);
+		os = FcObjectSetBuild( FC_FAMILY, (void*) 0);
+		s = FcFontList( 0, pat, os);
+		if ( s && s->nfont ) {
+			PFont f;
+			if (( f = prima_font_mapper_save_font(guts.default_font.name)) != NULL ) {
+				f->is_utf8 = guts.default_font.is_utf8;
+				f->undef.name = 0;
+				strncpy(f->family, guts.default_font.family,256);
+				f->undef.vector = 0;
+				f->vector = guts.default_font.vector;
+				f->undef.pitch = 0;
+				f->pitch  = guts.default_font.pitch;
+			}
+		}
+		FcObjectSetDestroy( os);
+		FcPatternDestroy( pat);
+		FcFontSetDestroy(s);
+	}
+
+	pat = FcPatternCreate();
+	FcPatternAddBool( pat, FC_SCALABLE, 1);
+	os = FcObjectSetBuild( FC_FAMILY, FC_FOUNDRY, FC_SCALABLE, FC_SPACING, (void*) 0);
+	s = FcFontList( 0, pat, os);
+	FcObjectSetDestroy( os);
+	FcPatternDestroy( pat);
+
+	if ( !s) return;
+
+	ppat = s-> fonts;
+	for ( i = 0; i < s->nfont; i++, ppat++) {
+		PFont f;
+		int j;
+		FcChar8 * s;
+		PList list;
+		char lower[512], *llower = lower, *lupper;
+
+		if ( FcPatternGetString(*ppat, FC_FAMILY, 0, &s) != FcResultMatch)
+			continue;
+
+		/* disable the corresponding core font */
+		lupper = (char*) s;
+		while ( *lupper && (lupper - (char*)s) < 512 )
+			*(llower++) = tolower((int)*(lupper++));
+		*llower = 0;
+		if (( list = (PList) hash_fetch(core_fonts, lower, strlen(lower))) != NULL) {
+			for (j = 0; j < list->count; j++) {
+				PFontInfo info = guts.font_info + (int) list->items[j];
+				info->flags.disabled = 1;
+			}
+		}
+
+		if ( !( f = prima_font_mapper_save_font((const char*) s)))
+			continue;
+
+		f-> is_utf8.name = utf8_flag_strncpy( f->name, (char*)s, 255);
+		f-> undef.name = 0;
+
+		if ( FcPatternGetString(*ppat, FC_FOUNDRY, 0, &s) == FcResultMatch) {
+			f->is_utf8.family = utf8_flag_strncpy( f->family, (char*)s, 255);
+		}
+		if ( FcPatternGetInteger(*ppat, FC_SPACING, 0, &j) == FcResultMatch) {
+			f->pitch = (( i == FC_PROPORTIONAL) ? fpVariable : fpFixed);
+			f->undef.pitch = 0;
+		}
+
+		f->undef.vector = 0;
+		f->vector = fvOutline;
+	}
+
+	FcFontSetDestroy(s);
+
+	hash_first_that( core_fonts, (void*)kill_lists, NULL, NULL, NULL);
+	hash_destroy( core_fonts, false);
 }
 
 #else

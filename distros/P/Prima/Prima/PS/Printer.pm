@@ -24,11 +24,13 @@ Also contains convenience classes (File, LPR, Pipe) for non-GUI use.
 
 	my $x;
 	if ( $preview) {
-		$x = Prima::PS::Pipe-> create( command => 'gv -');
+		$x = Prima::PS::Pipe-> new( command => 'gv $');
 	} elsif ( $print_in_file) {
-		$x = Prima::PS::File-> create( file => 'out.ps');
+		$x = Prima::PS::File-> new( file => 'out.ps');
+	} elsif ( $print_on_device) {
+		$x = Prima::PS::LPR-> new( args => '-d colorprinter');
 	} else {
-		$x = Prima::PS::LPR-> create( args => '-d colorprinter');
+		$x = Prima::PS::FileHandle-> new( handle => \*STDOUT );
 	}
 	$x-> begin_doc;
 	$x-> font-> size( 300);
@@ -43,6 +45,7 @@ use Prima;
 use Prima::Utils;
 use IO::Handle;
 use Prima::PS::Drawable;
+use Prima::PS::TempFile;
 
 package Prima::PS::Printer;
 use vars qw(@ISA %pageSizes $unix);
@@ -53,6 +56,7 @@ $unix = Prima::Application-> get_system_info-> {apc} == apc::Unix;
 use constant lpr  => 0;
 use constant file => 1;
 use constant cmd  => 2;
+use constant fh   => 3;
 
 
 sub profile_default
@@ -70,8 +74,6 @@ sub profile_default
 			isEPS          => 0,
 			scaling        => 1,
 			portrait       => 1,
-			useDeviceFonts => 1,
-			useDeviceFontsOnly => 0,
 			spoolerType    => $unix ? lpr : file,
 			spoolerData    => '',
 			devParms       => {
@@ -120,7 +122,7 @@ sub init
 			$self-> import_printers( 'printers', '/etc/printcap');
 			$self-> {printers}-> {GhostView} = deepcopy( $self-> {defaultData});
 			$self-> {printers}-> {GhostView}-> {spoolerType} = cmd;
-			$self-> {printers}-> {GhostView}-> {spoolerData} = 'gv -';
+			$self-> {printers}-> {GhostView}-> {spoolerData} = 'gv $';
 		}
 		$self-> {printers}-> {File} = deepcopy( $self-> {defaultData});
 		$self-> {printers}-> {File}-> {spoolerType} = file;
@@ -251,10 +253,6 @@ sub data
 		@{exists($pageSizes{$p-> {page}}) ?
 			$pageSizes{$p-> {page}} : $pageSizes{A4}}
 	) if exists $dd-> {page};
-	if ( exists $dd-> {page}) {
-		$self-> useDeviceFonts( $p-> {useDeviceFonts});
-		$self-> useDeviceFontsOnly( $p-> {useDeviceFontsOnly});
-	}
 	if ( defined $dv) {
 		my %dp = %{$p-> {devParms}};
 		for ( keys %dp) {
@@ -349,33 +347,19 @@ sub begin_doc
 	my ( $self, $docName) = @_;
 	return 0 if $self-> get_paint_state;
 
-	$self-> {spoolHandle} = undef;
+	if ($self-> {data}-> {spoolerType} != fh) {
+		$self-> {spoolHandle} = undef;
+	} else {
+		return 0 unless $self->{spoolHandle};
+	}
 
 	if ( $self-> {data}-> {spoolerType} == file) {
 		if ( $self-> {gui}) {
-			eval "use Prima::MsgBox"; die "$@\n" if $@;
-			my $f = Prima::MsgBox::input_box( 'Print to file', 'Output file name:', '', mb::OKCancel, buttons => {
-				mb::OK, {
-				modalResult => undef,
-				onClick => sub {
-					$_[0]-> clear_event;
-					my $f = $_[0]-> owner-> InputLine1-> text;
-					if ( -f $f) {
-						return 0 if Prima::MsgBox::message(
-							"File $f already exists. Overwrite?",
-							mb::Warning|mb::OKCancel) != mb::OK;
-					} else {
-						unless ( open F, "> $f") {
-							Prima::MsgBox::message(
-							"Error opening $f:$!", mb::Error|mb::OK);
-							return 0;
-						}
-						close F;
-						unlink $f;
-					}
-					$_[0]-> owner-> modalResult( mb::OK);
-					$_[0]-> owner-> end_modal;
-			}}});
+			require Prima::Dialog::FileDialog;	
+			my $f = Prima::save_file(
+				defaultExt => 'ps',
+				text       => 'Print to file',
+			);
 			return 0 unless defined $f;
 			my $h = IO::Handle-> new;
 			unless ( open $h, "> $f") {
@@ -388,7 +372,7 @@ sub begin_doc
 		} else { # no gui
 			my $h = IO::Handle-> new;
 			my $f = $self-> {data}-> {spoolerData};
-			unless ( open $h, "> $f") {
+			unless ( open $h, ">", $f) {
 				undef $h;
 				return 0;
 			}
@@ -401,6 +385,15 @@ sub begin_doc
 			return 0;
 		}
 		return 1;
+	} elsif ( $self-> {data}-> {spoolerType} == cmd && $self->{data}->{spoolerData} =~ /\$/) {
+		my $f = Prima::PS::TempFile->new(unlink => 0, warn => !$self->{gui});
+		unless ( defined $f ) {
+			Prima::message("Error creating temporary file: $!") if $self-> {gui};
+			return 0;
+		}
+		$self-> {spoolTmpFile} = $f;
+		$self-> {spoolHandle}  = $f->{fh};
+		$self-> {spoolName}    = $f->{filename};
 	}
 
 	return $self-> SUPER::begin_doc( $docName);
@@ -411,11 +404,22 @@ my ( $sigpipe);
 sub __end
 {
 	my $self = $_[0];
-	close( $self-> {spoolHandle}) if $self-> {spoolHandle};
+	close( $self-> {spoolHandle}) if $self-> {spoolHandle} && $self-> {data}-> {spoolerType} != fh;
 	if ( $self-> {data}-> {spoolerType} != file) {
 		defined($sigpipe) ? $SIG{PIPE} = $sigpipe : delete($SIG{PIPE});
 	}
-	$self-> {spoolHandle} = undef;
+	$self-> {spoolHandle} = undef if $self->{data}->{spoolerType} != fh;
+
+	if ( $self->{data}->{spoolerType} == cmd && $self->{data}->{spoolerData} =~ /\$/) {
+		my $cmd = $self->{data}->{spoolerData};
+		my $tmp = $self->{spoolName};
+		$cmd =~ s/\$/$tmp/g;
+		if ( system $cmd ) {
+			Prima::message("Error running '$cmd'") if $self-> {gui};
+		}
+		$self->{spoolTmpFile}->remove;
+		undef $self->{spoolTmpFile};
+	}
 	$sigpipe = undef;
 }
 
@@ -439,6 +443,7 @@ sub spool
 	my ( $self, $data) = @_;
 
 	my $piped = 0;
+	
 	if ( $self-> {data}-> {spoolerType} != file && !$self-> {spoolHandle}) {
 		my @cmds;
 		if ( $self-> {data}-> {spoolerType} == lpr) {
@@ -482,8 +487,7 @@ sub options
 
 	if ( 0 == @_) {
 		return qw(
-			Color Resolution PaperSize Copies Scaling Orientation
-			UseDeviceFonts UseDeviceFontsOnly EPS
+			Color Resolution PaperSize Copies Scaling Orientation EPS
 		), keys %{$self->{data}->{devParms}};
 	} elsif ( 1 == @_) {
 		# get value
@@ -557,6 +561,35 @@ sub file
 {
 	return $_[0]-> {data}-> {spoolerData} unless $#_;
 	$_[0]-> {data}-> {spoolerData} = $_[1];
+}
+
+package Prima::PS::FileHandle;
+use vars qw(@ISA);
+@ISA=q(Prima::PS::Printer);
+
+sub profile_default
+{
+	my $def = $_[ 0]-> SUPER::profile_default;
+	my %prf = (
+		handle => undef,
+		gui    => 0,
+	);
+	@$def{keys %prf} = values %prf;
+	return $def;
+}
+
+sub init
+{
+	my $self = shift;
+	my %profile = $self-> SUPER::init(@_);
+	$self-> {data}-> {spoolerType} = Prima::PS::Printer::fh;
+	$self-> {spoolHandle} = $profile{handle};
+}
+
+sub handle
+{
+	return $_[0]-> {spoolHandle} unless $#_;
+	$_[0]-> {spoolHandle} = $_[1];
 }
 
 package Prima::PS::LPR;
@@ -649,15 +682,6 @@ US Common #10 Envelope>.
 =item Orientation
 
 One of : C<Portrait>, C<Landscape>.
-
-=item UseDeviceFonts BOOLEAN
-
-If 1, use limited set of device fonts in addition to exported bitmap fonts.
-
-=item UseDeviceFontsOnly BOOLEAN
-
-If 1, use limited set of device fonts instead of exported bitmap fonts.
-Its usage may lead to that some document fonts will be mismatched.
 
 =item MediaType STRING
 

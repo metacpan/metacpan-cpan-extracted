@@ -1,7 +1,9 @@
 package TableData::Object::Base;
 
-our $DATE = '2019-09-15'; # DATE
-our $VERSION = '0.111'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-29'; # DATE
+our $DIST = 'TableData-Object'; # DIST
+our $VERSION = '0.112'; # VERSION
 
 use 5.010;
 use strict;
@@ -63,6 +65,23 @@ sub col_idx {
 sub col_count {
     my $self = shift;
     scalar @{ $self->{cols_by_idx} };
+}
+
+sub col_content {
+    my ($self, $name_or_idx) = @_;
+
+    my $col_idx = $self->col_idx($name_or_idx);
+    return undef unless defined $col_idx;
+
+    my $row_count = $self->row_count;
+    return [] unless $row_count;
+
+    my $col_content = [];
+    for my $i (0 .. $row_count-1) {
+        my $row = $self->row_as_aos($i);
+        $col_content->[$i] = $row->[$col_idx];
+    }
+    $col_content;
 }
 
 sub _select {
@@ -223,7 +242,7 @@ TableData::Object::Base - Base class for TableData::Object::*
 
 =head1 VERSION
 
-This document describes version 0.111 of TableData::Object::Base (from Perl distribution TableData-Object), released on 2019-09-15.
+This document describes version 0.112 of TableData::Object::Base (from Perl distribution TableData-Object), released on 2020-05-29.
 
 =head1 METHODS
 
@@ -266,6 +285,21 @@ See also: C<row_count()>.
 Check whether a column exists. Column can be referred to using its name or
 index/position (0, 1, ...).
 
+=head2 $td->col_content($name_or_idx) => aos
+
+Get the content of a column as an array of strings. Return undef if column is
+unknown. For example, given this table data:
+
+ | name  | age |
+ |-------+-----|
+ | andi  | 25  |
+ | budi  | 29  |
+ | cinta | 17  |
+
+then C<< $td->col_content('name') >> or C<< $td->col_content(0) >> will be:
+
+ ['andi', 'budi', 'cinta']
+
 =head2 $td->col_name($idx) => str
 
 Return the name of column referred to by its index/position. Undef if column is
@@ -279,6 +313,18 @@ Return the index/position of column referred to by its name. Undef if column is
 unknown.
 
 See also: C<col_name()>.
+
+=head2 $td->row($idx) => s/aos/hos
+
+Get a specific row (C<$idx> is 0 to mean first row, 1 for second, ...).
+
+=head2 $td->row_as_aos($idx) => aos
+
+Get a specific row (C<$idx> is 0 to mean first row, 1 for second, ...) as aos.
+
+=head2 $td->row_as_hos($idx) => hos
+
+Get a specific row (C<$idx> is 0 to mean first row, 1 for second, ...) as hos.
 
 =head2 $td->rows() => array
 
@@ -427,7 +473,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

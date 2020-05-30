@@ -14,6 +14,7 @@ object Prima::Drawable ( Prima::Component)
 	property     int           fillMode;
 	property     SV *          fillPattern;
 	property     Point         fillPatternOffset;
+	property     SV *          fontMapperPalette( int index );
 	property     int           height;
 	property     int           lineEnd;
 	property     int           lineJoin;
@@ -49,15 +50,16 @@ object Prima::Drawable ( Prima::Component)
 
 	method int   get_bpp();
 	method Font  get_font();
-	method SV *  get_font_abc( int first = -1, int last = -1, Bool unicode = 0);
-	method SV *  get_font_def( int first = -1, int last = -1, Bool unicode = 0);
+	method SV *  get_font_abc( int first = -1, int last = -1, int flags = 0);
+	method SV *  get_font_def( int first = -1, int last = -1, int flags = 0);
+	method SV *  get_font_languages();
 	method SV *  get_font_ranges();
 	method SV *  get_handle();
 	method Color get_nearest_color( Color color);
 	method int   get_paint_state();
 	method SV *  get_physical_palette();
-	method int   get_text_width( SV * text, Bool addOverhang = 0);
-	method SV *  get_text_box( SV * text);
+	method int   get_text_width( SV * text, int flags = 0, int from = 0, int len = -1);
+	method SV *  get_text_box( SV * text, int from = 0, int len = -1);
 	method SV *  render_glyph( int index, HV * profile);
 	static SV *  render_spline( SV * obj, SV * points, HV * profile);
 
@@ -80,11 +82,15 @@ object Prima::Drawable ( Prima::Component)
 	method Bool  put_image_indirect( Handle image, int x, int y, int xFrom, int yFrom, int xDestLen, int yDestLen, int xLen, int yLen, int rop);
 	method Bool  rectangle(int x1, int y1, int x2, int y2)  => apc_gp_rectangle;
 	method Bool  sector( int x, int y, int dX, int dY, double startAngle, double endAngle) => apc_gp_sector;
-	method Bool  text_out( SV * text, int x, int y);
-	method SV*   text_wrap( SV * text, int width, int options = twDefault, int tabIndent = 8);
+	method Bool  text_out( SV * text, int x, int y, int from = 0, int len = -1);
+	method SV*   text_shape( SV * text, HV * profile);
+	method SV*   text_wrap( SV * text, int width, int options = twDefault, int tabIndent = 8, int from = 0, int len = -1);
 
 	# font_abc caches
 	PFontABC font_abc_ascii;
 	PList    font_abc_unicode;
+	PList    font_abc_glyphs;
+	unsigned long * font_abc_glyphs_ranges;
+	int             font_abc_glyphs_n_ranges;
 
 }

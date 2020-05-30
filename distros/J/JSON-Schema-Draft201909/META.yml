@@ -4,21 +4,22 @@ author:
   - 'Karen Etheridge <ether@cpan.org>'
 build_requires:
   File::Spec: '0'
+  List::Util: '1.50'
   Module::Metadata: '0'
   Scalar::Util: '0'
   Test::Deep: '0'
   Test::Fatal: '0'
-  Test::JSON::Schema::Acceptance: '0.993'
+  Test::JSON::Schema::Acceptance: '0.994'
   Test::More: '0.88'
   Test::Warnings: '0.027'
   lib: '0'
   open: '0'
-  perl: '5.013002'
+  perl: v5.16.0
   utf8: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Build::Tiny: '0.034'
-  perl: '5.013002'
+  perl: v5.16.0
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
 keywords:
@@ -35,43 +36,44 @@ meta-spec:
 name: JSON-Schema-Draft201909
 no_index:
   directory:
-    - share
     - t
     - xt
 provides:
   JSON::Schema::Draft201909:
     file: lib/JSON/Schema/Draft201909.pm
-    version: '0.001'
+    version: '0.002'
   JSON::Schema::Draft201909::Error:
     file: lib/JSON/Schema/Draft201909/Error.pm
-    version: '0.001'
+    version: '0.002'
   JSON::Schema::Draft201909::Result:
     file: lib/JSON/Schema/Draft201909/Result.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Carp: '0'
   JSON::MaybeXS: '1.004001'
   JSON::PP: '0'
-  List::Util: '1.33'
+  List::Util: '1.50'
   Mojo::JSON::Pointer: '0'
   Mojo::URL: '0'
   Moo: '0'
   MooX::HandlesVia: '0'
   MooX::TypeTiny: '0.002002'
+  Safe::Isa: '0'
   Syntax::Keyword::Try: '0'
   Types::Standard: '1.010002'
   constant: '0'
+  feature: '0'
   if: '0'
   namespace::clean: '0'
   overload: '0'
-  perl: '5.013002'
+  perl: v5.16.0
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/karenetheridge/JSON-Schema-Draft201909/issues
   homepage: https://github.com/karenetheridge/JSON-Schema-Draft201909
   repository: https://github.com/karenetheridge/JSON-Schema-Draft201909.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.031011'
@@ -107,6 +109,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename:
             - CONTRIBUTING
+            - INSTALL
             - LICENCE
             - README.pod
             - pull_request_template.md
@@ -244,7 +247,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Test::MinimumVersion
       config:
         Dist::Zilla::Plugin::Test::MinimumVersion:
-          max_target_perl: '5.014'
+          max_target_perl: '5.016'
       name: '@Author::ETHER/Test::MinimumVersion'
       version: '2.000010'
     -
@@ -750,6 +753,7 @@ x_Dist_Zilla:
           allow_dirty:
             - CONTRIBUTING
             - Changes
+            - INSTALL
             - LICENCE
             - README.pod
           allow_dirty_match: []
@@ -768,7 +772,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.001
+          tag: v0.002
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -875,14 +879,6 @@ x_Dist_Zilla:
           phase: x_Dist_Zilla
           type: requires
       name: '@Author::ETHER/prereqs for @Author::ETHER'
-      version: '6.014'
-    -
-      class: Dist::Zilla::Plugin::FileFinder::Filter
-      name: UserTests
-      version: '6.014'
-    -
-      class: Dist::Zilla::Plugin::FileFinder::ByName
-      name: ExtraTests
       version: '6.014'
     -
       class: Dist::Zilla::Plugin::FinderCode

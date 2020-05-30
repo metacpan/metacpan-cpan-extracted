@@ -51,6 +51,14 @@
 #ifdef HAVE_X11_XCURSOR_XCURSOR_H
 #include <X11/Xcursor/Xcursor.h>
 #endif
+
+#ifdef WITH_FRIBIDI
+#include <fribidi/fribidi.h>
+#define ANALYSIS FriBidiLevel
+#else
+#define ANALYSIS Byte
+#endif
+
 #undef Font
 #undef Drawable
 #undef Bool
@@ -321,6 +329,7 @@ struct  _drawable_sys_data;
 			|       GCFunction      \
 			|       GCJoinStyle     \
 			|       GCFillRule      \
+			|       GCFillStyle      \
 			|       GCTileStipXOrigin \
 			|       GCTileStipYOrigin \
 			|       GCLineStyle     \
@@ -543,6 +552,8 @@ typedef struct
 #endif
 } CustomPointer;
 
+#define MAX_UNICODE_HEX_LENGTH 6
+
 typedef struct _UnixGuts
 {
 	/* Event management */
@@ -726,6 +737,7 @@ typedef struct _UnixGuts
 	int                          net_wm_maximize_HORZ_vs_HORIZ;
 	int                          use_gtk;
 	int                          use_quartz;
+	Bool                         use_harfbuzz;
 	Bool                         is_xwayland;
 	/* DND: Common */
 	Handle                       xdnd_clipboard;
@@ -746,6 +758,9 @@ typedef struct _UnixGuts
 	Box                          xdnds_suppress_events_within; /* in root coordinates */
 
 	CustomPointer                xdnd_pointers[5]; /* none,copy,link,move,ask */
+
+	int                          unicode_hex_input_flags;
+	char                         unicode_hex_input_buffer[MAX_UNICODE_HEX_LENGTH + 1];
 } UnixGuts;
 
 extern UnixGuts  guts;
@@ -1358,6 +1373,9 @@ extern void
 prima_xft_init( void);
 
 extern void
+prima_xft_init_font_substitution( void);
+
+extern void
 prima_xft_done( void);
 
 extern void
@@ -1377,23 +1395,36 @@ prima_xft_font_encodings( PHash hash);
 
 extern int
 prima_xft_get_text_width( PCachedFont self, const char * text, int len,
-			Bool addOverhang, Bool utf8, uint32_t * map8,
+			int flags, uint32_t * map8,
+			Point * overhangs);
+
+extern int
+prima_xft_get_glyphs_width( PCachedFont self, PGlyphsOutRec glyphs,
 			Point * overhangs);
 
 extern Point *
-prima_xft_get_text_box( Handle self, const char * text, int len, Bool utf8);
+prima_xft_get_text_box( Handle self, const char * text, int len, int flags);
+
+extern Point *
+prima_xft_get_glyphs_box( Handle self, PGlyphsOutRec glyphs);
 
 extern Bool
-prima_xft_text_out( Handle self, const char * text, int x, int y, int len, Bool utf8);
+prima_xft_text_out( Handle self, const char * text, int x, int y, int len, int flags);
+
+extern Bool
+prima_xft_glyphs_out( Handle self, PGlyphsOutRec glyphs, int x, int y);
 
 extern unsigned long *
 prima_xft_get_font_ranges( Handle self, int * count);
 
-extern PFontABC
-prima_xft_get_font_abc( Handle self, int firstChar, int lastChar, Bool unicode);
+extern char *
+prima_xft_get_font_languages( Handle self);
 
 extern PFontABC
-prima_xft_get_font_def( Handle self, int firstChar, int lastChar, Bool unicode);
+prima_xft_get_font_abc( Handle self, int firstChar, int lastChar, int flags);
+
+extern PFontABC
+prima_xft_get_font_def( Handle self, int firstChar, int lastChar, int flags);
 
 extern int
 prima_xft_get_glyph_outline( Handle self, int index, int flags, int ** buffer);
@@ -1412,6 +1443,20 @@ prima_xft_update_region( Handle self);
 
 extern int
 prima_xft_load_font( char * fontName );
+
+extern Bool
+prima_xft_text_shaper_ident( Handle self, PTextShapeRec r);
+
+extern Bool
+prima_xft_text_shaper_bytes( Handle self, PTextShapeRec r);
+
+#ifdef WITH_HARFBUZZ
+extern Bool
+prima_xft_text_shaper_harfbuzz( Handle self, PTextShapeRec r);
+#endif
+
+extern unsigned long *
+prima_xft_mapper_query_ranges(PFont font, int * count, unsigned int * flags);
 
 #endif
 

@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Mysql.pm
-## Version v0.3.2
+## Version v0.3.3
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2017/07/19
-## Modified 2020/05/21
+## Modified 2020/05/22
 ## 
 ##----------------------------------------------------------------------------
 ## This is the subclassable module for driver specific ones.
@@ -29,7 +29,7 @@ BEGIN
     ## DBI->trace( 5 );
     our( $VERSION, $DB_ERRSTR, $ERROR, $DEBUG, $CONNECT_VIA, $CACHE_QUERIES, $CACHE_SIZE );
     our( $CACHE_TABLE, $USE_BIND, $USE_CACHE, $MOD_PERL, @DBH );
-    $VERSION     = 'v0.3.2';
+    $VERSION     = 'v0.3.3';
     use Devel::Confess;
 };
 
@@ -141,8 +141,7 @@ sub commit($;$@)
 sub connect
 {
     my $that   = shift( @_ );
-    my $param = $that->_connection_params2hash( @_ ) || return( undef() );
-    ## my $param = $that->_check_connect_param( @_ ) || return( undef() );
+    my $param = $that->_connection_params2hash( @_ ) || return;
     $param->{ 'driver' } = 'mysql';
     $param->{ 'port' } = 3306 if( !length( $param->{ 'port' } ) );
     return( $that->SUPER::connect( $param ) );
@@ -208,7 +207,7 @@ sub databases
         }
         try
         {
-            $dbh = $self->connect( $con ) || return( undef() );
+            $dbh = $self->connect( $con ) || return;
         }
         catch( $e )
         {
@@ -236,8 +235,7 @@ sub having
 sub last_insert_id
 {
     my $self = shift( @_ );
-    my $query = $self->{dbh}->prepare( "SELECT LAST_INSERT_ID()" ) ||
-    return( undef() );
+    my $query = $self->{dbh}->prepare( "SELECT LAST_INSERT_ID()" ) || return;
     $query->execute();
     my $val = $query->fetchrow();
     $query->finish();

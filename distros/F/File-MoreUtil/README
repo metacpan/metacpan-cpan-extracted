@@ -2,8 +2,8 @@ NAME
     File::MoreUtil - File-related utilities
 
 VERSION
-    This document describes version 0.623 of File::MoreUtil (from Perl
-    distribution File-MoreUtil), released on 2020-04-13.
+    This document describes version 0.624 of File::MoreUtil (from Perl
+    distribution File-MoreUtil), released on 2020-05-30.
 
 SYNOPSIS
      use File::MoreUtil qw(
@@ -14,12 +14,19 @@ SYNOPSIS
          dir_has_dot_files
          dir_has_non_dot_files
          dir_has_subdirs
+         dir_has_non_subdirs
          dir_has_dot_subdirs
          dir_has_non_dot_subdirs
 
-         dir_entries
-         dir_dot_entries
-         dir_non_dot_entries
+         get_dir_entries
+         get_dir_dot_entries
+         get_dir_subdirs
+         get_dir_non_subdirs
+         get_dir_dot_subdirs
+         get_dir_non_dot_subdirs
+         get_dir_files
+         get_dir_dot_files
+         get_dir_non_dot_files
      );
 
      print "file exists" if file_exists("/path/to/file/or/dir");
@@ -115,10 +122,19 @@ FUNCTIONS
   dir_has_subdirs
     Usage:
 
-     dir_has_files($dir) => BOOL
+     dir_has_subdirs($dir) => BOOL
 
     Will return true if $dir exists and has one or more subdirectories in
-    it.
+    it. A symlink to a directory does *NOT* count as subdirectory.
+
+  dir_has_non_subdirs
+    Usage:
+
+     dir_has_non_subdirs($dir) => BOOL
+
+    Will return true if $dir exists and has one or more non-subdirectories
+    in it. A symlink to a directory does *NOT* count as subdirectory and
+    thus counts as a non-subdirectory.
 
   dir_has_dot_subdirs
     Usage:
@@ -126,7 +142,8 @@ FUNCTIONS
      dir_has_dot_subdirs($dir) => BOOL
 
     Will return true if $dir exists and has one or more dot subdirectories
-    (i.e. subdirectories with names beginning with a dot) in it.
+    (i.e. subdirectories with names beginning with a dot) in it. A symlink
+    to a directory does *NOT* count as subdirectory.
 
   dir_has_non_dot_subdirs
     Usage:
@@ -135,7 +152,7 @@ FUNCTIONS
 
     Will return true if $dir exists and has one or more non-dot
     subdirectories (i.e. subdirectories with names not beginning with a dot)
-    in it.
+    in it. A symlink to a directory does *NOT* count as subdirectory.
 
   get_dir_entries
     Usage:
@@ -168,9 +185,10 @@ FUNCTIONS
 
      my @filenames = get_dir_files([ $dir ]);
 
-    Get all filename entries of a directory specified by $dir (or the
+    Get all plain filename entries of a directory specified by $dir (or the
     current dir if unspecified), including dotfiles but excluding "." and
-    "..". Dies if directory does not exist or cannot be read.
+    "..". See "dir_has_files" for definition of "plain files". Dies if
+    directory does not exist or cannot be read.
 
     Basically a shortcut for something like:
 
@@ -181,9 +199,9 @@ FUNCTIONS
 
      my @dot_filenames = get_dir_dot_files([ $dir ]);
 
-    Get all "dot" filename entries of a directory specified by $dir (or the
-    current dir if unspecified). Dies if directory does not exist or cannot
-    be read.
+    Get all "dot" plain filename entries of a directory specified by $dir
+    (or the current dir if unspecified). See "dir_has_files" for definition
+    of "plain files". Dies if directory does not exist or cannot be read.
 
     Basically a shortcut for something like:
 
@@ -194,9 +212,10 @@ FUNCTIONS
 
      my @non_dot_filenames = get_dir_non_dot_files([ $dir ]);
 
-    Get all non-"dot" filename entries of a directory specified by $dir (or
-    the current dir if unspecified). Dies if directory does not exist or
-    cannot be read.
+    Get all non-"dot" plain filename entries of a directory specified by
+    $dir (or the current dir if unspecified). See "dir_has_files" for
+    definition of "plain files". Dies if directory does not exist or cannot
+    be read.
 
     Basically a shortcut for something like:
 
@@ -209,11 +228,25 @@ FUNCTIONS
 
     Get all subdirectory entries of a directory specified by $dir (or the
     current dir if unspecified), including dotsubdirs but excluding "." and
-    "..". Dies if directory does not exist or cannot be read.
+    "..". See "dir_has_subdirs" for definition of "subdirectories". Dies if
+    directory does not exist or cannot be read.
 
     Basically a shortcut for something like:
 
-     my @subdirnames = do { opendir my $dh, $dir; grep { $_ ne '.' && $_ ne '..' && -d } readdir $dh };
+     my @subdirnames = do { opendir my $dh, $dir; grep { $_ ne '.' && $_ ne '..' && !(-l) && (-d _) } readdir $dh };
+
+  get_dir_non_subdirs
+    Usage:
+
+     my @nonsubdirnames = get_dir_non_subdirs([ $dir ]);
+
+    Get all non-subdirectory entries of a directory specified by $dir (or
+    the current dir if unspecified). See "dir_has_subdirs" for definition of
+    "subdirectories". Dies if directory does not exist or cannot be read.
+
+    Basically a shortcut for something like:
+
+     my @nonsubdirnames = do { opendir my $dh, $dir; grep { $_ ne '.' && $_ ne '..' && !(-l) && !(-d) } readdir $dh };
 
   get_dir_dot_subdirs
     Usage:
@@ -221,8 +254,8 @@ FUNCTIONS
      my @dot_subdirnames = get_dir_dot_subdirs([ $dir ]);
 
     Get all "dot" subdirectory entries of a directory specified by $dir (or
-    the current dir if unspecified). Dies if directory does not exist or
-    cannot be read.
+    the current dir if unspecified). See "dir_has_subdirs" for definition of
+    "subdirectories". Dies if directory does not exist or cannot be read.
 
     Basically a shortcut for something like:
 
@@ -234,7 +267,8 @@ FUNCTIONS
      my @non_dot_subdirnames = get_dir_non_dot_subdirs([ $dir ]);
 
     Get all non-"dot" subdirectory entries of a directory specified by $dir
-    (or the current dir if unspecified). Dies if directory does not exist or
+    (or the current dir if unspecified). See "dir_has_subdirs" for
+    definition of "subdirectories". Dies if directory does not exist or
     cannot be read.
 
     Basically a shortcut for something like:

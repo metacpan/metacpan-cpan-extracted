@@ -22,10 +22,10 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "Test2::Suite" => 0,
+    "Test2::V0" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.10",
+  "VERSION" => "0.11",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,7 +37,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "Mojo::JWT" => 0,
   "Mojolicious" => "8.00",
-  "Test2::Suite" => 0,
+  "Test2::V0" => 0,
   "Test::More" => 0
 );
 

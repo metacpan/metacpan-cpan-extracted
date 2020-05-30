@@ -99,4 +99,14 @@ subtest 'changeable placeholder prefix' => sub {
     is_deeply \@bind, [1, 'active'];
 };
 
+subtest 'ignore casts' => sub {
+    my ($sql, @bind) =
+      sql 'SELECT foo FROM bar WHERE id::text=:id AND status=:status',
+      id     => 1,
+      status => 'active';
+
+    is $sql, 'SELECT foo FROM bar WHERE id::text=? AND status=?';
+    is_deeply \@bind, [1, 'active'];
+};
+
 done_testing;

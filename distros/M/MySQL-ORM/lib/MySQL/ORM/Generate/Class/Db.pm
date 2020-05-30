@@ -158,7 +158,7 @@ method _get_build_table_body {
     	}
     
     	load $want_class;
-    	return $want_class->new(dbh => $self->dbh, schema_name => $self->db_name);
+    	return $want_class->new(dbh => $self->dbh, schema_name => $self->db_name, db => $self);
 	';
 
 	return $body;

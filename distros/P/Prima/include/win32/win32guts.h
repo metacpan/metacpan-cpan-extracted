@@ -109,9 +109,16 @@ typedef HANDLE SOCKETHANDLE;
 	apcWarn;                \
 }
 #define apiErrRet         { apiErr;               return false; }
-#define apiErrCheckRet    { apiErrCheck; if ( rc) return false; }
 #define apcErrRet(err)    { apcErr(err);          return false; }
 #define apcErrClear       { apcError = errOk;                   }
+
+#define apiHErr(hr) {           \
+	apcError = errApcError; \
+	rc = hr;                \
+	apcWarn;                \
+}
+
+#define apiHErrRet(hr)     { apiHErr(hr);           return false; }
 
 #define objCheck          if ( var stage == csDead) return
 #define dobjCheck(handle) if ((( PObject)handle)-> stage == csDead) return
@@ -179,7 +186,7 @@ typedef struct _WinGuts
 	BYTE           emptyKeyState[ 256];// just zeros
 	BYTE          *currentKeyState;    // current virtual key buffer state
 	HKL            keyLayout;          // key layout, most likely latin for Ctrl+Key mapping
-	NONCLIENTMETRICS ncmData;          // windows system data
+	NONCLIENTMETRICSW ncmData;         // windows system data
 	List           transp;             // transparent controls list
 	int            topWindows;         // count of top-level windows in app
 	Bool           focSysDisabled;     // focus system disabled
@@ -212,6 +219,8 @@ typedef struct _WinGuts
 	void*          dragSource;         // not null if dragging
 	Handle         dragSourceWidget;   //
 	Handle         dragTarget;         // last successful drop
+	WORD           language_id;        // default shaping language
+	char           language_descr[32];
 } WinGuts, *PWinGuts;
 
 typedef struct _WindowData
@@ -396,6 +405,8 @@ typedef struct _DrawableData
 	/* cached GetTextMetrics */
 	BYTE           tmPitchAndFamily;
 	LONG           tmOverhang;
+	int            otmsStrikeoutSize, otmsStrikeoutPosition, otmsUnderscoreSize, otmsUnderscorePosition;
+	float          font_sin, font_cos;
 
 	/* HDC attributes storage outside paint mode */
 	Color          lbs[2];
@@ -568,6 +579,7 @@ extern int          timeDefsCount;
 extern PItemRegRec  timeDefs;
 extern PHash        menuBitmapMan;
 extern HBITMAP      uncheckedBitmap;
+extern PHash        scriptCacheMan;
 
 LRESULT CALLBACK    generic_app_handler      ( HWND win, UINT  msg, WPARAM mp1, LPARAM mp2);
 LRESULT CALLBACK    generic_frame_handler    ( HWND win, UINT  msg, WPARAM mp1, LPARAM mp2);
@@ -587,12 +599,12 @@ extern void         dc_compat_free( void);
 extern void         dbm_recreate( Handle self);
 extern Bool         destroy_font_hash( void);
 extern char *       err_msg( DWORD errId, char * buffer);
-extern PDCFont      font_alloc( Font * data, Point * resolution);
+extern PDCFont      font_alloc( Font * data);
 extern void         font_change( Handle self, Font * font);
 extern void         font_clean( void);
-extern void         font_font2logfont( Font * font, LOGFONT * lf);
+extern void         font_font2logfont( Font * font, LOGFONTW * lf);
 extern void         font_free( PDCFont res, Bool permanent);
-extern void         font_logfont2font( LOGFONT * lf, Font * font, Point * resolution);
+extern void         font_logfont2font( LOGFONTW * lf, Font * font, Point * resolution);
 extern void         font_pp2font( char * presParam, Font * font);
 extern void         font_textmetric2font( TEXTMETRICW * tm, Font * fm, Bool readOnly);
 extern Bool         get_font_from_hash( PFont font, Bool bySize);
@@ -640,6 +652,7 @@ extern void         char2wchar( WCHAR * dest, char * src, int lim);
 extern void         textmetric_c2w( LPTEXTMETRICA from, LPTEXTMETRICW to);
 extern int          apcUpdateWindow( HWND wnd );
 extern void         reset_system_fonts(void);
+extern void         register_mapper_fonts(void);
 extern void         dpi_change(void);
 extern Bool         set_dwm_blur( HWND win, int enable, HRGN mask, int transition_on_maximized);
 extern Bool         is_dwm_enabled(void);
@@ -685,6 +698,18 @@ UpdateLayeredWindow(
     __in_opt BLENDFUNCTION* pblend,
     __in DWORD dwFlags);
 #endif
+
+#ifndef MUI_LANGUAGE_NAME
+#define MUI_LANGUAGE_NAME 0x8
+#define MUI_COMPLEX_SCRIPT_FILTER 0x200
+#endif
+
+BOOL
+my_GetUserPreferredUILanguages(
+	DWORD dwFlags, PULONG pulNumLanguages,
+	PZZWSTR pwszLanguagesBuffer, PULONG pcchLanguagesBuffer
+);
+
 
 #ifdef __cplusplus
 }

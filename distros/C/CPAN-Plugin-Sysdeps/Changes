@@ -1,5 +1,10 @@
 Revision history for Perl extension CPAN::Plugin::Sysdeps.
 
+0.65  2020-06-30
+	- mapping update
+	  (especially changed DBD::Pg @ freebsd to depend on
+	   postgres*-client, not postgres*-server)
+
 0.64  2020-05-24
 	- mapping update
 

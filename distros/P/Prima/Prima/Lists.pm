@@ -486,7 +486,7 @@ sub point2item
 				( $l < $self->{count} -1 ) ? 1 : 0
 				if $y >= $r && $x >= 0 && $x < $c;
 			return $t + $r - 1            if $x < 0 && $y >= $r;
-			return $x * $r + $y + $t;
+			return $x * $self->{rows} + $y + $t;
 		} else {
 			if ( $y >= $r) {
 				$x = 0 if $x < 0;
@@ -962,22 +962,34 @@ sub set_focused_item
 	my $topSet = undef;
 	if ( $foc >= 0) {
 		my $mc   = $self-> {multiColumn};
-		my $rows = $self-> {whole_rows} || 1;
-		my $cols = $self-> {whole_columns} || 1;
-		( $cols, $rows) = ( $rows, $cols) if $mc and not $self->{vertical};
-		if ( $foc < $self-> {topItem}) {
-			$topSet = $mc ?
-				$foc - $foc % $rows :
-				$foc;
-		} elsif ( $foc >= $self-> {topItem} + $rows * $cols) {
-			$topSet = $mc ?
-				$foc - $foc % $rows - $rows * ( $cols - 1) :
-				$foc - $rows + 1;
+		if ( $mc ) {
+			my ( $rows, $cols) = ($mc and not $self->{vertical}) ?
+				($self-> {columns} || 1, $self-> {whole_rows} || 1) :
+				($self-> {rows}    || 1, $self-> {whole_columns} || 1);
+			if ( $foc < $self-> {topItem}) {
+				$topSet = $foc - $foc % $rows;
+			} elsif ( $foc >= $self-> {topItem} + $rows * $cols - 1) {
+				$topSet = $foc - $foc % $rows - $rows * ( $cols - 1);
+			}
+		} else {
+			if ( $foc < $self-> {topItem}) {
+				$topSet = $foc;
+			} elsif ( $foc >= $self-> {topItem} + $self->{whole_rows}) {
+				$topSet = $foc - $self->{whole_rows} + 1;
+			}
 		}
 	}
 	$oldFoc = 0 if $oldFoc < 0;
 	$self-> redraw_items( $foc, $oldFoc);
-	$self-> topItem( $topSet) if defined $topSet;
+	if (
+		!$self-> {multiSelect} && !$self-> {extendedSelect} &&
+		defined($topSet) &&
+		($self->{topItem} - $topSet) == ($oldFoc - $foc)
+	) {
+		$self-> set_top_item($topSet, $oldFoc - $foc);
+	} else {
+		$self-> topItem( $topSet) if defined $topSet;
+	}
 }
 
 sub colorIndex
@@ -1224,7 +1236,7 @@ sub add_selection
 
 sub set_top_item
 {
-	my ( $self, $topItem) = @_;
+	my ( $self, $topItem, $with_focus_shift) = @_;
 	$topItem = 0 if $topItem < 0;   # first validation
 	$topItem = $self-> {count} - 1 if $topItem >= $self-> {count};
 	$topItem = 0 if $topItem < 0;   # count = 0 case
@@ -1251,29 +1263,70 @@ sub set_top_item
 	if ( $self-> { multiColumn}) {
 		$iw += $self-> {drawGrid};
 		if ( $self-> {vertical}) {
-			$a[1] += $self-> {yedge};
-			if (( $self-> {rows} != 0) && ( $dt % $self-> {rows} == 0)) {
-				$self-> scroll(
-					-( $dt / $self-> {rows}) * $iw, 0,
-					clipRect => \@a
-				);
-			} else {
+			if ($self->{rows} != 0 && abs($dt) % $self->{rows}) {
+				$a[1] += $self->{yedge} if $self->{integralHeight};
 				$self-> scroll( 0, $ih * $dt, clipRect => \@a);
+				return;
 			}
+
+			if ($self->{integralWidth}) {
+				$a[2] -= $self->{xedge};
+			} elsif ( !defined $with_focus_shift || $with_focus_shift < 0 ) {
+				# invalid xedge on the right and exposed stripe on the left make clipRect too large
+				$self-> invalidate_rect($a[2] - $self->{xedge}, $a[1], $a[2], $a[3]);
+			}
+			if ( defined $with_focus_shift ) {
+				if ( $with_focus_shift < 0 ) {
+					my $dx = $iw + ($self->{integralWidth} ? 0 : $self->{xedge});
+					$self-> invalidate_rect($a[2] - $dx, $a[1], $a[2], $a[3]);
+					$a[2] -= $dx;
+				} else {
+					$self-> invalidate_rect($a[0], $a[1], $a[0] + $iw, $a[3]);
+					$a[0] += $iw;
+				}
+			}
+			$self-> scroll(
+				-( $dt / $self-> {rows}) * $iw, 0,
+				clipRect => \@a
+			);
 		} else {
-			$a[2] = $a[0] + int(( $a[2] - $a[0] ) / $iw) * $iw;
-			if (( $self-> {whole_columns} != 0) && ( $dt % $self-> {whole_columns} == 0)) {
-				$self-> scroll(
-					0, ( $dt / $self-> {whole_columns}) * $ih,
-					clipRect => \@a
-				);
-			} else {
+			if ($self->{columns} > 0 && abs($dt) % $self->{columns}) {
+				$a[2] -= $self->{xedge} if $self->{integralWidth};
 				$self-> scroll(- $iw * $dt, 0, clipRect => \@a);
+				return;
 			}
+
+			if ($self->{integralHeight}) {
+				$a[1] += $self->{yedge};
+			} elsif ( !defined $with_focus_shift || $with_focus_shift < 0 ) {
+				$self-> invalidate_rect($a[0], $a[1], $a[2], $a[1] + $self->{yedge})
+			}
+			if ( defined $with_focus_shift ) {
+				if ( $with_focus_shift < 0 ) {
+					my $dy = $ih + ($self->{integralHeight} ? 0 : $self->{yedge});
+					$self-> invalidate_rect($a[0], $a[1], $a[2], $a[1] + $dy);
+					$a[1] += $dy;
+				} else {
+					$a[3] -= $ih;
+					$self-> invalidate_rect($a[0], $a[3], $a[2], $a[3] + $ih);
+				}
+			}
+			$self-> scroll(
+				0, ( $dt / $self-> {columns}) * $ih,
+				clipRect => \@a
+			);
 		}
 	} else {
 		$a[1] += $self-> {yedge}
 			if $self-> {integralHeight} and $self-> {whole_rows} > 0;
+		if ( defined $with_focus_shift ) {
+			if ( $with_focus_shift < 0 ) {
+				$a[1] += $ih;
+				$a[1] += $self->{yedge} unless $self->{integralHeight};
+			} else {
+				$a[3] -= $ih;
+			}
+		}
 		$self-> scroll( 0, $dt * $ih, clipRect => \@a);
 	}
 	$self-> update_view;
@@ -1393,7 +1446,7 @@ sub draw_text_items
 		} elsif ( $self->{align} == ta::Right) {
 			$dx = ($iw > $width) ? $iw - $width : 0;
 		}
-		$canvas-> text_out_bidi( $self-> get_item_text( $i),
+		$canvas-> text_shape_out( $self-> get_item_text( $i),
 			$x + $dx, $y + $textShift - $j * $self-> {itemHeight} + 1
 		);
 	}
@@ -1412,7 +1465,7 @@ sub std_draw_text_items
 	my @clipRect = $canvas-> clipRect;
 	my $i;
 	my $drawVeilFoc = -1;
-	my $atY    = ( $self-> {itemHeight} - $canvas-> font-> height) / 2;
+	my $atY    = int(( $self-> {itemHeight} - $canvas-> font-> height) / 2 + .5);
 	my $ih     = $self-> {itemHeight};
 	my $offset = $self-> {offset};
 	my $step   = ( $self-> {multiColumn} and !$self-> {vertical}) ?
@@ -1787,7 +1840,8 @@ sub on_keydown
 	if (
 		(( $code & 0xFF) >= ord(' ')) &&
 		( $key == kb::NoKey) &&
-		!($mod & ~km::Shift) && $self-> {count}
+		!($mod & (km::Ctrl|km::Alt)) &&
+		$self-> {count}
 	) {
 		my $i;
 		my ( $c, $hit, $items) = ( lc chr ( $code & 0xFF), undef, $self-> {items});
@@ -1947,7 +2001,7 @@ stores an array of text scalars in a widget. More elaborated storage
 and representation types are not realized, and the programmer is urged
 to use the more abstract classes to derive own mechanisms.
 For example, for a list of items that contain text strings and icons
-see L<Prima::FileDialog/"Prima::DirectoryListBox">.
+see L<Prima::Dialog::FileDialog/"Prima::DirectoryListBox">.
 To organize an item storage, different from C<Prima::ListBox>, it is
 usually enough to overload either the C<Stringify>, C<MeasureItem>,
 and C<DrawItem> events, or their method counterparts: C<get_item_text>,
@@ -2088,7 +2142,7 @@ ARRAY is an array of integer indices of selected items.
 
 =item vertical BOOLEAN
 
-Sets seneral direction of items in multi-column mode. If 1, items increase
+Sets general direction of items in multi-column mode. If 1, items increase
 down-to-right. Otherwise, right-to-down.
 
 Doesn't have any effect in single-column mode.
@@ -2130,9 +2184,12 @@ See L<DrawItem> for parameters description.
 
 Called by C<std_draw_text_items> to draw sequence of text items with
 indices from FIRST to LAST, by STEP, on CANVAS, starting at point X, Y, and
-incrementing the horizontal position with OFFSET. CLIP_RECT is a reference
+incrementing the vertical position with OFFSET. CLIP_RECT is a reference
 to array of four integers with inclusive-inclusive coordinates of the active
 clipping rectangle.
+
+Note that OFFSET must be an integer, otherwise bad effects will be observed
+when text is drawn below Y=0
 
 =item get_item_text INDEX
 
@@ -2396,6 +2453,6 @@ Dmitry Karasik, E<lt>dmitry@karasik.eu.orgE<gt>.
 
 =head1 SEE ALSO
 
-L<Prima>, L<Prima::Widget>, L<Prima::ComboBox>, L<Prima::FileDialog>, F<examples/editor.pl>
+L<Prima>, L<Prima::Widget>, L<Prima::ComboBox>, L<Prima::Dialog::FileDialog>, F<examples/editor.pl>
 
 =cut

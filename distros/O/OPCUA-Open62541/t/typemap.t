@@ -153,13 +153,13 @@ no_leaks_ok { $server->{server}->writeValue(\%nodeid, \%value) }
     "write value leak";
 
 throws_ok { $server->{server}->writeValue(\%nodeid) }
-    (qr/Usage: ${package}::Server::writeValue\(server, nodeId, value\) /,
+    (qr/Usage: ${package}::Server::writeValue\(server, nodeId, newVariant\) /,
     "write value usage");
 no_leaks_ok { eval { $server->{server}->writeValue(\%nodeid) } }
     "write value usage leak";
 
 throws_ok { $server->{server}->writeValue(\%nodeid, undef) }
-    (qr/writeValue: Parameter value is undefined /,
+    (qr/writeValue: Parameter newVariant is undefined /,
     "write value undef");
 no_leaks_ok { eval { $server->{server}->writeValue(\%nodeid, undef) } }
     "write value undef leak";
@@ -192,21 +192,21 @@ no_leaks_ok { eval { $server->{server}->writeValue(\%nodeid, {foo=>"bar"}) } }
 
 $outvalue = {};
 throws_ok { $server->{server}->writeValue(\%nodeid, \$outvalue) }
-    (qr/writeValue: Parameter value is not scalar or array or hash /,
+    (qr/writeValue: Parameter newVariant is not scalar or array or hash /,
     "write value hashref");
 $outvalue = {};
 no_leaks_ok { eval { $server->{server}->writeValue(\%nodeid, \$outvalue) } }
     "write value hashref leak";
 
 throws_ok { $server->{server}->writeValue(\%nodeid, $client) }
-    (qr/writeValue: Parameter value is not scalar or array or hash /,
+    (qr/writeValue: Parameter newVariant is not scalar or array or hash /,
     "write client type");
 is(ref($client), 'OPCUA::Open62541::Client', "write client ref");
 no_leaks_ok { eval { $server->{server}->writeValue(\%nodeid, $client) } }
     "write client type leak";
 
 throws_ok { $server->{server}->writeValue(\%nodeid, $variant) }
-    (qr/writeValue: Parameter value is not scalar or array or hash /,
+    (qr/writeValue: Parameter newVariant is not scalar or array or hash /,
     "write variant type");
 is(ref($variant), 'OPCUA::Open62541::Variant', "write variant ref");
 no_leaks_ok { eval { $server->{server}->writeValue(\%nodeid, $variant) } }
@@ -224,39 +224,39 @@ no_leaks_ok { $server->{server}->readValue(\%nodeid, \$outvalue) }
     "read value leak";
 
 throws_ok { $server->{server}->readValue(\%nodeid) }
-    (qr/Usage: ${package}::Server::readValue\(server, nodeId, outValue\) /,
+    (qr/Usage: ${package}::Server::readValue\(server, nodeId, outVariant\) /,
     "read outvalue usage");
 no_leaks_ok { eval { $server->{server}->readValue(\%nodeid) } }
     "read outvalue usage leak";
 
 throws_ok { $server->{server}->readValue(\%nodeid, undef) }
-    (qr/readValue: Output parameter outValue is undefined /,
+    (qr/readValue: Output parameter outVariant is undefined /,
     "read outvalue undef");
 no_leaks_ok { eval { $server->{server}->readValue(\%nodeid, undef) } }
     "read outvalue undef leak";
 
 throws_ok { $server->{server}->readValue(\%nodeid, 77) }
-    (qr/readValue: Output parameter outValue is not a scalar reference /,
+    (qr/readValue: Output parameter outVariant is not a scalar reference /,
     "read outvalue number");
 no_leaks_ok { eval { $server->{server}->readValue(\%nodeid, 77) } }
     "read outvalue number leak";
 
 $outvalue = 5;
 throws_ok { $server->{server}->readValue(\%nodeid, $outvalue) }
-    (qr/readValue: Output parameter outValue is not a scalar reference /,
+    (qr/readValue: Output parameter outVariant is not a scalar reference /,
     "read outvalue variable");
 $outvalue = 5;
 no_leaks_ok { eval { $server->{server}->readValue(\%nodeid, $outvalue) } }
     "read outvalue variable leak";
 
 throws_ok { $server->{server}->readValue(\%nodeid, []) }
-    (qr/readValue: Output parameter outValue is not a scalar reference /,
+    (qr/readValue: Output parameter outVariant is not a scalar reference /,
     "read outvalue array");
 no_leaks_ok { eval { $server->{server}->readValue(\%nodeid, []) } }
     "read outvalue array leak";
 
 throws_ok { $server->{server}->readValue(\%nodeid, {}) }
-    (qr/readValue: Output parameter outValue is not a scalar reference /,
+    (qr/readValue: Output parameter outVariant is not a scalar reference /,
     "read outvalue hash");
 no_leaks_ok { eval { $server->{server}->readValue(\%nodeid, {}) } }
     "read outvalue hash leak";
@@ -277,14 +277,14 @@ no_leaks_ok { $server->{server}->readValue(\%nodeid, \$outvalue) }
     "read outvalue hashref leak";
 
 throws_ok { $server->{server}->readValue(\%nodeid, $client) }
-    (qr/readValue: Output parameter outValue is not a scalar reference /,
+    (qr/readValue: Output parameter outVariant is not a scalar reference /,
     "read client type");
 no_leaks_ok { eval { $server->{server}->readValue(\%nodeid, $client) } }
     "read client type leak";
 is(ref($client), 'OPCUA::Open62541::Client', "read client ref");
 
 throws_ok { $server->{server}->readValue(\%nodeid, $variant) }
-    (qr/readValue: Output parameter outValue is not a scalar reference /,
+    (qr/readValue: Output parameter outVariant is not a scalar reference /,
     "read outvalue variant");
 no_leaks_ok { eval { $server->{server}->readValue(\%nodeid, $variant) } }
     "read outvalue variant leak";

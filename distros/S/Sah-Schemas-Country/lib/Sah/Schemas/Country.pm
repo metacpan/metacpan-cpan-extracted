@@ -3,7 +3,7 @@ package Sah::Schemas::Country;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-03-02'; # DATE
 our $DIST = 'Sah-Schemas-Country'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: Various Sah schemas related to country codes/names
@@ -20,7 +20,7 @@ Sah::Schemas::Country - Various Sah schemas related to country codes/names
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::Schemas::Country (from Perl distribution Sah-Schemas-Country), released on 2020-03-02.
+This document describes version 0.005 of Sah::Schemas::Country (from Perl distribution Sah-Schemas-Country), released on 2020-03-02.
 
 =head1 HOMEPAGE
 

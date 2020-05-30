@@ -1,15 +1,12 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## DB/Object/Statement.pm
-## Version 0.3.4
-## Copyright(c) 2019 Jacques Deguest
-## Author: Jacques Deguest <jack@deguest.jp>
+## Database Object Interface - ~/lib/DB/Object/Statement.pm
+## Version v0.3.5
+## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2017/07/19
-## Modified 2019/08/25
-## All rights reserved.
+## Modified 2020/05/22
 ## 
-## This program is free software; you can redistribute it and/or modify it 
-## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 ## This package's purpose is to automatically terminate the statement object and
 ## separate them from the connection object (DB::Object).
@@ -25,7 +22,7 @@ BEGIN
     use IO::File;
     use DateTime;
     our( $VERSION, $VERBOSE, $DEBUG );
-    $VERSION    = '0.3.4';
+    $VERSION    = 'v0.3.5';
     $VERBOSE    = 0;
     $DEBUG      = 0;
     use Devel::Confess;
@@ -66,7 +63,6 @@ sub bind_param
         my $err = $self->errstr();
         $err =~ s/ at line \d+.*$//;
         printf( STDERR "%s in %s at line %d within sub '%s'.\n", $err, $self->{ 'file' }, $self->{ 'line' }, $self->{ 'sub' } );
-        ## return( undef() );
         exit( 1 );
     }
     elsif( $rc )
@@ -370,7 +366,7 @@ sub fetchall_arrayref($@)
     my $sth   = $self->{sth};
     if( !$self->executed() )
     {
-        $self->execute() || return( undef() );
+        $self->execute() || return;
     }
     ## $self->_cleanup();
     my $mode  = ref( $slice );
@@ -427,7 +423,7 @@ sub fetchcol($;$)
     my $col_num = shift( @_ );
     if( !$self->executed() )
     {
-        $self->execute() || return( undef() );
+        $self->execute() || return;
     }
     ## $self->_cleanup();
     ## return( $h->fetchcol( $COL_NUM ) );
@@ -446,7 +442,7 @@ sub fetchhash(@)
     my $self = shift( @_ );
     if( !$self->executed() )
     {
-        $self->execute() || return( undef() );
+        $self->execute() || return;
     }
     ## $self->_cleanup();
     ## %hash = $sth->fetchhash;
@@ -459,7 +455,6 @@ sub fetchhash(@)
     else
     {
         return( () );
-        ## return( undef() );
     }
 }
 
@@ -468,7 +463,7 @@ sub fetchrow(@)
     my $self = shift( @_ );
     if( !$self->executed() )
     {
-        $self->execute() || return( undef() );
+        $self->execute() || return;
     }
     ## $self->_cleanup();
     ## @arr = $sth->fetchrow;        # Array context
@@ -498,7 +493,7 @@ sub fetchrow_hashref
     my $sth = $self->{sth};
     if( !$self->executed() )
     {
-        $self->execute() || return( undef() );
+        $self->execute() || return;
     }
     return( $sth->fetchrow_hashref ) if( !$dbo->auto_decode_json && !$dbo->auto_convert_datetime_to_object );
     my $ref = $sth->fetchrow_hashref;
@@ -518,7 +513,7 @@ sub fetchrow_object
     my $basePack = ( ref( $self ) =~ /^DB::Object::([^\:]+)/ )[0];
     if( !$self->executed() )
     {
-        $self->execute() || return( undef() );
+        $self->execute() || return;
     }
     ## $self->_cleanup();
     my $rows = $self->{ 'sth' }->rows;
@@ -933,7 +928,7 @@ sub rows(@)
     my $self = shift( @_ );
     if( !$self->executed() )
     {
-        $self->execute() || return( undef() );
+        $self->execute() || return;
     }
     ## $self->_cleanup();
     ## $rv = $sth->rows;

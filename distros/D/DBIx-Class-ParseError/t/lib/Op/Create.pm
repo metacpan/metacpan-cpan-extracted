@@ -229,7 +229,12 @@ test 'data type' => sub {
             source_name => 'Foo',
             error_str => $error_str,
         });
-        cmp_deeply($error->columns, [qw(is_foo)], 'target column');
+        if ( my $reason = $self->should_skip('data_type', 'columns') ) {
+            SKIP: {
+                skip $reason, 1;
+                cmp_deeply($error->columns, [qw(is_foo)], 'target column');
+            }
+        }
         cmp_deeply(
             $error->column_data,
             {

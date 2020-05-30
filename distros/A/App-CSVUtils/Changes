@@ -1,3 +1,8 @@
+0.029   2020-05-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utility: csv2td.
+
+
 0.028   2019-12-27  Released-By: PERLANCAR; Urgency: medium
 
 	- [csv-sort-rows] Add options --key (-k), --by-sortsub.

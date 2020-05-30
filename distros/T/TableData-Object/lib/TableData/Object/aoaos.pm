@@ -1,7 +1,7 @@
 package TableData::Object::aoaos;
 
-our $DATE = '2019-09-15'; # DATE
-our $VERSION = '0.111'; # VERSION
+our $DATE = '2020-05-29'; # DATE
+our $VERSION = '0.112'; # VERSION
 
 use 5.010001;
 use strict;
@@ -41,6 +41,28 @@ sub new {
 sub row_count {
     my $self = shift;
     scalar @{ $self->{data} };
+}
+
+sub row {
+    my ($self, $idx) = @_;
+    $self->{data}[$idx];
+}
+
+sub row_as_aos {
+    my ($self, $idx) = @_;
+    $self->{data}[$idx];
+}
+
+sub row_as_hos {
+    my ($self, $idx) = @_;
+    my $row_aos = $self->{data}[$idx];
+    return undef unless $row_aos;
+    my $cols = $self->{cols_by_idx};
+    my $row_hos = {};
+    for my $i (0..$#{$cols}) {
+        $row_hos->{$cols->[$i]} = $row_aos->[$i];
+    }
+    $row_hos;
 }
 
 sub rows {
@@ -263,7 +285,7 @@ TableData::Object::aoaos - Manipulate array of arrays-of-scalars via table objec
 
 =head1 VERSION
 
-This document describes version 0.111 of TableData::Object::aoaos (from Perl distribution TableData-Object), released on 2019-09-15.
+This document describes version 0.112 of TableData::Object::aoaos (from Perl distribution TableData-Object), released on 2020-05-29.
 
 =head1 SYNOPSIS
 
@@ -314,7 +336,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

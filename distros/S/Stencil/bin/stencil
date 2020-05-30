@@ -1,0 +1,81 @@
+#!perl
+
+use strict;
+use warnings;
+
+use App::Spec;
+use Stencil::Task;
+
+@ARGV=qw(help) unless @ARGV;
+
+App::Spec->read(\Stencil::Task->data)->runner->run;
+
+print "\n";
+
+=encoding utf8
+
+=head1 NAME
+
+stencil
+
+=head1 ABSTRACT
+
+Code Generation Tool
+
+=head1 SYNOPSIS
+
+  stencil - perl 5 source code generator
+
+  ____________________________________________
+  7     77      77     77     77     77  77  7
+  |  ___!!__  __!|  ___!|  _  ||  ___!|  ||  |
+  !__   7  7  7  |  __|_|  7  ||  7___|  ||  !___
+  7     |  |  |  |     7|  |  ||     7|  ||     7
+  !_____!  !__!  !_____!!__!__!!_____!!__!!_____!
+
+
+  Usage: stencil <subcommands> [options]
+
+  Subcommands:
+  edit  Edit source spec (generate unless exists)
+  init  Initialize workspace
+  make  Generate source code
+  spec  Generate source spec
+  help  Show command help
+
+  Options:
+  --base -b         Stencil project directory
+  --help -h         Show command help (flag)
+
+=head1 DESCRIPTION
+
+This tool lets you generate Perl 5 source code from source code templates
+distributed as regular Perl packages, using the L<Stencil> framework.
+
+=head1 AUTHOR
+
+Al Newkirk, C<awncorp@cpan.org>
+
+=head1 LICENSE
+
+Copyright (C) 2011-2019, Al Newkirk, et al.
+
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the L<"license
+file"|https://github.com/iamalnewkirk/stencil/blob/master/LICENSE>.
+
+=head1 PROJECT
+
+L<Wiki|https://github.com/iamalnewkirk/stencil/wiki>
+
+L<Project|https://github.com/iamalnewkirk/stencil>
+
+L<Initiatives|https://github.com/iamalnewkirk/stencil/projects>
+
+L<Milestones|https://github.com/iamalnewkirk/stencil/milestones>
+
+L<Contributing|https://github.com/iamalnewkirk/stencil/blob/master/CONTRIBUTE.md>
+
+L<Issues|https://github.com/iamalnewkirk/stencil/issues>
+
+=cut

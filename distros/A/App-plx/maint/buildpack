@@ -1,0 +1,47 @@
+#!/bin/sh
+
+set -e
+
+rm -rf packbuild
+
+mkdir -p packbuild/fatlib/local
+cp $(perldoc -lm local::lib) packbuild/fatlib/local/
+mkdir -p packbuild/fatlib/File
+cp $(perldoc -lm File::Which) packbuild/fatlib/File/
+
+
+fragment () {
+  perl -e '
+  use File::Which;
+  my $cpanm = do { local (@ARGV, $/) = which("cpanm"); <> };
+  $cpanm =~ s/^/  /mg;
+  (my $out = $ARGV[0]) =~ s/__CPANM__/$cpanm/;
+  print $out
+' '
+BEGIN {
+  if (@ARGV and $ARGV[0] eq "--spiner") {
+    shift @ARGV;
+    my $cpanm = <<'"'"'CPANM'"'"';
+__CPANM__
+CPANM
+    $cpanm =~ s/^  //mg;
+    $cpanm =~ s/\Qunless (caller)/if (1)/;
+    warn "Running packed cpanm\n";
+    eval $cpanm;
+    die $@ if $@;
+    exit 0;
+  }
+}
+*App::plx::find_cpanm = sub { return ($0, "--spiner") };
+
+'
+
+}
+
+(
+  echo '#!/usr/bin/env perl';
+  perl -E 'require "./bin/plx"; say q{$App::plx::VERSION = }.$App::plx::VERSION.";";'
+  (cd packbuild; fatpack file);
+  fragment;
+  cat bin/plx;
+) >bin/plx-packed

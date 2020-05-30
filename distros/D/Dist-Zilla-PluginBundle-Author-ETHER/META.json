@@ -39,7 +39,7 @@
       },
       "develop" : {
          "recommends" : {
-            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.156",
+            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.157",
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
          },
          "requires" : {
@@ -205,6 +205,7 @@
             "Test::Spelling" : "0.19",
             "Text::Tabs" : "2013.0426",
             "Try::Tiny" : "0",
+            "URI::Escape" : "0",
             "if" : "0",
             "namespace::autoclean" : "0",
             "perl" : "5.010",
@@ -327,15 +328,15 @@
    "provides" : {
       "Dist::Zilla::MintingProfile::Author::ETHER" : {
          "file" : "lib/Dist/Zilla/MintingProfile/Author/ETHER.pm",
-         "version" : "0.156"
+         "version" : "0.157"
       },
       "Dist::Zilla::PluginBundle::Author::ETHER" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/ETHER.pm",
-         "version" : "0.156"
+         "version" : "0.157"
       },
       "Pod::Weaver::PluginBundle::Author::ETHER" : {
          "file" : "lib/Pod/Weaver/PluginBundle/Author/ETHER.pm",
-         "version" : "0.156"
+         "version" : "0.157"
       }
    },
    "release_status" : "stable",
@@ -353,7 +354,7 @@
       "x_IRC" : "irc://irc.perl.org/#distzilla",
       "x_MailingList" : "http://dzil.org/#mailing-list"
    },
-   "version" : "0.156",
+   "version" : "0.157",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.031011"
@@ -534,7 +535,7 @@
                }
             },
             "name" : "@Author::ETHER/stale modules, build",
-            "version" : "0.056"
+            "version" : "0.057"
          },
          {
             "class" : "Dist::Zilla::Plugin::FileFinder::ByName",
@@ -1034,7 +1035,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::AuthorDeps",
             "name" : "@Author::ETHER/Prereqs::AuthorDeps",
-            "version" : "0.006"
+            "version" : "0.007"
          },
          {
             "class" : "Dist::Zilla::Plugin::MinimumPerl",
@@ -1186,7 +1187,7 @@
                }
             },
             "name" : "@Author::ETHER/stale modules, release",
-            "version" : "0.056"
+            "version" : "0.057"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Check",
@@ -1384,7 +1385,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.156",
+                  "tag" : "v0.157",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

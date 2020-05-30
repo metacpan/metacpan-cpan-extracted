@@ -1,6 +1,14 @@
 Revision history for MySQL-ORM
 
 =======
+0.15    - Added a db attribute to the table classes in order to maintain a link
+          back to the orm class. Mainly useful in CustomRoles which want to make
+          use of methods defined in other CustomRoles on different tables.
+        - Fixed selectx method generation to handle self referencing tables.
+          Current solution was to not support selectx fetching the parent table
+          attributes when the parent table == current table.
+        - Better handling of dbh clone
+
 0.14    - Added dbh clone disconnect on destroy logic to avoid warning messages
           if the clone was created while autocommit was off or a transaction
           was open.

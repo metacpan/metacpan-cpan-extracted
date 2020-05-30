@@ -36,7 +36,7 @@ my $bundle_plugin_requirements; # hashref via CPAN::Meta::Requirements
     use Dist::Zilla::PluginBundle::Author::ETHER;
     package Dist::Zilla::PluginBundle::Author::ETHER;
     no warnings 'redefine';
-    sub _pause_config { +{ user => 'URMOM', password =>'mysekritpassword' } }
+    sub _pause_config { +{ user => 'URMOM', password =>'my sekrit password' } }
 
     use Moose;
     __PACKAGE__->meta->make_mutable;

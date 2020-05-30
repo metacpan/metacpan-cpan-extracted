@@ -3,7 +3,7 @@ package Sah::Schema::country::code::alpha3;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-03-02'; # DATE
 our $DIST = 'Sah-Schemas-Country'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use Locale::Codes::Country_Codes ();
 
@@ -49,7 +49,21 @@ Sah::Schema::country::code::alpha3 - Country code (alpha-3)
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::Schema::country::code::alpha3 (from Perl distribution Sah-Schemas-Country), released on 2020-03-02.
+This document describes version 0.005 of Sah::Schema::country::code::alpha3 (from Perl distribution Sah-Schemas-Country), released on 2020-03-02.
+
+=head1 SYNOPSIS
+
+Sample data:
+
+ ""  # INVALID
+
+ "ID"  # INVALID (Only alpha-3 codes are allowed)
+
+ "IDN"  # valid, becomes "idn"
+
+ "xx"  # INVALID
+
+ "xxx"  # INVALID
 
 =head1 DESCRIPTION
 

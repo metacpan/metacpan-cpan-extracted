@@ -8,34 +8,31 @@ plan skip_all => <<'' unless $ENV{TEST_HYPNOTOAD} or $ENV{TEST_HYPNOTOAD_PATH};
 set TEST_HYPNOTOAD or TEST_HYPNOTOAD_PATH to enable this test (developer only!)
 
 use Config;
-use File::Spec::Functions qw(catdir catfile);
-use File::Temp 'tempdir';
-use FindBin;
 use IO::Socket::INET;
 use Mojo::IOLoop::Server;
 use Mojo::Server::Hypnotoad;
 use Mojo::UserAgent;
-use Mojo::Util qw(slurp spurt);
+use Mojo::File qw(path tempdir);
 
 require Mojolicious::Plugin::SizeLimit;
 
 my ($total, $shared) = Mojolicious::Plugin::SizeLimit::check_size();
 
 unless (ok $total, "OS ($^O) is supported") {
-    done_testing();
+    done_testing;
     exit 0;
 }
 
 # Prepare script
 my $perl = $Config{perlpath};
-my $hypnotoad = $ENV{TEST_HYPNOTOAD_PATH} || catfile $Config{bin}, 'hypnotoad';
+my $hypnotoad = path($ENV{TEST_HYPNOTOAD_PATH} // ($Config{bin}, 'hypnotoad'));
 
 plan skip_all => <<"" unless -e $hypnotoad;
 No hypnotoad found at $hypnotoad. Set TEST_HYPNOTOAD_PATH to correct path.
 
-my $dir = tempdir CLEANUP => 1;
-my $script = catdir $dir, 'myapp.pl';
-my $log    = catdir $dir, 'mojo.log';
+my $dir    = tempdir CLEANUP => 1;
+my $script = $dir->child('myapp.pl');
+my $log    = $dir->child('mojo.log');
 my $port   = Mojo::IOLoop::Server->generate_port;
 
 my $tmpl = <<EOF;
@@ -72,7 +69,7 @@ get '/size' => sub {
 app->start;
 EOF
 
-spurt sprintf($tmpl, ''), $script;
+$script->spurt(sprintf $tmpl, '');
 
 # Start
 open my $start, '-|', $perl, $hypnotoad, $script;
@@ -132,7 +129,7 @@ else {
 }
 
 # Update script
-spurt sprintf($tmpl, "$p => $v, report_level => 'info'"), $script;
+$script->spurt(sprintf $tmpl, "$p => $v, report_level => 'info'");
 
 open my $hot_deploy1, '-|', $perl, $hypnotoad, $script;
 
@@ -186,8 +183,7 @@ like $wpid3, qr/^\d+$/, 'right content';
 isnt $wpid3, $wpid2, 'worker pid changed again';
 
 # Update script again
-spurt sprintf($tmpl, "$p => $v, check_interval => 3, report_level => 'warn'"),
-      $script;
+$script->spurt(sprintf $tmpl, "$p => $v, check_interval => 3, report_level => 'warn'");
 
 open my $hot_deploy2, '-|', $perl, $hypnotoad, $script;
 
@@ -244,8 +240,7 @@ open my $stop, '-|', $perl, $hypnotoad, $script, '-s';
 sleep 1 while _port($port);
 
 # Check log
-$log = slurp $log;
-like $log, qr/
+like $log->slurp, qr/
         Manager\s+$mpid1\s+started
         .+
         Worker\s+$wpid1\s+started
@@ -308,7 +303,7 @@ like $log, qr/
     /sx, 'log is correct';
 
 sub _pid {
-    return undef unless open my $file, '<', catdir($dir, 'hypnotoad.pid');
+    return undef unless open my $file, '<', $dir->child('hypnotoad.pid');
     my $pid = <$file>;
     chomp $pid;
     return $pid;

@@ -1,9 +1,9 @@
 package Net::DNS::Nameserver;
 
 #
-# $Id: Nameserver.pm 1761 2020-01-01 11:58:34Z willem $
+# $Id: Nameserver.pm 1781 2020-05-13 08:58:25Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1761 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1781 $)[1];
 
 
 =head1 NAME
@@ -39,7 +39,7 @@ See L</EXAMPLE> for an example.
 
 =cut
 
-use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.32; 1;';
+use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.38; 1;';
 
 use strict;
 use warnings;

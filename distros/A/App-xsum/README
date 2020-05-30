@@ -3,8 +3,8 @@ NAME
     algorithms)
 
 VERSION
-    This document describes version 0.009 of App::xsum (from Perl
-    distribution App-xsum), released on 2019-11-29.
+    This document describes version 0.010 of App::xsum (from Perl
+    distribution App-xsum), released on 2020-05-28.
 
 SYNOPSIS
     See xsum.
@@ -50,7 +50,7 @@ FUNCTIONS
 
         Supply checksum(s).
 
-    *   digest_args => *array[str]*
+    *   digest_args => *array*
 
         If you use "Digest" as the algorithm, you can pass arguments for the
         Digest module here.
@@ -87,19 +87,19 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    shasum. Script which comes with the perl distribution.
+    shasum. Perinci::To::POD=HASH(0x55f16a06f658).
 
-    md5sum. Unix utility.
+    md5sum. Perinci::To::POD=HASH(0x55f16a06f658).
 
-    sha1sum. Unix utility.
+    sha1sum. Perinci::To::POD=HASH(0x55f16a06f658).
 
-    sha224sum. Unix utility.
+    sha224sum. Perinci::To::POD=HASH(0x55f16a06f658).
 
-    sha256sum. Unix utility.
+    sha256sum. Perinci::To::POD=HASH(0x55f16a06f658).
 
-    sha384sum. Unix utility.
+    sha384sum. Perinci::To::POD=HASH(0x55f16a06f658).
 
-    sha512sum. Unix utility.
+    sha512sum. Perinci::To::POD=HASH(0x55f16a06f658).
 
     sum from PerlPowerTools (which only supports older algorithms like
     CRC32).
@@ -108,7 +108,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

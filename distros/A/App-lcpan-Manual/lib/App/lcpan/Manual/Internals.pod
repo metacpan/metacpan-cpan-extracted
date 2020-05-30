@@ -20,7 +20,7 @@ App::lcpan::Manual::Internals - App::lcpan internals
 
 =head1 VERSION
 
-version 1.057.000
+version 1.058.000
 
 =head1 INDEXING
 

@@ -12,6 +12,7 @@ lib/Module/Generic/Tie.pod
 Makefile.PL
 MANIFEST
 META.yml
+README
 README.md
 t/00.load.t
 t/01.pod.t

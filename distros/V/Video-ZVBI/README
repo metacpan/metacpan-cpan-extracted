@@ -1,9 +1,9 @@
-ZVBI library interface module
------------------------------
+ZVBI library interface module for Perl
+--------------------------------------
 
 Name:           Video-ZVBI
-Version:        1.0.0
-Date:           April 2020
+Version:        1.1.0
+Date:           May 2020
 
 DLSIP-code:     RcdOg
                 - stable release
@@ -22,43 +22,50 @@ Description
 
 This Perl module provides an object-oriented interface to the ZVBI
 library. The ZVBI library allows accessing broadcast data services such
-as teletext or closed caption via analog video or DVB capture devices.
+as teletext and closed caption via analog video or DVB capture devices.
 
 Official ZVBI library description:
 
   "The ZVBI library provides routines to access raw VBI sampling devices
-  (currently the Linux V4L & V4L2 APIs and the FreeBSD, OpenBSD,
+  (currently the Linux DVB & V4L2 APIs and the FreeBSD, OpenBSD,
   NetBSD and BSDi bktr driver API are supported), a versatile raw VBI
   bit slicer, decoders for various data services and basic search, render
   and export functions for text pages. The library was written for the
   Zapping TV viewer and Zapzilla Teletext browser."
 
-The ZVBI Perl module covers all exported libzvbi functions.
+The ZVBI module for Perl covers all exported libzvbi functions.
 
 The Perl interface is largely based on blessed references to binary
 pointers. Internally the module uses the native C structures of libzvbi
 as far as possible.  Only in the last step, when a Perl script wants
 to manipulate captured data directly (i.e. not via library functions),
-the structures' data is copied into Perl data types.  This approach
+the structures' data is converted into Perl data types.  This approach
 allows for a pretty snappy performance.
 
-Best starting point to get familiar with the module having a look at
-ZVBI <http://zapping.sourceforge.net/ZVBI/index.html>, the documentation
-generated when building the ZVBI package, and the example scripts
-provided in the example/ sub-directory: these are more or less direct C
-to Perl ports of the respective programs in the test/ sub-directory of
-the libzvbi sources with a few additions, such as a teletext level 2.5
-browser implemented in apx. 300 lines of Perl::Tk.
+Best starting point to get familiar with the module is having a look at
+the "Class Hierarchy", description of the main classes in the API
+documentation and the example scripts provided in the "examples/"
+sub-directory, which demonstrate use of all the main classes. (The
+examples are a more or less direct C to Perl ports of the respective
+programs in the "test/" sub-directory of the libzvbi source tree, plus a
+few additions, such as a teletext level 2.5 browser implemented in apx.
+300 lines of Perl::Tk.) A description of all example scripts can be found
+in the API documentation in section "Examples". Additionally you can look
+at the ZVBI home at <http://zapping.sourceforge.net/ZVBI/index.html> and
+the ZVBI library documentation (unfortunately not available online; built
+via doxygen when compiling the library).
+
+Finally note there is an equivalent module called "Zvbi" for Python at
+<https://pypi.org/project/Zvbi/>.
 
 
 Comparison with the Video-Capture-VBI module
 ---------------------------------------------
 
-You may have noticed that there already is a Perl VBI module which
-provides very similar functionality.  The approach is completely
-different though: The older VBI module contains an actual implementation
-of a teletext and VPS slicers and databases, while ZVBI is an interface
-layer to an external C library.
+You may have noticed there already is a Perl module which provides similar
+functionality.  The approach is completely different though: The older VBI
+module contains an actual implementation of a teletext and VPS slicers and
+databases, while ZVBI is an interface layer to an external C library.
 
 Besides that, the reason for not just contributing code to the
 existing module was that libzvbi alone can almost entirely replace

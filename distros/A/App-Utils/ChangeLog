@@ -12,3 +12,6 @@ App::Utils Perl package
 2020-05-13 20:39:27 Version 0.03
  - added command "remove-empty-dirs"
 
+2020-05-30 Version 0.042 (several versions to experiment with view)
+ - move utility commands into directory "bin/"
+ - improving documentation

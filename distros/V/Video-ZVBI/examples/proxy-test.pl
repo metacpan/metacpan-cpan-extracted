@@ -2,7 +2,7 @@
 #
 #  VBI proxy test client
 #
-#  Copyright (C) 2003,2004,2006,2007 Tom Zoerner
+#  Copyright (C) 2003,2004,2006,2007,2020 Tom Zoerner
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License version 2 as
@@ -20,15 +20,14 @@
 #
 #  Description:
 #
-#    This is a small demo application for the VBI proxy and libzvbi.
-#    It will read VBI data from the device given on the command line
-#    and dump requested services' data to standard output.  See below
-#    for a list of possible options.
+#   Example for the use of class Video::ZVBI::proxy. The script can
+#   capture either from a proxy daemon or a local device. Continuously
+#   shows summary of captured data on the terminal. Also allows changing
+#   services and channels during capturing (e.g.  by entering "+ttx" or
+#   "-ttx" via terminal at STDIN.) Run the script with option -help for a
+#   list of supported command line options.
 #
-#    This Perl script has been translated from proxy-test.c which is
-#    located in the test directory of the libzvbi package.
-#
-#  $Id: proxy-test.pl,v 1.1 2007/11/18 18:48:35 tom Exp tom $
+#   (This is a direct translation of test/proxy-test.c in libzvbi.)
 #
 
 use blib;
@@ -38,13 +37,12 @@ use POSIX;
 use Fcntl;
 use Video::ZVBI qw(/^VBI_/);
 
-use constant VIDIOCGCAP => 0x803C7601;  # from linux/videodev.h
-use constant VIDIOCGCHAN => 0xC0307602;
-use constant VIDIOCSCHAN => 0x40307603;
-use constant VIDIOCGFREQ => 0x8008760E;
-use constant VIDIOCSFREQ => 0x4008760F;
-use constant VIDIOCGTUNER => 0xC0407604;
-use constant VIDIOCSTUNER => 0x40407605;
+# constants from linux/videodev2.h
+use constant VIDIOC_ENUMINPUT => 0xC050561A;
+use constant VIDIOC_G_INPUT => 0x80045626;
+use constant VIDIOC_S_INPUT => 0xC0045627;
+use constant VIDIOC_G_FREQUENCY => 0xC02C5638;
+use constant VIDIOC_S_FREQUENCY => 0x402C5639;
 
 my $opt_device = "/dev/vbi0";
 my $opt_buf_count = 5;
@@ -53,7 +51,7 @@ my $opt_scanning = 0;
 my $opt_services = 0;
 my $opt_strict = 0;
 my $opt_debug_level = 0;
-my $opt_channel = -1;
+my $opt_vinput = -1;
 my $opt_freq = -1;
 my $opt_chnprio = VBI_CHN_PRIO_INTERACTIVE;
 my $opt_subprio = 0;
@@ -72,59 +70,55 @@ my $update_services = 0;
 my $proxy; # for callback
 
 # ---------------------------------------------------------------------------
-# Switch channel and frequency (Video 4 Linux #1 API)
+# Switch channel and frequency (Video 4 Linux #2 API)
 #
 sub SwitchTvChannel {
-   my ($proxy, $channel, $freq) = @_;
-   my ($vc_channel, $vc_tuners, $vc_flags, $vc_type, $vc_norm);
-   my $vchan; #struct video_channel
+   my ($proxy, $input_idx, $freq) = @_;
    my $result = 1;
 
-   if ($channel != -1) {
+   if ($input_idx != -1) {
       $result = 0;
 
-      my $norm = 0;
-      if ($opt_scanning == 625) {
-         $norm = 0;
-      } elsif ($opt_scanning == 525) {
-         $norm = 1;
-      }
-      $vchan = pack("ix32iLss", $channel, 0, 0, 0, $norm);
-
       # get current config of the selected chanel
-      if ($proxy->device_ioctl(VIDIOCGCHAN, $vchan) == 0) {
-         ($vc_channel, $vc_tuners, $vc_flags, $vc_type, $vc_norm) = unpack("ix32iLss", $vchan);
+      my $vinp = pack("i", 0);
+      if ($proxy->device_ioctl(VIDIOC_G_INPUT, $vinp) == 0) {
+         my $prev_inp_idx = unpack("i", $vinp);
 
          # insert requested channel and norm into the struct
-         $vchan = pack("ix32iLss", $channel, $vc_tuners, $vc_flags, $vc_type, $norm);
+         $vinp = pack("i", $input_idx);
 
          # send channel change request
-         if ($proxy->device_ioctl(VIDIOCSCHAN, $vchan) == 0) {
+         if ($proxy->device_ioctl(VIDIOC_S_INPUT, $vinp) == 0) {
+            print STDERR "Successfully switched video input from $prev_inp_idx to $input_idx\n";
             $result = 1;
          } else {
-            print STDERR "ioctl VIDIOCSCHAN: $!\n";
+            print STDERR "ioctl VIDIOC_S_INPUT: $!\n";
          }
       } else {
-         print STDERR "ioctl VIDIOCGCHAN: $!\n";
+         print STDERR "ioctl VIDIOC_G_INPUT: $!\n";
       }
    }
 
    if ($freq != -1) {
       $result = 0;
 
-      if ( ($channel == -1) ||
-           (($vc_type & 1) && ($vc_flags & 1)) ) {
+      # query current tuner parameters (including frequency)
+      my $vfreq = pack("LLLx32", 0, 0, 0);
+      if ($proxy->device_ioctl(VIDIOC_G_FREQUENCY, $vfreq) == 0) {
+         my ($vtuner, $vtype, $prev_freq) = unpack("LLLx32", $vfreq);
 
          # send frequency change request
-         my $arg = pack("L", $freq);
-         if ($proxy->device_ioctl(VIDIOCSFREQ, $arg) == 0)
+         my $vfreq = pack("LLLx32", $vtuner, $vtype, $freq);
+         if ($proxy->device_ioctl(VIDIOC_S_FREQUENCY, $vfreq) == 0)
          {
+            print STDERR "Successfully switched frequency: from $prev_freq to $freq ".
+                         "(tuner:$vtuner type:$vtype)\n";
             $result = 1;
          } else {
-            print STDERR "ioctl VIDIOCSFREQ: $!\n";
+            print STDERR "ioctl VIDIOC_S_FREQUENCY: $!\n";
          }
       } else {
-         print STDERR "cannot tune frequency: channel $channel has no tuner\n";
+         print STDERR "ioctl VIDIOC_G_FREQUENCY: $!\n";
       }
    }
    return $result;
@@ -147,8 +141,8 @@ sub ProxyEventCallback {
       } elsif ($ev_mask & VBI_PROXY_EV_CHN_GRANTED) {
          print STDERR "ProxyEventCallback: token granted\n";
 
-         if (($opt_channel != -1) || ($opt_freq != -1)) {
-            if (SwitchTvChannel($proxy, $opt_channel, $opt_freq)) {
+         if (($opt_vinput != -1) || ($opt_freq != -1)) {
+            if (SwitchTvChannel($proxy, $opt_vinput, $opt_freq)) {
                $flags = VBI_PROXY_CHN_TOKEN |
                         VBI_PROXY_CHN_FLUSH;
             } else {
@@ -169,9 +163,9 @@ sub ProxyEventCallback {
       }
       if ($ev_mask & VBI_PROXY_EV_CHN_CHANGED) {
          my $lfreq = 0;
-         my $buf = pack("L", $lfreq);
-         if ($proxy->device_ioctl(VIDIOCGFREQ, $buf) == 0) {
-            $lfreq = unpack("L", $buf);
+         my $vfreq = pack("LLLx32", 0, 0, 0);
+         if ($proxy->device_ioctl(VIDIOC_G_FREQUENCY, $vfreq) == 0) {
+            $lfreq = (unpack("LLLx32", $vfreq))[2];
          }
          print STDERR "ProxyEventCallback: TV channel changed: $lfreq\n";
       }
@@ -319,7 +313,7 @@ my $usage =
                    "       -dev <path>         : device path\n".
                    "       -api <type>         : v4l API: proxy|v4l2|v4l\n".
                    "       -strict <level>     : service strictness level: 0..2\n".
-                   "       -channel <index>    : switch video input channel\n".
+                   "       -vinput <index>     : switch video input source\n".
                    "       -freq <kHz * 16>    : switch TV tuner frequency\n".
                    "       -chnprio <1..3>     : channel switch priority\n".
                    "       -subprio <0..4>     : background scheduling priority\n".
@@ -357,6 +351,7 @@ sub parse_argv {
          $opt_device = shift @ARGV;
          die "-dev $opt_device: doesn't exist\n" unless -e $opt_device;
          die "-dev $opt_device: not a character device\n" unless -c $opt_device;
+         warn "WARNING: DVB devices are not supported by the proxy\n" if $opt_device =~ /dvb/;
       } elsif (/^-api/) {
          die "Missing argument for $_\n$usage" unless $#ARGV>=0;
          $opt_api = shift @ARGV;
@@ -381,10 +376,10 @@ sub parse_argv {
          die "Missing argument for $_\n$usage" unless $#ARGV>=0;
          $opt_strict = shift @ARGV;
          die "$_ $opt_strict: expect numeric argument\n" unless $opt_strict =~ /^\d+$/;
-      } elsif (/^-channel/) {
+      } elsif (/^-vinput/) {
          die "Missing argument for $_\n$usage" unless $#ARGV>=0;
-         $opt_channel = shift @ARGV;
-         die "$_ $opt_channel: expect numeric argument\n" unless $opt_channel =~ /^\d+$/;
+         $opt_vinput = shift @ARGV;
+         die "$_ $opt_vinput: expect numeric argument\n" unless $opt_vinput =~ /^\d+$/;
       } elsif (/^-freq/) {
          die "Missing argument for $_\n$usage" unless $#ARGV>=0;
          $opt_freq = shift @ARGV;
@@ -459,18 +454,18 @@ sub main {
       $lastLineCount = -1;
 
       # switch to the requested channel
-      if ( ($opt_channel != -1) || ($opt_freq != -1) ||
+      if ( ($opt_vinput != -1) || ($opt_freq != -1) ||
            ($opt_chnprio != VBI_CHN_PRIO_INTERACTIVE) ) {
          my $chn_profile = {};
 
-         $chn_profile->{is_valid}      = ($opt_channel != -1) || ($opt_freq != -1);
+         $chn_profile->{is_valid}      = ($opt_vinput != -1) || ($opt_freq != -1);
          $chn_profile->{sub_prio}      = $opt_subprio;
          $chn_profile->{min_duration}  = 10;
 
          $proxy->channel_request($opt_chnprio, $chn_profile);
 
          if ($opt_chnprio != VBI_CHN_PRIO_BACKGROUND) {
-            SwitchTvChannel($proxy, $opt_channel, $opt_freq);
+            SwitchTvChannel($proxy, $opt_vinput, $opt_freq);
          }
       }
 
@@ -602,4 +597,3 @@ sub main {
 
 parse_argv();
 main();
-

@@ -77,16 +77,28 @@ static void
 clear_font_abc_caches( Handle self)
 {
 	PList u;
+	if (( u = var-> font_abc_glyphs)) {
+		int i;
+		for ( i = 0; i < u-> count; i += 2)
+			free(( void*) u-> items[ i + 1]);
+		plist_destroy( u);
+		var-> font_abc_glyphs = NULL;
+	}
 	if (( u = var-> font_abc_unicode)) {
 		int i;
 		for ( i = 0; i < u-> count; i += 2)
 			free(( void*) u-> items[ i + 1]);
 		plist_destroy( u);
-		var-> font_abc_unicode = nil;
+		var-> font_abc_unicode = NULL;
 	}
 	if ( var-> font_abc_ascii) {
 		free( var-> font_abc_ascii);
-		var-> font_abc_ascii = nil;
+		var-> font_abc_ascii = NULL;
+	}
+	if ( var-> font_abc_glyphs_ranges ) {
+		free(var-> font_abc_glyphs_ranges);
+		var-> font_abc_glyphs_ranges = NULL;
+		var-> font_abc_glyphs_n_ranges = 0;
 	}
 }
 
@@ -218,8 +230,14 @@ Drawable_font_add( Handle self, Font * source, Font * dest)
 		if ( usePitch ) dest-> pitch     = source-> pitch;
 		if ( useSize  ) dest-> size      = source-> size;
 		if ( useVec   ) dest-> vector    = source-> vector;
-		if ( useName  ) strcpy( dest-> name, source-> name);
-		if ( useEnc   ) strcpy( dest-> encoding, source-> encoding);
+		if ( useName  ) {
+			strcpy( dest-> name, source-> name);
+			dest->is_utf8.name = source->is_utf8.name;
+		}
+		if ( useEnc   ) {
+			strcpy( dest-> encoding, source-> encoding);
+			dest->is_utf8.encoding = source->is_utf8.encoding;
+		}
 	}
 
 	/* nulling dependencies */
@@ -241,8 +259,10 @@ Drawable_font_add( Handle self, Font * source, Font * dest)
 		else if ( dest-> width  > 16383 ) dest-> width  = 16383;
 	if ( dest-> size   <= 0) dest-> size   = 1;
 		else if ( dest-> size   > 16383 ) dest-> size   = 16383;
-	if ( dest-> name[0] == 0)
+	if ( dest-> name[0] == 0) {
 		strcpy( dest-> name, "Default");
+		dest->is_utf8.name = false;
+	}
 	if ( dest-> undef.pitch || dest-> pitch < fpDefault || dest-> pitch > fpFixed)
 		dest-> pitch = fpDefault;
 	if ( dest-> undef. direction )
@@ -251,6 +271,8 @@ Drawable_font_add( Handle self, Font * source, Font * dest)
 		dest-> style = 0;
 	if ( dest-> undef. vector || dest-> vector < fvBitmap || dest-> vector > fvDefault)
 		dest-> vector = fvDefault;
+	if ( dest-> undef. encoding )
+		dest-> encoding[0] = 0;
 	memset(&dest->undef, 0, sizeof(dest->undef));
 
 	return useSize && !useHeight;
@@ -335,7 +357,7 @@ Drawable_get_physical_palette( Handle self)
 }
 
 SV *
-Drawable_get_font_abcdef( Handle self, int first, int last, Bool unicode, PFontABC (*func)(Handle, int, int, Bool))
+Drawable_get_font_abcdef( Handle self, int first, int last, int flags, PFontABC (*func)(Handle, int, int, int))
 {
 	int i;
 	AV * av;
@@ -343,22 +365,25 @@ Drawable_get_font_abcdef( Handle self, int first, int last, Bool unicode, PFontA
 
 	if ( first < 0) first = 0;
 	if ( last  < 0) last  = 255;
-	if ( !unicode) {
+
+	if ( flags & toGlyphs )
+		flags &= ~toUTF8;
+	else if ( !(flags & toUTF8)) {
 		if ( first > 255) first = 255;
 		if ( last  > 255) last  = 255;
 	}
 
 	if ( first > last)
-		abc = nil;
+		abc = NULL;
 	else {
 		gpARGS;
 		gpENTER( newRV_noinc(( SV *) newAV()));
-		abc = func( self, first, last, unicode );
+		abc = func( self, first, last, flags );
 		gpLEAVE;
 	}
 
 	av = newAV();
-	if ( abc != nil) {
+	if ( abc != NULL) {
 		for ( i = 0; i <= last - first; i++) {
 			av_push( av, newSVnv( abc[ i]. a));
 			av_push( av, newSVnv( abc[ i]. b));
@@ -370,17 +395,37 @@ Drawable_get_font_abcdef( Handle self, int first, int last, Bool unicode, PFontA
 }
 
 SV *
-Drawable_get_font_abc( Handle self, int first, int last, Bool unicode)
+Drawable_get_font_abc( Handle self, int first, int last, int flags)
 {
-	return Drawable_get_font_abcdef( self, first, last, unicode, apc_gp_get_font_abc);
+	return Drawable_get_font_abcdef( self, first, last, flags, apc_gp_get_font_abc);
 }
 
 SV *
-Drawable_get_font_def( Handle self, int first, int last, Bool unicode)
+Drawable_get_font_def( Handle self, int first, int last, int flags)
 {
-	return Drawable_get_font_abcdef( self, first, last, unicode, apc_gp_get_font_def);
+	return Drawable_get_font_abcdef( self, first, last, flags, apc_gp_get_font_def);
 }
 
+SV *
+Drawable_get_font_languages( Handle self)
+{
+	char *buf, *p;
+	AV * av = newAV();
+	gpARGS;
+
+	gpENTER( newRV_noinc(( SV *) av));
+	p = buf = apc_gp_get_font_languages( self);
+	gpLEAVE;
+	if (p) {
+		while (*p) {
+			int len = strlen(p);
+			av_push(av, newSVpv(p, len));
+			p += len + 1;
+		}
+		free(buf);
+	}
+	return newRV_noinc(( SV *) av);
+}
 SV *
 Drawable_get_font_ranges( Handle self)
 {
@@ -455,34 +500,17 @@ Drawable_put_image_indirect( Handle self, Handle image, int x, int y, int xFrom,
 	return ok;
 }
 
-Bool
-Drawable_text_out( Handle self, SV * text, int x, int y)
-{
-	Bool ok;
-	if ( !SvROK( text )) {
-		STRLEN dlen;
-		char * c_text = SvPV( text, dlen);
-		Bool   utf8 = prima_is_utf8_sv( text);
-		if ( utf8) dlen = utf8_length(( U8*) c_text, ( U8*) c_text + dlen);
-		ok = apc_gp_text_out( self, c_text, x, y, dlen, utf8);
-		if ( !ok) perl_error();
-	} else {
-		SV * ret = sv_call_perl(text, "text_out", "<Hii", self, x, y);
-		ok = ret && SvTRUE(ret);
-	}
-	return ok;
-}
-
 static Bool
 read_polypoints( Handle self, SV * points, char * procName, int min, Bool (*procPtr)(Handle,int,Point*))
 {
 	int count;
 	Point * p;
 	Bool ret = false;
-	if (( p = (Point*) prima_read_array( points, procName, true, 2, min, -1, &count)) != NULL) {
+	Bool do_free;
+	if (( p = (Point*) prima_read_array( points, procName, 'i', 2, min, -1, &count, &do_free)) != NULL) {
 		ret = procPtr( self, count, p);
 		if ( !ret) perl_error();
-		free(p);
+		if ( do_free ) free(p);
 	}
 	return ret;
 }
@@ -502,11 +530,11 @@ Drawable_bars( Handle self, SV * rects)
 {
 	int count;
 	Rect * p;
-	Bool ret = false;
-	if (( p = prima_read_array( rects, "Drawable::bars", true, 4, 0, -1, &count)) != NULL) {
+	Bool ret = false, do_free;
+	if (( p = prima_read_array( rects, "Drawable::bars", 'i', 4, 0, -1, &count, &do_free)) != NULL) {
 		ret = apc_gp_bars( self, count, p);
 		if ( !ret) perl_error();
-		free( p);
+		if ( do_free ) free( p);
 	}
 	return ret;
 }
@@ -528,10 +556,10 @@ Drawable_render_glyph( Handle self, int index, HV * profile)
 	hv_clear(profile); /* old gencls bork */
 	gpLEAVE;
 
-	if ( count == 0 ) return nilSV;
+	if ( count < 0 ) return nilSV;
 	ret = prima_array_new(sizeof(int) * count);
 	memcpy( prima_array_get_storage(ret), buffer, sizeof(int) * count);
-	free( buffer );
+	if ( buffer ) free( buffer );
 	return prima_array_tie( ret, sizeof(int), "i");
 }
 
@@ -743,7 +771,7 @@ Drawable_render_spline( SV * obj, SV * points, HV * profile)
 	} else
 		precision = 24;
 
-	p = (NPoint*) prima_read_array( points, "Drawable::render_spline", false, 2, degree + 1, -1, &n_points);
+	p = (NPoint*) prima_read_array( points, "Drawable::render_spline", 'd', 2, degree + 1, -1, &n_points, NULL);
 	if ( !p) goto EXIT;
 
 	/* closed curve will need at least one extra point and unclamped default knot set */
@@ -760,15 +788,15 @@ Drawable_render_spline( SV * obj, SV * points, HV * profile)
 	n_points += n_add_points;
 
 	if ( pexist( knots )) {
-		knots = (double*) prima_read_array( pget_sv(knots), "knots", false, 1,
-			n_points + degree + 1, n_points + degree + 1, NULL);
+		knots = (double*) prima_read_array( pget_sv(knots), "knots", 'd', 1,
+			n_points + degree + 1, n_points + degree + 1, NULL, NULL);
 		if (!knots) goto EXIT;
 	} else
 		knots = default_knots(n_points, degree, !closed);
 
 	if ( pexist( weights )) {
-		weights = (double*) prima_read_array(pget_sv(weights), "weights", false, 1,
-			n_points, n_points, NULL);
+		weights = (double*) prima_read_array(pget_sv(weights), "weights", 'd', 1,
+			n_points, n_points, NULL, NULL);
 		if (!weights) goto EXIT;
 		dim = 3;
 	} else {
@@ -858,502 +886,6 @@ EXIT:
 	}
 }
 
-int
-Drawable_get_text_width( Handle self, SV * text, Bool addOverhang)
-{
-	gpARGS;
-	int res;
-	if ( !SvROK( text )) {
-		STRLEN dlen;
-		char * c_text = SvPV( text, dlen);
-		Bool   utf8 = prima_is_utf8_sv( text);
-		if ( utf8) dlen = utf8_length(( U8*) c_text, ( U8*) c_text + dlen);
-		gpENTER(0);
-		res = apc_gp_get_text_width( self, c_text, dlen, addOverhang, utf8);
-		gpLEAVE;
-	} else {
-		SV * ret;
-		gpENTER(0);
-		ret = sv_call_perl(text, "get_text_width", "<Hi", self, addOverhang);
-		gpLEAVE;
-		res = (ret && SvOK(ret)) ? SvIV(ret) : 0;
-	}
-	return res;
-}
-
-SV *
-Drawable_get_text_box( Handle self, SV * text)
-{
-	gpARGS;
-	Point * p;
-	AV * av;
-	int i;
-	if ( !SvROK( text )) {
-		STRLEN dlen;
-		char * c_text = SvPV( text, dlen);
-		Bool   utf8 = prima_is_utf8_sv( text);
-		if ( utf8) dlen = utf8_length(( U8*) c_text, ( U8*) c_text + dlen);
-		gpENTER( newRV_noinc(( SV *) newAV()));
-		p = apc_gp_get_text_box( self, c_text, dlen, utf8);
-		gpLEAVE;
-
-		av = newAV();
-		if ( p) {
-			for ( i = 0; i < 5; i++) {
-				av_push( av, newSViv( p[ i]. x));
-				av_push( av, newSViv( p[ i]. y));
-			};
-			free( p);
-		}
-		return newRV_noinc(( SV *) av);
-	} else {
-		SV * ret;
-		gpENTER( newRV_noinc(( SV *) newAV()));
-		ret = newSVsv(sv_call_perl(text, "get_text_box", "<H", self));
-		gpLEAVE;
-		return ret;
-	}
-}
-
-static PFontABC
-query_abc_range( Handle self, TextWrapRec * t, unsigned int base)
-{
-	PFontABC abc;
-
-	/* find if present in cache */
-	if ( t-> utf8_text) {
-		if ( *(t-> unicode)) {
-			int i;
-			PList p;
-			if (( p = *(t-> unicode)))
-				for ( i = 0; i < p-> count; i += 2)
-					if (( unsigned int) p-> items[ i] == base)
-						return ( PFontABC) p-> items[i + 1];
-		}
-	} else
-		if ( *( t-> ascii)) return *(t-> ascii);
-
-	/* query ABC information */
-	if ( !self) {
-		abc = apc_gp_get_font_abc( self, base * 256, base * 256 + 255, t-> utf8_text);
-		if ( !abc) return nil;
-	} else if ( my-> get_font_abc == Drawable_get_font_abc) {
-		gpARGS;
-		gpENTER(nil);
-		abc = apc_gp_get_font_abc( self, base * 256, base * 256 + 255, t-> utf8_text);
-		gpLEAVE;
-		if ( !abc) return nil;
-	} else {
-		SV * sv;
-		if ( !( abc = malloc( 256 * sizeof( FontABC)))) return nil;
-		sv = my-> get_font_abc( self, base * 256, base * 256 + 255, t-> utf8_text);
-		if ( SvOK( sv) && SvROK( sv) && SvTYPE( SvRV( sv)) == SVt_PVAV) {
-			AV * av = ( AV*) SvRV( sv);
-			int i, j = 0, n = av_len( av) + 1;
-			if ( n > 256 * 3) n = 256 * 3;
-			n = ( n / 3) * 3;
-			if ( n < 256) memset( abc, 0, 256 * sizeof( FontABC));
-			for ( i = 0; i < n; i += 3) {
-				SV ** holder = av_fetch( av, i, 0);
-				if ( holder) abc[j]. a = ( float) SvNV( *holder);
-				holder = av_fetch( av, i + 1, 0);
-				if ( holder) abc[j]. b = ( float) SvNV( *holder);
-				holder = av_fetch( av, i + 2, 0);
-				if ( holder) abc[j]. c = ( float) SvNV( *holder);
-				j++;
-			}
-		} else
-			memset( abc, 0, 256 * sizeof( FontABC));
-		sv_free( sv);
-	}
-
-	/* store in cache */
-	if ( t-> utf8_text) {
-		PList p;
-		if ( !*(t-> unicode))
-			*(t-> unicode) = plist_create( 8, 8);
-		if (( p = *(t-> unicode))) {
-			list_add( p, ( Handle) base);
-			list_add( p, ( Handle) abc);
-		} else {
-			free( abc);
-			return nil;
-		}
-	} else
-		*(t-> ascii) = abc;
-
-	return abc;
-}
-
-static Bool
-precalc_abc_buffer( PFontABC src, float * width, PFontABC dest)
-{
-	int i;
-	if ( !dest) return false;
-	for ( i = 0; i < 256; i++) {
-		width[i] = src[i]. a + src[i]. b + src[i]. c;
-		dest[i]. a = ( src[i]. a < 0) ? - src[i]. a : 0;
-		dest[i]. b = src[i]. b;
-		dest[i]. c = ( src[i]. c < 0) ? - src[i]. c : 0;
-	}
-	return true;
-}
-
-static Bool
-add_wrapped_text( TextWrapRec * t, int start, int utfstart, int end, int utfend,
-						int tildeIndex, int * tildePos, int * tildeLPos, int * tildeLine,
-						char *** lArray, int * lSize)
-{
-	int l = end - start;
-	char *c = nil;
-	if (!( t-> options & twReturnChunks)) {
-		if ( !( c = allocs( l + 1))) return false;
-		memcpy( c, t-> text + start, l);
-		c[ l] = 0;
-	}
-	if ( tildeIndex >= 0 && tildeIndex >= start && tildeIndex < end) {
-		*tildeLine = t-> t_line = t-> count;
-		*tildePos = *tildeLPos = tildeIndex - start;
-		if ( tildeIndex == end - 1) {
-			t-> t_line++;
-			tildeLPos = 0;
-		}
-	}
-	if ( t-> count == *lSize) {
-		char ** n = allocn( char*, *lSize + 16);
-		if ( !n) return false;
-		memcpy( n, *lArray, sizeof( char*) * (*lSize));
-		*lSize += 16;
-		free( *lArray);
-		*lArray = n;
-	}
-	if ( t-> options & twReturnChunks) {
-		(*lArray)[ t-> count++] = INT2PTR(char*,utfstart);
-		(*lArray)[ t-> count++] = INT2PTR(char*,utfend - utfstart);
-	} else
-		(*lArray)[ t-> count++] = c;
-	return true;
-}
-
-char **
-Drawable_do_text_wrap( Handle self, TextWrapRec * t)
-{
-	unsigned int base = 0x10000000;
-	float width[256];
-	FontABC abc[256];
-	int start = 0, utf_start = 0, split_start = -1, split_end = -1, i, utf_p, utf_split = -1;
-	float w = 0, inc = 0, initial_overhang = 0;
-	char **ret;
-	Bool wasTab = 0, reassign_w = 1;
-	Bool doWidthBreak = t-> width >= 0;
-	int tildeIndex = -100, tildeLPos = 0, tildeLine = 0, tildePos = 0, tildeOffset = 0, lSize = 16;
-	int spaceWidth = 0, spaceC = 0, spaceOK = 0;
-
-#define lAdd(end, utfend) if(1) { \
-	if ( !add_wrapped_text( t, start, utf_start, end, utfend, tildeIndex, \
-		&tildePos, &tildeLPos, &tildeLine, &ret, &lSize)) return ret;\
-	start = end; \
-	utf_start = utfend; \
-	if (( t-> options & twReturnFirstLineLength) == twReturnFirstLineLength) return ret; }
-
-	t-> count = 0;
-	if (!( ret = allocn( char*, lSize))) return nil;
-
-	/* determining ~ character location */
-	if ( t-> options & twCalcMnemonic)
-		for ( i = 0; i < t-> textLen - 1; i++)
-			if ( t-> text[ i] == '~') {
-				unsigned char c = t-> text[ i + 1];
-				if ( c == '~' || c < ' ') {
-					i++;
-					continue;
-				} else {
-					tildeIndex = i;
-					break;
-				}
-			}
-
-
-	/* process UV chars */
-	for ( i = 0, utf_p = 0; i < t-> textLen; utf_p++) {
-		UV uv;
-		float winc;
-		int p = i;
-
-		if ( t-> utf8_text) {
-			STRLEN len;
-#if PERL_PATCHLEVEL >= 16
-			uv = utf8_to_uvchr_buf(( U8*) t-> text + i, ( U8*) t-> text + t-> textLen, &len);
-#else
-			uv = utf8_to_uvchr(( U8*) t-> text + i, &len);
-#endif
-			i += len;
-			if ( len == 0 ) break;
-		} else
-			uv = (( unsigned char *)(t-> text))[i++];
-
-		if ( uv / 256 != base)
-			if ( !precalc_abc_buffer( query_abc_range( self, t, base = uv / 256), width, abc))
-				return ret;
-		if ( reassign_w) w = initial_overhang = abc[ uv & 0xff]. a;
-		reassign_w = 0;
-
-		switch ( uv ) {
-		case '\t':
-			split_start = p; split_end = i; utf_split = utf_p;
-			if (!( t-> options & twCalcTabs)) goto _default;
-			if ( t-> options & twSpaceBreak) {
-				lAdd( p, utf_p);
-				start = i;
-				utf_start++;
-				reassign_w = 1;
-				continue;
-			}
-			if ( !spaceOK) {
-				PFontABC s = query_abc_range( self, t, 0);
-				if ( !s) return ret;
-				spaceWidth = (s[' '].a + s[' '].b + s[' '].c) * t-> tabIndent;
-				spaceC     = (s[' '].c < 0) ? - s[' ']. c : 0;
-				spaceOK = 1;
-			}
-			winc = spaceWidth;
-			inc  = spaceC;
-			wasTab = true;
-			break;
-		case '\n':
-		case 0x2028:
-		case 0x2029:
-			split_start = p; split_end = i; utf_split = utf_p;
-			if (!( t-> options & twNewLineBreak)) goto _default;
-			lAdd( p, utf_p);
-			start = i;
-			utf_start++;
-			reassign_w = 1;
-			continue;
-		case ' ':
-			split_start = p; split_end = i; utf_split = utf_p;
-			if (!( t-> options & twSpaceBreak)) goto _default;
-			lAdd( p, utf_p);
-			start = i;
-			utf_start++;
-			reassign_w = 1;
-			continue;
-		case '~':
-			if ( p == tildeIndex ) {
-				tildeOffset = w - initial_overhang;
-				inc = winc = 0;
-				break;
-			}
-		_default: default:
-			winc = width[ uv & 0xff];
-			inc  = abc[ uv & 0xff]. c;
-		}
-
-		if ( doWidthBreak && w + winc + inc > t-> width) {
-			if (( p == start) || (( p == start - 1) && ( p - 1 == tildeIndex))) {
-			/* case when even single char cannot be fit in  */
-				if ( t-> options & twBreakSingle) {
-					/* do not return anything in this case */
-					int j;
-					if (!( t-> options & twReturnChunks)) {
-						for ( j = 0; j < t-> count; j++) free( ret[ j]);
-						ret[ 0] = duplicate_string("");
-					}
-					t-> count = 0;
-					return ret;
-				}
-				/* or push this character disregarding the width */
-				lAdd( i, utf_p + 1);
-			} else { /* normal break condition */
-				/* checking if break was at word boundary */
-				if ( t-> options & twWordBreak) {
-					if ( start <= split_start) {
-						lAdd( split_start, utf_split );
-						i = start = split_end;
-						utf_start = utf_split + 1;
-						utf_p = utf_split;
-						w = 0;
-						continue;
-					} else if ( t-> options & twBreakSingle) {
-						/* cannot be split, return nothing */
-						int j;
-						if (!( t-> options & twReturnChunks)) {
-							for ( j = 0; j < t-> count; j++) free( ret[ j]);
-							ret[ 0] = duplicate_string("");
-						}
-						t-> count = 0;
-						return ret;
-					}
-				}
-				/* repeat again */
-				lAdd( p, utf_p );
-				i = start = p;
-				utf_start = utf_p;
-				utf_p--;
-			}
-			w = 0;
-			continue;
-		} else
-			w += winc;
-	}
-
-	/* adding or skipping last line */
-	if ( t-> textLen - start > 0 || t-> count == 0) lAdd( t-> textLen, t-> utf8_textLen);
-
-	/* removing ~ and determining it's location */
-	if ( tildeIndex >= 0 && !(t-> options & twReturnChunks)) {
-		UV uv;
-		PFontABC abcc;
-		char *l = ret[ tildeLine];
-		float start, end;
-		t-> t_char = t-> text + tildePos + 1;
-		if ( t-> options & twCollapseTilde)
-			memmove( l + tildePos, l + tildePos + 1, strlen( l) - tildePos);
-		if ( t-> utf8_text) {
-			STRLEN len;
-#if PERL_PATCHLEVEL >= 16
-			uv = utf8_to_uvchr_buf(( U8*) t-> t_char, ( U8*) t-> text + t-> textLen, &len);
-#else
-			uv = utf8_to_uvchr(( U8*) t-> t_char, &len);
-#endif
-			if ( len == 0 ) goto NO_TILDE;
-		} else
-			uv = *(t->t_char);
-
-		abcc = query_abc_range( self, t, base = uv / 256) + (uv & 0xff);
-		start = tildeOffset;
-		end   = start + abcc-> b - 1.0;
-		if ( abcc-> a < 0.0 ) {
-			start += abcc->a;
-			end += abcc->a;
-		}
-		t-> t_start = start + .5 * (( start < 0 ) ? -1 : 1);
-		t-> t_end   = end   + .5 * (( end   < 0 ) ? -1 : 1);
-
-	} else {
-	NO_TILDE:
-		t-> t_start = t-> t_end = t-> t_line = C_NUMERIC_UNDEF;
-	}
-
-	/* expanding tabs */
-	if (( t-> options & twExpandTabs) && !(t-> options & twReturnChunks) && wasTab) {
-		for ( i = 0; i < t-> count; i++) {
-			int tabs = 0, len = 0;
-			char *substr = ret[ i], *n;
-			while (*substr) {
-				if ( *substr == '\t') tabs++;
-				substr++;
-				len++;
-			}
-			if ( tabs == 0) continue;
-			if ( !( n = allocs( len + tabs * t-> tabIndent + 1)))
-				return ret;
-			len = 0;
-			substr = ret[ i];
-			while ( *substr) {
-				if ( *substr == '\t') {
-					int j = t-> tabIndent;
-					while ( j--) n[ len++] = ' ';
-				} else
-					n[ len++] = *substr;
-				substr++;
-			}
-			free( ret[ i]);
-			n[ len] = 0;
-			ret[ i] = n;
-		}
-	}
-
-	return ret;
-}
-
-SV*
-Drawable_text_wrap( Handle self, SV * text, int width, int options, int tabIndent)
-{
-	gpARGS;
-	TextWrapRec t;
-	Bool retChunks;
-	char** c;
-	int i;
-	AV * av;
-	STRLEN tlen;
-	int returnFirstLine = ( options & twReturnFirstLineLength) == twReturnFirstLineLength;
-
-	if ( SvROK( text )) {
-		SV * ret;
-		gpENTER( returnFirstLine ? newSViv(0) : newRV_noinc(( SV *) newAV()));
-		ret = newSVsv(sv_call_perl(text, "text_wrap", "<Hiii", self, width, options, tabIndent));
-		gpLEAVE;
-		return ret;
-	}
-
-	t. text      = SvPV( text, tlen);
-	t. utf8_text = prima_is_utf8_sv( text);
-	if ( t. utf8_text) {
-		t. utf8_textLen = prima_utf8_length( t. text);
-		t. textLen = utf8_hop(( U8*) t. text, t. utf8_textLen) - (U8*) t. text;
-	} else {
-		t. utf8_textLen = t. textLen = tlen;
-	}
-	t. width     = ( width < 0) ? 0 : width;
-	t. tabIndent = ( tabIndent < 0) ? 0 : tabIndent;
-	t. options   = options;
-	retChunks    = t. options & twReturnChunks;
-	t. ascii     = &var-> font_abc_ascii;
-	t. unicode   = &var-> font_abc_unicode;
-	t. t_char    = nil;
-
-	gpENTER( returnFirstLine ? newSViv(0) : newRV_noinc(( SV *) newAV()));
-	c = Drawable_do_text_wrap( self, &t);
-	gpLEAVE;
-
-	if (( t. options & twReturnFirstLineLength) == twReturnFirstLineLength) {
-		IV rlen = 0;
-		if ( c) {
-			if ( t. count > 0) rlen = PTR2IV(c[1]);
-			free( c);
-		}
-		return newSViv( rlen);
-	}
-
-	if ( !c) return nilSV;
-
-	av = newAV();
-	for ( i = 0; i < t. count; i++) {
-		SV * sv = retChunks ? newSViv( PTR2IV(c[i])) : newSVpv( c[ i], 0);
-		if ( !retChunks) {
-			if ( t. utf8_text) SvUTF8_on( sv);
-			free( c[i]);
-		}
-		av_push( av, sv);
-	}
-
-	free( c);
-
-	if  ( t. options & ( twCalcMnemonic | twCollapseTilde)) {
-		HV * profile = newHV();
-		SV * sv_char;
-		if ( t. t_char) {
-			STRLEN len = t. utf8_text ? utf8_hop(( U8*) t. t_char, 1) - ( U8*) t. t_char : 1;
-			sv_char = newSVpv( t. t_char, len);
-			if ( t. utf8_text) SvUTF8_on( sv_char);
-			if ( t. t_start != C_NUMERIC_UNDEF) pset_i( tildeStart, t. t_start);
-			if ( t. t_end   != C_NUMERIC_UNDEF) pset_i( tildeEnd,   t. t_end);
-			if ( t. t_line  != C_NUMERIC_UNDEF) pset_i( tildeLine,  t. t_line);
-		} else {
-			sv_char = newSVsv( nilSV);
-			pset_sv( tildeStart, nilSV);
-			pset_sv( tildeEnd,   nilSV);
-			pset_sv( tildeLine,  nilSV);
-		}
-		pset_sv_noinc( tildeChar, sv_char);
-		av_push( av, newRV_noinc(( SV *) profile));
-	}
-
-	return newRV_noinc(( SV *) av);
-}
-
-
 PRGBColor
 prima_read_palette( int * palSize, SV * palette)
 {
@@ -1363,20 +895,20 @@ prima_read_palette( int * palSize, SV * palette)
 
 	if ( !SvROK( palette) || ( SvTYPE( SvRV( palette)) != SVt_PVAV)) {
 		*palSize = 0;
-		return nil;
+		return NULL;
 	}
 	av = (AV *) SvRV( palette);
 	count = av_len( av) + 1;
 	*palSize = count / 3;
 	count = *palSize * 3;
-	if ( count == 0) return nil;
+	if ( count == 0) return NULL;
 
-	if ( !( buf = allocb( count))) return nil;
+	if ( !( buf = allocb( count))) return NULL;
 
 	for ( i = 0; i < count; i++)
 	{
 		SV **itemHolder = av_fetch( av, i, 0);
-		if ( itemHolder == nil)
+		if ( itemHolder == NULL)
 			return ( PRGBColor) buf;
 		buf[ i] = SvIV( *itemHolder);
 	}
@@ -1625,7 +1157,6 @@ Drawable_set_font( Handle self, Font font)
 	apc_font_pick( self, &font, &var-> font);
 	apc_gp_set_font( self, &var-> font);
 }
-
 
 #ifdef __cplusplus
 }

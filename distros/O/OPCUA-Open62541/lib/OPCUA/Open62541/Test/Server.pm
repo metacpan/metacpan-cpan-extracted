@@ -118,6 +118,9 @@ sub setup_complex_objects {
 	    VariableTypeAttributes_displayName => {
 		LocalizedText_text	=> 'Some Variable Type'
 	    },
+	    VariableTypeAttributes_description => {
+		LocalizedText_text	=> 'This defines some variable type'
+	    },
 	},
     };
     $nodes{some_object_type} = {
@@ -145,6 +148,9 @@ sub setup_complex_objects {
 	    ObjectTypeAttributes_displayName => {
 		LocalizedText_text	=> 'Some Object Type'
 	    },
+	    ObjectTypeAttributes_description => {
+		LocalizedText_text	=> 'This defines some object type'
+	    },
 	},
     };
     $nodes{some_variable_0} = {
@@ -170,6 +176,9 @@ sub setup_complex_objects {
 	},
 	attributes => {
 	    VariableAttributes_dataType	=> TYPES_INT32,
+	    VariableAttributes_description => {
+		LocalizedText_text	=> 'This defines some variable'
+	    },
 	    VariableAttributes_displayName => {
 		LocalizedText_text	=> 'Some Variable 0'
 	    },
@@ -208,6 +217,9 @@ sub setup_complex_objects {
 	    NodeId_identifier		=> "SOME_OBJECT_TYPE",
 	},
 	attributes => {
+	    ObjectAttributes_description => {
+		LocalizedText_text	=> 'This defines some object'
+	    },
 	    ObjectAttributes_displayName => {
 		LocalizedText_text	=> 'Some Object 0'
 	    },

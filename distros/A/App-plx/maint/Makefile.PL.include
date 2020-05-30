@@ -1,0 +1,24 @@
+BEGIN {
+  -e 'Distar'
+    or system("git clone git://git.shadowcat.co.uk/p5sagit/Distar.git")
+}
+use lib 'Distar/lib';
+use Distar;
+
+author 'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>';
+
+manifest_include bin => qr{plx.*};
+
+system('pod2markdown', 'bin/plx', 'README.md');
+system('maint/buildpack');
+
+sub MY::postamble {
+  q{distdir: actual_module_file
+actual_module_file: create_distdir
+	$(MKPATH) $(DISTVNAME)/lib/App/
+	cp $(DISTVNAME)/bin/plx $(DISTVNAME)/lib/App/plx.pm
+	$(ABSPERLRUN) $(HELPERS)/add-to-manifest -d $(DISTVNAME) lib/App/plx.pm
+};
+}
+
+1;

@@ -1,9 +1,9 @@
 package Net::DNS::RR::DNSKEY;
 
 #
-# $Id: DNSKEY.pm 1773 2020-03-17 08:40:55Z willem $
+# $Id: DNSKEY.pm 1781 2020-05-13 08:58:25Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1773 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1781 $)[1];
 
 
 use strict;
@@ -118,6 +118,7 @@ sub _defaults {				## specify RR attribute default values
 	$self->algorithm(1);
 	$self->flags(256);
 	$self->protocol(3);
+	$self->keybin('');
 }
 
 
@@ -131,7 +132,7 @@ sub flags {
 
 sub zone {
 	for ( shift->{flags} ) {
-		$_ = ( shift() ? 0 : 0x0100 ) ^ ( 0x0100 | ( $_ || 0 ) ) if scalar @_;
+		$_ = ( $_[0] ? 0 : 0x0100 ) ^ ( 0x0100 | ( $_ || 0 ) ) if scalar @_;
 		return 0x0100 & ( $_ || 0 );
 	}
 }
@@ -139,7 +140,7 @@ sub zone {
 
 sub revoke {
 	for ( shift->{flags} ) {
-		$_ = ( shift() ? 0 : 0x0080 ) ^ ( 0x0080 | ( $_ || 0 ) ) if scalar @_;
+		$_ = ( $_[0] ? 0 : 0x0080 ) ^ ( 0x0080 | ( $_ || 0 ) ) if scalar @_;
 		return 0x0080 & ( $_ || 0 );
 	}
 }
@@ -147,7 +148,7 @@ sub revoke {
 
 sub sep {
 	for ( shift->{flags} ) {
-		$_ = ( shift() ? 0 : 0x0001 ) ^ ( 0x0001 | ( $_ || 0 ) ) if scalar @_;
+		$_ = ( $_[0] ? 0 : 0x0001 ) ^ ( 0x0001 | ( $_ || 0 ) ) if scalar @_;
 		return 0x0001 & ( $_ || 0 );
 	}
 }
@@ -294,7 +295,7 @@ Unsigned 16-bit number representing Boolean flags.
 	...
  }
 
-Boolean Zone flag.
+Boolean ZONE flag.
 
 =back
 
@@ -308,7 +309,7 @@ Boolean Zone flag.
 	...
  }
 
-Boolean Revoke flag.
+Boolean REVOKE flag.
 
 =back
 
@@ -322,7 +323,7 @@ Boolean Revoke flag.
 	...
  }
 
-Boolean Secure Entry Point flag.
+Boolean Secure Entry Point (SEP) flag.
 
 =back
 
@@ -415,6 +416,7 @@ DEALINGS IN THE SOFTWARE.
 
 L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC4034, RFC3755
 
-L<Algorithm Numbers|http://www.iana.org/assignments/dns-sec-alg-numbers>
+L<Algorithm Numbers|http://www.iana.org/assignments/dns-sec-alg-numbers>,
+L<DNSKEY Flags|http://www.iana.org/assignments/dnskey-flags>
 
 =cut

@@ -1,0 +1,82 @@
+#!perl
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-30'; # DATE
+our $DIST = 'App-FileRenameUtils'; # DIST
+our $VERSION = '0.003'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use App::FileRenameUtils qw(find_unique_filename);
+use Cwd;
+use File::Find;
+
+my $cwd = getcwd;
+
+finddepth sub {
+  #print "dir=$File::Find::dir\n";
+  return if $File::Find::dir eq '.';
+  return unless -f;
+  my $filename = find_unique_filename("$cwd/$_");
+  rename $_, $filename;
+  print "$_ -> $filename\n";
+}, ".";
+
+# ABSTRACT: Move files in subdirectories to the current directory
+# PODNAME: move-files-here
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+move-files-here - Move files in subdirectories to the current directory
+
+=head1 VERSION
+
+This document describes version 0.003 of move-files-here (from Perl distribution App-FileRenameUtils), released on 2020-05-30.
+
+=head1 DESCRIPTION
+
+This utility will rename duplicates with the C< (n)> suffix, e.g.: F<foo.jpg>
+into F<foo (1).jpg>, F<foo (2).jpg> and so on.
+
+=head1 HISTORY
+
+Packaged into App-FileRenameUtils as C<move-files-here>. Some enhancements.
+
+First written as C<gather-files-here> on 2004-04-01.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-FileRenameUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-FileRenameUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-FileRenameUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

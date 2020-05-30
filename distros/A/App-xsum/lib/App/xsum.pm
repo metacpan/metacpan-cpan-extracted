@@ -1,9 +1,9 @@
 package App::xsum;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-11-29'; # DATE
+our $DATE = '2020-05-28'; # DATE
 our $DIST = 'App-xsum'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -68,7 +68,15 @@ _
             cmdline_aliases => {a=>{}},
         },
         digest_args => {
-            schema => ['array*', of=>'str*', 'x.perl.coerce_rules'=>['From_str::comma_sep']],
+            schema => ['array*',
+
+                       # comment out temporarily, Perinci::Sub::GetArgs::Argv
+                       # clashes with coerce rules; we should fix
+                       # Perinci::Sub::GetArgs::Argv to observe coercion rules
+                       # first
+                       #of=>'str*',
+
+                       'x.perl.coerce_rules'=>['From_str::comma_sep']],
             description => <<'_',
 
 If you use `Digest` as the algorithm, you can pass arguments for the <pm:Digest>
@@ -394,7 +402,7 @@ App::xsum - Compute and check file checksums/digests (using various algorithms)
 
 =head1 VERSION
 
-This document describes version 0.009 of App::xsum (from Perl distribution App-xsum), released on 2019-11-29.
+This document describes version 0.010 of App::xsum (from Perl distribution App-xsum), released on 2020-05-28.
 
 =head1 SYNOPSIS
 
@@ -409,7 +417,7 @@ Usage:
 
  xsum(%args) -> [status, msg, payload, meta]
 
-Compute and check file checksums/digests (using various algorithms).
+Compute and check file checksumsE<sol>digests (using various algorithms).
 
 C<xsum> is a handy small utility that can be used as an alternative/replacement
 for the individual per-algorithm Unix utilities like C<md5sum>, C<sha1sum>,
@@ -445,7 +453,7 @@ Read checksum from files and check them.
 
 Supply checksum(s).
 
-=item * B<digest_args> => I<array[str]>
+=item * B<digest_args> => I<array>
 
 If you use C<Digest> as the algorithm, you can pass arguments for the L<Digest>
 module here.
@@ -455,6 +463,7 @@ module here.
 =item * B<tag> => I<bool>
 
 Create a BSD-style checksum.
+
 
 =back
 
@@ -488,19 +497,19 @@ feature.
 =head1 SEE ALSO
 
 
-L<shasum>. Script which comes with the perl distribution.
+L<shasum>. Perinci::To::POD=HASH(0x55f16a06f658).
 
-L<md5sum>. Unix utility.
+L<md5sum>. Perinci::To::POD=HASH(0x55f16a06f658).
 
-L<sha1sum>. Unix utility.
+L<sha1sum>. Perinci::To::POD=HASH(0x55f16a06f658).
 
-L<sha224sum>. Unix utility.
+L<sha224sum>. Perinci::To::POD=HASH(0x55f16a06f658).
 
-L<sha256sum>. Unix utility.
+L<sha256sum>. Perinci::To::POD=HASH(0x55f16a06f658).
 
-L<sha384sum>. Unix utility.
+L<sha384sum>. Perinci::To::POD=HASH(0x55f16a06f658).
 
-L<sha512sum>. Unix utility.
+L<sha512sum>. Perinci::To::POD=HASH(0x55f16a06f658).
 
 L<sum> from L<PerlPowerTools> (which only supports older algorithms like CRC32).
 
@@ -510,7 +519,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my $eumm_version = version->parse($ExtUtils::MakeMaker::VERSION);
 my $prereq = {
-    'Mojolicious' => '5.80',
+    'Mojolicious' => '8.02',
 };
 
 if ($^O eq 'solaris') {

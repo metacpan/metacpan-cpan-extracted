@@ -387,7 +387,8 @@ prima_no_cursor( Handle self)
 	if ( self && guts.focused == self && X(self)
 		&& !(XF_IN_PAINT(X(self)))
 		&& X(self)-> flags. cursor_visible
-		&& guts. cursor_save)
+		&& guts. cursor_save
+		&& guts. cursor_shown)
 	{
 		DEFXX;
 		int x, y, w, h;
@@ -402,6 +403,7 @@ prima_no_cursor( Handle self)
 		XCHECKPOINT;
 		XCopyArea( DISP, guts. cursor_save, XX-> udrawable, XX-> gc,
 					0, 0, w, h, x, y);
+		XFlush(DISP);
 		XCHECKPOINT;
 		prima_release_gc( XX);
 		guts. cursor_shown = false;
@@ -450,30 +452,26 @@ prima_update_cursor( Handle self)
 			if ( guts. cursor_pixmap_size. y < 64)
 				guts. cursor_pixmap_size. y = 64;
 			guts. cursor_save = XCreatePixmap( DISP, XX-> udrawable,
-														guts. cursor_pixmap_size. x,
-														guts. cursor_pixmap_size. y,
-														XX-> visual-> depth);
+				guts. cursor_pixmap_size. x,
+				guts. cursor_pixmap_size. y,
+				XX-> visual-> depth);
 			guts. cursor_xor  = XCreatePixmap( DISP, XX-> udrawable,
-														guts. cursor_pixmap_size. x,
-														guts. cursor_pixmap_size. y,
-														XX-> visual-> depth);
+				guts. cursor_pixmap_size. x,
+				guts. cursor_pixmap_size. y,
+				XX-> visual-> depth);
 			guts. cursor_layered = XX-> flags. layered;
 		}
 
 		prima_get_gc( XX);
 		XChangeGC( DISP, XX-> gc, VIRGIN_GC_MASK, &guts. cursor_gcv);
-		XCHECKPOINT;
 		XCopyArea( DISP, XX-> udrawable, guts. cursor_save, XX-> gc,
-					x, y, w, h, 0, 0);
-		XCHECKPOINT;
+			x, y, w, h, 0, 0);
 		XCopyArea( DISP, guts. cursor_save, guts. cursor_xor, XX-> gc,
-					0, 0, w, h, 0, 0);
-		XCHECKPOINT;
+			0, 0, w, h, 0, 0);
 		XSetFunction( DISP, XX-> gc, GXxor);
-		XCHECKPOINT;
 		XFillRectangle( DISP, guts. cursor_xor, XX-> gc, 0, 0, w, h);
-		XCHECKPOINT;
 		prima_release_gc( XX);
+		XCHECKPOINT;
 
 		if ( XX-> flags. cursor_visible) {
 			guts. cursor_shown = false;
@@ -885,7 +883,7 @@ apc_show_message( const char * message, Bool utf8)
 		twr. text      = ( char *) message;
 		twr. utf8_text = utf8;
 		twr. textLen   = strlen( message);
-		twr. utf8_textLen = utf8 ? prima_utf8_length( message) : twr. textLen;
+		twr. utf8_textLen = utf8 ? prima_utf8_length( message, -1) : twr. textLen;
 		twr. width     = appSz. x * 2 / 3;
 		twr. tabIndent = 3;
 		twr. options   = twNewLineBreak | twWordBreak | twReturnLines;
@@ -920,7 +918,7 @@ apc_show_message( const char * message, Bool utf8)
 		for ( i = 0; i < twr. count; i++) {
 			if ( utf8) {
 				char * w;
-				md. lengths[i] = prima_utf8_length( wrapped[i]);
+				md. lengths[i] = prima_utf8_length( wrapped[i], -1);
 				w = ( char *) prima_alloc_utf8_to_wchar( wrapped[i], md. lengths[i]);
 				if ( !w) goto EXIT;
 				free( wrapped[i]);
@@ -1172,6 +1170,7 @@ apc_sys_get_value( int v)  /* XXX one big XXX */
 #endif
 ;
 	case svMenuCheckSize   : return MENU_CHECK_XOFFSET;
+	case svFriBidi         : return use_fribidi;
 	default:
 		return -1;
 	}
@@ -1298,6 +1297,17 @@ apc_system_action( const char *s)
 			if ( !opt_InPaint) return 0;
 			XSetFont( DISP, X(self)-> gc, XLoadFont( DISP, font));
 			return nil;
+		}
+		if ( strcmp( "shaper", s) == 0) {
+			char shaper[64] = "";
+#ifdef USE_XFT
+			if ( guts. use_xft ) strcat(shaper, "xft ");
+#endif
+#ifdef WITH_HARFBUZZ
+			if ( guts. use_harfbuzz ) strcat(shaper, "harfbuzz ");
+#endif
+			shaper[strlen(shaper)-1] = 0;
+			return duplicate_string(shaper);
 		}
 		break;
 	case 't':
@@ -1478,13 +1488,7 @@ prima_utf8_to_wchar( const char * utf8, XChar2b * u16, int src_len_bytes, int ta
 {
 	STRLEN charlen;
 	while ( target_len_xchars--) {
-		register UV u = (
-#if PERL_PATCHLEVEL >= 16
-			utf8_to_uvchr_buf(( U8*) utf8, ( U8*)(utf8 + src_len_bytes), &charlen)
-#else
-			utf8_to_uvchr(( U8*) utf8, &charlen)
-#endif
-		);
+		register UV u = prima_utf8_uvchr(utf8, src_len_bytes, &charlen);
 		if ( u < 0x10000) {
 			u16-> byte1 = u >> 8;
 			u16-> byte2 = u & 0xff;
@@ -1501,7 +1505,7 @@ XChar2b *
 prima_alloc_utf8_to_wchar( const char * utf8, int length_chars)
 {
 	XChar2b * ret;
-	if ( length_chars < 0) length_chars = prima_utf8_length( utf8) + 1;
+	if ( length_chars < 0) length_chars = prima_utf8_length( utf8, -1) + 1;
 	if ( !( ret = malloc( length_chars * sizeof( XChar2b)))) return nil;
 	prima_utf8_to_wchar( utf8, ret, strlen(utf8), length_chars);
 	return ret;

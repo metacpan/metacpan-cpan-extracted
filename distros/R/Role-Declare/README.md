@@ -16,7 +16,7 @@ In the interface Role:
     use Role::Declare;
     use Types::Standard qw/:all/;
     
-    class_method create_object ( Str $name, Int $age ) : Returns( InstanceOf['My::Class'] ) {
+    class_method create_object ( Str $name, Int $age ) : Return( InstanceOf['My::Class'] ) {
         die "Age cannot be negative: $age" if $age < 0;
     };
 ```

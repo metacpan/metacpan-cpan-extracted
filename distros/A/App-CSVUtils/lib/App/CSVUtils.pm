@@ -1,9 +1,9 @@
 package App::CSVUtils;
 
-# AUTHOR
-our $DATE = '2019-12-28'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-29'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.028'; # VERSION
+our $VERSION = '0.029'; # VERSION
 
 use 5.010001;
 use strict;
@@ -415,6 +415,7 @@ $SPEC{csvutil} = {
                 'map',
                 'each-row',
                 'convert-to-hash',
+                'convert-to-td',
                 #'concat', # not implemented in csvutil
                 'select-fields',
                 'dump',
@@ -765,6 +766,8 @@ sub csvutil {
             if ($i == $args{_row_number}) {
                 $selected_row = $row;
             }
+        } elsif ($action eq 'convert-to-td') {
+            push @$rows, $row unless $i == 1;
         } elsif ($action eq 'dump') {
             if ($args{hash}) {
                 push @$rows, _array2hash($row, $fields) unless $i == 1;
@@ -797,6 +800,10 @@ sub csvutil {
             $hash->{ $fields->[$_] } = $selected_row->[$_];
         }
         return [200, "OK", $hash];
+    }
+
+    if ($action eq 'convert-to-td') {
+        return [200, "OK", $rows, {'table.fields'=>$fields}];
     }
 
     if ($action eq 'sum') {
@@ -1479,6 +1486,26 @@ sub csv_convert_to_hash {
 
     csvutil(%args, action=>'convert-to-hash',
             _row_number=>$args{row_number} // 2);
+}
+
+$SPEC{csv2td} = {
+    v => 1.1,
+    summary => 'Return an enveloped aoaos table data from CSV data',
+    description => <<'_',
+
+Read more about "table data" in <pm:App::td>, which comes with a CLI <prog:td>
+to munge table data.
+
+_
+    args => {
+        %args_common,
+        %arg_filename_0,
+    },
+};
+sub csv2td {
+    my %args = @_;
+
+    csvutil(%args, action=>'convert-to-td');
 }
 
 $SPEC{csv_concat} = {
@@ -2193,7 +2220,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 0.028 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2019-12-28.
+This document describes version 0.029 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2020-05-29.
 
 =head1 DESCRIPTION
 
@@ -2247,6 +2274,8 @@ This distribution contains the following CLI utilities:
 
 =item * L<csv2ltsv>
 
+=item * L<csv2td>
+
 =item * L<csv2tsv>
 
 =item * L<dump-csv>
@@ -2256,6 +2285,59 @@ This distribution contains the following CLI utilities:
 =back
 
 =head1 FUNCTIONS
+
+
+=head2 csv2td
+
+Usage:
+
+ csv2td(%args) -> [status, msg, payload, meta]
+
+Return an enveloped aoaos table data from CSV data.
+
+Read more about "table data" in L<App::td>, which comes with a CLI L<td>
+to munge table data.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<filename>* => I<filename>
+
+Input CSV file.
+
+Use C<-> to read from stdin.
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether CSV has a header row.
+
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
 
 
 =head2 csv_add_field
@@ -2322,6 +2404,7 @@ and so on.
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -2374,6 +2457,7 @@ Inform that input file is in TSV (tab-separated) format instead of CSV.
 =item * B<with_data_rows> => I<bool>
 
 Whether to also output data rows.
+
 
 =back
 
@@ -2454,6 +2538,7 @@ and so on.
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -2506,6 +2591,7 @@ Row number (e.g. 2 for first data row).
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
 
 =back
 
@@ -2560,6 +2646,7 @@ and so on.
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -2581,7 +2668,7 @@ Usage:
 
  csv_dump(%args) -> [status, msg, payload, meta]
 
-Dump CSV as data structure (array of array/hash).
+Dump CSV as data structure (array of arrayE<sol>hash).
 
 This function is not exported.
 
@@ -2612,6 +2699,7 @@ and so on.
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
 
 =back
 
@@ -2685,6 +2773,7 @@ and so on.
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
 
 =back
 
@@ -2771,6 +2860,7 @@ and so on.
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -2820,6 +2910,7 @@ and so on.
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -2868,6 +2959,7 @@ and so on.
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
 
 =back
 
@@ -2956,6 +3048,7 @@ CSV file to fill fields of.
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -3041,6 +3134,7 @@ and so on.
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -3104,6 +3198,7 @@ and so on.
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -3160,6 +3255,7 @@ and so on.
 Inform that input file is in TSV (tab-separated) format instead of CSV.
 
 =item * B<with> => I<str> (default: " ")
+
 
 =back
 
@@ -3218,6 +3314,7 @@ and so on.
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -3270,6 +3367,7 @@ Row number (e.g. 2 for first data row), range (2-7), or comma-separated list of 
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
 
 =back
 
@@ -3401,6 +3499,7 @@ Set operation to perform.
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -3472,6 +3571,7 @@ and so on.
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
 
 =back
 
@@ -3646,6 +3746,7 @@ Arguments to pass to Sort::Sub routine.
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -3707,6 +3808,7 @@ and so on.
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -3759,6 +3861,7 @@ Inform that input file is in TSV (tab-separated) format instead of CSV.
 =item * B<with_data_rows> => I<bool>
 
 Whether to also output data rows.
+
 
 =back
 
@@ -3818,11 +3921,11 @@ L<App::SerializeUtils>
 
 L<setop>.
 
-L<csv-select-row>.
-
 L<csvgrep>.
 
 L<csv-split>.
+
+L<csv-select-row>.
 
 =head1 AUTHOR
 
@@ -3830,7 +3933,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

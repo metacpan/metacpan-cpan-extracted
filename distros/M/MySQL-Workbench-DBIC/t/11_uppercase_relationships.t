@@ -14,7 +14,7 @@ BEGIN {
 my $bin         = $FindBin::Bin;
 my $file        = $bin . '/uppercase.mwb';
 my $namespace   = 'MyApp::DB';
-my $output_path = $bin . '/Test';
+my $output_path = $bin . '/Test' . $$;
 
 my $foo = MySQL::Workbench::DBIC->new(
     file        => $file,

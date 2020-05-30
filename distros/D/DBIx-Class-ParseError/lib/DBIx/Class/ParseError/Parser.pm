@@ -1,8 +1,7 @@
 package DBIx::Class::ParseError::Parser;
 
-use strict;
-use warnings;
 use Moo::Role;
+use Carp 'croak';
 use DBIx::Class::ParseError::Error;
 use Regexp::Common qw(list);
 
@@ -11,6 +10,30 @@ requires 'type_regex';
 has _schema => (
     is => 'ro', required => 1, init_arg => 'schema',
 );
+
+has custom_errors => (
+    is      => 'ro',
+    default => sub { {} },
+);
+
+# Feels weird putting the BUILD method in a role, but this effectively acts as
+# a base class. We can't use a method modifier because BUILD isn't in the
+# inheritance hierarchy of the classes and I didn't think it was appropriate
+# to change too much.
+sub BUILD {
+    my $self           = shift;
+    my $custom_errors = $self->custom_errors;
+    foreach my $type ( keys %$custom_errors ) {
+        unless ( $type =~ /^custom_/ ) {
+            $custom_errors->{"custom_$type"} = delete $custom_errors->{$type};
+            $type = "custom_$type";
+        }
+        unless ('Regexp' eq ref $custom_errors->{$type} ) {
+            my $ref = ref $custom_errors->{$type} || 'string';
+            croak("Custom errors should point to Regexp references, not '$ref': $type");
+        }
+    }
+}
 
 has _source_table_map => (
     is => 'lazy', builder => '_build_source_table_map',
@@ -28,9 +51,20 @@ sub _build_source_table_map {
 }
 
 sub parse_type {
-    my ($self, $error) = @_;
-    my $type_regex = $self->type_regex;
-    foreach (sort keys %$type_regex) {
+    my ( $self, $error ) = @_;
+    my $custom_errors = $self->custom_errors;
+    my $type_regex    = $self->type_regex;
+
+    # try to match custom errors first
+    foreach ( sort keys %$custom_errors ) {
+        if ( my @data = $error =~ $custom_errors->{$_} ) {
+            return {
+                name => $_,
+                data => [ grep { defined && length } @data ],
+            };
+        }
+    }
+    foreach ( sort keys %$type_regex ) {
         if ( my @data = $error =~ $type_regex->{$_} ) {
             return {
                 name => $_,
@@ -113,7 +147,9 @@ sub parse_general_info {
         (\w+)\s+
         \( \s* ($RE{list}{-pat => '\w+'}|\w+)\s* \)\s+
         VALUES\s+
-        \( \s* (?:$RE{list}{-pat => '\?'}|\?)\s* \)\s*\"
+        \( \s* (?:$RE{list}{-pat => '\?'}|\?)\s* \)\s*
+        (?:RETURNING\s+id)?   # optional ID return from PostgreSQL
+        \s*\"
         \s*\w*\s*\w*:?\s*
         ($RE{list}{-pat => '\d=\'?[\w\s]+\'?'})?
     }ix;
@@ -137,6 +173,7 @@ sub parse_general_info {
     my $source_table_map = $self->_source_table_map;
 
     my $error_info;
+    my $error_matched;
     if ( $error =~ $insert_re ) {
         my ($table, $column_keys, $column_values) = ($1, $2, $3);
         $error_info = {
@@ -146,6 +183,7 @@ sub parse_general_info {
                 $column_keys, $column_values
             ),
         };
+        $error_matched = 1;
     }
     elsif ( $error =~ $update_re ) {
         my ($table, $column_keys, $column_values) = ($1, $2, $3);
@@ -156,6 +194,7 @@ sub parse_general_info {
                 $column_keys, $column_values
             ),
         };
+        $error_matched = 1;
     }
     elsif ( $error =~ $missing_column_re ) {
         my ($op_key, $column, $source_name) = ($1, $2, $3);
@@ -169,13 +208,47 @@ sub parse_general_info {
             $source ? ( table => $source->name ) : (),
             columns => [$column],
         };
+        $error_matched = 1;
     }
-    else {
-        die 'Parsing error string failed';
+    elsif ( $error_type->{'name'} eq 'missing_table' ) {
+        my $table_name = $error_type->{'data'}[0];
+        $error_info = {
+            table => $table_name,
+            operation => q{},
+            columns => [],
+            column_data => {},
+            source_name => $source_table_map->{ $table_name }->source_name,
+        };
+        $error_matched = 1;
     }
 
-    if (my $source = $source_table_map->{ $error_info->{'table'} }) {
+    if (my $source = $source_table_map->{ $error_info->{'table'} || '' }) {
         $error_info->{'source_name'} = $source->source_name;
+    }
+
+    my $type = $error_type->{name};
+
+    # some databases may support more different error types. Those should be
+    # prefixed with "custom_" (such as "custom_unknown_function" or
+    # something). This allows different databases to present different error
+    # types.
+    #
+    # However, these errors come in many sizes and shapes. We can't
+    # deterministically say what the columns, operation or *anything* really
+    # is, so we just punt and hand it back to the developer.
+    if ( $type =~ /^custom_/ ) {
+        return {
+            column_data => ( $error_info->{column_data} || {} ),
+            columns     => ( $error_info->{columns}     || [] ),
+            operation   => ( $error_info->{operation}   || '' ),
+            source_name => ( $error_info->{source_name} || '' ),
+            table       => ( $error_info->{table}       || '' ),
+            type        => $type,
+        };
+    }
+
+    unless ($error_matched) {
+        die 'Parsing error string failed';
     }
 
     return $self->_add_info_from_type($error_info, $error_type);

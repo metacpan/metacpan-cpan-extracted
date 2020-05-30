@@ -22,7 +22,20 @@ has parser => (
     is => 'lazy', handles => [qw(db_driver)],
 );
 
-sub _build_parser { DBIx::Class::ParseError->new(schema => shift->schema) }
+sub _build_parser {
+    my $self = shift;
+    DBIx::Class::ParseError->new(
+        schema        => $self->schema,
+        custom_errors => $self->custom_errors
+    );
+}
+
+has custom_errors => (
+    is      => 'ro',
+    builder => '_build_custom_errors',
+);
+
+sub _build_custom_errors { {} }
 
 before setup => sub {
     my $self = shift;
@@ -43,7 +56,7 @@ sub test_parse_error {
     is($error_str, $error->message, 'same error str in message');
     is($error->type, $type, 'error type');
     is($error->table, $table, 'target table');
-    is($error->source_name, $source_name, 'target table');
+    is($error->source_name, $source_name, 'source name');
     return $error;
 }
 

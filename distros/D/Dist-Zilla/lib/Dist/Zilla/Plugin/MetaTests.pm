@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::MetaTests 6.014;
+package Dist::Zilla::Plugin::MetaTests 6.015;
 # ABSTRACT: common extra tests for META.yml
 
 use Moose;
@@ -54,7 +54,7 @@ Dist::Zilla::Plugin::MetaTests - common extra tests for META.yml
 
 =head1 VERSION
 
-version 6.014
+version 6.015
 
 =head1 DESCRIPTION
 

@@ -79,4 +79,29 @@ subtest "deferred_link_html with inline disabled" => sub {
 
 };
 
+subtest "deferred_link_html with inline disabled, simple mode" => sub {
+
+    my $css = HTML::DeferableCSS->new(
+        css_root => 't/etc/css',
+        aliases  => {
+            reset => 'reset',
+            test  => 'foo',
+        },
+        inline_max => 0,
+        simple     => 1,
+        include_noscript => 0,
+    );
+
+    isa_ok $css, 'HTML::DeferableCSS';
+
+    ok $css->simple, 'simple mode';
+
+    my $html = $css->deferred_link_html('test');
+
+    is $html, '<link rel="preload" as="style" href="/foo.css">' .
+        q{<link rel="stylesheet" href="/foo.css" media="print" onload="this.media='all';this.onload=null;">},
+        'deferred_link_html';
+
+};
+
 done_testing;

@@ -1,3 +1,11 @@
+0.624   2020-05-30  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+
+	- Add functions: dir_has_non_subdirs, get_dir_non_subdirs.
+
+        - Now regard symlink to dir not as a subdir; a subdir must not be a
+          symlink.
+
+
 0.623   2020-04-13  Released-By: PERLANCAR; Urgency: medium
 
 	- Add routines: get_dir_{,dot_}entries,

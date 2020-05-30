@@ -33,7 +33,8 @@ method make_attribute (
 	Str      :$default,
 	Bool     :$no_init_arg,
 	Bool     :$lazy,
-	Str      :$builder
+	Str      :$builder,
+	Bool     :$required
   ) {
 
 	my $text;
@@ -50,6 +51,7 @@ method make_attribute (
 	$text .= "default => $default,\n" if $default;
 	$text .= "lazy => 1,\n" if $lazy;
 	$text .= "builder => '$builder',\n" if $builder;
+	$text .= "required => 1,\n" if $required;
 	$text .= ");\n";
 
 	return $text;

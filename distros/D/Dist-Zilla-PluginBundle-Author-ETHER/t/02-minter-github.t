@@ -87,9 +87,9 @@ like(
 
 =head1 SYNOPSIS
 
-    use My::New::Dist;
+  use My::New::Dist;
 
-    ...
+  ...
 
 =head1 DESCRIPTION
 SYNOPSIS
@@ -156,9 +156,9 @@ is(
 
 =head1 SYNOPSIS
 
-    use My::New::Dist;
+  use My::New::Dist;
 
-    ...
+  ...
 
 =head1 DESCRIPTION
 

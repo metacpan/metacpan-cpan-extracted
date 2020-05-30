@@ -1,43 +1,43 @@
 Revision history for Perl extension Class::Delegation.
 
 0.01  Sun Sep  3 15:10:12 2000
-	- original version; created by h2xs 1.18
+    - original version; created by h2xs 1.18
 
 
-1.05	Sat Dec  1 18:30:12 2001
+1.05    Sat Dec  1 18:30:12 2001
 
-	- Localized modification to %SIG (thanks Tatsuhiko)
+    - Localized modification to %SIG (thanks Tatsuhiko)
 
-	- Preserved $AUTOLOAD in classes that both delegate and AUTOLOAD
-	  (thanks Michael)
+    - Preserved $AUTOLOAD in classes that both delegate and AUTOLOAD
+      (thanks Michael)
 
 
-1.06	Tue Apr 23 14:20:20 2002
+1.06    Tue Apr 23 14:20:20 2002
 
-	- Made delegation inherited
+    - Made delegation inherited
 
-	- Added 'to => -SELF' option (thanks Piers)
+    - Added 'to => -SELF' option (thanks Piers)
 
-	- Added 'to => -SELF->method' option (thanks Piers)
+    - Added 'to => -SELF->method' option (thanks Piers)
 
-	- Allowed 'as' to take an array (thanks Piers)
+    - Allowed 'as' to take an array (thanks Piers)
 
-	- Allowed 'to' subs to return an object to be delegated to
+    - Allowed 'to' subs to return an object to be delegated to
 
 
 
 1.7.1  Fri Feb 17 19:10:58 2006
 
-	- Fixed test suite to be independent of hash key ordering
-	  (thanks Andreas)
+    - Fixed test suite to be independent of hash key ordering
+      (thanks Andreas)
 
-	- Allowed delegation to AUTOLOADed methods (thanks Corion)
+    - Allowed delegation to AUTOLOADed methods (thanks Corion)
 
-	- Fixed debugging output (thanks Steve)
+    - Fixed debugging output (thanks Steve)
 
-	- Removed superfluous and buggy C<eval>
+    - Removed superfluous and buggy C<eval>
 
-	- Fixed pod nits (thanks Dmitry)
+    - Fixed pod nits (thanks Dmitry)
 
 
 
@@ -48,3 +48,10 @@ Revision history for Perl extension Class::Delegation.
 
 
 
+
+
+1.009001  Fri May 29 08:25:38 2020
+
+    - Fixed erroneous behaviour when delegating class inherits
+      a destructor, rather than defining one itself.
+      (Thanks, Sven!)

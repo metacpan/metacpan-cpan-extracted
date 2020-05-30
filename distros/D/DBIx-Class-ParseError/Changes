@@ -1,4 +1,8 @@
 Revision history for DBIx-Class-ParseError
 
+0.02
+    - Add support for custom, per instance errors
+    - Add PostgreSQL support
+
 0.01 2019-10-21
     - Initial release
