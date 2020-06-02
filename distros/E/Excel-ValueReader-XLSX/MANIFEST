@@ -1,0 +1,12 @@
+benchmark.pl
+Build.PL
+Changes
+lib/Excel/ValueReader/XLSX.pm
+lib/Excel/ValueReader/XLSX/LibXML.pm
+lib/Excel/ValueReader/XLSX/Regex.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README.md
+t/valuereader.t
+t/valuereader.xlsx

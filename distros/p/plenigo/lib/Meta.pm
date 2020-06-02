@@ -1,6 +1,9 @@
 package plenigo;
 
-our $VERSION = '2.0006';
+use strict;
+use warnings;
+
+our $VERSION = '3.0000';
 
 =head1 NAME
 
@@ -8,7 +11,7 @@ plenigo::Meta - plenigo Perl SDK
 
 =head1 DESCRIPTION
 
-The plenigo Perl SDK offers wrappers for the plenigo API.
+The plenigo Perl SDK offers wrappers for the plenigo API v3.
 
 =head1 AUTHOR
 

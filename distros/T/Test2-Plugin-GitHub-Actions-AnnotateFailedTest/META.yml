@@ -28,7 +28,7 @@ no_index:
 provides:
   Test2::Plugin::GitHub::Actions::AnnotateFailedTest:
     file: lib/Test2/Plugin/GitHub/Actions/AnnotateFailedTest.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Encode: '0'
   Test2: '1.302133'
@@ -41,6 +41,6 @@ resources:
   bugtracker: https://github.com/utgwkk/Test2-Plugin-GitHub-Actions-AnnotateFailedTest/issues
   homepage: https://github.com/utgwkk/Test2-Plugin-GitHub-Actions-AnnotateFailedTest
   repository: git://github.com/utgwkk/Test2-Plugin-GitHub-Actions-AnnotateFailedTest.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

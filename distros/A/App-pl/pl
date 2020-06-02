@@ -6,7 +6,7 @@ use 5.010;
 
 our( $VERSION, $A, @A );
 BEGIN {
-    $VERSION = '0.52';
+    $VERSION = '0.52.1';
     *A = *ARGV;
     my $execed = shift if @A && $A[0] eq '+'; # don't recursively call perl again for -p
     return unless @A and $A[0] =~ /^-/s;
@@ -728,11 +728,13 @@ pl - Swiss Army Knife of Perl One-Liners
 
 =head1 SYNOPSIS
 
-Just one small script extends C<perl -E> with many bells & whistles: Various
-one-letter commands & magic variables (with meaningful aliases too) and more
-nifty loop options take Perl programming to the command line.  List::Util is
-fully imported.  If you pass no program on the command line, starts a simple
-Perl Shell.
+There are always those tasks too menial for dedicated script, but still too
+cumbersome even with the many neat one-liner options of C<perl -E>.  This
+small script fills the gap with many bells & whistles: Various one-letter
+commands & magic variables (with meaningful aliases too) and more nifty loop
+options take Perl programming to the command line.  List::Util is fully
+imported.  If you pass no program on the command line, starts a simple Perl
+Shell.
 
 How to C<e(cho)> values, including from C<@A(RGV)>, with single C<$q(uote)> &
 double C<$Q(uote)>.  Same for hard-to-print values:
@@ -796,7 +798,7 @@ All examples, if applicable, use the long names and are repeated for short names
 
 =item Heads ...
 
-I<People say the back of my head looks really nice -- but I don't see it :-)>
+I<People say the back of my head looks really nice -- but I don't see it. :-)>
 
 If you want just I<n>, e.g. 10, lines from the head of each file, use the
 optional number argument to B<-p>, along with B<-r> to reset the count.  The
@@ -818,20 +820,24 @@ You can combine the two, if you want at most I<n> lines, e.g. 10:
 
 I<What has a head, a tail, but no legs?  A penny. :-)>
 
-If you want just 1 last line from each file, the end-of-file B<-z> code (no
-need to quote, as it has no special characters) can C<E(cho)> it for you,
-without adding another newline (yes, Perl is case sensitive):
+If you want a bigger number of last lines, you need to stuff them in a list;
+not really worth it.  But if you want just 1 last line from each file, the
+end-of-file B<-z> code (no need to quote, as it has no special characters) can
+C<E(cho)> it for you, capitalized so as to not add another newline (yes, Perl
+is case sensitive):
 
     pl -z Echo '' file*
     pl -z E '' file*
 
-If you want the tail from a regexp, use the flip-flop operator, starting with
-your regexp and going till end-of-file:
+If you want the tail from a line-number (e.g. 99) or a regexp, use the
+flip-flop operator, starting with your regexp and going till each end-of-file:
 
+    pl -P '99..eof' file*
     pl -P '/first/..eof' file*
 
-You can even get head and tail, if last line of head comes before 1st line of
-tail (or actually any number of such disjoint ranges):
+You can even get head and tail (which in programming logic translates to: or),
+if last line of head comes before 1st line of tail (or actually any number of
+such disjoint ranges):
 
     pl -rP '1../last/ or /first/..eof' file*
 
@@ -857,6 +863,8 @@ If you're a fan or half-width tabs, make that:
     pl -pi '1 while s/(?:^|\t)\K(?: {1,3}\t| {4})/\t/' file*
 
 =item Print only 1st occurrence of each line
+
+I<Poets create worlds through a minimal of words. -- Kim Hilliker |/|>
 
 This counts repetitions of lines in a hash.  Print only when the expression is
 true (B<-P>), i.e. the count was 0:
@@ -885,7 +893,7 @@ If you have many files, which sort chronologically by name, and you want to
 keep only the last one, it can be quite painful to formulate Shell patterns.
 So check on each iteration of the B<-o> loop, if the index C<$ARGIND> (or
 C<$I>) is less than the last, before unlinking (deleting).  If you want to test
-it first, replace C<unlink> with C<echo> or C<e>:
+it first, replace C<unlink> with C<e(cho)>:
 
     pl -o 'unlink if $ARGIND < $#ARGV' file*
     pl -o 'unlink if $I < $#A' file*
@@ -926,6 +934,8 @@ C<%n(umber)>:
 
 =item Count files per directory per suffix
 
+I<There are three types of people: those who can count and those who can't. (-:>
+
 Match to last C</> and after a dot following something, i.e. not just a dot-file.
 C<""> is the suffix for suffixless files.  Stores in
 sort-by-key-and-stringify-at-end C<%s(tring)>.  So count in a nested hash of
@@ -959,7 +969,7 @@ This avoids the lone dot:
     find -type f -print0 |
         pl -0ln '/^(.+)\/.+?(?:\.([^.]*))?$/; ++$n{length($2) ? "$1 .$2" : "$1 none"}'
 
-=item Sum up file-sizes per suffix.
+=item Sum up file-sizes per suffix
 
 Find separates output with a dot and -F splits on that.  The C<\\> is to
 escape one backslash from the Shell.  No matter how many dots the filename
@@ -995,9 +1005,10 @@ I<Learn sign language!  It's very handy. :-)>
 
 Rollup means, additionally to the previous case, sum up dates with the same
 prefix.  The trick here is to count both for the actual year, month and day,
-as well as replacing once only the day, once also the month with "__",and once
-also the year with "____".  This sorts after numbers and gives a sum for all
-with the same leading numbers.  Use the sort-by-key-at-end hash C<%s(tring)>:
+as well as replacing once only the day, once also the month with "__", and
+once also the year with "____".  This sorts after numbers and gives a sum for
+all with the same leading numbers.  Use the sort-by-key-at-end hash
+C<%s(tring)>:
 
     find -printf '%TY-%Tm-%Td\n' |
         pl -ln '++$string{$_}; ++$string{$_} while s/[0-9]+(?=[-_]*$)/"_" x length $&/e'
@@ -1055,7 +1066,7 @@ several hosts:
 =item Diff several zip archives by member name
 
 This uses the same mechanism as the csv example.  Addidionally it reads the
-output of C<unzip -vql> for each archive through the C<p(ipe)> block.  That
+output of C<unzip -vql> for each archive through the C<p(iped)> block.  That
 has a fixed format, except for tiny members, which can report -200%, screwing
 the column by one:
 
@@ -1086,7 +1097,7 @@ Again without the date:
 
 You get the idea: you can do this for any command that outputs records with a
 unique key.  This one looks at the required libraries and which file they came
-from.  For a change, loop with B<-O> and C<@A(RGV)> to avoid the previous
+from.  For a change, loop with B<-O> and C<$A(RGV)> to avoid the previous
 examples' confusion between outer C<$_> which are the cli args, and the inner
 one, which are the read lines:
 
@@ -1328,6 +1339,8 @@ standard values.  Note that Shell strings can span more than one line:
 
 =item Generate a random password
 
+I<Why should you trust atoms? They make up everything. :-)>
+
 Use C<say>, which doesn't put spaces between its arguments.  Generate twelve
 random characters between 33 & 127, i.e. printable Ascii characters:
 
@@ -1413,3 +1426,10 @@ Any help for getting this to work in PowerShell is welcome!
 While the old Windows 10 terminal understands Ansi escape sequences, it makes
 it horribly hard to activate them.  So they are off by default, requiring
 B<--color> to override that choice.
+
+=for html <footer>
+
+Pl is maintained on L<SourceForge|https://perl1liner.sourceforge.io/> and also
+available on L<meta::cpan|https://metacpan.org/pod/distribution/App-pl/pl>.
+
+=for html </footer>

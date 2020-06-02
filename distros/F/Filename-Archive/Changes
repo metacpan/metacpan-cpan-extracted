@@ -1,6 +1,14 @@
-Revision history for Filename-Archive
+0.031   2020-06-02  Released-By: PERLANCAR; Urgency: medium
 
-0.02    2015-09-03 (PERLANCAR)
+	- Recognize .cb7, .cbz, .cba, .cbt, and .cbr files as archives.
+
+
+0.030   2020-04-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add .tgz, .tbz, .7z, and .arj.
+
+
+0.02    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -9,6 +17,6 @@ Revision history for Filename-Archive
 	  requirement.
 
 
-0.01    2015-01-01 (PERLANCAR)
+0.01    2015-01-01  Released-By: PERLANCAR
 
         - First release.

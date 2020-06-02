@@ -3,7 +3,7 @@ package Mail::MtPolicyd::AddressList;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 # ABSTRACT: a class for IP address lists
 
 use NetAddr::IP;
@@ -90,7 +90,7 @@ Mail::MtPolicyd::AddressList - a class for IP address lists
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 Attributes
 

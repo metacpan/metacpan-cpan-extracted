@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::Greylist::AWL::Sql;
 use Moose;
 
 # ABSTRACT: backend for SQL greylisting awl storage
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 
 use Time::Seconds;
 
@@ -116,7 +116,7 @@ Mail::MtPolicyd::Plugin::Greylist::AWL::Sql - backend for SQL greylisting awl st
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 AUTHOR
 

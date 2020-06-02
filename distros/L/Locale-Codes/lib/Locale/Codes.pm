@@ -16,7 +16,7 @@ use if $] >= 5.027007, 'deprecate';
 use Locale::Codes::Constants;
 
 our($VERSION);
-$VERSION='3.63';
+$VERSION='3.64';
 
 use Exporter qw(import);
 our(@EXPORT_OK,%EXPORT_TAGS);
@@ -39,7 +39,7 @@ our(%Data,%Retired);
 #              { codealias }{ CODESET } { ALIAS } = CODE
 #
 # $Retired{ TYPE }{ CODESET }{ code }{ CODE } = NAME
-#                            { name }{ NAME } = [CODE,NAME]  (the key is lowercase)
+#                            { name }{ lc(NAME) } = [CODE,NAME]
 
 ###############################################################################
 # METHODS
@@ -139,12 +139,14 @@ sub _code {
    $codeset                 = lc($codeset)  if (defined($codeset));
 
    if (! $$self{'type'}) {
-      carp "ERROR: _code: no type set for Locale::Codes object\n"  if ($$self{'err'});
+      carp "ERROR: _code: no type set for Locale::Codes object\n"
+        if ($$self{'err'});
       return (1);
    }
    my $type = $$self{'type'};
    if ($codeset  &&  ! exists $ALL_CODESETS{$type}{'codesets'}{$codeset}) {
-      carp "ERROR: _code: invalid codeset provided: $codeset\n"  if ($$self{'err'});
+      carp "ERROR: _code: invalid codeset provided: $codeset\n"
+        if ($$self{'err'});
       return (1);
    }
 
@@ -186,7 +188,8 @@ sub _code {
        ! exists $Data{$type}{'code2id'}{$codeset}{$code}  &&
        ! exists $Retired{$type}{$codeset}{'code'}{$code}  &&
        ! exists $Data{$type}{'codealias'}{$codeset}{$code}) {
-      carp "ERROR: _code: code not in codeset: $code [$codeset]\n"  if ($$self{'err'});
+      carp "ERROR: _code: code not in codeset: $code [$codeset]\n"
+        if ($$self{'err'});
       return (1);
    }
 
@@ -519,30 +522,45 @@ sub delete_code {
    }
    ($code,$codeset) = ($c,$cs);
 
-   # Delete the code
+   # Delete active codes
 
-   my $id = $Data{$type}{'code2id'}{$codeset}{$code}[0];
-   delete $Data{$type}{'code2id'}{$codeset}{$code};
-   delete $Data{$type}{'id2code'}{$codeset}{$id};
+   if (exists $Data{$type}{'code2id'}{$codeset}{$code}) {
 
-   # Delete any aliases that are linked to this code
+      my $id = $Data{$type}{'code2id'}{$codeset}{$code}[0];
+      delete $Data{$type}{'code2id'}{$codeset}{$code};
+      delete $Data{$type}{'id2code'}{$codeset}{$id};
 
-   foreach my $alias (keys %{ $Data{$type}{'codealias'}{$codeset} }) {
-      next  if ($Data{$type}{'codealias'}{$codeset}{$alias} ne $code);
-      delete $Data{$type}{'codealias'}{$codeset}{$alias};
+      # Delete any aliases that are linked to this code
+
+      foreach my $alias (keys %{ $Data{$type}{'codealias'}{$codeset} }) {
+         next  if ($Data{$type}{'codealias'}{$codeset}{$alias} ne $code);
+         delete $Data{$type}{'codealias'}{$codeset}{$alias};
+      }
+
+      # If this ID is used in any other codesets, we will leave all of the
+      # names in place.  Otherwise, we'll delete them.
+
+      my $inuse = 0;
+      foreach my $cs (keys %{ $Data{$type}{'id2code'} }) {
+         $inuse = 1, last   if (exists $Data{$type}{'id2code'}{$cs}{$id});
+      }
+
+      if (! $inuse) {
+         my @names = @{ $Data{$type}{'id2names'}{$id} };
+         delete $Data{$type}{'id2names'}{$id};
+
+         foreach my $name (@names) {
+            delete $Data{$type}{'alias2id'}{lc($name)};
+         }
+      }
    }
 
-   # If this ID is not used in any other codeset, delete it completely.
+   # Delete retired codes
 
-   foreach my $c (keys %{ $Data{$type}{'id2code'} }) {
-      return 1  if (exists $Data{$type}{'id2code'}{$c}{$id});
-   }
-
-   my @names = @{ $Data{$type}{'id2names'}{$id} };
-   delete $Data{$type}{'id2names'}{$id};
-
-   foreach my $name (@names) {
-      delete $Data{$type}{'alias2id'}{lc($name)};
+   if (exists $Retired{$type}{$codeset}{'code'}{$code}) {
+      my $name = $Retired{$type}{$codeset}{'code'}{$code};
+      delete $Retired{$type}{$codeset}{'code'}{$code};
+      delete $Retired{$type}{$codeset}{'name'}{lc($name)};
    }
 
    return 1;

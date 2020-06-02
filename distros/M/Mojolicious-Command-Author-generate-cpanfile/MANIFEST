@@ -1,0 +1,11 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Mojolicious/Command/Author/generate/cpanfile.pm
+minil.toml
+t/generate.t
+META.yml
+MANIFEST

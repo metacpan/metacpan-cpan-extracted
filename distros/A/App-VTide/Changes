@@ -1,5 +1,13 @@
 Revision history for App-VTide
 
+0.1.12   2020-06-02
+        Updating for release of version 0.1.12
+        Making sure check is as accurate as possible (Ivan Wills)
+        Making all commands use standard param for sizes (Ivan Wills)
+        Trying to fix new terminal issue (Ivan Wills)
+        Fixed history display (Ivan Wills)
+        Made history (better) (Ivan Wills)
+
 0.1.11   2020-05-19
         Updating for release of version 0.1.11
         Updated date (Ivan Wills)

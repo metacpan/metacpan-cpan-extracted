@@ -4,8 +4,11 @@ use strict;
 use warnings;
 use vars qw($VERSION);
 use Getopt::Long;
-use Class::Business::DK::CPR;
 use English qw(-no_match_vars);
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+use Class::Business::DK::CPR;
 
 $VERSION = '0.01';
 

@@ -1,18 +1,18 @@
 {
-   "abstract" : "A Perl implementation of the Firmata protocol.",
+   "abstract" : "module for controlling Firmata devices",
    "author" : [
       "Aki Mimoto <amimoto@cpan.org>",
       "Norbert Truchsess <ntruchses@cpan.org>",
       "Jens B. <jnsbyr@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Device-Firmata",
    "no_index" : {
@@ -52,6 +52,7 @@
          "web" : "https://github.com/ntruchsess/perl-firmata"
       }
    },
-   "version" : "0.65",
-   "x_homepage" : "https://github.com/ntruchsess/perl-firmata/"
+   "version" : "0.69",
+   "x_homepage" : "https://github.com/ntruchsess/perl-firmata/",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

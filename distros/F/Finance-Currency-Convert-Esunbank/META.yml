@@ -1,0 +1,28 @@
+---
+abstract: 'Query currency exchange rates from Esunbank'
+author:
+  - 'Kang-min Liu <gugod@gugod.org>'
+build_requires:
+  Test2::Harness: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.027, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Finance-Currency-Convert-Esunbank
+provides:
+  Finance::Currency::Convert::Esunbank:
+    file: lib/Finance/Currency/Convert/Esunbank.pm
+    version: v0.1.1
+requires:
+  Mojolicious: '0'
+resources:
+  bugtracker: https://github.com/perltaiwan/Finance-Currency-Convert-Esunbank/issues
+  repository: https://github.com/perltaiwan/Finance-Currency-Convert-Esunbank.git
+version: v0.1.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_spdx_expression: MIT
+x_static_install: '1'

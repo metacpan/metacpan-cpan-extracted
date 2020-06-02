@@ -5,9 +5,9 @@ package Date::Manip::Zones;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Mon Dec  2 09:47:31 EST 2019
-#    Data version: tzdata2019c
-#    Code version: tzcode2019c
+#    Generated on: Mon Jun  1 07:59:10 EDT 2020
+#    Data version: tzdata2020a
+#    Code version: tzcode2020a
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -18,7 +18,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.81';
+$VERSION='6.82';
 END { undef $VERSION; }
 
 our ($TzdataVersion,$TzcodeVersion,
@@ -37,11 +37,11 @@ END {
    undef %Offmod;
 }
 
-$TzdataVersion = 'tzdata2019c';
-$TzcodeVersion = 'tzcode2019c';
+$TzdataVersion = 'tzdata2020a';
+$TzcodeVersion = 'tzcode2020a';
 $FirstDate     = '0001010200:00:00';
 $LastDate      = '9999123100:00:00';
-$LastYear      = '2089';
+$LastYear      = '2090';
 
 
 %Module = (
@@ -113,7 +113,6 @@ $LastYear      = '2089';
   'america/fort_nelson'                => 'amfort00',
   'america/fortaleza'                  => 'amfort01',
   'america/glace_bay'                  => 'amglac00',
-  'america/godthab'                    => 'amgodt00',
   'america/goose_bay'                  => 'amgoos00',
   'america/grand_turk'                 => 'amgran00',
   'america/guatemala'                  => 'amguat00',
@@ -161,6 +160,7 @@ $LastYear      = '2089';
   'america/north_dakota/beulah'        => 'ambeul00',
   'america/north_dakota/center'        => 'amcent00',
   'america/north_dakota/new_salem'     => 'amnew_01',
+  'america/nuuk'                       => 'amnuuk00',
   'america/ojinaga'                    => 'amojin00',
   'america/panama'                     => 'ampana00',
   'america/pangnirtung'                => 'ampang00',
@@ -522,7 +522,6 @@ $LastYear      = '2089';
   'america/fort_nelson'                => 'America/Fort_Nelson',
   'america/fortaleza'                  => 'America/Fortaleza',
   'america/glace_bay'                  => 'America/Glace_Bay',
-  'america/godthab'                    => 'America/Godthab',
   'america/goose_bay'                  => 'America/Goose_Bay',
   'america/grand_turk'                 => 'America/Grand_Turk',
   'america/guatemala'                  => 'America/Guatemala',
@@ -570,6 +569,7 @@ $LastYear      = '2089';
   'america/north_dakota/beulah'        => 'America/North_Dakota/Beulah',
   'america/north_dakota/center'        => 'America/North_Dakota/Center',
   'america/north_dakota/new_salem'     => 'America/North_Dakota/New_Salem',
+  'america/nuuk'                       => 'America/Nuuk',
   'america/ojinaga'                    => 'America/Ojinaga',
   'america/panama'                     => 'America/Panama',
   'america/pangnirtung'                => 'America/Pangnirtung',
@@ -932,7 +932,6 @@ $LastYear      = '2089';
   'america/fort_nelson'                => 'america/fort_nelson',
   'america/fortaleza'                  => 'america/fortaleza',
   'america/glace_bay'                  => 'america/glace_bay',
-  'america/godthab'                    => 'america/godthab',
   'america/goose_bay'                  => 'america/goose_bay',
   'america/grand_turk'                 => 'america/grand_turk',
   'america/guatemala'                  => 'america/guatemala',
@@ -980,6 +979,7 @@ $LastYear      = '2089';
   'america/north_dakota/beulah'        => 'america/north_dakota/beulah',
   'america/north_dakota/center'        => 'america/north_dakota/center',
   'america/north_dakota/new_salem'     => 'america/north_dakota/new_salem',
+  'america/nuuk'                       => 'america/nuuk',
   'america/ojinaga'                    => 'america/ojinaga',
   'america/panama'                     => 'america/panama',
   'america/pangnirtung'                => 'america/pangnirtung',
@@ -1316,6 +1316,7 @@ $LastYear      = '2089';
   'america/dominica'                   => 'america/port_of_spain',
   'america/ensenada'                   => 'america/tijuana',
   'america/fort_wayne'                 => 'america/indiana/indianapolis',
+  'america/godthab'                    => 'america/nuuk',
   'america/grenada'                    => 'america/port_of_spain',
   'america/guadeloupe'                 => 'america/port_of_spain',
   'america/indianapolis'               => 'america/indiana/indianapolis',
@@ -1567,7 +1568,7 @@ $LastYear      = '2089';
   'gmt standard time'                  => 'europe/london',
   'gtb standard time'                  => 'europe/istanbul',
   'georgian standard time'             => 'asia/tbilisi',
-  'greenland standard time'            => 'america/godthab',
+  'greenland standard time'            => 'america/nuuk',
   'greenwich standard time'            => 'atlantic/reykjavik',
   'hawaiian standard time'             => 'pacific/honolulu',
   'india standard time'                => 'asia/kolkata',
@@ -2282,6 +2283,8 @@ $LastYear      = '2089';
                      'america/dawson_creek',
                      'america/inuvik',
                      'america/fort_nelson',
+                     'america/dawson',
+                     'america/whitehorse',
                      'america/north_dakota/beulah',
                      'america/bahia_banderas',
                      'america/north_dakota/new_salem',

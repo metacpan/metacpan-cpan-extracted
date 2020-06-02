@@ -21,7 +21,8 @@ my %WriteMakefileArgs = (
 	'JSON' => 0,
 	'Compiled::Params::OO' => 0.04,
 	'Type::Tiny' => 1.010001,
-    	'Tie::IxHash' => 1.23
+    	'Tie::IxHash' => 1.23,
+	'Blessed::Merge' => 0.11
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'JSON-Schema-Generate-*' },

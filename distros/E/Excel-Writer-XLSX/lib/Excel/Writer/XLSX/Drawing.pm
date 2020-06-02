@@ -6,7 +6,7 @@ package Excel::Writer::XLSX::Drawing;
 #
 # Used in conjunction with Excel::Writer::XLSX
 #
-# Copyright 2000-2019, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2020, John McNamara, jmcnamara@cpan.org
 #
 # Documentation after __END__
 #
@@ -21,7 +21,7 @@ use Excel::Writer::XLSX::Package::XMLwriter;
 use Excel::Writer::XLSX::Worksheet;
 
 our @ISA     = qw(Excel::Writer::XLSX::Package::XMLwriter);
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 
 ###############################################################################
@@ -1488,7 +1488,7 @@ John McNamara jmcnamara@cpan.org
 
 =head1 COPYRIGHT
 
-(c) MM-MMXIX, John McNamara.
+(c) MM-MMXX, John McNamara.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.
 

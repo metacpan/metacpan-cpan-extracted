@@ -1,6 +1,8 @@
 use 5.010;
 use alienfile;
 use Sort::Versions;
+use Env qw /@PATH/;
+use Path::Tiny qw /path/;
 
 my $on_windows = $^O =~ /mswin/i;
 my $on_automated_rig
@@ -8,32 +10,28 @@ my $on_automated_rig
   || $ENV{PERL_CPAN_REPORTER_CONFIG}
   || $ENV{AUTOMATED_TESTING}
   || $ENV{TRAVIS}
-  || $ENV{APPVEYOR};
+  || $ENV{APPVEYOR}
+  || $ENV{CI};
 
 my @aliens_l_and_I = qw(
         Alien::geos::af
         Alien::proj
         Alien::sqlite
+        Alien::libtiff
   );
 
 #  make sure we get GEOS, PROJ and other support
-use Alien::geos::af;
-use Alien::proj;
-use Alien::sqlite;
-my $sep_char = $on_windows ? ';' : ':';
-$ENV{PATH} .= $sep_char
-  . join (
-    $sep_char,
-    Alien::geos::af->bin_dir,
-    Alien::proj->bin_dir,
-    Alien::sqlite->bin_dir,
-  );
+foreach my $alien (@aliens_l_and_I) {
+  eval "require $alien";
+  if ($alien->install_type eq 'share') {
+    unshift @PATH, $alien->bin_dir;
+  }
+}
 my $have_spatialite = eval 'require
   Alien::spatialite';
 if ($have_spatialite) {
     $have_spatialite = 'Alien' . '::' . 'spatialite';  #  hide from scanners
-    $ENV{PATH} .= $sep_char
-    . $have_spatialite->bin_dir;
+    unshift @PATH, $have_spatialite->bin_dir;
     push @aliens_l_and_I, $have_spatialite;
 }
 
@@ -60,6 +58,7 @@ plugin 'Build::SearchDep' => (
 #  might also be able to access via old hash via https://metacpan.org/pod/Alien::Build#install_prop
 my $have_alien_gdal = eval 'require Alien::gdal';
 if (0 && $have_alien_gdal && Alien::gdal->install_type eq 'share') {
+    my $sep_char = $on_windows ? ';' : ':';
     my $ag_version = Alien::gdal->version;
     say "Found existing gdal via alien ($ag_version) in " .  Alien::gdal->dist_dir;
     #  append the relevant path
@@ -110,7 +109,7 @@ share {
   plugin Extract => (format => 'tar.gz');
 
   if (versioncmp($gdal_version, '2.3.0') == -1) {
-    if ($^O =~ /mswin/i) {
+    if ($on_windows) {
       #  fix known issue in 2.2.3, harmless in 2.2.4.
       patch [
         '%{patch} port/cpl_port.h < ' . $patch_file_isnan,
@@ -134,61 +133,107 @@ share {
   $build_static = '' if $ENV{FORCE_DYNAMIC};
   
   
-  if ($^O =~ /bsd/) {
+  if ($^O =~ /bsd|dragonfly/) {
     plugin 'Build::Make' => 'gmake';
     if (-d '/usr/local') {
-        $with_local = ' --with-local=/usr/local ';
+        $with_local = '--with-local=/usr/local';
     }
   }
-  elsif ($^O =~ /dragonfly/) {
-    #  might need to be combined with bsd check above
-    #  but not sure if /usr/local is needed yet
-    plugin 'Build::Make' => 'gmake';
-  }
 
-  my $with_gnm = '';
+
   my $make_cmd = '%{make}';
-  my $make_inst_cmd = '%{make} install';
-  my @make_clean;
+  my $make_inst_cmd = '%{make} install';  
+  my @automated_rig_config_args;
+  
   #  try not to exceed the cpan-testers log limits
   if ($on_automated_rig) {
     say "Running under CI or automated testing";
-    $make_cmd      .= q/ | perl -ne "BEGIN {$|=1; open our $log, q|>|, q|build.log|};   print qq|\n| if 0 == ($. %% 100); print q|.|; print {$log} $_;" || type build.log/;
-    $make_inst_cmd .= q/ | perl -ne "BEGIN {$|=1; open our $log, q|>|, q|install.log|}; print qq|\n| if 0 == ($. %% 100); print q|.|; print {$log} $_;" || type install.log/;
+    $make_cmd      .= q/ | perl -ne "BEGIN {$|=1; open our $log, q|>|, q|build.log|};   print qq|\n| if 0 == ($. %% 100); print q|.|; print {$log} $_;" /;
+    $make_inst_cmd .= q/ | perl -ne "BEGIN {$|=1; open our $log, q|>|, q|install.log|}; print qq|\n| if 0 == ($. %% 100); print q|.|; print {$log} $_;" /;
     if (!$on_windows) {
         $make_cmd =~ s/%%/%/;
-        $make_cmd =~ s/type/cat/;
         $make_cmd =~ s/"/'/g;
+        $make_cmd .= ' || (E=$? && cat build.log && exit $E)';
         $make_inst_cmd =~ s/%%/%/;
-        $make_inst_cmd =~ s/type/cat/;
         $make_inst_cmd =~ s/"/'/g;
+        $make_inst_cmd .= ' || (E=$? && cat install.log && exit $E)';
     }
-    if (! ($ENV{TRAVIS} || $ENV{APPVEYOR})) {
-        #  build will be slightly faster, and we do not use it yet
-        $with_gnm = '--with-gnm=no'
+    else {
+        #  fake exit codes on failure, not sure how to get originals
+        $make_cmd      .= q/ || perl -e"system ('type', 'build.log'); exit 1"/;
+        $make_inst_cmd .= q/ || perl -e"system ('type', 'install.log'); exit 1"/;
     }
+    if (! ($ENV{TRAVIS} || $ENV{APPVEYOR} || $ENV{CI})) {
+        #  make build slightly faster and smaller on cpan testers
+        push @automated_rig_config_args, '--with-gnm=no';
+    }
+    #  debug
+    push @automated_rig_config_args,
+      (qw/--with-openjpeg=no --with-jasper=no/);
+
     #  clean up the build dir on cpan testers etc
     plugin 'Cleanse::BuildDir';
   }
   
-  my $with_sqlite3    = '';
-  my $with_spatialite = '';
+  my @with_args = (
+    #'--with-libtiff=internal',
+    $with_cpp11,
+    $with_local,
+    @automated_rig_config_args,
+    #'--without-pg',
+  );
+  my @ld_flags;
   #  system installs won't necessarily have dist dirs
-  if (Alien::sqlite->install_type eq 'share') {
-    $with_sqlite3 = '--with-sqlite3=' . Alien::sqlite->dist_dir;
+  if (Alien::proj->install_type eq 'share') {
+    push @with_args, '--with-proj=' . Alien::proj->dist_dir;
+  }
+  if (Alien::libtiff->install_type eq 'share') {
+    push @with_args, '--with-libtiff=' . Alien::libtiff->dist_dir;
   }
   if ($have_spatialite && $have_spatialite->install_type eq 'share') {
-    $with_spatialite = '--with-spatialite=' . $have_spatialite->dist_dir;
+    push @with_args, '--with-spatialite=' . $have_spatialite->dist_dir;
   }
+  #  get dynamic proj extra deps, one day will not be needed
+  push @with_args,
+    q{--with-proj-extra-lib-for-test="} . Alien::proj->libs . q{"};
+  if (Alien::sqlite->install_type eq 'share') {
+    push @with_args, '--with-sqlite3=' . Alien::sqlite->dist_dir;
+    push @ld_flags, 'LDFLAGS=' . Alien::sqlite->libs;
+    #'-L/home/libraries/intel/sqlite/lib -lsqlite3'
+  }
+  
+  
+  my $config_args = $ENV{ALIEN_GDAL_CONFIG_ARGS} // '';
+  $config_args =~ s/[^-\s\w,=+]//g;  #  overkill?
+  $config_args = join (' ', @with_args) . " $config_args";
 
+  if (versioncmp ($gdal_version, '3.2') < 0) {
+    meta->before_hook( build => \&patch_makefile_long_line );
+  }
+  
+  meta->around_hook( build => \&remove_gitfw_from_path );
+  
+  #  debug
+  if ($ENV{CI} && Alien::proj->install_type eq 'share') {
+    my $dir = path(Alien::proj->dist_dir);
+    my @files = File::Find::Rule
+      ->file()
+      ->name( '*' )
+      #->recursive
+      ->in( "$dir" );;
+    say 'PROJ INCLUDE FILES: ' . join ' ', @files;
+    say 'PROJ CFLAGS: ' . Alien::proj->cflags;
+  }
+  
+  #  not sure this is needed, or if it is to deal with a cirrus quirk 
+  #local $ENV{LDFLAGS} = join ' ', @ld_flags;
   build [
-    "%{configure} --with-libtiff=internal $with_local $with_cpp11 $with_sqlite3 $with_spatialite $build_static",
-    \&update_makefile,
+    \&update_pkg_conf_path,
+    "%{configure} $config_args $build_static",
     \&pause,
     $make_cmd,
     \&patch_pkgconfig,
     $make_inst_cmd,
-    @make_clean
   ];
 
 };
@@ -197,6 +242,95 @@ sub update_makefile {
     return;  #  should not be needed now
     return if !$on_windows;
     system ($^X, '-p', '-i.bak', q{-e"s/\$\(GDAL_ROOT\)/\./"}, "GNUmakefile");
+}
+
+sub update_pkg_conf_path {
+    return if !$on_windows;
+    use Env qw /@PKG_CONFIG_PATH/;
+    say 'Modifying drive paths in PKG_CONFIG_PATH';
+    say $ENV{PKG_CONFIG_PATH};
+    #  msys-ificate drive paths
+    @PKG_CONFIG_PATH = map {s{^([a-z]):}{/$1}ri} @PKG_CONFIG_PATH;
+    say $ENV{PKG_CONFIG_PATH};
+    return;
+}
+
+
+sub patch_makefile_long_line {
+    my ($build) = @_;
+
+    #return if !$on_windows;
+    
+    my $target = "GNUmakefile";
+    $build->log ("Patching $target to cope with long lines");
+    #my $target_line = quotemeta q{$(LD) $(LDFLAGS) $(LIBS) -o $@ $(sort $(wildcard $(GDAL_OBJ:.o=.lo))) \ };
+    
+    my $text_target1 = '$(LIBGDAL):	$(GDAL_OBJ:.o=.lo)';
+    my $x = quotemeta $text_target1;
+    my $qr_target1 = qr /^$x/;
+    my $new_contents1 = <<'NEW_CONTENTS'
+SORTED  := $(sort $(wildcard $(GDAL_OBJ:.o=.lo)))
+NSORTED := $(words $(SORTED))
+#  mid left and right indices
+MIDL := $(shell echo $$(( $(NSORTED) / 2 )) )
+MIDR := $(shell echo $$(( $(MIDL) + 1 )) )
+NEW_CONTENTS
+  ;
+    my $qr_target2 = qr /sort .+wildcard/;
+    my $new_contents2 = << 'NEW_CONTENTS'
+$(LD) $(LDFLAGS) $(LIBS) -o $@ \
+$(wordlist 1,$(MIDL),$(SORTED)) \
+$(wordlist $(MIDR),$(NSORTED),$(SORTED)) \
+NEW_CONTENTS
+  ;
+    $new_contents2 =~ s/^/\t/gms;
+    open my $fh , '<', $target
+      or die "Could not open GNUmakefile for reading, $!";
+    my $file_contents;
+    
+    while (my $line = <$fh>) {
+        if ($line =~ $qr_target1) {
+            $file_contents .= $new_contents1;
+        }
+        elsif ($line =~ $qr_target2) {
+            $line = $new_contents2;
+        };
+        $file_contents .= $line;
+    }
+    $fh->close;
+    rename $target, "$target.bak";
+    open my $ofh, '>', $target
+      or die "Could not open $target for writing, $!";
+    print {$ofh} $file_contents;
+    return;
+}
+
+#  git for windows clashes with MSYS
+#  if its /usr/bin dir is in the path
+sub remove_gitfw_from_path {
+  my ($orig, $build, @args) = @_;
+
+  return $orig->($build, @args)
+    if !$on_windows;
+
+  local $ENV{PATH} = $ENV{PATH};
+
+  my $msys_path = eval {
+    path('Alien::MSYS'->msys_path())
+  };
+  return if !defined $msys_path;
+  my $count = @PATH;
+
+  @PATH
+    = grep {path($_)->stringify =~ m|/usr/bin$| && path($_) ne $msys_path ? () : $_}
+      @PATH;
+
+  my $removed = $count - @PATH;
+  if ($removed) {
+    $build->log ("$removed additional .../usr/bin dirs were removed from the path for compilation");
+  }
+
+  $orig->($build, @args);
 }
 
 sub pause {

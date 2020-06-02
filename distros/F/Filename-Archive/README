@@ -1,5 +1,12 @@
-SYNOPSIS
+NAME
+    Filename::Archive - Check whether filename indicates being an archive
+    file
 
+VERSION
+    This document describes version 0.031 of Filename::Archive (from Perl
+    distribution Filename-Archive), released on 2020-06-02.
+
+SYNOPSIS
      use Filename::Archive qw(check_archive_filename);
      my $res = check_archive_filename(filename => "foo.tar.gz");
      if ($res) {
@@ -11,8 +18,54 @@ SYNOPSIS
      }
 
 DESCRIPTION
+FUNCTIONS
+  check_archive_filename
+    Usage:
+
+     check_archive_filename(%args) -> bool|hash
+
+    Check whether filename indicates being an archive file.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   ci => *bool* (default: 1)
+
+        Whether to match case-insensitively.
+
+    *   filename* => *str*
+
+    Return value: (bool|hash)
+
+    Return false if no archive suffixes detected. Otherwise return a hash of
+    information, which contains these keys: "archive_name",
+    "archive_suffix", "compressor_info".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Filename-Archive>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Filename-Archive>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Filename-Archive>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Filename::Compressed
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

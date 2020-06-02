@@ -1,3 +1,14 @@
+0.132   2020-06-02  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Used wrong variable [copy-paste mistake].
+
+
+0.131   2020-06-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Add some additional fields: backend, type_from_name,
+	  video_shortest_side, video_longest_side, video_orientation.
+
+
 0.130   2019-07-03  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

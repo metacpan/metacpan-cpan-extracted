@@ -46,3 +46,7 @@
 9
     - Fix `download` command on MacOS. Now actually tested on MacOS!
     - Default to `moar` backend in `build` and `download` commands.
+
+10
+    - Implement Tcsh support. The implementation includes auto-complete.
+    - Fix `test` and `triple` commands.

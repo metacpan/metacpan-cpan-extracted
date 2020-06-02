@@ -1,6 +1,21 @@
 Revision history for DBIx-Class-Smooth
 
-0.0102 2019-12-22 23:04:36 UTC
+0.0103 2020-05-31 19:15:33 UTC
+ [Documentation]
+ - Documentation typos in ::ResultBase fixed
+
+ [Stats & Dependency Changes]
+ - 36 files changed, 38 insertions(+), 38 deletions(-)
+ - (dev req) ~ Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   0.008 --> 0.009
+ - (dev req) ~ Dist::Zilla::Plugin::CheckChangesHasContent 0.008 --> 0.011
+ - (dev req) ~ Dist::Zilla::Plugin::Git 2.045 --> 2.046
+ - (dev req) ~ Dist::Zilla::Plugin::Git::Contributors 0.034 --> 0.035
+ - (dev req) ~ Dist::Zilla::Plugin::RunExtraTests 0.028 --> 0.029
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Compile 2.057 --> 2.058
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0323 --> 0.0324
+
+0.0102 2019-12-22T23:04:36Z UTC
  [Bug Fixes]
  - Removed a leftover Dumper debug statement. Thanks to MANWAR for the
    heads up.

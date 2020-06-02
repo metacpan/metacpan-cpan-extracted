@@ -1,5 +1,8 @@
 Revision history for Perl extension CPAN::SQLite.
 
+0.219 May 30, 2020
+  - More FP protections
+
 0.218 May 27, 2020
   - Make Test::Memory::Cycle test optional
   - Modified the dot-cpan directory for t/0[234]*

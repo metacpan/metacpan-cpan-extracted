@@ -3,7 +3,7 @@ package Net::Async::Redis::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '2.003'; # VERSION
+our $VERSION = '2.004'; # VERSION
 
 =head1 NAME
 
@@ -772,7 +772,7 @@ Enable or disable server assisted client side caching support.
 
 =item * [REDIRECT client-id]
 
-=item * [PREFIX prefix]
+=item * [PREFIX prefix [PREFIX prefix ...]]
 
 =item * [BCAST]
 
@@ -2656,6 +2656,38 @@ sub acl_genpass : method {
     $self->execute_command(qw(ACL GENPASS) => @args)
 }
 
+=head2 acl_getuser
+
+Get the rules for a specific ACL user.
+
+=over 4
+
+=item * username
+
+=back
+
+L<https://redis.io/commands/acl-getuser>
+
+=cut
+
+sub acl_getuser : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(ACL GETUSER) => @args)
+}
+
+=head2 acl_help
+
+Show helpful text about the different subcommands.
+
+L<https://redis.io/commands/acl-help>
+
+=cut
+
+sub acl_help : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(ACL HELP) => @args)
+}
+
 =head2 acl_list
 
 List the current ACL rules in ACL config file format.
@@ -2720,7 +2752,9 @@ Modify or create the rules for a specific ACL user.
 
 =over 4
 
-=item * rule [rule ...]
+=item * username
+
+=item * [rule [rule ...]]
 
 =back
 

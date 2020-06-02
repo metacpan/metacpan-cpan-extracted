@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2012 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2020 -- leonerd@leonerd.org.uk
 
 package IO::Socket::Packet;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Socket );
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Carp;
 
@@ -44,16 +44,16 @@ C<IO::Socket::Packet> - Object interface to C<AF_PACKET> domain sockets
 
 =head1 SYNOPSIS
 
- use IO::Socket::Packet;
- use Socket::Packet qw( unpack_sockaddr_ll );
+   use IO::Socket::Packet;
+   use Socket::Packet qw( unpack_sockaddr_ll );
 
- my $sock = IO::Socket::Packet->new( IfIndex => 0 );
+   my $sock = IO::Socket::Packet->new( IfIndex => 0 );
 
- while( my ( $protocol, $ifindex, $hatype, $pkttype, $addr ) = 
-    $sock->recv_unpack( my $packet, 8192, 0 ) ) {
+   while( my ( $protocol, $ifindex, $hatype, $pkttype, $addr ) = 
+      $sock->recv_unpack( my $packet, 8192, 0 ) ) {
 
-    ...
- }
+      ...
+   }
 
 =head1 DESCRIPTION
 
@@ -67,7 +67,9 @@ class.
 
 =cut
 
-=head2 $sock = IO::Socket::Packet->new( %args )
+=head2 new
+
+   $sock = IO::Socket::Packet->new( %args )
 
 Creates a new C<IO::Socket::Packet> object. If any arguments are passed it
 will be configured to contain a newly created socket handle, and be C<bind>ed
@@ -130,7 +132,9 @@ sub configure
 
 =cut
 
-=head2 ( $addr, $len ) = $sock->recv_len( $buffer, $maxlen, $flags )
+=head2 recv_len
+
+   ( $addr, $len ) = $sock->recv_len( $buffer, $maxlen, $flags )
 
 Similar to Perl's C<recv> builtin, except it returns the packet length as an
 explict return value. This may be useful if C<$flags> contains the
@@ -141,7 +145,10 @@ if this is longer than the data written in the buffer.
 
 # don't actually need to implement it; the imported symbol works fine
 
-=head2 ( $protocol, $ifindex, $hatype, $pkttype, $addr, $len ) = $sock->recv_unpack( $buffer, $size, $flags )
+=head2 recv_unpack
+
+   ( $protocol, $ifindex, $hatype, $pkttype, $addr, $len ) =
+      $sock->recv_unpack( $buffer, $size, $flags )
 
 This method is a combination of C<recv_len> and C<unpack_sockaddr_ll>. If it
 successfully receives a packet, it unpacks the address and returns the fields
@@ -180,7 +187,9 @@ sub recv_unpack
    return unpack_sockaddr_ll( $addr ), $len;
 }
 
-=head2 $protocol = $sock->protocol
+=head2 protocol
+
+   $protocol = $sock->protocol
 
 Returns the ethertype protocol the socket is bound to.
 
@@ -192,7 +201,9 @@ sub protocol
    return (unpack_sockaddr_ll($self->sockname))[0];
 }
 
-=head2 $ifindex = $sock->ifindex
+=head2 ifindex
+
+   $ifindex = $sock->ifindex
 
 Returns the interface index the socket is bound to.
 
@@ -204,7 +215,9 @@ sub ifindex
    return (unpack_sockaddr_ll($self->sockname))[1];
 }
 
-=head2 $ifname = $sock->ifname
+=head2 ifname
+
+   $ifname = $sock->ifname
 
 Returns the name of the interface the socket is bound to.
 
@@ -216,7 +229,9 @@ sub ifname
    return siocgifname( $self, $self->ifindex );
 }
 
-=head2 $hatype = $sock->hatype
+=head2 hatype
+
+   $hatype = $sock->hatype
 
 Returns the hardware address type for the interface the socket is bound to.
 
@@ -228,9 +243,11 @@ sub hatype
    return (unpack_sockaddr_ll($self->sockname))[2];
 }
 
-=head2 $time = $sock->timestamp
+=head2 timestamp
 
-=head2 ( $sec, $usec ) = $sock->timestamp
+   $time = $sock->timestamp
+
+   ( $sec, $usec ) = $sock->timestamp
 
 Returns the timestamp of the last received packet on the socket (as obtained
 by the C<SIOCGSTAMP> C<ioctl>). In scalar context, returns a single
@@ -256,9 +273,11 @@ sub timestamp
    return siocgstamp( $self );
 }
 
-=head2 $time = $sock->timestamp_nano
+=head2 timestamp_nano
 
-=head2 ( $sec, $nsec ) = $sock->timestamp_nano
+   $time = $sock->timestamp_nano
+
+   ( $sec, $nsec ) = $sock->timestamp_nano
 
 Returns the nanosecond-precise timestamp of the last received packet on the
 socket (as obtained by the C<SIOCGSTAMPNS> C<ioctl>). In scalar context,
@@ -293,9 +312,11 @@ it again.
 
 =cut
 
-=head2 $ifindex = $sock->ifname2index( $ifname )
+=head2 ifname2index
 
-=head2 $ifindex = IO::Socket::Packet->ifname2index( $ifname )
+   $ifindex = $sock->ifname2index( $ifname )
+
+   $ifindex = IO::Socket::Packet->ifname2index( $ifname )
 
 Returns the name for the given interface index, or C<undef> if it doesn't
 exist.
@@ -319,9 +340,11 @@ sub ifname2index
    return siocgifindex( $sock, $ifname );
 }
 
-=head2 $ifname = $sock->ifindex2name( $ifindex )
+=head2 ifindex2name
 
-=head2 $ifname = IO::Socket::Packet->ifindex2name( $ifindex )
+   $ifname = $sock->ifindex2name( $ifindex )
+
+   $ifname = IO::Socket::Packet->ifindex2name( $ifindex )
 
 Returns the index for the given interface name, or C<undef> if it doesn't
 exist.
@@ -367,7 +390,9 @@ sub _make_sockopt_int
 
 =cut
 
-=head2 $sock->add_multicast( $addr, $ifindex )
+=head2 add_multicast
+
+   $sock->add_multicast( $addr, $ifindex )
 
 Adds the given multicast address on the given interface index. If the
 interface index is not supplied, C<< $sock->ifindex >> is used.
@@ -385,7 +410,9 @@ sub add_multicast
    );
 }
 
-=head2 $sock->drop_multicast( $addr, $ifindex )
+=head2 drop_multicast
+
+   $sock->drop_multicast( $addr, $ifindex )
 
 Drops the given multicast address on the given interface index. If the
 interface index is not supplied, C<< $sock->ifindex >> is used.
@@ -403,7 +430,9 @@ sub drop_multicast
    );
 }
 
-=head2 $sock->promisc( $promisc, $ifindex )
+=head2 promisc
+
+   $sock->promisc( $promisc, $ifindex )
 
 Sets or clears the PACKET_MR_PROMISC flag on the given interface. If the
 interface index is not supplied, C<< $sock->ifindex >> is used.
@@ -421,7 +450,9 @@ sub promisc
    );
 }
 
-=head2 $sock->allmulti( $allmulti, $ifindex )
+=head2 allmulti
+
+   $sock->allmulti( $allmulti, $ifindex )
 
 Sets or clears the PACKET_MR_ALLMULTI flag on the given interface. If the
 interface index is not supplied, C<< $sock->ifindex >> is used.
@@ -439,7 +470,9 @@ sub allmulti
    );
 }
 
-=head2 $stats = $sock->statistics
+=head2 statistics
+
+   $stats = $sock->statistics
 
 Returns the socket statistics. This will be a two-field hash containing
 counts C<packets>, the total number of packets the socket has seen, and
@@ -461,9 +494,11 @@ sub statistics
    return \%stats;
 }
 
-=head2 $val = $sock->origdev
+=head2 origdev
 
-=head2 $sock->origdev( $val )
+   $val = $sock->origdev
+
+   $sock->origdev( $val )
 
 Return or set the value of the C<PACKET_ORIGDEV> socket option.
 
@@ -482,7 +517,9 @@ module distribution; see F<examples/capture-rxring.pl> for more detail.
 
 =cut
 
-=head2 $size = $sock->setup_rx_ring( $frame_size, $frame_nr, $block_size )
+=head2 setup_rx_ring
+
+   $size = $sock->setup_rx_ring( $frame_size, $frame_nr, $block_size )
 
 Sets up the ring-buffer on the object. This method is identical to the
 C<Socket::Packet> function C<setup_rx_ring>, except that the ring-buffer
@@ -506,7 +543,9 @@ sub setup_rx_ring
    return $ret;
 }
 
-=head2 $len = $sock->get_ring_frame( $buffer, \%info )
+=head2 get_ring_frame
+
+   $len = $sock->get_ring_frame( $buffer, \%info )
 
 Receives the next packet from the ring-buffer. If there are no packets waiting
 it will return undef. This method aliases the C<$buffer> variable to the
@@ -527,7 +566,9 @@ sub get_ring_frame
    return Socket::Packet::get_ring_frame( $self, $_[0], $_[1] );
 }
 
-=head2 $len = $sock->wait_ring_frame( $buffer, \%info )
+=head2 wait_ring_frame
+
+   $len = $sock->wait_ring_frame( $buffer, \%info )
 
 If a packet is ready, this method sets C<$buffer> and C<%info> as per the
 C<get_ring_frame> method. If there are no packets waiting and the socket is
@@ -559,7 +600,9 @@ sub wait_ring_frame
    return $len;
 }
 
-=head2 $sock->done_ring_frame
+=head2 done_ring_frame
+
+   $sock->done_ring_frame
 
 Hands the current ring-buffer frame back to the kernel.
 

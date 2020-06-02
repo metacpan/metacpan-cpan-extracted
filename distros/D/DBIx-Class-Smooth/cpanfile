@@ -1,4 +1,4 @@
-# This file was auto-generated from iller.yaml by Dist::Iller on 2019-12-22 23:00:17 UTC.
+# This file was auto-generated from iller.yaml by Dist::Iller on 2020-05-31 19:08:59 UTC.
 
 on runtime => sub {
     requires 'Carp' => '1.38';
@@ -43,19 +43,19 @@ on develop => sub {
     requires 'Badge::Depot::Plugin::Travis' => '0';
     requires 'Dist::Zilla' => '6.012';
     requires 'Dist::Zilla::Plugin::Authority' => '1.009';
-    requires 'Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional' => '0.008';
+    requires 'Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional' => '0.009';
     requires 'Dist::Zilla::Plugin::ChangeStats::Dependencies::Git' => '0.0200';
-    requires 'Dist::Zilla::Plugin::CheckChangesHasContent' => '0.008';
+    requires 'Dist::Zilla::Plugin::CheckChangesHasContent' => '0.011';
     requires 'Dist::Zilla::Plugin::Clean' => '0.07';
     requires 'Dist::Zilla::Plugin::ConfirmRelease' => '0';
     requires 'Dist::Zilla::Plugin::CopyFilesFromBuild' => '0.170880';
     requires 'Dist::Zilla::Plugin::DistIller::MetaGeneratedBy' => '0';
     requires 'Dist::Zilla::Plugin::ExecDir' => '0';
-    requires 'Dist::Zilla::Plugin::Git' => '2.045';
+    requires 'Dist::Zilla::Plugin::Git' => '2.046';
     requires 'Dist::Zilla::Plugin::Git::Check' => '0';
     requires 'Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch' => '0.014';
     requires 'Dist::Zilla::Plugin::Git::Commit' => '0';
-    requires 'Dist::Zilla::Plugin::Git::Contributors' => '0.034';
+    requires 'Dist::Zilla::Plugin::Git::Contributors' => '0.035';
     requires 'Dist::Zilla::Plugin::Git::GatherDir' => '0';
     requires 'Dist::Zilla::Plugin::Git::Push' => '0';
     requires 'Dist::Zilla::Plugin::Git::Tag' => '0';
@@ -77,9 +77,9 @@ on develop => sub {
     requires 'Dist::Zilla::Plugin::Readme' => '0';
     requires 'Dist::Zilla::Plugin::ReadmeAnyFromPod' => '0.163250';
     requires 'Dist::Zilla::Plugin::RewriteVersion::Transitional' => '0.007';
-    requires 'Dist::Zilla::Plugin::RunExtraTests' => '0.028';
+    requires 'Dist::Zilla::Plugin::RunExtraTests' => '0.029';
     requires 'Dist::Zilla::Plugin::ShareDir' => '0';
-    requires 'Dist::Zilla::Plugin::Test::Compile' => '2.057';
+    requires 'Dist::Zilla::Plugin::Test::Compile' => '2.058';
     requires 'Dist::Zilla::Plugin::Test::EOF' => '0.0501';
     requires 'Dist::Zilla::Plugin::Test::EOL' => '0.18';
     requires 'Dist::Zilla::Plugin::Test::Kwalitee::Extra' => 'v0.2.1';
@@ -111,5 +111,5 @@ on develop => sub {
 };
 on develop => sub {
     suggests 'Dist::Iller' => '0.1408';
-    suggests 'Dist::Iller::Config::Author::CSSON' => '0.0323';
+    suggests 'Dist::Iller::Config::Author::CSSON' => '0.0324';
 };

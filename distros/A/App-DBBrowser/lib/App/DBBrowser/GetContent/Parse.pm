@@ -174,7 +174,7 @@ sub __parse_with_template {
             require App::DBBrowser::GetContent;
             my $gc = App::DBBrowser::GetContent->new( $sf->{i}, $sf->{o} );
             my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
-            $sf->{o} = $opt_set->set_options( $gc->__setting_menu_entries() );
+            $sf->{o} = $opt_set->set_options( [ { name => 'group_insert', text => '' } ] );
             return -1;
         }
         require String::Unescape;

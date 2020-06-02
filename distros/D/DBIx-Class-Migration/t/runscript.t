@@ -25,35 +25,35 @@ my $runs = sub {
   ok $runscript->schema->resultset('Artist'), 'got Artist RS';
 };
 
-BASIC: {
+subtest BASIC => sub {
   my $run = DBIx::Class::Migration::RunScript->new_with_traits(
     traits=>['SchemaLoader'], runs=>$runs);
 
   $run->as_coderef->($migration->schema, [1,2]);
-}
+};
 
-SUGAR: {
+subtest SUGAR => sub {
   my $code = builder {
     'SchemaLoader',
     $runs,
   };
   
   $code->($migration->schema, [1,2]);
-}
+};
 
-SUGAR2: {
+subtest SUGAR2 => sub {
   my $code = migrate {
     $runs->(shift)
   };
   $code->($migration->schema, [1,2]);
-}
+};
 
 # second go so that %INC now contains RunScript with all traits to trigger bug
-SUGAR3: {
+subtest SUGAR3 => sub {
   my $code = migrate {
     $runs->(shift)
   };
   $code->($migration->schema, [1,2]);
-}
+};
 
 done_testing;

@@ -9,7 +9,7 @@ package App::VTide::Command::Run;
 use Moo;
 use warnings;
 use version;
-use Carp;
+use Carp qw/carp longmess/;
 use English qw/ -no_match_vars /;
 use Hash::Merge::Simple qw/ merge /;
 use Path::Tiny;
@@ -19,7 +19,7 @@ use IO::Prompt qw/prompt/;
 
 extends 'App::VTide::Command';
 
-our $VERSION = version->new('0.1.11');
+our $VERSION = version->new('0.1.12');
 our $NAME    = 'run';
 our $OPTIONS = [
     'name|n=s',
@@ -200,6 +200,10 @@ sub watch {
 sub params {
     my ( $self, $cmd ) = @_;
 
+    if ( ! $cmd ) {
+        warn "No \$cmd passed to params()\n", longmess();
+    }
+
     my $config = $self->config->get;
     my $params = $config->{terminals}{$cmd} || {};
 
@@ -258,8 +262,8 @@ sub command {
         }
         1;
     } or do {
+        warn $@;
         warn $helper_text;
-        warn $@
     };
 
     my $groups = $self->config->get->{editor}{files};
@@ -372,7 +376,7 @@ App::VTide::Command::Run - Run a terminal command
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Run version 0.1.11
+This documentation refers to App::VTide::Command::Run version 0.1.12
 
 =head1 SYNOPSIS
 

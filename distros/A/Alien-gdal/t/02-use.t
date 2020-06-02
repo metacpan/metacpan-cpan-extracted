@@ -7,51 +7,24 @@ use Alien::gdal;
 
 alien_ok 'Alien::gdal';
 
-#  nasty hack
-$ENV{LD_LIBRARY_PATH}   = Alien::gdal->dist_dir . '/lib';
-$ENV{DYLD_LIBRARY_PATH} = Alien::gdal->dist_dir . '/lib';
+
+my $success = ffi_ok();
 
 
-diag ('libs: '   . Alien::gdal->libs);
-diag ('cflags: ' . Alien::gdal->cflags);
-eval {
-    diag ('Dynamic libs: ' . join ':', Alien::gdal->dynamic_libs);
-};
-warn $@ if $@;
-
-diag ('bin dir: ' . join (' ', Alien::gdal->bin_dir));
-my @bin = Alien::gdal->bin_dir;
-warn "no gdal bin dir found via bin_dir method\n" if not @bin;
-#$bin = Alien::gdal->dist_dir . '/bin';
-
-#if ($^O !~ /mswin/i) {
-    #diag join "", `ls -l $bin`;
-    #diag '=====';
-    #diag "Calling $bin/gdalwarp --version";
-    #diag join "\n", `$bin/gdalwarp --version`;
-    #diag '=====';
-#}
-
-
-TODO: {
-    local $TODO = 'known to fail under several variants - help appreciated';
-      #if $^O =~ /darwin|bsd/i;
-    my $xs = do { local $/; <DATA> };
-    xs_ok {xs => $xs, verbose => 1}, with_subtest {
-      my($module) = @_;
-      ok $module->version;
-    };
+if (!$success) {
+   diag ('libs: '   . Alien::gdal->libs);
+   diag ('cflags: ' . Alien::gdal->cflags);
+   eval {
+       diag ('Dynamic libs: ' . join ':', Alien::gdal->dynamic_libs);
+   };
+   warn $@ if $@;
+   
+   diag ('bin dir: ' . join (' ', Alien::gdal->bin_dir));
+   my @bin = Alien::gdal->bin_dir;
+   warn "no gdal bin dir found via bin_dir method\n" if not @bin;
+   #$bin = Alien::gdal->dist_dir . '/bin';
 }
 
-#  check we can run one of the utilities
-TODO: {
-    local $TODO = 'There are known issues running utilities';
-
-    run_ok([ "$bin[0]/gdalwarp", '--version' ])
-      ->success
-      ->out_like(qr{GDAL \d+\.\d+\.\d+, released \d{4}/\d{2}/\d{2}})
-      ->note; 
-}
 
 done_testing();
 

@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::SMTPVerify;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 # ABSTRACT: mtpolicyd plugin for remote SMTP address checks
 
 extends 'Mail::MtPolicyd::Plugin';
@@ -214,7 +214,7 @@ Mail::MtPolicyd::Plugin::SMTPVerify - mtpolicyd plugin for remote SMTP address c
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 DESCRIPTION
 
@@ -223,7 +223,7 @@ This plugin can be used to do remote SMTP verification of addresses.
 =head1 Example
 
 To check if the recipient exists on a internal relay and mailbox is able
-to recieve a message of this size:
+to receive a message of this size:
 
   <Plugin smtp-rcpt-check>
     module = "SMTPVerify"
@@ -297,7 +297,7 @@ Port to use for connection.
 
 Set to 'on' to enable check if an TLSA record for the MX exists.
 
-This requires that your DNS resolver returnes the AD flag for DNSSEC
+This requires that your DNS resolver returns the AD flag for DNSSEC
 secured records.
 
 =item check_openpgp (default: off)
@@ -363,7 +363,7 @@ for the remote SMTP server.
 
 =item no_openpgp_score (default: empty)
 
-Score to apply when a OPENPGPKEY record for the recpient
+Score to apply when a OPENPGPKEY record for the recipient
 exists or not exists.
 
 =back

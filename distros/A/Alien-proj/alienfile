@@ -177,23 +177,17 @@ share {
 
   meta->around_hook( build => \&_pkgconf_wrapper );
   meta->around_hook( build => \&remove_gitfw_from_path );
+
   
   build [
     #\&pause,
-    #\&update_pkg_conf_path,
     "%{configure} $config_args",
     $make_cmd,
     $make_inst_cmd,
-    #@make_clean,
     \&rename_la_files,
   ];
 
 };
-
-#gather [
-#    \&rename_la_files,
-#];
-#
 
 
 #  git for windows clashes with MSYS

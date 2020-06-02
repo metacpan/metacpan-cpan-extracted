@@ -1,13 +1,14 @@
 package App::MediaInfoUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-30'; # DATE
+our $DATE = '2020-06-02'; # DATE
 our $DIST = 'App-MediaInfoUtils'; # DIST
-our $VERSION = '0.128'; # VERSION
+our $VERSION = '0.129'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Perinci::Exporter;
 
@@ -62,29 +63,9 @@ our %argopt_quiet = (
     },
 );
 
-sub _type_from_name {
-    require Filename::Audio;
-    require Filename::Video;
-    require Filename::Image;
-    my $name = shift;
-
-    Filename::Video::check_video_filename(filename => $name) ? "video" :
-    Filename::Audio::check_audio_filename(filename => $name) ? "audio" :
-    Filename::Image::check_image_filename(filename => $name) ? "image" : "unknown";
-}
-
 $SPEC{media_info} = {
     v => 1.1,
     summary => 'Get information about media files/URLs',
-    description => <<'_',
-
-Many fields will depend on the backend used. Some other fields returned:
-
-* `info_backend`: the `Media::Info::*` backend module used, e.g. `Ffmpeg`.
-* `type_from_name`: either `image`, `audio`, `video`, or `unknown`. This
-  is determined from filename (extension).
-
-_
     args => {
         %arg0_media_multiple,
         %argopt_backend,
@@ -97,27 +78,27 @@ sub media_info {
 
     my $media = $args{media};
 
-    my @res;
-    for (@$media) {
+    my @rows;
+    for my $m (@$media) {
+        log_info "Getting media info for %s ...", $m;
         my $res = Media::Info::get_media_info(
-            media => $_,
+            media => $m,
             (backend => $args{backend}) x !!(defined $args{backend}),
         );
         unless ($res->[0] == 200) {
-            warn "Can't get media info for '$_': $res->[1] ($res->[0])\n";
+            warn "Can't get media info for '$m': $res->[1] ($res->[0])\n";
             next;
         }
-        push @res, {
-            media => $_,
+        my $row = {
+            media => $m,
             %{$res->[2]},
-            info_backend => $res->[3]{'func.backend'},
-            type_from_name => _type_from_name($_),
         };
+        push @rows, $row;
         if (@$media == 1) {
-            return [200, "OK", $res->[0]];
+            return [200, "OK", $row];
         }
     }
-    [200, "OK", \@res];
+    [200, "OK", \@rows];
 }
 
 $SPEC{media_summary_by_type} = {
@@ -137,7 +118,7 @@ sub media_summary_by_type {
     my %filesize_by_type;
     my %filecount_by_type;
     for my $file (@$media) {
-        my $type = _type_from_name($file);
+        my $type = Media::Info::_type_from_name($file);
         $filesize_by_type{$type} += (-s $file);
         $filecount_by_type{$type}++;
 
@@ -300,7 +281,7 @@ App::MediaInfoUtils - Utilities related to getting (metadata) information from m
 
 =head1 VERSION
 
-This document describes version 0.128 of App::MediaInfoUtils (from Perl distribution App-MediaInfoUtils), released on 2020-05-30.
+This document describes version 0.129 of App::MediaInfoUtils (from Perl distribution App-MediaInfoUtils), released on 2020-06-02.
 
 =head1 FUNCTIONS
 
@@ -312,17 +293,6 @@ Usage:
  media_info(%args) -> [status, msg, payload, meta]
 
 Get information about media filesE<sol>URLs.
-
-Many fields will depend on the backend used. Some other fields returned:
-
-=over
-
-=item * C<info_backend>: the C<Media::Info::*> backend module used, e.g. C<Ffmpeg>.
-
-=item * C<type_from_name>: either C<image>, C<audio>, C<video>, or C<unknown>. This
-is determined from filename (extension).
-
-=back
 
 This function is not exported.
 

@@ -10,7 +10,7 @@ use 5.008; #5.8.0
 
 use base qw(Exporter);
 
-$VERSION   = '0.09';
+$VERSION   = '0.12';
 @EXPORT_OK = qw(validate validateCVR generate _calculate_sum);
 
 use constant MODULUS_OPERAND => 11;
@@ -104,13 +104,23 @@ __END__
 
 =pod
 
+=encoding utf8
+
+=begin markdown
+
+[![CPAN version](https://badge.fury.io/pl/Business-DK-CVR.svg)](http://badge.fury.io/pl/Business-DK-CVR)
+[![Build Status](https://travis-ci.org/jonasbn/bdkcvr.svg?branch=master)](https://travis-ci.org/jonasbn/bdkcvr)
+[![Coverage Status](https://coveralls.io/repos/jonasbn/bdkcvr/badge.png)](https://coveralls.io/r/jonasbn/bdkcvr)
+
+=end markdown
+
 =head1 NAME
 
-Business::DK::CVR - Danish CVR (VAT Registration) code generator/validator
+Business::DK::CVR - Danish CVR (VAT Registration) number generator/validator
 
 =head1 VERSION
 
-This documentation describes version 0.09 of Business::DK::CVR
+This documentation describes version 0.12 of Business::DK::CVR
 
 =head1 SYNOPSIS
 
@@ -131,34 +141,34 @@ This documentation describes version 0.09 of Business::DK::CVR
 
     #Using with Params::Validate
     #See also examples/
-    
+
     use Params::Validate qw(:all);
     use Business::DK::CVR qw(validateCVR);
-    
+
     eval {
         check_cvr(cvr => 27355021);
     };
-    
+
     if ($@) {
         print "CVR is not valid - $@\n";
     }
-    
+
     eval {
         check_cvr(cvr => 27355020);
     };
-    
+
     if ($@) {
         print "CVR is not valid - $@\n";
     }
-    
+
     sub check_cvr {
         validate( @_,
         { cvr =>
             { callbacks =>
                 { 'validate_cvr' => sub { validateCVR($_[0]); } } } } );
-        
+
         print "$_[0] is a valid CVR\n";
-    
+
     }
 
 =head1 DESCRIPTION
@@ -173,9 +183,9 @@ L<Data::FormValidator::Constraints::Business::DK::CVR>
 
 =head2 validate
 
-The function takes a single argument, a 10 digit CVR number. 
+The function takes a single argument, a 10 digit CVR number.
 
-The function returns 1 (true) in case of a valid CVR number argument and  0 
+The function returns 1 (true) in case of a valid CVR number argument and  0
 (false) in case of an invalid CVR number argument.
 
 If the argument is a valid argument the sum is calculated by B<_calculate_sum>
@@ -198,7 +208,7 @@ authorities, but it can be used to generate example CVRs for testing and so on.
 
 =head2 _calculate_sum
 
-This function takes an integer and calculates the sum bases on the the 
+This function takes an integer and calculates the sum bases on the the
 controlcifer array.
 
 =head1 EXPORTS
@@ -265,17 +275,13 @@ The module has no known bugs or limitations.
 
 Coverage of the test suite is at 100%
 
-=head1 TODO
-
-=over
-
-=item * Get the generate method thorougly tested
-
-=back
-
 =head1 BUG REPORTING
 
-Please report issues via CPAN RT:
+Please report issue via GitHub
+
+    https://github.com/jonasbn/perl-business-dk-cvr/issues
+
+Alternativly report issues via CPAN RT:
 
   http://rt.cpan.org/NoAuth/Bugs.html?Dist=Business-DK-CVR
 
@@ -289,32 +295,42 @@ or by sending mail to
 
 =item L<http://www.cvr.dk/>
 
-=item L<Business::DK::PO>
+=item L<Business::DK::CPR>, validation of Danish social security numbers
 
-=item L<Business::DK::CPR>
+=item L<http://search.cpan.org/dist/Algorithm-CheckDigits>, an alternative implementation
 
-=item L<http://search.cpan.org/dist/Algorithm-CheckDigits>
+=item L<http://search.cpan.org/~mamawe/Algorithm-CheckDigits-0.38/CheckDigits/M11_008.pm>, see above
 
-=item L<http://search.cpan.org/~mamawe/Algorithm-CheckDigits-0.38/CheckDigits/M11_008.pm>
+=item L<Data::FormValidator::Constraints::Business::DK::CVR>, a validator for DFV, included in this distribution
 
-=item L<Data::FormValidator::Constraints::Business::DK::CVR>
+=item L<Business::Tax::VAT>, for VAT rates and doing VAT calculations
 
 =back
 
 =head1 AUTHOR
 
-Jonas B. Nielsen, (jonasbn) - C<< <jonasbn@cpan.org> >>
+Jonas B., (jonasbn) - C<< <jonasbn@cpan.org> >>
+
+=head1 ACKNOWLEDGEMENTS
+
+=over
+
+=item * Karen Etheridge (ETHER)
+
+=item * Andreas König (ANDK)
+
+=item * Neil Bowers (NEILB)
+
+=item * Mohammad S Anwar (MANWAR)
+
+=back
 
 =head1 COPYRIGHT
 
-Business-DK-CVR is (C) by Jonas B. Nielsen, (jonasbn) 2006-2014
+Business-DK-CVR and related is (C) by Jonas B., (jonasbn) 2006-2020
 
 =head1 LICENSE
 
-Business-DK-CVR is released under the artistic license
-
-The distribution is licensed under the Artistic License, as specified
-by the Artistic file in the standard perl distribution
-(http://www.perl.com/language/misc/Artistic.html).
+Business-DK-CVR is released under the Artistic License 2.0
 
 =cut

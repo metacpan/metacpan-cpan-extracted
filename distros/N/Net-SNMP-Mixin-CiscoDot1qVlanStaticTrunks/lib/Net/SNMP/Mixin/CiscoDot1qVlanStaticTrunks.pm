@@ -23,6 +23,9 @@ use Net::SNMP::Mixin::Util qw/idx2val hex2octet push_error get_init_slot/;
 my @mixin_methods;
 
 BEGIN {
+	# Net::SNMP::Mixin::CiscoDot1qVlanStatic supports trunks and access ports
+	warn "DEPRECATED: use Net::SNMP::Mixin::CiscoDot1qVlanStatic\n";
+
   @mixin_methods = (
     qw/
       cisco_vlan_ids2names
@@ -53,17 +56,21 @@ use constant {
   VLAN_TRUNK_PORT_VLANS_ENABLED_4K => '1.3.6.1.4.1.9.9.46.1.6.1.1.19',
 };
 
+=head1 DEPRECATED
+
+Use the new modul L<Net::SNMP::Mixin::CiscoDot1qVlanStatic> instead, it supports trunk- AND access-ports
+
 =head1 NAME
 
 Net::SNMP::Mixin::CiscoDot1qVlanStaticTrunks - mixin class for static Cisco IEEE-trunks info
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -492,7 +499,7 @@ Karl Gaissmaier <karl.gaissmaier at uni-ulm.de>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2011-2016 Karl Gaissmaier, all rights reserved.
+Copyright 2011-2020 Karl Gaissmaier, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

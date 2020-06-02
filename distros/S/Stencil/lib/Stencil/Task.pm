@@ -10,7 +10,7 @@ use Data::Object::Class;
 
 extends 'App::Spec::Run::Cmd';
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 # BUILD
 

@@ -10,23 +10,36 @@ services:
     links:
       - memcached
       - openldap
+      - mariadb
 
   memcached:
     image: memcached
 
   openldap:
-    image: osixia/openldap:1.2.1
+    image: osixia/openldap:1.3.0
     container_name: openldap
     environment:
+      LDAP_ORGANISATION: "Example Company"
+      LDAP_DOMAIN: "example.org"
       LDAP_ADMIN_PASSWORD: "admin"
       LDAP_CONFIG_PASSWORD: "config"
     volumes:
       - "ldap_config:/etc/ldap/slapd.d"
       - "ldap_data:/var/lib/ldap"
-    domainname: "example.org"
-    hostname: "example.org"
+
+  mariadb:
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_USER: mtpolicyd
+      MYSQL_PASSWORD: secret
+      MYSQL_DATABASE: mtpolicyd
+    volumes:
+      - "mariadb_data:/var/lib/mysql"
 
 volumes:
   ldap_config:
   ldap_data:
+  mariadb_data:
 

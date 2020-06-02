@@ -1,0 +1,6 @@
+Revision history for Perl extension Mojolicious-Command-Author-generate-cpanfile
+
+0.01 2020-06-01T17:39:46Z
+
+    - New Mojolicious::Command::Author::generate::cpanfile
+

@@ -12,7 +12,7 @@ use Readonly;
 use Params::Validate qw( validate_pos SCALAR ARRAYREF );
 use 5.010;    #5.10.0
 
-our $VERSION   = '0.13';
+our $VERSION   = '0.16';
 our @EXPORT_OK = qw(
   validate
   validateCPR
@@ -390,7 +390,7 @@ Business::DK::CPR - Danish CPR (SSN) number generator/validator
 
 =head1 VERSION
 
-This documentation describes version 0.07
+This documentation describes version 0.16
 
 =head1 SYNOPSIS
 
@@ -418,18 +418,18 @@ This documentation describes version 0.07
 
     #Using with Params::Validate
     #See also examples/
-    
+
     use Params::Validate qw(:all);
     use Business::DK::CPR qw(validateCPR);
-        
+
     sub check_cpr {
         validate( @_,
         { cpr =>
             { callbacks =>
                 { 'validate_cpr' => sub { validateCPR($_[0]); } } } } );
-        
+
         print $_[1]." is a valid CPR\n";
-    
+
     }
 
 =head1 DESCRIPTION
@@ -529,7 +529,7 @@ the case in this module, but then the behaviour is documented.
 =head2 _length
 
 This function validates the length of the argument, it dies if the argument
-does not fit wihtin the boundaries specified by the arguments provided:
+does not fit within the boundaries specified by the arguments provided:
 
 The B<_length> function takes the following arguments:
 
@@ -593,7 +593,7 @@ Business::DK::CPR exports on request:
 =over
 
 =item * 'argument for birthdate should be provided', a data parameter has to be
-provided. 
+provided.
 
 This error is thrown from L<_checkdate|/_checkdate>, which is used for all general parameter
 validation.
@@ -671,7 +671,7 @@ The matrix lists what flags are required to run the specific test.
     --------------- ---- ----------- ----------- --------
     00.load.t         *
     changes.t         *
-    critic.t                              * 
+    critic.t                              *
     kwalitee.t                *
     pod-coverage.t                                   *
     pod.t                                            *
@@ -681,7 +681,7 @@ The matrix lists what flags are required to run the specific test.
 All of the above tests are actually boilerplates and are maintained as separate
 components.
 
-=head2 TESTCOVERAGE
+=head2 TEST COVERAGE
 
 Coverage of the test suite is at 89.1% for release 0.04, the coverage report
 was generated with the TEST_AUTHOR flag enabled (SEE: L<TEST AND QUALITY|/TEST AND QUALITY>)
@@ -741,13 +741,19 @@ system (See: L<SEE ALSO|/SEE ALSO>).
 
 =head1 BUG REPORTING
 
-Please report issues via CPAN RT:
+=head1 BUG REPORTING
 
-  L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Business-DK-CPR>
+Please report issue via GitHub
+
+    L<https://github.com/jonasbn/perl-business-dk-cpr/issues>
+
+Alternatively report issues via CPAN RT:
+
+    L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Business-DK-CPR>
 
 or by sending mail to
 
-  bug-Business-DK-CPR@rt.cpan.org
+    bug-Business-DK-CPR@rt.cpan.org
 
 =head1 SEE ALSO
 
@@ -786,14 +792,28 @@ really sparked.
 
 =head1 AUTHOR
 
-Jonas B. Nielsen, (jonasbn) - C<< <jonasbn@cpan.org> >>
+=over
+
+=item * Jonas B., (jonasbn) - C<< <jonasbn@cpan.org> >>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+=over
+
+=item * Karen Etheridge (ETHER)
+
+=item * Neil Bowers (NEILB)
+
+=back
 
 =head1 COPYRIGHT
 
-Business-DK-CPR is (C) by Jonas B. Nielsen, (jonasbn) 2006-2015
+Business-DK-CPR and related is (C) by Jonas B., (jonasbn) 2006-2020
 
 =head1 LICENSE
 
-Business-DK-CPR is released under the artistic license 2.0
+Business-DK-CPR is released under the Artistic License 2.0
 
 =cut

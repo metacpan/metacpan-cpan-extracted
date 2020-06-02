@@ -1,7 +1,9 @@
 package Filename::Archive;
 
-our $DATE = '2015-09-03'; # DATE
-our $VERSION = '0.02'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-06-02'; # DATE
+our $DIST = 'Filename-Archive'; # DIST
+our $VERSION = '0.031'; # VERSION
 
 use 5.010001;
 use strict;
@@ -15,17 +17,36 @@ our @EXPORT_OK = qw(check_archive_filename);
 # XXX multi-part archive?
 
 our %SUFFIXES = (
+    '.7z'  => {name=>'7-zip'},
+    '.cb7'  => {name=>'7-zip'},
+
     '.zip' => {name=>'Zip'},
+    '.cbz' => {name=>'Zip'},
+
     '.rar' => {name=>'RAR'},
+    '.cbr' => {name=>'RAR'},
+
     '.tar' => {name=>'tar'},
-    # XXX 7zip
-    # XXX older/less popular: ARJ, lha, zoo
+    '.cbt' => {name=>'tar'},
+
+    '.tgz' => {name=>'tar+gzip'},
+    '.tbz' => {name=>'tar+bzip2'},
+
+    '.ace' => {name=>'ACE'},
+    '.cba' => {name=>'ACE'},
+
+    '.arj' => {name=>'arj'},
+    # XXX other older/less popular: lha, zoo
     # XXX windows: cab
     # XXX zip-based archives: war, etc
     # XXX tar-based archives: linux packages
 );
 
 our %ARCHIVES = (
+    'arj' => {
+    },
+    '7-zip' => {
+    },
     Zip => {
         # all programs mentioned here must accept filename(s) as arguments.
         # preferably CLI. XXX specify capabilities (password-protection, unix
@@ -42,6 +63,15 @@ our %ARCHIVES = (
     RAR => {
     },
     tar => {
+    },
+    'tar+gzip' => {
+    },
+    'tar+bzip2' => {
+    },
+    ace => {
+        extractor_programs => [
+            {name => 'unace', opts => ''},
+        ],
     },
 );
 
@@ -139,7 +169,7 @@ Filename::Archive - Check whether filename indicates being an archive file
 
 =head1 VERSION
 
-This document describes version 0.02 of Filename::Archive (from Perl distribution Filename-Archive), released on 2015-09-03.
+This document describes version 0.031 of Filename::Archive (from Perl distribution Filename-Archive), released on 2020-06-02.
 
 =head1 SYNOPSIS
 
@@ -158,9 +188,15 @@ This document describes version 0.02 of Filename::Archive (from Perl distributio
 =head1 FUNCTIONS
 
 
-=head2 check_archive_filename(%args) -> bool|hash
+=head2 check_archive_filename
+
+Usage:
+
+ check_archive_filename(%args) -> bool|hash
 
 Check whether filename indicates being an archive file.
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -172,6 +208,7 @@ Whether to match case-insensitively.
 
 =item * B<filename>* => I<str>
 
+
 =back
 
 Return value:  (bool|hash)
@@ -180,10 +217,6 @@ Return value:  (bool|hash)
 Return false if no archive suffixes detected. Otherwise return a hash of
 information, which contains these keys: C<archive_name>, C<archive_suffix>,
 C<compressor_info>.
-
-=head1 SEE ALSO
-
-L<Filename::Compressed>
 
 =head1 HOMEPAGE
 
@@ -201,13 +234,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Filename::Compressed>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

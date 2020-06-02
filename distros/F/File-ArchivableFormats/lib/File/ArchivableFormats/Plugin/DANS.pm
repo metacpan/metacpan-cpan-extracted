@@ -1,6 +1,6 @@
 use utf8;
 package File::ArchivableFormats::Plugin::DANS;
-our $VERSION = '1.6';
+our $VERSION = '1.8';
 use Moose;
 use namespace::autoclean;
 
@@ -282,6 +282,19 @@ sub _build_preferred_formats {
                 'Raspter GIS (ASCII GRID)',
             ],
         },
+        'text/markdown' => {
+            allowed_extensions => ['.md'],
+            types              => [
+                'Plain text (markdown)',
+            ],
+        },
+        'text/x-readme' => {
+            preferred_extension => '.txt',
+            allowed_extensions => [],
+            types              => [
+                'Plain text (README)',
+            ],
+        },
         'application/x-dbf' => {
             allowed_extensions => ['.dbf'],
             types              => ['dBase'],
@@ -331,7 +344,7 @@ File::ArchivableFormats::Plugin::DANS - DANS module for archivable formats
 
 =head1 VERSION
 
-version 1.6
+version 1.8
 
 =head1 SEE ALSO
 

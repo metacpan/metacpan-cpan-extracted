@@ -4,7 +4,7 @@ package Mojo::Base::Tiny;
 use strict;
 use warnings;
 use utf8;
-use feature ':5.10';
+use feature ':5.16';
 use mro;
 
 # No imports because we get subclassed, a lot!
@@ -12,10 +12,7 @@ use Carp         ();
 use Scalar::Util ();
 use Sub::Util    ();
 
-# Only Perl 5.14+ requires it on demand
-use IO::Handle ();
-
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 # Role support requires Role::Tiny 2.000001+
 use constant ROLES =>
@@ -107,7 +104,7 @@ sub import {
 
   # Mojo modules are strict!
   $_->import for qw(strict warnings utf8);
-  feature->import(':5.10');
+  feature->import(':5.16');
 
   while (my $flag = shift @flags) {
 
@@ -221,7 +218,7 @@ outside the core modules (or to be correct, on Perl 5.20 and older you need
 L<Sub::Util> 1.41). You can copy it directly to your project in all the
 "I can't (or don't want to) install L<Mojolicious>" cases.
 
-  # Automatically enables "strict", "warnings", "utf8" and Perl 5.10 features
+  # Automatically enables "strict", "warnings", "utf8" and Perl 5.16 features
   use Mojo::Base::Tiny -strict;
   use Mojo::Base::Tiny -base;
   use Mojo::Base::Tiny 'SomeBaseClass';
@@ -234,17 +231,15 @@ L<Role::Tiny> (2.000001+).
   use strict;
   use warnings;
   use utf8;
-  use feature ':5.10';
+  use feature ':5.16';
   use mro;
-  use IO::Handle ();
 
   # use Mojo::Base::Tiny -base;
   use strict;
   use warnings;
   use utf8;
-  use feature ':5.10';
+  use feature ':5.16';
   use mro;
-  use IO::Handle ();
   push @ISA, 'Mojo::Base::Tiny';
   sub has { Mojo::Base::Tiny::attr(__PACKAGE__, @_) }
 
@@ -252,9 +247,8 @@ L<Role::Tiny> (2.000001+).
   use strict;
   use warnings;
   use utf8;
-  use feature ':5.10';
+  use feature ':5.16';
   use mro;
-  use IO::Handle ();
   require SomeBaseClass;
   push @ISA, 'SomeBaseClass';
   sub has { Mojo::Base::Tiny::attr(__PACKAGE__, @_) }
@@ -263,9 +257,8 @@ L<Role::Tiny> (2.000001+).
   use strict;
   use warnings;
   use utf8;
-  use feature ':5.10';
+  use feature ':5.16';
   use mro;
-  use IO::Handle ();
   use Role::Tiny;
   sub has { Mojo::Base::Tiny::attr(__PACKAGE__, @_) }
 

@@ -10,9 +10,8 @@ package plenigo::Configuration;
 
  # Prepare configuration
 
- my $activate_testing = 0; # set if testing mode should be enabled
- my $use_external_customer_id = 0; # set if you use your own customer id instead of the one provided by plenigo
- my $configuration = plenigo::Configuration->new(company_id => 'YOUR_COMPANY_ID, secret => 'YOUR_SECRET', staging => $activate_testing, use_external_customer_id => $use_external_customer_id);
+ my $use_stage = 0; # set if stage system should be used
+ my $configuration = plenigo::Configuration->new(access_token => 'ACCESS_TOKEN', use_stage => $use_stage);
 
 =head1 DESCRIPTION
 
@@ -23,24 +22,14 @@ package plenigo::Configuration;
 use Moo;
 use Carp qw(confess);
 
-our $VERSION = '2.0006';
+our $VERSION = '3.0000';
 
-has company_id => (
+has access_token => (
     is       => 'ro',
     required => 1
 );
 
-has secret => (
-    is       => 'ro',
-    required => 1
-);
-
-has staging => (
-    is      => 'ro',
-    default => 0
-);
-
-has use_external_customer_id => (
+has use_stage => (
     is      => 'ro',
     default => 0
 );
@@ -50,9 +39,14 @@ has api_host => (
     default => 'https://api.plenigo.com'
 );
 
+has api_host_stage => (
+    is      => 'rw',
+    default => 'https://api.plenigo-stage.com'
+);
+
 has api_url => (
     is      => 'rw',
-    default => '/api/v2/'
+    default => '/api/v3/'
 );
 
 1;

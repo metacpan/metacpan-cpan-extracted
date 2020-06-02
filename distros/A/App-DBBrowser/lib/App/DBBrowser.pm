@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.250';
+our $VERSION = '2.251';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -114,7 +114,7 @@ sub __options {
             print clear_screen();
             require App::DBBrowser::Opt::Set;
             my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
-            $sf->{o} = $opt_set->set_options;
+            $sf->{o} = $opt_set->set_options();
         }
         1 }
     ) {
@@ -746,7 +746,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.250
+Version 2.251
 
 =head1 DESCRIPTION
 

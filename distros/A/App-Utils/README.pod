@@ -1,30 +1,24 @@
 =head1 NAME
 
-App::Utils - a set of utilities useful in Linux CLI
+App::Utils - some useful command-line utilities
 
 =head1 DESCRIPTION
 
-date-tag - print a simple date-tag in form YYYY-MM-DD-hhmmss
+This is a stub module that contains some useful command-line utilities,
+created for Linux environment.  Detailed descriptions are included in
+the programs.
 
-A simple command that prints one line of with the current date-time tags in
-the form C<YYYY-MM-DD-hhmmss>.
+F<date-tag> - print a date-time tag in form C<YYYY-MM-DD-hhmmss>
 
-remove-empty-dirs - remove recursively empty directories
+F<date-tag-file> - pre-tag filename with timestamp of last modification
 
-save - save a snapshot of given files in saved.d directory
+F<remove-empty-dirs> - remove recursively empty directories
 
-=head1 SYNOPSIS
-
- $ date-tag
- 2020-05-13-154542
+F<save> - save a snapshot of given files in C<saved.d> directory
 
 =head1 AUTHOR
 
-Vlado Keselj https://web.cs.dal.ca/~vlado 2002-2020
-
-=head1 LICENSE
-
-Artistic License L<perlartistic>
+Vlado Keselj http://web.cs.dal.ca/~vlado
 
 =head1 INSTALLATION
 
@@ -37,6 +31,5 @@ Manual install:
  $ perl Makefile.PL
  $ make
  $ make install
-
 
 =cut

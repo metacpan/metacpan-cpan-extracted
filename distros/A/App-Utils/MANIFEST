@@ -1,10 +1,11 @@
 bin/date-tag
+bin/date-tag-file
 bin/remove-empty-dirs
 bin/save
 lib/App/Utils.pm
 ChangeLog
 LICENSE
-MANIFEST			This list of files
+MANIFEST				This list of files
 Makefile.PL
 README.pod
 META.yml                                 Module YAML meta-data (added by MakeMaker)

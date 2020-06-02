@@ -46,6 +46,11 @@ has flag => (
     isa => 'Bool',
 );
 
+has is_array => (
+    is => 'rw',
+    isa => 'Bool',
+);
+
 ###############################################
 
 method get_signature {
@@ -139,15 +144,20 @@ method get_val {
     else {
 
         # get "-arg <val>" from cmdline if exists
+        my $arg_type = "s";
+        
+        if( $self->is_array ){
+            $arg_type='s@';
+        }
 
-        my $success = GetOptionsFromArray( \@ARGV, "$arg=s" => \$val, );
+        my $success = GetOptionsFromArray( \@ARGV, "$arg=$arg_type" => \$val, );
         if ($success) {
             return $val;
         }
 
         # we didn't find it in @ARGV
         if ( $self->required ) {
-            $self->fatal("failed to get arg $arg from argv");
+            $self->fatal("failed to get arg from argv: $arg");
         }
     }
 

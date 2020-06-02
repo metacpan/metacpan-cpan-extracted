@@ -1,9 +1,9 @@
 package Sah::SchemaR::dbi::connstr;
 
-our $DATE = '2019-01-20'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2020-03-02'; # DATE
+our $VERSION = '0.002'; # VERSION
 
-our $rschema = ["str",[{description=>"\n\n",match=>"\\Adbi:\\w+:.+\\z",summary=>"DBI connection string","x.completion"=>["dbi_connstr"]}],["str"]];
+our $rschema = ["str",[{description=>"\n\n",examples=>[{data=>"",valid=>0},{data=>"dbi:SQLite:dbname=foo",valid=>1},{data=>"DBI:SQLite:dbname=foo",valid=>0},{data=>"dbi:Foo",valid=>0},{data=>"dbi:Foo:bar=baz",valid=>1}],match=>"\\Adbi:\\w+:.+\\z",summary=>"DBI connection string","x.completion"=>["dbi_connstr"]}],["str"]];
 
 1;
 # ABSTRACT: DBI connection string
@@ -20,7 +20,7 @@ Sah::SchemaR::dbi::connstr - DBI connection string
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::SchemaR::dbi::connstr (from Perl distribution Sah-Schemas-DBI), released on 2019-01-20.
+This document describes version 0.002 of Sah::SchemaR::dbi::connstr (from Perl distribution Sah-Schemas-DBI), released on 2020-03-02.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

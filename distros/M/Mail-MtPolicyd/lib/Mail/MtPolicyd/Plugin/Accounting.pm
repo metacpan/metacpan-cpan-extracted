@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::Accounting;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 # ABSTRACT: mtpolicyd plugin for accounting in sql tables
 
 extends 'Mail::MtPolicyd::Plugin';
@@ -212,7 +212,7 @@ Mail::MtPolicyd::Plugin::Accounting - mtpolicyd plugin for accounting in sql tab
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 SYNOPSIS
 

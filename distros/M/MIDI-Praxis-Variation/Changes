@@ -1,5 +1,8 @@
 Revision history for MIDI::Praxis::Variation
 
+0.0604 2020-05-31 08:20:56
+    - Add eg/half-again to illustrate diminution().
+
 0.0603 2020-05-30 11:10:43
     - Add examples to eg/stretch.
 
@@ -18,6 +21,7 @@ Revision history for MIDI::Praxis::Variation
     - Modify the raugmentation() and rdiminution() functions to allow note list processing.
     - Improve documentation.
     - Add tests!
+    - Add eg/stretch to illustrate transposition() and augmentation().
 
 ~
 

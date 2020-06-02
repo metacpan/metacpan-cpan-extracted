@@ -1,173 +1,158 @@
 ==================================================
-Changes from 2017-06-08 00:00:00 +0000 to present.
+Changes from 2019-06-02 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 2.03 at 2018-06-08 14:19:13 +0000
+version 2.04 at 2020-06-01 18:01:40 +0000
 -----------------------------------------
 
-  Change: 25d4d7a9ae09d8f68a1d7f83c6b49d59eb10cf92
+  Change: 9bdd895e08a6b5afd8804a16fc011888482e9b83
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2018-06-08 13:31:12 +0000
+  Date : 2020-06-01 19:59:30 +0000
 
-    Remove website and mailing list links from docs
+    Fix openldap container in docker-compose env 
 
-    Website and mailing lists are no longer available.
-
-    The website was mostly based on the POD documentation which could
-    also be browsed on metacpan or github.
-
-    The mailing list was very low traffic. Please use the github
-    bugtracker instead. 
-
-  Change: e9c104a44f49a68385a57b4e5aa422b429c041df
+  Change: 267afbef3de10f3307f087c99f454f1277f9b584
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2018-06-08 13:21:26 +0000
+  Date : 2020-06-01 19:41:55 +0000
 
-    Merge branch 'master' of github.com:benningm/mtpolicyd 
+    Fix duplicate initialization in SqlList plugin 
 
-  Change: 0aa29d07f32d7e002780db19e01fa99428c314ee
+  Change: 606c751f7e597a76787c34f2f7a00b72e4032539
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2018-06-08 13:11:54 +0000
+  Date : 2020-06-01 19:34:50 +0000
 
-    Improve LDAP connection error handling
+    Generate README from bin/mtpolicyd 
 
-    In Mail::MtPolicyd::Connection::Ldap:
-
-    * Add error handler and invalidate connection on
-
-    connection errors.
-
-    * Add check before returning handle if underlying
-
-    socket is in connected state. If the socket is available.
-
-    This will only detect closed connection if the system knows
-
-    about it. There are still cases which can only be detected
-
-    by sending data.
-
-    In Mail::MtPolicyd::Role::Connection:
-
-    * Dont cache connection handles. Always ask the connection for it.
-
-    Test case:
-
-    * openldap container for tests in docker-compose.yml * test for ldap
-    connection handling in t/connection-ldap.t 
-
-  Change: 8aa7526653ff2ec92b5f67f46d4b0d70264f5849
+  Change: 8d5a00a71d3d52027985ec98292deb315682810d
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2018-06-08 10:54:00 +0000
+  Date : 2020-06-01 19:30:09 +0000
 
-    Remove TravisCI 
+    Add README.md generation 
 
-  Change: 8fdf3ecb909407c213c9e95359f0af89b2152c43
+  Change: 053db08c816b78d9a7b78a8c28a64c349c4d83d7
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2018-06-08 10:51:51 +0000
+  Date : 2020-05-31 07:32:43 +0000
 
-    Mount local source directory in docker environment 
+    Allow to configure the field for SQL lookups
 
-  Change: 5a338763b4c44676e35d30b5315d9b2591de1ac4
+    This adds a option `field` to the SqlList plugin to allow setting the
+    field used for the SQL lookup. 
+
+  Change: 1e86aab20c562c7baa3cda47d4ad345b874a1d7e
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2018-06-08 10:50:33 +0000
+  Date : 2020-05-31 07:29:12 +0000
 
-    Update dependencies
+    Handle Mail::SPF perm/temp errors
 
-    Removes Test::Memcached and adds missing File::Slurp. 
+    This adds handling of permerror and temperror returned by Mail::SPF.
 
-  Change: 510a19c25231e0a421be86028703278c6f521d47
+    It also exposes the following options of Mail::SPF:
+
+    * max_dns_interactive_terms * max_name_lookups_per_term *
+    max_void_dns_lookups 
+
+  Change: a9afcc0bd8fadccf9e9b99eacfd7a92e40b73253
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2018-06-08 10:48:00 +0000
+  Date : 2020-05-28 14:53:02 +0000
 
-    Use memcached container instead of Test::Memcached
+    Retab code 
 
-    This removes Test::Memcached from tests which will start a background
-    memcached for each tests. Instead the memcached docker container
-    instance is used. 
-
-  Change: a129653219bf13ec9ec3756433c23b1099d3465c
+  Change: b9568062702df9bc5510259d62496ecc4f48793a
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2018-06-08 10:46:36 +0000
+  Date : 2018-07-18 17:50:39 +0000
 
-    Update IP for SBL blocked host 
+    Add mariadb to docker environment
 
-  Change: f27289c67526b7d10e4f36540e24199edff08a38
+    This adds a mariadb database to the docker-compose development
+    environment. 
+
+  Change: 606e88f49ecd13595a454614ed812a47dce26438
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2018-06-08 10:45:13 +0000
+  Date : 2018-06-22 10:48:33 +0000
 
-    Run mtpolicyd with mtpolicyd user in docker 
+    Fix spell errors in documentation 
 
-  Change: 05f7ad91dd94f1f1d88bb59aaf2cec6623883156
+  Change: c7b5541c7c5fc61f05bea7c76a9eaa81cbbec783
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2018-06-07 16:32:32 +0000
+  Date : 2018-06-22 10:06:10 +0000
 
-    Move carton module to external folder in docker
+    Move ldap to new examples/ folder 
 
-    This will allow running with an source directory volume without
-    installing modules locally. 
-
-  Change: 8f39be765efd97c1a7a58af1ecc7ff107ba5e563
+  Change: 7599f207afa29f1bd6ea6e488fd1a7caafc925ea
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2018-06-07 16:31:14 +0000
+  Date : 2018-06-22 09:24:49 +0000
 
-    Dont ignore cpanfile.snapshot 
+    Merge pull request #30 from falon/master
 
-  Change: 6f5bbfdcb33f2851ac80eb31b124a522dd2148ec
-  Author: Markus Benning <ich@markusbenning.de>
-  Date : 2018-06-07 14:44:17 +0000
+    A complete example of accounting over LDAP 
 
-    Merge pull request #26 from benningm/mysql_engine_option
+  Change: 2012886de6356fba506c4b84f7623d7b9dd16db5
+  Author: Marco Favero <m.faverof@gmail.com>
+  Date : 2018-06-21 10:33:00 +0000
 
-    Add support for mysql_engine parameter 
+    Update README.md 
 
-  Change: 46d27d16c207920e331293b00781cc575f0f6809
-  Author: Markus Benning <ich@markusbenning.de>
-  Date : 2017-11-26 18:52:05 +0000
+  Change: a82a68484b9a70a045f02f90a684b6b09f68d6a7
+  Author: Marco Favero <m.faverof@gmail.com>
+  Date : 2018-06-21 10:31:13 +0000
 
-    Add support for mysql_engine parameter 
+    Update README.md 
 
-  Change: db3713ae2eb7d23949b49d26fffddb693155cda8
-  Author: Markus Benning <ich@markusbenning.de>
-  Date : 2017-11-26 18:51:34 +0000
+  Change: 963cf7227b7607a003e43798672a557e59d8cb63
+  Author: Marco Favero <m.faverof@gmail.com>
+  Date : 2018-06-21 10:25:10 +0000
 
-    Update test parameters 
+    Update and rename LDAP.readme.md to README.md 
 
-  Change: 75da529d10cd0f94ad7a5607fdbfa7822af02c05
-  Author: Markus Benning <ich@markusbenning.de>
-  Date : 2017-05-07 18:33:55 +0000
+  Change: 1fd7933e1b3db2c92487dc47c219c3cdeb426d1f
+  Author: Marco Favero <m.faverof@gmail.com>
+  Date : 2018-06-21 10:08:57 +0000
 
-    Modularize greylisting storage
+    Merge pull request #3 from falon/patch-3
 
-    This modularizes the storage backends of the greylisting plungin and
-    adds support for using Redis as storage for AWL and tickets. 
+    Create mtpolicyd.conf 
 
-  Change: 87960600287f3abafa01a116d6259d66b656fa8d
-  Author: Markus Benning <ich@markusbenning.de>
-  Date : 2017-03-25 11:15:35 +0000
+  Change: 417ad7278940c05367aa7178fde880f4a3ea9a30
+  Author: Marco Favero <m.faverof@gmail.com>
+  Date : 2018-06-21 10:07:55 +0000
 
-    Fix spelling errors in PODs
+    Merge pull request #2 from falon/patch-2
 
-    fixes #24 
+    Create 97mtpolicyd.ldif 
 
-  Change: 10c1ff8a6e8cb06865873ebc4f5ecddfcb55770c
-  Author: Markus Benning <ich@markusbenning.de>
-  Date : 2017-03-25 11:10:53 +0000
+  Change: ab7a505f3a99b82172833294b9644d0f5036e4ca
+  Author: Marco Favero <m.faverof@gmail.com>
+  Date : 2018-06-21 10:07:03 +0000
 
-    Added new RegexList Plugin 
+    Merge pull request #1 from falon/patch-1
 
-  Change: 9f91d2b1b827edf8adb7eb081aaf765762e09e84
-  Author: Markus Benning <ich@markusbenning.de>
-  Date : 2016-08-13 19:00:13 +0000
+    Create LDAP.readme.md 
 
-    Implement alternative connection methods for redis
+  Change: 3797754d766f0feaabe591960d608a6f70a3ac2c
+  Author: Marco Favero <m.faverof@gmail.com>
+  Date : 2018-06-20 12:35:59 +0000
 
-    This allows to specify a redis server also by unix domain socket or
-    sentinels/service.
+    Create mtpolicyd.conf
 
-    implements #20 
+    A working mtpolicyd conf for accounting usernames over LDAP. 
+
+  Change: efa528fec375cb0905517a4222202531eb5393a4
+  Author: Marco Favero <m.faverof@gmail.com>
+  Date : 2018-06-20 12:31:08 +0000
+
+    Create 97mtpolicyd.ldif
+
+    A possible LDAP schema for accounting plugin. 
+
+  Change: 6e57fc2974e824fd49e95fb4e01c41f44032a060
+  Author: Marco Favero <m.faverof@gmail.com>
+  Date : 2018-06-20 12:27:46 +0000
+
+    Create LDAP.readme.md
+
+    A case study for MtPolicyd over LDAP. 
 
 =================================================
-Plus 15 releases after 2017-06-08 00:00:00 +0000.
+Plus 16 releases after 2019-06-02 00:00:00 +0000.
 =================================================

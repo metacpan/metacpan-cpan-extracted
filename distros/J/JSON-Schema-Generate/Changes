@@ -3,3 +3,14 @@ Revision history for JSON-Schema-Generate
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.04    2020/05/31
+	Adds Options:
+        - merge_examples - Merge all learn data examples into a single example
+	- none_required - Do not analyse required keys in properties
+	- no_id - do not add $id(s) to properties and items
+
+0.05    2020/05/31
+	Adds Options:
+        - merge_examples - Merge all learn data examples into a single example
+	- none_required - Do not analyse required keys in properties
+	- no_id - do not add $id(s) to properties and items

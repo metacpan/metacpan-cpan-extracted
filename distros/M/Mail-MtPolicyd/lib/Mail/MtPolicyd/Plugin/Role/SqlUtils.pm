@@ -4,7 +4,7 @@ use strict;
 use Moose::Role;
 
 # ABSTRACT: role with support function for plugins using sql
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 
 requires '_db_handle';
 
@@ -81,7 +81,7 @@ Mail::MtPolicyd::Plugin::Role::SqlUtils - role with support function for plugins
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 AUTHOR
 

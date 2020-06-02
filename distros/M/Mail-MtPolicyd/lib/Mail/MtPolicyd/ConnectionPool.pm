@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use MooseX::Singleton;
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 # ABSTRACT: a singleton to hold all configure connections
 
 has 'pool' => (
@@ -101,7 +101,7 @@ Mail::MtPolicyd::ConnectionPool - a singleton to hold all configure connections
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 AUTHOR
 

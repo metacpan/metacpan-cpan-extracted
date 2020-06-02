@@ -23,7 +23,7 @@ do { my $x = {
                                       'Scalar::Util' => '0',
                                       'Sys::Hostname' => '0',
                                       'Text::Balanced' => '0',
-                                      'perl' => '5.014'
+                                      'perl' => '5.016'
                                     }
                     },
        'test' => {

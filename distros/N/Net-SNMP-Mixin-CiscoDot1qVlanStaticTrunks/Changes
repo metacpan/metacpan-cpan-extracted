@@ -1,7 +1,11 @@
 Revision history for Net-SNMP-Mixin-CiscoDot1qVlanStaticTrunks
 
+0.04	Sun, 31 May 2020 18:46:52 +0200
+        deprecated, use Net::SNMP::Mixin::CiscoDot1qVlanStatic
+        new Net::SNMP::Mixin::CiscoDot1qVlanStatic supports trunks and access ports
+
 0.03	Wed, 22 Jun 2016 16:10:47 +0200
-	new method init_ok(), check for partial initialization
+        new method init_ok(), check for partial initialization
         perltidy without errors
 
 0.01	Thu, 12 Jan 2012 14:13:26 +0100

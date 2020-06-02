@@ -9,7 +9,7 @@ use 5.010;    #5.10.0
 
 use Business::DK::CPR qw(validate1968 validate2007);
 
-our $VERSION = '0.13';
+our $VERSION = '0.16';
 
 private number    => my %number;       # read-only accessor: number()
 private gender    => my %gender;       # read-only accessor: gender()
@@ -18,6 +18,10 @@ private algorithm => my %algorithm;    # read-only accessor: algorithm()
 sub new {
     my ( $class, $number ) = @_;
 
+    if (not $number) {
+        croak 'You must provide a CPR number';
+    }
+
     ## no critic (Variables::ProhibitUnusedVariables)
     my $self = \( my $scalar );
 
@@ -25,12 +29,7 @@ sub new {
 
     register($self);
 
-    if ($number) {
-        $self->set_number($number);
-    }
-    else {
-        croak 'You must provide a CPR number';
-    }
+    $self->set_number($number);
 
     return $self;
 }
@@ -99,17 +98,17 @@ __END__
 
 =head1 NAME
 
-Class::Business::DK::CPR - Danish CPR number class 
+Class::Business::DK::CPR - Danish CPR number class
 
 =head1 VERSION
 
-The documentation describes version 0.01 of Class::Business::DK::CPR
+The documentation describes version 0.16 of Class::Business::DK::CPR
 
 =head1 SYNOPSIS
 
     use Class::Business::DK::CPR;
 
-    my $cvr = Class::Business::DK::CPR->new(1501729473);
+    my $cpr = Class::Business::DK::CPR->new(1501729473);
 
 =head1 DESCRIPTION
 
@@ -218,28 +217,32 @@ Coverage of the test suite is at 98.3%
 
 =head1 BUG REPORTING
 
-Please report issues via CPAN RT:
+Please report issue via GitHub
 
-  http://rt.cpan.org/NoAuth/Bugs.html?Dist=Business-DK-CPR
+    L<https://github.com/jonasbn/perl-business-dk-cpr/issues>
+
+Alternatively report issues via CPAN RT:
+
+    L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Business-DK-CPR>
 
 or by sending mail to
 
-  bug-Business-DK-CPR@rt.cpan.org
-  
+    bug-Business-DK-CPR@rt.cpan.org
+
 =head1 AUTHOR
 
-Jonas B. Nielsen, (jonasbn) - C<< <jonasbn@cpan.org> >>
+=over
+
+=item * Jonas B., (jonasbn) - C<< <jonasbn@cpan.org> >>
+
+=back
 
 =head1 COPYRIGHT
 
-Business-DK-CPR and related is (C) by Jonas B. Nielsen, (jonasbn) 2006-2014
+Business-DK-CPR and related is (C) by Jonas B., (jonasbn) 2006-2020
 
 =head1 LICENSE
 
-Business-DK-CPR and related is released under the artistic license
-
-The distribution is licensed under the Artistic License, as specified
-by the Artistic file in the standard perl distribution
-(L<http://www.perl.com/language/misc/Artistic.html>).
+Business-DK-CPR and related is released under the Artistic License 2.0
 
 =cut

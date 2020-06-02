@@ -1,0 +1,11 @@
+=name example-1
+
+Example #1
+
+=cut
+
+@=name example-2
+
+Example #2
+
+@=cut

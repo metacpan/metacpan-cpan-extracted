@@ -6,22 +6,34 @@ use warnings;
 
 use Test::More;
 
-plan tests => 15 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 27 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Filter.pm',
-    'Data/Sah/Filter/js/Str/lowcase.pm',
+    'Data/Sah/Filter/js/Str/downcase.pm',
+    'Data/Sah/Filter/js/Str/lc.pm',
+    'Data/Sah/Filter/js/Str/lcfirst.pm',
+    'Data/Sah/Filter/js/Str/lowercase.pm',
     'Data/Sah/Filter/js/Str/ltrim.pm',
     'Data/Sah/Filter/js/Str/rtrim.pm',
     'Data/Sah/Filter/js/Str/trim.pm',
+    'Data/Sah/Filter/js/Str/uc.pm',
+    'Data/Sah/Filter/js/Str/ucfirst.pm',
     'Data/Sah/Filter/js/Str/upcase.pm',
+    'Data/Sah/Filter/js/Str/uppercase.pm',
     'Data/Sah/Filter/perl/Str/check.pm',
-    'Data/Sah/Filter/perl/Str/lowcase.pm',
+    'Data/Sah/Filter/perl/Str/downcase.pm',
+    'Data/Sah/Filter/perl/Str/lc.pm',
+    'Data/Sah/Filter/perl/Str/lcfirst.pm',
+    'Data/Sah/Filter/perl/Str/lowercase.pm',
     'Data/Sah/Filter/perl/Str/ltrim.pm',
     'Data/Sah/Filter/perl/Str/replace_map.pm',
     'Data/Sah/Filter/perl/Str/rtrim.pm',
     'Data/Sah/Filter/perl/Str/trim.pm',
+    'Data/Sah/Filter/perl/Str/uc.pm',
+    'Data/Sah/Filter/perl/Str/ucfirst.pm',
     'Data/Sah/Filter/perl/Str/upcase.pm',
+    'Data/Sah/Filter/perl/Str/uppercase.pm',
     'Data/Sah/FilterCommon.pm',
     'Data/Sah/FilterJS.pm'
 );

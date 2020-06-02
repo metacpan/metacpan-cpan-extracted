@@ -6,7 +6,7 @@ our @EXPORT = qw();
 use strict;
 use warnings;
 use 5.010;
-use File::Spec::Functions qw(catdir updir);
+use File::Spec::Functions qw(catdir catfile updir);
 use Cwd qw(cwd);
 use App::Rakubrew::Variables;
 use App::Rakubrew::Tools;
@@ -14,7 +14,8 @@ use App::Rakubrew::VersionHandling;
 
 sub _version_is_at_least {
     my $min_ver = shift;
-    my $ver = slurp('VERSION');
+    my $rakudo_dir = shift;
+    my $ver = slurp(catfile($rakudo_dir, 'VERSION'));
     my ($min_year, $min_month, $min_sub);
     my ($year, $month, $sub);
     if ($ver =~ /(\d\d\d\d)\.(\d\d)(?:\.(\d+))?/ ) {
@@ -47,7 +48,8 @@ sub _version_is_at_least {
 }
 
 sub _get_git_cache_option {
-    if ( _version_is_at_least('2020.02') ) {
+    my $rakudo_dir = shift;
+    if ( _version_is_at_least('2020.02', $rakudo_dir) ) {
         return "--git-cache-dir=\"$git_reference\"";
     }
     else {
@@ -56,7 +58,8 @@ sub _get_git_cache_option {
 }
 
 sub _get_relocatable_option {
-    if ( _version_is_at_least('2019.07') ) {
+    my $rakudo_dir = shift;
+    if ( _version_is_at_least('2019.07', $rakudo_dir) ) {
         return "--relocatable";
     }
     say STDERR "The current rakubrew setup requires Rakudo to be relocated, but the";
@@ -97,21 +100,25 @@ sub build_impl {
     };
     run "$GIT checkout -q $ver_to_checkout";
 
-    $configure_opts .= ' ' . _get_git_cache_option;
+    $configure_opts .= ' ' . _get_git_cache_option(cwd());
     run $impls{$impl}{configure} . " $configure_opts";
 }
 
 sub determine_make {
-    my $makefile = shift;
-    $makefile = slurp($makefile);
+    my $version = shift;
 
-    if($makefile =~ /^MAKE\s*=\s*(\w+)\s*$/m) {
-        return $1;
-    }
-    else {
+    my $cmd = get_raku($version) . ' --show-config';
+    my $config = qx{$cmd};
+
+    my $make;
+    $make = $1 if $config =~ m/::make=(.*)$/m;
+
+    if (!$make) {
         say STDERR "Couldn't determine correct make program. Aborting.";
         exit 1;
     }
+
+    return $make;
 }
 
 sub build_triple {
@@ -123,10 +130,6 @@ sub build_triple {
 
     my $name = "$impl-$rakudo_ver-$nqp_ver-$moar_ver";
 
-    my $configure_opts = '--make-install'
-        . ' --prefix=' . catdir($versions_dir, $name, 'install')
-        . ' ' . _get_git_cache_option;
-
     chdir $versions_dir;
 
     unless (-d $name) {
@@ -137,9 +140,9 @@ sub build_triple {
     run "$GIT pull";
     run "$GIT checkout $rakudo_ver";
 
-    if (-e 'Makefile') {
-        run(determine_make('Makefile'), 'install');
-    }
+    my $configure_opts = '--make-install'
+        . ' --prefix=' . catdir($versions_dir, $name, 'install')
+        . ' ' . _get_git_cache_option(cwd());
 
     unless (-d "nqp") {
         update_git_reference('nqp');
@@ -153,6 +156,7 @@ sub build_triple {
         update_git_reference('MoarVM');
         run "$GIT clone --reference \"$git_reference/MoarVM\" $git_repos{MoarVM}";
     }
+
     chdir "MoarVM";
     run "$GIT pull";
     run "$GIT checkout $moar_ver";
@@ -190,7 +194,6 @@ sub update_git_reference {
     my $repo = shift;
     my $back = cwd();
     print "Update git reference: $repo\n";
-    say "Ref dir: $git_reference";
     chdir $git_reference;
     unless (-d $repo) {
         run "$GIT clone --bare $git_repos{$repo} $repo";

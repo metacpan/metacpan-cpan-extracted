@@ -3,20 +3,22 @@ abstract: 'Be able to select archivable formats'
 author:
   - 'Wesley Schwengle <wesley@mintlab.nl>'
 build_requires:
+  Capture::Tiny: '0'
   File::Spec: '0'
   File::Spec::Functions: '0'
   File::Temp: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   MIME::Types: '0'
+  Path::Tiny: '0'
   Test::Deep: '0'
   Test::More: '0'
-  perl: '5.008'
+  perl: '5.012'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.008'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,13 +27,13 @@ name: File-ArchivableFormats
 provides:
   File::ArchivableFormats:
     file: lib/File/ArchivableFormats.pm
-    version: '1.6'
+    version: '1.8'
   File::ArchivableFormats::Plugin:
     file: lib/File/ArchivableFormats/Plugin.pm
-    version: '1.6'
+    version: '1.8'
   File::ArchivableFormats::Plugin::DANS:
     file: lib/File/ArchivableFormats/Plugin/DANS.pm
-    version: '1.6'
+    version: '1.8'
 requires:
   File::Basename: '0'
   File::MimeInfo::Magic: '0'
@@ -41,11 +43,10 @@ requires:
   Moose::Role: '0'
   Moose::Util::TypeConstraints: '0'
   namespace::autoclean: '0'
-  perl: '5.008'
+  perl: '5.012'
 resources:
-  repository: git://gitlab.com/waterkip/File-ArchivableFormats.git
-version: '1.6'
-x_contributors:
-  - 'Wesley Schwengle <wesley@schwengle.net>'
-x_generated_by_perl: v5.28.1
+  repository: git://gitlab.com/zaaksysteem/file-archivableformats.git
+version: '1.8'
+x_generated_by_perl: v5.30.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: EUPL-1.1

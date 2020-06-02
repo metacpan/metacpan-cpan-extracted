@@ -1,5 +1,11 @@
 Changes for plenigo perl SDK
 
+3.0000  2020-06-02
+        - Started plenigo V3 integration
+        
+Unreleased
+        - Added https://api.plenigo.com/#!/user/hasBoughtProductWithProducts functionality
+        
 2.0006  2018-11-27
         - Bugfixes
         

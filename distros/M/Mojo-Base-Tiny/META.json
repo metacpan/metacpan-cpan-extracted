@@ -31,7 +31,7 @@
       "runtime" : {
          "requires" : {
             "Sub::Util" : "1.41",
-            "perl" : "v5.10.0"
+            "perl" : "v5.16.0"
          }
       },
       "test" : {
@@ -52,7 +52,7 @@
          "web" : "https://github.com/Tekki/mojo-base-tiny"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_contributors" : [
       "Sebastian Riedel <sri@cpan.org>",
       "William Lindley <wlindley+remove+this@wlindley.com>",

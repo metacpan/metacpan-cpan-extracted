@@ -20,7 +20,7 @@ L<http://perldoc.perl.org/perlartistic.html>.
 
 =cut
 
-use Test::More tests => 100;
+use Test::More tests => 128;
 use Scalar::Util qw/blessed/;
 
 sub exception (&) { eval { shift->(); 1 } ? undef : ($@ || die) }  ## no critic (ProhibitSubroutinePrototypes, RequireFinalReturn, RequireCarping)
@@ -30,7 +30,7 @@ sub warns (&) { my @w; { local $SIG{__WARN__} = sub { push @w, shift }; shift->(
 
 diag "This is Perl $] at $^X on $^O";
 BEGIN { use_ok 'Util::H2O' }
-is $Util::H2O::VERSION, '0.08';
+is $Util::H2O::VERSION, '0.10';
 
 my $PACKRE = qr/\AUtil::H2O::_[0-9A-Fa-f]+\z/;
 
@@ -189,8 +189,35 @@ sub checksym {
 		ok exception { my $x = $n->{DESTROY} };
 	}
 }
+{
+	my $o = h2o -meth, -new, { x=>111, y=>sub{222} }, qw/y/;
+	my $n = $o->new( x=>333, y=>444 );
+	is_deeply $n, { x=>333, y=>444 };
+	is $n->y, 222;
+	is $n->{y}, 444;
+	my $n2 = $o->new( y=>sub{555} );
+	is $n2->x, undef;
+	is $n2->y, 222;
+	is $n2->{y}->(), 555;
+}
 
-# -lock
+# -classify
+{
+	my $o = h2o -classify=>'Quz::Baz', { abc => 123, def => sub { $_[0]->abc(789); 456 } };
+	is $o->abc, 123;
+	is $o->def, 456;
+	is $o->abc, 789;
+	my $n = new_ok 'Quz::Baz';
+	is $n->abc, undef;
+	is $n->def, 456;
+	is $n->abc, 789;
+	my $n2 = $o->new( abc=>333 );
+	is $n2->abc, 333;
+	is $n2->def, 456;
+	is $n2->abc, 789;
+}
+
+# -lock / -nolock
 {
 	my $o = h2o { foo=>123 }, qw/ bar /;
 	is $o->{foo}, 123;
@@ -228,6 +255,20 @@ sub checksym {
 	ok exception { my $x = $o->quz };
 }
 {
+	my $o = h2o -nolock, { foo=>123 }, qw/ bar /;
+	is $o->{foo}, 123;
+	is $o->{bar}, undef;
+	is_deeply [sort keys %$o], [qw/ foo /];
+	$o->{bar} = 456;
+	is $o->{quz}, undef;
+	is $o->{bar}, 456;
+	is_deeply [sort keys %$o], [qw/ bar foo /];
+	$o->{quz} = 789;
+	is $o->{quz}, 789;
+	is_deeply [sort keys %$o], [qw/ bar foo quz /];
+	ok exception { my $x = $o->quz };
+}
+{
 	h2o -class=>'Baz', -new, {}, qw/ abc /;
 	my $n = Baz->new(abc=>123);
 	$n->{def} = 456;
@@ -250,5 +291,8 @@ ok exception { h2o(-new, { new=>5 }) };
 ok exception { h2o(-class) };
 ok exception { h2o(-class=>'') };
 ok exception { h2o(-class=>[]) };
+ok exception { h2o(-classify) };
+ok exception { h2o(-classify=>'') };
+ok exception { h2o(-classify=>[]) };
 
 done_testing;

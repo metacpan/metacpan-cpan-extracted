@@ -1,0 +1,73 @@
+{
+   "abstract" : "An asynchronous and multi channel Perl AMQP client.",
+   "author" : [
+      "Masahito Ikuta <cooldaemon@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "AnyEvent-RabbitMQ",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Perl::Critic" : "0",
+            "Test::Spelling" : "0.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Devel::GlobalDestruction" : "0",
+            "File::ShareDir" : "0",
+            "List::MoreUtils" : "0",
+            "Net::AMQP" : "0.06",
+            "Readonly" : "1.03",
+            "namespace::clean" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Test::Pod" : "0"
+         },
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "version" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/bobtfish/AnyEvent-RabbitMQ.git",
+         "web" : "https://github.com/bobtfish/AnyEvent-RabbitMQ"
+      }
+   },
+   "version" : "1.21",
+   "x_contributors" : [
+      "Tom Doran <bobtfish@cpan.org>",
+      "Nicolas R <atoomic@cpan.org>",
+      "Dave Lambley <dlambley@cpan.org>",
+      "Ruslan Zakirov <ruz@bestpractical.com>",
+      "Masahito Ikuta <cooldaemon@gmail.com>",
+      "Rod Taylor <rod.taylor@gmail.com>",
+      "Carl H\u00f6rberg <carl@cloudamqp.com>",
+      "Julio Polo <julio@hawaii.edu>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

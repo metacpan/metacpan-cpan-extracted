@@ -3,12 +3,11 @@ package Finance::Currency::Convert::SCSB;
 use strict;
 use warnings;
 
-our $VERSION = v0.1.0;
+our $VERSION = v0.1.1;
 
 use Exporter 'import';
 our @EXPORT_OK = qw(get_currencies convert_currency);
 
-use Mojo::Collection;
 use Mojo::UserAgent;
 
 sub get_currencies {
@@ -32,7 +31,9 @@ sub get_currencies {
 
     my @rows = ();
     for my $i (0..$#{$cols[0]}) {
+        my $currency = $cols[1][$i] =~ s/ CASH//r;
         push @rows, {
+            currency         => $currency,
             zh_currency_name => $cols[0][$i],
             en_currency_name => $cols[1][$i],
             buy_at           => $cols[2][$i],
@@ -53,7 +54,8 @@ sub convert_currency {
 
     my $rate;
     for (@$result) {
-        if ($_->{en_currency_name} eq $from_currency) {
+        next if $_->{en_currency_name} =~ /CASH/;
+        if ($_->{currency} eq $from_currency) {
             $rate = $_;
             last;
         }
@@ -168,9 +170,10 @@ Usage:
         ...
     }
 
-The "Rate" type is a HashRef with 4 specific key-value pairs that looks like this:
+The "Rate" type is a HashRef with 5 specific key-value pairs that looks like this:
 
     {
+        currency         => "USD",
         zh_currency_name => "美金現金",
         en_currency_name => "USD CASH",
         buy_at           => 33.06,

@@ -10,6 +10,7 @@ use Pod::Wordlist;
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( examples lib script t xt ) );
 __DATA__
+Document
 Draft201909
 Error
 Etheridge

@@ -14,7 +14,7 @@ use English qw/ -no_match_vars /;
 
 extends 'App::VTide::Command::Run';
 
-our $VERSION = version->new('0.1.11');
+our $VERSION = version->new('0.1.12');
 our $NAME    = 'edit';
 our $OPTIONS = [
     'test|T!',
@@ -45,7 +45,7 @@ sub run {
     $self->hooks->run('edit_editing', \@cmd);
     $self->runit( @cmd );
 
-    $params = $self->params($ENV{VTIDE_TERM});
+    $params = $self->params($ENV{VTIDE_TERM} || '1');
     eval { require Term::Title; }
         and Term::Title::set_titlebar($params->{title} || 'bash');
 
@@ -90,7 +90,7 @@ App::VTide::Command::Edit - Run an edit command (like Run but without a terminal
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Edit version 0.1.11
+This documentation refers to App::VTide::Command::Edit version 0.1.12
 
 =head1 SYNOPSIS
 

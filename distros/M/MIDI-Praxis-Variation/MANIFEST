@@ -8,6 +8,7 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/half-again
 eg/stretch
 lib/MIDI/Praxis/Variation.pm
 t/00-compile.t

@@ -1,6 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
 use Test::More;
 
@@ -13,8 +14,6 @@ use POSIX qw( ENOENT );
 unless( socket( my $dummy, PF_PACKET, SOCK_RAW, 0 ) ) {
    plan skip_all => "Cannot create PF_PACKET socket";
 }
-
-plan tests => 20;
 
 require IO::Socket::Packet;
 
@@ -76,3 +75,5 @@ SKIP: {
 }
 
 is_deeply( [ sort keys %{ $sock->statistics } ], [qw( drops packets )], '$sock->statistics' );
+
+done_testing;

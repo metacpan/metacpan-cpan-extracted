@@ -1,7 +1,12 @@
 Revision history for Alien::proj
 
+1.13 2020-05-31
+    - Disable clean_install option in Makefile.PL due to
+      possible timing issues with parallel make deleting
+      newly installed files.
+
 1.12 2020-05-29
-    - Die in alienfile is downloaded proj version is less
+    - Die in alienfile if downloaded proj version is less
       than the minimum required.  This could occur if
       Alien::Build::Fetch::Cache is in use.
     - Change utility test to use cs2cs instead of projinfo.

@@ -1,11 +1,11 @@
-# $Id: Index.pm 82 2020-05-30 06:14:27Z stro $
+# $Id: Index.pm 84 2020-05-31 06:29:34Z stro $
 
 package CPAN::SQLite::DBI::Index;
 use strict;
 use warnings;
 
 BEGIN {
-  our $VERSION = '0.218';
+  our $VERSION = '0.219';
   $CPAN::SQLite::DBI::Index::info::VERSION  = $VERSION;
   $CPAN::SQLite::DBI::Index::mods::VERSION  = $VERSION;
   $CPAN::SQLite::DBI::Index::dists::VERSION = $VERSION;
@@ -197,7 +197,7 @@ CPAN::SQLite::DBI::Index - DBI information for indexing the CPAN::SQLite databas
 
 =head1 VERSION
 
-version 0.218
+version 0.219
 
 =head1 DESCRIPTION
 

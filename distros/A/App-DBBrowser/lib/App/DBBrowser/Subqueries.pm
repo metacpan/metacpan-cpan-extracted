@@ -70,7 +70,8 @@ sub __get_history {
     my $h_ref = $ax->read_json( $sf->{i}{f_subqueries} ) // {};
     my $history_HD = $h_ref->{ $sf->{i}{driver} }{ $sf->{d}{db} }{substmt} // [];
     my $history_RAM = $sf->__tmp_history( $history_HD ) // [];
-    return [ @$history_HD, @$history_RAM ];
+    #return [ @$history_HD, @$history_RAM ];
+    return $history_HD, $history_RAM;
 }
 
 
@@ -78,14 +79,16 @@ sub choose_subquery {
     my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $history_comb = $sf->__get_history();
+    #my $history_comb = $sf->__get_history();
+    my ( $history_HD, $history_RAM ) = $sf->__get_history();
     my $edit_sq_file = 'Choose SQ:';
     my $readline     = '  Read-Line';
     my @pre = ( $edit_sq_file, undef, $readline );
     my $old_idx = 1;
 
     SUBQUERY: while ( 1 ) {
-        my $menu = [ @pre, map( '- ' . $_->[1], @$history_comb ) ];
+        #my $menu = [ @pre, map( '- ' . $_->[1], @$history_comb ) ];
+        my $menu = [ @pre, map( '- ' . $_->[1], @$history_HD ), map( '  ' . $_->[1], @$history_RAM ) ];
         # Choose
         my $idx = $tc->choose(
             $menu,
@@ -103,8 +106,10 @@ sub choose_subquery {
         }
         if ( $menu->[$idx] eq $edit_sq_file ) {
             if ( $sf->__edit_sq_file() ) {
-                $history_comb = $sf->__get_history();
-                $menu = [ @pre, map { '- ' . $_->[1] } @$history_comb ];
+                #$history_comb = $sf->__get_history();
+                #$menu = [ @pre, map { '- ' . $_->[1] } @$history_comb ];
+                ( $history_HD, $history_RAM ) = $sf->__get_history();
+                $menu = [ @pre, map( '- ' . $_->[1], @$history_HD ), map( '  ' . $_->[1], @$history_RAM ) ];
             }
             $ax->print_sql( $sql );
             next SUBQUERY;
@@ -116,7 +121,8 @@ sub choose_subquery {
         else {
             $prompt = 'Edit SQ: ';
             $idx -= @pre;
-            $default = $history_comb->[$idx][0];
+            #$default = $history_comb->[$idx][0];
+            $default = ( @$history_HD, @$history_RAM )[$idx][0];
         }
         my $tf = Term::Form->new( $sf->{i}{tf_default} );
         # Readline

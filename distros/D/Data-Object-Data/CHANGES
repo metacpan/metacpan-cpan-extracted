@@ -1,7 +1,19 @@
 Changelog for Data-Object-Data
 
-2.02 2020-05-10T19:12:02
- - No changes found
+2.03 2020-05-31T15:36:13
+ - Added release updates
+ - Allow passing a string to the constructor (#18)
+ - Escape nested POD syntax (#17)
+ - Support alternate POD start syntax (#16)
+ - Housekeeping (#15)
+ - Handle issue when loading "lines" from (eval) (#10)
+
+2.02 2020-05-10T19:02:41
+ - Built release version 2.02
+ - Added release updates
+ - Do not die on "from" with in-memory packages
+ - Miscellaneous housekeeping
+ - Add META data
 
 2.01 2020-03-16T00:21:54
  - Built release version 2.01

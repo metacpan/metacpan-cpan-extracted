@@ -6,7 +6,7 @@ verbose = 8
 
 #------------------------------------------------------------------------------
 
-[CodeLayout::RequireTidyCode]
+[-CodeLayout::RequireTidyCode]
 
 [Documentation::RequirePodSections]
 lib_sections    = NAME|VERSION|SYNOPSIS|DESCRIPTION|SUBROUTINES AND METHODS|DIAGNOSTICS|CONFIGURATION AND ENVIRONMENT|DEPENDENCIES|INCOMPATIBILITIES|BUGS AND LIMITATIONS|TEST AND QUALITY|TODO|SEE ALSO|BUG REPORTING|AUTHOR|COPYRIGHT|LICENSE
@@ -24,7 +24,7 @@ functions = print
 [-ValuesAndExpressions::ProhibitMagicNumbers]
 
 #deprecated [-NamingConventions::ProhibitMixedCaseSubs]
-[-NamingConventions::Capitalization] 
+[-NamingConventions::Capitalization]
 
 [-Miscellanea::ProhibitTies]
 
@@ -37,6 +37,9 @@ functions = print
 [-Bangs::ProhibitNumberedNames]
 
 [-Bangs::ProhibitFlagComments]
+
+[Documentation::PodSpelling]
+stop_words_file = t/wordlist.txt
 
 #TODO
 

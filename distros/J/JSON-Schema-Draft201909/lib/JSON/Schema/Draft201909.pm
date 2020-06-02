@@ -1,27 +1,29 @@
 use strict;
 use warnings;
-package JSON::Schema::Draft201909; # git description: v0.001-20-gbe3f104
+package JSON::Schema::Draft201909; # git description: v0.003-13-g3d882cb
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.002';
+our $VERSION = '0.004';
 
 no if "$]" >= 5.031009, feature => 'indirect';
-use feature 'current_sub';
 use JSON::MaybeXS 1.004001 'is_bool';
-use Syntax::Keyword::Try;
-use Carp 'croak';
+use Syntax::Keyword::Try 0.11;
+use Carp qw(croak carp);
 use List::Util 1.33 qw(any pairs);
 use Mojo::JSON::Pointer;
 use Mojo::URL;
 use Safe::Isa;
+use Path::Tiny;
+use File::ShareDir 'dist_dir';
 use Moo;
 use MooX::TypeTiny 0.002002;
 use MooX::HandlesVia;
-use Types::Standard 1.010002 qw(Bool HasMethods Enum InstanceOf HashRef Dict);
+use Types::Standard 1.010002 qw(Bool Int Str HasMethods Enum InstanceOf HashRef Dict);
 use JSON::Schema::Draft201909::Error;
 use JSON::Schema::Draft201909::Result;
+use JSON::Schema::Draft201909::Document;
 use namespace::clean;
 
 has output_format => (
@@ -37,47 +39,10 @@ has short_circuit => (
   default => sub { $_[0]->output_format eq 'flag' },
 );
 
-has _resource_index => (
-  is => 'bare',
-  isa => HashRef[Dict[
-      # see JSON::MaybeXS::is_bool
-      ref => InstanceOf[qw(JSON::XS::Boolean Cpanel::JSON::XS::Boolean JSON::PP::Boolean)]|HashRef,
-      canonical_uri => InstanceOf['Mojo::URL'],
-    ]],
-  handles_via => 'Hash',
-  handles => {
-    _add_resources => 'set',
-    _get_resource => 'get',
-    _remove_resource => 'delete',
-    _resource_index => 'elements',
-  },
-  lazy => 1,
-  default => sub { {} },
-);
-
-before _add_resources => sub {
-  my $self = shift;
-  foreach my $pair (pairs @_) {
-    my ($key, $value) = @$pair;
-    if (my $existing = $self->_get_resource($key)) {
-      croak 'a schema resource is already indexed with uri "'.$key.'"'
-        # we allow overwriting canonical_uri = '' to allow for ad hoc evaluation of
-        # schemas that lack all identifiers altogether
-        if ($key ne '' and $existing->{canonical_uri} ne '')
-          and $existing->{ref} != $value->{ref}
-            or $existing->{canonical_uri} ne $value->{canonical_uri};
-    }
-
-    croak sprintf('canonical_uri cannot contain a plain-name fragment (%s)', $value->{canonical_uri})
-      if ($value->{canonical_uri}->fragment // '') =~ m{^[^/]};
-  }
-};
-
-has _json_decoder => (
+has max_traversal_depth => (
   is => 'ro',
-  isa => HasMethods[qw(encode decode)],
-  lazy => 1,
-  default => sub { JSON::MaybeXS->new(allow_nonref => 1, utf8 => 1) },
+  isa => Int,
+  default => 50,
 );
 
 sub evaluate_json_string {
@@ -106,14 +71,24 @@ sub evaluate_json_string {
 sub evaluate {
   my ($self, $data, $schema) = @_;
 
-  $self->_find_all_identifiers($schema);
+  # TODO: move to $self->add_schema($schema)
+  my $document = JSON::Schema::Draft201909::Document->new(
+    # TODO canonical_uri => $self->base_uri,
+    schema => $schema,
+  );
+
+  $self->_add_resources(
+    map +( $_->[0] => +{ %{$_->[1]}, document => $document } ),
+      $document->_resource_pairs
+  );
 
   my $state = {
     base_uri => Mojo::URL->new,                   # TODO: will be set by a global attribute
     short_circuit => $self->short_circuit,
+    depth => 0,
     data_path => '',
     traversed_schema_path => '',  # the accumulated path up to the last $ref traversal
-    absolute_schema_uri => undef, # the absolute path of the last traversed $ref; always a Mojo::URL
+    canonical_schema_uri => undef,# the canonical path of the last traversed $ref (Mojo::URL)
     schema_path => '',            # the rest of the path, since the last traversed $ref
     errors => [],
   };
@@ -140,11 +115,16 @@ sub evaluate {
   );
 }
 
+######## NO PUBLIC INTERFACES FOLLOW THIS POINT ########
+
 sub _eval {
   my ($self, $data, $schema, $state) = @_;
 
   $state = { %$state };     # changes to $state should only affect subschemas, not parents
   delete $state->{keyword};
+
+  abort($state, 'maximum traversal depth exceeded')
+    if $state->{depth}++ > $self->max_traversal_depth;
 
   my $schema_type = $self->_get_type($schema);
   return $schema || E($state, 'subschema is false') if $schema_type eq 'boolean';
@@ -155,7 +135,7 @@ sub _eval {
 
   foreach my $keyword (
     # CORE KEYWORDS
-    qw($schema $id $anchor $ref $recursiveRef $recursiveAnchor $vocabulary $comment $defs),
+    qw($schema $id $anchor $recursiveAnchor $ref $recursiveRef $vocabulary $comment $defs),
     # VALIDATOR KEYWORDS
     qw(type enum const
       multipleOf maximum exclusiveMaximum minimum exclusiveMinimum
@@ -166,6 +146,8 @@ sub _eval {
     qw(allOf anyOf oneOf not if dependentSchemas
       items unevaluatedItems contains
       properties patternProperties additionalProperties unevaluatedProperties propertyNames),
+    # DISCONTINUED KEYWORDS
+    qw(definitions dependencies),
   ) {
     next if not exists $schema->{$keyword};
 
@@ -180,22 +162,10 @@ sub _eval {
   return $result;
 }
 
-sub _eval_keyword_comment {
-  my ($self, $data, $schema, $state) = @_;
-  abort($state, '"$comment" value is not a string')
-    if not $self->_is_type('string', $schema->{'$comment'});
-  # we do nothing with this keyword, including not collecting its value for annotations.
-  return 1;
-}
-
-sub _eval_keyword_defs {
-  # we do nothing directly with this keyword, including not collecting its value for annotations.
-  return 1;
-}
-
 sub _eval_keyword_schema {
   my ($self, $data, $schema, $state) = @_;
 
+  assert_keyword_type($state, $schema, 'string');
   abort($state, 'custom $schema references are not yet supported')
     if $schema->{'$schema'} ne 'https://json-schema.org/draft/2019-09/schema';
 
@@ -205,15 +175,16 @@ sub _eval_keyword_schema {
 sub _eval_keyword_id {
   my ($self, $data, $schema, $state) = @_;
 
-  abort($state, '%s is not a string', $schema->{'$id'})
-    if not $self->_is_type('string', $schema->{'$id'});
+  assert_keyword_type($state, $schema, 'string');
 
   my $uri = Mojo::URL->new($schema->{'$id'})->base($state->{base_uri})->to_abs;
-  abort($state, '%s cannot have a non-empty fragment', $schema->{'$id'}) if length $uri->fragment;
+  abort($state, '$id value "%s" cannot have a non-empty fragment', $schema->{'$id'})
+    if length $uri->fragment;
 
+  $uri->fragment(undef);
   $state->{base_uri} = $uri;
   $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path};
-  $state->{absolute_schema_uri} = $uri->clone;
+  $state->{canonical_schema_uri} = $uri->clone;
   $state->{schema_path} = '';
 
   return 1;
@@ -222,37 +193,49 @@ sub _eval_keyword_id {
 sub _eval_keyword_anchor {
   my ($self, $data, $schema, $state) = @_;
 
-  abort($state, '%s is not a string', $schema->{'$anchor'})
-    if not $self->_is_type('string', $schema->{'$anchor'});
+  assert_keyword_type($state, $schema, 'string');
 
   if ($schema->{'$anchor'} !~ /^[A-Za-z][A-Za-z0-9_:.-]+$/) {
     $self->_remove_resource($state->{base_uri}->clone->fragment($schema->{'$anchor'}));
-    abort($state, '%s does not match required syntax', $schema->{'$anchor'});
+    abort($state, '$anchor value "%s" does not match required syntax', $schema->{'$anchor'});
   }
 
   # we already indexed this uri, so there is nothing more to do.
-  # we explicitly do NOT set $state->{absolute_schema_uri}.
+  # we explicitly do NOT set $state->{canonical_schema_uri}.
   return 1;
 }
 
-sub _eval_keyword_ref {
+sub _eval_keyword_recursiveAnchor {
   my ($self, $data, $schema, $state) = @_;
 
-  my $uri = Mojo::URL->new($schema->{'$ref'})->base($state->{base_uri})->to_abs;
+  assert_keyword_type($state, $schema, 'boolean');
+  return 1 if not $schema->{'$recursiveAnchor'} or exists $state->{recursive_anchor_uri};
+
+  # record the canonical location of the current position, to be used against future resolution
+  # of a $recursiveRef uri -- as if it was the current location when we encounter a $ref.
+  my $uri = $state->{canonical_schema_uri} ? $state->{canonical_schema_uri}->clone : Mojo::URL->new;
+  $uri->fragment(($uri->fragment//'').$state->{schema_path});
+
+  $state->{recursive_anchor_uri} = $uri;
+  return 1;
+}
+
+sub _fetch_and_eval_ref_uri {
+  my ($self, $data, $schema, $state, $uri) = @_;
 
   my $fragment = $uri->fragment // '';
-  my ($subschema, $absolute_uri);
-  # TODO: this will get less ugly when we move to actual document objects
+  my ($subschema, $canonical_uri);
   if (not length($fragment) or $fragment =~ m{^/}) {
     my $base = $uri->clone->fragment(undef);
-    my $document = Mojo::JSON::Pointer->new(($self->_get_resource($base) // {})->{ref});
-    $subschema = $document->get($fragment);
-    $absolute_uri = $uri;
+    if (my $resource = $self->_get_or_load_resource($base)) {
+      $subschema = $resource->{document}->get($resource->{path}.$fragment);
+      $canonical_uri = $uri;
+    }
   }
   else {
     if (my $resource = $self->_get_resource($uri)) {
-      $subschema = $resource->{ref};
-      $absolute_uri = $resource->{canonical_uri}->clone;  # this is *not* the anchor-containing URI
+      $subschema = $resource->{document}->get($resource->{path});
+      $canonical_uri = $resource->{canonical_uri}->clone; # this is *not* the anchor-containing URI
     }
   }
 
@@ -260,10 +243,64 @@ sub _eval_keyword_ref {
 
   return $self->_eval($data, $subschema,
     +{ %$state,
-      traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/$ref',
-      absolute_schema_uri => $absolute_uri,
+      traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/'.$state->{keyword},
+      canonical_schema_uri => $canonical_uri, # note: not canonical yet until $id is processed
       schema_path => '',
     });
+}
+
+sub _eval_keyword_ref {
+  my ($self, $data, $schema, $state) = @_;
+
+  assert_keyword_type($state, $schema, 'string');
+
+  my $uri = Mojo::URL->new($schema->{'$ref'})->base($state->{base_uri})->to_abs;
+  return $self->_fetch_and_eval_ref_uri($data, $schema, $state, $uri);
+}
+
+sub _eval_keyword_recursiveRef {
+  my ($self, $data, $schema, $state) = @_;
+
+  assert_keyword_type($state, $schema, 'string');
+
+  my $uri = Mojo::URL->new($schema->{'$recursiveRef'})
+    ->base($state->{recursive_anchor_uri})->to_abs;
+
+  abort($state, 'cannot resolve a $recursiveRef with a non-empty fragment against a'
+      .' $recursiveAnchor location with a canonical URI containing a fragment')
+    if $schema->{'$recursiveRef'} ne '#' and $state->{recursive_anchor_uri}->fragment;
+
+  return $self->_fetch_and_eval_ref_uri($data, $schema, $state, $uri);
+}
+
+sub _eval_keyword_vocabulary {
+  my ($self, $data, $schema, $state) = @_;
+
+  assert_keyword_type($state, $schema, 'object');
+
+  # we do nothing with this keyword yet. When we know we are in a metaschema,
+  # we can scan the URIs included here and either abort if a vocabulary is enabled that we do not
+  # understand, or turn on and off certain keyword behaviours based on the boolean values seen.
+
+  return 1;
+}
+
+sub _eval_keyword_comment {
+  my ($self, $data, $schema, $state) = @_;
+  assert_keyword_type($state, $schema, 'string');
+  # we do nothing with this keyword, including not collecting its value for annotations.
+  return 1;
+}
+
+sub _eval_keyword_defs {
+  my ($self, $data, $schema, $state) = @_;
+
+  my $type = $self->_get_type($schema->{'$defs'});
+  abort($state, '$defs value is not an object or boolean')
+    if $type ne 'object' and $type ne 'boolean';
+
+  # we do nothing directly with this keyword, including not collecting its value for annotations.
+  return 1;
 }
 
 sub _eval_keyword_type {
@@ -302,9 +339,8 @@ sub _eval_keyword_multipleOf {
   my ($self, $data, $schema, $state) = @_;
 
   return 1 if not $self->_is_type('number', $data);
-  abort($state, '%s is not a number', $schema->{multipleOf})
-    if not $self->_is_type('number', $schema->{multipleOf});
-  abort($state, '%s is not a positive number', $schema->{multipleOf}) if $schema->{multipleOf} <= 0;
+  assert_keyword_type($state, $schema, 'number');
+  abort($state, 'multipleOf value is not a positive number') if $schema->{multipleOf} <= 0;
 
   my $quotient = $data / $schema->{multipleOf};
   return 1 if int($quotient) == $quotient;
@@ -315,8 +351,7 @@ sub _eval_keyword_maximum {
   my ($self, $data, $schema, $state) = @_;
 
   return 1 if not $self->_is_type('number', $data);
-  abort($state, '%s is not a number', $schema->{maximum})
-    if not $self->_is_type('number', $schema->{maximum});
+  assert_keyword_type($state, $schema, 'number');
 
   return 1 if $data <= $schema->{maximum};
   return E($state, 'value is larger than %d', $schema->{maximum});
@@ -326,8 +361,7 @@ sub _eval_keyword_exclusiveMaximum {
   my ($self, $data, $schema, $state) = @_;
 
   return 1 if not $self->_is_type('number', $data);
-  abort($state, '%s is not a number', $schema->{exclusiveMaximum})
-    if not $self->_is_type('number', $schema->{exclusiveMaximum});
+  assert_keyword_type($state, $schema, 'number');
 
   return 1 if $data < $schema->{exclusiveMaximum};
   return E($state, 'value is equal to or larger than %d', $schema->{exclusiveMaximum});
@@ -337,8 +371,7 @@ sub _eval_keyword_minimum {
   my ($self, $data, $schema, $state) = @_;
 
   return 1 if not $self->_is_type('number', $data);
-  abort($state, '%s is not a number', $schema->{minimum})
-    if not $self->_is_type('number', $schema->{minimum});
+  assert_keyword_type($state, $schema, 'number');
 
   return 1 if $data >= $schema->{minimum};
   return E($state, 'value is smaller than %d', $schema->{minimum});
@@ -348,8 +381,7 @@ sub _eval_keyword_exclusiveMinimum {
   my ($self, $data, $schema, $state) = @_;
 
   return 1 if not $self->_is_type('number', $data);
-  abort($state, '%s is not a number', $schema->{exclusiveMinimum})
-    if not $self->_is_type('number', $schema->{exclusiveMinimum});
+  assert_keyword_type($state, $schema, 'number');
 
   return 1 if $data > $schema->{exclusiveMinimum};
   return E($state, 'value is equal to or smaller than %d', $schema->{exclusiveMinimum});
@@ -359,10 +391,8 @@ sub _eval_keyword_maxLength {
   my ($self, $data, $schema, $state) = @_;
 
   return 1 if not $self->_is_type('string', $data);
-  abort($state, '%s is not an integer', $schema->{maxLength})
-    if not $self->_is_type('integer', $schema->{maxLength});
-  abort($state, '%s is not a non-negative integer', $schema->{maxLength})
-    if $schema->{maxLength} < 0;
+  assert_keyword_type($state, $schema, 'integer');
+  abort($state, 'maxLength value is not a non-negative integer') if $schema->{maxLength} < 0;
 
   return 1 if length($data) <= $schema->{maxLength};
   return E($state, 'length is greater than %d', $schema->{maxLength});
@@ -372,10 +402,8 @@ sub _eval_keyword_minLength {
   my ($self, $data, $schema, $state) = @_;
 
   return 1 if not $self->_is_type('string', $data);
-  abort($state, '%s is not an integer', $schema->{minLength})
-    if not $self->_is_type('integer', $schema->{minLength});
-  abort($state, '%s is not a non-negative integer', $schema->{minLength})
-    if $schema->{minLength} < 0;
+  assert_keyword_type($state, $schema, 'integer');
+  abort($state, 'minLength value is not a non-negative integer') if $schema->{minLength} < 0;
 
   return 1 if length($data) >= $schema->{minLength};
   return E($state, 'length is less than %d', $schema->{minLength});
@@ -385,6 +413,7 @@ sub _eval_keyword_pattern {
   my ($self, $data, $schema, $state) = @_;
 
   return 1 if not $self->_is_type('string', $data);
+  assert_keyword_type($state, $schema, 'string');
 
   return 1 if $data =~ qr/$schema->{pattern}/;
   return E($state, 'pattern does not match');
@@ -394,10 +423,8 @@ sub _eval_keyword_maxItems {
   my ($self, $data, $schema, $state) = @_;
 
   return 1 if not $self->_is_type('array', $data);
-  abort($state, '%s is not an integer', $schema->{maxItems})
-    if not $self->_is_type('integer', $schema->{maxItems});
-  abort($state, '%s is not a non-negative integer', $schema->{maxItems})
-    if $schema->{maxItems} < 0;
+  assert_keyword_type($state, $schema, 'integer');
+  abort($state, 'maxItems value is not a non-negative integer') if $schema->{maxItems} < 0;
 
   return 1 if @$data <= $schema->{maxItems};
   return E($state, 'more than %d items', $schema->{maxItems});
@@ -407,10 +434,8 @@ sub _eval_keyword_minItems {
   my ($self, $data, $schema, $state) = @_;
 
   return 1 if not $self->_is_type('array', $data);
-  abort($state, '%s is not an integer', $schema->{minItems})
-    if not $self->_is_type('integer', $schema->{minItems});
-  abort($state, '%s is not a non-negative integer', $schema->{minItems})
-    if $schema->{minItems} < 0;
+  assert_keyword_type($state, $schema, 'integer');
+  abort($state, 'minItems value is not a non-negative integer') if $schema->{minItems} < 0;
 
   return 1 if @$data >= $schema->{minItems};
   return E($state, 'fewer than %d items', $schema->{minItems});
@@ -420,8 +445,7 @@ sub _eval_keyword_uniqueItems {
   my ($self, $data, $schema, $state) = @_;
 
   return 1 if not $self->_is_type('array', $data);
-  abort($state, '%s is not a boolean', $schema->{uniqueItems})
-    if not $self->_is_type('boolean', $schema->{uniqueItems});
+  assert_keyword_type($state, $schema, 'boolean');
 
   return 1 if not $schema->{uniqueItems};
   return 1 if $self->_is_elements_unique($data, my $equal_indices = []);
@@ -432,9 +456,8 @@ sub _eval_keyword_maxProperties {
   my ($self, $data, $schema, $state) = @_;
 
   return 1 if not $self->_is_type('object', $data);
-  abort($state, '%s is not an integer', $schema->{maxProperties})
-    if not $self->_is_type('integer', $schema->{maxProperties});
-  abort($state, '%s is not a non-negative integer', $schema->{maxProperties})
+  assert_keyword_type($state, $schema, 'integer');
+  abort($state, 'maxProperties value is not a non-negative integer')
     if $schema->{maxProperties} < 0;
 
   return 1 if keys %$data <= $schema->{maxProperties};
@@ -445,9 +468,8 @@ sub _eval_keyword_minProperties {
   my ($self, $data, $schema, $state) = @_;
 
   return 1 if not $self->_is_type('object', $data);
-  abort($state, '%s is not an integer', $schema->{minProperties})
-    if not $self->_is_type('integer', $schema->{minProperties});
-  abort($state, '%s is not a non-negative integer', $schema->{minProperties})
+  assert_keyword_type($state, $schema, 'integer');
+  abort($state, 'minProperties value is not a non-negative integer')
     if $schema->{minProperties} < 0;
 
   return 1 if keys %$data >= $schema->{minProperties};
@@ -458,8 +480,7 @@ sub _eval_keyword_required {
   my ($self, $data, $schema, $state) = @_;
 
   return 1 if not $self->_is_type('object', $data);
-  abort($state, '"required" value is not an array')
-    if not $self->_is_type('array', $schema->{required});
+  assert_keyword_type($state, $schema, 'array');
   abort($state, '"required" element is not a string')
     if any { !$self->_is_type('string', $_) } @{$schema->{required}};
 
@@ -472,8 +493,7 @@ sub _eval_keyword_dependentRequired {
   my ($self, $data, $schema, $state) = @_;
 
   return 1 if not $self->_is_type('object', $data);
-  abort($state, '"dependentRequired" value is not an object')
-    if not $self->_is_type('object', $schema->{dependentRequired});
+  assert_keyword_type($state, $schema, 'object');
   abort($state, '"dependentRequired" property is not an array')
     if any { !$self->_is_type('array', $schema->{dependentRequired}{$_}) }
       keys %{$schema->{dependentRequired}};
@@ -486,13 +506,13 @@ sub _eval_keyword_dependentRequired {
     keys %{$schema->{dependentRequired}};
 
   return 1 if not @missing;
-  return E($state, 'missing propert'.(@missing > 1 ? 'ies' : 'y').': '.join(', ', @missing));
+  return E($state, 'missing propert'.(@missing > 1 ? 'ies' : 'y').': '.join(', ', sort @missing));
 }
 
 sub _eval_keyword_allOf {
   my ($self, $data, $schema, $state) = @_;
 
-  abort($state, '"allOf" value is not an array') if not $self->_is_type('array', $schema->{allOf});
+  assert_keyword_type($state, $schema, 'array');
   abort($state, '"allOf" array is empty') if not @{$schema->{allOf}};
 
   my @invalid;
@@ -512,7 +532,7 @@ sub _eval_keyword_allOf {
 sub _eval_keyword_anyOf {
   my ($self, $data, $schema, $state) = @_;
 
-  abort($state, '"anyOf" value is not an array') if not $self->_is_type('array', $schema->{anyOf});
+  assert_keyword_type($state, $schema, 'array');
   abort($state, '"anyOf" array is empty') if not @{$schema->{anyOf}};
 
   my $valid = 0;
@@ -532,7 +552,7 @@ sub _eval_keyword_anyOf {
 sub _eval_keyword_oneOf {
   my ($self, $data, $schema, $state) = @_;
 
-  abort($state, '"oneOf" value is not an array') if not $self->_is_type('array', $schema->{oneOf});
+  assert_keyword_type($state, $schema, 'array');
   abort($state, '"oneOf" array is empty') if not @{$schema->{oneOf}};
 
   my (@valid, @errors);
@@ -588,11 +608,10 @@ sub _eval_keyword_dependentSchemas {
   my ($self, $data, $schema, $state) = @_;
 
   return 1 if not $self->_is_type('object', $data);
-  abort($state, '"dependentSchemas" value is not an object')
-    if not $self->_is_type('object', $schema->{dependentSchemas});
+  assert_keyword_type($state, $schema, 'object');
 
   my $valid = 1;
-  foreach my $property (keys %{$schema->{dependentSchemas}}) {
+  foreach my $property (sort keys %{$schema->{dependentSchemas}}) {
     next if not exists $data->{$property}
       or $self->_eval($data, $schema->{dependentSchemas}{$property},
         +{ %$state, schema_path => $state->{schema_path}.'/dependentSchemas/'.$property });
@@ -691,10 +710,9 @@ sub _eval_keyword_contains {
   }
 
   if (exists $schema->{minContains}) {
-    abort($state, '%s is not an integer', $schema->{minContains})
-      if not $self->_is_type('integer', $schema->{minContains});
-    abort($state, '%s is not a non-negative integer', $schema->{minContains})
-      if $schema->{minContains} < 0;
+    local $state->{keyword} = 'minContains';
+    assert_keyword_type($state, $schema, 'integer');
+    abort($state, 'minContains value is not a non-negative integer') if $schema->{minContains} < 0;
   }
 
   my $valid = 1;
@@ -707,14 +725,13 @@ sub _eval_keyword_contains {
   }
 
   if (exists $schema->{maxContains}) {
-    abort($state, '%s is not an integer', $schema->{maxContains})
-      if not $self->_is_type('integer', $schema->{maxContains});
-    abort($state, '%s is not a non-negative integer', $schema->{maxContains})
-      if $schema->{maxContains} < 0;
+    local $state->{keyword} = 'maxContains';
+    assert_keyword_type($state, $schema, 'integer');
+    abort($state, 'maxContains value is not a non-negative integer') if $schema->{maxContains} < 0;
 
     if ($num_valid > $schema->{maxContains}) {
       $valid = 0;
-      E({ %$state, keyword => 'maxContains' }, 'contains too many matching items');
+      E($state, 'contains too many matching items');
       return 0 if $state->{short_circuit};
     }
   }
@@ -732,11 +749,10 @@ sub _eval_keyword_properties {
   my ($self, $data, $schema, $state) = @_;
 
   return 1 if not $self->_is_type('object', $data);
-  abort($state, '"properties" value is not an object')
-    if not $self->_is_type('object', $schema->{properties});
+  assert_keyword_type($state, $schema, 'object');
 
   my $valid = 1;
-  foreach my $property (keys %{$schema->{properties}}) {
+  foreach my $property (sort keys %{$schema->{properties}}) {
     next if not exists $data->{$property};
     $valid = 0 if not $self->_eval($data->{$property}, $schema->{properties}{$property},
         +{ %$state,
@@ -754,13 +770,11 @@ sub _eval_keyword_patternProperties {
   my ($self, $data, $schema, $state) = @_;
 
   return 1 if not $self->_is_type('object', $data);
-  abort($state, '"patternProperties" value is not an object')
-    if not $self->_is_type('object', $schema->{patternProperties});
+  assert_keyword_type($state, $schema, 'object');
 
   my $valid = 1;
-  foreach my $property_pattern (keys %{$schema->{patternProperties}}) {
-    my @property_matches = grep /$property_pattern/, keys %$data;
-    foreach my $property (@property_matches) {
+  foreach my $property_pattern (sort keys %{$schema->{patternProperties}}) {
+    foreach my $property (sort grep /$property_pattern/, keys %$data) {
       $valid = 0
         if not $self->_eval($data->{$property}, $schema->{patternProperties}{$property_pattern},
           +{ %$state,
@@ -781,7 +795,7 @@ sub _eval_keyword_additionalProperties {
   return 1 if not $self->_is_type('object', $data);
 
   my $valid = 1;
-  foreach my $property (keys %$data) {
+  foreach my $property (sort keys %$data) {
     next if exists $schema->{properties} and exists $schema->{properties}{$property};
     next if exists $schema->{patternProperties}
       and any { $property =~ /$_/ } keys %{$schema->{patternProperties}};
@@ -816,7 +830,7 @@ sub _eval_keyword_propertyNames {
   return 1 if not $self->_is_type('object', $data);
 
   my $valid = 1;
-  foreach my $property (keys %$data) {
+  foreach my $property (sort keys %$data) {
     $valid = 0 if not $self->_eval($property, $schema->{propertyNames},
       +{ %$state,
         data_path => $state->{data_path}.'/'.$property,
@@ -829,8 +843,18 @@ sub _eval_keyword_propertyNames {
   return E($state, 'not all property names are valid');
 }
 
+sub _eval_keyword_definitions {
+  carp 'no-longer-supported "definitions" keyword present: this should be rewritten as "$defs"';
+  return 1;
+}
+
+sub _eval_keyword_dependencies {
+  carp 'no-longer-supported "dependencies" keyword present: this should be rewritten as "dependentSchemas" or "dependentRequired"';
+  return 1;
+}
+
 sub _is_type {
-  my ($self, $type, $value) = @_;
+  my (undef, $type, $value) = @_;
 
   if ($type eq 'null') {
     return !(defined $value);
@@ -935,50 +959,103 @@ sub _is_elements_unique {
   return 1;
 }
 
-sub _traverse_for_identifiers {
-  my ($data, $canonical_uri) = @_;
-  my $uri_fragment = $canonical_uri->fragment // '';
-  my %identifiers;
-  if (ref $data eq 'ARRAY') {
-    return map
-      __SUB__->($data->[$_], $canonical_uri->clone->fragment($uri_fragment.'/'.$_)),
-      0 .. $#{$data};
-  }
-  elsif (ref $data eq 'HASH') {
-    if (exists $data->{'$id'} and _is_type(undef, 'string', $data->{'$id'})) {
-      $canonical_uri = Mojo::URL->new($data->{'$id'})->base($canonical_uri)->to_abs;
-      # this might not be a real $id... wait for it to be encountered at runtime before dying
-      $identifiers{$canonical_uri} = { ref => $data, canonical_uri => $canonical_uri }
-        if not length $canonical_uri->fragment;
+has _resource_index => (
+  is => 'bare',
+  isa => HashRef[Dict[
+      canonical_uri => InstanceOf['Mojo::URL'],
+      path => Str,
+      document => InstanceOf['JSON::Schema::Draft201909::Document'],
+    ]],
+  handles_via => 'Hash',
+  handles => {
+    _add_resources => 'set',
+    _get_resource => 'get',
+    _remove_resource => 'delete',
+    _resource_index => 'elements',
+    _resource_keys => 'keys',
+    _add_resources_unsafe => 'set',
+  },
+  lazy => 1,
+  default => sub { {} },
+);
+
+before _add_resources => sub {
+  my $self = shift;
+  foreach my $pair (sort { $a->[0] cmp $b->[0] } pairs @_) {
+    my ($key, $value) = @$pair;
+    if (my $existing = $self->_get_resource($key)) {
+      # we allow overwriting canonical_uri = '' to allow for ad hoc evaluation of
+      # schemas that lack all identifiers altogether; we drop *all* resources from that document
+      $self->_remove_resource(
+          grep $self->_get_resource($_)->{document} == $existing->{document}, $self->_resource_keys)
+        if $key eq '';
+
+      croak 'uri "'.$key.'" conflicts with an existing schema resource'
+        if ($key ne '' and $existing->{canonical_uri} ne '')
+          and $existing->{path} ne $value->{path}
+            or $existing->{canonical_uri} ne $value->{canonical_uri};
     }
-    if (exists $data->{'$anchor'} and _is_type(undef, 'string', $data->{'$anchor'})) {
-      # we cannot change the canonical uri, or we won't be able to properly identify
-      # paths within this resource
-      my $uri = Mojo::URL->new->base($canonical_uri)->to_abs->fragment($data->{'$anchor'});
-      $identifiers{$uri} = { ref => $data, canonical_uri => $canonical_uri };
+    elsif ($self->CACHED_METASCHEMAS->{$key}) {
+      croak 'uri "'.$key.'" conflicts with an existing meta-schema resource';
     }
 
-    return
-      %identifiers,
-      map __SUB__->($data->{$_}, $canonical_uri->clone->fragment($uri_fragment.'/'.$_)), keys %$data;
+    my $fragment = $value->{canonical_uri}->fragment;
+    croak sprintf('canonical_uri cannot contain an empty fragment (%s)', $value->{canonical_uri})
+      if defined $fragment and $fragment eq '';
+
+    croak sprintf('canonical_uri cannot contain a plain-name fragment (%s)', $value->{canonical_uri})
+      if ($fragment // '') =~ m{^[^/]};
+  }
+};
+
+use constant CACHED_METASCHEMAS => {
+  'https://json-schema.org/draft/2019-09/hyper-schema'        => '2019-09/hyper-schema.json',
+  'https://json-schema.org/draft/2019-09/links'               => '2019-09/links.json',
+  'https://json-schema.org/draft/2019-09/meta/applicator'     => '2019-09/meta/applicator.json',
+  'https://json-schema.org/draft/2019-09/meta/content'        => '2019-09/meta/content.json',
+  'https://json-schema.org/draft/2019-09/meta/core'           => '2019-09/meta/core.json',
+  'https://json-schema.org/draft/2019-09/meta/format'         => '2019-09/meta/format.json',
+  'https://json-schema.org/draft/2019-09/meta/hyper-schema'   => '2019-09/meta/hyper-schema.json',
+  'https://json-schema.org/draft/2019-09/meta/meta-data'      => '2019-09/meta/meta-data.json',
+  'https://json-schema.org/draft/2019-09/meta/validation'     => '2019-09/meta/validation.json',
+  'https://json-schema.org/draft/2019-09/output/hyper-schema' => '2019-09/output/hyper-schema.json',
+  'https://json-schema.org/draft/2019-09/output/schema'       => '2019-09/output/schema.json',
+  'https://json-schema.org/draft/2019-09/schema'              => '2019-09/schema.json',
+};
+
+# returns the same as _get_resource
+sub _get_or_load_resource {
+  my ($self, $uri) = @_;
+
+  my $resource = $self->_get_resource($uri);
+  return $resource if $resource;
+
+  if (my $local_filename = $self->CACHED_METASCHEMAS->{$uri}) {
+    my $file = path(dist_dir('JSON-Schema-Draft201909'), $local_filename);
+    my $schema = $self->_json_decoder->decode($file->slurp_raw);
+    my $document = JSON::Schema::Draft201909::Document->new(schema => $schema);
+
+    $self->_add_resources_unsafe(
+      map +( $_->[0] => +{ %{$_->[1]}, document => $document } ),
+        $document->_resource_pairs
+    );
+
+    return $self->_get_resource($uri);
   }
 
-  return ();
-}
+  # TODO:
+  # - load from network or disk
+  # - handle such resources with $anchor fragments
 
-# traverse a schema document, find all identifiers and add them to the resource index.
-# internal only and subject to change!
-sub _find_all_identifiers {
-  my ($self, $schema) = @_;
+  return;
+};
 
-  my $base_uri = Mojo::URL->new;  # TODO: $self->base_uri->clone
-  my %identifiers = _traverse_for_identifiers($schema, $base_uri);
-
-  $identifiers{''} = { ref => $schema, canonical_uri => $base_uri }
-    if not "$base_uri" and ref $schema eq 'HASH' and not exists $schema->{'$id'};
-
-  $self->_add_resources(%identifiers);
-}
+has _json_decoder => (
+  is => 'ro',
+  isa => HasMethods[qw(encode decode)],
+  lazy => 1,
+  default => sub { JSON::MaybeXS->new(allow_nonref => 1, utf8 => 1) },
+);
 
 # shorthand for creating error objects
 use namespace::clean 'E';
@@ -989,9 +1066,11 @@ sub E {
   push @{$state->{errors}}, JSON::Schema::Draft201909::Error->new(
     instance_location => $state->{data_path},
     keyword_location => $state->{traversed_schema_path}.$state->{schema_path}.$suffix,
-    !$state->{absolute_schema_uri} ? () : ( absolute_keyword_location => do {
-      my $abs = $state->{absolute_schema_uri}->clone;
-      $abs->fragment(($abs->fragment//'').$state->{schema_path}.$suffix);
+    !$state->{canonical_schema_uri} ? () : ( absolute_keyword_location => do {
+      my $uri = $state->{canonical_schema_uri}->clone;
+      $uri->fragment(($uri->fragment//'').$state->{schema_path}.$suffix)
+        if $state->{schema_path} or $suffix;
+      $uri;
     } ),
     error => @args ? sprintf($error_string, @args) : $error_string,
   );
@@ -1005,6 +1084,14 @@ sub abort {
   my ($state, $error_string, @args) = @_;
   E($state, 'EXCEPTION: '.$error_string, @args);
   die pop @{$state->{errors}};
+}
+
+# one common usecase of abort()
+use namespace::clean 'assert_keyword_type';
+sub assert_keyword_type {
+  my ($state, $schema, $type) = @_;
+  abort($state, $state->{keyword}.' value is not a%s %s', ($type =~ /^[aeiou]/ ? 'n' : ''), $type)
+    if not _is_type(undef, $type, $schema->{$state->{keyword}});
 }
 
 1;
@@ -1023,7 +1110,7 @@ JSON::Schema::Draft201909 - Validate data against a schema
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -1052,6 +1139,12 @@ When true, evaluation will immediately return upon encountering the first valida
 than continuing to find all errors.
 
 Defaults to true when C<output_format> is C<flag>, and false otherwise.
+
+=head2 max_traversal_depth
+
+The maximum number of levels deep a schema traversal may go, before evaluation is halted. This is to
+protect against accidental infinite recursion, such as from two subschemas that each reference each
+other. Defaults to 50.
 
 =head1 METHODS
 
@@ -1083,9 +1176,9 @@ that respects the Draft 2019-09 meta-schema at L<https://json-schema.org/draft/2
 
 The result is a L<JSON::Schema::Draft201909::Result> object, which can also be used as a boolean.
 
-=head2 CAVEATS
+=head1 LIMITATIONS
 
-=head3 TYPES
+=head2 TYPES
 
 Perl is a more loosely-typed language than JSON. This module delves into a value's internal
 representation in an attempt to derive the true "intended" type of the value. However, if a value is
@@ -1093,10 +1186,12 @@ used in another context (for example, a numeric value is concatenated into a str
 string is used in an arithmetic operation), additional flags can be added onto the variable causing
 it to resemble the other type. This should not be an issue if data validation is occurring
 immediately after decoding a JSON payload, or if the JSON string itself is passed to this module.
+If this turns out to be an issue in real environments, I may have to implement a C<lax_scalars>
+option.
 
 For more information, see L<Cpanel::JSON::XS/MAPPING>.
 
-=head2 LIMITATIONS
+=head2 SPECIFICATION COMPLIANCE
 
 Until version 1.000 is released, this implementation is not fully specification-compliant.
 
@@ -1167,6 +1262,14 @@ use of C<$recursiveRef> and C<$recursiveAnchor>
 use of plain-name fragments with C<$anchor>
 
 =back
+
+=head1 SECURITY CONSIDERATIONS
+
+The C<pattern> and C<patternProperties> keywords evaluate regular expressions from the schema.
+No effort is taken (at this time) to sanitize the regular expressions for embedded code or
+potentially pathological constructs that may pose a security risk, either via denial of service
+or by allowing exposure to the internals of your application. B<DO NOT RUN SCHEMAS FROM UNTRUSTED
+SOURCES.>
 
 =head1 SEE ALSO
 

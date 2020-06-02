@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Find the top repeated note phrases of MIDI files
 
-our $VERSION = '0.1600';
+our $VERSION = '0.1700';
 
 use Moo;
 use strictures 2;
@@ -31,10 +31,17 @@ has ngram_size => (
 );
 
 
+has min_phrases => (
+    is      => 'ro',
+    isa     => \&_is_integer,
+    default => sub { 2 },
+);
+
+
 has max_phrases => (
     is      => 'ro',
     isa     => \&_is_integer0,
-    default => sub { 10 },
+    default => sub { 0 },
 );
 
 
@@ -100,13 +107,6 @@ has weight => (
 
 
 has shuffle_phrases => (
-    is      => 'ro',
-    isa     => \&_is_boolean,
-    default => sub { 0 },
-);
-
-
-has single_phrases => (
     is      => 'ro',
     isa     => \&_is_boolean,
     default => sub { 0 },
@@ -218,6 +218,13 @@ sub _build_dura_net {
         }
     }
 
+    for my $channel (keys %net) {
+        for my $node (keys %{ $net{$channel} }) {
+            delete $net{$channel}{$node}
+                if $net{$channel}{$node} < $self->min_phrases;
+        }
+    }
+
     return \%net;
 }
 
@@ -250,6 +257,13 @@ sub _build_note_net {
             }
 
             push @group, $self->note_convert($notes);
+        }
+    }
+
+    for my $channel (keys %net) {
+        for my $node (keys %{ $net{$channel} }) {
+            delete $net{$channel}{$node}
+                if $net{$channel}{$node} < $self->min_phrases;
         }
     }
 
@@ -292,7 +306,7 @@ sub process {
         # Display the ngrams in order of their repetition amount
         for my $p ( sort { $dura_phrase->{$b} <=> $dura_phrase->{$a} || $a cmp $b } keys %$dura_phrase ) {
             # Skip single occurance phrases if requested
-            next if !$self->single_phrases && $dura_phrase->{$p} == 1;
+            next if $dura_phrase->{$p} < $self->min_phrases;
 
             $j++;
 
@@ -327,7 +341,7 @@ sub process {
         # Display the ngrams in order of their repetition amount
         for my $p ( sort { $note_phrase->{$b} <=> $note_phrase->{$a} || $a cmp $b } keys %$note_phrase ) {
             # Skip single occurance phrases if requested
-            next if !$self->single_phrases && $note_phrase->{$p} == 1;
+            next if $note_phrase->{$p} < $self->min_phrases;
 
             $j++;
 
@@ -481,7 +495,7 @@ sub dura_convert {
                 }
             }
 
-            push @csv, $match ? $dura : 'd' . $n;
+            push @csv, $match ? $dura : 'd' . $v;
             $match = 0;
         }
 
@@ -550,7 +564,7 @@ MIDI::Ngram - Find the top repeated note phrases of MIDI files
 
 =head1 VERSION
 
-version 0.1600
+version 0.1700
 
 =head1 SYNOPSIS
 
@@ -560,6 +574,7 @@ version 0.1600
   my $mng = MIDI::Ngram->new(
     in_file      => [ 'eg/twinkle_twinkle.mid' ],
     ngram_size   => 3,
+    min_phrases  => 3,
     max_phrases  => 0, # Analyze all events
     patches      => [qw( 68 69 70 71 72 73 )],
     random_patch => 1,
@@ -601,11 +616,18 @@ Ngram phrase size.
 
 Default: C<2>
 
+=head2 min_phrases
+
+Integer.  Allow a minimum of this number of ngram occurrences in both
+the repetition and network lists.
+
+Default: C<2>
+
 =head2 max_phrases
 
 The maximum number of phrases to analyze/play.
 
-Default: C<10>
+Default: C<0>
 
 Setting this to a value of C<0> analyzes all phrases.
 
@@ -674,12 +696,6 @@ Default: C<0>
 =head2 shuffle_phrases
 
 Boolean.  Shuffle the non-weighted phrases before playing them.
-
-Default: C<0>
-
-=head2 single_phrases
-
-Boolean.  Allow single occurrence ngrams.
 
 Default: C<0>
 

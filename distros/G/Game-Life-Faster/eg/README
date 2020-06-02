@@ -7,4 +7,7 @@ README
 game-life
     An interactive wrapper for Game::Life::Faster or Game::Life.
 
+glider
+    Send a glider across a grid of a specified size
+
 # ex: set filetype=text textwidth=72 autoindent :

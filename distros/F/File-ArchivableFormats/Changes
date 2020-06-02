@@ -1,5 +1,20 @@
 Revision history for File::ArchivableFormats
 
+1.8       2020-06-02 03:20:25Z
+
+    * Fix Path::Tiny glitches. Path::Tiny doesn't have a `seek` method
+      and thus fails in combination with File::MimeInfo::Magic.
+      It does however sees text/x-readme and text/markdown correctly,
+      added then to the DANS. Since it is text I consider this to be
+      valid (the spec might say differently, but Markdown is text and so
+      is a README file).
+    * Remove version requirement of IO from 1.39, solved with Perl dep bump
+    * Bump minimal perl version to 5.12
+
+1.7       2019-03-10 23:41:39Z (TRIAL RELEASE)
+
+    * Bump requirement of IO to 1.39
+
 1.6       2019-03-09 17:40:35Z
 
     * Remove dependencies of Archive::Zip and File::LibMagic in favor of

@@ -1,5 +1,11 @@
 Revision history for Net-Async-Redis
 
+2.004     2020-06-01 05:29:32+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - acl_getuser and related commands added
+    - client-side caching documentation updated
+
 2.003     2020-05-01 00:37:12+08:00 Asia/Kuala_Lumpur
     New features:
 

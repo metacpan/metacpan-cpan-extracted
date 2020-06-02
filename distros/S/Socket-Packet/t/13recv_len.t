@@ -1,6 +1,8 @@
 #!/usr/bin/perl
 
 use strict;
+use warnings;
+
 use Test::More;
 
 # MSG_TRUNC started only works on 2.4.27 or 2.6.8 or newer
@@ -11,8 +13,6 @@ plan skip_all => "Kernel version too old for MSG_TRUNC - need at least 2.4.27 or
    $ver[0] == 2 and $ver[1] < 4 or
    $ver[0] == 2 and $ver[1] == 4 and $ver[2] < 27 or
    $ver[0] == 2 and $ver[1] == 6 and $ver[2] < 8;
-
-plan tests => 3;
 
 # For now write the test with normal recv to prove it breaks
 
@@ -34,3 +34,5 @@ my ( $addr, $recvlen ) = recv_len( $s1, my $buffer, 4, MSG_TRUNC );
 is( $addr,    $s2->sockname, 'recv addr' );
 is( $recvlen, 12,            'returned length' );
 is( $buffer,  "hell",        'buffer' );
+
+done_testing;

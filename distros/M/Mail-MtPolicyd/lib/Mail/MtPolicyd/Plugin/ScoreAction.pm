@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::ScoreAction;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 # ABSTRACT: mtpolicyd plugin for running an action based on the score
 
 extends 'Mail::MtPolicyd::Plugin';
@@ -80,7 +80,7 @@ Mail::MtPolicyd::Plugin::ScoreAction - mtpolicyd plugin for running an action ba
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 DESCRIPTION
 

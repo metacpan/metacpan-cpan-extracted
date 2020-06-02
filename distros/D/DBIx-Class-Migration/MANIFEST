@@ -218,6 +218,7 @@ t/lib/Local/v2/Schema/Result/Cd.pm
 t/lib/Local/v2/Schema/Result/Country.pm
 t/lib/Local/v2/Schema/Result/Track.pm
 t/lib/Local/v2/Schema/ResultSet/Artist.pm
+t/migrate_sugar.t
 t/migration-mysql.t
 t/migration-postgresql.t
 t/migration-sqlite.t
@@ -225,5 +226,6 @@ t/missing-schema-version.t
 t/ordering.t
 t/runscript.t
 t/script.t
+t/share/.DS_Store
 t/upgrade-downgrade-sqlite.t
 t/use.t

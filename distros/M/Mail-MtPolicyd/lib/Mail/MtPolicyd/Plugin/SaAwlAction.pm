@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::SaAwlAction;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 # ABSTRACT: mtpolicyd plugin for checking spamassassin AWL reputation
 
 
@@ -121,7 +121,7 @@ Mail::MtPolicyd::Plugin::SaAwlAction - mtpolicyd plugin for checking spamassassi
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 DESCRIPTION
 

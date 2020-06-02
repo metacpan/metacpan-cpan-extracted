@@ -1,0 +1,28 @@
+requires "AnyEvent" => "0";
+requires "Devel::GlobalDestruction" => "0";
+requires "File::ShareDir" => "0";
+requires "List::MoreUtils" => "0";
+requires "Net::AMQP" => "0.06";
+requires "Readonly" => "1.03";
+requires "namespace::clean" => "0";
+requires "perl" => "5.010";
+
+on 'test' => sub {
+  requires "Test::Exception" => "0";
+  requires "Test::More" => "0";
+  requires "version" => "0";
+};
+
+on 'test' => sub {
+  recommends "Test::Pod" => "0";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+  requires "File::ShareDir::Install" => "0.06";
+};
+
+on 'develop' => sub {
+  requires "Test::Perl::Critic" => "0";
+  requires "Test::Spelling" => "0.12";
+};

@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::Greylist::Ticket::Memcached;
 use Moose;
 
 # ABSTRACT: greylisting ticket storage backend for memcached
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 
 extends 'Mail::MtPolicyd::Plugin::Greylist::Ticket::Base';
 
@@ -58,7 +58,7 @@ Mail::MtPolicyd::Plugin::Greylist::Ticket::Memcached - greylisting ticket storag
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 AUTHOR
 

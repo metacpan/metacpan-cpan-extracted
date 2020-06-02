@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
 ,
   PREREQ_PM      => {
   'Sub::Util' => '1.41',
-  'perl' => 'v5.10.0'
+  'perl' => 'v5.16.0'
 }
 ,
   META_MERGE     => {

@@ -4,14 +4,13 @@ author:
   - 'Nathan Wiger <nate@wiger.org>'
 build_requires:
   Storable: '0'
-  Test::Deep: '0.101'
   Test::Exception: '0.31'
   Test::More: '0.88'
   Test::Warn: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,6 +31,8 @@ requires:
   Moo: '2.000001'
   Scalar::Util: '0'
   Sub::Quote: '2.000001'
+  Test::Builder::Module: '0.84'
+  Test::Deep: '0.101'
   Text::Balanced: '2.00'
   perl: '5.006'
 resources:
@@ -39,5 +40,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=SQL-Abstract
   license: http://dev.perl.org/licenses/
   repository: https://github.com/dbsrgits/sql-abstract.git
-version: '1.86'
+version: '1.87'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

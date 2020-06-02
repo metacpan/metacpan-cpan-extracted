@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MySQL-Workbench-DBIC",
    "prereqs" : {
@@ -53,11 +53,11 @@
    "provides" : {
       "MySQL::Workbench::DBIC" : {
          "file" : "lib/MySQL/Workbench/DBIC.pm",
-         "version" : "1.17"
+         "version" : "1.19"
       },
       "MySQL::Workbench::DBIC::FakeDBIC" : {
          "file" : "lib/MySQL/Workbench/DBIC/FakeDBIC.pm",
-         "version" : "1.17"
+         "version" : "1.19"
       }
    },
    "release_status" : "stable",
@@ -72,13 +72,13 @@
          "web" : "http://github.com/reneeb/MySQL-Workbench-DBIC"
       }
    },
-   "version" : "1.17",
+   "version" : "1.19",
    "x_contributors" : [
       "Mario Minati <mario.minati@minati.de>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "reneeb <github@renee-baecker.de>",
       "reneeb <info@perl-services.de>"
    ],
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }
 

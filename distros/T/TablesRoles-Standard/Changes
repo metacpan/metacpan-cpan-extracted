@@ -1,0 +1,18 @@
+0.003   2020-06-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump File::Temp prereq version to 0.2307 (change EX_LOCK default
+	  from true to false) to avoid test failure [RT#132750], thanks
+	  SREZIC.
+
+
+0.002   2020-06-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add role & class: TablesRole::Source::DBI & Tables::DBI.
+
+	- get_column_names: Return arrayref in scalar context (as per Tables
+          0.1.1).
+
+
+0.001   2020-05-31  Released-By: PERLANCAR
+
+        - First, early release.

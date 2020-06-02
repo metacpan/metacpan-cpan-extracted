@@ -3,7 +3,7 @@ use warnings;
 no if "$]" >= 5.031009, feature => 'indirect';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::More;
+use Test::More 0.96;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::Deep;
 use JSON::Schema::Draft201909;
@@ -682,7 +682,7 @@ subtest 'const and enum' => sub {
 
 subtest 'exceptions' => sub {
   cmp_deeply(
-    $js->evaluate_json_string('[ 1, 2, 3, wargarbl ]', true)->TO_JSON,
+    $js->evaluate_json_string('[ 1, 2, 3, whargarbl ]', true)->TO_JSON,
     {
       valid => bool(0),
       errors => [
@@ -910,6 +910,57 @@ subtest 'abort due to a schema error' => sub {
       ],
     },
     'exception inside a oneOf (where errors are localized) are still included in the result',
+  );
+};
+
+subtest 'sorted property names' => sub {
+  cmp_deeply(
+    $js->evaluate(
+      { foo => 1, bar => 1, baz => 1, hello => 1 },
+      {
+        properties => {
+          foo => false,
+          bar => false,
+        },
+        additionalProperties => false,
+      }
+    )->TO_JSON,
+    {
+      valid => bool(0),
+      errors => [
+        {
+          instanceLocation => '/bar',
+          keywordLocation => '/properties/bar',
+          error => 'subschema is false',
+        },
+        {
+          instanceLocation => '/foo',
+          keywordLocation => '/properties/foo',
+          error => 'subschema is false',
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => '/properties',
+          error => 'not all properties are valid',
+        },
+        {
+          instanceLocation => '/baz',
+          keywordLocation => '/additionalProperties',
+          error => 'additional property not permitted',
+        },
+        {
+          instanceLocation => '/hello',
+          keywordLocation => '/additionalProperties',
+          error => 'additional property not permitted',
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => '/additionalProperties',
+          error => 'not all properties are valid',
+        },
+      ],
+    },
+    'property names are considered in sorted order',
   );
 };
 

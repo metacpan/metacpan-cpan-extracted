@@ -20,7 +20,7 @@ any '/table' => sub {
   my $c = shift;
   $c->stash('reply_table.tablify' => 1) if $c->param('tablify');
   $c->stash('reply_table.csv_options' => { sep_char => "|" }) if $c->param('format_as_psv');
-  	
+  $c->stash('reply_table.csv_options' => { invalid => 1 }) if $c->param('invalid_csv_opt');
 
   $c->reply->table($data);
 };
@@ -88,6 +88,11 @@ $t->get_ok('/table.csv?format_as_psv=1')
   is_deeply $csv->getline_all($fh), $data, 'data returned as psv';
 }
 
+# invalid csv options
+
+$t->get_ok('/table.csv?invalid_csv_opt=1')
+  ->status_is(500)
+  ->text_like('#error' => qr/unknown attribute/i);
 
 # html
 

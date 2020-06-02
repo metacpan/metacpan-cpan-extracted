@@ -1,0 +1,7 @@
+Revision history for Net-OAuth2Server-OIDC
+
+0.002 Mon 01 Jun 2020
+	- Compatibility with old MIME::Base64 versions
+
+0.001 Sun 31 May 2020
+	- Initial release.

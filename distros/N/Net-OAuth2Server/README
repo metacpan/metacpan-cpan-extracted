@@ -1,0 +1,48 @@
+Net::OAuth2Server
+
+A server-side OAuth2 framework with the following aims:
+
+* Well designed for direct use as-is within a web application
+
+  Application programmers should have a reasonable abstraction to build
+  on so they can fill in the specifics of their application without
+  having to reimplement significant parts of the protocol anyway.
+
+* Extensible enough as a framework to implement any OAuth2 extension
+
+  It should be possible to implement any OAuth2 extension such that it
+  can easily be shipped as a CPAN module.
+
+* Independent from specific web frameworks
+
+  It should not be necessary to reimplement OAuth2 as a plugin or
+  extension for every single framework.
+
+* Frugal in dependencies and means of implementation
+
+  OAuth2 is not deep or clever technology, it is glue. There is no need
+  for anything deep or clever in an implementation of it.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Aristotle Pagaltzis.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.

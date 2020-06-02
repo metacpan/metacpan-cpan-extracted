@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+# date-tag-file - pre-tag filename with timestamp of last modification
+# 2020 Vlado Keselj http://web.cs.dal.ca/~vlado
+# last update: 2020-05-26
+$|=1;
+for my $f (@ARGV) {
+  my @s = stat($f); die unless @s;
+  my $mtime = $s[9];
+  my ($S,$M,$H,$d,$m,$y,$wd,$yd,$isdst) = localtime($mtime);
+  $m+=1; $y+=1900;
+  my $tag=sprintf("%4d-%02d-%02d", $y, $m, $d);
+  my $nf = "$tag-$f"; die if -e $nf;
+  print "$f -> $nf\n"; rename($f, $nf);
+}
+
+__END__ # Documentation
+
+=head1 NAME
+
+date-tag-file - pre-tag filename with timestamp of last modification
+
+=head1 DESCRIPTION
+
+The command F<date-tag-file> pre-tags filename with timestamp of the last
+modification of the file.  Currently, it uses only date.  A future plan
+is to include time as option, or if the file with the give date already
+exists.
+
+=head1 SYNOPSIS
+
+ $ date-tag-file file1
+ file1 -> 2020-05-30-file1
+
+=head1 AUTHOR
+
+Vlado Keselj http://web.cs.dal.ca/~vlado
+
+=head1 LICENSE
+
+Artistic License 1.0 L<perlartistic>
+
+=head1 INSTALLATION
+
+Using C<cpan>:
+
+ $ cpan App::Utils
+
+Manual install:
+
+ $ perl Makefile.PL
+ $ make
+ $ make install
+
+=cut

@@ -4,7 +4,7 @@ package Excel::Writer::XLSX;
 #
 # Excel::Writer::XLSX - Create a new file in the Excel 2007+ XLSX format.
 #
-# Copyright 2000-2019, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2020, John McNamara, jmcnamara@cpan.org
 #
 # Documentation after __END__
 #
@@ -17,7 +17,7 @@ use Exporter;
 use Excel::Writer::XLSX::Workbook;
 
 our @ISA     = qw(Excel::Writer::XLSX::Workbook Exporter);
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 
 ###############################################################################
@@ -272,9 +272,9 @@ The worksheet name must be a valid Excel worksheet name, i.e:
 
 =item * It cannot be the same as an existing worksheet name (or a case insensitive variant).
 
-=item * It cannot be the reserved name "History" (or a case insensitive variant).
-
 =back
+
+Note, the sheetname should not be "History" (case insensitive) which is reserved in English language versions of Excel. Non-English versions may have restrictions on the equivalent word.
 
 See the Excel worksheet naming rules at L<https://support.office.com/en-ie/article/rename-a-worksheet-3f1f7148-ee83-404d-8ef0-9ff99fbad1f9>.
 
@@ -3604,7 +3604,19 @@ For examples of these formatting codes see the 'Numerical formats' worksheet cre
 
 Note 1. Numeric formats 23 to 36 are not documented by Microsoft and may differ in international versions.
 
-Note 2. The dollar sign appears as the defined local currency symbol.
+Note 2. The built-in formats are localised according to the locale settings (regional settings on Windows) of the user when opening the file in Excel:
+
+=over
+
+=item * The dot appears as the defined local decimal separator.
+
+=item * The comma appears as the defined local digit groups separator.
+
+=item * The dollar sign appears as the defined local currency symbol.
+
+=item * The date, time and duration formats appear as the local equivalent date or time format.
+
+=back
 
 
 
@@ -4048,11 +4060,11 @@ See also the C<unicode_*.pl> programs in the examples directory of the distro.
 
 Throughout Excel::Writer::XLSX colours can be specified using a Html style C<#RRGGBB> value. For example with a Format object:
 
-    $format->set_font_color( '#FF0000' );
+    $format->set_color( '#FF0000' );
 
 For backward compatibility a limited number of color names are supported:
 
-    $format->set_font_color( 'red' );
+    $format->set_color( 'red' );
 
 The color names supported are:
 
@@ -7436,9 +7448,21 @@ To read data from Excel files try:
 
 =over 4
 
+=item * L<Spreadsheet::ParseXLSX>
+
+A module for reading data from XLSX files. It also imports most, if
+not all, of the metadata to be found in Excel XLSX files.  As its
+author describes it: "This module is an adaptor for
+L<Spreadsheet::ParseExcel> that reads XLSX files. For documentation
+about the various data that you can retrieve from these classes,
+please see L<Spreadsheet::ParseExcel>,
+L<Spreadsheet::ParseExcel::Workbook>,
+L<Spreadsheet::ParseExcel::Worksheet>, and
+L<Spreadsheet::ParseExcel::Cell>."
+
 =item * Spreadsheet::XLSX
 
-A module for reading formatted or unformatted data form XLSX files.
+A module for reading formatted or unformatted data from XLSX files.
 
 L<Spreadsheet::XLSX>
 
@@ -7450,7 +7474,7 @@ L<SimpleXlsx>
 
 =item * Spreadsheet::ParseExcel
 
-This module can read  data from an Excel XLS file but it doesn't support the XLSX format.
+This module can read data from an Excel XLS file but it doesn't support the XLSX format.
 
 L<Spreadsheet::ParseExcel>
 
@@ -7596,6 +7620,6 @@ John McNamara jmcnamara@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright MM-MMXIX, John McNamara.
+Copyright MM-MMXX, John McNamara.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.

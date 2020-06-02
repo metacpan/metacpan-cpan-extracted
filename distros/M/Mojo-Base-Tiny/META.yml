@@ -19,12 +19,12 @@ no_index:
     - inc
 requires:
   Sub::Util: '1.41'
-  perl: v5.10.0
+  perl: v5.16.0
 resources:
   bugtracker: https://github.com/Tekki/mojo-base-tiny/issues
   homepage: https://github.com/Tekki/mojo-base-tiny
   repository: https://github.com/Tekki/mojo-base-tiny.git
-version: '0.05'
+version: '0.06'
 x_contributors:
   - 'Sebastian Riedel <sri@cpan.org>'
   - 'William Lindley <wlindley+remove+this@wlindley.com>'

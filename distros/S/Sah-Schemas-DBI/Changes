@@ -1,3 +1,10 @@
-0.001   2019-01-20 (PERLANCAR)
+0.002   2020-03-02  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Add examples (tests).
+
+
+0.001   2019-01-20  Released-By: PERLANCAR
 
         - First release.

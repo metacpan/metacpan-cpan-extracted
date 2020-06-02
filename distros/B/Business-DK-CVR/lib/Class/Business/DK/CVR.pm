@@ -8,7 +8,7 @@ use English qw(-no_match_vars);
 
 use Business::DK::CVR qw(validate);
 
-our $VERSION = '0.09';
+our $VERSION = '0.12';
 
 private number => my %number;    # read-only accessor: number()
 
@@ -63,20 +63,20 @@ __END__
 
 =head1 NAME
 
-Class::Business::DK::CVR - Danish CVR number class 
+Class::Business::DK::CVR - Danish CVR number class
 
 =head1 VERSION
 
-The documentation describes version 0.09 of Class::Business::DK::CVR
+The documentation describes version 0.12 of Class::Business::DK::CVR
 
 =head1 SYNOPSIS
 
     use Class::Business::DK::CVR;
 
     my $cvr = Class::Business::DK::CVR->new(27355021);
-    
+
     my $cvr_no = $cvr->get_number();
-    
+
     my $cvr_no = $cvr->number();
 
     $cvr->set_number(27355021);
@@ -172,21 +172,17 @@ Please report issues via CPAN RT:
 or by sending mail to
 
   bug-Business-DK-CVR@rt.cpan.org
-  
+
 =head1 AUTHOR
 
 Jonas B. Nielsen, (jonasbn) - C<< <jonasbn@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Business-DK-CVR and related is (C) by Jonas B. Nielsen, (jonasbn) 2006-2014
+Business-DK-CVR and related is (C) by Jonas B., (jonasbn) 2006-2020
 
 =head1 LICENSE
 
-Business-DK-CVR and related is released under the artistic license
-
-The distribution is licensed under the Artistic License, as specified
-by the Artistic file in the standard perl distribution
-(http://www.perl.com/language/misc/Artistic.html).
+Business-DK-CVR and related is released under the Artistic License 2.0
 
 =cut

@@ -4,7 +4,7 @@ package JSON::Schema::Draft201909::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.002';
+our $VERSION = '0.004';
 
 no if "$]" >= 5.031009, feature => 'indirect';
 use Moo;
@@ -88,7 +88,7 @@ JSON::Schema::Draft201909::Result - Contains the result of a JSON Schema evaluat
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -146,7 +146,7 @@ Calls L</format> with the style configured in L</output_format>.
 
 =head2 count
 
-Returns the number of errors, when the result is false.
+Returns the number of errors, when the result is false, or zero otherwise.
 
 =head1 SUPPORT
 

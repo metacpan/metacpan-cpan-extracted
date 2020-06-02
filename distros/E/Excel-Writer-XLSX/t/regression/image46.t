@@ -2,7 +2,7 @@
 #
 # Tests the output of Excel::Writer::XLSX against Excel generated files.
 #
-# reverse ('(c)'), April 2019, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2020, John McNamara, jmcnamara@cpan.org
 #
 
 use lib 't/lib';
@@ -34,7 +34,7 @@ use Excel::Writer::XLSX;
 my $workbook  = Excel::Writer::XLSX->new( $got_filename );
 my $worksheet = $workbook->add_worksheet();
 
-$worksheet->insert_image( 'E9', $dir . 'images/red.png', 0, 4 );
+$worksheet->insert_image( 'E9', $dir . 'images/red.png', {object_position => 4, y_offset => 4} );
 
 $worksheet->set_row( 8, 30, undef, 1 );
 

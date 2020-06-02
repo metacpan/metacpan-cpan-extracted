@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::GeoIPLookup;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 # ABSTRACT: mtpolicyd plugin for checking geo information of an client_address
 
 extends 'Mail::MtPolicyd::Plugin';
@@ -54,7 +54,7 @@ Mail::MtPolicyd::Plugin::GeoIPLookup - mtpolicyd plugin for checking geo informa
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 DESCRIPTION
 

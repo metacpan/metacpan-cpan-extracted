@@ -6,10 +6,11 @@ use warnings;
 
 use Test::More 0.94;
 
-plan tests => 4;
+plan tests => 5;
 
 my @module_files = (
     'JSON/Schema/Draft201909.pm',
+    'JSON/Schema/Draft201909/Document.pm',
     'JSON/Schema/Draft201909/Error.pm',
     'JSON/Schema/Draft201909/Result.pm'
 );

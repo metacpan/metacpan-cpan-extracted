@@ -1,0 +1,209 @@
+#!/usr/bin/env perl
+
+use Time::HiRes qw{ clock };
+
+use 5.008001;
+
+use strict;
+use warnings;
+
+use File::Basename qw{ dirname };
+# The following hack is so that, if we're being run from a distribution
+# directory, we use the version of Game::Life::Faster in that directory
+# no matter what our default directory is.
+use if -d "@{[ dirname( $0 ) ]}/../blib/lib",
+    lib => "@{[ dirname( $0 ) ]}/../blib/lib";
+use Getopt::Long 2.33 qw{ :config auto_version };
+use List::Util qw{ min };
+use Pod::Usage;
+
+our $VERSION = '0.003';
+
+use constant HCS => "\N{U+1B}[H\N{U+1B}[J";
+
+my %opt = (
+    faster	=> 1,
+    size	=> 1000,
+);
+
+GetOptions( \%opt,
+    qw{ faster! size=i steps=i display=i time! },
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) or pod2usage( { -verbose => 0 } );
+
+my $life;
+if ( $opt{faster} ) {
+    require Game::Life::Faster;
+    $life = Game::Life::Faster->new( $opt{size} );
+} else {
+    require Game::Life;
+    $life = Game::Life->new( $opt{size} );
+}
+
+my $steps = $opt{steps} || 4 * $opt{size} - 20;
+
+$life->place_text_points( 0, 0, 'X', '.X.', '..X', 'XXX' );
+
+$opt{time}
+    and printf "    Initialization: %.4f seconds\n", clock();
+my $start_time = clock();
+
+my $iteration_time;
+my $output_time;
+
+if ( $opt{display} ) {
+    while ( $steps > 0 ) {
+	$life->process( min( $steps, $opt{display} ) )
+	    or $steps = 0;
+	$steps -= $opt{display};
+	$iteration_time += clock() - $start_time;
+	$start_time = clock();
+	print HCS;
+	my ( $row, $col, $grid ) = $life->get_used_text_grid();
+	print "$row, $col\n$grid";
+	$output_time += clock() - $start_time;
+	$start_time = clock();
+    }
+} else {
+    $life->process( $steps );
+    $iteration_time = clock() - $start_time;
+    $start_time = clock();
+    my ( $row, $col, $grid ) = $life->get_used_text_grid();
+    print "$row,$col\n$grid";
+    $output_time = clock() - $start_time;
+}
+
+if ( $opt{time} ) {
+    printf "         Iteration: %.4f seconds\n", $iteration_time;
+    printf "            Output: %.4f seconds\n", $output_time;
+    $start_time = clock();
+    $life = undef;
+    printf "Garbage collection: %.4f seconds\n", clock() -
+	$start_time;
+}
+
+# Gross encapsulation violation.
+sub Game::Life::get_used_text_grid {
+    my ( $self, $living, $dead ) = @_;
+    defined $living
+	or $living = 'X';
+    defined $dead
+	or $dead = '.';
+
+    my ( $min_x, $max_x, $min_y, $max_y ) = (
+	$self->{size_x}, 0, $self->{size_y}, 0 );
+    foreach my $ix ( 0 .. $self->{size_x} - 1 ) {
+	foreach my $iy ( 0 .. $self->{size_y} - 1 ) {
+	    if ( $self->{grid}[$ix][$iy] ) {
+		$min_x = $ix if $ix < $min_x;
+		$max_x = $ix;
+		$min_y = $iy if $iy < $min_y;
+		$max_y = $iy if $iy > $max_y;
+	    }
+	}
+    }
+    return if $min_x > $min_y;
+    my $rslt;
+    foreach my $ix ( $min_x .. $max_x ) {
+	foreach my $iy ( $min_y .. $max_y ) {
+	    $rslt .= $self->{grid}[$ix][$iy] ? $living : $dead;
+	}
+	$rslt .= "\n";
+    }
+    return ( $min_x, $min_y, $rslt );
+}
+
+
+__END__
+
+=head1 TITLE
+
+glider - Send a glider (from J. H. Conway's Life) across a grid
+
+=head1 SYNOPSIS
+
+ glider
+ glider --help
+ glider --version
+
+=head1 OPTIONS
+
+=head2 --display
+
+ --display 4
+
+This option specifies the grid display interval in number of steps.
+
+The default is C<--display 0>, which causes display only at the end.
+
+=head2 --fast
+
+If this Boolean option is asserted, L<Game::Life::Fast|Game::Life::Fast>
+is used for the calculaton. If not, L<Game::Life|Game::Life> is used.
+The selected package must be installed on your system.
+
+The default is C<--fast>, but this can be negated with C<--nofast>.
+
+=head2 --help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 --size
+
+ --size 10000
+
+This option specifies the size of the grid.
+
+The default is C<--size 1000>.
+
+=head2 --steps
+
+ --steps 42
+
+This option specifies the number of steps to run.
+
+The default is C<$size * 4 - 20>.
+
+=head2 --time
+
+If this Boolean option is asserted, the elapsed time is displayed. This
+elapsed time includes only processing, but may be less accurate if
+L<--display|/--display> is asserted.
+
+=head2 --version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script executes a pre-programmed configuration of John Horton
+Conway's game of Life. It starts a glider (that is,
+
+          X
+           X
+         XXX
+
+) in the top left corner of a grid of specified size and sends it across
+the grid. The real purpose is to enable informal timing versus other
+implementations.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2020 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

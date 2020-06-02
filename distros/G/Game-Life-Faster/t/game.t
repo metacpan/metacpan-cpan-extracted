@@ -16,6 +16,9 @@ is $life, {
     max_y	=> 9,
     size_x	=> 10,
     size_y	=> 10,
+    change_count => 0,
+    living_x	=> [],
+    living_y	=> [],
 }, 'Initialized correctly'
     or diag explain $life;
 
@@ -27,45 +30,89 @@ is [ $life->get_living_rules() ],
 
 ok $life->toggle_point( 0, 0 ), 'toggle_point turned point on';
 
-is $life->{grid}, [
-    [ [ 1, 0 ], [ undef, 1 ] ],
-    [ [ undef, 1 ], [ undef, 1 ], ],
-], 'toggle_point left grid in correct state';
+is $life->{grid}, {
+    0	=> {
+	0 => [ 1, 0 ],
+	1 => [ undef, 1 ],
+    },
+    1	=> {
+	0 => [ undef, 1 ],
+	1 => [ undef, 1 ],
+    },
+}, 'toggle_point left grid in correct state';
 
 ok ! $life->toggle_point( 0, 0 ), 'toggle_point again turned point off';
 
-is $life->{grid}, [
-    [ [ 0, 0 ], [ undef, 0 ] ],
-    [ [ undef, 0 ], [ undef, 0 ], ],
-], 'toggle_point again left grid in correct state';
+is $life->{grid}, {
+    0	=> {
+	0 => [ 0, 0 ],
+	1 => [ undef, 0 ],
+    },
+    1	=> {
+	0 => [ undef, 0 ],
+	1 => [ undef, 0 ],
+    },
+}, 'toggle_point again left grid in correct state';
 
 ok $life->set_point( 0, 1 ), 'set_point turned point on';
 
-is $life->{grid}, [
-    [ [ 0, 1 ], [ 1, 0 ], [ undef, 1 ] ],
-    [ [ undef, 1 ], [ undef, 1 ], [ undef, 1 ] ],
-], 'set_point left grid in correct state';
+is $life->{grid}, {
+    0	=> {
+	0 => [ 0, 1 ],
+	1 => [ 1, 0 ],
+	2 => [ undef, 1 ],
+    },
+    1	=> {
+	0 => [ undef, 1 ],
+	1 => [ undef, 1 ],
+	2 => [ undef, 1 ],
+    },
+}, 'set_point left grid in correct state';
 
 ok $life->set_point( 0, 1 ), 'set_point again left point on';
 
-is $life->{grid}, [
-    [ [ 0, 1 ], [ 1, 0 ], [ undef, 1 ] ],
-    [ [ undef, 1 ], [ undef, 1 ], [ undef, 1 ] ],
-], 'set_point again left grid unchanged';
+is $life->{grid}, {
+    0	=> {
+	0 => [ 0, 1 ],
+	1 => [ 1, 0 ],
+	2 => [ undef, 1 ],
+    },
+    1	=> {
+	0 => [ undef, 1 ],
+	1 => [ undef, 1 ],
+	2 => [ undef, 1 ],
+    },
+}, 'set_point again left grid unchanged';
 
 ok ! $life->unset_point( 0, 0 ), 'unset_point on already-clear point';
 
-is $life->{grid}, [
-    [ [ 0, 1 ], [ 1, 0 ], [ undef, 1 ] ],
-    [ [ undef, 1 ], [ undef, 1 ], [ undef, 1 ] ],
-], 'unset_point on already-clear point left grid unchanged';
+is $life->{grid}, {
+    0	=> {
+	0 => [ 0, 1 ],
+	1 => [ 1, 0 ],
+	2 => [ undef, 1 ],
+    },
+    1	=> {
+	0 => [ undef, 1 ],
+	1 => [ undef, 1 ],
+	2 => [ undef, 1 ],
+    },
+}, 'unset_point on already-clear point left grid unchanged';
 
 ok ! $life->unset_point( 0, 1 ), 'unset_point on set point';
 
-is $life->{grid}, [
-    [ [ 0, 0 ], [ 0, 0 ], [ undef, 0 ] ],
-    [ [ undef, 0 ], [ undef, 0 ], [ undef, 0 ] ],
-], 'unset_point on set point cleared it';
+is $life->{grid}, {
+    0	=> {
+	0 => [ 0, 0 ],
+	1 => [ 0, 0 ],
+	2 => [ undef, 0 ],
+    },
+    1	=> {
+	0 => [ undef, 0 ],
+	1 => [ undef, 0 ],
+	2 => [ undef, 0 ],
+    },
+}, 'unset_point on set point cleared it';
 
 
 $life->place_text_points( 0, 0, 'X', <<'EOD' );
@@ -103,6 +150,30 @@ is scalar $life->get_text_grid(), <<'EOD',
 ..........
 EOD
     'Text grid after running glider 10 steps';
+
+{
+    my $coord = $life->get_used_grid_coord();
+    is $coord, [ 3, 5, 2, 4 ], 'Occupied grid bounding box';
+    my $grid = $life->get_used_text_grid();
+    is $grid, <<'EOD', 'Occupied grid is expected string';
+..X
+X.X
+.XX
+EOD
+}
+
+{
+    my $coord = $life->get_active_grid_coord();
+    is $coord, [ 2, 6, 1, 5 ], 'Active grid bounding box';
+    my $grid = $life->get_active_text_grid();
+    is $grid, <<'EOD', 'Active grid is expected string';
+.....
+...X.
+.X.X.
+..XX.
+.....
+EOD
+}
 
 $life->place_points( 1, 0, [ [ 1, 1, 1 ] ] );
 $life->place_text_points( 1, 7, 'X', 'XX', 'XX' );
@@ -151,9 +222,37 @@ is scalar $life->get_text_grid(), <<'EOD', 'Clear grid';
 ..........
 EOD
 
+$life->process();
+
+is scalar $life->get_text_grid(), <<'EOD', 'Still have clear grid';
+..........
+..........
+..........
+..........
+..........
+..........
+..........
+..........
+..........
+..........
+EOD
+
 $life->place_text_points( 1, 1, 'X', <<'EOD' );
 XX
 XX
+EOD
+
+is scalar $life->get_text_grid(), <<'EOD', 'Actually got lone block';
+..........
+.XX.......
+.XX.......
+..........
+..........
+..........
+..........
+..........
+..........
+..........
 EOD
 
 $life->process( 10 );

@@ -62,8 +62,8 @@ throws_ok {
 } qr/Invalid Boolean/, 'invalid shuffle_phrases';
 
 throws_ok {
-    MIDI::Ngram->new( in_file => [$filename], single_phrases => 'foo' )
-} qr/Invalid Boolean/, 'invalid single_phrases';
+    MIDI::Ngram->new( in_file => [$filename], min_phrases => 0 )
+} qr/Invalid integer/, 'invalid min_phrases';
 
 throws_ok {
     MIDI::Ngram->new( in_file => [$filename], one_channel => 'foo' )
@@ -75,7 +75,7 @@ my $obj = new_ok 'MIDI::Ngram' => [
 
 is_deeply $obj->in_file, [$filename], 'in_file';
 is $obj->ngram_size, 2, 'ngram_size';
-is $obj->max_phrases, 10, 'max_phrases';
+is $obj->max_phrases, 0, 'max_phrases';
 is $obj->bpm, 100, 'bpm';
 is_deeply $obj->durations, [], 'durations';
 is_deeply $obj->patches, [0 .. 127], 'patches';
@@ -86,7 +86,7 @@ is $obj->loop, 10, 'loop';
 ok !$obj->weight, 'weight';
 ok !$obj->random_patch, 'random_patch';
 ok !$obj->shuffle_phrases, 'shuffle_phrases';
-ok !$obj->single_phrases, 'single_phrases';
+is $obj->min_phrases, 2, 'min_phrases';
 ok !$obj->one_channel, 'one_channel';
 is $obj->score, undef, 'score';
 is_deeply $obj->dura, {}, 'notes';
@@ -96,16 +96,24 @@ $obj->process;
 
 my $expected = {
     0 => {
-        'C4 G4,E3'    => 2,
-        'C4,C3 C4'    => 2,
+        'A4 G4,E3' => 2,
+        'A4,F3 A4' => 2,
+        'C4 G4,E3' => 2,
+        'C4,C3 C4' => 2,
         'D4,F3 D4,G3' => 2,
         'D4,G3 C4,C3' => 2,
-        'E4 D4,F3'    => 2,
-        'E4 D4,G3'    => 2,
-        'E4,C3 E4'    => 2,
-        'E4,G3 E4'    => 2,
-        'F4 E4,C3'    => 2,
-        'G4,E3 G4'    => 4,
+        'E4 D4,F3' => 2,
+        'E4 D4,G3' => 2,
+        'E4,C3 E4' => 2,
+        'E4,G3 E4' => 2,
+        'F4 E4,C3' => 2,
+        'F4 E4,G3' => 2,
+        'F4,D3 F4' => 2,
+        'F4,F3 F4' => 2,
+        'G4 A4,F3' => 2,
+        'G4 F4,F3' => 2,
+        'G4,E3 F4,D3' => 2,
+        'G4,E3 G4' => 4,
     }
 };
 
@@ -131,38 +139,13 @@ $expected = {
     'qn hn,hn-qn,hn qn'    => 2,
     'qn qn,hn-qn hn,hn'    => 2,
     'qn qn,hn-qn qn,hn'    => 3,
-    'qn qn,hn-qn qn,qn'    => 1,
-    'qn qn,qn-qn,qn hn,qn' => 1,
     'qn,hn qn-hn,hn qn,hn' => 2,
     'qn,hn qn-qn,hn qn'    => 5,
-    'qn,hn qn-qn,qn qn,qn' => 1,
-    'qn,qn hn,qn-qn qn,hn' => 1,
 };
 
 is_deeply $obj->dura_net->{0}, $expected, 'dura_net';
 
-$expected = {
-    'A4 G4,E3-F4,D3 F4'    => 1,
-    'A4,F3 A4-G4,E3 F4,D3' => 1,
-    'C3 G4,E3-G4 F4,F3'    => 1,
-    'C4 G4,E3-G4 A4,F3'    => 1,
-    'C4,C3 C4-G4,E3 G4'    => 1,
-    'D4,G3 C4,C3-C4 G4,E3' => 1,
-    'D4,G3 C4,E3-C3 G4,E3' => 1,
-    'E4 D4,F3-D4,G3 C4,E3' => 1,
-    'E4 D4,G3-G4,E3 G4'    => 1,
-    'E4,C3 E4-D4,F3 D4,G3' => 1,
-    'E4,G3 E4-D4,G3 C4,C3' => 1,
-    'F4 E4,C3-E4 D4,F3'    => 1,
-    'F4 E4,G3-E4 D4,G3'    => 1,
-    'F4,D3 F4-E4,C3 E4'    => 1,
-    'F4,F3 F4-E4,G3 E4'    => 1,
-    'G4 A4,F3-A4 G4,E3'    => 1,
-    'G4 F4,F3-F4 E4,G3'    => 1,
-    'G4,E3 F4,D3-F4 E4,C3' => 1,
-    'G4,E3 G4-A4,F3 A4'    => 1,
-    'G4,E3 G4-F4,F3 F4'    => 1,
-};
+$expected = {};
 
 is_deeply $obj->note_net->{0}, $expected, 'note_net';
 

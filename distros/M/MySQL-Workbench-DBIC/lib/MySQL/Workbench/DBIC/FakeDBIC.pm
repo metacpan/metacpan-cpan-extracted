@@ -45,7 +45,7 @@ MySQL::Workbench::DBIC::FakeDBIC - provide some DBIx::Class method stubs when DB
 
 =head1 VERSION
 
-version 1.17
+version 1.19
 
 =head1 DESCRIPTION
 

@@ -9,7 +9,7 @@ use List::Util qw(uniq any first);
 use Moose::Util::TypeConstraints qw(enum subtype where);
 use namespace::autoclean;
 
-our $VERSION = '2.5';
+our $VERSION = '2.7';
 
 with
     'Dist::Zilla::Role::PluginBundle::Easy',
@@ -79,6 +79,8 @@ has copy_file_from_release => (
     traits   => ['Array'],
     handles => { copy_files_from_release => 'elements' },
 );
+
+sub mvp_multivalue_args { qw(copy_file_from_build copy_file_from_release exclude_files) }
 
 around copy_files_from_release => sub {
     my $orig = shift;
@@ -254,10 +256,12 @@ sub configure {
         [
             'Encoding' => [
                 encoding => 'bytes',
-                match    => 'ico',
-                match    => 'docx',
-                match    => 'zip',
-                match    => 'ztb', # Mintlab specific, just a zip file
+                match    => '\.ico$',
+                match    => '\.docx?$',
+                match    => '\.zip$',
+                match    => '\.ztb$', # Mintlab specific, just a zip file
+                match    => '\.pdf$',
+                match    => '\.odt$',
             ]
         ],
 
@@ -356,7 +360,7 @@ Dist::Zilla::PluginBundle::Author::WATERKIP - An plugin bundle for all distribut
 
 =head1 VERSION
 
-version 2.5
+version 2.7
 
 =head1 SYNOPSIS
 
@@ -416,10 +420,12 @@ following F<dist.ini>:
 
     [Encoding]
     encoding = bytes
-    match = ico
-    match = docx
-    match = zip
-    match = ztb ; Mintlab specific
+    match = \.ico$
+    match = \.docx?$
+    match = \.zip$
+    match = \.ztb$ ; Mintlab specific
+    match = \.pdf$
+    match = \.odt$
 
     [CPANFile]
 

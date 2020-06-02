@@ -69,16 +69,11 @@ my %WriteMakefileArgs = (
 );
 
 use Alien::Build::MM;
-my $abmm = Alien::Build::MM->new (
-    clean_install => 1,
-);
+my $abmm = Alien::Build::MM->new ();
 %WriteMakefileArgs = $abmm->mm_args(%WriteMakefileArgs);
 
 WriteMakefile(%WriteMakefileArgs);
 
-sub MY::install {
-  $abmm->mm_install(@_);
-}
 sub MY::postamble {
   $abmm->mm_postamble;
 }

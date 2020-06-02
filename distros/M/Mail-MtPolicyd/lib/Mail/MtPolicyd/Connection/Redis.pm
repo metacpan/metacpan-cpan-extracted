@@ -2,7 +2,7 @@ package Mail::MtPolicyd::Connection::Redis;
 
 use Moose;
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 # ABSTRACT: a mtpolicy connection for redis databases
 
 extends 'Mail::MtPolicyd::Connection';
@@ -80,7 +80,7 @@ Mail::MtPolicyd::Connection::Redis - a mtpolicy connection for redis databases
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 SYNOPSIS
 

@@ -49,9 +49,10 @@ my %WriteMakefileArgs = (
     "File::Path" => 0,
     "File::Spec::Functions" => 0,
     "Test::Most" => "0.34",
-    "Test::Requires" => "0.10"
+    "Test::Requires" => "0.10",
+    "Test::Warnings" => 0
   },
-  "VERSION" => "0.074",
+  "VERSION" => "0.075",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -84,6 +85,7 @@ my %FallbackPrereqs = (
   "SQL::Translator" => "0.11021",
   "Test::Most" => "0.34",
   "Test::Requires" => "0.10",
+  "Test::Warnings" => 0,
   "Text::Brew" => "0.02",
   "Type::Tiny" => "1.004004",
   "version" => "0.9924"

@@ -16,31 +16,21 @@ use Data::UUID;
 use Moo;
 use plenigo::Ex;
 
-our $VERSION = '0.1002';
+our $VERSION = '0.2000';
 
 has configuration => (
     is       => 'ro',
     required => 1
 );
 
-sub _createJwt {
-    my ($self) = @_;
-
-    my $ug = Data::UUID->new;
-    my $uuid = $ug->create();
-    my $exp = time() + (5 * 60);
-    my $jws_token = encode_jwt(payload => { jti => $ug->to_string($uuid), aud => 'plenigo', exp => $exp, companyId => $self->configuration->company_id }, alg => 'HS256', key => $self->configuration->secret);
-    return $jws_token
-}
-
 sub _createRestClient {
     my ($self) = @_;
 
     my $client = REST::Client->new({
-        host    => $self->configuration->api_host,
+        host    => $self->configuration->use_stage ? $self->configuration->api_host_stage : $self->configuration->api_host,
         timeout => 10,
     });
-    $client->addHeader('plenigoToken', $self->_createJwt);
+    $client->addHeader('plenigoToken', $self->configuration->access_token);
     $client->addHeader('Content-Type', 'application/json');
     $client->addHeader('Accept', 'application/json');
 

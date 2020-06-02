@@ -1,0 +1,137 @@
+NAME
+    Net::SNMP::Mixin::CiscoDot1qVlanStatic - mixin class for static Cisco
+    vlan info
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+      use Net::SNMP;
+      use Net::SNMP::Mixin;
+
+      # initialize session and mixin library
+      my $session = Net::SNMP->session( -hostname => 'foo.bar.com' );
+      $session->mixer('Net::SNMP::Mixin::CiscoDot1qVlanStatic');
+      $session->init_mixins;
+      snmp_dispatcher();
+      $session->init_ok();
+      die $session->errors if $session->errors;
+
+      # show VLAN IDs and corresponding names
+      my $id2name = $session - map_vlan_id2name();
+      foreach my $id ( keys %{$id2name} ) {
+        printf "Vlan-Id: %4d  => Vlan-Name: %s\n", $id, $id2name->{$id};
+      }
+
+      # sorted by vlan_id
+      my $vlan_ids2if_idx = $session->map_vlan_id2if_idx();
+      foreach my $id ( keys %{$vlan_ids2if_idx} ) {
+        printf "Vlan-Id: %4d\n", $id;
+        printf "\tTagged-Ports:     %s\n", ( join ',', @{ $vlan_ids2if_idx->{$id}{tagged} } );
+        printf "\tUntagged-Ports:   %s\n", ( join ',', @{ $vlan_ids2if_idx->{$id}{untagged} } );
+      }
+
+      # sorted by interface
+      my $ports2ids = $session->map_if_idx2vlan_id();
+      foreach my $if_idx ( keys %{$ports2ids} ) {
+        printf "Interface: %10d\n", $if_idx;
+        printf "\tTagged-Vlans:     %s\n", ( join ',', @{ $ports2ids->{$if_idx}{tagged} } );
+        printf "\tUntagged-Vlans:   %s\n", ( join ',', @{ $ports2ids->{$if_idx}{untagged} } );
+      }
+
+DESCRIPTION
+    A mixin class for vlan related infos from the CISCO-VTP-MIB for
+    802.1Q-trunks and CISCO-VLAN-MEMBERSHIP-MIB for access ports. The
+    mixin-module provides methods for mapping between vlan-ids and
+    vlan-names und relations between interfaces and vlan-ids, tagged or
+    untagged on these ports.
+
+MIXIN METHODS
+  OBJ->map_vlan_id2name()
+    Returns a hash reference with vlan-ids as keys and the corresponding
+    vlan-names as values:
+
+      {
+        vlan_id => vlan_name,
+        vlan_id => vlan_name,
+        ... ,
+      }
+
+  OBJ->map_vlan_id2if_idx()
+    Returns a hash reference with the vlan-ids as keys and tagged and
+    untagged if_idx as values:
+
+      {
+        vlan_id => {
+          tagged   => [if_idx, ..., ],
+          untagged => [if_idx, ..., ],
+        },
+
+        ... ,
+      }
+
+  OBJ->map_if_idx2vlan_id()
+    Returns a hash reference with the interfaces as keys and tagged and
+    untagged vlan-ids as values:
+
+      {
+        if_idx => {
+          tagged   => [vlan_id, ..., ],
+          untagged => [vlan_id, ..., ],
+        },
+
+        ... ,
+      }
+
+INITIALIZATION
+  OBJ->_init($reload)
+    Fetch basic Vlan related SNMP values from the host. Don't call this
+    method direct!
+
+PRIVATE METHODS
+    Only for developers or maintainers.
+
+  _fetch_vtp_vlan_tbl_entries($session)
+    Fetch selected rows from vtpVlanTable during object initialization.
+
+  _vtp_vlan_tbl_entries_cb($session)
+    The callback for _fetch_vtp_vlan_tbl_entries.
+
+  _fetch_vtp_vlan_trunk_port_tbl_entries($session)
+    Fetch selected rows from vlanTrunkPortTable during object
+    initialization.
+
+  _vtp_vlan_trunk_port_tbl_entries_cb($session)
+    The callback for _fetch_vtp_vlan_trunk_port_tbl_entries.
+
+  _fetch_vm_membership_tbl_entries($session)
+    Fetch selected rows from vmMembershipTable during object initialization.
+
+  _vm_membership_tbl_entries_cb($session)
+    The callback for _fetch_vm_membership_tbl_entries
+
+REQUIREMENTS
+    Net::SNMP, Net::SNMP::Mixin
+
+BUGS, PATCHES & FIXES
+    There are no known bugs at the time of this release. However, if you
+    spot a bug or are experiencing difficulties that are not explained
+    within the POD documentation, please submit a bug to the RT system (see
+    link below). However, it would help greatly if you are able to pinpoint
+    problems or even supply a patch.
+
+    Fixes are dependant upon their severity and my availablity. Should a fix
+    not be forthcoming, please feel free to (politely) remind me by sending
+    an email to gaissmai@cpan.org .
+
+      RT: http://rt.cpan.org/Public/Dist/Display.html?Name=Net-SNMP-Mixin-CiscoDot1qVlanStatic
+
+AUTHOR
+    Karl Gaissmaier <karl.gaissmaier at uni-ulm.de>
+
+COPYRIGHT & LICENSE
+    Copyright 2020 Karl Gaissmaier, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -41,7 +41,7 @@
    "provides" : {
       "Game::Life::Faster" : {
          "file" : "lib/Game/Life/Faster.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -59,6 +59,6 @@
          "web" : "https://github.com/trwyant/perl-Game-Life-Faster"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

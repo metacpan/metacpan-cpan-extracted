@@ -28,7 +28,18 @@ do a release any time the standards change.
 
 =head1 VERSION 3.65  (planned 2020-09-01  sbeck)
 
-=head1 VERSION 3.64  (planned 2020-06-01  sbeck)
+=head1 VERSION 3.64  (2020-06-02  sbeck)
+
+=over 5
+
+=item NEW CODE(s)
+
+=item Fixed bug deleting retired codes
+
+The delete_code function failed if you tried to delete a retired code.
+This is now fixed.  GitHub #12
+
+=back
 
 =head1 VERSION 3.63  (2020-03-01  sbeck)
 
@@ -36,7 +47,7 @@ do a release any time the standards change.
 
 =item NEW CODE(s)
 
-NOTE: no code changes on 2019-12-01
+NOTE: no code changes on 2019-12-01 so no release made at that time.
 
 =item Fixed a retired code
 

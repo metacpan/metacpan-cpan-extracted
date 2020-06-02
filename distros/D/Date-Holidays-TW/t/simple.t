@@ -3,7 +3,8 @@ use Test2::V0;
 use Date::Holidays::TW qw(is_tw_holiday tw_holidays);
 
 is is_tw_holiday(2020, 2, 28), T();
-is is_tw_holiday(2020, 11, 1), F();
+is is_tw_holiday(2020, 11, 1), T(), 'A Sunday';
+is is_tw_holiday(2020, 11, 2), F();
 
 is is_tw_holiday(2020, 4, 4), T(), "Qingming in 2020.";
 is is_tw_holiday(2021, 4, 4), T(), "Qingming in 2021.";

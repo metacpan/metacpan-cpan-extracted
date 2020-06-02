@@ -5,7 +5,7 @@ use warnings;
 
 use if $] >= 5.019, 'deprecate';
 
-our $VERSION='4.47';
+our $VERSION='4.48';
 
 use CGI::Util qw(rearrange unescape escape);
 use overload '""' => \&as_string, 'cmp' => \&compare, 'fallback' => 1;
@@ -167,7 +167,7 @@ sub bake {
           : Apache->request
   } if $MOD_PERL;
   if ($r) {
-      $r->headers_out->add('Set-Cookie' => $self->as_string);
+      $r->err_headers_out->add('Set-Cookie' => $self->as_string);
   } else {
       require CGI;
       print CGI::header(-cookie => $self);
@@ -440,7 +440,7 @@ argument to the header() method:
 Mod_perl users can set cookies using the request object's header_out()
 method:
 
-  $r->headers_out->set('Set-Cookie' => $c);
+  $r->err_headers_out->add('Set-Cookie' => $c);
 
 Internally, Cookie overloads the "" operator to call its as_string()
 method when incorporated into the HTTP header.  as_string() turns the

@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::Greylist::AWL::Redis;
 use Moose;
 
 # ABSTRACT: backend for redis greylisting awl storage
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 
 use Time::Seconds;
 
@@ -67,7 +67,7 @@ Mail::MtPolicyd::Plugin::Greylist::AWL::Redis - backend for redis greylisting aw
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 AUTHOR
 

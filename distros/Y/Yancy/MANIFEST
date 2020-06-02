@@ -29,6 +29,10 @@ eg/docker/Dockerfile
 eg/docker/Dockerfile.mysql
 eg/docker/Dockerfile.pg
 eg/docker/Dockerfile.sqlite
+eg/limited-editor/.gitignore
+eg/limited-editor/README.md
+eg/limited-editor/cpanfile
+eg/limited-editor/myapp.pl
 eg/test-app/.gitignore
 eg/test-app/myapp.auth.conf
 eg/test-app/myapp.conf
@@ -89,6 +93,7 @@ lib/Yancy/Controller/Yancy/API.pm
 lib/Yancy/Controller/Yancy/MultiTenant.pm
 lib/Yancy/Help/Auth.pod
 lib/Yancy/Help/Config.pod
+lib/Yancy/Help/Cookbook.pod
 lib/Yancy/Help/Standalone.pod
 lib/Yancy/Help/Upgrading.pod
 lib/Yancy/Plugin/Auth.pm
@@ -118,6 +123,7 @@ t/config.t
 t/controller/multi_tenant.t
 t/controller/yancy.t
 t/examples/doc-site.t
+t/examples/limited-editor.t
 t/examples/test-app.t
 t/examples/todo-app.t
 t/filter.t
@@ -127,6 +133,12 @@ t/fixtures/basic/mysql.sql
 t/fixtures/basic/pg.sql
 t/fixtures/basic/schema.json
 t/fixtures/basic/sqlite.sql
+t/fixtures/composite-key/README.md
+t/fixtures/composite-key/dbic.pl
+t/fixtures/composite-key/mysql.sql
+t/fixtures/composite-key/pg.sql
+t/fixtures/composite-key/schema.json
+t/fixtures/composite-key/sqlite.sql
 t/fixtures/filters/README.me
 t/fixtures/filters/dbic.pl
 t/fixtures/filters/mysql.sql

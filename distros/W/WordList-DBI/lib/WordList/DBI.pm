@@ -1,9 +1,9 @@
 package WordList::DBI;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-24'; # DATE
+our $DATE = '2020-06-01'; # DATE
 our $DIST = 'WordList-DBI'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -102,7 +102,7 @@ WordList::DBI - Wordlist that get its list from a DBI query
 
 =head1 VERSION
 
-This document describes version 0.001 of WordList::DBI (from Perl distribution WordList-DBI), released on 2020-05-24.
+This document describes version 0.002 of WordList::DBI (from Perl distribution WordList-DBI), released on 2020-06-01.
 
 =head1 SYNOPSIS
 
@@ -125,7 +125,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/WordList-D
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-WordList-DBI>.
+Source repository is at L<https://github.com/perlancar/home/u1/repos/perl-WordList-DBI>.
 
 =head1 BUGS
 

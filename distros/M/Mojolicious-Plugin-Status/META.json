@@ -37,8 +37,8 @@
             "Cpanel::JSON::XS" : "4.09",
             "File::Map" : "0",
             "File::Temp" : "0.2308",
-            "Mojolicious" : "8.33",
-            "perl" : "5.010001"
+            "Mojolicious" : "8.50",
+            "perl" : "5.016"
          }
       }
    },
@@ -58,6 +58,6 @@
       },
       "x_IRC" : "irc://irc.freenode.net/#mojo"
    },
-   "version" : "1.10",
+   "version" : "1.11",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

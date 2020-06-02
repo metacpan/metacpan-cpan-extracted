@@ -20,10 +20,11 @@ no_index:
     - t
     - inc
 requires:
+  Blessed::Merge: '0.11'
   Compiled::Params::OO: '0.04'
   JSON: '0'
   Tie::IxHash: '1.23'
   Type::Tiny: '1.010001'
   perl: '5.006'
-version: '0.03'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

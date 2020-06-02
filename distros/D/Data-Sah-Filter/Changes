@@ -1,7 +1,19 @@
+0.006   2020-05-31  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+
+	- [incompatible] Rename filter 'Str::lowcase' to 'Str::lowercase'.
+
+        - Reinstate filter 'Str::downcase' [RT#132743].
+
+        - [ux] add aliases 'Str::uc' & 'Str::uppercase' for 'Str::upcase',
+          'Str::lc' for 'Str::downcase'.
+
+        - Add filters 'Str::ucfirst' & 'Str::lcfirst'.
+
+
 0.005   2020-05-30  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
 
 	- [incompatible] Rename rule 'Str::downcase' to the more familiar
-          'Str::lowcase'.
+          'Str::lowcase'. UPDATE: 'Str::downcase' restored in 0.006.
 
 
 0.004   2020-02-11  Released-By: PERLANCAR; Urgency: medium

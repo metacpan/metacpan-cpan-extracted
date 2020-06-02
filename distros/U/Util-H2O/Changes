@@ -1,6 +1,10 @@
 Revision history for Perl extension Util::H2O.
 
-0.08	Sat, May 23 2020
+0.10	Mon, Jun  1 2020
+	- added "-classify" option
+	- added "-nolock" option
+
+0.08	Sat, May 23 2020	commit da41ca7d38dc99254a9aeabe0aaab1b4a94585ac
 	- WARNING: Potentially Incompatible Changes:
 		- methods created with "-meth" are removed from the hash by default
 	- minor doc updates

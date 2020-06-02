@@ -16,13 +16,13 @@ name: Finance-Currency-Convert-SCSB
 provides:
   Finance::Currency::Convert::SCSB:
     file: lib/Finance/Currency/Convert/SCSB.pm
-    version: v0.1.0
+    version: v0.1.1
 requires:
   Mojolicious: '0'
 resources:
   bugtracker: https://github.com/perltaiwan/Finance-Currency-Convert-SCSB/issues
   repository: https://github.com/perltaiwan/Finance-Currency-Convert-SCSB.git
-version: v0.1.0
+version: v0.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: MIT
 x_static_install: '1'

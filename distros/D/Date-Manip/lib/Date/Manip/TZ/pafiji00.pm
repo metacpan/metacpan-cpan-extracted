@@ -6,9 +6,9 @@ Date::Manip::TZ::pafiji00;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Mon Dec  2 09:44:58 EST 2019
-#    Data version: tzdata2019c
-#    Code version: tzcode2019c
+#    Generated on: Mon Jun  1 07:57:15 EDT 2020
+#    Data version: tzdata2020a
+#    Code version: tzcode2020a
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.81';
+$VERSION='6.82';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -787,6 +787,15 @@ END { undef $VERSION; }
         [ [2089,11,12,14,0,0],[2089,11,13,3,0,0],'+13:00:00',[13,0,0],
           '+13',1,[2090,1,14,13,59,59],[2090,1,15,2,59,59],
           '2089111214:00:00','2089111303:00:00','2090011413:59:59','2090011502:59:59' ],
+     ],
+   2090 =>
+     [
+        [ [2090,1,14,14,0,0],[2090,1,15,2,0,0],'+12:00:00',[12,0,0],
+          '+12',0,[2090,11,11,13,59,59],[2090,11,12,1,59,59],
+          '2090011414:00:00','2090011502:00:00','2090111113:59:59','2090111201:59:59' ],
+        [ [2090,11,11,14,0,0],[2090,11,12,3,0,0],'+13:00:00',[13,0,0],
+          '+13',1,[2091,1,13,13,59,59],[2091,1,14,2,59,59],
+          '2090111114:00:00','2090111203:00:00','2091011313:59:59','2091011402:59:59' ],
      ],
 );
 

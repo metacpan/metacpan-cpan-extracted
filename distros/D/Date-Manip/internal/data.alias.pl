@@ -51,7 +51,7 @@
    "GMT Standard Time"               => "Europe/London",
    "GTB Standard Time"               => "Europe/Istanbul",
    "Georgian Standard Time"          => "Asia/Tbilisi",
-   "Greenland Standard Time"         => "America/Godthab",
+   "Greenland Standard Time"         => "America/Nuuk",
    "Greenwich Standard Time"         => "Atlantic/Reykjavik",
    "Hawaiian Standard Time"          => "Pacific/Honolulu",
    "India Standard Time"             => "Asia/Kolkata",

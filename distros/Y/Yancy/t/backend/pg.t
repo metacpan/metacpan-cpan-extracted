@@ -37,11 +37,14 @@ BEGIN {
 }
 
 use lib catdir( $Bin, '..', 'lib' );
-use Local::Test qw( backend_common );
+use Local::Test qw( backend_common init_backend load_fixtures );
 
 use Mojo::Pg;
-# Isolate test data
-my $mojodb = Mojo::Pg->new($ENV{TEST_ONLINE_PG})->search_path(['yancy_pg_test']);
+# Isolate test data.  Also, make sure any backend we initialize with
+# `init_backend` is the same backend
+local $ENV{TEST_YANCY_BACKEND} = my $backend_url = $ENV{TEST_ONLINE_PG};
+$ENV{TEST_YANCY_BACKEND} =~ s/^postgres/pg/;
+my $mojodb = Mojo::Pg->new( $backend_url )->search_path(['yancy_pg_test']);
 $mojodb->db->query('DROP SCHEMA IF EXISTS yancy_pg_test CASCADE');
 $mojodb->db->query('CREATE SCHEMA yancy_pg_test');
 

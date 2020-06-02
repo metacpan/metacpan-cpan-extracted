@@ -1,9 +1,9 @@
 package Data::Sah::Filter;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-30'; # DATE
+our $DATE = '2020-05-31'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
@@ -123,7 +123,7 @@ Data::Sah::Filter - Filtering for Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.005 of Data::Sah::Filter (from Perl distribution Data-Sah-Filter), released on 2020-05-30.
+This document describes version 0.006 of Data::Sah::Filter (from Perl distribution Data-Sah-Filter), released on 2020-05-31.
 
 =head1 SYNOPSIS
 

@@ -50,7 +50,7 @@ ok (-f $output);
 check_metadata($output);
 
 unlink $output or die "Cannot unlink $output $!";
-like first_line($log), qr{This is LuaTeX};
+like first_line($log), qr{This is Lua(HB)?TeX};
 }
 
 foreach my $luatex (0..1) {

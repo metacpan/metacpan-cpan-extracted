@@ -31,7 +31,7 @@ Util::H2O - Hash to Object: turns hashrefs into objects with accessors for keys
      } };
  $obj->cool;                       # prints "beans"
  
- h2o -class=>'Point',-new,-meth, { # whip up a class
+ h2o -classify=>'Point', {         # whip up a class
          angle => sub { my $self = shift; atan2($self->y, $self->x) }
      }, qw/ x y /;
  my $one = Point->new(x=>1, y=>2);
@@ -40,7 +40,7 @@ Util::H2O - Hash to Object: turns hashrefs into objects with accessors for keys
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 # For AUTHOR, COPYRIGHT, AND LICENSE see the bottom of this file
 
 our @EXPORT = qw/ h2o /;  ## no critic (ProhibitAutomaticExportation)
@@ -112,6 +112,10 @@ name, you will get "redefined" warnings. Therefore, if you want to
 create multiple objects in the same package, you should probably use
 C<-new>.
 
+=item C<< -classify => I<classname> >>
+
+Short form of the options C<< -new, -meth, -class => I<classname> >>.
+
 =item C<-new>
 
 Generates a constructor named C<new> in the package. The constructor
@@ -140,6 +144,10 @@ Note that on really old Perls, that is, before Perl v5.8.9,
 L<Hash::Util> and its C<lock_ref_keys> are not available, so the hash
 is never locked on those versions of Perl. Versions of this module
 before v0.06 did not lock the keyset.
+
+=item C<-nolock>
+
+Short form of the option C<< lock=>0 >>.
 
 =back
 
@@ -175,11 +183,18 @@ sub h2o {  ## no critic (RequireArgUnpacking, ProhibitExcessComplexity)
 		elsif ($_[0] eq '-meth' ) { $meth    = shift }
 		elsif ($_[0] eq '-clean') { $clean   = (shift, shift()?1:0) }
 		elsif ($_[0] eq '-lock' ) { $lock    = (shift, shift()?1:0) }
+		elsif ($_[0] eq '-nolock'){ $lock = 0; shift }
 		elsif ($_[0] eq '-new'  ) { $new     = shift }
 		elsif ($_[0] eq '-class') {
 			$class = (shift, shift);
 			croak "invalid -class option value"
 				if !defined $class || ref $class || !length $class;
+		}
+		elsif ($_[0] eq '-classify') {
+			$class = (shift, shift);
+			croak "invalid -classify option value"
+				if !defined $class || ref $class || !length $class;
+			$meth = 1; $new = 1;
 		}
 		else { croak "unknown option to h2o: '$_[0]'" }
 	}

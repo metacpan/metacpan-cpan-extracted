@@ -3,8 +3,8 @@ NAME
     information from media files
 
 VERSION
-    This document describes version 0.128 of App::MediaInfoUtils (from Perl
-    distribution App-MediaInfoUtils), released on 2020-05-30.
+    This document describes version 0.129 of App::MediaInfoUtils (from Perl
+    distribution App-MediaInfoUtils), released on 2020-06-02.
 
 FUNCTIONS
   media_info
@@ -13,14 +13,6 @@ FUNCTIONS
      media_info(%args) -> [status, msg, payload, meta]
 
     Get information about media files/URLs.
-
-    Many fields will depend on the backend used. Some other fields returned:
-
-    *   "info_backend": the "Media::Info::*" backend module used, e.g.
-        "Ffmpeg".
-
-    *   "type_from_name": either "image", "audio", "video", or "unknown".
-        This is determined from filename (extension).
 
     This function is not exported.
 

@@ -1,5 +1,8 @@
 Revision history for Perl module Mojolicious::Plugin::ReplyTable
 
+0.10 2020-06-02
+  - Render an error when csv intialization fails (ichesnokov++)
+
 0.09 2017-03-28
   - Fix documentation from previous release
 

@@ -7,6 +7,7 @@ use Kavorka '-all';
 use Data::Printer alias => 'pdump';
 use CLI::Driver::Class;
 use CLI::Driver::Method;
+use CLI::Driver::Help;
 use Module::Load;
 use File::Basename;
 
@@ -21,6 +22,7 @@ has desc          => ( is => 'rw', isa => 'Str' );
 has is_deprecated => ( is => 'rw', isa => 'Bool' );
 has class         => ( is => 'rw', isa => 'CLI::Driver::Class' );
 has 'method'      => ( is => 'rw', isa => 'CLI::Driver::Method' );
+has 'help'        => ( is => 'rw', isa => 'CLI::Driver::Help' );
 
 ############################
 ###### PUBLIC METHODS ######
@@ -55,11 +57,10 @@ method parse (HashRef :$href!) {
     }
 
     if ( $href->{method} ) {
-        
+
         my $method = CLI::Driver::Method->new;
         my $success = $method->parse( href => $href->{method} );
         if ( !$success ) {
-        	$self->warn("error parsing action: " . $self->name);
             return 0;
         }
 
@@ -72,6 +73,10 @@ method parse (HashRef :$href!) {
     if ( $href->{desc} ) {
         $self->desc( $href->{desc} );
     }
+    
+    my $help = CLI::Driver::Help->new;
+    $help->parse( href => $href->{help} );
+    $self->help($help);
 
     return 1;
 }
@@ -81,6 +86,8 @@ method usage {
     printf "\nusage: %s %s [opts] [-?]\n", basename($0), $self->name;
     printf "description: %s\n", $self->desc if $self->desc;
     print "\n";
+    
+    my $help = $self->help;
 
     my @opts;
     push @opts, @{ $self->class->attr };
@@ -105,7 +112,9 @@ method usage {
         my $val = $opt->method_arg;
         printf "\t-%s <%s>", $arg, $val;
         print ' (soft)' if $opt->is_soft;
+        print ' (multi value)' if $opt->is_array;
         print "\n";
+        printf "\t\t%s\n", $help->get_help( $arg ) if $help->get_help( $arg );
     }
 
     ##########################################################################
@@ -127,7 +136,10 @@ method usage {
     foreach my $arg ( sort { uc($a) cmp uc($b) } keys %opts ) {
         my $opt = $opts{$arg};
         my $val = $opt->method_arg;
-        printf "\t[ -%s <%s> ]\n", $arg, $val;
+        printf "\t[ -%s <%s> ]", $arg, $val;
+        print ' (multi value)' if $opt->is_array;
+        print "\n";
+        printf "\t\t%s\n", $help->get_help( $arg ) if $help->get_help( $arg );
     }
 
     ##########################################################################
@@ -149,9 +161,23 @@ method usage {
     foreach my $arg ( sort { uc($a) cmp uc($b) } keys %opts ) {
         my $opt = $opts{$arg};
         printf "\t[ --%s ]\n", $arg;
+        printf "\t\t%s\n", $help->get_help( $arg ) if $help->get_help( $arg );
     }
 
     ##########################################################################
+    # print examples
+    if( $help->has_examples ){
+        
+        my $cmd = sprintf "%s %s", basename($0), $self->name;
+        
+        print "\n";
+        print "Examples:\n";
+        foreach my $eg ( @{$help->examples} ){
+            printf "\t%s %s\n", $cmd, $eg;
+        }
+    }
+    
+    #########################################################################
 
     print "\n";
     exit;
@@ -188,9 +214,9 @@ method do {
     my $method_name = $method->name;
     my %sig         = $method->get_signature;
 
-	if (@ARGV) {
-		$self->die( "extra args detected: @ARGV");
-	}
+    if (@ARGV) {
+        $self->die( "extra args detected: @ARGV");
+    }
     
     return $obj->$method_name(%sig);
 }

@@ -15,6 +15,10 @@ Also, the Changes document is automatically generated from the document:
 and that document should be considered the canonical source for all change
 related information.
 
+6.82  2020-06-01
+  -  Time zone fixes
+         Newest zoneinfo data (tzdata 2020a).
+
 6.81  2020-03-01
   -  Messed up the 6.80 package. This release fixes it.
 

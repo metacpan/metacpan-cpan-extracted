@@ -611,7 +611,6 @@ lib/Date/Manip/TZ/amel_s00.pm
 lib/Date/Manip/TZ/amfort00.pm
 lib/Date/Manip/TZ/amfort01.pm
 lib/Date/Manip/TZ/amglac00.pm
-lib/Date/Manip/TZ/amgodt00.pm
 lib/Date/Manip/TZ/amgoos00.pm
 lib/Date/Manip/TZ/amgran00.pm
 lib/Date/Manip/TZ/amguat00.pm
@@ -655,6 +654,7 @@ lib/Date/Manip/TZ/amnew_01.pm
 lib/Date/Manip/TZ/amnipi00.pm
 lib/Date/Manip/TZ/amnome00.pm
 lib/Date/Manip/TZ/amnoro00.pm
+lib/Date/Manip/TZ/amnuuk00.pm
 lib/Date/Manip/TZ/amojin00.pm
 lib/Date/Manip/TZ/ampana00.pm
 lib/Date/Manip/TZ/ampang00.pm

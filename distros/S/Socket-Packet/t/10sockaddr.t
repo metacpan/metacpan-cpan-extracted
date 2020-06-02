@@ -1,7 +1,9 @@
 #!/usr/bin/perl
 
 use strict;
-use Test::More tests => 4;
+use warnings;
+
+use Test::More;
 
 use Socket::Packet qw( AF_PACKET pack_sockaddr_ll unpack_sockaddr_ll );
 
@@ -16,3 +18,5 @@ is_deeply( [ unpack( "s n i s c c a8", $sll ) ],
 is_deeply( [ unpack_sockaddr_ll( $sll ) ],
            [ 1, 2, 3, 4, "ABCDE" ],
            'unpack_sockaddr_ll' );
+
+done_testing;

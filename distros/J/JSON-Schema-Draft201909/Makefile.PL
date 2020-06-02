@@ -12,6 +12,7 @@ use ExtUtils::MakeMaker;
 BEGIN {
 my %configure_requires = (
     'ExtUtils::MakeMaker' => '0',
+    'File::ShareDir::Install' => '0.06',
     'Module::Build::Tiny' => '0.034',
 );
 
@@ -70,11 +71,17 @@ EOW
 }
 } # end BEGIN
 
+use File::ShareDir::Install;
+$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
+$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
+install_share dist => "share";
+
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Validate data against a schema",
   "AUTHOR" => "Karen Etheridge <ether\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
+    "File::ShareDir::Install" => "0.06",
     "Module::Build::Tiny" => "0.034"
   },
   "DISTNAME" => "JSON-Schema-Draft201909",
@@ -84,6 +91,7 @@ my %WriteMakefileArgs = (
   "PL_FILES" => {},
   "PREREQ_PM" => {
     "Carp" => 0,
+    "File::ShareDir" => 0,
     "JSON::MaybeXS" => "1.004001",
     "JSON::PP" => 0,
     "List::Util" => "1.50",
@@ -92,8 +100,9 @@ my %WriteMakefileArgs = (
     "Moo" => 0,
     "MooX::HandlesVia" => 0,
     "MooX::TypeTiny" => "0.002002",
+    "Path::Tiny" => 0,
     "Safe::Isa" => 0,
-    "Syntax::Keyword::Try" => 0,
+    "Syntax::Keyword::Try" => "0.11",
     "Types::Standard" => "1.010002",
     "constant" => 0,
     "feature" => 0,
@@ -109,15 +118,17 @@ my %WriteMakefileArgs = (
     "Module::Metadata" => 0,
     "Scalar::Util" => 0,
     "Test::Deep" => 0,
+    "Test::Deep::UnorderedPairs" => 0,
     "Test::Fatal" => 0,
+    "Test::File::ShareDir" => 0,
     "Test::JSON::Schema::Acceptance" => "0.994",
-    "Test::More" => "0.88",
+    "Test::More" => "0.96",
     "Test::Warnings" => "0.027",
     "lib" => 0,
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -125,6 +136,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "File::ShareDir" => 0,
   "File::Spec" => 0,
   "JSON::MaybeXS" => "1.004001",
   "JSON::PP" => 0,
@@ -135,13 +147,16 @@ my %FallbackPrereqs = (
   "Moo" => 0,
   "MooX::HandlesVia" => 0,
   "MooX::TypeTiny" => "0.002002",
+  "Path::Tiny" => 0,
   "Safe::Isa" => 0,
   "Scalar::Util" => 0,
-  "Syntax::Keyword::Try" => 0,
+  "Syntax::Keyword::Try" => "0.11",
   "Test::Deep" => 0,
+  "Test::Deep::UnorderedPairs" => 0,
   "Test::Fatal" => 0,
+  "Test::File::ShareDir" => 0,
   "Test::JSON::Schema::Acceptance" => "0.994",
-  "Test::More" => "0.88",
+  "Test::More" => "0.96",
   "Test::Warnings" => "0.027",
   "Types::Standard" => "1.010002",
   "constant" => 0,
@@ -166,3 +181,9 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
+
+{
+package
+MY;
+use File::ShareDir::Install qw(postamble);
+}

@@ -11,7 +11,7 @@ use routines;
 use Data::Object::Class;
 use Data::Object::ClassHas;
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 # ATTRIBUTES
 
@@ -87,7 +87,7 @@ Code Generation Tool for Perl 5
   use Stencil::Data;
 
   my $repo = Stencil::Repo->new;
-  my $space = Stencil::Space->new(name => 'gen', repo => $repo);
+  my $space = Stencil::Space->new(name => 'test', repo => $repo);
   my $spec = Stencil::Data->new(name => 'foo', repo => $repo);
   my $stencil = Stencil->new(repo  => $repo, space => $space, spec  => $spec);
 

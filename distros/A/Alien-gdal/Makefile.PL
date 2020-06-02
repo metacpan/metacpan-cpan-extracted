@@ -4,7 +4,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %common_reqs = (
-    "Alien::Build" => "1.41",
+    "Alien::Build" => "1.55",  #  needed for version_atleast
     "ExtUtils::MakeMaker" => "6.52",
     "Alien::Build::MM" => "1.41",
     "Alien::patch" => 0,
@@ -13,8 +13,9 @@ my %common_reqs = (
     "PkgConfig" => 0.19026,
     "Alien::Build::Plugin::Cleanse::BuildDir" => 0,
     'Sort::Versions' => 0,
+    'Alien::libtiff' => 0,
     "Alien::geos::af" => '1.005',
-    "Alien::proj" => '1.02',
+    "Alien::proj" => '1.13',
     "Alien::sqlite" => '1.02',
     "FFI::CheckLib"   => "0.23",
     #"File::Stat" => 0,
@@ -39,6 +40,8 @@ my %WriteMakefileArgs = (
     },
     "PREREQ_PM" => {
         "Alien::Base" => "1.41",
+        "Capture::Tiny" => 0,
+        "Path::Tiny" => 0,
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },

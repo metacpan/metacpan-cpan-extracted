@@ -5,15 +5,18 @@ use strict;
 use warnings;
 use parent qw( Alien::Base );
 use FFI::CheckLib;
+use Env qw ( @PATH @LD_LIBRARY_PATH @DYLD_LIBRARY_PATH );
+use Capture::Tiny qw /:all/;
+use Path::Tiny qw /path/;
+use Alien::proj;
 
-our $VERSION = '1.17';
+our $VERSION = '1.20';
 
 my ($have_geos, $have_proj);
 my @have_aliens;
 BEGIN {
-    my $sep_char = ($^O =~ /mswin/i) ? ';' : ':';
     $have_geos = eval 'require Alien::geos::af';
-    foreach my $alien_lib (qw /Alien::geos::af Alien::sqlite Alien::spatialite Alien::freexl Alien::proj/) {
+    foreach my $alien_lib (qw /Alien::geos::af Alien::sqlite Alien::proj Alien::spatialite Alien::freexl Alien::libtiff/) {
         my $have_lib = eval "require $alien_lib";
         my $pushed_to_env = 0;
         if ($have_lib && $alien_lib->install_type eq 'share') {
@@ -21,13 +24,12 @@ BEGIN {
             #  crude, but otherwise Geo::GDAL::FFI does not
             #  get fed all the needed info
             #warn "Adding Alien::geos bin to path: " . Alien::geos::af->bin_dir;
-            $ENV{PATH} =~ s/;$//;
-            $ENV{PATH} .= $sep_char . join ($sep_char, $alien_lib->bin_dir);
+            push @PATH, $alien_lib->bin_dir;
             #warn $ENV{PATH};
         }
     }
     # 
-    if (!$ENV{PROJSO} and $^O =~ /mswin/i) {
+    if ($^O =~ /mswin/i and !$ENV{PROJSO} and Alien::gdal->version lt 3) {
         my $libpath;
         $have_proj = eval 'require Alien::proj';
         if ($have_proj) {
@@ -40,6 +42,10 @@ BEGIN {
         );
         #warn "PROJ_LIB FILE IS $proj_lib";
         $ENV{PROJSO} //= $proj_lib;
+    }
+    if (Alien::gdal->version ge '3') {
+        push @PATH, 'Alien::proj'->bin_dirs
+          if 'Alien::proj'->can('bin_dirs');
     }
 }
 
@@ -109,6 +115,47 @@ sub libs {
 #    return $cflags;
 #}
 
+sub run_utility {
+    my ($self, $utility, @args) = @_;
+
+    my @alien_bins
+      = grep {defined}
+        map {$_->bin_dir}
+        ($self, @have_aliens);
+    push @alien_bins, Alien::proj->bin_dirs
+      if Alien::proj->can ('bin_dirs');
+    
+    local $ENV{PATH} = $ENV{PATH};
+    unshift @PATH, @alien_bins
+      if @alien_bins;
+
+    #  something of a hack
+    local $ENV{LD_LIBRARY_PATH} = $ENV{LD_LIBRARY_PATH};
+    push @LD_LIBRARY_PATH, Alien::gdal->dist_dir . '/lib';
+
+    local $ENV{DYLD_LIBRARY_PATH} = $ENV{DYLD_LIBRARY_PATH};
+    push @DYLD_LIBRARY_PATH, Alien::gdal->dist_dir . '/lib';
+
+    if ($self->install_type eq 'share') {
+        my @bin_dirs = $self->bin_dir;
+        my $bin = $bin_dirs[0] // '';
+        $utility = "$bin/$utility";  #  should strip path from $utility first?
+    }
+    #  handle spaces in path
+    if ($^O =~ /mswin/i) {
+        if ($utility =~ /\s/) {
+            $utility = qq{"$utility"};
+        }
+    }
+    else {
+        $utility =~ s|(\s)|\$1|g;
+    }
+
+
+    #  user gets the pieces if it breaks
+    capture {system $utility, @args};
+}
+
 sub data_dir {
     my $self = shift;
  
@@ -174,9 +221,13 @@ Alien::gdal - Compile GDAL, the Geographic Data Abstraction Library
     print Alien::gdal->dist_dir;
 
     #  assuming you have populated @args already
-    system (Alien::gdal->bin_dir . '/gdalwarp', @args);
+    my ($stdout, $stderr, $exit_code)
+      = Alien::gdal->run_utility ('gdalwarp', @args);
+    #  Note that this is currently experimental.
+    #  Please report issues and solutions.  
     
-    #  access the GDAL data directory (note that not all system installs include it)
+    #  Access the GDAL data directory
+    #  (note that not all system installs include it)
     my $path = Alien::gdal->data_dir;
     
 =head1 DESCRIPTION

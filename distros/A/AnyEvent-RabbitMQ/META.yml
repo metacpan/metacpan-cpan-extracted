@@ -3,42 +3,38 @@ abstract: 'An asynchronous and multi channel Perl AMQP client.'
 author:
   - 'Masahito Ikuta <cooldaemon@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
-  Test::Exception: 0
-  Test::More: 0
-  version: 0
+  Test::Exception: '0'
+  Test::More: '0'
+  version: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: AnyEvent-RabbitMQ
-no_index:
-  directory:
-    - inc
-    - share
-    - t
-    - xt
 requires:
-  AnyEvent: 0
-  Devel::GlobalDestruction: 0
-  File::ShareDir: 0
-  List::MoreUtils: 0
+  AnyEvent: '0'
+  Devel::GlobalDestruction: '0'
+  File::ShareDir: '0'
+  List::MoreUtils: '0'
   Net::AMQP: '0.06'
   Readonly: '1.03'
-  namespace::clean: 0
-  perl: 5.10.0
+  namespace::clean: '0'
+  perl: '5.010'
 resources:
-  license: http://dev.perl.org/licenses/
   repository: git://github.com/bobtfish/AnyEvent-RabbitMQ.git
-version: '1.20'
+version: '1.21'
 x_contributors:
   - 'Tom Doran <bobtfish@cpan.org>'
   - 'Nicolas R <atoomic@cpan.org>'
   - 'Dave Lambley <dlambley@cpan.org>'
   - 'Ruslan Zakirov <ruz@bestpractical.com>'
   - 'Masahito Ikuta <cooldaemon@gmail.com>'
+  - 'Rod Taylor <rod.taylor@gmail.com>'
+  - 'Carl Hörberg <carl@cloudamqp.com>'
+  - 'Julio Polo <julio@hawaii.edu>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

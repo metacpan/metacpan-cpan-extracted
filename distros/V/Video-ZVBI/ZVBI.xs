@@ -18,11 +18,7 @@
 #include "perl.h"
 #include "XSUB.h"
 
-/* backwards compatibility with older versions of Perl via Devel::PPPort */
-#define NEED_newCONSTSUB
-#define NEED_newRV_noinc
-#define NEED_sv_2pv_flags
-#define NEED_sv_pvn_force_flags
+#define NEED_utf8_to_uvchr_buf
 #include "ppport_zvbi.h"
 
 #include <unistd.h>
@@ -56,7 +52,7 @@
 #endif
 
 /*
- *  Types of object classes. Note the class name using in blessing is
+ *  Types of object classes. Note the class name used in blessing is
  *  automatically derived from the type name via the typemap, hence the
  *  type names must match the PACKAGE names below except for the case.
  */
@@ -1966,7 +1962,7 @@ vbi_capture_pull(capture, raw_buffer, sliced_buffer, sliced_lines, timestamp, ti
                 timestamp = 0.0;
                 sliced_lines = 0;
         }
-        // note raw_buffer may be NULL for DVB device (raw data not supported)
+        /* note raw_buffer may be NULL for DVB device (raw data not supported) */
         OUTPUT:
         raw_buffer
         sliced_buffer

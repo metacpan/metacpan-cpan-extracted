@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::Greylist::AWL::Base;
 use Moose;
 
 # ABSTRACT: base class for grelisting AWL storage backends
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 
 has 'autowl_expire_days' => ( is => 'rw', isa => 'Int', default => 60 );
 
@@ -48,7 +48,7 @@ Mail::MtPolicyd::Plugin::Greylist::AWL::Base - base class for grelisting AWL sto
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 AUTHOR
 

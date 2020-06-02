@@ -44348,7 +44348,7 @@ language:
       bin: Bini
       bis: Bislama
       bla: Siksika
-      bnt: Bantu (Other)
+      bnt: Bantu languages
       bod: Tibetan
       bos: Bosnian
       bra: Braj
@@ -44385,11 +44385,11 @@ language:
       cor: Cornish
       cos: Corsican
       cpe: Creoles and pidgins, English based
-      cpf: "Creoles and pidgins, French-based "
-      cpp: "Creoles and pidgins, Portuguese-based "
+      cpf: Creoles and pidgins, French-based
+      cpp: Creoles and pidgins, Portuguese-based
       cre: Cree
       crh: Crimean Tatar
-      crp: "Creoles and pidgins "
+      crp: Creoles and pidgins
       csb: Kashubian
       cus: Cushitic languages
       cym: Welsh
@@ -44661,7 +44661,7 @@ language:
       sad: Sandawe
       sag: Sango
       sah: Yakut
-      sai: South American Indian (Other)
+      sai: South American Indian languages
       sal: Salishan languages
       sam: Samaritan Aramaic
       san: Sanskrit
@@ -44757,7 +44757,7 @@ language:
       vol: Volapuk
       vot: Votic
       wak: Wakashan languages
-      wal: Walamo
+      wal: Wolaitta
       war: Waray
       was: Washo
       wen: Sorbian languages
@@ -44908,9 +44908,9 @@ language:
       banda languages: 
         - bad
         - Banda languages
-      bantu (other): 
+      bantu languages: 
         - bnt
-        - Bantu (Other)
+        - Bantu languages
       basa: 
         - bas
         - Basa
@@ -45070,18 +45070,18 @@ language:
       creek: 
         - mus
         - Creek
-      "creoles and pidgins ": 
+      creoles and pidgins: 
         - crp
-        - "Creoles and pidgins "
+        - Creoles and pidgins
       creoles and pidgins, english based: 
         - cpe
         - Creoles and pidgins, English based
-      "creoles and pidgins, french-based ": 
+      creoles and pidgins, french-based: 
         - cpf
-        - "Creoles and pidgins, French-based "
-      "creoles and pidgins, portuguese-based ": 
+        - Creoles and pidgins, French-based
+      creoles and pidgins, portuguese-based: 
         - cpp
-        - "Creoles and pidgins, Portuguese-based "
+        - Creoles and pidgins, Portuguese-based
       crimean tatar: 
         - crh
         - Crimean Tatar
@@ -45991,9 +45991,9 @@ language:
       sotho, southern: 
         - sot
         - Sotho, Southern
-      south american indian (other): 
+      south american indian languages: 
         - sai
-        - South American Indian (Other)
+        - South American Indian languages
       southern altai: 
         - alt
         - Southern Altai
@@ -46180,9 +46180,6 @@ language:
       wakashan languages: 
         - wak
         - Wakashan languages
-      walamo: 
-        - wal
-        - Walamo
       walloon: 
         - wln
         - Walloon
@@ -46198,6 +46195,9 @@ language:
       western frisian: 
         - fry
         - Western Frisian
+      wolaitta: 
+        - wal
+        - Wolaitta
       wolof: 
         - wol
         - Wolof

@@ -2,6 +2,7 @@ Build.PL
 Changes
 eg/README
 eg/game-life
+eg/glider
 inc/My/Module/Build.pm
 inc/My/Module/Meta.pm
 lib/Game/Life/Faster.pm

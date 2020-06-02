@@ -1,0 +1,53 @@
+{
+   "abstract" : "Personal Perl 5 Stencil Generators",
+   "author" : [
+      "Al Newkirk <awncorp@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Stencil-Source-Awncorp",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Stencil" : "0.03",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Stencil" : "0.03",
+            "Test::Auto" : "0.12",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/iamalnewkirk/stencil-source-awncorp/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/iamalnewkirk/stencil-source-awncorp.git",
+         "web" : "https://github.com/iamalnewkirk/stencil-source-awncorp"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:AWNCORP",
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Apache-2.0"
+}
+

@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::Condition;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 # ABSTRACT: mtpolicyd plugin for conditions based on session values
 
 extends 'Mail::MtPolicyd::Plugin';
@@ -109,11 +109,11 @@ Mail::MtPolicyd::Plugin::Condition - mtpolicyd plugin for conditions based on se
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 DESCRIPTION
 
-Will return an action, score or execute futher plugins if the specified condition matched.
+Will return an action, score or execute further plugins if the specified condition matched.
 
 =head1 PARAMETERS
 
@@ -183,7 +183,7 @@ If set to 1 the logic will be inverted.
 
 Finally an action must be specified.
 
-First the score will be applied the the action will be executed
+First the score will be applied then the action will be executed
 or if specified additional plugins will be executed.
 
 =over

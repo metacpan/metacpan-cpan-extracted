@@ -1,4 +1,24 @@
-Changes file for Business::DK::CPR
+Change log for Business::DK::CPR
+
+0.16 2020-06-02 Maintenance release, update not required
+
+- Removed the directive from the Dist::Zilla config as indicated in release 0.15
+
+0.15 2020-06-01 Maintenance release, update not required
+
+- Improvements to Dist::Zilla config, only ExtUtils::MakeMaker supported via Dist::Zilla now. Module::Build support having been removed
+
+- See the Article by Neil Bowers (NEILB) on the topic: https://neilb.org/2015/05/18/two-build-files-considered-harmful.html
+
+- Thanks to Karen Etheridge (ETHER) for information and link to the mentioned article
+
+0.14 2020-05-31 Maintenance release, update not required
+
+- POD corrections
+
+- Spelling corrections
+
+- Example corrections
 
 0.13 2015-08-28 Maintenance release, update not required
 
@@ -29,7 +49,7 @@ Changes file for Business::DK::CPR
 
   https://logiclab.jira.com/browse/BDKCPR-14
 
-- Added changes.t automatic assertion of the integrity of the Changes file, 
+- Added changes.t automatic assertion of the integrity of the Changes file,
  see also BDKCPR-13 [BDKCPR-15]
 
   https://logiclab.jira.com/browse/BDKCPR-15
@@ -42,7 +62,7 @@ Changes file for Business::DK::CPR
 
   Quest: http://questhub.io/realm/perl/quest/51f0fd8e18ba7dcf4b000040
   Spec: https://metacpan.org/module/CPAN::Changes::Spec
-  
+
   https://logiclab.jira.com/browse/BDKCPR-13
 
 
@@ -59,7 +79,7 @@ Changes file for Business::DK::CPR
 
 - Migrated _length method from Business::DK::CVR into this package, since it's use was obsoleted in
   Business::DK::CVR
- 
+
 - Added use of Params::Validate in key places and phased out use of Business::DK::PO
 
 - Made control cifers Readonly
@@ -69,7 +89,7 @@ Changes file for Business::DK::CPR
 - Removed export of _checkdate, this seemed to be only for testing purposes
 
 Feedback from review: [CR-BDKCPR-1] http://logiclab.jira.com/source/cru/CR-BDKCPR-1/
-    
+
 - Cleaning TODO, BDKCPR-1 implemented the OOP variation
 
 - Removing Komodo IDE project file from Subversion
@@ -101,7 +121,7 @@ Feedback from review: [CR-BDKCPR-1] http://logiclab.jira.com/source/cru/CR-BDKCP
 - Eliminated use of the marvellous Hash::Merge, problems with Clone under
   perl 5.10 makes the code break. Hash::Merge uses Clone so I am removing it's
   use since it is breaking my code:
-  
+
   http://rt.cpan.org/Public/Bug/Display.html?id=40957
 
   I mimicking Hash::Merge's merge in my own simple merge function, which does
@@ -161,16 +181,16 @@ Feedback from review: [CR-BDKCPR-1] http://logiclab.jira.com/source/cru/CR-BDKCP
 
 - Introduced recursive test flag in Build.PL and restructured test
   suite to reflect this:
-  
+
     t/validate.t -> t/Business/DK/CPR/validate.t
     t/calculate.t -> t/Business/DK/CPR/calculate.t
     t/_checkdate.t -> t/Business/DK/CPR/_checkdate.t
-    
+
     New tests:
-    
+
     t/Business/DK/CPR/validate1968.t
     t/Business/DK/CPR/validate2007.t
-    
+
 - Refactored validate to be a wrapper around: validate1968 and validate2007, so
   the original modulus validation has propagated into validate1968, since 1968
   was the year CPR was introduced in Denmark
@@ -178,9 +198,9 @@ Feedback from review: [CR-BDKCPR-1] http://logiclab.jira.com/source/cru/CR-BDKCP
 - Introduced validate2007 as an implementation the new validation introduced in
   2007
 
-- Added LICENSE file 
+- Added LICENSE file
 
-- Added LICENSE section in POD into. The LICENSE section was not present, but 
+- Added LICENSE section in POD into. The LICENSE section was not present, but
   the information was
 
 
@@ -195,7 +215,7 @@ Feedback from review: [CR-BDKCPR-1] http://logiclab.jira.com/source/cru/CR-BDKCP
 
   These should be there for the quality, but will not be run as a part of the
   normal test run, unless the TEST_POD environment variable is set.
-  
+
   This seem to be the defacto way of doing things.
 
 

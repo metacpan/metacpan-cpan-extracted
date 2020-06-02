@@ -7,6 +7,7 @@ chdir $_ if length;
 
 sub pl($@) {
     my $expect = shift;
+    die "Will fail on Win, coz of \": @_\n", if grep /"/, @_;
     my $win = require Win32::ShellQuote if $^O =~ /^MSWin/;
     open my $fh, '-|', $^X, '-W', $win ? '..\pl' : '../pl',
       $win ? map '"'.join('""', split /"/).'"', @_ : @_;
@@ -89,7 +90,7 @@ pl $_, '-p', '', @abc;
 pl $_, '-lp', '', @abc;
 
 my @cdlines = grep /[cd]/, split /^/;
-pl join( '', $cdlines[0], "eof\n", $cdlines[1], "eof\n" x 2 ), '-P2z', 'e "eof"', '/[cde]/', @abc;
+pl join( '', $cdlines[0], "eof\n", $cdlines[1], "eof\n" x 2 ), '-P2z', 'e q{eof}', '/[cde]/', @abc;
 pl join( '', @cdlines ), '-rP2', '/[cde]/', @abc;
 
 sub pl10($$) {

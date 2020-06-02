@@ -31,8 +31,8 @@ sub new {
     if ( $info->{driver} eq 'Pg' ) {
         $sf->{aggregate}[3] = "STRING_AGG(X)";
     }
-    $sf->{i}{expand_signs}     = [ '',  'f()', 'SQ',       '%%' ];
-    $sf->{i}{expand_signs_set} = [ '',  'f()', 'SQ', '=N', '%%' ];
+    $sf->{i}{menu_additions}     = [ '',  'f()', 'SQ',       '%%' ];
+    $sf->{i}{menu_additions_set} = [ '',  'f()', 'SQ', '=N', '%%' ];
     bless $sf, $class;
 }
 
@@ -43,9 +43,9 @@ sub select {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $menu = [];
-    my $sign_idx = $sf->{o}{enable}{'expand_' . $clause};
-    my $expand_sign = $sf->{i}{expand_signs}[$sign_idx];
-    my @pre = ( undef, $sf->{i}{ok}, $expand_sign ? $expand_sign : () );
+    my $i = $sf->{o}{enable}{'expand_' . $clause};
+    my $menu_addition = $sf->{i}{menu_additions}[$i];
+    my @pre = ( undef, $sf->{i}{ok}, $menu_addition ? $menu_addition : () );
     if ( @{$sql->{group_by_cols}} || @{$sql->{aggr_cols}} ) {
         $menu = [ @pre, @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} ];
     }
@@ -77,14 +77,14 @@ sub select {
             push @{$sql->{select_cols}}, @{$menu}[@idx];
             return 1;
         }
-        elsif ( $menu->[$idx[0]] eq $expand_sign ) {
+        elsif ( $menu->[$idx[0]] eq $menu_addition ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $ext_col = $ext->extended_col( $sql, $clause );
-            if ( ! defined $ext_col ) {
+            my $complex_column = $ext->complex_unit( $sql, $clause );
+            if ( ! defined $complex_column ) {
                 ( $sql->{select_cols}, $sql->{alias} ) = @{pop @bu};
             }
             else {
-                push @{$sql->{select_cols}}, $ext_col;
+                push @{$sql->{select_cols}}, $complex_column;
             }
             next COLUMNS;
         }
@@ -211,7 +211,7 @@ sub set {
     my ( $sf, $sql ) = @_;
     my $clause = 'set';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $op = App::DBBrowser::Table::Substatements::Operators->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $so = App::DBBrowser::Table::Substatements::Operators->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $col_sep = ' ';
     $sql->{set_args} = [];
@@ -219,32 +219,46 @@ sub set {
     my @bu;
     my @pre = ( undef, $sf->{i}{ok} );
 
-    SET: while ( 1 ) {
+    COL: while ( 1 ) {
         $ax->print_sql( $sql );
         # Choose
-        my $col = $tc->choose(
+        my $quote_col = $tc->choose(
             [ @pre, @{$sql->{cols}} ],
             { %{$sf->{i}{lyt_h}} }
         );
-        if ( ! defined $col ) {
+        if ( ! defined $quote_col ) {
             if ( @bu ) {
-                ( $sql->{set_args}, $sql->{set_stmt}, $col_sep ) = @{pop @bu};
-                next SET;
+                ( $sql->{set_stmt}, $sql->{set_args}, $col_sep ) = @{pop @bu};
+                next COL;
             }
             return;
         }
-        if ( $col eq $sf->{i}{ok} ) {
+        if ( $quote_col eq $sf->{i}{ok} ) {
             if ( $col_sep eq ' ' ) {
                 $sql->{set_stmt} = '';
             }
             return 1;
         }
-        push @bu, [ [@{$sql->{set_args}}], $sql->{set_stmt}, $col_sep ];
-        $sql->{set_stmt} .= $col_sep . $col;
-        my $ok = $op->add_operator_with_value( $sql, $clause, $col );
-        if ( ! $ok ) {
-            ( $sql->{set_args}, $sql->{set_stmt}, $col_sep ) = @{pop @bu};
-            next SET;
+        push @bu, [ $sql->{set_stmt}, [@{$sql->{set_args}}], $col_sep ];
+        $sql->{set_stmt} .= $col_sep . $quote_col;
+
+        OPERATOR: while ( 1 ) {
+            my $bu_op = [ $sql->{set_stmt}, [@{$sql->{set_args}}] ];
+            my ( $op, $is_complex_value ) = $so->choose_and_add_operator( $sql, $clause, $quote_col );
+            if ( ! defined $op ) {
+                ( $sql->{set_stmt}, $sql->{set_args}, $col_sep ) = @{pop @bu};
+                next COL;
+            }
+
+            VALUE: while ( 1 ) {
+                my $ok = $so->read_and_add_value( $sql, $clause, $op, $is_complex_value );
+                if ( ! $ok ) {
+                    ( $sql->{set_stmt}, $sql->{set_args} ) = @$bu_op;
+                    next OPERATOR;
+                }
+                last VALUE;
+            }
+            last OPERATOR;
         }
         $col_sep = ', ';
     }
@@ -255,7 +269,7 @@ sub where {
     my ( $sf, $sql ) = @_;
     my $clause = 'where';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $op = App::DBBrowser::Table::Substatements::Operators->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $so = App::DBBrowser::Table::Substatements::Operators->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my @cols = @{$sql->{cols}};
     my $AND_OR = '';
@@ -263,12 +277,12 @@ sub where {
     $sql->{where_stmt} = "WHERE";
     my $unclosed = 0;
     my $count = 0;
-    my @bu;
-    my $sign_idx = $sf->{o}{enable}{'expand_' . $clause};
-    my $expand_sign = $sf->{i}{expand_signs}[$sign_idx];
-    my @pre = ( undef, $sf->{i}{ok}, $sign_idx ? $expand_sign : () );
+    my @bu_col;
+    my $i = $sf->{o}{enable}{'expand_' . $clause};
+    my $menu_addition = $sf->{i}{menu_additions}[$i];
+    my @pre = ( undef, $sf->{i}{ok}, $i ? $menu_addition : () );
 
-    WHERE: while ( 1 ) {
+    COL: while ( 1 ) {
         my @choices = ( @cols );
         if ( $sf->{o}{enable}{parentheses} ) {
             unshift @choices, $unclosed ? ')' : '(';
@@ -280,9 +294,9 @@ sub where {
             { %{$sf->{i}{lyt_h}} }
         );
         if ( ! defined $quote_col ) {
-            if ( @bu ) {
-                ( $sql->{where_args}, $sql->{where_stmt}, $AND_OR, $unclosed, $count ) = @{pop @bu};
-                next WHERE;
+            if ( @bu_col ) {
+                ( $sql->{where_stmt}, $sql->{where_args}, $AND_OR, $unclosed, $count ) = @{pop @bu_col};
+                next COL;
             }
             return;
         }
@@ -296,19 +310,19 @@ sub where {
             }
             return 1;
         }
-        if ( $quote_col eq $expand_sign ) {
+        if ( $quote_col eq $menu_addition ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $ext_col = $ext->extended_col( $sql, $clause );
-            if ( ! defined $ext_col ) {
-                if ( @bu ) {
-                    ( $sql->{where_args}, $sql->{where_stmt}, $AND_OR, $unclosed, $count ) = @{pop @bu};
+            my $complex_column = $ext->complex_unit( $sql, $clause );
+            if ( ! defined $complex_column ) {
+                if ( @bu_col ) {
+                    ( $sql->{where_stmt}, $sql->{where_args}, $AND_OR, $unclosed, $count ) = @{pop @bu_col};
                 }
-                next WHERE;
+                next COL;
             }
-            $quote_col = $ext_col;
+            $quote_col = $complex_column;
         }
         if ( $quote_col eq ')' ) {
-            push @bu, [ [@{$sql->{where_args}}], $sql->{where_stmt}, $AND_OR, $unclosed, $count ];
+            push @bu_col, [ $sql->{where_stmt}, [@{$sql->{where_args}}], $AND_OR, $unclosed, $count ];
             $sql->{where_stmt} .= " )";
             $unclosed--;
             next WHERE;
@@ -321,23 +335,37 @@ sub where {
                 { %{$sf->{i}{lyt_h}} }
             );
             if ( ! defined $AND_OR ) {
-                next WHERE;
+                next COL;
             }
             $AND_OR = ' ' . $AND_OR;
         }
         if ( $quote_col eq '(' ) {
-            push @bu, [ [@{$sql->{where_args}}], $sql->{where_stmt}, $AND_OR, $unclosed, $count ];
+            push @bu_col, [ $sql->{where_stmt}, [@{$sql->{where_args}}], $AND_OR, $unclosed, $count ];
             $sql->{where_stmt} .= $AND_OR . " (";
             $AND_OR = '';
             $unclosed++;
-            next WHERE;
+            next COL;
         }
-        push @bu, [ [@{$sql->{where_args}}], $sql->{where_stmt}, $AND_OR, $unclosed, $count ];
+        push @bu_col, [ $sql->{where_stmt}, [@{$sql->{where_args}}], $AND_OR, $unclosed, $count ];
         $sql->{where_stmt} .= $AND_OR . ' ' . $quote_col;
-        my $ok = $op->add_operator_with_value( $sql, $clause, $quote_col );
-        if ( ! $ok ) {
-            ( $sql->{where_args}, $sql->{where_stmt}, $AND_OR, $unclosed, $count ) = @{pop @bu};
-            next WHERE;
+
+        OPERATOR: while ( 1 ) {
+            my $bu_op = [ $sql->{where_stmt}, [@{$sql->{where_args}}] ];
+            my ( $op, $is_complex_value ) = $so->choose_and_add_operator( $sql, $clause, $quote_col );
+            if ( ! defined $op ) {
+                ( $sql->{where_stmt}, $sql->{where_args}, $AND_OR, $unclosed, $count ) = @{pop @bu_col};
+                next COL;
+            }
+
+            VALUE: while ( 1 ) {
+                my $ok = $so->read_and_add_value( $sql, $clause, $op, $is_complex_value );
+                if ( ! $ok ) {
+                    ( $sql->{where_stmt}, $sql->{where_args} ) = @$bu_op;
+                    next OPERATOR;
+                }
+                last VALUE;
+            }
+            last OPERATOR;
         }
         $count++;
     }
@@ -352,9 +380,9 @@ sub group_by {
     $sql->{group_by_stmt} = "GROUP BY";
     $sql->{group_by_cols} = [];
     $sql->{select_cols} = [];
-    my $sign_idx = $sf->{o}{enable}{'expand_' . $clause};
-    my $expand_sign = $sf->{i}{expand_signs}[$sign_idx];
-    my @pre = ( undef, $sf->{i}{ok}, $expand_sign ? $expand_sign : () );
+    my $i = $sf->{o}{enable}{'expand_' . $clause};
+    my $menu_addition = $sf->{i}{menu_additions}[$i];
+    my @pre = ( undef, $sf->{i}{ok}, $menu_addition ? $menu_addition : () );
     my $menu = [ @pre, @{$sql->{cols}} ];
 
     GROUP_BY: while ( 1 ) {
@@ -385,11 +413,11 @@ sub group_by {
             }
             return 1;
         }
-        elsif ( $menu->[$idx[0]] eq $expand_sign ) {
+        elsif ( $menu->[$idx[0]] eq $menu_addition ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $ext_col = $ext->extended_col( $sql, $clause );
-            if ( defined $ext_col ) {
-                push @{$sql->{group_by_cols}}, $ext_col;
+            my $complex_column = $ext->complex_unit( $sql, $clause );
+            if ( defined $complex_column ) {
+                push @{$sql->{group_by_cols}}, $complex_column;
             }
             next GROUP_BY;
         }
@@ -402,7 +430,7 @@ sub having {
     my ( $sf, $sql ) = @_;
     my $clause = 'having';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $op = App::DBBrowser::Table::Substatements::Operators->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $so = App::DBBrowser::Table::Substatements::Operators->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my @pre = ( undef, $sf->{i}{ok} );
     my $AND_OR = '';
@@ -412,7 +440,7 @@ sub having {
     my $count = 0;
     my @bu;
 
-    HAVING: while ( 1 ) {
+    COL: while ( 1 ) {
         my @choices = (
             @{$sf->{aggregate}},
             map( '@' . $_, @{$sql->{aggr_cols}} )
@@ -428,8 +456,8 @@ sub having {
         );
         if ( ! defined $aggr ) {
             if ( @bu ) {
-                ( $sql->{having_args}, $sql->{having_stmt}, $AND_OR, $unclosed, $count ) = @{pop @bu};
-                next HAVING;
+                ( $sql->{having_stmt}, $sql->{having_args}, $AND_OR, $unclosed, $count ) = @{pop @bu};
+                next COL;
             }
             return;
         }
@@ -444,10 +472,10 @@ sub having {
             return 1;
         }
         if ( $aggr eq ')' ) {
-            push @bu, [ [@{$sql->{having_args}}], $sql->{having_stmt}, $AND_OR, $unclosed, $count ];
+            push @bu, [ $sql->{having_stmt}, [@{$sql->{having_args}}], $AND_OR, $unclosed, $count ];
             $sql->{having_stmt} .= ")";
             $unclosed--;
-            next HAVING;
+            next COL;
         }
         if ( $count > 0 && $sql->{having_stmt} !~ /\(\z/ ) {
             $ax->print_sql( $sql );
@@ -457,28 +485,42 @@ sub having {
                 { %{$sf->{i}{lyt_h}} }
             );
             if ( ! defined $AND_OR ) {
-                next HAVING;
+                next COL;
             }
             $AND_OR = ' ' . $AND_OR;
         }
         if ( $aggr eq '(' ) {
-            push @bu, [ [@{$sql->{having_args}}], $sql->{having_stmt}, $AND_OR, $unclosed, $count ];
+            push @bu, [ $sql->{having_stmt}, [@{$sql->{having_args}}], $AND_OR, $unclosed, $count ];
             $sql->{having_stmt} .= $AND_OR . " (";
             $AND_OR = '';
             $unclosed++;
-            next HAVING;
+            next COL;
         }
-        push @bu, [ [@{$sql->{having_args}}], $sql->{having_stmt}, $AND_OR, $unclosed, $count ];
+        push @bu, [ $sql->{having_stmt}, [@{$sql->{having_args}}], $AND_OR, $unclosed, $count ];
         $sql->{having_stmt} .= $AND_OR;
-        my $quote_aggr = $op->build_having_col( $sql, $aggr );
+        my $quote_aggr = $so->build_having_col( $sql, $aggr );
         if ( ! defined $quote_aggr ) {
-            ( $sql->{having_args}, $sql->{having_stmt}, $AND_OR, $unclosed, $count ) = @{pop @bu};
-            next HAVING;
+            ( $sql->{having_stmt}, $sql->{having_args}, $AND_OR, $unclosed, $count ) = @{pop @bu};
+            next COL;
         }
-        my $ok = $op->add_operator_with_value( $sql, $clause, $quote_aggr );
-        if ( ! $ok ) {
-            ( $sql->{having_args}, $sql->{having_stmt}, $AND_OR, $unclosed, $count ) = @{pop @bu};
-            next HAVING;
+
+        OPERATOR: while ( 1 ) {
+            my $bu_op = [ $sql->{having_stmt}, [@{$sql->{having_args}}] ];
+            my ( $op, $is_complex_value ) = $so->choose_and_add_operator( $sql, $clause, $quote_aggr );
+            if ( ! defined $op ) {
+                ( $sql->{having_stmt}, $sql->{having_args}, $AND_OR, $unclosed, $count ) = @{pop @bu};
+                next COL;
+            }
+
+            VALUE: while ( 1 ) {
+                my $ok = $so->read_and_add_value( $sql, $clause, $op, $is_complex_value );
+                if ( ! $ok ) {
+                    ( $sql->{having_stmt}, $sql->{having_args} ) = @$bu_op;
+                    next OPERATOR;
+                }
+                last VALUE;
+            }
+            last OPERATOR;
         }
         $count++;
     }
@@ -490,9 +532,9 @@ sub order_by {
     my $clause = 'order_by';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $sign_idx = $sf->{o}{enable}{'expand_' . $clause};
-    my $expand_sign = $sf->{i}{expand_signs}[$sign_idx];
-    my @pre = ( undef, $sf->{i}{ok}, $expand_sign ? $expand_sign : () );
+    my $i = $sf->{o}{enable}{'expand_' . $clause};
+    my $menu_addition = $sf->{i}{menu_additions}[$i];
+    my @pre = ( undef, $sf->{i}{ok}, $menu_addition ? $menu_addition : () );
     my @cols;
     if ( @{$sql->{aggr_cols}} || @{$sql->{group_by_cols}} ) {
         @cols = ( @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} );
@@ -524,16 +566,16 @@ sub order_by {
             }
             return 1;
         }
-        elsif ( $col eq $expand_sign ) {
+        elsif ( $col eq $menu_addition ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $ext_col = $ext->extended_col( $sql, $clause );
-            if ( ! defined $ext_col ) {
+            my $complex_column = $ext->complex_unit( $sql, $clause );
+            if ( ! defined $complex_column ) {
                 if ( @bu ) {
                     ( $sql->{order_by_stmt}, $col_sep ) = @{pop @bu};
                 }
                 next ORDER_BY;
             }
-            $col = $ext_col;
+            $col = $complex_column;
         }
         push @bu, [ $sql->{order_by_stmt}, $col_sep ];
         $sql->{order_by_stmt} .= $col_sep . $col;

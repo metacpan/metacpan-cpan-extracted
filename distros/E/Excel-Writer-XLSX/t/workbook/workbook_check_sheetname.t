@@ -2,7 +2,7 @@
 #
 # Tests for Excel::Writer::XLSX::Workbook methods.
 #
-# reverse ('(c)'), MAy 2016, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2020, John McNamara, jmcnamara@cpan.org
 #
 
 use lib 't/lib';
@@ -45,12 +45,6 @@ eval { $workbook->add_worksheet('name_that_is_longer_than_thirty_one_characters'
 eval { $workbook->add_worksheet(q(Sheet')); };
 eval { $workbook->add_worksheet(q('Sheet)); };
 eval { $workbook->add_worksheet(q('Sheet')); };
-
-# Test reserved name.
-eval { $workbook->add_worksheet('History'); };
-eval { $workbook->add_worksheet('history'); };
-eval { $workbook->add_worksheet('HISTORY'); };
-eval { $workbook->add_worksheet('HisTory'); };
 
 
 # Test that only 1 worksheet was written.

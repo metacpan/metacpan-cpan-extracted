@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::Eval;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 # ABSTRACT: mtpolicyd plugin to capture the output of plugins
 
 
@@ -46,7 +46,7 @@ Mail::MtPolicyd::Plugin::Eval - mtpolicyd plugin to capture the output of plugin
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 DESCRIPTION
 

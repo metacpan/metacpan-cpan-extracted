@@ -194,6 +194,61 @@ test12:
         a: reqarg
       optional:
         b: optarg
-      flags:       
+      flags:
+      
+test13:
+  desc: "test multi value array arguments"
+  class:
+    name: CLI::Driver::TestArray
+    attr:
+      required:
+          hard:
+            r: '@attributeArrayReq'
+      optional:
+        o: '@attributeArrayOpt'
+      flags: 
+  method:
+    name: test13_method1
+    args:
+      required:
+        hard: 
+          a: '@methodArrayReq'
+      optional:
+        b: '@methodArrayOpt'
+      flags:
+      
+test14:
+  desc: "test help"
+  class:
+    name: CLI::Driver::TestArray
+    attr:
+      required:
+          hard:
+            a: '@attrArrayReq'
+      optional:
+        o: 'attrOptional'
+      flags: 
+        attr-flag: attrFlag
+  method:
+    name: test14_method
+    args:
+      required:
+        hard: 
+          r: 'argRequired'
+      optional:
+        o: 'argOptional'
+        n: 'noHelp'
+      flags:
+        method-flag: argFlag
+  help:
+    args:
+      a: "a help"
+      o: "o help"
+      attr-flag: "attr-flag help"
+      r: "r help"
+      method-flag: "method-flag help"
+    examples:
+      - "This is an example"
+      - "This is the second example"
           
           

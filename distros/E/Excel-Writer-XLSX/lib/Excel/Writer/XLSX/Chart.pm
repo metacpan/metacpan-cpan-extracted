@@ -7,7 +7,7 @@ package Excel::Writer::XLSX::Chart;
 #
 # Used in conjunction with Excel::Writer::XLSX.
 #
-# Copyright 2000-2019, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2020, John McNamara, jmcnamara@cpan.org
 #
 # Documentation after __END__
 #
@@ -27,7 +27,7 @@ use Excel::Writer::XLSX::Utility qw(xl_cell_to_rowcol
   quote_sheetname );
 
 our @ISA     = qw(Excel::Writer::XLSX::Package::XMLwriter);
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 
 ###############################################################################
@@ -6643,11 +6643,13 @@ The currently available subtypes are:
         smooth_with_markers
         smooth
 
+    line
+        stacked
+        percent_stacked
+
     radar
         with_markers
         filled
-
-More charts and sub-types will be supported in time. See the L</TODO> section.
 
 
 =head1 CHART METHODS
@@ -8755,34 +8757,12 @@ There are some limitations on combined charts:
 =back
 
 
-
-=head1 TODO
-
-Chart features that are on the TODO list and will hopefully be added are:
-
-=over
-
-=item * Add more chart sub-types.
-
-=item * Additional formatting options.
-
-=item * More axis controls.
-
-=item * 3D charts.
-
-=item * Additional chart types.
-
-=back
-
-If you are interested in sponsoring a feature to have it implemented or expedited let me know.
-
-
 =head1 AUTHOR
 
 John McNamara jmcnamara@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright MM-MMXIX, John McNamara.
+Copyright MM-MMXX, John McNamara.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.

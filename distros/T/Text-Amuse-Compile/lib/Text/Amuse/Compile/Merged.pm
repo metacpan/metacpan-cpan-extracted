@@ -316,7 +316,8 @@ sub as_latex {
     my @out;
     my $current_language = $self->language;
     my %lang_aliases = (
-                        macedonian => 'russian',
+                        # pre-texlive 2020
+                        # macedonian => 'russian',
                         serbian    => 'croatian',
                        );
     my $counter = 0;

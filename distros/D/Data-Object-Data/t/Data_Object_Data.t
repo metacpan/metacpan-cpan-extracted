@@ -59,6 +59,85 @@ anywhere in the source code and having Perl properly ignoring them.
 
 =cut
 
+=scenario syntax
+
+This package supports parsing standard POD and pod-like sections from any file
+or package, anywhere in the document. Additionally, this package supports an
+alternative POD definition syntax which helps differentiate between the
+traditional POD usage and other usages.
+
+=example syntax
+
+  # POD
+
+  # =head1 NAME
+  #
+  # Example #1
+  #
+  # =cut
+  #
+  # =head1 NAME
+  #
+  # Example #2
+  #
+  # =cut
+
+  # Podish Syntax
+
+  # =name
+  #
+  # Example #1
+  #
+  # =cut
+  #
+  # =name
+  #
+  # Example #2
+  #
+  # =cut
+
+  # Podish Syntax (Nested)
+
+  # =name
+  #
+  # Example #1
+  #
+  # +=head1 WHY?
+  #
+  # blah blah blah
+  #
+  # +=cut
+  #
+  # More information on the same topic as was previously mentioned in the
+  # previous section demonstrating the topic as-is obvious from said section
+  # ...
+  #
+  # =cut
+
+  # Alternate Podish Syntax
+
+  # @=name
+  #
+  # Example #1
+  #
+  # @=cut
+  #
+  # @=name
+  #
+  # Example #2
+  #
+  # @=cut
+
+  my $data = Data::Object::Data->new(
+    file => 't/examples/alternate.pod'
+  );
+
+  $data->contents('name');
+
+  # [['Example #1'], ['Example #2']]
+
+=cut
+
 =method content
 
 The content method the pod-like section where the name matches the given
@@ -89,6 +168,32 @@ content(Str $name) : ArrayRef[Str]
   $data->content('name');
 
   # ['Example #1']
+
+=example-2 content
+
+  # =name
+  #
+  # Example #1
+  #
+  # +=head1 WHY?
+  #
+  # blah blah blah
+  #
+  # +=cut
+  #
+  # More information on the same topic as was previously mentioned in the
+  # previous section demonstrating the topic as-is obvious from said section
+  # ...
+  #
+  # =cut
+
+  my $data = Data::Object::Data->new(
+    file => 't/examples/nested.pod'
+  );
+
+  $data->content('name');
+
+  # ['Example #1', '', '=head1 WHY?', ...]
 
 =cut
 
@@ -124,6 +229,50 @@ contents(Str $list, Str $name) : ArrayRef[ArrayRef]
   $data->contents('name');
 
  # [['Example #1'], ['Example #2']]
+
+=example-2 contents
+
+  # =name example-1
+  #
+  # Example #1
+  #
+  # +=head1 WHY?
+  #
+  # blah blah blah
+  #
+  # +=cut
+  #
+  # ...
+  #
+  # =cut
+
+  my $data = Data::Object::Data->new(
+    string => join "\n\n", (
+      '=name example-1',
+      '',
+      'Example #1',
+      '',
+      '+=head1 WHY?',
+      '',
+      'blah blah blah',
+      '',
+      '+=cut',
+      '',
+      'More information on the same topic as was previously mentioned in the',
+      '',
+      'previous section demonstrating the topic as-is obvious from said section',
+      '',
+      '...',
+      '',
+      '=cut'
+    )
+  );
+
+  $data->contents('name');
+
+  # [['Example #1', '', '=head1 WHY?', ...]]
+
+=cut
 
 =cut
 
@@ -404,9 +553,33 @@ $subs->synopsis(fun($tryable) {
   $result
 });
 
+$subs->scenario('syntax', fun($tryable) {
+  ok my $result = $tryable->result;
+  is_deeply $result, [['Example #1'], ['Example #2']];
+
+  $result
+});
+
 $subs->example(-1, 'content', 'method', fun($tryable) {
   ok my $result = $tryable->result;
   is_deeply $result, ['Example #1'];
+
+  $result
+});
+
+$subs->example(-2, 'content', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok scalar(@$result) > 1;
+  my $text = $result->[0];
+  is $result->[0], 'Example #1';
+  is $result->[1], '';
+  is $result->[2], '=head1 WHY?';
+  is $result->[3], '';
+  is $result->[4], 'blah blah blah';
+  is $result->[5], '';
+  is $result->[6], '=cut';
+  is $result->[7], '';
+  like $result->[8], qr/information on the same topic/;
 
   $result
 });
@@ -416,6 +589,25 @@ $subs->example(-1, 'contents', 'method', fun($tryable) {
   is_deeply $result, [['Example #1'], ['Example #2']];
 
   $result
+});
+
+$subs->example(-2, 'contents', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok scalar(@$result) == 1;
+  $result = $result->[0];
+  ok scalar(@$result) > 1;
+  my $text = $result->[0];
+  is $result->[0], 'Example #1';
+  is $result->[1], '';
+  is $result->[2], '=head1 WHY?';
+  is $result->[3], '';
+  is $result->[4], 'blah blah blah';
+  is $result->[5], '';
+  is $result->[6], '=cut';
+  is $result->[7], '';
+  like $result->[8], qr/information on the same topic/;
+
+  [$result]
 });
 
 $subs->example(-1, 'item', 'method', fun($tryable) {

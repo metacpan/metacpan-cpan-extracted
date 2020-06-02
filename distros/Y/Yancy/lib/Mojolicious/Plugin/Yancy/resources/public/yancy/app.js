@@ -243,9 +243,11 @@ Vue.component('edit-field', {
             }
             else if ( this.schema.format == 'date-time' ) {
                 fieldType = 'datetime-local';
+                // Value must contain T, not space
+                value = value.replace( / /, 'T' );
                 // Verify the value lacks seconds, since datetime-local
                 // fields do not support seconds...
-                value = value.replace( /^(\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}).*/, '$1' );
+                value = value.replace( /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}).*/, '$1' );
             }
             else if ( this.schema.format == 'markdown' ) {
                 fieldType = 'markdown';
@@ -292,11 +294,14 @@ Vue.component('edit-field', {
     },
     methods: {
         input: function () {
-            if(this.children.length){
-                this.value = this.children.map(function(e){return e.value;}).filter(function(e){return e;});
-                this.$data._value = this.value;
+            var value = this.$data._value;
+            if ( this.children.length ) {
+                value = this.children.map(function(e){return e.value;}).filter(function(e){return e;});
             }
-            this.$emit( 'input', this.$data._value );
+            else if ( this.$data.fieldType == 'datetime-local' ) {
+                value += ':00';
+            }
+            this.$emit( 'input', value );
         },
         addChild: function () {
             this.children.push({
@@ -587,7 +592,7 @@ var app = window.Yancy = new Vue({
 
                 for ( var propKey in definition.properties ) {
                     var prop = definition.properties[ propKey ];
-                    if ( prop[ 'x-html-field' ] ) {
+                    if ( prop[ 'x-html-field' ] && definitions.properties[ prop['x-html-field'] ] ) {
                         definition.properties[ prop['x-html-field' ] ][ 'x-hidden' ] = true;
                     }
                 }

@@ -3,7 +3,9 @@ use 5.014;
 use lib 't/lib';
 
 BEGIN {
-  $ENV{STENCIL_HOME} = 't/tmp';
+  use File::Temp 'tempdir';
+
+  $ENV{STENCIL_HOME} = tempdir('cleanup', 1);
 }
 
 use strict;
@@ -47,7 +49,7 @@ method: seed
   use Stencil::Data;
 
   my $repo = Stencil::Repo->new;
-  my $space = Stencil::Space->new(name => 'gen', repo => $repo);
+  my $space = Stencil::Space->new(name => 'test', repo => $repo);
   my $spec = Stencil::Data->new(name => 'foo', repo => $repo);
   my $stencil = Stencil->new(repo  => $repo, space => $space, spec  => $spec);
 

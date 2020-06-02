@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'App::ModuleBuildTiny version 0.018, CPAN::Meta::Converter version 2.150010'
+generated_by: 'App::ModuleBuildTiny version 0.027, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,7 +16,7 @@ name: Mojolicious-Plugin-ReplyTable
 provides:
   Mojolicious::Plugin::ReplyTable:
     file: lib/Mojolicious/Plugin/ReplyTable.pm
-    version: '0.09'
+    version: '0.10'
 recommends:
   Excel::Writer::XLSX: '0'
   Spreadsheet::WriteExcel: '0'
@@ -28,5 +28,6 @@ resources:
   bugtracker: http://github.com/jberger/Mojolicious-Plugin-ReplyTable/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/jberger/Mojolicious-Plugin-ReplyTable
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

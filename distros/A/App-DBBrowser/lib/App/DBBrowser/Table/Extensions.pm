@@ -22,10 +22,10 @@ sub new {
 }
 
 
-sub extended_col {
+sub complex_unit {
     my ( $sf, $sql, $clause ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my ( $none, $function, $subquery, $all ) = @{$sf->{i}{expand_signs}};
+    my ( $none, $function, $subquery, $all ) = @{$sf->{i}{menu_additions}};
     my $set_to_null = '=N';
     my @values;
     if ( $clause eq 'set' ) {
@@ -34,8 +34,8 @@ sub extended_col {
     else {
         @values = ( undef, [ $function ], [ $subquery ], [ $function, $subquery ] );
     }
-    my $sign_idx = $sf->{o}{enable}{'expand_' . $clause};
-    my @types = @{$values[$sign_idx]};
+    my $i = $sf->{o}{enable}{'expand_' . $clause};
+    my @types = @{$values[$i]};
     my $type;
     if ( @types == 1 ) {
         $type = $types[0];
@@ -50,7 +50,7 @@ sub extended_col {
             return;
         }
     }
-    my ( $ext_col, $alias_type );
+    my ( $complex_unit, $alias_type );
     if ( $type eq $subquery ) {
         require App::DBBrowser::Subqueries;
         my $new_sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -58,7 +58,7 @@ sub extended_col {
         if ( ! defined $subq ) {
             return;
         }
-        $ext_col = $subq;
+        $complex_unit = $subq;
         $alias_type = 'subqueries';
     }
     elsif ( $type eq $function ) {
@@ -68,7 +68,7 @@ sub extended_col {
         if ( ! defined $func ) {
             return;
         }
-        $ext_col = $func;
+        $complex_unit = $func;
         $alias_type = 'functions';
     }
     elsif ( $type eq $set_to_null ) {
@@ -76,12 +76,12 @@ sub extended_col {
     }
     if ( $clause !~ /^(?:set|where|having|group_by|order_by)\z/i ) {
         my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-        my $alias = $ax->alias( $alias_type, $ext_col );
+        my $alias = $ax->alias( $alias_type, $complex_unit );
         if ( defined $alias && length $alias ) {
-            $sql->{alias}{$ext_col} = $ax->quote_col_qualified( [ $alias ] );
+            $sql->{alias}{$complex_unit} = $ax->quote_col_qualified( [ $alias ] );
         }
     }
-    return $ext_col;
+    return $complex_unit;
 }
 
 

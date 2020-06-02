@@ -1,9 +1,16 @@
-0.007   2019-01-28 (PERLANCAR)
+0.008   2020-06-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Add fields: video_orientation, video_dar, video_sar.
+
+	- Add comment about ffprobe and ffmpeg -i being the same.
+
+
+0.007   2019-01-28  Released-By: PERLANCAR
 
 	- Tweak regex once again to get the correct width/height.
 
 
-0.006   2019-01-28 (PERLANCAR)
+0.006   2019-01-28  Released-By: PERLANCAR
 
 	- Add 'rotate' information.
 
@@ -11,30 +18,30 @@
 	  #0:0(eng): Video: h264 (Baseline) (avc1 / 0x31637661) ...').
 
 
-0.005   2017-07-10 (PERLANCAR)
+0.005   2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.004   2016-11-28 (PERLANCAR)
+0.004   2016-11-28  Released-By: PERLANCAR
 
         - [bugfix] Fix regex (thanks Scott Givan) [RT#118986].
 
 
-0.003   2016-06-09 (PERLANCAR)
+0.003   2016-06-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dist] Replace Log::Any::For::Builtins with IPC::System::Options.
 
 
-0.002   2016-04-06 (PERLANCAR)
+0.002   2016-04-06  Released-By: PERLANCAR
 
 	- [Bugfix] Typo which caused duration to not be parsed.
 
 
-0.001   2016-04-06 (PERLANCAR)
+0.001   2016-04-06  Released-By: PERLANCAR
 
         - First release.

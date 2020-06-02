@@ -16,10 +16,10 @@ lib/App/Rakubrew/Download.pm
 lib/App/Rakubrew/Shell.pm
 lib/App/Rakubrew/Shell/Bash.pm
 lib/App/Rakubrew/Shell/Cmd.pm
-lib/App/Rakubrew/Shell/Csh.pm
 lib/App/Rakubrew/Shell/Fish.pm
 lib/App/Rakubrew/Shell/PowerShell.pm
 lib/App/Rakubrew/Shell/Sh.pm
+lib/App/Rakubrew/Shell/Tcsh.pm
 lib/App/Rakubrew/Shell/Zsh.pm
 lib/App/Rakubrew/Tools.pm
 lib/App/Rakubrew/Update.pm

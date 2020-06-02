@@ -18,11 +18,12 @@ use Encode;
 use Text::CSV::Slurp;
 use Spreadsheet::XLSX;
 use Text::Iconv;
+use Mojo::DOM;
 
 use lib "./internal";
 
 our $VERSION;
-$VERSION='3.63';
+$VERSION='3.64';
 
 # Some required executables
 my @exe     = qw( wget xls2csv );
@@ -562,29 +563,43 @@ sub do_country {
    sub _init_country_iso {
       my $inst = qq
 (Please download the data manually for ISO 3166 country codes.
+
+Currently, this works best in firefox (not in chrome).
+
 Go to the following URL:
    $country_iso_url
 Click on:
    'Online Browsing Platform'
    'Officially assigned codes'
    300 results per page
-Select the entire chart (not including the header).  If not all of the
-countries fit on a single page, do it in multiple steps.
+
+Select <Save Page As> and save to this file.
 );
 
-      $in = _read_file('type'      => 'manual',
-                       'inst'      => $inst,
-                       'as_list'   => 1,
-                      );
+      my $html  = _read_file('type'      => 'manual',
+                             'inst'      => $inst,
+                            );
+      my $dom   = Mojo::DOM->new($html);
+
+      # Get the table with the data
+      my $coll  = $dom->find('table[role=grid]');
+      my $table = $coll->first();
+
+      # Get the rows, but discard the first (headers)
+      my @rows  = @{ $table->find('tr')->to_array() };
+      shift(@rows);
+      $in       = \@rows;
    }
 
    sub _read_country_iso {
       while (@$in) {
-         my $name   = shift(@$in);
-         shift(@$in);
-         my $alpha2 = lc(shift(@$in));
-         my $alpha3 = lc(shift(@$in));
-         my $num    = shift(@$in);
+         my $row    = shift(@$in);
+
+         my @col    = @{ $row->find('td') };
+         my $name   = $col[0]->all_text();
+         my $alpha2 = lc($col[2]->all_text());
+         my $alpha3 = lc($col[3]->all_text());
+         my $num    = $col[4]->all_text();
          $name      =~ s/^\s*//;
          $alpha2    =~ s/^\s*//;
          $alpha3    =~ s/^\s*//;
@@ -1720,7 +1735,7 @@ use warnings;
 use utf8;
 
 our(\$VERSION);
-\$VERSION='3.63';
+\$VERSION='3.64';
 
 \$Locale::Codes::Data{'$type'}{'id'} = '$ID';
 

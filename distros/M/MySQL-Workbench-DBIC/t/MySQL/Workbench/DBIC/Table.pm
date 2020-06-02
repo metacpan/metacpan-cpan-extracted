@@ -3,11 +3,12 @@ package
 
 use Moo;
 
-has comment     => (is => 'rw', default => sub { '' } );
-has name        => (is => 'ro', required => 1 );
-has columns     => (is => 'ro', default => \&_gen_cols );
-has indexes     => (is => 'ro', default => sub {[]} );
-has primary_key => (is => 'ro', default => sub { [$_[0]->columns->[0]->name] } );
+has comment      => (is => 'rw', default => sub { '' } );
+has name         => (is => 'ro', required => 1 );
+has columns      => (is => 'ro', default => \&_gen_cols );
+has indexes      => (is => 'ro', default => sub {[]} );
+has primary_key  => (is => 'ro', default => sub { [$_[0]->columns->[0]->name] } );
+has foreign_keys => ( is => 'ro', default => sub {[]} );
 
 sub _gen_cols {
     return [ map{ t::MySQL::Workbench::DBIC::Column->new( name => $_ ) }qw(hallo) ];
@@ -35,5 +36,12 @@ use Moo;
 has name    => (is => 'ro' );
 has type    => (is => 'rw' );
 has columns => (is => 'ro', default => sub { ['hallo'] } );
+
+package
+    t::MySQL::Workbench::DBIC::Parser;
+
+use Moo;
+
+has tables => ( is => 'ro', default => sub {[]} );
 
 1;

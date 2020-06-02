@@ -3,6 +3,9 @@
 use strict;
 use warnings;
 use vars qw($VERSION);
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
 use Business::DK::CPR qw(calculate);
 
 $VERSION = '0.01';

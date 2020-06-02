@@ -83,18 +83,17 @@ my $build = $cc->new_module_build(
    },
    configure_requires => {
       'ExtUtils::CChecker' => '0.04',
-      'Module::Build' => 0,
-      'Module::Build::Compat' => 0,
+      'Module::Build' => "0.4004", # test_requires
    },
    build_requires => {
       'ExtUtils::CChecker' => 0,
+      'Module::Build' => "0.4004", # test_requires
+   },
+   test_requires => {
       'IO::Socket::INET' => 0,
-      'Module::Build' => 0,
-      'Module::Build::Compat' => 0,
-      'Test::More' => 0,
+      'Test::More' => '0.88', # done_testing
    },
    license => 'perl',
-   create_makefile_pl => 'small',
    create_license => 1,
    create_readme  => 1,
 );

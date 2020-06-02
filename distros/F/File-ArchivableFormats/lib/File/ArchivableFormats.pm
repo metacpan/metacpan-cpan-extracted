@@ -10,7 +10,7 @@ use List::Util qw(first);
 use Module::Pluggable::Object;
 use Moose::Util::TypeConstraints;
 
-our $VERSION = '1.6';
+our $VERSION = '1.8';
 
 subtype 'PluginRole'
     => as 'Object'
@@ -47,18 +47,14 @@ sub installed_drivers {
     return @DRIVERS;
 }
 
-sub identify_via_libexif {
-    my $self = shift;
-    my $info = ImageInfo(shift);
-
-    if ($info->{MIMEType}) {
-        return { mime_type  => $info->{MIMEType} };
-    }
-    return;
-}
-
 sub identify_from_fh {
     my ($self, $fh) = @_;
+
+    if (blessed($fh) && $fh->isa('Path::Tiny')) {
+        # Path::Tiny doesn't have a seek and it doesn't play well with .docx as
+        # it than identifies as a zip file. See t/200-dans.t for the test.
+        return $self->identify_from_fh("$fh");
+    }
 
     my $info = { mime_type => mimetype($fh)} ;
     return $self->identify_from_mimetype($info->{mime_type});
@@ -116,7 +112,7 @@ File::ArchivableFormats - Be able to select archivable formats
 
 =head1 VERSION
 
-version 1.6
+version 1.8
 
 =head1 SYNOPSIS
 
@@ -132,13 +128,10 @@ version 1.6
 
 =head1 DESCRIPTION
 
-TODO: Add clear description
+This module identifies filetypes and tells you whether they are considered
+archivable by various institutes. This is done via a plugin mechanism.
 
 =head1 ATTRIBUTES
-
-=head2 magic
-
-The L<File::LibMagic> accessor
 
 =head1 METHODS
 
@@ -183,11 +176,6 @@ Identify the file from path/filename.
 
 Identify based on the mimetype
 
-=head2 identify_via_libexif
-
-Identify mimetype via libexif.
-You will need to have L<Archive::Zip> installed for MS Office documents
-
 =head2 installed_drivers
 
 Returns an array with all the installed plugins.
@@ -196,13 +184,13 @@ Returns an array with all the installed plugins.
 
 =over
 
+=item L<File::MimeInfo::Magic>
+
 =item IANA
 
 L<http://www.iana.org/assignments/media-types/media-types.xhtml>
 
 L<http://www.iana.org/assignments/media-types/application.csv>
-
-=item L<File::LibMagic>
 
 =back
 

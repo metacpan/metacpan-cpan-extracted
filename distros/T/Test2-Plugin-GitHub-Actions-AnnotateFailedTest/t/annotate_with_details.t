@@ -19,12 +19,10 @@ my $event = intercept {
 my $call = $g->calls_most_recent;
 undef $g;
 
-like $event, array {
-    item event 'Fail';
-};
-
 my $fail = $event->[0];
 
-is $call, [$file, $line, "not equal\n" . $fail->{info}->[0]->{details}], 'annotate with details';
+my $message = length $fail->{info}->[0]->{details} ? "not equal\n" . $fail->{info}->[0]->{details} : 'not equal';
+
+is $call, [$file, $line, $message], 'annotate with details';
 
 done_testing;

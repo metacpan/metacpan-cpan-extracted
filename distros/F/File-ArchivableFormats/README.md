@@ -12,25 +12,22 @@
 
 # DESCRIPTION
 
-TODO: Add clear description
+This module identifies filetypes and tells you whether they are considered
+archivable by various institutes. This is done via a plugin mechanism.
 
 # ATTRIBUTES
-
-## magic
-
-The [File::LibMagic](https://metacpan.org/pod/File::LibMagic) accessor
 
 # METHODS
 
 ## parse\_extension
 
 Parses the filename and returns the extension. Uses
-["fileparse" in File::Basename](https://metacpan.org/pod/File::Basename#fileparse)
+["fileparse" in File::Basename](https://metacpan.org/pod/File%3A%3ABasename#fileparse)
 
 ## identify\_from\_fh
 
 Identify the file from a file handle. Please note that this does not
-work with a [File::Temp](https://metacpan.org/pod/File::Temp) filehandle.
+work with a [File::Temp](https://metacpan.org/pod/File%3A%3ATemp) filehandle.
 
 Returns a data structure like this:
 
@@ -63,21 +60,15 @@ Identify the file from path/filename.
 
 Identify based on the mimetype
 
-## identify\_via\_libexif
-
-Identify mimetype via libexif.
-You will need to have [Archive::Zip](https://metacpan.org/pod/Archive::Zip) installed for MS Office documents
-
 ## installed\_drivers
 
 Returns an array with all the installed plugins.
 
 # SEE ALSO
 
+- [File::MimeInfo::Magic](https://metacpan.org/pod/File%3A%3AMimeInfo%3A%3AMagic)
 - IANA
 
     [http://www.iana.org/assignments/media-types/media-types.xhtml](http://www.iana.org/assignments/media-types/media-types.xhtml)
 
     [http://www.iana.org/assignments/media-types/application.csv](http://www.iana.org/assignments/media-types/application.csv)
-
-- [File::LibMagic](https://metacpan.org/pod/File::LibMagic)

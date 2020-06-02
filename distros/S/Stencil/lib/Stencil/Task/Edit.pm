@@ -13,7 +13,7 @@ use Proc::InvokeEditor;
 
 with 'Stencil::Executable';
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 # METHODS
 

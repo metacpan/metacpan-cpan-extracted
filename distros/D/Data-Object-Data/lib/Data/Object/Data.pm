@@ -10,7 +10,7 @@ use Moo;
 
 require Carp;
 
-our $VERSION = '2.02'; # VERSION
+our $VERSION = '2.03'; # VERSION
 
 # BUILD
 
@@ -41,6 +41,11 @@ fun new_file($self) {
 }
 
 has from => (
+  is => 'ro',
+  lazy => 1
+);
+
+has string => (
   is => 'ro',
   lazy => 1
 );
@@ -78,7 +83,9 @@ method item($name) {
 }
 
 method lines() {
-  my $file = $self->file or return '';
+  my $file = $self->file;
+
+  return $self->string || '' if !$file || !-f $file;
 
   open my $fh, '<', $file or Carp::confess "$!: $file";
   my $lines = join "\n", <$fh>;
@@ -109,7 +116,7 @@ method list_item($list, $name) {
 method parser($data) {
   $data =~ s/\n*$/\n/;
 
-  my @chunks = split /^=\s*(.+?)\s*\r?\n/m, $data;
+  my @chunks = split /^(?:@=|=)\s*(.+?)\s*\r?\n/m, $data;
 
   shift @chunks;
 
@@ -122,6 +129,7 @@ method parser($data) {
     my @info = split /\s/, $meta, 2;
     my ($list, $name) = @info == 2 ? @info : (undef, @info);
 
+    $data =~ s/\n\+=/\n=/g; # auto-escape nested pod syntax
     $data = [split /\n\n/, $data];
 
     my $item = { name => $name, data => $data, index => @$items + 1, list => $list };
@@ -186,6 +194,89 @@ Podish Parser for Perl 5
 This package provides methods for parsing and extracting pod-like sections from
 any file or package. The pod-like syntax allows for using these sections
 anywhere in the source code and having Perl properly ignoring them.
+
+=cut
+
+=head1 SCENARIOS
+
+This package supports the following scenarios:
+
+=cut
+
+=head2 syntax
+
+  # POD
+
+  # =head1 NAME
+  #
+  # Example #1
+  #
+  # =cut
+  #
+  # =head1 NAME
+  #
+  # Example #2
+  #
+  # =cut
+
+  # Podish Syntax
+
+  # =name
+  #
+  # Example #1
+  #
+  # =cut
+  #
+  # =name
+  #
+  # Example #2
+  #
+  # =cut
+
+  # Podish Syntax (Nested)
+
+  # =name
+  #
+  # Example #1
+  #
+  # +=head1 WHY?
+  #
+  # blah blah blah
+  #
+  # +=cut
+  #
+  # More information on the same topic as was previously mentioned in the
+  # previous section demonstrating the topic as-is obvious from said section
+  # ...
+  #
+  # =cut
+
+  # Alternate Podish Syntax
+
+  # @=name
+  #
+  # Example #1
+  #
+  # @=cut
+  #
+  # @=name
+  #
+  # Example #2
+  #
+  # @=cut
+
+  my $data = Data::Object::Data->new(
+    file => 't/examples/alternate.pod'
+  );
+
+  $data->contents('name');
+
+  # [['Example #1'], ['Example #2']]
+
+This package supports parsing standard POD and pod-like sections from any file
+or package, anywhere in the document. Additionally, this package supports an
+alternative POD definition syntax which helps differentiate between the
+traditional POD usage and other usages.
 
 =cut
 
@@ -258,6 +349,36 @@ string.
 
 =back
 
+=over 4
+
+=item content example #2
+
+  # =name
+  #
+  # Example #1
+  #
+  # +=head1 WHY?
+  #
+  # blah blah blah
+  #
+  # +=cut
+  #
+  # More information on the same topic as was previously mentioned in the
+  # previous section demonstrating the topic as-is obvious from said section
+  # ...
+  #
+  # =cut
+
+  my $data = Data::Object::Data->new(
+    file => 't/examples/nested.pod'
+  );
+
+  $data->content('name');
+
+  # ['Example #1', '', '=head1 WHY?', ...]
+
+=back
+
 =cut
 
 =head2 contents
@@ -292,6 +413,52 @@ by providing an additional argument.
   $data->contents('name');
 
  # [['Example #1'], ['Example #2']]
+
+=back
+
+=over 4
+
+=item contents example #2
+
+  # =name example-1
+  #
+  # Example #1
+  #
+  # +=head1 WHY?
+  #
+  # blah blah blah
+  #
+  # +=cut
+  #
+  # ...
+  #
+  # =cut
+
+  my $data = Data::Object::Data->new(
+    string => join "\n\n", (
+      '=name example-1',
+      '',
+      'Example #1',
+      '',
+      '+=head1 WHY?',
+      '',
+      'blah blah blah',
+      '',
+      '+=cut',
+      '',
+      'More information on the same topic as was previously mentioned in the',
+      '',
+      'previous section demonstrating the topic as-is obvious from said section',
+      '',
+      '...',
+      '',
+      '=cut'
+    )
+  );
+
+  $data->contents('name');
+
+  # [['Example #1', '', '=head1 WHY?', ...]]
 
 =back
 

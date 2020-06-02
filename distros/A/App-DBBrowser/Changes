@@ -1,6 +1,10 @@
 Revision history for App-DBBrowser
 
 
+2.251    2020-05-31
+        - Parse with template: bugfix in 'reparse'.
+        - Refactoring SET, WHERE and HAVING.
+
 2.250    2020-04-15
         - Filter 'search_and_replace': allow to save groups of 's///;'.
 

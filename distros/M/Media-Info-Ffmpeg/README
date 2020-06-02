@@ -2,8 +2,8 @@ NAME
     Media::Info::Ffmpeg - Return information on media file/URL, using ffmpeg
 
 VERSION
-    This document describes version 0.007 of Media::Info::Ffmpeg (from Perl
-    distribution Media-Info-Ffmpeg), released on 2019-01-28.
+    This document describes version 0.008 of Media::Info::Ffmpeg (from Perl
+    distribution Media-Info-Ffmpeg), released on 2020-06-02.
 
 SYNOPSIS
     Use directly:
@@ -78,7 +78,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2017, 2016 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

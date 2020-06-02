@@ -1,0 +1,79 @@
+NAME
+    Tables - Specification for Tables::*, modules that contains table data
+
+SPECIFICATION VERSION
+    0.1
+
+VERSION
+    This document describes version 0.1.1 of Tables (from Perl distribution
+    Tables), released on 2020-06-01.
+
+SYNOPSIS
+    Use one of the "Tables::*" modules.
+
+DESCRIPTION
+    NOTE: EARLY SPECIFICATION; THINGS WILL STILL CHANGE A LOT.
+
+    "Tables::*" modules are modules that contain two-dimensional table data.
+    The table can be accessed via a standard interface (see
+    TablesRole::Spec::Basic). An example of table data would be list of
+    countries along with their names and country code, or a list of CPAN
+    authors along with their published email addresses.
+
+    Why put data in a Perl module, as a Perl distribution? To leverage the
+    Perl/CPAN toolchain and infrastructure: 1) ease of installation, update,
+    and uninstallation; 2) allowing dependency expression and version
+    comparison; 3) ease of packaging further as OS packages, e.g. Debian
+    packages (converted from Perl distribution); 4) testing by CPAN Testers.
+
+    The table data can actually be stored as CSV in the DATA section of a
+    Perl module, or as a CSV file in a shared directory of a Perl
+    distribution, or a Perl structure in the module source code, or from
+    other sources.
+
+    The standard interface provides a convenient and consistent way to
+    access the data, from accessing the rows, getting the column names, and
+    dumping to CSV or Perl structure for other tools to operate on.
+
+    To get started, see TablesRole::Spec::Basic and one of existing
+    "Tables::*" module.
+
+NAMESPACE ORGANIZATION
+    "Tables" (this module) is the specification.
+
+    "TablesRole::*" the roles.
+
+    All the modules under "Tables::*" will be modules with actual table
+    data.
+
+FAQ
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Tables>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Tables>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Tables>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    WordList is an older, related project. Where "WordList" packages a list
+    of strings as Perl module, "Tables" tries to do the same for table data.
+
+    Modules and CLIs that manipulate table data: TableData::Object, td (from
+    App::td).
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

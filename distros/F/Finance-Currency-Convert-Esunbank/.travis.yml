@@ -1,0 +1,18 @@
+language: perl
+perl:
+  - "5.30"
+  - "5.28"
+
+notifications:
+  irc:
+    channels:
+      - "irc.freenode.org#perl.tw"
+    use_notice: true
+
+git:
+  depth: 1
+
+env:
+  - TEST_LIVE=1
+
+script: yath test

@@ -1,6 +1,14 @@
 Change history for MySQL::Workbench::DBIC
 =========================================
 
+1.19 2020-06-01 16:46:00
+
+  * Bugfixes for remove_table_prefix
+
+1.18 2020-06-01 16:30:00
+
+  * add remove_table_prefix feature
+
 1.17 2020-05-29 09:25:00
 
   * fix tests

@@ -1,6 +1,19 @@
 Changelog for Stencil
 
-0.01 2020-05-30T04:41:13
+0.03 2020-05-31T17:08:16
+ - Add release updates
+ - Add missing documentation for Stencil::Space (#10)
+ - Add addition spec details to generators (#12)
+ - Hide POD __DATA__ from MetaCPAN (#9)
+
+0.02 2020-05-31T07:48:42
+ - Built release version 0.02
+ - Add release updates
+ - Document undocumented packages (#5)
+ - Built release version 0.01 (#3)
+
+0.01 2020-05-30T04:41:15
+ - Built release version 0.01
  - Document main module (#2)
  - Initial implementation
  - Initial commit

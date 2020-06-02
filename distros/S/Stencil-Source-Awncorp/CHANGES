@@ -1,0 +1,8 @@
+Changelog for Stencil-Source-Awncorp
+
+0.01 2020-05-31T18:58:35
+ - Add newline to help dzil with __DATA__
+ - Update main module test
+ - Update documentation
+ - Add main module
+ - Initial commit

@@ -1,11 +1,16 @@
-# $Id: Makefile.PL 83 2020-05-30 06:14:44Z stro $
+# $Id: Makefile.PL 84 2020-05-31 06:29:34Z stro $
 
 use strict;
 use warnings;
 
 use ExtUtils::MakeMaker;
 
-if ($ENV{'PERLBREW_ROOT'} && $ENV{'PERLBREW_ROOT'} =~ '/home/opc/perl5/perlbrew') {
+my %broken_smokers_roots = map { $_ => 1 } (
+    '/home/opc/perl5/perlbrew',
+    '/home/njh/perl5/perlbrew',
+);
+
+if ($ENV{'PERLBREW_ROOT'} && $broken_smokers_roots{ $ENV{'PERLBREW_ROOT'} }) {
     my $honest_answer = ExtUtils::MakeMaker::prompt('This smoker setup is most definitely broken and the author is tired of FP. Please type "Yes. I swear I fixed it. Please continue." to continue: ');
     unless ($honest_answer and $honest_answer eq 'Yes. I swear I fixed it. Please continue.') {
         print 'Kthxbye', $/;

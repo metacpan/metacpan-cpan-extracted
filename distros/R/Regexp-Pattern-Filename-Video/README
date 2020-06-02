@@ -1,0 +1,72 @@
+NAME
+    Regexp::Pattern::Filename::Video - Video filename
+
+VERSION
+    This document describes version 0.001 of
+    Regexp::Pattern::Filename::Video (from Perl distribution
+    Regexp-Pattern-Filename-Video), released on 2020-04-01.
+
+SYNOPSIS
+     use Regexp::Pattern; # exports re()
+     my $re = re("Filename::Video::filename_video");
+
+DESCRIPTION
+    This is a Regexp::Pattern wrapper for Filename::Video.
+
+PATTERNS
+    *   filename_video
+
+        Video filename.
+
+        Examples:
+
+        No extension.
+
+         "foo" =~ re("Filename::Video::filename_video");  # doesn't match
+
+        Not an extension.
+
+         "mp4" =~ re("Filename::Video::filename_video");  # doesn't match
+
+         "foo.mp4" =~ re("Filename::Video::filename_video");  # matches
+
+        Case insensitive.
+
+         "foo bar.MKV" =~ re("Filename::Video::filename_video");  # matches
+
+        Regex is anchored.
+
+         "foo.MKV is the file" =~ re("Filename::Video::filename_video");  # doesn't match
+
+         "foo.mp3" =~ re("Filename::Video::filename_video");  # doesn't match
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Regexp-Pattern-Filename-Video>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Regexp-Pattern-Filename-Video>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern-Filena
+    me-Video>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Regexp::Pattern
+
+    Filename::Video
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

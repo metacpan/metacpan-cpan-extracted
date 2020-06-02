@@ -23,7 +23,7 @@
       "build" : {
          "requires" : {
             "Alien::Build" : "1.41",
-            "Alien::Build::MM" : "1.74",
+            "Alien::Build::MM" : "1.41",
             "Alien::Build::Plugin::Cleanse::BuildDir" : "0",
             "Alien::MSYS" : "0.07",
             "Alien::libtiff" : "0",
@@ -50,7 +50,7 @@
       "configure" : {
          "requires" : {
             "Alien::Build" : "1.41",
-            "Alien::Build::MM" : "1.74",
+            "Alien::Build::MM" : "1.41",
             "Alien::Build::Plugin::Build::SearchDep" : "0.53",
             "Alien::Build::Plugin::Cleanse::BuildDir" : "0",
             "Alien::MSYS" : "0",
@@ -66,7 +66,7 @@
       "runtime" : {
          "requires" : {
             "Alien::Base" : "1.41",
-            "Alien::Build" : "1.74",
+            "Alien::Build" : "0.25",
             "FFI::CheckLib" : "0.23"
          },
          "suggests" : {
@@ -91,7 +91,7 @@
          "url" : "https://github.com/shawnlaffan/perl-alien-proj"
       }
    },
-   "version" : "1.12",
+   "version" : "1.13",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.23",
       "requires" : {

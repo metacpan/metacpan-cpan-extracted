@@ -1,5 +1,9 @@
 Revision history for perl distribution Mojo-Base-Tiny
 
+0.06 2020-06-01T06:43:44+0200
+  - Changes from Mojolicious 8.50
+  - Increased Perl version requirement to 5.16.0
+
 0.05 2020-01-31T06:44:13+0100
   - Change name from -async to -async_await
 

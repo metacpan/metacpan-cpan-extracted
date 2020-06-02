@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Profiler::Timer;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 # ABSTRACT: a profiler for the mtpolicyd
 
 use Time::HiRes 'gettimeofday', 'tv_interval';
@@ -86,7 +86,7 @@ Mail::MtPolicyd::Profiler::Timer - a profiler for the mtpolicyd
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 AUTHOR
 

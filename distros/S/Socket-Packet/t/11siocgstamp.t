@@ -1,7 +1,9 @@
 #!/usr/bin/perl
 
 use strict;
-use Test::More tests => 4;
+use warnings;
+
+use Test::More;
 
 use Socket::Packet qw( siocgstamp );
 
@@ -29,3 +31,5 @@ my $sock = IO::Socket::INET->new( LocalPort => 0 );
 $stamp = siocgstamp( $sock ); $errno = $!+0;
 is( $stamp, undef, 'siocgstamp($sock) fails' );
 is( $errno, ENOENT, 'siocgstamp($sock) errors ENOENT' );
+
+done_testing;

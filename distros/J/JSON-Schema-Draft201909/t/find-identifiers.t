@@ -3,39 +3,12 @@ use warnings;
 no if "$]" >= 5.031009, feature => 'indirect';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::More 0.88;
+use Test::More 0.96;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::Deep;
 use JSON::Schema::Draft201909;
 use lib 't/lib';
 use Helper;
-
-subtest '_find_all_identifiers' => sub {
-  my $js = JSON::Schema::Draft201909->new;
-  $js->_find_all_identifiers(
-    my $schema = {
-      '$defs' => {
-        foo => my $foo_definition = {
-          '$id' => 'my_foo',
-          const => 'foo value',
-        },
-      },
-      '$ref' => 'my_foo',
-    }
-  );
-
-  cmp_deeply(
-    { $js->_resource_index },
-    {
-      '' => { ref => $schema, canonical_uri => str('') },
-      'my_foo' => {
-        ref => $foo_definition,
-        canonical_uri => str('my_foo'),
-      },
-    },
-    'internal resource index is correct',
-  );
-};
 
 subtest '$id sets canonical uri' => sub {
   my $js = JSON::Schema::Draft201909->new;
@@ -69,13 +42,14 @@ subtest '$id sets canonical uri' => sub {
   cmp_deeply(
     { $js->_resource_index },
     {
-      '' => { ref => $schema, canonical_uri => str('') },
+      '' => { path => '', canonical_uri => str(''), document => ignore },
       'http://localhost:4242/my_foo' => {
-        ref => $foo_definition,
+        path => '/$defs/foo',
         canonical_uri => str('http://localhost:4242/my_foo'),
+        document => methods(canonical_uri => str('')),
       },
     },
-    'internal resource index is correct',
+    'resources indexed; document canonical_uri is still unset',
   );
 };
 
@@ -143,20 +117,24 @@ subtest 'anchors' => sub {
     { $js->_resource_index },
     {
       'http://localhost:4242' => {
-        ref => $schema,
+        path => '',
         canonical_uri => str('http://localhost:4242'),
+        document => methods(canonical_uri => str('http://localhost:4242')),
       },
       'http://localhost:4242#my_foo' => {
-        ref => $foo_definition,
+        path => '/$defs/foo',
         canonical_uri => str('http://localhost:4242#/$defs/foo'),
+        document => shallow($js->_get_resource('http://localhost:4242')->{document}),
       },
       'http://localhost:4242#my_bar' => {
-        ref => $bar_definition,
+        path => '/$defs/bar',
         canonical_uri => str('http://localhost:4242#/$defs/bar'),
+        document => shallow($js->_get_resource('http://localhost:4242')->{document}),
       },
       'http://localhost:4242#my_not' => {
-        ref => $not_definition,
+        path => '/allOf/2/not',
         canonical_uri => str('http://localhost:4242#/allOf/2/not'),
+        document => shallow($js->_get_resource('http://localhost:4242')->{document}),
       },
     },
     'internal resource index is correct',
@@ -171,7 +149,7 @@ subtest '$anchor at root without $id' => sub {
       my $schema = {
         '$anchor' => 'root',
         '$defs' => {
-          foo => my $foo_definition = {
+          foo => {
             '$anchor' => 'my_foo',
             const => 'foo value',
           },
@@ -196,35 +174,15 @@ subtest '$anchor at root without $id' => sub {
   cmp_deeply(
     { $js->_resource_index },
     {
-      '' => { ref => $schema, canonical_uri => str('') },
-      '#root' => { ref => $schema, canonical_uri => str('') },
+      '' => { path => '', canonical_uri => str(''), document => ignore },
+      '#root' => { path => '', canonical_uri => str(''), document => ignore },
       '#my_foo' => {
-        ref => $foo_definition,
+        path => '/$defs/foo',
         canonical_uri => str('#/$defs/foo'),
+        document => ignore,
       },
     },
     'internal resource index is correct',
-  );
-};
-
-subtest '$id and $anchor as properties' => sub {
-  my $js = JSON::Schema::Draft201909->new;
-  $js->_find_all_identifiers(
-    my $schema = {
-      type => 'object',
-      properties => {
-        '$id' => { type => 'string' },
-        '$anchor' => { type => 'string' },
-      },
-    }
-  );
-
-  cmp_deeply(
-    { $js->_resource_index },
-    {
-      '' => { ref => $schema, canonical_uri => str('') },
-    },
-    'did not index the $id and $anchor properties as if they were identifier keywords',
   );
 };
 
@@ -308,7 +266,7 @@ subtest 'invalid $id and $anchor' => sub {
           instanceLocation => '',
           keywordLocation => '/allOf/0/else/then/$ref/$anchor',
           absoluteKeywordLocation => 'foo.json#/$defs/bad_anchor/$anchor',
-          error => 'EXCEPTION: my$foo does not match required syntax',
+          error => 'EXCEPTION: $anchor value "my$foo" does not match required syntax',
         }
       ],
     },
@@ -329,7 +287,7 @@ subtest 'invalid $id and $anchor' => sub {
           instanceLocation => '',
           keywordLocation => '/allOf/0/then/$ref/$id',
           absoluteKeywordLocation => 'foo.json#/$defs/bad_id/$id',
-          error => 'EXCEPTION: foo.json#/foo/bar cannot have a non-empty fragment',
+          error => 'EXCEPTION: $id value "foo.json#/foo/bar" cannot have a non-empty fragment',
         }
       ],
     },
@@ -337,45 +295,32 @@ subtest 'invalid $id and $anchor' => sub {
   );
 
   # TODO: bad $anchor should still be absent, because when we have ::Document objects we won't
-  # re-parse a document for $id and $anchors for each evaluation.
+  # re-parse a document for $id and $anchors for each evaluation (in theory?)
 };
 
 subtest 'nested $ids' => sub {
   my $js = JSON::Schema::Draft201909->new(short_circuit => 0);
-  $js->_find_all_identifiers(
-    my $schema = {
-      '$id' => '/foo/bar/baz.json',
-      '$ref' => '/foo/bar/baz.json#/properties/alpha',  # not the canonical URI for this location
-      properties => {
-        alpha => my $alpha = {
-          '$id' => 'alpha.json',
-          additionalProperties => false,
-          properties => {
-            beta => my $beta = {
-              '$id' => '/beta/hello.json',
-              properties => {
-                gamma => my $gamma = {
-                  '$id' => 'gamma.json',
-                  const => 'hello',
-                },
+  my $schema = {
+    '$id' => '/foo/bar/baz.json',
+    '$ref' => '/foo/bar/baz.json#/properties/alpha',  # not the canonical URI for this location
+    properties => {
+      alpha => my $alpha = {
+        '$id' => 'alpha.json',
+        additionalProperties => false,
+        properties => {
+          beta => my $beta = {
+            '$id' => '/beta/hello.json',
+            properties => {
+              gamma => my $gamma = {
+                '$id' => 'gamma.json',
+                const => 'hello',
               },
             },
           },
         },
       },
-    }
-  );
-
-  cmp_deeply(
-    { $js->_resource_index },
-    {
-      '/foo/bar/baz.json' => { ref => $schema, canonical_uri => str('/foo/bar/baz.json') },
-      '/foo/bar/alpha.json' => { ref => $alpha, canonical_uri => str('/foo/bar/alpha.json') },
-      '/beta/hello.json' => { ref => $beta, canonical_uri => str('/beta/hello.json') },
-      '/beta/gamma.json' => { ref => $gamma, canonical_uri => str('/beta/gamma.json') },
     },
-    'properly resolved all the nested $ids',
-  );
+  };
 
   cmp_deeply(
     $js->evaluate(
@@ -430,6 +375,103 @@ subtest 'nested $ids' => sub {
       ],
     },
     'errors have the correct location',
+  );
+
+  cmp_deeply(
+    { $js->_resource_index },
+    {
+      '/foo/bar/baz.json' => {
+        path => '',
+        canonical_uri => str('/foo/bar/baz.json'),
+        document => methods(canonical_uri => str('/foo/bar/baz.json')),
+      },
+      '/foo/bar/alpha.json' => {
+        path => '/properties/alpha',
+        canonical_uri => str('/foo/bar/alpha.json'),
+        document => shallow($js->_get_resource('/foo/bar/baz.json')->{document}),
+      },
+      '/beta/hello.json' => {
+        path => '/properties/alpha/properties/beta',
+        canonical_uri => str('/beta/hello.json'),
+        document => shallow($js->_get_resource('/foo/bar/baz.json')->{document}),
+      },
+      '/beta/gamma.json' => {
+        path => '/properties/alpha/properties/beta/properties/gamma',
+        canonical_uri => str('/beta/gamma.json'),
+        document => shallow($js->_get_resource('/foo/bar/baz.json')->{document}),
+      },
+    },
+    'properly resolved all the nested $ids',
+  );
+};
+
+subtest 'multiple documents, each using canonical_uri = ""' => sub {
+  my $js = JSON::Schema::Draft201909->new;
+  my $schema1 = {
+    allOf => [
+      { '$id' => 'subschema1.json', type => 'string' },
+      { '$id' => 'subschema2.json', type => 'number' },
+    ],
+  };
+  my $schema2 = {
+    anyOf => [
+      { '$id' => 'subschema1.json', type => 'string' },
+      { '$id' => 'subschema3.json', type => 'number' },
+    ],
+  };
+  $js->evaluate(1, $schema1);
+
+  my $resource_index1 = +{ $js->_resource_index };
+  my $document1 = $resource_index1->{''}{document};
+
+  cmp_deeply(
+    $resource_index1,
+    {
+      '' => {
+        path => '',
+        canonical_uri => str(''),
+        document => shallow($document1),
+      },
+      'subschema1.json' => {
+        path => '/allOf/0',
+        canonical_uri => str('subschema1.json'),
+        document => shallow($document1),
+      },
+      'subschema2.json' => {
+        path => '/allOf/1',
+        canonical_uri => str('subschema2.json'),
+        document => shallow($document1),
+      },
+    },
+    'resources in initial schema are indexed',
+  );
+
+  $js->evaluate(1, $schema2);
+
+  my $resource_index2 = +{ $js->_resource_index };
+  my $document2 = $resource_index2->{'subschema3.json'}{document};
+
+  cmp_deeply(
+    $resource_index2,
+    {
+      '' => {
+        path => '',
+        canonical_uri => str(''),
+        document => shallow($document2),    # same uri as earlier, but now points to document2
+      },
+      'subschema1.json' => {
+        path => '/anyOf/0',
+        canonical_uri => str('subschema1.json'),
+        document => shallow($document2),    # same uri as earlier, but now points to document2
+      },
+      # and subschema2.json is gone also
+      'subschema3.json' => {
+        path => '/anyOf/1',
+        canonical_uri => str('subschema3.json'),
+        document => shallow($document2),
+      },
+    },
+    'resources in second schema are indexed; all resources from first schema are removed',
   );
 };
 

@@ -6,6 +6,9 @@ META.json
 META.yml
 README
 cpanfile
+dev-bin/convert-from-csv.pl
 lib/Date/Holidays/TW.pm
 metamerge.json
+t/2017.t
+t/2018.t
 t/simple.t

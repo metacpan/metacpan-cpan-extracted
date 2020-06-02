@@ -32,6 +32,7 @@ my %opts = (
     dir     => undef,    # Directory of MIDI files
     files   => undef,    # MIDI files to process
     size    => 2,        # ngram size
+    min     => 2,        # Minimum repetitions
     max     => 20,       # 0 for all records
     bpm     => 100,      # Beats per minute
     dura    => 'hn qn en', # Note durations
@@ -41,7 +42,6 @@ my %opts = (
     loop    => 4,        # Times to choose a weighted phrase
     weight  => 0,        # Use weighted counts to play
     shuf    => 0,        # Shuffle phrases
-    single  => 0,        # Allow phrases seen only once
     one     => 0,        # Analyze phrases into one list
     image   => 0,        # Output GraphViz network diagram
     thresh  => 10,       # Threshold to show net edges
@@ -55,6 +55,7 @@ GetOptions( \%opts,
     'dir=s',
     'files=s',
     'size=i',
+    'min=i',
     'max=i',
     'bpm=i',
     'dura=s',
@@ -64,7 +65,6 @@ GetOptions( \%opts,
     'loop=i',
     'weight',
     'shuf',
-    'single',
     'one',
     'image',
     'thresh=i',
@@ -86,6 +86,7 @@ $opts{patches} = [ split /(?:\s+|\s*,\s*)/, $opts{patches} ];
 my $mng = MIDI::Ngram->new(
     in_file         => $opts{files},
     ngram_size      => $opts{size},
+    min_phrases     => $opts{min},
     max_phrases     => $opts{max},
     bpm             => $opts{bpm},
     durations       => $opts{dura},
@@ -96,7 +97,6 @@ my $mng = MIDI::Ngram->new(
     loop            => $opts{loop},
     weight          => $opts{weight},
     shuffle_phrases => $opts{shuf},
-    single_phrases  => $opts{single},
     one_channel     => $opts{one},
     patches         => $opts{patches},
 );

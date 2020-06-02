@@ -3,6 +3,15 @@ Revision history for Dist::Zilla::PluginBundle::Author::WATERKIP
 TODO:
 * Get dual license to work with dzil
 
+2.7       2020-06-02 02:03:41Z
+
+    * Fix array['str'] bug with copy files and exclude files in dist.ini
+
+2.6       2020-06-01 19:34:51Z
+
+    * Update [Encoding] with .odt
+    * Fix [Encoding] with extension rather than very globby matching
+
 2.5       2020-05-23 06:06:17Z
 
     * Add [Encoding] to configure

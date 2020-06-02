@@ -41,14 +41,14 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.perl.org/rt3/"
+         "web" : "https://github.com/Perl/perl5/issues"
       },
       "homepage" : "http://dev.perl.org/",
       "repository" : {
          "type" : "git",
-         "url" : "git://perl5.git.perl.org/perl.git"
+         "url" : "git://github.com/Perl/perl5.git"
       }
    },
-   "version" : "5.20200428",
+   "version" : "5.20200602",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

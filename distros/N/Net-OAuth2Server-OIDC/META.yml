@@ -1,0 +1,32 @@
+---
+abstract: 'An OpenID Connect server on top of Net::OAuth2Server'
+author:
+  - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
+build_requires: {}
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-OAuth2Server-OIDC
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Digest::SHA: '0'
+  JSON::WebToken: '0'
+  MIME::Base64: '0'
+  Net::OAuth2Server: '0'
+  parent: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/ap/Net-OAuth2Server-OIDC/issues
+  repository: git://github.com/ap/Net-OAuth2Server-OIDC.git
+version: '0.002'
+x_copyright:
+  holder: 'Aristotle Pagaltzis'
+  year: 2020
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

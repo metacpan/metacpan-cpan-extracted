@@ -17,7 +17,7 @@ use base 'Exporter';
 use constant VALID   => 1;
 use constant INVALID => undef;
 
-$VERSION = '0.13';
+$VERSION = '0.16';
 
 sub valid_cpr {
     return sub {
@@ -67,7 +67,7 @@ Data::FormValidator::Constraints::Business::DK::CPR - constraint for Danish CPR
 
 =head1 VERSION
 
-The documentation describes version 0.01 of Data::FormValidator::Constraints::Business::DK::CPR
+The documentation describes version 0.16 of Data::FormValidator::Constraints::Business::DK::CPR
 
 =head1 SYNOPSIS
 
@@ -100,11 +100,11 @@ L<Data::FormValidator::Constraints>.
 
 =head2 valid_cpr
 
-Checks whether a CPR is valid (see: SYNOPSIS) and L<Business::DK::CPR>
+Checks whether a CPR is valid (see: L</SYNOPSIS>) and L<Business::DK::CPR>
 
 =head2 match_valid_cpr
 
-Untaints a given CPR (see: SYNOPSIS and BUGS AND LIMITATIONS)
+Untaints a given CPR (see: L</SYNOPSIS> and L</"BUGS AND LIMITATIONS">)
 
 =head1 EXPORTS
 
@@ -112,7 +112,7 @@ Data::FormValidator::Constraints::Business::DK::CPR exports on request:
 
 =over
 
-=item L</valid_dk_cpr>
+=item L</valid_cpr>
 
 =item L</match_valid_cpr>
 
@@ -147,7 +147,7 @@ The module has no known incompatibilities.
 =head1 BUGS AND LIMITATIONS
 
 The tests seem to reflect that untainting takes place, but the L</match_valid_cpr> is not called at all, so
-how this untaiting is expected integrated into L<Data::FormValidator> is still not settled (SEE: TODO)
+how this untainting is expected integrated into L<Data::FormValidator> is still not settled (SEE: TODO)
 
 =head1 TEST AND QUALITY
 
@@ -179,28 +179,32 @@ Coverage of the test suite is at 57.6%
 
 =head1 BUG REPORTING
 
-Please report issues via CPAN RT:
+Please report issue via GitHub
 
-  http://rt.cpan.org/NoAuth/Bugs.html?Dist=Business-DK-CPR
+    L<https://github.com/jonasbn/perl-business-dk-cpr/issues>
+
+Alternatively report issues via CPAN RT:
+
+    L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Business-DK-CPR>
 
 or by sending mail to
 
-  bug-Business-DK-CPR@rt.cpan.org
-  
+    bug-Business-DK-CPR@rt.cpan.org
+
 =head1 AUTHOR
 
-Jonas B. Nielsen, (jonasbn) - C<< <jonasbn@cpan.org> >>
+=over
+
+=item * Jonas B., (jonasbn) - C<< <jonasbn@cpan.org> >>
+
+=back
 
 =head1 COPYRIGHT
 
-Business-DK-CPR and related is (C) by Jonas B. Nielsen, (jonasbn) 2006-2014
+Business-DK-CPR and related is (C) by Jonas B., (jonasbn) 2006-2020
 
 =head1 LICENSE
 
-Business-DK-CPR and related is released under the artistic license
-
-The distribution is licensed under the Artistic License, as specified
-by the Artistic file in the standard perl distribution
-(L<http://www.perl.com/language/misc/Artistic.html>).
+Business-DK-CPR and related is released under the Artistic License 2.0
 
 =cut

@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::SetField;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 # ABSTRACT: mtpolicyd plugin which just sets and key=value in the session
 
 
@@ -36,7 +36,7 @@ Mail::MtPolicyd::Plugin::SetField - mtpolicyd plugin which just sets and key=val
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 DESCRIPTION
 

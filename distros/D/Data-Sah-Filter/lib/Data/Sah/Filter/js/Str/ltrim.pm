@@ -1,9 +1,9 @@
 package Data::Sah::Filter::js::Str::ltrim;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-30'; # DATE
+our $DATE = '2020-05-31'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -43,7 +43,7 @@ Data::Sah::Filter::js::Str::ltrim - Trim whitespace at the beginning of string
 
 =head1 VERSION
 
-This document describes version 0.005 of Data::Sah::Filter::js::Str::ltrim (from Perl distribution Data-Sah-Filter), released on 2020-05-30.
+This document describes version 0.006 of Data::Sah::Filter::js::Str::ltrim (from Perl distribution Data-Sah-Filter), released on 2020-05-31.
 
 =head1 SYNOPSIS
 

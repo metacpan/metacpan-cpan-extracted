@@ -1,7 +1,7 @@
 package Pod::Weaver::Plugin::Regexp::Pattern;
 
-our $DATE = '2020-02-11'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2020-05-31'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -123,11 +123,12 @@ sub _process_module {
                 }
                 last unless @eg;
                 push @pod, "Examples:\n\n";
+                my $i = 0;
                 for my $eg (@eg) {
-                    if (defined $eg->{summary}) {
-                        require String::PodQuote;
-                        push @pod, String::PodQuote::pod_quote($eg->{summary}), ".\n\n";
-                    }
+                    $i++;
+                    my $summary = $eg->{summary} // "Example #$i";
+                    require String::PodQuote;
+                    push @pod, String::PodQuote::pod_quote($summary), ".\n\n";
 
                     push @pod, " ", dmp($eg->{str}), " =~ re(", dmp("$rp_package\::$patname"), ($eg->{gen_args} ? ", ".dmp($eg->{gen_args}) : ""), "); ";
                     if (ref $eg->{matches} eq 'ARRAY') {
@@ -137,7 +138,7 @@ sub _process_module {
                                     "\$".($_+1)."=".dmp($eg->{matches}[$_])}
                                      0..$#{$eg->{matches}});
                         } else {
-                            push @pod, " # doesn't match";
+                            push @pod, " # DOESN'T MATCH";
                         }
                     } elsif (ref $eg->{matches} eq 'HASH') {
                         if (keys %{ $eg->{matches} }) {
@@ -146,13 +147,13 @@ sub _process_module {
                                     "\$+{" . dmp($_) . "}=" . dmp($eg->{matches}{$_})}
                                      sort keys %{$eg->{matches}});
                         } else {
-                            push @pod, " # doesn't match";
+                            push @pod, " # DOESN'T MATCH";
                         }
                     } else {
                         if ($eg->{matches}) {
                             push @pod, " # matches";
                         } else {
-                            push @pod, " # doesn't match";
+                            push @pod, " # DOESN'T MATCH";
                         }
                     }
                     push @pod, "\n\n";
@@ -216,7 +217,7 @@ Pod::Weaver::Plugin::Regexp::Pattern - Plugin to use when building Regexp::Patte
 
 =head1 VERSION
 
-This document describes version 0.005 of Pod::Weaver::Plugin::Regexp::Pattern (from Perl distribution Pod-Weaver-Plugin-Regexp-Pattern), released on 2020-02-11.
+This document describes version 0.007 of Pod::Weaver::Plugin::Regexp::Pattern (from Perl distribution Pod-Weaver-Plugin-Regexp-Pattern), released on 2020-05-31.
 
 =head1 SYNOPSIS
 

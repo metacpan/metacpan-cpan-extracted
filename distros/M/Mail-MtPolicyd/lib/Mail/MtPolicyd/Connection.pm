@@ -2,7 +2,7 @@ package Mail::MtPolicyd::Connection;
 
 use Moose;
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 # ABSTRACT: base class for mtpolicyd connection modules
 
 has 'name' => ( is => 'ro', isa => 'Str', required => 1 );
@@ -36,7 +36,7 @@ Mail::MtPolicyd::Connection - base class for mtpolicyd connection modules
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 AUTHOR
 

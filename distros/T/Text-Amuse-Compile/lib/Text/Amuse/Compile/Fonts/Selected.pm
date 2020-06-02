@@ -120,7 +120,8 @@ HYPERREF
     my $orig_lang = $args{lang} || 'english';
 
     my %aliases = (
-                   macedonian => 'russian',
+                   # pre texlive-2020
+                   # macedonian => 'russian',
                    serbian => 'croatian',
                   );
 
@@ -139,17 +140,6 @@ HYPERREF
 
     foreach my $l (sort keys %langs) {
         push @out, "\\newfontfamily\\${l}font" . $self->_fontspec_args(main => $l);
-    }
-
-
-    # special cases.
-    my %toc_names = (
-                     macedonian => 'Содржина',
-                    );
-
-    if (my $toc_name = $toc_names{$orig_lang}) {
-        push @out, sprintf('\\renewcaptionname{%s}{\\contentsname}{%s}',
-                           $lang, $toc_names{$orig_lang});
     }
 
     if ($args{bidi}) {

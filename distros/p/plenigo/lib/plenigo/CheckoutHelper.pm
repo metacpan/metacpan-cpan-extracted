@@ -8,9 +8,12 @@ package plenigo::CheckoutHelper;
 
  use plenigo::CheckoutHelper;
 
- my $product = plenigo::Product->createPlenigoProduct('PRODUCT_ID');
+ my $use_stage = 0; # set if stage system should be used
+ my $configuration = plenigo::Configuration->new(access_token => 'ACCESS_TOKEN', use_stage => $use_stage);
+ 
+ my $offer = plenigo::Offer->createPlenigoOffer('CUSTOMER_ID', 'CUSTOMER_IP_ADDRESS', ((plenigoOfferId => 'OFFER_ID1')));
  my $checkout_helper = plenigo::CheckoutHelper->new(configuration => $configuration);
- my $checkout_code = $checkout_helper->createCheckoutCode($product);
+ my $purchase_id = $checkout_helper->getPurchaseId($offer);
 
 =head1 DESCRIPTION
 
@@ -23,7 +26,7 @@ use Carp qw(confess);
 use Crypt::JWT qw(encode_jwt);
 use Data::UUID;
 
-our $VERSION = '2.0006';
+our $VERSION = '3.0000';
 
 has configuration => (
     is       => 'ro',
@@ -34,21 +37,23 @@ has configuration => (
 
 =cut
 
-=head2 createCheckoutCode($product)
+=head2 getPurchaseId($offer)
 
- Create checkout code necessary for plenigo checkout.
+ Get purchase id necessary for plenigo checkout.
 
 =cut
 
 sub createCheckoutCode {
-    my ($self, $product) = @_;
+    my ($self, $offer) = @_;
 
-    my $ug = Data::UUID->new;
-    my $uuid = $ug->create();
-    my %checkout_data = $product->createCheckoutData($self->configuration);
-    $checkout_data{'jti'} = $ug->to_string($uuid);
-    $checkout_data{'aud'} = 'plenigo';
-    return encode_jwt(payload => {%checkout_data}, alg => 'HS256', key => $self->configuration->secret);
+    my $rest_client = plenigo::RestClient->new(configuration => $self->configuration);
+    my %result = $rest_client->post('checkout/preparePurchase', {}, $offer);
+
+    if ($result{'response_code'} == 404) {
+        plenigo::Ex->throw({ code => 404, message => 'There is no customer for the customer id passed.' });
+    }
+
+    return %{$result{'response_content'}};
 }
 
 1;

@@ -1,3 +1,9 @@
+0.129   2020-06-02  Released-By: PERLANCAR; Urgency: medium
+
+	- [refactor] Move adding '(info_)backend', 'type_from_name' fields
+	  to Media::Info.
+
+
 0.128   2020-05-30  Released-By: PERLANCAR; Urgency: medium
 
 	- [cli media-summary-by-type] Show total of ALL, audio+image+video,

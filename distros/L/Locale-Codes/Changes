@@ -7,9 +7,16 @@ This document is automatically generated from the document:
 and that document should be considered the canonical source of change
 related information.
 
+3.64  2020-06-02  sbeck
+  -  NEW CODE(s)
+  -  Fixed bug deleting retired codes
+         The delete_code function failed if you tried to delete a retired
+         code. This is now fixed. GitHub #12
+
 3.63  2020-03-01  sbeck
   -  NEW CODE(s)
-         NOTE: no code changes on 2019-12-01
+         NOTE: no code changes on 2019-12-01 so no release made at that
+         time.
 
   -  Fixed a retired code
 

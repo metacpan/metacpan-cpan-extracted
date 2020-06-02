@@ -1,5 +1,13 @@
 Revision history for MIDI-Ngram
 
+0.1700 2020-06-02 14:41:49
+    - Replace the single_phrases Boolean attribute with a more generic min_phrases integer.
+    - Make the note and duration net creation respect the min_phrases.
+    - Make the max_phrases default to zero (analyze all events).
+
+0.1601 2020-05-31 22:14:56
+    - Fix crucial variable in the ->dura_convert method.
+
 0.1600 2020-05-27 12:02:38
     - Improve eg/ngram-play.
     - Improve dist.ini.

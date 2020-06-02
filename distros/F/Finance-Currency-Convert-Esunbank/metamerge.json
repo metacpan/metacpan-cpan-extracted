@@ -1,0 +1,14 @@
+{
+    "name": "Finance-Currency-Convert-Esunbank",
+    "x_static_install": true,
+    "resources": {
+        "bugtracker": {
+            "web": "https://github.com/perltaiwan/Finance-Currency-Convert-Esunbank/issues"
+        },
+        "repository": {
+            "web": "https://github.com/perltaiwan/Finance-Currency-Convert-Esunbank",
+            "url": "https://github.com/perltaiwan/Finance-Currency-Convert-Esunbank.git",
+            "type": "git"
+        }
+    }
+}

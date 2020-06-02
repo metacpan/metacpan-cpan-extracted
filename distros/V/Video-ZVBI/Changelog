@@ -1,3 +1,11 @@
+libzvbi-perl (1.1.1) stable; urgency=low
+
+  * Fix for missing "utf8_to_uvchr_buf" with Perl < 5.15: solved by
+    generating ppport_zvbi.h with Devel-PPPort-3.58 (latest release);
+    Thanks to Slaven Rezic for detecting & reporting this issue.
+
+ -- T. Zoerner <tomzo@users.sourceforge.net>  Sun, 31 May 2020 19:38:00 +0200
+
 libzvbi-perl (1.1.0) stable; urgency=low
 
   * Adapted example scripts for use with DVB capture cards: Globally added

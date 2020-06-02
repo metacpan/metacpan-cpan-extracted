@@ -56,10 +56,12 @@ following `dist.ini`:
 
     [Encoding]
     encoding = bytes
-    match = ico
-    match = docx
-    match = zip
-    match = ztb ; Mintlab specific
+    match = \.ico$
+    match = \.docx?$
+    match = \.zip$
+    match = \.ztb$ ; Mintlab specific
+    match = \.pdf$
+    match = \.odt$
 
     [CPANFile]
 

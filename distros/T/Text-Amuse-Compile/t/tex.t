@@ -18,10 +18,10 @@ binmode STDOUT, ':encoding(utf-8)';
 binmode STDERR, ':encoding(utf-8)';
 
 if ($ENV{TEST_WITH_LATEX}) {
-    plan tests => 159;
+    plan tests => 158;
 }
 else {
-    plan tests => 142;
+    plan tests => 141;
 }
 
 
@@ -104,9 +104,8 @@ test_file($file_with_toc, {
                           }, [
           qr/scrbook/,
           qr/\n\s+oneside\,\%\n/s,
-          qr/^\\setmainlanguage\{russian\}/m,
-          qr/\\renewcaptionname\{russian\}\{\\contentsname\}\{Содржина\}/,
-          qr/\\russianfont\{CMU\sSerif\}\[Script=Cyrillic/,
+          qr/^\\setmainlanguage\{macedonian\}/m,
+          qr/\\macedonianfont\{CMU\sSerif\}\[Script=Cyrillic/,
           qr/paper=210mm:11in/,
           qr/\\end\{titlepage\}\s*\\cleardoublepage/s,
                              ]
@@ -165,17 +164,16 @@ test_file({
           {
           }, [
           qr/croatian/,
-          qr/russian/,
+          qr/macedonian/,
           qr/Pallino.*Pinco.*Second.*author/s,
-          qr/mainlanguage\{russian}.*selectlanguage\{croatian}.*selectlanguage\{russian}/s,
+          qr/mainlanguage\{macedonian}.*selectlanguage\{croatian}.*selectlanguage\{macedonian}/s,
           qr/\\end\{titlepage\}\s*\\cleardoublepage/s,
-          qr/\\setmainlanguage\{russian\}\s*
+          qr/\\setmainlanguage\{macedonian\}\s*
              \\setotherlanguages\{croatian\}\s*
              \\setmainfont\{CMU\sSerif\}\[Script=Cyrillic
              .*?
              \\newfontfamily\s*
-             \\russianfont\{CMU\sSerif\}\[Script=Cyrillic.*?
-             \\renewcaptionname\{russian\}\{\\contentsname\}\{Содржина\}
+             \\macedonianfont\{CMU\sSerif\}\[Script=Cyrillic.*?
              .*
              /sx,
              ],
@@ -191,15 +189,15 @@ test_file({
           },
           [
           qr/\\end\{titlepage\}\s*\\cleardoublepage/s,
-          qr/mainlanguage\{croatian}.*selectlanguage\{russian}.*selectlanguage\{croatian}/s,
+          qr/mainlanguage\{croatian}.*selectlanguage\{macedonian}.*selectlanguage\{croatian}/s,
           qr/Second.*author.*Pallino.*Pinco/s,
           qr/croatian/,
-          qr/russian/,
+          qr/macedonian/,
           qr/\\setmainlanguage\{croatian\}\s*
-             \\setotherlanguages\{russian\}\s*
+             \\setotherlanguages\{macedonian\}\s*
              .*
              \\newfontfamily\s*
-             \\russianfont\{CMU\sSerif\}\[Script=Cyrillic
+             \\macedonianfont\{CMU\sSerif\}\[Script=Cyrillic
              .*
             /sx
           ],
@@ -214,16 +212,16 @@ test_file({
           {
           },
           [
-          qr/mainlanguage\{russian}.*
+          qr/mainlanguage\{macedonian}.*
              selectlanguage\{croatian}.*
-             selectlanguage\{russian}.*
+             selectlanguage\{macedonian}.*
              selectlanguage\{italian}/sx,
           qr/\\begin\{document\}\s*
              \\hyphenation\{\s*pal-li-no\s*pin-co\s*\}.*
              \\hyphenation\{\s*pal-li-no\s*pin-co\s*\}.*
              \\selectlanguage\{croatian\}\s*
              \\hyphenation\{\s*a-no-ther\s*te-st\s*\}.*
-             \\selectlanguage\{russian\}\s*
+             \\selectlanguage\{macedonian\}\s*
              \\hyphenation\{\s*pal-li-no\s*pin-co\s*\}.*
              \\selectlanguage\{italian\}\s*
              \\hyphenation\{\s*ju-st\s*th-is\s*\}

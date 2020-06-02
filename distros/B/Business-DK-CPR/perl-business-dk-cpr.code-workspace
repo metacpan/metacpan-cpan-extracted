@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {},
+	"perlcritic.additionalArguments": [
+        "--profile",
+        "t/perlcriticrc"
+    ]
+}

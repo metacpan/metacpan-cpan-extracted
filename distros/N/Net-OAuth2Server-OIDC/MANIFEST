@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.json                                Module JSON meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+Makefile.PL
+README
+boilerplate.pl
+lib/Net/OAuth2Server/OIDC.pm
+lib/Net/OAuth2Server/OIDC/GrantUtil.pm
+lib/Net/OAuth2Server/OIDC/Request/Authorization.pm
+lib/Net/OAuth2Server/OIDC/Response.pm
+t/compile.t

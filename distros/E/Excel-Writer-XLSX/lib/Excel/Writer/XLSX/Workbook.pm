@@ -7,7 +7,7 @@ package Excel::Writer::XLSX::Workbook;
 #
 # Used in conjunction with Excel::Writer::XLSX
 #
-# Copyright 2000-2019, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2020, John McNamara, jmcnamara@cpan.org
 #
 # Documentation after __END__
 #
@@ -34,7 +34,7 @@ use Excel::Writer::XLSX::Package::XMLwriter;
 use Excel::Writer::XLSX::Utility qw(xl_cell_to_rowcol xl_rowcol_to_cell);
 
 our @ISA     = qw(Excel::Writer::XLSX::Package::XMLwriter);
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 
 ###############################################################################
@@ -98,6 +98,7 @@ sub new {
     $self->{_tab_ratio}          = 600;
     $self->{_excel2003_style}    = 0;
     $self->{_max_url_length}     = 2079;
+    $self->{_has_comments}       = 0;
 
     $self->{_default_format_properties} = {};
 
@@ -524,11 +525,6 @@ sub _check_sheetname {
     # Check that sheetname doesn't start or end with an apostrophe.
     if ( $name =~ /^'/ || $name =~ /'$/) {
         croak "Worksheet name $name cannot start or end with an apostrophe";
-    }
-
-    # Check that sheetname isn't a reserved word.
-    if ( lc($name) eq 'history') {
-        croak "Worksheet name cannot be Excel reserved word 'History'";
     }
 
     # Check that the worksheet name doesn't already exist since this is a fatal
@@ -1930,8 +1926,12 @@ sub _prepare_vml_objects {
 
         if ( $sheet->{_has_vml} ) {
 
-            $comment_files++ if $sheet->{_has_comments};
-            $comment_id++    if $sheet->{_has_comments};
+            if ( $sheet->{_has_comments} ) {
+                $comment_files++;
+                $comment_id++;
+                $self->{_has_comments} = 1;
+            }
+
             $vml_drawing_id++;
 
             my $count =
@@ -1956,21 +1956,6 @@ sub _prepare_vml_objects {
     $self->{_num_vml_files}     = $vml_files;
     $self->{_num_comment_files} = $comment_files;
 
-    # Add a font format for cell comments.
-    if ( $comment_files > 0 ) {
-        my $format = Excel::Writer::XLSX::Format->new(
-            \$self->{_xf_format_indices},
-            \$self->{_dxf_format_indices},
-            font          => 'Tahoma',
-            size          => 8,
-            color_indexed => 81,
-            font_only     => 1,
-        );
-
-        $format->get_xf_index();
-
-        push @{ $self->{_formats} }, $format;
-    }
 }
 
 
@@ -2841,6 +2826,6 @@ John McNamara jmcnamara@cpan.org
 
 =head1 COPYRIGHT
 
-(c) MM-MMXIX, John McNamara.
+(c) MM-MMXX, John McNamara.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.

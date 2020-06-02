@@ -8,7 +8,7 @@ plan skip_all => 'set TEST_ONLINE to enable this test' unless $ENV{TEST_ONLINE};
 
 use Mojo::Pg;
 use Mojolicious::Lite;
-use Scalar::Util 'refaddr';
+use Scalar::Util qw(refaddr);
 use Test::Mojo;
 
 # Isolate tests
@@ -49,14 +49,11 @@ $t->get_ok('/app_test')->status_is(404);
 # Blocking select (with connection reuse)
 $t->get_ok('/blocking')->status_is(200)->content_is('I ♥ Mojolicious!');
 my $ref = $t->tx->res->headers->header('X-Ref');
-$t->get_ok('/blocking')->status_is(200)->header_is('X-Ref', $ref)
-  ->content_is('I ♥ Mojolicious!');
+$t->get_ok('/blocking')->status_is(200)->header_is('X-Ref', $ref)->content_is('I ♥ Mojolicious!');
 
 # Non-blocking select (with connection reuse)
-$t->get_ok('/non-blocking')->status_is(200)->header_is('X-Ref', $ref)
-  ->content_is('I ♥ Mojolicious!');
-$t->get_ok('/non-blocking')->status_is(200)->header_is('X-Ref', $ref)
-  ->content_is('I ♥ Mojolicious!');
+$t->get_ok('/non-blocking')->status_is(200)->header_is('X-Ref', $ref)->content_is('I ♥ Mojolicious!');
+$t->get_ok('/non-blocking')->status_is(200)->header_is('X-Ref', $ref)->content_is('I ♥ Mojolicious!');
 $t->app->pg->db->query('drop table app_test');
 
 # Clean up once we are done

@@ -10,8 +10,6 @@ Available modules:
 
 - [plenigo::CheckoutHelper](./lib/plenigo/CheckoutHelper.pm) - Utility class offering support for checkout functionality
 
-- [plenigo::CompanySettingsManager](./lib/plenigo/CompanySettingsManager.pm) - Utility class to handle company settings manager
-
 - [plenigo::Configuration](./lib/plenigo/Configuration.pm) - Contains all base configuration settings
 
 - [plenigo::CustomersManager](./lib/plenigo/CustomersManager.pm) - Utility class to handle customers

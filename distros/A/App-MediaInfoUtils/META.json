@@ -39,11 +39,8 @@
             "Data::Sah::Compiler::perl::TH::str" : "0",
             "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" : "0",
             "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" : "0",
-            "Filename::Audio" : "0.002",
-            "Filename::Image" : "0.002",
-            "Filename::Video" : "0.002",
             "Log::ger" : "0.037",
-            "Media::Info" : "0",
+            "Media::Info" : "0.131",
             "Perinci::CmdLine::Any" : "0",
             "Perinci::CmdLine::Lite" : "1.827",
             "Perinci::Exporter" : "0.080",
@@ -75,7 +72,7 @@
          "web" : "https://github.com/perlancar/perl-App-MediaInfoUtils"
       }
    },
-   "version" : "0.128",
+   "version" : "0.129",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2012 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2020 -- leonerd@leonerd.org.uk
 
 package Socket::Packet;
 
@@ -10,7 +10,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -38,25 +38,25 @@ C<Socket::Packet> - interface to Linux's C<PF_PACKET> socket family
 
 =head1 SYNOPSIS
 
- use Socket qw( SOCK_RAW );
- use Socket::Packet qw(
-    PF_PACKET
-    ETH_P_ALL
-    pack_sockaddr_ll unpack_sockaddr_ll
- );
- 
- socket( my $sock, PF_PACKET, SOCK_RAW, 0 )
-    or die "Cannot socket() - $!\n";
- 
- bind( $sock, pack_sockaddr_ll( ETH_P_ALL, 0, 0, 0, "" ) )
-    or die "Cannot bind() - $!\n";
- 
- while( my $addr = recv( $sock, my $packet, 8192, 0 ) ) {
-    my ( $proto, $ifindex, $hatype, $pkttype, $addr )
-       = unpack_sockaddr_ll( $addr );
+   use Socket qw( SOCK_RAW );
+   use Socket::Packet qw(
+      PF_PACKET
+      ETH_P_ALL
+      pack_sockaddr_ll unpack_sockaddr_ll
+   );
 
-    ...
- }
+   socket( my $sock, PF_PACKET, SOCK_RAW, 0 )
+      or die "Cannot socket() - $!\n";
+
+   bind( $sock, pack_sockaddr_ll( ETH_P_ALL, 0, 0, 0, "" ) )
+      or die "Cannot bind() - $!\n";
+
+   while( my $addr = recv( $sock, my $packet, 8192, 0 ) ) {
+      my ( $proto, $ifindex, $hatype, $pkttype, $addr )
+         = unpack_sockaddr_ll( $addr );
+
+      ...
+   }
 
 =head1 DESCRIPTION
 
@@ -207,58 +207,78 @@ The underlying hardware address, in the type given by C<hatype>.
 
 =back
 
-=head2 $a = pack_sockaddr_ll( $protocol, $ifindex, $hatype, $pkttype, $addr )
+=head2 pack_sockaddr_ll
+
+   $a = pack_sockaddr_ll( $protocol, $ifindex, $hatype, $pkttype, $addr )
 
 Returns a C<sockaddr_ll> structure with the fields packed into it.
 
-=head2 ( $protocol, $ifindex, $hatype, $pkttype, $addr ) = unpack_sockaddr_ll( $a )
+=head2 unpack_sockaddr_ll
+
+   ( $protocol, $ifindex, $hatype, $pkttype, $addr ) = unpack_sockaddr_ll( $a )
 
 Takes a C<sockaddr_ll> structure and returns the unpacked fields from it.
 
-=head2 $mreq = pack_packet_mreq( $ifindex, $type, $addr )
+=head2 pack_packet_mreq
+
+   $mreq = pack_packet_mreq( $ifindex, $type, $addr )
 
 Returns a C<packet_mreq> structure with the fields packed into it.
 
-=head2 ( $ifindex, $type, $addr ) = unpack_packet_mreq( $mreq )
+=head2 unpack_packet_mreq
+
+   ( $ifindex, $type, $addr ) = unpack_packet_mreq( $mreq )
 
 Takes a C<packet_mreq> structure and returns the unpacked fields from it.
 
-=head2 ( $packets, $drops ) = unpack_tpacket_stats( $stats )
+=head2 unpack_tpacket_stats
+
+   ( $packets, $drops ) = unpack_tpacket_stats( $stats )
 
 Takes a C<tpacket_stats> structure from the C<PACKET_STATISTICS> sockopt and
 returns the unpacked fields from it.
 
-=head2 $time = siocgstamp( $sock )
+=head2 siocgstamp
 
-=head2 ( $sec, $usec ) = siocgstamp( $sock )
+   $time = siocgstamp( $sock )
+
+   ( $sec, $usec ) = siocgstamp( $sock )
 
 Returns the timestamp of the last received packet on the socket (as obtained
 by the C<SIOCGSTAMP> C<ioctl>). In scalar context, returns a single
 floating-point value in UNIX epoch seconds. In list context, returns the
 number of seconds, and the number of microseconds.
 
-=head2 $time = siocgstampns( $sock )
+=head2 siocgstampns
 
-=head2 ( $sec, $nsec ) = siocgstampns( $sock )
+   $time = siocgstampns( $sock )
+
+   ( $sec, $nsec ) = siocgstampns( $sock )
 
 Returns the nanosecond-precise timestamp of the last received packet on the
 socket (as obtained by the C<SIOCGSTAMPNS> C<ioctl>). In scalar context,
 returns a single floating-point value in UNIX epoch seconds. In list context,
 returns the number of seconds, and the number of nanoseconds.
 
-=head2 $ifindex = siocgifindex( $sock, $ifname )
+=head2 siocgifindex
+
+   $ifindex = siocgifindex( $sock, $ifname )
 
 Returns the C<ifindex> of the interface with the given name if one exists, or
 C<undef> if not. C<$sock> does not need to be a C<PF_PACKET> socket, any
 socket handle will do.
 
-=head2 $ifname = siocgifname( $sock, $ifindex )
+=head2 siocgifname
+
+   $ifname = siocgifname( $sock, $ifindex )
 
 Returns the C<ifname> of the interface at the given index if one exists, or
 C<undef> if not. C<$sock> does not need to be a C<PF_PACKET> socket, any
 socket handle will do.
 
-=head2 ( $addr, $len ) = recv_len( $sock, $buffer, $maxlen, $flags )
+=head2 recv_len
+
+   ( $addr, $len ) = recv_len( $sock, $buffer, $maxlen, $flags )
 
 Similar to Perl's C<recv> builtin, except it returns the packet length as an
 explict return value. This may be useful if C<$flags> contains the
@@ -280,7 +300,9 @@ message.
 
 =cut
 
-=head2 $size = setup_rx_ring( $sock, $frame_size, $frame_nr, $block_size )
+=head2 setup_rx_ring
+
+   $size = setup_rx_ring( $sock, $frame_size, $frame_nr, $block_size )
 
 Sets up the ring-buffer on the socket. The buffer will store C<$frame_nr>
 frames of up to C<$frame_size> bytes each (including metadata headers), and
@@ -290,7 +312,9 @@ should be a power of 2, at minimum, 4KiB.
 If successful, the overall size of the buffer in bytes is returned. If not,
 C<undef> is returned, and C<$!> will hold the error value.
 
-=head2 $status = get_ring_frame_status( $sock )
+=head2 get_ring_frame_status
+
+   $status = get_ring_frame_status( $sock )
 
 Returns the frame status of the next frame in the ring.
 
@@ -313,7 +337,9 @@ frame.
 
 =back
 
-=head2 $len = get_ring_frame( $sock, $buffer, \%info )
+=head2 get_ring_frame
+
+   $len = get_ring_frame( $sock, $buffer, \%info )
 
 If the next frame is ready for userland, fills in keys of the C<%info> hash
 with its metadata, sets C<$buffer> to its contents, and return the length of
@@ -370,7 +396,9 @@ Fields from the C<struct sockaddr_ll>; see above for more detail
 
 =back
 
-=head2 clear_ring_frame( $sock )
+=head2 clear_ring_frame
+
+   clear_ring_frame( $sock )
 
 Clears the status of current frame to hand it back to the kernel and moves on
 to the next.

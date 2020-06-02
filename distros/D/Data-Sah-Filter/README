@@ -2,8 +2,8 @@ NAME
     Data::Sah::Filter - Filtering for Data::Sah
 
 VERSION
-    This document describes version 0.005 of Data::Sah::Filter (from Perl
-    distribution Data-Sah-Filter), released on 2020-05-30.
+    This document describes version 0.006 of Data::Sah::Filter (from Perl
+    distribution Data-Sah-Filter), released on 2020-05-31.
 
 SYNOPSIS
      use Data::Sah::Filter qw(gen_filter);

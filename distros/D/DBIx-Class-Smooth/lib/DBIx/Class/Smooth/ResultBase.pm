@@ -6,7 +6,7 @@ package DBIx::Class::Smooth::ResultBase;
 
 # ABSTRACT: Short intro
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0102';
+our $VERSION = '0.0103';
 
 use parent 'DBIx::Class::Core';
 
@@ -61,12 +61,12 @@ DBIx::Class::Smooth::ResultBase - Short intro
 
 =head1 VERSION
 
-Version 0.0102, released 2019-12-22.
+Version 0.0103, released 2020-05-31.
 
 =head1 SYNOPSIS
 
     # in MyApp::Schema::Result::YourResultClass, instead of inheriting from DBIx::Class::Core
-    use base 'DBIx::Class::Sweeten::Result::Base';
+    use base 'DBIx::Class::Smooth::Result::Base';
 
     # DBIx::Class::Candy is always nice
     use DBIx::Class::Candy;
@@ -94,7 +94,7 @@ If given a one-character value, that evaluates to true, an index is created name
 
 =item *
 
-If given a more-than-one-character value an index is created name C<[table_name]_idxm_[index_name]>. If multiple columns are given the same name a composite index is created.
+If given a more-than-one-character value an index is created named C<[table_name]_idxm_[index_name]>. If multiple columns are given the same name a composite index is created.
 
 =item *
 

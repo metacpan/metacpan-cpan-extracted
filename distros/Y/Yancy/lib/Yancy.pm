@@ -1,6 +1,6 @@
 package Yancy;
-our $VERSION = '1.056';
-# ABSTRACT: A simple framework and editor for content-driven Mojolicious websites
+our $VERSION = '1.057';
+# ABSTRACT: The Best Web Framework Deserves the Best CMS
 
 #pod =head1 SYNOPSIS
 #pod
@@ -28,13 +28,13 @@ our $VERSION = '1.056';
 #pod
 #pod L<Yancy> is a simple content management system (CMS) for administering
 #pod content in a database. Yancy accepts a configuration file that describes
-#pod the data in the database and builds a website that lists all of the
-#pod available data and allows a user to edit data, delete data, and add new
+#pod the data in the database, builds a website that lists all of the
+#pod available data, and allows a user to edit data, delete data, and add new
 #pod data.
 #pod
-#pod Yancy uses L<JSON Schema|http://json-schema.org> to define the data in
-#pod the database. The schema is added to an L<OpenAPI
-#pod specification|http://openapis.org> which creates a L<REST
+#pod Yancy uses L<JSON Schema|http://json-schema.org> to describe the data in
+#pod a database and configure forms and applications. The schema is added to
+#pod an L<OpenAPI specification|http://openapis.org> which creates a L<REST
 #pod API|https://en.wikipedia.org/wiki/Representational_state_transfer> for
 #pod your data.
 #pod
@@ -46,8 +46,9 @@ our $VERSION = '1.056';
 #pod (L<Yancy::Backend> modules). Backends exist for L<Postgres via
 #pod Mojo::Pg|Yancy::Backend::Pg>, L<MySQL via
 #pod Mojo::mysql|Yancy::Backend::Mysql>, L<SQLite via
-#pod Mojo::SQLite|Yancy::Backend::Sqlite>, and L<DBIx::Class, a Perl
-#pod ORM|Yancy::Backend::Dbic>
+#pod Mojo::SQLite|Yancy::Backend::Sqlite>, L<DBIx::Class, a Perl
+#pod ORM|Yancy::Backend::Dbic>, and even L<static YAML and Markdown files
+#pod using Yancy::Backend::Static|Yancy::Backend::Static>.
 #pod
 #pod =head2 Mojolicious Plugin
 #pod
@@ -55,6 +56,12 @@ our $VERSION = '1.056';
 #pod management of Mojolicious applications. Yancy provides:
 #pod
 #pod =over
+#pod
+#pod =item *
+#pod
+#pod An L<administrative application|Yancy::Plugin::Editor> that allows
+#pod editing and managing your site's content. This app is highly
+#pod customizable using additional JavaScript.
 #pod
 #pod =item *
 #pod
@@ -146,6 +153,8 @@ our $VERSION = '1.056';
 #pod
 #pod =item * L<Yancy::Help::Upgrading> - How to upgrade from previous versions
 #pod
+#pod =item * L<Yancy::Help::Cookbook> - How to cook various apps with Yancy
+#pod
 #pod =back
 #pod
 #pod =head1 BUNDLED PROJECTS
@@ -214,11 +223,11 @@ sub startup {
 
 =head1 NAME
 
-Yancy - A simple framework and editor for content-driven Mojolicious websites
+Yancy - The Best Web Framework Deserves the Best CMS
 
 =head1 VERSION
 
-version 1.056
+version 1.057
 
 =head1 SYNOPSIS
 
@@ -242,13 +251,13 @@ version 1.056
 
 L<Yancy> is a simple content management system (CMS) for administering
 content in a database. Yancy accepts a configuration file that describes
-the data in the database and builds a website that lists all of the
-available data and allows a user to edit data, delete data, and add new
+the data in the database, builds a website that lists all of the
+available data, and allows a user to edit data, delete data, and add new
 data.
 
-Yancy uses L<JSON Schema|http://json-schema.org> to define the data in
-the database. The schema is added to an L<OpenAPI
-specification|http://openapis.org> which creates a L<REST
+Yancy uses L<JSON Schema|http://json-schema.org> to describe the data in
+a database and configure forms and applications. The schema is added to
+an L<OpenAPI specification|http://openapis.org> which creates a L<REST
 API|https://en.wikipedia.org/wiki/Representational_state_transfer> for
 your data.
 
@@ -260,8 +269,9 @@ Yancy can manage data in multiple databases using different backends
 (L<Yancy::Backend> modules). Backends exist for L<Postgres via
 Mojo::Pg|Yancy::Backend::Pg>, L<MySQL via
 Mojo::mysql|Yancy::Backend::Mysql>, L<SQLite via
-Mojo::SQLite|Yancy::Backend::Sqlite>, and L<DBIx::Class, a Perl
-ORM|Yancy::Backend::Dbic>
+Mojo::SQLite|Yancy::Backend::Sqlite>, L<DBIx::Class, a Perl
+ORM|Yancy::Backend::Dbic>, and even L<static YAML and Markdown files
+using Yancy::Backend::Static|Yancy::Backend::Static>.
 
 =head2 Mojolicious Plugin
 
@@ -269,6 +279,12 @@ Yancy is primarily a Mojolicious plugin to ease development and
 management of Mojolicious applications. Yancy provides:
 
 =over
+
+=item *
+
+An L<administrative application|Yancy::Plugin::Editor> that allows
+editing and managing your site's content. This app is highly
+customizable using additional JavaScript.
 
 =item *
 
@@ -359,6 +375,8 @@ is located at C</yancy/api>.
 =item * L<Yancy::Help::Standalone> - How to use Yancy without writing code
 
 =item * L<Yancy::Help::Upgrading> - How to upgrade from previous versions
+
+=item * L<Yancy::Help::Cookbook> - How to cook various apps with Yancy
 
 =back
 

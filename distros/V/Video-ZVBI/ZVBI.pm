@@ -31,7 +31,7 @@ require Exporter;
 require DynaLoader;
 
 our @ISA = ('Exporter', 'DynaLoader');
-our $VERSION = "1.1.0";  # remember to update README and META.yml too
+our $VERSION = "1.1.1";  # remember to update README and META.yml too
 our @EXPORT = qw();
 our @EXPORT_OK = qw();  # filled by XSUB
 

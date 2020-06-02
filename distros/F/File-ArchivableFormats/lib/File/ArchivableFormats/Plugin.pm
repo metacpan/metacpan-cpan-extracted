@@ -1,5 +1,5 @@
 package File::ArchivableFormats::Plugin;
-our $VERSION = '1.6';
+our $VERSION = '1.8';
 use Moose::Role;
 use namespace::autoclean;
 
@@ -55,7 +55,7 @@ File::ArchivableFormats::Plugin - Role which implements logic for all plugins
 
 =head1 VERSION
 
-version 1.6
+version 1.8
 
 =head1 ATTRIBUTES
 

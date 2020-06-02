@@ -14,7 +14,7 @@ use base 'Exporter';
 use constant VALID   => 1;
 use constant INVALID => undef;
 
-$VERSION = '0.09';
+$VERSION = '0.12';
 
 sub valid_cvr {
     return sub {
@@ -65,7 +65,7 @@ Data::FormValidator::Constraints::Business::DK::CVR - constraint for Danish CVR
 
 =head1 VERSION
 
-The documentation describes version 0.09 of Data::FormValidator::Constraints::Business::DK::CVR
+The documentation describes version 0.12 of Data::FormValidator::Constraints::Business::DK::CVR
 
 =head1 SYNOPSIS
 
@@ -185,21 +185,17 @@ Please report issues via CPAN RT:
 or by sending mail to
 
   bug-Business-DK-CVR@rt.cpan.org
-  
+
 =head1 AUTHOR
 
 Jonas B. Nielsen, (jonasbn) - C<< <jonasbn@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Business-DK-CVR and related is (C) by Jonas B. Nielsen, (jonasbn) 2006-2014
+Business-DK-CVR and related is (C) by Jonas B., (jonasbn) 2006-2020
 
 =head1 LICENSE
 
-Business-DK-CVR and related is released under the artistic license
-
-The distribution is licensed under the Artistic License, as specified
-by the Artistic file in the standard perl distribution
-(http://www.perl.com/language/misc/Artistic.html).
+Business-DK-CVR and related is released under the Artistic License 2.0
 
 =cut

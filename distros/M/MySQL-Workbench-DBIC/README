@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.17
+    version 1.19
 
 SYNOPSIS
 
@@ -218,6 +218,20 @@ ATTRIBUTES
  file
 
  schema_base_class
+
+ remove_table_prefix
+
+    If your tables have a common prefix and you do not want to have that
+    prefix in the class names, you can use remove_table_prefix:
+
+      my $foo = MySQL::Workbench::DBIC->new(
+        file                => $file,
+        schema_name         => 'Schema',
+        version             => '0.01',
+        remove_table_prefix => 'ot_',
+      );
+
+    This removes any ot_ from the start at the class name.
 
  inherit_from_core
 

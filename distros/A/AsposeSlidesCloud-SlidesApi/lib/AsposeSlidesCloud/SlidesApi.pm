@@ -10758,6 +10758,235 @@ sub post_copy_master_slide_from_source_presentation {
 }
 
 #
+# post_get_notes_slide
+#
+# Read notes slide info.
+# 
+# @param int $slide_index Slide index. (required)
+# @param File $document Document data. (optional)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_get_notes_slide' } = { 
+    	summary => 'Read notes slide info.',
+        params => $params,
+        returns => 'NotesSlide',
+        };
+}
+# @return NotesSlide
+#
+sub post_get_notes_slide {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling post_get_notes_slide");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/slides/{slideIndex}/notesSlide';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/octet-stream', 'multipart/form-data');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # body params
+    if ( exists $args{'document'}) {
+        $_body_data = $args{'document'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw(JWT )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('NotesSlide', $response);
+    return $_response_object;
+}
+
+#
+# post_get_notes_slide_with_format
+#
+# Convert notes slide to the specified image format.
+# 
+# @param int $slide_index Slide index. (required)
+# @param string $format Output file format. (required)
+# @param File $document Document data. (optional)
+# @param int $width Output file width. (optional)
+# @param int $height Output file height. (optional)
+# @param string $password Document password. (optional)
+# @param string $fonts_folder Storage folder containing custom fonts to be used with the document. (optional)
+{
+    my $params = {
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Output file format.',
+        required => '1',
+    },
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '0',
+    },
+    'width' => {
+        data_type => 'int',
+        description => 'Output file width.',
+        required => '0',
+    },
+    'height' => {
+        data_type => 'int',
+        description => 'Output file height.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Storage folder containing custom fonts to be used with the document.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_get_notes_slide_with_format' } = { 
+    	summary => 'Convert notes slide to the specified image format.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub post_get_notes_slide_with_format {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling post_get_notes_slide_with_format");
+    }
+
+    # verify the required parameter 'format' is set
+    unless (exists $args{'format'}) {
+      croak("Missing the required parameter 'format' when calling post_get_notes_slide_with_format");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/slides/{slideIndex}/notesSlide/{format}';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/octet-stream', 'multipart/form-data');
+
+    # query params
+    if (exists $args{'width'} && defined $args{'width'}) {
+        $query_params->{'width'} = $self->{api_client}->to_query_value($args{'width'});
+    }
+
+    # query params
+    if (exists $args{'height'} && defined $args{'height'}) {
+        $query_params->{'height'} = $self->{api_client}->to_query_value($args{'height'});
+    }
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
+        $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'format'}) {
+        my $_base_variable = "{" . "format" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'format'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # body params
+    if ( exists $args{'document'}) {
+        $_body_data = $args{'document'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw(JWT )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
 # post_notes_slide_add_new_paragraph
 #
 # Creates new paragraph.
@@ -17394,10 +17623,10 @@ sub put_slides_slide_size {
     __PACKAGE__->method_documentation->{ 'put_slides_view_properties' } = { 
     	summary => 'Update presentation document properties.',
         params => $params,
-        returns => 'DocumentProperty',
+        returns => 'ViewProperties',
         };
 }
-# @return DocumentProperty
+# @return ViewProperties
 #
 sub put_slides_view_properties {
     my ($self, %args) = @_;
@@ -17460,7 +17689,7 @@ sub put_slides_view_properties {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('DocumentProperty', $response);
+    my $_response_object = $self->{api_client}->deserialize('ViewProperties', $response);
     return $_response_object;
 }
 

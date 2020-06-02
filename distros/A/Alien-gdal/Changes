@@ -1,7 +1,29 @@
 Revision history for Alien::gdal
 
+1.20 20200602
+    - Share builds:
+      - Modify make steps to exit on first failure.
+      - Disable the OpenJPEG driver on CPAN testers.
+        Some GDAL configuration or packaging
+        issue is causing failures on BSDs.
+      - Apply fix for long makefile lines on all platforms.
+        This is harmless on those that have no line limits,
+        and is version guarded to GDAL<3.2.
+
+1.19 2020-05-31 22:00 AEST
+    - Re-enable optional drivers on CPAN testers.
+      Interdependencies between drivers mean this
+      can cause build failures.
+
+1.18 2020-05-31
+    - Add run_utility method
+    - Add --with-local arg to dragonfly builds
+    - Bump minimum Alien::proj to 1.13.  As a result,
+      the minimum Proj version is now 6.1, so the 
+      minimum GDAL version is 3.0.
+
 1.17 2019-08-03
-    - Make sure we install GDAL 2.4 if Proj version is less than 6
+    - Make sure we install GDAL 2.4 if Proj version is less than 6.0
 
 1.16 2019-04-04
     - Disable Alien::spatialite for now, as it needs

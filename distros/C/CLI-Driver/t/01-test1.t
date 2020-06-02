@@ -39,6 +39,7 @@ eval { $ret = $action->do; };
 ok( !$@ ) or die $@;
 ok($ret eq 'hello world');
 ok($action->desc);
+ok($action->help);
 
 ###
 

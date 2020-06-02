@@ -5,6 +5,7 @@
 # perl stretch --note A --type pminor # Use the A pentatonic minor scale
 # perl stretch --max 32 --phrases 8 --out 'foo.mid'
 # perl stretch --max 128 --pool sn:5 --pool ten:8 --pool tsn:10
+# perl stretch --max 128 --pool sn --pool ten --pool tsn
 #
 # The --pool option is a duration:weight spec where duration is a
 # MIDI::Simple length name. And the relative weight is an
@@ -15,6 +16,8 @@ use warnings;
 
 use Getopt::Long;
 use Data::Dumper::Compact 'ddc';
+# Use local libraries
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw( MIDI-Praxis-Variation MIDI-Util Music-Duration-Partition );
 use MIDI::Praxis::Variation qw(augmentation transposition);
 use MIDI::Util;
 use Music::Duration::Partition;
@@ -89,13 +92,8 @@ sub treble {
     my @scale = get_scale_MIDI($opts{note}, $opts{octave}, $opts{type});
 
     for my $n (0 .. $opts{max} - 1) {
-        my $note;
-        if (@notes < $opts{phrases}) {
-            $note = $scale[int rand @scale];
-        }
-        else {
-            $note = $notes[int rand @notes];
-        }
+        my $note = @notes < $opts{phrases}
+            ? $scale[int rand @scale] : $notes[int rand @notes];
         push @notes, $note; # Accumulate the notes
 
         my $dura = $motif->[$n % @$motif];

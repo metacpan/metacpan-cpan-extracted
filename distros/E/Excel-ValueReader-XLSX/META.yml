@@ -1,0 +1,40 @@
+---
+abstract: 'extracting values from Excel workbooks in XLSX format, fast'
+author:
+  - 'Laurent Dami <dami@cpan.org>'
+build_requires:
+  List::Util: '0'
+  Module::Load::Conditional: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Excel-ValueReader-XLSX
+provides:
+  Excel::ValueReader::XLSX:
+    file: lib/Excel/ValueReader/XLSX.pm
+    version: '1.0'
+  Excel::ValueReader::XLSX::LibXML:
+    file: lib/Excel/ValueReader/XLSX/LibXML.pm
+    version: '1.0'
+  Excel::ValueReader::XLSX::Regex:
+    file: lib/Excel/ValueReader/XLSX/Regex.pm
+    version: '1.0'
+recommends:
+  XML::LibXML::Reader: '0'
+requires:
+  Archive::Zip: '0'
+  Module::Load: '0'
+  Moose: '0'
+  perl: '5.010001'
+  utf8: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/damil/Excel-ValueReader-XLSX
+version: '1.0'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

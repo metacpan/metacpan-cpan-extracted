@@ -3,7 +3,7 @@ Locale::Codes::Script_Codes;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'harvest_data' is run.
-#    Generated on: Mon Mar  2 09:30:42 EST 2020
+#    Generated on: Tue Jun  2 12:18:06 EDT 2020
 
 use strict;
 require 5.006;
@@ -11,9 +11,9 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.63';
+$VERSION='3.64';
 
-$Locale::Codes::Data{'script'}{'id'} = '0200';
+$Locale::Codes::Data{'script'}{'id'} = '0201';
 
 $Locale::Codes::Data{'script'}{'id2names'} = {
    q(0001) => [
@@ -656,55 +656,58 @@ $Locale::Codes::Data{'script'}{'id2names'} = {
       q(Tirhuta),
       ],
    q(0185) => [
-      q(Ugaritic),
+      q(Toto),
       ],
    q(0186) => [
-      q(Vai),
+      q(Ugaritic),
       ],
    q(0187) => [
-      q(Visible Speech),
+      q(Vai),
       ],
    q(0188) => [
+      q(Visible Speech),
+      ],
+   q(0189) => [
       q(Warang Citi (Varang Kshiti)),
       q(Warang Citi),
       q(Varang Kshiti),
       ],
-   q(0189) => [
+   q(0190) => [
       q(Wancho),
       ],
-   q(0190) => [
+   q(0191) => [
       q(Woleai),
       ],
-   q(0191) => [
+   q(0192) => [
       q(Old Persian),
       ],
-   q(0192) => [
+   q(0193) => [
       q(Cuneiform, Sumero-Akkadian),
       q(Sumero-Akkadian cuneiform),
       ],
-   q(0193) => [
+   q(0194) => [
       q(Yezidi),
       ],
-   q(0194) => [
+   q(0195) => [
       q(Yi),
       ],
-   q(0195) => [
+   q(0196) => [
       q(Zanabazar Square (Zanabazarin Dorboljin Useg, Xewtee Dorboljin Bicig, Horizontal Square Script)),
       q(Zanabazar Square),
       q(Zanabazarin Dorboljin Useg),
       q(Xewtee Dorboljin Bicig),
       q(Horizontal Square Script),
       ],
-   q(0196) => [
+   q(0197) => [
       q(Code for inherited script),
       ],
-   q(0197) => [
+   q(0198) => [
       q(Mathematical notation),
       ],
-   q(0198) => [
+   q(0199) => [
       q(Symbols (Emoji variant)),
       ],
-   q(0199) => [
+   q(0200) => [
       q(Symbols),
       ],
 };
@@ -863,7 +866,7 @@ $Locale::Codes::Data{'script'}{'alias2id'} = {
       q(0),
       ],
    q(code for inherited script) => [
-      q(0196),
+      q(0197),
       q(0),
       ],
    q(coptic) => [
@@ -871,7 +874,7 @@ $Locale::Codes::Data{'script'}{'alias2id'} = {
       q(0),
       ],
    q(cuneiform, sumero-akkadian) => [
-      q(0192),
+      q(0193),
       q(0),
       ],
    q(cypriot syllabary) => [
@@ -1067,7 +1070,7 @@ $Locale::Codes::Data{'script'}{'alias2id'} = {
       q(3),
       ],
    q(horizontal square script) => [
-      q(0195),
+      q(0196),
       q(4),
       ],
    q(hungarian runic) => [
@@ -1287,7 +1290,7 @@ $Locale::Codes::Data{'script'}{'alias2id'} = {
       q(0),
       ],
    q(mathematical notation) => [
-      q(0197),
+      q(0198),
       q(0),
       ],
    q(mayan hieroglyphs) => [
@@ -1523,7 +1526,7 @@ $Locale::Codes::Data{'script'}{'alias2id'} = {
       q(0),
       ],
    q(old persian) => [
-      q(0191),
+      q(0192),
       q(0),
       ],
    q(old sogdian) => [
@@ -1703,7 +1706,7 @@ $Locale::Codes::Data{'script'}{'alias2id'} = {
       q(0),
       ],
    q(sumero-akkadian cuneiform) => [
-      q(0192),
+      q(0193),
       q(1),
       ],
    q(sundanese) => [
@@ -1715,11 +1718,11 @@ $Locale::Codes::Data{'script'}{'alias2id'} = {
       q(0),
       ],
    q(symbols) => [
-      q(0199),
+      q(0200),
       q(0),
       ],
    q(symbols (emoji variant)) => [
-      q(0198),
+      q(0199),
       q(0),
       ],
    q(syriac) => [
@@ -1822,8 +1825,12 @@ $Locale::Codes::Data{'script'}{'alias2id'} = {
       q(0184),
       q(0),
       ],
-   q(ugaritic) => [
+   q(toto) => [
       q(0185),
+      q(0),
+      ],
+   q(ugaritic) => [
+      q(0186),
       q(0),
       ],
    q(unified canadian aboriginal syllabics) => [
@@ -1831,55 +1838,55 @@ $Locale::Codes::Data{'script'}{'alias2id'} = {
       q(0),
       ],
    q(vai) => [
-      q(0186),
-      q(0),
-      ],
-   q(varang kshiti) => [
-      q(0188),
-      q(2),
-      ],
-   q(visible speech) => [
       q(0187),
       q(0),
       ],
-   q(wancho) => [
+   q(varang kshiti) => [
       q(0189),
-      q(0),
+      q(2),
       ],
-   q(warang citi) => [
-      q(0188),
-      q(1),
-      ],
-   q(warang citi (varang kshiti)) => [
+   q(visible speech) => [
       q(0188),
       q(0),
       ],
-   q(woleai) => [
+   q(wancho) => [
       q(0190),
       q(0),
       ],
+   q(warang citi) => [
+      q(0189),
+      q(1),
+      ],
+   q(warang citi (varang kshiti)) => [
+      q(0189),
+      q(0),
+      ],
+   q(woleai) => [
+      q(0191),
+      q(0),
+      ],
    q(xewtee dorboljin bicig) => [
-      q(0195),
+      q(0196),
       q(3),
       ],
    q(yezidi) => [
-      q(0193),
-      q(0),
-      ],
-   q(yi) => [
       q(0194),
       q(0),
       ],
-   q(zanabazar square) => [
-      q(0195),
-      q(1),
-      ],
-   q(zanabazar square (zanabazarin dorboljin useg, xewtee dorboljin bicig, horizontal square script)) => [
+   q(yi) => [
       q(0195),
       q(0),
       ],
+   q(zanabazar square) => [
+      q(0196),
+      q(1),
+      ],
+   q(zanabazar square (zanabazarin dorboljin useg, xewtee dorboljin bicig, horizontal square script)) => [
+      q(0196),
+      q(0),
+      ],
    q(zanabazarin dorboljin useg) => [
-      q(0195),
+      q(0196),
       q(2),
       ],
 };
@@ -2622,78 +2629,82 @@ $Locale::Codes::Data{'script'}{'code2id'} = {
          q(0184),
          q(0),
          ],
-      q(Ugar) => [
+      q(Toto) => [
          q(0185),
          q(0),
          ],
-      q(Vaii) => [
+      q(Ugar) => [
          q(0186),
          q(0),
          ],
-      q(Visp) => [
+      q(Vaii) => [
          q(0187),
          q(0),
          ],
-      q(Wara) => [
+      q(Visp) => [
          q(0188),
+         q(0),
+         ],
+      q(Wara) => [
+         q(0189),
          q(1),
          ],
       q(Wcho) => [
-         q(0189),
-         q(0),
-         ],
-      q(Wole) => [
          q(0190),
          q(0),
          ],
-      q(Xpeo) => [
+      q(Wole) => [
          q(0191),
          q(0),
          ],
-      q(Xsux) => [
+      q(Xpeo) => [
          q(0192),
+         q(0),
+         ],
+      q(Xsux) => [
+         q(0193),
          q(1),
          ],
       q(Yezi) => [
-         q(0193),
-         q(0),
-         ],
-      q(Yiii) => [
          q(0194),
          q(0),
          ],
-      q(Zanb) => [
+      q(Yiii) => [
          q(0195),
+         q(0),
+         ],
+      q(Zanb) => [
+         q(0196),
          q(1),
          ],
       q(Zinh) => [
-         q(0196),
-         q(0),
-         ],
-      q(Zmth) => [
          q(0197),
          q(0),
          ],
-      q(Zsye) => [
+      q(Zmth) => [
          q(0198),
          q(0),
          ],
-      q(Zsym) => [
+      q(Zsye) => [
          q(0199),
+         q(0),
+         ],
+      q(Zsym) => [
+         q(0200),
          q(0),
          ],
       },
    q(num) => {
       q(020) => [
-         q(0192),
+         q(0193),
          q(0),
          ],
       q(030) => [
-         q(0191),
+         q(0192),
          q(0),
          ],
       q(040) => [
-         q(0185),
+         q(0186),
          q(0),
          ],
       q(050) => [
@@ -2873,7 +2884,7 @@ $Locale::Codes::Data{'script'}{'code2id'} = {
          q(0),
          ],
       q(192) => [
-         q(0193),
+         q(0194),
          q(0),
          ],
       q(200) => [
@@ -2981,7 +2992,7 @@ $Locale::Codes::Data{'script'}{'code2id'} = {
          q(0),
          ],
       q(262) => [
-         q(0188),
+         q(0189),
          q(0),
          ],
       q(263) => [
@@ -2997,7 +3008,7 @@ $Locale::Codes::Data{'script'}{'code2id'} = {
          q(0),
          ],
       q(280) => [
-         q(0187),
+         q(0188),
          q(0),
          ],
       q(281) => [
@@ -3009,7 +3020,7 @@ $Locale::Codes::Data{'script'}{'code2id'} = {
          q(0),
          ],
       q(283) => [
-         q(0189),
+         q(0190),
          q(0),
          ],
       q(284) => [
@@ -3046,6 +3057,10 @@ $Locale::Codes::Data{'script'}{'code2id'} = {
          ],
       q(293) => [
          q(0141),
+         q(0),
+         ],
+      q(294) => [
+         q(0185),
          q(0),
          ],
       q(300) => [
@@ -3177,7 +3192,7 @@ $Locale::Codes::Data{'script'}{'code2id'} = {
          q(0),
          ],
       q(339) => [
-         q(0195),
+         q(0196),
          q(0),
          ],
       q(340) => [
@@ -3389,15 +3404,15 @@ $Locale::Codes::Data{'script'}{'code2id'} = {
          q(0),
          ],
       q(460) => [
-         q(0194),
+         q(0195),
          q(0),
          ],
       q(470) => [
-         q(0186),
+         q(0187),
          q(0),
          ],
       q(480) => [
-         q(0190),
+         q(0191),
          q(0),
          ],
       q(499) => [
@@ -3465,19 +3480,19 @@ $Locale::Codes::Data{'script'}{'code2id'} = {
          q(0),
          ],
       q(993) => [
-         q(0198),
+         q(0199),
          q(0),
          ],
       q(994) => [
-         q(0196),
-         q(0),
-         ],
-      q(995) => [
          q(0197),
          q(0),
          ],
+      q(995) => [
+         q(0198),
+         q(0),
+         ],
       q(996) => [
-         q(0199),
+         q(0200),
          q(0),
          ],
       },
@@ -3669,21 +3684,22 @@ $Locale::Codes::Data{'script'}{'id2code'} = {
       q(0182) => q(Thai),
       q(0183) => q(Tibt),
       q(0184) => q(Tirh),
-      q(0185) => q(Ugar),
-      q(0186) => q(Vaii),
-      q(0187) => q(Visp),
-      q(0188) => q(Wara),
-      q(0189) => q(Wcho),
-      q(0190) => q(Wole),
-      q(0191) => q(Xpeo),
-      q(0192) => q(Xsux),
-      q(0193) => q(Yezi),
-      q(0194) => q(Yiii),
-      q(0195) => q(Zanb),
-      q(0196) => q(Zinh),
-      q(0197) => q(Zmth),
-      q(0198) => q(Zsye),
-      q(0199) => q(Zsym),
+      q(0185) => q(Toto),
+      q(0186) => q(Ugar),
+      q(0187) => q(Vaii),
+      q(0188) => q(Visp),
+      q(0189) => q(Wara),
+      q(0190) => q(Wcho),
+      q(0191) => q(Wole),
+      q(0192) => q(Xpeo),
+      q(0193) => q(Xsux),
+      q(0194) => q(Yezi),
+      q(0195) => q(Yiii),
+      q(0196) => q(Zanb),
+      q(0197) => q(Zinh),
+      q(0198) => q(Zmth),
+      q(0199) => q(Zsye),
+      q(0200) => q(Zsym),
       },
    q(num) => {
       q(0001) => q(166),
@@ -3870,21 +3886,22 @@ $Locale::Codes::Data{'script'}{'id2code'} = {
       q(0182) => q(352),
       q(0183) => q(330),
       q(0184) => q(326),
-      q(0185) => q(040),
-      q(0186) => q(470),
-      q(0187) => q(280),
-      q(0188) => q(262),
-      q(0189) => q(283),
-      q(0190) => q(480),
-      q(0191) => q(030),
-      q(0192) => q(020),
-      q(0193) => q(192),
-      q(0194) => q(460),
-      q(0195) => q(339),
-      q(0196) => q(994),
-      q(0197) => q(995),
-      q(0198) => q(993),
-      q(0199) => q(996),
+      q(0185) => q(294),
+      q(0186) => q(040),
+      q(0187) => q(470),
+      q(0188) => q(280),
+      q(0189) => q(262),
+      q(0190) => q(283),
+      q(0191) => q(480),
+      q(0192) => q(030),
+      q(0193) => q(020),
+      q(0194) => q(192),
+      q(0195) => q(460),
+      q(0196) => q(339),
+      q(0197) => q(994),
+      q(0198) => q(995),
+      q(0199) => q(993),
+      q(0200) => q(996),
       },
 };
 

@@ -15,10 +15,10 @@ use YAML::Syck;
 
 extends 'App::VTide::Command::Run';
 
-our $VERSION = version->new('0.1.11');
+our $VERSION = version->new('0.1.12');
 our $NAME    = 'recent';
 our $OPTIONS = [
-    'max|m=i',
+    'number|n=i',
     'verbose|v+',
 ];
 sub details_sub { return ( $NAME, $OPTIONS )};
@@ -33,7 +33,7 @@ sub run {
         grep { ref $sessions->{sessions}{$_} }
         keys %{ $sessions->{sessions} };
 
-    my $max = $self->defaults->{max} || 10;
+    my $max = $self->defaults->{number} || 10;
     $max = scalar @sessions if $max - 1 > @sessions;
 
     for my $session ((reverse @sessions)[0 .. $max - 1]) {
@@ -57,14 +57,14 @@ App::VTide::Command::Recent - List recent App::VTide sessions
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Recent version 0.1.11
+This documentation refers to App::VTide::Command::Recent version 0.1.12
 
 =head1 SYNOPSIS
 
     vtide recent [-f|--force]
 
     OPTIONS
-     -m --max[=]int The maximum number of recent sessions to show (Default 10)
+     -n (int)       The maximum number of recent sessions to show (Default 10)
      -v --verbose   Show more detailed output
         --help      Show this help
         --man       Show the full man page

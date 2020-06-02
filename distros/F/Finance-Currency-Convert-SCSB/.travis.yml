@@ -6,8 +6,11 @@ perl:
 notifications:
   irc:
     channels:
-      - "irc.freenode.org#chupei.pm"
+      - "irc.freenode.org#perl.tw"
     use_notice: true
+
+env:
+  - TEST_LIVE=1
 
 git:
   depth: 1

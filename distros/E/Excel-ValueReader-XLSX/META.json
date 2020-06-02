@@ -1,0 +1,67 @@
+{
+   "abstract" : "extracting values from Excel workbooks in XLSX format, fast",
+   "author" : [
+      "Laurent Dami <dami@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Excel-ValueReader-XLSX",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "XML::LibXML::Reader" : "0"
+         },
+         "requires" : {
+            "Archive::Zip" : "0",
+            "Module::Load" : "0",
+            "Moose" : "0",
+            "perl" : "5.010001",
+            "utf8" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "List::Util" : "0",
+            "Module::Load::Conditional" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Excel::ValueReader::XLSX" : {
+         "file" : "lib/Excel/ValueReader/XLSX.pm",
+         "version" : "1.0"
+      },
+      "Excel::ValueReader::XLSX::LibXML" : {
+         "file" : "lib/Excel/ValueReader/XLSX/LibXML.pm",
+         "version" : "1.0"
+      },
+      "Excel::ValueReader::XLSX::Regex" : {
+         "file" : "lib/Excel/ValueReader/XLSX/Regex.pm",
+         "version" : "1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/damil/Excel-ValueReader-XLSX"
+      }
+   },
+   "version" : "1.0",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

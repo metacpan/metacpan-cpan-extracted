@@ -1,0 +1,38 @@
+---
+abstract: 'cpanfile generator command'
+author:
+  - 'Bernhard Graf <augensalat@gmail.com>'
+build_requires:
+  Test::More: '0.99'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Command-Author-generate-cpanfile
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Mojolicious::Command::Author::generate::cpanfile:
+    file: lib/Mojolicious/Command/Author/generate/cpanfile.pm
+    version: '0.01'
+requires:
+  Mojolicious: '8.0'
+resources:
+  bugtracker: https://gitlab.com/augensalat/perl-mojolicious-command-author-generate-cpanfile/issues
+  homepage: https://gitlab.com/augensalat/perl-mojolicious-command-author-generate-cpanfile
+  repository: git://gitlab.com/augensalat/perl-mojolicious-command-author-generate-cpanfile.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -1,0 +1,15 @@
+=name
+
+Example #1
+
++=head1 WHY?
+
+blah blah blah
+
++=cut
+
+More information on the same topic as was previously mentioned in the
+previous section demonstrating the topic as-is obvious from said section
+...
+
+=cut

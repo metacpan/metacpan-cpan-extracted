@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use Alien::gdal;
+use Sort::Versions;
 
 diag( 'NAME=' . Alien::gdal->config('name') );
 diag( 'VERSION=' . Alien::gdal->config('version') );
@@ -21,7 +22,10 @@ TODO: {
     diag $@ if $@;
     diag "Data dir is $data_dir";
     ok ($data_dir && -d $data_dir, "data dir exists (" . ($data_dir // '') . ")");
-    ok ($data_dir && -e "$data_dir/gcs.csv", "Found coordinate systems file (gcs.csv)");
+    if (versioncmp (Alien::gdal->version, 3) < 0) {
+        #  does not exist under 3.0 and higher
+        ok ($data_dir && -e "$data_dir/gcs.csv", "Found coordinate systems file (gcs.csv)");
+    }
 }
 
 done_testing();

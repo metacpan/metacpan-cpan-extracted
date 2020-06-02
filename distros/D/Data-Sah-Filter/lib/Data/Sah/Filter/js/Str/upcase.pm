@@ -1,9 +1,9 @@
 package Data::Sah::Filter::js::Str::upcase;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-30'; # DATE
+our $DATE = '2020-05-31'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -44,7 +44,7 @@ Data::Sah::Filter::js::Str::upcase - Convert string to uppercase
 
 =head1 VERSION
 
-This document describes version 0.005 of Data::Sah::Filter::js::Str::upcase (from Perl distribution Data-Sah-Filter), released on 2020-05-30.
+This document describes version 0.006 of Data::Sah::Filter::js::Str::upcase (from Perl distribution Data-Sah-Filter), released on 2020-05-31.
 
 =head1 SYNOPSIS
 
@@ -69,6 +69,13 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head1 SEE ALSO
+
+Related filters: L<downcase|Data::Sah::Filter::js::Str::downcase>.
+
+Synonym: L<uc|Data::Sah::Filter::js::Str::uc>,
+L<uppercase|Data::Sah::Filter::js::Str::uppercase>.
 
 =head1 AUTHOR
 

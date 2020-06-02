@@ -12,3 +12,4 @@ BEGIN {
 }
 
 diag( "Testing Text::Amuse::Compile $Text::Amuse::Compile::VERSION, Perl $], $^X" );
+diag("Using latex? " . ($ENV{TEST_WITH_LATEX} ? "yes" : "no") . " with PATH $ENV{PATH}");

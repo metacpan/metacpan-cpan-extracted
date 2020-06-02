@@ -1,40 +1,46 @@
 {
-   "abstract" : "Danish CVR (VAT Registration) code generator/validator",
+   "abstract" : "Danish CVR (VAT Registration) number generator/validator",
    "author" : [
-      "Jonas B. Nielsen, (jonasbn) <jonasbn@cpan.org>"
+      "Jonas B. <jonasbn@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4205",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "artistic_1"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Business-DK-CVR",
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Data::FormValidator" : "0",
-            "Taint::Runtime" : "0",
-            "Test::Exception" : "0",
-            "Test::Kwalitee" : "0",
-            "Test::More" : "0",
-            "Test::Perl::Critic" : "0",
-            "Test::Prereq::Build" : "0",
-            "Test::Taint" : "0"
+            "Module::Build" : "0.30"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build" : "0.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::Kwalitee" : "1.21",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
             "Class::InsideOut" : "0",
+            "Data::FormValidator" : "0",
             "English" : "0",
             "Exporter" : "0",
             "Params::Validate" : "0",
@@ -42,37 +48,53 @@
             "Scalar::Util" : "0",
             "perl" : "5.008"
          }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Taint::Runtime" : "0",
+            "Test::Exception" : "0",
+            "Test::Fatal" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Taint" : "0",
+            "Test::Tester" : "1.302111"
+         }
       }
    },
    "provides" : {
       "Business::DK::CVR" : {
          "file" : "lib/Business/DK/CVR.pm",
-         "version" : "0.09"
+         "version" : "0.12"
       },
       "Class::Business::DK::CVR" : {
          "file" : "lib/Class/Business/DK/CVR.pm",
-         "version" : "0.09"
+         "version" : "0.12"
       },
       "Data::FormValidator::Constraints::Business::DK::CVR" : {
          "file" : "lib/Data/FormValidator/Constraints/Business/DK/CVR.pm",
-         "version" : "0.09"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Business-DK-CVR"
+         "web" : "https://github.com/jonasbn/perl-business-dk-cvr/issues"
       },
-      "homepage" : "http://logicLAB.jira.com/browse/BDKCVR",
-      "license" : [
-         "http://www.perlfoundation.org/artistic_license_1_0"
-      ],
+      "homepage" : "https://github.com/jonasbn/perl-business-dk-cvr",
       "repository" : {
-         "url" : "https://github.com/jonasbn/bdkcvr"
-      },
-      "x_projectChangelog" : "http://logiclab.jira.com/browse/BDKCVR#selectedTab=com.atlassian.jira.plugin.system.project%3Achangelog-panel",
-      "x_projectSite" : "http://logicLAB.jira.com/browse/BDKCVR",
-      "x_projectWiki" : "http://logiclab.jira.com/wiki/display/BDKCVR/Home"
+         "type" : "git",
+         "url" : "https://github.com/jonasbn/perl-business-dk-cvr.git",
+         "web" : "https://github.com/jonasbn/perl-business-dk-cvr"
+      }
    },
-   "version" : "0.09"
+   "version" : "0.12",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
 }
+

@@ -10748,7 +10748,6 @@ langext:
       ayl: Libyan Arabic
       ayn: Sanaani Arabic
       ayp: North Mesopotamian Arabic
-      bbz: Babalia Creole Arabic
       bfi: British Sign Language
       bfk: Ban Khor Sign Language
       bjn: Banjar
@@ -10764,6 +10763,7 @@ langext:
       cds: Chadian Sign Language
       cjy: Jinyu Chinese
       cmn: Mandarin Chinese
+      cnp: Northern Ping Chinese
       coa: Cocos Islands Malay
       cpx: Pu-Xian Chinese
       csc: Catalan Sign Language
@@ -10773,6 +10773,7 @@ langext:
       csg: Chilean Sign Language
       csl: Chinese Sign Language
       csn: Colombian Sign Language
+      csp: Southern Ping Chinese
       csq: Croatia Sign Language
       csr: Costa Rican Sign Language
       czh: Huizhou Chinese
@@ -10987,9 +10988,6 @@ langext:
       austrian sign language: 
         - asq
         - Austrian Sign Language
-      babalia creole arabic: 
-        - bbz
-        - Babalia Creole Arabic
       bacanese malay: 
         - btj
         - Bacanese Malay
@@ -11398,6 +11396,9 @@ langext:
       north moluccan malay: 
         - max
         - North Moluccan Malay
+      northern ping chinese: 
+        - cnp
+        - Northern Ping Chinese
       northern uzbek: 
         - uzn
         - Northern Uzbek
@@ -11515,6 +11516,9 @@ langext:
       south levantine arabic: 
         - ajp
         - South Levantine Arabic
+      southern ping chinese: 
+        - csp
+        - Southern Ping Chinese
       southern uzbek: 
         - uzs
         - Southern Uzbek
@@ -12468,7 +12472,7 @@ language:
       acy: Cypriot Arabic
       acz: Acheron
       ada: Adangme
-      adb: Adabe
+      adb: Atauran
       add: Lidzonka
       ade: Adele
       adf: Dhofari Arabic
@@ -12699,7 +12703,6 @@ language:
       aoe: Angal Enen
       aof: Bragat
       aog: Angoram
-      aoh: Arma
       aoi: Anindilyakwa
       aoj: Mufian
       aok: Arho
@@ -12908,7 +12911,6 @@ language:
       ays: Sorsogon Ayta
       ayt: Magbukun Ayta
       ayu: Ayu
-      ayy: Tayabas Ayta
       ayz: Mai Brat
       aza: Azha
       azb: South Azerbaijani
@@ -12972,7 +12974,6 @@ language:
       bbw: Baba
       bbx: Bubia
       bby: Befang
-      bbz: Babalia Creole Arabic
       bca: Central Bai
       bcb: Bainouk-Samik
       bcc: Southern Balochi
@@ -13297,7 +13298,6 @@ language:
       boy: Bodo (Central African Republic)
       boz: Tieyaxo Bozo
       bpa: Daakaka
-      bpb: Barbacoas
       bpd: Banda-Banda
       bpg: Bonggo
       bph: Botlikh
@@ -13349,7 +13349,7 @@ language:
       brc: Berbice Creole Dutch
       brd: Baraamu
       bre: Breton
-      brf: Bera
+      brf: Bira
       brg: Baure
       brh: Brahui
       bri: Mokpwe
@@ -13612,7 +13612,6 @@ language:
       cbv: Cacua
       cbw: Kinabalian
       cby: Carabayo
-      cca: Cauca
       ccc: Chamicuro
       ccd: Cafundo Creole
       cce: Chopi
@@ -13631,7 +13630,6 @@ language:
       cdd: Caddoan languages
       cde: Chenchu
       cdf: Chiru
-      cdg: Chamari
       cdh: Chambeali
       cdi: Chodri
       cdj: Churahi
@@ -13711,6 +13709,7 @@ language:
       ckb: Central Kurdish
       ckh: Chak
       ckl: Cibak
+      ckm: Chakavian
       ckn: Kaang Chin
       cko: Anufo
       ckq: Kajakse
@@ -13758,6 +13757,7 @@ language:
       cnk: Khumi Chin
       cnl: Lalana Chinantec
       cno: Con
+      cnp: Northern Ping Chinese
       cnr: Montenegrin
       cns: Central Asmat
       cnt: Tepetotutla Chinantec
@@ -13843,6 +13843,7 @@ language:
       csm: Central Sierra Miwok
       csn: Colombian Sign Language
       cso: Sochiapam Chinantec
+      csp: Southern Ping Chinese
       csq: Croatia Sign Language
       csr: Costa Rican Sign Language
       css: Southern Ohlone
@@ -13991,7 +13992,6 @@ language:
       dgr: Dogrib
       dgs: Dogoso
       dgt: Ndra'ngith
-      dgu: Degaru
       dgw: Daungwurrung
       dgx: Doghoro
       dgz: Daga
@@ -14061,6 +14061,7 @@ language:
       dmc: Gavak
       dmd: Madhi Madhi
       dme: Dugwor
+      dmf: Medefaidrin
       dmg: Upper Kinabatangan
       dmk: Domaaki
       dml: Dameli
@@ -14122,7 +14123,6 @@ language:
       drn: West Damar
       dro: Daro-Matu Melanau
       drq: Dura
-      drr: Dororo
       drs: Gedeo
       drt: Drents
       dru: Rukai
@@ -14176,6 +14176,7 @@ language:
       duz: Duli-Gey
       dva: Duau
       dwa: Diri
+      dwk: Dawik Kui
       dwr: Dawro
       dws: Dutton World Speedwords
       dwu: Dhuwal
@@ -14199,6 +14200,7 @@ language:
       dzn: Dzando
       dzo: Dzongkha
       eaa: Karenggapa
+      ebc: Beginci
       ebg: Ebughu
       ebk: Eastern Bontok
       ebo: Teke-Ebo
@@ -14222,7 +14224,6 @@ language:
       eiv: Askopan
       eja: Ejamat
       eka: Ekajuk
-      ekc: Eastern Karnic
       eke: Ekit
       ekg: Ekari
       eki: Eki
@@ -14498,6 +14499,7 @@ language:
       geb: Kire
       gec: Gboloo Grebo
       ged: Gade
+      gef: Gerai
       geg: Gengle
       geh: Hutterite German
       gei: Gebe
@@ -14576,7 +14578,6 @@ language:
       gle: Irish
       glg: Galician
       glh: Northwest Pashai
-      gli: Guliguli
       glj: Gula Iro
       glk: Gilaki
       gll: Garlali
@@ -14596,6 +14597,7 @@ language:
       gmm: Gbaya-Mbodomo
       gmn: Gimnime
       gmq: North Germanic languages
+      gmr: Mirning
       gmu: Gumalu
       gmv: Gamo
       gmw: West Germanic languages
@@ -14728,7 +14730,7 @@ language:
       gvy: Guyani
       gwa: Mbato
       gwb: Gwa
-      gwc: Kalami
+      gwc: Gawri
       gwd: Gawwada
       gwe: Gweno
       gwf: Gowro
@@ -14866,6 +14868,7 @@ language:
       hna: Mina (Cameroon)
       hnd: Southern Hindko
       hne: Chhattisgarhi
+      hng: Hungu
       hnh: Ani
       hni: Hani
       hnj: Hmong Njua
@@ -15499,7 +15502,6 @@ language:
       kjc: Coastal Konjo
       kjd: Southern Kiwai
       kje: Kisar
-      kjf: Khalaj
       kjg: Khmu
       kjh: Khakas
       kji: Zabana
@@ -15535,7 +15537,7 @@ language:
       kkn: Kon Keu
       kko: Karko
       kkp: Gugubera
-      kkq: Kaiku
+      kkq: Kaeku
       kkr: Kir-Balar
       kks: Giiwo
       kkt: Koi
@@ -15554,7 +15556,7 @@ language:
       klg: Tagakaulo
       klh: Weliki
       kli: Kalumpang
-      klj: Turkic Khalaj
+      klj: Khalaj
       klk: Kono (Nigeria)
       kll: Kagan Kalagan
       klm: Migum
@@ -15855,7 +15857,6 @@ language:
       kxi: Keningau Murut
       kxj: Kulfa
       kxk: Zayein Karen
-      kxl: Nepali Kurux
       kxm: Northern Khmer
       kxn: Kanowit-Tanjong Melanau
       kxo: Kanoe
@@ -15864,7 +15865,6 @@ language:
       kxr: Koro (Papua New Guinea)
       kxs: Kangjia
       kxt: Koiwat
-      kxu: Kui (India)
       kxv: Kuvi
       kxw: Konai
       kxx: Likuba
@@ -16132,7 +16132,6 @@ language:
       lmw: Lake Miwok
       lmx: Laimbue
       lmy: Lamboya
-      lmz: Lumbee
       lna: Langbashe
       lnb: Mbalanhu
       lnd: Lundayeh
@@ -16615,7 +16614,7 @@ language:
       moa: Mwan
       moc: Mocovi
       mod: Mobilian
-      moe: Montagnais
+      moe: Innu
       mog: Mongondow
       moh: Mohawk
       moi: Mboi
@@ -17271,6 +17270,7 @@ language:
       nrx: Ngurmbur
       nrz: Lala
       nsa: Sangtam Naga
+      nsb: Lower Nossob
       nsc: Nshi
       nsd: Southern Nisu
       nse: Nsenga
@@ -17361,7 +17361,6 @@ language:
       nxo: Ndambomo
       nxq: Naxi
       nxr: Ninggerum
-      nxu: Narau
       nxx: Nafri
       nya: Chichewa
       nyb: Nyangbo
@@ -17658,7 +17657,7 @@ language:
       pey: Petjo
       pez: Eastern Penan
       pfa: Paafang
-      pfe: Peere
+      pfe: Pere
       pfl: Pfaelzisch
       pga: Sudanese Creole Arabic
       pgd: Gandhari
@@ -17737,7 +17736,6 @@ language:
       pll: Shwe Palaung
       pln: Palenquero
       plo: Oluta Popoluca
-      plp: Palpa
       plq: Palaic
       plr: Palaka Senoufo
       pls: San Marcos Tlacoyalco Popoloca
@@ -18220,10 +18218,10 @@ language:
       sdj: Suundi
       sdk: Sos Kundi
       sdl: Saudi Arabian Sign Language
-      sdm: Semandang
       sdn: Gallurese Sardinian
       sdo: Bukar-Sadung Bidayuh
       sdp: Sherdukpen
+      sdq: Semandang
       sdr: Oraon Sadri
       sds: Sened
       sdt: Shuadit
@@ -18696,7 +18694,6 @@ language:
       tay: Atayal
       taz: Tocho
       tba: Aikana
-      tbb: Tapeba
       tbc: Takia
       tbd: Kaki Ae
       tbe: Tanimbili
@@ -19232,6 +19229,7 @@ language:
       uka: Kaburi
       ukg: Ukuriguma
       ukh: Ukhwejo
+      uki: Kui (India)
       ukk: Muak Sa-aak
       ukl: Ukrainian Sign Language
       ukp: Ukpe-Bayobiri
@@ -19239,6 +19237,7 @@ language:
       ukr: Ukrainian
       uks: Urubu-Kaapor Sign Language
       uku: Ukue
+      ukv: Kuku
       ukw: Ukwuani-Aboh-Ndoni
       uky: Kuuk-Yak
       ula: Fungwa
@@ -19529,6 +19528,7 @@ language:
       wlc: Mwali Comorian
       wle: Wolane
       wlg: Kunbarlang
+      wlh: Welaun
       wli: Waioli
       wlk: Wailaki
       wll: Wali (Sudan)
@@ -19816,6 +19816,7 @@ language:
       xnh: Kuanhua
       xni: Ngarigu
       xnk: Nganakarti
+      xnm: Ngumbarl
       xnn: Northern Kankanay
       xno: Anglo-Norman
       xnr: Kangri
@@ -19836,12 +19837,17 @@ language:
       xor: Korubo
       xow: Kowaki
       xpa: Pirriya
+      xpb: Northeastern Tasmanian
       xpc: Pecheneg
+      xpd: Oyster Bay Tasmanian
       xpe: Liberia Kpelle
+      xpf: Southeast Tasmanian
       xpg: Phrygian
+      xph: North Midlands Tasmanian
       xpi: Pictish
       xpj: Mpalitjanh
       xpk: Kulina Pano
+      xpl: Port Sorell Tasmanian
       xpm: Pumpokol
       xpn: Kapinawa
       xpo: Pochutec
@@ -19851,7 +19857,11 @@ language:
       xps: Pisidian
       xpt: Punthamara
       xpu: Punic
+      xpv: Northern Tasmanian
+      xpw: Northwestern Tasmanian
+      xpx: Southwestern Tasmanian
       xpy: Puyo
+      xpz: Bruny Island Tasmanian
       xqa: Karakhanid
       xqt: Qatabanian
       xra: Kraho
@@ -19862,7 +19872,6 @@ language:
       xri: Krikati-Timbira
       xrm: Armazic
       xrn: Arin
-      xrq: Karranga
       xrr: Raetic
       xrt: Aranama-Tamique
       xru: Marriammu
@@ -19908,7 +19917,6 @@ language:
       xtv: Thawa
       xtw: Tawande
       xty: Yoloxochitl Mixtec
-      xtz: Tasmanian
       xua: Alu Kurumba
       xub: Betta Kurumba
       xud: Umiida
@@ -20215,6 +20223,7 @@ language:
       zax: Xadani Zapotec
       zay: Zayse-Zergulla
       zaz: Zari
+      zba: Balaibalan
       zbc: Central Berawan
       zbe: East Berawan
       zbl: Blissymbols
@@ -20246,7 +20255,6 @@ language:
       zil: Zialo
       zim: Mesme
       zin: Zinza
-      zir: Ziriya
       ziw: Zigula
       ziz: Zizilivakan
       zka: Kaimbulawa
@@ -20502,9 +20510,6 @@ language:
       acroa: 
         - acs
         - Acroa
-      adabe: 
-        - adb
-        - Adabe
       adai: 
         - xad
         - Adai
@@ -21507,9 +21512,6 @@ language:
       aringa: 
         - luc
         - Aringa
-      arma: 
-        - aoh
-        - Arma
       armazic: 
         - xrm
         - Armazic
@@ -21651,6 +21653,9 @@ language:
       atatlahuca mixtec: 
         - mib
         - Atatlahuca Mixtec
+      atauran: 
+        - adb
+        - Atauran
       atayal: 
         - tay
         - Atayal
@@ -21912,9 +21917,6 @@ language:
       baba malay: 
         - mbf
         - Baba Malay
-      babalia creole arabic: 
-        - bbz
-        - Babalia Creole Arabic
       babango: 
         - bbm
         - Babango
@@ -22131,6 +22133,9 @@ language:
       balaesang: 
         - bls
         - Balaesang
+      balaibalan: 
+        - zba
+        - Balaibalan
       balangao: 
         - blw
         - Balangao
@@ -22392,9 +22397,6 @@ language:
       barasana-eduria: 
         - bsn
         - Barasana-Eduria
-      barbacoas: 
-        - bpb
-        - Barbacoas
       barbaram: 
         - vmb
         - Barbaram
@@ -22656,6 +22658,9 @@ language:
       befang: 
         - bby
         - Befang
+      beginci: 
+        - ebc
+        - Beginci
       beja: 
         - bej
         - Beja
@@ -22752,9 +22757,6 @@ language:
       bepour: 
         - bie
         - Bepour
-      bera: 
-        - brf
-        - Bera
       berakou: 
         - bxv
         - Berakou
@@ -23019,6 +23021,9 @@ language:
       bipi: 
         - biq
         - Bipi
+      bira: 
+        - brf
+        - Bira
       birale: 
         - bxe
         - Birale
@@ -23412,6 +23417,9 @@ language:
       brunei bisaya: 
         - bsb
         - Brunei Bisaya
+      bruny island tasmanian: 
+        - xpz
+        - Bruny Island Tasmanian
       bu: 
         - jid
         - Bu
@@ -23928,9 +23936,6 @@ language:
       catawba: 
         - chc
         - Catawba
-      cauca: 
-        - cca
-        - Cauca
       caucasian languages: 
         - cau
         - Caucasian languages
@@ -24138,6 +24143,9 @@ language:
       chakali: 
         - cli
         - Chakali
+      chakavian: 
+        - ckm
+        - Chakavian
       chakma: 
         - ccp
         - Chakma
@@ -24156,9 +24164,6 @@ language:
       chamalal: 
         - cji
         - Chamalal
-      chamari: 
-        - cdg
-        - Chamari
       chambeali: 
         - cdh
         - Chambeali
@@ -24984,6 +24989,9 @@ language:
       dawera-daweloor: 
         - ddw
         - Dawera-Daweloor
+      dawik kui: 
+        - dwk
+        - Dawik Kui
       dawro: 
         - dwr
         - Dawro
@@ -25011,9 +25019,6 @@ language:
       deg: 
         - mzw
         - Deg
-      degaru: 
-        - dgu
-        - Degaru
       degema: 
         - deg
         - Degema
@@ -25395,9 +25400,6 @@ language:
       doromu-koki: 
         - kqc
         - Doromu-Koki
-      dororo: 
-        - drr
-        - Dororo
       dorze: 
         - doz
         - Dorze
@@ -25695,9 +25697,6 @@ language:
       eastern karaboro: 
         - xrb
         - Eastern Karaboro
-      eastern karnic: 
-        - ekc
-        - Eastern Karnic
       eastern katu: 
         - ktv
         - Eastern Katu
@@ -26622,6 +26621,9 @@ language:
       gawar-bati: 
         - gwt
         - Gawar-Bati
+      gawri: 
+        - gwc
+        - Gawri
       gawwada: 
         - gwd
         - Gawwada
@@ -26727,6 +26729,9 @@ language:
       gera: 
         - gew
         - Gera
+      gerai: 
+        - gef
+        - Gerai
       german: 
         - ger
         - German
@@ -27141,9 +27146,6 @@ language:
       gulf arabic: 
         - afb
         - Gulf Arabic
-      guliguli: 
-        - gli
-        - Guliguli
       gumalu: 
         - gmu
         - Gumalu
@@ -27819,6 +27821,9 @@ language:
       hungarian sign language: 
         - hsh
         - Hungarian Sign Language
+      hungu: 
+        - hng
+        - Hungu
       hunjara-kaina ke: 
         - hkk
         - Hunjara-Kaina Ke
@@ -28140,6 +28145,9 @@ language:
       inlaod itneg: 
         - iti
         - Inlaod Itneg
+      innu: 
+        - moe
+        - Innu
       inoke-yate: 
         - ino
         - Inoke-Yate
@@ -28839,6 +28847,9 @@ language:
       kaduo: 
         - ktp
         - Kaduo
+      kaeku: 
+        - kkq
+        - Kaeku
       kaera: 
         - jka
         - Kaera
@@ -28893,9 +28904,6 @@ language:
       kaike: 
         - kzq
         - Kaike
-      kaiku: 
-        - kkq
-        - Kaiku
       kaimbe: 
         - xai
         - Kaimbe
@@ -28980,9 +28988,6 @@ language:
       kalam: 
         - kmh
         - Kalam
-      kalami: 
-        - gwc
-        - Kalami
       kalamse: 
         - knz
         - Kalamse
@@ -29403,9 +29408,6 @@ language:
       karore: 
         - xkx
         - Karore
-      karranga: 
-        - xrq
-        - Karranga
       karuwali: 
         - rxw
         - Karuwali
@@ -29758,7 +29760,7 @@ language:
         - kjh
         - Khakas
       khalaj: 
-        - kjf
+        - klj
         - Khalaj
       khaling: 
         - klr
@@ -30628,7 +30630,7 @@ language:
         - xmh
         - Kugu-Muminh
       kui (india): 
-        - kxu
+        - uki
         - Kui (India)
       kui (indonesia): 
         - kvd
@@ -30657,6 +30659,9 @@ language:
       kukna: 
         - kex
         - Kukna
+      kuku: 
+        - ukv
+        - Kuku
       kuku-mangk: 
         - xmq
         - Kuku-Mangk
@@ -31983,6 +31988,9 @@ language:
       lower grand valley dani: 
         - dni
         - Lower Grand Valley Dani
+      lower nossob: 
+        - nsb
+        - Lower Nossob
       lower silesian: 
         - sli
         - Lower Silesian
@@ -32070,9 +32078,6 @@ language:
       lumba-yakkha: 
         - luu
         - Lumba-Yakkha
-      lumbee: 
-        - lmz
-        - Lumbee
       lumbu: 
         - lup
         - Lumbu
@@ -33408,6 +33413,9 @@ language:
       medebur: 
         - mjm
         - Medebur
+      medefaidrin: 
+        - dmf
+        - Medefaidrin
       media lengua: 
         - mue
         - Media Lengua
@@ -33786,6 +33794,9 @@ language:
       miriwoong sign language: 
         - rsm
         - Miriwoong Sign Language
+      mirning: 
+        - gmr
+        - Mirning
       miship: 
         - mjs
         - Miship
@@ -34062,9 +34073,6 @@ language:
       monsang naga: 
         - nmh
         - Monsang Naga
-      montagnais: 
-        - moe
-        - Montagnais
       montenegrin: 
         - cnr
         - Montenegrin
@@ -34698,9 +34706,6 @@ language:
       narango: 
         - nrg
         - Narango
-      narau: 
-        - nxu
-        - Narau
       nari nari: 
         - rnr
         - Nari Nari
@@ -34977,9 +34982,6 @@ language:
       nepali (individual language): 
         - npi
         - Nepali (individual language)
-      nepali kurux: 
-        - kxl
-        - Nepali Kurux
       nete: 
         - net
         - Nete
@@ -35208,6 +35210,9 @@ language:
       nguluwan: 
         - nuw
         - Nguluwan
+      ngumbarl: 
+        - xnm
+        - Ngumbarl
       ngumbi: 
         - nui
         - Ngumbi
@@ -35547,6 +35552,9 @@ language:
       north mesopotamian arabic: 
         - ayp
         - North Mesopotamian Arabic
+      north midlands tasmanian: 
+        - xph
+        - North Midlands Tasmanian
       north mofu: 
         - mfk
         - North Mofu
@@ -35592,6 +35600,9 @@ language:
       northeastern pomo: 
         - pef
         - Northeastern Pomo
+      northeastern tasmanian: 
+        - xpb
+        - Northeastern Tasmanian
       northeastern thai: 
         - tts
         - Northeastern Thai
@@ -35718,6 +35729,9 @@ language:
       northern pastaza quichua: 
         - qvz
         - Northern Pastaza Quichua
+      northern ping chinese: 
+        - cnp
+        - Northern Ping Chinese
       northern pomo: 
         - pej
         - Northern Pomo
@@ -35754,6 +35768,9 @@ language:
       northern tarahumara: 
         - thh
         - Northern Tarahumara
+      northern tasmanian: 
+        - xpv
+        - Northern Tasmanian
       northern tepehuan: 
         - ntp
         - Northern Tepehuan
@@ -35817,6 +35834,9 @@ language:
       northwestern tamang: 
         - tmk
         - Northwestern Tamang
+      northwestern tasmanian: 
+        - xpw
+        - Northwestern Tasmanian
       norwegian: 
         - nor
         - Norwegian
@@ -36588,6 +36608,9 @@ language:
       oyda: 
         - oyd
         - Oyda
+      oyster bay tasmanian: 
+        - xpd
+        - Oyster Bay Tasmanian
       ozolotepec zapotec: 
         - zao
         - Ozolotepec Zapotec
@@ -36735,9 +36758,6 @@ language:
       paloor: 
         - fap
         - Paloor
-      palpa: 
-        - plp
-        - Palpa
       palu'e: 
         - ple
         - Palu'e
@@ -37035,9 +37055,6 @@ language:
       pedi: 
         - nso
         - Pedi
-      peere: 
-        - pfe
-        - Peere
       pei: 
         - ppq
         - Pei
@@ -37089,6 +37106,9 @@ language:
       peranakan indonesian: 
         - pea
         - Peranakan Indonesian
+      pere: 
+        - pfe
+        - Pere
       peripheral mongolian: 
         - mvf
         - Peripheral Mongolian
@@ -37437,6 +37457,9 @@ language:
       port sandwich: 
         - psw
         - Port Sandwich
+      port sorell tasmanian: 
+        - xpl
+        - Port Sorell Tasmanian
       port vato: 
         - ptv
         - Port Vato
@@ -38824,7 +38847,7 @@ language:
         - sea
         - Semai
       semandang: 
-        - sdm
+        - sdq
         - Semandang
       semaq beri: 
         - szc
@@ -39651,6 +39674,9 @@ language:
       southeast pashai: 
         - psi
         - Southeast Pashai
+      southeast tasmanian: 
+        - xpf
+        - Southeast Tasmanian
       southeastern dinka: 
         - dks
         - Southeastern Dinka
@@ -39810,6 +39836,9 @@ language:
       southern pastaza quechua: 
         - qup
         - Southern Pastaza Quechua
+      southern ping chinese: 
+        - csp
+        - Southern Ping Chinese
       southern pomo: 
         - peq
         - Southern Pomo
@@ -39915,6 +39944,9 @@ language:
       southwestern tarahumara: 
         - twr
         - Southwestern Tarahumara
+      southwestern tasmanian: 
+        - xpx
+        - Southwestern Tasmanian
       southwestern tepehuan: 
         - tla
         - Southwestern Tepehuan
@@ -40587,9 +40619,6 @@ language:
       tanzanian sign language: 
         - tza
         - Tanzanian Sign Language
-      tapeba: 
-        - tbb
-        - Tapeba
       tapei: 
         - afp
         - Tapei
@@ -40635,9 +40664,6 @@ language:
       tase naga: 
         - nst
         - Tase Naga
-      tasmanian: 
-        - xtz
-        - Tasmanian
       tasmate: 
         - tmt
         - Tasmate
@@ -40725,9 +40751,6 @@ language:
       tay tac: 
         - tyt
         - Tay Tac
-      tayabas ayta: 
-        - ayy
-        - Tayabas Ayta
       tayart tamajeq: 
         - thz
         - Tayart Tamajeq
@@ -41793,9 +41816,6 @@ language:
       turkana: 
         - tuv
         - Turkana
-      turkic khalaj: 
-        - klj
-        - Turkic Khalaj
       turkic languages: 
         - trk
         - Turkic languages
@@ -42954,6 +42974,9 @@ language:
       wejewa: 
         - wew
         - Wejewa
+      welaun: 
+        - wlh
+        - Welaun
       weliki: 
         - klh
         - Weliki
@@ -44247,9 +44270,6 @@ language:
       zire: 
         - sih
         - Zire
-      ziriya: 
-        - zir
-        - Ziriya
       zizilivakan: 
         - ziz
         - Zizilivakan
@@ -46316,6 +46336,7 @@ langvar:
       pahawh3: Pahawh Hmong Third Stage Reduced orthography
       pahawh4: Pahawh Hmong Final Version orthography
       pamaka: Pamaka dialect
+      peano: Latino Sine Flexione
       petr1708: Petrine orthography
       pinyin: Pinyin romanization
       polyton: Polytonic Greek
@@ -46441,6 +46462,9 @@ langvar:
       late middle french (to 1606): 
         - 1606nict
         - Late Middle French (to 1606)
+      latino sine flexione: 
+        - peano
+        - Latino Sine Flexione
       limousin: 
         - lemosin
         - Limousin
@@ -46826,6 +46850,7 @@ script:
       Thai: Thai
       Tibt: Tibetan
       Tirh: Tirhuta
+      Toto: Toto
       Ugar: Ugaritic
       Vaii: Vai
       Visp: Visible Speech
@@ -47409,6 +47434,9 @@ script:
       tirhuta: 
         - Tirh
         - Tirhuta
+      toto: 
+        - Toto
+        - Toto
       ugaritic: 
         - Ugar
         - Ugaritic
@@ -47532,6 +47560,7 @@ script:
       291: Cirth
       292: Sarati
       293: Klingon (KLI pIqaD)
+      294: Toto
       300: Brahmi
       302: Siddham, Siddham, Siddhamatrka
       305: Kharoshthi
@@ -48208,6 +48237,9 @@ script:
       tirhuta: 
         - 326
         - Tirhuta
+      toto: 
+        - 294
+        - Toto
       ugaritic: 
         - '040'
         - Ugaritic

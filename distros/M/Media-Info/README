@@ -2,8 +2,8 @@ NAME
     Media::Info - Return information on media file/URL
 
 VERSION
-    This document describes version 0.130 of Media::Info (from Perl
-    distribution Media-Info), released on 2019-07-03.
+    This document describes version 0.132 of Media::Info (from Perl
+    distribution Media-Info), released on 2020-06-02.
 
 SYNOPSIS
      use Media::Info qw(get_media_info);
@@ -57,6 +57,15 @@ FUNCTIONS
         Note that not every backend can retrieve URL. At the time of this
         writing, only the Mplayer backend can.
 
+        Many fields will depend on the backend used. Common fields returned
+        include:
+
+        *   "backend": the "Media::Info::*" backend module used, e.g.
+            "Ffmpeg".
+
+        *   "type_from_name": either "image", "audio", "video", or
+            "unknown". This is determined from filename (extension).
+
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
@@ -83,7 +92,7 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    Video::Info - This module is first written because I couldn't install
+    Video::Info - "Media::Info" is first written because I couldn't install
     Video::Info. That module doesn't seem maintained (last release is in
     2003 at the time of this writing), plus I want a per-backend namespace
     organization instead of per-format one, and a simple functional
@@ -93,7 +102,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2016, 2015, 2014, 2013 by
+    This software is copyright (c) 2020, 2019, 2016, 2015, 2014, 2013 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

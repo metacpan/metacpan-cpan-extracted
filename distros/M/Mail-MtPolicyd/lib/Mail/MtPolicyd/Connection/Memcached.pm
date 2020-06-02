@@ -2,7 +2,7 @@ package Mail::MtPolicyd::Connection::Memcached;
 
 use Moose;
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 # ABSTRACT: a memcached connection plugin for mtpolicyd
 
 extends 'Mail::MtPolicyd::Connection';
@@ -65,7 +65,7 @@ Mail::MtPolicyd::Connection::Memcached - a memcached connection plugin for mtpol
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 SYNOPSIS
 

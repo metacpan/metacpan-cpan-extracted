@@ -12,7 +12,7 @@ Quickstart:
   - copy this to bin/<yournewcliname.pl> 
   - create 'share/' dir
   - create 'share/cli-driver.yml' file (you can use the cli-driver.yml example
-    included with this distro
+    included with this distro)
   - find the TODO(s) in this file and update those section(s) appropriately
   
   - Dist::Zilla users:
@@ -91,10 +91,8 @@ sub get_cli_driver_path {
 	}
 
 	#
-	# try the installed location
+	# try the File::ShareDir install location
 	#
-
-	# TODO
 	my $file = dist_file( DIST_NAME(), CLI_DRIVER_FILE());
 
 	return dirname $file;

@@ -1,7 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
-use Test::More tests => 7;
+use warnings;
+
+use Test::More;
 
 use Socket::Packet;
 
@@ -13,3 +15,5 @@ ok( defined PACKET_BROADCAST, 'PACKET_BROADCAST defined' );
 ok( defined PACKET_MULTICAST, 'PACKET_MULTICAST defined' );
 ok( defined PACKET_OTHERHOST, 'PACKET_OTHERHOST defined' );
 ok( defined PACKET_OUTGOING,  'PACKET_OUTGOING defined' );
+
+done_testing;

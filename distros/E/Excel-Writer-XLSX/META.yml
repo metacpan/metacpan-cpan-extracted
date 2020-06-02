@@ -26,4 +26,4 @@ resources:
   bugtracker: http://github.com/jmcnamara/excel-writer-xlsx/issues
   homepage: http://jmcnamara.github.com/excel-writer-xlsx/
   repository: http://github.com/jmcnamara/excel-writer-xlsx
-version: '1.03'
+version: '1.04'

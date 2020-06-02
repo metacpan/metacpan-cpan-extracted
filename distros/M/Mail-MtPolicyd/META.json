@@ -4,7 +4,7 @@
       "Markus Benning <ich@markusbenning.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "gpl_2"
    ],
@@ -46,6 +46,8 @@
             "Dist::Zilla::Plugin::Prereqs" : "0",
             "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
             "Dist::Zilla::Plugin::PruneFiles" : "0",
+            "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0",
+            "Dist::Zilla::Plugin::ReadmeFromPod" : "0",
             "Dist::Zilla::Plugin::Template::Tiny" : "0",
             "Dist::Zilla::Plugin::Test::Perl::Critic" : "0",
             "Dist::Zilla::Plugin::TravisYML" : "0",
@@ -123,267 +125,267 @@
    "provides" : {
       "Mail::MtPolicyd" : {
          "file" : "lib/Mail/MtPolicyd.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::AddressList" : {
          "file" : "lib/Mail/MtPolicyd/AddressList.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Client" : {
          "file" : "lib/Mail/MtPolicyd/Client.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Client::App" : {
          "file" : "lib/Mail/MtPolicyd/Client/App.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Client::Request" : {
          "file" : "lib/Mail/MtPolicyd/Client/Request.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Client::Response" : {
          "file" : "lib/Mail/MtPolicyd/Client/Response.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Connection" : {
          "file" : "lib/Mail/MtPolicyd/Connection.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Connection::Ldap" : {
          "file" : "lib/Mail/MtPolicyd/Connection/Ldap.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Connection::Memcached" : {
          "file" : "lib/Mail/MtPolicyd/Connection/Memcached.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Connection::Redis" : {
          "file" : "lib/Mail/MtPolicyd/Connection/Redis.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Connection::Sql" : {
          "file" : "lib/Mail/MtPolicyd/Connection/Sql.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::ConnectionPool" : {
          "file" : "lib/Mail/MtPolicyd/ConnectionPool.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin" : {
          "file" : "lib/Mail/MtPolicyd/Plugin.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::Accounting" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/Accounting.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::Action" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/Action.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::AddScoreHeader" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/AddScoreHeader.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::ClearFields" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/ClearFields.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::Condition" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/Condition.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::CtIpRep" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/CtIpRep.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::DBL" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/DBL.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::Eval" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/Eval.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::Fail2Ban" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/Fail2Ban.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::GeoIPAction" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/GeoIPAction.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::GeoIPLookup" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/GeoIPLookup.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::Greylist" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/Greylist.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::Greylist::AWL::Base" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/Greylist/AWL/Base.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::Greylist::AWL::Redis" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/Greylist/AWL/Redis.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::Greylist::AWL::Sql" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/Greylist/AWL/Sql.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::Greylist::Ticket::Base" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/Greylist/Ticket/Base.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::Greylist::Ticket::Memcached" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/Greylist/Ticket/Memcached.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::Greylist::Ticket::Redis" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/Greylist/Ticket/Redis.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::Honeypot" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/Honeypot.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::LdapUserConfig" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/LdapUserConfig.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::PostfixMap" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/PostfixMap.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::Proxy" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/Proxy.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::Quota" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/Quota.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::RBL" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/RBL.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::RBLAction" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/RBLAction.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::RegexList" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/RegexList.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::Result" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/Result.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::Role::ConfigurableFields" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/Role/ConfigurableFields.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::Role::PluginChain" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/Role/PluginChain.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::Role::Scoring" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/Role/Scoring.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::Role::SqlUtils" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/Role/SqlUtils.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::Role::UserConfig" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/Role/UserConfig.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::SMTPVerify" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/SMTPVerify.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::SPF" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/SPF.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::SaAwlAction" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/SaAwlAction.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::SaAwlLookup" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/SaAwlLookup.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::ScoreAction" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/ScoreAction.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::SetField" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/SetField.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::SqlList" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/SqlList.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::SqlUserConfig" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/SqlUserConfig.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Plugin::Stress" : {
          "file" : "lib/Mail/MtPolicyd/Plugin/Stress.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::PluginChain" : {
          "file" : "lib/Mail/MtPolicyd/PluginChain.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Profiler" : {
          "file" : "lib/Mail/MtPolicyd/Profiler.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Profiler::Timer" : {
          "file" : "lib/Mail/MtPolicyd/Profiler/Timer.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Request" : {
          "file" : "lib/Mail/MtPolicyd/Request.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Result" : {
          "file" : "lib/Mail/MtPolicyd/Result.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::Role::Connection" : {
          "file" : "lib/Mail/MtPolicyd/Role/Connection.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::SessionCache" : {
          "file" : "lib/Mail/MtPolicyd/SessionCache.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::SessionCache::Base" : {
          "file" : "lib/Mail/MtPolicyd/SessionCache/Base.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::SessionCache::Memcached" : {
          "file" : "lib/Mail/MtPolicyd/SessionCache/Memcached.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::SessionCache::None" : {
          "file" : "lib/Mail/MtPolicyd/SessionCache/None.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::SessionCache::Redis" : {
          "file" : "lib/Mail/MtPolicyd/SessionCache/Redis.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Mail::MtPolicyd::VirtualHost" : {
          "file" : "lib/Mail/MtPolicyd/VirtualHost.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       }
    },
    "release_status" : "stable",
@@ -398,8 +400,9 @@
          "web" : "https://github.com/benningm/mtpolicyd.git"
       }
    },
-   "version" : "2.03",
+   "version" : "2.04",
    "x_generated_by_perl" : "v5.24.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "GPL-2.0-only"
 }
 

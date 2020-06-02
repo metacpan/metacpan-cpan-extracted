@@ -17,6 +17,7 @@ subtest 'get_currencies' => sub {
         is $result, D(), "Result is defined because we encounter no errors";
         is $result, bag {
             all_items hash {
+                field 'currency', match(qr/[A-Z]+/);
                 field 'zh_currency_name', D();
                 field 'en_currency_name', D();
                 field 'buy_at', D();

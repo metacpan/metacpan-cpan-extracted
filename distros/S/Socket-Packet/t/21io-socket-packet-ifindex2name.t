@@ -1,6 +1,8 @@
 #!/usr/bin/perl
 
 use strict;
+use warnings;
+
 use Test::More;
 
 use IO::Socket::Packet;
@@ -22,8 +24,8 @@ foreach ( 0 .. 255 ) {
 
 defined $ifindex or plan skip_all => "Cannot find an interface index<->name mapping to use";
 
-plan tests => 2;
-
 cmp_ok( length $ifname, '>', 0, 'length($ifname) > 0' );
 
 is( IO::Socket::Packet->ifname2index( $ifname ), $ifindex, "ifname2index($ifname) is $ifindex" );
+
+done_testing;

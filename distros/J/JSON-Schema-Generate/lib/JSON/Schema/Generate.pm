@@ -5,11 +5,11 @@ use strict;
 use warnings;
 use Tie::IxHash;
 
-our $VERSION = '0.03';
-use Types::Standard qw/Str HashRef/;
+our $VERSION = '0.05';
+use Types::Standard qw/Str HashRef Bool/;
 use Compiled::Params::OO qw/cpo/;
 use JSON;
-
+use Blessed::Merge;
 our ($validate, $JSON);
 BEGIN {
 	$validate = cpo(
@@ -41,6 +41,18 @@ BEGIN {
 			spec => {
 				type => HashRef,
 				default => sub { { } }
+			},
+			merge_examples => {
+				type => Bool,
+				default => sub { !!0 }
+			},
+			none_required => {
+				type => Bool,
+				default => sub { !!0 }
+			},
+			no_id => {
+				type => Bool,
+				default => sub { !!0 }
 			}
 		}
 	);
@@ -52,11 +64,18 @@ sub new {
 	my $args = $validate->new->(@_);
 	my $self = bless {}, $class;
 	$self->{schema} = _tie_hash();
-	$self->{schema}{'$schema'} = $args->schema;
+	#$self->{schema}{'$schema'} = $args->schema;
 	$self->{schema}{'$id'} = $args->id;
 	$self->{schema}{title} = $args->title;
 	$self->{schema}{description} = $args->description;
-	$self->{spec} = $args->spec;
+	$self->{$_} = $args->$_ for qw/spec merge_examples none_required no_id/;
+	if ($args->merge_examples) {
+		$self->{merge} = Blessed::Merge->new(
+			blessed => 0,
+			unique_array => 1,
+			unique_hash => 1
+		);
+	}
 	return $self;
 }
 
@@ -68,9 +87,9 @@ sub learn {
 }
 
 sub generate {
-	my ($self) = @_;
-	$self->_handle_required($self->{schema});
-	return $JSON->encode($_[0]->{schema});
+	my ($self, $struct) = @_;
+	$self->_handle_required($self->{schema}) unless $self->{none_required};
+	return $struct ? $self->{schema} : $JSON->encode($self->{schema});
 }
 
 sub _handle_required {
@@ -101,17 +120,20 @@ sub _build_props {
 		$self->_unique_examples($props, $data);
 		return if ref $props->{type};
 		if (!$props->{properties}) {
-			$props->{required} = {};
+			$props->{required} = {} unless $self->{none_required};
 			$props->{properties} = _tie_hash();
 		}
 		for my $key (sort keys %{$data}) {
-			$props->{required}->{$key}++;
+			$props->{required}->{$key}++ unless $self->{none_required};
 			my $id = $path . '/properties/' . $key;
 			unless ($props->{properties}{$key}) {
 				$props->{properties}{$key} = _tie_hash();
-				$props->{properties}{$key}{'$id'} = $id;
-				$props->{properties}{$key}{title} = $self->{spec}{$key}{title} || 'The ' . ucfirst($key) . ' Schema';
-				$props->{properties}{$key}{description} = $self->{spec}{$key}{description} || 'An explanation about the purpose of this instance.';
+				%{$props->{properties}{$key}} = (
+					($self->{no_id} ? () : ('$id' => $id)),
+					title => 'The title',
+					description => 'An explanation about the purpose of this instance',
+					($self->{spec}->{$key} ? %{$self->{spec}->{$key}} : ())
+				);
 			}
 			$self->_build_props($props->{properties}{$key}, $data->{$key}, $id);
 		}
@@ -120,7 +142,7 @@ sub _build_props {
 		my $id = $path . '/items';
 		unless ($props->{items}) {
 			$props->{items} = _tie_hash();
-			$props->{items}{'$id'} = $id;
+			$props->{items}{'$id'} = $id unless $self->{no_id};
 			$props->{items}{title} = 'The Items Schema';
 			$props->{items}{description} = 'An explanation about the purpose of this instance.';
 		}
@@ -162,15 +184,20 @@ sub _add_type {
 		$props->{type} = $type;
 	} elsif ($props->{type} ne $type) {
 		$props->{type} = [ $props->{type} ] unless ref $props->{type};
-		push @{$props->{type}}, $type;
+		push @{$props->{type}}, $type unless grep { $type eq $_ } @{$props->{type}};
 	}
 }
 
 sub _unique_examples {
 	my ($self, $props, @examples) = @_;
 	for my $example (@examples) {
-		unless (grep { $_ eq $example } @{$props->{examples}}) {
-			push @{$props->{examples}}, $example;
+		use Data::Dumper;
+		if ((ref($example) || 'SCALAR') ne 'SCALAR' && $props->{examples} && $self->{merge_examples}) {
+			$props->{examples}->[0] = $self->{merge}->merge($props->{examples}->[0], $example);
+		} else {
+			unless (grep { ($_//"") eq ($example//"") } @{$props->{examples}}) {
+				push @{$props->{examples}}, $example;
+			}
 		}
 	}
 }
@@ -185,7 +212,7 @@ JSON::Schema::Generate - Generate JSON Schemas from data!
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =cut
 
@@ -223,6 +250,18 @@ Version 0.03
 	use JSON::Schema;
 	my $validator = JSON::Schema->new($schema);
 	my $result = $validator->validate($data);
+
+	...
+
+	my $schema = JSON::Schema::Generate->new(
+		no_id => 1
+	)->learn($data)->generate(1);
+
+	use JSON::Schema::Draft201909;
+
+	my $validator = JSON::Schema::Draft201909->new;
+	my $result = $validator->evaluate_json_string($data, $schema);
+
 
 =head1 DESCRIPTION
 
@@ -262,12 +301,23 @@ The root schema version. default: 'http://json-schema.org/draft-07/schema#'
 
 A mapping hash reference that represent a key inside of the passed data and a value that contains additional metadata to be added to the schema. default: {}
 
+=item merge_examples
+
+Merge all learn data examples into a single example. default: false
+
+=item none_required
+
+Do not analyse required keys in properties. default: false.
+
+=item no_id
+
+Do not add $id(s) to properties and items. default: false. 
+
 =back
 
 =head2 learn
 
-Accepts a JSON string, Hashref or ArrayRef that it will traverse to build a valid JSON schema. Learn can be chained allowing you to build a 
-schema from multiple data sources.
+Accepts a JSON string, Hashref or ArrayRef that it will traverse to build a valid JSON schema. Learn can be chained allowing you to build a schema from multiple data sources.
 
 	$schema->learn($data1)->learn($data2)->learn($data3);
 
@@ -275,9 +325,13 @@ schema from multiple data sources.
 
 =head2 generate
 
-Compiles the learned data and generates the final JSON schema.
+Compiles the learned data and generates the final JSON schema in JSON format.
 
 	$schema->generate();
+
+Optionally you can pass a boolean (true value) which will return the schema as a perl struct.
+
+	$schema->generate(1)
 
 =cut
 

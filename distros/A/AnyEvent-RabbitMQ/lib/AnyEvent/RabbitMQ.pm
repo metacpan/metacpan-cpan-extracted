@@ -32,7 +32,7 @@ use AnyEvent::RabbitMQ::LocalQueue;
 
 use namespace::clean;
 
-our $VERSION = '1.20';
+our $VERSION = '1.21';
 
 use constant {
     _ST_CLOSED => 0,
@@ -44,7 +44,7 @@ use constant {
 Readonly my $DEFAULT_AMQP_SPEC
     => File::ShareDir::dist_dir("AnyEvent-RabbitMQ") . '/fixed_amqp0-9-1.xml';
 
-Readonly my $DEFAULT_CHANNEL_MAX => 2**16;
+Readonly my $DEFAULT_CHANNEL_MAX => 2**16-1;
 
 sub new {
     my $class = shift;

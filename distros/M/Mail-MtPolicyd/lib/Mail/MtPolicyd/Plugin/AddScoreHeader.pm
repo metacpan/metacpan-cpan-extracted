@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::AddScoreHeader;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 # ABSTRACT: mtpolicyd plugin for adding the score as header to the mail
 
 extends 'Mail::MtPolicyd::Plugin';
@@ -61,7 +61,7 @@ Mail::MtPolicyd::Plugin::AddScoreHeader - mtpolicyd plugin for adding the score 
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 DESCRIPTION
 

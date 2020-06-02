@@ -4,13 +4,13 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4202",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Socket-Packet",
    "prereqs" : {
@@ -18,33 +18,35 @@
          "requires" : {
             "ExtUtils::CBuilder" : "0",
             "ExtUtils::CChecker" : "0",
-            "IO::Socket::INET" : "0",
-            "Module::Build" : "0",
-            "Module::Build::Compat" : "0",
-            "Test::More" : "0"
+            "Module::Build" : "0.4004"
          }
       },
       "configure" : {
          "requires" : {
             "ExtUtils::CChecker" : "0.04",
-            "Module::Build" : "0",
-            "Module::Build::Compat" : "0"
+            "Module::Build" : "0.4004"
          }
       },
       "runtime" : {
          "requires" : {
             "Exporter" : "5.57"
          }
+      },
+      "test" : {
+         "requires" : {
+            "IO::Socket::INET" : "0",
+            "Test::More" : "0.88"
+         }
       }
    },
    "provides" : {
       "IO::Socket::Packet" : {
          "file" : "lib/IO/Socket/Packet.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Socket::Packet" : {
          "file" : "lib/Socket/Packet.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -53,5 +55,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.10"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

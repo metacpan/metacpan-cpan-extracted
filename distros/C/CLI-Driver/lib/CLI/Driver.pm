@@ -10,7 +10,7 @@ use CLI::Driver::Action;
 
 with 'CLI::Driver::CommonRole';
 
-our $VERSION = 0.51;
+our $VERSION = 0.63;
 
 =head1 NAME
 
@@ -34,9 +34,10 @@ This is a module to drive your cli tool from a yaml config file.
         $Driver->fatal("failed to find action in config file");
     }
 
-	### cli-driver.yml example
-	
-	do-something:
+    ### cli-driver.yml example
+    
+    do-something:
+      desc: "Action description"
       class:
         name: My::App
         attr:
@@ -45,6 +46,7 @@ This is a module to drive your cli tool from a yaml config file.
               f: foo
             soft:
               h: home
+              a: '@array_arg'
           optional:
           flags:
             dry-run: dry_run_flag
@@ -56,6 +58,11 @@ This is a module to drive your cli tool from a yaml config file.
             soft:
           optional:
           flags:
+      help:
+        args:
+          f: "Additional help info for argument 'f'"
+        examples:
+          - "-f foo -a val1 -a val2 --dry-run"
 =cut
 
 ##############################################################################
@@ -74,15 +81,15 @@ use constant DEFAULT_CLI_DRIVER_FILE => 'cli-driver.yml';
 ##############################################################################
 
 has path => (
-	is      => 'rw',
-	isa     => 'Str',
+    is      => 'rw',
+    isa     => 'Str',
 );
 
 has file => (
-	is      => 'ro',
-	isa     => 'Str',
-	lazy    => 1,
-	builder => '_build_file'
+    is      => 'ro',
+    isa     => 'Str',
+    lazy    => 1,
+    builder => '_build_file'
 );
 
 ##############################################################################
@@ -90,10 +97,10 @@ has file => (
 ##############################################################################
 
 has actions => (
-	is      => 'rw',
-	isa     => 'ArrayRef[CLI::Driver::Action]',
-	lazy    => 1,
-	builder => '_build_actions',
+    is      => 'rw',
+    isa     => 'ArrayRef[CLI::Driver::Action]',
+    lazy    => 1,
+    builder => '_build_actions',
 );
 
 ##############################################################################
@@ -101,9 +108,9 @@ has actions => (
 ##############################################################################
 
 has _orig_argv => (
-	is => 'rw',
-	isa => 'ArrayRef',
-	default => sub {[ @ARGV ]}
+    is => 'rw',
+    isa => 'ArrayRef',
+    default => sub {[ @ARGV ]}
 );
 
 ##############################################################################
@@ -112,32 +119,32 @@ has _orig_argv => (
 
 method get_action (Str :$name!) {
 
-	my $actions = $self->get_actions;
+    my $actions = $self->get_actions;
 
-	foreach my $action (@$actions) {
-		if ( $action->name eq $name ) {
-			return $action;
-		}
-	}
+    foreach my $action (@$actions) {
+        if ( $action->name eq $name ) {
+            return $action;
+        }
+    }
 }
 
 method get_actions (Bool :$want_hashref = 0) {
 
-	my @ret = @{ $self->actions };
+    my @ret = @{ $self->actions };
 
-	if ($want_hashref) {
+    if ($want_hashref) {
 
-		my %actions;
-		foreach my $action (@ret) {
-			my $name = $action->name;
-			next if $name =~ /dummy/i;
-			$actions{$name} = $action;
-		}
+        my %actions;
+        foreach my $action (@ret) {
+            my $name = $action->name;
+            next if $name =~ /dummy/i;
+            $actions{$name} = $action;
+        }
 
-		return \%actions;
-	}
+        return \%actions;
+    }
 
-	return \@ret;
+    return \@ret;
 }
 
 ##############################################################################
@@ -146,63 +153,63 @@ method get_actions (Bool :$want_hashref = 0) {
 
 method _find_file {
 
-	my @path;
-	if ($self->path) {
-		push @path, split(/:/, $self->path);
-	}
-	
-	push @path, DEFAULT_CLI_DRIVER_PATH;
+    my @path;
+    if ($self->path) {
+        push @path, split(/:/, $self->path);
+    }
+    
+    push @path, DEFAULT_CLI_DRIVER_PATH;
 
-	foreach my $path (@path) {
-		my $fullpath = sprintf "%s/%s", $path, $self->file;
-		if ( -f $fullpath ) {
-			return $fullpath;
-		}
-	}
+    foreach my $path (@path) {
+        my $fullpath = sprintf "%s/%s", $path, $self->file;
+        if ( -f $fullpath ) {
+            return $fullpath;
+        }
+    }
 
-	my $msg = sprintf "unable to find %s in: %s", $self->file,
-	  join( ', ', @path );
-	confess $msg;
+    my $msg = sprintf "unable to find %s in: %s", $self->file,
+      join( ', ', @path );
+    confess $msg;
 }
 
 method _build_actions {
 
-	my @actions;
+    my @actions;
 
-	my $driver_file = $self->_find_file;
-	my $actions = $self->_parse_yaml( path => $driver_file );
+    my $driver_file = $self->_find_file;
+    my $actions = $self->_parse_yaml( path => $driver_file );
 
-	foreach my $action_name ( keys %$actions ) {
+    foreach my $action_name ( keys %$actions ) {
 
-		my $action = CLI::Driver::Action->new( name => $action_name );
-		my $success = $action->parse( href => $actions->{$action_name} );
-		if ($success) {
-			push @actions, $action;
-		}
-	}
+        my $action = CLI::Driver::Action->new( name => $action_name );
+        my $success = $action->parse( href => $actions->{$action_name} );
+        if ($success) {
+            push @actions, $action;
+        }
+    }
 
-	return \@actions;
+    return \@actions;
 }
 
 method _parse_yaml (Str :$path!) {
 
-	my $actions;
-	eval {
-		my $yaml = YAML::Tiny->read($path);
-		$actions = $yaml->[0];
-	};
-	confess $@ if $@;
+    my $actions;
+    eval {
+        my $yaml = YAML::Tiny->read($path);
+        $actions = $yaml->[0];
+    };
+    confess $@ if $@;
 
-	return $actions;
+    return $actions;
 }
 
 method _build_file {
 
-	if ( $ENV{CLI_DRIVER_FILE} ) {
-		return $ENV{CLI_DRIVER_FILE};
-	}
+    if ( $ENV{CLI_DRIVER_FILE} ) {
+        return $ENV{CLI_DRIVER_FILE};
+    }
 
-	return DEFAULT_CLI_DRIVER_FILE;
+    return DEFAULT_CLI_DRIVER_FILE;
 }
 
 1;

@@ -13,6 +13,7 @@
 #include <net/ethernet.h>
 #include <linux/if.h>
 #include <linux/if_packet.h>
+#include <linux/sockios.h>
 
 /* Borrowed from IO/Sockatmark.xs */
 

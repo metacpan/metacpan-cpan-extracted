@@ -1,0 +1,156 @@
+NAME
+
+    Mojolicious::Plugin::ReplyTable - Easily render rectangular data in
+    many formats using Mojolicious
+
+SYNOPSIS
+
+      use Mojolicious::Lite;
+      plugin 'ReplyTable';
+    
+      any '/table' => sub {
+        my $c = shift;
+        my $data = [
+          [qw/a b c d/],
+          [qw/e f g h/],
+        ];
+        $c->reply->table($data);
+      };
+    
+      app->start;
+
+DESCRIPTION
+
+    Mojolicious::Plugin::ReplyTable adds the reply->table helper which can
+    render a table of data in one of several user-selected formats. The
+    format is selected by the client via the usual Mojolicious Content
+    Negotiation mechanisms.
+
+    Loading the plugin also sets up several MIME types (using
+    Mojolicious::Types, see "types" in Mojolicious), and appends the module
+    to the list of rendering classes (See "renderer" in Mojolicious).
+
+HELPERS
+
+ reply->table
+
+      $c->reply->table([[...], [...], ... ]]);
+      $c->reply->table($default => $data, html => sub { ... });
+
+    Renders an arrayref of arrayrefs (the inner arrayref being a row) in
+    one of several formats listed below. An optional leading argument is
+    used as the default format when one is not otherwise requested.
+    Optional trailing key-value pairs are merged into the arguments to
+    "respond_to" in Mojolicious::Controller.
+
+    Any additional options, particularly those governing formatting
+    details, are via stash keys prefixed by reply_table.. Note that the
+    prefix reply_table.private. is reserved for internal use.
+
+    The formats currently include:
+
+  csv
+
+    Implemented via Text::CSV using the default values with binary enabled.
+    To override these defaults set the stash key reply_table.csv_options to
+    a hashref containing attributes to pass to Text::CSV. For example, to
+    create a PSV (pipe delimited) file:
+
+      $c->stash('reply_table.csv_options' => { sep_char => "|" });
+
+    See "new" in Text::CSV for available options.
+
+  html
+
+    Implemented via the standard Mojolicious rendering functionality and a
+    template named reply_table. Setting the stash key
+    reply_table.header_row to a true value will cause the default template
+    to use the first row as header values. This default template may be
+    overloaded to change the formatting, the table is available to the
+    template via the stash key reply_table.table.
+
+  json
+
+    Implemented via the standard Mojo::JSON handling.
+
+  txt
+
+    A textual representation of the table. This format is intended for
+    human consumption and the specific formatting should not be relied
+    upon.
+
+    If Text::Table::Tiny is available, it will be used to format the data
+    (can be overridden with reply_table.tablify). It can be controlled via
+    the stash keys reply_table.header_row and reply_table.separate_rows as
+    noted in that module's documentation. Otherwise it is generated via
+    Mojo::Util::tablify.
+
+  xls
+
+    Binary Microsoft Excel format (for older editions of Excel), provided
+    by optional module Spreadsheet::WriteExcel. If that module is not
+    installed, the client will receive an error status 406.
+
+  xlsx
+
+    XML Microsoft Excel format (for newer editions of Excel), provided by
+    optional module Excel::Writer::XLSX. If that module is not installed,
+    the client will receive an error status 406.
+
+METHODS
+
+    This module inherits all the methods from Mojolicious::Plugin and
+    implements the following new ones
+
+ register
+
+    The typical mechanism of loading a Mojolicious::Plugin. No pass-in
+    options are currently available.
+
+FUTURE WORK
+
+    Beyond what is mentioned in the specifc formats above, the following
+    work is planned. If any of it tickles your fancy, pull-requests are
+    always welcome.
+
+      * Better tests for generated Excel documents.
+
+      * Exposing the formatters so that they can be used directly.
+
+      * Add additional formats, like OpenOffice/LibreOffice. If needed
+      these can be appended via additional handlers to the helper.
+
+SEE ALSO
+
+    Mojolicious
+
+    https://metacpan.org/pod/Mojolicious::Plugin::WriteExcel
+
+SOURCE REPOSITORY
+
+    http://github.com/jberger/Mojolicious-Plugin-ReplyTable
+
+SPECIAL THANKS
+
+    Pharmetika Software, http://pharmetika.com
+
+AUTHOR
+
+    Joel Berger, <joel.a.berger@gmail.com>
+
+CONTRIBUTORS
+
+      Nils Diewald (Akron)
+
+      Красимир Беров (kberov)
+
+      Ryan Perry
+
+      Ilya Chesnokov (ichesnokov)
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2015 by "AUTHOR" and "CONTRIBUTORS". This library is free
+    software; you can redistribute it and/or modify it under the same terms
+    as Perl itself.
+

@@ -306,7 +306,7 @@ sub select_header_content_type
     } elsif ($header[0] eq 'multipart/form-data') {
         return 'application/json';
     } else {
-        return join(',', @header);
+        return @header[0]
     }
   
 }
